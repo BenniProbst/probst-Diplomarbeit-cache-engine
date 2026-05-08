@@ -1,0 +1,34 @@
+=== PAPER: P33-VAMPIR-Berthold2023
+=== FILENAME: vampir-poster-spp2377-p1-kickoff.pdf
+=== PAGES: 1
+
+--- PAGE 1 ---
+VAMPIR
+Virtualized Non-Functional Memory 
+Properties for Data-Pipeline Scheduling
+Overall Project Structure and Project Members
+Data Pipelines
+→ Memory Optimization Potential and Requirements
+Project Details
+Phase 1 (Single-Query Pipeline Scheduling)
+▪ DB: Efficient algorithms for “heterogeneous memory 
+pipeline orderings” considering NFPs
+▪ OS: Abstractions for heterogeneous memories; 
+virtualization + compensation, transparent 
+migration/replacement
+Phase 2 (Multi-Query Pipeline Scheduling)
+▪ Global schedule + compensation plan
+▪ Negotiation at query compile time
+Current System Under Test (SUT)
+▪ Xeon Phi 7250
+▪ NUMA-Nodes
+▪ Heterogeneous
+Memory
+▪ DRAM
+▪ HBM
+Prof. Wolfgang Lehner (PI)
+Prof. Horst Schirmeier (PI)
+Prof. Dirk Habich (PI)
+André Berthold (RA)
+Lennart Schmidt (RA)
+

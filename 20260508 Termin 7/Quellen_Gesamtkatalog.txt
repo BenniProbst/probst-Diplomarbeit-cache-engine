@@ -1,0 +1,732 @@
+================================================================================
+DIPLOMARBEIT — Quellen-Gesamtkatalog
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Datenbankentwicklung / Suchalgorithmen · Prof. Dirk Habich
+Stand: 2026-05-04 (Termin 7) · REV4 nach Volltext-CSB+ + SOSP-VAMPIR-Suche
+
+================================================================================
+LEGENDE (REV2)
+================================================================================
+  [PDF]    Heruntergeladen unter ./Forschungsarbeiten/<filename>.pdf
+  [LINK]   Noch NICHT als PDF lokal vorhanden — manuell ueber SLUB nachladen
+  [HABICH] Von Prof. Habich zusaetzlich beigestellt
+  [TOOL]   Werkzeug-/Plattform-/Hersteller-Dokumentation
+  [REPO]   Quellcode-Repository
+
+GESAMTSTATUS (Stand REV4 — Volltext-CSB+ + SOSP-VAMPIR-Suche fertig):
+  Aus Termin 1-6 referenziert + Habich-Zusatz : 31 wissenschaftliche Quellen
+  Davon als PDF lokal vorhanden + verifiziert : 31  (100% — alle Pflicht-Quellen!)
+  Davon problematisch (Folien statt Paper)    :  0  (CSB+ jetzt VOLLTEXT)
+  Davon "im Band enthalten, suboptimal"       :  1  (Bender et al. 2002 = Springer LNCS)
+  VAMPIR Poster                              : Endgueltig (SPP2377 Kickoff)
+                                                (SOSP'23-Hauptband enthaelt KEIN VAMPIR)
+
+KATALOG-AUTORENFIXES diese Revision (5 Korrekturen):
+  - A1.10 B-Trees Are Back: Mueller/Benson/Leis (NICHT Leis/Haubenschild/Kemper/Neumann)
+  - A2.3  ART Sync: Leis/Scheibner/Kemper/Neumann (NICHT Leis/Haubenschild/Kemper/Neumann)
+  - A2.5  Wormhole: Wu/Ni/Jiang (Song JIANG, NICHT Jin)
+  - A2.7  B²-Tree: Schmeisser/Schuele/Leis/Neumann/Kemper (5 Autoren)
+  - A2.8  CoCo-trie: Boffa/Ferragina/Tosoni/Vinciguerra (NICHT Belazzougui — T1 hatte falsch attribuiert)
+
+DETAILS DER PROBLEMATISCHEN DOWNLOADS UND KORREKTUREN:
+  → siehe Diskrepanzbericht_Downloads.txt (REV3, Teile C, D)
+  → siehe pdf_verification.txt              (vollstaendige PDF-Inhaltstabelle)
+  → siehe SLUB_Download_Liste.md           (mit Haekchen + Korrekturen)
+
+ERSTQUELLE: woraus die Quelle eingefuehrt wurde
+  T1 .. T6 = Termin 1 .. Termin 6 (./20260330 Termin 1 etc.)
+  E       = Vor-Termin Expose-Phase (Hauptordner)
+  Habich  = Zusatzbeitrag Prof. Habich
+
+================================================================================
+TEIL A — DOMAENE: SUCH-ALGORITHMEN UND INDEXSTRUKTUREN
+================================================================================
+
+--------------------------------------------------------------------------------
+A.1  Klassische cache-aware B-Baum-/Array-Familie (passive Cache-Awareness)
+--------------------------------------------------------------------------------
+
+A1.1 [PDF]  Rao, J. & Ross, K. A. (1999):
+     "Cache Conscious Indexing for Decision-Support in Main Memory" (CSS-Tree)
+     Venue: VLDB 1999
+     PDF:   ./Forschungsarbeiten/Cache Conscious Indexing for Decision-Support in Main Memory.pdf
+     URL:   https://www.vldb.org/conf/1999/P7.pdf
+     Erstquelle: T1, T4, T5
+     Rolle: Pflichtabgrenzung (Pointerfreies Directory ueber sortiertem Array)
+
+A1.2 [PDF]  Rao, J. & Ross, K. A. (2000):
+     "Making B+-Trees Cache Conscious in Main Memory" (CSB+-Tree)
+     Venue: SIGMOD 2000
+     PDF:   ./Forschungsarbeiten/Making B+-Trees Cache Conscious in Main Memory.pdf
+     URL Volltext: https://www.cse.iitb.ac.in/infolab/Data/Courses/CS632/2006/Papers/cache-b-tree.pdf
+     Erstquelle: T1, T4, T5
+     Rolle: Pflichtabgrenzung (Siblings contiguous, 1 Child-Pointer + Offsets)
+
+A1.3 [PDF]  Graefe, G. & Larson, P.-A. (2001):
+     "B-tree Indexes and CPU Caches"
+     Venue: ICDE 2001 (17th IEEE Intl. Conf. on Data Engineering)
+     Affiliation: Microsoft (goetzg, palarson@microsoft.com)
+     PDF:   ./Forschungsarbeiten/B-tree Indexes and CPU Caches.pdf  ✓ NEU REV3
+     URL:   https://www.computer.org/csdl/proceedings-article/icde/2001/10010349/12OmNx6g6dr
+     Erstquelle: T5
+     Rolle: Technik-Katalog fuer CPU-Cache-Techniken in B-Baeumen
+
+A1.4 [PDF]  Hankins, R. A. & Patel, J. M. (2003):
+     "Effect of Node Size on the Performance of Cache-Conscious B+-Trees"
+     Venue: SIGMETRICS 2003
+     PDF:   ./Forschungsarbeiten/Effect of Node Size on the Performance ofCache-Conscious B+-trees.pdf
+     URL:   https://pages.cs.wisc.edu/~jignesh/publ/cci.pdf
+     Erstquelle: T4, T5
+     Rolle: Beleg gegen "64B = optimale Knotengroesse"; TLB/Hoehe-Tradeoff
+
+A1.5 [PDF]  Samuel, M., Pedersen, A. U. & Bonnet, P. (2005):
+     "Making CSB+-Tree Processor Conscious"
+     Venue: First International Workshop on Data Management on New Hardware
+            (DaMoN 2005), June 12, 2005, Baltimore MD, USA
+     Affiliation: University of Copenhagen, Universitetsparken 1, 2100 Kobenhavn
+     Autoren-Mails: mrml@diku.dk, aborq@diku.dk, bonnet@diku.dk
+     PDF (Volltext): ./Forschungsarbeiten/Making CSB+-Trees Processor Conscious - Paper.pdf
+                     ✓ NEU REV4 — vom Nutzer ueber KU Copenhagen Pure-Repository geladen
+     PDF (Folien zusaetzlich): ./Forschungsarbeiten/Making CSB+-Trees Processor Conscious.pdf
+     URL Volltext: https://pure.itu.dk/en/publications/making-csb-trees-processor-conscious/
+     URL ACM DL:   https://dl.acm.org/doi/10.1145/1114252.1114254
+     URL Folien:   http://www.cs.cmu.edu/~damon2005/damonpdf/2%20making%20csb+%20trees%20processor%20conscious.pdf
+     Erstquelle: T1, T5
+     Rolle: Plattformabhaengige Parametrisierung -> Methodik fuer Cache-Engine
+
+A1.6 [PDF*] Bender, M. A., Demaine, E. D. & Farach-Colton, M. (2002):
+     "Efficient Tree Layout in a Multilevel Memory Hierarchy" (Tree Layout, ESA 2002)
+     Venue: ESA 2002, Springer LNCS 2461
+     PDF:   ./Forschungsarbeiten/Tree Layout in Multilevel Memory (BenderDemaineFarach-Colton 2002).pdf
+            ⚠ Datei ist 10,3 MB — enthaelt den GANZEN LNCS-Band, nicht nur das Paper.
+              Verwendbar (Paper ist als Kapitel drin), aber suboptimal.
+     OPTIONAL ersetzen mit kompaktem Direkt-PDF:
+            https://erikdemaine.org/papers/TreeLayout_ESA2002/paper.pdf
+     Erstquelle: T4
+     Rolle: Theoretische Basis fuer probability-driven Layout-Optimierung
+
+A1.7 [PDF]  Bender, M. A., Demaine, E. D. & Farach-Colton, M. (2005):
+     "Cache-Oblivious B-Trees"
+     Venue: SIAM J. on Computing
+     PDF:   ./Forschungsarbeiten/CACHE-OBLIVIOUS B-TREES.pdf
+     URL:   https://nyuscholars.nyu.edu/en/publications/cache-oblivious-b-trees
+     Erstquelle: T5
+     Rolle: Konzeptioneller Gegenentwurf zu PRT-ART (cache-oblivious vs cache-aware)
+
+A1.8 [PDF]  Saikkonen, R. & Soisalon-Soininen, E. (2008):
+     "Cache-sensitive Memory Layout for **Binary Trees**"
+       (KORREKTUR REV2: Originaltitel ist "for Binary Trees", nicht "for Dynamic Trees"!)
+     Venue: IFIP TCS 2008
+     PDF:   ./Forschungsarbeiten/Cache-sensitive Memory Layout for Binary Trees.pdf
+     URL:   https://dl.ifip.org/db/conf/ifipTCS/ifipTCS2008/SaikkonenS08.pdf
+     Springer LNCS:
+            https://link.springer.com/chapter/10.1007/978-0-387-09680-3_17
+     Erstquelle: T4 (Termin-4-Hauptdokument Referenz [4][22][53])
+     Rolle: Multi-Level-Relocation, BFS-Block-Fuellung, TLB als Block-Ebene
+
+A1.9 [PDF]  Saikkonen, R. & Soisalon-Soininen (2016):
+     "Cache-Sensitive Memory Layout for Dynamic Binary Trees"
+     Venue: Computer Journal Oxford, Vol. 59 No. 5
+     PDF:   ./Forschungsarbeiten/Cache-Sensitive Memory Layout for Dynamic Binary Trees.pdf
+     URL:   https://academic.oup.com/comjnl/article-abstract/59/5/630/2568636
+     Erstquelle: T1, T5
+     Rolle: Layout-Invariante als Beschleunigungsweg, AVL/Red-Black-Trees,
+            26-32% Verbesserung bei Suche
+
+A1.10 [PDF] Mueller, M., Benson, L. & Leis, V. (2025):
+      "B-Trees Are Back: Engineering Fast and Pageable Node Layouts"
+      Venue: Proc. ACM Manag. Data 3, 1 (SIGMOD), Article 14, Feb 2025
+      Affiliation: Technical University of Munich
+      PDF:   ./Forschungsarbeiten/B-Trees Are Back - Engineering Fast and Pageable Node Layouts.pdf
+      URL:   https://www.cs.cit.tum.de/fileadmin/w00cfj/dis/papers/btrees-are-back.pdf
+      KORREKTUR REV3: Autoren waren falsch attribuiert (Leis/Haubenschild/...).
+                      Tatsaechliche Autoren laut Paper-Titelseite:
+                      Marcus Mueller, Lawrence Benson, Viktor Leis (alle TUM)
+      Erstquelle: T4
+      Rolle: Adaptive Layout-Strategie (Runtime), Fingerprinting, Hints
+
+--------------------------------------------------------------------------------
+A.2  Trie-basierte und trie-hybride Suchstrukturen
+--------------------------------------------------------------------------------
+
+A2.1 [PDF]  Mao, Y., Kohler, E. & Morris, R. T. (2012):
+     "Cache Craftiness for Fast Multicore Key-Value Storage" (Masstree)
+     Venue: EuroSys 2012
+     PDF:   ./Forschungsarbeiten/Cache Craftiness for Fast Multicore Key-Value Storage.pdf
+     URL:   https://pdos.csail.mit.edu/papers/masstree:eurosys12.pdf
+     Folie/HPTS: https://read.seas.harvard.edu/~kohler/notes/hpts13/
+     Erstquelle: T1, T4, T5
+     Rolle: Trie-of-B+-Trees, prefetchable nodes, Layer-/Fence-Regeln
+
+A2.2 [PDF]  Leis, V., Kemper, A. & Neumann, T. (2013):
+     "The Adaptive Radix Tree: ARTful Indexing for Main-Memory Databases" (ART)
+     Venue: ICDE 2013
+     PDF:   ./Forschungsarbeiten/The_adaptive_radix_tree_ARTful_indexing_for_main-memory_databases.pdf
+     URL:   https://www.db.in.tum.de/~leis/papers/ART.pdf
+     Erstquelle: T1, T4, T5
+     Rolle: Pflichtbaseline, Adaptive Node 4/16/48/256 + Pfadkompression
+
+A2.3 [PDF]  Leis, V., Scheibner, F., Kemper, A. & Neumann, T. (2016):
+     "The ART of Practical Synchronization" (Optimistic Lock Coupling)
+     Venue: DaMoN 2016
+     PDF:   ./Forschungsarbeiten/The ART of Practical Synchronization.pdf
+     URL:   https://db.in.tum.de/~leis/papers/artsync.pdf
+     KORREKTUR REV3: Co-Autor war falsch (Haubenschild → Scheibner)
+     Erstquelle: T4
+     Rolle: OLC/ROWEX als Synchronisationsmuster fuer ART-aehnliche Strukturen
+
+A2.4 [PDF]  Binna, R., Zangerle, E., Pichl, M., Specht, G. & Leis, V. (2018):
+     "HOT — A Height Optimized Trie Index for Main-Memory Database Systems"
+     Venue: SIGMOD 2018
+     PDF:   ./Forschungsarbeiten/HOT - A Height Optimized Trie Index for Main-MemoryDatabase Systems.pdf
+     URL:   https://15721.courses.cs.cmu.edu/spring2019/papers/08-oltpindexes2/p521-binna.pdf
+     Erstquelle: T1, T4, T5
+     Rolle: Pflichtbaseline, dynamische diskriminierende Bits, SIMD-Layouts
+
+A2.5 [PDF]  Wu, X., Ni, F. & Jiang, S. (2019):
+     "Wormhole: A Fast Ordered Index for In-Memory Data Management"
+     Venue: EuroSys 2019
+     Affiliation: U. Illinois Chicago + U. Texas Arlington
+     PDF:   ./Forschungsarbeiten/Wormhole - A Fast Ordered Index for In-memory DataManagement.pdf
+     URL:   https://wuxb45.github.io/papers/wormhole.pdf
+     KORREKTUR REV3: Co-Autor war falsch (Jin → JIANG, Song Jiang)
+     Erstquelle: T4
+     Rolle: Hash + Trie + B+-Tree-Hybrid, Anchor-Sprungmechanismus (Redirect-Vorbild)
+
+A2.6 [PDF]  Fent, P., Jungmair, M., Kipf, A. & Neumann, T. (2020):
+     "START — Self-Tuning Adaptive Radix Tree"
+     Venue: ICDEW 2020
+     Affiliation: Technische Universitaet Muenchen
+     PDF:   ./Forschungsarbeiten/START– Self-Tuning Adaptive Radix Tree.pdf  ✓ NEU REV3
+     URL:   https://conferences.computer.org/icde/2020/pdfs/ICDEW2020-56MW9gWd2XRGOkRROeeZ2s/426600a147/426600a147.pdf
+     TUM Volltext: https://db.in.tum.de/~fent/papers/Self%20Tuning%20Art.pdf
+     Code GitHub:  https://github.com/jungmair/START
+     Erstquelle: T1, T4, T5
+     Rolle: Direktester Nachbar, hardwarekalibriertes Kostenmodell + Optimierer
+
+A2.7 [PDF]  Schmeisser, J., Schuele, M. E., Leis, V., Neumann, T. & Kemper, A. (2022):
+     "B²-Tree: Page-Based String Indexing in Concurrent Environments"
+     Venue: Datenbank Spektrum 22:11–22 (BTW 2022)
+     DOI:   10.1007/s13222-022-00409-y
+     PDF:   ./Forschungsarbeiten/B2-Tree - Page-Based String Indexing in Concurrent Environments.pdf
+     URL:   https://open.fau.de/handle/openfau/33203
+     KORREKTUR REV3: Vollstaendige Autorenliste ist 5 Personen, nicht 4
+                     (Schmeisser/Schuele/Leis/Neumann/Kemper, NICHT Schmeisser/Renen/Leis/Neumann)
+     Erstquelle: T1, T4, T5
+     Rolle: Eingebetteter Trie pro Page, page-lokale Suchraum-Einengung
+
+A2.8 [PDF]  Boffa, A., Ferragina, P., Tosoni, F. & Vinciguerra, G. (2024):
+     "CoCo-Trie: Data-Aware Compression and Indexing of Strings"
+     Venue: Information Systems 120, 102316 (2024)
+     Affiliation: University of Pisa, Italy
+     PDF:   ./Forschungsarbeiten/CoCo-trie - Data-aware compressionandindexingofstrings.pdf
+     URL:   https://www.sciencedirect.com/science/article/pii/S0306437923001527
+     URL Vorab: https://www.boffa.top/files/SPIRE.pdf
+     ANMERKUNG: Termin-1-Dokument [L9] hatte CoCo-trie faelschlich als
+                "Belazzougui et al. (2023)" attribuiert — TERMIN-FEHLER, keine
+                eigene Korrektur in unserem Katalog noetig.
+     Erstquelle: T1, T4, T5
+     Rolle: Datenabhaengige Subtrie-Kollabierung in Macro-Nodes (Redirect-Vorbild)
+
+A2.9 [HABICH][PDF] Jacobson, G. (1989):
+     "Space-efficient Static Trees and Graphs"
+     Venue: FOCS 1989, IEEE CH2806-8/89
+     PDF:   ./Forschungsarbeiten/Space-efficient_static_trees_and_graphs.pdf
+     SLUB-Provenienz: IEEE Xplore via SLUB Dresden, 2026-05-02
+     Erstquelle: Habich (Zusatzbeitrag, NICHT in Termin 1-6 referenziert)
+     Rolle: Originalquelle LOUDS (Level-Ordered Unary Degree Sequence),
+            succinct Tree-Encoding mit ~2 Bit/Knoten + rank/select
+
+A2.10 [HABICH][PDF] Zhang, H., Lim, H., Leis, V., Andersen, D. G., Kaminsky, M.,
+      Keeton, K. & Pavlo, A. (2018):
+      "SuRF: Practical Range Query Filtering with Fast Succinct Tries"
+      Venue: SIGMOD 2018, Houston TX
+      DOI:   10.1145/3183713.3196931
+      PDF:   ./Forschungsarbeiten/SuRF Practical Range Query Filtering with Fast Succinct Tries.pdf
+             (urspruenglich 3183713.3196931.pdf — vom Nutzer umbenannt)
+      Erstquelle: Habich (Zusatzbeitrag, NICHT in Termin 1-6 referenziert)
+      Rolle: Fast Succinct Trie (FST) + LOUDS-DS-Encoding,
+             Range-Query-Filterung mit ~10 Bit/Knoten
+
+--------------------------------------------------------------------------------
+A.3  Habich-/Dresden-Linie (TU Dresden Hardware-orientierte DB-Forschung)
+--------------------------------------------------------------------------------
+
+A3.1 [PDF]  Ungethuem, A. et al. (2017):
+     "Overview on Hardware Optimizations for Database Engines"
+     Venue: TUD/BTW 2017
+     PDF:   ./Forschungsarbeiten/Overview on Hardware Optimizations for Database Engines.pdf
+     URL:   https://fis.tu-dresden.de/portal/en/publications/overview-on-hardware-optimizations-for-database-engines%289be9c82c-5be7-4174-a5a2-4cc3d577fe75%29.html
+     Erstquelle: T1, T5
+     Rolle: TUD-Sprache fuer hardwarebewusste Optimierungen
+
+A3.2 [PDF]  Berthold, A., Schmidt, L. (RAs) + PIs Lehner, W., HABICH, D.
+            & Schirmeier, H. (2023):
+     "VAMPIR — Virtualized Non-Functional Memory Properties for Data-Pipeline Scheduling"
+     Venue: SPP2377 Phase-1-KICKOFF Poster (DFG SPP 2377)
+     PDF:   ./Forschungsarbeiten/vampir-poster-spp2377-p1-kickoff.pdf
+     SOSP'23-PROCEEDINGS-SUCHE (REV4): SOSP'23 Hauptband wurde durchsucht
+        (802 Seiten, ./Forschungsarbeiten/low priority/SOSP - October ...pdf)
+        VAMPIR-Poster ist NICHT im Hauptband enthalten — Posters wurden im
+        separaten SOSP'23 Companion publiziert. SOSP-Hauptband daher fuer uns
+        irrelevant; SPP2377-Kickoff-Poster ist die einzige aktuelle VAMPIR-Quelle.
+     INHALT verifiziert: Titel + Phase-1/2-Beschreibung + Current SUT
+                         (Xeon Phi 7250 mit DRAM/HBM)
+     TUD FIS Eintrag (SOSP'23-Snapshot, ergaenzend):
+        https://fis.tu-dresden.de/portal/de/publications/vampir--virtualized-nonfunctional-memory-properties-for-datapipeline-scheduling%281cd6ee64-f657-4f74-ab76-8d32ab8a0939%29.html
+     SPP 2377 Projekt: https://spp2377.uos.de/projects/
+     Erstquelle: T1, T5
+     Rolle: Virtualisierte nicht-funktionale Speicher-Eigenschaften
+     PROF.-BEZUG: Dirk HABICH ist Co-PI!
+
+A3.3 [PDF]  Schmidt, L. (TUD), Kuehn, R., Krause, M., Teubner, J. (alle TU Do),
+            Lehner, W. (TUD/AAU Aalborg) & HABICH, D. (TUD) (2025):
+     "To Stride or Not to Stride the Memory Access?"
+     Venue: TUD/TU Dortmund Kooperation 2025
+     PDF:   ./Forschungsarbeiten/To stride or not to stride the memory access.pdf
+     URL:   https://fis.tu-dresden.de/portal/en/publications/to-stride-or-not-to-stride-the-memory-access%28d5df1c1d-0e06-43cc-a6f7-a4f65a1093c0%29.html
+     KORREKTUR REV3: Vollstaendige Autorenliste extrahiert; Lehner+HABICH Co-Autoren
+     Erstquelle: T1, T5
+     Rolle: TUD Access-Pattern-Quelle
+
+================================================================================
+TEIL B — DOMAENE: CACHE-ENGINE / AKTIVES CACHE-MANAGEMENT
+================================================================================
+
+--------------------------------------------------------------------------------
+B.1  Software-Prefetching fuer Indexstrukturen
+--------------------------------------------------------------------------------
+
+B1.1 [PDF]  Chen, S., Gibbons, P. B. & Mowry, T. C. (2001):
+     "Improving Index Performance through Prefetching" (Prefetching B+-Trees)
+     Venue: SIGMOD 2001
+     PDF:   ./Forschungsarbeiten/Improving Index Performance through Prefetching.pdf
+     URL:   https://www.shimin-chen.com/papers/index_pf_final.pdf
+     Erstquelle: T4
+     Rolle: "Wider nodes" via Prefetch, Leaf-Pointer-Arrays fuer Range Scans
+
+B1.2 [PDF]  Chen, S., Gibbons, P. B., Mowry, T. C. & Valentin, G. (2002):
+     "Fractal Prefetching B+-Trees: Optimizing Both Cache and Disk Performance"
+     Venue: SIGMOD 2002 / 2003
+     PDF:   ./Forschungsarbeiten/Fractal Prefetching B+-Trees (Chen et al. 2002).pdf
+     URL:   https://sigmod.org/publications/discs/2003/out/p_fractalprefetchshpht.htm
+     Erstquelle: T5
+     Rolle: Disk- + cacheoptimierte Granularitaeten kombiniert
+
+B1.3 [PDF]  Khan, M. T. (2011):
+     "Dynamic Adaptation of Data Cache Prefetching"
+     Venue: The Computer Journal, Oxford 54(5)
+     PDF:   ./Forschungsarbeiten/Data Cache Prefetching With DynamicAdaptation.pdf
+     URL:   https://academic.oup.com/comjnl/article/54/5/815/543793
+     Erstquelle: T5
+     Rolle: Runtime-anpassbare Prefetch-Offsets durch dynamische Spezialisierung
+
+B1.4 [PDF]  Naderan-Tahan, M. & Sarbazi-Azad, H. (2016):
+     "Why Does Data Prefetching Not Work for Modern Workloads?"
+     Venue: Computer Journal Oxford (Online ePub Dec 2015, Print 2016)
+     DOI:   10.1093/comjnl/bxv112  (URL JETZT IDENTIFIZIERT, REV3)
+     Affiliation: Sharif Univ. of Technology + IPM, Tehran
+     PDF:   ./Forschungsarbeiten/WhyDoes Data Prefetching Not Work for Modern Workloads.pdf
+     URL:   https://academic.oup.com/comjnl/article/59/...
+     Erstquelle: T5 (nachgezogen)
+     Rolle: Gegenposition: Prefetching hilft nicht universell
+
+B1.5 [PDF]  Mahling, P., Weisgut, M. & Rabl, T. (2025):
+     "Fetch Me If You Can: Evaluating CPU Cache Prefetching and its
+      Reliability on High-Latency Memory"
+     Venue: DaMoN 2025 / BIFOLD Berlin
+     PDF:   ./Forschungsarbeiten/Fetch Me If You Can - Evaluating CPU Cache Prefetching and Its Reliability on High Latency Memory.pdf
+     URL:   https://hpi.de/oldsite/fileadmin/user_upload/fachgebiete/rabl/publications/2025/Mahling-DaMoN25-Prefetching.pdf
+     Erstquelle: T4, T5
+     Rolle: Prefetch-Erfolg haengt von Fill Buffers/Workload-Intensitaet ab
+
+B1.6 [PDF]  Zhang, Q., Song, H., Zhou, K., Wei, J. & Xiao, C. (2024):
+     "A prefetching indexing scheme for in-memory database systems"
+     Venue: Future Generation Computer Systems 156 (2024) 179-190
+     DOI:   10.1016/j.future.2024.03.012
+     PDF:   ./Forschungsarbeiten/Aprefetching indexingschemeforin-memorydatabasesystems.pdf
+     URL:   https://www.sciencedirect.com/science/article/pii/S0167739X24000840
+     Affiliation: ECNU (East China Normal University), Shanghai
+     Erstquelle: T4
+     Rolle: Read-Counter pro Block + evolvierende Hot Paths + Jump-Pointer-Queue
+
+B1.7 [PDF]  Zhang, T., Grot, B., He, W., Lv, Y., Qu, P., Su, F., Wang, W.,
+            Zhang, G., Zhang, X. & Zhang, Y. (2025):
+     "Hierarchical prefetching: A software-hardware instruction prefetcher
+      for server applications"
+     Venue: ASPLOS 2025, Rotterdam NL, 30/03/2025, vol. 2, pp. 529-544
+     DOI:   10.1145/3676641.3716260
+     PDF:   ./Forschungsarbeiten/ZhangEtalASPLOS2025HierarchicalPrefetching.pdf
+     URL:   https://www.pure.ed.ac.uk/ws/portalfiles/portal/521674398/ZhangEtalASPLOS2025HierarchicalPrefetching.pdf
+     KORREKTUR REV3: Voller Titel + komplette Autorenliste + DOI ergaenzt
+     Erstquelle: T4
+     Rolle: Moderne Prefetcher-Auswahl/Distanz Tradeoffs (Accuracy/Coverage)
+
+--------------------------------------------------------------------------------
+B.2  Adaptive Layout-Optimierung & Hot-Path-Modellierung
+--------------------------------------------------------------------------------
+
+B2.1 [PDF]  Kuehn, R., Biebert, D., Hakert, C., Chen, J.-J. & Teubner, J. (2023):
+     "Towards Data-Based Cache Optimization of B+-Trees"
+     Venue: DAMON 2023
+     Affiliation: TU Dortmund (DBIS-Group + DAES-Group, Kooperation)
+     PDF:   ./Forschungsarbeiten/Towards Data-Based Cache Optimization of B+-Trees.pdf
+     URL:   https://dbis.cs.tu-dortmund.de/storages/dbis-cs/r/papers/2023/cache-optimization/cache-optimization-damon-2023-submission.pdf
+     KORREKTUR REV3: Vollstaendige Autorenliste extrahiert
+     Erstquelle: T4
+     Rolle: Hot-Path-Histogramme, schliesst Runtime-Re-Layouting EXPLIZIT aus
+            -> direkte Forschungsluecke fuer PRT-ART
+
+--------------------------------------------------------------------------------
+B.3  Synchronisation und Memory Reclamation
+--------------------------------------------------------------------------------
+
+B3.1 [PDF]  McKenney, P. E., Appavoo, J., Kleen, A., Krieger, O., Russell, R.,
+            Sarma, D. & Soni, M. (2001):
+     "Read-Copy Update" (RCU)
+     Venue: Ottawa Linux Symposium 2001 (7-Autoren-Variante)
+     PDF:   ./Forschungsarbeiten/Read-Copy Update.pdf
+     URL:   https://www.kernel.org/doc/ols/2001/read-copy.pdf
+     ANMERKUNG: Originale RCU-Idee bei McKenney/Slingwine 1998 (PDCS).
+                Diese OLS-2001-Variante ist die kanonische zitierte Version.
+     Erstquelle: T4
+     Rolle: Grace-Period Mechanik fuer "publish/retire"
+
+B3.2 [PDF]  Michael, M. M. (2004):
+     "Hazard Pointers: Safe Memory Reclamation for Lock-Free Objects"
+     Venue: IEEE TPDS 2004
+     PDF:   ./Forschungsarbeiten/Hazard Pointers - Safe Memory Reclamation for Lock-Free Objects.pdf
+     URL:   https://www.cs.otago.ac.nz/cosc440/readings/hazard-pointers.pdf
+     Erstquelle: T4
+     Rolle: Alternative zu RCU fuer Lock-Free Reclamation
+
+================================================================================
+TEIL C — METHODIK / TOOLING / MESSWERKZEUGE (KEIN klassisches Paper)
+================================================================================
+
+C.1  [TOOL] Intel Advisor — CPU Metrics / Cache Line Utilization
+     URL:   https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2024-0/cpu-metrics.html
+     Erstquelle: T1, T3, T4, T5, T6
+     Rolle: CLU + Simulated Memory Footprint im MAP-Workflow
+
+C.2  [TOOL] Intel Advisor — Cache Simulation Mode
+     URL:   https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2024-1/cachesim-mode.html
+     Erstquelle: T4
+     Rolle: --enable-cache-simulation, -cachesim-mode=footprint
+
+C.3  [TOOL] Intel Intrinsics Guide
+     URL:   https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
+     Erstquelle: T4
+     Rolle: __builtin_prefetch / SIMD-Intrinsics
+
+C.4  [TOOL] GCC — Other-Builtins (incl. __builtin_prefetch)
+     URL:   https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
+     Erstquelle: T4
+     Rolle: Software-Prefetch-Hints
+
+C.5  [TOOL] GCC — Function Multiversioning (target_clones)
+     URL:   https://gcc.gnu.org/onlinedocs/gcc/Function-Multiversioning.html
+     Erstquelle: T4, T6
+     Rolle: ISA-Pfade (AVX2/AVX-512/scalar) sauber nebeneinander erzeugen
+
+C.6  [TOOL] ZIH HPC TU Dresden — perf Tools
+     URL:   https://compendium.hpc.tu-dresden.de/software/perf_tools/
+     Erstquelle: T3, T4, T5, T6
+     Rolle: Standardwerkzeug fuer PMU-Counter/Sampling auf Barnard
+
+C.7  [TOOL] ZIH HPC TU Dresden — PIKA (Monitoring abschaltbar)
+     URL:   https://compendium.hpc.tu-dresden.de/software/pika/
+     Erstquelle: T4, T6
+     Rolle: --exclusive + --constraint=no_monitoring fuer eigene Counter
+
+C.8  [TOOL] ZIH HPC TU Dresden — Barnard Jobs and Resources
+     URL:   https://compendium.hpc.tu-dresden.de/jobs_and_resources/barnard/
+     Erstquelle: T4
+     Rolle: Slurm-Konfiguration fuer Sapphire-Rapids Knoten
+
+C.9  [TOOL] TU Dresden — ZIH Hochleistungsrechnen Uebersicht
+     URL:   https://tu-dresden.de/zih/hochleistungsrechnen/hpc
+     Erstquelle: T4
+     Rolle: Allgemeine HPC-Plattform-Beschreibung
+
+C.10 [TOOL] PAPI — Performance Application Programming Interface
+     URL:   https://icl.utk.edu/papi/
+     Erstquelle: T6
+     Rolle: Portable PMU-Counter ueber Plattformen
+
+C.11 [TOOL] YCSB — Yahoo! Cloud Serving Benchmark
+     URL:   https://github.com/brianfrankcooper/YCSB
+     Erstquelle: T1, T3, T6
+     Rolle: A/B/C/D/E/F-Workload-Profile (read-mostly etc.)
+
+C.12 [TOOL] Google Benchmark
+     URL:   https://github.com/google/benchmark
+     Erstquelle: T6
+     Rolle: Mikrobenchmark-Vorlage fuer Kalibrierung
+
+C.13 [TOOL] SOSD — Search on Sorted Data Benchmark
+     URL:   https://github.com/learnedsystems/SOSD
+     Erstquelle: T1
+     Rolle: Optional fuer Numerik/Fingerprint-Nebenstrecke
+
+C.14 [TOOL] HdrHistogram (HDR-Histogramme fuer Tail-Latenz)
+     URL:   http://hdrhistogram.org/
+     Erstquelle: T3, T4
+     Rolle: Tail-Latenz-Erfassung ohne Mittelung
+
+================================================================================
+TEIL D — HARDWARE-/PLATTFORM-DOKUMENTATION (Termin 6 Plattformmatrix)
+================================================================================
+
+D.1  [TOOL] Intel Core i7-1270P (Hybrid 4P + 8E, AVX2) — Spec
+     URL:   https://www.intel.com/content/www/us/en/products/sku/226255/intel-core-i71270p-processor-18m-cache-up-to-4-80-ghz/specifications.html
+     Erstquelle: T3, T4, T6
+     Rolle: Lokaler Hybrid-Hauptpfad
+
+D.2  [TOOL] Intel Xeon Platinum 8470 (Sapphire Rapids, AVX-512) — Spec
+     URL:   https://www.intel.com/content/www/us/en/products/sku/231728/intel-xeon-platinum-8470-processor-105m-cache-2-00-ghz/specifications.html
+     Erstquelle: T3, T4, T6
+     Rolle: Barnard-Knoten Server-x86
+
+D.3  [TOOL] Intel Core i9-14900KS — Spec
+     URL:   per Intel ARK suchen (in T6 erwaehnt)
+     Erstquelle: T6
+     Rolle: Grosser Intel-Desktoppfad ohne AVX-512
+
+D.4  [TOOL] AMD Ryzen 9 9950X3D / 9950X3D2 — Spec
+     URL:   per AMD-Produktseite suchen
+     Erstquelle: T6
+     Rolle: AMD Zen 5 + 3D V-Cache, AVX-512
+
+D.5  [TOOL] StarFive VisionFive 2 (RISC-V RV64GC, JH7110) — Spec
+     URL:   https://www.starfivetech.com/en/site/boards
+     Erstquelle: T6
+     Rolle: Skalare RISC-V Untergrenze
+
+D.6  [TOOL] Raspberry Pi 5 (Arm Cortex-A76, NEON) — Offizielle Einfuehrung
+     URL:   https://www.raspberrypi.com/products/raspberry-pi-5/
+     Erstquelle: T6
+     Rolle: Embedded Arm-Pfad
+
+D.7  [TOOL] Apple Mac mini M1 (Apple arm64) — Apple Support
+     URL:   https://support.apple.com/en-us/111894
+     Erstquelle: T6
+     Rolle: Apple-Silicon Pfad, asymmetrische Cores
+     Anm.:  CPU-/Hardware-Profil ggf. erst nach exakter Modell-ID einfrieren
+
+D.8  [TOOL] Hardkernel ODROID-H4 Ultra (Intel N305 E-cores only)
+     URL:   https://www.hardkernel.com/shop/odroid-h4-ultra/
+     Erstquelle: T6
+     Rolle: x86 ohne P-Cores, AVX2 auf kleiner Cache-Basis
+
+D.9  [TOOL] NVIDIA Grace Hopper GH200 (Neoverse V2, SVE2)
+     URL:   ZIH-Doku Grace Hopper / NVIDIA Produktseite
+     Erstquelle: T6
+     Rolle: Arm-Server Pflichtplattform mit SVE2 + LPDDR5X
+
+D.10 [TOOL] AMD EPYC 9334 (Capella, AMD-Server) — optional
+     URL:   per AMD-Produktseite suchen
+     Erstquelle: T6
+     Rolle: Optionaler AMD-Servergegenpol zu Barnard
+
+D.11 [TOOL] Intel Memory Latency Checker (Intel MLC) — optional
+     URL:   https://www.intel.com/content/www/us/en/developer/articles/tool/intelr-memory-latency-checker.html
+     Erstquelle: T6
+     Rolle: Hilfswerkzeug auf Intel-Maschinen (NICHT primaer fuer ZIH)
+
+================================================================================
+TEIL E — DATENSAETZE
+================================================================================
+
+E.1  [TOOL] CoCo-trie Datasets (vorkonvertiert)
+     URL:   https://github.com/aboffa/CoCo-trie  (README -> Google Drive)
+     Erstquelle: T3, T4
+     Pflichtdatensaetze: url, xml, dna, protein, trec-terms, tpcds-id
+
+E.2  [TOOL] LAW Milano — it-2004 Web URLs Crawl
+     URL:   https://law.di.unimi.it/webdata/it-2004/
+     Erstquelle: T4
+     Rolle: Web-URL-Datenset fuer "url" Pflichtdatensatz
+
+E.3  [TOOL] Pizza & Chili Corpus — XML / DNA / Protein
+     URL:   http://pizzachili.dcc.uchile.cl/texts/xml/
+            http://pizzachili.dcc.uchile.cl/texts/dna/
+            http://pizzachili.dcc.uchile.cl/texts/protein/
+     Erstquelle: T3, T4
+     Rolle: Sekundaere/alternative Quellen fuer xml/dna/protein
+
+E.4  [TOOL] TPC-DS Benchmark
+     URL:   https://www.tpc.org/tpcds/
+     Erstquelle: T3, T4
+     Rolle: tpcds-id Pflichtdatensatz (datenbanknahe IDs)
+
+E.5  [TOOL] enwiki-titles, aol-queries, uk-2002, webbase-2001 (Erweiterung)
+     URL:   per CoCo-2024er Erweiterungsarbeit suchen
+     Erstquelle: T3
+     Rolle: Optionaler Erweiterungspool
+
+================================================================================
+TEIL F — REFERENZ-IMPLEMENTIERUNGEN (Repos zum Klonen)
+================================================================================
+
+F.1  [REPO] aboffa/CoCo-trie (CoCo-trie + preprocess + dataset pointers)
+     URL:   https://github.com/aboffa/CoCo-trie
+
+F.2  [REPO] speedskater/hot (HOT Referenzimplementierung)
+     URL:   https://github.com/speedskater/hot
+
+F.3  [REPO] kohler/masstree-beta (Masstree)
+     URL:   https://github.com/kohler/masstree-beta
+
+F.4  [REPO] armon/libart (verbreitete ART-Implementierung)
+     URL:   https://github.com/armon/libart
+
+F.5  [REPO] wuxb45/wormhole (Wormhole)
+     URL:   https://github.com/wuxb45/wormhole
+
+F.6  [REPO] UnoDB (moderner C++ ART-Gegencheck)
+     URL:   https://github.com/laurynas-biveinis/unodb
+     Erstquelle: T3 (Baseline-Katalog)
+
+F.7  [REPO] habedi/bptree (leichter B+-Baum Primaerpfad)
+     URL:   https://github.com/habedi/bptree
+     Erstquelle: T3
+
+F.8  [REPO] embedded2016/bplus-tree (B+ Baum Alternativpfad)
+     URL:   https://github.com/embedded2016/bplus-tree
+     Erstquelle: T3
+
+F.9  [REPO] Abseil — flat_hash_map / node_hash_map
+     URL:   https://github.com/abseil/abseil-cpp
+     Erstquelle: T3
+     Rolle: Hash-Baseline fuer Exact Hit/Miss
+
+F.10 [REPO] tcmalloc — Design-Doku
+     URL:   https://google.github.io/tcmalloc/design.html
+     Erstquelle: T4
+     Rolle: per-thread/per-cpu Caches fuer kleine Objekte
+
+F.11 [REPO] mimalloc (Microsoft Research)
+     URL:   https://www.microsoft.com/en-us/research/wp-content/uploads/2019/06/mimalloc-tr-v1.pdf
+     Erstquelle: T4
+     Rolle: Free-List-Sharding, Page-Management
+
+F.12 [REPO] snmalloc (Microsoft Research)
+     URL:   https://github.com/microsoft/snmalloc
+     Erstquelle: T4 (textuell erwaehnt)
+     Rolle: Skalierungsargumente fuer message-passing Allocator
+
+================================================================================
+DOMAENEN-TRENNUNG (KONZEPT-IDENTITAETEN — Vorbereitung Domaenenmodell)
+================================================================================
+
+DOMAENE 1 — SUCH-ALGORITHMEN (Trie/B-Tree-Familie)
+  Verantwortlich fuer: Lookup-Semantik, Ordnungsmodus, Schluesselrepraesentation,
+                       Range/Prefix-Operationen, Concurrency
+  Quellen: A.1 - A.3
+  Identitaet: WAS gesucht und WIE die Suche fortschreitet.
+
+DOMAENE 2 — CACHE-ENGINE (Control-Plane)
+  Verantwortlich fuer: Seitentyp-Wahl, Layout-Steuerung, Inline-vs-Handle,
+                       Prefetch-Policy, Online-Relocation, Plattform-Kalibrierung
+  Quellen: B.1 - B.3 + Methodik aus C
+  Identitaet: WIE und WO die Daten im Cache liegen, NICHT was gesucht wird.
+
+GEMEINSAMER VERTRAG (Schnittstelle):
+  - Cache-Engine sieht "Seiten/Knoten" als opake Blobs mit
+    Header-Telemetrie (Probability Sketches, Counter).
+  - Such-Algorithmen rufen "Naechster Knoten unter Schluessel-Praefix x" und
+    bekommen vom Cache-Engine-Modul den effektiven Seitentyp + Pointer zurueck.
+
+================================================================================
+NACHARBEIT FUER DEN NUTZER (manueller SLUB-Download) — REV2
+================================================================================
+
+PRIORITAET A — VORHANDEN (Pflichtbaselines)  [STATUS REV2]
+  [x] A1.1 Rao/Ross 1999  (CSS-tree)            ✓ heruntergeladen
+  [x] A1.2 Rao/Ross 2000  (CSB+-tree)           ✓ heruntergeladen
+  [x] A1.4 Hankins/Patel 2003 (Node Size)       ✓ heruntergeladen
+  [x] A1.6 Bender/Demaine/Farach-Colton 2002    ✓ heruntergeladen
+  [x] A1.7 Bender et al. 2005 (Cache-Oblivious B-Trees)  ✓ heruntergeladen
+  [x] A1.8 Saikkonen 2008 (Binary Trees, IFIP TCS) ✓ heruntergeladen
+  [x] A1.9 Saikkonen 2016 (Dynamic Binary Trees, ComJ) ✓ heruntergeladen
+  [x] A1.10 Leis et al. 2025 (B-Trees Are Back) ✓ heruntergeladen
+  [x] A2.1 Mao/Kohler/Morris 2012 (Masstree)    ✓ heruntergeladen
+  [x] A2.2 Leis/Kemper/Neumann 2013 (ART)       ✓ heruntergeladen
+  [x] A2.3 Leis et al. 2016 (ART of Practical Synchronization) ✓ heruntergeladen
+  [x] A2.4 Binna et al. 2018 (HOT)              ✓ heruntergeladen
+  [x] A2.5 Wu/Ni/Jin 2019 (Wormhole)            ✓ heruntergeladen
+  [x] A2.7 Schmeisser et al. 2022 (B²-tree)     ✓ heruntergeladen
+  [x] A2.8 Boffa et al. 2024 (CoCo-trie)        ✓ heruntergeladen
+  [x] B1.1 Chen/Gibbons/Mowry 2001 (Prefetching B+-Trees) ✓ heruntergeladen
+  [x] B1.2 Chen et al. 2002 (Fractal Prefetching B+-Trees) ✓ heruntergeladen
+  [x] B1.3 Khan 2011 (Dynamic Adaptation Data Cache Prefetching) ✓ heruntergeladen
+  [x] B1.4 Naderan-Tahan/Sarbazi-Azad 2016 (Why Does Data Prefetching Not Work) ✓ heruntergeladen
+  [x] B1.5 Mahling/Weisgut/Rabl 2025 (Fetch Me If You Can)  ✓ heruntergeladen
+  [x] B1.6 Zhang et al. 2024 (Prefetching Indexing Scheme, FGCS) ✓ heruntergeladen
+  [x] B1.7 Zhang et al. 2025 (Hierarchical Prefetching, ASPLOS) ✓ heruntergeladen
+  [x] B2.1 Dortmund 2023 (Towards Data-Based Cache Optimization) ✓ heruntergeladen
+  [x] B3.1 McKenney 2001 (RCU OLS)              ✓ heruntergeladen
+  [x] B3.2 Michael 2004 (Hazard Pointers)       ✓ heruntergeladen
+  [x] A3.1 Ungethuem et al. 2017 (Overview Hardware Optimizations) ✓ heruntergeladen
+  [x] A3.3 TUD 2025 (To Stride or Not to Stride) ✓ heruntergeladen
+
+PRIORITAET A — NOCH FEHLEND  [4 Eintraege + 1 Poster]
+  [ ] A1.3 Graefe/Larson 2001 (B-Tree Indexes and CPU Caches)
+       Direktlink: https://www.computer.org/csdl/proceedings-article/icde/2001/10010349/12OmNx6g6dr
+       Alt:        https://www.researchgate.net/publication/3892972_B-tree_indexes_and_CPU_caches
+       => Falsch heruntergeladen war: Dependable Computing in Virtual Laboratories.pdf
+
+  [ ] A1.5 Samuel/Pedersen/Bonnet 2005 (Making CSB+-Trees Processor Conscious)
+       Direktlink (FREI): http://www.cs.cmu.edu/~damon2005/damonpdf/2%20making%20csb+%20trees%20processor%20conscious.pdf
+       => Falsch heruntergeladen war: Multithreaded Architectures and The Sort Benchmark.pdf
+
+  [ ] A2.6 Fent/Jungmair/Kipf/Neumann 2020 (START — Self-Tuning Adaptive Radix Tree)
+       Direktlink (FREI): https://conferences.computer.org/icde/2020/pdfs/ICDEW2020-56MW9gWd2XRGOkRROeeZ2s/426600a147/426600a147.pdf
+       Alt:               https://db.in.tum.de/~fent/papers/Self%20Tuning%20Art.pdf
+       Code:              https://github.com/jungmair/START
+       => Falsch heruntergeladen war: Lessons learned from ... Intel Optane DC Persistent Memory.pdf
+
+  [ ] A3.2 VAMPIR Berthold/Habich et al. 2023 (SOSP'23 Poster — KEIN Volltext!)
+       => Im bereits geladenen SOSP'23 Proceedings-Band als 1-2 Seiten extrahieren
+          oder gezielt SOSP'23 Companion-Eintrag suchen
+       TUD FIS: https://fis.tu-dresden.de/portal/de/publications/vampir--virtualized-nonfunctional-memory-properties-for-datapipeline-scheduling%281cd6ee64-f657-4f74-ab76-8d32ab8a0939%29.html
+
+LOESCH-EMPFEHLUNG (siehe Diskrepanzbericht_Downloads.txt Teil F):
+  [ ] Dependable Computing in Virtual Laboratories.pdf      LOESCHEN
+  [ ] Multithreaded Architectures and The Sort Benchmark.pdf LOESCHEN
+  [ ] Lessons learned from the early ... Intel Optane DC ...pdf LOESCHEN
+  [ ] Accelerating Number Theoretic Transform ... Zero Knowledge Proof.pdf LOESCHEN
+  [ ] Delilah - eBPF-offload on Computational Storage.pdf   LOESCHEN
+  [ ] Onthe Integration of Structure Indexes and Inverted Lists.pdf LOESCHEN
+  [ ] SOSP - October - Koblenz, Germany ... Proceedings.pdf
+       (52,8 MB; nach VAMPIR-Poster-Extraktion optional loeschen)
+
+ZUSATZ — Originalquellen-Code (Phase 2.B; nach Paper-Lese-Reihenfolge):
+  [ ] aboffa/CoCo-trie  (F.1)  -- Paper-Originalcode
+  [ ] speedskater/hot   (F.2)  -- Paper-Originalcode
+  [ ] kohler/masstree-beta (F.3) -- Paper-Originalcode
+  [ ] armon/libart      (F.4)  -- de-facto ART-Standardimpl.
+  [ ] wuxb45/wormhole   (F.5)  -- Paper-Originalcode
+  [ ] jungmair/START    (NEU)  -- Originalimpl. von Fent/Jungmair (gefunden!)
+  [ ] efficient/SuRF    (NEU)  -- Originalimpl. von SuRF
+  Code-Ablage Zielordner: ./Forschungsarbeiten/<paper-id>/code/
+
+ANMERKUNG ZU SLUB-ZUGANG:
+  - SuRF und Jacobson 1989 sind bereits via SLUB Dresden / IEEE Xplore geladen.
+  - ACM-Papiere (z. B. SuRF SIGMOD'18) sind via SLUB-IP erreichbar.
+  - Springer-Papiere (BTW, IFIP, etc.) sind via SLUB-IP/Shibboleth erreichbar.
+  - VLDB-/SIGMOD-Volltexte sind oft direkt frei (db.in.tum.de, MIT/CSAIL etc.).
+  - ScienceDirect/Elsevier-Volltexte ueber SLUB-Shibboleth einloggen.
+
+================================================================================
+ENDE DES KATALOGS — REV2
+Gesamtzaehler (REV2):
+  Domaene A (Such-Algorithmen):    23 Quellen [3 noch offen, 20 vorhanden]
+  Domaene B (Cache-Engine/Tools):  10 Quellen [alle vorhanden]
+  Methodik / Tooling (C):          14 Eintraege
+  Hardware-/Plattform-Doku (D):    11 Eintraege
+  Datensaetze (E):                  5 Eintraege
+  Repositories (F):                12 + 2 NEU (jungmair/START, efficient/SuRF) Eintraege
+GESAMT (Wissenschaftliche Quellen): 33 (davon 28 als PDF, 4 fehlend, 1 Poster)
+================================================================================

@@ -1,0 +1,155 @@
+================================================================
+VORANALYSE: P04-CoCo-trie/CoCo-trie
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P04-CoCo-trie/CoCo-trie
+Stand: 2026-05-09 00:48:14
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 101
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609     0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .git
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .github
+-rw-r--r-- 1 benja 197609   262 May  4 23:38 .gitmodules
+-rw-r--r-- 1 benja 197609  3179 May  4 23:38 CITATION.cff
+-rw-r--r-- 1 benja 197609  1134 May  4 23:38 CMakeLists.txt
+-rw-r--r-- 1 benja 197609 35821 May  4 23:38 LICENSE
+-rw-r--r-- 1 benja 197609  7650 May  4 23:38 README.md
+-rw-r--r-- 1 benja 197609  4842 May  4 23:38 benchmark.cpp
+-rw-r--r-- 1 benja 197609  6405 May  4 23:38 codemeta.json
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 dataset
+-rw-r--r-- 1 benja 197609  1525 May  4 23:38 example.cpp
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 include
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 lib
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 script
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 static
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 test
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./dataset
+./include
+./lib
+./lib/adapted_code
+./lib/ds2i
+./lib/sdsl-lite
+./lib/sux
+./script
+./static
+./test
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./benchmark.cpp
+./example.cpp
+./include/alphabet_remapping.hpp
+./include/array.hpp
+./include/CoCo-trie_dfuds.hpp
+./include/CoCo-trie_v1.hpp
+./include/CoCo-trie_v2.hpp
+./include/dfuds.hpp
+./include/louds_sux.hpp
+./include/MAX_L_config.h
+./include/synthetic.hpp
+./include/uncompacted_trie.hpp
+./include/utils.hpp
+./lib/adapted_code/bit_vector.hpp
+./lib/adapted_code/broadword.hpp
+./lib/adapted_code/compact_elias_fano.hpp
+./lib/adapted_code/intrinsics.hpp
+./lib/adapted_code/Vector.hpp
+./test/catch.hpp
+./test/main.cpp
+./test/tests_entire_trie_128_big_alphabet.cpp
+./test/tests_entire_trie_128_small_alphabet.cpp
+./test/tests_serialize_load.cpp
+./test/tests_single_encoders_128.cpp
+./test/tests_utils.cpp
+./test/test_trie.hpp
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 24191 total
+ 17959 ./test/catch.hpp
+   809 ./include/uncompacted_trie.hpp
+   578 ./test/tests_utils.cpp
+   533 ./lib/adapted_code/bit_vector.hpp
+   479 ./include/CoCo-trie_v1.hpp
+   425 ./lib/adapted_code/compact_elias_fano.hpp
+   393 ./include/utils.hpp
+   389 ./include/CoCo-trie_v2.hpp
+   350 ./include/CoCo-trie_dfuds.hpp
+   299 ./include/synthetic.hpp
+   293 ./lib/adapted_code/Vector.hpp
+   264 ./test/tests_single_encoders_128.cpp
+   200 ./test/tests_entire_trie_128_big_alphabet.cpp
+   197 ./test/tests_entire_trie_128_small_alphabet.cpp
+   179 ./lib/adapted_code/broadword.hpp
+   156 ./include/louds_sux.hpp
+   131 ./lib/adapted_code/intrinsics.hpp
+   131 ./include/dfuds.hpp
+   125 ./benchmark.cpp
+    72 ./test/tests_serialize_load.cpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (34 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+                        GNU GENERAL PUBLIC LICENSE
+                           Version 3, 29 June 2007
+    
+
+## README EXCERPT
+  Datei: README.md
+    <p align="center">
+      <img src="https://github.com/aboffa/CoCo-trie/blob/main/static/coco-logo.png" height=150  alt="CoCo-trie logo"/>
+    </p>
+    
+    # CoCo-trie
+    
+    [![build_test](https://github.com/aboffa/CoCo-trie/actions/workflows/build_test.yml/badge.svg)](https://github.com/aboffa/CoCo-trie/actions/workflows/build_test.yml)
+    [![SWH](https://archive.softwareheritage.org/badge/swh:1:dir:7877831ae68867050ed98f4840b88150c58586eb/)](https://archive.softwareheritage.org/swh:1:dir:7877831ae68867050ed98f4840b88150c58586eb;origin=https://github.com/aboffa/CoCo-trie;visit=swh:1:snp:378b5a4a079a457500e3921de916b631e1d8b86c;anchor=swh:1:rev:8bc71d57235c22f7033f86bef5f3427bd82e2d29)
+    
+    ## What is it? 📣
+    
+    A data-aware trie-shaped data structure for indexing and compressing a set of strings. It is designed and implemented by the [A<sup>3</sup> lab](http://acube.di.unipi.it/). 
+    
+    CoCo-trie compresses and collapses subtrees in a principled and effective  way.
+    
+    It hinges upon a data-aware optimisation scheme that selects the best subtries to collapse based on a pool of succinct encoding schemes in order to minimise the overall space occupancy.
+    
+    An introduction to the string dictionary problem, a motivating example, a detailed description of CoCo-trie with proof about the space and time complexity, and experiments against well-established and highly-engineered trie-based string dictionaries are in the paper: [(DOI)](https://doi.org/10.1016/j.is.2023.102316) [(PDF)](https://www.boffa.top/files/IS.pdf)
+    
+    >  Antonio Boffa, Paolo Ferragina, Francesco Tosoni, and Giorgio Vinciguerra. CoCo-trie: Data-aware compression and indexing of strings.  In: Information Systems 120 (2024), p. 102316 [https://doi.org/10.1016/j.is.2023.102316](https://doi.org/10.1016/j.is.2023.102316)
+    
+    Preliminary results appeared in the paper: [(DOI)](https://doi.org/10.1007/978-3-031-20643-6_17) [(PDF)](https://www.boffa.top/files/SPIRE.pdf)
+    
+    >  Boffa, A., Ferragina, P., Tosoni, F., Vinciguerra, G. (2022). Compressed String Dictionaries via Data-Aware Subtrie Compaction. In: Arroyuelo, D., Poblete, B. (eds) String Processing and Information Retrieval. SPIRE 2022. Lecture Notes in Computer Science, vol 13617. Springer, Cham. [https://doi.org/10.1007/978-3-031-20643-6_17](https://doi.org/10.1007/978-3-031-20643-6_17)
+    
+    ## Build the project 🔧
+    
+    To build the CoCo-trie:
+    
+    ```
+    git submodule update --init --recursive
+    bash ./lib/adapted_code/move.sh
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release -S .. -B .
+    make -j
+    ```
+    
+    ## Run the example 🏃
+    
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  prefetch             in 3 Dateien
+  popcnt               in 1 Dateien
+  rank_select          in 6 Dateien
+  rank/select          in 1 Dateien
+  succinct             in 11 Dateien
+  bitmap               in 6 Dateien
+
+## C++-STANDARD-INDIKATOREN
+  set(CMAKE_CXX_STANDARD 20)
+
+## END VORANALYSE P04-CoCo-trie/CoCo-trie

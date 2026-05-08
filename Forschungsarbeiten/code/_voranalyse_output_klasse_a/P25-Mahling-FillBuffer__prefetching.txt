@@ -1,0 +1,166 @@
+================================================================
+VORANALYSE: P25-Mahling-FillBuffer/prefetching
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P25-Mahling-FillBuffer/prefetching
+Stand: 2026-05-09 00:50:24
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 42
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609    0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609  359 May  4 23:40 .gitignore
+-rw-r--r-- 1 benja 197609  565 May  4 23:40 .gitmodules
+-rw-r--r-- 1 benja 197609 1733 May  4 23:40 CMakeLists.txt
+-rw-r--r-- 1 benja 197609 1137 May  4 23:40 README.md
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 cmake
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 notes_dump
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 scripts
+-rw-r--r-- 1 benja 197609  249 May  4 23:40 setup.sh
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 src
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 third_party
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 visualization
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./cmake
+./notes_dump
+./scripts
+./scripts/github_prefetch_analysis
+./src
+./src/benchmark
+./src/benchmark/utils
+./src/lib
+./src/lib/BinarySearch
+./src/lib/BTree
+./src/lib/HashJoin
+./src/lib/numa
+./src/lib/profiling
+./src/lib/utils
+./src/perf_configs
+./src/perf_configs/generic_selections
+./src/perf_configs/orginally_generated
+./src/test
+./third_party
+./visualization
+./visualization/MT_final
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./src/benchmark/binary_search.cpp
+./src/benchmark/btree_benchmark.cpp
+./src/benchmark/cache_size_nvlink.cpp
+./src/benchmark/cssl.cpp
+./src/benchmark/hashmap_benchmark.cpp
+./src/benchmark/hash_join.cpp
+./src/benchmark/lfb_full_behavior.cpp
+./src/benchmark/lfb_reliability.cpp
+./src/benchmark/lfb_scale_benchmark.cpp
+./src/benchmark/lfb_size_benchmark.cpp
+./src/benchmark/lfb_size_benchmark_smt.cpp
+./src/benchmark/materialization.cpp
+./src/benchmark/memory_latencies.cpp
+./src/benchmark/old_pointer_chasing.cpp
+./src/benchmark/pointer_chasing.cpp
+./src/benchmark/prefetch_latency.cpp
+./src/benchmark/prefetch_locality_behavior.cpp
+./src/benchmark/random_read_benchmark.cpp
+./src/benchmark/rob_pressure.cpp
+./src/benchmark/test_ca_memory_placement.cpp
+./src/benchmark/test_perf.cpp
+./src/benchmark/tree_simulation_benchmark.cpp
+./src/benchmark/utils/fujitsu_memory_allocation.hpp
+./src/benchmark/utils/stats.hpp
+./src/benchmark/utils/zipfian_int_distribution.hpp
+./src/config.cpp
+./src/lib/BinarySearch/coro.h
+./src/lib/BinarySearch/coro_infra.h
+./src/lib/BinarySearch/naive.h
+./src/lib/BinarySearch/rng.h
+./src/lib/BinarySearch/sm.h
+./src/lib/BTree/btree_olc.h
+./src/lib/BTree/btree_vectorized_helper.h
+./src/lib/BTree/builtin.h
+./src/lib/BTree/coro.h
+./src/lib/BTree/coro_base_btree_olc.h
+./src/lib/BTree/coro_btree_olc.h
+./src/lib/BTree/coro_btree_olc_optimized.h
+./src/lib/BTree/coro_lines_btree_olc.h
+./src/lib/BTree/prefetch.h
+./src/lib/coroutine.hpp
+./src/lib/HashJoin/affinity.h
+./src/lib/HashJoin/barrier.h
+./src/lib/HashJoin/config.h
+./src/lib/HashJoin/cpu_mapping.c
+./src/lib/HashJoin/cpu_mapping.h
+./src/lib/HashJoin/generator.c
+./src/lib/HashJoin/generator.h
+./src/lib/HashJoin/genzipf.c
+./src/lib/HashJoin/genzipf.h
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 17044 total
+  1069 ./src/lib/HashJoin/npj2epb.c
+   815 ./src/lib/BTree/coro_lines_btree_olc.h
+   708 ./src/benchmark/tree_simulation_benchmark.cpp
+   691 ./src/lib/BTree/coro_btree_olc.h
+   665 ./src/lib/BTree/coro_btree_olc_optimized.h
+   650 ./src/lib/BTree/coro_base_btree_olc.h
+   581 ./src/lib/BTree/btree_olc.h
+   511 ./src/lib/skiplist.cpp
+   503 ./src/lib/HashJoin/generator.c
+   475 ./src/benchmark/btree_benchmark.cpp
+   461 ./src/benchmark/rob_pressure.cpp
+   454 ./src/benchmark/hash_join.cpp
+   401 ./src/benchmark/binary_search.cpp
+   388 ./src/lib/hashmap.cpp
+   358 ./src/benchmark/memory_latencies.cpp
+   336 ./src/benchmark/lfb_full_behavior.cpp
+   320 ./src/benchmark/materialization.cpp
+   300 ./src/benchmark/lfb_reliability.cpp
+   299 ./src/benchmark/lfb_scale_benchmark.cpp
+   280 ./src/lib/utils/utils.cpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (53 Zeilen)
+
+## LIZENZ
+  ⚠ KEINE LICENSE-Datei gefunden
+
+## README EXCERPT
+  Datei: README.md
+    ## Fetch Me If You Can: Evaluating CPU Cache Prefetching and Its Reliability on High Latency Memory
+    
+    This repository contains the code to our [DaMoN 2025 paper](https://hpi.de/oldsite/fileadmin/user_upload/fachgebiete/rabl/publications/2025/Mahling-DaMoN25-Prefetching.pdf).
+    The repository contains (Micro-)benchmarks for evaluation of prefetching algorithms on heterogeneous memory.
+    
+    ## Cite our work
+    
+    If you use the microbenchmarks or reference our findings, please cite us.
+     
+    ```bibtex
+    @inproceedings{mahling2025prefetching,
+      title={Fetch Me If You Can: Evaluating CPU Cache Prefetching and Its Reliability on High Latency Memory},
+      author={Mahling, Fabian and Weisgut, Marcel and Rabl, Tilmann},
+      booktitle={Proceedings of the International Workshop on Data Management on New Hardware},
+      year={2025}
+    }
+    ```
+    
+    # Setup
+    
+    - Run `setup.sh` to install all dependencies.
+    - Create a symlink from `/prefetching` to this folder or change the `default_repository_path` in `config.hpp`
+    - Create corresponding entries in `src/config.hpp`
+    
+    # Note: This is just the initial Code dump. Clean-up and documentation are TBD.
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  OLC                  in 4 Dateien
+  Prefetch             in 35 Dateien
+  prefetch             in 43 Dateien
+  Counter              in 4 Dateien
+
+## C++-STANDARD-INDIKATOREN
+  set(CMAKE_CXX_STANDARD 20)
+
+## END VORANALYSE P25-Mahling-FillBuffer/prefetching

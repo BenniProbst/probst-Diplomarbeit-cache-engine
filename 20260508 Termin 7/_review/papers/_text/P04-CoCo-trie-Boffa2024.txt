@@ -1,0 +1,1790 @@
+=== PAPER: P04-CoCo-trie-Boffa2024
+=== FILENAME: CoCo-trie - Data-aware compressionandindexingofstrings.pdf
+=== PAGES: 16
+
+--- PAGE 1 ---
+Information Systems 120 (2024) 102316
+Available online 17 November 2023
+0306-4379/© 2023 The Author(s). Published by Elsevier Ltd. This is an open access article under the CC BY-NC-ND license ( http://creativecommons.org/licenses/by-
+nc-nd/4.0/).
+Contents lists available at ScienceDirect
+Information Systems
+journal homepage: www.elsevier.com/locate/is
+CoCo-trie: Data-aware compression and indexing of strings✩
+Antonio Boffa ∗, Paolo Ferragina, Francesco Tosoni, Giorgio Vinciguerra
+Department of Computer Science, University of Pisa, L.go B. Pontecorvo 3, Pisa 56127, PI, Italy
+A R T I C L E I N F O
+Recommended by Dennis Shasha
+Dataset link: https://github.com/aboffa/CoCo-t
+rie
+Keywords:
+String dictionaries
+Tries
+Data compression
+Succinct data structures
+Key-value stores
+A B S T R A C T
+We address the problem of compressing and indexing a sorted dictionary of strings to support efficient lookups
+and more sophisticated operations, such as prefix, predecessor, and range searches. This problem occurs as
+a key task in a plethora of applications, and thus it has been deeply investigated in the literature since the
+introduction of tries in the ’60s.
+We introduce a new data structure, called the COmpressed COllapsed Trie (CoCo-trie), that hinges on a
+pool of techniques to compress subtries (of arbitrary depth) into succinctly-encoded and efficiently-searchable
+trie macro-nodes with a possibly large fan-out. Then, we observe that the choice of the subtries to compress
+depends on the trie structure and its edge labels. Hence, we develop a data-aware optimisation approach
+that selects the best subtries to compress via the above pool of succinct encodings, with the overall goal of
+minimising the total space occupancy and still achieving efficient query time. We also investigate some variants
+of this approach that induce interesting space–time trade-offs in the CoCo-trie design.
+Our experimental evaluation on six diverse and large datasets (representing URLs, XML data, DNA and
+protein sequences, database records, and search-engine dictionaries) shows that the space–time performance of
+well-established and highly-engineered data structures solving this problem is very input-sensitive. Conversely,
+our CoCo-trie provides a robust and uniform improvement over all competitors for half of the datasets, and it
+results on the Pareto space–time frontier for the others, thus offering new competitive trade-offs.
+1. Introduction
+Big data constitute a key production factor in the current digital
+economy. Governments and tech companies are now stipulating ambi-
+tious digital agendas aimed at overcoming the limitations of currently-
+known methods and technologies. These raise new challenges in the
+design of several modern software systems, such as next-generation
+green and edge computing platforms, massive key–value and media
+stores, high-performance networks and storage, search engines, big-
+data analytic tools, etc. In this paper, we concentrate on string dic-
+tionaries, which do undoubtedly constitute a core component of a
+plethora of big-data applications such as search engines [1–3], RDF and
+key–value stores [ 4–6], scalable distributed storage systems [ 7], com-
+putational biology tools [ 8,9], and 𝑛-gram language models [ 10,11],
+just to mention a few.
+Let  be a sorted set of 𝑛 variable-length strings 𝑠1, 𝑠2, … , 𝑠𝑛 drawn
+from an alphabet 𝛴 = {1 , 2, … , 𝜎}. The string dictionary problem
+consists of storing  in a compressed format while supporting some
+key query operations. One of the most powerful is the 𝚛𝚊𝚗𝚔 operation,
+✩ This is an extended version of Antonio Boffa, Paolo Ferragina, Francesco Tosoni, and Giorgio Vinciguerra. Compressed string dictionaries via data-aware
+subtrie compaction. SPIRE 2022. DOI:10.1007/978-3-031-20643-6_17 .
+∗ Corresponding author.
+E-mail addresses: antonio.boffa@phd.unipi.it (A. Boffa), paolo.ferragina@unipi.it (P. Ferragina), francesco.tosoni@phd.unipi.it (F. Tosoni),
+giorgio.vinciguerra@unipi.it (G. Vinciguerra).
+which returns the number of strings in  lexicographically smaller than
+or equal to a pattern 𝑃 [1, 𝑝]. Some other classic operations such as
+𝚕𝚘𝚘𝚔𝚞𝚙(𝑃 ) (returns a unique stringID for 𝑃 if 𝑃 ∈ , and −1 otherwise),
+𝚊𝚌𝚌𝚎𝚜𝚜(𝑖) (returns the string in  whose stringID is 𝑖), 𝚙𝚛𝚎𝚍𝚎𝚌𝚎𝚜𝚜𝚘𝚛(𝑃 )
+(returns the lexicographically largest string in  smaller than 𝑃 ),
+𝚙𝚛𝚎𝚏𝚒𝚡_𝚜𝚎𝚊𝚛𝚌𝚑(𝑃 ) (returns all strings in  that are prefixed by 𝑃 ),
+and 𝚕𝚘𝚗𝚐𝚎𝚜𝚝_𝚙𝚛𝚎𝚏𝚒𝚡_𝚖𝚊𝚝𝚌𝚑(𝑃 ) (returns the longest prefix of 𝑃 which
+is shared with one of the strings in ) can be implemented through the
+𝚛𝚊𝚗𝚔 operation, possibly using compact auxiliary data structures [ 12].
+In this paper, we assume that the set is static, which allows for consid-
+erably more space–time efficient solutions compared to a scenario with
+in-place updates, as we will show in Section 5.4. Moreover, we note that
+static sorted sets of strings are core components of several dynamic and
+scalable key–value storage engines based on LSM-trees [ 13].
+String dictionaries are typically approached via the trie data struc-
+ture, which dates back to the ’60s [ 14, §6.3]. Since then, as we will
+survey in Section 2, researchers have put a lot of effort into improving
+https://doi.org/10.1016/j.is.2023.102316
+Received 2 November 2023; Accepted 8 November 2023
+
+--- PAGE 2 ---
+Information Systems 120 (2024) 102316
+2
+A. Boffa et al.
+the time and space efficiency of the naïve pointer-based implemen-
+tation of tries. Some of these solutions compact paths [12,15–17]
+or subtrees [18–24], succinctly encode node fan-outs [25–30], apply
+sophisticated string transformations [31,32] or proper disk-based lay-
+outs [33–35], and some even replace the trie with learned models [36].
+However, the upsurge of interest in big data, the new architectural
+features of modern computers, and the demanding requirements posed
+by applications and users have led to a revamped interest in this
+data structure because of some clear limitations of the previous pro-
+posals. One of the key issues addressed in recent results has been
+the design of compressed storage schemes for tries that offer reduced
+space occupancy without (much) impairing their efficient query time,
+see e.g. [5,16,19,22–24,30,37–40]. These proposals are offering many
+interesting space–time trade-offs over various datasets but without a
+clear winner. So choosing the appropriate storage solution is still quite
+a daunting task, thus requiring specific algorithm-engineering expertise
+and accurate analysis of the input datasets.
+1.1. Our contribution
+In this paper, we tackle this long-standing problem by introducing
+a fully-new approach to compress and index a sorted string dictionary.
+We start from the classic trie data structure, built on the input strings,
+and make the following contributions:
+• We propose a compressed representation of individual subtries,
+and provide a concrete motivating example to show that its
+effectiveness depends on the ‘‘shape’’ of the collapsed subtrie
+and its possibly long ‘‘edge labels’’ (Section 3). This shows that
+approaching trie compression by collapsing its subtries in an
+‘‘agnostic way’’, e.g. by statically fixing their height as done in
+prior work, is not optimal.
+• In light of this, we design a new approach to trie compres-
+sion that hinges upon a data-aware optimisation scheme that
+selects the best subtries to collapse and compress, based on a
+pool of known and new succinct encodings, with the overall
+goal of minimising the total space occupancy and still achieving
+efficient query time. The result is a new data structure, called
+CoCo-trie, which stands for COmpressed and COllapsed trie. Tech-
+nically speaking, the CoCo-trie orchestrates three main tools: a
+novel compressed representation for collapsed subtries, a pool of
+succinct encoding schemes to compress the edge labels, and a
+data-aware optimisation procedure that selects the best subtries
+to collapse in order to minimise the overall occupied space while
+still guaranteeing efficient queries due to the shorter trie traversal
+and the efficiently-searchable encoding schemes (Section 4).
+• We corroborate our theoretical results with an experimental eval-
+uation on several datasets that offer different characteristics (be-
+cause they are originating from a variety of sources, such as
+URLs, XML data, DNA and protein sequences, database records,
+and dictionaries of search engines), and comparing the CoCo-trie
+against five highly-engineered state-of-the-art competitors (name-
+ly, ART [29], CART [41], ctrie ++ [24], FST [5], and PDT [17]).
+To the best of our knowledge, this is the very first work exper-
+imenting with all these implementations together, over a wide
+variety of datasets. Our results show that the performance of our
+competitors is very input-sensitive, in the sense that no solution
+dominates the others in space and time on all the datasets. Differ-
+ently, CoCo-trie turns out to be a robust, uniformly efficient, and
+flexible data structure since, on half of the datasets, it improves all
+experimented state-of-the-art solutions, while on the others it is
+on the Pareto space–time frontier, thus offering new competitive
+and interesting trade-offs (Section 5).
+Our contributions are significant a fortiori if one looks at them
+through the lenses of the about sixty years of research and development
+in the mature and competitive field of string dictionaries, which we
+advance both in knowledge and space–time performance.
+For the sake of presentation, we summarise in Table 1 the main
+notation used throughout the paper. And, as a final note, we list below
+the significant new material we added to the preliminary version of this
+work that appeared in [42].
+1. An extensive review of existing design techniques for represent-
+ing the trie data structure, either explicitly or in compressed
+form (Section 2).
+2. An analysis that generalises the example based on gamma code
+to the more query-efficient Elias-Fano-based code for represent-
+ing the edge labels of a compacted trie (Section 4.2.1).
+3. An explanation of the algorithm engineering techniques used to
+implement a new version of the CoCo-trie. This new version
+improves the space occupancy of the previous implementation
+(by 4.9%) and is up to 20% faster (Section 5.1).
+4. New experiments with novel and bigger datasets that offer new
+significant insights on how the CoCo-trie and its competitors
+perform in real-world scenarios (Section 5.2.1).
+5. An extended discussion about the effectiveness of our trie com-
+pression and compaction strategies on the experimental perfor-
+mance of the CoCo-trie (Section 5.3), including their impact on
+the construction time (Section 5.3.5).
+6. Novel experiments evaluating the impact of the query workload
+on the time efficiency of CoCo-trie and the tested state-of-the-art
+competitors (Section 5.4.1).
+2. Related work
+String dictionaries are generally implemented via thetrie data struc-
+ture, which dates back (according to D. Knuth [14]) to 1959 due to
+René de la Briandais [43]. A trie, also called digital tree or prefix tree,
+is a type of multi-ary search tree, with edges between nodes that are
+labelled by individual characters (aka, uncompacted trie) or by multiple
+characters (aka, compacted trie). We refer to classic literature like [44]
+and [14, §6.3] for an introduction to the trie data structure. Herein, we
+describe some existing design techniques for efficiently representing the
+trie either explicitly or in compressed form, and comment upon their
+space–time performance to better contextualise our contribution.
+Unary path compaction. This well-known technique consists in collaps-
+ing any unary path into a single edge labelled by the concatenation
+of the path labels so that each internal trie node gets at least two
+children. In this way, the number of trie nodes gets upper-bounded
+by the number of indexed strings rather than by their total length
+as, instead, occurs in uncompacted tries. The Patricia trie [15] is a
+further evolution that retains only the first character and the length of
+each (collapsed) edge label. This needs the introduction of the so-called
+blind-search algorithm [33] for lexicographically searching a pattern by
+recovering only one string of the dictionary, even if the edge labels
+are represented partially via their single starting characters. However,
+a Patricia trie acts as an index so it does not relieve the problem of
+storing the dictionary of strings in little space [49].
+Adaptive node representations. Branching out of a node is one of the
+most time-consuming operations in the trie traversal for string search,
+because of cache-miss effects. A central design decision when engineer-
+ing a trie implementation is thus the definition of the layout of an
+internal node. In general, such a layout should handle efficiently in
+space and access time different amounts of branching characters, which
+can vary greatly among nodes. The adaptive trie [19] addresses this
+issue by choosing among several, yet simple, representations of node
+layouts, from short arrays to hash tables, and up to B-trees depending
+on the node fan-out. Judy [50] uses 8 bits per branching character and,
+
+--- PAGE 3 ---
+Information Systems 120 (2024) 102316
+3
+A. Boffa et al.
+Table 1
+Summary of main notations used in the article.
+Symbol Definition
+ Input set of strings elements
+𝑛 Number of strings in the input set 
+𝑁 Number of nodes in the uncompacted trie built on the input set 
+𝑤 Machine word size (in bits)
+𝛴, 𝜎 Alphabet of the strings in , and its size
+𝑣𝓁 Macro-node collapsing 𝓁 levels
+𝑐𝑖
+𝑣𝓁
+𝑖th integer macro-character of the collapsed macro-node 𝑣𝑙
+𝑚 Number of branching macro-characters
+𝑢 Universe of the branching macro-characters ( 𝑐𝑚
+𝑣𝓁
+− 𝑐1
+𝑣𝓁
++ 1)
+ℎ(𝑣) Height of the subtrie rooted at node 𝑣
+𝐶(𝑣𝓁 ) Space cost of encoding the collapsed macro-node 𝑣𝓁
+𝛴𝑣𝓁
+, 𝜎𝑣𝓁
+Local alphabet of the symbols appearing in the edge labels of the macro-node 𝑣𝓁, and its size
+𝛼 Parameter to relax the space cost of macro-nodes, i.e. 𝐶(𝑣𝓁 ), thus enabling the choice of a larger 𝓁
+Table 2
+Datasets characteristics: number of strings in millions, dataset size in MB, average longest common prefix length, average length, maximum length, and alphabet size of the strings
+in the datasets.
+Name Description 𝑛∕106 Dataset size
+in MB
+Avg
+lcp
+Avg
+length
+Max
+length
+𝜎
+url URLs crawled from the web [45] 233.2 9 999.9 38.3 41.8 1 921 82
+dna unique 31-mers from a DNA sequence [46] 367.4 6 566.7 14.9 16.8 31 26
+tpcds-id customers ids in TPC-DS-3TB [47] 30.0 476.4 13.4 14.8 15 16
+trec-terms terms appearing in TREC GOV2 [48] 32.2 285.7 6.5 7.8 1 545 36
+protein sequences of amino acids [46] 2.9 171.4 36.7 53.3 16 191 26
+xml rows of an XML dump of dblp [46] 2.9 110.8 34.4 36.5 248 95
+depending on how many children are present out of the 256 possible
+branches, it uses one of several inner node layouts for representing both
+the branching characters (e.g. via a sorted array, or a bitmap of size
+256) and the corresponding pointers to children. Similarly, the Adap-
+tive Radix Tree (ART) [29] selects among four inner node types (each
+designed for handling up to 4, 16, 48, and 256 children, respectively),
+and it uses SIMD instructions to efficiently find the branch to take. Our
+CoCo-trie frees from the need of engineering complex node layouts and
+policies to switch among them since it transforms edge labels (possibly
+much longer than 1 byte) into integers, which are then compressed and
+indexed via a set of proper integer encoders, from which we select the
+best one in a data- and space-aware manner on a per-node basis. In
+Section 5, we consider ART and its compact static version CART [5,41]
+for experimental comparison against our proposal.
+Fan-out compaction. Differently from the adaptive node representations
+for the list of branching symbols and edges, some works suggested alter-
+native implementations for the frequent and time-consuming branching
+step in the trie traversal. For example, the ternary search tree [26],
+turns an arbitrary fan-out into a ternary one: depending on how the
+current character in the search string compares with the one in the
+node (less, equal, or greater) a different branch is taken. This makes
+the branching out of a node easily manageable, but it requires storing
+three pointers per node. The double-array trie [51], instead, uses two
+integer arrays indexed by the node numbers that allow following a
+branch with a given symbol in constant time, but it does not support
+efficient 𝚛𝚊𝚗𝚔 and its space is still high to require compression [52].
+Bonsai trie [25] and its descendant 𝑚-Bonsai [30] were introduced to
+exploit compact hash tables to represent the trie nodes, which makes
+branching faster but loses the lexicographic order of the string that
+is crucial to implement an efficient 𝚛𝚊𝚗𝚔 (and other operations that
+depend on it, such as range searches). Instead, in our CoCo-trie, we
+propose a fan-out compaction technique that orchestrates a sophisti-
+cated and order-preserving integer encoding of edge labels together
+with an optimisation strategy driven by the distribution of the edge
+labels involved in the fan-out.
+Subtrie compaction. The high-level idea here lies in representing entire
+subtries via a single macro-node encoded in a proper way, e.g. packed
+in a few computer words or represented via a space–time efficient data
+structure, thereby achieving space compaction and a faster traversal of
+the trie structure. In this sense, the LPC-trie [18] provides a valuable
+example of a binary-trie implementation that compacts complete sub-
+tries located at any level of the trie into single macro-nodes. The burst
+trie [21] applies a similar strategy as well: it substitutes entire subtries
+with small ‘‘containers’’, such as linked lists, binary search trees, and
+splay trees. Its evolution, the HAT-trie [20], employs cache-conscious
+hash tables [53] as containers, however, it does not support efficient
+𝚛𝚊𝚗𝚔 (and other operations that depend on it, such as range searches).
+The MassTree [27] uses a B-tree to index longer substrings as macro-
+characters (i.e. up to 64 bits) to efficiently branch out of a trie node.
+We do not experiment with Masstree because [39] shows that it uses
+from 1.8 to 3 × more space than ART.
+More recently, other compaction schemes have been proposed,
+which exploit efficient operations carried out over machine words. For
+instance, the c-trie [22,23] packs𝑤∕ log 𝜎 consecutive alphabet symbols
+in a single 𝑤-bit word. Or, also, the Height Optimised Trie (HOT) [39],
+whose salient algorithmic ingredient consists in packing afixed number
+of nodes of a binary Patricia trie into a ‘‘compound node’’ having a fan-
+out equal to 32, which is then stored using a few memory words and
+accessed via SIMD operations. We do not experiment with HOT [39]
+because its implementation only supports strings whose length does
+not exceed 256, while our datasets contain much longer strings (see
+Table 2).
+The latest solution featuring the packed approach is the dynamic
+improved compact trie , or ctrie ++ for short [24], a hybrid between the
+packed c-trie [22] and the 𝑧-fast trie [54]. Like these two tries, the
+ctrie++ gets decomposed in a macro trie that includes several micro
+tries, with the latter indexing substrings with up to 𝑤∕ log 𝜎 characters.
+Some traits of our solution are reminiscent of this packing strategy,
+however, the number of characters indexed in our CoCo-trie is not fixed
+but varies among its trie nodes, driven by a novel data-aware space-
+optimisation strategy described in Section 4.2.2. In order to show the
+impact of this optimisation strategy, we experimentally compare our
+CoCo-trie against the ctrie ++ in Section 5.
+
+--- PAGE 4 ---
+Information Systems 120 (2024) 102316
+4
+A. Boffa et al.
+Path decomposition. This is a fairly powerful technique, introduced for
+the very first time in [55], and later extended in [12] to design a
+static and cache-friendly trie. The key idea consists in identifying a
+‘‘good’’ root-to-leaf path, according to various strategies (e.g. enforcing
+balancedness, query-awareness, etc.) and then contracting it to a node
+with as many children as the subtries hanging off that path; the
+procedure is then carried out recursively downwards. Notwithstanding
+the increased fan-out could represent a limitation, researchers devised
+proper compression techniques that made the resulting trie asymp-
+totically efficient in time and space [12], dynamic [16], and very
+efficient in practice too [17]. We include the extremely compact and
+efficient implementation of Path Decomposed Tries (PDT) of [17] in
+our experiments of Section 5.
+Succinct encoding of the trie structure. Recently, numerous trie repre-
+sentations making use of succinct data structures have been proposed,
+achieving interesting theoretical and practical results. The Marisa trie
+[28], just to mention one of them, is a static compressed Patricia
+trie stored in a compressed form via the Level-Order Unary Degree
+Sequence (LOUDS) representation. LOUDS encodes the trie topology
+by visiting the nodes in level-wise order and appending 𝟷𝑚𝟶 to a
+bitvector 𝐵, where 𝑚 is the degree of the visited node. Navigating the
+trie is then possible (see [56, §8.1] for details) via 𝚛𝚊𝚗𝚔 and 𝚜𝚎𝚕𝚎𝚌𝚝
+primitives on 𝐵.1 Another well-known succinct representation of trees
+is the Depth-First Unary Degree Sequence (DFUDS), which, similarly
+to LOUDS, encodes the trie topology in a bitvector 𝐵 but visits the
+nodes in preorder. DFUDS allows implementing some operations more
+efficiently than LOUDS, such as computing the subtree size or the
+number of leaves to the left of a node (see [56, §8.3] for details), so that
+algorithm designers choose one or the other depending on the string
+queries they wish to support on the indexed dictionary.
+Now, the most recent and promising solution leveraging a suc-
+cinct trie-structure representation is offered by the Fast Succinct Trie
+(FST) [5], which features query-efficient encoding schemes (LOUDS-
+Dense) for the upper levels of the trie and space-efficient encoding
+schemes (LOUDS-Sparse) for its lower levels. Because of its known
+space–time efficiency, we include the FST in our experiments of Sec-
+tion 5.
+Burrows–Wheeler transform. The XBW [31] is a compressed indexing
+approach for labelled trees, based upon the Burrows–Wheeler Trans-
+form [58]. It achieves space occupancy up to their 𝑘th order entropy
+and supports efficient sub-path searches. Variants of this approach [32]
+have been applied to compress the Permuterm index [59] in order
+to support sophisticated and time-efficient wildcard queries over a
+dictionary of strings. Its reduced memory footprint makes its space
+performance similar to bzip2, and better than Front Coding. The
+LZ78-parsing scheme inspired other solutions too [38]. These succinct
+schemes achieve entropy bounds but unfortunately result in much
+slower query times compared to all the other viable solutions solving
+the very same problem, and thus are not experimented in this paper.
+String-adapted B-tree variants. If I/O efficiency is mandatory, the choice
+turns out to be the String B-tree [33], which is a sophisticated com-
+bination of B-trees with Patricia tries. Recently, it was made cache-
+oblivious [34] and compressed [35] by combining in a sophisticated
+way the best-known techniques in string and labelled tree compression,
+as well as a proper memory layout of trees for supporting cache-
+oblivious trie traversals. To the best of our knowledge, an implementa-
+tion of this scheme is yet to be released; this may be due to its rather
+complex structure.
+1 For 𝑏 = 𝟶 or 𝟷, the 𝚛𝚊𝚗𝚔𝑏(𝑖) primitive counts the number of 𝑏-bits up to
+position 𝑖, while 𝚜𝚎𝚕𝚎𝚌𝚝𝑏(𝑖) returns the position of the 𝑖th 𝑏-bit. Both operations
+can be supported in (1) time using succinct auxiliary structures [57].
+Non-trie solutions. The work of [37] contributed to this field with sim-
+ple static and compressed string dictionaries based on front-coding, suc-
+cinct structures, and full-text indexes [60,61]. Unfortunately enough,
+these proposals do not guarantee any good asymptotic I/O and space
+bounds [35]; nonetheless, they seem to be as competitive as PDT in
+practice. The 𝑧-fast trie (ZFT) [54,62] is a dynamic and asymptotically-
+efficient trie structure based upon the concept of fat binary search . In
+our view of it, ZFT can be regarded as another ‘‘non-trie solution’’, as it
+transforms a trie into a set of properly-built hash tables. This way, each
+prefix search is carried out with a (fat) binary search over the length
+of the searched string by leveraging those hash tables. Recently, the
+work of [40] introduced another compressed string dictionary based
+on a hierarchical front-coding with ideas leveraging longest common
+prefixes and suffix arrays to speed up searches.
+We do not experiment with the implementation provided in [37,40]
+as we were unable to run these codebases due to some old software
+dependencies and incompatibilities with modern compilers. We do not
+experiment with ZFT as its space and lookup performance have been
+shown to be dominated by ctrie ++ [24], which is included in our
+experiments.
+To summarise, in light of this literature review, we will experiment
+in Section 5 with ART [29] and its compact version CART [5,41],
+ctrie++ [24], FST [5], and PDT [17], because they are either the
+state of the art or they offer efficient approaches to compact trie
+representations. To the best of our knowledge, this represents the very
+first work experimenting with all these implementations together over
+a wide variety of datasets that allow us to show the benefits and the
+drawbacks of all of them.
+3. A motivating example
+‘‘Subtrie compaction’’ is a common technique in the design of
+compressed string dictionaries hinging on the trie data structure. It has
+been mainly investigated in the restricted context of either bounding
+the subtrie height, to fit the branching substring into one machine
+word [22–24], or in bounding the macro-node fan-out, so that more
+space–time efficient data structures can be used for it [20,21,39].
+In what follows, we first introduce a novel macro-node representa-
+tion of a subtrie and then provide a concrete example of the impact
+this technique can have on the space–time efficiency of the resulting
+compressed trie.
+Our technique consists of properly choosing (i) the different heights
+of the subtries to collapse into macro-nodes, and (ii) the coding mech-
+anism to represent the corresponding branching substrings (associated
+with the collapsed edge labels). In this way, the resulting trie repre-
+sentation adapts its space occupancy to the trie structure and to the
+distribution of the edge labels, while still preserving efficient time
+performance for the traversal operations.
+The question we wish to address here is whether thatadaptive choice
+is necessary or not.
+Consider the tries  and  of Fig. 1 built respectively on the two
+sets of strings 𝑆1 = {AG, AT, CA, CC} and 𝑆2 = {AA, AC, 𝜉𝜉′, 𝜉𝜉}, where
+𝜉 denotes the last symbol in a (potentially large) alphabet 𝛴, and 𝜉′
+denotes the symbol preceding 𝜉 in 𝛴. In , the alphabet {A, C, G, T}
+consists of just 4 symbols, so we need 2 bits to represent them. In ,
+the alphabet is assumed to be 𝛴 = {A, C, … , 𝜉′, 𝜉} and its symbols can
+be represented with 𝑏 = ⌈log2 |𝛴|⌉ bits.
+Let us now consider two scenarios for the encoding of both tries
+above: one in which the trie  ∈ { , } succinctly encodes the
+individual branching symbols; the other one in which the two levels
+of  are collapsed at the root node, thereby creating a macro-root  𝑐
+with branching macro-symbols of length 2 symbols. For evaluating the
+space cost of encoding  and  𝑐 we consider the following succinct
+scheme: for every node in level order, we store the first branching
+symbol explicitly and then encode the gap between successive symbols
+using some coding tool, say 𝛾-code.
+
+--- PAGE 5 ---
+Information Systems 120 (2024) 102316
+5
+A. Boffa et al.
+Fig. 1. Two tries  and  built on two sets of four strings: {AG, AT, CA, CC} on the left, and {AA, AC, 𝜉𝜉′, 𝜉𝜉} on the right.  uses just four alphabet symbols, and  uses a much
+larger alphabet in which 𝜉′ and 𝜉 are the last two symbols.
+Let us recall that the 𝛾-code of a positive integer 𝑥 consists of a
+number of 0s equal to the number of bits minus one of the binary
+representation of 𝑥, followed by that binary representation, e.g. 𝛾(6) =
+𝟶𝟶 𝟷𝟷𝟶. Thus, 𝛾(𝑥) takes 2⌊log2 𝑥⌋ + 1 bits.
+Fact 3.1. The succinct representation of the edge labels in the trie  takes
+9 bits. Instead, the succinct representation of the edge labels in the collapsed
+trie 𝑐 takes 7 bits.
+Proof. The succinct representation of the edge labels in the trie takes
+3 + 3 + 3 = 9 bits. In fact, the encoding of the edge labels {A, C} of the
+root is A 𝛾(C − A) = 𝟶𝟶 𝛾(𝟷) = 𝟶𝟶𝟷, then the encoding of the edge labels
+{G, T} of the first node at the second level is G 𝛾(G −T) = 𝟷𝟶 𝛾(𝟷) = 𝟷𝟶𝟷,
+and finally the encoding of the edge labels {A, C} (again) of the second
+node at the second level is A 𝛾(C − A) = 𝟶𝟶𝟷.
+If, instead, we collapse the two levels of  in the root of 𝑐,
+this gets four children whose edge labels are {AG, AT, CA, CC}, and
+their succinct representation takes 7 bits. In fact, we encode the first
+branching macro-symbol as AG = 𝟶𝟶𝟷𝟶, followed by the encoding of the
+other three branching macro-symbols as: 𝛾(AT −AG) = 𝛾(𝟶𝟶𝟷𝟷 − 𝟶𝟶𝟷𝟶) =
+𝛾(𝟷) = 𝟷, 𝛾(CA − AT) = 𝛾(𝟶𝟷𝟶𝟶 − 𝟶𝟶𝟷𝟷) = 𝛾(𝟷) = 𝟷, and 𝛾(CC − CA) =
+𝛾(𝟶𝟷𝟶𝟷 − 𝟶𝟷𝟶𝟶) = 𝛾(𝟷) = 𝟷.
+Therefore, in terms of space occupancy, the succinct representation
+of  is worse than the one of 𝑐. This result is even more evident when
+accounting for the space required to store the trie topology, simply
+because  has more nodes than 𝑐. We conclude that, in this setting,
+it is better to collapse the trie as 𝑐.
+Surprisingly, one comes to the opposite conclusion with , despite
+having the same topology of . Here, the larger alphabet together with
+the different distribution of the edge labels changes the optimal choice.
+Fact 3.2. The succinct representation of the edge labels in the trie  takes
+at most 5𝑏 + 1 bits. Instead, the succinct representation of the edge labels in
+the collapsed trie 𝑐 may take up to 6𝑏 − 1 bits.
+Proof. We can indeed represent the edge labels {A, 𝜉} of the root with
+A 𝛾(|𝛴|−1) which takes at most 3𝑏−1 bits; the root gets followed by the
+encoding of the edge labels {A, C} of the first node at the second level,
+namely A 𝛾(C − A) = A 𝛾(𝟷) which takes 𝑏 + 1 bits, and by the encoding
+of the edge labels {𝜉′, 𝜉} of the second node at the second level, which
+is 𝜉′ 𝛾(𝟷) which also takes 𝑏 + 1 bits.
+Conversely, the succinct representation of 𝑐 may take up to 6𝑏 −
+1 bits, since we encode AA with2𝑏 bits set to 0, followed by 𝛾(AC−AA) =
+𝛾(𝟷) = 𝟷, then by 𝛾(𝜉𝜉 ′ − AC) = 𝛾(𝟶𝟷 … 𝟷𝟶𝟷) (which takes 4𝑏 − 3 bits,
+because the 𝛾-encoded number consists of 2𝑏 − 1 bits), and finally by
+𝛾(𝜉𝜉 − 𝜉𝜉 ′) = 𝛾(𝟷) = 𝟷. □
+Hence, differently from the previous example on , here it is better
+not to collapse  because its succinct encoding takes 𝑏 − 2 bits less than
+the one of 𝑐, and 𝑏 can make this gap arbitrarily large, up to the point
+that the cost of representing their topology becomes negligible.
+This example shows that there is noa priori best choice about which
+subtrie to collapse, thus opening a significant deal of possible improve-
+ments to the known trie representations. In particular, the ‘‘best’’ choice
+depends upon several features, such as the trie structure, the number of
+distinct branching symbols at each node and their distribution among
+the trie edges. Consequently, designing a principled approach to finding
+that ‘‘best’’ choice for each individual trie node is a quite complex task,
+that we rigorously investigate throughout the rest of the paper.
+4. CoCo-trie: Compressed collapsed trie
+The simplest and most used approach to collapsing tries is to obtain
+the trie 𝓁 by collapsing 𝓁 levels of the subtries rooted at the nodes
+whose distances from the root of  are multiple of 𝓁 [22–24]. In this
+way, one can seek for a pattern𝑃 [1, 𝑝] over 𝓁 by traversing at most 𝑝∕𝓁
+(macro-)nodes and by executing 𝑝∕𝓁 branches over (macro-)characters
+(e.g., 𝓁 is the number of characters that fit into a RAM word). Ob-
+viously, increasing 𝓁 reduces the number of branching steps, but it
+may increase (i) the computational cost of each individual step, given
+that the number and the length of the branching (macro-)characters
+increase; and, (ii) the space occupancy of the overall trie, given that
+shared paths within the collapsed subtries are turned into distinct sub-
+strings by macro-characters (see e.g. the paths ‘‘e$’’ and ‘‘es’’ descending
+from 𝑣 in Fig. 2, which share ‘‘e’’).
+In order to address in a principled way the above issues, we start
+by dealing with three main questions:
+Q1: Can we tackle in an algorithmic way the issues (i) and (ii) above
+as 𝓁 increases?
+Q2: How does the choice about the number 𝓁 of levels to collapse
+depend on the dictionary of strings?
+Q3: Should the choice of 𝓁 be global, and thus unique to the entire trie,
+or should it be local, and thus vary among trie nodes?
+These questions admit surprising answers in theory, which have
+equally-surprising impacts in practice. In particular, we will:
+• answer Q1 affirmatively, by resorting to a pool of succinct en-
+coding schemes for compressing the possibly long edge labels
+(i.e., branching macro-characters);
+• show for Q2 that the choice for 𝓁 has to account for the topology
+and edge labelling of the trie  , and thus the characteristics of its
+indexed strings;
+• show for Q3 that one has to find locally, i.e., node by node, the
+best value of 𝓁, via a suitably-designed optimisation procedure
+aimed at minimising the overall space occupancy of the resulting
+collapsed trie.
+
+--- PAGE 6 ---
+Information Systems 120 (2024) 102316
+6
+A. Boffa et al.
+Fig. 2. Collapsing 𝓁 = 2 levels of the subtrie rooted at 𝑣.
+Our algorithmic answer to all these questions consists of six main
+steps, whose final result will be our CoCo-trie data structure. Firstly,
+we introduce a novel compressed encoding for the collapsed subtries
+(Section 4.1). Secondly, we provide an optimisation procedure that
+efficiently chooses the subtries to collapse within the trie  and com-
+press each of them by that compressed encoding (Section 4.2). Thirdly,
+we empower the previous optimisation procedure by defining a pool
+of compressed encodings, thus driving the choice of the subtries to
+collapse also in terms of the best compression scheme for each of them
+(Section 4.3). Fourthly, we introduce a further compression step that
+exploits the local alphabet of the edge labels in the collapsed subtries
+(Section 4.4). Fifthly, we show how to introduce some flexibility in
+our data-aware optimisation procedure by trading space occupancy
+with query time (Section 4.5). And lastly, we describe how to imple-
+ment the 𝚛𝚊𝚗𝚔 operation over the resulting compressed trie structure
+(Section 4.6).
+4.1. Compressed encoding of collapsed subtries
+Let us be given a trie  whose edges are drawn from an integer
+alphabet 𝛴 = {0 , … , 𝜎 − 1} and sorted increasingly at each node.
+The special character 0 (indicated with $) is the string terminator. We
+formalise the notion of collapsed subtries as follows.
+Definition 4.1. Given an internal node 𝑣 of a trie  and an integer
+𝓁 ≥ 1, the collapsing of 𝓁 levels of the subtrie of  rooted at 𝑣 consists
+in replacing this subtrie with a macro-node 𝑣𝓁 such that (i) the edges
+branching out of 𝑣𝓁 are labelled with substrings which correspond to
+the paths of length 𝓁 descending from 𝑣 in  , and (ii) the children of
+𝑣𝓁 are the nodes at distance 𝓁 from 𝑣 in  . If the branching substrings
+are shorter than 𝓁, we pad them with the character $.
+This is depicted in Fig. 2, where five paths of length 𝓁 = 2 are
+collapsed to form the five branching edges {at, e$, es, is, os} of 𝑣𝓁.
+To encode a string 𝑠 branching out of 𝑣𝓁, we initially right-pad it
+with 𝓁 − |𝑠| characters $, if |𝑠| < 𝓁; then, we assign it the integer
+𝑖𝑛𝑡𝓁(𝑠) =
+𝓁∑
+𝑖=1
+𝑠[𝑖] ⋅ 𝜎𝓁−𝑖. (1)
+Intuitively, we model every branching macro-character of 𝑣𝓁 as an
+integer 𝑖𝑛𝑡𝓁(𝑠) drawn from the integer alphabet 𝛴𝓁 = {0 , … , 𝜎𝓁 − 1}.
+Furthermore, we observe that 𝑖𝑛𝑡𝓁 is monotonic, in the sense that, given
+two strings 𝑠′ and 𝑠′′ such that 𝑠′ is lexicographically smaller than 𝑠′′,
+then 𝑖𝑛𝑡𝓁(𝑠′) < 𝑖𝑛𝑡 𝓁(𝑠′′). This is an important property because we want
+to support lexicographic searches over the CoCo-trie, and thus properly
+answer the 𝚛𝚊𝚗𝚔 operation.
+Now, suppose that 𝑣𝓁 has 𝑚 branching macro-characters, which
+are represented as integers 𝑐1
+𝑣𝓁
+, … , 𝑐𝑚
+𝑣𝓁
+by the 𝑖𝑛𝑡𝓁 function above. Our
+compression scheme explicitly encodes the first macro-character𝑥 = 𝑐1
+𝑣𝓁
+using a fixed-size representation, taking log 𝜎𝓁 bits,2 and represents
+the other 𝑚 − 1 macro-characters by encoding the sequence 𝑐𝑖
+𝑣𝓁
+− 𝑥
+2 We omit ceilings for the sake of simplicity.
+for 𝑖 = 2 , … , 𝑚 with Elias-Fano (EF) [63,64], which takes (𝑚 − 1)(2 +
+log 𝑢
+𝑚−1 ) bits, where 𝑢 = 𝑐𝑚
+𝑣𝓁
+−𝑐1
+𝑣𝓁
+is the universe size of the sequence. To
+decompress the EF sequence, we also need to store some small metadata
+taking log log 𝑢
+𝑚 ≤ log log 𝜎𝓁
+𝑚 bits.
+Crucially, the speed of the 𝚛𝚊𝚗𝚔 operation (which we will discuss
+in Section 4.6) depends on the ability to perform efficient searches on
+the compressed sequence of macro-character, which is indeed one of
+the reasons we use EF. Notice that other efficiently-searchable integer
+encoding schemes could be used in place of EF or along with it, and
+indeed we do so in Section 4.3.
+Summing up, the space occupancy in bits of the collapsed and
+compressed macro-node 𝑣𝓁 is (excluding EF’s metadata)
+𝐶(𝑣𝓁) = log 𝜎𝓁 + (𝑚 − 1)
+(
+2 + log 𝑢
+𝑚 − 1
+)
++ 2, (2)
+where the first term corresponds to the space taken by the first macro-
+character, the second term accounts for the space needed to store the
+(𝑚−1) EF-coded integers, and the last 2 bits account for the contribution
+of the node 𝑣𝓁 to the space required by a succinct trie representation
+(we use LOUDS, see Section 2).
+We underline that the subtraction of 𝑥 has a subtle, yet paramount,
+impact on the space occupancy of our trie representation. It indeed
+removes any possible redundancy given by the longest common prefix
+(shortly, lcp) among the substrings labelling the edges branching out
+of 𝑣𝓁. For instance, if we have 𝓁 = 2 and the four branching macro-
+characters {ha, he, hi, ho}, then our encoding scheme stores 𝑥 = 𝑖𝑛𝑡𝓁(ha)
+explicitly as the integer equal to h⋅𝜎1+a⋅𝜎0, and it encodes the following
+three branching macro-characters {he, hi, ho} as the difference with 𝑥.
+For example, it encodes ‘‘he’’ as 𝑖𝑛𝑡𝓁(he) = ( h ⋅ 𝜎1 + e ⋅ 𝜎0) − 𝑥 =
+(h ⋅ 𝜎1 + e ⋅ 𝜎0) − (h ⋅ 𝜎1 + a ⋅ 𝜎0) = e − a. So our encoding scheme stores
+the lcp ‘‘h’’ only once in 𝑥, thereby getting rid of much redundancy in
+the edge labels, and saving a big deal of space, especially when 𝓁 gets
+longer. As a matter of fact, we are reducing the value of the integers
+𝑐𝑖
+𝑣𝓁
+, which are upper-bounded by 𝜎𝓁, to the values 𝑐𝑖
+𝑣𝓁
+− 𝑐1
+𝑣𝓁
+, which are
+upper-bounded by 𝜎𝓁−|𝑙𝑐𝑝|.
+4.2. On the choice of the subtries to collapse
+Given the above compressed encoding of collapsed tries, we are
+ready to answer questions Q2 and Q3 of Section 4 about the choice
+and the number of levels of the subtries to collapse, which may vary
+among all trie nodes.
+4.2.1. CoCo-trie with the Elias-Fano code: an analysis
+First of all, we need to generalise the discussion of Section 3
+about the simple 𝛾-code, to the case of the more query-efficient, yet
+compressed, EF-based encoding we have introduced in the previous
+section.
+We consider the special situation of a trie  (𝑚) with a very regular
+structure, in which each internal node has got exactly 𝑚 children, with
+𝑚 ≤ 𝜎. We will show that, on such a regular trie, the optimal choice of
+𝓁 depends on the parameters 𝑚 and 𝜎. On a generic trie, the situation
+is even more complicated, because 𝑚 and 𝜎 may significantly vary at
+each internal node. As such, we will conclude that the optimal choice
+
+--- PAGE 7 ---
+Information Systems 120 (2024) 102316
+7
+A. Boffa et al.
+of 𝓁 cannot be global; hence, we will need to design an optimiser that
+systematically determines the value of 𝓁 locally at each trie node, with
+the goal of minimising the global space occupancy of the whole trie
+(see Section 4.2.2).
+Now, given  (𝑚), we notice that we do not need to store its topology.
+Thus, collapsing a subtrie of height 𝓁 yields a macro-node whose
+representation takes a number of bits upper-bounded by
+𝐵𝑚(𝓁) = log 𝜎𝓁 + (𝑚𝓁 − 1)(
+2 + log 𝜎𝓁
+𝑚𝓁 − 1
+)
+, (3)
+where we used Eq. (2), the fact that 𝑢 ≤ 𝜎𝓁 and that the number of
+branching macro-characters is 𝑚𝓁.
+For a given 𝑚, we can study the behaviour of 𝐵𝑚(𝓁) and thereby
+define an optimisation procedure that determines which value of 𝓁
+minimises the space occupancy of the compressed trie representation.
+Now, under the above-mentioned assumptions, by compacting 𝓁 ≥ 1
+levels we are actually compacting 𝑁𝑚(𝓁) = 1 + 𝑚 + 𝑚2 + ⋯ + 𝑚𝓁−1 =
+(𝑚𝓁 − 1)∕(𝑚 − 1) nodes of  (𝑚); in fact, at the 𝑘th level of  (𝑚) there are
+exactly 𝑚𝑘 nodes. We can hence infer that each node of  (𝑚) accounts
+for a 1∕𝑁𝑚(𝓁) fraction of a macro-node’s space cost. Consequently, we
+can upper-bound the space for the compacted representation of each
+node in  (𝑚) as
+𝛿𝑚(𝓁) = 𝐵𝑚(𝓁)
+𝑁𝑚(𝓁) = (𝑚 − 1)
+(
+2 + log 𝜎𝓁
+𝑚𝓁 − 1 + log 𝜎𝓁
+𝑚𝓁 − 1
+)
+. (4)
+It goes without saying that a space optimiser should choose the value
+for 𝓁 which minimises 𝛿𝑚(𝓁).
+Example. Let us fix 𝜎 = 16 and consider the 16 different regular
+tries  (𝑚) in which each internal node has got exactly 𝑚 children, for
+𝑚 = 1 , 2, … , 16. Let us also assume that these tries are very deep. For
+each of these tries, we want to minimise Eq. (4) and determine the
+value of 𝓁 for which the compaction of  (𝑚) is space-optimal.
+The case 𝑚 = 1 is not interesting, since the trie degenerates to
+a simple unary path, for which every 𝓁 is equally space-optimal. Let
+us thus draw our attention to the case of 𝑚 > 1. For a given fan-out
+𝑚 = 2, 3, … , 𝜎, we need to determine the value of 𝓁 ≥ 1 that minimises
+𝛿𝑚(𝓁). For 𝜎 = 16 , by numerical simulation is easy to get convinced
+that whenever 2 ≤ 𝑚 ≤ 11 the function 𝛿𝑚(𝓁) admits a global minimum
+at 𝓁 = 1 . Conversely, for 12 ≤ 𝑚 ≤ 15 the function 𝛿𝑚(𝓁) admits a
+global minimum at 𝓁 = 2 . Lastly, for 𝑚 = 16 we have that 𝛿16(𝓁) is
+a monotonically-decreasing function: this means that the greater 𝓁 is,
+the lower the cost for representing the regular trie. This latter is not a
+surprising outcome, since balanced tries with the maximum admissible
+fan-out ( 𝑚 = 𝜎 = 16 ) are extremely easy to compress: the optimal
+choice is to compact the whole trie (all levels, 𝓁 = +∞ ) into a single
+macro-node. Hence, for a trie whose alphabet size is 𝜎 = 16, we have
+arg min
+𝓁
+𝛿𝑚(𝓁) =
+⎧
+⎪
+⎨
+⎪⎩
+1 if 2 ≤ 𝑚 ≤ 11
+2 if 12 ≤ 𝑚 ≤ 15
++∞ if 𝑚 = 16
+Summing up, we have shown that for each different (regular) trie  (𝑚)
+a possibly different optimal 𝓁 does exist, but finding its best value is
+a non-trivial task, as 𝓁 depends on different parameters, including the
+alphabet dimension 𝜎 and the node fan-out 𝑚. □
+4.2.2. Our optimisation approach
+We now get down to the details of our data-aware optimisation
+scheme that, given an input a generic trie  , identifies which subtries
+of  to collapse (and for which height𝓁 each one), in order to minimise
+the space occupancy of its resulting representation.
+Our algorithm performs a post-order traversal of  , starting from
+the root. Let ℎ(𝑣) denote the height of the subtrie rooted at 𝑣 (and
+reaching its descending leaves in  ). For each node 𝑣, the algorithm
+evaluates the cost of encoding the entire subtrie descending from 𝑣
+by taking into account the space cost 𝐶(𝑣𝓁) of Eq. (2) referring to
+the subtrie of 𝑣 limited to height 𝓁, plus the optimal space cost 𝐶 ∗(𝑑)
+of encoding recursively the entire subtries hanging from the nodes 𝑑
+descending from 𝑣 at distance 𝓁. We vary 𝓁 = 1 , … , ℎ(𝑣), thereby de-
+termining the minimum space occupancy 𝐶 ∗(𝑣). Formally, if 𝑑𝑒𝑠𝑐 (𝑣, 𝓁)
+is the set of descendants of 𝑣 at distance 𝓁 in  (recall that 𝓁 ≤ ℎ(𝑣)),
+we have
+𝐶 ∗(𝑣) = min
+𝓁=1,…,ℎ(𝑣)
+{
+𝐶(𝑣𝓁) +
+∑
+𝑑∈𝑑𝑒𝑠𝑐 (𝑣,𝓁)
+𝐶 ∗(𝑑)
+}
+. (5)
+Note that, if 𝑣 is a leaf, we simply set 𝐶 ∗(𝑣) = 𝐶(𝑣1) = 2 , because a leaf
+cannot be further collapsed and its cost in the LOUDS representation
+is 2 bits. Clearly, because of the post-order visit, the values 𝐶 ∗(𝑑) are
+available whenever we compute 𝐶 ∗(𝑣).
+When the root of  is eventually visited, the topology and the
+encoding of all (macro-)nodes of our CoCo-trie have already been fully
+determined. Thus, we know which subtries to collapse and for which
+height 𝓁, which may vary from one subtrie to another. By Eq. (5), the
+resulting data structure is the space-optimal one using the encoding
+scheme described in Section 4.1.
+The following result estimates the space–time efficiency of this
+optimisation approach.
+Theorem 1. The CoCo-trie of a given input trie  of height ℎ and 𝑁
+nodes can be computed in (𝑁ℎ) time and (𝑁) space.
+Proof. Starting from a node 𝑣 of height ℎ(𝑣), we can compute 𝐶(𝑣𝓁)
+for any 𝓁 = 1 , 2, … , ℎ(𝑣) by obtaining incrementally all the optimi-
+sation parameters 𝑢𝓁 (universe) and 𝑚𝓁 (branching) from the already
+(inductively) known 𝑢𝓁−1 and 𝑚𝓁−1.
+To compute the universe size 𝑢𝓁 for 𝑣𝓁 we need to determine the
+𝑖𝑛𝑡𝓁-code of the leftmost and rightmost length- 𝓁 substrings descending
+from 𝑣, and these can be computed by extending the respective 𝑖𝑛𝑡𝓁−1-
+codes computed at the previous step with one character, in constant
+time. This costs overall (𝑁ℎ) time because, for each node, we have to
+visit the leftmost and rightmost branching substrings that are of length
+at most ℎ.
+To compute 𝑚𝓁 (i.e. the number of children of the collapsed macro-
+node 𝑣𝓁), we need to visit once the whole subtrie rooted at 𝑣. Knowing
+𝑚𝓁−1, we add to it the number of leaves at the 𝓁th level. Performing for
+every node 𝑣 a complete visit of its whole subtrie costs overall (𝑁ℎ)
+time: indeed, each of the 𝑁 nodes has at most ℎ different ancestors and
+thus belongs to at most ℎ different subtries, thereby getting visited at
+most ℎ times.
+For every node 𝑣 we maintain just the optimal 𝐶 ∗-cost, thus the
+required space amounts to (𝑁).
+We finally remark that in the above optimisation scheme we can fix
+a constant upper-bound to the maximum number 𝓁 of collapsed levels
+so that the above time cost becomes(𝑁). This is actually the approach
+we take in our experimental section, where we bound𝓁 for each node 𝑣
+by setting ℎ(𝑣) = 𝑤∕ log 𝜎 in Eq. (5), where 𝑤 is the RAM word size in
+bits (see also Section 4.4). This feature may remind similar mechanisms
+adopted in ctrie [22,23] and ctrie ++ [24], where a subtrie is packed
+into a machine word. However, our optimisation scheme provides more
+flexibility and thus it is more powerful because the height of the subtrie
+to collapse is not chosen in advance and equal over the whole trie, but
+it is adaptively chosen on a per-node basis and in a data-aware manner
+according to the subtrie topology and the distribution of its edge labels.
+Additionally, the height of the subtrie to collapse can also be tailored
+to the specific characters appearing in the subtrie rather than to the
+characters appearing in the whole trie (global alphabet), as we will see
+in Section 4.4.
+4.3. A pool of succinct encoding schemes
+Thus far, we represented the 𝑚 − 1 integers 𝑐𝑖
+𝑣𝓁
+representing the
+branching macro-characters of a macro-node 𝑣𝓁 via the EF-encoding of
+
+--- PAGE 8 ---
+Information Systems 120 (2024) 102316
+8
+A. Boffa et al.
+the increasing sequence 𝑐𝑖
+𝑣𝓁
+−𝑥, for 𝑖 = 2, … , 𝑚, where 𝑥 = 𝑐1
+𝑣𝓁
+is the first
+branching character we stored explicitly. This sequence of𝑚−1 integers
+is drawn from a universe of size 𝑢 = 𝑐𝑚
+𝑣𝓁
+− 𝑐1
+𝑣𝓁
++ 1. Depending on 𝑚, 𝑢
+and the values of the branching macro-characters, it may be beneficial
+in time, in space, or both, to resort to other kinds of encodings.
+On the grounds of this observation and inspired by the hybrid
+integer-encoding literature [65–69], we now equip the CoCo-trie op-
+timisation algorithm of the previous section with an assortment of
+encoding mechanisms so that the compressed representation of every
+single node can be chosen in a data-aware manner from them. This
+amounts to redefining the bit cost𝐶(𝑣𝓁) of storing the macro-node 𝑣𝓁 so
+as to consider the cost in bits of other compression schemes besides EF.
+Specifically, when evaluating 𝐶(𝑣𝓁) during the traversal (see Eq. (5)),
+we select the compression scheme that gives the minimum bit-represen-
+tation size for all collapsed subtries descending from 𝑣 and return that
+bit size as the result for 𝐶(𝑣𝓁).
+For our experimental study in Section 5, alongside EF, we adopt as
+the pool of integer encoders for the macro-characters: packed encod-
+ing (PA), characteristic bitvectors (BV), and dense encoding (DE). PA
+uses log 𝑢 bits for each 𝑐𝑖
+𝑣𝓁
+, for a total of (𝑚 − 1) log 𝑢 bits. BV uses 𝑢
+bits initially set to 0, and then sets to 1 the 𝑚 − 1 bits corresponding to
+each 𝑐𝑖
+𝑣𝓁
+. DE comes into use whenever 𝑢 = 𝑚 − 1, i.e. for representing
+a sequence of consecutive increasing integers. These encoding schemes
+allow us to implement the predecessor search easily, as needed by the
+𝚛𝚊𝚗𝚔 operation in our CoCo-trie (see Section 4.6).
+As a desideratum, we require that the bit size of the representation
+resulting from any of the deployed encoding schemes should be eval-
+uated in constant time by means of the sole parameters 𝑚 and 𝑢 of a
+given node, both of which are readily available during the tree traversal
+(see the proof of Theorem 1). All the aforementioned encoding schemes
+meet this requirement.
+This notwithstanding, one could employ other compression schemes
+that do not have a closed-form expression for their bit size (e.g. the
+𝛾-codes of the differences between macro-characters as in Section 3)
+either by running them and measuring the actual space occupancy or
+by using upper bounds for it (see e.g. [56, §2.9]). In this case, the cost
+stated in Theorem 1 should be re-evaluated, and could be larger.
+4.4. Squeezing the universe of the macro-characters
+We now describe an additional step to further decrease the space
+required by the compression of the macro-characters by means of
+an alphabet-aware encoding . The idea lies in replacing the encoding
+function 𝑖𝑛𝑡𝓁 defined in Eq. (1) and depending on the global alphabet
+𝛴 of the whole trie, with a new one that depends on the size of the
+local alphabet of the branching edges of the macro-node 𝑣𝓁.
+Specifically, let 𝛴𝑣𝓁 ⊆ 𝛴 be the alphabet of symbols occurring in the
+edge labels of the collapsed macro-node 𝑣𝓁. For example, in Fig. 2 we
+have 𝛴 = {$, a, e, h, i, n, o, s, t} and 𝛴𝑣𝓁 = 𝛴 ⧵{h, n}. By changing 𝜎 = |𝛴|
+in Eq. (1) with 𝜎𝑣𝓁 = |𝛴𝑣𝓁 |, we can squeeze the size of the universe
+of the branching macro-characters of 𝑣𝓁 from 𝜎𝓁 to 𝜎𝓁
+𝑣𝓁
+. This, in turn,
+reduces the magnitude and the distance between consecutive integers
+associated with the branching macro-characters and thus allows a more
+effective compression. Also, we reduce the first term of Eq. (2) to
+log 𝜎𝓁
+𝑣𝓁
+.
+Clearly, each macro-node 𝑣𝓁 adopting this optimisation must store a
+mapping between 𝛴 and the local alphabet 𝛴𝑣𝓁 , which is implemented
+with a bitvector 𝐵[0, 𝜎 − 1] where 𝐵[𝑖] = 1 if symbol 𝑖 appears in
+𝛴𝑣𝓁 [70]. In practice, 𝜎 is typically small (e.g. 256 for 8-bit ASCII al-
+phabets) so that rank/select operations over 𝐵 can be executed without
+additional space via a few bit-manipulation instructions (see e.g. [71,
+§3.2]).
+Of course, this optimisation requires modifying 𝐶(𝑣𝓁) to account
+for both the more efficient macro-characters representation due to the
+squeezed universe and the size of the alphabet mapping (i.e. 𝜎 bits).
+Overall, the time complexity for building the CoCo-trie becomes
+(𝑁ℎ 2) since we cannot compute 𝑢𝓁 incrementally as described in the
+proof of Theorem 1; the space complexity instead does not change, as
+we do not store the bitmaps 𝐵𝓁[1, 𝜎], but we compute them incremen-
+tally while visiting the subtries as in the proof of Theorem 1. This time
+complexity might appear prohibitive, but in Section 5 we will show that
+the practical building time is reasonable and worth achieving excellent
+and Pareto optimal performance at query time.
+4.5. Dealing with the space–time trade-off
+Under some scenarios, it might be of interest to slightly readjust
+our optimisation procedure to take into account the query performance
+too, while possibly giving up just a little of the space optimality. To
+accomplish this space–time trade-off, we rely on the intuition that the
+more levels are collapsed, the faster a trie traversal will be. But, on the
+other hand, as we collapse more levels, the fan-out of each macro-node
+increases and so the time to branch out of each individual macro-node
+increases as well. However, we experimentally observed that this is
+not a major concern because our compressed encoding of collapsed
+subtries is in practice extremely efficient to be navigated; thus the time
+reduction given by increasing the number of collapsed levels dominates
+the increased access time due to the larger node fan-out.
+With this in mind, we modify the algorithm of Section 4.2 to relax
+the search for the minimum space occupancy as follows. At each visited
+internal node 𝑣, we compute 𝐶 ∗(𝑣) as usual and denote by 𝓁∗ the value
+of 𝓁 minimising the right-hand side of Eq. (5). Then, we find the largest
+value 𝓁 ∈ { 𝓁∗, 𝓁∗ + 1, … , ℎ(𝑣)} that allows representing the collapsed
+node within a constant factor 𝛼 ≥ 0 more than 𝐶 ∗(𝑣). Note that this new
+approach has no impact on the construction complexity. We experiment
+with it in Section 5, where 𝛼 will be expressed as a percentage.
+4.6. Query operations
+The operation 𝚕𝚘𝚘𝚔𝚞𝚙(𝑃 ) in the CoCo-trie begins from the root
+macro-node 𝑣𝓁 by computing the integer 𝑦 = 𝑖𝑛𝑡𝓁(𝑃 [1, 𝓁]) − 𝑐1
+𝑣𝓁
+. Then,
+we seek for 𝑦 into the increasing sequence 𝑐𝑖
+𝑣𝓁
+− 𝑐1
+𝑣𝓁
+, for 𝑖 = 2 , … , 𝑚:
+if the search fails, we return −1; otherwise, we obtain an index 𝑗 of 𝑦,
+and proceed with the recursion in the 𝑗th child of the macro-node. We
+iteratively consume multiple characters at once from the pattern 𝑃 as
+we descend the CoCo-trie via LOUDS. When 𝑃 is exhausted, we return
+the unique LOUDS index of the node we reached.
+As for the operation 𝚛𝚊𝚗𝚔(𝑃 ), we switch to the DFUDS encoding for
+the trie topology as it allows us to compute the rank of a leaf efficiently,
+takes the same space of LOUDS, and it is still efficient in navigating
+the trie downwards [56, §8.3]. At each macro-node 𝑣𝓁 corresponding
+to the pattern substring 𝑃 [𝑘, 𝑘 + 𝓁 − 1], we compute the integer 𝑦 =
+𝑖𝑛𝑡𝓁(𝑃 [𝑘, 𝑘 + 𝓁 − 1]) − 𝑐1
+𝑣𝓁
+and seek for the largest index 𝑗 such that
+𝑐𝑗
+𝑣𝓁 ≤ 𝑦, and we keep searching recursively into the 𝑗th child of 𝑣𝓁. In
+the case the pattern substring we are considering in 𝑣𝓁 is shorter than
+𝓁, i.e. 𝑘 + 𝓁 − 1 > |𝑃 |, then we proceed downwards to the rightmost
+descendant of the 𝑗th child of 𝑣𝓁 (recall that 𝑖𝑛𝑡𝓁 right-pads the given
+pattern suffix with $ characters until it has length 𝓁). In any case, we
+eventually reach a leaf node and return efficiently its rank thanks to
+the DFUDS encoding of the trie structure.
+For solving the operation 𝚊𝚌𝚌𝚎𝚜𝚜(𝑖) = 𝑠 with DFUDS, we jump
+in constant time to the 𝑖th leaf and reconstruct 𝑠 backwards as the
+navigation proceeds to the root. Specifically, at each macro-node 𝑣𝓁
+encountered along the upward path, we decode the macro-character
+𝑐𝑗
+𝑣𝓁 , where 𝑗 is the position of the previously-visited macro-node among
+𝑣𝓁’s children.
+For solving the operation 𝚙𝚛𝚎𝚏𝚒𝚡_𝚜𝚎𝚊𝚛𝚌𝚑(𝑃 ) with DFUDS, we pro-
+ceed downwards from the root. At each macro-node 𝑣𝓁 corresponding
+to the pattern substring 𝑃 [𝑘, 𝑘 + 𝓁 − 1], we compute the integer 𝑦 =
+𝑖𝑛𝑡𝓁(𝑃 [1, 𝓁]) − 𝑐1
+𝑣𝓁
+and seek for 𝑦 into the increasing sequence 𝑐𝑖
+𝑣𝓁
+− 𝑐1
+𝑣𝓁
+:
+if the search fails, we return an empty string set, meaning that no
+
+--- PAGE 9 ---
+Information Systems 120 (2024) 102316
+9
+A. Boffa et al.
+strings in  are prefixed by 𝑃 . In the case the pattern substring we
+are considering in 𝑣𝓁 is shorter than 𝓁, i.e. 𝑘 + 𝓁 − 1 > |𝑃 |, then we
+return all strings in the subtries descending from the macro-characters
+𝑐𝑎
+𝑣𝓁
+, … , 𝑐𝑏
+𝑣𝓁
+of 𝑣𝓁 whose prefixes match with 𝑃 [𝑘, |𝑃 |]; a pre-order visit
+of the corresponding 𝑏 − 𝑎 + 1 subtries allows to retrieve the string set
+in lexicographic order.
+Finally, for both 𝚕𝚘𝚘𝚔𝚞𝚙(𝑃 ) and 𝚛𝚊𝚗𝚔(𝑃 ), we observe that the step
+that searches for 𝑦 in a macro-node can be efficiently supported in
+all the encoding schemes introduced in Section 4.3. Indeed, if the
+macro-node stores 𝑚 − 1 elements in a universe of size 𝑢, EF allows
+implementing the search in (log 𝑢
+𝑚 ) time using a well-known algorithm
+based on binary search [56, §4.4.2], PA supports it in (log 𝑚) time via
+a standard binary search, BV supports it in (1) time using succinct
+auxiliary structures (recall Footnote 1), and DE supports it in (1) time
+since the child to descend to is given by the value of 𝑦. Moreover, for
+𝚊𝚌𝚌𝚎𝚜𝚜(𝑖), we observe that the step of decoding a macro-character 𝑐𝑗
+𝑣𝓁
+can be done (1) time in all three encoding schemes, since they support
+random access according to 𝑗.
+5. Experiments
+We now experimentally show that:
+1. The choice of the subtries to collapse differs significantly from
+dataset to dataset and from node to node. This provides a clear
+and concrete answer to questions Q2 and Q3 in Section 4, thus
+motivating our study.
+2. The alphabet-aware compression of macro-nodes (Section 4.4)
+improves the space of CoCo-trie by up to 38% and the query
+time by up to 29%.
+3. The technique that allows us to trade off space with query time
+via a parameter 𝛼 (Section 4.5) improves the query time of CoCo-
+trie by up to 33% at the cost of a slight increase in space (no
+more than 24%).
+4. The performance of our highly-engineered competitors is very
+input-sensitive, in the sense that no solution dominates the
+others in space and time on all the datasets.
+5. With respect to our competitors, the CoCo-trie results space–time
+efficient, robust, and flexible: in fact, on three datasets it signif-
+icantly improves the space–time performance of all competitors
+whereas in the three other datasets it is on the space–time Pareto
+front of the best competitors (thus offering other competitive and
+interesting trade-offs).
+Given the variety of the datasets (six) and highly-engineered com-
+petitors (five) we experimentally test in this section, the above results
+suggest that our CoCo-trie may be regarded as the state-of-the-art
+reference for the static string dictionary problem.
+Readers interested in reproducing our experiments can find the
+source code and the datasets at https://github.com/aboffa/CoCo-trie.
+5.1. Implementation notes
+Our implementation of the CoCo-trie is composed of three main data
+structures: denoted with 𝐿, 𝐸, and 𝐹. The first one is the bit-array 𝐿
+containing the succinct LOUDS representation of the (collapsed) trie
+topology. The second one is the array 𝐸 containing, for each macro-
+node 𝑣𝓁, the first branching macro-character 𝑐1
+𝑣𝓁
+followed by the en-
+coding of the remaining macro-characters 𝑐𝑖
+𝑣𝓁
+− 𝑐1
+𝑣𝓁
+, the information
+needed to decode them (i.e. a field representing which encoding has
+been selected from the ones described in Section 4.3, and the alphabet
+in 𝜎 bits if the solution of Section 4.4 is used for 𝑣𝓁), the value of 𝓁
+(Section 4.2), and a flag indicating whether the string labelling the
+path from the trie root to 𝑣 is in the dictionary (since a string in the
+dictionary could be the prefix of another). The last data structure is
+the array 𝐹 containing, for each macro-node 𝑣𝓁, a pointer to 𝐸 where
+the encoding of 𝑐1
+𝑣𝓁
+starts. We random-access 𝐹 via the node identifiers
+implicitly given by the succinct LOUDS representation in 𝐿.
+As we mentioned at the end of Section 4.2, we bound the number
+of levels to be inspected by the optimiser so that the result of 𝑖𝑛𝑡𝓁 does
+not exceed the word size 𝑤 of the machine. This can be achieved by
+setting 𝓁 < ⌈𝑤∕ log 𝜎𝑣𝓁 ⌉ for each macro-node 𝑣𝓁. For example, in our
+128-bit ( uint128_t) implementation, we can collapse into a single
+macro-node a (sub)trie built over an alphabet size 𝜎 = 4 and having
+a height at most 𝓁 = 128∕2 = 64 (indeed this happens in practice, see
+Fig. 3).
+The CoCo-trie is built on the sdsl library [72], 3 ds2i library [73],
+and sux library [74]. To navigate the succinct LOUDS representation
+of the collapsed trie topology (contained in the bitvector 𝐿) the follow-
+ing operations are needed: nodemap, nodeselect, leafrank, and
+child [56, §8.1]. These operations can be implemented with constant-
+time rank/select operations on the bitvector 𝐿. More precisely, from
+the sdsl library, we use sdsl::rank_support_v for rank1 and
+rank00. From the sux library, we usesux::SimpleSelectZero for
+the implementation of select0. Recent studies [75] show that these
+implementations are the fastest, and thus the CoCo-trie is extremely fast
+in navigating the topology of the collapsed trie. Moreover, the pointers
+in the array 𝐹 are stored in a sdsl::int_vector whose entries
+take ⌈log(#macro-nodes)⌉ bits each. From the ds2i library, we leverage
+the efficient Elias-Fano implementation in ds2i::compact_elias_
+fano.
+Finally, we write CoCo-trie 𝛼% to denote the space-relaxation tech-
+nique of Section 4.5 with parameter 𝛼 ≥ 0 (𝛼 = 0 corresponds to the
+space-optimal solution).
+5.2. Experimental setting
+We perform our experiments on a machine equipped with a
+2.30 GHz Intel Xeon Platinum 8260M CPU and 384 GiB of RAM,
+running Ubuntu 20.04.3. We compile our codebase using g++-11.1
+and the C++-20 language standard.
+5.2.1. Datasets
+We aimed at choosing very diverse datasets in terms of sources
+(such as URLs, XML data, DNA and protein sequences, database records,
+and dictionaries of search engines) and features (such as number 𝑛 of
+strings, total size in MB, alphabet size 𝜎, and average/maximum length
+of the lcp between consecutive sorted strings) to capture and depict a
+broad spectrum of performance among the tested string dictionaries.
+All strings in each dataset are different.
+We will experiment with the following six datasets:
+url contains URLs of a Web crawl taken in 2015, starting from
+the site europa.eu without any domain restriction [45]. 4 Stor-
+ing a set of URLs into a string dictionary is fundamental for
+crawlers [59]. URLs datasets have also been used in [16,17,24,
+37,40], but ours is one order of magnitude larger.
+dna consists of all the unique substrings of 𝑘 = 31 bases from a
+DNA sequence obtained from files available at the Gutenberg
+Project site: namely, from 01hgp10 to 21hgp10, plus 0xhgp10
+and 0yhgp10. 5 These unique substrings are called 𝑘-mers, and
+storing them into a string dictionary allows performing subse-
+quent efficient 𝑘-mer-prefix searches (and suffix searches, if the
+dictionary is built on their reversal) and 𝑘-mer counting (even
+on a prefix/suffix of length 𝑙 < 𝑘 ). Datasets with 𝑘-mers have
+also been used in other evaluations [16,37].
+3 We use the https://github.com/vgteam/sdsl-lite fork.
+4 https://law.di.unimi.it/webdata/gsh-2015/
+5 http://pizzachili.dcc.uchile.cl/
+
+--- PAGE 10 ---
+Information Systems 120 (2024) 102316
+10
+A. Boffa et al.
+tpcds-id are strings of 16 characters taken from the
+c_customer_id column of the customer table in the TPC-
+DS-3TB dataset [76].6 Many research papers on query processing
+and optimisation use the TPC-DS standard benchmark [77,
+78], and we note that storing database columns into string
+dictionaries allows solving range queries and joins [79].
+trec-terms is the set of terms appearing in the text of the TREC
+GOV2 collection. The space–time efficient indexing of a set of
+terms appearing in a collection of Web documents is a funda-
+mental task in Information Retrieval [59]. This dataset has also
+been used in [48].
+protein contains different sequences of amino acids. 5 This dataset
+has also been used in [24].
+xml is a part of the XML dump of the dblp.org website. 5 This dataset
+has also been used in [24].
+We preprocess each dataset to keep, for each string 𝑠, the shortest
+prefix of 𝑠 that distinguishes it from all the other strings in the dataset.
+This suffices to index the dictionary strings and support the𝚛𝚊𝚗𝚔 opera-
+tion as well as all other query operations mentioned at the beginning of
+this paper. In fact, it is well known that, for any trie-based data struc-
+ture, the remaining suffixes can be concatenated and compressed into
+a separate array, and efficiently retrieved when needed [56, §8.5.3].
+Table 2 summarises the datasets and their characteristics after this
+preprocessing.
+5.2.2. State-of-the-art competitors
+As argued in Section 2, we consider as competitors of our CoCo-
+trie the following (static) string dictionary implementations because
+they are either the state-of-the-art or they offer space–time efficient
+approaches to trie representations:
+CART: a compact version of ART [29] obtained by constructing a plain
+ART and then converting it to a static compact version [5,41,
+80].
+PDT: the Centroid Path Decomposed Trie [17]. We experiment with
+both the vbyte version that encodes the labels of the edges
+with vbyte [81], and the csp version that adds another layer of
+compression on top of the edge labels.
+FST: the Fast Succinct Trie [5]. We use a slightly-modified code [82]
+that solves lookup queries rather than range-query filtering. We
+show the full space–time performance of FST by varying its
+parameter 𝑅 = 2 𝑖 for 𝑖 = 0, … , 10.
+We also tested the following representatives of the dynamic ap-
+proaches, which will allow us to show that the restriction to a static
+scenario allows for considerably more space–time efficient string dic-
+tionaries:
+ART: the Adaptive Radix Tree [29].
+ctrie++: the improved compact trie [24].
+5.2.3. Query workloads
+Given that our competitors do not implement 𝚛𝚊𝚗𝚔 (despite their
+design does support it), we decided to measure the performance of
+𝚕𝚘𝚘𝚔𝚞𝚙. We can reasonably expect that 𝚛𝚊𝚗𝚔 would perform similarly
+6 http://www.tpc.org/tpcds/
+to 𝚕𝚘𝚘𝚔𝚞𝚙, because of the way the former can be derived from the latter
+in trie-based (rather than hash-based) data structures, as the ones we
+experimentally test here.
+Given a dataset of 𝑛 strings, we measure the 𝚕𝚘𝚘𝚔𝚞𝚙 time by aver-
+aging the performance of 3 repetitions of a batch of 𝑛 string searches,
+where half of the strings are taken from the datasets and half are gen-
+erated randomly. Changing this proportion impacts the performance of
+the tested trie-based string dictionaries, so we vary it in an experiment
+in Section 5.4.1.
+To generate these random strings not in the datasets, we (i) extract
+a randomly-chosen string belonging to the dataset and truncate it to the
+average lcp of the entire dataset, and (ii) append to it a random string
+whose length matches the average length of the strings in the dataset.
+This way, the queries we generate mimic a fair query workload that
+guarantees a balance between existent and non-existent queried strings,
+and for the latter that the traversal does not stop at the very first steps
+because of a mismatch.
+5.3. An analysis of the CoCo-trie design
+In this section, we dig into an analysis of the effectiveness of
+the individual techniques and optimisations adopted in the design of
+CoCo-trie.
+5.3.1. Distribution of the number of collapsed levels
+Fig. 3 shows our first experimental result: the number of macro-
+nodes collapsing a certain amount of levels forms a non-trivial distri-
+bution whose shape differs from dataset to dataset. This provides a
+clear concrete answer to both questions Q2 and Q3 posed in Section 4:
+the number of levels to be collapsed in a subtrie greatly depends on
+the indexed strings, and it must be chosen locally on a per-node basis.
+Therefore, the data-aware optimisation approach to subtrie compaction
+implemented in our CoCo-trie is essential to achieve the most from
+these features.
+In particular, on url, xml, and trec-terms the CoCo-trie opti-
+miser selects many times the lowest possible values of 𝓁 (each horizon-
+tal axis ranges from 𝓁 = 1 to the largest 𝓁 over all macro-nodes 𝑣𝓁).
+On dna, the CoCo-trie optimiser collapses at most 𝓁 = 23 levels at a
+time, selects 𝓁 = 1 for 33% of the time, and a value between 2 and 15
+63% of the time. For protein, instead, the CoCo-trie optimiser selects
+high values of 𝓁 (very often 𝓁 ≈ 30) so that, in the end, the distribution
+resembles a Gaussian one. The results ontpcds-id are also of interest
+for their simplicity: due to the regularity of this dataset, the CoCo-trie
+optimiser creates a macro-node for the root that collapses𝓁 = 11 levels,
+and each of its 4096 children collapses 𝓁 = 4 levels.
+5.3.2. Effectiveness of the alphabet-aware encoding
+An important feature of our CoCo-trie is the alphabet-aware encod-
+ing of macro-nodes described in Section 4.4. Our experiments indeed
+suggest that operating on the smaller alphabet 𝛴𝑣𝓁 at each macro-
+node 𝑣𝓁, rather than on the global alphabet 𝛴, can simultaneously
+save a considerable amount of space and decrease the query time
+too. Specifically, on the dna dataset, this alphabet-aware encoding
+technique makes the CoCo-trie use 38% less space and be 16% faster
+in answering queries. On url, it obtains a 3% improvement in space
+and a 29% improvement in query time. On protein, it obtains a
+7% improvement in space and a 5% improvement in query time. On
+xml, it obtains a 4% improvement in space and a 14% improvement
+in query time. On trec-terms, it obtains a 12% space improvement
+and a 27% improvement in query time. Lastly, we notice that the
+dataset tpcds-id does not benefit from this technique, as indeed our
+optimiser does not choose the alphabet-aware encoding for any node.
+As a result, since the alphabet-aware encoding of macro-nodes is
+either effective or does not harm the performance of the CoCo-trie, we
+always enable it in the following experiments.
+
+--- PAGE 11 ---
+Information Systems 120 (2024) 102316
+11
+A. Boffa et al.
+Fig. 3. Normalised frequency of macro-nodes obtained by collapsing subtries consisting of 𝓁 levels. Greater values of 𝓁 yield fewer but (individually) more space-consuming
+macro-nodes. The CoCo-trie optimiser chooses 𝓁 on a per-node basis to minimise the space taken by the overall compressed trie, and this choice is highly dependent on the
+features of the input strings, as these plots show.
+5.3.3. Effectiveness of the space-relaxation technique
+The space-relaxation technique described in Section 4.5, albeit sim-
+ple, performs very well in practice. We evaluate it by testing the values
+𝛼 = 5 , 10, 15, and 20%, and by measuring the change in the average
+number of collapsed levels, the space occupancy, and the query time
+of the resulting CoCo-trie (these last two measures are also reported in
+Fig. 5, and commented next).
+On url, by going from a space-optimal solution ( 𝛼 = 0% ) to
+the space-relaxed solution with 𝛼 = 5% , we increase the average
+number of collapsed levels by 3.13% (i.e., from 8.65 to 8.92). This
+small improvement has a considerable impact on the query time, which
+improves by 15%, at the cost of a 16% increase in space. As we further
+increase 𝛼 from 5% to 10%, we notice another 3.3% improvement in
+the average number of collapsed levels, which in turn induces another
+2.6% improvement in query time at the cost of an 8% increase in space.
+For further increments of 𝛼 (i.e., beyond 10%), there is no significant
+improvement in the query time.
+On dna, by going from the space-optimal solution with 𝛼 = 0%
+to the space-relaxed solution with 𝛼 = 5% , we increase the average
+number of collapsed levels by 3% that, in turn, significantly improves
+the query time by 23% at the cost of a 6% increase in the total space
+occupancy. Further increasing 𝛼 from 5% to 20% does not change the
+performance much, the query time increases too and thus the space
+relaxation is of no help.
+On tpcds-id, the space–time performance of the CoCo-trie re-
+mains nearly the same for all tested values of 𝛼.
+On trec-terms, by increasing 𝛼 from 0% to 5% we incredibly
+improve the query time by 33%, at the cost of increasing the space
+usage by only 4%. Further increasing 𝛼 from 5% up to 20% slightly
+improves the query time (up to 6%) but it also increases the space
+occupancy (up to 12%).
+On protein, by going from the space-optimal solution with𝛼 = 0%
+to the space-relaxed solution with 𝛼 = 5% , we increase the average
+number of collapsed levels by 7% (from 24.3 to 26.0). In turn, this
+improves the query time by 19% at the cost of a 9% increase in space.
+In this dataset, if we further increase 𝛼 to 10%, 15%, or to 20%, we do
+not observe significant improvements in query time.
+Finally, on xml, by going from the space-optimal solution with
+𝛼 = 0% to the space-relaxed solution with 𝛼 = 5% , we increase the
+average number of collapsed levels by 4.3%. In turn, this improves
+the query time by 15% at the cost of an 8% increase in space. If we
+further increase 𝛼 up to 20%, the query time keeps decreasing achieving
+especially good time performance.
+Looking at these results, we suggest to the final user of the CoCo-
+trie, who wants to use a little bit more space but solve the query faster,
+to set 𝛼 = 10%. This value of 𝛼 has shown the best overall performance
+on this variegated collection of datasets.
+5.3.4. Breakdown of the space taken by the CoCo-trie components
+Fig. 4 shows the percentage of the space occupied by the various
+components of the CoCo-trie: the node structure (which includes, for
+each macro-node 𝑣𝓁, the value of 𝓁, a flag indicating whether the
+string labelling the path from the root to 𝑣𝓁 is in the dictionary, and
+the pointer to the encoding of the branching macro-characters of 𝑣𝓁),
+the topology (i.e. the LOUDS representation of the collapsed trie),
+the first macro-characters of each macro-node (encoded using 𝓁 log 𝜎
+bits), the first macro-character of each macro-node with its alphabet
+(encoded using 𝓁 log 𝜎𝑣𝓁 bits), and the macro-characters following the
+first one that are encoded with one of the succinct encoding schemes
+we described in Section 4.3.
+We can notice that the doughnut charts for the different datasets
+are very diverse. This supports our thesis that CoCo-trie is able to adapt
+to the very varied characteristics of the tested string dictionaries over
+which it is built.
+First of all, let us discuss the tpcds-id dataset. Due to its regu-
+larity, the CoCo-trie space occupancy is mainly made of topology and
+compressed labels. As discussed in Section 5.3.1, our optimiser creates
+a macro-node for the root that collapses 𝓁 = 11 levels, and each of its
+4096 children collapses 𝓁 = 4 levels. CoCo-trie internal macro-nodes
+contribute to the node structure, first macro-characters and topology
+components; instead, the leaves solely contribute to the topology com-
+ponent. So we have just 4097 internal nodes for 30 × 10 6 leaves and
+that explains why the space occupied by the node structure and first
+macro-characters is extremely low (0.06% and 0.03% respectively) and
+the space for topology is so high. This is the only dataset where the
+alphabet-aware encoding has not been applied to any node, and this is
+why the percentage of space occupied by first macro-characters remap
+and compressed macro-characters with the alphabet-remap encoding is
+0%.
+On all the other datasets, the space usage of the topology ranges
+from 5.1% to 24.4%, and the node structure occupies from 15.2% to
+25.1% of the total compressed space. Fig. 4 shows that in all these cases
+the alphabet-remapping technique, introduced in Section 4.4, is very
+effective since our optimiser often selects to encode the first macro-
+character using the local alphabet 𝛴𝑣𝓁 . In fact, the space usage of the
+first macro-characters compressed with the alphabet-aware encoding is
+almost equal to (on trec-terms) or more than the one without this
+technique. Similarly, the space usage for compressing the sequence with
+the other macro-characters (i.e., not the first ones) with the alphabet-
+aware encoding is more than the one without this technique on all
+datasets but xml.
+
+--- PAGE 12 ---
+Information Systems 120 (2024) 102316
+12
+A. Boffa et al.
+Fig. 4. Percentage of space occupied by the various components of the CoCo-trie built on top of the selected datasets.
+5.3.5. Construction time
+As discussed in Section 4.4, the construction of the CoCo-trie with
+the alphabet-aware encoding runs in (𝑁ℎ 2) time. This may seem
+prohibitive for growing values of ℎ, as indeed we have considered
+ℎ = 64 in Section 5.1. Nonetheless, in practice, given an uncompacted
+trie, building the CoCo-trie is from 3 × to 12 × slower than the clos-
+est solution on the Pareto front for each dataset (as commented in
+the next section). This slowdown is smaller than the expected one
+(i.e., (ℎ2)) and it may be due to the existence of many subtrees whose
+height is much smaller than 64, as in the case of the numerous leaves
+for which ℎ = 0 . More precisely, on url CoCo-trie is 7.2 × slower
+than PDT(csp) (which requires 1.65 μs /key), on dna it is 5.2 × slower
+than FST ( 0.67 μs /key), on tpcds-id it is 4.2 × slower than FST
+(0.36 μs/key), on trec-terms it is 3.9× slower than FST (0.34 μs/key),
+on protein it is 12× slower than PDT(csp) ( 7.7 μs/key), and on xml
+it is 3.0 × slower than PDT(csp) ( 1.1 μs /key). We argue that paying,
+on average, 6 × more construction time is well rewarded by having
+Pareto-optimal performance at query time, no matter the characteristics
+of the underlying dataset, and especially in a scenario of build-once-
+query-many-times is considered. Yet, we believe one may speed up
+the construction with a more space–time efficient representation of
+the input uncompacted trie navigated by the CoCo-trie optimiser. This
+input trie is currently pointer-based, potentially leading to a cache
+miss for each visited node. Compacted trie representations, as the ones
+discussed in Section 2, could provide viable solutions to address this
+issue; however, we prefer to leave these implementation details to
+future work.
+5.4. Space–time performance comparison
+Fig. 5 shows the results about the space and time performance of
+the CoCo-trie and of the static competitors: note that the more the
+performance of a data structure is close to the bottom-left corner of
+a picture, the best it is. Moreover, we point out that both 𝑦- and 𝑥-axis
+change with the datasets, whose original size in MBs is shown in each
+plot title.
+CART, though fast, is generally very space-inefficient. On url it is
+also particularly slow because of the large size of the dataset and of the
+large average-lcp among the indexed strings, which causes longer trie
+traversals and thus more cache misses.
+Whichever is the setting of its parameter 𝑅, FST is dominated
+in space and time performance by our CoCo-trie (and also by other
+data structures) on all the datasets. This is especially evident on dna,
+tpcds-id, protein, and xml. We argue that this is due to the high
+average-lcp of the strings in these datasets that require FST to perform
+longer trie traversals that proceed one character at a time (indeed, FST
+does not compact unary paths).
+PDT is always among the most space-efficient data structures (es-
+pecially in its csp configuration, which uses a form of grammar com-
+pression on the edge labels), but its query time performance is not
+competitive on dna, tpcds-id and trec-terms. This can be ex-
+plained by looking at the average height of the nodes in PDT and
+CoCo-trie. In fact, PDT nodes on dna, tpcds-id and trec-terms
+have an average height equal to 6.0, 5.4, and 9.6, respectively. Con-
+versely, the average height of the macro-nodes in the CoCo-trie (see
+the 𝛼 = 0% configuration in Fig. 5) is instead 3.5, 2.8, and 5.25.
+This means that the CoCo-trie requires nearly half of the accesses to
+nodes, on average. And in fact, CoCo-trie is 2.6 × faster than PDT(csp)
+on dna, 2.3 × faster on trec-terms using its same space, and it
+is 2.6 × faster and 1.8 × more succinct than PDT(csp) on tpcds-id.
+This means that, on these three datasets, our subtrie collapsing-and-
+compression technique is extremely effective not only in reducing the
+space occupancy but also in speeding up the query operation. On
+the other three datasets, CoCo-trie always has some configuration on
+the Pareto front of PDT (mainly improving the time efficiency), thus
+offering other competitive space–time trade-offs.
+Compared to CART, FST, and PDT, which are very input-sensitive as
+no solution dominates the others in space and time on all the datasets,
+the CoCo-trie results space–time efficient, robust, and flexible over all
+six datasets: in fact, it significantly dominates the space–time perfor-
+mance of all competitors on dna, tpcds-id, and trec-terms; and
+it is on the Pareto front of the best competitors on url, protein, and
+xml by offering faster query operations.
+Finally, we show the performance of our dynamic competitors, ART
+and ctrie++, in the separate Table 3 because they are far from the plot
+range of Fig. 5. As the table shows, their space usage is from 2.2 × to
+130× larger than CoCo-trie while being only slightly faster on trec-
+terms and protein. This increased space usage is expected due to
+the extended functionality of the dynamic competitors.
+5.4.1. Impact of the query workload
+In this last experiment, we dig into the time performance of the
+tested data structures over the various query workloads described in
+
+--- PAGE 13 ---
+Information Systems 120 (2024) 102316
+13
+A. Boffa et al.
+Fig. 5. CoCo-trie dominates the space–time performance of all static competitors on the dna, tpcds-id, and trec-terms datasets; and it is on the Pareto front of the best
+competitors on url, protein, and xml.
+Table 3
+Space–time performance of the dynamic competitors, ART and ctrie ++, compared to CoCo-trie.
+Dataset ART query time ART space usage ctrie ++ query time ctrie ++ space usage
+url 1.04× 6.45× 1.02× 27.36×
+dna 1.29× 15.90× 1.18× 81.24×
+tpcds-id 1.19× 42.50× 1.30× 130.76×
+trec-terms 1.16× 11.19× 0.98× 50.42×
+protein 1.54× 2.21× 0.89× 12.86×
+xml 1.02× 6.80× 1.09× 31.99×
+Fig. 6. Time performance of the lookup query for the fastest tested solutions as we vary the percentage of queries for strings not in the dataset (generated as described in
+Section 5.2.3).
+Section 5.2.3 and generated by varying the percentage of strings taken
+from the datasets or generated randomly from 0% to 100% (in Fig. 5
+this percentage was set to 50%). The results are shown in Fig. 6. For
+CoCo-trie and FST, we report the most time-efficient configuration by
+varying 𝛼 and 𝑅, respectively.
+Firstly, one may expect the query time to decrease as the amount of
+random strings increases, since the trie traversal should stop earlier due
+to a missing branch. This happens for all the tested implementations on
+url, xml, and protein, but it does not happen on dna and tpcds-
+id. This is due to the interplay between the size of the alphabets of
+the strings in these two latter datasets, and the fact that their lcp is
+close to the average length. So that, there is a high probability of
+randomly-generating strings that share a long lcp with some other
+dictionary string. As such, we observe an increased query time in all
+
+--- PAGE 14 ---
+Information Systems 120 (2024) 102316
+14
+A. Boffa et al.
+tested solutions (this is particularly evident for PDT), since each trie
+needs to traverse multiple levels for solving those queries.
+Secondly, the figure suggests also that the alphabet-aware encoding
+introduced in Section 4.4 is particularly effective when we query
+the CoCo-trie over many non-dictionary strings. Indeed, during the
+traversal we check whether the query substring corresponding to the
+current macro-node intersects with the macro-node’s local alphabet
+so to instantly recognise an unsuccessful 𝚕𝚘𝚘𝚔𝚞𝚙, thereby achieving
+faster performance compared to our competitors. Nevertheless, the
+search in the CoCo-trie could continue to compute 𝚛𝚊𝚗𝚔, as described
+in Section 4.6.
+Overall, the CoCo-trie is the fastest on all datasets and query work-
+loads except on url, where it is nonetheless the fastest for a large
+number of randomly-generated query strings.
+6. Conclusions and future work
+We have introduced a new trie-based design of compressed string
+dictionaries that collapses and compresses subtries chosen by means of
+a novel space-optimisation procedure hinging on a pool of new encod-
+ing techniques. The experimental results over a variety of six datasets
+and five highly-engineered competitors suggest that our CoCo-trie does
+advance the state of the art of string dictionaries.
+Our novel design scheme paves the way for the multi-criteria opti-
+misation of trie data structures that take into account possibly other
+encoding schemes (for macro-nodes) and multi-objective functions
+(e.g., over time, space, query distribution, etc.). It could also be
+interesting to investigate the use of hash-based approaches [53] in
+our space-optimisation scheme because this could allow faster 𝚕𝚘𝚘𝚔𝚞𝚙s
+but at the cost of giving up the 𝚛𝚊𝚗𝚔 operation. Finally, we mention
+some issues about dynamic string dictionaries that would deserve
+further investigation: the CoCo-trie could be ‘‘dynamised’’ either by (i)
+adopting an LSM-based approach, which is very well-known in large
+write-intensive systems (such as in key–value stores [13]); or by (ii)
+the use of buffers or dynamic containers in macro-nodes to hold newly
+inserted strings.
+Declaration of competing interest
+The authors declare that they have no known competing finan-
+cial interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+Data availability
+The source code and the datasets are available at https://github.
+com/aboffa/CoCo-trie.
+Acknowledgements
+This work was supported by the European Union – Horizon 2020
+Programme under the scheme ‘‘INFRAIA-01-2018-2019 – Integrating
+Activities for Advanced Communities’’, Grant Agreement n. 871042,
+‘‘SoBigData++: European Integrated Infrastructure for Social Mining
+and Big Data Analytics’’ (http://www.sobigdata.eu), by the NextGener-
+ationEU – National Recovery and Resilience Plan (Piano Nazionale di
+Ripresa e Resilienza, PNRR) – Project: ‘‘SoBigData.it - Strengthening the
+Italian RI for Social Mining and Big Data Analytics’’ – Prot. IR0000013
+- Avviso n. 3264 del 28/12/2021, by the spoke ‘‘FutureHPC & Big-
+Data’’ of the ICSC – Centro Nazionale di Ricerca in High-Performance
+Computing, Big Data and Quantum Computing funded by European
+Union – NextGenerationEU – PNRR, by the Italian Ministry of Univer-
+sity and Research ‘‘Progetti di Rilevante Interesse Nazionale’’ project:
+‘‘Multicriteria data structures and algorithms’’ (grant n. 2017WR7SHH).
+References
+[1] B.-J.P. Hsu, G. Ottaviano, Space-efficient data structures for top- 𝑘 completion,
+in: Proc. 22nd International Conference on World Wide Web, WWW, 2013, pp.
+583–594, http://dx.doi.org/10.1145/2488388.2488440.
+[2] S. Gog, G.E. Pibiri, R. Venturini, Efficient and effective query auto-completion,
+in: Proc. 43rd ACM International Conference on Research and Development in
+Information Retrieval, SIGIR, 2020, pp. 2271–2280, http://dx.doi.org/10.1145/
+3397271.3401432.
+[3] Y.M. Kang, W. Liu, Y. Zhou, QueryBlazer: Efficient query autocompletion frame-
+work, in: Proc. 14th International Conference on Web Search and Data Mining,
+WSDM, 2021, pp. 1020–1028, http://dx.doi.org/10.1145/3437963.3441725.
+[4] R. Mavlyutov, M. Wylot, P. Cudré-Mauroux, A comparison of data structures
+to manage URIs on the web of data, in: Proc. 12th European Semantic Web
+Conference, ESWC, 2015, pp. 137–151, http://dx.doi.org/10.1007/978-3-319-
+18818-8_9.
+[5] H. Zhang, H. Lim, V. Leis, D.G. Andersen, M. Kaminsky, K. Keeton, A. Pavlo,
+SuRF: practical range query filtering with fast succinct tries, in: Proc. ACM
+International Conference on Management of Data, SIGMOD, 2018, pp. 323–336,
+http://dx.doi.org/10.1145/3183713.3196931.
+[6] S. Luo, S. Chatterjee, R. Ketsetsidis, N. Dayan, W. Qin, S. Idreos, Rosetta: a robust
+space-time optimized range filter for key-value stores, in: Proc. ACM International
+Conference on Management of Data, SIGMOD, 2020, pp. 2071–2086, http:
+//dx.doi.org/10.1145/3318464.3389731.
+[7] F. Chang, J. Dean, S. Ghemawat, W.C. Hsieh, D.A. Wallach, M. Burrows,
+T. Chandra, A. Fikes, R.E. Gruber, Bigtable: a distributed storage system for
+structured data, ACM Trans. Comput. Syst. 26 (2) (2008) http://dx.doi.org/10.
+1145/1365815.1365816.
+[8] A. Apostolico, M. Crochemore, M. Farach-Colton, Z. Galil, S. Muthukrishnan, 40
+Years of suffix trees, Commun. ACM 59 (4) (2016) 66–73, http://dx.doi.org/10.
+1145/2810036.
+[9] V. Mäkinen, D. Belazzougui, F. Cunial, A.I. Tomescu, Genome-Scale Algo-
+rithm Design, Cambridge University Press, 2015, http://dx.doi.org/10.1017/
+CBO9781139940023.
+[10] S.J. Huston, A. Moffat, W.B. Croft, Efficient indexing of repeated n-grams, in:
+Proc. 4th International Conference on Web Search and Web Data Mining, WSDM,
+2011, pp. 127–136, http://dx.doi.org/10.1145/1935826.1935857.
+[11] G.E. Pibiri, R. Venturini, Efficient data structures for massive N-gram datasets,
+in: Proc. 40th ACM International Conference on Research and Development
+in Information Retrieval, SIGIR, 2017, pp. 615–624, http://dx.doi.org/10.1145/
+3077136.3080798.
+[12] P. Ferragina, R. Grossi, A. Gupta, R. Shah, J.S. Vitter, On searching compressed
+string collections cache-obliviously, in: Proc. 27th ACM Symposium on Principles
+of Database Systems, PODS, 2008, pp. 181–190, http://dx.doi.org/10.1145/
+1376916.1376943.
+[13] C. Luo, M.J. Carey, LSM-based storage techniques: a survey, VLDB J. 29 (1)
+(2020/01/01) 393–418, http://dx.doi.org/10.1007/s00778-019-00555-y.
+[14] D.E. Knuth, The Art of Computer Programming, Vol. 3, second ed.,
+Addison-Wesley, 1998.
+[15] D.R. Morrison, PATRICIA—Practical algorithm to retrieve information coded
+in alphanumeric, J. ACM 15 (4) (1968) 514–534, http://dx.doi.org/10.1145/
+321479.321481.
+[16] S. Kanda, D. Köppl, Y. Tabei, K. Morita, M. Fuketa, Dynamic path-decomposed
+tries, ACM J. Exp. Algorithmics 25 (2020) 1–28, http://dx.doi.org/10.1145/
+3418033.
+[17] R. Grossi, G. Ottaviano, Fast compressed tries through path decompositions,
+ACM J. Exp. Algorithmics 19 (1) (2014) http://dx.doi.org/10.1145/2656332,
+URL https://github.com/ot/path_decomposed_tries.
+[18] S. Nilsson, M. Tikkanen, Implementing a dynamic compressed trie, in: Proc. 2nd
+International Workshop on Algorithm Engineering, WAE, 1998, pp. 25–36.
+[19] A. Acharya, H. Zhu, K. Shen, Adaptive algorithms for cache-efficient trie search,
+in: Proc. International Workshop on Algorithm Engineering and Experimentation,
+ALENEX, 1999, pp. 300–315, http://dx.doi.org/10.1007/3-540-48518-X_18.
+[20] N. Askitis, R. Sinha, Engineering scalable, cache and space efficient tries for
+strings, VLDB J. 19 (5) (2010) 633–660, http://dx.doi.org/10.1007/s00778-010-
+0183-9.
+[21] S. Heinz, J. Zobel, H.E. Williams, Burst tries: a fast, efficient data structure for
+string keys, ACM Trans. Inf. Syst. 20 (2) (2002) 192–223, http://dx.doi.org/10.
+1145/506309.506312.
+[22] T. Takagi, S. Inenaga, K. Sadakane, H. Arimura, Packed compact tries: a fast
+and efficient data structure for online string processing, IEICE Trans. Fundam.
+Electron. Commun. Comput. Sci. 100-A (9) (2017) 1785–1793, http://dx.doi.org/
+10.1587/transfun.E100.A.1785.
+[23] P. Bille, I.L. Gørtz, F.R. Skjoldjensen, Deterministic indexing for packed strings,
+in: Proc. 28th Annual Symposium on Combinatorial Pattern Matching, CPM, 78,
+2017, pp. 6:1–6:11, http://dx.doi.org/10.4230/LIPIcs.CPM.2017.6.
+[24] K. Tsuruta, D. Köppl, S. Kanda, Y. Nakashima, S. Inenaga, H. Bannai, M. Takeda,
+c-trie++: a dynamic trie tailored for fast prefix searches, Inform. and Comput.
+285 (2022) 104794, http://dx.doi.org/10.1016/j.ic.2021.104794.
+
+--- PAGE 15 ---
+Information Systems 120 (2024) 102316
+15
+A. Boffa et al.
+[25] J.J. Darragh, J.G. Cleary, I.H. Witten, Bonsai: a compact representation of
+trees, Softw. - Pract. Exp. 23 (3) (1993) 277–291, http://dx.doi.org/10.1002/
+spe.4380230305.
+[26] J.L. Bentley, R. Sedgewick, Fast algorithms for sorting and searching strings, in:
+Proc. 8th Annual ACM-SIAM Symposium on Discrete Algorithms, SODA, 1997,
+pp. 360–369, http://dx.doi.org/10.5555/314161.314321.
+[27] Y. Mao, E. Kohler, R.T. Morris, Cache craftiness for fast multicore key-value
+storage, in: Proc. 7th European Conference on Computer Systems, EuroSys, 2012,
+pp. 183–196, http://dx.doi.org/10.1145/2168836.2168855.
+[28] S. Yata, Dictionary compression by nesting prefix/patricia tries, in: Proc. 17th
+Meeting of the Association for Natural Language, 2011.
+[29] V. Leis, A. Kemper, T. Neumann, The adaptive radix tree: ARTful indexing
+for main-memory databases, in: Proc. 29th IEEE International Conference on
+Data Engineering, ICDE, 2013, pp. 38–49, http://dx.doi.org/10.1109/ICDE.2013.
+6544812.
+[30] A. Poyias, S.J. Puglisi, R. Raman, m-Bonsai: a practical compact dynamic trie,
+Internat. J. Found Comput. Sci. 29 (8) (2018) 1257–1278, http://dx.doi.org/10.
+1142/S0129054118430025.
+[31] P. Ferragina, F. Luccio, G. Manzini, S. Muthukrishnan, Compressing and indexing
+labeled trees, with applications, J. ACM 57 (1) (2009) 4:1–4:33, http://dx.doi.
+org/10.1145/1613676.1613680.
+[32] P. Ferragina, R. Venturini, The compressed permuterm index, ACM Trans.
+Algorithms 7 (1) (2010) 10:1–10:21, http://dx.doi.org/10.1145/1868237.
+1868248.
+[33] P. Ferragina, R. Grossi, The string B-tree: a new data structure for string
+search in external memory and its applications, J. ACM 46 (2) (1999) 236–280,
+http://dx.doi.org/10.1145/301970.301973.
+[34] M.A. Bender, M. Farach-Colton, B.C. Kuszmaul, Cache-oblivious string B-trees,
+in: Proc. 25th ACM Symposium on Principles of Database Systems, PODS, 2006,
+pp. 233–242, http://dx.doi.org/10.1145/1142351.1142385.
+[35] P. Ferragina, R. Venturini, Compressed cache-oblivious string B-tree, ACM Trans.
+Algorithms 12 (4) (2016) 52:1–52:17, http://dx.doi.org/10.1145/2903141.
+[36] P. Ferragina, M. Frasca, G.C. Marinò, G. Vinciguerra, On nonlinear learned
+string indexing, IEEE Access 11 (2023) 74021–74034, http://dx.doi.org/10.1109/
+ACCESS.2023.3295434.
+[37] M.A. Martínez-Prieto, N.R. Brisaboa, R. Cánovas, F. Claude, G. Navarro, Practical
+compressed string dictionaries, Inf. Syst. 56 (2016) 73–108, http://dx.doi.org/
+10.1016/j.is.2015.08.008.
+[38] J. Arz, J. Fischer, Lempel-Ziv-78 compressed string dictionaries, Algorithmica 80
+(7) (2018) 2012–2047, http://dx.doi.org/10.1007/s00453-017-0348-7.
+[39] R. Binna, E. Zangerle, M. Pichl, G. Specht, V. Leis, HOT: a height optimized trie
+index for main-memory database systems, in: Proc. ACM International Conference
+on Management of Data, SIGMOD, 2018, pp. 521–534, http://dx.doi.org/10.
+1145/3183713.3196896.
+[40] N.R. Brisaboa, A. Cerdeira-Pena, G. de Bernardo, G. Navarro, Improved com-
+pressed string dictionaries, in: Proc. 28th ACM International Conference on
+Information and Knowledge Management, CIKM, 2019, pp. 29–38, http://dx.
+doi.org/10.1145/3357384.3357972.
+[41] H. Zhang, D.G. Andersen, A. Pavlo, M. Kaminsky, L. Ma, R. Shen, Reducing
+the storage overhead of main-memory OLTP databases with hybrid indexes, in:
+Proc. ACM International Conference on Management of Data, SIGMOD, 2016,
+pp. 1567–1581, http://dx.doi.org/10.1145/2882903.2915222.
+[42] A. Boffa, P. Ferragina, F. Tosoni, G. Vinciguerra, Compressed string dictionaries
+via data-aware subtrie compaction, in: Proc. 29th International Symposium on
+String Processing and Information Retrieval, SPIRE, 2022, pp. 233–249, http:
+//dx.doi.org/10.1007/978-3-031-20643-6_17.
+[43] R. De La Briandais, File searching using variable length keys, in: Proc. Western
+Joint Computer Conference, 1959, pp. 295–298, http://dx.doi.org/10.1145/
+1457838.1457895.
+[44] S. Sahni, Tries, in: D.P. Mehta, S. Sahni (Eds.), Handbook of Data Structures
+and Applications, Chapman and Hall/CRC, 2004, http://dx.doi.org/10.1201/
+9781420035179.pt5.
+[45] P. Boldi, A. Marino, M. Santini, S. Vigna, BUbiNG: massive crawling for the
+masses, ACM Trans. Web 12 (2) (2018) http://dx.doi.org/10.1145/3160017.
+[46] Pizza&Chili corpus, 2023, URL http://pizzachili.dcc.uchile.cl/texts.html. (Ac-
+cessed June 2022).
+[47] R.O. Nambiar, M. Poess, The making of TPC-DS, in: Proc. 32nd International
+Conference on Very Large Data Bases, VLDB, 2006, pp. 1049–1058, URL http:
+//www.tpc.org/tpcds/.
+[48] D. Belazzougui, P. Boldi, R. Pagh, S. Vigna, Theory and practice of monotone
+minimal perfect hashing, ACM J. Exp. Algorithmics 16 (2008) http://dx.doi.org/
+10.1145/1963190.2025378.
+[49] P. Ferragina, M. Rotundo, G. Vinciguerra, Engineering a textbook approach
+to index massive string dictionaries, in: Proc. 30th International Symposium
+on String Processing and Information Retrieval, SPIRE, 2023, pp. 203–217,
+http://dx.doi.org/10.1007/978-3-031-43980-3_16.
+[50] D. Baskins, A 10-minute description of how Judy arrays work and why they are
+so fast, 2002, URL http://judy.sourceforge.net/doc/10minutes.htm.
+[51] J.-I. Aoe, K. Morimoto, T. Sato, An efficient implementation of trie structures,
+Softw. - Pract. Exp. 22 (9) (1992) 695–721, http://dx.doi.org/10.1002/spe.
+4380220902.
+[52] S. Kanda, K. Morita, M. Fuketa, Compressed double-array tries for string
+dictionaries supporting fast lookup, Knowl. Inf. Syst. 51 (3) (2017) 1023–1042,
+http://dx.doi.org/10.1007/s10115-016-0999-8.
+[53] N. Askitis, J. Zobel, Cache-conscious collision resolution in string hash tables,
+in: Proc. 12th International Conference on String Processing and Information
+Retrieval, SPIRE, 2005, pp. 91–102, http://dx.doi.org/10.1007/11575832_11.
+[54] D. Belazzougui, P. Boldi, S. Vigna, Dynamic Z-fast tries, in: Proc. 17th Interna-
+tional Symposium on String Processing and Information Retrieval, SPIRE, 2010,
+pp. 159–172, http://dx.doi.org/10.1007/978-3-642-16321-0_15.
+[55] D.D. Sleator, R.E. Tarjan, A data structure for dynamic trees, J. Comput. System
+Sci. 26 (3) (1983) 362–391, http://dx.doi.org/10.1016/0022-0000(83)90006-5.
+[56] G. Navarro, Compact Data Structures: A Practical Approach, Cambridge
+University Press, 2016, http://dx.doi.org/10.1017/CBO9781316588284.
+[57] G. Jacobson, Space-efficient static trees and graphs, in: Proc. 30th IEEE Sym-
+posium on Foundations of Computer Science, FOCS, 1989, pp. 549–554, http:
+//dx.doi.org/10.1109/SFCS.1989.63533.
+[58] M. Burrows, D.J. Wheeler, A Block-Sorting Lossless Data Compression Algorithm,
+Tech. Rep. 124, Digital Equipment Corporation, 1994.
+[59] C.D. Manning, P. Raghavan, H. Schütze, Introduction to Information
+Retrieval, Cambridge University Press, 2008, http://dx.doi.org/10.1017/
+CBO9780511809071.
+[60] G. Navarro, Indexing highly repetitive string collections, part II: compressed
+indexes, ACM Comput. Surv. 54 (2) (2020) http://dx.doi.org/10.1145/3432999.
+[61] G. Navarro, V. Mäkinen, Compressed full-text indexes, ACM Comput. Surv. 39
+(1) (2007).
+[62] D. Belazzougui, P. Boldi, R. Pagh, S. Vigna, Monotone minimal perfect hashing:
+searching a sorted table with 𝑂(1) accesses, in: Proc. 20th Annual ACM-SIAM
+Symposium on Discrete Algorithms, SODA, 2009, pp. 785–794, http://dx.doi.
+org/10.5555/1496770.1496856.
+[63] P. Elias, Efficient storage and retrieval by content and address of static files, J.
+ACM 21 (2) (1974) 246–260, http://dx.doi.org/10.1145/321812.321820.
+[64] R.M. Fano, On the Number of Bits Required To Implement an Associative
+Memory. Memo 61, Massachusetts Institute of Technology, Project MAC, 1971.
+[65] F. Silvestri, R. Venturini, VSEncoding: efficient coding and fast decoding of
+integer lists via dynamic programming, in: Proc. 19th ACM International Confer-
+ence on Information and Knowledge Management, CIKM, 2010, pp. 1219–1228,
+http://dx.doi.org/10.1145/1871437.1871592.
+[66] G. Ottaviano, R. Venturini, Partitioned Elias-Fano indexes, in: Proc. 37th ACM
+International Conference on Research and Development in Information Retrieval,
+SIGIR, 2014, pp. 273–282, http://dx.doi.org/10.1145/2600428.2609615.
+[67] J. Kärkkäinen, D. Kempa, S.J. Puglisi, Hybrid compression of bitvectors for the
+FM-index, in: Proc. 24th Data Compression Conference, DCC, 2014, pp. 302–311,
+http://dx.doi.org/10.1109/DCC.2014.87.
+[68] A. Boffa, P. Ferragina, G. Vinciguerra, A learned approach to design compressed
+rank/select data structures, ACM Trans. Algorithms (2022) http://dx.doi.org/10.
+1145/3524060.
+[69] P. Ferragina, G. Manzini, G. Vinciguerra, Compressing and querying inte-
+ger dictionaries under linearities and repetitions, IEEE Access 10 (2022)
+118831–118848, http://dx.doi.org/10.1109/ACCESS.2022.3221520.
+[70] F. Claude, G. Navarro, Practical rank/select queries over arbitrary sequences, in:
+Proc. 15th International Symposium on String Processing and Information Re-
+trieval, SPIRE, 2008, pp. 176–187, http://dx.doi.org/10.1007/978-3-540-89097-
+3_18.
+[71] P. Pandey, M.A. Bender, R. Johnson, R. Patro, A general-purpose counting
+filter: making every bit count, in: Proc. ACM International Conference on
+Management of Data, SIGMOD, 2017, pp. 775–787, http://dx.doi.org/10.1145/
+3035918.3035963.
+[72] S. Gog, T. Beller, A. Moffat, M. Petri, From theory to practice: plug and
+play with succinct data structures, in: Proc. 13th International Symposium on
+Experimental Algorithms, SEA, 2014, pp. 326–337, http://dx.doi.org/10.1007/
+978-3-319-07959-2_28.
+[73] G. Ottaviano, N. Tonellotto, R. Venturini, Optimal space-time tradeoffs for
+inverted indexes, in: Proc. 8th ACM International Conference on Web Search
+and Data Mining, WSDM, 2015, pp. 47–56, http://dx.doi.org/10.1145/2684822.
+2685297.
+[74] S. Vigna, Broadword implementation of rank/select queries, in: Proc. 7th
+International Workshop on Experimental Algorithms, WEA, 2008, pp. 154–168,
+http://dx.doi.org/10.1007/978-3-540-68552-4_12.
+[75] F. Kurpicz, Engineering compact data structures for rank and select queries on
+bit vectors, in: Proc. 29th International Symposium on String Processing and
+Information Retrieval, SPIRE, 2022, pp. 257–272, http://dx.doi.org/10.1007/
+978-3-031-20643-6_19.
+[76] M. Pöss, R.O. Nambiar, D. Walrath, Why you should run TPC-DS: a workload
+analysis, in: Proc. 33rd International Conference on Very Large Data Bases, VLDB,
+2007, pp. 1138–1149.
+[77] M. Boissier, Robust and budget-constrained encoding configurations for in-
+memory database systems, PVLDB 15 (4) (2022) 780–793, http://dx.doi.org/
+10.14778/3503585.3503588.
+
+--- PAGE 16 ---
+Information Systems 120 (2024) 102316
+16
+A. Boffa et al.
+[78] V. Leis, B. Radke, A. Gubichev, A. Mirchev, P. Boncz, A. Kemper, T. Neumann,
+Query optimization through the looking glass, and what we found running the
+join order benchmark, VLDB J. 27 (5) (2018) 643–668, http://dx.doi.org/10.
+1007/s00778-017-0480-7.
+[79] H. Garcia-Molina, J.D. Ullman, J. Widom, Database Systems: The Complete Book,
+second ed., Prentice Hall Press, 2008.
+[80] ART and CART implementations, 2023, URL https://github.com/efficient/fast-
+succinct-trie/tree/master/third-party/art. (Accessed June 2022).
+[81] H.E. Williams, J. Zobel, Compressing integers for fast file access, Comput. J. 42
+(3) (1999) 193–201, http://dx.doi.org/10.1093/comjnl/42.3.193.
+[82] FST implementation, 2023, URL https://github.com/kampersanda/fast_succinct_
+trie. (Accessed June 2022).

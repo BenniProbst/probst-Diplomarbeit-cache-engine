@@ -1,0 +1,153 @@
+================================================================
+VORANALYSE: P05-START/START
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P05-START/START
+Stand: 2026-05-09 00:48:31
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 74
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609     0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609   112 May  4 23:39 .gitignore
+-rw-r--r-- 1 benja 197609   352 May  4 23:39 CMakeLists.txt
+-rw-r--r-- 1 benja 197609  1092 May  4 23:39 LICENSE
+-rw-r--r-- 1 benja 197609  6478 May  4 23:39 README.md
+-rw-r--r-- 1 benja 197609 17700 May  4 23:39 art_impl.tcc
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 config
+-rw-r--r-- 1 benja 197609   922 May  4 23:39 leaf.tcc
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 measurements
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 nodes
+-rw-r--r-- 1 benja 197609  3301 May  4 23:39 sosd-competitor-adapter-ART.h
+-rw-r--r-- 1 benja 197609  3690 May  4 23:39 sosd-competitor-adapter-START.h
+-rw-r--r-- 1 benja 197609  4741 May  4 23:39 statistics.tcc
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 tests
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 tuning
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 util
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./config
+./config/storage
+./measurements
+./measurements/util
+./nodes
+./nodes/migrate
+./nodes/rewired
+./nodes/simple
+./nodes/standard
+./tests
+./tests/datasets
+./tests/datasets/util
+./tests/resources
+./tests/resources/datasets
+./tuning
+./tuning/util
+./util
+./util/rewiring
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./config/machine_facts.h
+./config/node_costs.h
+./measurements/measurements.cpp
+./sosd-competitor-adapter-ART.h
+./sosd-competitor-adapter-START.h
+./tests/art.cpp
+./tests/datasets/util/locate_resources.h
+./tests/datasets/util/zipf.h
+./tests/range.cpp
+./tests/tests.cpp
+./util/rewiring/communication.h
+./util/rewiring/lkm_rewiring_provider.hpp
+./util/rewiring/lkm_rewiring_provider_creator.hpp
+./util/rewiring/mmap_rewiring_provider.hpp
+./util/rewiring/mmap_rewiring_provider_creator.hpp
+./util/rewiring/page_squeezer.h
+./util/rewiring/reservation.h
+./util/rewiring/rewiring_provider.hpp
+./util/rewiring/rewiring_provider_creator.h
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 1493 total
+  280 ./measurements/measurements.cpp
+  257 ./config/node_costs.h
+  112 ./sosd-competitor-adapter-START.h
+  100 ./sosd-competitor-adapter-ART.h
+   92 ./tests/range.cpp
+   92 ./tests/art.cpp
+   89 ./util/rewiring/lkm_rewiring_provider.hpp
+   88 ./tests/datasets/util/zipf.h
+   72 ./util/rewiring/page_squeezer.h
+   58 ./util/rewiring/reservation.h
+   52 ./util/rewiring/mmap_rewiring_provider_creator.hpp
+   49 ./util/rewiring/lkm_rewiring_provider_creator.hpp
+   40 ./util/rewiring/mmap_rewiring_provider.hpp
+   33 ./util/rewiring/rewiring_provider.hpp
+   27 ./util/rewiring/communication.h
+   26 ./tests/datasets/util/locate_resources.h
+   14 ./config/machine_facts.h
+    7 ./util/rewiring/rewiring_provider_creator.h
+    5 ./tests/tests.cpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (9 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+    MIT License
+    
+    Copyright (c) 2020 Michael Jungmair
+
+## README EXCERPT
+  Datei: README.md
+    # START - Self-Tuning Adaptive Radix Tree
+    The basis of this project is an efficient but extendible [ART](https://db.in.tum.de/~leis/papers/ART.pdf) implementation. Adding new multilevel nodes based on rewiring and a self-tuning component results in a self-tuning adaptive radix tree as described in  [our Paper](http://db.in.tum.de/~fent/papers/Self%20Tuning%20Art.pdf).
+    
+    ### Configurable ART implementation
+    Current implementations of adaptive radix trees are either implemented efficiently or flexible. Using hard-coded switch-case statements to handle the different node types permits many compiler optimizations and avoids the performance impacts of virtual functions. However, adding a new node type comes with a lot of effort.
+    
+    Our implementation of an adaptive radix tree in [art_impl.tcc](art_impl.tcc) handles arbitrary node types (also multilevel nodes) at compile time. All config is injected with a C++ trait as template parameter:
+    
+    * Which keys are indexed? 32-bit integer, 64-bit integer, strings?
+    * Which node types should be used?
+    * How are the keys stored? In a simple vector?
+    * Do we need statistics? e.g. memory consumption ...
+    * ...
+    
+    With these informations, an efficient ART implementation is constructed at compile time. For this purpose, we use our own implementation of a switch-case statement generated at compile-time using a mixture of macro and template magic: [util/compile-time-switch.tcc](util/compile-time-switch.tcc).
+    ### Nodes
+    The `nodes` directory contains all code related to implementing different node types. The base class for each node type can be found in [nodes/node.tcc](nodes/node.tcc).
+    
+    Since START is an extension to the adaptive radix tree, all standard ART Nodes (4/16/48/256) are implemented efficiently in [nodes/standard/](nodes/standard/). The two rewired node types, `Rewired64K` and `Rewired16M` can be found at [nodes/rewired/](nodes/rewired/), `MultiNode4` at [nodes/simple/](nodes/simple/).
+    
+    When a node overflows, or during the tuning phase, transitions from one node type to another occur. Then, all node entries must be migrated from one node instance to a newly created of another type. For many node types this implemented generically. However, for some migrations, e.g. to rewired nodes, between 4/16/48, efficient specializations have been implemented. All migration-related code is located in [nodes/migrate/](nodes/migrate/).
+    
+    
+    ### Measurements
+    For a decent costmodel, we measure the cost of a single lookup in different node types for three cases: Node is cached, node header is cached, the node is not cached at all. These finegrained measurements are possible by combining three assembler instructions:
+    
+    * `mfence` as memory barrier, to separate the code to be measured
+    * `rdtsc` for measuring cycles exactly.
+    * `clflush` for flushing single caches from the caches  
+    
+    To get reliable numbers, single measurements are repeated and the median is computed. The complete implementation can be found in [measurements/measurements.cpp](measurements/measurements.cpp)
+    ### Tuning
+    The tuning component is of course one main component of a self-tuning adaptive radix tree. All tuning-related code can be found in `tuning`, [tuning/tuning.tcc] contains the main tuning procedure including dynamic programming.
+    
+    During the tuning phase, we attach tags to the tree nodes by misusing the prefix field. After tuning, we restore the prefix fields. This allows for optimization without permant memory overhead. Have a look at [tuning/util/tag_manager.tcc](tuning/util/tag_manager.tcc) for more details.
+    
+    The tuning process can be split into three phases:
+    
+    1. **Cache estimation**: First, we iterate through the tree and estimate which nodes will most likely reside in L1/L2/L3 or no cache using [tuning/util/cache_estimator.tcc](tuning/util/cache_estimator.tcc). This estimation is then stored in the node's tag. 
+    2. **Dynamic programming**: Next, we apply dynamic programming to optimize the replacement decisions based on the [cost model](tuning/util/costmodel.tcc) The tree is visited bottom up, relevant DP data is accumulated using the [dp_data](tuning/util/dp_data.tcc) type.
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  Node4                in 5 Dateien
+  Node16               in 5 Dateien
+  Node48               in 5 Dateien
+  Node256              in 5 Dateien
+
+## C++-STANDARD-INDIKATOREN
+  set(CMAKE_CXX_STANDARD 17)
+
+## END VORANALYSE P05-START/START

@@ -1,0 +1,389 @@
+================================================================================
+CROSS-PAPER KONZEPTMATRIX
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.B.35
+Stand: 2026-05-04 nach RIGOROSER Tieflektuere ALLER 33 Paper
+================================================================================
+
+ZWECK
+  Diese Matrix verdichtet die in 33 Paper-Notizen identifizierten Konzept-
+  Identitaeten in eine einzige Cross-Reference-Tabelle. Pro Konzept sind die
+  Paper aufgefuehrt, die das Konzept (mit unterschiedlichen Namen) verwenden.
+
+  PRT-ART (KANON) Spalte = unsere Bezeichnung in Diplomarbeit
+  Pij Spalte = Paper-ID (siehe ./_review/papers/P*-*.md)
+
+LEGENDE
+  ✓     Konzept ist im Paper Hauptbeitrag
+  ●     Konzept ist im Paper sekundaer/erwaehnt
+  -     Konzept ist NICHT im Paper
+
+================================================================================
+DOMAENE 1: STRUKTURELLE PRIMITIVE (Such-Algorithmen)
+================================================================================
+
+================================================================================
+KONZEPT: KNOTEN (Node)
+================================================================================
+
+PRT-ART KANON: Knoten
+
+| Paper-ID | Begriff im Paper | Quelle | Form |
+|---|---|---|---|
+| P01 ART | "Inner Node" | Leis 2013 | adaptive 4 Typen |
+| P02 HOT | "Compound Node" | Binna 2018 | container fuer BiNodes |
+| P02 HOT | "BiNode" | Binna 2018 | binary Patricia subknoten |
+| P03 Masstree | "Internal Node", "Border Node" | Mao 2012 | B+ inner/leaf |
+| P04 CoCo-trie | "Macro-Node" | Boffa 2024 | kollabierter Subtrie |
+| P05 START | "Multilevel Node" | Fent 2020 | mehrbyteig |
+| P06 B²-tree | "Decision Node", "Span Node" | Schmeisser 2022 | byte-decision, prefix-span |
+| P07 Wormhole | "Anchor", "Internal/Leaf Hash Item" | Wu 2019 | hash + pointers |
+| P09 Jacobson | "Tree Node" | Jacobson 1989 | succinct node |
+| P10 SuRF | "FST Node" | Zhang 2018 | LOUDS-Dense oder LOUDS-Sparse |
+| P12 CSB+ | "Inner Node + Node Group" | Rao/Ross 2000 | contiguous siblings |
+| P20 B-Trees Are Back | "Slotted Page Node" | Mueller 2025 | adaptive layout |
+
+ABGRENZUNG: KEIN "Page" (Container), KEIN "Cache Line" (Hardware).
+
+================================================================================
+KONZEPT: SEITE / PAGE
+================================================================================
+
+PRT-ART KANON: Seite/Page
+
+| Paper-ID | Begriff im Paper | Quelle |
+|---|---|---|
+| P03 Masstree | "B+-Tree Node" (=256 Bytes, 4 Cachelines) | Mao 2012 |
+| P06 B²-tree | "B+-Tree Page" (Outer-Layer) | Schmeisser 2022 |
+| P12 CSB+ | "Node Group" (contiguous siblings) | Rao/Ross 2000 |
+| P16 Bender | "Block" (Multilevel Memory) | Bender 2002 |
+| P18 Saikkonen | "Block" (Cache-Block) | Saikkonen 2008 |
+| P20 B-Trees Are Back | "Pageable Node" (4 KiB) | Mueller 2025 |
+| P22 Chen Fractal | "Disk Page" + "Cache Page" | Chen 2002 |
+
+================================================================================
+KONZEPT: ADAPTIVE KNOTENTYPEN / PAGE-TYPE-FAMILIE
+================================================================================
+
+PRT-ART KANON: Page-Type-Familie (5 Typen)
+
+| Paper-ID | Begriff im Paper | Anzahl Layouts |
+|---|---|---|
+| P01 ART | adaptive nodes (Node4/16/48/256) | 4 |
+| P02 HOT | adaptive node sizes (Single-Mask + Multi-Mask × 8/16/32 bit) | 9 |
+| P05 START | multilevel nodes + Rewired64K + Rewired16M + MultiNode4 | 7 (4 Standard + 3 multilevel) |
+| P10 SuRF | LOUDS-Dense + LOUDS-Sparse | 2 |
+| P20 B-Trees Are Back | 6 Layout-Optimierungen + adaptive selection | 6 + adaptive |
+| P04 CoCo-trie | Pool of succinct encodings + macro-node levels l | viele |
+
+PRT-ART KANON Familie:
+  - Dense-Byte-Page         ← analog ART Node256, LOUDS-Dense
+  - Extended Dense Page     ← analog START multilevel
+  - Sparse Patricia Page    ← analog HOT, LOUDS-Sparse
+  - Redirect-Page           ← analog CoCo-trie macro-node, Wormhole anchor
+  - PRT-Custom-Cache-Page   ← Eigener Beitrag (B² + CSS/CSB+)
+
+================================================================================
+KONZEPT: PRAEFIXKOMPRESSION / PFADKOMPRESSION
+================================================================================
+
+PRT-ART KANON: Praefixkompression
+
+| Paper-ID | Begriff im Paper | Mechanik |
+|---|---|---|
+| P01 ART | "Path Compression", "Lazy Expansion" | pessimistic+optimistic Hybrid 8B |
+| P02 HOT | "Discriminative Bits + variable Span" | Patricia bit-level |
+| P04 CoCo-trie | "Macro-Node Subtrie Collapse" | data-aware level-l |
+| P07 Wormhole | "Anchor", "Shortcut Node" | Hash ueber Praefixe |
+| P09 Jacobson | implizit via degree-encoding | LOUDS bit-string |
+| P10 SuRF | "D-IsPrefixKey" + 0xFF marker | succinct flag |
+| P20 B-Trees Are Back | "Prefix Truncation" | header speichert prefix |
+
+================================================================================
+KONZEPT: VALUEHANDLE / PAYLOAD-MANAGEMENT
+================================================================================
+
+PRT-ART KANON: ValueHandle (Inline / External)
+
+| Paper-ID | Begriff im Paper | Mechanik |
+|---|---|---|
+| P01 ART | "Combined pointer/value slot" | tagged pointer |
+| P03 Masstree | "Adaptive Keysuffix Inline vs External" | dynamische Wahl |
+| P06 B²-tree | "Range Array translation" | indirektion |
+| P10 SuRF | "D-Values" / "S-Values" | byte-sequence |
+| P20 B-Trees Are Back | "Heads + Hints + Fingerprinting" | inline-Optimierungen |
+
+================================================================================
+KONZEPT: SUCH-OPERATIONEN
+================================================================================
+
+PRT-ART KANON: Exact Lookup, Prefix Lookup, Prefix Enumeration, Range Query
+
+| Operation | P01 ART | P02 HOT | P03 Masstree | P10 SuRF | P07 Wormhole |
+|---|---|---|---|---|---|
+| Exact Lookup | findChild | retrieveResultCandidates | get | ExactKeySearch | Lookup via Hash |
+| Insert | insert (3 Cases) | insert (4 Cases) | put | (static) | Insert + Anchor-Adjust |
+| Delete | delete | delete | remove | (static) | Delete + Anchor-Adjust |
+| Range | binary-comparable | sorted scan | getrange | LowerBound + MoveToNext | Linear LeafList scan |
+| Prefix | yes via radix | yes | implicit via slice | LowerBound | yes |
+
+================================================================================
+KONZEPT: ORDNUNG / SORTIERUNG
+================================================================================
+
+PRT-ART KANON: Unsorted / Local-Sorted / Lex-Mode
+
+| Paper-ID | Default-Modus | Optionen |
+|---|---|---|
+| P01 ART | Lex (binary-comparable Keys) | nur Lex |
+| P02 HOT | Lex | nur Lex |
+| P03 Masstree | Lex (slice-sorted) | nur Lex |
+| P10 SuRF | Lex (LowerBound braucht es) | nur Lex |
+| P12 CSB+ | Lex | nur Lex |
+| P11 CSS-tree | sortiertes Array (Lex) | nur Lex |
+| P07 Wormhole | Lex | nur Lex |
+
+→ ALLE Such-Algorithmen sind LEX-default. PRT-ART nimmt Termin 1: 3 Modi (unsorted/local/lex) als optional an.
+
+================================================================================
+KONZEPT: SUCCINCT / SPACE-EFFICIENT ENCODING
+================================================================================
+
+PRT-ART KANON: optionale succinct Page-Variante
+
+| Paper-ID | Begriff | Bits/Knoten |
+|---|---|---|
+| P09 Jacobson | LOUDS (Level-Ordered Unary Degree Sequence) | ~2 bits |
+| P10 SuRF | LOUDS-Sparse | ~10 bits |
+| P10 SuRF | LOUDS-Dense | (variable) |
+| P04 CoCo-trie | gamma/Elias-Fano codes pro Macro-Node | nahe Lower-Bound |
+
+→ ALLE 4 sind STATIC (PRT-ART braucht Updates → koennten als optionale read-only Pages eingesetzt werden)
+
+================================================================================
+DOMAENE 2: CACHE-ENGINE / OPTIMIERUNG
+================================================================================
+
+================================================================================
+KONZEPT: CACHE-AWARENESS-MODI
+================================================================================
+
+PRT-ART KANON: passive, active, cache-oblivious
+
+| Modus | Paper-IDs | Beispiel |
+|---|---|---|
+| **Passive Cache-Awareness** | P11 CSS-tree, P12 CSB+, P13 Hankins/Patel | feste Layouts |
+| **Active Cache-Awareness** | P01 ART (limit), P05 START, P20 B-Trees Are Back, **PRT-ART Hauptbeitrag** | adaptive Layouts |
+| **Cache-Oblivious (Gegenpol!)** | P16 Bender Tree Layout, P17 Bender Cache-Obliv | unbekannte Cache-Parameter |
+
+================================================================================
+KONZEPT: COST MODEL / PLATFORM CALIBRATION
+================================================================================
+
+PRT-ART KANON: Cache-Engine Cost-Model + Plattform-Kalibrierung
+
+| Paper-ID | Mechanik | Variablen |
+|---|---|---|
+| P05 START | Cost CL(n) gemessen, Dynamic Programming Optimizer | Cycles, L1/RAM-Latenz |
+| P13 Hankins/Patel | Analytisches Modell (I/M/B/T) | Instructions, Misses, Branch-Misp, TLB-Misses |
+| P14 Samuel | Configuration Experiment + Configuration Table | Node-Size, Search-Method |
+| P23 Khan | Runtime-Code-Specializer | Loop-Latency |
+
+→ START + Hankins + Samuel sind die drei wichtigsten Cost-Model-Quellen fuer PRT-ART.
+
+================================================================================
+KONZEPT: TELEMETRIE / PROBABILITY HINTS
+================================================================================
+
+PRT-ART KANON: Probability Hints im Page-Header
+
+| Paper-ID | Mechanik | Granularitaet |
+|---|---|---|
+| P16 Bender Tree Layout | Probabilities pro Leaf gegeben | static |
+| P26 Zhang FGCS | Read Counter pro Block + evolving Hot Paths | runtime |
+| P28 Kuehn DAMON 2023 | Histogramm pro Knoten + Hot Path Detection | static (RUNTIME = OUT-OF-SCOPE!) |
+| P02 HOT | Sparse Partial Keys (impliziter Hint) | static |
+
+→ **Kuehn DAMON 2023 schliesst Runtime-Adaption explizit aus — PRT-ART schliesst diese Luecke!**
+
+================================================================================
+KONZEPT: ONLINE RELOCATION / RE-LAYOUTING
+================================================================================
+
+PRT-ART KANON: Online-Relocation der Cache-Engine
+
+| Paper-ID | Mechanik | Granularitaet |
+|---|---|---|
+| P18 Saikkonen 2008 | Multi-Level Globale Relocation (BFS-Fuellung) | komplette Tree |
+| P19 Saikkonen 2016 | Layout-Invariante mit konstanten Update-Operationen | dynamic |
+| P05 START | Offline Tuning (VACUUM-Phase) | tree-weite Re-Optimierung |
+| P28 Kuehn | Static Layout (Runtime Re-Layout out-of-scope) | static |
+
+→ Saikkonen 2008 ist die direkte Algorithmische Blaupause fuer PRT-ART Online-Relocation.
+
+================================================================================
+KONZEPT: PREFETCHING
+================================================================================
+
+PRT-ART KANON: Prefetching (Cache-Engine waehlt Distanz + Aktivierung)
+
+| Paper-ID | Strategie | Wirkung |
+|---|---|---|
+| P21 Chen 2001 | Wider Nodes + Leaf-Pointer-Arrays | Speedup 1.2-1.5× search, 6× scan |
+| P22 Chen 2002 (Fractal) | Multi-Granularitaet (Disk + Cache) | Speedup 1.1-1.8× search |
+| P23 Khan 2010 | Runtime-adaptierte Distance | 2.5% Speedup |
+| P24 Naderan-Tahan 2016 | NEGATIV: hilft nicht bei modernen Workloads | - |
+| P25 Mahling 2025 | Weak vs Strong Reliability + Fill Buffer | bis 2.6× speedup ODER 2.5× slowdown! |
+| P26 Zhang FGCS 2024 | Path Prefetcher + Jump Pointer Queue | 20-70% Speedup |
+| P27 Zhang ASPLOS 2025 | Bundle-based Instruction Prefetcher | 6.6% Speedup |
+
+→ Mahling (P25) + Naderan-Tahan (P24) sind die kritischen Vorsicht-Quellen.
+→ PRT-ART Cache-Engine MUSS messen ob Prefetch hilft, nicht nur einschalten.
+
+================================================================================
+KONZEPT: SYNCHRONIZATION / CONCURRENCY
+================================================================================
+
+PRT-ART KANON: OLC + Optionale ROWEX
+
+| Paper-ID | Mechanik | Komplexitaet |
+|---|---|---|
+| P01 ART | NICHT geloest (Future Work) | - |
+| P02 HOT | ROWEX (Read-Optimized Write EXclusion) | 5-Schritt-Protokoll |
+| P03 Masstree | OCC mit Permutation-Field + dirty-bits | low overhead |
+| P08 ART of Practical Sync | OLC (Optimistic Lock Coupling) + ROWEX | OLC: simple, ROWEX: lock-free reads |
+| P06 B²-tree | OLC | mit zusaetzlicher Page-Boundary-Validation |
+| P29 RCU | Grace Period + Quiescent State | wait fuer alle Reader |
+| P30 Hazard Pointers | per-Thread Hazard Pointers | wait-free |
+
+→ PRT-ART nutzt OLC als Default + Hazard Pointers oder RCU fuer Reclamation.
+
+================================================================================
+KONZEPT: ALLOCATOR / MEMORY MANAGEMENT
+================================================================================
+
+PRT-ART KANON: Pool/Arena pro Page-Type
+
+| Paper-ID | Allocator | Strategy |
+|---|---|---|
+| P05 START | Rewired Memory (memfd_create + mmap) | virtual-physical decoupling |
+| - | tcmalloc | per-thread / per-cpu Caches |
+| - | mimalloc | Free-List-Sharding |
+| - | snmalloc | message-passing |
+
+→ Termin 4 Designmuster, nicht direkt aus den 33 Papern, aber als Repos in F.10-F.12.
+
+================================================================================
+DOMAENE 3: HARDWARE / ISA / PLATTFORM
+================================================================================
+
+================================================================================
+KONZEPT: SIMD-INSTRUCTIONS
+================================================================================
+
+| Paper-ID | ISA | Use-Case |
+|---|---|---|
+| P01 ART | SSE2 | Node16 search |
+| P02 HOT | AVX2 + BMI2 (PEXT/PDEP) | partial key search + bit extraction |
+| P10 SuRF | 128-bit SIMD | label search in LOUDS-Sparse |
+| P14 Samuel | (icc/gcc auf Itanium 2) | linear search ohne SIMD |
+| P32 To Stride | AVX-512 | scalar strided > simd-sequential |
+
+================================================================================
+KONZEPT: HARDWARE PREFETCH
+================================================================================
+
+| Paper-ID | Hardware-Anforderung |
+|---|---|
+| P21 Chen 2001 | Software-Prefetch (compiler-builtin) |
+| P25 Mahling | T0/T1/T2/NTA hints (x86) + KEEP/STREAM (ARM) |
+| P02 HOT | manueller cache-line Prefetch |
+
+================================================================================
+KONZEPT: TLB
+================================================================================
+
+| Paper-ID | TLB-Behandlung |
+|---|---|
+| P13 Hankins/Patel | TLB-Misses als Cost-Faktor |
+| P18 Saikkonen 2008 | TLB als oberste Block-Ebene modelliert |
+| P32 To Stride 2025 | DTLB-Groesse beeinflusst Stride-Strategie |
+
+================================================================================
+DOMAENE 4: TUD-/HABICH-LINIE
+================================================================================
+
+| Paper-ID | TUD-Beitrag |
+|---|---|
+| P31 Ungethuem 2017 | Habich Co-Autor — DB-Hardware-Optimization Survey |
+| P32 To Stride 2025 | Habich Co-Autor — Stride vs Sequential auf modernen Memory |
+| P33 VAMPIR Poster | Habich Co-PI — Heterogeneous Memory + NFP Modeling |
+
+→ Diese 3 Quellen positionieren PRT-ART in der Habich-Forschungslinie.
+
+================================================================================
+KONZEPT-CLUSTER (PRT-ART vs gesamte Literaturlinie)
+================================================================================
+
+Cluster A: TRIE-FAMILIE (PRT-ART direkter Vorgaenger)
+  P01 ART, P02 HOT, P04 CoCo-trie, P05 START, P09 Jacobson, P10 SuRF
+  → PRT-ART Trie-Huelle uebernimmt diese Konzepte.
+
+Cluster B: B+-TREE-FAMILIE (PRT-ART Pflicht-Vergleichsbasis)
+  P11 CSS-tree, P12 CSB+, P13 Hankins, P14 Samuel, P15 Graefe, P20 B-Trees Are Back
+  → PRT-ART hat KEINE B+-Tree-Form, aber lernt Layout-Optimierungen.
+
+Cluster C: HYBRID (PRT-ART Inspiration fuer Custom Cache Page)
+  P03 Masstree (Trie+B+), P06 B²-tree (B+ + Trie pro Page), P07 Wormhole (Hash+Trie+B+)
+  → PRT-ART Custom Cache Page ist verwandt zu B²-tree, aber Trie-Huelle.
+
+Cluster D: CACHE-LAYOUT-THEORIE
+  P16 Bender 2002, P17 Bender 2005, P18 Saikkonen 2008, P19 Saikkonen 2016
+  → PRT-ART Cache-Engine baut auf diesen Theorien auf.
+
+Cluster E: PREFETCHING (PRT-ART Cache-Engine Modul)
+  P21-P27 (Chen, Khan, Naderan-Tahan, Mahling, Zhang FGCS+ASPLOS, Kuehn)
+  → PRT-ART Cache-Engine waehlt Prefetch adaptive.
+
+Cluster F: SYNCHRONIZATION (PRT-ART Cache-Engine Concurrency)
+  P08 ART Sync, P29 RCU, P30 Hazard Pointers
+  → PRT-ART nutzt OLC + RCU/Hazard Pointers.
+
+Cluster G: TUD-HABICH-LINIE
+  P31 Ungethuem, P32 To Stride, P33 VAMPIR
+  → PRT-ART positioniert sich in der TUD-Habich-Forschungstradition.
+
+================================================================================
+ZENTRALES ERGEBNIS DIESER MATRIX
+================================================================================
+
+PRT-ART HAUPTBEITRAG (basierend auf 33-Paper-Lektuere):
+
+  Was die Literatur ALLES bietet:
+    - Adaptive Knotentypen pro Datenstruktur (P01 ART, P02 HOT, P05 START, P20 BTreesBack)
+    - Cache-aware Layouts (P11 CSS, P12 CSB+, P13 Hankins, P14 Samuel)
+    - Probability-basierte Layout-Optimierung (P16 Bender, P28 Kuehn)
+    - Online-Relocation (P18 Saikkonen 2008)
+    - Prefetching-Familie (P21-P27)
+    - Plattform-Kalibrierung (P14 Samuel Configuration Experiment)
+    - Cost-Model-basierte Optimierung (P05 START)
+    - Synchronization (P08 ART OLC, P29 RCU, P30 Hazard Pointers)
+    - Succinct Encoding (P09 Jacobson, P10 SuRF, P04 CoCo-trie)
+
+  Was die Literatur NICHT bietet:
+    1. Eine **getrennte Cache-Engine als Meta-Ebene** ueber trie-basierter Suche
+       → ALLE Such-Algorithmen integrieren Layout-Wahl IN die Datenstruktur
+    2. **Online (runtime-adaptive) Re-Layouting** fuer dynamische Indizes
+       → P28 Kuehn DAMON 2023 schliesst das EXPLIZIT aus
+    3. Eine **gemeinsame Wahl** von Seitentyp + Layout + Inline + Prefetch + Allocator
+       → Alle Quellen optimieren EIN Aspekt, nicht alle gemeinsam
+    4. **Plattform-bewusste online Adaption** ueber ISA-Pfade
+       → START (P05) macht offline; PRT-ART macht online
+
+  Das ist die **vier-fache Forschungsluecke** von PRT-ART, jetzt durch
+  die Tieflektuere aller 33 Paper als nicht-trivial bestaetigt.
+
+================================================================================
+ENDE DER CROSS-PAPER KONZEPTMATRIX
+Naechster Schritt: Begriffsglossar v3 (Phase 3.B.36) mit Paper-Beleg-IDs
+================================================================================

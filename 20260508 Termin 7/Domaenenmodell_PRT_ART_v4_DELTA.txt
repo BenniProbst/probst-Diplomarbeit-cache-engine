@@ -1,0 +1,429 @@
+================================================================================
+DOMAENENMODELL v4 (DELTA zu v3) — PRT-ART
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D REV 4
+Stand: 2026-05-04 · ERGAENZT Domaenenmodell_PRT_ART_v3.txt um die Korrekturen
+                     F10-K, F12-K und die F-EXTRA-1 bis F-EXTRA-8-Beschluesse
+Vorbereitet fuer: Phase 5 (drawio UML — gesperrt bis explizites Nutzer-GO)
+================================================================================
+
+ZWECK DIESES DOKUMENTS
+   v4 ist ein Delta-Dokument. v3 bleibt strukturell gueltig; v4 korrigiert
+   einzelne Sektionen und ergaenzt um die F-EXTRA-Beschluesse.
+
+   Bei Konflikt v3 ↔ v4 gewinnt v4.
+
+PARALLEL-DOKUMENTE
+   • Architekturentscheidungen_F1_F15.txt (REV 4)  — kanonische Beschluesse
+   • Begriffsglossar_v6_FINAL.txt                   — neue Begriffe
+   • Flag_System.txt                                — Bit-Belegung pro Bank
+   • Bausteine_Matrix.txt                           — Bausteine pro Achse
+
+================================================================================
+KORREKTUR D-1 — §1(C) CACHEENGINE-LOKATION  (F12-K)
+================================================================================
+
+WAS v3 SAGT
+   "(C) CACHE-ENGINE-LOKATION
+       Die Cache Engine ist KEIN separates globales Singleton-Heap-Modul.
+       Sie lebt IM `CacheEngineBuilder` (= main.cpp Orchestrator).
+       Sie wird zwischen Modul-Experimenten zurueckgesetzt."
+
+KORREKTUR v4
+   "(C) CACHE-ENGINE-LOKATION  (KORRIGIERT)
+       Die Cache Engine IST ein Heap-Singleton, lebt aber INNERHALB des
+       CacheEngineBuilder-Prozesses als globale Variable. Sie ist KEIN
+       separater Prozess und KEINE Member-Variable des Builders, sondern
+       eine Singleton-Instanz im Builder-Prozess-Heap.
+       Sie wird Such-Algorithmus-Modulen als RESSOURCE bereitgestellt
+       (via `CacheEngine::instance()` oder injizierte Referenz beim
+       Modul-Bind).
+       Sie bietet einen Observer-Slot, ueber den Module ihre
+       Entscheidungszustaende generieren.
+       Cache-Warmup gehoert ZUR Algorithmus-Permutation; CacheEngine.reset()
+       setzt internen Zustand zurueck (NICHT die Instanz)."
+
+ARCHITEKTUR-DIAGRAMM (KORRIGIERT)
+   CacheEngineBuilder = main.cpp Orchestrator (Prozess)
+     │
+     └─► Heap-Region des Prozesses
+            │
+            ├─► CacheEngine::instance()             [Singleton, global]
+            │     • ConcurrencyManager::instance()  [Sub-Singleton]
+            │     • DecisionLambdaTrees aus geladenem Modul
+            │     • InMemoryMeasurementBuffer
+            │     • ObserverRegistry
+            │
+            └─► Dynamisch geladene Module           [pro Experiment]
+                  └─► binden CacheEngine::instance() als Ressource
+
+================================================================================
+KORREKTUR D-2 — §3.2 DECISIONLAMBDATREES PRO BAUSTEIN  (F-EXTRA-6)
+================================================================================
+
+WAS v3 SAGT
+   "ENTSCHEIDUNGSKLASSEN (DecisionLambdaTree-Instanzen)
+       - PageRelocationDecisionTree
+       - PageTypeChangeDecisionTree
+       - PrefetchAdjustmentDecisionTree
+       - AllocatorRebalanceDecisionTree
+       - ConcurrencyDisciplineSwitchDecisionTree
+       - PageTypeSelectionDecisionTree
+       - HotPathRecognitionDecisionTree
+       - LayoutInvariantMaintenanceDecisionTree"
+   (System-globale Trees, eine Instanz pro Entscheidungsklasse)
+
+KORREKTUR v4
+   DecisionLambdaTrees sind PRO BAUSTEIN definiert, nicht system-global.
+   Jeder Baustein bringt die fuer ihn relevanten Trees mit. Ein Algorithmus
+   = Komposition der Trees seiner gewaehlten Bausteine.
+
+   BEISPIEL
+     • ART_Node256-Baustein bringt:
+         - PageRelocationTree (ART-spezifisch)
+         - PageTypeChangeTree (ART → Node48 bei Schrumpfung)
+     • AdaptivePrefetchDistance-Baustein bringt:
+         - PrefetchAdjustmentTree (Khan-Style, P23)
+     • HotPathRecognition-Baustein bringt:
+         - HotPathRecognitionTree (Kuehn-Style, P28)
+     • Wenn ein Algorithmus diese drei Bausteine nutzt:
+         → Komposition: alle drei Trees aktiv
+
+   KOMPOSITIONS-MECHANIK (C++23 Concepts + requires)
+     template<typename Module>
+     concept HasPageRelocationTree =
+       requires(Module m) { { m.page_relocation_tree() } -> std::convertible_to<DecisionTree*>; };
+
+     // Algorithmus-Modul aggregiert alle Trees seiner Bausteine
+     class AlgorithmModule : public IAlgorithmStrategy<K,V> {
+       std::vector<DecisionTree*> active_trees() const {
+         std::vector<DecisionTree*> trees;
+         if constexpr (HasPageRelocationTree<page_baustein>) trees.push_back(...);
+         // ... pro Baustein
+         return trees;
+       }
+     };
+
+   QUELLE Bausteine_Matrix.txt — pro Bausteine-Eintrag die mitgebrachten
+   DecisionTrees benannt.
+
+================================================================================
+KORREKTUR D-3 — §4.1 BUILDER-LIFECYCLE  (F-EXTRA-1, Compiler-Layering)
+================================================================================
+
+WAS v3 SAGT
+   Builder-Lifecycle in 7 Phasen, Pre-Build per CMake-Skript.
+
+ERGAENZUNG v4
+   Phase "Adhoc Build" wird konkretisiert mit Compiler-Layering:
+
+   ADHOC BUILD (KONKRETISIERT, F-EXTRA-1 + F-EXTRA-5)
+     - Builder ruft `tools/permutation_codegen/codegen.py`
+     - Skript erzeugt:
+         a. Pro Permutation eine .cpp/.ccm Schalen-Datei (C++23)
+         b. CMake-Targets (`add_library(perm_<flags> ...)`)
+     - Skript erzeugt zusaetzlich pro Permutation eine
+         `external_objects.cmake`-Liste, die die Original-Compiler-Object-
+         Files referenziert.
+     - Original-Compiler-Bausteine werden vorab kompiliert (siehe §6.3).
+     - CMake linkt Schalen-.o + Original-Compiler-.o → ABI-stabiles Modul.
+
+   COMPILER-LAYERING-PIPELINE
+     1. Pre-Build-Phase verifiziert Verfuegbarkeit aller Original-Compiler-
+        Versionen (F-EXTRA-1, Strategie A → B Fallback).
+     2. Codegen erzeugt Schalen-Code (C++23) UND
+        Bausteine-Wrapper-Code (Original-Compiler-kompatibel).
+     3. Original-Compiler kompiliert seine Bausteine zu .o (intern visible).
+     4. C++23-Hauptcompiler kompiliert die Schale zu .o (extern visible).
+     5. Linker (kompatibel mit beiden ABIs) fasst alles zu .so/.dll/.dylib.
+
+================================================================================
+KORREKTUR D-4 — §4.2 PRE-BUILD-PIPELINE  (F-EXTRA-5)
+================================================================================
+
+WAS v3 SAGT
+   "build_permutations.cmake (sequentiell pro Permutation)"
+
+KORREKTUR v4
+   Statt reines CMake → Python-Codegen-Skript erzeugt CMake-Targets,
+   dann normaler CMake-Build (parallelisiert):
+
+   `tools/permutation_codegen/codegen.py`
+     - Liest Bausteine_Matrix + Flag_System
+     - Enumeriert alle gueltigen Permutationen (ConstraintFilter)
+     - Generiert pro Permutation:
+         • Schalen-.cpp/.ccm (C++23-Modul-Wrapper)
+         • CMake `add_library(perm_<flags> ...)`-Eintrag
+     - Output: `build/generated/permutations.cmake`
+   Hauptbuild includiert die generierte Datei und parallelisiert.
+
+   BEGRUENDUNG (F-EXTRA-5 Empfehlung)
+     CMake skaliert mit Hunderten Targets schlecht; Python-Codegen erzeugt
+     klare CMake-Targets, die CMake dann effizient parallelisiert.
+
+================================================================================
+KORREKTUR D-5 — §4.5 MESS-MATRIX MIT DEFAULT+OVERRIDE  (F-EXTRA-7)
+================================================================================
+
+WAS v3 SAGT
+   "Pro Zelle dieser Matrix existiert eine constexpr-spezialisierte
+    Implementierung der Mess-Erfassung."
+
+KORREKTUR v4
+   Pro Zelle gibt es zwei Ebenen:
+   • Default-Hook: generische Implementation pro Mess-Kategorie
+   • Override: algorithmus-spezifische Spezialisierung (nur wo der
+     Algorithmus etwas Spezifisches messen kann)
+
+   KONZEPT-CONSTRAINT
+     template<typename Algo, MeasurementCategory C>
+     concept HasMeasurement =
+       requires(Algo& a, Context& ctx) {
+         { Measure<C, AlgorithmDetailOf<Algo>>::at_node_visit(a, ctx) };
+       };
+
+   FALLBACK-LOGIK
+     template<typename Algo, MeasurementCategory C>
+     constexpr void hooked_node_visit(Algo& a, Context& ctx) noexcept {
+       if constexpr (HasMeasurement<Algo, C>) {
+         Measure<C, AlgorithmDetailOf<Algo>>::at_node_visit(a, ctx);
+       } else {
+         // Default-Hook: generische Implementation
+         GenericMeasure<C>::at_node_visit(a, ctx);
+       }
+     }
+
+================================================================================
+KORREKTUR D-6 — §6.3 ORIGINAL-COMPILER-PIPELINE  (F-EXTRA-1, KORRIGIERT)
+================================================================================
+
+WAS v3 SAGT
+   "Jeder fremde Algorithmus wird mit SEINEM Original-Compiler kompiliert,
+    mit dem das Originalpaper das Verhalten verifiziert hat."
+   (Implizit: ganzes Modul mit Original-Compiler)
+
+KORREKTUR v4 (KRITISCH)
+   Hauptcompiler ist IMMER C++23. Nur die jeweiligen Bausteine
+   (= Originalcode-Snippets aus den Papers) werden mit ihrem Original-
+   Compiler kompiliert und anschliessend in unser C++23-Modul-Wrapper
+   STATISCH GELINKT.
+
+   ARCHITEKTUR-LAYERING (F-EXTRA-1)
+     • Schale ("Modul-Wrapper")
+         Compiler: C++23 (modern, GCC 14+ / Clang 17+ / MSVC 19.39+)
+         Inhalt:   Adapter, Concept-Bindungen, ABI-stabiles Modul-Interface
+         Sichtbarkeit: extern visible Symbol-Set (ABI)
+     • Internals ("Originalcode-Bausteine")
+         Compiler: Original-Compiler des jeweiligen Papers
+         Inhalt:   exakter Originalcode (Habich-Direktive)
+         Ausgabe:  .o (Object-File) oder .a (statische Library)
+         Sichtbarkeit: intern (kein externes Symbol des Moduls)
+     • Statisches Linking
+         Beide Schichten werden zur Compile-Time des Moduls statisch
+         gelinkt zu einem ABI-stabilen .so/.dll/.dylib.
+
+   STRATEGIE FUER COMPILER-VERSIONS-FESTLEGUNG (F-EXTRA-1)
+     A — Paper-Acknowledgement (Compiler-Version aus Originalpaper)
+     B — GitHub-Repo (CI-Files / Dockerfiles)
+     C — Email-Anfrage an Autoren (Fallback bei Unklarheit)
+     Aktuelle Strategie: A → B Fallback. Phase 4.B konkretisiert pro Algo.
+
+================================================================================
+KORREKTUR D-7 — §7 PLATTFORM-WORKFLOW ERWEITERT  (F-EXTRA-3, F-EXTRA-4)
+================================================================================
+
+WAS v3 SAGT
+   "ZIH (Barnard / Capella / Grace Hopper)
+       • Cross-Compile via vorhandene Infrastruktur
+       • Binaer-Lieferung via SOCKS5 (oder gleichwertig)"
+   "Self-built Compiler auf Pi 5 + VisionFive 2"
+
+ERGAENZUNG v4
+   ZIH-LIEFERUNG (F-EXTRA-3)
+     • SOCKS5-Tunnel als DEFAULT (vorhandene Tooling-Pipeline)
+     • SSH+rsync (Variante A) ist GESPERRT
+     • Architektur-Erweiterung: GitLab-CI-Job pusht Binaries direkt in
+       ZIH-Workspace (Variante C) — als Konfigurations-Option, abhaengig
+       von Fortigate-31G-Edge-Migration des Kubernetes-Clusters
+     • Tooling: `tools/socks5_zih_delivery/` (existiert) +
+       `tools/gitlab_ci_zih_push/` (neu, abhaengig vom Infra-Job)
+     • Cluster-Reference:
+       `C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\`
+
+   PI 5 + VISIONFIVE 2 COMPILER-PROVISIONING (F-EXTRA-4)
+     • Cross-Build auf x86-Host (schneller als nativer Bau auf Target)
+     • Stage-2 Native-Build zur Verifikation auf Target
+     • Self-hosted Toolchain auf Target (kann sich selbst neu bauen)
+     • Compiler-Version egal, Hauptsache verfuegbar
+     • Tooling: `tools/compiler_provisioning/`
+
+================================================================================
+KORREKTUR D-8 — §11 PROJEKT-STRUKTUR ERWEITERT  (alle F-EXTRA)
+================================================================================
+
+NEUE/AKTUALISIERTE EINTRAEGE
+   comdare-cache-engine/
+   ├── tools/
+   │   ├── socks5_zih_delivery/            (existiert, F-EXTRA-3)
+   │   ├── gitlab_ci_zih_push/             (NEU, F-EXTRA-3, abhaengig Infra)
+   │   ├── compiler_provisioning/          (F-EXTRA-4)
+   │   ├── permutation_codegen/            (NEU, F-EXTRA-5)
+   │   │   ├── codegen.py
+   │   │   ├── flag_system.py              (Bibliothek)
+   │   │   └── bausteine_matrix.py         (Bibliothek)
+   │   └── abi_stability_test/             (NEU, F-EXTRA-8)
+   │       ├── bit_diff.py
+   │       ├── struct_diff.py              (nm/objdump-Vergleich)
+   │       └── habich_log_generator.py
+   ├── tests/
+   │   ├── unit/
+   │   ├── integration/
+   │   ├── generic_module_tests/           (NEU, F-EXTRA-8)
+   │   │   - Concept-Erfuellung
+   │   │   - std::map-API-Vollstaendigkeit
+   │   │   - Generische Funktions-Tests
+   │   └── module_specific_tests/          (NEU, F-EXTRA-8)
+   │       - Pro Bausteine-Variante eigener Test-Satz
+   │       - Pro Modul-Permutation Edge-Cases
+   ├── cache_engine/
+   │   ├── builder/
+   │   │   ├── main.cpp                    (Orchestrator)
+   │   │   ├── cache_engine_singleton.cpp/.hpp  (KORRIGIERT, F12-K Heap-Singleton)
+   │   │   ├── decision_lambda_trees/      (LEER — Trees kommen pro Baustein, F-EXTRA-6)
+   │   │   ├── measurement_matrix/         (Default + Override-Spezialisierung, F-EXTRA-7)
+   │   │   ├── permutation_engine/         (nutzt Flag_System, F10-K)
+   │   │   ├── module_loader/              (dlopen / LoadLibrary)
+   │   │   ├── platform_probe/
+   │   │   ├── live_cpu_model/
+   │   │   ├── algorithm_visitor/
+   │   │   ├── observer_registry/
+   │   │   ├── compile_time_knowledge/
+   │   │   ├── runtime_micro_benchmarks/
+   │   │   ├── telemetry_spool/
+   │   │   ├── in_memory_measurement_buffer/
+   │   │   ├── disk_serializer/
+   │   │   └── latex_renderer/
+
+================================================================================
+KORREKTUR D-9 — TEST-STRATEGIE + HABICH-LOG  (F-EXTRA-8, NEU §11)
+================================================================================
+
+GOOGLE-TEST-STRATEGIE (zwei Ebenen)
+
+   1) GENERISCHE TESTS (CacheEngineBuilder-Seite)
+      Pfad: `tests/generic_module_tests/`
+      Pruefen pro geladenem Modul:
+        • Erfuellt das Modul alle Concepts? (FanOutContainer, Page, Node, ...)
+        • Implementiert das Modul die std::map-API komplett?
+        • Funktionale Aequivalenz: gleicher Input → gleicher Output
+
+   2) SPEZIFISCHE TESTS (pro dynamisches Such-Algorithmus-Permutations-Modul)
+      Pfad: `tests/module_specific_tests/<perm_id>/`
+      Pruefen pro Modul:
+        • Pro Funktion spezifische Tests (Edge-Cases, Algorithmus-spezifische
+          Invarianten)
+        • Pro Bausteine-Variante eigener Test-Satz
+        • Z.B. "ART_Node256 muss bei 257 Children auf Node256 expandieren"
+
+ABI-STABILITAETS-TEST (CI)
+   Pro Permutation, im CI-Lauf:
+     1. Bit-Identitaets-Pruefung — `diff` der Object-Files zwischen
+        Original-Build und Splitting-Build des Originalcode-Bausteins
+     2. Funktionale Aequivalenz — gleicher Input → gleicher Output
+        (Latenz im Toleranzband)
+     3. Strukturelle Pruefung — `nm`/`objdump` Symbol-/Section-/Relocation-
+        Vergleich
+
+HABICH-LOG (Bei Bit-Abweichung)
+   Wenn Splitting-Binary nicht bit-identisch:
+     • Welcher Baustein? Welche Compiler-Version?
+     • Was ist der Bit-Diff?
+     • Beweis Source-Identitaet
+     • Funktionaler Aequivalenz-Beweis
+     • Hypothese fuer Diff-Ursache
+     • Habich entscheidet ueber Akzeptanz
+
+================================================================================
+KORREKTUR D-10 — PERMUTATIONS-IDENTIFIER-SCHEMA  (F10-K)
+================================================================================
+
+WAS v3 SAGT
+   "perm_id" als opake Hash/Tupel-String-ID.
+
+KORREKTUR v4
+   Permutations-Identifier ist ein strukturiertes Flag-System nach Vorbild
+   der Intel-CPUID-Feature-Flags. Pro Bausteine-Achse eine `uint64_t`-Bank
+   mit Bit-Positionen pro Implementation. Permutation = Vereinigung der
+   gesetzten Flags.
+
+   QUELLE Vollstaendige Bit-Belegung in `Flag_System.txt` (NEU).
+
+   STRUCT
+     struct PermutationFlags {
+       std::uint64_t page_bank;
+       std::uint64_t node_bank;
+       std::uint64_t traversal_bank;
+       std::uint64_t value_handle_bank;
+       std::uint64_t memory_layout_bank;
+       std::uint64_t allocator_bank;
+       std::uint64_t prefetch_bank;
+       std::uint64_t concurrency_bank;
+       std::uint64_t isa_bank;
+       constexpr std::string to_identifier() const noexcept;
+     };
+
+   IDENTIFIER-FORMAT (Beispiel)
+     "PAGE_DENSEBYTE_ART256.NODE_NODE256.TRAVERSAL_BYTEBYBYTE.
+      VALUEHANDLE_INLINE.MEMORY_CACHELINE_ALIGNED.ALLOCATOR_POOL_PER_PAGETYPE.
+      PREFETCH_NONE.CONCURRENCY_OLC|MEMORY_READ_DISC.
+      ISA_SCALAR_X86_64|X86_AVX512F|X86_BMI2"
+
+   FOLGEN
+     • CMake generiert pro Permutation ein menschen-lesbares Modul-File
+     • ConstraintFilter wird zur Bit-Maskierung (Compile-Time)
+     • Module sind eindeutig identifizierbar ohne Hash-Kollision
+
+================================================================================
+NICHT-GEAENDERT (gegenueber v3)
+================================================================================
+
+Folgende v3-Sektionen bleiben UNVERAENDERT gueltig:
+   • §1(A) Basisvertrag (std::map-API)
+   • §1(B) Engine-Choice (StaticEngine vs CacheEngine)
+   • §1(D) Zwei Betriebsmodi (Permutations-Build + Experiment-Ausfuehrung)
+   • §1(E) Habich-Direktive (Originalcode unangetastet)
+   • §1(F) C++23 als Zielstandard
+   • §1(G) Read Counter = uint64_t
+   • §1(H) Memory Reclamation = RCU (HazardPointers raus)
+   • §1(I) In-Memory Measurement (KEINE externe DB)
+   • §1(J) Bausteine-Quer-Permutation als zentrales Prinzip
+   • §1(K) Konzept-Mapping (C++23 Concepts mit requires)
+   • §3.3 Visitor-Mid-Granularitaet (Page + Node)
+   • §3.4 ValueHandle: std::variant + Concept-Constraint
+   • §3.5 ConcurrencyManager: Klassen + Policy-Template
+   • §5 In-Memory Measurement Buffer
+   • §6.1 ISA-Dispatch
+   • §6.2 Plattform-Workflow (Pi 5 / VisionFive 2 / ODROID / x86 / ZIH)
+        — ergaenzt durch Korrektur D-7
+   • §10 Forschungsluecken-Mapping
+
+================================================================================
+F-EXTRA-LISTE NACH KORREKTUR-EINARBEITUNG
+================================================================================
+
+Status der F-EXTRA-Beschluesse:
+   F-EXTRA-1   ✅ eingearbeitet (Korrektur D-3, D-6 — Compiler-Layering)
+   F-EXTRA-2   ✅ eingearbeitet (vorhanden in v3 §5.1 + §F14 ADR)
+   F-EXTRA-3   ✅ eingearbeitet (Korrektur D-7 — SOCKS5 + GitLab-CI-Push)
+   F-EXTRA-4   ✅ eingearbeitet (Korrektur D-7 — Cross-Build + Stage-2)
+   F-EXTRA-5   ✅ eingearbeitet (Korrektur D-4 — Python-Codegen → CMake)
+   F-EXTRA-6   ✅ eingearbeitet (Korrektur D-2 — Trees pro Baustein)
+   F-EXTRA-7   ✅ eingearbeitet (Korrektur D-5 — Default + Override)
+   F-EXTRA-8   ✅ eingearbeitet (Korrektur D-9 — Tests + Habich-Log)
+   F10-K       ✅ eingearbeitet (Korrektur D-10 — Flag-System)
+   F12-K       ✅ eingearbeitet (Korrektur D-1 — Singleton im Builder)
+
+================================================================================
+ENDE DOMAENENMODELL v4 (DELTA)
+Naechste Phase: 4.A (Datasets) + 4.B (Projekt-Setup) + 5 (drawio UML)
+================================================================================

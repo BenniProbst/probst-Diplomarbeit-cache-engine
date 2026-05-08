@@ -1,0 +1,366 @@
+================================================================================
+BEGRIFFSGLOSSAR v6 — FINAL (Architektur-Korrekturen + F-EXTRA-Beschluesse)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D REV 4
+Stand: 2026-05-04 · ERGAENZT v5_FINAL.txt um die F10-K/F12-K-Korrekturen
+                     und F-EXTRA-1 bis F-EXTRA-8
+================================================================================
+
+WAS ENTHAELT v6
+   v6 ist ein Erweiterungsdokument zu v3+v4+v5. Es fuegt die Begriffe hinzu,
+   die aus den Korrekturen + F-EXTRA-Beschluessen entstanden sind:
+
+   BLOCK Z   — Flag-System (CPUID-Vorbild) (F10-K)
+   BLOCK AA  — CacheEngine als Heap-Singleton im Builder (F12-K)
+   BLOCK AB  — Compiler-Layering (Hauptcompiler C++23 + Original-Compiler-
+                Bausteine-Object-Files + statisches Linking) (F-EXTRA-1)
+   BLOCK AC  — Bausteine-DecisionLambdaTrees (kein globaler Default) (F-EXTRA-6)
+   BLOCK AD  — Cross-Build + Stage-2 native + Compiler-Provisioning (F-EXTRA-4)
+   BLOCK AE  — Python-Codegen → CMake-Targets (F-EXTRA-5)
+   BLOCK AF  — Default-Mess-Hooks + algo-spezifische Overrides (F-EXTRA-7)
+   BLOCK AG  — Google-Tests-Strategie + Habich-Log (F-EXTRA-8)
+   BLOCK AH  — SOCKS5 + GitLab-CI-Push + Fortigate-31G (F-EXTRA-3)
+
+PAPER-LEGENDE: identisch zu v3_FINAL.txt (P01-P33).
+
+================================================================================
+BLOCK Z — FLAG-SYSTEM (Intel-CPUID-Vorbild)  (F10-K)
+================================================================================
+
+[KANON]  PERMUTATIONS-FLAG-SYSTEM
+  BED Strukturierter Identifier-Mechanismus fuer Modul-Permutationen, nach
+      Vorbild der Intel-CPUID-Feature-Flags. Ersetzt den vorherigen
+      `perm_id`-Hash.
+  STRUKTUR
+      • Pro Bausteine-Achse eine "Bank" (32 oder 64 Bit, default uint64_t)
+      • Pro Implementation eine eindeutige Bit-Position innerhalb der Bank
+      • Eine Permutation = Vereinigung der gesetzten Flags (pro Achse
+        genau ein Bit; bei dynamischen Bausteinen mehrere Bits)
+      • Wohl-geordnete Reihenfolge der Banken im Permutations-Identifier
+
+[KANON]  FLAG-BANK
+  BED Eine `uint64_t`-Konstante pro Bausteine-Achse. Jede Bit-Position
+      kodiert eine Implementation aus dieser Achse.
+  ACHSEN-LISTE (9 Banken)
+      Bank 1  PageBank
+      Bank 2  NodeBank
+      Bank 3  TraversalBank
+      Bank 4  ValueHandleBank
+      Bank 5  MemoryLayoutBank
+      Bank 6  AllocatorBank
+      Bank 7  PrefetchBank
+      Bank 8  ConcurrencyBank
+      Bank 9  IsaBank
+  EINSATZ Komposition: `PermutationFlags{ page_bank, node_bank, ... }`
+
+[KANON]  PERMUTATION-IDENTIFIER (wohl geordnet)
+  BED Menschen-lesbarer Identifier-String, generiert aus den Flag-Banks
+      in fester Reihenfolge.
+  FORMAT
+      "<page_flag>.<node_flag>.<traversal_flag>.<value_handle_flag>.
+       <memory_layout_flag>.<allocator_flag>.<prefetch_flag>.
+       <concurrency_flag>.<isa_flag>"
+  BEISPIEL
+      "PAGE_DENSEBYTE_ART256.NODE_NODE256.TRAVERSAL_BYTEBYTE.
+       VALUEHANDLE_INLINE.MEMORY_CACHELINE_ALIGNED.ALLOCATOR_POOL.
+       PREFETCH_NONE.CONCURRENCY_OLC.ISA_X86_AVX2"
+
+[KANON]  CONSTRAINTFILTER ALS BIT-MASKIERUNG
+  BED Constraint-Pruefung wird zu einer Bit-Maskierung der zulaessigen
+      Kombinationen pro Target-Plattform.
+  BEISPIEL
+      // Auf RISC-V VisionFive 2: nur ISA_RISCV_SCALAR zulaessig
+      constexpr uint64_t allowed_isa_visionfive2 = IsaBank::SCALAR_RISCV;
+      static_assert((perm.isa_bank & ~allowed_isa_visionfive2) == 0,
+                    "ISA flag not supported on VisionFive 2");
+
+QUELLE  Eigene Spezifikations-Datei `Flag_System.txt` mit vollstaendiger
+        Bit-Belegung pro Bank.
+
+================================================================================
+BLOCK AA — CACHEENGINE ALS HEAP-SINGLETON IM BUILDER  (F12-K)
+================================================================================
+
+[KANON]  CACHEENGINE-LOKATION (KORRIGIERT)
+  BED Die CacheEngine ist ein Heap-allokierter Singleton, der als globale
+      Variable im CacheEngineBuilder-Prozess lebt.
+  ABG
+      • NICHT separater Prozess / NICHT Service ausserhalb des Builders.
+      • NICHT Member-Variable der Builder-Klasse.
+      • Sondern: globale Singleton-Instanz innerhalb des Builder-Prozess-Heaps.
+  LEBENSZEIT Builder-Prozess-Lebenszeit (vom main() bis Programm-Ende).
+  SICHTBARKEIT Dynamisch geladene Such-Algorithmus-Module erhalten Zugriff
+      via `CacheEngine::instance()` ODER per injizierter Referenz beim
+      Modul-Bind.
+  RESET-VERHALTEN `CacheEngine::reset()` setzt INTERNEN Zustand zurueck
+      (Observer, Trees, Buffers); die Singleton-INSTANZ bleibt.
+
+[KANON]  RESSOURCEN-INJEKTION (CacheEngine → Modul)
+  BED Beim Laden eines Such-Algorithmus-Moduls wird die CacheEngine als
+      RESSOURCE bereitgestellt:
+        - Modul implementiert `IAlgorithmStrategy<K,V>::bind(ICacheEngine&)`
+        - Builder ruft `module->bind(CacheEngine::instance())` direkt nach
+          dlopen+Symbol-Resolution
+        - Module nutzen die CacheEngine fuer Observer-Notifications und
+          Visitor-Akzeptanz
+
+[KANON]  ENTSCHEIDUNGSZUSTAND-GENERIERUNG (Observer-Slot)
+  BED Module rufen ueber den Observer-Slot der CacheEngine ihre
+      Entscheidungszustaende ab. Die CacheEngine generiert anhand des
+      Push-Events + DecisionLambdaTrees-Filter die Anpassungs-Entscheidung
+      (EXECUTE/DELAY/SKIP).
+
+KORREKTUR vs v5 BLOCK Y1
+   v5-Korrektur Y1 lautete: "CacheEngine LEBT IM CacheEngineBuilder als
+   Komponente. KEIN separater Singleton-Heap-Modul ausserhalb des Builders."
+   v6-Praezisierung: Die CacheEngine ist trotzdem ein Heap-Singleton, ABER
+   innerhalb des Builder-Prozesses (nicht als separater Prozess).
+
+================================================================================
+BLOCK AB — COMPILER-LAYERING  (F-EXTRA-1)
+================================================================================
+
+[KANON]  HAUPTCOMPILER (C++23)
+  BED Der Compiler fuer alle unter unserer Kontrolle stehenden Komponenten
+      (Builder, Schale, Adapter, Concept-Bindungen, Modul-Wrapper, eigene
+      Algorithmen wie PRT-ART) ist immer C++23.
+  ANFORDERUNG GCC 14+ / Clang 17+ / MSVC 19.39+
+
+[KANON]  ORIGINAL-COMPILER (Bausteine)
+  BED Originalcode-Bausteine aus den Papers werden mit IHREM Original-
+      Compiler kompiliert (Habich-Direktive).
+  AUSGABE Object-Files (.o) oder statische Libraries (.a)
+
+[KANON]  STATIC LINKING (Bausteine in Modul)
+  BED Object-Files / statische Libraries der Original-Compiler-Bausteine
+      werden zur Compile-Time des Moduls statisch in das ABI-stabile
+      C++23-Modul gelinkt.
+  RESULTAT Eine ABI-stabile .so/.dll/.dylib mit:
+      - C++23-Schale (extern visible Symbol-Set)
+      - Original-Compiler-Bausteine (intern visible, nicht exportiert)
+
+[KANON]  ABI-MULTI-COMPILER-PIPELINE
+  BED Build-Pipeline pro Modul:
+      1. Pre-Build-Phase verifiziert Verfuegbarkeit aller benoetigten
+         Original-Compiler-Versionen
+      2. Codegen erzeugt Schalen-.cpp (C++23) und Bausteine-Wrapper
+      3. Original-Compiler kompilieren ihre Bausteine zu Object-Files
+      4. Hauptcompiler (C++23) kompiliert die Schale
+      5. Linker (kompatibel mit beiden ABIs) fasst alles zu .so/.dll/.dylib
+
+[KANON]  COMPILER-PROVISIONING
+  BED Vorab-Bereitstellung aller benoetigten Compiler-Versionen pro
+      Plattform via `tools/compiler_provisioning/`.
+  STRATEGIEN
+      • A — Cross-Build auf x86-Host, Stage-2 Native-Build zur Verifikation
+      • B — GCC/Clang Self-Built auf Target (nur fuer Pi 5 / VisionFive 2)
+      • C — Vorhandene System-Compiler-Versionen via apt/dnf
+
+================================================================================
+BLOCK AC — BAUSTEINE-DECISIONLAMBDATREES  (F-EXTRA-6)
+================================================================================
+
+[KANON]  BAUSTEINE-DECISIONLAMBDATREE
+  BED Jeder Baustein bringt seine eigenen DecisionLambdaTrees mit (fuer
+      die Entscheidungsklassen, die ihn betreffen). KEIN globaler Default.
+  KORREKTUR vs v5 BLOCK M
+      v5-BLOCK M definierte Trees als pro-Entscheidungsklasse-System-globale
+      Komponenten. v6-Korrektur: Trees sind PRO BAUSTEIN definiert.
+
+[KANON]  TREE-KOMPOSITION (Algorithmus aus Bausteinen)
+  BED Ein Algorithmus-Modul = Vereinigung der Trees seiner gewaehlten
+      Bausteine. Komposition zur Compile-Time per Concepts/`requires`.
+  BEISPIEL
+      • ART_Node256-Baustein bringt:
+          - PageRelocationTree (ART-spezifisch)
+          - PageTypeChangeTree (ART-spezifisch)
+      • AdaptivePrefetchDistance-Baustein bringt:
+          - PrefetchAdjustmentTree (Khan-Style)
+      • HotPathRecognition-Baustein bringt:
+          - HotPathRecognitionTree (Kuehn-Style)
+      • Wenn ein Algorithmus diese drei Bausteine nutzt:
+          → Komponierter Tree-Satz: alle drei (PageReloc, PageTypeChange,
+                                              PrefetchAdjustment, HotPath)
+
+[KANON]  METAPROGRAMMIERUNG VS BINARY-IDENTITAET
+  BED Inline + Compiler-Flags der ALTEN Code-Abschnitte sorgen dafuer,
+      dass trotz Modularisierung des Originalcodes die Binary IDENTISCH
+      zur Original-Build-Binary ist.
+  REGEL Bausteine-Module duerfen keine Performance-Drift gegenueber dem
+      Originalcode einfuehren. Identitaet wird via ABI-Stabilitaets-Test
+      verifiziert (siehe BLOCK AG).
+
+================================================================================
+BLOCK AD — CROSS-BUILD + STAGE-2 NATIVE  (F-EXTRA-4)
+================================================================================
+
+[KANON]  CROSS-BUILD AUF X86-HOST
+  BED Compiler fuer Pi 5 (ARM Cortex-A76) + VisionFive 2 (RISC-V) werden
+      cross-built auf einem x86-Host (schneller als native Bau auf Target).
+
+[KANON]  STAGE-2 NATIVE BUILD (Verifikation)
+  BED Cross-built Compiler werden auf das Target deployed; dort wird ein
+      zweiter (Stage-2) Native-Build durchgefuehrt zur Verifikation, dass
+      die Cross-Toolchain korrekt funktioniert.
+  ZIEL Self-hosted Toolchain auf Target (kann sich selbst neu bauen).
+
+[KANON]  COMPILER-VERSION-WAHL (egal)
+  REGEL Compiler-Version egal, Hauptsache verfuegbar. Pro Algorithmus
+      wird die Compiler-Version dokumentiert (F-EXTRA-1, Phase 4.B).
+
+================================================================================
+BLOCK AE — PYTHON-CODEGEN → CMAKE-TARGETS  (F-EXTRA-5)
+================================================================================
+
+[KANON]  PERMUTATION-CODEGEN-SKRIPT
+  BED Python-Skript `tools/permutation_codegen/codegen.py`, das aus der
+      Bausteine-Matrix + Constraint-Filter alle gueltigen Permutationen
+      enumeriert und pro Permutation:
+      1. Generiert eine Schalen-.cpp (C++23 Modul-Wrapper)
+      2. Generiert ein CMake-Target (`add_library(perm_<flags> ...)`)
+      3. Ruft den passenden Original-Compiler fuer Bausteine-Dependencies
+      4. Ergebnis: `build/generated/permutations.cmake` mit allen Targets
+  EFFIZIENZ CMake parallelisiert die Hunderten Targets effizient (im
+      Gegensatz zu reinen CMake-Function-Loops).
+
+================================================================================
+BLOCK AF — MESS-DEFAULT + ALGO-SPEZIFISCHE OVERRIDES  (F-EXTRA-7)
+================================================================================
+
+[KANON]  DEFAULT-MESS-HOOK
+  BED Generischer Hook pro Mess-Kategorie fuer alle Algorithmen, die keine
+      spezialisierte Implementierung anbieten.
+  KOMPONENTE
+      template<MeasurementCategory C, AlgorithmDetail D>
+      struct Measure {
+        // Default-Implementation
+        static constexpr void at_node_visit(...) noexcept {
+          // generischer Hook (z.B. perf-Counter-Lesen)
+        }
+      };
+
+[KANON]  ALGO-SPEZIFISCHER OVERRIDE
+  BED Spezialisierung der Default-Mess-Implementation fuer einen
+      bestimmten (Algorithmus-Detail x Mess-Kategorie)-Pair, wo der
+      Algorithmus etwas Spezifisches messen kann.
+  BEISPIEL
+      // Override fuer ART_Node256 + CLU
+      template<>
+      struct Measure<MeasurementCategory::CLU, AlgorithmDetail::ART_Node256> {
+        static constexpr void at_node_visit(...) noexcept {
+          // Bit-genaue Berechnung der effektiv genutzten Bytes
+        }
+      };
+
+[KANON]  HASMEASUREMENT-CONCEPT-CONSTRAINT
+  BED `requires HasMeasurement<Algo, Category>` stellt sicher, dass nur
+      die fuer einen Algorithmus unterstuetzten Mess-Kategorien aktiviert
+      werden. Falls keine Override existiert, faellt es auf den Default
+      zurueck.
+
+================================================================================
+BLOCK AG — GOOGLE TESTS + ABI-STABILITAETS-TEST + HABICH-LOG  (F-EXTRA-8)
+================================================================================
+
+[KANON]  GENERISCHE GOOGLE TESTS (CacheEngineBuilder)
+  BED Tests, die fuer JEDES geladene Modul ausgefuehrt werden:
+      - Concept-Erfuellung (FanOutContainer, Page, Node, Traversal,
+        ValueHandleStrategy, MemoryLayout, ConcurrencyDiscipline)
+      - std::map-API-Vollstaendigkeit
+      - Generische Funktions-Tests (gleicher Input → gleicher Output)
+
+[KANON]  SPEZIFISCHE GOOGLE TESTS (pro Modul)
+  BED Tests, die spezifisch fuer eine Such-Algorithmus-Permutation oder
+      eine Baustein-Variante ausgefuehrt werden:
+      - Pro Funktion spezifische Tests (Edge-Cases, Algorithmus-spezifische
+        Invarianten)
+      - Pro Baustein-Variante eigener Test-Satz
+      - Z.B. "ART_Node256 muss bei 257 Children auf Node256 expandieren"
+
+[KANON]  ABI-STABILITAETS-TEST (CI)
+  BED Pro Permutation, im CI-Lauf:
+      1. Bit-Identitaets-Pruefung — `diff` der Object-Files zwischen
+         Original-Build und Splitting-Build
+      2. Funktionale Aequivalenz — gleicher Input → gleicher Output
+         (Latenz im Toleranzband)
+      3. Strukturelle Pruefung — `nm`/`objdump` Symbol-/Section-/
+         Relocation-Vergleich
+  REGEL Bei Bit-Diff: HABICH-LOG erforderlich (siehe naechster Eintrag).
+
+[KANON]  HABICH-LOG (Bei Bit-Abweichung)
+  BED Wenn die Splitting-Binary nicht bit-identisch zur Original-Binary
+      ist, MUSS ein Log fuer Prof. Habich erstellt werden mit:
+      - Welcher Baustein ist betroffen?
+      - Welche Compiler-Version (Original + Aktuell)?
+      - Was ist der erwartete vs. tatsaechliche Bit-Diff?
+      - Beweis, dass Source-Code identisch ist.
+      - Funktionaler Aequivalenz-Beweis.
+      - Hypothese fuer Diff-Ursache (Compiler-Optimierungs-Aenderung,
+        Linker-Order, etc.).
+  REGEL Habich entscheidet, ob Abweichung akzeptabel oder Re-Implementation
+      noetig.
+
+================================================================================
+BLOCK AH — SOCKS5 + GITLAB-CI-PUSH + FORTIGATE-31G  (F-EXTRA-3)
+================================================================================
+
+[KANON]  SOCKS5-ZIH-LIEFERUNG (Default)
+  BED Vorhandene Tooling-Pipeline fuer Binary-Uebertragung ans ZIH via
+      SOCKS5-Tunnel. Einziger vom ZIH zulaessiger Tunnel.
+  ABG SSH+rsync (Variante A) ist gesperrt.
+  TOOLING `tools/socks5_zih_delivery/`
+  CLUSTER-CONTEXT `C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\`
+
+[KANON]  GITLAB-CI-PUSH-ERWEITERUNG
+  BED Konfigurations-Option, in der ein GitLab CI-Job die Binaries direkt
+      in den ZIH-Workspace pusht. Erweiterung fuer automatisierte
+      Workflow-Tests.
+  ABHAENGIGKEIT Fortigate-31G-Edge-Migration des Kubernetes-Clusters
+  TOOLING `tools/gitlab_ci_zih_push/` (neu, abhaengig vom Infra-Job)
+
+[KANON]  FORTIGATE-31G-EDGE
+  BED Neues Edge-Geraet im Kubernetes-Cluster (geplante Infra-Migration),
+      das eine eigene statische IP-Adresse fuer den ZIH-Push verfuegbar
+      macht. Cluster-Reference im Cluster-Sessions-Verzeichnis.
+
+================================================================================
+BEZIEHUNG v3 / v4 / v5 / v6
+================================================================================
+
+v3_FINAL.txt — P01-P33-Begriffsbelege (gueltig)
+v4_FINAL.txt — Architektur-Pattern, Engine-Choice, Fan-Out, std::map-API,
+                 Concepts, ValueHandle, Concurrency-Disziplinen,
+                 CacheEngineBuilder-Begriffe, Habich, Submodules
+v5_FINAL.txt — Architektur-Beschluesse F1-F15: DecisionLambdaTree,
+                 In-Memory-Buffer, ABI-Module, Original-Compiler-Pipeline,
+                 Cache-Warmup als Permutation, Dual-Modus, Mess-Matrix,
+                 Bausteine-Quer-Permutation, Plattform-Workflow,
+                 Concurrency-Composition, ConstraintFilter, Module-Loader
+v6_FINAL.txt — Korrekturen + F-EXTRA-Beschluesse:
+                 Flag-System (CPUID-Vorbild), CacheEngine-Heap-Singleton-im-
+                 Builder, Compiler-Layering, Bausteine-DecisionLambdaTrees,
+                 Cross-Build + Stage-2, Python-Codegen, Default-Mess-Hooks,
+                 Google-Tests + Habich-Log, SOCKS5 + GitLab-CI-Push
+
+Bei Konflikt: spaetere Version gewinnt (v6 > v5 > v4 > v3).
+
+================================================================================
+PARALLEL DOKUMENTE
+================================================================================
+
+Architekturentscheidungen_F1_F15.txt (REV 4)
+   - Kanonische Festschreibung F1-F15 + F-EXTRA-1 bis F-EXTRA-8 + Korrekturen.
+
+Domaenenmodell_PRT_ART_v4_DELTA.txt
+   - Delta-Dokument zu v3, das die Korrekturen + F-EXTRA-Beschluesse abbildet.
+
+Flag_System.txt (NEU)
+   - Vollstaendige Bit-Belegung der 9 Flag-Banks.
+
+Bausteine_Matrix.txt (NEU)
+   - Pro konzeptionelle Achse: alle bekannten Implementationen aus den
+     33 Papers + PRT-ART, mit Original-Compiler-Anforderung.
+
+================================================================================
+ENDE DES BEGRIFFSGLOSSARS v6
+================================================================================

@@ -1,0 +1,191 @@
+================================================================
+VORANALYSE: P01-ART/unodb
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P01-ART/unodb
+Stand: 2026-05-09 00:47:20
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 970
+drwxr-xr-x 1 benja 197609      0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609      0 May  4 23:54 ..
+-rw-r--r-- 1 benja 197609    517 May  4 23:38 .clang-format
+-rw-r--r-- 1 benja 197609   3171 May  4 23:38 .clang-tidy
+-rw-r--r-- 1 benja 197609    349 May  4 23:38 .clangd
+-rw-r--r-- 1 benja 197609    155 May  4 23:38 .codecov.yml
+-rw-r--r-- 1 benja 197609    485 May  4 23:38 .coderabbit.yaml
+-rw-r--r-- 1 benja 197609    613 May  4 23:38 .dir-locals.el
+drwxr-xr-x 1 benja 197609      0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609    168 May  4 23:38 .gitattributes
+-rw-r--r-- 1 benja 197609    126 May  4 23:38 .gitconfig
+drwxr-xr-x 1 benja 197609      0 May  5 00:06 .github
+-rw-r--r-- 1 benja 197609    553 May  4 23:38 .gitignore
+-rw-r--r-- 1 benja 197609    362 May  4 23:38 .gitmodules
+-rw-r--r-- 1 benja 197609    180 May  4 23:38 .ispell.dict
+-rw-r--r-- 1 benja 197609    141 May  4 23:38 .jscpd.json
+drwxr-xr-x 1 benja 197609      0 May  5 00:06 .muse
+-rw-r--r-- 1 benja 197609    101 May  4 23:38 .muse.toml
+-rw-r--r-- 1 benja 197609     80 May  4 23:38 .yaml-lint.yml
+drwxr-xr-x 1 benja 197609      0 May  5 00:06 3rd_party
+-rw-r--r-- 1 benja 197609  37961 May  4 23:38 CMakeLists.txt
+-rw-r--r-- 1 benja 197609  16797 May  4 23:38 CMakePresets.json
+-rw-r--r-- 1 benja 197609  12725 May  4 23:38 CONTRIBUTING.md
+-rw-r--r-- 1 benja 197609    774 May  4 23:38 CPPLINT.cfg
+-rw-r--r-- 1 benja 197609 134831 May  4 23:38 Doxyfile
+-rw-r--r-- 1 benja 197609  11558 May  4 23:38 LICENSE
+-rw-r--r-- 1 benja 197609  12638 May  4 23:38 README.md
+-rw-r--r-- 1 benja 197609     30 May  4 23:38 actionlint.yml
+-rw-r--r-- 1 benja 197609  81149 May  4 23:38 art.hpp
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./3rd_party
+./3rd_party/benchmark
+./3rd_party/deepstate
+./3rd_party/googletest
+./benchmark
+./examples
+./fuzz_deepstate
+./test
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./art.hpp
+./art_common.hpp
+./art_internal.cpp
+./art_internal.hpp
+./art_internal_impl.hpp
+./assert.hpp
+./benchmark/micro_benchmark.cpp
+./benchmark/micro_benchmark_concurrency.hpp
+./benchmark/micro_benchmark_key_prefix.cpp
+./benchmark/micro_benchmark_mutex.cpp
+./benchmark/micro_benchmark_n16.cpp
+./benchmark/micro_benchmark_n256.cpp
+./benchmark/micro_benchmark_n4.cpp
+./benchmark/micro_benchmark_n48.cpp
+./benchmark/micro_benchmark_node_utils.hpp
+./benchmark/micro_benchmark_olc.cpp
+./benchmark/micro_benchmark_utils.cpp
+./benchmark/micro_benchmark_utils.hpp
+./duckdb_encode_decode.hpp
+./examples/example_art.cpp
+./examples/example_art_stats.cpp
+./examples/example_olc_art.cpp
+./fuzz_deepstate/deepstate_utils.hpp
+./fuzz_deepstate/test_art_fuzz_deepstate.cpp
+./fuzz_deepstate/test_qsbr_fuzz_deepstate.cpp
+./global.hpp
+./heap.hpp
+./in_fake_critical_section.hpp
+./mutex_art.hpp
+./node_type.hpp
+./olc_art.hpp
+./optimistic_lock.hpp
+./portability_arch.hpp
+./portability_builtins.hpp
+./qsbr.cpp
+./qsbr.hpp
+./qsbr_ptr.cpp
+./qsbr_ptr.hpp
+./sync.hpp
+./test/db_test_utils.cpp
+./test/db_test_utils.hpp
+./test/gtest_utils.hpp
+./test/qsbr_gtest_utils.cpp
+./test/qsbr_gtest_utils.hpp
+./test/qsbr_test_utils.cpp
+./test/qsbr_test_utils.hpp
+./test/test_art.cpp
+./test/test_art_concurrency.cpp
+./test/test_art_iter.cpp
+./test/test_art_key_view.cpp
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+  31052 total
+   3868 ./art_internal_impl.hpp
+   3362 ./olc_art.hpp
+   2108 ./art.hpp
+   1650 ./test/test_art_key_view.cpp
+   1608 ./qsbr.hpp
+   1203 ./benchmark/micro_benchmark_node_utils.hpp
+   1136 ./test/test_art_concurrency.cpp
+   1086 ./test/test_art_scan.cpp
+    989 ./test/test_art.cpp
+    960 ./test/test_qsbr.cpp
+    953 ./optimistic_lock.hpp
+    846 ./test/test_key_encode_decode.cpp
+    801 ./test/db_test_utils.hpp
+    764 ./fuzz_deepstate/test_qsbr_fuzz_deepstate.cpp
+    723 ./art_common.hpp
+    679 ./test/test_art_iter.cpp
+    635 ./art_internal.hpp
+    535 ./qsbr.cpp
+    465 ./test/test_art_oom.cpp
+    461 ./benchmark/micro_benchmark_key_prefix.cpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (902 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+                                     Apache License
+                               Version 2.0, January 2004
+                            http://www.apache.org/licenses/
+
+## README EXCERPT
+  Datei: README.md
+    <!--- -*- gfm -*- -->
+    
+    # unodb
+    
+    [![Github Actions Build
+    Status](https://github.com/laurynas-biveinis/unodb/workflows/build/badge.svg)](https://github.com/laurynas-biveinis/unodb/actions?query=workflow%3Abuild)
+    [![codecov](https://codecov.io/gh/laurynas-biveinis/unodb/branch/master/graph/badge.svg)](https://codecov.io/gh/laurynas-biveinis/unodb)
+    [![GitHub
+    Super-Linter](https://github.com/laurynas-biveinis/unodb/workflows/Super-Linter/badge.svg)](https://github.com/marketplace/actions/super-linter)
+    [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=laurynas-biveinis_unodb&metric=alert_status)](https://sonarcloud.io/dashboard?id=laurynas-biveinis_unodb)
+    
+    ## Introduction
+    
+    UnoDB is a library that implements of Adaptive Radix Tree (ART) data structure,
+    designed for efficient indexing in main-memory databases. The ART is a
+    trie-based data structure that dynamically adapts to the distribution of keys,
+    ensuring good search performance and memory usage. UnoDB offers two variants of
+    ART: a regular one and a concurrent one based on Optimistic Lock Coupling (OLC)
+    with Quiescent State Based Reclamation (QSBR).
+    
+    This library serves as a playground for experimenting with various C++ tools and
+    ideas. I am describing some of the things I learned at my [blog](https://of-code.blogspot.com/search/label/art).
+    
+    ## Requirements
+    
+    UnoDB source code is written in C++20, and relies on the following
+    platform-specific features:
+    
+    - On Intel platforms, it requires SSE4.1 intrinsics (Nehalem and higher), AVX
+      for MSVC builds, and optional AVX2 support, when available. This differs from
+      the original ART paper, which only required SSE2.
+    - On ARM, it uses NEON intrinsics.
+    
+    ### Build dependencies
+    
+    - Earliest versions of supported compilers: GCC 10, LLVM 11, Xcode 16.1,
+      MSVC 2022. Open an issue if you require support for an older version.
+    - CMake, at least 3.16.
+    - Boost library. It is a mandatory dependency for Boost.Container
+      (small_vector). If building with statistics counters, Boost.Accumulator is
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  Node4                in 7 Dateien
+  Node16               in 6 Dateien
+  Node48               in 6 Dateien
+  Node256              in 5 Dateien
+  OLC                  in 7 Dateien
+  Atomic               in 5 Dateien
+  AVX2                 in 4 Dateien
+  AVX512               in 1 Dateien
+  Counter              in 3 Dateien
+
+## C++-STANDARD-INDIKATOREN
+    target_compile_features(${TARGET} PUBLIC cxx_std_20)
+
+## END VORANALYSE P01-ART/unodb

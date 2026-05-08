@@ -1,0 +1,975 @@
+================================================================================
+ARCHITEKTURENTSCHEIDUNGEN F1-F15 + F-EXTRA-1 bis F-EXTRA-8 (kanonisch)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D REV 4 / Phase 5 PRE-UML
+Stand: 2026-05-04 · Beschluss durch den Architekten (Nutzer)
+================================================================================
+
+KORREKTUREN VOM 2026-05-04 (Architekt-Praezisierungen am Ende dieses Doks):
+   • F10-K  Flag-System statt perm_id (Intel-CPUID-aehnliches Schema)
+   • F12-K  CacheEngine ist trotzdem Heap-Singleton, lebt IM Builder-Prozess
+            als globale Variable; wird Modulen als Ressource bereitgestellt
+
+ZWECK
+   Dieses Dokument haelt die kanonischen Entscheidungen zu den 15 Design-
+   Entscheidungs-Fragen (F1-F15) PLUS die 8 nachgelagerten Detail-Beschluesse
+   (F-EXTRA-1 bis F-EXTRA-8) fest, die fuer das drawio UML der Diplomarbeit
+   gestellt wurden. Die Antworten sind verbindlich und orientieren das
+   Domaenenmodell v3 + Glossar v5.
+
+NOTATION
+   ENTSCHEIDUNG  — Was beschlossen wurde (kanonisch, verbindlich).
+   PRAEZISIERUNG — Architektonische Verfeinerung des Architekten.
+   FOLGEN        — Auswirkung auf Architektur/Implementation.
+   QUELLE        — Wo es im Domaenenmodell v3 vertieft wird.
+
+================================================================================
+F1 — CACHEENGINERUNTIME-SINGLETON-IMPLEMENTIERUNG
+================================================================================
+
+ENTSCHEIDUNG (B)  Heap-allokierter Singleton mit `std::unique_ptr` +
+                  `std::call_once`. Explizite Lebenszeit, manuelle
+                  Destruktion, deterministisch.
+
+PRAEZISIERUNG     Die CacheEngine require fuer JEDE Mess-Kategorie eine
+                  EIGENE Implementierung fuer JEDES Algorithmus-Detail
+                  der Suchalgorithmen. Diese Implementierungen kompilieren
+                  sich dynamisch zur Compile-Time als `constexpr` in den
+                  Funktionsablauf.
+
+FOLGEN
+   • Pro (Mess-Kategorie x Algorithmus-Detail) eine spezialisierte
+     constexpr-Implementierung. Beispiele:
+        - CLU x ART_Node256
+        - CLU x ART_Node48
+        - CLU x HOT_CompoundNode
+        - dTLB x ART_Node256
+        - dTLB x HOT_CompoundNode
+        - BranchMiss x ART_Node256
+        - ... (Mess-Kategorien × Algorithmus-Detail-Klassen)
+   • Compile-Time-Inlining: Telemetrie-Code wird in den Hot-Path
+     ge-inlined (zero-overhead bei nicht-aktiver Messung).
+   • Mess-Kategorien ↔ Algorithmus-Details werden ueber C++23-Concepts +
+     `requires`-Klauseln zugeordnet (Algo-Match).
+   • Keine virtuellen Aufrufe in der Mess-Schicht.
+
+QUELLE  Domaenenmodell v3 §4.5 "Mess-Kategorie x Algorithmus-Detail Matrix"
+
+================================================================================
+F2 — OBSERVER-MECHANIK
+================================================================================
+
+ENTSCHEIDUNG (A)  Push synchron — Algorithmus ruft direkt
+                  `runtime.notify(event)` im Hot-Path.
+
+PRAEZISIERUNG     Fuer JEDE Entscheidungsklasse existieren Command-Pattern-
+                  basierte Lambda-Entscheidungsbaeume, die anhand pre-
+                  conditions/triggers entscheiden:
+                     • EXECUTE  — Anpassung sofort durchfuehren
+                     • DELAY    — Anpassung verschieben (Barriere/Konsolidierung)
+                     • SKIP     — Anpassung ueberspringen (z.B. zu hohe Last)
+                  Push wird also nicht reaktiv abgehandelt, sondern durch
+                  Lambda-Trees gefiltert.
+
+FORSCHUNGS-BEZUEGE (Delays und Barrieren in der Literatur)
+   • P02 HOT (Binna 2018) — Compound-Node-Konsolidierung: Updates an
+     Compound Nodes werden gesammelt, dann in einer Barriere konsolidiert.
+   • P03 Masstree (Mao 2012) — Permutation Field: Schluessel werden NICHT
+     verschoben, sondern nur das Permutation-Field aktualisiert; konsolidierende
+     Reorganisation laeuft asynchron.
+   • P05 START (Fent 2020) — Rewiring laeuft mit Barrieren; Subtrie-
+     Reorganisation periodisch, nicht reaktiv.
+   • P08 ARTSync (Leis 2016) — OLC mit Versions-Counter; deferred updates
+     werden via Lock Coupling synchronisiert.
+   • P18 Saikkonen 2008 — Multi-Level Relocation als periodische Reorganisation,
+     nicht pro Operation.
+   • P28 Kuehn 2023 — Histogram-Updates inkrementell, Re-Layout explizit
+     ausgeschlossen (Barriere-bezogen).
+   • P29 RCU (McKenney 2001) — Grace Period IST eine explizite Barriere
+     fuer Memory Reclamation.
+   • P26 Zhang FGCS 2024 — Read Counter werden inkrementell gesetzt,
+     Hot-Path-Detection erst nach Threshold-Ueberschreitung.
+
+KOMPONENTE
+   class DecisionLambdaTree<EventT, DecisionClassT> {
+     using Decision = enum class { EXECUTE, DELAY, SKIP };
+     // konfigurierbare Lambda-Tree-Knoten
+     constexpr Decision evaluate(EventT&&, Context&) const noexcept;
+   };
+
+   Eine Instanz pro Entscheidungsklasse:
+   - PageRelocationDecisionTree
+   - PageTypeChangeDecisionTree
+   - PrefetchAdjustmentDecisionTree
+   - AllocatorRebalanceDecisionTree
+   - ConcurrencyDisciplineSwitchDecisionTree
+   - ... (eine pro Cache-Engine-Disziplin)
+
+FOLGEN
+   • Synchroner Push, aber Lambda-Tree-Filter gibt Hot-Path frei
+   • Delays werden ueber Barriere-Trigger spaeter aufgesammelt
+   • Skip schuetzt vor reaktiver Last-Spirale
+
+QUELLE  Domaenenmodell v3 §3.2 "Observer + Command-Lambda-Trees"
+
+================================================================================
+F3 — VISITOR-GRANULARITAET
+================================================================================
+
+ENTSCHEIDUNG (B)  Mid Visitor: `visit(IPage*)`, `visit(INode*)`.
+
+FOLGEN
+   • Respektiert die Habich-Direktive (Originalcode unangetastet)
+   • Concept-Interfaces als Cut-Off
+   • Keine ValueHandle/TraversalStep-Visit-Methoden
+
+QUELLE  Domaenenmodell v3 §3.3 "Visitor-Granularitaet"
+
+================================================================================
+F4 — PERMUTATIONSRAUM
+================================================================================
+
+ENTSCHEIDUNG (A) gefiltert durch (B)  Vollstaendig (alle Achsen kreuzen),
+                  aber durch ISA-Filter via CMake compile-time begrenzt.
+
+PRAEZISIERUNG
+   • Vollstaendige Permutationen werden NICHT zur Builder-Runtime gebaut,
+     sondern statisch zur CMake-Compile-Time durch ISA-Erkennung gefiltert.
+   • CMake erkennt Target-ISA (scalar / x86_avx2 / x86_avx512 / arm_neon /
+     arm_sve2) und schliesst nicht-passende Permutationen aus dem Compile-Set
+     aus.
+   • Es entstehen keine "absurde" Module wie AVX-512 auf RISC-V.
+
+FOLGEN
+   • CMake-Skript implementiert die Permutations-Konstruktion
+   • Pro Target-ISA wird eine Submenge der Permutationen kompiliert
+   • Die nicht-ISA-bezogenen Achsen (Page-Type x Node-Type x Traversal x
+     ValueHandle x Allocator x Concurrency) werden vollstaendig kreuzt.
+
+QUELLE  Domaenenmodell v3 §4.2 "Permutationsraum + CMake-Filter"
+
+================================================================================
+F5 — MEASUREMENT-PERSISTIERUNG
+================================================================================
+
+ENTSCHEIDUNG (eigene)  Eigene einfache und effiziente In-Memory-Loesung.
+                       KEINE externe Datenbank (SQLite/DuckDB/PostgreSQL).
+
+BEGRUENDUNG (Architekt)
+   Latenzen einer DB interferieren mit Experimenten. Wir koennen Kontrolle
+   nicht an eine Time-Series-Datenbank abgeben, ohne den Cache und den
+   Kernel zu unterbrechen. Wir brauchen eine eigene, einfache, effiziente
+   Loesung.
+
+KOMPONENTE
+   class InMemoryMeasurementBuffer {
+     // append-only, lock-free oder per-thread
+     std::pmr::monotonic_buffer_resource arena_;
+     std::vector<MeasurementRecord, ...>  records_;
+     // am Ende eines Laufs: Serialisierung in CSV/Binary-Dump
+     void serialize_to_disk(std::filesystem::path) const;
+   };
+
+EIGENSCHAFTEN
+   • Append-only, kein Lock im Hot-Path
+   • Pro CPU/Thread eigener Arena-Block (cache-line-aligned)
+   • Serialisierung NUR am Ende eines kompletten Experiments
+   • Format: Binary-Dump (kompakt) oder CSV (debug); Wahl per Build-Flag
+   • Keine Verbindungen zu externen Diensten waehrend der Messung
+
+FOLGEN
+   • LatexRenderer liest aus Disk-Dump, nicht aus DB
+   • Kein DB-Schema in der Compile-Chain
+   • Vorteil: Kein Kernel-Context-Switch waehrend Messung
+
+QUELLE  Domaenenmodell v3 §5 "Measurement (3 Bestandteile, In-Memory)"
+
+================================================================================
+F6 — CONCURRENCYMANAGER-KOMPOSITION
+================================================================================
+
+ENTSCHEIDUNG (A+C)  Eine Klasse pro Disziplin (Base) + Policy-Templates
+                    fuer Top-Level-Komposition.
+
+FOLGEN
+   • 8+ Disziplin-Klassen (Page/Node/Array/DataStructure/Path/MemoryAccess/
+     SimdThread/SimdFlow/...) als individuelle Klassen
+   • `template<Discipline... Ds> class ConcurrencyManager`-Komposition
+     liefert Zero-Overhead-Komposition (compile-time)
+
+QUELLE  Domaenenmodell v3 §3.5 "ConcurrencyManager-Komposition"
+
+================================================================================
+F7 — ADAPTER-STRATEGIE FUER ORIGINALCODE
+================================================================================
+
+ENTSCHEIDUNG (C)  C++23 Modules + Original-Compiler-Kompilierung pro
+                  fremdem Algorithmus.
+
+PRAEZISIERUNG (kritisch)
+   • Fremde Algorithmen (P01-P33 ausser PRT-ART) werden in EIGENE source
+     files gekapselt, die mit IHREM Original-Compiler separat kompiliert
+     werden.
+   • CMake-Konfiguration muss multiple Compiler-Versionen je Architektur
+     orchestrieren.
+   • Trotz Splitting bleibt die resultierende Binary EXAKT gleich mit der
+     originalen Fremd-Binary.
+   • Alle Algorithmen finden unter unserem Meta-Programming-C++-Code ein
+     gemeinsames Dach (das Concept-Interface), aber die Originalcode-
+     Kompilation bleibt separat.
+   • VOR jedem Experiment muss der Builder verifizieren, dass alle
+     erforderlichen Compiler-Versionen verfuegbar sind.
+
+ANFORDERUNGEN AN CMake
+   • per-Algorithmus Compiler-Toolchain-Konfiguration
+   • Original-Compiler-Erkennung (z.B. GCC 7.5 fuer P01 ART, GCC 9 fuer
+     P03 Masstree, ...)
+   • Compiler-Verfuegbarkeits-Check als Pre-Build-Phase
+   • Modul-Output: ABI-stabiles C++23-Modul (siehe F9)
+
+FOLGEN
+   • CMake-Konfiguration enorm aufwaendig (akzeptiert vom Architekten)
+   • Resultat: "echte" Originalcode-Binaries, vergleichbar mit publizierten
+     Messungen
+   • Habich-Direktive vollstaendig erfuellt
+
+QUELLE  Domaenenmodell v3 §6 "Adapter + Original-Compiler-Pipeline"
+
+================================================================================
+F8 — VALUEHANDLE-`switch_array` REPRAESENTATION
+================================================================================
+
+ENTSCHEIDUNG (B+C)  Type-Pack `std::variant<...>` + Concept-Constraint.
+
+FOLGEN
+   • `std::variant<InlineHandle, PointerHandle, RedirectToNodeHandle,
+     RedirectToPageHandle, DynamicHandle>` als ValueHandle-Repraesentation
+   • `requires AllowedHandle<HandleKind, AlgoTag>` validiert Compile-Time
+   • Dynamic-Variante: Runtime-Index in den variant-Alternativen, begrenzt
+     auf algorithmus-spezifische Untermenge
+
+QUELLE  Domaenenmodell v3 §1.4 "ValueHandle (Sache der Node)"
+
+================================================================================
+F9 — ABI-STABILITAET via C++23-MODULES
+================================================================================
+
+ENTSCHEIDUNG (A)  Vollstaendig modularisiert.
+
+PRAEZISIERUNG
+   • Compile-time Permutation fuehrt je zu einem ABI-stabilen austausch-
+     baren Binary-Gesamtmodul.
+   • Als Gesamtblock dynamisch ladbar (z.B. `dlopen` / `LoadLibrary`).
+   • Alle ABI-stabilen Such-Algorithmen-Modul-Bloecke werden statisch
+     vorab kompiliert (oder adhoc bei Bedarf, siehe F12).
+   • Pi 5 + VisionFive 2 sind unter unserer Kontrolle: Compiler dort
+     selbst bauen + vorkompilieren, um die noetigen Features zu unterstuetzen.
+   • ZIH hat nur x86 + ARM Prozessoren — entspricht ODROID H4 Ultra +
+     Pi 5 als Vorbereitung.
+   • Fertige Binaries via SOCKS5-Protokoll ans ZIH liefern und dort testen.
+   • SIMD-Erweiterungs-Erkennung durch CacheEngine zur Laufzeit bei der
+     Initialisierung.
+   • Compile-Time-Modus UND Laufzeit-Modus zur Initialisierung unterstuetzt
+     (gegenseitig ausschliessend).
+
+FOLGEN
+   • Compiler-Reife-Anforderung: GCC 14+, Clang 17+, MSVC 19.39+
+   • Self-Built Compiler auf Pi 5 + VisionFive 2 als Phase-4-Vorarbeit
+   • SOCKS5-Tooling (oder vergleichbar) fuer Binaer-Lieferung ans ZIH
+   • CacheEngine-Initialisierung mit Compile-Time- ODER Runtime-Detection
+     (Build-Flag oder Init-Parameter steuert)
+
+QUELLE  Domaenenmodell v3 §6 "Modul-Architektur" + §7 "Plattform-Workflow"
+
+================================================================================
+F10 — CODEGEN-STRATEGIE IM CACHEENGINEBUILDER
+================================================================================
+
+ENTSCHEIDUNG (C)  Hybrid (Templates + Codegen-Skript). PLUS Praezisierung:
+                  ISA-Pfade sind nicht alles.
+
+PRAEZISIERUNG (kritisch)
+   • Jedes permutierte Such-Algorithmus-Modul ist eine Rekombination
+     bekannter Modul-Klassifikationen:
+        Suchseiten (Page-Types) x
+        Nodes (Node-Types) x
+        Traversal-Verhalten x
+        ValueHandle-Strategy x
+        Allocator-Strategy x
+        Concurrency-Disziplin x
+        Prefetch-Strategy x
+        ISA-Pfad
+   • Es entstehen HUNDERTE ABI-stabile Such-Algorithmus-Module.
+   • Diese werden:
+        1. SEQUENTIELL vorab durch ein CMake-Skript als ABI-stabile
+           Module gebaut (Pre-Build-Phase).
+        2. ZUR LAUFZEIT durch den CacheEngineBuilder iterativ geladen,
+           als jeweils EIN Experiment.
+   • Der Builder iteriert ueber die Module, fuehrt Cache-Reset zwischen
+     Experimenten aus, sammelt Messungen.
+
+KOMPONENTEN
+   • CMake-Skript "build_permutations.cmake" — sequentiell pro Permutation:
+        1. Codegen (Template-instanziierter .cpp + .ccm Modul-Interface)
+        2. Compile mit Original-Compiler des Algorithmus (Habich-Direktive)
+        3. Link zu ABI-stabilem Modul (.so / .dll / .dylib)
+        4. Output: `build/modules/<perm_id>/<perm_id>.module.so`
+   • CacheEngineBuilder.scan_modules() — beim Init scannt vorhandene Module
+   • CacheEngineBuilder.build_missing_modules() — ruft adhoc das CMake-Skript
+
+FOLGEN
+   • Compile-Zeit fuer die Permutations-Pre-Build-Phase betraechtlich
+     (Stunden bis Tage), aber EINMALIG pro Plattform/ISA
+   • Builder-Runtime laedt nur Module, fuehrt Experimente aus
+   • Cache-Effekte zwischen Experimenten abgrenzbar (siehe F12)
+
+QUELLE  Domaenenmodell v3 §6.3 "Permutations-Build-Pipeline"
+
+================================================================================
+F11 — MIKROBENCHMARK-TRIGGERING
+================================================================================
+
+ENTSCHEIDUNG (B+A)  Sampled (1:N) fuer Produktion, Continuous fuer
+                    Builder-Runs.
+
+FOLGEN
+   • Builder-Modus: Continuous (jeder Lookup misst, Overhead irrelevant)
+   • Produktions-Modus: Sampled (typisch 1:1000)
+   • Beides per Build-Flag oder Init-Parameter waehlbar
+
+QUELLE  Domaenenmodell v3 §5.2 "Mikrobenchmark-Triggering"
+
+================================================================================
+F12 — CACHEENGINE-LEBENS-LOKATION (KOMPLETT NEU)
+================================================================================
+
+ENTSCHEIDUNG (komplett ueberarbeitet)
+   Die Cache Engine LEBT IM CacheEngineBuilder (quasi main.cpp mit
+   Orchestrator). Kein separater Runtime-Singleton ausserhalb des Builders.
+
+ARCHITEKTUR
+   • Mit C++23 verwenden wir Such-Algorithmen als ABI-stabile Module.
+   • Laden zur Laufzeit erzeugt kurzen Overhead → erneuter Cache-Warmup.
+   • Cache-Warmup-Implementierung GEHOERT ZUR Algorithmus-Permutation
+     (nicht zur CacheEngine selbst).
+   • CacheEngine selbst ist generisch und lebt im CacheEngineBuilder.
+   • Nach jedem Modul-Experiment wird die CacheEngine zurueckgesetzt.
+   • Pro ISA-Plattform wird die passende Version des CacheEngineBuilders
+     direkt aus Source kompiliert.
+   • CacheEngineBuilder prueft zur Initialisierung, ob die Modul-
+     Permutationen schon gebaut sind.
+   • Bei Bedarf ruft er selbst ein nachgelagertes CMake-Skript zu seiner
+     eigenen Runtime auf, das eine adhoc compile-time der Such-Algorithmus-
+     Module triggert.
+   • Module werden anschliessend dynamisch geladen → je ein Experiment
+     ueber die orchestrierten Testdaten.
+
+LEBENSZYKLUS (CacheEngineBuilder = main.cpp)
+   1. Plattform-Probe (CPU-Features, ISA, Cache-Topo, verfuegbare Compiler)
+   2. Modul-Permutationen-Scan (welche existieren bereits?)
+   3. Falls fehlend: adhoc CMake-Skript-Aufruf → Modul-Bau
+   4. CacheEngine instanziieren (innerhalb des Builders)
+   5. Pro Modul (sequentiell):
+        a. Modul dynamisch laden (`dlopen` / `LoadLibrary`)
+        b. Cache-Warmup (Modul-Permutation-spezifisch)
+        c. Dataset-Aufbereitung
+        d. Experiment ausfuehren (perf/PAPI Makro + interne Mikrobenchmarks)
+        e. Messungen in InMemoryMeasurementBuffer schreiben
+        f. CacheEngine zuruecksetzen
+        g. Modul entladen
+   6. Serialisierung des MeasurementBuffer auf Disk (CSV/Binary)
+   7. LaTeX-Renderer fuer Anhang
+
+FOLGEN
+   • KEINE separate `CacheEngineRuntime`-Singleton-Klasse ausserhalb
+     des Builders (wie in v2 modelliert).
+   • Die Cache Engine ist eine in den Builder eingebettete Komponente.
+   • Builder-Modus = "Cache-Engine aktiv". Produktions-Container-Modus
+     (StaticEngine vs CacheEngine als std::map-Wrapper) ist eine
+     ABGELEITETE Verwendung der gleichen Komponenten — aber das
+     primaere Lieferziel der Diplomarbeit ist der Builder.
+
+KORREKTUR vs v2
+   • v2-§4.2 "CacheEngineRuntime als globales Heap-Modul" wird REVIDIERT.
+   • Die CacheEngine ist NICHT ein globaler Singleton-Heap-Modul, sondern
+     eine in den Builder eingebettete Komponente.
+   • Falls eine Library-Verwendung (z.B. comdare-Modul-Konsumenten)
+     gewuenscht ist, wird diese als ABGELEITETE Schicht modelliert
+     (NICHT primaerer Diplomarbeit-Scope).
+
+QUELLE  Domaenenmodell v3 §4 "CacheEngineBuilder als Orchestrator"
+
+================================================================================
+F13 — CROSS-COMPILATION-TOOLCHAIN
+================================================================================
+
+ENTSCHEIDUNG (Mix A+B+C)
+   Cross-compile via vorhandene Infrastruktur, ZIH-Lieferung, CI/CD direkt.
+
+PRAEZISIERUNG
+   • CacheEngineBuilder = eigenes Benchmark-Tool, Orchestrator.
+   • Holt Metriken ueber Interfaces vorhandener Mess-Tools (perf, PAPI, ...)
+     fuer globale Messung.
+   • Cross-Compile via vorhandene Infrastruktur (Pi 5 / VisionFive 2 /
+     ODROID / x86-Server).
+   • Binaries werden ans ZIH (wegen Restriktionen) DIREKT geliefert.
+   • Sonst: Tests auf CI/CD je Plattform/ISA/OS und Erweiterungen.
+   • Mix aus A (Cross-Compile-Host), B (Native pro Target) und C (CI-basiert).
+
+DUAL-MODUS-ANFORDERUNG
+   • CacheEngineBuilder unterstuetzt SOWOHL Compile-Time- als AUCH Runtime-
+     Erkennung der Optimierungen + ISA-Erweiterungen.
+   • ZIH-Modus: Runtime-Erkennung (Binaries vorab cross-compiled, dort nur
+     ausgefuehrt).
+   • Sonstige Plattformen (wo wir kein Cross-Compile brauchen): Compile-Time-
+     Optimierung.
+   • Beide Modi sind gegenseitig ausschliessend (siehe F9).
+
+FOLGEN
+   • CMake muss Toolchain-Files je Target-Plattform haben
+   • SOCKS5-Tunnel oder gleichwertig fuer ZIH-Lieferung
+   • CI/CD-Konfig fuer Direkt-Tests pro Plattform
+
+QUELLE  Domaenenmodell v3 §7 "Plattform-Workflow"
+
+================================================================================
+F14 — DATASETS-AKQUISE
+================================================================================
+
+ENTSCHEIDUNG (A+B vollstaendig)
+   YCSB komplett (A-F) UND Custom-Korpus voll.
+
+BEGRUENDUNG (Architekt)
+   "Wenn wir sowieso die ersten sind, die durch Metaprogrammierung in der
+    Lage sind, einfach mal alle Algorithmendetails gegeneinander auszuprobieren,
+    dann koennen wir auch damit angeben, dass wir zusaetzlich auch noch den
+    Testdatensatz-Umfang erweitert haben."
+
+CUSTOM-KORPUS-VORSCHLAG (zu praezisieren in Phase 4.A)
+   • URL-Praefixe (real, z.B. CommonCrawl-Subset)
+   • IP-Adressen (real, z.B. RIPE-Datasets)
+   • String-Praefixe mit unterschiedlicher Verteilung (Zipfsche Schluessel)
+   • Numerische Schluessel (Integer-Sequenzen)
+   • Mixed-Length-Schluessel (variable laenge)
+   • Praefix-lastige Workloads (PRT-ART-Staerke)
+
+QUELLE  Domaenenmodell v3 §5.1 "Dataset-Loader" + Phase 4.A Spezifikation
+
+================================================================================
+F15 — VERGLEICHSBASIS + BAUSTEINE-QUER-PERMUTATION
+================================================================================
+
+ENTSCHEIDUNG (B als Minimum + C als Ziel + Bausteine-Quer-Permutation als KERN)
+
+ARCHITEKTONISCHER KERN (KORRIGIERT — bisher unterspezifiziert)
+   Es geht NICHT nur um den Vergleich gesamter Algorithmen!
+
+   ZENTRALE FORSCHUNGS-THESE
+   Wir muessen die Algorithmen IN BAUSTEINE NACH DEM DOMAENENMODELL zerlegen,
+   sodass jeder Algorithmus-Baustein EINZELN testweise gegen einen anderen
+   aus JEDEM BELIEBIGEN anderen Algorithmus ausgetauscht werden kann.
+
+   Es geht um die Untersuchung jedes einzelnen Prinzips gegen jedes Andere
+   unter Verwendung der aktiven Cache Engine, welche einen massgeblichen
+   Einfluss auf ALLE Bausteine der Algorithmus-Konzepte ausuebt.
+
+KONSEQUENZ FUER ARCHITEKTUR
+   • Domaenenmodell muss eine BAUSTEINE-MATRIX explizit aufstellen:
+        Pro konzeptionelles Element (Page / Node / Traversal /
+        ValueHandle-Strategy / MemoryLayout / Allocator / Prefetch /
+        ConcurrencyDiscipline) gibt es eine Spalte mit allen
+        Implementierungen aus den 33 Papern.
+   • Permutationsraum ist nicht nur "Algorithmus x ISA", sondern
+     "JEDE Achsen-Wahl x JEDE Algorithmus-Achse" → kreuz-permutiert.
+   • Beispiel: PRT-ART-Trie-Huelle + ART-Node256-Implementation +
+     HOT-discriminative-Bits-Traversal + START-Multibyte-Inline-
+     ValueHandle + CSS-pointer-frei-MemoryLayout + AVX-512-ISA-Pfad +
+     RCU-Concurrency.
+
+THESE FUER DIE DIPLOMARBEIT
+   "Die universalitaet der Cache Engine wird im allgemeinen Fall gezeigt:
+    Jedes Algorithmus-Muster mit verschiedenen Details gegen jedes Andere,
+    unter aktiver Cache-Engine-Steuerung. Die Cache Engine zeigt ihren
+    massgeblichen Einfluss auf ALLE Bausteine der Algorithmus-Konzepte."
+
+VERGLEICHS-MINIMUM (B)
+   • Static-PRT-ART vs Cache-PRT-ART (zeigt CacheEngine-Lift bei eigenem Algo)
+
+VERGLEICHS-ZIEL (C + erweitert)
+   • Jeder Fremd-Algorithmus unter StaticEngine (Originalcode-Baseline)
+   • Jeder Fremd-Algorithmus unter CacheEngine (Cache-Engine-Lift)
+   • Quer-permutierte Bausteine unter CacheEngine (Bausteine-Synthese)
+   • Vergleich aller drei Ebenen → universelle Aussage
+
+QUELLE  Domaenenmodell v3 §2 "Bausteine-Matrix" + §6.2 "Quer-Permutation"
+
+================================================================================
+GESAMTFOLGEN FUER DAS DOMAENENMODELL
+================================================================================
+
+A) Cache Engine ist eine Komponente des CacheEngineBuilders, kein
+   separates Singleton-Heap-Modul (F12).
+
+B) Die Schnittstelle "Algorithmus ↔ Cache Engine" wird ueber Observer-
+   Push + Lambda-Tree-Filter implementiert (F2).
+
+C) Mess-Code wird als constexpr-Implementierung pro
+   (Mess-Kategorie x Algorithmus-Detail) im Hot-Path ge-inlined (F1).
+
+D) Adapter binden Originalcode mit dem Original-Compiler an, modularisiert
+   als ABI-stabile C++23-Module (F7 + F9).
+
+E) Bausteine werden quer-permutiert (F15) — der Permutationsraum erweitert
+   sich entsprechend.
+
+F) Permutations-Module werden vorab durch ein CMake-Skript gebaut (F10).
+
+G) Cache Engine wird zwischen Experimenten zurueckgesetzt; Cache-Warmup
+   gehoert zur Permutation (F12).
+
+H) Measurement bleibt In-Memory; KEINE externe DB; Disk-Dump erst nach
+   Lauf-Ende (F5).
+
+I) ConcurrencyManager mit 8+ Disziplin-Klassen + Policy-Template-
+   Komposition (F6).
+
+J) ValueHandle als `std::variant<...>` + Concept-Constraint (F8).
+
+K) Cross-compile + ZIH-Lieferung + CI/CD-Direkttests (F13).
+
+L) Datasets: YCSB voll + Custom voll (F14).
+
+M) Vergleichsumfang: Static-PRT-ART vs Cache-PRT-ART (Min) +
+   Quer-permutierte Bausteine unter CacheEngine (Ziel) (F15).
+
+N) Visitor: Mid-Granularitaet (Page + Node) (F3).
+
+O) Permutationsraum: vollstaendig + ISA-Filter via CMake (F4).
+
+P) Mikrobenchmarks: Continuous (Builder) + Sampled (Produktion) (F11).
+
+================================================================================
+F10-K — KORREKTUR DES PERMUTATIONS-IDENTIFIKATOR-SCHEMAS
+================================================================================
+
+URSPRUENGLICHE ENTSCHEIDUNG (F10)
+   "perm_id" als eindeutige Hash/Tupel-String-ID pro Modul-Permutation.
+
+KORREKTUR DES ARCHITEKTEN
+   Statt einer opaken `perm_id` verwenden wir ein **strukturiertes Flag-System**
+   nach dem Vorbild der Intel-CPUID-Feature-Flags.
+
+DEFINITION
+   • Pro Bausteine-Achse (Page-Type, Node-Type, Traversal, ValueHandle,
+     MemoryLayout, Allocator, Prefetch, Concurrency, ISA) eine eigene
+     "Bank" (32 oder 64 Bit).
+   • Pro Implementation einer Achse eine eindeutige Bit-Position innerhalb
+     der Bank.
+   • Eine Modul-Permutation = Vereinigung der gesetzten Flags (pro Achse
+     genau ein Bit gesetzt; bei dynamischen Bausteinen mehrere).
+   • Wohl geordnete Reihenfolge der Banken im Permutations-Identifier.
+
+INTEL-CPUID-VORBILD (Recherche-Quellen)
+   • Intel CPUID-Leaves (EAX-Eingabe waehlt Leaf): jedes Leaf liefert eine
+     4-Register-Bank (EAX, EBX, ECX, EDX), darin pro Bit eine Feature-Flag.
+   • Beispiele: CPUID.01H:ECX/EDX (SSE/SSE2/SSE3/AVX/AESNI/...),
+     CPUID.07H:EBX (BMI1/AVX2/BMI2/AVX-512F/...).
+   • Mehrere Flags koennen gleichzeitig aktiv sein.
+
+PRT-ART-FLAG-SYSTEM
+   namespace comdare::flags {
+     // Bank 1 — PAGE-TYPE
+     struct PageBank {
+       constexpr uint64_t DENSEBYTE_ART256        = 1ULL << 0;
+       constexpr uint64_t SPARSE_NODE4_ART        = 1ULL << 1;
+       constexpr uint64_t COMPOUND_HOT            = 1ULL << 2;
+       constexpr uint64_t MULTIBYTE_START         = 1ULL << 3;
+       constexpr uint64_t MACRO_COCO              = 1ULL << 4;
+       constexpr uint64_t DECISION_B2TREE         = 1ULL << 5;
+       constexpr uint64_t LOUDS_DENSE_SURF        = 1ULL << 6;
+       constexpr uint64_t LOUDS_SPARSE_SURF       = 1ULL << 7;
+       constexpr uint64_t CSS_NODE                = 1ULL << 8;
+       constexpr uint64_t CSB_NODEGROUP           = 1ULL << 9;
+       constexpr uint64_t WIDER_HANKINS           = 1ULL << 10;
+       // ... (vollstaendige Belegung in Bausteine-Matrix)
+       constexpr uint64_t PRTART_DENSEBYTE        = 1ULL << 56;
+       constexpr uint64_t PRTART_EXTENDEDDENSE    = 1ULL << 57;
+       constexpr uint64_t PRTART_SPARSEPATRICIA   = 1ULL << 58;
+       constexpr uint64_t PRTART_REDIRECT         = 1ULL << 59;
+       constexpr uint64_t PRTART_CUSTOMCACHE      = 1ULL << 60;
+     };
+
+     // Bank 2 — NODE-TYPE
+     struct NodeBank { ... };
+
+     // Bank 3 — TRAVERSAL
+     // Bank 4 — VALUEHANDLE
+     // Bank 5 — MEMORYLAYOUT
+     // Bank 6 — ALLOCATOR
+     // Bank 7 — PREFETCH
+     // Bank 8 — CONCURRENCY
+     // Bank 9 — ISA
+   }
+
+   struct PermutationFlags {
+     uint64_t page_bank;
+     uint64_t node_bank;
+     uint64_t traversal_bank;
+     uint64_t value_handle_bank;
+     uint64_t memory_layout_bank;
+     uint64_t allocator_bank;
+     uint64_t prefetch_bank;
+     uint64_t concurrency_bank;
+     uint64_t isa_bank;
+
+     // Wohl-geordnete Identifier-String-Repraesentation
+     constexpr std::string_view to_identifier() const noexcept;
+     // z.B. "PAGE_DENSEBYTE_ART256.NODE_NODE256.TRAVERSAL_BYTEBYTE.
+     //       VALUEHANDLE_INLINE.MEMORY_CACHELINE_ALIGNED.ALLOCATOR_POOL.
+     //       PREFETCH_NONE.CONCURRENCY_OLC.ISA_X86_AVX2"
+   };
+
+VORTEILE
+   • Jede Permutation ist menschen-lesbar dokumentiert.
+   • Komposition: pro Achse genau ein Bit, total ~9 Bit-Auswahl pro Permutation.
+   • ConstraintFilter wird zur Bit-Maskierung (z.B. AVX-512-Bit nur bei
+     entsprechendem Target-Bit).
+   • CMake kann die Flag-Banks als compile-time-Konstanten generieren.
+
+QUELLE  Eigene Datei `Flag_System.txt` (folgt) konkretisiert die
+        Bit-Belegung pro Bank.
+
+================================================================================
+F12-K — KORREKTUR DER CACHEENGINE-LOKATION
+================================================================================
+
+URSPRUENGLICHE ENTSCHEIDUNG (F12)
+   "Die Cache Engine LEBT IM CacheEngineBuilder. Kein separater Runtime-
+    Singleton ausserhalb des Builders."
+
+PRAEZISIERUNG DES ARCHITEKTEN
+   Die CacheEngine bleibt trotzdem ein Heap-Singleton als globale Variable
+   IM Builder-Prozess. Sie ist KEIN inkorporiertes Member der Builder-Klasse,
+   sondern lebt als globale Singleton-Instanz innerhalb des Builder-Prozess-
+   Speichers.
+
+   Sie wird einem Such-Algorithmus-Modul als RESSOURCE zur Verfuegung
+   gestellt. Sie bietet einen Observer-Slot, ueber den Module ihre
+   Entscheidungszustaende generieren.
+
+KONSEQUENZ
+   • Singleton-Mechanik (heap, unique_ptr + call_once, F1) gilt auch fuer
+     die CacheEngine — nicht nur fuer den ConcurrencyManager.
+   • Lebenszeit: Builder-Prozess-Lebenszeit.
+   • Sichtbarkeit: dynamisch geladene Module erhalten Zugriff via
+     `CacheEngine::instance()` (oder injizierter Pointer beim Modul-Bind).
+   • CacheEngine-Reset zwischen Experimenten: setzt Zustand zurueck, NICHT
+     die Instanz.
+
+ARCHITEKTUR-DARSTELLUNG (KORRIGIERT)
+   CacheEngineBuilder = main.cpp Orchestrator (Prozess)
+     │
+     └─► Heap-Region des Prozesses
+            │
+            ├─► CacheEngine::instance()             [Singleton, global]
+            │     • ConcurrencyManager::instance()  [Sub-Singleton]
+            │     • DecisionLambdaTrees (pro Baustein)
+            │     • InMemoryMeasurementBuffer
+            │     • ObserverRegistry
+            │
+            └─► Dynamisch geladene Module           [pro Experiment]
+                  └─► binden CacheEngine::instance() als Ressource
+
+KORREKTUR vs Domaenenmodell v3 §1(C)
+   v3 §1(C) sagt: "Die Cache Engine ist KEIN separates globales Singleton-
+   Heap-Modul. Sie lebt IM CacheEngineBuilder."
+   v4-Korrektur: Die CacheEngine ist ein globales Singleton-Heap-Modul,
+   ABER innerhalb des Builder-Prozesses (nicht als separater Prozess).
+
+   Die Trennung "global vs. im Builder" war missverstaendlich: gemeint war
+   "kein separater Prozess / kein eigener Service". Die Singleton-Mechanik
+   bleibt erhalten.
+
+================================================================================
+F-EXTRA-1 — ORIGINAL-COMPILER-VERSIONEN PRO ALGORITHMUS
+================================================================================
+
+ENTSCHEIDUNG (A) Strategie Paper-Acknowledgement, Fallback (B) GitHub-Repo.
+
+KRITISCHE PRAEZISIERUNG (Architekt — KORREKTUR meines vorherigen Verstaendnisses)
+   Der Hauptcompiler ist IMMER C++23 (modern, GCC 14+ / Clang 17+ /
+   MSVC 19.39+).
+
+   NUR die jeweiligen Bausteine (= Originalcode-Snippets aus den Papers)
+   werden mit IHREM Original-Compiler kompiliert und ANSCHLIESSEND in
+   unser C++23-Konstrukt als Binary STATISCH GELINKT.
+
+ARCHITEKTUR-LAYERING
+   • Schale ("Modul-Wrapper")
+       Compiler: C++23 (modern)
+       Inhalt: Adapter, Concept-Bindungen, ABI-stabiles Modul-Interface
+   • Internals ("Originalcode-Bausteine")
+       Compiler: Original-Compiler des jeweiligen Papers
+       Inhalt: exakter Originalcode (Habich-Direktive)
+       Ausgabe: .o (Object-File) oder .a (statische Library)
+   • Statisches Linking
+       Schale + Internals werden zur Compile-Time des Moduls statisch
+       gelinkt zu einem ABI-stabilen .so/.dll/.dylib.
+
+WAS DAS BEDEUTET
+   • Wir brauchen je Original-Algorithmus einen Original-Compiler-Pfad in
+     der CMake-Konfiguration.
+   • Die ABI-stabile Modul-Schnittstelle ist immer C++23 (vereinheitlicht).
+   • Die Original-Compiler-Sektionen sind reine Object-Files, deren ABI
+     nur intern (= internal linkage in Modul-Granularitaet) relevant ist.
+   • Folge: Der Original-Compiler muss die korrekten Bausteine bauen, aber
+     nicht den ganzen Modul-Wrapper.
+
+QUELLE  Domaenenmodell v4 §6.3 "Original-Compiler-Pipeline (Layering)"
+
+================================================================================
+F-EXTRA-2 — CUSTOM-DATASETS
+================================================================================
+
+ENTSCHEIDUNG (A) Alle 6 Custom-Datasets vollstaendig.
+
+DATASET-LISTE
+   • URL-Praefixe (CommonCrawl-Subset)
+   • IP-Adressen (RIPE-Datasets)
+   • Zipfsche Schluesselverteilung (String-Praefixe)
+   • Numerische Schluessel (Integer-Sequenzen)
+   • Mixed-Length-Schluessel (variable Laenge)
+   • Praefix-lastige Workloads (PRT-ART-Staerke)
+
+BEGRUENDUNG (Architekt)
+   "Universalitaet der CacheEngine mit moeglichst vielen Daten unterlegen.
+    Eine derart vollstaendige Benchmark ueber alle Algorithmen und Algorithmus-
+    Bestandteile existiert noch nicht. In einem Schwung das gesamte
+    Forschungsfeld abdecken, ohne Mehraufwand."
+
+KONSEQUENZ
+   • Phase 4.A spezifiziert pro Dataset: Quelle, Volumen, Pre-Processing,
+     Verteilung, Hot/Cold-Profile.
+   • DatasetLoader unterstuetzt alle 6 Custom-Datasets + YCSB A-F.
+
+QUELLE  Phase 4.A Dataset-Spezifikation
+
+================================================================================
+F-EXTRA-3 — SOCKS5-ZIH-LIEFERUNG + ARCHITEKTUR-ERWEITERUNG
+================================================================================
+
+ENTSCHEIDUNG  SOCKS5-Tunnel als ZIH-Default (vorhanden); Erweiterung auf
+               C (GitLab CI-Job pusht Binaries) als zusaetzliche
+               Konfiguration (workflow-automation).
+
+KONTEXT
+   • Eigene Infrastruktur ist aufgebaut.
+   • Bisher: SOCKS5 als einziger vom ZIH zulaessiger Tunnel fuer Binary-
+     Uebertragung.
+   • Variante A (SSH+rsync) ist gesperrt (rsync nicht erlaubt).
+   • Eigene statische IP-Adresse jetzt verfuegbar.
+   • Kubernetes-Cluster-Migration: Fortigate 31G als neues Edge-Geraet.
+   • Cluster-Reference: `C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\`
+
+KONSEQUENZ
+   • Default-Lieferpfad: SOCKS5-Tunnel (vorhandene Tooling-Pipeline).
+   • Architektur-Erweiterung: Konfigurations-Option "GitLab CI-Job pusht
+     Binaries direkt in ZIH-Workspace" — abhaengig vom Fortigate-31G-
+     Cluster-Umbau.
+   • Tooling: `tools/socks5_zih_delivery/` (existiert) + `tools/gitlab_ci_zih_push/`
+     (neu, abhaengig von Infrastruktur-Job).
+
+QUELLE  Domaenenmodell v4 §6.2 "Plattform-Workflow"
+
+================================================================================
+F-EXTRA-4 — SELF-BUILT COMPILER AUF PI 5 + VISIONFIVE 2
+================================================================================
+
+ENTSCHEIDUNG (C) Cross-Build auf x86-Host + Stage-2 native Build zur
+                  Verifikation auf Target. Compiler-Version egal,
+                  Hauptsache verfuegbar.
+
+QUELLE  `tools/compiler_provisioning/`
+
+================================================================================
+F-EXTRA-5 — `build_permutations.cmake` KONKRETISIERUNG
+   ⚠️ REVIDIERT durch H6 (siehe Habich_Feedback_2026_05_08.txt) am 2026-05-08
+================================================================================
+
+URSPRUENGLICHE ENTSCHEIDUNG (B, REVIDIERT)
+   Python-Codegen-Skript erzeugt CMake-Targets, dann normaler CMake-Build.
+
+KORREKTUR durch Habich-Feedback H6 (2026-05-08)
+   Architekt-Direktive: KEIN Python in der Build-Pipeline. Talos OS hat
+   kein Python und schwer nachzuruesten. Stattdessen:
+     • CMake-eigene Funktionen + `configure_file()` + `add_custom_command()`
+     • Wo CMake nicht ausreicht: shell-Skripte synchron in `*.sh` und `*.bat`
+     • Falls komplexe Logik wirklich nicht in CMake/Shell ausdrueckbar ist:
+       minimaler kompilierter C++23-Helper im BuildSystem
+
+KORRIGIERTE KOMPONENTE
+   `tools/permutation_codegen/codegen.cmake` + `codegen.sh` + `codegen.bat`
+   (statt `codegen.py`).
+
+BEGRUENDUNG (Habich)
+   CMake skaliert tatsaechlich mit `add_custom_command` und ueber-generated
+   `*.cmake` Dateien — der Python-Komfort war nicht zwingend noetig.
+   Talos-OS-Bedingungen + minimale Prerequisites haben Vorrang.
+
+VERWORFEN
+   `tools/permutation_codegen/codegen.py` — wird in Phase 4.B-Implementation
+   nicht erzeugt. (Existierende Setup-Skripte wie `_generate_stubs.py`,
+   `_copy_ext_repos.py`, `_analyze_licenses.py`, `_generate_legacy_reimpl.py`
+   waren EINMALIGE Operationen und bleiben unveraendert — sie sind nicht
+   Teil der Build-Pipeline.)
+
+QUELLE  Task #107 (F-EXTRA-5 KORREKTUR), Memory `feedback_no_python_in_buildchain.md`
+
+QUELLE  Domaenenmodell v4 §4.2 "Permutations-Build-Pipeline"
+
+================================================================================
+F-EXTRA-6 — DECISIONLAMBDATREE-FORMAT (KORRIGIERT)
+================================================================================
+
+ENTSCHEIDUNG  KEIN globaler Default-Tree.
+              JEDER BAUSTEIN bringt seinen eigenen DecisionLambdaTree mit.
+              Format: Code-only (Variant D), aber pro Baustein einzeln
+              adjustierbar/konfigurierbar.
+
+KORREKTUR vs Domaenenmodell v3 §3.2
+   v3 §3.2 definierte DecisionLambdaTrees pro Entscheidungsklasse
+   (PageRelocationDecisionTree, PageTypeChangeDecisionTree, ...) als
+   System-globale Trees.
+
+   Korrektur: Trees werden PRO BAUSTEIN definiert. Wenn ein Algorithmus
+   die Bausteine A, B, C nutzt, werden deren Trees komponiert.
+
+PRAEZISIERUNG (Architekt)
+   "Wir hatten von Bausteinen der Algorithmen gesprochen, die jeweils eigene
+    Interfaces und Implementierungen anbieten. Im Prinzip zu jedem Baustein
+    D, EINZELN adjustierbar und konfigurierbar. Ein default Tree gibt es
+    nicht, jeder Suchalgorithmus wird durch die Permutation der allgemein
+    bekannten Prinzipien-Bausteine modular zusammengesetzt — durch
+    Metaprogrammierung ergibt sich trotz der Modularisierung des
+    Originalcodes (durch inline und Compiler-Flags der ALTEN Code-Abschnitte)
+    dieselbe Binary fuer die Such-Algorithmus-Permutation aus den
+    bestehenden Papern."
+
+KONSEQUENZ FUER KOMPONENTEN
+   • Jeder Baustein implementiert die fuer ihn relevanten DecisionLambdaTrees.
+   • Beispiel:
+       - ART_Node256-Baustein bringt PageRelocationTree + PageTypeChangeTree mit.
+       - AdaptivePrefetchDistance-Baustein bringt PrefetchAdjustmentTree mit.
+       - HotPathRecognition-Baustein bringt HotPathRecognitionTree mit.
+   • Ein Algorithmus-Modul = Vereinigung der Trees seiner gewaehlten Bausteine.
+   • Komposition zur Compile-Time per Concepts/requires.
+
+KONSEQUENZ FUER METAPROGRAMMIERUNG
+   • Inline + Compiler-Flags der ALTEN Code-Abschnitte sorgen fuer Binary-
+     Identitaet (Habich-Direktive).
+   • Modularisierung darf nicht zu Performance-Drift im Originalcode fuehren.
+
+QUELLE  Domaenenmodell v4 §3.2 "DecisionLambdaTrees pro Baustein"
+
+================================================================================
+F-EXTRA-7 — MESS-KATEGORIEN × ALGORITHMUS-DETAILS VOLLSTAENDIGKEITS-MATRIX
+================================================================================
+
+ENTSCHEIDUNG (B+C) Default-Spezialisierung + algo-spezifische Overrides
+                    nur wo noetig; Algo-Detail × Mess-Kategorie-Untermenge
+                    pro Algo via `requires HasMeasurement<...>`.
+
+KONSEQUENZ
+   • Generischer Default-Hook fuer jede Mess-Kategorie pro
+     `at_lookup_begin/at_lookup_end/at_node_visit/...`.
+   • Algorithmus-spezifische Override nur wo der Algorithmus etwas
+     Spezifisches messen kann (z.B. CLU bei ART_Node256: Bit-genaue
+     Berechnung der effektiv genutzten Bytes).
+   • `requires HasMeasurement<Algo, Category>`-Concept-Constraint stellt
+     sicher, dass nur unterstuetzte Mess-Kategorien aktiviert werden.
+
+QUELLE  Domaenenmodell v4 §4.5 "Mess-Matrix mit Default+Override"
+
+================================================================================
+F-EXTRA-8 — ABI-STABILITAETS-TEST + GOOGLE TESTS
+================================================================================
+
+ENTSCHEIDUNG (D) Mix Bit-Identisch + Funktional + Strukturell als CI-Test.
+                  PLUS umfangreiche Google-Test-Strategie.
+
+GOOGLE-TEST-STRATEGIE
+   Zwei Ebenen:
+   • Generische Google Tests (auf Seite des CacheEngineBuilders)
+       - Pruefen, dass jeder geladene Modul die Concepts erfuellt
+       - Pruefen, dass jede Bausteine-Variante die std::map-API komplett
+         implementiert
+       - Generische Funktions-Tests (gleicher Input → gleicher Output)
+   • Spezifische Google Tests (pro dynamischem Such-Algorithmus-Permutations-
+     Modul)
+       - Pro Funktion spezifische Tests
+       - Pro Baustein-Variante ihren spezifischen Satz Google Tests je Modul
+       - Algo-spezifische Edge-Cases (z.B. Node256-Overflow bei ART)
+
+ABI-STABILITAETS-TEST (CI)
+   Pro Permutation:
+   1. Bit-Identische Pruefung — `diff` der Object-Files / `.so` zwischen
+      Original-Build und Splitting-Build des Originalcode-Bausteins.
+   2. Funktionale Aequivalenz — Tests mit identischem Input liefern
+      identische Outputs (incl. Latenz-Verteilung im Toleranzband).
+   3. Strukturelle Pruefung — `nm`/`objdump` vergleicht Symbole, Sections,
+      Relocations.
+
+ABWEICHUNGS-PROTOKOLL (Habich-Log)
+   • Bei nicht-exakter Bit-Genauigkeit: LOG fuer Prof. Habich erforderlich.
+   • Inhalt:
+       - Welcher Baustein ist betroffen?
+       - Welche Compiler-Version?
+       - Was ist der erwartete vs. tatsaechliche Bit-Diff?
+       - Beweis, dass Source-Code identisch ist.
+       - Funktionaler Aequivalenz-Beweis.
+       - Hypothese fuer Diff-Ursache (z.B. Compiler-Optimierungs-
+         Aenderung, Linker-Order, etc.).
+   • Habich entscheidet, ob Abweichung akzeptabel oder Re-Implementation
+     noetig.
+
+QUELLE  Domaenenmodell v4 §11 "Test-Strategie + Habich-Log"
+
+================================================================================
+GESAMTFOLGEN AUS F-EXTRA-1 BIS F-EXTRA-8 + KORREKTUREN
+================================================================================
+
+Q) Permutations-Identifier ist strukturiertes Flag-System nach CPUID-Vorbild,
+   pro Bausteine-Achse eine 64-bit Bank (F10-K).
+
+R) CacheEngine bleibt Heap-Singleton, lebt IM Builder-Prozess als globale
+   Variable; den Modulen als Ressource bereitgestellt (F12-K).
+
+S) Hauptcompiler immer C++23; nur Bausteine-Internals mit Original-Compiler;
+   statisches Linken (F-EXTRA-1).
+
+T) Custom-Dataset-Korpus vollstaendig (6 Datasets) (F-EXTRA-2).
+
+U) SOCKS5 default + GitLab-CI-Push als Erweiterung; Fortigate-31G-Migration
+   laeuft (F-EXTRA-3).
+
+V) Cross-Build + Stage-2 native fuer Pi 5 + VisionFive 2 (F-EXTRA-4).
+
+W) CMake-Funktionen + `configure_file()` + `add_custom_command()` + sh/bat
+   erzeugen CMake-Targets fuer Permutations-Pre-Build
+   (F-EXTRA-5 REVIDIERT durch H6 — NO-PYTHON-DIREKTIVE; Talos OS hat kein
+   Python-Standard).
+
+X) DecisionLambdaTrees PRO BAUSTEIN, kein globaler Default. Komposition
+   via Concepts (F-EXTRA-6).
+
+Y) Mess-Matrix mit Default-Hooks + algo-spezifischen Overrides via
+   `requires HasMeasurement<...>` (F-EXTRA-7).
+
+Z) Generische + spezifische Google Tests + Bit-Identitaets-Test (CI) +
+   Habich-Log bei Abweichung (F-EXTRA-8).
+
+================================================================================
+ENDE DER ARCHITEKTURENTSCHEIDUNGEN (REV 4)
+Domaenenmodell v4 + Glossar v6 + Flag_System.txt + Bausteine_Matrix.txt
+implementieren diese Beschluesse.
+================================================================================

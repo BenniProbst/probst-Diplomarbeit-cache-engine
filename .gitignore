@@ -1,0 +1,52 @@
+# probst-Diplomarbeit-cache-engine
+# Diplomarbeit-Wrapper: LaTeX + Toolchain + Experiment-Skripte + Architektur-Dokumente
+# klont comdare-cache-engine zur Build-Zeit
+
+# Sub-.git-Verzeichnisse (Sicherheits-Filter; sollte leer sein)
+**/.git/
+**/.git
+
+# Build-Artefakte
+build/
+out/
+cmake-build-*/
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+*.lib
+*.exp
+*.pdb
+*.obj
+
+# Generated Text-Extracts (redundant — Quelldokumente sind die docx selbst)
+20260508 Termin 7/_extracted_text/
+
+# Mess-Dumps + LaTeX-Output
+*.csv
+*.binarydump
+*.aux
+*.log
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-Files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Temporaere Dateien
+*.tmp
+~$*

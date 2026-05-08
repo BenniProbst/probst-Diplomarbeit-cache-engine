@@ -1,0 +1,157 @@
+================================================================
+VORANALYSE: P03-Masstree/masstree-beta
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P03-Masstree/masstree-beta
+Stand: 2026-05-09 00:47:57
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 1255
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609     0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609   864 May  4 23:37 .gitignore
+-rw-r--r-- 1 benja 197609   111 May  4 23:37 AUTHORS
+-rw-r--r-- 1 benja 197609  2804 May  4 23:37 GNUmakefile.in
+-rw-r--r-- 1 benja 197609  1913 May  4 23:37 LICENSE
+-rw-r--r-- 1 benja 197609  5547 May  4 23:37 README.md
+-rwxr-xr-x 1 benja 197609    64 May  4 23:37 bootstrap.sh
+-rw-r--r-- 1 benja 197609  4298 May  4 23:37 btree_leaflink.hh
+-rw-r--r-- 1 benja 197609  1300 May  4 23:37 checkpoint.cc
+-rw-r--r-- 1 benja 197609  1947 May  4 23:37 checkpoint.hh
+-rw-r--r-- 1 benja 197609  4258 May  4 23:37 circular_int.hh
+-rw-r--r-- 1 benja 197609 76896 May  4 23:37 clp.c
+-rw-r--r-- 1 benja 197609 12767 May  4 23:37 clp.h
+-rw-r--r-- 1 benja 197609  2191 May  4 23:37 compiler.cc
+-rw-r--r-- 1 benja 197609 38858 May  4 23:37 compiler.hh
+-rw-r--r-- 1 benja 197609 20099 May  4 23:37 configure.ac
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 doc
+-rw-r--r-- 1 benja 197609  2695 May  4 23:37 file.cc
+-rw-r--r-- 1 benja 197609  2645 May  4 23:37 file.hh
+-rw-r--r-- 1 benja 197609  3338 May  4 23:37 hashcode.hh
+-rw-r--r-- 1 benja 197609 38866 May  4 23:37 json.cc
+-rw-r--r-- 1 benja 197609 94352 May  4 23:37 json.hh
+-rw-r--r-- 1 benja 197609 20479 May  4 23:37 jsontest.cc
+-rw-r--r-- 1 benja 197609 11157 May  4 23:37 kpermuter.hh
+-rw-r--r-- 1 benja 197609  5563 May  4 23:37 ksearch.hh
+-rw-r--r-- 1 benja 197609  3117 May  4 23:37 kvio.cc
+-rw-r--r-- 1 benja 197609  2003 May  4 23:37 kvio.hh
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./doc
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./checkpoint.cc
+./clp.c
+./clp.h
+./compiler.cc
+./file.cc
+./json.cc
+./jsontest.cc
+./kvio.cc
+./kvrandom.cc
+./kvthread.cc
+./log.cc
+./memdebug.cc
+./misc.cc
+./msgpack.cc
+./msgpacktest.cc
+./mtclient.cc
+./mtd.cc
+./mttest.cc
+./perfstat.cc
+./query_masstree.cc
+./scantest.cc
+./str.cc
+./straccum.cc
+./string.cc
+./string_slice.cc
+./testrunner.cc
+./test_atomics.cc
+./test_string.cc
+./unit-mt.cc
+./value_array.cc
+./value_string.cc
+./value_versioned_array.cc
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 14990 total
+  2506 ./clp.c
+  1724 ./mtclient.cc
+  1715 ./mtd.cc
+  1432 ./mttest.cc
+  1389 ./string.cc
+  1233 ./json.cc
+   867 ./log.cc
+   609 ./jsontest.cc
+   468 ./test_atomics.cc
+   398 ./straccum.cc
+   348 ./clp.h
+   342 ./query_masstree.cc
+   254 ./kvthread.cc
+   240 ./msgpack.cc
+   216 ./perfstat.cc
+   209 ./msgpacktest.cc
+   190 ./unit-mt.cc
+   112 ./kvio.cc
+    97 ./value_versioned_array.cc
+    89 ./test_string.cc
+
+## BUILD-SYSTEM
+  ✓ configure.ac (455 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+    This software is subject to the license below, which is referenced
+    elsewhere using the phrase "the Masstree LICENSE file". This license
+    is an MIT license, plus a clause (taken from the W3C license)
+
+## README EXCERPT
+  Datei: README.md
+    Masstree
+    ========
+    
+    This is the source release for Masstree, a fast, multi-core key-value
+    store. This document describes how to run Masstree and interpret its
+    results.
+    
+    ## Contents
+    
+    * `MTDIR`: this directory
+    * `MTDIR/doc`: Masstree algorithm specification
+    
+    ## Installation
+    
+    Masstree is tested on Debian, Ubuntu and Mac OS X. To build from
+    source:
+    
+        $ ./bootstrap.sh
+        $ ./configure
+        $ make
+    
+    For performance measurements, you should disable assertions.
+    
+        $ ./configure --disable-assertions
+    
+    Masstree needs a fast malloc, and can link with jemalloc, Google’s
+    tcmalloc, Hoard, or our own Flow allocator. It will normally choose
+    jemalloc or tcmalloc, if it finds them. To use a specific memory
+    allocator:
+    
+        ./configure --with-malloc=<jemalloc|tcmalloc|flow|hoard>
+    
+    Flow is our re-implementation of
+    [Streamflow](http://people.cs.vt.edu/~scschnei/streamflow/) allocator,
+    and may be open-sourced in future.
+    
+    See `./configure --help` for more configure options.
+    
+    ## Testing
+    
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  RCU                  in 1 Dateien
+
+## C++-STANDARD-INDIKATOREN
+
+## END VORANALYSE P03-Masstree/masstree-beta

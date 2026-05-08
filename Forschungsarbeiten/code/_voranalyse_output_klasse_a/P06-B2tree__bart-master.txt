@@ -1,0 +1,95 @@
+================================================================
+VORANALYSE: P06-B2tree/bart-master
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P06-B2tree/bart-master
+Stand: 2026-05-09 00:49:00
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 274
+drwxr-xr-x 1 benja 197609     0 May  8 01:41 .
+drwxr-xr-x 1 benja 197609     0 May  8 01:28 ..
+-rw-r--r-- 1 benja 197609 20886 Dec  5  2019 ART.cpp
+-rw-r--r-- 1 benja 197609  1853 Dec  5  2019 CMakeLists.txt
+-rw-r--r-- 1 benja 197609   110 Dec  5  2019 Makefile
+-rw-r--r-- 1 benja 197609 27781 Dec  5  2019 b2tree_int.cpp
+-rw-r--r-- 1 benja 197609 54144 Dec  5  2019 bart.cpp
+-rwxr-xr-x 1 benja 197609   350 Dec  5  2019 bench.sh
+-rw-r--r-- 1 benja 197609  7612 Dec  5  2019 btree.cpp
+drwxr-xr-x 1 benja 197609     0 May  8 01:41 cpp-btree-1.0.1
+-rw-r--r-- 1 benja 197609 20910 Dec  5  2019 hattrie.cpp
+drwxr-xr-x 1 benja 197609     0 May  8 01:41 lib
+-rw-r--r-- 1 benja 197609 12678 Dec  5  2019 pbtreestatic.cpp
+-rw-r--r-- 1 benja 197609 16679 Dec  5  2019 pbtreestatic_opt.cpp
+-rw-r--r-- 1 benja 197609 40149 Dec  5  2019 pbtreestatic_trie.cpp
+-rw-r--r-- 1 benja 197609 27771 Dec  5  2019 pbtreestaticart.cpp
+-rw-r--r-- 1 benja 197609  4153 Dec  5  2019 profile.cpp
+drwxr-xr-x 1 benja 197609     0 May  8 01:41 third_party
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./cpp-btree-1.0.1
+./lib
+./third_party
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./ART.cpp
+./b2tree_int.cpp
+./bart.cpp
+./btree.cpp
+./cpp-btree-1.0.1/btree.h
+./cpp-btree-1.0.1/btree_container.h
+./cpp-btree-1.0.1/btree_map.h
+./cpp-btree-1.0.1/btree_set.h
+./cpp-btree-1.0.1/btree_test.h
+./cpp-btree-1.0.1/safe_btree.h
+./cpp-btree-1.0.1/safe_btree_map.h
+./cpp-btree-1.0.1/safe_btree_set.h
+./hattrie.cpp
+./pbtreestatic.cpp
+./pbtreestaticart.cpp
+./pbtreestatic_opt.cpp
+./pbtreestatic_trie.cpp
+./profile.cpp
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 11996 total
+  2394 ./cpp-btree-1.0.1/btree.h
+  1652 ./bart.cpp
+  1240 ./pbtreestatic_trie.cpp
+   940 ./cpp-btree-1.0.1/btree_test.h
+   924 ./pbtreestaticart.cpp
+   833 ./b2tree_int.cpp
+   701 ./hattrie.cpp
+   685 ./ART.cpp
+   575 ./pbtreestatic_opt.cpp
+   448 ./pbtreestatic.cpp
+   395 ./cpp-btree-1.0.1/safe_btree.h
+   349 ./cpp-btree-1.0.1/btree_container.h
+   293 ./btree.cpp
+   139 ./profile.cpp
+   130 ./cpp-btree-1.0.1/btree_map.h
+   121 ./cpp-btree-1.0.1/btree_set.h
+    89 ./cpp-btree-1.0.1/safe_btree_map.h
+    88 ./cpp-btree-1.0.1/safe_btree_set.h
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (42 Zeilen)
+  ✓ Makefile (2 Zeilen)
+
+## LIZENZ
+  ⚠ KEINE LICENSE-Datei gefunden
+
+## README EXCERPT
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  Node4                in 4 Dateien
+  Node16               in 4 Dateien
+  Node48               in 2 Dateien
+  Node256              in 4 Dateien
+  prefetch             in 5 Dateien
+  Counter              in 3 Dateien
+
+## C++-STANDARD-INDIKATOREN
+  set(CMAKE_CXX_STANDARD 17)
+
+## END VORANALYSE P06-B2tree/bart-master

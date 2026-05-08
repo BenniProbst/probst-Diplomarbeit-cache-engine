@@ -1,0 +1,964 @@
+================================================================================
+BAUSTEINE-MATRIX — Algorithmus-Bausteine pro konzeptionelle Achse
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D REV 4
+Stand: 2026-05-08 (REV 1) · Beschluss F15 (Bausteine-Quer-Permutation)
+================================================================================
+
+UPDATES IN REV 1 (2026-05-08)
+   - Implementierungs-Pfad-Tabelle am Ende (§ Implementierungs-Pfade)
+   - 11 + 1 Originalcode-Repos in `ext/` zugeordnet (P01-P10 + P20, P25, P29, P30)
+     wobei P06 NEU heute (b2-tree-master + bart-master)
+   - 14 Re-Impl-Skelette in `prt_art/legacy_reimpl/` zugeordnet
+     (P11-P14, P16-P19, P21-P24, P26, P27)
+   - bart-master Cross-Algorithm-Vergleichsbasis (P06-Bonus): zusaetzliche
+     Bausteine HAT-Trie + PB-Tree-Static-Varianten
+   - Architekt-Direktive 2026-05-08 angewandt: GPL-3.0/LGPL/keine-Lizenz
+     kein Hinderungsgrund (modularisierte Bruchstuecke + C++23-
+     Metaprogrammierung = neues Werk)
+
+ZWECK
+   Vollstaendige Aufstellung aller Algorithmus-Bausteine pro konzeptioneller
+   Achse aus den 33 Papern (P01-P33) + PRT-ART. Jeder Baustein ist:
+   - Eine eigene Klassen-Implementation
+   - Mit einem definierten Concept-Interface (C++23 requires)
+   - Pro Original-Algorithmus mit dessen Original-Compiler kompiliert (F-EXTRA-1)
+   - Austauschbar gegen jeden anderen Baustein derselben Achse (F15)
+
+NOTATION
+   ID            Eindeutige Bausteine-ID (= Flag-Position in Flag_System.txt)
+   QUELLE        P-ID des Originalpapers + PRT-ART eigen
+   ORIG-COMP.    Original-Compiler-Anforderung (zu praezisieren in Phase 4.B)
+   CONCEPT       C++23 Concept, das der Baustein erfuellt
+   ABHAENGIG     Andere Bausteine, von denen dieser abhaengt
+   DECISIONTREE  DecisionLambdaTrees, die der Baustein mitbringt (F-EXTRA-6)
+   IMPL-PFAD     Pfad zum Code (siehe § Implementierungs-Pfade am Ende)
+
+GLIEDERUNG
+   ACHSE 1  PAGE-TYPE                       (PageBank, Flag_System.txt)
+   ACHSE 2  NODE-TYPE                       (NodeBank)
+   ACHSE 3  TRAVERSAL                       (TraversalBank)
+   ACHSE 4  VALUEHANDLE                     (ValueHandleBank)
+   ACHSE 5  MEMORY-LAYOUT                   (MemoryLayoutBank)
+   ACHSE 6  ALLOCATOR                       (AllocatorBank)
+   ACHSE 7  PREFETCH                        (PrefetchBank)
+   ACHSE 8  CONCURRENCY                     (ConcurrencyBank)
+   ACHSE 9  ISA                             (IsaBank)
+   ACHSE 10 MEASUREMENT                     (Mess-Kategorie x Algo-Detail Matrix, F1)
+   ACHSE 11 TELEMETRY-COLLECTION-STRATEGY   (NEU 2026-05-09 — Kuehn-Erkenntnisse)
+
+================================================================================
+ACHSE 1 — PAGE-TYPE
+================================================================================
+
+ID: PAGE_DENSEBYTE_ART256
+   QUELLE        P01 ART (Leis 2013)
+   ORIG-COMP.    GCC 4.7+ (zu verifizieren in Phase 4.B)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Dense-Byte-Page mit 256 children, ART-Node256-Adapter
+   DECISIONTREE  PageRelocationTree (ART-spezifisch),
+                 PageTypeChangeTree (ART → Node48 bei Schrumpfung)
+
+ID: PAGE_SPARSE_NODE4_ART
+   QUELLE        P01 ART (Leis 2013)
+   ORIG-COMP.    GCC 4.7+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Sparse Node4 (4 keys + 4 children), ART-spezifisch
+   DECISIONTREE  PageTypeChangeTree (Node4 → Node16 bei Wachstum)
+
+ID: PAGE_NODE16_ART / PAGE_NODE48_ART
+   QUELLE        P01 ART
+   ORIG-COMP.    GCC 4.7+
+   BESCHREIBUNG  Node16 mit SSE2-Compare; Node48 mit indirect children
+   DECISIONTREE  PageTypeChangeTree
+
+ID: PAGE_COMPOUND_HOT
+   QUELLE        P02 HOT (Binna 2018)
+   ORIG-COMP.    GCC 5+ (BMI2/AVX2 erforderlich)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Compound Node mit k=32 max. branching factor
+   DECISIONTREE  PageRelocationTree (HOT-Konsolidierung),
+                 PageTypeChangeTree
+
+ID: PAGE_MULTIBYTE_START
+   QUELLE        P05 START (Fent 2020)
+   ORIG-COMP.    GCC 7+ (zu verifizieren)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Multibyte Node (mehrere Bytes pro Verzweigung)
+   DECISIONTREE  PageTypeChangeTree (Multibyte-Span-Wahl)
+
+ID: PAGE_MACRO_COCO
+   QUELLE        P04 CoCo-Trie (Boffa 2024)
+   ORIG-COMP.    GCC 11+ (C++20)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Macro-Node = kollabierter Subtrie als Einheit
+   DECISIONTREE  PageRelocationTree (CoCo-Optimizer)
+
+ID: PAGE_METATRIEHT_WORMHOLE
+   QUELLE        P07 Wormhole (Wu 2019)
+   ORIG-COMP.    GCC 7+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Hash + Trie + B+ Hybrid (Anchor Keys)
+   DECISIONTREE  -
+
+ID: PAGE_LOUDS_DENSE_SURF / PAGE_LOUDS_SPARSE_SURF
+   QUELLE        P10 SuRF (Zhang 2018)
+   ORIG-COMP.    GCC 5+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  3 Bitmaps a 256 (Dense) / 3 Byte-Sequenzen (Sparse)
+   DECISIONTREE  PageTypeChangeTree (Dense vs Sparse Cutoff R)
+
+ID: PAGE_LOUDS_JACOBSON
+   QUELLE        P09 Jacobson 1989
+   ORIG-COMP.    Externes statisches Modul (LOUDS Originalcode)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  BFS-Bit-String mit unary degree
+   DECISIONTREE  -
+
+ID: PAGE_BPLUS_MASSTREE
+   QUELLE        P03 Masstree (Mao 2012)
+   ORIG-COMP.    GCC 4.6+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  B+-Page (8-Byte-Slice) mit Permutation Field
+   DECISIONTREE  PageTypeChangeTree (Masstree-Border-Logik),
+                 PageRelocationTree (Permutation-Field-Reorg)
+
+ID: PAGE_DECISION_B2TREE / PAGE_SPAN_B2TREE
+   QUELLE        P06 B²-tree (Schmeisser 2022)
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Decision-Page (byte-weise) / Span-Page (gemeinsame Praefix)
+   DECISIONTREE  PageTypeChangeTree
+
+# ─── BART-MASTER BONUS-BAUSTEINE (P06 Sub-Repo, NEU 2026-05-09) ─────────────
+# Quelle: ext/P06-B2tree/bart-master/ (Schmeisser TUM Cross-Algorithm-Vergleich)
+# Diese Bausteine wurden urspruenglich von Schmeisser fuer Vergleichsmessungen
+# implementiert und sind in seinem internen "bart-master"-Repo verfuegbar.
+# F15-relevant: vorgefertigte Cross-Algorithm-Vergleichsbasis.
+
+ID: PAGE_BART_HYBRID_P06
+   QUELLE        P06 B²-tree (Schmeisser, bart-master/bart.cpp)
+   ORIG-COMP.    GCC 9+ (CMakeLists fordert C++17)
+   CONCEPT       Page<P>, FanOutContainer (Hybrid)
+   BESCHREIBUNG  BART Hauptprogramm — Hybrid-Datenstruktur, kombiniert
+                 B-Tree-Eigenschaften mit ART-Adaptivitaet.
+                 ~54 KB Source, eine Datei.
+   DECISIONTREE  PageTypeChangeTree (B-Tree-Knoten ↔ ART-Knoten)
+   IMPL-PFAD     ext/P06-B2tree/bart-master/bart.cpp
+
+ID: PAGE_HATTRIE_P06
+   QUELLE        P06 B²-tree (Schmeisser, bart-master/hattrie.cpp)
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  HAT-Trie (Hash Array Trie) — kombiniert Hash-Tabellen-
+                 Lookup an Blaettern mit Trie-Praefix-Sharing in
+                 inneren Knoten.
+   DECISIONTREE  -
+   IMPL-PFAD     ext/P06-B2tree/bart-master/hattrie.cpp
+
+ID: PAGE_PBTREESTATIC_P06
+   QUELLE        P06 B²-tree (Schmeisser, bart-master/pbtreestatic.cpp)
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  PB-Tree Static — Prefetching-basierter B+-Tree-Aufbau,
+                 Knoten statisch alloziert (kein Dynamic-Allocation auf
+                 dem Hot-Path).
+   DECISIONTREE  PrefetchAdjustmentTree
+   IMPL-PFAD     ext/P06-B2tree/bart-master/pbtreestatic.cpp
+
+ID: PAGE_PBTREESTATIC_OPT_P06
+   QUELLE        P06 B²-tree (Schmeisser, bart-master/pbtreestatic_opt.cpp)
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  PB-Tree Static OPTIMIERT — Variante mit zusaetzlichen
+                 Compiler-Optimierungs-Hinweisen (likely/unlikely, hot/cold,
+                 prefetch-Distanzen feinsteuerbar).
+   DECISIONTREE  PrefetchAdjustmentTree (Distanz-Tuning)
+   IMPL-PFAD     ext/P06-B2tree/bart-master/pbtreestatic_opt.cpp
+
+ID: PAGE_PBTREESTATIC_TRIE_P06
+   QUELLE        P06 B²-tree (Schmeisser, bart-master/pbtreestatic_trie.cpp)
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Page<P>, FanOutContainer (Hybrid)
+   BESCHREIBUNG  Treeception — PB-Tree-Static mit eingebettetem Trie pro
+                 Page (analog zu B²-tree-Konzept, aber mit PB-Tree-Static-
+                 Aussenstruktur statt B+-Tree).
+   DECISIONTREE  PageTypeChangeTree
+   IMPL-PFAD     ext/P06-B2tree/bart-master/pbtreestatic_trie.cpp
+
+ID: PAGE_PBTREESTATIC_ART_P06
+   QUELLE        P06 B²-tree (Schmeisser, bart-master/pbtreestaticart.cpp)
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Page<P>, FanOutContainer (Hybrid)
+   BESCHREIBUNG  PB-Tree-Static-ART — Hybrid PB-Tree-Static + ART-Knoten
+                 (Schmeisser-eigene Cross-Algorithm-Idee, NICHT publiziert).
+   DECISIONTREE  PageTypeChangeTree
+   IMPL-PFAD     ext/P06-B2tree/bart-master/pbtreestaticart.cpp
+
+# ─── ENDE BART-MASTER BONUS-BAUSTEINE ──────────────────────────────────────
+
+ID: PAGE_CSS_NODE
+   QUELLE        P11 CSS-Tree (Rao/Ross 1999)
+   ORIG-COMP.    GCC 3.x (sehr alt) oder Re-Build mit GCC 7+
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Cache-Line-grosser, pointer-freier Knoten
+   DECISIONTREE  -
+
+ID: PAGE_CSB_NODEGROUP
+   QUELLE        P12 CSB+-Tree (Rao/Ross 2000)
+   ORIG-COMP.    GCC 3.x oder Re-Build
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Sibling-Cluster mit 1 Pointer + Offsets
+   DECISIONTREE  -
+
+ID: PAGE_WIDER_HANKINS
+   QUELLE        P13 Hankins/Patel 2003
+   ORIG-COMP.    GCC 3.x oder Re-Build
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Wider B+-Knoten (4-16 Cache-Lines pro Knoten)
+   DECISIONTREE  PageTypeChangeTree (Width-Optimum-Wahl)
+
+ID: PAGE_CONFIGTABLE_SAMUEL
+   QUELLE        P14 Samuel 2005
+   ORIG-COMP.    GCC 4+ (zu verifizieren)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Vorberechnete Config-Tabelle bestimmt Tree-Shape
+   DECISIONTREE  -
+
+ID: PAGE_ADAPTIVE_BTREESAREBACK
+   QUELLE        P20 B-Trees Are Back (Mueller 2025)
+   ORIG-COMP.    GCC 13+ (C++20/23)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  6 Layout-Optimierungen + adaptive Runtime-Wahl
+   DECISIONTREE  PageTypeChangeTree (Layout-Wahl)
+
+ID: PAGE_PREFETCH_CHEN / PAGE_FRACTAL_CHEN
+   QUELLE        P21 Chen 2001 / P22 Chen 2002
+   ORIG-COMP.    GCC 3.x oder Re-Build
+   CONCEPT       Page<P>
+   BESCHREIBUNG  Wider Nodes via Prefetching / Fractal-Cluster
+   DECISIONTREE  PrefetchAdjustmentTree
+
+ID: PAGE_LSM_TREE / PAGE_COLA / PAGE_SKIPLIST / PAGE_TTREE
+   QUELLE        Klassische Strukturen (eigene Implementation)
+   ORIG-COMP.    C++23 (eigene Implementation)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  LSM-Tree / Cache-Oblivious Lookahead / Skiplist / T-Tree
+   DECISIONTREE  -
+
+ID: PAGE_TST / PAGE_JUDY / PAGE_VAN_EMDE_BOAS
+   QUELLE        Klassische Spezial-Strukturen
+   ORIG-COMP.    eigene Implementation oder bestehende Libs
+   CONCEPT       Page<P>
+   BESCHREIBUNG  TST / Judy Array / Van Emde Boas Tree
+   DECISIONTREE  -
+
+ID: PAGE_PRTART_DENSEBYTE / PAGE_PRTART_EXTENDEDDENSE /
+    PAGE_PRTART_SPARSEPATRICIA / PAGE_PRTART_REDIRECT /
+    PAGE_PRTART_CUSTOMCACHE
+   QUELLE        PRT-ART (eigen, frei modifizierbar)
+   ORIG-COMP.    C++23 (Hauptcompiler)
+   CONCEPT       Page<P>
+   BESCHREIBUNG  PRT-ART Page-Familie (5 Typen)
+   DECISIONTREE  Alle relevanten Trees (PRT-ART als Test-Algorithmus
+                 implementiert das volle Spektrum)
+
+================================================================================
+ACHSE 2 — NODE-TYPE
+================================================================================
+
+ID: NODE_NODE4 / NODE_NODE16 / NODE_NODE48 / NODE_NODE256  (P01 ART)
+   ORIG-COMP.    GCC 4.7+
+   CONCEPT       Node<N>
+   BESCHREIBUNG  ART-Knoten mit aufsteigendem Fanout
+   DECISIONTREE  -
+
+ID: NODE_HOT_COMPOUND_K32 / NODE_HOT_BINODE  (P02 HOT)
+   ORIG-COMP.    GCC 5+ (BMI2/AVX2)
+   CONCEPT       Node<N>
+   BESCHREIBUNG  HOT Compound Node / BiNode
+   DECISIONTREE  -
+
+ID: NODE_INTERNAL_MASSTREE / NODE_BORDER_MASSTREE  (P03 Masstree)
+   ORIG-COMP.    GCC 4.6+
+   CONCEPT       Node<N>
+   BESCHREIBUNG  B+-Internal-Node / Border-Node (Layer-Grenze)
+   DECISIONTREE  -
+
+ID: NODE_MACRONODE_COCO  (P04 CoCo)
+   ORIG-COMP.    GCC 11+
+   CONCEPT       Node<N>
+   BESCHREIBUNG  Macro-Node (kollabierter Subtrie)
+
+ID: NODE_MULTIBYTE_START  (P05 START)
+   ORIG-COMP.    GCC 7+
+   CONCEPT       Node<N>
+   BESCHREIBUNG  Multibyte Node (rewired)
+
+ID: NODE_DECISION_B2TREE / NODE_SPAN_B2TREE  (P06 B²-tree)
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Node<N>
+
+# ─── BART-MASTER BONUS-NODE-TYPES (P06 Sub-Repo, NEU 2026-05-09) ──────────
+ID: NODE_HATTRIE_HASHBUCKET_P06  (HAT-Trie Hash-Bucket-Knoten)
+   QUELLE        P06 Schmeisser bart-master/hattrie.cpp
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Node<N>
+   BESCHREIBUNG  Hash-Bucket-Blattknoten (HAT-Trie-spezifisch); innere
+                 Knoten sind Standard-Trie-Knoten
+
+ID: NODE_PBTREE_STATIC_NODE_P06  (PB-Tree-Static Knoten)
+   QUELLE        P06 Schmeisser bart-master/pbtreestatic*.cpp
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Node<N>
+   BESCHREIBUNG  Statisch alloziert, Prefetch-Distanzen feinsteuerbar im
+                 Layout. Variant-Hierarchie in opt/trie/art
+
+ID: NODE_BART_HYBRID_P06  (BART-Hybrid Knoten)
+   QUELLE        P06 Schmeisser bart-master/bart.cpp
+   ORIG-COMP.    GCC 9+
+   CONCEPT       Node<N>
+   BESCHREIBUNG  Hybrid-Knoten — kann sowohl B-Tree-Sortier-Funktion als
+                 auch ART-Discriminative-Bits-Funktion uebernehmen
+# ─── ENDE BART-MASTER BONUS-NODE-TYPES ─────────────────────────────────────
+
+ID: NODE_CSS_NODE / NODE_CSB_NODEGROUP / NODE_WIDER_BPLUS_HANKINS
+   QUELLE        P11 / P12 / P13
+   ORIG-COMP.    GCC 3.x oder Re-Build
+   CONCEPT       Node<N>
+
+ID: NODE_PRTART_*  (PRT-ART eigen)
+   ORIG-COMP.    C++23
+   CONCEPT       Node<N>
+
+================================================================================
+ACHSE 3 — TRAVERSAL
+================================================================================
+
+ID: TRAVERSAL_BYTEBYBYTE  (P01 ART)
+   CONCEPT       TraversalAlgorithm<T>
+   BESCHREIBUNG  Byte-by-byte Traversal mit Path Compression + Lazy Expansion
+   DECISIONTREE  HotPathRecognitionTree
+
+ID: TRAVERSAL_DISCRIMINATIVE_BITS  (P02 HOT)
+   CONCEPT       TraversalAlgorithm<T>
+   BESCHREIBUNG  Discriminative-Bits-Auswertung mit BMI2 PEXT
+   DECISIONTREE  -
+
+ID: TRAVERSAL_LAYER_SLICE  (P03 Masstree)
+   CONCEPT       TraversalAlgorithm<T>
+   BESCHREIBUNG  8-Byte-Slice-Wechsel an Layer-Grenze
+
+ID: TRAVERSAL_MACRO_NODE  (P04 CoCo)
+   CONCEPT       TraversalAlgorithm<T>
+   BESCHREIBUNG  Macro-Node-Pattern-Match
+
+ID: TRAVERSAL_MULTIBYTE_SPAN  (P05 START)
+   CONCEPT       TraversalAlgorithm<T>
+
+ID: TRAVERSAL_EMBEDDED_DEC_TREE  (P06 B²-tree)
+   CONCEPT       TraversalAlgorithm<T>
+
+# ─── BART-MASTER BONUS-TRAVERSALS (P06 Sub-Repo, NEU 2026-05-09) ──────────
+ID: TRAVERSAL_HATTRIE_HASH_THEN_TRIE_P06
+   QUELLE        P06 Schmeisser bart-master/hattrie.cpp
+   CONCEPT       TraversalAlgorithm<T>
+   BESCHREIBUNG  Trie-Praefix-Sharing in inneren Knoten + Hash-Lookup an
+                 Bucket-Blaettern (HAT-Trie-spezifisch)
+
+ID: TRAVERSAL_PBTREE_STATIC_PREFETCH_P06
+   QUELLE        P06 Schmeisser bart-master/pbtreestatic*.cpp
+   CONCEPT       TraversalAlgorithm<T>
+   BESCHREIBUNG  Static-Layout-Walk mit feinsteuerbarer Prefetch-Distanz
+                 (PB-Tree-Static-Variante)
+
+ID: TRAVERSAL_BART_HYBRID_DISPATCH_P06
+   QUELLE        P06 Schmeisser bart-master/bart.cpp
+   CONCEPT       TraversalAlgorithm<T>
+   BESCHREIBUNG  Hybrid-Dispatch — entscheidet pro Knoten, ob B-Tree-Suche
+                 oder ART-Discriminative-Bits angewendet wird (Kern-Idee
+                 von BART)
+# ─── ENDE BART-MASTER BONUS-TRAVERSALS ────────────────────────────────────
+
+ID: TRAVERSAL_HASH_ANCHOR  (P07 Wormhole)
+   CONCEPT       TraversalAlgorithm<T>
+
+ID: TRAVERSAL_RANK_SELECT  (P09 / P10 LOUDS / SuRF)
+   CONCEPT       TraversalAlgorithm<T>
+   ABHAENGIG     SDSL oder eigene rank/select-Implementation
+
+ID: TRAVERSAL_LOWER_BOUND  (P10 SuRF)
+   CONCEPT       TraversalAlgorithm<T>
+
+ID: TRAVERSAL_POINTER_ARITHMETIC  (P11 CSS)
+   CONCEPT       TraversalAlgorithm<T>
+
+ID: TRAVERSAL_OFFSET  (P12 CSB+)
+   CONCEPT       TraversalAlgorithm<T>
+
+ID: TRAVERSAL_PREFETCH_AHEAD  (P21 Chen)
+   CONCEPT       TraversalAlgorithm<T>
+   DECISIONTREE  PrefetchAdjustmentTree
+
+ID: TRAVERSAL_ADAPTIVE_PREFETCH_DIST  (P23 Khan)
+   CONCEPT       TraversalAlgorithm<T>
+   DECISIONTREE  PrefetchAdjustmentTree (adaptiv)
+
+ID: TRAVERSAL_PRTART_HOT_PATH / TRAVERSAL_PRTART_PREFETCH_AWARE
+   QUELLE        PRT-ART eigen
+
+================================================================================
+ACHSE 4 — VALUEHANDLE
+================================================================================
+
+ID: VALUEHANDLE_INLINE
+   CONCEPT       ValueHandleStrategy<S, V>
+   BESCHREIBUNG  Wert direkt im Node-Slot
+
+ID: VALUEHANDLE_POINTER
+   CONCEPT       ValueHandleStrategy<S, V>
+   BESCHREIBUNG  External Pointer auf separates Werte-Array
+
+ID: VALUEHANDLE_REDIRECT_TO_NODE
+   CONCEPT       ValueHandleStrategy<S, V>
+   BESCHREIBUNG  Verweist auf naechste Node (Patricia-Style)
+
+ID: VALUEHANDLE_REDIRECT_TO_PAGE
+   CONCEPT       ValueHandleStrategy<S, V>
+   BESCHREIBUNG  Verweist auf naechste Page
+
+ID: VALUEHANDLE_DYNAMIC
+   CONCEPT       ValueHandleStrategy<S, V>
+   BESCHREIBUNG  Runtime-Auswahl, mit `switch_array` begrenzt
+   DECISIONTREE  ValueHandleSelectionTree
+
+================================================================================
+ACHSE 5 — MEMORY-LAYOUT
+================================================================================
+
+ID: MEMORY_CACHELINE_ALIGNED  (default)
+   CONCEPT       MemoryLayout<L>
+   BESCHREIBUNG  64-Byte cache-line aligned
+
+ID: MEMORY_HUGEPAGE_2MB_ALIGNED  (P32-Lehre)
+   CONCEPT       MemoryLayout<L>
+   BESCHREIBUNG  2 MiB Hugepages, reduziert TLB-Druck
+
+ID: MEMORY_HUGEPAGE_1GB_ALIGNED
+   CONCEPT       MemoryLayout<L>
+
+ID: MEMORY_POINTER_FREE_CONTIG  (P11 CSS)
+   CONCEPT       MemoryLayout<L>
+   BESCHREIBUNG  Pointer-frei, kontigous Array, Index-Arithmetik
+
+ID: MEMORY_SIBLING_CLUSTER  (P12 CSB+)
+   CONCEPT       MemoryLayout<L>
+
+ID: MEMORY_INLINE_SLOT
+   CONCEPT       MemoryLayout<L>
+
+ID: MEMORY_METADATA_HEADER
+   CONCEPT       MemoryLayout<L>
+   BESCHREIBUNG  Telemetrie-Slots im Page-Header
+
+ID: MEMORY_EMBEDDED_TREE  (P06 B²-tree)
+   CONCEPT       MemoryLayout<L>
+
+================================================================================
+ACHSE 6 — ALLOCATOR
+================================================================================
+
+ID: ALLOCATOR_POOL_PER_PAGETYPE
+   CONCEPT       Allocator<A>
+
+ID: ALLOCATOR_ARENA_PER_SUBTREE
+   CONCEPT       Allocator<A>
+
+ID: ALLOCATOR_SLAB
+   CONCEPT       Allocator<A>
+
+ID: ALLOCATOR_HBM  (P32/P33-Plattform)
+   CONCEPT       Allocator<A>
+   BESCHREIBUNG  HBM-Allocation via hbwmalloc
+
+ID: ALLOCATOR_DEFAULT_MALLOC  (Baseline)
+   CONCEPT       Allocator<A>
+
+ID: ALLOCATOR_TCMALLOC / ALLOCATOR_MIMALLOC / ALLOCATOR_SNMALLOC
+   CONCEPT       Allocator<A>
+   BESCHREIBUNG  Library-Wrapper
+
+================================================================================
+ACHSE 7 — PREFETCH
+================================================================================
+
+ID: PREFETCH_NONE  (Baseline)
+   CONCEPT       PrefetchStrategy<P>
+
+ID: PREFETCH_SOFTWARE_FIXED  (P21 Chen)
+   CONCEPT       PrefetchStrategy<P>
+
+ID: PREFETCH_ADAPTIVE_DISTANCE  (P23 Khan)
+   CONCEPT       PrefetchStrategy<P>
+   DECISIONTREE  PrefetchAdjustmentTree
+
+ID: PREFETCH_HIERARCHICAL_BUNDLE  (P27 Zhang ASPLOS)
+   CONCEPT       PrefetchStrategy<P>
+
+ID: PREFETCH_FILL_BUFFER_AWARE  (P25 Mahling)
+   CONCEPT       PrefetchStrategy<P>
+
+ID: PREFETCH_HOT_PATH  (P26 Zhang FGCS)
+   CONCEPT       PrefetchStrategy<P>
+   DECISIONTREE  HotPathRecognitionTree
+
+================================================================================
+ACHSE 8 — CONCURRENCY
+================================================================================
+
+DISZIPLINEN (mehrere kombinierbar)
+   ID: CONCURRENCY_PAGE_DISCIPLINE
+   ID: CONCURRENCY_NODE_DISCIPLINE
+   ID: CONCURRENCY_ARRAY_DISCIPLINE
+   ID: CONCURRENCY_DATA_STRUCTURE_DISC
+   ID: CONCURRENCY_PATH_DISCIPLINE
+   ID: CONCURRENCY_MEMORY_READ_DISC
+   ID: CONCURRENCY_MEMORY_WRITE_DISC
+   ID: CONCURRENCY_MEMORY_READWRITE_DISC
+   ID: CONCURRENCY_SIMD_THREAD_DISC
+   ID: CONCURRENCY_SIMD_FLOW_DISC
+
+MECHANIKEN (orthogonal zu Disziplinen)
+   ID: CONCURRENCY_OLC                  (P08)
+   ID: CONCURRENCY_ROWEX                (P08)
+   ID: CONCURRENCY_RCU                  (P29)
+
+BASELINE
+   ID: CONCURRENCY_SINGLE_THREADED
+
+CONCEPT  ConcurrencyDiscipline<D>
+
+================================================================================
+ACHSE 9 — ISA  (siehe Flag_System.txt Bank 9)
+================================================================================
+
+   ISA_SCALAR_X86_64 / ARM64 / RISCV
+   ISA_X86_SSE2 / SSE4_2 / AVX / AVX2 / AVX512F / BMI1 / BMI2 / AESNI
+   ISA_ARM_NEON / SVE / SVE2
+   ISA_RISCV_V
+
+================================================================================
+ACHSE 10 — MEASUREMENT  (Mess-Kategorie x Algo-Detail Matrix, F1)
+================================================================================
+
+MESSKATEGORIEN
+   • CLU (Cache Line Utilization)
+   • CACHE_MISS (L1/L2/L3)
+   • DTLB_MISS
+   • MEMORY_FOOTPRINT
+   • BRANCH_MISS
+   • IPC_CPI
+   • LATENCY (Mean/p50/p95/p99/p999)
+   • THROUGHPUT
+   • ENERGY_J
+   • FILL_BUFFER_OCCUPANCY
+
+ALGORITHM-DETAIL-GRANULARITAET (zu spezialisieren)
+   Pro Algorithm-Detail eine constexpr-Spezialisierung von
+   `Measure<Category, Detail>`. Default-Implementation pro Kategorie
+   uebernimmt generische Hooks (F-EXTRA-7).
+
+   Detail-Liste (vorlaeufig, erweiterbar):
+   • ART_NODE4 / ART_NODE16 / ART_NODE48 / ART_NODE256
+   • HOT_COMPOUND_K32 / HOT_BINODE
+   • MASSTREE_INTERNAL / MASSTREE_BORDER
+   • COCO_MACRONODE
+   • START_MULTIBYTE
+   • B2TREE_DECISION / B2TREE_SPAN
+   • SURF_LOUDS_DENSE / SURF_LOUDS_SPARSE
+   • CSS_NODE / CSB_NODEGROUP / WIDER_HANKINS
+   • PRTART_DENSEBYTE / PRTART_EXTENDEDDENSE / PRTART_SPARSEPATRICIA
+   • PRTART_REDIRECT / PRTART_CUSTOMCACHE
+
+================================================================================
+ACHSE 11 — TELEMETRY-COLLECTION-STRATEGY  (NEU 2026-05-09 — Kuehn-Erkenntnisse)
+================================================================================
+
+QUELLE  Kuehn-Mailverlauf P28 vom 2026-05-08, dokumentiert in
+        `Kuehn_Erkenntnisse_Einarbeitung_2026_05_09.txt` und
+        `comdare-cache-engine/docs/email/20260508-1900-mailverlauf_kuehn_p28_eingang.md`
+
+ORTHOGONAL ZU ACHSE 10
+   Achse 10 = WAS gemessen wird (CLU, Cache-Miss, dTLB-Miss, ...)
+   Achse 11 = WIE Telemetrie erfasst wird (Per-Node, Leaf-Only, Sampled)
+   Beide Achsen werden permutiert; ConstraintFilter sortiert inkohaerente
+   Kombinationen aus (z.B. LeafOnlyCounter + Per-Node-Branch-Mispredict).
+
+ID: TELEMETRY_PER_NODE_COUNTER
+   QUELLE        P28 Kuehn 2023 (naive Variante, Original-Paper)
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Counter pro Knoten, in jeder Traversierung aktualisiert
+   ⚠️ WARNUNG    Cache-Kohaerenz-Ping-Pong bei Multi-Core
+                 (Kuehn 2026-05-08: "Schreibzugriffe auf obere Knoten
+                  fuehren zu starkem Cacheline-Ping-Pong zwischen Kernen")
+   DECISIONTREE  CacheCoherenceDetectionTree (warnt + falls Multi-Core
+                 erkannt → SKIP fuer obere Baum-Ebenen)
+   CONCEPT-CONSTRAINT
+                 `requires NotInTopLevels<TelemetryStrategy>` fuer
+                 Multi-Core-Workloads
+
+ID: TELEMETRY_LEAFONLY_COUNTER
+   QUELLE        P28 Kuehn (NEU 2026-05-08, NICHT im Paper P28!)
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Counter NUR in Blatt-Knoten; nur 1 Counter pro Blatt wird
+                 in regulaerer Traversierung aktualisiert. Untere Ebenen
+                 haben geringere Multi-Thread-Konkurrenz auf gleichem
+                 Knoten — Cache-Kohaerenz-Overhead minimal.
+   ABHAENGIG     TELEMETRY_RETROACTIVE_AGGREGATION (vor Reordering noetig)
+
+ID: TELEMETRY_LEAFONLY_SAMPLED_COUNTER
+   QUELLE        P28 Kuehn (NEU 2026-05-08, NICHT im Paper P28!)
+   CONCEPT       TelemetryStrategy<T>, parametrisiert mit Sampling-Rate N
+   BESCHREIBUNG  Counter nur in Blaettern, nur jeder N-te Zugriff zaehlt.
+                 Konfigurierbarer Genauigkeit-vs-Overhead-Tradeoff.
+   PARAMETER N   1 (jeder Zugriff) | 100 | 1000 | 10000 (Default 1000)
+   DECISIONTREE  SamplingRateAdjustmentTree (adaptive N je nach Last)
+
+ID: TELEMETRY_RETROACTIVE_AGGREGATION
+   QUELLE        P28 Kuehn (NEU 2026-05-08)
+   CONCEPT       TelemetryAggregationStrategy<S>
+   BESCHREIBUNG  Wurzel-Up-Traversal vor Reordering; summiert Blatt-
+                 Counter zu inneren Knoten — laeuft als Single-Threaded
+                 BARRIERE.
+   ABHAENGIG     ConsolidationBarrier-Event aus Observer-Push (siehe
+                 Glossar v5 BLOCK N — Konsolidierungsbarriere)
+
+ID: TELEMETRY_PATH_READ_COUNTER
+   QUELLE        P26 Zhang FGCS 2024
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Read-Counter pro Block, dynamische Hot-Path-Detection;
+                 Path-Prefetcher + Jump-Pointer-Mechanik
+
+ID: TELEMETRY_PROBABILITY_HINTS_HEADER
+   QUELLE        PRT-ART eigen (T4 Designentscheidung)
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Quantisierte Wahrscheinlichkeits-Sketches im Page-Header,
+                 quer zur Knotenebene erfasst — Aggregation pro Page,
+                 nicht pro Node
+   PARAMETER     Bit-Layout siehe F1 (Build-Flag konfigurierbar 16/32 bit)
+
+================================================================================
+ACHSE 8 (CONCURRENCY) — ERGAENZUNG: CACHE-KOHAERENZ-COST  (NEU 2026-05-09)
+================================================================================
+
+`MemoryAccessConcurrency::Write` erhaelt eine Cost-Funktion-Komponente:
+
+   cost_cache_coherence(write_target_node) =
+      f( node_depth_from_root,
+         num_cores_sharing_node,
+         write_frequency,
+         cache_line_size )
+
+DAS WAECHST EXPONENTIELL mit num_cores_sharing_node fuer Knoten nahe der
+Wurzel — Cache-Kohaerenz-Protokoll-Roundtrips (MESI/MOESI) dominieren.
+
+DecisionLambdaTree-Konsequenz:  CoherenceAwareWriteDecisionTree
+   • SKIP Per-Node-Counter-Updates an Wurzelnaehe-Knoten unter Multi-
+     Core-Last
+   • DELAY Reordering bis ConsolidationBarrier (Single-Threaded-Phase)
+   • EXECUTE nur wenn cost_cache_coherence < threshold ODER wenn der
+     Knoten in Blattnaehe (LeafOnly-Strategie aktiv)
+
+================================================================================
+PERMUTATIONS-ZAEHLUNG (Schaetzung)
+================================================================================
+
+Naive Berechnung (alle Achsen voll kreuzen):
+   |Page|  ~30
+   |Node|  ~20
+   |Trav|  ~15
+   |VH|     5
+   |Mem|    8
+   |Allo|   8
+   |Pref|   6
+   |Conc|  ~15  (Disziplinen-Kombinationen)
+   |ISA|   ~10  (relevant pro Plattform)
+
+   30 × 20 × 15 × 5 × 8 × 8 × 6 × 15 × 10
+   = 51.840.000.000  (51 Milliarden, unrealistisch)
+
+Mit ConstraintFilter (F4):
+   - Nur Bausteine, die zusammen ein syntaktisch valides Modul ergeben
+   - Pro Page-Type passende Node-Type, Traversal, MemoryLayout
+   - Pro ISA passende Bausteine (z.B. AVX2-spezifische nur auf x86)
+   - Heuristik: < 1.000 valide Permutationen pro Plattform
+
+Diplomarbeit-Scope:
+   - Phase-1: ~100 ausgewaehlte Permutationen (Originalpaper-Reproduktion)
+   - Phase-2: + ~200 Quer-Permutationen (Bausteine-Mix; F15-Forschungsthese)
+   - Phase-3: + Custom-PRT-ART-Permutationen
+   Total: ~500 Permutationen, jeweils ueber 10 Datasets x 4 Plattformen
+        = ~20.000 Experimente
+
+================================================================================
+OFFENE PUNKTE FUER PHASE 4.B
+================================================================================
+
+P4B-1   Original-Compiler-Versionen pro Algorithmus FINAL festlegen
+        (F-EXTRA-1: Strategie A = Paper-Acknowledgement, Fallback B = GitHub-Repo)
+
+P4B-2   Concept-Interfaces (FanOutContainer, Page, Node, Traversal,
+        ValueHandleStrategy, MemoryLayout, Allocator, PrefetchStrategy,
+        ConcurrencyDiscipline) konkretisieren
+
+P4B-3   Pro Baustein einen DecisionLambdaTree-Skelett-Code anlegen
+
+P4B-4   ConstraintFilter konkretisieren (welche Achsen-Kombinationen
+        sind syntaktisch invalid?)
+
+P4B-5   Mess-Default-Hooks konkretisieren (welche Mess-Kategorie liefert
+        per default welchen Wert?)
+
+P4B-6   Permutations-Matrix-Schaetzung verfeinern (fuer Builder-Runtime-
+        Planung)
+
+================================================================================
+§ IMPLEMENTIERUNGS-PFADE  (NEU REV 1, 2026-05-08)
+================================================================================
+
+ZWECK  Quer-Referenz von Bausteine-ID zu konkretem Code-Pfad. Drei Quellen:
+
+   1. ORIGINALCODE (`ext/<paper>/<repo>/`)
+      Habich-Direktive: EXAKT KOPIERT, mit Original-Compiler kompiliert.
+      Anbindung via Adapter in `adapters/<paper>/`.
+
+   2. RE-IMPL-SKELETT (`prt_art/legacy_reimpl/<paper>/`)
+      C++23-Re-Implementation aus Pseudocode des Originalpapers.
+      Skelette liegen vor (Phase 4.B); Implementation in Phase 5+.
+
+   3. PRT-ART EIGEN (`prt_art/<komponente>/`)
+      Eigener Diplomarbeit-Algorithmus (frei modifizierbar).
+
+PFAD-WURZEL: `comdare-cache-engine/` (siehe README.md fuer Verzeichnisstruktur)
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 1 — PAGE-TYPE
+────────────────────────────────────────────────────────────────────────────────
+
+PAGE_DENSEBYTE_ART256          → ext/P01-ART/unodb/
+PAGE_SPARSE_NODE4_ART          → ext/P01-ART/unodb/
+PAGE_NODE16_ART                → ext/P01-ART/unodb/
+PAGE_NODE48_ART                → ext/P01-ART/unodb/
+PAGE_COMPOUND_HOT              → ext/P02-HOT/hot/
+PAGE_BPLUS_MASSTREE            → ext/P03-Masstree/masstree-beta/
+PAGE_MACRO_COCO                → ext/P04-CoCo-trie/CoCo-trie/         [GPL-3.0]
+PAGE_MULTIBYTE_START           → ext/P05-START/START/
+PAGE_DECISION_B2TREE           → ext/P06-B2tree/b2-tree-master/        [LICENSE: PENDING]
+PAGE_SPAN_B2TREE               → ext/P06-B2tree/b2-tree-master/        [LICENSE: PENDING]
+PAGE_METATRIEHT_WORMHOLE       → ext/P07-Wormhole/wormhole/            [GPL-3.0]
+PAGE_LOUDS_JACOBSON            → prt_art/legacy_reimpl/...             [konzeptuell, SDSL als Referenz]
+PAGE_LOUDS_DENSE_SURF          → ext/P10-SuRF/SuRF/
+PAGE_LOUDS_SPARSE_SURF         → ext/P10-SuRF/SuRF/
+PAGE_CSS_NODE                  → prt_art/legacy_reimpl/P11-CSS-tree/include/css_node_page.hpp
+PAGE_CSB_NODEGROUP             → prt_art/legacy_reimpl/P12-CSB-tree/include/csb_node_group_page.hpp
+PAGE_WIDER_HANKINS             → prt_art/legacy_reimpl/P13-Hankins/include/wider_bplus_page.hpp
+PAGE_CONFIGTABLE_SAMUEL        → prt_art/legacy_reimpl/P14-Samuel/include/config_table_bplus_page.hpp
+PAGE_ADAPTIVE_BTREESAREBACK    → ext/P20-BTreesAreBack/leanstore/
+PAGE_PREFETCH_CHEN             → prt_art/legacy_reimpl/P21-Chen-PrefetchBPlus/include/prefetch_bplus.hpp
+PAGE_FRACTAL_CHEN              → prt_art/legacy_reimpl/P22-Chen-Fractal/include/fractal_prefetch_bplus.hpp
+PAGE_PRTART_DENSEBYTE          → prt_art/pages/dense_byte/
+PAGE_PRTART_EXTENDEDDENSE      → prt_art/pages/extended_dense/
+PAGE_PRTART_SPARSEPATRICIA     → prt_art/pages/sparse_patricia/
+PAGE_PRTART_REDIRECT           → prt_art/pages/redirect/
+PAGE_PRTART_CUSTOMCACHE        → prt_art/pages/custom_cache/
+
+BART-MASTER BONUS (P06 Sub-Repo) — Cross-Algorithm-Vergleich:
+PAGE_BART_HYBRID_P06           → ext/P06-B2tree/bart-master/bart.cpp     [BART-Hybrid]
+PAGE_HATTRIE_P06               → ext/P06-B2tree/bart-master/hattrie.cpp  [HAT-Trie]
+PAGE_PBTREESTATIC_P06          → ext/P06-B2tree/bart-master/pbtreestatic.cpp
+PAGE_PBTREESTATIC_OPT_P06      → ext/P06-B2tree/bart-master/pbtreestatic_opt.cpp
+PAGE_PBTREESTATIC_TRIE_P06     → ext/P06-B2tree/bart-master/pbtreestatic_trie.cpp
+PAGE_PBTREESTATIC_ART_P06      → ext/P06-B2tree/bart-master/pbtreestaticart.cpp
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 2 — NODE-TYPE
+────────────────────────────────────────────────────────────────────────────────
+
+NODE_NODE4 / NODE16 / NODE48 / NODE256  → ext/P01-ART/unodb/
+NODE_HOT_COMPOUND_K32          → ext/P02-HOT/hot/
+NODE_HOT_BINODE                → ext/P02-HOT/hot/
+NODE_INTERNAL_MASSTREE         → ext/P03-Masstree/masstree-beta/
+NODE_BORDER_MASSTREE           → ext/P03-Masstree/masstree-beta/
+NODE_MACRONODE_COCO            → ext/P04-CoCo-trie/CoCo-trie/          [GPL-3.0]
+NODE_MULTIBYTE_START           → ext/P05-START/START/
+NODE_DECISION_B2TREE           → ext/P06-B2tree/b2-tree-master/
+NODE_SPAN_B2TREE               → ext/P06-B2tree/b2-tree-master/
+NODE_CSS_NODE                  → prt_art/legacy_reimpl/P11-CSS-tree/
+NODE_CSB_NODEGROUP             → prt_art/legacy_reimpl/P12-CSB-tree/
+NODE_WIDER_BPLUS_HANKINS       → prt_art/legacy_reimpl/P13-Hankins/
+NODE_PRTART_*                  → prt_art/nodes/
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 3 — TRAVERSAL
+────────────────────────────────────────────────────────────────────────────────
+
+TRAVERSAL_BYTEBYBYTE              → ext/P01-ART/unodb/                    [P01]
+TRAVERSAL_DISCRIMINATIVE_BITS     → ext/P02-HOT/hot/                      [P02]
+TRAVERSAL_LAYER_SLICE             → ext/P03-Masstree/masstree-beta/       [P03]
+TRAVERSAL_MACRO_NODE              → ext/P04-CoCo-trie/CoCo-trie/          [P04 GPL-3.0]
+TRAVERSAL_MULTIBYTE_SPAN          → ext/P05-START/START/                  [P05]
+TRAVERSAL_EMBEDDED_DEC_TREE       → ext/P06-B2tree/b2-tree-master/        [P06]
+TRAVERSAL_HASH_ANCHOR             → ext/P07-Wormhole/wormhole/            [P07 GPL-3.0]
+TRAVERSAL_RANK_SELECT             → ext/P10-SuRF/SuRF/                    [P10]
+TRAVERSAL_LOWER_BOUND             → ext/P10-SuRF/SuRF/                    [P10]
+TRAVERSAL_POINTER_ARITHMETIC      → prt_art/legacy_reimpl/P11-CSS-tree/   [P11]
+TRAVERSAL_OFFSET                  → prt_art/legacy_reimpl/P12-CSB-tree/   [P12]
+TRAVERSAL_PREFETCH_AHEAD          → prt_art/legacy_reimpl/P21-Chen-PrefetchBPlus/  [P21]
+TRAVERSAL_ADAPTIVE_PREFETCH_DIST  → prt_art/legacy_reimpl/P23-Khan-AdaptivePrefetch/include/adaptive_prefetch_distance.hpp [P23]
+TRAVERSAL_PRTART_HOT_PATH         → prt_art/traversal/hot_path/
+TRAVERSAL_PRTART_PREFETCH_AWARE   → prt_art/traversal/prefetch_aware/
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 4 — VALUEHANDLE
+────────────────────────────────────────────────────────────────────────────────
+
+VALUEHANDLE_INLINE             → prt_art/value_handles/inline/
+VALUEHANDLE_POINTER            → prt_art/value_handles/pointer/
+VALUEHANDLE_REDIRECT_TO_NODE   → prt_art/value_handles/redirect_to_node/
+VALUEHANDLE_REDIRECT_TO_PAGE   → prt_art/value_handles/redirect_to_page/
+VALUEHANDLE_DYNAMIC            → prt_art/value_handles/dynamic/    (mit switch_array)
+
+(Anmerkung: ValueHandle ist Sache der NODE — wird pro Node-Implementation
+ ueber Concept-Constraint angebunden, siehe Glossar v6 BLOCK G)
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 5 — MEMORY-LAYOUT
+────────────────────────────────────────────────────────────────────────────────
+
+MEMORY_CACHELINE_ALIGNED       → prt_art/memory_layout/cacheline_aligned/
+MEMORY_HUGEPAGE_2MB_ALIGNED    → prt_art/memory_layout/hugepage_2mb/   [P32-Lehre]
+MEMORY_HUGEPAGE_1GB_ALIGNED    → prt_art/memory_layout/hugepage_1gb/
+MEMORY_POINTER_FREE_CONTIG     → prt_art/legacy_reimpl/P11-CSS-tree/   [P11]
+MEMORY_SIBLING_CLUSTER         → prt_art/legacy_reimpl/P12-CSB-tree/   [P12]
+MEMORY_INLINE_SLOT             → prt_art/memory_layout/inline_slot/
+MEMORY_METADATA_HEADER         → prt_art/memory_layout/metadata_header/
+MEMORY_EMBEDDED_TREE           → ext/P06-B2tree/b2-tree-master/        [P06]
+MEMORY_PROBABILITY_LAYOUT      → prt_art/legacy_reimpl/P16-Bender-TreeLayout/include/probability_layout.hpp [P16]
+MEMORY_CACHE_OBLIVIOUS         → prt_art/legacy_reimpl/P17-Bender-CacheOblivious/include/cache_oblivious_layout.hpp [P17]
+MEMORY_LAYOUT_INVARIANT        → prt_art/legacy_reimpl/P19-Saikkonen-LayoutInvariant/include/layout_invariant.hpp [P19]
+MEMORY_MULTI_LEVEL_RELOC       → prt_art/legacy_reimpl/P18-Saikkonen-MultiLevel/include/multi_level_reloc.hpp [P18]
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 6 — ALLOCATOR
+────────────────────────────────────────────────────────────────────────────────
+
+ALLOCATOR_POOL_PER_PAGETYPE    → prt_art/allocator/pool_per_pagetype/
+ALLOCATOR_ARENA_PER_SUBTREE    → prt_art/allocator/arena_per_subtree/
+ALLOCATOR_SLAB                 → prt_art/allocator/slab/
+ALLOCATOR_HBM                  → prt_art/allocator/hbm/                [P32/P33]
+ALLOCATOR_DEFAULT_MALLOC       → prt_art/allocator/default_malloc/     (Baseline)
+ALLOCATOR_TCMALLOC             → external library (link-time)
+ALLOCATOR_MIMALLOC             → external library (link-time)
+ALLOCATOR_SNMALLOC             → external library (link-time)
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 7 — PREFETCH
+────────────────────────────────────────────────────────────────────────────────
+
+PREFETCH_NONE                  → prt_art/prefetch/none/                (Baseline)
+PREFETCH_SOFTWARE_FIXED        → prt_art/legacy_reimpl/P21-Chen-PrefetchBPlus/   [P21]
+PREFETCH_ADAPTIVE_DISTANCE     → prt_art/legacy_reimpl/P23-Khan-AdaptivePrefetch/include/adaptive_prefetch_distance.hpp [P23]
+PREFETCH_HIERARCHICAL_BUNDLE   → prt_art/legacy_reimpl/P27-Zhang-ASPLOS-Hierarchical/include/hierarchical_bundle_prefetch.hpp [P27]
+PREFETCH_FILL_BUFFER_AWARE     → ext/P25-Mahling/prefetching/          [P25 / Mikrobenchmarks]
+PREFETCH_HOT_PATH              → prt_art/legacy_reimpl/P26-Zhang-FGCS/include/path_jumppointer_prefetch.hpp [P26]
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 8 — CONCURRENCY
+────────────────────────────────────────────────────────────────────────────────
+
+CONCURRENCY_PAGE_DISCIPLINE         → prt_art/concurrency/page/
+CONCURRENCY_NODE_DISCIPLINE         → prt_art/concurrency/node/
+CONCURRENCY_ARRAY_DISCIPLINE        → prt_art/concurrency/array/
+CONCURRENCY_DATA_STRUCTURE_DISC     → prt_art/concurrency/data_structure/
+CONCURRENCY_PATH_DISCIPLINE         → prt_art/concurrency/path/
+CONCURRENCY_MEMORY_READ_DISC        → prt_art/concurrency/memory_read/
+CONCURRENCY_MEMORY_WRITE_DISC       → prt_art/concurrency/memory_write/
+CONCURRENCY_MEMORY_READWRITE_DISC   → prt_art/concurrency/memory_readwrite/
+CONCURRENCY_SIMD_THREAD_DISC        → prt_art/concurrency/simd_thread/
+CONCURRENCY_SIMD_FLOW_DISC          → prt_art/concurrency/simd_flow/
+CONCURRENCY_OLC                     → ext/P01-ART/unodb/               [P01/P08 inkl. OLC]
+CONCURRENCY_ROWEX                   → ext/P01-ART/unodb/               [P08 ROWEX-Variante]
+CONCURRENCY_RCU                     → ext/P29-RCU/userspace-rcu/       [P29 LGPL — DYNAMISCH linken!]
+CONCURRENCY_SINGLE_THREADED         → (kein Code, Default)
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 9 — ISA  (kein Code, sondern Compiler-Flags + target_clones)
+────────────────────────────────────────────────────────────────────────────────
+
+ISA_*  → cache_engine/builder/permutation_engine/  (Codegen via CMake +
+                                                    sh/bat — F-EXTRA-5
+                                                    REVIDIERT durch H6,
+                                                    NO-PYTHON-DIREKTIVE)
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 10 — MEASUREMENT  (Mess-Kategorie x Algo-Detail Matrix, F1)
+────────────────────────────────────────────────────────────────────────────────
+
+MEASUREMENT_*  → cache_engine/builder/measurement_matrix/  (constexpr-
+                                                            Spezialisierungen
+                                                            pro Zelle)
+
+(Default-Hooks + algo-spezifische Overrides; siehe Glossar v6 BLOCK AF)
+
+────────────────────────────────────────────────────────────────────────────────
+ACHSE 11 — TELEMETRY-COLLECTION-STRATEGY  (NEU 2026-05-09 — Kuehn-Erkenntnisse)
+────────────────────────────────────────────────────────────────────────────────
+
+TELEMETRY_PER_NODE_COUNTER         → prt_art/telemetry/per_node_counter/                [P28 Original — mit Cache-Kohaerenz-WARNUNG]
+TELEMETRY_LEAFONLY_COUNTER         → prt_art/telemetry/leafonly_counter/                [P28 Kuehn NEU 2026-05-08]
+TELEMETRY_LEAFONLY_SAMPLED_COUNTER → prt_art/telemetry/leafonly_sampled_counter/        [P28 Kuehn NEU 2026-05-08]
+TELEMETRY_RETROACTIVE_AGGREGATION  → prt_art/telemetry/retroactive_aggregation/         [P28 Kuehn NEU 2026-05-08]
+TELEMETRY_PATH_READ_COUNTER        → prt_art/legacy_reimpl/P26-Zhang-FGCS/include/path_jumppointer_prefetch.hpp  [P26]
+TELEMETRY_PROBABILITY_HINTS_HEADER → prt_art/telemetry/probability_hints_header/        [PRT-ART eigen, T4]
+
+DECISIONLAMBDATREES (Achse 11 begleitet):
+SamplingRateAdjustmentTree         → prt_art/telemetry/leafonly_sampled_counter/sampling_rate_tree.hpp
+CoherenceAwareWriteDecisionTree    → cache_engine/concurrency_manager/memory_access_concurrency/coherence_aware_write_tree.hpp
+CacheCoherenceDetectionTree        → cache_engine/concurrency_manager/memory_access_concurrency/coherence_detect_tree.hpp
+
+────────────────────────────────────────────────────────────────────────────────
+ZUSAETZLICHE TELEMETRIE / STUDIE
+────────────────────────────────────────────────────────────────────────────────
+
+TELEMETRY_USELESS_PREFETCH_STUDY   → prt_art/legacy_reimpl/P24-NaderanTahan/include/useless_prefetch_study.hpp [P24]
+
+(P24 ist Studien/Analyse-Paper — keine direkte Implementation, sondern
+Mess-Begleit-Logik fuer Useless-Prefetch-Detection)
+
+================================================================================
+PFAD-LEGENDE
+================================================================================
+
+   ext/<paper>/<repo>/                  → Originalcode (Habich-Direktive)
+   adapters/<paper>/                    → C++23-Adapter zur Concept-Anbindung
+   prt_art/<komponente>/                → PRT-ART Test-Algorithmus (eigen)
+   prt_art/legacy_reimpl/<paper>/       → Re-Implementation aus Originalpaper
+
+PFAD-STATUS pro Achse (REV 1):
+   - 11 Original-Repos in `ext/` (P01-P05, P07, P10, P20, P25, P29, P30)
+   - 1 zusaetzliches Original-Repo NEU 2026-05-08: P06 (b2-tree-master + bart-master)
+   - 14 Re-Impl-Skelette in `prt_art/legacy_reimpl/` (P11-P14, P16-P19,
+     P21-P24, P26, P27)
+   - PRT-ART eigene Komponenten in `prt_art/{pages, nodes, value_handles,
+     traversal, memory_layout, allocator, prefetch, concurrency}/`
+
+LIZENZ-MARKER:
+   [GPL-3.0] = Architekt-Direktive 2026-05-08: kein Hinderungsgrund
+               (modularisierte Bruchstuecke + C++23-Metaprogrammierung
+                = neues Werk)
+   [LICENSE: PENDING] = keine LICENSE-Datei, akademische Nutzung im
+                         Forschungskontext
+
+================================================================================
+ENDE BAUSTEINE-MATRIX (REV 1)
+================================================================================

@@ -1,0 +1,298 @@
+<mxfile host="app.diagrams.net" modified="2026-05-08T17:00:00.000Z" agent="phase5-entwurf-rev2" version="22.1.0">
+  <diagram name="1_Architektur_Uebersicht" id="diag-overview">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title-1" value="comdare-cache-engine — Architektur-Uebersicht (Domaenen 1-6)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle-1" value="TU Dresden Diplomarbeit · PRT-ART · Phase 5 Entwurf · 2026-05-08 · REV 2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="200" y="55" width="1100" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d1-search" value="DOMAENE 1 — SEARCH ENGINE&#xa;━━━━━━━━━━━━━━━━━━━━━━━&#xa;fan_out_engine (Tries / B-/B+-/...)&#xa;Algorithm Strategies (P01-P33 + PRT-ART)&#xa;Page / Node / Traversal / ValueHandle&#xa;als C++23 Concepts mit requires&#xa;━━━━━━━━━━━━━━━━━━━━━━━&#xa;std::map-API (vollstaendig C++23)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="320" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d2-cache" value="DOMAENE 2 — CACHE ENGINE  «KERNBEITRAG»&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Schicht A: CacheEngineBuilder  (= main.cpp)&#xa;Schicht B: CacheEngine  «Heap-Singleton im Builder-Prozess»&#xa;ConcurrencyManager  «Sub-Singleton, 8+ Disziplinen»&#xa;DecisionLambdaTrees PRO BAUSTEIN  (F-EXTRA-6)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Live Modell der CPU — Observer + Visitor + Empfehlung" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#BF360C;strokeWidth=4;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="540" y="120" width="440" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d3-meas" value="DOMAENE 3 — MEASUREMENT&#xa;━━━━━━━━━━━━━━━━━━━━━&#xa;In-Memory MeasurementBuffer  «KEINE DB!»&#xa;perf / PAPI / Intel Advisor Wrapper&#xa;HdrHistogram (Tail-Latenz)&#xa;Builder-Run + Single-Run + Mikrobenchmarks&#xa;━━━━━━━━━━━━━━━━━━━━━&#xa;Continuous (Builder) / Sampled (Production)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E7D32;strokeColor=#1B5E20;strokeWidth=3;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="350" width="320" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d4-hwisa" value="DOMAENE 4 — HARDWARE / ISA&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;ISA-Dispatch  (target_clones)&#xa;scalar / x86_avx2 / x86_avx512 / arm_neon / arm_sve2&#xa;Hybrid-Core Pinning  (P/E-Cores)&#xa;Memory-Type-Detector  (DRAM / HBM / NV-RAM)&#xa;Hugepages  (2MB / 1GB)&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;Compile-Time XOR Runtime ISA-Detection  (F9)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#00838F;strokeColor=#006064;strokeWidth=3;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="540" y="350" width="440" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d5-engine" value="DOMAENE 5 — ENGINE-CHOICE&#xa;━━━━━━━━━━━━━━━━━━━━━&#xa;Compile-Time Template-Wahl:&#xa;StaticEngine&lt;Algo&gt;  vs  CacheEngine&lt;Algo&gt;&#xa;━━━━━━━━━━━━━━━━━━━━━&#xa;Static = Originalcode + Adapter, KEINE Optimierung&#xa;Cache = aktive Optimierung mit Builder + Singleton" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C62828;strokeColor=#B71C1C;strokeWidth=3;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="580" width="320" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d6-pub" value="DOMAENE 6 — PERSISTENCE &amp; PUBLICATION&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Disk-Serializer (Binary/CSV-Dump aus In-Memory-Buffer)&#xa;LaTeX-Renderer (tabular + pgfplots + booktabs + siunitx)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Output: Anhang fuer Diplomarbeit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AD1457;strokeColor=#880E4F;strokeWidth=3;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="540" y="580" width="440" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d-direktive" value="HABICH-DIREKTIVE&#xa;━━━━━━━━━━━━━━━━&#xa;Originalcode (P01-P33) wird&#xa;EXAKT KOPIERT in ext/ ablegt.&#xa;Anbindung NUR ueber Adapter.&#xa;━━━━━━━━━━━━━━━━&#xa;Hauptcompiler IMMER C++23.&#xa;Bausteine mit Original-Compiler&#xa;kompiliert + statisch gelinkt." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#283593;strokeColor=#1A237E;strokeWidth=3;align=left;verticalAlign=top;fontSize=11;fontColor=#FFFFFF;fontStyle=2;spacingTop=10;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="120" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d-f15" value="FORSCHUNGS-THESE F15&#xa;━━━━━━━━━━━━━━━━━━━&#xa;BAUSTEINE-QUER-PERMUTATION:&#xa;jeder Baustein gegen jeden anderen&#xa;Baustein aus jedem Algorithmus&#xa;austauschbar.&#xa;━━━━━━━━━━━━━━━━━━━&#xa;CacheEngine-Universalitaet im&#xa;allgemeinen Fall zeigen." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A825;strokeColor=#F57F17;strokeWidth=4;align=left;verticalAlign=top;fontSize=12;fontColor=#000000;fontStyle=1;spacingTop=10;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="350" width="280" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="d-direktive2" value="ARCHITEKT-DIREKTIVE 2026-05-08&#xa;━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Modularisierte Bruchstuecke +&#xa;C++23-Metaprogrammierung&#xa;= NEUES Werk (auch wenn&#xa;'inspiriert' von GPL-3.0).&#xa;━━━━━━━━━━━━━━━━━━━━━━━━&#xa;CacheEngine LEBT IM Builder&#xa;als Heap-Singleton (F12-K)." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6A1B9A;strokeColor=#4A148C;strokeWidth=3;align=left;verticalAlign=top;fontSize=11;fontColor=#FFFFFF;fontStyle=2;spacingTop=10;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="580" width="280" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-d1-d2-observer" value="OBSERVER&#10;Push synchron + DecisionLambdaTree-Filter&#10;EXECUTE / DELAY / SKIP" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;strokeColor=#0D47A1;strokeWidth=4;fontSize=11;fontStyle=1;fontColor=#0D47A1;" edge="1" parent="1" source="d1-search" target="d2-cache">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-d2-d1-visitor" value="VISITOR&#10;Mid-Granularitaet&#10;visit(IPage*) / visit(INode*)" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;strokeColor=#BF360C;strokeWidth=4;fontSize=11;fontStyle=1;fontColor=#BF360C;" edge="1" parent="1" source="d2-cache" target="d1-search">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-d2-d3" value="schreibt Mess-Records" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#1B5E20;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#1B5E20;" edge="1" parent="1" source="d2-cache" target="d3-meas">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-d2-d4" value="nutzt LiveCpuModel" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#006064;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#006064;" edge="1" parent="1" source="d2-cache" target="d4-hwisa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-d3-d6" value="Disk-Dump nach Lauf-Ende" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#880E4F;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#880E4F;" edge="1" parent="1" source="d3-meas" target="d6-pub">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-d5-d1" value="waehlt Algo + Engine" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#B71C1C;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#B71C1C;" edge="1" parent="1" source="d5-engine" target="d1-search">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-d5-d2" value="aktiviert CacheEngine" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#B71C1C;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#B71C1C;" edge="1" parent="1" source="d5-engine" target="d2-cache">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend" value="LEGENDE&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;━━━━━━━━ Synchroner Observer-Push (Domaene 1 → 2) mit DecisionLambdaTree-Filter (EXECUTE / DELAY / SKIP)&#xa;━━━━━━━━ Visitor-Besuch (Domaene 2 → 1, Mid-Granularitaet: Page + Node, respektiert Habich-Direktive)&#xa;┄┄┄┄┄┄┄┄ Nutzt-/Schreibt-Beziehung (Domaene 2 → 3/4, 3 → 6, 5 → 1/2)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Knallige Farb-Codierung: Blau Search · Orange Cache (Kern!) · Gruen Mess · Tuerkis HW · Rot Engine-Choice · Magenta Pub · Indigo Habich · Gelb F15 · Lila Architekt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#424242;strokeWidth=2;align=left;verticalAlign=top;fontSize=11;fontColor=#000000;spacingTop=8;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="800" width="1210" height="140" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="2_CacheEngine_Singleton_Hierarchie" id="diag-cache-engine">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title-2" value="Domaene 2 — Cache Engine Detail (F12-K Heap-Singleton-Hierarchie im Builder-Prozess)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1400" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="proc-frame" value="CacheEngineBuilder = main.cpp Orchestrator (PROZESS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;strokeWidth=4;align=center;verticalAlign=top;fontSize=15;fontColor=#BF360C;fontStyle=1;dashed=0;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="1480" height="780" as="geometry" />
+        </mxCell>
+
+        <mxCell id="heap-frame" value="HEAP-Region des Builder-Prozesses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#F57C00;strokeWidth=3;align=center;verticalAlign=top;fontSize=12;fontColor=#E65100;fontStyle=2;dashed=8 4;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="100" y="240" width="1080" height="500" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-builder" value="&lt;b&gt;CacheEngineBuilder&lt;/b&gt;  «Orchestrator»&lt;br&gt;&lt;i&gt;= main.cpp Entry Point&lt;/i&gt;&lt;hr&gt;- mode: { COMPILE_TIME | RUNTIME }&lt;br&gt;- platform_probe: PlatformProbe&lt;br&gt;- module_loader: ModuleLoader&lt;br&gt;- in_memory_buffer: InMemoryMeasurementBuffer&lt;hr&gt;+ run(BuilderConfig) -&gt; BuilderReport&lt;br&gt;+ scan_modules() -&gt; vector&amp;lt;PermutationFlags&amp;gt;&lt;br&gt;+ build_missing_modules(perm_ids)&lt;br&gt;+ run_experiment_loop()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#BF360C;strokeWidth=3;align=left;verticalAlign=top;fontSize=11;fontColor=#FFFFFF;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="120" y="120" width="340" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-runtime" value="&lt;b&gt;CacheEngine&lt;/b&gt;  «Heap-Singleton»&lt;br&gt;&lt;i&gt;F12-K: lebt IM Builder-Prozess als globale Variable&lt;/i&gt;&lt;hr&gt;static unique_ptr&amp;lt;CacheEngine&amp;gt; instance_&lt;br&gt;static once_flag once_&lt;hr&gt;- live_cpu_model: LiveCpuModel&lt;br&gt;- visitor: AlgorithmVisitor&lt;br&gt;- observers: ObserverRegistry&lt;br&gt;- compile_time_knowledge: CompileTimeKnowledge&lt;br&gt;- telemetry_spool: TelemetrySpool&lt;hr&gt;+ instance() -&gt; CacheEngine&amp;amp;&lt;br&gt;+ register_algorithm(IAlgorithmStrategy*)&lt;br&gt;+ on_observation(ObservationEvent)  &lt;i&gt;Push synchron&lt;/i&gt;&lt;br&gt;+ visit(IAlgorithmStrategy*)  &lt;i&gt;Mid-Visitor&lt;/i&gt;&lt;br&gt;+ recommend_strategy(Context)&lt;br&gt;+ reset()  &lt;i&gt;zwischen Experimenten — Instanz bleibt&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FB8C00;strokeColor=#E65100;strokeWidth=3;align=left;verticalAlign=top;fontSize=11;fontColor=#FFFFFF;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="500" y="280" width="420" height="280" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-cm" value="&lt;b&gt;ConcurrencyManager&lt;/b&gt;  «Sub-Singleton»&lt;br&gt;&lt;i&gt;Heap-Singleton in CacheEngine&lt;/i&gt;&lt;hr&gt;Disziplin-Klassen (8+):&lt;br&gt;• PageConcurrency&lt;br&gt;• NodeConcurrency&lt;br&gt;• ArrayConcurrency&lt;br&gt;• DataStructureConcurrency&lt;br&gt;• PathConcurrency&lt;br&gt;• MemoryAccessConcurrency  (R/W/RW)&lt;br&gt;• SimdThreadConcurrency&lt;br&gt;• SimdFlowConcurrency&lt;hr&gt;Mechaniken (orthogonal):&lt;br&gt;• OLC  [P08]&lt;br&gt;• ROWEX  [P08]&lt;br&gt;• RCU  [P29 LGPL — dynamisch linken!]&lt;hr&gt;+ instance() -&gt; ConcurrencyManager&amp;amp;&lt;br&gt;+ acquire(DisciplineKind, Context)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFA726;strokeColor=#FB8C00;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#000000;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="960" y="280" width="200" height="430" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-perm" value="&lt;b&gt;PermutationEngine&lt;/b&gt;&lt;hr&gt;9 Bausteine-Banken (uint64_t):&lt;br&gt;page / node / traversal / value_handle&lt;br&gt;memory_layout / allocator / prefetch&lt;br&gt;concurrency / isa&lt;hr&gt;- constraint_filter&lt;br&gt;- target_isa: ISA-Maske (CMake compile-time, F4)&lt;hr&gt;+ enumerate() -&gt; range&amp;lt;PermutationFlags&amp;gt;&lt;br&gt;&lt;i&gt;CPUID-aehnliches Flag-System (F10-K)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#FFFFFF;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="120" y="380" width="340" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-loader" value="&lt;b&gt;ModuleLoader&lt;/b&gt;&lt;hr&gt;dlopen / LoadLibrary Wrapper&lt;hr&gt;+ load(path: filesystem::path) -&gt; Handle&lt;br&gt;+ extract_strategy(Handle) -&gt; IAlgorithmStrategy*&lt;br&gt;+ unload(Handle)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#FFFFFF;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="120" y="600" width="340" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-buffer" value="&lt;b&gt;InMemoryMeasurementBuffer&lt;/b&gt;&lt;br&gt;&lt;i&gt;F5: KEINE externe DB!&lt;/i&gt;&lt;hr&gt;- arena: pmr::monotonic_buffer_resource&lt;br&gt;- records: vector&amp;lt;MeasurementRecord&amp;gt; (per-thread)&lt;hr&gt;+ append(record) noexcept  &lt;i&gt;append-only, lock-free&lt;/i&gt;&lt;br&gt;+ serialize_to_disk(path)  &lt;i&gt;am Lauf-Ende&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#2E7D32;strokeColor=#1B5E20;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#FFFFFF;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="500" y="600" width="420" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-trees" value="&lt;b&gt;DecisionLambdaTree&amp;lt;EventT&amp;gt;&lt;/b&gt;&lt;br&gt;&lt;i&gt;F-EXTRA-6: PRO BAUSTEIN, kein globaler Default!&lt;/i&gt;&lt;hr&gt;Decision = { EXECUTE, DELAY, SKIP }&lt;br&gt;Trees pro Baustein:&lt;br&gt;• PageRelocationTree (ART_Node256-Baustein bringt mit)&lt;br&gt;• PageTypeChangeTree&lt;br&gt;• PrefetchAdjustmentTree (Khan-Baustein bringt mit)&lt;br&gt;• HotPathRecognitionTree (Kuehn-Baustein bringt mit)&lt;br&gt;• AllocatorRebalanceTree&lt;br&gt;• ConcurrencyDisciplineSwitchTree&lt;br&gt;• PageTypeSelectionTree&lt;br&gt;• LayoutInvariantMaintenanceTree&lt;hr&gt;+ evaluate(EventT&amp;amp;&amp;amp;, Context&amp;amp;) noexcept -&gt; Decision" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFB300;strokeColor=#FF8F00;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#000000;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="120" width="320" height="240" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-meas-matrix" value="&lt;b&gt;Measure&amp;lt;Category, Detail&amp;gt;&lt;/b&gt;&lt;br&gt;&lt;i&gt;F1: Mess-Kategorie x Algorithmus-Detail Matrix&lt;/i&gt;&lt;br&gt;&lt;i&gt;constexpr Spezialisierungen — compile-time inlined&lt;/i&gt;&lt;hr&gt;Default-Hook + algo-spezifische Overrides (F-EXTRA-7)&lt;br&gt;requires HasMeasurement&amp;lt;Algo, C&amp;gt;&lt;hr&gt;Beispiele:&lt;br&gt;Measure&amp;lt;CLU, ART_Node256&amp;gt;::at_node_visit(...)&lt;br&gt;Measure&amp;lt;dTLB, HOT_CompoundNode&amp;gt;::at_node_visit(...)&lt;br&gt;Measure&amp;lt;BranchMiss, Masstree_BorderNode&amp;gt;::at_lookup_end(...)&lt;hr&gt;ZERO-OVERHEAD bei nicht-aktiver Messung" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#43A047;strokeColor=#2E7D32;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#FFFFFF;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="380" width="320" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cls-modules" value="&lt;b&gt;ABI-stabile Such-Algorithmus-Module&lt;/b&gt;&lt;br&gt;&lt;i&gt;C++23 Modules, dynamisch geladen&lt;/i&gt;&lt;hr&gt;Pro Permutation eine .so / .dll / .dylib&lt;br&gt;Build via Python-Codegen + CMake (F-EXTRA-5)&lt;br&gt;Compiler-Layering F-EXTRA-1:&lt;br&gt;Schale (C++23) + Bausteine (Original-Compiler) → static link&lt;hr&gt;binden CacheEngine::instance() als Ressource&lt;br&gt;rufen on_observation() im Hot-Path" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#FFFFFF;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="620" width="320" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-builder-runtime" value="kreiert Singleton" style="endArrow=diamondThin;endFill=1;html=1;rounded=0;startSize=14;endSize=14;strokeColor=#000000;strokeWidth=3;fontSize=11;fontStyle=1;fontColor=#000000;" edge="1" parent="1" source="cls-builder" target="cls-runtime">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-runtime-cm" value="haelt Sub-Singleton" style="endArrow=diamondThin;endFill=1;html=1;rounded=0;startSize=14;endSize=14;strokeColor=#000000;strokeWidth=3;fontSize=11;fontStyle=1;fontColor=#000000;" edge="1" parent="1" source="cls-runtime" target="cls-cm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-builder-perm" value="" style="endArrow=open;html=1;rounded=0;strokeColor=#0D47A1;strokeWidth=2;" edge="1" parent="1" source="cls-builder" target="cls-perm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-builder-loader" value="" style="endArrow=open;html=1;rounded=0;strokeColor=#0D47A1;strokeWidth=2;" edge="1" parent="1" source="cls-builder" target="cls-loader">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-builder-buffer" value="" style="endArrow=open;html=1;rounded=0;strokeColor=#1B5E20;strokeWidth=2;" edge="1" parent="1" source="cls-builder" target="cls-buffer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-runtime-trees" value="evaluiert" style="endArrow=open;html=1;rounded=0;strokeColor=#FF8F00;strokeWidth=3;fontSize=11;fontStyle=1;fontColor=#FF8F00;" edge="1" parent="1" source="cls-runtime" target="cls-trees">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-runtime-meas" value="ruft (compile-time inlined)" style="endArrow=open;html=1;rounded=0;dashed=1;strokeColor=#1B5E20;strokeWidth=2;fontSize=11;fontStyle=1;fontColor=#1B5E20;" edge="1" parent="1" source="cls-runtime" target="cls-meas-matrix">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-loader-modules" value="laedt dynamisch" style="endArrow=open;html=1;rounded=0;strokeColor=#0D47A1;strokeWidth=4;fontSize=11;fontStyle=1;fontColor=#0D47A1;" edge="1" parent="1" source="cls-loader" target="cls-modules">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-modules-runtime" value="bindet als Ressource&#10;ruft on_observation()" style="endArrow=classic;dashed=1;html=1;rounded=0;strokeColor=#0D47A1;strokeWidth=4;fontSize=11;fontStyle=1;fontColor=#0D47A1;" edge="1" parent="1" source="cls-modules" target="cls-runtime">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lifecycle" value="EXPERIMENT-LIFECYCLE (F12-K Domaenenmodell v3 §4.1)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;1. PLATFORM-PROBE  (CPU-Features, ISA, Cache-Topo, Memory-Topo, verfuegbare Original-Compiler?)&#xa;2. MODE-DETECTION  (COMPILE_TIME XOR RUNTIME — gegenseitig ausschliessend, F9)&#xa;3. MODULE-PERMUTATIONS-SCAN  (welche pre-built? Liste vorhandener perm_ids)&#xa;4. ADHOC BUILD  (falls fehlend: Python-Codegen → CMake → Original-Compiler je Baustein → static link → .so)&#xa;5. PRO MODUL EXPERIMENT-LOOP:&#xa;   reset() → load() → Cache-Warmup (modul-spezifisch!) → Dataset-Prep → Experiment&#xa;   → on_observation() Push (DecisionTrees: EXECUTE/DELAY/SKIP) → spool() → unload()&#xa;6. SERIALISIERUNG  (InMemoryBuffer → Disk-Dump Binary/CSV)&#xa;7. LATEX-RENDERER  (Anhang fuer Diplomarbeit: tabular + pgfplots + booktabs + siunitx)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#424242;strokeWidth=2;align=left;verticalAlign=top;fontSize=11;fontColor=#000000;spacingTop=8;spacingLeft=12;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="880" width="1440" height="180" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="3_Bausteine_QuerPermutation_F15" id="diag-f15">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title-3" value="Forschungs-These F15 — Bausteine-Quer-Permutation" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle-3" value="Universalitaet der Cache-Engine ueber alle Bausteine-Achsen — nicht nur ganze Algorithmen" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="100" y="55" width="1400" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-page" value="ACHSE 1&#xa;PAGE-TYPE&#xa;━━━━━━━━&#xa;DenseByte_ART256&#xa;Compound_HOT&#xa;BPlus_Masstree&#xa;Macro_CoCo [GPL]&#xa;Multibyte_START&#xa;Decision_B²tree&#xa;Span_B²tree&#xa;MetaTrieHT_Wormhole&#xa;LOUDS_Dense_SuRF&#xa;LOUDS_Sparse_SuRF&#xa;CSS_Node&#xa;CSB_NodeGroup&#xa;Wider_Hankins&#xa;Adaptive_BTreesAreBack&#xa;PRTART_DenseByte&#xa;PRTART_Redirect&#xa;..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="170" height="290" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-node" value="ACHSE 2&#xa;NODE-TYPE&#xa;━━━━━━━&#xa;Node4 / 16 / 48 / 256&#xa;Compound_K32_HOT&#xa;BiNode_HOT&#xa;Internal_Masstree&#xa;Border_Masstree&#xa;Macronode_CoCo&#xa;Multibyte_START&#xa;Decision_B²tree&#xa;Span_B²tree&#xa;CSS_Node&#xa;CSB_NodeGroup&#xa;Wider_BPlus&#xa;PRTART_*Node" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="250" y="100" width="170" height="290" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-trav" value="ACHSE 3&#xa;TRAVERSAL&#xa;━━━━━━━━&#xa;ByteByByte_ART&#xa;DiscBits_HOT&#xa;LayerSlice_Masstree&#xa;MacroNode_CoCo&#xa;MultibyteSpan_START&#xa;EmbDecTree_B²tree&#xa;HashAnchor_Wormhole&#xa;RankSelect_LOUDS&#xa;LowerBound_SuRF&#xa;PtrArith_CSS&#xa;Offset_CSB&#xa;PrefetchAhead_Chen&#xa;AdaptDist_Khan&#xa;PRTART_HotPath&#xa;PRTART_PrefetchAware" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="440" y="100" width="170" height="290" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-vh" value="ACHSE 4&#xa;VALUE-HANDLE&#xa;━━━━━━━━━━&#xa;Inline&#xa;Pointer&#xa;Redirect_To_Node&#xa;Redirect_To_Page&#xa;Dynamic&#xa;(switch_array&#xa; pro Algorithmus&#xa; begrenzt)&#xa;━━━━━━━━━━&#xa;Sache der NODE&#xa;(F8 std::variant +&#xa; Concept-Constraint)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="630" y="100" width="170" height="290" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-mem" value="ACHSE 5&#xa;MEMORY-LAYOUT&#xa;━━━━━━━━━━━&#xa;CachelineAligned&#xa;Hugepage_2MB&#xa;Hugepage_1GB&#xa;PointerFreeContig&#xa;SiblingCluster&#xa;InlineSlot&#xa;MetadataHeader&#xa;EmbeddedTree&#xa;ProbabilityLayout&#xa;CacheOblivious&#xa;LayoutInvariant&#xa;MultiLevelReloc" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="820" y="100" width="170" height="290" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-alloc" value="ACHSE 6&#xa;ALLOCATOR&#xa;━━━━━━━━&#xa;PoolPerPageType&#xa;ArenaPerSubtree&#xa;Slab&#xa;HBM&#xa;DefaultMalloc&#xa;TcmallocAdapter&#xa;MimallocAdapter&#xa;SnmallocAdapter" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="100" width="170" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-pref" value="ACHSE 7&#xa;PREFETCH&#xa;━━━━━━━&#xa;None&#xa;SoftwareFixed_Chen&#xa;AdaptiveDist_Khan&#xa;HierBundle_Zhang&#xa;FillBufferAware_Mahling&#xa;HotPath_Zhang" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="100" width="170" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-conc" value="ACHSE 8&#xa;CONCURRENCY&#xa;━━━━━━━━━━&#xa;Disziplinen:&#xa;Page / Node / Array&#xa;DataStructure / Path&#xa;Memory R / W / RW&#xa;SimdThread / SimdFlow&#xa;━━━━━━━━━━&#xa;Mechaniken:&#xa;OLC&#xa;ROWEX&#xa;RCU (LGPL, dyn.)&#xa;SingleThreaded" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="320" width="170" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="axis-isa" value="ACHSE 9&#xa;ISA&#xa;━━━━━━&#xa;scalar (x86/arm/riscv)&#xa;x86_avx2&#xa;x86_avx512&#xa;x86_bmi1 / bmi2&#xa;arm_neon&#xa;arm_sve / sve2&#xa;riscv_v" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=3;align=left;verticalAlign=top;fontSize=9;fontColor=#FFFFFF;fontStyle=1;spacingTop=6;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="320" width="170" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="example-trad" value="TRADITIONELLE STUDIE  (vor PRT-ART)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Vergleich GANZER Algorithmen:&#xa;ART vs HOT vs Masstree vs B²-tree vs ...&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Pro Algorithmus EINE feste Kombination&#xa;auf alle 9 Achsen — nicht zerlegbar." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C62828;strokeColor=#B71C1C;strokeWidth=3;align=left;verticalAlign=top;fontSize=11;fontColor=#FFFFFF;fontStyle=1;spacingTop=8;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="450" width="450" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="example-prt" value="PRT-ART F15 — BAUSTEINE-QUER-PERMUTATION&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Beispiel-Permutation A (Originalpaper-Reproduktion):&#xa;DenseByte_ART256 + Node256 + ByteByByte + Inline + CachelineAligned&#xa;+ PoolPerPageType + None + OLC + AVX2&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Beispiel-Permutation B (Quer-Mix):&#xa;Compound_HOT + Internal_Masstree + RankSelect_LOUDS + Dynamic&#xa;+ PointerFreeContig_CSS + ArenaPerSubtree&#xa;+ AdaptDist_Khan + RCU + AVX-512" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E7D32;strokeColor=#1B5E20;strokeWidth=3;align=left;verticalAlign=top;fontSize=11;fontColor=#FFFFFF;fontStyle=1;spacingTop=8;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="540" y="450" width="830" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="thesis" value="ZENTRALE FORSCHUNGS-AUSSAGE F15&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;'Wir muessen die Algorithmen IN BAUSTEINE NACH DEM DOMAENENMODELL zerlegen, sodass jeder Algorithmus-Baustein EINZELN testweise gegen einen anderen aus JEDEM&#xa;BELIEBIGEN anderen Algorithmus ausgetauscht werden kann. Es geht um die Untersuchung jedes einzelnen Prinzips gegen jedes Andere&#xa;unter Verwendung der aktiven Cache Engine.'  — Architekt-Direktive 2026-05-04&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Permutations-Identifier = Flag-System nach CPUID-Vorbild (F10-K, 9 uint64-Banken)&#xa;Permutationsraum (gefiltert) ≈ 500 Modul-Permutationen × 144 Test-Traces × 4 Plattformen = ≈ 20.000 Experimente" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9A825;strokeColor=#F57F17;strokeWidth=4;align=left;verticalAlign=top;fontSize=12;fontColor=#000000;spacingTop=10;spacingLeft=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="660" width="1310" height="220" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cache-engine-role" value="ROLLE DER CACHE-ENGINE BEIM F15-BEWEIS&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Visitor + Observer ueber alle gewaehlten Bausteine.&#xa;DecisionLambdaTrees PRO BAUSTEIN (kein globaler Default) — Komposition pro Algorithmus.&#xa;Empfehlung aus CompileTimeKnowledge (Builder-Erfahrung pro Plattform).&#xa;Ergebnis: Cache-Engine wirkt UNIVERSELL auf jede Bausteine-Kombination —&#xa;das ist der Diplomarbeits-Beweis der Verallgemeinerbarkeit." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6A1B9A;strokeColor=#4A148C;strokeWidth=3;align=left;verticalAlign=top;fontSize=11;fontColor=#FFFFFF;fontStyle=1;spacingTop=8;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="900" width="1310" height="140" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="4_Compiler_Layering_FExtra1" id="diag-compiler">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title-4" value="Compiler-Layering (F-EXTRA-1) — Habich-Direktive: Originalcode mit Original-Compiler" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle-4" value="Pro Modul-Permutation: C++23-Schale + Original-Compiler-Bausteine → statisches Linken → ABI-stabiles Modul" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="100" y="55" width="1300" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="schale" value="SCHALE  «Modul-Wrapper»&#xa;━━━━━━━━━━━━━━━━━━━━&#xa;Compiler:  C++23  (GCC 14+, Clang 17+, MSVC 19.39+)&#xa;━━━━━━━━━━━━━━━━━━━━&#xa;Inhalt:&#xa;• Adapter (uebersetzt Original-API → Concepts)&#xa;• Concept-Bindungen (FanOutContainer, Page, Node,&#xa;   Traversal, ValueHandleStrategy, MemoryLayout)&#xa;• ABI-stabiles Modul-Interface (export module ...)&#xa;• Cache-Warmup-Logik (modul-spezifisch, F12-K)&#xa;• Mess-Hooks (constexpr Measure&amp;lt;C, D&amp;gt;, F1)&#xa;━━━━━━━━━━━━━━━━━━━━&#xa;Sichtbarkeit:  EXTERN (Modul-API)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=4;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="500" height="240" as="geometry" />
+        </mxCell>
+
+        <mxCell id="bausteine" value="BAUSTEINE  «Originalcode-Internals»&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Compiler:  je Algorithmus dessen Original-Compiler&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Beispiele:&#xa;• ART (P01) → GCC 4.7+&#xa;• HOT (P02) → GCC 5+ (BMI2 / AVX2)&#xa;• Masstree (P03) → GCC 4.6+&#xa;• CoCo-Trie (P04) → GCC 11+ (C++20)&#xa;• START (P05) → GCC 7+&#xa;• B²-tree (P06) → GCC 9+&#xa;• Wormhole (P07) → GCC 7+&#xa;• SuRF (P10) → GCC 5+&#xa;• LeanStore (P20) → GCC 13+&#xa;• Mahling Prefetch (P25) → GCC 11+&#xa;• userspace-rcu (P29) → GCC 4+ (LGPL — dynamisch!)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Inhalt:  EXAKTER Originalcode (Habich-Direktive)&#xa;Ausgabe:  .o (Object-File) oder .a (statische Library)&#xa;Sichtbarkeit:  INTERN (kein externes Symbol)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#283593;strokeColor=#1A237E;strokeWidth=4;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="120" width="500" height="320" as="geometry" />
+        </mxCell>
+
+        <mxCell id="static-link" value="STATIC LINKING  →  ABI-stabiles Modul&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Linker:  Hauptcompiler (C++23-Toolchain)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Eingabe:&#xa;• Schale-.o  (C++23, extern visible)&#xa;• Bausteine-.o / .a  (Original-Compiler, intern visible)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Ausgabe:&#xa;• .so  (Linux)&#xa;• .dll  (Windows)&#xa;• .dylib  (macOS)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;Pfad: build/modules/&amp;lt;perm_id&amp;gt;/&amp;lt;perm_id&amp;gt;.module.so&#xa;Identifier:  Flag-System (CPUID-Stil, F10-K)&#xa;PAGE_DENSEBYTE_ART256.NODE_NODE256.TRAVERSAL_BYTEBYBYTE&#xa;.VALUEHANDLE_INLINE.MEMORY_CACHELINE_ALIGNED&#xa;.ALLOCATOR_POOL_PER_PAGETYPE.PREFETCH_NONE&#xa;.CONCURRENCY_OLC.ISA_X86_AVX2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E65100;strokeColor=#BF360C;strokeWidth=4;align=left;verticalAlign=top;fontSize=12;fontColor=#FFFFFF;fontStyle=1;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="500" width="1100" height="300" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-schale-link" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeColor=#0D47A1;strokeWidth=4;" edge="1" parent="1" source="schale" target="static-link">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr-baust-link" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;strokeColor=#1A237E;strokeWidth=4;" edge="1" parent="1" source="bausteine" target="static-link">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cmake-pipeline" value="PIPELINE (F-EXTRA-5: Python-Codegen → CMake)&#xa;━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&#xa;1.  tools/permutation_codegen/codegen.py  liest Bausteine_Matrix + Flag_System&#xa;2.  Enumeriert gueltige Permutationen (ConstraintFilter via CMake compile-time, F4)&#xa;3.  Pro Permutation:  Schalen-.cpp/.ccm + external_objects.cmake generiert&#xa;4.  CMake parallelisiert die Hunderten add_library()-Targets&#xa;5.  Pre-Build verifiziert pro Algorithmus die Verfuegbarkeit des Original-Compilers&#xa;6.  Output:  build/modules/&amp;lt;perm_id&amp;gt;/  +  build/generated/permutations.cmake" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#424242;strokeWidth=2;align=left;verticalAlign=top;fontSize=11;fontColor=#000000;fontStyle=2;spacingTop=10;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="100" y="820" width="1300" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="hint-architekt" value="ARCHITEKT-DIREKTIVE 2026-05-08&#xa;━━━━━━━━━━━━━━━━━━━━━&#xa;'Wir verwenden ohnehin nur&#xa;modularisierte Bruchstuecke des&#xa;Original codes, was technisch&#xa;gesehen neuen Code erzeugt.&#xa;Unser Code wird C++23 und damit&#xa;ist durch die Metaprogrammierung&#xa;alles neu, auch wenn wir uns&#xa;inspirieren lassen.'&#xa;━━━━━━━━━━━━━━━━━━━━━&#xa;→ GPL-3.0 / LGPL kein&#xa;Hinderungsgrund&#xa;(P04, P07, P29)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6A1B9A;strokeColor=#4A148C;strokeWidth=3;align=left;verticalAlign=top;fontSize=10;fontColor=#FFFFFF;fontStyle=2;spacingTop=8;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="120" width="220" height="320" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

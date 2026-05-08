@@ -1,0 +1,623 @@
+================================================================================
+DOMAENENMODELL — PRT-ART (Predix-Trie-ART)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D
+Stand: 2026-05-04 · ersetzt keine Vorgaengerversion (NEU)
+Vorbereitet fuer: Phase 5 (drawio UML — gesperrt bis Nutzer-GO)
+================================================================================
+
+QUELLEN-BASIS
+   - Begriffsglossar_v3_FINAL.txt (Phase 3.C, mit Belegen P01-P33)
+   - Cross_Paper_Konzeptmatrix.txt (Phase 3.B Konsolidierung)
+   - 33 Paper-Tieflektuere-Notizen (`_review/papers/P01-P33-*.md`)
+   - 6 Termin-Konsolidierungen (`_review/T1- bis T6-konsolidierung.md`)
+   - PRT-ART Termine 1-6 (Master-Designentscheidungen eingefroren)
+
+DESIGN-LEITLINIE: MAXIMALE MODULARITAET (NUTZER-DIREKTIVE)
+   Niemals monolithisch. Jeder Baustein in einem eigenen Modul mit klarer
+   Schnittstelle. Ziel: Austauschbarkeit, Testbarkeit, Erweiterbarkeit.
+
+================================================================================
+1. DOMAENEN-UEBERBLICK
+================================================================================
+
+Das System gliedert sich in 4 Domaenen mit strikt einseitigen Abhaengigkeiten:
+
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ DOMAENE 1 — SUCH-ALGORITHMEN                                    │
+   │ Trie-Struktur, Page-Familie, Lookup-Operationen, Concurrency    │
+   └─────────────────────────────────────────────────────────────────┘
+              │  ruft auf
+              ▼
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ DOMAENE 2 — CACHE-ENGINE  (KERNBEITRAG der Diplomarbeit)        │
+   │ Page-Type-Wahl, Prefetch, Relocation, Allocator, Telemetrie     │
+   └─────────────────────────────────────────────────────────────────┘
+              │  nutzt          │  nutzt
+              ▼                 ▼
+   ┌──────────────────┐  ┌─────────────────────────────────────────┐
+   │ DOMAENE 3        │  │ DOMAENE 4                               │
+   │ MESSUNG          │  │ HARDWARE / ISA                          │
+   │ perf/PAPI/...    │  │ ISA-Dispatch, Hybrid-Core, Memory-Type  │
+   └──────────────────┘  └─────────────────────────────────────────┘
+
+KARDINAL-REGEL (Single Direction Dependency)
+   - Such-Algorithmen-Domaene darf Cache-Engine-Domaene aufrufen.
+   - Cache-Engine-Domaene darf NICHT in die Such-Logik eingreifen.
+   - Beide nutzen Messung + Hardware/ISA als Querschnittsdienste.
+   - Messung + Hardware/ISA haben KEINE Kenntnis voneinander.
+
+================================================================================
+2. DOMAENE 1 — SUCH-ALGORITHMEN-DOMAENE
+================================================================================
+
+ZWECK
+   Implementierung der eigentlichen Indexstruktur (Trie-Huelle + Pages) und
+   der Operationen darauf (Lookup, Range, CRUD, Concurrency).
+
+SICHTBARKEIT
+   Sieht NICHT in die Cache-Engine. Erhaelt von der Cache-Engine nur
+   "Page-Handles" + Telemetrie-Slots im Page-Header.
+
+================================================================================
+2.1 PACKAGE: trie_core
+================================================================================
+
+INTERFACE ITrieEngine                                              [PUBLIC API]
+   + lookup(key) -> Optional<ValueHandle>
+   + lookup_prefix(prefix) -> PrefixCursor
+   + range_scan(low, high) -> RangeCursor
+   + insert(key, value)
+   + remove(key)
+   + bulk_build(keys[]) -> ITrieEngine
+   + size() -> usize
+   + memory_footprint() -> usize
+
+CLASS TrieEngine implements ITrieEngine                            [KERN]
+   - root: PageHandle
+   - cache_engine: ICacheEngine                       (DI von cache_engine)
+   - concurrency: IConcurrencyController              (DI von concurrency)
+   - allocator: IAllocator                            (DI von cache_engine)
+   + traverse(key) -> TraversalResult
+   - request_page_type(...) -> PageHandle             (delegiert an cache_engine)
+
+CLASS Redirect                                                     [BAUSTEIN]
+   - target: PageHandle
+   - skipped_bits: usize
+   - terminal_value: Optional<ValueHandle>
+   BELEG-LIT: P04 CoCo-trie Macro-Node, P05 START Rewiring, P07 Wormhole Anchor
+
+================================================================================
+2.2 PACKAGE: page_types  (5 Modul-Typen, je Modul = je Datei + je Test)
+================================================================================
+
+INTERFACE IPage                                                    [PUBLIC API]
+   + lookup(key_segment) -> LookupOutcome
+   + insert(key_segment, value) -> InsertOutcome
+   + remove(key_segment) -> RemoveOutcome
+   + iterate(start_segment) -> Iterator
+   + telemetry() -> PageTelemetry                     (lesbar fuer cache_engine)
+   + page_type() -> PageType                          (Tag fuer cache_engine)
+
+ENUM PageType
+   { DenseByte, ExtendedDense, SparsePatricia, Redirect, CustomCache }
+
+MODUL: dense_byte_page                                             [BAUSTEIN]
+   CLASS DenseBytePage implements IPage
+   - children: array<PageHandle, 256>
+   - bitmap_present: array<u64, 4>
+   BELEG-LIT: P01 ART Node256, P10 SuRF LOUDS-Dense
+   ROLLE: dichte Byte-Transitionen, hohe Cache-Lokalitaet
+
+MODUL: extended_dense_page                                         [BAUSTEIN]
+   CLASS ExtendedDensePage implements IPage
+   - levels: usize             (mehrbyteig)
+   - dense_table: Vec<...>
+   BELEG-LIT: P05 START Multibyte Node
+   ROLLE: mehrbyteige dichte Region (Wurzelnaehe, dichter Subtrie)
+
+MODUL: sparse_patricia_page                                        [BAUSTEIN]
+   CLASS SparsePatriciaPage implements IPage
+   - discriminative_bits: BitSet
+   - children: SmallVec<PageHandle>
+   BELEG-LIT: P02 HOT Compound Node, P10 SuRF LOUDS-Sparse
+   ROLLE: spaerlich besetzte Region (Nicht-Wurzelnaehe)
+
+MODUL: redirect_page                                               [BAUSTEIN]
+   CLASS RedirectPage implements IPage
+   - skipped_path: PathSegment
+   - target: PageHandle
+   - terminal_value: Optional<ValueHandle>
+   BELEG-LIT: P04 CoCo-trie Macro-Node, P05 START Rewiring
+   ROLLE: Pfad-Kompression (Patricia-Effekt)
+
+MODUL: custom_cache_page                                           [BAUSTEIN]
+   CLASS CustomCachePage implements IPage
+   - layout: CacheLineGroupedLayout
+   - hints_header: HintsBlock
+   BELEG-LIT: eigener Beitrag, P06 B²-tree-inspiriert + P11 CSS + P12 CSB+
+   ROLLE: PRT-ART-eigene Cache-optimierte Variante (Page-Family-Ergaenzung)
+
+================================================================================
+2.3 PACKAGE: value_handle
+================================================================================
+
+CLASS ValueHandle                                                  [BAUSTEIN]
+   tagged_union {
+     Inline(InlineValue),                  // Wert direkt im Page-Slot
+     External(ExternalRef),                // Wert ausserhalb (Pointer)
+     ChainRef(ChainStartRef)               // VERTAGT — Wertekette
+   }
+   BELEG-LIT: PRT-ART Termin 2
+
+================================================================================
+2.4 PACKAGE: concurrency
+================================================================================
+
+INTERFACE IConcurrencyController                                   [PUBLIC API]
+   + read_begin(node) -> ReadGuard
+   + read_validate(guard) -> bool
+   + write_acquire(node) -> WriteGuard
+   + write_release(guard)
+   + retire(node)                          (zu spaeter Reclamation)
+
+CLASS OLCController implements IConcurrencyController              [VARIANTE A]
+   - per_node_version: AtomicU64
+   BELEG-LIT: P08 ARTSync OLC
+
+CLASS ROWEXController implements IConcurrencyController            [VARIANTE B]
+   BELEG-LIT: P08 ARTSync ROWEX
+
+CLASS RCUReclaim                                                   [VARIANTE C]
+   - grace_period: GracePeriodCounter
+   BELEG-LIT: P29 McKenney2001
+   ROLLE: Default Memory-Reclamation nach Online-Relocation
+
+CLASS HazardPointerReclaim                                         [VARIANTE D]
+   - per_thread_pointers: ThreadLocal<HazardSlot[2]>
+   BELEG-LIT: P30 Michael2004
+   ROLLE: Wait-free Alternative bei kritischen Anforderungen
+
+================================================================================
+2.5 PACKAGE: operations
+================================================================================
+
+INTERFACE IOperationDispatcher                                     [INTERN]
+   + execute(op: Operation) -> OperationResult
+
+CLASS OperationDispatcher implements IOperationDispatcher          [BAUSTEIN]
+   - trie_engine: ITrieEngine
+   - dispatch by Operation::variant: Get, Put, Delete, Range, BulkBuild
+
+================================================================================
+3. DOMAENE 2 — CACHE-ENGINE-DOMAENE (KERNBEITRAG)
+================================================================================
+
+ZWECK
+   Meta-Ebene, die getrennt von der Such-Logik Layout-/Prefetch-/
+   Relocation-/Allocator-Entscheidungen trifft. Die 4 PRT-ART-
+   Forschungsluecken (siehe Konzeptmatrix) werden hier adressiert.
+
+SICHTBARKEIT
+   Erhaelt von Such-Algorithmen nur Anfragen ("naechste Page fuer
+   Praefix x") und Header-Telemetrie. Sieht NICHT in die Knoten-Logik.
+
+3 BETRIEBSMODI (Termin 6 eingefroren)
+   • Modus 1 — PASSIV               : feste Schwellen (kompiliert)
+   • Modus 2 — WARM-UP-KALIBRIERT   : einmalige Mikrobenchmarks beim Start
+   • Modus 3 — ONLINE ADAPTIV       : laufende Re-Kalibrierung waehrend Last
+
+================================================================================
+3.1 PACKAGE: cache_engine_core
+================================================================================
+
+INTERFACE ICacheEngine                                             [PUBLIC API]
+   + select_page_type(context: PageContext) -> PageType
+   + prefetch_advice(context: PrefetchContext) -> PrefetchHint
+   + relocate_request(handle: PageHandle, telemetry: PageTelemetry)
+   + allocate(page_type: PageType) -> PageHandle
+   + free(handle: PageHandle)
+   + get_mode() -> CacheEngineMode
+   + set_mode(mode: CacheEngineMode)
+
+CLASS CacheEngine implements ICacheEngine                          [KERN]
+   - mode: CacheEngineMode { Passive | WarmupCalibrated | OnlineAdaptive }
+   - profiler: PlatformProfiler
+   - cost_model: CostModel
+   - scheduler: PageTypeScheduler
+   - prefetch: PrefetchController
+   - relocator: RelocationManager
+   - allocator: AllocatorManager
+   - telemetry: TelemetryAggregator
+   ROLLE: Aggregation aller Cache-Engine-Module
+
+ENUM CacheEngineMode
+   { Passive, WarmupCalibrated, OnlineAdaptive }
+
+================================================================================
+3.2 PACKAGE: platform_profiler
+================================================================================
+
+CLASS PlatformProfiler                                             [BAUSTEIN]
+   + run_microbenchmarks() -> PlatformProfile
+   + measure_working_set_sweep() -> WorkingSetCurve
+   + measure_stride_curve() -> StrideCurve
+   + measure_prefetch_distance_curve() -> PrefetchCurve
+   + measure_tlb_coverage() -> TlbCurve
+   BELEG-LIT: P05 START Cost Model Calibration, P23 Khan Profiling Phase
+   ROLLE: liefert Plattformkennlinien an Cost Model
+
+CLASS PlatformProfile                                              [DTO]
+   - cache_hierarchy: CacheTopology
+   - tlb_coverage: TlbConfig
+   - hbm_present: bool                                  (P32/P33-Lehre)
+   - hugepages_2mb_available: bool                      (P32-Lehre)
+   - isa_features: IsaFeatures                          (von hardware_isa)
+
+================================================================================
+3.3 PACKAGE: cost_model
+================================================================================
+
+INTERFACE ICostModel                                               [INTERN]
+   + estimate_cost(context: PageContext, page_type: PageType) -> Cost
+
+CLASS CostModel implements ICostModel                              [BAUSTEIN]
+   - i_m_b_t: IMBTComponents              (Instr/Memory/Branch/TLB Komponenten)
+   - probability_layout: ProbabilityModel
+   - calibration: PlatformProfile
+   BELEG-LIT: P13 Hankins I/M/B/T, P16 Bender Probability, P05 START
+   ROLLE: Mathematisches Modell fuer Page-Type-Wahl
+
+CLASS IMBTComponents                                               [DTO]
+   - instr_cost_per_op: f64
+   - memory_stall_per_miss: f64
+   - branch_miss_penalty: f64
+   - tlb_miss_penalty: f64
+   BELEG-LIT: P13 Hankins multi-variates Cost-Modell
+
+================================================================================
+3.4 PACKAGE: page_type_scheduler
+================================================================================
+
+CLASS PageTypeScheduler                                            [BAUSTEIN]
+   + decide(context: PageContext) -> PageType
+   - rules: Vec<SelectionRule>
+   - cost_model: ICostModel
+   - telemetry: TelemetryAggregator
+   BELEG-LIT: P10 SuRF Cutoff R, P14 Samuel Configuration Table,
+              P20 Mueller Adaptive Layout
+   ROLLE: trifft die Page-Type-Entscheidung gemeinsam mit:
+          - Layout (innerhalb des Page-Typs)
+          - Inline/External fuer ValueHandle
+          - Prefetch-Empfehlung
+          - Allocator-Wahl
+          → DAS ist Forschungsluecke #3 (gemeinsame Wahl aller 5)
+
+================================================================================
+3.5 PACKAGE: prefetch_controller
+================================================================================
+
+INTERFACE IPrefetchController                                      [INTERN]
+   + advise(context: PrefetchContext) -> PrefetchHint
+
+CLASS PrefetchController implements IPrefetchController            [BAUSTEIN]
+   - distance: PrefetchDistance
+   - reliability: ReliabilityLevel    (Strong | Weak — P25-Lehre)
+   - fill_buffer_aware: bool          (P25 Mahling)
+   - hierarchical_bundles: bool       (P27 Zhang ASPLOS)
+   BELEG-LIT: P21 Chen, P23 Khan, P25 Mahling, P27 Zhang ASPLOS
+   ROLLE: Software-Prefetch-Steuerung pro Page-Typ + Plattform
+
+================================================================================
+3.6 PACKAGE: relocation_manager
+================================================================================
+
+INTERFACE IRelocationManager                                       [INTERN]
+   + propose_relocation(telemetry: PageTelemetry) -> RelocationPlan
+   + execute(plan: RelocationPlan, reclamation: ReclamationStrategy)
+
+CLASS RelocationManager implements IRelocationManager              [BAUSTEIN]
+   - hot_path_threshold: f64
+   - reorganization_policy: { BFS, ProbabilityGreedy, MultiLevelBlock }
+   - reclamation: ReclamationStrategy { RCU | HazardPointer }
+   BELEG-LIT: P18 Saikkonen Multi-Level Reloc, P19 Saikkonen Layout Inv,
+              P26 Zhang FGCS Read Counter, P28 Kuehn Histogram (NICHT relayout!)
+   ROLLE: Online Re-Layouting → schliesst Forschungsluecke #2!
+
+================================================================================
+3.7 PACKAGE: allocator_manager
+================================================================================
+
+INTERFACE IAllocator                                               [PUBLIC API]
+   + allocate(page_type: PageType) -> PageHandle
+   + free(handle: PageHandle)
+
+CLASS AllocatorManager implements IAllocator                       [BAUSTEIN]
+   - per_page_type_arena: HashMap<PageType, Arena>
+   - alignment: usize    (page_size_aware)
+   BELEG-LIT: P31 Ungethuem (TUD Hardware/Software Co-Design)
+   ROLLE: Pool/Arena pro Page-Type, Cache-Line-aligned
+
+================================================================================
+3.8 PACKAGE: telemetry_aggregator
+================================================================================
+
+INTERFACE ITelemetryAggregator                                     [INTERN]
+   + record_access(page: PageHandle, branch: u8)
+   + record_hit_miss(page: PageHandle, hit: bool)
+   + read_page_telemetry(page: PageHandle) -> PageTelemetry
+
+CLASS TelemetryAggregator implements ITelemetryAggregator          [BAUSTEIN]
+   - per_page_histogram: HashMap<PageHandle, Histogram>
+   - read_counter: HashMap<PageHandle, u32>
+   - probability_sketch: ProbabilitySketch
+   BELEG-LIT: P26 Zhang FGCS Read Counter, P28 Kuehn Histogram per Node,
+              P16 Bender Access Distribution
+   ROLLE: liefert "Hot Path" und Wahrscheinlichkeitsdaten an Scheduler
+
+================================================================================
+4. DOMAENE 3 — MESS-/TELEMETRIE-DOMAENE (Querschnitt)
+================================================================================
+
+ZWECK
+   Counter-Erfassung, Tail-Latenz-Histogramme, Plattform-Erkennung,
+   Reproduzierbarkeits-Logging.
+
+REGELN (PRT-ART Termin 3)
+   - 5 Laeufe je Konfiguration
+   - Rohwerte separat ablegen
+   - KEINE Mittelung von Perzentilen
+   - Hybrid-Cores NIE zusammenaggregieren (cpu_core/* vs cpu_atom/*)
+
+================================================================================
+4.1 PACKAGE: counter_collector
+================================================================================
+
+INTERFACE ICounterCollector                                        [PUBLIC API]
+   + start_counters(events: CounterSet)
+   + stop_counters() -> CounterReadings
+
+CLASS PerfCollector implements ICounterCollector                   [VARIANTE A]
+   BELEG-LIT: Linux perf
+   PFLICHT: cycles, instructions, branches, branch-misses, cache-misses,
+            L1/LLC misses, dTLB-misses
+
+CLASS PapiCollector implements ICounterCollector                   [VARIANTE B]
+   BELEG-LIT: PAPI
+   ZIH-Pflicht: Barnard, Capella
+
+CLASS AdvisorCollector implements ICounterCollector                [VARIANTE C]
+   BELEG-LIT: Intel Advisor MAP
+   LIEFERT: CLU, Sim. Memory Footprint, modellierte Cache-Misses
+
+================================================================================
+4.2 PACKAGE: histogram_aggregator
+================================================================================
+
+CLASS HdrHistogramAggregator                                       [BAUSTEIN]
+   + record_latency(ns: u64)
+   + percentile(p: f64) -> u64
+   + raw_dump() -> RawHistogram
+   BELEG-LIT: HdrHistogram
+
+================================================================================
+4.3 PACKAGE: platform_probe
+================================================================================
+
+CLASS PlatformProbe                                                [BAUSTEIN]
+   + detect_cpu() -> CpuInfo
+   + detect_isa_features() -> IsaFeatures
+   + detect_cache_topology() -> CacheTopology
+   + detect_memory_types() -> MemoryTypes  (DRAM/HBM/NV-RAM)
+   + detect_hugepages() -> HugepageConfig
+
+================================================================================
+4.4 PACKAGE: run_recorder
+================================================================================
+
+CLASS RunRecorder                                                  [BAUSTEIN]
+   + record_run(metadata: RunMetadata, results: RunResults)
+   - includes: build_flags, compiler_version, isa_path, kernel_version,
+                cpu_pinning, seed, warmup_iterations
+
+================================================================================
+5. DOMAENE 4 — HARDWARE/ISA-DOMAENE (Querschnitt, Build + Runtime)
+================================================================================
+
+ZWECK
+   ISA-Pfad-Wahl, Function Multiversioning, Hybrid-Core-Behandlung,
+   Heterogeneous-Memory-Erkennung, Hugepage-Verwaltung.
+
+================================================================================
+5.1 PACKAGE: isa_dispatch
+================================================================================
+
+CLASS IsaDispatcher                                                [BAUSTEIN]
+   + dispatch_lookup_simd(...) -> ...
+   - target_clones: scalar, x86_avx2, x86_avx512, arm_neon, arm_sve2
+   BELEG-LIT: P31 Ungethuem ISA-Extensions, P32 Schmidt SIMD-Ergebnisse
+
+================================================================================
+5.2 PACKAGE: hybrid_core_pinning
+================================================================================
+
+CLASS HybridCorePinning                                            [BAUSTEIN]
+   + pin_thread(thread_id: TID, core_class: { Performance | Efficient })
+   + measure_per_class() -> { p_core: Counters, e_core: Counters }
+   ROLLE: trennt Messungen auf Hybrid-CPUs (Intel P/E, Apple M1)
+
+================================================================================
+5.3 PACKAGE: memory_type_detector
+================================================================================
+
+CLASS MemoryTypeDetector                                           [BAUSTEIN]
+   + detect_dram() -> Region
+   + detect_hbm() -> Optional<Region>            (Grace Hopper, Sapphire Rapids)
+   + detect_nvram() -> Optional<Region>
+   BELEG-LIT: P33 VAMPIR (DRAM+HBM), P32 Schmidt (DDR5+HBM)
+
+================================================================================
+5.4 PACKAGE: hugepage_manager
+================================================================================
+
+CLASS HugepageManager                                              [BAUSTEIN]
+   + try_allocate_hugepages(size: usize) -> Result<Region>
+   - sizes: 2MB, 1GB
+   BELEG-LIT: P32 Schmidt 2025 (2 MiB Hugepages senken TLB-Druck)
+
+================================================================================
+6. ABHAENGIGKEITS-DIAGRAMM (textuell)
+================================================================================
+
+   search_engine.trie_core
+        │
+        ├──→ search_engine.page_types        (5 Module)
+        ├──→ search_engine.value_handle
+        ├──→ search_engine.concurrency       (4 Varianten)
+        ├──→ search_engine.operations
+        ├──→ cache_engine.cache_engine_core  ← KARDINAL: nur in diese Richtung!
+        │      │
+        │      ├──→ cache_engine.platform_profiler
+        │      ├──→ cache_engine.cost_model
+        │      ├──→ cache_engine.page_type_scheduler
+        │      ├──→ cache_engine.prefetch_controller
+        │      ├──→ cache_engine.relocation_manager
+        │      ├──→ cache_engine.allocator_manager
+        │      ├──→ cache_engine.telemetry_aggregator
+        │      │
+        │      ├──→ measurement.counter_collector
+        │      ├──→ measurement.histogram_aggregator
+        │      ├──→ measurement.platform_probe
+        │      └──→ hardware_isa.isa_dispatch
+        │
+        ├──→ measurement.counter_collector   (fuer Operations-Counter)
+        └──→ hardware_isa.isa_dispatch       (fuer Knoten-SIMD-Operationen)
+
+ZYKLEN: KEINE
+   - Cache-Engine darf NICHT search_engine importieren.
+   - Measurement und Hardware-ISA haben KEINE Kenntnis voneinander.
+
+================================================================================
+7. SCHNITTSTELLE SUCH-ENGINE ↔ CACHE-ENGINE (Vertrag, eingefroren)
+================================================================================
+
+WAS DIE SUCH-ENGINE AN DIE CACHE-ENGINE GIBT
+   - Operation-Kontext (Op-Typ, Schluessel-Praefix, geschaetzte Restpfadlaenge)
+   - Page-Telemetrie-Slot im Page-Header (lesbar, nicht semantisch interpretiert)
+   - Anfrage "ich brauche eine neue Page (oder ich will diese reorganisieren)"
+
+WAS DIE CACHE-ENGINE AN DIE SUCH-ENGINE GIBT
+   - Konkreten Page-Type fuer eine neue Knoten-Region
+   - Allokierten Page-Handle (mit Memory-Layout passend zum Page-Type)
+   - Prefetch-Hinweis fuer das naechste erwartete Knoten-Lookup
+   - (asynchron) Notification "diese Page wurde reorganisiert/verschoben"
+
+WAS DIE CACHE-ENGINE NICHT DARF
+   - Knoten-Inhalt semantisch interpretieren (Schluessel-Praefixe parsen,
+     Werte vergleichen)
+   - Such-Operationen direkt ausloesen
+   - Such-Engine-API umgehen oder umgekehrt aufrufen
+
+WAS DIE SUCH-ENGINE NICHT DARF
+   - Page-Allokation am Allocator vorbei machen
+   - Page-Type-Wahl fest verdrahten ohne Cache-Engine-Konsultation
+     (im Modus 2/3; im Modus 1 sind Schwellen vorgegeben)
+   - Telemetrie-Slot direkt schreiben (nur ueber Telemetry-API)
+
+================================================================================
+8. ABBILDUNG DER 4 FORSCHUNGSLUECKEN AUF MODULE
+================================================================================
+
+LUECKE 1: Cache-Engine als getrennte Meta-Ebene
+   → cache_engine.cache_engine_core (KOMPLETTES Package)
+   → Single Direction Dependency (Architekturregel)
+
+LUECKE 2: Online Re-Layouting
+   → cache_engine.relocation_manager
+   → in Verbindung mit search_engine.concurrency.RCUReclaim oder HazardPointer
+
+LUECKE 3: Gemeinsame Wahl Seitentyp+Layout+Inline+Prefetch+Allocator
+   → cache_engine.page_type_scheduler (zentral)
+   → konsultiert: cost_model, telemetry_aggregator, prefetch_controller,
+                  allocator_manager
+   → ergebnis: gemeinsame koordinierte Entscheidung in EINEM Schritt
+
+LUECKE 4: Plattform-bewusste online Adaption pro ISA-Pfad
+   → cache_engine.platform_profiler (Plattform-Profil)
+   → cache_engine.cache_engine_core.mode = OnlineAdaptive (Modus 3)
+   → hardware_isa.isa_dispatch (ISA-Pfad-Wahl)
+   → Kombination dieser drei in einer Adaptions-Schleife
+
+================================================================================
+9. PROJEKT-STRUKTUR (Vorbereitung fuer comdare-cache-engine)
+================================================================================
+
+ZIEL-LAYOUT (modular, je Domaene ein Top-Level-Modul/Crate)
+   comdare-cache-engine/
+   ├── search_engine/
+   │   ├── trie_core/
+   │   ├── page_types/
+   │   │   ├── dense_byte/
+   │   │   ├── extended_dense/
+   │   │   ├── sparse_patricia/
+   │   │   ├── redirect/
+   │   │   └── custom_cache/
+   │   ├── value_handle/
+   │   ├── concurrency/
+   │   │   ├── olc/
+   │   │   ├── rowex/
+   │   │   ├── rcu/
+   │   │   └── hazard_pointer/
+   │   └── operations/
+   ├── cache_engine/
+   │   ├── core/
+   │   ├── platform_profiler/
+   │   ├── cost_model/
+   │   ├── page_type_scheduler/
+   │   ├── prefetch_controller/
+   │   ├── relocation_manager/
+   │   ├── allocator_manager/
+   │   └── telemetry_aggregator/
+   ├── measurement/
+   │   ├── counter_collector/
+   │   │   ├── perf/
+   │   │   ├── papi/
+   │   │   └── advisor/
+   │   ├── histogram_aggregator/
+   │   ├── platform_probe/
+   │   └── run_recorder/
+   ├── hardware_isa/
+   │   ├── isa_dispatch/
+   │   ├── hybrid_core_pinning/
+   │   ├── memory_type_detector/
+   │   └── hugepage_manager/
+   ├── benchmarks/
+   │   ├── ycsb/
+   │   ├── microbenchmarks/
+   │   └── platform_calibration/
+   └── tests/
+       ├── unit/
+       └── integration/
+
+LIZENZ: Apache 2.0 (BEP Venture UG / Marke Comdare)
+
+================================================================================
+10. NICHT-FESTGELEGT (offen fuer Termin 7+)
+================================================================================
+
+* Sprache: C++23 vs Rust — beide sind technisch tauglich. PRT-ART-Termin 6
+   nennt C++23 als Default (Linie comdare/BuildSystem). Rust ist Backup.
+* Build-System: cd-buildsystem-core (PRT-ART nutzt eigenes COMDARE-System)
+* Genaue Header-Telemetrie-Bit-Layout: zu definieren (typisch 16-32 bit pro
+   Branch-Histogram, 16-32 bit pro Read-Counter)
+* RCU-Implementierung: liburcu vs eigene
+* Hazard-Pointers-Implementierung: folly vs eigene
+* SDSL-Library fuer succinct rank/select: optional (nur falls succinct Pages
+   in spaeterer Iteration aufgenommen werden)
+* HBM-Allocation-API: hbwmalloc (Linux/Intel) vs CUDA Memory Pools (Grace H.)
+
+================================================================================
+ENDE DES DOMAENENMODELLS
+Phase 5 (drawio UML) ist gesperrt bis explizites GO vom Nutzer.
+Dieses textuelle Modell ist die direkte Vorlage fuer das spaetere drawio UML.
+================================================================================

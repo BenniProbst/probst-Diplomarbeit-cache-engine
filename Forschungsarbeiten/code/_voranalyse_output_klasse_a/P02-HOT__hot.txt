@@ -1,0 +1,200 @@
+================================================================
+VORANALYSE: P02-HOT/hot
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P02-HOT/hot
+Stand: 2026-05-09 00:47:35
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 47
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609    0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609   69 May  4 23:37 .gitignore
+-rw-r--r-- 1 benja 197609  509 May  4 23:37 .gitmodules
+-rw-r--r-- 1 benja 197609 1001 May  4 23:37 .travis.yml
+-rw-r--r-- 1 benja 197609 2526 May  4 23:37 CMakeLists.txt
+-rw-r--r-- 1 benja 197609  757 May  4 23:37 LICENSE
+-rw-r--r-- 1 benja 197609 8647 May  4 23:37 README.md
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 apps
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 libs
+-rwxr-xr-x 1 benja 197609  282 May  4 23:37 releaseBuild.sh
+-rwxr-xr-x 1 benja 197609  728 May  4 23:37 runTests.sh
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 tests
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 third-party
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./apps
+./apps/benchmarks
+./apps/benchmarks/integer
+./apps/benchmarks/string
+./libs
+./libs/hot
+./libs/hot/commons
+./libs/hot/rowex
+./libs/hot/single-threaded
+./libs/idx
+./libs/idx/benchmark-helpers
+./libs/idx/content-helpers
+./libs/idx/map-helpers
+./libs/idx/utils
+./libs/profile-lib
+./libs/profile-lib/include
+./tests
+./tests/hot
+./tests/hot/commons-test
+./tests/hot/rowex-test
+./tests/hot/single-threaded-test
+./tests/hot/test-helpers
+./tests/idx
+./tests/idx/benchmark-helpers-test
+./tests/idx/content-helpers-test
+./tests/idx/map-helpers-test
+./tests/map-helpers-test
+./tests/map-helpers-test/src
+./third-party
+./third-party/bilke-cmake-modules
+./third-party/boost-cmake
+./third-party/boost-hana
+./third-party/tbb
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./apps/benchmarks/integer/hot-rowex-integer-benchmark/src/main.cpp
+./apps/benchmarks/integer/hot-single-threaded-integer-benchmark/src/main.cpp
+./apps/benchmarks/string/hot-rowex-string-benchmark/src/main.cpp
+./apps/benchmarks/string/hot-single-threaded-string-benchmark/src/main.cpp
+./libs/hot/commons/include/hot/commons/Algorithms.hpp
+./libs/hot/commons/include/hot/commons/BiNode.hpp
+./libs/hot/commons/include/hot/commons/BiNodeInformation.hpp
+./libs/hot/commons/include/hot/commons/BiNodeInterface.hpp
+./libs/hot/commons/include/hot/commons/BitMask32.hpp
+./libs/hot/commons/include/hot/commons/DiscriminativeBit.hpp
+./libs/hot/commons/include/hot/commons/EntriesRange.hpp
+./libs/hot/commons/include/hot/commons/InsertInformation.hpp
+./libs/hot/commons/include/hot/commons/MultiMaskPartialKeyMapping.hpp
+./libs/hot/commons/include/hot/commons/MultiMaskPartialKeyMappingInterface.hpp
+./libs/hot/commons/include/hot/commons/NodeAllocationInformation.hpp
+./libs/hot/commons/include/hot/commons/NodeAllocationInformations.hpp
+./libs/hot/commons/include/hot/commons/NodeMergeInformation.hpp
+./libs/hot/commons/include/hot/commons/NodeParametersMapping.hpp
+./libs/hot/commons/include/hot/commons/NodeType.hpp
+./libs/hot/commons/include/hot/commons/PartialKeyConversionInformation.hpp
+./libs/hot/commons/include/hot/commons/PartialKeyMappingBase.hpp
+./libs/hot/commons/include/hot/commons/PartialKeyMappingHelpers.hpp
+./libs/hot/commons/include/hot/commons/SearchResultForInsert.hpp
+./libs/hot/commons/include/hot/commons/SIMDHelper.hpp
+./libs/hot/commons/include/hot/commons/SingleMaskPartialKeyMapping.hpp
+./libs/hot/commons/include/hot/commons/SingleMaskPartialKeyMappingInterface.hpp
+./libs/hot/commons/include/hot/commons/SparsePartialKeys.hpp
+./libs/hot/commons/include/hot/commons/TwoEntriesNode.hpp
+./libs/hot/rowex/include/hot/rowex/EpochBasedMemoryReclamationStrategy.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowex.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexChildPointer.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexChildPointerInterface.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexFirstInsertLevel.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexInsertStack.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexInsertStackEntry.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexInterface.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexIterator.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexIteratorBufferState.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexIteratorBufferStates.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexIteratorEndToken.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexIteratorStackEntry.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexIteratorStackState.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexNode.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexNodeBase.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexNodeBaseInterface.hpp
+./libs/hot/rowex/include/hot/rowex/HOTRowexNodeInterface.hpp
+./libs/hot/rowex/include/hot/rowex/MemoryGuard.hpp
+./libs/hot/rowex/include/hot/rowex/SpinLock.hpp
+./libs/hot/rowex/include/hot/rowex/ThreadSpecificEpochBasedReclamationInformation.hpp
+./libs/hot/single-threaded/include/hot/singlethreaded/HOTSingleThreaded.hpp
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+  42322 total
+  10011 ./tests/hot/test-helpers/src/hot/testhelpers/SampleTriples.cpp
+   5509 ./tests/hot/single-threaded-test/src/hot/singlethreaded/HOTSingleThreadedTest.cpp
+   5026 ./tests/hot/rowex-test/src/hot/rowex/StringTestData.cpp
+   1788 ./tests/hot/single-threaded-test/src/hot/singlethreaded/HOTSingleThreadedNodeTest.cpp
+   1188 ./tests/hot/commons-test/src/hot/commons/SparsePartialKeysTest.cpp
+   1070 ./tests/hot/rowex-test/src/hot/rowex/HOTRowexNodeTest.cpp
+    890 ./libs/hot/single-threaded/include/hot/singlethreaded/HOTSingleThreadedNode.hpp
+    658 ./libs/hot/single-threaded/include/hot/singlethreaded/HOTSingleThreaded.hpp
+    616 ./libs/hot/rowex/include/hot/rowex/HOTRowexNode.hpp
+    597 ./libs/hot/commons/include/hot/commons/MultiMaskPartialKeyMapping.hpp
+    593 ./tests/hot/rowex-test/src/hot/rowex/HOTRowexTest.cpp
+    528 ./libs/idx/benchmark-helpers/include/idx/benchmark/Benchmark.hpp
+    477 ./tests/hot/rowex-test/include/hot/rowex/ConcurrentTestHelper.hpp
+    461 ./libs/idx/benchmark-helpers/include/idx/benchmark/StringBenchmark.hpp
+    442 ./libs/hot/single-threaded/include/hot/singlethreaded/HOTSingleThreadedNodeInterface.hpp
+    435 ./libs/hot/rowex/include/hot/rowex/HOTRowex.hpp
+    385 ./libs/hot/commons/include/hot/commons/SparsePartialKeys.hpp
+    344 ./tests/hot/test-helpers/src/hot/testhelpers/PartialKeyMappingTestHelper.cpp
+    324 ./libs/hot/commons/include/hot/commons/SIMDHelper.hpp
+    315 ./tests/hot/commons-test/src/hot/commons/MultiMaskPartialKeyMappingTest.cpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (68 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+    ISC License
+    
+    Copyright (c) 2018, Robert Binna
+
+## README EXCERPT
+  Datei: README.md
+    [![Build Status](https://travis-ci.org/speedskater/hot.svg?branch=master)](https://travis-ci.org/speedskater/hot) [![codecov](https://codecov.io/gh/speedskater/hot/branch/master/graph/badge.svg)](https://codecov.io/gh/speedskater/hot) [![ISC license](http://img.shields.io/badge/license-ISC-brightgreen.svg)](https://github.com/speedskater/hot/blob/master/LICENSE)
+    
+    # What is HOT
+    HOT stands for Height Optimized Trie.
+    It is an order preserving index structure which facilitates a dynamic span to reduce the overall tree height.
+    This makes it highly suitable for general purpose workloads where the distribution of the data is not known in advance and
+    non uniformly distributed data can be expected.
+    
+    Its structure and algorithmic details can be found in:
+    
+    HOT: A Height Optimized Trie Index for Main-Memory Database Systems
+    by Binna, Zangerle, Pichl, Specht and Leis
+    
+    # Content
+    
+    This implementation of HOT is written in C++14 and can be built with the CMake build system.
+    It is a cleaned up version of the code used in the original HOT publication.
+    This libraries contains two different implementations of HOT.
+     * A single threaded version supporting insert, lookup, scan and deletion operations.
+     * A concurrent version using a ROWEX (Read-Optimized Write EXclusion) synchronization strategy. The concurrent implementation currently supports only insert, lookup and scan operatoins
+    
+    Additionally this library contains tools for creating different variations of these two index structures.
+    Contained are tools for integers and c-strings. But using the provided helper structures custom variations can be created.
+    
+    Further more this library contains a simple benchmarking framework for index structures to build benchmarking applications for strings and integers.
+    Based on this benchmarking framework 4 benchmark applications are provided with this library which can be used to evaluate the peformance of the single and the concurrent HOT index.
+    
+    # Getting started
+    
+    1. Clone the repository int a subdirectory labeld 'hot' by calling
+    
+    ``` git clone https://github.com/speedskater/hot.git hot```
+    
+    2. Changing the working directory to the currently checked out repository
+    
+    ```cd hot```
+    
+    3. Initialize the submodules with
+    ```git submodule update --init --recursive ```
+    
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  Patricia             in 2 Dateien
+  ROWEX                in 21 Dateien
+  Prefetch             in 4 Dateien
+  prefetch             in 5 Dateien
+  popcnt               in 7 Dateien
+  AVX-512              in 1 Dateien
+  AVX512               in 1 Dateien
+  Counter              in 5 Dateien
+
+## C++-STANDARD-INDIKATOREN
+
+## END VORANALYSE P02-HOT/hot

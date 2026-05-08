@@ -1,0 +1,119 @@
+================================================================
+VORANALYSE: P07-Wormhole/wormhole
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P07-Wormhole/wormhole
+Stand: 2026-05-09 00:49:16
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 385
+drwxr-xr-x 1 benja 197609      0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609      0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609      0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609     29 May  4 23:38 .gitignore
+-rw-r--r-- 1 benja 197609  35823 May  4 23:38 LICENSE
+-rw-r--r-- 1 benja 197609   1146 May  4 23:38 Makefile
+-rw-r--r-- 1 benja 197609   7278 May  4 23:38 Makefile.common
+-rw-r--r-- 1 benja 197609  21162 May  4 23:38 README.md
+-rw-r--r-- 1 benja 197609   4398 May  4 23:38 concbench.c
+-rw-r--r-- 1 benja 197609   1246 May  4 23:38 ctypes.h
+-rw-r--r-- 1 benja 197609   2733 May  4 23:38 easydemo.c
+-rw-r--r-- 1 benja 197609  29048 May  4 23:38 kv.c
+-rw-r--r-- 1 benja 197609  18816 May  4 23:38 kv.h
+-rw-r--r-- 1 benja 197609  72874 May  4 23:38 lib.c
+-rw-r--r-- 1 benja 197609  14831 May  4 23:38 lib.h
+-rw-r--r-- 1 benja 197609  10479 May  4 23:38 stresstest.c
+-rw-r--r-- 1 benja 197609 110567 May  4 23:38 wh.c
+-rw-r--r-- 1 benja 197609   8982 May  4 23:38 wh.h
+-rwxr-xr-x 1 benja 197609   5268 May  4 23:38 wh.py
+-rw-r--r-- 1 benja 197609   2919 May  4 23:38 wh.strip
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./concbench.c
+./ctypes.h
+./easydemo.c
+./kv.c
+./kv.h
+./lib.c
+./lib.h
+./stresstest.c
+./wh.c
+./wh.h
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 10214 total
+  3873 ./wh.c
+  3026 ./lib.c
+  1131 ./kv.c
+   688 ./lib.h
+   554 ./kv.h
+   354 ./stresstest.c
+   313 ./wh.h
+   144 ./concbench.c
+    91 ./easydemo.c
+    40 ./ctypes.h
+
+## BUILD-SYSTEM
+  ✓ Makefile (45 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+                        GNU GENERAL PUBLIC LICENSE
+                           Version 3, 29 June 2007
+    
+
+## README EXCERPT
+  Datei: README.md
+    # Wormhole
+    
+    The Wormhole index structure was introduced in paper ["Wormhole: A Fast Ordered Index for In-memory Data Management"](https://www.cs.uic.edu/~wuxb/papers/wormhole.pdf)
+    by Xingbo Wu, Fan Ni, and Song Jiang ([ACM DL](https://dl.acm.org/citation.cfm?id=3303955)).
+    This repository maintains a reference implementation of the Wormhole index structure.
+    
+    It supports Linux/FreeBSD/MacOS on x86\_64 and AArch64 CPUs.
+    On x86\_64, Wormhole requires SSE4.2.
+    On AArch64, Wormhole requires NEON SIMD and the `crc` features on the target CPU.
+    The code has been tested with Intel Haswell, Broadwell, and Skylake CPUs.
+    It has also been tested on a Raspberry PI 4 running 64-bit ArchlinuxArm, and a Jetson Nano running 64-bit Ubuntu Groovy.
+    
+    ## NEWS
+    
+    * See `wh.py` for a brief example of using Wormhole in Python.
+    
+    * An old limitation about anchor keys has been removed (See Section 3.3 in the original paper for more details).
+    Now Wormhole can store binary string keys of any patterns including any number of '\0's. A key's length can be 0 to UINT32\_MAX bytes. (Internally: leaf-nodes' anchor key length <= UINT16\_MAX).
+    
+    * `wh.h` provides a user-friendly interface. See `easydemo.c` for coding examples. the `wh_` functions are thread-safe.
+    
+    * The `whsafe` API is a *worry-free* thread-safe wormhole API.
+    At a small cost on each operation, users no longer need to call the `wormhole_refresh_qstate` in any circumstances.
+    
+    * `merge` (Merge a new kv with existing kv) and `delr` (delete range) operations have been added. They are all thread-safe.
+    
+    ## Highlights:
+    
+    * Thread-safety: all operations, including `get`, `put`, `inplace-update (inp)`, `del`, `iter-seek`, `iter-peek`, `iter-skip` etc., are thread-safe.
+    See `stresstest.c` for more thread-safe operations.
+    
+    * Keys can contain any value, including binary zeros (`'\0'`). Their sizes are always explicitly specified.
+    
+    * Long keys are welcome! The key-length field (`klen` in `struct kv`) is a 32-bit unsigned integer and the maximum size of a key is 4294967295.
+    
+    * No background threads or global status. Wormhole uses a mix of user-space rwlocks and QSBR RCU to synchronize between readers and writers.
+    See below for more details.
+    
+    # Build
+    
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  RCU                  in 1 Dateien
+  prefetch             in 6 Dateien
+  AVX2                 in 2 Dateien
+  AVX512               in 1 Dateien
+  bitmap               in 2 Dateien
+
+## C++-STANDARD-INDIKATOREN
+
+## END VORANALYSE P07-Wormhole/wormhole

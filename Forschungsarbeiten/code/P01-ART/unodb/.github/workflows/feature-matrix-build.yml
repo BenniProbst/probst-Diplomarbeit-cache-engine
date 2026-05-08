@@ -1,0 +1,53 @@
+---
+name: feature-matrix-build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_TYPE: ${{matrix.BUILD_TYPE}}
+      STANDALONE: ${{matrix.STANDALONE}}
+      TESTS: ${{matrix.TESTS}}
+      BENCHMARKS: ${{matrix.BENCHMARKS}}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        BUILD_TYPE: [Release, Debug]
+        STANDALONE: [ON, OFF]
+        TESTS: [ON, OFF]
+        BENCHMARKS: [ON, OFF]
+
+    steps:
+      - uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        with:
+          submodules: ${{ matrix.TESTS == 'ON' || matrix.BENCHMARKS == 'ON' }}
+          persist-credentials: false
+
+      - name: Setup Boost
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev
+
+      - name: Configure CMake
+        # Use a bash shell so we can use the same syntax for environment
+        # variable access regardless of the host operating system
+        shell: bash
+        run: |
+          cmake -B build "$GITHUB_WORKSPACE" "-DSTANDALONE=$STANDALONE" \
+              "-DCMAKE_BUILD_TYPE=$BUILD_TYPE" "-DTESTS=$TESTS" \
+              "-DBENCHMARKS=$BENCHMARKS"
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        run: make -j3 -k

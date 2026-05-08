@@ -1,0 +1,496 @@
+================================================================================
+BEGRIFFSGLOSSAR — Domaenenmodell Vorstufe
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Stand: 2026-05-04 (Termin 7) · REV2 nach 1. SLUB-Welle
+================================================================================
+
+STATUS REV2 (2026-05-04 nach Download-Konsolidierung)
+  Begriffsbasis aktuell aus:  Termin-1-6 Dokumenten + 2 Habich-Zusatzpapern
+  Noch ausstehend:            Tiefere Lektuere von 4 nachzuladenden Papern:
+                                - Graefe/Larson 2001 (B-Tree Indexes and CPU Caches)
+                                - Samuel/Pedersen/Bonnet 2005 (Processor Conscious CSB+)
+                                - Fent et al. 2020 (START Cost Model + Optimizer)
+                                - VAMPIR Berthold/Habich 2023 (SOSP Poster)
+  Phase 3.B/3.C (Eigenschaften extrahieren + finalisieren) ist noch offen.
+
+ZWECK
+  Dieses Glossar identifiziert konzeptionelle Identitaeten zwischen Begriffen,
+  die in unterschiedlichen Forschungsarbeiten verschiedene Namen tragen, aber
+  funktional dasselbe meinen. Es ist die VORSTUFE zum Domaenenmodell, das
+  spaeter (NACH Termin 6 Vollstaendigkeit) als UML in drawio formalisiert wird.
+
+  Trennung:
+    DOMAENE 1 = SUCH-ALGORITHMEN     (WAS und WIE wird gesucht)
+    DOMAENE 2 = CACHE-ENGINE         (WIE/WO liegen Daten im Cache)
+    QUERSCHNITT = METRIKEN/MESSUNG   (gemeinsame Beobachtbarkeit)
+
+  Notation einer Begriffsgruppe:
+    [KANON] kanonischer Name fuer PRT-ART
+       <- "Synonym 1" (Quelle/Paper)
+       <- "Synonym 2" (Quelle/Paper)
+    BEDEUTUNG: was der Begriff funktional bezeichnet
+    ABGRENZUNG: gegen welchen anderen Begriff er klar getrennt sein muss
+
+================================================================================
+DOMAENE 1 — SUCH-ALGORITHMEN
+================================================================================
+
+--------------------------------------------------------------------------------
+1.1  STRUKTURELLE BAUSTEINE EINES TRIE
+--------------------------------------------------------------------------------
+
+[KANON] KNOTEN (Node)
+   <- "Node"                  (ART, HOT, B²-tree, START, Masstree)
+   <- "Vertex"                (Graph-theoretische Sicht, CoCo-trie)
+   <- "Decision Node"         (B²-tree: Entscheidungsknoten in der Page)
+   <- "Span Node"             (B²-tree: Konsumiert mehrere Bytes)
+   <- "Trie Node"             (Jacobson 1989, allgemein)
+   BEDEUTUNG: Eine logische Verzweigungseinheit der Suchstruktur.
+   ABGRENZUNG: KEIN "Page" — eine Page kann mehrere Knoten enthalten.
+
+[KANON] SEITE / PAGE
+   <- "Page"                  (B+-Tree, B²-tree, Masstree)
+   <- "Block"                 (Bender et al. 2002 Tree Layout)
+   <- "Suchseite"             (PRT-ART Termin 2)
+   <- "Page-Cluster"          (CSB+-tree)
+   <- "Disk Block"            (klassische DBMS-Sicht)
+   BEDEUTUNG: Containereinheit, in der ein oder mehrere Knoten gespeichert
+              und aus dem Cache/Speicher als Einheit geladen werden.
+   ABGRENZUNG: Cache Line (kleinere Granularitaet, Hardware-Einheit).
+              Page in PRT-ART ist Software-Konzept; Cache Line ist Hardware.
+
+[KANON] SEITENTYP / PAGE TYPE
+   <- "Page Type"             (PRT-ART Termin 2)
+   <- "Node Family"           (ART: Node4/16/48/256)
+   <- "Node Layout"           (HOT, B-Trees Are Back)
+   <- "Encoding"              (CoCo-trie: Pool unterschiedlicher Encodings)
+   <- "Page Format"           (B²-tree)
+   BEDEUTUNG: Konkrete Auspraegung einer Seite mit fester Layout-Konvention.
+   PRT-ART Familie:
+       - Dense-Byte-Page         (analog ART Node256, dichte Byte-Transitionen)
+       - Extended Dense Page     (analog START multilevel Nodes)
+       - Sparse Patricia Page    (analog HOT, diskriminierende Bits)
+       - Redirect-Page           (analog CoCo-trie collapsed macro-nodes)
+       - PRT-Custom-Cache-Page   (eigener Beitrag: B²+CSS/CSB+-Schnitt)
+
+[KANON] PFAD / SUCHPFAD
+   <- "Search Path"            (allgemein)
+   <- "Root-to-Leaf Path"      (Bender/Demaine/Farach-Colton 2002)
+   <- "Traversal"              (allgemein)
+   <- "Lookup Path"            (CoCo-trie, ART)
+   BEDEUTUNG: Sequenz von Knotenbesuchen vom Root bis zum Treffer/Miss.
+
+[KANON] PRAEFIXKOMPRESSION / PFADKOMPRESSION
+   <- "Path Compression"       (ART)
+   <- "Lazy Expansion"         (ART)
+   <- "Patricia Bits"          (HOT, Patricia Trees)
+   <- "Discriminative Bits"    (HOT)
+   <- "Span"                   (HOT, B²-tree: Bit-/Byte-Span pro Node)
+   <- "Prefix Truncation"      (B-Trees Are Back)
+   <- "Collapsed Subtrie"      (CoCo-trie macro-nodes)
+   BEDEUTUNG: Eindeutige Schluesselsegmente werden NICHT als separate Knoten
+              gespeichert, sondern in einem einzigen Knoten/Eintrag kondensiert.
+   ABGRENZUNG: Redirect (siehe naechster Eintrag) ist die PRT-ART-spezifische
+              physische Umsetzung; Praefixkompression ist das logische Prinzip.
+
+[KANON] REDIRECT
+   <- "Macro-Node"             (CoCo-trie)
+   <- "Anchor"                 (Wormhole)
+   <- "Shortcut Node"          (Wormhole, Redirect-Diskussion)
+   <- "Rewiring"               (START)
+   <- "Jump Pointer"           (Path-Prefetching ScienceDirect 2024)
+   BEDEUTUNG: Knoten, der einen ganzen eindeutigen Restpfad in einem
+              einzigen Sprung ueberspringt — physische Umsetzung von
+              Praefixkompression in PRT-ART.
+
+[KANON] FANOUT
+   <- "Fanout"                 (allgemein, ART, B+-Tree)
+   <- "Branching Factor"       (CoCo-trie, klassisch)
+   <- "Children Count"         (Jacobson 1989: degree)
+   <- "Degree"                 (Jacobson 1989, Graphentheorie)
+   BEDEUTUNG: Anzahl der Kinder eines Knotens (wie viele Sub-Trees).
+
+[KANON] HOEHE / TIEFE
+   <- "Tree Height"            (allgemein, HOT explizit)
+   <- "Depth"                  (Jacobson 1989, allgemein)
+   <- "Tree Levels"            (Jacobson 1989, BFS-level)
+   BEDEUTUNG: Maximale Pfadlaenge Root -> Blatt; bestimmt Worst-Case-Lookup.
+
+--------------------------------------------------------------------------------
+1.2  PAYLOAD / WERTE-VERWALTUNG
+--------------------------------------------------------------------------------
+
+[KANON] VALUEHANDLE
+   <- "ValueHandle"            (PRT-ART Termin 2)
+   <- "Tuple Identifier (TID)" (klassisch)
+   <- "Record ID (RID)"        (DBMS allgemein)
+   <- "Pointer to Payload"     (allgemein)
+   <- "Leaf Pointer"           (B+-Tree)
+   BEDEUTUNG: Referenz auf die mit einem Schluessel assoziierten Nutzdaten.
+
+[KANON] INLINE VALUE
+   <- "Inline Value"           (PRT-ART Termin 2)
+   <- "ValueHandle::Inline"    (PRT-ART Termin 2)
+   <- "Embedded Value"         (allgemein)
+   <- "Hot Value"              (Hot/Cold-Split, PRT-ART)
+   BEDEUTUNG: Kleiner Wert, der direkt im terminalen Knoten gespeichert wird,
+              um eine zusaetzliche Pointer-Indirektion zu sparen.
+
+[KANON] EXTERNAL VALUE
+   <- "External Value"         (PRT-ART Termin 2)
+   <- "ValueHandle::External"  (PRT-ART Termin 2)
+   <- "Cold Value"             (Hot/Cold-Split)
+   <- "Out-of-band Payload"    (allgemein)
+   BEDEUTUNG: Wert wird ausserhalb der Suchstruktur gespeichert; der
+              terminale Knoten enthaelt nur einen Pointer.
+
+[KANON] HOT/COLD-SPLIT
+   <- "Hot/Cold-Split"         (PRT-ART Termin 2)
+   <- "Payload Separation"     (allgemein DBMS)
+   <- "Heavy/Light Indexing"   (allgemein)
+   BEDEUTUNG: Trennung zwischen "im Suchpfad heisser" Navigationsstruktur
+              und "kalter" Payload-Region.
+
+--------------------------------------------------------------------------------
+1.3  SUCH-OPERATIONEN
+--------------------------------------------------------------------------------
+
+[KANON] EXACT LOOKUP
+   <- "Exact Lookup"           (PRT-ART)
+   <- "Point Query"            (B+-Tree, ART, allgemein)
+   <- "Equality Search"        (allgemein)
+   <- "Get"                    (Key-Value-Sicht, Masstree)
+   <- "Find"                   (allgemein)
+   BEDEUTUNG: Schluessel exakt finden; Treffer oder Miss.
+
+[KANON] PREFIX LOOKUP
+   <- "Prefix Lookup"          (PRT-ART)
+   <- "Prefix Match"           (allgemein)
+   <- "Prefix Hit"             (PRT-ART Termin 3)
+   <- "Range Lower Bound"      (SuRF: lower_bound)
+   <- "MoveToNext / Iterator"  (SuRF)
+   BEDEUTUNG: Findet alle (oder das erste) Element mit gegebenem Praefix.
+
+[KANON] PREFIX ENUMERATION
+   <- "Prefix Enumeration"     (PRT-ART)
+   <- "Range Scan"             (B+-Tree, allgemein)
+   <- "Range Query"            (SuRF, ART, allgemein)
+   <- "Iterator"               (Masstree, SuRF)
+   <- "Getrange"               (Masstree)
+   BEDEUTUNG: Aufzaehlung aller Eintraege in einem Praefix-/Range-Bereich.
+
+[KANON] BULK BUILD
+   <- "Bulk Build"             (PRT-ART Termin 3)
+   <- "Bulk Load"              (B+-Tree, ART)
+   <- "Construction"           (allgemein)
+   <- "Build Phase"            (CoCo-trie, START)
+   BEDEUTUNG: Initialer Aufbau aus einer Schluesselmenge.
+
+[KANON] CRUD-OPERATIONEN
+   <- "CRUD"                   (PRT-ART, allgemein)
+   <- "Insert/Update/Delete"   (allgemein)
+   <- "Mutation"               (Termin 6)
+   <- "Reorganisation"         (Termin 6)
+   BEDEUTUNG: Sammelbegriff fuer veraendernde Operationen.
+
+--------------------------------------------------------------------------------
+1.4  ORDNUNGS-/SORTIER-MODUS
+--------------------------------------------------------------------------------
+
+[KANON] UNSORTED MODE
+   <- "Unsorted"               (PRT-ART Termin 1)
+   <- "No Order"               (PRT-ART Termin 2 Default)
+   <- "Hash-Order"             (Wormhole hash-Pfad)
+   BEDEUTUNG: Keine Enumerationsordnung garantiert; nur Punkt-Lookup wichtig.
+
+[KANON] LOCAL ORDERING
+   <- "Local Sorting"          (PRT-ART Termin 1)
+   <- "Page-local Order"       (PRT-ART Termin 2)
+   <- "Sorted within Page"     (CSB+-tree)
+   BEDEUTUNG: Einzelne Seiten/Knoten sind sortiert, aber keine globale Reihenfolge.
+
+[KANON] LEX MODE
+   <- "Lex Mode"               (PRT-ART Termin 2)
+   <- "Lexicographic Order"    (ART, B+-Tree, allgemein)
+   <- "Ordered"                (allgemein)
+   BEDEUTUNG: Globale lexikographische Ordnung; ermoeglicht Range-Scans.
+
+================================================================================
+DOMAENE 2 — CACHE-ENGINE / CACHE-MANAGEMENT
+================================================================================
+
+--------------------------------------------------------------------------------
+2.1  CACHE-HIERARCHIE-BAUSTEINE
+--------------------------------------------------------------------------------
+
+[KANON] CACHE LINE
+   <- "Cache Line"             (Intel/AMD, allgemein)
+   <- "Cacheline"              (PRT-ART Termin 2)
+   <- "Block"                  (Bender et al. 2002, IFIP TCS Saikkonen 2008)
+   BEDEUTUNG: Kleinste Granularitaet, in der Daten zwischen RAM und CPU-Cache
+              transferiert werden (typisch 64 B).
+
+[KANON] CACHE-EBENE
+   <- "Cache Level (L1/L2/L3)" (allgemein)
+   <- "Memory Level"           (Bender 2002)
+   <- "Block Level"            (Saikkonen/Soisalon-Soininen 2008)
+   <- "Hierarchy Level"        (Cache-oblivious Theorie)
+   BEDEUTUNG: Stufe in der Speicherhierarchie (L1, L2, L3, LLC, RAM, Disk).
+
+[KANON] WORKING SET
+   <- "Working Set"            (PRT-ART Termin 6)
+   <- "Hot Set"                (allgemein)
+   <- "Resident Set"           (Linux/OS-Sicht)
+   BEDEUTUNG: Aktuell aktiv genutzte Datenmenge eines Programms.
+
+[KANON] TLB (Translation Lookaside Buffer)
+   <- "TLB"                    (allgemein)
+   <- "Page Table Cache"       (allgemein)
+   <- "Block Level (TLB)"      (Saikkonen/Soisalon-Soininen 2008,
+                                  als "Block-Ebene" modelliert)
+   BEDEUTUNG: CPU-Cache fuer virtuell-physische Adressuebersetzungen.
+   ABGRENZUNG: TLB ist NICHT Cache Line, NICHT Page; eigene Ebene.
+
+--------------------------------------------------------------------------------
+2.2  CACHE-METRIKEN (MESSGROESSEN)
+--------------------------------------------------------------------------------
+
+[KANON] CACHE LINE UTILIZATION (CLU)
+   <- "CLU"                    (Intel Advisor, PRT-ART)
+   <- "Cache Line Utilization" (Intel Advisor User Guide)
+   <- "Effective Bandwidth Use"(allgemein)
+   BEDEUTUNG: Anteil der tatsaechlich genutzten Bytes pro geladener
+              Cache Line. 100% = jede geladene Cache Line wird vollstaendig
+              verwendet.
+
+[KANON] CACHE MISS
+   <- "Cache Miss"             (allgemein)
+   <- "L1/L2/L3-load-miss"     (perf-counter)
+   <- "Cache-misses"           (perf event)
+   <- "Cold Miss / Capacity Miss / Conflict Miss" (Hill/Smith Klassifikation)
+   BEDEUTUNG: Zugriff auf Daten, die sich NICHT im Cache befinden.
+
+[KANON] dTLB-MISS
+   <- "dTLB-Miss"              (perf event, PRT-ART Termin 3)
+   <- "Data TLB Miss"          (Intel docs)
+   <- "Page Table Walk"        (Saikkonen)
+   BEDEUTUNG: TLB enthaelt keine Uebersetzung -> Page-Table Walk.
+
+[KANON] MEMORY FOOTPRINT
+   <- "Memory Footprint"       (Intel Advisor)
+   <- "Simulated Memory Footprint" (Intel Advisor cachesim-mode=footprint)
+   <- "Working Set Size"       (allgemein)
+   <- "Resident Memory"        (OS-Sicht)
+   BEDEUTUNG: Gesamtmenge des effektiv beruehrten Speichers eines Algorithmus.
+
+[KANON] BRANCH MISS
+   <- "Branch Misprediction"   (Intel docs)
+   <- "branch-misses"          (perf event)
+   BEDEUTUNG: CPU prophezeit Verzweigung falsch -> Pipeline-Flush.
+
+[KANON] CYCLES PER INSTRUCTION (CPI) / IPC
+   <- "Cycles"                 (perf event)
+   <- "Instructions"           (perf event)
+   <- "IPC"                    (Intel docs, PRT-ART Termin 3)
+   BEDEUTUNG: Effizienz-Mass; haengt stark von Cache-/Branch-Verhalten ab.
+
+[KANON] LATENZ
+   <- "Latency"                (allgemein)
+   <- "End-to-End Latency"     (PRT-ART Termin 3)
+   <- "Wall Time"              (PRT-ART Termin 6)
+   <- "Tail Latency"           (PRT-ART Termin 3, p95/p99/p99.9)
+   BEDEUTUNG: Zeit zwischen Operations-Anstoss und Ergebnis.
+
+[KANON] DURCHSATZ
+   <- "Throughput"             (PRT-ART, allgemein)
+   <- "ops/s"                  (PRT-ART Termin 4)
+   <- "Operations per Second"  (allgemein)
+   BEDEUTUNG: Anzahl Operationen pro Zeiteinheit.
+
+--------------------------------------------------------------------------------
+2.3  PREFETCH-KONZEPTE
+--------------------------------------------------------------------------------
+
+[KANON] PREFETCH
+   <- "Prefetch"               (allgemein)
+   <- "Software Prefetch"      (Chen/Gibbons/Mowry 2001, GCC __builtin_prefetch)
+   <- "Hardware Prefetch"      (Intel/AMD, automatisch)
+   BEDEUTUNG: Daten werden VOR dem tatsaechlichen Bedarf in den Cache geladen.
+
+[KANON] PREFETCH-DISTANZ
+   <- "Prefetch Distance"      (PRT-ART, Khan 2011)
+   <- "Lookahead Distance"     (Chen/Gibbons/Mowry 2001)
+   <- "Prefetch Offset"        (Khan 2011)
+   BEDEUTUNG: Zeit-/Pointer-Abstand zwischen Prefetch und tatsaechlichem
+              Zugriff. Zu klein -> noch nicht da; zu gross -> Cache Pollution.
+
+[KANON] OVERFETCH / CACHE POLLUTION
+   <- "Overfetch"              (PRT-ART Termin 4)
+   <- "Cache Pollution"        (Mahling 2025, allgemein)
+   <- "False Prefetch"         (Naderan-Tahan 2016)
+   BEDEUTUNG: Prefetch laedt Daten, die NICHT verwendet werden, und
+              verdraengt nuetzliche Cachelines.
+
+[KANON] FILL BUFFER
+   <- "Fill Buffer"            (Intel uarch, Mahling 2025)
+   <- "Line Fill Buffer (LFB)" (Intel)
+   BEDEUTUNG: Hardware-Puffer, der ausstehende Cache-Misses bedient.
+              Begrenzte Anzahl -> bestimmt Prefetch-Wirksamkeit.
+
+[KANON] HOT PATH
+   <- "Hot Path"               (Dortmund 2023 Cache-Optimization)
+   <- "Frequent Access Path"   (Path-Prefetching ScienceDirect 2024)
+   <- "Probability-driven Layout" (Bender/Demaine 2002)
+   BEDEUTUNG: Pfad, der mit hoher Wahrscheinlichkeit besucht wird;
+              Kandidat fuer physische Zusammenfuehrung im Cache.
+
+--------------------------------------------------------------------------------
+2.4  STEUERUNGS-KONZEPTE (CACHE-ENGINE-KERN)
+--------------------------------------------------------------------------------
+
+[KANON] CACHE-ENGINE
+   <- "Cache-Engine"           (PRT-ART Termin 2-6)
+   <- "Cache Control Plane"    (PRT-ART Termin 5)
+   <- "Cache Manager"          (allgemein)
+   <- "Active Cache Layer"     (PRT-ART Termin 4)
+   BEDEUTUNG: PRT-ART-spezifische Meta-Ebene, die unabhaengig von der
+              Such-Algorithmus-Logik Layout-/Prefetch-/Allocation-Entscheidungen
+              trifft.
+   ABGRENZUNG: KEIN "OS Page Cache" — die Cache-Engine arbeitet im User-Space
+              und beeinflusst CPU-Caches indirekt ueber Layout/Allocator/Hints.
+
+[KANON] PASSIVE CACHE-AWARENESS
+   <- "Passive Cache-Awareness"(PRT-ART Termin 4)
+   <- "Static Cache-Conscious" (CSS-tree, CSB+-tree)
+   <- "Cache-Conscious"        (Rao/Ross 1999)
+   BEDEUTUNG: Layout wird einmal beim Design gewaehlt und bleibt fest.
+
+[KANON] AKTIVE CACHE-AWARENESS
+   <- "Active Cache-Awareness" (PRT-ART Termin 4 — Kernbeitrag)
+   <- "Adaptive Layout"        (B-Trees Are Back)
+   <- "Online Adaptation"      (Khan 2011, PRT-ART Termin 6 Modus 3)
+   BEDEUTUNG: Layout-/Policy-Entscheidungen werden zur Laufzeit getroffen
+              und ggf. revidiert.
+
+[KANON] PLATTFORM-KALIBRIERUNG
+   <- "Plattformkalibrierung"  (PRT-ART Termin 5)
+   <- "Hardware Calibration"   (START)
+   <- "Warm-up Calibration"    (PRT-ART Termin 6 Modus 2)
+   <- "Cost Model Calibration" (START)
+   BEDEUTUNG: Mikrobenchmarks zur Erstinstanz, die Plattformschwellen ableiten.
+
+[KANON] ONLINE RELOCATION
+   <- "Online Relocation"      (PRT-ART Termin 4)
+   <- "Re-Layouting"           (Dortmund 2023, PRT-ART Termin 4)
+   <- "Multi-Level Relocation" (Saikkonen 2008)
+   <- "Compaction"             (allgemein, PRT-ART Termin 4)
+   BEDEUTUNG: Daten werden zur Laufzeit physisch umkopiert/umgeordnet,
+              um Cache-Lokalitaet zu verbessern.
+
+[KANON] PROBABILITY HINTS / TELEMETRIE
+   <- "Probability Hints"      (PRT-ART Termin 4)
+   <- "Probability Sketch"     (PRT-ART Termin 4)
+   <- "Histogram per Node"     (Dortmund 2023 Hot-Path)
+   <- "Read Counter"           (Path-Prefetching ScienceDirect 2024)
+   <- "Block-Level Counter"    (Path-Prefetching 2024)
+   BEDEUTUNG: Quantisierte Statistik im Page/Node-Header, die der Cache-Engine
+              "Hot Path"-Information liefert.
+
+[KANON] ALLOCATOR / POOL / ARENA
+   <- "Allocator"              (allgemein, PRT-ART Termin 4)
+   <- "Pool"                   (PRT-ART Termin 2)
+   <- "Arena"                  (tcmalloc, mimalloc)
+   <- "Slab"                   (Linux, allgemein)
+   BEDEUTUNG: Speicher-Verwaltungseinheit, die Allokation kleiner Objekte
+              koalesziert (per Cache Line / Page-aligned).
+
+================================================================================
+DOMAENE 3 — QUERSCHNITT: HARDWARE / ISA
+================================================================================
+
+[KANON] ISA (Instruction Set Architecture)
+   <- "ISA"                    (allgemein)
+   <- "Instruction Set"        (allgemein)
+   <- "Architecture Path"      (PRT-ART Termin 6)
+   PRT-ART-Pfade:
+       - scalar    (kein Vektor)
+       - x86_avx2  (Intel/AMD AVX2)
+       - x86_avx512(Intel Server / AMD Zen 5)
+       - arm_neon  (ARMv8 NEON)
+       - arm_sve2  (ARM Neoverse V2 SVE2)
+
+[KANON] HYBRID CPU (P-/E-Cores)
+   <- "Hybrid CPU"             (Intel Alder Lake/Raptor Lake)
+   <- "Big.LITTLE"             (Arm)
+   <- "P-Core / E-Core"        (Intel)
+   <- "Performance / Efficient"(Intel)
+   <- "asymmetric cores"       (Apple M1, ARM)
+   BEDEUTUNG: CPU mit Kernen unterschiedlicher Mikroarchitektur.
+   PRT-ART Regel: NICHT zusammenaggregieren (cpu_core/* vs cpu_atom/*).
+
+[KANON] FUNCTION MULTIVERSIONING
+   <- "Function Multiversioning"(GCC)
+   <- "target_clones"          (GCC __attribute__)
+   <- "ISA Dispatch"           (PRT-ART Termin 4)
+   <- "Build-/Dispatch-Schicht"(PRT-ART Termin 4)
+   BEDEUTUNG: Gleiche Funktion in mehreren ISA-Varianten kompiliert,
+              Auswahl zur Laufzeit anhand CPU-Features.
+
+================================================================================
+KONZEPTIONELLE IDENTITAETS-MATRIX (Cross-Paper-Mapping fuer wichtigste Begriffe)
+================================================================================
+
+ART        HOT          START          B²-tree     CoCo-trie   PRT-ART (kanon.)
+---------- ------------ -------------- ----------- ----------- -----------------
+Node4      Sparse Node  Single-Byte    Dec. Node   Macro-Node? Sparse Patricia
+                          Multi Node                            Page
+Node256    Dense Node   Multi Node     Span Node   --          Dense-Byte-Page
+                                                               Extended Dense Page
+Path       Patricia     Rewiring       --          Collapsed   Redirect-Page
+Compress.  Bits                                    Subtrie
+--         --           Cost Model     --          Optimizer   Cache-Engine
+                          + Optimizer                            (Control Plane)
+Lazy Exp.  Disc. Bits   Multi-byte     Span        --          Praefixkompression
+                          Span                                  (logisches Konzept)
+TID/RID    Leaf Value   Leaf Pointer   Leaf Value  Lookup      ValueHandle
+                                                    Result
+
+================================================================================
+KONZEPTIONELLE IDENTITAETS-MATRIX (Cache/CPU-Metriken)
+================================================================================
+
+Intel Advisor    perf (Linux)         PAPI               PRT-ART (kanon.)
+---------------- -------------------- ------------------ ---------------------
+CLU              -- (modelliert)      --                 Cache Line Utilization
+Memory Footprint -- (modelliert)      --                 Memory Footprint
+Cache Misses     cache-misses         PAPI_L1_DCM,...    Cache Miss
+LLC Misses       LLC-load-misses      PAPI_L3_TCM        LLC Miss
+TLB Misses       dTLB-load-misses     PAPI_TLB_DM        dTLB Miss
+--               cycles               PAPI_TOT_CYC       Cycles
+--               instructions         PAPI_TOT_INS       Instructions
+--               branches/branch-miss PAPI_BR_*          Branch / Branch Miss
+--               cpu_core/cpu_atom    --                 Hybrid Core PMU
+
+================================================================================
+NOCH UNGEKLAERTE/UNAUFGELOESTE BEGRIFFE (TODO fuer Termin 7+)
+================================================================================
+
+* "ChainRef" (PRT-ART Termin 2 ValueHandle::ChainRef) — explizit vertagt;
+  Mapping zu CoCo-trie Macro-Node noch unklar
+* "fence" / "border node" (Masstree) vs. PRT-ART Page-Boundary — noch
+  nicht endgueltig zugeordnet
+* "Fingerprinting" (B-Trees Are Back) — Methodisch nah an Bloom-Filter,
+  aber konzeptioneller Status in PRT-ART (Termin 1: optional) noch offen
+* "Heads / Hints" (B-Trees Are Back) — Mapping zu PRT-ART Probability Hints
+  noch zu ueberpruefen
+* "Concurrency Token" / "Version" (ART OLC, Masstree) vs. RCU Grace Period —
+  Synchronisations-Begriffe noch nicht vollstaendig harmonisiert
+* SuRF "Fast Succinct Trie (FST)" + "LOUDS-Dense / LOUDS-Sparse" —
+  Mapping zu PRT-ART Seitentyp-Familie (Dense vs Sparse) noch zu pruefen!
+  -> Diese Konzepte stehen sehr nah an PRT-ART Dense-Byte-Page und
+     Sparse Patricia Page; SuRF + Jacobson 1989 muessen vor Termin 8
+     in Domaenenmodell integriert werden.
+
+================================================================================
+ENDE DES GLOSSARS
+================================================================================

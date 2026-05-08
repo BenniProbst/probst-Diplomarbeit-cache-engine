@@ -1,0 +1,284 @@
+================================================================================
+BEGRIFFSGLOSSAR v7 — FINAL (Kuehn-Erkenntnisse + Plattform-Spezifikation)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 5 PRE-REV2
+Stand: 2026-05-09 · ERGAENZT v6_FINAL.txt um Kuehn-Antwort-Erkenntnisse
+                     + Production-Plattform-Spezifikation
+                     + Forschungs-Mission-Statement
+================================================================================
+
+WAS ENTHAELT v7
+   v7 ist ein Erweiterungsdokument zu v3+v4+v5+v6. Es fuegt die Begriffe
+   hinzu, die aus dem Kuehn-Mailverlauf P28 vom 2026-05-08 hervorgehen,
+   plus die in der Probst-Antwort an Kuehn dokumentierte Plattform-
+   Spezifikation und das konsolidierte Forschungs-Mission-Statement.
+
+   BLOCK AI  — Cache-Coherence-Anti-Pattern (Cache-Kohaerenz-Ping-Pong)
+   BLOCK AJ  — LeafOnlyCounter
+   BLOCK AK  — RetroactiveAggregation
+   BLOCK AL  — LeafOnlySampledCounter<N>
+   BLOCK AM  — SamplingRateAdjustmentTree
+   BLOCK AN  — CacheCoherenceCost (in MemoryAccessConcurrency::Write)
+   BLOCK AO  — Production-Plattform-Spezifikation (K8s/Talos, 9950X3D + 14900KS)
+   BLOCK AP  — Forschungs-Mission-Statement (heuristisch vs informiert)
+
+PAPER-LEGENDE: identisch zu v3_FINAL.txt (P01-P33).
+QUELLEN: `Kuehn_Erkenntnisse_Einarbeitung_2026_05_09.txt` und
+         `comdare-cache-engine/docs/email/20260508-1900-mailverlauf_kuehn_p28_eingang.md`
+
+================================================================================
+BLOCK AI — CACHE-COHERENCE-ANTI-PATTERN  (Kuehn 2026-05-08)
+================================================================================
+
+[KANON]  CACHE-COHERENCE-ANTI-PATTERN  (Cache-Kohaerenz-Ping-Pong)
+  SYN ← "Cacheline-Ping-Pong"          P28 Kuehn 2026-05-08 (Mailverlauf)
+  SYN ← "Cache-Kohaerenz-Traffic"      MESI/MOESI-Protokoll-Roundtrips
+  SYN ← "False Sharing (verwandt)"     allgemein, aber feiner: hier echtes
+                                        sharen + schreiben auf gleichem Cache-Line
+  BED Performance-Anti-Pattern bei Multi-Core-Workloads:
+      Wenn ein Knoten in den Caches mehrerer Kerne liegt (typisch Knoten in
+      oberen Baum-Ebenen, weil sie haeufig zugegriffen werden) und Schreib-
+      zugriffe auf diesen Knoten erfolgen, fuehrt das Cache-Kohaerenz-
+      Protokoll zu starkem Cacheline-Ping-Pong zwischen den Kernen.
+      Resultat: Schreiboperation, die isoliert nanosekunden-schnell waere,
+      kostet Hunderte von Zyklen durch Inter-Core-Synchronisation.
+  KONSEQUENZ Naive Per-Knoten-Histogramm-Implementierungen sind
+      UNBRAUCHBAR fuer parallele Workloads — der Telemetrie-Overhead
+      frisst die Hot-Path-Detection-Vorteile auf.
+  BELEG (Kuehn 2026-05-08, Mailverlauf P28):
+      "Insbesondere auf die Knoten in den oberen Ebenen des Baums wird
+       sehr haeufig zugegriffen, sodass diese typischerweise in den
+       Caches mehrerer Kerne liegen. Zusaetzliche Schreibzugriffe fuehren
+       dann durch die Cache-Kohaerenzmechanismen schnell zu starkem
+       Cacheline-Ping-Pong zwischen den Kernen, was die Performance
+       entsprechend beeintraechtigt."
+  BEZ PRT-ART Cache-Engine muss dieses Anti-Pattern erkennen + vermeiden
+      (siehe BLOCK AN — CacheCoherenceCost-Funktion).
+
+[KANON]  NOT-IN-TOP-LEVELS-CONSTRAINT
+  BED C++23-Concept-Constraint, der Per-Knoten-Telemetrie-Strategien NUR
+      in unteren Baum-Ebenen erlaubt:
+        template<typename TS>
+          requires NotInTopLevels<TelemetryStrategy<TS>>
+        ...
+  ROLLE Compile-Time-Verhinderung des Cache-Kohaerenz-Anti-Patterns bei
+      Multi-Core-Workloads.
+
+================================================================================
+BLOCK AJ — LEAFONLY-COUNTER  (Kuehn NEU 2026-05-08, NICHT im Paper P28!)
+================================================================================
+
+[KANON]  LEAFONLY-COUNTER
+  SYN ← "Leaf-Only-Access-Counter"     P28 Kuehn 2026-05-08 (Mailverlauf)
+  BED Telemetrie-Strategie, bei der Zugriffsinformationen NUR in Blatt-
+      Knoten gespeichert werden. Pro Blatt EIN Counter, der in jeder
+      regulaeren Traversierung aktualisiert wird. Innere Knoten
+      enthalten keine Counter waehrend des Hot-Pathes.
+  WARUM-VORTEIL Untere Baum-Ebenen haben geringere Multi-Thread-Konkurrenz
+      auf gleichem Knoten — die Wahrscheinlichkeit, dass viele Threads
+      denselben Blatt-Knoten gleichzeitig bearbeiten, ist niedrig.
+      Cache-Kohaerenz-Overhead minimal.
+  ABHAENGIG `RetroactiveAggregation` (siehe BLOCK AK) ist Voraussetzung,
+      um vor Reordering die Zaehlwerte fuer innere Knoten zu erhalten.
+  BELEG (Kuehn 2026-05-08):
+      "Wir haben daher mittlerweile auch eine vergleichsweise einfache
+       Variante implementiert, bei der die Zugriffsinformationen nicht
+       in allen Knoten, sondern nur in den Blatt-Knoten gespeichert werden."
+  BEZ PRT-ART Cache-Engine: neuer Bausteine-Typ in
+      `Bausteine_Matrix.txt` Achse 11 (Telemetry-Collection-Strategy).
+      Diese Variante ist NEU gegenueber dem publizierten P28-Paper-Stand.
+
+================================================================================
+BLOCK AK — RETROACTIVE-AGGREGATION  (Kuehn NEU 2026-05-08)
+================================================================================
+
+[KANON]  RETROACTIVE-AGGREGATION
+  SYN ← "Retroactive Counter Aggregation"  P28 Kuehn 2026-05-08
+  SYN ← "Wurzel-Up-Traversal vor Reordering"
+  BED Aggregations-Strategie: vor dem eigentlichen Reordering werden alle
+      Blaetter einmal bis zur Wurzel traversiert, wobei die Zugriffszahlen
+      fuer die inneren Knoten aufsummiert werden. Erst danach steht ein
+      vollstaendiges Frequency-Histogramm zur Verfuegung — nur fuer den
+      Reordering-Algorithmus, nicht fuer parallele Reader.
+  PHASE Single-Threaded BARRIERE-Phase (siehe Glossar v5 BLOCK N —
+      Konsolidierungsbarriere).
+  BELEG (Kuehn 2026-05-08):
+      "Vor dem eigentlichen Reordering werden dann alle Blaetter einmal
+       bis zur Wurzel traversiert, wobei die Zugriffszahlen fuer die
+       inneren Knoten aufsummiert werden."
+  BEZ Implementiert als Aggregations-Strategie in
+      `cache_engine/concurrency_manager/` — wird vom RelocationManager
+      vor jeder Reorganisations-Phase aufgerufen.
+
+================================================================================
+BLOCK AL — LEAFONLY-SAMPLED-COUNTER<N>  (Kuehn NEU 2026-05-08)
+================================================================================
+
+[KANON]  LEAFONLY-SAMPLED-COUNTER<N>
+  SYN ← "Sampling-basierte Variante" P28 Kuehn 2026-05-08
+  BED Erweiterung des LeafOnly-Counters: nur jeder N-te Zugriff zaehlt im
+      Blatt-Knoten. Konfigurierbarer GENAUIGKEIT-VS-OVERHEAD-TRADEOFF
+      ueber die Sampling-Rate N.
+  PARAMETER N
+      • N = 1   — jeder Zugriff zaehlt (= LeafOnlyCounter ohne Sampling)
+      • N = 100 — jeder 100. Zugriff zaehlt
+      • N = 1000 — jeder 1000. Zugriff zaehlt (Default fuer Production)
+      • N = 10000 — Hot-Workloads, sehr leichter Overhead
+  ADAPTIV ueber `SamplingRateAdjustmentTree` (siehe BLOCK AM)
+  BELEG (Kuehn 2026-05-08):
+      "Wir haben das Ganze zusaetzlich um eine Sampling-basierte Variante
+       erweitert, bei der nicht jeder Zugriff, sondern nur jeder n-te
+       Zugriff im Blatt-Knoten gezaehlt wird. Dadurch laesst sich der
+       Runtime-Overhead noch einmal reduzieren und man erhaelt einen
+       konfigurierbaren Trade-off zwischen Genauigkeit und Overhead."
+  BEZ Direkt mappbar auf F11 (Mikrobenchmark-Triggering: Sampled 1:N) —
+      jetzt aber auch fuer Telemetrie-Erfassung, nicht nur fuer Mess-Hooks.
+
+================================================================================
+BLOCK AM — SAMPLING-RATE-ADJUSTMENT-TREE  (PRT-ART eigene Konsequenz aus AL)
+================================================================================
+
+[KANON]  SAMPLING-RATE-ADJUSTMENT-TREE
+  SYN ← "Adaptive Sampling-Rate-Decision-Tree"
+  BED DecisionLambdaTree, der waehrend der Laufzeit die Sampling-Rate N
+      des LeafOnly-Sampled-Counters anpasst:
+        • Bei hoher Last → N erhoehen (less measurement overhead)
+        • Bei niedriger Last + sich aendernden Hot-Paths → N reduzieren
+          (mehr Praezision)
+  ENTSCHEIDUNGSGRUNDLAGE
+      • Aktuelle CPU-Auslastung (LiveCpuModel)
+      • Variabilitaet der Hot-Paths in den letzten Messintervallen
+      • Cache-Miss-Rate (perf-Counter)
+  ANBINDUNG In Achse 11 (Telemetry-Collection-Strategy) als
+      DecisionTree-Begleiter zum LeafOnlySampledCounter.
+  BEZ Diese Adjustment-Logik ist PRT-ART-eigene Erweiterung — Kuehn hat
+      die Sampling-Variante eingefuehrt, aber NICHT die adaptive
+      Rate-Anpassung. Das ist unsere Forschungs-Erweiterung.
+
+================================================================================
+BLOCK AN — CACHE-COHERENCE-COST  (Cost-Funktion in MemoryAccessConcurrency::Write)
+================================================================================
+
+[KANON]  CACHE-COHERENCE-COST
+  BED Cost-Funktions-Komponente in der ConcurrencyManager-Disziplin
+      `MemoryAccessConcurrency::Write`, die die Kosten von
+      Schreibzugriffen unter Cache-Kohaerenz-Druck modelliert.
+  FORMEL (vorlaeufig)
+        cost_cache_coherence(write_target_node) =
+           f( node_depth_from_root,
+              num_cores_sharing_node,
+              write_frequency,
+              cache_line_size )
+  WACHSTUM Exponentiell mit `num_cores_sharing_node` fuer Knoten nahe
+      der Wurzel. Linear-mild in `write_frequency`. Threshold-Charakter
+      mit `cache_line_size` (kleinere Cache-Lines = weniger Sharing
+      pro Cache-Line, aber mehr Cache-Lines).
+  ANWENDUNG ueber `CoherenceAwareWriteDecisionTree` in DecisionLambdaTree-
+      Auswertung der CacheEngine:
+        • SKIP Per-Node-Counter-Updates an Wurzelnaehe-Knoten unter
+          Multi-Core-Last
+        • DELAY Reordering bis ConsolidationBarrier
+          (Single-Threaded-Phase, siehe BLOCK AK)
+        • EXECUTE wenn cost_cache_coherence < threshold ODER LeafOnly-
+          Strategie aktiv
+  BEZ Modellierung erfordert Plattform-spezifische Kalibrierung
+      (PlatformProbe + perf MESI-Counter) — passt zur Cache-Engine-Modus-3
+      Online-Adaption.
+
+================================================================================
+BLOCK AO — PRODUCTION-PLATTFORM-SPEZIFIKATION  (Probst-Antwort an Kuehn)
+================================================================================
+
+[KANON]  PRODUCTION-CLUSTER-SPEZ
+  CLUSTER  Kubernetes auf Talos OS (minimalistisch, kein Python; siehe
+           Memory-Notiz `feedback_no_python_in_buildchain`)
+  PRODUCTION-MASCHINEN (zwei, Architekt-Beschluss 2026-05-08)
+      • AMD Ryzen 9 9950X3D2 (Zen 5, mit X3D-V-Cache)
+        - 16 Cores / 32 Threads
+        - 3D V-Cache: asymmetrisch 96+32 MiB L3 (CCD0 mit V-Cache, CCD1 ohne)
+        - DDR5-5600, 64 GB
+      • Intel Core i9-14900KS (Raptor Lake Refresh)
+        - Hybrid-CPU: 8 P-Cores + 16 E-Cores (24 Cores / 32 Threads)
+        - Pflicht: cpu_core/* vs cpu_atom/* perf-Counter trennen
+          (PRT-ART Termin 3+6 Regel)
+        - DDR5-5600, 64 GB
+  MEMORY DDR5-5600, 36 Zyklen Latenz (CL36), 64 GB pro Maschine
+
+[KANON]  X3D-V-CACHE-AWARENESS
+  BED PRT-ART PlatformProbe muss Ryzen-9950X3D-asymmetrischen L3 erkennen:
+      Eines der beiden CCD-Chiplets traegt 96 MiB V-Cache, das andere
+      nur 32 MiB Standard-L3. Bei Trie-Workloads ist Pinning auf das
+      V-Cache-CCD ein 3-fach-Hot-Set-Vergroesserer.
+  KONSEQUENZ neue Concurrency-Disziplin oder Erweiterung von
+      `HybridCorePinning` aus Glossar v4 BLOCK W:
+        - Auf Ryzen 9950X3D: Pinning auf CCD0 (V-Cache) bevorzugt
+          fuer Hot-Path-Threads
+        - Auf i9-14900KS: P-Core-Pinning fuer Hot-Path-Threads
+  BEZ LiveCpuModel haelt Plattform-spezifische Caches-Topologie + nutzt
+      sie in DecisionLambdaTrees fuer Concurrency-Decisions.
+
+================================================================================
+BLOCK AP — FORSCHUNGS-MISSION-STATEMENT  (Probst-Antwort an Kuehn)
+================================================================================
+
+[KANON]  FORSCHUNGS-MISSION
+  ZITAT (Probst 2026-05-08, Mail an Kuehn):
+      "Im Prinzip baue ich also ein Framework zu bewerten und Testen von
+       Suchalgorithmen mit dem Vergleich zwischen heuristischen und
+       informierten Architektur-Entscheidungen und automatischer
+       Anpassung."
+  KONSOLIDIERTE THESE
+      PRT-ART liefert ein Framework zur Bewertung und Testung von
+      Suchalgorithmen mit dem expliziten Vergleich zwischen:
+        • HEURISTISCHEN Architektur-Entscheidungen
+          (klassische Faustregeln, plattform-unabhaengige Defaults,
+           StaticEngine-Modus)
+        • INFORMIERTEN Architektur-Entscheidungen
+          (Cache-Engine-Modell der CPU + plattform-spezifische
+           Kalibrierung, CacheEngine-Modus 1+2)
+        • AUTOMATISCHER ANPASSUNG
+          (Cache-Engine-Modus 3 mit DecisionLambdaTree-Steuerung
+           waehrend der Laufzeit, online adaptiv)
+  OPERATIONALISIERUNG
+      Die Bausteine-Quer-Permutation (F15) operationalisiert diesen
+      Vergleich durch Zerlegung der 33 publizierten Algorithmen in
+      austauschbare Bausteine, die uniform unter heuristischer und
+      informierter Engine-Variante getestet werden.
+  BEZ Diese Mission-These ist als zentrale Diplomarbeit-Einleitung
+      verwendbar — sie konsolidiert F15 + Engine-Choice + Cache-Engine-
+      Modi in einem Satz.
+
+================================================================================
+BEZIEHUNG v3 / v4 / v5 / v6 / v7
+================================================================================
+
+v3_FINAL.txt — P01-P33-Begriffsbelege
+v4_FINAL.txt — Architektur-Pattern, Engine-Choice, Concepts, std::map-API
+v5_FINAL.txt — F1-F15-Beschluss-Begriffe (DecisionLambdaTree, In-Memory-Buffer,
+                ABI-Module, Bausteine-Quer-Permutation, ConcurrencyManager)
+v6_FINAL.txt — Korrekturen + F-EXTRA: Flag-System, Heap-Singleton-im-Builder,
+                Compiler-Layering, Bausteine-Trees, Default-Hooks, Google-Tests
+v7_FINAL.txt — Kuehn-Erkenntnisse + Production-Plattform + Forschungs-Mission:
+                Cache-Coherence-Anti-Pattern, LeafOnly-Counter,
+                RetroactiveAggregation, LeafOnlySampledCounter<N>,
+                SamplingRateAdjustmentTree, CacheCoherenceCost,
+                X3D-V-Cache-Awareness, Forschungs-Mission-Statement
+
+Bei Konflikt: spaetere Version gewinnt (v7 > v6 > v5 > v4 > v3).
+
+================================================================================
+PARALLEL DOKUMENTE
+================================================================================
+
+Kuehn_Erkenntnisse_Einarbeitung_2026_05_09.txt
+   - Zentrale Einarbeitungs-Notiz mit Quellen-Verweisen + Aenderungs-Log
+
+Bausteine_Matrix.txt (Achse 11 NEU + Achse 8 erweitert)
+   - Konkrete Bausteine-Eintraege fuer alle Kuehn-Konzepte
+
+comdare-cache-engine/docs/email/20260508-1900-mailverlauf_kuehn_p28_eingang.md
+   - Vollstaendiger Mailverlauf-Auszug mit Probst-Antwort
+
+================================================================================
+ENDE DES BEGRIFFSGLOSSARS v7
+================================================================================

@@ -1,0 +1,389 @@
+================================================================================
+DATASETS-SPEZIFIKATION (Phase 4.A)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 4.A
+Stand: 2026-05-04 · Beschluss F-EXTRA-2 (voller Custom-Korpus + YCSB)
+================================================================================
+
+ZWECK
+   Vollstaendige Spezifikation des Test-Datensatz-Korpus fuer die
+   PRT-ART-Diplomarbeit. Beschluss F-EXTRA-2: YCSB A-F vollstaendig +
+   alle 6 Custom-Datasets vollstaendig. Begruendung des Architekten:
+   "Universalitaet der CacheEngine mit moeglichst vielen Daten unterlegen.
+    Eine derart vollstaendige Benchmark ueber alle Algorithmen und
+    Algorithmus-Bestandteile existiert noch nicht. In einem Schwung das
+    gesamte Forschungsfeld abdecken, ohne Mehraufwand."
+
+DATASETS-UEBERSICHT
+   Block A — YCSB Standardprofile  (A-F)
+   Block B — URL-Praefixe          (CommonCrawl-Subset)
+   Block C — IP-Adressen           (RIPE-Datasets)
+   Block D — Zipf-Strings          (synthetisch, Praefix-lastig)
+   Block E — Numerische Schluessel (Integer-Sequenzen)
+   Block F — Mixed-Length-Schluessel (variable Laenge)
+   Block G — Praefix-lastige Workloads (PRT-ART-Staerke)
+
+GESAMTUMFANG
+   ~6 YCSB-Profile + 6 Custom-Korpora x 4 Volumen-Klassen = 48 Daten-Sets
+   Pro Daten-Set ein RO-Lookup-Set, ein RW-Mixed-Set, ein Range-Set
+   = ~144 Test-Trace-Dateien
+   Geschaetztes Gesamtvolumen: 100-500 GiB (zu stagen auf ZIH /data/horse)
+
+================================================================================
+BLOCK A — YCSB STANDARDPROFILE
+================================================================================
+
+QUELLE Yahoo! Cloud Serving Benchmark
+   - GitHub: https://github.com/brianfrankcooper/YCSB
+   - Paper: Cooper et al., "Benchmarking Cloud Serving Systems with YCSB"
+            SoCC 2010
+
+PROFILE
+   • A — Update Heavy
+        - Read 50% / Update 50%
+        - Use case: Session store
+   • B — Read Mostly
+        - Read 95% / Update 5%
+        - Use case: Photo tagging
+   • C — Read Only
+        - Read 100%
+        - Use case: User profile cache
+   • D — Read Latest
+        - Read 95% / Insert 5%
+        - Use case: User status updates
+   • E — Short Range
+        - Scan 95% / Insert 5%
+        - Use case: Threaded conversations
+   • F — Read-Modify-Write
+        - Read 50% / Read-Modify-Write 50%
+        - Use case: User database
+
+KEY-DISTRIBUTION (default)
+   Zipfsche Verteilung (Theta = 0.99) ueber Schluessel.
+
+VOLUMEN-KLASSEN (pro Profil)
+   • S    1 Mio. Records, ~100 MiB
+   • M    10 Mio. Records, ~1 GiB
+   • L    100 Mio. Records, ~10 GiB
+   • XL   1 Mrd. Records, ~100 GiB (nur ZIH-Storage)
+
+KEY-/VALUE-SCHEMA
+   Key:   24-Byte ASCII (z.B. "user1234567890123456789")
+   Value: 1 KiB Blob (10 Felder a 100 Byte; YCSB-Standard)
+
+GENERIERUNG
+   `tools/dataset_loader/ycsb_generator.py --profile=A --volume=M --output=...`
+   (eigener Wrapper um YCSB-Generator)
+
+================================================================================
+BLOCK B — URL-PRAEFIXE  (CommonCrawl-Subset)
+================================================================================
+
+QUELLE CommonCrawl
+   - Web: https://commoncrawl.org/
+   - Format: WARC/WET-Dateien
+   - Lizenz: CC-BY (frei)
+
+ZWECK
+   PRT-ART-relevant: URL-Praefixe sind hierarchisch (Schema/Host/Path/Query),
+   was Praefixkompression + Trie-Strukturen ideal stresst.
+
+EXTRAKTION
+   `tools/dataset_loader/commoncrawl_extractor.py`
+   - Liest WARC-Dateien
+   - Extrahiert URLs
+   - Sortiert nach Praefix-Verteilung
+
+VOLUMEN-KLASSEN
+   • S    100k URLs, ~10 MiB
+   • M    1 Mio. URLs, ~100 MiB
+   • L    10 Mio. URLs, ~1 GiB
+   • XL   100 Mio. URLs, ~10 GiB
+
+KEY-SCHEMA
+   Variable laenge (typisch 30-200 Byte), UTF-8.
+
+WORKLOAD-VARIANTEN
+   • B-RO    100% Lookup
+   • B-RW    50/50 Lookup/Insert
+   • B-RANGE Praefix-Range-Scan (z.B. "alle URLs unter https://example.com/")
+
+================================================================================
+BLOCK C — IP-ADRESSEN  (RIPE-Datasets)
+================================================================================
+
+QUELLE RIPE NCC
+   - RIPE Atlas: https://atlas.ripe.net/
+   - RIPE BGP-Daten: https://www.ripe.net/analyse/internet-measurements/
+                     routing-information-service-ris
+   - Lizenz: oeffentlich
+
+ZWECK
+   IP-Adressen sind feste-laenge binaere Schluessel (4 Byte IPv4 / 16 Byte
+   IPv6), gut fuer Vergleich mit URL-/String-Datasets.
+
+EXTRAKTION
+   `tools/dataset_loader/ripe_extractor.py`
+   - Extrahiert IPv4/IPv6-Adressen aus RIPE-Dumps
+   - Verteilung: IPv4-aktive Adressen + IPv6-Praefixe
+
+VOLUMEN-KLASSEN
+   • S    1 Mio. IPs, ~16 MiB (IPv6) / ~4 MiB (IPv4)
+   • M    10 Mio. IPs, ~160 MiB / ~40 MiB
+   • L    100 Mio. IPs, ~1.6 GiB / ~400 MiB
+   • XL   alle aktiven IPv4 (~4 Mrd.) / IPv6-Praefixe
+
+KEY-SCHEMA
+   IPv4: 4 Byte unsigned int (network-order)
+   IPv6: 16 Byte big-endian
+
+WORKLOAD-VARIANTEN
+   • C-RO       100% Lookup
+   • C-RW       50/50 Lookup/Insert
+   • C-LPM      Longest Prefix Match (router-typisch)
+   • C-RANGE    Subnet-Range-Scan (z.B. "alle IPs in 10.0.0.0/8")
+
+================================================================================
+BLOCK D — ZIPF-STRINGS  (synthetisch, Praefix-lastig)
+================================================================================
+
+QUELLE Synthetisch generiert
+   - Zipfsche Verteilung ueber Praefixe
+   - Variable Theta (0.5, 0.99, 1.5)
+
+ZWECK
+   Kontrollierte Zipfsche Schluesselverteilung — wichtig fuer Hot-Path-
+   Detection (P26/P28) und Cache-Engine-Modus 3.
+
+GENERIERUNG
+   `tools/dataset_loader/zipf_string_generator.py --theta=0.99 --keys=1M`
+   - Generiert Strings mit kontrollierter Praefix-Verteilung
+   - Theta steuert Schraege
+
+VOLUMEN-KLASSEN
+   • S    100k Keys, ~10 MiB
+   • M    1 Mio. Keys, ~100 MiB
+   • L    10 Mio. Keys, ~1 GiB
+   • XL   100 Mio. Keys, ~10 GiB
+
+KEY-SCHEMA
+   Variable laenge 16-128 Byte, ASCII
+
+WORKLOAD-VARIANTEN
+   • D-RO    100% Lookup (Hot-Set sichtbar)
+   • D-RW    Update-Heavy Hot-Set
+   • D-CHURN dynamische Hot-Set-Verschiebung (Test fuer Online-Adaption)
+
+================================================================================
+BLOCK E — NUMERISCHE SCHLUESSEL  (Integer-Sequenzen)
+================================================================================
+
+QUELLE Synthetisch generiert
+   - Sequential Integer (1, 2, 3, ...)
+   - Random Integer (uniform)
+   - Skewed Integer (Zipf)
+
+ZWECK
+   Vergleichsbasis fuer Strukturen, die mit fester-laenge primitiven
+   Schluesseln optimal arbeiten (CSS-Tree, CSB+-Tree, Wider-Hankins,
+   B²-tree). Numerische Schluessel sind eine wichtige Klasse fuer DBMS-
+   Indexes.
+
+GENERIERUNG
+   `tools/dataset_loader/integer_generator.py --distribution=zipf --keys=10M`
+
+VOLUMEN-KLASSEN
+   • S    1 Mio. Keys, ~8 MiB (uint64)
+   • M    10 Mio. Keys, ~80 MiB
+   • L    100 Mio. Keys, ~800 MiB
+   • XL   1 Mrd. Keys, ~8 GiB
+
+KEY-SCHEMA
+   uint64_t, little-endian (oder als Byte-String fuer Trie-Adapter)
+
+WORKLOAD-VARIANTEN
+   • E-RO         100% Lookup
+   • E-RW         50/50 Lookup/Insert
+   • E-RANGE      Range-Scan ueber Integer-Bereich
+   • E-SEQUENTIAL ascending Insert (Worst-Case fuer einige Strukturen)
+
+================================================================================
+BLOCK F — MIXED-LENGTH-SCHLUESSEL  (variable Laenge)
+================================================================================
+
+QUELLE Synthetisch (vermischt Block B+D+E)
+   - 30% kurze Schluessel (8-32 Byte)
+   - 50% mittlere Schluessel (32-128 Byte)
+   - 20% lange Schluessel (128-512 Byte)
+
+ZWECK
+   Stresst Mechaniken wie Praefixkompression (P01 Path Compr., P04 Macro,
+   P05 Rewiring) sowie ValueHandle-Inline-vs-External-Logik.
+
+GENERIERUNG
+   `tools/dataset_loader/mixed_length_generator.py --keys=10M`
+
+VOLUMEN-KLASSEN
+   • S    100k Keys, ~30 MiB
+   • M    1 Mio. Keys, ~300 MiB
+   • L    10 Mio. Keys, ~3 GiB
+   • XL   100 Mio. Keys, ~30 GiB
+
+WORKLOAD-VARIANTEN
+   • F-RO       100% Lookup
+   • F-RW       50/50 Lookup/Insert
+   • F-PREFIX   Praefix-Range-Scan
+   • F-DELETE   Insert + Delete (stresst Concurrency + Reclamation)
+
+================================================================================
+BLOCK G — PRAEFIX-LASTIGE WORKLOADS  (PRT-ART-Staerke)
+================================================================================
+
+QUELLE Hybrid (CommonCrawl + DNS-Zonen + RIPE-Praefixe)
+   - DNS-Zonen-Subdomains (z.B. *.example.com)
+   - Hierarchische Filesystem-Pfade (/usr/local/bin/...)
+   - Versionierte Software-Identifier (z.B. com.comdare:cache-engine:1.0.0)
+
+ZWECK
+   PRT-ART optimiert fuer Praefix-lastige Workloads (Trie-Huelle +
+   Redirect-Knoten). Dieser Block testet die Staerken von PRT-ART
+   explizit.
+
+EXTRAKTION
+   `tools/dataset_loader/prefix_heavy_generator.py`
+   - Kombiniert mehrere Praefix-Hierarchien
+   - Verteilung: starke Praefix-Klusterung (z.B. 80% der Keys teilen
+     einen 32-Byte-Praefix mit anderen Keys)
+
+VOLUMEN-KLASSEN
+   • S    100k Keys, ~20 MiB
+   • M    1 Mio. Keys, ~200 MiB
+   • L    10 Mio. Keys, ~2 GiB
+   • XL   100 Mio. Keys, ~20 GiB
+
+WORKLOAD-VARIANTEN
+   • G-RO         100% Lookup
+   • G-PREFIX     Praefix-Range-Scan (PRT-ART-spezifischer Use Case)
+   • G-PREFIX-DEL Praefix-Range-Delete
+
+================================================================================
+DATASET-LOADER (Komponente)
+================================================================================
+
+KOMPONENTE
+   namespace comdare::dataset {
+
+     enum class DatasetKind {
+       YCSB_A, YCSB_B, YCSB_C, YCSB_D, YCSB_E, YCSB_F,
+       URL_COMMONCRAWL, IP_RIPE, ZIPF_STRING, INTEGER_SEQ,
+       MIXED_LENGTH, PREFIX_HEAVY
+     };
+
+     enum class VolumeClass { S, M, L, XL };
+
+     enum class WorkloadVariant {
+       RO, RW, RANGE, LPM, CHURN, SEQUENTIAL, PREFIX, DELETE
+     };
+
+     class DatasetLoader {
+     public:
+       struct Spec {
+         DatasetKind kind;
+         VolumeClass volume;
+         WorkloadVariant variant;
+         std::filesystem::path source_root;
+       };
+
+       struct LoadedTrace {
+         std::span<const std::byte> keys;
+         std::span<const Operation> operations;
+       };
+
+       LoadedTrace load(Spec const&) const;
+     };
+
+   } // namespace
+
+ABLAGE
+   Datasets liegen unter:
+     • Lokale Workstation:  Z:\Datasets\PRT-ART\<dataset>\<volume>\<variant>\
+     • ZIH /data/horse:     /data/horse/p_llm_compile/datasets/PRT-ART/...
+
+================================================================================
+ZUORDNUNG DATASET ↔ ALGORITHMUS-BAUSTEIN-PERMUTATION
+================================================================================
+
+Nicht jede Datasets-Variante ist fuer jede Permutation sinnvoll. Mapping:
+
+   YCSB A-F           → ALLE Algorithmen (Vergleich mit Literatur)
+   URL CommonCrawl    → Trie-Familie + Hybrid (P01-P10, P07)
+   IP RIPE LPM        → Radix-Tree-aehnliche Strukturen (P01 ART, PRT-ART)
+   Zipf-Strings       → Hot-Path-Erkennung-Tests (P26, P28, PRT-ART Modus 3)
+   Integer-Sequenzen  → B-Tree-Familie (P11-P14, P20-P22)
+   Mixed-Length       → Praefixkompression-Tests (P01 Path Compr., P04, P05)
+   Prefix-Heavy       → PRT-ART-Staerke (Redirect + Praefix-Trie-Huelle)
+
+CROSS-MATRIX: Dataset x Algorithmus-Permutation = Experimentskala
+   ~144 Test-Trace-Dateien x ~500 Algorithmus-Permutationen
+   = ~72.000 Experimente (full-cross)
+   In Realitaet via Mapping reduziert auf ~20.000 sinnvolle Experimente.
+
+================================================================================
+PHASE 4.A — DURCHFUEHRUNGS-PLAN
+================================================================================
+
+SCHRITT 1  Tooling-Stub-Code anlegen
+   - `tools/dataset_loader/ycsb_generator.py`
+   - `tools/dataset_loader/commoncrawl_extractor.py`
+   - `tools/dataset_loader/ripe_extractor.py`
+   - `tools/dataset_loader/zipf_string_generator.py`
+   - `tools/dataset_loader/integer_generator.py`
+   - `tools/dataset_loader/mixed_length_generator.py`
+   - `tools/dataset_loader/prefix_heavy_generator.py`
+
+SCHRITT 2  Datasets-S-Volumen generieren (lokal)
+   - Pro Block ein S-Volumen erzeugen, fuer Quick-Tests
+
+SCHRITT 3  Datasets-M-Volumen generieren (lokal/CI)
+   - Workstation-Tests fuer Compile-Time-Modus
+
+SCHRITT 4  Datasets-L+XL-Volumen vorbereiten
+   - L-Volumen lokal (auf NAS-Storage)
+   - XL-Volumen auf ZIH /data/horse
+
+SCHRITT 5  CommonCrawl + RIPE Daten herunterladen
+   - CommonCrawl-Subset (~10-100 GiB)
+   - RIPE BGP-Dump (~1-10 GiB)
+
+SCHRITT 6  Validierungs-Tests (in Phase 4.B als Test-Targets)
+   - Pro Dataset: Verteilungstest, Praefix-Histogram
+   - Pro Workload-Variante: Operations-Mix-Test
+
+================================================================================
+ABHAENGIGKEITEN
+================================================================================
+
+ABH-1  Phase 4.B (Projekt-Setup) muss DatasetLoader-Komponente integrieren
+ABH-2  ZIH-Workspace fuer XL-Datasets benoetigt
+ABH-3  CommonCrawl + RIPE-Dataset-Quotas verifizieren
+ABH-4  Storage-Quota auf NAS und ZIH /data/horse pruefen
+
+================================================================================
+OFFENE PUNKTE
+================================================================================
+
+OP-1   YCSB-Generator-Anbindung — F5-Beschluss: Original Java-YCSB einbinden,
+       Steuerung via CMake + sh/bat-Skripte (KEIN Python — H6/F-EXTRA-5
+       NO-PYTHON-DIREKTIVE). Java-YCSB lebt auf Debian-Pod im Development-
+       Cluster (OPEN-3 / Task #109); Production-Cluster (Talos OS) erhaelt
+       Daten per Netzwerk zur Test-Zeit.
+OP-2   CommonCrawl-Subset-Definition (welche Crawl-Welle? welche Sub-
+       sample-Strategie?)
+OP-3   RIPE-Dataset-Stand (welche Snapshot-Datum?)
+OP-4   Zipf-Theta-Klassen (welche Werte konkret?)
+OP-5   Mixed-Length-Verteilungs-Parameter (welche Distribution genau?)
+OP-6   Prefix-Heavy-Verteilung (wie stark gruppiert?)
+
+================================================================================
+ENDE DATASET-SPEZIFIKATION (Phase 4.A)
+================================================================================

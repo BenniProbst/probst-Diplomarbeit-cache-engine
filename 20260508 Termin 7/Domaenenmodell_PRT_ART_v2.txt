@@ -1,0 +1,1025 @@
+================================================================================
+DOMAENENMODELL v2 — PRT-ART (Predix-Trie-ART)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D (REV 2)
+Stand: 2026-05-04 · ersetzt Domaenenmodell_PRT_ART.txt (v1)
+Vorbereitet fuer: Phase 5 (drawio UML — gesperrt bis Nutzer-GO)
+================================================================================
+
+WAS GEAENDERT WURDE GEGENUEBER v1 (Nutzer-Direktiven, Termin 7, 2026-05-04)
+   1. Cache Engine = globales Heap-Modul mit Observer + Visitor (2 Funktionsschichten)
+   2. Compile-Time-Schicht ausgegliedert: separates Programm `CacheEngineBuilder`
+   3. Runtime-Schicht: Visitor des Such-Algorithmus + Observer der Telemetrie
+   4. trie_core → fan_out_engine (allgemeiner; Tries, B-/B+-/B*-Baum, ... )
+   5. std::map-API ist Basisvertrag; Engine-Type-Wahl: StaticEngine vs CacheEngine
+   6. Habich-Direktive: Originalcode aller Fremd-Algorithmen NUR exakt kopiert;
+      Adapter-Pattern dazwischen; invasive Eingriffe (Messpunkte) AB Habich
+   7. ValueHandle ist Sache der NODE; compile-time switch array begrenzt
+      Moeglichkeiten, runtime-Auswahl je nach Algorithmus-Eigenschaften
+   8. ConcurrencyManager als Singleton in CacheEngine — 8+ Disziplin-Klassen
+      (Suchseiten/Nodes/Arrays/Datenstrukturen/Suchpfade/Speicherzugriffe/SIMD)
+   9. Hazard Pointers RAUS — memory leak ist undefiniertes Verhalten;
+      Aufraeumen ist Pflicht (RCU + deterministische Reclamation)
+   10. C++23 als Pflichtstandard (Metaprogrammierung + ABI-stabile Module)
+   11. Read Counter = uint64_t (Langzeit-Experimente)
+   12. Projektstruktur korrigiert: comdare-cache-engine wurde verschoben →
+       wir VERWENDEN bestehende COMDARE-Modules (private) UND erweitern sie;
+       Modules werden AUSNAHMSWEISE als feste Submodules in das C++ Projekt
+       einbezogen. Statische Veroeffentlichung NUR im comdare-cache-engine.
+   13. Konzeptionelle Elemente sind als C++ concepts mit requires zu modellieren
+       (Page, Node, Traversal, MemoryLayout, ValueHandle-Strategy, ...).
+   14. Basis aller Algorithmen: std::map<Key, Value>; Algorithmen ersetzen map.
+       Key-Type kann implizit mit Hashing/Fingerprinting ueberlagert sein.
+   15. CacheEngine ist per Definition ein laufendes Modell der CPU.
+
+================================================================================
+1. ARCHITEKTUR-GRUNDPRINZIPIEN
+================================================================================
+
+(A) BASISVERTRAG
+   Jeder Such-Algorithmus implementiert die `std::map<Key, Value>`-API
+   (vollstaendig, C++23). Algorithmen sind dropin-Ersatz fuer std::map.
+   Der Key-Type kann implizit mit Hashing/Fingerprinting ueberlagert sein
+   (z.B. fuer ART/HOT-Style Bit-Manipulation auf bytewise-Schluesseln).
+
+(B) ENGINE-TYPE-WAHL
+   Jeder Algorithmus existiert in zwei Engine-Varianten, gewaehlt ueber Template-
+   Parameter:
+     • `StaticEngine<Algo>`  — exakter Originalcode + Adapter; KEINE
+        Optimierungen ueber State-of-the-Art hinaus
+     • `CacheEngine<Algo>`   — aktive Optimierung; Compile-Time-Permutation +
+        Runtime-Visitor/Observer + ConcurrencyManager + Mikrobenchmarks
+   Beide liefern Mikrobenchmarks; nur CacheEngine optimiert aktiv.
+
+(C) ZWEI FUNKTIONSSCHICHTEN DER CACHE ENGINE
+   Schicht 1 — COMPILE TIME (Programm: `CacheEngineBuilder`)
+     - Permutiert Algorithmus-Bestandteile (Page-Type x Node-Layout x
+       Traversal x ValueHandle-Strategy x Allocator x Concurrency-Disziplin
+       x ISA-Pfad x ...) gegeneinander
+     - C++23-Metaprogrammierung: statische Kompilation jeder Permutation
+     - Misst Permutationen (Cache-Warmup, Datensatz-Aufbereitung, Benchmark)
+     - Persistiert in Datenbank
+     - Rendert finalen LaTeX-Anhang fuer die Diplomarbeit (Tabellen, Plots)
+   Schicht 2 — RUNTIME (Globales Heap-Modul, Singleton-aehnlich)
+     - Observer Pattern: Algorithmus benachrichtigt Cache Engine ueber Zustand
+     - Visitor Pattern: Cache Engine besucht Algorithmus-Knoten zur Laufzeit
+     - Empfiehlt Ausfuehrungsstrategie (basierend auf Compile-Time-Wissen)
+     - Fuehrt zu statischer Auslieferung der gewaehlten/optimalen Strategie
+       je Architektur (per kompilierter Variante geladen)
+     - Echtzeit-Mikrobenchmarks akkumulieren im Speicher, werden gespoolt
+     - ConcurrencyManager-Singleton lebt in der CacheEngine
+
+(D) CACHE ENGINE = LAUFENDES CPU-MODELL
+   Per Definition ein laufendes Modell der CPU, ihrer Eigenschaften, Prozesse/
+   Ablaeufe und Verarbeitungs-Bewusstsein, um Verarbeitungseigenschaften mit
+   wissenden Entscheidungen ueber die Architektur zu verbessern.
+
+(E) HABICH-DIREKTIVE (Originalcode unangetastet)
+   - Originalcode JEDES fremden Algorithmus (P01-P33 ausser PRT-ART) wird
+     EXAKT KOPIERT uebernommen.
+   - Anbindung erfolgt ueber ein Adapter-Pattern.
+   - Einzelne invasive Eingriffe (z.B. Messpunkt-Hooks) muessen mit Prof. Habich
+     ABGESPROCHEN werden — bis dahin nur extern messen.
+   - PRT-ART (eigener Test-Algorithmus) ist die einzige Ausnahme, in die wir
+     frei eingreifen duerfen.
+
+(F) KONZEPT-MAPPING (Klassen ↔ C++ concepts)
+   Konzeptionelle Elemente werden als C++ concepts mit `requires`-Klauseln
+   modelliert. Jeder Algorithmus liefert pro konzeptionellem Element seine
+   eigene Implementierung — alle erfuellen dasselbe Interface (Concept).
+   Konzeptionelle Elemente:
+     • Page                (Suchseite)
+     • Node                (Knoten)
+     • Traversal           (Lookup-Pfad-Strategie)
+     • MemoryLayout        (Allocation + Alignment fuer Nodes/Data/Inline/Meta)
+     • ValueHandleStrategy (Inline | Pointer | RedirectToNode/Page)
+     • PageAllocator       (Pool/Arena/Slab)
+     • PrefetchStrategy
+     • ConcurrencyDiscipline
+     • Telemetry
+
+(G) ZIELSTANDARD: C++23
+   - Verbesserte Metaprogrammierung (constexpr, concepts, deducing this)
+   - ABI-stabile Module fuer Algorithmus-Austausch ueber gleiches Interface
+   - Erleichtert die globale Messung aller Experimente durch CacheEngineBuilder.
+
+(H) READ COUNTER = uint64_t
+   Aufgrund von Langzeit-Experimenten (Stunden bis Tage) sind Read Counter
+   pro Block/Knoten als `std::uint64_t` zu modellieren (KEIN u32).
+
+(I) MEMORY RECLAMATION
+   - RCU als Default fuer Online-Relocation (P29 McKenney 2001)
+   - Hazard Pointers RAUS — memory leak ist verbotenes undefiniertes Verhalten,
+     Aufraeumen ist Pflicht. Deterministische Reclamation in Verbindung mit
+     RCU/EpochManager.
+   - Kein GPU-Code (CPU-only Scope der Diplomarbeit).
+
+================================================================================
+2. DOMAENEN-UEBERBLICK (sechs Domaenen, einseitige Abhaengigkeiten)
+================================================================================
+
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ DOMAENE 1 — SEARCH ENGINE                                       │
+   │ fan_out_engine, Algorithm Strategies (P01-P33 + PRT-ART),       │
+   │ Page/Node/Traversal/ValueHandle als Concepts, std::map-API      │
+   └─────────────────────────────────────────────────────────────────┘
+              │  benachrichtigt (Observer)         empfaengt (Visitor)
+              ▼                                                ▲
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ DOMAENE 2 — CACHE ENGINE  (KERNBEITRAG)                         │
+   │ Schicht A: CacheEngineBuilder (Compile-Time-Programm)            │
+   │ Schicht B: CacheEngineRuntime (globales Heap-Modul, Singleton)   │
+   │ ConcurrencyManager (Singleton, viele Disziplinen) lebt hier      │
+   └─────────────────────────────────────────────────────────────────┘
+              │ nutzt          │ nutzt              │ nutzt
+              ▼                 ▼                    ▼
+   ┌──────────────────┐  ┌──────────────────┐  ┌────────────────────────┐
+   │ DOMAENE 3        │  │ DOMAENE 4        │  │ DOMAENE 5              │
+   │ MEASUREMENT      │  │ HARDWARE / ISA   │  │ ENGINE-CHOICE          │
+   │ 3 Bestandteile:  │  │ ISA-Dispatch,    │  │ StaticEngine vs        │
+   │ Builder/Single/  │  │ Hybrid-Core,     │  │ CacheEngine als Top-   │
+   │ Mikrobenchmark   │  │ Memory-Type      │  │ Level Adapter          │
+   └──────────────────┘  └──────────────────┘  └────────────────────────┘
+                                                    │
+                                                    ▼
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ DOMAENE 6 — PERSISTENCE & PUBLICATION                           │
+   │ DB-Schema fuer Permutations-Messungen, LaTeX-Renderer            │
+   └─────────────────────────────────────────────────────────────────┘
+
+KARDINAL-REGELN
+   - SearchEngine ↔ CacheEngine: bidirektional (Observer/Visitor), aber:
+     • SearchEngine ruft CacheEngine via Observer-Notify auf
+     • CacheEngine traversiert SearchEngine via Visitor-Pattern
+     • CacheEngine kennt KEINE algorithmus-spezifischen internen Strukturen
+       (interagiert nur ueber Concepts/Interfaces)
+   - Engine-Choice ist eine COMPILE-TIME-Entscheidung (Template-Parameter),
+     KEINE Runtime-Switching-Logik.
+   - Persistence wird NUR von CacheEngineBuilder beschrieben (compile-time
+     side); LaTeX-Renderer NUR aus DB lesend.
+
+================================================================================
+3. DOMAENE 1 — SEARCH ENGINE
+================================================================================
+
+ZWECK
+   Implementierung der Indexstrukturen (fan-out engine: Tries / B-/B+-/...-
+   Baeume etc.) und der Operationen darauf (vollstaendige std::map-API).
+   Jede konzeptionelle Komponente ist als C++23 Concept definiert; jedes
+   Paper-Algorithmus liefert seine Implementierung.
+
+3.1 PACKAGE: fan_out_engine                                       [PUBLIC API]
+================================================================================
+
+CONCEPT FanOutContainer<C, K, V>                                   [C++23 CONCEPT]
+   requires {
+     typename C::key_type;
+     typename C::value_type;
+     typename C::iterator;
+     typename C::size_type;
+     { c.lookup(k) } -> std::same_as<std::optional<V>>;
+     { c.insert(k, v) } -> std::same_as<std::pair<typename C::iterator, bool>>;
+     { c.range(low, high) } -> std::same_as<typename C::range_view>;
+     // ... vollstaendige std::map-API
+   };
+
+CLASS-FAMILIE FanOutContainer (Adapter-Pattern, je Algorithmus eine Klasse)
+   - SUB-INTERFACE TrieContainer       (z.B. P01 ART, P02 HOT, P05 START,
+                                         P03 Masstree, P04 CoCo, P10 SuRF,
+                                         P07 Wormhole, P09 LOUDS, PRT-ART)
+   - SUB-INTERFACE BTreeContainer      (z.B. P11 CSS, P12 CSB+, P13 Hankins,
+                                         P14 Samuel, P20 B-Trees Are Back,
+                                         P21 ChenPB, P22 Chen Fractal,
+                                         P06 B²-tree)
+   - SUB-INTERFACE BPlusTreeContainer  (B+-spezifische Operationen — verlinkte
+                                         Leaves)
+   - SUB-INTERFACE BStarTreeContainer  (B*-spezifisch, 2/3 fill-factor)
+   - SUB-INTERFACE LSMContainer        (Log-Structured Merge — falls integriert)
+   - SUB-INTERFACE FractalTreeContainer
+   - SUB-INTERFACE COLAContainer       (Cache-Oblivious Lookahead)
+   - SUB-INTERFACE SkipListContainer   (probabilistisch, Multi-Way)
+   - SUB-INTERFACE TTreeContainer      (in-memory T-Tree)
+   - SUB-INTERFACE TSTContainer        (Ternary Search Tree)
+   - SUB-INTERFACE JudyContainer       (Judy Array)
+   - SUB-INTERFACE VanEmdeBoasContainer
+   - SUB-INTERFACE DAFSAContainer      (Directed Acyclic Word Automaton)
+   - SUB-INTERFACE XFastTrieContainer / YFastTrieContainer
+   - SUB-INTERFACE ARTContainer        (P01 ART, PRT-ART als Spezialisierung)
+   - SUB-INTERFACE HOTContainer
+   - ...erweiterbar je Paper
+
+LISTE DER FAN-OUT-FAMILIEN (Recherche, vollstaendig fuer Termin-7-Scope)
+   • Trie-Familie:
+       - Standard Trie / Patricia Trie / Radix Tree (komprimiert)
+       - HAT-Trie (Hash Array Trie)
+       - ART (Adaptive Radix Tree, P01)
+       - HOT (Height-Optimized Trie, P02)
+       - Masstree (Trie of B+-Trees, P03)
+       - CoCo-Trie (P04)
+       - START (P05)
+       - SuRF / FST (P10)
+       - LOUDS / LOUDS-Dense / LOUDS-Sparse (P09)
+       - Bonsai Trie
+       - DAFSA / DAWG (Directed Acyclic Word Automaton)
+       - X-Fast / Y-Fast Trie
+       - Wormhole MetaTrie (P07, hybrid)
+       - PRT-ART (eigen)
+   • B-Tree-Familie:
+       - B-Tree
+       - B+-Tree
+       - B*-Tree (2/3 fill factor)
+       - B(epsilon)-Tree (LSM-aehnliches Verhalten)
+       - B²-tree (P06; eingebetteter Tree pro Page)
+       - 2-3-Tree, 2-3-4-Tree
+       - CSS-Tree (P11; pointer-frei)
+       - CSB+-Tree (P12; Sibling-Cluster)
+       - Wider-Node B+-Tree (P13)
+       - Adaptive B-Tree (P20)
+       - Prefetching B+-Tree (P21)
+       - Fractal Prefetching B+-Tree (P22)
+       - T-Tree (in-memory)
+   • Hybrid:
+       - Wormhole (Trie+Hash+B+, P07)
+       - Masstree (Trie+B+, P03)
+       - Fractal Tree
+       - LSM-Tree (Log-Structured Merge)
+       - COLA (Cache-Oblivious Lookahead Array)
+       - Skiplist
+   • Succinct:
+       - LOUDS (P09), FST/SuRF (P10)
+   • Spezial:
+       - TST (Ternary Search Tree)
+       - Judy Array
+       - Van Emde Boas Tree
+
+3.2 PACKAGE: algorithm_strategies (Strategy Pattern, je Paper eine Strategy)
+================================================================================
+
+INTERFACE IAlgorithmStrategy<K, V>                                 [INTERN]
+   + lookup(K) -> Option<V>
+   + insert(K, V) -> InsertResult
+   + range(K low, K high) -> Iterator
+   + traversal_concept() -> TraversalKind     (Concept-Tag)
+   + page_concept() -> PageKind               (Concept-Tag)
+   + node_concept() -> NodeKind               (Concept-Tag)
+   + value_handle_strategy() -> ValueHandleKind
+   + accept(IVisitor& visitor)                (Visitor-Pattern Hook)
+   + register_observer(IObserver*)            (Observer-Pattern Hook)
+
+CLASS ARTStrategy implements IAlgorithmStrategy<K,V>               [P01]
+   - original_code: ext::leis_art::ART          (HABICH: exakt kopiert)
+   - adapter: AdapterToFanOutContainer
+   ...
+
+CLASS HOTStrategy implements IAlgorithmStrategy<K,V>               [P02]
+   - original_code: ext::binna_hot::HOT
+   - adapter: AdapterToFanOutContainer
+   ...
+
+CLASS MasstreeStrategy implements IAlgorithmStrategy<K,V>          [P03]
+CLASS CoCoTrieStrategy implements IAlgorithmStrategy<K,V>          [P04]
+CLASS STARTStrategy implements IAlgorithmStrategy<K,V>             [P05]
+CLASS B2TreeStrategy implements IAlgorithmStrategy<K,V>            [P06]
+CLASS WormholeStrategy implements IAlgorithmStrategy<K,V>          [P07]
+CLASS ARTSyncStrategy implements IAlgorithmStrategy<K,V>           [P08]
+CLASS LOUDSStrategy implements IAlgorithmStrategy<K,V>             [P09]
+CLASS SuRFStrategy implements IAlgorithmStrategy<K,V>              [P10]
+CLASS CSSTreeStrategy implements IAlgorithmStrategy<K,V>           [P11]
+CLASS CSBPlusTreeStrategy implements IAlgorithmStrategy<K,V>       [P12]
+CLASS HankinsBTreeStrategy implements IAlgorithmStrategy<K,V>      [P13]
+CLASS SamuelBTreeStrategy implements IAlgorithmStrategy<K,V>       [P14]
+CLASS BTreesAreBackStrategy implements IAlgorithmStrategy<K,V>     [P20]
+CLASS ChenPBTreeStrategy implements IAlgorithmStrategy<K,V>        [P21]
+CLASS ChenFractalStrategy implements IAlgorithmStrategy<K,V>       [P22]
+...
+CLASS PRTARTStrategy implements IAlgorithmStrategy<K,V>            [PRT-ART, eigen]
+
+NOTE Alle Strategy-Klassen kapseln den Originalcode in `ext::<paper>::*`-
+Namespaces. Adapter uebersetzt zwischen std::map-API ↔ Original-API.
+
+3.3 PACKAGE: page (Concept + Implementations)
+================================================================================
+
+CONCEPT Page<P>                                                    [C++23 CONCEPT]
+   requires {
+     { p.lookup(k_segment) } -> std::same_as<LookupOutcome>;
+     { p.insert(k_segment, v) } -> std::same_as<InsertOutcome>;
+     { p.iterate(start) } -> std::ranges::input_range;
+     { p.telemetry() } -> std::same_as<PageTelemetry>;
+     { p.page_kind() } -> std::same_as<PageKind>;
+     { p.memory_layout() } -> std::same_as<MemoryLayoutDescriptor>;
+     // KEIN semantischer Zugriff auf Knoten von aussen
+   };
+
+ENUM PageKind { DenseByte, ExtendedDense, SparsePatricia, Redirect,
+                CustomCache, B_Tree, B_PlusTree, ... }
+
+PAGE-IMPLEMENTIERUNGEN PRO ALGORITHMUS (Auswahl, je Paper)
+   • DenseBytePage_ART          (P01 Node256-Adapter)
+   • SparseNode4Page_ART        (P01 Node4-Adapter)
+   • CompoundNodePage_HOT       (P02)
+   • MultiBytePage_START        (P05)
+   • MacroNodePage_CoCo         (P04)
+   • DecisionSpanPage_B2tree    (P06)
+   • CSSNodePage                (P11; pointer-frei, Cache-Line-grosse Knoten)
+   • CSBNodeGroupPage           (P12)
+   • WiderBPlusNodePage_Hankins (P13)
+   • LOUDSDensePage_SuRF        (P10 Top-Level)
+   • LOUDSSparsePage_SuRF       (P10 Bottom-Level)
+   • PRTART_DenseBytePage       (PRT-ART eigen)
+   • PRTART_ExtendedDensePage   (PRT-ART eigen)
+   • PRTART_SparsePatriciaPage  (PRT-ART eigen)
+   • PRTART_RedirectPage        (PRT-ART eigen)
+   • PRTART_CustomCachePage     (PRT-ART eigen)
+
+3.4 PACKAGE: node (Concept + Implementations + ValueHandle-Strategy)
+================================================================================
+
+CONCEPT Node<N>                                                    [C++23 CONCEPT]
+   requires {
+     { n.children() } -> std::ranges::input_range;
+     { n.fanout() } -> std::same_as<std::size_t>;
+     { n.value_handle() } -> ValueHandleConcept;
+     { n.read_counter() } -> std::same_as<std::uint64_t>;   // 64-bit, Langzeit
+     { n.access_histogram() } -> std::same_as<std::span<const std::uint64_t>>;
+   };
+
+NODE-IMPLEMENTIERUNGEN PRO ALGORITHMUS (Adapter ueber Originalcode)
+   • Node4 / Node16 / Node48 / Node256        [P01 ART]
+   • CompoundNode (BiNode k=32)               [P02 HOT]
+   • InternalNode / BorderNode                [P03 Masstree]
+   • MacroNode                                [P04 CoCo]
+   • MultiByteNode                            [P05 START]
+   • DecisionNode / SpanNode                  [P06 B²-tree]
+   • CSSNode                                  [P11]
+   • CSBNodeGroup                             [P12]
+   • WiderBPlusNode                           [P13]
+   • PRTART_*Node                             [PRT-ART eigen]
+
+3.5 PACKAGE: value_handle (KORRIGIERT v2 — Sache der Node)
+================================================================================
+
+ValueHandle ist eine Eigenschaft DER NODE. Zur Compile-Time begrenzt ein
+`switch_array<ValueHandleKind, ...>` die zulaessigen Varianten je Algorithmus.
+Zur Runtime waehlt der Algorithmus je nach Knoten-Eigenschaften (Wertegroesse,
+Hot/Cold, Pointer-Tiefe, ...) die konkrete Variante.
+
+CONCEPT ValueHandleStrategy<S, V>                                  [C++23 CONCEPT]
+   requires {
+     { s.kind() } -> std::same_as<ValueHandleKind>;
+     { s.resolve() } -> std::same_as<V*>;
+     { s.is_inline() } -> std::same_as<bool>;
+   };
+
+ENUM ValueHandleKind {
+     Inline,                  // Wert direkt in Node-Slot
+     Pointer,                 // External Pointer
+     RedirectToNode,          // Redirect-Knoten (analog Patricia/Macro)
+     RedirectToPage,          // Redirect-Page
+     ChainRef,                // VERTAGT: Wertekette
+     Dynamic                  // Runtime-Auswahl (mit switch_array begrenzt)
+};
+
+CLASS InlineValueHandle implements ValueHandleStrategy
+CLASS PointerValueHandle implements ValueHandleStrategy
+CLASS RedirectToNodeValueHandle implements ValueHandleStrategy
+CLASS RedirectToPageValueHandle implements ValueHandleStrategy
+CLASS DynamicValueHandle implements ValueHandleStrategy
+   - allowed_kinds: std::array<ValueHandleKind, N>     (compile-time begrenzt)
+   - resolved_kind: ValueHandleKind                    (runtime-gewaehlt)
+   - select_at_runtime(NodeContext) -> ValueHandleKind
+
+NOTE Die compile-time-`switch_array` ist ein constexpr-Array, das je
+Algorithmus die zulaessigen Varianten kodiert. Beispiel:
+   ART:        Inline | Pointer | RedirectToNode
+   HOT:        Inline | Pointer
+   B²-tree:    Inline | Pointer | RedirectToPage
+   PRT-ART:    Inline | Pointer | RedirectToNode | RedirectToPage | Dynamic
+
+3.6 PACKAGE: traversal (Concept + Implementations)
+================================================================================
+
+CONCEPT TraversalAlgorithm<T>                                      [C++23 CONCEPT]
+   requires {
+     { t.start(root) } -> TraversalCursor;
+     { t.advance(cursor, key) } -> TraversalStep;
+     { t.terminate(cursor) } -> TraversalResult;
+     { t.kind() } -> std::same_as<TraversalKind>;
+   };
+
+ENUM TraversalKind {
+     ByteByByte, BitByBit, MultiBytePerStep,
+     SkipBased, HashAnchor, RangeIterator, ...
+}
+
+TRAVERSAL-IMPLEMENTIERUNGEN
+   • ByteByByteTraversal_ART
+   • BitByBitTraversal_HOT
+   • LayerSliceTraversal_Masstree
+   • MacroNodeTraversal_CoCo
+   • LowerBoundTraversal_SuRF
+   • RankSelectTraversal_LOUDS
+   • PRTART_HotPathTraversal       (eigene)
+   • PRTART_PrefetchAwareTraversal (eigene)
+
+3.7 PACKAGE: memory_layout (Concept + Adapter)
+================================================================================
+
+CONCEPT MemoryLayout<L>                                            [C++23 CONCEPT]
+   requires {
+     { l.alignment() } -> std::same_as<std::align_val_t>;
+     { l.size_bytes() } -> std::same_as<std::size_t>;
+     { l.cache_line_aligned() } -> std::same_as<bool>;
+     { l.huge_page_eligible() } -> std::same_as<bool>;
+     { l.descriptor() } -> std::same_as<MemoryLayoutDescriptor>;
+   };
+
+CLASS CacheLineAlignedLayout                  (default fuer Page/Node-Speicher)
+CLASS HugePageAlignedLayout                   (P32-Lehre)
+CLASS InlineSlotLayout                        (kleine Inline-Werte)
+CLASS PointerHandleLayout                     (External-Pointer-Region)
+CLASS MetadataHeaderLayout                    (Telemetrie-Slots im Header)
+
+3.8 PACKAGE: operations (std::map-API, vollstaendig C++23)
+================================================================================
+
+INTERFACE IMapAPI<K, V>                                            [PUBLIC API]
+   ── Construction / Destruction ──
+   + map()
+   + map(Compare)
+   + map(InputIt first, InputIt last, Compare, Alloc)
+   + map(const map&) / map(map&&)
+   + map(initializer_list, Compare, Alloc)
+   + map(from_range_t, R&& rng)                         [C++23]
+   + ~map()
+   ── Assignment / Allocator ──
+   + operator=(const map&) / operator=(map&&) / operator=(initializer_list)
+   + get_allocator()
+   ── Element Access ──
+   + at(key) / operator[](key) / operator[](key&&)
+   ── Iterators ──
+   + begin() / cbegin() / end() / cend()
+   + rbegin() / crbegin() / rend() / crend()
+   ── Capacity ──
+   + empty() / size() / max_size()
+   ── Modifiers ──
+   + clear()
+   + insert(value_type) / insert(InputIt,InputIt) / insert(initializer_list)
+   + insert_or_assign(K, V)                              [C++17]
+   + insert_range(R&&)                                   [C++23]
+   + emplace(args...) / emplace_hint(hint, args...)
+   + try_emplace(K, args...)                             [C++17]
+   + erase(iterator) / erase(K)
+   + swap(map&)
+   + extract(K) / extract(iterator)                      [C++17]
+   + merge(map&)                                         [C++17]
+   ── Lookup ──
+   + count(K) / find(K) / contains(K)                    [contains: C++20]
+   + equal_range(K) / lower_bound(K) / upper_bound(K)
+   ── Observers ──
+   + key_comp() / value_comp()
+   ── Non-member ──
+   + operator== / operator<=>                            [C++20]
+   + erase_if(map&, Pred)                                [C++20]
+   + swap(map&, map&)
+
+INTERFACE IRangeAPI<K, V>                                          [PUBLIC API]
+   + range(low, high) -> RangeView
+   + range_count(low, high) -> std::size_t
+   + lower_bound_iterator(K) -> Iterator
+   + upper_bound_iterator(K) -> Iterator
+
+CLASS-FAMILIE EngineWrapper<Algo, EngineKind> implements IMapAPI / IRangeAPI
+   • EngineWrapper<Algo, StaticEngine>     — KEINE Optimierung, Originalcode
+   • EngineWrapper<Algo, CacheEngine>      — aktive Optimierung via CacheEngine
+
+NOTE Deduction Guides + Allocator Aware (C++23 ranges-Konstruktor mit
+from_range_t), strukturierte Bindings, transparenter Compare (`is_transparent`).
+
+================================================================================
+4. DOMAENE 2 — CACHE ENGINE (KERNBEITRAG)
+================================================================================
+
+ZWECK
+   Globales Heap-Modul, das ein laufendes Modell der CPU bereitstellt.
+   Zwei Funktionsschichten: Compile Time (CacheEngineBuilder) + Runtime
+   (CacheEngineRuntime mit Visitor + Observer + ConcurrencyManager).
+
+================================================================================
+4.1 PACKAGE: cache_engine_builder  (COMPILE-TIME-PROGRAMM)
+================================================================================
+
+ROLLE
+   Eigenstaendiges C++23-Programm, das die moeglichen Rekombinationen
+   verschiedener Such-Algorithmen + ihrer Bestandteile permutiert, jede
+   Permutation per Metaprogrammierung statisch kompiliert + ausmisst, in
+   eine Datenbank persistiert und am Ende einen LaTeX-Anhang fuer die
+   Diplomarbeit rendert.
+
+EINSATZ
+   `comdare-cache-engine-builder run --architecture x86_avx512 --dataset YCSB-A`
+
+CLASS CacheEngineBuilder
+   + run(BuilderConfig) -> BuilderReport
+   - permutation_engine: PermutationEngine
+   - codegen: ConstexprCodegen                 (C++23 Metaprogrammierung)
+   - compiler_driver: CompilerDriver           (ruft GCC/Clang/MSVC auf)
+   - measurement: BuilderMeasurement
+   - persistence: MeasurementDB
+   - latex_renderer: LatexRenderer
+
+CLASS PermutationEngine
+   + enumerate() -> std::ranges::input_range<Permutation>
+   - axis_PageKind: std::array<PageKind, ...>
+   - axis_NodeKind: std::array<NodeKind, ...>
+   - axis_TraversalKind: std::array<TraversalKind, ...>
+   - axis_ValueHandleKind: std::array<ValueHandleKind, ...>
+   - axis_PrefetchStrategy: std::array<PrefetchStrategy, ...>
+   - axis_AllocatorKind: std::array<AllocatorKind, ...>
+   - axis_ConcurrencyKind: std::array<ConcurrencyKind, ...>
+   - axis_ISAPath: std::array<ISAPath, ...>
+   - constraint_filter: ConstraintFilter       (sortiert ungueltige Kombis aus)
+
+CLASS ConstexprCodegen
+   + generate_compilation_unit(Permutation) -> CompilationUnit
+   - C++23-Templates, requires-Klauseln, deducing this
+   ROLLE: erzeugt aus einer Permutation eine konkrete C++-Datei zum Kompilieren
+
+CLASS CompilerDriver
+   + compile(CompilationUnit) -> Binary
+   - target_triples: std::vector<TargetTriple>      (architektur-spezifisch)
+   - compiler: { gcc, clang, msvc }
+   - flags: per-target ISA-Flags
+
+CLASS BuilderMeasurement
+   + measure(Binary, Dataset) -> MeasurementResult
+   - cache_warmup: CacheWarmup
+   - dataset_prep: DatasetPreparation
+   - benchmark: Benchmark
+   - includes: perf/PAPI Makro-Messung
+              + interne Echtzeit-Mikrobenchmarks
+
+CLASS MeasurementDB
+   + persist(Permutation, MeasurementResult, Architecture, Dataset)
+   + query(filter) -> std::ranges::input_range<MeasurementRow>
+   - schema (vorlaeufig):
+       (perm_id, architecture, isa_path, dataset, page_kind, node_kind,
+        traversal_kind, value_handle_kind, prefetch_strategy, allocator_kind,
+        concurrency_kind, walltime_ns, throughput_ops_s, p50/p95/p99/p999_ns,
+        clu_pct, cache_misses, llc_misses, dtlb_misses, branch_misses,
+        memory_footprint_bytes, energy_j, build_id, compiler, flags)
+
+CLASS LatexRenderer
+   + render(QueryResult) -> LatexDocument
+   - includes: tabular, pgfplots, booktabs, siunitx
+   - output: appendix-ready .tex + .pdf
+   ROLLE: Anhang fuer Diplomarbeit mit Messwerttabellen + Plots
+
+================================================================================
+4.2 PACKAGE: cache_engine_runtime  (RUNTIME-MODUL, GLOBAL/HEAP)
+================================================================================
+
+ROLLE
+   Globales Heap-Modul (Singleton-aehnlich), das per Observer-Pattern
+   Telemetrie von Such-Algorithmen empfaengt und per Visitor-Pattern
+   Such-Algorithmus-Strukturen besucht. Empfiehlt Ausfuehrungsstrategien
+   basierend auf Compile-Time-Wissen aus der Datenbank (siehe 4.1).
+
+CLASS CacheEngineRuntime                                           [SINGLETON-LIKE]
+   + instance() -> CacheEngineRuntime&
+   - cpu_model: LiveCpuModel                  (laufendes CPU-Modell)
+   - concurrency_manager: ConcurrencyManager  (Singleton, siehe 4.3)
+   - visitor: AlgorithmVisitor
+   - observer_registry: ObserverRegistry
+   - micro_benchmarks: RuntimeMicroBenchmarks
+   - knowledge_base: CompileTimeKnowledge     (geladen aus MeasurementDB)
+   - telemetry_spool: TelemetrySpool
+   + register_algorithm(IAlgorithmStrategy*)
+   + recommend_strategy(Context) -> StrategyRecommendation
+   + visit(IAlgorithmStrategy*)
+   + on_observation(ObservationEvent)
+   + spool() -> SpooledTelemetry            (am Ende eines Laufs)
+
+CLASS LiveCpuModel
+   + cpu_features() -> CpuFeatures          (ISA, Hybrid-Cores, Cache, TLB)
+   + memory_topology() -> MemoryTopology    (DRAM/HBM/NVRAM, NUMA)
+   + current_load() -> LoadSnapshot
+   + estimate(metric, context) -> EstimatedMetric
+   ROLLE: das laufende Modell der CPU, Eigenschaften, Prozesse, Bewusstsein
+
+CLASS AlgorithmVisitor                                              [VISITOR PATTERN]
+   + visit(IAlgorithmStrategy*)
+   + visit_page(IPage*)
+   + visit_node(INode*)
+   + visit_traversal(ITraversal*)
+   ROLLE: traversiert Algorithmus-Strukturen, sammelt Lokalitaet/Telemetrie
+
+CLASS ObserverRegistry                                              [OBSERVER PATTERN]
+   + register_observer(IObserver*)
+   + notify(ObservationEvent)
+   - observers: std::vector<IObserver*>
+   ROLLE: Algorithmen registrieren sich; Cache Engine empfaengt Events
+
+CLASS RuntimeMicroBenchmarks
+   + measure_inline_during_op(Op, Context) -> MicroResult
+   - cache_warmup_in_situ: bool
+   - akkumuliert in_memory; spooling am Ende
+   ROLLE: Echtzeit-Mikrobenchmarks zur Laufzeit (bei Bedarf)
+
+CLASS CompileTimeKnowledge
+   + lookup(Architecture, Workload) -> StrategyRecommendation
+   - source: MeasurementDB-Snapshot          (oder eingebettet als constexpr)
+   ROLLE: liest Compile-Time-Permutations-Messungen, empfiehlt Strategie
+
+CLASS TelemetrySpool
+   + accumulate(Sample)
+   + flush() -> SpooledData
+   - storage: lock-free Ring oder per-thread
+
+================================================================================
+4.3 PACKAGE: concurrency_manager  (SINGLETON IN CacheEngineRuntime)
+================================================================================
+
+CLASS ConcurrencyManager                                            [SINGLETON]
+   + instance() -> ConcurrencyManager&
+   - disciplines: ConcurrencyDisciplines     (alle 8+ Disziplin-Klassen)
+   + acquire(DisciplineKind, Context) -> Discipline&
+   + configure(DisciplinePolicy)
+
+DISZIPLINEN (jede ein eigenes Modul / eigene Klasse)
+
+   1) PageConcurrency
+      + parallel_page_access(...)
+      ROLLE: Parallelitaet auf Suchseiten-Granularitaet
+
+   2) NodeConcurrency
+      + parallel_node_access(...)
+      ROLLE: Parallelitaet auf Knoten-Granularitaet
+
+   3) ArrayConcurrency
+      + parallel_array_access(...)
+      ROLLE: Parallelitaet auf intra-Knoten-Arrays (z.B. children[])
+
+   4) DataStructureConcurrency
+      + parallel_subtree(...)
+      ROLLE: Parallelitaet auf gesamter Subtree-/Datenstruktur-Ebene
+
+   5) PathConcurrency
+      + parallel_search_path(...)
+      ROLLE: Parallelitaet entlang eines Suchpfads (mehrere Pfade)
+
+   6) MemoryAccessConcurrency
+      + parallel_read(...)
+      + parallel_write(...)
+      + parallel_read_write(...)
+      ROLLE: Lese-/Schreib-Parallelitaet bei Speicherzugriffen
+
+   7) SimdThreadConcurrency
+      + dispatch_simd_in_thread(thread_id, op)
+      ROLLE: SIMD-Parallelitaet in bestimmten Threads
+
+   8) SimdFlowConcurrency
+      + dispatch_simd_in_flow(flow_id, op)
+      ROLLE: SIMD-Parallelitaet nur in bestimmten Thread-Ablaeufen
+
+   (Erweiterbar: NumaConcurrency, EpochConcurrency, ...)
+
+CLASS RCUReclaim                                                    [STANDARD]
+   - grace_period: GracePeriodCounter
+   BELEG-LIT: P29 McKenney2001
+   ROLLE: Memory Reclamation; deterministisches Aufraeumen ist Pflicht
+
+NOTE: HazardPointers entfernt (vorher in v1) — memory leak ist verbotenes
+undefiniertes Verhalten; deterministische Reclamation via RCU + EpochManager
+ist ausreichend (kein GPU-Code).
+
+================================================================================
+4.4 PACKAGE: cache_engine_subsystems  (intern fuer Schicht B Runtime)
+================================================================================
+
+(Diese Subsysteme arbeiten als Helfer der CacheEngineRuntime, NICHT als
+eigene Public-API. Sie wurden in v1 als eigene Module vorgeschlagen, sind
+in v2 stuktur-intern unter cache_engine_runtime verkapselt.)
+
+   - PlatformProfiler        (P05/P23 Lehre, Mikrobenchmark-Sweeps)
+   - CostModel               (P13 I/M/B/T + P16 Probability + P05 START)
+   - PageTypeScheduler       (Selection Rule fuer Page-Type)
+   - PrefetchController      (P21/P23/P25/P27 Lehren)
+   - RelocationManager       (P18 + P28; Online Re-Layouting via RCU)
+   - AllocatorManager        (Pool/Arena/Slab pro Page-Type)
+   - TelemetryAggregator     (P26 Read Counter uint64_t + P28 Histogram)
+
+================================================================================
+5. DOMAENE 3 — MEASUREMENT (3 BESTANDTEILE, KORRIGIERT v2)
+================================================================================
+
+5.1 BUILDER-MEASUREMENT (in CacheEngineBuilder integriert, siehe 4.1)
+   - Compile-Time, statisch kompiliert + ausgefuehrt fuer jede Permutation
+   - Cache-Warmup → Dataset-Prep → Benchmark
+   - perf/PAPI Makro + interne Mikrobenchmarks
+   - Persistiert in MeasurementDB
+   - Ziel: schnellste Permutation pro Architektur+Dataset finden
+
+5.2 SINGLE-RUN-MEASUREMENT (in StaticEngine ODER CacheEngine)
+   - Runtime, fuer EINE festgelegte Algorithmus-Permutation
+   - Beide Engines liefern Mikrobenchmarks
+   - Nur CacheEngine optimiert aktiv (siehe 4.2)
+   - Output: SingleRunReport
+
+5.3 MICROBENCHMARKS-PACKAGES (Bibliothek von Mikrobenchmark-Bausteinen)
+   - perf-Wrapper, PAPI-Wrapper, Intel-Advisor-Wrapper
+   - HdrHistogram-Wrapper
+   - Dataset-Loader (YCSB, Custom)
+   - PlatformProbe (CPU-ID, ISA, Cache-Topo, Memory-Topo)
+   - RunRecorder (Build-Flags, Compiler, Pinning, Seeds)
+
+================================================================================
+6. DOMAENE 4 — HARDWARE / ISA  (Querschnitt)
+================================================================================
+
+(Unveraendert gegenueber v1, jetzt Teil des LiveCpuModel innerhalb der
+CacheEngineRuntime.)
+
+   - IsaDispatcher (target_clones; scalar/AVX2/AVX-512/NEON/SVE2)
+   - HybridCorePinning (P-/E-Cores, Big.LITTLE)
+   - MemoryTypeDetector (DRAM/HBM/NVRAM)
+   - HugepageManager (P32-Lehre)
+
+================================================================================
+7. DOMAENE 5 — ENGINE-CHOICE  (Compile-Time-Wahl)
+================================================================================
+
+template<typename Algo, typename EngineKind>
+class Container : public IMapAPI<...> { ... };
+
+   - StaticEngine: liefert Originalcode, KEINE Optimierungen ueber State-of-
+     the-Art hinaus. Nutzt nur:
+        + std::map-API-Wrapper
+        + Single-Run-Mikrobenchmarks (Domaene 3.2)
+   - CacheEngine: liefert vollen Stack
+        + std::map-API-Wrapper
+        + Observer-/Visitor-Bindung an CacheEngineRuntime
+        + ConcurrencyManager
+        + Mikrobenchmarks
+        + Compile-Time-Empfehlung aus MeasurementDB
+
+================================================================================
+8. DOMAENE 6 — PERSISTENCE & PUBLICATION
+================================================================================
+
+   - MeasurementDB (siehe 4.1, gehoert zur Builder-Schicht)
+   - LatexRenderer (siehe 4.1)
+   - Output: Anhang in Diplomarbeit (Tabellen + Plots)
+   - Datenbank-Wahl: SQLite (default; portable, embed-bar) oder PostgreSQL
+     (falls Cluster-Builds via ZIH parallel persistieren sollen)
+
+================================================================================
+9. SCHNITTSTELLE SEARCH-ENGINE ↔ CACHE-ENGINE  (NEU v2)
+================================================================================
+
+OBSERVER-RICHTUNG (Algorithmus → CacheEngine)
+   - Algorithmus implementiert IObserverProducer; ruft notify(...) bei
+     wesentlichen Ereignissen auf:
+       • PageAccessed        (page_handle, branch_taken)
+       • NodeAccessed        (node_handle, child_idx)
+       • PathTraversed       (path_signature, depth, terminal_kind)
+       • TelemetryUpdate     (page_handle, telemetry_delta)
+       • MutationCommitted   (op_kind, count)
+
+VISITOR-RICHTUNG (CacheEngine → Algorithmus)
+   - CacheEngine ruft accept(visitor) am Algorithmus auf; Visitor besucht
+     Page/Node/Traversal-Strukturen ueber Concept-Interfaces, OHNE algorithmus-
+     spezifische Internals zu kennen:
+       • visit(IPage*)
+       • visit(INode*)
+       • visit(ITraversal*)
+
+EMPFEHLUNG-RICHTUNG (CacheEngine → Algorithmus)
+   - CacheEngine empfiehlt Strategie (basierend auf CompileTimeKnowledge);
+     Algorithmus kann Empfehlung uebernehmen oder ignorieren (im Zweifel:
+     statisch ausgelieferte optimale Variante laufen lassen).
+
+WAS VERBOTEN IST
+   - CacheEngine darf NICHT Algorithmus-Internals direkt manipulieren.
+   - Algorithmus darf NICHT die CacheEngine-Internals umgehen
+     (z.B. eigenen ConcurrencyManager parallel betreiben).
+   - Engine-Choice (Static vs Cache) ist Compile-Time, KEIN Runtime-Switch.
+
+================================================================================
+10. ABBILDUNG DER 4 FORSCHUNGSLUECKEN AUF MODULE  (REV 2)
+================================================================================
+
+LUECKE 1: Cache-Engine als getrennte Meta-Ebene
+   → cache_engine_runtime (KOMPLETTES Package, Singleton, Heap)
+   → Observer/Visitor-Vertrag (siehe 9)
+
+LUECKE 2: Online Re-Layouting
+   → cache_engine_subsystems.RelocationManager
+   → in Verbindung mit RCUReclaim (P29) — Hazard Pointers RAUS!
+
+LUECKE 3: Gemeinsame Wahl Seitentyp+Layout+Inline+Prefetch+Allocator
+   → CacheEngineBuilder (Permutationsraum erfasst alle Achsen)
+   → CacheEngineRuntime.recommend_strategy() (selektiert kompiliert)
+
+LUECKE 4: Plattform-bewusste online Adaption pro ISA-Pfad
+   → CacheEngineBuilder.PermutationEngine.axis_ISAPath
+   → CacheEngineRuntime.LiveCpuModel + AlgorithmVisitor
+   → IsaDispatcher (target_clones)
+
+================================================================================
+11. PROJEKT-STRUKTUR  (KORRIGIERT v2 — comdare Submodules!)
+================================================================================
+
+WICHTIG (Nutzer-Direktive)
+   - `C:\Users\benja\OneDrive\Desktop\Projekte\Research\comdare-cache-engine`
+     wurde verschoben.
+   - Wir verwenden BESTEHENDE comdare Modules und erweitern diese.
+   - AUSNAHMSWEISE entgegen der uebrigen comdare Struktur werden die Modules
+     als feste Submodules in das C++ Projekt einbezogen.
+   - Modules sind sonst privat und werden NUR statisch im
+     comdare-cache-engine Projekt veroeffentlicht.
+   - Globale CLAUDE.md-Regel "KEINE Git Submodules" wird hier AUSNAHMSWEISE
+     suspendiert (vom User explizit zugelassen fuer dieses Projekt).
+
+GEPLANTES LAYOUT
+   comdare-cache-engine/
+   ├── CMakeLists.txt                       (Build-Driver)
+   ├── modules/                             (Submodules: comdare-Modules)
+   │   ├── comdare-search-engine/           (Submodule, privat)
+   │   ├── comdare-cache-engine-core/       (Submodule, privat)
+   │   ├── comdare-measurement/             (Submodule, privat)
+   │   ├── comdare-isa-dispatch/            (Submodule, privat)
+   │   ├── comdare-build-tools/             (Submodule, privat)
+   │   └── comdare-test-system/             (Submodule, privat)
+   ├── ext/                                 (Originalcode fremder Algorithmen,
+   │   │                                     EXAKT KOPIERT — Habich-Direktive)
+   │   ├── leis_art/                        (P01)
+   │   ├── binna_hot/                       (P02)
+   │   ├── mao_masstree/                    (P03)
+   │   ├── boffa_coco/                      (P04)
+   │   ├── fent_start/                      (P05)
+   │   ├── schmeisser_b2tree/               (P06)
+   │   ├── wu_wormhole/                     (P07)
+   │   ├── leis_artsync/                    (P08)
+   │   ├── jacobson_louds/                  (P09)
+   │   ├── zhang_surf/                      (P10)
+   │   ├── raoross_css/                     (P11)
+   │   ├── raoross_csb/                     (P12)
+   │   ├── hankins_btree/                   (P13)
+   │   ├── samuel_btree/                    (P14)
+   │   ├── mueller_btreesareback/           (P20)
+   │   ├── chen_pbtree/                     (P21)
+   │   ├── chen_fractal/                    (P22)
+   │   ├── khan_adaptive/                   (P23)
+   │   ├── ... (P24-P28, P30-P33)
+   │   └── README.md                        (Habich-Direktive dokumentiert)
+   ├── adapters/                            (Adapter zwischen ext/ und unseren
+   │   │                                     Concepts/Interfaces)
+   │   ├── art_adapter.cpp/.hpp
+   │   ├── hot_adapter.cpp/.hpp
+   │   ├── ...
+   │   └── prtart_adapter.cpp/.hpp          (PRT-ART, eigen — frei modifizierbar)
+   ├── prt_art/                             (PRT-ART Test-Algorithmus, eigen)
+   │   ├── pages/
+   │   ├── nodes/
+   │   ├── value_handles/
+   │   ├── traversal/
+   │   └── prtart.cpp/.hpp
+   ├── search_engine/                       (Domaene 1)
+   │   ├── fan_out_engine/
+   │   ├── algorithm_strategies/            (eine pro Paper)
+   │   ├── page/                            (Concept + Adapter)
+   │   ├── node/                            (Concept + Adapter)
+   │   ├── value_handle/                    (Concept + switch_array)
+   │   ├── traversal/                       (Concept + Adapter)
+   │   ├── memory_layout/                   (Concept + Adapter)
+   │   └── operations/                      (std::map-API-Wrapper)
+   ├── cache_engine/                        (Domaene 2)
+   │   ├── builder/                         (CacheEngineBuilder, separates Programm)
+   │   │   ├── main.cpp                     (entry point)
+   │   │   ├── permutation_engine/
+   │   │   ├── constexpr_codegen/
+   │   │   ├── compiler_driver/
+   │   │   ├── builder_measurement/
+   │   │   ├── measurement_db/              (SQLite/PostgreSQL)
+   │   │   └── latex_renderer/
+   │   ├── runtime/                         (CacheEngineRuntime)
+   │   │   ├── cache_engine_runtime.hpp/.cpp
+   │   │   ├── live_cpu_model/
+   │   │   ├── algorithm_visitor/
+   │   │   ├── observer_registry/
+   │   │   ├── compile_time_knowledge/
+   │   │   ├── runtime_micro_benchmarks/
+   │   │   └── telemetry_spool/
+   │   ├── concurrency_manager/             (Singleton)
+   │   │   ├── concurrency_manager.hpp/.cpp
+   │   │   ├── page_concurrency/
+   │   │   ├── node_concurrency/
+   │   │   ├── array_concurrency/
+   │   │   ├── data_structure_concurrency/
+   │   │   ├── path_concurrency/
+   │   │   ├── memory_access_concurrency/
+   │   │   ├── simd_thread_concurrency/
+   │   │   └── simd_flow_concurrency/
+   │   └── subsystems/                      (intern)
+   │       ├── platform_profiler/
+   │       ├── cost_model/
+   │       ├── page_type_scheduler/
+   │       ├── prefetch_controller/
+   │       ├── relocation_manager/
+   │       ├── allocator_manager/
+   │       └── telemetry_aggregator/
+   ├── engine_choice/                       (Domaene 5)
+   │   ├── static_engine.hpp                (template)
+   │   └── cache_engine.hpp                 (template)
+   ├── measurement/                         (Domaene 3 — Mikrobenchmarks-Lib)
+   │   ├── perf_wrapper/
+   │   ├── papi_wrapper/
+   │   ├── advisor_wrapper/
+   │   ├── hdr_histogram_wrapper/
+   │   ├── dataset_loader/
+   │   ├── platform_probe/
+   │   └── run_recorder/
+   ├── hardware_isa/                        (Domaene 4)
+   │   ├── isa_dispatch/
+   │   ├── hybrid_core_pinning/
+   │   ├── memory_type_detector/
+   │   └── hugepage_manager/
+   ├── benchmarks/
+   │   ├── ycsb/
+   │   ├── microbenchmarks/
+   │   └── platform_calibration/
+   ├── tests/
+   │   ├── unit/
+   │   └── integration/
+   └── docs/
+       ├── architecture/
+       └── habich_directive.md              (Originalcode-Regel dokumentiert)
+
+LIZENZ Apache 2.0 (BEP Venture UG / Marke Comdare)
+ABHAENGIGKEITEN externe Algorithmen unter ext/ : jeweils Originallizenz behalten
+
+================================================================================
+12. DOMAENEN-TRENNUNG  (REV 2)
+================================================================================
+
+DOMAENE 1 — SEARCH ENGINE
+   - implementiert std::map-API
+   - kennt Concepts (Page/Node/Traversal/...)
+   - bindet Originalcode via Adapter
+   - ruft CacheEngineRuntime via Observer auf
+   - empfaengt Visitor-Besuche der CacheEngineRuntime
+
+DOMAENE 2 — CACHE ENGINE
+   - laufendes Modell der CPU
+   - Compile-Time (Builder) + Runtime (Singleton-Heap-Modul)
+   - Visitor + Observer + ConcurrencyManager
+   - empfiehlt Strategie aus Compile-Time-Wissen
+
+DOMAENE 3 — MEASUREMENT (3 Bestandteile)
+   - 3.1 BuilderMeasurement (Teil von CacheEngineBuilder)
+   - 3.2 SingleRunMeasurement (in Static- und CacheEngine)
+   - 3.3 Mikrobenchmarks-Bibliothek
+
+DOMAENE 4 — HARDWARE / ISA
+   - ISA-Dispatch / Hybrid-Core / Memory-Type / Hugepages
+   - genutzt von CacheEngineRuntime.LiveCpuModel
+
+DOMAENE 5 — ENGINE-CHOICE
+   - Compile-Time Template-Parameter
+   - StaticEngine vs CacheEngine
+
+DOMAENE 6 — PERSISTENCE & PUBLICATION
+   - MeasurementDB
+   - LatexRenderer
+   - Output: Anhang Diplomarbeit
+
+================================================================================
+13. NICHT-FESTGELEGT — OFFENE DESIGN-FRAGEN FUER UML
+================================================================================
+
+Diese Punkte sind als professionelle Design-Entscheidungen mit dem Architekten
+(Nutzer) abzustimmen, BEVOR das drawio UML gestartet wird. Siehe
+ANTWORT-TEXT der Phase-3.D-REV2-Lieferung fuer die strukturierte Fragenliste.
+
+   F1: Singleton-Implementierungstechnik der CacheEngineRuntime
+   F2: Observer-Mechanik (Pull vs Push, sync vs async, lock-free)
+   F3: Visitor-Granularitaet
+   F4: Permutationsraum-Begrenzung (Constraints, Heuristiken)
+   F5: MeasurementDB-Wahl (SQLite vs PostgreSQL vs duckdb)
+   F6: ConcurrencyManager-Disziplinen-Komposition
+   F7: Adapter-Strategie fuer Originalcode (Header-only vs PIMPL)
+   F8: ValueHandle-`switch_array` Compile-Time-Reprasentation
+   F9: ABI-Stabilitaet via C++23-Modules
+   F10: Codegen-Strategie im CacheEngineBuilder (Templates vs Codegen-Skript)
+   F11: Mikrobenchmark-Triggering (continuous vs sampled)
+   F12: ConstexprCodegen-Dispatcher
+   F13: Cross-Compilation-Toolchain
+   F14: Datasets-Akquise (YCSB-Profile + Custom?)
+   F15: PRT-ART vs Static-PRT-ART (Vergleichsbasis fuer Diplomarbeit?)
+
+================================================================================
+ENDE DES DOMAENENMODELLS v2
+Phase 5 (drawio UML) ist gesperrt bis explizites GO vom Nutzer und
+Beantwortung der 15 Design-Fragen (F1-F15).
+================================================================================

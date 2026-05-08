@@ -1,0 +1,204 @@
+================================================================
+VORANALYSE: P29-RCU-McKenney/userspace-rcu
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P29-RCU-McKenney/userspace-rcu
+Stand: 2026-05-09 00:50:53
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 147
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609     0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609  5810 May  4 23:38 .gitignore
+-rw-r--r-- 1 benja 197609   216 May  4 23:38 .gitreview
+-rw-r--r-- 1 benja 197609 49120 May  4 23:38 ChangeLog
+-rw-r--r-- 1 benja 197609   452 May  4 23:38 CodingStyle.md
+-rw-r--r-- 1 benja 197609  1905 May  4 23:38 LICENSE.md
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 LICENSES
+-rw-r--r-- 1 benja 197609   938 May  4 23:38 Makefile.am
+-rw-r--r-- 1 benja 197609 17700 May  4 23:38 README.md
+-rwxr-xr-x 1 benja 197609   182 May  4 23:38 bootstrap
+-rw-r--r-- 1 benja 197609 12706 May  4 23:38 configure.ac
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 doc
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 extras
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 include
+-rw-r--r-- 1 benja 197609  1290 May  4 23:38 lgpl-relicensing.md
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 m4
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 scripts
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 src
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 tests
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./doc
+./doc/examples
+./doc/examples/dist-files
+./doc/examples/hlist
+./doc/examples/lfstack
+./doc/examples/list
+./doc/examples/rculfhash
+./doc/examples/rculfqueue
+./doc/examples/urcu-flavors
+./doc/examples/wfcqueue
+./doc/examples/wfstack
+./extras
+./extras/abi
+./extras/abi/0.10
+./extras/abi/0.11
+./extras/abi/0.12
+./extras/abi/0.13
+./extras/abi/0.14
+./extras/abi/0.9
+./include
+./include/urcu
+./include/urcu/arch
+./include/urcu/map
+./include/urcu/static
+./include/urcu/uatomic
+./LICENSES
+./m4
+./scripts
+./src
+./tests
+./tests/benchmark
+./tests/common
+./tests/regression
+./tests/unit
+./tests/utils
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./doc/examples/hlist/cds_hlist_add_head_rcu.c
+./doc/examples/hlist/cds_hlist_del_rcu.c
+./doc/examples/hlist/cds_hlist_for_each_entry_rcu.c
+./doc/examples/hlist/cds_hlist_for_each_rcu.c
+./doc/examples/lfstack/cds_lfs_pop_all_blocking.c
+./doc/examples/lfstack/cds_lfs_pop_blocking.c
+./doc/examples/lfstack/cds_lfs_push.c
+./doc/examples/list/cds_list_add_rcu.c
+./doc/examples/list/cds_list_add_tail_rcu.c
+./doc/examples/list/cds_list_del_rcu.c
+./doc/examples/list/cds_list_for_each_entry_rcu.c
+./doc/examples/list/cds_list_for_each_rcu.c
+./doc/examples/list/cds_list_replace_rcu.c
+./doc/examples/rculfhash/cds_lfht_add.c
+./doc/examples/rculfhash/cds_lfht_add_replace.c
+./doc/examples/rculfhash/cds_lfht_add_unique.c
+./doc/examples/rculfhash/cds_lfht_del.c
+./doc/examples/rculfhash/cds_lfht_destroy.c
+./doc/examples/rculfhash/cds_lfht_for_each_entry_duplicate.c
+./doc/examples/rculfhash/cds_lfht_lookup.c
+./doc/examples/rculfhash/jhash.h
+./doc/examples/rculfqueue/cds_lfq_dequeue.c
+./doc/examples/rculfqueue/cds_lfq_enqueue.c
+./doc/examples/urcu-flavors/bp.c
+./doc/examples/urcu-flavors/mb.c
+./doc/examples/urcu-flavors/membarrier.c
+./doc/examples/urcu-flavors/qsbr.c
+./doc/examples/wfcqueue/cds_wfcq_dequeue.c
+./doc/examples/wfcqueue/cds_wfcq_enqueue.c
+./doc/examples/wfcqueue/cds_wfcq_splice.c
+./doc/examples/wfstack/cds_wfs_pop.c
+./doc/examples/wfstack/cds_wfs_pop_all_blocking.c
+./doc/examples/wfstack/cds_wfs_push.c
+./include/urcu/annotate.h
+./include/urcu/arch/aarch64.h
+./include/urcu/arch/alpha.h
+./include/urcu/arch/arm.h
+./include/urcu/arch/gcc.h
+./include/urcu/arch/generic.h
+./include/urcu/arch/hppa.h
+./include/urcu/arch/ia64.h
+./include/urcu/arch/loongarch.h
+./include/urcu/arch/m68k.h
+./include/urcu/arch/mips.h
+./include/urcu/arch/nios2.h
+./include/urcu/arch/ppc.h
+./include/urcu/arch/riscv.h
+./include/urcu/arch/s390.h
+./include/urcu/arch/sparc64.h
+./include/urcu/arch/tile.h
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 31228 total
+  5438 total
+  2342 ./src/rculfhash.c
+  1112 ./src/urcu-call-rcu-impl.h
+   774 ./src/urcu-bp.c
+   758 ./include/urcu/uatomic/generic.h
+   757 ./tests/benchmark/test_urcu_hash.c
+   696 ./include/urcu/uatomic/x86.h
+   679 ./tests/regression/rcutorture.h
+   675 ./include/urcu/static/wfcqueue.h
+   666 ./include/urcu/rculfhash.h
+   653 ./include/urcu/wfcqueue.h
+   560 ./tests/benchmark/test_urcu_wfcq.c
+   559 ./src/urcu.c
+   544 ./tests/benchmark/test_urcu_wfs.c
+   516 ./src/urcu-qsbr.c
+   498 ./tests/benchmark/test_urcu_lfs.c
+   491 ./tests/utils/tap.c
+   483 ./src/workqueue.c
+   476 ./src/urcu-defer-impl.h
+   452 ./include/urcu/static/wfstack.h
+
+## BUILD-SYSTEM
+  ✓ configure.ac (413 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE.md
+    # Userspace RCU library licensing
+    
+    This project is compliant with the [REUSE](https://reuse.software/spec/)
+
+## README EXCERPT
+  Datei: README.md
+    <!--
+    SPDX-FileCopyrightText: 2025 EfficiOS Inc.
+    
+    SPDX-License-Identifier: CC-BY-4.0
+    -->
+    
+    Userspace RCU Implementation
+    ============================
+    
+    by Mathieu Desnoyers and Paul E. McKenney
+    
+    
+    Building
+    --------
+    
+        ./bootstrap # skip if using tarball
+        ./configure
+        make
+        make install
+        ldconfig
+    
+    Hints:
+    
+      - Forcing 32-bit build:
+    
+            CFLAGS="-m32 -g -O2" ./configure
+    
+      - Forcing 64-bit build:
+    
+            CFLAGS="-m64 -g -O2" ./configure
+    
+      - Forcing a 32-bit build for Sparcv9 (typical for Sparc v9)
+    
+            CFLAGS="-m32 -Wa,-Av9a -g -O2" ./configure
+    
+    
+    Architectures supported
+    -----------------------
+    
+    Currently, the following architectures are supported:
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  OLC                  in 4 Dateien
+  RCU                  in 184 Dateien
+  Atomic               in 10 Dateien
+  Histogram            in 1 Dateien
+
+## C++-STANDARD-INDIKATOREN
+
+## END VORANALYSE P29-RCU-McKenney/userspace-rcu

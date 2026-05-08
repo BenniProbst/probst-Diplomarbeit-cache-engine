@@ -1,0 +1,529 @@
+---
+name: build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  DEFAULT_COMPILER: gcc
+  DEFAULT_SANITIZE_ADDRESS: OFF
+  DEFAULT_SANITIZE_THREAD: OFF
+  DEFAULT_SANITIZE_UB: OFF
+  DEFAULT_STATIC_ANALYSIS: OFF
+  DEFAULT_AVX2: ON
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+
+    env:
+      BUILD_TYPE: ${{matrix.BUILD_TYPE}}
+      SANITIZE_ADDRESS: ${{matrix.SANITIZE_ADDRESS}}
+      SANITIZE_THREAD: ${{matrix.SANITIZE_THREAD}}
+      SANITIZE_UB: ${{matrix.SANITIZE_UB}}
+      STATIC_ANALYSIS: ${{matrix.STATIC_ANALYSIS}}
+      COMPILER: ${{matrix.COMPILER}}
+      CPPLINT: ${{matrix.CPPLINT}}
+      CPPCHECK: ${{matrix.CPPCHECK}}
+      AVX2: ${{matrix.AVX2}}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: GCC 14 Release (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            COMPILER: gcc
+
+          - name: GCC 14 Release with ASan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            COMPILER: gcc
+            SANITIZE_ADDRESS: ON
+
+          - name: GCC 14 Release with TSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            COMPILER: gcc
+            SANITIZE_THREAD: ON
+
+          - name: GCC 14 Release with UBSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            COMPILER: gcc
+            SANITIZE_UB: ON
+
+          - name: GCC 14 Debug (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+
+          - name: GCC 14 Debug with ASan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+            SANITIZE_ADDRESS: ON
+
+          - name: GCC 14 Debug with TSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+            SANITIZE_THREAD: ON
+
+          - name: GCC 14 Debug with UBSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+            SANITIZE_UB: ON
+
+          - name: GCC 14 Debug without AVX2 (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+            AVX2: OFF
+
+          - name: GCC 14 Release static analysis & cpplint (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            COMPILER: gcc
+            STATIC_ANALYSIS: ON
+            CPPLINT: ON
+
+          - name: GCC 14 default CMake configuration (Linux Intel)
+            os: ubuntu-latest
+            COMPILER: gcc
+
+          - name: clang 21 Release (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            COMPILER: clang
+
+          - name: clang 21 Release with ASan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            SANITIZE_ADDRESS: ON
+            COMPILER: clang
+
+          - name: clang 21 Release with TSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            SANITIZE_THREAD: ON
+            COMPILER: clang
+
+          - name: clang 21 Release with UBSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            SANITIZE_UB: ON
+            COMPILER: clang
+
+          - name: clang 21 Debug (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            COMPILER: clang
+
+          - name: clang 21 Debug with ASan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            SANITIZE_ADDRESS: ON
+            COMPILER: clang
+
+          - name: clang 21 Debug with TSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            SANITIZE_THREAD: ON
+            COMPILER: clang
+
+          - name: clang 21 Debug with UBSan (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            SANITIZE_UB: ON
+            COMPILER: clang
+
+          - name: clang 21 Release static analysis (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Release
+            COMPILER: clang
+            STATIC_ANALYSIS: ON
+
+          - name: clang 21 Debug static analysis (Linux Intel)
+            os: ubuntu-latest
+            BUILD_TYPE: Debug
+            COMPILER: clang
+            STATIC_ANALYSIS: ON
+
+          - name: XCode Release (Intel)
+            os: macos-latest
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            AVX2: OFF
+
+          - name: XCode Release with ASan (Intel)
+            os: macos-latest
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            SANITIZE_ADDRESS: ON
+            AVX2: OFF
+
+          - name: XCode Release with TSan (Intel)
+            os: macos-latest
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            SANITIZE_THREAD: ON
+            AVX2: OFF
+
+          - name: XCode Release with UBSan (Intel)
+            os: macos-latest
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            SANITIZE_UB: ON
+            AVX2: OFF
+
+          - name: XCode Debug with cppcheck (Intel)
+            os: macos-latest
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            CPPCHECK: ON
+            AVX2: OFF
+
+          - name: XCode Debug with ASan (Intel)
+            os: macos-latest
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            SANITIZE_ADDRESS: ON
+            AVX2: OFF
+
+          - name: XCode Debug with TSan (Intel)
+            os: macos-latest
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            SANITIZE_THREAD: ON
+            AVX2: OFF
+
+          - name: XCode Debug with UBSan (Intel)
+            os: macos-latest
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            SANITIZE_UB: ON
+            AVX2: OFF
+
+          - name: XCode Release (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            AVX2: OFF
+
+          - name: XCode Release with ASan (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            SANITIZE_ADDRESS: ON
+            AVX2: OFF
+
+          - name: XCode Release with TSan (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            SANITIZE_THREAD: ON
+            AVX2: OFF
+
+          - name: XCode Release with UBSan (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Release
+            COMPILER: macos-clang
+            SANITIZE_UB: ON
+            AVX2: OFF
+
+          - name: XCode Debug with cppcheck (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            CPPCHECK: ON
+            AVX2: OFF
+
+          - name: XCode Debug with ASan (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            SANITIZE_ADDRESS: ON
+            AVX2: OFF
+
+          - name: XCode Debug with TSan (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            SANITIZE_THREAD: ON
+            AVX2: OFF
+
+          - name: XCode Debug with UBSan (Apple Silicon)
+            os: macos-14
+            BUILD_TYPE: Debug
+            COMPILER: macos-clang
+            SANITIZE_UB: ON
+            AVX2: OFF
+
+          - name: GCC 14 Release (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Release
+            COMPILER: gcc
+
+          - name: GCC 14 Release with ASan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Release
+            COMPILER: gcc
+            SANITIZE_ADDRESS: ON
+
+          - name: GCC 14 Release with TSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Release
+            COMPILER: gcc
+            SANITIZE_THREAD: ON
+
+          - name: GCC 14 Release with UBSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Release
+            COMPILER: gcc
+            SANITIZE_UB: ON
+
+          - name: GCC 14 Debug (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+
+          - name: GCC 14 Debug with ASan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+            SANITIZE_ADDRESS: ON
+
+          - name: GCC 14 Debug with TSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+            SANITIZE_THREAD: ON
+
+          - name: GCC 14 Debug with UBSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: gcc
+            SANITIZE_UB: ON
+
+          - name: clang 21 Release (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Release
+            COMPILER: clang
+
+          - name: clang 21 Release with TSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Release
+            COMPILER: clang
+            SANITIZE_THREAD: ON
+
+          - name: clang 21 Release with UBSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Release
+            COMPILER: clang
+            SANITIZE_UB: ON
+
+          - name: clang 21 Debug (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: clang
+
+          - name: clang 21 Debug with ASan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: clang
+            SANITIZE_ADDRESS: ON
+
+          - name: clang 21 Debug with TSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: clang
+            SANITIZE_THREAD: ON
+
+          - name: clang 21 Debug with UBSan (Linux ARM64)
+            os: ubuntu-24.04-arm
+            BUILD_TYPE: Debug
+            COMPILER: clang
+            SANITIZE_UB: ON
+
+    steps:
+      - uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        with:
+          submodules: true
+          persist-credentials: false
+
+      - name: Setup common dependencies for Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev
+        if: runner.os == 'Linux'
+
+      - name: Setup x86-specific dependencies for Linux
+        run: |
+          sudo apt-get install -y libc6-dev-i386
+        if: runner.os == 'Linux' && !contains(matrix.os, 'arm')
+
+      - name: Setup dependencies for cpplint
+        run: pip install cpplint
+        if: env.CPPLINT == 'ON'
+
+      - name: Setup dependencies for GCC
+        run: |
+          sudo apt-get install -y g++-14
+        if: runner.os == 'Linux' && env.COMPILER == 'gcc'
+
+      - name: Setup multilib dependencies for GCC (x86 only)
+        run: |
+          sudo apt-get install -y g++-14-multilib
+        if: runner.os == 'Linux' && env.COMPILER == 'gcc' && !contains(matrix.os, 'arm')
+
+      - name: Setup dependencies for Linux LLVM (common)
+        run: |
+          curl 'https://apt.llvm.org/llvm-snapshot.gpg.key' \
+            | sudo apt-key add -
+          sudo add-apt-repository -y \
+            "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-21 main"
+          sudo apt-get update
+          sudo apt-get install -y clang-21 iwyu
+        if: runner.os == 'Linux' && env.COMPILER == 'clang'
+
+      - name: Setup dependencies for Linux LLVM (Release)
+        run: sudo apt-get install -y libomp5 llvm-21 lld-21
+        if: >
+          runner.os == 'Linux' && env.COMPILER == 'clang'
+          && env.BUILD_TYPE == 'Release'
+
+      - name: Setup dependencies for Linux LLVM (static analysis)
+        run: sudo apt-get install -y clang-tools-21
+        if: >
+          runner.os == 'Linux' && env.COMPILER == 'clang'
+          && env.STATIC_ANALYSIS == 'ON'
+
+      - name: Setup dependencies for Linux LLVM (not static analysis)
+        run: sudo apt-get install -y clang-tidy-21
+        if: >
+          runner.os == 'Linux' && env.COMPILER == 'clang'
+          && env.STATIC_ANALYSIS != 'ON'
+
+      - name: Set up dependencies for macOS (common)
+        run: |
+          brew install boost include-what-you-use python-setuptools
+        if: runner.os == 'macOS'
+
+      - name: Set up dependencies for macOS (cppcheck)
+        run: brew install cppcheck
+        if: runner.os == 'macOS' && env.CPPCHECK == 'ON'
+
+      - name: Configure CMake
+        # Use a bash shell so we can use the same syntax for environment
+        # variable access regardless of the host operating system
+        shell: bash
+        run: |
+          COMPILER="${COMPILER:-$DEFAULT_COMPILER}"
+          SANITIZE_ADDRESS="${SANITIZE_ADDRESS:-$DEFAULT_SANITIZE_ADDRESS}"
+          SANITIZE_THREAD="${SANITIZE_THREAD:-$DEFAULT_SANITIZE_THREAD}"
+          SANITIZE_UB="${SANITIZE_UB:-$DEFAULT_SANITIZE_UB}"
+          STATIC_ANALYSIS="${STATIC_ANALYSIS:-$DEFAULT_STATIC_ANALYSIS}"
+          AVX2="${AVX2:-$DEFAULT_AVX2}"
+          export PATH="$HOME/.local/bin:$PATH"
+          if [[ -n "$BUILD_TYPE" ]]; then
+            CBT="-DCMAKE_BUILD_TYPE=$BUILD_TYPE"
+          else
+            CBT=""
+          fi
+          if [[ $COMPILER == "gcc" ]]; then
+            V=14
+            EXTRA_CMAKE_ARGS=()
+            export CC=gcc-$V
+            export CXX=g++-$V
+          elif [[ $COMPILER == "clang" ]]; then
+            V=21
+            export CC=clang-$V
+            export CXX=clang++-$V
+            if [[ $BUILD_TYPE == "Release" ]]; then
+              EXTRA_CMAKE_ARGS=(\
+                "-DLLVMAR_EXECUTABLE=/usr/bin/llvm-ar-$V" \
+                "-DLLVMNM_EXECUTABLE=/usr/bin/llvm-nm-$V" \
+                "-DLLVMRANLIB_EXECUTABLE=/usr/bin/llvm-ranlib-$V")
+            else
+              EXTRA_CMAKE_ARGS=()
+            fi
+            # LLVM static analysis wart
+            if [[ $STATIC_ANALYSIS == "ON" ]]; then
+              STATIC_ANALYSIS=OFF
+              # Workaround https://github.com/llvm/llvm-project/issues/61576
+              # scan-build defaults to -std=c++14
+              EXTRA_CMAKE_ARGS=("${EXTRA_CMAKE_ARGS[@]}" \
+                  "-DCMAKE_CXX_FLAGS=-std=c++20")
+            else
+              EXTRA_CMAKE_ARGS=("${EXTRA_CMAKE_ARGS[@]}" \
+                  "-DCLANG_TIDY_EXE=/usr/bin/clang-tidy-$V")
+            fi
+          elif [[ $COMPILER == "macos-clang" ]]; then
+            export CC=clang
+            export CXX=clang++
+          fi
+          set +e
+          cmake -B build "$GITHUB_WORKSPACE" "$CBT" -DSTANDALONE=ON \
+              -DMAINTAINER_MODE=ON -DIWYU=ON \
+              "-DSANITIZE_ADDRESS=${SANITIZE_ADDRESS}" \
+              "-DSANITIZE_THREAD=${SANITIZE_THREAD}" \
+              "-DSANITIZE_UB=${SANITIZE_UB}" \
+              "-DSTATIC_ANALYSIS=${STATIC_ANALYSIS}" \
+              "-DAVX2=${AVX2}" "${EXTRA_CMAKE_ARGS[@]}"
+          CMAKE_EXIT_CODE=$?
+          set -e
+          if [ $CMAKE_EXIT_CODE -ne 0 ]; then
+            if [ -f build/CMakeFiles/CMakeConfigureLog.yaml ]; then
+              echo "::group::CMakeConfigureLog.yaml"
+              cat build/CMakeFiles/CMakeConfigureLog.yaml
+              echo "::endgroup::"
+            fi
+            exit $CMAKE_EXIT_CODE
+          fi
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        run: PYTHONWARNINGS=ignore make -j3 -k
+        if: env.STATIC_ANALYSIS != 'ON' || env.COMPILER != 'clang'
+
+      - name: clang static analysis
+        working-directory: ${{github.workspace}}/build
+        run: |
+          /usr/bin/scan-build-21 --status-bugs -stats -analyze-headers \
+            --force-analyze-debug-code make -j3 -k;
+        if: env.STATIC_ANALYSIS == 'ON' && env.COMPILER == 'clang'
+
+      - name: Correctness test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -j3 -V
+        if: env.STATIC_ANALYSIS != 'ON'
+
+      - name: Benchmark correctness test
+        working-directory: ${{github.workspace}}/build
+        run: make -k quick_benchmarks
+        if: env.STATIC_ANALYSIS != 'ON'
+
+      - name: DeepState 1 minute fuzzing
+        working-directory: ${{github.workspace}}/build
+        run: make -j2 -k deepstate_1m
+        if: >
+          env.STATIC_ANALYSIS != 'ON' && !contains(matrix.os, 'arm')
+          && (runner.os != 'macOS'
+          || (env.SANITIZE_ADDRESS == 'OFF' && env.SANITIZE_THREAD == 'OFF'))
+
+      - name: DeepState libfuzzer 1 minute fuzzing
+        working-directory: ${{github.workspace}}/build
+        run: make -j2 -k deepstate_lf_1m
+        if: >
+          env.STATIC_ANALYSIS != 'ON' && !contains(matrix.os, 'arm')
+          && env.COMPILER == 'clang'
+          && env.BUILD_TYPE != 'Release'
+          && env.SANITIZE_THREAD != 'ON'

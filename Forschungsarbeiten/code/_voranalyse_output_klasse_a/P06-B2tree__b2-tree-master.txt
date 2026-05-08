@@ -1,0 +1,80 @@
+================================================================
+VORANALYSE: P06-B2tree/b2-tree-master
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P06-B2tree/b2-tree-master
+Stand: 2026-05-09 00:48:48
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 21
+drwxr-xr-x 1 benja 197609    0 May  8 01:41 .
+drwxr-xr-x 1 benja 197609    0 May  8 01:28 ..
+-rw-r--r-- 1 benja 197609   45 Dec 26  2019 .gitignore
+-rw-r--r-- 1 benja 197609 1853 Dec 26  2019 CMakeLists.txt
+drwxr-xr-x 1 benja 197609    0 May  8 01:41 include
+drwxr-xr-x 1 benja 197609    0 May  8 01:41 lib
+drwxr-xr-x 1 benja 197609    0 May  8 01:41 src
+drwxr-xr-x 1 benja 197609    0 May  8 01:41 test
+drwxr-xr-x 1 benja 197609    0 May  8 01:41 third_party
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./include
+./lib
+./src
+./test
+./third_party
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./include/BufferManager.hpp
+./include/Database.hpp
+./include/epoch.hpp
+./include/hazard.hpp
+./include/NonCopyable.hpp
+./include/optimistic_lock.hpp
+./include/Page.hpp
+./include/search.hpp
+./include/tree.hpp
+./src/bench.cpp
+./src/BufferManager.cpp
+./src/Database.cpp
+./src/main.cpp
+./src/Page.cpp
+./src/tree.cpp
+./test/test_tree.cpp
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+ 2617 total
+ 1387 ./src/tree.cpp
+  186 ./include/hazard.hpp
+  185 ./include/Page.hpp
+  176 ./src/bench.cpp
+  175 ./src/Page.cpp
+  119 ./include/optimistic_lock.hpp
+  115 ./include/epoch.hpp
+   91 ./test/test_tree.cpp
+   79 ./include/search.hpp
+   31 ./include/tree.hpp
+   20 ./src/BufferManager.cpp
+   14 ./src/main.cpp
+   13 ./include/BufferManager.hpp
+   12 ./include/NonCopyable.hpp
+    8 ./include/Database.hpp
+    6 ./src/Database.cpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (60 Zeilen)
+
+## LIZENZ
+  ⚠ KEINE LICENSE-Datei gefunden
+
+## README EXCERPT
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  Hazard               in 2 Dateien
+  AVX512               in 1 Dateien
+  Counter              in 1 Dateien
+
+## C++-STANDARD-INDIKATOREN
+  set(CMAKE_CXX_STANDARD 17)
+
+## END VORANALYSE P06-B2tree/b2-tree-master

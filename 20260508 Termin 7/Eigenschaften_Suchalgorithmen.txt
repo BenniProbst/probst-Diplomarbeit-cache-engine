@@ -1,0 +1,669 @@
+================================================================================
+EIGENSCHAFTEN DER SUCH-ALGORITHMEN — Konzeptionelle Identitaet pro Paper
+TU Dresden · Diplomarbeit Cache-Engine · Termin 7 · Phase 3.B
+Stand: 2026-05-04
+================================================================================
+
+ZWECK
+  Pro Such-Algorithmus aus dem Korpus: konzeptionelle Identitaet, strukturelle
+  Bausteine, Operationen, Komplexitaet, Concurrency-Modell, Cache-Annahmen,
+  Plattform-Annahmen. Dies ist die Grundlage fuer das Begriffsglossar (Phase 3.C)
+  und das Domaenenmodell (Phase 3.D).
+
+QUELLEN
+  - Verifizierte PDFs (REV4) in ./Forschungsarbeiten/
+  - Termin 1-6 Konsolidierung in ./_review/
+
+LESEHINWEISE
+  Pro Algorithmus eine eigene Sektion mit identischer Struktur:
+    1. Identitaet (was IST der Algorithmus konzeptionell?)
+    2. Strukturelle Bausteine (welche Knoten-/Seitentypen?)
+    3. Operationen (Lookup/Insert/Delete/Range?)
+    4. Komplexitaet
+    5. Concurrency-Modell
+    6. Cache-Annahmen
+    7. Plattform-Annahmen
+    8. PRT-ART-Bezug
+
+================================================================================
+A. KLASSISCHE CACHE-AWARE B-BAUM-FAMILIE
+================================================================================
+
+--------------------------------------------------------------------------------
+A.1  CSS-TREE — Cache-Sensitive Search Tree (Rao/Ross 1999)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Pointer-FREIE Directory-Struktur ueber sortiertem Array. Verzeichnisknoten
+   in Cache-Line-Groesse, Kinder ueber Offset-Arithmetik adressiert.
+   Klasse:    statische cache-line-orientierte Indexstruktur
+   Lesbar:    "Sortiertes Array + arithmetisch-navigierter Cache-Line-Header"
+
+STRUKTURELLE BAUSTEINE
+   - Sortiertes Array (Datenanker)
+   - Cache-line-grosse Directory-Knoten (keine Pointer!)
+   - Offset-arithmetische Kindermittlung (k-aere Verzweigung pro Cacheline)
+
+OPERATIONEN
+   Lookup:     binary search innerhalb Knoten + arithmetisches Descending
+   Insert/Del: schwer (Re-Build noetig)
+   Range:     direkt auf sortiertem Array (effizient nach Lokalisierung)
+
+KOMPLEXITAET
+   Lookup:    O(log_k n) mit k = Schluessel pro Cache-Line
+   Build:     O(n log n)
+   Insert:    O(n) — De facto statisch
+
+CONCURRENCY
+   Implizit lesbar (immutable bei aktivem Build)
+
+CACHE-ANNAHMEN
+   Cache-Line-Groesse als Designanker (z.B. 64 B). TLB nicht modelliert.
+
+PLATTFORM-ANNAHMEN
+   Pre-2000 CPU-Modell (Pentium-Aera). Nicht NUMA-aware.
+
+PRT-ART-BEZUG
+   Pflichtabgrenzung — direkter Kontrast zur "Alles-statisch"-Variante.
+   Rolle: Beleg fuer hohe CLU bei minimalen Pointern.
+   Schwaeche: Updates -> motiviert PRT-ART Online-Relocation.
+
+--------------------------------------------------------------------------------
+A.2  CSB+-TREE — Cache-Sensitive B+-Tree (Rao/Ross 2000)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Updatefaehiger Cache-bewusster B+-Tree. Geschwister liegen kontigous
+   im Speicher; nur erster Kindpointer wird gespeichert; weitere Kinder
+   per Offset.
+   Klasse:    dynamische cache-line-orientierte B+-Variante
+   Lesbar:    "B+-Tree mit kontigous-Geschwister-Layout statt N Pointern"
+
+STRUKTURELLE BAUSTEINE
+   - Knoten in Cacheline-Groesse
+   - 1 Kindpointer + Sibling-Offset-Layout
+   - Optional: Segmented CSB+-Tree (Gruppen kontigous), Full CSB+-Tree
+
+OPERATIONEN
+   Lookup, Insert, Delete, Range — alle wie B+-Tree, aber cache-effizienter
+
+KOMPLEXITAET
+   Lookup:    O(log_k n)
+   Insert:    O(log_k n) amortisiert; Splits koennen Sibling-Re-Allokation triggern
+
+CONCURRENCY
+   Single-Writer-Modell des Originalpapers; multi-reader OK
+
+CACHE-ANNAHMEN
+   Knotengroesse = Cache-Line-Groesse. TLB nicht modelliert.
+
+PLATTFORM-ANNAHMEN
+   Pre-Multicore-Aera. Single-Threaded.
+
+PRT-ART-BEZUG
+   Pflichtabgrenzung — direkter Vorlaeufer fuer "pointerarme Seitengruppen".
+   Inspiriert PRT-ART Custom Cache Page.
+   Schwaeche: Statisches Layout -> motiviert PRT-ART adaptive Seitenwahl.
+
+--------------------------------------------------------------------------------
+A.3  GRAEFE/LARSON — B-Tree Indexes and CPU Caches (2001)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   KEIN neuer Algorithmus — Survey/Folklore-Sammlung.
+   Klasse:    Technik-Katalog fuer Cache-bewusste B-Trees.
+   Lesbar:    "Welche Tricks gibt es alle?" — Uebersicht.
+
+STRUKTURELLE BAUSTEINE
+   N/A (Survey)
+
+OPERATIONEN
+   N/A (Survey)
+
+CACHE-ANNAHMEN
+   Cache-Faults und Pipeline-Stalls als wichtiger als Instruktionspfadlaenge.
+   Folkloric — keine eigenen Messungen.
+
+PRT-ART-BEZUG
+   Sekundaer als Technikfundus. Rolle: Argumentationsstuetze
+   "Cache-Faults > Instruktionspfad" -> motiviert CLU-Optimierung.
+
+--------------------------------------------------------------------------------
+A.4  HANKINS/PATEL — Effect of Node Size (2003)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Empirische Studie zu CSB+-Tree Knotengroesse.
+   Klasse:    Empirisch-analytisch — modellbasierte Performance-Studie.
+
+KERNAUSSAGE (wichtig fuer PRT-ART!)
+   Knotengroesse > Cache-Line-Groesse kann BESSER sein, weil TLB-Misses und
+   Tree-Hoehe eine dominante Rolle spielen.
+   "Cacheline = optimale Node" wird empirisch WIDERLEGT.
+
+CACHE-ANNAHMEN
+   L1-Cache + dTLB explizit gemeinsam modelliert.
+   Cache-Line + Page-Groesse + Tree-Hoehe als gekoppelte Tradeoff-Variablen.
+
+PRT-ART-BEZUG
+   Zentrale Beleg fuer "Plattformkalibrierung statt fester Schwellen".
+   Stuetzt PRT-ART Cache-Engine-These: Schwellen sind plattformabhaengig.
+
+--------------------------------------------------------------------------------
+A.5  SAMUEL/PEDERSEN/BONNET — Processor-Conscious CSB+-Tree (2005)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   CSB+-Tree mit prozessorabhaengiger Parametrisierung.
+   Klasse:    parametrisierte cache-aware B+-Variante.
+
+KERNAUSSAGE
+   Multiple Parameter (NICHT nur Knotengroesse) muessen an Prozessor-
+   architektur angepasst werden — z.B. Pentium vs Itanium2.
+
+STRUKTURELLE BAUSTEINE
+   Wie CSB+-Tree, aber mit konfigurierbarer Knoten-Innenstruktur:
+   - Linear search vs binary search innerhalb Knoten
+   - Prefetching-Triggern
+   - Knotengroesse pro Plattform
+
+CACHE-ANNAHMEN
+   L1/L2/L3 + dTLB + Branch-Misprediction + Architekturspezifische Stalls
+
+PLATTFORM-ANNAHMEN
+   Itanium 2 (Pentium-Klasse) — VLIW-aehnliche Architektur, sehr cache-empfindlich
+
+PRT-ART-BEZUG
+   Direkte Stuetze fuer Plattform-Kalibrierungs-These der Cache-Engine.
+   Methodik-Vorbild fuer Modus-2 (Warm-up-Kalibrierung).
+
+--------------------------------------------------------------------------------
+A.6  BENDER/DEMAINE/FARACH-COLTON — Tree Layout in Multilevel Memory (2002)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Theoretisches Modell: Tree-Layout-Optimierung als Minimierung erwarteter
+   Blocktransfers entlang Root-to-Leaf, gegeben Wahrscheinlichkeitsverteilung
+   ueber Leaves.
+   Klasse:    Theoretisches Modell + algorithmische Konstruktion.
+
+STRUKTURELLE BAUSTEINE
+   Bloecke (block transfers), Multilevel-Hierarchie, Wahrscheinlichkeits-
+   verteilung als Eingabe.
+
+OPERATIONEN
+   Layout-Konstruktion: gegeben Tree T + p(leaves) -> optimales Layout
+
+KOMPLEXITAET
+   Polynomial in n
+
+CACHE-ANNAHMEN
+   Multi-Level-Cache als Block-Hierarchie modelliert.
+
+PRT-ART-BEZUG
+   Theoretische Basis fuer "Probability Hints im Page-Header".
+   Ausgangspunkt fuer Online-Relocation-Algorithmen.
+
+--------------------------------------------------------------------------------
+A.7  BENDER/DEMAINE/FARACH-COLTON — Cache-Oblivious B-Trees (2005)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Dynamische Suchstruktur, **OHNE Kenntnis konkreter Cache-Parameter**
+   nahezu optimale Performance auf jeder Hierarchie.
+   Klasse:    cache-OBLIVIOUS Suchbaum (konzeptioneller Gegenpol!).
+
+KERNAUSSAGE
+   O(1+log_{B+1} N) Memory Transfers — gleich wie B-Tree, aber B unbekannt.
+
+STRUKTURELLE BAUSTEINE
+   - van Emde Boas Layout
+   - Ordered File Maintenance
+
+OPERATIONEN
+   Lookup, Insert/Delete: O(1+log_{B+1} N) amortisiert
+
+CACHE-ANNAHMEN
+   **KEINE** spezifischen Annahmen ueber Cache-Hierarchie
+   Modell: Block-Transfer von B Bytes; B unbekannt zur Compile-/Runtime
+
+PRT-ART-BEZUG
+   **WICHTIGSTER GEGENPOL** — PRT-ART ist explizit cache-AWARE!
+   Argumentationspunkt: Wir geben den Cache-Engine-Vorteil bewusst auf
+   Cache-Obliviousness (Eleganz) zugunsten gemessener cache-aware Optimierung.
+
+--------------------------------------------------------------------------------
+A.8  SAIKKONEN/SOISALON-SOININEN — Cache-sensitive Memory Layout for Binary Trees (2008 IFIP TCS)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Multi-Level-Layout fuer dynamische Binary Trees inkl. TLB als Block-Ebene.
+   Klasse:    cache-sensitive Layout-Algorithmus mit Online-Relocation.
+
+KERNAUSSAGE
+   Multi-Level-Relocation ueber TLB/L1/L2/L3 algorithmisch beherrschbar
+   (BFS-gefuellte Bloecke + Rekursion ueber Ebenen + "mindestens halb voll"-
+   Packing).
+
+STRUKTURELLE BAUSTEINE
+   - Bloecke pro Cache-Ebene (inkl. TLB als oberster Block)
+   - BFS-basierte Block-Fuellung
+   - Globale Re-Allokation bei "Verstreuung"
+
+OPERATIONEN
+   Search, Insert, Delete, Relocation (global rearrangement)
+
+CACHE-ANNAHMEN
+   Multi-Level-Cache als Block-Hierarchie inkl. TLB
+
+PRT-ART-BEZUG
+   **DIREKTE BLAUPAUSE** fuer PRT-ART Online-Relocation.
+   Liefert Algorithmus-Skelett fuer Phase 2 (P2) der Cache-Engine.
+
+--------------------------------------------------------------------------------
+A.9  SAIKKONEN/SOISALON-SOININEN — Cache-Sensitive Memory Layout for Dynamic Binary Trees (2016 ComJ)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Erweiterung des 2008-Papers fuer rein dynamische Binary Trees (AVL/Red-Black).
+   Klasse:    cache-sensitive Layout-Invariante mit konstanter Update-Komplexitaet.
+
+KERNAUSSAGE
+   Layout-Invariante (Nachbar-Knoten in gleichem Cache-Block) wird via worst-case
+   konstant-zeitiger Operationen waehrend Insertion/Deletion aufrechterhalten.
+   26-32% Verbesserung bei Suche.
+
+PRT-ART-BEZUG
+   Stuetze fuer "Layout-Invarianten als Beschleuniger ohne Update-Overhead".
+
+--------------------------------------------------------------------------------
+A.10  MUELLER/BENSON/LEIS — B-Trees Are Back (2025 SIGMOD)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Effiziente B-Tree-Implementierung mit variable-sized Records und
+   adaptiver Layout-Wahl zur Runtime.
+   Klasse:    moderne adaptive cache-aware B+-Variante.
+
+STRUKTURELLE BAUSTEINE (6 Layout-Optimierungen)
+   - Prefix Truncation
+   - Heads / Hints
+   - Fingerprinting
+   - Semi-Dense Leaves
+   - Fully Dense Leaves
+   - Adaptive Layout-Wahl zur Runtime
+
+OPERATIONEN
+   Hybrid-Storage: in-memory + flash-persistent
+
+CACHE-ANNAHMEN
+   B-Tree-Knoten als Pages (variable size); cache-aware fuer in-memory Pfad
+
+PRT-ART-BEZUG
+   **METHODISCH NACHESTER VERWANDTER** — adaptive Runtime-Layoutwahl.
+   Inspiriert PRT-ART Page-Type-Selection Rules.
+   Unterschied: B-Trees Are Back hat KEINE Trie-Huelle und KEINE separate
+   Cache-Engine als Modul.
+
+================================================================================
+B. TRIE-BASIERTE UND TRIE-HYBRIDE SUCHSTRUKTUREN
+================================================================================
+
+--------------------------------------------------------------------------------
+A2.1  MASSTREE — Cache Craftiness for Fast Multicore Key-Value Storage (2012)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Trie-Hybrid: Trie-artige Verkettung von B+-Trees ueber 8-Byte-Slices der
+   Schluessel.
+   Klasse:    Trie-of-B+-Trees Hybrid mit OCC + RCU-Lookups.
+
+STRUKTURELLE BAUSTEINE
+   - 8-Byte-Slice als Trie-Layer
+   - Border Node + Internal Node (B+-Tree-aehnlich)
+   - Fences zwischen Layern
+   - "Prefetchable" Wide Nodes
+
+OPERATIONEN
+   Lookup, Insert, Update, Delete, Range, Getrange
+
+KOMPLEXITAET
+   Lookup: O(log n) im B+-Pfad + O(L/8) im Trie-Pfad
+
+CONCURRENCY
+   Optimistic Concurrency Control (OCC) + Read-Copy-Update-aehnlich
+   - Lookups schreiben keine shared structures
+   - Updates locken nur betroffene Nodes
+   - Logging + Checkpointing fuer Persistenz
+
+CACHE-ANNAHMEN
+   Wide Nodes mit Prefetching (Mehrere Cache-Lines fast gratis)
+   8-Byte-Slice = naturlich x86-64 word-aligned
+
+PLATTFORM-ANNAHMEN
+   SMP Multicore mit Network-Queries; 16-Core-Maschine in Originalpaper
+
+PRT-ART-BEZUG
+   Inspiration fuer Subbaumgrenzen, Fences, Layer-Regeln, Range-Semantik.
+   PRT-ART nutzt KEIN Trie-of-B+-Trees-Layout, aber lernt OCC-Konzept.
+
+--------------------------------------------------------------------------------
+A2.2  ART — Adaptive Radix Tree (Leis/Kemper/Neumann 2013)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Radix-Tree mit adaptiven Knotentypen je nach Fanout.
+   Klasse:    adaptive Trie-Struktur.
+
+STRUKTURELLE BAUSTEINE (4 Node-Typen)
+   - Node4    (1-4 Kinder, Linear Array)
+   - Node16   (5-16 Kinder, SIMD-search-able Array)
+   - Node48   (17-48 Kinder, indirekter Index)
+   - Node256  (49-256 Kinder, direkte Adressierung)
+   + Pfadkompression (Prefix Compression im Knoten)
+   + Lazy Expansion (Knoten erst materialisieren bei Verzweigung)
+
+OPERATIONEN
+   Lookup, Insert, Delete, Range, Prefix-Lookup
+
+KOMPLEXITAET
+   Lookup: O(k) mit k = Schluessellaenge in Bytes (NICHT O(log n))
+
+CONCURRENCY
+   Originalpaper: Single-Thread; spaeter ART of Practical Sync (siehe A2.3)
+
+CACHE-ANNAHMEN
+   - Node4/16: passen in 1-2 Cache-Lines
+   - Node48/256: mehrere Cache-Lines, aber direkt adressiert
+   - Pfadkompression -> weniger Pointer-Chasing
+
+PLATTFORM-ANNAHMEN
+   x86-64 mit SIMD (SSE2 fuer Node16 Search)
+
+PRT-ART-BEZUG
+   **DIREKTE BASELINE** — PRT-ART uebernimmt das Konzept Adaptive Node Family,
+   trennt aber die "Node-Typ-Wahl" von der "Cache-Engine-Wahl".
+
+--------------------------------------------------------------------------------
+A2.3  ART OF PRACTICAL SYNCHRONIZATION — Leis/Scheibner/Kemper/Neumann (2016)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Synchronisationsmuster fuer ART (und aehnliche Strukturen).
+   Klasse:    Concurrency-Pattern, kein neuer Algorithmus.
+
+KERNBEITRAG
+   - **OLC** (Optimistic Lock Coupling) — Versionsnummer pro Knoten, beim Lesen
+     pruefen ob Version stabil
+   - **ROWEX** (Read-Optimized Write EXclusion) — wie OLC, aber mit Reader-
+     Sicherheit gegen In-Place-Updates
+
+CONCURRENCY-MODELL
+   - Lookups sind LOCK-FREE (versioniert)
+   - Writers locken nur betroffene Knoten
+   - Skaliert auf modernem Hardware (24+ Kerne)
+
+PRT-ART-BEZUG
+   Synchronisationsbaustein fuer PRT-ART Cache-Engine, falls Online-Relocation
+   bei aktiven Lesern erfolgt.
+
+--------------------------------------------------------------------------------
+A2.4  HOT — Height Optimized Trie (Binna/Zangerle/Pichl/Specht/Leis 2018)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Trie mit dynamisch variierender Anzahl betrachteter Bits pro Knoten.
+   Klasse:    sparse trie mit konfigurabler Hoehe.
+
+STRUKTURELLE BAUSTEINE
+   - **Diskriminierende Bits** (NICHT Bytes!) als Trie-Verzweigung
+   - Knoten mit dynamisch waehlbarer Anzahl Bits ("Span")
+   - SIMD-optimiertes Knoten-Layout (kompakt, in 1-2 Cache-Lines)
+   - Patricia-aehnliche Compressed Paths
+
+OPERATIONEN
+   Lookup, Insert, Delete, Range, Prefix-Lookup
+
+KOMPLEXITAET
+   Lookup: O(k bits / span_avg)
+
+CACHE-ANNAHMEN
+   Sparse Knoten passen in wenige Cache-Lines (auch bei sehr vielen Schluesseln)
+
+PLATTFORM-ANNAHMEN
+   x86-64 mit AVX2/SIMD (kritisch fuer Knoten-Search)
+
+PRT-ART-BEZUG
+   **PFLICHTBASELINE** — direkter sparse-Vergleich.
+   Inspiriert PRT-ART "Sparse Patricia Page".
+
+--------------------------------------------------------------------------------
+A2.5  WORMHOLE — A Fast Ordered Index (Wu/Ni/Jiang 2019)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Hybrid Hash + Trie + B+-Tree mit O(log L)-Suche bei Schluessellaenge L.
+   Klasse:    Multi-Index-Hybrid.
+
+STRUKTURELLE BAUSTEINE
+   - Hash-Index fuer Anchor-Lookup
+   - Trie fuer Praefixnavigation
+   - B+-Tree fuer ordered Range
+   - "Anchor" / Shortcut Nodes fuer schnelle Spruenge
+
+KOMPLEXITAET
+   Lookup: O(log L) — schnellere Reaktion bei langen Schluesseln als O(log n)
+
+CACHE-ANNAHMEN
+   SIMD/CRC fuer Anchor-Hashing
+
+PRT-ART-BEZUG
+   Inspiriert das **Redirect**-Konzept (Anchor = Redirect).
+   PRT-ART hat KEINEN Hash-Index — fokussiert auf Trie + lokale Seiten.
+
+--------------------------------------------------------------------------------
+A2.6  START — Self-Tuning Adaptive Radix Tree (Fent/Jungmair/Kipf/Neumann 2020)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   ART-Variante mit multilevel Nodes (mehrere Bytes pro Knoten) + Kostenmodell
+   + Optimierer.
+   Klasse:    self-tuning ART-Erweiterung.
+
+STRUKTURELLE BAUSTEINE
+   - Standard ART Nodes 4/16/48/256
+   - **Multibyte Nodes** (mehrere Bytes konsumiert pro Step)
+   - **Kostenmodell** (offline Performance-Charakterisierung)
+   - **Optimierer** (waehlt Nodes anhand Modell)
+
+OPERATIONEN
+   Wie ART + offline Re-Optimierung
+
+KOMPLEXITAET
+   Lookup: O(k/avg_span) — kuerzer als ART
+
+CACHE-ANNAHMEN
+   Multibyte = weniger Knoten = weniger Pointer-Chasing
+   Kostenmodell beruecksichtigt L1/L2/L3-Charakteristika der Zielmaschine
+
+PRT-ART-BEZUG
+   **DIREKTESTER NACHBAR** — adaptive Knoten + Kostenmodell.
+   Unterschied: START's Kostenmodell ist Knoten-intern; PRT-ART hat eine
+   GETRENNTE Cache-Engine als externe Steuerlogik.
+
+--------------------------------------------------------------------------------
+A2.7  B²-TREE — Page-Based String Indexing (Schmeisser/Schuele/Leis/Neumann/Kemper 2022)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   B+-Tree mit eingebettetem trieartigen Suchbaum pro Page.
+   Klasse:    Hybrid-Page-Layout (B+-Outer + Trie-Inner-per-Page).
+
+STRUKTURELLE BAUSTEINE
+   - Outer B+-Tree (klassisch, dense Array sortiert)
+   - Embedded Trie pro Page:
+     * **Decision Nodes** (Bytes-fuer-Bytes Verzweigung)
+     * **Span Nodes** (gemeinsame Praefixe)
+
+KERNAUSSAGE
+   Embedded Trie engt den Suchraum innerhalb einer Page ein -> weniger
+   beruehrte Cache-Lines pro Page-Lookup als vanilla B+-Tree.
+
+OPERATIONEN
+   Lookup, Insert, Delete, Range — concurrent (in Umbra-System)
+
+KOMPLEXITAET
+   Lookup: O(log_k n) im Outer + O(log_2 page_size) im Inner-Trie
+
+PRT-ART-BEZUG
+   **STAERKSTER PAGE-LOKALER VERWANDTER**.
+   Inspiriert PRT-ART "Custom Cache Page" (page-lokale Suchraum-Einengung).
+
+--------------------------------------------------------------------------------
+A2.8  COCO-TRIE — Data-Aware Compression and Indexing (Boffa/Ferragina/Tosoni/Vinciguerra 2024)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Trie mit datenabhaengiger Subtrie-Kollabierung in komprimierte Macro-Nodes.
+   Klasse:    succinct-style komprimierter Trie mit lokaler Optimierung.
+
+STRUKTURELLE BAUSTEINE
+   - Macro-Nodes (kollabierte Subtries beliebiger Tiefe)
+   - **Pool unterschiedlicher Encodings** (Wahl pro Macro-Node)
+   - Lokaler Optimierer (waehlt Encoding + Subtrie-Schnitt)
+
+OPERATIONEN
+   Lookup, Rank (klassisch), Range — primaer Lookup-fokussiert
+
+KOMPLEXITAET
+   Space: nahe Information-theoretical Lower Bound
+   Time: O(log n) bei kompetitiver Konstanten
+
+CACHE-ANNAHMEN
+   KEINE expliziten Cache-Annahmen — Fokus auf Speichereffizienz
+
+PRT-ART-BEZUG
+   **REDIRECT-VORBILD** — Macro-Nodes = PRT-ART Redirect-Knoten konzeptionell.
+   PRT-ART nutzt KEINE komprimierten Encodings; nur die Idee der Subtrie-Kollabierung.
+
+--------------------------------------------------------------------------------
+A2.9  JACOBSON — Space-efficient Static Trees and Graphs (1989)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   **LOUDS** (Level-Ordered Unary Degree Sequence) — succinct Tree-Encoding.
+   Klasse:    Information-theoretical optimal succinct Tree.
+
+STRUKTURELLE BAUSTEINE
+   - Bit-Sequence der Form 1*0 pro Knoten
+   - Rank/Select-Operationen ueber Bit-String
+
+OPERATIONEN
+   Navigation: parent, first_child, next_sibling — alle O(1) via rank/select
+   Lookup: O(k) bei String-Schluessel
+
+KOMPLEXITAET
+   Space: 2n + o(n) bits — nahe Lower Bound
+   Time: O(1) Navigation (bei amortisierter rank/select)
+
+CACHE-ANNAHMEN
+   Sehr kompakt -> exzellente Cache-Lokalitaet, aber **statisch**
+
+PRT-ART-BEZUG
+   **HABICH-ZUSATZ — SEHR WICHTIG FUER PRT-ART DENSE-PAGE!**
+   LOUDS-style succinct Encoding kann fuer Dense Byte Pages verwendet werden.
+   Aber: PRT-ART braucht UPDATE-FAEHIGKEIT — LOUDS ist statisch.
+
+--------------------------------------------------------------------------------
+A2.10  SURF — Practical Range Query Filtering with Fast Succinct Tries (Zhang/Lim/Leis/Andersen et al. 2018)
+--------------------------------------------------------------------------------
+
+IDENTITAET
+   Succinct Range Filter basierend auf Fast Succinct Trie (FST).
+   Klasse:    succinct Trie mit Range-Filter-Funktion (Bloom-Filter-Ersatz).
+
+STRUKTURELLE BAUSTEINE
+   - **FST** (Fast Succinct Trie) — basiert auf LOUDS
+   - **LOUDS-Dense** (obere Trie-Ebenen) — dichte Bitmap-Encoding
+   - **LOUDS-Sparse** (untere Trie-Ebenen) — sparse Byte-Encoding
+   - **LOUDS-DS** (Hybrid Dense + Sparse) — Top-Levels Dense, Bottom-Levels Sparse
+
+OPERATIONEN
+   - **ExactKeySearch** (key) -> value or NULL
+   - **LowerBound** (key) -> Iterator zu kleinstem k' >= key
+   - **MoveToNext** (iter)
+
+KOMPLEXITAET
+   Space: ~10 bits per trie node (close to information-theoretic lower bound!)
+   Time: O(k) wo k = Schluessellaenge
+
+CACHE-ANNAHMEN
+   Dense oben (cache-friendly) + Sparse unten (space-efficient)
+   Hybrid-Schwelle "R" (R=64 default) tunable
+
+PRT-ART-BEZUG
+   **HABICH-ZUSATZ — HOECHST RELEVANT!**
+   LOUDS-Dense / LOUDS-Sparse mappt direkt auf PRT-ART Dense Page / Sparse Page.
+   Aber: SuRF ist STATISCH (FST = static); PRT-ART braucht Updates.
+   FST-Hybrid-Logik ist KONZEPTUELL aequivalent zu PRT-ART Cache-Engine
+   Page-Type-Selection Rules!
+
+================================================================================
+C. CACHE-ENGINE / PREFETCHING / SYNCHRONISATION
+================================================================================
+
+(Diese Quellen sind KEINE Such-Algorithmen, sondern liefern Bausteine fuer die
+Cache-Engine-Domaene — gehen daher in Phase 3.D Domaenenmodell ein, nicht hier.)
+
+Zusammenfassung der Bausteine pro Quelle:
+
+B1.1  Chen/Gibbons/Mowry 2001 (pB+-Tree):  Software-Prefetch-Hints,
+       wider nodes via Prefetching, Leaf-Pointer-Arrays fuer Range Scans.
+
+B1.2  Chen et al. 2002 (Fractal pB+-Tree):  Mehrstufige Granularitaeten
+       (Disk + Cache), eingebettete cache-optimierte Subtrees.
+
+B1.3  Khan 2011:  Runtime-anpassbare Prefetch-Distanz, dynamische
+       Code-Spezialisierung.
+
+B1.4  Naderan-Tahan/Sarbazi-Azad 2016:  Gegenposition — Prefetching
+       hilft NICHT bei modernen workloads mit grossen Working Sets.
+
+B1.5  Mahling/Weisgut/Rabl 2025:  Prefetch-Erfolg haengt von Fill Buffers
+       und Workload-Intensitaet ab; CPU-spezifisch (x86 vs ARM).
+
+B1.6  Zhang et al. FGCS 2024:  Read-Counter pro Block + Jump-Pointer-Queue
+       fuer evolvierende Hot Paths.
+
+B1.7  Zhang et al. ASPLOS 2025:  Hierarchical Prefetcher fuer Server-
+       Instruktions-Cache.
+
+B2.1  Kuehn et al. DAMON 2023:  Hot-Path-Histogramme, schliesst
+       Runtime-Re-Layouting EXPLIZIT aus -> direkte Forschungsluecke fuer PRT-ART!
+
+B3.1  McKenney et al. RCU OLS 2001:  Grace-Period Mechanik fuer
+       publish/retire bei Mover/Reader-Synchronisation.
+
+B3.2  Michael Hazard Pointers 2004:  Lock-free Reclamation; Alternative zu RCU.
+
+================================================================================
+D. HABICH-/DRESDEN-LINIE
+================================================================================
+
+A3.1  Ungethuem/Habich/Karnagel/Haas/Mier/Fettweis/Lehner 2017:
+      Survey ueber Hardwareoptimierungen fuer DB-Engines (CPU, FPGA, GPU).
+      Liefert Sprache + Methodik fuer "hardwarebewusste DB-Optimierung".
+
+A3.2  VAMPIR (Berthold/Schmidt + Lehner/HABICH/Schirmeier 2023):
+      DFG SPP 2377 Projekt — Virtualisierte Non-Functional Memory Properties
+      fuer Data-Pipeline Scheduling. Co-PI: HABICH.
+
+A3.3  To Stride or Not to Stride (Schmidt/Kuehn/Krause/Teubner/Lehner/HABICH 2025):
+      Stride-Access vs Sequential auf modernen disruptive Memory Systems.
+      Empirisch zeigt: Stride-Access mit gut gewaehlter Stride-Groesse
+      schlaegt Sequential — auch SIMD-accelerated Sequential.
+
+================================================================================
+ENDE DER ALGORITHMUS-EIGENSCHAFTEN
+Naechste Datei: Begriffsglossar_v2.txt (Phase 3.C — Cross-Paper-Synonyme)
+================================================================================

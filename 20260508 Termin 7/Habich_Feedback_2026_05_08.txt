@@ -1,0 +1,454 @@
+================================================================================
+HABICH-FEEDBACK 2026-05-08 (Sprechstunde + Folge-Direktiven)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 5 PRE-REV2
+Stand: 2026-05-08 · Beschluesse aus Habich-Sprechstunde + Folge-Korrespondenz
+================================================================================
+
+ZWECK
+   Dieses Dokument haelt die in der heutigen Habich-Sprechstunde + Folge-
+   Korrespondenz hinterlassenen Anforderungen fest, die die bisherige
+   Architektur-Beschluss-Lage erweitern oder korrigieren.
+
+   Es ergaenzt `Architekturentscheidungen_F1_F15.txt` um die Punkte
+   H1-H6 (Habich-Feedback) und die Architekt-Antworten F1-F8 zu
+   "offene Architektur-Detail-Fragen 2026-05-08".
+
+================================================================================
+H1 — UML-Vollausarbeitung (Habich-Anforderung)
+================================================================================
+
+ANFORDERUNG
+   Neben dem bisherigen Domaenenmodell-Vorentwurf wird eine maximal-
+   detaillierte Software-Architektur-UML mit allen Klassen + ER-Modell +
+   Verbindungen + Relationen + Assoziationen verlangt — "das volle
+   Programm".
+
+INHALT
+   • UML-Klassendiagramm mit Attributen, Methoden, Sichtbarkeiten
+   • Vererbungs-, Implementierungs- und Abhaengigkeits-Beziehungen
+   • Assoziationen, Aggregationen, Kompositionen mit Multiplizitaeten
+   • Constraints (OCL-aehnlich) wo relevant
+   • ER-Modell fuer persistente Datenstrukturen (auch In-Memory-Buffer-Schema!)
+   • Cross-References zwischen Klassen-Diagrammen und ER-Modell
+
+UMSETZUNG
+   • drawio-Datei `Phase5_UML_Detail/phase5_uml_detail.drawio`
+   • Mehrere Tabs:
+       - UML pro Domaene (Search Engine, Cache Engine, Measurement,
+         Hardware/ISA, Engine-Choice, Persistence)
+       - ER-Modell (MeasurementRecord, PermutationFlags, BuildArtefakte)
+       - Cross-Reference (Concept-zu-Implementation-Mapping)
+
+QUELLE  Task #99 (PHASE 5 REV 2 — Voll-detaillierte UML + ER-Modell)
+
+================================================================================
+H2 — Code-Qualitaets-Bewertung pro Bausteine-Quelle
+================================================================================
+
+ANFORDERUNG
+   Manche Code-Quellen sind experimentell und unsauber umgesetzt. Wir bauen
+   ein professionelles Software-Projekt. Bei Zerstueckelung muss der
+   Originalcode teilweise aequivalent geupdated werden (NUR wenn unbedingt
+   noetig), und diese Anpassungen muessen detailliert kommentiert werden,
+   um die Vergleichbarkeit der Ergebnisse zu wahren.
+
+ANFORDERUNG-DETAIL
+   Pro zerlegtem Algorithmus-Aspekt zu dokumentieren:
+   • QUELLE — Original-Code-Datei + Zeilen-Bereich + Commit-Hash
+   • ZIEL — Adapter-Header + Funktion in unserem Repo
+   • BESCHREIBUNG — was wurde aequivalent geupdated, warum, mit welchen
+     Auswirkungen auf die Vergleichbarkeit
+
+ZIEL
+   Integritaet der Vergleiche perfekt wahren oder moeglichst nahe-
+   liegend vergleichbar halten.
+
+UMSETZUNG
+   Pro Bausteine-Quelle eine `BAUSTEIN_BEWERTUNG.md` mit folgender
+   Struktur:
+
+     # Bausteine-Bewertung — <Paper-ID> <Baustein-Name>
+     **Quelle-Repo:** `ext/<paper>/<repo>/<file>:lines`
+     **Quelle-Commit:** <hash>
+     **Ziel:** `adapters/<paper>/<adapter_file>:funktion`
+     **Code-Qualitaet vor Zerstueckelung:** ★ ★ ★ ☆ ☆ (kommentiert)
+     **Aenderungen:** keine | minimale | substantielle (mit Liste)
+     **Vergleichbarkeit-Bewertung:** vollstaendig | naheliegend | gefaehrdet
+     **Habich-Sign-Off:** ausstehend | erteilt am YYYY-MM-DD
+
+ERWEITERUNG VON TASK #80
+   Task #80 (STRUKTUR_NOTIZ.md pro Repo) wird um `BAUSTEIN_BEWERTUNG.md`
+   pro Bausteine-Aspekt erweitert.
+
+================================================================================
+H3 — LaTeX-Toolchain mit dynamischer Diagramm-Compile
+================================================================================
+
+ANFORDERUNG
+   Die Diplomarbeit wird als LaTeX-Dokument ausgearbeitet. Die durch
+   Experimente entstehenden Datenblobs muessen im Appendix dynamisch zu
+   Diagrammen kompiliert werden.
+
+VOLLSTAENDIGE TOOLCHAIN (Habich-Direktive)
+   Parameter-Update
+      ↓
+   CacheEngineBuilder Compile (auto)
+      ↓
+   Auto-Experiment auf Testmaschine
+      ↓
+   Binary-Dump erzeugt
+      ↓
+   LaTeX-Compile mit dynamischer Diagramm-Erzeugung
+      ↓
+   Diplomarbeit-PDF aktualisiert
+
+VORDEFINIERTE TEXTBAUSTEINE
+   Im LaTeX-Sourcecode der Diplomarbeit (NUR im Appendix-Bereich)
+   eingebettete Bausteine, die zur Compile-Zeit Werte aus Binary-Dumps
+   einsetzen. Beispiel:
+
+     \PRTARTPlot{
+       dataset = YCSB-A,
+       isa     = AVX-512,
+       metric  = p99-latency,
+       baseline= ART_Node256,
+       compare = PRTART_DenseByte
+     }
+
+ZIEL
+   Direkte Ueberfuehrung der Binary-Dumps in das Ausgabe-Dokument als
+   Werkzeug. Bei Aenderung von Code/Parametern → automatisch aktualisiertes
+   PDF.
+
+UMSETZUNG-KOMPONENTEN
+   1. LaTeX-Diplomarbeit-Source mit Textbausteine-Slots
+   2. Binary-Dump → pgfplots/tikz-Konverter (LaTeX-Renderer)
+   3. Toolchain-Skript (sh/bat) als Orchestrator
+   4. Auto-Experiment-Hook in CacheEngineBuilder
+
+QUELLE  Task #100 (PHASE 8 REV 2 — LaTeX-Toolchain mit dynamischer Compile)
+
+================================================================================
+H4 — Repo-Separation Diplomarbeit ↔ CacheEngine-Library
+================================================================================
+
+ANFORDERUNG
+   Die Diplomarbeit (Latex + Experiment-Skripte + Auswertung) ist GETRENNT
+   von der CacheEngine-Library. Die CacheEngine ist ein Werkzeug, die
+   Diplomarbeit ist die Anwendung.
+
+ARCHITEKTUR
+   Diplomarbeit-Ordner (auf Desktop)
+   ├── LaTeX-Dokument (mit Textbausteinen)
+   ├── Experiment-Batch-Skripte (sh/bat)
+   ├── Auswertungs-Skripte (sh/bat → LaTeX-Diagramme)
+   └── Klon-Skript fuer comdare-cache-engine (von GitHub)
+
+   Projekte/Research/comdare-cache-engine (saubere wiederverwendbare Library)
+   ├── alle bisherigen Komponenten
+   ├── ABI-stabiles Container-Interface (std::map<>-aehnlich)
+   └── Wird spaeter fuer ComdareDB wiederverwendet
+
+ABLAUF (Habich-Direktive)
+   1. Diplomarbeit-Skript klont comdare-cache-engine von GitHub
+   2. Baut den CacheEngineBuilder
+   3. Ruft den Builder fuer Permutationen + Experimente auf
+   4. Sammelt Binary-Dumps
+   5. LaTeX-Compile mit Dump-zu-Diagramm-Konvertierung
+   6. PDF-Ausgabe
+
+WICHTIG
+   • Die CacheEngine selbst muss SAUBER sein (professionelle
+     Software-Architektur, ABI-stabil, wiederverwendbar)
+   • Die Diplomarbeit-Toolchain (Experiment-Batch + LaTeX-Compile)
+     bleibt im Diplomarbeit-Ordner
+   • Klon via GitHub erfordert: comdare-cache-engine als public
+     GitHub-Repo (mind. fuer den Diplomarbeit-Bedarf)
+
+QUELLE  Task #101 (PHASE 4.B-detail — Repo-Separation + GitHub-Push)
+
+================================================================================
+H5 — CacheEngine als ABI-stabiler Production-Container
+================================================================================
+
+ANFORDERUNG
+   Nach Abschluss der Experimente liefert die CacheEngine fuer eine
+   Plattform die beste Suchalgorithmus-Rekombination unter Optimierung.
+   Diese Optimal-Wahl wird ABI-stabil geladen + ueber std::map<>-aehnliches
+   Interface in Produktion verfuegbar.
+
+ARCHITEKTUR (Praezisierung der bisherigen F12-K)
+   Experiment-Modus (Diplomarbeit-Toolchain)
+      → CacheEngineBuilder iteriert ueber Permutationen
+      → Findet best-permformende Algorithmus-Permutation pro Plattform
+      → Persistiert die Optimal-Wahl als "Production-Konfiguration"
+
+   Production-Modus (ComdareDB-Verwendung)
+      → CacheEngineBuilder als Container-Library
+      → Laedt Optimal-Konfiguration der Plattform (ABI-stabil)
+      → Bietet std::map-API fuer den Konsumenten
+
+GOOGLE-TEST-INTEGRATION
+   Experiment-Loops nutzen Google Tests mit eingeschalteter Mess-Logik
+   (Template-Pattern Mess-Tool). Das gleiche Test-Setup wird in Produktion
+   als Verifikations-Suite mitgeliefert (ohne Mess-Aktivierung).
+
+ZIEL
+   Eine Library, die im Experiment der Diplomarbeit den besten Algorithmus
+   findet und in der Produktion (ComdareDB spaeter) den besten Algorithmus
+   ueber ein std::map-API anbietet.
+
+QUELLE  bestaetigt Domaenenmodell v3 §1(B) Engine-Choice + §4 CacheEngineBuilder
+
+================================================================================
+H6 — F-EXTRA-5 KORREKTUR: KEIN PYTHON, sh/bat statt Python-Codegen
+================================================================================
+
+ANFORDERUNG
+   Architekt-Direktive: "Ich moechte ohnehin alles ohne Python machen wenn
+   moeglich, ein einfaches shell skript synchron in bat und sh reicht auch
+   aus, damit sinken die prerequisites, die wir wohl auf Talos OS auch gar
+   nicht so leicht nachinstallieren koennen und auch gar nicht brauchen."
+
+KORREKTUR
+   F-EXTRA-5 hatte beschlossen: "Python-Codegen-Skript erzeugt CMake-Targets".
+   Diese Entscheidung wird REVIDIERT.
+
+NEUE STRATEGIE
+   • CMake-eigene Funktionen + `configure_file()` + `add_custom_command()`
+     fuer Permutations-Generierung
+   • Wo CMake nicht ausreicht: shell-Skripte (synchron in `*.sh` und
+     `*.bat` gepflegt)
+   • KEIN Python in der Build-Pipeline
+   • Falls eine komplexe Logik wirklich nicht in CMake/Shell ausdrueckbar
+     ist: minimaler C++23-Helper als kompiliertes Tool im BuildSystem
+
+KONSEQUENZ
+   • `tools/permutation_codegen/codegen.py` wird verworfen
+   • Neu: `tools/permutation_codegen/codegen.cmake` + `codegen.sh` + `codegen.bat`
+   • Datasets-Tooling (Phase 4.A): ebenfalls sh/bat statt Python
+   • TS-Stub-Skripte fuer LaTeX-Toolchain: sh/bat
+
+PLATTFORM-KONSEQUENZ (Talos OS)
+   Talos OS ist minimalistisch — Python ist NICHT standardmaessig verfuegbar
+   und schwer nachzuruesten. Die Direktive vermeidet dieses Problem komplett.
+
+MEMORY-ANKER
+   Neue Memory-Notiz `feedback_no_python_in_buildchain.md` ergaenzen.
+
+================================================================================
+ARCHITEKT-ANTWORTEN AUF F1-F4 (Domaenenmodell v3 §10) UND F5-F8 (DATASETS)
+================================================================================
+
+F1 — Header-Telemetrie-Bit-Layout (Branch-Histogram)
+   ENTSCHEIDUNG (c)  Konfigurierbar via Build-Flag (default 32 bit).
+
+F2 — RCU-Implementierung
+   ENTSCHEIDUNG  EIGENE Implementation in der CacheEngine.
+   PRAEZISIERUNG  liburcu-Quellcode (offen, LGPL) wird gruendlich analysiert
+                  als KONZEPT-Quelle. Eigene Implementation als bedeutsamer
+                  Eigenbestandteil der CacheEngine — Optimierungs-Kontrolle
+                  + Interface fuer Suchalgorithmen zur CacheEngine-Verwendung.
+   FOLGE         `ext/P29-RCU/userspace-rcu/` bleibt KONZEPT-Quelle, NICHT
+                 direkt-gelinkter Code. Eigene Implementation in
+                 `cache_engine/reclamation/comdare_rcu/`.
+
+F3 — SDSL-Library
+   ENTSCHEIDUNG (c-erweitert)  SDSL-Library als C++23-Portierung in eigener
+                                Bibliothek.
+   PRAEZISIERUNG  SDSL ist C++11 (vor KI-Zeit). C++23-Metaprogrammierung
+                  ermoeglicht compile-time-optimierte Datenstrukturen, die
+                  je Plattform/ISA optimal kompiliert werden. Mit der
+                  CacheEngine-Awareness koennen wir bessere Ergebnisse als
+                  SDSL liefern.
+   STRATEGIE     SDSL-Lite kopieren → Auf C++23 portieren → Erweiterung mit
+                 Compile-Time-ISA-Optimierungen (BMI2 popcnt, AVX-512
+                 broadcast, ARM SVE/SVE2). Vermeidet Latenz-sensible
+                 Runtime-Konstrukte.
+   FOLGE         Neue Komponente `comdare-succinct/` (oder unter
+                 `prt_art/legacy_reimpl/SDSL-Cpp23-Port/`). Aufwaendige
+                 Portierungs-Aufgabe — eigene Task.
+
+F4 — HBM-Allocation-API
+   ENTSCHEIDUNG (b+c)  Plattform-spezifisch via Abstract Factory + Hybrid-
+                       Cache-Hierarchie-Manager.
+   PRAEZISIERUNG  Software-Cache-Hierarchie ueber DIMM + HBM:
+                  • CacheEngine verwaltet Mix in Software (Adapter +
+                    Scheduler + Engine)
+                  • Abstract Factory Pattern fuer plattform-spezifische
+                    Hardware-Bindung
+                  • Compile-Time durch Metaprogrammierung — passt zur
+                    CacheEngineBuilder-Praecompile-Mechanik
+                  • Plattform-Adapter:
+                      - IntelHBMAllocator (`hbwmalloc`)
+                      - GraceHopperHBMAllocator (CUDA/UCM-API)
+                      - StandardDIMMOnlyAllocator (Fallback)
+   FOLGE         Neue Concept-Achse: `IHBMAllocator` mit Plattform-
+                 Implementations. Cache-Hierarchie-Manager als neue
+                 Komponente in `cache_engine/subsystems/cache_hierarchy_manager/`.
+
+F5 — Datasets-Generator
+   ENTSCHEIDUNG (a, KORRIGIERT)  Original Java-YCSB einbinden, Steuerung
+                                  via CMake + sh/bat-Skripte (NICHT Python).
+   FOLGE         Java-YCSB ist Prerequisite (JVM noetig); aber kein Python.
+                 Auf Talos OS muss Java-Runtime separat bereitgestellt
+                 werden — wird im Compiler-Provisioning mitberuecksichtigt.
+
+F6 — Zipfsche Theta-Werte
+   ENTSCHEIDUNG (c)  Vier Klassen: 0.0 (uniform Baseline), 0.5, 0.99, 1.5.
+
+F7 — Mixed-Length-Verteilung
+   ENTSCHEIDUNG (a+b+c als Permutations-Achse)
+                Alle drei Optionen werden als Factory-Pattern-
+                Permutations-Dimension durchprobiert:
+                  • 30/50/20 Bin-Verteilung
+                  • Pareto (heavy-tail)
+                  • Gleichverteilung 16-512 Byte
+                Alle Experimente decken alle drei Verteilungen ab.
+   FOLGE         Datasets-Permutations-Achse erweitert um "Schluessel-
+                 laengen-Verteilung". Permutationsraum waechst entsprechend.
+
+F8 — Prefix-Heavy-Gruppierung
+   ENTSCHEIDUNG (b default + c konfigurierbar)
+                  • Default: Drei Stufen 10% / 50% / 80% Praefix-Sharing
+                  • Custom-Konfiguration moeglich
+                  • Mehrere Permutationsstufen werden nacheinander getestet
+                    und dokumentiert
+   FOLGE         Datasets-Permutations-Achse erweitert um "Praefix-Heavy-
+                 Gruppierung". Generator parametrisiert.
+
+================================================================================
+F9 — F10 (Bausteine-Matrix Detail)
+================================================================================
+
+F9 — Original-Compiler-Versionen — Vorgehen
+   (Architekt-Antwort steht aus — voruebergehend autonom (a) starten,
+    finale Liste mit Habich abstimmen)
+
+F10 — Concept-Interfaces als Header-Stubs
+   (Architekt-Antwort steht aus — Hinweis: passt zu UML REV 2 H1)
+
+================================================================================
+GESAMTFOLGEN FUER DIE ARCHITEKTUR
+================================================================================
+
+A) UML REV 2 mit ER-Modell — eigene Iteration (Task #99)
+B) Code-Qualitaets-Bewertung pro Bausteine-Quelle — Erweiterung Task #80
+C) LaTeX-Toolchain mit dynamischer Compile — neue Aufgabe (Task #100)
+D) Repo-Separation Diplomarbeit ↔ Library — neue Aufgabe (Task #101)
+E) CacheEngine als Production-Container ABI-stabil — Praezisierung F12-K
+F) NO-PYTHON-DIREKTIVE — Korrektur F-EXTRA-5 + Memory-Notiz
+G) RCU eigene Implementation — neue Komponente
+H) SDSL-Lite C++23-Portierung — neue Komponente
+I) HBM-Hybrid-Cache-Hierarchie via Abstract Factory — neue Komponente
+J) Datasets-Permutations-Achsen erweitert (Theta + Length-Verteilung +
+   Prefix-Gruppierung als Permutations-Dimensionen)
+
+================================================================================
+ARCHITEKT-ANTWORTEN AUF OPEN-1 BIS OPEN-4 (2026-05-09)
+================================================================================
+
+OPEN-1 — Original-Compiler-Versions-Tabelle pro Algorithmus
+   ENTSCHEIDUNG  AUTONOM recherchieren — Habich weiss das auch nicht.
+   PRAEZISIERUNG  Alle 33 Code-Quellen systematisch durchsuchen, jeweils
+                  deren Struktur kartografieren, dann den Code klassifiziert
+                  in Aspekte zerlegen. Code-Kommentare enthalten i.d.R.
+                  Compiler-/Plattform-Hinweise.
+   FOLGE         Task #108 (Systematische Kartografierung aller 33 Code-
+                 Quellen) — Erweiterung von Task #80 STRUKTUR_NOTIZ.md auf
+                 ALLE 33 Quellen (nicht nur 12 geklonte).
+                 Ergebnis blockt OPEN-2 (Concept-Interfaces).
+
+OPEN-2 — Concept-Interfaces als Header-Stubs
+   ENTSCHEIDUNG  Erst NACH der Kartografierung (OPEN-1) und nach detaillier-
+                 ter Domaenenmodell-Ausarbeitung mit Such-Algorithmus-
+                 spezifischen Bausteinen.
+   PRAEZISIERUNG  Diese Klassifizierungsgrundlage an Code-Schnipseln muss
+                  hinreichend definiert sein. Sie ist von den analysierten,
+                  ueber alle Paper quer verwendeten Baustein-Begriffen
+                  ableitbar (Cross-Paper-Konzeptmatrix).
+   FOLGE         Task #79 / Concept-Interfaces wartet auf Task #108.
+                 Reihenfolge: Kartografierung → detailliertes Domaenenmodell
+                 → Concept-Interfaces.
+
+OPEN-3 — Java-YCSB-Java-Runtime-Provisioning
+   ENTSCHEIDUNG  Java-YCSB lebt auf einem schweren Debian-Pod auf dem
+                 Development-Cluster mit Server-Port. Production-Cluster
+                 (Ryzen 9 9950X3D + i9-14900KS, 64 GB DDR5-5600, Latenz
+                 36 Zyklen) erhaelt die generierten Daten per Netzwerk
+                 zur Test-Zeit.
+   PRAEZISIERUNG  KEINE Java-Runtime auf Production-Cluster — bleibt
+                  unbelastet und unverfaelscht. Schwere Pods (mit JVM,
+                  YCSB, ggf. anderen Generatoren) bleiben "drauehen" auf
+                  dem Development-Cluster.
+   FOLGE         Task #109 (Debian-Pod als YCSB-Daten-Provider auf
+                 Development-Cluster).
+                 Task #111 (Talos OS Java-Provisioning bestaetigt:
+                 KEINE Java-Runtime auf Production).
+
+OPEN-4 — comdare-cache-engine GitHub-Repo + Diplomarbeit-Repo-Tracking
+   ENTSCHEIDUNG  SOFORT vor Cluster-Migration zwei PRIVATE GitHub-Repos
+                 anlegen. Veroeffentlichung erst wenn reif.
+   ZWEI REPOS
+                 1. PRIVAT: `comdare-cache-engine` (die Library)
+                    — Wird spaeter ggf. veroeffentlicht
+                    — Saubere wiederverwendbare Codebasis fuer ComdareDB
+                 2. PRIVAT: `probst-Diplomarbeit-cache-engine`
+                    (eigener Diplomarbeit-Wrapper)
+                    — LaTeX + Toolchain + Experiment-Skripte
+                    — Klont das comdare-cache-engine-Repo zur Build-Zeit
+   ZUSAETZLICH    Diplomarbeit-Ordner separat lokal tracken (Git-Init):
+                  `C:\Users\benja\OneDrive\Desktop\Diplomarbeit - Datenbanken\`
+                  → eigener lokaler Git-History fuer LaTeX-Diplomarbeit-
+                    Source + Aenderungen, damit Versionsverlauf erhalten
+                    bleibt
+   FOLGE         Task #110 (Zwei private GitHub-Repos + Diplomarbeit-Ordner
+                 Git-Init).
+                 Cluster-Migration kann starten, sobald die Repos lokal
+                 vorbereitet sind.
+
+================================================================================
+KORREKTUREN AUS AGENT-VERIFIKATION 2026-05-09
+================================================================================
+
+Verifikations-Agent hat 3 kosmetische Luecken identifiziert (alle nicht-kritisch):
+
+LUECKE 1 — Task-Redundanz #99 vs #100
+   Beide Tasks deckten dieselbe Anforderung (UML REV 2 Vollausarbeitung) ab.
+   AKTION: Task #100 als deleted markiert; Task #99 bleibt einziger
+   Anchor-Task fuer H1.
+
+LUECKE 2 — Talos-Java-Provisioning ohne Task
+   F5 erwaehnte Java-YCSB als Prerequisite, aber kein expliziter Task fuer
+   Talos-Java.
+   AKTION: durch OPEN-3 geklaert (Java NICHT auf Production); Task #111
+   dokumentiert das Provisioning-Konzept.
+
+LUECKE 3 — F-EXTRA-5 in `Architekturentscheidungen_F1_F15.txt` nicht editiert
+   F-EXTRA-5 (Python-Codegen) wurde nur via Memory + Habich_Feedback
+   widerrufen, der ADR-Eintrag selbst nicht.
+   AKTION: F-EXTRA-5 Sektion in
+   `Architekturentscheidungen_F1_F15.txt` mit "REVIDIERT durch H6 (siehe
+   Habich_Feedback_2026_05_08.txt)" markiert.
+
+================================================================================
+ZEITSCHRANKE-CHECK (Architekt-Anliegen)
+================================================================================
+
+Architekt hat angemerkt, dass das Nachdenken nach 2 Minuten unterbrochen
+worden sein koennte. Verifikations-Agent (43 Sekunden Laufzeit, 70k Tokens
+Analyse) bestaetigt:
+   • 8/8 F-Antworten VOLLSTAENDIG erfasst
+   • 6/6 Habich-Punkte (H1-H6) VOLLSTAENDIG erfasst
+   • Alle 8 neuen Tasks (#100-#107) korrekt angelegt (vor Bereinigung)
+   • Memory-Eintraege korrekt (NO-PYTHON-DIREKTIVE)
+   • Keine Inkonsistenzen mit frueheren ADR-Beschluessen (F12-K wird durch
+     H5 nur praezisiert, nicht widersprochen)
+
+   ⇒ Die identifizierten Luecken waren KOSMETISCH — nichts Wesentliches
+     wurde durch eine etwaige Zeitschranke gekappt.
+
+================================================================================
+ENDE DES HABICH-FEEDBACK-DOKUMENTS (REV 1 mit OPEN-Antworten 2026-05-09)
+================================================================================

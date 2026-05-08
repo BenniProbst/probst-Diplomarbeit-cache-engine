@@ -1,0 +1,180 @@
+================================================================
+VORANALYSE: P20-BTreesAreBack/leanstore
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P20-BTreesAreBack/leanstore
+Stand: 2026-05-09 00:49:57
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 47
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609    0 May  4 23:54 ..
+-rw-r--r-- 1 benja 197609  131 May  4 23:39 .clang-format
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 .git
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 .github
+-rw-r--r-- 1 benja 197609  163 May  4 23:39 .gitignore
+-rw-r--r-- 1 benja 197609    2 May  4 23:39 .projectile
+-rw-r--r-- 1 benja 197609 3185 May  4 23:39 CMakeLists.txt
+-rw-r--r-- 1 benja 197609 1087 May  4 23:39 LICENSE
+-rw-r--r-- 1 benja 197609 6894 May  4 23:39 README.md
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 backend
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 frontend
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 libs
+drwxr-xr-x 1 benja 197609    0 May  5 00:06 shared-headers
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./backend
+./backend/leanstore
+./backend/leanstore/concurrency-recovery
+./backend/leanstore/profiling
+./backend/leanstore/storage
+./backend/leanstore/sync-primitives
+./backend/leanstore/threads
+./backend/leanstore/utils
+./frontend
+./frontend/micro-benchmarks
+./frontend/minimal-example
+./frontend/mix
+./frontend/scaled-example
+./frontend/shared
+./frontend/tpc-c
+./frontend/ycsb
+./libs
+./shared-headers
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./backend/leanstore/concurrency-recovery/ConcurrencyControl.cpp
+./backend/leanstore/concurrency-recovery/CRMG.cpp
+./backend/leanstore/concurrency-recovery/CRMG.hpp
+./backend/leanstore/concurrency-recovery/GroupCommitCordinator.cpp
+./backend/leanstore/concurrency-recovery/GroupCommiter.cpp
+./backend/leanstore/concurrency-recovery/GroupCommiter1.cpp
+./backend/leanstore/concurrency-recovery/GroupCommiter2.cpp
+./backend/leanstore/concurrency-recovery/HistoryTree.cpp
+./backend/leanstore/concurrency-recovery/HistoryTree.hpp
+./backend/leanstore/concurrency-recovery/HistoryTreeInterface.hpp
+./backend/leanstore/concurrency-recovery/Logging.cpp
+./backend/leanstore/concurrency-recovery/Transaction.hpp
+./backend/leanstore/concurrency-recovery/WALEntry.hpp
+./backend/leanstore/concurrency-recovery/Worker.cpp
+./backend/leanstore/concurrency-recovery/Worker.hpp
+./backend/leanstore/Config.cpp
+./backend/leanstore/Config.hpp
+./backend/leanstore/KVInterface.hpp
+./backend/leanstore/LeanStore.cpp
+./backend/leanstore/LeanStore.hpp
+./backend/leanstore/profiling/counters/CPUCounters.cpp
+./backend/leanstore/profiling/counters/CPUCounters.hpp
+./backend/leanstore/profiling/counters/CRCounters.cpp
+./backend/leanstore/profiling/counters/CRCounters.hpp
+./backend/leanstore/profiling/counters/PPCounters.cpp
+./backend/leanstore/profiling/counters/PPCounters.hpp
+./backend/leanstore/profiling/counters/WorkerCounters.cpp
+./backend/leanstore/profiling/counters/WorkerCounters.hpp
+./backend/leanstore/profiling/tables/BMTable.cpp
+./backend/leanstore/profiling/tables/BMTable.hpp
+./backend/leanstore/profiling/tables/ConfigsTable.cpp
+./backend/leanstore/profiling/tables/ConfigsTable.hpp
+./backend/leanstore/profiling/tables/CPUTable.cpp
+./backend/leanstore/profiling/tables/CPUTable.hpp
+./backend/leanstore/profiling/tables/CRTable.cpp
+./backend/leanstore/profiling/tables/CRTable.hpp
+./backend/leanstore/profiling/tables/DTTable.cpp
+./backend/leanstore/profiling/tables/DTTable.hpp
+./backend/leanstore/profiling/tables/LatencyTable.cpp
+./backend/leanstore/profiling/tables/LatencyTable.hpp
+./backend/leanstore/profiling/tables/ProfilingTable.hpp
+./backend/leanstore/storage/btree/BTreeLL.cpp
+./backend/leanstore/storage/btree/BTreeLL.hpp
+./backend/leanstore/storage/btree/BTreeVI.cpp
+./backend/leanstore/storage/btree/BTreeVI.hpp
+./backend/leanstore/storage/btree/core/BTreeGeneric.cpp
+./backend/leanstore/storage/btree/core/BTreeGeneric.hpp
+./backend/leanstore/storage/btree/core/BTreeGenericIterator.cpp
+./backend/leanstore/storage/btree/core/BTreeGenericIterator.hpp
+./backend/leanstore/storage/btree/core/BTreeIteratorInterface.hpp
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+  23730 total
+   1913 ./frontend/shared/lmdb++.hpp
+   1705 ./shared-headers/CRC.hpp
+   1153 ./frontend/tpc-c/TPCCWorkload.hpp
+    948 ./backend/leanstore/storage/btree/BTreeVI.cpp
+    684 ./backend/leanstore/storage/btree/core/BTreeGeneric.cpp
+    648 ./backend/leanstore/storage/btree/BTreeLL.cpp
+    600 ./backend/leanstore/storage/btree/core/BTreeGenericIterator.hpp
+    498 ./backend/leanstore/storage/btree/FatTupleDifferentAttributes.cpp
+    490 ./backend/leanstore/storage/btree/BTreeVI.hpp
+    479 ./backend/leanstore/storage/buffer-manager/BufferManager.cpp
+    461 ./backend/leanstore/LeanStore.cpp
+    444 ./backend/leanstore/storage/btree/core/BTreeNode.hpp
+    424 ./backend/leanstore/storage/btree/core/BTreeNode.cpp
+    399 ./frontend/tpc-c/Schema.hpp
+    352 ./backend/leanstore/concurrency-recovery/HistoryTree.cpp
+    331 ./backend/leanstore/concurrency-recovery/ConcurrencyControl.cpp
+    329 ./shared-headers/PerfEvent.hpp
+    323 ./backend/leanstore/storage/buffer-manager/PageProviderThread.cpp
+    316 ./frontend/tpc-c/tpcc.cpp
+    310 ./backend/leanstore/utils/Files.cpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (82 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+    MIT License
+    
+    Copyright (c) 2021, FSU Jena
+
+## README EXCERPT
+  Datei: README.md
+    # LeanStore
+    
+    [LeanStore](https://db.in.tum.de/~leis/papers/leanstore.pdf) is a high-performance OLTP storage engine optimized for many-core CPUs and NVMe SSDs. Our goal is to achieve performance comparable to in-memory systems when the data set fits into RAM while being able to fully exploit the bandwidth of fast NVMe SSDs for large data sets. While LeanStore is currently a research prototype, we hope to make it usable in production in the future.
+    
+    ## Compiling
+    
+    Install dependencies:
+    
+    `sudo apt-get install cmake libtbb2-dev libaio-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev librocksdb-dev liblmdb-dev libwiredtiger-dev liburing-dev`
+    
+    `mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make -j`
+    
+    ## Benchmark Examples
+    ### TPC-C
+    
+    `build/frontend/tpcc --tpcc_warehouse_count=100 --notpcc_warehouse_affinity --ssd_path=./ssd_block_device_or_file --worker_threads=120 --pp_threads=4 --dram_gib=240 --csv_path=./log --free_pct=1 --contention_split --xmerge --print_tx_console --run_for_seconds=60 --isolation_level=si`
+    
+    Check `build/frontend/tpcc --help` for other options.
+    
+    ### YCSB
+    `build/frontend/ycsb --ycsb_read_ratio=50 --target_gib=10 --ssd_path=./ssd_block_device_or_file --worker_threads=120 --pp_threads=4 --dram_gib=5 --csv_path=./log --free_pct=1 --contention_split --xmerge --print_tx_console --run_for_seconds=60 --isolation_level=si`
+    check `build/frontend/ycsb --help` for other options
+    
+    ## Implement Your Workload
+    
+    LeanStore offers a flexible transactional Key/Value interface similar to WiredTiger and RocksDB.
+    A table is a B-Tree index where keys and values are stored in a normalized format, i.e., lexicographically ordered strings.
+    For convenience, frontend/shared offers templates that take care of (un)folding common types.
+    The best starting points are frontend/minimal-example and frontend/ycsb.
+    The required parameters at runtime are: `--ssd_path=/block_device/or/filesystem --dram_gib=fixed_in_gib`.
+    The default transaction isolation level is `--isolation_level=si`. You can lower it to Read Committed or Read Uncommitted by replacing `si` with `rc` or `ru`, respectively.
+    You can set the transaction isolation level using `--isolation_level=si` and enable the B-Tree techniques from CIDR202 with `--contention_split --xmerge`.
+    
+    ### Metrics Reporting
+    LeanStore emits several metrics per second in CSV files: `log_bm.csv, log_configs.csv, log_cpu.csv, log_cr.csv, log_dt.csv`.
+    Each row has a c_hash value, which is calculated by chaining and hashing all the configurations that you passed to the binary at runtime.
+    This gives you an easy way to identify your run and join all relevant information from the different CSV files using SQLite, for example."
+    
+    ## Implemented Features
+    
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  AVX512               in 2 Dateien
+  Counter              in 53 Dateien
+
+## C++-STANDARD-INDIKATOREN
+  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+## END VORANALYSE P20-BTreesAreBack/leanstore

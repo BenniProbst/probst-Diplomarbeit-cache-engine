@@ -1,0 +1,2511 @@
+=== PAPER: P21-ChenPB2001
+=== FILENAME: Improving Index Performance through Prefetching.pdf
+=== PAGES: 12
+
+--- PAGE 1 ---
+Improving Index Performance through Prefetching
+Shimin Chen
+School of Computer Science
+Carnegie Mellon University
+Pittsburgh, PA 15213
+chensm@cs.cmu.edu
+Phillip B. Gibbons
+Information Sciences Research Center
+Bell Laboratories
+Murray Hill, NJ 07974
+gibbons@research.bell-labs.com
+T odd C. Mowry
+School of Computer Science
+Carnegie Mellon University
+Pittsburgh, PA 15213
+tcm@cs.cmu.edu
+ABSTRACT
+This pap er prop oses and ev aluates Pr efetching B
+/+
+/-T r e es
+/#28pB
+/+
+/-T rees/#29/, whic h use prefetc hing to accelerate t w o im/-
+p ortan t op erations on B
+/+
+/-T ree indices/: searc hes and range
+scans/. T o accelerate searc hes/, pB
+/+
+/-T rees use prefetc hing to
+e/#0Bectiv ely create wider no des than the natural data trans/-
+fer size/: e/.g/./, eigh t vs/. one cac he lines or disk pages/. These
+wider no des reduce the heigh t of the B
+/+
+/-T ree/, thereb y de/-
+creasing the n um b er of exp ensiv e misses when going from
+paren tt o c hild without signi/#0Ccan tl y increasing the cost of
+fetc hing a giv en no de/. Our results sho w that this tec hnique
+sp eeds up searc h and up date times b y a factor of /1/./2/#7B/1/./5 for
+main/-memory B
+/+
+/-T rees/. In addition/, it outp erforms and is
+complemen tary to /#5CCac he/-Sensitiv eB
+/+
+/-T rees/./" T o accel/-
+erate range scans/, pB
+/+
+/-T rees pro vide arra ys of p oin ters to
+their leaf no des/. These allo w the pB
+/+
+/-T ree to prefetc h ar/-
+bitrarily far ahead/, ev en for nonclustered indices/, thereb y
+hiding the normally exp ensiv e cac he misses asso ciated with
+tra v ersing the lea v es within the range/. Our results sho w
+that this tec hnique yields o v er a sixfold sp eedup on range
+scans of /1/0/0/0/+ k eys/. Although our exp erimen tal ev aluation
+fo cuses on main memory databases/, the tec hniques that w e
+prop ose are also applicabl e to hiding disk latency /.
+1. INTRODUCTION
+As the gap b et w een pro cessor sp eed and b oth DRAM and
+disk sp eeds con tin ues to gro w exp onen tially /, it is b ecoming
+increasingl y imp ortan t to mak e e/#0Bectiv e use of cac hes to
+ac hiev e high p erformance on database managemen t systems/.
+Cac hing exists at m ultiple lev els within mo dern memory hi/-
+erarc hies/: t ypically t w o or more lev els of SRAM serv es as
+cac hes for the con ten ts of main memory in DRAM/, whic hi n
+turn is a cac he for the con ten ts on disk/. While database re/-
+searc hers ha v e historicall y fo cused on the imp ortance of this
+latter form of cac hing /#28also kno wn as the /#5Cbu/#0Ber p o ol/"/#29/,
+recen t studies ha v e demonstrated that ev en on traditional
+disk/-orien ted databases/, roughly /5/0/#25 or more of execution
+time is often w asted due to SRAM cac he misses /#5B/1/, /2/, /1/0/,
+/1/8/#5D/. F or main/-memory databases/, it is ev en clearer that
+SRAM cac he p erformance is crucial /#5B/1/9/#5D/. Hence sev eral re/-
+cen t studies ha v e revisited core database algorithms in an
+e/#0Bort to mak e them more cac he friendly /#5B/5/, /1/7/, /1/9/, /2/0/, /2/1/#5D/.
+Permission to make digital or hard copies of all or part of this work for
+personal or classroom use is granted without fee provided that copies are
+not made or distributed for proﬁt or commercial advantage and that copies
+bear this notice and the full citation on the ﬁrst page. To copy otherwise, to
+republish, to post on servers or to redistribute to lists, requires prior speciﬁc
+permission and/or a fee.
+ACM SIGMOD 2001 May 21-24, Santa Barbara, California, USA
+Copyright 2001 ACM 1-58113-332-4/01/05 ...
+/$ 5.00.
+|0
+|20
+|40
+|60
+|80
+|100
+ 
+ 
+ Normalized Execution Time
+ dcache stalls
+ other stalls
+ busy
+B+ CSB+ B+
+search scan
+Figure /1/: Execution time breakdo wn for index op/-
+erations /#28B/+ /= B
+/+
+/-T rees/, CSB/+ /= CSB
+/+
+/-T rees/#29/.
+1.1 Cache Performance of B
+/+
+-Tree Indices
+Index structures are used extensiv ely throughout database
+systems/, and they are often implemen ted as B
+/+
+/-T rees/. While
+database managemen t systems p erform sev eral di/#0Beren t op/-
+erations that in v olv eB
+/+
+/-T ree indices /#28e/.g/./, selections/, joins/,
+etc/./#29/, these higher/-lev el op erations can b e decomp osed in to
+t w ok ey lo w er/-lev el access patterns/: /#28i/#29 se ar ching for a par/-
+ticular k ey /, whic hi n v olv es descending from the ro ot to a leaf
+no de using binary searc h within a giv en no de to determine
+whic hc hild p oin ter to follo w/; and /#28ii/#29 sc anning some p ortion
+of the index/, whic hi n v olv es tra v ersing the lea v es through a
+link ed/-lis t structure for a non/-clustered index/. /#28F or clus/-
+tered indices/, one can directly scan the database table after
+searc hing for the starting k ey /./#29 While searc h time is the k ey
+factor in single v alue selections and nested lo op index joins/,
+scan time is the dominan t e/#0Bect in range selections/.
+T o illustrate the need for impro ving the cac he p erformance
+of b oth searc h and scan on B
+/+
+/-T ree indices/, Figure /1 sho ws
+a breakdo wn of their sim ulated p erformance on a state/-of/-
+the/-art mac hine/. F or the sak e of concreteness/, w e pattern
+the memory subsystem after the Compaq ES/4/0 /#5B/8/#5D/|details
+are pro vided later in Section /4/. The /#5Csearc h/" exp erimen ti n
+Figure /1 lo oks up /1/0/0/,/0/0/0 random k eys in a main/-memory
+B
+/+
+/-T ree index after it has b een bulkloaded with /1/0 million
+k eys/. The /#5Cscan/" exp erimen t p erforms /1/0/0 range scan op er/-
+ations starting at random k eys/, eac h of whic h scans through
+/1 million h key /, tupleID i pairs retrieving the tupleID v al/-
+ues/. /#28The results for shorter range scans/|e/.g/./, /1/0/0/0 tuple
+scans/|are similar/#29/. The B
+/+
+/-T ree no de size is equal to the
+cac he line size/, whic hi s /6 /4 b ytes/. Eac h bar in Figure /1 is
+brok en do wn in to three categories/: busy time/, data cac he
+stalls/, and other stalls/. Both searc h and scan accesses on
+B
+/+
+/-T ree indices /#28the bars lab eled /#5C B/+ /"/|w e will explain
+the /#5C CSB/+ /" bar later/#29 sp end a signi/#0Ccan t fraction of their
+time/|/6/5/#25 and /8/4/#25/, resp ectiv ely/|sta ll ed on data cac he
+misses/. Hence there is considerable ro om for impro v emen t/.
+
+
+--- PAGE 2 ---
+1.2 Previous Work on Improving the Cache
+Performance of Indices
+In an e/#0Bort to impro v e the cac he p erformance of index
+se ar ches for main/-memory databases/, Rao and Ross pro/-
+p osed t w o new t yp es of index structures/: /#5CCac he/-Sensitiv e
+Searc hT rees/" /#28CSS/-T rees/#29 /#5B/1/9/#5D and /#5CCac he/-Sensitiv eB
+/+
+/-
+T rees/" /#28CSB
+/+
+/-T rees/#29 /#5B/2/0/#5D/. The premise of their studies is
+the con v en tional wisdom that the optimal tree no de size is
+equal to the natur al data tr ansfer size /, whic h corresp onds to
+the disk p age size for disk/-residen t databases and the c ache
+line size for main/-memory databases/. Because cac he lines
+are roughly t w o orders of magnitude smaller than disk pages
+/#28e/.g/./, /6/4 b ytes vs/. /4 Kb ytes/#29/, the resulting index trees for
+main/-memory databases are considerably deep er/. Since the
+n um b er of exp ensiv e cac he misses is roughly prop ortional
+to the heigh t of the tree/, it w ould b e desirable to someho w
+increase the e/#0Bectiv e fanout /#28also called the br anching fac/-
+tor /#29 of the tree/, without pa ying the cost of additional cac he
+misses that this w ould normally imply /.
+T o accomplish this/, Rao and Ross /#5B/1/9/, /2/0/#5D exploit the fol/-
+lo wing insigh t/: b y restricting the data la y out suc h that the
+lo cation of eac hc hild no de can b e directly computed from
+the paren t no de/'s address /#28or a single p oin ter/#29/, w e can elim/-
+inate all /#28or nearly all/#29 of the c hild p oin ters/. Assuming that
+k eys and p oin ters are the same size/, this e/#0Bectiv ely doubles
+the fanout of cac he/-line/-sized tree no des/, th us reducing the
+heigh t of the tree and the n um b er of cac he misses/. CSS/-
+T rees /#5B/1/9/#5D eliminate all c hild p oin ters/, but do not supp ort
+incremen tal up dates and therefore are only suitable for read/-
+only en vironmen ts/. CSB
+/+
+/-T rees /#5B/2/0/#5D do supp ort up dates b y
+retaining a single p oin ter p er non/-leaf no de that p oin ts to
+a con tiguous blo c k of its c hildren/. Although CSB
+/+
+/-T rees
+outp erform B
+/+
+/-T rees on searc hes/, they still p erform signi/#0C/-
+can tly w orse on up dates /#5B/2/0/#5D due to the o v erheads of k eeping
+all c hildren for a giv en no de in sequen tial order within con/-
+tiguous memory /, esp ecially during no de splits/.
+Returning to Figure /1/, the bar lab eled /#5C CSB/+ /" sho ws
+the execution time of CSB
+/+
+/-T rees /#28normalized to that of
+B
+/+
+/-T rees/#29 for the same index searc h exp erimen t/. As w e see
+in Figure /1/, CSB
+/+
+/-T rees eliminate /2/0/#25 of the data cac he
+stall time/, th us resulting in an o v erall sp eedup
+/1
+of /1/./1/5 for
+searc hes/. While this is a signi/#0Ccan t impro v emen t/, o v er half
+of the remaining execution time is still b eing lost to data
+cac he misses/; hence there is signi/#0Ccan t ro om for further im/-
+pro v emen t/. In addition/, these searc h/-orien ted optimizations
+pro vide no b ene/#0Ct to sc an accesses/, whic h are su/#0Bering ev en
+more from data cac he misses/.
+1.3 Our Approach: Prefetching B
+/+
+-Trees
+Mo dern micropro cessors pro vide the follo wing mec hanisms
+for coping with large cac he miss latencies/. First/, they allo w
+m ultiple outstanding cac he misses to b e in /#0Digh t sim ultane/-
+ously for the sak e of exploiting parallelis m within the mem/-
+ory hierarc h y /.F or example/, the Compaq ES/4/0 /#5B/8/#5D supp orts
+/3/2 in/-/#0Digh t loads/, /3/2 in/-/#0Digh t stores/, and eigh t outstanding
+o/#0B/-c hip cac he misses p er pro cessor/, and its crossbar mem/-
+ory system supp orts /2/4 outstanding cac he misses/. Second/,
+to help applications tak e full adv an tage of this paralleli sm/,
+they also pro vide pr efetch instructions whic h enable soft w are
+to mo v e data in to the cac he b efore it is needed/. Previous
+studies /#28whic h did not target databases sp eci/#0Ccall y/#29 ha v e
+demonstrated that for b oth arra y/-based and p oin ter/-based
+program co des/, prefetc hing can successfully hide m uc ho f
+the p erformance impact of cac he misses b yo v erlapping them
+/1
+Throughout this pap er/, w e rep ort p erformance gains as sp e e dup /: i/.e/.
+the original time divided b y the impro v ed time/.
+with computation and other misses /#5B/1/3/, /1/6/#5D/. Hence for mo d/-
+ern mac hines/, it is not the numb er of cac he misses that dic/-
+tates p erformance/, but rather the amoun to f exp ose d miss
+latency that cannot b e successfully hidden through tec h/-
+niques suc h as prefetc hing/.
+In this pap er/, w e prop ose and study Pr efetching B
+/+
+/-T r e es
+/#28pB
+/+
+/-T rees/#29/, whic h use prefetc hing to limit the exp osed miss
+latency /.T ree/-based indices suc ha s B
+/+
+/-T rees p ose a ma jor
+c hallenge for prefetc hing searc h and scan accesses since b oth
+access patterns su/#0Ber from the p ointer/-chasi ng pr oblem /#5B/1/3/#5D/:
+The data dep endencies through p oin ters mak e it di/#0Ecult to
+prefetc h su/#0Ecien tly far ahead to limit the exp osed miss la/-
+tency /.F or index se ar ches /,p B
+/+
+/-T rees reduce this problem
+b yh a ving wider no des than the natural data transfer size/,
+e/.g/./, eigh t vs/. one cac he lines /#28or disk pages/#29/. These wider
+no des reduce the heigh t of the tree/, thereb y decreasing the
+n um b er of exp ensiv e misses when going from paren tt oc hild/.
+The k ey observ ation is that b y using prefetc hing/, the wider
+no des come almost for free/: all of the cac he lines in a wider
+no de can b e fetc hed almost as quic kly as the single cac he
+line of a traditional no de/. T o accelerate index sc ans /,w e in/-
+tro duce arra ys of p oin ters to the B
+/+
+/-T ree leaf no des whic h
+allo w us to prefetc h arbitrarily far ahead/, thereb y hiding the
+normally exp ensiv e cac he misses asso ciated with tra v ersing
+the lea v es within the range/. Of course/, indices ma y b e fre/-
+quen tly up dated/. P erhaps surprisingl y /,w e demonstrate that
+insertion and deletion times actually de cr e ase with our tec h/-
+niques/, despite an yo v erheads asso ciated with main taining
+the wider no des and the arra ys of p oin ters/.
+1.4 Contributions of This Paper
+This pap er mak es the follo wing con tributions/. First/, to
+our kno wledge/, this is the /#0Crst study to explore ho w prefetc h/-
+ing can b e used to accelerate searc h and scan op erations on
+B
+/+
+/-T ree indices/. W e prop ose and study the Pr efetching B
+/+
+/-
+T r e e /#28pB
+/+
+/-T ree/#29/. Second/, w e demonstrate that con trary to
+con v en tional wisdom/, the optimal B
+/+
+/-T ree no de size on a
+mo dern mac hine is often wider than the natural data trans/-
+fer size/, since w e can use prefetc hing to fetc h eac h piece of
+the no de sim ultaneousl y /. Our approac h o/#0Bers the follo w/-
+ing adv an tages relativ e to CSB
+/+
+/-T rees/: /#28i/#29 w ea c hiev e b et/-
+ter searc h p erformance b ecause w e can increase the fanout
+b y more than the factor of t w o that CSB
+/+
+/-T rees pro vide
+/#28e/.g/./, b y a factor of eigh t/#29/; /#28ii/#29 w ea c hiev e b etter /#28rather
+than w orse/#29 p erformance on up dates relativ et o B
+/+
+/-T rees/,
+b ecause our impro v ed searc h sp eed more than o/#0Bsets an y
+increase in no de split cost due to wider no des/; and /#28iii/#29 w e
+do not require fundamen tal c hanges to the original B
+/+
+/-T ree
+data structures or algorithms/. In addition/, w e /#0Cnd that
+our approac hi s c omplementary to CSB
+/+
+/-T rees/. Third/, w e
+demonstrate ho w the pB
+/+
+/-T ree can e/#0Bectiv ely hide o v er /9/0/#25
+of the cac he miss latency su/#0Bered b y /#28non/-clustered/#29 index
+scans/, th us resulting in a factor of /6/./5/#7B/8/./7 sp e e dup o v er a
+range of scan lengths/. While our exp erimen tal ev aluation
+is p erformed within the con text of main memory databases/,
+w e b eliev e that our tec hniques are also applicable to hiding
+disk latency /, in whic h case the prefetc hes will mo v e data
+from disk in to main memory /.
+The remainder of this pap er is organized as follo ws/. Sec/-
+tions /2 and /3 discuss ho wp B
+/+
+/-T rees use prefetc hing to ac/-
+celerate index searc hes and scans/, resp ectiv ely /.T o quan tify
+the b ene/#0Cts of these tec hniques/, w e presen t exp erimen tal
+results in Section /4/. Finally /,w e discuss further issues and
+conclude in Sections /5 and /6/, resp ectiv ely /.
+
+
+--- PAGE 3 ---
+/0/0/0/0/1/1/1/1/0/0/0/0/0/1/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1
+/0
+/0
+/0
+/0
+/1
+/1
+/1
+/1
+node 0 node 1
+150 300 450 600
+cache miss
+node 2 node 3
+0
+time (cycles)
+/#28a/#29 F our lev els of one/-cac he/-line/-wide no des/.
+/0/0/0/0/1/1/1/1/0/0/0/0/0/1/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/0/1/1/1/1/1
+node 1 node 2
+cache miss
+node 0
+0 150 300 450 600 750 900
+time (cycles)
+/#28b/#29 Three lev els of t w o/-cac he/-lines/-wide no des/.
+/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/0/1/1/1/1/1/0/0/0/0/0/1/1/1/1/1
+/0
+/0
+/0
+/0
+/0
+/0
+/1
+/1
+/1
+/1
+/1
+/1
+node 2node 1
+cache miss
+node 0
+0 160 320 480
+time (cycles)
+/#28c/#29 P art /#28b/#29 with prefetc hing/.
+Figure /2/: P erformance of v arious B
+/+
+/-T ree searc hes
+where a cac he miss to memory tak es /1/5/0 cycles/, and
+a subsequen t access can b egin /1/0 cycles later /#5B/8/#5D/.
+2. PREFETCHING INDEX SEARCHES
+Recall that during a B
+/+
+/-T ree searc h/, w e start from the
+ro ot/, p erforming a binary searc h in eac h non/-leaf no de to
+determine whic hc hild to visit next/. Up on reac hing a leaf
+no de/, a /#0Cnal binary searc h returns the k ey p osition/. Re/-
+garding the cac he b eha vior/, w e exp ect at least one exp en/-
+siv e cac he miss to o ccur eac h time w em o v ed o wn a lev el
+in the tree/. Hence the n um b e ro fc a c he misses is roughly
+prop ortional to the heigh t of the tree /#28min us an y no des that
+migh t remain in the cac he if the index is reused/#29/. Th us/,
+ha ving wider tree no des for the sak e of reducing the heigh t
+of the tree migh t seem lik e a go o d idea/. Unfortunately /,i n
+the absence of prefetc hing /#28i/.e/. when all cac he misses are
+equally exp ensiv e and cannot b e o v erlapp ed/#29/, making the
+tree no des wider than the natur al data tr ansfer size /|i/.e/. a
+cac he line for main/-memory databases /#28and a disk page for
+disk/-residen t databases/#29/|actual ly hurts p erformance rather
+than helps it/, as has b een sho wn in previous studies /#5B/1/9/, /2/0/#5D/.
+The reason for this is that the n um b er of additional cac he
+misses at eac h no de more than o/#0Bsets the b ene/#0Cts of reduc/-
+ing the n um b er of lev els in the tree/.
+As a small example/, consider a main/-memory B
+/+
+/-T ree
+holding /1/0/0/0 k eys where the cac he line size is /6/4 b ytes and
+the key s/, c hild p oin ters/, and tupleID s are all four b ytes/. If
+w e limit the no de size to one cac he line/, then the B
+/+
+/-T ree
+will con tain at least four lev els/. Figure /2/#28a/#29 illustrates the
+resulting cac he b eha vior/, where the four cac he misses cost
+a total of /6/0/0 cycles on our Compaq ES/4/0/-based mac hine
+mo del /#5B/8/#5D/. If w e double the no de width to two cac he lines/,
+the heigh t of the B
+/+
+/-T ree can b e reduced to thr e e lev els/.
+Ho w ev er/, as w e see in Figure /2/#28b/#29/, this w ould result in six
+cac he misses/, th us increasing execution time b y /5/0/#25/.
+With prefetc hing/, ho w ev er/, it b ecomes p ossible to hide
+the latency of an y miss whose address can b e predicted suf/-
+/#0Ccien tly early /. Returning to our example/, if w e prefetc h the
+second half of eac ht w o/-cac he/-line/-wide tree no de so that
+it is fetc hed in parallel with the /#0Crst half/|as illustrated
+in Figure /2/#28c/#29/|w e can ac hiev e signi/#0Ccan tly b etter /#28rather
+than w orse/#29 p erformance compared with the one/-cac he/-line/-
+wide no des in Figure /2/#28a/#29/. The exten t to whic h the misses
+can b e o v erlapp ed dep ends up on the implemen tation details
+of the memory hierarc h y /, but the trend is to w ard supp ort/-
+ing greater paralleli sm/. In fact/, with m ultiple cac he and
+memory banks and crossbar in terconnects/, it is p ossible to
+completely o v erlap m ultiple cac he misses/. Figure /2/#28c/#29 il/-
+T able /1/: T erminology used throughout this pap er/.
+V ariable De/#0Cnition
+w /#23 of cac he lines in an index no de
+m /#23o f c hild p oin ters in a one/-line/-wide no de
+N /#23o f h key /, tupleID i pairs in an index
+d /#23o f c hild p oin ters in non/-leaf no de /#28/= w /#02 m /#29
+T
+/1
+full latency of a cac he miss
+T
+next
+latency of an additional pip elined cac he miss
+B normalized memory bandwidth
+/#10
+B /=
+T
+/1
+T
+next
+/#11
+k /#23 of no des to prefetc h ahead
+c /#23 of cac he lines in jump/-p oin t er arra yc h unk
+p
+w
+B
+/+
+/-T ree plain pB
+/+
+/-T ree with w /-line/-wide no des
+p
+w
+e
+B
+/+
+/-T ree p
+w
+B
+/+
+/-T ree with external jump/-p oin t er arra ys
+p
+w
+i
+B
+/+
+/-T ree p
+w
+B
+/+
+/-T ree with internal jump/-p oin t er arra ys
+lustrates the timing on our Compaq ES/4/0/-based mac hine
+mo del/, where bac k/-to/-bac k misses to memory can b e ser/-
+viced once ev ery /1/0 cycles/, whic h is a small fraction of the
+o v erall /1/5/0 cycle miss latency /. Therefore ev en without p er/-
+fect o v erlap of the misses/, w e can still p oten tially ac hiev e
+large p erformance gains /#28a sp eedup of /1/./2/5 in this example/#29
+b y creating wider than normal B
+/+
+/-T ree no des/.
+Hence the /#0Crst asp ect of our pB
+/+
+/-T ree design is to use
+prefetc hing to /#5Ccreate/" no des that are wider than the natu/-
+ral data transfer size/, but where the en tire miss p enalt y for
+eac h extra/-wide no de is comparable to that of an original
+B
+/+
+/-T ree no de/.
+2.1 Modiﬁcations to the B
+/+
+-Tree Algorithm
+W e consider a standard B
+/+
+/-T ree no de structure/: Eac h
+non/-le af no de is comprised of some n um b er/, d /#1D /1/, of
+childptr /#0Celds/, d /, /1 key /#0Celds/,
+/2
+and one keynum /#0Celd that
+records the n um be r o f key s stored in the no de /#28at most d /, /1/#29/.
+/#28All notation is summarized in T able /1/./#29 Eac h le af no de is
+comprised of d /, /1 key /#0Celds/, d /, /1 asso ciated tupleID /#0Celds/,
+one keynum /#0Celd/, and one next/-lea f /#0Celd that p oin ts to the
+next leaf no de in k ey order/. Our /#0Crst mo di/#0Ccation is to store
+the keynum and all of the key s prior to an y of the p oin ters
+or tupleID s in a no de/. This simple la y out optimization al/-
+lo ws the binary searc h to pro ceed without w aiting to fetc h
+all the p oin ters/. Our searc h algorithm is a straigh tforw ard
+extension of the standard B
+/+
+/-T ree algorithm/, and w en o w
+describ e only the parts that c hange/.
+Searc h/: Before starting a binary searc h/, w e prefetc h all of
+the cac he lines that comprise the no de/.
+Insertion/: Since an index searc h is /#0Crst p erformed to lo cate
+the p osition for insertion/, all of the no des on the path
+from the ro ot to the leaf are already in the cac he b efore
+the real insertion phase/. The only additional cac he
+misses are caused b y newly allo cated no des/, whic hw e
+prefetc h in their en tiret y b efore redistributi ng the k eys/.
+Deletion/: W e p erform lazy deletion as in Rao and Ross /#5B/2/0/#5D/.
+If more than one k ey is in the no de/, w e simply delete
+the k ey /. It is only when the last k ey in a no de is deleted
+that w e try to redistribute k eys or delete the no de/.
+Since index searc h is also p erformed prior to deletion/,
+the en tire ro ot/-to/-leaf path is in the cac he/. Key re/-
+distributio n is the only p oten tial cause of additional
+misses/; hence when all k eys in a no de are deleted/, w e
+prefetc h the sibling no de from whic hk eys will b e re/-
+distributed/.
+/2
+Throughout this pap er/, w e consider for simplicit y /#0Cxe d/-size key s/,
+tupleID s/, and p oin ters/. W e also assume that tupleID s and p oin ters
+are the same size/.
+
+
+--- PAGE 4 ---
+Prefetc hing can also b e used to accelerate the bulklo ad of
+aB
+/+
+/-T ree/. Ho w ev er/, b ecause this is exp ected to o ccur in/-
+frequen tly /,w e fo cus instead on the more frequen t op erations
+of searc h/, insertion and deletion/.
+2.2 Qualitative Analysis
+As discussed earlier in this section/, w e exp ect searc h times
+to impro v e through our sc heme b ecause it reduces the n um/-
+b er of lev els in the B
+/+
+/-T ree without signi/#0Ccan tly increasing
+the cost of accessing eac h lev el/. What ab out the p erfor/-
+mance impact on up dates/? Up dates alw a ys b egin with a
+searc h phase/, whic h will b e sp ed up/. The exp ensiv e op/-
+erations only o ccur either when the no de b ecomes to o full
+up on an insertion and m ust b e split/, or when a no de b ecomes
+empt y up on a deletion and k eys m ust b e redistributed/. Al/-
+though no de splits and k ey redistribution s are more costly
+with larger no des/, the relativ e frequency of these exp ensiv e
+ev en ts should decrease/. Therefore w e exp ect up date p erfor/-
+mance to b e comparable to/, or p erhaps ev en b etter than/,
+B
+/+
+/-T rees with single/-line no des/.
+The space o v erhead of the index is strictly reduced with
+wider no des/. This is primarily due to the reduction in the
+n um b er of non/-leaf no des/. F or a full tree/, eac h leaf no de
+con tains d /, /1 h key /, tupleID i pairs /. The n um b er of non/-leaf
+no des is dominated b y the n um b er of no des in the lev el im/-
+mediately ab o v e the leaf no des/, and hence is appro ximately
+N
+d /#28 d /, /1/#29
+/. As the fanout d increases with wider no des/, the
+no de size gro ws linearly but the n um b er of non/-leaf no des
+decreases quadraticall y /, resulting in a near linear decrease
+in the non/-leaf space o v erhead/.
+Finally /,a n i n teresting consideration is to determine the
+optimal no de size/, giv en prefetc hing/. Should no des simply
+b e as wide as p ossible/? There are t w o system parameters
+that a/#0Bect this answ er/. The /#0Crst is the exten t to whic h the
+memory subsystem can o v erlap m ultiple cac he misses/. W e
+quan tify this as the latency of a full cac he miss /#28 T
+/1
+/#29 divided
+b y the additional time un til another pip elined cac he miss
+w ould also complete /#28 T
+next
+/#29/. W e call this ratio /#28i/.e/.
+T
+/1
+T
+next
+/#29
+the normalize db andwidth /#28 B /#29/. F or example/, in our Compaq
+ES/4/0/-based mac hine mo del/, T
+/1
+/= /1/5/0 cycles/, T
+next
+/=/1 /0
+cycles/, and hence B /= /1/5/. The larger the v alue of B /, the
+greater the system/'s abilit yt o o v erlap parallel accesses/, and
+hence the greater lik eliho o d of b ene/#0Cting from wider index
+no des/. In general/, w e do not exp ect the optimal n um be r o f
+cac he lines p er no de /#28 w
+optimal
+/#29 to exceed B /, since b ey ond
+that p oin tw e could ha v e completed a binary searc h and
+mo v ed do wn to the next lev el in the tree/. The second system
+parameter that p oten tially limits the optimal no de size is the
+size of the cac he/, although in practice this do es not app ear
+to b e a limitation giv en realistic v alues of B /.
+Let us no w consider a more quan titativ e analysis of the
+optimal no de width w
+optimal
+/.A p B
+/+
+/-T ree with N h key /,
+tupleID i pairs con tains at least
+l
+log
+d
+/#10
+N
+d /, /1
+/#11
+/+/1
+m
+lev els/.
+With our data la y out optimization of putting k eys b efore
+c hild p oin ters/,
+/3
+/4
+of the no de is read on a v erage/. Hence the
+a v erage memory stall time for a searc h in a full tree is
+l
+log
+d
+N
+d /, /1
+/+/1
+m
+/#02
+/,
+T
+/1
+/+
+/,/#06
+/3 w
+/4
+/#07
+/, /1
+/#01
+/#02 T
+next
+/#01
+/= T
+next
+/#02
+l
+log
+wm
+N
+wm /, /1
+/+/1
+m
+/#02
+/,
+B /+
+/#06
+/3 w
+/4
+/#07
+/, /1
+/#01
+/#28/1/#29
+By computing the v alue of w that minimizes this cost/, w e can
+/#0Cnd w
+optimal
+/.F or example/, in our sim ulations where m /=/8
+and B /= /1/5/, b ya v eraging o v er tree sizes N /=/1 /0
+/3
+/;/:/: /: /; /1/0
+/9
+/,
+w e can compute from equation /#28/1/#29 that w
+optimal
+/= /8/. If the
+memory subsystem bandwidth increases suc h that B /= /5/0/,
+/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1
+cache miss
+leaf0 leaf1 leaf2 leaf3
+0 150 300 450 600
+time (cycles)
+/#28a/#29 Scanning /4 one/-line no des
+/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1
+/0
+/0
+/0
+/0
+/1
+/1
+/1
+/1
+cache miss
+leaf0 leaf1
+time (cycles)
+0 160 320
+/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1/0/0/0/0/1/1/1/1
+cache miss
+0 180
+time (cycles)
+/#28b/#29 Scanning /2 t w o/-line no des /#28c/#29 Scanning with prefetc hing
+Figure /3/: Cac he b eha viors of index range scans/.
+then w
+optimal
+increases to /2/2/.
+In summary /, comparing our pB
+/+
+/-T rees with con v en tional
+B
+/+
+/-T rees/, w e exp ect b etter searc h p erformance/, comparable
+or somewhat b etter up date p erformance/, and lo w er space
+o v erhead/. Ha ving addressed index searc h p erformance/, w e
+no w turn our atten tion to index range scans/.
+3. PREFETCHING INDEX SCANS
+Giv en starting and ending k eys as argumen ts/, an index
+range scan returns a list of either the tupleID s or the tuples
+themselv es with k eys that fall within this range/. First the
+starting k ey is se ar che d in the B
+/+
+/-T ree to lo cate the start/-
+ing leaf no de/. Then the scan follo ws the next/-leaf p oin ters/,
+visiting the leaf no des in order/. As the scan pro ceeds/, the
+tupleID s /#28or tuples/#29 are copied in to a return bu/#0Ber/. This
+pro cess stops when either the ending k ey is found or the re/-
+turn bu/#0Ber /#0Clls up/. In the latter case/, the scan pro cedure
+pauses and returns the bu/#0Ber to the caller /#28often a join no de
+in a query execution plan/#29/, whic h then consumes the data
+and resumes the scan where it left o/#0B/. Hence a range se/-
+lection in v olv es one k ey searc h and often m ultiple leaf no de
+scan calls/. Throughout this section/, w e will fo cus on range
+selections that return tupleID s/, although returning the tu/-
+ples themselv es /#28or other v ariations/#29 is a straigh tforw ard ex/-
+tension of our algorithm/, as discussed in the full pap er /#5B/7/#5D/.
+As w es a w already in Figure /1/, the cac he p erformance of
+range scans is ab ysmal/: /8/4/#25 of execution time is b eing lost
+to data cac he misses in that exp erimen t/. Figure /3/#28a/#29 illus/-
+trates the problem/: a full cac he miss latency is su/#0Bered for
+eac h leaf no de/. A partial solution is to use the tec hnique
+describ ed in Section /2/: If w e mak e the leaf no des m ulti/-
+ple cac he lines wide and prefetc h eac h comp onen t of a leaf
+no de in parallel/, w e can reduce the frequency of exp ensiv e
+cac he misses/, as illustrated in Figure /3/#28b/#29/. While this is
+helpful/, our goal is to ful ly hide the miss latencies to the
+exten t p ermitted b y the memory system/, as illustrated in
+Figure /3/#28c/#29/. In order to do that/, w em ust /#0Crst o v ercome the
+p ointer/-chas ing pr oblem /.
+3.1 Solving the Pointer-Chasing Problem
+Figure /4/#28a/#29 illustrates the p ointer/-cha sin gp r oblem /, whic h
+w as observ ed b y Luk and Mo wry /#5B/1/3/, /1/4/#5D in the con text of
+prefetc hing p oin ter/-link ed data structures /#28i/.e/. link ed/-lis ts/,
+trees/, etc/./#29 in general/-purp ose application s/. Assuming that
+three no des w orth of computation are needed to hide the
+miss latency /, then when no de n
+i
+in Figure /4/#28a/#29 is visited/,
+w ew ould lik e to b e launc hing a prefetc ho f n o d e n
+i /+/3
+/.T o
+compute the address of no de n
+i /+/3
+/,w ew ould normally follo w
+the p oin ter c hain through no des n
+i /+/1
+and n
+i /+/2
+/.H o w ev er/,
+this w ould incur the full miss latency to fetc h n
+i /+/1
+and then
+to fetc h n
+i /+/2
+/, b efore the prefetc ho f n
+i /+/3
+could b e launc hed/,
+
+
+--- PAGE 5 ---
+ni i+1n i+2n i+3n. . . . . .
+Currently visiting Would like to prefetch
+/#28a/#29 T ra v ersing a link ed list
+ni i+1n i+2n i+3n
+&ni+4&ni+3 &ni+5
+Jump Pointer
+. . .. . .
+/#28b/#29 Link ed list with jump p oin ters
+ni i+1n i+2n i+3n. . . . . .
+&ni+2 &ni+3 &ni+4 &ni+5&ni+1&ni. . . . . .
+prefetching distance
+Jump Pointer
+Array
+/#28c/#29 Link ed list with a jump/-p oin ter arra y
+Figure /4/: Addressing the p oin ter/-c hasing problem/.
+thereb y defeating our goal of hiding the miss latency of n
+i /+/3
+/.
+Luk and Mo wry prop osed t w o solutions to the p oin ter/-
+c hasing problem that are applicabl e to link ed lists /#5B/1/3/, /1/4/#5D/.
+The /#0Crst sc heme /#28 data/-line ariza tio np r efetching /#29i n v olv es ar/-
+ranging the no des in memory suc h that their addresses can
+b e trivially calculated without dereferencing an y p oin ters/.
+F or example/, if the leaf no des of the B
+/+
+/-T ree are arranged
+sequen tially in con tiguous memory /, they w ould b e trivial to
+prefetc h/. Ho w ev er/, this will only w ork in read/-only situa/-
+tions/, and w ew ould lik e to supp ort frequen t up dates/. The
+second sc heme /#28 history/-p oint er pr efetching /#29i n v olv es creat/-
+ing new p oin ters/|call ed jump p ointers /|whic h p oin t from
+a no de to the no de that it should prefetc h/. F or example/,
+Figure /4/#28b/#29 sho ws ho wn o d e n
+i
+could directly prefetc hn o d e
+n
+i /+/3
+using three/-ahead jump p oin ters/.
+In our study /,w e will build up on the concept of jump
+p oin ters/, but customize them to the sp eci/#0Cc needs of B
+/+
+/-
+T ree indices/. Rather than storing jump p oin ters directly in
+the leaf no des/, w e instead pull them out in to a separate ar/-
+ra y /, whic hw e call the jump/-p ointer arr ay /, as illustrated in
+Figure /4/#28c/#29/. T o initiate prefetc hing/, a bac k/-p oin ter in the
+starting leaf no de is used to lo cate the leaf /'s p osition within
+the jump p oin ter arra y/; then based on the desired prefetc h/-
+ing distance/, an arra y o/#0Bset is adjusted to /#0Cnd the address of
+the appropriate leaf no de to prefetc h/. As the scan pro ceeds/,
+the prefetc hing task simply con tin ues to w alk ahead in the
+jump/-p oin ter arra y /#28whic h itself is also prefetc hed/#29 without
+ha ving to dereference the actual leaf no des again/.
+Jump/-p oin ter arra ys are more /#0Dexible than jump p oin ters
+stored directly in the leaf no des/. W e can adjust the prefetc h/-
+ing distance b y simply c hanging the o/#0Bset used within the
+arra y /. This allo ws dynamic adaptation to c hanging p erfor/-
+mance conditions on a giv en mac hine/, or if the co de migrates
+to di/#0Beren t mac hines/. In addition/, the same jump/-p oin ter
+arra y can b e reused to target di/#0Beren t latencies in the mem/-
+ory hierarc h y /#28e/.g/./, disk latency vs/. memory latency/#29/.
+F rom an abstract p ersp ectiv e/, one migh t think of the
+jump/-p oin ter arra y as a single large/, con tiguous arra y /,a si l /-
+lustrated in Figure /5/#28a/#29/. This w ould b e e/#0Ecien t in read/-only
+situations/, but in suc h cases w e could simply arrange the leaf
+no des themselv es con tiguously and use data/-line ari zat ion
+pr efetching /#5B/1/3/, /1/4/#5D/. Therefore a k ey issue in implemen ting
+jump/-p oin ter arra ys is to handle up dates gracefully /.
+.  .  .
+leaf nodes
+address array
+back
+pointer
+Tree
+leaf node addresses
+/#28a/#29 single arra y with real bac k/-p oin ters
+.  .  .
+.  .  . /
+Tree
+chunked
+linked
+list
+hints
+leaf addresses
+.  .  . .  .  .
+leaf nodes
+/#28b/#29 c h unk ed link ed list with /#5Chin t/" bac k/-p oin ters
+Figure /5/: External jump/-p oin ter arra ys/.
+3.2 Implementing Jump-Pointer Arrays to
+Support Efﬁcient Updates
+Let us brie/#0Dy consider the problems created b y up dates
+if w e attempted to main tain the jump/-p oin ter arra ya s a
+single con tiguous arra ya ss h o wn in Figure /5/#28a/#29/. When a
+leaf is deleted/, w e can simply lea v e an empt y slot in the
+arra y /.H o w ev er/, insertion can b e v ery exp ensiv e/. When a
+new leaf is inserte d /, an empt y slot needs to b e created in the
+appropriate p osition for the new jump p oin ter/. If no nearb y
+empt y slots could b e lo cated/, this could p oten tially in v olv e
+cop ying a v ery large amoun t of data within the arra yi n
+order to create the empt y slot/. In addition/, for eac h jump/-
+p oin ter that is mo v ed within the arra y /, the corresp onding
+bac k/-p oin ter from the leaf no de in to the arra y also needs
+to b e up dated/, whic h could b e v ery costly to o/. Clearly w e
+w ould not w an tt op a y suc h a high cost up on insertions/.
+W e impro v e up on the naiv e con tiguous arra y implemen/-
+tation in the follo wing three w a ys/. First/, w e break the con/-
+tiguous arra yi n to a c h unk ed link ed list/|as illustrated in
+Figure /5/#28b/#29/|whic h allo ws us to limit the impact of an in/-
+sertion to its corresp onding c h unk/. /#28W e will discuss the
+c h unk size selection later in Section /3/./3/#29/.
+Second/, w e activ ely attempt to in terlea v e empt y slots within
+the jump/-p oin ter arra y so that insertions can pro ceed quic kly /.
+During bulkload or when a c h unk splits/, the jump p oin ters
+are stored suc h that empt y slots are ev enly distributed to
+maximize the c hance of /#0Cnding a nearb y empt y slot for in/-
+sertion/. When a jump/-p oin ter is deleted/, w e simply lea v ea n
+empt y slot in the c h unk/.
+Finally /,w e alter the meaning of the bac k/-p oin ter in a leaf
+no de to its p osition in the jump/-p oin ter arra y suc h that it
+is merely a hin t/. The p oin ter should p oin t to the correct
+c h unk/, but the p osition within that c h unk ma y b e impre/-
+cise/. Therefore when mo ving jump p oin ters in a c h unk for
+inserting a new leaf address/, w e do not need to up date the
+hin ts for the mo v ed jump p oin ters/. W e only up date a hint
+/#0Celd when/: /#28i/#29 the precise p osition in the jump/-p oin ter arra y
+is lo ok ed up during range scan or insertion/, in whic h case the
+leaf no de should b e already in cac he and up dating the hint
+is almost free/; and /#28ii/#29 when a c h unk splits and addresses
+are redistributed/, in whic h case w e are forced to up date the
+hint s to p oin t to the new c h unk/. The cost of using hin ts/,
+of course/, is that w e need to searc h for the correct lo cation
+within the c h unk in some cases/. In practice/, ho w ev er/, the
+
+
+--- PAGE 6 ---
+hin ts app ear to b e go o d appro ximations of the true p osi/-
+tions/, and searc hing for the precise lo cation is not a costly
+op eration /#28e/.g/./, it should not incur an y cac he misses/#29/.
+In summary /, the net e/#0Bect of these three enhancemen ts is
+that nothing mo v es during deletions/, t ypically only a small
+n um b er of jump p oin ters /#28b et w een the insertion p osition
+and the nearest empt y slot/#29 mo v e during insertions/, and
+in neither case do w e normally up date the hint s within the
+leaf no des/. Th us w e exp ect jump/-p oin ter arra ys to p erform
+w ell during up dates/.
+3.3 Algorithm and Qualitative Analysis
+Ha ving describ ed the data structure to facilitate prefetc h/-
+ing/, w en o w describ e our prefetc hing algorithm/. Recall that
+the basic range scan algorithm consists of a lo op that visits
+a leaf on eac h iteration b y follo wing a next/-lea f p oin ter/.
+T o supp ort prefetc hing/, w e add prefetc hes b oth prior to this
+lo op /#28for the startup phase/#29/, and inside the lo op /#28for the
+ste ady/-state phase/#29/. Let k b e the desired pr efetching dis/-
+tanc e /, in units of leaf no des /#28w e discuss b elo wh o w to select
+k /#29/. During the startup phase/, w e issue prefetc hes for the
+/#0Crst k leaf no des/.
+/3
+These prefetc hes pro ceed in parallel/, ex/-
+ploiting the a v ailable memory hierarc h y bandwidth/. During
+eac h lo op iteration /#28i/.e/. in the steady/-state phase/#29/, prior to
+visiting the curren t leaf no de in the range scan/, w e prefetc h
+the leaf no de that is k no des after the curren t leaf no de/. The
+goal is to ensure that b y the time the basic range scan lo op
+is ready to visit a leaf no de/, that no de is already prefetc hed
+in to the cac he/. With this framew ork in mind/, w en o w de/-
+scrib e further details of our algorithm/.
+First/, in the startup phase/, w em ust lo cate the jump
+p oin ter of the starting leaf within the jump/-p oin ter arra y /.
+T o do this/, w e follo w the hint p oin ter from the starting leaf
+to see whether it is precise/|i/.e/. whether the hint p oin ts to
+a p oin ter bac k to the starting leaf/. If not/, then w e start
+searc hing within the c h unk in b oth directions relativ e to the
+hin t p osition un til the matc hing p osition is found/. As dis/-
+cussed earlier/, the distance b et w een the hin t and the actual
+p osition app ears to b e small in practice/.
+Second/, w e need to prefetc h the jump/-p oin ter c h unks as
+w ell as the leaf no des/, and handle empt y slots in the c h unks/.
+During the startup phase/, b oth the curren tc h unk and the
+next c h unk are prefetc hed/. When lo oking for a jump p oin ter/,
+w e test for and skip all empt y slots/. If the end of the cur/-
+ren tc h unk is reac hed/, w e will go to the next c h unk to get
+the /#0Crst non/-empt y jump/-p oin ter /#28there is at least one non/-
+empt y jump p oin ter or the c h unk should ha v e b een deleted/#29/.
+W e then prefetc h the next c h unk ahead in the jump/-p oin ter
+arra y /. Because w e alw a ys prefetc h the next c h unk b efore
+prefetc hing an y leaf no des p oin ted to b y the curren tc h unk/,
+w e exp ect the next c h unk to b e in the cac he b y the time w e
+access it/.
+Third/, although the actual n um be r o f tupleID s in the leaf
+no de is unkno wn when w e do range prefetc hing/, w e will as/-
+sume that the leaf is full and prefetc h the return bu/#0Ber area
+accordingly /.T h us the return bu/#0Ber will alw a ys b e prefetc hed
+su/#0Ecien tly early /.
+W en o w discuss ho w to select the prefetc hing distance and
+the c h unk size/.
+Selecting the prefetc hing distance k /. The pr efetch/-
+ing distanc e /#28 k /, in units of no des to prefetc h ahead/#29 is se/-
+/3
+Note that the bu/#0Ber area to hold the resulting tupleID s needs also to
+b e prefetc hed/; to simplify presen tation/, when w e refer to /#5Cprefetc h/-
+ing a leaf no de/" in the range scan algorithm/, w e mean prefetc hing
+the cac he lines for b oth the leaf no de and the bu/#0Ber area where the
+tupleID s are to b e stored/.
+lected as follo ws/. Normally this quan tit y is deriv ed b y divid/-
+ing the exp ected w orst/-case miss latency b y the computa/-
+tion time sp en t on one leaf no de /#28similar to what has b een
+done in other con texts /#5B/1/6/#5D/#29/. Ho w ev er/, b ecause the com/-
+putation time asso ciated with visiting a leaf no de during a
+range scan is quite small relativ e to the miss latency /,w e will
+assume that the limiting factor is the memory bandwidth/.
+Roughly sp eaking/, w e can estimate this bandwidth/-limi ted
+prefetc hing distance as
+k /=
+/#18
+B
+w
+/#19
+/; /#28/2/#29
+where B is the normalized memory bandwidth and w is the
+n um b er of cac he lines p er leaf no de/, as de/#0Cned in T able /1/.
+In practice/, there is no problem with increasing k a bit to
+create some extra slac k/, b ecause an y prefetc hes that cannot
+pro ceed are simply bu/#0Bered within the memory system/.
+/4
+Selecting the c h unk size c /. Ch unks m ust b e suf/-
+/#0Ccien tly large to ensure that w e only need to prefetc h one
+c h unk ahead to hide the miss latency of accessing the c h unks
+themselv es/. Recall that during the steady/-state phase of a
+range scan/, when w e get to a new c h unk/, w e immediately
+prefetc h the next c h unk ahead so that w e can o v erlap its
+fetc h time with the time it tak es to prefetc h the leaf no des
+asso ciated with the curren tc h unk/. Since the memory hier/-
+arc h y only has enough bandwidth to initiate B cac he misses
+during the time it tak es one cac he miss to complete/, the
+c h unks w ould clearly b e large enough to hide the latency
+of fetc hing the next c h unk if they con tained at least B leaf
+p oin ters /#28there is at least one cac he line access for ev ery leaf
+visit/#29/. F or a full tree with no empt y leaf slots and no empt y
+c h unk slots/, eac h cac he line can hold /2 m leaf p oin ters /#28since
+there are only p oin ters and no k eys/#29/, in whic h case w e can
+estimate the minim um c h unk size in units of cac he lines as
+c /=
+/#18
+B
+/2 m
+/#19
+/: /#28/3/#29
+T o accoun t for empt yc h unk slots/, w e can m ultiply the de/-
+nominator in equation /#28/3/#29 b y the o ccupancy of c h unk slots
+/#28a v alue similar to the bulklo ad factor /#29/, whic hw ould increase
+c somewhat/. Another factor that could /#28in theory/#29 dictate
+the minim um c h unk size is that eac hc h unk should con tain
+at least k leaf p oin ters so that our prefetc hing algorithm can
+get su/#0Ecien tly far ahead/. Ho w ev er/, since k /#14 B from equa/-
+tion /#28/2/#29/, the c h unk size in equation /#28/3/#29 should b e su/#0Ecien t/.
+Increasing c be y ond this minim um v alue to create some ex/-
+tra slac k for empt y leaf no des and empt yc h unk slots do es
+not h urt p erformance in practice/.
+/4
+Remarks/. Giv en su/#0Ecien t memory system bandwidth/,
+our prefetc hing sc heme hides the full memory latency exp e/-
+rienced at ev ery leaf no de visited during range scan op era/-
+tions/. With the data structure impro v emen ts in Section /3/./2/,
+w e also exp ect go o d p erformance on up dates/.
+Ho w ev er/, there is a space o v erhead asso ciated with the
+jump/-p oin ter arra y /. Since the jump p oin ter arra y only con/-
+tains one p oin ter p er leaf no de/, the space o v erhead is rela/-
+tiv ely small/. Since a next/-leaf p oin ter and a bac k/-p oin ter are
+stored in ev ery leaf/, there are at most d /, /2 h key /, tupleID i
+pairs in ev ery leaf no des /#28 d is de/#0Cned in T able /1/#29/. So the
+jump p oin ter for a full leaf no de only tak es
+/1
+/2/#28 d /, /2/#29
+as m uc h
+space as the leaf no de/. Giv en our tec hnique describ ed earlier
+in Section /2 for creating wider B
+/+
+/-T ree no des/, the resulting
+increase in the fanout d will help reduce this o v erhead/. Ho w/-
+/4
+Details are in the full pap er /#5B/7/#5D/.
+
+
+--- PAGE 7 ---
+Tree
+Bottom
+non-leaf
+Figure /6/: In ternal jump/-p oin ter arra ys/.
+ev er/, if this space o v erhead is still a concern/, w en o w describ e
+ho w it can b e reduced further/.
+3.4 Internal Jump-Pointer Arrays
+So far w eh a v e describ ed ho w a jump/-p oin ter arra y can b e
+implemen ted b y creating a new external structure to store
+the jump p oin ters /#28as illustrated earlier in Figure /5/#29/. Ho w/-
+ev er/, there is an existing structure within aB
+/+
+/-T ree that
+already con tains p oin ters to the leaf no des/, namely /, the p ar/-
+ents of the leaf no des/. W e will refer to these paren t no des as
+the b ottom non/-le af no des /. The c hild p oin ters within a b ot/-
+tom non/-leaf no de corresp ond to the jump/-p oin ters within a
+c h unk of the external jump/-p oin ter arra y describ ed in Sec/-
+tion /3/./2/. A k ey di/#0Berence/, ho w ev er/, is that there is no easy
+w a y to tra v erse these b ottom non/-leaf no des quic kly enough
+to p erform prefetc hing/. A p oten tial solution is to connect
+these b ottom non/-leaf no des together in leaf k ey order us/-
+ing link ed/-li st p oin ters/. /#28Note that this is sometimes done
+already for concurrency con trol purp oses /#5B/2/2/#5D/./#29
+Figure /6 illustrates the internal jump/-p oin ter arra y /. Note
+that leaf no des do not con tain bac k/-p oin ters to their p osi/-
+tions within their paren ts/. It turns out that suc h p oin ters
+are not necessary for this in ternal implemen tation/, b ecause
+the p osition will b e determined during the searc h for the
+starting k ey /.I f w e simply retain the result of the b ottom
+non/-leaf no de/'s binary searc h/, w e will ha v e the p osition to
+initiate the prefetc hing appropriately /.
+This approac h is attractiv e with resp ect to space o v er/-
+head/, since the only o v erhead is one additional p oin ter p er
+b ottom non/-leaf no de/. The o v erhead of up dating this p oin ter
+should b e insigni/#0Ccant/, b ecause it only needs to b e c hanged
+in the rare ev en t that a b ottom non/-leaf no de splits or is
+deleted/. One p oten tial limitation of this approac h/, ho w ev er/,
+is that the length of a /#5Cc h unk/" in this jump/-p oin ter arra y
+is dictated b y the B
+/+
+/-T ree structure/, and ma y not b e eas/-
+ily adjusted to satisfy large prefetc h distance requiremen ts
+/#28e/.g/./, for hiding disk latencies/#29/.
+In the remainder of this pap er/, w e will use the nota/-
+tions /#5Cp
+e
+B
+/+
+/-T ree/" and /#5Cp
+i
+B
+/+
+/-T ree/" to refer to pB
+/+
+/-T rees
+with external and internal jump/-p oin ter arra ys/, resp ectiv ely /.
+F urther details on the algorithms using external and in ternal
+jump p oin ter arra ys can b e found in the full pap er /#5B/7/#5D/.
+4. EXPERIMENTAL RESULTS
+T o facilitate comparisons with CSB
+/+
+/-T rees/, w e presen t
+our exp erimen tal results in a main/-memory database en/-
+vironmen t/. W e b egin b y describing the framew ork for the
+exp erimen ts/, includin g our p erformance sim ulator and the
+implemen tation details of the index structures that w e com/-
+pare/. The three subsections that follo w presen t our exp er/-
+imen tal results for index searc h/, index scan/, and up dates/.
+Finally /,w e presen t a detailed cac he p erformance study for
+a few of our earlier exp erimen ts/.
+4.1 Experimental Framework
+Mac hine Mo del/. W ee v aluate the p erformance im/-
+pact of Pr efetching B
+/+
+/-T r e es through detailed sim ulations
+T able /2/: Sim ulation parameters/.
+Pip eline P arameters
+Clo c k Rate /1 GHz
+Issue Width /4 insts/#2Fcycle
+F unctional Units /2I n teger/, /2 FP /,
+/2 Memory /, /1 Branc h
+Reorder Bu/#0Ber Size /6/4 insts
+In teger Multiply/#2FDivide /1/2/#2F/7/6 cycles
+All Other In teger /1 cycle
+FP Divide/#2FSquar eR o o t /1/5/#2F/2/0 cycles
+All Other FP /2 cycles
+Branc h Prediction Sc heme gshare /#5B/1/5/#5D
+Memory P arameters
+Line Size /6/4 b ytes
+Primary Data Cac he /6/4 KB/, /2/-w a y set/-asso c/.
+Primary Instruction Cac he /6/4 KB/, /2/-w a y set/-asso c/.
+Miss Handlers /3/2 for data/, /2 for inst/.
+Uni/#0Ced Secondary Cac he /2 MB/, direct/-mapp e d
+Primary/-to/-Sec ond ary /1/5 cycles /#28plus an y dela ys
+Miss Latency due to con ten tion/#29
+Primary/-to/-Memo ry /1/5/0 cycles /#28plus an y dela ys
+Miss Latency due to con ten tion/#29
+Main Memory Bandwidth /1 access p er /1/0 cycles
+of fully/-functional executables running on a state/-of/-the/-art
+mac hine/. Since the gap b et w een pro cessor and memory
+sp eeds is con tin uing to increase dramatically with eac h new
+generation of mac hines/, it is imp ortan t to fo cus on the p er/-
+formance c haracteristics of mac hines in the near future rather
+than in the past/. Hence w e base our memory hierarc h yo n
+the Compaq ES/4/0 /#5B/8/#5D /#28one of the most adv anced computer
+systems announced to date/#29/, but w e up date it sligh tly to
+include a dynamicall y/-sc hed ul ed/, sup erscalar pro cessor sim/-
+ilar to the MIPS R/1/0/0/0/0 /#5B/2/3/#5D running at a clo c k rate of
+/1 GHz/. The sim ulator p erforms a cycle/-b y/-cycle sim ula/-
+tion/, mo deling the ric h details of the pro cessor including
+the pip eline/, register renaming/, the reorder bu/#0Ber/, branc h
+prediction/, branc hing p enalties/, the memory hierarc h y /#28in/-
+cluding all forms of con ten tion/#29/, etc/. T able /2 sho ws the k ey
+parameters of the sim ulator/.
+Giv en the parameters in T able /2/, one can see that the nor/-
+malized memory bandwidth /#28 B /#29/|i/.e/. the n um b er of cac he
+misses to memory that can b e serviced sim ultaneously /|i s/:
+B /=
+T
+/1
+T
+next
+/=
+/1/5/0
+/1/0
+/=/1 /5 /: /#28/4/#29
+This is sligh tly p essimistic compared with the actual Com/-
+paq ES/4/0 /#5B/8/#5D/, where B /=/1 /6 /: /2/5/, and is in tended to re/#0Dect
+other recen t memory system designs /#5B/3/#5D/. As sho wn in the full
+pap er /#5B/7/#5D/, small v ariations in B do not substan tiv ely alter
+the results of our studies/.
+W e compiled our C source co de in to MIPS executables
+using v ersion /2/./9/5/./2 of the gcc compiler with optimization
+/#0Dags enabled/. W e added prefetc h instructions to the source
+co de b y hand/, using the gcc ASM macro to translate these
+directly in to v alid MIPS prefetc h instructions/.
+B
+/+
+/-T rees Studied and Implemen tation Details/. Our
+exp erimen tal study compares pB
+/+
+/-T rees of v arious no de widths
+w with B
+/+
+/-T rees and CSB
+/+
+/-T rees/. W e consider b oth p
+w
+e
+B
+/+
+/-
+T rees and p
+w
+i
+B
+/+
+/-T rees /#28describ ed earlier in Sections /3/./2/#7B/3/./3
+and Section /3/./4/, resp ectiv ely/#29/. W e also consider the com bi/-
+nation of b oth pB
+/+
+/-T ree and CSB
+/+
+/-T ree tec hniques/, whic h
+w e denote as a pCSB
+/+
+/-T ree/.
+W e implemen ted bulkload/, searc h/, insertion/, deletion/, and
+range scan op erations for/: /#28i/#29 standard B
+/+
+/-T rees/; /#28ii/#29 p
+w
+B
+/+
+/-
+T rees for no de widths w /=/2 /; /4 /; /8 /; and /1/6/; /#28iii/#29 p
+/8
+e
+B
+/+
+/-T rees/;
+and /#28iv/#29 p
+/8
+i
+B
+/+
+/-T rees/. F or these latter t w o cases/, the no de
+
+
+--- PAGE 8 ---
+width w /=/8 w as selected b ecause our exp erimen ts sho w ed
+that this c hoice resulted in the b est searc h p erformance /#28con/-
+sisten t with the analytical computation in Section /2/#29/. W e
+also implemen ted bulkload and searc h for CSB
+/+
+/-T rees and
+pCSB
+/+
+/-T rees/. Although w e did not implemen t insertion or
+deletion for CSB
+/+
+/-T rees/, w e conduct the same exp erimen ts
+as in Rao and Ross /#5B/2/0/#5D /#28alb eit in a di/#0Beren t memory hierar/-
+c h y/#29 to facilitate a comparison of the results/. Although Rao
+and Ross presen t tec hniques to impro v e CSB
+/+
+/-T ree searc h
+p erformance within a no de /#5B/2/0/#5D/, w e only implemen ted stan/-
+dard binary searc h for all the trees studied b ecause our fo cus
+is on memory p erformance /#28whic h is the primary b ottlenec k/,
+as sho wn earlier in Figure /1/#29/.
+Our pB
+/+
+/-T ree tec hniques impro v e p erformance o v er a range
+of key /, p oin ter/, and tupleID sizes/. F or concreteness/, w e
+rep ort exp erimen tal results where the key s/, p oin ters/, and
+tupleID s are /4 b ytes eac h/, as w as done in previous stud/-
+ies /#5B/1/9/, /2/0/#5D/. As discussed in Section /2/, w e use a standard
+B
+/+
+/-T ree no de structure/, consisten t with previous studies/.
+F or the B
+/+
+/-T ree/, eac h no de is one cac he line wide /#28i/.e/. /6/4
+b ytes/#29/. Eac h non/-leaf no de con tains a keynum /#0Celd/, /7 key
+/#0Celds and /8 childptr /#0Celds/, while eac h leaf no de con tains a
+keynum /#0Celd/, /7 key /#0Celds/, /7 asso ciated tupleID /#0Celds/, and
+a next/-leaf p oin ter/. The no des of the pB
+/+
+/-T rees are the
+same as the B
+/+
+/-T rees/, except that they are wider/. So for
+eigh t/-cac he/-line/-wi de no des/, eac h non/-leaf no de is /5/1/2 b ytes
+and con tains a keynum /#0Celd/, /6/3 key /#0Celds/, and /6/4 childptr
+/#0Celds/, while eac h leaf no de con tains a keynum /#0Celd/, /6/3 key
+/#0Celds/, /6/3 asso ciated tupleID /#0Celds/, and a next/-leaf p oin ter/.
+F or the p
+/8
+e
+B
+/+
+/-T ree/, non/-leaf no des ha v e the same struc/-
+ture as for the pB
+/+
+/-T ree/, while eac h leaf no de has a hint
+/#0Celd and one few er key and tupleID /#0Celds/. The only dif/-
+ference with a p
+/8
+i
+B
+/+
+/-T ree compared to a pB
+/+
+/-T ree is that
+eac h b ottom non/-leaf no de has a next/-sib lin g p oin ter/, and
+one few er key and childptr /#0Celds/. F or the CSB
+/+
+/-T ree and
+the pCSB
+/+
+/-T ree/, eac h non/-leaf no de has only one childptr
+/#0Celd/. F or example/, a CSB
+/+
+/-T ree non/-leaf no de has a keynum
+/#0Celd/, /1/4 key /#0Celds/, and a childptr /#0Celd/. All tree no des are
+aligned on a /6/4 b yte b oundary when allo cated/.
+F or the p
+/8
+e
+B
+/+
+/-T ree and p
+/8
+i
+B
+/+
+/-T ree exp erimen ts/, w e need
+to select the prefetc h distance /#28for b oth/#29 and the c h unk size
+/#28for the former/#29/. According to equations /#28/2/#29 and /#28/4/#29/, w e
+should select k /=
+/#06
+B
+w
+/#07
+/=
+/#06
+/1/5
+/8
+/#07
+/=/2 /. H o w ev er/, as discussed
+in Section /3/, it is often adv an tageous to sligh tly increase k
+in order to create some extra slac k/. W e set k /= /3/, to create
+extra slac k for the prefetc hing of c h unks and non/-leaf no des/.
+/#28Our sensitivit y analysis in /#5B/7/#5D sho w ed that selecting k /=/2 /,
+/3/, or /4 results in similar scan p erformance/./#29 As for the c h unk
+size/, according to equation /#28/3/#29 and the discussion that fol/-
+lo ws/, w e should select c to b e at least
+/#06
+B
+/2 m
+/#07
+/=
+/#06
+/1/5
+/1/6
+/#07
+/=/1 /. W e
+conserv ativ ely select c /= /8/|i/.e/. eac hc h unk is /8 cac he lines
+wide/|so that eac hc h unk con tains /1/2/6 leaf p oin ter /#0Celds/.
+/#28Our sensitivit y analysis /#5B/7/#5D sho w ed that selecting c /=/1
+through /3/2 results in similar scan p erformance/./#29
+4.2 Search Performance
+W e /#0Crst ev aluate index searc h p erformance for B
+/+
+/-T rees/,
+CSB
+/+
+/-T rees/, p
+w
+B
+/+
+/-T rees /#28where w /= /2/, /4/, /8/, and /1/6/#29/, and
+p
+/8
+CSB
+/+
+/-T rees /#28whic h com bine our prefetc hing approac h with
+CSB
+/+
+/-T rees/#29/.
+V arying the n um b er of leaf no des/. Figure /7 sho ws
+the execution time of /1/0/0K random searc hes after bulkload/-
+ing /1/0K/, /3/0K/, /1/0/0K/, /3/0/0K/, /1M/, /3M/, and /1/0M k eys in to the
+trees /#28no des are /1/0/0/#25 full except the ro ot/#29/.
+/5
+In the exp eri/-
+/5
+Note that throughout this pap er/, /#5CK/" and /#5CM/" corresp ond to /1/0/0/0
+10
+4
+10
+5
+10
+6
+10
+710
+20
+30
+40
+50
+60
+70
+80
+entries in leaf nodes
+time (M cycles)
+B+tree   
+CSB+     
+p2B+tree 
+p4B+tree 
+p8B+tree 
+p16B+tree
+p8CSB+   
+10
+4
+10
+5
+10
+6
+10
+760
+80
+100
+120
+140
+160
+180
+200
+220
+240
+260
+280
+entries in leaf nodes
+time (M cycles)
+B+tree   
+CSB+     
+p2B+tree 
+p4B+tree 
+p8B+tree 
+p16B+tree
+p8CSB+   
+/#28a/#29 w arm cac he /#28b/#29 cold cac he
+Figure /7/: /1/0/0K searc hes after bulkloading /1/0K/-/1/0M
+k eys/.
+T able /3/: The n um b er of lev els in trees for Figure /7/.
+Num b er of Keys
+T ree T yp e /1/0K /3/0K /1/0/0K /3/0/0K /1M /3M /1/0M
+B
+/+
+/-T ree /5 /6 /6 /7 /7 /8 /8
+CSB
+/+
+/-T ree /4 /5 /5 /5 /6 /6 /7
+p
+/2
+B
+/+
+/-T ree /4 /4 /5 /5 /6 /6 /6
+p
+/4
+B
+/+
+/-T ree /3 /3 /4 /4 /4 /5 /5
+p
+/8
+B
+/+
+/-T ree /3 /3 /3 /4 /4 /4 /4
+p
+/1/6
+B
+/+
+/-T ree /2 /3 /3 /3 /3 /4 /4
+pCSB
+/+
+/-T ree /3 /3 /3 /3 /3 /4 /4
+men ts sho wn in Figure /7/#28a/#29/, searc h op erations are p erformed
+one immediately after another /#28the /#5Cw arm cac he/" case/#29/;
+whereas in the exp erimen ts sho wn in Figure /7/#28b/#29/, the cac he
+is cleared b et w een eac h searc h /#28the /#5Ccold cac he/" case/#29/. De/-
+p ending on the op erations p erformed b et w een the searc hes/,
+the real/-w orld p erformance of an index searc hw ould lie in
+be t w een the t w o extremes/: closer to the w arm cac he case for
+index joins/, while often closer to the cold cac he case for single
+v alue selections/. F rom these exp erimen ts/, w e see that/: /#28i/#29
+the B
+/+
+/-T ree has the w orst p erformance/; /#28ii/#29 the trees with
+wider no des and prefetc hing supp ort /#28pB
+/+
+/-T rees/, pCSB
+/+
+/-
+T ree/#29 all p erform b etter than their non/-prefetc hing coun/-
+terparts /#28B
+/+
+/-T ree/, CSB
+/+
+/-T ree/#29/; and /#28iii/#29 the p
+/8
+B
+/+
+/-T ree is
+comparable to or b etter than all other pB
+/+
+/-T rees o v er the
+en tire range of tree sizes/. F or w arm cac hes/, the sp eedup of
+the p
+/8
+B
+/+
+/-T ree o v er the B
+/+
+/-T ree is b et w een a factor of /1/./2/7
+to /1/./4/7/. The w arm cac he sp eedup of the p
+/8
+B
+/+
+/-T ree o v er
+the CSB
+/+
+/-T ree is b et w een a factor of /1/./1/4 to /1/./2/8 once the
+tree no longer /#0Cts in the L/2 cac he/. Lik ewise/, the cold cac he
+sp eedups are /1/./3/2 to /1/./5/5 and /1/./1/4 to /1/./3/4/, resp ectiv ely /.
+The cold cac he curv es pro vide insigh ti n to the index searc h
+p erformance/. The trend of ev ery single curv e is clearly
+sho wn in the cold cac he exp erimen t/: the curv es all increase
+in discrete large steps/, and within the same step they in/-
+crease only sligh tly /. The large steps for a curv e o ccur when
+the n um b er of lev els in the tree increases/. This can b e v er/-
+i/#0Ced b y examining T able /3/, whic h depicts the n um be r o f
+lev els in the tree for eac h data p oin t plotted in Figure /7/.
+Within a step/, additional leaf no des result in more k eys in
+the ro ot no de /#28the other no des in the tree remain full/#29/, whic h
+in turn increases the cost to searc h the ro ot/. The step/-up
+trend is blurred in the w arm cac he curv es b ecause the top
+lev els of the tree ma y remain in the cac he/. F or di/#0Beren t
+curv es/, w e can see that generally the higher the tree struc/-
+ture/, the larger the searc h cost/; when trees are of the same
+heigh t/, the smaller no de size yields b etter p erformance/. W e
+and /1/,/0/0/0/,/0/0/0/, resp ectiv ely /, except for when w e refer to the size of a
+memory structure /#28e/.g/./, a cac he/#29/, in whic h case they corresp ond to
+/1/0/2/4 and /1/,/0/4/8/,/5/7/6/, resp ectiv ely /.
+
+
+--- PAGE 9 ---
+50 60 70 80 90 100
+40
+50
+60
+70
+80
+90
+100
+110
+percentage of entries used in leaf nodes
+time (M cycles)
+B+tree   
+CSB+     
+p2B+tree 
+p4B+tree 
+p8B+tree 
+p16B+tree
+p8CSB+   
+50 60 70 80 90 100
+100
+140
+180
+220
+260
+300
+percentage of entries used in leaf nodes
+time (M cycles)
+B+tree   
+CSB+     
+p2B+tree 
+p4B+tree 
+p8B+tree 
+p16B+tree
+p8CSB+   
+/#28a/#29 w arm cac he /#28b/#29 cold cac he
+Figure /8/: /1/0/0K searc hes after bulkloading /3M k eys
+with v arious bulkload factors/.
+conclude that the p erformance gains for wider no des stem
+mainly from the resulting decrease in tree heigh t/.
+Another observ ation w orth men tioning is that when the
+n um b er of lev els are the same/, the p
+/2
+B
+/+
+/-T ree and the CSB
+/+
+/-
+T ree ha v ev ery similar p erformance/. This is b ecause the
+second cac he line in a p
+/2
+B
+/+
+/-T ree no de stores p oin ters/, and
+the cost of retrieving these second lines is partly hidden b y
+the k ey comparisons/. By eliminati ng all but one p oin ter/,
+the CSB
+/+
+/-T ree has almost the same n um be r o f k eys as the
+p
+/2
+B
+/+
+/-T ree/, resulting in similar k ey comparison costs/.
+V arying the bulkload factor/. Figure /8 sho ws the ef/-
+fect on searc h p erformance of v arying the bulkload factor/.
+All the trees are bulkloaded with /3M h key /, tupleID i pairs /,
+with bulkload factors of /6/0/#25/, /7/0/#25/, /8/0/#25/, /9/0/#25/, and /1/0/0/#25/.
+Because the actual n um b er of used en tries in leaf no des in
+an exp erimen t is the pro duct of the bulkload factor and the
+maxim um n um b er of slots /#28rounded to the nearest in teger/#29/,
+w e computed and used the true p ercen tage of used en tries
+when plotting the data/|hence they ma y not b e aligned with
+the target bulkload factors/. As in the previous exp erimen ts/,
+Figure /8 sho ws that/: /#28i/#29 the B
+/+
+/-T ree has the w orst p er/-
+formance/; /#28ii/#29 the trees with wider no des and prefetc hing
+supp ort /#28pB
+/+
+/-T rees/, pCSB
+/+
+/-T ree/#29 all p erform b etter than
+their non/-prefetc hing coun terparts /#28B
+/+
+/-T ree/, CSB
+/+
+/-T ree/#29/;
+and /#28iii/#29 the p
+/8
+B
+/+
+/-T ree is the b est of all the pB
+/+
+/-T rees/.
+In the cold cac he exp erimen t/, w e see a step/-do wn pattern
+in the curv es/: the steps corresp ond to the n um b e ro fl e v els
+in the trees/, since the tree heigh t decreases /#28in a step/-wise
+fashion/#29 as the bulkload factor increases/. Within a step/,
+ho w ev er/, the curv es increase sligh tly /. This is b ecause in our
+bulkload algorithms/, the bulkload factor also determines the
+n um b e ro fk eys in non/-leaf no des/. So the larger the bulkload
+factor/, the larger the n um be r o f k eys in eac h non/-ro ot no de/,
+and hence the larger the k ey comparison cost/.
+In the full pap er /#5B/7/#5D/, w e also presen t exp erimen tal results
+for matur e trees /#5B/2/0/#5D/, created b y bulkloadin g /1/0/#25 of the
+h key /, tupleID i pairs and then inserting the remaining /9/0/#25/.
+W e /#0Cnd similar p erformance for mature trees as for trees
+immediately after bulkloads/.
+Searc hes on trees with jump/-p oin ter arra ys/. Our
+next exp erimen t determines whether the di/#0Beren t structures
+for sp eeding up range scans ha v e an impact on searc h p erfor/-
+mance/. W e use no de width w /= /8 for these exp erimen ts/, b e/-
+cause the p
+/8
+B
+/+
+/-T ree resulted in the b est searc h p erformance
+among the pB
+/+
+/-T rees/. Figure /9 compares the searc h p erfor/-
+mance of the p
+/8
+B
+/+
+/-T ree/, the p
+/8
+e
+B
+/+
+/-T ree/, and the p
+/8
+i
+B
+/+
+/-T ree/.
+The same exp erimen ts as in Figure /7 w ere p erformed/. Re/-
+call that b oth the p
+/8
+e
+B
+/+
+/-T ree and the p
+/8
+i
+B
+/+
+/-T ree consume
+space in the tree structures relativ e to the p
+/8
+B
+/+
+/-T ree/: the
+maxim um n um be r o f k eys in leaf no des is one few er for the
+10
+4
+10
+5
+10
+6
+10
+710
+20
+30
+40
+50
+60
+70
+80
+entries in leaf nodes
+time (M cycles)
+p8B+tree 
+p8eB+tree
+p8iB+tree
+10
+4
+10
+5
+10
+6
+10
+760
+80
+100
+120
+140
+160
+180
+200
+220
+240
+260
+entries in leaf nodes
+time (M cycles)
+p8B+tree 
+p8eB+tree
+p8iB+tree
+/#28a/#29 w arm cac he /#28b/#29 cold cac he
+Figure /9/: /1/0/0K searc hes after bulkloading /1/0K to
+/1/0M k eys in to p
+/8
+B
+/+
+/-T rees with and without jump/-
+p oin ter arra ys/.
+10
+2
+10
+4
+10
+610
+4
+10
+6
+10
+8
+10
+10
+entries scanned through in a single call
+time (Cycles)
+B+tree   
+p8B+tree 
+p8eB+tree
+p8iB+tree 50 60 70 80 90 100
+10
+5
+10
+6
+10
+7
+percentage of entries used in leaf nodes
+time (Cycles)
+B+tree   
+p8B+tree 
+p8eB+tree
+p8iB+tree
+/#28a/#29 v arying n um be r o f tupleID s /#28b/#29 v arying bulkload factor
+scanned for eac h request
+Figure /1/0/: Range scan p erformance/.
+p
+/8
+e
+B
+/+
+/-T ree/, and the maxim um n um b e ro fk eys in b ottom
+non/-leaf no des is one few er for the p
+/8
+i
+B
+/+
+/-T ree/. Figures /9/#28a/#29
+and /9/#28b/#29 sho w that these di/#0Berences ha v e a negligibl e impact
+on searc h p erformance/. In one cold cac he case/, when /1/0M
+k eys are in the tree/, the p
+/8
+e
+B
+/+
+/-T ree su/#0Bers from ha ving one
+more lev el than the other t w o trees/, but otherwise b oth the
+w arm and cold cac he p erformances are basically the same
+for all three trees/, o v er the en tire range of /1/0K to /1/0M k eys/.
+4.3 Range Scan Performance
+In our next set of exp erimen ts/, w ee v aluate the e/#0Bectiv e/-
+ness of our tec hniques for impro ving range scan p erformance/.
+W e compare B
+/+
+/-T rees/, p
+/8
+B
+/+
+/-T rees/, p
+/8
+e
+B
+/+
+/-T rees/, and p
+/8
+i
+B
+/+
+/-
+T rees/. As indicated ab o v e/, w e restrict our atten tion to no de
+width w /= /8 b ecause this is the b est width for searc hes/,
+whic h are presumed to o ccur more frequen tly than range
+scans/. As discussed in Section /4/./1/, w e set the prefetc hing
+distance to /3 no des and the c h unk size to /8 cac he lines/.
+V arying the range size and the bulkload factor/.
+Figure /1/0 sho ws the execution time of range scans while
+v arying /#28a/#29 the n um be r o f tupleID s to scan p er request /#28i/.e/.
+the size of the range/#29/, or /#28b/#29 the bulkload factor/. Because
+of the large p erformance gains for pB
+/+
+/-T rees/, the execution
+time is sho wn on a logarithmic scale/. In Figure /1/0/#28a/#29/, the
+trees are bulkloaded with /3M h key /, tupleID i pairs /, using
+a /1/0/0/#25 bulkload factor/. Then /1/0/0 random starting key s
+are selected/, and a range scan is requested for m tupleID s
+starting at that starting k ey v alue/, for m /= /1/0/, /1/0/0/, /1K/,
+/1/0K/, /1/0/0K/, and /1M/. The execution time plotted for eac h
+m is the total for the /1/0/0 starting key s/. In Figure /1/0/#28b/#29/,
+the trees are bulkloaded with /3M h key /, tupleID i pairs /, with
+bulkload factors of /6/0/#25/, /7/0/#25/, /8/0/#25/, /9/0/#25/, and /1/0/0/#25/. /1/0/0
+
+
+--- PAGE 10 ---
+50 60 70 80 90 100
+10
+8
+10
+9
+10
+10
+percentage of entries used in leaf nodes
+time (Cycles)
+B+tree   
+p8B+tree 
+p8eB+tree
+p8iB+tree
+Figure /1/1/: Large /#28segmen ted/#29 range scans with v ar/-
+ious bulkload factors/.
+random starting key s are then selected/, and a range scan is
+requested for /1/0/0/0 tuple IDs starting at that v alue/. Bet w een
+the range scan requests/, the cac hes are cleared to more accu/-
+rately re/#0Dect scenarios in whic h range scan requests are in/-
+terlea v ed with other database op erations or application pro/-
+grams /#28whic hw ould tend to evict an y cac he/-residen t no des/#29/.
+As w e see in Figure /1/0/, p
+/8
+e
+B
+/+
+/-T rees and p
+/8
+i
+B
+/+
+/-T rees ac hiev e
+a factor of /6/./5 to /8/./7 sp e e dup o v er standard B
+/+
+/-T rees for
+range scans of /1K to /1M tupleID s/. As the bulkload fac/-
+tor decreases/, the n um b er of leaf no des to b e scanned in/-
+creases /#28since w em ust skip an increasing n um b er of empt y
+slots/#29/, and hence our prefetc hing sc hemes ac hiev ee v en larger
+sp eedups/. Figure /1/0 also sho ws the con tribution of b oth as/-
+p ects of our pB
+/+
+/-T ree design to o v erall p erformance/. First/,
+extending the no de size and sim ultaneously prefetc hing all
+cac he lines within a no de while scanning /#28and p erforming the
+initial searc h/#29/|similar to what w as illustrated earlier in Fig/-
+ure /3/#28b/#29/|results in a sp eedup of /3/./5 to /3/./7/, as sho wn b y the
+di/#0Berence b et w een p
+/8
+B
+/+
+/-T rees and B
+/+
+/-T rees in Figure /1/0/.
+Second/, b y also using jump/-p oin ter arra ys to prefetc h ahead
+across the /#28extra/-wide/#29 leaf no des/, w e see an additional sp eed/-
+up of roughly /2 in this case/, as sho wn b y the impro v emen to f
+b oth p
+/8
+e
+B
+/+
+/-T rees and p
+/8
+i
+B
+/+
+/-T rees o v er p
+/8
+B
+/+
+/-T rees in Fig/-
+ure /1/0/. Since b oth p
+/8
+e
+B
+/+
+/-T rees and p
+/8
+i
+B
+/+
+/-T rees ac hiev e
+nearly iden tical p erformance/, there do es not app ear to b e
+a comp elling need to build an external /#28rather than an in/-
+ternal/#29 jump/-p oin ter arra y /, at least for these system param/-
+eters/. /#28Note that this conclusion dep ends up on the ratio of
+w and k /; in other scenarios with di/#0Beren t ratios/|e/.g/./, when
+prefetc hing to hide disk as w ell as memory latencies/|the
+/#0Dexibili t y of an external jump/-p oin ter arra ym a y b e needed/./#29
+When scanning far few er than /1K tupleID s/, ho w ev er/, the
+startup cost of our prefetc hing sc hemes b ecomes noticeable/.
+F or example/, when scanning only /1/0/0 tupleID s/, pB
+/+
+/-T rees
+are only t wice as fast as standard B
+/+
+/-T rees/. When scan/-
+ning only /1/0 tupleID s/, p
+/8
+B
+/+
+/-T rees are only sligh tly faster
+than B
+/+
+/-T rees/, and p
+/8
+e
+B
+/+
+/-T rees and p
+/8
+i
+B
+/+
+/-T rees are actu/-
+ally slo w er/. This suggests a sc heme where jump/-p oin ter ar/-
+ra ys are only exploited for prefetc hing if the exp ected n um/-
+be r o f tupleID s within the range is signi/#0Ccan t /#28e/.g/./, /1/0/0 or
+more/#29/. This estimate of the range size could b e computed
+either b y using standard query optimization tec hniques suc h
+as histograms/, or else b y sim ultaneousl y searc hing for b oth
+the starting and ending k eys to see ho w far apart they are/.
+Large segmen ted range scans/. W en o w consider the
+b eha vior of large range scans/. In practice/, these large scans
+are often brok en up in to smaller segmen ts either to p ermit
+other op erations and queries to pro ceed/, or else to a v oid
+o v er/#0Do wing the return bu/#0Ber/. F or example/, an indexed scan
+pro viding sorted input to a sort/-merge join op erator will
+ha v e its return bu/#0Ber consumed at a rate dep enden to n
+the data pro/#0Cle of the other input to the join/. Figure /1/1
+50 60 70 80 90 100
+50
+60
+70
+80
+90
+100
+110
+percentage of entries used in leaf nodes
+time (M cycles)
+B+tree   
+p8B+tree 
+p8eB+tree
+p8iB+tree 50 60 70 80 90 100
+50
+60
+70
+80
+90
+percentage of entries used in leaf nodes
+time (M cycles)
+B+tree   
+p8B+tree 
+p8eB+tree
+p8iB+tree
+/#28a/#29 insertion /#28b/#29 deletion
+Figure /1/2/: /1/0/0K up date op erations with v arious
+bulkload factors/.
+50 60 70 80 900
+2
+4
+6
+8
+10
+percentage of entries used in leaf nodesinsertions with splits (x1K)
+B+tree   
+p8B+tree 
+p8eB+tree
+p8iB+tree
+|0
+|20
+|40
+|60
+|80
+|100
+ 
+ 
+ Total Insertions
+ more splits
+ one split
+ no split
+B+ p8B+ p8eB+p8iB+
+/#28a/#29 trees with empt y slots /#28b/#29 trees that are /1/0/0/#25 full
+Figure /1/3/: Analysis of insertion b eha vior/.
+sho ws the execution time for p erforming segmen ted range
+scans/: eac h scan consists of a searc h for the starting k ey
+follo w ed b y /1/0/0/0 range scan requests/, eac h of whic h scans
+/#28and places in to the return bu/#0Ber/#29 the next segmen t of /1/0/0/0
+h key /, tupleID i pairs /, resulting in a total of /1M pairs/. The
+trees are bulkloaded with /3M h key /, tupleID i pairs /, with
+bulkload factors ranging from /6/0/#25 to /1/0/0/#25/. The rep orted
+execution times are the total for /1/0/0 segmen ted range scans/,
+starting from /1/0/0 randomly selected starting key s/. As w e
+see in Figure /1/1/, the p erformance gains for segmen ted range
+scans are similar to what w es a w earlier in Figure /1/0 for
+non/-segmen ted range scans/.
+4.4 Update Performance
+In addition to impro ving searc h and scan p erformance/,
+another one of our goals is to ac hiev e go o d p erformance on
+up dates /, esp ecially since this had b een a problem with earlier
+cac he/-sensitiv e index structures /#5B/1/9/, /2/0/#5D/. T o quan tify the im/-
+pact of pB
+/+
+/-T rees on up date p erformance/, Figure /1/2 sho ws
+the execution time for /1/0/0K random insertions or deletions
+on a tree bulkloaded with /3M h key /, tupleID i pairs /, with
+bulkload factors ranging from /6/0/#25 to /1/0/0/#25/, and with w arm
+cac hes/. /#28The cold cac he results exhibit the same trends /#5B/7/#5D/./#29
+As w e see in Figure /1/2/, all three pB
+/+
+/-T ree sc hemes /#28i/.e/.
+p
+/8
+B
+/+
+/-T rees/, p
+/8
+e
+B
+/+
+/-T rees/, and p
+/8
+i
+B
+/+
+/-T rees/#29 p erform roughly
+the same/, and all are signi/#0Ccan tly faster than the B
+/+
+/-T ree/.
+F or example/, when the bulkload factor is /1/0/0/#25/, the pB
+/+
+/-
+T rees ac hiev e at least a /1/./2/4 sp eedup o v er the B
+/+
+/-T ree for
+b oth insertions and deletions/. This result ma y app ear some/-
+what surprising/, giv en the additional o v erheads of main tain/-
+ing the external jump/-p oin ter arra ys for p
+/8
+e
+B
+/+
+/-T rees/.
+There are t w o primary factors con tributing to the faster
+up date times for pB
+/+
+/-T rees compared with the B
+/+
+/-T ree/.
+First/, searc hi sa ni n tegral part of b oth insertion and dele/-
+tion/, and our pB
+/+
+/-T rees enjo y faster searc h times due to
+their wider no des /#28as w es a w earlier in Section /4/./2/#29/. Second/,
+no de splits o ccur less frequen tly for wider no des/. Let us
+start b y considering trees that are not full/|i/.e/. with bulk/-
+
+
+--- PAGE 11 ---
+|0
+|20
+|40
+|60
+|80
+|100
+ 
+ 
+ Normalized Execution Time
+ dcache stalls
+ other stalls
+ busy
+B+ CSB+ p8B+p8CSB+ B+ p8B+ p8eB+ p8iB+
+search scan
+Figure /1/4/: Impact of v arious pB
+/+
+/-T rees on the cac he
+p erformance of index searc h and range scan/.
+load factors ranging from /6/0/#25 to /9/0/#25/. Figure /1/3/#28a/#29 sho ws
+that when the bulkload factor is within this range/, the n um/-
+b er of the /1/0/0K insertions that cause no de splits is extremely
+small for eac h of the pB
+/+
+/-T rees/, and is ev en less than /1/0/#25
+for B
+/+
+/-T rees/. Giv en that Figures /1/2/#28a/#29 and /#28b/#29 sho w similar
+trends to Figure /8 within this range of bulkload factors/, w e
+conclude that the dominan t e/#0Bect is impro v ed searc h time
+for these less/-than/-full trees/.
+In con trast/, when the trees are full/, man y insertions will
+cause no de splits/, as sho wn in Figure /1/3/#28b/#29/. Due to their
+smaller no des/, B
+/+
+/-T rees su/#0Ber far more no de splits than
+pB
+/+
+/-T rees/, and o v er /4/0/#25 of the insertions result in m ultiple
+splits due to splitting non/-le af no des /. Hence although the
+cost of eac h no de split in a pB
+/+
+/-T rees is greater/, this cost
+is more than o/#0Bset b y the reduced frequency of no de splits
+and the impro v ed searc h times/.
+T urning our atten tion to deletion p erformance in Fig/-
+ure /1/2/#28b/#29/, since b oth pB
+/+
+/-T rees and B
+/+
+/-T rees use lazy dele/-
+tion/, v ery few deletions result in a deleted no de or a k ey
+redistribution /. Hence the p erformance gains for pB
+/+
+/-T ree
+deletions are due solely to faster searc h times/.
+4.5 Cache Performance
+Finally /, our last set of exp erimen ts presen t a more de/-
+tailed cac he p erformance study /, using t w o represen tativ e
+exp erimen ts/: one for index searc h and one for index range
+scan/. A cen tral claim of this pap er is that the demonstrated
+sp eedups for pB
+/+
+/-T rees are obtained b y e/#0Bectiv ely limiting
+the exp osed miss latency of previous approac hes/. In these
+exp erimen ts/, w e con/#0Crm that claim/.
+Our starting p oin t is the exp erimen ts presen ted earlier in
+Figure /1 whic h illustrated the p o or cac he p erformance of
+existing B
+/+
+/-T rees on index searc h and scan/. W e repro duce
+those results no w in Figure /1/4/, along with sev eral v ariations
+of our pB
+/+
+/-T rees/. The bars on the left /#28lab eled /#5Csearc h/"/#29
+corresp ond to the exp erimen t sho wn earlier in Figure /7/#28a/#29
+with /1/0M h key /, tupleID i pairs bulk/-loaded/, and the bars
+on the righ t /#28lab eled /#5Cscan/"/#29 corresp ond to the exp erimen t
+sho wn earlier in Figure /1/0/#28a/#29 with /1M tupleID s scanned/.
+Eac h bar in Figure /1/4 represen ts execution time normal/-
+ized to a B
+/+
+/-T ree/, and is brok en do wn in to the follo wing
+three categories that explain what happ ened during all p o/-
+ten tial gr aduation slots /.
+/6
+The b ottom section /#28 busy /#29 is the
+n um b er of slots where instructions actually graduate/. The
+other t w o sections are the n um b er of slots where there is no
+graduating instruction/, brok en do wn in to data cac he stalls
+and other stalls/. Sp eci/#0Ccall y /, the top section /#28 dc ache stal ls /#29
+is the n um b er of suc h slots that are immediately caused b y
+the oldest instruction su/#0Bering a data cac he miss/, and the
+/6
+The n um b er of graduation slots is the issue width /#28/4 in our sim u/-
+lated arc hitecture/#29 m ultiplied b y the n um b er of cycles/. W e fo cus on
+graduation slots rather than issue slots to a v oid coun ting sp eculativ e
+op erations that are squashed/.
+middle section /#28 other stal ls /#29 is all other slots where instruc/-
+tions do not graduate/. Note that the dc ache stal ls section
+is only a /#0Crst/-order appro ximation of the p erformance loss
+due to data cac he misses/: these dela ys also exacerbate subse/-
+quen t data dep endence stalls/, thereb y increasing the n um be r
+of other stal ls /.
+As w e see in Figure /1/4/, pB
+/+
+/-T rees signi/#0Ccan tl y reduce the
+amoun t of exp osed miss latency /#28i/.e/. the dc ache stal ls com/-
+p onen to fe a c h bar/#29/. F or the index searc h exp erimen ts/, w e
+see that while CSB
+/+
+/-T rees eliminated /2/0/#25 of the data cac he
+stall time that existed with B
+/+
+/-T rees/, p
+/8
+B
+/+
+/-T rees eliminate
+/4/5/#25 of this stall time/, th us resulting in an o v erall sp eedup
+of /1/./4/7 /#28compared with /1/./1/5 for CSB
+/+
+/-T rees/#29/. A signi/#0C/-
+can t amoun t of data cac he stall time still remains for index
+searc hes/, since w e still exp erience the full miss latency eac h
+time w em o v ed o wn a lev el in the tree /#28unless the no de is al/-
+ready in the cac he due to previous op erations/#29/. Eliminating
+this remaining latency app ears to b e di/#0Ecult/, as w e will dis/-
+cuss in the next section/. In con trast/, w ea c hiev e nearly ideal
+p erformance for the index range scan exp erimen ts sho wn
+in Figure /1/4/, where b oth p
+/8
+e
+B
+/+
+/-T rees and p
+/8
+i
+B
+/+
+/-T rees elimi/-
+nate /9/7/#25 of the original data cac he stall time/, resulting in an
+impressiv e eightfold over al l sp e e dup /. These results demon/-
+strate that the pB
+/+
+/-T ree sp eedups are indeed primarily due
+to a signi/#0Ccan t reduction in the exp osed miss latency /.
+5. DISCUSSION
+W en o w discuss sev eral p ossible impro v emen ts to pB
+/+
+/-
+T rees and related issues/. While our approac h of using pre/-
+fetc hing to create wider no des impro v es searc h p erformance
+b y a factor of /1/./2/#7B/1/./5/, w e still su/#0Ber a full cac he miss la/-
+tency at eac h lev el of the tree/. Unfortunately /, this is a v ery
+di/#0Ecult problem to solv e giv en/: /#28i/#29 the data dep endence
+through the c hild p oin ter/; /#28ii/#29 the relativ ely large fanout of
+the tree no des/; and /#28iii/#29 the fact that it is equally lik ely that
+an yc hild will b e visited /#28assuming uniformly distributed
+random searc hk eys/#29/. While one migh t consider prefetc hing
+the c hildren or ev en the grandc hildren of a no de in parallel
+with accessing the no de/, there is a dualit yb e t w een this and
+simply creating wider no des/. Compared with our approac h/,
+prefetc hing c hildren or grandc hildren su/#0Bers from/: /#28i/#29 addi/-
+tional storage o v erhead for the c hildren and grandc hildren
+p oin ters/, and /#28ii/#29 the restriction that the /#5Csize/" of a no de
+/#28i/.e/. the n um b er of cac he lines prefetc hed/#29 can only gro wb y
+m ultiples of the tree fanout/.
+Extending the idea of adding p oin ters to the b ottom non/-
+leaf no des/, it is p ossible to use no additional p ointers at al l /.
+P oten tially /,w e could retain all the p oin ters from the ro ot to
+the leaf during the searc h/, and then k eep mo ving this set of
+p oin ters/, sw eeping through the en tire range prefetc hing the
+leaf no des/. Note that with wider no des/, trees are shallo w er
+and this sc heme ma y b e feasible/.
+Lehman and Carey /, in an early pap er on index structures
+for main memory databases/, prop osed and studied the T/-
+T ree /#5B/1/1/, /1/2/#5D/. A t the time of their study /#28the mid/-/8/0/'s/#29/, the
+T/-T ree outp erformed the B
+/+
+/-T ree/, and w as considered the
+index structure of c hoice for main memory databases for o v er
+a decade/. Ho w ev er/, more recen t studies ha v e sho wn that the
+B
+/+
+/-T ree outp erforms the T/-T ree on mo dern pro cessors /#5B/1/9/#5D/,
+due in large part to the exp onen tial gro wth these past /1/5
+y ears in cac he miss latency relativ e to pro cessor sp eed/.
+Previous w ork has also considered k ey compression sc hemes
+/#28e/.g/./, /#5B/4/, /6/, /9/#5D/#29/, in order to pac k more k eys in to an index
+no de/. As with CSB
+/+
+/-T rees/, these tec hniques can b e used in
+conjunction with our approac h/, as desired/.
+Although our discussions and exp erimen ts ha v e fo cused
+
+
+--- PAGE 12 ---
+on main memory databases/, pB
+/+
+/-T rees can also b e used to
+impro v e b oth the I/#2FO p erformance and the memory p erfor/-
+mance of disk/-residen t databases/. Because the index no de
+size for a disk/-residen t database is t ypically a disk page of
+/4KB/, the fanout is m uc h larger than with main memory
+indices/. This ma y e/#0Bect the b ene/#0Cts of using ev en wider
+no des for searc hes/. Ho w ev er/, our range scan prefetc hing
+tec hniques applied to pages w ould lik ely con tin ue to ha v ea
+signi/#0Ccan t b ene/#0Ct/. F urthermore/, main memory p erformance
+is imp ortan te v en for disk/-residen t databases/, so it w ould b e
+in teresting to apply our metho ds for b oth cac he lines and
+pages/, and quan tify the o v erall p erformance gains/.
+6. CONCLUSIONS
+While eliminating c hild p oin ters through data la y out tec h/-
+niques has b een sho wn to signi/#0Ccan tly impro v e main mem/-
+ory B
+/+
+/-T ree searc h p erformance/, a large fraction of the ex/-
+ecution time for a searc h is still sp en t in data cac he stalls/,
+and index insertion p erformance is h urt b y these tec hniques/.
+Moreo v er/, the cac he p erformance of index scan /#28another im/-
+p ortan tB
+/+
+/-T ree op eration/#29 has not b een studied/. In this
+pap er/, w e explored ho w prefetc hing could b e used to impro v e
+the cac he p erformance of index searc h/, up date/, and scan op/-
+erations/. W e prop osed the Pr efetching B
+/+
+/-T r e e /#28pB
+/+
+/-T ree/#29
+and ev aluated its e/#0Bectiv eness in mo dern memory systems/.
+W e sho w ed that the optimal B
+/+
+/-T ree no de size is often
+wider than a cac he line on a mo dern mac hine/, when prefetc h/-
+ing is used to retriev e the pieces of a no de/, e/#0Bectiv ely o v er/-
+lapping m ultiple cac he misses/. Our results can b e summa/-
+rized as follo ws/:
+/#0F F or index searc h/, this prefetc hing tec hnique ac hiev es a
+sp eedup of /1/./2/7 to /1/./5/5 o v er the B
+/+
+/-T ree/, b y decreasing
+the heigh t of the tree/.
+/#0F F or index up dates /#28insertions and deletions/#29/, the tec h/-
+nique ac hiev es a sp eedup of /1/./2/4 to /1/./5/2 o v er the B
+/+
+/-
+T ree/, due to the faster searc h and the less frequen t
+no de splits with wider no des/.
+/#0F F or index scan/, the tec hnique ac hiev es a sp eedup of /3/./5
+to /3/./7 o v er the B
+/+
+/-T ree/, again due to the faster searc h
+and wider no des/. Moreo v er/, w e prop osed jump/-p ointer
+arr ays /, whic h enable e/#0Bectiv e range scan prefetc hing
+across no de b oundaries/. Ov erall/, the pB
+/+
+/-T ree ac hiev es
+a sp eedup of /6/./5 to /8/./7 o v er the B
+/+
+/-T ree for range
+scans/. W e prop osed t w o alternativ e implemen tations
+of jump/-p oin ter arra ys/, with comparable p erformance/.
+F rom our results/, w e conclude that the cac he p erformance
+of B
+/+
+/-T ree indices can b e greatly impro v ed b y exploiting
+the prefetc hing capabilities of state/-of/-the/-art computer sys/-
+tems/. W e b eliev e that this w ork mak es an imp ortan t con/-
+tribution to w ards applying prefetc hing tec hniques to adv an/-
+tage throughout a DBMS/.
+Ac kno wledgemen ts
+W e thank Berni Sc hiefer at IBM for his man y helpful com/-
+men ts regarding this w ork/. T o d dC /.M o wry is partially sup/-
+p orted b y an Alfred P /. Sloan Researc hF ello wship and b ya
+F acult y Dev elopmen tA w ard from IBM/.
+7. REFERENCES
+/#5B/1/#5D A/. Ailamaki/, D/. J/. DeWitt/, M/. D/. Hill/, and D/. A/. W ood /.
+DBMSs on a Mo dern Pro cessor/: Where Do es Time Go/? In
+Pr o c e e dings of the /2/5th VLDB /, pages /2/6/6/#7B/2/7/7/, Sept/. /1/9/9/9/.
+/#5B/2/#5D L/. A/. Barroso/, K/. Gharac horlo o /, and E/. D/. Bugnion/.
+Memory System Characterizat ion of Commercial
+W orkloads/. In Pr o c e e dings of the /2/5th ISCA /, pages /3/#7B/1/4/,
+June /1/9/9/8/.
+/#5B/3/#5D L/. A/. Barroso/, K/. Gharac horlo o /,A /. N o w atzyk/, and
+B/. V erghese/. Impact of Chip/-Lev el In tegration on
+P erformance of OL TP W orkloads/. In Pr o c e e dings of the /6th
+HPCA /, pages /3/#7B/1/4/, Jan/. /2/0/0/0/.
+/#5B/4/#5D R/. Ba y er and K/. Un terauer/. Pre/#0Cx B/-trees/. A CM T r ans/. on
+Datab ase Systems /, /2/#28/1/#29/:/1/1/#7B/2/6 /, Marc h /1/9/7/7/.
+/#5B/5/#5D M/. A/. Bender/, E/. D/. Demaine/, and M/. F arac h/-Colton/.
+Cac he/-Oblivious B/-T rees/. In Pr o c e e ding s of the /4/1st IEEE
+F OCS /, pages /3/9/9/#7B/4/0/9/, No v/. /2/0/0/0/.
+/#5B/6/#5D P /. Bohannon/, P /. McIlro y /, and R/. Rastogi/. Impro ving
+Main/-Memory Index P erformance with P artial Key
+Informatio n/. In Pr o c e e dings of the /2/0/0/1 SIGMOD
+Confer enc e /,M a y /2/0/0/1/.
+/#5B/7/#5D S/. Chen/, P /. B/. Gibb ons/, and T/. C/. Mo wry /. Impro ving Index
+P erformance through Prefetc hing/. T ec hnical Rep ort
+CMU/-CS/-/0/0/-/1/7/7/, Sc ho ol of Computer Science/, Carnegie
+Mellon Univ ersit y /, Dec/. /2/0/0/0/.
+/#5B/8/#5D Z/. Cv etano vic and R/. E/. Kessler/. P erformance Analysis of
+the Alpha /2/1/2/6/4/-Based Compaq ES/4/0 System/. In
+Pr o c e e dings of the /2/7th ISCA /, pages /1/9/2/#7B/2/0/2/, June /2/0/0/0/.
+/#5B/9/#5D J/. Goldstein/, R/. Ramakrishna n/, and U/. Shaft/. Compressing
+Relations and Indexes/. In Pr o c e e dings of the /1/4th ICDE /,
+pages /3/7/0/#7B/3/7/9/, F eb/. /1/9/9/8/.
+/#5B/1/0/#5D K/. Keeton/, D/. A/. P atterson/, Y/. Q/. He/, R/. C/. Raphael/, and
+W/. E/. Bak er/. P erformance Characterizat ion of a Quad
+P en tium Pro SMP using OL TP W orkloads/. In Pr o c e e dings
+of the /2/5th ISCA /, pages /1/5/#7B/2/6/, June /1/9/9/8/.
+/#5B/1/1/#5D T/. J/. Lehman and M/. J/. Carey /. A Study of Index Structures
+for Main Memory Database Managemen t Systems/. In
+Pr o c e e dings of the /1/2th VLDB /, pages /2/9/4/#7B/3/0/3/, Aug/. /1/9/8/6/.
+/#5B/1/2/#5D T/. J/. Lehman and M/. J/. Carey /. Query Pro cessing in Main
+Memory Database Managemen t Systems/. In Pr o c e e dings of
+the /1/9/8/6 SIGMOD Confer enc e /, pages /2/3/9/#7B/2/5/0/, Ma y /1/9/8/6/.
+/#5B/1/3/#5D C/./-K/. Luk and T/. C/. Mo wry /. Compiler/-Based Prefetc hing
+for Recursiv e Data Structures/. In Pr o c e e dings of the /7th
+ASPLOS /, pages /2/2/2/#7B/2/3/3/, Oct/. /1/9/9/6/.
+/#5B/1/4/#5D C/./-K/. Luk and T/. C/. Mo wry /. Automatic Compiler/-Inserte d
+Prefetc hing for P oin ter/-Based Applications/. IEEE
+T r ansactions on Computers /, /4/8/#28/2/#29/:/1/3/4/#7B/1 /4/1/, F eb/. /1/9/9/9/.
+/#5B/1/5/#5D S/. McF arling/. Com bining Branc h Predictors/. T ec hnical
+Rep ort WRL T ec hnical Note TN/-/3/6/, Digital Equipmen t
+Corp oration/, June /1/9/9/3/.
+/#5B/1/6/#5D T/. C/. Mo wry /, M/. S/. Lam/, and A/. Gupta/. Design and
+Ev aluation of a Compiler Algorithm for Prefetc hing /.I n
+Pr o c e e dings of the /5th ASPLOS /, pages /6/2/#7B/7/3/, Oct/. /1/9/9/2/.
+/#5B/1/7/#5D C/. Nyb erg/, T/. Barcla y /,Z /. C v etano vic/, J/. Gra y /, and
+D/. Lomet/. AlphaSort/: A RISC Mac hine Sort/. In
+Pr o c e e dings of the /1/9/9/4 SIGMOD Confer enc e /, pages
+/2/3/3/#7B/2/4/2/, Ma y /1/9/9/4/.
+/#5B/1/8/#5D P /. Ranganathan/, K/. Gharac horlo o /, S/. V/. Adv e/, and L/. A/.
+Barroso/. P erformanc e of Database W orkloads on
+Shared/-Memo ry Systems with Out/-of/-Order Pro cessors/. In
+Pr o c e e dings of the /8th ASPLOS /, pages /3/0/7/#7B/3/1/8/, Oct/. /1/9/9/8/.
+/#5B/1/9/#5D J/. Rao and K/. A/. Ross/. Cac he Conscious Indexing for
+Decision/-Sup po rt in Main Memory/. In Pr o c e e dings of the
+/2/5th VLDB /, pages /7/8/#7B/8/9/, Sept/. /1/9/9/9/.
+/#5B/2/0/#5D J/. Rao and K/. A/. Ross/. Making B
+/+
+/-T rees Cac he Conscious
+in Main Memory/. In Pr o c e e dings of the SIGMOD /2/0/0/0
+Confer enc e /, pages /4/7/5/#7B/4/8/6/, Ma y /2/0/0/0/.
+/#5B/2/1/#5D A/. Shatdal/, C/. Kan t/, and J/. F/. Naugh ton/. Cac he Conscious
+Algorithms for Relational Query Pro cessing/. In Pr o c e e dings
+of the /2/0th VLDB /, pages /5/1/0/#7B/5/2/1/, Sept/. /1/9/9/4/.
+/#5B/2/2/#5D A/. Silb ersc hat z/, H/. F/. Korth/, and S/. Sudarshan/. Datab ase
+System Conc epts /. McGra w Hill/, New Y ork/, New Y ork/, /3rd
+edition/, /1/9/9/7/.
+/#5B/2/3/#5D K/. C/. Y eager/. The MIPS R/1/0/0/0/0 Sup erscalar
+Micropro cessor /. IEEE Micr o /, /1/6/#28/2/#29/:/2/8/#7B/4/0 /, April /1/9/9/6/.
+

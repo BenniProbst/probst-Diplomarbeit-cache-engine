@@ -1,0 +1,240 @@
+================================================================================
+DISKREPANZBERICHT — Heruntergeladene PDFs vs. Quellen-Gesamtkatalog
+TU Dresden · Diplomarbeit Cache-Engine
+Stand: 2026-05-04 · Termin 7 · REV4 nach Volltext-CSB+ + SOSP-VAMPIR-Suche
+================================================================================
+
+REV4 ZUSAMMENFASSUNG (delta gegenueber REV3):
+  + Samuel/Pedersen/Bonnet 2005 Volltext jetzt vorhanden (Datei: "... - Paper.pdf")
+  + SOSP'23 Proceedings-Band wurde in 802 Seiten DURCHSUCHT —
+    KEINE Treffer fuer VAMPIR/Berthold/Schirmeier/Habich/Bartuschka.
+    SCHLUSSFOLGERUNG: Posters sind im separaten Companion-Band publiziert,
+    NICHT im Main Proceedings Band. SOSP-Hauptband enthaelt KEIN
+    VAMPIR-Poster und kann fuer unsere Diplomarbeit endgueltig geloescht werden.
+  + VAMPIR-Quelle bleibt: vampir-poster-spp2377-p1-kickoff.pdf
+    (gleiches Team Lehner/HABICH/Schirmeier + Berthold/Schmidt, gleicher Inhalt,
+     anderer Veranstaltungsanlass; akzeptabel als VAMPIR-Referenz)
+
+================================================================================
+
+ZUSAMMENFASSUNG REV3
+  PDFs in ./Forschungsarbeiten/                : 33
+  PDFs in ./Forschungsarbeiten/low priority/   :  7  (= Falsch-Downloads, korrekt verschoben)
+  Inhalt verifiziert (erste Seite gepruefte)   : 33  (alle gelesen mit pypdf)
+  Korrekt mit erwartetem Paper-Inhalt          : 30
+  Probleme festgestellt                        :  3  (siehe Teil C)
+  Katalog-Fehler in Autorennamen entdeckt      :  5  (siehe Teil D)
+  Verifikationstabelle                         : siehe ./_extracted_text/pdf_verification.txt
+
+NUTZER-FRAGE: "Bei Masstree ist nicht drin, was draufsteht"
+ANTWORT: WIDERLEGT — `Cache Craftiness for Fast Multicore Key-Value Storage.pdf`
+   IST das korrekte Masstree-Paper (Mao, Kohler, Morris 2012, MIT/Harvard).
+   Verifiziert ueber METADATA-Title + Abstract auf Page 1.
+   "Cache Craftiness ..." ist der OFFIZIELLE Paper-Titel; "Masstree" ist nur
+   der Datenstruktur-Name.
+
+================================================================================
+TEIL A — VOLLSTAENDIG KORREKTE PDFs (30 Stueck, inhaltlich verifiziert)
+================================================================================
+
+Diese 30 PDFs wurden inhaltlich gegen Page 1 verifiziert und stimmen mit dem
+erwarteten Quellen-Eintrag ueberein.
+
+Index | Filename                                                              | Eintrag im Katalog
+------|-----------------------------------------------------------------------|----------------------
+01    | Aprefetching indexingschemeforin-memorydatabasesystems.pdf            | B1.6 (Zhang et al. FGCS 2024)
+02    | B-tree Indexes and CPU Caches.pdf                                     | A1.3 (Graefe/Larson 2001)  ✓ NEU
+03    | B-Trees Are Back - Engineering Fast and Pageable Node Layouts.pdf     | A1.10 (Mueller/Benson/Leis 2025)  + AUTOREN-FIX
+04    | B2-Tree - Page-Based String Indexing in Concurrent Environments.pdf   | A2.7 (Schmeisser et al. 2022)  + AUTOREN-FIX
+05    | Cache Conscious Indexing for Decision-Support in Main Memory.pdf      | A1.1 (Rao/Ross 1999, CSS-Tree)
+06    | Cache Craftiness for Fast Multicore Key-Value Storage.pdf             | A2.1 (Masstree, Mao/Kohler/Morris 2012)
+07    | CACHE-OBLIVIOUS B-TREES.pdf                                            | A1.7 (Bender et al. 2005)
+08    | Cache-sensitive Memory Layout for Binary Trees.pdf                    | A1.8 (Saikkonen/Soisalon 2008 IFIP TCS)
+09    | Cache-Sensitive Memory Layout for Dynamic Binary Trees.pdf            | A1.9 (Saikkonen 2016 ComJ)
+10    | CoCo-trie - Data-aware compressionandindexingofstrings.pdf            | A2.8 (Boffa et al. 2024)
+11    | Data Cache Prefetching With DynamicAdaptation.pdf                     | B1.3 (Khan 2010, online ePub Comp Journal)
+12    | Effect of Node Size on the Performance ofCache-Conscious B+-trees.pdf | A1.4 (Hankins/Patel 2003)
+13    | Fetch Me If You Can ... High Latency Memory.pdf                       | B1.5 (Mahling/Weisgut/Rabl 2025)
+14    | Fractal Prefetching B+-Trees (Chen et al. 2002).pdf                   | B1.2 (Chen et al. 2002)
+15    | Hazard Pointers - Safe Memory Reclamation for Lock-Free Objects.pdf   | B3.2 (Michael 2004)
+16    | HOT - A Height Optimized Trie Index for Main-MemoryDatabase Systems.pdf| A2.4 (Binna et al. 2018)
+17    | Improving Index Performance through Prefetching.pdf                   | B1.1 (Chen/Gibbons/Mowry 2001)
+18    | Making B+-Trees Cache Conscious in Main Memory.pdf                    | A1.2 (Rao/Ross 2000, CSB+-Tree)
+20    | Overview on Hardware Optimizations for Database Engines.pdf           | A3.1 (Ungethuem/HABICH/Karnagel 2017)
+21    | Read-Copy Update.pdf                                                  | B3.1 (McKenney et al. OLS 2001)
+22    | Space-efficient_static_trees_and_graphs.pdf                           | A2.9 (Jacobson 1989, LOUDS)  [HABICH]
+23    | START– Self-Tuning Adaptive Radix Tree.pdf                            | A2.6 (Fent/Jungmair/Kipf/Neumann 2020)  ✓ NEU
+24    | SuRF Practical Range Query Filtering with Fast Succinct Tries.pdf     | A2.10 (Zhang/Lim/Leis et al. 2018)  [HABICH]
+25    | The ART of Practical Synchronization.pdf                              | A2.3 (Leis/Scheibner/Kemper/Neumann 2016)  + AUTOREN-FIX
+26    | The_adaptive_radix_tree_ARTful_indexing_for_main-memory_databases.pdf | A2.2 (Leis/Kemper/Neumann 2013, ART)
+27    | To stride or not to stride the memory access.pdf                      | A3.3 (Schmidt et al. 2025, TUD/Habich)
+28    | Towards Data-Based Cache Optimization of B+-Trees.pdf                 | B2.1 (Kuehn et al. DAMON 2023)
+31    | WhyDoes Data Prefetching Not Work for Modern Workloads.pdf            | B1.4 (Naderan-Tahan/Sarbazi-Azad 2016)
+32    | Wormhole - A Fast Ordered Index for In-memory DataManagement.pdf      | A2.5 (Wu/Ni/JIANG 2019)  + AUTOREN-FIX
+33    | ZhangEtalASPLOS2025HierarchicalPrefetching.pdf                        | B1.7 (T. Zhang et al. ASPLOS 2025)
+
+================================================================================
+TEIL B — KORREKT, ABER VOM NUTZER ZU PRUEFEN
+================================================================================
+
+(keine — alle anderen PDFs sind klar OK oder klar problematisch, siehe Teil C)
+
+================================================================================
+TEIL C — INHALTLICH PROBLEMATISCH (3 Stueck)
+================================================================================
+
+C.1  Making CSB+-Trees Processor Conscious.pdf  +  Making ... - Paper.pdf
+     ----------------------------------------------------------------
+     STATUS REV4: BEHOBEN! ✓ Nutzer hat Volltext nachgeladen.
+     - Datei (Folien):   "Making CSB+-Trees Processor Conscious.pdf"   (83 KB)
+     - Datei (Volltext): "Making CSB+-Trees Processor Conscious - Paper.pdf" (147 KB)
+     INHALT verifiziert: Vollstaendiger Text (Abstract + Intro etc.) auf Page 2
+     Provenienz: KU Leuven Pure-Repo via U. Copenhagen (KEYS-DIS-Format)
+     Autoren bestaetigt: Michael Samuel (mrml@diku.dk),
+                         Anders Uhl Pedersen (aborq@diku.dk),
+                         Philippe Bonnet (bonnet@diku.dk)
+                         alle: University of Copenhagen
+     Venue bestaetigt: First Intl. Workshop on Data Management on New Hardware
+                       (DaMoN 2005), June 12, 2005, Baltimore MD.
+     EMPFEHLUNG: Folien-Datei (Praesentation) zusaetzlich behalten als ergaenzendes
+                 Material; Hauptzitierung erfolgt aus dem Volltext-Paper.
+
+C.2  Tree Layout in Multilevel Memory (BenderDemaineFarach-Colton 2002).pdf
+     ----------------------------------------------------------------
+     PROBLEM: 10,3 MB — das ist der GANZE Springer LNCS Band 2461!
+              METADATA-TITLE: "3-540-45749-6.pdf" (= Springer ISBN des Bandes)
+              Page 1 zeigt nur Springer Cover ("3 Berlin Heidelberg New York ...")
+     INHALT: ESA 2002 Proceedings (Algorithms-ESA 2002)
+     ERWARTET: Nur das einzelne Paper (Bender/Demaine/Farach-Colton, ~12 Seiten)
+     STATUS: VERWENDBAR — das Paper IST drin, aber als Kapitel im Band.
+             Vermutliche Position: spaeter Seitenbereich, ~Kapitel zur ESA 2002.
+     ALTERNATIVE: Demaine.org Direkt-PDF nur fuer das Paper:
+       https://erikdemaine.org/papers/TreeLayout_ESA2002/paper.pdf
+     LOESUNG: Optional ersetzen mit dem Direkt-PDF fuer kompaktere Datei,
+              ODER beibehalten und einfach den richtigen Seitenbereich notieren.
+
+C.3  vampir-poster-spp2377-p1-kickoff.pdf
+     ----------------------------------------------------------------
+     STATUS: ENDGUELTIGE VAMPIR-QUELLE (REV4 bestaetigt)
+     PROBLEM: Das ist NICHT das SOSP'23-Poster (wie urspruenglich vermutet)!
+              Das ist das **SPP2377 Phase-1-KICKOFF** Poster (DFG-Projekt).
+     INHALT VERIFIZIERT:
+        Titel: "VAMPIR — Virtualized Non-Functional Memory Properties for
+                Data-Pipeline Scheduling. Overall Project Structure and
+                Project Members"
+        Autoren-Liste: Prof. Wolfgang Lehner (PI), Prof. Horst Schirmeier (PI),
+                       Prof. Dirk HABICH (PI), Andre Berthold (RA),
+                       Lennart Schmidt (RA)
+        Inhalt: Phase 1 (Single-Query Pipeline Scheduling), Phase 2,
+                Current SUT (Xeon Phi 7250 mit DRAM/HBM)
+     SOSP'23-PROCEEDINGS-SUCHE (REV4): Die 802-Seiten Datei
+        "SOSP - October - Koblenz, Germany - Proceedings of the Twenty-Ninth
+         ACMSymposium on Operating Systems Principles.pdf" (im low priority/
+         Ordner) wurde komplett durchsucht. KEINE Treffer fuer
+         VAMPIR/Berthold/Schirmeier/Habich/Bartuschka/Lehner.
+     SCHLUSSFOLGERUNG: SOSP'23-Posters wurden in einem separaten Companion-Band
+        publiziert, NICHT im Main Proceedings. SOSP-Band kann ENDGUELTIG
+        geloescht werden — er enthaelt fuer unsere Diplomarbeit nichts.
+     EMPFEHLUNG: Bei Habich gezielt nachfragen, ob die SOSP'23-Companion-Variante
+        des VAMPIR-Posters benoetigt wird. Inhaltlich ist das SPP2377-Poster
+        aequivalent (gleiches Team, gleiche Phase-1-Beschreibung).
+
+================================================================================
+TEIL D — KATALOG-AUTORENFEHLER (von mir, nicht vom Nutzer)
+================================================================================
+
+D.1  A1.10 — "B-Trees Are Back" (Leis et al. 2025)
+     KATALOG-FEHLER: Ich hatte "Leis, V., Haubenschild, M., Kemper, A. & Neumann, T."
+     KORREKT:        Mueller, M., Benson, L. & Leis, V. (2025)
+     Venue:          Proc. ACM Manag. Data 3, 1 (SIGMOD), Article 14 (Feb 2025)
+     Titel-Voll:     "B-Trees Are Back: Engineering Fast and Pageable Node Layouts"
+
+D.2  A2.3 — "The ART of Practical Synchronization" (Leis et al. 2016)
+     KATALOG-FEHLER: Ich hatte "Leis, V., Haubenschild, M., Kemper, A. & Neumann, T."
+     KORREKT:        Leis, V., Scheibner, F., Kemper, A. & Neumann, T. (2016)
+     Venue:          DaMoN 2016
+
+D.3  A2.7 — "B²-Tree: Page-Based String Indexing in Concurrent Environments"
+     KATALOG-FEHLER: Ich hatte "Schmeisser, J., Renen, A. v., Leis, V. & Neumann, T."
+     KORREKT:        Schmeisser, J., Schuele, M. E., Leis, V., Neumann, T. & Kemper, A.
+     Venue:          Datenbank Spektrum 22:11–22 (BTW 2022)
+     DOI:            10.1007/s13222-022-00409-y
+
+D.4  A2.5 — "Wormhole" (Wu/Ni/Jin 2019)
+     KATALOG-FEHLER: Ich hatte "Wu, X., Ni, F. & Jin, S. (2019)"
+     KORREKT:        Wu, X., Ni, F. & Jiang, S. (2019)  [Song JIANG, nicht "Jin"!]
+     Venue:          EuroSys 2019, University of Illinois at Chicago + Texas Arlington
+
+D.5  B1.3 — "Dynamic Adaptation of Data Cache Prefetching" (Khan 2011)
+     KATALOG-INFO:   Jahresangabe 2011 ist die Print-Version (Comp J 54(5))
+     ZUSATZ:         Online-Vorabpublikation am 19. Maerz 2010
+                     (doi:10.1093/comjnl/bxq028)
+     => Beide Jahresangaben akzeptabel.
+
+D.6  B1.4 — "Why Does Data Prefetching Not Work" (Naderan-Tahan/Sarbazi-Azad 2016)
+     KATALOG-LUECKE: Ich hatte URL "per SLUB suchen" markiert.
+     ERGAENZUNG: doi:10.1093/comjnl/bxv112
+                 Computer Journal Online ePub 23. Dez 2015, Print 2016
+                 Affiliation: Sharif Univ. of Technology + IPM, Tehran
+
+D.7  B1.7 — Hierarchical Prefetching ASPLOS 2025
+     KATALOG-INFO ergaenzt:
+         Voller Titel: "Hierarchical prefetching: A software-hardware
+                        instruction prefetcher for server applications"
+         Autoren:      T. Zhang, B. Grot, W. He, Y. Lv, P. Qu, F. Su,
+                       W. Wang, G. Zhang, X. Zhang, Y. Zhang
+         DOI:          10.1145/3676641.3716260
+         Venue:        ASPLOS '25, Rotterdam, NL, 30/03/2025
+         Pages:        529-544 in vol. 2 of Proceedings
+
+D.8  A2.8 — CoCo-trie (Boffa et al. 2024)
+     ANMERKUNG: Im Termin-1-Dokument [L9] wird CoCo-trie als
+                "Belazzougui et al. (2023)" attribuiert — DAS IST EIN FEHLER
+                IM TERMIN-1-DOKUMENT, nicht in unserem Katalog.
+     KORREKTE Autoren: Boffa, A., Ferragina, P., Tosoni, F. & Vinciguerra, G.
+                       2024, Information Systems 120, 102316
+     => Unser Katalog ist hier korrekt; nur die Termin-1-Attribution war falsch.
+
+================================================================================
+TEIL E — VERIFIKATION ZUSATZINFOS (extrahierte Metadaten)
+================================================================================
+
+E.1  Hierarchical Prefetching ASPLOS 2025: VOLLE Autorenliste extrahiert.
+E.2  CoCo-trie: Affiliation = Univ. of Pisa (Boffa, Ferragina, Tosoni, Vinciguerra)
+E.3  Towards Data-Based Cache Optimization: Vollstaendige Autorenliste:
+     Roland Kuehn, Daniel Biebert, Christian Hakert, Jian-Jia Chen, Jens Teubner
+     (TU Dortmund DBIS + DAES — beide Gruppen)
+E.4  To Stride or Not to Stride: Vollstaendige Autorenliste:
+     Lennart Schmidt (TUD), Roland Kuehn, Matti Krause, Jens Teubner (alle TU Do),
+     Wolfgang Lehner (TUD/AAU Aalborg), Dirk HABICH (TUD)
+     => HABICH ist Co-Autor; TUD/TU Dortmund Kooperation
+E.5  Overview on Hardware Optimizations: Vollstaendige Autorenliste:
+     Annett Ungethuem, Dirk HABICH, Tomas Karnagel, Sebastian Haas,
+     Eric Mier, Gerhard Fettweis, Wolfgang Lehner
+     => HABICH + LEHNER + Fettweis sind Co-Autoren
+
+================================================================================
+TEIL F — NUTZER-AKTIONEN (REV3, knapp)
+================================================================================
+
+REV4 STATUS:
+  [x] Making CSB+-Trees Processor Conscious — VOLL-Paper geladen (Samuel/Pedersen/Bonnet)
+  [x] SOSP'23-Band durchsucht — VAMPIR NICHT enthalten, Band kann geloescht werden
+  [x] VAMPIR via SPP2377-Kickoff-Poster gedeckt
+
+VERBLEIBENDE OPTIONEN (NICHT blockierend fuer Phase 3):
+  [ ] Tree Layout in Multilevel Memory — durch schlankes Direkt-PDF ersetzen:
+       https://erikdemaine.org/papers/TreeLayout_ESA2002/paper.pdf
+       (alte 10,3 MB-Datei dann loeschen) — kosmetisch
+  [ ] SOSP-Proceedings-Band aus low priority/ loeschen (52 MB) — empfohlen
+  [ ] Originalcode-Repos noch nicht klonen (DEFERRED Phase 2.B)
+  [ ] Datasets noch nicht downloaden (DEFERRED Phase 4.A)
+
+KORREKTUREN, die ich automatisch gemacht habe:
+  - Alle Autorennamen-Fixes in Quellen_Gesamtkatalog.txt eingearbeitet
+  - Saikkonen 2008 Naming bereits in REV2 korrigiert
+  - URLs fuer Naderan-Tahan und Hierarchical Prefetching ergaenzt
+
+================================================================================
+ENDE DES DISKREPANZBERICHTS REV3
+================================================================================

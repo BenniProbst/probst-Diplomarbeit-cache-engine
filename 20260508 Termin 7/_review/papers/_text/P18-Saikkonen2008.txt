@@ -1,0 +1,694 @@
+=== PAPER: P18-Saikkonen2008
+=== FILENAME: Cache-sensitive Memory Layout for Binary Trees.pdf
+=== PAGES: 15
+
+--- PAGE 1 ---
+Cache-sensitive Memory Layout
+for Binary T rees∗
+Riku Saikkonen and Eljas Soisalon-Soininen
+Helsinki University of Technology , Finland, {rjs,ess}@cs.hut.fi
+Abstract We i m prove the p erf orm ance of m ai n- m em ory bi nary s earch trees
+(including A VL and red-black trees) by applying cache-sensitive and cache-
+oblivious memory layouts. We relocate tree nodes in memory according to
+am u l t i - l e v e lc a c h eh i e r a r c h y ,a l s oc o n s i d e r i n gt h ec o n ﬂ i c tm i s s e sp r o d u c e d
+by set-associative caches. Moreover, we present a method to improve one-
+level cache-sensitivity without increasing the time complexity of rebalancing.
+The empirical performance of our cache-sensitive binary trees is comparable
+to cache-sensitive B-trees. We also use the multi-level layout to improve the
+performance of cache-sensitive B-trees.
+1I n t r o d u c t i o n
+Most of today’s processor architectur es use a hierarchical memory system: a
+number of caches are placed between the processor and the main memory.
+Caching has become an increasingly impo rtant factor in the practical perfor-
+mance of main-memory data structures. The relative importance of caching
+will likely increase in the future [1, 2]: processor speeds have increased faster
+than memory speeds, and many applications that previously needed to read
+data from disk can now ﬁt all of the necessary data in main memory. In data-
+intensive main memory applications, reading from main memory is often a bot-
+tleneck similar to disk I/O for external-memory algorithms.
+There are two types of cache-consci ous algorithms. We will focus on the
+cache-sensitive (or cache-aware) model, where the parameters of the caches
+are assumed to be known to the implementation. In contrast, cache-oblivious
+algorithms attempt to optimize themselves to an unknown memory hierarchy.
+The simplest cache-sensitive variant of the B-tree is an ordinary B +-tree
+where the node size is chosen to match the size of a cache block (e.g., 64 or
+128 bytes) [3]. A more advanced version called the Cache-Sensitive B +-tree or
+CSB+-tree [1] additionally removes pointers from internal nodes by storing the
+children of a node consecutively in memory. The CSB +-tree has been further
+optimized using a variety of techniques, such as prefetching [4], storing only
+partial keys in nodes [5], and choosing the node size more carefully [2]. The
+above structures used a one-level cache model; B-trees in two-level cache models
+(one level of cache plus the TLB) are examined in [6, 7].
+∗ This research was partially supported by the Academy of Finland.
+241
+
+--- PAGE 2 ---
+242 R. Saikkonen, E. Soisalon-Soininen
+Aw e i g h t - b a l a n c e dB - t r e ebased on the cache-oblivious model has been pro-
+posed in [8]. Its simpler variants [9, 10] use an implicit binary tree (a complete
+binary tree stored in a large array without explicit pointers) whose structure
+and rebalancing operations are dictated by the cache-oblivious memory layout.
+In all three, update operations may rebuild parts of the tree, so most of the
+complexity bounds are amortized.
+When using binary search trees, the no de size cannot be chosen as freely as
+in B-trees. Instead, we will place the nodes in memory so that each cache block
+contains nodes that are close to each other in the tree. Binary search tree nodes
+are relatively small; for example, A VL and red-black tree nodes can ﬁt in about
+16 or 20 bytes using 4-byte keys and 4-byte pointers, so 3–8 nodes ﬁt in one
+64-byte or 128-byte cache block. (We assume that the nodes contain only small
+keys. Larger keys could be stored externally with the node storing a pointer to
+the key.)
+Caching and explicit-pointer binary search trees have been previously con-
+sidered in [11], which presents a cache-oblivious splay tree based on periodically
+rearranging all nodes in memory. In addition, [12] presents a one-level cache-
+sensitive periodic rearrangement algorithm for explicit-pointer binary trees. A
+similar one-level layout (extended to u nbalanced trees) is analyzed in [13], which
+also discusses the multi-level cache-oblivious layout known as the van Emde
+Boas layout. The latter is analyzed in detail in [14].
+We give an algorithm that preserves cache-sensitivity in binary trees in the
+dynamic case, i.e., during insertions and deletions. Our algorithm retains single-
+level cache-sensitivity using small worst- case constant-time operations executed
+when the tree changes. In addition, we give an explicit algorithm for multi-
+level cache-sensitive global rearrangement, including a variation that obtains
+ac a c h e - o b l i v i o u sl a y o u t .W ea l s oi n v e s t i g a t eaf o r mo fc o n ﬂ i c tm i s sc a u s e db y
+cache-sensitive memory layouts that interact poorly with set-associative caches.
+Our approach does not change the internal structure of the nodes nor the
+rebalancing strategy of the binary search tree. The approach is easy to imple-
+ment on top of an existing implementation of any tree that uses rotations for
+balancing, e.g., red-black trees and A VL trees. Our global rearrangement algo-
+rithm can also be applied to cache-sensitive B-trees, and our empirical results
+indicate that the multi-level memory la yout improves the performance of both
+B+-trees with cache-block-sized nodes and CSB +-trees.
+2C a c h em o d e l
+We deﬁne a multi-level cache mo del as follows. We have a k-level cache hierarchy
+with block sizes B1,...,B k at each level. We also deﬁne B0 = node size in bytes,
+Bk+1 = ∞.W ea s s u m et h a to u ra l g o r i t h m sk n o wt h e s ec a c h ep a r a m e t e r s .( I n
+practice, they can be easily inferred f rom the CPU model or from metadata
+
+--- PAGE 3 ---
+Cache-sensitive Memory Layout for Binary Trees 243
+stored in the CPU.) To keep the model simple, we do not model any other
+features of the cache, such as the capacity.
+Our algorithms shorten the Bi-block search path length ,d e n o t e dPi and de-
+ﬁned as the length of a root-to-leaf path measured in the number of separate
+cache blocks of size Bi encountered on the path. Using this terminology, P0 is
+the traditional search path length in nodes (assuming that the search does not
+end before the leaf level), P1 is the length counted in separate B1-sized cache
+blocks encountered on the path, and so on.
+We assume that for i> 1,e a c hb l o c ks i z eBi is an integer multiple of Bi−1.
+Additionally, if B1 is not an integer multiple of the node size B0,an o d es h o u l d
+not cross a B1-block boundary (so that it is never necessary to fetch two cache
+blocks from memory in order to access a sing le node). In practice, this is achieved
+by not using the last B1 mod B0 bytes of each B1-block. (In practice, Bi, i> 0,
+is almost always a power of 2.)
+At y p i c a lm o d e r nc o m p u t e re m p l o y st w olevels of caches: a relatively small
+and fast level 1 (“L1”) cache, and a larger and slower level 2 (“L2”) cache.
+In addition, the mapping of virtual addresses to physical addresses used by
+multitasking operating systems employs a third hardware cache: the Translation
+Lookaside Buﬀer or TLB cache.
+Currently the cache block size is often the same in the L1 and L2 caches.
+They then use only one level of our hierarchy. For example, the cache model used
+in the experiments in Section 5 is k =2 , B0 =1 6 (16-byte nodes), B1 =6 4
+(the block size of the L1 and L2 caches in an AMD Athlon XP processor),
+B2 =4 0 9 6(the page size of the TLB cache), B3 = ∞ .H o w e v e r ,o u ra l g o r i t h m s
+can be applied to an arbitrary hierarchy of cache block sizes.
+3G l o b a lr e l o c a t i o n
+Figure 1 gives an algorithm that rearranges the nodes of a tree in memory into
+am u l t i - l e v e lc a c h e - s e n s i t i v em e m o r ylayout. The algorithm can be used for any
+kind of balanced tree with ﬁxed-size nodes.
+The produced layout can be considered to be a generalization of the one-
+level cache-sensitive layouts of [12, 13] and the two-level layouts of [6, 7] to
+an arbitrary hierarchy of block sizes. It is diﬀerent from the multi-level “van
+Emde Boas” layout (see [13]) in that the recursive placement of smaller blocks
+in larger ones is more comple x, because, in the cache-sensitive model, we cannot
+choose the block sizes according to the structure of the tree, as is done in the
+cache-oblivious van Emde Boas layout.
+In the produced layout, the ﬁrst lowest-level ( l =1 )b l o c ki sﬁ l l e db ya
+breadth-ﬁrst traversal of the tree starting from the root r.W h e nt h i s“ r o o t
+block” is full, each of its children (i.e., the “grey” or border nodes in the breadth-
+ﬁrst search) will become the root node of its own level 1 block, and so on. On
+levels l> 1,l e v e ll −1 blocks are allocated to level l blocks in the same manner.
+
+--- PAGE 4 ---
+244 R. Saikkonen, E. Soisalon-Soininen
+reloc-block(l, r):
+1: if l =0 then
+2: Copy node r to address A,a n du p d a t et h el i n ki ni t sp a r e n t .
+3: A ← A + B0
+4: return children of r
+5: else
+6: S ← A
+7: E ← A + F (A, l) − Bl−1
+8: Q ← empty queue
+9: put(Q, r)
+10: while Q is not empty and A ≤ E do
+11: n ← get(Q)
+12: c ← reloc-block(l − 1,n )
+13: put(Q,a l ln o d e si nc)
+14: end while
+15: if Q is not empty then
+16: A ← start of next level l block ( = E + Bl−1)
+17: if F (S, l) <B l/2 then {less than half of the block was free }
+18: Free the copies made ab ove, i.e., all no des at addresses S to A − 1.
+19: return r {our caller will try to relocate r again later }
+20: end if
+21: end if
+22: return remaining nodes in Q
+23: end if
+relocate(r):
+1: A ← beginning of a new memory area, aligned at a level k block boundary
+2: reloc-block(k +1 , r){ Bk+1 = ∞ ,s ot h i sr e l o c a t e se v e r y t h i n g}
+Fig. 1 The global relocation algorithm. The address A of the next available position for a
+node is a global variable. F (A, l)= Bl − A mod Bl is the number of bytes between A and the
+end of the level l block containing A.( T ob ea b l et ou p d a t et h el i n ki nap a r e n tw h e nan o d e
+is copied, the algorithm actually needs to store (node, parent) pairs in the queue Q,u n l e s s
+the tree structure contains parent links. This was left out of the pseudocode for clarity.)
+The algorithm of Figure 1 produces this layout using a single traversal of
+the tree using auxiliary queues that store border nodes for each level of the
+breadth-ﬁrst search. Lines 17–20 are an optional space optimization: at the leaf
+level, there may not be enough nodes to ﬁll a block. Lines 17–20 ensure that
+each level l block will be at least half full by trying to allocate the next available
+subtree in the remaining space in a non-full block.
+Theorem 1. Assume that the global relocation algorithm of Figure 1 is executed
+on a complete binary tree of height h. Then the worst-case Bi-block path length
+will be Pi = ⌈h/hi⌉,w h e r e hi = hi−1 ·⌊ logdi−1 (Bi/Bi−1 +1 ) ⌋, h0 =1 . If
+B1 is an integer multiple of B0,t h e n di = Bi/B0 +1 ; otherwise, d0 =2 and
+di =( di−1 − 1) ·⌊ Bi/Bi−1⌋ +1 .
+Proof. Consider a cache block level i ∈{ 1,...,k }.E a c hl e v e li − 1 block pro-
+duced by the layout (except possibly for blocks that contain leaves of the tree)
+contains a connected part of the tree with di−1 − 1 binary tree nodes. These
+
+--- PAGE 5 ---
+Cache-sensitive Memory Layout for Binary Trees 245
+blocks can be thought of as “super-nodes” with fanout di− 1.T h ea l g o r i t h mo f
+Figure 1 produces a level i block by allocating Bi/Bi− 1 of these super-nodes in
+breadth-ﬁrst order (i.e., highest level i − 1 block ﬁrst). The shortest root-to-leaf
+path of the produced level i block has hi binary tree nodes. ⊓⊔
+The produced layout is optimal on the level of B1-blocks: it is not possible
+to produce a larger h1.I ti sn o tp o s s i b l et ob eo p t i m a lo na l ll e v e l s[ 1 4 ] ,a n dw e
+resolved this tradeoﬀ by preferring the l owest level. Knowledge of the relative
+costs of cache misses at each level could in theory be used to produce a more
+optimal layout, but we did not want our cache-sensitive algorithms to depend
+on these kinds of additional parameters.
+Theorem 2. The algorithm of Figure 1 rearranges the nodes of a tree into a
+multi-level cache-sensitive memory layout in time O(nk),w h e r en is the number
+of nodes in the tree and k is the number of memory-block levels.
+Proof. Each node in the tree is normally co pied to a new location only once.
+However, the memory-usage optimization in line 18 may “undo” (free) some of
+these copies. The undo only happens when ﬁlling a level l cache block that was
+more than half full, and the layout is then restarted from an empty level l cache
+block. Thus, an undo concerning the s ame nodes cannot happen again on the
+same level l.H o w e v e r ,t h e s en o d e sm a ya l r e a d yh a v et a k e np a r ti na nu n d oo n
+as m a l l e rl e v e ll′ <l .I nt h ew o r s tc a s e ,an o d em a yh a v et a k e np a r ti na nu n d o
+on all k memory-block levels. Each of the n nodes can then be copied at most
+k times.
+Consider then the queues Q at various levels of recursion. Each node enters
+aq u e u ea tl e v e ll =1 (line 13, using c from line 4), and travels up to a level
+l′ ≤ k +1 ,w h e r ei tb e c o m e st h er o o to fal e v e ll′ − 1 subtree and descends to
+level 0 in the recursion. Thus, each node is stored in O(k) queues. ⊓⊔
+Cache-oblivious layout. Though cache-sensitive, the produced layout is
+similar to the “van Emde Boas” layout used as the basis of many cache-oblivious
+algorithms. In fact, our algorithm can produce the van Emde Boas layout:
+simply use the block sizes Bi =( 2 2i
+− 1) · B0 (i =1 ,...,k where k =4 or
+k =5 is enough for trees that ﬁt in main me mory). The only diﬀerence between
+the layout thus produced and the van Emde Boas layout (as described in, e.g.,
+[13]) is that the recursive subdivision is done top-down instead of bottom-up,
+and some leaf-level blocks may not be full. (These diﬀerences are unavoidable
+because the van Emde Boas layout is deﬁned only for complete trees.)
+Aliasing correction. While experimenting with the global relocation al-
+gorithm, we found that multi-level cache-sensitive layouts can suﬀer from a
+problem called aliasing, a kind of repeated conﬂict miss. Many hardware caches
+are d-way set associative ( d ∈{ 2, 4, 8} are common), i.e., there are only d pos-
+sible places in the cache for a block with a given address A.T h ep r o b l e mi s
+that, for instance, the ith cache block in each TLB page is often mapped to the
+same set of d places. Therefore, if the ith cache blocks of several TLB pages are
+accessed, the cache can only hold d of these blocks.
+
+--- PAGE 6 ---
+246 R. Saikkonen, E. Soisalon-Soininen
+As t r a i g h t f o r w a r dm u l t i - l e v e lc a c h e - s e n s i t i v el a y o u t( i n c l u d i n gt h eo n ep r o -
+duced by the above algorithm) ﬁlls a TLB page (of size Bl for some l)w i t ha
+subtree so that the root of the subtree is placed at the beginning of the TLB
+page (i.e., in the ﬁrst Bl− 1-sized cache block). Then, for example, when a par-
+ticular root-to-leaf path i st r a v e r s e di nas e a r c h ,o n l yd root nodes of these
+TLB-sized subtrees can be kep ti nt h e( s e ta s s o c i a t i v e )Bl− 1-block cache. (The
+root of the TLB-sized subtree is not of course the only problematic node, but
+the problem is most pronounced at the root.)
+The problem can be ﬁxed by noting t hat we can freely reorder the cache
+blocks inside a TLB page. The Bl-sized TLB page consists of Bl/Bl− 1 cache
+blocks, and the subtree located in the TLB page can use these cache blocks in
+any order. We simply use a diﬀerent ord ering for separate TLB pages, so the
+root node of the subtree will not always be located in the ﬁrst cache block.
+We implement the reordering by a simple cache-sensitive translation of the
+addresses of each node allocated by the global relocation algorithm, as fol-
+lows.2 Every address A can be partitioned into co mponents according to the
+cache block hierarchy: A = Ak ...A 2A1A0,w h e r ee a c hAi, i ∈{ 1,...,k − 1},
+has log2 Bi/Bi− 1 bits of A,a n d A0 and Ak have the rest. For each level
+i = {1,...,k },w es i m p l ya d dt h eu p p e rp o r t i o nAk ...A i+1 to Ai,m o d u l o
+Bi/Bi− 1 (so that only the Ai part is changed).
+For example, if Bl is the size of the TLB page, the root of the ﬁrst allocated
+TLB page ( Ak ...A l+1 =0 )w i l lb eo nt h eﬁ r s tc a c h eb l o c k( t h et r a n s l a t e d
+portion A′
+l =0 ), but the root of the second TLB page (which is a child of the
+ﬁrst page) will be on the second cache block ( Ak ...A l+1 =1 ,s o A′
+l =1 )o fi t s
+page.
+It would be enough to apply this correction to those memory-block levels
+with set associative caches on the previous level (i.e., only level l in the above
+example, since level l − 1 has the set associative cache). However, we do it on
+all levels, because then our cache-sens itive algorithms only need knowledge of
+the block sizes and not any other parameters of the cache hierarchy. Applying
+the translation on every level increase st h et i m ec o m p l e x i t yo ft h er e l o c a t i o n
+algorithm to O(nk2),b u tt h i si sn o tap r o b l e mi np r a c t i c e ,s i n c ek is very small
+(e.g., k =2 was discussed above).
+4L o c a lr e l o c a t i o n
+When updates (insertions and deletions )a r ep e r f o r m e do nat r e ew h i c hh a sb e e n
+relocated using the global algorithm of the previous section, each update may
+disrupt the cache-sensitive memory layout at the nodes that are modiﬁed in the
+update. In this section, we present modiﬁ cations to the insert and delete algo-
+2 The translation is applied to every address used in lines 2 and 18 of the algorithm of Figure 1.
+The other addresses S, A and E in the algorithm do not need to be translated, because they
+are only used to detect block boundaries.
+
+--- PAGE 7 ---
+Cache-sensitive Memory Layout for Binary Trees 247
+rithms that try to preserve a good memory layout without increasing the time
+complexity of insertion and deletion in a binary search tree that uses rotations
+for balancing. These algorithms can be used either together with the global
+relocation algorithm of the previous section (which could be run periodically)
+or completely independently.
+Our approach preserves the following memory-layout property:
+Invariant 1 For al l non-leaf nodes x,e i t h e rt h ep a r e n to ro n eo ft h ec h i l d r e n
+of x is located on the same B1-sized cache block as x.
+This property reduces the average B1-block path length even in a worst-case
+memory layout. For simplicity, the proof only considers a complete binary tree
+of height h.( T os e et h a tI n v a r i a n t1i m p r o v e st h em e m o r yl a y o u to f ,e . g . ,ar e d -
+black tree, note that the top part of a red-black tree of height h is a complete
+tree of height at least h/2.)
+Theorem 3. Assume that Invariant 1 holds in a complete binary tree of
+height h.T h e nt h ea v e r a g eB1-block path length
+ P1 ≤ 2h/3+1 /3.
+Proof. In the worst-case memory layout, each B1-sized cache block contains
+only nodes prescribed by Invariant 1, i.e., a single leaf or a parent and child.
+By Invariant 1, the root r of the tree (with height h)i so nt h es a m e
+cache block as one of its children. Considering all possible paths down from r
+leads to the following recurrence for the expected value of the B1-block path
+length: P (h)=1 /2 · (1 + P (h − 2)) + 1 /2 · (1 + P (h − 1)) (with P (1) = 1
+and P (0) = 0 ). Solving gives E[P1|worst-case memory layout ]= P (h)=
+2h/3+2 /9 − 2(−1)h/(9 · 2h) ≤ 2h/3+1 /3.I na n ym e m o r yl a y o u t ,t h ea v -
+erage
+ P1 ≤ E[Pi|worst-case memory layout ]. ⊓⊔
+We say that a no de x is broken if Invariant 1 does not hold for x.T oa n a l y z e
+how this can happen, denote N (x)= the set of “neighbors” of node x,i . e . ,t h e
+parent of x and both of its children (if they exist). Furthermore, say that x
+depends on y if y is the only neighbor of x that keeps x non-broken (i.e., the
+only neighbor on the same cache block).
+Our local relocation approach works as follows. We do the standard binary
+search tree structure modiﬁ cation operations (insertion, deletion, rotations) as
+usual, but after each such operation, we collect a list of nodes that can poten-
+tially be broken (Figure 2), and use the algorithm given below to re-establish
+Invariant 1 before executing the next operation.
+The nodes that can break are exactly those whose parent or either child
+changes in the structure modiﬁcation, s ince a node will break if it depended on
+an o d et h a tw a sm o v e da w a yo rd e l e t e d .A ss e e nf r o mF i g u r e2 ,1t o6n o d e s
+can be broken by one structure modiﬁcation. We explain the various cases in
+Figure 2 below.
+In internal trees, actual insertion is performed by adding a new leaf node to
+an empty location in the tree. If the parent of the new node was previously a
+leaf, it may now be broken; thus, the parent is marked as potentially broken in
+Figure 2(c).
+
+--- PAGE 8 ---
+248 R. Saikkonen, E. Soisalon-Soininen
+⇒
+(a) External tree insertion
+⇒
+(b) External tree deletion
+(c) Internal tree
+insertion
+⇒ ⇒
+(d) Internal tree deletion (non-leaf)
+⇒
+(e) Internal tree
+deletion (leaf)
+⇒
+(f) Single rotation
+⇒
+(g) Double rotation
+Fig. 2 Broken nodes in actual insertion, actual deletion and rotations. Potentially broken
+nodes are ﬁlled black; the dotted lines indicate the nodes that the operation works on.
+In external (leaf-oriented) trees, actua li n s e r t i o nr e p l a c e sal e a fn o d eb yan e w
+internal node with two children: the old leaf and a new one (see Figure 2(a)).
+The new internal node is potentially broken (if it was not allocated on the same
+cache block as one of the other nodes), and its parent may become broken, if
+the parent depended on the old leaf node.
+Actual deletion in external trees deletes a leaf and its parent and replaces
+the parent with its other child (Figure 2(b)). The parent of the deleted internal
+node and the other child can become brok en, since they could have depended
+on the deleted internal node.
+Actual deletion in internal trees is slightly more complicated, with two cases.
+In the simple case (Figure 2(e)), a leaf i sd e l e t e d ,a n di t sp a r e n tb e c o m e sb r o k e n ,
+if it depended on the deleted leaf. The more complicated case arises when a non-
+leaf node x needs to be deleted (Figure 2(d )). The standard way of doing the
+deletion is to locate the node y with the next-larger key from the right child
+of x, copy the key and possible associated data ﬁelds to x,a n dt h e nd e l e t ey
+by replacing it with its right child (if any). In this process, the parent of y
+and the right child can become broken (if they depended on y). The node x
+cannot become broken, since it or its n eighbors were not moved in memory.
+(The equivalent implementation that looks for the next-smaller key of x in its
+left child is completely symmetric with regard to broken nodes.)
+When a single or double rotation is performed, the nodes that can break are
+those whose parent or either child changes in the rotation, since a node will
+break if it depended on a node that was moved away by the rotation.
+
+--- PAGE 9 ---
+Cache-sensitive Memory Layout for Binary Trees 249
+fix-broken(B):
+1: while B ̸= ∅ do
+2: Remove any non-broken nodes from B (and exit if B is emptied).
+3: if an o d ei n N (B) has free space in its cache block then
+4: Select such a node x and a broken neighbor b ∈ B.( P r e f e rt h ex with the
+most free space and a b with no broken neighbors.)
+5: Move b to the cache block containing x.
+6: else if an o d e b ∈ B has enough free space in its cache block then
+7: Select the neighbor x ∈ N (b) with the smallest |D(x)|.
+8: Move x and all nodes in D(x) to the cache block containing b.
+9: else
+10: Select a node x ∈ N (B) and its broken neighbor b ∈ B.( P r e f e rab r o k e nx,
+and after that an x with small |D(x)|.I ft h e r ea r em u l t i p l ec h o i c e sf o rb,
+prefer a b with N (b) \ x non-broken.)
+11: Move b, x and all nodes in D(x) to a newly-allocated cache block.
+12: end if
+13: end while
+Fig. 3 The local relocation algorithm. B is a set of potentially broken nodes which the
+algorithm will make non-broken; N (B)=
+⋃
+b∈B N (b).A ni m p l e m e n t a t i o nd e t a i li st h a tt h e
+algorithm needs access to the parent, grandparent and great grandparent of each node in B,
+since the grandparent may have to be moved in lines 8 and 11.
+We can optimize the memory layout somewhat further with a simple heuristic
+(not required for Invariant 1): In insertion, a new node should be allocated in
+the cache block of its parent, if it happens to have enough free space.
+We need an additional deﬁnition for the algorithm of Figure 3: D(x) is the set
+of neighbors of node x that depend on node x (i.e., will be broken if x is moved
+to another cache block). Thus, D(x) ⊂ N (x) and 0 ≤| D(x)|≤| N (x)|≤ 3.A
+crucial property is that nothing depends on a broken node (because no neighbor
+is on the same cache block), and thus broken nodes can be moved freely.
+The algorithm of Figure 3 repeats three steps until the set of broken nodes B
+is empty. First, all neighbors of the broken nodes are examined to ﬁnd a neigh-
+bor x with free space in its cache block. If such a neighbor is found, a broken
+node b ∈ N (x) is ﬁxed by moving it to this cache block. If no such neighbor was
+found, then the cache blocks of the nodes in B are examined; if one of them
+has enough space for a neighbor x and its dependants D(x),t h e ya r em o v e dt o
+this cache block. Otherwise, if nothing was moved in the previous steps, then
+ab r o k e nn o d eb is forcibly ﬁxed by moving it and some neighboring nodes to
+an e w l ya l l o c a t e dc a c h eb l o c k .A tl e a s to n en e i g h b o rx of b needs to be moved
+along with b to make b non-broken; but if x was not broken, some of its other
+neighbors may depend on x staying where it is – these are exactly the nodes in
+D(x),a n dw em o v ea l lo ft h e mt ot h en e wc a c h eb l o c k .( I ti ss a f et om o v et h e
+nodes in D(x) together with x,b e c a u s et h e i ro t h e rn e i g h b o r sa r en o to nt h e
+same cache block.)
+
+--- PAGE 10 ---
+250 R. Saikkonen, E. Soisalon-Soininen
+Theorem 4. Assume that Invariant 1 holds in all nodes in a tree, except for a
+set B of broken nodes. Then giving B to the algorithm of Figure 3 will establish
+Invariant 1 everywhere.
+Theorem 5. The algorithm of Figure 3 moves at most 4|B| = O(|B|) nodes in
+memory. The total time complexity of the algorithm is O(|B|2).
+Proof. Each iteration of the loop in the algorithm of Figure 3 ﬁxes at least
+one broken node. Line 5 does this by moving one node; line 11 moves at most
+4n o d e s( b, x,a n dt h et w oo t h e rn e i g h b o r so fx), and line 8 moves at most
+3n o d e s(x and two neighbors). Thus, at most 4|B| nodes are moved in the at
+most |B| iterations that the algorithm executes.
+Each iteration looks at O(|B|) nodes; thus, the total time complexity is
+O(|B|2).A d d i t i o n a l l y ,l o o k i n gf o rf r e en o d e si naB1 cache block can require
+more time. A naïve implementation looks at every node in the B1-block to
+locate the free nodes, thus increasing the time complexity to O(|B|2 · B1/B0).
+This may actually be preferable with the small B1 of current processors. (The
+implementation we describe in Section 5 did this, with B1/B0 =4 .)
+With larger B1/B0,t h eb o u n do ft h et h e o r e mi sr e a c h e ds i m p l yb yk e e p i n g
+track of the number of free nodes in a ni n t e g e rs t o r e ds o m e w h e r ei nt h eB1-sized
+block. To ﬁnd a free node in constant time, a doubly-linked list of free nodes
+can be stored in the (otherwise unused) f ree nodes themselves, and a pointer to
+the head of this list is stored in a ﬁxed location of the B1-block. ⊓⊔
+Remember that |B|≤ 6 always when we execute the algorithm.
+As p a c e - t i m et r a d e o ﬀi si n v o l v e di nt h ea l g o r i t h mo fF i g u r e3 :w es o m e t i m e s
+allocate a new cache block to get two nodes on the same cache block (thus
+improving cache locality), even though two existing cache blocks have space for
+the nodes. Since our relocation algorithm always prefers an unused location in
+ap r e v i o u s l ya l l o c a t e dc a c h eb l o c k ,i ti st ob eh o p e dt h a tt h ec a c h eb l o c k sd o
+not become very empty on average. (Moving unrelated nodes on the existing
+cache blocks “out of the way” is not practical: to move a node x in memory, we
+need access to the parent of x to update the link that points to the node, and
+our small-node trees do not store parent links.)
+We get a lower limit for the cache blo ck ﬁll ratio from the prop erty that
+our algorithm preserves: each non-leaf node has at least the parent or one child
+accompanying it on the same cache block. (Empty cache blocks should of course
+be reused by new allocations.)
+5E x p e r i m e n t s
+We implemented the algorithms of Sections 3 and 4 on internal AVL and red-
+black trees, and compared them to the cache-sensitive B +-tree (the “full CSB +-
+tree” of [1]) and to a standard B +-tree with cache block-sized nodes (called a
+
+--- PAGE 11 ---
+Cache-sensitive Memory Layout for Binary Trees 251
+105 106 107
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+Keys in tree ( n)
+Tra d i t i o n a l re d -b l a ck ( = 1 )
+Red-black local
+Red-black cache-obl. (global)
+Red-black global (no ac)
+Red-black global with ac
+cB+ global with ac
+(a) Binary trees
+105 106 107
+0.8
+0.85
+0.9
+0.95
+1
+1.05
+1.1
+1.15
+Keys in tree ( n)
+Plain cB + (=1)
+Red-black global with ac
+cB+ global (no ac)
+cB+ global with ac
+Plain CSB +
+CSB+ global (no ac)
+CSB+ global with ac
+(b) B-tree variants
+Fig. 4 Eﬀect of global and local relocation and aliasing correction (=“ac”). The ﬁgures give
+the search time relative to (a) the traditional red-black tree, (b) the cB +-tree. The trees
+marked “global” have been relocated using the global algorithm. “Red-black local” uses local
+relocation; the others use neither global nor local relocation. A VL trees (not shown) performed
+almost identically to red-black trees.
+“cB+-tree” below for brevity). 3 As noted in Section 2, we used the following
+cache parameters: k =2 , B0 =1 6 , B1 =6 4 , B2 =4 0 9 6, B3 = ∞.T h e
+tree implementations did not have parent links: rebalancing was done using an
+auxiliary stack. 4
+Figure 4 examines the time taken to search for 105 uniformly distributed
+random keys in a tree initialized by n insertions of random keys. (Before the
+105 searches whose time was measured, the cache was “warmed up” with 104
+random searches.) The search performance of red-black and A VL trees relocated
+using the global algorithm was close to the cB +-tree. The local algorithm was
+not quite as good, but still a large (about 30%) improvement over a traditional
+non-cache-optimized binary tree. The cache-oblivious layout produced by the
+3 We executed our exp eri m ents on an A M D Athl on X P pro ces s or runni ng at 2167 M H z,
+with 64 Kb L1 data cache (2-way associative) and 512 Kb L2 cache (8-way associative). Our
+implementation was written in C, compiled using the GNU C compiler version 4.1.1, and ran
+under the Linux kernel version 2.6.18. Each experiment was repeated 15 times; we report
+averages.
+4 The binary tree node size B0 =1 6 bytes was reached by using 4-byte integer keys, 4-byte
+data ﬁelds and 4-byte left and right children. The balance and color information for the A VL
+and red-black tree was encoded in the otherwise unused low-order bits of the child pointers.
+The nodes of the B-trees were structured as simple sorted arrays of keys and pointers. The
+branching factor of a non-leaf node was 7 in the cB +-tree and 14 in the CSB +-tree.
+
+--- PAGE 12 ---
+252 R. Saikkonen, E. Soisalon-Soininen
+1500
+2000
+2500
+3000
+3500
+4000
+106 107
+Keys in tree ( n)
+AV L l o c a l
+Red-black local
+Tra d i t i o n a l re d -b l a ck
+Traditional AVL
+(a) Nanoseconds per insertion
+1500
+2000
+2500
+3000
+106 107
+Keys in tree ( n)
+Tra d i t i o n a l re d -b l a ck
+Traditional AVL
+Red-black local
+AV L l o c a l
+(b) Nanoseconds per deletion
+Fig. 5 Eﬀect of the local relocation algorithm on the time taken by (a) insertions and (b) dele-
+tions.
+global algorithm was somewhat worse than a cache-sensitive layout, but about
+40–45% better than a non-cache-optimized tree. Aliasing correction had about
+10–15% impact on binary trees and cB +-trees, and about 5% on CSB +-trees
+(which don’t always access the ﬁrst B1-sized node of a TLB page). Especially in
+the B-trees, global relocat ion was not very useful without aliasing correction. In
+summary, the multi-level cache-sensitive layout improved binary search trees by
+50–55%, cB +-trees by 10–20% and CSB +-trees by 3–5% in these experiments.
+Figure 5 examines the running time of updates when using the local algo-
+rithm. Here the tree was initialized with n random insertions, and then 104 +105
+uniformly distributed random insertions or deletions were performed. The times
+given are averaged from the 105 updates (the 104 were used to “warm up” the
+cache). The local algorithm increased the insertion time by about 20–70% (more
+with smaller n). The deletion time was aﬀected less: random deletions in bi-
+nary search trees produce less rotations than random insertions, and the better
+memory layout produced by the local al gorithm decreases the time needed to
+search for the key to be inserted or deleted.
+In addition, we combined the global and local algorithms and investigated
+how quickly updates degrade the cache-sensitive memory layout created by the
+global algorithm. In Figure 6, we initialized the tree using n =1 0 6 random
+insertions, executed the global algorithm once, and performed a number of
+random updates (half insertions and half deletions). Finally, we measured the
+average search time from 105 random searches (after a warmup period of 104
+random searches), and the average B1-block path length. The results indicate
+that the cache-sensitivity of the tree decreases signiﬁcantly only after about
+n updates have been performed. The loc al algorithm keeps a clearly better
+memory layout, though it does not quite match the eﬃciency of the global
+algorithm.
+Our experiments, as well as those in [6, 9], support the intuition that multi-
+level cache-sensitive structures are more eﬃcient than cache-oblivious ones. It
+has been shown in [14] that a cache-oblivious layout is never more than 44%
+
+--- PAGE 13 ---
+Cache-sensitive Memory Layout for Binary Trees 253
+600
+800
+1000
+1200
+1400
+103 104 105 106 107 108
+Updates after global relocation
+Traditional AVL
+Tra d i t i o n a l re d -b l a ck
+AV L l o c a l
+Red-black local
+(a) Search time (nanoseconds)
+8
+10
+12
+14
+103 104 105 106 107 108
+Updates after global relocation
+Traditional AVL
+Tra d i t i o n a l re d -b l a ck
+AV L l o c a l
+Red-black local
+(b) A verage P1 (B1-sized blocks)
+Fig. 6 Degradation of locality when random insertions and deletions are performed after
+global relocation of a tree with n =1 06 initial keys: (a) average search time from 105 searches,
+(b) B1-block path length. F or 0 to 104 updates after relocation, there was practically no change
+in the values; here, the x axis begins from 103 for clarity .
+worse in the number of block transfers than an optimal cache-sensitive layout,
+and that the two converge when the number of levels of caches increases. How-
+ever, the cache-sensitive model is still important, because the number of levels
+of caches with diﬀerent block sizes is rela tively small in curre nt computers (e.g.,
+only two in the one we used for our experiments).
+6C o n c l u s i o n s
+We have examined binary search trees in a k-level cache memory hierarchy with
+block sizes B1,...,B k.W ep r e s e n t e da na l g o r i t h mt h a tr e l o c a t e st r e en o d e s
+into a multi-level cache-sensitive memory layout in time O(nk),w h e r en is the
+number of nodes in the tree. Moreover, our one-level local algorithm preserves
+an improved memory layout for binary s earch trees by executing a constant-
+time operation after each structure modiﬁcation (i.e., actual insertion, actual
+deletion or individual rotation).
+Although cache-sensitive binary trees did not quite match the speed of the
+B+-tree variants in our experiments, in pr actice there may be other reasons than
+average-case eﬃciency to use binary search trees. For instance, the worst-case
+(as opposed to amortized or average) time complexity of updates in red-black
+trees is smaller than in B-trees: O(log2 n) vs. O(d logd n) time for a full sequence
+of page splits or merges in a d-way B-tree, d ≥ 5.R e d - b l a c kt r e er o t a t i o n sa r e
+constant-time operations, unlike B-tree node splits or merges (which take O(B1)
+time in B-trees with B1-sized nodes, or O(B2
+1 ) in the full CSB +-tree). This may
+improve concurrency: nodes are locked for a shorter duration. In addition, it has
+been argued in [15] that, in main-memory databases, binary trees are optimal
+
+--- PAGE 14 ---
+254 R. Saikkonen, E. Soisalon-Soininen
+for a form of shadow paging that allows eﬃcient crash recovery and transaction
+rollback, as well as the group commit operation [16].
+The simple invariant of our local algorithm could be extended, for instance, to
+handle multi-level caches in some way. However, we wanted to keep the property
+that individual structure modiﬁcations use only O(1) time (as opposed to O(B1)
+or O(B2
+1 ) for the cache-sensitive B-trees). Then we cannot, e.g., move a cache-
+block-sized area of nodes to establish the invariant after a change in the tree
+structure. A multi-level approach doe sn o ts e e mf e a s i b l ei ns u c ham o d e l .
+Other multi-level cache-sensitive sea rch tree algorithms are presumably also
+aﬀected by the aliasing phenomenon, and it would be interesting to see the eﬀect
+of a similar aliasing correction on, for example, the two-level cache-sensitive B-
+trees of [7].
+References
+1. Rao, J., Ross, K.A.: Making B+-trees cache conscious in main memory. In: 2000 ACM
+SIGMOD International Conference on Management of Data, ACM Press (2000) 475–486
+2. Hankins, R.A., Patel, J.M.: Eﬀect of node size on the performance of cache-conscious
+B+-trees. In: 2003 ACM SIGMETRICS International Conference on Measurement and
+Modeling of Computer Systems, ACM Press (2003) 283–294
+3. Rao, J., Ross, K.A.: Cache conscious indexing for decision-support in main memory. In:
+25th International Conference on Very Large Data Bases (VLDB 1999), Morgan Kauf-
+mann (1999) 78–89
+4. Chen, S., Gibbons, P.B., Mowry, T.C.: Improving index performance through prefetching.
+In: 2001 ACM SIGMOD International Conference on Management of Data, ACM Press
+(2001) 235–246
+5. Bohannon, P., McIlroy, P., Rastogi, R.: Main-memory index structures with ﬁxed-size
+partial keys. In: 2001 ACM SIGMOD International Conference on Management of Data,
+ACM Press (2001) 163–174
+6. Rahman, N., Cole, R., Raman, R.: Optimised predecessor data structures for internal
+memory . In: 5th W orkshop on Algorithm Engineering (W AE 2001). Volume 2141 of
+Lecture Notes in Computer Science., Springer-Verlag (2001) 67–78
+7. Chen, S., Gibbons, P.B., Mowry, T.C., Valentin, G.: Fractal prefetching B+-trees: Opti-
+mizing both cache and disk performance. In: 2002 ACM SIGMOD International Confer-
+ence on Management of Data, ACM Press (2002) 157–168
+8. Bender, M.A., Demaine, E.D., Farach-Colton, M.: Cache-oblivious B-trees. SIAM Journal
+on Computing 35(2) (2005) 341–358
+9. Brodal, G.S., Fagerberg, R., Jacob, R.: Cache oblivious search trees via binary trees of
+small height. In: 13th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA
+2002), Society for Industrial and Applied Mathematics (2002) 39–48
+10. Bender, M.A., Duan, Z., Iacono, J., Wu, J.: A locality-preserving cache-oblivious dynamic
+dictionary. In: 13th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA
+2002), Society for Industrial and Applied Mathematics (2002) 29–38
+11. Jiang, W., Ding, C., Cheng, R.: Memory access analysis and optimization approaches
+on splay trees. In: 7th Workshop on Languages, Compilers and Run-time Support for
+Scalable Systems, ACM Press (2004) 1–6
+12. Oksanen, K., Malmi, L.: Memory reference locality and periodic relocation in main
+memory search trees. In: 5th Hellenic Conference of Informatics, Greek Computer Society
+(1995)
+
+--- PAGE 15 ---
+Cache-sensitive Memory Layout for Binary Trees 255
+13. Bender, M.A., Demaine, E.D., Farach-Colton, M.: Eﬃcient tree layout in a multilevel
+memory hierarchy . In: 10th Annual European Symposium on Algorithms (ESA 2002).
+Volume 2461 of Lecture Notes in Computer Science., Springer- Verlag (2002) 165–173
+14. Bender, M.A., Brodal, G.S., Fagerberg, R., Ge, D., He, S., Hu, H., Iacono, J., López-
+Ortiz, A.: The cost of cache-oblivious searching. In: 44th Annual IEEE Symposium on
+Foundati ons of Computer Sci ence (FOCS 2003), IEEE Computer So ci ety (2003) 271–282
+15. Soisalon-Soininen, E., Widmayer, P.: Concurrency and recovery in full-text indexing. In:
+String Processing and Information Retrieval Symposium (SPIRE 1999), IEEE Computer
+Society (1999) 192–198
+16. Gray, J., Reuter, A.: Transaction Processing: Concepts and Techniques. Morgan Kauf-
+mann (1993)

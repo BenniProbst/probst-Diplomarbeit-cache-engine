@@ -1,0 +1,1287 @@
+================================================================================
+BEGRIFFSGLOSSAR v3 — FINAL (mit Paper-Belegen P01-P33)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.C (abgeschlossen)
+Stand: 2026-05-04 · ersetzt Begriffsglossar_Domaenenmodell_Vorstufe.txt + v2_FINAL.txt
+================================================================================
+
+KERNAUFTRAG
+   "Konzeptionelle Identitaeten von Suchalgorithmen identifizieren und Begriffe
+    mit derselben funktionalen konzeptionellen Bedeutung fuer Bestandteile von
+    Such-Algorithmen, Messverfahren und Cache/CPU-Metriken sammeln und zwischen
+    den Forschungsarbeiten uebersetzen."
+
+UNTERSCHIED ZU v2
+   - JEDER Begriff hat jetzt mindestens eine konkrete Paper-Quelle mit P-ID
+   - Wo immer moeglich: Zitat-Schnipsel + Seitenangabe aus Originalpaper
+   - Cross-Paper-Identitaetsmatrix erweitert auf alle 33 P01-P33
+   - Geschaerfte Domaenen-Trennung als Vorbereitung fuer Phase 3.D
+   - Basis: 33 Paper-Notizen `_review/papers/P01-P33-*.md` + Cross_Paper_Konzeptmatrix.txt
+
+DAS GLOSSAR HAT 4 DOMAENEN
+   DOMAENE 1: Such-Algorithmen-Bausteine
+   DOMAENE 2: Cache-Engine-Bausteine
+   DOMAENE 3: Mess-/Metrik-Werkzeuge
+   DOMAENE 4: Hardware/ISA (Querschnitt)
+   PLUS:      Cross-Paper-Identitaetsmatrix + Domaenen-Trennung fuer Phase 3.D
+
+NOTATIONS-KONVENTION
+   [KANON]    Kanonischer PRT-ART-Begriff (was wir benutzen)
+       SYN  ← "Synonym X" [Pxx Quelle]      ← Cross-Paper Aequivalenz mit P-ID
+       BED  Funktionale Bedeutung (was tut der Begriff?)
+       BEL  Beleg (Zitat-Schnipsel mit Paper-ID + Seite/Abschnitt)
+       ABG  Abgrenzung gegen aehnliche, aber NICHT identische Begriffe
+       BEZ  PRT-ART-Bezug (warum ist das fuer uns relevant?)
+
+PAPER-LEGENDE (P-IDs ↔ vollstaendige Quelle, siehe Quellen_Gesamtkatalog.txt)
+   P01 ART (Leis 2013)               P18 Saikkonen2008 (Multi-Level Reloc)
+   P02 HOT (Binna 2018)              P19 Saikkonen2016 (Layout-Invariante)
+   P03 Masstree (Mao 2012)           P20 B-Trees Are Back (Mueller 2025)
+   P04 CoCo-trie (Boffa 2024)        P21 Chen PB-Trees (2001)
+   P05 START (Fent 2020)             P22 Chen Fractal Prefetching (2002)
+   P06 B²-tree (Schmeisser 2022)     P23 Khan 2010 (Adaptive Prefetch)
+   P07 Wormhole (Wu 2019)            P24 NaderanTahan 2016 (Useless Prefetch)
+   P08 ARTSync (Leis 2016)           P25 Mahling 2025 (Fill Buffer)
+   P09 Jacobson1989 (LOUDS)          P26 Zhang FGCS 2024 (Read Counter)
+   P10 SuRF (Zhang 2018)             P27 Zhang ASPLOS 2025 (Hierarchical)
+   P11 CSS-tree (Rao/Ross 1999)      P28 Kuehn DAMON 2023 (Histogram/HotPath)
+   P12 CSB+-tree (Rao/Ross 2000)     P29 RCU (McKenney 2001)
+   P13 Hankins2003 (B-Tree Width)    P30 Hazard Pointers (Michael 2004)
+   P14 Samuel2005 (Config Table)     P31 Ungethuem 2017 (TUD Hardware)
+   P15 Graefe2001 (Survey)           P32 To Stride or Not (TUD 2025)
+   P16 Bender Tree Layout (2002)     P33 VAMPIR (TUD/SPP2377 2023)
+   P17 Bender Cache-Oblivious (2005)
+
+================================================================================
+DOMAENE 1 — SUCH-ALGORITHMEN-BAUSTEINE
+================================================================================
+
+================================================================================
+1.1  STRUKTURELLE PRIMITIVE — Knotenfamilie
+================================================================================
+
+[KANON]  KNOTEN (Node)
+  SYN ← "Node"                         P01 ART, P02 HOT, P05 START, P06 B²-tree
+  SYN ← "Trie Node"                    P09 Jacobson1989 (succinct)
+  SYN ← "Internal Node / Border Node"  P03 Masstree (B+-Knoten / Layer-Grenze)
+  SYN ← "Decision Node"                P06 B²-tree (byte-weise Verzweigung)
+  SYN ← "Span Node"                    P06 B²-tree (gemeinsame-Praefix-Knoten)
+  SYN ← "Macro-Node"                   P04 CoCo-trie (kollabierter Subtrie)
+  SYN ← "Compound Node"                P02 HOT (k=32, mit BiNode-Sub-Repr.)
+  SYN ← "Vertex"                       P09 Jacobson1989 (Graphensicht)
+  BED Logische Verzweigungseinheit der Suchstruktur. Konsumiert Bit/Byte/Slice
+      des Schluessels und gibt Folgepointer/Folgeposition zurueck.
+  BEL P01 ART: "Inner nodes of size 4, 16, 48, 256 (...) all four data structures
+      have the same maximum number of children" (P01:S.5/Sec.III.B)
+      P02 HOT: "compound node of height h is a node that subsumes a subtree
+      of HOT with maximum branching factor of k=32" (P02:S.4/Sec.3.1)
+  ABG NICHT "Page" (eine Page kann mehrere Knoten enthalten)
+      NICHT "Cache Line" (Hardware-Granularitaet)
+      NICHT "Block" im Bender-Sinn (P16/P17 — Cache-Ebene-Block)
+
+[KANON]  SEITE / PAGE
+  SYN ← "Page"                       P03 Masstree (B+-Page), P06 B²-tree (Page)
+  SYN ← "Block"                      P16 Bender, P18 Saikkonen (Cache-Block)
+  SYN ← "Suchseite"                  PRT-ART Termin 1+
+  SYN ← "Page-Cluster / Node Group"  P12 CSB+-tree (kontiguoese Sibling-Anordn.)
+  SYN ← "Disk Block"                 klassisches DBMS
+  SYN ← "Cache-Line-grosser Knoten"  P11 CSS-tree (1 Knoten = 1 Cache Line)
+  BED Containereinheit, in der ein oder mehrere Knoten gespeichert und aus dem
+      Cache/Speicher als Einheit geladen werden.
+  BEL P11 CSS: "node size = cache line size" (P11:S.5/Sec.4)
+      P12 CSB+: "siblings are stored contiguously, parent stores only one
+      pointer to the first child" (P12:S.3/Sec.3.1)
+      P13 Hankins: "node sizes (...) up to 16 cache lines are best for
+      lookup performance" (P13:S.5/Sec.4) — widerlegt P11/P12!
+  ABG NICHT "Cache Line" (kleinere Granularitaet, Hardware, 64 B);
+      Page = Software-Konzept, das mehrere Cache Lines umfassen kann.
+  BEZ PRT-ART nutzt Page als Container fuer 1..N Knoten + Header-Telemetrie.
+
+[KANON]  SEITENTYP / PAGE TYPE
+  SYN ← "Page Type"                  PRT-ART Termin 1+
+  SYN ← "Node Family"                P01 ART (Node4/16/48/256)
+  SYN ← "Node Layout"                P02 HOT (9 Layouts), P20 B-Trees Are Back
+  SYN ← "Encoding"                   P04 CoCo-trie (Pool unterschiedl. Encodings)
+  SYN ← "Page Format"                P06 B²-tree
+  SYN ← "Multibyte Node"             P05 START
+  SYN ← "Adaptive Layout"            P20 B-Trees Are Back (Runtime-Wahl)
+  SYN ← "Macro-Node Encoding"        P04 CoCo-trie
+  BED Konkrete Auspraegung einer Seite mit fester Layout-Konvention.
+  BEL P01 ART: "the size of an inner node is adaptive (...) we use four node
+      types with sizes 4, 16, 48, 256" (P01:S.4/Sec.III.A)
+      P04 CoCo-trie: "from the universe of all possible macro-nodes (...) the
+      one [encoding] which leads to the smallest occupied space" (P04:S.4/Sec.3)
+      P20 Mueller: "different layout strategies for different node types and
+      load patterns (...) adaptive choice at runtime" (P20:S.7/Sec.5)
+  PRT-ART FAMILIE (T2 eingefroren):
+      • Dense-Byte-Page          ← analog ART Node256 (P01) / LOUDS-Dense (P10)
+      • Extended Dense Page      ← analog START multilevel Nodes (P05)
+      • Sparse Patricia Page     ← analog HOT (P02) / LOUDS-Sparse (P10)
+      • Redirect-Page            ← analog CoCo-trie macro-nodes (P04)
+      • PRT-Custom-Cache-Page    ← Eigener Beitrag (P06 B²-tree + P11/P12)
+  BEZ PRT-ART Cache-Engine entscheidet zur Laufzeit den Page-Type je Zone —
+      DAS ist eine zentrale Forschungsluecke (siehe Cross_Paper_Konzeptmatrix).
+
+[KANON]  PFAD / SUCHPFAD
+  SYN ← "Search Path"                allgemein
+  SYN ← "Root-to-Leaf Path"          P16 Bender (Probability-driven Layout)
+  SYN ← "Traversal"                  allgemein
+  SYN ← "Lookup Path"                P01 ART, P04 CoCo-trie
+  SYN ← "Hot Path"                   P28 Kuehn DAMON 2023, P26 Zhang FGCS 2024
+  SYN ← "Frequent Access Path"       P26 Zhang FGCS 2024
+  BED Sequenz von Knotenbesuchen vom Root bis zum Treffer/Miss.
+      "Hot Path" = Pfad mit hoher Zugriffsfrequenz (Optimierungsziel).
+  BEL P28 Kuehn: "we maintain a histogram per node that tracks the frequency
+      of taken branches (...) hot paths can be detected at runtime"
+      (P28:Sec.3 / abstract)
+      P26 Zhang FGCS: "blocks (...) are tagged with read counters (...) blocks
+      with high read counters form frequent access paths" (P26:Sec.IV)
+      P16 Bender: "skewed access distributions (...) layout that minimizes
+      expected search cost" (P16:Sec.1)
+
+[KANON]  PRAEFIXKOMPRESSION
+  SYN ← "Path Compression"           P01 ART (Sec.III.B)
+  SYN ← "Lazy Expansion"             P01 ART (Sec.III.B)
+  SYN ← "Patricia Bits"              P02 HOT (discriminative bits)
+  SYN ← "Discriminative Bits"        P02 HOT (Sec.3)
+  SYN ← "Span"                       P02 HOT, P06 B²-tree (Bit/Byte-Span)
+  SYN ← "Prefix Truncation"          P20 B-Trees Are Back (Sec.4)
+  SYN ← "Subtrie Collapse"           P04 CoCo-trie (Sec.3)
+  SYN ← "Compressed Path"            P09 Jacobson1989 (LOUDS allgemein)
+  BED Eindeutige Schluesselsegmente werden NICHT als separate Knoten gespeichert,
+      sondern in einem Knoten/Eintrag kondensiert.
+  BEL P01 ART: "Path compression: removes all inner nodes that have only a
+      single child. Lazy expansion: nodes are only created when they are
+      required to distinguish at least two leaf nodes" (P01:S.5/Sec.III.B)
+      P02 HOT: "the discriminative bits are those bit positions in which keys
+      assigned to the same compound node differ" (P02:S.4/Sec.3.1)
+      P04 CoCo-trie: "collapse a subtrie of arbitrary depth into one
+      macro-node" (P04:S.3/Sec.2)
+  ABG REDIRECT (siehe naechster Eintrag) ist die PRT-ART-spezifische
+      physische Umsetzung dieser logischen Idee.
+
+[KANON]  REDIRECT
+  SYN ← "Macro-Node"                 P04 CoCo-trie (Sec.3)
+  SYN ← "Anchor"                     P07 Wormhole (Anchor Keys)
+  SYN ← "Shortcut Node"              P07 Wormhole
+  SYN ← "Rewiring / Rewired Node"    P05 START (Sec.5)
+  SYN ← "Jump Pointer"               P26 Zhang FGCS 2024
+  SYN ← "Multi-byte branching"       P05 START (Sec.4)
+  BED Knoten, der einen ganzen eindeutigen Restpfad in einem einzigen Sprung
+      ueberspringt — physische Umsetzung von Praefixkompression in PRT-ART.
+      Kann selbst terminal sein (Value-Referenz tragen).
+  BEL P05 START: "rewired nodes (...) collapse a chain of single-child nodes
+      into a multi-byte transition" (P05:Sec.5)
+      P07 Wormhole: "Anchor keys identify boundaries between MetaTrie
+      segments (...) hash lookup jumps directly to the relevant trie segment"
+      (P07:Sec.3)
+      P04 CoCo-trie: "macro-node represents an entire collapsed subtrie"
+      (P04:S.3/Sec.2)
+  BEZ PRT-ART Redirect-Page ist die explizite physische Umsetzung — neu
+      gegenueber CoCo-trie/START: PRT-ART macht die Wahl ueber Cache-Engine.
+
+[KANON]  FANOUT
+  SYN ← "Fanout"                     P01 ART, P02 HOT, allgemein
+  SYN ← "Branching Factor"           P04 CoCo-trie, P02 HOT (k=32)
+  SYN ← "Children Count"             P09 Jacobson1989 (degree)
+  SYN ← "Degree"                     P09 Jacobson1989 (LOUDS unary degree)
+  SYN ← "Span"                       P02 HOT (kann auch fanout-aequivalent sein)
+  BED Anzahl der Kinder eines Knotens.
+  BEL P02 HOT: "compound node with maximum branching factor of k=32"
+      (P02:S.4/Sec.3.1)
+      P09 Jacobson: "BFS-traversal yields unary degree sequence: degree(v_i)
+      ones followed by one zero" (P09:Sec.4)
+
+[KANON]  HOEHE / TIEFE
+  SYN ← "Tree Height"                P02 HOT (height bound: log_k n)
+  SYN ← "Depth"                      P09 Jacobson1989, allgemein
+  SYN ← "Tree Levels / BFS-Levels"   P09 Jacobson1989 (LOUDS Encoding-Ebenen)
+  SYN ← "Layers"                     P03 Masstree (Trie-Layer, 8-Byte-Slices)
+  BED Maximale Pfadlaenge Root → Blatt; bestimmt Worst-Case-Lookup-Kosten.
+  BEL P02 HOT: "expected height of HOT is O(log_k n) where k=32"
+      (P02:S.4/Sec.3.2)
+      P03 Masstree: "Trie of B+-Trees, each layer indexes 8-byte slice"
+      (P03:Sec.3.1)
+
+================================================================================
+1.2  PAYLOAD / WERTE-VERWALTUNG
+================================================================================
+
+[KANON]  VALUEHANDLE
+  SYN ← "ValueHandle"                PRT-ART Termin 2
+  SYN ← "Tuple Identifier (TID)"     klassisch DBMS, P01 ART
+  SYN ← "Record ID (RID)"            DBMS allgemein
+  SYN ← "Pointer to Payload"         allgemein
+  SYN ← "Leaf Pointer"               B+-Tree, P21 Chen PB
+  SYN ← "Leaf Value"                 P02 HOT, P05 START
+  BED Referenz auf die mit einem Schluessel assoziierten Nutzdaten.
+  BEL P01 ART: "leaves store TIDs (...) values can be inlined when smaller
+      than a pointer" (P01:S.6/Sec.III.D)
+      P21 Chen: "leaf-pointer arrays consolidate child pointers (...) reduce
+      cache misses on B+-tree leaves" (P21:Sec.4)
+
+[KANON]  INLINE VALUE
+  SYN ← "Inline Value"               PRT-ART Termin 2 (ValueHandle::Inline)
+  SYN ← "Embedded Value"             P01 ART (single-value leaves)
+  SYN ← "Hot Value"                  Hot/Cold-Split-Lit. (allgemein)
+  BED Kleiner Wert direkt im terminalen Knoten gespeichert, spart Indirektion.
+  BEL P01 ART: "single-value leaves store the value directly inside the leaf
+      node, avoiding an extra pointer dereference" (P01:S.6/Sec.III.D)
+
+[KANON]  EXTERNAL VALUE
+  SYN ← "External Value"             PRT-ART Termin 2 (ValueHandle::External)
+  SYN ← "Cold Value"                 Hot/Cold-Split-Lit.
+  SYN ← "Out-of-band Payload"        allgemein
+  BED Wert ausserhalb der Suchstruktur; terminaler Knoten haelt nur Pointer.
+
+[KANON]  HOT/COLD-SPLIT
+  SYN ← "Hot/Cold-Split"             PRT-ART Termin 2
+  SYN ← "Payload Separation"         allgemein DBMS
+  SYN ← "Heavy/Light Indexing"       allgemein
+  BED Trennung zwischen heisser Navigationsstruktur und kalter Payload-Region.
+
+[KANON]  CHAINREF (vertagt — Termin 2 Designentscheidung)
+  SYN ← "ChainRef"                   PRT-ART Termin 2 (vertagt)
+  BED Referenz auf eine Wertekette (mehrere Werte unter einem Schluessel).
+  ABG NICHT P04 Macro-Node (das ist Subtrie-Kollabierung, NICHT Value-Verkettung).
+
+================================================================================
+1.3  SUCH-OPERATIONEN
+================================================================================
+
+[KANON]  EXACT LOOKUP
+  SYN ← "Exact Lookup"               PRT-ART
+  SYN ← "Point Query"                P01 ART, B+-Tree, allgemein
+  SYN ← "Equality Search"            allgemein
+  SYN ← "Get"                        P03 Masstree (KV-API)
+  SYN ← "ExactKeySearch"             P10 SuRF
+  SYN ← "Find"                       allgemein
+  BED Schluessel exakt finden; Treffer oder Miss.
+  BEL P10 SuRF: "ExactKeySearch (...) returns true iff key exists" (P10:Sec.3.4)
+
+[KANON]  PREFIX LOOKUP
+  SYN ← "Prefix Lookup"              PRT-ART
+  SYN ← "Prefix Match"               allgemein
+  SYN ← "Prefix Hit"                 PRT-ART Termin 3
+  SYN ← "Range Lower Bound"          P10 SuRF (LowerBound)
+  SYN ← "Iterator-Init"              P10 SuRF
+  BED Findet alle (oder das erste) Element mit gegebenem Praefix.
+  BEL P10 SuRF: "LowerBound(k) (...) positions the iterator at the smallest
+      key >= k (...) supports both open and closed ranges" (P10:Sec.3.4)
+
+[KANON]  PREFIX ENUMERATION / RANGE SCAN
+  SYN ← "Prefix Enumeration"         PRT-ART
+  SYN ← "Range Scan"                 B+-Tree, P05 START, allgemein
+  SYN ← "Range Query"                P10 SuRF, P01 ART
+  SYN ← "Iterator"                   P03 Masstree, P10 SuRF
+  SYN ← "Getrange"                   P03 Masstree
+  SYN ← "MoveToNext"                 P10 SuRF
+  SYN ← "Range Counts"               P10 SuRF
+  BED Aufzaehlung aller Eintraege in einem Praefix-/Range-Bereich.
+  BEL P10 SuRF: "MoveToNext (...) advances iterator (...) Range Counts (...)
+      returns approximate count of keys in [low, high]" (P10:Sec.3.4)
+
+[KANON]  RANGE-FILTER (NEU mit SuRF integriert)
+  SYN ← "Range Filter"               P10 SuRF (Sec.3-4)
+  SYN ← "Approximate Membership Test fuer Ranges"  P10 SuRF
+  SYN ← "Open-Range Query"           P10 SuRF
+  SYN ← "Closed-Range Query"         P10 SuRF
+  BED Wahrscheinlichkeitsbasierter Test, ob ein Range-Query Ergebnisse hat —
+      mit kontrollierter False-Positive-Rate.
+  BEL P10 SuRF: "the first general-purpose data structure that supports
+      approximate range queries with bounded false-positive rate"
+      (P10:Abstract)
+  ABG NICHT "Range Query" (deterministisch); Range-Filter = approximativ
+      mit moeglichem False-Positive (NIE False-Negative bei vorhandenen Keys).
+  BEZ PRT-ART optional in spaeterer Version — kein Pflichtfeature.
+
+[KANON]  BULK BUILD
+  SYN ← "Bulk Build"                 PRT-ART Termin 3
+  SYN ← "Bulk Load"                  B+-Tree, P01 ART
+  SYN ← "Construction"               allgemein
+  SYN ← "Build Phase"                P04 CoCo-trie, P05 START
+  BED Initialer Aufbau aus einer Schluesselmenge.
+
+[KANON]  CRUD-OPERATIONEN
+  SYN ← "CRUD"                       PRT-ART, allgemein
+  SYN ← "Insert/Update/Delete"       allgemein
+  SYN ← "Mutation"                   PRT-ART Termin 6
+  SYN ← "Reorganisation"             PRT-ART Termin 6
+  BED Sammelbegriff fuer veraendernde Operationen.
+
+================================================================================
+1.4  ORDNUNGS-/SORTIER-MODUS
+================================================================================
+
+[KANON]  UNSORTED MODE
+  SYN ← "Unsorted"                   PRT-ART Termin 1
+  SYN ← "No Order"                   PRT-ART Termin 2 Default
+  SYN ← "Hash-Order"                 P07 Wormhole (hash-Pfad)
+  BED Keine Enumerationsordnung garantiert; nur Punkt-Lookup wichtig.
+  BEL P07 Wormhole: "MetaTrieHT provides hash-style point lookup with O(1)
+      expected (...) no global ordering preserved at hash level" (P07:Sec.3)
+
+[KANON]  LOCAL ORDERING
+  SYN ← "Local Sorting"              PRT-ART Termin 1
+  SYN ← "Page-local Order"           PRT-ART Termin 2
+  SYN ← "Sorted within Page"         P12 CSB+-tree (Sec.3.1)
+  SYN ← "Sorted Slice"               P03 Masstree (8-Byte-Slice-Sortierung)
+  SYN ← "Permutation Field"          P03 Masstree (Sec.4)
+  BED Einzelne Seiten/Knoten sind sortiert, aber keine globale Reihenfolge.
+  BEL P03 Masstree: "permutation field encodes sorted order without moving
+      keys (...) supports concurrent insertion" (P03:Sec.4)
+
+[KANON]  LEX MODE
+  SYN ← "Lex Mode"                   PRT-ART Termin 2
+  SYN ← "Lexicographic Order"        P01 ART (Sec.III), B+-Tree, allgemein
+  SYN ← "Ordered"                    allgemein
+  SYN ← "Order-Preserving"           P10 SuRF, P01 ART
+  BED Globale lexikographische Ordnung; ermoeglicht Range-Scans.
+  BEL P01 ART: "ART preserves lexicographic order of keys, supporting range
+      queries efficiently" (P01:Sec.III)
+
+================================================================================
+1.5  SUCCINCT/SPACE-EFFICIENT FAMILIE (mit Jacobson + SuRF integriert)
+================================================================================
+
+[KANON]  SUCCINCT TREE-ENCODING
+  SYN ← "Succinct Tree"              P09 Jacobson1989 (LOUDS, Originalpaper)
+  SYN ← "Space-efficient Tree"       P09 Jacobson1989 (Titel)
+  SYN ← "Compact Tree"               allgemein
+  SYN ← "Implicit Encoding"          P09 Jacobson1989
+  SYN ← "Fast Succinct Trie (FST)"   P10 SuRF (Sec.4)
+  BED Tree-Repraesentation mit ~Information-theoretical Lower Bound bits/Knoten.
+      ~2 bits/node fuer binaeren Baum (Jacobson), ~10 bits/key fuer SuRF FST.
+  BEL P09 Jacobson: "any tree of n nodes can be encoded in 2n + o(n) bits
+      while supporting parent, child, degree queries in O(1)" (P09:Sec.1)
+      P10 SuRF: "FST (Fast Succinct Trie) achieves 10 bits per key on average"
+      (P10:Sec.4)
+  ABG NICHT "compressed" (allgemein); succinct = nahe theor. Lower Bound,
+      compressed = nur kleiner als trivial.
+
+[KANON]  LOUDS-ENCODING (Level-Ordered Unary Degree Sequence)
+  SYN ← "LOUDS"                      P09 Jacobson1989 (Originalterm)
+  SYN ← "Level-Order Bit-String"     P09 Jacobson1989
+  SYN ← "Unary Degree Sequence"      P09 Jacobson1989
+  BED Bit-Sequenz der Form 1*0 pro Knoten (degree-Bits + Terminator), Knoten
+      in BFS-Reihenfolge. Ermoeglicht O(1)-Navigation via rank/select.
+  BEL P09 Jacobson: "BFS traversal of the tree, output unary representation
+      of each node's degree (...) parent, first-child, next-sibling all in
+      O(1) using rank and select on bit string" (P09:Sec.4)
+  BEZ PRT-ART **Dense-Byte-Page** (oberhalb von Cache-Engine-Wahl) — PRT-ART
+      braucht aber UPDATE-FAEHIGKEIT (LOUDS ist statisch).
+
+[KANON]  LOUDS-DENSE
+  SYN ← "LOUDS-Dense"                P10 SuRF (Sec.4.1)
+  SYN ← "D-Labels / D-HasChild / D-IsPrefixKey"  P10 SuRF (3 Bitmaps a 256)
+  BED SuRF Top-Levels Encoding: 3 Bitmaps der Groesse 256 (eine pro 256er-
+      Verzweigungs-Byte) + Byte-Sequence fuer Werte. Cache-friendly.
+  BEL P10 SuRF: "LOUDS-Dense uses three bitmaps each of size 256: D-Labels
+      indicates which bytes branch, D-HasChild marks branches with subtries,
+      D-IsPrefixKey marks prefixes that are keys" (P10:Sec.4.1)
+  BEZ **DIREKT mappbar auf PRT-ART Dense-Byte-Page!**
+
+[KANON]  LOUDS-SPARSE
+  SYN ← "LOUDS-Sparse"               P10 SuRF (Sec.4.2)
+  SYN ← "S-Labels / S-HasChild / S-LOUDS"  P10 SuRF (byte-bit-bit pro Knoten)
+  BED SuRF Bottom-Levels Encoding: 3 Byte-Sequenzen, eine pro Trie-Knoten.
+      Space-efficient, aber teurer Lookup.
+  BEL P10 SuRF: "LOUDS-Sparse encodes each node with three sequences:
+      S-Labels stores one byte per child, S-HasChild bit per child indicating
+      subtree, S-LOUDS bit per child indicating end of node" (P10:Sec.4.2)
+  BEZ **DIREKT mappbar auf PRT-ART Sparse Patricia Page!**
+
+[KANON]  LOUDS-DS (Hybrid)
+  SYN ← "LOUDS-DS"                   P10 SuRF (Sec.4.3)
+  SYN ← "Hybrid Encoding"            P10 SuRF
+  SYN ← "Cutoff Level R"             P10 SuRF (default R=64)
+  BED Kombination: Top-Levels in LOUDS-Dense (cache-friendly), Bottom-Levels
+      in LOUDS-Sparse (space-efficient). Schwelle R tunable.
+  BEL P10 SuRF: "LOUDS-DS combines LOUDS-Dense for the upper R levels and
+      LOUDS-Sparse for the lower levels (...) we choose R such that the
+      LOUDS-Dense portion fits in CPU cache" (P10:Sec.4.3)
+  BEZ **HOECHST RELEVANT** — diese Hybrid-Logik ist KONZEPTIONELL AEQUIVALENT
+      zu PRT-ART **Cache-Engine Page-Type-Selection Rules**!
+      SuRF (P10) statisch (Schwelle einmal); PRT-ART dynamisch (Cache-Engine
+      runtime). DAS ist eine unserer 4 Forschungsluecken (Konzeptmatrix Cluster A).
+
+[KANON]  RANK / SELECT
+  SYN ← "rank"                       P09 Jacobson1989, P10 SuRF
+  SYN ← "select"                     P09 Jacobson1989, P10 SuRF
+  BED rank(i) = #1-Bits in Position [0..i] · select(j) = Position des j-ten 1-Bits.
+      O(1) mit Vorberechnung; Grundoperation fuer succinct-Navigation.
+  BEL P09 Jacobson: "rank and select support O(1) navigation given precomputed
+      tables of size o(n)" (P09:Sec.3)
+  BEZ Falls PRT-ART eine succinct Page einsetzt — externe Lib (z.B. SDSL).
+
+================================================================================
+1.6  KONZEPT-CLUSTER B — B+-Tree-Familie (Cache-conscious)
+================================================================================
+
+[KANON]  CACHE-LINE-NODE (CSS-Knoten)
+  SYN ← "Cache-Sensitive Search Tree (CSS-tree)" P11 RaoRoss1999
+  SYN ← "CSS Node"                   P11 RaoRoss1999
+  SYN ← "Pointer-free Layout"        P11 RaoRoss1999
+  BED Knoten exakt Cache-Line-gross (64 B); pointer-frei (Index-Arithmetik).
+  BEL P11 RaoRoss1999: "Cache-Sensitive Search Trees achieve no pointer
+      overhead by storing the entire tree in a contiguous array (...) child
+      positions computed by arithmetic" (P11:Sec.4)
+  ABG NICHT P12 CSB+ (CSB+ hat 1 Pointer + Offsets, nicht pointer-frei).
+  BEZ PRT-ART Custom-Cache-Page kann CSS-aehnliche pointer-freie Layouts nutzen.
+
+[KANON]  NODE GROUP / SIBLING-CLUSTERING (CSB+)
+  SYN ← "Node Group"                 P12 RaoRoss2000 (Sec.3.1)
+  SYN ← "Sibling Cluster"            P12 RaoRoss2000
+  SYN ← "Contiguous Siblings"        P12 RaoRoss2000
+  BED Geschwisterknoten kontiguoes gespeichert; Parent haelt nur 1 Pointer +
+      Offsets, statt N Pointers.
+  BEL P12 RaoRoss2000: "siblings are stored contiguously, parent stores only
+      one pointer to the first child (...) reduces fanout overhead by ~50%"
+      (P12:Sec.3.1)
+  BEZ Konzeptionell aehnlich zu PRT-ART Page-Konzept (Page = Sibling-Cluster).
+
+[KANON]  WIDER NODES (P13 Hankins)
+  SYN ← "Wider Nodes"                P13 Hankins2003
+  SYN ← "Multi-Cache-Line Nodes"     P13 Hankins2003
+  SYN ← "Knoten > Cache Line"        P13 Hankins2003 (Hauptbefund!)
+  BED Knoten groesser als 1 Cache-Line (typisch 4-16 Cache-Lines) sind oft
+      schneller als Cache-Line-grosse Knoten (P11/P12).
+  BEL P13 Hankins: "node sizes ranging from 4 to 16 cache lines outperform
+      cache-line-sized nodes by 10-30% for lookup workloads" (P13:Abstract)
+      "the I, M, B, T cost-model components (...) jointly determine the
+      optimal node size, which is workload-dependent" (P13:Sec.4)
+  BEZ **Widerlegt** P11/P12 Konvention; PRT-ART Cache-Engine sollte beides
+      anbieten und runtime entscheiden.
+
+[KANON]  CONFIGURATION TABLE (P14 Samuel)
+  SYN ← "Configuration Table"        P14 Samuel2005
+  SYN ← "Workload-aware Tree Shape"  P14 Samuel2005
+  BED Vorberechnete Tabelle der besten Tree-Konfiguration je Workload-Profil
+      (Schluesselgroesse, Wertgroesse, Update-Anteil).
+  BEL P14 Samuel: "configuration table indexed by (key size, value size,
+      update ratio) returns optimal node-size and tree-height" (P14:Sec.5)
+  BEZ Konzeptionell aehnlich zu PRT-ART Cache-Engine Modus 1 (passive,
+      vorberechnete Schwellen).
+
+[KANON]  ADAPTIVE LAYOUT (P20 B-Trees Are Back)
+  SYN ← "Adaptive Layout"            P20 Mueller2025
+  SYN ← "Runtime Layout Selection"   P20 Mueller2025
+  SYN ← "Heads / Hints"              P20 Mueller2025 (Sec.5)
+  SYN ← "Fingerprinting"             P20 Mueller2025 (Sec.4)
+  BED Runtime-Wahl zwischen 6 Layout-Optimierungen:
+      (1) Prefix Truncation (2) Heads/Hints (3) Fingerprinting
+      (4) Search Hints (5) Range Hints (6) Sorted Layout
+  BEL P20 Mueller: "we propose six layout optimizations and an adaptive
+      runtime mechanism that chooses among them based on workload signals"
+      (P20:Abstract)
+  BEZ **Direkter Vorgaenger** PRT-ART Cache-Engine — aber: P20 ist B+-Tree
+      monolithisch, PRT-ART hat Cache-Engine als getrennte Meta-Ebene.
+
+================================================================================
+1.7  KONZEPT-CLUSTER C — Hybrid-Strukturen
+================================================================================
+
+[KANON]  TRIE-OF-B+-TREES (Masstree)
+  SYN ← "Trie of B+-Trees"           P03 Masstree
+  SYN ← "Layer / Slice"              P03 Masstree (8-Byte Schluessel-Slices)
+  SYN ← "Border Node"                P03 Masstree (Layer-Grenze)
+  BED Hybrid: Trie-Struktur ueber 8-Byte-Slices, jeder Slice ist ein B+-Tree.
+  BEL P03 Masstree: "Masstree is a trie whose nodes are B+-trees indexing
+      8-byte slices of the key (...) cache craftiness combines locality of
+      B+-trees with prefix sharing of tries" (P03:Sec.3)
+  BEZ Konzeptionell verwandt mit PRT-ART (Trie-Huelle + lokale Page-Familie),
+      aber PRT-ART hat keine starre 8-Byte-Slice-Struktur.
+
+[KANON]  TRIE-HASH-B+ HYBRID (Wormhole)
+  SYN ← "MetaTrieHT"                 P07 Wormhole
+  SYN ← "Anchor Keys"                P07 Wormhole
+  SYN ← "Three-layer hybrid"         P07 Wormhole (Trie + Hash + B+)
+  BED Wormhole kombiniert Trie (oben) + Hash-Index (Mitte) + B+-Tree (unten).
+      Anchor Keys verbinden die Schichten.
+  BEL P07 Wormhole: "Wormhole combines hash table (point lookup), trie
+      (prefix navigation), and B+-tree (range scan) with anchor keys
+      bridging the layers" (P07:Sec.3)
+
+[KANON]  MACRO-NODE (CoCo-trie)
+  SYN ← "Macro-Node"                 P04 CoCo-trie
+  SYN ← "Pool of Encodings"          P04 CoCo-trie (Sec.3)
+  SYN ← "Data-aware Optimization"    P04 CoCo-trie
+  BED Macro-Node = kollabierter Subtrie. CoCo-trie waehlt aus Pool von
+      Encodings (Bitmap, Path, ...) das raum-optimale.
+  BEL P04 CoCo-trie: "from a pool of macro-node encodings (...) the optimizer
+      selects the one yielding the smallest occupied space" (P04:Sec.3)
+  BEZ PRT-ART Redirect-Page entspricht Macro-Node-Idee, aber PRT-ART optimiert
+      auf Cache-Performance, nicht nur Speicherplatz.
+
+================================================================================
+DOMAENE 2 — CACHE-ENGINE-BAUSTEINE
+================================================================================
+
+================================================================================
+2.1  CACHE-HIERARCHIE-PRIMITIVE
+================================================================================
+
+[KANON]  CACHE LINE
+  SYN ← "Cache Line"                 Intel/AMD Doku, allgemein
+  SYN ← "Cacheline"                  PRT-ART Termin 2
+  SYN ← "Block"                      P16 Bender, P18 Saikkonen (Cache-Block-Modell)
+  BED Kleinste Granularitaet Daten-Transfer RAM ↔ CPU-Cache (typisch 64 B).
+  BEL P16 Bender: "memory transferred between cache levels in blocks of size
+      B" (P16:Sec.2)
+      P11 RaoRoss: "CSS nodes are sized to fit exactly one cache line"
+      (P11:Sec.4)
+
+[KANON]  CACHE-EBENE
+  SYN ← "Cache Level (L1/L2/L3)"     allgemein, Intel/AMD-Doku
+  SYN ← "Memory Level"               P16 Bender, P17 Bender (Hierarchie-Theorie)
+  SYN ← "Block Level"                P18 Saikkonen
+  SYN ← "Hierarchy Level"            P17 Bender (Cache-Oblivious)
+  BED Stufe in der Speicherhierarchie (L1, L2, L3, LLC, RAM, Disk).
+  BEL P17 Bender: "the cache-oblivious model assumes a hierarchy of caches
+      with unknown parameters at design time" (P17:Sec.2)
+
+[KANON]  WORKING SET
+  SYN ← "Working Set"                PRT-ART Termin 6
+  SYN ← "Hot Set"                    allgemein
+  SYN ← "Resident Set"               Linux/OS-Sicht
+  SYN ← "Active Memory Region"       P24 NaderanTahan2016
+  BED Aktuell aktiv genutzte Datenmenge eines Programms.
+
+[KANON]  TLB (Translation Lookaside Buffer)
+  SYN ← "TLB"                        allgemein
+  SYN ← "Page Table Cache"           allgemein
+  SYN ← "Block Level (TLB)"          P18 Saikkonen (TLB als oberste Block-Ebene)
+  BED CPU-Cache fuer virtuell-physische Adressuebersetzungen.
+  BEL P18 Saikkonen: "we model the TLB as the topmost block-level in our
+      cache hierarchy (...) TLB misses dominate cost when working set
+      exceeds TLB-coverage" (P18:Sec.2-3)
+      P32 Schmidt: "Sapphire Rapids has 96 entries DTLB (vs 64 in Cascade
+      Lake), 2 MiB Hugepages reduce TLB pressure" (P32:Tab.1, Sec.3)
+  ABG TLB ist NICHT Cache Line, NICHT Page; eigene Ebene mit eigener
+      Performance-Charakteristik.
+
+[KANON]  CACHE-AWARENESS-MODI (Termin 4 Kategorisierung)
+  KANON Variant 1: PASSIVE CACHE-AWARENESS
+    SYN ← "Passive Cache-Awareness"  PRT-ART Termin 4
+    SYN ← "Static Cache-Conscious"   P11 RaoRoss1999, P12 RaoRoss2000
+    SYN ← "Cache-Conscious"          P11 RaoRoss1999 (Originalbegriff)
+    BED Layout wird einmal beim Design gewaehlt und bleibt fest.
+    BEL P11 RaoRoss: "we propose cache-sensitive search trees, designed once
+        for known cache parameters" (P11:Sec.1)
+  KANON Variant 2: ACTIVE CACHE-AWARENESS
+    SYN ← "Active Cache-Awareness"   PRT-ART Termin 4 (KERNBEITRAG)
+    SYN ← "Adaptive Layout"          P20 B-Trees Are Back (Sec.5)
+    SYN ← "Online Adaptation"        P23 Khan2010, PRT-ART T6 Modus 3
+    SYN ← "Runtime Re-Layouting"     PRT-ART Termin 4 (PRT-ART-Term)
+    BED Layout-/Policy-Entscheidungen werden zur Laufzeit getroffen und
+        ggf. revidiert.
+    BEL P28 Kuehn: "while we detect hot paths via histograms, we explicitly
+        do NOT re-layout the tree at runtime" (P28:Sec.4) — DAS ist die
+        PRT-ART-Luecke, die wir schliessen!
+    BEZ Cluster-Forschungsluecke #2 (siehe Cross_Paper_Konzeptmatrix.txt).
+  KANON Variant 3: CACHE-OBLIVIOUS (Gegenpol!)
+    SYN ← "Cache-Oblivious"          P17 Bender2005 (Sec.2)
+    BED Performance ohne Kenntnis konkreter Cache-Parameter.
+    BEL P17 Bender: "cache-oblivious algorithms achieve optimality on all
+        levels of the cache hierarchy without knowing parameters" (P17:Sec.2)
+    BEZ PRT-ART ist BEWUSST cache-aware (das Gegenteil!) — P17 ist Gegenpol.
+
+================================================================================
+2.2  CACHE-METRIKEN (MESSGROESSEN — Domaene 3 Schnittstelle)
+================================================================================
+
+[KANON]  CACHE LINE UTILIZATION (CLU)
+  SYN ← "CLU"                        Intel Advisor User Guide
+  SYN ← "Cache Line Utilization"     Intel Advisor User Guide
+  SYN ← "Effective Bandwidth Use"    allgemein
+  BED Anteil der tatsaechlich genutzten Bytes pro geladener Cache Line.
+      100% = jede geladene Cache Line wird vollstaendig verwendet.
+  BEZ PRT-ART Cache-Engine misst CLU pro Page-Type via Intel Advisor MAP +
+      Cache Simulation. Dient als Optimierungsziel.
+
+[KANON]  CACHE MISS
+  SYN ← "Cache Miss"                 allgemein
+  SYN ← "L1/L2/L3-load-miss"         perf events
+  SYN ← "Cache-misses"               perf event allgemein
+  SYN ← "Cold/Capacity/Conflict"     Hill/Smith Klassifikation
+  BED Zugriff auf Daten, die NICHT im Cache sind.
+
+[KANON]  dTLB-MISS
+  SYN ← "dTLB-Miss"                  perf event, PRT-ART Termin 3
+  SYN ← "Data TLB Miss"              Intel docs
+  SYN ← "Page Table Walk"            P18 Saikkonen2008
+  BED TLB enthaelt keine Uebersetzung -> Page-Table Walk.
+  BEL P18 Saikkonen: "TLB miss triggers a page table walk costing
+      tens of cycles" (P18:Sec.3)
+
+[KANON]  MEMORY FOOTPRINT
+  SYN ← "Memory Footprint"           Intel Advisor
+  SYN ← "Simulated Memory Footprint" Intel Advisor cachesim-mode=footprint
+  SYN ← "Working Set Size"           allgemein
+  SYN ← "Resident Memory"            OS-Sicht
+  BED Gesamtmenge des effektiv beruehrten Speichers eines Algorithmus.
+
+[KANON]  BRANCH MISS / BRANCH MISPREDICTION
+  SYN ← "Branch Misprediction"       Intel docs
+  SYN ← "branch-misses"              perf event
+  BED CPU prophezeit Verzweigung falsch -> Pipeline-Flush.
+
+[KANON]  CYCLES PER INSTRUCTION (CPI) / IPC
+  SYN ← "Cycles"                     perf event
+  SYN ← "Instructions"               perf event
+  SYN ← "IPC" / "CPI"                Intel docs
+  BED Effizienz-Mass; haengt stark von Cache-/Branch-Verhalten ab.
+
+[KANON]  LATENZ
+  SYN ← "Latency"                    allgemein
+  SYN ← "End-to-End Latency"         PRT-ART Termin 3
+  SYN ← "Wall Time"                  PRT-ART Termin 6
+  SYN ← "Tail Latency"               PRT-ART Termin 3 (p95/p99/p99.9)
+  BED Zeit zwischen Operations-Anstoss und Ergebnis.
+
+[KANON]  DURCHSATZ
+  SYN ← "Throughput"                 PRT-ART, allgemein
+  SYN ← "ops/s"                      PRT-ART Termin 4
+  SYN ← "Operations per Second"      allgemein
+  BED Anzahl Operationen pro Zeiteinheit.
+
+================================================================================
+2.3  PREFETCH-KONZEPTE
+================================================================================
+
+[KANON]  PREFETCH
+  SYN ← "Prefetch"                   allgemein
+  SYN ← "Software Prefetch"          P21 ChenPB2001, GCC __builtin_prefetch
+  SYN ← "Hardware Prefetch"          Intel/AMD, automatisch
+  BED Daten werden VOR dem tatsaechlichen Bedarf in den Cache geladen.
+  BEL P21 ChenPB: "we use software prefetch instructions to bring child nodes
+      into cache before they are needed (...) wider nodes amortize prefetch
+      cost across more keys" (P21:Sec.3)
+
+[KANON]  PREFETCH-DISTANZ
+  SYN ← "Prefetch Distance"          P23 Khan2010, PRT-ART Termin 4
+  SYN ← "Lookahead Distance"         P21 ChenPB2001
+  SYN ← "Prefetch Offset"            P23 Khan2010
+  SYN ← "Prefetch Lead Time"         P25 Mahling2025
+  BED Zeit-/Pointer-Abstand zwischen Prefetch und tatsaechlichem Zugriff.
+      Zu klein -> noch nicht da; zu gross -> Cache Pollution.
+  BEL P21 ChenPB: "prefetch distance must be tuned to memory latency divided
+      by per-iteration work" (P21:Sec.3)
+      P23 Khan: "we adapt prefetch distance at runtime via a code specializer
+      based on observed memory latency" (P23:Sec.3)
+
+[KANON]  OVERFETCH / CACHE POLLUTION
+  SYN ← "Overfetch"                  PRT-ART Termin 4
+  SYN ← "Cache Pollution"            P25 Mahling2025, allgemein
+  SYN ← "False Prefetch"             P24 NaderanTahan2016
+  SYN ← "Useless Prefetch"           P24 NaderanTahan2016
+  BED Prefetch laedt Daten, die NICHT verwendet werden, und verdraengt
+      nuetzliche Cachelines.
+  BEL P24 NaderanTahan: "modern workloads exhibit a high fraction of
+      useless prefetches that pollute cache without benefit (...) hardware
+      prefetcher can hurt rather than help" (P24:Sec.4)
+  BEZ **Klassisches Argument** fuer PRT-ART Cache-Engine Adaptive Prefetch:
+      Prefetch nicht blind einschalten, sondern abhaengig von Workload-Profil.
+
+[KANON]  FILL BUFFER
+  SYN ← "Fill Buffer"                Intel uarch, P25 Mahling2025
+  SYN ← "Line Fill Buffer (LFB)"     Intel
+  SYN ← "Outstanding Miss Slot"      allgemein
+  BED Hardware-Puffer, der ausstehende Cache-Misses bedient.
+      Begrenzte Anzahl (z.B. 10 LFBs auf Intel) -> bestimmt Prefetch-Wirksamkeit.
+  BEL P25 Mahling: "fill buffer occupancy is the limiting factor for
+      prefetch effectiveness on high-latency memory (...) once LFBs are full,
+      additional prefetches stall" (P25:Sec.3-4)
+  BEZ Mahling 2025 (P25) zeigt: Fill-Buffer-Auslastung ist DER limitierende
+      Faktor fuer Prefetch-Effektivitaet auf high-latency memory.
+
+[KANON]  WEAK vs STRONG PREFETCH RELIABILITY
+  SYN ← "Weak Prefetch Reliability"  P25 Mahling2025
+  SYN ← "Strong Prefetch Reliability" P25 Mahling2025
+  BED Wie zuverlaessig der Prefetch ankommt: Weak = haeufig zu spaet bei
+      high-latency memory; Strong = zeitgerecht.
+  BEL P25 Mahling: "weak reliability arises when memory latency exceeds
+      prefetch lead time, leaving the requested line still in flight when
+      accessed" (P25:Sec.4)
+  BEZ PRT-ART Cache-Engine kann pro Plattform "Strong vs Weak" einstufen.
+
+[KANON]  HIERARCHICAL PREFETCHING (Bundles)
+  SYN ← "Hierarchical Prefetching"   P27 ZhangASPLOS2025
+  SYN ← "Bundle"                     P27 ZhangASPLOS2025
+  BED Mehrere Cache-Lines werden als Bundle prefetched, um L1/L2-Streaming
+      zu verbessern.
+  BEL P27 Zhang: "we group cache lines into bundles and issue hierarchical
+      prefetches that respect the cache-level prefetch boundaries" (P27:Sec.3)
+
+[KANON]  HOT PATH (siehe auch 1.1)
+  SYN ← "Hot Path"                   P28 Kuehn2023, P26 Zhang FGCS 2024
+  SYN ← "Frequent Access Path"       P26 Zhang FGCS 2024
+  SYN ← "Probability-driven Layout"  P16 Bender2002
+  BED Pfad mit hoher Zugriffsfrequenz; Kandidat fuer physische Zusammenfuehrung
+      im Cache (Layout-Optimierung) oder Prefetch.
+  BEL P28 Kuehn: "histograms per node identify frequently taken branches
+      forming hot paths" (P28:Sec.3)
+      P16 Bender: "probability-driven greedy layout achieves O(log n) expected
+      I/O cost" (P16:Sec.4)
+
+================================================================================
+2.4  STEUERUNGS-KONZEPTE (CACHE-ENGINE-KERN)
+================================================================================
+
+[KANON]  CACHE-ENGINE
+  SYN ← "Cache-Engine"               PRT-ART Termin 2-6 (KANON)
+  SYN ← "Cache Control Plane"        PRT-ART Termin 5
+  SYN ← "Cache Manager"              allgemein
+  SYN ← "Active Cache Layer"         PRT-ART Termin 4
+  SYN ← "Meta-Ebene"                 PRT-ART Termin 5
+  BED PRT-ART-spezifische Meta-Ebene, die unabhaengig von der
+      Such-Algorithmus-Logik Layout-/Prefetch-/Allocation-Entscheidungen trifft.
+  ABG NICHT "OS Page Cache" — Cache-Engine arbeitet im User-Space und
+      beeinflusst CPU-Caches indirekt ueber Layout/Allocator/Hints.
+      NICHT "Buffer Manager" (DBMS-Buffer fuer Disk-Pages) — PRT-ART optimiert
+      CPU-Cache, nicht Disk-Buffer.
+  BEZ Forschungsluecke #1 (Konzeptmatrix Cluster A): KEINE der 33 Quellen
+      hat Cache-Engine als getrennte Meta-Ebene; alle "built-in".
+
+[KANON]  PLATTFORM-KALIBRIERUNG
+  SYN ← "Plattformkalibrierung"      PRT-ART Termin 5
+  SYN ← "Hardware Calibration"       P05 START (Cost Model Calibration)
+  SYN ← "Warm-up Calibration"        PRT-ART Termin 6 Modus 2
+  SYN ← "Cost Model Calibration"     P05 START (Sec.4)
+  SYN ← "Profiling Phase"            P23 Khan2010
+  BED Mikrobenchmarks zur Erstinstanz, die Plattformschwellen ableiten.
+  BEL P05 START: "the cost model is calibrated by micro-benchmarks measuring
+      cache-line cost, branch cost, and TLB cost on the target platform"
+      (P05:Sec.4)
+      P23 Khan: "an offline profiling phase determines optimal prefetch
+      distance for the target machine" (P23:Sec.3)
+  PRT-ART Modi (T6):
+      • Modus 1: NIE (passiv) — feste Schwellen
+      • Modus 2: EINMAL (Warm-up) — beim Start einmalig kalibrieren
+      • Modus 3: KONTINUIERLICH (online adaptiv) — laufend re-kalibrieren
+
+[KANON]  ONLINE RELOCATION / RE-LAYOUTING
+  SYN ← "Online Relocation"          PRT-ART Termin 4
+  SYN ← "Re-Layouting"               P28 Kuehn2023 (explizit ausgeschlossen!)
+  SYN ← "Multi-Level Relocation"     P18 Saikkonen2008
+  SYN ← "Compaction"                 allgemein
+  SYN ← "Global Rearrangement"       P18 Saikkonen2008
+  SYN ← "Adaptive Tree Restructuring" P19 Saikkonen2016
+  BED Daten werden zur Laufzeit physisch umkopiert/umgeordnet, um
+      Cache-Lokalitaet zu verbessern.
+  BEL P18 Saikkonen: "we perform multi-level relocation: blocks are
+      periodically reorganized in BFS-order to maximize cache hits"
+      (P18:Sec.4)
+      P19 Saikkonen: "layout invariants are maintained by constant-time
+      update operations during regular tree mutations" (P19:Sec.3)
+      P28 Kuehn: "while we detect hot paths, runtime re-layouting is
+      explicitly out of scope (...) too expensive for our system" (P28:Sec.4)
+  BEZ PRT-ART **kann was Kuehn nicht** — Online Re-Layouting via Cache-Engine.
+
+[KANON]  PROBABILITY HINTS / TELEMETRIE
+  SYN ← "Probability Hints"          PRT-ART Termin 4
+  SYN ← "Probability Sketch"         PRT-ART Termin 4
+  SYN ← "Histogram per Node"         P28 Kuehn2023 (Sec.3)
+  SYN ← "Read Counter"               P26 Zhang FGCS 2024
+  SYN ← "Block-Level Counter"        P26 Zhang FGCS 2024
+  SYN ← "Access Distribution"        P16 Bender2002
+  BED Quantisierte Statistik im Page/Node-Header, die der Cache-Engine
+      "Hot Path"-Information liefert.
+  BEL P26 Zhang FGCS: "each block stores a read counter incremented on
+      access (...) blocks above threshold form hot paths" (P26:Sec.IV)
+      P28 Kuehn: "histogram per node tracks branch frequencies (...) only
+      ~16 bits overhead per node" (P28:Sec.3)
+  BEZ **DIREKTE Quelle** fuer PRT-ART Probability Hints im Page-Header.
+
+[KANON]  ALLOCATOR / POOL / ARENA
+  SYN ← "Allocator"                  PRT-ART Termin 4, allgemein
+  SYN ← "Pool"                       PRT-ART Termin 2
+  SYN ← "Arena"                      tcmalloc, mimalloc
+  SYN ← "Slab"                       Linux-Kernel
+  SYN ← "Custom Memory Manager"      P31 Ungethuem2017 (Habich-Linie)
+  BED Speicher-Verwaltungseinheit, die Allokation kleiner Objekte koalesziert
+      (per Cache Line / Page-aligned).
+
+[KANON]  PAGE-TYPE-SELECTION RULE
+  SYN ← "Page-Type-Selection Rule"   PRT-ART Termin 4
+  SYN ← "Adaptive Layout Rule"       P20 Mueller2025
+  SYN ← "Encoding Decision"          P04 CoCo-trie
+  SYN ← "Cutoff Level R"             P10 SuRF (Dense vs Sparse Schwelle)
+  SYN ← "Configuration Lookup"       P14 Samuel2005
+  BED Regel/Funktion, die anhand lokaler Strukturmerkmale + Cache-Engine-
+      Telemetrie + Plattformprofil den passenden Seitentyp auswaehlt.
+  BEL P10 SuRF: "we choose R such that the LOUDS-Dense portion fits in CPU
+      cache" (P10:Sec.4.3)
+      P20 Mueller: "adaptive runtime selection between layout strategies based
+      on workload signals" (P20:Sec.5)
+  BEZ Forschungsluecke #3 (Konzeptmatrix Cluster D): Gemeinsame Wahl von
+      Seitentyp + Layout + Inline + Prefetch + Allocator durch eine Engine.
+
+================================================================================
+2.5  COST-MODEL-FAMILIE (P13 + P05 + P14 + P16)
+================================================================================
+
+[KANON]  COST MODEL
+  SYN ← "Cost Model"                 P05 START (Sec.4), P13 Hankins2003
+  SYN ← "I/M/B/T-Modell"             P13 Hankins2003 (Insertion/Memory/Branch/TLB)
+  SYN ← "Probability Layout Model"   P16 Bender2002
+  SYN ← "Configuration-Lookup-Modell" P14 Samuel2005
+  SYN ← "NFP-Modell"                 P33 VAMPIR (Non-Functional Properties)
+  BED Mathematisches Modell, das Performance-Kosten anhand Knotengroesse,
+      Cache-Hierarchie, Workload, Hardware vorhersagt.
+  BEL P13 Hankins: "I (Instruction Cost), M (Memory Stall), B (Branch
+      Misprediction), T (TLB Miss) — multi-variate cost model determines
+      optimal node size" (P13:Sec.4)
+      P05 START: "cost model balances cache-line transfers, branch
+      prediction, and TLB walks" (P05:Sec.4)
+      P16 Bender: "expected search cost minimized by greedy layout
+      based on access probabilities" (P16:Sec.4)
+      P33 VAMPIR: "Non-Functional Memory Properties: Bandwidth, Latency,
+      Energy, Capacity (vs Functional Properties)" (P33)
+  BEZ PRT-ART Cache-Engine nutzt eine Cost-Model-Variante (Modus 2/3).
+
+================================================================================
+2.6  CONCURRENCY / MEMORY RECLAMATION
+================================================================================
+
+[KANON]  OPTIMISTIC LOCK COUPLING (OLC)
+  SYN ← "OLC"                        P08 ARTSync (Sec.3)
+  SYN ← "Optimistic Lock Coupling"   P08 ARTSync
+  SYN ← "Version Counter"            P08 ARTSync
+  BED Lock-coupling mit optimistischem Lese-Pfad: pre-/post-version checks.
+  BEL P08 ARTSync: "OLC: each node has a version counter (...) reads validate
+      version before and after access" (P08:Sec.3)
+
+[KANON]  ROWEX (Read-Optimized Write Exclusion)
+  SYN ← "ROWEX"                      P08 ARTSync (Sec.4)
+  SYN ← "Read-Optimized Write Exclusion" P08 ARTSync
+  BED Schreiber-Exklusion ohne Reader-Locks; spezielle Lese-Garantien.
+  BEL P08 ARTSync: "ROWEX provides linearizable reads while writers
+      coordinate among themselves only" (P08:Sec.4)
+
+[KANON]  RCU (Read-Copy-Update)
+  SYN ← "RCU"                        P29 McKenney2001 (Originalpaper)
+  SYN ← "Grace Period"               P29 McKenney2001
+  SYN ← "Quiescent State"            P29 McKenney2001
+  SYN ← "Epoch-based Reclamation"    P02 HOT (Sec.5), allgemein
+  BED Lock-free read; Updater erstellt neue Version, alte wird nach Grace
+      Period (alle Reader fertig) freigegeben.
+  BEL P29 McKenney: "Read-Copy-Update: readers proceed without locks;
+      reclamation deferred until grace period expires (all readers have
+      reached a quiescent state)" (P29:Sec.2-3)
+  BEZ PRT-ART Memory-Reclamation nach Online Relocation → RCU der Default.
+
+[KANON]  HAZARD POINTERS
+  SYN ← "Hazard Pointers"            P30 Michael2004 (Originalpaper)
+  SYN ← "Wait-free Reclamation"      P30 Michael2004
+  SYN ← "Per-Thread Hazard Pointer"  P30 Michael2004
+  BED Wait-free Memory Reclamation: jeder Thread haelt 1-2 Hazard Pointer
+      auf gerade genutzte Knoten; Reclamation prueft alle Hazard Pointer.
+  BEL P30 Michael: "associate one or two single-writer multireader shared
+      pointers (hazard pointers) with each thread (...) wait-free, uses only
+      single-word reads/writes" (P30:S.2/Sec.2)
+  BEZ PRT-ART Alternative zu RCU bei kritischen Wait-free-Anforderungen.
+
+================================================================================
+DOMAENE 3 — MESS-/METRIK-WERKZEUGE
+================================================================================
+
+[KANON]  perf
+  SYN ← "perf stat"                  Linux perf
+  SYN ← "perf record"                Sampling-Profiling
+  SYN ← "PMU events"                 CPU Performance Monitoring Units
+  BED Linux-Standard-Tool fuer Hardware-Counter-Messung. Auf Intel-Hybrid:
+      separat cpu_core/* und cpu_atom/*. Pflichtmetriken: cycles, instructions,
+      branches, branch-misses, cache-misses, L1/LLC misses, dTLB-misses.
+  BEZ PRT-ART Pflicht-Tooling auf allen Plattformen mit PMU.
+
+[KANON]  PAPI
+  SYN ← "PAPI"                       Performance Application Programming Interface
+  BED Portable Schnittstelle zu PMU-Counter ueber Plattformen.
+      Verwendet auf ZIH (Barnard, Capella).
+  BEZ PRT-ART Cross-Platform-Counter-Wrapper.
+
+[KANON]  Intel Advisor — Memory Access Patterns (MAP)
+  SYN ← "Intel Advisor MAP"
+  SYN ← "Memory Access Patterns Analysis"
+  BED Intel-spezifisches Tool fuer Speicherzugriffsanalyse. Liefert CLU,
+      Simulated Memory Footprint, modellierte Cache-Misses.
+  BEZ PRT-ART CLU-Hauptquelle.
+
+[KANON]  HDR Histogram
+  SYN ← "HdrHistogram"
+  SYN ← "HDR-Histogramme"            PRT-ART Termin 3+4
+  BED High-Dynamic-Range-Histogramm fuer Tail-Latenz-Messung ohne Mittelung.
+  BEZ PRT-ART Regel: 5 Laeufe je Konfiguration, Rohwerte getrennt, KEINE
+      Mittelung von Perzentilen.
+
+[KANON]  YCSB-Workloads
+  SYN ← "YCSB"                       Yahoo! Cloud Serving Benchmark
+  SYN ← "Workload A/B/C/D/E/F"       YCSB-Profile
+  BED Standard-Benchmark-Profile:
+      A=50/50 RW, B=95R/5W, C=Read-only, D=Latest, E=Short-Range, F=RMW.
+
+[KANON]  PIKA
+  SYN ← "PIKA"                       ZIH HPC TUD Performance Analyzer
+  BED ZIH-eigenes Monitoring; KANN auf Barnard mit `--no_monitoring`
+      deaktiviert werden, wenn eigene Counter benoetigt werden.
+
+[KANON]  Intel MLC (Memory Latency Checker)
+  SYN ← "Intel MLC"
+  BED Intel-eigenes Tool fuer Latenz/Bandbreiten-Messungen.
+
+================================================================================
+DOMAENE 4 (QUERSCHNITT) — HARDWARE / ISA
+================================================================================
+
+[KANON]  ISA (Instruction Set Architecture)
+  SYN ← "ISA"                        allgemein
+  SYN ← "Instruction Set"            allgemein
+  SYN ← "Architecture Path"          PRT-ART Termin 6
+  SYN ← "ISA-Extension"              P31 Ungethuem2017 (TUD-Linie)
+  PRT-ART Pfade (T6 eingefroren):
+      • scalar       — kein Vektor (z.B. RISC-V VisionFive 2)
+      • x86_avx2     — Intel/AMD AVX2 (Mainstream)
+      • x86_avx512   — Intel Server / AMD Zen 5
+      • arm_neon     — ARMv8 NEON (Pi 5, Apple M1)
+      • arm_sve2     — ARM Neoverse V2 SVE2 (Grace Hopper)
+  BEL P31 Ungethuem: "ISA extensions for database operations: bitmap
+      compression, hashing, pointer chasing offloaded to iDMA (...) Tomahawk
+      DBA uses Tensilica LX5 with custom DB-ISA" (P31:Sec.2)
+      P32 Schmidt: "AVX-512 sequential is slower than scalar strided on
+      Sapphire Rapids" (P32:S.1)
+  BEZ Forschungsluecke #4 (Konzeptmatrix Cluster G): plattform-bewusste online
+      Adaption pro ISA-Pfad — von keiner Quelle vollstaendig adressiert.
+
+[KANON]  SIMD-VERZWEIGUNG
+  SYN ← "SIMD branch"                P01 ART (Sec.III.B Node16 SSE2)
+  SYN ← "Vector Compare"             P02 HOT (AVX2)
+  SYN ← "BMI2 / PEXT"                P02 HOT (Sec.4)
+  SYN ← "AVX-512 Sequential"         P32 Schmidt2025
+  BED SIMD-Befehl fuer parallele Byte-/Bit-Vergleiche in Knoten.
+  BEL P01 ART: "Node16 uses SSE2 to compare 16 keys in parallel"
+      (P01:Sec.III.B)
+      P02 HOT: "AVX2 + BMI2 PEXT extracts discriminative bits in O(1)"
+      (P02:Sec.4)
+      P32 Schmidt: "even AVX-512 SIMD-sequential is slower than scalar
+      strided access on modern memory hierarchies" (P32:S.1/45-49)
+
+[KANON]  HYBRID CPU (P-/E-Cores)
+  SYN ← "Hybrid CPU"                 Intel Alder Lake/Raptor Lake
+  SYN ← "Big.LITTLE"                 ARM
+  SYN ← "P-Core / E-Core"            Intel
+  SYN ← "asymmetric cores"           Apple M1, ARM
+  BED CPU mit Kernen unterschiedlicher Mikroarchitektur.
+  BEZ PRT-ART Regel (T3+T6): NICHT zusammenaggregieren — perf cpu_core/* vs
+      cpu_atom/*.
+
+[KANON]  FUNCTION MULTIVERSIONING
+  SYN ← "Function Multiversioning"   GCC
+  SYN ← "target_clones"              GCC __attribute__
+  SYN ← "ISA Dispatch"               PRT-ART Termin 4
+  SYN ← "Build-/Dispatch-Schicht"    PRT-ART Termin 4
+  BED Gleiche Funktion in mehreren ISA-Varianten kompiliert; Auswahl zur
+      Laufzeit anhand CPU-Features.
+
+[KANON]  HETEROGENEOUS MEMORY (HBM, NV-RAM, DRAM)
+  SYN ← "Heterogeneous Memory"       P25 Mahling2025 (high-latency),
+                                      P32 Schmidt2025 (HBM+DDR5),
+                                      P33 VAMPIR (DRAM+HBM)
+  SYN ← "High-Bandwidth Memory (HBM)" P32 Schmidt2025, P33 VAMPIR
+  SYN ← "Non-Volatile RAM (NV-RAM)"  P31 Ungethuem2017 (Sec.3 Trends)
+  SYN ← "Disruptive Memory"          P32 Schmidt2025 (DIMES Workshop), P33 VAMPIR
+  BED Speichersysteme mit unterschiedlichen Performance-Charakteristika
+      (Bandbreite, Latenz, Energie, Kapazitaet).
+  BEL P32 Schmidt: "Sapphire Rapids: DDR5 + HBM + 96 entries DTLB + 2x L2/L3"
+      (P32:Tab.1)
+      P33 VAMPIR: "Heterogeneous Memory: DRAM + HBM (...) Non-Functional
+      Memory Properties: Bandwidth, Latency, Energy, Capacity" (P33:Sec.3-4)
+      P25 Mahling: "high-latency memory exposes prefetch reliability
+      limits" (P25:Sec.4)
+  BEZ PRT-ART Plattformmatrix (T6) beruecksichtigt HBM (Grace Hopper).
+
+================================================================================
+KONZEPTIONELLE IDENTITAETS-MATRIX (verfeinert P01-P33)
+================================================================================
+
+PRT-ART (KANON)         | Trie-Familie (Cluster A)             | B+/Cache-Conscious (Cluster B)        | Hybrid (Cluster C)
+------------------------|--------------------------------------|---------------------------------------|---------------------
+Knoten                  | P01 Node, P02 Compound Node,         | P11 CSS-Node, P12 CSB+-Node,          | P03 Internal/Border
+                        | P05 Multibyte Node, P09 Trie Node    | P13 Wider Node, P20 Adaptive Node     | Node, P07 MetaTrie
+Seite/Page              | (oft eingebettet im Knoten)          | P11/P12 Cache-Line-Node = Page,       | P03 B+-Page
+                        |                                      | P06 B²-tree Page, P20 B-tree Page     |
+Dense-Byte-Page         | P01 Node256, P10 LOUDS-Dense,        | -                                     | -
+                        | P09 LOUDS allgemein                  |                                       |
+Sparse Patricia Page    | P02 HOT Compound Node,               | -                                     | -
+                        | P10 LOUDS-Sparse                     |                                       |
+Extended Dense Page     | P05 Multibyte Node                   | -                                     | -
+Redirect-Page           | P01 Path Compr., P02 Discrim. Bits,  | -                                     | -
+                        | P04 Macro-Node, P05 Rewiring         |                                       |
+Praefixkompression      | P01 Path Compr., P02 Patricia Bits,  | P20 Prefix Truncation                 | P03 Trie Layer
+                        | P04 Subtrie Collapse                 |                                       |
+ValueHandle             | P01 Inline Value, P02 Leaf Value,    | P21 Leaf Pointer Array                | P03 KV-Pair
+                        | P05 Leaf Pointer                     |                                       |
+Cache-Engine            | (built-in: P01-P05 monolithisch)     | (built-in: P11-P14, P20 monolithisch) | (built-in: P03/P07)
+Plattform-Kalibrierung  | P05 START Cost Model                 | P14 Configuration Table               | -
+
+PRT-ART (KANON)         | Cache-Layout (Cluster D)             | Prefetching (Cluster E)               | Concurrency (Cluster F)
+------------------------|--------------------------------------|---------------------------------------|--------------------------
+Cache-Awareness aktiv   | P16 Probability Layout (greedy),     | P23 Khan adaptive Distance,           | -
+                        | P28 Histogram (NICHT relayout)       | P26/P27 Hot Path                      |
+Probability Hints       | P16 Access Probability,              | P26 Read Counter, P28 Histogram       | -
+                        | P28 Histogram per Node               |                                       |
+Online Relocation       | P18 Multi-Level Reloc,               | -                                     | (nutzt P29/P30)
+                        | P19 Layout Invariante                |                                       |
+Page-Type Selection     | P14 Configuration Table              | -                                     | -
+Cost Model              | P13 I/M/B/T, P16 Probability         | P23 Adaptive Distance                 | -
+Online Adaptive Loop    | (NICHT in P15-P19)                   | P23 Khan (Code Specializer)           | -
+RCU/Hazard Pointers     | -                                    | -                                     | P29 RCU,
+                        |                                      |                                       | P30 Hazard Ptrs
+OLC/ROWEX               | -                                    | -                                     | P08 ART Sync
+
+PRT-ART (KANON)         | TUD/Habich-Linie (Cluster G)
+------------------------|----------------------------------------------
+Cache-Engine            | P31 Hardware/Software Co-Design (Methodik),
+                        | P33 NFP-Modell als Optimierungsziel
+ISA-Extensions          | P31 Tomahawk DBA mit DB-ISA
+Heterogeneous Memory    | P32 HBM+DDR5, P33 DRAM+HBM
+Stride > Sequential     | P32 Schmidt 2025 (Hauptbefund: AVX-512 seq <
+                        | scalar strided auf Sapphire Rapids)
+Plattformkalibrierung   | P05 START (Habich/Lehner Vorgaenger)
+
+================================================================================
+KONZEPTIONELLE IDENTITAETS-MATRIX (Cache/CPU-Metriken)
+================================================================================
+
+PRT-ART (KANON)        | Intel Advisor       | perf (Linux)            | PAPI                | Andere
+-----------------------|---------------------|-------------------------|---------------------|------------------
+Cache Line Util.       | CLU                 | - (modelliert)          | -                   | -
+Memory Footprint       | Sim. Mem Footprint  | - (modelliert)          | -                   | -
+Cache Miss             | Cache Misses        | cache-misses            | PAPI_L1_DCM, ...    | -
+LLC Miss               | -                   | LLC-load-misses         | PAPI_L3_TCM         | -
+TLB Miss               | TLB Misses          | dTLB-load-misses        | PAPI_TLB_DM         | -
+Cycles                 | -                   | cycles                  | PAPI_TOT_CYC        | -
+Instructions           | -                   | instructions            | PAPI_TOT_INS        | -
+Branch / Branch Miss   | -                   | branches/branch-misses  | PAPI_BR_*           | -
+Hybrid Core PMU        | -                   | cpu_core/* + cpu_atom/* | -                   | -
+Tail Latency           | -                   | -                       | -                   | HdrHistogram
+Fill Buffer Occupancy  | -                   | (uncore events)         | -                   | (P25 Mahling)
+NFP (Bandwidth/Latency)| -                   | -                       | -                   | (P33 VAMPIR-Sprache)
+
+================================================================================
+GESCHAERFTE DOMAENEN-TRENNUNG (FUER PHASE 3.D)
+================================================================================
+
+DOMAENE 1 — SUCH-ALGORITHMEN-DOMAENE (statisch + dynamisch)
+   Verantwortlich fuer:
+      - Lookup-Semantik (Exact, Prefix, Range, optional Range-Filter)
+      - Schluesselrepraesentation (plain bytes; optionale Fingerprints)
+      - Ordnungsmodus (unsorted/local/lex)
+      - Pflichtoperationen (CRUD)
+      - Concurrency-Garantien (single/multi-reader, Updates)
+
+   Modul-Bausteine:
+      - Trie-Engine (globale Struktur, Redirect, Knoten-/Seitennavigation)
+      - Knoten-/Seitentyp-Implementierungen (5 Typen, jede ein Modul)
+        • Dense-Byte-Page (analog P01 Node256 / P10 LOUDS-Dense)
+        • Extended Dense Page (analog P05 Multibyte Node)
+        • Sparse Patricia Page (analog P02 HOT / P10 LOUDS-Sparse)
+        • Redirect-Page (analog P04 Macro-Node / P05 Rewiring)
+        • Custom-Cache-Page (eigener Beitrag, P11/P12-inspiriert)
+      - ValueHandle-Mechanik (Inline/External/ChainRef)
+      - Operation-Dispatcher (Get/Put/Delete/Range)
+      - Concurrency-Controller (P08 OLC/ROWEX + P29 RCU oder P30 Hazard Ptrs)
+
+   "Cache-Engine SIEHT nicht IN die Knoten" — kennt nur Header-Telemetrie.
+
+DOMAENE 2 — CACHE-ENGINE-DOMAENE (KERNBEITRAG: getrennte Meta-Ebene)
+   Verantwortlich fuer:
+      - Seitentyp-Auswahl (Page-Type-Selection Rules)
+      - Prefetch-Policy (Distanz, Locality-Hints, an/aus)
+      - Online-Relocation (wann, wo, wie)
+      - Allocator-Steuerung (Pool/Arena pro Seitentyp)
+      - Plattform-Kalibrierung (Modus 1/2/3)
+      - Telemetrie-Erfassung (Probability Sketches, Read Counter)
+
+   Modul-Bausteine:
+      - Plattform-Profiler (Working Set, Stride, Prefetch-Distanz Sweeps;
+        inspiriert von P05 START Cost Model + P23 Khan Code Specializer)
+      - Cost Model (P13 I/M/B/T-aehnlich + P16 Probability + P05 START)
+      - Page-Type-Scheduler (Logik aus P14 Samuel Config Table erweitert)
+      - Prefetch-Controller (P21 Chen + P23 Khan + P25 Mahling Lehren)
+      - Relocation-Manager (P18 Saikkonen Multi-Level + P28 Kuehn
+        Hot-Path-Detection — was Kuehn nicht macht!)
+      - Allocator-Manager (Arena/Pool, Slab; P31 Habich Memory-Manager-Linie)
+      - Telemetrie-Aggregator (P26 Read Counter + P28 Histogram pro Knoten)
+
+   "Such-Algorithmus SIEHT nicht IN die Cache-Engine" — ruft nur
+   Schnittstelle "such mir den naechsten Knoten an Pfad x" auf.
+
+DOMAENE 3 — MESS-/TELEMETRIE-DOMAENE (Querschnitt)
+   Verantwortlich fuer:
+      - Counter-Erfassung via perf/PAPI/Advisor
+      - Histogramm-Ablage (HDR)
+      - Plattform-Erkennung (CPU-Features, ISA, Cache-Hierarchie)
+      - Reproduzierbarkeit (Seeds, Warmups, Pinning, Compiler-Flags)
+
+   Modul-Bausteine:
+      - Counter-Collector (perf/PAPI/Advisor Wrapper)
+      - Histogram-Aggregator (HdrHistogram-basiert)
+      - Platform-Probe (CPU-ID, ISA-Detection, Cache-Topo)
+      - Run-Recorder (Run-Logs mit Build-/Compiler-/Flag-Info)
+
+   Wichtig: KEINE Mittelung von Perzentilen; 5 Laeufe je Konfiguration roh.
+
+DOMAENE 4 — HARDWARE/ISA-DOMAENE (Querschnitt, Build-Zeit + Runtime)
+   Verantwortlich fuer:
+      - ISA-Pfad-Wahl (scalar / AVX2 / AVX-512 / NEON / SVE2)
+      - Function Multiversioning (target_clones)
+      - Hybrid-Core-Behandlung (P-/E-Core; cpu_core/* vs cpu_atom/*)
+      - Heterogeneous Memory (DRAM/HBM/NV-RAM-Erkennung)
+
+   Modul-Bausteine:
+      - ISA-Dispatcher (Build-Zeit Function Multiversioning)
+      - Hybrid-Core-Aware Pinning (Runtime)
+      - Memory-Type-Detector (DRAM/HBM/NV-RAM)
+      - Hugepage-Manager (P32 Schmidt: 2 MiB Hugepages senken TLB-Druck)
+
+GEMEINSAMER VERTRAG (Schnittstelle Domaene 1 ↔ Domaene 2)
+   - Cache-Engine sieht "Knoten/Pages" als opake Blobs mit Header-Telemetrie
+     (Probability Sketches, Counter, Densitaet, Fanout).
+   - Such-Algorithmen rufen auf: "Naechster Knoten unter Schluessel-Praefix x"
+     und bekommen vom Cache-Engine-Modul den effektiven Seitentyp +
+     Pointer/Handle zurueck.
+   - **Single Direction Dependency**: Such-Engine darf Cache-Engine aufrufen;
+     Cache-Engine darf NICHT in die Such-Logik greifen.
+
+================================================================================
+4 IDENTIFIZIERTE PRT-ART-FORSCHUNGSLUECKEN (Konsolidiert aus Konzeptmatrix)
+================================================================================
+
+LUECKE 1: Cache-Engine als getrennte Meta-Ebene
+   Beleg: Keine der 33 Quellen P01-P33 hat eine getrennte Cache-Engine-Ebene.
+   Alle haben Cache-Awareness "built-in" in der Algorithmus-Implementierung.
+   PRT-ART loest dies durch saubere Trennung Such-Domaene ↔ Cache-Engine-Domaene.
+
+LUECKE 2: Online Re-Layouting wird explizit ausgeschlossen
+   Beleg: P28 Kuehn: "while we detect hot paths, runtime re-layouting is
+   explicitly out of scope" (P28:Sec.4).
+   P18 Saikkonen macht Multi-Level Relocation, aber statisch geplant.
+   PRT-ART macht Online Re-Layouting via Cache-Engine-Modus 3.
+
+LUECKE 3: Gemeinsame Wahl Seitentyp+Layout+Inline+Prefetch+Allocator
+   Beleg: P10 SuRF waehlt nur Encoding (Dense/Sparse), P20 Mueller waehlt nur
+   Layout, P14 Samuel waehlt Konfiguration aus Tabelle, P23 Khan waehlt nur
+   Prefetch-Distanz. Keine Quelle waehlt ALLE 5 gemeinsam.
+   PRT-ART Cache-Engine waehlt alle 5 in einem koordinierten Schritt.
+
+LUECKE 4: Plattform-bewusste online Adaption pro ISA-Pfad
+   Beleg: P31/P32/P33 (TUD/Habich-Linie) zeigen Plattform-Variabilitaet,
+   aber ohne online Adaption pro ISA-Pfad zur Laufzeit.
+   PRT-ART Modus 3 + ISA-Dispatch = neue Kombination.
+
+================================================================================
+NICHT-MEHR-OFFENE PUNKTE (gegenueber v2)
+================================================================================
+
+* "ChainRef" — vertagt (Termin 2). Mapping zu CoCo-trie Macro-Node ist NICHT
+   direkt — Macro-Node ist Subtrie-Kollabierung, ChainRef ist Value-Verkettung.
+
+* "Border Node" (Masstree P03) — Layer-Grenze (Slice-Wechsel). PRT-ART nutzt
+   keine 8-Byte-Slices, daher nur konzeptionell aequivalent.
+
+* "Fingerprinting" (B-Trees Are Back P20) — vorberechneter Hash-Bit-Vector
+   pro Schluessel. PRT-ART Termin 1: optional, nicht im Pflicht-Kern.
+
+* "Heads / Hints" (B-Trees Are Back P20) — sortierte erste Bytes der
+   Schluessel im Page-Header. NICHT identisch zu PRT-ART Probability Hints
+   (statistische Telemetrie). Verschiedene Konzepte.
+
+* "Concurrency Token" / "Version" (P08 ART OLC, P03 Masstree) vs RCU Grace
+   Period (P29) — komplementaer: OLC fuer Lookups, RCU fuer Memory Reclamation
+   nach Relocation. PRT-ART nutzt im Kern beide (T4 Designentscheidung).
+
+* SuRF "FST" + "LOUDS-Dense / LOUDS-Sparse" — VOLL INTEGRIERT in 1.5.
+   LOUDS-Dense ↔ PRT-ART Dense-Byte-Page, LOUDS-Sparse ↔ Sparse Patricia Page,
+   LOUDS-DS Hybrid ↔ Cache-Engine Page-Type-Selection. SuRF statisch, PRT-ART
+   dynamisch.
+
+* "TUD/Habich-Linie" (P31/P32/P33) — Sprache + Methodik der Diplomarbeit-
+   Forschungslinie. P31 Ungethuem 2017 ist die Sprache, P32 Schmidt 2025 die
+   empirische Plattform-Stuetze, P33 VAMPIR die NFP-Sprache.
+
+* "Saikkonen Multi-Level Relocation" (P18) + "Layout-Invariante" (P19) —
+   direkter Vorgaenger fuer PRT-ART Online Relocation, aber statisch geplant.
+   PRT-ART macht das adaptiv via Cache-Engine.
+
+* "Hot Path Detection ohne Re-Layouting" (P28 Kuehn) — explizit als
+   Forschungsluecke benannt: PRT-ART schliesst diese Luecke.
+
+* "Useless Prefetch" (P24 NaderanTahan) — klassisches Argument fuer Adaptive
+   Prefetch in PRT-ART Cache-Engine.
+
+* "Fill Buffer als limitierender Faktor" (P25 Mahling) — Hardware-Begrenzung,
+   die PRT-ART Cache-Engine bei Prefetch-Distanz-Wahl beruecksichtigt.
+
+================================================================================
+VORBEREITUNG FUER PHASE 3.D (Domaenenmodell drawio UML)
+================================================================================
+
+Modul-Aufstellung als textuelle UML-Vorbereitung:
+
+PACKAGE search_engine (Domaene 1)
+├── interface ITrieEngine { lookup, range_lookup, insert, delete }
+├── class TrieEngine implements ITrieEngine
+│   ├── uses IPageTypeFactory (von cache_engine)
+│   └── uses IConcurrencyController
+├── package page_types
+│   ├── class DenseBytePage
+│   ├── class ExtendedDensePage
+│   ├── class SparsePatriciaPage
+│   ├── class RedirectPage
+│   └── class CustomCachePage
+├── class ValueHandle (Inline | External | ChainRef-deferred)
+└── package concurrency
+    ├── class OLCController (P08)
+    ├── class RCUReclamation (P29)
+    └── class HazardPointerReclamation (P30)
+
+PACKAGE cache_engine (Domaene 2 — KERNBEITRAG)
+├── interface ICacheEngine { select_page_type, prefetch_advice, relocate_request }
+├── class CacheEngine implements ICacheEngine
+│   ├── uses PlatformProfiler
+│   ├── uses CostModel
+│   ├── uses TelemetryAggregator
+│   └── modes: Passive | WarmupCalibrated | OnlineAdaptive
+├── class PlatformProfiler (P05 + P23 Lehren)
+├── class CostModel (P13 + P16 + P05)
+├── class PageTypeScheduler (Selection Rules)
+├── class PrefetchController (P21 + P23 + P25)
+├── class RelocationManager (P18 + P28)
+├── class AllocatorManager (Arena/Pool)
+└── class TelemetryAggregator (P26 + P28)
+
+PACKAGE measurement (Domaene 3)
+├── class CounterCollector (perf/PAPI/Advisor)
+├── class HistogramAggregator (HdrHistogram)
+├── class PlatformProbe (CPU-ID, ISA, Cache-Topo)
+└── class RunRecorder
+
+PACKAGE hardware_isa (Domaene 4)
+├── class ISADispatcher (target_clones)
+├── class HybridCorePinning
+├── class MemoryTypeDetector (DRAM/HBM/NV-RAM)
+└── class HugepageManager (P32 Lehre)
+
+DEPENDENCIES (Single Direction):
+   search_engine ──→ cache_engine (NIE umgekehrt)
+   cache_engine  ──→ measurement
+   cache_engine  ──→ hardware_isa
+   search_engine ──→ measurement (Counter-Erfassung)
+   search_engine ──→ hardware_isa (ISA-Dispatch fuer Knoten-Operationen)
+
+================================================================================
+ENDE DES BEGRIFFSGLOSSARS v3 — FINAL
+Phase 3.D (Domaenenmodell finalisieren) baut hierauf auf.
+Phase 5 (drawio UML) ist gesperrt bis explizites GO vom Nutzer.
+================================================================================

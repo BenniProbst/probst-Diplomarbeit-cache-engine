@@ -1,0 +1,742 @@
+================================================================================
+DOMAENENMODELL v3 — PRT-ART (Predix-Trie-ART)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D REV 3
+Stand: 2026-05-04 · ersetzt Domaenenmodell_PRT_ART_v2.txt
+Basis: Architekturentscheidungen_F1_F15.txt (kanonisch beschlossen)
+Vorbereitet fuer: Phase 5 (drawio UML — gesperrt bis explizites Nutzer-GO)
+================================================================================
+
+WAS GEAENDERT WURDE GEGENUEBER v2 (basierend auf F1-F15)
+   1. F12 → CacheEngine lebt IM CacheEngineBuilder (KEIN separater Singleton).
+   2. F1  → Mess-Kategorie x Algorithmus-Detail Matrix als constexpr-
+            Implementierungen, compile-time im Hot-Path inlined.
+   3. F2  → Observer Push synchron + Command-Pattern Lambda-Entscheidungs-
+            baeume mit DELAY/EXECUTE/SKIP. Forschungs-Belege fuer Barrieren
+            (P02 Konsolidierung, P03 Permutation Field, P05 Rewiring,
+            P08 OLC, P18 Multi-Level Reloc, P28 Histogram, P29 RCU).
+   4. F5  → In-Memory MeasurementBuffer; KEINE externe Datenbank.
+   5. F7+F9+F10 → Module-Permutationen via CMake-Skript pre-built; Original-
+            Compiler pro fremdem Algorithmus; ABI-stabile C++23-Module.
+   6. F15 → Bausteine-Quer-Permutation als ZENTRALES FORSCHUNGS-PRINZIP.
+            Explizite Bausteine-Matrix.
+   7. Plattform-Workflow (F9+F13): Compile-Time vs Runtime SIMD-Detection
+            gegenseitig ausschliessend; ZIH Runtime, sonst Compile-Time.
+   8. F4  → Permutationsraum vollstaendig, ISA-Filter via CMake compile-time.
+
+================================================================================
+1. ARCHITEKTUR-GRUNDPRINZIPIEN  (REV 3)
+================================================================================
+
+(A) BASISVERTRAG (unveraendert vs v2)
+    Jeder Algorithmus implementiert die `std::map<Key,Value>`-API (C++23).
+    Algorithmen sind dropin-Ersatz fuer `std::map`. Key-Type kann implizit
+    mit Hashing/Fingerprinting ueberlagert sein.
+
+(B) ENGINE-CHOICE (unveraendert vs v2)
+    `template<typename Algo, typename EngineKind> Container<...>`
+       • StaticEngine — Originalcode + Adapter; KEINE Optimierungen ueber
+         State-of-the-Art hinaus.
+       • CacheEngine  — aktive Optimierung; Visitor + Observer + Command-
+         Lambda-Trees + ConcurrencyManager + constexpr-Telemetrie.
+    Engine-Choice ist Compile-Time, KEIN Runtime-Switch.
+
+(C) CACHE-ENGINE-LOKATION (KORRIGIERT F12)
+    Die Cache Engine ist KEIN separates globales Singleton-Heap-Modul.
+    Sie lebt IM `CacheEngineBuilder` (= main.cpp Orchestrator).
+    Sie wird zwischen Modul-Experimenten zurueckgesetzt.
+    Cache-Warmup gehoert ZUR Algorithmus-Permutation (nicht zur CacheEngine).
+
+(D) ZWEI BETRIEBSMODI DES BUILDERS (KORRIGIERT F12)
+    Schicht A — PERMUTATIONS-BUILD (vorbereitend, einmalig pro Plattform)
+       - CMake-Skript baut alle gueltigen Permutationen als ABI-stabile
+         C++23-Module.
+       - Pro fremdem Algorithmus mit dessen Original-Compiler.
+       - Pre-Build-Phase, dauert Stunden bis Tage, EINMALIG je Plattform.
+    Schicht B — EXPERIMENT-AUSFUEHRUNG (Builder-Runtime)
+       - CacheEngineBuilder (main.cpp) iteriert ueber pre-built Module.
+       - Pro Modul: dynamisch laden, Cache-Warmup, Dataset-Prep, Experiment,
+         Reset, Modul entladen.
+       - In-Memory MeasurementBuffer akkumuliert; am Ende Disk-Dump + LaTeX.
+
+(E) HABICH-DIREKTIVE (unveraendert vs v2)
+    Originalcode aller fremden Algorithmen wird EXAKT KOPIERT uebernommen.
+    Adapter-Pattern als Anbindung. Originalcode wird mit DEM ORIGINAL-COMPILER
+    des Papers separat kompiliert (F7-Praezisierung). Invasive Eingriffe
+    (Messpunkte) NUR mit Habich-Absprache.
+
+(F) ZIELSTANDARD: C++23 (unveraendert)
+    Module fuer ABI-Stabilitaet (F9). `requires`-Klauseln fuer Concepts.
+    `constexpr` fuer Mess-Kategorien-Inlining (F1).
+
+(G) READ COUNTER = uint64_t (unveraendert)
+
+(H) MEMORY RECLAMATION = RCU (unveraendert; Hazard Pointers raus)
+
+(I) MEASUREMENT IST IN-MEMORY (KORRIGIERT F5)
+    Eigene einfache, effiziente In-Memory-Loesung. KEINE externe DB.
+    Begruendung (Architekt): "Latenzen einer DB interferieren mit
+    Experimenten. Wir koennen Kontrolle nicht an eine Time-Series-Datenbank
+    abgeben, ohne den Cache und den Kernel zu unterbrechen."
+
+(J) BAUSTEINE-QUER-PERMUTATION (NEU F15 — ZENTRALES PRINZIP)
+    Jeder Algorithmus-Baustein (Page-Type, Node-Type, Traversal, ValueHandle-
+    Strategy, MemoryLayout, Allocator, Prefetch, Concurrency-Disziplin) ist
+    EINZELN gegen einen anderen aus JEDEM BELIEBIGEN anderen Algorithmus
+    AUSTAUSCHBAR. Untersuchung jedes einzelnen Prinzips gegen jedes Andere.
+    Die Cache Engine zeigt ihren massgeblichen Einfluss auf ALLE Bausteine.
+
+(K) KONZEPT-MAPPING (unveraendert vs v2)
+    Konzeptionelle Elemente als C++23 Concepts mit `requires`-Klauseln:
+       FanOutContainer, Page, Node, Traversal, MemoryLayout,
+       ValueHandleStrategy, PageAllocator, PrefetchStrategy,
+       ConcurrencyDiscipline, Telemetry, MeasurementCategory.
+
+================================================================================
+2. BAUSTEINE-MATRIX  (NEU — ZENTRAL FUER F15)
+================================================================================
+
+ZWECK
+   Explizite Aufstellung aller bekannten Implementierungen pro konzeptioneller
+   Achse aus den 33 Papern + PRT-ART. Jeder Eintrag ist ein eigenes Modul,
+   das als Baustein in den Permutationsraum einfliesst.
+
+ACHSE 1 — PAGE-TYPE
+   • DenseBytePage_ART_Node256                          [P01]
+   • SparseNode4Page_ART                                [P01]
+   • Node16Page_ART                                     [P01]
+   • Node48Page_ART                                     [P01]
+   • CompoundNodePage_HOT                               [P02]
+   • B_PlusPage_Masstree                                [P03]
+   • MacroNodePage_CoCo                                 [P04]
+   • MultiBytePage_START                                [P05]
+   • DecisionPage_B2tree                                [P06]
+   • SpanPage_B2tree                                    [P06]
+   • MetaTrieHTPage_Wormhole                            [P07]
+   • LOUDSDensePage_SuRF                                [P10]
+   • LOUDSSparsePage_SuRF                               [P10]
+   • LOUDSPage_Jacobson                                 [P09]
+   • CSSNodePage                                        [P11]
+   • CSBNodeGroupPage                                   [P12]
+   • WiderBPlusPage_Hankins                             [P13]
+   • ConfigTableBPlusPage_Samuel                        [P14]
+   • AdaptiveBPlusPage_BTreesAreBack                    [P20]
+   • PrefetchBPlusPage_Chen                             [P21]
+   • FractalPrefetchPage_Chen                           [P22]
+   • PRTART_DenseBytePage                               [PRT-ART eigen]
+   • PRTART_ExtendedDensePage                           [PRT-ART eigen]
+   • PRTART_SparsePatriciaPage                          [PRT-ART eigen]
+   • PRTART_RedirectPage                                [PRT-ART eigen]
+   • PRTART_CustomCachePage                             [PRT-ART eigen]
+
+ACHSE 2 — NODE-TYPE
+   • Node4 / Node16 / Node48 / Node256                  [P01]
+   • CompoundNode (BiNode k=32)                         [P02]
+   • InternalNode / BorderNode                          [P03]
+   • MacroNode                                          [P04]
+   • MultiByteNode                                      [P05]
+   • DecisionNode / SpanNode                            [P06]
+   • CSSNode (pointer-frei, Cache-Line-gross)           [P11]
+   • CSBNodeGroup                                       [P12]
+   • WiderBPlusNode                                     [P13]
+   • PRTART_*Node                                       [PRT-ART eigen]
+
+ACHSE 3 — TRAVERSAL
+   • ByteByByteTraversal                                [P01 ART]
+   • DiscriminativeBitsTraversal                        [P02 HOT]
+   • LayerSliceTraversal                                [P03 Masstree]
+   • MacroNodeTraversal                                 [P04 CoCo]
+   • MultiByteSpanTraversal                             [P05 START]
+   • EmbeddedDecisionTreeTraversal                      [P06 B²-tree]
+   • HashAnchorTraversal                                [P07 Wormhole]
+   • RankSelectTraversal                                [P09 Jacobson]
+   • LowerBoundTraversal                                [P10 SuRF]
+   • PointerArithmeticTraversal                         [P11 CSS]
+   • OffsetTraversal                                    [P12 CSB+]
+   • PrefetchAheadTraversal                             [P21 Chen]
+   • AdaptivePrefetchDistanceTraversal                  [P23 Khan]
+   • PRTART_HotPathTraversal                            [PRT-ART eigen]
+   • PRTART_PrefetchAwareTraversal                      [PRT-ART eigen]
+
+ACHSE 4 — VALUEHANDLE-STRATEGY
+   • InlineHandle                                       (P01 ART, P02 HOT, ...)
+   • PointerHandle                                      (alle)
+   • RedirectToNodeHandle                               (P01 Path Compr., P04 Macro)
+   • RedirectToPageHandle                               (P06 B²-tree)
+   • DynamicHandle                                      (PRT-ART eigen)
+   ChainRefHandle                                        (vertagt)
+
+ACHSE 5 — MEMORYLAYOUT
+   • CacheLineAlignedLayout                             (default)
+   • HugePageAlignedLayout                              (P32-Lehre)
+   • PointerFreeContiguousLayout                        (P11 CSS)
+   • SiblingClusterLayout                               (P12 CSB+)
+   • InlineSlotLayout                                   (small inline values)
+   • MetadataHeaderLayout                               (Telemetrie-Slots)
+   • EmbeddedTreeLayout                                 (P06 B²-tree)
+
+ACHSE 6 — ALLOCATOR
+   • PoolPerPageType
+   • ArenaPerSubtree
+   • SlabAllocator                                       (Linux-aehnlich)
+   • HBMAllocator                                        (P32/P33-Plattform)
+   • DefaultMallocAllocator                              (Baseline)
+   • TcmallocAdapter / MimallocAdapter                   (Library-Wrapper)
+
+ACHSE 7 — PREFETCH-STRATEGY
+   • NoPrefetch                                          (Baseline)
+   • SoftwarePrefetchFixed                               (P21 Chen)
+   • AdaptivePrefetchDistance                            (P23 Khan)
+   • HierarchicalBundlePrefetch                          (P27 Zhang ASPLOS)
+   • FillBufferAwarePrefetch                             (P25 Mahling)
+   • HotPathPrefetch                                     (P26 Zhang FGCS)
+
+ACHSE 8 — CONCURRENCY-DISZIPLIN
+   • PageConcurrency / NodeConcurrency / ArrayConcurrency
+   • DataStructureConcurrency / PathConcurrency
+   • MemoryAccessConcurrency (Read/Write/ReadWrite)
+   • SimdThreadConcurrency / SimdFlowConcurrency
+   • ConcurrencyComposition<...>                         (Policy-Template)
+   • OLC                                                 [P08]
+   • ROWEX                                               [P08]
+   • RCUReclaim                                          [P29]
+
+ACHSE 9 — ISA-PFAD
+   • scalar / x86_avx2 / x86_avx512 / arm_neon / arm_sve2
+
+ACHSE 10 — MEASUREMENT-KATEGORIE  (Mess-Achse, NEU F1)
+   • CLU (Cache Line Utilization)
+   • CacheMiss (L1/L2/L3)
+   • dTLBMiss
+   • MemoryFootprint
+   • BranchMiss
+   • IPC / CPI
+   • Latency (Mean, p50, p95, p99, p999)
+   • Throughput
+   • EnergyJ
+   • FillBufferOccupancy
+
+PERMUTATIONSRAUM
+   |Achse 1| × |Achse 2| × |Achse 3| × |Achse 4| × |Achse 5| × |Achse 6|
+   × |Achse 7| × |Achse 8| × |Achse 9|
+   = HUNDERTE bis TAUSENDE Module nach ISA-Filter (F4)
+   ConstraintFilter sortiert ungueltige Kombinationen aus.
+
+CONSTEXPR PRO (MEASUREMENT-KATEGORIE × ALGORITHMUS-DETAIL)  (F1)
+   Pro Zelle dieser Matrix existiert eine constexpr-spezialisierte
+   Implementierung der Mess-Erfassung, die compile-time im Hot-Path
+   inlined wird. Beispiele:
+       template<>
+       constexpr void measure<MeasurementCategory::CLU,
+                              AlgorithmDetail::ART_Node256>(...) noexcept {
+         // ART-Node256-spezifische CLU-Messung
+       }
+       template<>
+       constexpr void measure<MeasurementCategory::CLU,
+                              AlgorithmDetail::HOT_CompoundNode>(...) noexcept {
+         // HOT-spezifische CLU-Messung
+       }
+
+================================================================================
+3. DOMAENE 1 — SEARCH ENGINE  (REV 3)
+================================================================================
+
+(Strukturell unveraendert vs v2 §3 — `fan_out_engine`, Algorithm Strategies,
+Page/Node/Traversal/ValueHandle/MemoryLayout/Operations als Concepts.
+Hier nur die geaenderten/ergaenzten Punkte:)
+
+3.1 ALGORITHMUS-MODULE ALS C++23 ABI-STABILE MODULE  (F9)
+   • Jede Permutation der Bausteine (Page x Node x Traversal x ... x ISA)
+     wird als eigenes ABI-stabiles C++23-Modul gebaut.
+   • Module werden VOR dem Builder-Lauf via CMake-Skript pre-built.
+   • Builder laed sie zur Laufzeit dynamisch (`dlopen` / `LoadLibrary`).
+   • Modul-Schnittstelle:
+        export module comdare.algo_perm.<perm_id>;
+        export class AlgorithmModule : public IAlgorithmStrategy<K,V> {
+          ...
+        };
+
+3.2 OBSERVER-PUSH + COMMAND-LAMBDA-TREES  (F2)
+   • Algorithmus implementiert `IObserverProducer`; bei Hot-Path-Ereignissen
+     ruft direkt `runtime.notify(event)` synchron auf.
+   • Pro Entscheidungsklasse haelt CacheEngine eine `DecisionLambdaTree`-
+     Instanz. Tree entscheidet:
+        - EXECUTE (Anpassung sofort)
+        - DELAY   (Anpassung verschieben → Barriere/Konsolidierung)
+        - SKIP    (Anpassung ueberspringen)
+   • Komponente:
+        template<typename EventT>
+        class DecisionLambdaTree {
+          using Decision = enum class { EXECUTE, DELAY, SKIP };
+          // konfigurierbare Lambda-Knoten
+          constexpr Decision evaluate(EventT&&, Context&) const noexcept;
+        };
+
+   ENTSCHEIDUNGSKLASSEN (DecisionLambdaTree-Instanzen)
+     - PageRelocationDecisionTree
+     - PageTypeChangeDecisionTree
+     - PrefetchAdjustmentDecisionTree
+     - AllocatorRebalanceDecisionTree
+     - ConcurrencyDisciplineSwitchDecisionTree
+     - PageTypeSelectionDecisionTree
+     - HotPathRecognitionDecisionTree
+     - LayoutInvariantMaintenanceDecisionTree
+
+   FORSCHUNGS-BELEGE FUER BARRIEREN/DELAYS
+     • P02 HOT — Compound-Node-Konsolidierung als Barriere
+     • P03 Masstree — Permutation-Field aktualisiert ohne Move
+     • P05 START — Rewiring laeuft mit Barrieren
+     • P08 ARTSync — OLC deferred Updates via Lock Coupling
+     • P18 Saikkonen — Multi-Level Reloc periodisch
+     • P28 Kuehn — Histogram-Update inkrementell, Re-Layout ausgeschlossen
+     • P29 RCU — Grace Period als explizite Barriere
+     • P26 Zhang FGCS — Hot-Path-Detection erst nach Threshold
+
+3.3 VISITOR-MID-GRANULARITAET  (F3)
+   • CacheEngine ruft `accept(visitor)` am Algorithmus auf
+   • Visitor kennt nur:
+        + visit(IPage*)
+        + visit(INode*)
+   • KEINE feinere Granularitaet (kein visit(ValueHandle*)/visit(TraversalStep*))
+   • Respektiert Habich-Direktive (Originalcode-Boundary)
+
+3.4 VALUEHANDLE: std::variant + Concept-Constraint  (F8)
+   class ValueHandle {
+     std::variant<InlineHandle, PointerHandle, RedirectToNodeHandle,
+                  RedirectToPageHandle, DynamicHandle> v_;
+   };
+   template<ValueHandleKind K, typename AlgoTag>
+   concept AllowedHandle = ...;   // begrenzt erlaubte Varianten je Algo
+   template<typename Algo>
+     requires AllowedHandle<DynamicHandle, AlgoTag<Algo>>
+   class DynamicHandle { ... };
+
+3.5 CONCURRENCYMANAGER: Klassen + Policy-Template  (F6)
+   • 8+ Disziplin-Klassen (PageConcurrency, NodeConcurrency, ...)
+     als Base-Implementierungen
+   • Top-Level: `template<typename... Ds> class ConcurrencyManager`
+     komponiert Disziplinen zero-overhead compile-time.
+   • Singleton-Mechanik wie CacheEngine (heap, unique_ptr + call_once).
+
+================================================================================
+4. DOMAENE 2 — CACHE ENGINE & BUILDER  (KOMPLETT NEU STRUKTURIERT, F12)
+================================================================================
+
+4.1 OBERSTE EINHEIT: CacheEngineBuilder  (= main.cpp Orchestrator)
+   ROLLE
+     Eigenstaendiges C++23-Programm pro ISA-Plattform. Aus Source kompiliert
+     mit den Plattform-spezifischen Compiler-Versionen (selbst gebaut auf
+     Pi 5 / VisionFive 2; cross-compiled fuer ZIH-Lieferung).
+     Beinhaltet die CacheEngine als Komponente.
+
+   LEBENSZYKLUS (Phase fuer Phase)
+     1. PLATFORM-PROBE
+        - CPU-Features (ISA, Hybrid-Cores, Cache-Topo, Memory-Topo)
+        - Verfuegbare Compiler-Versionen pro fremdem Algorithmus
+        - Initialisiert LiveCpuModel
+     2. MODE-DETECTION
+        - Compile-Time-Modus (Default) ODER Runtime-Modus (ZIH) — gegenseitig
+          ausschliessend
+     3. MODULE-PERMUTATIONS-SCAN
+        - Scan `build/modules/` nach pre-built Modulen
+        - Ergebnis: Liste vorhandener / fehlender Permutationen
+     4. ADHOC BUILD (nur falls fehlend)
+        - Ruf `build_permutations.cmake` mit Liste fehlender perm_ids
+        - Sequentieller Bau pro Permutation, jeweils mit dem fuer den
+          Fremd-Algorithmus passenden Original-Compiler
+     5. EXPERIMENT-LOOP (pro Modul)
+        a. CacheEngine.reset()
+        b. Modul dynamisch laden
+        c. Cache-Warmup (modul-spezifisch, gehoert zur Permutation)
+        d. Dataset-Aufbereitung
+        e. Experiment ausfuehren
+              - perf/PAPI Makro-Messung
+              - Interne Mikrobenchmarks (continuous im Builder-Modus)
+              - constexpr-Telemetrie pro (MessKategorie x AlgoDetail)
+        f. Push observations → CacheEngine via Observer
+        g. CacheEngine evaluiert DecisionLambdaTrees → EXECUTE/DELAY/SKIP
+        h. Messungen → InMemoryMeasurementBuffer
+        i. Modul entladen
+     6. SERIALISIERUNG
+        - InMemoryMeasurementBuffer → Disk-Dump (Binary/CSV)
+     7. LATEX-RENDERING
+        - LatexRenderer liest Disk-Dump, generiert Anhang fuer Diplomarbeit
+
+4.2 PERMUTATIONS-BUILD-PIPELINE  (F10)
+   build_permutations.cmake (sequentiell pro Permutation)
+     1. Codegen — Template-instanziierter .cpp + .ccm Modul-Interface
+     2. Compile mit Original-Compiler des jeweiligen Fremd-Algorithmus
+        (Habich-Direktive, F7)
+     3. Link zu ABI-stabilem Modul (.so / .dll / .dylib)
+     4. Output: `build/modules/<perm_id>/<perm_id>.module.so`
+
+   PRAEZISIERUNG (F4)
+     • Permutationsraum vollstaendig
+     • ISA-Filter via CMake compile-time
+     • ConstraintFilter sortiert absurde Kombis aus
+     • Cross-Compile-Toolchains pro Target im CMake hinterlegt
+     • Pro fremdem Algorithmus: dessen Original-Compiler-Version registriert
+
+4.3 CACHE ENGINE (KOMPONENTE INNERHALB DES BUILDERS)
+   class CacheEngine {                         // im Builder instanziiert
+     LiveCpuModel cpu_;
+     ConcurrencyManager& cm_;                  // Singleton, Heap (F1)
+     AlgorithmVisitor visitor_;
+     ObserverRegistry observers_;
+     // Decision Lambda Trees pro Entscheidungsklasse:
+     PageRelocationDecisionTree            page_reloc_dt_;
+     PageTypeChangeDecisionTree            page_type_dt_;
+     PrefetchAdjustmentDecisionTree        prefetch_dt_;
+     AllocatorRebalanceDecisionTree        allocator_dt_;
+     ConcurrencyDisciplineSwitchDecisionTree concurrency_dt_;
+     PageTypeSelectionDecisionTree         page_type_sel_dt_;
+     HotPathRecognitionDecisionTree        hot_path_dt_;
+     LayoutInvariantMaintenanceDecisionTree layout_invariant_dt_;
+
+     RuntimeMicroBenchmarks micro_;
+     CompileTimeKnowledge knowledge_;          // pro Plattform vorberechnet
+     TelemetrySpool spool_;
+
+     void reset();                             // zwischen Modul-Experimenten
+     void register_algorithm(IAlgorithmStrategy*);
+     void on_observation(ObservationEvent);    // Push synchron (F2)
+     void visit(IAlgorithmStrategy*);          // Visitor mid (F3)
+     StrategyRecommendation recommend_strategy(Context);
+   };
+
+4.4 SINGLETON-MECHANIK  (F1)
+   class ConcurrencyManager {
+     static std::unique_ptr<ConcurrencyManager> instance_;
+     static std::once_flag once_;
+   public:
+     static ConcurrencyManager& instance() {
+       std::call_once(once_, []{
+         instance_ = std::make_unique<ConcurrencyManager>();
+       });
+       return *instance_;
+     }
+   };
+   // Identisches Muster fuer CacheEngine (innerhalb des Builders).
+
+4.5 MESS-KATEGORIE × ALGORITHMUS-DETAIL MATRIX  (F1, ZENTRAL)
+   Pro Zelle: eine constexpr-Implementierung, compile-time inlined.
+
+   namespace cm = comdare::measurement;
+   namespace ad = comdare::algorithm_detail;
+
+   template<cm::Category C, ad::Detail D>
+   struct Measure {
+     static constexpr void at_lookup_begin(...) noexcept;
+     static constexpr void at_lookup_end(...) noexcept;
+     static constexpr void at_node_visit(...) noexcept;
+     // weitere Hooks
+   };
+
+   // Spezialisierungen (Beispiele):
+   template<>
+   struct Measure<cm::Category::CLU, ad::Detail::ART_Node256> {
+     static constexpr void at_node_visit(...) noexcept {
+       // ART-Node256-spezifische CLU-Messung
+       // (effective bytes touched / 64)
+     }
+   };
+
+   template<>
+   struct Measure<cm::Category::CLU, ad::Detail::HOT_CompoundNode> {
+     static constexpr void at_node_visit(...) noexcept {
+       // HOT-spezifische CLU-Messung (Bit-Granularitaet beachten)
+     }
+   };
+
+   template<>
+   struct Measure<cm::Category::dTLB, ad::Detail::ART_Node256> { ... };
+   template<>
+   struct Measure<cm::Category::dTLB, ad::Detail::HOT_CompoundNode> { ... };
+   ...
+
+   ZUORDNUNG via C++23 Concepts + requires:
+   template<typename Algo, cm::Category C>
+     requires cm::HasMeasurement<Algo, C>
+   constexpr void hooked_node_visit(Algo& a, Context& ctx) {
+     Measure<C, ad::DetailOf<Algo>>::at_node_visit(a, ctx);
+   }
+
+   FOLGEN
+     • Zero-overhead Telemetrie bei nicht-aktivierter Messung
+     • Pro Algorithmus-Modul wird ein bestimmtes Mess-Set ge-inlined
+     • Kein virtual call in der Mess-Schicht
+     • Mess-Set ist Teil des ABI-stabilen Modul-Builds
+
+================================================================================
+5. DOMAENE 3 — MEASUREMENT (3 BESTANDTEILE, IN-MEMORY)
+================================================================================
+
+5.1 MIKROBENCHMARK-TRIGGERING  (F11)
+   • Builder-Modus: continuous (jeder Lookup misst)
+   • Produktions-Modus: sampled (typisch 1:1000)
+
+5.2 IN-MEMORY MEASUREMENT BUFFER  (F5)
+   class InMemoryMeasurementBuffer {
+     // pro Thread eigener Arena-Block
+     std::pmr::monotonic_buffer_resource arena_;
+     // append-only, lock-free oder per-thread
+     std::vector<MeasurementRecord, ...> records_;
+
+     void append(MeasurementRecord) noexcept;
+     void serialize_to_disk(std::filesystem::path) const;
+   };
+
+   EIGENSCHAFTEN
+     • Append-only, kein Lock im Hot-Path
+     • Pro CPU/Thread eigener Arena-Block (cache-line-aligned)
+     • Format: Binary-Dump (kompakt) oder CSV (debug)
+     • Serialisierung NUR am Ende eines kompletten Experiments
+     • KEINE externe DB → keine Kernel-Context-Switches waehrend Messung
+     • LatexRenderer liest aus Disk-Dump
+
+5.3 MIKROBENCHMARKS-PACKAGES (Bibliothek)
+   • PerfWrapper / PapiWrapper / AdvisorWrapper
+   • HdrHistogramWrapper (Tail-Latenz, KEINE Mittelung von Perzentilen)
+   • DatasetLoader (YCSB A-F + Custom-Korpus, F14)
+   • PlatformProbe (CPU-ID, ISA, Cache-Topo, Memory-Topo)
+   • RunRecorder (Build-Flags, Compiler, Pinning, Seeds)
+
+================================================================================
+6. DOMAENE 4 — HARDWARE / ISA  (F9 + F13)
+================================================================================
+
+6.1 ISA-DISPATCH
+   • scalar / x86_avx2 / x86_avx512 / arm_neon / arm_sve2
+   • Function Multiversioning (target_clones) optional pro Algorithmus
+   • Compile-Time-Modus: ISA als Build-Flag fixiert
+   • Runtime-Modus: ISA-Detection bei Init der CacheEngine
+   • Beide Modi gegenseitig ausschliessend (F9)
+
+6.2 PLATTFORM-WORKFLOW  (F13)
+   PI 5 / VISIONFIVE 2  (unter unserer Kontrolle)
+     • Self-built Compiler mit voller C++23-Modules-Unterstuetzung
+     • CacheEngineBuilder direkt aus Source kompiliert
+     • Compile-Time-ISA-Optimierung
+   ODROID H4 ULTRA / X86-SERVER  (CI/CD-Direkt)
+     • CI/CD-Builds pro ISA
+     • Compile-Time-ISA-Optimierung
+   ZIH (Barnard / Capella / Grace Hopper)
+     • Cross-Compile auf vorhandener Infrastruktur
+     • Binaer-Lieferung via SOCKS5 (oder gleichwertig)
+     • Runtime-ISA-Detection in der CacheEngine bei Init
+     • KEINE Compile-Aktivitaet auf ZIH (Restriktionen)
+
+6.3 ORIGINAL-COMPILER-PIPELINE  (F7)
+   Jeder fremde Algorithmus benoetigt SEINEN Original-Compiler.
+   CMake-Konfiguration registriert pro Algorithmus die noetige Compiler-
+   Version. Pre-Build-Phase verifiziert Verfuegbarkeit aller Compiler.
+
+   Beispiele (zu praezisieren):
+     • P01 ART (Leis 2013) — GCC 4.7+, Original-Build geprueft mit GCC 4.8
+     • P02 HOT (Binna 2018) — GCC 5+, BMI2/AVX2 erforderlich
+     • P03 Masstree (Mao 2012) — GCC 4.6+, x86-Spezifika
+     • P10 SuRF (Zhang 2018) — GCC 5+
+     • ... (vollstaendige Liste in Phase 4.B)
+
+   VOR Experiment: Builder verifiziert, dass alle erforderlichen Compiler
+   verfuegbar sind. Andernfalls Abbruch mit klarer Fehlermeldung.
+
+================================================================================
+7. DOMAENE 5 — ENGINE-CHOICE
+================================================================================
+
+template<typename Algo, typename EngineKind> class Container : public IMapAPI<...>;
+
+   • StaticEngine<Algo>:
+       - liefert Originalcode + Adapter
+       - KEINE aktive CacheEngine
+       - liefert Mikrobenchmarks (passive)
+   • CacheEngine<Algo>:
+       - aktive CacheEngine im Builder eingebettet (siehe §4)
+       - Observer + Visitor + DecisionLambdaTrees + ConcurrencyManager
+       - constexpr-Telemetrie
+
+   Beide bieten std::map-API komplett (C++23, BLOCK E des Glossars v4).
+
+================================================================================
+8. DOMAENE 6 — PUBLICATION
+================================================================================
+
+8.1 LATEX RENDERER
+   • Liest InMemoryMeasurementBuffer-Disk-Dump
+   • Generiert .tex + .pdf (tabular + pgfplots + booktabs + siunitx)
+   • Output: appendix-ready Tabellen + Plots
+   • Ziel: Anhang in Diplomarbeit
+
+8.2 ENTKOPPLUNG
+   • LatexRenderer ist eine SEPARATE Komponente (nicht im Hot-Path)
+   • Kann auf einem Workstation-Host laufen, nicht auf Target-Hardware
+
+================================================================================
+9. SCHNITTSTELLE SEARCH-ENGINE ↔ CACHE-ENGINE  (REV 3)
+================================================================================
+
+OBSERVER (Algorithmus → CacheEngine, Push synchron mit Lambda-Tree-Filter)
+   Algorithmus implementiert IObserverProducer; ruft direkt
+   `runtime.notify(event)` synchron auf. Cache-Engine evaluiert pro
+   Event den passenden DecisionLambdaTree → EXECUTE/DELAY/SKIP.
+
+   EVENTS (vorlaeufig)
+     • PageAccessed         (page_handle, branch_taken)
+     • NodeAccessed         (node_handle, child_idx)
+     • PathTraversed        (path_signature, depth, terminal_kind)
+     • TelemetryUpdate      (page_handle, telemetry_delta)
+     • MutationCommitted    (op_kind, count)
+     • ConsolidationBarrier (barrier_id)              [P02 / P05 / P29]
+     • GracePeriodElapsed   (gp_id)                   [P29 RCU]
+
+VISITOR (CacheEngine → Algorithmus, Mid-Granularitaet)
+   • visit(IPage*)
+   • visit(INode*)
+
+EMPFEHLUNG (CacheEngine → Algorithmus)
+   • CacheEngine empfiehlt Strategie aus CompileTimeKnowledge
+   • Algorithmus uebernimmt oder ignoriert (im Zweifel: statisch
+     ausgelieferte optimale Variante laufen)
+
+VERBOTEN
+   • CacheEngine darf NICHT Algorithmus-Internals direkt manipulieren
+   • Algorithmus darf NICHT die CacheEngine-Internals umgehen
+   • Engine-Choice ist Compile-Time, KEIN Runtime-Switch
+
+================================================================================
+10. ABBILDUNG DER 4 FORSCHUNGSLUECKEN AUF MODULE  (REV 3)
+================================================================================
+
+LUECKE 1: Cache-Engine als getrennte Meta-Ebene
+   → CacheEngineBuilder + CacheEngine-Komponente (F12)
+   → Observer + Visitor + DecisionLambdaTrees
+
+LUECKE 2: Online Re-Layouting
+   → DecisionLambdaTree-Steuerung (Reloc EXECUTE/DELAY/SKIP)
+   → RCU als Reclamation-Backbone (P29)
+   → KEIN HazardPointer mehr (memory leak verboten)
+
+LUECKE 3: Gemeinsame Wahl Seitentyp+Layout+Inline+Prefetch+Allocator
+   → Bausteine-Quer-Permutation (F15) — JEDER Baustein gegen JEDEN ausgetauscht
+   → Permutationsraum erfasst alle Achsen
+   → CacheEngine empfiehlt aus CompileTimeKnowledge
+
+LUECKE 4: Plattform-bewusste online Adaption pro ISA-Pfad
+   → ISA-Achse im Permutationsraum
+   → Compile-Time vs Runtime SIMD-Detection (F9)
+   → LiveCpuModel haelt aktuelle Plattform-Sicht
+
+================================================================================
+11. PROJEKT-STRUKTUR  (REV 3)
+================================================================================
+
+(Strukturell identisch zu v2 §11. Aenderungen:)
+   • `cache_engine/runtime/` entfaellt → CacheEngine ist Komponente IM
+     Builder (in `cache_engine/builder/cache_engine_component/`).
+   • NEU: `cache_engine/builder/build_permutations.cmake` — Pre-Build-Skript
+   • NEU: `cache_engine/builder/decision_lambda_trees/` — eine Datei pro
+     Entscheidungsklasse
+   • NEU: `cache_engine/builder/measurement_matrix/` — constexpr Mess-Spez.
+   • NEU: `tools/socks5_zih_delivery/` — Binaer-Lieferung ans ZIH
+   • NEU: `tools/compiler_provisioning/` — Self-Built-Compiler-Setup fuer
+     Pi 5 + VisionFive 2
+
+   COMPLETE LAYOUT
+   comdare-cache-engine/
+   ├── modules/                            (Submodules: comdare-Modules, F-Glossar BLOCK K)
+   ├── ext/                                (Originalcode fremder Algorithmen, exakt kopiert)
+   ├── adapters/                           (pro Paper Adapter; Original-Compiler-konfiguriert)
+   ├── prt_art/                            (PRT-ART Test-Algorithmus, eigen)
+   ├── search_engine/
+   │   ├── fan_out_engine/
+   │   ├── algorithm_strategies/
+   │   ├── page/                           (Concept + Implementierungen aus Bausteine-Matrix)
+   │   ├── node/                           (Concept + Implementierungen aus Bausteine-Matrix)
+   │   ├── value_handle/                   (variant + Concept-Constraint, F8)
+   │   ├── traversal/                      (Concept + Implementierungen)
+   │   ├── memory_layout/                  (Concept + Implementierungen)
+   │   └── operations/                     (volle std::map-API, C++23)
+   ├── cache_engine/
+   │   ├── builder/
+   │   │   ├── main.cpp                    (Orchestrator)
+   │   │   ├── cache_engine_component/     (CacheEngine als Builder-Komponente)
+   │   │   ├── decision_lambda_trees/      (eine Datei pro Entscheidungsklasse)
+   │   │   ├── measurement_matrix/         (constexpr Mess x Algo-Detail)
+   │   │   ├── permutation_engine/
+   │   │   ├── module_loader/              (dlopen / LoadLibrary Wrapper)
+   │   │   ├── platform_probe/
+   │   │   ├── live_cpu_model/
+   │   │   ├── algorithm_visitor/
+   │   │   ├── observer_registry/
+   │   │   ├── compile_time_knowledge/
+   │   │   ├── runtime_micro_benchmarks/
+   │   │   ├── telemetry_spool/
+   │   │   ├── in_memory_measurement_buffer/
+   │   │   ├── disk_serializer/
+   │   │   ├── latex_renderer/
+   │   │   └── build_permutations.cmake    (Pre-Build-Skript)
+   │   ├── concurrency_manager/            (Singleton, Heap)
+   │   │   ├── concurrency_manager.hpp/.cpp
+   │   │   ├── page_concurrency/
+   │   │   ├── node_concurrency/
+   │   │   ├── array_concurrency/
+   │   │   ├── data_structure_concurrency/
+   │   │   ├── path_concurrency/
+   │   │   ├── memory_access_concurrency/  (Read/Write/ReadWrite)
+   │   │   ├── simd_thread_concurrency/
+   │   │   ├── simd_flow_concurrency/
+   │   │   └── concurrency_composition/    (Policy-Template, F6)
+   │   └── reclamation/
+   │       └── rcu_reclaim/                (P29; HazardPointers RAUS)
+   ├── engine_choice/
+   │   ├── static_engine.hpp               (template)
+   │   └── cache_engine.hpp                (template)
+   ├── measurement/                        (Mikrobenchmarks-Lib)
+   │   ├── perf_wrapper/
+   │   ├── papi_wrapper/
+   │   ├── advisor_wrapper/
+   │   ├── hdr_histogram_wrapper/
+   │   ├── dataset_loader/                 (YCSB + Custom, F14)
+   │   ├── platform_probe/
+   │   └── run_recorder/
+   ├── hardware_isa/
+   │   ├── isa_dispatch/
+   │   ├── hybrid_core_pinning/
+   │   ├── memory_type_detector/
+   │   └── hugepage_manager/
+   ├── tools/
+   │   ├── socks5_zih_delivery/            (Binaer-Lieferung ans ZIH, F13)
+   │   └── compiler_provisioning/          (Self-Built-Compiler Pi5/VisionFive2, F9)
+   ├── benchmarks/
+   │   ├── ycsb/
+   │   ├── microbenchmarks/
+   │   └── platform_calibration/
+   ├── tests/
+   └── docs/
+
+================================================================================
+12. OFFENE PUNKTE (jenseits F1-F15)
+================================================================================
+
+F-EXTRA-1  Original-Compiler-Versionen pro Algorithmus festlegen (Phase 4.B)
+F-EXTRA-2  Custom-Dataset-Spezifikation (Phase 4.A; F14 verlangt voll)
+F-EXTRA-3  SOCKS5-ZIH-Tooling-Auswahl (vorhandenes Tool oder Eigenbau?)
+F-EXTRA-4  Self-Built-Compiler-Strategie auf Pi 5 + VisionFive 2 (welche
+           GCC/Clang-Version, Cross-Compile-Approach?)
+F-EXTRA-5  CMake `build_permutations.cmake` Konkretisierung (Templating-
+           Mechanik? CMake function vs Python-Codegen-Skript?)
+F-EXTRA-6  DecisionLambdaTree-Format (Konfig-File? Code? DSL?)
+F-EXTRA-7  Mess-Kategorien × Algorithmus-Details Vollstaendigkeits-Matrix
+           (welche Algorithmus-Details bekommen welche constexpr-Spezialisierung?)
+F-EXTRA-8  ABI-Stabilitaets-Test (wie verifizieren wir, dass die fremde
+           Originalcode-Binary tatsaechlich identisch zur Original-Build-Binary
+           ist nach Modul-Splitting?)
+
+Diese Punkte sind in Phase 4 / Phase 5 zu klaeren, bevor Implementation beginnt.
+
+================================================================================
+ENDE DES DOMAENENMODELLS v3
+Phase 5 (drawio UML) ist gesperrt bis explizites GO vom Nutzer und
+Beantwortung der F-EXTRA-1 bis F-EXTRA-8.
+================================================================================

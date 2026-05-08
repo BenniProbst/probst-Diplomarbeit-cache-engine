@@ -1,0 +1,56 @@
+---
+name: examples
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BUILD_TYPE: ${{matrix.BUILD_TYPE}}
+      TESTS: ${{matrix.TESTS}}
+      BENCHMARKS: ${{matrix.BENCHMARKS}}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        BUILD_TYPE: [Release, Debug]
+        TESTS: [ON, OFF]
+        BENCHMARKS: [ON, OFF]
+
+    steps:
+      - uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        with:
+          submodules: false
+          persist-credentials: false
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev libc6-dev-i386 libc6-dbg \
+              libgtest-dev libgmock-dev libbenchmark-dev valgrind
+
+      - name: Configure CMake
+        # Use a bash shell so we can use the same syntax for environment
+        # variable access regardless of the host operating system
+        shell: bash
+        run: |
+          cmake -B build "$GITHUB_WORKSPACE/examples" \
+              "-DCMAKE_BUILD_TYPE=$BUILD_TYPE" "-DTESTS=$TESTS" \
+              "-DBENCHMARKS=$BENCHMARKS"
+
+      - name: Examples
+        working-directory: ${{github.workspace}}/build
+        run: make -j3 -k examples
+
+      - name: Valgrind examples
+        working-directory: ${{github.workspace}}/build
+        run: make -j3 -k valgrind_examples

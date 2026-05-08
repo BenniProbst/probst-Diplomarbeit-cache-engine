@@ -1,0 +1,754 @@
+================================================================================
+BEGRIFFSGLOSSAR v2 — FINAL
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.C
+Stand: 2026-05-04 · ersetzt Begriffsglossar_Domaenenmodell_Vorstufe.txt
+================================================================================
+
+KERNAUFTRAG (aus erster Nutzeranfrage)
+   "Konzeptionelle Identitaeten von Suchalgorithmen identifizieren und
+    Begriffe mit derselben funktionalen konzeptionellen Bedeutung fuer
+    Bestandteile von Such-Algorithmen und Messverfahren, sowie Cache/CPU
+    Metriken sammeln und zwischen den Forschungsarbeiten uebersetzen."
+
+DAS GLOSSAR HAT 3 DOMAENEN
+   DOMAENE 1: Such-Algorithmen-Bausteine
+   DOMAENE 2: Cache-Engine-Bausteine
+   DOMAENE 3: Mess-/Metrik-Bausteine
+   PLUS:      Schnittstellen / Querschnitt (ISA, Hardware)
+
+NOTATIONS-KONVENTION
+   [KANON]    Kanonischer PRT-ART-Begriff (was wir benutzen)
+       SYN  ← "Synonym X" (Paper Y)         ← Cross-Paper Aequivalenz
+       BED  Funktionale Bedeutung (was tut der Begriff?)
+       ABG  Abgrenzung gegen aehnliche, aber NICHT identische Begriffe
+       LIT  Literaturanker (wer hat den Begriff gepraegt? wo nachlesen?)
+
+================================================================================
+DOMAENE 1 — SUCH-ALGORITHMEN
+================================================================================
+
+================================================================================
+1.1  STRUKTURELLE PRIMITIVE — Basisformen
+================================================================================
+
+[KANON]  KNOTEN (Node)
+  SYN ← "Node"             ART [Leis 2013] · HOT [Binna 2018] · B²-tree [Schmeisser 2022] · START [Fent 2020] · Masstree [Mao 2012]
+  SYN ← "Vertex"           Graphentheorie (allgemein)
+  SYN ← "Decision Node"    B²-tree [Schmeisser 2022]: byte-weise Verzweigungsknoten
+  SYN ← "Span Node"        B²-tree [Schmeisser 2022]: gemeinsame-Praefix-Knoten
+  SYN ← "Trie Node"        Jacobson [1989] (allgemein): Knoten in succinct Encoding
+  SYN ← "Internal Node"    Masstree [Mao 2012]: Nicht-Blatt-B+-Tree-Knoten
+  SYN ← "Border Node"      Masstree [Mao 2012]: Knoten an Trie-Layer-Grenze
+  SYN ← "Macro-Node"       CoCo-trie [Boffa 2024]: kollabierter Subtrie als Einheit
+  BED Eine logische Verzweigungseinheit der Suchstruktur. Konsumiert i.d.R.
+      einen Teil des Schluessels (Bit/Byte/Slice) und gibt einen oder mehrere
+      Folgepointer/Folgeposition zurueck.
+  ABG NICHT "Page" (eine Page kann mehrere Knoten enthalten) ·
+      NICHT "Cache Line" (Hardware-Granularitaet) ·
+      NICHT "Block" im Bender-Sinn (das ist eine Cache-Ebene-Block)
+
+[KANON]  SEITE / PAGE
+  SYN ← "Page"            B+-Tree, B²-tree [Schmeisser 2022], Masstree [Mao 2012]
+  SYN ← "Block"           Bender/Demaine/Farach-Colton [2002] (Block in Multilevel Memory)
+  SYN ← "Block"           Saikkonen/Soisalon-Soininen [2008] (Cache-Block)
+  SYN ← "Suchseite"       PRT-ART Termin 1+
+  SYN ← "Page-Cluster"    CSB+-tree [Rao/Ross 2000]: kontigous Sibling-Anordnung
+  SYN ← "Disk Block"      klassische DBMS-Sicht
+  BED Containereinheit, in der ein oder mehrere Knoten gespeichert und aus
+      dem Cache/Speicher als Einheit geladen werden.
+  ABG NICHT "Cache Line" (kleinere Granularitaet, Hardware-Einheit, 64 B);
+      Page = Software-Konzept, Cache Line = Hardware.
+  LIT Klassisch: B+-Tree-Literatur. PRT-ART verwendet "Page" als
+      Software-Layout-Einheit, die mehrere Cache-Lines umfassen kann.
+
+[KANON]  SEITENTYP / PAGE TYPE
+  SYN ← "Page Type"        PRT-ART Termin 1+
+  SYN ← "Node Family"      ART [Leis 2013]: Node4/16/48/256
+  SYN ← "Node Layout"      HOT [Binna 2018], B-Trees Are Back [Mueller 2025]
+  SYN ← "Encoding"         CoCo-trie [Boffa 2024]: Pool unterschiedlicher Encodings
+  SYN ← "Page Format"      B²-tree [Schmeisser 2022]
+  SYN ← "Multibyte Node"   START [Fent 2020]
+  SYN ← "Adaptive Layout"  B-Trees Are Back [Mueller 2025]: Runtime-Layoutwahl
+  SYN ← "Macro-Node Encoding" CoCo-trie [Boffa 2024]
+  BED Konkrete Auspraegung einer Seite mit fester Layout-Konvention.
+  PRT-ART FAMILIE (T2 eingefroren):
+      • Dense-Byte-Page          ← analog ART Node256, dichte Byte-Transitionen
+      • Extended Dense Page      ← analog START multilevel Nodes (mehrbyteig)
+      • Sparse Patricia Page     ← analog HOT, diskriminierende Bits, sparse
+      • Redirect-Page            ← analog CoCo-trie collapsed macro-nodes
+      • PRT-Custom-Cache-Page    ← Eigener Beitrag (B²-tree + CSS/CSB+ Schnitt)
+
+[KANON]  PFAD / SUCHPFAD
+  SYN ← "Search Path"          allgemein
+  SYN ← "Root-to-Leaf Path"    Bender/Demaine/Farach-Colton [2002]
+  SYN ← "Traversal"            allgemein
+  SYN ← "Lookup Path"          CoCo-trie [Boffa 2024], ART [Leis 2013]
+  SYN ← "Hot Path"             Dortmund DAMON 2023 [Kuehn et al.]
+  SYN ← "Frequent Access Path" Path-Prefetching FGCS 2024 [Zhang et al.]
+  BED Sequenz von Knotenbesuchen vom Root bis zum Treffer/Miss.
+      "Hot Path" = Pfad mit hoher Zugriffsfrequenz (Zielobjekt fuer Optimierung).
+
+[KANON]  PRAEFIXKOMPRESSION
+  SYN ← "Path Compression"      ART [Leis 2013]
+  SYN ← "Lazy Expansion"        ART [Leis 2013]: Knoten erst materialisieren bei Verzweigung
+  SYN ← "Patricia Bits"         HOT [Binna 2018], Patricia Tries (allgemein)
+  SYN ← "Discriminative Bits"   HOT [Binna 2018]: pro Knoten dynamisch waehlbar
+  SYN ← "Span"                  HOT [Binna 2018], B²-tree [Schmeisser 2022]: Bit-/Byte-Span pro Node
+  SYN ← "Prefix Truncation"     B-Trees Are Back [Mueller 2025]
+  SYN ← "Subtrie Collapse"      CoCo-trie [Boffa 2024]
+  BED Eindeutige Schluesselsegmente werden NICHT als separate Knoten
+      gespeichert, sondern in einem einzigen Knoten/Eintrag kondensiert.
+  ABG REDIRECT (siehe naechster Eintrag) ist die PRT-ART-spezifische
+      physische Umsetzung dieser logischen Idee.
+
+[KANON]  REDIRECT
+  SYN ← "Macro-Node"           CoCo-trie [Boffa 2024]: mehrere Subtrie-Ebenen kondensiert
+  SYN ← "Anchor"               Wormhole [Wu 2019]: Sprungpunkt im Hash-Index
+  SYN ← "Shortcut Node"        Wormhole [Wu 2019]
+  SYN ← "Rewiring"             START [Fent 2020]: Subtrie-Reorganisation
+  SYN ← "Jump Pointer"         Path-Prefetching FGCS 2024 [Zhang et al.]
+  BED Knoten, der einen ganzen eindeutigen Restpfad in einem einzigen
+      Sprung ueberspringt — physische Umsetzung von Praefixkompression
+      in PRT-ART. Kann selbst terminal sein (Value-Referenz tragen).
+
+[KANON]  FANOUT
+  SYN ← "Fanout"             allgemein, ART [Leis 2013], B+-Tree
+  SYN ← "Branching Factor"   CoCo-trie [Boffa 2024], klassisch
+  SYN ← "Children Count"     Jacobson [1989]: degree
+  SYN ← "Degree"             Jacobson [1989] (LOUDS), Graphentheorie
+  SYN ← "Span"               (kann auch fanout-aequivalent sein in HOT-Kontext)
+  BED Anzahl der Kinder eines Knotens.
+
+[KANON]  HOEHE / TIEFE
+  SYN ← "Tree Height"        allgemein, HOT [Binna 2018] explizit
+  SYN ← "Depth"              Jacobson [1989], allgemein
+  SYN ← "Tree Levels"        Jacobson [1989]: BFS-level (LOUDS-Encoding-Ebenen)
+  SYN ← "Layers"             Masstree [Mao 2012]: Trie-Layer (8-Byte-Slices)
+  BED Maximale Pfadlaenge Root → Blatt; bestimmt Worst-Case-Lookup-Kosten.
+
+================================================================================
+1.2  PAYLOAD / WERTE-VERWALTUNG
+================================================================================
+
+[KANON]  VALUEHANDLE
+  SYN ← "ValueHandle"        PRT-ART Termin 2
+  SYN ← "Tuple Identifier (TID)" klassisch DBMS
+  SYN ← "Record ID (RID)"    DBMS allgemein
+  SYN ← "Pointer to Payload" allgemein
+  SYN ← "Leaf Pointer"       B+-Tree
+  SYN ← "Leaf Value"         HOT [Binna 2018]
+  BED Referenz auf die mit einem Schluessel assoziierten Nutzdaten.
+
+[KANON]  INLINE VALUE
+  SYN ← "Inline Value"       PRT-ART Termin 2 (ValueHandle::Inline)
+  SYN ← "Embedded Value"     allgemein
+  SYN ← "Hot Value"          Hot/Cold-Split-Lit. (allgemein)
+  BED Kleiner Wert, der direkt im terminalen Knoten gespeichert wird,
+      um eine zusaetzliche Pointer-Indirektion zu sparen.
+
+[KANON]  EXTERNAL VALUE
+  SYN ← "External Value"     PRT-ART Termin 2 (ValueHandle::External)
+  SYN ← "Cold Value"         Hot/Cold-Split-Lit.
+  SYN ← "Out-of-band Payload" allgemein
+  BED Wert wird ausserhalb der Suchstruktur gespeichert; der
+      terminale Knoten enthaelt nur einen Pointer.
+
+[KANON]  HOT/COLD-SPLIT
+  SYN ← "Hot/Cold-Split"     PRT-ART Termin 2
+  SYN ← "Payload Separation" allgemein DBMS
+  SYN ← "Heavy/Light Indexing" allgemein
+  BED Trennung zwischen heisser Navigationsstruktur und kalter Payload-Region.
+
+================================================================================
+1.3  SUCH-OPERATIONEN
+================================================================================
+
+[KANON]  EXACT LOOKUP
+  SYN ← "Exact Lookup"       PRT-ART
+  SYN ← "Point Query"        B+-Tree, ART, allgemein
+  SYN ← "Equality Search"    allgemein
+  SYN ← "Get"                Key-Value-Sicht: Masstree
+  SYN ← "Find"               allgemein
+  SYN ← "ExactKeySearch"     SuRF [Zhang 2018]
+  BED Schluessel exakt finden; Treffer oder Miss.
+
+[KANON]  PREFIX LOOKUP
+  SYN ← "Prefix Lookup"      PRT-ART
+  SYN ← "Prefix Match"       allgemein
+  SYN ← "Prefix Hit"         PRT-ART Termin 3
+  SYN ← "Range Lower Bound"  SuRF [Zhang 2018]: LowerBound
+  SYN ← "Iterator-Init"      SuRF [Zhang 2018]
+  BED Findet alle (oder das erste) Element mit gegebenem Praefix.
+
+[KANON]  PREFIX ENUMERATION
+  SYN ← "Prefix Enumeration" PRT-ART
+  SYN ← "Range Scan"         B+-Tree, allgemein
+  SYN ← "Range Query"        SuRF [Zhang 2018], ART, allgemein
+  SYN ← "Iterator"           Masstree, SuRF
+  SYN ← "Getrange"           Masstree [Mao 2012]
+  SYN ← "MoveToNext"         SuRF [Zhang 2018]
+  SYN ← "Range Counts"       SuRF [Zhang 2018]: count keys in range
+  BED Aufzaehlung aller Eintraege in einem Praefix-/Range-Bereich.
+
+[KANON]  RANGE-FILTER (NEU mit SuRF integriert!)
+  SYN ← "Range Filter"        SuRF [Zhang 2018]
+  SYN ← "Approximate Membership Test fuer Ranges"  SuRF [Zhang 2018]
+  SYN ← "Open-Range Query"    SuRF [Zhang 2018]
+  SYN ← "Closed-Range Query"  SuRF [Zhang 2018]
+  BED **Wahrscheinlichkeitsbasierter** Test, ob ein Range-Query Ergebnisse
+      hat — mit kontrollierter False-Positive-Rate. Kein PRT-ART-Kernfeature
+      aktuell, aber konzeptioneller Nachbar.
+  ABG NICHT "Range Query" (deterministisch); Range-Filter = approximativ
+      mit moeglichem False-Positive (NIE False-Negative bei vorhandenen Keys).
+
+[KANON]  BULK BUILD
+  SYN ← "Bulk Build"         PRT-ART Termin 3
+  SYN ← "Bulk Load"          B+-Tree, ART
+  SYN ← "Construction"       allgemein
+  SYN ← "Build Phase"        CoCo-trie [Boffa 2024], START [Fent 2020]
+  BED Initialer Aufbau aus einer Schluesselmenge.
+
+[KANON]  CRUD-OPERATIONEN
+  SYN ← "CRUD"               PRT-ART, allgemein
+  SYN ← "Insert/Update/Delete" allgemein
+  SYN ← "Mutation"           PRT-ART Termin 6
+  SYN ← "Reorganisation"     PRT-ART Termin 6
+  BED Sammelbegriff fuer veraendernde Operationen.
+
+================================================================================
+1.4  ORDNUNGS-/SORTIER-MODUS
+================================================================================
+
+[KANON]  UNSORTED MODE
+  SYN ← "Unsorted"           PRT-ART Termin 1
+  SYN ← "No Order"           PRT-ART Termin 2 Default
+  SYN ← "Hash-Order"         Wormhole [Wu 2019] hash-Pfad
+  BED Keine Enumerationsordnung garantiert; nur Punkt-Lookup wichtig.
+
+[KANON]  LOCAL ORDERING
+  SYN ← "Local Sorting"      PRT-ART Termin 1
+  SYN ← "Page-local Order"   PRT-ART Termin 2
+  SYN ← "Sorted within Page" CSB+-tree [Rao/Ross 2000]
+  SYN ← "Sorted Slice"       Masstree [Mao 2012]: 8-Byte-Slice-Sortierung
+  BED Einzelne Seiten/Knoten sind sortiert, aber keine globale Reihenfolge.
+
+[KANON]  LEX MODE
+  SYN ← "Lex Mode"           PRT-ART Termin 2
+  SYN ← "Lexicographic Order" ART [Leis 2013], B+-Tree, allgemein
+  SYN ← "Ordered"            allgemein
+  SYN ← "Order-Preserving"   SuRF [Zhang 2018], ART [Leis 2013]
+  BED Globale lexikographische Ordnung; ermoeglicht Range-Scans.
+
+================================================================================
+1.5  SUCCINCT/SPACE-EFFICIENT FAMILIE (NEU mit Jacobson + SuRF integriert)
+================================================================================
+
+[KANON]  SUCCINCT TREE-ENCODING
+  SYN ← "Succinct Tree"       Jacobson [1989] (LOUDS), Information Theory
+  SYN ← "Space-efficient Tree" Jacobson [1989]: Titel
+  SYN ← "Compact Tree"        allgemein
+  SYN ← "Implicit Encoding"   Jacobson [1989]
+  BED Tree-Repraesentation mit ~Information-theoretical Lower Bound bits/Knoten
+      (~2 bits/node fuer bin Tree, ~10 bits/node fuer SuRF FST).
+  ABG NICHT "compressed" (allgemein); succinct = nahe theor. Lower Bound,
+      compressed = nur kleiner als trivial.
+
+[KANON]  LOUDS-ENCODING (Level-Ordered Unary Degree Sequence)
+  SYN ← "LOUDS"              Jacobson [1989]: Originalterm
+  SYN ← "Level-Order Bit-String" Jacobson [1989]
+  SYN ← "Unary Degree Sequence" Jacobson [1989]
+  BED Bit-Sequenz Form 1*0 pro Knoten (degree-Bits + Terminator), Knoten
+      in BFS-Reihenfolge. Ermoeglicht O(1)-Navigation via rank/select.
+  PRT-ART Bezug:
+      Konzeptionell aequivalent zu PRT-ART **Dense-Byte-Page** (oberhalb
+      von Cache-Engine-Wahl) — succinct-codiert, statisch, aber sehr
+      dense. PRT-ART braucht aber UPDATE-FAEHIGKEIT (LOUDS ist statisch).
+
+[KANON]  LOUDS-DENSE
+  SYN ← "LOUDS-Dense"         SuRF [Zhang 2018]
+  SYN ← "D-Labels / D-HasChild / D-IsPrefixKey" SuRF [Zhang 2018]: 3 Bitmaps a 256
+  BED SuRF Top-Levels Encoding: 3 Bitmaps der Groesse 256 (eine pro 256er-
+      Verzweigungs-Byte) + Byte-Sequence fuer Werte. Cache-friendly.
+  PRT-ART Bezug:
+      **DIREKT mappbar auf PRT-ART Dense-Byte-Page!**
+      Wenn PRT-ART eine succinct Page fuer dichte Subtries braucht:
+      LOUDS-Dense waere die kanonische Struktur.
+
+[KANON]  LOUDS-SPARSE
+  SYN ← "LOUDS-Sparse"        SuRF [Zhang 2018]
+  SYN ← "S-Labels / S-HasChild / S-LOUDS" SuRF [Zhang 2018]: byte-bit-bit pro Knoten
+  BED SuRF Bottom-Levels Encoding: 3 Byte-Sequenzen, eine pro Trie-Knoten.
+      Space-efficient, aber teurer Lookup.
+  PRT-ART Bezug:
+      **DIREKT mappbar auf PRT-ART Sparse Patricia Page!**
+      LOUDS-Sparse = succinct sparse Repraesentation (vs HOT = byte-aligned
+      sparse Repraesentation).
+
+[KANON]  LOUDS-DS (Hybrid)
+  SYN ← "LOUDS-DS"            SuRF [Zhang 2018]
+  SYN ← "Hybrid Encoding"     SuRF [Zhang 2018]
+  SYN ← "Cutoff Level R"      SuRF [Zhang 2018]: Schwelle Dense vs Sparse
+  BED Kombination: Top-Levels in LOUDS-Dense (cache-friendly), Bottom-Levels
+      in LOUDS-Sparse (space-efficient). Schwelle R tunable (default 64).
+  PRT-ART Bezug:
+      **HOECHST RELEVANT** — diese Hybrid-Logik ist KONZEPTIONELL
+      AEQUIVALENT zu PRT-ART **Cache-Engine Page-Type-Selection Rules**!
+      SuRF macht es STATISCH (Schwelle einmal beim Build); PRT-ART macht
+      es DYNAMISCH (Cache-Engine entscheidet runtime).
+
+[KANON]  RANK / SELECT
+  SYN ← "rank"                Jacobson [1989], SuRF [Zhang 2018]
+  SYN ← "select"              Jacobson [1989], SuRF [Zhang 2018]
+  BED rank(i) = #1-Bits in Position [0..i] · select(j) = Position des j-ten 1-Bits.
+      O(1) mit Vorberechnung; Grundoperation fuer succinct-Navigation.
+  PRT-ART Bezug:
+      Falls PRT-ART eine succinct Page einsetzt, brauchen wir eine
+      rank/select-Implementierung. (Externe Lib z.B. SDSL.)
+
+================================================================================
+DOMAENE 2 — CACHE-ENGINE
+================================================================================
+
+================================================================================
+2.1  CACHE-HIERARCHIE-PRIMITIVE
+================================================================================
+
+[KANON]  CACHE LINE
+  SYN ← "Cache Line"          Intel/AMD, allgemein
+  SYN ← "Cacheline"           PRT-ART Termin 2
+  SYN ← "Block"               Bender [2002], Saikkonen [2008]: Cache-Block-Modell
+  BED Kleinste Granularitaet, in der Daten zwischen RAM und CPU-Cache
+      transferiert werden (typisch 64 B).
+
+[KANON]  CACHE-EBENE
+  SYN ← "Cache Level (L1/L2/L3)" allgemein, Intel/AMD-Doku
+  SYN ← "Memory Level"        Bender [2002]
+  SYN ← "Block Level"         Saikkonen [2008]
+  SYN ← "Hierarchy Level"     Cache-oblivious Theorie [Bender 2005]
+  BED Stufe in der Speicherhierarchie (L1, L2, L3, LLC, RAM, Disk).
+
+[KANON]  WORKING SET
+  SYN ← "Working Set"         PRT-ART Termin 6
+  SYN ← "Hot Set"             allgemein
+  SYN ← "Resident Set"        Linux/OS-Sicht
+  SYN ← "Active Memory Region" Naderan-Tahan [2016]
+  BED Aktuell aktiv genutzte Datenmenge eines Programms.
+
+[KANON]  TLB (Translation Lookaside Buffer)
+  SYN ← "TLB"                 allgemein
+  SYN ← "Page Table Cache"    allgemein
+  SYN ← "Block Level (TLB)"   Saikkonen [2008]: TLB als oberste Block-Ebene modelliert
+  BED CPU-Cache fuer virtuell-physische Adressuebersetzungen.
+  ABG TLB ist NICHT Cache Line, NICHT Page; eigene Ebene mit eigener
+      Performance-Charakteristik.
+
+[KANON]  CACHE-AWARENESS-MODI (Termin 4 Kategorisierung)
+  KANON Variant 1: PASSIVE CACHE-AWARENESS
+    SYN ← "Passive Cache-Awareness" PRT-ART Termin 4
+    SYN ← "Static Cache-Conscious"  CSS-tree, CSB+-tree
+    SYN ← "Cache-Conscious"          Rao/Ross [1999]
+    BED Layout wird einmal beim Design gewaehlt und bleibt fest.
+  KANON Variant 2: ACTIVE CACHE-AWARENESS
+    SYN ← "Active Cache-Awareness"  PRT-ART Termin 4 (KERNBEITRAG)
+    SYN ← "Adaptive Layout"          B-Trees Are Back [Mueller 2025]
+    SYN ← "Online Adaptation"        Khan [2011], PRT-ART Termin 6 Modus 3
+    BED Layout-/Policy-Entscheidungen werden zur Laufzeit getroffen
+        und ggf. revidiert.
+  KANON Variant 3: CACHE-OBLIVIOUS (Gegenpol!)
+    SYN ← "Cache-Oblivious"         Bender et al. [2005]
+    BED Performance ohne Kenntnis konkreter Cache-Parameter.
+
+================================================================================
+2.2  CACHE-METRIKEN (MESSGROESSEN — Domaene 3 Schnittstelle)
+================================================================================
+
+[KANON]  CACHE LINE UTILIZATION (CLU)
+  SYN ← "CLU"                          Intel Advisor, PRT-ART
+  SYN ← "Cache Line Utilization"       Intel Advisor User Guide
+  SYN ← "Effective Bandwidth Use"      allgemein
+  BED Anteil der tatsaechlich genutzten Bytes pro geladener Cache Line.
+      100% = jede geladene Cache Line wird vollstaendig verwendet.
+      Tooling: Intel Advisor MAP + Cache Simulation.
+
+[KANON]  CACHE MISS
+  SYN ← "Cache Miss"          allgemein
+  SYN ← "L1/L2/L3-load-miss"  perf events
+  SYN ← "Cache-misses"        perf event allgemein
+  SYN ← "Cold Miss / Capacity Miss / Conflict Miss" Hill/Smith Klassifikation
+  BED Zugriff auf Daten, die sich NICHT im Cache befinden.
+
+[KANON]  dTLB-MISS
+  SYN ← "dTLB-Miss"           perf event, PRT-ART Termin 3
+  SYN ← "Data TLB Miss"       Intel docs
+  SYN ← "Page Table Walk"     Saikkonen [2008]
+  BED TLB enthaelt keine Uebersetzung -> Page-Table Walk.
+
+[KANON]  MEMORY FOOTPRINT
+  SYN ← "Memory Footprint"        Intel Advisor
+  SYN ← "Simulated Memory Footprint" Intel Advisor cachesim-mode=footprint
+  SYN ← "Working Set Size"        allgemein
+  SYN ← "Resident Memory"         OS-Sicht
+  BED Gesamtmenge des effektiv beruehrten Speichers eines Algorithmus.
+
+[KANON]  BRANCH MISS / BRANCH MISPREDICTION
+  SYN ← "Branch Misprediction" Intel docs
+  SYN ← "branch-misses"        perf event
+  BED CPU prophezeit Verzweigung falsch -> Pipeline-Flush.
+
+[KANON]  CYCLES PER INSTRUCTION (CPI) / IPC
+  SYN ← "Cycles"               perf event
+  SYN ← "Instructions"         perf event
+  SYN ← "IPC" / "CPI"          Intel docs, PRT-ART Termin 3
+  BED Effizienz-Mass; haengt stark von Cache-/Branch-Verhalten ab.
+
+[KANON]  LATENZ
+  SYN ← "Latency"              allgemein
+  SYN ← "End-to-End Latency"   PRT-ART Termin 3
+  SYN ← "Wall Time"            PRT-ART Termin 6
+  SYN ← "Tail Latency"         PRT-ART Termin 3 (p95/p99/p99.9)
+  BED Zeit zwischen Operations-Anstoss und Ergebnis.
+
+[KANON]  DURCHSATZ
+  SYN ← "Throughput"           PRT-ART, allgemein
+  SYN ← "ops/s"                PRT-ART Termin 4
+  SYN ← "Operations per Second" allgemein
+  BED Anzahl Operationen pro Zeiteinheit.
+
+================================================================================
+2.3  PREFETCH-KONZEPTE
+================================================================================
+
+[KANON]  PREFETCH
+  SYN ← "Prefetch"             allgemein
+  SYN ← "Software Prefetch"    Chen/Gibbons/Mowry [2001], GCC __builtin_prefetch
+  SYN ← "Hardware Prefetch"    Intel/AMD, automatisch
+  BED Daten werden VOR dem tatsaechlichen Bedarf in den Cache geladen.
+
+[KANON]  PREFETCH-DISTANZ
+  SYN ← "Prefetch Distance"     PRT-ART, Khan [2011]
+  SYN ← "Lookahead Distance"    Chen/Gibbons/Mowry [2001]
+  SYN ← "Prefetch Offset"       Khan [2011]
+  SYN ← "Prefetch Lead Time"    Mahling [2025]
+  BED Zeit-/Pointer-Abstand zwischen Prefetch und tatsaechlichem
+      Zugriff. Zu klein -> noch nicht da; zu gross -> Cache Pollution.
+
+[KANON]  OVERFETCH / CACHE POLLUTION
+  SYN ← "Overfetch"            PRT-ART Termin 4
+  SYN ← "Cache Pollution"      Mahling [2025], allgemein
+  SYN ← "False Prefetch"       Naderan-Tahan [2016]
+  SYN ← "Useless Prefetch"     Naderan-Tahan [2016]
+  BED Prefetch laedt Daten, die NICHT verwendet werden, und verdraengt
+      nuetzliche Cachelines.
+
+[KANON]  FILL BUFFER
+  SYN ← "Fill Buffer"          Intel uarch, Mahling [2025]
+  SYN ← "Line Fill Buffer (LFB)" Intel
+  SYN ← "Outstanding Miss Slot" allgemein
+  BED Hardware-Puffer, der ausstehende Cache-Misses bedient.
+      Begrenzte Anzahl (z.B. 10 LFBs auf Intel) -> bestimmt Prefetch-Wirksamkeit.
+  LIT Mahling [2025] zeigt: Fill-Buffer-Auslastung ist DER limitierende
+      Faktor fuer Prefetch-Effektivitaet auf high-latency memory.
+
+[KANON]  HOT PATH (siehe auch 1.1)
+  SYN ← "Hot Path"             Dortmund DAMON 2023 [Kuehn et al.]
+  SYN ← "Frequent Access Path" Path-Prefetching FGCS 2024 [Zhang et al.]
+  SYN ← "Probability-driven Layout" Bender/Demaine/Farach-Colton [2002]
+  BED Pfad mit hoher Zugriffsfrequenz; Kandidat fuer physische
+      Zusammenfuehrung im Cache (Layout-Optimierung) oder Prefetch.
+
+================================================================================
+2.4  STEUERUNGS-KONZEPTE (CACHE-ENGINE-KERN)
+================================================================================
+
+[KANON]  CACHE-ENGINE
+  SYN ← "Cache-Engine"          PRT-ART Termin 2-6 (KANON)
+  SYN ← "Cache Control Plane"   PRT-ART Termin 5
+  SYN ← "Cache Manager"         allgemein
+  SYN ← "Active Cache Layer"    PRT-ART Termin 4
+  SYN ← "Meta-Ebene"            PRT-ART Termin 5
+  BED PRT-ART-spezifische Meta-Ebene, die unabhaengig von der
+      Such-Algorithmus-Logik Layout-/Prefetch-/Allocation-Entscheidungen trifft.
+  ABG NICHT "OS Page Cache" — die Cache-Engine arbeitet im User-Space
+      und beeinflusst CPU-Caches indirekt ueber Layout/Allocator/Hints.
+      NICHT "Buffer Manager" (DBMS-Buffer fuer Disk-Pages) — wir reden
+      ueber CPU-Cache-Optimierung, nicht Disk-Buffer.
+
+[KANON]  PLATTFORM-KALIBRIERUNG
+  SYN ← "Plattformkalibrierung" PRT-ART Termin 5
+  SYN ← "Hardware Calibration"  START [Fent 2020]
+  SYN ← "Warm-up Calibration"   PRT-ART Termin 6 Modus 2
+  SYN ← "Cost Model Calibration" START [Fent 2020]
+  SYN ← "Profiling Phase"       Khan [2011]
+  BED Mikrobenchmarks zur Erstinstanz, die Plattformschwellen ableiten.
+  PRT-ART Modi (T6):
+      • Modus 1: NIE (passiv) — feste Schwellen
+      • Modus 2: EINMAL (Warm-up) — beim Start einmalig kalibrieren
+      • Modus 3: KONTINUIERLICH (online adaptiv) — laufend re-kalibrieren
+
+[KANON]  ONLINE RELOCATION
+  SYN ← "Online Relocation"     PRT-ART Termin 4
+  SYN ← "Re-Layouting"          Dortmund DAMON 2023 [Kuehn], PRT-ART Termin 4
+  SYN ← "Multi-Level Relocation" Saikkonen [2008]
+  SYN ← "Compaction"            allgemein, PRT-ART Termin 4
+  SYN ← "Global Rearrangement"  Saikkonen [2008]
+  BED Daten werden zur Laufzeit physisch umkopiert/umgeordnet,
+      um Cache-Lokalitaet zu verbessern.
+
+[KANON]  PROBABILITY HINTS / TELEMETRIE
+  SYN ← "Probability Hints"     PRT-ART Termin 4
+  SYN ← "Probability Sketch"    PRT-ART Termin 4
+  SYN ← "Histogram per Node"    Dortmund DAMON 2023 [Kuehn]
+  SYN ← "Read Counter"          Path-Prefetching FGCS 2024 [Zhang]
+  SYN ← "Block-Level Counter"   Path-Prefetching FGCS 2024 [Zhang]
+  SYN ← "Access Distribution"   Bender/Demaine/Farach-Colton [2002]
+  BED Quantisierte Statistik im Page/Node-Header, die der Cache-Engine
+      "Hot Path"-Information liefert.
+
+[KANON]  ALLOCATOR / POOL / ARENA
+  SYN ← "Allocator"             allgemein, PRT-ART Termin 4
+  SYN ← "Pool"                  PRT-ART Termin 2
+  SYN ← "Arena"                 tcmalloc, mimalloc
+  SYN ← "Slab"                  Linux, allgemein
+  BED Speicher-Verwaltungseinheit, die Allokation kleiner Objekte
+      koalesziert (per Cache Line / Page-aligned).
+  LIT tcmalloc, mimalloc, snmalloc — siehe Repos F.10-F.12.
+
+[KANON]  PAGE-TYPE-SELECTION RULE
+  SYN ← "Page-Type-Selection Rule" PRT-ART Termin 4
+  SYN ← "Adaptive Layout Rule"  B-Trees Are Back [Mueller 2025]
+  SYN ← "Encoding Decision"     CoCo-trie [Boffa 2024]
+  SYN ← "Cutoff Level R"        SuRF [Zhang 2018]: Dense vs Sparse Schwelle
+  BED Regel/Funktion, die anhand lokaler Strukturmerkmale + Cache-Engine-
+      Telemetrie + Plattformprofil den passenden Seitentyp auswaehlt.
+
+================================================================================
+DOMAENE 3 — MESS-/METRIK-WERKZEUGE
+================================================================================
+
+[KANON]  perf
+  SYN ← "perf stat"            Linux perf (allgemein)
+  SYN ← "perf record"          (Sampling-Profiling)
+  SYN ← "PMU events"           allgemein (CPU Performance Monitoring Units)
+  BED Linux-Standard-Tool fuer Hardware-Counter-Messung. Auf Intel-Hybrid:
+      separat cpu_core/* und cpu_atom/*. Pflichtmetriken: cycles,
+      instructions, branches, branch-misses, cache-misses, L1/LLC misses,
+      dTLB-misses.
+  LIT ZIH HPC Compendium [C.6]; PRT-ART Termin 3+6.
+
+[KANON]  PAPI
+  SYN ← "PAPI"                 Performance Application Programming Interface
+  BED Portable Schnittstelle zu PMU-Counter ueber Plattformen. Verwendet
+      auf ZIH (Barnard, Capella).
+  LIT [C.10]; PRT-ART Termin 6.
+
+[KANON]  Intel Advisor — Memory Access Patterns (MAP)
+  SYN ← "Intel Advisor MAP"
+  SYN ← "Memory Access Patterns Analysis"
+  BED Intel-spezifisches Tool fuer Speicherzugriffsanalyse. Liefert
+      CLU, Simulated Memory Footprint, modellierte Cache-Misses.
+  LIT [C.1, C.2]; PRT-ART Termin 3+4+5+6.
+
+[KANON]  HDR Histogram
+  SYN ← "HdrHistogram"
+  SYN ← "HDR-Histogramme"      PRT-ART Termin 3+4
+  BED High-Dynamic-Range-Histogramm fuer Tail-Latenz-Messung ohne Mittelung.
+  PRT-ART Regel: 5 Laeufe je Konfiguration, Rohwerte getrennt, KEINE Mittelung
+      von Perzentilen.
+
+[KANON]  YCSB-Workloads
+  SYN ← "YCSB"                 Yahoo! Cloud Serving Benchmark
+  SYN ← "Workload A/B/C/D/E/F" YCSB-Profile
+  BED Standard-Benchmark-Profile fuer Key-Value-Stores:
+      A=50/50 RW, B=95R/5W, C=Read-only, D=Latest, E=Short-Range, F=RMW.
+  LIT [C.11]; PRT-ART Termin 3+6.
+
+[KANON]  PIKA
+  SYN ← "PIKA"                 ZIH HPC TUD Performance Analyzer
+  BED ZIH-eigenes Monitoring; KANN auf Barnard mit `--no_monitoring`
+      deaktiviert werden, wenn eigene Counter benoetigt werden.
+  LIT [C.7]; PRT-ART Termin 4+6.
+
+[KANON]  Intel MLC (Memory Latency Checker)
+  SYN ← "Intel MLC"
+  BED Intel-eigenes Tool fuer Latenz/Bandbreiten-Messungen. Optional auf
+      eigenen Intel-Maschinen, NICHT auf ZIH-Pflicht.
+  LIT [D.11]; PRT-ART Termin 6.
+
+================================================================================
+DOMAENE 4 (QUERSCHNITT) — HARDWARE / ISA
+================================================================================
+
+[KANON]  ISA (Instruction Set Architecture)
+  SYN ← "ISA"                  allgemein
+  SYN ← "Instruction Set"      allgemein
+  SYN ← "Architecture Path"    PRT-ART Termin 6
+  PRT-ART Pfade (T6 eingefroren):
+      • scalar       — kein Vektor (z.B. RISC-V VisionFive 2)
+      • x86_avx2     — Intel/AMD AVX2 (Mainstream)
+      • x86_avx512   — Intel Server / AMD Zen 5
+      • arm_neon     — ARMv8 NEON (Pi 5, Apple M1)
+      • arm_sve2     — ARM Neoverse V2 SVE2 (Grace Hopper)
+
+[KANON]  HYBRID CPU (P-/E-Cores)
+  SYN ← "Hybrid CPU"           Intel Alder Lake/Raptor Lake
+  SYN ← "Big.LITTLE"           Arm
+  SYN ← "P-Core / E-Core"      Intel
+  SYN ← "Performance / Efficient" Intel
+  SYN ← "asymmetric cores"     Apple M1, ARM
+  BED CPU mit Kernen unterschiedlicher Mikroarchitektur.
+  PRT-ART Regel (T3+T6): NICHT zusammenaggregieren — perf cpu_core/* vs cpu_atom/*.
+
+[KANON]  FUNCTION MULTIVERSIONING
+  SYN ← "Function Multiversioning" GCC
+  SYN ← "target_clones"        GCC __attribute__
+  SYN ← "ISA Dispatch"         PRT-ART Termin 4
+  SYN ← "Build-/Dispatch-Schicht" PRT-ART Termin 4
+  BED Gleiche Funktion in mehreren ISA-Varianten kompiliert,
+      Auswahl zur Laufzeit anhand CPU-Features (z.B. AVX2 vs scalar).
+  LIT [C.5]; PRT-ART Termin 4+6.
+
+================================================================================
+KONZEPTIONELLE IDENTITAETS-MATRIX (Cross-Paper-Mapping fuer Hauptbegriffe)
+================================================================================
+
+PRT-ART (KANON)         Jacobson/SuRF   ART          HOT          START         B²-tree     CoCo-trie   Masstree     B-Trees Are Back
+----------------------- --------------- ------------ ------------ ------------- ----------- ----------- ------------ -------------------
+Knoten                  Tree Node       Node         Node         Node          Decision/Span Macro-Node Internal/Border Node
+Seite/Page              -               -            -            -             Page         -          B+-Page      Node (= Page)
+Dense-Byte-Page         LOUDS-Dense     Node256      Dense Node   single-byte   Dec.+Span    -          B+-Tree dense Dense Leaf Layout
+Sparse Patricia Page    LOUDS-Sparse    -            Sparse Node  -             -            -          -            -
+Extended Dense Page     -               -            -            multibyte     -            -          -            -
+Redirect-Page           Compressed Path Path Compr.  Patricia     Rewiring      -            Macro-Node Layer-Slice  Prefix Truncation
+Praefixkompression      Compressed Path Path Compr.  Patricia     -             -            Subtrie    -            Prefix Truncation
+                        + Lazy Exp.     Bits/Span    Collapse                                                         Heads/Hints
+ValueHandle             -               TID/Leaf Ptr Leaf Value   Leaf Pointer  Leaf Value   Lookup Res. Leaf Value   Leaf Value
+Cache-Engine            (none)          (built-in)   (built-in)   Cost Model    (built-in)   Optimizer  (none)        Adaptive Layout
+
+================================================================================
+KONZEPTIONELLE IDENTITAETS-MATRIX (Cache/CPU-Metriken)
+================================================================================
+
+PRT-ART (KANON)        Intel Advisor       perf (Linux)            PAPI                 Andere
+---------------------- ------------------- ------------------------ -------------------- -----------------
+Cache Line Util.       CLU                 - (modelliert)           -                    -
+Memory Footprint       Sim. Mem Footprint  - (modelliert)           -                    -
+Cache Miss             Cache Misses        cache-misses             PAPI_L1_DCM,...      -
+LLC Miss               -                   LLC-load-misses          PAPI_L3_TCM          -
+TLB Miss               TLB Misses          dTLB-load-misses         PAPI_TLB_DM          -
+Cycles                 -                   cycles                   PAPI_TOT_CYC         -
+Instructions           -                   instructions             PAPI_TOT_INS         -
+Branch / Branch Miss   -                   branches/branch-misses   PAPI_BR_*            -
+Hybrid Core PMU        -                   cpu_core/*+cpu_atom/*    -                    -
+Tail Latency           -                   -                        -                    HdrHistogram
+
+================================================================================
+GESCHAERFTE DOMAENEN-TRENNUNG (FUER PHASE 3.D)
+================================================================================
+
+DOMAENE 1 — SUCH-ALGORITHMEN-DOMAENE
+   Verantwortlich fuer:
+      - Lookup-Semantik (Exact, Prefix, Range, Range-Filter)
+      - Schluesselrepraesentation (plain bytes; optionale Fingerprints)
+      - Ordnungsmodus (unsorted/local/lex)
+      - Pflichtoperationen (CRUD)
+      - Concurrency-Garantien (single/multi-reader, Updates)
+
+   Modul-Bausteine:
+      - Trie-Engine (globale Struktur, Redirect, Knoten-/Seitennavigation)
+      - Knoten-/Seitentyp-Implementierungen (5 Typen, jede ein Modul)
+      - ValueHandle-Mechanik (Inline/External/ChainRef)
+      - Operation-Dispatcher (Get/Put/Delete/Range)
+
+   "Cache-Engine SIEHT nicht IN die Knoten" — kennt nur Header-Telemetrie.
+
+DOMAENE 2 — CACHE-ENGINE-DOMAENE
+   Verantwortlich fuer:
+      - Seitentyp-Auswahl (Page-Type-Selection Rules)
+      - Prefetch-Policy (Distanz, Locality-Hints, an/aus)
+      - Online-Relocation (wann, wo, wie)
+      - Allocator-Steuerung (Pool/Arena pro Seitentyp)
+      - Plattform-Kalibrierung (Modus 1/2/3)
+      - Telemetrie-Erfassung (Probability Sketches, Read Counter)
+
+   Modul-Bausteine:
+      - Plattform-Profiler (Working Set, Stride, Prefetch-Distanz Sweeps)
+      - Cost Model (anhand Plattform-Profil + lokaler Telemetrie)
+      - Page-Type-Scheduler
+      - Prefetch-Controller
+      - Relocation-Manager
+      - Allocator-Manager
+
+   "Such-Algorithmus SIEHT nicht IN die Cache-Engine" — ruft nur
+   Schnittstelle "such mir den Naechsten Knoten an Pfad x" auf.
+
+DOMAENE 3 — MESS-/TELEMETRIE-DOMAENE (Querschnitt)
+   Verantwortlich fuer:
+      - Counter-Erfassung via perf/PAPI/Advisor
+      - Histogramm-Ablage (HDR)
+      - Plattform-Erkennung (CPU-Features, ISA, Cache-Hierarchie)
+      - Reproduzierbarkeit (Seeds, Warmups, Pinning, Compiler-Flags)
+
+   Modul-Bausteine:
+      - Counter-Collector (perf/PAPI/Advisor Wrapper)
+      - Histogram-Aggregator
+      - Platform-Probe (CPU-ID, ISA-Detection, Cache-Topo)
+      - Run-Recorder (Run-Logs mit Build-/Compiler-/Flag-Info)
+
+   Wichtig: KEINE Mittelung von Perzentilen; 5 Laeufe je Konfiguration roh.
+
+GEMEINSAMER VERTRAG (Schnittstelle Domaene 1 ↔ Domaene 2)
+   - Cache-Engine sieht "Knoten/Pages" als opake Blobs mit
+     Header-Telemetrie (Probability Sketches, Counter, Densitaet, Fanout).
+   - Such-Algorithmen rufen auf: "Naechster Knoten unter Schluessel-Praefix x"
+     und bekommen vom Cache-Engine-Modul den effektiven Seitentyp +
+     Pointer/Handle zurueck.
+   - **Single Direction Dependency**: Such-Engine darf Cache-Engine
+     aufrufen; Cache-Engine darf NICHT in die Such-Logik greifen.
+
+================================================================================
+NICHT-MEHR-OFFENE PUNKTE (gegenueber Vorstufe)
+================================================================================
+
+Aus Begriffsglossar-Vorstufe waren folgende Punkte als TODO markiert.
+Status nach REV4 + Phase 3.B + Phase 3.C:
+
+* "ChainRef" (PRT-ART Termin 2 ValueHandle::ChainRef) — explizit vertagt;
+   Bleibt vertagt (Termin 2 Entscheidung gilt). Mapping zu CoCo-trie Macro-Node
+   ist NICHT direkt — Macro-Node ist eine Subtrie-Kollabierung, ChainRef ist
+   eine Value-Verkettung. Konzeptionell unterschiedliche Domaenen.
+
+* "fence" / "border node" (Masstree) vs. PRT-ART Page-Boundary —
+   GEKLAERT: Masstree-Border-Node = PRT-ART Layer-Grenze (Slice-Wechsel).
+   PRT-ART verwendet KEINE 8-Byte-Slices, daher keine direkte 1:1-Uebernahme.
+   Konzeptionell aequivalent: Page-Boundary in PRT-ART trennt
+   Trie-Huelle-Knoten von eingebetteter Such-Page-Logik.
+
+* "Fingerprinting" (B-Trees Are Back) — Methodisch nah an Bloom-Filter,
+   GEKLAERT: Fingerprinting = vorberechneter Hash-Bit-Vector pro Schluessel
+   in der Page-Zeile. Reduziert teure String-Vergleiche.
+   PRT-ART Termin 1: optional — nicht im Pflicht-Kern.
+
+* "Heads / Hints" (B-Trees Are Back) — Mapping zu PRT-ART Probability Hints
+   GEKLAERT: B-Trees-Are-Back "Heads" = Sortierte ersten Bytes der Schluessel
+   in der Page-Header-Region (fuer schnellen Vergleich). NICHT identisch zu
+   PRT-ART Probability Hints (statistische Telemetrie). Verschiedene Konzepte.
+
+* "Concurrency Token" / "Version" (ART OLC, Masstree) vs. RCU Grace Period —
+   GEKLAERT: OLC-Version = atomarer Counter pro Knoten (Lese-Pruefung).
+   RCU-Grace-Period = globale Wait-fuer-alle-Reader-Mechanik.
+   Komplementaer: OLC fuer Lookups, RCU fuer Memory Reclamation nach Relocation.
+   PRT-ART nutzt im Kern beide (T4 Designentscheidung).
+
+* SuRF "Fast Succinct Trie (FST)" + "LOUDS-Dense / LOUDS-Sparse" —
+   VOLL INTEGRIERT in v2 (siehe 1.5 Succinct/Space-efficient Familie).
+   LOUDS-Dense ↔ PRT-ART Dense-Byte-Page (Konzept aequivalent)
+   LOUDS-Sparse ↔ PRT-ART Sparse Patricia Page (Konzept aequivalent)
+   LOUDS-DS Hybrid ↔ PRT-ART Cache-Engine Page-Type-Selection (Konzept aequivalent)
+   ABER: SuRF ist STATISCH; PRT-ART braucht Updates -> wir koennen LOUDS-Encoding
+   nicht 1:1 uebernehmen, sondern nur als konzeptionelle Inspiration nutzen.
+
+================================================================================
+ENDE DES BEGRIFFSGLOSSARS v2 — FINAL
+Phase 3.D (Domaenenmodell finalisieren) baut hierauf auf.
+================================================================================

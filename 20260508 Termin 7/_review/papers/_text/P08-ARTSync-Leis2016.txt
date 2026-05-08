@@ -1,0 +1,927 @@
+=== PAPER: P08-ARTSync-Leis2016
+=== FILENAME: The ART of Practical Synchronization.pdf
+=== PAGES: 8
+
+--- PAGE 1 ---
+The ART of Practical Synchronization
+Viktor Leis Florian Scheibner Alfons Kemper Thomas Neumann
+T echnische Universität München
+{leis,scheibnf,kemper,neumann}@in.tum.de
+ABSTRACT
+The performance of transactional database systems is critically de-
+pendent on the efﬁcient synchronization of in-memory data struc-
+tures. The traditional approach, ﬁne-grained locking, does not scale
+on modern hardware. Lock-free data structures, in contrast, scale
+very well but are extremely difﬁcult to implement and often require
+additional indirections. In this work, we argue for a middle ground,
+i.e., synchronization protocols that use locking, but only sparingly.
+We synchronize the Adaptive Radix Tree (ART) using two such
+protocols, Optimistic Lock Coupling and Read-Optimized Write
+EXclusion (ROWEX). Both perform and scale very well while be-
+ing much easier to implement than lock-free techniques.
+1. INTRODUCTION
+In traditional database systems, most data structures are pro-
+tected by ﬁne-grained locks 1. This approach worked well in the
+past, since these locks were only acquired for a short time and
+disk I/O dominated overall execution time. On modern servers with
+many cores and where most data resides in RAM, synchronization
+itself often becomes a major scalability bottleneck. And with the
+increasing number of CPU cores—Intel’s current server platform
+Broadwell EP supports up to 24 cores per socket—efﬁcient syn-
+chronization will become even more important.
+Figure 1 gives an overview over the synchronization paradigms
+discussed in this paper. Besides traditional ﬁne-grained locking,
+which is known to scale badly on modern CPUs, the ﬁgure shows
+the lock-free paradigm, which offers strong theoretical guarantees,
+and Hardware Transactional Memory (HTM), which requires spe-
+cial hardware support. When designing a data structure, so far, one
+had to decide between the extreme difﬁculty of the lock-free ap-
+proach, special hardware support of HTM, and poor scalability of
+locking. In this paper, we present two additional points in the de-
+sign space that ﬁll the void in between. Optimistic Lock Coupling
+and ROWEX are much easier to use than lock-free synchronization
+but offer similar scalability without special hardware support.
+1 In this paper, we always use the term “lock” instead of “latch”
+since we focus on low-level data structure synchronization, not
+high-level concurrency control.
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for proﬁt or commercial advantage and that copies bear this notice and the full cita-
+tion on the ﬁrst page. Copyrights for components of this work owned by others than
+ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or re-
+publish, to post on servers or to redistribute to lists, requires prior speciﬁc permission
+and/or a fee. Request permissions from permissions@acm.org.
+DaMoN’16, June 26-July 01 2016, San Francisco, CA, USA
+c⃝ 2016 ACM. ISBN 978-1-4503-4319-0/16/06. . . $15.00
+DOI: http://dx.doi.org/10.1145/2933349.2933352
+scalability
+ease of use
+ﬁne-grained locking
+(lock coupling)
+optimistic
+lock coupling
+HTM
+lock-free
+ROWEX
+Figure 1: Overview of synchronization paradigms
+We focus on synchronizing the Adaptive Radix Tree (ART) [12],
+a general-purpose, order-preserving index structure for main-memory
+database systems. ART is an interesting case study, because it is a
+non-trivial data structure that was not designed with concurrency
+in mind rather with high single-threaded performance. We present
+a number of synchronization protocols for ART and compare them
+experimentally.
+Our main goal in this paper, however, is to distill general prin-
+ciples for synchronizing data structures in general. This is impor-
+tant for two reasons. First, besides index structures, database sys-
+tems also require other data structures that must be concurrently ac-
+cessible like tuple storage, buffer management data structures, job
+queues, etc. Second, concurrent programs are very hard to write
+and even harder to debug. We therefore present our ideas, which,
+as we discuss in Section 6, are not entirely new, as general building
+blocks that can be applied to other other data structures.
+The rest of this work is organized as follows. We ﬁrst present
+necessary background about the Adaptive Radix Tree in Section 2.
+The two new synchronization paradigmsOptimistic Lock Coupling
+and Read-Optimized Write EXclusion are introduced in Section 3
+and Section 4. Section 5 evaluates the presented mechanisms. Fi-
+nally, after discussing related work in Section 6, we present our
+conclusions in Section 7.
+2. THE ADAPTIVE RADIX TREE (ART)
+Trie data structures, which are also known as radix trees and
+preﬁx trees, have been shown to outperform classical in-memory
+search trees [12, 10]. At the same time, and in contrast to hash
+
+--- PAGE 2 ---
+Node256
+0 1 2
+…
+3 255
+child pointer
+4 5
+13 129130
+key child pointerNode4
+0 1 2 3 0 1 2 3
+3 8 9 ……
+key child pointerNode16
+255
+0 1 2 0 1 2 1515
+Node48
+0 1 2
+… …
+child index child pointer
+3 255 47210
+Header preﬁxCount count type preﬁx
+(in front of
+each node) 4 3 N4 0 0 0 0
+TIDTIDTID TID
+TID
+Figure 2: The internal data structures of ART
+tables, they are order-preserving, making them very attractive in-
+dexing structures for main-memory database systems.
+What distinguishes ART [12] from most other trie variants is that
+it uses an adaptive node structure. ART dynamically chooses the
+internal representation of each node from multiple data structures.
+The four available node types are illustrated in Figure 2. Initially,
+the smallest node type (Node4) is selected, and, as entries are in-
+serted into that node, it is replaced with a larger node type. In
+the ﬁgure, if two more entries would be inserted into the (Node4),
+which currently holds 3 entries, it would be replaced by a (Node16).
+Another important feature of ART is path compression, which
+collapses nodes with only a single child pointer into the ﬁrst node
+with more than one child. To implement this, each node stores a
+preﬁx of key bytes in its header. This allows indexing long keys
+(e.g., strings) effectively, because the optimization signiﬁcantly re-
+duces the height of the tree. The example header shown in Figure 2
+stores a preﬁx of 4 zero bytes thus reducing the height by 4 levels.
+In HyPer, where ART is the default indexing structure [8], ART
+maps arbitrary keys to tuple identiﬁers (TIDs). As the ﬁgure
+shows, the TIDs are stored directly inside the pointers. Pointers
+and TIDs are distinguished using “pointer tagging”, i.e., by using
+one of the pointer’s bits.
+Adaptive node types and path compression reduce space con-
+sumption while allowing for nodes with high fanout and thus en-
+sure high overall performance. At the same time, these features
+are also the main challenges for synchronizing ART. Tries without
+these features are easier to synchronize, which makes ART a more
+interesting case study for synchronizing non-trivial data structures.
+3. OPTIMISTIC LOCK COUPLING
+Lock coupling [1], i.e., holding at most 2 locks at a time during
+traversal, is the standard method for synchronizing B-trees. One
+interesting property of ART is that modiﬁcations affect at most two
+nodes: the node where the value is inserted or deleted, and poten-
+tially its parent node if the node must grow (during insert) or shrink
+(during deletion). In contrast to B-trees, a modiﬁcation will never
+propagate up to more than 1 level. Lock coupling can therefore be
+applied to ART even more easily than to B-trees.
+The left-hand-side of Figure 3 shows the necessary changes for
+synchronizing the lookup operation of ART with lock coupling.
+The pseudo code uses read-write locks to allow for concurrent read-
+ers. Insert and delete operations can also initially acquire read locks
+before upgrading them to write locks if necessary. This allows to
+avoid exclusively locking nodes near the root, which greatly en-
+hances concurrency because most updates only affect nodes far
+from the root.
+Lock coupling is simple and seems to allow for a high degree
+of parallelism. However, as we show in Section 5, it performs very
+badly on modern multi-core CPUs even if the locks do not logically
+conﬂict at all, for example in read-only workloads. The reason is
+that concurrent locking of tree structures causes many unnecessary
+cache misses: Each time a core acquires a read lock for a node
+(by writing to that node), all copies of that cache line are invali-
+dated in the caches of all other cores. Threads, in effect, “ﬁght” for
+exclusive ownership of the cache line holding the lock. The root
+node and other nodes close to it become contention points. There-
+fore, other synchronization mechanisms are necessary to fully uti-
+lize modern multi-core CPUs.
+Optimistic Lock Coupling is similar to “normal” lock coupling,
+but offers dramatically better scalability. Instead of preventing con-
+current modiﬁcations of nodes (as locks do), the basic idea is to
+optimistically assume that there will be no concurrent modiﬁcation.
+Modiﬁcations are detected after the fact using version counters, and
+the operation is restarted if necessary. From a performance stand-
+point, this optimism makes a huge difference, because it dramati-
+cally reduces the number of writes to shared memory locations.
+3.1 Optimistic Locks
+Figure 3 compares the pseudo code for lookup in ART using lock
+coupling and Optimistic Lock Coupling (the code for insert can be
+found in Appendix B). Clearly, the two versions are very similar.
+The difference is encapsulated in the readLockOrRestart and
+readUnlockOrRestart functions, which mimic a traditional
+locking interface but are implemented differently. This interface
+makes it possible for the programmer to reason (almost) as if she
+was using normal read-write locks.
+Internally, an optimistic lock consists of a lock and a version
+counter. For writers, optimistic locks work mostly like normal
+locks, i.e., they provide mutual exclusion by physically acquir-
+ing (by writing into) the lock. Additionally, each writeUnlock
+operation causes the version counter associated with the lock
+to be incremented. Read operations, in contrast, do not actu-
+ally acquire or release locks. readLockOrRestart merely
+waits until the lock is free, before returning the current version.
+readUnlockOrRestart, which takes a version as an argument,
+makes sure the lock is still free and that the version (returned by
+readLockOrRestart) did not change. If a change occurred,
+the lookup operation is restarted from the root of tree. In our im-
+plementation we encode the lock and the version counter (and an
+obsolete ﬂag) in a single 64 bit word that is updated atomically and
+is stored in the header of each ART node. A full description of the
+optimistic lock primitives can be found in Appendix A.
+Let us mention that, for debugging purposes, it is possible to
+map the optimistic primitives to their pessimistic variants (e.g.,
+pthread_rwlock). This enables thread analysis tools like
+Helgrind to detect synchronization bugs. Version/lock combi-
+nations have been used in the past for synchronizing data struc-
+tures (e.g., [4, 2, 18]), usually in combination with additional, data
+structure-speciﬁc tricks that reduce the number of restarts. Opti-
+
+--- PAGE 3 ---
+lookup(key, node, level, parent)
+readLock(node)
+if parent != null
+unlock(parent)
+// check if prefix matches, may increment level
+if !prefixMatches(node, key, level)
+unlock(node)
+return null // key not found
+// find child
+nextNode = node.findChild(key[level])
+if isLeaf(nextNode)
+value = getLeafValue(nextNode)
+unlock(node)
+r
+eturn value // key found
+if nextNode == null
+unlock(node)
+r
+eturn null // key not found
+// recurse to next level
+return lookup(key, nextNode, level+1, node)
+lookupOpt(key, node, level, parent, versionParent)
+version = readLockOrRestart(node)
+if parent != null
+readUnlockOrRestart(parent, versionParent)
+// check if prefix matches, may increment level
+if !prefixMatches(node, key, level)
+readUnlockOrRestart(node, version)
+r
+eturn null // key not found
+// find child
+nextNode = node.findChild(key[level])
+checkOrRestart(node, version)
+i
+f isLeaf(nextNode)
+value = getLeafValue(nextNode)
+readUnlockOrRestart(node, version)
+r
+eturn value // key found
+if nextNode == null
+readUnlockOrRestart(node, version)
+r
+eturn null // key not found
+// recurse to next level
+return lookupOpt(key, nextNode, level+1, node, version)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+Figure 3: Pseudo code for a lookup operation that is synchronized using lock coupling (left) vs. Optimistic Lock Coupling (right).
+The necessary changes for synchronization are highlighted
+mistic Lock Coupling is indeed a very general technique that al-
+lows consistent snapshots over multiple nodes (e.g., 2 at a time for
+lock coupling). The region can even involve more than 2 nodes, but
+should obviously be as small as possible to reduce conﬂicts.
+3.2 Assumptions of Optimistic Lock Coupling
+To make Optimistic Lock Coupling work correctly, there
+are certain properties that an algorithm must fulﬁll. After
+readLockOrRestart has been called, a reader may see inter-
+mediate, inconsistent states of the data structure. An incorrect state
+will be detected later by readUnlockOrRestart, but, in some
+cases, can still cause problems. In particular, care must be taken to
+avoid (1) inﬁnite loops and (2) invalid pointers. For ART, an inﬁnite
+loop cannot occur. To protect against invalid pointers, it is neces-
+sary to add an additional version check (line 11 in Figure 3). With-
+out this check, nextNode might be an invalid pointer, which may
+cause the program to crash. These additional checks are needed
+before an optimistically read pointer is dereferenced.
+Another aspect that needs some care is deletion of nodes. A node
+must not be immediately reclaimed after removing it from the tree
+because readers might still be active. We use epoch-based memory
+reclamation to defer freeing such nodes. Additionally, when a node
+has been logically deleted, we mark it as obsolete when unlocking
+the node (cf. writeUnlockObsolete in Appendix A). This al-
+lows other writers to detect this situation and trigger a restart.
+One theoretical problem with Optimistic Lock Coupling is that—
+in pathological cases—a read operation may be restarted repeat-
+edly. A simple solution for ensuring forward progress is to limit
+the number of optimistic restarts. After this limit has been reached,
+the lookup operation can acquire write locks instead.
+To summarize, Optimistic Lock Coupling is remarkably simple,
+requires few changes to the underlying data structure, and, as we
+show in Section 5, performs very well. The technique is also quite
+general and can be applied to other data structures (e.g., B-trees).
+4. READ-OPTIMIZED WRITE EXCLUSION
+Like many optimistic concurrency control schemes, Optimistic
+Lock Coupling performs very well as long as there are few con-
+ﬂicts. The big disadvantage is, however, that all operations may
+restart. Restarts are particularly undesirable for reads, because they
+are predominant in many workloads. We therefore present a sec-
+ond synchronization technique that still uses locks for writes, but
+where reads always succeed and never block or restart. We call this
+technique Read-Optimized Write EXclusion (ROWEX).
+4.1 General Idea
+ROWEX is a synchronization paradigm that lies between tra-
+ditional locking and lock-free techniques (cf. Figure 1). It pro-
+vides the guarantee that reads are non-blocking and always suc-
+ceed. Synchronizing an existing data structure with ROWEX is
+harder than with (optimistic) lock coupling, but generally still eas-
+ier (i.e., at least possible) than designing a similar lock-free data
+structure. The main tool of ROWEX is the write lock, which pro-
+vides additional leverage in comparison with lock-free approaches
+that must conﬁne themselves with primitive atomic operations like
+compare-and-swap. The write locks are acquired only infrequently
+by writers and never by readers.
+The basic idea with ROWEX is that, before modifying a node,
+the lock for that node is ﬁrst acquired. This lock only provides
+exclusion relative to other writers, but not readers, which never ac-
+quire any locks (and never check any versions). The consequence
+is that writers must ensure that reads are always consistent by using
+atomic operations. As we describe in the following, ROWEX gen-
+erally requires some modiﬁcations to the internal data structures.
+Although the name ROWEX indicates that reads are fast, writes
+are not slow either (despite requiring locks). The reason is that writ-
+ers only acquire local locks at the nodes that are actually changed,
+i.e., where physical conﬂicts are likely. Even lock-free designs
+will often have cache line invalidations that impair scalability when
+writing to the same node. ROWEX thus provides very good scala-
+bility while still being realistically applicable to many existing data
+structures.
+
+--- PAGE 4 ---
+4.2 ROWEX for ART
+One important invariant of ART is that every insertion/deletion
+order results in the same tree because there are no rebalancing op-
+erations. Each key, therefore, has a deterministic physical location.
+In B-link trees [11], in contrast, a key may have been moved to a
+node on the right (and never to the left due to deliberately omitting
+underﬂow handling).
+To synchronize ART using ROWEX, we ﬁrst discuss local mod-
+iﬁcations within the 4 node types before describing how node re-
+placement and ﬁnally path compression are handled.
+To allow concurrent local modiﬁcations, accesses to ﬁelds that
+may be read concurrently must be atomic. These ﬁelds include
+the key bytes (in Node4 and Node16), the child indexes (in
+Node48), and the child pointers (in all node types). In C++ 11
+this is done by using the std::atomic type, which ensures that
+appropriate memory barriers are inserted 2. These changes are al-
+ready sufﬁcient for the Node48 and Node256 types and allow
+adding (removing) children to (from) these nodes. For the lin-
+ear node types (Node4 and Node16), which are structurally very
+similar to each other, some additional conceptual changes are nec-
+essary. In the original design, the keys in linear nodes are sorted
+(cf. Figure 2) to simplify range scans. To allow for concurrent mod-
+iﬁcations while reads are active, we avoid maintaining the sorted
+order and append new keys at the end of the node instead. Deletions
+simply set the child pointer to null, and slots are reclaimed lazily
+by replacing the node with a new one. With this change, lookups
+must check all keys (i.e., 4 for Node4 and 16 for Node16). How-
+ever, this is not a problem since SIMD instructions can be used to
+perform the comparison.
+Node replacement can become necessary due to (1) the node
+becoming too full to encompass another insert or due to (2) the node
+becoming underfull. In both cases, the required steps for replacing
+a node are the same:
+1. Both the node and its parent are locked.
+2. A new node of the appropriate type is created and initialized
+by copying over all entries from the old node.
+3. The location within the parent pointing to the old node is
+changed to the new node using an atomic store.
+4. The old node is unlocked and marked as obsolete. The parent
+node is unlocked.
+Like with Optimistic Lock Coupling, once a node is not reachable
+in the most recent version of the tree (after step 3), the node must
+be marked as obsolete before being unlocked. Any writer waiting
+for that lock will detect that the node is obsolete and will restart the
+entire insert or delete operation. For readers, in contrast, it is safe
+to read from obsolete nodes.
+Path compressionis illustrated in Figure 4. In the 2-level tree on
+the left-hand side, the blue node contains the “R” preﬁx. In order to
+insert the new key “AS”, it is necessary to (1) install a new (green)
+node and (2) truncate the preﬁx (at the blue node). Individually,
+both steps can be performed atomically: Installing the new node
+can be done by a single (atomic) store. To change the preﬁx of the
+node atomically, we store both the preﬁx and its length in a single
+2 The std::atomic type does not change the physical layout.
+Also note that on x86 an atomic load adds very little overhead, as
+it does not introduce a memory barrier. Making the ﬁelds atomic
+merely prevents the compiler from reordering instructions but does
+not introduce additional instructions for readers.
+2
+A
+ARE ART
+E T
+I
+I
+preﬁxlevel
+0
+R 2
+A
+ARE ART
+E T
+I
+I
+0
+1
+AS
+S R
+R
+1. install
+new node
+2. update
+preﬁx
+2
+A
+ARE ART
+E T
+I
+I
+0
+1
+AS
+SR
+preﬁxlevel preﬁxlevel
+preﬁxlevel preﬁx level
+preﬁx levelpreﬁx levelpreﬁx level
+Figure 4: Path compression changes for inserting “AS”
+8 byte value, which can be changed atomically3.
+The main difﬁculty with path compression is that it is not pos-
+sible to install a new node and truncate the preﬁx in a single oper-
+ation. As a consequence, a reader may see the intermediate state
+in Figure 4. To solve this problem, we augment each node with
+a level ﬁeld, which stores the height of the node including the
+preﬁx and which never changes after a node has been created. With
+this additional information, the intermediate state in Figure 4 is
+safe, because a reader will detect that the preﬁx at the blue node
+has to be skipped. Similarly, it is also possible that a reader sees
+the ﬁnal state of the blue node without having seen the green node
+before. In that situation, the reader can detect the missing preﬁx
+using level ﬁeld and retrieve the missing key from the database.
+To summarize, whereas in Optimistic Lock Coupling readers de-
+tect changes and restart, with ROWEX it is the responsibility of
+writers to ensure that reads are safe. Thus ROWEX is not a simple
+recipe that can be applied to any data structure, but must be care-
+fully adapted to it. In some cases, it might even prove impossible
+without major changes to the underlying data structure. Neverthe-
+less, we believe that ROWEX is an interesting design point between
+lock-free techniques and locking.
+5. EV ALUATION
+In this section we experimentally compare a number of ART
+variants: unmodiﬁed ART without support for concurrent modi-
+ﬁcations, lock coupling with read-write spinlocks, Optimistic Lock
+Coupling, ROWEX, and hardware transactional memory (HTM)
+with 20 restarts using a global, elided lock as fallback (as described
+in [14]). The additional space consumption per node is 4 bytes for
+lock coupling, 8 bytes for Optimistic Lock Coupling, and 12 bytes
+for ROWEX. As a competitor we chose Masstree [18], which, to
+the best of our knowledge, is the fastest publicly available 4, syn-
+chronized, order-preserving data structure. Note that the compar-
+ison between ART and Masstree is not really “apples-to-apples”,
+as both the synchronization protocol and the data structures them-
+selves differ. All implementations use the jemalloc memory
+allocator and, when required, low-overhead epoch-based memory
+3In comparison with the original ART implementation this decision
+reduces the maximum preﬁx length from 9 to 4. On x86, 16 byte
+values can also be accessed atomically, which would also allow
+storing 12 byte preﬁxes.
+4https://github.com/kohler/masstree-beta
+
+--- PAGE 5 ---
+lookup insert remove
+0
+25
+50
+75
+100
+5 10 15 20 5 10 15 20 5 10 15 20
+threads
+M operations/second
+no sync.
+lock coupling
+Opt. Lock Coupling
+ROWEX
+HTM
+Masstree
+Figure 5: Scalability (50M 8 byte integers)
+reclamation. We use a Haswell EP system with an Intel Xeon E5-
+2687W v3 CPU, which has 10 cores (20 “Hyper-Threads”) and
+25 MB of L3 cache.
+5.1 Scalability
+In our ﬁrst experiment we investigate the scalability using 50M
+random (sparse) 8-byte integers. This is a low contention work-
+load, because conﬂicts are unlikely with random keys. Figure 5
+shows the results for individually executing lookup, insert, and re-
+move. As expected, the variant without synchronization, which
+is only shown for the read-only experiment, performs best. Lock
+coupling does not scale well, even in the lookup experiment and
+although we use read-write locks. Optimistic Lock Coupling and
+ROWEX, in contrast, scale very well and have very similar perfor-
+mance, with Optimistic Lock Coupling being slightly (around 7%)
+faster for lookup. The HTM variant also performs very well on the
+lookup experiment, but is slightly slower for insert and signiﬁcantly
+slower for remove. We veriﬁed that the reason for this is (unneces-
+sary) contention in the memory allocator causing frequent aborts.
+Masstree scales well but with short keys its overall performance is
+signiﬁcantly lower than with ART.
+To better understand the lookup results in Figure 5, we measured
+some important CPU statistics:
+1 thread / 20 threads [per lookup]
+cycles instruct. L1 misses L3 misses
+no sync 211 / 381 123 / 124 4.3 / 4.5 1.7 / 1.8
+lock coupling 418 / 2787 242 / 243 5.2 / 9.0 1.8 / 2.0
+Opt. Lock Coup. 348 / 418 187 / 187 5.3 / 5.7 1.8 / 2.0
+ROWEX 375 / 427 248 / 249 5.6 / 5.8 1.9 / 1.9
+HTM 347 / 428 132 / 135 4.3 / 4.5 1.7 / 2.1
+Masstree 982 / 1231 897 / 897 20.5 / 21.1 6.5 / 7.1
+Single-threaded, the overhead of Optimistic Lock Coupling in
+comparison with the non-synchronized variant is around 65%,
+mostly due to additional instructions. With 20 threads, the overhead
+is reduced to only 10%, likely due to longer delays in the memory
+controller. With lock coupling, because of cache line invalidations
+caused by lock acquisitions, the number of L1 misses (highlighted)
+increases signiﬁcantly when going from 1 to 20 threads and the
+CPU cycles increase by a factor of 6.6×. The slowdown would
+be even larger on multi-socket systems, since such systems do
+not have a shared cache for inter-thread communication. The CPU
+statistics also explain why ART is signiﬁcantly faster than Masstree
+with integer keys. The Optimistic Lock Coupling variant of ART,
+for example, requires 4.8× fewer instructions and 3.6× fewer L3
+misses than Masstree.
+lookup
+0
+5
+10
+15
+20
+25
+0 1 2 3 0 1 2 3
+Zipf parameter (skew)
+M operations/second
+lock coupling lock coupling
+Masstree
+Masstree
+HTM
+HTM
+ROWEX
+ROWEXOpt. Lock Coupling
+OLC
+insert + remove
+Figure 6: Performance under contention (1 lookup thread and
+1 insert+remove thread)
+5.2 Contention
+In order to show the effect of contention, we measured simulta-
+neous lookup and update operations (insert+remove) in a tree with
+10M dense 8 byte integer keys. We used 1 lookup thread and 1 up-
+date thread and varied the skewness of the keys going from uniform
+to extremely skewed (reading and modifying the same key 83% of
+the time). The lookup results (left-hand side of Figure 6) show
+that with higher skew most variants initially become faster (due to
+better cache locality), before eventually slowing down under very
+high contention. ROWEX is the only exception, as its lookup per-
+formance stays very high even under extreme contention due to the
+non-blocking reads. The performance of the update thread (right-
+hand side of Figure 6) is generally similar to the lookup perfor-
+mance. One exception is HTM, which has higher performance for
+the update thread than for the lookup thread, because Intel’s trans-
+actional memory implementation favors writers over reader [17].
+5.3 Strings
+Besides integer keys, we also measured the lookup performance
+for three real-world string data sets. The “genome” data set has
+256K strings of average length 10.0, “Wikipedia” contains 16M ar-
+ticle titles of average length 22.4, and “URL” has 6.4M URLs of
+average length 63.3. The lookup and insert performance with 20
+threads is shown in Figure 7. Masstree closes its performance gap
+to ART with longer keys. Again, lock coupling is very slow and the
+synchronized ART variants are slightly slower than the unsynchro-
+nized variant.
+
+--- PAGE 6 ---
+lookup insert
+0
+25
+50
+75
+0
+10
+20
+30
+0
+10
+20
+30
+40
+genomeWikipediaURL
+no sync.
+lock coupling
+Opt. Lock Coup.
+ROWEX
+HTM
+Masstree
+lock coupling
+Opt. Lock Coup.
+ROWEX
+HTM
+Masstree
+M operations/second
+Figure 7: Performance for string data with 20 threads
+5.4 Code Complexity
+To give a rough indication for the relative complexity of the im-
+plementations, we counted the core algorithmic C++ code lines ex-
+cluding the lock implementations, garbage collection, comments,
+and empty lines:
+lookup insert remove
+no synchronization 29 95 87
+HTM 30 96 88
+lock coupling 41 136 139
+Optimistic Lock Coupling 44 148 143
+ROWEX 34 200 156
+Using HTM is quite trivial, it merely requires wrapping each
+transaction in a hardware transaction, which we implemented with
+a Transaction object that starts the HTM transaction in the con-
+structor and commits the transaction in the destructor. The two
+lock coupling variants require more changes, with the optimistic
+variant being only marginally larger. ROWEX requires most ad-
+ditional code, in particular for the insert and remove operations.
+The ROWEX numbers actually underestimate the complexity of
+ROWEX, since its protocol is fairly subtle in comparison with the
+other variants.
+6. RELATED WORK
+Concurrency control is one of the major areas in the database
+ﬁeld. Most prior work, however, focuses on high-level user transac-
+tions, and not so much on low-level synchronization of data struc-
+tures, which is what we study in this work.
+Hand-over-hand locking, i.e., the idea underlying Optimistic
+Lock Coupling, was used to synchronize binary search trees [2].
+ROWEX-like ideas have also been used before, for example by the
+FOEDUS system [9]. The goal of this paper has been to consoli-
+date these ideas and to present them as general building blocks as
+opposed to clever tricks used to synchronize individual data struc-
+tures.
+The traditional method of synchronizing B-trees, lock coupling,
+was proposed by Bayer and Schkolnick [1]. Graefe’s surveys [6, 5]
+on low-level synchronization of B-trees, which summarize decades
+of accumulate wisdom in the database community, focus on ﬁne-
+grained locking. Unfortunately, as was already observed by Cha
+et al. [4] in 2001, lock coupling simply does not scale on modern
+multi- and many-core CPUs. Since then, the problem has become
+even more pronounced and the trend is likely to continue. Like
+Optimistic Lock Coupling, Cha et al.’s solution (OLFIT) uses ver-
+sions to detect changes within a node. In contrast to Optimistic
+Lock Coupling, OLFIT does not keep track of versions across mul-
+tiple nodes, but uses the B-link tree idea [11] to support concurrent
+structure modiﬁcation operations.
+Both the Bw-Tree [15] and Masstree [18] are two B-tree pro-
+posals published in 2012, and both eschew traditional lock cou-
+pling. The Bw-Tree is latch-free and its nodes can be, due to their
+relatively large size, moved to disk/SSD [16]. To allow concur-
+rent modiﬁcations, delta records are pre-pended to a list of existing
+changes and the (immutable) B-tree node at the end of the list itself.
+Nodes do not store physical pointers but offsets into a mapping ta-
+bles that points to the delta lists and allows one to atomically add
+new delta records. After a number of updates the deltas and the
+node are consolidated to a new node. The Bw-Tree has been de-
+signed with concurrency in mind and its synchronization protocol is
+highly sophisticated; structure modiﬁcation operations (e.g., node
+splits) are very complex operations involving multiple steps.
+Masstree [18] is a hybrid B-tree/trie data structure and, like ART,
+exclusively focuses on the in-memory case. Like the Bw-Tree,
+Masstree was designed with concurrency in mind, but the design-
+ers took different design decisions. The synchronization protocol
+of Masstree relies on a mix of local locks, clever use of atomic
+operations, and hand-over-hand locking (the idea underlying Opti-
+mistic Lock Coupling). Like Optimistic Lock Coupling, but unlike
+ROWEX, Masstree lookups must, in some cases, be restarted when
+a conﬂict with a structure-modifying operation is detected.
+Previous work has shown that Hardware Transactional Memory
+can be used to synchronize ART [13, 14] and B-trees [7] with very
+little effort using elided coarse-grained HTM locks. Makreshan-
+ski et al. [17] conﬁrmed these ﬁndings in an in-depth experimental
+study but found that performance with HTM can degrade with large
+tuples or heavy contention. Cervini et al. [3] found that replacing
+ﬁne-grained locks with (elided) HTM locks at the same granularity
+does not improve performance. HTM also has the obvious dis-
+advantage of requiring special hardware support, which is not yet
+widespread.
+7. SUMMARY AND DISCUSSION
+We presented two synchronization protocols for ART that have
+good scalability despite relying on locks. The ﬁrst protocol, Opti-
+mistic Lock Coupling is very simple, requires few changes to the
+underlying data structure, and performs very well as long as con-
+ﬂicts are not too frequent. The Read-Optimized Write EXclusion
+(ROWEX) protocol is more complex, but has the advantage that
+reads never block. ROWEX generally requires changes to the data
+structure itself, as opposed to simply adding a lock at each node.
+However, in our experience, while synchronizing an existing, non-
+trivial data structure using ROWEX may be non-trivial, it is, at
+least, realistic. Truly lock-free algorithms, in contrast, are much
+more complicated. They also generally require radical changes and
+
+--- PAGE 7 ---
+additional indirections to the underlying data structure. The Bw-
+Tree, for example, requires an indirection table that causes addi-
+tional cache misses whenever a node is accessed. Similarly, the
+state-of-the-art lock-free hash table, the split-ordered list [19], re-
+quires “dummy” nodes—again at the price of more cache misses.
+It is an open question how a lock-free variant of ART would
+look like and how well it would perform. We speculate that it
+would likely be signiﬁcantly slower than the Optimistic Lock Cou-
+pling and ROWEX implementations. We therefore argue that one
+should not discount the use of locks as long as these locks are infre-
+quently acquired like in our two protocols. Optimistic Lock Cou-
+pling and ROWEX are two pragmatic paradigms that result in very
+good overall performance. We believe both to be highly practical
+and generally applicable.
+8. REFERENCES
+[1] R. Bayer and M. Schkolnick. Concurrency of operations on
+B-trees. Acta Informatica, 9, 1977.
+[2] N. G. Bronson, J. Casper, H. Chaﬁ, and K. Olukotun. A
+practical concurrent binary search tree. In PPOPP, pages
+257–268, 2010.
+[3] D. Cervini, D. Porobic, P. Tözün, and A. Ailamaki. Applying
+HTM to an OLTP system: No free lunch. In DaMoN, 2015.
+[4] S. K. Cha, S. Hwang, K. Kim, and K. Kwon.
+Cache-conscious concurrency control of main-memory
+indexes on shared-memory multiprocessor systems. In
+VLDB, 2001.
+[5] G. Graefe. A survey of B-tree locking techniques. ACM
+Trans. Database Syst., 35(3), 2010.
+[6] G. Graefe. Modern B-tree techniques. Foundations and
+Trends in Databases, 3(4):203–402, 2011.
+[7] T. Karnagel, R. Dementiev, R. Rajwar, K. Lai, T. Legler,
+B. Schlegel, and W. Lehner. Improving in-memory database
+index performance with Intel transactional synchronization
+extensions. In HPCA, 2014.
+[8] A. Kemper, T. Neumann, J. Finis, F. Funke, V . Leis,
+H. Mühe, T. Mühlbauer, and W. Rödiger. Transaction
+processing in the hybrid OLTP & OLAP main-memory
+database system HyPer. IEEE Data Eng. Bull., 36(2):41–47,
+2013.
+[9] H. Kimura. FOEDUS: OLTP engine for a thousand cores and
+NVRAM. In SIGMOD, pages 691–706, 2015.
+[10] T. Kissinger, B. Schlegel, D. Habich, and W. Lehner.
+KISS-Tree: Smart latch-free in-memory indexing on modern
+architectures. In DaMoN, 2012.
+[11] P. L. Lehman and S. B. Yao. Efﬁcient locking for concurrent
+operations on B-trees. ACM Trans. Database Syst.,
+6(4):650–670, 1981.
+[12] V . Leis, A. Kemper, and T. Neumann. The adaptive radix
+tree: ARTful indexing for main-memory databases. In ICDE,
+2013.
+[13] V . Leis, A. Kemper, and T. Neumann. Exploiting hardware
+transactional memory in main-memory databases. In ICDE,
+2014.
+[14] V . Leis, A. Kemper, and T. Neumann. Scaling
+HTM-supported database transactions to many cores. IEEE
+Trans. Knowl. Data Eng., 28(2), 2016.
+[15] J. J. Levandoski, D. B. Lomet, and S. Sengupta. The Bw-tree:
+A B-tree for new hardware platforms. In ICDE, 2013.
+[16] J. J. Levandoski, D. B. Lomet, and S. Sengupta. LLAMA: a
+cache/storage subsystem for modern hardware. PVLDB,
+6(10):877–888, 2013.
+[17] D. Makreshanski, J. J. Levandoski, and R. Stutsman. To lock,
+swap, or elide: On the interplay of hardware transactional
+memory and lock-free indexing. PVLDB, 8(11), 2015.
+[18] Y . Mao, E. Kohler, and R. T. Morris. Cache craftiness for fast
+multicore key-value storage. In EuroSys, 2012.
+[19] O. Shalev and N. Shavit. Split-ordered lists: Lock-free
+extensible hash tables. J. ACM, 53(3):379–405, 2006.
+APPENDIX
+A. Implementation of Optimistic Locks
+The following pseudo code implements optimistic locks. Each
+node header stores a 64 bit version ﬁeld that is read and writ-
+ten atomically. The two least signiﬁcant bits indicate if the node is
+obsolete or if the node is locked, respectively. The remaining bits
+store the update counter.
+struct Node
+atomic<uint64_t> version
+...
+uint64_t readLockOrRestart(Node node)
+uint64_t version = awaitNodeUnlocked(node)
+if isObsolete(version)
+restart()
+return version
+void checkOrRestart(Node node, uint64_t version)
+readUnlockOrRestart(node, version)
+void readUnlockOrRestart(Node node, uint64_t version)
+if version != node.version.load()
+restart()
+void readUnlockOrRestart(Node node, uint64_t version,
+Node lockedNode)
+if version != node.version.load()
+writeUnlock(lockedNode)
+restart()
+void upgradeToWriteLockOrRestart(Node node, uint64_t version)
+if !node.version.CAS(version, setLockedBit(version))
+restart()
+void upgradeToWriteLockOrRestart(Node node, uint64_t version,
+Node lockedNode)
+if !node.version.CAS(version, setLockedBit(version))
+writeUnlock(lockedNode)
+restart()
+void writeLockOrRestart(Node node)
+uint64_t version
+do
+version = readLockOrRestart(node)
+while !upgradeToWriteLockOrRestart(node, version)
+void writeUnlock(Node node)
+// reset locked bit and overflow into version
+node.version.fetch_add(2)
+void writeUnlockObsolete(Node node)
+// set obsolete, reset locked, overflow into version
+node.version.fetch_add(3)
+// Helper functions
+uint64_t awaitNodeUnlocked(Node node)
+uint64_t version = node.version.load()
+while (version & 2) == 2 // spinlock
+pause()
+version = node.version.load()
+return version
+uint64_t setLockedBit(uint64_t version)
+return version + 2
+bool isObsolete(uint64_t version)
+return (version & 1) == 1
+
+--- PAGE 8 ---
+B. Insert with Optimistic Lock Coupling
+The following pseudo code implements the insert operation using
+optimistic lock coupling. Initially, the traversal proceed like in the
+lookup case without acquiring write locks. Once the node that
+needs to be modiﬁed is found, it is locked. In cases where the
+node must grow the parent is also locked.
+insertOpt(key, value, node, level, parent, parentVersion)
+version = readLockOrRestart(node)
+if !prefixMatches(node, key, level)
+upgradeToWriteLockOrRestart(parent, parentVersion)
+upgradeToWriteLockOrRestart(node, version, parent)
+insertSplitPrefix(key, value, node, level, parent) 
+writeUnlock(node)
+writeUnlock(parent)
+r
+eturn
+nextNode = node.findChild(key[level])
+checkOrRestart(node, version)
+i
+f nextNode == null
+if node.isFull()
+upgradeToWriteLockOrRestart(parent, parentVersion)
+upgradeToWriteLockOrRestart(node, version, parent)
+insertAndGrow(key, value, node, parent)
+writeUnlockObsolete(node)
+writeUnlock(parent)
+else
+upgradeToWriteLockOrRestart(node, version)
+readUnlockOrRestart(parent, parentVersion, node)
+node.insert(key, value)
+writeUnlock(node)
+return
+if parent != null
+readUnlockOrRestart(parent, parentVersion)
+if isLeaf(nextNode)
+upgradeToWriteLockOrRestart(node, version)
+insertExpandLeaf(key, value, nextNode, node, parent)
+writeUnlock(node)
+r
+eturn
+// recurse to next level
+insertOpt(key, value, nextNode, level+1, node, version)
+r
+eturn
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34

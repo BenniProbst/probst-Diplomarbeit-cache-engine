@@ -1,0 +1,533 @@
+================================================================================
+BEGRIFFSGLOSSAR v4 — FINAL (Architektur-Erweiterungen, Phase 3.D REV 2)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.C / 3.D REV 2
+Stand: 2026-05-04 · ERGAENZT v3_FINAL.txt (v3 bleibt gueltig fuer P01-P33-Belege)
+================================================================================
+
+WAS ENTHAELT v4
+   v4 ist ein **Erweiterungsdokument** zu v3. v3_FINAL.txt enthaelt das
+   vollstaendige P01-P33-Begriffsregister mit Belegen und bleibt gueltig.
+   v4 fuegt folgende Bloecke hinzu, die aus den Architektur-Korrekturen
+   des Nutzers (2026-05-04) erforderlich wurden:
+
+   BLOCK A — Architektur-Pattern-Begriffe (Observer, Visitor, Singleton,
+              Strategy, Adapter)
+   BLOCK B — CacheEngine-Spaltung (Builder vs Runtime; 2 Funktionsschichten)
+   BLOCK C — Engine-Choice-Begriffe (StaticEngine vs CacheEngine als Top-Level)
+   BLOCK D — Fan-Out-Familie (umfassende Recherche aller Multi-Way-Strukturen)
+   BLOCK E — std::map-API-Begriffe (vollstaendige C++23-Operationen)
+   BLOCK F — Concept-Begriffe (C++23 Concepts mit requires)
+   BLOCK G — ValueHandle KORRIGIERT (Sache der Node, switch_array, Dynamic)
+   BLOCK H — ConcurrencyManager-Disziplinen (8+ Klassen)
+   BLOCK I — CacheEngineBuilder-spezifische Begriffe (Permutation, Codegen,
+              MeasurementDB, LatexRenderer)
+   BLOCK J — Habich-Direktive (Originalcode-Regel)
+   BLOCK K — Submodules-Ausnahme (Korrektur zur No-Submodules-Regel)
+   BLOCK L — Korrekturen zu v3 (HazardPointers RAUS; ReadCounter uint64_t)
+
+PAPER-LEGENDE: identisch zu v3_FINAL.txt (P01-P33), siehe Quellen_Gesamtkatalog.
+
+================================================================================
+BLOCK A — ARCHITEKTUR-PATTERN-BEGRIFFE
+================================================================================
+
+[KANON]  CACHE ENGINE (Top-Level-Definition, KORRIGIERT)
+  SYN ← "Cache-Engine"            PRT-ART Termin 2-6 + Termin 7 (KANON)
+  SYN ← "Cache Control Plane"     PRT-ART Termin 5
+  SYN ← "Active Cache Layer"      PRT-ART Termin 4
+  SYN ← "Meta-Ebene"              PRT-ART Termin 5
+  SYN ← "Live CPU-Modell"         PRT-ART Termin 7 REV 2
+  BED Globales Heap-Modul (Singleton-aehnlich), das ein laufendes Modell
+      der CPU bereitstellt. Per Definition: Modell der CPU, ihrer
+      Eigenschaften, Prozesse/Ablaeufe und Verarbeitungs-Bewusstsein,
+      um Verarbeitungseigenschaften mit wissenden Entscheidungen ueber
+      die Architektur zu verbessern.
+  STRUKTUR Zwei Funktionsschichten:
+      • Schicht A — COMPILE TIME: separates Programm `CacheEngineBuilder`
+        permutiert Bestandteile, kompiliert + misst, persistiert in DB,
+        rendert LaTeX-Anhang.
+      • Schicht B — RUNTIME: globales Heap-Modul `CacheEngineRuntime`,
+        Observer + Visitor + ConcurrencyManager + Mikrobenchmarks.
+  KORREKTUR vs v3: in v3 als monolithische Meta-Ebene beschrieben — in v4
+      explizit zweischichtig (Compile-Time-Programm + Runtime-Singleton).
+
+[KANON]  STATIC ENGINE
+  BED Engine-Variante, die exakt den Originalcode eines Algorithmus liefert
+      und KEINE Optimierungen ueber den State-of-the-Art hinaus vornimmt.
+      Implementiert die std::map-API als Top-Level-Adapter.
+  EINSATZ Vergleichsbasis fuer CacheEngine-Messungen.
+  BEZ `template<typename Algo> StaticEngine<Algo>`
+
+[KANON]  ENGINE-CHOICE
+  BED Compile-Time-Wahl zwischen StaticEngine und CacheEngine via Template-
+      Parameter. KEIN Runtime-Switching.
+  BEZ `template<typename Algo, typename EngineKind> Container<Algo, EngineKind>`
+
+[KANON]  OBSERVER PATTERN  (im Cache-Engine-Kontext)
+  SYN ← "Observer"                  GoF Design Patterns
+  SYN ← "Publish/Subscribe"         allgemein
+  SYN ← "Notification Sink"         PRT-ART Termin 7 REV 2
+  BED Such-Algorithmus benachrichtigt CacheEngineRuntime ueber Ereignisse
+      (PageAccessed, NodeAccessed, PathTraversed, TelemetryUpdate,
+      MutationCommitted). CacheEngineRuntime hostet die Observer-Registry.
+  RICHTUNG Algorithmus → CacheEngine
+
+[KANON]  VISITOR PATTERN  (im Cache-Engine-Kontext)
+  SYN ← "Visitor"                   GoF Design Patterns
+  SYN ← "Double Dispatch"           allgemein
+  BED CacheEngineRuntime besucht Algorithmus-Strukturen (Page, Node,
+      Traversal) ueber Concept-Interfaces, OHNE algorithmus-spezifische
+      Internals zu kennen. Algorithmus implementiert `accept(visitor)`.
+  RICHTUNG CacheEngine → Algorithmus
+
+[KANON]  STRATEGY PATTERN  (Algorithmus-Wahl)
+  SYN ← "Strategy"                  GoF Design Patterns
+  BED Jeder Such-Algorithmus (P01-P33 + PRT-ART) ist eine konkrete
+      `IAlgorithmStrategy<K,V>`-Implementierung. Container kapselt eine
+      Strategy als Template-Parameter.
+
+[KANON]  ADAPTER PATTERN  (Originalcode-Anbindung — HABICH-DIREKTIVE)
+  SYN ← "Adapter"                   GoF Design Patterns
+  SYN ← "Wrapper"                   allgemein
+  BED Originalcode der Paper liegt unveraendert unter `ext/<paper>/`. Ein
+      Adapter pro Algorithmus uebersetzt zwischen Original-API und unseren
+      C++23-Concepts (FanOutContainer, Page, Node, Traversal, ...).
+  REGEL siehe BLOCK J (Habich-Direktive).
+
+[KANON]  SINGLETON  (CacheEngineRuntime + ConcurrencyManager)
+  SYN ← "Singleton"                 GoF Design Patterns
+  SYN ← "Globales Modul"            PRT-ART Termin 7 REV 2
+  BED Genau eine Instanz pro Prozess; Lebenszeit = Programm-Lebenszeit;
+      Heap-allokiert mit deterministischer Zerstoerung am Programm-Ende.
+  ANWENDUNG `CacheEngineRuntime::instance()`,
+            `ConcurrencyManager::instance()` (lebt IN der CacheEngineRuntime)
+
+================================================================================
+BLOCK B — CACHE-ENGINE-SPALTUNG (BUILDER vs RUNTIME)
+================================================================================
+
+[KANON]  CACHE ENGINE BUILDER  (Compile-Time-Programm)
+  BED Eigenstaendiges C++23-Programm, das die moeglichen Rekombinationen
+      verschiedener Such-Algorithmen + ihrer Bestandteile permutiert, jede
+      Permutation per Metaprogrammierung statisch kompiliert + ausmisst,
+      in eine Datenbank persistiert und am Ende einen LaTeX-Anhang fuer
+      die Diplomarbeit rendert.
+  EINSATZ `comdare-cache-engine-builder run --architecture <isa> --dataset <ds>`
+  BESTANDTEILE PermutationEngine, ConstexprCodegen, CompilerDriver,
+              BuilderMeasurement, MeasurementDB, LatexRenderer
+
+[KANON]  CACHE ENGINE RUNTIME  (Runtime-Modul, Heap, global)
+  BED Globales Heap-Modul (Singleton-aehnlich), das per Observer Telemetrie
+      empfaengt und per Visitor Algorithmus-Strukturen besucht. Empfiehlt
+      Ausfuehrungsstrategien basierend auf Compile-Time-Wissen aus der DB.
+      Hostet `LiveCpuModel`, `ConcurrencyManager`, `RuntimeMicroBenchmarks`,
+      `CompileTimeKnowledge`, `TelemetrySpool`.
+
+[KANON]  LIVE CPU-MODELL
+  BED In-Process Modell der CPU + ihrer Topologie + ihrer aktuellen Last.
+      Liefert CpuFeatures, MemoryTopology, LoadSnapshot, EstimatedMetric.
+  EINSATZ Wird von der CacheEngineRuntime gehalten und von Visitor +
+          Observer-Logik konsultiert.
+
+[KANON]  COMPILE TIME KNOWLEDGE
+  BED Snapshot der MeasurementDB, eingebettet als constexpr-Tabelle oder
+      geladen aus DB beim Programmstart. Mappt (Architecture, Workload)
+      auf StrategyRecommendation.
+
+[KANON]  RUNTIME MICRO BENCHMARK
+  BED Im Algorithmus-Lauf eingebettete Mikromessungen, deren Ergebnisse
+      in_memory akkumuliert und am Ende gespoolt werden.
+  ABG NICHT BuilderMeasurement (Compile-Time, statisch); RuntimeMicroBenchmark
+      laeuft in der Engine zur Laufzeit.
+
+[KANON]  TELEMETRY SPOOL
+  BED Akkumulator fuer Telemetrie-Samples (lock-free Ring oder per-thread).
+      Wird am Ende eines Laufs geflusht und kann optional in die
+      MeasurementDB gemerged werden.
+
+================================================================================
+BLOCK C — ENGINE-CHOICE-BEGRIFFE
+================================================================================
+
+[KANON]  ENGINE WRAPPER
+  BED Top-Level-Klasse `Container<Algo, EngineKind>`, die std::map-API +
+      Engine-spezifische Bindung (Static oder Cache) liefert.
+      KEIN Runtime-Switch — reine Compile-Time-Entscheidung.
+
+[KANON]  STATIC RUN
+  BED Lauf eines Algorithmus unter StaticEngine (Originalcode).
+      Liefert Mikrobenchmarks, aber keine aktive Optimierung.
+
+[KANON]  CACHE RUN
+  BED Lauf eines Algorithmus unter CacheEngine (mit Observer/Visitor +
+      ConcurrencyManager + Empfehlung aus CompileTimeKnowledge).
+
+================================================================================
+BLOCK D — FAN-OUT-FAMILIE (KORRIGIERT v4 — vorher trie_core)
+================================================================================
+
+[KANON]  FAN-OUT ENGINE
+  BED Allgemeines Modul fuer Multi-Way-Container mit fanout >= 2. Bietet
+      Sub-Interfaces fuer Tries, B-Baeume, B+-Baeume, B*-Baeume und
+      Hybrid-Strukturen. Ersetzt `trie_core` aus v1.
+
+[KANON]  TRIE-FAMILIE  (vollstaendige Recherche)
+  Mitglieder:
+   • Standard Trie / Patricia Trie / Radix Tree (komprimiert)
+   • HAT-Trie (Hash Array Trie)
+   • ART (Adaptive Radix Tree)                       [P01]
+   • HOT (Height-Optimized Trie)                     [P02]
+   • Masstree (Trie of B+-Trees)                     [P03]
+   • CoCo-Trie                                       [P04]
+   • START                                           [P05]
+   • SuRF / FST (Fast Succinct Trie)                 [P10]
+   • LOUDS / LOUDS-Dense / LOUDS-Sparse              [P09]
+   • Bonsai Trie
+   • DAFSA / DAWG (Directed Acyclic Word Automaton)
+   • X-Fast / Y-Fast Trie
+   • Wormhole MetaTrie                               [P07, hybrid]
+   • PRT-ART                                         [eigen, Diplomarbeit]
+
+[KANON]  B-TREE-FAMILIE  (vollstaendige Recherche)
+  Mitglieder:
+   • B-Tree (Bayer/McCreight 1972, klassisch)
+   • B+-Tree
+   • B*-Tree (2/3 fill factor)
+   • B(epsilon)-Tree (LSM-aehnliches Verhalten)
+   • B²-tree                                         [P06]
+   • 2-3-Tree, 2-3-4-Tree
+   • Red-Black-Tree (binary, als Vergleich; KEIN Fan-Out > 2)
+   • CSS-Tree (pointer-frei, Cache-Line-grosse Knoten) [P11]
+   • CSB+-Tree (Sibling-Cluster)                       [P12]
+   • Wider-Node B+-Tree                                [P13]
+   • Configuration-Table B+-Tree                       [P14]
+   • Adaptive B-Tree                                   [P20]
+   • Prefetching B+-Tree                               [P21]
+   • Fractal Prefetching B+-Tree                       [P22]
+   • T-Tree (in-memory)
+
+[KANON]  HYBRID-FAMILIE
+  Mitglieder:
+   • Wormhole (Trie + Hash + B+)                     [P07]
+   • Masstree (Trie + B+)                            [P03]
+   • Fractal Tree
+   • LSM-Tree (Log-Structured Merge)
+   • COLA (Cache-Oblivious Lookahead Array)
+   • Skiplist (probabilistisch, Multi-Way)
+
+[KANON]  SUCCINCT-FAMILIE
+  Mitglieder:
+   • LOUDS                                           [P09]
+   • LOUDS-Dense / LOUDS-Sparse / LOUDS-DS           [P10]
+   • FST (Fast Succinct Trie)                        [P10]
+
+[KANON]  SPEZIAL-FAMILIE
+  Mitglieder:
+   • TST (Ternary Search Tree)
+   • Judy Array
+   • Van Emde Boas Tree
+
+================================================================================
+BLOCK E — std::map-API (BASISVERTRAG)  [Quelle: cppreference.com C++23]
+================================================================================
+
+[KANON]  std::map-API-VERTRAG
+  BED Jeder Such-Algorithmus implementiert die vollstaendige `std::map<K,V>`-
+      API (C++23). Algorithmen sind dropin-Ersatz fuer std::map. Der Key-Type
+      kann implizit mit Hashing/Fingerprinting ueberlagert sein.
+  QUELLE https://en.cppreference.com/cpp/container/map
+
+OPERATIONEN (vollstaendig, mit Standard-Version)
+  Construction / Destruction
+   - map() / map(Compare) / map(InputIt, InputIt, Compare, Alloc)
+   - map(const map&) / map(map&&) / map(initializer_list, Compare, Alloc)
+   - map(from_range_t, R&& rng)                                  [C++23]
+   - ~map()
+  Assignment / Allocator
+   - operator=(const map&) / operator=(map&&) / operator=(initializer_list)
+   - get_allocator()
+  Element Access
+   - at(key) / operator[](key) / operator[](key&&)
+  Iterators
+   - begin() / cbegin() / end() / cend() / rbegin() / crbegin() / rend() / crend()
+  Capacity
+   - empty() / size() / max_size()
+  Modifiers
+   - clear()
+   - insert(value_type) / insert(InputIt,InputIt) / insert(initializer_list)
+   - insert_or_assign(K, V)                                      [C++17]
+   - insert_range(R&&)                                           [C++23]
+   - emplace(args...) / emplace_hint(hint, args...)
+   - try_emplace(K, args...)                                     [C++17]
+   - erase(iterator) / erase(K)
+   - swap(map&)
+   - extract(K) / extract(iterator)                              [C++17]
+   - merge(map&)                                                 [C++17]
+  Lookup
+   - count(K) / find(K) / contains(K)                            [contains: C++20]
+   - equal_range(K) / lower_bound(K) / upper_bound(K)
+  Observers
+   - key_comp() / value_comp()
+  Non-member
+   - operator==, operator<=>                                     [C++20]
+   - erase_if(map&, Pred)                                        [C++20]
+   - swap(map&, map&)
+  Deduction Guides                                                [C++17]
+
+[KANON]  TRANSPARENT COMPARE
+  BED `Compare::is_transparent`-Marker erlaubt heterogene Lookup ohne
+      Konstruktion eines Key-Objekts. Wichtig fuer effiziente Range-Queries
+      und Praefix-Matches.
+
+[KANON]  IMPLICIT KEY OVERLAY
+  BED Key-Type kann implizit mit Hashing/Fingerprinting ueberlagert sein
+      (z.B. ART/HOT bytewise; Bloom-Filter-Fingerprint pro Knoten).
+      `template<typename K, typename Overlay = NoOverlay>`
+
+================================================================================
+BLOCK F — C++23-CONCEPTS (mit requires)
+================================================================================
+
+[KANON]  C++23 CONCEPT
+  SYN ← "Concept"                   C++20+ Sprachfeature
+  SYN ← "requires-Klausel"          C++20+
+  BED Compile-Time-Constraint, das ein Template-Parameter erfuellen muss.
+  ANWENDUNG Jedes konzeptionelle Element ist ein Concept; jeder Algorithmus
+            liefert eine Implementierung, die das Concept erfuellt.
+
+CONCEPT-LISTE (PRT-ART)
+   • FanOutContainer<C, K, V>
+   • Page<P>
+   • Node<N>
+   • Traversal<T>
+   • MemoryLayout<L>
+   • ValueHandleStrategy<S, V>
+   • PrefetchStrategy<P>
+   • ConcurrencyDiscipline<D>
+   • Telemetry<T>
+   • Allocator<A>
+
+[KANON]  ALGO-MATCH
+  BED Compile-Time-Match zwischen Algorithmus-Eigenschaften (page_concept,
+      node_concept, traversal_concept, value_handle_strategy) und einem
+      vorgegebenen Set von Concept-Erfuellungen — automatisches
+      Empfehlungs-System ueber `requires`-Klauseln.
+
+================================================================================
+BLOCK G — VALUEHANDLE  (KORRIGIERT vs v3)
+================================================================================
+
+[KANON]  VALUEHANDLE  (KORRIGIERT)
+  KORREKTUR vs v3: ValueHandle ist NICHT eine globale Top-Level-Klasse,
+      sondern eine Eigenschaft DER NODE. Compile-Time-`switch_array` begrenzt
+      zulaessige Varianten je Algorithmus; Runtime waehlt je Knoten-Eigenschaft.
+  BED Strategie zur Speicherung des Werts an einem terminalen Knoten.
+
+[KANON]  VALUEHANDLE-KIND  (Enum, je Node konfigurierbar)
+   • Inline           — Wert direkt im Node-Slot
+   • Pointer          — External Pointer auf separates Werte-Array
+   • RedirectToNode   — verweist auf naechste Node (Patricia-Style)
+   • RedirectToPage   — verweist auf naechste Page
+   • ChainRef         — VERTAGT (Wertekette)
+   • Dynamic          — Runtime-Auswahl, mit `switch_array` begrenzt
+
+[KANON]  VALUEHANDLE-SWITCH-ARRAY
+  BED Compile-Time-`std::array<ValueHandleKind, N>`, das je Algorithmus die
+      zulaessigen Varianten kodiert. Runtime waehlt aus dieser Menge.
+  BEISPIELE (vorlaeufig):
+   • ART:        Inline | Pointer | RedirectToNode
+   • HOT:        Inline | Pointer
+   • B²-tree:    Inline | Pointer | RedirectToPage
+   • PRT-ART:    Inline | Pointer | RedirectToNode | RedirectToPage | Dynamic
+
+[KANON]  DYNAMIC VALUEHANDLE
+  BED Runtime-entscheidende Variante: pro Knoten zur Laufzeit Inline vs
+      Pointer vs Redirect waehlen, basierend auf Knoten-Eigenschaften
+      (Wertegroesse, Hot/Cold-Score, Pointer-Tiefe, ...).
+
+================================================================================
+BLOCK H — CONCURRENCY-MANAGER + DISZIPLINEN  (KORRIGIERT vs v3)
+================================================================================
+
+[KANON]  CONCURRENCY MANAGER  (Singleton in CacheEngineRuntime)
+  BED Singleton, das die feingranulare Concurrency-Disziplin orchestriert.
+      Jede Disziplin ist eine eigene Klasse.
+  KORREKTUR vs v3: in v3 nur als grobe "Concurrency-Garantien"-Notiz —
+      in v4 als 8+ benannte Disziplinen.
+
+DISZIPLINEN
+   1) PAGE CONCURRENCY        — Parallelitaet auf Suchseiten-Granularitaet
+   2) NODE CONCURRENCY        — Parallelitaet auf Knoten-Granularitaet
+   3) ARRAY CONCURRENCY       — intra-Knoten-Arrays (z.B. children[])
+   4) DATA STRUCTURE CONC.    — gesamte Subtree-/Datenstruktur-Ebene
+   5) PATH CONCURRENCY        — Parallelitaet entlang Suchpfade
+   6) MEMORY ACCESS CONC.     — Lese-/Schreib-Parallelitaet
+                                (nur read parallel; nur write parallel;
+                                 read-write parallel — drei Sub-Disziplinen)
+   7) SIMD THREAD CONC.       — SIMD-Parallelitaet IN bestimmten Threads
+   8) SIMD FLOW CONC.         — SIMD-Parallelitaet IN bestimmten Thread-
+                                 Ablaeufen (nicht der ganze Thread)
+   (Erweiterbar: NumaConcurrency, EpochConcurrency, ...)
+
+[KANON]  RCU-RECLAIM  (BLEIBT — Default fuer Online-Relocation)
+  BED Read-Copy-Update; deterministisches Aufraeumen nach Grace Period.
+  BELEG-LIT P29 McKenney2001
+
+[KANON]  HAZARD POINTERS  (ENTFERNT vs v3)
+  STATUS REMOVED in v4. Begruendung: memory leak ist verbotenes
+      undefiniertes Verhalten; Aufraeumen ist Pflicht; deterministische
+      Reclamation via RCU + EpochManager ist ausreichend; kein GPU-Code.
+
+================================================================================
+BLOCK I — CACHEENGINEBUILDER-BEGRIFFE
+================================================================================
+
+[KANON]  PERMUTATION ENGINE
+  BED Modul, das Achsen (PageKind, NodeKind, TraversalKind, ValueHandleKind,
+      PrefetchStrategy, AllocatorKind, ConcurrencyKind, ISAPath) in alle
+      gueltigen Kombinationen entfaltet. Ein ConstraintFilter sortiert
+      ungueltige Kombinationen aus.
+
+[KANON]  PERMUTATION
+  BED Ein Tupel von Achsen-Wahlen, das eine konkrete kompilierbare
+      Algorithmus-Variante beschreibt.
+
+[KANON]  CONSTRAINT FILTER
+  BED Pradikate, die ungueltige Permutationen frueh ausschliessen
+      (z.B. AVX-512 Pfad nur bei x86_avx512-Target; HBM-Allocator nur
+      bei Maschinen mit HBM).
+
+[KANON]  CONSTEXPR CODEGEN
+  BED C++23-Metaprogrammierung, die aus einer Permutation eine konkrete
+      Kompilations-Einheit (.cpp/.hpp) erzeugt.
+
+[KANON]  COMPILER DRIVER
+  BED Treibt GCC/Clang/MSVC mit korrekten Target-Flags an, kompiliert die
+      pro Permutation generierte Einheit. Cross-Compilation moeglich.
+
+[KANON]  BUILDER MEASUREMENT
+  BED Compile-Time-Messung jeder kompilierten Permutation:
+      Cache-Warmup → Dataset-Aufbereitung → Benchmark
+      (perf/PAPI Makro + interne Mikrobenchmarks).
+
+[KANON]  MEASUREMENT DB
+  BED Datenbank fuer Permutations-Messungen. Schema (vorlaeufig):
+      (perm_id, architecture, isa_path, dataset, page_kind, node_kind,
+       traversal_kind, value_handle_kind, prefetch_strategy, allocator_kind,
+       concurrency_kind, walltime_ns, throughput_ops_s, p50/p95/p99/p999_ns,
+       clu_pct, cache_misses, llc_misses, dtlb_misses, branch_misses,
+       memory_footprint_bytes, energy_j, build_id, compiler, flags).
+  WAHL SQLite (default) oder PostgreSQL (Cluster-Builds) oder DuckDB
+       (analytisches Querying).
+
+[KANON]  LATEX RENDERER
+  BED Rendert MeasurementDB-Snapshots als appendix-ready .tex / .pdf mit
+      tabular + pgfplots + booktabs + siunitx. Ziel: Anhang in Diplomarbeit.
+
+================================================================================
+BLOCK J — HABICH-DIREKTIVE (Originalcode-Regel)
+================================================================================
+
+[KANON]  HABICH-DIREKTIVE
+  REGEL Originalcode aller fremden Algorithmen (P01-P33 ausser PRT-ART)
+        wird EXAKT KOPIERT uebernommen. Anbindung erfolgt ausschliesslich
+        ueber Adapter-Pattern. Einzelne invasive Eingriffe (z.B. Messpunkt-
+        Hooks im Originalcode) muessen mit Prof. Habich ABGESPROCHEN
+        werden — bis dahin nur extern messen.
+  AUSNAHME PRT-ART (eigener Test-Algorithmus) ist die einzige Stelle, in
+        die wir frei eingreifen duerfen.
+  ABLAGE `ext/<paper>/` (Originalcode), `adapters/<paper>_adapter.cpp`
+        (Adapter zum Concept-Interface).
+  LIZENZ Pro `ext/<paper>/`-Ordner Originallizenz beibehalten.
+
+================================================================================
+BLOCK K — SUBMODULES-AUSNAHME
+================================================================================
+
+[KANON]  COMDARE-MODULES-SUBMODULES (Ausnahme zur globalen No-Submodules-Regel)
+  KORREKTUR `comdare-cache-engine`-Verzeichnis wurde verschoben. Wir verwenden
+      bestehende COMDARE-Modules und erweitern sie. Die Modules werden
+      AUSNAHMSWEISE (entgegen der globalen "KEINE Git Submodules"-Regel)
+      als feste Submodules in das C++ Projekt einbezogen.
+  REGEL Modules sind sonst privat; werden NUR statisch im comdare-cache-engine-
+      Projekt veroeffentlicht.
+  GLOBAL-REGEL bleibt fuer alle anderen Projekte gueltig (siehe MEMORY.md
+      Eintrag `feedback_no_git_submodules`).
+
+================================================================================
+BLOCK L — KORREKTUREN ZU v3
+================================================================================
+
+KORREKTUR L1  HazardPointers entfernt
+   - v3: P30 Michael2004 Hazard Pointers als Wait-free-Alternative gelistet.
+   - v4: ENTFERNT. Begruendung siehe BLOCK H. P30 bleibt aber als
+     Literatur-Quelle im Glossar (P30 ist relevant, aber nicht Implementierungs-
+     ziel).
+
+KORREKTUR L2  Read Counter = uint64_t
+   - v3: implizit angenommen u32.
+   - v4: explizit `std::uint64_t` wegen Langzeit-Experimenten (Stunden bis
+     Tage; Counter wuerden in u32 frueh ueberlaufen).
+
+KORREKTUR L3  trie_core → fan_out_engine
+   - v3 / Domaenenmodell v1: `trie_core`-Package vorgeschlagen.
+   - v4: `fan_out_engine` (allgemein fuer Tries + B-Baeume + B+-Baeume +
+     B*-Baeume + Hybrid + Succinct + Spezial-Familie).
+
+KORREKTUR L4  ValueHandle ist Sache der NODE
+   - v3: ValueHandle als globales Domaene-1-Konzept.
+   - v4: pro Node, mit compile-time `switch_array` und runtime Dynamic-
+     Variante.
+
+KORREKTUR L5  Cache-Engine ist 2 Funktionsschichten
+   - v3: monolithische Meta-Ebene.
+   - v4: Compile-Time (CacheEngineBuilder) + Runtime (CacheEngineRuntime).
+
+KORREKTUR L6  ConcurrencyManager mit 8+ Disziplinen
+   - v3: nur "Concurrency-Garantien"-Notiz.
+   - v4: Singleton mit benannten Disziplin-Klassen (siehe BLOCK H).
+
+KORREKTUR L7  Operations-Package = volle std::map-API
+   - v3: Operations als 5 Operationen (Get/Put/Delete/Range/BulkBuild).
+   - v4: vollstaendige `std::map<K,V>`-API nach C++23 (siehe BLOCK E).
+
+KORREKTUR L8  Domaene 3 (Messung) = 3 Bestandteile
+   - v3: Domaene 3 als ein Block.
+   - v4: BuilderMeasurement / SingleRunMeasurement / Mikrobenchmarks-Lib.
+
+KORREKTUR L9  Engine-Choice als eigene Domaene 5
+   - v3: nicht vorgesehen.
+   - v4: StaticEngine vs CacheEngine als Compile-Time-Top-Level-Wahl.
+
+KORREKTUR L10 Persistence + Publication als Domaene 6
+   - v3: nicht vorgesehen.
+   - v4: MeasurementDB + LatexRenderer als eigene Domaene
+     (Anhang-Generierung fuer Diplomarbeit).
+
+================================================================================
+BEZIEHUNG v3 ↔ v4
+================================================================================
+
+v3_FINAL.txt — bleibt gueltig fuer alle P01-P33-Begriffsbelege (Trie/Page/Node/
+   Praefixkompression/Redirect/ValueHandle-Konzept/Concurrency-Konzepte/
+   Cost-Model/Telemetrie/Hardware/ISA/Mess-Tools).
+
+v4_FINAL.txt — ergaenzt v3 um Architektur-Pattern, Engine-Choice, Fan-Out-
+   Familie, std::map-API, C++23-Concepts, ValueHandle-Korrektur, Concurrency-
+   Disziplinen, CacheEngineBuilder-Begriffe, Habich-Direktive, Submodules-
+   Ausnahme, Read-Counter-Typ, HazardPointer-Entfernung.
+
+Bei Konflikt v3 ↔ v4 → v4 GEWINNT.
+
+================================================================================
+PARALLEL DOKUMENT
+================================================================================
+
+Domaenenmodell_PRT_ART_v2.txt — die ueberarbeitete textuelle UML-Vorlage
+   (Phase 3.D REV 2), die alle v4-Begriffe in eine konkrete Klassenstruktur
+   umsetzt und die 15 offenen Design-Fragen (F1-F15) fuer Phase 5 listet.
+
+================================================================================
+ENDE DES BEGRIFFSGLOSSARS v4
+================================================================================

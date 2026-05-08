@@ -1,0 +1,370 @@
+================================================================================
+FLAG-SYSTEM — Permutations-Identifier (Intel-CPUID-Vorbild)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D REV 4
+Stand: 2026-05-04 · Beschluss F10-K (Architektur-Korrektur)
+================================================================================
+
+ZWECK
+   Strukturierter Identifier-Mechanismus fuer Such-Algorithmus-Modul-
+   Permutationen, nach Vorbild der Intel-CPUID-Feature-Flags.
+   Ersetzt den vorherigen `perm_id`-Hash.
+
+DESIGN-PRINZIP (Intel-CPUID-Analogie)
+   • Pro Bausteine-Achse eine "Bank" (uint64_t)
+   • Pro Implementation eine eindeutige Bit-Position
+   • Eine Permutation = Vereinigung der gesetzten Flags
+   • Pro Achse genau ein Bit (statisch); mehrere Bits bei dynamischen
+     Bausteinen (z.B. DynamicValueHandle erlaubt mehrere Handle-Varianten)
+   • Wohl-geordnete Reihenfolge der Banken im Identifier-String
+
+QUELLEN-RECHERCHE
+   • CPUID — CPU Identification: https://www.felixcloutier.com/x86/cpuid
+   • CPUID Wikipedia: https://en.wikipedia.org/wiki/CPUID
+   • Intel Architecture Instruction Set Extensions PDF
+   • Linux Kernel x86 Feature Flags: https://docs.kernel.org/arch/x86/cpuinfo.html
+
+================================================================================
+SCHEMA-UEBERSICHT (9 Banken)
+================================================================================
+
+   Bank 1  PageBank          uint64_t (64 Bits fuer Page-Type-Implementations)
+   Bank 2  NodeBank          uint64_t (64 Bits fuer Node-Type-Implementations)
+   Bank 3  TraversalBank     uint64_t (64 Bits fuer Traversal-Algorithmen)
+   Bank 4  ValueHandleBank   uint64_t (Bits fuer ValueHandle-Strategy)
+   Bank 5  MemoryLayoutBank  uint64_t (Bits fuer MemoryLayout)
+   Bank 6  AllocatorBank     uint64_t (Bits fuer Allocator-Strategy)
+   Bank 7  PrefetchBank      uint64_t (Bits fuer Prefetch-Strategy)
+   Bank 8  ConcurrencyBank   uint64_t (Bits fuer Concurrency-Disziplin)
+   Bank 9  IsaBank           uint64_t (Bits fuer ISA-Pfad)
+
+   Total: 9 x uint64_t = 72 Bytes pro Permutation-Identifier
+   (analog zu CPUID: mehrere Banken, jede mit eigenen Bit-Positionen).
+
+================================================================================
+BANK 1 — PAGE-TYPE  (uint64_t)
+================================================================================
+
+namespace comdare::flags::PageBank {
+  // Trie-Familie (Bits 0-31)
+  constexpr uint64_t DENSEBYTE_ART256        = 1ULL << 0;
+  constexpr uint64_t SPARSE_NODE4_ART        = 1ULL << 1;
+  constexpr uint64_t NODE16_ART              = 1ULL << 2;
+  constexpr uint64_t NODE48_ART              = 1ULL << 3;
+  constexpr uint64_t COMPOUND_HOT            = 1ULL << 4;
+  constexpr uint64_t MULTIBYTE_START         = 1ULL << 5;
+  constexpr uint64_t MACRO_COCO              = 1ULL << 6;
+  constexpr uint64_t METATRIEHT_WORMHOLE     = 1ULL << 7;
+  constexpr uint64_t LOUDS_DENSE_SURF        = 1ULL << 8;
+  constexpr uint64_t LOUDS_SPARSE_SURF       = 1ULL << 9;
+  constexpr uint64_t LOUDS_JACOBSON          = 1ULL << 10;
+  constexpr uint64_t BPLUS_MASSTREE          = 1ULL << 11;
+  constexpr uint64_t DECISION_B2TREE         = 1ULL << 12;
+  constexpr uint64_t SPAN_B2TREE             = 1ULL << 13;
+
+  // B-Tree-Familie (Bits 16-31)
+  constexpr uint64_t CSS_NODE                = 1ULL << 16;
+  constexpr uint64_t CSB_NODEGROUP           = 1ULL << 17;
+  constexpr uint64_t WIDER_HANKINS           = 1ULL << 18;
+  constexpr uint64_t CONFIGTABLE_SAMUEL      = 1ULL << 19;
+  constexpr uint64_t ADAPTIVE_BTREESAREBACK  = 1ULL << 20;
+  constexpr uint64_t PREFETCH_CHEN           = 1ULL << 21;
+  constexpr uint64_t FRACTAL_CHEN            = 1ULL << 22;
+
+  // Hybrid (Bits 32-47)
+  constexpr uint64_t LSM_TREE                = 1ULL << 32;
+  constexpr uint64_t COLA                    = 1ULL << 33;
+  constexpr uint64_t SKIPLIST                = 1ULL << 34;
+  constexpr uint64_t TTREE                   = 1ULL << 35;
+
+  // Spezial (Bits 48-55)
+  constexpr uint64_t TST                     = 1ULL << 48;
+  constexpr uint64_t JUDY                    = 1ULL << 49;
+  constexpr uint64_t VAN_EMDE_BOAS           = 1ULL << 50;
+
+  // PRT-ART eigen (Bits 56-63)
+  constexpr uint64_t PRTART_DENSEBYTE        = 1ULL << 56;
+  constexpr uint64_t PRTART_EXTENDEDDENSE    = 1ULL << 57;
+  constexpr uint64_t PRTART_SPARSEPATRICIA   = 1ULL << 58;
+  constexpr uint64_t PRTART_REDIRECT         = 1ULL << 59;
+  constexpr uint64_t PRTART_CUSTOMCACHE      = 1ULL << 60;
+}
+
+================================================================================
+BANK 2 — NODE-TYPE  (uint64_t)
+================================================================================
+
+namespace comdare::flags::NodeBank {
+  // ART (Bits 0-7)
+  constexpr uint64_t NODE4                   = 1ULL << 0;
+  constexpr uint64_t NODE16                  = 1ULL << 1;
+  constexpr uint64_t NODE48                  = 1ULL << 2;
+  constexpr uint64_t NODE256                 = 1ULL << 3;
+  // HOT (Bits 8-15)
+  constexpr uint64_t HOT_COMPOUND_K32        = 1ULL << 8;
+  constexpr uint64_t HOT_BINODE              = 1ULL << 9;
+  // Masstree (Bits 16-19)
+  constexpr uint64_t INTERNAL_MASSTREE       = 1ULL << 16;
+  constexpr uint64_t BORDER_MASSTREE         = 1ULL << 17;
+  // CoCo (Bits 20-23)
+  constexpr uint64_t MACRONODE_COCO          = 1ULL << 20;
+  // START (Bits 24-27)
+  constexpr uint64_t MULTIBYTE_START         = 1ULL << 24;
+  // B²-tree (Bits 28-31)
+  constexpr uint64_t DECISION_B2TREE         = 1ULL << 28;
+  constexpr uint64_t SPAN_B2TREE             = 1ULL << 29;
+  // CSS / CSB+ (Bits 32-39)
+  constexpr uint64_t CSS_NODE                = 1ULL << 32;
+  constexpr uint64_t CSB_NODEGROUP           = 1ULL << 33;
+  constexpr uint64_t WIDER_BPLUS_HANKINS     = 1ULL << 34;
+  // PRT-ART eigen (Bits 56-63)
+  constexpr uint64_t PRTART_NODE4            = 1ULL << 56;
+  constexpr uint64_t PRTART_NODE16           = 1ULL << 57;
+  constexpr uint64_t PRTART_NODE48           = 1ULL << 58;
+  constexpr uint64_t PRTART_NODE256          = 1ULL << 59;
+  constexpr uint64_t PRTART_REDIRECT_NODE    = 1ULL << 60;
+}
+
+================================================================================
+BANK 3 — TRAVERSAL  (uint64_t)
+================================================================================
+
+namespace comdare::flags::TraversalBank {
+  constexpr uint64_t BYTEBYBYTE              = 1ULL << 0;   // P01 ART
+  constexpr uint64_t DISCRIMINATIVE_BITS     = 1ULL << 1;   // P02 HOT
+  constexpr uint64_t LAYER_SLICE             = 1ULL << 2;   // P03 Masstree
+  constexpr uint64_t MACRO_NODE              = 1ULL << 3;   // P04 CoCo
+  constexpr uint64_t MULTIBYTE_SPAN          = 1ULL << 4;   // P05 START
+  constexpr uint64_t EMBEDDED_DEC_TREE       = 1ULL << 5;   // P06 B²-tree
+  constexpr uint64_t HASH_ANCHOR             = 1ULL << 6;   // P07 Wormhole
+  constexpr uint64_t RANK_SELECT             = 1ULL << 7;   // P09/P10 LOUDS/SuRF
+  constexpr uint64_t LOWER_BOUND             = 1ULL << 8;   // P10 SuRF
+  constexpr uint64_t POINTER_ARITHMETIC      = 1ULL << 9;   // P11 CSS
+  constexpr uint64_t OFFSET                  = 1ULL << 10;  // P12 CSB+
+  constexpr uint64_t PREFETCH_AHEAD          = 1ULL << 11;  // P21 Chen
+  constexpr uint64_t ADAPTIVE_PREFETCH_DIST  = 1ULL << 12;  // P23 Khan
+  // PRT-ART (Bits 56-63)
+  constexpr uint64_t PRTART_HOT_PATH         = 1ULL << 56;
+  constexpr uint64_t PRTART_PREFETCH_AWARE   = 1ULL << 57;
+}
+
+================================================================================
+BANK 4 — VALUEHANDLE  (uint64_t)
+================================================================================
+
+namespace comdare::flags::ValueHandleBank {
+  constexpr uint64_t INLINE                  = 1ULL << 0;
+  constexpr uint64_t POINTER                 = 1ULL << 1;
+  constexpr uint64_t REDIRECT_TO_NODE        = 1ULL << 2;
+  constexpr uint64_t REDIRECT_TO_PAGE        = 1ULL << 3;
+  constexpr uint64_t DYNAMIC                 = 1ULL << 4;   // mehrere gleichzeitig
+  // CHAIN_REF reserved (vertagt)
+  constexpr uint64_t CHAIN_REF_RESERVED      = 1ULL << 5;
+}
+
+NOTE  Bei DYNAMIC sind mehrere Bits gleichzeitig gesetzt (jeweils erlaubte
+      Sub-Variante). Beispiel: DYNAMIC | INLINE | POINTER | REDIRECT_TO_NODE
+      bedeutet "Dynamic mit allen drei Sub-Varianten zur Wahl".
+
+================================================================================
+BANK 5 — MEMORYLAYOUT  (uint64_t)
+================================================================================
+
+namespace comdare::flags::MemoryLayoutBank {
+  constexpr uint64_t CACHELINE_ALIGNED       = 1ULL << 0;   // default
+  constexpr uint64_t HUGEPAGE_2MB_ALIGNED    = 1ULL << 1;   // P32-Lehre
+  constexpr uint64_t HUGEPAGE_1GB_ALIGNED    = 1ULL << 2;
+  constexpr uint64_t POINTER_FREE_CONTIG     = 1ULL << 3;   // P11 CSS
+  constexpr uint64_t SIBLING_CLUSTER         = 1ULL << 4;   // P12 CSB+
+  constexpr uint64_t INLINE_SLOT             = 1ULL << 5;
+  constexpr uint64_t METADATA_HEADER         = 1ULL << 6;
+  constexpr uint64_t EMBEDDED_TREE           = 1ULL << 7;   // P06 B²-tree
+}
+
+================================================================================
+BANK 6 — ALLOCATOR  (uint64_t)
+================================================================================
+
+namespace comdare::flags::AllocatorBank {
+  constexpr uint64_t POOL_PER_PAGETYPE       = 1ULL << 0;
+  constexpr uint64_t ARENA_PER_SUBTREE       = 1ULL << 1;
+  constexpr uint64_t SLAB                    = 1ULL << 2;
+  constexpr uint64_t HBM                     = 1ULL << 3;   // P32/P33
+  constexpr uint64_t DEFAULT_MALLOC          = 1ULL << 4;
+  constexpr uint64_t TCMALLOC                = 1ULL << 5;
+  constexpr uint64_t MIMALLOC                = 1ULL << 6;
+  constexpr uint64_t SNMALLOC                = 1ULL << 7;
+}
+
+================================================================================
+BANK 7 — PREFETCH  (uint64_t)
+================================================================================
+
+namespace comdare::flags::PrefetchBank {
+  constexpr uint64_t NONE                    = 1ULL << 0;
+  constexpr uint64_t SOFTWARE_FIXED          = 1ULL << 1;   // P21 Chen
+  constexpr uint64_t ADAPTIVE_DISTANCE       = 1ULL << 2;   // P23 Khan
+  constexpr uint64_t HIERARCHICAL_BUNDLE     = 1ULL << 3;   // P27 Zhang ASPLOS
+  constexpr uint64_t FILL_BUFFER_AWARE       = 1ULL << 4;   // P25 Mahling
+  constexpr uint64_t HOT_PATH                = 1ULL << 5;   // P26 Zhang FGCS
+}
+
+================================================================================
+BANK 8 — CONCURRENCY  (uint64_t)
+================================================================================
+
+namespace comdare::flags::ConcurrencyBank {
+  // Disziplinen (mehrere kombinierbar via Policy-Template)
+  constexpr uint64_t PAGE_DISCIPLINE         = 1ULL << 0;
+  constexpr uint64_t NODE_DISCIPLINE         = 1ULL << 1;
+  constexpr uint64_t ARRAY_DISCIPLINE        = 1ULL << 2;
+  constexpr uint64_t DATA_STRUCTURE_DISC     = 1ULL << 3;
+  constexpr uint64_t PATH_DISCIPLINE         = 1ULL << 4;
+  constexpr uint64_t MEMORY_READ_DISC        = 1ULL << 5;
+  constexpr uint64_t MEMORY_WRITE_DISC       = 1ULL << 6;
+  constexpr uint64_t MEMORY_READWRITE_DISC   = 1ULL << 7;
+  constexpr uint64_t SIMD_THREAD_DISC        = 1ULL << 8;
+  constexpr uint64_t SIMD_FLOW_DISC          = 1ULL << 9;
+  // Concurrency-Mechaniken (orthogonal)
+  constexpr uint64_t OLC                     = 1ULL << 32;  // P08
+  constexpr uint64_t ROWEX                   = 1ULL << 33;  // P08
+  constexpr uint64_t RCU                     = 1ULL << 34;  // P29
+  // SINGLE_THREADED (Baseline)
+  constexpr uint64_t SINGLE_THREADED         = 1ULL << 63;
+}
+
+NOTE  Bei Concurrency koennen mehrere Bits gesetzt sein:
+      Disziplinen (Bits 0-9) + Mechaniken (Bits 32-34).
+
+================================================================================
+BANK 9 — ISA  (uint64_t)
+================================================================================
+
+namespace comdare::flags::IsaBank {
+  // Scalar
+  constexpr uint64_t SCALAR_X86_64           = 1ULL << 0;
+  constexpr uint64_t SCALAR_ARM64            = 1ULL << 1;
+  constexpr uint64_t SCALAR_RISCV            = 1ULL << 2;
+
+  // x86-Vektor
+  constexpr uint64_t X86_SSE2                = 1ULL << 8;
+  constexpr uint64_t X86_SSE4_2              = 1ULL << 9;
+  constexpr uint64_t X86_AVX                 = 1ULL << 10;
+  constexpr uint64_t X86_AVX2                = 1ULL << 11;
+  constexpr uint64_t X86_AVX512F             = 1ULL << 12;
+  constexpr uint64_t X86_AVX512BW            = 1ULL << 13;
+  constexpr uint64_t X86_AVX512VL            = 1ULL << 14;
+  constexpr uint64_t X86_BMI1                = 1ULL << 15;
+  constexpr uint64_t X86_BMI2                = 1ULL << 16;
+  constexpr uint64_t X86_AESNI               = 1ULL << 17;
+
+  // ARM-Vektor
+  constexpr uint64_t ARM_NEON                = 1ULL << 32;
+  constexpr uint64_t ARM_SVE                 = 1ULL << 33;
+  constexpr uint64_t ARM_SVE2                = 1ULL << 34;
+
+  // RISC-V Vektor (V-Extension)
+  constexpr uint64_t RISCV_V                 = 1ULL << 48;
+}
+
+NOTE  Mehrere Bits gleichzeitig moeglich (z.B. SCALAR_X86_64 | X86_AVX2 | X86_BMI2
+      fuer ein x86-Modul mit AVX2 + BMI2 Unterstuetzung).
+
+================================================================================
+PERMUTATION-IDENTIFIER STRUCT
+================================================================================
+
+struct PermutationFlags {
+  std::uint64_t page_bank;
+  std::uint64_t node_bank;
+  std::uint64_t traversal_bank;
+  std::uint64_t value_handle_bank;
+  std::uint64_t memory_layout_bank;
+  std::uint64_t allocator_bank;
+  std::uint64_t prefetch_bank;
+  std::uint64_t concurrency_bank;
+  std::uint64_t isa_bank;
+
+  // Wohl-geordnete Identifier-String-Repraesentation
+  constexpr std::string to_identifier() const noexcept;
+
+  // Operatoren
+  constexpr bool operator==(PermutationFlags const&) const noexcept = default;
+  constexpr auto operator<=>(PermutationFlags const&) const noexcept = default;
+};
+
+IDENTIFIER-FORMAT
+   "<page_flag>.<node_flag>.<traversal_flag>.<value_handle_flag>.
+    <memory_layout_flag>.<allocator_flag>.<prefetch_flag>.
+    <concurrency_flag>.<isa_flag>"
+
+BEISPIEL (ART-Original auf Sapphire Rapids x86_64 + AVX-512)
+   "PAGE_DENSEBYTE_ART256.NODE_NODE256.TRAVERSAL_BYTEBYBYTE.
+    VALUEHANDLE_INLINE.MEMORY_CACHELINE_ALIGNED.ALLOCATOR_POOL_PER_PAGETYPE.
+    PREFETCH_NONE.CONCURRENCY_OLC|MEMORY_READ_DISC.
+    ISA_SCALAR_X86_64|X86_AVX512F|X86_BMI2"
+
+================================================================================
+CONSTRAINTFILTER-IMPLEMENTATION (CMake compile-time)
+================================================================================
+
+// Beispiel: AVX-512 nur auf Targets mit entsprechender Hardware
+constexpr std::uint64_t allowed_isa_visionfive2 =
+    IsaBank::SCALAR_RISCV | IsaBank::RISCV_V;
+
+constexpr std::uint64_t allowed_isa_pi5 =
+    IsaBank::SCALAR_ARM64 | IsaBank::ARM_NEON;
+
+constexpr std::uint64_t allowed_isa_grace_hopper =
+    IsaBank::SCALAR_ARM64 | IsaBank::ARM_NEON |
+    IsaBank::ARM_SVE | IsaBank::ARM_SVE2;
+
+constexpr std::uint64_t allowed_isa_sapphire_rapids =
+    IsaBank::SCALAR_X86_64 | IsaBank::X86_SSE2 | IsaBank::X86_SSE4_2 |
+    IsaBank::X86_AVX | IsaBank::X86_AVX2 | IsaBank::X86_AVX512F |
+    IsaBank::X86_AVX512BW | IsaBank::X86_AVX512VL | IsaBank::X86_BMI1 |
+    IsaBank::X86_BMI2 | IsaBank::X86_AESNI;
+
+template<TargetPlatform T>
+constexpr bool is_permutation_valid(PermutationFlags const& p) noexcept {
+  if constexpr (T == TargetPlatform::VisionFive2) {
+    return (p.isa_bank & ~allowed_isa_visionfive2) == 0;
+  }
+  // ... weitere Targets
+}
+
+// Weitere Constraint-Beispiele:
+// • LOUDS-basierte Pages erfordern RankSelect-Traversal
+// • CSS-Page erfordert PointerFreeContiguousLayout
+// • HotPathPrefetch erfordert HotPathRecognition-Concurrency-Disziplin
+
+================================================================================
+USAGE-FLOW
+================================================================================
+
+1. CMake-Codegen (`tools/permutation_codegen/codegen.cmake`) + sh/bat-Helper
+   (REVIDIERT durch H6 — NO-PYTHON-DIREKTIVE; Talos OS hat kein Python)
+   - Enumeriert alle Kombinationen der Flag-Banks via CMake `foreach`
+   - Wendet ConstraintFilter an (Bit-Maskierung) per CMake-Funktionen
+   - Generiert pro gueltige Permutation via `configure_file()` + `add_custom_command()`:
+       - .cpp-Datei (Schalen-Code mit den Bausteinen)
+       - .ccm Modul-Interface
+       - CMake `add_library(perm_<flags> ...)` Target
+   - Wo CMake-Logik nicht ausreicht: shell-Skripte (`codegen.sh` + `codegen.bat`,
+     synchron gepflegt)
+   - Falls komplexe Logik unausdrueckbar: minimaler kompilierter C++23-Helper
+     im BuildSystem
+
+2. CMake-Build
+   - Includiert `build/generated/permutations.cmake`
+   - Parallelisiert die Hunderten Targets
+   - Pro Target: Schale (C++23) + Bausteine (Original-Compiler) → .so/.dll
+
+3. CacheEngineBuilder (Runtime)
+   - Scannt `build/modules/` nach existierenden Permutationen
+   - Iteriert ueber Module: dlopen, Experiment, dlclose
+   - Identifiziert Module per `PermutationFlags::to_identifier()`
+
+================================================================================
+ENDE FLAG-SYSTEM
+================================================================================

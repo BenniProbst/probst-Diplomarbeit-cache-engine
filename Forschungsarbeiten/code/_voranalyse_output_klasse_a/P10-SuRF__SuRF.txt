@@ -1,0 +1,158 @@
+================================================================
+VORANALYSE: P10-SuRF/SuRF
+Pfad: /c/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Forschungsarbeiten/code/P10-SuRF/SuRF
+Stand: 2026-05-09 00:49:35
+================================================================
+
+## TOP-LEVEL-VERZEICHNIS
+total 62
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .
+drwxr-xr-x 1 benja 197609     0 May  4 23:54 ..
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 .git
+-rw-r--r-- 1 benja 197609   302 May  4 23:38 .gitignore
+-rw-r--r-- 1 benja 197609    95 May  4 23:38 .gitmodules
+-rw-r--r-- 1 benja 197609   698 May  4 23:38 .travis.yml
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 ARF
+-rw-r--r-- 1 benja 197609   961 May  4 23:38 CMakeLists.txt
+-rw-r--r-- 1 benja 197609  9365 May  4 23:38 CodeCoverage.cmake
+-rw-r--r-- 1 benja 197609 10501 May  4 23:38 LICENSE
+-rw-r--r-- 1 benja 197609  1979 May  4 23:38 README.md
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 bench
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 include
+-rw-r--r-- 1 benja 197609  3449 May  4 23:38 simple_example.cpp
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 src
+drwxr-xr-x 1 benja 197609     0 May  5 00:06 test
+
+## VERZEICHNIS-HIERARCHIE (max Tiefe 3)
+.
+./ARF
+./bench
+./bench/workload_gen
+./bench/workload_gen/workload_spec
+./include
+./src
+./test
+./test/unitTest
+
+## SOURCE-FILE-INVENTAR (.cpp .hpp .h .cc .c)
+./bench/bench.hpp
+./bench/bloom.hpp
+./bench/filter.hpp
+./bench/filter_bloom.hpp
+./bench/filter_factory.hpp
+./bench/filter_surf.hpp
+./bench/MurmurHash3.h
+./bench/workload.cpp
+./bench/workload_arf.cpp
+./bench/workload_multi_thread.cpp
+./include/bitvector.hpp
+./include/config.hpp
+./include/hash.hpp
+./include/label_vector.hpp
+./include/louds_dense.hpp
+./include/louds_sparse.hpp
+./include/popcount.h
+./include/rank.hpp
+./include/select.hpp
+./include/suffix.hpp
+./include/surf.hpp
+./include/surf_builder.hpp
+./simple_example.cpp
+./test/unitTest/test_bitvector.cpp
+./test/unitTest/test_label_vector.cpp
+./test/unitTest/test_louds_dense.cpp
+./test/unitTest/test_louds_dense_small.cpp
+./test/unitTest/test_louds_sparse.cpp
+./test/unitTest/test_louds_sparse_small.cpp
+./test/unitTest/test_rank.cpp
+./test/unitTest/test_select.cpp
+./test/unitTest/test_suffix.cpp
+./test/unitTest/test_suffix_vector.cpp
+./test/unitTest/test_surf.cpp
+./test/unitTest/test_surf_builder.cpp
+./test/unitTest/test_surf_small.cpp
+
+## LINES-OF-CODE-SUMMARY (top 20 by LOC)
+  8303 total
+   687 ./include/louds_sparse.hpp
+   661 ./include/louds_dense.hpp
+   633 ./test/unitTest/test_surf.cpp
+   466 ./test/unitTest/test_louds_sparse.cpp
+   451 ./test/unitTest/test_louds_dense.cpp
+   428 ./include/surf_builder.hpp
+   408 ./include/surf.hpp
+   405 ./test/unitTest/test_surf_builder.cpp
+   324 ./bench/MurmurHash3.h
+   275 ./test/unitTest/test_suffix.cpp
+   271 ./include/suffix.hpp
+   270 ./test/unitTest/test_label_vector.cpp
+   254 ./bench/workload_multi_thread.cpp
+   237 ./bench/workload.cpp
+   230 ./test/unitTest/test_bitvector.cpp
+   230 ./include/label_vector.hpp
+   200 ./bench/bloom.hpp
+   194 ./include/popcount.h
+   174 ./include/bitvector.hpp
+   168 ./include/select.hpp
+
+## BUILD-SYSTEM
+  ✓ CMakeLists.txt (35 Zeilen)
+
+## LIZENZ
+  Datei: LICENSE
+                                     Apache License
+                               Version 2.0, January 2004
+                            http://www.apache.org/licenses/
+
+## README EXCERPT
+  Datei: README.md
+    # Succinct Range Filter (SuRF)
+    [![Build Status](https://travis-ci.org/efficient/SuRF.svg?branch=master)](https://travis-ci.org/efficient/SuRF)
+    [![Coverage Status](https://coveralls.io/repos/github/efficient/SuRF/badge.svg?branch=master)](https://coveralls.io/github/efficient/SuRF?branch=master)
+    
+    **SuRF** is a fast and compact filter that provides exact-match filtering,
+    range filtering, and approximate range counts. This is the source code for our
+    [SIGMOD best paper](http://www.cs.cmu.edu/~huanche1/publications/surf_paper.pdf).
+    We also host a [demo website](https://www.rangefilter.io/).
+    The RocksDB experiments with SuRF can be found [here](https://github.com/efficient/rocksdb).
+    
+    ## Install Dependencies
+        sudo apt-get install build-essential cmake libgtest.dev
+        cd /usr/src/gtest
+        sudo cmake CMakeLists.txt
+        sudo make
+        sudo cp *.a /usr/lib
+    
+    ## Build
+        git submodule init
+        git submodule update
+        mkdir build
+        cd build
+        cmake ..
+        make -j
+    
+    ## Simple Example
+    A simple example can be found [here](https://github.com/efficient/SuRF/blob/master/simple_example.cpp). To run the example:
+    ```
+    g++ -mpopcnt -std=c++11 simple_example.cpp
+    ./a.out
+    ```
+    Note that the key list passed to the SuRF constructor must be SORTED.
+    
+    ## Run Unit Tests
+        make test
+    
+    ## Benchmark
+    
+    ### Step 1: Download YCSB
+        cd bench/workload_gen
+
+## GREP-INDIKATOREN (Bausteine-Hints)
+  SparseNode           in 1 Dateien
+  prefetch             in 4 Dateien
+  popcnt               in 1 Dateien
+  bitmap               in 5 Dateien
+
+## C++-STANDARD-INDIKATOREN
+
+## END VORANALYSE P10-SuRF/SuRF

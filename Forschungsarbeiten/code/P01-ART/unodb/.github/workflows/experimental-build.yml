@@ -1,0 +1,51 @@
+---
+name: experimental-build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    env:
+      BUILD_TYPE: ${{matrix.BUILD_TYPE}}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: XCode Release aggressive cppcheck, not standalone
+            BUILD_TYPE: Release
+
+          - name: XCode Debug aggressive cppcheck, not standalone
+            BUILD_TYPE: Debug
+
+    steps:
+      - uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        with:
+          submodules: true
+          persist-credentials: false
+
+      - name: Set up dependencies for macOS
+        run: |
+          brew update
+          brew install boost cppcheck
+
+      - name: Configure CMake with developer warnings
+        shell: bash
+        run: |
+          export CC=clang
+          export CXX=clang++
+          cmake -B build "$GITHUB_WORKSPACE" "-DCMAKE_BUILD_TYPE=$BUILD_TYPE" \
+            -DCPPCHECK_AGGRESSIVE=ON -Wdev -Wdeprecated --warn-uninitialized
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        run: make -j3 -k
+        continue-on-error: true

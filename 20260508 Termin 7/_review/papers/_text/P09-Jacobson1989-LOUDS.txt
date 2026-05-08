@@ -1,0 +1,21 @@
+=== PAPER: P09-Jacobson1989-LOUDS
+=== FILENAME: Space-efficient_static_trees_and_graphs.pdf
+=== PAGES: 6
+
+--- PAGE 1 ---
+Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply. 
+
+--- PAGE 2 ---
+Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply. 
+
+--- PAGE 3 ---
+Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply. 
+
+--- PAGE 4 ---
+Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply. 
+
+--- PAGE 5 ---
+Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply. 
+
+--- PAGE 6 ---
+Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply. 

@@ -1,0 +1,41 @@
+---
+name: sonarcloud
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions: {}
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    environment: sonarcloud
+    steps:
+      - uses: actions/checkout@v6 # zizmor: ignore[unpinned-uses]
+        with:
+          submodules: true
+          # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libboost-dev
+
+      - name: Produce Compilation Database
+        run: |
+          cmake . -DCMAKE_BUILD_TYPE=Release -DSTANDALONE=ON
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v7 # zizmor: ignore[unpinned-uses]
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            "-Dsonar.cfamily.compile-commands=compile_commands.json"

@@ -1,0 +1,307 @@
+================================================================================
+KUEHN-ERKENNTNISSE — EINARBEITUNG IN ARCHITEKTUR-DOKUMENTE
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 5 PRE-REV2
+Stand: 2026-05-09 · Task #94 · Quelle: Mailverlauf P28 vom 2026-05-08
+================================================================================
+
+ZWECK
+   Dieses Dokument haelt die Architektur-Aenderungen fest, die aus der
+   Antwort-Mail von Roland Kuehn (TU Dortmund DBIS, Erstautor P28 DaMoN
+   2023) hervorgehen.
+
+QUELLE
+   `comdare-cache-engine/docs/email/20260508-1900-mailverlauf_kuehn_p28_eingang.md`
+   (vollstaendiger Mailverlauf inklusive Probst-Antwort mit Plattform-
+   Spezifikation und Forschungs-Mission-Statement)
+
+================================================================================
+ERKENNTNIS 1 — CACHE-KOHAERENZ-PING-PONG
+================================================================================
+
+KERN-AUSSAGE (Kuehn 2026-05-08)
+
+   "Insbesondere auf die Knoten in den oberen Ebenen des Baums wird sehr
+    haeufig zugegriffen, sodass diese typischerweise in den Caches mehrerer
+    Kerne liegen. Zusaetzliche Schreibzugriffe fuehren dann durch die Cache-
+    Kohaerenzmechanismen schnell zu starkem Cacheline-Ping-Pong zwischen den
+    Kernen, was die Performance entsprechend beeintraechtigt."
+
+KONSEQUENZ FUER PRT-ART
+
+   Naive Pro-Knoten-Histogramm-Implementierung ist UNBRAUCHBAR fuer
+   parallele Workloads — Cache-Kohaerenz-Traffic frisst die Latenz-Vorteile
+   auf.
+
+ARCHITEKTUR-AENDERUNGEN
+
+   1. ConcurrencyManager-Disziplin `MemoryAccessConcurrency::Write` muss
+      Cache-Kohaerenz-Kosten als Teil ihrer Cost-Funktion modellieren
+      → Bausteine_Matrix.txt Achse 8 erweitert
+      → Glossar v7 BLOCK A neu
+
+   2. Telemetrie-Erfassung auf oberen Baum-Ebenen ist GEGEN-PATTERN bei
+      Multi-Core
+      → Glossar v7 BLOCK A definiert "Cache-Coherence-Anti-Pattern"
+
+   3. Neuer Concept-Constraint: `requires NotInTopLevels<TelemetryStrategy>`
+      → fuer Per-Knoten-Histogramm-Strategien, die nur in unteren Ebenen
+         angewendet werden duerfen
+
+================================================================================
+ERKENNTNIS 2 — LEAFONLY-COUNTER + RETROACTIVE-AGGREGATION (NEU)
+================================================================================
+
+KERN-AUSSAGE (Kuehn 2026-05-08, NEU — nicht im Original-Paper P28!)
+
+   "Wir haben daher mittlerweile auch eine vergleichsweise einfache Variante
+    implementiert, bei der die Zugriffsinformationen nicht in allen Knoten,
+    sondern nur in den Blatt-Knoten gespeichert werden. Vor dem eigentlichen
+    Reordering werden dann alle Blaetter einmal bis zur Wurzel traversiert,
+    wobei die Zugriffszahlen fuer die inneren Knoten aufsummiert werden."
+
+KONSEQUENZ FUER PRT-ART
+
+   Telemetrie-Erfassung NUR IN BLAETTERN + RETROAKTIVE AGGREGATION vor
+   Reordering vermeidet Cache-Kohaerenz-Problem komplett. Bei der
+   regulaeren Baum-Traversierung wird nur ein einzelner Counter im Blatt-
+   Knoten aktualisiert. Untere Ebenen haben geringere Wahrscheinlichkeit,
+   dass viele Threads denselben Knoten bearbeiten — Cache-Kohaerenz-
+   Overhead minimal.
+
+ARCHITEKTUR-AENDERUNG — NEUE ACHSE 11 IN BAUSTEINE-MATRIX
+
+   ACHSE 11 — TELEMETRY-COLLECTION-STRATEGY (NEU)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   • PerNodeCounter           — Kuehn naive Variante (P28 Paper, mit
+                                 Cache-Kohaerenz-Warnung!)
+   • LeafOnlyCounter          — Kuehn NEU (NICHT im Paper) — nur in
+                                 Blatt-Knoten zaehlen
+   • LeafOnlySampledCounter<N>— Kuehn NEU — Sampling-Variante (Erkenntnis 3)
+   • RetroactiveAggregation   — Kuehn NEU — Wurzel-Up-Traversal vor
+                                 Reordering, summiert Counter aus Blaettern
+                                 zu inneren Knoten
+   • PathReadCounter          — P26 Zhang FGCS (Per-Block-Counter)
+   • HistogramPerNode         — P28 Kuehn Original (mit Cache-Kohaerenz-Warning)
+   • ProbabilityHintsHeader   — PRT-ART eigen (Page-Header-basiert)
+
+DIESE ACHSE IST ORTHOGONAL ZU ACHSE 10 (MEASUREMENT-KATEGORIE)
+   Achse 10 = WAS gemessen wird (CLU, Cache-Miss, dTLB-Miss, ...)
+   Achse 11 = WIE Telemetrie erfasst wird (Per-Node, Leaf-Only, Sampled)
+
+   Beide Achsen werden permutiert — und manche Kombinationen sind invalid
+   (z.B. LeafOnlyCounter + Per-Node-Branch-Mispredict-Telemetrie ist
+    inkohaerent, weil Branch-Mispredict pro Knoten anfaellt, nicht pro
+    Blatt).
+
+================================================================================
+ERKENNTNIS 3 — SAMPLING-BASIERTER TRADEOFF (NEU)
+================================================================================
+
+KERN-AUSSAGE (Kuehn 2026-05-08, NEU — nicht im Original-Paper P28!)
+
+   "Wir haben das Ganze zusaetzlich um eine Sampling-basierte Variante
+    erweitert, bei der nicht jeder Zugriff, sondern nur jeder n-te Zugriff
+    im Blatt-Knoten gezaehlt wird. Dadurch laesst sich der Runtime-Overhead
+    noch einmal reduzieren und man erhaelt einen konfigurierbaren Trade-off
+    zwischen Genauigkeit und Overhead."
+
+KONSEQUENZ FUER PRT-ART
+
+   Konfigurierbarer GENAUIGKEIT-VS-OVERHEAD-TRADEOFF ueber Sampling-Rate N.
+   Direkt mappbar auf F11 (Mikrobenchmark-Triggering: Sampled 1:N) — aber
+   jetzt auch fuer Telemetrie-Erfassung, nicht nur fuer Mess-Hooks.
+
+ARCHITEKTUR-AENDERUNG
+
+   1. Neuer Bausteine-Typ in Achse 11:
+      `LeafOnlySampledCounter<N>` mit konfigurierbarem N (1, 100, 1000, ...)
+
+   2. DecisionLambdaTree-Eintrag fuer adaptive Sampling-Rate:
+      Bei hoher Last → Sampling-Rate N erhoehen (less measurement overhead)
+      Bei niedriger Last + sich aendernden Hot-Paths → Sampling-Rate N
+      reduzieren (mehr Praezision)
+      → Neuer DecisionTree: `SamplingRateAdjustmentTree`
+
+   3. Konfigurations-Schnittstelle: N als Compile-Time-Constant ODER
+      Runtime-Parameter (per Build-Flag waehlbar)
+
+================================================================================
+PLATTFORM-SPEZIFIKATION (aus Probst-Antwort an Kuehn)
+================================================================================
+
+PROBST-AUSSAGE (2026-05-08)
+
+   "Plattform zum Testen ist derzeit ein K8s Cluster auf Talos OS mit einer
+    Produktion auf einem Ryzen 9 9950X3D und einem i9 14900KS, je mit 64GB
+    RAM bei 5600 MIT DDR5 RAM und einer Latenz von 36 Zyklen."
+
+KONSOLIDIERTE PRODUCTION-PLATTFORM-SPEZIFIKATION
+
+   Cluster-Layer:
+      Kubernetes (Talos OS minimalistisch) — siehe `feedback_no_python_in_buildchain`
+
+   Production-Maschinen (zwei):
+      • AMD Ryzen 9 9950X3D2 (Zen 5, X3D-V-Cache)
+        - 16 Cores / 32 Threads
+        - 3D V-Cache: 96+32 MiB L3, sehr hot fuer Trie-Workloads!
+        - DDR5-5600, 64 GB
+      • Intel Core i9-14900KS (Raptor Lake Refresh)
+        - 8 P-Cores + 16 E-Cores (24 Cores / 32 Threads)
+        - Hybrid-CPU: Pflicht: cpu_core/* vs cpu_atom/* perf-Counter trennen
+        - DDR5-5600, 64 GB
+   Memory-Latenz: 36 Zyklen (DDR5-5600)
+
+KONSEQUENZ FUER ARCHITEKTUR
+
+   • PRT-ART Plattform-Probe muss X3D-V-Cache-Erkennung beinhalten
+     (Ryzen 9950X3D hat asymmetrischen L3 — der eine Chiplet hat 96 MiB,
+      der andere 32 MiB; Pinning-Strategie wird relevant)
+   • i9-14900KS Hybrid-CPU: cpu_core/* + cpu_atom/* getrennt erfassen
+     (PRT-ART-Regel T3+T6 schon dokumentiert; jetzt mit konkreter Plattform)
+   • DDR5-5600 mit 36-Zyklen-Latenz: ergibt fuer Cache-Engine eine
+     konkrete Bandbreiten-/Latenz-Zielzahl, die LiveCpuModel als Default
+     fuer beide Production-Maschinen benutzen kann
+
+================================================================================
+FORSCHUNGS-MISSION-STATEMENT (aus Probst-Antwort an Kuehn)
+================================================================================
+
+PROBST-AUSSAGE (2026-05-08)
+
+   "Im Prinzip baue ich also ein Framework zu bewerten und Testen von
+    Suchalgorithmen mit dem Vergleich zwischen heuristischen und
+    informierten Architektur-Entscheidungen und automatischer Anpassung."
+
+KONSOLIDIERTES THESEN-STATEMENT (fuer Diplomarbeit-Einleitung verwendbar)
+
+   PRT-ART liefert ein Framework zur Bewertung und Testung von Such-
+   algorithmen mit dem expliziten Vergleich zwischen:
+      • HEURISTISCHEN Architektur-Entscheidungen
+        (klassische Faustregeln und plattform-unabhaengige Defaults)
+      • INFORMIERTEN Architektur-Entscheidungen
+        (Cache-Engine-Modell der CPU + plattform-spezifische Kalibrierung)
+      • AUTOMATISCHER ANPASSUNG
+        (Cache-Engine-Modus 3 mit DecisionLambdaTree-Steuerung waehrend
+         der Laufzeit)
+
+   Die Bausteine-Quer-Permutation (F15) operationalisiert diesen Vergleich
+   durch Zerlegung der 33 publizierten Algorithmen in austauschbare
+   Bausteine, die uniform unter heuristischer und informierter Engine-
+   Variante getestet werden.
+
+================================================================================
+DOKUMENT-AENDERUNGEN (Konsolidierung)
+================================================================================
+
+A) `Bausteine_Matrix.txt` — siehe ANHANG A unten
+   • NEUE ACHSE 11 — TELEMETRY-COLLECTION-STRATEGY
+   • Achse 8 (CONCURRENCY) erweitert um Cache-Kohaerenz-Cost-Funktion in
+     `MemoryAccessConcurrency::Write`
+   • Verweise auf Kuehn-Mailverlauf als Quelle
+
+B) `Begriffsglossar_v7_FINAL.txt` (NEU) — siehe separates Dokument
+   • Cache-Coherence-Anti-Pattern (BLOCK AI)
+   • LeafOnlyCounter (BLOCK AJ)
+   • RetroactiveAggregation (BLOCK AK)
+   • LeafOnlySampledCounter<N> (BLOCK AL)
+   • SamplingRateAdjustmentTree (BLOCK AM)
+   • Production-Plattform-Spezifikation (BLOCK AN)
+   • Forschungs-Mission-Statement (BLOCK AO)
+
+C) Domaenenmodell — Korrektur via Anhang
+   • §3.5 ConcurrencyManager: MemoryAccessConcurrency::Write erweitert
+   • §6.2 Plattform-Workflow: Production-Cluster-Spezifikation eingearbeitet
+   • Neue Concept-Constraint: NotInTopLevels<TelemetryStrategy>
+
+================================================================================
+ANHANG A — BAUSTEINE_MATRIX REV 2 ERGAENZUNG (zu integrieren)
+================================================================================
+
+(Wird direkt in `Bausteine_Matrix.txt` als neue Achse 11 ergaenzt;
+hier zur Referenz)
+
+ACHSE 11 — TELEMETRY-COLLECTION-STRATEGY (NEU 2026-05-09 — Kuehn)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ID: TELEMETRY_PER_NODE_COUNTER
+   QUELLE        P28 Kuehn 2023 (naive Variante, Original-Paper)
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Counter pro Knoten, in jeder Traversierung aktualisiert
+   ⚠️ WARNING    Cache-Kohaerenz-Ping-Pong bei Multi-Core (Kuehn 2026-05-08)
+   DECISIONTREE  CacheCoherenceDetectionTree (warnt + falls aktiv → SKIP)
+
+ID: TELEMETRY_LEAFONLY_COUNTER
+   QUELLE        P28 Kuehn (NEU 2026-05-08, NICHT im Paper!)
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Counter NUR in Blatt-Knoten; nur 1 Counter pro Blatt
+                 wird in regulaerer Traversierung aktualisiert.
+   ABHAENGIG     RetroactiveAggregation (vor Reordering noetig)
+
+ID: TELEMETRY_LEAFONLY_SAMPLED_COUNTER<N>
+   QUELLE        P28 Kuehn (NEU 2026-05-08, NICHT im Paper!)
+   CONCEPT       TelemetryStrategy<T>, parametrisiert mit Sampling-Rate N
+   BESCHREIBUNG  Counter nur in Blaettern, nur jeder N-te Zugriff zaehlt
+   PARAMETER N   1 (jeder Zugriff) | 100 | 1000 | 10000 (Default 1000)
+   DECISIONTREE  SamplingRateAdjustmentTree (adaptive N je nach Last)
+
+ID: TELEMETRY_RETROACTIVE_AGGREGATION
+   QUELLE        P28 Kuehn (NEU 2026-05-08)
+   CONCEPT       TelemetryAggregationStrategy<S>
+   BESCHREIBUNG  Wurzel-Up-Traversal vor Reordering, summiert Blatt-Counter
+                 zu inneren Knoten — laeuft als Single-Threaded-Phase
+                 BARRIERE
+   ABHAENGIG     ConsolidationBarrier-Event aus Observer-Push
+
+ID: TELEMETRY_PATH_READ_COUNTER
+   QUELLE        P26 Zhang FGCS 2024
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Read-Counter pro Block, dynamische Hot-Path-Detection
+
+ID: TELEMETRY_PROBABILITY_HINTS_HEADER
+   QUELLE        PRT-ART eigen (T4 Designentscheidung)
+   CONCEPT       TelemetryStrategy<T>
+   BESCHREIBUNG  Quantisierte Wahrscheinlichkeits-Sketches im Page-Header,
+                 quer zur Knotenebene erfasst
+   PARAMETER     Bit-Layout siehe F1 (Build-Flag konfigurierbar 16/32 bit)
+
+ACHSE 8 (CONCURRENCY) — ERGAENZUNG: Cache-Kohaerenz-Cost in
+                                     MemoryAccessConcurrency::Write
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CONCURRENCY_MEMORY_WRITE_DISC erhaelt eine Cost-Funktion-Komponente:
+
+   cost_cache_coherence(write_target_node) =
+      f( node_depth_from_root,
+         num_cores_sharing_node,
+         write_frequency,
+         cache_line_size )
+
+   Diese Cost waechst exponentiell mit num_cores_sharing_node fuer Knoten
+   nahe der Wurzel, weil Cache-Kohaerenz-Protokoll-Roundtrips noetig sind.
+
+   DecisionLambdaTree-Konsequenz: `CoherenceAwareWriteDecisionTree`
+      → SKIP Per-Node-Counter-Updates an Wurzelnaehe-Knoten unter
+        Multi-Core-Last
+      → DELAY Reordering bis ConsolidationBarrier (Single-Threaded-Phase)
+
+================================================================================
+NICHT-ENTSCHIEDENE PUNKTE (offen fuer Phase 6 Implementation)
+================================================================================
+
+OPEN-K1  Wo wird die Cache-Kohaerenz-Cost-Funktion geschaetzt?
+         • Compile-Time aus PlatformProfile heuristisch
+         • Runtime via perf-Counter (cache_misses, MESI-Transitions)
+         • Hybrid
+
+OPEN-K2  RetroactiveAggregation-Barriere: wann triggert sie?
+         • Periodisch (Timer-Tick)
+         • Event-basiert (Threshold-Counter ueberschritten)
+         • Manuell via Operator-Eingriff
+
+OPEN-K3  SamplingRateAdjustmentTree: konkrete Heuristik fuer N-Anpassung?
+         (Vorschlag: Kuehn als Email-Folge konsultieren)
+
+================================================================================
+ENDE DER KUEHN-ERKENNTNISSE-EINARBEITUNG
+================================================================================

@@ -1,0 +1,462 @@
+================================================================================
+BEGRIFFSGLOSSAR v5 — FINAL (Architektur-Beschluesse F1-F15)
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 3.D REV 3
+Stand: 2026-05-04 · ERGAENZT v4_FINAL.txt um Architektur-Beschluss-Begriffe
+================================================================================
+
+WAS ENTHAELT v5
+   v5 ist ein Erweiterungsdokument zu v3+v4. Es fuegt die Begriffe hinzu,
+   die aus den Architekturentscheidungen F1-F15 entstanden sind:
+
+   BLOCK M  — DecisionLambdaTree + Command-Pattern-Begriffe (F2)
+   BLOCK N  — Konsolidierungsbarrieren-Begriffe + Forschungs-Belege (F2)
+   BLOCK O  — In-Memory MeasurementBuffer (F5)
+   BLOCK P  — ABI-stabile C++23-Module + Modul-Permutationen (F9 + F10)
+   BLOCK Q  — Permutations-Build-Pipeline + Original-Compiler (F7 + F10)
+   BLOCK R  — Cache-Warmup als Permutation + CacheEngine.reset() (F12)
+   BLOCK S  — Dual-Modus (Compile-Time vs Runtime SIMD-Detection) (F9)
+   BLOCK T  — Mess-Kategorie x Algorithmus-Detail Matrix (F1)
+   BLOCK U  — Bausteine-Quer-Permutation + Bausteine-Matrix (F15)
+   BLOCK V  — Plattform-Workflow + ZIH-SOCKS5 (F13)
+   BLOCK W  — Concurrency-Composition Policy-Template (F6)
+   BLOCK X  — ConstraintFilter + Module-Loader (F4 + F12)
+   BLOCK Y  — Korrekturen zu v4 (CacheEngine-Lokation, F12)
+
+PAPER-LEGENDE: identisch zu v3_FINAL.txt (P01-P33).
+
+================================================================================
+BLOCK M — DECISIONLAMBDATREE + COMMAND PATTERN
+================================================================================
+
+[KANON]  DECISIONLAMBDATREE
+  BED Per-Entscheidungsklasse instanziierter Baum aus Lambda-Knoten, der
+      jedes Push-Event aus dem Algorithmus auf eine Entscheidung abbildet:
+      EXECUTE (sofort), DELAY (an Barriere verschieben), SKIP (verwerfen).
+  ROLLE Filtert das synchrone Observer-Push-Signal, BEVOR die CacheEngine
+      auf jedes Event reaktiv handelt.
+  KOMPONENTE
+      template<typename EventT>
+      class DecisionLambdaTree {
+        using Decision = enum class { EXECUTE, DELAY, SKIP };
+        constexpr Decision evaluate(EventT&&, Context&) const noexcept;
+      };
+  EINSATZ ENTSCHEIDUNGSKLASSEN (eine Tree-Instanz pro Klasse):
+      • PageRelocationDecisionTree
+      • PageTypeChangeDecisionTree
+      • PrefetchAdjustmentDecisionTree
+      • AllocatorRebalanceDecisionTree
+      • ConcurrencyDisciplineSwitchDecisionTree
+      • PageTypeSelectionDecisionTree
+      • HotPathRecognitionDecisionTree
+      • LayoutInvariantMaintenanceDecisionTree
+
+[KANON]  COMMAND PATTERN  (im Cache-Engine-Kontext)
+  SYN ← "Command"                   GoF Design Patterns
+  BED Jede mit DELAY markierte Anpassung wird als Command-Objekt gekapselt
+      und in eine Barriere-Queue eingestellt; bei Barriere-Trigger werden
+      die Commands ausgefuehrt.
+
+[KANON]  ENTSCHEIDUNGSKLASSE
+  BED Domaene innerhalb der CacheEngine, in der jeweils eigene DecisionLambda-
+      Trees aktiv sind. Eine Klasse pro Optimierungs-Subjekt.
+
+[KANON]  EXECUTE / DELAY / SKIP  (DecisionLambdaTree-Outcomes)
+  BED Drei moegliche Ergebnisse einer Entscheidung:
+      EXECUTE — Anpassung sofort durchfuehren
+      DELAY   — Anpassung in eine Barriere-Queue verschieben
+      SKIP    — Anpassung verwerfen (z.B. wegen Last/Threshold)
+
+================================================================================
+BLOCK N — KONSOLIDIERUNGSBARRIEREN  (Forschungs-Belege fuer DELAY)
+================================================================================
+
+[KANON]  KONSOLIDIERUNGSBARRIERE
+  SYN ← "Consolidation Barrier"     P02 HOT (Compound-Node-Merge)
+  SYN ← "Permutation Field Update"  P03 Masstree
+  SYN ← "Rewiring Barrier"          P05 START
+  SYN ← "Lock Coupling Barrier"     P08 ARTSync
+  SYN ← "Multi-Level Reorg"         P18 Saikkonen
+  SYN ← "Histogram Threshold"       P28 Kuehn
+  SYN ← "Grace Period"              P29 RCU
+  SYN ← "Hot Path Threshold"        P26 Zhang FGCS
+  BED Synchronisations-/Reorganisations-Punkt, an dem aufgesammelte Anpas-
+      sungen aus DecisionLambdaTrees ausgefuehrt werden.
+
+  BELEGE
+   • P02 HOT (Binna 2018): Compound-Node-Konsolidierung als Barriere.
+     Updates werden gesammelt, dann konsolidiert.
+   • P03 Masstree (Mao 2012): Permutation Field aktualisiert ohne
+     physische Verschiebung der Schluessel; Reorganisation periodisch.
+   • P05 START (Fent 2020): Rewiring laeuft mit Barrieren.
+   • P08 ARTSync (Leis 2016): OLC mit deferred updates via Lock Coupling.
+   • P18 Saikkonen 2008: Multi-Level Relocation als periodische
+     Reorganisation, nicht pro Operation.
+   • P28 Kuehn 2023: Histogram-Updates inkrementell, Re-Layout explizit
+     ausgeschlossen — bewusst Barriere-bezogen.
+   • P29 RCU (McKenney 2001): Grace Period IST eine explizite Barriere fuer
+     Memory Reclamation.
+   • P26 Zhang FGCS 2024: Read-Counter-Threshold als Barriere fuer
+     Hot-Path-Detection.
+
+================================================================================
+BLOCK O — IN-MEMORY MEASUREMENT BUFFER  (F5)
+================================================================================
+
+[KANON]  IN-MEMORY MEASUREMENT BUFFER
+  BED Eigene einfache, effiziente In-Memory-Loesung zur Aufnahme von
+      Mess-Records waehrend eines Experiments. KEINE externe Datenbank.
+  KOMPONENTE
+      class InMemoryMeasurementBuffer {
+        std::pmr::monotonic_buffer_resource arena_;
+        std::vector<MeasurementRecord, ...> records_;
+        void append(MeasurementRecord) noexcept;
+        void serialize_to_disk(std::filesystem::path) const;
+      };
+  EIGENSCHAFTEN
+      • Append-only, kein Lock im Hot-Path
+      • Pro CPU/Thread eigener Arena-Block (cache-line-aligned)
+      • Format: Binary-Dump (kompakt) oder CSV (debug)
+      • Serialisierung NUR am Ende eines kompletten Experiments
+  BEGRUENDUNG (Architekt) Latenzen externer DBs interferieren mit
+      Experimenten; wir koennen Kontrolle nicht an eine Time-Series-DB
+      abgeben, ohne Cache + Kernel zu unterbrechen.
+  KORREKTUR vs v4 BLOCK I: MeasurementDB-Wahl (SQLite/DuckDB/PostgreSQL)
+      verworfen. Stattdessen In-Memory-Buffer + Disk-Dump.
+
+================================================================================
+BLOCK P — ABI-STABILE C++23-MODULE  (F9)
+================================================================================
+
+[KANON]  ABI-STABILES C++23-MODUL
+  BED Pro Permutation der Bausteine wird ein C++23-Modul gebaut, das ueber
+      ein stabiles ABI verfuegt. Ladbar als `dlopen`/`LoadLibrary`-Modul.
+  EINSATZ Im CacheEngineBuilder dynamisch geladen, pro Modul ein Experiment.
+  DATEIENDUNG `.so` (Linux) / `.dll` (Windows) / `.dylib` (macOS)
+  AUSGABEPFAD `build/modules/<perm_id>/<perm_id>.module.{so|dll|dylib}`
+
+[KANON]  MODUL-PERMUTATION
+  BED Eine konkrete Auspraegung der Bausteine-Achsen, kompiliert zu einem
+      ABI-stabilen Modul. Pro Permutation eindeutige `perm_id`.
+
+[KANON]  PERM_ID
+  BED Eindeutige ID einer Modul-Permutation. Format (vorlaeufig):
+      `<page_kind>_<node_kind>_<traversal>_<value_handle>_<allocator>_
+       <prefetch>_<concurrency>_<isa>` als Hash oder Tupel-String.
+
+[KANON]  MODULE LOADER
+  BED Wrapper um plattformspezifisches `dlopen`/`LoadLibrary`. Liefert
+      `IAlgorithmStrategy<K,V>*` bei erfolgreichem Laden. Verwaltet
+      Modul-Lifetime + sauberes Entladen.
+
+================================================================================
+BLOCK Q — PERMUTATIONS-BUILD-PIPELINE  (F7 + F10)
+================================================================================
+
+[KANON]  PERMUTATIONS-BUILD-PIPELINE
+  BED CMake-Skript `build_permutations.cmake`, das pro Permutation
+      sequentiell die folgenden Schritte ausfuehrt:
+      1. Codegen (Template-instanziierter .cpp + .ccm Modul-Interface)
+      2. Compile mit dem Original-Compiler des Fremd-Algorithmus
+         (Habich-Direktive)
+      3. Link zu ABI-stabilem Modul
+      4. Output: `build/modules/<perm_id>/<perm_id>.module.so`
+
+[KANON]  ORIGINAL-COMPILER-PIPELINE  (F7)
+  BED Jeder fremde Algorithmus wird mit DEM ORIGINAL-COMPILER kompiliert,
+      mit dem das Originalpaper das Verhalten verifiziert hat.
+  ANFORDERUNG CMake registriert pro Algorithmus die noetige Compiler-
+      Version. Pre-Build-Phase verifiziert Verfuegbarkeit aller Compiler.
+  ZIEL Resultierende Binary EXAKT gleich zur originalen Fremd-Binary,
+      trotz Splitting der Bestandteile in eigene source files.
+  ZUORDNUNG (vorlaeufig — Phase 4.B konkretisiert)
+      • P01 ART (Leis 2013) — GCC 4.7+
+      • P02 HOT (Binna 2018) — GCC 5+, BMI2/AVX2
+      • P03 Masstree (Mao 2012) — GCC 4.6+
+      • ... (vollstaendig in Phase 4.B)
+
+[KANON]  CONSTRAINT FILTER  (F4)
+  BED CMake-Mechanismus, der absurde Permutationen aus dem Compile-Set
+      ausschliesst (z.B. AVX-512-Pfad nur bei x86_avx512-Target).
+  REGEL Der Filter laeuft compile-time im CMake, NICHT zur Builder-Runtime.
+
+[KANON]  PRE-BUILD PHASE
+  BED Einmalige Compile-Phase, in der ALLE gueltigen Modul-Permutationen
+      sequentiell kompiliert werden. Dauert Stunden bis Tage. Wird pro
+      ISA-Plattform durchgefuehrt.
+
+[KANON]  ADHOC BUILD
+  BED Falls die Pre-Build-Phase nicht alle Module abgedeckt hat, ruft der
+      CacheEngineBuilder zur Init das `build_permutations.cmake`-Skript
+      adhoc fuer fehlende `perm_id`s auf.
+
+================================================================================
+BLOCK R — CACHE-WARMUP ALS PERMUTATION + RESET  (F12)
+================================================================================
+
+[KANON]  CACHE-WARMUP ALS PERMUTATIONSBESTANDTEIL
+  BED Da das dynamische Laden eines Moduls (dlopen) den Cache-Zustand
+      stoert, MUSS der Cache-Warmup zur Algorithmus-Permutation gehoeren
+      (NICHT zur generischen CacheEngine).
+  KONSEQUENZ Pro Modul wird der Warmup-Code modul-spezifisch implementiert
+      und im Modul mitgeliefert.
+
+[KANON]  CACHEENGINE.RESET()
+  BED Methode zum Zuruecksetzen aller CacheEngine-Zustaende zwischen
+      Experimenten. Loescht ObserverRegistry, DecisionLambdaTrees-State,
+      RuntimeMicroBenchmarks-Akkumulator, TelemetrySpool.
+  EINSATZ Im Builder-Lifecycle nach jedem Modul-Experiment.
+
+[KANON]  EXPERIMENT-LOOP  (CacheEngineBuilder)
+  BED Fuer jedes pre-built Modul:
+      1. CacheEngine.reset()
+      2. Modul dynamisch laden
+      3. Cache-Warmup (modul-spezifisch)
+      4. Dataset-Aufbereitung
+      5. Experiment ausfuehren (perf/PAPI + Mikrobenchmarks)
+      6. Push observations → CacheEngine
+      7. DecisionLambdaTrees evaluieren
+      8. Mess-Records → InMemoryMeasurementBuffer
+      9. Modul entladen
+
+================================================================================
+BLOCK S — DUAL-MODUS DER CACHEENGINE-INITIALISIERUNG  (F9)
+================================================================================
+
+[KANON]  COMPILE-TIME-MODUS  (CacheEngine-Init)
+  BED ISA + SIMD-Erweiterungen sind via Build-Flags fixiert. Die CacheEngine
+      ist auf eine konkrete ISA hin kompiliert.
+  EINSATZ Auf eigenen Plattformen (Pi 5, VisionFive 2, ODROID, x86-Server)
+      mit voller Kontrolle ueber Toolchain.
+
+[KANON]  RUNTIME-MODUS  (CacheEngine-Init)
+  BED ISA + SIMD-Erweiterungen werden zur Initialisierung der CacheEngine
+      detektiert (CPUID-aehnlich).
+  EINSATZ Auf ZIH (Binaries vorab cross-compiled, dort nur ausgefuehrt).
+
+[KANON]  MUTUALLY EXCLUSIVE
+  BED Compile-Time-Modus und Runtime-Modus schliessen sich gegenseitig
+      aus. Ein Build hat genau EINEN Modus aktiviert (Build-Flag).
+
+================================================================================
+BLOCK T — MESS-KATEGORIE x ALGORITHMUS-DETAIL MATRIX  (F1)
+================================================================================
+
+[KANON]  MESS-KATEGORIE x ALGORITHMUS-DETAIL MATRIX
+  BED Pro Zelle (Mess-Kategorie x Algorithmus-Detail) eine constexpr-
+      spezialisierte Implementierung der Mess-Erfassung. Compile-time im
+      Hot-Path inlined.
+  ZWECK Zero-overhead Telemetrie + plattform-spezifische Optimierung.
+  KOMPONENTE
+      template<MeasurementCategory C, AlgorithmDetail D>
+      struct Measure {
+        static constexpr void at_lookup_begin(...) noexcept;
+        static constexpr void at_lookup_end(...) noexcept;
+        static constexpr void at_node_visit(...) noexcept;
+      };
+      // Spezialisierungen pro (C, D)-Zelle
+
+  ZUORDNUNG via C++23 Concepts:
+      template<typename Algo, MeasurementCategory C>
+        requires HasMeasurement<Algo, C>
+      constexpr void hooked_node_visit(Algo&, Context&);
+
+[KANON]  MEASUREMENT CATEGORY  (Achse 10 der Bausteine-Matrix)
+  Mitglieder:
+      • CLU (Cache Line Utilization)
+      • CacheMiss (L1/L2/L3)
+      • dTLBMiss
+      • MemoryFootprint
+      • BranchMiss
+      • IPC / CPI
+      • Latency (Mean, p50, p95, p99, p999)
+      • Throughput
+      • EnergyJ
+      • FillBufferOccupancy
+
+[KANON]  ALGORITHM DETAIL  (Mess-relevante Granularitaet)
+  Mitglieder (vorlaeufig):
+      • ART_Node256 / ART_Node48 / ART_Node16 / ART_Node4
+      • HOT_CompoundNode / HOT_BiNode
+      • Masstree_BorderNode / Masstree_InternalNode
+      • CSS_Node / CSB_NodeGroup
+      • SuRF_LOUDSDense / SuRF_LOUDSSparse
+      • PRTART_DenseByte / PRTART_SparsePatricia / PRTART_Redirect / ...
+
+================================================================================
+BLOCK U — BAUSTEINE-QUER-PERMUTATION  (F15, ZENTRALES PRINZIP)
+================================================================================
+
+[KANON]  BAUSTEINE-QUER-PERMUTATION
+  BED Forschungsprinzip: jeder Algorithmus-Baustein (Page-Type, Node-Type,
+      Traversal, ValueHandle-Strategy, MemoryLayout, Allocator, Prefetch,
+      Concurrency-Disziplin, ISA-Pfad) ist EINZELN gegen einen anderen aus
+      JEDEM beliebigen anderen Algorithmus AUSTAUSCHBAR.
+  THESE Die Cache Engine zeigt ihren massgeblichen Einfluss auf ALLE
+      Bausteine der Algorithmus-Konzepte.
+
+[KANON]  BAUSTEINE-MATRIX
+  BED Explizite Aufstellung aller bekannten Implementierungen pro
+      konzeptioneller Achse aus den 33 Papern + PRT-ART.
+  ACHSEN
+      Achse 1: PAGE-TYPE
+      Achse 2: NODE-TYPE
+      Achse 3: TRAVERSAL
+      Achse 4: VALUEHANDLE-STRATEGY
+      Achse 5: MEMORYLAYOUT
+      Achse 6: ALLOCATOR
+      Achse 7: PREFETCH-STRATEGY
+      Achse 8: CONCURRENCY-DISZIPLIN
+      Achse 9: ISA-PFAD
+      Achse 10: MEASUREMENT-KATEGORIE
+  PERMUTATIONSRAUM Kreuzprodukt aller Achsen, gefiltert via ConstraintFilter.
+
+[KANON]  ALGORITHM-DETAIL-MODULE  (eine Bausteine-Implementation = ein Modul)
+  BED Jeder Eintrag in der Bausteine-Matrix wird als eigenes Modul
+      ausgeliefert (in-source under `search_engine/<concept>/<impl>/`).
+      Dadurch sind Bausteine austauschbar.
+
+[KANON]  UNIVERSAL-VERGLEICH (CacheEngine-Universalitaet)
+  BED Vergleich quer ueber Bausteine + Algorithmen + ISAs unter aktiver
+      CacheEngine. Zeigt, dass die CacheEngine universell wirkt — nicht
+      nur auf PRT-ART, sondern auf JEDE Algorithmus-Komposition.
+
+================================================================================
+BLOCK V — PLATTFORM-WORKFLOW + ZIH-SOCKS5  (F13)
+================================================================================
+
+[KANON]  PLATTFORM-WORKFLOW
+  Drei Workflow-Klassen je nach Plattform-Kontrolle:
+
+  EIGEN-KONTROLLIERT (Pi 5, VisionFive 2)
+   • Self-built Compiler (volle C++23-Modules-Unterstuetzung)
+   • CacheEngineBuilder direkt aus Source kompiliert
+   • Compile-Time-ISA-Optimierung
+
+  CI/CD-DIREKT (ODROID H4 Ultra, x86-Server)
+   • Builds via vorhandene CI/CD pro ISA
+   • Compile-Time-ISA-Optimierung
+
+  ZIH (Barnard, Capella, Grace Hopper)
+   • Cross-Compile via vorhandene Infrastruktur
+   • Binaer-Lieferung via SOCKS5 (oder gleichwertig)
+   • Runtime-ISA-Detection in CacheEngine.init()
+   • KEINE Compile-Aktivitaet auf ZIH
+
+[KANON]  SOCKS5-LIEFERUNG
+  BED Tooling, das fertige Cross-Compile-Binaries via SOCKS5-Tunnel zum
+      ZIH-Cluster ueberfuehrt. Umgeht ZIH-Restriktionen (kein Build-Recht).
+
+[KANON]  CROSS-COMPILE-INFRASTRUKTUR
+  BED Vorhandene COMDARE-Infrastruktur (CI/CD + Build-Hosts), die pro
+      Target Plattform Cross-Compile-Binaries erzeugt.
+
+================================================================================
+BLOCK W — CONCURRENCY-COMPOSITION POLICY-TEMPLATE  (F6)
+================================================================================
+
+[KANON]  CONCURRENCY COMPOSITION  (Policy-Template)
+  BED Top-Level-Komposition der Concurrency-Disziplinen via Template-
+      Parameter, zero-overhead compile-time:
+      template<Discipline... Ds> class ConcurrencyManager;
+  ROLLE Erlaubt beliebige Kombinationen der 8+ Disziplin-Klassen ohne
+      virtuelle Aufrufe.
+
+[KANON]  POLICY TEMPLATE
+  SYN ← "Policy-based Design"      Andrei Alexandrescu (Modern C++ Design)
+  BED C++-Technik, in der Verhalten ueber Template-Parameter ("Policies")
+      injiziert wird. Compile-time, zero-overhead.
+
+================================================================================
+BLOCK X — CONSTRAINT FILTER + MODULE LOADER  (F4 + F12)
+================================================================================
+
+[KANON]  CONSTRAINT FILTER
+  BED CMake-Mechanismus, der absurde Permutationen aus dem Compile-Set
+      ausschliesst. Compile-time im CMake.
+  BEISPIELE
+      • AVX-512-Pfad nur bei `target=x86_avx512`
+      • SVE2-Pfad nur bei `target=arm_sve2`
+      • HBM-Allocator nur bei Maschinen mit HBM
+      • Bestimmte Page-/Node-Type-Kombinationen schliessen sich aus
+
+[KANON]  MODULE LOADER
+  BED Plattformspezifischer Wrapper um `dlopen`/`LoadLibrary`. Liefert
+      `IAlgorithmStrategy<K,V>*` bei Erfolg; verwaltet Modul-Lifetime.
+  KOMPONENTE
+      class ModuleLoader {
+        Handle load(std::filesystem::path module_path);
+        IAlgorithmStrategy<K,V>* extract_strategy(Handle);
+        void unload(Handle);
+      };
+
+================================================================================
+BLOCK Y — KORREKTUREN ZU v4
+================================================================================
+
+KORREKTUR Y1  CacheEngine-Lokation (F12)
+   - v4 BLOCK A: CacheEngine als globales Heap-Modul, Singleton-aehnlich.
+   - v5: CacheEngine LEBT IM CacheEngineBuilder als Komponente. KEIN
+     separater Singleton-Heap-Modul ausserhalb des Builders.
+   - Singleton-Mechanik (heap, unique_ptr + call_once) gilt FUER den
+     ConcurrencyManager INNERHALB der CacheEngine; nicht fuer eine
+     globale CacheEngineRuntime.
+
+KORREKTUR Y2  MeasurementDB raus (F5)
+   - v4 BLOCK I: SQLite/DuckDB/PostgreSQL fuer MeasurementDB.
+   - v5: KEINE externe DB. In-Memory MeasurementBuffer +
+     Disk-Dump nach Lauf-Ende. Begruendung: Latenz-Interferenz.
+
+KORREKTUR Y3  ValueHandle-Repr (F8)
+   - v4 BLOCK G: switch_array als `std::array<ValueHandleKind, N>`.
+   - v5: Repr ist `std::variant<...>` + Concept-Constraint (siehe BLOCK G v4
+     ENTSCHEIDUNG aktualisiert).
+
+KORREKTUR Y4  Observer-Mechanik (F2)
+   - v4 BLOCK A: Observer/Visitor allgemein.
+   - v5: Push synchron + DecisionLambdaTree-Filter (BLOCK M).
+
+KORREKTUR Y5  Mess-Telemetrie (F1)
+   - v4 hatte keine Mess-x-Algo-Detail Matrix.
+   - v5: explizite constexpr-Spezialisierung pro Zelle (BLOCK T).
+
+KORREKTUR Y6  Bausteine-Quer-Permutation (F15)
+   - v4 hatte keine Quer-Permutations-These.
+   - v5: zentrales Forschungsprinzip (BLOCK U).
+
+KORREKTUR Y7  Original-Compiler-Pipeline (F7)
+   - v4 BLOCK A nannte C++23-Modules als Adapter-Strategie.
+   - v5: praezisiert auf Original-Compiler PRO fremdem Algorithmus
+     (BLOCK Q).
+
+================================================================================
+BEZIEHUNG v3 / v4 / v5
+================================================================================
+
+v3_FINAL.txt — P01-P33-Begriffsbelege; bleibt vollstaendig gueltig.
+v4_FINAL.txt — Architektur-Pattern, Engine-Choice, Fan-Out, std::map-API,
+                 Concepts, ValueHandle, Concurrency-Disziplinen,
+                 CacheEngineBuilder-Begriffe, Habich, Submodules.
+v5_FINAL.txt — Architektur-Beschluesse F1-F15: DecisionLambdaTree,
+                 In-Memory-Buffer, ABI-Module, Original-Compiler-Pipeline,
+                 Cache-Warmup als Permutation, Dual-Modus, Mess-Matrix,
+                 Bausteine-Quer-Permutation, Plattform-Workflow,
+                 Concurrency-Composition, ConstraintFilter, Module-Loader.
+
+Bei Konflikt v3 ↔ v4 → v4 gewinnt.
+Bei Konflikt v4 ↔ v5 → v5 gewinnt.
+Bei Konflikt v3 ↔ v5 → v5 gewinnt.
+
+================================================================================
+PARALLEL DOKUMENTE
+================================================================================
+
+Architekturentscheidungen_F1_F15.txt
+   - Kanonische Festschreibung der 15 Beschluesse (ADR-Dokument).
+
+Domaenenmodell_PRT_ART_v3.txt
+   - Ueberarbeitete textuelle UML-Vorlage mit allen Praezisierungen.
+
+================================================================================
+ENDE DES BEGRIFFSGLOSSARS v5
+================================================================================
