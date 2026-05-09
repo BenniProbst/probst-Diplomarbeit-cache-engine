@@ -1,6 +1,13 @@
 # Korrektur-Architektur-Skizze 2026-05-09
 
-**Anlass:** User-Korrektur zur ersten drawio-Version (`phase5_uml_detail.drawio`) — meine UML war Achsen-Klassifikation (Page/Node/Traversal/...), aber der Architekt erwartet eine **hierarchische Concept-Architektur** mit zwei klar getrennten Saeulen:
+**Anlass:** User-Korrektur zur ersten drawio-Version (`phase5_uml_detail.drawio`) — meine UML war Achsen-Klassifikation (Page/Node/Traversal/...), aber der Architekt erwartet eine **hierarchische Concept-Architektur** mit zwei klar getrennten Saeulen.
+
+**Stand REV 2 (2026-05-09 nachmittag):** Diese Skizze enthaelt Architekt-Korrekturen Runde 2:
+1. Multiplizitaeten praezisiert (siehe §1.2)
+2. ICacheStrategy als **Visitor-Pattern** mit zwei Konkretisierungen (siehe §1.4)
+3. **Cache-Strategien-Verallgemeinerung** ist NOCH NICHT VOLLSTAENDIG — separate Tieflektuere aller 33 Paper laeuft gerade in 6 parallelen Agenten (siehe §8 unten). Die hier aufgelisteten Cache-Strategy-Familien werden nach Agenten-Abschluss verfeinert in `_paper_extractions/`.
+
+Zwei Saeulen:
 
 1. **Saeule A — Suchalgorithmus-Datenstruktur** (Verallgemeinerung der 33 Paper-Algorithmen unter gemeinsamen Daechern)
 2. **Saeule B — Cache-Engine-Plattform-Modell** (Echtzeit-Modell der CPU/Caches/Bandbreiten als Grundlage fuer Scheduling + Heuristik)
@@ -51,12 +58,15 @@
    - controls: insertion of new ISearchPage
    - controls: removal of obsolete ISearchPage
    - controls: re-ordering / consolidation
-   - delegates per-page entry handling to:  ISearchPageStrategy[s]  via  ISearchPagesStrategyPattern
+   - delegates per-page entry handling via  ISearchPagesStrategyPattern
 
-«concept» ISearchPagesStrategyPattern<SSP>             (PATTERN: Anordnungs-Vorschrift fuer Strategien)
+«concept» ISearchPagesStrategyPattern<SSP>             (PATTERN: Anordnungs-Vorschrift)
+   ★★ KORREKTUR REV 2: Multiplizitaeten praezisiert ★★
+   - IFanout  has  EXACTLY 1  ISearchPagesStrategyPattern    (eindeutig pro Fanout)
+   - ISearchPagesStrategyPattern  has  N  ISearchPageStrategy  (eine pro ISearchPage)
    - assigns: which ISearchPageStrategy applies to which ISearchPage in the Structure
    - examples (aus Papern):
-       * „all-pages-uniform"      (P11 CSS, P12 CSB+ — eine Strategie fuer alle Seiten)
+       * „all-pages-uniform"      (P11 CSS, P12 CSB+ — gleiche Strategie fuer alle Seiten)
        * „layer-mix"              (P03 Masstree — pro Layer eine andere Strategie)
        * „inner-vs-leaf"          (P10 SuRF — LOUDS-Dense oben, LOUDS-Sparse unten;
                                               P04 CoCo — Macro-Node oben, Patricia unten)
@@ -67,6 +77,34 @@
    - controls: where in the page key-value goes
    - controls: when to split/merge the page
    - controls: layout invariants
+   ★ MULTIPLIZITAET: 1 ISearchPageStrategy pro 1 ISearchPage; ISearchPagesStrategyPattern hat N davon ★
+```
+
+### 1.4 ICacheStrategy als Visitor-Pattern (KORREKTUR REV 2)
+
+```
+«concept, visitor» ICacheStrategy<CS>                  (Visitor — entscheidet Read/Write-Pfad pro Page-Op)
+   ★★ KORREKTUR REV 2: Visitor-Pattern mit ZWEI Konkretisierungen ★★
+   - visit(read_op : PageReadOp&) : void
+   - visit(write_op : PageWriteOp&) : void
+
+«concrete» BaseEngineStrategy : ICacheStrategy
+   - ruft die NICHT-OPTIMIERTE Read/Write-Variante auf
+   - StaticEngine-Pfad: Originalcode-Bauteil ohne CacheEngine-Beeinflussung
+   - Baseline fuer F15-Vergleich (Pflicht-Vergleichsbasis pro Permutation)
+   - keine ILivePlatformModel-Konsultation; keine Heuristik-Aufrufe
+
+«concrete» CacheEngineStrategy : ICacheStrategy
+   - ruft die CACHEENGINE auf, um Speicher-optimiert zu lesen/schreiben
+   - konsultiert ILivePlatformModel + ICacheResidency + IHeuristic (Saeule B)
+   - kann Read/Write umrouten auf besseres Cache-Tier (L1/L2/L3/HBM/V-Cache)
+   - kann Page-Layout vor Write rearrangieren (cache_line_formation aendern)
+   - Forschungs-Pfad fuer F15-Vergleich
+
+ABBILDUNG ISearchPage → ICachePage[s] passiert IMMER ueber eine ICacheStrategy:
+   - In der StaticEngine-Konfiguration: BaseEngineStrategy
+   - In der CacheEngine-Konfiguration: CacheEngineStrategy
+   - Die Wahl ist Compile-Time (Engine-Choice, Domaenenmodell §1B)
 ```
 
 ### 1.3 Iteratoren (orthogonale Schicht, vom User explizit verlangt)
@@ -359,7 +397,37 @@ cache_engine/                                      (Saeule B)
 
 ---
 
-## 7. Offene Punkte fuer User-Bestaetigung
+## 8. LAUFENDE TIEFLEKTUERE — Cache-Strategien aus 33 Papern (REV 2)
+
+**Architekt-Direktive 2026-05-09 nachmittag:** Cache-Strategien-Verallgemeinerung ist UNVOLLSTAENDIG. Alle 33 Paper muessen mit hoechster Praezision MANUELL gelesen werden, um:
+1. **Cache-Strategien** unter gemeinsamen Daechern zu finden (zentrale Luecke)
+2. **Algorithmus-Strategien** auf Luecken zu pruefen
+3. Aus jeder konkreten Paper-Implementierung **verallgemeinerte Strategie-Absichten** zu extrahieren
+
+**Vorgehen:** 6 parallele general-purpose-Agenten, jeder liest 5-6 Paper mit Read-Tool (PDF + pages-Argument), schreibt einen strukturierten Bericht in `_paper_extractions/<cluster>.md`. Konsolidierung danach.
+
+**Cluster-Zuordnung:**
+| Cluster | Paper | Output |
+|---------|-------|--------|
+| A — Trie-Familie | P01 ART, P02 HOT, P04 CoCo, P05 START, P09 LOUDS, P10 SuRF | `_paper_extractions/cluster_A_trie.md` |
+| B — Hybrid + B+ | P03 Masstree, P06 B²-tree, P07 Wormhole, P11 CSS, P12 CSB+, P13 Hankins | `_paper_extractions/cluster_B_hybrid_bplus.md` |
+| C — Layout-Theorie | P14 Samuel, P15 Graefe, P16 Bender Tree-Layout, P17 Bender CO, P18 Saikkonen 2008, P19 Saikkonen 2016 | `_paper_extractions/cluster_C_layout_theorie.md` |
+| D — Prefetching 1 | P20 B-Trees-Are-Back, P21 Chen 2001, P22 Chen Fractal, P23 Khan | `_paper_extractions/cluster_D_prefetching_1.md` |
+| E — Prefetching 2 + Telemetry | P24 Naderan-Tahan, P25 Mahling, P26 Zhang FGCS, P27 Zhang ASPLOS, P28 Kuehn | `_paper_extractions/cluster_E_prefetching_telemetry.md` |
+| F — Sync + TUD-Habich | P08 ART-Sync, P29 RCU, P30 Hazard, P31 Ungethuem, P32 To-Stride, P33 VAMPIR | `_paper_extractions/cluster_F_sync_tud_habich.md` |
+
+**Pro Paper extrahiert jeder Agent:**
+1. Identifizierte CACHE-STRATEGIEN (Concept-Verallgemeinerungen fuer ICacheStrategy-Familie)
+2. Identifizierte ALGORITHMUS-STRATEGIEN (Concept-Verallgemeinerungen fuer ISearchPagesStrategy / ISearchPageStrategy / IHeuristic)
+3. Implementations-Details die NICHT in andere Paper passen (Sondermerkmale)
+4. Verallgemeinerungs-Vorschlaege (welches gemeinsame Dach passt?)
+
+**Konsolidierung nach Agent-Abschluss:**
+- Alle Cache-Strategie-Konzepte unter einem gemeinsamen Schirm in `11_cache_strategy_taxonomie.md`
+- Alle Algorithmus-Strategie-Konzepte verfeinert in dieser Skizze (REV 3)
+- Lueckenanalyse: was haben wir uebersehen?
+
+## 9. Offene Punkte fuer User-Bestaetigung
 
 - **Begriffe stimmen?** IPage / IFanout / INode / ISearchPage / ICachePage / ICacheStrategy / ISearchPageStructure / ISearchPagesStrategy / ISearchPagesStrategyPattern / ISearchPageStrategy
 - **Iteratoren-Schicht:** INodeIterator + ISearchPageIterator + ISearchPageStrategyIterator + comdare::prt_art::iterator — passt das?
