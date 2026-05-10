@@ -1,7 +1,54 @@
 # Saeule B Plattform-Modell — Konkretisierung aus 33 Papern
-**Stand:** 2026-05-09
+**Stand:** 2026-05-09 (REV 1) · Korrektur-Runde 3 ergaenzt 2026-05-10
 **Quelle:** _paper_extractions/cluster_A-F.md
 **Architektur-Bezug:** REV 2 Concept-Hierarchie, Saeule B (Cache-Engine-Plattform-Modell, Echtzeit-Modell)
+
+---
+
+## ⚠ KORREKTUR-RUNDE 3 (2026-05-10) — Plattform-Auto-Discovery statt CPU-Spezialisierung
+
+**Bezug:** `10_korrektur_architektur_skizze_2026_05_09.md` Sektion K3.2
+
+### Lese-Anweisung fuer dieses Dokument
+
+Dieses Dokument enthaelt an mehreren Stellen Klassen-Bezeichnungen wie `RyzenX3DProbe`, `IntelHybridProbe`, `X3DAwareFactory`, `X3DVCachePinningHeuristic`, `IntelHybridPCoreRoutingHeuristic`. Diese Bezeichnungen sind Architektur-falsch:
+
+**Architektur-falsch ist:** plattform-spezifische Klassen, die hard-coded fuer eine bestimmte CPU-Generation gebaut sind (z.B. fuer Ryzen 9950X3D).
+
+**Architektur-richtig ist:** GENERELLE `IPlatformProbe` und `IPlatformPropertyClassifier`, die ALLE Cache-/CPU-Eigenschaften AUTOMATISCH entdecken + AUTOMATISCH ausmessen. Die schnellste Rekombination wird vom CacheEngineBuilder ausgewaehlt — keine plattform-spezifische Klassen-Hierarchie.
+
+### Re-Mapping Tabelle (in Korrektur-Runde 3 anzuwenden)
+
+| Bezeichnung in diesem Dokument (zu ersetzen) | Architektur-richtige Bezeichnung |
+|----------------------------------------------|----------------------------------|
+| `RyzenX3DProbe` Klasse | `IPlatformProbe` entdeckt `cache_topology.l3_per_ccd` mit verschiedenen Werten ⇒ Property `has_asymmetric_l3 = true` |
+| `IntelHybridProbe` Klasse | `IPlatformProbe` entdeckt `core_layout.core_classes` mit mehreren Klassen ⇒ Property `has_hybrid_cores = true` |
+| `X3DAwareFactory` | `IPlatformPropertyClassifier` liefert `preferred_pinning = LARGEST_L3_CCD` (gewaehlt durch Messung) |
+| `X3DVCachePinningHeuristic` | **`LargestL3CcdPinningHeuristic`** (allgemein, nicht CPU-spezifisch) |
+| `IntelHybridPCoreRoutingHeuristic` | **`HotPathOnHighIpcCoreHeuristic`** (allgemein) |
+| `Block AO Production-Plattform` | bleibt als BEISPIEL-KONKRETION fuer Auto-Discovery, NICHT als Implementierung |
+| `IntelHBMAllocator` / `GraceHopperHBMAllocator` | `IPlatformProbe` entdeckt `has_hbm_tier = true` ⇒ Property + generelle `HbmAllocationStrategy` |
+
+### Auto-Discovery-Pflichten der CacheEngine
+
+Pro Plattform-Eigenschaft, die wir beruecksichtigen wollen, muss der CacheEngineBuilder vor jedem Permutations-Build folgende Auto-Discovery-Schritte ausfuehren:
+
+1. **Discover** (statisch): Lese aus CPUID / sysfs / /proc/cpuinfo / hwloc / cpuid-Instruction
+2. **Measure** (dynamisch): Mikrobenchmark (z.B. clflush-cycle-Measurement; All-Pairs-Pinning-Vermessung; Cache-Coherence-Cost-Calibration)
+3. **Classify**: Stelle aus den Messungen Properties zusammen (`has_asymmetric_l3`, `preferred_pinning`, `usable_simd_width`, ...)
+4. **Publish**: Stelle die Properties allen Permutations-Modulen als Konfigurations-Optionen zur Verfuegung
+5. **Bind**: Pro Permutation entscheidet die `ICacheStrategy`-Visitor-Implementierung, welche Properties sie konsumiert
+
+Die Cache-Engine bleibt damit **plattform-agnostisch im Code, plattform-konkret im Verhalten** — exakt das Gegenteil einer plattform-spezifischen Klassen-Hierarchie.
+
+### Was vom Block AO erhalten bleibt
+
+Block AO (Production-Plattform Ryzen 9950X3D + i9-14900KS, 64 GB DDR5-5600 CL36) bleibt als KONKRETES BEISPIEL erhalten:
+- **Was Auto-Discovery dort findet:** asymmetrisches L3 (96+32 MiB), Hybrid-Cores (8P+16E), DDR5-5600 mit 36 Zyklen
+- **Welche Properties daraus resultieren:** `has_asymmetric_l3=true`, `has_hybrid_cores=true`, `cpu_core_atom_perf_separation=required`
+- **Welche Permutationen davon profitieren:** alle, die `ICacheStrategy`-Visitor mit Pinning-Hint konsumieren
+
+Damit ist Block AO ein TESTFALL fuer die Auto-Discovery, nicht eine Implementierung der Cache-Engine.
 
 ---
 

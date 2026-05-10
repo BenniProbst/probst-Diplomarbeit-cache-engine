@@ -1,5 +1,7 @@
 # Cluster A — Trie-Familie
 
+> ⚠ **KORREKTUR-RUNDE 3 (2026-05-10):** Die Cluster-Bezeichnung „Trie-Familie" ist eine Lektuere-Gruppierung — die hier gelisteten Algorithmen (P01 ART, P02 HOT, P04 CoCo, P05 START, P09 LOUDS, P10 SuRF) sind **Konfigurations-Pakete**, deren atomare Bausteine in `11_cache_strategy_taxonomie.md` (29 Familien) und `12_algorithmus_strategie_taxonomie.md` (4 Strategie-Ebenen) einzeln katalogisiert sind und ueber Cluster-Grenzen hinweg permutierbar bleiben. Zusammen mit Cluster B (Hybrid + B+) bilden sie damit architektonisch EINE Familie der Algorithmus-Konfigurations-Pakete (siehe `10_korrektur_architektur_skizze...md` §K3.3).
+
 > Tiefe Lektuere von 6 Paper im Kontext der Concept-Hierarchie REV 2.
 > Saeule A: ISearchPage / IRootPage / IFanout / INode / ICacheStrategy (BaseEngine vs. CacheEngine) / ISearchPagesStrategy / ISearchPagesStrategyPattern.
 > Saeule B: ICacheLevel / ICacheLine / ICacheTopology / ICacheResidency / ICpuCore / IIsaFeatureSet / IInterconnect / IMemoryBandwidthModel / ILivePlatformModel / IHeuristic.

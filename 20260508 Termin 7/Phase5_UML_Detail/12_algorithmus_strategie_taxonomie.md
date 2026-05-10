@@ -1,8 +1,33 @@
 # Algorithmus-Strategien-Taxonomie (Konsolidierung aus 33 Papern)
-**Stand:** 2026-05-09
+**Stand:** 2026-05-09 (REV 1) · Korrektur-Runde 3 ergaenzt 2026-05-10
 **Quelle:** 6 Cluster-Dateien (cluster_A_trie.md, cluster_B_hybrid_bplus.md, cluster_C_layout_theorie.md, cluster_D_prefetching_1.md, cluster_E_prefetching_telemetry.md, cluster_F_sync_tud_habich.md)
 **Pendant zu:** 11_cache_strategien_taxonomie.md
 **Architektur-Bezug:** REV 2 Concept-Hierarchie, Saeule A (IPage / IRootPage / IFanout / INode / ISearchPage / ISearchPagesStrategy / ISearchPagesStrategyPattern / ICacheStrategy)
+
+---
+
+## ⚠ KORREKTUR-RUNDE 3 (2026-05-10) — Cluster-Aufloesung + Hybrid-Command-Pattern + ExecutingEngine
+
+**Bezug:** `10_korrektur_architektur_skizze_2026_05_09.md` Sektionen K3.1, K3.3, K3.4
+
+### K3.1-Wirkung — IExecutingEngine als Wurzel ueber ISearchEngine
+
+Die `ISearchPagesStrategy` etc. unten sind die Strategie-Achsen einer `ISearchEngine`. `ISearchEngine` ist eine Spezialisierung von `IExecutingEngine`. Andere Engines (kuenftig) erben analog. Die Strategien dieser Datei sind also auf der Ebene **„Suchalgorithmus-Spezifikum"** angesiedelt — die CacheEngine-Anbindung erfolgt eine Schicht hoeher (`IExecutingEngine` → CacheEngine als Optimierungs-Service).
+
+### K3.3-Wirkung — Cluster-Aufloesung: B+- und Trie-„Familien" sind Konfigurations-Pakete
+
+In den Sektionen 2.1 (B+-Familie) und 2.2 (Trie-Familie) und in den Cluster-A/B-Dateien wird jeweils eine „Familie" angesprochen. Das ist eine Lektuere-Gruppierung, KEINE architektonische Trennung. Die Forschungs-These der Diplomarbeit ist gerade, dass diese „Familien" nur Rekombinations-Pakete der gleichen atomaren Bausteine sind. Architektur-richtig:
+- B+- und Trie-„Strategien" (siehe Sektionen 2.1 + 2.2) sind **Sammel-Bezeichner** fuer Bausteine-Konfigurationen
+- Die atomaren Bausteine sind in `11_cache_strategy_taxonomie.md` (29 Cache-Familien) und in den Strategy-Ebenen unten frei rekombinierbar
+- Cross-Familien-Permutationen (Trie-Pattern + B+-Strategy + ART-Page + LOUDS-Encoding + Hot-Path-Heuristic) sind explizites Forschungs-Ziel (F15)
+
+### K3.4-Wirkung — Hybrid-Strategien IMMER Command-Pattern-zerlegen
+
+Wo immer in dieser Taxonomie eine Strategie als „hybrid" bezeichnet wird (z.B. `MultiStrategyOrchestrationPattern`, `HierarchicalFractalPattern`, `HeterogeneousAdaptivePattern`, sowie die in §2.1/2.2 hybrid kombinierten Algorithmen P02 HOT, P10 SuRF, P07 Wormhole, P03 Masstree, P04 CoCo, P06 B²-Tree, P20 B-Trees-Are-Back, P22 Fractal):
+
+→ Diese Hybrid-Strategien werden in **atomare Strategy-Commands** zerlegt + unter einem **HybridCompositionCommand** zusammengesetzt. Die atomaren Commands sind einzeln testbar und einzeln in Permutationen rekombinierbar.
+
+Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **§9 Hybrid-Command-Pattern-Konvention** unten am Ende dieses Dokuments.
 
 ---
 
@@ -793,3 +818,99 @@ Workload-Modellierung als Strategy-Input (P16, P28):
 | F (Sync + TUD-Habich) | P08 ART OLC/ROWEX, P29 RCU, P30 Hazard Pointers, P31 Ungethuem TUD, P32 Schmidt To-Stride, P33 VAMPIR Poster | Synchronisations-Mechaniken, Hardware-Optimization-Survey, Live-Plattform-Modell, NFP-Framework |
 
 **Total:** 33 Paper, 6 Cluster, 4 Strategie-Ebenen, 12+ Iterator-Konkretisierungen, 50+ neue Concept-Vorschlaege fuer REV 3.
+
+---
+
+## §9 — Hybrid-Command-Pattern-Konvention (Korrektur-Runde 3, 2026-05-10)
+
+**Bezug:** `10_korrektur_architektur_skizze...md` Sektion K3.4
+
+**Schema (siehe K3.4):**
+```
+«abstract» IStrategyCommand                              (Command-Pattern Wurzel)
+   + execute(context : StrategyContext&) : Result
+   + can_compose_with(other : IStrategyCommand&) : bool
+
+«composite» HybridCompositionCommand : IStrategyCommand  (NEU — Sammler)
+   - parts : vector<IStrategyCommand*>
+   - composition_rule : ICompositionRule           (sequenziell, parallel, conditional, recursive)
+```
+
+**Pruefungs-Regel:** WO IMMER in dieser Datei eine Strategy oder ein Pattern als „hybrid" / „composite" / „mixed" / „dual-tier" / „dual-layer" / „triple-layer" / „N-prefetcher" / „hierarchical" / „heterogen" beschrieben ist, ist eine Command-Pattern-Aufloesung Pflicht.
+
+**Aufloesungs-Tabelle (vollstaendig fuer hier dokumentierte Hybride):**
+
+| Quelle in dieser Datei | Bisher monolithisch | Atomare Strategy-Commands | HybridCompositionCommand |
+|------------------------|---------------------|---------------------------|--------------------------|
+| §1.1 `LayerMixPattern` (P03 Masstree) | Trie-Layer + B+-pro-Layer | `SliceLayerJumpCommand` + `BPlusPerLayerCommand` + `PermutationFieldInsertCommand` | `MasstreeSliceLayeredCompositionCommand` |
+| §1.1 `LayerMixPattern` (P10 SuRF) | LOUDS-Dense + LOUDS-Sparse | `LoudsDenseEncodingCommand` + `LoudsSparseEncodingCommand` | `CutoffLevelLoudsCompositionCommand` |
+| §1.1 `LayerMixPattern` (P04 CoCo) | Macro-Levels + Patricia-Inner | `MacroNodeCollapseCommand` + `PatriciaInnerExpandCommand` + `SuccinctEncodingPoolCommand` | `CoCoLevelLDecisionCompositionCommand` |
+| §1.1 `LayerMixPattern` (P22 fpB+) | Disk-Tier + In-Page-Tier | `DiskTierTraversalCommand` + `CacheTierTraversalCommand` | `FractalHierarchicalCompositionCommand` |
+| §1.1 `InnerVsLeafPattern` (P02 HOT) | Compound-Inner + BiNode-Subtree | `CompoundContainerCommand` + `BiNodeSubtreeCommand` + `SingleMaskPartialKeyCommand` + `MultiMaskPartialKeyCommand` | `HOTCompoundCompositionCommand` |
+| §1.1 `InnerVsLeafPattern` (P19 Saikkonen α-Connected-Subgraph) | Inner-Layout + Leaf-Layout-Switch | `InnerSubgraphLayoutCommand` + `LeafSubgraphLayoutCommand` | `AlphaConnectedSubgraphCompositionCommand` |
+| §1.1 `HotVsColdPattern` (P28 Kuehn) | Hot-Path-Layout monolithisch | `LeafOnlyCounterCommand` + `RetroactiveAggregationCommand` + `GreedyHotPathLayoutCommand` | `KuehnHotPathOptimizationCompositionCommand` |
+| §1.1 `HotVsColdPattern` (P26 Zhang FGCS) | Path-Prefetcher-Table monolithisch | `CachePrefetcherCommand (CP)` + `PathPrefetcherCommand (PP)` + `MonitorPrefetcherCommand (MP)` | `ThreePrefetcherOrchestrationCompositionCommand` |
+| §1.1 `DynamicRebalancePattern` (P05 START) | Self-Tuning Multilevel monolithisch | `OfflineCostMeasureCommand` + `BellmanDPLayoutCommand` + `LkmRewireCommand` + `MultilevelRebuildCommand` | `STARTSelfTuningCompositionCommand` |
+| §1.1 `HierarchicalFractalPattern` (P22 fpB+) | Outer-Tier + Inner-Tier | (siehe oben) | (siehe oben) |
+| §1.1 `HierarchicalFractalPattern` (P15 B-Trees of Cache-Lines) | Cache-Line-Sub-Tree + Inter-Line-Tree | `IntraCachelineSubtreeCommand` + `InterCachelineTreeCommand` | `BTreesOfCachelinesCompositionCommand` |
+| §1.1 `HierarchicalFractalPattern` (P06 B²-Tree) | Outer-B+ + Inner-Decision/Span | `OuterBPlusPageCommand` + `DecisionPageStrategyCommand` + `SpanPageStrategyCommand` | `B2TreeRecursiveCommonPrefixCompositionCommand` |
+| §1.1 `MultiStrategyOrchestrationPattern` (P07 Wormhole) | Hash + B+ + LinkedList | `HashAnchorLookupCommand` + `BPlusHopLookupCommand` + `LeafLinkedListScanCommand` | `TripleLayerLookupCompositionCommand` |
+| §1.1 `MultiStrategyOrchestrationPattern` (P15 Strategy-Compatibility-Matrix) | Survey-Mix-Empfehlungen | (pro empfohlenem Mix eigene Composition) | `GraefeStrategyMixCompositionCommand` (parametriert) |
+| §1.1 `OrthogonalRuntimeParametrizedPattern` (P23 Khan) | Runtime-adaptive Prefetch | `BasePrefetchCommand` + `DistanceAdaptCommand` + `LoopUnrollAdaptCommand` | `KhanRuntimeAdaptiveCompositionCommand` |
+| §1.1 `OrthogonalRuntimeParametrizedPattern` (P14 ConfigurationTable) | Cost-Lookup-Table monolithisch | `NodeSizeSelectCommand` + `SearchMethodSelectCommand` + `ConfigurationLookupCommand` | `SamuelConfigurationTableCompositionCommand` |
+| §1.1 `HeterogeneousAdaptivePattern` (P20 B-Trees-Are-Back) | KeyAdaption + OperationAdaption Selector | `KeyAdaptionCommand` (mit `ComparisonSubCommand` + `FingerprintingSubCommand`) + `OperationAdaptionCommand` (mit `SDLSubCommand` + `FDLSubCommand`) | `BTreesAreBackHeterogeneousAdaptiveCompositionCommand` |
+| §1.1 `BoundaryNodePartitionPattern` (P20) | Sequential-Insert FDL-Special | `SplitPointSelectCommand` + `DenseLayoutPreserveCommand` | `SequentialInsertCompositionCommand` |
+| §2.1 `FractalBPlusStrategy (Disk-First / Cache-First)` (P22) | beide Modi | (siehe HierarchicalFractalPattern oben) | (siehe oben) |
+| §2.1 `EmbeddedSecondaryIndexStrategy (B²)` (P06) | Outer-B+ + Inner-Mini-Index | (siehe HierarchicalFractalPattern P06) | (siehe oben) |
+| §2.2 Trie-Familie (P03/P10/P02/P04) | (alle bereits oben) | ... | ... |
+| §3 (Singular Strategies) | sind atomare Strategie-Commands | — keine Aufloesung noetig — | — |
+| §4 IHeuristic | sind atomare Heuristik-Commands | — keine Aufloesung noetig — | — |
+
+**Permutations-Raum-Erweiterung durch Aufloesung:**
+
+Vor Aufloesung: 1 monolithische Hybrid-Strategie pro Eintrag
+Nach Aufloesung: N atomare Commands + M Composition-Variants pro Eintrag
+
+Beispiel P07 Wormhole: 1 → 3 Atome + 1 Composition = 4 Bausteine im Permutations-Raum, davon 3 einzeln testbar gegen andere Algorithmen (Hash gegen ART, B+-Hop gegen Masstree-B+, LinkedList-Scan gegen P21-Wide-Node).
+
+Diese Aufloesung erschliesst einen wesentlichen Teil der F15-Cross-Familien-Permutationen, der ohne Command-Pattern unzuganglich bliebe.
+
+**Verzeichnis-Anbindung:**
+```
+search_engine/strategies/commands/
+├── i_strategy_command.hpp                              (Command-Pattern Wurzel)
+├── hybrid_composition_command.hpp                      (Composite)
+├── i_composition_rule.hpp                              (sequenziell|parallel|conditional|recursive)
+├── pages/                                              (atomare Commands der Page-Strategien)
+├── traversals/                                         (atomare Commands der Traversal-Strategien)
+├── prefetchers/                                        (atomare Commands der Prefetch-Strategien)
+├── relocations/                                        (atomare Commands der Reloc-Strategien)
+└── compositions/                                       (HybridCompositionCommand-Konkretisierungen pro Hybrid-Quelle)
+    ├── masstree_slice_layered_composition.hpp
+    ├── cutoff_level_louds_composition.hpp
+    ├── coco_level_l_decision_composition.hpp
+    ├── fractal_hierarchical_composition.hpp
+    ├── hot_compound_composition.hpp
+    ├── alpha_connected_subgraph_composition.hpp
+    ├── kuehn_hot_path_optimization_composition.hpp
+    ├── three_prefetcher_orchestration_composition.hpp
+    ├── start_self_tuning_composition.hpp
+    ├── b_trees_of_cachelines_composition.hpp
+    ├── b2_tree_recursive_common_prefix_composition.hpp
+    ├── triple_layer_lookup_composition.hpp
+    ├── graefe_strategy_mix_composition.hpp
+    ├── khan_runtime_adaptive_composition.hpp
+    ├── samuel_configuration_table_composition.hpp
+    ├── b_trees_are_back_heterogeneous_adaptive_composition.hpp
+    └── sequential_insert_composition.hpp
+```
+
+---
+
+## §10 — Wirkung auf §6 (REV 3 Update-Vorschlaege)
+
+In §6 vermerkte Update-Vorschlaege fuer REV 3 werden um folgende Punkte aus K3 erweitert:
+
+- **K3.1 (IExecutingEngine):** Ergaenze `i_executing_engine.hpp` als Wurzel-Konzept ueber `i_search_engine.hpp` in REV 3.
+- **K3.3 (Cluster-Aufloesung):** Cluster-Bezeichnungen sind Lektuere-Hilfen, NICHT Architektur-Trennlinien. In REV 3 die Sektionen 2.1/2.2 als „Sammel-Bezeichner fuer Konfigurations-Pakete" markieren.
+- **K3.4 (Hybrid-Command-Pattern):** Pro Hybrid-Strategie Command-Pattern-Aufloesung Pflicht. Tabelle aus §9 in `12_algorithmus_strategie_taxonomie.md` ist die Referenz.

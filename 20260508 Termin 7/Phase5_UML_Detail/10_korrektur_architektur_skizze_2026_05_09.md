@@ -1,6 +1,206 @@
 # Korrektur-Architektur-Skizze 2026-05-09
 
-**Anlass:** User-Korrektur zur ersten drawio-Version (`phase5_uml_detail.drawio`) — meine UML war Achsen-Klassifikation (Page/Node/Traversal/...), aber der Architekt erwartet eine **hierarchische Concept-Architektur** mit zwei klar getrennten Saeulen.
+> **HINWEIS — Korrektur-Runde 3 (2026-05-10) ergaenzt am Anfang dieses Dokuments.**
+> Die ursprueng­liche REV-2-Skizze (Stand 2026-05-09) bleibt unten erhalten und wird durch die folgenden vier Korrekturen verfeinert. Es wird KEIN Inhalt geloescht — nur erweitert + an Schluesselstellen inline-praezisiert.
+
+---
+
+# KORREKTUR-RUNDE 3 (2026-05-10) — 4 Praezisierungen ohne Loeschen
+
+**Quelle:** Architekt-Korrektur 2026-05-10 nach Pruefung der Konsolidierungs-Dateien `11_cache_strategy_taxonomie.md`, `12_algorithmus_strategie_taxonomie.md`, `13_saeule_b_plattform_modell_konkretisierung.md` und der 6 Cluster-Dateien.
+
+## K3.1 — IExecutingEngine als Wurzel-Abstraktion ueber ISearchEngine
+
+**Heute:** Die Architektur kennt nur eine ISearchEngine als Konsumentin der CacheEngine.
+
+**Korrektur:** Die ISearchEngine ist eine SPEZIALISIERUNG einer allgemeineren `IExecutingEngine`. Andere Engines (z.B. ICompactingEngine, IDeduplicationEngine, IRetentionEngine, ...) werden in Zukunft ebenfalls die CacheEngine als Optimierungs-Service nutzen.
+
+```
+«concept» IExecutingEngine                              (allgemeine Wurzel-Abstraktion)
+   - holds: reference to CacheEngine (optional)         (CacheEngine wird zur Verfuegung gestellt)
+   - generic API: execute<Op>(operation : Op&) : Result
+   - exposes: telemetry hooks fuer DecisionLambdaTrees
+   - exposes: lifecycle (warm_up, reset, shutdown)
+   - subclasses are Engine-Familien
+
+«concept» ISearchEngine : IExecutingEngine               (Spezialisierung)
+   - composes: IRootPage, IFanout, INode, ISearchPage, ICachePage
+   - composes: ISearchPagesStrategy, ISearchPagesStrategyPattern, ISearchPageStrategy
+   - composes: ICacheStrategy (Visitor)
+   - subscribes: comdare::prt_art<K,V>::iterator family
+
+«concept» IFutureEngine : IExecutingEngine               (Platzhalter)
+   - z.B. ICompactingEngine, IDeduplicationEngine, ISortingEngine
+   - keine Implementierung in PRT-ART-Diplomarbeit, aber Architektur-Slot frei
+```
+
+**Verzeichnis-Korrektur (war: `search_engine/concepts/...`):**
+
+```
+executing_engine/                                         (NEU — Wurzel-Schicht)
+├── concepts/
+│   ├── i_executing_engine.hpp                            (Wurzel-Abstraktion)
+│   └── i_engine_lifecycle.hpp
+├── search_engine/                                        (Spezialisierung 1)
+│   ├── concepts/
+│   │   ├── i_search_engine.hpp  : public IExecutingEngine
+│   │   ├── i_root_page.hpp ... (alle Saeule-A-Concepts wie REV 2)
+│   │   └── iterators/...
+│   ├── adapters/                                         (siehe ext/<paper>/<repo>/)
+│   └── prt_art/
+│       └── pages/, nodes/, strategies/
+└── future_engines/                                       (Platzhalter, leer in PRT-ART)
+    └── README.md: "Architektur-Slot fuer kuenftige Engines, die CacheEngine nutzen"
+```
+
+**Wirkung auf REV-2-Saeule-A (unten):** `IRootPage` bleibt wie ist, aber das Wurzel-Konzept ist jetzt `IExecutingEngine` mit `ISearchEngine` als Konkretisierung. Der CacheEngine-Slot ist von der Wurzel `IExecutingEngine` aus zugaenglich (per Composition oder dependency injection).
+
+---
+
+## K3.2 — Cache-Engine: Plattform-AUTO-DISCOVERY statt plattform-spezifischer Klassen
+
+**Heute (FALSCH):** In `13_saeule_b_plattform_modell_konkretisierung.md` und in der Skizze werden konkrete Klassen wie `RyzenX3DProbe`, `IntelHybridProbe`, `X3DAwareFactory`, `IntelHybridPCoreScheduler` modelliert. Das ist eine konkrete Implementierung pro CPU-Generation.
+
+**Korrektur:** Die Cache-Engine darf KEINE plattform-spezifischen Klassen tragen. Stattdessen:
+
+1. **CacheEngineBuilder** fuehrt **Auto-Discovery** ALLER Cache-Eigenschaften der Plattform durch (Cache-Hierarchie, V-Cache-CCDs, Hybrid-Cores, Bandbreiten, ISA-Features).
+2. CacheEngineBuilder fuehrt **automatische Vermessung** der Eigenschaften durch (Latenzen, Bandbreiten, Cache-Coherence-Cost-Funktion).
+3. Daraus entstehen **klassifizierte Cache-Eigenschaften** als Properties (`PlatformProperty<T>`).
+4. Diese Properties werden den **kompilierten Such-Algorithmus-Permutationen als Konfigurations-Optionen bereitgestellt** (compile-time bei statischer Engine, runtime bei adaptive Engine).
+5. Die Cache-Engine waehlt SELBST die schnellste Rekombination der verfuegbaren Optionen.
+
+```
+«concept» IPlatformProbe                                 (allgemein, OHNE CPU-Spezialisierung)
+   - discover_cache_topology() : ICacheTopology
+   - discover_core_layout() : ICoreLayout
+   - discover_isa_features() : IIsaFeatureSet
+   - discover_interconnect() : IBusTopology
+   - measure_cache_latencies() : map<TierPair, Cycles>
+   - measure_bandwidths() : map<InterconnectId, Gbps>
+   - measure_cache_coherence_cost() : CoherenceCostFunction
+   - measure_pinning_effects() : map<PinningPolicy, Speedup>
+                                  (probiert ALLE moeglichen Pinning-Varianten + misst)
+
+«concept» IPlatformPropertyClassifier                    (NEU — die Konsequenz aus Auto-Discovery)
+   - classify(probe_results) : PlatformPropertySet
+   - PlatformPropertySet enthaelt z.B.:
+       * has_asymmetric_l3 : bool   (entdeckt durch Vermessung, nicht via "Ryzen X3D")
+       * has_hybrid_cores  : bool   (entdeckt, nicht via "Intel Hybrid")
+       * preferred_pinning : PinningPolicy  (gewaehlt aus Vermessungs-Ergebnis)
+
+«concept» ICacheEngineOptionPublisher                    (NEU — Bereitstellung an Permutationen)
+   - publish_options_to(permutation_modules : list) : void
+   - jede Permutation erhaelt nur die Optionen, die ihre Bausteine
+     tatsaechlich konsumieren koennen (compile-time-gefiltert via Concepts)
+```
+
+**Korrektur-Beispiele in `13_saeule_b_plattform_modell_konkretisierung.md`:**
+
+| Bisheriger Eintrag (FALSCH) | Korrigierter Eintrag (RICHTIG) |
+|-----------------------------|--------------------------------|
+| `RyzenX3DProbe` Klasse | `IPlatformProbe` entdeckt `cache_topology.l3_per_ccd` Map mit verschiedenen Werten ⇒ `has_asymmetric_l3 = true` als Property |
+| `IntelHybridProbe` Klasse | `IPlatformProbe` entdeckt `core_layout.core_classes` mit mehreren Klassen ⇒ `has_hybrid_cores = true` als Property |
+| `X3DAwareFactory` | `IPlatformPropertyClassifier` liefert `preferred_pinning = LARGEST_L3_CCD` (gewaehlt durch Messung, nicht hard-coded) |
+| `X3DVCachePinningHeuristic` | `LargestL3CcdPinningHeuristic` (allgemeine Heuristik fuer asymmetrisches L3, nicht CPU-spezifisch) |
+| `IntelHybridPCoreRoutingHeuristic` | `HotPathOnHighIpcCoreHeuristic` (allgemeine Heuristik fuer Cores mit hoeherer IPC, nicht CPU-spezifisch) |
+
+**Wirkung:** Block AO (Production-Plattform Ryzen 9950X3D + i9-14900KS) bleibt als KONKRETIONS-BEISPIEL fuer die Auto-Discovery — die Plattformen werden vom IPlatformProbe entdeckt, nicht hard-coded modelliert. Die CacheEngine ist generisch fuer JEDE Plattform.
+
+---
+
+## K3.3 — Cluster-Aufloesung: A + B = EINE Familie (Algorithmus-Konfigurationspakete)
+
+**Heute (FALSCH):** Cluster A (Trie-Familie) und Cluster B (Hybrid + B+-Familie) werden als unterschiedliche Familien dargestellt. Das gilt fuer den klassischen Sprachgebrauch (Trie vs B+).
+
+**Korrektur:** Die Forschungs-These der Diplomarbeit ist gerade, dass diese „Familien" nur unterschiedliche **Rekombinations-Pakete** der gleichen atomaren Bausteine sind. Was klassisch als „Trie" bezeichnet wird, ist heute eine **zusammengesetzte Strategie** aus einem Basis-Subset von Methoden-Bausteinen, die wir in dieser Arbeit:
+- aufschluesseln,
+- einzeln verallgemeinert vergleichen,
+- gegen die Bausteine anderer „Familien" austauschen koennen.
+
+**Konsequenz fuer die Cluster-Files (`cluster_A_trie.md`, `cluster_B_hybrid_bplus.md`):**
+- Inhaltlich nichts loeschen.
+- Hinzufuegen: Einleitungs-Hinweis „**Diese Cluster-Bezeichnungen sind nur das Gruppierungs-Werkzeug fuer die Lektuere — die hier gelisteten Algorithmen sind Konfigurations-Pakete, deren atomare Bausteine in `11_cache_strategy_taxonomie.md` und `12_algorithmus_strategie_taxonomie.md` einzeln katalogisiert sind**".
+
+**Konsequenz fuer `12_algorithmus_strategie_taxonomie.md`:**
+- Im B+- bzw. Trie-Familien-Abschnitt der `ISearchPagesStrategy`-Liste eine Vorbemerkung einfuegen, dass die Familien-Bezeichnungen `BPlus*Strategy` / `Trie*Strategy` Sammel-Bezeichner sind, deren Bausteine ueber die Pattern + Page-Strategy + Heuristic-Achsen frei rekombiniert werden koennen.
+
+**Konsequenz fuer `11_cache_strategy_taxonomie.md`:**
+- Die 29 Familien sind genau die schichtweise Zerlegung der Rekombinatorik — die Taxonomie ist also bereits korrekt strukturiert.
+- Hinzufuegen: Einleitungs-Hinweis dass die Familien orthogonal zu den Algorithmus-Paketen sind und ueber alle Paket-Bezeichnungen hinweg permutierbar.
+
+---
+
+## K3.4 — Hybrid-Familien IMMER als Command-Pattern aufgliedern
+
+**Heute (TEILWEISE):** Einige Hybrid-Strategien (z.B. LOUDS-Dense + LOUDS-Sparse Cutoff in P10 SuRF, HOT-Compound mit BiNode-Subtree in P02, B²-Tree Decision-Page + Span-Page in P06, Wormhole Triple-Layer Hash+B+/LinkedList in P07) sind in den Familien als monolithische Hybrid-Konzepte vermerkt.
+
+**Korrektur:** Bei JEDER Hybrid-Familie aus mehreren direkt zusammengeschlossenen Strategien:
+1. **Aufgliedern** in einzelne atomare Strategien (Command-Objekte)
+2. **Zusammensetzen** unter einem **generellen Command-Pattern** (HybridCompositionCommand)
+3. **Einzeln testbar** machen — jeder Bestandteil als eigenstaendiger Permutations-Baustein
+4. **Konkret benennen** der atomaren Bestandteile und des Composition-Commands
+
+**Schema:**
+```
+«abstract» IStrategyCommand                              (Command-Pattern Wurzel)
+   + execute(context : StrategyContext&) : Result
+   + can_compose_with(other : IStrategyCommand&) : bool
+
+«composite» HybridCompositionCommand : IStrategyCommand  (NEU — Sammler)
+   - parts : vector<IStrategyCommand*>
+   - composition_rule : ICompositionRule           (sequenziell, parallel, conditional ...)
+   + execute(context) : Result                     (orchestriert die Bestandteile)
+```
+
+**Konkrete Hybrid → Command-Pattern Aufloesungen (Pflicht-Pruefung in 11/12):**
+
+| Quelle | Bisher monolithisch | Zerlegen in atomare Commands | Hybrid-Composition |
+|--------|---------------------|------------------------------|--------------------|
+| P10 SuRF Dense+Sparse | `LOUDSDenseSparseHybridStrategy` | `LoudsDenseEncodingCommand` + `LoudsSparseEncodingCommand` | `CutoffLevelLoudsCompositionCommand` (mit Cutoff-R-Decision) |
+| P02 HOT Compound+BiNode | `HOTCompoundHybridStrategy` | `CompoundContainerCommand` + `BiNodeSubtreeCommand` + `PartialKeyMaskingCommand` (Single+Multi) | `HOTCompoundCompositionCommand` |
+| P07 Wormhole Hash+B++LL | `WormholeTripleLayerHybridStrategy` | `HashAnchorLookupCommand` + `BPlusHopLookupCommand` + `LeafLinkedListScanCommand` | `TripleLayerLookupCompositionCommand` |
+| P06 B²-Tree Decision+Span | `B2TreeDecisionSpanHybridStrategy` | `DecisionPageStrategyCommand` + `SpanPageStrategyCommand` | `B2TreeRecursiveCommonPrefixCompositionCommand` (gem. P06 Sec. 3.1.1) |
+| P04 CoCo Macro+Patricia | `CoCoMacroPatriciaHybridStrategy` | `MacroNodeCollapseCommand` + `PatriciaInnerExpandCommand` + `SuccinctEncodingPoolCommand` | `CoCoLevelLDecisionCompositionCommand` |
+| P03 Masstree Slice+B+ | `MasstreeSliceBPlusHybridStrategy` | `SliceLayerJumpCommand` + `BPlusPerLayerCommand` + `PermutationFieldInsertCommand` | `MasstreeSliceLayeredCompositionCommand` |
+| P20 B-Trees-Are-Back KeyAdapt+OpAdapt | `BTreesAreBackAdaptiveSelectorHybrid` | `KeyAdaptionCommand` (mit Comparison/Fingerprinting Sub-Commands) + `OperationAdaptionCommand` (mit SDL/FDL Sub-Commands) | `BTreesAreBackHeterogeneousAdaptiveCompositionCommand` |
+| P28 Kuehn (NEU 2026-05-08) Hot-Path-Layout | `HotPathLayoutHybrid` | `LeafOnlyCounterCommand` + `RetroactiveAggregationCommand` + `GreedyHotPathLayoutCommand` | `KuehnHotPathOptimizationCompositionCommand` |
+| P22 Chen Fractal Disk+Cache | `FractalDualTierHybrid` | `DiskTierTraversalCommand` + `CacheTierTraversalCommand` + `DualJumpPointerArrayCommand` | `FractalHierarchicalCompositionCommand` |
+| P26 Zhang FGCS 3 Prefetcher | `ThreePrefetcherMixHybrid` | `CachePrefetcherCommand (CP)` + `PathPrefetcherCommand (PP)` + `MonitorPrefetcherCommand (MP)` | `ThreePrefetcherOrchestrationCompositionCommand` |
+| P25 Mahling Coro Full+Half-Node | `MahlingCoroutinedPrefetchHybrid` | `CoroutinedFullNodePrefetchCommand` + `CoroutinedHalfNodePrefetchCommand` | `CoroutineSelectionCompositionCommand` |
+| P19 Saikkonen Local + Global Reloc | `SaikkonenLocalGlobalRelocHybrid` | `LocalRelocationCommand` (wait-free) + `GlobalRelocationCommand` (BFS-Periodic) | `LayoutInvariantCompositionCommand` |
+| ... | (alle weiteren Familien aus 11+12 systematisch pruefen) | ... | ... |
+
+**Vorteil der Auflosung:**
+- Permutations-Raum-Erweiterung: Statt 1 monolithischer Strategie haben wir N atomare Bausteine pro Hybrid + 1 Composition-Variante.
+- Einzeln testbare Atome: Beweis dass die Composition-Wirkung tatsaechlich aus einer bestimmten atomaren Komponente stammt (Ablations-Studien moeglich).
+- Wir verpassen sonst genau die Einzelergebnis-Rekombinationen, auf die F15-Kern-These der Diplomarbeit zielt.
+
+**Konsequenz fuer 11_cache_strategy_taxonomie.md:** Pro hybrid-erkannter Familie eine zusaetzliche Zeile „Command-Pattern-Aufloesung: ..." mit den atomaren Bausteinen + Composition-Command.
+
+**Konsequenz fuer 12_algorithmus_strategie_taxonomie.md:** Pro hybrid-erkannter Strategy/Pattern eine zusaetzliche Zeile gleicher Form. Plus eine neue Sektion „§9 — Hybrid-Command-Pattern-Konvention" als Zusammenfassung.
+
+---
+
+## K3.X — Aenderungs-Liste (Konsequenzen aus K3.1-K3.4)
+
+| Datei | Aenderungs-Typ | Inhalt |
+|-------|----------------|--------|
+| `10_korrektur_architektur_skizze...md` | Erweiterung am Anfang | Diese 4 Korrekturen + inline-Hinweise an Schluesselstellen |
+| `11_cache_strategy_taxonomie.md` | Inline-Hinweise | Pro Hybrid-Familie: Command-Pattern-Aufloesung in einer Tabellen-Zeile |
+| `12_algorithmus_strategie_taxonomie.md` | Inline-Hinweise + neue Sektion §9 | Cluster-Aufloesungs-Vorbemerkung (B+/Trie sind Konfigurations-Pakete) + Hybrid-Command-Pattern-Konvention |
+| `13_saeule_b_plattform_modell_konkretisierung.md` | Inline-Korrektur | Plattform-spezifische Klassen entfernen / umbenennen in allgemeine Auto-Discovery-Concepts; Block AO als Beispiel-Konkretion fuer die Auto-Discovery |
+| `_paper_extractions/cluster_A_trie.md` | Einleitungs-Hinweis | „Sammelbezeichnung fuer Lektuere — Bausteine sind in 11/12 atomar verfuegbar" |
+| `_paper_extractions/cluster_B_hybrid_bplus.md` | Einleitungs-Hinweis | dito |
+
+KEINE Loeschungen — alle Inhalte bleiben + werden ergaenzt.
+
+---
+
+# REV 2 SKIZZE (UNVERAENDERT — Stand 2026-05-09)
+
+## Anlass (REV 2)
+
+User-Korrektur zur ersten drawio-Version (`phase5_uml_detail.drawio`) — meine UML war Achsen-Klassifikation (Page/Node/Traversal/...), aber der Architekt erwartet eine **hierarchische Concept-Architektur** mit zwei klar getrennten Saeulen.
 
 **Stand REV 2 (2026-05-09 nachmittag):** Diese Skizze enthaelt Architekt-Korrekturen Runde 2:
 1. Multiplizitaeten praezisiert (siehe §1.2)

@@ -1,5 +1,7 @@
 # Cluster B - Hybrid + B+-Familie
 
+> ⚠ **KORREKTUR-RUNDE 3 (2026-05-10):** Die Cluster-Bezeichnung „Hybrid + B+-Familie" ist eine Lektuere-Gruppierung — die hier gelisteten Algorithmen sind **Konfigurations-Pakete**, deren atomare Bausteine in `11_cache_strategy_taxonomie.md` und `12_algorithmus_strategie_taxonomie.md` einzeln katalogisiert sind und ueber Cluster-Grenzen hinweg permutierbar bleiben. Zusammen mit Cluster A (Trie) bilden sie architektonisch EINE Familie der Algorithmus-Konfigurations-Pakete. Hybrid-Konkretisierungen (z.B. P07 Wormhole Triple-Layer Hash+B++LinkedList, P06 B²-Tree Decision+Span, P03 Masstree Slice-Trie+B+) werden via **Command-Pattern** in atomare Strategy-Commands zerlegt + unter `HybridCompositionCommand` zusammengesetzt — siehe `10_korrektur_architektur_skizze...md` §K3.3 + §K3.4.
+
 Dokument: Tiefe Lektuere von 6 Forschungspapern (P03 Masstree, P06 B^2-Tree, P07 Wormhole, P11 CSS-Tree, P12 CSB+-Tree, P13 Hankins/Patel) zur Verallgemeinerung von Cache- und Algorithmus-Strategien unter den Concept-Daechern der korrigierten REV-2-Architektur.
 
 Bezugsarchitektur:

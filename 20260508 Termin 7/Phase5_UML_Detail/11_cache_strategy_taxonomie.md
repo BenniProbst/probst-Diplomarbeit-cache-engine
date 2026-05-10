@@ -1,7 +1,37 @@
 # Cache-Strategien-Taxonomie (Konsolidierung aus 33 Papern)
-**Stand:** 2026-05-09
+**Stand:** 2026-05-09 (REV 1) · Korrektur-Runde 3 ergaenzt 2026-05-10
 **Quelle:** _paper_extractions/cluster_A-F.md
 **Architektur-Bezug:** REV 2 Concept-Hierarchie, Saeule A (ICacheStrategy = VISITOR: BaseEngineStrategy | CacheEngineStrategy)
+
+---
+
+## ⚠ KORREKTUR-RUNDE 3 (2026-05-10) — Hybrid-Command-Pattern + Familien-Orthogonalitaet
+
+**Bezug:** `10_korrektur_architektur_skizze_2026_05_09.md` Sektionen K3.3 + K3.4
+
+### K3.3-Wirkung — Familien-Orthogonalitaet zu Algorithmus-Paketen
+
+Die 29 Cache-Strategie-Familien F1-F29 unten sind die schichtweise Zerlegung der Rekombinatorik gemaess Architekt-Bestaetigung 2026-05-10. Das bedeutet:
+
+- Die Familien sind **orthogonal zu den klassischen Algorithmus-„Familien"** (Trie, B+, Hybrid).
+- Ein „Trie"-Algorithmus (z.B. P01 ART) konfiguriert eine bestimmte Auswahl der 29 Familien (z.B. F1 AdaptiveFootprint + F3 CacheLineAligned + F7 SimdAccelerated + ...).
+- Ein „B+-Algorithmus" (z.B. P12 CSB+) konfiguriert eine andere Auswahl (z.B. F2 SuccinctEncoding partial-pointer + F3 CacheLineAligned + ...).
+- Cross-Algorithmus-Permutationen (Trie-Page + B+-Layout + LOUDS-Encoding + Hot-Path-Heuristic) sind durch die Orthogonalitaet der 29 Familien **architekturell vorgesehen** und sind das Kern-Forschungs-Ziel (F15).
+- Cluster-A (Trie-Familie) und Cluster-B (Hybrid + B+-Familie) der Lektuere sind reine Lektuere-Gruppierung — die hier extrahierten Familien sind ueber alle Cluster permutierbar.
+
+### K3.4-Wirkung — Hybrid-Familien IMMER Command-Pattern-zerlegen
+
+Etliche Familien unten enthalten **Hybrid-Konkretisierungen**: monolithisch beschriebene Strategien, die intern aus mehreren atomaren Bausteinen bestehen. Beispiele:
+- F2 `ISuccinctEncodingStrategy`: P10 SuRF (LOUDS-Dense + LOUDS-Sparse Hybrid)
+- F2: P04 CoCo (Pool aus EF+PA+BV+DE-Encodings)
+- F1 `IAdaptiveFootprintStrategy`: P02 HOT (Single-Mask + Multi-Mask-Hybrid mit 9 Layout-Varianten)
+- F4 `IMultiCacheLineNodeStrategy`: P22 Fractal (in-page Tree mit adaptive Width pro Tier — Disk-Tier + Cache-Tier)
+- F5 `ISoftwarePrefetchStrategy`: P26 Zhang Index (3 Prefetcher-Komponenten CP+PP+MP)
+- ... (weitere Hybrid-Eintraege siehe systematische Pruefung in §10 unten)
+
+Diese Hybrid-Konkretisierungen werden in atomare **Strategy-Commands** zerlegt + unter einem **HybridCompositionCommand** zusammengesetzt. Die atomaren Commands sind einzeln testbar und einzeln im Permutations-Raum rekombinierbar — sonst wuerden wir die F15-Cross-Familien-Permutationen verpassen.
+
+Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **§10 Hybrid-Command-Pattern-Aufloesungen pro Familie** unten am Ende dieses Dokuments.
 
 ---
 
@@ -528,3 +558,53 @@ Aus den paper-spezifischen OFFEN-Listen sind die folgenden Punkte fuer die Diplo
 - **Multi-Level-Local-Relocation** (P19 Sektion 6) — als nicht-trivial diskutiert; Diplomarbeits-Forschungspotenzial.
 - **Probability-weighted Trie-Layout** (P16-Methode auf Cluster A) — bisher nicht in Trie-Literatur angewendet.
 - **`ITopologyEncoding` als orthogonal-zu-Layout** — fundamentale Concept-Trennung, die in REV 2 fehlt.
+
+---
+
+## §10 — Hybrid-Command-Pattern-Aufloesungen pro Cache-Strategie-Familie (Korrektur-Runde 3, 2026-05-10)
+
+**Bezug:** `10_korrektur_architektur_skizze...md` §K3.4 + `12_algorithmus_strategie_taxonomie.md` §9
+
+**Pruefungs-Ergebnis pro Familie F1-F29:**
+
+| Familie | Hybrid-Konkretisierungen | Atomare Strategy-Commands | HybridCompositionCommand |
+|---------|--------------------------|---------------------------|--------------------------|
+| **F1 IAdaptiveFootprintStrategy** | P02 HOT (9 Layout-Varianten Single-Mask + Multi-Mask × {8,16,32}) | `SingleMask8PKEYCommand` + `SingleMask16PKEYCommand` + `SingleMask32PKEYCommand` + `MultiMask8x8Command` + ... + `MultiMask32x32Command` (9 Atom-Commands) | `HOTAdaptiveLayoutSelectionCompositionCommand` |
+| F1 | P05 START Multilevel + Rewired | `MultilevelNodeCommand` + `RewiredVirtualPhysicalCommand` + `Multinode4Command` | `STARTAdaptiveCompositionCommand` |
+| F1 | P12 CSB+ (Segmented + Full + Basic) | `SegmentedAllocationCommand` + `FullPreallocatedCommand` + `BasicSinglePointerCommand` | `CSBPlusAllocationModeCompositionCommand` |
+| F1 | P14 ConfigurationTable | (in §9 oben aufgeloest) | `SamuelConfigurationTableCompositionCommand` |
+| F1 | P20 KeyAdaption + OperationAdaption | (in §9 oben aufgeloest) | `BTreesAreBackHeterogeneousAdaptiveCompositionCommand` |
+| F1 | P28 HotPathLayout | (in §9 oben aufgeloest) | `KuehnHotPathOptimizationCompositionCommand` |
+| **F2 ISuccinctEncodingStrategy** | P10 SuRF (LOUDS-Dense + LOUDS-Sparse) | (in §9 oben aufgeloest) | `CutoffLevelLoudsCompositionCommand` |
+| F2 | P04 CoCo (Pool aus EF + PA + BV + DE) | `EliasFanoEncodingCommand` + `PackedArrayEncodingCommand` + `BitvectorEncodingCommand` + `DenseEncodingCommand` | `CoCoEncodingPoolCompositionCommand` |
+| F2 | P11 CSS-Tree Pointer-Elimination | (atomar — keine Aufloesung noetig) | — |
+| F2 | P12 CSB+ Partial-Pointer-Elimination | (atomar — keine Aufloesung noetig) | — |
+| **F3 ICacheLineAlignedStrategy** | (alle Konkretisierungen sind atomare Cache-Line-Aligning-Strategien) | — keine Aufloesung noetig — | — |
+| **F4 IMultiCacheLineNodeStrategy** | P22 Fractal (in-page Tree mit adaptive Width pro Tier) | (in §9 oben aufgeloest) | `FractalHierarchicalCompositionCommand` |
+| F4 | P21 Chen pB+ (Wide-Node + JumpPointerArray + ChunkedLinkedList) | `WideNodePrefetchCommand` + `JumpPointerArrayPrefetchCommand` + `ChunkedLinkedListHintCommand` | `ChenPrefetchedBPlusCompositionCommand` |
+| F4 | P13 Hankins/Patel (Cost-Modell-getriebene Knotengroesse) | `CostModelEvaluationCommand` + `NodeSizeSelectionCommand` + `LargeNodePrefetchCommand` | `HankinsPatelCostModelCompositionCommand` |
+| **F5 ISoftwarePrefetchStrategy** | P26 Zhang Index (3 Prefetcher-Komponenten CP+PP+MP) | (in §9 oben aufgeloest) | `ThreePrefetcherOrchestrationCompositionCommand` |
+| F5 | P22 Fractal (DualJumpPointerArray fuer Cache + Disk) | (Teil der FractalHierarchical-Aufloesung) | (siehe F4) |
+| F5 | P25 Mahling Coro (Full-Node + Half-Node) | `CoroutinedFullNodePrefetchCommand` + `CoroutinedHalfNodePrefetchCommand` | `CoroutineSelectionCompositionCommand` |
+| F5 | P14 Itanium (lfetch + TwoNodesAheadRangeScan) | `LfetchExplicitCommand` + `RangeScanLookaheadCommand` | `ItaniumPrefetchCompositionCommand` |
+| F5 | P15 Graefe Survey (Multi-Cache-Line + Indirection-Vector + Multi-Record) | `MultiCacheLinePrefetchCommand` + `IndirectionVectorCommand` + `MultiRecordHintCommand` + `PostLocationCheckCommand` | `GraefePrefetchSurveyCompositionCommand` |
+| F5 | P21 (WideNodePrefetch + JumpPointerArrayPrefetch) | (siehe F4 P21) | (siehe F4) |
+| **F6 IPointerChasingResolutionStrategy** | P22 Fractal (Dual JumpPointer Cache+Disk) | (in F4 aufgeloest) | (siehe F4) |
+| F6 | P26 Zhang JumpPointerQueue (MVCC) | `JumpPointerQueueCommand` + `MvccVersionChainCommand` + `TwoAheadLookupCommand` | `ZhangFGCSPointerResolutionCompositionCommand` |
+| **F7 ISimdAcceleratedLookupStrategy** | (Konkretisierungen sind atomare SIMD-Strategien — meist keine Hybrid-Aufloesung noetig) | — keine Aufloesung noetig — | — |
+| F7 | P02 HOT (BMI2 PEXT + AVX2 + Single-Mask + Multi-Mask) | (Bestandteil von F1 HOT-Aufloesung) | (siehe F1 HOT) |
+| **F8-F29** (Pruefung pro Familie) | meist atomare Strategien (KEINE Aufloesung noetig) — Ausnahmen pro Familie unten gelistet | ... | ... |
+| **F-Concurrency-Familien** (z.B. F-Sync) | P19 Saikkonen Local + Global Reloc | `LocalRelocationCommand` (wait-free) + `GlobalRelocationCommand` (BFS-Periodic) | `LayoutInvariantCompositionCommand` |
+| **F-Composition-uebergreifend** (Cross-Familie) | Wormhole P07 (Hash + B+ + LinkedList) | (in §9 aufgeloest, weil cross-family) | `TripleLayerLookupCompositionCommand` |
+| **F-Composition-uebergreifend** | Masstree P03 (Slice-Trie + B+-pro-Layer) | (in §9 aufgeloest, weil cross-family) | `MasstreeSliceLayeredCompositionCommand` |
+| **F-Composition-uebergreifend** | B²-Tree P06 (Outer-B+ + Inner-Decision/Span) | (in §9 aufgeloest, weil cross-family) | `B2TreeRecursiveCommonPrefixCompositionCommand` |
+
+**Anmerkungen zur systematischen Pruefung:**
+- Wo §9 in 12_algorithmus_strategie_taxonomie.md eine Aufloesung bereits dokumentiert, wird hier nur referenziert (keine Doppelung).
+- F8-F29 sind ueberwiegend atomare Strategien (z.B. CacheLineAligned, RankSelectPrimitive, NUMA-Local-Allocator, SIMD-Compare). Wo Hybrid-Konkretisierungen existieren (z.B. Multi-Tier-Allocator), gilt das Schema analog.
+- Die exakte Sub-Command-Granularitaet ist Phase-6+-Implementations-Aufgabe — die Aufloesungs-Vorschlaege hier sind Architektur-Slots.
+
+**Permutations-Raum-Auswirkung der Aufloesung:**
+- Vor: 29 monolithische Familien × wenige Konkretisierungen = ~100 Bausteine
+- Nach: 29 Familien × atomare Commands × Composition-Varianten = ~250-300 Bausteine
+- → Permutations-Raum **3x groesser**, mit **vielfach mehr Cross-Familien-Permutationen** zugaenglich (F15-Forschungs-Ziel)
