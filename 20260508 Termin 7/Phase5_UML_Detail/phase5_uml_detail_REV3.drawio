@@ -1,0 +1,280 @@
+<mxfile host="app.diagrams.net" modified="2026-05-10T00:00:00.000Z" agent="Mozilla/5.0" version="24.0.0" type="device">
+  <diagram id="01_executing_engine" name="01 IExecutingEngine + Spezialisierungen (NEU REV 3)">
+    <mxGraphModel dx="2200" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_ee" value="01 IExecutingEngine — Wurzel-Abstraktion (NEU REV 3, K3.1)&#xa;Andere Engines koennen kuenftig CacheEngine als Optimierungs-Service nutzen" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2120" height="60" as="geometry" /></mxCell>
+        <mxCell id="iexec" value="«concept» IExecutingEngine&#xa;━━━━━━━━━━━━━━━━━&#xa;- cache_engine : CacheEngine&amp; [optional]&#xa;━━━━━━━━━━━━━━━━━&#xa;+ execute&lt;Op&gt;(operation : Op&amp;) : Result&#xa;+ telemetry_hooks() : ObserverSlots&#xa;+ warm_up() / reset() / shutdown()&#xa;━━━━━━━━━━━━━━━━━&#xa;Wurzel fuer ALLE Engines, die CacheEngine konsumieren" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="120" width="500" height="200" as="geometry" /></mxCell>
+        <mxCell id="isearch" value="«concept» ISearchEngine : IExecutingEngine&#xa;━━━━━━━━━━━━━━━━━&#xa;PRT-ART Diplomarbeit-Fokus&#xa;━━━━━━━━━━━━━━━━━&#xa;composes:&#xa; - IRootPage, IFanout, INode&#xa; - ISearchPage, ICachePage&#xa; - ICacheStrategy (Visitor)&#xa; - ISearchPagesStrategy (+Pattern)&#xa; - ISearchPageStrategy&#xa;━━━━━━━━━━━━━━━━━&#xa;exposes: comdare::prt_art&lt;K,V&gt;::iterator-Familie" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="200" y="400" width="500" height="220" as="geometry" /></mxCell>
+        <mxCell id="ifuture" value="«concept» IFutureEngine : IExecutingEngine&#xa;━━━━━━━━━━━━━━━━━&#xa;Architektur-Slot — leer in PRT-ART&#xa;━━━━━━━━━━━━━━━━━&#xa;Zukunftige Konkretisierungen, z.B.:&#xa; - ICompactingEngine&#xa; - IDeduplicationEngine&#xa; - ISortingEngine&#xa; - IRetentionEngine&#xa;━━━━━━━━━━━━━━━━━&#xa;Alle nutzen CacheEngine analog" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7986CB;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="400" width="500" height="220" as="geometry" /></mxCell>
+        <mxCell id="cacheengine_ref" value="«singleton» CacheEngine&#xa;(siehe Tab 07-09 Ebene 3)&#xa;━━━━━━━&#xa;Optimierungs-Service fuer alle IExecutingEngine-Konsumenten" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#303F9F;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="800" y="700" width="500" height="120" as="geometry" /></mxCell>
+        <mxCell id="dir_box" value="Verzeichnis-Struktur REV 3:&#xa;executing_engine/&#xa;├── concepts/i_executing_engine.hpp&#xa;├── search_engine/&#xa;│   ├── concepts/...&#xa;│   ├── strategies/commands/...&#xa;│   ├── adapters/...&#xa;│   └── prt_art/...&#xa;└── future_engines/  (leer, Architektur-Slot)" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fillColor=#FFF9C4;" vertex="1" parent="1">
+          <mxGeometry x="200" y="700" width="500" height="180" as="geometry" /></mxCell>
+        <mxCell id="e1" style="endArrow=block;endFill=0;html=1;" edge="1" parent="1" source="isearch" target="iexec"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="endArrow=block;endFill=0;html=1;" edge="1" parent="1" source="ifuture" target="iexec"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="endArrow=open;startArrow=none;html=1;dashed=1;" edge="1" parent="1" source="iexec" target="cacheengine_ref"><mxGeometry relative="1" as="geometry" /><mxCell value="konsumiert (optional)" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="02_search_engine_concepts" name="02 Search Engine — Concept-Hierarchie">
+    <mxGraphModel dx="2400" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_se" value="02 Search Engine — Concept-Hierarchie (Saeule A korrigiert REV 3)&#xa;IPage → IRootPage → IFanout → INode → ISearchPage → ICachePage (via ICacheStrategy)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2320" height="60" as="geometry" /></mxCell>
+        <mxCell id="ipage" value="«concept» IPage&lt;P&gt;&#xa;━━━━━━━&#xa;Top-Abstraktion: jede „Seite" eines Algorithmus&#xa;━━━━━━━&#xa;+ lookup(key) : LookupResult&#xa;+ insert(key, value) : InsertResult&#xa;+ bytes() : span&lt;byte&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="320" height="140" as="geometry" /></mxCell>
+        <mxCell id="iroot" value="«concept» IRootPage&lt;R&gt; : IPage&#xa;━━━━━━━&#xa;Algorithmus-Wurzel — Einstiegspunkt&#xa;━━━━━━━&#xa;composes 1 IFanout" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="300" width="320" height="120" as="geometry" /></mxCell>
+        <mxCell id="ifan" value="«concept» IFanout&lt;F&gt;&#xa;━━━━━━━&#xa;Verzweigungs-Abstraktion&#xa;━━━━━━━&#xa;composes [N] INode  via «contains»&#xa;has EXACTLY 1 ISearchPagesStrategyPattern&#xa;★ K3.4 Multiplizitaet ★" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="500" y="300" width="380" height="160" as="geometry" /></mxCell>
+        <mxCell id="inode" value="«concept» INode&lt;N&gt;&#xa;━━━━━━━&#xa;Verzweigungs-/Daten-Einheit&#xa;━━━━━━━&#xa;placed on ISearchPage&#xa;via «mapped via ISearchPageStrategy»" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="940" y="300" width="320" height="140" as="geometry" /></mxCell>
+        <mxCell id="ispage" value="«concept» ISearchPage&lt;S&gt;&#xa;━━━━━━━&#xa;Logische Such-Seite&#xa;━━━━━━━&#xa;contains [N] INode&#xa;mapped onto ICachePage[s]&#xa;via «ICacheStrategy»" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="300" width="320" height="160" as="geometry" /></mxCell>
+        <mxCell id="icpage" value="«concept» ICachePage&lt;C&gt;&#xa;━━━━━━━&#xa;Physische Speicher-Repraesentation&#xa;━━━━━━━&#xa;- size : size_t&#xa;- cache_line_formation : CacheLineFormation&#xa;- influenced_by : CacheEngine" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="300" width="320" height="160" as="geometry" /></mxCell>
+        <mxCell id="iss" value="«concept» ISearchPageStructure&lt;SS&gt;&#xa;━━━━━━━&#xa;Container fuer mehrere ISearchPage&#xa;contains [N] ISearchPage in geordneter Abfolge" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="540" width="380" height="120" as="geometry" /></mxCell>
+        <mxCell id="isps" value="«concept» ISearchPagesStrategy&lt;SPS&gt;&#xa;━━━━━━━&#xa;POLICY: Structure-Pflege fuer key-value-Eintraege&#xa;━━━━━━━&#xa;+ controls: insertion / removal / re-ordering&#xa;+ delegates per-page via ISearchPagesStrategyPattern" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="540" y="540" width="500" height="160" as="geometry" /></mxCell>
+        <mxCell id="ispsp" value="«concept» ISearchPagesStrategyPattern&lt;SSP&gt;&#xa;★★ K3.4 Multiplizitaet ★★&#xa;━━━━━━━&#xa;1 ISearchPagesStrategyPattern pro IFanout&#xa;has N ISearchPageStrategy (1 pro ISearchPage)&#xa;━━━━━━━&#xa;Beispiele (siehe 12 §1.1):&#xa; AllPagesUniform, LayerMix, InnerVsLeaf,&#xa; HotVsCold, DynamicRebalance,&#xa; HierarchicalFractal, MultiStrategyOrch., ..." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F57C00;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="540" width="500" height="240" as="geometry" /></mxCell>
+        <mxCell id="isps_single" value="«concept» ISearchPageStrategy&lt;SP&gt;&#xa;★ K3.4 Multiplizitaet ★&#xa;━━━━━━━&#xa;1 ISearchPageStrategy pro 1 ISearchPage&#xa;ISearchPagesStrategyPattern hat N davon&#xa;━━━━━━━&#xa;+ controls: where in the page key-value goes&#xa;+ controls: when to split/merge the page&#xa;+ controls: layout invariants" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F57C00;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1660" y="540" width="500" height="200" as="geometry" /></mxCell>
+        <mxCell id="se_e1" style="endArrow=block;endFill=0;html=1;" edge="1" parent="1" source="iroot" target="ipage"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e2" style="endArrow=diamondThin;endFill=1;html=1;" edge="1" parent="1" source="iroot" target="ifan"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e3" style="endArrow=diamondThin;endFill=1;html=1;" edge="1" parent="1" source="ifan" target="inode"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e4" style="endArrow=open;startArrow=none;html=1;" edge="1" parent="1" source="inode" target="ispage"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e5" style="endArrow=open;startArrow=none;html=1;dashed=1;" edge="1" parent="1" source="ispage" target="icpage"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e6" style="endArrow=diamondThin;endFill=1;html=1;" edge="1" parent="1" source="iss" target="ispage"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e7" style="endArrow=open;startArrow=none;html=1;" edge="1" parent="1" source="isps" target="iss"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e8" style="endArrow=open;startArrow=none;html=1;" edge="1" parent="1" source="isps" target="ispsp"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="se_e9" style="endArrow=open;startArrow=none;html=1;" edge="1" parent="1" source="ispsp" target="isps_single"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="03_cache_strategy_visitor" name="03 ICacheStrategy Visitor (Base/CacheEngine)">
+    <mxGraphModel dx="2000" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_cs" value="03 ICacheStrategy als Visitor-Pattern (REV 3 fixiert, K3.4)&#xa;Zwei Konkretisierungen: BaseEngineStrategy (Baseline F15) | CacheEngineStrategy (CacheEngine-aktiv)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1920" height="60" as="geometry" /></mxCell>
+        <mxCell id="ics" value="«concept, visitor» ICacheStrategy&lt;CS&gt;&#xa;━━━━━━━━━━━━━━━━━&#xa;+ visit(read_op : PageReadOp&amp;) : void&#xa;+ visit(write_op : PageWriteOp&amp;) : void" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="120" width="600" height="120" as="geometry" /></mxCell>
+        <mxCell id="bes" value="«concrete» BaseEngineStrategy : ICacheStrategy&#xa;━━━━━━━━━━━━━━━━━&#xa;NICHT-OPTIMIERTE Read/Write-Variante&#xa;StaticEngine-Pfad: Originalcode-Bauteil&#xa;Baseline fuer F15-Vergleich&#xa;━━━━━━━━━━━━━━━━━&#xa;- KEINE ILivePlatformModel-Konsultation&#xa;- KEINE Heuristik-Aufrufe&#xa;- KEINE Cache-Engine-Beeinflussung" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="380" width="600" height="200" as="geometry" /></mxCell>
+        <mxCell id="ces" value="«concrete» CacheEngineStrategy : ICacheStrategy&#xa;━━━━━━━━━━━━━━━━━&#xa;CACHE-ENGINE-OPTIMIERTE Read/Write-Variante&#xa;ruft CacheEngine fuer Speicher-optimierte Op&#xa;━━━━━━━━━━━━━━━━━&#xa;+ konsumiert ILivePlatformModel + ICacheResidency&#xa;+ ruft IHeuristic (auf Live-Modell)&#xa;+ kann Read/Write umrouten auf besseres Cache-Tier&#xa;+ kann Page-Layout vor Write rearrangieren" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="380" width="700" height="220" as="geometry" /></mxCell>
+        <mxCell id="ispage_ref" value="ISearchPage --maps via ICacheStrategy--&gt; ICachePage[s]&#xa;━━━━━━━&#xa;Engine-Choice (Compile-Time): waehlt zwischen BaseEngineStrategy + CacheEngineStrategy" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#FFE0B2;" vertex="1" parent="1">
+          <mxGeometry x="400" y="700" width="1200" height="80" as="geometry" /></mxCell>
+        <mxCell id="ce1" style="endArrow=block;endFill=0;html=1;dashed=1;" edge="1" parent="1" source="bes" target="ics"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ce2" style="endArrow=block;endFill=0;html=1;dashed=1;" edge="1" parent="1" source="ces" target="ics"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="04_strategy_4_levels" name="04 4-Ebenen-Strategien + Multiplizitaeten">
+    <mxGraphModel dx="2200" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t4" value="04 4-Ebenen-Strategie-Trennung (12 §1-§4 + REV 3 K3.4 Multiplizitaeten)&#xa;Pattern (1 pro IFanout) → Strategy-Plural (N pro Pattern) → Strategy-Singular (1 pro ISearchPage) → Heuristic (beliebig)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2120" height="60" as="geometry" /></mxCell>
+        <mxCell id="ebene_a" value="EBENE A — ISearchPagesStrategyPattern (1 pro IFanout)&#xa;━━━━━━━&#xa;10 Patterns (siehe 12 §1.1):&#xa;AllPagesUniform | LayerMix | InnerVsLeaf | HotVsCold |&#xa;DynamicRebalance | HierarchicalFractal | OrthogonalRuntimeParametrized |&#xa;MultiStrategyOrchestration | HeterogeneousAdaptive | BoundaryNodePartition" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F57C00;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="2040" height="160" as="geometry" /></mxCell>
+        <mxCell id="ebene_b" value="EBENE B — ISearchPagesStrategy (PLURAL, N pro Pattern)&#xa;━━━━━━━&#xa;Konfigurations-Pakete (K3.3 — Cluster A+B sind Lektuere-Hilfen, NICHT Architektur-Trennlinien):&#xa;B+-Familie | Trie-Familie | Hybrid-Familie&#xa;Beispiele: BPlusTreePerLayerStrategy (P03), CSBPlusTreeStrategy (P12), WideNodeBPlusStrategy (P21),&#xa;FractalBPlusStrategy (P22), EmbeddedSecondaryIndexStrategy (P06), ..." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5C6BC0;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="320" width="2040" height="180" as="geometry" /></mxCell>
+        <mxCell id="ebene_c" value="EBENE C — ISearchPageStrategy (SINGULAR, 1 pro ISearchPage)&#xa;━━━━━━━&#xa;Atomare Strategien (siehe 12 §3):&#xa;PermutationFieldInsertStrategy (P03), AdaptiveLayoutSelectionStrategy (P20),&#xa;CompoundContainerStrategy (P02), DecisionPageStrategy (P06), SpanPageStrategy (P06), ..." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="540" width="2040" height="160" as="geometry" /></mxCell>
+        <mxCell id="ebene_d" value="EBENE D — IHeuristic (beliebig viele, parametrieren die Strategien)&#xa;━━━━━━━&#xa;~80 paper-abgeleitete Heuristiken (siehe 13 §8):&#xa;AdaptivePrefetchDistanceHeuristic (P23) | CacheCostDPHeuristic (P05) |&#xa;CacheCoherenceCostHeuristic (P28 Block AN) | WidthCostModelHeuristic (P13) |&#xa;ProbabilityLayoutHeuristic (P16) | LargestL3CcdPinningHeuristic (allgemein, ersetzt X3DAware) |&#xa;HotPathOnHighIpcCoreHeuristic (allgemein, ersetzt IntelHybridP) | StrideVsSequentialHeuristic (P32) | ..." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7B1FA2;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="740" width="2040" height="220" as="geometry" /></mxCell>
+        <mxCell id="ind_legende" value="LEGENDE Multiplizitaeten:&#xa;1 IFanout has-1 ISearchPagesStrategyPattern (eindeutig pro Fanout)&#xa;1 ISearchPagesStrategyPattern has-N ISearchPageStrategy (eine pro ISearchPage)&#xa;1 IHeuristic kann beliebig viele Strategien parametrieren&#xa;Iteratoren orthogonal — siehe Tab 05" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fillColor=#FFF9C4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1000" width="2040" height="100" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="05_iterators" name="05 Iteratoren-Familie">
+    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_it" value="05 Iteratoren-Familie (vom Architekt explizit verlangt, REV 3 fixiert)&#xa;3 Concept-Iteratoren + comdare::prt_art&lt;K, V&gt;::iterator-Familie" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1720" height="60" as="geometry" /></mxCell>
+        <mxCell id="ini" value="«concept» INodeIterator&lt;NI&gt;&#xa;━━━━━━━&#xa;visit_each_child / byte-by-byte / discriminative-bits&#xa;━━━━━━━&#xa;Konkretisierungen:&#xa; - ART-byte-by-byte-iter (P01)&#xa; - HOT-discriminative-bits-iter (P02)&#xa; - LOUDS-rank-select-iter (P09/P10)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="140" width="500" height="200" as="geometry" /></mxCell>
+        <mxCell id="ispi" value="«concept» ISearchPageIterator&lt;SI&gt;&#xa;━━━━━━━&#xa;Range-Scan ueber ISearchPage&#xa;━━━━━━━&#xa;Konkretisierungen:&#xa; - linear-sibling-list-iter (P03 Masstree)&#xa; - LOUDS-lower-bound-iter (P10 SuRF)&#xa; - SortedKeyArrayIterator (P11 CSS)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="640" y="140" width="500" height="200" as="geometry" /></mxCell>
+        <mxCell id="isps_iter" value="«concept» ISearchPageStrategyIterator&lt;SSI&gt;&#xa;━━━━━━━&#xa;Cross-Algorithm-Iteration ueber Permutationen&#xa;━━━━━━━&#xa;F15 Bausteine-Quer-Permutation:&#xa; - permutiert ueber 4-Ebenen-Tupel&#xa; - delegiert an Strategy-Konkretisierungen&#xa; - liefert Vergleichs-Sequenz fuer Phase-7" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="140" width="500" height="200" as="geometry" /></mxCell>
+        <mxCell id="prtart_iter" value="class comdare::prt_art&lt;Key, Value&gt;&#xa;━━━━━━━&#xa;+ iterator           (mutable forward iterator)&#xa;+ const_iterator&#xa;+ range_iterator&#xa;+ key_iterator&#xa;+ value_iterator&#xa;━━━━━━━&#xa;Kompatibel zu std::map-API&#xa;(Domaenenmodell §1A)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="450" width="700" height="240" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="06_command_pattern" name="06 Hybrid-Command-Pattern + 17 Compositions">
+    <mxGraphModel dx="2400" dy="1800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_cp" value="06 Hybrid-Command-Pattern (NEU REV 3, K3.4) — atomare Strategien + Composition-Commands&#xa;17 Hybrid-Aufloesungen aus 12 §9 + 11 §10 — F15 Permutations-Raum 3x erweitert" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#FCE4EC;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2320" height="60" as="geometry" /></mxCell>
+        <mxCell id="iscmd" value="«abstract» IStrategyCommand&#xa;━━━━━━━&#xa;Wurzel jeder atomaren Strategie&#xa;━━━━━━━&#xa;+ execute(context : StrategyContext&amp;) : Result&#xa;+ can_compose_with(other : IStrategyCommand&amp;) : bool" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="120" width="600" height="140" as="geometry" /></mxCell>
+        <mxCell id="hcc" value="«composite» HybridCompositionCommand : IStrategyCommand&#xa;━━━━━━━&#xa;Sammler von Atom-Commands&#xa;━━━━━━━&#xa;- parts : vector&lt;IStrategyCommand*&gt;&#xa;- composition_rule : ICompositionRule&#xa;━━━━━━━&#xa;+ execute(context) : Result" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D81B60;strokeColor=#880E4F;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="350" width="600" height="180" as="geometry" /></mxCell>
+        <mxCell id="icr" value="«concept» ICompositionRule&#xa;━━━━━━━&#xa;Varianten:&#xa; - SequentialRule&#xa; - ParallelRule&#xa; - ConditionalRule&#xa; - RecursiveRule" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5C6BC0;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="800" y="350" width="380" height="180" as="geometry" /></mxCell>
+        <mxCell id="atoms" value="Atomare Strategy-Commands (Beispiele aus 17 Aufloesungen)&#xa;━━━━━━━━━━━━━━━━━&#xa;P03: SliceLayerJumpCommand, BPlusPerLayerCommand, PermutationFieldInsertCommand&#xa;P10: LoudsDenseEncodingCommand, LoudsSparseEncodingCommand&#xa;P02: CompoundContainerCommand, BiNodeSubtreeCommand, SingleMaskPartialKeyCommand, MultiMaskPartialKeyCommand&#xa;P07: HashAnchorLookupCommand, BPlusHopLookupCommand, LeafLinkedListScanCommand&#xa;P06: OuterBPlusPageCommand, DecisionPageStrategyCommand, SpanPageStrategyCommand&#xa;P04: MacroNodeCollapseCommand, PatriciaInnerExpandCommand, SuccinctEncodingPoolCommand&#xa;P22: DiskTierTraversalCommand, CacheTierTraversalCommand, DualJumpPointerArrayCommand&#xa;P28: LeafOnlyCounterCommand, RetroactiveAggregationCommand, GreedyHotPathLayoutCommand&#xa;P26: CachePrefetcherCommand (CP), PathPrefetcherCommand (PP), MonitorPrefetcherCommand (MP)&#xa;P25: CoroutinedFullNodePrefetchCommand, CoroutinedHalfNodePrefetchCommand&#xa;P20: KeyAdaptionCommand (mit Comparison/Fingerprinting Sub) + OperationAdaptionCommand (mit SDL/FDL Sub)&#xa;P05: MultilevelNodeCommand, RewiredVirtualPhysicalCommand, Multinode4Command&#xa;P14: NodeSizeSelectCommand, SearchMethodSelectCommand, ConfigurationLookupCommand&#xa;P19: LocalRelocationCommand (wait-free), GlobalRelocationCommand (BFS-Periodic)&#xa;P23: BasePrefetchCommand, DistanceAdaptCommand, LoopUnrollAdaptCommand&#xa;P15: MultiCacheLinePrefetchCommand, IndirectionVectorCommand, MultiRecordHintCommand, PostLocationCheckCommand" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="600" width="2200" height="380" as="geometry" /></mxCell>
+        <mxCell id="comps" value="HybridCompositionCommand-Konkretisierungen (17 Stueck)&#xa;━━━━━━━━━━━━━━━━━&#xa;1.  MasstreeSliceLayeredCompositionCommand            10. ChenPrefetchedBPlusCompositionCommand&#xa;2.  CutoffLevelLoudsCompositionCommand               11. HankinsPatelCostModelCompositionCommand&#xa;3.  HOTAdaptiveLayoutSelectionCompositionCommand     12. ZhangFGCSPointerResolutionCompositionCommand&#xa;4.  TripleLayerLookupCompositionCommand              13. STARTAdaptiveCompositionCommand&#xa;5.  B2TreeRecursiveCommonPrefixCompositionCommand    14. KhanRuntimeAdaptiveCompositionCommand&#xa;6.  CoCoLevelLDecisionCompositionCommand             15. SamuelConfigurationTableCompositionCommand&#xa;7.  CoCoEncodingPoolCompositionCommand               16. BTreesAreBackHeterogeneousAdaptiveCompositionCommand&#xa;8.  ThreePrefetcherOrchestrationCompositionCommand   17. SequentialInsertCompositionCommand&#xa;9.  KuehnHotPathOptimizationCompositionCommand&#xa;━━━━━━━━━━━━━━━━━&#xa;PLUS: AlphaConnectedSubgraphCompositionCommand (P19), FractalHierarchicalCompositionCommand (P22),&#xa;BTreesOfCachelinesCompositionCommand (P15), GraefePrefetchSurveyCompositionCommand (P15),&#xa;LayoutInvariantCompositionCommand (P19 Local+Global Reloc), ItaniumPrefetchCompositionCommand (P14)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D81B60;strokeColor=#880E4F;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1010" width="2200" height="320" as="geometry" /></mxCell>
+        <mxCell id="cmd_e1" style="endArrow=block;endFill=0;html=1;dashed=1;" edge="1" parent="1" source="hcc" target="iscmd"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="cmd_e2" style="endArrow=diamondThin;endFill=1;html=1;" edge="1" parent="1" source="hcc" target="icr"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="07_platform_probe" name="07 IPlatformProbe Auto-Discovery (5 Schritte)">
+    <mxGraphModel dx="2200" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_pp" value="07 IPlatformProbe Auto-Discovery (NEU REV 3, K3.2)&#xa;KEINE plattform-spezifischen Klassen — generisches Auto-Discovery + Property-Klassifikation" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2120" height="60" as="geometry" /></mxCell>
+        <mxCell id="ipp" value="«concept» IPlatformProbe&#xa;━━━━━━━━━━━━━━━━━&#xa;ALLGEMEIN — OHNE CPU-Spezialisierung&#xa;━━━━━━━━━━━━━━━━━&#xa;+ discover_cache_topology() : ICacheTopology&#xa;+ discover_core_layout() : ICoreLayout&#xa;+ discover_isa_features() : IIsaFeatureSet&#xa;+ discover_interconnect() : IBusTopology&#xa;━━━━━━━&#xa;+ measure_cache_latencies() : map&lt;TierPair, Cycles&gt;&#xa;+ measure_bandwidths() : map&lt;InterconnectId, Gbps&gt;&#xa;+ measure_cache_coherence_cost() : CoherenceCostFunction&#xa;+ measure_pinning_effects() : map&lt;PinningPolicy, Speedup&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="600" height="320" as="geometry" /></mxCell>
+        <mxCell id="ippc" value="«concept» IPlatformPropertyClassifier&#xa;━━━━━━━━━━━━━━━━━&#xa;NEU REV 3 — Konsequenz aus Auto-Discovery&#xa;━━━━━━━━━━━━━━━━━&#xa;+ classify(probe_results) : PlatformPropertySet&#xa;━━━━━━━&#xa;PlatformPropertySet enthaelt z.B.:&#xa; * has_asymmetric_l3 : bool   (entdeckt, nicht hard-coded)&#xa; * has_hybrid_cores  : bool   (entdeckt, nicht hard-coded)&#xa; * preferred_pinning : PinningPolicy  (gewaehlt aus Vermessung)&#xa; * has_hbm_tier      : bool   (entdeckt)&#xa; * usable_simd_width : int    (gemessen)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5C6BC0;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="780" y="120" width="660" height="320" as="geometry" /></mxCell>
+        <mxCell id="iceop" value="«concept» ICacheEngineOptionPublisher&#xa;━━━━━━━━━━━━━━━━━&#xa;NEU REV 3 — Bereitstellung an Permutationen&#xa;━━━━━━━━━━━━━━━━━&#xa;+ publish_options_to(permutation_modules : list) : void&#xa;━━━━━━━&#xa;Jede Permutation erhaelt nur die Optionen,&#xa;die ihre Bausteine tatsaechlich konsumieren&#xa;koennen (compile-time-gefiltert via Concepts)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="120" width="580" height="280" as="geometry" /></mxCell>
+        <mxCell id="schritte" value="5-Schritt-Auto-Discovery-Pflicht (CacheEngineBuilder pro Permutations-Build):&#xa;━━━━━━━━━━━━━━━━━&#xa;1. DISCOVER (statisch)  — CPUID / sysfs / /proc/cpuinfo / hwloc / cpuid-Instruction&#xa;2. MEASURE (dynamisch)  — Mikrobenchmark (clflush-cycle / All-Pairs-Pinning / Cache-Coherence-Calibration)&#xa;3. CLASSIFY            — Properties zusammenstellen (has_asymmetric_l3, preferred_pinning, ...)&#xa;4. PUBLISH             — Properties allen Permutations-Modulen als Konfigurations-Optionen&#xa;5. BIND                — Pro Permutation entscheidet ICacheStrategy-Visitor, welche Properties konsumiert" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#FFE0B2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="500" width="2040" height="180" as="geometry" /></mxCell>
+        <mxCell id="block_ao" value="Block AO als TESTFALL (nicht Implementierung):&#xa;━━━━━━━━━━━━━━━━━&#xa;Ryzen 9 9950X3D + i9-14900KS + DDR5-5600 CL36&#xa;Was Auto-Discovery dort findet:&#xa; - asymmetrisches L3 (96 + 32 MiB) ⇒ has_asymmetric_l3=true&#xa; - Hybrid-Cores (8P + 16E) ⇒ has_hybrid_cores=true&#xa; - cpu_core/cpu_atom-perf-Counter-Trennung erforderlich&#xa; - DDR5-5600 mit 36 Zyklen Latenz" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#FFF9C4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="730" width="1000" height="220" as="geometry" /></mxCell>
+        <mxCell id="entscheidung" value="Heuristik-Wahl ist GENERISCH:&#xa;━━━━━━━━━━━━━━━━━&#xa;has_asymmetric_l3=true   ⇒ LargestL3CcdPinningHeuristic (allgemein, ersetzt X3DAware)&#xa;has_hybrid_cores=true    ⇒ HotPathOnHighIpcCoreHeuristic (allgemein, ersetzt IntelHybridP)&#xa;has_hbm_tier=true        ⇒ HbmAllocationStrategy (allgemein)&#xa;━━━━━━━&#xa;Wirkung: Cache-Engine ist plattform-agnostisch im Code,&#xa;plattform-konkret im Verhalten" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#C8E6C9;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="730" width="1000" height="220" as="geometry" /></mxCell>
+        <mxCell id="pp_e1" style="endArrow=open;startArrow=none;html=1;" edge="1" parent="1" source="ipp" target="ippc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="pp_e2" style="endArrow=open;startArrow=none;html=1;" edge="1" parent="1" source="ippc" target="iceop"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="08_platform_model" name="08 Plattform-Modell (Cache + CPU + Bus)">
+    <mxGraphModel dx="2400" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_pm" value="08 Cache-Engine Plattform-Modell (Saeule B Concepts)&#xa;Cache-Hierarchie + CPU-Kerne + Hardware-Erweiterungen + Kommunikationsverbindungen" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2320" height="60" as="geometry" /></mxCell>
+        <mxCell id="grp_cache" value="Cache-Hierarchie&#xa;━━━━━━━&#xa;ICacheLevel — L1/L2/L3/HBM/V-Cache (size, latency, bandwidth)&#xa;ICacheLine — Granularitaet (typ. 64 B, 256 B ARM A64FX)&#xa;ICacheTopology — gesamte Hierarchie + asymmetric_l3 als Property&#xa;ICacheResidency — Cache whereabouts (Cached/HeaderCached/Uncached)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="700" height="200" as="geometry" /></mxCell>
+        <mxCell id="grp_cpu" value="CPU-Kerne (generisch, KEINE CPU-Spezialisierung)&#xa;━━━━━━━&#xa;ICpuCore — core_class als generic enum&#xa;ICoreLayout — Topologie ohne CPU-Namen&#xa;ICoreToThreadMap — Thread→Core, IPinningPolicy generisch&#xa;IPinningPolicy — LARGEST_L3_CCD | HIGH_IPC_CORES | NUMA_LOCAL | ROUND_ROBIN" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="820" y="120" width="700" height="200" as="geometry" /></mxCell>
+        <mxCell id="grp_isa" value="Hardware-Erweiterungen (ISA-Features)&#xa;━━━━━━━&#xa;IHardwareExtension — eine ISA-Feature-Bank&#xa;  (AVX-512, BMI2, NEON, SVE2, RISC-V V-Ext)&#xa;IIsaFeatureSet — gesamte Feature-Verfuegbarkeit&#xa;  (Auto-discovered)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="120" width="700" height="200" as="geometry" /></mxCell>
+        <mxCell id="grp_bus" value="Kommunikations- + Bandbreitenverbindungen&#xa;━━━━━━━&#xa;IInterconnect — CCD↔CCD, Core↔Cache, Cache↔Memory, NUMA, PCIe, NVLink&#xa;IBusTopology — gesamte Bus-/Interconnect-Topologie&#xa;IMemoryBandwidthModel — Live-Bandbreiten + Bottleneck-Detection" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="370" width="1100" height="200" as="geometry" /></mxCell>
+        <mxCell id="grp_live" value="Echtzeit-Modelle&#xa;━━━━━━━&#xa;ILivePlatformModel — Echtzeit-Modell, periodisch aktualisiert&#xa;ILiveCpuModel — Per-Core-Lasten + Hot-Path-Score&#xa;━━━━━━━&#xa;Update-Source: perf-Counter / sysfs / cpuid&#xa;Update-Period: ~100 ms-Tick" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5C6BC0;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="370" width="1040" height="200" as="geometry" /></mxCell>
+        <mxCell id="grp_sched" value="Scheduling (Thread→Core + Task→Tier)&#xa;━━━━━━━&#xa;«concept» IScheduler&#xa;Konkretisierungen (allgemeine Pinning-Logik, KEINE CPU-Namen):&#xa; - PinningAwareScheduler&#xa; - NumaLocalScheduler&#xa; - RoundRobinScheduler" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="610" width="1100" height="220" as="geometry" /></mxCell>
+        <mxCell id="grp_heur" value="Heuristiken (~80 paper-abgeleitete Heuristiken — siehe 13 §8)&#xa;━━━━━━━&#xa;«concept» IHeuristic — Wert-Berechnungen auf dem Live-Modell&#xa;Konkretisierungen (Auswahl):&#xa; - AdaptivePrefetchDistanceHeuristic (P23) | CacheCostDPHeuristic (P05)&#xa; - CacheCoherenceCostHeuristic (P28 Block AN) | WidthCostModelHeuristic (P13)&#xa; - ProbabilityLayoutHeuristic (P16) | StrideVsSequentialHeuristic (P32)&#xa; - LargestL3CcdPinningHeuristic (allgemein) | HotPathOnHighIpcCoreHeuristic (allgemein)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7B1FA2;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="610" width="1040" height="240" as="geometry" /></mxCell>
+        <mxCell id="hint_pm" value="Verzeichnis Ebene 3:&#xa;cache_engine/&#xa;├── platform_model/  (Concepts oben)&#xa;├── scheduling/      (IScheduler + Konkretisierungen)&#xa;└── heuristics/      (~80 IHeuristic-Konkretisierungen)" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fillColor=#FFF9C4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="880" width="2180" height="100" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="09_heuristics" name="09 IHeuristic-Familie (~80 aus 13)">
+    <mxGraphModel dx="2400" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_h" value="09 IHeuristic-Familie — ~80 paper-abgeleitete Heuristiken (Auswahl, siehe 13 §8 fuer komplette Liste)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2320" height="60" as="geometry" /></mxCell>
+        <mxCell id="iheur" value="«concept» IHeuristic&lt;H&gt;&#xa;━━━━━━━&#xa;Wert-/Kostenberechnungen auf dem Live-Modell&#xa;━━━━━━━&#xa;input:  ILivePlatformModel + Strategy-State&#xa;output: Recommendations → DecisionLambdaTrees" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="120" width="700" height="160" as="geometry" /></mxCell>
+        <mxCell id="grp_pref" value="Prefetch-Heuristiken&#xa;━━━━━━━&#xa;AdaptivePrefetchDistanceHeuristic (P23 Khan)&#xa;PrefetchEffectivenessHeuristic (P24 Naderan-Tahan, NEGATIV-Befund)&#xa;FillBufferOccupancyHeuristic (P25 Mahling)&#xa;PathPrefetcherHeuristic (P26 Zhang FGCS)&#xa;BundleInstructionPrefetchHeuristic (P27 Zhang ASPLOS)&#xa;CoroutinedPrefetchSelectionHeuristic (P25)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7B1FA2;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="350" width="700" height="220" as="geometry" /></mxCell>
+        <mxCell id="grp_layout" value="Layout/Cost-Heuristiken&#xa;━━━━━━━&#xa;CacheCostDPHeuristic (P05 START — DP-Optimizer)&#xa;WidthCostModelHeuristic (P13 Hankins-Patel — analytisch I/M/B/T)&#xa;ProbabilityLayoutHeuristic (P16 Bender 2002)&#xa;CacheObliviousLayoutHeuristic (P17 Bender 2005)&#xa;ConfigurationTableHeuristic (P14 Samuel)&#xa;LayoutInvariantHeuristic (P19 Saikkonen)&#xa;HotPathLayoutGreedyHeuristic (P28 Kuehn)&#xa;AdaptiveLayoutSelectionHeuristic (P20 B-Trees-Are-Back)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7B1FA2;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="820" y="350" width="700" height="240" as="geometry" /></mxCell>
+        <mxCell id="grp_coh" value="Cache-Coherence + Telemetry-Heuristiken&#xa;━━━━━━━&#xa;CacheCoherenceCostHeuristic (P28 Kuehn Block AN)&#xa;CacheCoherenceDetectionHeuristic (P28 NEU 2026-05-08)&#xa;LeafOnlyCounterRoutingHeuristic (Kuehn NEU)&#xa;SamplingRateAdjustmentHeuristic (Kuehn NEU)&#xa;RetroactiveAggregationTriggerHeuristic (Kuehn NEU)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D81B60;strokeColor=#880E4F;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="350" width="700" height="240" as="geometry" /></mxCell>
+        <mxCell id="grp_plat" value="Plattform-/Pinning-Heuristiken (KEINE CPU-Namen — generisch)&#xa;━━━━━━━&#xa;LargestL3CcdPinningHeuristic (allgemein, ersetzt X3DAware)&#xa;HotPathOnHighIpcCoreHeuristic (allgemein, ersetzt IntelHybridP)&#xa;NumaLocalAllocationHeuristic (allgemein)&#xa;HbmTierRoutingHeuristic (allgemein, P25/P31/P33)&#xa;HybridMemoryNodeBindingHeuristic (P25 Mahling)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="620" width="700" height="240" as="geometry" /></mxCell>
+        <mxCell id="grp_isa" value="ISA + Stride-Heuristiken&#xa;━━━━━━━&#xa;StrideVsSequentialHeuristic (P32 To-Stride TUD)&#xa;Avx512BroadcastVsScalarStridedHeuristic (P32)&#xa;BMI2PEXTLookupHeuristic (P02 HOT)&#xa;SimdAccelerationDecisionHeuristic (P01/P02/P10)&#xa;PopcountFallbackHeuristic (P10 SuRF)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="820" y="620" width="700" height="240" as="geometry" /></mxCell>
+        <mxCell id="grp_conc" value="Concurrency-Heuristiken&#xa;━━━━━━━&#xa;OlcVsRowexSelectionHeuristic (P08 ART-Sync)&#xa;RcuFlavorSelectionHeuristic (P29 — 6 Flavors)&#xa;HazardPointerVsRcuHeuristic (P30 vs P29)&#xa;PermutationFieldInsertHeuristic (P03 Masstree)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5C6BC0;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="620" width="700" height="240" as="geometry" /></mxCell>
+        <mxCell id="hint_h" value="Vollstaendige Liste: 13_saeule_b_plattform_modell_konkretisierung.md §8 (~80 Heuristiken)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#FFF9C4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="900" width="2180" height="40" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="10_cache_families" name="10 29 Cache-Strategie-Familien F1-F29">
+    <mxGraphModel dx="2400" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_f" value="10 29 Cache-Strategie-Familien F1-F29 (siehe 11 fuer komplette Liste + Familien-x-Paper-Tabelle)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2320" height="60" as="geometry" /></mxCell>
+        <mxCell id="meta" value="3 Meta-Achsen zur Klassifikation (siehe 11):&#xa;━━━━━━━&#xa;Awareness: cache-aware vs cache-oblivious vs auto-discovery&#xa;Compositionality: atomare vs zusammengesetzte (Hybrid → Command-Pattern siehe Tab 06)&#xa;Dynamicity: statisch vs adaptive vs runtime-adaptiv" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#FFE0B2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="2280" height="100" as="geometry" /></mxCell>
+        <mxCell id="grp_f17" value="F1-F7 (Hauptfamilien)&#xa;━━━━━━━&#xa;F1 IAdaptiveFootprintStrategy (P01, P02, P05, P12, P14, P20, P28)&#xa;F2 ISuccinctEncodingStrategy (P09, P04, P10, P11, P12, P14)&#xa;F3 ICacheLineAlignedStrategy (P01, P02, P07, P11, P12, P14, P15, P32)&#xa;F4 IMultiCacheLineNodeStrategy (P03, P13, P21, P22)&#xa;F5 ISoftwarePrefetchStrategy (P02, P03, P10, P14, P15, P21, P22, P25, P26, P27)&#xa;F6 IPointerChasingResolutionStrategy (P21, P22, P26)&#xa;F7 ISimdAcceleratedLookupStrategy (P01, P02, P10, P14, P32)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="240" width="1100" height="280" as="geometry" /></mxCell>
+        <mxCell id="grp_f815" value="F8-F15 (weitere Strategie-Familien)&#xa;━━━━━━━&#xa;F8 IRankSelectPrimitiveStrategy&#xa;F9 IPagewiseEncodingStrategy&#xa;F10 ICacheObliviousLayoutStrategy (P17 Bender CO)&#xa;F11 IProbabilityWeightedLayoutStrategy (P16 Bender)&#xa;F12 ICacheCohabitationStrategy (P28 Kuehn Hot-Path)&#xa;F13 IPostorderDpLayoutStrategy (P04 CoCo, P05 START)&#xa;F14 ICompoundContainerStrategy (P02 HOT)&#xa;F15 ITagManagerOverlayStrategy (P05 START Tag-Manager)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#5C6BC0;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="240" width="1140" height="280" as="geometry" /></mxCell>
+        <mxCell id="grp_f1629" value="F16-F29 (Spezial-Familien — Auswahl)&#xa;━━━━━━━&#xa;F16 IRewireMappingStrategy (P05 START LKM-rewiring)&#xa;F17 ISliceVergleichStrategy (P03 Masstree)&#xa;F18 IPermutationFieldStrategy (P03 Masstree)&#xa;F19 IRangeArrayTranslationStrategy (P06 B²-Tree)&#xa;F20 ITopologyEncodingStrategy (NEU REV 3 — orthogonal-zu-Layout)&#xa;F21 IFractalDualTierStrategy (P22)&#xa;F22 IFillBufferAwareStrategy (P25 Mahling)&#xa;F23 IBundleBasedInstructionPrefetchStrategy (P27 Zhang ASPLOS)&#xa;F24 IAlphaConnectedSubgraphStrategy (P19 Saikkonen)&#xa;F25 ILocalRelocationWaitFreeStrategy (P19 Saikkonen)&#xa;F26 IGlobalRelocationBfsStrategy (P18 Saikkonen)&#xa;F27 IAdaptiveBytewideKeyTransformStrategy (P01 ART)&#xa;F28 IPathReadCounterStrategy (P26 Zhang FGCS)&#xa;F29 IConfigurationTableLookupStrategy (P14 Samuel)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="560" width="2280" height="380" as="geometry" /></mxCell>
+        <mxCell id="hint_f" value="K3.3 — Familien sind ORTHOGONAL zu Algorithmus-„Familien" (Trie/B+/Hybrid):&#xa;Cross-Familien-Permutationen (Trie-Page + B+-Layout + LOUDS-Encoding + Hot-Path-Heuristic) sind explizites F15-Forschungsziel" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#FCE4EC;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="980" width="2280" height="60" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="11_three_levels" name="11 Drei-Ebenen-Verbindungen">
+    <mxGraphModel dx="2200" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_3l" value="11 Drei-Ebenen-Verbindungen (Engine ↔ Strategien ↔ Cache-Engine)&#xa;Trennungs-Prinzip: Engine konsumiert CacheEngine; Strategien wissen nichts direkt von CPU/Caches" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2120" height="60" as="geometry" /></mxCell>
+        <mxCell id="ebene1" value="EBENE 1 — IExecutingEngine&#xa;(siehe Tab 01)&#xa;━━━━━━━&#xa;ISearchEngine | IFutureEngine&#xa;━━━━━━━&#xa;konsumiert CacheEngine als Optimierungs-Service" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0097A7;strokeColor=#006064;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="120" width="700" height="160" as="geometry" /></mxCell>
+        <mxCell id="ebene2" value="EBENE 2 — Strategien (Saeule A)&#xa;(siehe Tab 02-06)&#xa;━━━━━━━&#xa;ISearchPagesStrategy uses ISearchPagesStrategyPattern (1 pro IFanout)&#xa;mit N ISearchPageStrategy (1 pro Page)&#xa;━━━━━━━&#xa;ICacheStrategy (Visitor) routet Read/Write durch:&#xa; (a) BaseEngineStrategy (StaticEngine, Baseline)&#xa; (b) CacheEngineStrategy (CacheEngine-aktiv)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="380" width="1900" height="240" as="geometry" /></mxCell>
+        <mxCell id="ebene3" value="EBENE 3 — CacheEngine + Plattform-Modell (Saeule B)&#xa;(siehe Tab 07-09)&#xa;━━━━━━━&#xa;IPlatformProbe (Auto-Discovery, 5 Schritte) → IPlatformPropertyClassifier → ICacheEngineOptionPublisher&#xa;ILivePlatformModel (periodisch aktualisiert) → ICacheResidency / ILiveCpuModel&#xa;IScheduler (Thread→Core) + IHeuristic (~80 Konkretisierungen) + DecisionLambdaTrees (per Baustein)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#303F9F;strokeColor=#1A237E;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="720" width="1900" height="220" as="geometry" /></mxCell>
+        <mxCell id="dec_box" value="DecisionLambdaTrees (F-EXTRA-6 — pro Baustein)&#xa;━━━━━━━&#xa;routen Events zwischen Ebene 2 (ISearchPagesStrategy)&#xa;und Ebene 3 (IHeuristic + ICacheResidency)&#xa;Beispiele:&#xa;PageRelocationTree, PageTypeChangeTree, PrefetchAdjustmentTree,&#xa;HotPathRecognitionTree, AllocatorRebalanceTree,&#xa;ConcurrencyDisciplineSwitchTree, ValueHandleSelectionTree,&#xa;SamplingRateAdjustmentTree (Kuehn AM),&#xa;CoherenceAwareWriteDecisionTree (Kuehn AN),&#xa;CacheCoherenceDetectionTree (Kuehn AI)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D81B60;strokeColor=#880E4F;fontColor=#FFFFFF;fontSize=10;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1000" width="1900" height="220" as="geometry" /></mxCell>
+        <mxCell id="ce1" style="endArrow=open;startArrow=none;html=1;dashed=1;" edge="1" parent="1" source="ebene1" target="ebene2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ce2" style="endArrow=open;startArrow=none;html=1;dashed=1;" edge="1" parent="1" source="ebene2" target="ebene3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ce3" style="endArrow=open;startArrow=none;html=1;" edge="1" parent="1" source="dec_box" target="ebene2"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="12_research_mission" name="12 Forschungs-Mission + F15">
+    <mxGraphModel dx="2200" dy="1300" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+        <mxCell id="t_rm" value="12 Forschungs-Mission (Block AP) — heuristisch ↔ informiert ↔ adaptiv&#xa;F15 Bausteine-Quer-Permutation als Kern-Forschungsziel" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fillColor=#E0E0E0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2120" height="60" as="geometry" /></mxCell>
+        <mxCell id="m_h" value="HEURISTIC_STATIC&#xa;━━━━━━━&#xa;Klassische Faustregeln, plattform-unabhaengige Defaults&#xa;━━━━━━━&#xa;ICacheStrategy = BaseEngineStrategy&#xa;ISearchPagesStrategy mit klassischen Patterns&#xa;Kein Auto-Discovery, kein Live-Modell" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="700" height="220" as="geometry" /></mxCell>
+        <mxCell id="m_i" value="INFORMED_KALIBRIERT&#xa;━━━━━━━&#xa;Cache-Engine-Modell + plattform-Kalibrierung (Auto-Discovery)&#xa;━━━━━━━&#xa;ICacheStrategy = CacheEngineStrategy&#xa;Statische Heuristik-Wahl basierend auf IPlatformProbe-Output&#xa;PlatformPropertySet bestimmt zur Compile-Zeit Strategie-Wahl" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#388E3C;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="800" y="120" width="700" height="220" as="geometry" /></mxCell>
+        <mxCell id="m_a" value="AUTOMATIC_ADAPTIVE&#xa;━━━━━━━&#xa;DecisionLambdaTree-Steuerung waehrend Laufzeit&#xa;━━━━━━━&#xa;ICacheStrategy = CacheEngineStrategy&#xa;Dynamische Heuristik-Wahl via Live-Modell + Telemetry&#xa;DecisionLambdaTrees adjustieren Strategien online" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D81B60;strokeColor=#880E4F;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1520" y="120" width="600" height="220" as="geometry" /></mxCell>
+        <mxCell id="f15" value="F15 Bausteine-Quer-Permutation (architektonisch erschlossen durch K3.3 + K3.4)&#xa;━━━━━━━&#xa;29 Cache-Familien × 4 Strategie-Ebenen × ~80 Heuristiken = ~10.000 mögliche Bausteine-Tupel&#xa;Mit Hybrid-Command-Pattern-Aufloesung ×3 = ~30.000 Bausteine&#xa;ConstraintFilter (F4 K3.2) liefert ~500-1000 valide Permutationen pro Plattform&#xa;━━━━━━━&#xa;Cross-Familien-Permutationen (Trie-Page + B+-Layout + LOUDS-Encoding + Hot-Path-Heuristic):&#xa;EXPLIZITES Forschungs-Ziel der Diplomarbeit" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7B1FA2;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=11;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="420" width="2040" height="240" as="geometry" /></mxCell>
+        <mxCell id="opera" value="Operationalisierung (F15)&#xa;━━━━━━━&#xa;Bausteine-Quer-Permutation als Kern:&#xa;Pro Permutation wird die SELBE Workload-Sequenz auf den drei Modi (HEURISTIC_STATIC / INFORMED_KALIBRIERT / AUTOMATIC_ADAPTIVE) ausgefuehrt.&#xa;Ergebnis: Direkter Vergleich der drei Modi ueber identische Workloads + Plattformen.&#xa;━━━━━━━&#xa;Diese These ist als zentrale Diplomarbeit-Einleitung verwendbar (siehe Glossar v7 BLOCK AP)." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#FFF9C4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="2040" height="200" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
