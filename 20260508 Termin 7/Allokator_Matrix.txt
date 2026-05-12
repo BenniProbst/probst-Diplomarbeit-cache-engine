@@ -1,0 +1,801 @@
+================================================================================
+ALLOKATOR-MATRIX — Allokator-Bausteine pro konzeptionelle Achse
+Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+TU Dresden · Diplomarbeit · Termin 7 · Phase 6.2.D
+Stand: 2026-05-13 (REV 1) · Cluster-Aufteilung AC1-AC5
+Vorlage: Bausteine_Matrix.txt (Phase 3.D REV 4)
+================================================================================
+
+ZWECK
+   Vollstaendige Cross-Paper-Aufstellung aller Allokator-Bausteine pro
+   konzeptionelle Achse aus den 23 Papern (A01-A23). Jeder Baustein:
+   - Erweitert std::allocator<T> typsicher (REV-7 §3.1 A1)
+   - Bietet std::pmr::memory_resource-Konformanz (REV-7 §3.1 A2)
+   - Default Concurrency: Single-Writer-Multi-Reader via std::shared_mutex
+   - Optional: Cache-Page-Aware Multi-Writer via std::scoped_lock
+   - Pflicht-Tests: Container-Matrix x Threading x Concurrency-Sicherheit
+
+NOTATION
+   ID            Eindeutige Bausteine-ID (= Flag-Position fuer
+                 PermutationFlags der CacheEngine)
+   QUELLE        A-ID des Originalpapers
+   CLUSTER       AC1-AC5 (Foundation/ModernProd/NUMA/Concurrent/Standard)
+   ORIG-COMP.    Original-Compiler-/Sprach-Anforderung
+   CONCEPT       C++23 Concept (in cache_engine/include/cache_engine/allocators/concepts/)
+   ABHAENGIG     Andere Bausteine, von denen dieser abhaengt
+   IMPL-PFAD     Pfad zum Code (siehe § Implementierungs-Pfade am Ende)
+
+GLIEDERUNG (7 ALLOKATOR-ACHSEN AA1-AA7, REV 7 §2.5)
+   AA1  FREE-LIST-TOPOLOGIE        (FreeListTopologyBank)
+   AA2  SIZE-CLASS-SCHEMA          (SizeClassSchemaBank)
+   AA3  THREAD-LOCALITY            (ThreadLocalityBank)
+   AA4  SYNCHRONIZATION            (SynchronizationBank)
+   AA5  ALLOCATION-POLICY          (AllocationPolicyBank)
+   AA6  RECLAMATION                (ReclamationBank)
+   AA7  FRAGMENTATION-STRATEGY     (FragmentationStrategyBank)
+
+================================================================================
+AA1 — FREE-LIST-TOPOLOGIE
+================================================================================
+
+ID: ALLOC_FREELIST_FLAT_LIFO
+   QUELLE        A20 dlmalloc (Doug Lea)
+   CLUSTER       AC5 Standard + Optimizing
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Doppelt verkettete Listen pro Smallbin (32 lists), Trie pro
+                 Treebin fuer >256 Byte. Wilderness top chunk preserved.
+   ABHAENGIG     ALLOC_SIZECLASS_DLMALLOC
+
+ID: ALLOC_FREELIST_SUPERBLOCK_HOARD
+   QUELLE        A01 Hoard (Berger ASPLOS 2000)
+   CLUSTER       AC1 Foundation
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Innerhalb Superblock: LIFO Free-List (Cache-Lokalitaet).
+                 Pro Heap: doubly-linked List of Superblocks per Fullness-Group.
+                 Move-to-Front-Heuristic.
+
+ID: ALLOC_FREELIST_SLAB_BUFCTL
+   QUELLE        A02 Bonwick Slab (USENIX 1994)
+   CLUSTER       AC1 Foundation
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Pro-Cache: doubly-linked Slab-List (empty/partial/complete
+                 sortiert). Pro-Slab: einfache bufctl-Liste (in-buffer linkage).
+
+ID: ALLOC_FREELIST_LOCKFREE_ANCHOR
+   QUELLE        A03 Michael Lock-Free (PLDI 2004)
+   CLUSTER       AC1 Foundation
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Per-Superblock LIFO via Anchor.avail (atomic 64-bit).
+                 Pro Sizeclass: lock-free FIFO Partial-List.
+
+ID: ALLOC_FREELIST_PAGE_SHARDED_3LIST
+   QUELLE        A04 mimalloc (Leijen MSR 2019)
+   CLUSTER       AC2 Modern Production
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Pro mimalloc-page (64 KiB) drei Free-Lists:
+                 (1) free (allocation), (2) local_free (slow path),
+                 (3) thread_free (atomic foreign frees).
+
+ID: ALLOC_FREELIST_BITMAP_RUN_JEMALLOC
+   QUELLE        A05 jemalloc (Evans BSDCan 2006)
+   CLUSTER       AC2 Modern Production
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Bitmap-basiert pro Run; Red-Black-Tree pro Arena fuer
+                 freie Runs/Chunks.
+
+ID: ALLOC_FREELIST_PERTHREAD_TCMALLOC
+   QUELLE        A06 tcmalloc (Google 2009/2024)
+   CLUSTER       AC2 Modern Production
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Pro size-class single-linked Object-Liste (per-thread cache);
+                 Span = 2-byte indexed Array (Cache-effizient).
+                 Modern: Per-CPU Cache 256 KiB Slab per CPU.
+
+ID: ALLOC_FREELIST_BUMPHYBRID_SNMALLOC
+   QUELLE        A07 snmalloc (Lietar et al. ISMM 2019)
+   CLUSTER       AC2 Modern Production
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Hybrid Bump-Pointer + Lazy Free-List per Slab; Per-Thread
+                 Pending-Bucket-Array (2^k=64 Buckets) fuer batched message-passing.
+
+ID: ALLOC_FREELIST_GLOBAL_LOCKFREE_LIFO_SCALLOC
+   QUELLE        A08 scalloc (Aigner et al. OOPSLA 2015)
+   CLUSTER       AC2 Modern Production
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Per-Span object freelist (LIFO); Pro Size-Class globaler
+                 Span-Pool als lock-free LIFO (Treiber-stack-style).
+
+ID: ALLOC_FREELIST_NUMA_PERNODE
+   QUELLE        A09 NUMAlloc (Yang et al. ISMM 2023)
+   CLUSTER       AC3 NUMA + Hardware
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Pro NUMA-Node eigene Free-Lists; Per-Thread Cache mit
+                 NUMA-Origin-Tag.
+
+ID: ALLOC_FREELIST_RPMALLOC
+   QUELLE        A10 rpmalloc (Jansson Public Domain)
+   CLUSTER       AC3 NUMA + Hardware
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Per-Thread Cache + Global Cache; aehnlich tcmalloc-style
+                 aber single-file 2000 LOC C-Library.
+
+ID: ALLOC_FREELIST_LOCKFREE_THREADCACHE_LRMALLOC
+   QUELLE        A11 LRMalloc (Leite/Rocha VECPAR 2018)
+   CLUSTER       AC4 Concurrent + Formal
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Per-Thread Cache (modern Hot-Path) + Per-Procheap
+                 Active+Partial (von Michael 2004 geerbt).
+
+ID: ALLOC_FREELIST_CACHESET_DIRECTED_CAMA
+   QUELLE        A12 CAMA (Herter et al. ECRTS 2011)
+   CLUSTER       AC3 NUMA + Hardware
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Pro Cache-Set eigene Free-Liste; User waehlt Set bei alloc
+                 → predictable cache behavior fuer WCET.
+
+ID: ALLOC_FREELIST_BITMAP_AVL_STARMALLOC
+   QUELLE        A13 StarMalloc (Reitz/Fromherz/Protzenko OOPSLA 2024)
+   CLUSTER       AC4 Concurrent + Formal
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Bitmap pro Slab + AVL-Tree fuer Slab-Metadata + FIFO Queue
+                 fuer Reclamation. Verifiziert in Steel/F*.
+
+ID: ALLOC_FREELIST_LIFETIME_AWARE_L8_TCMALLOC2024
+   QUELLE        A14 ASPLOS 2024 TCMalloc Characterization (Zhou et al.)
+   CLUSTER       AC3 NUMA + Hardware
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  L=8 Span-Lists in Central FreeList differenziert nach
+                 live-allocation-count; span prioritization fuer release.
+
+ID: ALLOC_FREELIST_LOCAL_SHARED_HMALLOC
+   QUELLE        A15 HMalloc (Li/Yao 2019)
+   CLUSTER       AC4 Concurrent + Formal
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Strikte Trennung Local (per-thread, coalescence-free) und
+                 Shared (global, flag-basiert lock-free) Memory.
+
+ID: ALLOC_FREELIST_PIM_CORE_LOCAL
+   QUELLE        A16 PIM-malloc (Lee et al. HPCA-32 2026)
+   CLUSTER       AC3 NUMA + Hardware
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Per-PIM-Core eigene Free-Lists in PIM-Memory;
+                 Per-PIM-Core lightweight Hardware-Cache.
+
+ID: ALLOC_FREELIST_BUDDY_BITMAP
+   QUELLE        A19 Buddy (Knuth/Knowlton 1965/1968)
+   CLUSTER       AC1 Foundation
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Pro Order doubly-linked Liste freier Bloecke; Bitmap fuer
+                 Buddy-State-Tracking; XOR-Buddy-Lookup O(1).
+
+ID: ALLOC_FREELIST_PTMALLOC_TCACHE_FASTBIN
+   QUELLE        A21 ptmalloc2 / glibc malloc (Wolfram Gloger)
+   CLUSTER       AC5 Standard + Optimizing
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Hierarchie: tcache (per-thread, glibc 2.26+) → fastbin
+                 → smallbin → unsorted → largebin (per-arena).
+
+ID: ALLOC_FREELIST_VMEM_POW2_RB
+   QUELLE        A23 Vmem (Bonwick/Adams USENIX ATC 2001)
+   CLUSTER       AC1 Foundation
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Power-of-2 Freelists indexed by log2(size); external
+                 boundary tags + hash-table fuer allocated segments.
+
+ID: ALLOC_FREELIST_MAGAZINE_STACK_VMEM
+   QUELLE        A23 Magazines (Bonwick/Adams USENIX ATC 2001)
+   CLUSTER       AC1 Foundation
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Per-CPU Magazine = Stack[M] of pointers; Depot mit
+                 full+empty Magazine-Listen pro Cache.
+
+ID: ALLOC_FREELIST_SINGLE_PAGE_EXGEN
+   QUELLE        A18 Exgen-Malloc (Li/John/Yadwadkar IEEE CAL 2025)
+   CLUSTER       AC5 Standard + Optimizing
+   CONCEPT       FreeListTopology<T>
+   BESCHREIBUNG  Single-thread: Centralized Heap + Single Free-Block List;
+                 Page-Metadata adjacent zu Blocks.
+
+================================================================================
+AA2 — SIZE-CLASS-SCHEMA
+================================================================================
+
+ID: ALLOC_SIZECLASS_POW2
+   QUELLE        A19 Buddy (Knuth/Knowlton)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Strikte Power-of-2-Klassen, max 50% internal frag.
+
+ID: ALLOC_SIZECLASS_HOARD_POWB
+   QUELLE        A01 Hoard (Berger 2000)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Power-of-b mit b > 1 (Default b=1.2) → internal frag bound by b.
+
+ID: ALLOC_SIZECLASS_OBJECT_CACHE_SLAB
+   QUELLE        A02 Bonwick Slab (1994)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Object-Cache pro Typ (vom Client erstellt), default
+                 ~30 Caches in 8B-9K range mit 10-20% increments.
+
+ID: ALLOC_SIZECLASS_TIERED_JEMALLOC
+   QUELLE        A05 jemalloc (Evans 2006)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  4 Tiers: Tiny (2-16B pow2), Quantum-spaced (16-496B 16B-
+                 quantum), Sub-page (512-2048B pow2), Large (page-multiples),
+                 Huge (chunk-multiples).
+
+ID: ALLOC_SIZECLASS_TCMALLOC_88
+   QUELLE        A06 tcmalloc (Google)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  ~80-90 carefully chosen Klassen; max ~12.5% internal frag;
+                 8/16-Byte alignment.
+
+ID: ALLOC_SIZECLASS_PAGE_DIRECT_MIMALLOC
+   QUELLE        A04 mimalloc (Leijen 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  pages_direct[1024]: direct array fuer Objects <1 KiB;
+                 pages[]: lists pro size class darueber.
+                 Max internal frag 1/6 = 16.7%.
+
+ID: ALLOC_SIZECLASS_VIRTUAL_SPAN_SCALLOC
+   QUELLE        A08 scalloc (Aigner et al. 2015)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Power-of-2 Span-Sizes (4 KiB - 1 MiB), uniforme Behandlung
+                 Small+Medium+Large.
+
+ID: ALLOC_SIZECLASS_SNMALLOC_3TIER
+   QUELLE        A07 snmalloc (Lietar 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Small (<64 KiB) / Medium (64 KiB-16 MiB) / Large (≥16 MiB).
+
+ID: ALLOC_SIZECLASS_FINEGRAINED_8B_EXGEN
+   QUELLE        A18 Exgen-Malloc (Li/John/Yadwadkar 2025)
+   CLUSTER       AC5 Standard + Optimizing
+   BESCHREIBUNG  8-byte fine-grained steps statt power-of-2 → reduce internal frag.
+
+ID: ALLOC_SIZECLASS_DLMALLOC
+   QUELLE        A20 dlmalloc (Doug Lea)
+   CLUSTER       AC5 Standard + Optimizing
+   BESCHREIBUNG  32 Smallbins (8-byte steps bis 256B) + Trie fuer Large +
+                 mmap-Threshold (~128 KiB) separation.
+
+ID: ALLOC_SIZECLASS_PTMALLOC_HIERARCHY
+   QUELLE        A21 ptmalloc2 / glibc
+   CLUSTER       AC5 Standard + Optimizing
+   BESCHREIBUNG  tcache: 64 bins (24-1032B, 16B steps); fastbin: 10 (≤160B);
+                 smallbin: 62 fixed; largebin: 32 ranged.
+
+ID: ALLOC_SIZECLASS_PMR_POOL_OPTIONS
+   QUELLE        A22 N3916 PMR (C++17 std::pmr)
+   CLUSTER       AC5 Standard + Optimizing
+   BESCHREIBUNG  pool_options.max_blocks_per_chunk +
+                 largest_required_pool_block konfigurierbar.
+
+================================================================================
+AA3 — THREAD-LOCALITY
+================================================================================
+
+ID: ALLOC_THREADLOCALITY_NONE_SINGLE_THREAD
+   QUELLE        A18 Exgen-Malloc / A19 Buddy / A20 dlmalloc (original)
+   CLUSTER       AC1+AC5
+   BESCHREIBUNG  Bewusste Single-Thread-Optimierung; kein per-thread state.
+
+ID: ALLOC_THREADLOCALITY_PER_PROCESSOR_HEAP
+   QUELLE        A01 Hoard (Berger 2000)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Hash(thread-id) → heap-id; private heaps with thresholds.
+
+ID: ALLOC_THREADLOCALITY_PROCHEAP_MICHAEL
+   QUELLE        A03 Michael Lock-Free (2004), A11 LRMalloc (2018)
+   CLUSTER       AC1+AC4
+   BESCHREIBUNG  Per-thread procheap + per-sizeclass procheap mappings.
+
+ID: ALLOC_THREADLOCALITY_TCACHE_PER_THREAD
+   QUELLE        A04 mimalloc, A05 jemalloc, A06 tcmalloc (legacy),
+                 A07 snmalloc, A21 ptmalloc2 (glibc 2.26+)
+   CLUSTER       AC2+AC5
+   BESCHREIBUNG  Per-thread cache als Hot-Path-Schicht vor Arena/Central.
+
+ID: ALLOC_THREADLOCALITY_PER_CPU_RSEQ
+   QUELLE        A06 tcmalloc Modern (Google 2024)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Per-logical-CPU 256 KiB Slab; Linux RSEQ (4.18+) → lockless
+                 ohne CAS! Schneller als Per-Thread-Cache.
+
+ID: ALLOC_THREADLOCALITY_NUMA_ORIGIN_AWARE
+   QUELLE        A09 NUMAlloc (Liu/Berger 2023)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Per-NUMA-Node statt nur Per-Thread; Origin-Tag bei
+                 allocation, Free returns to origin-node freelist.
+
+ID: ALLOC_THREADLOCALITY_PER_CORE_PIM
+   QUELLE        A16 PIM-malloc (Lee 2026)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Per-PIM-Core in PIM-Memory; entspricht "PIM-Core-Locality".
+
+ID: ALLOC_THREADLOCALITY_MAGAZINE_PER_CPU
+   QUELLE        A23 Magazines (Bonwick/Adams 2001)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Per-CPU Magazine-Cache (loaded + previous Stack[M]) →
+                 KERN der Magazine-Innovation, lockfreie Common-Path.
+
+ID: ALLOC_THREADLOCALITY_HETEROGENEOUS_DYNAMIC
+   QUELLE        A14 ASPLOS 2024 TCMalloc Optimization 1
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Heterogeneous Per-CPU Caches mit dynamischer Resizing;
+                 background thread alle 5s redistributes capacity.
+
+================================================================================
+AA4 — SYNCHRONIZATION
+================================================================================
+
+ID: ALLOC_SYNC_GLOBAL_LOCK
+   QUELLE        A19 Buddy / A20 dlmalloc (original)
+   CLUSTER       AC1+AC5
+   BESCHREIBUNG  Single global mutex; einfach, aber Skalierungs-Bottleneck.
+
+ID: ALLOC_SYNC_PERHEAP_LOCK_HOARD
+   QUELLE        A01 Hoard (Berger 2000)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Pro-Heap-Lock (1 fuer malloc, 2 fuer free); Global heap
+                 lock nur bei Cross-Heap-Transfer (selten).
+
+ID: ALLOC_SYNC_PERCACHE_LOCK_SLAB
+   QUELLE        A02 Bonwick Slab (1994)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Per-Cache Locking statt globaler Heap-Lock.
+
+ID: ALLOC_SYNC_LOCKFREE_CAS_MICHAEL
+   QUELLE        A03 Michael (2004), A11 LRMalloc (2018)
+   CLUSTER       AC1+AC4
+   BESCHREIBUNG  Vollstaendig lock-free CAS (oder LL/SC); SafeCAS via
+                 Hazard Pointers fuer pointer-sized Strukturen;
+                 ABA-Prevention via tag:42 in Anchor.
+
+ID: ALLOC_SYNC_NO_LOCKS_MIMALLOC
+   QUELLE        A04 mimalloc (Leijen 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  No locks at all! Nur atomic ops fuer thread_free.
+                 thread_id check via fs-register-read O(1).
+
+ID: ALLOC_SYNC_PERARENA_LOCK_JEMALLOC
+   QUELLE        A05 jemalloc, A21 ptmalloc2 (multi-arena)
+   CLUSTER       AC2+AC5
+   BESCHREIBUNG  Per-Arena chunk_alloc_lock + bin_lock; tcache lockless.
+
+ID: ALLOC_SYNC_PERCPU_LOCKLESS_RSEQ
+   QUELLE        A06 tcmalloc Modern (Google)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Per-CPU lockless via RSEQ (kein Atomic noetig!) Linux 4.18+.
+
+ID: ALLOC_SYNC_MESSAGE_PASSING_SNMALLOC
+   QUELLE        A07 snmalloc (Lietar 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Lock-free; Batched Message-Passing reduce Atomic-Frequency.
+
+ID: ALLOC_SYNC_LOCKFREE_TREIBER_SCALLOC
+   QUELLE        A08 scalloc (Aigner 2015)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Lock-free Treiber-stack fuer Globale Pools mit ABA-Prevention.
+
+ID: ALLOC_SYNC_PER_NUMA_NODE_LOCK
+   QUELLE        A09 NUMAlloc (Liu/Berger 2023)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Per-NUMA-Node-Lock; reduziert Cross-Node-Coherence-Verkehr.
+
+ID: ALLOC_SYNC_LOCKFREE_RPMALLOC
+   QUELLE        A10 rpmalloc (Jansson)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Vollstaendig lock-free (atomics only).
+
+ID: ALLOC_SYNC_VERIFIED_LOCKFREE_STARMALLOC
+   QUELLE        A13 StarMalloc (Reitz/Fromherz/Protzenko 2024)
+   CLUSTER       AC4 Concurrent + Formal
+   BESCHREIBUNG  Verifiziert lock-free wo eingesetzt; AVL-Trees mit
+                 Constant-Time-Operations.
+
+ID: ALLOC_SYNC_SHARED_MUTEX_DEFAULT_COMDARE
+   QUELLE        Comdare-eigen (REV 7 §1.4 A3)
+   CLUSTER       Comdare-Default
+   BESCHREIBUNG  std::shared_mutex (C++17) - Single-Writer-Multi-Reader Default.
+
+ID: ALLOC_SYNC_SCOPED_LOCK_PERPAGE_COMDARE
+   QUELLE        Comdare-eigen (REV 7 §1.4 A4 + §3.3)
+   CLUSTER       Comdare-Optional
+   BESCHREIBUNG  std::scoped_lock (C++17) ueber pro-Cache-Page-Mutexe;
+                 Cache-Page-Aware Multi-Writer optional.
+
+ID: ALLOC_SYNC_PMR_SYNC_VARIANTS
+   QUELLE        A22 N3916 PMR
+   CLUSTER       AC5 Standard + Optimizing
+   BESCHREIBUNG  synchronized_pool_resource (thread-safe) vs
+                 unsynchronized_pool_resource (lockless single-threaded).
+
+================================================================================
+AA5 — ALLOCATION-POLICY
+================================================================================
+
+ID: ALLOC_POLICY_FIRST_FIT
+   QUELLE        A20 dlmalloc (original best-fit fallback)
+   CLUSTER       AC5
+   BESCHREIBUNG  Erste passende Free-Liste; einfach, schnell.
+
+ID: ALLOC_POLICY_BEST_FIT_TREE
+   QUELLE        A20 dlmalloc Treebin
+   CLUSTER       AC5
+   BESCHREIBUNG  Best-fit via Trie/Tree-Suche fuer Large-Requests.
+
+ID: ALLOC_POLICY_FULLEST_SUPERBLOCK_HOARD
+   QUELLE        A01 Hoard (Berger 2000)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Always allocate from "fullest" superblock (move-to-front
+                 auf Fullness-Bin).
+
+ID: ALLOC_POLICY_ACTIVE_PARTIAL_NEWSB_MICHAEL
+   QUELLE        A03 Michael (2004), A11 LRMalloc
+   CLUSTER       AC1+AC4
+   BESCHREIBUNG  3-Pfad-Hierarchie: MallocFromActive (Hot) →
+                 MallocFromPartial → MallocFromNewSB.
+
+ID: ALLOC_POLICY_BUMP_POINTER_THEN_FREELIST
+   QUELLE        A07 snmalloc (Lietar 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Bump-Pointer first, dann Free-List bei first free → fuer
+                 Allocation-Heavy + Rarely-Freeing optimal.
+
+ID: ALLOC_POLICY_INSTANT_FIT_VMEM
+   QUELLE        A23 Vmem (Bonwick/Adams 2001)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Power-of-2 Freelist + Instant-Fit (take first in
+                 freelist[ceil(log2(size))+1]) → garantiert O(1).
+
+ID: ALLOC_POLICY_BEST_FIT_VMEM
+   QUELLE        A23 Vmem (Bonwick/Adams 2001)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  VM_BESTFIT-Option: search freelists fuer best-fit (langsamer
+                 als instant-fit, aber lower fragmentation).
+
+ID: ALLOC_POLICY_NEXT_FIT_VMEM
+   QUELLE        A23 Vmem (Bonwick/Adams 2001)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  VM_NEXTFIT-Option: cyclic search starting at last-allocated.
+
+ID: ALLOC_POLICY_NUMA_ORIGIN_AWARE
+   QUELLE        A09 NUMAlloc (Liu/Berger 2023)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Origin-Aware: Re-Use bleibt auf gleichem NUMA-Node.
+
+ID: ALLOC_POLICY_CACHE_SET_DIRECTED_CAMA
+   QUELLE        A12 CAMA (Herter et al. 2011)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  User-controlled placement: addr & cache_index_mask == set.
+
+ID: ALLOC_POLICY_TCACHE_FAST_FALLTHROUGH
+   QUELLE        A21 ptmalloc2 (glibc), A06 tcmalloc, A05 jemalloc
+   CLUSTER       AC2+AC5
+   BESCHREIBUNG  tcache → fastbin → smallbin → unsorted → largebin → top
+                 → sbrk/mmap (Stack of fallback).
+
+ID: ALLOC_POLICY_SPAN_PRIORITIZATION_LIFETIME
+   QUELLE        A14 ASPLOS 2024 TCMalloc Optimization 3
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Allociert zuerst aus Spans mit MEHR live allocations
+                 → low-count-Spans werden eher leer + released.
+
+ID: ALLOC_POLICY_PIM_METADATA_PIM_EXECUTED
+   QUELLE        A16 PIM-malloc (Lee 2026)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Allokator-Metadata + Compute in PIM-Memory; kein Host-CPU-
+                 Round-Trip im Common-Case.
+
+================================================================================
+AA6 — RECLAMATION
+================================================================================
+
+ID: ALLOC_RECL_BOUNDARY_TAG_COALESCE
+   QUELLE        A20 dlmalloc, A21 ptmalloc2
+   CLUSTER       AC5
+   BESCHREIBUNG  Boundary-Tag-basiert: prev_size field, coalesce mit
+                 linken/rechten Nachbarn in O(1) bei Free.
+
+ID: ALLOC_RECL_BUDDY_XOR_COALESCE
+   QUELLE        A19 Buddy
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Buddy-Lookup via XOR(addr, 1<<order); Merge wenn buddy frei.
+
+ID: ALLOC_RECL_EMPTY_THRESHOLD_HOARD
+   QUELLE        A01 Hoard (Berger 2000)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Empty-Threshold f, K: Transfer mostly-empty Superblock
+                 zu global heap (NICHT zur OS!).
+
+ID: ALLOC_RECL_REFCOUNT_SLAB
+   QUELLE        A02 Bonwick Slab (1994)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Reference Count pro Slab → wenn 0: ganzer Slab → VM zurueck.
+                 15-second working-set algorithm + kmem_cache_reap.
+
+ID: ALLOC_RECL_LOCKFREE_DESCAVAIL_MICHAEL
+   QUELLE        A03 Michael (2004)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Hyperblocks (1MB batches of 16KB superblocks); descriptor
+                 recycle via lock-free LIFO + Hazard-Pointer SafeCAS.
+
+ID: ALLOC_RECL_DEFERRED_FREE_MIMALLOC
+   QUELLE        A04 mimalloc (Leijen 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Slow path collects all 3 lists; deferred_free callback
+                 (User-Hook fuer reference-count batching!).
+
+ID: ALLOC_RECL_DECAY_BASED_PURGING
+   QUELLE        A05 jemalloc (modern, 4.1.0+)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  madvise(MADV_DONTNEED) on idle pages nach decay_time;
+                 background threads fuer page-purging.
+
+ID: ALLOC_RECL_PAGE_RELEASE_TCMALLOC
+   QUELLE        A06 tcmalloc
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Adaptive max_per_class steals from underused classes;
+                 Page release back to OS via madvise; Decay-based.
+
+ID: ALLOC_RECL_BATCH_DISPATCH_SNMALLOC
+   QUELLE        A07 snmalloc (Lietar 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  1 MiB Batch-Dispatch zwischen Allokatoren; Cross-Allocator-
+                 Forwarding via Multi-Hop.
+
+ID: ALLOC_RECL_SPAN_FREED_AT_LAST_OBJECT_SCALLOC
+   QUELLE        A08 scalloc (Aigner 2015)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Span freed bei letztem Object-Free zurueck zum globalen Pool;
+                 KEIN Buddy-Coalesce noetig dank Virtual-Span-Approach.
+
+ID: ALLOC_RECL_NUMA_ORIGIN_RETURN
+   QUELLE        A09 NUMAlloc (Liu/Berger 2023)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Block geht zurueck zu Free-List des Origin-Nodes,
+                 NICHT freeing-thread Nodes!
+
+ID: ALLOC_RECL_WAITFREE_CRYSTALLINE
+   QUELLE        A17 Crystalline (Nikolaev PLDI 2024)
+   CLUSTER       AC4 Concurrent + Formal
+   BESCHREIBUNG  Wait-free reclamation; asynchron + balanced; bounded memory;
+                 ubiquitous x86-64 + ARM64 atomics.
+
+ID: ALLOC_RECL_QUARANTINE_HARDENED
+   QUELLE        A13 StarMalloc, A04 smimalloc
+   CLUSTER       AC4 Concurrent + Formal + AC2 Hardened-Variants
+   BESCHREIBUNG  Recently-freed Pages bleiben N Frees long unmapped →
+                 Use-After-Free Detection.
+
+ID: ALLOC_RECL_LIFETIME_AWARE_HUGEPAGE_FILLER
+   QUELLE        A14 ASPLOS 2024 TCMalloc Optimization 4
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Span-capacity als lifetime proxy; long-lived und short-lived
+                 spans auf verschiedenen Hugepages; -8.1% dTLB misses.
+
+ID: ALLOC_RECL_MAGAZINE_RESIZE_VMEM
+   QUELLE        A23 Magazines (Bonwick/Adams 2001)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Magazine-Resize bei Depot-Lock-Kontention; M doppeln (typ.
+                 1, 3, 7, 15, 31, 63, 127, 143).
+
+ID: ALLOC_RECL_MONOTONIC_NO_FREE
+   QUELLE        A22 PMR monotonic_buffer_resource
+   CLUSTER       AC5
+   BESCHREIBUNG  Bump-Pointer; KEIN individuelles Free; alles freed bei
+                 Resource-Destruction (analog Test-Daten Bulk-Load).
+
+ID: ALLOC_RECL_COALESCENCE_FREE_HMALLOC
+   QUELLE        A15 HMalloc (Li/Yao 2019)
+   CLUSTER       AC4 Concurrent + Formal
+   BESCHREIBUNG  Coalescence-Free fuer Local-Memory; flag-basiert lock-free
+                 fuer Shared-Memory.
+
+================================================================================
+AA7 — FRAGMENTATION-STRATEGY
+================================================================================
+
+ID: ALLOC_FRAG_SLAB_COLORING
+   QUELLE        A02 Bonwick Slab (1994)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Slab-Coloring: jede neue Slab Buffer-Adressen offset (color)
+                 → bus imbalance 43%->17%, primary cache miss -13%.
+
+ID: ALLOC_FRAG_BOUNDED_BLOWUP_HOARD
+   QUELLE        A01 Hoard (Berger 2000)
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Empty-fraction f (Default 1/4) + Threshold-K-Superblocks;
+                 bounded blowup O(1) constant factor.
+
+ID: ALLOC_FRAG_CACHE_PAGE_AWARE_MULTI_WRITER
+   QUELLE        Comdare-eigen (REV 7 §3.3) + A12 CAMA Inspiration
+   CLUSTER       Comdare-Optional
+   BESCHREIBUNG  Pro Cache-Page (64 B) ein eigener mutex; Akquise via
+                 std::scoped_lock fuer Multi-Page-Operations
+                 (deadlock-vermeidend).
+
+ID: ALLOC_FRAG_GUARD_PAGES_HARDENED
+   QUELLE        A13 StarMalloc, A04 smimalloc
+   CLUSTER       AC4+AC2 Hardened
+   BESCHREIBUNG  OS Guard Pages zwischen Slabs; Heap-Overflow → Page-Fault.
+
+ID: ALLOC_FRAG_BUDDY_INTERNAL_50PC
+   QUELLE        A19 Buddy
+   CLUSTER       AC1 Foundation
+   BESCHREIBUNG  Internal frag bis 50% durch Power-of-2; external frag
+                 minimal durch Coalesce.
+
+ID: ALLOC_FRAG_VIRTUAL_SPAN_RESERVATION
+   QUELLE        A08 scalloc (Aigner 2015)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Riesige Virtual-Reservation (2^46 Bytes); Pages on-demand
+                 committed; vermeidet klassische Buddy-Probleme.
+
+ID: ALLOC_FRAG_HUGEPAGE_FILLER
+   QUELLE        A06 tcmalloc, A14 ASPLOS-2024
+   CLUSTER       AC2+AC3
+   BESCHREIBUNG  Hugepage-aware Backend (filler/region/cache); 30-40% TLB-
+                 Miss-Reduction.
+
+ID: ALLOC_FRAG_INCREMENTAL_HUGEPAGE_NUMA
+   QUELLE        A09 NUMAlloc (Liu/Berger 2023)
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Incremental Hugepage-Sharing; balanciert Performance vs
+                 Memory bei NUMA.
+
+ID: ALLOC_FRAG_PAGE_METADATA_COMPACTION
+   QUELLE        A18 Exgen-Malloc (2025)
+   CLUSTER       AC5 Standard + Optimizing
+   BESCHREIBUNG  Page-Metadata adjacent zu Blocks; minimaler Pointer-Chase;
+                 erhoehte Cache-Residency.
+
+ID: ALLOC_FRAG_64BIT_SLAB_METADATA_SNMALLOC
+   QUELLE        A07 snmalloc (Lietar 2019)
+   CLUSTER       AC2 Modern Production
+   BESCHREIBUNG  Nur 64 Bits Metadata pro 64 KiB Slab; Slab freed bei letztem
+                 Free → minimaler Overhead.
+
+ID: ALLOC_FRAG_NUCA_AWARE_TRANSFER
+   QUELLE        A14 ASPLOS 2024 TCMalloc Optimization 2
+   CLUSTER       AC3 NUMA + Hardware
+   BESCHREIBUNG  Eine Transfer-Cache pro LLC-Domain (chiplet); reduziert
+                 inter-cache-domain access (2.07x langsamer auf chiplets).
+
+================================================================================
+CROSS-PAPER PERMUTATIONS-MATRIX (Auszug)
+================================================================================
+
+Pflicht-Konkretisierungs-Kombinationen fuer Comdare CacheEngine:
+
+  [Hoard-style]   = AA1 SUPERBLOCK + AA2 POWB(1.2) + AA3 PER_PROCESSOR
+                  + AA4 PERHEAP_LOCK + AA5 FULLEST_SUPERBLOCK
+                  + AA6 EMPTY_THRESHOLD + AA7 BOUNDED_BLOWUP
+                  → klassischer scalable allocator
+
+  [mimalloc-style] = AA1 PAGE_SHARDED_3LIST + AA2 PAGE_DIRECT
+                   + AA3 TCACHE_PER_THREAD + AA4 NO_LOCKS
+                   + AA5 TCACHE_FAST_FALLTHROUGH + AA6 DEFERRED_FREE
+                   + AA7 64BIT_SLAB
+                   → modernster Multi-Thread Hot-Path
+
+  [tcmalloc-modern] = AA1 PERTHREAD + AA2 TCMALLOC_88
+                    + AA3 PER_CPU_RSEQ + AA4 PERCPU_LOCKLESS_RSEQ
+                    + AA5 TCACHE_FAST + AA6 PAGE_RELEASE
+                    + AA7 HUGEPAGE_FILLER
+                    → Linux-Production-Optimum
+
+  [PRT-ART-Pool]   = AA1 SUPERBLOCK + AA2 OBJECT_CACHE_SLAB
+                   + AA3 TCACHE_PER_THREAD + AA4 SHARED_MUTEX_DEFAULT
+                   + AA5 FULLEST_SUPERBLOCK + AA6 REFCOUNT_SLAB
+                   + AA7 SLAB_COLORING
+                   → PRT-ART 4+2 Pools optimal-config
+
+  [Hardened-Comdare] = [PRT-ART-Pool] + AA6 QUARANTINE_HARDENED
+                     + AA7 GUARD_PAGES_HARDENED
+                     → security-oriented variant
+
+  [Lockless-Comdare] = AA1 LOCKFREE_ANCHOR + AA4 LOCKFREE_CAS
+                     + AA6 WAITFREE_CRYSTALLINE
+                     → maximal-concurrency variant fuer 100+ CPUs
+
+  [NUMA-Comdare]    = AA3 NUMA_ORIGIN_AWARE + AA4 PER_NUMA_LOCK
+                    + AA5 NUMA_ORIGIN_AWARE + AA6 NUMA_ORIGIN_RETURN
+                    + AA7 INCREMENTAL_HUGEPAGE_NUMA
+                    → multi-socket NUMA optimum
+
+  [Realtime-Comdare] = AA5 CACHE_SET_DIRECTED_CAMA
+                     + AA6 BOUNDARY_TAG_COALESCE
+                     + AA7 SLAB_COLORING
+                     + AA4 SHARED_MUTEX_DEFAULT (or single-thread)
+                     → predictable WCET fuer real-time
+
+  [Single-Thread-Optimum] = AA3 NONE_SINGLE_THREAD + AA4 GLOBAL_LOCK (no contention)
+                          + AA1 SINGLE_PAGE_EXGEN + AA2 FINEGRAINED_8B
+                          + AA7 PAGE_METADATA_COMPACTION
+                          → single-thread Comdare-Variant
+
+================================================================================
+PRT-ART NUTZUNG (Pool A/B/C/D/R/V) — Mapping zu Allokator-Achsen
+================================================================================
+
+PRT-ART definiert 4+2 Pools (REV 6 §5.17 + §5.21):
+
+Pool A (256B Slabs fuer Suchtyp A Array[256]):
+  AA1 SLAB_BUFCTL + AA2 OBJECT_CACHE + AA7 SLAB_COLORING
+
+Pool B (64KB Slabs fuer Suchtyp B Array[65535]):
+  AA1 SUPERBLOCK + AA2 OBJECT_CACHE + AA7 HUGEPAGE_FILLER (option)
+
+Pool C (4KB+ variable fuer Suchtyp C Vector<u8,u8>):
+  AA1 SLAB_BUFCTL + AA2 PAGE_DIRECT + AA5 BUMP_POINTER_THEN_FREELIST
+
+Pool D (4KB+ variable fuer Suchtyp D Vector<u16,u16>):
+  AA1 SLAB_BUFCTL + AA2 PAGE_DIRECT + AA5 BUMP_POINTER_THEN_FREELIST
+
+Pool R (Redirect-Knoten 64B Cache-Line):
+  AA1 SLAB_BUFCTL + AA2 OBJECT_CACHE + AA7 SLAB_COLORING
+
+Pool V-static (Values mit statischer Groesse):
+  AA1 SLAB_BUFCTL + AA2 OBJECT_CACHE + AA5 BUMP_POINTER
+
+Pool V-dynamic (Values mit dynamischer Groesse + Signaling-Bits):
+  AA1 PAGE_SHARDED_3LIST + AA2 FINEGRAINED_8B + AA5 BUMP_POINTER_THEN_FREELIST
+
+================================================================================
+IMPLEMENTIERUNGS-PFADE (Phase 6.2.C Klone-Plan)
+================================================================================
+
+Pflicht-Klone (sofort in Phase 6.2.C):
+  comdare-cache-engine/ext/A01-hoard/             (BSD/GPL Dual)
+  comdare-cache-engine/ext/A02-bonwick-slab/      (Linux SLUB-Subset CDDL/GPL)
+  comdare-cache-engine/ext/A03-michael-lockfree/  (scotts/michael MIT)
+  comdare-cache-engine/ext/A04-mimalloc/          (MIT)
+  comdare-cache-engine/ext/A05-jemalloc/          (BSD-2-Clause)
+  comdare-cache-engine/ext/A06-tcmalloc/          (Apache 2.0)
+  comdare-cache-engine/ext/A07-snmalloc/          (MIT)
+  comdare-cache-engine/ext/A08-scalloc/           (BSD)
+  comdare-cache-engine/ext/A10-rpmalloc/          (Public Domain / MIT)
+  comdare-cache-engine/ext/A11-lrmalloc/          (MIT)
+  comdare-cache-engine/ext/A20-dlmalloc/          (Public Domain)
+
+Klone optional (sobald Code-Repo identifiziert):
+  comdare-cache-engine/ext/A09-numalloc/          (Forschungsprototyp)
+  comdare-cache-engine/ext/A12-cama-herter/       (Saarland-internal?)
+  comdare-cache-engine/ext/A13-starmalloc/        (Inria-Prosecco)
+  comdare-cache-engine/ext/A15-hmalloc/           (IEEE-Code unklar)
+  comdare-cache-engine/ext/A16-pim-malloc/        (KAIST VIA-Research)
+  comdare-cache-engine/ext/A17-crystalline/       (Penn State)
+  comdare-cache-engine/ext/A18-exgen-malloc/      (UT Austin SysML)
+
+Nicht-klone-pflichtig (in Standard / Legacy Reference):
+  A14 ASPLOS-2024 TCMalloc-Optimierungen (im google/tcmalloc gerollt)
+  A19 Buddy-System (eigene Implementation als Studie)
+  A21 ptmalloc2/glibc (LGPL — bereits System-Default verfuegbar)
+  A22 N3916 PMR (C++17 Standard-Library)
+  A23 Vmem+Magazines (illumos / FreeBSD UMA)
+
+================================================================================
+NEXT STEPS — Phase 6.2.E ff.
+================================================================================
+
+Phase 6.2.E (Cache-Engine-Allokator-Bibliothek):
+  Erstellen unter comdare-cache-engine/cache_engine/include/cache_engine/allocators/
+  - concepts/i_allocation_strategy.hpp (Concept-Wurzel)
+  - concepts/allocator_concept.hpp (std::allocator-konform)
+  - concepts/pmr_resource_concept.hpp (std::pmr::memory_resource)
+  - concepts/locking_concept.hpp (Single-W/Multi-R + Cache-Page-Aware)
+  - families/a01_hoard/, a02_slab/, ... a23_vmem/ (1 Verzeichnis pro A-ID)
+  - axes/aa1_freelist_topology/, ... aa7_fragmentation_strategy/
+
+Phase 6.2.F (Container-Tests-Matrix):
+  Pro Konkretisierung: Tests mit std::vector, map, unordered_map,
+  deque, list, set, pmr-Variants.
+
+Phase 6.2.G (Concurrency-Tests):
+  Pro Konkretisierung: Single-Writer-Multi-Reader Default + optional
+  Cache-Page-Aware Multi-Writer.
+
+================================================================================
+ENDE Allokator_Matrix.txt
+================================================================================
