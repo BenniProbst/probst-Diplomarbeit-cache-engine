@@ -840,12 +840,13 @@ User-Nachricht 2026-05-12/13 in 48 atomische Anforderungen zerlegt (Kategorien A
 
 ✅ **47 von 48 Atomen vollstaendig dokumentiert** (alle E.6-E.8 mit dieser Revision in §4.2(f) ergaenzt).
 
-⚠️ **1 offene Klaerung (A.4):** "jalloc" — Begriffsambiguitaet:
-- (a) Tippfehler fuer **jemalloc** (A05 Jason Evans BSDCan 2006)? → wahrscheinlichste Interpretation
-- (b) **Java-Hotspot-VM-Allocator (jvm-internal)**?
-- (c) Anderer von Nutzer gemeinter Allokator?
+✅ **A.4 GEKLAERT 2026-05-13:** "jalloc" = **jemalloc** (A05, Jason Evans, BSDCan 2006).
 
-Bitte Klaerung — danach ist die Doku-Phase 6.2.A vollstaendig und Phase 6.2.B (Paper-Tieflektuere) kann starten.
+**Doku-Phase 6.2.A VOLLSTAENDIG.** User-Direktive 2026-05-13: autonom weiter.
+
+**Pflicht laut User:** "Allokator-Familien benoetigen die angefragte Recherche, bis wir den groessten Teil des angewendeten Standes der Technik anbieten koennen."
+
+**→ Phase 6.2.B startet:** Tieflektuere aller 23 Allokator-Paper analog Phase 3.B (33 Such-Paper). Output unter `_paper_extractions_allocators/`.
 
 ---
 
