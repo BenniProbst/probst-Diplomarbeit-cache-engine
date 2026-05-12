@@ -9,6 +9,9 @@
 # Build-Artefakte
 build/
 out/
+
+# Phase 6.2 Code-Archivierung (zu gross fuer Repo, lokal beibehalten)
+_archive_code_pre_migration/
 cmake-build-*/
 *.o
 *.a
