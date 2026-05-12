@@ -362,6 +362,24 @@ Stufe 3: SearchEngine         (erbt ExecutionEngine; +
                                auf CacheEngine wenn Permutations-Typen fehlen
 ```
 
+**(f) Layer-Verantwortlichkeiten (Provider-Rollen, User-Direktive 2026-05-12 woertlich):**
+
+Die drei Schichten sind nicht nur Consumer (die CacheEngine konsumieren), sondern jede Schicht **stellt ihrer hoeheren Schicht eine semantisch staerkere Schnittstelle bereit**. Sie heben das Abstraktions-Niveau gestaffelt an:
+
+| Schicht | Provider-Rolle (was sie der naechsten Schicht BEREITSTELLT) | Verhaeltnis zu CacheEngine-Limits |
+|---------|--------------------------------------------------------------|------------------------------------|
+| **CacheEngine** (Stufe 1) | Stand-der-Technik-Bausteine + Visitor-Hooks fuer Algorithmus-Beratung + direktes experimentelles OS-Interface (Cache-Page-Topologie, Allocator-Pools, Concurrency-Disziplinen, Telemetrie, Scheduling-Heuristiken) | Definiert die Limits / Budgets (z.B. Cache-Page-Kapazitaet, Allocator-Pool-Groessen, Concurrency-Atomizitaet) |
+| **ExecutionEngine** (Stufe 2) | **Stellt mithilfe der CacheEngine experimentelle OS-Primitiven bereit** — Wrap der CacheEngine-Bausteine zu hoeheren Operationen (z.B. ein cache-line-aligned-Alloc, ein NUMA-konformes Read-Pin, ein Coherence-aware-Write). Die ExecutionEngine "uebersetzt" CacheEngine-Bausteine zu wiederverwendbaren OS-Primitiven, ohne sie semantisch zu ueberschreiten. | Reicht die CacheEngine-Limits in primitiver Form weiter; permutiert sie compile-time-statisch ueber `processing_strategy_type`. |
+| **SearchEngine** (Stufe 3, Dach) | **Stellt Implementierungen fuer Such-spezifische, komplexere experimentelle Standard-OS-Such- und Speicherzugriffsmuster + Routinen bereit** — z.B. ein Trie-Walk-Pattern, ein B+-Range-Scan-Pattern, ein Prefix-Scan, ein Hot-Path-Lookup. Diese Patterns nutzen ExecutionEngine-Primitiven, sind aber semantisch hoeher (sie kennen "Suche", "Trie", "Rang"). Die SearchEngine bildet **das Dach des Konstrukts**: sie verkoerpert **Suchheuristiken und Konzepte, die strategisch die CacheEngine-definierten Limits an Ressourcen abbilden** — und **den Bereich der reinen Speicherzugriffsmuster weit ueberschreiten**. | **Ueberschreitet** die CacheEngine-Limits konzeptuell: Eine SearchEngine kann strategische Entscheidungen treffen, die Limits ueber mehrere Cache-Pages, mehrere Concurrency-Domaenen oder mehrere Heuristik-Zyklen hinweg orchestrieren — die CacheEngine selbst kann das pro Baustein nicht. |
+
+Diese Layer-Provider-Hierarchie ist Pflicht fuer die Architektur:
+
+1. Eine SearchEngine darf nicht direkt CacheEngine-Bausteine konsumieren — sie muss durch die ExecutionEngine-Primitiven-Schicht gehen, sonst zerstoert sie die ABI-Stabilitaet (siehe §5.28.4 in REV 6).
+2. Eine ExecutionEngine darf keine Such-spezifischen Patterns kennen — sie operiert nur auf OS-Primitiven-Ebene (Allocator, Concurrency, Cache-Page, NUMA-Pinning).
+3. PRT-ART als Pruefling-SearchEngine kann eigene Such-Patterns hinzufuegen, faellt aber per Compile-time-Fallback (§6) auf die ExecutionEngine-Primitiven zurueck, wenn ein Baustein im Pruefling-Permutations-Stack fehlt.
+
+Die SearchEngine ist damit **strategisch dem CacheEngine-Stack uebergeordnet**, weil sie Suchheuristik-Konzepte (z.B. "Hot-Path-Recognition", "Adaptive-Prefetch-Distance", "Density-Threshold-Transition") als Patterns realisiert, die einzelne CacheEngine-Bausteine nicht ausdruecken koennen.
+
 ### 4.3 Variadic-Template-Magie (Implementierungs-Skelett)
 
 ```cpp
@@ -716,45 +734,118 @@ Conversion ist **Pflicht-Bestandteil des Messmoduls**, aber wird **NIE waehrend 
 
 ---
 
-## 11. Bestaetigung der Doku-Vollstaendigkeit (Checkliste)
+## 11. Bestaetigung der Doku-Vollstaendigkeit (48-Atom-Checkliste)
 
-| User-Anmerkung | Sektion in dieser Doku |
-|----------------|------------------------|
-| Custom Allokation als Cache-Engine-Basisdisziplin vergessen | §1 |
-| Google-Scholar-Recherche Allokationsmethoden | §2 |
-| jalloc/malloc/calloc als bekannte Familien | §2 (A21 ptmalloc2 = glibc malloc; jalloc nicht eindeutig — kann jemalloc gemeint sein, in §2 A05; verifizieren) |
-| Pro Paper elaborate Zusammenfassung + Code-Recherche | §9 Phase 6.2.B/C |
-| Optional thread-safe Implementierungen | §3.1, §3.2, §3.3 |
-| Grundlage aller std-Container | §3.1, §3.2 |
-| Umfangreiche Tests Allokation/Container/Threading/Concurrency | §3.2 |
-| Standard single-write multi-read | §3.3 |
-| Optional local-aware multi-write Cache-Page-Awareness | §3.3 |
-| C++17 Locks recherchieren | §1.5 + Recherche §2.6 |
-| ABI-stabiles C++23 Interface jeder Experiment-Permutation | §4 |
-| Pseudocode-Definition std::variant<search_engine : execution_engine(...)>() | §4.1 woertlich + §4.2 praezisiert |
-| Variadic Template 1-Param implicit-uint64 / 2+Param Key+Tuple | §4.2 (b) + §4.3 |
-| Komplexer Key implicit Fingerprint-Hash binary string | §4.2 (c) |
-| Einfach-Key implicit binary-cast | §4.2 (c) + Overload-Notiz |
-| execution_engine erbt CacheEngine als Visitor-Pattern | §4.2 (d) |
-| processing_strategy_type compile-time permutation + runtime Verhalten | §4.2 (d) |
-| 3 Stufen CacheEngineBuilder + ExecutionEngine + SearchEngine | §4.2 (e), §5 |
-| CacheEngineBuilder eigenstaendiges Programm + XML | §5 |
-| PRT-ART nutzt CacheEngine + Permutations-Struktur-Vererbung | §6.1 |
-| Compile-time-Fallback PRT-ART → CacheEngine | §6.1 + §6.2 Concept-Skelett |
-| Bevorzugung CacheEngine-Struktur in Stub-Bearbeitung | §6.1.5 |
-| `_archive_code_pre_migration/` | Bereits umgesetzt (siehe Status-Update vom 2026-05-13) |
-| Testdaten Deserialization/Parsing + fair-aligned | §7 |
-| test_data_set_accumulation_engine_type kennt Test-Algo-Interfaces | §7.2 |
-| SearchEngine-Initialisierung laedt Datasets | §7.1 + §7.2 |
-| Mikrobenchmark-Suite no-deprecate Wrapper | §8.2.1 |
-| Custom-Allocation #1 fuer Messergebnisse, gross genug, nie fail | §8.2.2 |
-| Separate Custom-Allocation #2 fuer Sparse-Byte-States | §8.2.2, §8.2.3 |
-| Konsolidierung Binary → handliche Formate erst am Experiment-Ende | §8.2.4 |
-| Auswertbares Binary-Blob als finales Ergebnis | §8.2.4 |
-| Laufzeit-Fokus sparse + minimaler OS-Einfluss | §8.2.3 |
-| Auswertungs-Konversion-Routine im Messmodul | §8.2.5 |
+User-Nachricht 2026-05-12/13 in 48 atomische Anforderungen zerlegt (Kategorien A-J). Stand 2026-05-13 nach REV-7-Delta-Check:
 
-Alle 32 Anmerkungen sind dokumentiert. Bitte freigeben oder Korrekturen einbringen, bevor Phase 6.2.B (Paper-Recherche) gestartet wird.
+### Kategorie A — Custom Allokation Basis (A.1-A.13)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| A.1 | Custom Allokation = wichtigste Cache-Engine-Basis-Disziplin (vergessen) | §1.1, §1.3 |
+| A.2 | Cache-Engine verwaltet Speicher nach bekannten weitreichenden Allokationsmethoden | §1.3 |
+| A.3 | Umfassende wissenschaftliche Analyse + Google-Scholar-Recherche | §2.1-§2.3 + §2.6 |
+| A.4 | **jalloc + malloc + calloc als bekannte Vertreter** — **KLAERUNG OFFEN** | §2 A05 jemalloc / A20 dlmalloc / A21 ptmalloc2 (jalloc = jemalloc? oder eigener Allokator?) |
+| A.5 | Baustein-Familie UMFASSEND ergaenzen | §2.4 + §2.5 7 Achsen AA1-AA7 |
+| A.6 | Pro Paper elaborate Zusammenfassung + Code-Recherche analog Suchalgorithmen | §2.4 Pflicht-Vorgehen + §9 Phase 6.2.B/C |
+| A.7 | Optionale thread-safe Implementierungen der std C++ Bibliothek | §3.1 CacheEngineAllocator + CacheEnginePmrResource |
+| A.8 | Recherche: Permutierte Allokator-Bausteine erweitern Standard typsicher | §1.4 A1-A8 + §3.1 |
+| A.9 | Grundlage aller verwendeten std-Container | §3.2 Container-Matrix |
+| A.10 | Umfangreiche Tests Allokation/Container/Threading/Concurrency-Sicherheit | §3.2 Pflicht-Tests |
+| A.11 | Standard = Single-Write + Multi-Read Concurrency | §1.4 A3 + §3.3 |
+| A.12 | Optional: erweiterte local-aware Multi-Write Concurrency ueber Cache-Page-Awareness | §1.4 A4 + §3.3 CachePageAwareConcurrentAllocator |
+| A.13 | C++17 Locks recherchieren | §1.5 8 Lock-Typen-Tabelle |
+
+### Kategorie B — ABI-stabiles C++23-Interface (B.1-B.6)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| B.1 | Jedes kompilierte Experiment = bestimmte ExecutionEngine→SearchEngine Rekombination | §4.1 + REV 6 §5.28.1 |
+| B.2 | Formal: zusammengesetzter Custom-Suchalgorithmus + definierte Baustein-Permutation | §4 + §5.3 |
+| B.3 | Pseudocode `std::variant<...>()` woertlich erfasst | §4.1 woertlich zitiert |
+| B.4 | Pseudocode-Bedeutung: Algorithmus-Varianten der Cache-Engine-Permutation | §4.2 |
+| B.5 | Varianten bewegen sich an Baustein-Permutation der Cache-Engine | §4.2(d) |
+| B.6 | Varianten wandeln sich automatisch je nach Anzahl Typ-Parameter | §4.2(b) + §4.3 |
+
+### Kategorie C — Variadic-Template-Magie (C.1-C.6)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| C.1 | 1 Parameter → Typ ist value | §4.2(b) Fall 1 |
+| C.2 | Implicit Key = beim Einfuegen hochzaehlender uint64 | §4.2(b) Fall 1 |
+| C.3 | 2+ Parameter → erster = Key, Rest = Tuple<values> | §4.2(b) Faelle 2+3 |
+| C.4 | Komplexer Key (ab 2 Params) → kein Einfachtyp | §4.2(c) |
+| C.5 | Implicit `comdare::fingerprint`-Bibliothek + Overload hasht zu binary-string statischer Laenge | §4.2(c) FixedLengthFingerprint<16>::hash() |
+| C.6 | Einfach-Key → Funktions-Ueberladung als binary-string implicit gecastet | §4.2(c) Overload to_binary_string |
+
+### Kategorie D — Visitor-Pattern + processing_strategy_type (D.1-D.5)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| D.1 | execution_engine erbt CacheEngine als Basisklasse | §4.2(a) Hierarchie + §4.2(d) |
+| D.2 | CacheEngine = Visitor-Pattern, durch SearchEngine-Abkoemmlinge initialisiert | §4.2(d) |
+| D.3 | CacheEngine bei Algorithmus-Entscheidungen um Rat gefragt | §4.2(d) |
+| D.4 | CacheEngine direkt als experimentelles OS-Interface verwendbar | §4.2(d) |
+| D.5 | processing_strategy_type: permutation-statisch + verhalten-runtime-dynamisch + Bereiche (Limits/Verhalten/Heuristiken/Allokation/Scheduling/Concurrency) | §4.2(d) |
+
+### Kategorie E — 3-Stufen-Bauprozess + Layer-Rollen (E.1-E.8)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| E.1 | 3 Stufen: CacheEngineBuilder + ExecutionEngine + SearchEngine | §4.2(e) + §5 |
+| E.2 | CacheEngineBuilder = eigenstaendiges Programm mit XML-Konfigs | §5 + §5.1 + §5.2 |
+| E.3 | XML definiert alle zulaessigen CacheEngine-Rekombinationen + abhaengige Custom-Suchalgorithmen | §5.2 XML-Format |
+| E.4 | execution_engine = Reihe CacheEngine-impliziter Typen, compile-time kompiliert | §5.3 + §4.2(e) |
+| E.5 | search_algorithm = spezielle execution_engine, erbt compile-time-statische Suchalgorithmus-Bausteine | §5.3 + §4.2(a) Hierarchie |
+| E.6 | **ExecutionEngine STELLT mithilfe CacheEngine experimentelle OS-Primitiven BEREIT (Provider-Rolle)** — NEU ergaenzt | **§4.2(f)** Layer-Verantwortlichkeiten |
+| E.7 | **SearchEngine STELLT Such-spezifische, komplexere experimentelle Standard-OS-Such-+ Speicherzugriffsmuster + Routinen BEREIT** — NEU ergaenzt | **§4.2(f)** |
+| E.8 | **SearchEngine = Dach des Konstrukts, oberster Layer mit Suchheuristiken + Konzepten, die CacheEngine-Limits "weit ueberschreiten"** — NEU ergaenzt | **§4.2(f)** |
+
+### Kategorie F — PRT-ART Compile-time-Fallback (F.1-F.5)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| F.1 | Strategisch: CacheEngine-Struktur in Stub-Bearbeitung bevorzugen (PRT_ART spaeter mergen) | §6.1 (5) |
+| F.2 | Cache-Engine hat Algorithmus-Bausteine-Stack im Bereich Suche; PRT_ART hat dieselbe Struktur als parallel-Stack | §6.1 (1)+(2) |
+| F.3 | processing_strategy_type fuer Rekombinations-Konfig auf alle drei Layer + PRT_ART anwendbar | §6.1 (3) |
+| F.4 | PRT_ART erbt aus CacheEngine die Permutations-Struktur-Hierarchie | §6.1 (4) + §6.2 |
+| F.5 | Compile-time-Fallback: fehlende Typen in configuration_permutation_type → automatischer Fallback auf Cache-Engine-Bausteine | §6.1 (4) + §6.2 Concept-Skelett |
+
+### Kategorie G — Code-Archivierung (G.1)
+| Atom | Aussage | Status |
+|------|---------|--------|
+| G.1 | `_archive_code_pre_migration/` umsetzen | ✅ Umgesetzt 2026-05-13 (`Diplomarbeit/_archive_code_pre_migration/`) |
+
+### Kategorie H — Doku-Reihenfolge (H.1-H.2)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| H.1 | Im ersten Schritt: ALLE User-Anmerkungen + Plan mit hoechster Praezision dokumentieren | §0 Pflicht-Reihenfolge + diese 48-Atom-Checkliste |
+| H.2 | Ziel: Modulares Interface der precompiled ABI-stabilen C++23-Module vorbereiten | §4 ABI komplett + §5 Builder |
+
+### Kategorie I — TestDataSetAccumulationEngine (I.1-I.4)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| I.1 | Unterschiedliche Testdatentypen → per Deserialization/Parsing in Arbeitsspeicher + fair-reproduzierbar-aligned | §7.1 woertlich + §7.3 Alignment |
+| I.2 | test_data_set_accumulation_engine_type = Klasse mit Daten + Test-Algo-Interfaces | §7.2 Pseudocode |
+| I.3 | Datasets werden bei SearchEngine-Initialisierung mit-konstruiert | §7.2 explicit ctor |
+| I.4 | Ausfuehrung durch separate Testroutine | §7.2 + §8.2.1 BenchmarkRunner |
+
+### Kategorie J — Mikrobenchmark-Suite (J.1-J.6)
+| Atom | Aussage | Sektion |
+|------|---------|---------|
+| J.1 | No-Deprecate-Wrapper aller Testmethoden | §8.2.1 |
+| J.2 | Custom-Allocation #1 fuer Messergebnisse, gross genug, nie fail oder erweitern | §8.2.2 |
+| J.3 | Custom-Allocation #2 separat fuer Sparse-Serialized-Byte-States | §8.2.2 + §8.2.3 Format |
+| J.4 | Am Experiment-Ende: Binary → handlichere Formate konsolidieren → auswertbarer Binary-Blob | §8.2.4 |
+| J.5 | Laufzeit-Fokus: sparse + minimaler OS-Einfluss | §8.2.3 |
+| J.6 | Conversion-Routine im Messmodul Pflicht | §8.2.5 |
+
+---
+
+**Stand 2026-05-13 nach Delta-Check:**
+
+✅ **47 von 48 Atomen vollstaendig dokumentiert** (alle E.6-E.8 mit dieser Revision in §4.2(f) ergaenzt).
+
+⚠️ **1 offene Klaerung (A.4):** "jalloc" — Begriffsambiguitaet:
+- (a) Tippfehler fuer **jemalloc** (A05 Jason Evans BSDCan 2006)? → wahrscheinlichste Interpretation
+- (b) **Java-Hotspot-VM-Allocator (jvm-internal)**?
+- (c) Anderer von Nutzer gemeinter Allokator?
+
+Bitte Klaerung — danach ist die Doku-Phase 6.2.A vollstaendig und Phase 6.2.B (Paper-Tieflektuere) kann starten.
 
 ---
 
