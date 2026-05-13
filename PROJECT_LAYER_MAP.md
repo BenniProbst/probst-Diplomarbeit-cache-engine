@@ -1,27 +1,43 @@
-# PROJECT_LAYER_MAP — Diplomarbeit (2026-05-13)
+# PROJECT_LAYER_MAP — Diplomarbeit (REV 7.6, 2026-05-13)
 
 Strategische Strukturübersicht für **manuelles Code-Review**.
-Dieses Repo enthält die wissenschaftliche Dokumentation; die Code-Repos
-`comdare-cache-engine` und `comdare-prt-art` sind separat.
+**REV 7.6:** Diplomarbeit hat jetzt EIGENEN Code unter `Code/` —
+zusaetzlich zur Dokumentation. Die Code-Repos `comdare-cache-engine` und
+`comdare-prt-art` sind weiterhin separat, werden aber als **parallele
+Submodules** unter `Code/external/` konsumiert.
+
+> **REV 7.6 Update:** Drei-Repo-Architektur klarer getrennt.
+> Diplomarbeit = **WAS** getestet wird (XML-Configs der 3 Messreihen)
+> + Binary-Ergebnis-AUSWERTUNG (CSV → LaTeX → PDF). Siehe
+> `FINDINGS_REV7_6_2026_05_13.md` + `STRUCTURAL_CORRECTION_2026_05_13.md`
+> + `Phase5_UML_Detail/30_architektur_delta_REV7_6_drei_repo_layer_…md`.
 
 ---
 
-## 0. Repo-Rolle
+## 0. Repo-Rolle (REV 7.6 prazisiert)
 
-`probst-Diplomarbeit-cache-engine` ist das **Wissenschafts-Repo** der
-Diplomarbeit am Lehrstuhl Habich, TU Dresden. Es enthält:
+`probst-Diplomarbeit-cache-engine` ist:
 
+### Teil A: Wissenschafts-Doku (Phasen 1-6)
 - Recherche (33 Such-Paper P01–P33, 21 Allokator-Paper A01–A23)
-- Architektur-Skizzen (REV 1 bis REV 7.5)
+- Architektur-Skizzen (REV 1 bis REV 7.6)
 - Termin-Protokolle (Termin 1–7)
 - Begriffsglossar (v1–v5)
 - Habich-Sprechstunden-Protokolle
 - Email-Korrespondenz mit Paper-Autoren
-- Datasets-Spezifikationen
-- LaTeX-Anhang-Outputs
 
-Das Repo führt **keinen Code** aus, ist aber die **Konzept-Quelle** für
-beide Code-Repos.
+### Teil B: Code-Schicht (NEU REV 7.6, unter `Code/`)
+Anwender-Code, der die 3 Pflicht-Messreihen durchfuehrt + Auswertung:
+- `Code/messung_driver/` — Loop ueber 3 Messreihen (A/B/C)
+- `Code/binary_to_csv/` — Deserialisiert measurement_record_v1 binary
+- `Code/csv_to_latex/` — CSV + Algorithmus-Baustein-Steckbrief → LaTeX
+- `Code/diagram_generator/` — C++ → TikZ (A4-Awareness)
+- `Code/latex_to_pdf/` — Wrapper um cache-engine latex_toolchain
+- `Code/experiment_config/` — 3 XML-Configs (A/B/C)
+- `Code/external/comdare-{prt-art, cache-engine}/` — Submodules parallel
+
+### Teil C: Manuskript (NOCH NICHT)
+- `thesis/main.tex` + `thesis/refs.bib` + `thesis/chapters/` (TBD)
 
 ---
 
@@ -202,12 +218,53 @@ Nur **5 neue Dokumente** + IDE-Config:
     ├── 22_architektur_skizze_REV5_2026_05_11.md
     ├── 23_architektur_skizze_REV6_2026_05_11.md
     ├── 24_architektur_skizze_REV7_2026_05_13.md      ← MASTER
-    ├── 25..29_*.md   ← NEU heute (Delta REV 7.1..7.5)
+    ├── 25..29_*.md   ← REV 7.1..7.5 Delta-Docs
+    ├── 30_architektur_delta_REV7_6_drei_repo_layer_2026_05_13.md  ← REV 7.6
     └── phase5_uml_detail_REV{3..6}.drawio
 ```
 
-**Master-Architektur:** `24_…REV7_2026_05_13.md` (872 Zeilen) — bei
-Tiefes Verständnis Pflicht.
+**Master-Architektur:** `24_…REV7_2026_05_13.md` (872 Zeilen) +
+`30_…REV7_6…md` (REV 7.6 Drei-Repo-Schichten-Korrektur) — beides Pflicht.
+
+---
+
+## 6.5 NEU REV 7.6: Code/-Verzeichnis-Struktur
+
+```
+Diplomarbeit/Code/
+├── CMakeLists.txt                       (top-level, C++23, ruft Submodules)
+├── README.md                            (Code-Schicht-Doku)
+├── .gitignore                           (build/, _runs/)
+├── external/
+│   ├── comdare-prt-art/                Submodule (parallel)
+│   └── comdare-cache-engine/           Submodule (parallel)
+├── messung_driver/
+│   ├── main.cpp                        (3-Messreihen-Loop A/B/C)
+│   └── CMakeLists.txt
+├── binary_to_csv/
+│   ├── binary_to_csv.{hpp,cpp}         (magic 0xC0FFEE02)
+│   ├── main_cli.cpp                     (binary-to-csv Executable)
+│   └── CMakeLists.txt
+├── csv_to_latex/
+│   ├── csv_to_latex.{hpp,cpp}           (mit generate_baustein_description)
+│   ├── main_cli.cpp                     (csv-to-latex Executable)
+│   └── CMakeLists.txt
+├── diagram_generator/
+│   ├── diagram_generator.{hpp,cpp}      (Bar+Scatter+Heatmap → TikZ)
+│   ├── main_cli.cpp                     (diagram-generator Executable)
+│   └── CMakeLists.txt
+├── latex_to_pdf/
+│   ├── build_thesis.sh + .bat           (POSIX + Windows Frontend)
+│   └── CMakeLists.txt
+├── experiment_config/
+│   ├── config_a_prt_art_vs_sota.xml    (Messreihe A)
+│   ├── config_b_cache_engine_perms.xml  (Messreihe B)
+│   └── config_c_merge_alt_neu.xml       (Messreihe C)
+└── tests/unit/
+    ├── test_binary_to_csv.cpp
+    ├── test_csv_to_latex.cpp
+    └── test_diagram_generator.cpp
+```
 
 ---
 
@@ -215,43 +272,59 @@ Tiefes Verständnis Pflicht.
 
 ### Tag 1 (Architektur, Konzept)
 - `20260508 Termin 7/Phase5_UML_Detail/24_architektur_skizze_REV7_2026_05_13.md`
+- **`30_architektur_delta_REV7_6_drei_repo_layer_2026_05_13.md`** (Drei-Repo-Modell)
+- **`STRUCTURAL_CORRECTION_2026_05_13.md`** (User-Original-Nachricht §10)
+- **`FINDINGS_REV7_6_2026_05_13.md`** (was war wo verloren / gefixt)
 - Begriffsglossar
 - Domänenmodell v3
 - Bausteine_Matrix + Allokator_Matrix
 
-### Tag 2 (Heutige Updates)
-- 5 neue Delta-Docs (25–29) in Reihenfolge
+### Tag 2 (Heutige Updates REV 7.1-7.6)
+- 6 Delta-Docs (25–30) in Reihenfolge
 
-### Tag 3 (Code-Review: cache-engine)
+### Tag 3 (Code-Review: Diplomarbeit/Code/ NEU)
+- `Code/README.md` zuerst
+- `Code/CMakeLists.txt` (Submodule-Layout)
+- `Code/messung_driver/main.cpp` (3-Messreihen-Loop)
+- `Code/experiment_config/config_{a,b,c}*.xml` (WAS getestet wird)
+- `Code/binary_to_csv/`, `csv_to_latex/`, `diagram_generator/`, `latex_to_pdf/`
+
+### Tag 4 (Code-Review: cache-engine)
 - `comdare-cache-engine/PROJECT_LAYER_MAP.md` zuerst
 - `cache_engine/include/cache_engine/abi/module_abi_v1.hpp` (zentral)
 - `cache_engine/builder/main.cpp` (heutige Phase 4-7)
 - `cache_engine/builder/codegen/codegen.cpp` (heutige Aggregator)
 - `cache_engine/builder/module_loader/{hpp,cpp}` (heute NEU)
 
-### Tag 4 (Code-Review: prt-art)
+### Tag 5 (Code-Review: prt-art)
 - `comdare-prt-art/PROJECT_LAYER_MAP.md` zuerst
-- `prt_art/include/prt_art/identity/prt_art_search_engine.hpp` (heutige hybride API)
+- `prt_art/include/prt_art/identity/prt_art_search_engine.hpp` (hybride API)
 - 51 neue Tests in `tests/unit/test_prt_art_identity.cpp`
 
-### Tag 5 (Tools + LEGACY_REIMPL + Stand der Technik)
+### Tag 6 (Tools + LEGACY_REIMPL + Stand der Technik)
 - `cache-engine/tools/{ycsb_cli,latex_anhang,latex_toolchain}/`
 - 14 LEGACY_REIMPL Skelette (P11–P27) — je 1 Header
 - `docs/quality_audit/HABICH_H2_CODE_QUALITY_2026_05_13.md`
 
 ---
 
-## 8. Querverweis zu Code-Repos
+## 8. Querverweis zu Code-Repos (Stand REV 7.6, heute Abend)
 
 ```
-comdare-cache-engine  →  github.com/BenniProbst/comdare-cache-engine
-                          letzter Commit: a8f12cf (heute, main)
+comdare-cache-engine    →  github.com/BenniProbst/comdare-cache-engine
+                           (Library-Refactoring + Diagnose-Restore + gitignore-Fix)
 
-comdare-prt-art        →  github.com/BenniProbst/comdare-prt-art
-                          letzter Commit: a7d86c7 (heute, development)
+comdare-prt-art          →  github.com/BenniProbst/comdare-prt-art
+                           (unveraendert seit REV 7.1)
 
-Diplomarbeit (this)    →  github.com/BenniProbst/probst-Diplomarbeit-cache-engine
-                          letzter Commit: c6523db (heute, main)
+Diplomarbeit (this)      →  github.com/BenniProbst/probst-Diplomarbeit-cache-engine
+                           (Code/-Verzeichnis NEU + Submodules + Delta 30)
+```
+
+Submodule-Pfade (parallel):
+```
+Diplomarbeit/Code/external/comdare-prt-art       ← prt-art Pin
+Diplomarbeit/Code/external/comdare-cache-engine  ← cache-engine Pin
 ```
 
 Die `PROJECT_LAYER_MAP.md` von **jedem** der drei Repos ist die Ausgangs-
