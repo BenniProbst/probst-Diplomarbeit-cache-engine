@@ -40,7 +40,7 @@ cmake-build-*/
 
 # IDE
 .vscode/
-.idea/
+# .idea/ wird selektiv getrackt (siehe .idea/.gitignore)
 *.swp
 *.swo
 *~
