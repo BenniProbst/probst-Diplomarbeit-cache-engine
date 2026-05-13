@@ -99,6 +99,8 @@ Die existierenden 54 (oder mehr) Permutationen aus der
 `example_configs/`-XML, ohne PRT-ART. Reine Vergleichsbasis "Stand der
 Technik".
 
+Kommentar des Users: Ich vermisse in der CacheEngine einen Ordner, in dem alle Suchalgorithmen mit ihrer Gesamtkonfiguration als XML/json persistiert sind, sodass die in der CacheEngine einzeln persistierten Algorithmusbestandteile durch die Permutationsbeschreibung wiederherstellbar sind. Derzeit gibt es fälschlicherweise einen PRT-ART Ordner direkt in der CacheEngine, aber der PRT-ART sollte mit neuen Layered Algorithmus-Baustein-Bestandteilen und einer separaten eigenen Konfiguration im PRT-ART repo als Prüfling dargestellt werden, um den Fall einer Beitrittsprüfung eines Algorithmus zum Stand der Technik zu zeigen. In Messreihe A verwenden wir nur die Permutationen für Suchalgorithmen, die bereits in der CacheEngine dokumentiert sind. Dabei können wir zwischen den Modi defined (vorhandene Suchalgorithmusprofile) oder full (Suchalgorithmusprofile ignorieren und jede Rekombination auf dem Algorithmus-Baustein-Stack gegen jede andere prüfen) wählen.
+
 **Output:** Cross-Permutation-Matrix CSV → LaTeX
 
 ### §2.3 Messreihe C — Merge alt/neu
@@ -111,6 +113,8 @@ PRT-ART-Bausteine in die cache-engine-Permutationen eingesetzt werden
 **Hypothese:** Bei welchen Workloads bringt der Merge messbare Vorteile?
 
 **Output:** Differenz-CSV (A − B) → LaTeX-Diff-Tabelle + Diagramme
+
+Kommentar des Users: Formal ist jeder Algorithmus-Baustein eine Ansammlung an compile time std::variants dieser bestimmten Algorithmus Komponente. Formal handelt es sich also synchron auf jeder spezifischen Ebene des Stacks einer ExecutionEngine Implementierung wie SearchEngine - je Ebene um einen full join der angebotenen Algorithmen des oder der multiplen Prüflinge mit der Ebene bekannter Layer-Baustein-Algorithmen, die bereits in der CacheEngine zum Stand der Technik gehören.
 
 ---
 
@@ -132,6 +136,8 @@ soll NUR die Bausteine + Builder-Mechanik liefern; der eigentliche
 **Experiment-Orchestrator** (mit Konfigurationsdatei + 3 Messreihen +
 PDF-Erzeugung) ist der **Code der Diplomarbeit**.
 
+Kommentar des Users: Immer noch an einer Stelle falsch, weil der PRT-ART formal von der CacheEngine erbt und ein spezieller SearchEngine Suchalgorithmus ist, welcher per polymorpher Metaprogrammierung die eben benannten left/right/full join Eigenschaften beim Testen vereinen muss -> Dadurch gehört der result Aggregator in die abstrakte ExecutionEngine, wird dort mithilfe der SearchEngine als spezielles Messinterface implementiert und ist, wenn wir im experiment Modus kompilieren, immer fester Bestandteil der result binary. Schalten wir den Experiment Modus ab, den wir bei der Kompilation aus dem CMake code der CacheEngine erben, dann kompilieren wir einen Suchalgorithmus als SearchEngine ohne Messung. Dies sollte ein statisch einstellbares CMake compile flag sein, welches default übrigens aus ist, nur der Aufruf des Messtreibers aktiviert und überschreibt die Einstellung beim Laden des PRT-ART, welcher das flag dann seinerseits an die CacheEngine weitergibt.
+
 ---
 
 ## §4 Migrations-Plan (vorgeschlagen, NICHT umgesetzt)
@@ -148,6 +154,8 @@ PDF-Erzeugung) ist der **Code der Diplomarbeit**.
 - `experiment/` (ResultAggregator) als Bibliothek
 - 14 LEGACY_REIMPL Skelette (Bausteine = Werkzeuge)
 
+Kommentar des Users: Das ist korrekt, CacheEngineBuilder ist dabei eine Binary die im compile time stack per CMake zu Beginn kompilert und dann direkt ausgeführt wird, um die vorkonfigurierten Module zur compile time, um CMake steuerung abzulösen, zu bauen.
+
 ### §4.2 Was in `comdare-prt-art` bleibt / hinzukommt
 
 - PRT-ART-Bausteine (8 Schichten, wie heute)
@@ -155,6 +163,8 @@ PDF-Erzeugung) ist der **Code der Diplomarbeit**.
   (Builder + Loader + Aggregator) auf die fuer PRT-ART-Permutationen
   relevanten Ausschnitte zuschneidet
 - Submodule-Pin auf aktuelle cache-engine
+
+Kommentar des Users: Die CacheEngine sollte eigentlich die 8 Schichten an den PRT-ART vererben, die es an Algorithmus-Bausteinen gibt. Ich sehe hier nicht klar aufgeführt, dass der PRT-ART strikt die vorhandenen Strukturen und source Interfaces der CacheEngine erweitert. Ich gehe grundsätzlich davon aus, dass der Code stets als source vorliegt und die Bibliotheken hot kompiliert werden, um die Metaprogrammierung und variadische Konstruktur von C++23 optimal ausnutzen zu können.
 
 ### §4.3 Was in `Diplomarbeit/Code/` NEU entstehen muss
 
@@ -167,6 +177,9 @@ PDF-Erzeugung) ist der **Code der Diplomarbeit**.
 | `Code/latex_to_pdf/` | Driver | Sammelt Tabellen + Diagramme + Manuskript-Kapitel → pdflatex 2×+bibtex (heute: cache-engine/tools/latex_toolchain) |
 | `Code/experiment_config.xml` | Konfig | Spezifiziert die 3 Messreihen + Workloads + Merge-Punkte |
 | `Code/CMakeLists.txt` | Build | C++23, konsumiert prt-art als Submodule |
+
+Kommentar des Users:
+Vollständig korrekt
 
 ### §4.4 Submodule-Hierarchie nach Migration
 
@@ -182,6 +195,8 @@ Diplomarbeit/
 Doppelte Submodule-Tiefe.  Alternative: cache-engine direkt **auch** als
 Submodule in Diplomarbeit/Code/external/comdare-cache-engine — vermeidet
 "Submodule-of-Submodule" Pflege-Aufwand.
+
+Kommentar des Users: Die Submodul sollten parallel geführt werden, dazu muss die Diplomarbeit beim build dem prt-art verraten, wo eine required nutzbare und aktuelle cache engine als Bibliothek zu finden ist (source Bibliothek für die weitere Nutzung und template Adaption mit Metaprogrammierung)
 
 ---
 
@@ -205,6 +220,8 @@ gehoeren in cache-engine, NICHT in die Diplomarbeit:
 
 **Kandidat fuer Verschiebung:** `cache_engine/builder/main.cpp` → `Diplomarbeit/Code/messung_driver/main.cpp`. Die `cache_engine_builder`-Lib-Targets
 (xml-parser, codegen, permutation-loop, module-loader) bleiben in cache-engine.
+
+Kommentar des Users: Das ist korrekt
 
 ---
 
@@ -237,13 +254,18 @@ noch mit auf, indem du nach dieser Nachricht auf mich wartest."*
 
 1. Wann + von wem (mir? Habich? User?) wurde die Code-Schicht der
    Diplomarbeit urspruenglich geplant?
+Antwort: Die Code Schichtung der Cache Engine (neues Diplomarbeit Thema seit Beginn April in Termin 1 bis 7 geplant) und des PRT (älterer comdare Suchalgorithmus, inoffiziell und noch nicht Stand der Technik) wurden beide von Benjamin-Elias Probst geplant und entworfen, Claude Code hat lediglich die Struktur der Anforderungen geordnet und Recherchearbeit geleistet.
 2. Welche genauen Komponenten waren urspruenglich vorgesehen?
+Ursprünglich war vorgesehen, dass ein CacheEngineBuilder als statisches Programm und Bestandteil der CacheEngine ABI stabile und dynamisch vorkompiliert ladbare C++23 Module (je SearchEngine Suchalgorithmus ein vorkompiliertes Modul) läd und ausmisst, das bedeutet, dass es für den CacheEngineBuilder (den wir beibehalten wollen) eine permutierte vorbereitete Liste an ExecutionEngine virtual Implementierungen gibt, die über ein virtual Interface zuerst getestet (Suchalgorithmus Funktionalität je Suchalgorithmus-Identität per Parameter Set Anzahl) und im nächsten Schritt ausgemessen werden. Wird der experiment Mode der Cache Engine deaktiviert, durchkämmt die CacheEngineBuilder immer noch mit google Tests alle ExecutionEngine/SearchEngine Suchalgorithmus-Funktionalitäten auf Fehler, die in Rekombination aufteten können. Ist eine Permutation für die CacheEngineBuilder nicht vorkompiliert vorliegend, wird sie per runtime auf einen CompilerAufruf aus der Metaprogrammierten Permuation des Suchalgorithmus-Stacks generiert. Daher ergibt sich in der CacheEngine eigentlich ein zweigeteiltes Bild: CacheEngineBuilder builds and permutates -> CacheEngineLib + ExecutionEngine/SearchEngine, wobei die CacheEngineLib die Messmethoden und auch die Cache Strategie Permuationen enthält. Die Diplomarbeit ruft also das CMake der CacheEngineBuilder als Bestandteil der CacheEngine auf, um bestimmte Konfigurationen zu testen. Das Programm wird jedes Mal live mit Metaprogrammierung kompiliert, um im ersten Schritt die CacheEngineBuilder zu erzeugen, die dann als Compile stack handler die übrigen Kompilationen und deren Ausführung zu ihrer runtime orchestriert. Die Kompilation der C++23 Module muss vor den Experimenten abgeschlossen sein, damit diese nicht mit der Messung interferieren.
 3. War der **Diagram-Generator (C++)** schon konkretisiert (Library? Tool?
    Welche Algorithmen?)?
+Antwort: In Termin 1 bis 7 sind alle Metriken gelistet, die aufgenommen werden müssen, ebenso auch Algorithmen und Paper, welche diese verwenden. Es ist deine Aufgabe alle paper zu durchsuchen, mit welchen Techniken welche Metriken erhoben wurden, damit wir diese übernehmen können.
 4. Welche **Konfigurationsdatei** war geplant — XML wie cache-engine, oder
    abweichend?
+Antwort: Jeder Suchalgorihtmus und Experiment Strategie (jeweils multiple gegeneinander möglich, beide sollten in einem Dokument darstellbar sein), sollte per xml darstellbar sein, entweder beide zusammen oder getrennt. In der Regel haben beide getrennte Ordner und Definitionssätze zum parsen vor Experiment start durch die CacheEngineBuider.
 5. Wie soll der **Submodule-Pfad** sein (doppelt-genested vs. zwei parallele
    Submodules)?
+Antwort: parallel
 
 **Bis zur Original-Nachricht:**
 - Keine Code-Verschiebung
@@ -548,6 +570,8 @@ Die drei Repos haben klarere Rollen als bisher dokumentiert:
 │  WICHTIG: tools/{ycsb_cli, latex_anhang, latex_toolchain}            │
 │  MUESSEN raus + nach Diplomarbeit/Code/                              │
 └─────────────────────────────────────────────────────────────────────┘
+
+Antwort: Im Diagramm fehlt die wichtige CacheEngineBuilder Komponente!
 ```
 
 ---
@@ -702,6 +726,8 @@ Gruenden:
    Trennung gebaut werden (Driver + Caller-Logik), waehrend die Tools in
    cache-engine die Library-Backbone-Implementation bleiben.
 
+Antwort: Option C, aber mit Prämisse, dass die Schichten von cache-engine -> prt-art -> diplomarbeit in der Reihenfolge überarbeitet werden (also im Prinzip doch A machen aber danach direkt C)
+
 ### Q2: Submodule-Struktur Diplomarbeit/Code/
 
 Option A: Submodule-Tiefe 2:
@@ -719,6 +745,8 @@ Diplomarbeit/Code/external/comdare-cache-engine/
 **Mein Vorschlag:** Option B — vermeidet Submodule-Recursion + Diplomarbeit
 hat direkten Pin auf beide Repo-Versionen.
 
+Antwort: B
+
 ### Q3: Diagram-Generator-Technologie
 
 Welche Diagram-Library + Output-Format?
@@ -734,6 +762,8 @@ Welche Diagram-Library + Output-Format?
 durch direkten LaTeX-Output, Diagramme kommen automatisch im LaTeX-Layout
 mit korrekter Seitenpositionierung.
 
+Antwort: TikZ
+
 ### Q4: Was passiert mit dem heute angelegten cache-engine main.cpp Phase 4-7?
 
 Option A: BLEIBT als generischer Builder-Demo
@@ -743,6 +773,8 @@ ab nach Diplomarbeit/Code/messung_driver/
 **Mein Vorschlag:** Option B + alter main.cpp wird zu kurzer Demo-Driver
 gekuerzt, der die volle ExperimentDriver-Library nur per
 `run_pipeline()` aufruft (mit fest-codierter YCSB-C-Demo wie heute).
+
+Antwort: Wie in deinem Vorschlag
 
 ---
 

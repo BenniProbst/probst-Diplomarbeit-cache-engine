@@ -87,7 +87,7 @@ iteriert ueber alle drei und ruft pro Reihe die cache-engine
   Allokator × Layout × Prefetch × Density × Sync = bis zu mehrere 100
   DLLs. Sollen wir initial auf eine Teil-Auswahl (z. B. 3 × 3 × 2)
   reduzieren, um die ersten Mess-Plots fuer das Manuskript schneller zu
-  bekommen? — Entscheidung nach Termin.
+  bekommen? — Entscheidung nach Termin. Antwort: Nein, die Messung muss immer so vollständig wie möglich sein
 
 ---
 

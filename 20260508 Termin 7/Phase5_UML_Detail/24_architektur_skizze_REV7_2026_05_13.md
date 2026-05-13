@@ -537,7 +537,7 @@ public:
 
 ### 6.1 Praezisierung
 
-1. **CacheEngine** hat einen **Stack an Such-Algorithmus-Bausteinen** (33 Paper, Bausteine-Matrix Achsen 1-11).
+1. **CacheEngine** hat einen **Stack an Such-Algorithmus-Bausteinen** (33 Paper, Bausteine-Matrix Achsen 1-11). Kommentar des Users: Die Achsen sind die zu Permutierenden Algorithmus-Schichten für die CacheEngineBuilder, um alle möglichen Eigenschaften eines Suchalgorithmus durch probieren und ausmessen zu finden.
 2. **PRT-ART** hat einen **eigenen permutativen Parallel-Stack** zum CacheEngine-Such-Stack — strukturell identisch aufgebaut, aber mit PRT-ART-eigenen Konkretisierungen (z.B. `PRTART_REDIRECT`-Page, `PRTART_BPLUS`-Node etc.).
 3. **`processing_strategy_type`** ist auf beide Stacks anwendbar:
    - Auf `execution_engine`/`search_engine` ueber den CacheEngine-Stack.
