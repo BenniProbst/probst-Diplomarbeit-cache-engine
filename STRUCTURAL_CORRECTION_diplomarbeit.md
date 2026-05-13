@@ -574,6 +574,88 @@ Die drei Repos haben klarere Rollen als bisher dokumentiert:
 Antwort: Im Diagramm fehlt die wichtige CacheEngineBuilder Komponente!
 ```
 
+### §11.5 NACHTRAG (REV 7.6 V8.14, 2026-05-14): Korrigiertes Diagramm mit CacheEngineBuilder
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Diplomarbeit/  (WAS getestet wird + Auswertung)                     │
+│  └── Code/                                                            │
+│      ├── messung_driver/      (3-Reihen-Loop)                         │
+│      ├── binary_to_csv/                                               │
+│      ├── csv_to_latex/                                                │
+│      ├── diagram_generator/   (TikZ, A4-aware)                        │
+│      ├── latex_to_pdf/                                                │
+│      ├── experiment_config/{a,b,c}.xml  (defined/full Mode V8.13)     │
+│      └── external/                                                    │
+│          ├── comdare-prt-art/         (parallel Submodule)            │
+│          └── comdare-cache-engine/    (parallel Submodule)            │
+└─────────────────────────────────────────────────────────────────────┘
+                       │ ruft auf via CMake-Sub-Build
+                       │ -DCOMDARE_EXPERIMENT_MODE=ON  (V8.4 + V8.12)
+                       ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  comdare-cache-engine/  (WIE gemessen wird)                          │
+│                                                                       │
+│  ┌─────────────────────────────────────────────────┐                 │
+│  │ STAGE 1 (Compile-Time-Stack, V8.7):             │                 │
+│  │   cache_engine/builder/main.cpp                 │                 │
+│  │     → CacheEngineBuilder Binary (cache_engine_builder)            │
+│  │     → wird zuerst von CMake gebaut + ausgefuehrt                  │
+│  └─────────────────────────────────────────────────┘                 │
+│                       │                                               │
+│                       │ orchestriert                                  │
+│                       ▼                                               │
+│  ┌─────────────────────────────────────────────────┐                 │
+│  │ STAGE 2 (Runtime, V8.7):                        │                 │
+│  │   pro Permutation:                              │                 │
+│  │     - vorkompiliert? → laden (LoadLibrary/dlopen)                 │
+│  │     - sonst       → cmake/cl Hot-Compile      │                 │
+│  └─────────────────────────────────────────────────┘                 │
+│                                                                       │
+│  Library-Bestandteile:                                                │
+│  ├── cache_engine/builder/{xml_config_parser, codegen, perm_loop,    │
+│  │                          experiment_runner, module_loader,         │
+│  │                          experiment_driver/}                       │
+│  ├── cache_engine/include/cache_engine/abi/                           │
+│  │   ├── execution_engine.hpp   (V8.5: ResultAggregator-Member)       │
+│  │   ├── search_engine.hpp                                            │
+│  │   ├── algorithm_baustein.hpp (V8.8: std::variant Pattern)          │
+│  │   └── resolve_baustein.hpp                                         │
+│  ├── cache_engine/algorithm_profiles/  (V8.3 NEU)                    │
+│  │   ├── permutation_axes.xml           (11 Achsen + Werte)           │
+│  │   └── sota/{art, hot, masstree, coco, start, b2tree, wormhole, surf}.profile.xml │
+│  ├── workload_generator/   (Library)                                  │
+│  ├── experiment/           (ResultAggregator)                         │
+│  ├── benchmark_suite/                                                 │
+│  ├── test_data_accumulation/                                          │
+│  ├── ext/   (23 Source-Repos: A01-A23 + P01-P30)                     │
+│  ├── tools/{ycsb_cli, latex_anhang, latex_toolchain,                 │
+│  │          permutation_codegen, abi_stability_test, compiler_provisioning,│
+│  │          gitlab_ci_zih_push, socks5_zih_delivery}                  │
+│  └── prt_art/legacy_reimpl/  [DEPRECATED V8.2, Migration zu prt-art] │
+└─────────────────────────────────────────────────────────────────────┘
+                       ▲
+                       │ konsumiert als Submodule + erbt 8 Schichten
+                       │
+┌─────────────────────────────────────────────────────────────────────┐
+│  comdare-prt-art/  (Pruefling / Beitritt zum Stand der Technik)      │
+│                                                                       │
+│  ├── prt_art/include/prt_art/identity/                                │
+│  │   ├── prt_art_search_engine.hpp          (REV 7.1 hybride API)     │
+│  │   ├── prt_art_search_engine_adapter.hpp  (V8.9 ABI-Adapter)        │
+│  │   └── status.hpp                                                   │
+│  ├── prt_art/algorithm_profiles/  (V8.10 NEU)                        │
+│  │   ├── prtart_pruefling.profile.xml                                 │
+│  │   └── permutation_axes_extension.xml                               │
+│  └── prt_art/{allocator, concurrency, memory_layout, nodes, prefetch, │
+│              traversal, value_handles}/  (8 Schichten Bausteine)      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Kernpunkt der Korrektur:** STAGE-1-CacheEngineBuilder + STAGE-2-Hot-Compile,
+algorithm_profiles/ in beiden Repos, ABI-Adapter in prt-art, EXPERIMENT_MODE-
+Flag-Propagation Diplomarbeit→cache-engine.
+
 ---
 
 ## §12 Aktualisierter Migrations-Plan (mit Original-Nachricht-Praezision)

@@ -106,11 +106,24 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::cout << "==== Comdare Messung-Driver (REV 7.6) ====\n";
+    std::cout << "==== Comdare Messung-Driver (REV 7.6 V8.12) ====\n";
     std::cout << "Config-Dir   : " << config_dir.string() << "\n";
     std::cout << "Output-Dir   : " << output_dir.string() << "\n";
     std::cout << "Comdare-Root : " << comdare_root.string() << "\n";
-    std::cout << "Messreihen   : 3 (A=PRT-ART vs SOTA, B=Cache-Engine, C=Merge)\n\n";
+    std::cout << "Messreihen   : 3 (A=PRT-ART vs SOTA, B=Cache-Engine, C=Merge)\n";
+
+    // REV 7.6 V8.12 — Aktivierung des EXPERIMENT_MODE im Sub-Build (User-Direktive
+    // 2026-05-13/14). Default in cache-engine ist OFF (Production-Pfad).
+    // Beim Sub-Build der Permutations-Module muss das Flag explizit ON sein,
+    // damit ResultAggregator + Mess-Hooks in der ExecutionEngine kompiliert werden.
+#ifndef COMDARE_EXPERIMENT_MODE_ON
+    std::cerr << "[V8.12] WARNING: COMDARE_EXPERIMENT_MODE_ON ist NICHT definiert.\n"
+              << "         Der messung_driver wurde ohne Mess-Hooks gebaut.\n"
+              << "         Build mit: cmake -DCOMDARE_EXPERIMENT_MODE=ON\n";
+#else
+    std::cout << "Experiment-Mode: ON (ResultAggregator in ExecutionEngine aktiv)\n";
+#endif
+    std::cout << "\n";
 
     std::filesystem::create_directories(output_dir);
 

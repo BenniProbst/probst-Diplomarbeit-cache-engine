@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Messreihe A: PRT-ART Testalgorithmus gegen Stand-der-Technik
-     REV 7.6 (2026-05-13)
+     REV 7.6 (2026-05-13) + V8.13 (2026-05-14)
+     defined/full Mode (User-Direktive 2026-05-13/14 §2.2 + Habich-Antwort)
 -->
 <comdare_experiment>
-  <messreihe id="A" name="PRT-ART vs Stand-der-Technik">
+  <messreihe id="A_defined" name="PRT-ART vs Stand-der-Technik (defined Mode)">
     <description>
-      Misst PRT-ART (hybride Vector-/Map-/Tuple-API) gegen die in der
-      cache-engine vorhandenen Stand-der-Technik-Adapter (ART, HOT, Masstree,
-      CoCo-Trie, START, B2tree, Wormhole, SuRF).
+      defined-Mode: Vergleich gegen die 8 in cache-engine algorithm_profiles/sota/
+      dokumentierten SOTA-Algorithmen. Schnelle Vorab-Verifikation.
     </description>
+
+    <mode>defined</mode>
+    <sota_profiles>
+      <profile>art</profile>
+      <profile>hot</profile>
+      <profile>masstree</profile>
+      <profile>coco_trie</profile>
+      <profile>start</profile>
+      <profile>b2tree</profile>
+      <profile>wormhole</profile>
+      <profile>surf</profile>
+    </sota_profiles>
+
+    <pruefling>
+      <name>PRT-ART</name>
+      <source>comdare-prt-art</source>
+      <profile>prtart_pruefling.profile.xml</profile>
+      <api_variant>hybrid_search_engine</api_variant>
+    </pruefling>
+  </messreihe>
+
+  <messreihe id="A_full" name="PRT-ART vs Stand-der-Technik (full Mode)">
+    <description>
+      full-Mode: alle Achsen-Permutationen aus cache-engine
+      algorithm_profiles/permutation_axes.xml + prt-art
+      permutation_axes_extension.xml. Habich-Direktive 2026-05-14:
+      "Messung muss immer so vollstaendig wie moeglich sein."
+    </description>
+
+    <mode>full</mode>
+    <axes_source>cache_engine/algorithm_profiles/permutation_axes.xml</axes_source>
+    <pruefling_axes_extension>prt_art/algorithm_profiles/permutation_axes_extension.xml</pruefling_axes_extension>
+
+    <pruefling>
+      <name>PRT-ART</name>
+      <source>comdare-prt-art</source>
+      <api_variant>hybrid_search_engine</api_variant>
+    </pruefling>
+  </messreihe>
+
+  <messreihe id="A_legacy" name="LEGACY-Format (vor V8.13, fuer Rueckwaerts-Kompatibilitaet)">
+    <description>Bestehender Adapter-Format-Block, NICHT mehr aktiv ab V8.13.</description>
 
     <test_algorithm>
       <name>PRT-ART</name>
@@ -56,4 +98,24 @@
       </diagrams>
     </output>
   </messreihe>
+
+  <!-- Gemeinsame Workloads + Parameter fuer A_defined / A_full -->
+  <shared>
+    <workloads>
+      <workload type="ycsb">A</workload>
+      <workload type="ycsb">B</workload>
+      <workload type="ycsb">C</workload>
+      <workload type="ycsb">D</workload>
+      <workload type="ycsb">E</workload>
+      <workload type="ycsb">F</workload>
+    </workloads>
+    <parameters>
+      <num_keys>1000000</num_keys>
+      <num_operations>5000000</num_operations>
+      <key_size_bytes>16</key_size_bytes>
+      <value_size_bytes>64</value_size_bytes>
+      <zipfian_theta>0.99</zipfian_theta>
+      <seed>42</seed>
+    </parameters>
+  </shared>
 </comdare_experiment>
