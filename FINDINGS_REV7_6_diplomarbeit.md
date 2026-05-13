@@ -1,6 +1,13 @@
-# FINDINGS REV 7.6 (2026-05-13) — was wurde gefunden, korrigiert, dokumentiert
+# FINDINGS REV 7.6 — Diplomarbeit (2026-05-13)
 
-**Status:** Konsolidierung aller heute entdeckten Probleme + Korrekturen.
+**Status:** **MASTER-Dokument** der heutigen Findings + Korrekturen. Konsolidiert
+alle drei Repos, da die Diplomarbeit selbst das **WAS**-Repo ist und damit
+die Architektur-Hoheit haelt.
+
+**Schwester-Dokumente** (gleicher Sprint, pro Repo):
+- comdare-cache-engine: `FINDINGS_REV7_6_cache_engine.md`
+- comdare-prt-art: `FINDINGS_REV7_6_prt_art.md`
+- Habich-Termin-Zusammenfassung: `20260508 Termin 7/HABICH_TERMIN7_ZUSAMMENFASSUNG_2026_05_13.md`
 
 ---
 

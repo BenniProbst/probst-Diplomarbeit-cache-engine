@@ -26,3 +26,12 @@ comdare_da_add_test(test_csv_to_latex
 comdare_da_add_test(test_diagram_generator
     SOURCES unit/test_diagram_generator.cpp
     LIBRARIES comdare::diagram_generator)
+
+comdare_da_add_test(test_messung_driver
+    SOURCES unit/test_messung_driver.cpp
+    LIBRARIES
+        comdare_builder_experiment_driver
+        comdare::workload_generator
+        comdare::experiment)
+target_include_directories(test_messung_driver PRIVATE
+    ${COMDARE_CACHE_ENGINE_DIR}/cache_engine/include)

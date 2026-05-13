@@ -1,0 +1,276 @@
+# Diplomarbeit/Code — Stack-Anleitung (REV 7.6)
+
+Diese Anleitung beschreibt die **vollstaendige Befehlskette** vom frischen
+Klonen des Repos bis zum fertigen PDF mit eingebetteten LaTeX-Tabellen
+und TikZ-Diagrammen. Sie ist explizit als Schritt-fuer-Schritt-Skript
+geschrieben, damit der Stand jederzeit reproduzierbar ist.
+
+> Wichtig: **NO Python in der Build-Pipeline** (F-EXTRA-5). Alle Tools
+> sind CMake + sh + bat + C++23. Python ist nur dann erlaubt, wenn der
+> User es ausserhalb der Pipeline manuell aufruft.
+
+---
+
+## 0. Bestandteile des Stacks
+
+```
+Diplomarbeit/Code/                    ← Anwender-Schicht (WAS)
+├── CMakeLists.txt                    Top-Level cmake, C++23, FetchContent gtest
+├── external/
+│   ├── comdare-prt-art/              Submodule (Pruefling, REV 7.1)
+│   └── comdare-cache-engine/         Submodule (WIE-Library, REV 7.6)
+├── experiment_config/
+│   ├── config_a_prt_art_vs_sota.xml      Messreihe A
+│   ├── config_b_cache_engine_perms.xml   Messreihe B
+│   └── config_c_merge_alt_neu.xml        Messreihe C
+├── messung_driver/                   3-Messreihen-Loop (ruft ExperimentDriver-Lib)
+├── binary_to_csv/                    binary records → CSV (kBinaryMagic 0xC0FFEE02)
+├── csv_to_latex/                     CSV → LaTeX-Tabelle + Baustein-Steckbrief
+├── diagram_generator/                C++ → TikZ Bar/Scatter/Heatmap (A4-aware)
+├── latex_to_pdf/                     Wrapper um cache-engine latex_toolchain
+└── tests/                            GoogleTest-Suite (Mess-Driver + Pipeline)
+```
+
+**Pflicht-Tools auf dem Host:**
+
+| Tool | Mindest-Version | Wofuer |
+|------|-----------------|--------|
+| CMake | 3.28 | Top-Level Generator |
+| MSVC (Win) oder GCC/Clang (Linux) | C++23 | Sources |
+| pdflatex (TeX Live / MiKTeX) | 2022+ | latex_to_pdf |
+| Git | 2.30+ | Submodules |
+| ctest | (bundled) | Tests |
+
+Optional: `git lfs` (nur falls grosse Binaries committet werden — derzeit nein).
+
+---
+
+## 1. Klonen + Submodule init
+
+```sh
+git clone https://github.com/BenniProbst/probst-Diplomarbeit-cache-engine.git
+cd probst-Diplomarbeit-cache-engine/Code
+git submodule update --init --recursive
+```
+
+Auf Windows mit PowerShell:
+
+```powershell
+git clone https://github.com/BenniProbst/probst-Diplomarbeit-cache-engine.git
+cd .\probst-Diplomarbeit-cache-engine\Code
+git submodule update --init --recursive
+```
+
+Verifikation: `external/comdare-prt-art/CMakeLists.txt` und
+`external/comdare-cache-engine/CMakeLists.txt` muessen existieren.
+
+---
+
+## 2. cmake configure (Top-Level)
+
+```sh
+cmake -B build -G "Visual Studio 17 2022"   # Windows MSVC
+cmake -B build -G "Ninja"                   # Linux/macOS
+```
+
+Erwartete Status-Ausgabe (Tail):
+
+```
+-- comdare-diplomarbeit-code 0.1.0
+--   C++ Standard         : 23
+--   prt-art Submodule    : .../external/comdare-prt-art
+--   cache-engine Submod. : .../external/comdare-cache-engine
+--   Build Tests          : ON
+```
+
+Wenn cmake nach googletest fragt: das CMake-Skript faellt auf
+`FetchContent` zurueck, falls keine lokale Tar-Archive existieren.
+
+---
+
+## 3. Build der Tools (cache-engine-Library + Code-Module)
+
+```sh
+# Alles auf einmal
+cmake --build build --config Debug --target ALL_BUILD          # Windows
+cmake --build build --target all                                # Linux/macOS
+
+# Oder gezielt:
+cmake --build build --config Debug --target comdare-messung-driver
+cmake --build build --config Debug --target comdare-binary-to-csv
+cmake --build build --config Debug --target comdare-csv-to-latex
+cmake --build build --config Debug --target comdare-diagram-generator
+```
+
+Die cache-engine-Library `comdare_builder_experiment_driver` wird
+automatisch als Sub-Target gebaut.
+
+---
+
+## 4. Tests (ctest + GoogleTest)
+
+```sh
+ctest --test-dir build --output-on-failure
+```
+
+Erwartet: alle Unit-Tests gruen. Die GoogleTest-Suite fuer den
+Mess-Driver liegt unter `tests/unit/test_messung_driver.cpp` und deckt
+ab:
+
+- XML-Config-Parse (3 Messreihen)
+- Pro-Phase-Dispatch (Phase 1 enumerate, Phase 2 codegen, Phase 3 compile
+  via `--skip-build` Mock, Phase 4 load mit Mock-DLLs, Phase 7 export)
+- End-to-End: `--enumerate-only` ueber alle 3 Messreihen
+- Fehlerpfade: ungueltige XML, fehlendes Output-Verzeichnis
+
+---
+
+## 5. Pipeline-Lauf (Phase 1 → 7, alle 3 Messreihen)
+
+```sh
+build/Debug/messung_driver/comdare-messung-driver.exe \
+    --config-dir experiment_config \
+    --output-dir _runs/2026-05-13 \
+    --verbose
+```
+
+Auf Linux:
+
+```sh
+build/messung_driver/comdare-messung-driver \
+    --config-dir experiment_config \
+    --output-dir _runs/2026-05-13 \
+    --verbose
+```
+
+Ablauf pro Messreihe (intern delegiert an
+`comdare::builder::ExperimentDriver::run_pipeline_full`):
+
+1. **Phase 1 — ENUMERATION**: XML parsen, Permutations-Liste erzeugen
+2. **Phase 2 — CODEGEN**: pro Permutation eine `comdare_perm_<fp>.cpp`
+3. **Phase 3 — COMPILE**: cmake configure + cmake --build (Sub-Build)
+4. **Phase 4 — LOAD**: alle `.dll`/`.so` per LoadLibrary/dlopen laden
+5. **Phase 5 — EXECUTE**: pro Modul `create_instance` + `run_workload`
+6. **Phase 6 — MEASURE**: binary measurement-records aggregieren
+7. **Phase 7 — PERSIST**: `measurements.csv` + `measurements.json`
+
+Output liegt unter `_runs/2026-05-13/<reihe>/measurements.{csv,json}` und
+unter `_runs/2026-05-13/<reihe>/build-perms/`.
+
+---
+
+## 6. Binary → CSV (optional Detail-Konvertierung)
+
+Falls das binary-record-Format (`kBinaryMagic 0xC0FFEE02`) ausserhalb der
+Standard-CSV-Exports verwendet werden soll:
+
+```sh
+build/Debug/binary_to_csv/comdare-binary-to-csv.exe \
+    --in  _runs/2026-05-13/messreihe_a/raw.bin \
+    --out _runs/2026-05-13/messreihe_a/extended.csv
+```
+
+---
+
+## 7. CSV → LaTeX-Tabelle + Baustein-Steckbrief
+
+```sh
+build/Debug/csv_to_latex/comdare-csv-to-latex.exe \
+    --in  _runs/2026-05-13/messreihe_b/measurements.csv \
+    --out latex/messreihe_b/table.tex \
+    --baustein-description on
+```
+
+Erzeugt:
+- `latex/messreihe_b/table.tex` — eine booktabs-LaTeX-Tabelle
+- `latex/messreihe_b/algorithm_description.tex` — Steckbrief jedes
+  Bausteins (Allokator, Layout, Prefetch, etc.)
+
+---
+
+## 8. C++ → TikZ Diagramm-Generator
+
+```sh
+build/Debug/diagram_generator/comdare-diagram-generator.exe \
+    --in       _runs/2026-05-13/messreihe_b/measurements.csv \
+    --out-dir  latex/messreihe_b/diagrams/ \
+    --types    bar,scatter,heatmap \
+    --page-format a4
+```
+
+Erzeugt fuer jede Permutation `tikz_<id>.tex`. A4-Awareness bedeutet:
+maximale Breite/Hoehe pro Diagramm werden vor Generierung gepruefft,
+um keine LaTeX-Overfull-hbox zu erzeugen.
+
+---
+
+## 9. LaTeX → PDF (Manuskript-Wrapper)
+
+```sh
+# POSIX
+cd Code/latex_to_pdf
+./build_thesis.sh latex/main.tex
+
+# Windows
+cd .\Code\latex_to_pdf
+.\build_thesis.bat latex\main.tex
+```
+
+Der Wrapper ruft intern die cache-engine `latex_toolchain.cmake`-Pipeline
+auf (pdflatex 3 Durchlaeufe + biber + makeindex). Output:
+`latex/main.pdf`.
+
+---
+
+## 10. Voll-automatischer All-in-one-Lauf (Beispiel)
+
+```sh
+#!/usr/bin/env bash
+set -euo pipefail
+RUN_ID=$(date +%Y-%m-%d_%H%M%S)
+OUT="_runs/${RUN_ID}"
+
+cmake --build build --target ALL_BUILD
+ctest --test-dir build --output-on-failure
+
+build/Debug/messung_driver/comdare-messung-driver \
+    --config-dir experiment_config --output-dir "${OUT}" --verbose
+
+for reihe in messreihe_a messreihe_b messreihe_c; do
+    build/Debug/csv_to_latex/comdare-csv-to-latex \
+        --in "${OUT}/${reihe}/measurements.csv" \
+        --out "latex/${reihe}/table.tex" \
+        --baustein-description on
+    build/Debug/diagram_generator/comdare-diagram-generator \
+        --in "${OUT}/${reihe}/measurements.csv" \
+        --out-dir "latex/${reihe}/diagrams/" \
+        --types bar,scatter,heatmap --page-format a4
+done
+
+latex_to_pdf/build_thesis.sh latex/main.tex
+```
+
+---
+
+## 11. Fehler-Diagnose
+
+| Fehler | Ursache | Loesung |
+|--------|---------|---------|
+| `Submodule nicht initialisiert` | `git submodule update --init --recursive` vergessen | wie genannt |
+| `cmake configure: cache-engine not found` | falscher COMDARE_CACHE_ENGINE_DIR | mit `-DCOMDARE_CACHE_ENGINE_DIR=...` override |
+| `Phase 3: cmake --build failed` | Sub-Build der DLLs schlug fehl | Logs unter `build-perms/` lesen |
+| `Phase 4: No modules loaded` | DLLs nicht in `Debug/` oder `Release/` | `--config-dir` Pfad pruefen |
+| `pdflatex: command not found` | TeX Live / MiKTeX nicht installiert | nachinstallieren |
+| `Overfull hbox` | A4-Limit ueberschritten | `--page-format` einschraenken oder Diagramm splitten |
+
+---
+
+## 12. Querverweise
+
+- `STRUCTURAL_CORRECTION_diplomarbeit.md` — Drei-Repo-Aufteilung (Master)
+- `FINDINGS_REV7_6_diplomarbeit.md` — Findings 2026-05-13 (Master)
+- `20260508 Termin 7/HABICH_TERMIN7_ZUSAMMENFASSUNG_2026_05_13.md`
+- `20260508 Termin 7/REVIEW_PLAN_6_TAGE.md`
+- `20260508 Termin 7/Phase5_UML_Detail/30_architektur_delta_REV7_6_drei_repo_layer_2026_05_13.md`
+- cache-engine: `cache_engine/builder/experiment_driver/experiment_driver.hpp`
+- prt-art: `prt_art/identity/prt_art_search_engine.hpp`

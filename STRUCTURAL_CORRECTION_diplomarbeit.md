@@ -1,8 +1,16 @@
-# Strukturelle Korrektur 2026-05-13 (Architektur-Aufteilung der 3 Repos)
+# STRUCTURAL_CORRECTION REV 7.6 — Diplomarbeit (2026-05-13)
 
-**Status:** WIP — wartet auf User-Original-Nachricht zur finalen Bestaetigung.
-**Anlass:** User-Klarstellung 2026-05-13: ich habe die Code-Verzeichnisstruktur
-der **Diplomarbeit** falsch verortet und stattdessen in `comdare-cache-engine`
+**Status:** **MASTER-Dokument** der Drei-Repo-Architektur-Korrektur. Enthaelt
+die User-Original-Nachricht §10 verbatim. Schwester-Dokumente referenzieren
+hierher.
+
+**Schwester-Dokumente** (gleicher Sprint, pro Repo):
+- comdare-cache-engine: `STRUCTURAL_CORRECTION_cache_engine.md`
+- comdare-prt-art: `STRUCTURAL_CORRECTION_prt_art.md`
+- Habich-Termin-Zusammenfassung: `20260508 Termin 7/HABICH_TERMIN7_ZUSAMMENFASSUNG_2026_05_13.md`
+
+**Anlass:** User-Klarstellung 2026-05-13: die Code-Verzeichnisstruktur
+der **Diplomarbeit** wurde zunaechst falsch verortet und stattdessen in `comdare-cache-engine`
 abgelegt. Diese Doku korrigiert die Architektur, **ohne** Code zu verschieben.
 
 ---
