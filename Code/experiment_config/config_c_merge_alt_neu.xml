@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Messreihe C: Merge alt/neu (PRT-ART-Bausteine in cache-engine-Stack)
+     REV 7.6 (2026-05-13)
+-->
+<comdare_experiment>
+  <messreihe id="C" name="Merge PRT-ART-Bausteine in Cache-Engine-Stack">
+    <description>
+      Misst gezielte Merge-Punkte, an denen einzelne PRT-ART-Bausteine
+      (z. B. OLC-with-Reserved-Blocks, 4+2-Pool-Allocator, Path-Oriented-
+      Prefetch) in existierende cache-engine-Permutationen eingesetzt werden.
+      Hypothese: Bei welchen Workloads bringt der Merge messbare Vorteile?
+    </description>
+
+    <merge_points>
+      <merge_point id="C.1" name="OLC + tcmalloc + ART-Page">
+        <concurrency_baustein from="prt-art" baustein="OlcWithReservedValueBlocks"/>
+        <allocator_baustein   from="cache-engine" baustein="A06_tcmalloc"/>
+        <page_baustein        from="cache-engine" baustein="P01_ART_Node"/>
+      </merge_point>
+
+      <merge_point id="C.2" name="4+2-Pool + HOT-Page">
+        <allocator_baustein   from="prt-art" baustein="PoolSet_4plus2"/>
+        <page_baustein        from="cache-engine" baustein="P02_HOT_Node"/>
+        <concurrency_baustein from="cache-engine" baustein="ConcurrencyManager_OLC"/>
+      </merge_point>
+
+      <merge_point id="C.3" name="PathOrientedPrefetch + B2tree">
+        <prefetch_baustein from="prt-art" baustein="PathOrientedPrefetch"/>
+        <page_baustein     from="cache-engine" baustein="P06_B2tree_Node"/>
+      </merge_point>
+
+      <merge_point id="C.4" name="MultiLevelLayout + Wormhole">
+        <memory_layout_baustein from="prt-art" baustein="MultiLevelLayout"/>
+        <page_baustein          from="cache-engine" baustein="P07_Wormhole_Node"/>
+      </merge_point>
+    </merge_points>
+
+    <workloads>
+      <workload type="ycsb">A</workload>
+      <workload type="ycsb">C</workload>
+      <workload type="ycsb">E</workload>
+    </workloads>
+
+    <parameters>
+      <num_keys>1000000</num_keys>
+      <num_operations>5000000</num_operations>
+      <key_size_bytes>16</key_size_bytes>
+      <value_size_bytes>64</value_size_bytes>
+      <zipfian_theta>0.99</zipfian_theta>
+      <seed>42</seed>
+    </parameters>
+
+    <output>
+      <binary_path>measurements_C.bin</binary_path>
+      <csv_path>measurements_C.csv</csv_path>
+      <latex_path>messreihe_C_table.tex</latex_path>
+      <diff_against>measurements_A.bin</diff_against>
+      <diagrams>
+        <diagram type="bar_chart" plot="merge_point_cycles_diff"/>
+        <diagram type="scatter"   plot="alloc_size_vs_latency_per_merge"/>
+        <diagram type="heatmap"   plot="merge_point_vs_workload_speedup"/>
+      </diagrams>
+    </output>
+  </messreihe>
+</comdare_experiment>

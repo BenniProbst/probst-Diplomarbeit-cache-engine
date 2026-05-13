@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Messreihe A: PRT-ART Testalgorithmus gegen Stand-der-Technik
+     REV 7.6 (2026-05-13)
+-->
+<comdare_experiment>
+  <messreihe id="A" name="PRT-ART vs Stand-der-Technik">
+    <description>
+      Misst PRT-ART (hybride Vector-/Map-/Tuple-API) gegen die in der
+      cache-engine vorhandenen Stand-der-Technik-Adapter (ART, HOT, Masstree,
+      CoCo-Trie, START, B2tree, Wormhole, SuRF).
+    </description>
+
+    <test_algorithm>
+      <name>PRT-ART</name>
+      <source>comdare-prt-art</source>
+      <api_variant>hybrid_search_engine</api_variant>
+    </test_algorithm>
+
+    <comparison_baselines>
+      <baseline id="P01-ART"     adapter="cache_engine_concepts/p01_art"/>
+      <baseline id="P02-HOT"     adapter="cache_engine_concepts/p02_hot"/>
+      <baseline id="P03-Masstree" adapter="cache_engine_concepts/p03_masstree"/>
+      <baseline id="P04-CoCo"    adapter="cache_engine_concepts/p04_coco_trie"/>
+      <baseline id="P05-START"   adapter="cache_engine_concepts/p05_start"/>
+      <baseline id="P06-B2tree"  adapter="cache_engine_concepts/p06_b2tree"/>
+      <baseline id="P07-Wormhole" adapter="cache_engine_concepts/p07_wormhole"/>
+      <baseline id="P10-SuRF"    adapter="cache_engine_concepts/p10_surf"/>
+    </comparison_baselines>
+
+    <workloads>
+      <workload type="ycsb">A</workload>
+      <workload type="ycsb">B</workload>
+      <workload type="ycsb">C</workload>
+      <workload type="ycsb">D</workload>
+      <workload type="ycsb">E</workload>
+      <workload type="ycsb">F</workload>
+    </workloads>
+
+    <parameters>
+      <num_keys>1000000</num_keys>
+      <num_operations>5000000</num_operations>
+      <key_size_bytes>16</key_size_bytes>
+      <value_size_bytes>64</value_size_bytes>
+      <zipfian_theta>0.99</zipfian_theta>
+      <seed>42</seed>
+    </parameters>
+
+    <output>
+      <binary_path>measurements_A.bin</binary_path>
+      <csv_path>measurements_A.csv</csv_path>
+      <latex_path>messreihe_A_table.tex</latex_path>
+      <diagrams>
+        <diagram type="bar_chart"   plot="cycles_per_permutation"/>
+        <diagram type="bar_chart"   plot="cache_misses_l1_per_permutation"/>
+        <diagram type="heatmap"     plot="workload_vs_permutation_throughput"/>
+      </diagrams>
+    </output>
+  </messreihe>
+</comdare_experiment>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Messreihe B: Bestehende cache-engine-Permutationen (SOTA-only)
+     REV 7.6 (2026-05-13)
+-->
+<comdare_experiment>
+  <messreihe id="B" name="Cache-Engine Permutations Vergleichsbasis">
+    <description>
+      Misst die 54+ Permutationen aus cache-engine/cache_engine/builder/
+      example_configs/ als reine Vergleichsbasis ohne PRT-ART-Integration.
+    </description>
+
+    <use_existing_builder>true</use_existing_builder>
+    <builder_config_dir>
+      ../external/comdare-cache-engine/cache_engine/builder/example_configs
+    </builder_config_dir>
+
+    <workloads>
+      <workload type="ycsb">C</workload>
+      <workload type="ycsb">A</workload>
+    </workloads>
+
+    <parameters>
+      <num_keys>500000</num_keys>
+      <num_operations>2500000</num_operations>
+      <key_size_bytes>16</key_size_bytes>
+      <value_size_bytes>64</value_size_bytes>
+      <zipfian_theta>0.99</zipfian_theta>
+      <seed>42</seed>
+    </parameters>
+
+    <output>
+      <binary_path>measurements_B.bin</binary_path>
+      <csv_path>measurements_B.csv</csv_path>
+      <latex_path>messreihe_B_table.tex</latex_path>
+      <diagrams>
+        <diagram type="bar_chart" plot="cycles_per_permutation"/>
+        <diagram type="heatmap"   plot="allocator_vs_concurrency_throughput"/>
+      </diagrams>
+    </output>
+  </messreihe>
+</comdare_experiment>
