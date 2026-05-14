@@ -41,7 +41,7 @@ CacheEngine-Limits konzeptuell durch strategische Heuristiken.
 Das ABI \texttt{module\_abi\_v1.hpp} folgt dem Prinzip variadischer
 Template-Parameter (V12.1/V12.2): 1~Parameter $\Rightarrow$
 \texttt{std::vector}-API, 2~Parameter $\Rightarrow$ \texttt{std::map}-API,
-$N>2 \Rightarrow$ \texttt{std::map<K, std::tuple<V_1\ldots V_N>>}.
+$N>2 \Rightarrow$ \texttt{std::map<K, std::tuple<V$_1$\ldots V$_N$>>}.
 Komplexe Keys werden durch
 \texttt{comdare::fingerprint::FixedLengthFingerprint} auf 16-Byte-
 Binaer-Strings reduziert.
