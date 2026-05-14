@@ -111,3 +111,45 @@ fuer die Verteidigung wichtig ist oder ob die jetzige Mischstruktur
 - Option C: V30.D.1-D.6 sequentiell autonom (2-3 Sessions, hochrisikant)
 
 **Bis zur Entscheidung:** kein Code-Refactoring in cache-engine V23.D-Bereich.
+
+Entscheidung: Option C, wir machen das ordentlich und konsistent von cache-engine als Wurzel über prt-art bis hin zur Diplomarbeit. Allerdings brauchen wir den Unterordner "Domain" nicht dazwischen, wir gehen einfach direkt mit libs/execution_engine und so weiter, die Zwischenebene erscheint mir nicht nützlich.
+
+---
+
+## §7 V30 DONE (2026-05-14, autonom umgesetzt)
+
+| Phase | Commit | Inhalt | Build |
+|---|---|---|---|
+| V30-PRE | (Tags) | v29-final in 3 Repos | OK |
+| V30.D.1 | 37e2ce1 | experiment/ -> libs/execution_engine/ (4 Files) | 31/31 Tests |
+| V30.D.2 | 9c3a2ab | search_engine/ -> libs/search_engine/ (8 INTERFACE-Subs) | configure OK |
+| V30.D.3 | ce46b7c | engine_choice/ -> libs/common/config/ + ALIAS comdare::common::config | configure OK |
+| V30.D.4+D.5 | ac13e2f | cache_engine/ -> libs/cache_engine/ (134 .hpp + 7 .cpp + 22 Builder-Subs) | 31/31 Tests |
+
+**Konsolidierung:** 9 hardcodierte `${CMAKE_SOURCE_DIR}/cache_engine/...`-Pfade
+in einem Schritt aktualisiert (apps/cache_engine_builder, builder/{module_loader,
+experiment_runner, experiment_driver}, tests/unit (3 Stellen), libs/test_infra/
+workload_generator, libs/execution_engine).
+
+**Pin-Kette:**
+- prt-art e83e52f: cache-engine -> ac13e2f
+- Diplomarbeit (V32 commit): cache-engine -> ac13e2f, prt-art -> e83e52f
+
+**Push:** lokal pending (DNS-Ausfall fuer github.com — User pusht manuell oder
+spaeter, wenn Internet stabil).
+
+**Layout-Zustand:**
+- ✅ libs/cache_engine/ (Domaene 2, Restkern + Builder)
+- ✅ libs/execution_engine/ (Phase 7.3+7.4)
+- ✅ libs/search_engine/ (Domaene 1, INTERFACE-Skelette)
+- ✅ libs/common/{succinct,serialization,platform,measurement,config}/
+- ✅ libs/test_infra/{workload_generator,test_data,benchmark_suite}/
+- ✅ libs/deprecated/prt_art_legacy/
+- ✅ apps/cache_engine_builder/ (Top-Level Executable)
+- ✅ adapters/ (21 INTERFACE-Skelette, V31 fuellt diese)
+- ✅ ext/ (Originalcode, mit Original-Compilern)
+
+**Kein domain/-Zwischenebene** (User-Direktive verifiziert).
+
+V23.D ist damit ABGESCHLOSSEN. V31 (K) Adapter-Inhalte folgt.
+

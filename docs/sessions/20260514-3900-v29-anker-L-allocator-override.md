@@ -53,11 +53,11 @@ allocator_override; wenn gesetzt, ueberschreibt es die axes/allocator.
 
 ## §3 Erfolg-Kriterien
 
-- [ ] AlgorithmProfile.allocator_override Field
-- [ ] xml_config_parser parst <allocator_override>
-- [ ] Phase 5 honored Override
-- [ ] +1 Test in test_codegen_from_profile (analog V19.4)
-- [ ] cache-engine commit + push + Diplomarbeit Pin-Bump
+- [x] AlgorithmProfile.allocator_override Field
+- [x] xml_config_parser parst <allocator_override>
+- [x] Phase 5 honored Override
+- [x] +1 Test in test_codegen_from_profile (analog V19.4)
+- [x] cache-engine commit + push + Diplomarbeit Pin-Bump
 
 ---
 

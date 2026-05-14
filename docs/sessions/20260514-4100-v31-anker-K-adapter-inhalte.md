@@ -132,6 +132,8 @@ um die 3 Risikodimensionen einzeln zu verifizieren.
 
 **Bis zur Entscheidung:** keine ext-Repo-Aktivierung, keine Adapter-Header.
 
+User Entscheidung: Option D und danach Option C.
+
 ---
 
 ## §8 Querverweis V27-V31
