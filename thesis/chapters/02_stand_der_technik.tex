@@ -79,3 +79,98 @@ jemalloc (A05), TCMalloc (A06), snmalloc (A07, ISMM 2019),
 NUMAlloc (A09, ISMM 2023). Tier-2/3 ergaenzt CAMA (A12, RTAS 2011),
 StarMalloc (A13, OOPSLA 2024), Crystalline-Reclamation (A17, PLDI 2024)
 und PIM-malloc (A16, arXiv 2025).
+
+\section{Profile-Schema mit \texttt{<expected\_workload>}-Tag (V19/V25/V26)}
+
+Pro SOTA-Algorithmus und pro Allokator wurde ein Profile-XML in
+\texttt{cache\_engine/algorithm\_profiles/} angelegt. Jedes Profile traegt
+Metadata, Achsen-Belegung (page, node, traversal, value\_handle, concurrency,
+allocator, prefetch, telemetry, isa, layout, reclamation), Key-Value-Signatur
+und seit V19 einen optionalen \texttt{<expected\_workload>}-Tag, der die
+\texttt{ExperimentDriver}-Heuristik (Phase~5, V11.2) ueberschreibt.
+
+Mit V25.B sind alle 30/30 SOTA-Profile, mit V26.A alle 10/10
+Allokator-Profile getagged.
+
+\subsection{30 SOTA-Algorithmus-Profile (V25.B)}
+
+\begin{table}[!htbp]
+\caption{SOTA-Algorithmus-Profile mit Workload-Affinitaet}
+\label{tab:sota-profiles}
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Profile} & \textbf{Paper-Ref} & \textbf{expected\_workload} \\
+\hline
+art            & P01 (Leis 2013)     & YCSB\_C \\
+hot            & P02 (Binna 2018)    & YCSB\_C \\
+masstree       & P03 (Mao 2012)      & YCSB\_A \\
+coco\_trie     & P04 (Boffa 2024)    & YCSB\_C \\
+start          & P05 (Fent 2020)     & YCSB\_C \\
+b2tree         & P06 (Schmeisser 2022) & YCSB\_E \\
+wormhole       & P07 (Wu 2019)       & YCSB\_A \\
+surf           & P10 (Zhang 2018)    & YCSB\_A \\
+css\_tree      & P11 (Rao/Ross 1999) & YCSB\_C \\
+csb\_tree      & P12 (Rao/Ross 2000) & YCSB\_E \\
+hankins        & P13 (Hankins 2003)  & YCSB\_C \\
+samuel         & P14 (Samuel 2005)   & YCSB\_C \\
+graefe         & P15 (Graefe 2001)   & YCSB\_C \\
+bender\_treelayout       & P16 (Bender 2002)  & YCSB\_C \\
+bender\_cacheoblivious   & P17 (Bender 2005)  & YCSB\_C \\
+saikkonen\_multilevel    & P18 (Saikkonen 2008) & YCSB\_E \\
+saikkonen\_layoutinvariant & P19 (Saikkonen 2016) & YCSB\_E \\
+btreesareback  & P20 (Mueller 2025)  & YCSB\_E \\
+chen\_prefetch & P21 (Chen 2001)     & YCSB\_A \\
+chen\_fractal  & P22 (Chen 2002)     & YCSB\_A \\
+khan\_adaptive & P23 (Khan 2010)     & YCSB\_A \\
+naderan\_tahan & P24 (Naderan-Tahan 2016) & YCSB\_A \\
+mahling        & P25 (Mahling 2025)  & YCSB\_E \\
+zhang\_fgcs    & P26 (Zhang 2024)    & YCSB\_A \\
+zhang\_asplos  & P27 (Zhang 2025)    & YCSB\_A \\
+kuehn          & P28 (Kuehn 2023)    & YCSB\_C \\
+rcu            & P29 (McKenney 2001) & YCSB\_B \\
+hazard\_pointers & P30 (Michael 2004) & YCSB\_B \\
+ungethuem      & P31 (Ungethuem 2017) & YCSB\_C \\
+to\_stride     & P32 (Schmidt 2025)  & YCSB\_C \\
+\hline
+\end{tabular}
+\end{table}
+
+Workload-Verteilung: 13$\times$ YCSB\_C (read-heavy), 9$\times$ YCSB\_A
+(zipfian read+update), 6$\times$ YCSB\_E (range scans), 2$\times$ YCSB\_B
+(95/5 read-update). PRT-ART selbst ist mit YCSB\_F (read-modify-write fuer
+Density-Tracker-Updates) im prt-art-Repo getagged.
+
+\subsection{10 Allokator-Profile (V26.A)}
+
+\begin{table}[!htbp]
+\caption{Allokator-Profile mit Workload-Affinitaet}
+\label{tab:allocator-profiles}
+\centering
+\small
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Profile} & \textbf{Family} & \textbf{Lizenz} & \textbf{expected\_workload} \\
+\hline
+hoard            & A01 & Apache-2.0      & YCSB\_A \\
+michael\_lockfree & A03 & BSD-3           & YCSB\_B \\
+mimalloc         & A04 & MIT             & YCSB\_A \\
+jemalloc         & A05 & BSD-2           & YCSB\_B \\
+tcmalloc         & A06 & BSD-3           & YCSB\_C \\
+snmalloc         & A07 & MIT             & YCSB\_A \\
+scalloc          & A08 & BSD-3           & YCSB\_A \\
+rpmalloc         & A10 & Public Domain   & YCSB\_C \\
+lrmalloc         & A11 & BSD-3           & YCSB\_B \\
+dlmalloc         & A20 & CC0             & YCSB\_C \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Permutations-Matrix}
+
+30~SOTA-Algorithmen $\times$ 10~Allokatoren $\times$ 6~YCSB-Workloads
+$=$ \textbf{1800 deklarierte Permutations-Profile}. Davon werden via
+\texttt{<expected\_workload>}-Tag sinnvolle Defaults gesetzt; volle
+Permutation per \texttt{messreihen.xml mode=full}. Reale Mess-Daten
+ersetzen Sample-Daten nach V21.2 (HW-E2E), siehe Kapitel~6.
