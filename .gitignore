@@ -10,6 +10,9 @@
 build/
 out/
 
+# V23.3 (2026-05-14): Benchmark-Daten (lazy on-demand via tools/fetch_testdata.{sh,bat})
+Code/tests/fixtures/external/
+
 # Phase 6.2 Code-Archivierung (zu gross fuer Repo, lokal beibehalten)
 _archive_code_pre_migration/
 cmake-build-*/
