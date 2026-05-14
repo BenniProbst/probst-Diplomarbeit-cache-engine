@@ -400,3 +400,64 @@ basis für das systematische Review.
 ### Querverweis
 - thesis/main.tex (Build via cache-engine tools/latex_toolchain)
 - HABICH_TERMIN8 (V15.3): siehe 20260508 Termin 7/HABICH_TERMIN8_*.md
+
+---
+
+## REV 7.7 V19-V27 (2026-05-14): Pipeline + Layout + Konsistenz
+
+### V19-V22: Mess-Pipeline-Vollendung
+- V19 Profile-Tag `<expected_workload>` (cache-engine)
+- V20 `workload_used` durchs Mess-Pipeline-Output (CSV/JSON)
+- V21 ART-ext-Skelett + sample_data_generator + thesis chapter 06
+- V22 diagram_generator nutzt Sample-CSV → echte TikZ + thesis re-built
+
+### V23: cache-engine Layout-Refactoring (Pitchfork/ClickHouse)
+- V23.A Cleanup + CMakePresets (8 build-dirs weg, 7 GB)
+- V23.B `apps/cache_engine_builder/`
+- V23.C `libs/common/{succinct, serialization, platform, measurement}/`
+- V23.E `libs/deprecated/prt_art_legacy/` (Folly-Stil)
+- V23.F `libs/test_infra/{workload_generator, test_data, benchmark_suite}/`
+- V23.D `libs/domain/` deferred (~280 Dateien hochrisikant)
+
+### V24: Konsistenz alle 3 Repos
+- V24.A prt-art Cleanup + CMakePresets
+- V24.B Diplomarbeit Code/ Cleanup + CMakePresets
+- V24.C cache-engine PROJECT_LAYER_MAP +Kapitel 12 (V19-V24 Delta)
+- V24.D thesis chapter 04 +V19-V24 Sections (4 Sections)
+- Direktive verankert: "Niemals Doku loeschen"
+
+### V25: Profile-Vollstaendigkeit + Adapter-Schicht
+- V25.A prt-art Audit (READMEs in cmake/, prt_art/src/ — keine Loeschung)
+- V25.B 30/30 SOTA-Profile mit `<expected_workload>`
+- V25.C 11 SOTA-Adapter-Skelette in cache-engine adapters/P*
+- V25.D Diplomarbeit docs/termine/INDEX.md (Wegweiser statt Reorganisation)
+
+### V26: Allokator-Schicht
+- V26.A 10 Allokator-Profile in cache-engine
+- V26.B 10 Allokator-Adapter-Skelette (21 Adapter-Total: 11 SOTA + 10 Allokator)
+
+### V27: PROJECT_LAYER_MAPs in 3 Repos
+- V27.A cache-engine +Kap 13 (V25-V26 Delta)
+- V27.B prt-art +Kap 12
+- V27.C Diplomarbeit +diese Sektion
+
+### Diplomarbeit-Code-Erweiterungen V21-V25
+| Pfad | Eingefuehrt | Zweck |
+|---|---|---|
+| `Code/sample_data_generator/` | V21.3 | Sample-CSV-Generator |
+| `Code/test_data_xml/` | V23.X1 | Diplomarbeit-eigene Testdatensatz-XMLs |
+| `Code/tools/fetch_testdata.{sh,bat}` | V23.3 | Lazy-Download fuer ~30 GB |
+| `Code/tests/fixtures/external/` | V23.3 | Daten gitignored |
+| `Code/CMakePresets.json` | V24.B | analog cache-engine V23.A |
+| `docs/termine/INDEX.md` | V25.D | Wegweiser |
+
+### Pin-Bump-Kette V19-V27 (cache-engine)
+2f0222d (V18) → 08aca46 → ccb1555 → eee33fb → d70b9a4 → 94123c4 → 141e3eb → 205e848 → 803c577 → 5528184 → b9abc72 → e11f925 (V23.F) → afad1c6 (V24.C) → cb925ff (V25.C) → 8b8e312 (V26) → 11ab988 (V27.A)
+
+### Pin-Bump-Kette V19-V27 (prt-art)
+eca14a2 (V18) → bc877ed (V19) → a1bcd09 (V24) → afbdd75 (V25.A) → c3688fa (V27.B)
+
+### Querverweis V19-V27
+- 20+ Session-Dokus in `docs/sessions/20260514-*.md`
+- Tags `v22-final` in 3 Repos (Pre-V23 Rollback-Punkt)
+- Memory-Direktive: `feedback_never_delete_documentation.md`
