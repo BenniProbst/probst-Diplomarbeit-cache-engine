@@ -1,0 +1,35 @@
+% AUTO-GENERATED durch diagram_generator (REV 7.6, TikZ-Bar-Chart)
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=10pt,
+    width=0.9500\textwidth,
+    height=0.4000\textheight,
+    scale only axis,
+    title={Throughput pro Permutation, gruppiert nach Workload},
+    xlabel={Permutation (gruppiert nach YCSB-Workload)},
+    ylabel={Throughput (Mio.\textbackslash{} Operationen/s)},
+    grid=both,
+    enlargelimits=0.05,
+    symbolic x coords={masstree\_p03 [YCSB\_A],surf\_p10 [YCSB\_A],art\_p01 [YCSB\_C],b2tree\_p06 [YCSB\_C],coco\_trie\_p04 [YCSB\_C],hot\_p02 [YCSB\_C],start\_p05 [YCSB\_C],btreesareback\_p20 [YCSB\_E],wormhole\_p07 [YCSB\_E],prtart\_baseline [YCSB\_F]},
+    xtick=data,
+    x tick label style={rotate=45,anchor=east,font=\tiny},
+]
+\addplot coordinates {
+    (masstree\_p03 [YCSB\_A],9.7113)
+    (surf\_p10 [YCSB\_A],11.3241)
+    (art\_p01 [YCSB\_C],12.9186)
+    (b2tree\_p06 [YCSB\_C],11.5943)
+    (coco\_trie\_p04 [YCSB\_C],14.5159)
+    (hot\_p02 [YCSB\_C],14.8244)
+    (start\_p05 [YCSB\_C],10.1822)
+    (btreesareback\_p20 [YCSB\_E],10.2913)
+    (wormhole\_p07 [YCSB\_E],9.1213)
+    (prtart\_baseline [YCSB\_F],10.4292)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Throughput pro Permutation, gruppiert nach Workload}
+\end{figure}

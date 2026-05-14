@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "diagram_generator.hpp"
 
+#include <algorithm>
+#include <charconv>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <string_view>
 
 namespace comdare::da::diagram_generator {
 
@@ -175,6 +178,102 @@ int write_heatmap(std::filesystem::path const& out_path,
     f << "\\caption{" << escape_latex(data.title) << "}\n";
     f << "\\end{figure}\n";
     return f.good() ? status_ok : status_io_error;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REV 7.6 V22.1 — Sample-CSV-Loader + workload-Gruppen-Plot
+// ─────────────────────────────────────────────────────────────────────────────
+
+namespace {
+
+[[nodiscard]] std::vector<std::string> split_csv_line(std::string const& line) {
+    std::vector<std::string> fields;
+    fields.reserve(16);
+    std::string cur;
+    cur.reserve(64);
+    for (char c : line) {
+        if (c == ',') {
+            fields.push_back(std::move(cur));
+            cur.clear();
+        } else {
+            cur.push_back(c);
+        }
+    }
+    fields.push_back(std::move(cur));
+    return fields;
+}
+
+[[nodiscard]] std::uint64_t parse_u64(std::string const& s) noexcept {
+    std::uint64_t v = 0;
+    auto const* first = s.data();
+    auto const* last  = s.data() + s.size();
+    auto [_, ec] = std::from_chars(first, last, v);
+    return (ec == std::errc{}) ? v : 0;
+}
+
+}  // anonymous namespace
+
+std::vector<CsvRow>
+load_csv_with_workload_used(std::filesystem::path const& csv_path) {
+    std::vector<CsvRow> rows;
+    std::ifstream f{csv_path};
+    if (!f) return rows;
+
+    std::string line;
+    bool        is_header = true;
+    while (std::getline(f, line)) {
+        if (is_header) { is_header = false; continue; }  // skip CSV header
+        if (line.empty()) continue;
+
+        auto const fields = split_csv_line(line);
+        if (fields.size() < 14) continue;  // V20.3 hat 16 Spalten
+
+        CsvRow r;
+        r.permutation_id    = fields[0];
+        // fields[1] = fingerprint, fields[2] = succeeded — nicht benoetigt
+        r.workload_used     = fields[3];
+        r.op_count          = parse_u64(fields[4]);
+        r.total_cycles      = parse_u64(fields[5]);
+        r.cache_misses_l1   = parse_u64(fields[6]);
+        r.bytes_in_use_peak = parse_u64(fields[13]);
+        rows.push_back(std::move(r));
+    }
+    return rows;
+}
+
+int write_throughput_by_workload(std::filesystem::path const& out_tikz,
+                                  std::span<CsvRow const> rows,
+                                  PageConstraints const& cnst)
+{
+    if (rows.empty()) return status_empty_input;
+
+    // Stabile Sortierung nach workload_used (gruppiert), Sekundaer-Schluessel id.
+    std::vector<CsvRow> sorted{rows.begin(), rows.end()};
+    std::sort(sorted.begin(), sorted.end(),
+        [](CsvRow const& a, CsvRow const& b) {
+            if (a.workload_used != b.workload_used) {
+                return a.workload_used < b.workload_used;
+            }
+            return a.permutation_id < b.permutation_id;
+        });
+
+    BarChartData bar;
+    bar.title    = "Throughput pro Permutation, gruppiert nach Workload";
+    bar.x_label  = "Permutation (gruppiert nach YCSB-Workload)";
+    bar.y_label  = "Throughput (Mio.\\ Operationen/s)";
+    bar.labels.reserve(sorted.size());
+    bar.values.reserve(sorted.size());
+    for (auto const& r : sorted) {
+        // throughput = op_count * 1e9 / total_cycles  (cycles ~ ns in V21.3 Sample)
+        double const tput_ops_per_sec =
+            (r.total_cycles > 0)
+                ? (static_cast<double>(r.op_count) * 1.0e9 / static_cast<double>(r.total_cycles))
+                : 0.0;
+        // Label-Konvention: "<id> [<workload>]"
+        bar.labels.push_back(r.permutation_id + " [" + r.workload_used + "]");
+        bar.values.push_back(tput_ops_per_sec / 1.0e6);  // in Millionen
+    }
+    return write_bar_chart(out_tikz, bar, cnst);
 }
 
 }  // namespace comdare::da::diagram_generator

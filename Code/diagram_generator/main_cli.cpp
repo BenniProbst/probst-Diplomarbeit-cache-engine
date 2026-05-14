@@ -12,9 +12,29 @@
 namespace dg = comdare::da::diagram_generator;
 
 int main(int argc, char* argv[]) {
+    // V22.1 — neuer Subcommand --by-workload erzeugt gruppierten Bar-Chart aus
+    // V20.3-konformer measurements.csv (16 Spalten inkl. workload_used).
+    if (argc >= 4 && std::string{argv[1]} == "--by-workload") {
+        auto rows = dg::load_csv_with_workload_used(argv[2]);
+        if (rows.empty()) {
+            std::cerr << "load_csv_with_workload_used: 0 rows\n";
+            return 11;
+        }
+        int const rc = dg::write_throughput_by_workload(argv[3], rows);
+        if (rc != 0) {
+            std::cerr << "write_throughput_by_workload failed: " << rc << "\n";
+            return rc;
+        }
+        std::cout << "diagram-generator: " << rows.size()
+                  << " rows by workload -> " << argv[3] << "\n";
+        return 0;
+    }
+
     if (argc < 3) {
         std::cerr << "Usage: diagram-generator <input.csv> <output.tex>\n"
-                  << "       (Demo: liest 1. Spalte = label, 2. Spalte = value)\n";
+                  << "       (Demo: liest 1. Spalte = label, 2. Spalte = value)\n"
+                  << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
+                  << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n";
         return 1;
     }
     std::ifstream f{argv[1]};

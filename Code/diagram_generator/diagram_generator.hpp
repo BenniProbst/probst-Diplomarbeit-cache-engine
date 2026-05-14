@@ -86,4 +86,36 @@ struct HeatmapData {
 // LaTeX-Escape (lokal, NICHT abhaengig von csv_to_latex)
 [[nodiscard]] std::string escape_latex(std::string_view s);
 
+// ─────────────────────────────────────────────────────────────────────────────
+// REV 7.6 V22.1 — Sample-CSV-Loader + workload-Gruppen-Plot
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Liest eine V20.3-konforme measurements.csv (16 Spalten):
+//   permutation_id, fingerprint, succeeded, workload_used, op_count,
+//   total_cycles, cache_misses_l1..l3, dtlb_misses, coherence_invalidations,
+//   energy_micro_joules, bytes_allocated, bytes_in_use_peak,
+//   external_frag, internal_frag
+//
+// Berechnet pro Zeile throughput_ops_per_sec = op_count * 1e9 / total_cycles
+// (cycles als Nanosekunden interpretiert, V21.3 Sample-Daten-Konvention).
+
+struct CsvRow {
+    std::string   permutation_id;
+    std::string   workload_used;     // YCSB_A..F (V20.1)
+    std::uint64_t op_count;
+    std::uint64_t total_cycles;
+    std::uint64_t cache_misses_l1;
+    std::uint64_t bytes_in_use_peak;
+};
+
+[[nodiscard]] std::vector<CsvRow>
+load_csv_with_workload_used(std::filesystem::path const& csv_path);
+
+// Gruppiert nach workload_used + plottet Bar-Chart mit Throughput pro Permutation.
+// Permutationen werden nach workload_used sortiert (gruppiert dargestellt).
+[[nodiscard]] int write_throughput_by_workload(
+    std::filesystem::path const& out_tikz,
+    std::span<CsvRow const> rows,
+    PageConstraints const& cnst = {});
+
 }  // namespace comdare::da::diagram_generator
