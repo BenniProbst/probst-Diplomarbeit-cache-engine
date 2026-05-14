@@ -1,0 +1,39 @@
+\chapter{Einleitung}\label{ch:einleitung}
+
+\section{Motivation}
+
+% TODO V14+: Motivation aus Habich-Sprechstunden + 33-Paper-Korpus
+% Aufhaenger: Cache-Awareness in Trie-basierten Index-Strukturen ist
+% historisch in der Forschung weit gestreut, aber nicht systematisch
+% permutiert + ausgemessen worden.
+
+\section{Forschungsfragen}
+
+\begin{itemize}
+    \item \textbf{F1}: Welche Algorithmus-Bausteine eines Cache-bewussten
+          Trie-Index lassen sich in einer 11-Achsen-Permutationsmatrix
+          systematisch kombinieren?
+    \item \textbf{F2}: Welche Permutationen erzielen die besten
+          Latenz/Throughput-Werte unter YCSB-A bis YCSB-F?
+    \item \textbf{F3}: Wie verhaelt sich PRT-ART (Pruefling) im Vergleich
+          zum Stand der Technik (8 Tier-1-SOTA + 22 Tier-2/3-SOTA)?
+\end{itemize}
+
+\section{Beitraege}
+
+\begin{itemize}
+    \item Drei-Schichten-Architektur (CacheEngine $\to$ ExecutionEngine $\to$
+          SearchEngine) mit ABI-stabilen C++23-Modul-Interfaces.
+    \item 30 SOTA-Algorithmus-Profile als persistierte XML-Konfigurationen.
+    \item PRT-ART als Pruefling mit 8 eigenen Bausteine-Schichten.
+    \item Mess-Driver mit Defined/Full-Mode + Profile-aware Workload-Routing.
+\end{itemize}
+
+\section{Aufbau der Arbeit}
+
+Kapitel~\ref{ch:sota} fasst den 33-Paper-Stand der Technik zusammen.
+Kapitel~\ref{ch:architektur} stellt die Drei-Schichten-Architektur vor.
+Kapitel~\ref{ch:implementation} dokumentiert die Implementation in den drei
+Repositorien (cache-engine, prt-art, Diplomarbeit-Code). Kapitel~\ref{ch:messverfahren}
+beschreibt das Mess-Verfahren. Kapitel~\ref{ch:auswertung} praesentiert die
+Mess-Resultate. Kapitel~\ref{ch:fazit} schliesst mit Fazit und Ausblick.

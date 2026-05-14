@@ -1,0 +1,37 @@
+\chapter{Messverfahren}\label{ch:messverfahren}
+
+\section{Drei Pflicht-Messreihen}
+
+\subsection{Messreihe A: PRT-ART vs. Stand der Technik}
+
+% A_defined: 8 Tier-1-SOTA aus algorithm_profiles/sota
+% A_full:    alle 30 SOTA (Tier-1 + Tier-2 + Tier-3) — Habich-Direktive
+% Verweis: experiment_config/messreihen.xml
+
+\subsection{Messreihe B: Cache-Engine-Permutationen}
+
+% Reine Vergleichsbasis Stand der Technik, ohne PRT-ART
+
+\subsection{Messreihe C: Merge alt/neu}
+
+% PRT-ART-Bausteine in cache-engine-Permutationen
+
+\section{Profile-aware Workload-Routing}
+
+% Aus traversal-Tag des Profils:
+%   RANGE_*    -> YCSB-E
+%   HOT_PATH    -> YCSB-A
+%   STANDARD    -> YCSB-C
+% Verweis: ExperimentDriver Phase 5 (V11.2)
+
+\section{Defined- vs. Full-Mode}
+
+% Defined: nur referenzierte Profile aus sota_profile_filter
+% Full:    alle Profile aus algorithm_profiles/sota
+% Habich-Direktive: Full ist Default (Messung immer vollstaendig)
+
+\section{ExperimentDriver Phase 1-7}
+
+% Enumeration -> Codegen -> Compile -> Load -> Execute -> Measure -> Persist
+% Plus optional Phase 4b functional_tests (V13.3) +
+% Phase 3 hot_compile_missing (V13.2)

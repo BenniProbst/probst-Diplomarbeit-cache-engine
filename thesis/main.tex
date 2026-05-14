@@ -1,0 +1,57 @@
+% Diplomarbeit-Manuskript Skelett (REV 7.6 V13.7)
+% Probst, Benjamin-Elias — TU Dresden, Prof. Habich
+% Thema: Active Cache-Aware Hardware Adaptation Cache Engine for Trie-Based Index Structures
+%
+% Build: cache-engine/tools/latex_toolchain (siehe README.md im selben Verzeichnis)
+% Diagramme: aus Diplomarbeit/Code/diagram_generator/ als TikZ-Files in tikz/
+% Tabellen: aus Diplomarbeit/Code/csv_to_latex/ als .tex-Files in tabellen/
+
+\documentclass[11pt,a4paper,oneside,bibliography=totoc]{scrreprt}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{a4paper,top=3cm,bottom=3cm,left=3cm,right=3cm}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=blue}
+
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{literatur.bib}
+
+\title{Active Cache-Aware Hardware Adaptation\\
+       Cache Engine for Trie-Based Index Structures}
+\author{Benjamin-Elias Probst\\
+        Matrikelnummer 4510512\\
+        Technische Universit\"{a}t Dresden}
+\date{Sommersemester 2026 \\ Betreuer: Prof. Dirk Habich}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\include{chapters/01_einleitung}
+\include{chapters/02_stand_der_technik}
+\include{chapters/03_architektur}
+\include{chapters/04_implementation}
+\include{chapters/05_messverfahren}
+\include{chapters/06_auswertung}
+\include{chapters/07_fazit_und_ausblick}
+
+\printbibliography
+
+\appendix
+\include{chapters/A1_anhang_messreihen}
+\include{chapters/A2_anhang_codestruktur}
+
+\end{document}

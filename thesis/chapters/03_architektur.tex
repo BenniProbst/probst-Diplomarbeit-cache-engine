@@ -1,0 +1,33 @@
+\chapter{Architektur}\label{ch:architektur}
+
+% REV 7 Drei-Schichten-Hierarchie
+% Verweis: 20260508 Termin 7/Phase5_UML_Detail/24_architektur_skizze_REV7_2026_05_13.md
+
+\section{Drei-Schichten-Hierarchie}
+
+% CacheEngine (Stand der Technik) -> ExecutionEngine (OS-Primitiven) ->
+% SearchEngine (Such-spezifische Patterns)
+% TODO: ASCII-Diagramm aus 24_architektur_skizze in TikZ uebersetzen
+
+\section{ABI-stabiles C++23-Modul-Interface}
+
+% module_abi_v1.hpp + Variadic-Template-Magie + comdare::fingerprint
+% Verweis: cache_engine/include/cache_engine/abi/
+
+\section{11-Achsen-Permutationsmatrix}
+
+% Page, Node, Traversal, ValueHandle, Concurrency, Allocator, Prefetch,
+% Telemetry, ISA, Layout, Reclamation
+% Verweis: cache_engine/include/cache_engine/abi/baustein_variants.hpp (V11.4 + V12.6)
+% Verweis: cache_engine/algorithm_profiles/permutation_axes.xml
+
+\section{PRT-ART als Pruefling}
+
+% 8 Bausteine + Compile-Time-Fallback auf CacheEngine via resolve_baustein
+% Verweis: comdare-prt-art/prt_art/identity/PrtArtSearchEngine
+% Verweis: comdare-prt-art/prt_art/algorithm_profiles/prtart_pruefling.profile.xml
+
+\section{CacheEngineBuilder zwei-stufig}
+
+% Stage 1 (CMake-build) + Stage 2 (runtime codegen + permutation generation)
+% Verweis: cache_engine/builder/experiment_driver/ (V13.2 + V13.4)
