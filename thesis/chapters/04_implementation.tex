@@ -148,3 +148,101 @@ mit \texttt{ctest} verifiziert; ein Tag \texttt{v22-final} in allen
           ergaenzt. Direktive "niemals Dokumentation loeschen" beachtet
           --- alte Doku bleibt vollstaendig erhalten.
 \end{description}
+
+\section{Sprint V25--V29: Profile-Stack und Allokator-Override (2026-05-14)}
+
+\begin{description}
+    \item[V25.B \texttt{<expected\_workload>} Tag] Alle 30 SOTA-Profile
+          unter \texttt{algorithm\_profiles/} um den Tag erweitert. Der
+          Parser \texttt{libs/common/serialization/xml\_config\_parser/}
+          liest den Tag und uebergibt ihn an \texttt{ExperimentDriver}
+          (Phase~5), der ihn als Override fuer die Workload-Heuristik
+          aus V11.2 verwendet.
+    \item[V25.C SOTA-Adapter-Skelette] 11 Sub-Verzeichnisse unter
+          \texttt{adapters/P*/}, jeweils mit \texttt{INTERFACE}-Library
+          und ALIAS \texttt{comdare::adapter::p\_<NN>\_<name>}.
+    \item[V26.A Allokator-Profile] 10 Profile A01--A20 unter
+          \texttt{algorithm\_profiles/allocators/} mit eigenem
+          \texttt{<expected\_workload>}-Tag und Lizenz-Annotation.
+    \item[V26.B Allokator-Adapter-Skelette] 10 Sub-Verzeichnisse unter
+          \texttt{adapters/A*/}, analog V25.C.
+    \item[V28 Manuskript-Update] Kapitel~02 erweitert um zwei Tabellen:
+          30~SOTA-Profile mit Workload-Tag, 10~Allokator-Profile mit
+          Lizenz und Workload-Tag.
+    \item[V29 \texttt{<allocator\_override>}-Tag] Optionales Feld
+          \texttt{allocator\_override} im SOTA-Profil, das die Achse
+          ``allocator'' der Permutation ueberschreibt --- erlaubt z.B.
+          ``ART nutzt mimalloc statt jemalloc'' im Profil zu fixieren.
+          Tests: 2 neue Faelle in
+          \texttt{test\_codegen\_from\_profile.cpp} (16/16 gruen).
+\end{description}
+
+\section{Sprint V30: \texttt{libs/}-Migration vollstaendig (2026-05-14)}
+
+V30 zog die in V23.D deferrte Migration nach. \emph{Auf Wunsch des
+Architekten ohne den \texttt{domain/}-Zwischenpfad,} also flach
+\texttt{libs/<modul>/} statt \texttt{libs/domain/<modul>/}.
+
+\begin{description}
+    \item[V30.D.1] \texttt{experiment/} $\rightarrow$
+          \texttt{libs/execution\_engine/} (4 Files).
+    \item[V30.D.2] \texttt{search\_engine/} $\rightarrow$
+          \texttt{libs/search\_engine/} (8 INTERFACE-Subs).
+    \item[V30.D.3] \texttt{engine\_choice/} $\rightarrow$
+          \texttt{libs/common/config/} mit ALIAS
+          \texttt{comdare::common::config}.
+    \item[V30.D.4+D.5] \texttt{cache\_engine/} $\rightarrow$
+          \texttt{libs/cache\_engine/} (134 \texttt{.hpp} + 7
+          \texttt{.cpp} + 22 Builder-Subs). Neun hardcodierte
+          \texttt{\$\{CMAKE\_SOURCE\_DIR\}/cache\_engine/...}-Pfade
+          aktualisiert.
+    \item[Build] 31/31 Tests gruen nach jeder Phase
+          (Codegen, Workload, ResultAggregator, ExperimentDemo).
+\end{description}
+
+\section{Sprint V31: Adapter-Inhalte + P27 (2026-05-14)}
+
+Der Architekt traf zur Lizenz-Frage eine zweite Direktive
+(2026-05-14): da fuer jede Permutations-Achse durch das Zerschneiden
+ein neues Werk entsteht, koennen Adapter alle 22 ext-Repos benutzen ---
+GPL-3, LGPL-2.1+ und Repos ohne LICENSE-Datei eingeschlossen. Dies ist
+in der \texttt{NOTICE} unter dem Abschnitt \emph{Architekt-Direktive II}
+verankert.
+
+\begin{description}
+    \item[V31.A] \texttt{NOTICE} +Abschnitt mit der wortwoertlichen
+          Direktive und Implikationen pro Lizenz-Klasse.
+          \texttt{LICENSE\_AUDIT\_EXT.md} mit V31-PRE-Befund (Korrektur:
+          P03-Masstree ist MIT, nicht GPL-2; echter GPL-Konflikt liegt
+          in P04-CoCo-trie und P07-Wormhole, beide GPL-3).
+    \item[V31.K1+K2] Pilot-Adapter \texttt{P01-ART/p01\_art\_adapter.hpp}
+          (\texttt{UnodbDbAdapter}) und
+          \texttt{A04-mimalloc/a04\_mimalloc\_adapter.hpp}
+          (\texttt{MimallocAdapter}). Pattern: \texttt{COMDARE\_HAVE\_<X>}
+          Compile-Flag, \texttt{\#if defined}-Block fuer Original-API,
+          Fallback (\texttt{std::malloc} oder
+          \texttt{std::runtime\_error}).
+    \item[V31.K3] 11 SOTA-Adapter (P02-P30): jeweils Header +
+          \texttt{CMakeLists.txt}-Update mit COMDARE\_HAVE-Option.
+    \item[V31.K4] 9 Allokator-Adapter (A01-A20): analog.
+    \item[V31.K5] \texttt{tools/p27\_bundle\_finder/} --- C++23-Port der
+          \texttt{hp\_soft.py} aus der Mail-Antwort von Boris Grot und
+          Youhui Zhang (2026-05-14). Build-Time Call-Graph-Analyse:
+          parsed \texttt{objdump -d} und \texttt{objdump -t}, baut
+          Call-Graph, berechnet Subtree-Footprints via iterativer DFS,
+          und liefert Funktionen mit Footprint $\geq$ Threshold als
+          Bundle-Entry-Points (Standard 240\,kB).
+    \item[V31.K6] Runtime-Anteil:
+          \texttt{prt\_art/legacy\_reimpl/P27-Zhang-ASPLOS-Hierarchical/}
+          (im prt-art-Repo, aus Phase 6+ vorhanden).
+          \texttt{HierarchicalBundlePrefetcher} mit L1/L2/L3-Tracking;
+          5 GTest-Tests gruen.
+    \item[V31.F] \texttt{tests/unit/test\_v31\_adapters.cpp}: Smoke-Test
+          fuer alle 22 Adapter (Konstruieren + \texttt{paper\_id()}
+          liefert non-empty); 23/23 Tests gruen.
+\end{description}
+
+Damit liegen alle Bausteine fuer das Permutations-Experiment
+bereit; was offen bleibt, ist die Aktivierung der Original-Compiler
+pro \texttt{ext/}-Repo (Cluster-Aufgabe, parallel zur Diplomarbeit) und
+die HW-E2E-Mess-Reihe (Phase~V21.2, manuell).
