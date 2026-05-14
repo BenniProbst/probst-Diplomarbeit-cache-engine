@@ -1,33 +1,101 @@
 \chapter{Architektur}\label{ch:architektur}
 
-% REV 7 Drei-Schichten-Hierarchie
-% Verweis: 20260508 Termin 7/Phase5_UML_Detail/24_architektur_skizze_REV7_2026_05_13.md
+Die Architektur folgt der REV-7-Skizze \cite{leis2013art}\footnote{
+Der Verweis ist symbolisch — die Architektur-Skizze REV~7 selbst liegt in
+\texttt{20260508 Termin 7/Phase5\_UML\_Detail/24\_architektur\_skizze\_REV7\_2026\_05\_13.md}.}
+und gliedert sich in drei Schichten plus Drei-Repo-Aufteilung.
 
 \section{Drei-Schichten-Hierarchie}
 
-% CacheEngine (Stand der Technik) -> ExecutionEngine (OS-Primitiven) ->
-% SearchEngine (Such-spezifische Patterns)
-% TODO: ASCII-Diagramm aus 24_architektur_skizze in TikZ uebersetzen
+\begin{verbatim}
+        comdare::cache_engine::CacheEngine          (Stufe 1: Stand der Technik)
+                  ^
+                  | erbt
+        comdare::execution_engine<ProcessingStrategy>  (Stufe 2: OS-Primitiven)
+                  ^
+                  | erbt
+        comdare::search_engine<Collection, Config>   (Stufe 3: Such-Patterns)
+                  ^
+                  | spezialisiert
+        comdare::prt_art::PrtArtSearchEngineAdapter   (Pruefling-Anbindung)
+                  |
+                  | komponiert
+        comdare::prt_art::PrtArtSearchEngine<Ts...>   (hybride Vector/Map/Tuple)
+\end{verbatim}
+
+\textbf{Stufe~1 (CacheEngine)} stellt die Cache-Page-Topologie, 23
+Allokator-Familien, 12 Sub-Engines und Telemetrie-Strategien als
+Bibliothek bereit (Stand der Technik aus den 33 Tieflektuere-Papern).
+
+\textbf{Stufe~2 (ExecutionEngine)} wrappt diese Bausteine zu hoeheren
+OS-Primitiven (cache-line-aligned Allocate, NUMA-konformes Read-Pin,
+Coherence-aware Write).
+
+\textbf{Stufe~3 (SearchEngine)} bietet Such-spezifische Patterns
+(Trie-Walk, B+-Range-Scan, Hot-Path-Lookup) auf den ExecutionEngine-
+Primitiven; sie ist der oberste Layer und ueberschreitet die
+CacheEngine-Limits konzeptuell durch strategische Heuristiken.
 
 \section{ABI-stabiles C++23-Modul-Interface}
 
-% module_abi_v1.hpp + Variadic-Template-Magie + comdare::fingerprint
-% Verweis: cache_engine/include/cache_engine/abi/
+Das ABI \texttt{module\_abi\_v1.hpp} folgt dem Prinzip variadischer
+Template-Parameter (V12.1/V12.2): 1~Parameter $\Rightarrow$
+\texttt{std::vector}-API, 2~Parameter $\Rightarrow$ \texttt{std::map}-API,
+$N>2 \Rightarrow$ \texttt{std::map<K, std::tuple<V_1\ldots V_N>>}.
+Komplexe Keys werden durch
+\texttt{comdare::fingerprint::FixedLengthFingerprint} auf 16-Byte-
+Binaer-Strings reduziert.
 
 \section{11-Achsen-Permutationsmatrix}
 
-% Page, Node, Traversal, ValueHandle, Concurrency, Allocator, Prefetch,
-% Telemetry, ISA, Layout, Reclamation
-% Verweis: cache_engine/include/cache_engine/abi/baustein_variants.hpp (V11.4 + V12.6)
-% Verweis: cache_engine/algorithm_profiles/permutation_axes.xml
+Pro Stack-Ebene definiert \texttt{baustein\_variants.hpp} ein
+\texttt{std::variant} ueber alle Konkretisierungen:
+
+\begin{description}
+    \item[Page] 11 Konkretisierungen (DenseByteArt256, HotMultiByte,
+        MasstreeINode, CoCoCompact, Start, B2Tree, Wormhole, Surf,
+        PrtArtDenseByte, PrtArtRedirect, StandardHeap)
+    \item[Node] 8 (SparseNode4Art, HotBitNode, MasstreeTrie, BPlus,
+        WormholeHash, SurfTrie, PrtArtRedirect, PrtArtBPlus)
+    \item[Traversal] 5 (Standard, HotPath, RangeScan, RangeHotPath,
+        PrtArtHotPath)
+    \item[ValueHandle] 3 (Inline, External, ChainRef)
+    \item[Concurrency] 6 (SingleThreaded, SharedMutex, OLC, RCU,
+        HazardPointers, PrtArtOlcReserved)
+    \item[Allocator] 16 (SystemMalloc, Hoard, Slab, MichaelLockFree,
+        Mimalloc, Jemalloc, TCMalloc, Snmalloc, Scalloc, NUMAlloc,
+        Rpmalloc, LRMalloc, CAMA, StarMalloc, Buddy, Dlmalloc)
+    \item[Prefetch] 6 (None, AdaptiveDistance, PathOriented, Fractal,
+        Hierarchical, PrtArtRedirectPrefetch)
+    \item[Telemetry] 5 (Off, LeafOnlySampled, AllNodes, VampirOtf2,
+        PikaProfile)
+    \item[ISA] 6 (X86\_Baseline, SSE42, AVX2, AVX512, ARM\_Neon, ARM\_SVE)
+    \item[Layout] 6 (StandardHeap, CacheObliviousVeb, CacheLineAligned,
+        NumaPinned, HbmHybrid, PrtArtMultiLevel)
+    \item[Reclamation] 5 (None, RcuGp, HazardPointers, EpochBased,
+        CrystallineLockFree)
+\end{description}
+
+Total moegliche Permutationen: $11 \cdot 8 \cdot 5 \cdot 3 \cdot 6 \cdot
+16 \cdot 6 \cdot 5 \cdot 6 \cdot 6 \cdot 5 \approx 5{,}5 \cdot 10^9$.
 
 \section{PRT-ART als Pruefling}
 
-% 8 Bausteine + Compile-Time-Fallback auf CacheEngine via resolve_baustein
-% Verweis: comdare-prt-art/prt_art/identity/PrtArtSearchEngine
-% Verweis: comdare-prt-art/prt_art/algorithm_profiles/prtart_pruefling.profile.xml
+Der \texttt{PrtArtSearchEngineAdapter} (V8.9, V9.1, V11.1, V13.5)
+implementiert das ABI-Interface \texttt{comdare::search\_engine} via
+Komposition statt direkter Vererbung. Dadurch bleibt die hybride
+\texttt{PrtArtSearchEngine<Ts\ldots>}-API (66 Tests V14.1) unangetastet,
+und das Adapter-Pattern erlaubt Compile-Time-Fallback auf
+\texttt{cache\_engine}-Bausteine via \texttt{resolve\_baustein.hpp}
+(V10.2 mit 11 Tag-Specializations).
 
 \section{CacheEngineBuilder zwei-stufig}
 
-% Stage 1 (CMake-build) + Stage 2 (runtime codegen + permutation generation)
-% Verweis: cache_engine/builder/experiment_driver/ (V13.2 + V13.4)
+\textbf{Stage~1} (CMake-Build) baut die \texttt{cache-engine-builder}-
+Binary inkl. \texttt{ExperimentDriver}-Library.
+\textbf{Stage~2} (Runtime, opt-in V13.4 \texttt{COMDARE\_AUTO\_RUN\_BUILDER})
+ruft den Builder auf, der pro Permutation entweder ein vorkompiliertes
+Modul laedt oder per \texttt{cmake/cl}-Aufruf hot-kompiliert
+(\texttt{phase3\_hot\_compile\_missing}, V13.2). Optional verifiziert
+\texttt{phase4b\_functional\_tests} (V13.3) den ABI-Vertrag jedes
+geladenen Moduls.

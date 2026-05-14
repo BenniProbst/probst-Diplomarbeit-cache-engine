@@ -37,7 +37,8 @@ test:messung_driver:
     - cd Code
     - cmake -B build-test -G Ninja
     - cmake --build build-test
-    - ctest --test-dir build-test --output-on-failure -R test_messung_driver
+    # REV 7.6 V14.3 — Direkt-Ausfuehrung umgeht gtest_discover_tests MSB3073
+    - ./build-test/tests/test_messung_driver
   artifacts:
     paths:
       - Code/build-test/Testing/

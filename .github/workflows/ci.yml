@@ -42,5 +42,6 @@ jobs:
         run: |
           cmake -S Code -B Code/build-test -G Ninja
           cmake --build Code/build-test
-      - name: Run ctest
-        run: ctest --test-dir Code/build-test --output-on-failure -R test_messung_driver
+      # REV 7.6 V14.3 — Direkt-Ausfuehrung umgeht gtest_discover_tests MSB3073
+      - name: Run test binary directly (V14.3)
+        run: ./Code/build-test/tests/test_messung_driver

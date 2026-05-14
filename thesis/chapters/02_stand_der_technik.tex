@@ -1,34 +1,81 @@
 \chapter{Stand der Technik}\label{ch:sota}
 
-% Zusammenfassung der 33-Paper-Tieflektuere (Cluster A-F + Allokator-Cluster)
-% Verweis auf Diplomarbeit/20260508 Termin 7/_review/T1-T6 + papers/P01-P33
+Der Stand der Technik im Bereich Cache-bewusster Trie-Index-Strukturen
+gliedert sich in sechs thematische Cluster (Such-Familie A--F) und einen
+parallelen Allokator-Korpus (A01--A23). Insgesamt 33 Such-Algorithmus-Paper
+und 21 Allokations-Paper wurden tieflektuert; die Ergebnisse sind als
+\verb|algorithm_profiles/sota/| persistierte XML-Konfigurationen in der
+\texttt{comdare-cache-engine} verfuegbar (30 Profile in V9.5).
 
 \section{Trie-Familie (Cluster A)}
 
-% P01 ART, P02 HOT, P04 CoCo-Trie, P05 START, P09 Jacobson LOUDS, P10 SuRF
-% TODO: 1 Absatz pro Paper, mit Verweis auf cache_engine/algorithm_profiles/sota/
+\textbf{P01 ART} \cite{leis2013art} fuehrt den Adaptive Radix Tree mit
+adaptiver Knotengroesse Node4/16/48/256 ein.
+\textbf{P02 HOT} \cite{binna2018hot} optimiert die Trie-Hoehe mittels
+multi-byte Praefixen und bit-vector-Indizes.
+\textbf{P03 Masstree} \cite{mao2012masstree} kombiniert Trie + B-Baum mit
+Permutations-Index pro INode.
+\textbf{P04 CoCo-Trie} \cite{boffa2024coco} verwendet succinct-encoded
+compact pages.
+\textbf{P05 START} \cite{fent2020start} ergaenzt ART um Self-Tuning der
+Knoten-Konkretisierung.
+P09 LOUDS (Jacobson 1989) ist die succinct-Trie-Foundation.
+\textbf{P10 SuRF} \cite{zhang2018surf} nutzt LOUDS fuer Range-Filter.
 
 \section{Hybrid + B+-Familie (Cluster B)}
 
-% P03 Masstree, P06 B2tree, P07 Wormhole, P11 CSS-Tree, P12 CSB+-Tree, P13 Hankins
+\textbf{P06 B$^2$-Tree} \cite{schmeisser2022b2tree} hat zwei-stufiges
+Fanout fuer L1+L2-Cache-Awareness.
+\textbf{P07 Wormhole} \cite{wu2019wormhole} kombiniert Hash-Tabelle mit
+linearer Praefix-Sicht.
+P11 CSS-Tree (Rao/Ross 1999) ist die erste Cache-Sensitive Search Tree.
+P12 CSB+-Tree (Rao/Ross 2000) entwickelt CSS zum B+-Tree weiter.
+P13 Hankins/Patel 2003 untersucht den Effekt der Knotengroesse auf
+Cache-Performance.
 
 \section{Layout-Theorie (Cluster C)}
 
-% P14 Samuel, P15 Graefe, P16 Bender Tree-Layout, P17 Bender Cache-Oblivious,
-% P18 Saikkonen Multi-Level, P19 Saikkonen Layout-Invariant
+P14 Samuel/Pedersen/Bonnet 2005 macht CSB+-Tree prozessor-bewusst.
+P15 Graefe/Larson 2001 untersucht B-Tree-Indizes vs. CPU-Caches.
+P16 Bender/Demaine/Farach-Colton 2002 fuehrt cache-oblivious
+Tree-Layout (van Emde Boas) ein.
+P17 Bender et al. 2005 erweitert es zu Cache-Oblivious B-Trees.
+P18 Saikkonen/Soisalon-Soininen 2008 + P19 (2016) entwickeln
+Multi-Level + Layout-Invariant B-Trees.
 
 \section{Prefetching (Cluster D + E)}
 
-% P20 B-Trees-Are-Back, P21 Chen Prefetch, P22 Chen Fractal, P23 Khan Adaptive,
-% P24 Naderan-Tahan, P25 Mahling, P26 Zhang FGCS, P27 Zhang ASPLOS, P28 Kuehn
+P20 B-Trees-Are-Back (Mueller/Benson/Leis 2025) demonstriert moderne
+B-Tree-Engineering.
+P21 Chen/Gibbons/Mowry 2001 fuehrt Prefetching B+-Trees ein.
+P22 Chen et al. 2002 entwickelt fractal Prefetching.
+P23 Khan 2010 macht Cache-Prefetching dynamisch adaptiv.
+P24 Naderan-Tahan/Sarbazi-Azad 2016 baut adaptive Filter auf
+Cache-Prefetcher.
+P25 Mahling/Weisgut/Rabl 2025 (Fetch Me If You Can) kombiniert
+Range-Scan mit Hot-Path-Caching.
+P26 Zhang FGCS 2024 + P27 Zhang ASPLOS 2025 (Hierarchical Prefetching)
+sind die juengsten Prefetching-Schemata.
+P28 Kuehn DaMoN 2023 motiviert datenbasierte Cache-Optimierung.
 
 \section{Synchronization + TUD-Habich (Cluster F)}
 
-% P08 ART Practical Sync, P29 RCU, P30 Hazard Pointers,
-% P31 Ungethuem Hardware Optimizations, P32 Schmidt To Stride or Not to Stride,
-% P33 VAMPIR Poster
+P08 ART of Practical Synchronization (Leis 2016) fuehrt
+Optimistic-Lock-Coupling fuer ART ein.
+P29 RCU (McKenney OLS 2001) und P30 Hazard Pointers (Michael 2004) sind
+die kanonischen Reklamations-Schemata.
+P31 Ungethuem/Habich 2017 + P32 Schmidt/Habich 2025 sind
+TU-Dresden-spezifische Hardware-Optimierungs-Ueberblicke.
+P33 VAMPIR-Poster (Berthold/Habich 2023) liefert die OTF2-Profiler-
+Integration.
 
-\section{Allokator-Cluster (A01-A23)}
+\section{Allokator-Cluster (A01--A23)}
 
-% Hoard, Slab, Michael Lock-Free, Mimalloc, Jemalloc, TCMalloc, Snmalloc, Scalloc,
-% NUMAlloc, rpmalloc, LRMalloc, CAMA, StarMalloc, Buddy, dlmalloc, ptmalloc2, ...
+Die 21 Allokator-Paper sind in der \texttt{Allokator\_Matrix.txt} der
+\texttt{comdare-cache-engine} systematisch erfasst. Tier-1-Repraesentanten
+sind Hoard (A01, ASPLOS 2000), Slab (A02, USENIX 1994),
+Michael Lock-Free (A03, PLDI 2004), mimalloc (A04, MSR-TR-2019-18),
+jemalloc (A05), TCMalloc (A06), snmalloc (A07, ISMM 2019),
+NUMAlloc (A09, ISMM 2023). Tier-2/3 ergaenzt CAMA (A12, RTAS 2011),
+StarMalloc (A13, OOPSLA 2024), Crystalline-Reclamation (A17, PLDI 2024)
+und PIM-malloc (A16, arXiv 2025).
