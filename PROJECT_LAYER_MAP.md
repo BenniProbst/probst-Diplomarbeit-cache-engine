@@ -369,3 +369,34 @@ basis für das systematische Review.
 ### Querverweis
 - Letzte V11-Anker-Session: `docs/sessions/20260514-1430-v11-anker-mit-delta.md`
 - STRUCTURAL_CORRECTION_diplomarbeit.md §11.5 — korrigiertes Diagramm
+
+---
+
+## 11. V12-V14 Delta (REV 7.6 weitere Iterationen, 2026-05-14)
+
+### 11.1 Diplomarbeit/Code/ Aenderungen
+- `Code/messung_driver/main.cpp` — V11.3 Spec→ExperimentDriverOptions E2E
+- `Code/experiment_config/messreihen.xml` (V11.5) — 4 Pflicht-Messreihen
+- `Code/tests/unit/test_messung_driver.cpp` — V11.6 + V14.2 MessreihenMode-Tests
+
+### 11.2 docs/ neu (V12.5 + V15.x)
+- `docs/NAMING_CONVENTIONS.md` (V12.5) — 2 legitime Naming-Stile dokumentiert (snake_case ABI vs PascalCase Domain)
+
+### 11.3 thesis/ Manuskript-Skelett (V13.7 + V14.4 + V15.1)
+- `thesis/main.tex` — KOMA-Script + biber + tikz/pgfplots
+- `thesis/chapters/` — 9 Kapitel (V14.4 02-04 inhaltlich; V15.1 01+05+06+07 inhaltlich)
+- `thesis/literatur.bib` — 8 Tier-1-Paper
+- `thesis/README.md` — Build-Anleitung + Diagramm-Integration
+
+### 11.4 CI Test-Discovery-Workaround (V14.3)
+- `.gitlab-ci.yml` + `.github/workflows/ci.yml`: direkte Test-Binary-Ausfuehrung
+
+### 11.5 Submodule-Pin-Bumps Verlauf
+- V8 (b88eab1, 0d3baeb) → V9 (4048638, 54a7224) → V10 (e824d30, fd67e82) → V11 (493db36, 54f024f) → V12 (9208ceb, eaf1234) → V13 (e31faf6, 0ad2eab) → V14 (13260c7, e6b79a3)
+
+### 11.6 Sessions
+- 7 Anker-Sessions + 7 Final-Sessions (V8 bis V14) — vollstaendige Sprint-Doku
+
+### Querverweis
+- thesis/main.tex (Build via cache-engine tools/latex_toolchain)
+- HABICH_TERMIN8 (V15.3): siehe 20260508 Termin 7/HABICH_TERMIN8_*.md

@@ -1,22 +1,107 @@
 \chapter{Auswertung}\label{ch:auswertung}
 
-% Mess-Resultate aus messung_driver-Laeufen
-% Diagramme aus diagram_generator (TikZ in tikz/)
-% Tabellen aus csv_to_latex (.tex in tabellen/)
+% Hinweis: Konkrete Mess-Resultate werden nach den ersten messung_driver-
+% Laeufen eingefuegt. Aktuell beschreibt dieses Kapitel die Auswertungs-
+% Methodik und die Hypothesen-Definitionen.
 
-\section{Messreihe A: PRT-ART vs. SOTA}
+\section{Auswertungs-Pipeline}
 
-% TODO V14+: nach erstem messung_driver-Lauf einbinden
-% Beispiel:
+Pro Messreihen-Lauf erzeugt der \texttt{messung\_driver} unter
+\texttt{Code/\_runs/<date>/<spec\_id>/} folgende Dateien:
+
+\begin{itemize}
+    \item \texttt{measurements.csv} --- pro Permutation eine Zeile mit
+          Cycles, L1/L2/L3-Misses, Branches, Throughput
+    \item \texttt{measurements.json} --- gleiche Daten als JSON
+    \item \texttt{raw.bin} (optional) --- binary Records mit
+          \texttt{kBinaryMagic 0xC0FFEE02}
+\end{itemize}
+
+Die Auswertung nutzt drei Tools aus \texttt{Diplomarbeit/Code/}:
+
+\begin{enumerate}
+    \item \texttt{binary\_to\_csv} --- deserialisiert binary records
+          mit Anreicherung (Profil-id, paper\_ref, axes)
+    \item \texttt{csv\_to\_latex} --- generiert booktabs-Tabellen +
+          Algorithmus-Steckbriefe pro Profil
+    \item \texttt{diagram\_generator} --- A4-aware TikZ-Diagramme
+          (Bar-Chart, Scatter, Heatmap)
+\end{enumerate}
+
+Diese Tools werden vom Manuskript-Build (\texttt{thesis/}) konsumiert
+ueber \texttt{\textbackslash input\{tikz/<spec\_id>/...\}} bzw.
+\texttt{\textbackslash input\{tabellen/<spec\_id>...\}}.
+
+\section{Hypothesen}
+
+\subsection{H1: Page-Type-Cost}
+
+\textbf{Hypothese:} Die mittleren Zugriffskosten pro Page-Type-Variante
+unterscheiden sich systematisch nach Workload-Charakteristik. Insbesondere
+wird erwartet, dass dichte Page-Typen (DenseByteArt256, HotMultiByte)
+unter Zipfian-Workloads (YCSB-A) schneller sind als sparse Varianten
+(B+-Node), waehrend Range-Scan-optimierte Pages (B$^2$-Tree, Wormhole)
+unter YCSB-E fuehren.
+
+\textbf{Mess-Mechanik:} \texttt{H1PageTypeCost::note\_lookup(page\_type,
+cycles)} in \texttt{prt\_art/measurement/hypothesis\_metrics.hpp}
+sammelt online-Mean-Werte pro Page-Type ueber alle Lookup-Operationen.
+
+\subsection{H2: Code-Qualitaet pro Bausteine-Quelle}
+
+\textbf{Hypothese:} Der vom Repo-Originalcode geerbte Code-Qualitaets-
+Score korreliert messbar mit der erreichten Throughput-Performance.
+Habich-Direktive (Sprechstunde 2026-05-08) verlangt explizit die
+Bewertung der Code-Qualitaet pro Bausteine-Quelle.
+
+\textbf{Mess-Mechanik:} \texttt{H2CodeQuality::score(source, value, note)}
+sammelt manuell-vergebene + automatisch-gemessene Quality-Scores pro
+Source-Repo-Identifier (P01-unodb, P02-hot, A04-mimalloc, etc.).
+
+\subsection{H3: Inline-vs-External-vs-Chain Distribution}
+
+\textbf{Hypothese:} Die empirisch beobachtete Verteilung der drei
+ValueHandle-Varianten (Inline / External / ChainRef) korreliert mit
+der Page-Density: dichte Pages bevorzugen Inline (kein Indirection-
+Overhead), spaerliche Pages External (Cache-Footprint-Reduktion),
+PRT-ART-spezifische Heuristiken bevorzugen ChainRef (Linear-Value-
+Buffer-Sharing).
+
+\textbf{Mess-Mechanik:}
+\texttt{H3InlineVsExternalDistribution::note\_inline}/\texttt{note\_external}/
+\texttt{note\_chain} zaehlen pro Insert-Operation den gewaehlten
+ValueHandle-Variant. Die \texttt{inline\_share}/\texttt{external\_share}/
+\texttt{chain\_share}-Methoden liefern die normalisierten Anteile.
+
+\section{Notify-Hooks (V11.1 verdrahtet)}
+
+Die \texttt{search\_engine}-ABI definiert drei
+Such-Heuristik-Hooks, die vom \texttt{ExperimentDriver} oder externen
+Beobachtern aktiviert werden koennen:
+
+\begin{itemize}
+    \item \texttt{notify\_density\_threshold(pct)} $\to$
+          \texttt{DensityTracker::note\_observation(pct/100)}
+    \item \texttt{notify\_hot\_path\_detected(path)} $\to$
+          \texttt{PathOrientedPrefetch::note\_hot\_path\_bytes(path.data,
+          path.size)}
+    \item \texttt{notify\_workload\_change(locality)} $\to$
+          \texttt{HypothesisMetrics::adapt\_locality(locality)}
+\end{itemize}
+
+Diese Hooks sind in \texttt{PrtArtSearchEngineAdapterMap} (V11.1)
+operational verdrahtet --- damit fliessen externe Beobachtungen direkt
+in die H1/H2/H3-Mess-Pipeline.
+
+\section{Mess-Resultate (TBD)}
+
+% V15.2 / V15.3: hier kommen nach den ersten messung_driver-Laeufen die
+% TikZ-Diagramme + Tabellen rein. Beispielhafte Struktur:
+%
+% \subsection{Messreihe A\_full}
 % \input{tikz/A_full/cycles_per_permutation.tikz}
 % \input{tabellen/A_full_summary.tex}
-
-\section{Messreihe B: SOTA-Permutationen}
-
-\section{Messreihe C: Merge-Punkte}
-
-\section{Hypothesen H1/H2/H3}
-
-% H1 Page-Type-Cost (DensityTracker)
-% H2 Code-Qualitaet (HypothesisMetrics)
-% H3 Inline-vs-External-Distribution (HypothesisMetrics)
+%
+% \subsection{Messreihe B}
+% \input{tikz/B_CacheEngine_Perms/heatmap.tikz}
+% ...

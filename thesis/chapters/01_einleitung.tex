@@ -2,38 +2,98 @@
 
 \section{Motivation}
 
-% TODO V14+: Motivation aus Habich-Sprechstunden + 33-Paper-Korpus
-% Aufhaenger: Cache-Awareness in Trie-basierten Index-Strukturen ist
-% historisch in der Forschung weit gestreut, aber nicht systematisch
-% permutiert + ausgemessen worden.
+Trie-basierte Index-Strukturen sind das Rueckgrat moderner In-Memory-
+Datenbanken. Seit dem Adaptive Radix Tree (ART) von Leis et al.
+\cite{leis2013art} 2013 ist die Forschung in mehrere Richtungen
+ausdifferenziert: Trie-Hoehen-Optimierung (HOT \cite{binna2018hot}),
+Hybrid-B+-Strukturen (Masstree \cite{mao2012masstree}, B$^2$-Tree
+\cite{schmeisser2022b2tree}), succinct-Repraesentationen (CoCo-Trie
+\cite{boffa2024coco}, SuRF \cite{zhang2018surf}) und Self-Tuning
+(START \cite{fent2020start}).
+
+Parallel dazu hat sich ein eigener Forschungs-Korpus zu
+Cache-Bewusstheit, Prefetching und Allokations-Strategien entwickelt.
+Heuristiken wie Cache-Sensitive Search Trees (P11/P12 Rao\&Ross),
+Cache-Oblivious Layouts (P16/P17 Bender et al.) und Hierarchical
+Prefetching (P27 Zhang et al. ASPLOS 2025) addressieren jeweils
+einzelne Achsen der Cache-Pyramide --- aber sind nie systematisch
+in einer permutierten Mess-Architektur kombiniert worden.
+
+Diese Arbeit schliesst diese Luecke durch eine drei-schichtige Cache-
+Engine-Architektur (CacheEngine $\to$ ExecutionEngine $\to$ SearchEngine)
+mit elf Permutations-Achsen, die einen $\sim$5,5 Milliarden grossen
+Konfigurations-Raum aufspannen. Als Pruefling fuer die Beitritts-
+faehigkeit zum Stand der Technik dient PRT-ART (Probst Redirect
+Tree-ART hybrid) mit acht eigenen Bausteine-Schichten.
 
 \section{Forschungsfragen}
 
-\begin{itemize}
-    \item \textbf{F1}: Welche Algorithmus-Bausteine eines Cache-bewussten
-          Trie-Index lassen sich in einer 11-Achsen-Permutationsmatrix
-          systematisch kombinieren?
-    \item \textbf{F2}: Welche Permutationen erzielen die besten
-          Latenz/Throughput-Werte unter YCSB-A bis YCSB-F?
-    \item \textbf{F3}: Wie verhaelt sich PRT-ART (Pruefling) im Vergleich
-          zum Stand der Technik (8 Tier-1-SOTA + 22 Tier-2/3-SOTA)?
-\end{itemize}
+\begin{description}
+    \item[F1 (Komposition)] Welche elf Algorithmus-Achsen eines
+          Cache-bewussten Trie-Index lassen sich kanonisch in einer
+          Permutationsmatrix systematisieren, sodass Stand-der-Technik-
+          Implementierungen als Profil-Konfigurationen rekonstruiert
+          werden koennen?
+
+    \item[F2 (Mess-Methodik)] Wie laesst sich pro Permutation ein fairer,
+          reproduzierbarer YCSB-Workload-Lauf durchfuehren, der Profile-
+          spezifische Workload-Auswahl (z.\,B. RANGE\_SCAN $\to$ YCSB-E)
+          erlaubt und dabei den Mess-Overhead durch ein opt-in
+          \texttt{COMDARE\_EXPERIMENT\_MODE}-Flag minimiert?
+
+    \item[F3 (Pruefling-Vergleich)] Wie schneidet PRT-ART als Pruefling
+          gegen 8 Tier-1-SOTA (ART, HOT, Masstree, CoCo-Trie, START,
+          B$^2$-Tree, Wormhole, SuRF) und 22 Tier-2/3-SOTA (P11--P32)
+          unter den drei Pflicht-Messreihen A (Pruefling vs. SOTA),
+          B (SOTA-only Vergleichsbasis) und C (Merge-Punkte) ab?
+\end{description}
 
 \section{Beitraege}
 
+Die zentralen Beitraege dieser Arbeit sind:
+
 \begin{itemize}
-    \item Drei-Schichten-Architektur (CacheEngine $\to$ ExecutionEngine $\to$
-          SearchEngine) mit ABI-stabilen C++23-Modul-Interfaces.
-    \item 30 SOTA-Algorithmus-Profile als persistierte XML-Konfigurationen.
-    \item PRT-ART als Pruefling mit 8 eigenen Bausteine-Schichten.
-    \item Mess-Driver mit Defined/Full-Mode + Profile-aware Workload-Routing.
+    \item Eine drei-schichtige Architektur (CacheEngine $\to$
+          ExecutionEngine $\to$ SearchEngine) mit ABI-stabilen
+          C++23-Modul-Interfaces und variadisch-templatierten
+          Hybrid-API-Spezialisierungen (1~Param $\Rightarrow$
+          \texttt{std::vector}-API; 2~Params $\Rightarrow$
+          \texttt{std::map}-API; $N>2 \Rightarrow$
+          \texttt{std::map<K, std::tuple<V_1\ldots V_N>>}).
+
+    \item Eine 11-Achsen-Permutationsmatrix mit
+          \texttt{std::variant}-Bausteinen und Compile-Time-Fallback
+          (\texttt{resolve\_baustein.hpp}) zwischen Pruefling-Stack und
+          Stand-der-Technik-Stack.
+
+    \item 30 SOTA-Algorithmus-Profile als persistierte XML-Konfigurationen
+          (8~Tier-1 + 22~Tier-2/3 fuer P11--P32), die der
+          \texttt{ExperimentDriver} automatisch zu vorkompilierten
+          C++23-Modulen transformiert.
+
+    \item PRT-ART als Pruefling mit acht eigenen Bausteine-Schichten
+          (4+2-Pool-Allocator, OLC mit reservierten Bloecken, MultiLevel-
+          Layout, PathOriented-Prefetch, DensityTracker, Hypothesis-
+          Metriken H1/H2/H3, Inline/External/ChainRef ValueHandle,
+          Signaling-Bits-Serialisierung).
+
+    \item Ein Mess-Driver mit Defined-/Full-Mode-Unterscheidung +
+          Profile-aware Workload-Routing, der die Habich-Direktive
+          ``Messung immer so vollstaendig wie moeglich'' default-haft
+          erfuellt.
 \end{itemize}
 
 \section{Aufbau der Arbeit}
 
-Kapitel~\ref{ch:sota} fasst den 33-Paper-Stand der Technik zusammen.
-Kapitel~\ref{ch:architektur} stellt die Drei-Schichten-Architektur vor.
-Kapitel~\ref{ch:implementation} dokumentiert die Implementation in den drei
-Repositorien (cache-engine, prt-art, Diplomarbeit-Code). Kapitel~\ref{ch:messverfahren}
-beschreibt das Mess-Verfahren. Kapitel~\ref{ch:auswertung} praesentiert die
-Mess-Resultate. Kapitel~\ref{ch:fazit} schliesst mit Fazit und Ausblick.
+Kapitel~\ref{ch:sota} fasst den 33-Paper-Stand der Technik zusammen,
+gegliedert nach sechs Such-Clustern (A--F) und einem Allokator-Cluster.
+Kapitel~\ref{ch:architektur} stellt die Drei-Schichten-Architektur,
+das ABI-Interface und die 11-Achsen-Permutationsmatrix vor.
+Kapitel~\ref{ch:implementation} dokumentiert die Implementation in den
+drei Repositorien (cache-engine, prt-art, Diplomarbeit-Code).
+Kapitel~\ref{ch:messverfahren} beschreibt das Mess-Verfahren mit den
+drei Pflicht-Messreihen und dem Profile-aware Workload-Routing.
+Kapitel~\ref{ch:auswertung} praesentiert die Mess-Resultate und
+diskutiert die Hypothesen H1 (Page-Type-Cost), H2 (Code-Qualitaet) und
+H3 (Inline-vs-External-Distribution). Kapitel~\ref{ch:fazit} schliesst
+mit Fazit und Ausblick.

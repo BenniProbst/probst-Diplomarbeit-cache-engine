@@ -2,8 +2,99 @@
 
 \section{Beantwortung der Forschungsfragen}
 
+\subsection*{F1 (Komposition)}
+
+Die elf Permutations-Achsen (Page, Node, Traversal, ValueHandle,
+Concurrency, Allocator, Prefetch, Telemetry, ISA, Layout, Reclamation)
+spannen einen Konfigurations-Raum von $\sim$5,5 Milliarden Permutationen
+auf. Stand-der-Technik-Implementierungen lassen sich durch
+algorithm\_profile-XMLs eindeutig rekonstruieren: 30~SOTA-Profile
+(8~Tier-1 + 22~Tier-2/3) belegen die Tragfaehigkeit der Achsen-
+Konzeption fuer P01--P32.
+
+Die hybride API-Spezialisierung (1~Param $\Rightarrow$
+\texttt{std::vector}, 2~Params $\Rightarrow$ \texttt{std::map},
+$N>2 \Rightarrow$ \texttt{std::map<K, std::tuple>}) erlaubt die
+nahtlose Integration sowohl algorithmus-orientierter
+(\texttt{std::map::find}/\texttt{insert}/\texttt{erase}) als auch
+container-orientierter (\texttt{std::vector::push\_back}/\texttt{at})
+Such-Patterns auf der gleichen Engine-Klasse.
+
+\subsection*{F2 (Mess-Methodik)}
+
+Die Mess-Methodik gliedert sich in zwei Modi:
+
+\begin{itemize}
+    \item \textbf{Production-Mode} (\texttt{COMDARE\_EXPERIMENT\_MODE=OFF},
+          Default): kein Mess-Overhead, ResultAggregator nicht in der
+          ExecutionEngine.
+    \item \textbf{Experiment-Mode} (\texttt{COMDARE\_EXPERIMENT\_MODE=ON},
+          vom messung\_driver gesetzt): ResultAggregator als
+          integraler ExecutionEngine-Member, sammelt pro
+          run\_workload-Aufruf die Hardware-Counter.
+\end{itemize}
+
+Profile-aware Workload-Routing (V11.2) waehlt pro Permutations-Modul
+den Workload-Typ aus dem \texttt{traversal}-Tag des Profils, was
+faire Vergleiche zwischen Range-Query- und Point-Lookup-orientierten
+Algorithmen sicherstellt.
+
+\subsection*{F3 (Pruefling-Vergleich)}
+
+Der konkrete Vergleich von PRT-ART gegen die 30~SOTA-Profile steht
+nach den ersten messung\_driver-Laeufen aus (siehe Ausblick~\S\ref{sec:ausblick}).
+Die Architektur ist vollstaendig vorbereitet:
+
+\begin{itemize}
+    \item PRT-ART-Profil in
+          \texttt{prt\_art/algorithm\_profiles/prtart\_pruefling.profile.xml}
+    \item Drei Pflicht-Messreihen-Templates in
+          \texttt{Code/experiment\_config/messreihen.xml}
+    \item ExperimentDriver mit Auto-Pickup von 30~SOTA-Profilen
+          (V10.5)
+    \item PrtArtSearchEngineAdapter mit vollstaendiger ABI-Konformitaet
+          inkl. notify\_*-Hooks (V11.1) und allen std::map-Operationen
+          (V12.2 + V13.5 merge/extract)
+\end{itemize}
+
 \section{Limitierungen}
 
-\section{Zukuenftige Arbeit}
+\begin{itemize}
+    \item \textbf{Module-Bodies derzeit Stub:} Die Codegen-Pipeline
+          generiert ABI-konforme Skelett-Module pro Profil. Die
+          eigentliche Such-Algorithmus-Implementation pro Permutation
+          bleibt fuer eine Folge-Phase (V15+) offen.
+    \item \textbf{Hardware-Validierung ausstehend:} cmake configure ist
+          gruen auf MSVC i7-1270P, aber der vollstaendige ctest-Lauf +
+          messung\_driver-E2E auf BlockAO-Plattformen (X86\_AVX2/AVX512,
+          ARM\_Neon/SVE) steht aus.
+    \item \textbf{Manuskript-Auswertungs-Kapitel:} Aktuell methodisch
+          beschrieben; konkrete Mess-Resultate folgen.
+\end{itemize}
 
-% Verweis auf V13+ TODOs aus docs/sessions/
+\section{Zukuenftige Arbeit}\label{sec:ausblick}
+
+\textbf{Kurzfristig (V15+):}
+
+\begin{itemize}
+    \item E2E-Lauf der drei Pflicht-Messreihen auf realer Hardware
+          (V15.2 in der Sprint-Plannung)
+    \item Generierung der Mess-Diagramme via diagram\_generator und
+          Integration in Kapitel~\ref{ch:auswertung}
+    \item Vervollstaendigung der Module-Bodies pro Permutation
+\end{itemize}
+
+\textbf{Mittel- bis langfristig:}
+
+\begin{itemize}
+    \item Erweiterung um GPU-Adapter (Grace Hopper Cluster, ZIH TUD)
+    \item PIM-Allokator-Integration (A16 Lee et al. HPCA 2026)
+    \item Formale Verifikation einzelner Permutations-Klassen
+          (StarMalloc-Style A13)
+\end{itemize}
+
+Die Drei-Repo-Architektur (cache-engine + prt-art + Diplomarbeit-Code)
+ermoeglicht es zukuenftigen Diplomanden, weitere Pruefling-Algorithmen
+analog zu PRT-ART einzubringen, ohne die Werkzeug-Bibliothek
+(cache-engine) zu modifizieren --- ein wichtiges Designprinzip fuer
+die Skalierbarkeit der Forschungs-Infrastruktur.

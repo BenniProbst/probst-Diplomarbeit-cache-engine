@@ -2,36 +2,116 @@
 
 \section{Drei Pflicht-Messreihen}
 
+Die Architektur sieht drei Messreihen vor, die alle vom
+\texttt{messung\_driver} (Diplomarbeit/Code/) ueber die
+\texttt{ExperimentDriver}-Library (cache-engine) ausgefuehrt werden.
+Die Konfiguration erfolgt entweder als drei feste Reihen
+(klassischer Modus) oder ueber eine externe
+\texttt{messreihen.xml}-Datei (V11.5 Standard-Template).
+
 \subsection{Messreihe A: PRT-ART vs. Stand der Technik}
 
-% A_defined: 8 Tier-1-SOTA aus algorithm_profiles/sota
-% A_full:    alle 30 SOTA (Tier-1 + Tier-2 + Tier-3) — Habich-Direktive
-% Verweis: experiment_config/messreihen.xml
+Messreihe~A vergleicht PRT-ART als Pruefling gegen alle in der
+\texttt{cache\_engine/algorithm\_profiles/sota/} dokumentierten SOTA-
+Algorithmen. Zwei Modi sind verfuegbar:
+
+\begin{description}
+    \item[A\_defined] Schnelle Vorab-Verifikation gegen die 8~Tier-1-
+          Profile (art, hot, masstree, coco\_trie, start, b2tree,
+          wormhole, surf). Mode \texttt{defined} mit
+          \texttt{sota\_profile\_filter} in
+          \texttt{ExperimentDriverOptions}.
+    \item[A\_full] Vollstaendige Messung gegen alle 30~SOTA-Profile
+          (Tier-1 + Tier-2/3 fuer P11--P32). Mode \texttt{full} ist
+          Default gemaess Habich-Direktive 2026-05-14
+          (``Messung immer so vollstaendig wie moeglich'').
+\end{description}
 
 \subsection{Messreihe B: Cache-Engine-Permutationen}
 
-% Reine Vergleichsbasis Stand der Technik, ohne PRT-ART
+Reine Vergleichsbasis ``Stand der Technik'' --- alle SOTA-Profile ohne
+PRT-ART-Pruefling. Im aktuellen Skelett identisch zu A\_full;
+zukuenftige Erweiterung kann zusaetzlich
+\texttt{cache\_engine\_permutations.xml}-Achsen einbeziehen.
 
 \subsection{Messreihe C: Merge alt/neu}
 
-% PRT-ART-Bausteine in cache-engine-Permutationen
+Konkrete Merge-Punkte zwischen PRT-ART-Bausteinen und cache-engine-
+Permutationen:
+
+\begin{itemize}
+    \item PRT-ART OLC + tcmalloc-Allocator + ART-Page
+    \item PRT-ART 4+2-Pool + HOT-Page
+    \item PRT-ART PathPrefetch + B$^2$-Tree-Page
+    \item PRT-ART MultiLevelLayout + Wormhole-Page
+\end{itemize}
 
 \section{Profile-aware Workload-Routing}
 
-% Aus traversal-Tag des Profils:
-%   RANGE_*    -> YCSB-E
-%   HOT_PATH    -> YCSB-A
-%   STANDARD    -> YCSB-C
-% Verweis: ExperimentDriver Phase 5 (V11.2)
+\texttt{ExperimentDriver::phase5\_run\_workload} (V11.2) leitet pro
+Permutations-Modul den YCSB-Workload aus dem \texttt{traversal}-Tag
+des Profils ab:
 
-\section{Defined- vs. Full-Mode}
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Traversal-Tag} & \textbf{YCSB-Workload} & \textbf{Charakteristik} \\
+\midrule
+\texttt{RANGE\_SCAN} / \texttt{RANGE\_HOT\_PATH} & YCSB-E & Range-Queries \\
+\texttt{HOT\_PATH} / \texttt{PRTART\_HOT\_PATH} & YCSB-A & 50/50 Read/Update Zipfian \\
+\texttt{STANDARD} (Default) & YCSB-C & Read-only \\
+\bottomrule
+\end{tabular}
+\caption{Profile-aware Workload-Routing (V11.2)}
+\label{tab:workload-routing}
+\end{table}
 
-% Defined: nur referenzierte Profile aus sota_profile_filter
-% Full:    alle Profile aus algorithm_profiles/sota
-% Habich-Direktive: Full ist Default (Messung immer vollstaendig)
+Module ohne zugehoeriges Profil verwenden den globalen Default-Workload
+aus \texttt{WorkloadOptions::workload}.
 
-\section{ExperimentDriver Phase 1-7}
+\section{ExperimentDriver Phase 1--7}
 
-% Enumeration -> Codegen -> Compile -> Load -> Execute -> Measure -> Persist
-% Plus optional Phase 4b functional_tests (V13.3) +
-% Phase 3 hot_compile_missing (V13.2)
+Der \texttt{ExperimentDriver} (V8.7 Library + V10.5 Profile-Auto-Pickup)
+durchlaeuft sieben Phasen:
+
+\begin{enumerate}
+    \item \textbf{Enumerate} --- XML-Configs parsen + Permutations-
+          Liste erzeugen
+    \item \textbf{Codegen} --- pro Permutation eine
+          \texttt{comdare\_perm\_<fp>.cpp} (V9.3 zusaetzlich
+          \texttt{generate\_module\_from\_profile} fuer 30~SOTA-Profile)
+    \item \textbf{Compile} --- cmake configure + cmake \texttt{--build}
+    \item \textbf{Load} --- LoadLibrary/dlopen aller
+          \texttt{.dll}/\texttt{.so}-Module
+    \item \textbf{Execute} --- pro Modul \texttt{create\_instance} +
+          \texttt{run\_workload} (V11.2 Profile-aware)
+    \item \textbf{Measure} --- binary measurement-records aggregieren
+    \item \textbf{Persist} --- \texttt{measurements.csv} +
+          \texttt{measurements.json}
+\end{enumerate}
+
+\textbf{Opt-in-Phasen:}
+
+\begin{itemize}
+    \item \texttt{phase3\_hot\_compile\_missing} (V13.2): falls
+          \texttt{enable\_runtime\_codegen=true} und ein
+          vorkompiliertes Modul fehlt, wird per \texttt{cmake/cl}-Aufruf
+          hot-kompiliert.
+    \item \texttt{phase4b\_functional\_tests} (V13.3): falls
+          \texttt{enable\_functional\_tests=true}, wird pro Modul
+          die ABI-Vertrags-Konformitaet (\texttt{create\_instance} non-null,
+          \texttt{run\_workload} mit empty WorkloadDescriptor schreibt
+          \texttt{rec.version == COMDARE\_ABI\_VERSION},
+          \texttt{destroy\_instance} sicher) verifiziert.
+\end{itemize}
+
+\section{Mess-Modus: COMDARE\_EXPERIMENT\_MODE}
+
+Der Mess-Pfad in der \texttt{ExecutionEngine} (V8.5) ist nur dann aktiv,
+wenn die cache-engine mit \texttt{-DCOMDARE\_EXPERIMENT\_MODE=ON}
+kompiliert wurde. Im Production-Pfad (Default OFF) ist der
+\texttt{ResultAggregator} kein Member der \texttt{ExecutionEngine}, was
+Production-Code von jeglichem Mess-Overhead befreit. Der
+Diplomarbeits-\texttt{messung\_driver} setzt das Flag explizit beim
+Sub-Build (V8.12).
