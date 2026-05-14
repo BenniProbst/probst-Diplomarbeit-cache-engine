@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  REV 7.6 V11.5 — Standard-Template fuer messung_driver --messreihen-xml=...
+  Definiert die 4 Pflicht-Messreihen (A_defined, A_full, B, C) im
+  defined/full Mode (User-Direktive 2026-05-13/14 + Habich-Antwort
+  2026-05-14: "Messung muss immer so vollstaendig wie moeglich sein").
+
+  Aufruf:
+    comdare-messung-driver <config_dir> <output_dir> --messreihen-xml=messreihen.xml
+
+  Pro Messreihe wird ein eigener ExperimentDriver-Lauf gestartet (V11.3),
+  Output unter <output_dir>/<id>/measurements.{csv,json}.
+-->
+<comdare_messreihen version="1">
+
+  <!-- Messreihe A_defined: PRT-ART Pruefling vs. 8 Tier-1 SOTA-Profile -->
+  <messreihe id="A_defined">
+    <description>
+      PRT-ART Beitrittspruefung gegen 8 Tier-1-SOTA aus algorithm_profiles/sota.
+      Schnelle Vorab-Verifikation (defined Mode).
+    </description>
+    <mode>defined</mode>
+    <profile>art</profile>
+    <profile>hot</profile>
+    <profile>masstree</profile>
+    <profile>coco_trie</profile>
+    <profile>start</profile>
+    <profile>b2tree</profile>
+    <profile>wormhole</profile>
+    <profile>surf</profile>
+  </messreihe>
+
+  <!-- Messreihe A_full: PRT-ART vs. ALLE 30 SOTA-Profile (Tier-1 + Tier-2 + Tier-3) -->
+  <messreihe id="A_full">
+    <description>
+      PRT-ART Beitrittspruefung gegen alle 30 SOTA-Profile (Tier-1 + Tier-2 + Tier-3).
+      Vollstaendige Messung (full Mode) — Habich-Direktive 2026-05-14.
+    </description>
+    <mode>full</mode>
+  </messreihe>
+
+  <!-- Messreihe B: Cache-Engine-Permutationen (SOTA-only, ohne PRT-ART-Pruefling) -->
+  <messreihe id="B_CacheEngine_Perms">
+    <description>
+      Reine Vergleichsbasis "Stand der Technik" — alle SOTA-Profile ohne PRT-ART.
+      Im aktuellen Skelett identisch zu A_full; bei Bedarf werden hier zusaetzlich
+      cache_engine_permutations.xml Achsen einbezogen.
+    </description>
+    <mode>full</mode>
+  </messreihe>
+
+  <!-- Messreihe C: Merge alt/neu (PRT-ART-Bausteine in cache-engine-Permutationen) -->
+  <messreihe id="C_Merge_Alt_Neu">
+    <description>
+      Konkrete Merge-Punkte: PRT-ART OLC + tcmalloc + ART; 4+2-Pool + HOT;
+      PathPrefetch + B2tree; MultiLevelLayout + Wormhole.
+      Im defined Mode mit handselektiertem Profile-Subset.
+    </description>
+    <mode>defined</mode>
+    <profile>art</profile>
+    <profile>hot</profile>
+    <profile>b2tree</profile>
+    <profile>wormhole</profile>
+  </messreihe>
+
+</comdare_messreihen>

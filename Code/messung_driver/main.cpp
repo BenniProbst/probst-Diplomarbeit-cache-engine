@@ -185,6 +185,47 @@ int main(int argc, char* argv[]) {
             std::cout << "  - " << s.id << " (mode=" << s.mode
                       << ", profiles=" << s.sota_profiles.size() << ")\n";
         }
+
+        // REV 7.6 V11.3 — Pro Messreihen-Spec einen ExperimentDriver-Lauf
+        int spec_overall_rc = 0;
+        for (auto const& spec : external_specs) {
+            std::cout << "─────────────────────────────────────────────\n";
+            std::cout << "[V11.3] Messreihe " << spec.id << " (mode=" << spec.mode << ")\n";
+            std::cout << "─────────────────────────────────────────────\n";
+
+            cb::ExperimentDriverOptions opts;
+            opts.config_dir   = config_dir;
+            opts.output_dir   = output_dir / spec.id;
+            opts.comdare_root = comdare_root;
+            opts.messreihen_mode = (spec.mode == "full")
+                ? cb::ExperimentDriverOptions::MessreihenMode::Full
+                : cb::ExperimentDriverOptions::MessreihenMode::Defined;
+            opts.sota_profile_filter = spec.sota_profiles;
+
+            cb::ExperimentDriver  driver{opts};
+            cb::WorkloadOptions   w;  // Default-Workload (V11.2 routet pro Profil)
+            w.config.random_seed     = 42;
+            w.config.key_size_bytes  = 16;
+            w.config.value_size_bytes = 64;
+            w.config.num_keys        = 1000000;
+            w.config.num_operations  = 5000000;
+            w.config.zipfian_theta   = 0.99;
+            w.workload               = wg::YcsbWorkload::C;
+
+            int rc = driver.run_pipeline_full(w);
+            if (rc != cb::status_ok) {
+                std::cerr << "[V11.3] Spec " << spec.id << " FAILED (status=" << rc << ")\n";
+                spec_overall_rc = rc;
+            } else {
+                std::cout << "[V11.3] Spec " << spec.id << " OK -> "
+                          << opts.output_dir.string() << "\n\n";
+            }
+        }
+
+        std::cout << "==== V11.3 Spec-Lauf ";
+        std::cout << (spec_overall_rc == 0 ? "(OK)" : "(MIT FEHLERN)");
+        std::cout << " ====\n";
+        return spec_overall_rc;  // Bei Spec-Mode beenden wir hier (kein 3-Reihen-Fallback)
     }
 
     constexpr std::array<MessreiheKind, 3> kinds{

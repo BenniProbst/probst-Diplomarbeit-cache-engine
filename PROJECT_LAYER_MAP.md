@@ -341,3 +341,31 @@ basis für das systematische Review.
 4. **Habich-Termine 8+ folgen** — nächste Sprechstunde-Protokolle
 5. **Diplomarbeits-Manuskript (`*.tex`)** muss noch geschrieben werden;
    `tools/latex_toolchain` von cache-engine ist bereit es zu kompilieren
+
+---
+
+## 10. V8-V11 Delta (REV 7.6 Vollimplementierung, 2026-05-13/14)
+
+### 10.1 Neue Files in Code/
+- `Code/messung_driver/main.cpp` — V8.12 EXPERIMENT_MODE check, V9.6 --messreihen-xml, V11.3 Spec→ExperimentDriver E2E
+- `Code/experiment_config/messreihen.xml` (V11.5) — Standard-Template fuer 4 Messreihen (A_defined/A_full/B/C)
+- `Code/experiment_config/config_a_prt_art_vs_sota.xml` — V8.13 defined/full Mode XML-Schema
+- `Code/USAGE.md` — V11.8 V8-V11 Delta-Sektion ergaenzt
+
+### 10.2 Tests
+- `Code/tests/unit/test_messung_driver.cpp` — V8.4 Skelett, V11.6 MessreihenMode-Tests + Options-Defaults-Tests
+
+### 10.3 Submodule-Pin-Bumps
+- `Code/external/comdare-cache-engine` — V11 → e824d30 (V8.4-V10.5)
+- `Code/external/comdare-prt-art` — V11 → fd67e82 (V8.9-V10.3)
+
+### 10.4 CI
+- `.gitlab-ci.yml` (V11.7) — primaer
+- `.github/workflows/ci.yml` (V11.7) — synchron
+
+### 10.5 Sessions
+- `docs/sessions/` — komplette Sprint-Anker + Final-Sessions V8/V9/V10/V11
+
+### Querverweis
+- Letzte V11-Anker-Session: `docs/sessions/20260514-1430-v11-anker-mit-delta.md`
+- STRUCTURAL_CORRECTION_diplomarbeit.md §11.5 — korrigiertes Diagramm

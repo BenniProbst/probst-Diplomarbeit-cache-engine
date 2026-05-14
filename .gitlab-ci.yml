@@ -1,0 +1,45 @@
+# probst-Diplomarbeit-cache-engine — GitLab CI (REV 7.6 V11.7)
+# Synchron mit .github/workflows/ci.yml
+
+stages:
+  - configure
+  - test
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  CMAKE_BUILD_PARALLEL_LEVEL: "4"
+
+.linux_base:
+  image: debian:bookworm
+  before_script:
+    - apt-get update -qq
+    - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
+        build-essential cmake ninja-build git ca-certificates
+
+configure:diplomarbeit_code:
+  extends: .linux_base
+  stage: configure
+  script:
+    - cd Code
+    - cmake -B build -G Ninja
+    - cmake --build build --target comdare-messung-driver
+  artifacts:
+    paths:
+      - Code/build/CMakeCache.txt
+    expire_in: 1 day
+    when: always
+
+test:messung_driver:
+  extends: .linux_base
+  stage: test
+  needs: ["configure:diplomarbeit_code"]
+  script:
+    - cd Code
+    - cmake -B build-test -G Ninja
+    - cmake --build build-test
+    - ctest --test-dir build-test --output-on-failure -R test_messung_driver
+  artifacts:
+    paths:
+      - Code/build-test/Testing/
+    expire_in: 1 week
+    when: always

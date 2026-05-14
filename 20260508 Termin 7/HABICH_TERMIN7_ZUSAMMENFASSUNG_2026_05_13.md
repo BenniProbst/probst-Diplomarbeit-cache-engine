@@ -110,3 +110,65 @@ iteriert ueber alle drei und ruft pro Reihe die cache-engine
 - `FINDINGS_REV7_6_prt_art.md`
 - `STRUCTURAL_CORRECTION_prt_art.md`
 - `PROJECT_LAYER_MAP.md` (REV 7.6)
+
+---
+
+## 7. NACHTRAG (2026-05-14): V8-V11 Vollimplementierung
+
+Nach dem 13.05. wurden 4 weitere Sprints autonom abgearbeitet, die den
+V7.6-Architektur-Stand vollstaendig in Code ueberfuehren. Wesentliche
+Neuerungen seit dem ursprunglichen Termin-7-Stand:
+
+### 7.1 cache-engine
+- **30 SOTA-Profile** in `algorithm_profiles/sota/` (8 Tier-1 + 22 Tier-2/3
+  fuer P11-P32) als XML/JSON-Persistenz aller Suchalgorithmen
+- **CMake-Flag `COMDARE_EXPERIMENT_MODE`** (default OFF) aktiviert den
+  ResultAggregator als integralen Bestandteil der ExecutionEngine
+- **`generate_module_from_profile`** Codegen-API + Auto-Pickup im
+  ExperimentDriver Phase 2 (V10.5)
+- **`MessreihenMode::Defined/Full`** + `sota_profile_filter` in
+  ExperimentDriverOptions (Habich-Direktive 2026-05-14: Full ist Default)
+- **Profile-aware Workload-Routing** in Phase 5 (V11.2): pro Profil
+  wird der YCSB-Workload aus dem `traversal`-Tag abgeleitet
+- **`baustein_variants.hpp`** mit 11 Achsen × Tag-Strukturen (V9.2 + V11.4)
+- **`resolve_baustein.hpp`** operationalisiert mit 11 Tag-Specializations (V10.2)
+- **`prt_art/legacy_reimpl/` physisch entfernt** (V10.1) — Pruefling-Code
+  ausschliesslich in prt-art-Repo
+- **6 Codegen-Roundtrip-Tests** (V10.4)
+
+### 7.2 prt-art
+- **3 konkrete Adapter-Subklassen** Map/Vector/Tuple (V9.1)
+- **`legacy_reimpl/`** mit 14 Pruefling-Re-Implementations (V9.4 verschoben
+  aus cache-engine)
+- **`algorithm_profiles/`** mit Pruefling-Profil + Achsen-Erweiterung
+- **`notify_*`-Methoden vollstaendig verdrahtet** (V11.1) — DensityTracker,
+  PathOrientedPrefetch, HypothesisMetrics jeweils mit neuen externen
+  Beobachtungs-API-Methoden
+
+### 7.3 Diplomarbeit
+- **`messung_driver --messreihen-xml=FILE`** Option (V9.6)
+- **`messung_driver` E2E**: pro Spec einen ExperimentDriver-Lauf mit
+  korrekter Mode + sota_profile_filter Konfiguration (V11.3)
+- **`experiment_config/messreihen.xml`** als Standard-Template (V11.5)
+- **`test_messung_driver.cpp`** um MessreihenMode-Tests erweitert (V11.6)
+
+### 7.4 CI / DevOps (V11.7, User-Direktive 2026-05-14)
+- **GitLab CI** als primaere Pipeline in alle 3 Repos
+- **GitHub Actions** synchron in alle 3 Repos
+- Jobs: configure-default + configure-experiment-mode + test
+
+### 7.5 Aufgaben-Stand seit Termin-7-Original-Tabelle
+
+| # | Punkt | Stand 2026-05-14 |
+|---|-------|------------------|
+| V1 | cache-engine Library + E2E "Demo pipeline OK" | DONE seit 2026-05-13 |
+| V2 | Diplomarbeit/Code/ Submodule init + cmake configure | DONE seit 2026-05-13 |
+| V3 | Per-Repo Findings + STRUCTURAL_CORRECTION pro Repo | DONE seit 2026-05-13 |
+| V4 | Diplomarbeit/Code/ Full-Build alle Targets | TEILWEISE — cmake configure DONE, ctest steht aus |
+| V5 | Diplomarbeit/Code/ ctest | TEILWEISE — Test-Source aktualisiert in V11.6, ctest-Lauf User-Aufgabe |
+| V6 | E2E: messung_driver fuehrt 3 Messreihen aus | DONE V11.3 (Code-Verdrahtung), Lauf User-Aufgabe |
+| V7 | Manuskript-Wrapper `thesis/main.tex` | OFFEN (fuer naechsten Habich-Termin) |
+| **V8** | **8 User-Direktiven aus 2026-05-13/14 vollstaendig in Code** | DONE |
+| **V9** | **30 SOTA-Profile + Adapter-Subklassen + Codegen** | DONE |
+| **V10** | **Cleanup + ABI operational + Codegen-Tests** | DONE |
+| **V11** | **notify_* + Workload-Routing + E2E + CI** | DONE |

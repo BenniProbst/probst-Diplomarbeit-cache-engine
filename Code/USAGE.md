@@ -1,4 +1,4 @@
-# Diplomarbeit/Code — Stack-Anleitung (REV 7.6)
+# Diplomarbeit/Code — Stack-Anleitung (REV 7.6 + V8-V11 Updates)
 
 Diese Anleitung beschreibt die **vollstaendige Befehlskette** vom frischen
 Klonen des Repos bis zum fertigen PDF mit eingebetteten LaTeX-Tabellen
@@ -127,11 +127,36 @@ ab:
 
 ## 5. Pipeline-Lauf (Phase 1 → 7, alle 3 Messreihen)
 
+### 5.1 Klassischer 3-Reihen-Modus (V8 Default)
+
 ```sh
 build/Debug/messung_driver/comdare-messung-driver.exe \
-    --config-dir experiment_config \
-    --output-dir _runs/2026-05-13 \
-    --verbose
+    experiment_config \
+    _runs/2026-05-14 \
+    --comdare-root=C:/path/to/comdare-cache-engine
+```
+
+### 5.2 NEU (V11.3): Messreihen-XML-Modus
+
+```sh
+build/Debug/messung_driver/comdare-messung-driver.exe \
+    experiment_config \
+    _runs/2026-05-14 \
+    --messreihen-xml=experiment_config/messreihen.xml
+```
+
+Liest `messreihen.xml` + startet pro `<messreihe>` einen eigenen
+ExperimentDriver-Lauf mit dem entsprechenden Mode (defined/full) +
+sota_profile_filter. Output: `_runs/<date>/<id>/measurements.{csv,json}`.
+
+### 5.3 EXPERIMENT_MODE Compile-Flag (V8.4 + V8.12)
+
+Damit der ResultAggregator als integraler Bestandteil der ExecutionEngine
+kompiliert wird, muss der Sub-Build mit `-DCOMDARE_EXPERIMENT_MODE=ON`
+laufen. messung_driver gibt eine Warnung aus, wenn das Flag nicht aktiv ist.
+
+```sh
+cmake -B build -DCOMDARE_EXPERIMENT_MODE=ON
 ```
 
 Auf Linux:
@@ -272,5 +297,42 @@ latex_to_pdf/build_thesis.sh latex/main.tex
 - `20260508 Termin 7/HABICH_TERMIN7_ZUSAMMENFASSUNG_2026_05_13.md`
 - `20260508 Termin 7/REVIEW_PLAN_6_TAGE.md`
 - `20260508 Termin 7/Phase5_UML_Detail/30_architektur_delta_REV7_6_drei_repo_layer_2026_05_13.md`
+- `docs/sessions/20260514-1430-v11-anker-mit-delta.md` (V11-Anker)
 - cache-engine: `cache_engine/builder/experiment_driver/experiment_driver.hpp`
+- cache-engine: `cache_engine/algorithm_profiles/sota/*.profile.xml` (30 SOTA)
+- cache-engine: `cache_engine/include/cache_engine/abi/baustein_variants.hpp` (V9.2/V11.4)
 - prt-art: `prt_art/identity/prt_art_search_engine.hpp`
+- prt-art: `prt_art/identity/prt_art_search_engine_adapter.hpp` (V9.1/V10.3/V11.1)
+- prt-art: `prt_art/algorithm_profiles/prtart_pruefling.profile.xml`
+- experiment_config/messreihen.xml (V11.5 Standard-Template)
+
+---
+
+## 13. V8-V11 Delta (Was hat sich seit V7.6 geaendert?)
+
+| Sprint | Aenderung | Datei/Komponente |
+|---|---|---|
+| V8.4  | `COMDARE_EXPERIMENT_MODE` CMake Flag (default OFF) | cache-engine/CMakeLists.txt |
+| V8.5  | ResultAggregator integral in ExecutionEngine | execution_engine.hpp |
+| V8.3  | algorithm_profiles/sota/ mit 8 SOTA-Profilen | cache-engine |
+| V8.6  | defined/full mode + AlgorithmProfile-Loader | xml_config_parser |
+| V8.8  | algorithm_baustein.hpp std::variant Pattern | abi/algorithm_baustein.hpp |
+| V8.9  | PrtArtSearchEngineAdapter (Komposition) | prt-art ABI-Adapter |
+| V9.1  | 3 Adapter-Subklassen (Map/Vector/Tuple) | prt-art Adapter |
+| V9.2  | baustein_variants.hpp + DefaultElevenAxes | cache-engine ABI |
+| V9.3  | generate_module_from_profile | cache-engine codegen |
+| V9.5  | +22 Tier-2/3 SOTA-Profile = 30 gesamt | cache-engine algorithm_profiles |
+| V9.6  | --messreihen-xml=FILE Option | messung_driver |
+| V10.1 | cache-engine prt_art/legacy_reimpl/ geloescht | cache-engine cleanup |
+| V10.2 | resolve_baustein operationalisiert | cache-engine ABI |
+| V10.3 | notify_*-Methoden (Skelett mit TODO) | prt-art Adapter |
+| V10.4 | 6 Codegen-Tests | cache-engine tests/unit |
+| V10.5 | ExperimentDriver Auto-Pickup von Profilen | cache-engine experiment_driver |
+| V10.6 | MessreihenMode + sota_profile_filter | ExperimentDriverOptions |
+| V11.1 | notify_*-Methoden vollstaendig verdrahtet | prt-art Adapter + Komponenten |
+| V11.2 | Profile-aware Workload-Routing in Phase 5 | cache-engine experiment_driver |
+| V11.3 | messung_driver Spec→ExperimentDriver E2E | Diplomarbeit messung_driver |
+| V11.4 | Variant-Bodies mit description + paper_ref | cache-engine baustein_variants |
+| V11.5 | experiment_config/messreihen.xml Template | Diplomarbeit |
+| V11.6 | test_messung_driver MessreihenMode-Tests | Diplomarbeit tests |
+| V11.7 | GitLab CI + GitHub Actions in alle 3 Repos | .gitlab-ci.yml + .github/workflows/ |

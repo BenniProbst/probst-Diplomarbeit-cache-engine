@@ -372,6 +372,32 @@ TEST(MessungDriver_WorkloadDefaults, SmallWorkloadIsSane) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Test-Group 10b (REV 7.6 V11.6): MessreihenMode in ExperimentDriverOptions
+// ─────────────────────────────────────────────────────────────────────────────
+
+TEST(MessungDriver_MessreihenMode, DefaultIsFullMode) {
+    cb::ExperimentDriverOptions opts;
+    EXPECT_EQ(opts.messreihen_mode, cb::ExperimentDriverOptions::MessreihenMode::Full);
+    EXPECT_TRUE(opts.sota_profile_filter.empty());
+}
+
+TEST(MessungDriver_MessreihenMode, DefinedModeFilterIsSettable) {
+    cb::ExperimentDriverOptions opts;
+    opts.messreihen_mode = cb::ExperimentDriverOptions::MessreihenMode::Defined;
+    opts.sota_profile_filter = {"art", "hot", "masstree"};
+    EXPECT_EQ(opts.messreihen_mode, cb::ExperimentDriverOptions::MessreihenMode::Defined);
+    EXPECT_EQ(opts.sota_profile_filter.size(), 3u);
+    EXPECT_EQ(opts.sota_profile_filter[0], "art");
+}
+
+TEST(MessungDriver_MessreihenMode, RuntimeCodegenAndFunctionalTestsAreOptIn) {
+    // V8.7 Options sind Default OFF
+    cb::ExperimentDriverOptions opts;
+    EXPECT_FALSE(opts.enable_runtime_codegen);
+    EXPECT_FALSE(opts.enable_functional_tests);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Test-Group 10: Reproduzierbarkeit — gleicher Seed → gleiche Fingerprints
 // ─────────────────────────────────────────────────────────────────────────────
 
