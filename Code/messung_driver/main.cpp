@@ -11,15 +11,20 @@
 // measurement-records pro Messreihe in separate Unterordner.
 
 #include "experiment_driver/experiment_driver.hpp"
+#include "xml_config_parser/xml_config_parser.hpp"
 
 #include <comdare/workload_generator/workload_generator.hpp>
 
 #include <array>
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <regex>
+#include <sstream>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace cb = comdare::builder;
 namespace wg = comdare::workload_generator;
@@ -74,16 +79,57 @@ enum class MessreiheKind : std::uint8_t {
 
 void print_usage() {
     std::cerr
-        << "Usage: comdare-messung-driver <config_dir> <output_dir> [--comdare-root=DIR]\n\n"
+        << "Usage: comdare-messung-driver <config_dir> <output_dir> [--comdare-root=DIR] [--messreihen-xml=FILE]\n\n"
         << "Erwartete Files in <config_dir>:\n"
         << "  cache_engine_permutations.xml\n"
         << "  search_algorithm_permutations.xml\n"
         << "  allocator_permutations.xml\n"
-        << "  test_data_sets.xml\n\n"
+        << "  test_data_sets.xml\n"
+        << "  (optional, V9.6) messreihen.xml — defined/full Mode pro Reihe\n\n"
         << "Output (separat pro Messreihe A/B/C):\n"
         << "  <output_dir>/A_PRT_ART_vs_SOTA/measurements.{csv,json}\n"
         << "  <output_dir>/B_CacheEngine_Perms/measurements.{csv,json}\n"
         << "  <output_dir>/C_Merge_Alt_Neu/measurements.{csv,json}\n";
+}
+
+// REV 7.6 V9.6 — minimaler XML-Reader fuer messreihe-Tags (defined/full Mode)
+struct MessreihenSpec {
+    std::string id;
+    std::string mode;           // "defined" oder "full"
+    std::vector<std::string> sota_profiles;
+};
+
+[[nodiscard]] std::vector<MessreihenSpec> load_messreihen(std::filesystem::path const& xml_path) {
+    std::vector<MessreihenSpec> result;
+    if (!std::filesystem::exists(xml_path)) return result;
+
+    std::ifstream in{xml_path};
+    std::ostringstream ss;
+    ss << in.rdbuf();
+    auto content = ss.str();
+
+    std::regex reihe_re{R"(<messreihe\s+id\s*=\s*"([^"]+)"[^>]*>([\s\S]*?)</messreihe>)"};
+    auto it = std::sregex_iterator(content.begin(), content.end(), reihe_re);
+    auto end = std::sregex_iterator();
+    for (; it != end; ++it) {
+        MessreihenSpec spec;
+        spec.id = (*it)[1].str();
+        std::string inner = (*it)[2].str();
+
+        std::regex mode_re{R"(<mode>(\w+)</mode>)"};
+        std::smatch mm;
+        if (std::regex_search(inner, mm, mode_re)) spec.mode = mm[1].str();
+        else                                        spec.mode = "defined";
+
+        std::regex prof_re{R"(<profile>([^<]+)</profile>)"};
+        auto pit = std::sregex_iterator(inner.begin(), inner.end(), prof_re);
+        auto pend = std::sregex_iterator();
+        for (; pit != pend; ++pit) {
+            spec.sota_profiles.push_back((*pit)[1].str());
+        }
+        result.push_back(std::move(spec));
+    }
+    return result;
 }
 
 }  // anonymous
@@ -94,11 +140,14 @@ int main(int argc, char* argv[]) {
     std::filesystem::path config_dir{argv[1]};
     std::filesystem::path output_dir{argv[2]};
     std::filesystem::path comdare_root = std::filesystem::current_path();
+    std::filesystem::path messreihen_xml;  // V9.6: optional
 
     for (int i = 3; i < argc; ++i) {
         std::string a{argv[i]};
         if (a.rfind("--comdare-root=", 0) == 0) {
             comdare_root = std::filesystem::path{a.substr(15)};
+        } else if (a.rfind("--messreihen-xml=", 0) == 0) {
+            messreihen_xml = std::filesystem::path{a.substr(17)};
         } else {
             std::cerr << "Unknown arg: " << a << "\n";
             print_usage();
@@ -126,6 +175,17 @@ int main(int argc, char* argv[]) {
     std::cout << "\n";
 
     std::filesystem::create_directories(output_dir);
+
+    // REV 7.6 V9.6 — Externe Messreihen-Spec (defined/full Mode)
+    auto external_specs = load_messreihen(messreihen_xml);
+    if (!external_specs.empty()) {
+        std::cout << "[V9.6] Geladen aus " << messreihen_xml.string()
+                  << ": " << external_specs.size() << " Messreihe(n).\n";
+        for (auto const& s : external_specs) {
+            std::cout << "  - " << s.id << " (mode=" << s.mode
+                      << ", profiles=" << s.sota_profiles.size() << ")\n";
+        }
+    }
 
     constexpr std::array<MessreiheKind, 3> kinds{
         MessreiheKind::A_PrtArtVsSota,
