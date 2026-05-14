@@ -105,3 +105,39 @@ in die H1/H2/H3-Mess-Pipeline.
 % \subsection{Messreihe B}
 % \input{tikz/B_CacheEngine_Perms/heatmap.tikz}
 % ...
+
+\section{Sample-Mess-Pipeline (V20+V21.3)}
+
+Die Mess-Pipeline ist ab V20 voll funktionsfaehig und exportiert pro
+Permutation 16 Spalten in der \texttt{measurements.csv}. Die V19/V20-
+Erweiterung um \texttt{workload\_used} (Spalte~4) ist als zusaetzliche
+Plot-Dimension nutzbar:
+
+\begin{itemize}
+    \item Profile mit \texttt{<expected\_workload>} XML-Tag
+          (V19.1) ueberschreiben die V11.2-traversal-Heuristik.
+    \item Phase~5 des \texttt{ExperimentDriver} setzt
+          \texttt{PermutationResult.workload\_used} pro Permutation.
+    \item \texttt{ResultAggregator::export\_csv}/\texttt{export\_json}
+          schreiben die Spalte mit, sodass die Auswertung Cluster-Bildung
+          nach Workload-Profil vornehmen kann.
+\end{itemize}
+
+Bevor die reale Hardware-E2E-Mess-Reihe (V21.2) verfuegbar ist, liefert
+\texttt{Code/sample\_data\_generator/} eine deterministische
+Sample-CSV mit 10 Permutationen unter
+\texttt{experiment\_config/sample\_data/v21\_sample\_measurements.csv}.
+Der Sample-Datensatz ist zur Pipeline-Verifikation und Diagramm-Test
+gedacht und ersetzt sich automatisch durch reale Mess-Daten, sobald die
+HW-Reihe (V21.2) gelaufen ist.
+
+\paragraph{V21.2 (HW-E2E) — User-Pending.}
+Die Durchfuehrung der echten Mess-Reihe auf der i7-1270P-Workstation
+oder dem TU-Dresden-ZIH-Cluster (Barnard CPU oder Capella GPU) ist
+nicht vollautonom moeglich --- der User muss den Mess-Lauf starten,
+da Stunden bis Tage Laufzeit anfallen koennen und ein Cluster-Job
+explizite Submission braucht. Nach erfolgreicher V21.2-Reihe ersetzt
+\texttt{Code/\_runs/<date>/A\_full/measurements.csv} die Sample-Datei
+und alle Diagramme dieses Kapitels werden automatisch neu generiert
+(Build-Pipeline laeuft ueber \texttt{diagram\_generator} → TikZ →
+pdflatex).
