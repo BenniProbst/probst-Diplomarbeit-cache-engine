@@ -75,3 +75,76 @@ Wesentliche Komponenten:
     \item[CI] \texttt{.gitlab-ci.yml} (primaer) + \texttt{.github/workflows/ci.yml}
           (synchron) in alle 3~Repos (V11.7 + V14.3 Test-Discovery-Workaround).
 \end{description}
+
+\section{Pipeline-Erweiterungen V19--V22 (2026-05-14)}
+
+Vier autonome Sprints liessen die Mess-Pipeline End-to-End ohne reale
+Hardware funktionieren. Profil-getriebenes Workload-Routing,
+Reproduzierbarkeit im Mess-Export und Sample-Diagramme bilden zusammen
+die Voraussetzung fuer die spaetere reale Mess-Reihe.
+
+\begin{description}
+    \item[V19 expected\_workload] Profile-XML kann optional
+          \texttt{<expected\_workload>YCSB\_X</expected\_workload>} setzen
+          und ueberschreibt damit die V11.2-traversal-Heuristik des
+          \texttt{ExperimentDriver}. Sechs Profile haben heute explizite
+          Workload-Affinitaet (surf=A, coco\_trie=C, btreesareback=E,
+          mahling=E, kuehn=C, prtart=F).
+    \item[V20 workload\_used] Das Feld
+          \texttt{PermutationResult.workload\_used} wird pro Permutation
+          gesetzt; CSV-Export erhaelt eine 4.~Spalte
+          \texttt{workload\_used}, JSON-Export ein zusaetzliches Feld.
+    \item[V21 ext-Skelett + Sample-Pipeline] \texttt{art\_body.hpp.template}
+          erhielt einen \texttt{\#if defined(COMDARE\_HAVE\_UNODB)}-Block
+          fuer optionale Verdrahtung mit \texttt{unodb::db<>}
+          (\texttt{ext/P01-ART/unodb}, Apache 2.0). Default bleibt der Stub.
+          \texttt{Code/sample\_data\_generator/} erzeugt deterministisch
+          eine 10-Permutationen-CSV als Pipeline-Verifikation.
+    \item[V22 diagram\_generator] CLI
+          \texttt{diagram-generator --by-workload} gruppiert Permutationen
+          nach \texttt{workload\_used} und generiert TikZ-Bar-Charts.
+\end{description}
+
+\section{Layout-Refactoring V23 (cache-engine, 2026-05-14)}
+
+Auf Direktive einer professionellen C++-Konvention wurde die cache-engine
+in 6~Phasen sauber strukturiert. Jede Phase wurde einzeln committed und
+mit \texttt{ctest} verifiziert; ein Tag \texttt{v22-final} in allen
+3~Repos dient als Rollback-Punkt.
+
+\begin{description}
+    \item[V23.A Cleanup] Acht obsolete \texttt{build-msvc-vXX/}-Verzeichnisse
+          (insgesamt ${\sim}7$~GB) entfernt; \texttt{CMakePresets.json}~(V6)
+          mit \texttt{binaryDir=\$\{sourceDir\}/build/\$\{presetName\}}
+          eingefuehrt.
+    \item[V23.B Apps] \texttt{cache\_engine/builder/main.cpp} extrahiert
+          nach \texttt{apps/cache\_engine\_builder/main.cpp}
+          (Pitchfork-/ClickHouse-Konvention: \texttt{apps/} fuer Executables,
+          \texttt{libs/} fuer Bibliotheken).
+    \item[V23.C Cross-Cutting] Vier Komponenten nach
+          \texttt{libs/common/} migriert (ClickHouse-Stil):
+          \texttt{succinct}, \texttt{serialization/xml\_config\_parser},
+          \texttt{platform} (heute: \texttt{hardware\_isa}),
+          \texttt{measurement}.
+    \item[V23.E Deprecated] \texttt{prt\_art/} nach
+          \texttt{libs/deprecated/prt\_art\_legacy/} (Folly-Idiom),
+          \texttt{option(COMDARE\_BUILD\_DEPRECATED OFF)}. Der echte
+          PRT-ART-Code lebt im separaten \texttt{comdare-prt-art}-Repo.
+    \item[V23.F Test-Infra] \texttt{workload\_generator/},
+          \texttt{test\_data/}, \texttt{benchmark\_suite/} nach
+          \texttt{libs/test\_infra/}.
+    \item[V23.D libs/domain/ deferred] ${\sim}280$ Source-Dateien,
+          22 Builder-Subkomponenten, 41 CMakeLists --- eigene Session.
+\end{description}
+
+\section{Konsistenz-Updates V24 (2026-05-14)}
+
+\begin{description}
+    \item[V24.A prt-art] 5 alte Build-Verzeichnisse entfernt,
+          \texttt{CMakePresets.json} analog cache-engine~V23.A.
+    \item[V24.B Diplomarbeit/Code] 3 alte Build-Verzeichnisse entfernt,
+          \texttt{CMakePresets.json}.
+    \item[V24.C PROJECT\_LAYER\_MAPs] Alle drei Repos um V19--V24-Delta
+          ergaenzt. Direktive "niemals Dokumentation loeschen" beachtet
+          --- alte Doku bleibt vollstaendig erhalten.
+\end{description}
