@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Diplomarbeit Testdatensatz: Pizza&Chili DNA-Korpus
+     Standard-Korpus fuer Trie-Familie (P01 ART, P02 HOT, P04 CoCo-Trie).
+     V23.X1 (2026-05-14) -->
+<comdare_test_data id="pizzachili_dna" source="Pizza&amp;Chili">
+  <metadata>
+    <name>Pizza&amp;Chili DNA</name>
+    <license>public</license>
+    <size_bytes>404000000</size_bytes>
+    <source_url>https://pizzachili.dcc.uchile.cl/texts/dna/</source_url>
+    <referenced_in_paper>P01 ART, P02 HOT, P04 CoCo-Trie</referenced_in_paper>
+  </metadata>
+
+  <key_value_signature>
+    <key_types>std::string</key_types>
+    <value_types>std::uint64_t</value_types>
+  </key_value_signature>
+
+  <local_path>tests/fixtures/external/pizzachili/dna</local_path>
+  <fetch_script>tools/fetch_testdata.sh --dataset pizzachili_dna</fetch_script>
+
+  <expected_workload>YCSB_C</expected_workload>
+</comdare_test_data>

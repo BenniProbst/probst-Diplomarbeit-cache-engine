@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Diplomarbeit Testdatensatz: english-words/words.txt
+     Verwendung: Wormhole-Concbench (P07) Standard-String-Workload.
+     V23.X1 (2026-05-14) -->
+<comdare_test_data id="english_words" source="dwyl/english-words">
+  <metadata>
+    <name>english-words words.txt (MIT)</name>
+    <license>MIT</license>
+    <size_bytes>4250000</size_bytes>
+    <source_url>https://github.com/dwyl/english-words/raw/master/words.txt</source_url>
+    <referenced_in_paper>P07 Wormhole (Wu/Ni/Jiang 2019)</referenced_in_paper>
+  </metadata>
+
+  <key_value_signature>
+    <key_types>std::string</key_types>
+    <value_types>std::uint64_t</value_types>
+  </key_value_signature>
+
+  <local_path>tests/fixtures/external/english_words/words.txt</local_path>
+  <fetch_script>tools/fetch_testdata.sh --dataset english_words</fetch_script>
+
+  <expected_workload>YCSB_A</expected_workload>
+</comdare_test_data>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Diplomarbeit Testdatensatz: SOSD books_200M_uint64
+     Standard-Korpus fuer Layout-Theorie + Lernindexe (P05/P06/P11-P20).
+     V23.X1 (2026-05-14) -->
+<comdare_test_data id="sosd_books_200M" source="SOSD">
+  <metadata>
+    <name>SOSD books_200M_uint64</name>
+    <license>CC-BY 4.0</license>
+    <size_bytes>1600000000</size_bytes>
+    <source_url>https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/JGVF9A/5YTV8K</source_url>
+    <mirror_url>https://zenodo.org/records/15240501</mirror_url>
+    <referenced_in_paper>P20 B-Trees Are Back, P05 START, P06 B2-Tree</referenced_in_paper>
+  </metadata>
+
+  <key_value_signature>
+    <key_types>std::uint64_t</key_types>
+    <value_types>std::uint64_t</value_types>
+  </key_value_signature>
+
+  <local_path>tests/fixtures/external/sosd/books_200M_uint64</local_path>
+  <fetch_script>tools/fetch_testdata.sh --dataset sosd_books_200M</fetch_script>
+
+  <expected_workload>YCSB_E</expected_workload>
+</comdare_test_data>
