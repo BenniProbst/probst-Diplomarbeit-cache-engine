@@ -89,12 +89,29 @@ Geplant fuer REV7-drawio (`phase5_uml_detail_REV7.drawio`):
 - 4 NEUE Tabs (REV7-Master, Adapter-Familie, P27-Bundles, libs/-Layout)
 - **Total: 36 Tabs**
 
-### §4.1 Stand 2026-05-15 (Session 4700 Ende)
+### §4.1 Stand 2026-05-15 (Session 4700 + Folge)
 
 | K-H Sub-Phase | Status |
 |---|---|
-| K-H.1 REV6 → REV7 Kopie als Basis | ✅ DONE (`phase5_uml_detail_REV7.drawio` 295 KB im selben Verzeichnis) |
-| K-H.2-K-H.10 (XML-Tab-fuer-Tab + JPG-Export) | ⏳ pending — eigene Folge-Session |
+| K-H.1 REV6 → REV7 Kopie als Basis | ✅ DONE (`phase5_uml_detail_REV7.drawio`) |
+| K-H.2 Tab 01 Search Engine V12-V13 Update | ✅ DONE (Banner + Trace-Tab Eintrag U01/U07) |
+| K-H.3 Tabs K01-K05 Konzepte REV7-Update | ✅ DONE (Banner + Trace-Tab Eintraege K01-K05h) |
+| K-H.4 Tab MX1 Layer-vs-Matrix Update | ✅ DONE (Banner + Trace-Tab Eintrag K14 Layer-Matrix-Hybrid) |
+| K-H.5 Tabs U01-U06 UML-Klassen Update | ✅ DONE (Banner + Trace-Tab Eintraege U01-U10) |
+| K-H.6 NEU REV7-Master | ✅ DONE (Drei-Repo-Architektur Snapshot) |
+| K-H.7 NEU Adapter-Familie | ✅ DONE (22 V31-Adapter mit COMDARE_HAVE-Pattern) |
+| K-H.8 NEU P27 hp-soft + Bundle-Prefetcher | ✅ DONE (Build-Time-Tool + Runtime L1/L2/L3) |
+| K-H.9 NEU libs/-Layout V30-Konsolidierung | ✅ DONE (5 Sub-Migrationen V30.D.1-D.5) |
+| K-H.X NEU REV7-Konsolidierungs-Trace | ✅ DONE (Pro-Tab Stand vs V31-Aenderungen + K-H Status-Summary) |
+| K-H.10 JPG-Export pro Tab | ⏳ pending (drawio CLI noetig, USER-Aktion) |
+
+**Total Tabs:** 45 (40 alt + 4 neu V31-substantiell + 1 Trace).
+
+**Konsolidierungs-Strategie (Memory-Direktive: niemals Doku loeschen):**
+- Alle 40 alten Tabs INHALTLICH UNVERAENDERT (Original-XML bleibt)
+- Banner `REV7 Stand 2026-05-15 / V31.F / K-H Konsolidierungs-Sprint` in ALLEN 45 Tabs (rechts oben, klein, einheitlich)
+- NEUE Tabs (4 substantiell + 1 Trace) bringen V31-Inhalte und Cross-Refs
+- Trace-Tab listet pro alten Tab welche V-Sprints relevant + welche konsolidierte Doku
 
 ---
 
