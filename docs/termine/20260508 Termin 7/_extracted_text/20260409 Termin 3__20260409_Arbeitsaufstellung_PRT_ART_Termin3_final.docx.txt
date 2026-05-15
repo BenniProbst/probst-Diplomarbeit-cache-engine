@@ -1,0 +1,97 @@
+Arbeitsaufstellung Termin 3
+PRT-ART | Benchmark-, Datensatz- und Messplan
+Stand: 09.04.2026
+1. Festgezogene Leitentscheidungen
+Reproduzierbarkeit zuerst: Ein statischer Satz an Testdatensätzen, Testmethoden und Messparametern wird fixiert. Variabel ist nur das Verhalten der geprüften Algorithmen unter identischen Bedingungen.
+Zwei Pflichtplattformen: lokales Hybrid-System (Intel Core i7-1270P laut Nutzerangabe, P- und E-Cores separat) und ZIH Barnard (Sapphire Rapids, AVX-512-fähig).
+ISA-Modi als feste Achse: Scalar/Vanilla, AVX2 und – sofern verfügbar – AVX-512. ISA-Pfade werden pro Build automatisch erkannt und zur Laufzeit sauber ausgewiesen.
+Baselines: PRT-ART wird selbst implementiert. Andere Algorithmen werden nicht neu geschrieben, sondern über Wrapper auf bestehende Referenzimplementierungen bzw. Bibliotheken angebunden.
+Pflichtdatensätze: alle sechs CoCo-trie-Datensätze (url, dna, tpcds-id, trec-terms, protein, xml) werden als Kernportfolio gesetzt.
+Volle Permutationsmatrix zulässig: Ordnung, Inline-Grenze, Seitentyp-Scheduler, ISA-Modus, Plattform und Workload werden systematisch permutiert. Eine Reduktion erfolgt nur dann, wenn ein Vergleich technisch nicht sinnvoll oder funktional nicht äquivalent ist.
+Wiederholungen: fünf Läufe pro Konfiguration. Rohwerte bleiben getrennt; Perzentile und Histogramme werden nicht über arithmetische Mittel verzerrt.
+2. Plattform- und Messpolitik
+3. Datensatzportfolio für Termin 3
+Erweiterungspool: enwiki-titles, aol-queries, uk-2002, webbase-2001, synthetic, Filenames und URLs aus der 2024er Folgeliteratur zu massiven String-Dictionaries werden als nachgelagerter Zusatzkatalog vorbereitet.
+Quellenpolitik: jeder Datensatz erhält URL/DOI, Download-Datum, Dateigröße, Format, Vorverarbeitungsschritte, Prüfsumme und eine kanonische interne Bezeichnung im Benchmark-Harness.
+Normalisierung: alle Keys werden als Byte-Strings behandelt; Vorverarbeitung, Sortierung, Deduplizierung und optionale Payload-Erzeugung werden pro Datensatzskript exakt protokolliert.
+4. Workloadfamilien
+5. Baselines und Integrationsstrategie
+6. Metriken und Toolchain
+End-to-End: Durchsatz, p50/p95/p99, Build-Zeit, Insert/Update/Delete-Kosten, Prefix-Enumeration-Kosten, Bytes pro Key, Bytes pro Value, Fragmentierung und Reorganisationskosten.
+Hardware-Counter: cycles, instructions, branches, branch-misses, cache-misses, LLC-load-misses, dTLB-load-misses sowie getrennte cpu_core/*- und cpu_atom/*-Events auf Hybridplattformen.
+Intel Advisor: Memory Access Patterns mit Cache-Simulation, Cache Line Utilization und Simulated Memory Footprint; standardmäßig mit 64-Byte-Cache-Line-Modell, aber nicht als starre Architekturannahme im Algorithmus.
+Ausgabeformat: Roh-CSV/JSON je Lauf, HDR-Histogramme separat, kein Mitteln von Latenzperzentilen.
+7. Arbeitspakete für Termin 3
+AP1 – Datensatzkatalog und Reproduzierbarkeit: Quellen, Mirror-Skripte, Prüfsummen, Normalisierung, Metadatenblatt.
+AP2 – Baseline-Katalog: Buildbarkeit, Lizenz, Toolchain, C/C++-Wrapper, API-Mapping in den gemeinsamen Harness.
+AP3 – Benchmark-Harness: Konfigurationsschema, Workload-Generator, Raw-Log-Format, HDR-Histogramm-Ausgabe, Seed-Strategie.
+AP4 – Plattformskripte: lokales Pinning (P/E getrennt), Slurm-Skripte für Barnard, Compiler-/ISA-Matrix, perf- und Advisor-Profile.
+AP5 – Fairnessregeln: Funktionsparität, N/A-Regeln für nicht unterstützte Operationen, Common-Denominator- und Native-Pfade.
+AP6 – Termin-4-Übergabe: finaler Satz implementierter Baselines, fixierte Benchmark-Matrix und Scope-Freeze der ersten Diplomarbeitsphase.
+8. Offene Punkte, die in Termin 4 eingefroren werden müssen
+welche Literatur-Nachbarn neben den Pflichtbaselines tatsächlich mit Originalcode in den Messkorridor aufgenommen werden können,
+welche Overlay-/Fingerprint-Verfahren funktionsäquivalent genug sind, um in den Kernbenchmark aufgenommen zu werden,
+welche minimale, aber noch vertretbare Benchmark-Matrix als Pflichtsatz gilt und welche Permutationen in Nachtläufe ausgelagert werden,
+welche Common-Denominator-Regeln für Inline-Values, lokale Ordnung und ISA-spezifische Pfade in der späteren Diplomarbeit verbindlich werden.
+Direktlinks
+Barnard Hardware Overview
+ZIH HPC Systems
+Intel Xeon Platinum 8470
+perf stat Hybrid Support
+Intel Advisor MAP / Cache Simulation
+YCSB Core Workloads
+YCSB Core Properties
+YCSB-C
+
+[TABELLE 1]
+Ziel von Termin 3. Aus Termin 2 wird jetzt ein belastbarer Messplan: feste Plattformen, feste Datensätze, feste Workloadfamilien, feste Metriken, feste Fairnessregeln. Dynamisch bleiben nur die konfigurierbaren PRT-ART-Policies und die Zielplattform selbst.
+[/TABELLE]
+
+
+[TABELLE 2]
+Plattform || Rolle in Termin 3 || Messpolitik
+Lokales Hybrid-System || Entwicklung, frühe Mikrobenchmarks, Trennung P-Core/E-Core, AVX2- und Scalar-Pfade || perf stat mit getrennten cpu_core/*- und cpu_atom/*-Events; Single-Core und Read-Scaling separat
+ZIH Barnard || skalierende CPU-Plattform für AVX-512, homogene Serverkerne, reproduzierbare Batch-Läufe || Slurm-gesteuerte Läufe, perf/Advisor auf repräsentativen Nodes, AVX-512- und AVX2-Vergleich gegen denselben Codepfad
+[/TABELLE]
+
+
+[TABELLE 3]
+Hybrid-Regel. Auf Intel-Hybridplattformen werden Core- und Atom-Events getrennt erhoben. Gemischte Event-Gruppen über cpu_core und cpu_atom werden vermieden; die Auswertung erfolgt getrennt nach PMU-Typ und dann nebeneinander, nicht zusammengeworfen.
+[/TABELLE]
+
+
+[TABELLE 4]
+Pflichtdatensatz (A-F) || Eigenschaft für PRT-ART || Status in Termin 3
+url || sehr lange Keys, lange gemeinsame Präfixe, realistische String-Dictionaries || Pflicht
+dna || kleines Alphabet, extreme Präfix- und Zeichenwiederholung, große Datenmenge || Pflicht
+tpcds-id || datenbanknahe IDs, mittlere Längen, geordnete Schlüsselräume || Pflicht
+trec-terms || Such-/Term-artige Wörterbuchlast || Pflicht
+protein || kleines bis mittleres Alphabet, biologische Sequenzen || Pflicht
+xml || strukturierte Stringdaten mit Präfixmustern || Pflicht
+[/TABELLE]
+
+
+[TABELLE 5]
+Block || Pflichtoperationen || Anmerkung
+Microbenchmarks || Exact hit/miss, Prefix hit/miss, Prefix enumeration, Build, Insert, Update, Delete || Kern für Ursachenanalyse auf Cache-/TLB-/Branch-Ebene
+YCSB-inspirierte Mischlasten || A, B, C, D, E, F als methodische Vorlage || eigener Harness; YCSB dient als Semantik- und Property-Referenz
+Ordnungsmodi || unsortiert, lokal geordnet, global lexikographisch || vollständige Permutation mit PRT-ART-Policies
+Value-Modi || inline, external handle || Umschaltpunkt explizit vermessen
+[/TABELLE]
+
+
+[TABELLE 6]
+Algorithmus || Quellenbasis || Geplanter Status
+PRT-ART || eigene C++23-Implementierung || Pflichtimplementierung
+ART || libart (C) / optional UnoDB (C++) || Wrapper um Original-/Referenzcode
+HOT || speedskater/hot || Wrapper um Originalcode
+Masstree || kohler/masstree-beta || Wrapper um Originalcode; primär Struktur- und Scanvergleich
+B+-Baum || habedi/bptree oder embedded2016/bplus-tree || leichte Wrapper; je nach Buildbarkeit ein Primärpfad
+Hash-Baseline || absl::flat_hash_map und/oder absl::node_hash_map || Pflichtbaseline für Exact-Lookups
+START, CSS-tree, CSB+-tree, B²-tree, CoCo-trie || Papier-/Designnachbarn || Literaturvergleich; nur mit belastbarer Codebasis als Erweiterung
+[/TABELLE]
+
+
+[TABELLE 7]
+Fairnessregel für Payload. Der Termin-3-Plan trennt einen Common-Denominator-Modus (externe Payload/Handle für alle vergleichbaren Algorithmen) von einem PRT-ART-Native-Modus (Inline/External-Umschaltung). So bleibt der Baselinevergleich fair, ohne den eigentlichen PRT-ART-Beitrag zu verstecken.
+[/TABELLE]

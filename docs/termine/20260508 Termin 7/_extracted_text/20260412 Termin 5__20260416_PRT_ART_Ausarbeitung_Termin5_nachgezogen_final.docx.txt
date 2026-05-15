@@ -1,0 +1,80 @@
+Ausarbeitung Termin 5
+PRT-ART — Forschungslandkarte der Cache-Engine
+im Kontext trie-basierter Suche
+1. Ziel von Termin 5
+Termin 5 professionalisiert die theoretische Begründung des Themas. Er beantwortet noch nicht die Architektur- oder Plattformfragen von Termin 6, sondern verdichtet die relevante Forschung zu einer belastbaren Forschungslandkarte: Welche Literatur stützt PRT-ART direkt, welche ist nur konzeptionell verwandt, wo beginnt die eigentliche Forschungslücke und welche Aussagen sollten vorsichtig behandelt werden?
+2. Geschärfte Einordnung von PRT-ART
+Die belastbare Einordnung lautet: PRT-ART ist primär eine aktive Cache-Engine bzw. Control Plane über trie-basierter Suche. Die Suchstruktur bleibt Mittel zum Zweck. Der wissenschaftliche Mehrwert liegt nicht in einem weiteren Trie als Selbstzweck, sondern in der messgetriebenen Orchestrierung von Seitentypwahl, Layout, Inline-vs.-Handle-Ablage, Prefetching und plattformabhängigen Parametern.
+Damit grenzt sich PRT-ART in zwei Richtungen ab. Gegen klassische cache-aware Indexe ist der Unterschied, dass Layout nicht nur einmal statisch gewählt wird. Gegen ART/HOT/Masstree/B²-tree ist der Unterschied, dass Suchstruktur und Cache-Sicht explizit voneinander getrennt werden: Suchsemantik bleibt beim Algorithmus, während die Cache-Engine eine wiederverwendbare Meta-Ebene bildet.
+3. Forschungscluster
+3.1 Passive cache-aware Layoutforschung
+CSS-tree zeigt die klassische Form passiver Cache-Awareness: cache-line-große Verzeichnisknoten, arraybasierte Speicherung und keine internen Pointer. CSB+-tree überträgt diese Richtung auf updatefähigere B+-Baum-Varianten, indem Kinder zusammenhängend abgelegt und nur der erste Kindverweis explizit gespeichert werden. Die processor-conscious CSB+-Arbeit verschärft das weiter: Nicht nur die Knotengröße, sondern ein ganzer Parametersatz muss an die konkrete Prozessorarchitektur angepasst werden. Für PRT-ART folgt daraus: cache-line-aware Layout ist Pflicht, aber ein einmal statisch gewähltes Layout genügt als Forschungsbeitrag nicht.
+3.2 Adaptive trieartige Suchstrukturen
+ART, START, HOT, Masstree, B²-tree und CoCo-trie bilden das direkte Suchmaschinenarsenal. ART liefert adaptive Node-Familien und geordnete Prefix-/Range-Fähigkeit. START zeigt, dass ein Byte pro Knoten für read-heavy Workloads nicht immer optimal ist, und führt multibyte Nodes mit Kostenmodell und Optimierer ein. HOT macht diskriminierende Bits und sehr kompakte Sparse-Layouts zum Prinzip. Masstree verbindet Trie und lokale B+-Bäume mit Prefetching und klaren Layer-/Fence-Regeln. B²-tree zeigt, dass page-lokale Decision- und Span-Techniken Suchräume effektiv einengen können. CoCo-trie ist für PRT-ART besonders wichtig, weil es Subtries datenabhängig kollabiert und damit den Redirect-Gedanken auf professionelle Beine stellt.
+3.3 Prefetching und aktive Laufzeitanpassung
+Fractal Prefetching B+-Trees verschieben den Fokus vom bloßen Layout auf das aktive Vorladen: cache-optimierte Teilbäume werden in diskoptimierte B+-Bäume eingebettet, und Such-, Scan- und Update-Performance steigen ohne große I/O-Nachteile. Dynamic Adaptation of Cache Prefetching zeigt, dass Prefetch-Abstände zur Laufzeit angepasst werden können. Die Gegenliteratur ist genauso wichtig: Arbeiten wie „Why Does Data Prefetching Not Work for Modern Workloads?“ machen klar, dass Prefetching nicht universell hilft. Für PRT-ART ergibt sich daraus eine nüchterne Regel: Prefetching gehört in die Cache-Engine, aber nur als gemessene, platform-aware Entscheidung.
+3.4 Cache-oblivious Gegenentwurf
+Cache-oblivious B-trees und cache-oblivious string B-trees liefern den konzeptionellen Gegenentwurf. Sie modellieren gute Performance ohne Kenntnis konkreter Cache-Parameter und sind gerade deshalb als Abgrenzung wichtig. PRT-ART verfolgt explizit nicht diese Linie. Die Arbeit soll gerade zeigen, dass aktive, plattformbewusste Cache-Entscheidungen gegenüber rein hierarchieunabhängigen Strukturen zusätzlichen Nutzen bringen können.
+4. Was die Literatur bereits beantwortet
+Node- und Page-Layout beeinflussen Suchkosten massiv; Cache-Line-Größe allein ist kein ausreichender Designanker.
+Trieartige Strukturen profitieren stark von lokaler Adaptivität: Pfadkompression, diskriminierende Bits, mehrbyteige Knoten und page-lokale Suchraum-Einengung sind belastbar belegt.
+Prefetching kann große Gewinne erzeugen, ist aber systematisch riskant und stark an Plattform, Fill Buffers, Zielcache und Zugriffsmuster gebunden.
+Plattformbewusste Optimierung existiert bereits in der Literatur, aber fast immer innerhalb einer konkreten Struktur und nicht als getrennte, wiederverwendbare Kontrollschicht.
+5. Wo die eigentliche Forschungslücke beginnt
+Die Literatur liefert PRT-ART viele Bausteine, aber nicht die gesamte Konstruktion. Was noch nicht überzeugend als zusammenhängende Lösung vorliegt, ist eine getrennte Cache-Control-Plane über trie-basierter Suche, die Seitentypwahl, Layout, Value-Ablage und Prefetching gemeinsam steuert und ihre Regeln an eine konkrete Plattform kalibriert. Genau an dieser Stelle beginnt die echte Forschungslücke.
+6. Was PRT-ART nach Termin 5 sicher behaupten darf – und was nicht
+Belastbar behauptbar:
+PRT-ART kombiniert bekannte Bausteine bewusst zu einer aktiven, messgetriebenen Cache-Orchestrierungsschicht.
+Die Cache-Engine ist als Meta-Ebene über trie-basierter Suche neu und wissenschaftlich plausibel genug, um als Kernbeitrag zu dienen.
+Dense-, Sparse-, Redirect- und Value-Policy-Fragen müssen plattformbewusst behandelt werden und sollten nicht dogmatisch fest verdrahtet sein.
+Vorsichtig zu behandeln:
+Behauptungen einer direkten 'Verwaltung' von Hardware-Caches; korrekt ist die Beeinflussung über Layout, Access Patterns, Prefetching und Allokation.
+Starke Aussagen zur expliziten Programm-/Instruction-Cache-Steuerung im Kontext von Suchindizes; die Literaturbasis ist hier deutlich schwächer.
+Universelle Prefetch-Regeln; die relevante Literatur spricht klar für plattform- und workloadabhängige Entscheidungen.
+7. Konsequenz für die Spezifikation vor Termin 6
+Termin 5 friert daher keine neue Architektur ein. Er verdichtet die Begründung der bisherigen Linie und schafft die wissenschaftliche Brücke zu Termin 6. Vor einer belastbaren Implementationsplanung müssen als Nächstes die Verifikationsarchitekturen, ISA-Pfade, Messwerkzeuge und Kalibrierungsbenchmarks festgezogen werden. Genau dort setzt Termin 6 an.
+8. Auswahl der Kernliteratur
+Rao/Ross (1999): Cache Conscious Indexing for Decision-Support in Main Memory (CSS-tree).
+Rao/Ross (2000): Making B+-Trees Cache Conscious in Main Memory (CSB+-tree).
+Samuel/Pedersen/Bonnet (2005): Making CSB+-Trees Processor Conscious.
+Leis/Kemper/Neumann (2013): The Adaptive Radix Tree: ARTful Indexing for Main-Memory Databases.
+Fent/Jungmair/Kipf/Neumann (2020): START — Self-Tuning Adaptive Radix Tree.
+Binna et al. (2018): HOT — A Height Optimized Trie Index for Main-Memory Database Systems.
+Mao/Kohler/Morris (2012): Cache Craftiness for Fast Multicore Key-Value Storage (Masstree).
+Schmeißer et al. (2022): B²-tree: Page-Based String Indexing in Concurrent Environments.
+Boffa et al. (2024): CoCo-trie: Data-aware Compression and Indexing of Strings.
+Chen/Gibbons/Mowry/Valentin (2002/2003): Fractal Prefetching B+-Trees.
+Khan (2011): Data Cache Prefetching with Dynamic Adaptation.
+Naderan-Tahan/Sarbazi-Azad (2016): Why Does Data Prefetching Not Work for Modern Workloads?
+Bender/Demaine/Farach-Colton (2006): Cache-Oblivious B-Trees.
+Saikkonen/Soisalon-Soininen (2016): Cache-Sensitive Memory Layout for Dynamic Binary Trees.
+Ungethüm et al. (2017): Overview on Hardware Optimizations for Database Engines.
+
+[TABELLE 1]
+Kernaussage | Nach Termin 5 sollte PRT-ART professionell nicht als weiterer trieartiger Index, sondern als aktive, messgetriebene Cache-Orchestrierungsschicht über trie-basierter Suche eingeordnet werden. Die Literatur deckt bereits viele Bausteine ab — passive cache-aware Layouts, adaptive Seitentypen, Präfixkollabierung, Prefetching und plattformbewusstes Tuning —, aber nicht deren Bündelung in einer getrennten Control Plane, die Seitentypwahl, Layout, Prefetching und Value-Ablage gemeinsam steuert.
+[/TABELLE]
+
+
+[TABELLE 2]
+Cluster || Repräsentative Arbeiten || Was die Literatur zeigt || Bedeutung für PRT-ART
+Passive cache-aware Layouts || CSS-tree, CSB+-tree, processor-conscious CSB+, cache-sensitive binary-tree layouts || Node-Größe, Kindanordnung, Pointerzahl, Suchschema und Plattformparameter bestimmen Cache-Miss-Kosten stark mit. || Stützt Dense Pages, pointerarme Adressierung, Gruppierung verwandter Nodes und platform-aware Parameterwahl.
+Adaptive trieartige Suchstrukturen || ART, START, HOT, Masstree, B²-tree, CoCo-trie || Lokale Repräsentation, Pfadkompression, diskriminierende Bits, mehrbyteige Knoten und page-lokale Suchraum-Einengung verbessern Point-/Prefix-Suche deutlich. || Stützt Seitentypfamilien, Redirects, lokale Suchtechniken und Präfixkollabierung.
+Aktives Prefetching & Laufzeitanpassung || Fractal Prefetching B+-Trees, Dynamic Adaptation, Prefetch-Reliability-Arbeiten || Prefetching kann deutlich helfen, ist aber plattform-, Workload- und Zielcache-abhängig und kann ebenso schaden. || Stützt eine Kalibrierungsphase und evidenzbasiertes, regel- oder kostenmodellbasiertes Prefetching.
+Cache-oblivious Gegenentwurf || Cache-oblivious B-trees / string B-trees || Suchstrukturen können ohne explizite Cache-Parameter modelliert werden, optimieren dann aber bewusst nicht auf konkrete Cache-Hierarchien. || Markiert den philosophischen Kontrast: PRT-ART ist explizit cache-aware, nicht cache-oblivious.
+Lokaler Kontext || Habich-/Dresden-Linie zu Hardwareoptimierung, Access Patterns und Scheduling || Hoher Durchsatz, niedrige Latenz, Access-Pattern-Analyse und hardwarebewusste Entscheidungen sind lokale Erwartungshaltung. || Hilft beim Framing der Arbeit in der Sprache der Professur.
+[/TABELLE]
+
+
+[TABELLE 3]
+Bereits stark abgedeckt || Für PRT-ART noch offen
+• lokales Node-/Page-Layout || • getrennte Cache-Control-Plane über der Suchlogik
+• adaptive Suchseiten innerhalb einer Struktur || • gemeinsame Entscheidung über Seitentyp, Layout, Prefetching und Value-Ablage
+• Präfixkollabierung und Redirect-Ideen || • messgetriebene Regeln für mehrere CPU-Typen und ISA-Pfade
+• statisches bzw. halb-statisches Hardwaretuning || • Mehrzieloptimierung über Latenz, CLU, Footprint und Handle-vs.-Inline
+• punktuelle Prefetch-Strategien || • klare Trennung: Suchsemantik beim Algorithmus, Cache-Sicht bei der Engine
+[/TABELLE]
+
+
+[TABELLE 4]
+Kurzform für Prof. Habich: Die Literatur rechtfertigt PRT-ART nicht als weiteren Trie, sondern als aktive, plattformkalibrierte Cache-Engine über trie-basierter Suche. Termin 6 muss deshalb nicht die Suchidee neu begründen, sondern die Verifikationsarchitekturen, Benchmarks und Messpfade festziehen.
+[/TABELLE]

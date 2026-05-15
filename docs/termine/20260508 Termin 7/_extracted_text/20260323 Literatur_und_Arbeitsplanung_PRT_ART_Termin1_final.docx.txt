@@ -1,0 +1,62 @@
+Literatur- und Arbeitsplanung für den 1. Termin
+PRT-ART – CPU-only Präfixindex mit cache-line-aware Suchseiten
+1. Vorläufige Fokussierung der Forschungsfrage
+Arbeitsfrage: Wie beeinflussen adaptive, cache-line-aware Suchseitenrepräsentationen und getrennte Allokationspools die Leistung von Exact- und Prefix-Lookups für bytebasierte Schlüssel auf modernen CPUs – im Vergleich zu B+-Tree, CSS-Tree, CSB+-Tree, ART, HOT, Masstree und B²-Tree?
+H1: Der Nutzen von PRT-ART muss primär über geringere Cache-/TLB- und Branch-Kosten nachgewiesen werden, nicht über asymptotische Neuheit und Plausibilität der Performanceverbesserungen seiner Einzelteile.
+H2: Es gibt keine universell beste lokale Seitendarstellung; die beste Wahl hängt von lokaler Dichte, Präfixstruktur und Zugriffsmix ab.
+H3: Die stärkste Zieloperation ist Exact/Prefix Lookup inklusive Prefix Enumeration; globale lange Range-Scans sind nicht der primäre Dominanzanspruch.
+2. Direkte Abgrenzung im Stand der Technik
+3. Metriken und Messaufbau
+Metriken müssen zwei Ebenen abdecken: End-to-End-Indexleistung und mikroarchitektonische Ursachen. Angelehnt an derzeitig aktuelle Forschungsarbeiten sind zu liefern: hoher Durchsatz, niedrige Latenz, Mikrobenchmarks, Access-Pattern-Analyse und End-to-End-Runtime.
+Vergleichsmatrix für Operationen: successful exact lookup, unsuccessful exact lookup, prefix lookup, prefix enumeration, insert, delete, bulk build, konsolidierter Rebuild.
+Nicht im Kernscope von Termin 1: GPU, IAM-Engine, generische SIMD-Beschleunigung, heterogene CPU-Engines, vollständige DBMS-Integration.
+4. Datensätze und Arbeitsplanung für Termin 1 Recherche:
+5. Leseliste mit Direktlinks
+Kernliteratur zum Lesen vor dem nächsten Gespräch – zuerst [L1] bis [L6], danach Metrik-/Datensatzliteratur.
+[L1] Rao / Ross (1999): Cache Conscious Indexing for Decision-Support in Main Memory (CSS-tree, PDF) – Statischer, pointerfreier, cache-line-orientierter Referenzpunkt.
+[L2] Rao / Ross (2000): Making B+-Trees Cache Conscious in Main Memory (CSB+-Tree, DOI/Metadata) – Pflichtabgrenzung für dynamische, cachebewusste B+-Baum-Varianten.
+[L3] Leis / Kemper / Neumann (2013): The Adaptive Radix Tree – ARTful Indexing for Main-Memory Databases (PDF) – Hauptbaseline auf der trieartigen Seite.
+[L4] Binna et al. (2018): HOT – A Height Optimized Trie Index for Main-Memory Database Systems (PDF) – Sehr starker CPU-only Vergleich; SIMD ist dort Mittel, hier aber nicht Kernthema.
+[L5] Mao / Kohler / Morris (2012): Cache Craftiness for Fast Multicore Key-Value Storage – Masstree (PDF) – Hybrid aus Trie und B+-Tree; relevant für Slice-basierte Suche und Prefetching.
+[L6] Schmeißer et al. (2022): B²-Tree – Page-Based String Indexing in Concurrent Environments (Open Access) – Seitenlokaler Vergleich mit trie-/spanartiger Inner-Page-Suche.
+[L7] Samuel / Pedersen / Bonnet (2005): Making CSB+-Trees Processor Conscious – Hilfreich für plattformspezifische Parametrisierung von cachebewussten B-Baum-Layouts.
+[L8] Saikkonen / Soisalon-Soininen (2016): Cache-Sensitive Memory Layout for Dynamic Binary Trees (PDF) – Nützlich für das allgemeine Verständnis dynamischer cache-sensitiver Speicherlayouts.
+[L9] Belazzougui et al. (2023): CoCo-trie – Data-aware Compression and Indexing of Strings – Wichtig für String-Datensätze und für die heutige Wettbewerbslandschaft auf String Dictionaries.
+[L10] YCSB GitHub – Running a Workload / Latency Percentiles – Standardreferenz für CRUD-Mischungen; betont P99 und tiefere Tail-Latenzen.
+[L11] Intel Advisor – CPU Metrics / Cache Line Utilization – Offizielle Referenz für Cache-Line-Utilization und modellierte Miss-Metriken.
+[L12] SOSD – Search on Sorted Data Benchmark – Optional für numerische/fingerprint-basierte Nebenexperimente, nicht als Hauptbenchmark für String-Keys.
+[L13] TU Dresden: Overview on Hardware Optimizations for Database Engines – Gut, um den Stil der geforderten Metriken im Habich-Umfeld zu treffen.
+[L14] TU Dresden: To stride or not to stride the memory access? – Zeigt, wie stark Access Patterns selbst auf moderner Hardware die Ergebnisse drehen können.
+[L15] TU Dresden: VAMPIR – Virtualized Non-Functional Memory Properties for Data-Pipeline Scheduling – Nützlich für Formulierungen rund um Antwortzeit, Durchsatz und Hardwareeigenschaften.
+[L16] Cache Line Size – an overview | ScienceDirectTopics  – Cache Line Überblick.
+
+[TABELLE 1]
+Ziel || Für Termin 1 sollen Abgrenzung, Metriken und Benchmarks so festgezurrt werden, dass die Forschungsfrage relevant, neu genug und bearbeitbar wirkt – mit CSB/CSB+-Tree und CSS-Tree als Pflichtabgrenzung, sowie ART, HOT, Masstree und B²-Tree als direkte Sekundärvergleiche.
+[/TABELLE]
+
+
+[TABELLE 2]
+Struktur || Kernidee || Was PRT-ART im Vergleich nachweisen muss:
+B+-Tree || Geordnete Vergleichsstruktur; robuste Baseline für Punkt- und Range-Suche. || Pflichtbaseline für Bytes/Key, Exact Lookup, Insert/Delete und geordnete Ausgabe. PRT-ART darf nur dort Mehrwert beanspruchen, wo Präfixpfade und Speicherlayout tatsächlich helfen.
+CSS-Tree [L1] || Pointer-freie, cache-line-große Suchverzeichnisse über sortierten Arrays; stark cachebewusst, aber update-schwach. || Direkter Kontrast zu statischer, pointerfreier Offsetarithmetik. Zeigt, ob PRT-ART ähnliche Locality-Vorteile mit dynamischen Updates erreicht.
+CSB+-Tree [L2] || B+-Tree-Variante mit zusammenhängenden Kindgruppen; nur erster Kindzeiger wird gespeichert, Rest per Offset. || Wichtigste B-Tree-nahe Pflichtabgrenzung für cachebewusste interne Knoten. Prüft, ob PRT-ART mehr bringt als “nur” contiguouse Kinder und bessere Cache-Line-Ausnutzung.
+ART [L3] || Adaptive Radix-Nodes, Pfadkompression, geordnete Speicherung, Point + Prefix + Range. || Direkter trieartiger Hauptgegner. PRT-ART muss den Mehrwert der eigenen Suchseiten, Pools und Seitenschwellen gegenüber klassischem ART klar messbar machen.
+HOT [L4] || Dynamische Spanwahl zur Höhenreduktion; kompakte cacheeffiziente Knoten, oft SIMD-beschleunigt. || Sekundär sehr nah. PRT-ART darf HOT nicht per SIMD schlagen wollen, sondern über Layout, Pooltrennung und veränderte Seitensuche.
+Masstree [L5] || Trie aus B+-Bäumen auf festen Key-Slices; Fanout und Prefetching auf DRAM-Latenz optimiert. || Hybridvergleich: PRT-ART muss zeigen, wann rein präfixorientierte Navigation günstiger ist als trie-of-B+-trees mit Vergleichssuche pro Slice.
+B²-Tree [L6] || B+-Tree mit eingebetteter trie-/spanartiger Seitenstruktur; zielt auf weniger berührte Cache-Lines pro Page-Lookup. || Nächster page-lokaler Verwandter. Besonders wichtig, falls PRT-ART später eigene Seitendarstellungen oder page-lokale Suchräume betont.
+[/TABELLE]
+
+
+[TABELLE 3]
+Ebene || Pflichtmetriken || Begründung
+Lookup/CRUD || Throughput; p50/p95/p99; Build-Zeit; Insert/Update/Delete; Fehlzugriffe; Prefix Enumeration || Zeigt, wo PRT-ART praktisch gewinnt oder verliert. YCSB betont explizit P99 und tiefere Tails, nicht nur Mittelwerte [L10].
+Speicher || Bytes pro Key; Poolgrößen getrennt nach Suchseiten/Redirects/Values; Tombstones; Konsolidierungskosten || Ohne saubere Speicherbilanz ist der Layout-Anspruch nicht glaubwürdig.
+CPU-Counter || cycles, instructions, IPC, branches, branch-misses, L1D-misses, LLC-misses, dTLB-misses || Diese Zähler machen sichtbar, ob der behauptete Vorteil wirklich aus Cache-/TLB-/Branch-Verhalten stammt.
+Cache-Modell || Cache Line Utilization; modellierte Misses; optional Advisor Memory Access Patterns || Intel Advisor nennt Cache Line Utilization explizit als zentrale Metrik für Speichernutzungsanalyse [L11].
+[/TABELLE]
+
+
+[TABELLE 4]
+Datensatz-/Benchmarkschicht || Arbeitsplan / Ergebnis des 1. Termins
+Reale String-Dictionaries: url, xml, dna, protein, trec-terms, tpcds-id aus CoCo-trie [L9]; breite Abdeckung von Quellen, Alphabetgrößen und LCP-Strukturen. | Synthetische Kontrolllasten: Alphabetgröße, Key-Länge, gemeinsame Präfixlänge, Hot-Prefix-Skew, Fehlzugriffe, Delete-Rate und Value-Größen gezielt variieren. | CRUD-Workloads: YCSB-inspirierte Mischungen für Durchsatz und Tail-Latenzen [L10]; Prefix-Workloads zusätzlich selbst erzeugen. | Optional: SOSD [L12] nur für numerische/fingerprint-basierte Nebenvariante, nicht als Hauptbenchmark für String-Keys. Planung von vergleichbaren Mikrobenchmarks als Factory für alle Algorithmen || Lesen der Pflichtliteratur [L1]–[L6] und Erstellen einer 1-seitigen Abgrenzungsmatrix. | Fixieren der Forschungsfrage in CPU-only-Form mit explizitem Fokus auf cache-line-aware Suchseiten. | Formalisieren des Messplans: Pflichtmetriken, perf-Counter, Cache-Line-Analyse, Datensatzfamilien. | Festlegen der Kernbaselines für Implementierung/Benchmark: B+-Tree, CSB+-Tree, CSS-Tree, ART; HOT, Masstree und B²-Tree als starke Sekundärvergleiche. | Schriftliches Ergebnis von Termin 1: präzisierte Forschungsfrage, Literaturmatrix, Metrikmatrix, Scope-Freeze und offene Risiken.
+[/TABELLE]

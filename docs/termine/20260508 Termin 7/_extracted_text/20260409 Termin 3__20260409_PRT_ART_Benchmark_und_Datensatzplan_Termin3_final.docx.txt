@@ -1,0 +1,112 @@
+Ausarbeitung Termin 3
+PRT-ART | Benchmark-, Datensatz- und Messplan mit Baseline-Katalog und Fairnessregeln
+Stand: 09.04.2026
+1. Zielbild und Scope von Termin 3
+Primäres Ziel: ein statischer Benchmarkkorridor für PRT-ART und die Pflichtbaselines auf festen Datensätzen, festen Workloads und festen Metriken.
+Keine Scope-Verschiebung: Termin 3 baut auf Termin 2 auf. Architekturfragen werden nur noch insoweit nachgeschärft, wie sie Messbarkeit, Fairness oder Plattformintegration betreffen.
+Kernfrage: welche Kombination aus Seitentypwahl, Cache-Engine, Ordnungsmodus, Inline-Umschaltung und ISA-Pfad liefert unter identischen Bedingungen die beste Zielgröße für Exact-, Prefix- und Enumerationsworkloads?
+2. Plattformmatrix und ISA-Politik
+Build-Matrix: je Plattform werden mindestens ein Scalar-Build, ein AVX2-Build und – auf Barnard – ein AVX-512-Build vorbereitet. Feature-Erkennung erfolgt beim Build, Auswahl und Kennzeichnung des aktiven Pfades im Harness zur Laufzeit.
+Hybrid-Regel lokal: P- und E-Cores werden nicht zusammenaggregiert. perf dokumentiert dafür getrennte PMUs cpu_core und cpu_atom; gruppierte Events über beide PMUs werden vermieden.
+Advisor-Regel: für repräsentative Kernschleifen wird Memory Access Patterns mit Cache-Simulation gefahren; Zielgrößen sind Cache Line Utilization, Simulated Memory Footprint und modellierte Miss-Information.
+3. Datensatzkatalog
+4. Baseline-Katalog und Wrapper-Strategie
+Wrapper-Regel: Fremdalgorithmen werden nicht neu implementiert. Zulässig sind nur Build-Patches, Adapter, Mess-Hooks und ein gemeinsames Interface für Load/Get/Prefix/Scan/Insert/Delete, soweit vom Original unterstützt.
+Funktionsparität: Operationen, die eine Baseline nicht unterstützt, werden als N/A ausgewiesen und nicht künstlich emuliert, wenn dadurch der Vergleich methodisch verzerrt würde.
+Hash-Vergleich: Hash-Baselines dienen primär Exact-Hit/Exact-Miss und Read-mostly Workloads. Prefix/Range bleiben dort nur dann im Messkorridor, wenn eine echte, faire Unterstützung vorliegt.
+5. Workload- und Policy-Matrix
+Overlay-/Fingerprint-Achse: plain byte keys bilden den Pflichtpfad. Zusätzliche Overlays (z. B. Rabin/Fingerprint-ähnliche Repräsentationen oder Digests) werden nur dann in den Kernbenchmark aufgenommen, wenn Ordnungserhaltung bzw. die zulässige Exact-only-Semantik explizit markiert ist.
+Permutationsregel: die Matrix darf groß sein. Trotzdem werden Kern- und Erweiterungsmatrix getrennt berichtet, damit Termin 4 einen verbindlichen Pflichtsatz fixieren kann.
+6. Metriken, Perf-Setup und Advisor-Setup
+Histogramm-Regel: Perzentile werden nicht gemittelt. Je Lauf werden HDR-Histogramme persistiert; Auswertung erfolgt auf den separaten Rohläufen oder über korrekt zusammengeführte Histogramme.
+Wiederholungsregel: fünf Läufe werden nebeneinander berichtet. Abweichungen zwischen Lauf 1–5 sind Teil der Aussage und werden nicht weggemittelt.
+Cache-Line-Regel: Intels Advisor modelliert standardmäßig 64-Byte-Cache-Lines; diese Größe darf für die Analyse verwendet werden, ersetzt aber nicht die Hardware-Discovery und den expliziten Plattformbezug im Algorithmus.
+7. Fairnessregeln
+Common-Denominator vs. Native Mode: jeder Vergleich trennt einen gemeinsamen Minimalmodus (externe Payload/Handle, keine PRT-ART-Spezialtricks) von einem PRT-ART-Native-Modus (Inline-Umschaltung, Cache-Engine, Seitentyp-Scheduler).
+Gleiche Schlüsselräume: alle Baselines erhalten identische normalisierte Byte-Keys und identische Miss-/Update-/Delete-Mengen.
+Gleiche Warmups und Seeds: Warmup, Randomisierung und Thread-Pinning werden pro Plattform und Workload fest protokolliert.
+Keine verdeckte Emulation: fehlende Prefix-/Range-Fähigkeit von Hash-Baselines wird nicht über externe Hilfsstrukturen „repariert“. Solche Operationen bleiben N/A.
+Build-Transparenz: Compiler, Flags, ISA-Pfad, Allocator und Commit-Hash jeder Fremdbibliothek werden mitgeloggt.
+8. Risiken und Gegenmaßnahmen
+9. Ergebnis von Termin 3, das zu Termin 4 führt
+ein vollständiger Datensatz- und Quellenkatalog mit sechs Pflichtdatensätzen plus Erweiterungspool,
+ein Baseline-Katalog mit Buildstatus, Wrapperbedarf und Funktionsparität,
+ein verbindliches Messschema für lokale Hybrid-CPU und Barnard,
+ein Fairnessblatt für Common-Denominator- und Native-Vergleiche,
+eine eingefrorene Kernmatrix, aus der Termin 4 dann den Scope-Freeze der Diplomarbeit ableiten kann.
+
+[TABELLE 1]
+Arbeitsdefinition. Termin 3 beantwortet nicht mehr, wie PRT-ART gebaut wird, sondern wie PRT-ART gegen andere Algorithmen belastbar gemessen wird: reproduzierbar, plattformbewusst und ohne unfairen Baseline-Vorteil.
+[/TABELLE]
+
+
+[TABELLE 2]
+Plattform || Architekturprofil || Verpflichtender Messmodus || Besonderheit
+Lokal: Intel Core i7-1270P (Nutzerangabe) || Hybrid CPU, Vanilla + AVX2, getrennte P-/E-Cores || Single P, Single E, All-P, All-E; perf cpu_core/* und cpu_atom/* getrennt || Ideal für Entwicklung, Hybrid-Counter und ISA-Umschaltlogik
+ZIH Barnard || 2× Intel Xeon Platinum 8470 pro Node, Sapphire Rapids, AVX-512-fähig, 512 GiB RAM || homogene Serverkerne, Scalar/AVX2/AVX-512, Batchläufe via Slurm || Skalierende Referenzplattform für den AVX-512-Zweig
+[/TABELLE]
+
+
+[TABELLE 3]
+Datensatz || Charakteristik || Warum Pflicht? || Vorverarbeitung
+url || sehr lange Schlüssel, lange LCPs, mittleres Alphabet || Stress für Redirects, Präfixkollabierung und Cache-Lokalität || newline-basierte Keys, Byte-Encoding, optionale Payload-Zuordnung
+dna || kleines Alphabet, sehr große Datenmenge, hohe Wiederholung || maximaler Test für Präfix-Entropie und tiefe Trie-Strukturen || wie Quelle, zusätzlich Teilmengen für schnelle Mikrobenchmarks
+tpcds-id || datenbanknahe IDs || relevanter Gegenpol zu textartigen und biologischen Daten || kanonische Sortier- und unsortierte Version
+trec-terms || Term-/Suchindex-artige Wörter || Exact-/Prefix-Verhalten bei realen Wörterbüchern || Dedup, definierte Miss-Keys
+protein || biologische Sequenzen, kleines bis mittleres Alphabet || Gegenpol zu DNA und textlastigen Daten || kanonische Byte-Key-Version
+xml || strukturierte Strings mit wiederkehrenden Präfixen || wichtig für Präfix- und Enumerationspfade || kanonische Byte-Key-Version
+[/TABELLE]
+
+
+[TABELLE 4]
+Erweiterungskandidaten || Quelle/Begründung || Status
+enwiki-titles, aol-queries, uk-2002, webbase-2001, synthetic || aus der 2024er Arbeit zu massiven String Dictionaries; geeignet zur Erweiterung des CoCo-Portfolios || nachgelagert
+Pizza&Chili DNA / protein / xml || sekundäre, frei verfügbare Referenzquellen für kleinere oder alternative Teilmengen || optional als Zusatz-/Validierungssatz
+[/TABELLE]
+
+
+[TABELLE 5]
+Reproduzierbarkeitsregel. Jeder Datensatz erhält eine Akte: Originalquelle, Downloadskript, Prüfsumme, Zeilenanzahl, Bytevolumen, Vorverarbeitung, Sortierzustand, Payload-Generator und Seed-Regel für synthetische Miss-/Update-/Delete-Schlüssel.
+[/TABELLE]
+
+
+[TABELLE 6]
+Baseline || Referenzimplementierung || Sprache/Build || Termin-3-Status
+ART || libart; optional UnoDB als moderner C++-Gegencheck || C99 / C++20 || Pflicht
+HOT || speedskater/hot || C++14/CMake || Pflicht
+Masstree || kohler/masstree-beta || C++/autotools || Pflicht, sofern Build stabil
+B+-Baum || habedi/bptree als leichter Primärpfad; embedded2016/bplus-tree als Alternativpfad || C/Make || Pflicht
+Hash || absl::flat_hash_map und optional node_hash_map || C++/Bazel or CMake package integration || Pflicht
+START || Papiernachbar ohne fest zugesagtes öffentliches Artefakt || — || Literaturbaseline
+CSS-tree / CSB+-tree / B²-tree / CoCo-trie || Papier- bzw. Konzeptnachbarn || — || Literaturbaseline
+[/TABELLE]
+
+
+[TABELLE 7]
+Achse || Pflichtwerte
+Operationen || Bulk build, exact hit, exact miss, prefix hit, prefix miss, prefix enumeration, insert, update, delete
+YCSB-inspirierte Mischungen || A (50/50), B (95/5), C (read only), D (latest), E (short ranges), F (read-modify-write) als methodische Vorlage
+Ordnungsmodus || unsortiert, lokal geordnet, lexikographisch
+Value-Modus || inline, external handle
+ISA-Modus || scalar, AVX2, AVX-512 (wenn vorhanden)
+Core-Modus || Single P, Single E, All-P, All-E, Barnard homogeneous
+Wiederholungen || 5 Läufe je Konfiguration, Rohwerte getrennt
+[/TABELLE]
+
+
+[TABELLE 8]
+Ebene || Pflichtmetriken || Werkzeug
+End-to-End || Throughput, p50/p95/p99, Build-Zeit, Prefix-Enumeration-Kosten, Bytes pro Key/Value, Fragmentierung || eigener Harness + HDR-Histogramme
+Counter lokal || cycles, instructions, branches, branch-misses, cache-misses, LLC-load-misses, dTLB-load-misses || perf stat JSON + cpu_core/* / cpu_atom/*
+Counter Barnard || dieselben Kernzähler, homogen pro Core-Gruppe || perf stat / perf record auf repräsentativen Nodes
+Memory-Access-Analyse || Cache Line Utilization, Simulated Memory Footprint, modellierte Cache-Misses || Intel Advisor MAP + Cache Simulation
+[/TABELLE]
+
+
+[TABELLE 9]
+Risiko || Gegenmaßnahme
+alte oder schwer baubare Referenzimplementierungen || früher Build-Screening-Katalog; Alternativpfad pro Baseline
+Hybrid-CPU-Zähler werden falsch aggregiert || strikte Trennung cpu_core/cpu_atom; JSON-Ausgabe aus perf
+Permutationsmatrix wird zu groß für ad-hoc Interpretation || Kernmatrix vs. Erweiterungsmatrix; Nachtläufe und Batch-Auswertung
+inline vs. external macht Vergleiche unfair || Common-Denominator- und Native-Modus strikt trennen
+[/TABELLE]

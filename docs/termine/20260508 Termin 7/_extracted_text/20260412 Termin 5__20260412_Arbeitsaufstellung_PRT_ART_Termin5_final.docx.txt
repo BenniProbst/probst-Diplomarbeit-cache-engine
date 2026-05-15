@@ -1,0 +1,50 @@
+Arbeitsaufstellung Termin 5
+PRT-ART — Forschungslandkarte zur Cache-Engine im Kontext trie-basierter Suche
+1. Konkretes Terminziel
+Für Termin 5 wird eine belastbare Forschungslandkarte erstellt, die ähnliche und angrenzende Arbeiten systematisch gruppiert. Sie soll Prof. Habich zeigen, dass PRT-ART nicht als weiterer trieartiger Index gepitcht wird, sondern als aktive Cache-Engine über trie-basierter Suche. Gleichzeitig muss klar werden, welche Teile der Literatur direkt übernommen werden können und wo der eigene Beitrag beginnt.
+2. Arbeitsblöcke
+A. Passive cache-aware Indexstrukturen
+CSS-tree, CSB+-tree, B-tree-Cache-Survey, Knotengrößenforschung, processor-conscious tuning. Ziel: Stand der Technik für Layout, Cache-Line-Nutzung und Pointerreduktion sauber abgrenzen.
+B. Adaptive trieartige Suchstrukturen
+ART, START, HOT, Masstree, B²-tree, CoCo-trie. Ziel: Seitentypen, Redirects, lokale Suchraum-Einengung, Layer-Regeln und Präfixkollabierung als Inspiration für PRT-ART ordnen.
+C. Prefetching und aktive Laufzeitanpassung
+Fractal Prefetching B+-Trees, adaptive Software-Prefetching-Arbeiten, aktuelle Prefetch-Reliability-Arbeiten. Ziel: verstehen, wann aktives Prefetching hilft, wann es schadet und wie stark Plattformeffekte sind.
+D. Gegenentwurf: cache-oblivious Denken
+Cache-oblivious B-trees als Vergleichsphilosophie. Ziel: klar machen, dass PRT-ART bewusst cache-aware und nicht cache-oblivious gedacht ist.
+E. Dresden-/Habich-Kontext
+Hardwareoptimierungen, VAMPIR und neuere Arbeiten zu Zugriffsmustern. Ziel: die eigene Richtung an der lokalen Forschungssprache und Erwartungshaltung ausrichten.
+3. Erwartete Resultate
+• Eine priorisierte Literaturmatrix mit Kernidee, Limitierung und direkter Relevanz für PRT-ART.
+• Eine klare Aussage, welche Optimierungshebel in der Literatur bereits stark belegt sind: Node-Layout, Page-Layout, Fanout, Knotengröße, Präfixkollabierung, lokale Suchraum-Einengung, Prefetching.
+• Eine ebenso klare Aussage, welche Behauptungen vorsichtig behandelt werden müssen: direkte 'Verwaltung' von Hardware-Caches, starke Eingriffe in Instruction-Cache/Programmseiten und universelle Prefetch-Regeln.
+• Ein professionalisiertes Framing der Forschungsfrage: PRT-ART ist primär eine aktive Cache-Orchestrierungsschicht und nicht bloß ein weiterer Trie.
+4. Prioritäten für die Umsetzung danach
+5. Offene Leitfragen für das Ergebnisdokument
+• Welche Literatur stützt explizit aktive, messgetriebene Plattformanpassung?
+• Welche Arbeiten kombinieren Suchstruktur und Prefetching direkt und welche nur indirekt über Layout?
+• Wo endet die Literatur bei lokaler Seitensuche und wo beginnt eine echte, externe Cache-Kontrollschicht?
+• Welche Teile der PRT-ART-Idee sind bereits Stand der Technik, welche sind neu in ihrer Kombination und welche sind forschungsriskant?
+6. Leseliste für Termin 5
+Hinweis: Termin 5 friert keine neue Architektur ein. Er professionalisiert die theoretische und empirische Begründung der bereits gesetzten Termin-1-bis-Termin-4-Linie.
+
+[TABELLE 1]
+Arbeitsziel | • Ziel dieses Termins ist nicht mehr die Grundarchitektur von PRT-ART, sondern die professionelle Einordnung der Cache-Engine in die existierende Forschung. | • Die Leitfrage lautet: Welche Teile der Literatur lösen bereits passive Cache-Awareness, welche adaptive Seitentypwahl, welche Prefetch-/Scheduling-Fragen — und wo beginnt der eigentliche Beitrag von PRT-ART?
+[/TABELLE]
+
+
+[TABELLE 2]
+Priorität || Inhalt || Begründung
+P0 || Forschungslandkarte + Gap-Statement || Ohne klare Einordnung ist der Neuheitsanspruch weich.
+P1 || Abgrenzung aktive Cache-Engine vs. passive Layoutoptimierung || Das ist die wissenschaftliche Kernschärfung.
+P2 || Übertragbare Designhebel für PRT-ART katalogisieren || Seitentypen, Redirects, Prefetch, Inline-/Handle, Kostenmodell.
+P3 || Explorative Themen markieren, aber nicht übergewichten || Code-/Instruction-Cache und aggressive Online-Umlagerung nur sauber gestützt vertreten.
+[/TABELLE]
+
+
+[TABELLE 3]
+Cluster || Pflichtlektüre || Nutzen für PRT-ART
+Passive Cache-Awareness || CSS-tree; CSB+-tree; CSB+-processor conscious; Graefe/Larson; Knotengröße || Grundlage für Layout- und Seitendesign
+Adaptive Suchstrukturen || ART; START; HOT; Masstree; B²-tree; CoCo-trie || Seitentypen, Redirects, lokale Suche
+Prefetching / Adaptation || Fractal Prefetching; Dynamic Adaptation; Fetch Me If You Can || Aktive Cache-Engine und Prefetch-Regeln
+Kontrast + lokaler Kontext || Cache-oblivious B-trees; TUD Hardware/Memory-Papers || Beitragsschärfung und Habich-kompatible Sprache
+[/TABELLE]

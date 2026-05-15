@@ -1,0 +1,41 @@
+EXPOSE DIPLOMARBEIT
+CPU-only Evaluation eines speicheralignierten Präfix-/Radix-/Trie-Hybrids für Byte-Keys
+Arbeitsfassung | Comdare Predix-Trie-ART (PRT-ART) mit stabilem 256-Fanout, Pfadkompression und Vergleich zu CPU-Baselines
+Motivation und Anschluss an die Gruppe
+Die Professur für Datenbanken der TU Dresden adressiert ausdrücklich die hardware-nahe Optimierung von Datenbanksystemen; für studentische Arbeiten ist im Themenfeld DB Systems insbesondere hardware-nahe Programmierung und Robustheit der Anfrageverarbeitung genannt. Daran knüpft die Arbeit direkt an: Ausgehend von einer experimentellen Datenbankbasis soll eine CPU-only Indexstruktur für Byte-Keys entwickelt und gegen gängige Verfahren verglichen werden. Im Fokus stehen Layout, Allokation und belastbare Evaluation moderner In-Memory-Suchpfade.
+Zielsetzung
+Ziel ist die prototypische Umsetzung des noch zu entwickelden Predix-Trie-ART (PRT-ART) Konzepts als präfixorientierten Trie-/Radix-Hybriden mit stabilem 256-Fanout-Layout. Suchmetadaten, Sucharrays und Values werden getrennt im Heap verwaltet; eindeutige Schlüsselsuffixe werden als Resteinträge pfadkomprimiert gespeichert. Der Suchpfad wird byteweise über unsigned-integer-basierte Offsetbestimmungen aufgebaut, sodass die Adressierung weitgehend über stabile Offsets statt über wiederholtes Pointer-Chasing erfolgt. Optional werden template-basierte Varianten mit key overlay Fingerprints betrachtet. Ziel der Evaluation ist zu zeigen, unter welchen Daten- und Lastprofilen PRT-ART gegenüber etablierten CPU-Methoden Vorteile oder Nachteile besitzt.
+Forschungsfragen
+Wie lässt sich ein speicheraligniertes 256-Fanout-Layout so gestalten, dass der Platzbedarf ART-artiger Knoten durch Allokation, Pfadkompression und Offsetadressierung praktisch beherrscht wird?
+In welchen Workloads ist PRT-ART B+-Baum, Hash-Index, Patricia/Radix, ART, Masstree und sortierter Binärsuche überlegen oder unterlegen?
+Welchen Einfluss haben Resteinträge, template-basierte Varianten und Fingerprints auf Latenz, Durchsatz und Speicherbedarf?
+Welche Hardwaremetriken wie LLC-/TLB-Misses, Branch-Mispredictions und Bytes pro Key erklären die Ergebnisse?
+Methodik und Evaluation
+Methodisch beginnt die Arbeit mit einer klaren CPU-only Baseline-Menge. Verglichen werden PRT-ART sowie B+-Baum, Hash-Index, sortiertes Array mit Binärsuche, Patricia/Radix, ART und Masstree. Die Evaluation variiert Datenvolumen, Keylängen, Präfixüberlappung, Trefferquote und Verteilung. Gemessen werden p50/p95/p99-Latenz, Durchsatz, Speicherverbrauch pro key/structs/sucharrays/value-arrays, Insert-Kosten und relevante Hardwarezähler. Single-Thread- und Multi-Thread-Szenarien auf derselben CPU sollen den Einfluss von Alignment, Cache-Lokalität und Offsetadressierung charakterisieren.
+Erwarteter Beitrag
+Integration von PRT-ART in die redcomponent/comdare DB samt CPU-only Benchmarkmatrix.
+Charakterisierung, wann 256-Fanout, Pfadkompression und Offsetadressierung Vorteile bringen.
+Arbeitsfassung auf Basis öffentlicher TUD/FIS-Quellen und eigener Systemskizze, Stand März 2026.
+OPTIONALER ANHANG
+Betreuungswunsch und fachlich begründete Vorschläge
+Einordnung des Vorschlags
+Mit der Liste möchte ich keine Betreuungszuordnung vorwegnehmen, sondern meine fachliche Einordnung transparent machen. Inhaltlich sehe ich die engste Anschlussstelle für die CPU- und Layoutseite bei Dr.-Ing. Johannes Pietrzyk, für die systemnahe Integration bei Dr.-Ing. Alexander Krause und für eine vertiefte Analyse der Speicherzugriffsmuster bei Dr.-Ing. Juliana Hildebrandt bzw. Lennart Schmidt M.Sc. Über Ihre Einschätzung, welche Betreuungskonstellation für dieses überarbeitete Thema innerhalb Ihrer Gruppe am sinnvollsten wäre, würde ich mich sehr freuen.
+
+[TABELLE 1]
+Systembasis | redcomponent/comdare DB; PRT-ART als prototypische Indexstruktur || Technischer Fokus | CPU-only; speicheralignierter Präfix-/Radix-/Trie-Hybrid mit stabilem 256-Fanout || Wissenschaftlicher Fokus | Vergleich mit CPU-Suchverfahren nach Latenz, Durchsatz und Speicherbedarf
+[/TABELLE]
+
+
+[TABELLE 2]
+Sehr geehrter Herr Prof. Habich, für das überarbeitete, nun CPU-zentrierte Thema würde ich mich zunächst sehr über eine Betreuung durch Sie freuen. Falls eine engere operative Betreuung innerhalb Ihrer Gruppe sinnvoller sein sollte, möchte ich mit der folgenden Liste transparent machen, welche Personen aus meiner Sicht fachlich besonders gut zu einem speicheralignierten CPU-Suchindex mit belastbarer Vergleichsevaluation passen würden.
+[/TABELLE]
+
+
+[TABELLE 3]
+Priorität || Vorschlag || Kurze Begründung
+1 || Prof. Dr.-Ing. habil. Dirk Habich || Erste Präferenz, da das Thema direkt in den von Ihnen ausgeschriebenen Bereich DB Systems mit hardware-naher Programmierung und Robustheit der Anfrageverarbeitung fällt und zugleich eng an Ihre Linie zu analytischen Datensystemen und In-Memory-Query-Processing auf moderner Hardware anknüpft.
+2 || Dr.-Ing. Johannes Pietrzyk || Aus meiner Sicht die engste fachliche Anschlussstelle für CPU-seitige Datenparallelität, SIMD, Layoutfragen und moderne In-Memory-OLAP-Engines; besonders passend durch CHORYS, TSL/TVL und Arbeiten zu data-level parallel query processing.
+3 || Dr.-Ing. Alexander Krause || Sehr passend für die prototypische Integration in die Datenbank und für systemnahe Umsetzung von Suchpfaden, Datenlayouts und Ausführungspfaden; zusätzliche Nähe über TVL/TSL, SIMD-Arbeiten und execution-nahe Forschung.
+4 || Dr.-Ing. Juliana Hildebrandt || Fachlich naheliegend, wenn der Fokus stärker auf CPU-seitige Zugriffsmuster, SIMD-GATHER bzw. partitionsbasierte Verarbeitung und die praktische Wirkung des Datenlayouts gelegt wird.
+5 || Lennart Schmidt M.Sc. || Besonders passend für die vertiefte Analyse von Speicher- und Zugriffsmustern, da die Arbeit wesentlich von Cache-Verhalten, Memory-Access-Pattern und skalierbarer Benchmarkauswertung abhängen würde.
+[/TABELLE]

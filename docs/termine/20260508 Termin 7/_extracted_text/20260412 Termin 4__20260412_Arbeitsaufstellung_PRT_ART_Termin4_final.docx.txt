@@ -1,0 +1,63 @@
+Arbeitsaufstellung Termin 4
+PRT-ART – Scope-Freeze, Implementationsprioritäten und verbindliche Abgrenzung
+Stand: Wiederholung Termin 4 / Scope-Freeze für die Diplomarbeit
+1. Finale Leitfrage und Ziel von Termin 4
+Die übergeordnete Forschungsfrage wird nun als Cache-Engine-Frage statt als reine Trie-Frage eingefroren:
+Wie stark verbessern aktive, explizite cache-aware Layout-, Seitentyp- und Value-Ablageentscheidungen die Leistung trie-basierter Suchbäume gegenüber passiven, statischen Layouts auf moderner CPU-Hardware?
+Termin 4 hat drei feste Ergebnisse:
+• die endgültige Scope-Abgrenzung inklusive Nicht-Ziele und einer einzigen Optional-Komponente,
+• eine verbindliche Priorisierung aller Implementationsblöcke,
+• klare Cut-Regeln, damit aus dem Vorhaben kein offener Werkzeugkasten wird.
+2. Prioritätsmodell
+Die Arbeit bleibt absichtlich breit im Anspruch, wird aber in der Umsetzung hart priorisiert. Nur so bleiben Literatur, Architektur und Benchmarkplan konsistent.
+3. Verbindliche Arbeitspakete
+• WP1 – Kernindex: Trie-Hülle, Redirect-Knoten, terminale Knoten, ValueHandle, Dense- und Sparse-Seiten.
+• WP2 – Cache-Engine: Seitentypwahl, Layoutwahl, Prefetch-Hinweise, Cache-related blocks, Online-Reaktion auf Laufzeitbeobachtungen.
+• WP3 – Plattformpfade: Scalar, AVX2 und AVX-512; getrennte Messung von cpu_core und cpu_atom auf Hybrid-Systemen.
+• WP4 – Baseline-Wrapper: B+-Baum, Hash, ART, HOT und Masstree in Originalfassung, soweit als Artefakt praktisch integrierbar.
+• WP5 – Benchmark-Harness: reproduzierbare Datensätze, Workloads, fünf Rohläufe, keine Mittelung der Perzentile, vollständige Artefaktablage.
+• WP6 – Permutations- und Auswertungsschicht: Kernmatrix zuerst, Vollfaktor danach als Batch-Jobs.
+4. Entscheidende Termin-4-Regeln
+• Die Cache-Engine ist explizit Teil des Systems und nicht nur eine implizite Folge von Alignment.
+• Seitentypen, Layoutwahl und Value-Ablage werden bewusst getrennt betrachtet und separat gemessen.
+• Baselines werden nicht nachimplementiert; es werden Wrapper für Originalartefakte gebaut.
+• Die Pflichtplattformen sind lokal Alder-Lake-P (P/E getrennt) und Barnard/Sapphire Rapids.
+• Für Entwicklung und Debugging wird mit einer Pflichtmatrix gearbeitet; der Vollfaktor bleibt Pflichtziel der Batch-Läufe.
+5. Cut-Regeln
+Falls die Implementierung unter Zeitdruck gerät, werden nicht wahllos Features gestrichen. Stattdessen gilt folgende Reihenfolge:
+• Zuerst werden reine Feinkalibrierungen, zusätzliche Overlays und große Permutationsblöcke nach hinten verschoben.
+• Danach bleiben P0 und P1 unantastbar; P2 darf in minimaler Form starten und später vertieft werden.
+• Der einzige echte optionale Block bleibt multiples multithreaded Schreiben.
+• Die Arbeit gilt nur dann als erfolgreich, wenn PRT-ART plus Cache-Engine v1 auf beiden Pflichtplattformen gegen die Baselines messbar und reproduzierbar ausgewertet werden kann.
+6. Übergang zur Implementierung
+Mit Termin 4 ist der Ideenraum geschlossen. Der nächste Schritt ist nicht weitere Konzeptsuche, sondern die Umsetzung in klarer Reihenfolge:
+• PRT-ART-Kern auf Plain-Byte-Keys lauffähig machen,
+• Cache-Engine v1 und Messpfade anschließen,
+• lokale Pflichtmatrix validieren,
+• Barnard-/AVX-512-Pfade und Batch-Auswertung ergänzen,
+• erst danach Vollfaktor- und Overlay-Sweeps anwerfen.
+Rahmenquellen
+• Intel Core i7-1270P Spezifikation: 12 Kerne, 4 P-Cores, 8 E-Cores, 18 MB Smart Cache, AVX2.
+• ZIH Barnard Hardwareübersicht: 2× Xeon Platinum 8470, 104 Kerne pro Node, RHEL 9.6.
+• perf-stat Hybrid Support: getrennte cpu_core/cpu_atom-PMUs.
+• Intel Advisor MAP/Cache-Simulation: Default 64-Byte Cache-Line; Modi utilization und footprint.
+• GCC Function Multiversioning und __builtin_prefetch als technischer Rahmen für ISA- und Prefetch-Pfade.
+
+[TABELLE 1]
+Arbeitsauftrag von Termin 4 | Der Gesamtumfang wird eingefroren. Termin 4 entscheidet nicht mehr, welche Ideen zusätzlich möglich wären, sondern welche Komponenten in welcher Reihenfolge verbindlich implementiert, gemessen und gegenüber Baselines ausgewertet werden.
+[/TABELLE]
+
+
+[TABELLE 2]
+Priorität || Block || Inhalt || Status
+P0 || Erster lauffähiger Kern || Reproduzierbarer Datenpfad, Plain-Byte-Keys, Trie-Hülle, Redirect-Knoten, Dense-ART-Seite, Sparse-HOT-Seite, terminale Knoten mit ValueHandle, externer Payload, Scalar-Pfad, lokaler perf-Messpfad. || Pflicht
+P1 || Forschungs-Kern || Cache-Engine v1, START-Multilevel-Seiten, Inline-vs-Handle-Umschaltung, drei Ordnungsmodi, getrennte P-/E-Core-Messung, Barnard-AVX-512-Pfad, Wrapper für Baselines. || Pflicht
+P2 || Ausbau im Kernscope || B²-artige Decision-/Span-Suche, PRT-Custom-Seite, Online-Umlagerung/Switching von Suchseiten, Page-/Pool-Affinity, Code-/Daten-Prefetch-Regeln, erste Kostenmodelle je Seitentyp und ISA. || Pflicht
+P3 || Späterer Pflichtblock || Fingerprint-/Hash-Overlays, volle Permutationsläufe, Seitengrößen-Sweeps, verfeinerte Rebuild-Regeln, daten- und plattformabhängige Feinkalibrierung der Cache-Engine. || Pflicht, aber nachrangig
+OPT || Einzige Optional-Komponente || Multiples multithreaded Schreiben mit mehreren gleichzeitigen Writer-Pfaden. || Optional
+[/TABELLE]
+
+
+[TABELLE 3]
+Was explizit NICHT mehr offen bleibt | GPU, vollständige DBMS-Integration, generische SIMD-Forschung über Suchbäume hinaus und Value-Deduplikationsketten als eigener Schwerpunkt bleiben außerhalb des Kernbeitrags. Diese Themen dürfen die Cache-Engine-Frage nicht verdrängen.
+[/TABELLE]

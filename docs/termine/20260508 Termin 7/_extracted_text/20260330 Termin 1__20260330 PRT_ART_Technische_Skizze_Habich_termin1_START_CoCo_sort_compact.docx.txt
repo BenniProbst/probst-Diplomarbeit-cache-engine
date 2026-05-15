@@ -1,0 +1,65 @@
+Verfeinerte technische Skizze: PRT-ART
+CPU-orientierte, präfixkomprimierte Byte-Key-Indexstruktur mit CoCo-trie-inspiriertem Key-Handling, ART-/START-/HOT-inspirierten Suchseiten, cache-line-aware Node-Encoding und externer Payload-Ablage in Präfix-orientierten Radix/Patricia/Trie Bäumen nach Masstree design und ART Anpassung
+Stand: 29.03.2026
+1. Zielbild und präzise Abgrenzung
+PRT-ART wird nicht als eigener Ersatz für bestehende Strukturen beschrieben. Die Architektur soll vielmehr eine gezielte Kombination komplementärer Prinzipien sein: CoCo-trie-artige Präfixkollabierung für das Key-Handling, ART-artige Direktseiten für dichte Verzweigungen, START-inspirierte mehrbyteige lokale Seiten, HOT-inspirierte Patricia-/Mehrbit-Seiten für sparse Suchräume, Masstree-inspirierte Fences und Subbaumgrenzen sowie cache-line-aware Layoutideen aus CSS-tree, CSB+-tree und B²-tree.
+Neuheitsanspruch. Die Arbeit behauptet nicht, einen völlig neuen Grundtyp erfunden zu haben. Der Beitrag liegt in der Kombination aus hot/cold split, lokaler Seitenauswahl, präfixkomprimierter Navigation, cache-line-orientierter Kodierung, expliziten Value-Referenzen und einer policy-basierten, compile-time wartbaren Zusammensetzung bekannter Einzelprinzipien. Wissenschaftlich relevant wird dies erst durch die experimentelle Klärung, wann diese Kombination auf moderner CPU-Hardware gegenüber starken Baselines gewinnt.
+2. Literaturbasierte Zerlegung der Bausteine
+Status für Termin 1. Die folgende Tabelle markiert bewusst nur die Herkunft der Prinzipien. Welche Seitentypen PRT-ART am Ende wirklich fest übernimmt, wird erst in Termin 2 eingefroren.
+3. Revidierte Architektur von PRT-ART
+3.1 Globale Trie-Hülle und Redirect-Knoten. Die äußere Struktur bleibt präfixorientiert und ordnungserhaltend. Eindeutige Restpfade werden nicht Ebene für Ebene materialisiert, sondern in Redirect-Knoten zusammengefasst. Diese Knoten speichern einen komprimierten Reststring und optional eine terminale Value-Referenz. Ergänzend kann dies am Beispiel „hallo“ / „halter“ illustriert werden: Der gemeinsame Redirect-Pfad „hal“ zeigt nicht direkt auf die Payload, sondern auf den nächsten Knoten beziehungsweise die nächste lokale Suchseite. Diese Redirect-Ziele sollen bevorzugt so alloziert werden, dass sie auf möglichst wenige Speicherseiten und idealerweise in eine oder wenige Cache-Lines kondensiert und bewusst nach Performance oder Speicherdichte Priorisierung im memory aligment organisiert werden.
+3.2 Lokale Suchseiten statt eines universellen Knotentyps. Unterhalb der Trie-Hülle werden keine starren Einheitsknoten erzwungen. Vorgesehen ist eine kleine Familie lokaler Seitentypen: (i) direkte ART-artige Byte-Seiten für dichte lokale Übergänge, (ii) START-inspirierte mehrbyteige Seiten für lokal zusammenfassbare Ebenen, (iii) HOT-inspirierte Patricia-/Mehrbit-Seiten für sparse lokale Suchräume, (iv) cache-line-ausgerichtete Custom Nodes mit kompakter Metadatenkodierung. Welche Darstellung lokal verwendet wird, ist selbst Teil der Forschungsfrage und soll über experimentell begründete Umschaltregeln entschieden werden.
+3.3 Terminale Knoten und externe Payload-Ablage. Ein terminaler Knoten hält eine explizite Value-Referenz auf die eigentliche Information im Speicher. Die Nutzdaten werden nicht in den heißen Suchseiten mitgeführt. Dadurch bleibt die Navigationsstruktur klein und vorhersagbar, während Payload in getrennten Arenen, Pools oder Allokator-spezifischen Bereichen liegen kann.
+3.4 Ordnungs- und Sortierpolitik. Die Präfixstruktur erlaubt Ordnung, garantiert sie aber nicht in jedem Betriebsmodus automatisch. Standardmäßig soll die Enumeration-Reihenfolge offen bleiben, solange die API keine lexikographische Ordnung verlangt. Als Policy-Achse sind drei Modi vorgesehen: kein zusätzliches Sortieren, lokales Sortieren pro Seite/Knoten und ein expliziter lexikographischer Modus für Range-/Enumerationsoperationen. Die konkrete Wahl des Sortieralgorithmus – jeweils auf std::vector-ähnlichen Containern – bleibt eine spätere Experimentachse und wird für Termin 1 noch nicht fest eingefroren.
+3.5 Modulare Policy-Layer über dem Kernindex. PRT-ART soll längerfristig framework-artig aufgebaut werden. Dazu gehören eine wählbare Schlüsselrepräsentation (plain bytes als Pflichtbaseline, optionale Fingerprint-/Hash-Layer erst nachgelagert), eine compile-time gewählte Seitenfamilie mit runtime-Scheduler, sowie konfigurierbare Inline-/Value-Strategien. Diese Modularität ist Teil der Vision, aber nicht der gesamte Kernbeitrag der ersten Architekturiteration.
+3.6 Subbaumgrenzen, Fences und spätere Parallelität. Masstree dient nicht als direkte Bauanleitung für B+-Blätter, sondern als Referenz für Fences, Subbaumgrenzen und Erstellungsregeln lokaler Suchräume. Die ursprüngliche Masstree-Concurrency ist im jetzigen Scope kein Kernbeitrag. Wenn Parallelität später vertieft wird, dann eher über eine zentrale Versions- oder Änderungsverwaltung mit Copy-on-Change als über umfangreiche Metadaten je Knoten.
+Arbeitsmodell der Bausteine. Für Termin 2 sollten diese Bausteine mit expliziten Invarianten eingefroren werden.
+4. Operationen, Fokus und Hypothesen
+Exact Lookup. Verbraucht Bytes des Keys entlang der Trie-Hülle, prüft Redirect-Knoten direkt und wählt lokal die passende Suchseite, bis eine terminale Value-Referenz erreicht oder verworfen wird.
+Prefix Lookup / Enumeration. Nutzt dieselbe Navigation, traversiert nach dem erreichten Präfix aber nur den relevanten Unterraum. Die lexikographische Ordnung ist aus der Präfixstruktur ableitbar, muss aber nur dann garantiert werden, wenn die API dies explizit fordert.
+Insert / Split. Spaltet Redirect-Knoten an der ersten Divergenz und materialisiert nur dort eine lokale Suchseite, wo aus einem eindeutigen Restpfad ein echter Verzweigungspunkt wird.
+Arbeitshypothese zur Ordnungsachse. Nicht jede Sortierpolitik wird denselben Workloads helfen; unsortierte Modi können punktuelle Suchen beschleunigen, während lexikographische Modi Range-/Enumerationsfunktionen erleichtern.
+Primäre Arbeitshypothese. PRT-ART gewinnt nicht über asymptotische Neuheit, sondern über bessere Mikroarchitektur-Eigenschaften: höhere Cache-Line-Utilization, weniger LLC-/dTLB-Misses, geringere Branch-Kosten und kleinere heiße Suchpfade für Exact Lookup, Prefix Lookup und Prefix Enumeration.
+Nicht Kernbeitrag in der jetzigen Fassung. GPU (wird auch nicht geplant), vollständige SIMD-Arbeit (In Planung), IAM-/Engine-Integration, generische Multi-Writer-Concurrency, copy on write und breite Optimizer-Fragen bleiben zunächst außerhalb des Kernscopes (sind aber in Planung).
+5. Was für Termin 2 eingefroren werden sollte
+exakte Familie lokaler Seitentypen (dense Byte Page, START-inspirierte Multi-Byte-Variante, sparse Patricia Page, optionale weitere Custom-Encoding-Variante),
+harte Invarianten für Redirect-Knoten, terminale Knoten und Value-Referenzen,
+Kriterien bzw. experimentelle Schwellen für den Wechsel zwischen Seitentypen,
+API-Entscheidung für Ordnungsmodi: unsortiert, lokal sortiert, global/lexikographisch, absteigend/aufsteigend/custom,
+saubere Trennung zwischen Kernbeitrag (plain byte keys, single-threaded Kern, read scaling) und optionalen Erweiterungen (Fingerprint-Layer, weitergehende Parallelität, SIMD),
+Benchmark-Kern mit Exact Lookup, fehlgeschlagenem Lookup, Prefix Lookup, Prefix Enumeration, Insert/Delete und hardwarebezogenen Counters.
+Literaturbasis (Auswahl, passend zu Termin 1)
+Belazzougui et al.: CoCo-trie – Data-aware Compression and Indexing of Strings.
+Leis / Kemper / Neumann: The Adaptive Radix Tree (ART).
+Fent et al.: START – Self-Tuning Adaptive Radix Tree.
+Binna et al.: HOT – Height Optimized Trie.
+Mao / Kohler / Morris: Masstree – Cache Craftiness for Fast Multicore Key-Value Storage.
+Rao / Ross: Cache Conscious Indexing for Decision-Support in Main Memory (CSS-tree).
+Rao / Ross: Making B+-Trees Cache Conscious in Main Memory (CSB+-tree).
+Schmeißer et al.: B²-Tree – Page-Based String Indexing in Concurrent Environments.
+
+[TABELLE 1]
+Leitidee des Predix-Trie-ART || Der Baum ist ausschließlich Navigationsstruktur. Die eigentlichen Daten liegen außerhalb der Suchpfade in getrennten Speicherarenen. Ein terminaler Knoten hält eine explizit persistierte Value-Referenz; die Navigationskette lautet damit: Key → Redirect-/Suchseiten → Pointer → Data.
+[/TABELLE]
+
+
+[TABELLE 2]
+Quelle || Herausstechendes Prinzip || Geplante Rolle in PRT-ART || Status
+CoCo-trie || Data-aware Collapse geeigneter Subtries zu kompakten Macro-Nodes. || Vorbild für Redirect-Knoten und systematisches Zusammenfassen eindeutiger Restpfade von Byte-Keys. || Konzeptioneller Nachbar
+ART || Ordnungserhaltende adaptive Radixnavigation mit Node4/16/48/256 und Pfadkompression. || Dichte lokale Byte-Seiten für direkte Präfixnavigation. || Direkte Abgrenzung
+START || ART mit multilevel nodes, Kostenmodell und Optimierer. || Option für mehrbyteige lokale Seiten und für spätere Schwellen-/Kostenmodelle. || Direkte Abgrenzung
+HOT / Patricia || Varying span, diskriminierende Bits, sparse partial keys und hohe Fanouts. || Sparse Patricia-/Mehrbit-Seiten, wenn direkte Byte-Seiten lokal zu leer oder zu hoch würden. || Direkte Abgrenzung
+Masstree || Trie aus lokalen Suchbäumen, klare Fences, Layer-Regeln und getrange-Semantik. || Vorbild für Subbaumgrenzen, Erstellungsregeln und spätere Range-/Enumeration-Semantik. || Direkte Abgrenzung
+CSS-tree / CSB+-tree || Cache-line-bewusstes Layout, pointerarme bzw. zusammenhängende Kindanordnung. || Custom Node-Encoding und Pool-Layout der heißen Navigationsstrukturen. || Direkte Abgrenzung
+B²-tree || Page-lokale Decision-/Span-Suche innerhalb einer B-tree page. || Bestätigung, dass page-lokale Suchräume und Span-Logik algorithmisch sinnvoll sind. || Direkte Abgrenzung
+[/TABELLE]
+
+
+[TABELLE 3]
+Baustein || Primäre Aufgabe || Hardware-/Layoutbezug
+Redirect-Knoten || Komprimierter eindeutiger Restpfad; optional terminal. || Verhindert unnötige Zwischenknoten und reduziert Pointer-Chasing.
+Dense Byte Page || Direkte lokale Übergänge für dichte Branching-Situationen. || Wenige Rechnungen, hohe Vorhersagbarkeit, cache-line-nahe Metadaten.
+Dense Multi-Byte Page (START-inspiriert) || Lokales Zusammenfassen mehrerer Byte-Ebenen. || Reduziert Höhe, kann aber größere und komplexere Seiten verursachen.
+Sparse Patricia Page || Ordnungserhaltende Suche über diskriminierende Bytes/Bits. || Weniger Leerlauf und geringere Höhe in sparsamen Teilräumen.
+Value-Referenz || Finaler Verweis auf Payload außerhalb des Baums. || Hot/cold split: Suchpfad bleibt klein, Daten liegen separat oder inline (Policy)
+[/TABELLE]

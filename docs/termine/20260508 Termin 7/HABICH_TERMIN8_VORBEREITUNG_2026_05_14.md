@@ -172,3 +172,118 @@ nur fuer die ZIH-Cluster-Laeufe.)
 - Manuskript-Skelett: `thesis/main.tex` (+ chapters/01-07 + A1/A2 + literatur.bib)
 - Naming-Konventionen: `docs/NAMING_CONVENTIONS.md`
 - Sessions-Verlauf: `docs/sessions/` (V8-V15 Anker + Final, je 2 pro Sprint)
+
+---
+
+## 6. NACHTRAG (2026-05-15): Sprint V16-V31 (16 weitere Sprints)
+
+Nach V15 wurden weitere 16 Sprints ausgefuehrt. Detail-Snapshot fuer
+Termin 8 in den 3 dedizierten Dokumenten unter
+`docs/termine/20260515 Termin 8/`:
+- `Arbeitsplan_Termin8.md`
+- `Arbeitsergebnis_Termin8.md`
+- `Praesentation_Termin8.md`
+
+### 6.1 Sprint-Block V16-V18 (Codegen-Templates)
+| Sprint | Schwerpunkt |
+|---|---|
+| V16 | Build-Verifikation aller 3 Repos + thesis/main.tex pdflatex Build + ART (P01) Module-Body Vorlage |
+| V17 | Codegen Template-Substitution + 7 weitere Tier-1 SOTA-Module-Body-Templates |
+| V18 | Codegen Multi-Template-Path (cache-engine + prt-art) + prtart_body.hpp.template |
+
+### 6.2 Sprint-Block V19-V22 (Profile-Stack + Mess-Pipeline)
+| Sprint | Schwerpunkt |
+|---|---|
+| V19 | algorithm_profiles XML-Schema +`<expected_workload>` (V11.2 ueberschreiben) + Tests |
+| V20 | PermutationResult.workload_used Field + ResultAggregator CSV/JSON +Spalte |
+| V21 | Sample-Mess-Daten-Generator + thesis chapter 06 Sample-Diagramm |
+| V22 | diagram_generator plot_by_workload + End-to-End Sample-Pipeline-Test + thesis pdflatex Re-Build |
+
+### 6.3 Sprint-Block V23-V24 (cache-engine Layout-Refactoring)
+| Sprint | Schwerpunkt |
+|---|---|
+| V23.A | Cleanup (build-Dirs, .gitignore, CMakePresets) |
+| V23.B | apps/cache_engine_builder/ extrahieren |
+| V23.C | libs/common/{succinct,serialization,platform,measurement} |
+| V23.D | libs/domain/ — initial DEFERRED, ueber V30 nachgeholt |
+| V23.E | prt_art/-Subsumption (libs/deprecated/prt_art_legacy/) |
+| V23.F | test_infra + adapters + Final-Verifikation |
+| V24.A-E | prt-art + Diplomarbeit/Code Cleanup + 3 PROJECT_LAYER_MAPs Update |
+
+### 6.4 Sprint-Block V25-V29 (Profile-Stack-Erweiterung + Allokator-Override)
+| Sprint | Schwerpunkt |
+|---|---|
+| V25.B | `<expected_workload>`-Tag fuer alle 30 SOTA-Profile |
+| V25.C | adapters/ Skelette in cache-engine (11 SOTA INTERFACE-Libs) |
+| V26.A | 10 Allokator-Profile A01-A20 mit Workload-Tag |
+| V26.B | 10 Allokator-Adapter-Skelette |
+| V26.C | prt-art codegen/templates/ Erweiterung |
+| V27 | PROJECT_LAYER_MAP-Updates in 3 Repos (V19-V27 Delta-Kapitel) |
+| V28 | thesis chapter 02 +SOTA-Profile-Tabellen (30 SOTA + 10 Allokator) |
+| V29 | ExperimentDriver Allokator-Override (`<allocator_override>`-Tag) |
+
+### 6.5 Sprint-Block V30 (libs/-Migration vollstaendig)
+**User-Direktive 2026-05-14:** Option C+ = ohne `domain/`-Zwischenebene.
+
+| Sprint | Migration | Tests |
+|---|---|---|
+| V30.D.1 | `experiment/` → `libs/execution_engine/` | 31/31 |
+| V30.D.2 | `search_engine/` → `libs/search_engine/` | configure OK |
+| V30.D.3 | `engine_choice/` → `libs/common/config/` + ALIAS comdare::common::config | configure OK |
+| V30.D.4+D.5 | `cache_engine/` → `libs/cache_engine/` (134 .hpp + 7 .cpp + 22 Builder-Subs) | 31/31 |
+
+**Top-Level cache-engine:** 8 → 5 Verzeichnisse. **9 hardcodierte Pfade** aktualisiert.
+
+### 6.6 Sprint-Block V31 (Adapter-Inhalte + P27 + NOTICE Architekt-Direktive II)
+
+**User-Direktive 2026-05-14 (in NOTICE verankert):**
+> "Da wir alle Algorithmus-Bestandteile zerschneiden, entsteht fuer alle
+> Permutations-Achsen ein neues Werk. Das gilt fuer alle Lizenztypen.
+> Repos ohne Lizenztypen haben nur ein formales copyright."
+→ GPL-3 (P04, P07), LGPL (P29), no-LICENSE (P06, P25, P30, A03) **freigegeben**.
+
+| Sprint | Inhalt | Tests |
+|---|---|---|
+| V31-PRE | Lizenz-Audit aller 22 ext/-Repos (`LICENSE_AUDIT_EXT.md`) | n/a |
+| V31.A | NOTICE +Architekt-Direktive II 2026-05-14 | n/a |
+| V31.K1 | P01-ART unodb-Adapter (Pilot, Apache-2.0) | 1 |
+| V31.K2 | A04-mimalloc-Adapter (Pilot, MIT) + Bug-Fix Fallback | 2 |
+| V31.K3 | 11 SOTA-Adapter (P02-P30) | 11 |
+| V31.K4 | 9 Allokator-Adapter (A01-A20) | 9 |
+| V31.K5 | P27 hp_soft.py → C++23-Port (`tools/p27_bundle_finder/`) | n/a (CLI) |
+| V31.K6 | P27 Runtime-Skelett (im prt-art Repo, schon vorhanden) | 5 (existed) |
+| V31.F | Smoke-Test-Suite | **23 gruen** |
+| V31.I | thesis chapter 04 +V25-V31 + Habich-Briefing-Refresh | 24 S PDF |
+
+### 6.7 P27-Mail-Antwort hp-soft.zip (2026-05-14)
+
+Boris Grot + Youhui Zhang lieferten **hp-soft.zip** (1981 B):
+- `hp_soft.py` (3751 B): Build-Time Call-Graph-Analyse via objdump
+- `readme.txt` (436 B): Input-Spec
+- **User-Hinweis:** "Mehr kommt nicht" → keine Folge-Mails
+
+Was es leistet: identifiziert Funktionen mit Subtree-Footprint > Threshold (240KB)
+als "potential entry points of Bundles" fuer Hierarchical-Bundle-Prefetcher.
+
+### 6.8 Stand-Snapshot 2026-05-15 (Termin 8)
+
+| Repo | HEAD | Push |
+|------|------|------|
+| comdare-cache-engine | `16176ee` (V31.F) | OK |
+| comdare-prt-art | `1a36ab4` (Pin V31.F) | OK |
+| Diplomarbeit/Code | `75e92d8` (Master-Plan + V31-Final) | OK |
+
+- ~180 Tests gruen ueber alle 3 Repos
+- thesis/main.pdf 24 Seiten
+- 22 V31-Adapter mit `COMDARE_HAVE_<X>=OFF` default
+- 1800 deklarierte Permutationen (30 × 10 × 6)
+- libs/-Layout konsolidiert
+- NOTICE Architekt-Direktive II
+- Master-Plan `docs/MASTERPLAN_KONSOLIDIERUNG_TERMINE.md` (10 Phasen K-A bis K-J fuer docs/-Konsolidierung)
+
+### 6.9 Querverweis
+
+- Termin-8-Trio: `docs/termine/20260515 Termin 8/`
+- Master-Plan: `docs/MASTERPLAN_KONSOLIDIERUNG_TERMINE.md`
+- Fortschrittsdoku V30+V31: `docs/sessions/20260514-4600-fortschrittsdokumentation-v30-v31.md`
+- Briefing-Refresh V19-V31: `docs/sessions/20260514-4500-habich-termin-8-briefing-refresh-v19-v31.md`

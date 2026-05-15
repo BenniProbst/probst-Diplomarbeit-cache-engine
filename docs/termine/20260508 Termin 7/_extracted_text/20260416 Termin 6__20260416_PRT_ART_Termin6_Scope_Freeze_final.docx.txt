@@ -1,0 +1,61 @@
+PRT-ART Termin 6 · Scope-Freeze
+Architekturen, Benchmarks und Messalgorithmen zur Verifikation der automatischen Cache-Engine
+Leitfrage. Die Cache-Engine wird über Architektur-Extrema verifiziert. Sie ist nur dann erfolgreich, wenn sie auf deutlich unterschiedlichen Plattformen automatisch andere, aber konsistent bessere Seitentyp-, Layout-, Prefetch- und Value-Ablage-Entscheidungen hervorbringt als ein passives, statisches Layout.
+1. Pflichtplattformen und ihre Rolle
+Bedingt: Der ältere Intel-Mac-mini wird erst nach exakter CPU-/ISA-Erkennung in die Pflichtmatrix aufgenommen. Optionaler Serverzusatz: Capella (AMD EPYC 9334, 8 NUMA-Domains) als AMD-Servergegenpol zu Barnard.
+2. Benchmark- und Kalibrierungsfamilien
+3. Messalgorithmen und Werkzeugkette
+4. Verifikationslogik und Erfolgskriterien
+• Modus 1: passiv/statisch – feste Seitentypen und feste Schwellen ohne Plattformkalibrierung.
+• Modus 2: Warm-up-kalibriert – einmalige Mikrobenchmarks bei der ersten Instanz; daraus folgen feste Plattformregeln.
+• Modus 3: online adaptiv – Warm-up plus laufende Rekalibrierung/Umschaltung bei veränderten Zugriffsmustern.
+• Eine Plattform gilt als erfolgreich verifiziert, wenn die Cache-Engine auf derselben Hardware konsistent bessere Entscheidungen erzeugt als der statische Modus und die Verbesserungen gleichzeitig in End-to-End-Latenz sowie in Miss-/CLU-/Footprint-Metriken sichtbar werden.
+• Barnard und Grace Hopper sind Pflicht, weil dort Server-x86 gegen Arm-SVE2 und LPDDR5X/hohe Bandbreite gestellt werden; Capella bleibt der spannendste optionale AMD-Serverzusatz.
+5. Termin-6-Nichtziele
+• Keine GPU-Kerneloptimierung oder Nutzung; auf Grace Hopper wird für Termin 6 der CPU-/Speicherpfad verifiziert.
+• Keine erzwungene Neuimplementierung fremder Algorithmen; Baselines werden über Originalprojekte und Wrapper angebunden.
+• Kein Multiwriter als Pflichtkern; Schreibparallelität bleibt nachgelagert.
+• Keine Volltheorie für den Instruction Cache als eigener Forschungspfad; der Schwerpunkt bleibt auf Datenpfad, Seitentypwahl, Prefetch und Layout.
+6. Quellenbasis (Auszug)
+• Barnard / Grace Hopper / Capella / perf / PAPI / PIKA: ZIH HPC Compendium.
+• VisionFive 2: StarFive / RVSpace Dokumentation.
+• Raspberry Pi 5: offizielle Raspberry-Pi-Ankündigung und Arm Cortex-A76 Produktseite.
+• Apple M1 Mac mini und Apple-Silicon-Optimierungsdokumentation: Apple Support / Apple Developer.
+• ODROID-H4 Ultra: Hardkernel Spezifikationsseite.
+• Intel Advisor MAP/Cache-Simulation und Intel CPU-Spezifikationen.
+• AMD Ryzen 9 9950X3D / 9950X3D2 Produktseiten.
+• Google Benchmark und YCSB als Benchmark-Vorlagen.
+
+[TABELLE 1]
+Plattform || Klasse / ISA || Wichtiger Hardwarepunkt || Rolle für Termin 6 || Messpfad
+VisionFive 2 || RISC-V RV64GC · scalar || quad-core JH7110, 2 MB L2, LPDDR4 || skalare Untergrenze ohne breite Server-/Desktop-SIMD || Linux perf + Benchmark-Harness
+Raspberry Pi 5 || Arm Cortex-A76 · arm_neon || 4 Kerne, 512 KB L2 je Kern, 2 MB L3 || kleine Arm-Cache-Hierarchie und Embedded-Latenzpfad || Linux perf + Benchmark-Harness
+Mac mini M1 || Apple arm64 · arm_neon/Apple SIMD || 8 Kerne, 4P+4E, Apple-Silicon Scheduling || Apple-Silicon-Pfad und asymmetrische Cores unter macOS, Process pinning || Instruments / Time Profiler + eigener Harness
+ODROID-H4 Ultra || x86 E-core-only · x86_avx2 || Intel N305, 8C/8T, single-channel DDR5-4800 || x86 ohne P-Cores; AVX2 auf kleiner Cache-/Memory-Basis || Linux perf + Benchmark-Harness
+i7-1270P || x86 Hybrid · x86_avx2 || 4P+8E, 18 MB Smart Cache || lokaler Hybrid-Hauptpfad; cpu_core/cpu_atom getrennt, Process pinning || perf stat/record + Intel Advisor
+i9-14900KS || x86 Hybrid Desktop · x86_avx2 || 8P+16E, DDR5-5600, 36 MB Smart Cache || großer Intel-Desktoppfad ohne AVX-512 || perf + Advisor + optional MLC
+Ryzen 9 9950X3D2 || x86 Zen 5 + 3D V-Cache · x86_avx512 || 16C/32T, 192 MB L3, DDR5-5600 || großer AMD-Desktoppfad mit massivem LLC || perf + PAPI/Benchmark-Harness
+Barnard || Intel Sapphire Rapids · x86_avx512 || 2× Xeon 8470, DDR5-4800, AVX-512/AMX || Server-x86-Pflichtplattform || perf + PAPI + Advisor auf CPU-Pfaden
+Grace Hopper GH200 || Arm Server · arm_sve2 || 72 Neoverse V2, 480 GB LPDDR5X, 900 GB/s C2C || Arm-Server-Pflichtplattform mit SVE2 und hoher Speicherbandbreite || perf + PAPI; CPU/Speicherpfad
+[/TABELLE]
+
+
+[TABELLE 2]
+Familie || Pflichttests || Zielgröße || Nutzen für die Cache-Engine
+Kalibrierung || Working-set staircase; stride sweep; dependent pointer chase; prefetch-distance sweep; TLB/page sweep || L1/L2/L3/DRAM-Knicke, Seiten- und TLB-Kosten || liefert Grundwahrheiten für Schwellen, Prefetch und Poolwahl
+Seitentypen || Dense page; START-style multibyte page; sparse HOT-page; redirect path; inline vs handle value || lokale Latenz, CLU, Footprint, Miss-Verhalten || entscheidet Seitentyp- und Value-Policy
+PRT-ART Suche || exact hit/miss; prefix hit/miss; prefix enumeration; sequential lex-scan || End-to-End-Latenz, Durchsatz, Suchpfadlänge || verifiziert aktive statt passive Cache-Awareness
+Mutation || bulk build; insert; update; delete; rebuild / consolidation || Reorganisations- und Nachkalibrierungskosten || zeigt, ob Online-Adaption tragfähig ist
+Mischlasten || YCSB-inspirierte A/B/C/E/F-Profile über festen eigenen Harness || read-mostly, read-only, scan-lastig, read-modify-write || prüft Robustheit gegenüber realistischeren Lastprofilen
+[/TABELLE]
+
+
+[TABELLE 3]
+Plattformklasse || Primärwerkzeug || Ergänzung || Pflichtmetriken
+Linux allgemein || perf stat || perf record/report für Hotspots || cycles, instructions, branches, branch-misses, cache-misses, dTLB-misses, wall time
+Intel-Hybrid lokal || perf mit cpu_core/* und cpu_atom/* getrennt || Intel Advisor MAP/CLU/Footprint || Miss-Verhalten getrennt nach P- und E-Cores; CLU und Footprint
+Intel-Server || perf + PAPI || Advisor auf CPU-Pfaden; optional Intel MLC lokal || LLC/Memory-Nähe, Server-AVX-512-Pfade, Vergleich zu lokaler Intel-Plattform
+AMD x86 || perf + PAPI || eigener ISA-/working-set Sweep || LLC-Ausnutzung, 3D-V-Cache-Effekt, AVX-512-Pfad
+macOS / Apple Silicon || Instruments / Time Profiler || eigener Harness mit Run-Logs und Systemdaten || CPU-Zeit, Verteilung P/E, End-to-End-Latenz; keine AVX-Annahmen
+ZIH allgemein || PAPI + perf || PIKA nur falls Monitoring nicht deaktiviert ist || Rohcounter je Job; exklusive Messjobs mit no_monitoring für eigene Counters
+[/TABELLE]

@@ -1,0 +1,68 @@
+Arbeitsaufstellung Termin 2
+PRT-ART | cache-line-aware Entwurf, Feature-Katalog und Architektur-Freeze für den Wiederholungstermin
+1. Festgezogene Leitentscheidungen
+• PRT-ART bleibt eine globale Trie-Hülle mit CoCo-trie-artiger Redirect-Kompaktion. Der Baum ist die Wegbeschreibung zur Information, nicht deren primärer Speicherort.
+• Der Kernbeitrag liegt in expliziter Cache-Awareness: lokale Seitentypen, Pooling, Ausrichtung, Reduktion berührter Cache-Lines und minimiertes Pointer-Chasing.
+• Ordnung und Darstellung werden getrennt betrachtet: rohe Byte-Keys bleiben der Standardpfad; die interne Seitencodierung darf variieren, solange die Ordnungsrelation erhalten bleibt.
+• Termin 2 friert den Kern auf wenige Familien ein. Framework-Ideen wie Fingerprint-Overlays, Value-Dedup-Ketten, zusätzliche Sortieralgorithmen oder Multi-Writer-Concurrency bleiben explizit nachgelagert.
+2. Literaturbasierter Feature-Katalog
+Die Tabelle trennt zwischen übernommener Kernidee, bewusst verschobenen Erweiterungen und reinen Referenzprinzipien. Sie bildet die direkte Entscheidungsgrundlage für Termin 2.
+3. Für Termin 2 einzufrierende Architekturachsen
+• Seitentypenfamilie: fünf logische Seitentypen werden vorbereitet – Redirect-Page, Dense-Byte-Page (ART-artig), Extended Dense Page (START-artig), Sparse Patricia Page (HOT-artig) und PRT-Custom-Cache-Page mit B²-artiger Suchraum-Einengung.
+• Value-Modell: ein Handle-Modell mit Umschaltung zwischen Inline-Value und externer Value-Referenz wird fest eingeplant; Value-Dedup-/ChainRef bleibt vorerst Erweiterung.
+• Ordnungsmodus: Default ohne garantierte Enumerationsreihenfolge; lokal geordnete Page; expliziter lexikographischer Modus für Range/Enumeration. Konkrete Sortieralgorithmen sind noch keine Kernentscheidung.
+• Kindadressierung: Tendenz zu pool-relativen Handles mit möglichst wenig rohen Pointern. Der finale Value-Zugriff darf jedoch über eine explizite Referenz erfolgen.
+• Hardwareprofil: keine statischen Architekturannahmen als allgemeine Regel. Stattdessen Hardware-Discovery plus anfänglicher Referenzpfad für Intel Core i7-1270P (AVX2) und optional AVX-512-fähige ZIH-Ziele.
+• Cache-Engine: eigene Steuerlogik neben der Trie-Engine, die Seitentypwahl, Ausrichtung, lokale Ordnung und Inline-/Pointer-Strategie auf Basis lokaler Strukturmerkmale und Hardwareprofilen optimiert.
+4. Arbeitspakete für den Wiederholungstermin
+5. Harte Scope-Grenzen für Termin 2
+• Nicht Kern von Termin 2: Multi-Writer-Concurrency, GPU, vollständige DBMS-IAM-Integration, generischer Sortieralgorithmus-Vergleich auf jeder Ebene, Fingerprint-/Hash-Framework als Hauptpfad.
+• Erlaubte Erweiterungshinweise: Observer-/Visitor-Stellen für spätere Parallelität, optionale SIMD-Kernels, optionale Fingerprint-Pfade für reine Exact-Lookups.
+• Der Architektur-Freeze muss bewusst unterkomplex bleiben: Lieber drei saubere Kernfragen beantworten als zehn lose Features ankündigen.
+6. Rückfragen, die zu Termin 3 überleiten
+• Welche Datensätze bilden den Pflichtkern von Termin 3: CoCo-Dictionaries, URL/Wikipedia, synthetische Präfix-Entropie-Stresstests und YCSB-ähnliche CRUD-Mixe?
+• Welche Baselines werden tatsächlich implementiert und welche bleiben Literatur-Nachbarn mit struktureller Abgrenzung?
+• Wie wird die Fairnessregel für seitenspezifische Inline-/Pointer-Values gegenüber Baselines formuliert?
+• Welche Metriken werden Pflicht: cycles, instructions, L1/L2/LLC-/dTLB-Misses, branch-misses, Bytes pro Key, p50/p95/p99, Build- und Rebuild-Kosten?
+• Wie wird das Kostenmodell der Cache-Engine kalibriert: Mikrobenchmarks, Intel Advisor MAP/Roofline, perf stat, ISA-spezifische Profile?
+Kurzreferenzen
+• ART – The Adaptive Radix Tree (Leis et al., 2013)
+• START – Self-Tuning Adaptive Radix Tree (Fent et al.)
+• HOT – A Height Optimized Trie Index for Main-Memory Database Systems (Binna et al., 2018)
+• Masstree – A Fast Storage System for Main Memory (Mao et al.)
+• CoCo-trie – Data-aware compression and indexing of strings (Boffa et al., 2023)
+• CSS-tree / CSB+-tree (Rao / Ross 1999–2000), processor-conscious CSB+
+• B²-tree – Page-Based String Indexing in Concurrent Environments
+
+[TABELLE 1]
+
+[/TABELLE]
+
+
+[TABELLE 2]
+Zweck dieses Dokuments: Termin 2 wiederholt sich nicht als neue Literaturrecherche, sondern als Architektur-Freeze. Die Literatur aus Termin 1 wird hier in konkrete Entwurfsachsen, Arbeitspakete, Annahmen, Risiken und offene Übergänge zu Termin 3 übersetzt.
+[/TABELLE]
+
+
+[TABELLE 3]
+Quelle || Kernfeature || Übernahme in PRT-ART || Status Termin 2
+ART || Adaptive Node-Familie, lexikographische Ordnung, Pfadkompression, lokale Suchalgorithmen (Node4/16/48/256) || Dense-Page-Grundfamilie und Ausgangspunkt der Präfixnavigation || Kern übernehmen
+START || Mehrbyteige ART-Nodes, Kostenmodell, Optimierer, Budgetgrenze für Multilevel-Nodes || Erweiterte Dense-Page-Familie und Vorbild für schwellwert-/kostenmodellbasiertes Umschalten || Kern übernehmen
+HOT || Discriminative Bits, k-constrained trie, bis zu 31 Bitpositionen bei Fanout 32, 9 Layouts, SIMD-geeignete Suche || Sparse-Patricia-/Mehrbit-Page-Familie || Kern übernehmen
+CoCo-trie || Datenabhängige Kollabierung tiefer Subtries zu Macro-Nodes mit großem Fanout || Redirect-/Key-Handling-Konzept für eindeutige Restpfade || Kern übernehmen
+Masstree || 8-Byte-Slices, Fences/Layer-Regeln, getrange, lockfreie Lookups, wenige wichtige Cache-Lines pro Traversal || Fences, Layer-Regeln, Subbaumgrenzen; nicht als lokaler B+-Baum im Kern || Teilweise übernehmen
+CSS-tree || Cache-line-große, pointerfreie Directory-Nodes über sortiertem Array || Layoutprinzip für arithmetische Navigation und Cache-Line-Disziplin || Prinzip übernehmen
+CSB+-tree || Kontiguierliche Node-Groups, erster Child-Pointer plus Offsets, pointer elimination, workloadabhängige Parameter || Pool-relative Handles und zusammenhängende Node-Gruppen || Prinzip übernehmen
+B²-tree || Eingebetteter Seitensuchbaum mit Decision-/Span-Nodes, Suchraum-Einengung, weniger Cache-Lines je Page || Vorbild für PRT-Custom-Page und page-lokale Suchraumbegrenzung || Kern übernehmen
+Processor-conscious CSB+ || Nicht nur Knotengröße, sondern mehrere Parameter müssen architekturspezifisch abgestimmt werden || Begründung für Cache-Engine und Hardwareprofile || Methodik übernehmen
+[/TABELLE]
+
+
+[TABELLE 4]
+Paket || Ziel || Ergebnis
+WP1 || Kernarchitektur einfrieren || Seitenfamilie, Redirect-Rolle, Handle-Modell, Ordnungsmodi, harte Nicht-Ziele.
+WP2 || Cache-Engine definieren || Welche Eingaben sie beobachten darf: lokale Dichte, Präfixentropie, Value-Größe, erwartete Cache-Line-Kosten, ISA/HW-Profil.
+WP3 || Knoten-/Seitentyp-Katalog konkretisieren || Für jeden Typ: Layoutidee, Suchverfahren, Vorteile, Risiken, Trigger für Umschaltung.
+WP4 || Invarianten und Risiken festhalten || Terminals, Ordnungsrelation, Redirect-Splits, externe Payload, Grenzen des Inline-Modus, Scope-Disziplin.
+WP5 || Übergang zu Termin 3 vorbereiten || Welche Daten-, Workload- und Metrikfragen für die Benchmarkplanung noch offen bleiben.
+[/TABELLE]

@@ -1,0 +1,42 @@
+Technische Skizze: PRT-ART (Comdare Predix-Trie-ART)
+CPU-orientierte adaptive Präfixindexstruktur für Byte-Keys mit Redirect-Kompression, getrennten Speicherpools und layoutbewusster Seitendarstellung
+1. Zielbild und Abgrenzung
+PRT-ART ist kein weiterer generischer Trie unter neuem Namen. Die zentrale Idee ist eine CPU-only Präfixstruktur mit kontrolliertem Speicherlayout, in der die Traversierungslogik bewusst von den eigentlichen Values getrennt wird. Im Gegensatz zu klassischen ART-Implementierungen liegt die Adaptivität nicht primär in den Knotentypen 4/16/48/256, sondern in der Wahl der lokalen Seitendarstellung, der Pfadkompression über Redirect-Knoten und der Aufteilung auf typspezifische Speicherpools.
+2. Strukturkomponenten
+3. Adaptive Suchseiten
+Vorgesehen sind vier lokale Seitendarstellungen: 8-Bit-Punktseite, 16-Bit-Punktseite, 8-Bit-Kompaktseite und 16-Bit-Kompaktseite. Punktseiten erlauben direkte Slot-Adressierung; Kompaktseiten speichern nur vorhandene Übergänge und durchsuchen eine Tupelstruktur. Welche Darstellung an einem Verzweigungspunkt am günstigsten ist, ist selbst Teil der wissenschaftlichen Fragestellung. Die Umschaltlogik wird daher nicht dogmatisch fest verdrahtet, sondern experimentell bestimmt.
+4. Operationen
+Exact Lookup. Der Schlüssel wird als Folge von unsigned Bytes gelesen. Redirect-Knoten vergleichen ihre Restsequenz direkt; Suchseiten bestimmen den nächsten lokalen Slot. Ein Treffer liegt vor, wenn nach vollständigem Konsum des Schlüssels eine terminale Value-Referenz erreicht wird.
+Prefix Lookup / Enumeration. Nach Konsum eines Präfixes kann der Unterbaum unterhalb des erreichten Knotens traversiert werden. Die Ausgabe besteht aus Tupeln <Key-Rest, Value>. Eine lexikographische Ordnung ist nicht implizit garantiert; sie kann bei Bedarf explizit hergestellt werden.
+5. Einfügen, Überschreiben und Löschen
+Insert / Update. Tritt eine Abweichung innerhalb eines Redirect-Knotens auf, wird an der ersten divergierenden Position gesplittet: gemeinsamer Präfix bleibt komprimiert, die Divergenz wird über eine neue Suchseite materialisiert, die beiden Restpfade werden darunter neu eingehängt. Beim Überschreiben wird der neue Value append-orientiert geschrieben und die alte Referenz tombstoned.
+Delete / Rekompaktion. Deletes entfernen die terminale Value-Referenz. Entsteht dadurch wieder ein eindeutiger Restpfad, kann lokal in einen Redirect-Knoten rekonstruiert werden. Value-Pools werden nicht sofort physisch bereinigt; Konsolidierung läuft getrennt und asynchron.
+6. Speicher- und Referenzmodell
+Wichtige Präzisierung: PRT-ART sollte nach außen nicht als global stabiler virtueller Adressraum beschrieben werden. Tragfähiger ist die Formulierung, dass jede Suchseite lokale Slots bzw. pool-relative Referenzen liefert und dass Konsolidierungen diese Referenzen kontrolliert neu abbilden können. Dadurch bleibt das Modell implementierbar, obwohl Value-Pools und Seitentyp-Pools sich im Zeitverlauf aufteilen oder zusammengeführt werden.
+7. Wissenschaftliche Hypothese und Evaluationsrahmen
+Hypothese. Die Kombination aus Redirect-Kompression, adaptiven Suchseiten, getrennten Pools und kleinen lokalen Suchpfaden kann auf moderner CPU-Hardware einen besseren Trade-off zwischen Lookup-Latenz, Durchsatz, Speicherbedarf und Update-Kosten erreichen als etablierte Baselines.
+Vergleichsbasis. B-/B+-Baum, Hash-Index, Patricia/Radix-Tree, ART und Masstree.
+Metriken. Exact-/Prefix-Lookup-Durchsatz, p50/p95/p99-Latenz, Build-Zeit, Insert/Update/Delete-Kosten, Bytes pro Key, LLC-Misses, dTLB-Misses, Branch-Mispredictions sowie Verhalten bei erfolglosen Lookups, stark gemeinsamem Präfix und Delete-induzierter Fragmentierung.
+
+[TABELLE 1]
+Kurzfassung. PRT-ART behandelt jeden Schlüssel als Bytefolge und kombiniert drei Bausteine: Redirect-Knoten für eindeutige Restpfade, adaptive Suchseiten an echten Verzweigungen und eine separate Value-Arena für Nutzdaten. Der Suchpfad bleibt klein und lokal; die eigentlichen Werte werden append-orientiert verwaltet und bei Bedarf asynchron konsolidiert.
+[/TABELLE]
+
+
+[TABELLE 2]
+Komponente || Rolle im Index
+Redirect-Knoten || Speichert einen eindeutigen Restsuffix direkt im Knoten. Vermeidet unnötige Zwischenebenen und kann selbst terminal sein, also direkt eine Value-Referenz tragen.
+Suchseite || Materialisiert nur echte Verzweigungspunkte. Jeder Knoten enthält optional eine terminale Value-Referenz; dadurch sind Fälle wie „ab“ und „abc“ sauber darstellbar.
+Value-Arena || Separater Speicherbereich für serialisierte Nutzdaten. Updates schreiben append-orientiert; alte Werte werden tombstone-artig markiert und später asynchron konsolidiert.
+Node-Pools || Getrennte Pools pro Seitentyp plus eigener Pool für Redirect-Knoten. Das Layout bleibt dadurch stabiler und gezielter an Seiten- und Cachegrenzen ausrichtbar.
+[/TABELLE]
+
+
+[TABELLE 3]
+Beispiel: hallo / halter | Redirect("hal")  ->  Suchseite mit Übergängen { l -> Redirect("lo"),  t -> Redirect("ter") } | Jeder der drei Knoten kann zusätzlich eine terminale Value-Referenz tragen.
+[/TABELLE]
+
+
+[TABELLE 4]
+Empfohlene Zuspitzung für die Diplomarbeit. Der Kernbeitrag sollte zuerst die Datenstruktur, das Speicherlayout und die Evaluation auf CPU-Hardware sein. Feingranulare read/write-Concurrency, komplexe asynchrone Rebalancing-Strategien und mehrere Fingerprint-Policies sind sinnvolle Erweiterungen, sollten aber im Exposé klar als Ausbauoptionen und nicht als zwingender Minimalumfang erscheinen.
+[/TABELLE]

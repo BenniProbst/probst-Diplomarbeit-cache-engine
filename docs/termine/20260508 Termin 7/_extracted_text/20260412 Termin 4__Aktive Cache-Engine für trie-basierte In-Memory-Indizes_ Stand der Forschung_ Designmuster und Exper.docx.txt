@@ -1,0 +1,314 @@
+Aktive Cache-Engine für trie-basierte In-Memory-Indizes: Stand der Forschung, Designmuster und Experimentagenda für PRT-ART
+Executive Summary
+Die Literatur zu modernen Indexstrukturen hat in den letzten 25 Jahren primär passive Cache-Awareness verfolgt: Datenstrukturen werden so entworfen, dass sie „von Natur aus“ cachefreundlich sind (Layout der Nodes, Span/Path-Compression, SIMD in Nodes, Page-Design, Pointer-Reduktion). Beispiele sind ART (adaptive Node-Familien + Pfadkompression), HOT (dynamischer Bit-Span pro Node + SIMD-optimierte Node-Layouts), und START (hardware-spezifische Kostenmodelle + Optimierer zur Offline/Online-Transformation eines ART). [1]
+Die von dir vorgeschlagene aktive Cache-Engine für PRT-ART hebt sich qualitativ ab: Sie soll nicht nur Layouts bereitstellen, sondern aktiv (i) Page-Repräsentation wählen, (ii) Platzierung/Allocator steuern, (iii) Prefetching orchestrieren, (iv) online Seiten/Nodes umlagern (Relocation) und (v) dabei Metriken wie Cache Line Utilization (CLU) und (simulierte) Memory Footprint minimieren. Für genau diese Richtung gibt es in der Forschung mehrere starke Anknüpfungspunkte – aber auch klare Lücken:
+Messbare Ziele und Tooling: Intel Advisor modelliert CLU und Footprint über Cache-Simulation im Memory-Access-Patterns-Workflow; diese Metriken sind direkt anschlussfähig an deine CLU/Footprint-Zielgrößen. [2]
+Online/Profil-getriebene Layout-Optimierung: Es existieren Arbeiten, die Wahrscheinlichkeitsmodelle/Histogramme pro Node nutzen, um „Hot Paths“ physisch zusammenzulegen (für Prefetch/Cache-Hits), aber Runtime-Re-Layouting bleibt oft explizit „out of scope“. Genau hier liegt eine Kern-Lücke, die PRT-ART adressieren kann. [3]
+Relocation/Global Rearrangement: Für dynamische Bäume existieren explizite Relocation-Algorithmen über mehrstufige Cache-Hierarchien inkl. TLB/Page-Größe (Blockebenenmodell). Die Prinzipien lassen sich auf Page-Cluster/Trie-Hüllen übertragen, müssen aber für Nebenläufigkeit/Handles/Pages neu gedacht werden. [4]
+Prefetch als „Breiten“-Werkzeug: Prefetching kann Bäume effektiv „breiter“ machen (Mehr-Cacheline-Nodes nahezu ohne zusätzliche Latenz) und Pointer-Chasing kaschieren; gleichzeitig gibt es klare Risiken (Bandbreitenverschwendung, falsches Vorladen, i-cache Nebenwirkungen). [5]
+Hybrid-CPUs & ISA-Varianten: Auf Hybrid-CPUs (P-/E-Cores) kann die optimale Konfiguration kippen; Messung nach cpu_core/cpu_atom ist dafür zentral. perf unterstützt Hybrid-Modi; für ISA-Varianten ist Function Multiversioning (target_clones) ein naheliegendes, offizielles Werkzeug. [6]
+Damit entsteht ein klarer Forschungsrahmen: Wie stark verbessert „aktive statt passive“ Cache-Awareness (Page-Typwahl + Placement + Prefetch + Online-Relocation) trie-basierte und trie-hybride Indizes im Vergleich zu (a) ART/HOT/START/Masstree/Wormhole/CoCo-trie und (b) cache-sensitiven B-Tree-Varianten (CSS/CSB+, B², moderne variable-sized B-Trees)?
+Stand der Forschung: Bausteine, die einer Cache-Engine nahekommen
+Trie-basierte und trie-hybride Indizes als „passive“ Cache-Awareness
+ART adressiert Cache-Effizienz über adaptive Node-Typen (Node4/16/48/256) plus Pfadkompression/Lazy Expansion; das reduziert Höhe und spart Speicher, aber Platzierung/Allocator und Code-Prefetch sind nicht „Engine“-getrieben. [7]
+HOT optimiert explizit die Baumhöhe für Strings durch dynamische Wahl der diskriminativen Bits (Span) pro Node und kombiniert dies mit SIMD-optimierten Node-Layouts. Es ist ein Paradebeispiel für „Node-Layout als Performance-Kern“. [8]
+START geht einen Schritt in Richtung „Engine“: Es misst Node-Traversal-Kosten auf der Zielmaschine und baut daraus ein Kostenmodell + Optimierer, um multilevel Nodes einzuführen (offline, optional online) und so die Baumhöhe hardware-spezifisch zu reduzieren. START ist damit ein direkter methodischer Vorläufer für PRT-ARTs geplante Kostenmodelle. [9]
+Masstree ist trie-hybrid (Trie aus B+-Trees über 8‑Byte Slices) und argumentiert u.a. über „prefetchable nodes“ (bewusst „fette“, aber nicht zu fette Nodes). In der Praxis ist Masstree relevant, weil es eine echte, produktionsnahe Balance aus Layout, Prefetch-Idee und Nebenläufigkeit zeigt. [10]
+Wormhole kombiniert Hash + Trie + B+-Tree-Ideen, um die Suchkosten an die Schlüssellänge (log L) zu koppeln und schnelle Sprünge („Anchors“) zu ermöglichen. Für PRT-ART ist Wormhole besonders interessant als Referenz für Redirect-/Shortcut-Mechaniken, die du als Redirect/Collapsed Nodes in der Trie-Hülle planst. [11]
+CoCo-trie zeigt, wie stark datenabhängige (data-aware) Kompression/Collapsing die Space/Time-Tradeoffs beeinflussen können: Subtries werden per Optimierung lokal kollabiert (Macro-Nodes) und mit einem Pool unterschiedlicher Encodings komprimiert. Das ist verwandt zu deiner Idee, Page-Typen lokal/dynamisch zu wählen – allerdings fokussiert CoCo-trie primär auf Kompression und „klassische“ Operationen (lookup/rank) statt auf Cacheline-Alignment/Relocation-Engine. [12]
+Page-basierte und „In-Page Narrowing“-Ansätze
+CSS-Trees (read-mostly/OLAP) eliminieren interne Pointer durch arraybasiertes Directory über einem sortierten Array; Kinder werden über Offset-Arithmetik lokalisiert. Das ist die archetypische Blaupause für „Pointer vermeiden“ und für sehr hohe CLU, aber Updates sind erschwert. [13]
+CSB+-Trees sind ein updatefähiger Kompromiss: Siblings liegen zusammenhängend, es gibt nur einen Pointer auf den Child-Block; weitere Children per Offset. Das ist ein frühes Beispiel einer layoutdominierten Optimierung. [14]
+Node-Größe vs. Cache/TLB: Hankins/Patel zeigen modell- und messbasiert, dass Node-Größen deutlich größer als die Cacheline besser sein können, weil TLB-Misses und Tree-Höhe eine dominante Rolle spielen; damit ist „Cacheline = optimale Node“ explizit widerlegt. Das stützt deine PRT-ART-These, dass „in die Länge gezogene Nodes“ je nach Kontext sinnvoll sein können. [15]
+B²-tree (Page-Based String Indexing) ist für PRT-ART besonders nahe: Outer ist B+-Tree/Page-Architektur, aber jede Page enthält einen eingebetteten trieartigen Suchbaum (Decision- und Span-Nodes), der den Suchraum innerhalb der Page auf eine kleine Region einschränkt, sodass weniger Cachelines berührt werden. Diese Page-lokale Suchraum-Einengung ist praktisch eine „B²-style in-page narrowing“-Schablone für deine Seitentypfamilie. [16]
+Moderne variable-sized B-Tree Layouts: „B‑Trees Are Back“ evaluiert mehrere Node-Layout-Optimierungen (u.a. Prefix Truncation, Heads/Hints, Fingerprinting, semi-/fully dense Leaves) und beschreibt explizit eine adaptive Layout-Strategie, die zur Runtime den besten Node-Typ wählt. Das ist methodisch extrem nah an deiner „Page-Type-Wahl + Umschaltpunkte“ Idee – nur ohne Trie-Hülle. [17]
+Cache-aware vs. cache-oblivious Layout und (Re-)Platzierung
+Es gibt eine theoretisch fundierte Linie, die Trees/Tries für mehrstufige Speicherhierarchien layoutet:
+Tree layout mit Wahrscheinlichkeiten: Bender/Demaine/Farach-Colton formulieren Layout als Optimierung der erwarteten Blocktransfers entlang Root-to-Leaf, gegeben eine Wahrscheinlichkeitsverteilung auf Leaves. Das ist die konzeptionelle Basis für deine geplanten „Header-Probability-Hints“ und path-affines Placement. [18]
+Dynamische cache-sensitive Relocation: Saikkonen/Soisalon-Soininen geben (i) eine explizite globale Relocation über Blockebenen (inkl. TLB als Block-Level) und (ii) Mechanismen, Cache-Sensitivität bei Updates zu erhalten. Der Algorithmus füllt Blöcke per BFS-artiger Traversierung und recursed über Ebenen – sehr ähnlich zur Idee „Caches als Baum fester Tiefe“ zu behandeln und Arbeitsmengen zielgerichtet zu clustern. [4]
+Wichtig: Diese Arbeiten liefern starke Prinzipien für Placement/Relocation, aber nicht die vollständige „Engine“-Mechanik (Policies, Telemetrie, Nebenläufigkeit, Page-Typwechsel, Code-Prefetch). Genau da setzt PRT-ART an.
+Prefetching als aktives Steuerinstrument
+Prefetching ist der wichtigste externe Baustein, der eine aktive Cache-Engine unmittelbar operationalisiert:
+Prefetching B+-Trees: Chen/Gibbons/Mowry zeigen, dass Prefetching B+-Trees „wider nodes“ ermöglicht (z.B. 8 Cachelines statt 1), wodurch die Baumschichten sinken und Such-/Updatezeiten steigen; zusätzlich werden Leaf-Pointer-Arrays genutzt, um bei Range Scans arbiträr weit vorzuprefetchen. Das ist ein strukturelles Argument für deine Idee, dass „gezielt breitere Page/Node-Layouts“ und aktiv orchestriertes Prefetch zusammengehören. [19]
+Jüngere Prefetch-Pfade mit Online-Path-Modellen: Ein aktueller Ansatz koppelt Prefetching an Block-Level Read Counters und entwickelt frequentierte Pfade weiter („evolve frequent access paths“) und nutzt Jump-Pointer-Queues. Das ist praktisch genau das Muster „Header-Probability/Counter + Prefetch-Kandidaten + Online-Adaption“, das du als Cache-Engine-Kern formulierst (hier im Kontext MVCC-Versionchains). [20]
+Risiken und Systemeffekte: Moderne Arbeiten zur Prefetch-Evaluation zeigen, dass aggressive Prefetcher neben Bandbreite auch i-cache Effekte und Fehlvorhersagen triggern können; für eine aktive Engine ist daher die explizite Kosten-Nutzen-Regel (Accuracy/Coverage vs. Overfetch) zentral. [21]
+Konkrete Designmuster für eine aktive Cache-Engine in PRT-ART
+Die folgenden Muster sind aus der Literatur ableitbar (und dort jeweils „in Teilen“ implementiert). PRT-ART kombiniert sie erstmals in einer expliziten Engine-Schicht.
+Kostenmodelle als „Entscheidungskern“
+Hardwarekalibrierte Kostenmodelle sind in START bereits ein Kernprinzip: START misst Traversalkosten isoliert auf der Zielmaschine, baut daraus ein Lookup-Kostenmodell und optimiert Strukturtransformationen. Dieses Vorgehen ist direkt übertragbar auf PRT-ART: Nicht nur „welcher Seitentyp“, sondern „welcher Seitentyp auf dieser CPU, bei dieser ISA (AVX2/AVX‑512/vanilla) und diesem Core-Typ“. [9]
+Multi-Level-Kosten müssen Cache und TLB gemeinsam berücksichtigen. Saikkonnen/Soisalon-Soininen modellieren explizit Blockebenen inklusive TLB (Page-Größe ~ Blockgröße) und optimieren Blockpfadlängen Pi pro Ebene. Das liefert eine formale Struktur, in die du L1/L2/L3/dTLB als Ebenen einhängen kannst. [22]
+„Probability Hints“ / Histogramme im Header als Telemetrie-API
+Ein sehr direktes Vorbild ist „Towards Data-Based Cache Optimization of B+-Trees“: Dort werden pro Node Histogramme/relative Pfadwahrscheinlichkeiten aufgebaut, Hot Paths extrahiert und physisch zusammengelegt, um Hardware-Prefetch und Cache-Eviction zugunsten dieser Pfade zu beeinflussen. Gleichzeitig wird die Runtime-Re-Layouting-Frage explizit ausgeklammert – genau diese Lücke ist dein Forschungsbeitrag. [23]
+Theoretisch wird dieselbe Idee (probability-driven Layout) seit Bender/Demaine/Farach-Colton als Optimierungsproblem formuliert: Layout minimiert erwartete Blocktransfers gegeben Leaf-Wahrscheinlichkeiten. PRT-ARTs „quantisierte Wahrscheinlichkeitsskizzen“ in Page/Node-Headern sind damit theoretisch anschlussfähig, aber systempraktisch neu. [18]
+Online-Relocation als Engine-Fähigkeit
+Die Relocation-Algorithmen für dynamische Bäume zeigen, dass explizites Umkopieren und Neuplazieren über mehrstufige Cache-/TLB-Modelle algorithmisch beherrschbar ist (BFS-gefüllte Blöcke, Rekursion über Ebenen, optionales „mindestens halb voll“ Packing). Das ist eine direkte Blaupause für PRT-ARTs geplantes „online Pages neu aufbauen und verschieben“. [22]
+Für PRT-ART kommt zusätzlich hinzu:
+Page-Typwechsel (Dense↔Sparse↔Redirect/CoCo↔B²-in-page) – analog zur „adaptive layout“-Idee bei modernen B-Trees, die Node-Typen zur Runtime wechseln. [17]
+Sicheres Umschalten im Lese-/Schreibpfad: Relocation impliziert Pointer-Änderungen und potenziell parallele Reader. Die Literatur zu ART-Synchronisation (OLC/ROWEX) zeigt, wie versionierte Optimistic-Lesewege funktionieren; RCU/Hazard-Pointers/Epoch-Reclamation liefern Mechanismen, Speicher erst nach Grace Period freizugeben. [24]
+Prefetch-Policies als regelbares Modul
+Die älteren und neueren Prefetch-Arbeiten ergeben ein robustes Policy-Rezept:
+Prefetch wird genutzt, um effektiv breitere Nodes zu laden, ohne die kritische Latenz zu erhöhen (mehrere Cachelines „fast gratis“ wenn Overlap gelingt). [19]
+Prefetch-Kandidaten kommen aus Pfad- oder Block-Countern (Read Counters), die online fortgeschrieben werden. [20]
+Der Policy-Raum braucht Parameter: Prefetch-Distanz, Locality-Hints, Sampling, Abschalten bei geringer Trefferquote. Moderne Prefetch-Evaluations warnen explizit vor i-cache/Overfetch Rückkopplungen. [21]
+Allocator/Pool-Strategien als Teil der Cache-Engine
+Da Platzierung/Relocation ohne Kontrolle über Allokation kaum deterministisch ist, ist ein „hardware-conscious allocator“ ein plausibler Infrastrukturbaustein:
+tcmalloc (Design-Doku) betont per-thread/per-cpu Caches für kleine Objekte und reduziert Locking/Fragmentation. [25]
+mimalloc und snmalloc liefern Forschungs-/Designargumente für Free-List-Sharding, Page-Management und Skalierung. [26]
+Für PRT-ART ist das Muster: Seitentyp → eigener Pool/Arena → planbarer Alignment- und Packing-Spielraum (Cacheline und Page). Das ist konsistent mit der CSB+-Idee „siblings contiguous“ und mit B² „embedded tree per page“, aber als Engine-Mechanik erweitert. [27]
+Vergleichstabelle relevanter Ansätze
+Forschungslücken und offene Fragen für PRT-ART
+Online-Relocation in echten, mutierenden Indexstrukturen
+Viele Arbeiten zeigen dass layoutbasierte Optimierung (contiguity, hot paths, probability-driven placement) wirkt – aber:
+„Data-based cache optimization“ baut Histogramme/Hot Paths, schließt Runtime-Re-Layouting explizit aus. PRT-ART muss genau diesen Schritt definieren (Trigger, Kostenmodell, Stabilität). [23]
+Relocation-Algorithmen existieren für „klassische“ (binäre) Bäume, aber nicht als direkte „Page-Typ + Trie-Hülle“-Engine. [4]
+Offen ist insbesondere: Wie oft relocaten, wie inkrementell (local swaps vs rebuild), wie teuer (Copy/Invalidate) im Verhältnis zu Miss-Reduktion.
+Nebenläufigkeit und Safety (auch ohne „multiwriter-multi-threaded“ als Pflicht)
+Selbst wenn multiple writer threads optional bleiben, braucht Online-Relocation mindestens einen sauberen Pfad für „Reader vs. Mover“. Hier bieten sich etablierte Muster an:
+OLC/ROWEX als Inspirationsquelle für versionierte Traversals. [40]
+RCU (Grace Period) als mechanischer Unterbau für „copy new, publish, retire old“. [41]
+Hazard Pointers/Epoch Reclamation als Alternative/Ergänzung. [42]
+Offen ist die konkrete Kombination mit ValueHandles, Redirects und Page-Typwechseln (insb. wenn ein Handle zwischen inline/external toggelt).
+Prefetch: Nutzen vs. Overfetch, Bandbreite, i-cache Nebenwirkungen
+Die Literatur zeigt starke Speedups durch Prefetch (auch bei Updates), aber eine Engine muss Overfetch aktiv vermeiden:
+Prefetching kann Nodes „gratis breiter“ machen und Höhe reduzieren. [19]
+Moderne Systeme zeigen aber, dass Prefetcher-Auswahl/Distanz zu Accuracy/Coverage Tradeoffs führt; zudem können i-cache Misses steigen. [43]
+Offen: Wie modellierst du Prefetch-Kosten (zusätzliche Bandbreite, Cache Pollution) gegen CLU/Footprint Gewinne?
+ISA- und Hybrid-CPU-Effekte sind systematisch unterexploriert
+Auf deinem Laptop ist der Zielprozessor ein Hybrid-Design mit 4 P-Cores und 8 E-Cores sowie AVX2. [44]
+Auf dem Barnard-Cluster (Sapphire Rapids) ist AVX‑512 verfügbar. [45]
+Offen ist nicht „ob“ der optimale Seitentyp/Prefetch-Policy variiert, sondern wie stark und wie robust eine Policy across (P/E, AVX2/AVX‑512) bleibt.
+Priorisierte Agenda und Termine‑4 Experimente
+Implementierungsprioritäten P0–P3
+P0 – Mess- und Vergleichbarkeit zuerst (Scope-Freeze Kern)
+Ziel: Reproduzierbares Benchmarking, das CLU/Footprint/Miss-Profile pro Seitentyp/Modus liefert.
+Minimal lauffähiger PRT-ART Kernpfad (Trie-Hülle + ValueHandles + min. 2 Seitentypen: eine Dense-Basis und eine Sparse-Basis).
+Mess-Harness: einheitliche Load/Lookup/Insert/Delete-Workloads (inkl. Warmup/Pinning), 5 Wiederholungen ohne Mittelwertbildung (Rohwerte).
+Toolchain: perf stat (inkl. dTLB, LLC misses, branch-misses) plus Intel Advisor MAP/CacheSim für CLU/Footprint. [46]
+P1 – Regelbasierte Cache-Engine (Policy v1)
+Ziel: Nachweis, dass aktive Entscheidungen messbar CLU/Footprint senken.
+Page-Type-Selection Rules: z.B. Dichte/Entropie/Keylength → Dense vs Sparse vs Redirect. (Analog zur Runtime-Layoutwahl bei modernen B-Trees.) [17]
+Prefetch v1: „sicheres“ Prefetching (nächste Page/Child) mit konservativer Distanz + Abschalten bei geringer Trefferquote. (Motiviert durch Prefetching-B+-Trees und neuere Path-Prefetching Arbeiten.) [47]
+P2 – Online-Relocation (Engine v2)
+Ziel: Der zentrale Forschungsbeitrag: aktive Layout-Umlagerung zur Laufzeit.
+Telemetrie: quantisierte Histogramme/Probability Sketch pro Page/Node (ähnlich Hot-Path-Modell). [3]
+Relocation: block-/page-weise Umkopier-Strategien inspiriert durch Multi-Level-Relocation (BFS-Füllung, Blockebenen, „mindestens halb voll“). [22]
+Safety: RCU oder Epoch-Reclamation für publish/retire, kompatibel mit OLC/ROWEX Readern. [48]
+P3 – Erweiterungen (voll, aber nachrangig)
+Ziel: Breite Designspace-Exploration und Spezialisierungen.
+Fingerprints als optionales Key-Overlay und deren Einfluss auf Ordnung und CLU (inspiriert durch moderne B-Tree Optimierungen inkl. Fingerprinting). [49]
+Erweiterte Seitentypenmatrix (START-ähnliche multilevel Nodes, HOT-sparse, CoCo-redirect, B²-in-page). [50]
+Multiwriter-Multithreading: optional (dein einziger „optional statt TODO“ Punkt).
+Konkrete Experimente für Termin 4
+Mikrobenchmarks (isoliert, zur Kostenmodell-Kalibrierung)
+1) Seitentyp‑Sweep: Für fixe Datensätze und Operationen (Lookup/Insert/Delete) die Seitengröße × Node-Length × Ordnungsmodus variieren; Ziel: Heatmap von CLU/Footprint/Misses pro Kombination. (Motiviert durch „Node sizes“ und „B‑Trees Are Back“.) [51]
+2) Prefetch‑Distanz‑Sweep: Prefetch on/off; Distanz {1,2,4,8} Seiten/Cacheblocks; Auswertung Overfetch vs. Miss-Latenz. (Motiviert durch Prefetching-B+-Trees und Prefetch-Evaluations.) [52]
+3) TLB‑Stress: Seitengröße/Allocator so wählen, dass dTLB-Misses sichtbar werden; Ziel: Node-Length/Cluster-Placement so kalibrieren, dass dTLB nicht „verloren“ geht. (Motiviert durch Saikkonen und Node-size vs TLB.) [53]
+Makrobenchmarks (realistische Datensätze, reproduzierbar)
+4) Datensatzportfolio (Pflicht 6): url, xml, dna, protein, trec-terms, tpcds-id – identische Workloads über Baselines und PRT-ART. CoCo-trie liefert Quellen/Preprocessing-Skripte und verweist auf etablierte Corpora. [54]
+5) Policy‑Ablation: Cache-Engine Off (Baseline PRT-ART), nur Page-Type-Selection, nur Prefetch, nur Relocation, Full Engine; Ziel: Kausaler Nachweis „active > passive“.
+6) Hybrid‑Split: Messungen getrennt auf P-cores und E-cores; Vergleich, ob Umschaltpunkte (z.B. inline value size threshold) core-abhängig werden. (Hybrid-Events und CPU-Spezifikationen sind klar messrelevant.) [55]
+7) AVX2 vs AVX‑512 vs vanilla: Gleiche binäre Module, aber ISA-Pfade getrennt; Ziel: ISA-abhängige Layout-/Prefetch-Optima. (AVX‑512 Plattform Barnard, AVX2 lokal; FMV zum sauberen Umschalten.) [56]
+Erfolgskriterien (Beispiele, explizit messbar)
+CLU ↑ (signifikant) und Footprint ↓ (signifikant) bei gleicher/geringerer Latenz, gemessen in Advisor MAP (CacheSim). [2]
+Reduktion von LLC‑Misses und dTLB‑Misses pro Operation (perf). [57]
+Bei aktivem Relocation-Modus: Nachweis, dass „Hot Path“-Cluster zu messbarer Prefetch-/Cache-Hit Verbesserung führen (wie in Hot-Path-Layout-Arbeiten, aber nun online). [58]
+Empfohlenes Mess-Setup
+Intel Advisor: MAP + Cache Simulation als CLU/Footprint Quelle
+Intel Advisor liefert im Memory Access Patterns Workflow u.a.:
+Cache Line Utilization als „simulated cache line utilization for data transfer operations“. [59]
+Simulated Memory Footprint als „summarized and overlap-aware memory footprint across all instances of a loop“, erfordert --enable-cache-simulation und -cachesim-mode=footprint. [60]
+Die CacheSim kann sampling-basiert arbeiten und skaliert auf Cachegrößen hoch. [61]
+Praktisch heißt das: PRT-ART sollte Hotspots (Lookup/Insert/Delete Kernloops) so strukturieren, dass Advisor die relevanten Memory Sites sauber isolieren kann.
+perf und Hybrid-CPU Messung
+perf stat unterstützt auf Hybrid-Systemen die getrennte Auswertung über cpu_core und cpu_atom (z.B. getrennte Events oder „hybrid“-Kontext). [57]
+Für Barnard erklärt das ZIH Compendium perf als Standardwerkzeug für Counter/Sampling. [62]
+Auf Barnard ist außerdem relevant, dass Monitoring (PIKA) deaktivierbar ist, wenn eigene Countermessungen gefahren werden sollen (--exclusive + --constraint=no_monitoring). [63]
+HDR-Histogramme und Rohwert-Policy
+Für die von dir gewünschte Darstellung „5 Läufe, nicht gemittelt“ empfiehlt sich HDRHistogramm-basierte Erfassung pro Lauf, um Tail‑Latenzen und Jitter sichtbar zu halten (insb. bei Prefetch/Relocation). (Kein spezifisches Paper im Scope; als Methodik-Hinweis.)
+Build-Flags und Multiversioning
+Für ISA-Varianten ist GCC Function Multiversioning (__attribute__((target_clones(...)))) eine offizielle Option, mehrere Funktionsklone zu erzeugen und zur Laufzeit passend zu dispatchen. [39]
+Für Software-Prefetch steht u.a. __builtin_prefetch zur Verfügung; damit lassen sich Engine‑Policies konkret in Code gießen (Locality/ReadWrite-Hints). [64]
+Hardware-Seite für eure Plattformen:
+Laptop: Intel Core i7‑1270P mit 4 Performance‑Cores und 8 Efficient‑Cores, Instruction Set Extensions inkl. AVX2. [44]
+Barnard-Knoten: Sapphire Rapids (z.B. Xeon Platinum 8470) unterstützt AVX‑512 (und AMX). [65]
+Visualisierung: Komponenten-Interaktion und Experimentplan
+flowchart LR
+  W[Workload Generator\n(datasets + ops + seeds)] --> API[PRT-ART API\nlookup/insert/delete/scan]
+  API --> TRIE[PRT-ART Trie-Hülle\nRedirect/Collapsed Nodes]
+  API --> CE[Cache-Engine\nPolicies + Kostenmodell]
+  CE <--> PT[Page-Typen\nDense/START | Sparse/HOT | Redirect/CoCo | B²-in-page]
+  PT <--> VH[ValueHandles\ninline vs external payloads]
+  CE <--> ALLOC[Allocator/Pools\n(Arena pro Page-Typ)]
+  CE <--> PF[Prefetcher\nSoftware hints + Distanzregeln]
+  CE <--> RL[Relocation/Compaction\nonline page rebuild/move]
+  CE --> TEL[Telemetrie\nHistogramme/Prob-Skizzen]
+  TEL --> RL
+  API --> OBS[Observability\nperf + Advisor MAP/CacheSim + HDR]
+gantt
+dateFormat  YYYY-MM-DD
+title Termin-4 Zeitplan (Template, anpassbar)
+
+section P0 Messbarkeit
+Benchmark-Harness + Baseline Pages :a1, 2026-04-13, 10d
+perf/Advisor Integration           :a2, after a1, 7d
+
+section P1 Engine v1
+Rule-based Page Selection          :b1, after a2, 10d
+Prefetch v1 (konservativ)          :b2, after b1, 7d
+
+section P2 Engine v2
+Probability Sketches + Counters    :c1, after b2, 10d
+Online Relocation (RCU/Epoch)      :c2, after c1, 14d
+
+section P3 Erweiterungen
+Seitentyp-Matrix ausbauen          :d1, after c2, 10d
+Fingerprints/Key-Overlays          :d2, after d1, 7d
+Multiwriter (optional)             :d3, after d2, 10d
+Chart‑Template: Erwartete CLU vs. Page‑Typ (Beispielstruktur)
+(Werte sind Platzhalter; die Tabelle ist ein Reporting‑Template.)
+Repositories und Datensätze zum Klonen/Downloaden
+Die folgende Liste priorisiert „Primary/Official“ Repos und Datensatzquellen, die in der Literatur explizit verwendet/verwiesen werden.
+Repositories (priorisiert)
+aboffa/CoCo-trie (inkl. preprocess scripts + dataset pointers). [54]
+speedskater/hot (HOT Referenzimplementierung; auch im TODS‑Artikel referenziert). [66]
+kohler/masstree-beta (Masstree Source Release). [67]
+armon/libart (ART Implementierung, verbreitete Referenz für ART‑Konzept). [28]
+wuxb45/wormhole (Wormhole Referenzimplementierung). [34]
+Datensätze (Pflicht + Ergänzungen)
+CoCo-trie dokumentiert mehrere große Originalquellen und verweist auf vorkonvertierte Datensätze (inkl. Pizza&Chili DNA/Protein/XML, Web-URLs, TPC‑DS). [36]
+B²-tree und moderne B‑Tree Arbeiten betonen die Relevanz realer String‑Keys und variable-sized records. [68]
+# Repos
+https://github.com/aboffa/CoCo-trie
+https://github.com/speedskater/hot
+https://github.com/kohler/masstree-beta
+https://github.com/armon/libart
+https://github.com/wuxb45/wormhole
+
+# Datensatzquellen (primär als in Papers/Repos referenziert)
+# Web URLs (it-2004)
+https://law.di.unimi.it/webdata/it-2004/
+
+# Pizza&Chili Corpora (XML, DNA, Protein)
+http://pizzachili.dcc.uchile.cl/texts/xml/
+http://pizzachili.dcc.uchile.cl/texts/dna/
+http://pizzachili.dcc.uchile.cl/texts/protein/
+
+# TPC-DS (IDs/Keys ableitbar, je nach Setup)
+https://www.tpc.org/tpcds/
+
+# CoCo-trie: vorkonvertierte große Datensätze (Google Drive Link im Repo-README)
+# (Link variiert; bitte direkt aus dem README ziehen, um Reproduzierbarkeit zu erhalten.)
+ZIH/Barnard Messumgebung (für Reproduzierbarkeit)
+Barnard Hardware-Überblick: 104 Cores (Sapphire Rapids), 512 GB RAM je Knoten (u.a.). [69]
+perf und weitere Performance Tools: ZIH Compendium. [70]
+Monitoring abschalten für eigene Messungen: --exclusive + --constraint=no_monitoring. [63]
+[1] [7] https://www.db.in.tum.de/~leis/papers/ART.pdf
+https://www.db.in.tum.de/~leis/papers/ART.pdf
+[2] [59] [60] https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2024-0/cpu-metrics.html
+https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2024-0/cpu-metrics.html
+[3] [23] [58] https://dbis.cs.tu-dortmund.de/storages/dbis-cs/r/papers/2023/cache-optimization/cache-optimization-damon-2023-submission.pdf
+https://dbis.cs.tu-dortmund.de/storages/dbis-cs/r/papers/2023/cache-optimization/cache-optimization-damon-2023-submission.pdf
+[4] [22] [53] https://dl.ifip.org/db/conf/ifipTCS/ifipTCS2008/SaikkonenS08.pdf
+https://dl.ifip.org/db/conf/ifipTCS/ifipTCS2008/SaikkonenS08.pdf
+[5] [19] [47] [52] https://www.shimin-chen.com/papers/index_pf_final.pdf
+https://www.shimin-chen.com/papers/index_pf_final.pdf
+[6] [38] [46] [55] [57] https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
+https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
+[8] https://15721.courses.cs.cmu.edu/spring2019/papers/08-oltpindexes2/p521-binna.pdf
+https://15721.courses.cs.cmu.edu/spring2019/papers/08-oltpindexes2/p521-binna.pdf
+[9] [50] https://db.in.tum.de/~fent/papers/Self%20Tuning%20Art.pdf?lang=de
+https://db.in.tum.de/~fent/papers/Self%20Tuning%20Art.pdf?lang=de
+[10] [30] https://pdos.csail.mit.edu/papers/masstree%3Aeurosys12.pdf
+https://pdos.csail.mit.edu/papers/masstree%3Aeurosys12.pdf
+[11] [33] https://wuxb45.github.io/papers/wormhole.pdf
+https://wuxb45.github.io/papers/wormhole.pdf
+[12] [35] https://www.boffa.top/files/SPIRE.pdf
+https://www.boffa.top/files/SPIRE.pdf
+[13] https://www.vldb.org/conf/1999/P7.pdf
+https://www.vldb.org/conf/1999/P7.pdf
+[14] [27] https://www.cse.iitb.ac.in/infolab/Data/Courses/CS632/2006/Papers/cache-b-tree.pdf
+https://www.cse.iitb.ac.in/infolab/Data/Courses/CS632/2006/Papers/cache-b-tree.pdf
+[15] [37] [51] https://pages.cs.wisc.edu/~jignesh/publ/cci.pdf
+https://pages.cs.wisc.edu/~jignesh/publ/cci.pdf
+[16] [68] https://d-nb.info/125978522X/34
+https://d-nb.info/125978522X/34
+[17] [49] https://www.cs.cit.tum.de/fileadmin/w00cfj/dis/papers/btrees-are-back.pdf
+https://www.cs.cit.tum.de/fileadmin/w00cfj/dis/papers/btrees-are-back.pdf
+[18] https://erikdemaine.org/papers/TreeLayout_ESA2002/paper.pdf
+https://erikdemaine.org/papers/TreeLayout_ESA2002/paper.pdf
+[20] https://www.sciencedirect.com/science/article/pii/S0167739X24000840
+https://www.sciencedirect.com/science/article/pii/S0167739X24000840
+[21] https://hpi.de/oldsite/fileadmin/user_upload/fachgebiete/rabl/publications/2025/Mahling-DaMoN25-Prefetching.pdf
+https://hpi.de/oldsite/fileadmin/user_upload/fachgebiete/rabl/publications/2025/Mahling-DaMoN25-Prefetching.pdf
+[24] [40] The ART of Practical Synchronization
+https://db.in.tum.de/~leis/papers/artsync.pdf?utm_source=chatgpt.com
+[25] https://google.github.io/tcmalloc/design.html
+https://google.github.io/tcmalloc/design.html
+[26] https://www.microsoft.com/en-us/research/wp-content/uploads/2019/06/mimalloc-tr-v1.pdf
+https://www.microsoft.com/en-us/research/wp-content/uploads/2019/06/mimalloc-tr-v1.pdf
+[28] https://github.com/armon/libart
+https://github.com/armon/libart
+[29] [66] https://github.com/speedskater/hot
+https://github.com/speedskater/hot
+[31] https://read.seas.harvard.edu/~kohler/notes/hpts13/
+https://read.seas.harvard.edu/~kohler/notes/hpts13/
+[32] [67] https://github.com/kohler/masstree-beta
+https://github.com/kohler/masstree-beta
+[34] https://github.com/wuxb45/wormhole
+https://github.com/wuxb45/wormhole
+[36] [54] https://github.com/aboffa/CoCo-trie
+https://github.com/aboffa/CoCo-trie
+[39] https://gcc.gnu.org/onlinedocs/gcc/Function-Multiversioning.html
+https://gcc.gnu.org/onlinedocs/gcc/Function-Multiversioning.html
+[41] [48] Read-Copy Update
+https://www.kernel.org/doc/ols/2001/read-copy.pdf?utm_source=chatgpt.com
+[42] Hazard Pointers: Safe Memory Reclamation for Lock-Free ...
+https://www.cs.otago.ac.nz/cosc440/readings/hazard-pointers.pdf?utm_source=chatgpt.com
+[43] https://www.pure.ed.ac.uk/ws/portalfiles/portal/521674398/ZhangEtalASPLOS2025HierarchicalPrefetching.pdf
+https://www.pure.ed.ac.uk/ws/portalfiles/portal/521674398/ZhangEtalASPLOS2025HierarchicalPrefetching.pdf
+[44] https://www.intel.com/content/www/us/en/products/sku/226255/intel-core-i71270p-processor-18m-cache-up-to-4-80-ghz/specifications.html
+https://www.intel.com/content/www/us/en/products/sku/226255/intel-core-i71270p-processor-18m-cache-up-to-4-80-ghz/specifications.html
+[45] [69] https://tu-dresden.de/zih/hochleistungsrechnen/hpc
+https://tu-dresden.de/zih/hochleistungsrechnen/hpc
+[56] [65] https://www.intel.com/content/www/us/en/products/sku/231728/intel-xeon-platinum-8470-processor-105m-cache-2-00-ghz/specifications.html
+https://www.intel.com/content/www/us/en/products/sku/231728/intel-xeon-platinum-8470-processor-105m-cache-2-00-ghz/specifications.html
+[61] https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2024-1/cachesim-mode.html
+https://www.intel.com/content/www/us/en/docs/advisor/user-guide/2024-1/cachesim-mode.html
+[62] https://compendium.hpc.tu-dresden.de/software/perf_tools/
+https://compendium.hpc.tu-dresden.de/software/perf_tools/
+[63] https://compendium.hpc.tu-dresden.de/software/pika/
+https://compendium.hpc.tu-dresden.de/software/pika/
+[64] https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
+https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
+[70] https://compendium.hpc.tu-dresden.de/jobs_and_resources/barnard/
+https://compendium.hpc.tu-dresden.de/jobs_and_resources/barnard/
+
+[TABELLE 1]
+Paper/Repo || Jahr || Kerngedanke || Anwendbarkeit für PRT-ART (Dense/Sparse/Redirect) || Online-Relocation? || Prefetch-Strategie || Metriken berichtet (CLU/Footprint/Cache-Misses) || Implementierung verfügbar
+ART [7] || 2013 || Adaptive Node-Familie + Pfadkompression; Cache/TLB-aware Performance || Dense (ART-Seiten), Redirect (compressed paths) || Nein (implizit via Updates) || nicht als Kernbeitrag || Cache-/TLB-Argumentation, Microbenchmarks || mehrere Implementierungen, u.a. libart [28]
+HOT [8] || 2018 || Dynamischer Span pro Node; SIMD-Node-Layouts; Höhe minimieren || Sparse (HOT-Seiten), Redirect (Patricia/HOT) || Nein (keine Layout-Umlagerung) || SIMD in-node, kein Engine-Prefetch || Memory footprint & Performance in Benchmarks || GitHub speedskater/hot [29]
+START [9] || 2020 || Hardwarekalibriertes Kostenmodell + Optimierer; multilevel Nodes || Dense (START-ähnliche Seiten), Redirect (rewiring) || „konzeptionell auch online“ (Papierfokus: offline) || indirekt (Height↓ ⇒ weniger Pointer-Chasing) || speedups, hardware-spezifisch || (kein offizielles Repo im Paper genannt; Details im PDF) [9]
+Masstree [30] || 2012 || Trie aus B+-Trees (8‑Byte slices), SMP/Concurrency, „prefetchable nodes“ || Dense (B+-Tree Pages), Redirect (Slicing) || Nein || Prefetch als Designmotiv („fat nodes“) [31] || Throughput/Scalability || GitHub kohler/masstree-beta [32]
+Wormhole [33] || 2019 || Hash+Trie+B+-Tree-Hybrid; schnelle Sprünge (Anchors) || Redirect (Shortcut Nodes), evtl. Sparse || Nein || nutzt SIMD/CRC Features (implizit) || Throughput, Space || GitHub wuxb45/wormhole [34]
+CoCo-trie [35] || 2022/2024 || Data-aware Collapsing + Pool von Encodings; lokale Optimierung || Redirect (collapsed subtries), Sparse (compressed) || Offline-Optimierung im Fokus || nein (Kompression) || Space/Time Tradeoffs, viele Datensätze || GitHub aboffa/CoCo-trie [36]
+CSS-tree [13] || 1999 || Pointer-freies Directory über sortiertem Array; cacheline-sized nodes || Dense (array pages), Redirect (arith. child) || Nein (batch rebuild) || nein || Cache-Simulation/Cache-Miss-Argumentation || (kein verbreitetes „original repo“)
+CSB+-tree [14] || 2000 || Siblings contiguous; 1 Child-Pointer + Offsets || Dense (Page-Cluster), Cacheline/Block-Packing || partielle Reallokation bei splits || nicht zentral || Cache-Fokus, Performance-Studien || (kein offizielles repo; Paper-PDF verfügbar)
+Node size vs Cache/TLB (Hankins/Patel) [37] || 2003 || Node-Größe > Cacheline kann besser sein (TLB/Height tradeoff) || Page-Größe/Node-Länge als Parameter || — || — || Cache- & TLB-Miss-Modelle || Paper-PDF verfügbar
+Prefetching B+-Trees [19] || 2001 || Prefetch macht Nodes effektiv breiter; Leaf-Pointer-Arrays für Scans || Prefetch-Policy-Baustein (Engine) || Nein || Software-Prefetch, „wider nodes“ || D-cache stalls, speedups || Paper-PDF verfügbar
+„Prefetching indexing scheme…“ [20] || 2024 || Read-Counter pro Block + evolvierende Hot Paths; Jump Pointer Queue || Probability hints, Engine-Telemetrie || Ja (Pfadmodell evolviert), Relocation nicht zwingend || Path- und Jump-Pointer Prefetcher || Micro-arch Profiling, speedups || (Code nicht angegeben; Data „on request“)
+B²-tree (Datenbank Spektrum) [16] || 2022 || Embedded trie pro Page → Suchraum-Einengung → weniger Cachelines || Dense+In-page narrowing || Nein (im Paper: Page-intern) || nicht als Kernmechanismus || Cacheline-Reduktion als Argument || Umbra-intern; Paper/PDF verfügbar
+„B‑Trees Are Back“ [17] || 2025 || 6 Node-Layout-Optimierungen + adaptive Runtime-Wahl || Dense Page-Familie, Fingerprints, Hints || adaptiert Layout zur Runtime (nicht physische Relocation im Sinne „umkopieren“) || indirekt über Layout/Hints || Throughput; Memory/Footprint im Benchmark-Fokus || Paper-PDF verfügbar
+Cache-sensitive dynamic layout (Saikkonen/S.) [4] || 2008/2016 || Multi-Level-Relocation + dynamische Invarianten; TLB als Ebene || Engine-Relocation-Basis || Ja (global rearrangement + lokale Ops) || indirekt (contiguous blocks) || Search speedup, Cache/TLB Modell || Paper-PDF verfügbar
+Intel Advisor MAP/CLU/Footprint [2] || 2023–2025 || Cache-Simulation + CLU + Footprint als Metriken || Mess-/Feedback-Loop der Engine || — || — || CLU, Cache Misses, Simulated Footprint || Tool-Doku (offiziell)
+Linux perf Hybrid-Messung [38] || laufend || PMU counter inkl. Hybrid cpu_core/cpu_atom || Mess-Backend P/E getrennt || — || — || cache-misses, dTLB, branches, … || Kernel/Tool-Doku + ZIH-Anleitung
+GCC Function Multiversioning [39] || laufend || target_clones/FMV für ISA-Varianten || Build-/Dispatch-Schicht für AVX2/AVX‑512/vanilla || — || — || — || GCC-Doku (offiziell)
+[/TABELLE]
+
+
+[TABELLE 2]
+Datensatz || Seitentyp || Ordnungsmodus || ISA || Core‑Typ || CLU (Advisor) || Footprint (Advisor) || LLC‑miss/op (perf) || dTLB‑miss/op (perf) || Throughput (ops/s)
+url || Dense || sorted || AVX2 || P || … || … || … || … || …
+url || Sparse/HOT || sorted || AVX2 || P || … || … || … || … || …
+url || Redirect/CoCo || sorted || AVX2 || P || … || … || … || … || …
+url || B²‑in‑page || sorted || AVX2 || P || … || … || … || … || …
+[/TABELLE]

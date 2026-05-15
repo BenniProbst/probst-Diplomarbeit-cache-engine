@@ -1,0 +1,40 @@
+EXPOSE DIPLOMARBEIT
+CPU-only Evaluation eines cache-line-aware Präfixindex für Byte-Keys
+Arbeitsfassung | PRT-ART mit adaptiven Suchseiten, HOT-inspirierten Patricia-Modi und separaten Value-Arenen
+Motivation und Anschluss an die Gruppe
+Die Arbeit adressiert hardware-nahe Optimierung von Datenbanksystemen. Auf Basis einer experimentellen Datenbank soll eine CPU-only Indexstruktur für Byte-Keys entwickelt und gegen starke main-memory-nahe Referenzen abgegrenzt werden. Im Fokus stehen cache-line-aware Knotenkodierung, Präfixkompression, Trennung von Navigationsstruktur und Payload sowie eine belastbare CPU-Evaluation.
+Zielsetzung
+Ziel ist die prototypische Umsetzung des Comdare Predix-Trie-ART (PRT-ART) als CPU-orientierten, präfixkomprimierten Index für Byte-Keys. Die Struktur übernimmt aus ART lokale Adaptivität und Pfadkompression und ergänzt cache-line-aligned custom nodes, optionale HOT-inspirierte Patricia-/Mehrbit-Suchmodi sowie getrennte Value-Arenen. Der Baum hält im Suchpfad keine Nutzdaten; terminale Blätter tragen eine explizit gespeicherte Value-Referenz auf extern abgelegte Daten. Verarbeitungsschema: Key -> Knoten-Traversierung -> Pointer -> Daten.
+Forschungsfragen
+Wie sollten direkte, kompakte und HOT-inspirierte Patricia-/Mehrbit-Seiten kodiert werden, und wann sollte zwischen ihnen umgeschaltet werden?
+Wie stark profitiert PRT-ART von der Trennung zwischen heißem Navigationspfad und externen Value-Arenen im Vergleich zu B-/B+-Baum, CSS-tree, CSB+-tree, ART/START, HOT, Masstree und B²-tree?
+Bei welchen Workloads ist PRT-ART bei Exact Lookup, Prefix Lookup und Prefix Enumeration überlegen oder unterlegen, und wo bleiben klassische Bereichsscan- oder Update-Baselines stärker?
+Welche Hardwaremetriken wie L1/L2/LLC-/dTLB-Misses, Branch-Mispredictions, Fehlzugriffe und Bytes pro Key erklären die Ergebnisse?
+Methodik und Evaluation
+Verglichen werden B-/B+-Baum, CSS-tree, CSB+-tree, ART/START, HOT, Masstree und B²-tree; Hash und sortiertes Array dienen nur ergänzend. Variiert werden Datenvolumen, Keylängen, Präfixüberlappung, lokale Dichte, Skew, Treffer/Fehler, Delete-Raten und Value-Größen. Gemessen werden Exact/Prefix Lookup, Prefix Enumeration, Insert/Update/Delete, Build/Konsolidierung, p50/p95/p99, Durchsatz, Bytes pro Key/Pool und Hardwarezähler wie cycles, instructions, L1/L2/LLC-/dTLB-Misses sowie branches. Zunächst wird Single-Thread untersucht; danach folgen leseparallele Multi-Thread-Szenarien. Schreibparallelität und SIMD bleiben Ausbauoptionen.
+Erwarteter Beitrag
+Integration von PRT-ART in die redcomponent/comdare DB mit explizitem Value-Pointer-Modell, Exact-/Prefix-Lookup und CPU-only Benchmarkmatrix.
+Charakterisierung, wann cache-line-aligned custom nodes, HOT-inspirierte Patricia-/Mehrbit-Modi, Redirect-Kompression und getrennte Value-Arenen Vorteile bringen und wo klassische cache-sensitive B-/Trie-Varianten überlegen bleiben.
+OPTIONALER ANHANG
+Betreuungswunsch und fachlich begründete Vorschläge
+Einordnung des Vorschlags
+Mit der Liste möchte ich meine fachliche Einordnung transparent machen. Inhaltlich sehe ich die engsten Anschlussstellen für adaptive Suchseiten, custom node encodings und cache-line-aware Layoutfragen bei Dr.-Ing. Alexander Krause und Dr.-Ing. Johannes Pietrzyk; für Zugriffsmuster, Hardwaremetriken und Benchmarkcharakterisierung erscheinen mir außerdem Dr.-Ing. Juliana Hildebrandt bzw. Lennart Schmidt M.Sc. sehr passend.
+
+[TABELLE 1]
+Systembasis | redcomponent/comdare DB; PRT-ART als prototypische Indexstruktur || Technischer Fokus | CPU-only; präfixkomprimierter Suchindex mit adaptiven Suchseiten || Wissenschaftlicher Fokus | Vergleich nach Latenz, Durchsatz, Speicherbedarf und Hardwarezählern
+[/TABELLE]
+
+
+[TABELLE 2]
+Sehr geehrter Herr Prof. Habich, für das überarbeitete CPU-Thema würde ich mich zunächst sehr über eine Betreuung durch Sie freuen. Falls eine engere operative Betreuung innerhalb Ihrer Gruppe sinnvoller sein sollte, möchte ich mit der folgenden Liste transparent machen, welche Personen aus meiner Sicht fachlich besonders gut zum PRT-ART und seiner Vergleichsevaluation passen würden.
+[/TABELLE]
+
+
+[TABELLE 3]
+Priorität || Vorschlag || Kurze Begründung
+1 || Prof. Dr.-Ing. habil. Dirk Habich || Erste Präferenz, da das Thema direkt in Ihren ausgeschriebenen Bereich DB Systems mit hardware-naher Programmierung und Robustheit der Anfrageverarbeitung fällt.
+2 || Dr.-Ing. Alexander Krause || Besonders passend für die prototypische Integration in die Datenbank und die systemnahe Ausgestaltung von Suchpfaden, Seitendarstellungen und Datenlayouts.
+3 || Dr.-Ing. Johannes Pietrzyk || Sehr passend für CPU-seitige Datenparallelität, SIMD-/TSL-Layoutfragen und die Einordnung des Entwurfs gegenüber moderner In-Memory-Verarbeitung.
+4 || Dr.-Ing. Juliana Hildebrandt || Naheliegend für Zugriffsmuster, Gather-/Layout-Effekte, Datenrepräsentation und die praktische Wirkung des Speicherlayouts.
+5 || Lennart Schmidt M.Sc. || Besonders passend für die Analyse von Cache-/TLB-Verhalten, Memory-Access-Patterns, Skalierung und reproduzierbarer Benchmarkauswertung.
+[/TABELLE]

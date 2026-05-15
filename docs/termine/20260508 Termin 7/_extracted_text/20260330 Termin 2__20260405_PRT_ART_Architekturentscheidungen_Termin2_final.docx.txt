@@ -1,0 +1,69 @@
+Ausarbeitung Termin 2
+Cache-line-aware Entwurf von PRT-ART | eingefrorene Architekturentscheidungen, Invarianten, Risiken
+1. Eingefrorener Kernentwurf
+• Globale Form: eine ordnungserhaltende Trie-Hülle mit CoCo-trie-artigen Redirect-Knoten für eindeutige Restpfade.
+• Lokale Suchseiten: eine begrenzte Familie aus Dense-Byte-Page, Extended Dense Page, Sparse Patricia Page und PRT-Custom-Cache-Page.
+• Terminale Semantik: terminale Knoten statt terminaler Blätter; ein terminaler Knoten trägt ein ValueHandle.
+• Payload: hot/cold split. Der Suchpfad enthält standardmäßig keine großen Nutzdaten; kleine Werte dürfen im Inline-Modus direkt im terminalen Knoten liegen.
+2. Logische Seitentypenfamilie
+3. Die Cache-Engine als zweite Steuerlogik
+Die Cache-Engine ist logisch von der Trie-Engine getrennt. Sie ist keine neue Query-Engine, sondern ein lokales Entscheidungswerk, das Seitentyp, Ausrichtung und Handle-Strategie auswählt. Damit wird Cache-Awareness explizit statt implizit.
+• Beobachtbare Eingaben: lokale Dichte und Fanout im aktuellen Teilbaum; Präfixentropie bzw. Länge gemeinsam geteilter Restpfade; erwartete berührte Cache-Lines und Pages pro Lookup; Key- und Value-Größe sowie Inline-Eignung; ISA- und Hardwareprofil (z. B. AVX2 verfügbar, optionale AVX-512-Zielplattform)
+• Entscheidungen: Seitentyp, Alignment, lokale Ordnung, Inline-vs.-Pointer-Value, Reorganisation von Node-Gruppen.
+• Für Termin 2 reicht ein konkretes Kostenmodell-Gerüst; numerische Schwellwerte werden erst in Termin 3 kalibriert.
+4. ValueHandle statt fester Payload-Politik
+• ValueHandle::Inline – für kleine Werte, wenn ein zusätzlicher Pointer teurer wäre als das direkte Mitlesen aus derselben Cache-Line.
+• ValueHandle::External – Standardpfad für größere Werte; der terminale Knoten trägt nur eine referenzierbare Handle-/Pointer-Information.
+• ValueHandle::ChainRef – als explizit vertagte Erweiterung für Value-Dedup oder verkettete Payload-Segmente. Nicht Kern von Termin 2.
+5. Ordnung und Sortierung als Policy-Achse
+• Default-Modus: keine garantierte Enumerationsreihenfolge; optimiert für reine Navigationsleistung.
+• Lokaler Ordnungsmodus: geordnete Einträge innerhalb einer Seite oder Knotengruppe, ohne globale Lex-Garantie.
+• Lex-Modus: expliziter, global lexikographischer Betriebsmodus für Prefix Enumeration und Range-ähnliche Ausgaben.
+• Konkrete Sortieralgorithmen bleiben Policy-Hooks; Termin 2 friert nur die Semantik, nicht den späteren Sortiervergleich ein.
+6. Invarianten
+7. Risiken und bewusste Gegenmaßnahmen
+8. Was Termin 3 beantworten muss
+• Welche Datenmengen, Präfixentropien und Key-Längen werden Pflichtfälle im Benchmark?
+• Welche Baselines werden tatsächlich implementiert: mindestens ART, HOT, eine cache-sensitive B+-Variante und eine einfache B+-/Hash-Referenz?
+• Wie wird die Cache-Engine kalibriert: perf, Intel Advisor MAP/Roofline, gezielte Mikrobenchmarks je Seitentyp?
+• Welche Fairnessregeln gelten für Inline-Werte, lokale Ordnung und hardwareabhängige ISA-Pfade?
+
+[TABELLE 1]
+
+[/TABELLE]
+
+
+[TABELLE 2]
+Leitbild: PRT-ART ist kein einzelner Knotentyp, sondern eine kleine, bewusst begrenzte Familie lokaler Seitentypen unter einer präfixorientierten Trie-Hülle. Die Navigationsstruktur bleibt heiß und kompakt; Payload liegt standardmäßig außerhalb des Suchpfads.
+[/TABELLE]
+
+
+[TABELLE 3]
+Seitentyp || Literaturanker || Rolle im PRT-ART-Kern
+Redirect-Page || CoCo-trie / klassische Pfadkompression || Komprimiert eindeutige Restpfade und zeigt auf den nächsten Knoten; Ziele möglichst auf wenige Cache-Lines kondensieren.
+Dense-Byte-Page || ART || Dichte lokale Übergänge über ein Byte; direkte oder nahezu direkte Adressierung mit stark vorhersehbarer Traversierung.
+Extended Dense Page || START || Mehrbyteige dichte Transitionen; reduziert Höhe lokal, benötigt aber schwellwert- oder kostenmodellbasiertes Tuning.
+Sparse Patricia Page || HOT || Nutzen diskriminierender Bits, partielle Schlüssel und kompakte Layouts für sparse Suchräume; page-lokale Suche statt Pointer-Chasing.
+PRT-Custom-Cache-Page || B²-tree + CSS/CSB+-Prinzipien || Page-lokale Suchraum-Einengung, kompakte Metadaten, bewusste Cache-Line-Zuschnitte und pool-relative Handles.
+[/TABELLE]
+
+
+[TABELLE 4]
+ID || Invariante
+I1 || Jeder Lookup traversiert ausschließlich Navigationsknoten bis zu einem terminalen Knoten oder Miss.
+I2 || Ein terminaler Knoten besitzt genau ein ValueHandle; Payload ist standardmäßig extern, optional inline.
+I3 || Redirect-Knoten komprimieren eindeutige Restpfade, ersetzen aber keine echte Mehrfachverzweigung.
+I4 || Lokale Seitencodierung darf variieren, solange die Ordnungsrelation der rohen Byte-Keys nicht verletzt wird.
+I5 || Seitentyp-Umschaltungen sind explizite Policy-Entscheidungen; feste universelle Schwellwerte werden nicht behauptet.
+I6 || Concurrency bleibt im Kernumfang auf spätere Erweiterung begrenzt; Termin 2 fokussiert Single-Thread und Read-Scaling-Vorbereitung.
+[/TABELLE]
+
+
+[TABELLE 5]
+Risiko || Problem || Gegenmaßnahme
+Framework-Explosion || Zu viele kombinierbare Features || Kern auf fünf Seitentypen, ValueHandle, Ordnungsmodus und Cache-Engine begrenzen.
+Architekturabhängigkeit || Schwellwerte kippen je CPU || Hardwareprofile und Messkalibrierung statt universeller Konstanten.
+Zu komplexe Cache-Engine || Entwurf wird unimplementierbar || Termin 2 nur als Entscheidungsgerüst; numerische Kalibrierung auf Termin 3 verschieben.
+Inline-Value-Fehlannahmen || Payload sprengt Cache-Line-Ziele || Inline nur als messbare Policy, nicht als Default.
+Concurrency-Scope || Kernfrage verwässert || Observer-/Visitor-Stellen notieren, aber Multi-Writer nicht im Kernumfang.
+[/TABELLE]

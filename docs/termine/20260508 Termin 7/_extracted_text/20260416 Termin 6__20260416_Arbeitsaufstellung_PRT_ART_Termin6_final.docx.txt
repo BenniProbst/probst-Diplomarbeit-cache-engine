@@ -1,0 +1,44 @@
+Arbeitsaufstellung Termin 6
+PRT-ART · Plattformmatrix, Benchmarks und Messalgorithmen zur Verifikation der Cache-Engine
+Auftrag. Für Termin 6 wird festgezogen, auf welchen Architekturen, mit welchen Benchmarkfamilien und mit welchem Messstack die automatische Funktionalität der Cache-Engine verifiziert wird. Ziel ist nicht mehr die grobe Ideenbildung, sondern eine belastbare Experimentier- und Kalibrierungsstrategie für PRT-ART.
+1. Zielbild für Termin 6
+• Die Plattformmatrix wird auf Pflichtplattformen, optionale Zusatzplattformen und bedingte Altgeräte getrennt.
+• Die Verifikation wird zweistufig aufgebaut: zuerst Kalibrierungs-Mikrobenchmarks der Cache-Engine, danach eigentliche Such- und Mischlasten für PRT-ART und die angebundenen Baselines.
+• Der Messstack wird je Betriebssystem und Plattformklasse explizit festgelegt; insbesondere werden Intel-Hybrid-Systeme getrennt nach cpu_core und cpu_atom behandelt.
+• Die Cache-Engine wird in drei Modi verifiziert: statisch/passiv, Warm-up-kalibriert und online adaptiv.
+2. Arbeitspakete
+3. Pflichtentscheidungen für die Termin-6-Präsentation
+• Pflichtplattformen lokal: VisionFive 2, Raspberry Pi 5, Mac mini M1 (Bedingungen unter ungenauer Hardwarebestimmung), ODROID-H4 Ultra, i7-1270P, i9-14900KS, Ryzen 9 9950X3D2; der alte Intel-Mac-mini nur nach exakter CPU-Erkennung.
+• Pflichtplattformen am ZIH: Barnard (Sapphire Rapids) und Grace Hopper GH200; Capella wird als interessanter AMD-Server-Zusatz vorbereitet.
+• Pflicht-ISA-Pfade: scalar, x86_avx2, x86_avx512 (wenn verfügbar), arm_neon, arm_sve2.
+• Pflicht-Benchmarkfamilien: Working-set-, stride-, pointer-chase-, prefetch- und Seitentyp-Mikrobenchmarks sowie exact/prefix/build/update/delete und YCSB-inspirierte Mischlasten.
+• Pflicht-Messstack: perf stat/record auf Linux, PAPI auf ZIH, Intel Advisor MAP/CLU/Footprint auf Intel-x86, Instruments/Time Profiler auf macOS.
+• Pflicht-Auswertung: fünf Rohläufe, keine Mittelung von Perzentilen, getrennte Ausweisung nach Plattform, Core-Typ, ISA und Cache-Engine-Modus.
+4. Offene Randpunkte, die Termin 6 nicht blockieren dürfen
+• Der ältere Intel-Mac-mini bleibt bedingt, bis Modell-ID, CPU-Features und sinnvoller Messpfad exakt aufgenommen sind.
+• Intel MLC wird nur als Hilfswerkzeug auf eigenen Intel-Maschinen betrachtet; auf ZIH ist es nicht das Primärinstrument.
+• AMX auf Barnard bleibt beobachtbar, wird aber nicht als eigener Kernpfad für trie-basierte Suche eingefroren.
+• Grace Hopper wird für die Termin-6-Verifikation über den CPU-/Speicherpfad betrachtet; GPU-Kernelanalyse ist ein not TODO.
+5. Quellenbasis (Auszug)
+• ZIH HPC Compendium: Barnard, Capella, NVIDIA Grace Hopper, perf, PAPI, PIKA/No-Monitoring.
+• Intel Spezifikationsseiten: i7-1270P, i9-14900KS, Xeon Platinum 8470; Intel Advisor User Guide.
+• AMD Produktseiten: Ryzen 9 9950X3D und Ryzen 9 9950X3D2 Dual Edition.
+• Apple Support und Apple Developer: Mac mini (M1, 2020), Apple-Silicon-Optimierung.
+• Raspberry Pi 5 offizielle Einführung, StarFive VisionFive 2 Spezifikation, Hardkernel ODROID-H4 Ultra.
+• Google Benchmark User Guide und YCSB Core Workloads als Benchmark-Vorlagen.
+
+[TABELLE 1]
+Pflichtfrage für Termin 6: Auf welchen Architektur-Extrema muss die Cache-Engine zeigen, dass sie ihre Seitentyp-, Layout- und Value-Ablage-Entscheidungen automatisch und plattformbewusst verbessern kann?
+[/TABELLE]
+
+
+[TABELLE 2]
+AP || Inhalt || Ergebnis || Priorität
+AP1 || Pflichtplattformen und Architektur-Extrema katalogisieren || fixe Plattformmatrix mit ISA-Pfaden und Rollen || P0
+AP2 || Kalibrierungs-Mikrobenchmarks definieren || Working-set-, stride-, pointer-chase-, TLB- und prefetch-Sweeps || P0
+AP3 || Suchworkloads und Datensätze einfrieren || CoCo-trie-Datensätze + feste Such- und Mischlastfamilien || P0
+AP4 || Messstack je Plattform festlegen || perf/PAPI/Advisor/Instruments und Run-Regeln || P0
+AP5 || Verifikationslogik der Cache-Engine definieren || Vergleich passiv vs. Warm-up vs. online adaptiv || P1
+AP6 || Queue- und Jobstrategie für ZIH vorbereiten || Barnard/GH200 optional Capella mit Batch-Regeln || P1
+AP7 || Bedingte Plattformen und Risiken dokumentieren || Legacy mac mini nur nach exakter CPU-ID || P2
+[/TABELLE]

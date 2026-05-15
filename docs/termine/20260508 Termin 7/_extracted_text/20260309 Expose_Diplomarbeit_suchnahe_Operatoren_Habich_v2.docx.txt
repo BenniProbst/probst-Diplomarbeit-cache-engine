@@ -1,0 +1,42 @@
+EXPOSE DIPLOMARBEIT
+Build- und laufzeitadaptive heterogene Ausführung
+suchnaher Operatoren in analytischen Datenbanksystemen
+Arbeitsfassung | hardware-oblivious Operatorfamilien mit Build-Spezialisierung für CPU-SIMD, einem ersten GPU-Backend und Laufzeit-Scheduling für CPU/GPU-Co-Execution
+Motivation und Anschluss an die Gruppe
+Die Professur für Datenbanken der TU Dresden adressiert ausdrücklich die hardware-nahe Optimierung von Datenbanksystemen; für studentische Arbeiten ist im Themenfeld DB Systems insbesondere hardware-nahe Programmierung und Robustheit der Anfrageverarbeitung genannt. Daran knüpft die Arbeit direkt an: Ausgehend von einer eigenen experimentellen Datenbankbasis soll untersucht werden, wie suchnahe Operatoren auf moderner heterogener Hardware robust, portabel und adaptiv ausgeführt werden können.
+Zielsetzung
+Ziel ist der Entwurf einer gemeinsamen, hardware-oblivious Beschreibung suchnaher Operatoren, die zur Build-Zeit für CPU-SIMD und ein erstes GPU-Backend spezialisiert werden kann. Die GPU-Unterstützung ist dabei nicht der Kern des Themas, sondern eine erste Zielplattform; zunächst exemplarisch ist NVIDIA/CUDA vorgesehen. Darauf aufbauend soll ein Laufzeitmechanismus entscheiden, ob Anfragen CPU-only, GPU-only oder kooperativ auf beiden Ressourcen ausgeführt werden. Berücksichtigt werden insbesondere Eingabegröße, Selektivität, Datenlayout, Zugriffsmuster, Transferkosten und aktuelle Systemlast.
+Forschungsfragen
+Wie lässt sich eine gemeinsame Operatorfamilie für CPU-SIMD und GPU formulieren, ohne wartungsintensive Spezialpfade zu erzeugen?
+Welche Workload- und Hardwaremerkmale bestimmen CPU-only, GPU-only oder kooperative Ausführung?
+Wie sollte ein Scheduler große Filter- und Suchaufträge zwischen GPU-Kernels und CPU-Multithreading aufteilen?
+Wie tief muss die Lösung in Executor und gegebenenfalls Kostenmodell integriert werden, um robust wiederverwendbar zu sein?
+Methodik und Evaluation
+Methodisch beginnt die Arbeit mit CPU-Baselines (skalar und SIMD) für repräsentative suchnahe Operatoren. Anschließend wird ein GPU-Backend über eine gemeinsame Schnittstelle ergänzt und mit einem leichtgewichtigen Scheduling- beziehungsweise Kostenmodell verbunden. Die Evaluation vergleicht CPU-only, GPU-only und kooperative Ausführung entlang von Datenvolumen, Selektivität, Datenlayout, Ergebnisdichte, Transfergrößen und Konkurrenzlast. Gemessen werden Latenz, Durchsatz, Ressourcen-Auslastung, Datenbewegung und die Robustheit der Scheduling-Entscheidungen.
+Erwarteter Beitrag
+Prototypische Integration der Operatorfamilie in die redcomponent/comdare DB.
+Belastbare Charakterisierung, wann Build-Spezialisierung und CPU/GPU-Co-Execution tatsächlich Vorteile bringen.
+Ein verallgemeinerbares Entwurfs- und Evaluationsschema für heterogene suchnahe Operatoren in analytischen Datenbanksystemen.
+Arbeitsfassung auf Basis öffentlich verfügbarer TUD/FIS-Quellen, Stand März 2026.
+Betreuungswunsch und fachlich begründete Vorschläge
+Einordnung des Vorschlags
+Mit der Liste möchte ich keine Betreuungszuordnung vorwegnehmen, sondern meine thematische Einordnung transparent machen. Inhaltlich sehe ich die engste Anschlussstelle für die Operator- und Hardwareseite bei Dr.-Ing. Johannes Pietrzyk, für einen stärkeren Fokus auf Laufzeitscheduling und Datenbewegung bei Lennart Schmidt M.Sc. und für eine stärkere executor- bzw. optimizernahe Einbettung bei Dr.-Ing. Alexander Krause bzw. Dr.-Ing. Claudio Hartmann. Über Ihre Einschätzung, welche Betreuungskonstellation für das Thema innerhalb Ihrer Gruppe am sinnvollsten wäre, würde ich mich sehr freuen.
+
+[TABELLE 1]
+Systembasis | redcomponent/comdare DB als experimentelle Datenbankbasis || Technischer Fokus | CPU-SIMD plus erstes GPU-Backend; zunächst exemplarisch NVIDIA/CUDA || Wissenschaftlicher Fokus | Adaptivität, Robustheit und Laufzeit-Scheduling für suchnahe Operatoren
+[/TABELLE]
+
+
+[TABELLE 2]
+Sehr geehrter Herr Prof. Habich, für das skizzierte Thema würde ich mich zunächst sehr über eine Betreuung durch Sie freuen. Falls dies zeitlich nicht möglich sein sollte, möchte ich mit der folgenden Liste transparent machen, welche Personen aus Ihrer Gruppe aus meiner Sicht fachlich besonders gut passen würden.
+[/TABELLE]
+
+
+[TABELLE 3]
+Priorität || Vorschlag || Kurze Begründung
+1 || Prof. Dr.-Ing. habil. Dirk Habich || Erste Präferenz, da das Thema direkt in den von Ihnen ausgeschriebenen Bereich DB Systems mit hardware-naher Programmierung und Robustheit der Anfrageverarbeitung fällt und zugleich eng an Ihre Forschung zu adaptiven analytischen Datensystemen anknüpft.
+2 || Dr.-Ing. Johannes Pietrzyk || Engste fachliche Anschlussstelle für gemeinsame Operatorfamilien, Build-Spezialisierung und moderne Hardwarepfade; besonders passend durch CHORYS, hardware-oblivious Vektorisierung und data-level parallel query processing.
+3 || Lennart Schmidt M.Sc. || Besonders passend, wenn der Schwerpunkt stark auf Laufzeitscheduling, Lastaufteilung, Datenbewegung und Zugriffsmustern zwischen CPU und GPU liegt; naheliegend durch VAMPIR und aktuelle Arbeiten zu heterogenen Speicher- und Zugriffseigenschaften.
+4 || Dr.-Ing. Alexander Krause || Sehr passend für die prototypische Integration in die Datenbank, insbesondere bei operatornaher Systemtechnik, asynchronem Offload und executor-naher Umsetzung.
+5 || Dr.-Ing. Claudio Hartmann || Fachlich naheliegend, sobald Auswahl und Einbindung von CPU-, GPU- oder kooperativer Ausführung stärker über Scheduler-, Kostenmodell- oder Optimizer-Schnittstellen abgebildet werden sollen.
+[/TABELLE]

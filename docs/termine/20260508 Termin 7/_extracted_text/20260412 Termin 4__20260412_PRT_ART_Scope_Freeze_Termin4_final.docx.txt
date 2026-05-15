@@ -1,0 +1,82 @@
+PRT-ART Termin 4 – Scope-Freeze
+Finale Forschungsfrage, Architekturgrenzen und verbindlicher Implementationsumfang
+Stand: Scope-Freeze nach Termin 1–3
+1. Finale Forschungsfrage und Hypothesen
+Finale Forschungsfrage:
+Wie stark verbessern aktive, explizite cache-aware Layout-, Seitentyp- und Value-Ablageentscheidungen die Leistung trie-basierter Suchbäume gegenüber passiven, statischen Layouts auf Hybrid-CPUs und Sapphire-Rapids-Systemen?
+Eingefrorene Arbeitshypothesen:
+• H1: Eine aktive Cache-Engine verbessert Cache Line Utilization, Footprint und Laufzeit gegenüber statischen Layouts.
+• H2: Dense-, Sparse- und Multilevel-Seiten gewinnen abhängig von Datensatz, ISA, Core-Typ und Ordnungsmodus unterschiedlich.
+• H3: Die Grenze zwischen Inline-Value und ValueHandle ist architektur- und workloadabhängig und muss aktiv gewählt werden.
+• H4: Online-Umlagerung und explizites Prefetching helfen nur dann, wenn Seitentyp, Wertablage und Affinity gemeinsam modelliert werden.
+2. Eingefrorene Systemgrenzen
+• Standardpfad für Schlüssel: ordnungserhaltende Byte-Repräsentation.
+• Pflichtplattformen: lokales Alder-Lake-P-System und Barnard/Sapphire Rapids.
+• Pflichtmesspfade: perf auf beiden Plattformen; Intel Advisor lokal; auf ZIH perf/PAPI/PIKA-konforme Messung ohne Administrationsrechte.
+• PRT-ART wird vollständig selbst implementiert; Fremdalgorithmen nur als Originalartefakte mit Wrappern.
+• Der reproduzierbare Datenpfad aus Termin 3 bleibt bindend: Quelle → Rohdaten → deterministische Aufbereitung → feste Workloads → feste Plattform-/Build-Konfiguration → Rohmessartefakte je Lauf.
+3. Architektur-Freeze von PRT-ART
+Die Architektur wird in vier Schichten eingefroren:
+• A. Trie-Hülle mit Redirect-Knoten für kollabierte Präfixpfade (CoCo-trie-Idee).
+• B. Suchseitenfamilie mit mehreren implementierten Seitentypen.
+• C. Terminale Knoten mit ValueHandle als Übergang zur Payload.
+• D. Cache-Engine als explizite Steuerungsschicht für Layout, Prefetch, Affinity und Rebuild.
+4. Suchseitenfamilie und Knotenklassen
+5. Value-Pfad und Value-Ablage
+Der Suchbaum hält die Nutzdaten nicht als Hauptinhalt, sondern beschreibt den Weg dorthin. Der eingefrorene Datenpfad lautet:
+Key → Redirects / Suchseiten → terminaler Knoten → ValueHandle → Inline-Value oder externer Payload-Speicher
+• ValueHandle ist Kernbestandteil des Systems und keine spätere Verzierung.
+• Inline-Values bleiben Pflichtachse der Arbeit; der Umschaltpunkt wird global, pro Seitentyp und pro Node-Familie parametrierbar gedacht.
+• Komplexe Value-Deduplikationsketten werden im Termin-4-Freeze nicht zum Hauptbeitrag gemacht; sie bleiben eine spätere Ausbauoption innerhalb des Themas.
+6. Cache-Engine als Mikro-Kern
+Die Cache-Engine wird als eigener, hochspezialisierter Abschnitt der Programmbinary definiert. Sie ist nicht nur Beobachter, sondern trifft aktive Entscheidungen.
+• Optimierung von Suchzugriffen innerhalb von Seiten mit Fokus auf Cache-Line-Ausnutzung.
+• Berücksichtigung von Daten- und Programmseiten, um Suchpfade und zugehörige Routinen gemeinsam günstig zu halten.
+• Header-Metadaten in Nodes/Pages mit quantisierten Wahrscheinlichkeiten nachfolgender Seitentypen als Prefetch-Hinweis.
+• Modellierung von Cache-related blocks über L3/L2/L1, um Vorwärm- und Berührungsstrategien explizit zu untersuchen.
+• Online-Umlagerung, Rebuild und Registrierung aktiver Seiten im Rahmen eines lokalen Kostenmodells.
+• Eigene Kostenmodelle je Seitentyp, Datentyp, Speicherart, ISA-Pfad und Mikrobenchmarkklasse.
+7. Build-, ISA- und Plattformmodell
+• C++23-Modul-/Template-Aufbau mit faktischer Ausprägung vieler Varianten als eigene ABI-stabile Modulkombinationen.
+• GNU Function Multiversioning / target(target_clones) für ISA-spezifische Varianten; minimaler C++23 variadischer Runtime-compiletime-hybrid-Resolver statt großem dynamischem Dispatcher.
+• Scalar, AVX2 und AVX-512 als Pflichtpfade; lokal nur Scalar/AVX2, auf Barnard zusätzlich AVX-512.
+• Auf Hybrid-Intel-Plattformen werden P- und E-Cores getrennt gemessen und ausgewertet.
+• Auf Barnard sind perf/PAPI/PIKA-konforme Messpfade und Slurm-Batch-Läufe Pflicht; für eigene Counter-Messung sollen exklusive Jobs mit no_monitoring berücksichtigt werden.
+8. Baselines, Messgrenzen und Nicht-Ziele
+• Implementationsbaselines werden nur als Originalimplementierungen per Wrapper angebunden.
+• START, CSS-tree, CSB+-tree, B²-tree und CoCo-trie bleiben direkte Literatur- und Designnachbarn, solange kein belastbares Artefakt für faire Wrapper vorliegt.
+• GPU, vollständige DBMS-Integration und generische SIMD-Arbeit außerhalb des Suchbaumkerns bleiben Nicht-Ziele.
+• Der einzige optional markierte Block ist multiples multithreaded Schreiben.
+9. Erfolgs- und Abnahmekriterien
+• PRT-ART muss mit Cache-Engine v1 reproduzierbar auf beiden Pflichtplattformen laufen.
+• Die Arbeit muss zeigen, wann aktive Cache-Entscheidungen helfen, wann nicht und welche Seitentyp-/Value-Politik pro Plattform gewinnt.
+• Die Ergebnisse müssen gegenüber Baselines und über den festen Datenpfad nachvollziehbar sein.
+• Die Arbeit darf nicht an voller Multiwriter-Concurrency hängen.
+Rahmenquellen
+• Intel Core i7-1270P: 4 P-Cores, 8 E-Cores, 18 MB Smart Cache, AVX2.
+• Barnard: 2× Xeon Platinum 8470, 104 Kerne, RHEL 9.6.
+• Xeon Platinum 8470: AVX-512 verfügbar.
+• perf hybrid support: getrennte cpu_core/cpu_atom-PMUs und Ereignisse.
+• Intel Advisor MAP/Cache-Simulation: 64-Byte Default Cache-Line; utilization/footprint Modi.
+• ZIH: perf, PAPI und PIKA als verfügbare Performance-Werkzeuge; no_monitoring für eigene Counter-Messung in exklusiven Jobs empfohlen.
+• GCC: Function Multiversioning; __builtin_prefetch.
+
+[TABELLE 1]
+Leitidee | PRT-ART ist nicht mehr nur ein trie-basierter Index. Die eigentliche Forschungsarbeit liegt in einer aktiven Cache-Engine, die Seitentypwahl, Layoutwahl und Value-Ablage bewusst steuert und plattformabhängig misst.
+[/TABELLE]
+
+
+[TABELLE 2]
+Klasse || Literaturanker || Rolle in PRT-ART || Priorität
+Redirect-Knoten || CoCo-trie || Kollabierte Präfixpfade, Weiterleitung auf nahe Suchseiten, Cacheline-/Page-Kondensation. || P0
+Dense Byte Page || ART || Dichte lokale Byte-Navigation als robuste Grundform. || P0
+Multilevel Dense Page || START || Mehrbyteige dichte Seitendarstellung mit eigener Policy und Kostenmodell. || P1
+Sparse Patricia Page || HOT || Diskriminierende Bits, kompakte sparse Suche, hoher Fanout ohne Pointer-Chasing. || P0/P1
+Decision-/Span-Page || B²-tree || Seitinterne Suchraum-Einengung und begrenzte Vergleichssuche. || P2
+Custom Aligned Page || PRT-ART intern || Cacheline- und page-optimierte Spezialdarstellung als eigener Seitentyp. || P2
+[/TABELLE]
+
+
+[TABELLE 3]
+Termin-4-Entscheidung | Die Cache-Engine darf live Pages umbauen und verschieben. Dieses Verhalten ist nicht Optional, sondern Teil des Forschungsbeitrags. Multiple gleichzeitige Writer bleiben davon getrennt und sind die einzige optionale Komponente.
+[/TABELLE]

@@ -1,0 +1,1185 @@
+================================================================================
+PDF VERIFIKATIONSTABELLE
+Quelle:  C:\Users\benja\OneDrive\Desktop\Diplomarbeit - Datenbanken\Forschungsarbeiten
+Stand:   2026-05-04 (REV2 nach Nachladung)
+================================================================================
+
+Anzahl PDFs (Hauptordner): 33
+Anzahl PDFs (low priority): 7
+
+--------------------------------------------------------------------------------
+[01] FILENAME: Aprefetching indexingschemeforin-memorydatabasesystems.pdf
+     SIZE:     3,495,860 bytes
+     META-TITLE: A prefetching indexing scheme for in-memory database systems
+     FIRST-TEXT:
+        Future Generation Computer Systems 156 (2024) 179–190
+        Available online 5 March 2024
+        0167-739X/© 2024 The Author(s). Published by Elsevier B.V. This is an open access article under the CC BY-NC-ND license ( http://creativecommons.org/licenses/by-
+        nc-nd/4.0/).
+        Contents lists available at ScienceDirect
+        Future Generation Computer Systems
+        journal homepage: www.elsevier.com/locate/fgcs
+        Review article
+        A prefetching indexing scheme for in-memory database systems✩
+        Qian Zhang ∗, Haoyun Song, Kaiyan Zhou, Jianhao Wei, Chuqiao Xiao
+        Software Engineering Institute, East China Normal University, 200062, Shanghai, China
+        A R T I C L E I N F O
+        Keywords:
+        Main memory
+        Prefetching
+        Database systems
+        Multi-versioning
+        Indexing scheme
+        A B S T R A C T
+        In-memory databases (IMDBs) store all working data in the main memory, making memory access the dominant
+        factor in system performance. Moreover, for modern multi-version systems, the extended version chain makes
+        the access pattern more complex, putting extra pressure on indexing. Our micro-architectural profiling results
+        of existing IMDB indexing schemes show that over half of the execution time goes to memory stalls caused by
+        pointer chasing operations.
+        This paper proposes a prefetching indexing scheme for modern in-memory database systems. This scheme
+        achieves high performance in the presence of serial accesses in pointer chasing. The essential idea is to use a
+        path prefetcher and a jump pointer prefetcher to hide cache miss latencies induced by indexing
+
+--------------------------------------------------------------------------------
+[02] FILENAME: B-tree Indexes and CPU Caches.pdf
+     SIZE:     1,125,508 bytes
+     META-TITLE: B-tree indexes and CPU caches
+     FIRST-TEXT:
+        B-tree Indexes and CPU Caches 
+        Goetz Graefe and Per-Ake Larson 
+        Microsoft 
+        {goetzg, palarson} @ microsoft. com 
+        Abstract 
+        Since many existing techniques for exploiting CPU 
+        caches in the implementation of B-tree indexes have not 
+        been discussed in the literature, most of them are surveyed 
+        here. Rather than providing a detailed performance 
+        evaluation for one or two of them on some specific con- 
+        temporary hardware, the purpose here is to survey and to 
+        make widely available this heretofore-folkloric knowledge 
+        in order to enable, structure, and hopefully stimulate fu- 
+        ture research. 
+        1. Introduction 
+        Today, most DBMS installations are “compute bound”, 
+        at least after sufficient disk drives and indexes have been 
+        added. However, the bottlenecks are actually not CPU 
+        cycles for instruction execution but cache faults and pipe- 
+        line stalls. At the present time, many product developers 
+        believe that the traditional goal of reducing instruction 
+        path length is much less important than techniques that 
+        improve cache faults and branch prediction. 
+        This brief paper is a summary of knowledge, much of it 
+        folkloric, about how to adapt database indexing software, 
+        in particular B-tree code, to memory hierarchies with mul- 
+        tiple levels of caches. Given the current trends in hardware 
+        design that require increasing sophistication from system 
+        software and compilers, for example Intel’s 64-bit proces- 
+        sors or Transmeta’s innovative processors that employ on- 
+        the-fly translation among 
+
+--------------------------------------------------------------------------------
+[03] FILENAME: B-Trees Are Back - Engineering Fast and Pageable Node Layouts.pdf
+     SIZE:     828,318 bytes
+     META-TITLE: (kein /Title in Metadaten)
+     FIRST-TEXT:
+        B-Trees Are Back: Engineering Fast and Pageable Node Layouts
+        Marcus Müller
+        Technical University of Munich
+        Munich, Germany
+        muelm@cit.tum.de
+        Lawrence Benson
+        Technical University of Munich
+        Munich, Germany
+        lawrence.benson@tum.de
+        Viktor Leis
+        Technical University of Munich
+        Munich, Germany
+        leis@in.tum.de
+        Abstract
+        Large main memory capacity and even larger data sets have moti-
+        vated hybrid storage systems, which serve most transactions from
+        memory, but can seamlessly transition to flash storage. In such sys-
+        tems, the data structure of choice is usually a B-Tree with pageable
+        nodes. Most academic B-Tree work considers only fixed size records,
+        making them unsuitable for most practical applications. Given the
+        prevalence of B-Trees, surprisingly few available implementations
+        and benchmarks of optimized B-Trees cover variable-sized records.
+        In this paper, we describe an efficient B-Tree implementation sup-
+        porting variable-sized records containing six known node layout
+        optimizations. We evaluate each optimization to guide future imple-
+        mentations, and propose an optimized adaptive layout that can even
+        compete with pure in-memory structures for many workloads. Our
+        results show that well-engineered B-Trees can efficiently handle
+        both in-memory and out-of-memory workloads.
+        ACM Reference Format:
+        Marcus Müller, Lawrence Benson, and Viktor Leis. 2025. B-Trees Are Back:
+        Engineering Fast and Pageable Node Layouts. Proc. ACM Manag. Data 3,
+        1 (SIGMOD), Article 14 (February 2025), 15 pages. https:/
+
+--------------------------------------------------------------------------------
+[04] FILENAME: B2-Tree - Page-Based String Indexing in Concurrent Environments.pdf
+     SIZE:     794,132 bytes
+     META-TITLE: (kein /Title in Metadaten)
+     FIRST-TEXT:
+        SCHWERPUNKTBEITRAG
+        https://doi.org/10.1007/s13222-022-00409-y
+        Datenbank Spektrum (2022) 22:11–22
+        B2-Tree: Page-Based String Indexing in Concurrent Environments
+        Josef Schmeißer1 · Maximilian E. Schüle1 · Viktor Leis2 · Thomas Neumann1 ·A l f o n sK e m p e r1
+        Received: 30 January 2021 / Accepted: 5 January 2022 / Published online: 21 February 2022
+        © The Author(s) 2022
+        Abstract
+        Recently proposed index structures, that combine trie-based and comparison-ba sed search mechanisms, considerably
+        improve retrieval throughput for in-memory database systems. However, most of these index structures allocate small
+        memory chunks when required. This stands in contrast to block-based index structures, that are necessary for disk-accesses
+        of beyond main-memory database systems such as Umbra. We therefore present the B
+        2-tree. The outer structure is identical
+        to that of an ordinary B+-tree. It still stores elements in a dense array in sorted order, enabling efﬁcient range scan
+        operations. However, B 2-tree is composed of multiple trees, each page inte grates another trie-based search tree, which
+        is used to determine a small memory region where a sought entry may be found. An embedded tree thereby consists
+        of decision nodes, which operate on a single byte at a time, and span nodes, which are used to store common preﬁxes.
+        This architecture usually accesses fewer cache lines than a vanilla B+-tre e as shown in our performance evaluation.
+        As a result, the B
+        2-tree answers point queri es considerab
+
+--------------------------------------------------------------------------------
+[05] FILENAME: Cache Conscious Indexing for Decision-Support in Main Memory.pdf
+     SIZE:     433,872 bytes
+     META-TITLE: vldb.dvi
+     FIRST-TEXT:
+        Cache Conscious Indexing for Decision-Support in
+        Main Memory
+        Jun Rao
+        Columbia University
+        junr@cs.columbia.edu
+        Kenneth A. Ross∗
+        Columbia University
+        kar@cs.columbia.edu
+        Abstract
+        We study indexing techniques for main
+        memory, including hash indexes, binary
+        search trees, T-trees, B+-trees, interpola-
+        tion search, and binary search on arrays.
+        In a decision-support context, our primary
+        concerns are the lookup time, and the space
+        occupied by the index structure.
+        Our goal is to provide faster lookup times
+        than binary search by paying attention to
+        reference locality and cache behavior, with-
+        out using substantial extra space. We
+        propose a new indexing technique called
+        “Cache-Sensitive Search Trees” (CSS-trees).
+        Our technique stores a directory structure
+        on top of a sorted array. Nodes in this
+        directory have size matching the cache-line
+        size of the machine. We store the directory
+        in an array and do not store internal-node
+        pointers; child nodes can be found by per-
+        forming arithmetic on array oﬀsets.
+        We compare the algorithms based on their
+        time and space requirements. We have im-
+        plemented all of the techniques, and present
+        a performance study on two popular mod-
+        ern machines. We demonstrate that with
+        ∗This research was supported by a David and Lucile
+        Packard Foundation Fellowship in Science and Engineering,
+        by an NSF Young Investigator Award, by NSF grant number
+        IIS-98-12014, and by NSF CISE award CDA-9625374.
+        Permission to copy without fee all or part of this material is
+        granted provi
+
+--------------------------------------------------------------------------------
+[06] FILENAME: Cache Craftiness for Fast Multicore Key-Value Storage.pdf
+     SIZE:     601,565 bytes
+     META-TITLE: Cache craftiness for fast multicore key-value storage
+     FIRST-TEXT:
+        Cache Craftiness for Fast Multicore Key-Value Storage
+        Yandong Mao, Eddie Kohler†, Robert Morris
+        MIT CSAIL, †Harvard University
+        Abstract
+        We present Masstree, a fast key-value database designed for
+        SMP machines. Masstree keeps all data in memory. Its main
+        data structure is a trie-like concatenation of B+-trees, each of
+        which handles a ﬁxed-length slice of a variable-length key.
+        This structure effectively handles arbitrary-length possibly-
+        binary keys, including keys with long shared preﬁxes. B +-
+        tree fanout was chosen to minimize total DRAM delay when
+        descending the tree and prefetching each tree node. Lookups
+        use optimistic concurrency control, a read-copy-update-like
+        technique, and do not write shared data structures; updates
+        lock only affected nodes. Logging and checkpointing pro-
+        vide consistency and durability. Though some of these ideas
+        appear elsewhere, Masstree is the ﬁrst to combine them. We
+        discuss design variants and their consequences.
+        On a 16-core machine, with logging enabled and queries
+        arriving over a network, Masstree executes more than six
+        million simple queries per second. This performance is com-
+        parable to that of memcached, a non-persistent hash table
+        server, and higher (often much higher) than that of V oltDB,
+        MongoDB, and Redis.
+        Categories and Subject Descriptors H.2.4 [Information
+        Systems]: DATABASE MANAGEMENT – Concurrency
+        Keywords multicore; in-memory; key-value; persistent
+        1. Introduction
+        Storage server performance matters. In many systems that
+        use 
+
+--------------------------------------------------------------------------------
+[07] FILENAME: CACHE-OBLIVIOUS B-TREES.pdf
+     SIZE:     310,527 bytes
+     META-TITLE: (kein /Title in Metadaten)
+     FIRST-TEXT:
+        CACHE-OBLIVIOUS B-TREES ∗
+        MICHAEL A. BENDER † , ERIK D. DEMAINE ‡ , AND MARTIN F ARACH-COLTON§
+        Abstract. This paper presents two dynamic search trees attaining near-optimal performance
+        on any hierarchical memory. The data structures are independent of the parameters of the memory
+        hierarchy, e.g., the number of memory levels, the block-transfer size at each level, and the relative
+        speeds of memory levels. The performance is analyzed in terms of the number of memory transfers
+        between two memory levels with an arbitrary block-transfer size of B; this analysis can then be
+        applied to every adjacent pair of levels in a multilevel memory hierarchy. Both search trees match the
+        optimal search bound of Θ(1+log B+1 N ) memory transfers. This bound is also achieved by the classic
+        B-tree data structure on a two-level memory hierarchy with a known block-transfer size B. The ﬁrst
+        search tree supports insertions and deletions in Θ(1 + log B+1 N ) amortized memory transfers, which
+        matches the B-tree’s worst-case bounds. The second search tree supports scanning S consecutive
+        elements optimally in Θ(1 + S/B) memory transfers and supports insertions and deletions in Θ(1 +
+        logB+1 N + log2 N
+        B ) amortized memory transfers, matching the performance of the B-tree for B =
+        Ω(log N log log N ).
+        Key words. Memory hierarchy, cache eﬃciency, data structures, search trees
+        AMS subject classiﬁcations. 68P05, 68P30, 68P20
+        DOI. 10.1137/S0097539701389956
+        1. Introduction. The memory hierarchies of modern compute
+
+--------------------------------------------------------------------------------
+[08] FILENAME: Cache-sensitive Memory Layout for Binary Trees.pdf
+     SIZE:     1,219,592 bytes
+     META-TITLE: Cache-sensitive Memory Layout for Binary Trees.
+     FIRST-TEXT:
+        Cache-sensitive Memory Layout
+        for Binary T rees∗
+        Riku Saikkonen and Eljas Soisalon-Soininen
+        Helsinki University of Technology , Finland, {rjs,ess}@cs.hut.fi
+        Abstract We i m prove the p erf orm ance of m ai n- m em ory bi nary s earch trees
+        (including A VL and red-black trees) by applying cache-sensitive and cache-
+        oblivious memory layouts. We relocate tree nodes in memory according to
+        am u l t i - l e v e lc a c h eh i e r a r c h y ,a l s oc o n s i d e r i n gt h ec o n ﬂ i c tm i s s e sp r o d u c e d
+        by set-associative caches. Moreover, we present a method to improve one-
+        level cache-sensitivity without increasing the time complexity of rebalancing.
+        The empirical performance of our cache-sensitive binary trees is comparable
+        to cache-sensitive B-trees. We also use the multi-level layout to improve the
+        performance of cache-sensitive B-trees.
+        1I n t r o d u c t i o n
+        Most of today’s processor architectur es use a hierarchical memory system: a
+        number of caches are placed between the processor and the main memory.
+        Caching has become an increasingly impo rtant factor in the practical perfor-
+        mance of main-memory data structures. The relative importance of caching
+        will likely increase in the future [1, 2]: processor speeds have increased faster
+        than memory speeds, and many applications that previously needed to read
+        data from disk can now ﬁt all of the necessary data in main memory. In data-
+        intensive main memory applications, reading from main memory is often a bot-
+        tleneck si
+
+--------------------------------------------------------------------------------
+[09] FILENAME: Cache-Sensitive Memory Layout for Dynamic Binary Trees.pdf
+     SIZE:     1,457,126 bytes
+     META-TITLE: Cache-Sensitive Memory Layout for Dynamic Binary Trees
+     FIRST-TEXT:
+        c⃝ The British Computer Society 2015. All rights reserved.
+        For Permissions, please email: journals.permissions@oup.com
+        doi:10.1093/comjnl/bxv090
+        Cache-Sensitive Memory Layout
+        for Dynamic Binary Trees
+        Riku Saikkonen∗ and Eljas Soisalon-Soininen
+        Department of Computer Science, School of Science, Aalto University,
+        PO Box 15400, FI-00076 Aalto, Finland
+        ∗Corresponding author: riku.saikkonen@alumni.aalto.ﬁ
+        We use cache-sensitive memory layouts to improve search performance in ordinary binary search
+        trees, without increasing the time complexity of insertion or deletion. Our approach does not require
+        changes to the structure of the nodes or the rebalancing strategy of the tree. Cache-sensitivity is main-
+        tained with a memory-layout invariant that keeps a given number of neighboring nodes in the tree
+        stored in the same cache block. We show how to preserve it using worst-case constant-time operations
+        executed when the tree changes. In our extensive experiments, the invariant consistently improved the
+        search performance of large AV Land red–black trees by 26–32%, on synthetic data as well as real-
+        istic search tree operations extracted from a database benchmark. We also compare binary search
+        trees with several cache-sensitive B-trees, and non-dynamic approaches for laying out tree nodes in
+        a multi-level memory hierarchy.
+        Keywords: binary search trees; cache-conscious data structures; experiments
+        Received 20 November 2014; revised 23 August 2015
+        Handling editor: Rajeev Raman
+        1. INTRODUCT
+
+--------------------------------------------------------------------------------
+[10] FILENAME: CoCo-trie - Data-aware compressionandindexingofstrings.pdf
+     SIZE:     984,995 bytes
+     META-TITLE: CoCo-trie: Data-aware compression and indexing of strings
+     FIRST-TEXT:
+        Information Systems 120 (2024) 102316
+        Available online 17 November 2023
+        0306-4379/© 2023 The Author(s). Published by Elsevier Ltd. This is an open access article under the CC BY-NC-ND license ( http://creativecommons.org/licenses/by-
+        nc-nd/4.0/).
+        Contents lists available at ScienceDirect
+        Information Systems
+        journal homepage: www.elsevier.com/locate/is
+        CoCo-trie: Data-aware compression and indexing of strings✩
+        Antonio Boffa ∗, Paolo Ferragina, Francesco Tosoni, Giorgio Vinciguerra
+        Department of Computer Science, University of Pisa, L.go B. Pontecorvo 3, Pisa 56127, PI, Italy
+        A R T I C L E I N F O
+        Recommended by Dennis Shasha
+        Dataset link: https://github.com/aboffa/CoCo-t
+        rie
+        Keywords:
+        String dictionaries
+        Tries
+        Data compression
+        Succinct data structures
+        Key-value stores
+        A B S T R A C T
+        We address the problem of compressing and indexing a sorted dictionary of strings to support efficient lookups
+        and more sophisticated operations, such as prefix, predecessor, and range searches. This problem occurs as
+        a key task in a plethora of applications, and thus it has been deeply investigated in the literature since the
+        introduction of tries in the ’60s.
+        We introduce a new data structure, called the COmpressed COllapsed Trie (CoCo-trie), that hinges on a
+        pool of techniques to compress subtries (of arbitrary depth) into succinctly-encoded and efficiently-searchable
+        trie macro-nodes with a possibly large fan-out. Then, we observe that the choice of the subtries to compress
+        depends on the trie
+
+--------------------------------------------------------------------------------
+[11] FILENAME: Data Cache Prefetching With DynamicAdaptation.pdf
+     SIZE:     626,505 bytes
+     META-TITLE: doi:10.1093/comjnl/bxq028
+     FIRST-TEXT:
+        © The Author 2010. Published by Oxford University Press on behalf of The British Computer Society. All rights reserved.
+        For Permissions, please email: journals.permissions@oup.com
+        Advance Access publication on March 19, 2010 doi:10.1093/comjnl/bxq028
+        Data Cache Prefetching With
+        Dynamic Adaptation
+        Minhaj Ahmad Khan∗
+        Department of Computer Science, Bahauddin Zakariya University, Multan, Pakistan
+        ∗Corresponding author: minhajahmad@gmail.com
+        Modern processors based on VLIW architecture rely heavily on software cache prefetching
+        incorporated by the compiler . For accurate prefetching different factors such as latencies of the
+        loop iterations need to be taken into account, which cannot be determined at (static) compile time.
+        Consequently, the compilers either produce inaccurate prefetches or resort to producing code without
+        prefetching. Many applications with complex code are therefore unable to perform very well on
+        the modern processors. In this paper, we present an approach that is able to generate accurate
+        prefetch instructions by exploiting information available at runtime. The code is instrumented with
+        prefetches having offsets which may be adapted at runtime through a dynamic code specializer . Such
+        cache prefetching with dynamic adaptation results in better performance of the applications. The
+        runtime code generation activity is highly efﬁcient and incurs a very small overhead. The experiments
+        performed on Itanium-II architecture using icc and gcc compilers produce an averag
+
+--------------------------------------------------------------------------------
+[12] FILENAME: Effect of Node Size on the Performance ofCache-Conscious B+-trees.pdf
+     SIZE:     271,160 bytes
+     META-TITLE: sigmetrics03.dvi
+     FIRST-TEXT:
+        Effect of Node Size on the Performance of
+        Cache-Conscious B+-trees
+        Richard A. Hankins
+        University of Michigan
+        1301 Beal Avenue
+        Ann Arbor, MI 48109-2122, USA.
+        hankinsr@eecs.umich.edu
+        Jignesh M. Patel
+        University of Michigan
+        1301 Beal Avenue
+        Ann Arbor, MI 48109-2122, USA.
+        jignesh@eecs.umich.edu
+        ABSTRACT
+        In main-memory databases, the number of processor cache misses
+        has a critical impact on the performance of the system. Cache-
+        conscious indices are designed to improve performance by reduc-
+        ing the number of processor cache misses that are incurred during
+        a search operation. Conventional wisdom suggests that the index’s
+        node size should be equal to the cache line size in order to min-
+        imize the number of cache misses and improve performance. As
+        we show in this paper, this designchoice ignores additional effects,
+        such as the number of instructions executed and the number of TLB
+        misses, which play a signiﬁcant role in determining the overall per-
+        formance. To capture the impact of node size on the performance
+        of a cache-conscious B+-tree (CSB+-tree), we ﬁrst develop an an-
+        alytical model based on the fundamental components of the search
+        process. This model is then validated with an actual implementa-
+        tion, demonstrating that the model is accurate. Both the analytical
+        model and experiments conﬁrm that using node sizes much larger
+        than the cache line size can result in better search performance for
+        the CSB+-tree.
+        Categories and Subject Descriptors
+        H.2.2 [Database Management]: Physical
+
+--------------------------------------------------------------------------------
+[13] FILENAME: Fetch Me If You Can - Evaluating CPU Cache Prefetching and Its Reliability on High Latency Memory.pdf
+     SIZE:     761,872 bytes
+     META-TITLE: Fetch Me If You Can: Evaluating CPU Cache Prefetching and Its Reliability on High Latency Memory
+     FIRST-TEXT:
+        Fetch Me If You Can: Evaluating CPU Cache Prefetching and Its
+        Reliability on High Latency Memory
+        Fabian Mahling
+        Hasso Plattner Institute,
+        University of Potsdam
+        Potsdam, Germany
+        fabian.mahling@student.hpi.de
+        Marcel Weisgut
+        Hasso Plattner Institute,
+        University of Potsdam
+        Potsdam, Germany
+        marcel.weisgut@hpi.de
+        Tilmann Rabl
+        Hasso Plattner Institute,
+        University of Potsdam
+        Potsdam, Germany
+        tilmann.rabl@hpi.de
+        Abstract
+        Memory can be located close to a CPU, at remote sockets, or on
+        devices connected via interconnects such as CXL or NVLink. A
+        larger distance between memory and a core accessing the mem-
+        ory usually results in higher access latency. Software prefetching
+        algorithms claim to hide memory access latencies by moving data
+        to the CPU cache before a core accesses the data. In this work, we
+        analyze to what extent software prefetching can hide increased
+        memory access latencies. We evaluate these on seven systems, each
+        offering different memory technologies and access latencies. We
+        show that prefetching can increase performance by up to 2.6× and
+        2.8× for B+-Tree and binary search workloads. We find that CPU
+        fill buffers, which track L1 cache misses, and a workload’s memory
+        intensity dictate how much access latency can be hidden. CPUs
+        implement prefetches differently. We introduce microbenchmarks
+        that identify concrete target cache and eviction strategies for dif-
+        ferent prefetch localities across x86 and ARM architectures. When
+        the fill buffers are full, CPUs either drop prefetche
+
+--------------------------------------------------------------------------------
+[14] FILENAME: Fractal Prefetching B+-Trees (Chen et al. 2002).pdf
+     SIZE:     333,665 bytes
+     META-TITLE: paper.dvi
+     FIRST-TEXT:
+        Fractal Prefetching B
+        /B7
+        -Trees:
+        Optimizing Both Cache and Disk Performance
+        Shimin Chen, Phillip B. Gibbons
+        /DD
+        , Todd C. Mowry, and Gary Valentin
+        /DC
+        School of Computer Science
+        /DD
+        Information Sciences Research Center
+        /DC
+        DB2 UDB Development Team
+        Carnegie Mellon University Bell Laboratories IBM Toronto Lab
+        Pittsburgh, PA 15213 Murray Hill, NJ 07974
+        /A3
+        Markham, Ontario, Canada L6G 1C7
+        /CU chensm,tcm/CV @cs.cmu.edu valentin@ca.ibm.com
+        ABSTRACT
+        /BU
+        /B7
+        /B9/CC /D6/CT/CT/D7 /CW/CP /DA /CT /CQ /CT/CT/D2 /D8/D6/CP/CS/CX/D8/CX/D3/D2/CP/D0/D0/DD /D3/D4/D8/CX/D1/CX/DE/CT/CS /CU/D3/D6 /C1/BB/C7 /D4 /CT/D6/CU/D3/D6/B9
+        /D1/CP/D2/CR/CT /DB/CX/D8/CW /CS/CX/D7/CZ /D4/CP/CV/CT/D7 /CP/D7 /D8/D6/CT/CT /D2/D3 /CS/CT/D7/BA /CA/CT/CR/CT/D2 /D8/D0/DD /B8 /D6/CT/D7/CT/CP/D6/CR /CW/CT/D6/D7
+        /CW/CP /DA /CT /D4/D6/D3/D4 /D3/D7/CT/CS /D2/CT/DB /D8 /DD/D4 /CT/D7 /D3/CU /BU
+        /B7
+        /B9/CC /D6/CT/CT/D7 /D3/D4/D8/CX/D1/CX/DE/CT/CS /CU/D3/D6 /BV/C8/CD
+        /CR/CP/CR /CW/CT /D4 /CT/D6/CU/D3/D6/D1/CP/D2/CR/CT /CX/D2 /D1/CP/CX/D2 /D1/CT/D1/D3/D6/DD /CT/D2 /DA/CX/D6/D3/D2/D1/CT/D2 /D8/D7/B8 /DB/CW/CT/D6/CT /D8/CW/CT
+        /D8/D6/CT/CT /D2/D3 /CS/CT /D7/CX/DE/CT/D7 /CP/D6/CT /D3/D2/CT /D3/D6 /CP /CU/CT/DB /CR/CP/CR /CW/CT /D0/CX/D2/CT/D7/BA /CD/D2/CU/D3/D6/D8/D9/D2/CP/D8/CT/D0/DD /B8
+        /CS/D9/CT /D4/D6/CX/D1/CP/D6/CX/D0/DD /D8/D3 /D8/CW/CX/D7 /D0/CP/D6/CV/CT /CS/CX/D7/CR/D6/CT/D4/CP/D2/CR/DD /CX/D2 /D3/D4/D8/CX/D1/CP/D0 /D2/D3 /CS/CT /D7/CX/DE/CT/D7/B8
+        /CT/DC/CX/D7/D8/CX/D2/CV /CS/CX/D7/CZ/B9/D3/D4/D8/CX/D1/CX/DE/CT/CS /BU
+        /B7
+
+--------------------------------------------------------------------------------
+[15] FILENAME: Hazard Pointers - Safe Memory Reclamation for Lock-Free Objects.pdf
+     SIZE:     1,610,395 bytes
+     META-TITLE: (kein /Title in Metadaten)
+     FIRST-TEXT:
+        Hazard Pointers: Safe Memory Reclamation for
+        Lock-Free Objects
+        Maged M. Michael
+        Abstract—Lock-free objects offer significant performance and reliability advantages over conventional lock-based objects. However,
+        the lack of an efficient portable lock-free method for the reclamation of the memory occupied by dynamic nodes removed from such
+        objects is a major obstacle to their wide use in practice. This paper presents hazard pointers , a memory management methodology
+        that allows memory reclamation for arbitrary reuse. It is very efficient, as demonstrated by our experimental results. It is suitable for
+        user-level applications—as well as system programs—without dependence on special kernel or scheduler support. It is wait-free. It
+        requires only single-word reads and writes for memory access in its core operations. It allows reclaimed memory to be returned to the
+        operating system. In addition, it offers a lock-free solution for the ABA problem using only practical single-word instructions. Our
+        experimental results on a multiprocessor system show that the new methodology offers equal and, more often, significantly better
+        performance than other memory management methods, in addition to its qualitative advantages regarding memory reclamation and
+        independence of special hardware support. We also show that lock-free implementations of important object types, using hazard
+        pointers, offer comparable performance to that of efficient lock-based implementations under no contention and no mu
+
+--------------------------------------------------------------------------------
+[16] FILENAME: HOT - A Height Optimized Trie Index for Main-MemoryDatabase Systems.pdf
+     SIZE:     1,337,362 bytes
+     META-TITLE: HOT: A Height Optimized Trie Index for Main-Memory Database Systems
+     FIRST-TEXT:
+        HOT: A Height Optimized Trie Index for Main-Memory
+        Database Systems
+        Robert Binna, Eva Zangerle, Martin Pichl,
+        Günther Specht
+        University of Innsbruck, Austria
+        firstname.lastname@uibk.ac.at
+        Viktor Leis
+        Technische Universität München, Germany
+        leis@in.tum.de
+        ABSTRACT
+        We present the Height Optimized Trie (HOT), a fast and space-
+        efficient in-memory index structure. The core algorithmic idea of
+        HOT is to dynamically vary the number of bits considered at each
+        node, which enables a consistently high fanout and thereby good
+        cache efficiency. The layout of each node is carefully engineered for
+        compactness and fast search using SIMD instructions. Our experi-
+        mental results, which use a wide variety of workloads and data sets,
+        show that HOT outperforms other state-of-the-art index structures
+        for string keys both in terms of search performance and memory
+        footprint, while being competitive for integer keys. We believe that
+        these properties make HOT highly useful as a general-purpose
+        index structure for main-memory databases.
+        CCS CONCEPTS
+        •Information systems → Data access methods; Main memory
+        engines;
+        KEYWORDS
+        height optimized trie, main memory, index, SIMD
+        ACM Reference Format:
+        Robert Binna, Eva Zangerle, Martin Pichl, Günther Specht and Viktor Leis.
+        2018. HOT: A Height Optimized Trie Index for Main-Memory Database Sys-
+        tems. In SIGMOD’18: 2018 International Conference on Management of Data,
+        June 10–15, 2018, Houston, TX, USA. ACM, New York, NY, USA, 14 pages.
+        https://doi.org/10.1145/3183
+
+--------------------------------------------------------------------------------
+[17] FILENAME: Improving Index Performance through Prefetching.pdf
+     SIZE:     322,208 bytes
+     META-TITLE: paper.dvi
+     FIRST-TEXT:
+        Improving Index Performance through Prefetching
+        Shimin Chen
+        School of Computer Science
+        Carnegie Mellon University
+        Pittsburgh, PA 15213
+        chensm@cs.cmu.edu
+        Phillip B. Gibbons
+        Information Sciences Research Center
+        Bell Laboratories
+        Murray Hill, NJ 07974
+        gibbons@research.bell-labs.com
+        T odd C. Mowry
+        School of Computer Science
+        Carnegie Mellon University
+        Pittsburgh, PA 15213
+        tcm@cs.cmu.edu
+        ABSTRACT
+        This pap er prop oses and ev aluates Pr efetching B
+        /+
+        /-T r e es
+        /#28pB
+        /+
+        /-T rees/#29/, whic h use prefetc hing to accelerate t w o im/-
+        p ortan t op erations on B
+        /+
+        /-T ree indices/: searc hes and range
+        scans/. T o accelerate searc hes/, pB
+        /+
+        /-T rees use prefetc hing to
+        e/#0Bectiv ely create wider no des than the natural data trans/-
+        fer size/: e/.g/./, eigh t vs/. one cac he lines or disk pages/. These
+        wider no des reduce the heigh t of the B
+        /+
+        /-T ree/, thereb y de/-
+        creasing the n um b er of exp ensiv e misses when going from
+        paren tt o c hild without signi/#0Ccan tl y increasing the cost of
+        fetc hing a giv en no de/. Our results sho w that this tec hnique
+        sp eeds up searc h and up date times b y a factor of /1/./2/#7B/1/./5 for
+        main/-memory B
+        /+
+        /-T rees/. In addition/, it outp erforms and is
+        complemen tary to /#5CCac he/-Sensitiv eB
+        /+
+        /-T rees/./" T o accel/-
+        erate range scans/, pB
+        /+
+        /-T rees pro vide arra ys of p oin ters to
+        their leaf no des/. These allo w the pB
+        /+
+        /-T ree to prefetc h ar/-
+        bitrarily far ahead/, ev en for nonclustered indices/, thereb y
+        hiding the normall
+
+--------------------------------------------------------------------------------
+[18] FILENAME: Making B+-Trees Cache Conscious in Main Memory.pdf
+     SIZE:     406,751 bytes
+     META-TITLE: csb.dvi
+     FIRST-TEXT:
+        Making B+-Trees Cache Conscious in Main Memory
+        Jun Rao
+        Columbia University
+        junr@cs.columbia.edu
+        Kenneth A. Ross∗
+        Columbia University
+        kar@cs.columbia.edu
+        Abstract
+        Previous research has shown that cache behavior is im-
+        portant for main memory index structures. Cache con-
+        scious index structures such as Cache Sensitive Search
+        Trees (CSS-Trees) perform lookups much faster than
+        binary search and T-Trees. However, CSS-Trees are
+        designed for decision support workloads with relatively
+        static data. Although B
+        +-Trees are more cache con-
+        scious than binary search and T-Trees, their utilization
+        o fac a c h el i n ei sl o ws i n c eh a l fo ft h es p a c ei su s e d
+        to store child pointers. Nevertheless, for applications
+        that require incremental updates, traditional B
+        +-Trees
+        perform well.
+        Our goal is to make B +-Trees as cache conscious
+        as CSS-Trees without increasing their update cost too
+        much. We propose a new indexing technique called
+        “Cache Sensitive B
+        +-Trees” (CSB+-Trees). It is a
+        variant of B+-Trees that stores all the child nodes of any
+        given node contiguously, and keeps only the address of
+        the ﬁrst child in each node. The rest of the children can
+        be found by adding an oﬀset to that address. Since only
+        one child pointer is stored explicitly, the utilization of
+        a cache line is high. CSB
+        +-Trees support incremental
+        updates in a way similar to B +-Trees.
+        We also introduce two variants of CSB +-Trees.
+        Segmented CSB +-Trees divide the child nodes into
+        segments. Nodes within the same 
+
+--------------------------------------------------------------------------------
+[19] FILENAME: Making CSB+-Trees Processor Conscious.pdf
+     SIZE:     83,722 bytes
+     META-TITLE: Microsoft PowerPoint - 2-makingPres.ppt
+     FIRST-TEXT:
+        Making CSB+-Trees 
+        Processor Conscious 
+        Michael L. Samuel 
+        Anders U. Pedersen 
+        Philippe Bonnet 
+        University of Copenhagen 
+        --PAGE2--
+        Goal 
+        /circle6Make CSB+-Trees processor conscious 
+        /circle6Incorporate our CSB+-Tree variant into 
+        MySQL
+
+--------------------------------------------------------------------------------
+[20] FILENAME: Overview on Hardware Optimizations for Database Engines.pdf
+     SIZE:     3,986,580 bytes
+     META-TITLE: Datenbanksysteme für Business, Technologie und Web (BTW 2017)
+     FIRST-TEXT:
+        B. Mitschang et al. (Hrsg.): Datenbanksysteme für Business, Technologie und Web (BTW 2017),
+        Lecture Notes in Informatics (LNI), Gesellschaft für Informatik, Bonn 2017 383
+        Overview on Hardware Optimizations for Database Engines
+        Annett Ungethüm1, Dirk Habich1, Tomas Karnagel1, Sebastian Haas2, Eric Mier1,
+        Gerhard Fettweis2, Wolfgang Lehner1
+        Abstract:The key objective of database systems is to e ciently manage an always increasing amount
+        of data. Thereby, a high query throughput and a low query latency are core requirements. To satisfy
+        these requirements, database engines are highly adapted to the given hardware by using all features
+        of modern processors. Apart from this software optimization, even tailor-made processing circuits
+        running on FGPAs are built to run mostly stateless query plans with a high throughput. A similar
+        approach, which was already investigated three decades ago, is to build customized hardware like
+        a database processor. Tailor-made hardware allows to achieve performance numbers that cannot be
+        reached with software running on general-purpose CPUs, while at the same time, addressing the dark
+        silicon problem. The main disadvantage of custom hardware is the high development cost that comes
+        with designing and verifying a new processor, as well as building respective drivers and the software
+        stack. However, there is actually no need to build a fully-ßedged processor from scratch. In this paper,
+        we present our conducted as well as our ongoing research e orts in th
+
+--------------------------------------------------------------------------------
+[21] FILENAME: Read-Copy Update.pdf
+     SIZE:     241,958 bytes
+     META-TITLE: (kein /Title in Metadaten)
+     FIRST-TEXT:
+        Read-Copy Update
+        Paul E. McKenney
+        Linux Technology Center
+        IBM Beaverton
+        pmckenne@us.ibm.com, http://www.rdrop.com/users/paulmck
+        Jonathan Appavoo
+        Department of Electrical and Computer Engineering
+        University of Toronto
+        jonathan@eecg.toronto.edu
+        Andi Kleen
+        SuSE Labs
+        ak@suse.de
+        Orran Krieger
+        IBM T. J. Watson Research Center
+        okrieg@us.ibm.com, http://www.eecg.toronto.edu/˜okrieg
+        Rusty Russell
+        RustCorp
+        rusty@rustcorp.com.au
+        Dipankar Sarma
+        Linux Technology Center
+        IBM India Software Lab
+        dipankar.sarma@in.ibm.com
+        Maneesh Soni
+        Linux Technology Center
+        IBM India Software Lab
+        smaneesh@in.ibm.com
+        Abstract
+        Traditional operating-system locking designs tend
+        to either be very complex, result in poor concur-
+        rency, or both. These traditional locking designs fail
+        to take advantage of the event-driven nature of op-
+        erating systems, which process many small, quickly
+        completed units of work, in contrast to CPU-bound
+        software such as scientiﬁc applications. This event-
+        driven nature can often be exploited by splitting up-
+        dates into the two phases: 1) carrying out enough of
+        each update for new operations to see the new state,
+        while still allowing existing operations to proceed on
+        the old state, then: 2) completing the update after
+        all active operations have completed. Common-case
+        code can then proceed without disabling interrupts
+        or acquiring any locks to protect against the update
+        code, which simpliﬁes locking protocols, improves
+        uniprocessor performance, and increases scalability.
+        Examples of the 
+
+--------------------------------------------------------------------------------
+[22] FILENAME: Space-efficient_static_trees_and_graphs.pdf
+     SIZE:     385,048 bytes
+     META-TITLE: Space-efficient static trees and graphs
+     FIRST-TEXT:
+        Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply. 
+        --PAGE2--
+        Authorized licensed use limited to: SLUB Dresden. Downloaded on May 02,2026 at 15:55:19 UTC from IEEE Xplore.  Restrictions apply.
+
+--------------------------------------------------------------------------------
+[23] FILENAME: START– Self-Tuning Adaptive Radix Tree.pdf
+     SIZE:     149,993 bytes
+     META-TITLE: START – Self-Tuning Adaptive Radix Tree
+     FIRST-TEXT:
+        START – Self-Tuning Adaptive Radix Tree
+        Philipp Fent∗, Michael Jungmair ∗, Andreas Kipf, Thomas Neumann
+        Technische Universit¨at M ¨unchen
+        {fent,jungmair,kipf,neumann}@in.tum.de
+        Abstract—Index structures like the Adaptive Radix Tree (ART)
+        are a central part of in-memory database systems. However, we
+        found that radix nodes that index a single byte are not optimal
+        for read-heavy workloads. In this work, we introduce START, a
+        self-tuning variant of ART that uses nodes spanning multiple key-
+        bytes. To determine where to introduce these new node types, we
+        propose a cost model and an optimizer . These components allow
+        us to ﬁne-tune an existing ART, reducing its overall height, and
+        improving performance. As a result, START performs on average
+        85 % faster than a regular ART on a wide variety of read-only
+        workloads and 45 % faster for read-mostly workloads.
+        I. I NTRODUCTION
+        One of the go-to index structures for main-memory database
+        systems is the Adaptive Radix Tree (ART) [13]. Several aspects
+        make ART very favorable: It is almost as efﬁcient to query as a
+        hash table [1], while still storing entries in-order, which allows
+        supporting range queries. Furthermore, it supports efﬁcient
+        inserts [13], which makes it overall one of the best index
+        structures. Several fully-ﬂedged DBMSs, including HyPer [9]
+        and DuckDB [15], use ART in practice.
+        More recent research explored using machine learning to
+        predict the location of a sought-after data item efﬁciently [12].
+        This approach showed great suc
+
+--------------------------------------------------------------------------------
+[24] FILENAME: SuRF Practical Range Query Filtering with Fast Succinct Tries.pdf
+     SIZE:     2,756,311 bytes
+     META-TITLE: SuRF: Practical Range Query Filtering with Fast Succinct Tries
+     FIRST-TEXT:
+        SuRF: Practical Range Query Filtering with Fast Succinct Tries
+        Huanchen Zhang
+        Carnegie Mellon University
+        huanche1@cs.cmu.edu
+        Hyeontaek Lim
+        Carnegie Mellon University
+        hl@cs.cmu.edu
+        Viktor Leis
+        TU München
+        leis@in.tum.de
+        David G. Andersen
+        Carnegie Mellon University
+        dga@cs.cmu.edu
+        Michael Kaminsky
+        Intel Labs
+        michael.e.kaminsky@intel.com
+        Kimberly Keeton
+        Hewlett Packard Enterprise
+        kimberly.keeton@hpe.com
+        Andrew Pavlo
+        Carnegie Mellon University
+        pavlo@cs.cmu.edu
+        ABSTRACT
+        We present theSuccinct Range Filter (SuRF), a fast and compact data
+        structure for approximate membership tests. Unlike traditional
+        Bloom filters, SuRF supports both single-key lookups and common
+        range queries: open-range queries, closed-range queries, and range
+        counts. SuRF is based on a new data structure called theFast Succinct
+        Trie (FST) that matches the point and range query performance of
+        state-of-the-art order-preserving indexes, while consuming only
+        10 bits per trie node. The false positive rates in SuRF for both point
+        and range queries are tunable to satisfy different application needs.
+        We evaluate SuRF in RocksDB as a replacement for its Bloom filters
+        to reduce I/O by filtering requests before they access on-disk data
+        structures. Our experiments on a 100 GB dataset show that replacing
+        RocksDB’s Bloom filters with SuRFs speeds up open-seek (without
+        upper-bound) and closed-seek (with upper-bound) queries by up
+        to 1.5× and 5× with a modest cost on the worst-case (all-missing)
+        point query throughput due to sligh
+
+--------------------------------------------------------------------------------
+[25] FILENAME: The ART of Practical Synchronization.pdf
+     SIZE:     589,794 bytes
+     META-TITLE: (kein /Title in Metadaten)
+     FIRST-TEXT:
+        The ART of Practical Synchronization
+        Viktor Leis Florian Scheibner Alfons Kemper Thomas Neumann
+        T echnische Universität München
+        {leis,scheibnf,kemper,neumann}@in.tum.de
+        ABSTRACT
+        The performance of transactional database systems is critically de-
+        pendent on the efﬁcient synchronization of in-memory data struc-
+        tures. The traditional approach, ﬁne-grained locking, does not scale
+        on modern hardware. Lock-free data structures, in contrast, scale
+        very well but are extremely difﬁcult to implement and often require
+        additional indirections. In this work, we argue for a middle ground,
+        i.e., synchronization protocols that use locking, but only sparingly.
+        We synchronize the Adaptive Radix Tree (ART) using two such
+        protocols, Optimistic Lock Coupling and Read-Optimized Write
+        EXclusion (ROWEX). Both perform and scale very well while be-
+        ing much easier to implement than lock-free techniques.
+        1. INTRODUCTION
+        In traditional database systems, most data structures are pro-
+        tected by ﬁne-grained locks 1. This approach worked well in the
+        past, since these locks were only acquired for a short time and
+        disk I/O dominated overall execution time. On modern servers with
+        many cores and where most data resides in RAM, synchronization
+        itself often becomes a major scalability bottleneck. And with the
+        increasing number of CPU cores—Intel’s current server platform
+        Broadwell EP supports up to 24 cores per socket—efﬁcient syn-
+        chronization will become even more important.
+        Figure 1 gives an overview over the
+
+--------------------------------------------------------------------------------
+[26] FILENAME: The_adaptive_radix_tree_ARTful_indexing_for_main-memory_databases.pdf
+     SIZE:     301,664 bytes
+     META-TITLE: The adaptive radix tree: ARTful indexing for main-memory databases
+     FIRST-TEXT:
+        The Adaptive Radix Tree:
+        ARTful Indexing for Main-Memory Databases
+        Viktor Leis, Alfons Kemper, Thomas Neumann
+        Fakult¨at f ¨ur Informatik
+        Technische Universit¨at M ¨unchen
+        Boltzmannstrae 3, D-85748 Garching
+        <lastname>@in.tum.de
+        Abstract—Main memory capacities have grown up to a point
+        where most databases ﬁt into RAM. For main-memory database
+        systems, index structure performance is a critical bottleneck.
+        Traditional in-memory data structures like balanced binary
+        search trees are not efﬁcient on modern hardware, because they
+        do not optimally utilize on-CPU caches. Hash tables, also often
+        used for main-memory indexes, are fast but only support point
+        queries.
+        To overcome these shortcomings, we present ART, an adaptive
+        radix tree (trie) for efﬁcient indexing in main memory. Its lookup
+        performance surpasses highly tuned, read-only search trees, while
+        supporting very efﬁcient insertions and deletions as well. At the
+        same time, ART is very space efﬁcient and solves the problem
+        of excessive worst-case space consumption, which plagues most
+        radix trees, by adaptively choosing compact and efﬁcient data
+        structures for internal nodes. Even though ART’s performance
+        is comparable to hash tables, it maintains the data in sorted
+        order, which enables additional operations like range scan and
+        preﬁx lookup.
+        I. I NTRODUCTION
+        After decades of rising main memory capacities, even large
+        transactional databases ﬁt into RAM. When most data is
+        cached, traditional database systems are CPU bound because
+        the
+
+--------------------------------------------------------------------------------
+[27] FILENAME: To stride or not to stride the memory access.pdf
+     SIZE:     608,166 bytes
+     META-TITLE: To stride or not to stride the memory access?
+     FIRST-TEXT:
+        To stride or not to stride the memory access?
+        Lennart Schmidt
+        lennart.schmidt1@tu-dresden.de
+        TU Dresden
+        Dresden, Germany
+        Roland Kühn
+        roland.kuehn@cs.tu-dortmund.de
+        TU Dortmund University
+        Dortmund, Germany
+        Matti Krause
+        matti.krause@cs.tu-dortmund.de
+        TU Dortmund University
+        Dortmund, Germany
+        Jens Teubner
+        jens.teubner@cs.tu-dortmund.de
+        TU Dortmund University
+        Dortmund, Germany
+        Wolfgang Lehner
+        wolfgang.lehner@tu-dresden.de
+        TU Dresden/AAU Aalborg University
+        Dresden, Germany
+        Dirk Habich
+        dirk.habich@tu-dresden.de
+        TU Dresden
+        Dresden, Germany
+        Abstract
+        Due to the increasing gap between CPU performance and
+        memory bandwidth, memory access patterns play more and
+        more a significant role for efficient data processing. The
+        current core assumption is that a sequential access pattern
+        delivers the best performance, especially when the data to be
+        processed is stored in adjacent memory locations (contigu-
+        ous memory). Given the continuous advances in memory
+        technologies, it is of course questionable whether this as-
+        sumption still holds true. To answer this question, we present
+        a comprehensive experimental comparison of the sequential
+        and the strided access pattern for data stored in contiguous
+        memory on modern disruptive memory systems in this paper.
+        As we are going to show, the core assumption must be re-
+        vised, as the strided access pattern with a well-chosen stride
+        size clearly outperforms the sequential access pattern. Even
+        a SIMD-accelerated sequential access is considerably slower
+        than the b
+
+--------------------------------------------------------------------------------
+[28] FILENAME: Towards Data-Based Cache Optimization of B+-Trees.pdf
+     SIZE:     629,359 bytes
+     META-TITLE: Towards Data-Based Cache Optimization of B+-Trees
+     FIRST-TEXT:
+        Towards Data-Based Cache Optimization of B +-Trees
+        Roland Kühn
+        Databases and Information Systems
+        Group (DBIS)
+        TU Dortmund University
+        roland.kuehn@cs.tu-dortmund.de
+        Daniel Biebert
+        Design Automation for Embedded
+        Systems Group (DAES)
+        TU Dortmund University
+        daniel.biebert@tu-dortmund.de
+        Christian Hakert
+        Design Automation for Embedded
+        Systems Group (DAES)
+        TU Dortmund University
+        christian.hakert@tu-dortmund.de
+        Jian-Jia Chen
+        Design Automation for Embedded
+        Systems Group (DAES)
+        TU Dortmund University
+        jian-jia.chen@cs.tu-dortmund.de
+        Jens Teubner
+        Databases and Information Systems
+        Group (DBIS)
+        TU Dortmund University
+        jens.teubner@cs.tu-dortmund.de
+        ABSTRACT
+        The rise of in-memory databases and systems with considerably
+        large memories and cache sizes requires the rethinking of the proper
+        implementation of index structures like B+-trees in such systems.
+        While disk block-sized nodes and binary search were considered
+        as good in the past, smaller node sizes and cache-friendly linear
+        search within nodes can be noticeably more performant nowadays.
+        Considering the probabilistic distribution of lookup values to the
+        B+-tree as part of a memory-friendly and cache-aware layout is
+        a consequent next step, which is studied in this paper. Favoring
+        frequently visited nodes and paths in the regard of cache hits can
+        improve the overall performance of the tree and, thus, of the entire
+        database system. We provide such an optimized B +-tree layout,
+        which takes the probabilistic distribution of the lookup values 
+
+--------------------------------------------------------------------------------
+[29] FILENAME: Tree Layout in Multilevel Memory (BenderDemaineFarach-Colton 2002).pdf
+     SIZE:     10,352,245 bytes
+     META-TITLE: 3-540-45749-6.pdf
+     FIRST-TEXT:
+        --PAGE2--
+        3
+        Berlin
+        Heidelberg
+        New York
+        Barcelona
+        Hong Kong
+        London
+        Milan
+        Paris
+        Tokyo
+
+--------------------------------------------------------------------------------
+[30] FILENAME: vampir-poster-spp2377-p1-kickoff.pdf
+     SIZE:     1,422,367 bytes
+     META-TITLE: Pic2Brick
+     FIRST-TEXT:
+        VAMPIR
+        Virtualized Non-Functional Memory 
+        Properties for Data-Pipeline Scheduling
+        Overall Project Structure and Project Members
+        Data Pipelines
+        → Memory Optimization Potential and Requirements
+        Project Details
+        Phase 1 (Single-Query Pipeline Scheduling)
+        ▪ DB: Efficient algorithms for “heterogeneous memory 
+        pipeline orderings” considering NFPs
+        ▪ OS: Abstractions for heterogeneous memories; 
+        virtualization + compensation, transparent 
+        migration/replacement
+        Phase 2 (Multi-Query Pipeline Scheduling)
+        ▪ Global schedule + compensation plan
+        ▪ Negotiation at query compile time
+        Current System Under Test (SUT)
+        ▪ Xeon Phi 7250
+        ▪ NUMA-Nodes
+        ▪ Heterogeneous
+        Memory
+        ▪ DRAM
+        ▪ HBM
+        Prof. Wolfgang Lehner (PI)
+        Prof. Horst Schirmeier (PI)
+        Prof. Dirk Habich (PI)
+        André Berthold (RA)
+        Lennart Schmidt (RA)
+
+--------------------------------------------------------------------------------
+[31] FILENAME: WhyDoes Data Prefetching Not Work for Modern Workloads.pdf
+     SIZE:     1,756,217 bytes
+     META-TITLE: doi.10.1112/comjnl/bxv112
+     FIRST-TEXT:
+        c⃝ The British Computer Society 2015. All rights reserved.
+        For Permissions, please email: journals.permissions@oup.com
+        Advance Access publication on 23 December 2015 doi:10.1093/comjnl/bxv112
+        Why Does Data Prefetching Not Work
+        for Modern Workloads?
+        Mahmood Naderan-Tahan1 and Hamid Sarbazi-Azad 1,2∗
+        1Department of Computer Engineering, Sharif University of Technology, Azadi Av., Tehran, Iran
+        2School of Computer Science, Institute for Research in Fundamental Sciences (IPM), Tehran, Iran
+        ∗Corresponding author: azad@sharif.edu
+        Emerging cloud workloads in today’s modern data centers have large memory footprints that make
+        the processor’s caches to be ineffective. Since L1 data cache is in the critical path, high data cache
+        miss rates degrade the performance. To ﬁx the issue in traditional workloads, data prefetchers pre-
+        dict the needed data to hide the memory latency and ultimately improve performance. In this paper,
+        we focus on the L1 data cache to answer the question on why state-of-the-art prefetching methods are
+        inefﬁcient for modern workloads in terms of performance and energy consumption? This is because
+        L1 cache is the most important player affecting the processor performance. Results show that, on the
+        one hand, these workloads suffer from low temporal locality and address repetition, and their consec-
+        utive accesses exhibit better spatial locality compared with the traditional workloads. On the other
+        hand, miss patterns are spatially irregular and there is little opportuni
+
+--------------------------------------------------------------------------------
+[32] FILENAME: Wormhole - A Fast Ordered Index for In-memory DataManagement.pdf
+     SIZE:     1,123,184 bytes
+     META-TITLE: Wormhole: A Fast Ordered Index for In-memory Data Management
+     FIRST-TEXT:
+        Wormhole: A Fast Ordered Index for In-memory Data
+        Management
+        Xingbo Wu
+        University of Illinois at Chicago
+        wuxb@uic.edu
+        Fan Ni
+        University of Texas at Arlington
+        fan.ni@mavs.uta.edu
+        Song Jiang
+        University of Texas at Arlington
+        sjiang@uta.edu
+        ABSTRACT
+        In-memory data management systems, such as key-value
+        stores, have become an essential infrastructure in today’s big-
+        data processing and cloud computing. They rely on efficient
+        index structures to access data. While unordered indexes,
+        such as hash tables, can perform point search withO(1) time,
+        they cannot be used in many scenarios where range queries
+        must be supported. Many ordered indexes, such as B+ tree
+        and skip list, have aO(log N ) lookup cost, whereN is number
+        of keys in an index. For an ordered index hosting billions of
+        keys, it may take more than 30 key-comparisons in a lookup,
+        which is an order of magnitude more expensive than that
+        on a hash table. With availability of large memory and fast
+        network in today’s data centers, thisO(log N ) time is taking
+        a heavy toll on applications that rely on ordered indexes.
+        In this paper we introduce a new ordered index structure,
+        named Wormhole, that takes O(log L) worst-case time for
+        looking up a key with a length of L. The low cost is achieved
+        by simultaneously leveraging strengths of three indexing
+        structures, namely hash table, prefix tree, and B+ tree, to
+        orchestrate a single fast ordered index. Wormhole’s range
+        operations can be performed by a linear scan of a list after
+        an initial 
+
+--------------------------------------------------------------------------------
+[33] FILENAME: ZhangEtalASPLOS2025HierarchicalPrefetching.pdf
+     SIZE:     1,733,741 bytes
+     META-TITLE: (kein /Title in Metadaten)
+     FIRST-TEXT:
+        Edinburgh Research Explorer 
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+        Hierarchical prefetching
+        A software-hardware instruction prefetcher for server applications
+        Citation for published version:
+        Zhang, T, Grot, B, He, W, Lv, Y, Qu, P, Su, F, Wang, W, Zhang, G, Zhang, X & Zhang, Y 2025, Hierarchical
+        prefetching: A software-hardware instruction prefetcher for server applications. in Proceedings of the 30th
+        ACM International Conference on Architectural Support for Programming Languages and Operating
+        Systems. vol. 2, Association for Computing Machinery (ACM), New York, NY, USA, pp. 529-544, The 30th
+        ACM International Conference on Architectural Support for Programming Languages and Operating
+        Systems, Rotterdam, Netherlands, 30/03/25. https://doi.org/10.1145/3676641.3716260
+        Digital Object Identifier (DOI):
+        10.1145/3676641.3716260
+        Link:
+        Link to publication record in Edinburgh Research Explorer
+        Document Version:
+        Publisher's PDF, also known as Version of record
+        Published In:
+        Proceedings of the 30th ACM International Conference on Architectural Support for Programming Languages
+        and Operating Systems
+        General rights
+        Copyright for the publications made accessible via the Edinburgh Research Explorer is retained by the author(s)
+        and / or other copyright owners and it is a condition of accessing these publications that users recognise and
+        abide by the legal requirements associated with these rights.
+        Take down policy
+        The University of Edinburgh has made every 
+
+================================================================================
+LOW-PRIORITY ORDNER
+================================================================================
+  LP01: Accelerating Number Theoretic Transform withMulti-GPU Systems for Efficient Zero Knowledge Proof.pdf  (4,257,386 bytes)
+  LP02: Delilah - eBPF-offload on Computational Storage.pdf  (1,593,577 bytes)
+  LP03: Dependable Computing in Virtual Laboratories.pdf  (1,078,835 bytes)
+  LP04: Lessons learned from the early performance evaluation of IntelOptane DC Persistent Memory in DBMS.pdf  (778,904 bytes)
+  LP05: Multithreaded Architectures and The Sort Benchmark.pdf  (252,437 bytes)
+  LP06: Onthe Integration of Structure Indexes and Inverted Lists.pdf  (213,776 bytes)
+  LP07: SOSP - October - Koblenz, Germany - Proceedings of the Twenty-Ninth ACMSymposium on Operating Systems Principles.pdf  (55,348,013 bytes)

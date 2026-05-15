@@ -1,0 +1,88 @@
+Ausarbeitung Termin 5
+PRT-ART — Forschungslandkarte der Cache-Engine im Kontext trie-basierter Suche
+1. Geschärfte Einordnung
+Nach Sichtung der relevanten Arbeiten lässt sich PRT-ART professionell so einordnen: Nicht als weiterer trieartiger Index, sondern als Bibliotheks- bzw. Control-Plane-Schicht, die Seitentypwahl, Layout, Inline-/Handle-Ablage, Prefetching und plattformspezifische Parameter für einen trieartigen Suchkern aktiv steuert. Die Suchstruktur bleibt Mittel zum Zweck; der wissenschaftliche Mehrwert liegt in der Cache-Engine und ihrer messgetriebenen Orchestrierung.
+2. Forschungscluster
+2.1 Passive cache-aware Layoutforschung
+CSS-tree, CSB+-tree, Graefe/Larson und die Arbeiten zur Knotengröße zeigen, dass Cache-Line-Größe, Pointerzahl, Kindanordnung und Suchschema auf der Seite dramatischen Einfluss auf Suchkosten haben. Diese Arbeiten liefern starke Bausteine für Dense Pages, Seitengruppierung und pointerarme Adressierung, behandeln Layout aber überwiegend als statische Designentscheidung.
+2.2 Adaptive trieartige Suchstrukturen
+ART, START, HOT, Masstree, B²-tree und CoCo-trie liefern das Suchmaschinenarsenal: adaptive Fanouts, mehrbyteige Knoten, diskriminierende Bits, Layer-/Fence-Regeln, page-lokale Decision-/Span-Techniken und datenabhängige Trie-Kollabierung. Gemeinsam zeigen sie, wie stark Trie-Varianten von lokaler Strukturwahl und Datenverteilung abhängen.
+2.3 Prefetching und Laufzeitanpassung
+Fractal Prefetching B+-Trees, Dynamic Prefetch Adaptation und neuere Prefetch-Reliability-Arbeiten verschieben den Fokus vom reinen Layout auf das aktive Vorladen und dessen Risiken. Besonders wichtig: Software-Prefetching ist kein universeller Gewinn, sondern stark von Zielcache, Fill Buffers, Speicherlatenz und Workload-Intensität abhängig.
+2.4 Cache-oblivious Gegenentwurf
+Cache-oblivious B-trees zeigen, dass man Suchstrukturen ohne konkrete Cache-Parameter elegant modellieren kann. Gerade deshalb sind sie für PRT-ART wichtig: Sie markieren die philosophische Gegenposition zu einer bewusst plattform- und cache-aware Engine.
+2.5 Habich-/Dresden-Kontext
+Die Dresdner Arbeiten zu Hardwareoptimierungen, virtuellen Memory-Eigenschaften und Zugriffsmustern stützen genau die Sprache, die PRT-ART braucht: hoher Durchsatz, niedrige Latenz, explizite Access-Pattern-Analyse, Scheduling und hardwarebewusste Entscheidungen.
+3. Literaturmatrix
+4. Was die Literatur bereits beantwortet
+• Node- und Page-Layout sind zentral. Cache-Line-Größe allein ist aber kein hinreichender Designanker; Knotengröße, Suchschema, Instruktionskosten und TLB-Verhalten wirken zusammen.
+• Trieartige Strukturen gewinnen bei Point-/Prefix-Suche häufig durch geringere Höhe, adaptive Knoten oder präzisere Suchraum-Einengung.
+• Prefetching kann große Effekte haben, ist aber architektur- und workloadabhängig. Eine Plattformkalibrierung ist daher keine Kür, sondern Pflicht.
+• Plattformbewusste Optimierung ist in der Literatur vorhanden, aber meist innerhalb einer einzelnen Struktur und nicht als getrennte, wiederverwendbare Kontrollschicht.
+5. Was die Literatur PRT-ART noch nicht fertig liefert
+• Eine eigenständige Cache-Engine, die als getrennte Meta-Ebene über einer trieartigen Suchstruktur steht und Seitentypwahl, Prefetching, Value-Ablage und Layoutentscheidungen zentralisiert.
+• Ein konsistentes Modell, das Dense-, Sparse-, Redirect- und lokale Suchraum-Seiten gleichzeitig unter plattformabhängigen Cache-Regeln auswählt.
+• Eine sauber experimentell begründete Kopplung aus Suchstruktur, Value-Handle/Inline-Umschaltung und aktiver Cache-Line-Affinity in einer gemeinsamen Bibliothek.
+• Eine überzeugende Literaturbasis für aggressive, direkte Steuerung von Instruction-Cache/Programmseiten im Kontext von Suchindizes. Dieser Teil sollte daher als explorativ und sekundär behandelt werden.
+6. Abgeleitete Designregeln für PRT-ART
+7. Konsequenz für die Forschungsfrage
+Die belastbare Formulierung der Arbeit lautet damit sinngemäß: Wie stark verbessern aktive, messgetriebene Cache-Entscheidungen — bezogen auf Seitentyp, Layout, Value-Ablage und Prefetching — die Leistung trie-basierter Suchstrukturen gegenüber passiven, statisch ausgelegten Varianten auf unterschiedlichen CPU-Plattformen?
+8. Literaturbasis und Direktlinks
+
+[TABELLE 1]
+Verdichtetes Ergebnis | • Die Literatur spaltet sich klar in passive cache-aware Indexstrukturen, adaptive trieartige Suchstrukturen, Prefetch-/Runtime-Adaptation und den cache-oblivious Gegenentwurf. | • Die Forschungslücke von PRT-ART liegt nicht in einem neuen Trie als Selbstzweck, sondern in einer aktiven, messgetriebenen Cache-Orchestrierung über der Suchlogik. | • Stark belegt sind Datenpfad-, Layout-, Fanout- und Prefetch-Fragen. Schwächer belegt und daher vorsichtiger zu formulieren sind direkte Programmseiten-/Instruction-Cache-Eingriffe.
+[/TABELLE]
+
+
+[TABELLE 2]
+Arbeit || Kernidee || Direkter Nutzen für PRT-ART || Grenze / fehlender Teil
+Cache-Sensitive Search Trees (Rao/Ross 1999) || Pointerfreie Directory-Struktur in Cache-Line-Größe über sortiertem Array. || Starker Beleg für passives, lokales Cache-Line-Design; keine aktive Steuerung, schwach bei Updates. || Link: https://www.vldb.org/conf/1999/P7.pdf
+CSB+-Tree (Rao/Ross 2000) || Zusammenhängende Kinder, nur ein expliziter Kindpointer, bessere Cache-Line-Ausnutzung. || Direkter Vorläufer für pointerarme Seitengruppen; weiterhin statische Layoutidee. || Link: https://cir.nii.ac.jp/crid/1363951793924061824
+B-Tree Indexes and CPU Caches (Graefe/Larson 2001) || Breite Übersicht über CPU-Cache-Techniken für B-Bäume. || Nützlich als Technik-Katalog; keine eigenständige aktive Cache-Steuerung. || Link: https://sigmod.org/publications/discs/2002/out/p_btreeindexesandgope.htm
+Fractal Prefetching B+-Trees (Chen et al. 2002) || Kombiniert disk- und cacheoptimierte Granularitäten, nutzt Prefetching für B+-Bäume. || Wichtiger Vorläufer für hierarchische, mehrstufige Optimierung; noch kein allgemeiner Cache-Kontrollpfad. || Link: https://sigmod.org/publications/discs/2003/out/p_fractalprefetchshpht.htm
+Node Size in Cache-Conscious B+-Trees (Hankins/Patel 2003) || Zeigt, dass optimale Knotengröße nicht einfach Cache-Line-Größe ist; Instruktionen und TLB zählen mit. || Direkter Beleg gegen naive '64B ist immer optimal'-Annahmen. || Link: https://citeseerx.ist.psu.edu/document?doi=05e9f12a9d3231ef611194540fcba3917baa0220&repid=rep1&type=pdf
+Making CSB+-Trees Processor Conscious (Samuel/Pedersen/Bonnet 2005) || Architekturabhängige Parametrisierung und systematische Plattformanpassung. || Starke Stütze für eine messgetriebene Cache-Engine mit Plattformkalibrierung. || Link: https://researchprofiles.ku.dk/da/publications/making-csb-trees-processor-conscious/
+Cache-Oblivious B-Trees (Bender et al. 2006) || Optimierung für Hierarchien ohne konkrete Cache-Parameter. || Wichtiger Kontrast: elegante Theorie, aber gerade nicht explizit plattform- und cache-aware. || Link: https://nyuscholars.nyu.edu/en/publications/cache-oblivious-b-trees
+Masstree (Mao/Kohler/Morris 2012) || Trie-artige Verkettung lokaler B+-Bäume, fanout- und prefetchbewusst, lockfreie Lookups. || Sehr nah an Layer-/Fence-Ideen; Fokus bleibt Datenstruktur, nicht externe Cache-Kontrollschicht. || Link: https://dash.harvard.edu/entities/publication/73120378-af8b-6bd4-e053-0100007fdf3b
+ART (Leis/Kemper/Neumann 2013) || Adaptive Node-Familie 4/16/48/256, geordnet, prefix- und rangefähig. || Zentrale Suchbaseline; zeigt lokale Adaptivität, aber keine gesonderte Cache-Engine. || Link: https://portal.fis.tum.de/en/publications/the-adaptive-radix-tree-artful-indexing-for-main-memory-databases
+HOT (Binna et al. 2018) || Diskriminierende Bits, kompakte sparse Nodes, SIMD-nahe Suche. || Wichtige Sparse-Page-Inspiration; Fokus auf Node-Layout, nicht auf globale Cache-Orchestrierung. || Link: https://cris.fau.de/publications/255105165/
+START (Fent et al. 2020) || Mehrbyteige ART-Nodes, Kostenmodell und Optimierer, deutliche Speedups gegenüber ART. || Der direkteste Nachbar für adaptive Seitentypwahl; wertvoll für Kostenmodellideen. || Link: https://portal.fis.tum.de/en/publications/start-self-tuning-adaptive-radix-tree/
+B²-Tree (Schmeißer et al. 2022) || Page-lokale Decision-/Span-Nodes, weniger Cache-Lines pro Suchvorgang. || Starke Referenz für lokale Suchraum-Einengung innerhalb einer Seite. || Link: https://open.fau.de/handle/openfau/33203
+CoCo-trie (Boffa/Ferragina/Tosoni/Vinciguerra 2023) || Datenabhängige Kollabierung tiefer Subtries in kompakte Macro-Nodes. || Sehr nah an Redirect-/Collapsed-Path-Ideen und Key-Handling. || Link: https://www.sciencedirect.com/science/article/pii/S0306437923001527
+Dynamic Adaptation of Data Cache Prefetching (Khan 2011) || Runtime-anpassbare Prefetch-Offets über dynamische Spezialisierung. || Wichtige methodische Stütze für online adaptives Prefetching außerhalb der Indexliteratur. || Link: https://academic.oup.com/comjnl/article/54/5/815/543793
+Fetch Me If You Can (Mahling/Weisgut/Rabl 2025) || Prefetch-Erfolg hängt von Fill Buffers, Workload-Intensität und CPU-Verhalten ab. || Direkter Warnhinweis: Software-Prefetching hilft nicht immer; Plattformkalibrierung ist Pflicht. || Link: https://www.bifold.berlin/impact-transfer/publications/view/publication-detail/fetch-me-if-you-can-evaluating-cpu-cache-prefetching-and-its-reliability-on-high-latency-memory
+[/TABELLE]
+
+
+[TABELLE 3]
+Regel || Interpretation
+R1 || Die Cache-Engine sollte als Control Plane formuliert werden, nicht als vollwertiger 'Kernel' im hardwareseitigen Sinn.
+R2 || Plattformkalibrierung vor dem produktiven Betrieb ist wissenschaftlich gut begründbar; universelle Schwellwerte sind es nicht.
+R3 || Dense-/Sparse-/Redirect-/lokale Suchraum-Seiten dürfen nicht als beliebige Sammlung erscheinen, sondern als messgetrieben ausgewählte Familie.
+R4 || Inline vs. Handle ist ein First-Class-Thema, weil Value-Ablage direkt auf Cache-Line-Nutzung und Pointer-Kette wirkt.
+R5 || Prefetching braucht Vorsicht: zuerst messen, dann aktivieren. 'Mehr Prefetch' ist kein Forschungsbeitrag.
+R6 || Programmpfad- und Code-Page-Optimierung können als Zusatzhypothese erwähnt werden, sollten aber nicht die Hauptbegründung der Arbeit tragen.
+[/TABELLE]
+
+
+[TABELLE 4]
+Quelle || URL
+Cache-Sensitive Search Trees (Rao/Ross 1999) || https://www.vldb.org/conf/1999/P7.pdf
+CSB+-Tree (Rao/Ross 2000) || https://cir.nii.ac.jp/crid/1363951793924061824
+B-Tree Indexes and CPU Caches (Graefe/Larson 2001) || https://sigmod.org/publications/discs/2002/out/p_btreeindexesandgope.htm
+Fractal Prefetching B+-Trees (Chen et al. 2002) || https://sigmod.org/publications/discs/2003/out/p_fractalprefetchshpht.htm
+Node Size in Cache-Conscious B+-Trees (Hankins/Patel 2003) || https://citeseerx.ist.psu.edu/document?doi=05e9f12a9d3231ef611194540fcba3917baa0220&repid=rep1&type=pdf
+Making CSB+-Trees Processor Conscious (Samuel/Pedersen/Bonnet 2005) || https://researchprofiles.ku.dk/da/publications/making-csb-trees-processor-conscious/
+Cache-Oblivious B-Trees (Bender et al. 2006) || https://nyuscholars.nyu.edu/en/publications/cache-oblivious-b-trees
+Masstree (Mao/Kohler/Morris 2012) || https://dash.harvard.edu/entities/publication/73120378-af8b-6bd4-e053-0100007fdf3b
+ART (Leis/Kemper/Neumann 2013) || https://portal.fis.tum.de/en/publications/the-adaptive-radix-tree-artful-indexing-for-main-memory-databases
+HOT (Binna et al. 2018) || https://cris.fau.de/publications/255105165/
+START (Fent et al. 2020) || https://portal.fis.tum.de/en/publications/start-self-tuning-adaptive-radix-tree/
+B²-Tree (Schmeißer et al. 2022) || https://open.fau.de/handle/openfau/33203
+CoCo-trie (Boffa/Ferragina/Tosoni/Vinciguerra 2023) || https://www.sciencedirect.com/science/article/pii/S0306437923001527
+Dynamic Adaptation of Data Cache Prefetching (Khan 2011) || https://academic.oup.com/comjnl/article/54/5/815/543793
+Fetch Me If You Can (Mahling/Weisgut/Rabl 2025) || https://www.bifold.berlin/impact-transfer/publications/view/publication-detail/fetch-me-if-you-can-evaluating-cpu-cache-prefetching-and-its-reliability-on-high-latency-memory
+Overview on hardware optimizations for database engines (TUD 2017) || https://fis.tu-dresden.de/portal/en/publications/overview-on-hardware-optimizations-for-database-engines%289be9c82c-5be7-4174-a5a2-4cc3d577fe75%29.html
+VAMPIR (TUD 2023) || https://fis.tu-dresden.de/portal/de/publications/vampir--virtualized-nonfunctional-memory-properties-for-datapipeline-scheduling%281cd6ee64-f657-4f74-ab76-8d32ab8a0939%29.html
+To stride or not to stride (TUD 2025) || https://fis.tu-dresden.de/portal/en/publications/to-stride-or-not-to-stride-the-memory-access%28d5df1c1d-0e06-43cc-a6f7-a4f65a1093c0%29.html
+[/TABELLE]
