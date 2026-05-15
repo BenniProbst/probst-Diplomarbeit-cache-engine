@@ -89,6 +89,13 @@ Geplant fuer REV7-drawio (`phase5_uml_detail_REV7.drawio`):
 - 4 NEUE Tabs (REV7-Master, Adapter-Familie, P27-Bundles, libs/-Layout)
 - **Total: 36 Tabs**
 
+### §4.1 Stand 2026-05-15 (Session 4700 Ende)
+
+| K-H Sub-Phase | Status |
+|---|---|
+| K-H.1 REV6 → REV7 Kopie als Basis | ✅ DONE (`phase5_uml_detail_REV7.drawio` 295 KB im selben Verzeichnis) |
+| K-H.2-K-H.10 (XML-Tab-fuer-Tab + JPG-Export) | ⏳ pending — eigene Folge-Session |
+
 ---
 
 ## §5 V31-Code-Bezug fuer drawio-Update
