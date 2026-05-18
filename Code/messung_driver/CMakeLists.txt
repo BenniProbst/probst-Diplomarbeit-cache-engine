@@ -15,3 +15,15 @@ target_link_libraries(messung_driver PRIVATE
 set_target_properties(messung_driver PROPERTIES
     OUTPUT_NAME "comdare-messung-driver"
 )
+
+# V32.JJ.2 (2026-05-18 spaet) - V32 Orchestrator-Header verfuegbar machen
+option(COMDARE_V32_ENABLE "Enable V32 Orchestrator (parallele EE-Submission via Command-Pattern)" OFF)
+if(COMDARE_V32_ENABLE)
+    target_compile_definitions(messung_driver PRIVATE COMDARE_V32_ENABLE=1)
+    target_include_directories(messung_driver PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}  # fuer v32_orchestrator.hpp
+    )
+    message(STATUS "[messung_driver] V32 Orchestrator AKTIVIERT (parallele EE-A + EE-B)")
+else()
+    message(STATUS "[messung_driver] V32 Orchestrator DEAKTIVIERT (V31.F Default)")
+endif()
