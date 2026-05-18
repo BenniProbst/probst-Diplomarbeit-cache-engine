@@ -7,7 +7,51 @@
 
 ---
 
-## §1 KERNSATZ (User-Direktive 2026-05-18, verbatim)
+## §0 KRITISCHE KORREKTUR AA.2 (2026-05-18 spaet)
+
+**User-Korrektur 2026-05-18:** Das im REV7-Stand beschriebene "CE bindet Pruefling ein"-Modell ist UNVOLLSTAENDIG und teilweise falsch. **Korrekte Sicht:**
+
+> "Beide [CacheEngine und PRT-ART] werden in erster Linie durch die CacheEngineBuilder orchestriert. Hier ist noch ein Design-Fehler, weil beide in erster Linie durch die CacheEngineBuilder orchestriert werden."
+
+### §0.1 Was ist korrekt?
+
+- **CacheEngineBuilder** orchestriert **BEIDE ExecutionEngines parallel**:
+  - **ExecutionEngine A = CacheEngine** (selbst eine ExecutionEngine, nicht nur Werkzeug-Bibliothek!)
+  - **ExecutionEngine B = PRT-ART** (gleichwertig zu CacheEngine, nicht "im CE-Subsystem")
+- **Command-Pattern** wird verwendet um die beiden EE-Performances zu vergleichen
+- CacheEngineBuilder ist der **Test-Treiber** mit ICommand-Hierarchie
+
+### §0.2 Was bleibt unveraendert?
+
+- 4-Subsystem-Trennung (messung_driver / CEB / CE / Pruefling) als grobe Struktur
+- CEB ist autonomes Plattform-Ausmess-System
+- Phasen 1-7 Pipeline
+- Bidirektionale Beziehung CE<->PA (jetzt aber als gleichberechtigte EEs)
+
+### §0.3 Wo ist der Design-Fehler im alten M-Modell?
+
+- §2.1 Subsystem-Rollen-Tabelle: CacheEngine als "Werkzeug-Bibliothek" zu klein gegriffen — CE ist EINE der zwei EEs
+- §3 Bidirektionale CE<->PA: "(a) CE -> PA: instantiiert" UNGENAU — beide werden vom CEB instantiiert (nicht CE-instantiiert-PA)
+- §5 Phasen 1-7: Phase 5 BIND "CEB+CE Owner" UNVOLLSTAENDIG — Owner ist CEB allein, der beide EEs registriert
+
+### §0.4 V32-Implementierungs-Konsequenz (DD.1+DD.2+DD.3)
+
+- `CacheEngineBuilder` braucht `ICommand`-Hierarchie (ExecuteEngineACommand, ExecuteEngineBCommand, CompareResultsCommand)
+- `CacheEngine` wird selbst zur ExecutionEngine (implementiert IExecutingEngine + ISearchEngine, gleich wie PRT-ART)
+- `PrtArtSearchEngine` ist ExecutionEngine B (kein "Pruefling-Adapter im CE-Subsystem")
+- `messung_driver` registriert BEIDE EEs beim CEB (nicht "CE wird gebaut + PA als Pruefling")
+
+### §0.5 Korrekturen in nachgelagerten Doks
+
+- `11_axes_vs_strategies_disambiguation.md` §10.9 R.9: V1-V4 sind ENGINE-CHOICE-DIMENSION der CE-as-EE-A
+- `Y4_cross_repo_beziehungen.md` §3 ABI: CacheEngine implementiert auch IExecutingEngine
+- drawio Tab 47 MCORR + neuer Tab CC.1 (M-CORRECT-V2 mit Command-Pattern)
+
+**Folgesektionen 1-8 bleiben fuer Memory-Direktive (NIE Doku loeschen), aber sind ab §0 als korrekturbeduerftig markiert. Die folgende ueberholte Sicht wird durch AA.2-Korrektur in §0 oben relativiert.**
+
+---
+
+## §1 KERNSATZ (User-Direktive 2026-05-18, verbatim — UEBERHOLT durch §0)
 
 > "CacheEngineBuilder und CacheEngine sind formal 2 getrennte Systeme, die dennoch zum selben Projekt gehoeren. Der CacheEngineBuilder ist ein autonomes System zum Ausmessen einer Plattform, waehrend die CacheEngine dabei als Werkzeug verwendet wird. Die CacheEngine kann einen registrierten Pruefling (PRT-ART) als Struktur ueber alle Permutationen mit einbinden und dessen Konfigurationen gegenpruefen, **waehrend dieser die CacheEngine mit benutzt, um die eigene Performance auszumessen und zu optimieren**."
 

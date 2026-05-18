@@ -1,5 +1,68 @@
 # Z.5 — Master-UML-INDEX + Gap-Analyse Ist-vs-Soll
 
+## §0 KRITISCHE KORREKTUR AA.3 (2026-05-18 spaet)
+
+**User-Direktive 2026-05-18 spaet:** Die in §3 stehende Tabelle markiert mehrere PRT-ART-Sub-Achsen als "FEHLT - NEU". **Das ist GRUNDSAETZLICH FALSCH.**
+
+### §0.1 Korrekte Semantik fehlender Achsen-Spec
+
+> "Wenn bei einem Algorithmus eine Axe nicht explizit definiert wird, dann ist es die Aufgabe des Testsystems aus dem bestehenden Stand der Technik der CacheEngine den besten existierenden Algorithmus der besagten Axe/Kategorie durch Permutation zu ermitteln und auszumessen. Die Default-Aktion bei fehlender Spezifikation ist also Nachschlagen in der Bibliothek. Darunter fallen die Pruefung ALLER verfuegbaren Algorithmen der Axe, sofern diese in der Pruef-Konfiguration nicht explizit limitiert wurden."
+
+### §0.2 Konkret: was bedeutet das fuer PRT-ART?
+
+PRT-ART definiert eigene Sub-Achsen-Implementierungen **NUR DORT WO ES ETWAS NEUES BRINGT**. Fuer alle anderen Achsen ist die DEFAULT-AKTION:
+
+1. **CacheEngineBuilder** (AA.2 Korrektur: Test-Treiber) erkennt fehlende Achsen-Spec im Profil
+2. CEB ruft Auto-Permutator: lookup in CE-Bibliothek aller verfuegbaren SOTA-Bausteine der Achse
+3. Pro SOTA-Baustein der Achse: eine Permutations-Variante generieren
+4. CEB testet alle Permutationen + ermittelt besten
+5. Mess-Resultat zeigt: PRT-ART (Achse X) verwendet "X-Best-Variant"
+
+### §0.3 Aufhebung der "FEHLT - NEU" Markierungen
+
+Die §3.2 Gap-Analyse-Tabelle PRT-ART war FALSCH wo "FEHLT" markiert war. **Korrekte Markierungen:**
+
+| Alte Markierung | Neue Markierung | Bedeutung |
+|---|---|---|
+| FEHLT - NEU | **DEFAULT-LOOKUP** | CEB-Auto-Permutation aus CE-Bibliothek, kein PrtArt-Code erforderlich |
+| NEU (mit Eigen-Implementation) | **NEU (b)** | PRT-ART bringt eigene Implementation der Achse |
+| REUSE K05 Konzept | **REUSE (a)** | PRT-ART nutzt SOTA-Baustein der CE-Bibliothek explizit gepinnt |
+| Permutations-Config | **CONFIG (c)** | PRT-ART konfiguriert CE-Bausteine ohne neue Implementation |
+
+### §0.4 Aktualisierte §3.2 PRT-ART Gap (korrigiert)
+
+| Klasse / Modul | Korrigierter Status | V32-Aktion |
+|---|---|---|
+| `prt_art_search_engine.hpp` 12 -> 20+ Params | REFACTOR (Default-Variant pro Param = DEFAULT-LOOKUP) | V32.1 |
+| `prt_art/hardware/` | **DEFAULT-LOOKUP** (NICHT NEU!) | (kein PrtArt-Code, CEB-Auto-Permutation) |
+| `prt_art/scheduling/` | **DEFAULT-LOOKUP** | (analog) |
+| `prt_art/traversal/cache_memory_traversal.hpp` | **DEFAULT-LOOKUP** | (analog) |
+| `prt_art/traversal/search_algo_traversal.hpp` | NEU (b) | O.3 |
+| `prt_art/traversal/traversal_mapping.hpp` | NEU (b) VirtualOffsetCalculator | O.3 |
+| `prt_art/telemetry/` | **DEFAULT-LOOKUP** | (CE-Bibliothek liefert Kuehn 11.X1-X4 via Auto-Permutation) |
+| `prt_art/isa/` | **DEFAULT-LOOKUP** | (CE liefert IPlatformProbe-Output) |
+| `prt_art/allocator/reclamation/numa/huge_page/` | **DEFAULT-LOOKUP** fuer Reclamation/NUMA/HugePage | (CE-Allokator-Bibliothek liefert via Auto-Permutation) |
+| `prt_art/concurrency/locking_mode.hpp` | DEFAULT-LOOKUP (CE-Bibliothek 4 Modes) | (CE liefert read-only/RW/optimistic/upgradeable) |
+| `docs/PRT_ART_AXES_REUSE_MATRIX.md` | NEU mit (a)/(b)/(c)/(default-lookup) | O.4 |
+
+**Bilanz prt-art KORRIGIERT:** Statt 11 V32+ Aenderungen sind es **nur ca. 4-5 echte Neuerungen** (Trie-Mapping + Search-Algo-Traversal + Reuse-Matrix-Doku + V32.1 Template). **6 Module entfallen** (sind Default-Lookup-Faelle).
+
+### §0.5 Aktualisierte Gesamt-Bilanz V32+
+
+| Repo | NEU | REFACTOR | ERWEITERN | MOVE/SPLIT | DOKU | DEFAULT-LOOKUP (kein Code!) | TOTAL Code-Aenderungen |
+|---|---|---|---|---|---|---|---|
+| cache-engine | 3 (Hardware-Strategy, Scheduling-Strategy, NUMA-Achse) | 3 | 2 | 1 | 1 | 0 | **10** |
+| prt-art (KORRIGIERT) | **2** (Traversal-Mapping, SearchAlgo-Traversal) | 1 | 0 | 1 | 2 (Reuse-Matrix + Default-Lookup-Doku) | **6** | **6 (statt 11!)** |
+| Diplomarbeit/Code | 2 | 0 | 3 | 0 | 0 | 0 | **5** |
+| Cross-Repo | 1 | 0 | 0 | 0 | 3 | 0 | **4** |
+| **TOTAL** | **8** | **4** | **5** | **2** | **6** | **6** | **25 (statt 30)** |
+
+**5 Aenderungen weniger** durch korrekte Default-Lookup-Semantik. Aufwand reduziert sich auf 2-3 Sprint-Wochen.
+
+---
+
+
+
 **Stand:** 2026-05-18 (Z.5, Z-Phase Abschluss)
 **Vorgaenger:** Y.1-Y.4 (Ist) + Z.1-Z.4 (Soll)
 **Konsequenz:** Diese Gap-Liste ist die **direkte V32+ Code-Sprint-Vorlage**

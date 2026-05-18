@@ -1,5 +1,77 @@
 # O-Phase PRT-ART als Bausteine-Spiegel — V32+ Vorbereitung (O.1-O.6)
 
+## §0 KRITISCHE KORREKTUR AA.4 (2026-05-18 spaet)
+
+**User-Direktive 2026-05-18 spaet:** Im §1.2 dieser Doku stehen 10 Sub-Achsen als "FEHLT - muss angelegt werden". **Diese Markierung ist FALSCH.**
+
+### §0.1 Korrekte Default-Aktion bei fehlender Achsen-Spec
+
+> "Wenn eine Axe nicht explizit definiert wird, ist die Default-Aktion: Nachschlagen in der Bibliothek (CE-Sub-Engine Permutation aller SOTA-Bausteine der Achse). Pruefung ALLER verfuegbaren Algorithmen der Axe, sofern in Pruef-Config nicht limitiert."
+
+### §0.2 Wann braucht PRT-ART trotzdem ein eigenes Modul?
+
+Nur wenn:
+- PRT-ART eine ECHTE Neu-Implementation auf der Achse bietet (Status (b))
+- PRT-ART einen SOTA-Baustein der CE-Bibliothek explizit PINNT (Status (a))
+- PRT-ART eine spezifische Permutations-Configuration setzt (Status (c))
+
+Wenn nichts davon: KEIN PrtArt-Modul noetig, CEB nutzt Default-Lookup.
+
+### §0.3 Korrigiertes §1.2 Achsen-Abdeckung Audit
+
+| Achse | Aktueller Status | Korrigierter Status |
+|---|---|---|
+| 1 PAGE-TYPE | DONE | DONE (b) Neu-Impl |
+| 2 NODE-TYPE | DONE | DONE (b) Neu-Impl |
+| 3.A SearchAlgo-Traversal | DONE | DONE (b) Neu-Impl |
+| 3.B Cache-Memory-Traversal | FEHLT - muss NEU | **DEFAULT-LOOKUP** (CE-Bibliothek hat Default-Cache-Line-Walk) |
+| 3.M Traversal-Mapping | FEHLT - muss NEU | DONE (b) VirtualOffsetCalculator (existiert in memory_layout/, muss nur verschoben werden) |
+| 4 VALUEHANDLE | DONE | DONE (a) Reuse K05 |
+| 5 MEMORY-LAYOUT | DONE | DONE (b) Neu-Impl |
+| 6.1 Allocation-Strategy | DONE | DONE (b) Neu-Impl Bucket |
+| 6.2 Reclamation-Policy | FEHLT | **DEFAULT-LOOKUP** (CE liefert epoch/RCU/HP/QSBR-Permutation) |
+| 6.3 NUMA-Affinity | FEHLT | **DEFAULT-LOOKUP** (CE liefert local/interleave/preferred-Permutation) |
+| 6.4 Huge-Page-Policy | FEHLT | **DEFAULT-LOOKUP** (CE liefert transparent/explicit/none-Permutation) |
+| 6.5 Free-List-Strategy | DONE | DONE (b) Bucket-Strategy |
+| 7 PREFETCH | DONE | DONE (b) Neu-Impl + (a) P27-Reuse |
+| 8.1 Concurrency-Pattern | DONE | DONE (b) Neu-Impl Kombination |
+| 8.2 Locking-Mode | FEHLT | **DEFAULT-LOOKUP** (CE liefert read-only/RW/optimistic/upgradeable-Permutation) |
+| 9 ISA | FEHLT | **DEFAULT-LOOKUP** (CE-IPlatformProbe liefert Host-ISA, kein PrtArt-Override) |
+| 10 MEASUREMENT | DONE | DONE (b) Neu-Impl |
+| 11 TELEMETRY-COLLECTION | FEHLT (Kuehn-Strategien) | **DEFAULT-LOOKUP** (CE-concepts/telemetry/* hat Kuehn 11.X1-X4) |
+| 12 HARDWARE-STRATEGY | FEHLT | **DEFAULT-LOOKUP** (CE-IHardwareStrategy Auto-Permutation, V32 NEU im CE) |
+| 13 SCHEDULING-STRATEGY | FEHLT | **DEFAULT-LOOKUP** (CE-ISchedulingStrategy Auto-Permutation, V32 NEU im CE) |
+
+### §0.4 Korrigierte O.3 Spiegel-Module Pflichtliste
+
+Statt 6 NEUE Subdirectories sind nur 2 wirklich noetig:
+
+- `prt_art/traversal/traversal_mapping.hpp` — VirtualOffsetCalculator verschieben (b Neu-Impl)
+- `prt_art/traversal/search_algo_traversal.hpp` — bestehende internal_search/-Klassen reorganisieren (b Neu-Impl)
+
+**Optional (NICHT pflicht)** falls PRT-ART eigene Erweiterung auf der Achse haben sollte:
+- `prt_art/telemetry/`, `prt_art/hardware/`, `prt_art/scheduling/`, etc. — aktuell NICHT noetig, CEB-Auto-Permutation deckt es ab
+
+### §0.5 Korrigierte O.6 Template-Parameter
+
+PrtArtSearchEngine bekommt KEINE 20+ Template-Params (das war Z.2 §1 Soll). **Korrigiertes Soll:**
+
+- 12 V31.F Template-Params **bleiben** (Backward-Compat)
+- + 2 NEUE Template-Params: `TraversalMapping` + `SearchAlgoTraversal` (= O.3 Pflicht-Neue)
+- + Optionale Template-Params fuer Default-Lookup-Overrides (Hardware/Scheduling/Telemetry/etc.) wenn User explizit konfigurieren will
+
+Damit: **PrtArtSearchEngine mit 14-16 Template-Params** (Pflicht), Rest via Default-Lookup vom CEB.
+
+### §0.6 V32-Implementations-Konsequenzen
+
+- DD.1 CEB AutoPermutator-Klasse: lookup in CE-Bibliothek aller Bausteine pro Achse + Permutations-Generierung
+- DD.2 PrtArt-Template-Erweiterung auf 14-16 Params (statt 20+)
+- DD.3 messung_driver XML-Schema: `<axes_default_lookup>true</axes_default_lookup>` Flag erlaubt das
+
+---
+
+
+
 **Stand:** 2026-05-18 (O-Phase 6/6 DONE als Konsolidierungs-Doku)
 **Trigger:** User-Direktive 2026-05-18 + N-Phase 14 Achsen
 **Konsequenz fuer V32+:** comdare-prt-art/prt_art/include/prt_art/ Sub-Verzeichnisse aufruesten
