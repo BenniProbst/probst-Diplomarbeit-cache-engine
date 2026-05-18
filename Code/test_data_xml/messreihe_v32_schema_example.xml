@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  V32.GG.2 (2026-05-18 spaet) - Messreihe XML-Schema V32 Beispiel
+
+  AA.3-Korrektur: messreihen.xml unterstuetzt jetzt:
+  - <execution_engines> Liste (beide EE-A + EE-B fuer F15-Vergleich)
+  - <axes_default_lookup> Flag (true = CEB-AutoPermutator fuer fehlende Achsen-Spec)
+  - <axis allowed_variants=""> pro Achse User-Limit
+-->
+<messreihe version="32">
+    <metadata>
+        <name>example_messreihe_v32</name>
+        <description>V32 Beispiel mit parallele EE-Submission + Default-Lookup</description>
+        <mode>defined</mode>  <!-- defined | full | full_sampled -->
+    </metadata>
+
+    <!-- V32 NEU: beide ExecutionEngines parallel registrieren -->
+    <execution_engines>
+        <engine id="ee_a" type="CacheEngineExecutionEngineAdapter" name="CE-Pure-SOTA-Baseline"/>
+        <engine id="ee_b" type="PrtArtExecutionEngineAdapter" name="PrtArt-mit-Innovationen"/>
+    </execution_engines>
+
+    <!-- V32 NEU: Default-Lookup-Mechanik fuer Achsen ohne explizite Spec -->
+    <axes_default_lookup enabled="true">
+        <!-- Beispiel: limitiere Auto-Permutation auf 2 Variants pro Achse 12.1 SIMD -->
+        <axis id="12.1" allowed_variants="AVX2,scalar"/>
+        <axis id="12.2" allowed_variants="L1Aware,L2Aware"/>
+        <!-- Alle anderen Achsen ohne <axis> = CEB-Auto-Permutator nimmt alle Host-faehigen -->
+    </axes_default_lookup>
+
+    <!-- Test-Konfigurations-Tupel -->
+    <tupel id="t01">
+        <workload kind="YCSB_C_ReadOnly" record_count="1000000" operation_count="100000" seed="42"/>
+        <!-- explizite Achsen-Spec (optional) - sonst Default-Lookup -->
+        <axes>
+            <axis id="1" baustein="PAGE_PRTART_DENSEBYTE"/>
+            <axis id="7" baustein="DISTANCE_ESTIMATOR_PREFETCH"/>
+            <!-- 12, 13 etc. nicht definiert -> Auto-Permutation -->
+        </axes>
+    </tupel>
+
+    <tupel id="t02">
+        <workload kind="YCSB_A_Read50Write50" record_count="500000" operation_count="50000" seed="42"/>
+        <!-- KEIN <axes> Block = vollstaendige Auto-Permutation -->
+    </tupel>
+
+    <!-- Output-Konfiguration -->
+    <output>
+        <binary_path>_runs/${date}/example_messreihe_v32/results.bin</binary_path>
+        <csv_path>_runs/${date}/example_messreihe_v32/results.csv</csv_path>
+        <latex_path>_runs/${date}/example_messreihe_v32/results.tex</latex_path>
+        <comparison_metrics>true</comparison_metrics>  <!-- F15-Verdict + Ratios pro Tupel -->
+    </output>
+</messreihe>
