@@ -217,6 +217,113 @@ PRT-ART ist NICHT verantwortlich fuer Ebene II oder Ebene III — das ist CE-Eig
 
 ---
 
+## §10 R.1-R.10 Detail-Vermischungs-Klarstellungen (2026-05-18)
+
+Pro K-Tab spezifische Klarstellung. Konkretisiert §4 + §5 mit Code-Beispielen.
+
+### §10.1 R.1 — K10 F1-F29 vs Bausteine-Achsen (CACHE-INTERNAL, nicht Algorithmus)
+
+**Vermischung:** K10 listet 29 "Cache-Strategie-Familien F1-F29". Sprachlich nahe an "Achsen". Aber: F = Ebene III (Cache-Strategien), Achsen = Ebene I.
+
+**Konkret-Beispiel:**
+- F9-F14 "ENCODING + PREFETCH": **gehoeren zu CE-Sub-Engine C3 Cache-Prefetch-Engine + C8 Cache-Encoding-Engine**. NICHT identisch mit Algorithmus-Achse 7 PREFETCH.
+- Algorithmus-Achse 7 PREFETCH waehlt aus: PRT-ART nutzt Distance-Estimator + Path-Oriented + Redirect-Prefetch + (V31.K6) HierarchicalBundlePrefetcher
+- CE-Strategie F9 LayerDependentEncoding ist ein Bausteine-INTERNAL-Encoding-Hilfsmittel das die CE bereitstellt — Algorithmus kann es konsumieren oder nicht
+
+**Korrektur in Doku:** K10-Tab-Banner in P-Phase um "Ebene III" erweitern. Schon vorbereitet in §5 Tabelle.
+
+### §10.2 R.2 — K15 C1-C12 vs Algorithmus-Achsen (CE-Services, nicht Permutations-Dimensionen)
+
+**Vermischung:** K15 listet 12 ICacheEngine-Sub-Engines C1-C12. Einige Sub-Engine-Namen ueberlappen mit Achsen-Namen:
+- C2 Cache-Pinning ↔ ?
+- C3 Cache-Prefetch ↔ Achse 7 PREFETCH
+- C6 Cache-Allocation ↔ Achse 6.1 ALLOCATOR
+- C11 Cache-Scheduler ↔ Achse 13 SCHEDULING
+
+**Klarstellung:** C* = Service den die CE bereitstellt. Achse = Konfigurations-Dimension des Algorithmus.
+
+**Konkret-Beispiel:** Achse 6.1 Allocation-Strategy ist die FRAGE "welche Allocation-Strategie nutzt der Algorithmus?". C6 Cache-Allocation-Engine ist die ANTWORT-INFRASTRUKTUR (17 Atome) die der CE bereitstellt — pro Achse-6.1-Wert wird eine entsprechende C6-Strategie instantiiert.
+
+### §10.3 R.3 — K09 C8 Hardware-Probing vs Achse 12 HARDWARE-STRATEGY
+
+**Vermischung:** K09 zeigt 8 Heuristik-Cluster (C1-C8), davon C8 "Hardware-Probing". Sprachlich nahe an neue Achse 12 HARDWARE-STRATEGY.
+
+**Klarstellung:** Zwei verschiedene Perspektiven:
+- **K09 C8 Hardware-Probing** (Ebene II Heuristik-Cluster) = wie ENTDECKT die CE die verfuegbare Hardware? PlatformProbe + OnlinePerformanceCounterReader + DynamicSpezializer + SchedulerThreshold
+- **Achse 12 HARDWARE-STRATEGY** (Ebene I Algorithmus-Permutations-Dimension) = welche Hardware-Features NUTZT der Algorithmus AKTIV? SIMD-Family + Cache-Level-Targeting + NUMA-Strategy + Prefetch-HW + Atomic-Instruction-Family
+
+**Konkret-Beispiel:** PRT-ART nutzt AVX2 (Achse 12.1) — das ist eine PRT-ART-Entscheidung (Ebene I). Die CE C8 Heuristik *entdeckt* ob AVX2 verfuegbar ist (Ebene II) — kann aber AVX2 nicht erzwingen wenn der Algorithmus es nicht nutzt.
+
+### §10.4 R.4 — K06 S1-S30 vs K10 F1-F29 (Algorithmus-Seite vs Cache-Seite)
+
+**Vermischung:** Beide Tabs verwenden den Begriff "Hybrid-Aufloesungen" (REV5 NEU §9). Unklare Abgrenzung.
+
+**Klarstellung:** 
+- K06 S1-S30 = Ebene IV (Implementations der Algorithmus-Achsen). z.B. S22 BPlus-Familie implementiert Algorithmus-Achse 1 PAGE-TYPE.
+- K10 F1-F29 = Ebene III (Implementations der CE-Sub-Engines). z.B. F1 AdaptiveFootprintStrategy implementiert C1 Cache-Layout-Engine.
+- Hybrid-Aufloesungen kommen auf BEIDEN Ebenen vor — als Komposition mehrerer S-Familien (Algorithmus-Hybrid) ODER als Komposition mehrerer F-Strategien (Cache-Hybrid). Beide sind orthogonal.
+
+### §10.5 R.5 — K05b PRT-ART 4 Suchtypen A/B/C/D (Sub-Permutation, nicht Achse)
+
+**Vermischung:** K05b zeigt PRT-ART internal Typ A (Array[256]) / B (Array[65535]) / C (Range-Scan tuple<u8,u8>) / D (Range-Scan tuple<u16,u16>). Sprachlich nahe an einer "Achse".
+
+**Klarstellung:** 4 Suchtypen sind **Sub-Permutation auf Achse 2 NODE-TYPE** (PrtArtBPlusNode-Variante) oder optional als **Permutationsdimension D10** in K12 NEU REV 6 modelliert.
+
+**Konkret:** Achse 2 NODE-TYPE hat `NODE_PRTART_BPLUS` als Hauptbaustein. PrtArtBPlusNode hat intern 4 Variant-Auspraegungen (Typ A/B/C/D). Diese 4-fache Variation ergibt eine 4-fache Permutations-Multiplikation pro PRT-ART-Konfiguration.
+
+### §10.6 R.6 — K05e PRT-ART 4+2 Pools (7 Instanzen einer Allokations-Strategie, nicht 7 Allokatoren)
+
+**Vermischung:** K05e zeigt 4+2 Pool-Familie (Pool A/B/C/D + R + V-static/V-dynamic = 7 Pools). Ueberlappung mit Allokator-Matrix (23 Allokatoren AC1-AC5).
+
+**Klarstellung:** 7 PRT-ART-Pools sind **7 Pool-INSTANZEN derselben Allokations-Strategie** (Bucket-Strategy mit per-Suchtyp-Sub-Cache + per-Value-Typ-Sub-Cache). Achse 6.1 Allocation-Strategy waehlt "Bucket". Achse 6.5 Free-List-Strategy "size-class". Die 7 Pools sind PRT-ART-INTERNAL Multiplicity, NICHT 7 verschiedene Allokatoren.
+
+**Konkret:** Achse 6.X "Per-Type-Pool-Multiplicity" als Sub-Achse koennte explizit eingefuehrt werden — das macht PRT-ART einzigartig (Sub-Pool-Multiplicity > 1).
+
+### §10.7 R.7 — K05g Concurrency (PRT-ART eigen vs CE-Disziplin)
+
+**Vermischung:** K05g zeigt PRT-ART internal Concurrency: OLC + Reserved-Value-Blocks + Lock-Free-Reader. Ueberlappung mit Achse 8 (8 Disziplinen + 3 Mechaniken via Phase 6 INK-3 ConcurrencyManager).
+
+**Klarstellung:** 
+- Achse 8.1 Concurrency-Pattern: PRT-ART waehlt **OLC** (eine der 8 CE-Disziplinen) PLUS eigene Erweiterung **Reserved-Value-Blocks** (PRT-ART-spezifisch).
+- Achse 8.2 Locking-Mode: PRT-ART verwendet **mixed**: read-only (Tree-Pfad) + optimistic-validation (Updates) + read-write (Value-Buffer)
+- Die Reserved-Value-Blocks-Mechanik ist PRT-ART-eigen und qualifiziert PRT-ART als neuartig auf Achse 8.1.
+
+**Sub-Achse-Vorschlag:** 8.X1 Reservation-Strategy + 8.X2 Lock-Free-Read-Path-Type als Sub-Achsen klaeren.
+
+### §10.8 R.8 — K04 4-Ebenen-Strategien (Implementations-Tiefe, nicht Achsen)
+
+**Vermischung:** K04 zeigt 4 Ebenen A IPattern (21) / B IPlural (41) / C ISingular (74) / D IHeuristic (~80-85). User koennte 4 Ebenen als "Bausteine-Achsen" lesen.
+
+**Klarstellung:** 
+- K04-Ebenen = **Implementations-Tiefe pro S-Familie** (Pattern → Plural → Singular → Heuristic ist eine Implementations-Hierarchie GoF-aehnlich)
+- Achsen 1-13 = **Permutations-Dimensionen**
+- Pro Algorithmus kann auf jeder K04-Ebene 1 bis N Bausteine pro Achse haben — **multiplikativ**.
+- z.B.: PRT-ART auf Achse 1 hat Ebene A "AllPagesUniform" + Ebene B "PRT-ART-eigene Plural" + Ebene C "PrtArtPageStrategy" + Ebene D "AdaptivePrefetchHeuristic" — alle 4 Ebenen pro Achse.
+
+### §10.9 R.9 — K03 V1-V4 Builds (ENGINE-CHOICE-DIMENSION, nicht Cache-Familien)
+
+**Vermischung:** K03 zeigt 4 Builds V1=BaseEngine (NO-CE) / V2=Static / V3=Informed_Kalibriert / V4=Automatic_Adaptive. Sprachlich nahe an "Cache-Strategien".
+
+**Klarstellung:** V1-V4 sind eine **Meta-Achse "ENGINE-CHOICE-DIMENSION"** (Phase Vergleich, F15-Forschungsmission). Pro Search-Engine-Permutation entstehen 4-fache Multiplikation der Builds = systematischer Vergleich:
+- V1 ist die "No-CE-Baseline" (Algorithmus laeuft ohne CE-Services)
+- V2 ist statische CE (kompilierte Defaults)
+- V3 ist kalibrierte CE (Mikrobenchmark-Warmup)
+- V4 ist adaptive CE (Online-Adaption zur Laufzeit)
+
+**Bezug zu CEB-Autonomie:** CEB orchestriert die V1-V4-Enumeration. CE instantiiert die V1-V4. V1-V4 ist DER zentrale Vergleichs-Mechanismus fuer die F15-Forschungsmission.
+
+### §10.10 R.10 — K12 F15-Familie vs F15-Forschungsmission
+
+**Vermischung:** K12 zeigt F15 (ProbabilityWeightedLayoutStrategy P16+P28) als HERZSTUECK. F15 ist sowohl Cache-Familie (Ebene III) als auch Forschungs-Mission (Meta).
+
+**Klarstellung:**
+- **F15-Familie** (Cache-Strategie III): konkrete Implementation einer ICacheStrategy fuer wahrscheinlichkeits-gewichtetes Layout
+- **F15-Forschungsmission** (META): "Aktive Cache-Engine verbessert CLU/Footprint/Laufzeit/H2 etc. systematisch ueber alle Workloads und Hardware-Plattformen". F15-Mission nutzt V1-V4-Builds (R.9) fuer Vergleich.
+
+**Konkret:** F15-Familie ist EIN Baustein in der CE-Strategien-Tabelle. F15-Mission ist DER zentrale Forschungs-Beitrag der Diplomarbeit (siehe Architekturentscheidungen F1-F15).
+
+---
+
 ## §9 Cross-Refs
 
 - **M-Phase 4-Subsystem-Modell:** `10_schichten_modell_M.md` (komplementaer — Subsysteme vs Konzept-Ebenen)
