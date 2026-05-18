@@ -252,3 +252,56 @@ Damit liegen alle Bausteine fuer das Permutations-Experiment
 bereit; was offen bleibt, ist die Aktivierung der Original-Compiler
 pro \texttt{ext/}-Repo (Cluster-Aufgabe, parallel zur Diplomarbeit) und
 die HW-E2E-Mess-Reihe (Phase~V21.2, manuell).
+
+\section{14-Achsen-Sub-Struktur (N-Phase Verfeinerung)}\label{sec:14-achsen-substruktur}
+
+% Quelle: docs/bausteine/07_bausteine_matrix_N_erweitert.md (alle Sektionen)
+
+Nach Termin~8 und User-Direktive 2026-05-18 wurde die Bausteine-Matrix
+von 11 auf \textbf{14 Hauptachsen + ca.~30 Sub-Achsen} erweitert
+(N-Phase). Damit gibt es eine feinere Granularitaet fuer die
+Permutations-Konfiguration:
+
+\begin{description}
+    \item[Achse~3 TRAVERSAL] gesplittet in
+    \emph{3.A SearchAlgo-Traversal} (Algorithmus-Seite),
+    \emph{3.B Cache-Memory-Traversal} (Cache-Seite) und
+    \emph{3.M Traversal-Mapping} (Uebersetzung zwischen den
+    beiden Seiten). Dies adressiert die fundamentale Trennung
+    zwischen den nicht-Cache-kohaerenten Konzepten des
+    Suchalgorithmus und der Cache-Mechanik der CacheEngine.
+
+    \item[Achse~6 ALLOCATOR] feingliedrig in
+    \emph{6.1 Allocation-Strategy},
+    \emph{6.2 Reclamation-Policy} (epoch/RCU/HP/QSBR),
+    \emph{6.3 NUMA-Affinity},
+    \emph{6.4 Huge-Page-Policy} und
+    \emph{6.5 Free-List-Strategy} unterteilt. Die 23 Allokatoren
+    A01--A23 wurden entsprechend reorganisiert.
+
+    \item[Achse~8 CONCURRENCY] aufgeteilt in
+    \emph{8.1 Concurrency-Pattern} (OLC/HTM/STM/lock-free/RCU/HP)
+    und \emph{8.2 Locking-Mode} (read-only/read-write/optimistic).
+
+    \item[Achse~11 TELEMETRY] um die Kuehn-Strategien
+    (\emph{11.X1 Leaf-Only-Counter}, \emph{11.X2 Sampling},
+    \emph{11.X3 Offline-Recompute}, \emph{11.X4 Inner-Node ANTI-PATTERN})
+    erweitert.
+
+    \item[\textbf{Achse~12 HARDWARE-STRATEGY} (NEU)] mit fuenf
+    Sub-Achsen 12.1--12.5 wie in Kapitel~\ref{sec:hw-sched-pro-paper}
+    beschrieben.
+
+    \item[\textbf{Achse~13 SCHEDULING-STRATEGY} (NEU)] mit fuenf
+    Sub-Achsen 13.1--13.5. Besonders wichtig:
+    \emph{13.2 SIMD-Worker-Count-Limit} (typisch nur~2 von $N$
+    Cores haben SIMD-Einheiten --- alle anderen Worker laufen
+    weiterhin scalar parallel).
+\end{description}
+
+Diese Verfeinerung wirkt sich auf das Flag-System aus
+(siehe docs/bausteine/05\_flag\_system.md~\S{}9): aus 9~Banks mit
+$\sim$50~Bit werden 14~Banks mit Sub-Bank-Bitfields und insgesamt
+\textbf{82~Bit Permutations-Identifier}. Die zugehoerige PermutationFlags-
+Struktur und der \texttt{xml\_config\_parser} werden im Code-Refactoring
+V32 angepasst (siehe Tasks V32.1--V32.4).

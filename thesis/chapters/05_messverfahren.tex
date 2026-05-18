@@ -121,3 +121,76 @@ kompiliert wurde. Im Production-Pfad (Default OFF) ist der
 Production-Code von jeglichem Mess-Overhead befreit. Der
 Diplomarbeits-\texttt{messung\_driver} setzt das Flag explizit beim
 Sub-Build (V8.12).
+
+\section{Permutations-Explosion durch 14 Achsen}\label{sec:permexplosion}
+
+% Quelle: docs/bausteine/05_flag_system.md §9 (N.10 Phase 2026-05-18)
+% Quelle: docs/bausteine/07_bausteine_matrix_N_erweitert.md §1-§6
+
+Mit der N-Phasen-Erweiterung der Bausteine-Matrix von 11 auf
+14~Achsen + ca.~30 Sub-Achsen (siehe Kapitel~\ref{sec:14-achsen-substruktur})
+wird der Permutations-Raum substantiell groesser.
+
+\subsection{Quantitative Schaetzung}
+
+\begin{itemize}
+    \item \textbf{Vor der N-Phase} ($\sim$11~Achsen, $\sim$85 Bausteine):
+    geschaetzt $\sim$5,5~Milliarden Permutationen.
+    \item \textbf{Nach der N-Phase} (14~Achsen + Sub-Achsen, ca.~120 Bausteine):
+    geschaetzt \textbf{$\sim$100~Milliarden+ Permutationen}.
+\end{itemize}
+
+Im PermutationFlags-Bitfeld wachsen entsprechend die Banks:
+9~Banks $\rightarrow$ 14~Banks, $\sim$50~Bit $\rightarrow$
+82~Bit Permutations-ID-Breite.
+
+\subsection{Konsequenzen fuer die drei Messreihen}
+
+Ein vollstaendiger Permutations-Sweep ueber 100~Mrd Konfigurationen ist
+selbst auf dem ZIH-Cluster nicht erschoepfend laufbar. Drei
+Mechanismen daempfen die Explosion:
+
+\paragraph{(1) Profile-Filter via \texttt{<expected\_workload>}.}
+Seit V19 (\texttt{algorithm\_profiles/}-XML-Schema) tagged jedes
+SOTA-Profil seinen erwarteten Workload (z.\,B.\ YCSB\_A fuer Update-heavy,
+YCSB\_C fuer Read-only). Phase~5 des \texttt{ExperimentDriver} routet
+pro Permutation nur die kompatiblen Workloads -- nicht $6\times$ alles.
+
+\paragraph{(2) \texttt{MessreihenMode::Defined} fuer Manuskript-Plots.}
+Standard-Modus liest \texttt{messreihen.xml} und fuehrt nur die
+\emph{deklarierten} Tupel aus. Die drei Pflicht-Messreihen
+(\texttt{config\_a\_prt\_art\_vs\_sota.xml},
+\texttt{config\_b\_cache\_engine\_perms.xml},
+\texttt{config\_c\_merge\_alt\_neu.xml}) deklarieren typischerweise
+ca.~100--1000 Tupel pro Reihe. Diese Mess-Daten landen direkt im
+Manuskript-Anhang.
+
+\paragraph{(3) \texttt{MessreihenMode::Full} nur fuer ZIH-Cluster.}
+Der Full-Modus iteriert systematisch ueber den vollen Permutations-Raum
+unter Beachtung der Achsen-Kompatibilitaet (z.\,B.\ AVX-512 nur auf
+Plattformen mit AVX-512-Support). Realistischer Sub-Modus ist
+\texttt{Full-Sampled} (z.\,B.\ jede 1000.\ Permutation), der weiterhin
+sinnvolle Stichprobe der ca.~100~Mrd Permutationen liefert. Diese
+Laeufe finden auf den drei TIER-3-HABICH-Plattformen statt:
+ZIH-Talos-OS-K8s-Pods auf Ryzen~9~9950X3D, Intel~i9~14900KS und
+P31-HBM-Hardware (vgl.\ Kapitel~\ref{sec:hw-sched-pro-paper}).
+
+\subsection{Hardware-Pflicht zur Achsen-Reduktion}
+
+Nicht alle 14~Achsen sind auf allen Plattformen variierbar. Beispielsweise:
+
+\begin{itemize}
+    \item Achse~12.1 SIMD-Family: AVX-512 ist nur auf
+    Server-Plattformen verfuegbar (i9 14900KS hat keine
+    AVX-512-Encoding-Unit).
+    \item Achse~12.2 Cache-Level-Targeting: HBM-aware ist nur auf
+    HBM-Hardware sinnvoll (P31-Tier-3).
+    \item Achse~13.2 SIMD-Worker-Count-Limit: hardware-limitiert
+    durch die Anzahl physischer SIMD-Einheiten (typisch~2 von $N$
+    Cores), nicht durch Software.
+\end{itemize}
+
+Der \texttt{IPlatformProbe} (Phase~1 DISCOVER der Builder-Pipeline)
+liefert daher pro Plattform eine reduzierte \emph{lauffaehige
+Permutations-Achsen-Menge}, die den Permutations-Raum von vornherein
+auf das auf dem Host machbare einschraenkt.

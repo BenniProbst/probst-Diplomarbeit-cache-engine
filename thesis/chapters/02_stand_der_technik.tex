@@ -181,3 +181,67 @@ $=$ \textbf{1800 deklarierte Permutations-Profile}. Davon werden via
 \texttt{<expected\_workload>}-Tag sinnvolle Defaults gesetzt; volle
 Permutation per \texttt{messreihen.xml mode=full}. Reale Mess-Daten
 ersetzen Sample-Daten nach V21.2 (HW-E2E), siehe Kapitel~6.
+
+\section{Hardware- und Scheduling-Strategie pro Paper}\label{sec:hw-sched-pro-paper}
+
+% Quelle: docs/bausteine/03_cross_paper_konzeptmatrix.md §6 (N.8 Phase 2026-05-18)
+% Achsen-Definition: docs/bausteine/07_bausteine_matrix_N_erweitert.md §5 (Achse 12) + §6 (Achse 13)
+
+Nach der N-Phasen-Erweiterung der Bausteine-Matrix (siehe
+docs/bausteine/07\_bausteine\_matrix\_N\_erweitert.md) sind zwei
+zusaetzliche Algorithmus-Permutations-Achsen verankert:
+
+\begin{itemize}
+    \item \textbf{Achse~12 HARDWARE-STRATEGY}: welche Hardware-Features
+    nutzt der Algorithmus aktiv? Sub-Achsen 12.1 SIMD-Family
+    (AVX2/AVX-512/NEON/SVE2/scalar), 12.2 Cache-Level-Targeting
+    (L1/L2/L3/HBM-aware), 12.3 NUMA-Strategy, 12.4 Prefetch-Hardware
+    (PREFETCH/PREFETCHNTA/PREFETCHW), 12.5 Atomic-Instruction-Family
+    (CAS/LL-SC/RMW-extended).
+
+    \item \textbf{Achse~13 SCHEDULING-STRATEGY}: wie wird Arbeit
+    verteilt? Sub-Achsen 13.1 Worker-Pool-Layout (thread-per-core /
+    work-stealing / CPU-pinning), 13.2 SIMD-Worker-Count-Limit
+    (Hardware-limitiert auf typisch 2 von $N$ Cores!),
+    13.3 Heterogeneous-Core-Dispatch (Intel Hybrid P-cores/E-cores),
+    13.4 Co-Routine-Strategy, 13.5 Batch-Granularity.
+\end{itemize}
+
+Tabelle~\ref{tab:hw-sched-papers} zeigt pro SOTA-Paper die
+Auspraegungen dieser zwei Achsen (Auswahl, Vollkatalog in
+docs/bausteine/03\_cross\_paper\_konzeptmatrix.md~\S{}6).
+
+\begin{table}[h!]
+\centering
+\caption{Hardware- und Scheduling-Strategie pro SOTA-Paper (Auswahl)}\label{tab:hw-sched-papers}
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Paper} & \textbf{Hardware-Strategy (Achse 12)} & \textbf{Scheduling-Strategy (Achse 13)} \\
+\hline
+P01 ART          & AVX2, L1-aware, none, CAS                     & thread-per-core \\
+P02 HOT          & AVX2 (Bit-Vector), L1-aware, none, CAS        & thread-per-core \\
+P03 Masstree     & scalar, L1-aware, none, CAS                   & thread-per-core + work-stealing \\
+P05 START        & AVX2 (Multi-Byte-Span), L1-aware, none, CAS   & thread-per-core \\
+P20 LeanStore    & AVX2, HBM-aware, NUMA-aware, CAS              & work-stealing + hybrid-aware \\
+P27 hp-soft      & PREFETCH (L1/L2/L3-Bundle), all-Cache, none, CAS & thread-per-core + Co-Routine-interleave \\
+P28 Kuehn        & PREFETCH (none, scalar Counter), L1-aware, none, CAS & thread-per-core + Sampling-Worker \\
+P31 Ungethuem    & AVX-512 (HBM), HBM-aware, NUMA-aware, CAS     & hybrid-aware (P-cores + E-cores) \\
+P32 Schmidt      & AVX-512 (SIMD-Stride), HBM-aware, NUMA-aware, CAS & hybrid-aware \\
+P33 VAMPIR       & AVX-512 (Profiler), all-Cache-Level, NUMA-aware, none & hybrid-aware + Profiler-Worker \\
+\hline
+\textbf{PRT-ART} & \textbf{AVX2, L1-aware (TLB-aligned), local NUMA, PREFETCH (Distance-Estimator + Redirect-NTA), CAS (OLC)} & \textbf{thread-per-core + 2 SIMD-Worker-Limit + hybrid-aware + Co-Routine-interleave + micro-batch} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Permutations-Explosion}
+
+Mit den NEUEN Achsen 12 + 13 sowie der Verfeinerung der Achsen 3, 6, 8
+explodiert der Permutations-Raum: vor der N-Phase $\sim$5,5 Milliarden
+Permutationen, nach der N-Phase \textbf{$\sim$100 Milliarden+}. Dies
+erfordert zwingend den Profile-Filter-Mechanismus
+(\texttt{<expected\_workload>}, V19+) und den Modus
+\texttt{MessreihenMode::Defined} fuer Manuskript-Plots. Der
+Full-Modus ist nur auf dem ZIH-Cluster (Talos-OS-Kubernetes-Pods auf
+Tier-3-HABICH-Hardware, P31-Plattform) sinnvoll lauffaehig.

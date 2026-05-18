@@ -105,3 +105,72 @@ ermoeglicht es zukuenftigen Diplomanden, weitere Pruefling-Algorithmen
 analog zu PRT-ART einzubringen, ohne die Werkzeug-Bibliothek
 (cache-engine) zu modifizieren --- ein wichtiges Designprinzip fuer
 die Skalierbarkeit der Forschungs-Infrastruktur.
+
+\section{Konsolidierungs-Beitraege (N + M-Phase 2026-05-18)}\label{sec:konsolidierungs-beitraege}
+
+% Quelle: docs/sessions/20260518-4900-...md + 10_schichten_modell_M.md + 11_axes_vs_strategies_disambiguation.md + 07_bausteine_matrix_N_erweitert.md
+
+Nach Termin~8 wurden zwei strukturelle Konsolidierungen vorgenommen,
+die ueber den ursprueglichen Diplomarbeit-Scope hinausgehen:
+
+\subsection{M-Modell: 4-Subsystem-Trennung}
+
+Die Trennung von CacheEngineBuilder (autonomes
+Plattform-Ausmess-System), CacheEngine (Werkzeug-Bibliothek) und
+Pruefling (PRT-ART) als drei unabhaengige Subsysteme im selben
+Repo, plus dem messung\_driver als vierter Outer-Loop, wurde
+formalisiert (siehe Kapitel~\ref{sec:vier-subsysteme}). Die
+\emph{bidirektionale} Cache-Engine~$\leftrightarrow$~Pruefling-Beziehung
+(CE bindet Pruefling als Permutations-Struktur ein, Pruefling nutzt
+CE als Optimierungs-Service) ist die zentrale Eigenschaft des
+M-Modells. Diese Symmetrie war in REV7 implizit und wurde durch das
+M-Modell explizit gemacht. Sie ermoeglicht die Multi-Pruefling-Faehigkeit
+(Messreihe~A vergleicht PRT-ART gegen 22 V31-SOTA-Adapter parallel).
+
+\subsection{N-Phase: 14-Achsen-Bausteine-Matrix}
+
+Die Bausteine-Matrix wurde von 11~Hauptachsen auf
+\textbf{14~Hauptachsen + ca.~30 Sub-Achsen} erweitert
+(siehe Kapitel~\ref{sec:14-achsen-substruktur}). Die fuenf Achsen-
+Aenderungen (3-Split, 6-Split, 8-Split, 11-Erweiterung, 12+13~NEU)
+adressieren konzeptionelle Luecken der ursprueglichen Matrix:
+
+\begin{itemize}
+    \item Die fundamentale Trennung zwischen Algorithmus-Traversal und
+    Cache-Memory-Traversal (Achse~3-Split) ist die Voraussetzung fuer
+    eine saubere Mapping-Strategie zwischen den nicht-Cache-kohaerenten
+    Konzepten des Entwicklers und der Cache-Mechanik der CacheEngine.
+
+    \item Die feingliedrige Aufteilung der Allokations-Strategien
+    (Achse~6.1--6.5) loest die vorher vermischten 7~Allokator-Achsen
+    AA1--AA7 in 5~konzeptionell klar getrennte Sub-Achsen auf.
+
+    \item Die NEUE Achse~13 SCHEDULING beruecksichtigt explizit die
+    Hardware-Limitierung der SIMD-Einheiten (typisch 2~von $N$~Cores)
+    und ermoeglicht damit \emph{heterogene} Worker-Pools, wo
+    SIMD-faehige Worker und scalare Worker parallel laufen.
+\end{itemize}
+
+\subsection{PRT-ART als Bausteine-Spiegel}
+
+Die N-Phase-Pflicht (User-Direktive 2026-05-18: "PRT-ART muss alle
+Achsen detailliert benennen und konstruieren") qualifiziert PRT-ART
+als \emph{neuartigen Algorithmus}: PRT-ART hat in den Achsen~1, 5,
+6.5, 7, 8.1 und 10 jeweils Neu-Implementationen (die PRT-ART-spezifische
+Bucket-Strategy mit 4+2 Pool-Multiplicity, die Distance-Estimator-
+basierte Prefetch-Strategie, die OLC + Reserved-Value-Blocks-
+Concurrency-Mechanik und die H1/H2/H3-Metriken). In den uebrigen
+Achsen werden bestehende Stand-der-Technik-Bausteine via
+Permutations-Konfiguration wiederverwendet.
+
+\subsection{Anti-Vermischung der 4 Konzept-Ebenen}
+
+Die Klarstellung der 4~unabhaengigen Konzept-Ebenen
+(Ebene~I Bausteine-Achsen, Ebene~II CE-Sub-Engines, Ebene~III
+Cache-Strategien, Ebene~IV Such-Engine-Familien) in
+docs/architektur/11\_axes\_vs\_strategies\_disambiguation.md ist eine
+methodische Konsequenz aus der Tieflektuere der 33~Quell-Paper:
+Begriffe wie "Hardware-Probing", "Cache-Strategie" oder "Permutations-
+Dimension" haben in der Literatur unterschiedliche Bedeutungen, was
+die Ableitung der eigenen Bausteine-Matrix verschleiert hat. Die
+4-Ebenen-Hierarchie ist die Basis fuer weitere Konsolidierungen.
