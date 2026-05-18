@@ -1,7 +1,9 @@
 \chapter{Architektur}\label{ch:architektur}
 
-% [Cross-Ref Konsolidierte Doku, K-I.2 2026-05-15]
+% [Cross-Ref Konsolidierte Doku, K-I.2 2026-05-15 + M.6 2026-05-18]
 % Architektur-Master REV7.7: docs/architektur/02_aktueller_master_REV7_7.md
+% Schichten-Modell M (4-Subsystem-Trennung): docs/architektur/10_schichten_modell_M.md
+% Anti-Vermischung 4-Konzept-Ebenen: docs/architektur/11_axes_vs_strategies_disambiguation.md
 % REV-Historie REV3 -> REV7.7: docs/architektur/01_REV_Historie.md
 % Saeule A (Such-Strategien): docs/architektur/03_konzepte_saeule_a.md
 % Saeule B (Cache-Strategien + Plattform): docs/architektur/04_konzepte_saeule_b.md
@@ -15,6 +17,92 @@ Der Verweis ist symbolisch --- die Architektur-Skizze REV~7 selbst liegt in
 \texttt{20260508 Termin 7/Phase5\_UML\_Detail/24\_architektur\_skizze\_REV7\_2026\_05\_13.md}
 und konsolidiert in \texttt{docs/architektur/02\_aktueller\_master\_REV7\_7.md}.}
 und gliedert sich in drei Schichten plus Drei-Repo-Aufteilung.
+Die Trennung des Cache-Engine-Werkzeugs vom Cache-Engine-Builder als
+autonomes Plattform-Ausmess-System sowie die bidirektionale
+Beziehung zwischen Cache-Engine und Pruefling werden in
+Abschnitt~\ref{sec:vier-subsysteme} formalisiert.
+
+\section{Vier-Subsystem-Trennung (M-Modell)}\label{sec:vier-subsysteme}
+
+% Quelle: docs/architektur/10_schichten_modell_M.md (Phase M.2, 2026-05-18)
+
+Diplomarbeit, Cache-Engine-Builder, Cache-Engine und Pruefling sind
+\emph{vier formal getrennte Subsysteme}, die zwar im selben Projekt
+wohnen, aber unterschiedliche Verantwortungen tragen. Die Trennung
+ist orthogonal zur Drei-Repo-Aufteilung
+(\texttt{Diplomarbeit/Code/}, \texttt{comdare-cache-engine},
+\texttt{comdare-prt-art}): Cache-Engine-Builder und Cache-Engine
+wohnen beide im \texttt{cache-engine}-Repo, sind dort aber zwei
+unabhaengige Subsysteme (eine Executable + eine Bibliothek).
+
+\subsection{Subsystem-Rollen}
+
+\begin{enumerate}
+    \item \textbf{Diplomarbeit/Code/messung\_driver} --- der
+    Auswertungs-Orchestrator (Outer-Loop). Liest die drei
+    Messreihen-XML-Konfigurationen (A/B/C), triggert pro Reihe
+    den Cache-Engine-Builder und sammelt am Ende die
+    Mess-Resultate fuer den Anhang.
+
+    \item \textbf{CacheEngineBuilder} (\texttt{cache-engine/apps/}) ---
+    ein \emph{autonomes Plattform-Ausmess-System}. Implementiert die
+    Sieben-Phasen-Pipeline (\textsc{discover}, \textsc{measure},
+    \textsc{classify}, \textsc{publish}, \textsc{bind},
+    \textsc{execute}, \textsc{compare}) und enumeriert
+    pro registrierter Engine den Permutations-Raum. Verwendet die
+    Cache-Engine als Werkzeug, ist aber selbst eine eigenstaendige
+    Executable, die ohne den \texttt{messung\_driver} aufgerufen
+    werden kann.
+
+    \item \textbf{CacheEngine} (\texttt{cache-engine/libs/cache\_engine/}) ---
+    die \emph{Werkzeug-Bibliothek}. Bietet zwoelf interne
+    Sub-Engines $C_1$--$C_{12}$ (Layout, Pinning, Prefetch,
+    Coherence, Telemetry, Allocation, Migration, Encoding, Heuristik,
+    Topologie, Scheduler, Filter), 29 Cache-Strategien $F_1$--$F_{29}$
+    und etwa achtzig bis fuenfundachtzig
+    \texttt{IHeuristic}-Instanzen als C++23-Concept-API.
+
+    \item \textbf{Pruefling (PRT-ART)} (\texttt{comdare-prt-art/}) ---
+    eine als \texttt{IExecutingEngine} bei der Cache-Engine
+    registrierte Algorithmus-Implementation. Implementiert
+    Ebene IV (Such-Engine-Familien) fuer alle dreizehn
+    Algorithmus-Achsen und konsumiert die Cache-Engine-Services
+    waehrend eigener Lookup-, Insert- und Scan-Operationen.
+\end{enumerate}
+
+\subsection{Bidirektionale Cache-Engine~$\leftrightarrow$~Pruefling-Beziehung}
+
+Die symmetrische Beziehung zwischen Cache-Engine und Pruefling
+ist die zentrale Eigenschaft des M-Modells:
+
+\begin{itemize}
+    \item \textbf{Richtung~(a) CE~$\rightarrow$~PRT-ART:} Die
+    Cache-Engine instantiiert PRT-ART als
+    \texttt{IExecutingEngine} pro Permutations-Konfiguration.
+    Dies entspricht Phase~5 (\textsc{bind}) der
+    Builder-Pipeline.
+
+    \item \textbf{Richtung~(b) PRT-ART~$\rightarrow$~CE:} PRT-ART
+    ruft Cache-Engine-Services (Telemetry, Prefetch,
+    Heuristik\,\dots) waehrend eigener Lookups zur Laufzeit
+    in Phase~6 (\textsc{execute}). Das Pruefling-Modul nutzt
+    also die Cache-Engine, um seine eigene Performance
+    auszumessen und zu optimieren.
+\end{itemize}
+
+Beide Richtungen muessen im Klassendiagramm (siehe U10 in
+\texttt{docs/architektur/05\_uml\_klassen.md}) und im
+drawio-Master-Tab (siehe Phase~P.2,
+\texttt{phase5\_uml\_detail\_REV8.drawio}) explizit modelliert sein.
+
+\subsection{Multi-Pruefling-Faehigkeit}
+
+Die Cache-Engine kann mehrere Pruefling-Implementationen
+gleichzeitig registriert halten. Messreihe~A
+(\texttt{config\_a\_prt\_art\_vs\_sota.xml}) nutzt diese
+Faehigkeit, um PRT-ART, ART, HOT, Masstree und weitere
+SOTA-Adapter (22 V31-Adapter) in einer einzigen
+Builder-Pipeline gegeneinander zu vermessen.
 
 \section{Drei-Schichten-Hierarchie}
 
