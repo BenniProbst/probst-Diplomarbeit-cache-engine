@@ -77,3 +77,30 @@ Im Bausteine-Module-Identifier wird sie als
 Das Build-Time-Tool `hp_soft.py` (Schritt 2) ist hingegen eine
 direkte Portierung — bleibt unter `tools/p27_bundle_finder/` mit
 expliziter Zitation, unabhaengig vom Adapter-Mechanismus.
+
+---
+
+## L.3 Update 2026-05-18 (Verbindung zur N-Phase Achsen-Erweiterung)
+
+**Kontext:** Mit der Bausteine-Matrix-Erweiterung auf 14 Achsen (N-Phase 2026-05-18, siehe `../../../docs/bausteine/07_bausteine_matrix_N_erweitert.md`) ergibt sich fuer P27 hp-soft eine spezifische Achsen-Zuordnung:
+
+| Achse | P27 hp-soft Auspraegung | Sub-Strategie |
+|---|---|---|
+| 7 PREFETCH | Hierarchical-Bundle | 6 Bausteine-Familie (Hauptachse, V31.K6 implementiert in `comdare-prt-art/prt_art/include/prt_art/prefetch/`) |
+| 12.1 SIMD-Family | scalar / AVX2-optional | (Bundle-Selektion ist scalar) |
+| 12.2 Cache-Level-Targeting | **L1+L2+L3-aware** (hierarchical) | NEU klar via Achse 12 |
+| 12.4 Prefetch-Hardware | PREFETCH + PREFETCHNTA | NEU klar via Achse 12 |
+| 13.4 Co-Routine-Strategy | interleave (mit Hardware-Prefetch) | NEU klar via Achse 13 |
+
+### Status der drei TODO-Schritte aus §"Re-Implementation-Plan"
+
+1. ✅ hp_soft.py einsortiert — DONE (Forschungsarbeiten/code/P27-...-Hierarchical/hp-soft/)
+2. ✅ C++23-Port von hp_soft.py — DONE (V31.K5, `comdare-prt-art/tools/p27_bundle_finder/`)
+3. ✅ Runtime-Prefetching-Logik re-implementiert — DONE (V31.K6, `comdare-prt-art/prt_art/include/prt_art/prefetch/hierarchical_bundle_prefetcher.hpp`)
+4. **[TODO]** Adapter-Code in `cache-engine/adapters/P27-hp-soft/p27_hp_soft_adapter.hpp` als Bausteine-Familie-Wrapper fuer Achse 7 PREFETCH (Re-Use durch andere Algorithmen ueber `if COMDARE_HAVE_P27_BUNDLE` Schalter).
+
+### User-Memory-Direktive (Zhang)
+
+User-Hinweis (verankert in `~/.claude/.../memory/reference_p27_zhang_no_more_input.md`): "Herr Zhang ist ein sehr stolzer und zynischer Mensch. Mehr als dieses Sammelsurium aus Hinweisen werden wir nicht bekommen." Damit ist P27 vollstaendig — keine weiteren Mails an Autoren.
+
+Email-Verlauf 2026-05-08 bis 2026-05-13: `../../../E-Mail Zhang – benjamin-elias.probst@mailbox.tu-dresden.de.pdf`
