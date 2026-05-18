@@ -145,6 +145,68 @@ identische Permutationen identische IDs haben.
 
 ---
 
+## §9 N-Phase Erweiterung 2026-05-18 — 14 Banks + Sub-Bank-Encoding
+
+**Trigger:** N.10 (#473), User-Direktive Bausteine-Matrix auf 14 Achsen
+**Pflicht-Pre-Read:** `07_bausteine_matrix_N_erweitert.md`
+
+### §9.1 Banks-Erweiterung 9 -> 14 (analog 14-Achsen-Modell)
+
+| Bank | Achse | Bits | Beschreibung |
+|---|---|---|---|
+| 1 PageBank | 1 PAGE-TYPE | 8 bit (26 Bausteine) | unveraendert |
+| 2 NodeBank | 2 NODE-TYPE | 5 bit (13 Bausteine) | unveraendert |
+| **3 TraversalBank** | **3 TRAVERSAL** | **3+3+2 = 8 bit** | **gesplittet** in 3.A (3 bit, 8 Sub-Bausteine) + 3.B (3 bit, 6 Sub-Bausteine) + 3.M (2 bit, 4 Sub-Bausteine) |
+| 4 ValueHandleBank | 4 VALUEHANDLE | 3 bit (5 Bausteine) | unveraendert |
+| 5 MemoryLayoutBank | 5 MEMORY-LAYOUT | 3 bit (8 Bausteine) | unveraendert |
+| **6 AllocatorBank** | **6 ALLOCATOR** | **3+2+2+2+2 = 11 bit** | **gesplittet** in 6.1 (3 bit) + 6.2 (2 bit) + 6.3 (2 bit) + 6.4 (2 bit) + 6.5 (2 bit) |
+| 7 PrefetchBank | 7 PREFETCH | 3 bit (6 Bausteine) | unveraendert |
+| **8 ConcurrencyBank** | **8 CONCURRENCY** | **3+2 = 5 bit** | **gesplittet** in 8.1 Pattern (3 bit, 7 Patterns) + 8.2 Locking-Mode (2 bit, 4 Modes) |
+| 9 IsaBank | 9 ISA | 4 bit (16 ISA-Auspraegungen) | unveraendert |
+| 10 MeasurementBank | 10 MEASUREMENT | 4 bit (F1 Matrix) | unveraendert |
+| 11 TelemetryBank | 11 TELEMETRY-COLLECTION | 3 bit (6 + 4 Kuehn = 10 Auspraegungen) | erweitert |
+| **12 HardwareBank (NEU)** | **12 HARDWARE-STRATEGY** | **3+2+2+2+2 = 11 bit** | NEU: 12.1 SIMD (3 bit) + 12.2 Cache-Level (2 bit) + 12.3 NUMA (2 bit) + 12.4 Prefetch-HW (2 bit) + 12.5 Atomic-Family (2 bit) |
+| **13 SchedulingBank (NEU)** | **13 SCHEDULING-STRATEGY** | **3+3+2+2+2 = 12 bit** | NEU: 13.1 Worker-Pool (3 bit) + 13.2 SIMD-Limit (3 bit) + 13.3 Hetero-Core (2 bit) + 13.4 Co-Routine (2 bit) + 13.5 Batch (2 bit) |
+| 14 EngineChoiceBank | (Meta-Achse, K03 V1-V4) | 2 bit (4 Builds) | NEU (war implizit in K03) |
+
+**Total Permutations-ID-Breite:** 8 + 5 + 8 + 3 + 3 + 11 + 3 + 5 + 4 + 4 + 3 + 11 + 12 + 2 = **82 bit**
+
+(vorher 9 Banks ~50 bit, jetzt 14 Banks 82 bit)
+
+### §9.2 Permutations-Anzahl-Schaetzung
+
+Mit den neuen Sub-Achsen explodiert der Permutationsraum:
+- Vor N: 85 Bausteine über 11 Achsen, geschaetzt ~5.5 Milliarden Permutationen
+- Nach N: ca. 120 Bausteine über 14 Achsen + Sub-Achsen, geschaetzt ca. 100 Milliarden+ Permutationen
+
+**Konsequenz:** Profile-Filter + MessreihenMode::Defined wird zur Pflicht (V19+ schon implementiert). Full-Mode nur fuer ZIH-Cluster (Talos OS K8s Pods, P31-Plattform).
+
+### §9.3 Sub-Bank-Bitfield-Layout (Beispiel Bank 3 TraversalBank)
+
+```
+TraversalBank (8 bit) Layout:
+  Bit 0-2 (3 bit): Sub-Achse 3.A SearchAlgo-Traversal (8 Sub-Bausteine)
+  Bit 3-5 (3 bit): Sub-Achse 3.B Cache-Memory-Traversal (6 Sub-Bausteine)
+  Bit 6-7 (2 bit): Sub-Achse 3.M Traversal-Mapping (4 Sub-Bausteine)
+
+Decoder-API (Pseudo-Code):
+  uint8_t bank = permutation_id_get_bank<TraversalBank>(perm_id);
+  TraversalAlgoSub a = (TraversalAlgoSub)(bank & 0x07);
+  TraversalCacheSub b = (TraversalCacheSub)((bank >> 3) & 0x07);
+  TraversalMappingSub m = (TraversalMappingSub)((bank >> 6) & 0x03);
+```
+
+### §9.4 Konsequenzen fuer Code (V32+)
+
+| Konsequenz | Was | Wo |
+|---|---|---|
+| 1 | PermutationFlags-Struktur um 5 neue Banks erweitern (12 + 13 + 14 + Sub-Banks fuer 3 + 6 + 8) | `cache-engine/libs/cache_engine/include/comdare/cache_engine/permutation_flags.hpp` |
+| 2 | XML-Config-Parser auf 14 Banks anpassen | `cache-engine/libs/common/config/xml_config_parser.hpp` |
+| 3 | Codegen-Templates fuer 14-Bank-Sub-Bank-Encoding | `cache-engine/codegen/templates/` |
+| 4 | Test-Suite fuer Sub-Bank-Encoding/Decoding | `cache-engine/tests/unit/test_permutation_flags.cpp` |
+
+---
+
 ## §8 Querverweise
 
 - Original-Quelle (UNVERAENDERT): `../termine/20260508 Termin 7/Flag_System.txt`

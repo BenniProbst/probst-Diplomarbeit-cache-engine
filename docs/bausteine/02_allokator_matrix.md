@@ -151,6 +151,68 @@ Smoke-Test: `tests/unit/test_v31_adapters.cpp` — 10/10 Allokator-Tests gruen.
 
 ---
 
+## §10 N-Phase Faltung 2026-05-18 — Allokatoren in Sub-Achsen 6.1-6.5 reorganisiert
+
+**Trigger:** N.9 (#472), User-Direktive Allokations-Strategien feingliedrig
+**Pflicht-Pre-Read:** `07_bausteine_matrix_N_erweitert.md` §2 (Achse 6 Split)
+
+### §10.1 Aenderung: AA1-AA7 -> 6.1-6.5
+
+Vor N: 7 Allokator-Achsen AA1-AA7 als Hauptachsen.
+Nach N: Allokatoren als Bausteine in Sub-Achsen 6.1-6.5 der Bausteine-Matrix.
+
+| AA-Achse (alt) | Sub-Achse (neu) | Beschreibung |
+|---|---|---|
+| AA1 Allocation-Strategy | **6.1** | slab/buddy/region/pool/object-cache/stack-allocator |
+| AA2 Huge-Page-Policy | **6.4** | transparent (THP), explicit (madvise), none |
+| AA3 Free-List-Strategy | **6.5** | size-class/best-fit/first-fit/segregated-fit |
+| AA4 Reclamation-Policy | **6.2** | epoch/RCU/HP/QSBR/mark-sweep |
+| AA5 NUMA-Affinity | **6.3** | local/interleave/preferred/bind/none |
+| AA6 Concurrent-Discipline | (Sonderfall, gehoert eigentlich zu Achse 8.1) | lock-free/coarse-locked/fine-locked |
+| AA7 Special-Hardware-Bind | (Sonderfall, gehoert eigentlich zu Achse 12.3) | GPU-Allocator/HBM-Allocator/Persistent-Memory |
+
+### §10.2 23 Allokatoren A01-A23 mit neuer Sub-Achsen-Zuordnung
+
+| Allokator | 6.1 Allocation | 6.2 Reclamation | 6.3 NUMA | 6.4 HugePage | 6.5 FreeList |
+|---|---|---|---|---|---|
+| A01 Hoard | object-cache | mark-sweep | local | transparent | size-class |
+| A02 Lockless | pool | epoch | local | none | first-fit |
+| A03 Michael Lock-Free | pool | hazard-pointer | local | none | best-fit |
+| A04 mimalloc | slab | thread-local | local | transparent | size-class |
+| A05 jemalloc | slab | thread-local | local | transparent | size-class |
+| A06 tcmalloc | slab + thread-cache | thread-local | local | transparent | size-class |
+| A07 snmalloc | message-passing | epoch | local | transparent | size-class |
+| A08 scalloc | per-CPU + size-class | epoch | local | transparent | size-class |
+| A09 Hoard-extended | object-cache | mark-sweep | local | transparent | size-class |
+| A10 rpmalloc | thread-local + global | RCU | local | transparent | size-class |
+| A11 LRMalloc | lock-free | epoch | local | transparent | size-class |
+| A12 SuperMalloc | pool + arena | mark-sweep | NUMA-aware | transparent | best-fit |
+| A13 Streamflow | per-CPU + lock-free | hazard-pointer | NUMA-aware | transparent | best-fit |
+| A14 NUMA-aware | region + pool | epoch | NUMA-aware | explicit | size-class |
+| A15 Memkind (HBM) | region | mark-sweep | NUMA-aware | explicit | best-fit |
+| A16 HBM-Allocator | region | RCU | preferred (HBM) | explicit | best-fit |
+| A17 PMDK (Persistent) | region + log | epoch + persistence | local | none | best-fit |
+| A18 PMEM-vmalloc | region + log | epoch | local | explicit | size-class |
+| A19 Coz (Causal) | wrapper + profiling | mark-sweep | local | none | first-fit |
+| A20 dlmalloc | best-fit | mark-sweep | none | none | best-fit |
+| A21 LZ-FAST | size-class | epoch | NUMA-aware | transparent | size-class |
+| A22 Multi-Tier (HBM+DRAM+NVRAM) | region + tier-cache | epoch | preferred (HBM) | explicit | best-fit |
+| A23 Idma-Allocator | region | mark-sweep | NUMA-aware | explicit | best-fit |
+
+### §10.3 5 Cluster AC1-AC5 (BLEIBEN als Cluster, orthogonal zu Sub-Achsen)
+
+| Cluster | Allokatoren | Cluster-Eigenschaft |
+|---|---|---|
+| AC1 Foundation | A04, A05, A06 | Modern production-grade (mimalloc/jemalloc/tcmalloc) |
+| AC2 Lock-Free | A02, A03, A07, A11, A13 | Lock-free + Hazard-Pointer-Familie |
+| AC3 NUMA + Hardware | A14, A15, A16, A22, A23 | NUMA-aware + HBM/Persistent |
+| AC4 Standard | A01, A09, A20 | Traditionelle Allokatoren |
+| AC5 Special | A17, A18, A19, A21 | Profiling / Persistent / LZ-Fast |
+
+Cluster sind orthogonal zu Sub-Achsen — pro Cluster-Klasse koennen mehrere Sub-Achsen-Auspraegungen vorkommen.
+
+---
+
 ## §9 Querverweise
 
 - Original-Quelle (UNVERAENDERT): `../termine/20260508 Termin 7/Allokator_Matrix.txt`
