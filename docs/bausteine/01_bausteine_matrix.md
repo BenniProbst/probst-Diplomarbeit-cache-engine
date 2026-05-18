@@ -219,6 +219,103 @@ V31 hat 22 Adapter implementiert (Skelette, COMDARE_HAVE_<X>=OFF default). Die A
 
 ---
 
+## §16 N-Phase Erweiterung 2026-05-18 (14 Achsen + Sub-Achsen)
+
+**Trigger:** User-Direktive 2026-05-18 (5 Anmerkungen zur Bausteine-Matrix)
+**Original-Quelle und §1-§14 oben bleiben UNVERAENDERT** (Memory-Direktive niemals Doku loeschen).
+**Erweiterungs-Doku:** `07_bausteine_matrix_N_erweitert.md` (Detail-Beschreibung der Sub-Achsen)
+
+### §16.1 Erweiterungs-Tabelle (11 -> 14 Achsen + Sub-Achsen)
+
+| Achse | Stand vor N | Stand nach N | Aenderung |
+|---|---|---|---|
+| 1 PAGE-TYPE | 26 Bausteine | unveraendert | — |
+| 2 NODE-TYPE | 13 Bausteine | unveraendert | — |
+| **3 TRAVERSAL** | 14 Bausteine flach | **3.A SearchAlgo + 3.B Cache + 3.M Mapping** | gesplittet (N.5 #468) |
+| 4 VALUEHANDLE | 5 Bausteine | unveraendert | — |
+| 5 MEMORY-LAYOUT | 8 Bausteine | unveraendert | — |
+| **6 ALLOCATOR** | 7 + 23 Allokator-Paper flach | **6.1-6.5** (Allocation / Reclamation / NUMA / HugePage / FreeList) | gesplittet (N.1 #464) |
+| 7 PREFETCH | 6 Bausteine | unveraendert | — |
+| **8 CONCURRENCY** | 8 Disziplinen + 3 Mechaniken flach | **8.1 Pattern + 8.2 Locking-Mode** | gesplittet (N.2 #465) |
+| 9 ISA | Bank 9 | unveraendert | — |
+| 10 MEASUREMENT | F1 Matrix | unveraendert | — |
+| **11 TELEMETRY-COLL** | 6 (Kuehn 2026-05-09) | **+ 11.X1-X4 Kuehn-Erkenntnisse 2026-05-08** | verfeinert (N.6 #469) |
+| **12 HARDWARE-STRATEGY** | (existierte nicht) | **NEU 5 Sub-Achsen** | NEU angelegt (N.3 #466) |
+| **13 SCHEDULING-STRATEGY** | (existierte nicht) | **NEU 5 Sub-Achsen** | NEU angelegt (N.4 #467) |
+
+**Total geschaetzt:** 85 -> ca. 120 Bausteine nach N-Phase-Verfeinerung.
+
+### §16.2 Hauptachsen + Sub-Achsen Detail (Kurzform — Detail in `07_*.md`)
+
+```
+Achse 3 TRAVERSAL (gesplittet)
+├── 3.A SearchAlgo-Traversal          ← byte-by-byte, layer-slice, macro-node-jump
+├── 3.B Cache-Memory-Traversal        ← cache-line-walk, prefetch-stride, page-jump
+└── 3.M Traversal-Mapping             ← linear-1to1, hash-redirect, hierarchical-page-fault
+
+Achse 6 ALLOCATOR (gesplittet)
+├── 6.1 Allocation-Strategy           ← slab, buddy, region, pool, object-cache, ...
+├── 6.2 Reclamation-Policy            ← epoch, RCU, hazard-pointer, QSBR, mark-sweep
+├── 6.3 NUMA-Affinity                 ← local, interleave, preferred, bind, none
+├── 6.4 Huge-Page-Policy              ← transparent (THP), explicit (madvise), none
+└── 6.5 Free-List-Strategy            ← size-class, best-fit, first-fit, segregated-fit
+
+Achse 8 CONCURRENCY (gesplittet)
+├── 8.1 Concurrency-Pattern           ← OLC, HTM, STM, lock-free, wait-free, RCU, HP
+└── 8.2 Locking-Mode                  ← read-only (shared), read-write (exclusive),
+                                        upgradeable, optimistic-validation
+
+Achse 11 TELEMETRY-COLLECTION (Kuehn-Erweiterung 2026-05-08)
+├── 11.X1 Leaf-Only-Counter           ← Kuehn Hauptvariante, vermeidet Cache-Line-Ping-Pong
+├── 11.X2 Sampling                    ← jeder n-te Zugriff im Blatt-Knoten
+├── 11.X3 Offline-Recompute           ← bottom-up Aufsummierung vor Reordering
+└── 11.X4 Inner-Node-Counter          ← NAIVE Variante, hat Ping-Pong-Problem (Anti-Pattern)
+
+Achse 12 HARDWARE-STRATEGY (NEU)
+├── 12.1 SIMD-Family                  ← AVX2, AVX-512, NEON, SVE2, scalar
+├── 12.2 Cache-Level-Targeting        ← L1-aware, L2-aware, L3-aware, HBM
+├── 12.3 NUMA-Strategy                ← single-node, multi-node, NUMA-aware-pinning
+├── 12.4 Prefetch-Hardware            ← PREFETCH, PREFETCHNTA, PREFETCHW, none
+└── 12.5 Atomic-Instruction-Family    ← CAS, LL-SC, RMW-extended (HTM, ...)
+
+Achse 13 SCHEDULING-STRATEGY (NEU)
+├── 13.1 Worker-Pool-Layout           ← thread-per-core, work-stealing, CPU-pinning
+├── 13.2 SIMD-Worker-Count-Limit      ← typ. 2 von N Cores (Hardware-Limit!)
+├── 13.3 Heterogeneous-Core-Dispatch  ← P-cores / E-cores (Intel Hybrid)
+├── 13.4 Co-Routine-Strategy          ← interleave, dependency-tracking, none
+└── 13.5 Batch-Granularity            ← single, micro-batch, macro-batch
+```
+
+### §16.3 Begruendungen (User-Direktive 2026-05-18 verbatim)
+
+| Aenderung | User-Quote |
+|---|---|
+| 6.1-6.5 | "Allokations-Strategien in Feingliedrig (Unterkategorien hast du schon genannt aber noch als Hauptstrategien, die eigentlich unter diesen Punkt gehoeren)" |
+| 8.1+8.2 | "concurrency patterns+locking read only oder read/write" |
+| 12 HARDWARE | "eine Axe fuer verwendete Hardwarestrategien" |
+| 13 SCHEDULING | "eine Axe fuer Scheduling Strategien (SIMD Erweiterungen sind limitiert auf die Anzahl der Verfuegbaren SIMD Einheiten die mit CPU Kernen gekoppelt werden koennen - meist nur 2 stueck auf dutzende Kerne, die anderen Kerne muessen normal parallel weiter laufen)" |
+| 3.A+3.B+3.M | "die Traversal Axe ist nicht feingliedrig getrennt in die Suchalgorithmus-Seite vs die dadurch getriggerte Cache-Seite ... Mapping Strategie mit Suchalgorithmus-Traversal -> Cache-Memory-Traversal" |
+
+### §16.4 Konsequenzen fuer abhaengige Doks
+
+| Doku | Konsequenz | Task |
+|---|---|---|
+| `02_allokator_matrix.md` | Allokatoren als Bausteine in Achse 6.1, 7 Achsen AA1-AA7 als Sub-Achsen 6.1-6.5 | N.9 (#472) |
+| `03_cross_paper_konzeptmatrix.md` | 2 neue Spalten "Hardware-Strategy" + "Scheduling-Strategy" | N.8 (#471) |
+| `05_flag_system.md` | 9 Banks -> 14 Banks + Sub-Bank-Encoding fuer 3.A/B/M + 6.1-5 + 8.1-2 + 12.1-5 + 13.1-5 | N.10 (#473) |
+| `00_INDEX.md` | Achsen-Uebersicht von 11 auf 14 erweitern | N.7 (#470) |
+
+### §16.5 Konsequenzen fuer PRT-ART (O-Phase Trigger)
+
+User-Direktive 2026-05-18: PRT-ART muss fuer JEDE der 14 Hauptachsen + Sub-Achsen eine eigene Klasse haben (Reuse SOTA oder Neu-Impl). Aktuell fehlen:
+- Achse 12 HARDWARE-STRATEGY (PrtArt-Klasse muss angelegt werden) — O.3 (#476)
+- Achse 13 SCHEDULING-STRATEGY (PrtArt-Klasse muss angelegt werden) — O.3 (#476)
+- Achse 3.B Cache-Memory-Traversal (eventueller Reuse-Default aus CE) — O.1 (#474)
+
+Pruefling-Pflicht: mindestens 1 voellig neuartige Implementation in mindestens 1 Achse. PRT-ART qualifiziert bereits durch Achse 1 (PAGE_PRTART_*), Achse 5 (TLB-Offset + cache-line-aligned), Achse 6.5 (Bucket-Strategy 4+2 Pools), Achse 7 (Distance-Estimator), Achse 8.1 (OLC + Reserved-Blocks).
+
+---
+
 ## §15 Querverweise
 
 - Original-Quelle (UNVERAENDERT): `../termine/20260508 Termin 7/Bausteine_Matrix.txt`
