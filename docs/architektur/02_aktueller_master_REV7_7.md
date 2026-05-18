@@ -40,6 +40,9 @@ EBENE 3: CacheEngine + Plattform-Modell (Saeule B)
 
 ## §2 Drei-Repo-Layer (REV7.6, V31 operationalisiert)
 
+> **WICHTIGER VERWEIS (Phase M, 2026-05-18):** Die Drei-Repo-Aufteilung (Diplomarbeit/comdare-prt-art/comdare-cache-engine) ist orthogonal zur **4-Subsystem-Trennung** (Diplomarbeit/Code/messung_driver -> CacheEngineBuilder -> CacheEngine <-> Pruefling). CEB und CE wohnen beide im selben Repo `comdare-cache-engine`, sind aber 2 unabhaengige Subsysteme. Details: siehe `10_schichten_modell_M.md`.
+
+
 | Repo | Rolle | HEAD V31 (Stand 2026-05-15) |
 |---|---|---|
 | **`Diplomarbeit/Code/`** | **WAS** + Auswertung | `0f7b4d2` (Master-Plan + Konsolidierung) |
