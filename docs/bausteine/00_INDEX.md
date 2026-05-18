@@ -16,8 +16,20 @@
 | `04_architekturentscheidungen_F1_F15.md` | F1-F15 + 2 Korrekturen K + 8 F-EXTRA = 25 ADRs | `Architekturentscheidungen_F1_F15.txt` (975 Z) | 25 ADRs |
 | `05_flag_system.md` | 9-Bank-Flag-System (F10-K Korrektur) | `Flag_System.txt` (370 Z) | 9 Banken |
 | `06_eigenschaften_suchalgorithmen.md` | 23 Algorithmen in 4 Hauptkategorien (A-D) | `Eigenschaften_Suchalgorithmen.txt` (669 Z) | 23 Algorithmen |
+| **`07_bausteine_matrix_N_erweitert.md`** | **N-Phase Erweiterung: 14 Achsen + Sub-Achsen Detail** (Stand 2026-05-18) | (User-Direktive 2026-05-18) | 14 Achsen + ~30 Sub-Achsen |
 
-**Total:** 6 Konsolidierungs-Doks aus 6 Quell-Doks (4.168 Zeilen Original).
+**Total:** 7 Konsolidierungs-Doks (6 K-E + 1 N-Phase).
+
+### N-Phase Achsen-Erweiterung (2026-05-18, siehe 07_*.md)
+
+| Aenderung | Was | Task |
+|---|---|---|
+| Achse 3 TRAVERSAL | gesplittet in 3.A SearchAlgo + 3.B Cache + 3.M Mapping | N.5 (#468) |
+| Achse 6 ALLOCATOR | gesplittet in 6.1-6.5 (Allocation/Reclamation/NUMA/HugePage/FreeList) | N.1 (#464) |
+| Achse 8 CONCURRENCY | gesplittet in 8.1 Pattern + 8.2 Locking-Mode | N.2 (#465) |
+| Achse 11 TELEMETRY | erweitert um Kuehn 11.X1-X4 (Leaf-Only / Sampling / Offline / Anti-Pattern) | N.6 (#469) |
+| **NEU Achse 12 HARDWARE** | 5 Sub-Achsen (SIMD/Cache-Level/NUMA/Prefetch-HW/Atomic-Family) | N.3 (#466) |
+| **NEU Achse 13 SCHEDULING** | 5 Sub-Achsen (Worker-Pool/SIMD-Limit/Hetero-Core/Co-Routine/Batch) | N.4 (#467) |
 
 ---
 
