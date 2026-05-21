@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  V33.D.1 (2026-05-21) - Messreihe XSD-Schema V32
+
+  Formale Spec der messreihe_v32_*.xml Struktur.
+  Code-side Validation via messung_driver/messreihe_v32_validator.hpp
+  (kein xerces/libxml2 Aufwand fuer Header-only Tooling).
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+  <xs:element name="messreihe">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="metadata" type="MetadataType"/>
+        <xs:element name="execution_engines" type="ExecutionEnginesType"/>
+        <xs:element name="axes_default_lookup" type="AxesDefaultLookupType" minOccurs="0"/>
+        <xs:element name="tupel" type="TupelType" maxOccurs="unbounded"/>
+        <xs:element name="output" type="OutputType"/>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="required" fixed="32"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="MetadataType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="mode">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="defined"/>
+            <xs:enumeration value="full"/>
+            <xs:enumeration value="full_sampled"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ExecutionEnginesType">
+    <xs:sequence>
+      <xs:element name="engine" minOccurs="2" maxOccurs="2">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="type" type="xs:string" use="required"/>
+          <xs:attribute name="name" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AxesDefaultLookupType">
+    <xs:sequence>
+      <xs:element name="axis" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="allowed_variants" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="enabled" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="TupelType">
+    <xs:sequence>
+      <xs:element name="workload">
+        <xs:complexType>
+          <xs:attribute name="kind" type="xs:string" use="required"/>
+          <xs:attribute name="record_count" type="xs:positiveInteger" use="required"/>
+          <xs:attribute name="operation_count" type="xs:positiveInteger" use="required"/>
+          <xs:attribute name="seed" type="xs:unsignedLong" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="axes" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="axis" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="id" type="xs:string" use="required"/>
+                <xs:attribute name="baustein" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="OutputType">
+    <xs:sequence>
+      <xs:element name="binary_path" type="xs:string"/>
+      <xs:element name="csv_path" type="xs:string"/>
+      <xs:element name="latex_path" type="xs:string"/>
+      <xs:element name="comparison_metrics" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

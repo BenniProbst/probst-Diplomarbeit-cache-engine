@@ -1,80 +1,159 @@
 #pragma once
-// V32.GG.1 (2026-05-18 spaet) - V32 Orchestrator fuer parallele EE-Submission
+// V32.GG.1 (2026-05-18) + V33.C.1 (2026-05-21) - V32 Orchestrator: parallele EE-Submission
 //
 // AA.2-Korrektur: messung_driver registriert BEIDE ExecutionEngines beim CEB
 // (CE-as-EE-A + PrtArt-as-EE-B) parallel via Command-Pattern.
 //
 // V31.F-Code in main.cpp bleibt unveraendert (Memory-Direktive).
-// V32-Orchestrator wird in main.cpp ueber V32_ENABLE Compile-Flag aktiviert.
+// V32-Orchestrator wird in main.cpp ueber COMDARE_V32_ENABLE Compile-Flag aktiviert.
 
+#include "cache_engine/builder/commands/auto_permutator.hpp"
+#include "cache_engine/builder/commands/axis_library_registry.hpp"
+#include "cache_engine/builder/commands/compare_engine_command.hpp"
+#include "cache_engine/builder/commands/execute_engine_command.hpp"
+#include "cache_engine/builder/commands/workload.hpp"
+#include "prt_art/default_lookup/default_lookup_registry.hpp"
+
+#include <chrono>
+#include <future>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
-// Forward-Declarations zu vermeiden Cross-Submodule include-cycle
-namespace comdare::cache_engine::abi {
-class CacheEngineExecutionEngineAdapter;
-}
-namespace comdare::prt_art::identity {
-class PrtArtExecutionEngineAdapter;
-}
-
 namespace comdare::diplomarbeit::messung_driver::v32 {
+
+namespace cmd = comdare::cache_engine::builder::commands;
+namespace dl = comdare::prt_art::default_lookup;
+
+/**
+ * @brief PermutationOutcome - Ergebnis einer Permutation (EE-A vs EE-B Vergleich)
+ * @subsystem MessungDriver
+ */
+struct PermutationOutcome {
+    std::string axis_id;
+    std::string variant_name;
+    cmd::ExecutionResult ee_a_result;
+    cmd::ExecutionResult ee_b_result;
+    cmd::CompareEngineCommand::Verdict verdict {cmd::CompareEngineCommand::Verdict::InconclusiveData};
+    double welch_p_value {1.0};
+    double throughput_ratio {0.0};
+};
+
+/**
+ * @brief MessreiheReport - Aggregat-Ergebnis ueber alle Permutationen
+ * @subsystem MessungDriver
+ */
+struct MessreiheReport {
+    std::vector<PermutationOutcome> outcomes;
+    std::size_t total_axes {0};
+    std::size_t total_variants {0};
+    std::size_t ee_a_wins {0};
+    std::size_t ee_b_wins {0};
+    std::size_t ties {0};
+    std::chrono::nanoseconds total_elapsed {};
+};
 
 /**
  * @brief V32Orchestrator - parallel EE-Submission an CacheEngineBuilder (AA.2)
  * @subsystem MessungDriver (Subsystem 1 Outer-Loop)
  *
- * Korrektur AA.2: CacheEngineBuilder orchestriert BEIDE ExecutionEngines
- * (CE-as-EE-A + PrtArt-as-EE-B) parallel via Command-Pattern.
- *
- * Diese Klasse ist V32-Outer-Loop, der die V31-CacheEngineBuilder-API
- * minimal-invasiv erweitert.
- *
- * V32-Workflow:
- *   1. Construct CE-as-EE-A Adapter + PrtArt-as-EE-B Adapter
- *   2. ceb.submit_engine(ee_a)
- *   3. ceb.submit_engine(ee_b)
- *   4. ceb.execute_messreihe(config_xml, mode=defined|full|full_sampled)
- *      - Iteriert Permutationen
- *      - Pro Permutation: ExecuteEngineCommand fuer beide EE-A + EE-B
- *      - Pro Permutation: CompareEngineCommand (F15-Vergleich)
- *      - Pro fehlender Achsen-Spec: AutoPermutateAxisCommand (AA.3 Default-Lookup)
- *   5. ResultAggregator.collect() pro Tupel
- *   6. binary_to_csv + csv_to_latex + diagram_generator
+ * V33.C.1 Vollausbau:
+ * - run_default_lookup_messreihe(): konsumiert prt_art DefaultLookupRegistry,
+ *   iteriert pro Achse die CE-Bibliothek-Variants, fuehrt parallel EE-A + EE-B
+ *   via std::async, vergleicht via Welch's t-Test.
+ * - Result-Aggregation in MessreiheReport.
  */
 class V32Orchestrator {
 public:
-    /// Konstruiert beide ExecutionEngine-Adapter
-    V32Orchestrator() {
-        // V32.GG.1 Skelett - konkrete Konstruktion in V32.2+ Sprint:
-        // ee_a_ = std::make_shared<CacheEngineExecutionEngineAdapter>();
-        // ee_b_ = std::make_shared<PrtArtExecutionEngineAdapter>();
+    V32Orchestrator() = default;
+
+    /// V32.GG.1 Skelett-Kompatibilitaet
+    void submit_to_builder() {
+        // Im V33.C.1 Vollausbau: ExecuteEngineCommands werden pro Permutation
+        // direkt im run_default_lookup_messreihe() konstruiert + parallel ausgefuehrt.
     }
 
-    /// Registriert beide EEs beim CacheEngineBuilder (Submission)
-    void submit_to_builder(/* CacheEngineBuilder& ceb */) {
-        // V32.GG.1 Skelett:
-        // ceb.submit_engine(ee_a_);
-        // ceb.submit_engine(ee_b_);
-    }
-
-    /// V32-Lifecycle: execute eine Messreihe mit parallel EE-A + EE-B
+    /// V32.GG.1 Skelett-Kompatibilitaet (existierende Tests)
     int execute_messreihe(std::string_view config_xml,
                           std::string_view mode = "defined") {
-        // V32.GG.1 Skelett - V32.2+ Sprint:
-        // 1. ceb.load_config(config_xml)
-        // 2. ceb.set_mode(mode)
-        // 3. ceb.execute()  // intern: ICommand-Liste pro Permutation
-        // 4. aggregator.write_binary_results(output_path)
         (void)config_xml;
         (void)mode;
         return 0;
     }
 
-private:
-    std::shared_ptr<comdare::cache_engine::abi::CacheEngineExecutionEngineAdapter> ee_a_;
-    std::shared_ptr<comdare::prt_art::identity::PrtArtExecutionEngineAdapter> ee_b_;
+    /**
+     * @brief V33.C.1 Hauptmethode: Default-Lookup-Messreihe ueber alle PRT-ART-Achsen
+     *
+     * Workflow:
+     * 1. Enumerate DefaultLookupRegistry (9 Achsen)
+     * 2. Pro Achse: AxisLibraryRegistry.lookup() -> Variant-Liste
+     * 3. Pro Variant: std::async(EE-A) + std::async(EE-B), get() beide
+     * 4. CompareEngineCommand mit beiden Results
+     * 5. Outcome in Report sammeln
+     *
+     * @param workload Gemeinsamer Workload fuer EE-A + EE-B
+     * @return MessreiheReport mit kompletter Outcome-Liste + Statistik
+     */
+    [[nodiscard]] MessreiheReport run_default_lookup_messreihe(const cmd::Workload& workload) {
+        MessreiheReport report;
+        const auto start = std::chrono::steady_clock::now();
+
+        constexpr auto default_axes = dl::DefaultLookupRegistry::enumerate();
+        report.total_axes = default_axes.size();
+
+        for (const auto& axis : default_axes) {
+            auto variants = cmd::AxisLibraryRegistry::lookup(std::string(axis.axis_id));
+            for (const auto& variant : variants) {
+                ++report.total_variants;
+                auto outcome = execute_one_permutation(axis.axis_id, variant.variant_name, workload);
+                switch (outcome.verdict) {
+                    case cmd::CompareEngineCommand::Verdict::EE_A_Wins: ++report.ee_a_wins; break;
+                    case cmd::CompareEngineCommand::Verdict::EE_B_Wins: ++report.ee_b_wins; break;
+                    case cmd::CompareEngineCommand::Verdict::Tie:       ++report.ties;       break;
+                    default: break;
+                }
+                report.outcomes.push_back(std::move(outcome));
+            }
+        }
+
+        report.total_elapsed = std::chrono::steady_clock::now() - start;
+        return report;
+    }
+
+    /// V33.C.1 Einzel-Permutation: parallel EE-A + EE-B + Vergleich
+    [[nodiscard]] PermutationOutcome execute_one_permutation(
+        std::string_view axis_id,
+        std::string_view variant_name,
+        const cmd::Workload& workload)
+    {
+        PermutationOutcome outcome;
+        outcome.axis_id = std::string(axis_id);
+        outcome.variant_name = std::string(variant_name);
+
+        auto fut_a = std::async(std::launch::async, [&]() {
+            cmd::ExecuteEngineCommand cmd_a("CacheEngine-EE-A", workload);
+            cmd_a.execute();
+            return cmd_a.result();
+        });
+        auto fut_b = std::async(std::launch::async, [&]() {
+            cmd::ExecuteEngineCommand cmd_b("PrtArt-EE-B", workload);
+            cmd_b.execute();
+            return cmd_b.result();
+        });
+
+        outcome.ee_a_result = fut_a.get();
+        outcome.ee_b_result = fut_b.get();
+
+        cmd::CompareEngineCommand compare(outcome.ee_a_result, outcome.ee_b_result);
+        compare.execute();
+        outcome.verdict = compare.verdict();
+        outcome.throughput_ratio = compare.throughput_ratio();
+        if (compare.welch().valid) {
+            outcome.welch_p_value = compare.welch().p_value;
+        }
+        return outcome;
+    }
 };
 
 }  // namespace comdare::diplomarbeit::messung_driver::v32
