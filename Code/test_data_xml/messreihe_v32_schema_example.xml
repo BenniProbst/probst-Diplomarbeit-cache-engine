@@ -31,6 +31,17 @@
     <!-- Test-Konfigurations-Tupel -->
     <tupel id="t01">
         <workload kind="YCSB_C_ReadOnly" record_count="1000000" operation_count="100000" seed="42"/>
+        <op_type>OP-1</op_type>  <!-- V33.D.4 Q.2: OP-1 Read = Hot-Key Lookup -->
+        <hardware_strategy>      <!-- V33.E.3 Q.1: Hardware-Strategie pro Tupel -->
+            <simd>AVX2</simd>
+            <cache_level>L1Aware</cache_level>
+            <numa>Local</numa>
+        </hardware_strategy>
+        <scheduling_strategy>    <!-- V33.E.3 Q.1: Scheduling-Strategie pro Tupel -->
+            <worker_pool>ThreadPerCore</worker_pool>
+            <simd_workers>2</simd_workers>
+            <heterogeneous_awareness>HybridAware</heterogeneous_awareness>
+        </scheduling_strategy>
         <!-- explizite Achsen-Spec (optional) - sonst Default-Lookup -->
         <axes>
             <axis id="1" baustein="PAGE_PRTART_DENSEBYTE"/>
@@ -41,7 +52,23 @@
 
     <tupel id="t02">
         <workload kind="YCSB_A_Read50Write50" record_count="500000" operation_count="50000" seed="42"/>
-        <!-- KEIN <axes> Block = vollstaendige Auto-Permutation -->
+        <op_type>OP-3</op_type>  <!-- V33.D.4 Q.2: OP-3 Update -->
+        <!-- KEIN hardware/scheduling/axes -> komplettes Default-Lookup -->
+    </tupel>
+
+    <tupel id="t03_scan">
+        <workload kind="YCSB_E_Scan95" record_count="500000" operation_count="50000" seed="42"/>
+        <op_type>OP-4</op_type>  <!-- V33.D.4 Q.2: OP-4 Scan -->
+        <hardware_strategy>
+            <simd>AVX512</simd>
+            <cache_level>L3Aware</cache_level>
+            <prefetch_distance>PrefetchT1</prefetch_distance>
+        </hardware_strategy>
+        <scheduling_strategy>
+            <worker_pool>ThreadPerCore</worker_pool>
+            <batching>MacroBatch</batching>
+            <memory_interleave>RoundRobin</memory_interleave>
+        </scheduling_strategy>
     </tupel>
 
     <!-- Output-Konfiguration -->

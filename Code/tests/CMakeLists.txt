@@ -52,4 +52,10 @@ if(COMDARE_V32_ENABLE)
         SOURCES unit/test_messreihe_v32_validator.cpp)
     target_include_directories(test_messreihe_v32_validator PRIVATE
         ${CMAKE_SOURCE_DIR}/messung_driver)
+
+    # V33.E.4 (2026-05-21) - HardwareFilter Tests (Q.1)
+    comdare_da_add_test(test_dataset_filter
+        SOURCES unit/test_dataset_filter.cpp)
+    target_include_directories(test_dataset_filter PRIVATE
+        ${CMAKE_SOURCE_DIR}/messung_driver)
 endif()

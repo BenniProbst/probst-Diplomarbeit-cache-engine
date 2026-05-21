@@ -72,6 +72,43 @@
           <xs:attribute name="seed" type="xs:unsignedLong" use="required"/>
         </xs:complexType>
       </xs:element>
+      <!-- V33.D.4 NEU (Q.2): op_type Tag fuer OP-1 bis OP-6 -->
+      <xs:element name="op_type" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="OP-1"/>
+            <xs:enumeration value="OP-2"/>
+            <xs:enumeration value="OP-3"/>
+            <xs:enumeration value="OP-4"/>
+            <xs:enumeration value="OP-5"/>
+            <xs:enumeration value="OP-6"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <!-- V33.E.3 NEU (Q.1): hardware_strategy Tag -->
+      <xs:element name="hardware_strategy" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="simd" type="xs:string" minOccurs="0"/>
+            <xs:element name="cache_level" type="xs:string" minOccurs="0"/>
+            <xs:element name="numa" type="xs:string" minOccurs="0"/>
+            <xs:element name="prefetch_distance" type="xs:string" minOccurs="0"/>
+            <xs:element name="atomic_granularity" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!-- V33.E.3 NEU (Q.1): scheduling_strategy Tag -->
+      <xs:element name="scheduling_strategy" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="worker_pool" type="xs:string" minOccurs="0"/>
+            <xs:element name="simd_workers" type="xs:positiveInteger" minOccurs="0"/>
+            <xs:element name="heterogeneous_awareness" type="xs:string" minOccurs="0"/>
+            <xs:element name="memory_interleave" type="xs:string" minOccurs="0"/>
+            <xs:element name="batching" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="axes" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
