@@ -29,6 +29,10 @@ cmake-build-*/
 # Generated Text-Extracts (redundant — Quelldokumente sind die docx selbst)
 20260508 Termin 7/_extracted_text/
 
+# Geklonte 3rd-party-Repos in Forschungsarbeiten/code/ (Lizenz-Klaerung pending)
+# - P28-Kuehn-DAMON: privates TU Dortmund Repo (Roland Kuehn), Lizenz noch ungeklaert
+Forschungsarbeiten/code/P28-Kuehn-DAMON/bplustree_reordering/
+
 # Mess-Dumps + LaTeX-Output
 *.csv
 *.binarydump
