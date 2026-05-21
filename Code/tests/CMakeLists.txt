@@ -58,4 +58,13 @@ if(COMDARE_V32_ENABLE)
         SOURCES unit/test_dataset_filter.cpp)
     target_include_directories(test_dataset_filter PRIVATE
         ${CMAKE_SOURCE_DIR}/messung_driver)
+
+    # V34.B.2 (2026-05-21) - MessreiheReportExporter Tests
+    comdare_da_add_test(test_messreihe_report_exporter
+        SOURCES unit/test_messreihe_report_exporter.cpp)
+    target_include_directories(test_messreihe_report_exporter PRIVATE
+        ${CMAKE_SOURCE_DIR}/messung_driver
+        ${COMDARE_CACHE_ENGINE_DIR}/libs
+        ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
+        ${COMDARE_PRT_ART_DIR}/prt_art/include)
 endif()

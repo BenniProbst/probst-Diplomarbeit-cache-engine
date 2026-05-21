@@ -9,6 +9,8 @@
 # Build-Artefakte
 build/
 out/
+# V34.D.2: Doxygen HTML-Output (Doxyfile bleibt)
+docs/doxygen_diplomarbeit/
 
 # V23.3 (2026-05-14): Benchmark-Daten (lazy on-demand via tools/fetch_testdata.{sh,bat})
 Code/tests/fixtures/external/
