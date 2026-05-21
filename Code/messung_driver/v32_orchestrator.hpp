@@ -7,12 +7,14 @@
 // V31.F-Code in main.cpp bleibt unveraendert (Memory-Direktive).
 // V32-Orchestrator wird in main.cpp ueber COMDARE_V32_ENABLE Compile-Flag aktiviert.
 
+#include "cache_engine/abi/cache_engine_execution_engine_adapter.hpp"
 #include "cache_engine/builder/commands/auto_permutator.hpp"
 #include "cache_engine/builder/commands/axis_library_registry.hpp"
 #include "cache_engine/builder/commands/compare_engine_command.hpp"
 #include "cache_engine/builder/commands/execute_engine_command.hpp"
 #include "cache_engine/builder/commands/workload.hpp"
 #include "prt_art/default_lookup/default_lookup_registry.hpp"
+#include "prt_art/identity/prt_art_execution_engine_adapter.hpp"
 
 #include <chrono>
 #include <future>
@@ -122,6 +124,7 @@ public:
     }
 
     /// V33.C.1 Einzel-Permutation: parallel EE-A + EE-B + Vergleich
+    /// V34.A.3 (2026-05-21): nutzt echte Adapter mit as_engine_callable() statt Simulation
     [[nodiscard]] PermutationOutcome execute_one_permutation(
         std::string_view axis_id,
         std::string_view variant_name,
@@ -131,13 +134,19 @@ public:
         outcome.axis_id = std::string(axis_id);
         outcome.variant_name = std::string(variant_name);
 
+        comdare::cache_engine::abi::CacheEngineExecutionEngineAdapter<> ee_a;
+        comdare::prt_art::identity::PrtArtExecutionEngineAdapter<> ee_b;
+
+        auto callable_a = ee_a.as_engine_callable();
+        auto callable_b = ee_b.as_engine_callable();
+
         auto fut_a = std::async(std::launch::async, [&]() {
-            cmd::ExecuteEngineCommand cmd_a("CacheEngine-EE-A", workload);
+            cmd::ExecuteEngineCommand cmd_a(ee_a.engine_name(), workload, callable_a);
             cmd_a.execute();
             return cmd_a.result();
         });
         auto fut_b = std::async(std::launch::async, [&]() {
-            cmd::ExecuteEngineCommand cmd_b("PrtArt-EE-B", workload);
+            cmd::ExecuteEngineCommand cmd_b(ee_b.engine_name(), workload, callable_b);
             cmd_b.execute();
             return cmd_b.result();
         });
