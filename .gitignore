@@ -56,3 +56,7 @@ desktop.ini
 # Temporaere Dateien
 *.tmp
 ~$*
+
+# drawio Backup-Files (regenerieren sich automatisch)
+*.bkp
+.$*.bkp

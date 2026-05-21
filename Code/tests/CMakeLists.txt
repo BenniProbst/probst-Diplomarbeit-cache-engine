@@ -35,3 +35,11 @@ comdare_da_add_test(test_messung_driver
         comdare::experiment)
 target_include_directories(test_messung_driver PRIVATE
     ${COMDARE_CACHE_ENGINE_DIR}/cache_engine/include)
+
+# V32.II.3 (2026-05-21) - V32Orchestrator E2E-Smoke-Test
+if(COMDARE_V32_ENABLE)
+    comdare_da_add_test(test_v32_orchestrator
+        SOURCES unit/test_v32_orchestrator.cpp)
+    target_include_directories(test_v32_orchestrator PRIVATE
+        ${CMAKE_SOURCE_DIR}/messung_driver)
+endif()
