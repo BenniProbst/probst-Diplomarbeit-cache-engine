@@ -1,16 +1,19 @@
 @echo off
-REM V34.C.1 (2026-05-21) + V35.C.1 (2026-05-22) - All-in-one Test-Runner (Windows)
+REM V34.C.1 (2026-05-21) + V35.C.1 + V35.E.2 (2026-05-22) - All-in-one Test-Runner (Windows)
 REM
-REM Verwendung:
-REM   tools\run_all_tests.bat                          REM autodetect
-REM   tools\run_all_tests.bat --config Debug
-REM   set BUILD_TYPE=Debug && tools\run_all_tests.bat
+REM V35.E.2: nach Code\tools\ verschoben (vorher: tools\ im Diplomarbeit-Repo-Root)
+REM
+REM Verwendung (aus Diplomarbeit-Repo-Root):
+REM   Code\tools\run_all_tests.bat                     REM autodetect
+REM   Code\tools\run_all_tests.bat --config Debug
+REM   set BUILD_TYPE=Debug && Code\tools\run_all_tests.bat
 REM
 REM Build-Type-Resolution: CLI --config > ENV BUILD_TYPE > Autodetect
 REM   Autodetect-Reihenfolge: Release > Debug > RelWithDebInfo > MinSizeRel > <single-config>
 
 setlocal enabledelayedexpansion
-set "REPO_ROOT=%~dp0.."
+set "CODE_ROOT=%~dp0.."
+set "REPO_ROOT=%CODE_ROOT%\.."
 
 set "BUILD_TYPE_OVERRIDE="
 :parse_args
@@ -36,22 +39,22 @@ if not "%BUILD_TYPE_OVERRIDE%"=="" (
     set "DESIRED_BUILD_TYPE=%BUILD_TYPE%"
 )
 
-pushd "%REPO_ROOT%"
+pushd "%CODE_ROOT%"
 
 set TOTAL_PASS=0
 set TOTAL_FAIL=0
 set TOTAL_NOT_FOUND=0
 set "RESOLVED_BUILD_TYPE="
 
-set "CE_BUILD=Code\external\comdare-cache-engine\build\msvc-release"
-if not exist "%CE_BUILD%" set "CE_BUILD=..\Projekte\Research\comdare-cache-engine\build\msvc-release"
+set "CE_BUILD=external\comdare-cache-engine\build\msvc-release"
+if not exist "%CE_BUILD%" set "CE_BUILD=..\..\Projekte\Research\comdare-cache-engine\build\msvc-release"
 set "CE_TESTS=%CE_BUILD%\libs\cache_engine\builder\commands\tests"
 
-set "PA_BUILD=Code\external\comdare-prt-art\build\msvc-release"
-if not exist "%PA_BUILD%" set "PA_BUILD=..\Projekte\Research\comdare-prt-art\build\msvc-release"
+set "PA_BUILD=external\comdare-prt-art\build\msvc-release"
+if not exist "%PA_BUILD%" set "PA_BUILD=..\..\Projekte\Research\comdare-prt-art\build\msvc-release"
 set "PA_TESTS=%PA_BUILD%\tests\unit"
 
-set "DA_BUILD=Code\build\msvc-release-v32"
+set "DA_BUILD=build\msvc-release-v32"
 set "DA_TESTS=%DA_BUILD%\tests"
 
 echo.

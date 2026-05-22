@@ -21,6 +21,48 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 option(COMDARE_DA_BUILD_TESTS "Build Diplomarbeit-Code Tests" ON)
 
 # ─────────────────────────────────────────────────────────────────────────────
+# V35.E (2026-05-22) - FetchContent-Cache im User-Home
+#
+# Vermeidet, dass GoogleTest (und weitere FetchContent-Pakete) bei JEDEM
+# cmake-clean-Build neu geladen werden. Wirkt fuer ALLE FetchContent-Calls
+# inkl. der cache-engine + prt-art Sub-Builds (transitive).
+#
+# Reihenfolge: CLI -DFETCHCONTENT_BASE_DIR=... > ENV > Plattform-Default
+# Override: cmake -DCOMDARE_FETCHCONTENT_USER_CACHE=OFF
+# ─────────────────────────────────────────────────────────────────────────────
+option(COMDARE_FETCHCONTENT_USER_CACHE
+       "Lege FetchContent-Downloads im User-Cache ab (geteilt zwischen Build-Trees)"
+       ON)
+
+# V35.F (2026-05-22): Im Diplomarbeit-Container ist der cache-engine-Skelett-
+# Build OK — die internen Submodules (modules/comdare-*) sind erst nach
+# Cluster-Migration verfuegbar. CLion zeigt sonst alle Submodule-Warnings als
+# rote Fehler im Debug-Tab.
+set(COMDARE_QUIET_SUBMODULE_CHECK ON CACHE BOOL
+    "Submodule-Check-Warnings als STATUS statt WARNING ausgeben (CLion)")
+
+if(COMDARE_FETCHCONTENT_USER_CACHE AND NOT DEFINED FETCHCONTENT_BASE_DIR)
+    set(_comdare_fetch_cache "")
+    if(DEFINED ENV{COMDARE_FETCHCONTENT_CACHE})
+        set(_comdare_fetch_cache "$ENV{COMDARE_FETCHCONTENT_CACHE}")
+    elseif(WIN32 AND DEFINED ENV{LOCALAPPDATA})
+        set(_comdare_fetch_cache "$ENV{LOCALAPPDATA}/comdare/_deps")
+    elseif(DEFINED ENV{XDG_CACHE_HOME})
+        set(_comdare_fetch_cache "$ENV{XDG_CACHE_HOME}/comdare/_deps")
+    elseif(DEFINED ENV{HOME})
+        set(_comdare_fetch_cache "$ENV{HOME}/.cache/comdare/_deps")
+    elseif(DEFINED ENV{USERPROFILE})
+        set(_comdare_fetch_cache "$ENV{USERPROFILE}/.cache/comdare/_deps")
+    endif()
+    if(_comdare_fetch_cache)
+        file(MAKE_DIRECTORY "${_comdare_fetch_cache}")
+        set(FETCHCONTENT_BASE_DIR "${_comdare_fetch_cache}"
+            CACHE PATH "User-Cache fuer FetchContent (V35.E)")
+        message(STATUS "Comdare V35.E: FetchContent-Cache unter ${_comdare_fetch_cache}")
+    endif()
+endif()
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Submodule-Pfade (parallel, NICHT genested — REV 7.6 Q2)
 # ─────────────────────────────────────────────────────────────────────────────
 set(COMDARE_PRT_ART_DIR

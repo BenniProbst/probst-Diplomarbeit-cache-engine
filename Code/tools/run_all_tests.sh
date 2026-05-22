@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# V34.C.1 (2026-05-21) + V35.C.1 (2026-05-22) - All-in-one Test-Runner (3 Repos)
+# V34.C.1 (2026-05-21) + V35.C.1 + V35.E.2 (2026-05-22) - All-in-one Test-Runner
 #
-# Verwendung:
-#   tools/run_all_tests.sh                                  # autodetect Build-Config
-#   tools/run_all_tests.sh --config Debug                   # explizit Debug
-#   tools/run_all_tests.sh --config RelWithDebInfo
-#   BUILD_TYPE=Debug tools/run_all_tests.sh                 # via ENV
+# V35.E.2: nach Code/tools/ verschoben (vorher: tools/ im Diplomarbeit-Repo-Root)
+#
+# Verwendung (aus Diplomarbeit-Repo-Root):
+#   Code/tools/run_all_tests.sh                             # autodetect Build-Config
+#   Code/tools/run_all_tests.sh --config Debug              # explizit Debug
+#   Code/tools/run_all_tests.sh --config RelWithDebInfo
+#   BUILD_TYPE=Debug Code/tools/run_all_tests.sh            # via ENV
 #
 # Ruft direkt die V32/V33/V34-Test-Executables auf (nicht via ctest, weil
 # gtest_discover_tests *_NOT_BUILT-Markierungen erzeugt die ctest stoeren).
@@ -13,14 +15,13 @@
 # Build-Type-Logik (V35.C):
 # 1. CLI --config <X> hat Vorrang
 # 2. Sonst ENV BUILD_TYPE
-# 3. Sonst Autodetect: erstes existierendes Verzeichnis in der Suchreihenfolge
-#    Release > Debug > RelWithDebInfo > MinSizeRel
-# 4. Bei Single-Config-Generatoren (Ninja) ist der Pfad ohne Subverzeichnis,
-#    dann faellt das Skript auf "" (Single-Config-Modus) zurueck.
+# 3. Sonst Autodetect: Release > Debug > RelWithDebInfo > MinSizeRel
+# 4. Bei Single-Config-Generatoren (Ninja) ist der Pfad ohne Subverzeichnis.
 
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+CODE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$CODE_ROOT/.." && pwd)"
 
 # Fallback: erst Diplomarbeit-Submodule, dann Research-Klon
 RESEARCH_ROOT="$REPO_ROOT/../Projekte/Research"
@@ -126,7 +127,7 @@ run_test_exe() {
 echo
 bold "=== comdare-cache-engine V32/V34 ==="
 echo
-CE_BUILD="$REPO_ROOT/Code/external/comdare-cache-engine/build/msvc-release"
+CE_BUILD="$CODE_ROOT/external/comdare-cache-engine/build/msvc-release"
 [[ -d "$CE_BUILD" ]] || CE_BUILD="$RESEARCH_ROOT/comdare-cache-engine/build/msvc-release"
 CE_TESTS="$CE_BUILD/libs/cache_engine/builder/commands/tests"
 
@@ -138,7 +139,7 @@ run_test_exe "test_engine_adapters"       "$CE_TESTS" "test_engine_adapters"
 echo
 bold "=== comdare-prt-art V33/V34 ==="
 echo
-PA_BUILD="$REPO_ROOT/Code/external/comdare-prt-art/build/msvc-release"
+PA_BUILD="$CODE_ROOT/external/comdare-prt-art/build/msvc-release"
 [[ -d "$PA_BUILD" ]] || PA_BUILD="$RESEARCH_ROOT/comdare-prt-art/build/msvc-release"
 PA_TESTS="$PA_BUILD/tests/unit"
 
@@ -149,7 +150,7 @@ run_test_exe "test_leaf_only_counter"       "$PA_TESTS" "test_leaf_only_counter"
 echo
 bold "=== Diplomarbeit V33/V34 ==="
 echo
-DA_BUILD="$REPO_ROOT/Code/build/msvc-release-v32"
+DA_BUILD="$CODE_ROOT/build/msvc-release-v32"
 DA_TESTS="$DA_BUILD/tests"
 
 run_test_exe "test_v32_orchestrator"           "$DA_TESTS" "test_v32_orchestrator"
