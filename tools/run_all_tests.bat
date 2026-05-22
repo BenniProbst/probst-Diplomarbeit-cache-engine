@@ -76,6 +76,19 @@ call :run_test_exe "test_dataset_filter"             "%DA_TESTS%"
 call :run_test_exe "test_messreihe_report_exporter"  "%DA_TESTS%"
 
 echo.
+echo === Diplomarbeit V35.D Per-Stage-Fixtures ===
+echo.
+set "DA_03=%DA_BUILD%\03_binary_to_csv"
+set "DA_04=%DA_BUILD%\04_csv_to_latex"
+set "DA_05=%DA_BUILD%\05_diagram_generator"
+set "DA_06=%DA_BUILD%\06_latex_to_pdf"
+
+call :run_test_exe "test_03_binary_to_csv_cached_fixtures"    "%DA_03%"
+call :run_test_exe "test_04_csv_to_latex_cached_fixtures"     "%DA_04%"
+call :run_test_exe "test_05_diagram_generator_cached_fixtures" "%DA_05%"
+call :run_test_exe "test_06_latex_to_pdf_cached_fixtures"     "%DA_06%"
+
+echo.
 echo === Bilanz V35.C all-in-one ===
 echo.
 if "!RESOLVED_BUILD_TYPE!"=="" set "RESOLVED_BUILD_TYPE=^<none-found^>"

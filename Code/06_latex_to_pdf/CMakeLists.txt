@@ -23,3 +23,20 @@ configure_file(
     COPYONLY)
 
 message(STATUS "latex_to_pdf: Toolchain bereit unter ${CMAKE_CURRENT_BINARY_DIR}")
+
+# V35.D.4 (2026-05-22) - Stufen-Test mit gecachten Fixtures
+if(COMDARE_DA_BUILD_TESTS)
+    include(GoogleTest)
+    add_executable(test_06_latex_to_pdf_cached_fixtures
+        tests/test_06_latex_to_pdf_cached_fixtures.cpp)
+    target_link_libraries(test_06_latex_to_pdf_cached_fixtures PRIVATE
+        gtest gtest_main)
+    target_compile_features(test_06_latex_to_pdf_cached_fixtures PRIVATE cxx_std_23)
+    set(_fix06 "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/cached")
+    set(_src06 "${CMAKE_CURRENT_SOURCE_DIR}")
+    gtest_discover_tests(test_06_latex_to_pdf_cached_fixtures
+        DISCOVERY_TIMEOUT 30
+        PROPERTIES
+            TIMEOUT 120
+            ENVIRONMENT "COMDARE_FIXTURES_DIR_06=${_fix06};COMDARE_MODULE_SOURCE_DIR_06=${_src06}")
+endif()

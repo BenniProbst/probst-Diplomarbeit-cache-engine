@@ -157,6 +157,20 @@ run_test_exe "test_messreihe_v32_validator"    "$DA_TESTS" "test_messreihe_v32_v
 run_test_exe "test_dataset_filter"             "$DA_TESTS" "test_dataset_filter"
 run_test_exe "test_messreihe_report_exporter"  "$DA_TESTS" "test_messreihe_report_exporter"
 
+# === Diplomarbeit V35.D — Pro-Stufe-Tests mit gecachten Fixtures ===
+echo
+bold "=== Diplomarbeit V35.D Per-Stage-Fixtures ==="
+echo
+DA_03="$DA_BUILD/03_binary_to_csv"
+DA_04="$DA_BUILD/04_csv_to_latex"
+DA_05="$DA_BUILD/05_diagram_generator"
+DA_06="$DA_BUILD/06_latex_to_pdf"
+
+run_test_exe "test_03_binary_to_csv_cached_fixtures"    "$DA_03" "test_03_binary_to_csv_cached_fixtures"
+run_test_exe "test_04_csv_to_latex_cached_fixtures"     "$DA_04" "test_04_csv_to_latex_cached_fixtures"
+run_test_exe "test_05_diagram_generator_cached_fixtures" "$DA_05" "test_05_diagram_generator_cached_fixtures"
+run_test_exe "test_06_latex_to_pdf_cached_fixtures"     "$DA_06" "test_06_latex_to_pdf_cached_fixtures"
+
 # === Bilanz ===
 echo
 bold "=== Bilanz V35.C all-in-one ==="
