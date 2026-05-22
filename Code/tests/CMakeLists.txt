@@ -42,7 +42,7 @@ if(COMDARE_V32_ENABLE)
     comdare_da_add_test(test_v32_orchestrator
         SOURCES unit/test_v32_orchestrator.cpp)
     target_include_directories(test_v32_orchestrator PRIVATE
-        ${CMAKE_SOURCE_DIR}/messung_driver
+        ${CMAKE_SOURCE_DIR}/02_messung_driver
         ${COMDARE_CACHE_ENGINE_DIR}/libs
         ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
         ${COMDARE_PRT_ART_DIR}/prt_art/include)
@@ -51,19 +51,19 @@ if(COMDARE_V32_ENABLE)
     comdare_da_add_test(test_messreihe_v32_validator
         SOURCES unit/test_messreihe_v32_validator.cpp)
     target_include_directories(test_messreihe_v32_validator PRIVATE
-        ${CMAKE_SOURCE_DIR}/messung_driver)
+        ${CMAKE_SOURCE_DIR}/02_messung_driver)
 
     # V33.E.4 (2026-05-21) - HardwareFilter Tests (Q.1)
     comdare_da_add_test(test_dataset_filter
         SOURCES unit/test_dataset_filter.cpp)
     target_include_directories(test_dataset_filter PRIVATE
-        ${CMAKE_SOURCE_DIR}/messung_driver)
+        ${CMAKE_SOURCE_DIR}/02_messung_driver)
 
     # V34.B.2 (2026-05-21) - MessreiheReportExporter Tests
     comdare_da_add_test(test_messreihe_report_exporter
         SOURCES unit/test_messreihe_report_exporter.cpp)
     target_include_directories(test_messreihe_report_exporter PRIVATE
-        ${CMAKE_SOURCE_DIR}/messung_driver
+        ${CMAKE_SOURCE_DIR}/02_messung_driver
         ${COMDARE_CACHE_ENGINE_DIR}/libs
         ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
         ${COMDARE_PRT_ART_DIR}/prt_art/include)

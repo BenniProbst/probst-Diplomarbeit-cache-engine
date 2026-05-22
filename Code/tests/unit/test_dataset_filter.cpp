@@ -1,6 +1,6 @@
 // V33.E.4 (2026-05-21) - HardwareFilter Tests (Q.1 Akzeptanz-Kriterium)
 
-#include "../../messung_driver/hardware_filter.hpp"
+#include "../../02_messung_driver/hardware_filter.hpp"
 
 #include <gtest/gtest.h>
 

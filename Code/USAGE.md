@@ -23,13 +23,20 @@ Diplomarbeit/Code/                    ← Anwender-Schicht (WAS)
 │   ├── config_a_prt_art_vs_sota.xml      Messreihe A
 │   ├── config_b_cache_engine_perms.xml   Messreihe B
 │   └── config_c_merge_alt_neu.xml        Messreihe C
-├── messung_driver/                   3-Messreihen-Loop (ruft ExperimentDriver-Lib)
-├── binary_to_csv/                    binary records → CSV (kBinaryMagic 0xC0FFEE02)
-├── csv_to_latex/                     CSV → LaTeX-Tabelle + Baustein-Steckbrief
-├── diagram_generator/                C++ → TikZ Bar/Scatter/Heatmap (A4-aware)
-├── latex_to_pdf/                     Wrapper um cache-engine latex_toolchain
+├── 01_sample_data_generator/         Helper: synthetische CSV (Test-Daten)
+├── 02_messung_driver/                V32Orchestrator + HardwareFilter + Validator + Exporter
+├── 03_binary_to_csv/                 binary records → CSV (kBinaryMagic 0xC0FFEE02)
+├── 04_csv_to_latex/                  CSV → LaTeX-Tabelle + Baustein-Steckbrief
+├── 05_diagram_generator/             CSV → TikZ Bar/Scatter/Heatmap (A4-aware)
+├── 06_latex_to_pdf/                  Wrapper um cache-engine latex_toolchain
 └── tests/                            GoogleTest-Suite (Mess-Driver + Pipeline)
 ```
+
+**V35.A.2:** Pipeline-Module folgen jetzt der `XX_operation/`-Konvention mit
+zweistelliger Index-Praefix. Jedes Modul hat eine eigene `README.md` + ein
+`tests/fixtures/cached/` Skelett (Konventions-Disziplin "Teile und Herrsche").
+Pro Modul sind die Eingangs-Fixtures der Vorgaenger-Stufe gecacht damit
+isolierte Schritt-Tests moeglich sind (User-Direktive 2026-05-22).
 
 **Pflicht-Tools auf dem Host:**
 

@@ -5,7 +5,7 @@
 // Skelett-Tests fuer Konstruktion + Submit + execute_messreihe (V32),
 // plus V33.C.2 Default-Lookup-Messreihe + Einzel-Permutation.
 
-#include "../../messung_driver/v32_orchestrator.hpp"
+#include "../../02_messung_driver/v32_orchestrator.hpp"
 
 #include <gtest/gtest.h>
 

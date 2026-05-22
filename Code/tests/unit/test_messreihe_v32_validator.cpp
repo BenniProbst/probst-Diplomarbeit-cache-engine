@@ -1,6 +1,6 @@
 // V33.D.3 (2026-05-21) - MessreiheV32Validator Tests
 
-#include "../../messung_driver/messreihe_v32_validator.hpp"
+#include "../../02_messung_driver/messreihe_v32_validator.hpp"
 
 #include <gtest/gtest.h>
 #include <string>

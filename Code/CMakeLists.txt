@@ -79,12 +79,13 @@ endif()
 # ─────────────────────────────────────────────────────────────────────────────
 # Diplomarbeit-Code-Module
 # ─────────────────────────────────────────────────────────────────────────────
-add_subdirectory(messung_driver)
-add_subdirectory(binary_to_csv)
-add_subdirectory(csv_to_latex)
-add_subdirectory(diagram_generator)
-add_subdirectory(latex_to_pdf)
-add_subdirectory(01_sample_data_generator)  # V21.3 + V35.A.1 Pilot (renamed)
+# V35.A.2 (2026-05-22) - Pipeline-Module nach XX_operation/ Konvention
+add_subdirectory(01_sample_data_generator)  # Helper: synthetische Test-Daten
+add_subdirectory(02_messung_driver)          # echte Messung via V32Orchestrator
+add_subdirectory(03_binary_to_csv)           # binary records -> CSV
+add_subdirectory(04_csv_to_latex)            # CSV -> LaTeX-Tabelle
+add_subdirectory(05_diagram_generator)       # CSV -> TikZ-Plot
+add_subdirectory(06_latex_to_pdf)            # final PDF-Build
 
 if(COMDARE_DA_BUILD_TESTS)
     add_subdirectory(tests)
