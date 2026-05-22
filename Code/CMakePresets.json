@@ -29,6 +29,31 @@
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     },
     {
+      "name": "ninja-msvc-release",
+      "displayName": "Ninja MSVC Release",
+      "inherits": "_base",
+      "generator": "Ninja",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "COMDARE_V32_ENABLE": "ON" },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    },
+    {
+      "name": "ninja-msvc-debug",
+      "displayName": "Ninja MSVC Debug",
+      "inherits": "ninja-msvc-release",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "COMDARE_V32_ENABLE": "ON" }
+    },
+    {
+      "name": "ninja-mingw-debug",
+      "displayName": "Ninja MinGW Debug (CLion-Default)",
+      "inherits": "_base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "COMDARE_V32_ENABLE": "ON"
+      },
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    },
+    {
       "name": "gcc-release",
       "displayName": "GCC Release (Linux)",
       "inherits": "_base",
@@ -38,6 +63,12 @@
         "CMAKE_CXX_COMPILER": "g++"
       },
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+    },
+    {
+      "name": "ninja-gcc-release",
+      "displayName": "Ninja GCC Release (Linux)",
+      "inherits": "gcc-release",
+      "generator": "Ninja"
     },
     {
       "name": "clang-release",
@@ -52,13 +83,19 @@
     }
   ],
   "buildPresets": [
-    { "name": "msvc-release", "configurePreset": "msvc-release", "configuration": "Release" },
-    { "name": "msvc-debug",   "configurePreset": "msvc-debug",   "configuration": "Debug" },
-    { "name": "gcc-release",  "configurePreset": "gcc-release" },
-    { "name": "clang-release","configurePreset": "clang-release" }
+    { "name": "msvc-release",      "configurePreset": "msvc-release",      "configuration": "Release" },
+    { "name": "msvc-debug",        "configurePreset": "msvc-debug",        "configuration": "Debug" },
+    { "name": "ninja-msvc-release","configurePreset": "ninja-msvc-release" },
+    { "name": "ninja-msvc-debug",  "configurePreset": "ninja-msvc-debug" },
+    { "name": "ninja-mingw-debug", "configurePreset": "ninja-mingw-debug" },
+    { "name": "gcc-release",       "configurePreset": "gcc-release" },
+    { "name": "ninja-gcc-release", "configurePreset": "ninja-gcc-release" },
+    { "name": "clang-release",     "configurePreset": "clang-release" }
   ],
   "testPresets": [
-    { "name": "msvc-release", "configurePreset": "msvc-release", "configuration": "Release", "output": { "outputOnFailure": true } },
-    { "name": "gcc-release",  "configurePreset": "gcc-release", "output": { "outputOnFailure": true } }
+    { "name": "msvc-release",      "configurePreset": "msvc-release",      "configuration": "Release", "output": { "outputOnFailure": true } },
+    { "name": "ninja-msvc-release","configurePreset": "ninja-msvc-release","output": { "outputOnFailure": true } },
+    { "name": "ninja-mingw-debug", "configurePreset": "ninja-mingw-debug", "output": { "outputOnFailure": true } },
+    { "name": "gcc-release",       "configurePreset": "gcc-release",       "output": { "outputOnFailure": true } }
   ]
 }

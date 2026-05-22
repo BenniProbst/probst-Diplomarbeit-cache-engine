@@ -55,10 +55,23 @@ if(COMDARE_FETCHCONTENT_USER_CACHE AND NOT DEFINED FETCHCONTENT_BASE_DIR)
         set(_comdare_fetch_cache "$ENV{USERPROFILE}/.cache/comdare/_deps")
     endif()
     if(_comdare_fetch_cache)
-        file(MAKE_DIRECTORY "${_comdare_fetch_cache}")
-        set(FETCHCONTENT_BASE_DIR "${_comdare_fetch_cache}"
-            CACHE PATH "User-Cache fuer FetchContent (V35.E)")
-        message(STATUS "Comdare V35.E: FetchContent-Cache unter ${_comdare_fetch_cache}")
+        # V35.E.3 (2026-05-22): Sub-Verzeichnis pro Generator+Compiler+BuildType.
+        # Sonst kollidiert googletest-subbuild/CMakeCache.txt zwischen z.B.
+        # "Visual Studio 17 2022" und "Ninja" (verschiedene Build-Backends).
+        string(MAKE_C_IDENTIFIER "${CMAKE_GENERATOR}" _gen_safe)
+        set(_compiler_id "${CMAKE_CXX_COMPILER_ID}")
+        if(NOT _compiler_id)
+            set(_compiler_id "unknown")
+        endif()
+        set(_btype "${CMAKE_BUILD_TYPE}")
+        if(NOT _btype)
+            set(_btype "multi")
+        endif()
+        set(_cache_dir "${_comdare_fetch_cache}/${_gen_safe}-${_compiler_id}-${_btype}")
+        file(MAKE_DIRECTORY "${_cache_dir}")
+        set(FETCHCONTENT_BASE_DIR "${_cache_dir}"
+            CACHE PATH "User-Cache fuer FetchContent (V35.E.3)")
+        message(STATUS "Comdare V35.E.3: FetchContent-Cache unter ${_cache_dir}")
     endif()
 endif()
 
