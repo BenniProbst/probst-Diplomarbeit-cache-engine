@@ -84,7 +84,7 @@ add_subdirectory(binary_to_csv)
 add_subdirectory(csv_to_latex)
 add_subdirectory(diagram_generator)
 add_subdirectory(latex_to_pdf)
-add_subdirectory(sample_data_generator)  # V21.3: Sample-CSV bis V21.2 echte HW liefert
+add_subdirectory(01_sample_data_generator)  # V21.3 + V35.A.1 Pilot (renamed)
 
 if(COMDARE_DA_BUILD_TESTS)
     add_subdirectory(tests)
