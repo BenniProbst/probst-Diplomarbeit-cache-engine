@@ -69,6 +69,13 @@
             <batching>MacroBatch</batching>
             <memory_interleave>RoundRobin</memory_interleave>
         </scheduling_strategy>
+        <compiler_strategy>      <!-- V35.B.4 NEU: Compiler-Achse 15 -->
+            <family>Clang</family>
+            <opt_level>O3</opt_level>
+            <lto>ThinLTO</lto>
+            <pgo>None</pgo>
+            <target_arch>x86-64-v4</target_arch>
+        </compiler_strategy>
     </tupel>
 
     <!-- Output-Konfiguration -->

@@ -109,6 +109,27 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <!-- V35.B.4 NEU: compiler_strategy Tag (Achse 15.1-15.5) -->
+      <xs:element name="compiler_strategy" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="family" minOccurs="0">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="GCC"/>
+                  <xs:enumeration value="Clang"/>
+                  <xs:enumeration value="AppleClang"/>
+                  <xs:enumeration value="MSVC"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="opt_level"   type="xs:string" minOccurs="0"/>
+            <xs:element name="lto"         type="xs:string" minOccurs="0"/>
+            <xs:element name="pgo"         type="xs:string" minOccurs="0"/>
+            <xs:element name="target_arch" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="axes" minOccurs="0">
         <xs:complexType>
           <xs:sequence>

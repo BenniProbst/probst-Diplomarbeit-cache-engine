@@ -19,6 +19,9 @@
 
 namespace comdare::diplomarbeit::messung_driver::v32 {
 
+/// V35.B.2 — Compiler-Family (Achse 15.1)
+enum class CompilerFamily { Unknown, GCC, Clang, AppleClang, MSVC };
+
 /**
  * @brief HostCapabilities - Auswahl an Hardware-Faehigkeiten des Hosts
  * @subsystem MessungDriver
@@ -36,6 +39,9 @@ struct HostCapabilities {
     bool huge_pages_1gb {false};
     std::size_t num_p_cores {0};
     std::size_t num_e_cores {0};
+
+    /// V35.B.2 — Compiler-Family (Achse 15.1) erfasst beim Build dieses Binaries
+    CompilerFamily compiler_family {CompilerFamily::Unknown};
 
     /// Default-Konstruktor mit konservativen Annahmen (alles false ausser scalar)
     constexpr HostCapabilities() noexcept = default;
@@ -55,9 +61,31 @@ struct HostCapabilities {
 #if defined(__ARM_FEATURE_SVE2)
         hc.supports_sve2 = true;
 #endif
+        // V35.B.2 — Compiler-Detection
+#if defined(__clang__) && defined(__APPLE_CC__)
+        hc.compiler_family = CompilerFamily::AppleClang;
+#elif defined(__clang__)
+        hc.compiler_family = CompilerFamily::Clang;
+#elif defined(__GNUC__)
+        hc.compiler_family = CompilerFamily::GCC;
+#elif defined(_MSC_VER)
+        hc.compiler_family = CompilerFamily::MSVC;
+#endif
         return hc;
     }
 };
+
+/// V35.B.2 — Compiler-Family string conversion
+[[nodiscard]] inline std::string_view compiler_family_name(CompilerFamily f) noexcept {
+    switch (f) {
+        case CompilerFamily::GCC:        return "GCC";
+        case CompilerFamily::Clang:      return "Clang";
+        case CompilerFamily::AppleClang: return "AppleClang";
+        case CompilerFamily::MSVC:       return "MSVC";
+        case CompilerFamily::Unknown:    return "Unknown";
+    }
+    return "Unknown";
+}
 
 /**
  * @brief HardwareRequest - Hardware-Strategie aus messreihen.xml `<hardware_strategy>`
@@ -73,6 +101,25 @@ struct HardwareRequest {
     [[nodiscard]] bool empty() const noexcept {
         return simd.empty() && cache_level.empty() && numa.empty()
             && prefetch_distance.empty() && atomic_granularity.empty();
+    }
+};
+
+/**
+ * @brief CompilerRequest - Compiler-Strategie aus messreihen.xml `<compiler_strategy>` (V35.B)
+ * @subsystem MessungDriver
+ *
+ * Achse 15: 15.1 family, 15.2 opt_level, 15.3 lto, 15.4 pgo, 15.5 target_arch.
+ */
+struct CompilerRequest {
+    std::string family;          ///< "GCC", "Clang", "AppleClang", "MSVC"
+    std::string opt_level;       ///< "O0".."O3", "Ofast", "MSVC_Od", "MSVC_O1", "MSVC_O2"
+    std::string lto;             ///< "None", "ThinLTO", "FullLTO", "MSVC_LTCG"
+    std::string pgo;             ///< "None", "Generate", "Use", "SamplePGO"
+    std::string target_arch;     ///< "native", "x86-64-v3", "x86-64-v4", "znver4", "armv9-a", "generic"
+
+    [[nodiscard]] bool empty() const noexcept {
+        return family.empty() && opt_level.empty() && lto.empty()
+            && pgo.empty() && target_arch.empty();
     }
 };
 
@@ -126,6 +173,33 @@ public:
 
         // Cache-Level + Prefetch + Atomic-Granularity sind Soft-Constraints (kein Skip)
         return {FilterDecision::Verdict::Pass, "all constraints satisfied"};
+    }
+
+    /// V35.B.3 — Compiler-Filter (Achse 15.1 family + 15.5 target_arch)
+    /// Soft-Filter: prueft nur ob die geforderte Family auf dem Host verfuegbar ist.
+    /// LTO/PGO/OptLevel sind reine Compile-Time-Konfigurationen und werden hier nicht gefiltert.
+    [[nodiscard]] FilterDecision evaluate(const CompilerRequest& req) const {
+        if (req.empty()) {
+            return {FilterDecision::Verdict::Pass, "no compiler constraints"};
+        }
+        if (!req.family.empty()) {
+            const auto host_family_name = compiler_family_name(host_.compiler_family);
+            if (req.family != host_family_name) {
+                return {FilterDecision::Verdict::Skip,
+                    "compiler '" + req.family + "' requested but host built with '"
+                    + std::string(host_family_name) + "'"};
+            }
+        }
+        if (req.target_arch == "armv9-a" && !host_.supports_neon) {
+            return {FilterDecision::Verdict::Skip,
+                "target_arch 'armv9-a' requires ARM host but x86-Detection fehlt NEON"};
+        }
+        if (req.target_arch == "x86-64-v4" && !host_.supports_avx512) {
+            return {FilterDecision::Verdict::Skip,
+                "target_arch 'x86-64-v4' requires AVX-512"};
+        }
+        // OptLevel / LTO / PGO sind Compile-Time-only -> kein Skip
+        return {FilterDecision::Verdict::Pass, "compiler constraints satisfied"};
     }
 
     [[nodiscard]] const HostCapabilities& host() const noexcept { return host_; }

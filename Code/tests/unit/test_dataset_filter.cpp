@@ -106,3 +106,71 @@ TEST(HostCapabilities, DetectCompileTime) {
 #endif
     SUCCEED();  // mindestens default-Konstruktion
 }
+
+// ===========================================================================
+// V35.B.5 — CompilerRequest Tests (Achse 15)
+// ===========================================================================
+
+TEST(CompilerFilter, EmptyRequestPasses) {
+    v32::HardwareFilter filter(v32::HostCapabilities{});
+    v32::CompilerRequest req {};
+    EXPECT_TRUE(filter.evaluate(req).passes());
+}
+
+TEST(CompilerFilter, MatchingFamilyPasses) {
+    auto hc = v32::HostCapabilities::detect_compile_time();
+    v32::HardwareFilter filter(hc);
+    v32::CompilerRequest req {};
+    req.family = std::string(v32::compiler_family_name(hc.compiler_family));
+    auto decision = filter.evaluate(req);
+    EXPECT_TRUE(decision.passes()) << decision.reason;
+}
+
+TEST(CompilerFilter, WrongFamilyIsSkipped) {
+    auto hc = v32::HostCapabilities::detect_compile_time();
+    v32::HardwareFilter filter(hc);
+    v32::CompilerRequest req {};
+    // bewusst falsche Family
+    req.family = (hc.compiler_family == v32::CompilerFamily::MSVC) ? "GCC" : "MSVC";
+    auto decision = filter.evaluate(req);
+    EXPECT_FALSE(decision.passes());
+    EXPECT_TRUE(decision.reason.find(req.family) != std::string::npos);
+}
+
+TEST(CompilerFilter, AVX512TargetArchOnNonAVX512HostSkipped) {
+    v32::HostCapabilities hc;
+    hc.supports_avx2 = true;
+    hc.supports_avx512 = false;
+    v32::HardwareFilter filter(hc);
+    v32::CompilerRequest req {};
+    req.target_arch = "x86-64-v4";
+    auto decision = filter.evaluate(req);
+    EXPECT_FALSE(decision.passes());
+    EXPECT_TRUE(decision.reason.find("x86-64-v4") != std::string::npos);
+}
+
+TEST(CompilerFilter, OptLevelAndLtoAreSoftConstraints) {
+    auto hc = v32::HostCapabilities::detect_compile_time();
+    v32::HardwareFilter filter(hc);
+    v32::CompilerRequest req {};
+    // Family leer = kein Check; OptLevel/LTO/PGO sind Compile-Time-only
+    req.opt_level = "Ofast";
+    req.lto = "FullLTO";
+    req.pgo = "Generate";
+    auto decision = filter.evaluate(req);
+    EXPECT_TRUE(decision.passes());
+}
+
+TEST(CompilerFamilyName, AllVariantsHaveDistinctNames) {
+    EXPECT_EQ(v32::compiler_family_name(v32::CompilerFamily::GCC), "GCC");
+    EXPECT_EQ(v32::compiler_family_name(v32::CompilerFamily::Clang), "Clang");
+    EXPECT_EQ(v32::compiler_family_name(v32::CompilerFamily::AppleClang), "AppleClang");
+    EXPECT_EQ(v32::compiler_family_name(v32::CompilerFamily::MSVC), "MSVC");
+    EXPECT_EQ(v32::compiler_family_name(v32::CompilerFamily::Unknown), "Unknown");
+}
+
+TEST(HostCapabilities, DetectsCompilerAtCompileTime) {
+    auto hc = v32::HostCapabilities::detect_compile_time();
+    EXPECT_TRUE(hc.compiler_family != v32::CompilerFamily::Unknown)
+        << "detected family: " << v32::compiler_family_name(hc.compiler_family);
+}

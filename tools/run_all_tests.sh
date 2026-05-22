@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
-# V34.C.1 (2026-05-21) - All-in-one Test-Runner (3 Repos)
+# V34.C.1 (2026-05-21) + V35.C.1 (2026-05-22) - All-in-one Test-Runner (3 Repos)
 #
 # Verwendung:
-#   tools/run_all_tests.sh
+#   tools/run_all_tests.sh                                  # autodetect Build-Config
+#   tools/run_all_tests.sh --config Debug                   # explizit Debug
+#   tools/run_all_tests.sh --config RelWithDebInfo
+#   BUILD_TYPE=Debug tools/run_all_tests.sh                 # via ENV
 #
 # Ruft direkt die V32/V33/V34-Test-Executables auf (nicht via ctest, weil
 # gtest_discover_tests *_NOT_BUILT-Markierungen erzeugt die ctest stoeren).
-# Voraussetzung: Tests sind bereits gebaut.
+#
+# Build-Type-Logik (V35.C):
+# 1. CLI --config <X> hat Vorrang
+# 2. Sonst ENV BUILD_TYPE
+# 3. Sonst Autodetect: erstes existierendes Verzeichnis in der Suchreihenfolge
+#    Release > Debug > RelWithDebInfo > MinSizeRel
+# 4. Bei Single-Config-Generatoren (Ninja) ist der Pfad ohne Subverzeichnis,
+#    dann faellt das Skript auf "" (Single-Config-Modus) zurueck.
 
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,18 +30,79 @@ green() { printf '\033[32m%s\033[0m' "$1"; }
 yellow() { printf '\033[33m%s\033[0m' "$1"; }
 bold() { printf '\033[1m%s\033[0m' "$1"; }
 
+# V35.C.1 — Build-Type Resolution
+BUILD_TYPE_OVERRIDE=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --config) BUILD_TYPE_OVERRIDE="$2"; shift 2 ;;
+        --config=*) BUILD_TYPE_OVERRIDE="${1#*=}"; shift ;;
+        -h|--help)
+            sed -n '1,20p' "$0"
+            exit 0
+            ;;
+        *) echo "unknown arg: $1" >&2; exit 2 ;;
+    esac
+done
+
+# Resolve Build-Type: CLI > ENV > Autodetect
+DESIRED_BUILD_TYPE="${BUILD_TYPE_OVERRIDE:-${BUILD_TYPE:-}}"
+
+# Pro Test-Verzeichnis: finde passenden Pfad
+# Multi-config (MSVC): tests/Release/test.exe | tests/Debug/test.exe | tests/test.exe
+# Single-config (Ninja): tests/test.exe (kein Sub-Dir)
+resolve_test_exe() {
+    local base_dir="$1"
+    local test_name="$2"
+    local candidates=()
+    if [[ -n "$DESIRED_BUILD_TYPE" ]]; then
+        candidates+=("$base_dir/$DESIRED_BUILD_TYPE/$test_name.exe")
+        candidates+=("$base_dir/$DESIRED_BUILD_TYPE/$test_name")
+    fi
+    # Autodetect-Reihenfolge
+    for cfg in Release Debug RelWithDebInfo MinSizeRel; do
+        candidates+=("$base_dir/$cfg/$test_name.exe")
+        candidates+=("$base_dir/$cfg/$test_name")
+    done
+    # Single-config (Ninja)
+    candidates+=("$base_dir/$test_name.exe")
+    candidates+=("$base_dir/$test_name")
+    for c in "${candidates[@]}"; do
+        if [[ -f "$c" ]]; then
+            echo "$c"
+            return 0
+        fi
+    done
+    # nichts gefunden -> erste Kandidate-Variante zurueckgeben (fuer Fehlermeldung)
+    echo "${candidates[0]}"
+    return 1
+}
+
 TOTAL_PASS=0
 TOTAL_FAIL=0
 TOTAL_NOT_FOUND=0
+RESOLVED_BUILD_TYPE=""
 
 run_test_exe() {
     local label="$1"
-    local exe="$2"
-    if [[ ! -x "$exe" && ! -f "$exe" ]]; then
+    local base_dir="$2"
+    local test_name="$3"
+    local exe
+    exe="$(resolve_test_exe "$base_dir" "$test_name")"
+    if [[ ! -f "$exe" ]]; then
         yellow "  [NOT FOUND] $label  ($exe)"
         echo
         TOTAL_NOT_FOUND=$((TOTAL_NOT_FOUND + 1))
         return
+    fi
+    # Build-Type aus dem Pfad ableiten (fuer Bilanz-Anzeige)
+    if [[ -z "$RESOLVED_BUILD_TYPE" ]]; then
+        for cfg in Release Debug RelWithDebInfo MinSizeRel; do
+            if [[ "$exe" == *"/$cfg/"* ]]; then
+                RESOLVED_BUILD_TYPE="$cfg"
+                break
+            fi
+        done
+        [[ -z "$RESOLVED_BUILD_TYPE" ]] && RESOLVED_BUILD_TYPE="<single-config>"
     fi
     local output
     output=$("$exe" --gtest_brief=1 2>&1)
@@ -53,49 +124,44 @@ run_test_exe() {
 
 # === comdare-cache-engine V32/V34 ===
 echo
-bold "=== comdare-cache-engine V32/V34 (build/msvc-release) ==="
+bold "=== comdare-cache-engine V32/V34 ==="
 echo
 CE_BUILD="$REPO_ROOT/Code/external/comdare-cache-engine/build/msvc-release"
 [[ -d "$CE_BUILD" ]] || CE_BUILD="$RESEARCH_ROOT/comdare-cache-engine/build/msvc-release"
+CE_TESTS="$CE_BUILD/libs/cache_engine/builder/commands/tests"
 
-run_test_exe "test_permutation_flags_v32" \
-    "$CE_BUILD/libs/cache_engine/builder/commands/tests/Release/test_permutation_flags_v32.exe"
-run_test_exe "test_commands" \
-    "$CE_BUILD/libs/cache_engine/builder/commands/tests/Release/test_commands.exe"
-run_test_exe "test_engine_adapters" \
-    "$CE_BUILD/libs/cache_engine/builder/commands/tests/Release/test_engine_adapters.exe"
+run_test_exe "test_permutation_flags_v32" "$CE_TESTS" "test_permutation_flags_v32"
+run_test_exe "test_commands"              "$CE_TESTS" "test_commands"
+run_test_exe "test_engine_adapters"       "$CE_TESTS" "test_engine_adapters"
 
-# === comdare-prt-art V33 ===
+# === comdare-prt-art V33/V34 ===
 echo
-bold "=== comdare-prt-art V33 (build/msvc-release) ==="
+bold "=== comdare-prt-art V33/V34 ==="
 echo
 PA_BUILD="$REPO_ROOT/Code/external/comdare-prt-art/build/msvc-release"
 [[ -d "$PA_BUILD" ]] || PA_BUILD="$RESEARCH_ROOT/comdare-prt-art/build/msvc-release"
+PA_TESTS="$PA_BUILD/tests/unit"
 
-run_test_exe "test_default_lookup_registry" \
-    "$PA_BUILD/tests/unit/Release/test_default_lookup_registry.exe"
-run_test_exe "test_leaf_only_counter" \
-    "$PA_BUILD/tests/unit/Release/test_leaf_only_counter.exe"
+run_test_exe "test_default_lookup_registry" "$PA_TESTS" "test_default_lookup_registry"
+run_test_exe "test_leaf_only_counter"       "$PA_TESTS" "test_leaf_only_counter"
 
 # === Diplomarbeit V33/V34 ===
 echo
-bold "=== Diplomarbeit V33/V34 (Code/build/msvc-release-v32) ==="
+bold "=== Diplomarbeit V33/V34 ==="
 echo
 DA_BUILD="$REPO_ROOT/Code/build/msvc-release-v32"
+DA_TESTS="$DA_BUILD/tests"
 
-run_test_exe "test_v32_orchestrator" \
-    "$DA_BUILD/tests/Release/test_v32_orchestrator.exe"
-run_test_exe "test_messreihe_v32_validator" \
-    "$DA_BUILD/tests/Release/test_messreihe_v32_validator.exe"
-run_test_exe "test_dataset_filter" \
-    "$DA_BUILD/tests/Release/test_dataset_filter.exe"
-run_test_exe "test_messreihe_report_exporter" \
-    "$DA_BUILD/tests/Release/test_messreihe_report_exporter.exe"
+run_test_exe "test_v32_orchestrator"           "$DA_TESTS" "test_v32_orchestrator"
+run_test_exe "test_messreihe_v32_validator"    "$DA_TESTS" "test_messreihe_v32_validator"
+run_test_exe "test_dataset_filter"             "$DA_TESTS" "test_dataset_filter"
+run_test_exe "test_messreihe_report_exporter"  "$DA_TESTS" "test_messreihe_report_exporter"
 
 # === Bilanz ===
 echo
-bold "=== Bilanz V34.C all-in-one ==="
+bold "=== Bilanz V35.C all-in-one ==="
 echo
+echo "Build-Type: ${RESOLVED_BUILD_TYPE:-<none-found>}  (Override: ${DESIRED_BUILD_TYPE:-<autodetect>})"
 echo "passed: $(green "$TOTAL_PASS")"
 if [[ $TOTAL_FAIL -gt 0 ]]; then
     echo "failed: $(red "$TOTAL_FAIL")"
