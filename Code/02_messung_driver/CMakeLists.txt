@@ -27,3 +27,9 @@ if(COMDARE_V32_ENABLE)
 else()
     message(STATUS "[messung_driver] V32 Orchestrator DEAKTIVIERT (V31.F Default)")
 endif()
+
+# V36.D (2026-05-23) - Runtime-Check fuer Pre-Build-Permutationen
+# Pfade zur generierten Manifests via compile-time defines durchreichen.
+target_compile_definitions(messung_driver PRIVATE
+    "COMDARE_PERMUTATIONS_MANIFEST_CE=\"${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt\""
+    "COMDARE_PERMUTATIONS_MANIFEST_PA=\"${CMAKE_BINARY_DIR}/generated/prt_art_permutations_manifest.txt\"")

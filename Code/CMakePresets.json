@@ -10,53 +10,84 @@
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_CXX_STANDARD": "23",
         "CMAKE_CXX_STANDARD_REQUIRED": "ON",
-        "CMAKE_CXX_EXTENSIONS": "OFF"
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "COMDARE_V32_ENABLE": "ON",
+        "COMDARE_BUILD_PERMUTATIONS": "ON",
+        "COMDARE_PRT_ART_BUILD_PERMUTATIONS": "ON",
+        "COMDARE_PERMUTATION_MODE": "on_build_on_demand",
+        "COMDARE_PRT_ART_PERMUTATION_MODE": "on_build_on_demand",
+        "COMDARE_PERMUTATION_PROFILE": "smoke",
+        "COMDARE_PRT_ART_PERMUTATION_PROFILE": "smoke"
       }
     },
     {
-      "name": "msvc-release",
-      "displayName": "MSVC Release (Visual Studio 17 2022)",
+      "name": "_msvc_base",
+      "hidden": true,
       "inherits": "_base",
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" },
       "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
     },
     {
       "name": "msvc-debug",
-      "displayName": "MSVC Debug",
-      "inherits": "msvc-release",
+      "displayName": "MSVC Debug (Diplomarbeit Default-Entwicklung)",
+      "inherits": "_msvc_base",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     },
     {
-      "name": "ninja-msvc-release",
-      "displayName": "Ninja MSVC Release",
-      "inherits": "_base",
-      "generator": "Ninja",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "COMDARE_V32_ENABLE": "ON" },
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+      "name": "msvc-release",
+      "displayName": "MSVC Release (Diplomarbeit Vollausbau)",
+      "inherits": "_msvc_base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
     },
     {
-      "name": "ninja-msvc-debug",
-      "displayName": "Ninja MSVC Debug",
-      "inherits": "ninja-msvc-release",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "COMDARE_V32_ENABLE": "ON" }
+      "name": "msvc-minsizerel",
+      "displayName": "MSVC MinSizeRel",
+      "inherits": "_msvc_base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "MinSizeRel" }
+    },
+    {
+      "name": "msvc-relwithdebinfo",
+      "displayName": "MSVC RelWithDebInfo (Profiling)",
+      "inherits": "_msvc_base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+    {
+      "name": "_ninja_mingw_base",
+      "hidden": true,
+      "inherits": "_base",
+      "generator": "Ninja",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
     },
     {
       "name": "ninja-mingw-debug",
       "displayName": "Ninja MinGW Debug (CLion-Default)",
-      "inherits": "_base",
-      "generator": "Ninja",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "COMDARE_V32_ENABLE": "ON"
-      },
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+      "inherits": "_ninja_mingw_base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "ninja-mingw-release",
+      "displayName": "Ninja MinGW Release",
+      "inherits": "_ninja_mingw_base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "ninja-mingw-minsizerel",
+      "displayName": "Ninja MinGW MinSizeRel",
+      "inherits": "_ninja_mingw_base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "MinSizeRel" }
+    },
+    {
+      "name": "ninja-mingw-relwithdebinfo",
+      "displayName": "Ninja MinGW RelWithDebInfo",
+      "inherits": "_ninja_mingw_base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
     },
     {
       "name": "gcc-release",
       "displayName": "GCC Release (Linux)",
       "inherits": "_base",
+      "generator": "Unix Makefiles",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_COMPILER": "gcc",
@@ -74,6 +105,7 @@
       "name": "clang-release",
       "displayName": "Clang Release (Linux)",
       "inherits": "_base",
+      "generator": "Unix Makefiles",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_COMPILER": "clang",
@@ -83,19 +115,25 @@
     }
   ],
   "buildPresets": [
-    { "name": "msvc-release",      "configurePreset": "msvc-release",      "configuration": "Release" },
-    { "name": "msvc-debug",        "configurePreset": "msvc-debug",        "configuration": "Debug" },
-    { "name": "ninja-msvc-release","configurePreset": "ninja-msvc-release" },
-    { "name": "ninja-msvc-debug",  "configurePreset": "ninja-msvc-debug" },
-    { "name": "ninja-mingw-debug", "configurePreset": "ninja-mingw-debug" },
-    { "name": "gcc-release",       "configurePreset": "gcc-release" },
-    { "name": "ninja-gcc-release", "configurePreset": "ninja-gcc-release" },
-    { "name": "clang-release",     "configurePreset": "clang-release" }
+    { "name": "msvc-debug",                "configurePreset": "msvc-debug",                "configuration": "Debug" },
+    { "name": "msvc-release",              "configurePreset": "msvc-release",              "configuration": "Release" },
+    { "name": "msvc-minsizerel",           "configurePreset": "msvc-minsizerel",           "configuration": "MinSizeRel" },
+    { "name": "msvc-relwithdebinfo",       "configurePreset": "msvc-relwithdebinfo",       "configuration": "RelWithDebInfo" },
+    { "name": "ninja-mingw-debug",         "configurePreset": "ninja-mingw-debug" },
+    { "name": "ninja-mingw-release",       "configurePreset": "ninja-mingw-release" },
+    { "name": "ninja-mingw-minsizerel",    "configurePreset": "ninja-mingw-minsizerel" },
+    { "name": "ninja-mingw-relwithdebinfo","configurePreset": "ninja-mingw-relwithdebinfo" },
+    { "name": "gcc-release",               "configurePreset": "gcc-release" },
+    { "name": "ninja-gcc-release",         "configurePreset": "ninja-gcc-release" },
+    { "name": "clang-release",             "configurePreset": "clang-release" }
   ],
   "testPresets": [
-    { "name": "msvc-release",      "configurePreset": "msvc-release",      "configuration": "Release", "output": { "outputOnFailure": true } },
-    { "name": "ninja-msvc-release","configurePreset": "ninja-msvc-release","output": { "outputOnFailure": true } },
-    { "name": "ninja-mingw-debug", "configurePreset": "ninja-mingw-debug", "output": { "outputOnFailure": true } },
-    { "name": "gcc-release",       "configurePreset": "gcc-release",       "output": { "outputOnFailure": true } }
+    { "name": "msvc-debug",                "configurePreset": "msvc-debug",                "configuration": "Debug",          "output": { "outputOnFailure": true } },
+    { "name": "msvc-release",              "configurePreset": "msvc-release",              "configuration": "Release",        "output": { "outputOnFailure": true } },
+    { "name": "msvc-minsizerel",           "configurePreset": "msvc-minsizerel",           "configuration": "MinSizeRel",     "output": { "outputOnFailure": true } },
+    { "name": "msvc-relwithdebinfo",       "configurePreset": "msvc-relwithdebinfo",       "configuration": "RelWithDebInfo", "output": { "outputOnFailure": true } },
+    { "name": "ninja-mingw-debug",         "configurePreset": "ninja-mingw-debug",         "output": { "outputOnFailure": true } },
+    { "name": "ninja-mingw-release",       "configurePreset": "ninja-mingw-release",       "output": { "outputOnFailure": true } },
+    { "name": "gcc-release",               "configurePreset": "gcc-release",               "output": { "outputOnFailure": true } }
   ]
 }

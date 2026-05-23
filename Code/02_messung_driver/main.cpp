@@ -12,6 +12,7 @@
 
 #include "experiment_driver/experiment_driver.hpp"
 #include "xml_config_parser/xml_config_parser.hpp"
+#include "permutations_runtime_check.hpp"  // V36.D
 
 #include <comdare/workload_generator/workload_generator.hpp>
 
@@ -136,6 +137,12 @@ struct MessreihenSpec {
 
 int main(int argc, char* argv[]) {
     if (argc < 3) { print_usage(); return 1; }
+
+    // V36.D: Pre-Build-Permutationen-Check. Wenn KEINE Permutationen
+    // vorhanden sind, hat das Experiment keinen Sinn -> Fatal mit Exit 2.
+    if (int rc = comdare::messung_driver::assert_permutations_available_or_die(); rc != 0) {
+        return rc;
+    }
 
     std::filesystem::path config_dir{argv[1]};
     std::filesystem::path output_dir{argv[2]};

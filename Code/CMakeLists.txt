@@ -20,6 +20,21 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 option(COMDARE_DA_BUILD_TESTS "Build Diplomarbeit-Code Tests" ON)
 
+# V36.B (2026-05-23): Permutations-Pre-Build Default-ON im Diplomarbeit-Container
+# Mode: on_build_on_demand (User-Direktive 2026-05-23) — inkrementell
+set(COMDARE_BUILD_PERMUTATIONS ON CACHE BOOL
+    "Pre-Build der cache-engine Permutationen (V36.B Diplomarbeit-Default)")
+set(COMDARE_PRT_ART_BUILD_PERMUTATIONS ON CACHE BOOL
+    "Pre-Build der PRT-ART Pruefling-Permutationen (V36.C Diplomarbeit-Default)")
+set(COMDARE_PERMUTATION_MODE "on_build_on_demand" CACHE STRING
+    "Tri-State Mode: on_rebuild | on_build_on_demand | off_pause_build")
+set(COMDARE_PRT_ART_PERMUTATION_MODE "on_build_on_demand" CACHE STRING
+    "Tri-State Mode (PRT-ART): on_rebuild | on_build_on_demand | off_pause_build")
+set(COMDARE_PERMUTATION_PROFILE "smoke" CACHE STRING
+    "Profile-Filter: smoke (~27) | medium (~108) | full (Stunden)")
+set(COMDARE_PRT_ART_PERMUTATION_PROFILE "smoke" CACHE STRING
+    "PRT-ART Profile: smoke (~16) | medium (~81) | full")
+
 # ─────────────────────────────────────────────────────────────────────────────
 # V35.E (2026-05-22) - FetchContent-Cache im User-Home
 #
@@ -101,6 +116,42 @@ endif()
 add_subdirectory(${COMDARE_CACHE_ENGINE_DIR}
                  ${CMAKE_BINARY_DIR}/_cache_engine_external
                  EXCLUDE_FROM_ALL)
+
+# V36.C (2026-05-23): prt-art als add_subdirectory einbinden — nur fuer
+# Pruefling-Permutations, NICHT die internen prt-art-Tests (vermeidet
+# doppelten gtest-FetchContent + Test-Konflikte).
+set(COMDARE_PRT_ART_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(COMDARE_PRT_ART_USE_CACHE_ENGINE OFF CACHE BOOL "" FORCE)
+add_subdirectory(${COMDARE_PRT_ART_DIR}
+                 ${CMAKE_BINARY_DIR}/_prt_art_external
+                 EXCLUDE_FROM_ALL)
+
+# V36.B (2026-05-23): Re-Export der Permutations-Targets auf Top-Level.
+# Ohne dieses Re-Export sind die ~27 Per-Permutation-Targets nur in der
+# cache-engine.sln, nicht in der Diplomarbeit-Sln.
+if(TARGET comdare_permutations_all)
+    # Aggregator-Top-Level Target: explizit baubar via
+    #   cmake --build <preset> --target comdare_perms
+    add_custom_target(comdare_perms_ce
+        DEPENDS comdare_permutations_all
+        COMMENT "V36.B Pre-Build aller cache-engine Permutationen")
+    message(STATUS "Comdare V36.B: 'comdare_perms_ce' Top-Level-Target registriert")
+endif()
+
+# V36.C (2026-05-23): PRT-ART Pruefling-Permutations Top-Level Re-Export
+if(TARGET comdare_prt_art_permutations_all)
+    add_custom_target(comdare_perms_pa
+        DEPENDS comdare_prt_art_permutations_all
+        COMMENT "V36.C Pre-Build aller PRT-ART Pruefling-Permutationen")
+    message(STATUS "Comdare V36.C: 'comdare_perms_pa' Top-Level-Target registriert")
+endif()
+
+# V36.D (2026-05-23): Kombi-Target — beide Permutations-Sets in einem Schritt
+if(TARGET comdare_perms_ce AND TARGET comdare_perms_pa)
+    add_custom_target(comdare_perms_all
+        DEPENDS comdare_perms_ce comdare_perms_pa
+        COMMENT "V36.D Pre-Build aller Permutationen (cache-engine + PRT-ART)")
+endif()
 
 # prt-art baut intern wieder cache-engine ein — das aber NICHT noch einmal:
 # wir setzen COMDARE_CACHE_ENGINE_DIR explizit, sodass prt-art unsere
