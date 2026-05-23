@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #ifndef COMDARE_PERMUTATIONS_MANIFEST_CE
 #define COMDARE_PERMUTATIONS_MANIFEST_CE ""
@@ -58,6 +59,42 @@ inline PermutationsAvailability probe_permutations() {
     a.cache_engine_count = count_manifest_entries(ce);
     a.prt_art_count      = count_manifest_entries(pa);
     return a;
+}
+
+// V37.C (2026-05-23): Manifest-Lader fuer Iteration ueber Permutationen
+inline std::vector<std::string> load_manifest_entries(std::filesystem::path const& p) {
+    std::vector<std::string> out;
+    if (!std::filesystem::exists(p)) {
+        return out;
+    }
+    std::ifstream in(p);
+    for (std::string line; std::getline(in, line);) {
+        if (line.empty() || line.front() == '#') {
+            continue;
+        }
+        // trim CR (Windows line-endings)
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+        out.push_back(std::move(line));
+    }
+    return out;
+}
+
+struct PermutationEntry {
+    std::string id;
+    std::string subsystem;  // "cache_engine" | "prt_art"
+};
+
+inline std::vector<PermutationEntry> load_all_permutations() {
+    std::vector<PermutationEntry> out;
+    for (auto const& id : load_manifest_entries(COMDARE_PERMUTATIONS_MANIFEST_CE)) {
+        out.push_back({id, "cache_engine"});
+    }
+    for (auto const& id : load_manifest_entries(COMDARE_PERMUTATIONS_MANIFEST_PA)) {
+        out.push_back({id, "prt_art"});
+    }
+    return out;
 }
 
 // Return: 0 = ok, 2 = no permutations available (fatal)

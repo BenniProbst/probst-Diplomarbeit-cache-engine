@@ -20,6 +20,23 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 option(COMDARE_DA_BUILD_TESTS "Build Diplomarbeit-Code Tests" ON)
 
+# V37.G (2026-05-23): Dynamische CPU-Core-Erkennung fuer optimale
+# Parallelisierung der Permutations-Builds. User-Direktive:
+# "Anzahl verfuegbarer Kerne messen, jedem parallelen Build 2 Threads als
+#  Ressource zuteilen. Pipeline moeglichst voll halten." Cross-Platform.
+include(ProcessorCount)
+ProcessorCount(_comdare_n_cores)
+if(_comdare_n_cores EQUAL 0)
+    set(_comdare_n_cores 4)  # Fallback wenn nicht detektierbar
+endif()
+math(EXPR COMDARE_PARALLEL_JOBS "${_comdare_n_cores} / 2")
+if(COMDARE_PARALLEL_JOBS LESS 1)
+    set(COMDARE_PARALLEL_JOBS 1)
+endif()
+set(COMDARE_PARALLEL_JOBS "${COMDARE_PARALLEL_JOBS}" CACHE STRING
+    "Parallele Builds (User-Direktive: cores/2, je 2 Threads, Pipeline voll)")
+message(STATUS "Comdare V37.G: ${_comdare_n_cores} cores detected, ${COMDARE_PARALLEL_JOBS} parallel jobs (2 threads each)")
+
 # V36.B (2026-05-23): Permutations-Pre-Build Default-ON im Diplomarbeit-Container
 # Mode: on_build_on_demand (User-Direktive 2026-05-23) — inkrementell
 set(COMDARE_BUILD_PERMUTATIONS ON CACHE BOOL
@@ -151,6 +168,60 @@ if(TARGET comdare_perms_ce AND TARGET comdare_perms_pa)
     add_custom_target(comdare_perms_all
         DEPENDS comdare_perms_ce comdare_perms_pa
         COMMENT "V36.D Pre-Build aller Permutationen (cache-engine + PRT-ART)")
+endif()
+
+# V37.G (2026-05-23): Drei-Wurzel-Filesystem-Layout fuer Permutations.
+# User-Direktive: "Cache Engine Rekombinationen vs Prueflings Rekombinationen
+# vs ALLE Rekombinationen sind jeweils die Wurzel des Baumes"
+#
+# Wurzeln:
+#   ${BINARY_DIR}/perm/cache_engine/  (27 smoke / 144 medium)
+#   ${BINARY_DIR}/perm/prt_art/       (16 smoke / 81 medium)
+#   ${BINARY_DIR}/perm/all/           (Aggregator-Manifest)
+#
+# Compiler/BuildType-Label als perm/BUILD_LABEL.txt (User-Direktive:
+# "Compiler/CMake-build-type/Version koennen als Beschriftung des
+# Permutation-Builds vereinfacht werden")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/perm/all")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/perm/cache_engine")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/perm/prt_art")
+
+# Compiler/BuildType/Version als Label
+# Bei Multi-Config-Generatoren (VS) ist CMAKE_BUILD_TYPE leer
+set(_label_build_type "${CMAKE_BUILD_TYPE}")
+if(NOT _label_build_type)
+    set(_label_build_type "multi-config")
+endif()
+set(_build_label_content "# perm/BUILD_LABEL.txt — generiert vom Diplomarbeit-Container
+# User-Direktive V37.G: Compiler/BuildType/Version als Beschriftung
+
+compiler_id=${CMAKE_CXX_COMPILER_ID}
+compiler_version=${CMAKE_CXX_COMPILER_VERSION}
+compiler_path=${CMAKE_CXX_COMPILER}
+build_type=${_label_build_type}
+generator=${CMAKE_GENERATOR}
+cmake_version=${CMAKE_VERSION}
+system_name=${CMAKE_SYSTEM_NAME}
+system_processor=${CMAKE_SYSTEM_PROCESSOR}
+parallel_jobs=${COMDARE_PARALLEL_JOBS}
+permutation_profile=${COMDARE_PERMUTATION_PROFILE}
+prt_art_profile=${COMDARE_PRT_ART_PERMUTATION_PROFILE}
+permutation_mode=${COMDARE_PERMUTATION_MODE}
+prt_art_mode=${COMDARE_PRT_ART_PERMUTATION_MODE}
+")
+file(WRITE "${CMAKE_BINARY_DIR}/perm/BUILD_LABEL.txt" "${_build_label_content}")
+
+# Aggregator-Manifest (perm/all/manifest_all.txt) wird via custom_command
+# nach jedem comdare_perms_all-Build geschrieben (POST_BUILD).
+if(TARGET comdare_perms_all)
+    add_custom_command(TARGET comdare_perms_all POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+            -DPERM_CE_MANIFEST=${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt
+            -DPERM_PA_MANIFEST=${CMAKE_BINARY_DIR}/generated/prt_art_permutations_manifest.txt
+            -DPERM_ALL_OUT=${CMAKE_BINARY_DIR}/perm/all/manifest_all.txt
+            -DPERM_ROOT=${CMAKE_BINARY_DIR}/perm
+            -P ${CMAKE_SOURCE_DIR}/cmake/write_perm_all_manifest.cmake
+        COMMENT "V37.G: schreibe perm/all/manifest_all.txt + perm/README.md")
 endif()
 
 # prt-art baut intern wieder cache-engine ein — das aber NICHT noch einmal:

@@ -144,6 +144,19 @@ int main(int argc, char* argv[]) {
         return rc;
     }
 
+    // V37.C (2026-05-23): Manifest-Iteration — pro Permutation ein Eintrag.
+    // Phase 6+ wuerde hier pro perm den eigentlichen Algorithmus laden +
+    // benchmarken. Aktuell: Inventar-Log.
+    {
+        auto perms = comdare::messung_driver::load_all_permutations();
+        std::cout << "[V37.C] Permutations-Inventar: " << perms.size() << " Eintraege\n";
+        std::size_t i {0};
+        for (auto const& p : perms) {
+            std::cout << "  [" << (++i) << "/" << perms.size() << "] "
+                      << p.subsystem << " :: " << p.id << "\n";
+        }
+    }
+
     std::filesystem::path config_dir{argv[1]};
     std::filesystem::path output_dir{argv[2]};
     std::filesystem::path comdare_root = std::filesystem::current_path();
