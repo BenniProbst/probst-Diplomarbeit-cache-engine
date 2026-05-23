@@ -10,12 +10,8 @@
 // cache-engine, REV 7.6 Q4) + workload_generator. Schreibt binary
 // measurement-records pro Messreihe in separate Unterordner.
 
-#include "experiment_driver/experiment_driver.hpp"
-#include "xml_config_parser/xml_config_parser.hpp"
-#include "permutations_runtime_check.hpp"  // V36.D
-
-#include <comdare/workload_generator/workload_generator.hpp>
-
+// V38.C: STL-Header zuerst (windows.h via plugin_loader.hpp am Ende),
+// damit <regex> & co. nicht durch Windows-Makros gestoert werden.
 #include <array>
 #include <cstdint>
 #include <filesystem>
@@ -26,6 +22,25 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include "experiment_driver/experiment_driver.hpp"
+#include "xml_config_parser/xml_config_parser.hpp"
+#include "permutations_runtime_check.hpp"  // V36.D
+
+#include <comdare/workload_generator/workload_generator.hpp>
+
+// V38.C - bringt windows.h auf Win32 (LEAN_AND_MEAN + NOMINMAX gesetzt).
+// MUSS am Ende stehen, sonst clash mit STL via Windows-Makros.
+// V38.C.2 Workaround: windows.h definiert auf manchen SDK-Versionen Macros
+// die das raw-string-Parsing in main.cpp stoeren. #undef vor Includes setzen.
+#include "plugin_loader.hpp"               // V38.C
+// Defensiv: einige potentielle Macro-Konflikte zwischen Win32-SDK + C++ Source
+#ifdef R
+  #undef R
+#endif
+#ifdef S
+  #undef S
+#endif
 
 namespace cb = comdare::builder;
 namespace wg = comdare::workload_generator;
@@ -109,7 +124,7 @@ struct MessreihenSpec {
     ss << in.rdbuf();
     auto content = ss.str();
 
-    std::regex reihe_re{R"(<messreihe\s+id\s*=\s*"([^"]+)"[^>]*>([\s\S]*?)</messreihe>)"};
+    std::regex reihe_re{"<messreihe\\s+id\\s*=\\s*\"([^\"]+)\"[^>]*>([\\s\\S]*?)</messreihe>"};
     auto it = std::sregex_iterator(content.begin(), content.end(), reihe_re);
     auto end = std::sregex_iterator();
     for (; it != end; ++it) {
@@ -117,12 +132,12 @@ struct MessreihenSpec {
         spec.id = (*it)[1].str();
         std::string inner = (*it)[2].str();
 
-        std::regex mode_re{R"(<mode>(\w+)</mode>)"};
+        std::regex mode_re{"<mode>(\\w+)</mode>"};
         std::smatch mm;
         if (std::regex_search(inner, mm, mode_re)) spec.mode = mm[1].str();
         else                                        spec.mode = "defined";
 
-        std::regex prof_re{R"(<profile>([^<]+)</profile>)"};
+        std::regex prof_re{"<profile>([^<]+)</profile>"};
         auto pit = std::sregex_iterator(inner.begin(), inner.end(), prof_re);
         auto pend = std::sregex_iterator();
         for (; pit != pend; ++pit) {
@@ -145,8 +160,6 @@ int main(int argc, char* argv[]) {
     }
 
     // V37.C (2026-05-23): Manifest-Iteration — pro Permutation ein Eintrag.
-    // Phase 6+ wuerde hier pro perm den eigentlichen Algorithmus laden +
-    // benchmarken. Aktuell: Inventar-Log.
     {
         auto perms = comdare::messung_driver::load_all_permutations();
         std::cout << "[V37.C] Permutations-Inventar: " << perms.size() << " Eintraege\n";
@@ -154,6 +167,40 @@ int main(int argc, char* argv[]) {
         for (auto const& p : perms) {
             std::cout << "  [" << (++i) << "/" << perms.size() << "] "
                       << p.subsystem << " :: " << p.id << "\n";
+        }
+    }
+
+    // V38.C (2026-05-24): Plugin-Loader — laedt alle .dll/.so/.dylib aus
+    // dem perm-Baum, ruft pro Plugin perm_<id>_run(N, &micros) auf.
+    {
+        // Annahme: messung_driver-Binary liegt in build/<preset>/<config>/.
+        // perm-Root liegt unter build/<preset>/perm/.
+        auto exe_dir = std::filesystem::current_path();
+        // heuristische Suche nach perm/-Wurzel
+        auto perm_root = exe_dir / "perm";
+        for (int up = 0; up < 4 && !std::filesystem::exists(perm_root); ++up) {
+            exe_dir = exe_dir.parent_path();
+            perm_root = exe_dir / "perm";
+        }
+        if (!std::filesystem::exists(perm_root)) {
+            std::cerr << "[V38.C] perm-Root nicht gefunden, ueberspringe Plugin-Mikrobenchmark\n";
+        } else {
+            std::cout << "[V38.C] lade Plugins aus: " << perm_root.string() << "\n";
+            auto plugins = comdare::messung_driver::load_all_perm_plugins(perm_root);
+            std::cout << "[V38.C] " << plugins.size() << " Plugins geladen, fuehre Mikrobenchmark aus (N=1000)\n";
+            for (auto const& p : plugins) {
+                double micros = 0.0;
+                int rc = p.desc->run(1000, &micros);
+                if (rc == 0) {
+                    std::cout << "  [OK] " << p.desc->id
+                              << "  v" << p.desc->version
+                              << "  axes={" << p.desc->axes << "}"
+                              << "  " << micros << " us/op\n";
+                } else {
+                    std::cout << "  [ERR rc=" << rc << "] " << p.desc->id << "\n";
+                }
+            }
+            comdare::messung_driver::unload_all(plugins);
         }
     }
 

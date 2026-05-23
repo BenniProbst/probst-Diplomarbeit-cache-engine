@@ -18,6 +18,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# V38.A (2026-05-24): C++23 Compiler-Mindestversion erzwingen.
+# User-Direktive: "Dazu brauchen wir mindestens compiler der Stufe C++23"
+#
+# Mindestversionen mit ausreichendem C++23-Support fuer Phase 6 (SHARED-
+# Module + dlopen, std::format, ranges, std::expected, deducing this):
+#   gcc:   13.0+  (volles std::format, partial std::expected via libstdc++ 13)
+#   clang: 16.0+  (volles std::format ab 17, std::expected ab 16)
+#   MSVC:  19.34+ (VS 2022 17.4, std::format + std::expected ab MSVC 19.35)
+#   apple-clang: 15.0+ (Xcode 15)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13.0)
+    message(FATAL_ERROR "gcc >= 13.0 erforderlich fuer C++23 (gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0)
+    message(FATAL_ERROR "clang >= 16.0 erforderlich fuer C++23 (gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.0)
+    message(FATAL_ERROR "Apple Clang >= 15.0 erforderlich (gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.34)
+    message(FATAL_ERROR "MSVC >= 19.34 (VS 2022 17.4+) erforderlich (gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
+endif()
+message(STATUS "V38.A C++23-Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} OK")
+
 option(COMDARE_DA_BUILD_TESTS "Build Diplomarbeit-Code Tests" ON)
 
 # V37.G (2026-05-23): Dynamische CPU-Core-Erkennung fuer optimale
