@@ -26,6 +26,7 @@
 #include "experiment_driver/experiment_driver.hpp"
 #include "xml_config_parser/xml_config_parser.hpp"
 #include "permutations_runtime_check.hpp"  // V36.D
+#include "measurement_writer.hpp"          // V41.B1
 
 #include <comdare/workload_generator/workload_generator.hpp>
 
@@ -172,6 +173,8 @@ int main(int argc, char* argv[]) {
 
     // V38.C (2026-05-24): Plugin-Loader — laedt alle .dll/.so/.dylib aus
     // dem perm-Baum, ruft pro Plugin perm_<id>_run(N, &micros) auf.
+    // V41.B1 (2026-05-24): jeder Plugin-Aufruf wird als binary measurement-record
+    // in <output_dir>/measurements/<perm_id>.bin geschrieben (Stage-03-kompatibel).
     {
         // Annahme: messung_driver-Binary liegt in build/<preset>/<config>/.
         // perm-Root liegt unter build/<preset>/perm/.
@@ -187,11 +190,23 @@ int main(int argc, char* argv[]) {
         } else {
             std::cout << "[V38.C] lade Plugins aus: " << perm_root.string() << "\n";
             auto plugins = comdare::messung_driver::load_all_perm_plugins(perm_root);
-            std::cout << "[V38.C] " << plugins.size() << " Plugins geladen, fuehre Mikrobenchmark aus (N=1000)\n";
+            constexpr unsigned long kRunOps = 1000;
+            std::cout << "[V38.C] " << plugins.size() << " Plugins geladen, fuehre Mikrobenchmark aus (N=" << kRunOps << ")\n";
+
+            // V41.B1: ein Aggregat-File fuer alle Permutationen
+            std::filesystem::path const v41_out_dir = std::filesystem::path{argv[2]} / "measurements";
+            std::filesystem::create_directories(v41_out_dir);
+            comdare::messung_driver::MeasurementWriter writer{v41_out_dir / "all_permutations.bin"};
+            if (!writer.ok()) {
+                std::cerr << "[V41.B1] WARN: konnte " << (v41_out_dir / "all_permutations.bin").string()
+                          << " nicht oeffnen, ueberspringe binary records\n";
+            }
+
             for (auto const& p : plugins) {
                 double micros = 0.0;
-                int rc = p.desc->run(1000, &micros);
-                if (rc == 0) {
+                int rc = p.desc->run(kRunOps, &micros);
+                bool const succeeded = (rc == 0);
+                if (succeeded) {
                     std::cout << "  [OK] " << p.desc->id
                               << "  v" << p.desc->version
                               << "  axes={" << p.desc->axes << "}"
@@ -199,6 +214,17 @@ int main(int argc, char* argv[]) {
                 } else {
                     std::cout << "  [ERR rc=" << rc << "] " << p.desc->id << "\n";
                 }
+                if (writer.ok()) {
+                    auto rec = comdare::messung_driver::make_record_from_run(
+                        static_cast<std::uint64_t>(kRunOps), micros);
+                    auto fp = comdare::messung_driver::fingerprint_of(p.desc->id);
+                    writer.add(p.desc->id, fp, succeeded, rec);
+                }
+            }
+            writer.finalize();
+            if (writer.ok() || writer.count() > 0) {
+                std::cout << "[V41.B1] " << writer.count() << " binary records geschrieben: "
+                          << writer.path().string() << "\n";
             }
             comdare::messung_driver::unload_all(plugins);
         }
