@@ -1628,9 +1628,118 @@ PermutationEngine erkennt `iterable_aspect_t != void` → generiert Hybrid-Permu
 hybriden Ansatzes — als optionaler Aspekt pro Achs-Variant. Andere Achsen koennen es ebenfalls
 nutzen (z.B. Buffer-Size-Thresholds in queuing-Topic, Cache-Tier-Levels in prefetch-Topic).
 
+### §15.7 Topic-constexpr-Konfigurations-Set + CacheEngineBuilder als C++-App-Orchestrator
+
+User-Direktive 2026-05-25 nach W6-Recherche:
+"Jedes Topic soll ein constexpr-Set an Achs-Konfigurationen tragen (eine je Achse, dynamische
+Permutation mit den constexpr-Listen der durchzufuehrenden Aspekt-Iterations-Permutationen),
+welches ueber architektonisch als Build-Orchestrator separat geladene Modul CacheEngineBuilder
+konfiguriert und on-demand (oder default precompile) gebaut wird."
+
+**Soll-Architektur (klare Trennung statisch/dynamisch):**
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  CacheEngineBuilder (separate C++-App, nicht CMake)                  │
+│  Hauptfunktionen:                                                     │
+│   - Liest constexpr-Topic-Konfigurations-Sets                         │
+│   - Bestimmt welche Permutationen zu bauen sind (Meta-Konfiguration) │
+│   - Stoesst CMake mit dynamischen Flags pro Permutation an           │
+│   - Trennt Experiment-Durchfuehrungs-Strategie + Testdaten von      │
+│     realer permutierter Binary-Implementierung                       │
+└──────────────────────────────────────────────────────────────────────┘
+              |                                            |
+              | a) STATIC: stoesst Compile pro Perm an     | b) DYNAMIC: lade Binaries
+              v                                            v
+┌──────────────────────────────┐         ┌─────────────────────────────────┐
+│ Compile-Time:                │         │ Runtime: Pre-Built Permutations │
+│ Statischer Bestandteil       │         │ - dynamisches Laden (.so/.dll)  │
+│ jeder Permutation Engine     │         │   via C++23 import oder dlopen  │
+│ - axis_06_registry.hpp       │         │ - Pro Binary intern KEINE       │
+│   AllVendors / EnabledVendors│         │   weiteren dlopen, ALLES static │
+│ - mp_filter, mp_product      │         │   gelinkt (V41.E10 Direktive)   │
+│ - PermutationEngine          │         │ - **Innerhalb der Binary:**     │
+│   <TopicConfigSet>           │         │   dynamische Aspekt-Iteration   │
+│ - per Vendor enabled-flag    │         │   ueber iterable_aspect_t span  │
+│ - Wrapper-Code mit if constexpr│       │   z.B. concurrency thresholds  │
+└──────────────────────────────┘         └─────────────────────────────────┘
+```
+
+**Warum C++-App statt CMake-Script fuer CacheEngineBuilder:**
+- Mehr Kontrolle ueber Permutations-Strategy (Reihenfolge, Filterung, Constraint-Erkennung)
+- Meta-Konfiguration: Experiment-Strategy + Testdaten klar getrennt von der realen Binary-Implementation
+- Modular: CacheEngineBuilder kann pro Pruefling spezifische Permutations-Subsets steuern
+- C++ erlaubt direkte Compile-Time-Auswertung der constexpr-Topic-Konfigurations-Sets
+- Saubere Trennung: Experiment-Orchestrierung (C++-App) vs Algorithmus-Implementierung (Wrapper)
+
+**Statisch vs Dynamisch Trennung (klar spezifiziert):**
+
+| Aspekt | Statischer Anteil | Dynamischer Anteil |
+|--------|-------------------|---------------------|
+| **Wer steuert** | CacheEngineBuilder (C++-App, build-time) | Pre-Built Binary (run-time) |
+| **Was wird permutiert** | cache-engine-Achsen (Allokator, Layout, Prefetch, ...) | Aspekt-Iterations (z.B. Concurrency Thresholds 16/64/256/1024/4096) |
+| **Wie kompiliert** | Eine eigene Binary pro Achsen-Kombination | EINE Binary mit Runtime-Loop ueber iterable_values() |
+| **Latenz-Verhalten** | KEINE Latenz (alles static gelinkt, V41.E10) | Wechsel ueber Threshold-Span ist setter-Aufruf zwischen Mess-Reihen, NICHT in jeder Operation |
+| **Mess-Reihen pro Binary** | 1 Mess-Reihe = 1 Binary | N Mess-Reihen pro Binary (eine je iterable_value) |
+
+**Topic-Konfigurations-Set (constexpr):**
+
+Pro Topic eine zentrale Konfigurations-Datei, die alle Achsen + Aspekt-Iterations zentral deklariert:
+
+```cpp
+// topics/allocator/topic_allocator_config_set.hpp (NEU, kommt in F.6.1.D)
+namespace comdare::cache_engine::allocator {
+struct TopicConfigSet {
+    // Static-Variant-Liste (CacheEngineBuilder generiert Binary pro Eintrag)
+    using StaticAxisVariants = EnabledVendors;   // = mp_filter aus axis_06_registry
+
+    // Dynamic-Aspekt-Iteration (Runtime-Loop innerhalb jeder Binary)
+    template <class Vendor>
+    using AspectIterations = typename Vendor::iterable_aspect_t;  // void wenn keine
+
+    template <class Vendor>
+    static constexpr auto aspect_values() {
+        if constexpr (!std::is_void_v<AspectIterations<Vendor>>) {
+            return Vendor::iterable_values();  // z.B. std::array{16, 64, 256, 1024, 4096}
+        } else {
+            return std::array<int, 0>{};
+        }
+    }
+};
+}
+```
+
+**CacheEngineBuilder (separate C++-App) konsumiert TopicConfigSet:**
+
+```cpp
+// apps/cache_engine_builder/main.cpp (REFACTOR von heutiger Binary)
+int main(int argc, char** argv) {
+    // Lade Meta-Konfiguration (Experiment-Strategy, Testdaten, ...)
+    auto meta_cfg = load_meta_config(argv[1]);
+
+    // Compile-Time: enumeriere alle StaticAxisVariants pro Topic
+    mp_for_each<allocator::TopicConfigSet::StaticAxisVariants>([&](auto V){
+        // Generiere CMake-Build pro Vendor-Permutation
+        invoke_cmake_build_for_permutation<decltype(V)>(meta_cfg);
+    });
+
+    // Runtime (separater Schritt): lade Binaries + fuehre Mess-Reihen aus
+    // - Pro Binary: intern Runtime-Loop ueber aspect_values<Vendor>()
+}
+```
+
+**Bezug zu §14.8 / §15.5 hybride Laufzeit-Permutation:**
+
+§15.7 ist die formale Spezifikation. §14.8 + §15.5 sind die konkrete Anwendung fuer
+concurrency-Sonderfall mit iterable_aspect_t = std::size_t (threshold).
+
+**Pflicht-Pattern fuer alle Topics:** Constexpr TopicConfigSet definiert WAS permutiert wird
+(statisch + dynamisch), CacheEngineBuilder definiert WIE die Mess-Reihen orchestriert werden.
+
 ### §15 Status-Marker
 
-- **Doku-Aufnahme:** 2026-05-25 abendlich spaet (nach Batch 1 Vendor-Wrapper)
-- **W6 Web-Recherche:** UNMITTELBAR NAECHSTER SCHRITT (zentralisierte CMake-Topic-Registrierung + variadische MP11-Akkumulation)
-- **Refactoring Batch 1+:** NACH W6-Recherche-Ergebnis
-- **Tasks angelegt:** F.6.1.C.R1 (Refactoring), F.6.1.D (Permutation Engine Verknuepfung), F.6.1.E (Hybride Laufzeit-Permutation)
+- **Doku-Aufnahme:** 2026-05-25 abendlich spaet (nach Batch 1 + W6-Recherche)
+- **W6 Web-Recherche:** DONE (zentralisierte CMake-Topic-Registrierung + MP11-Akkumulation)
+- **Refactoring Batch 1+:** UNMITTELBAR NAECHSTER SCHRITT (User-Direktive Vollausbau)
+- **§15.7 TopicConfigSet + CacheEngineBuilder:** wird in F.6.1.D zusammen mit PermutationEngine-Anbindung umgesetzt
+- **Tasks angelegt:** #655 W6 (done), #656 F.6.1.C.R1, #657 F.6.1.D, #658 F.6.1.E
