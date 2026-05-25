@@ -1149,3 +1149,131 @@ W4-Agent durchsuchte `docs/` + Termin 7 Detailplanung. Liefert priorisierte List
 - `docs/architektur/10_schichten_modell_M.md`
 - `docs/termine/20260508 Termin 7/Phase5_UML_Detail/_paper_extractions/cluster_F_sync_tud_habich.md`
 - `docs/uml_planning/Y2_prt_art_ist_kartografie.md`
+
+---
+
+## §13 F.6.1.A Pilot-Status (Live ab 2026-05-25)
+
+Pilot-Topic `allocator/axis_06_allocator` ist Stand HEAD `20dd0fa` (cache-engine standalone) bzw. `4e5f8d4` (Diplomarbeit-Submodule) **implementiert + getestet**.
+
+### §13.1 Implementierte Files (10 Files)
+
+```
+libs/cache_engine/
+├── topics/allocator/                                  Topic-Verzeichnis
+│   ├── concepts/topic_allocator_concept.hpp           Marker AllocatorComponent
+│   └── axis_06_allocator/                             Achsen-Verzeichnis
+│       ├── concepts/
+│       │   ├── axis_06_allocator_concept.hpp                              Pflicht-Standard (AllocatorStrategy)
+│       │   ├── axis_06_allocator_cache_engine_permutation_concept.hpp     Pflicht cache-engine-spec (parallel)
+│       │   ├── axis_06_allocator_zeroing_strategy_concept.hpp             Sub-Concept (calloc)
+│       │   ├── axis_06_allocator_overallocating_strategy_concept.hpp      Sub-Concept (C++23 allocate_at_least)
+│       │   ├── axis_06_allocator_introspectable_strategy_concept.hpp      Sub-Concept (usable_size)
+│       │   ├── axis_06_allocator_reclaimable_strategy_concept.hpp         Sub-Concept (collect/purge)
+│       │   ├── axis_06_allocator_resettable_strategy_concept.hpp          Sub-Concept (Pool release_all)
+│       │   └── axis_06_allocator_reallocating_strategy_concept.hpp        Sub-Concept (realloc)
+│       ├── axis_06_allocator_subaxes_aa1_to_aa7.hpp                       7 AA-Tags
+│       ├── axis_06_allocator_strategy_base.hpp                            CRTP-Basis (static_assert Concept-Guard)
+│       └── axis_06_allocator_std_malloc.hpp                               Concept-Beweis-Klasse (A22 ptmalloc2/glibc)
+├── src/
+│   ├── measurement/measurable_concept.hpp             Skelett (Topic-uebergreifend)
+│   └── permutations/permutation_strategy_concept.hpp  Skelett (Topic-uebergreifend)
+└── tests/unit/test_v41_topic_allocator_axis_06.cpp    18 Tests (mit STATISTICS=ON) / 17 (OFF)
+```
+
+### §13.2 Naming-Konvention (User-validiert)
+
+| Datei | Schema |
+|-------|--------|
+| Topic-Concept | `topic_<topic_name>_concept.hpp` |
+| Achsen-Concept | `axis_<NN>_<topic_name>_concept.hpp` (Hauptanforderungen) |
+| Sub-Concept | `axis_<NN>_<topic_name>_<refinement>_strategy_concept.hpp` |
+| CE-Permutation-Concept | `axis_<NN>_<topic_name>_cache_engine_permutation_concept.hpp` |
+| AA-Tags | `axis_<NN>_<topic_name>_subaxes_aa1_to_aa<M>.hpp` |
+| CRTP-Basis | `axis_<NN>_<topic_name>_strategy_base.hpp` |
+| Concrete Vendor-Wrapper | `axis_<NN>_<topic_name>_<vendor_name>.hpp` |
+| Test | `test_v41_topic_<topic_name>_axis_<NN>.cpp` |
+
+### §13.3 3-Schichten-Architektur (User-Direktive bestaetigt durch Pilot)
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ Schicht 1: src/ (Topic-uebergreifend, allgemein)                     │
+│ ├── measurement/measurable_concept.hpp        MeasurableComponent    │
+│ ├── permutations/permutation_strategy_concept.hpp  PermutationStrat. │
+│ └── (weiter: builder/, abi/, api/, fingerprint/, ...)                │
+└──────────────────────────────────────────────────────────────────────┘
+                                  ↑ Spezialisierung
+┌──────────────────────────────────────────────────────────────────────┐
+│ Schicht 2: topics/<topic>/concepts/topic_<topic>_concept.hpp         │
+│  Topic-Marker-Concept (z.B. AllocatorComponent mit topic_tag)        │
+└──────────────────────────────────────────────────────────────────────┘
+                                  ↑
+┌──────────────────────────────────────────────────────────────────────┐
+│ Schicht 3: topics/<topic>/axis_<NN>_<name>/concepts/                 │
+│  Achsen-Concepts (Pflicht-API + Sub-Concepts mit Refinements)       │
+│   + axis_<NN>_<name>_strategy_base.hpp  CRTP-Basis                  │
+│   + axis_<NN>_<name>_<vendor>.hpp       Konkrete Vendor-Wrapper     │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### §13.4 Parallel-Concepts (User-Direktive)
+
+```
+AllocatorStrategy                      CacheEnginePermutationStrategy
+(Standard-Pflicht, PMR-konform)        (cache-engine-spec, parallel Pflicht)
+├ allocate(bytes, alignment)           ├ typename axis_tag (AA1-AA7)
+├ deallocate(p, bytes, align) noexcept ├ typename family_id (A01-A23)
+├ value_type / size_type               ├ static constexpr is_thread_safe()
+├ operator==                           ├ static constexpr supports_pmr()
+└ copy_constructible + nothrow_destr.  ├ static constexpr max_alignment()
+                                        ├ static constexpr name() / family_name()
+              ↓                         ├ statistics() [WENN STATISTICS=ON]
+   6 Sub-Concept-Refinements:          └ reset()      [WENN STATISTICS=ON]
+   - ZeroingStrategy
+   - OverAllocatingStrategy
+   - IntrospectableStrategy
+   - ReclaimableStrategy
+   - PoolResettableStrategy (release_all)
+   - ReallocatingStrategy
+```
+
+Eine Klasse erfuellt typischerweise **beide Pflicht-Concepts** + optional N Sub-Refinements.
+
+### §13.5 CMake-Flag `COMDARE_CE_ENABLE_STATISTICS` (Production-Build ohne Mess-Overhead)
+
+**Definition:** `CMakeLists.txt` Zeile 38ff:
+```cmake
+option(COMDARE_CE_ENABLE_STATISTICS
+    "V41.F.6.1.A: Topic+Achsen-Statistics enabled (jede Achse muss statistics()+reset() bieten)"
+    ON)
+if(COMDARE_CE_ENABLE_STATISTICS)
+    add_compile_definitions(COMDARE_CE_ENABLE_STATISTICS=1)
+endif()
+```
+
+**Auswirkung bei OFF:**
+1. `CacheEnginePermutationStrategy`-Concept verlangt KEIN `statistics()` + `reset()` mehr
+2. Topic+Achsen-Wrapper-Klassen (z.B. `StdMalloc`) #ifdef'n:
+   - `statistics()` + `reset()` Methoden weg
+   - `stats_` Member weg
+   - alle stats-Updates in `allocate/deallocate/zero_allocate/reallocate` weg
+3. CRTP-Basis Delegate-Methoden `statistics()`/`reset()` weg
+4. Production-Binary einer Final-Permutation enthaelt **keinen Mess-Overhead**
+
+**Verifikation Pilot (2026-05-25):**
+- STATISTICS=ON → 18 Tests passing (inkl. `ResetClearsStatistics` Test)
+- STATISTICS=OFF → 17 Tests passing (Statistik-Tests #ifdef'd raus)
+
+### §13.6 Naechste Pilot-Iterationen (engmaschig)
+
+| Iteration | Inhalt | Status |
+|-----------|--------|--------|
+| F.6.1.A   | Pilot allocator/axis_06 (10 Files + Concepts + StdMalloc + Test) | **DONE** (HEAD 20dd0fa) |
+| F.6.1.B   | NEUE Wrapper-Files: `std_allocator_wrapper` + `pmr_resource_wrapper` (kompatibel mit neuem Concept) | TODO |
+| F.6.1.C   | Mimalloc-Vendor-Wrapper als Concept-Generalisierungs-Beweis (erfuellt mehr Sub-Concepts) | TODO |
+| F.6.1.D   | AxisVariantList Template + PermutationVisitor in `src/permutations/` | TODO |
+| F.6.1.E   | 2. Topic anlegen (`queuing/` mit W2-Buffer-Strategien) — validiert Pattern-Generalisierung | TODO |
+| F.6.1.F   | Cross-Constraint-Validator (W3-Pattern) | TODO |
+| F.6.2     | Migration der 27 BASIS-Files bestehender prt-art-Headers in neue Topics | TODO |
+| F.6.3     | prt-art Namespace-Restrukturierung (`comdare::prt_art::*` → `comdare::cache_engine::<topic>::<axis>::prt_art::*`) | TODO |
