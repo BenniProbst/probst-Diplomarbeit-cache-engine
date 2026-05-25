@@ -244,17 +244,93 @@ Die 9 `default_lookup/prt_art_*_default.hpp` sind technisch leer, aber **DIENEN 
 
 Dies ist der zentrale Pruefling-Composit-Header — er bindet ALLE Achsen-Komponenten. Nach Migration (V41.F.6.3) entsteht hier die Notwendigkeit dass prt-art-Pruefling-Adapter via Vererbung von cache-engine-Basis-Klassen aufbaut, nicht via direkte Includes.
 
-### 3.4 Klassifikations-Verteilung
+### 3.3.5 NACHTRAG 2026-05-25 spaet — Korrekte Migrations-Reihenfolge + Pattern (User-Direktive)
 
-| Klassifikation | Anzahl | Anteil | Migration-Ziel |
-|----------------|--------|--------|----------------|
-| **BASIS** (→ cache-engine) | 27 | 63% | `cache_engine/<axis>/` per V41.F.6.2 |
-| **SPEZIFISCH** (bleibt prt-art) | 5 + 1 Registry = 6 | 14% | `cache_engine/<axis>/optional_prt_art_impl/` via V41.F.6.3 (Vererbung) |
-| **DEPRECATED Indikator** (default_lookup-Marker) | 9 | 21% | Ersetzt durch CMake-Config bei V41.F.6.2 |
-| **DEPRECATED Stub** (traversal/) | 2 | 5% | LOESCHEN bei V41.F.6.2 |
-| **Summe** | **43** | **100%** | |
+**User-Praezisierung 2026-05-25 abendlich:**
+> "optional_prt_art_impl kommt eigentlich aus dem namespacing Aufgabenumfeld und bedeutet, dass eine Erweiterung des cache-engine namespaces optional durch Pruefling-Permutations-Achsen erweitert werden kann. Bleibt der namespace in einer Achse aus, werden die standard cache-engine Permutationen gegengeprueft und automatisch verwendet."
 
-Migration-Befund: ~63% BASIS gehoeren architektonisch tatsaechlich nach cache-engine (User-Direktive bestaetigt). Die ~14% SPEZIFISCH (alle identity/) sind die genuinen Pruefling-Adapter und bleiben unter Pruefling-Namespace.
+> "Die Implementierung verwenden ein dynamisches Muster, anstatt statisch kompilerter Metaprogrammierung, wie gefordert. Eine Hauptkategorie steuert nur die Permutations der einzelnen registrierten Achsen mithilfe einer Permutations-Modul-Klasse als visitor Registrierungs-pattern (statische Metaprogrammierung durch CacheEngineBuilder Pre-compile Permutation). Ich sehe auch noch keine Absicherung der Metaprogrammierung durch ein concept System."
+
+> "Wir muessen erst nach Cache Engine migrieren und dann davon ableiten."
+
+**Falscher erster Implementations-Versuch (V41.F.6.0.S1+S2 v1 — ZURUECKGEROLLT):**
+- Monolithische Klasse `SearchAlgoTraversal` mit `std::variant` und Runtime-Switch (DYNAMISCH)
+- Direkt in prt-art geschrieben ohne Basis in cache-engine (FALSCHE REIHENFOLGE)
+- Kein Concept-System fuer Metaprogrammierungs-Absicherung
+- Kein Factory-Pattern je Achse, kein Visitor-Permutations-Modul
+
+**Korrekte Vorgehensweise (V41.F.6.1 + F.6.2 + F.6.3):**
+
+1. **F.6.1 zuerst:** cache-engine Basis-Konstruktion
+   - Concepts pro Achse: `concept ITraversalStrategy`, `concept ISearchAlgoVariant`, etc.
+   - Basis-Interface pro Achse (Vererbungsgrundlage)
+   - PermutationVisitor-Modul-Klasse mit Registrierungs-Pattern
+   - CacheEngineBuilder Pre-Compile-Permutation (statische Metaprogrammierung via templates)
+   - Namespace-Slots: `comdare::cache_engine::<axis>::optional_prt_art_impl`
+
+2. **F.6.2:** 27 BASIS-Files von prt-art nach cache-engine migrieren
+   - Klassen erben von Basis-Interface aus F.6.1
+   - Compile-Time-Registrierung via Visitor-Pattern
+   - Concept-Constraints absichern korrektes API
+
+3. **F.6.3:** prt-art-Spezialisierungen via Namespace-Erweiterung
+   - prt-art schreibt Klassen in `comdare::cache_engine::<axis>::optional_prt_art_impl::*`
+   - Erweitert (per Compile-Time-Detection) die cache-engine-Standards
+   - Wenn ein Namespace-Slot leer bleibt: cache-engine-Default wird gegengeprueft + verwendet (Compile-Time-Fallback)
+
+**Status der heute geschriebenen Stubs (NACH ROLLBACK):**
+- `traversal/search_algo_traversal.hpp` ist wieder V32.DD.2-Skelett-Zustand
+- `traversal/traversal_mapping.hpp` ist wieder V32.DD.2-Skelett-Zustand
+- `tests/unit/test_traversal.cpp` ist entfernt
+- `tests/unit/CMakeLists.txt` ist auf vorigen Zustand revertiert
+
+Die korrekte Implementation folgt unter F.6.1 (cache-engine Basis) + F.6.2 (Migration) + F.6.3 (prt-art Spezialisierung via Namespace).
+
+### 3.4 Klassifikations-Verteilung (KORRIGIERT 2026-05-25 nach User-Praezisierung)
+
+**User-Direktive 2026-05-25 spaet:**
+> "Die themenbezogenen Funktionalitaeten bestehen parallel NEBEN der Achsen-zentrischen Logik. Daher werden die lookup Klassen auch nicht geloescht, sondern wir erweitern das System in eine 2-Ebenen-Architektur, wobei allgemeinere Module wie default_lookup, nodes, memory_layout und so weiter (alle), je mindestens eine Achse als Haupt-Kategorie aufnehmen. Die Achsen sind damit unter-Kategorien eines Themas. ... Also entgegen deiner Erwartung: alles valide Funktionalitaeten und Pflicht fuer die Implementierung noch ausstehender stubs in die cache-engine."
+
+**KORREKTUR:** Die zuvor als "DEPRECATED" markierten Files sind **NICHT DEPRECATED**, sondern **PFLICHT-Stubs/Marker** in einer 2-Ebenen-Architektur, deren Implementierung in cache-engine TODO ist.
+
+| Klassifikation | Anzahl | Anteil | Migration-Ziel | Status |
+|----------------|--------|--------|----------------|--------|
+| **BASIS** (vollstaendig implementiert) | 27 | 63% | `cache_engine/<topic>/` UND `cache_engine/axes/<axis>/` (2-Ebenen, parallel) | DONE |
+| **SPEZIFISCH Pruefling** (identity/ + Registry) | 6 | 14% | `cache_engine/<topic>/optional_prt_art_impl/` + Vererbung | DONE (Adapter) |
+| **PFLICHT-Stub Achsen-Slot** (traversal/) | 2 | 5% | Echte Dispatch-Impl jetzt schreiben (User-Direktive) → BASIS | **TODO HEUTE** |
+| **PFLICHT-Marker Themen-Kategorie** (default_lookup/prt_art_*_default.hpp) | 9 | 21% | Themen-Slot (default_lookup) + Achsen-Slot (axes/<axis>/optional_prt_art_impl) parallel; Implementations-TODOs in cache-engine | **TODO BEHALTEN bis F.6.3 + cache-engine Implementations-TODOs** |
+| **Summe** | **43** | **100%** | | |
+
+**2-Ebenen-Architektur (User-Klarstellung):**
+
+```
+cache_engine/
+├── <topic>/                                  # Themen-Ebene (alte prt-art-Struktur)
+│   ├── default_lookup/                       # Thema mit mind. einer Achse als Haupt-Kategorie
+│   │   ├── prt_art_*_default.hpp            # PFLICHT-Marker bleibt (Pruefling-Slots)
+│   │   ├── basis_telemetry_default.hpp      # NEU: BASIS-Implementation (PFLICHT-TODO)
+│   │   └── ...                              # weitere Achsen-Defaults
+│   ├── nodes/
+│   ├── memory_layout/
+│   ├── value_handle/
+│   ├── prefetch/
+│   ├── telemetry/
+│   ├── traversal/                            # KEIN Stub mehr — echte Dispatch (V41.F.6.0 TODO)
+│   └── ... (alle 14 Themen)
+└── axes/                                     # Achsen-Ebene (V41.F.2 Neu-Struktur)
+    ├── lookup/                               # Achse via Themen-Cross-Reference
+    ├── layout/
+    ├── ... (alle 14 Achsen)
+    └── <axis>/optional_prt_art_impl/         # Pruefling-Override pro Achse
+```
+
+Beide Hierarchien koexistieren, sind aufeinander cross-referenziert (z.B. via #includes oder using-Aliases).
+
+**Migration-Befund (korrigiert):**
+- 27 BASIS gehoeren nach cache-engine **unter beiden Ebenen** (Themen + Achsen) — duplizieren nicht, sondern via Cross-Reference verlinken
+- 6 SPEZIFISCH sind genuine Pruefling-Adapter und bleiben unter `optional_prt_art_impl/`
+- 11 PFLICHT-Stubs/Marker sind **valide Funktionalitaeten** mit ausstehender Impl in cache-engine — werden migriert + ergaenzt, nicht geloescht
+- Implementations-TODOs werden in F.6.2 in cache-engine als BASIS-Defaults ausgebaut
 
 ### 3.5 Test-Coverage
 
