@@ -1270,10 +1270,232 @@ endif()
 | Iteration | Inhalt | Status |
 |-----------|--------|--------|
 | F.6.1.A   | Pilot allocator/axis_06 (10 Files + Concepts + StdMalloc + Test) | **DONE** (HEAD 20dd0fa) |
+| F.6.1.A+  | Concept-Vollausbau Permutation+Statistics mit Observer + Boost.MP11 + CMake-Flag | **DONE** (HEAD 8257c15) |
 | F.6.1.B   | NEUE Wrapper-Files: `std_allocator_wrapper` + `pmr_resource_wrapper` (kompatibel mit neuem Concept) | TODO |
-| F.6.1.C   | Mimalloc-Vendor-Wrapper als Concept-Generalisierungs-Beweis (erfuellt mehr Sub-Concepts) | TODO |
-| F.6.1.D   | AxisVariantList Template + PermutationVisitor in `src/permutations/` | TODO |
+| F.6.1.C   | Mimalloc + Snmalloc Vendor-Wrapper als Concept-Generalisierungs-Beweis (mehr Sub-Concepts erfuellt) | NEXT |
+| F.6.1.D   | StdMalloc um axis_id/family_id/variant_tag/variant_hash erweitern (PermutationVariant-Concept) | TODO |
 | F.6.1.E   | 2. Topic anlegen (`queuing/` mit W2-Buffer-Strategien) — validiert Pattern-Generalisierung | TODO |
 | F.6.1.F   | Cross-Constraint-Validator (W3-Pattern) | TODO |
 | F.6.2     | Migration der 27 BASIS-Files bestehender prt-art-Headers in neue Topics | TODO |
 | F.6.3     | prt-art Namespace-Restrukturierung (`comdare::prt_art::*` → `comdare::cache_engine::<topic>::<axis>::prt_art::*`) | TODO |
+
+---
+
+## §14 Roadmap-Erweiterung 2026-05-25 spaet (User-Direktive, NUR ELABORAT DOKUMENTIERT)
+
+User-Direktive 2026-05-25 abendlich spaet: nach Sichtung der bestehenden Strukturen unter
+`https://github.com/BenniProbst/comdare-cache-engine/tree/main/libs/cache_engine` +
+`https://github.com/BenniProbst/comdare-cache-engine/tree/main/libs` +
+`https://github.com/BenniProbst/comdare-cache-engine/tree/main/apps` +
+`https://github.com/BenniProbst/comdare-cache-engine/tree/main/adapters` +
+`https://github.com/BenniProbst/comdare-cache-engine/tree/main/ext` +
+`https://github.com/BenniProbst/comdare-cache-engine/tree/main/modules` +
+`https://github.com/BenniProbst/comdare-cache-engine/tree/main/tools`
+
+sind acht zusaetzliche strukturelle Konsolidierungs-Punkte identifiziert.
+
+**WICHTIG:** Dieser Abschnitt ist NUR Architektur-Roadmap. Aktuelle Aufgaben (F.6.1.C Mimalloc/Snmalloc-Adapter, dann F.6.1.D StdMalloc-Erweiterung, dann F.6.1.E Queuing-Topic) bleiben prioritaer. Umsetzung von §14 erfolgt **NACH** Pilot-Vollausbau + nach mind. 2 Topics-Validierung des Patterns.
+
+**Repo-Status:** Diplomarbeit-Repo `probst-Diplomarbeit-cache-engine` ist seit 2026-05-25 abendlich **PUBLIC** auf GitHub (vorher PRIVATE). Prof. Habich kann mitlesen.
+
+### §14.1 Bestehende libs/cache_engine Verzeichnisse → Migration nach topics/ + src/
+
+User-Direktive: "die bestehende Architektur die du vorher in groben (falschen) Schritten ausgeheckt hattest, nach topics, src und die anderen libs und Module unter `libs/` auszulagern und weiter wie gehabt KLEINSCHRITTIG zu konsolidieren."
+
+Bestehende Verzeichnisse die migriert werden muessen (nach §11.7.C Mapping):
+
+| Bestehend | Soll | F.6.2 Sub-Task |
+|-----------|------|----------------|
+| `libs/cache_engine/subsystems/c01_cost_engine/` | `libs/cache_engine/src/cost_engine/` (Teil V3 Engine-Choice) | F.6.2.X |
+| `libs/cache_engine/subsystems/c02_pinning_engine/` | `topics/hardware/axis_12_general_hardware/sub_pinning/` | F.6.2.X |
+| `libs/cache_engine/subsystems/c03_prefetch_engine/` | `topics/prefetch/axis_07_prefetch/` | F.6.2.X |
+| `libs/cache_engine/subsystems/c04_coherence_engine/` | `topics/concurrency/axis_08/sub_83_coherence/` | F.6.2.X |
+| `libs/cache_engine/subsystems/c05_telemetry_engine/` | `topics/telemetry/axis_11_telemetry/` | F.6.2.X |
+| `libs/cache_engine/subsystems/c06_allocation_engine/` | `topics/allocator/axis_06_allocator/` | F.6.2.X |
+| `libs/cache_engine/subsystems/c07_migration_engine/` | `topics/migration/axis_migration/` (NEUES Topic) | F.6.2.X |
+| `libs/cache_engine/subsystems/c08_encoding_engine/` | `topics/serialization/axis_10_compression/` | F.6.2.X |
+| `libs/cache_engine/subsystems/c09_heuristik_engine/` | `src/heuristics/` | F.6.2.X |
+| `libs/cache_engine/subsystems/c10_topologie_engine/` | `topics/hardware/axis_topologie/` (Sub-Achse hardware) | F.6.2.X |
+| `libs/cache_engine/subsystems/c11_scheduler_engine/` | **ZERLEGT in 7 Sub-Achsen pro Topic** (W3-Pattern) | F.6.2.X |
+| `libs/cache_engine/subsystems/c12_filter_engine/` | `topics/filter/axis_filter/` (NEUES Topic) | F.6.2.X |
+
+Migration KLEINSCHRITTIG pro Subsystem, jeweils 104 Tests gruen halten.
+
+### §14.2 apps/cache_engine_builder als kompilierbares Tool/Submodule
+
+User-Direktive: "Dazu gehoert spaeter auch die Klassifizierung des cache_engine_builder unter `apps/` als kompilierbares Tool (vielleicht auch ein Submodule und eigenes Projekt unter comdare-cache-engine unter modules)."
+
+**Bestehend:** `apps/cache_engine_builder/` ist heute Teil des cache-engine-Repos (direkt-builtin).
+
+**Soll-Optionen:**
+
+| Option | Beschreibung | Konsequenz |
+|--------|--------------|------------|
+| A | Bleibt unter `apps/cache_engine_builder/` als reines Tool | minimal Aenderung, keine Wiederverwendung extern |
+| B | Migration zu `tools/cache_engine_builder/` (analog anderen Tools) | konsistente Tool-Verzeichnisstruktur |
+| C | NEUES Submodule `modules/comdare-cache-engine-builder/` (eigenes Repo) | wiederverwendbar in anderen Comdare-Projekten, eigenes Versionierung |
+
+**Empfehlung Option C** wenn CacheEngineBuilder generisch nutzbar werden soll (z.B. fuer prt-art Sub-Builds, oder fuer andere Pruefling-Projekte ohne cache-engine selbst).
+
+### §14.3 adapters/ + ext/ mergen — Achsen-Adapter direkt in Achsen-Unterordner
+
+User-Direktive: "Wir haben unter `comdare-cache-engine/` noch adapters, die eigentlich mit `ext/` gemerged werden muessen, um je externer Ressource Erweiterungen fuer Achsen zu definieren, die direkt in einem Unterordner in der Achse mit einem Adapter fuer die Permutation nutzbar gemacht werden. So haben wir sonst mehrere schwer wartbare orthogonale Strukturen."
+
+**Bestehend (orthogonal, schwer wartbar):**
+- `ext/A01-Hoard/`, `ext/A04-mimalloc/`, ..., `ext/P01-ART/`, `ext/P04-CoCo-trie/`, ... (Vendor-Originalcode mit eigenen Build-Systemen)
+- `adapters/A0*/`, `adapters/P0*/` (Comdare-Adapter-Wrapper auf Vendor-API)
+
+**Soll (Achsen-zentriert, eine Stelle pro Vendor):**
+```
+topics/<topic>/axis_<NN>_<topic>/
+├── concepts/                               (wie heute)
+├── axis_<NN>_<topic>_std_malloc.hpp        (eigene Default-Variants)
+├── ...
+└── vendors/                                (NEU — externe Vendor-Wrapper pro Achse)
+    ├── A04_mimalloc/
+    │   ├── ext_source/                     (vorher unter ext/A04-mimalloc/, oder Symlink)
+    │   ├── adapter/                        (vorher unter adapters/A04/, jetzt hier)
+    │   └── axis_06_allocator_mimalloc.hpp  (Pruefling-Permutations-Wrapper)
+    ├── A06_tcmalloc/...
+    └── A14_tcmalloc_warehouse/...
+```
+
+**Vorteil:** pro Vendor 1 Verzeichnis-Slot, der Vendor-Source + Adapter + Wrapper buendelt. Keine orthogonalen Verzeichnisbaum-Strukturen mehr.
+
+**Migration:** F.6.X — pro Vendor schrittweise migrieren, ext/ + adapters/ Verzeichnisse leeren wenn alle Vendor in topics/<topic>/axis_<NN>/vendors/<vendor>/ umgezogen sind.
+
+### §14.4 modules/ vs tools/ — alle als Submodules
+
+User-Direktive: "Wenn ich mir jetzt ausserdem in der comdare-cache-engine die modules und die tools anschaue, dann ist der einzige thematische Unterschied zwischen den Beiden, dass die modules vollstaendig git getrackte Submodules sind. Die Tools lassen sich ALLE in wiederverwendbare generische Module umbauen und ebenfalls als tools-Submodule definieren."
+
+**Bestehend:**
+- `modules/comdare-{search-engine, cache-engine-core, measurement, isa-dispatch, build-tools, test-system}/` (6 echte Git-Submodules)
+- `tools/permutation_codegen/`, `tools/perf_counters/`, ... (direkt im cache-engine-Repo)
+
+**Soll:** ALLE Tools als wiederverwendbare generische Submodules definieren — z.B.:
+- `modules/comdare-permutation-codegen/` (statt `tools/permutation_codegen/`)
+- `modules/comdare-perf-counters/` (statt `tools/perf_counters/`)
+- `modules/comdare-cache-engine-builder/` (statt `apps/cache_engine_builder/`, siehe §14.2)
+
+**Konsequenz:** `tools/`-Verzeichnis wird obsolet. cache-engine ist Aggregator-Repo mit nur `modules/`-Submodules + `topics/` + `src/`. Wiederverwendbarkeit der Tools in anderen Comdare-Projekten (z.B. nur permutation_codegen aus anderem Projekt ziehen ohne cache-engine selbst).
+
+### §14.5 Mess-Strategien als statisch CMake-einstellbare src-Komponenten
+
+User-Direktive: "Hinweis: die hier verwendeten Modules sind in unseren gerade eben erstellten Concepts unter anderem valide Strategien sofern es um Messung geht, also muessen wir bezueglich Messung notieren, dass auch hier Mess-Strategien als separates src, statisch cmake-einstellbar definiert werden koennen."
+
+**Konkret:**
+- `comdare-measurement` Submodule (aktuell Skelett unter `modules/`) liefert Mess-Strategien
+- Diese Strategien sind valide Implementations des `MeasurableComponent`-Concepts (siehe §13.4)
+- Sie sind **selbst eine Achse** — verschiedene Mess-Strategien (z.B. Welch-T-Test vs Mann-Whitney-U vs Anderson-Darling) können per CMake-Option `COMDARE_CE_STATS_STRATEGY=welch|mannwhitney|anderson` statisch gewaehlt werden
+- Compile-Time-Selektion via `if constexpr` oder `using StatsStrategy = WelchStrategy;`
+
+**Code-Skizze (zukuenftig in `src/measurement/strategy_selector.hpp`):**
+```cpp
+#if defined(COMDARE_CE_STATS_STRATEGY_WELCH)
+    using ActiveStatsStrategy = WelchTTestStrategy;
+#elif defined(COMDARE_CE_STATS_STRATEGY_MANNWHITNEY)
+    using ActiveStatsStrategy = MannWhitneyUStrategy;
+#else
+    using ActiveStatsStrategy = NoStatsStrategy;  // wenn STATISTICS=OFF
+#endif
+```
+
+Damit ist die Mess-Strategie selbst ein eigener Permutationsfaktor (jede Pruefling-Permutations-Binary kann anders konfiguriert sein).
+
+### §14.6 reclamation/ ist strukturell falsch positioniert
+
+User-Direktive: "Dann sehe ich noch die strukturellen Probleme, dass reclamation bei `libs/cache_engine/reclamation/` falsch positioniert ist, weil wir ja definiert hatten, dass es eine Achse unter einem Topic ist."
+
+**Bestehend:** `libs/cache_engine/reclamation/rcu_reclaim/` als Top-Level-Verzeichnis (parallel zu subsystems, concurrency_manager, ...).
+
+**Soll:** Migration nach `topics/allocator/axis_06_allocator/sub_62_reclamation/`. Mapping bereits in §11.7.C dokumentiert.
+
+**Zusammenhang mit V42.P1.2 (comdare-rcu eigene Implementation):** F2-Beschluss erfordert eigene RCU-Impl unter dem korrekten Pfad — also direkt in `sub_62_reclamation/` migrieren, nicht im alten reclamation/-Pfad ausbauen.
+
+### §14.7 concurrency_manager/* → topics/concurrency/axis_08/sub_*
+
+User-Direktive: "Dann haben wir noch den concurrency_manager unter `libs/cache_engine/concurrency_manager/` dessen Unterpunkte streng genommen jeweils eine Achse unter einem concurrency-topic sind, deren definierte Strategien gegeneinander geprueft werden muessen."
+
+**Bestehend (8 Unterpunkte als Top-Level Sub-Verzeichnisse):**
+- `concurrency_manager/array_concurrency/`
+- `concurrency_manager/data_structure_concurrency/`
+- `concurrency_manager/memory_access_concurrency/`
+- `concurrency_manager/node_concurrency/`
+- `concurrency_manager/page_concurrency/`
+- `concurrency_manager/path_concurrency/`
+- `concurrency_manager/simd_flow_concurrency/`
+- `concurrency_manager/simd_thread_concurrency/`
+
+**Soll:**
+```
+topics/concurrency/
+├── concepts/topic_concurrency_concept.hpp
+└── axis_08_concurrency/
+    ├── concepts/axis_08_concurrency_concept.hpp
+    ├── sub_array/                  (← array_concurrency)
+    ├── sub_data_structure/         (← data_structure_concurrency)
+    ├── sub_memory_access/          (← memory_access_concurrency)
+    ├── sub_node/                   (← node_concurrency)
+    ├── sub_page/                   (← page_concurrency)
+    ├── sub_path/                   (← path_concurrency)
+    ├── sub_simd_flow/              (← simd_flow_concurrency)
+    └── sub_simd_thread/            (← simd_thread_concurrency)
+```
+
+**Permutations-Konsequenz:** jede Sub-Achse ist eine eigene Permutationsdimension. Cartesian-Product 8 Sub-Achsen × ihre Variants kann grosse Zahlen erzeugen — siehe §14.8.
+
+### §14.8 Sonderfall concurrency: hybrider statisch+dynamisch Variant-Ansatz
+
+User-Direktive: "Im Sonderfall von concurrency lohnt sich die vollstaendige Kompilation nicht, wenn der eigentliche switch in jeder Strategie im Prinzip nur eine einzige Variable betrifft, weshalb wir hier nur fuer besonders kleine Achsen-Anpassungen den hybriden dynamischen Ansatz von `std::variant<>` in Kombination mit static compiled variant verwenden — das concurrency-Topic ist fuer SIMD-Themen statisch variant in der Strategie kompiliert und fuer alle uebrigen Achsen gilt, dass wir dynamisch zur Laufzeit Permutationen durch-iterieren, also concurrency-thresholds permutativ ausprobieren, indem wir uns darauf besinnen dass sinnvolle Limits den Suchraum stark einschraenken."
+
+**Konkrete Regel pro concurrency-Sub-Achse:**
+
+| Sub-Achse | Variant-Strategie | Begruendung |
+|-----------|-------------------|-------------|
+| `sub_simd_flow/` | **statisch** (compiled per Permutation) | SIMD-Code-Pfade sind ISA-spezifisch + branch-frei optimiert; Runtime-Switch im Hot-Path zerstoert Vector-Pipeline |
+| `sub_simd_thread/` | **statisch** | gleich wie sub_simd_flow |
+| `sub_array_concurrency/` | **dynamisch (std::variant<> + Runtime-iter)** | Threshold-basierte Permutationen (z.B. lock-free-cutoff bei N elements), sinnvolle Limits schraenken Suchraum stark ein |
+| `sub_data_structure/` | **dynamisch** | analog |
+| `sub_memory_access/` | **dynamisch** | analog |
+| `sub_node/` | **dynamisch** | analog |
+| `sub_page/` | **dynamisch** | analog |
+| `sub_path/` | **dynamisch** | analog |
+
+**Hybride Variant-Architektur:**
+```cpp
+// Statisch (SIMD): jede Permutation = eigene Binary
+template <typename SimdFlowVariant, typename SimdThreadVariant>
+class ConcurrencyEngine_Static { /* ... */ };
+
+// Dynamisch (alle anderen): EINE Binary, Runtime-iteration ueber sinnvolle Thresholds
+class ConcurrencyEngine_Dynamic {
+    std::variant<LockFreeUnder<10>, LockFreeUnder<100>, LockFreeUnder<1000>,
+                 SpinLock<2>, SpinLock<8>, SpinLock<32>,
+                 MutexBase> threshold_strategy_;
+public:
+    void switch_strategy(ConcurrencyThreshold limit) { /* runtime variant assignment */ }
+};
+
+// Hybrid-Komposition:
+template <typename SimdF, typename SimdT>
+class ConcurrencyEngine {
+    ConcurrencyEngine_Static<SimdF, SimdT> simd_;     // compile-time
+    ConcurrencyEngine_Dynamic               threshold_; // runtime
+};
+```
+
+**Konsequenz fuer Permutations-Zahl:** Wenn SIMD (2 statische Sub-Achsen mit z.B. 5 Variants) statisch und 6 dynamische Sub-Achsen runtime-iteriert werden:
+- Statisch: 5 × 5 = 25 Concurrency-SIMD-Permutations-Binaries
+- Dynamisch: 6 × ~5 Thresholds = 30 Runtime-Iterationen pro Binary
+- Effektive Mess-Reihen: 25 × 30 = 750 (statt 5 × 5 × 5⁶ = ~390.000 vollstaendig statisch)
+
+**Mess-Praezisions-Anmerkung:** dynamische Threshold-Iteration im Mess-Hot-Path muss `[[gnu::hot]]` + Branch-Hint markiert sein, sonst zerstoert std::variant-Switch die ±0.1%-Praezision (siehe Memory `[[no-runtime-switch]]` — Sonderfall concurrency-thresholds aufgehoben weil Switch nur einmal pro Mess-Reihe statt pro Operation).
+
+**Generelle Regel:** `[[no-runtime-switch]]` gilt weiter fuer Achsen wo der Switch im Hot-Path liegt (allocator, layout, prefetch, ...). Ausnahme `concurrency::sub_*` (ausser SIMD): Switch nur zwischen Mess-Permutationen, nicht pro Operation.
+
+### §14 Status-Marker
+
+- **Doku-Aufnahme:** 2026-05-25 abendlich spaet (User-Direktive elaborate ergaenzen, keine Code-Aenderungen)
+- **Code-Umsetzung:** NACH Pilot-Vollausbau (mind. F.6.1.B-F + F.6.1.E 2. Topic) — also fruehestens V41.F.6.2 oder spaeter
+- **Tasks:** NICHT als separate Tasks angelegt — bleiben unter §14 als Architektur-Roadmap-Erweiterung referenzierbar
+- **Memory:** keine neuen Memory-Files (alle Punkte gehoeren in Master-Doc-Referenz `[[reference-master-architektur-skizze]]`)
