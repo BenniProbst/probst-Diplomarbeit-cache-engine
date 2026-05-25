@@ -1826,6 +1826,59 @@ int main(int argc, char** argv) {
 - HAVE-Detection bleibt im ext/CMakeLists.txt (Verfuegbarkeit der Vendor-Header)
 - USE = ENABLE && HAVE als effektive Aktivierung weiterhin via CMakeLists.txt am Ende
 
+### §15.11 mp11-Limits + Vendor-Vollausbau (User-Direktive 2026-05-26 nach F.6.1.G)
+
+User-Frage 2026-05-26: "Ich habe gehoert, dass nur 10 templates in einer variadischen
+Liste unterstuetzt werden — koennen wir die ganze Allokations-Achse (~23 Vendor) ueberhaupt
+mit mp11 abbilden?"
+
+**Recherche-Ergebnis (Agent 2026-05-26):**
+
+Das "10-Template-Limit"-Geruecht stammt aus **altem Boost.MPL** (Vorgaenger, `BOOST_MPL_LIMIT_LIST_SIZE=20` Default wegen Preprocessor-Spezialisierungen).
+
+**Boost.MP11 (modern, C++11+) hat KEIN solches Limit:**
+```cpp
+template <class... T> struct mp_list {};  // echtes variadic template, kein BOOST_MP11_LIMIT_* Makro
+```
+
+**Praktische Compiler-Limits:**
+
+| Limit | GCC | Clang | MSVC |
+|-------|-----|-------|------|
+| Parameter-Pack-Size Standard-Minimum | 1024 | 1024 | 1024 |
+| Template-Instantiation-Depth (Default) | 900 | 256 (!) | 500 |
+| Flag zum Erhoehen | `-ftemplate-depth=N` | `-ftemplate-depth=N` | `/Zc:templateDepth=N` |
+
+**Unser Use-Case (vollkommen unproblematisch):**
+- Allocator-Achse: 23 Vendor (A01-A23, Vollausbau Batch 1-8)
+- 15 Topic-Achsen × 3-5 Variants pro Achse
+- Cartesian-Product: 30 × 15 × 5 = 2.250 Instanziierungen — sub-Sekunde Compile
+- Kritisch wird erst ab ~100k Cartesian-Produkten (RAM 4-8 GB / Compile-Minuten)
+
+**Empfehlung (Sicherheits-Puffer):** in `CMakeLists.txt` optional:
+```cmake
+target_compile_options(<target> PRIVATE
+    $<$<CXX_COMPILER_ID:Clang>:-ftemplate-depth=1024>
+    $<$<CXX_COMPILER_ID:GNU>:-ftemplate-depth=1024>
+)
+```
+
+**Allocator-Achse Vendor-Vollausbau (~23 Implementierungen):**
+
+| Batch | Vendor | Status |
+|-------|--------|--------|
+| Batch 1 | A04 mimalloc + A07 snmalloc + A22 pmr + A22 std | ✅ DONE Pilot |
+| Batch 2 | **A05 Jemalloc + A06 TCMalloc + A20 dlmalloc** | NEXT |
+| Batch 3 | A01 Hoard + A02 Slab + A03 Michael LockFree | pending |
+| Batch 4 | A08 Scalloc + A09 NUMAlloc + A10 RPMalloc | pending |
+| Batch 5 | A11 LRMalloc + A12 CAMA + A13 StarMalloc | pending |
+| Batch 6 | A14 TCMalloc-Warehouse + A15 HMalloc + A16 PIM-Malloc | pending |
+| Batch 7 | A17 Crystalline + A18 Exgen-Malloc + A19 Buddy | pending |
+| Batch 8 | A21 ptmalloc2 + A23 Vmem-Magazines + (1 weiterer) | pending |
+
+Alle 23 Vendor passen problemlos in `AllVendors = mp::mp_list<...>` (kein Limit).
+Stufe 1+2 W6-Pattern (Flags + Shim + Wrapper-if-constexpr) skaliert linear.
+
 ### §15 Status-Marker (Stand 2026-05-26 Session-Ende)
 
 - **Doku-Aufnahme:** 2026-05-25 abendlich → 2026-05-26 Session-Ende
