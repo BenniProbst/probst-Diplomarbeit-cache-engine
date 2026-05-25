@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -27,6 +28,7 @@
 #include "xml_config_parser/xml_config_parser.hpp"
 #include "permutations_runtime_check.hpp"  // V36.D
 #include "measurement_writer.hpp"          // V41.B1
+#include "stats_aggregator.hpp"            // V41.B3
 
 #include <comdare/workload_generator/workload_generator.hpp>
 
@@ -202,23 +204,44 @@ int main(int argc, char* argv[]) {
                           << " nicht oeffnen, ueberspringe binary records\n";
             }
 
+            // V41.B3: pro Plugin N_REPS Runs sammeln (statt 1) fuer Statistik
+            constexpr std::size_t kReps = 10;
+            std::vector<comdare::messung_driver::PermStats> all_stats;
+            all_stats.reserve(plugins.size());
+
             for (auto const& p : plugins) {
-                double micros = 0.0;
-                int rc = p.desc->run(kRunOps, &micros);
-                bool const succeeded = (rc == 0);
-                if (succeeded) {
-                    std::cout << "  [OK] " << p.desc->id
-                              << "  v" << p.desc->version
-                              << "  axes={" << p.desc->axes << "}"
-                              << "  " << micros << " us/op\n";
-                } else {
-                    std::cout << "  [ERR rc=" << rc << "] " << p.desc->id << "\n";
+                std::vector<double> samples_us;
+                samples_us.reserve(kReps);
+                bool all_ok = true;
+                for (std::size_t rep = 0; rep < kReps; ++rep) {
+                    double micros = 0.0;
+                    int rc = p.desc->run(kRunOps, &micros);
+                    if (rc == 0) {
+                        samples_us.push_back(micros);
+                    } else {
+                        all_ok = false;
+                    }
                 }
-                if (writer.ok()) {
+                std::string subsystem = (std::string{p.desc->id}.rfind("pa_", 0) == 0) ? "prt_art" : "cache_engine";
+                auto stats = comdare::messung_driver::compute_stats(
+                    p.desc->id, subsystem, p.desc->axes, p.desc->version, samples_us);
+                all_stats.push_back(stats);
+
+                if (all_ok && !samples_us.empty()) {
+                    std::cout << "  [OK] " << stats.permutation_id
+                              << "  N=" << stats.n_runs
+                              << "  " << stats.mean_us << " ± " << stats.sem
+                              << " us/op  [" << stats.ci_low << "-" << stats.ci_high << "]\n";
+                } else {
+                    std::cout << "  [ERR] " << p.desc->id << "  ok-samples=" << samples_us.size() << "\n";
+                }
+
+                // V41.B1: pro Plugin EIN aggregate binary record (mean us/op)
+                if (writer.ok() && !samples_us.empty()) {
                     auto rec = comdare::messung_driver::make_record_from_run(
-                        static_cast<std::uint64_t>(kRunOps), micros);
+                        static_cast<std::uint64_t>(kRunOps), stats.mean_us);
                     auto fp = comdare::messung_driver::fingerprint_of(p.desc->id);
-                    writer.add(p.desc->id, fp, succeeded, rec);
+                    writer.add(p.desc->id, fp, all_ok, rec);
                 }
             }
             writer.finalize();
@@ -226,6 +249,61 @@ int main(int argc, char* argv[]) {
                 std::cout << "[V41.B1] " << writer.count() << " binary records geschrieben: "
                           << writer.path().string() << "\n";
             }
+
+            // V41.B3: Stats-CSV + paarweise Welch-Vergleiche
+            std::filesystem::path stats_csv = v41_out_dir / "permutation_stats.csv";
+            comdare::messung_driver::write_stats_csv(stats_csv, all_stats);
+            std::cout << "[V41.B3] " << all_stats.size() << " Stats-Eintraege: " << stats_csv.string() << "\n";
+
+            // Sammle Samples nochmal als map<id, vector<us>> fuer paarweise Welch
+            std::map<std::string, std::vector<double>> samples_by_id;
+            for (auto const& p : plugins) {
+                std::vector<double> samples;
+                for (std::size_t rep = 0; rep < kReps; ++rep) {
+                    double micros = 0.0;
+                    if (p.desc->run(kRunOps, &micros) == 0) {
+                        samples.push_back(micros);
+                    }
+                }
+                samples_by_id[std::string{p.desc->id}] = std::move(samples);
+            }
+
+            // Paarweiser Welch: nur fuer interessante Achsen-Paare innerhalb
+            // gleicher SIMD+Layout (Vergleich allokator-Variants).
+            std::vector<comdare::messung_driver::PairwiseRow> pairs;
+            std::vector<std::string> ce_keys;
+            for (auto const& [id, _] : samples_by_id) {
+                if (id.rfind("pa_", 0) != 0) ce_keys.push_back(id);
+            }
+            for (std::size_t i = 0; i < ce_keys.size(); ++i) {
+                for (std::size_t j = i + 1; j < ce_keys.size(); ++j) {
+                    auto const& a = ce_keys[i];
+                    auto const& b = ce_keys[j];
+                    auto const& sa = samples_by_id[a];
+                    auto const& sb = samples_by_id[b];
+                    if (sa.size() < 2 || sb.size() < 2) continue;
+                    auto w = comdare::messung_driver::welch_us(sa, sb);
+                    if (!w.valid) continue;
+                    comdare::messung_driver::PairwiseRow row{};
+                    row.a = a;
+                    row.b = b;
+                    row.mean_a = w.mean_a / 1000.0;  // ns->us
+                    row.mean_b = w.mean_b / 1000.0;
+                    row.delta  = row.mean_a - row.mean_b;
+                    row.t_stat = w.t_statistic;
+                    row.df     = w.degrees_of_freedom;
+                    row.p_value = w.p_value;
+                    row.significant_5pc = (w.p_value < 0.05);
+                    pairs.push_back(row);
+                }
+            }
+            std::filesystem::path pairs_csv = v41_out_dir / "welch_pairwise.csv";
+            comdare::messung_driver::write_pairwise_csv(pairs_csv, pairs);
+            std::size_t sig = 0;
+            for (auto const& r : pairs) if (r.significant_5pc) ++sig;
+            std::cout << "[V41.B3] " << pairs.size() << " paarweise Welch-Tests (cache_engine), "
+                      << sig << " signifikant (p<0.05): " << pairs_csv.string() << "\n";
+
             comdare::messung_driver::unload_all(plugins);
         }
     }
