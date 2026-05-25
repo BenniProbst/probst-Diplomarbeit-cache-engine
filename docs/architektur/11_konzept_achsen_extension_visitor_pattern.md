@@ -1499,3 +1499,138 @@ class ConcurrencyEngine {
 - **Code-Umsetzung:** NACH Pilot-Vollausbau (mind. F.6.1.B-F + F.6.1.E 2. Topic) — also fruehestens V41.F.6.2 oder spaeter
 - **Tasks:** NICHT als separate Tasks angelegt — bleiben unter §14 als Architektur-Roadmap-Erweiterung referenzierbar
 - **Memory:** keine neuen Memory-Files (alle Punkte gehoeren in Master-Doc-Referenz `[[reference-master-architektur-skizze]]`)
+
+---
+
+## §15 Roadmap-Erweiterung 2026-05-25 abendlich (nach Batch 1, weitere Strukturprobleme)
+
+User-Direktive 2026-05-25 nach Batch 1 Vendor-Wrapper (F.6.1.C): NUR elaborat dokumentieren,
+nicht direkt umsetzen — Code-Konzentration bleibt auf F.6.1.X Pilot-Vollausbau + W6-Recherche
+(Metaprogrammierungs-Verbesserung).
+
+### §15.1 benchmarks/ gehoert ins Mess-Modul + Facade-Pattern
+
+User-Direktive: "Die Bestandteile des Ordners `https://github.com/BenniProbst/comdare-cache-engine/tree/main/benchmarks` gehoeren eigentlich in das Mess-Modul und sie sollten ueber ein Facade-Pattern Moeglichkeiten der Systemanalyse und Messung sowie Messdaten bereitstellen, welche wiederum die cache-engine ueber ihr eigenes Facade-Pattern der Diplomarbeit zur Verfuegung stellen kann. Die Unterordner sind hier wieder TODO-Stubs die mit hoechster Praezision gegen bestehende Features konsolidiert und final umgesetzt werden muessen. Auch hier gibt es ein weiteres Strukturproblem."
+
+**Bestehend:** `benchmarks/` als Top-Level-Verzeichnis (parallel zu `apps/`, `libs/`, `ext/`, `adapters/`, `modules/`, `tools/`).
+
+**Soll:** Migration in `modules/comdare-measurement/` (eines der 6 V41.E4 Skelett-Submodules).
+
+**Facade-Architektur:**
+
+```
+Diplomarbeit-Container
+    |
+    | konsumiert
+    v
+cache-engine Facade (V41.E11 ICacheEngine — Schicht 1)
+    |
+    | vermittelt
+    v
+modules/comdare-measurement Facade (NEU — Schicht 2)
+    |
+    | vermittelt
+    v
+benchmarks/* (Systemanalyse, Mess-Strategien, Mess-Daten) — Schicht 3
+```
+
+**Konkret die `benchmarks/`-Unterordner sind heute TODO-Stubs** und muessen mit hoechster Praezision gegen bestehende Features konsolidiert werden:
+- Pruefen: was ueberlappt mit `libs/cache_engine/builder/runtime_micro_benchmarks/`?
+- Pruefen: was ueberlappt mit `libs/cache_engine/builder/in_memory_measurement_buffer/`?
+- Pruefen: was ueberlappt mit `libs/cache_engine/builder/measurement_matrix/`?
+- Pruefen: was ueberlappt mit `libs/cache_engine/builder/telemetry_spool/`?
+
+**Migration in F.6.2.X-Iterationen:**
+1. `benchmarks/<inhalt>` Audit + Mapping zu existierenden Mess-Komponenten
+2. Code-Konsolidierung (Duplikate eliminieren, nicht-Duplikate ausbauen)
+3. Migration nach `modules/comdare-measurement/src/`
+4. Facade-Header `modules/comdare-measurement/include/IMeasurementFacade.hpp`
+5. cache-engine `ICacheEngine::measurement()` Accessor (V41.E11 erweitert)
+6. Diplomarbeit konsumiert nur `ce.measurement().<service>()`
+
+**Bezug zu §11.7.B (src/-Hilfsfunktionen):** `src/measurement/` enthaelt heute nur den Concept-Skelett. Die echte Implementierung wandert NICHT nach `src/measurement/` sondern nach `modules/comdare-measurement/` (Submodule). `src/measurement/` bleibt fuer Topic-uebergreifende Concepts (`MeasurableComponent` etc.) zustaendig.
+
+### §15.2 Compile-Flag-Strategie revidieren (W6-Recherche nachgelagert)
+
+User-Kritik 2026-05-25 nach Batch 1: `#ifdef COMDARE_HAVE_<VENDOR>` pro Vendor-Wrapper ist
+ineffizient + verteilt Compile-Schalter. Stattdessen:
+
+**Soll-Pattern (W6-Recherche-Ergebnis abwarten):**
+- Zentralisierte CMake-Flags pro Topic-Achse (z.B. `COMDARE_AXIS_06_ENABLE_A04=ON|OFF`)
+- Variadische Topic-Registrierung mit Boost.MP11 (mp_list/mp_filter)
+- Meta-programmierte if-else-Kette: pro registrierter Achs-Klasse Compile-Time-Test ob CMake-Flag ON → akkumulieren in `EnabledAxisVariants` mp_list
+- Compiler verwirft unbenutzte Referenzen automatisch aus Binary (Linker-Strip)
+- KEINE `#ifdef COMDARE_HAVE_*` mehr in Vendor-Wrapper-Klassen — nur in CMake-Topic-Registrierung
+- Wartungskosten massiv reduziert
+
+**Konsequenz fuer Batch 1 (Mimalloc/Snmalloc/PMR):** Vendor-Wrapper bleiben Code-konsistent (ohne Compile-Switches), aber die Topic-Registrierung filtert pro Build welche Wrapper instanziiert werden.
+
+**Umsetzung:** NACH W6-Recherche, dann Refactoring von Batch 1 + Batch 2+ nutzen das neue Pattern.
+
+### §15.3 AllocatorStrategyBase muss bei STATISTICS=ON variadische Statistik-Observer-Auswertung erzwingen
+
+User-Kritik 2026-05-25: aktuell `AllocatorStrategyBase` hat `#ifdef COMDARE_CE_ENABLE_STATISTICS`
+Delegate-Methoden — aber das Concept verlangt nicht zwingend dass die Derived-Klasse die
+Statistik-Observer-Auswertungsklasse als variadische Erweiterung definiert.
+
+**Soll:** Wenn STATISTICS=ON, muss `CacheEnginePermutationStrategy` zusaetzlich verlangen:
+- `typename observer_t = MeasurableObserver<snapshot_t>` Pflicht-Alias
+- `observer() const noexcept -> observer_t` Pflicht-Methode
+- Variadische Akkumulation aller Observer pro Topic-Achse fuer externe Auswertung
+
+Direkter Bezug zu §15.4 (Permutation Engine Verknuepfung).
+
+### §15.4 PermutationEngine noch nicht mit Topic-System verknuepft
+
+User-Kritik 2026-05-25: das `PermutationStrategy`-Concept (W5 Boost.MP11) ist heute
+allgemein definiert — aber es gibt KEINE konkrete `PermutationEngine`-Klasse die die
+variadische Registrierung der statisch kompilierbaren Bestandteile durchfuehrt.
+
+**Soll:** `src/permutations/permutation_engine.hpp` (NEU) mit:
+- `template <typename TopicAxisList> class PermutationEngine`
+- Sammelt alle `EnabledAxisVariants` aus den Topic-Achsen (per CMake-Flag gefiltert)
+- Bietet `enumerate_all_permutations()` Visitor-Pattern
+- Bietet `select_for_pruefling<Pruefling>()` Pruefling-spezifische Filterung (via `prt_art` Namespace-Slot, §3-§11)
+
+### §15.5 Hybride Laufzeit-Permutation pro Achse (iterierbarer ASPEKT)
+
+User-Kritik 2026-05-25: PermutationEngine bietet noch KEINE generische Funktion ab, um
+die **hybride Laufzeit-Permutation** in einer Achse zu iterieren, sofern mindestens ein
+Achsen-Bestandteil einen **iterierbaren Aspekt** hat (vgl. §14.8 Sonderfall concurrency
+threshold-Permutationen).
+
+**Soll:** Achsen-Strategy-Klasse darf optional definieren:
+- `typename iterable_aspect_t = void` (Default: keine Laufzeit-Iteration)
+- `static constexpr std::span<iterable_aspect_t const> iterable_values()` Pflicht wenn aspect_t nicht void
+- PermutationEngine erkennt iterierbaren Aspekt zur Compile-Time und generiert Hybrid-Variant:
+  - Statisch: kartesisches Produkt aller Variants OHNE iterierbaren Aspekt
+  - Dynamisch: pro Variant mit iterable_aspect_t → Runtime-Iteration via `for (auto v : iterable_values())`
+
+**Konkret-Pattern fuer concurrency thresholds:**
+```cpp
+struct LockFreeConcurrency {
+    using iterable_aspect_t = std::size_t;  // threshold N
+    static constexpr std::array values{16, 64, 256, 1024, 4096};
+    static constexpr std::span<std::size_t const> iterable_values() noexcept {
+        return values;
+    }
+    // Runtime: threshold wird via setter eingestellt
+};
+```
+
+PermutationEngine erkennt `iterable_aspect_t != void` → generiert Hybrid-Permutation:
+- 1 Compile-Time-Binary fuer `LockFreeConcurrency` (statt 5 separate)
+- Innerhalb der Binary: Runtime-Loop ueber 5 thresholds → 5 Mess-Datenpunkte
+
+### §15.6 Bezug zu §14.8 Concurrency-Sonderfall
+
+§15.5 ist die generelle Realisierung des in §14.8 fuer concurrency-Sonderfall beschriebenen
+hybriden Ansatzes — als optionaler Aspekt pro Achs-Variant. Andere Achsen koennen es ebenfalls
+nutzen (z.B. Buffer-Size-Thresholds in queuing-Topic, Cache-Tier-Levels in prefetch-Topic).
+
+### §15 Status-Marker
+
+- **Doku-Aufnahme:** 2026-05-25 abendlich spaet (nach Batch 1 Vendor-Wrapper)
+- **W6 Web-Recherche:** UNMITTELBAR NAECHSTER SCHRITT (zentralisierte CMake-Topic-Registrierung + variadische MP11-Akkumulation)
+- **Refactoring Batch 1+:** NACH W6-Recherche-Ergebnis
+- **Tasks angelegt:** F.6.1.C.R1 (Refactoring), F.6.1.D (Permutation Engine Verknuepfung), F.6.1.E (Hybride Laufzeit-Permutation)
