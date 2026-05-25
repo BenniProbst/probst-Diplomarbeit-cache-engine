@@ -875,19 +875,92 @@ src/
 └── permutations/                 # PermutationVisitor + AxisVariantList + cartesian_product_t
 ```
 
-### §11.7 NEUE Rueckfragen RQ-10 bis RQ-15 (aus W1/W2/W3/UML/bestehender Struktur)
+### §11.7 RQ-10 bis RQ-15 ALLE BEANTWORTET (User 2026-05-25 spaet)
 
-**RQ-10:** Bestehende `subsystems/c01_cost_engine/` (Kosten-Modell). Eigenes Topic `cost/` mit Achse(n) oder unter `src/`?
+| RQ | Frage | User-Antwort |
+|----|-------|--------------|
+| RQ-10 | c01_cost_engine | **Sub-Achse von Engine-Choice V3 (Informed-Kalibriert)** — wird Teil der V42.P0.2 V1-V4 Engine-Choice-Achse, NICHT eigenes Topic |
+| RQ-11 | c07_migration_engine | **Eigenes Topic `migration/` mit Achse `migration::policy`** (none/lazy_on_access/proactive_scan/hot_cold_split/learned) |
+| RQ-12 | c12_filter_engine | **Eigenes Topic `filter/`** (Bloom/Cuckoo/Quotient/XOR/Ribbon) |
+| RQ-13 | c10_topologie_engine | **Sub-Achse von `hardware/axis_topologie`** (flat/numa_2sock/numa_8sock/hetero_p_e/disaggregated) |
+| RQ-14 | io als Topic | **Eigenes Topic `io/` mit Achse `io::dispatch_policy`** (in_memory_only/sync_spill/async_io_uring/read_ahead_tuned/cooling_classified) |
+| RQ-15 | search_engine axis_01 Klassifizierung | **JA, Konzept-Skelett:** axis_01 mit 4 Sub-Klassifikationen: 01a `std_map_like` (sorted+unique+ordered), 01b `std_vector_like` (positional+dense), 01c `std_list_like` (linked+sequence), 01d `std_multi_map_like` (sorted+non-unique). Pro Sub eigene default_variants + Cross-Constraints (z.B. linked_list braucht pseudo Spread) |
 
-**RQ-11:** Bestehende `subsystems/c07_migration_engine/` (Page-Migration zwischen NUMA-Nodes/HBM). Eigenes Topic `migration/` oder Sub-Achse von `topics/allocator/axis_06/sub_63_numa/`?
+### §11.7.A FINALE Topic-Liste (User-validiert)
 
-**RQ-12:** Bestehende `subsystems/c12_filter_engine/` (Bloom-Filter, etc.). Eigenes Topic `filter/` oder Achse von `topics/search_engine/`?
+15 Topics + jeweils mind. 1 Achse + jeweils mind. 1 scheduling Sub-Achse (W3) wo sinnvoll:
 
-**RQ-13:** Bestehende `subsystems/c10_topologie_engine/`. Sub-Achse von `topics/hardware/` oder eigenes Topic?
+| # | Topic | Achsen | Scheduling Sub-Achse |
+|---|-------|--------|----------------------|
+| 1 | `allocator/` | axis_06 (Sub 6.1-6.5: alloc_lib, reclamation, numa, huge_page, strategy) | allocator::pool_resize_policy |
+| 2 | `concurrency/` | axis_08 (Sub 8.1, 8.2, 8.3 coherence + 8 Disziplinen-Liste C.6) | concurrency::scheduler_topology |
+| 3 | `traversal/` | axis_03a search_algo, 03b cache_traversal, 03m mapping | — |
+| 4 | `nodes/` | axis_02 path_compression, axis_04 node_type | — |
+| 5 | `memory_layout/` | axis_05 (AoS/SoA/hybrid/AoSoA) | — |
+| 6 | `prefetch/` | axis_07 | prefetch::interleave_depth |
+| 7 | `telemetry/` | axis_11 (Sub 11.X1 LeafOnly, X2 Sampled, X3 Offline-Recompute, X4 Inner-AntiPattern) | telemetry::collection_rhythm |
+| 8 | `serialization/` | axis_10 compression | — |
+| 9 | `value_handle/` | axis_14 (Inline/External/ChainRef + CostModel) | — |
+| 10 | `queuing/` (NEU ex value_buffer) | axis_Q (13 W2-Strategien × 6 Sizes) | buffer::flush_policy |
+| 11 | `hardware/` (NEU) | axis_09 ISA, axis_12 general_hardware, axis_topologie (c10) | — |
+| 12 | `search_engine/` (NEU) | axis_01 Index-Organization (Sub 01a std_map_like, 01b std_vector_like, 01c std_list_like, 01d std_multi_map_like) | — |
+| 13 | `io/` (NEU) | axis_io dispatch_policy | — (axis_io selbst ist scheduling-Domaene) |
+| 14 | `migration/` (NEU, ex c07) | axis_migration policy | — |
+| 15 | `filter/` (NEU, ex c12) | axis_filter (Bloom/Cuckoo/Quotient/XOR/Ribbon) | — |
 
-**RQ-14:** `io/` als neues Topic mit Achse `io::dispatch_policy` (W3-Empfehlung)? Oder Sub-Achse von `topics/allocator/axis_06/sub_64_huge_page/`?
+### §11.7.B FINALE src/-Hilfsfunktionen (KEINE Topics, KEINE Achsen)
 
-**RQ-15:** `topics/search_engine/axis_01_index_organization/` als Klassifizierungs-Achse fuer Such-Algorithmus-Familie (std::map / std::vector / std::list / std::multi_map / ...): konkretes Konzept-Skelett?
+```
+libs/cache_engine/src/
+├── builder/                  # CacheEngineBuilder + 22 Subkomponenten
+├── abi/                      # ABI-Layer (execution_engine, search_engine POD)
+├── api/                      # Facade (ICacheEngine, IPrueflingFactory) V41.E11
+├── concepts/                 # Cross-Topic-Concepts (Topic-Concepts liegen IN topics/)
+├── fingerprint/              # FixedLengthFingerprint<Bytes> (UML §4.2(c))
+├── strategy_command/         # Strategy + Command fuer Builder
+├── algorithm_profiles/       # CMake-/XML-Profile (Bausteine_Matrix.txt)
+├── default_lookup/           # Strategy-Pattern + Interpreter fuer Pruefling-Validierung (RQ-6)
+├── identity/                 # Pruefling-Identifikation (RQ-4)
+├── measurement/              # Mess-Infrastruktur (ggf. comdare-measurement Submodule, RQ-5)
+├── heuristics/               # c09_heuristik_engine (Builder-internal)
+├── cost_engine/              # c01 Kosten-Modell (RQ-10: Teil von Engine-Choice V3)
+├── permutations/             # PermutationVisitor + AxisVariantList + cartesian_product_t
+├── platform_probe/           # c-bestand + V42.P0.3 IPlatformProbe Auto-Discovery
+└── codegen/                  # Build-Time codegen::permutation_emit_order (W3)
+```
+
+### §11.7.C Mapping bestehende libs/cache_engine/* → FINAL (User-validiert)
+
+| Bestehender Pfad | Ziel |
+|------------------|------|
+| `subsystems/c01_cost_engine/` | `src/cost_engine/` (Teil V3 Engine-Choice V42.P0.2) |
+| `subsystems/c02_pinning_engine/` | `topics/hardware/axis_12_general_hardware/sub_pinning/` |
+| `subsystems/c03_prefetch_engine/` | `topics/prefetch/axis_07_prefetch/` |
+| `subsystems/c04_coherence_engine/` | `topics/concurrency/axis_08_concurrency/sub_83_coherence/` |
+| `subsystems/c05_telemetry_engine/` | `topics/telemetry/axis_11_telemetry/` |
+| `subsystems/c06_allocation_engine/` | `topics/allocator/axis_06_allocator/` |
+| `subsystems/c07_migration_engine/` | `topics/migration/axis_migration/` (NEUES Topic) |
+| `subsystems/c08_encoding_engine/` | `topics/serialization/axis_10_compression/` |
+| `subsystems/c09_heuristik_engine/` | `src/heuristics/` |
+| `subsystems/c10_topologie_engine/` | `topics/hardware/axis_topologie/` (Sub-Achse von hardware) |
+| `subsystems/c11_scheduler_engine/` | **ZERLEGT in 7 Sub-Achsen pro Topic** (W3-Pattern, KEIN eigenes Subsystem mehr) |
+| `subsystems/c12_filter_engine/` | `topics/filter/axis_filter/` (NEUES Topic) |
+| `subsystems/platform_profiler/` | `src/platform_probe/` (+ V42.P0.3 Auto-Discovery erweitert) |
+| `concurrency_manager/{array,data_structure,memory_access,node,page,path,simd_flow,simd_thread}_concurrency/` | `topics/concurrency/axis_08_concurrency/sub_{...}/` (8 Disziplinen — C.6 vergessenes Feature wieder einsortiert) |
+| `reclamation/rcu_reclaim/` | `topics/allocator/axis_06_allocator/sub_62_reclamation/` (+ V42.P1.2 comdare-rcu eigene Impl) |
+| `builder/{22 Subkomponenten}` | `src/builder/*` |
+| `include/cache_engine/abi/` | `src/abi/` |
+| `include/cache_engine/concepts/` | `src/concepts/` |
+| `include/cache_engine/fingerprint/` | `src/fingerprint/` |
+| `include/cache_engine/hbm/` | `topics/allocator/axis_06_allocator/sub_64_huge_page/` (+ V42.P1.3 HBM Abstract Factory) |
+| `include/cache_engine/indexes/` (LinearProbeHashSet, RadixIndex) | `topics/search_engine/axis_01_index_organization/sub_01a_std_map_like/default_variants/` |
+| `include/cache_engine/measurement/` | `src/measurement/` |
+| `include/cache_engine/platform/` + `platform_probe/` | `src/platform_probe/` (konsolidiert) |
+| `include/cache_engine/strategy_command/` | `src/strategy_command/` |
+| `include/cache_engine/allocators/families/a01-a14_*/` | `topics/allocator/axis_06_allocator/sub_61_alloc_lib/default_variants/{a01..a14}/` |
+| `algorithm_profiles/{allocators,sota}/` | `src/algorithm_profiles/` |
+
+**Konsequenz:** Migration ist substantiell aber strukturell klar — 12 Subsystems + 8 Concurrency-Disziplinen + 14 Allocator-Familien werden in 15 Topics mit klarer Achsen-Zuordnung restrukturiert. Bestehende Code-Substanz bleibt erhalten; nur Pfade + Namespaces wechseln.
 
 ### §11.8 Konkreter F.6.1.A Vorschlag (nach User-Validierung von §11.6 Mapping)
 
