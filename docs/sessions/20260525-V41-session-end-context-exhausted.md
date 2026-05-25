@@ -146,6 +146,14 @@ Session-Tag mit substantieller Arbeit an drei Achsen:
 - ✅ snmalloc real ab medium-Profile
 - ✅ binary records + welch_pairwise.csv produziert (40 records / 277 pairs)
 
+## §6.5 P0-Architektur-Befund (User-Direktive 2026-05-25 ganz spaet)
+
+**V41.F.6 P0:** prt-art hat 47 Header in 14 Achsen-Verzeichnissen (`prt_art/include/prt_art/{allocator,concurrency,default_lookup,identity,internal_search,measurement,memory_layout,nodes,prefetch,serialization,telemetry,traversal,value_buffer,value_handle}/`). Die BASIS-Strukturen davon gehoeren ARCHITEKTONISCH in cache-engine — cache-engine ist die zentrale Map<K,V>-Implementation aller Permutationen. prt-art darf nur namespace-Erweiterungen tragen (`optional_prt_art_impl`).
+
+**Aufwand:** SEHR GROSS, Einzel-Sichtpruefung jedes Files erforderlich. Migration setzt V41.F.2 (Axen-Namespaces) voraus.
+
+Naechste Session: V41.F.6 hat HOECHSTE PRIORITAET vor V41.E11 Impl und anderen Algorithmus-Erweiterungen.
+
 ## §7 Naechste Aufgaben (Reihenfolge fuer Fortsetzungs-Session)
 
 ### Quick-Wins (≤30min)
