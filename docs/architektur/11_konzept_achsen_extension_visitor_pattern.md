@@ -1736,10 +1736,104 @@ concurrency-Sonderfall mit iterable_aspect_t = std::size_t (threshold).
 **Pflicht-Pattern fuer alle Topics:** Constexpr TopicConfigSet definiert WAS permutiert wird
 (statisch + dynamisch), CacheEngineBuilder definiert WIE die Mess-Reihen orchestriert werden.
 
-### §15 Status-Marker
+### §15.8 Stufe 2 LIVE + offene Aufgaben fuer Stufe 3+ (Session-Uebergabe 2026-05-26)
 
-- **Doku-Aufnahme:** 2026-05-25 abendlich spaet (nach Batch 1 + W6-Recherche)
+**Stufe 1+2 abgeschlossen (cache-engine HEAD 2d55de3, Diplomarbeit e576f61):**
+- ✅ CMake-Optionen `COMDARE_AXIS_06_ENABLE_<VENDOR>` (Default ON)
+- ✅ `axis_06_allocator_flags.hpp.in` configure_file mit `USE_<VENDOR>` = ENABLE && HAVE
+- ✅ `vendor_includes/` Shims mit Forward-Stubs (einzige #if-Stelle pro Vendor)
+- ✅ `axis_06_allocator_registry.hpp` mit `AllVendors` + `EnabledVendors` mp_filter
+- ✅ Wrapper StdMalloc/Mimalloc/Snmalloc/PMR refactored: KEIN `#ifdef COMDARE_HAVE_*` mehr, alles via `static constexpr bool enabled = flags::<vendor>_enabled` + `if constexpr`
+- ✅ 33/33 Standalone-Tests + 104/104 Diplomarbeit-Tests gruen
+
+**Stufe 3 ANGEFANGEN, Observer-Konzept BLEIBT als Pflicht-Architektur (Aktivierung verschoben):**
+- Observer-Konzept ([[statistics-observer-pflicht]]) ist und bleibt **Pflicht-Bestandteil** der Architektur — User-Klarstellung 2026-05-26: "das observer Konzept ist NICHT gestrichen"
+- Concept-Constraint `typename observer_t + observer()` Pflicht wenn STATISTICS=ON wurde im Concept-File temporaer auskommentiert (TODO-Marker), weil WRAPPER-Klassen die observer_t-API noch nicht implementieren
+- TODO-Marker steht jetzt im Concept-File als verbindliche Erinnerung — Aktivierung in der naechsten Iteration zusammen mit Wrapper-Updates
+- **Naechste Iteration F.6.1.I:**
+  1. Wrapper-Klassen erweitern: `using observer_t = ::comdare::cache_engine::measurement::MeasurableObserver<snapshot_t>;`
+  2. Wrapper-Member: `observer_t observer_;`
+  3. Wrapper-Methode: `[[nodiscard]] observer_t const& observer() const noexcept { return observer_; }`
+  4. allocate/deallocate/reallocate/zero_allocate ergaenzen um `observer_.notify(stats_);` nach jedem stats-Update
+  5. Concept-Constraint im axis_06_allocator_cache_engine_permutation_concept.hpp REAKTIVIEREN (TODO-Kommentar entfernen)
+  6. Tests fuer Observer-Notify-Pattern (Callback-Registrierung + notify-Empfang)
+
+### §15.9 Pflicht min-1-Algorithmus pro Achse (User-Direktive 2026-05-26)
+
+User-Direktive: "Wir definieren, dass wir je Achse mindestens einen Algorithmus fuer
+Permutationen anbieten muessen, dazu verwenden wir ebenfalls mp11. Soweit ich das sehe,
+fuehrt diese fehlende Grenze derzeit dazu, dass noch verbotene Permutationen moeglich
+sind, die der CacheEngineBuilder erlauben koennten den Build zu crashen."
+
+**Heute (Stufe 2 LIVE):**
+- `axis_06_allocator_registry.hpp` hat `static_assert(mp_size<EnabledVendors>::value > 0)`
+- Aber **nur** als Sanity-Check innerhalb dieser einen Achse — KEINE achsen-uebergreifende Grenze
+
+**Soll-Erweiterung (Stufe 3+):**
+- **Topic-uebergreifender mp11-Constraint:** PermutationEngine pruefe pro Achse dass `mp_size<EnabledVendors_<axis>>::value >= 1`
+- **CacheEngineBuilder muss Achsen-Vollstaendigkeit validieren** BEVOR er CMake-Build mit `cmake -DCOMDARE_AXIS_<NN>_ENABLE_<V>=ON|OFF` Build-Flags startet
+- **Crash-Vermeidung:** wenn der Builder eine Achse mit 0 Variants konfigurieren wuerde → frueh Compile-Fail-Diagnostik (klar formuliert), NICHT spaeter Linker-Crash
+
+**Konkrete Implementation (TODO V41.F.6.1.H):**
+```cpp
+// src/permutations/permutation_engine.hpp (NEU, geplant)
+template <class... TopicAxisLists>
+class PermutationEngine {
+    // Compile-Time Pflicht: alle Achsen-Listen NICHT-leer
+    static_assert(
+        (boost::mp11::mp_size<typename TopicAxisLists::variants>::value > 0 && ...),
+        "PermutationEngine: jede Topic-Achse muss mindestens 1 enabled Vendor haben."
+        " Pruefe COMDARE_AXIS_<NN>_ENABLE_<VENDOR> CMake-Flags pro Achse."
+    );
+    // ...
+};
+```
+
+### §15.10 USE-Flags via CacheEngineBuilder CLI (User-Direktive 2026-05-26)
+
+User-Direktive: "Die CacheEngineBuilder Anwendung wird die Kompilation mit Build-Flags
+fuer die Permutation-Binary aufrufen und daher direkt auf der Kommandozeile setzen."
+
+**Konkrete Implementation (TODO V41.F.6.1.G):**
+
+```cpp
+// apps/cache_engine_builder/main.cpp (geplant)
+int main(int argc, char** argv) {
+    auto meta_cfg = load_meta_config(argv[1]);
+
+    // Compile-Time: enumeriere alle Permutationen aus TopicConfigSet (siehe §15.7)
+    mp_for_each<allocator::TopicConfigSet::StaticAxisVariants>([&](auto V){
+        // Pro Permutation-Variant ein CMake-Build mit dynamischen Flags via CLI
+        std::string cmake_cmd = "cmake -B build/perm_" + std::to_string(V::variant_hash);
+        cmake_cmd += " -DCOMDARE_AXIS_06_ENABLE_STD=OFF";       // disable
+        cmake_cmd += " -DCOMDARE_AXIS_06_ENABLE_" + std::string{V::name} + "=ON";  // enable nur dieser
+        // ... weitere Achsen-Flags pro Permutation-Element
+        std::system(cmake_cmd.c_str());
+
+        // dann: cmake --build build/perm_<hash> --config Release
+    });
+}
+```
+
+**Vorteil:**
+- Keine separate Build-Konfig-Datei je Permutation noetig
+- CMake-Cache pro Permutations-Build-Verzeichnis isoliert
+- Pro Permutation eine eigene Binary `perm_<hash>.so/.dll`
+- CacheEngineBuilder kontrolliert vollstaendig welche Vendor je Permutation aktiv sind
+
+**Konsequenz fuer Stufe 1+2 Refactoring:**
+- Die heute vorhandene `COMDARE_AXIS_06_ENABLE_*` Optionen sind die richtige Schnittstelle fuer den CacheEngineBuilder
+- HAVE-Detection bleibt im ext/CMakeLists.txt (Verfuegbarkeit der Vendor-Header)
+- USE = ENABLE && HAVE als effektive Aktivierung weiterhin via CMakeLists.txt am Ende
+
+### §15 Status-Marker (Stand 2026-05-26 Session-Ende)
+
+- **Doku-Aufnahme:** 2026-05-25 abendlich → 2026-05-26 Session-Ende
 - **W6 Web-Recherche:** DONE (zentralisierte CMake-Topic-Registrierung + MP11-Akkumulation)
-- **Refactoring Batch 1+:** UNMITTELBAR NAECHSTER SCHRITT (User-Direktive Vollausbau)
-- **§15.7 TopicConfigSet + CacheEngineBuilder:** wird in F.6.1.D zusammen mit PermutationEngine-Anbindung umgesetzt
-- **Tasks angelegt:** #655 W6 (done), #656 F.6.1.C.R1, #657 F.6.1.D, #658 F.6.1.E
+- **Refactoring Batch 1 Stufe 1+2:** DONE (cache-engine 2d55de3 + Diplomarbeit e576f61)
+- **Stufe 3 (Observer-Concept + PermutationEngine + iterable_aspect_t):** PENDING (TODO #657 + #658)
+- **§15.7 TopicConfigSet + CacheEngineBuilder:** PENDING in F.6.1.D
+- **§15.8 Concept-Constraint observer_t:** REVERTIERT, naechste Iteration aktivieren + Wrapper updaten
+- **§15.9 min-1-Algorithmus pro Achse:** TODO neu (CacheEngineBuilder darf keinen 0-Achsen-Build starten)
+- **§15.10 CacheEngineBuilder CLI-Flags:** TODO neu (apps/cache_engine_builder/main.cpp Refactor)
+- **Tasks:** alle #635-#658 (siehe TaskList)
