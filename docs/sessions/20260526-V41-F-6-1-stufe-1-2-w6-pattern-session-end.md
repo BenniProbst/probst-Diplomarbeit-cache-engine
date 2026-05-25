@@ -72,14 +72,24 @@
 4. **`MEMORY.md`** (immer)
 5. **Tasks #657-#661** als naechste Code-Schritte
 
-## §6 Naechste-Session Erste Schritte
+## §6 Naechste-Session Erste Schritte (KORREKTE REIHENFOLGE — User-Klarstellung 2026-05-26)
+
+**HAUPT-PHASEN (Stufe 3 + 4 wie urspruenglich geplant):**
 
 1. Build-Verifikation (33 standalone + 104 Diplomarbeit Tests gruen)
-2. F.6.1.I Stufe 3 fertigstellen: Wrapper observer_t + observer() + notify + Concept-Reaktivierung
-3. F.6.1.H min-1-Algorithmus mp11-Constraint in PermutationEngine
-4. F.6.1.D PermutationEngine + EnabledVendors-Konsum
-5. F.6.1.E iterable_aspect_t Pattern
-6. Batch 2 Vendor (A05/A06/A20)
+2. **F.6.1.I Stufe 3:** Wrapper observer_t + observer_ Member + observer() + notify in alloc/dealloc/realloc/zero_alloc + Concept-Reaktivierung + Tests
+3. **F.6.1.D Stufe 4:** PermutationEngine + EnabledVendors-Konsum + Visitor-Pattern + Pruefling-Filter
+4. **F.6.1.E:** iterable_aspect_t Hybride Laufzeit-Permutation Pattern
+
+**ERGÄNZUNGEN (User-Reviews 2026-05-26, kommen DANACH):**
+
+5. **F.6.1.H ERGÄNZUNG:** min-1-Algorithmus pro Achse mp11-Constraint (achsen-uebergreifend in PermutationEngine)
+6. **F.6.1.G ERGÄNZUNG:** CacheEngineBuilder CLI-Build-Flags (apps/cache_engine_builder Refactor)
+
+**Vendor-Vollausbau (parallel oder danach):**
+
+7. Batch 2 Vendor (A05 Jemalloc + A06 TCMalloc + A20 dlmalloc)
+8. Batch 3-8 (alle 23 Vendor in 3er-Batches mit User-Review-Pause)
 
 ## §7 Cross-Repo-Stand
 
