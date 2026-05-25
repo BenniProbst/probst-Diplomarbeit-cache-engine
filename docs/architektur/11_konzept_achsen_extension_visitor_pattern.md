@@ -296,6 +296,8 @@ libs/cache_engine/
     └── ...
 ```
 
+Kommentar des Users zur Struktur: Bei value_buffer erzeugen wir eine Axe "queuing" und recherchieren im Web, welche Buffer Implementierungen es für diese Achse geben kann: kein Buffer, oder bestimmte buffer Strategien wie FIFO, LIFO und so weiter, dabei verschiedene Buffer Größen -> Buffer muss gleichzeitig der Achsen-Konfiguration der Allokation unter eigener Permutation gegen die Buffer Strategie unterliegen, mithilfe von Metaprogrammierung. "identity" war die Basisklasse des Suchalgorithmus und ist definitiv src. Von hier aus werden angefragte Suchalgorithmus-Permutationen oder Listen-Permutationen custom als Binary Modul gebaut (suche nach dem Stichwort default "Precompiled"). Measurement ist ein submodule der cache-engine für das Abbilden der Messung - bitte überprüfe bestehende comdare Module, ob es das nicht schon gibt und wir erweitern sollten, anstatt ein völlig neues Modul auf zu machen -> bessere Wiederverwendbarkeit. Wir sollten alle nun aufgeteilten submodules unter cache-engine prüfen, ob nicht schon was ähnliches und erweiterbares in den Projekte/Comdare-Modules existiert. internal_search ist ein Unterpunkt von traversal und kann gelöscht werden, weil es schon traversal Achsen gibt. Noch nicht zugeordnete Achsen brauchen jeweils ein Hauptthema (oder teilen sich ein Hauptthema), welches zum Umsetzungsort im Suchalgorithmus passt.
+
 **Pruefling-Namespace pro Achse:**
 
 Jedes `axes/<axis_NN>/` Verzeichnis hat zusaetzlich `optional_<pruefling>_impl/` Slot fuer Pruefling-Override:
@@ -308,32 +310,54 @@ topics/allocator/axis_06_allocator/
                                # leer = cache-engine-Defaults werden als Fallback verwendet
 ```
 
+Kommentar des users: Das ist richtig, aber "optional_prt_art_impl" heißt am besten einfach "prt_art_impl" und ist Teil des prt-art Projektes, welches durch die cache-engine geladen und durch seine bloße dynamische cmake include Technik in die cache-engine geladen wird (reine cmake Konfiguration von prt-art mithilfe von C++23 Metaprogrammierung mit Auflistung von fremden includes -> recherchiere das Feature im Web).
+
 ### §3.1 NEUE Rueckfragen aus Hierarchie-Korrektur
 
 Bevor F.6.1.A startet, muss diese Topic-Zuordnung mit User abgestimmt werden:
 
 **RQ-1:** Topic-Concepts und Achsen-Concepts sind beides vorhanden. Hat das Topic ein eigenes "Topic-Concept" das alle Achsen-Concepts darunter erfuellen muessen, oder existieren Topic-Concepts nicht und nur Achsen-Concepts werden geprueft? (Vorschlag: Beides — Topic-Concept ist breit ("alle haben insert/lookup"), Achse-Concept ist enger ("Allocator hat allocate/deallocate")).
 
+Antwort des Users: Ja, jedes Topic hat ein generelles Concept, von dem die Achsen ihre Concepts ableiten und spezifizieren, wir haben also eine saubere zweischichtige Architektur. Jeder Ordner und Unterordner hat genau ein File für die Definition aller concepts des Ordner- oder Unterordner Suchraums. Also ja beides.
+
 **RQ-2:** Topic-Zuordnung der noch nicht zugeordneten Achsen:
-- Achse 1 (Index-Organization) → eigenes Topic? Oder unter `traversal/`?
-- Achse 2 (Path-Compression) → eigenes Topic? Oder unter `nodes/`?
-- Achse 9 (ISA) → eigenes Topic `isa/`? Oder unter `src/abi/`?
-- Achse 12 (Hardware-Strategy) → eigenes Topic? Oder unter `src/`?
-- Achse 13 (Scheduling-Strategy) → eigenes Topic? Oder unter `src/`?
+- Achse 1 (Index-Organization) → eigenes Topic? Oder unter `traversal/`? -> traversal
+- Achse 2 (Path-Compression) → eigenes Topic? Oder unter `nodes/`? -> nodes
+- Achse 9 (ISA) → eigenes Topic `isa/`? Oder unter `src/abi/`? -> neues topic /hardware
+- Achse 12 (Hardware-Strategy) → eigenes Topic? Oder unter `src/`? -> Achse unter /hardware -> als "general_hardware" neben dem ISA Achse.
+- Achse 13 (Scheduling-Strategy) → eigenes Topic? Oder unter `src/`? -> Zerlegen je topic, weil Scheduling kann im Buffer, im concurrency, im IO und vielen anderen Bereichen auftreten und muss jeweils im Topic eine NEUE SEPARATE zu permutierende Achse bilden. Dies ist ein experimentell wertvoll zu variierender Faktor. Bitte recherchiere im Web zu welchen Topic- UND Achsen-Themen scheduling auftreten kann.
 
 **RQ-3:** Hat `value_buffer/` eine eigene Achse oder ist es nur Hilfsfunktion (`src/`)? In Bausteine-Matrix nicht eindeutig.
 
+Antwort des Users:
+Siehe RQ2 und vorangegangenes.
+
 **RQ-4:** Hat `identity/` eine eigene Achse, oder ist es eine Pruefling-Identifikation die unter `src/` (oder unter dem Pruefling-spezifischen Repo) liegt?
+
+Antwort des Users:
+Siehe RQ2 und vorangegangenes.
 
 **RQ-5:** Hat `measurement/` eigene Achsen, oder ist es Mess-Infrastruktur (gehoert dann zu `comdare-measurement` Submodule)?
 
+Antwort des Users:
+Siehe RQ2 und vorangegangenes. Das measurement wird von der CacheEngineBuilder laut UML Plan bedient und kann von ihr durchgewechselt werden. Die Struktur der topics und Achsen betrifft NUR die zu konstruierenden Experiment Binary Permutationen der Suchalgorithmen bzw. Listen-Algorithmen. Alles was klar per Architektur außerhalb des direkten Kontextes von Suchalgorithmus-Achsen-Permutationen liegt, ist Teil der Experimentier Struktur, also Diplomarbeit, welche die Cache Engine mit Konfigurationen bedient. Alles was also in der Cache Engine in src liegt bedient nur die CacheEngineBulider Instanz, welche die Experimente misst und durchwechselt, sowie on demand Prebuild der Binary-Module der Suchalgorithmen vornimmt. Dazu kann die cache-engine Submodule verwenden, um die für "alles drum rum" notwendigen Einrichtungen bereitzustellen.
+
+
 **RQ-6:** `default_lookup/` ist nach Audit ein **Vermittler** zwischen prt-art und cache-engine-Achsen (3.B, 6.2-6.4, 8.2, 9, 11, 12, 13). Bleibt es als eigenes Topic in cache-engine, oder werden die 9 Marker direkt in die jeweiligen Achsen-Verzeichnisse migriert (z.B. `topics/allocator/axis_06_allocator/sub_62_reclamation/` enthaelt dann die `prt_art_uses_default.hpp` Marker)?
+
+Antwort des users: Eigentlich ist diese Einrichtung ein Strategy pattern, welches durch einen Interpreter die Konfigurationen der Diplomarbeit lesen und per Metaprogrammierung statisch kompilieren sollte. Dort sind bereits Einrichtungen für Experimente vorbereitet und angedeutet, aber noch nicht vollständig bezüglich der Konfiguration der Achsen. Der default_lookup gehört also zur src als Konfiguration der CacheEngineBuilder (bitte präzise die drawio Detail UML nachlesen für Architektur). Die Aufgabe von default_lookup ist es aus der Cache Engine heraus bei dynamisch konfigurierten Prüflingen, auch deren Konfiguration aufzunehmen und zu validieren. Wir hatten eine massive Architektur Verdrehung in der letzten session erlitten, dass der prt-art die Hauptrolle spielen wollte, was aber falsch ist. Im Prinzip ist es also richtig, dass der Default lookup damit Vermittler zwischen Cache Engine und Prüflingen/prt-art ist (nicht umgekehrt!). Die Registry ist auf der Seite des prt-art in Kombination der neuen Topics/Axes Architektur weiterhin erforderlich, muss allerdings durch das neue Namespace System ersetzt werden. Ist analog ein Prüflings-Subnamespace eines cache-engine namespaces vorhanden (automatische Erkennung), dann wird das Feature automatisch unter dem betreffenden Prüfling für Experimente registriert, fehlende eigene Achsenimplementierungen werden auch automatisch erkannt. Keine Implementierung einer Achse (also kein comdare::cache_engine::numa_default::prt_art (merke prt_art als Namespace Anzeige einer validen zusätzlichen Implementierung auf die cache_engine Basis) bedeutet vollständige Übernahme der Cache Engine Permutationen einer Achse aus der Cache Engine Bibliothek. Wir emulieren damit also mit Metaprogrammierung ein Vererbungs-System mit der Cache Engine als allgemeinsten Fall einer "Klasse" und dem Prüflings-Algorithmus als Spezifikation und Erweiterung.
 
 **RQ-7:** `internal_search/` (Array256, Array65535, VectorU8U8, VectorU16U16) sind die default_variants/ der Achse 3.A SearchAlgo-Traversal. Bleibt es als eigenes Topic oder wandert es als `topics/traversal/axis_03a_search_algo/default_variants/`?
 
+Antwort des Users: Das habe ich weiter oben schon beantwortet.
+
 **RQ-8:** `src/` global vs. `src/` pro Topic — beides parallel? Hilfsfunktion die ueber mehrere Topics genutzt wird (z.B. `VirtualOffsetAddress` von memory_layout + traversal): liegt sie global oder im Topic mit "Haupt-Owner"?
 
+Antwort des users: Habe ich weiter oben schon beantwortet. Ja src ist global, aber die Topics sind paralle zu src und beinhalten speziell die "modular" erweiterbaren Achsen (je mindestens eine ) je Topic.
+
 **RQ-9:** Sub-Achsen wie 6.2 (Reclamation): bekommt das eigene `default_variants/` + eigenes `optional_prt_art_impl/`, oder erbt die Sub-Achse die Slots der Eltern-Achse 6?
+
+Antwort des Users: Du vermischt hier grundsätzlich das Zielprojekt unserer Bemühungen (die Cache Engine) mit dem prt-art von dem wir verschieben wollen. Wenn ein Prüfling Topics und dann auch Achsen erweitern will, muss die Cache Engine alle diese Strukturen vorhalten und der prt-art hat exakt dieselbe Topics Struktur (nur vollständig wo notwendig für überschreibende Achsen), um die Cache Engine Basis Struktur zu erweitern. Daher existiert weder "default_variants" noch "optional_prt_art_impl" . Es gibt die Cache Engine und den prt-art. Sonst nichts. Stelle gerne nochmal Rückfragen, dieser Punkt scheint mir am weitesten vom Plan weg zu sein. Reclamation ist einfach eine Achse in einem am besten passenden Topic, welches sich um Speicher kümmert.
 
 ---
 
@@ -366,6 +390,9 @@ Stufe 3: Full Join (Multi-Pruefling)
    Wichtig: nicht-redundant, d.h. wenn ein Pruefling eine Default-Variante reuses,
             wird sie nur einmal gezaehlt
 ```
+
+Kommentar des Users: Wieder unscharfe Architektur Abgrenzung. Ein Prüfling ist ein KOMPLETTES Achsen-Kompendium eines neuen Suchalgorithmus Vorschlages. Das heißt ein eigenes Projekt. Eine Prüflings-Binary ist dahingegen ein build einer exakten Rekombination aus neuen und bestehenden Algorithmen je Achsen-Schicht. Daher kann es je Prüfling NIE NUR EINEN BUILD geben, sondern eine Metaprogrammierte Sammlung aus Builds der Rekombinationen - das können einerseits für die Cache Engine, als auch für den Prüfling mehrere zehntausende Rekombinationen für einzelne binaries sein, welche je in einem EIGENEN Experiment durchgemessen werden (von der CacheEngineBuilder Klasse als orchestrator). Die 3 Modi setzen fest, dass zu Beginn erst die Rekombinations-binaries der Cache Engine, dann die der Prüflinge einzeln, und dann je Achsen-Schicht die möglichen Rekombinationen der Cache Engine gegen ein separates Permutationssystem multipler Prüflinge+CacheEngine gegeneinander als Permutationen der full join Achsen ausgewertet werden. Hier entstehen je der 3 Modi zehntausende (default static) binaries, die als C++23 Modul feature dynamisch in die CacheEngineBuilder als Prüflings-Binary geladen werden. Also Prüfling != Prüflings-binary !!! Der Prüfling liefert ein komplexes Messprofil aus den Prüflings-Binaries, die über die Achsen Ergebnisse in der Dimensionalen Ordnung der Anzahl der Achsen liefern. Das sind gigantische Experiment Setups für große Super-Computer wie das ZIH der TU Dresden.
+
 
 **Compile-Time-Logik fuer "ERSETZT-mit-Fallback" pro Stufe (User-Antwort 2):**
 
@@ -587,3 +614,465 @@ Aufgrund der Hierarchie-Korrektur entstehen 9 neue Detail-Rueckfragen — gesamm
 2. Nach Antwort: F.6.1.A Concepts pro Achse implementieren
 3. Pilot in F.6.1.F validieren
 4. Rollout F.6.1.G + F.6.2 + F.6.3
+
+---
+
+## §11 Konsolidierungs-NACHTRAG 2026-05-25 (W1/W2/W3 Web-Recherchen + UML REV7 + bestehende Struktur)
+
+### §11.1 W1-Ergebnis: C++23 Modules NICHT geeignet → configure_file Master-Header
+
+**Verdikt:** Echte C++23 Modules (`import`) erzwingen Kopplung (Konsument muss expliziten `import comdare.ce.prt_art;` schreiben). Das widerspricht dem Pruefling-Unabhaengigkeits-Ziel.
+
+**Empfohlene Mechanik (3-fach):**
+
+```cmake
+# 1. prt-art exportiert sich als INTERFACE-Provider
+add_library(comdare_ce_prueflinge_prt_art INTERFACE)
+target_include_directories(comdare_ce_prueflinge_prt_art INTERFACE include)
+set_property(TARGET comdare_ce_prueflinge_prt_art APPEND PROPERTY
+    INTERFACE_COMDARE_CE_PRUEFLING_HEADERS
+        "prt_art/extensions/allocator_extension.hpp"
+        "prt_art/extensions/traversal_extension.hpp")
+
+# 2. cache-engine sammelt + generiert Master-Header
+foreach(tgt IN LISTS COMDARE_CE_PRUEFLINGE)
+    get_target_property(h ${tgt} INTERFACE_COMDARE_CE_PRUEFLING_HEADERS)
+    list(APPEND _all_headers ${h})
+endforeach()
+set(CE_PRUEFLING_INCLUDE_LINES "")
+foreach(h IN LISTS _all_headers)
+    string(APPEND CE_PRUEFLING_INCLUDE_LINES "#include \"${h}\"\n")
+endforeach()
+configure_file(prueflinge_includes.hpp.in
+               ${CMAKE_BINARY_DIR}/generated/comdare/ce/prueflinge_includes.hpp
+               @ONLY)
+```
+
+```cpp
+// 3. C++20/23 concept-Detection auf Namespace-Inhalt
+#include <comdare/ce/prueflinge_includes.hpp>  // auto-generiert, leer wenn keine Prueflinge
+
+namespace comdare::cache_engine::allocator::axis_06 {
+
+template <typename = void>
+concept has_prt_art_variants = requires {
+    typename prt_art::PrueflingVariants;
+};
+
+template <typename Permuter>
+constexpr auto generate_permutations() {
+    if constexpr (has_prt_art_variants<>) {
+        return Permuter::expand(prt_art::PrueflingVariants{});
+    } else {
+        return Permuter::defaults();
+    }
+}
+}
+```
+
+**Referenzen:** Kitware C++ Modules Blog (Hanwell 2024), Crascit Modules/CMake/Shared (2024), Catch2 configure_file Pattern, Boost.Hana Detection-Idiom.
+
+### §11.2 W2-Ergebnis: Achse "queuing" mit 13 Strategien × 6 Sizes
+
+**Neue Achse `queuing` (ehemals `value_buffer`):**
+
+| ID | Strategie | Anwendung |
+|----|-----------|-----------|
+| Q-NONE | NoBuffer | Klassisch B+ / ART (Leaf direkt) |
+| Q-APP | AppendOnly (Linear) | LSM-MemTable, Bw-Tree Delta-Chain |
+| Q-FIFO | FIFOQueue (Ring/Deque) | LSM, Write-Coalescing |
+| Q-LIFO | LIFOStack | Hot-Path Reuse, Versions-Tombstones |
+| Q-RING | BoundedRing<N> | SPSC/MPMC, Disruptor-Pattern |
+| Q-PRIO | PriorityHeap | LRU-Approx, Hot-Key Promotion |
+| Q-DELTA | DeltaChain | **Bw-Tree (Levandoski 2013)** |
+| Q-SKIP | SkiplistBuffer | LSM (RocksDB, LevelDB) |
+| Q-TOMB | TombstoneBuffer | LSM, ART-Optimistik, MVCC |
+| Q-COW | CopyOnWrite Snapshot | Persistent ART, RCU-Tries |
+| Q-EPOCH | EpochBuffer (QSBR) | SMART ART (OSDI 2023), Masstree |
+| Q-BATCH | BatchedInsertBuffer<N> | OLAP-Index, ART-Bulk-Insert |
+| Q-SPSC | LockFreeSPSC (Lamport) | Per-Thread → Background |
+| Q-MPMC | LockFreeMPMC (Vyukov/MS) | Globaler Write-Pfad |
+
+**Sweep-Groessen:** {0, 8, 64, 1024, 16384, dynamic_2x} (6 Werte) × 13 Strategien = **78 Konfigurationen, ~38 nach Constraint-Filter valide**.
+
+**Cross-Constraints (Buffer × Allocator) als compile-time `requires`-Klausel:**
+```cpp
+template<QueuingKind Q, class Alloc>
+inline constexpr bool valid_combo_v = []{
+    if constexpr (Q == QueuingKind::AppendOnly)
+        return AllocatorTrait<Alloc>::is_monotonic;
+    if constexpr (Q == QueuingKind::Epoch)
+        return AllocatorTrait<Alloc>::supports_qsbr;
+    return true;
+}();
+```
+
+**Wissenschaftliche Referenzen:** Leis (ART, ICDE 2013), Luo (SMART, OSDI 2023), Levandoski (Bw-Tree ICDE 2013), Mao (MassTree EuroSys 2012), O'Neil (LSM 1996), Disruptor (Thompson 2011), Vyukov MPMC, Michael-Scott PODC 1996, McKenney RCU (OLS 2001).
+
+### §11.3 W3-Ergebnis: Scheduling als 7 Sub-Achsen pro Topic
+
+User-Direktive 2026-05-25: Scheduling ZERLEGEN je Topic. W3-Recherche liefert konkrete Sub-Achsen:
+
+| Topic | Sub-Achse | Varianten |
+|-------|-----------|-----------|
+| `queuing` (buffer) | `buffer::flush_policy` | eager_per_op / threshold_watermark / time_window / lazy_on_evict / adaptive_lsm |
+| `concurrency` | `concurrency::scheduler_topology` | per_core_pinned / work_stealing_global / work_stealing_numa_neighbor / hybrid_p_e_split (Intel) / coroutine_stackless / coroutine_stackful / learned_pmoss |
+| `io` (NEU? siehe RQ) | `io::dispatch_policy` | in_memory_only / sync_spill / async_io_uring_batch / read_ahead_tuned / cooling_classified (LeanStore) |
+| `prefetch` | `prefetch::interleave_depth` | none / single_lookahead_1 / group_prefetch_8 / coroutine_suspend_resume / amac_async_4 / adaptive_distance |
+| `allocator` | `allocator::pool_resize_policy` | eager_preallocate / lazy_first_use / hwm_watermark_75 / oom_reactive (CacheLib) / prediction_driven |
+| `telemetry` | `telemetry::collection_rhythm` | disabled / push_per_op / pull_5s / pull_60s / adaptive_sampled / hardware_pmu_driven (P-MOSS) |
+| `codegen` (Build-Time) | `codegen::permutation_emit_order` | lexicographic_serial / parallel_per_topic / dependency_dag_topological / hotpath_first_pgo |
+
+**Cross-Topic-Constraints (Beispiele):**
+- `buffer::lazy_on_evict + io::sync_spill = INVALID` (Burst-Konflikt)
+- `prefetch::adaptive_distance REQUIRES telemetry != disabled`
+- `allocator::prediction_driven REQUIRES telemetry::hardware_pmu_driven`
+- `buffer::adaptive_lsm + io::in_memory_only = INVALID`
+
+**Referenzen:** LeanStore (Leis ICDE 2018, PVLDB 17), P-MOSS (Mukherjee 2024), CoroBase (He PVLDB 14), Interleaving with Coroutines (Psaropoulos PVLDB 11), SAP HANA NUMA Scaling, CacheLib Slab-Rebalancing, Hyrise HPI.
+
+### §11.4 UML REV7 §4 Drei-Schichten-Hierarchie + Variadic-Template + Fingerprint
+
+Aus `docs/termine/20260508 Termin 7/Phase5_UML_Detail/24_architektur_skizze_REV7_2026_05_13.md`:
+
+```
+CacheEngine (Basis, Visitor-Wurzel)
+    ^
+    |  erbt
+execution_engine<processing_strategy_type>     (Provider: OS-Primitiven)
+    ^
+    |  erbt
+search_engine<collection<K,V>, ConfigPerm>     (Provider: Such-Patterns)
+    ^
+    |  Spezialisierung
+prt_art<K, V, ...>                              (Pruefling-SearchEngine)
+```
+
+**Layer-Provider-Rollen (Pflicht):**
+- CacheEngine: Stand-der-Technik-Bausteine + OS-Primitiven (Cache-Page-Topologie, Allocator-Pools, Concurrency-Disziplinen, Telemetrie, Scheduling-Heuristiken)
+- ExecutionEngine: stellt experimentelle OS-Primitiven via CacheEngine bereit (cache-line-aligned-Alloc, NUMA-pinning, ...)
+- SearchEngine: stellt Such-Patterns bereit (Trie-Walk, Range-Scan, Hot-Path-Lookup), Dach des Konstrukts
+
+**Pflicht-Regeln:**
+- SearchEngine darf NICHT direkt CacheEngine-Bausteine konsumieren → muss durch ExecutionEngine
+- ExecutionEngine darf KEINE Such-spezifischen Patterns kennen — nur OS-Primitiven-Ebene
+- PRT-ART als Pruefling-SearchEngine kann eigene Patterns hinzufuegen, faellt aber per Compile-time-Fallback auf ExecutionEngine-Primitiven zurueck
+
+**Variadic-Template-Magie:**
+```cpp
+// 1 Param: Value-only, Key = auto-incrementing uint64
+// 2 Params: (Key, Value)
+// N>2: (Key, std::tuple<Value1..N>)
+template <typename... Ts>
+class search_algorithm_type_collection {
+    using traits = type_collection_traits<Ts...>;
+    using key_t  = typename traits::key_t;
+    using value_t = typename traits::value_t;
+    using binary_key_t = decltype(fingerprint::to_binary_string(std::declval<key_t>()));
+};
+```
+
+**Komplexer Key → Fingerprint-Hash:**
+```cpp
+template <std::size_t Bytes = 16>
+class FixedLengthFingerprint {
+    static std::array<std::byte, Bytes> hash(auto const& complex_object);
+};
+// Overload: einfach-Typen direkter binary-cast, komplex via FixedLengthFingerprint<16>
+```
+
+### §11.5 Allokator-Achsen AA1-AA7 (UML REV7 §2.5)
+
+Bestehende Allokator-Achsen-Klassifizierung (analog 7 Such-Achsen):
+
+| Achse | Konzept | Beispiele |
+|-------|---------|-----------|
+| AA1 | Free-List-Topologie | A04 mimalloc Free-List-Sharding, A07 snmalloc Per-Thread-Caching, A19 Buddy-Tree |
+| AA2 | Size-Class-Schema | A02 Slab-per-Objektgroesse, A20 dlmalloc bins, A05 jemalloc size-classes, A08 scalloc spans |
+| AA3 | Thread-Locality | A06 tcmalloc thread-local-caches, A10 rpmalloc, A07 snmalloc message-passing |
+| AA4 | Synchronization | A03 lock-free CAS, A11 LRMalloc, A04 mimalloc-CAS-on-non-local-free, A01 Hoard-per-heap-locks |
+| AA5 | Allocation-Policy | A09 NUMA-origin-aware, A12 cache-set-aware, A14 NUCA-aware, A16 PIM-aware |
+| AA6 | Reclamation | A02 magazine cache, A06 page-heap-release, A17 lock-free-reclamation, A04 deferred-free |
+| AA7 | Fragmentation-Strategy | A20 dlmalloc coalescing, A02 object-coloring, A19 buddy-splitting, A04 page-local-sharding |
+
+### §11.6 MAPPING bestehende cache-engine libs/ → neue Topics+Achsen-Hierarchie
+
+**Bestehende libs/cache_engine/ Struktur (heute, HEAD `2eb21d6`):**
+
+| Pfad | Inhalt | Mapping nach neuer Hierarchie |
+|------|--------|-------------------------------|
+| `libs/cache_engine/subsystems/c01_cost_engine/` | Kosten-Modell | → `topics/cost/axis_<N>_*/` (NEU) ODER `src/cost_engine/` |
+| `libs/cache_engine/subsystems/c02_pinning_engine/` | NUMA-Pinning | → `topics/hardware/axis_12_general_hardware/sub_pinning/` |
+| `libs/cache_engine/subsystems/c03_prefetch_engine/` | Prefetch | → `topics/prefetch/axis_07_prefetch/` (bestehende Achse-7) |
+| `libs/cache_engine/subsystems/c04_coherence_engine/` | Cache-Kohaerenz | → `topics/concurrency/axis_08_concurrency/sub_83_coherence/` (NEU) |
+| `libs/cache_engine/subsystems/c05_telemetry_engine/` | Telemetrie | → `topics/telemetry/axis_11_telemetry/` |
+| `libs/cache_engine/subsystems/c06_allocation_engine/` | Allokator | → `topics/allocator/axis_06_allocator/` |
+| `libs/cache_engine/subsystems/c07_migration_engine/` | Migration | → `topics/migration/axis_<N>_migration/` (NEU?) — Rueckfrage |
+| `libs/cache_engine/subsystems/c08_encoding_engine/` | Encoding/Serialisierung | → `topics/serialization/axis_10_compression/` |
+| `libs/cache_engine/subsystems/c09_heuristik_engine/` | Heuristiken | → `src/heuristics/` (CacheEngineBuilder-internal) |
+| `libs/cache_engine/subsystems/c10_topologie_engine/` | Topologie | → `topics/hardware/axis_topologie/` (NEU?) |
+| `libs/cache_engine/subsystems/c11_scheduler_engine/` | Scheduling | **WIDERSPRUCH** zu User-Direktive "Scheduling zerlegen je Topic". Loesung: c11 wird zerlegt in 7 Topic-Sub-Achsen (W3-Ergebnis) |
+| `libs/cache_engine/subsystems/c12_filter_engine/` | Filter (z.B. Bloom) | → `topics/filter/axis_<N>_*/` (NEU?) |
+| `libs/cache_engine/subsystems/platform_profiler/` | Plattform-Probe | → `topics/hardware/axis_09_isa/sub_profiler/` |
+| `libs/cache_engine/concurrency_manager/array_concurrency/` | Concurrency Sub | → `topics/concurrency/axis_08_concurrency/sub_array/` |
+| `libs/cache_engine/concurrency_manager/data_structure_concurrency/` | | → `topics/concurrency/axis_08_concurrency/sub_data_structure/` |
+| `libs/cache_engine/concurrency_manager/memory_access_concurrency/` | | → `topics/concurrency/axis_08_concurrency/sub_memory_access/` |
+| `libs/cache_engine/concurrency_manager/node_concurrency/` | | → `topics/concurrency/axis_08_concurrency/sub_node/` |
+| `libs/cache_engine/concurrency_manager/page_concurrency/` | | → `topics/concurrency/axis_08_concurrency/sub_page/` |
+| `libs/cache_engine/concurrency_manager/path_concurrency/` | | → `topics/concurrency/axis_08_concurrency/sub_path/` |
+| `libs/cache_engine/concurrency_manager/simd_flow_concurrency/` | | → `topics/concurrency/axis_08_concurrency/sub_simd_flow/` |
+| `libs/cache_engine/concurrency_manager/simd_thread_concurrency/` | | → `topics/concurrency/axis_08_concurrency/sub_simd_thread/` |
+| `libs/cache_engine/reclamation/rcu_reclaim/` | Reclamation | → `topics/allocator/axis_06_allocator/sub_62_reclamation/` |
+| `libs/cache_engine/builder/{22 Subkomponenten}` | Builder-Infrastruktur | → `src/builder/*` (CacheEngineBuilder-Domaene, NICHT Topic) |
+| `libs/cache_engine/include/cache_engine/abi/` | ABI-Headers | → `src/abi/` |
+| `libs/cache_engine/include/cache_engine/concepts/` | Globale Concepts | → `src/concepts/` (Topics haben eigene Concepts) |
+| `libs/cache_engine/include/cache_engine/fingerprint/` | Fingerprint-Hash | → `src/fingerprint/` (Hilfsfunktion fuer Variadic-Template) |
+| `libs/cache_engine/include/cache_engine/hbm/` | HBM-Allokator | → `topics/allocator/axis_06_allocator/sub_64_huge_page/` |
+| `libs/cache_engine/include/cache_engine/indexes/` | Index-Strukturen (V41.A5 LinearProbeHashSet, RadixIndex) | → `topics/search_engine/axis_01_index_organization/default_variants/` |
+| `libs/cache_engine/include/cache_engine/measurement/` | Mess-Headers | → `src/measurement/` (CacheEngineBuilder-internal) |
+| `libs/cache_engine/include/cache_engine/platform/` | Plattform-Probe | → `topics/hardware/axis_09_isa/` |
+| `libs/cache_engine/include/cache_engine/platform_probe/` | (Duplikat?) | → konsolidieren mit platform/ |
+| `libs/cache_engine/include/cache_engine/strategy_command/` | Strategy-Pattern + Commands | → `src/strategy_command/` (Builder-Pattern, CacheEngineBuilder-internal) |
+| `libs/cache_engine/include/cache_engine/allocators/families/a01-a14_*/` | 14 Allocator-Familien | → `topics/allocator/axis_06_allocator/sub_61_alloc_lib/default_variants/{a01..a14}/` |
+| `libs/cache_engine/algorithm_profiles/{allocators,sota}/` | Algorithmus-Profile | → `src/algorithm_profiles/` |
+
+**Geplante NEUE Topics (nach User-RQ-Antworten + W3-Recherche):**
+
+| Topic | Achsen |
+|-------|--------|
+| `topics/allocator/` | axis_06 (mit Sub-Achsen 6.1-6.5 + neue 6.x scheduling) |
+| `topics/concurrency/` | axis_08 (mit Sub-Achsen 8.1, 8.2, 8.3 coherence + scheduling) |
+| `topics/traversal/` | axis_01 (Index-Org), axis_03a (Search-Algo), axis_03b (Cache-Traversal), axis_03m (Mapping) |
+| `topics/nodes/` | axis_02 (Path-Compression), axis_04 (Node-Type) |
+| `topics/memory_layout/` | axis_05 (Layout, mit AoS/SoA/AoSoA-Sub) |
+| `topics/prefetch/` | axis_07 (mit scheduling Sub) |
+| `topics/telemetry/` | axis_11 (mit scheduling Sub) |
+| `topics/serialization/` | axis_10 (Compression, mit scheduling Sub) |
+| `topics/value_handle/` | axis_14 (Inline/External/ChainRef) |
+| `topics/queuing/` (NEU, ex value_buffer) | axis_Q (13 Strategien, mit scheduling Sub) |
+| `topics/hardware/` (NEU) | axis_09 (ISA), axis_12 (general_hardware) |
+| `topics/search_engine/` (NEU?) | axis_01 (Index-Organization, fuer std::map/vector/list/multi_map Klassifizierung) |
+| `topics/io/` (NEU? siehe RQ-W3) | axis_io (mit scheduling Sub: io::dispatch_policy) |
+| `topics/migration/` (NEU? siehe RQ-Bestand c07) | axis_<N>_migration |
+| `topics/cost/` (NEU? siehe RQ-Bestand c01) | axis_<N>_cost |
+| `topics/filter/` (NEU? siehe RQ-Bestand c12) | axis_<N>_filter |
+
+**Geplante src/-Hilfsfunktionen (NICHT Topics, da achsenfrei):**
+
+```
+src/
+├── builder/                      # CacheEngineBuilder + 22 Subkomponenten
+├── abi/                          # ABI-Layer (execution_engine, search_engine)
+├── api/                          # Facade (ICacheEngine, IPrueflingFactory) (V41.E11)
+├── concepts/                     # Globale Cross-Topic-Concepts
+├── fingerprint/                  # FixedLengthFingerprint<Bytes>
+├── strategy_command/             # Strategy-Pattern + Command-Pattern fuer Builder
+├── algorithm_profiles/           # CMake-/XML-Profile
+├── default_lookup/               # Interpreter fuer Pruefling-Achs-Defaults (RQ-6 User-Antwort: src/)
+├── identity/                     # Pruefling-Identifikation (RQ-4 User-Antwort: src/)
+├── measurement/                  # Mess-Infrastruktur fuer CacheEngineBuilder (RQ-5: ggf. comdare-measurement Submodule)
+├── heuristics/                   # c09_heuristik_engine (Builder-internal)
+└── permutations/                 # PermutationVisitor + AxisVariantList + cartesian_product_t
+```
+
+### §11.7 NEUE Rueckfragen RQ-10 bis RQ-15 (aus W1/W2/W3/UML/bestehender Struktur)
+
+**RQ-10:** Bestehende `subsystems/c01_cost_engine/` (Kosten-Modell). Eigenes Topic `cost/` mit Achse(n) oder unter `src/`?
+
+**RQ-11:** Bestehende `subsystems/c07_migration_engine/` (Page-Migration zwischen NUMA-Nodes/HBM). Eigenes Topic `migration/` oder Sub-Achse von `topics/allocator/axis_06/sub_63_numa/`?
+
+**RQ-12:** Bestehende `subsystems/c12_filter_engine/` (Bloom-Filter, etc.). Eigenes Topic `filter/` oder Achse von `topics/search_engine/`?
+
+**RQ-13:** Bestehende `subsystems/c10_topologie_engine/`. Sub-Achse von `topics/hardware/` oder eigenes Topic?
+
+**RQ-14:** `io/` als neues Topic mit Achse `io::dispatch_policy` (W3-Empfehlung)? Oder Sub-Achse von `topics/allocator/axis_06/sub_64_huge_page/`?
+
+**RQ-15:** `topics/search_engine/axis_01_index_organization/` als Klassifizierungs-Achse fuer Such-Algorithmus-Familie (std::map / std::vector / std::list / std::multi_map / ...): konkretes Konzept-Skelett?
+
+### §11.8 Konkreter F.6.1.A Vorschlag (nach User-Validierung von §11.6 Mapping)
+
+**Pilot: Topic `allocator` mit Achse `axis_06_allocator` und Sub-Achse `sub_61_alloc_lib`:**
+
+```
+libs/cache_engine/topics/allocator/
+├── concepts/topic_concept.hpp     # Topic-Concept (breit, fuer alle Achsen darunter)
+└── axis_06_allocator/
+    ├── concepts/axis_concept.hpp  # Achsen-Concept (eng, alloc/dealloc)
+    ├── i_allocator_strategy.hpp   # CRTP-Basis + concept-Guard
+    └── sub_61_alloc_lib/
+        ├── concepts/sub_concept.hpp
+        ├── default_variants/      # KEIN extra Ordner — User RQ-9 Antwort
+        ├── std_malloc.hpp
+        ├── mimalloc.hpp
+        ├── ...
+        └── (prt_art Namespace-Slot existiert NICHT als Ordner —
+             prt_art-Code lebt im prt-art-Repo unter
+             `comdare::cache_engine::allocator::axis_06::sub_61::prt_art::*`,
+             cmake-Master-Header `prueflinge_includes.hpp` includiert ihn falls Submodule aktiv)
+```
+
+**Pilot-Code-Beispiel (cache-engine):**
+
+```cpp
+// libs/cache_engine/topics/allocator/axis_06_allocator/i_allocator_strategy.hpp
+namespace comdare::cache_engine::allocator::axis_06 {
+
+namespace concepts {
+    template <typename T>
+    concept AllocatorStrategy = requires(T t, std::size_t bytes) {
+        { t.allocate(bytes) } -> std::same_as<void*>;
+        { t.deallocate((void*)nullptr, bytes) } -> std::same_as<void>;
+        typename T::pool_kind_t;
+    };
+}
+
+template <typename Derived>
+    requires concepts::AllocatorStrategy<Derived>
+class AllocatorStrategyBase {
+public:
+    void* allocate(std::size_t bytes) {
+        return static_cast<Derived*>(this)->allocate_impl(bytes);
+    }
+    // Default-Methoden via CRTP-Inlining
+};
+
+}  // namespace
+```
+
+**Pilot-Code-Beispiel (prt-art Erweiterung):**
+
+```cpp
+// comdare-prt-art/include/prt_art/extensions/allocator_extension.hpp
+namespace comdare::cache_engine::allocator::axis_06::prt_art {
+
+struct PrtArtPoolAllocator
+    : public comdare::cache_engine::allocator::axis_06::AllocatorStrategyBase<PrtArtPoolAllocator> {
+    using pool_kind_t = ...;
+    void* allocate_impl(std::size_t bytes) { /* ... */ }
+    void deallocate(void* p, std::size_t bytes) { /* ... */ }
+};
+
+using PrueflingVariants = AxisVariantList<PrtArtPoolAllocator>;
+
+}  // namespace
+```
+
+**Pilot-CMake (prt-art):**
+
+```cmake
+add_library(comdare_ce_prueflinge_prt_art INTERFACE)
+target_include_directories(comdare_ce_prueflinge_prt_art INTERFACE include)
+set_property(TARGET comdare_ce_prueflinge_prt_art APPEND PROPERTY
+    INTERFACE_COMDARE_CE_PRUEFLING_HEADERS
+        "prt_art/extensions/allocator_extension.hpp")
+```
+
+**Pilot-CMake (cache-engine, generischer Master-Header-Generator):**
+
+```cmake
+# cache-engine bekommt von Diplomarbeit-Container die Pruefling-Liste
+foreach(tgt IN LISTS COMDARE_CE_PRUEFLINGE)
+    get_target_property(h ${tgt} INTERFACE_COMDARE_CE_PRUEFLING_HEADERS)
+    list(APPEND _ce_all_pruefling_headers ${h})
+    list(APPEND _ce_all_pruefling_targets ${tgt})
+endforeach()
+set(CE_PRUEFLING_INCLUDE_LINES "")
+foreach(h IN LISTS _ce_all_pruefling_headers)
+    string(APPEND CE_PRUEFLING_INCLUDE_LINES "#include \"${h}\"\n")
+endforeach()
+configure_file(prueflinge_includes.hpp.in
+               ${CMAKE_BINARY_DIR}/generated/comdare/ce/prueflinge_includes.hpp
+               @ONLY)
+target_link_libraries(cache_engine_topic_allocator INTERFACE ${_ce_all_pruefling_targets})
+```
+
+### §11.9 Status der laufenden W-Agents
+
+| Agent | Status | Output |
+|-------|--------|--------|
+| W1 (C++23 Modules + cmake) | ✓ DONE | configure_file Master-Header empfohlen, NICHT echte C++23 Modules |
+| W2 (Buffer/Queuing-Strategien) | ✓ DONE | 13 Strategien × 6 Sizes = 78 Permutationen, 38 valide |
+| W3 (Scheduling pro Topic) | ✓ DONE | 7 Sub-Achsen pro Topic + Cross-Constraints |
+| W4 (Doku-Audit vergessene Features) | LAEUFT | Erwartet: Liste vergessener Features aus gesamter docs/ |
+
+### §11.10 Naechste Schritte (KORRIGIERT nach W1/W2/W3/W4 + bestehende Struktur)
+
+1. **User-Validierung der §11.6 Mapping-Tabelle** (kritisch: 6 Rueckfragen RQ-10 bis RQ-15)
+2. **W4 fertig** (vergessene Features in §12 dokumentiert) — User-Priorisierung
+3. F.6.1.A Pilot: Topic `allocator/axis_06/sub_61_alloc_lib/` mit den 3 Mechaniken aus §11.1 (configure_file + INTERFACE-Target + concept-detection)
+4. F.6.1.B Q-Achse `queuing/` neu anlegen mit W2-Strategien
+5. F.6.1.C 7 Scheduling-Sub-Achsen pro Topic nach W3-Empfehlung
+6. F.6.1.D Mapping bestehender libs/* → topics/* per git mv schrittweise (104 Tests gruen halten)
+7. F.6.1.E `src/permutations/` mit PermutationVisitor + AxisVariantList (W1-Pattern)
+8. F.6.1.F BUILD-Test
+9. F.6.1.G Rollout auf 14+ Topics
+
+---
+
+## §12 W4 Doku-Audit Ergebnis: VERGESSENE FEATURES in V41-Planung
+
+W4-Agent durchsuchte `docs/` + Termin 7 Detailplanung. Liefert priorisierte Liste vergessener Features die Diplomarbeit-Ergebnis beeinflussen.
+
+### §12.A KRITISCH (P0) — direkt thesis-relevant
+
+| # | Feature | Quelle | Warum fehlt |
+|---|---------|--------|-------------|
+| A.1 | **H1/H2/H3 Hypothesen als formale Mess-Achse pro Permutation** | `uml_planning/Y2_prt_art_ist_kartografie.md:175`, `Z3_soll_uml_diplomarbeit_code.md:127-129` | V41 behaelt `hypothesis_metrics.hpp` als prt-art-SPEZIFISCH. ABER: H1 (PageType-Cost / CLU), H2 (Layout-Quality), H3 (Inline/External/ChainRef-Distribution) sind das **wissenschaftliche Resultat** und gehoeren pro Lauf evaluiert. V41.D2 deckt das nicht ab. |
+| A.2 | **V1-V4 Engine-Choice-Dimension** (Meta-Achse) | `architektur/11_axes_vs_strategies_disambiguation.md:301-322`, `glossar/02_domaenenmodell_v4_master.md` §1B, `bausteine/05_flag_system.md:170` Bank 14 EngineChoiceBank | F15-Forschungsmission braucht 4 Builds pro Permutation: V1=BaseEngine (Baseline), V2=Static-CE, V3=Informed-Kalibriert, V4=Adaptive. V41-Codegen erzeugt nur 1 Build/Permutation → **kein sauberer CE-Wirksamkeitsbeweis** |
+| A.3 | **IPlatformProbe Auto-Discovery** (K3.2) | `termine/.../10_korrektur_architektur_skizze_2026_05_09.md:60-107` | V41.A3 erwaehnt nur "TODO". F13 sagt "ZIH nutzt Runtime-Detection" — fehlt in Codegen. Pflicht-These der "Plattform-Kalibrierung" (P05 START, P14 Samuel) |
+
+### §12.B WICHTIG (P1) — F15-Permutationsraum erweiternd
+
+| # | Feature | Quelle | Action |
+|---|---------|--------|--------|
+| B.1 | **SDSL-Lite C++23-Portierung + comdare-succinct Modul** (F3-Beschluss) | `termine/.../Habich_Feedback_2026_05_08.txt:258-272` | NEUES Submodule `comdare-succinct/` mit BMI2/AVX-512/SVE2 ISA-Opt. Blockt Achse 1 LOUDS_DENSE/SPARSE/JACOBSON/MACRO_COCO |
+| B.2 | **comdare-rcu eigene Implementation** (F2-Beschluss) | `termine/.../Habich_Feedback_2026_05_08.txt:248-256` | NEUER Pfad `cache_engine/reclamation/comdare_rcu/`, liburcu nur KONZEPT. Achse 6.2 (Reclamation: epoch/RCU/hazard/QSBR) in V41 nicht abgebildet |
+| B.3 | **HBM Abstract Factory + Cache-Hierarchy-Manager** (F4-Beschluss) | `termine/.../Habich_Feedback_2026_05_08.txt:274-289` | `IHBMAllocator`-Concept mit IntelHBM/GraceHopperHBM/StandardDIMM. Pflicht-Plattform Sapphire Rapids HBM (P31/P32/P33 Habich-Linie) |
+| B.4 | **Hybrid-Command-Pattern-Aufloesungen** (K3.4) | `termine/.../10_korrektur_architektur_skizze_2026_05_09.md:134-178` Tabelle 12+ Aufloesungen | V41 behandelt SuRF Dense+Sparse monolithisch. Zerlegung in atomare Commands (`LoudsDenseEncodingCommand` + `LoudsSparseEncodingCommand` + `CutoffLevelLoudsCompositionCommand`). Ohne diese verliert F15 Ablations-Studien |
+| B.5 | **Reproduzierbarkeits-Slots** (Seeds, Warmups, Pinning, Compiler-Flags) | `termine/.../Begriffsglossar_v3_FINAL.txt:1125`, `termine/.../06_uml_persistence.md:69-78` (RunMetadata.config_hash:sha256) | Welch-Tests in V41.B3 ohne Provenance-Trail unvollstaendig fuer Publizierung |
+| B.6 | **D10-D13 PRT-ART-Permutationsdimensionen** aus REV 6 | `termine/.../23_architektur_skizze_REV6_2026_05_11.md:676-689` | D10 Suchtyp-Reihenfolge (6 Permutationen A/B/C/D), D11 Dichte-Schwellen kalibriert (30/55/80), D12 Fingerprint-Filter an/aus (P31), D13 Serialization-Wahl statisch/dynamisch Compile-Time |
+| B.7 | **Dataset-Permutations-Achsen** (F6/F7/F8) | `termine/.../Habich_Feedback_2026_05_08.txt:298-319` | F6: 4 Zipf-Theta-Klassen. F7: Mixed-Length Verteilungen. F8: Prefix-Sharing 10/50/80%. Nicht im V41.B2 YCSB-TODO |
+| B.8 | **Cluster F TUD-Habich iDMA + Strided** (P31/P32) | `termine/.../_paper_extractions/cluster_F_sync_tud_habich.md:255-466` | P31 `IIntelligentDMA`-Concept (push-down Pointer-Chasing, 10x Speedup). P32 "strided > SIMD" Re-Denken auf Sapphire Rapids. V41 hat keine strided-Achse |
+
+### §12.C OPTIONAL aber wertvoll fuer Thesis
+
+| # | Feature | Quelle |
+|---|---------|--------|
+| C.1 | LaTeX-Toolchain H3 (Auto-Compile mit Diagrammen, `\PRTARTPlot{...}` Bausteine) | Habich H3 (`Habich_Feedback_2026_05_08.txt:85-130`) + `06_uml_persistence.md:95-107` LatexRenderer |
+| C.2 | Code-Qualitaets-Bewertung pro Bausteine-Quelle (H2: `BAUSTEIN_BEWERTUNG.md` pro Adapter) | Habich H2 (`Habich_Feedback_2026_05_08.txt:46-83`) |
+| C.3 | Volle Plattform-Matrix (8 Plattformen): Ryzen 9950X3D, i9-14900KS, ARM Pi5 NEON, VisionFive2 RISC-V, Grace Hopper SVE2+HBM3 | T6-Konsolidierung (`_review/T6-konsolidierung.md:28`) |
+| C.4 | Achse 15 (Compiler) + Achse 16 (Allokator real vs Fallback) | V41.D2 erwaehnt, nicht implementiert |
+| C.5 | P15 Graefe Survey + P19 Saikkonen Layout-Invariante (konstante Update-Ops) | `Eigenschaften_Suchalgorithmen.txt:109-130, 265-278` |
+| C.6 | Achse 8 Original-Disziplinen-Liste (Page/Node/Array/DataStructure/Path/MemoryRW/SimdThread/SimdFlow) + 3 Mechaniken (OLC/ROWEX/RCU) | `Bausteine_Matrix.txt:516-547`. 14-Achsen-Erweiterung verlor die feinere Disziplinen-Liste |
+| C.7 | P29 RCU + P30 Hazard Pointers Pruefling-Permutationen (Achse 6.2) | `cluster_F_sync_tud_habich.md:92-254` |
+| C.8 | ZIH-Workspace-Strategie + Singularity-Container-Manifest + SLURM-Template (600 GPU-h + 20.000 Core-h Budget) | `CLAUDE.md` ZIH-Sektion |
+| C.9 | BART-Master Bonus-Bausteine P06 (6 BART-Varianten als F15-Vergleichsbasis) | `Bausteine_Matrix.txt:133-198, 302-323, 362-381` |
+
+### §12.D KRITISCH FEHLENDE Architektur-Patterns
+
+| # | Pattern | Quelle | Fehlende Bezug |
+|---|---------|--------|---------------|
+| D.1 | **IExecutingEngine-Wurzel** ueber ISearchEngine (K3.1) | `architektur/10_schichten_modell_M.md:0-50` (AA.2-Korrektur 2026-05-18) | CE und PRT-ART sind **gleichberechtigte ExecutionEngines**, vom CacheEngineBuilder via Command-Pattern orchestriert. V41 hat nicht das `IExecutingEngine`-Wurzel-Interface mit `ExecuteEngineACommand` + `ExecuteEngineBCommand` + `CompareResultsCommand` |
+| D.2 | **Multi-Pruefling-Faehigkeit** (M-Modell §6, Stufe 3 echtes Kartesisches Produkt) | `architektur/10_schichten_modell_M.md:226-240` | V41.F.5 markiert "comdare_perms_all = nur Aggregator, NICHT echtes Kartesisches Produkt 27×16=432". Multi-Pruefling-Full-Join fehlt |
+| D.3 | **ABI-stabiles C++23-Modul-Interface** als POD-ABI | `termine/.../23_architektur_skizze_REV6_2026_05_11.md:576-606` | `struct ComdarePermutationModule_v1` + `struct comdare_cache_engine_v1`. V41.E11 Facade ist verwandt, nicht identisch. Detail fehlt |
+
+### §12.E Empfohlene Top-7 fuer V42 (W4-Empfehlung)
+
+1. **H1/H2/H3 als Mess-Achse** in jeder Permutation auswerten (P0)
+2. **V1-V4 Engine-Choice-Multiplikation** in Codegen aktivieren (P0)
+3. **IPlatformProbe Auto-Discovery + Live-Tuning** implementieren (P0)
+4. **Hybrid-Command-Pattern-Aufloesung** (12+ Algorithmen aus K3.4-Tabelle) (P1)
+5. **Reproduzierbarkeits-Slots** (Seeds + RunMetadata.config_hash) (P1)
+6. **D10-D13 PRT-ART-Permutationsdimensionen** in Codegen (P1)
+7. **comdare-rcu + comdare-succinct + comdare-hbm** als Module (P1)
+
+### §12.F Wichtige Quelldateien fuer Audit (W4-Bericht referenziert)
+
+- `docs/termine/20260508 Termin 7/Habich_Feedback_2026_05_08.txt`
+- `docs/termine/20260508 Termin 7/Phase5_UML_Detail/10_korrektur_architektur_skizze_2026_05_09.md`
+- `docs/termine/20260508 Termin 7/Phase5_UML_Detail/23_architektur_skizze_REV6_2026_05_11.md`
+- `docs/bausteine/07_bausteine_matrix_N_erweitert.md`
+- `docs/architektur/11_axes_vs_strategies_disambiguation.md`
+- `docs/architektur/10_schichten_modell_M.md`
+- `docs/termine/20260508 Termin 7/Phase5_UML_Detail/_paper_extractions/cluster_F_sync_tud_habich.md`
+- `docs/uml_planning/Y2_prt_art_ist_kartografie.md`
