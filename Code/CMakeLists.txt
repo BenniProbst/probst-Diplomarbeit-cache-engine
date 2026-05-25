@@ -38,6 +38,25 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERS
 endif()
 message(STATUS "V38.A C++23-Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} OK")
 
+# V41.E2 (2026-05-25): Vendor-Lib User-Cache via ccache/sccache.
+# Vendor-Libraries (mimalloc-static.c, jemalloc/snmalloc Headers, etc.) werden
+# bei jedem clean-Build neu kompiliert (~5s pro perm × 43 perms = ~3min Overhead).
+# ccache/sccache cachen Compile-Output user-global -> spaeter clean-Build = instant.
+# Aktivierung: cmake compiler-launcher. Installation: 'choco install ccache' oder 'sccache'.
+option(COMDARE_USE_COMPILER_CACHE "Aktiviere ccache/sccache wenn verfuegbar (User-Cache fuer Vendor-Libs)" ON)
+if(COMDARE_USE_COMPILER_CACHE)
+    find_program(COMDARE_CCACHE_EXE NAMES ccache sccache)
+    if(COMDARE_CCACHE_EXE)
+        set(CMAKE_C_COMPILER_LAUNCHER "${COMDARE_CCACHE_EXE}" CACHE STRING "" FORCE)
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${COMDARE_CCACHE_EXE}" CACHE STRING "" FORCE)
+        message(STATUS "V41.E2 Compile-Cache aktiviert: ${COMDARE_CCACHE_EXE}")
+    else()
+        message(STATUS "V41.E2 ccache/sccache nicht gefunden. Vendor-Libs werden pro Build-Tree neu kompiliert.")
+        message(STATUS "  Aktivierung: 'choco install ccache' oder 'choco install sccache' (Windows)")
+        message(STATUS "  Linux/Mac:   'apt install ccache' / 'brew install ccache'")
+    endif()
+endif()
+
 option(COMDARE_DA_BUILD_TESTS "Build Diplomarbeit-Code Tests" ON)
 
 # V37.G (2026-05-23): Dynamische CPU-Core-Erkennung fuer optimale
