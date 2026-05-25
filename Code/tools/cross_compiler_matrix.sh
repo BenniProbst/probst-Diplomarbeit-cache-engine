@@ -73,7 +73,13 @@ for combo in "${COMBOS[@]}"; do
     rm -rf "$build_dir" 2>/dev/null
     t0=$(date +%s)
     cfg_log="$(mktemp)"
-    eval cmake -B "$build_dir" -G \"$generator\" $extra \
+    # PATH explizit pro Combo neu setzen (MinGW braucht libstdc++-DLL im PATH)
+    if [[ "$family" == "mingw" ]]; then
+        export PATH="${NINJA_BIN}:${MINGW_BIN}:${PATH:-}"
+    fi
+    # Direkt invoke ohne eval (Quoting-stabil) — extra ist eine Liste von -D-Flags
+    # shellcheck disable=SC2086
+    cmake -B "$build_dir" -G "$generator" $extra \
         -DCMAKE_BUILD_TYPE=$buildtype \
         -DCOMDARE_V32_ENABLE=ON \
         > "$cfg_log" 2>&1
