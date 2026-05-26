@@ -481,11 +481,46 @@ Bei Vollausbau aller Achsen (z.B. 10 node_types, 8 concurrency-Patterns, 5 prefe
 4. Pflicht-API: `insert(K,V) → bool`, `lookup(K) const → optional<V>`, `erase(K) → bool`, `clear()`
 5. Tests: alle 6 bekannten Compositions instantiieren via `SearchAlgorithmAnatomy<>` + Smoke
 
-### §14.2 Phase R3.2 — OriginalXxx-Wrappers-Entscheidung
+### §14.2 Phase R3.2 — OriginalXxx-Wrappers Promotion (KORRIGIERT 2026-05-26 spät)
 
-**Empfehlung Option D (NEU):** `OriginalXxx`-Wrappers werden DEPRECATED zugunsten
-`SearchAlgorithmAnatomy<XxxComposition>` Template-Instantiation. Loeschung in R3.3
-nach Anatomie-Pilot verifiziert.
+> **AUDIT-KORREKTUR:** Diese Sektion wurde zuvor (R3 Initial-Doku) faelschlich als
+> "Deprecation zugunsten SearchAlgorithmAnatomy<XxxComposition>" beschrieben.
+> Audit beim R3.2-Start zeigte: Die `OriginalXxx`-Wrappers sind im Registry
+> `axis_03a_search_algo_registry.hpp` als S04-S08 als **legitime search_algo-
+> Achsen-Werte** registriert — neben den CE-Re-Impls S01-S03 (Array256/VectorU8U8/
+> VectorU16U16). Sie passen exakt in die Organ-Metapher: alternative Skelett-
+> Auspraegungen mit Paper-Bindung statt Re-Impl. Property-Tests (SimdSubset=5/8,
+> DenseSubset=2/6) demonstrieren ihre Registry-Integration.
+
+**Korrigierte Strategie: PROMOTION statt Deprecation.**
+
+Fuer jeden OriginalXxx-Wrapper wird eine eigene PaperBinding-Composition
+angelegt, identisch zur Re-Impl-Composition AUSSER search_algo. Dadurch:
+
+1. Die Habich-Compliance bleibt erhalten (SHA256-Validation via Paper-Mixin)
+2. Beide Varianten (Re-Impl + Paper-Bindung) sind in der zentralen Anatomie austauschbar
+3. R4 PermutationEngine wird in mp_product BEIDE Varianten mit-iterieren
+
+**Implementation (R3.2 done):**
+
+5 neue Compositions:
+- `ArtPaperBindingComposition`      (search_algo = OriginalArtSearchAlgo S04, P01 ART unodb::db)
+- `HotPaperBindingComposition`      (search_algo = OriginalHotSearchAlgo S05, P02 HOT Patricia)
+- `StartPaperBindingComposition`    (search_algo = OriginalStartSearchAlgo S06, P05 START Multibyte)
+- `WormholePaperBindingComposition` (search_algo = OriginalWormholeSearchAlgo S07, P07 Wormhole wh.c)
+- `SurfPaperBindingComposition`     (search_algo = OriginalSurfSearchAlgo S08, P10 SuRF surf.hpp)
+
+5 weitere using-Aliases in `known_algorithms.hpp`:
+- `ana::ArtPaperBinding`, `ana::HotPaperBinding`, `ana::StartPaperBinding`,
+  `ana::WormholePaperBinding`, `ana::SurfPaperBinding`
+
+10 weitere Tests in `test_v41_anatomy.cpp` (§7+§8), inkl. Beweis dass
+`ArtComposition` und `ArtPaperBindingComposition` sich **nur** im `search_algo`
+unterscheiden (16 andere Achsen identisch).
+
+**Tests-Snapshot:** 14 (R3) + 10 (R3.2) = **24 Tests grün** in `test_v41_anatomy`.
+
+**KEINE Loeschung** der OriginalXxx-Wrappers — sie bleiben legitime Achsen-Werte.
 
 ### §14.3 Phase R4 — PermutationEngine + Cartesian
 
@@ -502,7 +537,7 @@ nach Anatomie-Pilot verifiziert.
 | Phase | Was | Wo |
 |---|---|---|
 | **R3 jetzt** | SearchAlgorithmAnatomy<C> Template-Skelett | `libs/cache_engine/anatomy/` |
-| **R3.2** | OriginalXxx Deprecation-Plan | Doku 13 Teil J |
+| **R3.2 done** | OriginalXxx Promotion (5 PaperBinding-Compositions) | `libs/cache_engine/compositions/*_paper_binding_reference.hpp` |
 | **R4** | PermutationEngine mp_product 15 Achsen | `src/permutations/` |
 | **R5** | CacheEngineBuilder pro Permutation .so/.dll | `apps/cache_engine_builder/` |
 | **R6 (V42)** | Mess-Treiber + Welch-Test ueber tausende Permutationen | `Diplomarbeit/Code/02_messung_driver/` |

@@ -243,28 +243,64 @@ ungleich verteilt ist:
 
 ---
 
-## §8 Wichtige Audit-Erkenntnis — OriginalXxx-Wrappers Konflikt
+## §8 OriginalXxx-Wrappers — Audit-Korrektur (R3.2 ergaenzt 2026-05-26 spät)
 
-**Konflikt-Status:** HOCH
+**Initial-Annahme (FALSCH, korrigiert beim R3.2-Start):**
+> "5 monolithische Wrappers — Permutations-PUNKTE (ganze Tiere) als Achsen-Varianten
+> verkleidet. Loesung: Deprecation, durch SearchAlgorithmAnatomy<XxxComposition> ersetzen."
 
-5 monolithische Wrappers existieren in `topics/traversal/axis_03a_search_algo/`:
-- `OriginalArt` (Task #688)
-- `OriginalHot` (Task #688)
-- `OriginalStart` (Task #688)
-- `OriginalWormhole` (Task #691 Batch 1)
-- `OriginalSurf` (Task #691 Batch 1)
+**Tatsaechlicher Befund (Audit bei R3.2-Start):**
 
-**Problem:** Diese sind Permutations-PUNKTE (ganze Tiere) als Achsen-Varianten
-verkleidet — das verstoesst gegen die Organ-Metapher.
+Die 5 OriginalXxx-Wrappers sind im Registry `axis_03a_search_algo_registry.hpp`
+als S04-S08 als **legitime search_algo-Achsen-Werte** registriert, neben den
+CE-Re-Impls S01-S03 (Array256/VectorU8U8/VectorU16U16):
 
-**Loesung (Task #695 R3.2):**
-1. SearchAlgorithmAnatomy<XxxComposition> bietet jetzt aequivalente Funktion
-2. OriginalXxx-Wrappers werden deprecated
-3. Tests umstellen auf Anatomy-Instantiation
-4. Loeschung der Wrappers nach R4-Verifikation
+| Wrapper | Family | Paper | Rolle |
+|---|---|---|---|
+| Array256 | S01 | (CE Re-Impl) | Dense Skelett-Variante |
+| VectorU8U8 | S02 | (CE Re-Impl) | Sparse-Klein |
+| VectorU16U16 | S03 | (CE Re-Impl) | Sparse-Gross |
+| OriginalArt | S04 | P01 ART | **Paper-Bindung (Habich-SHA256)** |
+| OriginalHot | S05 | P02 HOT | **Paper-Bindung** |
+| OriginalStart | S06 | P05 START | **Paper-Bindung** |
+| OriginalWormhole | S07 | P07 Wormhole | **Paper-Bindung** |
+| OriginalSurf | S08 | P10 SuRF | **Paper-Bindung** |
 
-**Reihenfolge zwingend:** R3 done → R3.2 Deprecation → R4 PermutationEngine (sonst
-faengt PermutationEngine Wrapper-Punkte statt reiner Achsen).
+Property-Tests (SimdSubset=5/8, DenseSubset=2/6) beweisen die Registry-Integration.
+
+**Korrekte Loesung (R3.2 done): PROMOTION statt Deprecation.**
+
+Fuer jeden OriginalXxx-Wrapper wurde eine eigene PaperBinding-Composition
+angelegt, identisch zur Re-Impl-Composition AUSSER `search_algo`:
+
+```cpp
+// libs/cache_engine/compositions/art_paper_binding_reference.hpp
+struct ArtPaperBindingComposition {
+    using search_algo = traversal::axis_03a_search_algo::OriginalArtSearchAlgo;  // S04
+    // ... 16 weitere Achsen identisch zu ArtComposition ...
+    static constexpr std::string_view paper_id = "P01 Leis ICDE 2013 (Paper-Binding)";
+    static constexpr std::string_view name     = "ArtPaperBindingComposition";
+};
+
+// libs/cache_engine/anatomy/known_algorithms.hpp ergaenzt:
+using ArtPaperBinding      = SearchAlgorithmAnatomy<compositions::ArtPaperBindingComposition>;
+using HotPaperBinding      = SearchAlgorithmAnatomy<compositions::HotPaperBindingComposition>;
+using StartPaperBinding    = SearchAlgorithmAnatomy<compositions::StartPaperBindingComposition>;
+using WormholePaperBinding = SearchAlgorithmAnatomy<compositions::WormholePaperBindingComposition>;
+using SurfPaperBinding     = SearchAlgorithmAnatomy<compositions::SurfPaperBindingComposition>;
+```
+
+**Tests R3.2:** 10 neue Tests in §7+§8 von `test_v41_anatomy.cpp`:
+- §7 5 Conformance + 5 Roundtrip + 1 Name + 1 Instantiation = 7 Tests
+- §8 ArtVsArtPaperBinding (16 von 17 Achsen identisch) + ElevenAlgosOrganCount17 = 2 Tests
+- Plus TYPED_TEST_SUITE Auto-Skalierung = 10 Tests total
+
+**Tests-Snapshot anatomy:** 14 (R3) + 10 (R3.2) = **24 Tests grün**.
+
+**KEINE Loeschung** der OriginalXxx-Wrappers — sie bleiben legitime Achsen-Werte.
+
+**Pflicht-Reihenfolge unveraendert:** R3 → R3.2 → R4 PermutationEngine (Cartesian
+mp_product nimmt jetzt BEIDE Varianten Re-Impl + Paper-Bindung mit).
 
 ---
 
@@ -300,7 +336,15 @@ SearchAlgorithmAnatomy ergaenzen. Resultat: PermutationEngine waere mit
 monolithischen Wrappers gefuettert worden, R3 haette kein klares Mandat.
 
 Richtige Reihenfolge (per User-Direktive 2026-05-26 spaet):
-**Topics F1+F2+F3 → Compositions R2 → Anatomie R3 → Deprecation R3.2 → PermutationEngine R4.**
+**Topics F1+F2+F3 → Compositions R2 → Anatomie R3 → Promotion R3.2 → PermutationEngine R4.**
+
+### §10.5 Audit-Pflicht VOR jeder destruktiven Aktion (R3.2-Lektion)
+
+Bei R3.2-Start sollte ich Originalxxx-Wrappers "deprecaten". Stattdessen Audit
+gemacht — Registry-Check zeigte: sie sind LEGITIME Achsen-Werte. Aktion korrigiert
+zu "Promotion" (eigene PaperBinding-Compositions). Lektion: **Vor jeder
+Loeschung/Deprecation IMMER Code-Audit** (Registry, Tests, Property-Filter)
+durchfuehren, auch wenn Doku/Memory das Gegenteil sagt.
 
 ### §10.3 Säugetier-Anatomie-Metapher als wissenschaftliche Frame
 
@@ -330,10 +374,11 @@ User-Direktive [[no-quick-fixes]] und [[no-mock]] werden eingehalten:
 
 ### Erledigt diese Session
 - **#694 V41.F.6.1.R3 SearchAlgorithmAnatomy Skelett** → completed
+- **#695 V41.F.6.1.R3.2 PaperBinding-Compositions Promotion** → completed (Audit-Korrektur)
 
 ### Neu angelegt
 - **#694** R3 (siehe oben)
-- **#695 V41.F.6.1.R3.2 OriginalXxx Deprecation** → pending (HOCH-Konflikt-Risiko fuer R4)
+- **#695** R3.2 (umtituliert von "Deprecation" zu "Promotion" nach Audit)
 - **#696 V41.F.6.1.R4 PermutationEngine mp_product 15 Achsen** → pending
 
 ### Pflicht-Reihenfolge fuer naechste Session
@@ -362,10 +407,10 @@ User-Direktive [[no-quick-fixes]] und [[no-mock]] werden eingehalten:
 | test_v41_paper_legacy_p* (5 paper) | 145 | ✅ green |
 | test_v41_compositions (R2) | 25 | ✅ green |
 | test_v41_topics_fundament (F1+F2+F3) | 16 | ✅ green |
-| **test_v41_anatomy (R3 NEU)** | **14** | **✅ green** |
-| **GESAMT** | **823** | **✅ alle green** |
+| **test_v41_anatomy (R3 + R3.2)** | **24** | **✅ green** |
+| **GESAMT** | **833** | **✅ alle green** |
 
-(+14 vs vorherigem Endstand 809)
+(R3 brachte +14, R3.2 brachte +10 = +24 vs vorherigem Endstand 809)
 
 ---
 
