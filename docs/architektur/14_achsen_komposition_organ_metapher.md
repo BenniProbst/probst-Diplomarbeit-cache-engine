@@ -1976,3 +1976,101 @@ Adapter-Klassen-Name). Restliche Metapher-Identifier bleiben bis V41.Z.1.
 
 **Ende Teil 8 §43 (Stand 2026-05-27 mittag — R5.C.A4 run() Lifecycle-Hook ergaenzt +
 Cleanup-Sprint V41.Z.1 fuer Endphase geplant).**
+
+---
+
+# Teil 9 — Anatomy Module ABI v1 (R5.D Pilot)
+
+## §44 R5.D — Permutations-Binary ABI + COMDARE_DEFINE_ANATOMY_MODULE Macro
+
+### §44.1 Pilot-Scope (atomare Lieferung)
+
+R5.D ist umfangreich (Codegen + ModuleLoader + .so/.dll-Build). Pilot R5.D liefert
+den **minimalen ABI-Layer** + **Convenience-Macro** fuer Permutations-Binary
+Authoring. Konkretes Codegen + ModuleLoader-Anbindung folgen in R5.D.2 / R5.E.
+
+### §44.2 Architektur-Entscheidung: minimaler ABI statt PermutationModule-v1
+
+Existing `cache_engine/abi/module_abi_v1.hpp` (REV 7.6) definiert
+`comdare_permutation_module_v1` — ein POD-Struct mit 9+ Funktion-Pointern, dass
+in jedem Permutations-Binary populiert wird. Das ist fuer die alte Pre-Anatomy-
+Architektur.
+
+R5.D nutzt die neue Anatomy-Schicht (`IAnatomyBase` Virtual-Interface) und
+reduziert die ABI auf **4 extern "C" Symbole** pro .so/.dll:
+
+| Symbol | Signatur | Zweck |
+|---|---|---|
+| `comdare_anatomy_abi_version` | `() -> uint64_t` | Major<<32 \| Minor |
+| `comdare_anatomy_abi_magic` | `() -> uint64_t` | Compat-Sanity |
+| `comdare_create_anatomy` | `() -> IAnatomyBase*` | Factory (heap-alloc) |
+| `comdare_destroy_anatomy` | `(IAnatomyBase*) -> void` | RAII-Cleanup |
+
+**Vorteile:**
+1. Anatomy-API-Erweiterungen brechen ABI NICHT (neue Virtual-Methoden werden in
+   IAnatomyBase ergaenzt, .so/.dll bleibt kompatibel solange Major-Version stabil)
+2. Type-Safety: kein void*-Cast erforderlich
+3. C++ RAII statt manueller Pointer-Tracking
+
+### §44.3 Lieferung R5.D Pilot
+
+| Datei | Inhalt |
+|---|---|
+| `libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1.hpp` (NEU) | ABI-Version-Macros, 4 extern "C" Forward-Declarations, COMDARE_DEFINE_ANATOMY_MODULE Macro, AnatomyAbiVersion Helper-Klasse (Pack/Unpack/Compat-Check) |
+| `tests/unit/test_v41_anatomy_module_abi.cpp` (NEU) | 10 Tests in 3 Suites |
+| `tests/unit/CMakeLists.txt` | Test-Target registriert |
+
+### §44.4 COMDARE_DEFINE_ANATOMY_MODULE Verwendung
+
+Generiertes Permutations-Binary nutzt das Macro:
+
+```cpp
+// generated/perm_<hash>.cpp
+#define COMDARE_ANATOMY_MODULE_BUILD 1
+#include <cache_engine/abi/anatomy_module_abi_v1.hpp>
+#include <compositions/art_reference.hpp>
+
+// Eine Zeile expandiert zu 4 extern "C" Symbolen:
+COMDARE_DEFINE_ANATOMY_MODULE(::comdare::cache_engine::compositions::ArtComposition)
+```
+
+R5.D.2 Codegen wird diese Datei pro AdHocComposition aus dem PermutationEngine-
+Cartesian-Product generieren (configure_file mit Composition-Type-String).
+
+### §44.5 AnatomyAbiVersion Compatibility-Regeln
+
+```cpp
+struct AnatomyAbiVersion { uint32_t major; uint32_t minor; };
+
+// Host-Compat: Major identisch, Modul-Minor <= Host-Minor
+// (Module darf alt sein, aber nicht aus der Zukunft)
+```
+
+| Host | Modul | Compat? | Grund |
+|---|---|---|---|
+| 1.5 | 1.5 | ✅ | gleich |
+| 1.5 | 1.3 | ✅ | alt OK |
+| 1.5 | 1.6 | ❌ | Modul aus Zukunft (Host kennt neue Features nicht) |
+| 1.5 | 2.0 | ❌ | Major-Mismatch |
+
+### §44.6 Tests-Snapshot R5.D (10 Tests, 3 Test-Suites)
+
+| § | Suite | Tests |
+|---|---|---|
+| §1 | R5D_AnatomyAbi (Version/Magic Compile-Time) | 2 |
+| §2-§3 | R5D_AnatomyAbiVersion (pack/unpack + Compat-Rules) | 2 |
+| §4-§8 | R5D_AnatomyFactory (Symbole + Lifecycle + Multi-Create) | 6 |
+
+Anatomy-Tests gesamt nach R5.D: **117 grün** (9 Test-Files, +10 vs R5.C.A4).
+
+### §44.7 NEXT R5.D.2 + R5.E
+
+| Sprint | Was |
+|---|---|
+| R5.D.2 | Codegen-Template + CMake-Codegen-Funktion: pro AdHocComposition `.cpp` generieren + `add_library(perm_<hash> SHARED ...)` |
+| R5.E | ModuleLoader::load_anatomy(dll_path) → IAnatomyBase* (dlopen/LoadLibrary + ABI-Version-Check) |
+
+---
+
+**Ende Teil 9 §44 (Stand 2026-05-27 mittag — R5.D Anatomy Module ABI v1 Pilot mit
+COMDARE_DEFINE_ANATOMY_MODULE Macro + 10 Tests).**
