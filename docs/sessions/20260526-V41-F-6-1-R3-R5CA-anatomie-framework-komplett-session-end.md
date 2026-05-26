@@ -678,5 +678,150 @@ Vorbereitet durch R5.C.A3:
 
 **Ende Teil III R5.C.A3 (Stand 2026-05-27 vormittag).**
 
-**Diese Teil-III-Sektion ist die aktuelle Architektur-Wahrheit. Teil I+II bleiben
+---
+---
+---
+
+# TEIL IV — R5.C.B NACHTRAG (AKTUELLE VERSION, 2026-05-27 mittag)
+
+> **Aktualitaets-Hinweis:** Teil I-III oben sind historische Aufzeichnungen bis
+> Sprint R5.C.A3. Teil IV dokumentiert die R5.C.B-Lieferung
+> (SearchAlgorithmPermutationEngine Genus-Specialization +
+> Slot-Genus-Detection).
+> **Diese Teil-IV-Sektion ist die aktuelle Architektur-Vorlage fuer naechste Sessions.**
+
+---
+
+## §24 R5.C.B — SearchAlgorithmPermutationEngine genus-aware
+
+### §24.1 Lieferung
+
+| Datei | Inhalt |
+|---|---|
+| `libs/cache_engine/anatomy/pruefling_merge.hpp` (erweitert) | `HasExplicitGenus<Slot>` Concept, `slot_genus_v<Slot>` Helper (Default SearchAlgorithm), `IsSlotOfGenus_v<Slot,G>` Predicate, `IsSearchAlgorithmSlot` Concept |
+| `libs/cache_engine/anatomy/search_algorithm_permutation_engine.hpp` (NEU) | `SearchAlgorithmPermutationEngine<TopicConfigSets...>` Klasse mit Genus-Marker + Slot-Validation + technische Visitor-API |
+| `tests/unit/test_v41_search_algorithm_permutation_engine.cpp` (NEU) | 15 Tests in 7 Test-Suites |
+| `tests/unit/CMakeLists.txt` | Test-Target registriert |
+| `docs/architektur/14_achsen_komposition_organ_metapher.md` Teil 7 §42 (NEU) | R5.C.B-Lieferung dokumentiert |
+
+### §24.2 Schicht-Hierarchie nach R5.C.B
+
+```
+pe::PermutationEngine<TopicConfigSets...>            (generisch, kein Anatomie-Wissen)
+   │
+   ▼
+ana::AnatomyPermutationDriver<TopicConfigSets...>    (R4 — Anatomie-Instantiation)
+   │
+   ▼
+ana::SearchAlgorithmPermutationEngine<TopicConfigSets...>   (R5.C.B — Genus-Spezialisierung)
+   ├── static constexpr genus = AnatomyGenus::SearchAlgorithm
+   ├── assert_pruefling_slot_genus<Slot>()             (Doku 14 §32 Constraint)
+   ├── slots_match_genus_v<Slots...>                   (Compile-Time Predicate)
+   ├── for_each_search_algorithm(visitor)              (technisch benannt)
+   ├── for_each_composition_type(visitor)
+   └── for_each_abi_adapter(visitor)                   (R5.E Module-Loader Vorbereitung)
+```
+
+### §24.3 Tests-Snapshot ENDSTAND R5.C.B (107 Anatomy-Tests gruen)
+
+| Test-File | Tests | Status |
+|---|---|---|
+| test_v41_anatomy | 13 | ✅ |
+| test_v41_anatomy_r4_driver | 10 | ✅ |
+| test_v41_anatomy_observer | 12 | ✅ |
+| test_v41_builder_anatomy_commands | 21 | ✅ |
+| test_v41_anatomy_pruefling_merge | 13 | ✅ |
+| test_v41_anatomy_base | 12 | ✅ |
+| test_v41_execution_engine | 11 | ✅ |
+| **test_v41_search_algorithm_permutation_engine (R5.C.B NEU)** | **15** | **✅** |
+| **Anatomy-Summe** | **107** | **+15 vs R5.C.A3** |
+
+### §24.4 Slot-Genus-Detection (R5.C.B Erweiterung pruefling_merge.hpp)
+
+```cpp
+// Concept-Check: ist Slot::genus explizit deklariert?
+template <class Slot>
+concept HasExplicitGenus = requires { { Slot::genus } -> std::convertible_to<AnatomyGenus>; };
+
+// Helper: liefert Gattung (Default SearchAlgorithm bei nicht-deklariert)
+template <class Slot>
+constexpr AnatomyGenus slot_genus_v = []{
+    if constexpr (HasExplicitGenus<Slot>) return Slot::genus;
+    else                                    return AnatomyGenus::SearchAlgorithm;
+}();
+
+// Predicate fuer Gattungs-Match
+template <class Slot, AnatomyGenus G>
+constexpr bool IsSlotOfGenus_v = (slot_genus_v<Slot> == G);
+
+// Concept fuer SearchAlgorithm-Slot
+template <class Slot>
+concept IsSearchAlgorithmSlot =
+    PrueflingSlotConcept<Slot> &&
+    IsSlotOfGenus_v<Slot, AnatomyGenus::SearchAlgorithm>;
+```
+
+**Backward-Kompatibilitaet:** Existing Slots ohne `genus`-Member werden als
+SearchAlgorithm-Gattung interpretiert (Default-Verhalten). Migration ist
+optional, aber empfohlen fuer Klarheit + Cross-Genus-Validation.
+
+### §24.5 R5.E Module-Loader-Vorbereitung
+
+`for_each_abi_adapter(visitor)` materialisiert pro Permutation einen
+`SearchAlgorithmAbiAdapter<...>` und uebergibt als `IAnatomyBase&` an den
+Visitor. Beispiel-Mess-Loop:
+
+```cpp
+PilotEngine::for_each_abi_adapter([&](ana::IAnatomyBase& base, std::string_view name) {
+    base.warm_up();
+    // ... Workload ausfuehren ueber base (R5.D CacheEngineBuilder) ...
+    base.shutdown();
+});
+```
+
+R5.E Module-Loader (dlopen/LoadLibrary) wird statt static-instantiation ueber
+`extern "C"` Factory pro generierte .so/.dll polymorph laden.
+
+---
+
+## §25 Forschungs-Mission Status nach R5.C.B (5.0/7 Phasen done)
+
+| Phase | Was | Status |
+|---|---|---|
+| 1 | Bottom-Up Achsen-Zerlegung (15 Topics) | ✅ F1+F2+F3 |
+| 2 | Reference-Compositions (11 Algorithmen) | ✅ R2+R3.2 |
+| 3 | Zentrale Anatomie-Implementation | ✅ R3 |
+| 4 | Permutations-Engine + Cartesian | ✅ R4 |
+| 4.5 | ABI-stabiler Observer-Aggregate | ✅ R5.A |
+| 4.6 | Anatomie-API-Refactor | ✅ R5.B |
+| 4.7 | Pruefling-Merge 3 Joins | ✅ R5.C |
+| 4.8 | AnatomyBase + Gattungs-Marker | ✅ R5.C.A |
+| 4.9 | ExecutionEngine als Wurzel | ✅ R5.C.A2 |
+| 4.95 | SearchAlgorithmAbiAdapter Production-Header | ✅ R5.C.A3 |
+| **5.0** | **SearchAlgorithmPermutationEngine genus-aware** | ✅ **R5.C.B** |
+| 5b | CacheEngineBuilder CLI + extern "C" ABI | ⏳ R5.D NEXT |
+| 5c | dlopen/LoadLibrary Module-Loader | ⏳ R5.E |
+| 6 | Mess-Treiber + VirusExecutionEngine | ⏳ R6/V42 |
+| 7 | F15-Auswertung + Virus-Vergleich | ⏳ R7/V42 |
+
+---
+
+## §26 NEXT-Action fuer naechste Session
+
+**R5.D** (groesserer Sprint): CacheEngineBuilder CLI + extern "C" ABI pro
+Permutations-Binary. Pro Composition wird .so/.dll generiert, das genau eine
+`SearchAlgorithmAbiAdapter<C>`-Factory exportiert.
+
+Vorbereitet durch R5.C.A3 + R5.C.B:
+- `SearchAlgorithmAbiAdapter<A>` als Production-Klasse (R5.C.A3)
+- `SearchAlgorithmPermutationEngine<...>::for_each_abi_adapter` als Iterations-API (R5.C.B)
+- Slot-Genus-Validation als Compile-Time-Gate (R5.C.B)
+
+**Geschaetzte Restzeit bis F15-Forschungsmissions-Ergebnis:** 3-5 Wochen autonome Arbeit.
+
+---
+
+**Ende Teil IV R5.C.B (Stand 2026-05-27 mittag).**
+
+**Diese Teil-IV-Sektion ist die aktuelle Architektur-Wahrheit. Teil I-III bleiben
 als historische Aufzeichnung erhalten.**

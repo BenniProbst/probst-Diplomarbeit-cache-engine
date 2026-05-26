@@ -1740,3 +1740,164 @@ Neue Direktive: `[[technical-identifiers-over-metaphor]]`
 
 **Ende Teil 6 §41 (Stand 2026-05-27 vormittag — R5.C.A3 SearchAlgorithmAbiAdapter
 Production-Header + technische-Identifier-Konvention).**
+
+---
+
+# Teil 7 — SearchAlgorithmPermutationEngine (R5.C.B Genus-Specialization)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil 1-6 oben unangetastet.
+> Teil 7 dokumentiert die R5.C.B-Lieferung — die erste Gattungs-spezialisierte
+> PermutationEngine fuer die SearchAlgorithm-Gattung mit Compile-Time-Validierung
+> von Pruefling-Slot-Gattungs-Constraint (Doku 14 §32).
+
+---
+
+## §42 R5.C.B — SearchAlgorithmPermutationEngine + Slot-Genus-Detection
+
+### §42.1 User-Direktive-Referenz
+
+Aus Doku 14 §29.2 (User-Direktive 2026-05-26 sehr spaet):
+
+> "Die Permutation Engine muss fuer die anatomischen Moeglichkeiten jeder
+>  Anatomie-Gattungen durch Unterklassen spezifiziert werden, die von der
+>  Haupt-Permutation-Engine erben und diese fuer jede Anatomie-Gattung
+>  spezifizieren, um korrekt gesteuert durch die CacheEngineBuilder Anatomien
+>  und damit Experiment-Algorithmus-Binaries ausliefern zu koennen."
+
+Aus Doku 14 §32 (User-Direktive 2026-05-26 sehr spaet, R5.C.A-Sprint-Ende):
+
+> "Wir koennen nur gleiche Gattungen an Algorithmen miteinander kreuzen, weil
+>  Gattungen die exakt selben permutativen Achsen verwenden."
+
+### §42.2 Lieferung R5.C.B
+
+| Datei | Aktion |
+|---|---|
+| `libs/cache_engine/anatomy/pruefling_merge.hpp` | Erweitert: `HasExplicitGenus<Slot>` Concept, `slot_genus_v<Slot>` Helper (Default = SearchAlgorithm), `IsSlotOfGenus_v<Slot,G>` Predicate, `IsSearchAlgorithmSlot` Concept |
+| `libs/cache_engine/anatomy/search_algorithm_permutation_engine.hpp` | NEU — `SearchAlgorithmPermutationEngine<TopicConfigSets...>` Klasse |
+| `tests/unit/test_v41_search_algorithm_permutation_engine.cpp` | NEU — 15 Tests |
+| `tests/unit/CMakeLists.txt` | Test-Target hinzugefuegt |
+
+### §42.3 SearchAlgorithmPermutationEngine API
+
+```cpp
+template <class... TopicConfigSets>
+class SearchAlgorithmPermutationEngine {
+public:
+    // Gattungs-Marker (Doku 14 §27.2 + §29.2)
+    static constexpr AnatomyGenus genus = AnatomyGenus::SearchAlgorithm;
+
+    // Inspection (delegiert an PermutationEngine)
+    using all_permutations = ...;
+    static constexpr std::size_t count() noexcept;
+    static constexpr std::size_t arity() noexcept;
+
+    // R5.C.B Pruefling-Slot-Validierung (Doku 14 §32.3)
+    template <class Slot>
+    static constexpr void assert_pruefling_slot_genus() noexcept;
+    template <class... Slots>
+    static constexpr void assert_all_pruefling_slots_genus() noexcept;
+
+    // Compile-Time Genus-Match-Predicate
+    template <class... Slots>
+    static constexpr bool slots_match_genus_v = ...;
+
+    // Technisch benannte Iteration (Doku 14 §41 [[technical-identifiers-over-metaphor]])
+    template <class Visitor>
+    static constexpr void for_each_search_algorithm(Visitor&& v);     // ≈ for_each_animal
+    template <class Visitor>
+    static constexpr void for_each_composition_type(Visitor&& v);
+
+    // R5.E Module-Loader-Vorbereitung — produziert IAnatomyBase pro Permutation
+    template <class Visitor>
+    static constexpr void for_each_abi_adapter(Visitor&& v);
+};
+```
+
+### §42.4 Pruefling-Slot Gattung-Deklaration
+
+Pruefling-Slots koennen ihre Gattung jetzt explizit deklarieren (Doku 14 §32.3):
+
+```cpp
+// In prt-art/include/prt_art/axis_03a_slot.hpp:
+namespace prt_art::axis_03a {
+    struct Slot {
+        using PrueflingVariants = mp::mp_list<PrtArtRadix512>;
+        static constexpr bool has_pruefling = true;
+        static constexpr AnatomyGenus genus = AnatomyGenus::SearchAlgorithm;  // R5.C.B PFLICHT
+    };
+}
+
+// Validierung (frueh im Pruefling-Header empfohlen):
+SearchAlgorithmPermutationEngine<...>::assert_pruefling_slot_genus<prt_art::axis_03a::Slot>();
+```
+
+**Optional bei Implicit-Default:** wenn `Slot::genus` nicht deklariert ist, gilt
+Default `SearchAlgorithm` (via `slot_genus_v<Slot>` Helper). Backward-kompatibel
+zu existing Slots aus R5.C.
+
+**Cross-Genus-Slot (illegal):**
+```cpp
+struct SequenceSlot {
+    using PrueflingVariants = mp::mp_list<>;
+    static constexpr bool has_pruefling = false;
+    static constexpr AnatomyGenus genus = AnatomyGenus::Sequence;  // FALSCH fuer SearchAlgorithm-Engine
+};
+// SearchAlgorithmPermutationEngine<...>::assert_pruefling_slot_genus<SequenceSlot>();
+// → static_assert mit klarer Diagnostik:
+//   "Slot gehoert nicht zur SearchAlgorithm-Gattung. Cross-Genus-Joins sind
+//    type-system-mathematisch unmoeglich (Doku 14 §32)."
+```
+
+### §42.5 Tests-Snapshot R5.C.B
+
+15 neue Tests in `test_v41_search_algorithm_permutation_engine.cpp`:
+
+| § | Test-Gruppe | Tests |
+|---|---|---|
+| §1 | Genus-Marker | 1 (GenusIsSearchAlgorithm) |
+| §2 | count/arity-Delegation | 1 |
+| §3-§5 | Slot-Genus-Detection (Implicit/Explicit/Sequence/Set) | 4 |
+| §6 | IsSearchAlgorithmSlot Concept (positiv + negativ) | 2 |
+| §7 | assert_pruefling_slot_genus Compile-Time-Check | 2 |
+| §8 | slots_match_genus_v Predicate | 2 |
+| §9 | for_each_search_algorithm/for_each_composition_type | 2 |
+| §10 | for_each_abi_adapter (R5.E-Vorbereitung) | 1 |
+
+Anatomy-Tests gesamt: **107 grün** (8 Test-Files, +15 vs R5.C.A3).
+
+### §42.6 Bezug zu AnatomyPermutationDriver (R4)
+
+`SearchAlgorithmPermutationEngine` ist eine zusaetzliche Schicht ueber dem
+existing `AnatomyPermutationDriver`. Der Driver bleibt als technische Facade
+verfuegbar und wird intern delegiert. Zukuenftige Gattungs-Engines
+(SequencePermutationEngine, SetPermutationEngine etc. fuer V42) folgen demselben
+Pattern.
+
+| Schicht | Aufgabe |
+|---|---|
+| `pe::PermutationEngine<TopicConfigSets...>` | Cartesian-Product generisch (kein Anatomie-Wissen) |
+| `ana::AnatomyPermutationDriver<TopicConfigSets...>` | Anatomie-Instantiation pro Permutation (R4) |
+| `ana::SearchAlgorithmPermutationEngine<TopicConfigSets...>` | Genus-Spezialisierung mit Constraint-Validation (R5.C.B) |
+
+### §42.7 NEXT-Phase Vorbereitung
+
+R5.D CacheEngineBuilder CLI kann jetzt:
+- Pro Permutation `SearchAlgorithmAbiAdapter<...>` materialisieren (R5.C.A3)
+- Genus-Constraint auf Pruefling-Slots erzwingen (R5.C.B)
+- `for_each_abi_adapter` als Mess-Loop-Iterator nutzen
+
+R5.E Module-Loader (dlopen/LoadLibrary) Factory-Pattern:
+```cpp
+// Generiertes Permutations-Binary (.so/.dll)
+extern "C" comdare::cache_engine::anatomy::IAnatomyBase*
+comdare_create_anatomy() {
+    using A = comdare::cache_engine::anatomy::SearchAlgorithmAnatomy<MyComposition>;
+    return new comdare::cache_engine::anatomy::SearchAlgorithmAbiAdapter<A>{};
+}
+```
+
+---
+
+**Ende Teil 7 §42 (Stand 2026-05-27 vormittag — R5.C.B SearchAlgorithmPermutationEngine
+Genus-Specialization + Slot-Genus-Detection + 15 Tests).**
