@@ -1337,3 +1337,264 @@ Neue Direktive `[[gattungs-constraint-pruefling-merge]]` markiert die Pflicht:
 
 **Ende Teil 4 §32 (Stand 2026-05-26 sehr spaet — User-Direktive Gattungs-Constraint
 fuer Pruefling-Merge, R5.C.A-Sprint-Ende-Vertiefung).**
+
+---
+
+# Teil 5 — ExecutionEngine als Wurzel ueber AnatomyBase (Lebewesen vs Viren)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil 1+2+3+4 oben unangetastet.
+> Teil 5 dokumentiert die User-Direktive 2026-05-27 frueh zur fundamentalen
+> Wurzel-Strukturierung: ExecutionEngine ist die generischere Mess-Wurzel ueber
+> AnatomyBase. Anatomien (Lebewesen) sind eine SPEZIALISIERUNG; "Viren" (Nicht-
+> Lebewesen wie Graphen-Algorithmen) sind eine andere Spezialisierung — beide
+> ausmessbar via gemeinsamer ExecutionEngine-Mess-Schnittstelle.
+
+---
+
+## §33 User-Direktive verbatim (R5.C.A-Sprint-Ende-Erweiterung)
+
+> "Hinweis: weiter vorne in der Dokumentation hatten wir weiterhin beschrieben,
+> dass die Wurzel, der mit der aktuelleren ueberholten SearchEngine (jetzt
+> Anatomie mit Gattungen), des Konstruktes eine Execution Engine sein sollte,
+> welche noch ueber der AnatomyBase steht. Diese verhaelt sich zur Anatomie eines
+> Lebewesens, wie der Unterschied zwischen Lebewesen und Viren: Die Viren sind
+> nicht lebendig und haben wiederum ein eigenes System, moeglicherweise keine
+> Topics und Achsen, aber sie koennen auch ausgemessen werden (Beispielhaft waeren
+> das etwa Graphen-Algorithmen, die eine eigene ganz andere Anatomie beherbergen)
+> -> Wir trennen das allgemeine Mess-Interface auf die ExecutionEngine auf, von
+> der die AnatomyBase mit ihrer Spezifikation ueber Topics und Achsen erbt."
+
+---
+
+## §34 Biologische Klassifikation der Wurzel-Hierarchie
+
+### §34.1 Drei-Ebenen-Taxonomie (analog Biologie)
+
+```
+                  ExecutionEngine (ALLES Ausmessbare)
+                       │
+        ┌──────────────┴──────────────────┐
+        │                                 │
+   AnatomyBase                    VirusExecutionEngine
+   (Lebewesen, Kingdom=Animalia)  (Nicht-Lebewesen, kein Stoffwechsel)
+        │                                 │
+   5 Gattungen:                      Beispiele:
+   - SearchAlgorithm (Mammal)       - Graphen-Algorithmen (BFS/DFS/Dijkstra)
+   - Set (Bird)                     - Funktionale Pipelines
+   - Sequence (Reptile)             - Stream-Processor
+   - Adapter (Invertebrate)         - Pure-Math Algorithmen (FFT/Matrix-Multiply)
+   - View (Plant)                   - Crypto-Hashes
+```
+
+### §34.2 Biologische Metapher-Schaerfung
+
+**Lebewesen (Anatomie):** haben Organe (Achsen), erben von AnatomyBase, sind in
+17 (Mammal) bzw. weniger Achsen zerlegbar. Permutierbar via PermutationEngine.
+
+**Viren (VirusExecutionEngine):** haben KEINEN Stoffwechsel (keine
+Topics/Achsen), sind aber MESSBAR (Latenz/Throughput/Cache-Misses). Sie sind
+"Kapseln" mit eigenem Inneren — keine Achsen-Permutation moeglich, aber
+Algorithm-internes Tuning ist denkbar (z.B. Graphen-BFS mit unterschiedlichen
+Adjacency-Representations).
+
+**Gemeinsame Wurzel ExecutionEngine:** Mess-Interface (Latenz, Throughput,
+Cache-Misses, Speicher-Verbrauch) ist allgemein und gilt fuer beide.
+
+---
+
+## §35 ExecutionEngine — Compile-Time-Concept + Virtual-Interface
+
+### §35.1 ExecutionEngineConcept (Compile-Time Wurzel)
+
+```cpp
+// libs/cache_engine/execution_engine/execution_engine_base.hpp
+
+enum class ExecutionEngineKind : std::uint8_t {
+    Anatomy = 0,         ///< Lebewesen — erbt AnatomyBase, hat Topics/Achsen
+    Virus   = 1,         ///< Nicht-Lebewesen — kein Anatomie-Stoffwechsel, eigenes Mess-System
+    Hybrid  = 2          ///< experimentell: kombiniert beide (V42+)
+};
+
+/// ExecutionEngineConcept — Wurzel-Concept aller ausmessbaren Algorithmen.
+template <class E>
+concept ExecutionEngineConcept = requires {
+    typename E::measurement_snapshot_t;          // Pflicht: eigener Snapshot-POD
+    { E::engine_name() } -> std::convertible_to<std::string_view>;
+    { E::engine_kind() } -> std::convertible_to<ExecutionEngineKind>;
+};
+```
+
+### §35.2 IExecutionEngine (Virtual Interface)
+
+```cpp
+/// IExecutionEngine — abstract base fuer Runtime-ABI (Module-Loader).
+class IExecutionEngine {
+public:
+    virtual ~IExecutionEngine() = default;
+    [[nodiscard]] virtual std::string_view      engine_name() const noexcept = 0;
+    [[nodiscard]] virtual ExecutionEngineKind   engine_kind() const noexcept = 0;
+
+    // Mess-Schnittstelle (Pflicht — wie das gemessen wird, ist Engine-spezifisch)
+    // Snapshot-Type ist Engine-spezifisch via measurement_snapshot_t
+    // Hier nur abstrakte Trigger-Schnittstelle:
+    virtual void warm_up()  = 0;  ///< Engine vor Mess-Reihe vorwaermen
+    virtual void reset()    = 0;  ///< Statistik-Reset (NICHT Container-Clear!)
+    virtual void shutdown() = 0;  ///< Engine sauber herunterfahren
+};
+```
+
+### §35.3 AnatomyBase erbt von IExecutionEngine
+
+```cpp
+// libs/cache_engine/anatomy/anatomy_base.hpp (Update R5.C.A2)
+
+class IAnatomyBase : public IExecutionEngine {
+public:
+    // engine_kind() liefert immer Anatomy (Pflicht-Override)
+    [[nodiscard]] ExecutionEngineKind engine_kind() const noexcept final {
+        return ExecutionEngineKind::Anatomy;
+    }
+
+    // Zusaetzliche Anatomie-spezifische Pflicht-API:
+    [[nodiscard]] virtual std::string_view composition_name() const noexcept = 0;
+    [[nodiscard]] virtual std::string_view paper_id() const noexcept = 0;
+    [[nodiscard]] virtual AnatomyGenus     genus() const noexcept = 0;
+    [[nodiscard]] virtual std::size_t      organ_count() const noexcept = 0;
+};
+```
+
+### §35.4 IVirusExecutionEngine (parallel zu IAnatomyBase)
+
+```cpp
+// libs/cache_engine/execution_engine/virus_execution_engine.hpp (R6 NEU pending)
+
+class IVirusExecutionEngine : public IExecutionEngine {
+public:
+    [[nodiscard]] ExecutionEngineKind engine_kind() const noexcept final {
+        return ExecutionEngineKind::Virus;
+    }
+
+    // Virus-spezifische Pflicht-API:
+    [[nodiscard]] virtual std::string_view algorithm_family() const noexcept = 0;  // z.B. "GraphBFS"
+    [[nodiscard]] virtual std::string_view algorithm_paper()  const noexcept = 0;  // Paper-Referenz
+
+    // KEINE Achsen, KEINE Composition — Virus ist intern undurchsichtig
+};
+```
+
+---
+
+## §36 Beispiele fuer Viren (V42+ Erweiterung)
+
+### §36.1 Graphen-Algorithmen
+- BFS / DFS / Dijkstra / A*
+- Min-Cut / Max-Flow
+- PageRank / HITS
+- Strongly-Connected-Components
+
+**Charakteristik:** kein K-V-Mapping, keine 17 Achsen — interne Graph-
+Representation ist Implementation-Detail (Adjacency-Matrix vs Adjacency-List).
+Mess-Snapshot ist Latenz + Speicher pro Graph-Operation.
+
+### §36.2 Funktionale Pipelines
+- Map/Reduce-Pipelines
+- Filter-Cascades
+- Stream-Processor (Kafka-Style)
+
+**Charakteristik:** stateless oder mit minimaler State — Mess-Snapshot ist
+Throughput + Latenz pro Datensatz.
+
+### §36.3 Pure-Math Algorithmen
+- FFT / Matrix-Multiply
+- Convex Optimization (SGD/Adam)
+- Crypto-Hashes (SHA256/BLAKE3)
+
+**Charakteristik:** Input → Output Transformation ohne Container — Mess-Snapshot
+ist Throughput + FLOPs pro Sekunde.
+
+---
+
+## §37 Verantwortlichkeits-Update (Erweiterung Teil 3 §17)
+
+| Akteur | Stand R5.C.A | Update Teil 5 |
+|---|---|---|
+| **PermutationEngine** | Anatomie-Generator | nur fuer ExecutionEngineKind::Anatomy |
+| **VirusExecutionEngineFactory** (NEU R6) | n.v. | erzeugt Virus-Instanzen ohne Permutation |
+| **AnatomyBase** | nur Organ-Container | erbt von IExecutionEngine |
+| **CacheEngineBuilder** | Mess-Orchestrierung fuer Anatomien | Mess-Orchestrierung fuer **alle** ExecutionEngines (Anatomy + Virus) |
+
+### §37.1 CacheEngineBuilder als Mess-Plattform fuer beide
+
+```cpp
+// Pseudocode CacheEngineBuilder R5.D
+class CacheEngineBuilder {
+public:
+    // Hauptmess-Schleife fuer ExecutionEngine (Anatomy ODER Virus)
+    template <ExecutionEngineConcept E>
+    void measure_engine(E& engine, Workload const& wl);
+
+    // Spezialisiert fuer Anatomien (mit Composition-Iteration)
+    template <ana::AnatomyConcept A>
+    void measure_anatomy_permutations(/* PermutationEngine + Anatomy */);
+
+    // Spezialisiert fuer Viren (ohne Composition-Iteration)
+    template <ExecutionEngineConcept V>
+        requires (V::engine_kind() == ExecutionEngineKind::Virus)
+    void measure_virus(V& virus, Workload const& wl);
+};
+```
+
+---
+
+## §38 Konsistenz-Check mit existing Code
+
+### §38.1 Existing IExecutingEngine (legacy/deprecated)
+
+In `libs/deprecated/prt_art_legacy/include/prt_art/concepts/i_executing_engine.hpp`
+existiert eine alte IExecutingEngine (REV 5, 2026-05-18) mit `warm_up/reset/shutdown`
++ `bind_cache_engine()`. **Diese ist die Vorlage** fuer die neue Wurzel-Schicht.
+
+**Migration-Pfad (R5.C.A2 Sprint):**
+1. NEUE Datei `libs/cache_engine/execution_engine/execution_engine_base.hpp` mit
+   `IExecutionEngine` (ohne `bind_cache_engine` — das war prt-art-spezifisch)
+2. AnatomyBase (R5.C.A) wird ergaenzt um Inheritance von IExecutionEngine
+3. Existing `i_executing_engine.hpp` im prt_art_legacy bleibt unveraendert
+   (Kompatibilitaet zu alten prt-art Modulen) — wird in V42 deprecated
+
+### §38.2 Mess-Saeule (M-Modell-Verbindung)
+
+Doku 10 `10_schichten_modell_M.md` §0.4 zeigt: CacheEngineBuilder orchestriert
+ExecutionEngine A + ExecutionEngine B parallel via Command-Pattern. Diese
+"ExecutionEngine A/B" Notation ist konsistent mit der neuen Wurzel.
+
+**Pre-Read-Pflicht-Update:** Doku 10 §0-§4 ist Wurzel-Modell, wird in jeder
+zukuenftigen Architektur-Iteration referenziert.
+
+---
+
+## §39 Phasen-Plan-Update fuer R5.C.A2 (NEU)
+
+| Sprint | Was | Wo |
+|---|---|---|
+| **R5.C.A2 NEXT** | ExecutionEngineConcept + IExecutionEngine + ExecutionEngineKind enum | `libs/cache_engine/execution_engine/` |
+| R5.C.A3 | AnatomyBase als Spezialisierung von IExecutionEngine (Inheritance + final-Override) | Update `anatomy_base.hpp` |
+| R5.C.B | SearchAlgorithmPermutationEngine genus-aware | `anatomy/search_algorithm_permutation_engine.hpp` |
+| R5.D | CacheEngineBuilder CLI + extern "C" ABI (ExecutionEngine-Factory) | `apps/anatomy_binary/` |
+| R5.E | dlopen/LoadLibrary Module-Loader (IExecutionEngine Factory) | `builder/module_loader/` |
+| R6 (V42) | VirusExecutionEngine fuer Graphen-Algorithmen (erste Virus-Implementation) | `libs/cache_engine/virus/` |
+| R7 (V42) | F15-Auswertung schnellstes Tier + Virus-Vergleich | `Diplomarbeit/06_auswertung/` |
+
+---
+
+## §40 Memory-Update
+
+NEU `[[execution-engine-als-wurzel]]` markiert die Pflicht:
+- ExecutionEngine ist die wahre Wurzel ueber AnatomyBase
+- AnatomyBase erbt von IExecutionEngine
+- Viren (Graphen etc.) erben direkt von IExecutionEngine (keine Anatomie)
+- Mess-Schnittstelle (warm_up/reset/shutdown) ist auf IExecutionEngine-Ebene
+
+---
+
+**Ende Teil 5 §33-§40 (Stand 2026-05-27 sehr frueh — User-Direktive ExecutionEngine
+als Wurzel ueber AnatomyBase + Virus-Analogie fuer Nicht-Lebewesen).**
