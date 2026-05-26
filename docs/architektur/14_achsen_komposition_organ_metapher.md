@@ -2166,3 +2166,141 @@ Konflikte.
 
 **Ende Teil 10 §45 (Stand 2026-05-27 mittag — R5.D.2 anatomy_codegen Function mit
 configure_file-Template + STATIC-Pilot + 5 Tests).**
+
+---
+
+# Teil 11 — AnatomyModuleLoader dlopen/LoadLibrary (R5.E)
+
+## §46 R5.E — AnatomyModuleLoader: SHARED-DLL Runtime-Loading
+
+### §46.1 Lieferung
+
+| Datei | Inhalt |
+|---|---|
+| `libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.hpp` (NEU) | `AnatomyModuleHandle` RAII + `AnatomyModuleLoader` Klasse |
+| `libs/cache_engine/builder/anatomy_module_loader/anatomy_module_loader.cpp` (NEU) | Plattform-Code (dlopen/LoadLibrary via `#if defined(_WIN32)`) |
+| `libs/cache_engine/builder/anatomy_module_loader/CMakeLists.txt` (NEU) | `comdare::anatomy_module_loader` STATIC-Lib + Boost::mp11 + ${CMAKE_DL_LIBS} |
+| `libs/cache_engine/builder/CMakeLists.txt` | `add_subdirectory(anatomy_module_loader)` ergaenzt |
+| `tests/unit/CMakeLists.txt` | SHARED-Pilot via comdare_codegen_anatomy_module(LIBRARY_TYPE SHARED) fuer WormholeComposition + Test-Target |
+| `tests/unit/test_v41_anatomy_module_loader.cpp` (NEU) | 11 Tests in 1 Suite |
+
+### §46.2 AnatomyModuleHandle RAII-Lifecycle
+
+```cpp
+class AnatomyModuleHandle {
+public:
+    AnatomyModuleHandle() = default;  // leere/invalide Handle
+    // Move-only (Copy = delete)
+
+    [[nodiscard]] bool valid() const noexcept;
+    [[nodiscard]] IAnatomyBase* anatomy() noexcept;
+    [[nodiscard]] AnatomyAbiVersion module_version() const noexcept;
+
+    void unload() noexcept;
+    ~AnatomyModuleHandle() { unload(); }
+};
+```
+
+**Cleanup-Reihenfolge in `unload()` (KRITISCH):**
+1. `comdare_destroy_anatomy(ptr)` ZUERST — die Instanz muss innerhalb der gleichen
+   .so/.dll-Heap-Allokation freigegeben werden (sonst Heap-Mismatch)
+2. `dlclose()` / `FreeLibrary()` DANACH — Modul entladen
+
+### §46.3 AnatomyModuleLoader::load() Validierungs-Schritte
+
+```cpp
+static int load(std::filesystem::path const& dll_path, AnatomyModuleHandle& out);
+```
+
+| Schritt | Check | Failure-Status |
+|---|---|---|
+| 1 | std::filesystem::exists(path) | `status_file_not_found` |
+| 2 | LoadLibrary/dlopen erfolgreich | `status_load_failed` |
+| 3 | 4 Pflicht-Symbole resolvable | `status_symbol_not_found` |
+| 4 | pfn_magic() == COMDARE_ANATOMY_ABI_MAGIC | `status_magic_mismatch` |
+| 5 | module.major == host.major | `status_abi_major_mismatch` |
+| 6 | module.minor <= host.minor | `status_abi_minor_too_new` |
+| 7 | pfn_create() != nullptr | `status_factory_returned_null` |
+| ✅ | alles OK | `status_ok` |
+
+Reihenfolge ist bewusst: Magic-Check vor Version-Check (defensiv: falls fremde
+.dll mit zufaelligem Version-Symbol geladen wird, faengt Magic den fehlerhaften
+Cast ab).
+
+### §46.4 End-to-End-Flow (R5.D + R5.D.2 + R5.E zusammen)
+
+```
+SearchAlgorithmPermutationEngine
+  └─ comdare_codegen_anatomy_module(LIBRARY_TYPE SHARED)
+       ├─ Template: anatomy_permutation_module.cpp.in
+       │    ├─ #include <cache_engine/abi/anatomy_module_abi_v1.hpp>
+       │    ├─ #include "@COMDARE_COMPOSITION_HEADER@"
+       │    └─ COMDARE_DEFINE_ANATOMY_MODULE(@COMDARE_COMPOSITION_TYPE@)
+       │       expandiert zu 4 extern "C" Symbolen
+       └─ add_library(comdare_anatomy_perm_<hash> SHARED ...)
+            → comdare_anatomy_perm_<hash>.dll
+                 ↓
+AnatomyModuleLoader::load(path)
+  ├─ LoadLibrary (Win) / dlopen (POSIX)
+  ├─ 4× GetProcAddress / dlsym
+  ├─ Magic + Major + Minor Validation
+  └─ comdare_create_anatomy() → IAnatomyBase*
+       ↓
+AnatomyModuleHandle (RAII)
+  ├─ anatomy()->warm_up()
+  ├─ anatomy()->run()
+  ├─ anatomy()->reset()
+  └─ anatomy()->shutdown()
+       ↓ (Destruktor)
+  comdare_destroy_anatomy(ptr)  +  FreeLibrary/dlclose
+```
+
+### §46.5 Tests-Snapshot R5.E (11 Tests, 1 Suite)
+
+| § | Test | Beweis |
+|---|---|---|
+| §1 | PlatformSuffixIsCorrect | `.dll` / `.so` / `.dylib` per OS |
+| §2 | PilotDllExists | SHARED-Codegen produziert echte .dll |
+| §3 | LoadNonExistentReturnsNotFound | errno-Style-Fehler-Mapping |
+| §4 | LoadPilotDllSucceeds | End-to-End OK, Handle valid() |
+| §5 | LoadedAnatomyIsWormholeComposition | DLL-Inhalt = generierte Composition |
+| §6 | LifecycleRoundtripViaLoadedHandle | warm_up/run/reset/shutdown via Virtual-Call ueber DLL-Grenze |
+| §7 | ModuleVersionMatchesHost | host_compatible_with(module_version) |
+| §8 | MoveConstructTransfersOwnership | Move-Only-Semantik |
+| §9 | MoveAssignReleasesPreviousAndTakesNew | Move-Assign-Cleanup |
+| §10 | MultipleLoadsProduceDistinctInstances | 2× Load → 2× distinkte IAnatomyBase-Heap-Pointer |
+| §11 | ExplicitUnloadInvalidatesHandle | manuelles unload() + Idempotenz |
+
+Anatomy-Tests gesamt nach R5.E: **133 grün** (11 Test-Files, +11 vs R5.D.2).
+
+### §46.6 Architektur-Beweis R5.D-R5.E Pipeline ist End-to-End funktional
+
+R5.D ABI + R5.D.2 Codegen + R5.E Loader sind in dieser Reihenfolge gestapelt
+und arbeiten zusammen. Die Pilot-Test-Pipeline beweist:
+
+1. CMake `comdare_codegen_anatomy_module` generiert kompilierbares C++ aus
+   Template + Composition-Type
+2. SHARED-Build mit `dllexport` exportiert die 4 ABI-Symbole als public
+3. `LoadLibrary` findet die DLL, `GetProcAddress` resolved alle 4 Symbole
+4. Magic + Version-Check verifizieren ABI-Compat
+5. Factory liefert `IAnatomyBase*` ueber DLL-Grenze (Virtual-Interface bleibt
+   stabil dank ABI-Major-Match)
+6. Virtual-Calls (`warm_up/run/reset/shutdown/composition_name`) funktionieren
+   ueber Heap-Grenze (DLL-Code-Section + Host-vtable)
+7. RAII-Cleanup ohne Heap-Mismatch
+
+### §46.7 NEXT (R6+ V42)
+
+R5.D-R5.E Pipeline ist komplett. Naechste Sprints:
+
+| Sprint | Was |
+|---|---|
+| R5.D.3 (optional) | Multi-Permutation-Codegen: SearchAlgorithmPermutationEngine iteriert + ruft Function pro Permutation → N Pilot-DLLs aus Cartesian |
+| R5.F | CacheEngineBuilder-CLI End-to-End: parst Composition-List + Codegen-Aufruf + Loader-Aufruf + Mess-Loop |
+| R6 (V42) | Workload-Driver pro geladenem Modul (YCSB-Insert/Lookup-Sequenz) |
+| R7 (V42) | F15-Auswertung: tausende Permutationen messen + schnellste identifizieren |
+
+---
+
+**Ende Teil 11 §46 (Stand 2026-05-27 nachmittag — R5.E AnatomyModuleLoader End-to-End
+SHARED-DLL Runtime-Loading + 11 Tests).**
