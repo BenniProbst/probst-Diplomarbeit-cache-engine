@@ -936,3 +936,306 @@ Statistics-Support): leerer `EmptySnapshot{}` POD.
 
 **Ende Teil 3 (Stand 2026-05-26 sehr spaet — User-Direktive Verantwortlichkeits-
 Trennung + 3-Kompositionale-Joins + ABI-Stabilitaet).**
+
+---
+
+# Teil 4 — Anatomie-Gattungen + AnatomyBase + Gattungs-spezialisierte PermutationEngines
+
+> **Anmerkung [[never-delete-documentation]]:** Teil 1+2+3 oben unangetastet.
+> Teil 4 dokumentiert die User-Direktive 2026-05-26 sehr spaet zur Gattungs-
+> Klassifikation der Anatomien (Saeugetier vs Reptil-Metapher) und der
+> daraus folgenden PermutationEngine-Spezialisierung.
+
+---
+
+## §25 User-Direktive verbatim (2026-05-26 sehr spaet, R5.C-Sprint-Start)
+
+> "Hinweis: Fuer die Anatomie eines Suchalgorithmus gibt es unter einer AnatomyBase
+> verschiedene spezielle Suchalgorithmen oder Anatomie-Varianten, die vielleicht
+> auch nur container darstellen. Bitte recherchiere dazu die std container von C++
+> im web. Es gibt hier auch eine std::map<key,value> als Suchalgorithmus oder eine
+> std::multi_map<key,value>. Es gibt daneben std::vector<>, std::list und so
+> weiter. Das sind im Grunde alles Auspraegungen von Anatomien. Dabei gehoeren
+> Suchalgorithmen und algemeine Container jedoch zu unterschiedlichen Gattungen
+> bezueglich ihrer Metaprogrammierten template Variablen. Sie verwenden daher
+> jeweils passend unterschiedliche Auspraegungen der Achsen. Dies kann man sich
+> vorstellen wie Gattungen in der Tierwelt wie Saeugetiere vs. Reptilien. Bitte
+> dokumentiere das. Trotzdem sind alle Gattungen am Ende Lebewesen, also alle
+> Anatomie-Gattungen fallen unter die abstrakte Klasse der AnatomyBase. Wir
+> beginnen bei den Suchalgorithmen, also std::map<key,value> aehnlichen Anatomie
+> Permutationen. Die Permutation Engine muss fuer die anatomischen Moeglichkeiten
+> jeder Anatomie-Gattungen durch Unterklassen spezifiziert werden, die von der
+> Haupt-Permutation-Engine erben und diese fuer jede Anatomie-Gattung spezifizieren,
+> um korrekt gesteuert durch die CacheEngineBuilder Anatomien und damit
+> Experiment-Algorithmus-Binaries ausliefern zu koennen."
+
+---
+
+## §26 Web-Recherche Ergebnis — std::-Container-Hierarchie
+
+5 std-Container-Familien identifiziert (siehe cppreference.com Container library):
+
+### §26.1 Gattung A — Sequence Containers (V-only indexed)
+| Container | Template-Signatur |
+|---|---|
+| `std::array<T, N>` | Fixed-size, kein Allocator |
+| `std::vector<T>` | Dynamic, contiguous |
+| `std::deque<T>` | Double-ended, chunked |
+| `std::list<T>` | Doubly-linked |
+| `std::forward_list<T>` | Singly-linked |
+
+Pflicht-API: `push_back(V)/operator[](i)/at(i)/begin()/end()/value_type/size_type/allocator_type`.
+
+### §26.2 Gattung B — Ordered Associative (K-V Search, Tree-basiert)
+| Container | Template-Signatur |
+|---|---|
+| `std::set<K>` | Set, Key-only |
+| `std::multiset<K>` | Multi-Key Set |
+| `std::map<K, V>` | Map, K → V (one) |
+| `std::multimap<K, V>` | Multi-Map, K → {V1...Vn} |
+
+Pflicht-API: `find(K)/contains(K)/insert(K,V)/erase(K)/key_compare/key_type/mapped_type`.
+
+### §26.3 Gattung C — Unordered Associative (K-V Search, Hash-basiert)
+| Container | Template-Signatur |
+|---|---|
+| `std::unordered_set<K>` | Hash-Set |
+| `std::unordered_map<K, V>` | Hash-Map |
+| `std::unordered_multi{set,map}` | Multi-Variants |
+
+Pflicht-API: identisch zu Gattung B + zusaetzlich `hasher/key_equal/bucket_count()`.
+
+### §26.4 Gattung D — Container Adapters (Wrapper)
+| Container | Inner-Container-Default |
+|---|---|
+| `std::stack<T>` | `std::deque<T>` |
+| `std::queue<T>` | `std::deque<T>` |
+| `std::priority_queue<T>` | `std::vector<T>` + Compare |
+
+Pflicht-API: `push(V)/pop()/top()/front()/back()` — KEIN `begin()/end()`.
+
+### §26.5 Gattung E — Flat Associative (C++23 NEU)
+| Container | Inner-Container |
+|---|---|
+| `std::flat_set<K>` | Default `std::vector<K>` |
+| `std::flat_map<K, V>` | Default `std::vector<K>` + `std::vector<V>` |
+| `std::flat_multi{set,map}` | Multi-Variants |
+
+Pflicht-API: identisch zu Gattung B, aber Inner-Container ist Composition-Achse.
+
+### §26.6 Gattung F — Views/Spans (non-owning)
+| View | Pflicht-Template |
+|---|---|
+| `std::span<T, Extent>` | `T, std::size_t Extent` |
+| `std::mdspan<T, Extents, Layout, Accessor>` | Multidimensional |
+| `std::string_view` | Spezialfall fuer `CharT, Traits` |
+
+Pflicht-API: `operator[]/data()/size()` — KEIN insert/erase, non-owning.
+
+---
+
+## §27 AnatomyBase — die abstrakte Wurzel aller Lebewesen
+
+User-Direktive: "Alle Anatomie-Gattungen fallen unter die abstrakte Klasse der
+AnatomyBase."
+
+### §27.1 Two-Phase-Architektur: Concept (Compile-Time) + Interface (Runtime/ABI)
+
+| Schicht | Was | Wann verwendet |
+|---|---|---|
+| **AnatomyConcept** | C++23 Concept (Compile-Time) | Static Dispatch, Concept-Guards, Template-Constraints |
+| **IAnatomyBase** | Virtual Interface | Module-Loader (R5.D), ABI ueber .so/.dll, dlopen Polymorphismus |
+
+Beide gelten gleichzeitig — konkrete Anatomien implementieren **beide**:
+
+```cpp
+// libs/cache_engine/anatomy/anatomy_base.hpp (R5.C.0 Pflicht)
+namespace comdare::cache_engine::anatomy {
+
+// Compile-Time Wurzel-Concept (statische Klassifizierung)
+template <class A>
+concept AnatomyConcept = requires {
+    typename A::composition_t;
+    { A::composition_name() } -> std::convertible_to<std::string_view>;
+    { A::paper_id() }         -> std::convertible_to<std::string_view>;
+    { A::organ_count() }      -> std::convertible_to<std::size_t>;
+    { A::genus() }            -> std::convertible_to<AnatomyGenus>;  // Pflicht in Teil 4
+};
+
+// Compile-Time Gattungs-Enum
+enum class AnatomyGenus {
+    SearchAlgorithm,  // std::map / multimap / unordered_map / flat_map
+    Sequence,         // std::vector / list / deque / array
+    Set,              // std::set / unordered_set / flat_set
+    Adapter,          // std::stack / queue / priority_queue
+    View              // std::span / mdspan / string_view
+};
+
+// Runtime ABI-Interface (R5.D fuer Module-Loader)
+class IAnatomyBase {
+public:
+    virtual ~IAnatomyBase() = default;
+    [[nodiscard]] virtual std::string_view composition_name() const noexcept = 0;
+    [[nodiscard]] virtual std::string_view paper_id() const noexcept = 0;
+    [[nodiscard]] virtual AnatomyGenus     genus() const noexcept = 0;
+    [[nodiscard]] virtual std::size_t      organ_count() const noexcept = 0;
+};
+
+}  // namespace
+```
+
+### §27.2 Tier-Metapher-Mapping
+
+| Tierwelt-Gattung | Anatomie-Gattung | std::-Container Beispiele | Stoffwechsel |
+|---|---|---|---|
+| **Saeugetier** | `SearchAlgorithm` | std::map, std::unordered_map, std::flat_map | Vollstaendige Anatomie mit allen 17 Achsen |
+| **Vogel** | `Set` | std::set, std::unordered_set | Reduzierte Anatomie (K-only, kein V-Suchorgan) |
+| **Reptil** | `Sequence` | std::vector, std::list, std::deque | Lineare Anatomie (V-only, kein K-Suchorgan) |
+| **Wirbelloses** | `Adapter` | std::stack, std::queue, std::priority_queue | Decorator ueber anderem Lebewesen (Inner-Container) |
+| **Pflanze** | `View` | std::span, std::mdspan | Sessil + non-owning |
+
+---
+
+## §28 Achsen-Verteilung pro Gattung
+
+Jede Gattung verwendet eine **Teilmenge** der 17 Achsen:
+
+| Achse | Mammal (Search) | Bird (Set) | Reptile (Sequence) | Invertebrate (Adapter) | Plant (View) |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **search_algo** (axis_03a) | ✓ | ✓ | — | (delegated) | — |
+| **cache_traversal** (axis_03b) | ✓ | ✓ | — | (delegated) | — |
+| **mapping** (axis_03m) | ✓ | — | — | — | — |
+| **path_compression** (axis_02) | ✓ | ✓ | — | — | — |
+| **node_type** (axis_04) | ✓ | ✓ | — | — | — |
+| **memory_layout** (axis_05) | ✓ | ✓ | ✓ | (delegated) | ✓ |
+| **allocator** (axis_06) | ✓ | ✓ | ✓ | (delegated) | — (non-owning) |
+| **prefetch** (axis_07) | ✓ | ✓ | ✓ | (delegated) | — |
+| **concurrency** (axis_08) | ✓ | ✓ | ✓ | (delegated) | — (immutable) |
+| **serialization** (axis_10) | ✓ | ✓ | ✓ | ✓ | — |
+| **telemetry** (axis_11) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **value_handle** (axis_14) | ✓ | — (K=V) | ✓ | ✓ | ✓ |
+| **isa** (axis_09) | ✓ | ✓ | ✓ | (delegated) | ✓ |
+| **index_organization** (axis_01) | ✓ | ✓ | — | — | — |
+| **io_dispatch** (axis_io) | ✓ | ✓ | ✓ | (delegated) | — |
+| **migration_policy** (axis_migration) | ✓ | ✓ | ✓ | (delegated) | — |
+| **filter** (axis_filter) | ✓ | ✓ | — | — | — |
+| **inner_container** (NEU axis_inner fuer Adapter) | — | — | — | ✓ | — |
+| **growth_policy** (NEU axis_growth fuer Sequence) | — | — | ✓ | — | — |
+| **extent_policy** (NEU axis_extent fuer View) | — | — | — | — | ✓ |
+| **layout_policy** (NEU axis_layout fuer mdspan-View) | — | — | — | — | ✓ |
+| **accessor_policy** (NEU axis_accessor fuer mdspan-View) | — | — | — | — | ✓ |
+
+**Konsequenz:** Die 17 Achsen sind **fuer Mammal/Search** das Komplettpaket. Andere
+Gattungen nutzen Teilmengen + ggf. eigene Achsen (NEU axis_inner/axis_growth/etc.).
+
+---
+
+## §29 PermutationEngine-Spezialisierung pro Gattung
+
+User-Direktive: "Die Permutation Engine muss fuer die anatomischen Moeglichkeiten
+jeder Anatomie-Gattungen durch Unterklassen spezifiziert werden, die von der
+Haupt-Permutation-Engine erben und diese fuer jede Anatomie-Gattung spezifizieren."
+
+### §29.1 Generische Wurzel (V41.F.6.1.D existing)
+
+```cpp
+template <class... TopicConfigSets>
+class PermutationEngine {
+    using AllPermutations = mp::mp_product<PermTuple, typename TopicConfigSets::StaticAxisVariants...>;
+public:
+    template <class Visitor> static void for_each_permutation(Visitor&&);
+};
+```
+
+Generisch — ohne Wissen ueber Gattung.
+
+### §29.2 Gattungs-Spezialisierung (R5.C+ Pflicht)
+
+```cpp
+// libs/cache_engine/anatomy/search_algorithm_permutation_engine.hpp
+template <class... TopicConfigSets>
+class SearchAlgorithmPermutationEngine : public PermutationEngine<TopicConfigSets...> {
+public:
+    static constexpr AnatomyGenus genus = AnatomyGenus::SearchAlgorithm;
+
+    // Spezialisierte Composition-Materialization mit K=uint64_t, V=uint64_t Defaults
+    template <class Visitor>
+    static constexpr void for_each_search_algorithm(Visitor&& v) {
+        Base::for_each_permutation([&]<class P>(){
+            using AdHoc = CompositionFromPermTuple<P>;
+            // Gattungs-spezifische Anatomie-Instantiation
+            SearchAlgorithmAnatomy<AdHoc> anatomy;
+            std::forward<Visitor>(v)(anatomy, AdHoc::name);
+        });
+    }
+};
+
+// libs/cache_engine/anatomy/sequence_permutation_engine.hpp
+template <class... TopicConfigSets>
+class SequencePermutationEngine : public PermutationEngine<TopicConfigSets...> {
+public:
+    static constexpr AnatomyGenus genus = AnatomyGenus::Sequence;
+    // KEINE search_algo/cache_traversal/mapping Achsen — nur V-only-Achsen
+    // SequenceAnatomy<AdHoc> hat reduzierten Achsen-Satz
+};
+
+// Analog: SetPermutationEngine, AdapterPermutationEngine, ViewPermutationEngine
+```
+
+### §29.3 CacheEngineBuilder waehlt Gattung pro Sprint
+
+```cpp
+// Pseudocode CacheEngineBuilder
+int main(int argc, char** argv) {
+    std::string genus = argv[1];  // "search" / "sequence" / "set" / ...
+    if (genus == "search") {
+        SearchAlgorithmPermutationEngine<...>::for_each_search_algorithm(...);
+    } else if (genus == "sequence") {
+        SequencePermutationEngine<...>::for_each_sequence(...);
+    }
+    // ...
+}
+```
+
+Jede Gattung produziert eigene **Experiment-Algorithmus-Binaries** (.so/.dll)
+mit eigenem Permutations-Raum.
+
+---
+
+## §30 Phasen-Plan: Wir beginnen bei Suchalgorithmen (Saeugetier)
+
+User-Direktive: "Wir beginnen bei den Suchalgorithmen, also std::map<key,value>
+aehnlichen Anatomie Permutationen."
+
+| Sprint | Was | Status |
+|---|---|---|
+| **R5.C.0** | AnatomyBase + AnatomyConcept + AnatomyGenus enum + Tier-Metapher-Doku | Doku 14 §27-§29 done |
+| **R5.C.A** | SearchAlgorithmAnatomy explizit als Gattung markieren (genus() = SearchAlgorithm) | NEXT |
+| **R5.C.B** | SearchAlgorithmPermutationEngine als Spezialisierung anlegen | folgt |
+| **R5.C.C** | Pruefling-Merge Stufe 2 + 3 (war urspruenglich R5.C-Plan) | folgt |
+| **R5.D** | CacheEngineBuilder CLI + extern "C" ABI fuer Search-Algorithm-Anatomien | spaeter |
+| **R5.E** | dlopen/LoadLibrary Module-Loader (IAnatomyBase virtual Interface) | spaeter |
+| **R6 (V42)** | Andere Gattungen ergaenzen (Sequence/Set/Adapter/View) | optional V42 |
+
+---
+
+## §31 Konsistenz-Check mit existing Code (R3+R3.2+R4+R5.A+R5.B)
+
+Bestehendes muss um Gattungs-Marker ergaenzt werden:
+
+| Stand R5.B | Ergaenzung Teil 4 |
+|---|---|
+| `SearchAlgorithmAnatomy<C>` | `+ static constexpr AnatomyGenus genus() = SearchAlgorithm` |
+| `AdHocComposition<T0...T16>` | unveraendert (Search-Achsen-Set) |
+| `ObserverAggregate<C>` | unveraendert (POD-Snapshot pro Achse) |
+| `AnatomyPermutationDriver<TopicConfigSets...>` | wird zu `SearchAlgorithmPermutationEngine<TopicConfigSets...>` umbenannt (Folge-Sprint) |
+| `AnatomyExecutionContext<C>` | unveraendert (Builder-Wrapper) |
+| `5 Builder-Commands` | unveraendert (Search-spezifisch ok fuer jetzt) |
+
+**Memory-Updates:**
+- NEU `[[anatomie-gattungen]]` — 5 Gattungen + Tier-Metapher + AnatomyBase
+
+---
+
+**Ende Teil 4 (Stand 2026-05-26 sehr spaet — User-Direktive Anatomie-Gattungen +
+AnatomyBase + Gattungs-spezialisierte PermutationEngines).**
