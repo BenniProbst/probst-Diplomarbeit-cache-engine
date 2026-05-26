@@ -1030,3 +1030,134 @@ Inheritance + 4 using-Statements einen Override.
 ---
 
 **Ende Teil C (Stand 2026-05-26 spaete Nacht nach P2.C-Refactor).**
+
+---
+
+# Teil D — Erweiterungen Phase B.2.D + Helper-Refactor + TYPED_TEST + Papers-Sortierung
+
+> **Anmerkung [[never-delete-documentation]]:** Teil A+B+C bleiben unangetastet.
+> Teil D dokumentiert die Roll-out-Erweiterungen + User-Kritik-Reaktionen
+> (Test-Bloat-Reduktion via TYPED_TEST, Papers-Reorganisation).
+
+---
+
+## §20 Helper-Refactor `comdare_register_paper_wrapper()`
+
+User-Kritik (analog [[cross-axis-defaults-no-bloat]]): pro Paper 12-Zeilen-Block
+in CMakeLists.txt war Wiederholungs-Bloat fuer Roll-out.
+
+**Loesung:** Helper-Funktion in `cmake/is_original_codegen.cmake`. Pro Paper 1 Aufruf:
+
+```cmake
+comdare_register_paper_wrapper(
+    PAPER_ID          a05_jemalloc
+    EXT_DIR           "${CMAKE_CURRENT_SOURCE_DIR}/ext/A05-jemalloc"
+    EXT_SENTINEL_FILE "src/jemalloc.c"
+    LEGACY_DIR        "${_a06_legacy_root}/paper_a05_jemalloc"
+    FILES             "src/jemalloc.c"
+    OUTPUT_HEADER     "${_a06_gen_root}/paper_a05_jemalloc_is_original.hpp"
+    NAMESPACE         "${_a06_namespace_root}::a05_jemalloc"
+    WRAPPER_NAME      jemalloc
+)
+```
+
+Auto-SKIP wenn EXT_SENTINEL_FILE fehlt (graceful Fallback wenn ext/-Submodul nicht ausgecheckt).
+
+---
+
+## §21 TYPED_TEST_SUITE Refactor — Smoke-Tests skalieren ueber Type-List
+
+User-Kritik: P2.B + P2.D Smoke-Tests waren per-Wrapper kopiert (Code-Bloat).
+
+**Refactor in `test_v41_paper_legacy_code.cpp`:**
+
+```cpp
+using PaperWrapperList = ::testing::Types<
+    MimallocAllocator, JemallocAllocator, SnmallocAllocator,
+    DlmallocAllocator, RPMallocAllocator, LRMallocAllocator
+>;
+template <typename W> class PaperWrapperConformance : public ::testing::Test {};
+TYPED_TEST_SUITE(PaperWrapperConformance, PaperWrapperList);
+
+TYPED_TEST(PaperWrapperConformance, AxisBaseConcept) { static_assert(AxisBaseConcept<TypeParam>); ... }
+TYPED_TEST(PaperWrapperConformance, IsOriginalModuleAggregation) { static_assert(TypeParam::is_original_module()); ... }
+// ... 8 Tests total pro Wrapper
+```
+
+Bei Roll-out weiterer Paper-Wrappers: nur Type-List ergaenzen → automatisch 8 weitere Tests.
+
+**Analog NonPaperWrapperDefaults** (5 Tests × 6 Cross-Topic-Wrappers).
+
+---
+
+## §22 Roll-out Status (Allocator-Achse 24 Wrappers)
+
+| Status | Wrappers | Bemerkung |
+|---|---|---|
+| **6 INTEGRIERT** (P2.B + P2.D + P2.D.b2) | mimalloc, jemalloc, snmalloc, dlmalloc, rpmalloc, lrmalloc | Paper-Mixin-Inheritance + Tool-validiert |
+| **4 DEFERRED P2.D.t2** | tcmalloc, hoard, michael_lf, scalloc | Bazel-Build oder Custom-Shim-Symbol-Mapping |
+| **14 ohne ext/-Source** | StdMalloc, PMR, Slab, NUMAlloc, CAMA, StarMalloc, TC-WH, HMalloc, PIM, Crystalline, Exgen, Buddy, PtMalloc2, Vmem-Mag | Pseudocode/algorithmic — AxisBase Default `false`/`"original"` |
+
+**Konsequenz aktuell:** 6 von 24 Allocator-Wrappers haben echte Habich-Compliance,
+14 sind via AxisBase Default abgedeckt (kein Code-Bloat).
+
+---
+
+## §23 Traversal-Achse Roll-out (TODO P2.D.tr — separater Sprint)
+
+ext/ enthaelt P0X-Submodule fuer Paper-Algorithmen jenseits Allocator:
+
+| ext-Submodul | Traversal-Wrapper | Paper |
+|---|---|---|
+| ext/P01-ART/unodb | Array256 | Leis ICDE 2013 |
+| ext/P02-HOT/hot | VectorU8U8 | Binna PVLDB 2018 |
+| ext/P05-START/START | VectorU16U16 | Mertens ICDE 2024 |
+| ext/P03-Masstree | (kein direkter Wrapper, evtl. zukuenftig) | Mao 2012 |
+| ext/P04-CoCo-trie | (kein direkter Wrapper) | Boffa 2024 |
+| ext/P06-B2tree, P07-Wormhole, P10-SuRF, P20-BTreesAreBack, P25-Mahling, P29-RCU, P30-HazardPointers | (kein direkter Wrapper) | verschiedene |
+
+**Plan-Sprint P2.D.tr:**
+1. Audit P01/P02/P05 Source-Function-Names + manifest.txt
+2. legacy_code/paper_p0X_xxx/ Skelett pro Wrapper
+3. CMakeLists Helper-Aufruf (analog Allocator-Pattern)
+4. Wrapper-Refactor (Array256/VectorU8U8/VectorU16U16 erben vom Paper-Mixin)
+5. TYPED_TEST-Liste in test_v41_paper_legacy_code.cpp erweitern (Auto-Skalierung)
+
+Mixin-Template: braucht entweder neue Achs-Mixin-Files (axis_03a_search_algo_original_code_mixin.hpp
+existiert bereits aus P2.F!) — Wrappers koennen direkt davon erben.
+
+---
+
+## §24 Papers-Sortierung Diplomarbeit/Forschungsarbeiten/
+
+37 Papers nach Topic-Achse strukturiert ([[never-delete-documentation]]: nur git mv):
+
+| Topic-Unterordner | Papers | Inhalt-Beispiele |
+|---|---|---|
+| traversal/ | 17 | ART, HOT, START, B+/B²/CSB+-Trees, CoCo-trie, SuRF, Wormhole, Masstree |
+| prefetch/ | 8 | Hardware/Software-Prefetching + Fractal B+ |
+| concurrency/ | 3 | Hazard Pointers, RCU, ART of Practical Synchronization |
+| memory_layout/ | 5 | Cache-Sensitive Layouts, Tree Layout Multilevel |
+| general/ | 1 | Overview Hardware Optimizations |
+| hardware/ | 1 | vampir-poster ZIH |
+| code/ | (unangetastet) | P0X Source-Code-Kartographien |
+| low priority/ | (unangetastet) | spaeter zu sichten |
+
+cache-engine `ext/`-Submodule sind bereits topic-strukturiert
+(A0X = Allocator, P0X = Paper-Algorithmus).
+
+---
+
+## §25 Tests-Stand Endstand P2.D.b2
+
+| Test-Target | Tests | Aenderung |
+|---|---|---|
+| test_v41_topic_allocator_axis_06 | 252 | unveraendert |
+| test_v41_topic_queuing | 205 | unveraendert |
+| test_v41_topic_traversal | 95 | unveraendert |
+| test_v41_paper_legacy_code | 102 | +24 (3 neue Paper-Wrappers × 8 TYPED_TEST) |
+| **TOTAL cache-engine** | **654** | **+61 von 593** |
+
+---
+
+**Ende Teil D (Stand 2026-05-26 noch spaeter — Phase B.2.D.b2 Endstand).**
