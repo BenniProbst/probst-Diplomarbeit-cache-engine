@@ -1645,3 +1645,215 @@ Wenn der externe Repos-Sprint kommt, gelten folgende Pattern-Disziplinen:
 ---
 
 **Ende Teil G (Stand 2026-05-26 spaeter — P2.D.q Audit-only Sprint, 0 ext/-Sources verfuegbar).**
+
+---
+
+# Teil H — ext/-Topic-Reorganisation (2026-05-26 spaeter)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil A-G unangetastet. Teil H dokumentiert
+> die ext/-Verzeichnis-Reorganisation nach User-Direktive 2026-05-26 + concurrentqueue
+> Pilot-Submodule fuer P2.D.q.s2.
+
+---
+
+## §43 User-Direktive (2026-05-26)
+
+> "Viele paper werden mir einfach per zip zugesendet, es ist teilweise einfach ein
+> lokaler Ordner mit code. Wenn es ein externes repo gibt, sollten wir die ext in
+> topics analog gliedern und dort die Paper entweder speichern oder hinein clonen
+> (beim ersten build). Hab das geklont, vielleicht noch nach Namenskonventionen
+> umbenennen und wie gesagt Struktur etwas aufraeumen."
+
+**Konsequenz:** ext/ wird nach Topic gegliedert (analog libs/cache_engine/topics/):
+
+```
+ext/
+├── allocator/      ← Topic 06 (10 Paper-Sources: A01-A20)
+│   ├── A01-hoard/      (ZIP, regulaerer git-Subtree)
+│   ├── A03-michael-lockfree/
+│   ├── A04-mimalloc/
+│   ├── A05-jemalloc/
+│   ├── A06-tcmalloc/
+│   ├── A07-snmalloc/
+│   ├── A08-scalloc/
+│   ├── A10-rpmalloc/
+│   ├── A11-lrmalloc/
+│   ├── A20-dlmalloc/
+│   └── REPOS_OVERVIEW.md
+├── traversal/      ← Topic 03 (12 Paper-Sources: P01-P30)
+│   ├── P01-ART/        (ZIP, regulaerer git-Subtree)
+│   ├── P02-HOT/
+│   ├── ...
+│   └── P30-HazardPointers/
+├── queuing/        ← Topic Q (1 Paper-Source: Q01-concurrentqueue als Submodule)
+│   └── Q01-concurrentqueue/  ← echtes git Submodule (header-only, cameron314)
+└── CMakeLists.txt
+```
+
+---
+
+## §44 Source-Eintrag-Methoden (zwei Pattern)
+
+### §44.1 Pattern A — Lokaler Source-Snapshot (ZIP/Manual)
+
+Wenn ein Paper-Code als ZIP oder lokaler Ordner vom Autor/Reviewer kommt
+(kein externes Repo verfuegbar oder nicht gewuenscht): direkt als regulaerer
+Git-Subtree ins cache-engine repository einfuegen.
+
+**Pattern (manuell):**
+```bash
+# User entpackt ZIP nach ext/<topic>/<XX-name>/
+unzip Paper-XXX.zip -d ext/allocator/A99-foo/
+# Dann commit als regulaerer git-Subtree:
+git add ext/allocator/A99-foo/
+git commit -m "Add A99-foo Paper-Source (ZIP from Author 2026-XX-XX)"
+```
+
+**Stand 2026-05-26:** 22 Source-Snapshots dieser Art (10 Allokatoren + 12 SearchAlgo-Paper)
+
+### §44.2 Pattern B — Externes Submodule (git submodule add)
+
+Wenn ein Paper als public GitHub/GitLab-Repo verfuegbar ist: als git Submodule
+einbinden mit folgender Namens-Konvention.
+
+**Pattern (vom User auszufuehren — Memory `[[no-git-submodules]]` Ausnahme cache-engine):**
+```bash
+cd ext/<topic>/
+git submodule add <URL> XX-<name>
+# z.B.: git submodule add https://github.com/cameron314/concurrentqueue Q01-concurrentqueue
+```
+
+**Stand 2026-05-26:** 1 Submodule (Q01-concurrentqueue).
+
+### §44.3 Pattern C (zukuenftig) — Lazy-Clone bei first Build
+
+User-Direktive (verbatim): "beim ersten Build". Konkret koennte das per
+CMake-FetchContent oder `add_custom_command` (PRE_BUILD) realisiert werden:
+
+```cmake
+function(comdare_ext_lazy_clone)
+    cmake_parse_arguments(ARG "" "TOPIC;NAME;URL;TAG" "" ${ARGN})
+    set(_dest "${CMAKE_SOURCE_DIR}/ext/${ARG_TOPIC}/${ARG_NAME}")
+    if(NOT EXISTS "${_dest}/.git" AND NOT EXISTS "${_dest}/CMakeLists.txt")
+        message(STATUS "comdare ext lazy-clone: ${ARG_NAME} from ${ARG_URL}")
+        execute_process(COMMAND ${GIT_EXECUTABLE} clone --depth 1 ${ARG_URL} "${_dest}"
+                        RESULT_VARIABLE _rc)
+        if(NOT _rc EQUAL 0)
+            message(WARNING "comdare ext lazy-clone FAILED: ${ARG_NAME} (skip Paper-Wrapper)")
+        endif()
+    endif()
+endfunction()
+```
+
+**Status:** Nicht implementiert. TODO fuer P2.D.q.s2 oder Folge-Sprint.
+
+---
+
+## §45 Namens-Konvention (verbindlich seit P2.D.q.s2)
+
+```
+ext/<topic>/<TOPICPREFIX><NN>-<descriptive_name>/
+```
+
+| Komponente | Regel | Beispiele |
+|---|---|---|
+| `<topic>` | snake_case Topic-Name (matched libs/cache_engine/topics/) | allocator, traversal, queuing |
+| `<TOPICPREFIX>` | Single Capital Letter | A (allocator), P (traversal/Paper), Q (queuing) |
+| `<NN>` | 2-stellige Zahl, Null-paddiert | 01, 04, 25 |
+| `<descriptive_name>` | kebab-case Paper/Repo-Name | mimalloc, ART, concurrentqueue |
+
+**Beispiele konform:**
+- `ext/allocator/A04-mimalloc/`
+- `ext/traversal/P01-ART/`
+- `ext/queuing/Q01-concurrentqueue/`
+
+**Korrektur 2026-05-26:** `ext/Q-concurrentqueue` → `ext/queuing/Q01-concurrentqueue`
+(2-stellige NN-Padding angeglichen).
+
+---
+
+## §46 CMake-Pfad-Auswirkungen
+
+Pfad-Aenderungen in folgenden Files (~25 Stellen total):
+
+| File | Anzahl | Bemerkung |
+|---|:-:|---|
+| `CMakeLists.txt` (Root) | 9 | comdare_register_paper_wrapper EXT_DIR pro Wrapper |
+| `ext/CMakeLists.txt` | mehrere | mimalloc/snmalloc Vendor-Build-Pfade |
+| `cmake/is_original_codegen.cmake` | 2 | Doku-Kommentare |
+| `adapters/A01-A20/CMakeLists.txt` | 10 Files × 2 | COMDARE_HAVE_<X> include_directories |
+| `adapters/P01-P30/CMakeLists.txt` | 12 Files × 1-2 | COMDARE_HAVE_<X> include_directories |
+
+**Tests-Verifikation:** alle 714 cache-engine Tests gruen nach Reorganisation
+(252 + 205 + 131 + 126). KEINE Test-Code-Aenderung noetig — nur Pfad-Anpassung.
+
+---
+
+## §47 Pilot-Plan P2.D.q.s2 (concurrentqueue — Folge-Sprint)
+
+Nach erfolgter ext/-Reorganisation kann der queuing Pilot-Wrapper folgen:
+
+### §47.1 Verzeichnis-Struktur (Plan)
+
+```
+libs/cache_engine/topics/queuing/axis_q1_queuing/
+├── ... (existing 14 Wrappers)
+├── axis_q1_queuing_original_lockfree_mpmc.hpp  ← NEU (Pilot fuer P2.D.q.s2)
+└── legacy_code/
+    └── paper_q01_concurrentqueue/
+        ├── LICENSE                 (BSD-2)
+        ├── README.md
+        ├── manifest.txt            (@compiler gcc-9.5, mapping enqueue/try_dequeue)
+        ├── compiler_info.txt       (gcc-9.5 -O3 -std=c++17 -DMOODYCAMEL_DELETE_FUNCTION=delete)
+        ├── MODIFICATIONS.md
+        ├── .gitignore              (excludes concurrentqueue.h Source-Copy)
+        └── sha256_locked.txt       (auto-generated First-Build)
+```
+
+### §47.2 CMakeLists.txt Erweiterung (axis_q1_queuing Block)
+
+```cmake
+# V41.F.6.1.P2.D.q.s2 Queuing Roll-out Stufe 1 — axis_q1_queuing
+set(_aq1_legacy_root "${CMAKE_CURRENT_SOURCE_DIR}/libs/cache_engine/topics/queuing/axis_q1_queuing/legacy_code")
+set(_aq1_gen_root    "${CMAKE_CURRENT_BINARY_DIR}/generated/topics/queuing/axis_q1_queuing/legacy_code")
+set(_aq1_namespace_root "comdare::cache_engine::queuing::axis_q1_queuing::generated")
+set(_aq1_axis_mixin     "comdare::cache_engine::queuing::axis_q1_queuing::concepts::BufferOriginalCodeMixin")
+
+comdare_register_paper_wrapper(
+    PAPER_ID          q01_concurrentqueue
+    EXT_DIR           "${CMAKE_CURRENT_SOURCE_DIR}/ext/queuing/Q01-concurrentqueue"
+    EXT_SENTINEL_FILE "concurrentqueue.h"
+    LEGACY_DIR        "${_aq1_legacy_root}/paper_q01_concurrentqueue"
+    FILES             "concurrentqueue.h"
+    OUTPUT_HEADER     "${_aq1_gen_root}/paper_q01_concurrentqueue_is_original.hpp"
+    NAMESPACE         "${_aq1_namespace_root}::q01_concurrentqueue"
+    WRAPPER_NAME      concurrentqueue
+    AXIS_MIXIN_TYPE   "${_aq1_axis_mixin}"
+)
+```
+
+### §47.3 Wrapper-Klasse OriginalLockFreeMpmcConcurrentQueue
+
+Inheritance: `BufferStrategyBase` + `generated::q01_concurrentqueue::OriginalCodeMixin`.
+Paper-API-Mapping: put → enqueue, get → try_dequeue (concurrentqueue MPMC-API).
+6/6 originall (BufferOriginalCodeMixin hat put/get/emplace/peek_front/peek_back/clear —
+peek_front/peek_back/emplace sind Cache-Engine Re-Impl-Erweiterung, also 2-3 Lücken
+je nach Mixin-Field-Konfiguration). Body: extern Linking gegen concurrentqueue.h Headers.
+
+**Plan Status:** Wartet auf P2.D.q.s2 Sprint.
+
+---
+
+## §48 Pending Sub-Stufen — Reihenfolge (Stand nach ext/-Reorganisation)
+
+| Sub-Task | Stand | Bemerkung |
+|---|---|---|
+| ~~ext/ Topic-Reorganisation~~ | ✅ **heute** — V41.F.6.1.struct |
+| **P2.D.q.s2 Pilot** OriginalLockFreeMpmcConcurrentQueue | **NEXT** Task #690 |
+| **P2.D.t2** 4 deferred Allocator (Bazel + Custom-Shims) | pending Task #685 |
+| **P2.D.tr.s3** weitere Traversal-Paper (P03/P04/P06/P07/P10/P20/P25/P29/P30) | pending |
+| **P2.A.W + P2.D.tr.s4** Library-Build Original-Compiler | pending Task #689 |
+
+---
+
+**Ende Teil H (Stand 2026-05-26 spaeter — ext/-Topic-Reorganisation + concurrentqueue Pilot-Submodule).**
