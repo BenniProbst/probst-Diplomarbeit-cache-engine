@@ -399,3 +399,481 @@ Reproducibility-Manifest (build/reproducibility.md):
   `has_original=false`, ~20% echte Paper-Linking).
 - **Phase D (V42):** Compiler-Matrix-Permutationen (V41.B4 / V41.B4.1 als
   CartesianProduct mit experiment_compiler).
+
+---
+
+# Teil B — Erweiterungen aus Phase B.2.x (Stand 2026-05-26 spaete Nacht)
+
+> **Anmerkung Memory `[[never-delete-documentation]]`:** Sektionen §1-§11 oben sind die Phase-A-Konzeption (Initial-Doku 2026-05-26 frueh). Phase B.2 hat substantielle Architektur-Korrekturen erbracht (Pre-Build-Tool, Mixin-Pattern, AxisBase Wurzel). Folgende §12-§18 dokumentieren den Endstand nach P2.A0 + P2.A0.5 + P2.A0.6 + P2.A0.7 + P2.C.1. Bei Konflikten zwischen Teil A und Teil B ist Teil B verbindlich.
+
+---
+
+## §12 AxisBase Wurzel-Pattern (V41.F.6.1.P2.A0.7 + P2.C.1)
+
+### §12.1 Motivation
+
+Phase A Doku (§1-§11) hatte 4 Schichten konzipiert (Concept-System + C-Interface-Adapter + Paper-Original-Code + Compiler-Cache). Phase B.2 hat sich gezeigt: die Achsen-Wrapper waren **strukturell synchron** in ihren Eigenschaften (z.B. `is_thread_safe`, `progress_guarantee`, `name`), aber ohne **gemeinsame Wurzel**. Eine echte Cross-Axis-Basis war Pflicht fuer:
+
+- Konsistente Property-API ueber alle Topics (allocator/queuing/traversal/...)
+- Vererbungs-Hierarchie statt "informal-synchronisiert"
+- Default-Werte ueber alle Wrapper (Beispiel `get_compiler() = "original"` wenn nicht explizit gesetzt)
+- Concept-Basis-Pattern fuer zukuenftige Cross-Axis-Properties
+
+User-Direktive (verbatim, vor P2.A0.7):
+> "Weitere abrufbare constexpr Eigenschaft je Achse: `std::string_view get_compiler()` ist standard ein Text 'original' und kann in einem Paper-Algorithmus einer Achse mit dem Zielcompiler ueberschrieben werden. Bisher hatten wir nur `is_eigenschaft`, jetzt erweitern wir um dieses string pattern und erfordern dieses als Interface aller topics und Achsen. Daraus folgt, dass die Achsen diese Eigenschaft aus einer abstract class aus der Ebene der topics erben und je Algorithmus optional per overload setzen."
+
+### §12.2 Wurzel-Datei `topics/axis_base.hpp`
+
+Direkt im `topics/` Ordner (NICHT in einem `axis_<NN>_*/` Unterordner). Cross-Axis-Basis fuer ALLE Achsen-Wrapper.
+
+```cpp
+namespace comdare::cache_engine::topics {
+
+/// AxisBase — Cross-Axis Pflicht-Properties (alle Wrapper erfuellen via Inheritance)
+struct AxisBase {
+    /// Default-Compiler-Identitaet pro Algorithmus. Override pro Paper-Wrapper.
+    [[nodiscard]] static constexpr std::string_view get_compiler() noexcept {
+        return "original";  // Default — Wrapper kann ueberschreiben (gcc-9.5, etc.)
+    }
+};
+
+/// Concept zur statischen Verifikation
+template <typename T>
+concept AxisBaseConcept = requires {
+    { T::get_compiler() } -> std::convertible_to<std::string_view>;
+};
+
+}  // namespace
+```
+
+### §12.3 Default vs Override (Wertebereich)
+
+| Wert | Semantik | Wer setzt? |
+|---|---|---|
+| `"original"` | Default (AxisBase) — kein Override, beliebiger Compiler OK | AxisBase via Default |
+| `"self"` | Re-Impl ohne Paper-Bindung (Pseudocode-Papers, eigene Erfindung) | Wrapper manual override |
+| `"system"` | C-Standard-libc (StdMalloc, PMR) — kein Paper | Wrapper manual override |
+| `"gcc-9.5"` / `"gcc-12"` / `"gcc-14"` | Konkreter GCC-Compiler aus Paper-Original-Build | Paper-Mixin via Manifest |
+| `"clang-12"` / `"clang-15"` / `"clang-18"` | analog Clang | Paper-Mixin via Manifest |
+| `"msvc-19.30"` / `"icc-2021"` / `"icx-2024"` | analog MSVC/Intel | Paper-Mixin via Manifest |
+
+### §12.4 CRTP-Henne-Ei-Pattern
+
+Concept-Constraint `requires AxisBaseConcept<Derived>` als template-clause funktioniert NICHT — `Derived` ist bei Basis-Instantiation incomplete. Loesung analog Allocator-Achse: `static_assert` im Konstruktor (Derived ist dann vollstaendig).
+
+```cpp
+template <typename Derived>
+class AllocatorStrategyBase : public ::comdare::cache_engine::topics::AxisBase {
+public:
+    constexpr AllocatorStrategyBase() noexcept {
+        static_assert(concepts::AllocatorStrategy<Derived>, "...");
+        static_assert(concepts::CacheEnginePermutationStrategy<Derived>, "...");
+        static_assert(::comdare::cache_engine::topics::AxisBaseConcept<Derived>,
+            "Pflicht: Derived erfuellt AxisBaseConcept (get_compiler() Default 'original' via Inheritance)");
+    }
+};
+```
+
+### §12.5 Mass-Update P2.C.1 (KOMPLETT)
+
+5 CRTP-Bases + 5 q2-Wrappers haben Inheritance bekommen. Effekt: alle 50 Wrappers haben `get_compiler()` ohne manuelles Edit. Tests: 569/569 cache-engine standalone gruen.
+
+| Komponente | Vererbungs-Pfad | Status |
+|---|---|---|
+| `AllocatorStrategyBase<D>` (CRTP) | `: public AxisBase` | ✅ |
+| `BufferStrategyBase<D>` (Q1 CRTP) | `: public AxisBase` | ✅ |
+| `SearchAlgoBase<D>` (03a CRTP) | `: public AxisBase` | ✅ |
+| `CacheTraversalBase<D>` (03b CRTP) | `: public AxisBase` | ✅ |
+| `MappingBase<D>` (03m CRTP) | `: public AxisBase` | ✅ |
+| `EagerFlush` (q2 Wrapper, kein CRTP) | `: public AxisBase` direkt | ✅ |
+| `WatermarkFlush` (q2) | `: public AxisBase` direkt | ✅ |
+| `LazyFlush` (q2) | `: public AxisBase` direkt | ✅ |
+| `TimedFlush` (q2) | `: public AxisBase` direkt | ✅ |
+| `AdaptiveLsmFlush` (q2) | `: public AxisBase` direkt | ✅ |
+| 24 Allocator-Wrappers (StdMalloc, MimallocAllocator, ...) | indirekt via `AllocatorStrategyBase` | ✅ |
+| 14 Q1-Buffer-Wrappers (NoBuffer, FIFOQueue, ...) | indirekt via `BufferStrategyBase` | ✅ |
+| 7 Traversal-Wrappers (Array256, ...) | indirekt via SearchAlgo/CacheTraversal/Mapping-Base | ✅ |
+
+---
+
+## §13 Pre-Build-Tool Workflow vollstaendig (P2.A0 + P2.A0.5 + P2.A0.6)
+
+### §13.1 Tool-Architektur
+
+`apps/is_original_validator/main.cpp` (~390 LoC, C++23 Standalone-Binary, nutzt ctsha intern). Wird zur Build-Time gestartet (NICHT zur Runtime — `[[compile-time-only-no-runtime]]`).
+
+**Architektur-Entscheidung (kritisch — siehe §7 alte MSVC-Episode):**
+Compile-Time-Issues (z.B. MSVC `std::array<char,64>` constexpr-Bug) duerfen NICHT zu Runtime-Fallback fuehren. Stattdessen wird der Algorithmus in ein Pre-Build-Tool ausgelagert; der Output (constexpr Bool-Header) wird zur Compile-Zeit der eigentlichen Cache-Engine eingebunden.
+
+### §13.2 CLI
+
+```bash
+is_original_validator \
+    --manifest path/to/legacy_code/paper_a04_mimalloc/manifest.txt \
+    --base-dir path/to/legacy_code/paper_a04_mimalloc/ \
+    --output ${CMAKE_BINARY_DIR}/generated/.../a04_mimalloc_is_original.hpp \
+    --namespace generated::a04_mimalloc \
+    --axis-mixin-type comdare::cache_engine::allocator::axis_06_allocator::concepts::AllocatorOriginalCodeMixin
+```
+
+### §13.3 Auto-Discovery via Regex + Brace-Balancer
+
+User-Direktive (verbatim, vor P2.A0.5):
+> "Die in der compile time abzugleichenden Function bodies ueber den Funktions Namen im Original Paper file gefunden und von allein per regex ausgewertet und dann gehasht werden."
+
+Implementation:
+
+- Function-Body extrahiert via Regex `\b<paper_fn>\s*\([^)]*\)[^{;]*\{`
+- Brace-Balancer-State-Machine mit Behandlung von:
+  - String-Literals: `"..."` und `'...'`
+  - Line-Comments: `//`
+  - Block-Comments: `/* ... */`
+  - Char-Escape-Sequences: `\"`, `\\`, etc.
+- Extrahiert von Signatur (inkl. opening `{`) bis matching `}`
+- Deckt typische C-Variationen ab: Comment zwischen `)` und `{`, `__attribute__`-Annotations, `inline`/`static` modifiers, multi-line signatures
+
+### §13.4 Lock-File-Pattern
+
+User-Direktive (vor P2.A0.5):
+> "Die Registrierung muss voll dynamisch sein, alles was der User tut, ist die Achse zu definieren und moeglicherweise den Pfad fuer die Paper-source anzugeben."
+
+Implementation `sha256_locked.txt` im `legacy_code/paper_<id>/` Verzeichnis:
+
+```
+1. First-Time-Init (Lock-File fehlt):
+   Tool berechnet SHA pro Function aus Source
+   Tool schreibt sha256_locked.txt (Reference-SHAs)
+   Generiert Header mit kIsOriginal_<fn>=true fuer alle Functions
+   User committet sha256_locked.txt ins Git
+
+2. Spaetere Builds (Lock-File existiert):
+   Tool berechnet SHA aus aktueller Source
+   Vergleicht gegen sha256_locked.txt
+   Match  → kIsOriginal_<fn> = true
+   Mismatch → kIsOriginal_<fn> = false
+   Mismatch ist deklarativer Hinweis "jemand hat legacy_code modifiziert"
+```
+
+### §13.5 Multi-File-Paper-Support (P2.A0.6)
+
+User-Direktive (vor P2.A0.6):
+> "Ein paper hat vielleicht multiple source files, welche die zu referenzierenden Funktionen verteilt beinhalten und in einem source file koennen mehrere relevante function bodies existieren."
+
+Pro Function eigener `source_relative_path`. Tool iteriert pro Mapping, liest pro Iteration das entsprechende Source-File. Beispiel mimalloc:
+
+```
+allocate    mi_malloc      src/alloc.c
+deallocate  mi_free        src/alloc.c     # gleiches File wie allocate
+reallocate  mi_realloc     src/heap.c      # anderes File
+init        mi_init        src/init.c      # noch anderes File
+```
+
+### §13.6 Mixin-Generation (P2.A0.6)
+
+Tool generiert PaperManifest + using-Alias (KEINE Macros mehr). Output:
+
+```cpp
+// AUTO-GENERATED: ${BUILD}/generated/.../paper_a04_mimalloc_is_original.hpp
+namespace generated::a04_mimalloc {
+
+inline constexpr bool kIsOriginal_allocate   = true;
+inline constexpr bool kIsOriginal_deallocate = true;
+inline constexpr bool kIsOriginal_reallocate = false;
+
+struct PaperManifest {
+    static constexpr std::string_view kCompiler = "gcc-9.5";
+    static constexpr bool kHasOriginalPaperCode = true;
+    static constexpr bool kIsOriginal_allocate   = generated::a04_mimalloc::kIsOriginal_allocate;
+    static constexpr bool kIsOriginal_deallocate = generated::a04_mimalloc::kIsOriginal_deallocate;
+    static constexpr bool kIsOriginal_reallocate = generated::a04_mimalloc::kIsOriginal_reallocate;
+};
+
+using OriginalCodeMixin = ::comdare::cache_engine::allocator::axis_06_allocator::
+                          concepts::AllocatorOriginalCodeMixin<PaperManifest>;
+
+}  // namespace
+```
+
+Wrapper erbt EINMAL → alle Pflicht-API automatisch (KEINE manuelle Property-Registrierung):
+
+```cpp
+class MimallocAllocator
+    : public AllocatorStrategyBase<MimallocAllocator>,
+      public generated::a04_mimalloc::OriginalCodeMixin {     // 1 Zeile fuer ALLES
+    void* allocate(std::size_t bytes, std::size_t align) { /* mi_malloc */ }
+    void  deallocate(void* p, std::size_t bytes, std::size_t align) noexcept { /* mi_free */ }
+};
+```
+
+---
+
+## §14 Manifest-Format (vollstaendige Spezifikation)
+
+### §14.1 Datei `legacy_code/paper_<id>_<paper_name>/manifest.txt`
+
+```
+# Kommentar (Zeilen mit # am Anfang werden ignoriert)
+
+# Pflicht-Annotations (3 Stueck)
+@compiler gcc-9.5
+@has_original_paper_code true
+@axis_mixin_type comdare::cache_engine::allocator::axis_06_allocator::concepts::AllocatorOriginalCodeMixin
+
+# Function-Mappings (3-Felder, whitespace-separated, eine Zeile pro Function)
+# wrapper_fn  paper_fn   source_relative_path
+allocate      mi_malloc    src/alloc.c
+deallocate    mi_free      src/alloc.c
+reallocate    mi_realloc   src/heap.c
+```
+
+### §14.2 @-Annotations
+
+| Annotation | Typ | Pflicht | Default (Phase A) | Beispiel-Wert |
+|---|---|---|---|---|
+| `@compiler` | string | ja | (Default in AxisBase: `"original"`) | `"gcc-9.5"` |
+| `@has_original_paper_code` | bool | ja | (Default: `false`) | `true` |
+| `@axis_mixin_type` | fully-qualified C++ type-name | ja | — | siehe oben |
+
+### §14.3 Function-Mappings
+
+| Feld | Bedeutung |
+|---|---|
+| `wrapper_fn` | interner Wrapper-Function-Name (entspricht Achs-Interface, z.B. `allocate`) |
+| `paper_fn` | Function-Name im Paper-Original-Code (z.B. `mi_malloc`) |
+| `source_relative_path` | Pfad zur Source-Datei relativ zu `--base-dir` |
+
+### §14.4 `sha256_locked.txt` (auto-generated)
+
+Erste Build: auto-erstellt. Danach git-committed. Inhalt:
+
+```
+allocate     5f8b3a8e0c1a8e7c8b3a8e0c1a8e7c8b3a8e0c1a8e7c8b3a8e0c1a8e7c8b3a8e
+deallocate   a7c2d96b4e1093b2c2d96b4e1093b2c2d96b4e1093b2c2d96b4e1093b2c2d96b
+reallocate   b6e1f48c2a37d9e8e1f48c2a37d9e8e1f48c2a37d9e8e1f48c2a37d9e8e1f48c
+```
+
+Bei zukuenftigen Builds vergleicht Tool die aktuelle Source-SHA gegen diese gespeicherten Hashes (siehe §13.4).
+
+---
+
+## §15 Vererbungs-Hierarchie kompletter Diagram
+
+```
+                  ┌────────────────────────────────────┐
+                  │ topics/axis_base.hpp (cross-topic) │
+                  │ struct AxisBase {                  │
+                  │   get_compiler() = "original"      │
+                  │ };                                 │
+                  │ concept AxisBaseConcept = ...      │
+                  └──────────────┬─────────────────────┘
+                                 │
+                ┌────────────────┴────────────────┐
+                │                                 │
+   (a) CRTP-Pfad │                  (b) Mixin-Pfad │ (cross-topic)
+                ▼                                 ▼
+   ┌──────────────────────────┐    ┌─────────────────────────────────┐
+   │ AllocatorStrategyBase<D> │    │ OriginalCodeMixinBase<M>         │
+   │ (Achs-CRTP-Basis)        │    │ - get_compiler() OVERRIDE        │
+   │ : public AxisBase        │    │     returns M::kCompiler         │
+   │                          │    │ - has_original_paper_code()      │
+   │ static_assert(           │    │     returns M::kHasOriginalPaperCode│
+   │   AxisBaseConcept<D>)    │    │ : public AxisBase                │
+   └──────────┬───────────────┘    └─────────────────┬───────────────┘
+              │                                      │
+              │                                      ▼
+              │              ┌──────────────────────────────────────┐
+              │              │ AllocatorOriginalCodeMixin<M>         │
+              │              │ (Achsen-spezifisches Mixin-Template)  │
+              │              │ : OriginalCodeMixinBase<M>            │
+              │              │ - is_original_allocate()              │
+              │              │ - is_original_deallocate()            │
+              │              │ - is_original_reallocate()            │
+              │              │ - is_original_module() = mp_all_of    │
+              │              └─────────────────┬────────────────────┘
+              │                                │
+              │                                ▼
+              │              ┌──────────────────────────────────────┐
+              │              │ generated::a04_mimalloc::             │
+              │              │   OriginalCodeMixin (Tool-Alias)      │
+              │              │                                       │
+              │              │ struct PaperManifest {                │
+              │              │   kCompiler = "gcc-9.5"               │
+              │              │   kHasOriginalPaperCode = true        │
+              │              │   kIsOriginal_allocate = ... (Tool)   │
+              │              │   ...                                 │
+              │              │ };                                    │
+              │              │                                       │
+              │              │ using OriginalCodeMixin =             │
+              │              │   AllocatorOriginalCodeMixin<         │
+              │              │       PaperManifest>;                 │
+              │              └─────────────────┬────────────────────┘
+              │                                │
+              ▼                                ▼
+       ┌────────────────────────────────────────────────────────────┐
+       │ class MimallocAllocator                                    │
+       │   : public AllocatorStrategyBase<MimallocAllocator>        │  (CRTP)
+       │   , public generated::a04_mimalloc::OriginalCodeMixin       │  (Mixin)
+       │                                                            │
+       │ // get_compiler() = "gcc-9.5" (via OriginalCodeMixinBase)   │
+       │ // is_original_module() = true (via AllocatorOrigMixin)     │
+       │                                                            │
+       │ void* allocate(...) { return mi_malloc(...); }              │
+       │ void  deallocate(...) { mi_free(...); }                     │
+       └────────────────────────────────────────────────────────────┘
+```
+
+**Diamond-Vererbung:** beide Pfade enden in `AxisBase`. KEINE virtual base notwendig, weil `AxisBase` keinen instance state hat (nur `static constexpr` Methoden). C++ Lookup-Regeln: `get_compiler()` ohne Ambiguitaet, weil Mixin-Pfad explizit ueberschreibt.
+
+---
+
+## §16 User-Pflicht-Trennung (pro Achse vs pro Paper-Wrapper)
+
+### §16.1 Pro Achse (1× pro Achse, vor ersten Paper-Wrapper)
+
+| Datei | Inhalt | Status |
+|---|---|---|
+| `topics/<topic>/axis_<NN>_<topic>/concepts/axis_<NN>_<topic>_interface_functions.hpp` | `std::array<std::string_view> kAxisInterfaceFunctions` | TODO P2.F |
+| `topics/<topic>/axis_<NN>_<topic>/concepts/axis_<NN>_<topic>_original_code_mixin.hpp` | Achsen-spezifisches Mixin-Template | TODO P2.F |
+
+Beispiel allocator:
+
+```cpp
+// axis_06_allocator_interface_functions.hpp
+namespace ::concepts {
+inline constexpr std::array<std::string_view, 3> kAxisInterfaceFunctions = {
+    "allocate", "deallocate", "reallocate"
+    // zero_allocate ist optional Sub-Concept, nicht hier
+};
+}
+
+// axis_06_allocator_original_code_mixin.hpp
+template <typename PaperManifest>
+struct AllocatorOriginalCodeMixin
+    : ::comdare::cache_engine::concepts::OriginalCodeMixinBase<PaperManifest> {
+    static constexpr bool is_original_allocate()   noexcept { return PaperManifest::kIsOriginal_allocate; }
+    static constexpr bool is_original_deallocate() noexcept { return PaperManifest::kIsOriginal_deallocate; }
+    static constexpr bool is_original_reallocate() noexcept { return PaperManifest::kIsOriginal_reallocate; }
+    static constexpr bool is_original_module()      noexcept {
+        return is_original_allocate() && is_original_deallocate() && is_original_reallocate();
+    }
+};
+```
+
+### §16.2 Pro Paper-Wrapper
+
+| Datei / Aenderung | Inhalt | Aufwand |
+|---|---|---|
+| `legacy_code/paper_<id>_<paper_name>/` | Verzeichnis anlegen | trivial |
+| `legacy_code/paper_<id>/src/*.c` | Original-Source kuratiert | abhaengig vom Paper |
+| `legacy_code/paper_<id>/LICENSE` | Original-Lizenz | trivial |
+| `legacy_code/paper_<id>/README.md` | Paper-Vollangabe (Autor/Titel/Venue/Jahr) | trivial |
+| `legacy_code/paper_<id>/manifest.txt` | @-Annotations + Function-Mappings | siehe §14 |
+| `legacy_code/paper_<id>/sha256_locked.txt` | auto-generated First-Build | 0 manuell |
+| Wrapper-Klasse | 1 Inheritance-Zeile + extern "C" Delegates | ~30 Zeilen |
+
+### §16.3 Was der User NICHT mehr tun muss
+
+- `COMDARE_IS_ORIGINAL` Macro pro Function manuell aufrufen
+- SHA per Function manuell berechnen
+- Property im Wrapper deklarieren (alles via Inheritance)
+- Modul-Aggregat manuell `a && b && c` schreiben (Tool/Mixin macht es)
+- Source-Region-Marker im Header pflegen (line_start/line_end — entfaellt durch Auto-Discovery)
+
+---
+
+## §17 Naming-Konvention (cross-axis Pflicht-Pattern)
+
+### §17.1 Property-Naming nach Return-Typ
+
+| Pattern | Return-Typ | Default | Beispiele |
+|---|---|---|---|
+| `is_<eigenschaft>()` | `bool` | meist `false` (Opt-In) | `is_thread_safe`, `is_event_driven`, `is_versioned`, `is_simd_capable` |
+| `supports_<feature>()` | `bool` | `false` | `supports_pmr`, `supports_numa_node_hint`, `supports_simd` |
+| `requires_<resource>()` | `bool` | `false` | `requires_explicit_init`, `requires_specialized_hardware`, `requires_pool_base` |
+| `has_<feature>()` | `bool` | true/false je Semantik | `has_native_aligned_alloc`, `has_original_paper_code` |
+| `get_<eigenschaft>()` | `std::string_view` | je Default (`"original"` fuer compiler) | `get_compiler` |
+| `<name>()` ohne Verb-Praefix | `enum class` | je Semantik | `progress_guarantee`, `density_class` |
+| `statistics()` / `snapshot()` / `observer()` | Struct/Type | leerer State | siehe Allocator-Pattern |
+| `<eigenschaft>_count()` / `<eigenschaft>_pct()` | numeric | 0 | `occupied_count`, `density_percent`, `threshold_pct` |
+
+### §17.2 Pflicht: snake_case + bedeutungsvoller Prefix
+
+Alle Property-Methoden in snake_case. Verb-Prefix MUSS Boolean-Semantik klarmachen (`is_*`, `has_*`, `supports_*`, `requires_*`). String-Getter MUESSEN `get_*` Prefix tragen.
+
+### §17.3 Stufen-Pattern (User-Direktive nach Allocator Batch 7)
+
+Wenn eine Property eine **Stufe/Klassifikation** ausdrueckt (statt isoliertem Bool-Flag) — z.B. WaitFree impliziert LockFree impliziert ObstructionFree impliziert Blocking — dann **`enum class` mit int-Backing** statt mehrere separate Bools:
+
+```cpp
+enum class ProgressGuarantee : int {
+    Blocking        = 0,
+    ObstructionFree = 1,
+    LockFree        = 2,
+    WaitFree        = 3,
+};
+```
+
+Vorteil: Vergleich `level() >= LockFree` deckt impliziert WaitFree + LockFree. Erweiterbar ohne Concept-Breakage (z.B. `BoundedWaitFree = 4` fuer Real-Time).
+
+| Pattern | Verwendung |
+|---|---|
+| `bool` | orthogonale binaere Eigenschaften (z.B. `supports_pmr`, `has_native_aligned_alloc`) |
+| `enum class int` | ordinale Klassifikationen mit Implikations-Hierarchie (z.B. `ProgressGuarantee`, `DensityClass`) |
+
+### §17.4 `get_compiler()`-Werte-Konvention
+
+Siehe §12.3 oben — Default in AxisBase ist `"original"`. Wrapper ueberschreibt mit konkretem Wert. Paper-Mixin via PaperManifest.
+
+---
+
+## §18 Migrations-Plan 50 Wrapper (aktualisiert nach P2.C.1)
+
+### §18.1 Status-Tabelle nach P2.C.1 (heute)
+
+| Komponente | get_compiler() | has_original_paper_code() | is_original_module() | P2.C.1 |
+|---|---|---|---|---|
+| **5 CRTP-Bases** (AllocatorStrategyBase, BufferStrategyBase, SearchAlgoBase, CacheTraversalBase, MappingBase) | `"original"` (via AxisBase) | (n/a) | (n/a) | ✅ erben |
+| **5 q2-Wrappers** (Eager/Watermark/Lazy/Timed/AdaptiveLsm) | `"original"` (via AxisBase direkt) | (Phase B.2.C pending) | (Phase B.2.C pending) | ✅ erben |
+| **24 Allocator-Wrappers** (StdMalloc, ..., MimallocAllocator, ...) | `"original"` indirekt via Base | (Phase B.2.C pending) | (Phase B.2.C pending) | ✅ indirekt |
+| **14 Q1-Buffer-Wrappers** (NoBuffer, FIFOQueue, ..., LockFreeMPMC) | `"original"` indirekt via Base | (Phase B.2.C pending) | (Phase B.2.C pending) | ✅ indirekt |
+| **7 Traversal-Wrappers** (Array256, ..., PoolRelative) | `"original"` indirekt via Base | (Phase B.2.C pending) | (Phase B.2.C pending) | ✅ indirekt |
+| **MimallocAllocator** (nach P2.B Pilot) | `"gcc-9.5"` via Mixin | `true` via Mixin | computed via Tool | pending P2.B |
+| **PMR Resource / StdMalloc** | `"system"` manual override | `false` manual | `false` manual | pending P2.C |
+
+### §18.2 Pending Sub-Tasks (Reihenfolge nach Session-End §12)
+
+| Sub-Task | Inhalt | Aufwand |
+|---|---|---|
+| **P2.E ✓** | Diese Doku-Erweiterung (heute) | done |
+| **P2.F** | 14 Achsen-Mixin-Templates + Interface-Functions-Listen (pro Achse 2 Files) | ~28 Files |
+| **P2.A** | 4 CMake-Module (is_original_codegen + compiler_cache + paper_binary + tools_cache xxd) | ~400 LoC |
+| **P2.B** | mimalloc Pilot End-to-End (legacy_code Snapshot + manifest.txt + Wrapper-Refactor) | substantieller Sprint |
+| **P2.C** | Concept-Pflicht-Erweiterung + Default-Properties fuer alle 50 Wrappers (kein-Paper Defaults `"self"` / `false` / `false`) | ~150 Zeilen |
+| **P2.D** | Roll-out A05 jemalloc + A06 tcmalloc + A07 snmalloc (3 weitere Paper-Wrappers) | optional, separater Sprint |
+
+### §18.3 Skalierungs-Schaetzung P2.C (Default-Properties)
+
+| Achse | Wrappers | Aufwand pro Wrapper | Total |
+|---|:---:|---|---|
+| allocator | 23 ohne Paper, 1 mit (MimallocAllocator nach P2.B) | 3-4 Zeilen Property-Default oder 1 Mixin-Inheritance | ~80 Zeilen |
+| queuing Q1 | 14 alle Re-Impl (`"self"`) | 3-4 Zeilen Property-Default | ~56 Zeilen |
+| queuing Q2 | 5 alle Re-Impl (`"self"`) | 3-4 Zeilen Property-Default | ~20 Zeilen |
+| traversal 03a | 3 alle Re-Impl | 3-4 Zeilen Property-Default | ~12 Zeilen |
+| traversal 03b | 2 alle Re-Impl | 3-4 Zeilen Property-Default | ~8 Zeilen |
+| traversal 03m | 2 alle Re-Impl | 3-4 Zeilen Property-Default | ~8 Zeilen |
+| **TOTAL** | **50** | — | **~184 Zeilen** |
+
+### §18.4 Cross-Memory + Cross-Doku
+
+- Memory `[[axis-base-pattern]]` — Wurzel-Pattern + Naming-Konvention
+- Memory `[[legacy-code-sha256-validation]]` — Tool-Workflow + Mixin-Pattern
+- Memory `[[compile-time-only-no-runtime]]` — KRITISCHE Pflicht-Direktive bei MSVC-Issues
+- Memory `[[paper-original-code-pattern]]` — Verzeichnis-Struktur
+- Memory `[[experiment-compiler-property]]` — Cross-Wirkung mit `has_original_paper_code`
+- Memory `[[meta-driven-concept-hardening-pattern]]` — M0/M1/M2/M3 OMG-MOF-Mapping
+- Session-Doku `20260526-V41-F-6-1-traversal-konsolidierung-paper-legacy-pattern-session.md` §5-§7
+- Session-Doku `20260526-V41-F-6-1-P2-A0-tool-refactor-axisbase-pattern-session-end.md` §3-§7
+
+---
+
+**Ende Teil B (Stand 2026-05-26 spaete Nacht nach P2.E).**
