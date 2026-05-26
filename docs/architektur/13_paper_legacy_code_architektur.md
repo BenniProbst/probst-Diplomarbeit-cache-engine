@@ -1502,3 +1502,146 @@ Empfohlene Naechst-Reihenfolge:
 ---
 
 **Ende Teil F (Stand 2026-05-26 spaeter — P2.D.tr.s2: 3 NEUE Original-Wrapper-Klassen + TYPED_TEST Suites).**
+
+---
+
+# Teil G — P2.D.q Queuing Paper-Source-Audit (2026-05-26 spaeter)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil A-F unangetastet. Teil G dokumentiert
+> Task #687 (P2.D.q) — **Audit-only Sprint**, keine Code-Aenderungen am queuing-Topic.
+> Ergebnis: queuing-Achse hat aktuell 0 ext/-Sources → Paper-Bindung-Roll-out wartet
+> auf Folge-Sprint mit externen Submodule-Hinzufuegungen.
+
+---
+
+## §38 Audit-Methodik P2.D.q
+
+Pro queuing-Wrapper (Q1 14 + Q2 5 = 19 total): pruefen ob in `ext/` ein
+Paper-Source verfuegbar ist (analog ext/A04-mimalloc fuer MimallocAllocator,
+ext/P01-ART/unodb fuer OriginalArtSearchAlgo).
+
+**Pruefungs-Methodik:**
+1. Wrapper-Header lesen — Paper-Referenz im Kommentar?
+2. `ext/`-Verzeichnis listen — entsprechende Submodule vorhanden?
+3. Wenn Referenz UND Submodule → Roll-out-Kandidat
+4. Wenn Referenz ABER kein Submodule → Pending fuer Folge-Sprint
+5. Wenn keine Referenz (Standard-Container/std::chrono) → Re-Impl ohne Paper-Bindung
+
+---
+
+## §39 Audit-Ergebnis (Stand 2026-05-26)
+
+### §39.1 Q1 Buffer-Strategy (14 Wrappers)
+
+| Wrapper | Family | Paper-Referenz (Wrapper-Header) | ext/-Source | Roll-out-Kandidat |
+|---|:-:|---|:-:|:-:|
+| NoBuffer | Q01 | (Standard, no-op) | n/a | nein |
+| AppendOnly | Q02 | LSM-MemTable + Bw-Tree Delta-Chain (Levandoski 2013) | ❌ | pending (Folge-Sprint) |
+| FIFOQueue | Q03 | (std::deque) | n/a | nein |
+| LIFOStack | Q04 | (std::vector) | n/a | nein |
+| BoundedRing | Q05 | (Standard Ring-Buffer) | n/a | nein |
+| PriorityHeap | Q06 | LRU-Approx, Hot-Key Promotion (kein konkretes Paper) | n/a | nein |
+| DeltaChain | Q07 | Levandoski/Lomet/Sengupta Bw-Tree, ICDE 2013 | ❌ | **pending (Microsoft Bw-Tree Repo)** |
+| SkiplistBuffer | Q08 | RocksDB, LevelDB LSM-MemTable | ❌ | **pending (RocksDB Repo)** |
+| TombstoneBuffer | Q09 | LSM, ART-Optimistik, MVCC | ❌ | pending |
+| CopyOnWrite | Q10 | Persistent ART, RCU-Tries | ❌ | pending |
+| EpochBuffer | Q11 | McKenney OLS 2001 + Masstree EuroSys 2012 + SMART ART OSDI 2023 | ❌ | **pending (Masstree Repo)** |
+| BatchedInsertBuffer | Q12 | Leis ICDE 2013 §6 + Lopez-Pesch ICDE 2024 | ❌ | pending |
+| LockFreeSPSC | Q13a | Lamport, Per-Thread → Background | ❌ | pending |
+| LockFreeMPMC | Q13b | Vyukov/Michael-Scott (moodycamel-Style) | ❌ | **pending (moodycamel concurrentqueue)** |
+
+### §39.2 Q2 Flush-Policy (5 Wrappers)
+
+| Wrapper | Family | Paper-Referenz | ext/-Source | Roll-out-Kandidat |
+|---|:-:|---|:-:|:-:|
+| EagerFlush | F01 | (Standard, per-op) | n/a | nein |
+| WatermarkFlush | F02 | (Standard Threshold) | n/a | nein |
+| LazyFlush | F04 | (Standard Defer) | n/a | nein |
+| TimedFlush | F03 | (std::chrono::steady_clock) | n/a | nein |
+| AdaptiveLsmFlush | F05 | RocksDB DynamicLevel (EWMA-adaptiv) | ❌ | **pending (RocksDB Repo)** |
+
+### §39.3 Summary
+
+```
+ext/ Allocator-Sources verfuegbar:  10 (6 integriert, 4 deferred Task #685)
+ext/ SearchAlgo-Paper verfuegbar:   11 (3 integriert P2.D.tr.s1+s2, 8 deferred)
+ext/ Queuing-Paper verfuegbar:       0  ← P2.D.q Befund: KEINE
+```
+
+**Konsequenz:** P2.D.q Audit-Sprint produziert KEINE Code-Aenderung an queuing-Wrappers.
+Alle 19 queuing-Wrappers bleiben Cache-Engine-Standalone-Re-Impl mit `get_compiler() = "original"`
+und `is_original_module() = false` via AxisBase-Default (Pattern [[cross-axis-defaults-no-bloat]]).
+
+---
+
+## §40 Roll-out-Kandidaten fuer P2.D.q.s2 (externer Repos-Folge-Sprint)
+
+Wenn Folge-Sprint die externen Repos als `ext/Q-*` Submodule hinzufuegt, ergibt sich
+folgendes Roll-out-Potential (priorisiert nach wissenschaftlicher Relevanz fuer
+Habich-Mess-Reihen):
+
+### §40.1 Pflicht-Repos (substantielle Paper-Bindung)
+
+| Repo | URL-Vorschlag | Roll-out-Kandidaten | Source-Lizenz | Build-Komplexitaet |
+|---|---|---|---|:-:|
+| **RocksDB** | github.com/facebook/rocksdb | SkiplistBuffer (memtable), AdaptiveLsmFlush (DynamicLevel) | Apache 2.0 / GPL-2 dual | hoch (CMake, viele deps) |
+| **Bw-Tree** | github.com/wangziqi2013/BwTree (akademischer Port) ODER microsoft/peloton-sub | DeltaChain | MIT-ähnlich | mittel |
+| **Masstree-beta** | github.com/kohler/masstree-beta | EpochBuffer (QSBR-Pattern) | BSD-3 | mittel |
+| **moodycamel concurrentqueue** | github.com/cameron314/concurrentqueue | LockFreeSPSC, LockFreeMPMC | BSD-2 | trivial (header-only) |
+
+### §40.2 Optional-Repos (geringere Prioritaet)
+
+| Repo | Roll-out-Kandidat | Bemerkung |
+|---|---|---|
+| LevelDB (github.com/google/leveldb) | SkiplistBuffer Alt-Variante | redundant zu RocksDB |
+| Bonsai-Tree (Akademisch) | CopyOnWrite | schwer zu finden |
+| Tombstone-Pattern Papers (Yang et al.) | TombstoneBuffer | Custom-Shim |
+
+### §40.3 Vermutete Permutations-Verteilung nach Roll-out
+
+Bei vollem P2.D.q.s2 Roll-out (4 Wrappers mit Paper-Bindung):
+
+| Wrapper-Kategorie | get_compiler() | Anzahl |
+|---|---|:-:|
+| Pure-Original (alle Functions Paper-bound) | "gcc-9.5" via Mixin | ~4 (Skiplist/AdaptiveLsm/DeltaChain/Masstree-Epoch) |
+| Re-Impl (Standard-Container) | "original" (AxisBase Default) | ~10 |
+| Re-Impl mit Paper-Inspiration (kein Code-Link) | "original" (AxisBase Default) | ~5 (TombstoneBuffer/CopyOnWrite/BatchedInsertBuffer/etc.) |
+
+---
+
+## §41 Architektonische Konsequenz
+
+### §41.1 Disziplinen fuer P2.D.q.s2
+
+Wenn der externe Repos-Sprint kommt, gelten folgende Pattern-Disziplinen:
+
+1. **EIN externer Repo pro Pilot-Wrapper** vor Vollausbau (analog mimalloc-Pilot in P2.B)
+2. **Header-only-Repos bevorzugen** (concurrentqueue trivial vs RocksDB komplex)
+3. **Compile-Time-Detection** via `comdare_register_paper_wrapper` Auto-SKIP wenn EXT_SENTINEL_FILE fehlt
+4. **Cross-Platform-Pflicht** (3 OS + 4 ISAs analog Allocator)
+5. **Lizenz-Audit** vor Integration (RocksDB dual-licensed, Masstree BSD-3, etc.)
+
+### §41.2 Tests-Bilanz-Erwartung nach Roll-out
+
+| Test-Target | Heute | nach P2.D.q.s2 (Schaetzung) |
+|---|:-:|:-:|
+| test_v41_topic_queuing | 205 | 205 + (4 Wrappers × ~5 Body-Tests) ≈ 225 |
+| test_v41_paper_legacy_code | 126 | 126 + (4 Wrappers × ~10 TYPED Tests) ≈ 166 |
+| **TOTAL cache-engine** | **714** | **~770** (Schaetzung) |
+
+---
+
+## §42 Pending Sub-Stufen — Reihenfolge (Stand nach P2.D.q Audit)
+
+| Sub-Task | Stand | Bemerkung |
+|---|---|---|
+| ~~P2.D.tr.s1/s2~~ Traversal Roll-out 3 Original-Wrapper | ✅ vorherige Sprints |
+| ~~P2.D.q (Audit)~~ Queuing Paper-Source-Audit | ✅ **heute** — Ergebnis: 0 ext/-Sources |
+| **P2.D.q.s2** External Repos + Roll-out (RocksDB/Bw-Tree/Masstree/concurrentqueue) | **pending** Folge-Sprint (NEU Task) |
+| **P2.D.t2** 4 deferred Allocator (Bazel + Custom-Shims) | **pending** Task #685 |
+| **P2.D.tr.s3** weitere Traversal-Paper (P03 Masstree, P04 CoCo-trie, P06 B²tree, P07 Wormhole, P10 SuRF, P20, P25, P29, P30) | **NEU pending** |
+| **P2.A.W + P2.D.tr.s4** Library-Build Original-Compiler (Cross-Platform) | **pending** Task #689 |
+
+---
+
+**Ende Teil G (Stand 2026-05-26 spaeter — P2.D.q Audit-only Sprint, 0 ext/-Sources verfuegbar).**
