@@ -877,3 +877,156 @@ Siehe §12.3 oben — Default in AxisBase ist `"original"`. Wrapper ueberschreib
 ---
 
 **Ende Teil B (Stand 2026-05-26 spaete Nacht nach P2.E).**
+
+---
+
+# Teil C — Korrektur Phase B.2.C (Stand 2026-05-26 noch spaeter)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil A + B oben bleiben unangetastet.
+> Teil C dokumentiert User-Kritik (heute spaet) am ersten P2.C-Skelett + den
+> resultierenden Refactor zu kompakter Generik. Bei Konflikten mit Teil A/B ist
+> Teil C verbindlich. Bei Bedarf bitte alle 3 Teile lesen — Teile A+B fuer
+> Architektur-Genese, Teil C fuer aktuellen Endstand.
+
+---
+
+## §19 User-Kritik am ersten P2.C-Skelett + Refactor
+
+### §19.1 Drei Kritikpunkte (verbatim Direktive)
+
+User-Stop vor P2.C-Commit:
+> "Das sieht aber noch nicht nach einer compile time dynamischen Auswertung der
+> Code-Validitaet aus, das ist einfach hardcoded. Wo ist das cmake flag fuer
+> alle Funktionen, welches mit der app die Originalitaet beweist? `is_original_module`
+> ist keine Metaprogrammierung, welche die Originalen Funktionen ueber ein AND
+> prueft. [...] Weiterhin ist das doppelt, weil entweder ist der paper code
+> original und damit auch das Modul UND UMGEKEHRT. Wir brauchen nur eine der
+> beiden Variablen. [...] Das ist Code-Bloat statt generischer Modularisierung!
+> Wir verwenden wie im Allokator Achse immer Template Tests und moeglichst
+> kompakte Strukturen."
+
+**3 substantielle Punkte:**
+
+1. **Redundanz:** `has_original_paper_code` + `is_original_module` sind semantisch identisch — eine reicht
+2. **Code-Bloat:** Hardcoded `false`-Defaults in 10 Wrapper-Files (5 CRTP-Bases + 5 q2-Wrappers) statt cross-axis Generik
+3. **Fehlt:** Zentrales CMake-Flag fuer Original-Code-Validierung (Build-Switch)
+
+### §19.2 Refactor-Loesung (P2.C neu, 587 Tests gruen)
+
+| Schritt | Aktion | Konsequenz |
+|---|---|---|
+| 1 | `AxisBase` erweitert: `is_original_module() = false` Default | Cross-axis generisch — ALLE 50 Wrappers haben `false` automatisch ohne Code |
+| 2 | `AxisBaseConcept` fordert beide Properties (`get_compiler` + `is_original_module`) | Statische Verifikation cross-axis |
+| 3 | `LegacyOriginalCodePflicht` reduziert auf 2 Properties (statt 3) | `has_original_paper_code` entfernt — Redundanz weg |
+| 4 | `OriginalCodeMixinBase`: `has_original_paper_code` Override entfernt | Mixin liefert nur noch `get_compiler` Override |
+| 5 | 5 CRTP-Bases + 5 q2-Wrappers: alle hardcoded Defaults entfernt | KEIN Code-Bloat mehr — Defaults via AxisBase Inheritance |
+| 6 | mimalloc-Wrapper: `using has_original_paper_code` entfernt | Konsequenz aus Schritt 3+4 |
+| 7 | **NEU `option(COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION ON)`** | Zentrales CMake-Flag: bei OFF kein Codegen, alle `false` via AxisBase Default |
+| 8 | Concept-Anhang `&& LegacyOriginalCodePflicht<W>` in alle 6 Achs-Permutation-Concepts | Pflicht-API statisch enforced (Allocator/Q1/Q2/03a/03b/03m) |
+| 9 | `HasOriginalCode` Sub-Concept reformiert: `get_compiler() != "original"/"self"/"system"` | Detection von konkretem Paper-Compiler ohne separate Bool |
+| 10 | Tool-Output `kHasOriginalPaperCode` bleibt im PaperManifest als Diagnose-Info | User-Wahl (Doku-Comment, nicht API) |
+
+### §19.3 Aktualisierte AxisBase (Endstand P2.C)
+
+```cpp
+namespace comdare::cache_engine::topics {
+
+struct AxisBase {
+    [[nodiscard]] static constexpr std::string_view get_compiler() noexcept {
+        return "original";  // Override pro Paper-Wrapper via Mixin
+    }
+    [[nodiscard]] static constexpr bool is_original_module() noexcept {
+        return false;  // Override pro Paper-Wrapper via Mixin
+    }
+};
+
+template <typename T>
+concept AxisBaseConcept = requires {
+    { T::get_compiler() }       -> std::convertible_to<std::string_view>;
+    { T::is_original_module() } -> std::convertible_to<bool>;
+};
+
+}  // namespace
+```
+
+### §19.4 Aktualisierte LegacyOriginalCodePflicht
+
+```cpp
+namespace comdare::cache_engine::concepts {
+
+template <typename W>
+concept LegacyOriginalCodePflicht = requires {
+    { W::get_compiler() }       -> std::convertible_to<std::string_view>;
+    { W::is_original_module() } -> std::convertible_to<bool>;
+};
+
+template <typename W>
+concept HasOriginalCode =
+    LegacyOriginalCodePflicht<W>
+    && (W::get_compiler() != std::string_view{"original"})
+    && (W::get_compiler() != std::string_view{"self"})
+    && (W::get_compiler() != std::string_view{"system"});
+
+template <typename W>
+concept PaperOriginalValidated =
+    LegacyOriginalCodePflicht<W> && (W::is_original_module());
+
+}  // namespace
+```
+
+### §19.5 CMake-Option Workflow
+
+```cmake
+option(COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION
+       "Enable Paper-Original-Code SHA-Validation (Habich-Compliance Pre-Build-Tool)" ON)
+
+if(COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION
+   AND COMMAND comdare_paper_init
+   AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ext/A04-mimalloc/src/alloc-aligned.c")
+    # P2.B Pilot-Block: comdare_paper_init + comdare_generate_is_original_mixin
+    ...
+endif()
+```
+
+**Drei OFF-Konsequenzen (bei `COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION=OFF`):**
+
+1. Kein Tool-Lauf, kein PaperManifest-Header generiert
+2. Wrapper-Inheritance vom Mixin schlaegt fehl (Header fehlt) → Build-Error
+   → User MUSS bei OFF auch Paper-Wrapper-Includes deaktivieren oder ext/ entfernen
+3. Wenn alle Paper-Wrapper deaktiviert: alle 50 Wrappers haben `is_original_module()=false`
+   via AxisBase Default — KEINE Code-Aenderung am Wrapper noetig
+
+### §19.6 Endstand-Tabelle 50 Wrappers (ueberholt §18.1)
+
+| Wrapper-Kategorie | get_compiler() | is_original_module() | Quelle |
+|---|---|---|---|
+| 5 CRTP-Bases (kein Wrapper, nur Vererbungs-Schicht) | (n/a) | (n/a) | inherits AxisBase |
+| 24 Allocator-Wrappers ohne Paper (StdMalloc, PMR, ..., 23 Stueck) | "original" | false | via AxisBase Default |
+| MimallocAllocator (A04 Paper-Pilot, **EINZIGER mit echtem Linking**) | "gcc-9.5" | true | via generated Mixin |
+| 14 Q1-Buffer-Wrappers (NoBuffer, FIFOQueue, ...) | "original" | false | via AxisBase Default |
+| 5 Q2-FlushPolicy-Wrappers (Eager, ..., AdaptiveLsm) | "original" | false | via AxisBase Default |
+| 3 SearchAlgo-Wrappers (Array256, VectorU8U8, VectorU16U16) | "original" | false | via AxisBase Default |
+| 2 CacheTraversal-Wrappers (LinearFanout, HashLookup) | "original" | false | via AxisBase Default |
+| 2 Mapping-Wrappers (DirectPlacement, PoolRelative) | "original" | false | via AxisBase Default |
+
+**Konsequenz:** **49 von 50 Wrappers brauchen ZERO Code** fuer LegacyOriginalCodePflicht-
+Konformitaet — alles via AxisBase Default. Nur MimallocAllocator hat aktiv via Mixin-
+Inheritance + 4 using-Statements einen Override.
+
+### §19.7 Lessons-Learned (kompakte Generik vs Bloat)
+
+| Anti-Pattern | Pattern |
+|---|---|
+| Hardcoded `static constexpr bool xxx = false;` in N Wrapper-Files | Cross-Axis-Default in AxisBase, Wrapper erbt automatisch |
+| 2 Boolean-Properties die immer dieselbe Antwort liefern | 1 Property, das andere als Computed-Derivative |
+| Concept fordert N Properties, von denen N-1 redundante Defaults sind | Concept fordert nur die einzigartig-semantischen Properties |
+| Kein zentraler Build-Switch fuer optionale Feature-Schicht | `option(...)` mit ON Default + Gating-Conditional in CMake-Block |
+
+**Pattern-Disziplin (verbindlich fuer kuenftige Cross-Axis-Properties):**
+- Zuerst pruefen: ist neue Property semantisch redundant zu existierender? Falls ja: Computed-Helper, nicht Property
+- Defaults gehoeren in `topics/axis_base.hpp` (cross-axis Wurzel), NICHT in CRTP-Bases oder Wrappern
+- Optional Features brauchen CMake-Option als Build-Switch (Standard ON, dokumentierter OFF-Pfad)
+
+---
+
+**Ende Teil C (Stand 2026-05-26 spaete Nacht nach P2.C-Refactor).**
