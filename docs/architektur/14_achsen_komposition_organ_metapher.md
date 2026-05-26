@@ -590,3 +590,349 @@ Visitor-Schicht hinzu.
 ---
 
 **Ende Teil 2 (Stand 2026-05-26 spaet — User-Vertiefung Saeugetier-Anatomie + F15-Forschungsmission).**
+
+---
+
+# Teil 3 — Verantwortlichkeits-Trennung + 3 Kompositionale Joins + ABI-Stabilitaet
+
+> **Anmerkung [[never-delete-documentation]]:** Teil 1 + Teil 2 oben unangetastet.
+> Teil 3 dokumentiert die User-Direktive 2026-05-26 sehr spaet zur Aufgaben-
+> Verteilung zwischen PermutationEngine, SearchAlgorithmAnatomy und
+> CacheEngineBuilder + zur Pruefling-Algorithmus-Integration ueber 3 Joins.
+
+---
+
+## §16 User-Direktive verbatim (2026-05-26 sehr spaet, R5.A-Sprint-Start)
+
+> "Bitte den naechsten sinnvollen sprint. Bitte notiere, dass es die Aufgabe der
+> Permutations-Engine ist, gesteuert durch die Konfiguration der CacheEngineBuilder
+> (die ABI stabil das struct aller Achsen-Statistik-Observer abfragt und ausmisst),
+> Suchalgorithmus-Anatomien zu erzeugen, bei der jede Anatomie exakt eine
+> Permutation aus den Achsen-Algorithmen ist. Die entstandene Anatomie wird als
+> dokumentierter und und registrierter Suchalgorithmus-Binary gespeichert und
+> spaeter unter der CacheEngineBulider als Modul ABI stabil ausgefuehrt und
+> durchgemessen. Alle Methoden und tools, die nicht direkt Teil der Anatomie
+> sind (bis auf die Statistik observer der Achsen) gehoeren in die CacheEngineBuilder.
+> Wir muessen uns bewusst sein, dass ein abstract class composition
+> Pruefungs-Algorithmus, wie der prt-art einen neuartigen, teilweise
+> unvollstaendigen, stack an Achsen-Algorithmus-Erweiterungen anbietet, wodurch
+> die Permuation-Engine fuer die Erzeugung der 3 Arten an Kompositionalen joins
+> an neuartigen Anatomien, per Metaprogrammierung erweiterbar sein muss. Die
+> Regeln fuer den merge eines Pruefungs-Algorithmus gegen die Achsen der
+> cache-engine ist umfassend dokumentiert."
+
+---
+
+## §17 Verantwortlichkeits-Trennung — 3 Akteure
+
+### §17.1 PermutationEngine (Anatomie-Generator)
+
+**Einzige Aufgabe:** Aus einer Konfiguration (TopicConfigSets...) Suchalgorithmus-
+Anatomien erzeugen, bei der **jede Anatomie exakt EINE Permutation aus den
+Achsen-Algorithmen ist**.
+
+- Compile-Time Cartesian via `mp_product` ueber alle Topic-Achsen-Wrapper-Listen
+- Pro Permutation: 1 AdHocComposition (17-Achsen-Tupel) + 1 SearchAlgorithmAnatomy<AdHocComposition>
+- Compiler emittiert pro Permutation einen distinkten Algorithmus-Binary
+- KEIN Runtime-Switch — alles statisch determiniert
+
+**Was nicht zur PermutationEngine gehoert:**
+- Insert/Lookup/Erase/Clear-Methoden (gehoeren zum CacheEngineBuilder als Commands)
+- Mess-Logik (gehoert zum CacheEngineBuilder)
+- Binary-Loading/Module-Dispatch (gehoert zum CacheEngineBuilder)
+
+### §17.2 SearchAlgorithmAnatomy (Organ-Container)
+
+**Einzige Aufgabe:** Pro Permutation die 17 Achsen-Algorithmen statisch
+zusammenfuehren UND einen **ABI-stabilen Observer-Aggregat-Struct** exponieren,
+der pro Achse den Statistik-Observer liefert.
+
+**Was zur Anatomie gehoert:**
+- 17 Achsen-Algorithmen als Template-Member (Composition::search_algo, ::node_type, ...)
+- 17 Statistik-Observer pro Achse (composition::xxx::observer())
+- **ObserverAggregate-Struct** — ABI-stabiler POD/standard-layout-struct mit
+  allen 17 Achsen-Snapshots zu einem Zeitpunkt
+- Composition-Inspection (paper_id, composition_name, organ_count)
+
+**Was NICHT zur Anatomie gehoert (R3 hatte das falsch):**
+- ❌ `insert/lookup/erase/clear` Container-Methoden — gehoeren in CacheEngineBuilder
+- ❌ `std::map` oder anderer interner Container — gehoeren in CacheEngineBuilder
+- ❌ Workload-Driver / YCSB-Treiber — gehoeren in CacheEngineBuilder/Mess-Treiber
+
+**R3-Initialer-Stand (zu refactoren in R5.B):**
+```cpp
+template <IsComposition Composition>
+class SearchAlgorithmAnatomy {
+    std::map<key_type, value_type> container_;  // ← FALSCH, gehoert in Builder
+public:
+    bool insert(key_type, value_type);           // ← FALSCH
+    std::optional<value_type> lookup(key_type);  // ← FALSCH
+    bool erase(key_type);                        // ← FALSCH
+    void clear();                                 // ← FALSCH
+};
+```
+
+**R5.B-Ziel-Stand:**
+```cpp
+template <IsComposition Composition>
+class SearchAlgorithmAnatomy {
+public:
+    using composition_t = Composition;
+    using observer_aggregate_t = ObserverAggregate<Composition>;
+
+    // RICHTIG: nur Achsen-Zugriff + Observer-Aggregate
+    [[nodiscard]] observer_aggregate_t observe_all() const noexcept;
+    // Composition-Inspection (statisch)
+    static constexpr std::string_view composition_name() noexcept { return Composition::name; }
+    static constexpr std::string_view paper_id()         noexcept { return Composition::paper_id; }
+    static constexpr std::size_t      organ_count()      noexcept { return 17; }
+private:
+    typename Composition::search_algo  axis_search_algo_;
+    typename Composition::cache_traversal  axis_cache_traversal_;
+    // ... 15 weitere Achsen ...
+};
+```
+
+### §17.3 CacheEngineBuilder (Mess-Orchestrierung + ABI-Loader)
+
+**Aufgaben:**
+- **Konfiguration:** Welche TopicConfigSets gehen in PermutationEngine?
+- **CMake-Treiber:** Pro Permutation `cmake -B build/perm_<hash> -D...` rufen → 1 .so/.dll pro Permutation
+- **ABI-Stabilitaet:** Module-Loader (dlopen/LoadLibrary) loadet .so/.dll und ruft fuer Mess-Reihe:
+  - `ObserverAggregate snapshot = anatomy.observe_all()`
+  - `bool insert(K, V)` als Command
+  - `std::optional<V> lookup(K)` als Command
+  - `bool erase(K)` als Command
+  - `void clear()` als Command
+- **Command-Pattern fuer Workload-Driver:** InsertCommand/LookupCommand/EraseCommand/ClearCommand + WorkloadDriverCommand (YCSB)
+- **Mess-Aggregation:** Pro Permutation Welch-t-Test + Sample-Statistiken auf ObserverAggregate-Snapshots
+- **3-Stufen-Pruefung-Auswahl:** Stufe 1 / Stufe 2 / Stufe 3 als CLI-Flag des CacheEngineBuilder
+
+**ABI-Schnittstelle pro Binary (R5+ Skelett):**
+```cpp
+// In jedem generierten Permutations-Binary (.so/.dll)
+extern "C" {
+    // Anatomy-Singleton-Zugriff
+    void* comdare_create_anatomy();
+    void  comdare_destroy_anatomy(void*);
+    // Container-Operationen (Builder-Commands)
+    bool  comdare_insert(void* anatomy, std::uint64_t k, std::uint64_t v);
+    bool  comdare_lookup(void* anatomy, std::uint64_t k, std::uint64_t* out_v);
+    bool  comdare_erase(void* anatomy, std::uint64_t k);
+    void  comdare_clear(void* anatomy);
+    // Observer-Aggregate-Snapshot (POD, copy-back via Out-Pointer)
+    void  comdare_snapshot(void* anatomy, ObserverAggregateSnapshot* out_snapshot);
+    // Composition-Identifikation
+    const char* comdare_composition_name();
+    const char* comdare_paper_id();
+}
+```
+
+---
+
+## §18 3 Kompositionale Joins (User-Direktive)
+
+Die Pruefling-Algorithmen (z.B. prt-art) sind **abstract class compositions**:
+sie bieten einen "neuartigen, teilweise unvollstaendigen Stack an
+Achsen-Algorithmus-Erweiterungen" an. PermutationEngine muss per Metaprogrammierung
+fuer 3 Arten von Joins erweiterbar sein.
+
+### §18.1 Stufe 1 — `comdare_perms_ce` (Default CE-only)
+
+**Merge-Regel:** Keine Pruefling-Beteiligung. Nur cache-engine DefaultVariants.
+```cpp
+using Stufe1_Axes_03a = ce::axis_03a::DefaultVariants;  // {Array256, VectorU8U8, VectorU16U16, OriginalArt, ...}
+using Stufe1_Axes_06  = ce::axis_06::DefaultVariants;   // {Mimalloc, Jemalloc, ...}
+// ... 15 weitere Achsen ...
+
+using Stufe1_Engine = PermutationEngine<
+    Stufe1_03a, Stufe1_03b, Stufe1_03m, ..., Stufe1_filter>;
+```
+
+**Cartesian:** alle CE-Varianten × alle Permutationen.
+
+### §18.2 Stufe 2 — `comdare_perms_<pruefling>` (ERSETZT-mit-Fallback)
+
+**Merge-Regel (User-Direktive 2026-05 [[pruefling-replace-not-extend]]):**
+Pro Achse: ERSETZT komplett wenn Pruefling-Namespace existiert, sonst Compile-
+Time-Fallback auf CE-Defaults.
+
+```cpp
+namespace prt_art {
+    namespace axis_03a {
+        // Wenn definiert: Pruefling-Variants ERSETZEN CE-Defaults fuer Stufe 2
+        using PrueflingVariants = mp::mp_list<PrtArtRadixVariant, PrtArtCompactVariant>;
+    }
+    // axis_06: KEINE Namespace-Definition → CE-Defaults bleiben (Fallback)
+}
+
+// Compile-Time-Detection
+template <class Default, class Pruefling>
+using StufeTwoAxis = std::conditional_t<
+    has_pruefling_variants_v<Pruefling>,
+    typename Pruefling::PrueflingVariants,
+    Default
+>;
+
+using Stufe2_Axes_03a = StufeTwoAxis<ce::axis_03a::DefaultVariants, prt_art::axis_03a>;
+using Stufe2_Axes_06  = StufeTwoAxis<ce::axis_06::DefaultVariants,  prt_art::axis_06>;
+// ...
+```
+
+**Cartesian:** Mix aus Pruefling-Achsen (wo definiert) + CE-Defaults (wo nicht).
+
+### §18.3 Stufe 3 — `comdare_perms_full_join` (Union-non-redundant)
+
+**Merge-Regel:** Alle Pruefling- und CE-Variants pro Achse vereinigt, dedupliziert.
+
+```cpp
+// Existing in permutation_engine.hpp §5
+template <class DefaultList, class... PrueflingLists>
+using AxisFullJoin = mp::mp_unique<
+    mp::mp_append<DefaultList, PrueflingLists...>
+>;
+
+using Stufe3_Axes_03a = AxisFullJoin<
+    ce::axis_03a::DefaultVariants,
+    prt_art::axis_03a::PrueflingVariantsOrEmpty,
+    other_pruefling::axis_03a::PrueflingVariantsOrEmpty
+>;
+```
+
+**Cartesian:** vollstaendiger Permutations-Raum mit allen Variantenquellen.
+
+---
+
+## §19 Pruefling-Namespace-Slot-Pattern (R5.C Pflicht)
+
+Pro Achse ist ein optionaler Pruefling-Namespace-Slot definiert:
+
+```cpp
+// libs/cache_engine/topics/<topic>/axis_<NN>/<topic>_pruefling_slot.hpp
+namespace comdare::cache_engine::<topic>::axis_<NN>::pruefling_slot {
+    // Per Default leer — wird ueberschrieben wenn Pruefling-Repo eingebunden ist
+    using PrueflingVariants = mp::mp_list<>;  // empty fallback
+    static constexpr bool has_pruefling = false;
+}
+```
+
+Pruefling-Repos (prt-art etc.) registrieren via Partial-Specialization oder
+Namespace-Extension:
+
+```cpp
+// In comdare-prt-art/libs/.../axis_03a_search_algo_prt_art_slot.hpp
+namespace comdare::cache_engine::traversal::axis_03a_search_algo::pruefling_slot {
+    using PrueflingVariants = mp::mp_list<PrtArtRadix512, PrtArtCompactBoolean>;
+    static constexpr bool has_pruefling = true;
+}
+```
+
+PermutationEngine konsumiert ueber Concept-Detection:
+```cpp
+template <class Slot>
+concept HasPruefling = requires { Slot::has_pruefling; } && Slot::has_pruefling;
+
+template <class Default, class Slot>
+using StufeTwoMerge = std::conditional_t<
+    HasPruefling<Slot>,
+    typename Slot::PrueflingVariants,
+    Default
+>;
+```
+
+---
+
+## §20 ObserverAggregate — ABI-stabiler Snapshot-Struct (R5.A Pflicht)
+
+Pro Composition wird ein ABI-stabiler POD-Struct definiert, der 17 Snapshots
+(einer pro Achse) sammelt:
+
+```cpp
+// libs/cache_engine/anatomy/observer_aggregate.hpp
+template <IsComposition Composition>
+struct ObserverAggregate {
+    // 17 named Snapshot-Members (POD-types pro Achse)
+    typename Composition::search_algo::snapshot_t        search_algo_snapshot;
+    typename Composition::cache_traversal::snapshot_t    cache_traversal_snapshot;
+    typename Composition::mapping::snapshot_t            mapping_snapshot;
+    // ... 14 weitere ...
+
+    // ABI-Stabilitaet: standard_layout + trivially_copyable
+    // (Achs-Snapshots sind selbst POD → Aggregate ist POD)
+};
+
+// SearchAlgorithmAnatomy<C> exponiert eine snapshot-Methode:
+template <IsComposition Composition>
+class SearchAlgorithmAnatomy {
+public:
+    using observer_aggregate_t = ObserverAggregate<Composition>;
+
+    [[nodiscard]] observer_aggregate_t observe_all() const noexcept {
+        return {
+            axis_search_algo_.statistics(),
+            axis_cache_traversal_.statistics(),
+            // ... 15 weitere ...
+        };
+    }
+};
+```
+
+**Pflicht-Concept fuer alle Wrappers:**
+```cpp
+template <class W>
+concept ObservableAxis = requires(W const& w) {
+    typename W::snapshot_t;
+    { w.statistics() } -> std::same_as<typename W::snapshot_t>;
+};
+```
+
+Falls eine Achse keinen Snapshot liefert (Stufe-A Default-Wrappers ohne
+Statistics-Support): leerer `EmptySnapshot{}` POD.
+
+---
+
+## §21 Implementierungs-Plan R5.A bis R5.C
+
+| Sprint | Was | Wo |
+|---|---|---|
+| **R5.A jetzt** | Observer-Aggregate ABI-Struct + Anatomie-Methode | `libs/cache_engine/anatomy/observer_aggregate.hpp` |
+| **R5.B** | Anatomie-API-Refactor: insert/lookup/erase/clear → Builder-Commands | `libs/cache_engine/builder/anatomy_command/` |
+| **R5.C** | PermutationEngine Stufe-2 + Stufe-3 Joins + Pruefling-Slot-Pattern | `libs/cache_engine/anatomy/pruefling_merge.hpp` |
+| **R5.D** | CacheEngineBuilder CLI + extern "C" ABI-Interface | `libs/cache_engine/builder/cli/` + `apps/anatomy_binary/` |
+| **R5.E** | dlopen/LoadLibrary Module-Loader (Workload-Treiber) | `libs/cache_engine/builder/module_loader/` |
+
+---
+
+## §22 Mapping zu existing Memory-Direktiven (Konsistenz-Check)
+
+| User-Direktive (Teil 3) | Existing Memory-Direktive | Status |
+|---|---|---|
+| Anatomie nur Achsen + Observer | (NEU R5.A — siehe [[anatomie-nur-achsen-und-observer]]) | wird angelegt |
+| 3 Kompositionale Joins | [[3-stufen-pruefung]] | ✅ konsistent |
+| Pruefling ERSETZT-mit-Fallback | [[pruefling-replace-not-extend]] | ✅ konsistent |
+| Topic-Namespace + Pruefling-Slot | [[topic-axis-pruefling-namespace]] | ✅ konsistent |
+| ABI-Stabilitaet via Module-Loader | (NEU R5.D — siehe Doku 10 §0.4) | konsistent |
+| PermutationEngine Anatomie-Generator | [[achsen-komposition-organ-metapher]] | ✅ konsistent |
+
+---
+
+## §23 Was R3 + R3.2 + R4 KORREKT war (Bestand bleibt)
+
+- ✅ AdHocComposition 17-Tupel: korrekt
+- ✅ CompositionFromPermTuple: korrekt
+- ✅ AnatomyPermutationDriver Facade: korrekt
+- ✅ 6 CE-Re-Impl-Compositions + 5 PaperBinding-Compositions: korrekt
+- ✅ Frankenstein-Demo: korrekt
+
+## §24 Was R3 + R3.2 + R4 zu KORRIGIEREN ist (R5.B Plan)
+
+- ❌ `SearchAlgorithmAnatomy::insert/lookup/erase/clear`: in Builder-Commands verschieben
+- ❌ `std::map container_`: in Builder verschieben
+- ❌ Tests die direkte Anatomie-Methoden nutzen: auf Commands umstellen
+- ✅ `composition_name() / paper_id() / organ_count()`: bleiben in Anatomie
+- ✅ NEU `observe_all() → ObserverAggregate<Composition>`: kommt in R5.A
+
+---
+
+**Ende Teil 3 (Stand 2026-05-26 sehr spaet — User-Direktive Verantwortlichkeits-
+Trennung + 3-Kompositionale-Joins + ABI-Stabilitaet).**
