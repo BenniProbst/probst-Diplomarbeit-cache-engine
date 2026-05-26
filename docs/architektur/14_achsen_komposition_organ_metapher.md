@@ -1237,5 +1237,103 @@ Bestehendes muss um Gattungs-Marker ergaenzt werden:
 
 ---
 
-**Ende Teil 4 (Stand 2026-05-26 sehr spaet — User-Direktive Anatomie-Gattungen +
+**Ende Teil 4 §25-§31 (Stand 2026-05-26 sehr spaet — User-Direktive Anatomie-Gattungen +
 AnatomyBase + Gattungs-spezialisierte PermutationEngines).**
+
+---
+
+## §32 Gattungs-Constraint fuer Pruefling-Merge (User-Direktive 2026-05-26 sehr spaet)
+
+### §32.1 User-Direktive verbatim
+
+> "Wir stellen fest, dass wir nur gleiche Gattungen an Algorithmen miteinander
+> kreuzen koennen, weil Gattungen die exakt selben permutativen Achsen verwenden.
+> Dies ist eine Einschraenkung fuer die experimentelle Mischung mit einem
+> Pruefungs-Algorithmus-Permutations-Stack gegen die cache-engine."
+
+### §32.2 Formale Konsequenz fuer 3 Kompositionale Joins (Teil 3 §18)
+
+Die 3 Joins in `pruefling_merge.hpp` (Stufe 1/2/3) sind nur **innerhalb derselben
+Gattung** valide. Cross-Genus-Joins sind type-system-mathematisch unmoeglich, weil:
+
+| Gattung | Pflicht-Achsen-Set (Teilmenge der 17) | Eigene Achsen (NEU) |
+|---|---|---|
+| **Mammal (SearchAlgorithm)** | 17 (komplett) | keine |
+| **Bird (Set)** | 14 (kein mapping/value_handle/inner) | keine |
+| **Reptile (Sequence)** | 9 (kein search_algo/cache_traversal/mapping/path_compression/node_type/index/filter) | `axis_growth` |
+| **Invertebrate (Adapter)** | meiste delegated | `axis_inner` |
+| **Plant (View)** | 7 | `axis_extent`, `axis_layout`, `axis_accessor` |
+
+Da Achsen-Sets disjunkt sind, ist `mp_product<F, Set_A, Set_B>` mit Set_A != Set_B
+**nicht typkompatibel** — die Wrapper-Klassen jeder Gattung haben
+inkompatible Concept-Constraints (z.B. `SearchAlgoConcept` vs `SequenceConcept`).
+
+### §32.3 Pflicht-Regel: Gattung-Match in Pruefling-Slot
+
+Jeder Pruefling-Slot **MUSS** seine Gattung explizit deklarieren — die
+PermutationEngine prueft Gattung-Match zur Compile-Zeit:
+
+```cpp
+namespace prt_art::axis_03a {
+    struct Slot {
+        using PrueflingVariants = mp::mp_list<PrtArtRadix512>;
+        static constexpr bool has_pruefling = true;
+
+        // R5.C.B Pflicht-Erweiterung: Gattungs-Marker fuer Slot-Validierung
+        static constexpr AnatomyGenus genus = AnatomyGenus::SearchAlgorithm;
+    };
+}
+
+// In SearchAlgorithmPermutationEngine: Compile-Time Genus-Check
+template <class Default, class... Slots>
+class SearchAlgorithmPermutationEngine : public PermutationEngine<...> {
+    static_assert((Slots::genus == AnatomyGenus::SearchAlgorithm && ...),
+        "ALLE Pruefling-Slots in SearchAlgorithmPermutationEngine muessen "
+        "Mammal-Gattung sein. Cross-Genus-Merge ist unmoeglich (Doku 14 §32).");
+};
+```
+
+### §32.4 Implikation fuer prt-art als experimenteller Pruefling
+
+prt-art ist ein Adaptive-Radix-Tree Pruefling — passt zur **Mammal-Gattung** (K→V Map):
+- Kompatibel: kann mit ArtComposition / HotComposition / WormholeComposition etc. gemischt werden
+- Inkompatibel: KANN NICHT mit hypothetischer `VectorReptileComposition` (Sequence-Gattung) gemischt werden
+
+### §32.5 Cross-Genus-Vergleich: nur als Wissenschaftliche Mess-Ebene (NICHT als Permutation)
+
+Mess-Reihen koennen Mammal-Tier vs Reptile-Tier **vergleichen** (Performance-Studie
+"std::map vs std::vector"), aber NICHT als gemischte Permutationen kombinieren.
+Diese Cross-Genus-Mess-Reihen liegen in `CacheEngineBuilder` Ebene (R6/V42), NICHT
+in der PermutationEngine.
+
+### §32.6 Spezialisierte PermutationEngine pro Gattung (Recap Teil 4 §29)
+
+Aus Gattungs-Constraint folgt zwingend: **eine PermutationEngine pro Gattung**.
+Nicht eine generische `PermutationEngine<MixedGenus>`. Dies bestaetigt User-Direktive
+aus Teil 4 §25 ("durch Unterklassen pro Anatomie-Gattung spezifiziert").
+
+| PermutationEngine | Gattungs-Set | Status (R5.C.A) |
+|---|---|---|
+| `SearchAlgorithmPermutationEngine<...>` | nur Mammal-Slots | TODO R5.C.B |
+| `SequencePermutationEngine<...>` | nur Reptile-Slots | TODO V42 |
+| `SetPermutationEngine<...>` | nur Bird-Slots | TODO V42 |
+| `AdapterPermutationEngine<...>` | nur Invertebrate-Slots | TODO V42 |
+| `ViewPermutationEngine<...>` | nur Plant-Slots | TODO V42 |
+
+### §32.7 Build-System-Konsequenz
+
+CacheEngineBuilder muss bei `cmake -DCOMDARE_GENUS=mammal` nur Mammal-Compositions
+generieren. Bei `--genus=reptile` nur Sequence-Compositions. Cross-Genus-Builds
+sind ungueltig und werden mit `static_assert` blockiert.
+
+### §32.8 Update Memory-Direktive
+
+Neue Direktive `[[gattungs-constraint-pruefling-merge]]` markiert die Pflicht:
+- Pruefling-Slots deklarieren Gattung
+- PermutationEngine validiert Gattung-Match zur Compile-Zeit
+- Cross-Genus-Joins sind Architektur-Verstoss
+
+---
+
+**Ende Teil 4 §32 (Stand 2026-05-26 sehr spaet — User-Direktive Gattungs-Constraint
+fuer Pruefling-Merge, R5.C.A-Sprint-Ende-Vertiefung).**
