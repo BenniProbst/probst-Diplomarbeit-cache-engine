@@ -1857,3 +1857,116 @@ je nach Mixin-Field-Konfiguration). Body: extern Linking gegen concurrentqueue.h
 ---
 
 **Ende Teil H (Stand 2026-05-26 spaeter — ext/-Topic-Reorganisation + concurrentqueue Pilot-Submodule).**
+
+---
+
+# Teil I — P2.D.q.s2 Pilot: OriginalLockFreeMpmcConcurrentQueue (2026-05-26 spaeter)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil A-H unangetastet. Teil I dokumentiert
+> P2.D.q.s2 — erster Q-Wrapper mit echter externer Submodule-Bindung (moodycamel
+> ConcurrentQueue, BSD-2, header-only). Pilot fuer Pattern B (Submodule) im
+> queuing-Topic.
+
+---
+
+## §49 P2.D.q.s2 Pilot — OriginalLockFreeMpmcConcurrentQueue (Q15)
+
+| Aspekt | Wert |
+|---|---|
+| Family | Q15 (parallel zu Re-Impl Q13b LockFreeMPMC) |
+| Subaxis | QS6 lock_free_access |
+| Paper-Source | `ext/queuing/Q01-concurrentqueue/concurrentqueue.h` |
+| Lizenz | BSD-2 Simplified |
+| Einbindung | git submodule (cameron314/concurrentqueue) |
+| Compiler-Marker | "gcc-9.5" via Mixin |
+| Habich-Compliance | 2/6 originall, 4/6 Lücken |
+| Body-Strategie s2 | Standalone Vyukov bounded MPMC (analog LockFreeMPMC) |
+| Body-Strategie s4 | extern Linking `#include <concurrentqueue.h>` + `ConcurrentQueue<u64>` |
+
+### §49.1 API-Mapping (Tool-validiert)
+
+| wrapper_fn | paper_fn | Status | Bemerkung |
+|---|---|---|---|
+| put | `ConcurrentQueue::enqueue` | ✅ originall | SHA256 d3424613c119... |
+| get | `ConcurrentQueue::try_dequeue` | ✅ originall | SHA256 4f866455144e... |
+| emplace | (LUECKE) | ❌ Re-Impl | concurrentqueue hat keine emplace-Methode |
+| peek_front | (LUECKE) | ❌ Re-Impl | concurrentqueue ist async-only, kein peek im Paper-Design |
+| peek_back | (LUECKE) | ❌ Re-Impl | analog peek_front |
+| clear | (LUECKE) | ❌ Re-Impl | kein clear in concurrentqueue, Drain-Loop |
+
+### §49.2 Mixin-Diamond-Vererbung (Pattern wie Allocator/SearchAlgo)
+
+```cpp
+class OriginalLockFreeMpmcConcurrentQueue
+    : public BufferStrategyBase<OriginalLockFreeMpmcConcurrentQueue>,
+      public generated::q01_concurrentqueue::OriginalCodeMixin {
+public:
+    using generated::q01_concurrentqueue::OriginalCodeMixin::get_compiler;       // → "gcc-9.5"
+    using generated::q01_concurrentqueue::OriginalCodeMixin::is_original_put;    // → true
+    using generated::q01_concurrentqueue::OriginalCodeMixin::is_original_get;    // → true
+    using generated::q01_concurrentqueue::OriginalCodeMixin::is_original_emplace; // → false (Mixin-Default via if-constexpr-requires)
+    using generated::q01_concurrentqueue::OriginalCodeMixin::is_original_peek_front;
+    using generated::q01_concurrentqueue::OriginalCodeMixin::is_original_peek_back;
+    using generated::q01_concurrentqueue::OriginalCodeMixin::is_original_clear;
+    using generated::q01_concurrentqueue::OriginalCodeMixin::is_original_module; // → mp_all_of = false
+    ...
+};
+```
+
+---
+
+## §50 Tests s2 Endstand
+
+| Test-Target | Vorher (P2.D.q Audit) | Nachher (P2.D.q.s2 Pilot) | Delta |
+|---|:-:|:-:|:-:|
+| test_v41_topic_allocator_axis_06 | 252 | 252 | 0 |
+| test_v41_topic_queuing | 205 | 216 | **+11** (TYPED_TEST Auto-Skalierung Q15) |
+| test_v41_topic_traversal | 131 | 131 | 0 |
+| test_v41_paper_legacy_code | 126 | 133 | **+7** (PartialOriginalBufferConformance) |
+| **TOTAL cache-engine** | **714** | **732** | **+18** |
+
+Plus ext/-Reorganisation (V41.F.6.1.struct, unmittelbar vor P2.D.q.s2): cache-engine unverändert 714.
+
+### §50.1 PartialOriginalBufferConformance TYPED_TEST (NEU)
+
+Analog `PartialOriginalSearchAlgoConformance` (HOT/START Pattern), aber fuer Q1-Buffer
+(6 Functions statt 4). 7 Tests pro Wrapper: AxisBaseConcept / LegacyOriginalCodePflicht /
+HasOriginalCode / NotPaperOriginalValidated / GetCompilerOverridesAxisBaseDefault /
+PaperApiFunctionsOriginal (put+get) / LueckenFunctionsNotOriginal (emplace+peek_front+peek_back+clear).
+
+Bei Roll-out weiterer Partial-Original-Buffer-Wrappers (RocksDB/Bw-Tree/Masstree)
+nur Type-Liste erweitern → automatisch +7 Tests pro Wrapper.
+
+---
+
+## §51 Lessons-Learned Pilot P2.D.q.s2
+
+1. **CMake-Custom-Command-Dependency** zwischen `comdare_paper_q01_concurrentqueue_codegen` (Tool-Run) und Test-Target ist NICHT automatisch — bei erstem Build muss Tool-Target explizit aufgerufen werden:
+   ```bash
+   cmake --build build-pilot --config Release --target comdare_paper_q01_concurrentqueue_codegen
+   ```
+   Folge-Builds funktionieren transparent. TODO Folge-Sprint: Dependency-Edge explizit hinzufuegen.
+
+2. **Concept-Naming-Disziplin:** im Q1-Achs-Namespace heißen die Concepts `BufferStrategy`, `BoundedBufferStrategy`, `IterableAspectStrategy`, `CacheEngineBufferPermutationStrategy` (NICHT `IterableAspectBufferStrategy` oder `CacheEngineQueuingBufferPermutationStrategy` wie initial vermutet). Pflicht-Check `grep -n "concept" concepts/*.hpp` vor neuem Wrapper.
+
+3. **Pattern B (Submodule) ist trivial wenn Header-only:** concurrentqueue funktioniert direkt nach `git submodule add`. Tool generiert PaperManifest aus header. Build-System kennt keine extra Vendor-Library — `comdare_register_paper_wrapper` reicht.
+
+4. **Body-Strategie analog Re-Impl-Vorlage:** in s2 kann der Body 1:1 vom existing Re-Impl-Wrapper kopiert werden (LockFreeMPMC → OriginalLockFreeMpmcConcurrentQueue), Properties via Mixin-Inheritance differenziert. s4 wird Body durch extern "C" Adapter ersetzen.
+
+---
+
+## §52 Pending Sub-Stufen — Reihenfolge (Stand nach P2.D.q.s2)
+
+| Sub-Task | Stand | Bemerkung |
+|---|---|---|
+| ~~P2.D.tr.s2~~ Traversal 3 Original-Wrapper (ART/HOT/START) | ✅ vorherige Phase |
+| ~~ext/-Reorganisation~~ Topic-Gliederung + Submodule-Pattern | ✅ vorherige Phase |
+| ~~P2.D.q.s2 Pilot~~ OriginalLockFreeMpmcConcurrentQueue (Q15) | ✅ **heute** |
+| **P2.D.tr.s3** 9 weitere Traversal-Paper (P03/P04/P06/P07/P10/P20/P25/P29/P30) | **pending** Task NEU |
+| **P2.D.q.s2.t2** weitere Queuing-Paper (RocksDB Skiplist+AdaptiveLsm, Bw-Tree DeltaChain, Masstree EpochBuffer) | **pending** (User-Aktion git submodule add) |
+| **P2.D.t2** 4 deferred Allocator (tcmalloc/Hoard/Michael-LF/Scalloc) | **pending** Task #685 |
+| **P2.A.W + P2.D.tr.s4** Library-Build Original-Compiler (Cross-Platform) | **pending** Task #689 |
+
+---
+
+**Ende Teil I (Stand 2026-05-26 spaeter — P2.D.q.s2 Pilot OriginalLockFreeMpmcConcurrentQueue, 732 Tests gruen).**

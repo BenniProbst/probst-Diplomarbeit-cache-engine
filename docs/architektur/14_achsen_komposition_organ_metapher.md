@@ -307,4 +307,207 @@ auftreten. Kompositioniere Algorithmen NUR aus den definierten Achsen-Ausprägun
 
 ---
 
-**Ende docs/architektur/14_achsen_komposition_organ_metapher.md (Stand 2026-05-26 User-Direktive).**
+**Ende Teil 1 (Stand 2026-05-26 User-Direktive Organ-Metapher).**
+
+---
+
+# Teil 2 — Saeugetier-Anatomie als Forschungs-Ziel der Diplomarbeit
+
+> **Anmerkung [[never-delete-documentation]]:** Teil 1 §1-§9 oben unangetastet.
+> Teil 2 dokumentiert die User-Vertiefung 2026-05-26 spaet — aus den statischen
+> Compositions wird die **zentrale Anatomie** eines Suchalgorithmus abgeleitet.
+
+---
+
+## §10 User-Direktive verbatim (2026-05-26 spaet, F15-Forschungsmission)
+
+> "Jetzt haben wir statische Algorithmen als Beispiel von Kombinationen von
+> Permutationen. Nachdem alle topics und Achsen vollständig ausgebaut sind, können
+> wir mithilfe dieser Kompositionen die zentrale Anatomie eines Suchalgorithmus
+> finden, was bedeutet, dass wir anhand des Gesamtbildes der Kompositionen und
+> der nun fertiggestellten Zerlegung eine Implementierung finden können, welche
+> zentral für alle Kompositionen passen wird, und die sich nur anhand der
+> Ausprägung der Merkmale jeder Achse/Organe (ähnlich Tier-Metapher) zum finalen
+> eindeutigen Komposit-Algorithmus zusammensetzt."
+
+> "Methapher: Alle Säugetiere haben im Kern hauptsächlich dieselben Organe und
+> Anatomie, aber alle Knochen, Organe, Bindegewebe haben unterschiedliche
+> Ausprägungen."
+
+> "Das finale Ziel der Diplomarbeit ist es, die Anatomie eines Suchalgorithmus
+> zu finden und das schnellste 'Tier' bzw. die schnellste Rekombination aller
+> Achsen zu finden und ansonsten alle Achsen-Permutationen bis ins Detail über
+> ihr Verhalten zu studieren und auszuwerten."
+
+---
+
+## §11 Drei-Schichten-Architektur fuer Suchalgorithmus-Anatomie
+
+Aus User-Vertiefung folgt eine klare 3-Schichten-Architektur:
+
+### §11.1 Schicht 1 — Achsen + Sub-Achsen (15 Topics)
+
+**Was:** Die individuellen "Organe" — Sub-Aufgaben die jeder Algorithmus erfuellt.
+**Wer:** `libs/cache_engine/topics/<topic>/axis_<NN>_<name>/` mit Default-Wrappers.
+**Stand 2026-05-26:** Fundament-Sprint F1+F2+F3 abgeschlossen (15/15 Topics implementiert).
+
+### §11.2 Schicht 2 — Composition-Templates (statische Beispiele)
+
+**Was:** Konkrete Reference-Konfigurationen — bekannte Such-Algorithmen als Beweis
+dass die Achsen-Zerlegung deren Anatomie korrekt abbildet.
+**Wer:** `libs/cache_engine/compositions/<algorithm>_reference.hpp` mit 15
+`using`-Aliases pro Algorithmus.
+**Stand 2026-05-26:** 6 Compositions (Art/Hot/Wormhole/Surf/Start/Masstree) als 15-Achsen-Tupel.
+
+### §11.3 Schicht 3 — Zentrale Anatomie-Implementation (FORSCHUNGS-ZIEL)
+
+**Was:** EINE generische `SearchEngine<Composition>`-Template-Klasse, die durch
+Spezialisierung mit jeder Composition zu einem konkreten Algorithmus wird.
+**Wer:** `libs/cache_engine/anatomy/search_algorithm_anatomy.hpp` (NEU pending Task #694).
+**Stand:** TODO Phase R3.
+
+```cpp
+// Konzept-Skelett (R3+R4)
+namespace comdare::cache_engine::anatomy {
+
+template <typename Composition>
+class SearchAlgorithmAnatomy {
+    typename Composition::allocator       allocator_;
+    typename Composition::node_type       root_;
+    typename Composition::concurrency     concurrency_;
+    typename Composition::prefetch        prefetcher_;
+    typename Composition::telemetry       telemetry_;
+    // ... 15 Organ-Instances ...
+
+public:
+    bool insert(Key k, Value v) {
+        prefetcher_.prefetch(predicted_path);
+        auto lock = concurrency_.acquire_write();
+        Composition::search_algo::insert_into(root_, k, v);
+        telemetry_.notify_insert();
+        return true;
+    }
+    std::optional<Value> lookup(Key k) const { /* analog */ }
+};
+
+// Konkrete Algorithmen = reine Template-Instantiationen:
+using Art       = SearchAlgorithmAnatomy<compositions::ArtComposition>;
+using Hot       = SearchAlgorithmAnatomy<compositions::HotComposition>;
+using Wormhole  = SearchAlgorithmAnatomy<compositions::WormholeComposition>;
+using SuRF      = SearchAlgorithmAnatomy<compositions::SurfComposition>;
+using Masstree  = SearchAlgorithmAnatomy<compositions::MasstreeComposition>;
+using Start     = SearchAlgorithmAnatomy<compositions::StartComposition>;
+
+// Eine NEUE Permutation = neues Tier (z.B. ART-Node mit Wormhole-Hash-Lookup):
+struct FrankensteinComposition {
+    using search_algo     = traversal::axis_03a::Array256;
+    using cache_traversal = traversal::axis_03b::HashLookup;  // ← von Wormhole
+    using mapping         = traversal::axis_03m::DirectPlacement;
+    // ... 12 weitere Achsen frei kombinierbar ...
+};
+using Frankenstein = SearchAlgorithmAnatomy<FrankensteinComposition>;
+```
+
+---
+
+## §12 F15-Forschungsmission-Verknuepfung
+
+**Diplomarbeit-Forschungsfrage (formal):**
+
+> *Gibt es eine zentrale Anatomie-Implementation eines Suchalgorithmus, die
+> durch Template-Parameter-Variation aller orthogonalen Achsen ALLE bekannten
+> Such-Algorithmen als Spezialfaelle reproduziert UND eine systematische Suche
+> im Permutations-Raum erlaubt um bisher unbekannte performante Algorithmen
+> zu finden?*
+
+**Antwort-Plan (Phasen 1-7):**
+
+1. **Bottom-Up Achsen-Zerlegung** (15 Topics) ✅ F1+F2+F3 done
+2. **Reference-Compositions** als Punkt-Konfigurationen ✅ R2 done (6 Algorithmen)
+3. **Zentrale Anatomie-Implementation** → R3 NEXT
+4. **Permutations-Engine** mp_product → R4
+5. **CacheEngineBuilder** baut pro Permutation .so/.dll → V41.E11 Skeleton da, Impl pending
+6. **Mess-Reihe + Welch-Test** ueber tausende Permutationen → V41.B1+B3 done
+7. **F15-Auswertung**: schnellste Permutation in Anatomie-Raum identifizieren → V42
+
+**Wissenschaftlicher Beitrag der Diplomarbeit:**
+- Bewies dass Such-Algorithmen eine gemeinsame Anatomie haben (Reduktion auf 15 Achsen)
+- Erschloss neuen Permutations-Raum (Cartesian aller Achsen-Sub-Werte)
+- Identifizierte schnellstes "Tier" (optimale Komposit-Konfiguration) systematisch
+
+---
+
+## §13 Saeugetier-Anatomie-Tabelle (6 bekannte Algorithmen)
+
+| Aspekt (Organ) | ART | HOT | Wormhole | SuRF | Masstree | START |
+|---|---|---|---|---|---|---|
+| **Skelett** (search_algo) | BYTEBYBYTE | DISCR_BITS | HASH_ANCHOR | LOUDS_BITPOS | LAYER_SLICE | MULTIBYTE_SPAN |
+| **Verdauung** (cache_traversal) | LinearWalk | LinearWalk | **HashLookup** | LinearWalk | LinearWalk | LinearWalk |
+| **Nervensystem** (mapping) | Direct | Direct | Direct | **PoolRelative** | Direct | Direct |
+| **Atmung** (path_compression) | None | k-constrained | None | None | None | None |
+| **Herz** (node_type) | Node4/16/48/256 | Patricia | HashAnchor | LOUDS-Bitmap | B+/Trie | Node4/16/48/256 |
+| **Knochen** (memory_layout) | CacheLineAligned | CacheLineAligned | AoS-strict | Bitmap-kompakt | Cache-Craftiness | CacheLineAligned |
+| **Blutkreislauf** (allocator) | Mimalloc | Mimalloc | Custom-Pool | Bulk-Loaded | Custom | Mimalloc |
+| **Sinne** (prefetch) | DistanceEstimator | None | HW-Prefetch | None | None | None |
+| **Immunsystem** (concurrency) | OLC | RCU-light | RW-Latches | (single-thread) | OLC+Versioning | OLC |
+| **Fortpflanzung** (serialization) | VarLen | binary | nicht-pers. | succinct | nicht-pers. | binary |
+| **Telemetrie** (telemetry) | Density | Insert-Count | Latency-Hist | (no) | (no) | (no) |
+| **Wert-Speicherung** (value_handle) | Inline | Inline | External-Pool | Inline | Inline | Inline |
+| **Spezialisierung** (isa) | AVX2 | AVX2 | AVX2 | scalar | scalar | scalar |
+| **Index-Typ** (index_organization) | sorted_unique | sorted_unique | sorted_unique | range_filter | sorted_unique | sorted_unique |
+| **IO-Strategie** (io_dispatch) | InMemory | InMemory | InMemory | InMemory | InMemory | InMemory |
+| **Migration** (migration_policy) | None | None | None | None | None | None |
+| **Filter** (filter) | None | None | None | **(= Funktion!)** | None | None |
+
+**Beobachtungen:**
+- SuRF ist das einzige Tier wo `filter` Composition-konstitutiv ist (SuRF **IST** ein Filter)
+- Wormhole als einziges Tier nutzt HashLookup statt LinearWalk fuer cache_traversal
+- Viele Organe sind ueber alle 6 Tiere identisch (value_handle Inline, io_dispatch InMemory, migration None) → kleine echte Variation
+- 3 Skelett-Gruppen (BYTEBYBYTE/DISCRIMINATIVE_BITS+HASH_ANCHOR/LAYER_SLICE+MULTIBYTE_SPAN+LOUDS_BITPOS) sind die dominanten search_algo-Cluster
+
+**Permutations-Raum-Schaetzung** (heute mit Stufe-A-Defaults):
+3 × 2 × 1 × 1 × 1 × 1 × 24 × 1 × 1 × 1 × 1 × 1 × 1 × 4 × 1 × 1 × 1 ≈ **576 minimal-Permutationen**.
+Bei Vollausbau aller Achsen (z.B. 10 node_types, 8 concurrency-Patterns, 5 prefetch, 5 telemetry) wird das auf 10⁴-10⁵ wachsen → CacheEngineBuilder muss tausende .so/.dll bauen + messen.
+
+---
+
+## §14 Implementierungs-Plan (Anatomie + Permutation)
+
+### §14.1 Phase R3 (NEXT) — SearchAlgorithmAnatomy Skelett
+
+1. `libs/cache_engine/anatomy/` Verzeichnis anlegen
+2. `search_algorithm_anatomy.hpp` mit `SearchAlgorithmAnatomy<Composition>` Template
+3. Concept `IsComposition` zur Validierung der 15 Pflicht-Achsen-Aliases
+4. Pflicht-API: `insert(K,V) → bool`, `lookup(K) const → optional<V>`, `erase(K) → bool`, `clear()`
+5. Tests: alle 6 bekannten Compositions instantiieren via `SearchAlgorithmAnatomy<>` + Smoke
+
+### §14.2 Phase R3.2 — OriginalXxx-Wrappers-Entscheidung
+
+**Empfehlung Option D (NEU):** `OriginalXxx`-Wrappers werden DEPRECATED zugunsten
+`SearchAlgorithmAnatomy<XxxComposition>` Template-Instantiation. Loeschung in R3.3
+nach Anatomie-Pilot verifiziert.
+
+### §14.3 Phase R4 — PermutationEngine + Cartesian
+
+1. `src/permutations/permutation_engine.hpp` mit `mp_product` ueber alle 15 Achsen-Listen
+2. Pro Permutation: `using AdHocComposition = make_composition_from_tuple<...>::type;`
+3. PermutationEngine instantiiert `SearchAlgorithmAnatomy<AdHocComposition>` ueber alle Punkte
+4. CacheEngineBuilder linkt pro Permutation .so/.dll
+5. Mess-Treiber loadet .so/.dll und misst Performance
+
+---
+
+## §15 Pflicht fuer naechste Phasen
+
+| Phase | Was | Wo |
+|---|---|---|
+| **R3 jetzt** | SearchAlgorithmAnatomy<C> Template-Skelett | `libs/cache_engine/anatomy/` |
+| **R3.2** | OriginalXxx Deprecation-Plan | Doku 13 Teil J |
+| **R4** | PermutationEngine mp_product 15 Achsen | `src/permutations/` |
+| **R5** | CacheEngineBuilder pro Permutation .so/.dll | `apps/cache_engine_builder/` |
+| **R6 (V42)** | Mess-Treiber + Welch-Test ueber tausende Permutationen | `Diplomarbeit/Code/02_messung_driver/` |
+| **R7 (V42)** | F15-Auswertung: schnellste Permutation identifizieren | `Diplomarbeit/06_auswertung/` |
+
+---
+
+**Ende Teil 2 (Stand 2026-05-26 spaet — User-Vertiefung Saeugetier-Anatomie + F15-Forschungsmission).**
