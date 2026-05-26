@@ -2304,3 +2304,109 @@ R5.D-R5.E Pipeline ist komplett. Naechste Sprints:
 
 **Ende Teil 11 §46 (Stand 2026-05-27 nachmittag — R5.E AnatomyModuleLoader End-to-End
 SHARED-DLL Runtime-Loading + 11 Tests).**
+
+---
+
+# Teil 12 — Multi-Permutation-Codegen + load_all (R5.D.3)
+
+## §47 R5.D.3 — comdare_codegen_anatomy_module_list + load_all End-to-End
+
+### §47.1 Architektur-Entscheidung: deklarative CMake-Liste vs C++-Iteration
+
+`SearchAlgorithmPermutationEngine` ist C++23 Compile-Time-Code. CMake-Codegen
+laeuft zur Build-System-Time. Beide Welten direkt zu verbinden braucht ein
+Pre-Build-Codegen-Tool (R5.F).
+
+**R5.D.3 wahl als pragmatischen Zwischenschritt:** deklarative CMake-Liste von
+Composition-Types, ueber die `comdare_codegen_anatomy_module()` in einer Schleife
+aufgerufen wird. Voll-Integration mit PermutationEngine kommt in R5.F.
+
+### §47.2 Lieferung
+
+| Datei | Inhalt |
+|---|---|
+| `cmake/anatomy_codegen.cmake` (erweitert) | `comdare_codegen_anatomy_module_list()` Function: iteriert ueber `COMPOSITIONS` Liste (Format "type\|header"), ruft Single-Codegen pro Eintrag, sammelt Targets, setzt gemeinsames RUNTIME_OUTPUT_DIRECTORY |
+| `tests/unit/CMakeLists.txt` (erweitert) | Pilot mit 3 Compositions (Art/Start/Surf) als SHARED → 3 DLLs in eigenem Output-Verzeichnis |
+| `tests/unit/test_v41_anatomy_multi_codegen.cpp` (NEU) | 7 Tests gegen Multi-Pilot |
+
+### §47.3 List-Function Signatur
+
+```cmake
+comdare_codegen_anatomy_module_list(
+    PILOT_PREFIX  <name>                                 # z.B. "anatomy_multi_pilot"
+    OUTPUT_DIR    <dir>                                  # alle DLLs landen hier
+    LIBRARY_TYPE  SHARED|STATIC                          # default SHARED
+    COMPOSITIONS
+        "<fully-qualified type>|<include-path>"          # Pipe-getrennt (Semikolon-Konflikt)
+        "<fully-qualified type>|<include-path>"
+        ...
+    [TARGETS_OUT  <var-name>]                            # erzeugte Target-Namen-Liste
+)
+```
+
+**Pipe-Separator-Begruendung:** CMake nutzt Semikolon als List-Separator.
+Composition-Type-Strings koennten Semikolons enthalten (sie tun es nicht in unserem
+Kontext, aber als robustes Pattern). Pipe (`|`) ist ein sicherer alternativer
+Separator innerhalb eines Eintrags.
+
+### §47.4 Auto-Generierte Target-Namen + Fingerprints
+
+Pro Listen-Eintrag wird ein Target generiert mit:
+- **TARGET_NAME:** `<PILOT_PREFIX>_<index>` (z.B. `anatomy_multi_pilot_0`)
+- **FINGERPRINT:** `<PILOT_PREFIX>_<index>` (stabile DLL-Namen statt SHA256-Default)
+- **DLL-Name:** `comdare_anatomy_perm_<fingerprint>.dll` — passt zum
+  AnatomyModuleLoader::load_all Pattern (`comdare_anatomy_perm_*`)
+
+Lesbare DLL-Namen statt SHA256-Hashes erlauben Debug-Diagnose im Output-Dir.
+
+### §47.5 RUNTIME_OUTPUT_DIRECTORY-Override
+
+Standard ist `CMAKE_BINARY_DIR/tests/unit/Release/` (je nach Generator).
+R5.D.3 setzt explicit `RUNTIME_OUTPUT_DIRECTORY` + `LIBRARY_OUTPUT_DIRECTORY`
+auf ARG_OUTPUT_DIR damit alle DLLs gemeinsam im Pilot-Verzeichnis landen —
+sonst kann `load_all(dir)` sie nicht finden.
+
+Pflicht-Property-Set inklusive `_RELEASE`/`_DEBUG`/`_RELWITHDEBINFO` Suffixe
+(Visual Studio multi-config Generator).
+
+### §47.6 Pilot-Verifikation (3 Compositions)
+
+```
+generated/anatomy_modules_multi/
+├── anatomy_perm_anatomy_multi_pilot_0.cpp        # ArtComposition
+├── anatomy_perm_anatomy_multi_pilot_1.cpp        # StartComposition
+├── anatomy_perm_anatomy_multi_pilot_2.cpp        # SurfComposition
+├── comdare_anatomy_perm_anatomy_multi_pilot_0.dll
+├── comdare_anatomy_perm_anatomy_multi_pilot_1.dll
+└── comdare_anatomy_perm_anatomy_multi_pilot_2.dll
+```
+
+`AnatomyModuleLoader::load_all(generated/anatomy_modules_multi)` laedt alle
+3 DLLs (sortiert nach Dateiname) und liefert 3 `AnatomyModuleHandle`-Instanzen.
+
+### §47.7 Tests-Snapshot R5.D.3 (7 Tests, 1 Suite)
+
+| § | Test | Beweis |
+|---|---|---|
+| §1 | PilotDirectoryExists | Multi-Codegen produziert Verzeichnis |
+| §2 | PilotDirectoryContainsExpectedDlls | 3 DLLs mit comdare_anatomy_perm_-Praefix |
+| §3 | LoadAllReturnsThreeHandles | load_all erfolgreich + alle valid() |
+| §4 | LoadAllProducesCorrectCompositionSet | Set{Art, Start, Surf} aus geladenen Anatomien |
+| §5 | AllHandlesHaveSearchAlgorithmGenus | jeder Handle: genus + organ_count + engine_kind |
+| §6 | LifecyclePerHandleIsIndependent | warm_up/run/shutdown pro Handle separat |
+| §7 | PolymorphicMeasurementLoopOverAllHandles | R5.F-Vorbereitung: pro Permutation Mess-Iteration |
+
+Anatomy-Tests gesamt nach R5.D.3: **140 grün** (12 Test-Files, +7 vs R5.E).
+
+### §47.8 NEXT R5.F (CacheEngineBuilder-CLI End-to-End)
+
+| Sprint | Was |
+|---|---|
+| R5.F | C++-Tool das SearchAlgorithmPermutationEngine instantiiert + Composition-Type-Liste fuer CMake generiert + CMake-Aufruf orchestriert |
+| R6 (V42) | Workload-Driver pro geladenem Modul (YCSB-Sequenz) |
+| R7 (V42) | F15-Auswertung tausende Permutationen |
+
+---
+
+**Ende Teil 12 §47 (Stand 2026-05-27 nachmittag — R5.D.3 Multi-Permutation-Codegen
+mit comdare_codegen_anatomy_module_list + load_all End-to-End + 7 Tests).**
