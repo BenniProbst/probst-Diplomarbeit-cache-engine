@@ -514,3 +514,169 @@ Empfohlene Sprint-Reihenfolge nach Pre-Read:
 
 **Diese Teil-II-Sektion ist die aktuelle Architektur-Wahrheit. Teil I (R3-R5.C.A)
 bleibt als historische Aufzeichnung erhalten.**
+
+---
+---
+---
+
+# TEIL III — R5.C.A3 NACHTRAG (AKTUELLE VERSION, 2026-05-27 vormittag)
+
+> **Aktualitaets-Hinweis:** Teil I + Teil II oben sind historische Aufzeichnungen
+> bis Sprint R5.C.A2. Teil III dokumentiert die R5.C.A3-Lieferung
+> (SearchAlgorithmAbiAdapter Production-Header + Bug-Fix in test_v41_anatomy_base
+> + technische-Identifier-Konvention).
+> **Diese Teil-III-Sektion ist die aktuelle Architektur-Vorlage fuer naechste Sessions.**
+
+---
+
+## §19 R5.C.A3 — SearchAlgorithmAbiAdapter Production-Header + Bug-Fix
+
+### §19.1 Pre-Audit-Befund (vor R5.C.A3-Implementation)
+
+Beim Pre-Read der Session-Doku Teil II §16 ("12 Tests grün fuer test_v41_anatomy_base")
+fiel auf: nach R5.C.A2 Wurzel-Inheritance (IAnatomyBase erbt von IExecutionEngine)
+muss die lokale `AnatomyAbiAdapter`-Klasse in `test_v41_anatomy_base.cpp:110`
+mehr Pflicht-API ueberschreiben. Build-Verifikation zeigte:
+
+```
+test_v41_anatomy_base.cpp(119,33): error C2259:
+"AnatomyAbiAdapter<comdare::cache_engine::anatomy::Art>":
+Abstrakte Klasse kann nicht erstellt werden.
+("engine_name", "lifecycle_state", "warm_up", "reset", "shutdown" abstract)
+```
+
+**Erkenntnis:** Session-Doku Teil II §16 stimmte fuer den R5.C.A-Stand, aber
+test_v41_anatomy_base war seit dem R5.C.A2-Commit nicht mehr lauffaehig. R5.C.A3
+ist also Cleanup + Bug-Fix in einem Atom-Sprint.
+
+### §19.2 Lieferung R5.C.A3
+
+| Datei | Aktion |
+|---|---|
+| `libs/cache_engine/anatomy/abi_adapter.hpp` | NEU — `SearchAlgorithmAbiAdapter<A>` Production-Template |
+| `tests/unit/test_v41_anatomy_base.cpp` | lokaler `AnatomyAbiAdapter` entfernt, `ana::SearchAlgorithmAbiAdapter` genutzt |
+| `tests/unit/test_v41_execution_engine.cpp` | lokaler `MammalAbiAdapter` entfernt, `ana::SearchAlgorithmAbiAdapter` genutzt |
+| `docs/architektur/14_achsen_komposition_organ_metapher.md` | Teil 6 §41 NEU (R5.C.A3-Lieferung + Naming-Konvention) |
+| `~/.claude/.../memory/feedback_technical_identifiers_over_metaphor.md` | NEU — kritische Direktive |
+
+**Adapter-Template:**
+```cpp
+template <AnatomyConcept A>
+class SearchAlgorithmAbiAdapter final : public IAnatomyBase {
+    static_assert(A::genus() == AnatomyGenus::SearchAlgorithm,
+                  "...Cross-Genus-Adapter unmoeglich — Doku 14 §32.");
+public:
+    // IExecutionEngine: engine_name/lifecycle_state/warm_up/reset/shutdown
+    // IAnatomyBase: composition_name/paper_id/genus/organ_count
+private:
+    EngineLifecycleState state_{EngineLifecycleState::Uninitialized};
+};
+```
+
+### §19.3 User-Direktive verbatim (2026-05-27 vormittag, R5.C.A3-Sprint-Mitte)
+
+> "Wir nennen den MammalAbiAdapter besser SearchAlgorithmAbiAdapter. Wir nehmen
+> sicherlich die Tierwelt als Metapher, muessen aber bei der aktuellen Aufgabe
+> bleiben. Bitte pruefe, ob wir noch irgendwo statt der technischen Benennung
+> versehentlich die methaphorische Benennung als Uebersetzung verwendet haben."
+
+### §19.4 Identifier-Audit Ergebnis
+
+Grep nach Metapher-Bezeichnern (`Mammal|Bird|Reptile|Invertebrate|Plant|
+Frankenstein|Saeugetier|Vogel|Reptil|Wirbelloses|Pflanze|Tier`) in
+`libs/`+`tests/`+`apps/`:
+
+| Befund | Aktion |
+|---|---|
+| `MammalAbiAdapter` (abi_adapter.hpp + 2 Test-Files) | umbenannt zu `SearchAlgorithmAbiAdapter` |
+| Test-Macro-Namen mit "Mammal" (z.B. `AllElevenAnatomiesAreMammal`) | OK (Test-internal Reasoning-Text) |
+| `Frankenstein` / `FrankensteinComposition` (test_v41_anatomy.cpp) | OK (Test-Demo-Helper, kein API) |
+| Kommentare "Saeugetier-Anatomie-Metapher" / "Tier-Organ-Metapher" | OK (didaktischer Doku-Text) |
+| Architektur-Doku 14 Sektions-Texte | OK (Metapher etabliert in Architektur-Doku) |
+
+**Konsequenz:** Nur 3 Code-Identifier-Stellen umzubenennen waren — Restliche
+Metapher-Sprache (Kommentare + Architektur-Doku) bleibt.
+
+### §19.5 Memory-Direktive `[[technical-identifiers-over-metaphor]]` (NEU)
+
+- **Rule:** Code-Identifier MUESSEN technisch benannt sein (z.B. `SearchAlgorithmAbiAdapter`)
+- **Erlaubt:** metaphorische Sprache in `/// Doku-Kommentaren` UND in `.md`-Dateien
+- **Pflicht-Audit:** vor jedem Code-Commit grep auf neue Code-Identifier
+
+---
+
+## §20 Test-Snapshot ENDSTAND R5.C.A3 (alle 7 Anatomy-Tests gruen)
+
+| Test-File | Tests | Vorher (R5.C.A2) | R5.C.A3 |
+|---|---|---|---|
+| test_v41_anatomy | 13 | ✅ | ✅ |
+| test_v41_anatomy_r4_driver | 10 | ✅ | ✅ |
+| test_v41_anatomy_observer | 12 | ✅ | ✅ |
+| test_v41_builder_anatomy_commands | 21 | ✅ | ✅ |
+| test_v41_anatomy_pruefling_merge | 13 | ✅ | ✅ |
+| **test_v41_anatomy_base** | **12** | **❌ broken** | **✅ FIXED** |
+| **test_v41_execution_engine** | **11** | **✅** | **✅ (refactored)** |
+| **Anatomy-Summe** | **92** | **80 grün** | **92 grün** |
+
+**Konsistenz-Korrektur:** Session-Doku Teil II §16 hatte "901 grün total" gelistet,
+das war aber NUR fuer den R5.C.A-Snapshot korrekt — R5.C.A2 hatte
+test_v41_anatomy_base.exe nicht kompilierbar gemacht. R5.C.A3 stellt 901 Tests
+tatsaechlich grün.
+
+---
+
+## §21 Memory-State Update (Ende R5.C.A3 — 6 kritische Direktiven)
+
+| # | Direktive | Quelle |
+|---|---|---|
+| 1 | `[[anatomie-nur-achsen-und-observer]]` | R5.A Doku 14 Teil 3 |
+| 2 | `[[3-kompositionale-joins-anatomie]]` | R5.A Doku 14 Teil 3 |
+| 3 | `[[anatomie-gattungen]]` | R5.C Doku 14 Teil 4 §25-§31 |
+| 4 | `[[gattungs-constraint-pruefling-merge]]` | R5.C.A spaet Doku 14 §32 |
+| 5 | `[[execution-engine-als-wurzel]]` | R5.C.A2 Doku 14 Teil 5 §33-§40 |
+| 6 | **`[[technical-identifiers-over-metaphor]]`** | **R5.C.A3 NEU Doku 14 Teil 6 §41** |
+
+---
+
+## §22 Forschungs-Mission Status nach R5.C.A3 (4.95/7 Phasen done)
+
+| Phase | Was | Status |
+|---|---|---|
+| 1 | Bottom-Up Achsen-Zerlegung (15 Topics) | ✅ F1+F2+F3 |
+| 2 | Reference-Compositions (11 Algorithmen) | ✅ R2+R3.2 |
+| 3 | Zentrale Anatomie-Implementation | ✅ R3 |
+| 4 | Permutations-Engine + Cartesian | ✅ R4 |
+| 4.5 | ABI-stabiler Observer-Aggregate | ✅ R5.A |
+| 4.6 | Anatomie-API-Refactor | ✅ R5.B |
+| 4.7 | Pruefling-Merge 3 Joins | ✅ R5.C |
+| 4.8 | AnatomyBase + Gattungs-Marker | ✅ R5.C.A |
+| 4.9 | ExecutionEngine als Wurzel | ✅ R5.C.A2 |
+| 4.95 | **SearchAlgorithmAbiAdapter Production-Header** | ✅ **R5.C.A3** |
+| 5 | SearchAlgorithmPermutationEngine genus-aware | ⏳ R5.C.B NEXT |
+| 5b | CacheEngineBuilder CLI + extern "C" ABI | ⏳ R5.D |
+| 5c | dlopen/LoadLibrary Module-Loader | ⏳ R5.E |
+| 6 | Mess-Treiber + VirusExecutionEngine | ⏳ R6/V42 |
+| 7 | F15-Auswertung schnellstes Tier + Virus-Vergleich | ⏳ R7/V42 |
+
+---
+
+## §23 NEXT-Action fuer naechste Session (KLAR DOKUMENTIERT)
+
+**R5.C.B** (mittlerer Sprint): `SearchAlgorithmPermutationEngine<...>` als
+Genus-Specialization von PermutationEngine. Pflicht-Check: alle Pruefling-Slots
+muessen `genus = SearchAlgorithm` haben (Doku 14 §32 Constraint). Tests:
+Compile-Error bei Cross-Genus-Slot.
+
+Vorbereitet durch R5.C.A3:
+- `SearchAlgorithmAbiAdapter<A>` ist verfuegbar fuer R5.E Module-Loader
+- Doku 14 Teil 6 §41 dokumentiert technische Identifier-Konvention
+- Memory-Direktive `[[technical-identifiers-over-metaphor]]` etabliert
+
+**Geschaetzte Restzeit bis F15-Forschungsmissions-Ergebnis:** 3-5 Wochen autonome Arbeit.
+
+---
+
+**Ende Teil III R5.C.A3 (Stand 2026-05-27 vormittag).**
+
+**Diese Teil-III-Sektion ist die aktuelle Architektur-Wahrheit. Teil I+II bleiben
+als historische Aufzeichnung erhalten.**

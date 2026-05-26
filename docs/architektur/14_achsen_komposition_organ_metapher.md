@@ -1598,3 +1598,145 @@ NEU `[[execution-engine-als-wurzel]]` markiert die Pflicht:
 
 **Ende Teil 5 §33-§40 (Stand 2026-05-27 sehr frueh — User-Direktive ExecutionEngine
 als Wurzel ueber AnatomyBase + Virus-Analogie fuer Nicht-Lebewesen).**
+
+---
+
+# Teil 6 — SearchAlgorithmAbiAdapter Production-Header (R5.C.A3)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil 1+2+3+4+5 oben unangetastet.
+> Teil 6 dokumentiert die R5.C.A3-Lieferung — Promotion des bisher in Tests
+> dupliziert lokal definierten ABI-Adapters zu einem Production-Header sowie die
+> Naming-Korrektur `MammalAbiAdapter` → `SearchAlgorithmAbiAdapter` per User-Direktive
+> 2026-05-27 (technische Symbole statt metaphorischer Klassen-Namen).
+
+---
+
+## §41 R5.C.A3 — Lieferung + Hintergrund
+
+### §41.1 User-Direktive verbatim (2026-05-27 vormittag)
+
+> "Wir nennen den MammalAbiAdapter besser SearchAlgorithmAbiAdapter. Wir nehmen
+> sicherlich die Tierwelt als Metapher, muessen aber bei der aktuellen Aufgabe
+> bleiben. Bitte pruefe, ob wir noch irgendwo statt der technischen Benennung
+> versehentlich die metaphorische Benennung als Uebersetzung verwendet haben."
+
+### §41.2 Konvention: technische Symbole vs metaphorische Doku
+
+| Schicht | Erlaubte Sprache | Beispiele |
+|---|---|---|
+| **Code-Identifier** (Klassen/Funktionen/Variablen) | NUR technisch | `SearchAlgorithmAbiAdapter`, `AnatomyGenus::SearchAlgorithm` |
+| **Doku-Kommentare im Code** | beides erlaubt (Doku-Text) | "Saeugetier-Anatomie-Metapher", "Mammal-Gattung in Tier-Metapher" |
+| **Architektur-Doku (.md)** | beides erlaubt | siehe Teil 1-5 oben |
+
+**Begruendung:** Code-Identifier sind API-Vertrag → muessen aus dem Anwendungs-
+domain (Search-Algorithm) lesbar sein. Kommentare/Doku-Text erlauben die
+Tier-Metapher als didaktische Hilfe.
+
+### §41.3 Pre-existing Befund: test_v41_anatomy_base.cpp war seit R5.C.A2 broken
+
+Vor R5.C.A3-Start zeigte ein Audit-Build:
+
+```
+test_v41_anatomy_base.cpp(119,33): error C2259:
+"AnatomyAbiAdapter<comdare::cache_engine::anatomy::Art>":
+Abstrakte Klasse kann nicht erstellt werden.
+```
+
+Ursache: `AnatomyAbiAdapter` (lokal in `test_v41_anatomy_base.cpp:110`) hat nur
+`composition_name/paper_id/genus/organ_count` ueberschrieben. Nach R5.C.A2 erbt
+`IAnatomyBase` aber von `IExecutionEngine` — zusaetzliche Pflicht-Overrides
+`engine_name/lifecycle_state/warm_up/reset/shutdown` waren in der Test-Adapter-
+Klasse nicht implementiert.
+
+Die Session-Doku Teil II §16 listete "12 Tests grün" — das stimmte fuer den
+Stand vor dem R5.C.A2-Build (R5.C.A war zuletzt grün). R5.C.A3 ist also
+gleichzeitig Cleanup UND Bug-Fix.
+
+### §41.4 Production-Header `libs/cache_engine/anatomy/abi_adapter.hpp`
+
+```cpp
+template <AnatomyConcept A>
+class SearchAlgorithmAbiAdapter final : public IAnatomyBase {
+    static_assert(A::genus() == AnatomyGenus::SearchAlgorithm,
+                  "SearchAlgorithmAbiAdapter erwartet eine SearchAlgorithm-Gattung-"
+                  "Anatomie (AnatomyGenus::SearchAlgorithm). Cross-Genus-Adapter "
+                  "sind type-system-mathematisch unmoeglich — Doku 14 §32.");
+public:
+    // IExecutionEngine Override (5 Methoden, Lifecycle-State maschinell)
+    [[nodiscard]] std::string_view engine_name() const noexcept override;
+    [[nodiscard]] EngineLifecycleState lifecycle_state() const noexcept override;
+    void warm_up()  override;
+    void reset()    override;
+    void shutdown() override;
+    // IAnatomyBase Override (4 Methoden, statisch delegiert an A::xxx())
+    [[nodiscard]] std::string_view composition_name() const noexcept override;
+    [[nodiscard]] std::string_view paper_id() const noexcept override;
+    [[nodiscard]] AnatomyGenus     genus() const noexcept override;
+    [[nodiscard]] std::size_t      organ_count() const noexcept override;
+private:
+    EngineLifecycleState state_{EngineLifecycleState::Uninitialized};
+};
+```
+
+**Wichtig:** `static_assert` validiert Gattungs-Constraint (Doku 14 §32) bereits
+beim Adapter-Bau zur Compile-Zeit. Eine ggf. zukuenftige `SequenceAnatomy<C>`-
+Instantiation wuerde nicht in den `SearchAlgorithmAbiAdapter` passen — der Build
+schlaegt mit klarer Diagnostik fehl.
+
+### §41.5 Verwendung in R5.E Module-Factory-Pattern
+
+```cpp
+// In generiertem Permutations-Binary (.so/.dll):
+extern "C" comdare::cache_engine::anatomy::IAnatomyBase*
+comdare_create_anatomy() {
+    using A = comdare::cache_engine::anatomy::SearchAlgorithmAnatomy<MyComposition>;
+    return new comdare::cache_engine::anatomy::SearchAlgorithmAbiAdapter<A>{};
+}
+```
+
+Der CacheEngineBuilder (R5.D) wird pro Permutation ein .so/.dll mit dieser
+Factory generieren. R5.E loadet via `dlopen`/`LoadLibrary` und ruft
+`comdare_create_anatomy` → bekommt `IAnatomyBase*`-Pointer mit korrektem
+Lifecycle-Tracking.
+
+### §41.6 Test-Refactor (Konsolidierung 2 → 0 lokale Adapter)
+
+| File | Vorher | Nachher |
+|---|---|---|
+| `test_v41_anatomy_base.cpp` | lokale `AnatomyAbiAdapter` (broken) | `ana::SearchAlgorithmAbiAdapter<A>` |
+| `test_v41_execution_engine.cpp` | lokale `MammalAbiAdapter` (lauffaehig) | `ana::SearchAlgorithmAbiAdapter<A>` |
+
+Test-Endstand R5.C.A3: alle 7 Anatomy-Tests gruen (13+10+12+21+13+12+11 = 92).
+
+### §41.7 Identifier-Audit (Metapher-Code-Bezeichner)
+
+Grep nach `\b(Mammal|Bird|Reptile|Invertebrate|Plant|Frankenstein|Saeugetier|
+Vogel|Reptil|Wirbelloses|Pflanze|Tier)\b` in `libs/`+`tests/`:
+
+| Befund | Kategorie | Aktion |
+|---|---|---|
+| `MammalAbiAdapter` (abi_adapter.hpp) | Code-Identifier | umbenannt zu `SearchAlgorithmAbiAdapter` |
+| `MammalAbiAdapter` (test_v41_execution_engine.cpp) | Code-Identifier | entfernt, Production-Adapter nutzen |
+| Test-Macros `R5CA_GenusMarker.AllElevenAnatomiesAreMammal` etc. | Test-Beschreibung | OK (test-internal, Reasoning-Text) |
+| `Frankenstein` / `FrankensteinComposition` (test_v41_anatomy.cpp) | Test-Demo-Helper | OK (interner Test-Helper, kein API) |
+| Kommentare "Saeugetier-Anatomie-Metapher" | Doku-Text in Code | OK (didaktischer Doku-Text) |
+| Doku 14 Sektions-Texte | Architektur-Doku | OK (Metapher etabliert) |
+
+**Konsequenz:** Architektur-Doku + Doku-Text-Kommentare bleiben unveraendert.
+Nur API-Identifier wurden uebersetzt.
+
+### §41.8 Memory-Update (`feedback_technical_identifiers_over_metaphor`)
+
+Neue Direktive: `[[technical-identifiers-over-metaphor]]`
+- **Rule:** Code-Identifier (Klassen-Namen, Funktionen, Variablen, Konstanten)
+  MUESSEN technische Bezeichner aus der Anwendungs-Domain verwenden.
+- **Erlaubt:** metaphorische Sprache in Doku-Kommentaren UND in Architektur-`.md`
+- **Why:** API-Vertrag muss aus dem Anwendungs-Domain lesbar sein. Metaphern
+  helfen beim Verstaendnis, gehoeren aber nicht in den Klassen-Namen.
+- **How to apply:** vor jedem Code-Commit grep `\b(Mammal|Bird|Reptile|...)\b`
+  auf neue Code-Identifier.
+
+---
+
+**Ende Teil 6 §41 (Stand 2026-05-27 vormittag — R5.C.A3 SearchAlgorithmAbiAdapter
+Production-Header + technische-Identifier-Konvention).**
