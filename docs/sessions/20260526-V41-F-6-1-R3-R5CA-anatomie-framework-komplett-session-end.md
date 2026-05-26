@@ -260,9 +260,257 @@ fuer Vollausbau bis F15-Forschungsmissions-Auswertung.
 
 **Ende V41.F.6.1.R3 → R5.C.A Mega-Session — Anatomie-Framework strukturell komplett.**
 
-**Naechster Sprint:** R5.D CacheEngineBuilder CLI + extern "C" ABI pro
+**Naechster Sprint (Stand R5.C.A — VERALTET, siehe Teil II unten):** R5.D CacheEngineBuilder CLI + extern "C" ABI pro
 Permutations-Binary — ABI-Loader-Schicht ueber AnatomyExecutionContext + Builder-
 Commands. Erste echte .so/.dll-Generation pro Permutation.
 
 Alternativ: R5.C.B Gattungs-spezialisierte PermutationEngine (SearchAlgorithm-
 PermutationEngine als Spezialisierung) — kleinerer Sprint, vorbereitet R5.D.
+
+---
+---
+---
+
+# TEIL II — R5.C.A2 NACHTRAG (AKTUELLE VERSION, 2026-05-27 frueh)
+
+> **Aktualitaets-Hinweis:** Teil I oben (R3→R5.C.A) ist historische Aufzeichnung
+> bis Sprint R5.C.A. Teil II unten dokumentiert die R5.C.A2-Erweiterung
+> (ExecutionEngine als Wurzel) + Lebewesen-vs-Viren-Schaerfung + Doku 14 Teil 5.
+> **Diese Teil-II-Sektion ist die aktuelle Architektur-Vorlage fuer naechste Sessions.**
+
+---
+
+## §11 R5.C.A2 — ExecutionEngine als Wurzel ueber AnatomyBase
+
+### §11.1 User-Direktive verbatim (2026-05-27 frueh)
+
+> "Die Wurzel des Konstruktes ist eine ExecutionEngine, welche noch ueber der
+> AnatomyBase steht. Diese verhaelt sich zur Anatomie eines Lebewesens, wie der
+> Unterschied zwischen Lebewesen und Viren: Die Viren sind nicht lebendig und
+> haben wiederum ein eigenes System, moeglicherweise keine Topics und Achsen,
+> aber sie koennen auch ausgemessen werden (Beispielhaft waeren das etwa
+> Graphen-Algorithmen). Wir trennen das allgemeine Mess-Interface auf die
+> ExecutionEngine auf, von der die AnatomyBase mit ihrer Spezifikation ueber
+> Topics und Achsen erbt."
+
+### §11.2 Drei-Ebenen-Taxonomie (NEUE Wurzel)
+
+```
+IExecutionEngine (Mess-Wurzel — warm_up/reset/shutdown/lifecycle_state)
+   │
+   ├── IAnatomyBase (Lebewesen, Kingdom=Animalia, 5 Gattungen)
+   │     └── SearchAlgorithmAnatomy (Mammal-Gattung)
+   │
+   └── IVirusExecutionEngine (Nicht-Lebewesen, keine Achsen)
+         └── GraphBfsVirusStub (Beispiel: Moore 1959 Shortest-Path)
+```
+
+### §11.3 Lieferung
+
+- `libs/cache_engine/execution_engine/execution_engine_base.hpp`:
+  - `ExecutionEngineKind` enum (Anatomy/Virus/Hybrid)
+  - `EngineLifecycleState` enum (5 Phasen: Uninitialized/Warming/Running/Idle/Shutdown)
+  - `ExecutionEngineConcept` C++23 Compile-Time-Concept
+  - `IExecutionEngine` Virtual Interface
+- `libs/cache_engine/anatomy/anatomy_base.hpp` Update:
+  - `IAnatomyBase` erbt jetzt von `IExecutionEngine`
+  - `engine_kind() final = Anatomy` (Pflicht-Override)
+- 11 Tests in `tests/unit/test_v41_execution_engine.cpp`:
+  - §1-§3 Concept-Conformance (Anatomy + Virus + Counter-Beispiel)
+  - §5 IAnatomyBase erbt von IExecutionEngine Compile-Time-Beweis
+  - §6 GraphBfsVirusStub als Sample IVirusExecutionEngine
+  - §7 Polymorpher Mess-Loop (Anatomy + Virus uniform via Wurzel)
+
+### §11.4 Doku 14 Teil 5 §33-§40 (300+ Zeilen)
+
+| § | Inhalt |
+|---|---|
+| §33 | User-Direktive verbatim |
+| §34 | Drei-Ebenen-Taxonomie (biologische Metapher-Schaerfung) |
+| §35 | ExecutionEngineConcept + IExecutionEngine + IAnatomyBase + IVirusExecutionEngine |
+| §36 | 3 Virus-Beispiel-Kategorien (Graphen/Pipelines/Pure-Math) |
+| §37 | Verantwortlichkeits-Update — CacheEngineBuilder misst beide Engines uniform |
+| §38 | Konsistenz-Check mit existing prt_art_legacy IExecutingEngine REV 5 |
+| §39 | Phasen-Plan-Update R5.C.A2 → R5.E → V42 |
+| §40 | MEMORY-Update `[[execution-engine-als-wurzel]]` |
+
+### §11.5 Virus-Beispiele (V42+ Erweiterung)
+
+| Kategorie | Beispiele | Charakteristik |
+|---|---|---|
+| Graphen-Algorithmen | BFS / DFS / Dijkstra / A* / PageRank / Min-Cut | kein K-V-Mapping, keine 17 Achsen |
+| Funktionale Pipelines | Map/Reduce / Filter / Stream-Processor | stateless oder minimal State |
+| Pure-Math | FFT / Matrix-Multiply / SGD / Crypto-Hashes | Input→Output ohne Container |
+
+---
+
+## §12 Memory-State Update (Ende R5.C.A2 — Stand 5 kritische Direktiven)
+
+| # | Direktive | Quelle |
+|---|---|---|
+| 1 | `[[anatomie-nur-achsen-und-observer]]` | R5.A Doku 14 Teil 3 |
+| 2 | `[[3-kompositionale-joins-anatomie]]` | R5.A Doku 14 Teil 3 |
+| 3 | `[[anatomie-gattungen]]` | R5.C Doku 14 Teil 4 §25-§31 |
+| 4 | `[[gattungs-constraint-pruefling-merge]]` | R5.C.A spaet Doku 14 §32 |
+| 5 | **`[[execution-engine-als-wurzel]]`** | **R5.C.A2 NEU Doku 14 Teil 5 §33-§40** |
+
+Plus existing strikte Direktiven (auszugsweise):
+- `[[v41-session-start-pre-read]]` — Pre-Read Pflicht
+- `[[achsen-komposition-organ-metapher]]` — Doku 14 Teil 1
+- `[[never-delete-documentation]]` — Doku nie umschreiben, nur extend
+- `[[no-quick-fixes]]` — Root-Cause statt Workaround
+- `[[reset-is-statistics-reset]]` — wichtig fuer warm_up/reset/shutdown-API
+- `[[topic-axis-pruefling-namespace]]` — Topic-Slot-Pattern Pflicht
+
+---
+
+## §13 Pflicht-Pre-Read fuer naechste Session (KRITISCH)
+
+Per `[[v41-session-start-pre-read]]` Direktive muss naechste Session vor JEDER
+Implementation einlesen:
+
+**Architektur-Dokumente (letzte 5):**
+1. `docs/architektur/14_achsen_komposition_organ_metapher.md` — **5 TEILE!** (§1-§40)
+2. `docs/architektur/13_paper_legacy_code_architektur.md`
+3. `docs/architektur/12_queuing_topic_achsen_eigenschaften.md`
+4. `docs/architektur/11_konzept_achsen_extension_visitor_pattern.md`
+5. `docs/architektur/10_schichten_modell_M.md`
+
+**Session-Dokumente (V41-Sessions, vollstaendig):**
+- `20260526-V41-F-6-1-R3-R5CA-anatomie-framework-komplett-session-end.md` — **DIESE DATEI** (Teil I + Teil II!)
+- `20260526-V41-F-6-1-R3-R5A-anatomie-vollausbau-session-end.md` (R3-R5.A Zwischen-Doku)
+- Alle weiteren `20260525*` / `20260526*` V41-Sessions
+
+**Memory-Direktiven (auto-loaded via MEMORY.md):**
+- Alle 5 kritischen Direktiven oben werden automatisch in Context geladen
+- KEINE manuelle Memory-Read noetig — MEMORY.md auto-injected
+
+---
+
+## §14 Architektur-Pyramide ENDSTAND R5.C.A2 (aktuelle Wahrheit)
+
+```
+IExecutionEngine                         ← R5.C.A2 NEUE WURZEL
+(Mess-Schicht: warm_up/reset/shutdown/lifecycle_state)
+   │
+   ├── IAnatomyBase                      ← erbt von IExecutionEngine (R5.C.A2)
+   │   (Lebewesen-Kingdom=Animalia, R5.C.A)
+   │     │
+   │     ├── AnatomyConcept              ← Compile-Time C++23 Concept
+   │     │   (composition_t/composition_name/paper_id/organ_count/genus)
+   │     │
+   │     └── SearchAlgorithmAnatomy (Mammal-Gattung) — R3+R5.C.A
+   │           │
+   │           ├── 6 CE-Re-Impl Compositions (R2)
+   │           │   Art/Hot/Wormhole/SuRF/Masstree/Start
+   │           ├── 5 PaperBinding-Compositions (R3.2)
+   │           │   ArtPaperBinding/HotPaperBinding/StartPaperBinding/
+   │           │   WormholePaperBinding/SurfPaperBinding
+   │           ├── ObserverAggregate ABI-stabil (R5.A)
+   │           ├── 17 named Snapshot-Members
+   │           │
+   │           ▼
+   │     AnatomyExecutionContext + 5 Builder-Commands (R5.B)
+   │     insert/lookup/erase/clear/observe via ICommand
+   │           │
+   │           ▼
+   │     AnatomyPermutationDriver (R4) — mp_product Visitor
+   │     for_each_animal + for_each_composition_type
+   │           │
+   │           ▼
+   │     Pruefling-Merge 3 Joins (R5.C) — pruefling_merge.hpp
+   │     Stufe 1 ce-only / Stufe 2 ersetzt / Stufe 3 union-non-redundant
+   │           │
+   │           ▼
+   │     Gattungs-Constraint (§32) — Cross-Genus-Joins blockiert
+   │     (gleiche Gattung Pflicht, sonst type-system-unmoeglich)
+   │
+   └── IVirusExecutionEngine             ← R5.C.A2 NEU (Skelett)
+       (Nicht-Lebewesen, V42+ Implementation)
+         │
+         └── Beispiele: GraphBFS/Dijkstra/PageRank/FFT/Map-Reduce
+```
+
+---
+
+## §15 Forschungs-Mission Status nach R5.C.A2 (4.9/7 Phasen done)
+
+| Phase | Was | Status |
+|---|---|---|
+| 1 | Bottom-Up Achsen-Zerlegung (15 Topics) | ✅ F1+F2+F3 |
+| 2 | Reference-Compositions (11 Algorithmen) | ✅ R2+R3.2 |
+| 3 | Zentrale Anatomie-Implementation | ✅ R3 |
+| 4 | Permutations-Engine + Cartesian | ✅ R4 |
+| 4.5 | ABI-stabiler Observer-Aggregate | ✅ R5.A |
+| 4.6 | Anatomie-API-Refactor (Verantwortlichkeits-Trennung) | ✅ R5.B |
+| 4.7 | Pruefling-Merge 3 Joins | ✅ R5.C |
+| 4.8 | AnatomyBase + Gattungs-Marker | ✅ R5.C.A |
+| 4.9 | **ExecutionEngine als Wurzel (Lebewesen vs Viren)** | ✅ **R5.C.A2** |
+| 5 | SearchAlgorithmPermutationEngine genus-aware | ⏳ R5.C.B NEXT |
+| 5b | CacheEngineBuilder CLI + extern "C" ABI | ⏳ R5.D |
+| 5c | dlopen/LoadLibrary Module-Loader | ⏳ R5.E |
+| 6 | VirusExecutionEngine fuer Graphen (erste Virus-Implementation) | ⏳ R6/V42 |
+| 7 | F15-Auswertung schnellstes Tier + Virus-Vergleich | ⏳ R7/V42 |
+
+---
+
+## §16 Tests-Snapshot ENDSTAND R5.C.A2 (901 grün)
+
+| Test-File | Tests | Erweitert in Sprint |
+|---|---|---|
+| test_v41_allocator | 252 | - |
+| test_v41_queuing | 216 | - |
+| test_v41_traversal | 155 | - |
+| test_v41_paper_legacy_p* (5 paper) | 145 | - |
+| test_v41_compositions (R2) | 25 | - |
+| test_v41_topics_fundament (F1+F2+F3) | 16 | - |
+| test_v41_anatomy (R3+R3.2, refactor R5.B) | 13 | R5.B (-11 weil Container-Tests verschoben) |
+| test_v41_anatomy_r4_driver (R4) | 10 | - |
+| test_v41_anatomy_observer (R5.A) | 12 | - |
+| test_v41_builder_anatomy_commands (R5.B) | 21 | - |
+| test_v41_anatomy_pruefling_merge (R5.C) | 13 | - |
+| test_v41_anatomy_base (R5.C.A) | 12 | - |
+| **test_v41_execution_engine (R5.C.A2 NEU)** | **11** | **R5.C.A2** |
+| **GESAMT** | **901** | **+92 vs Session-Start 809** |
+
+---
+
+## §17 Commits Endstand (18 Commits gesamt diese Mega-Session)
+
+| Repo | HEADs (chronologisch komplett) |
+|---|---|
+| cache-engine | a677aa3 → 41b7438 → c7f63ad → 88708b0 → b1a8222 → 6ca1b1b → 19a3d16 → **26b289d** |
+| Diplomarbeit | 60fb26a → 4bbb74a → c272c0a → 7098af8 → 02441da → 115fecb → ef83bf3 → b09e685 → e8262b4 → aa08409 → **8a498c4** |
+
+8 cache-engine Sprint-Commits + 11 Diplomarbeit Commits (Submodule-Bumps + Doku-Updates +
+Session-Doku-Updates).
+
+---
+
+## §18 NEXT-Action fuer naechste Session (klar dokumentiert)
+
+Empfohlene Sprint-Reihenfolge nach Pre-Read:
+
+1. **R5.C.A3** (kleiner Cleanup-Sprint): `AnatomyAbiAdapter` Template von Test §5
+   in eigenen Production-Header verschieben (`anatomy/abi_adapter.hpp`). Wird in R5.E
+   benoetigt fuer Module-Factory.
+2. **R5.C.B** (mittlerer Sprint): `SearchAlgorithmPermutationEngine<...>` als
+   Genus-Specialization von PermutationEngine. Pflicht-Check: alle Pruefling-Slots
+   muessen genus=Mammal haben (Doku 14 §32 Constraint). Tests: Compile-Error
+   bei Cross-Genus-Slot.
+3. **R5.D** (groesserer Sprint): CacheEngineBuilder CLI + extern "C" ABI pro
+   Permutations-Binary. Pro Composition wird .so/.dll generiert, exportiert
+   AnatomyAbiAdapter-Factory.
+4. **R5.E** (groesserer Sprint): dlopen/LoadLibrary Module-Loader fuer .so/.dll-
+   Iteration. Wechselt zwischen Anatomy-Loader und (V42) Virus-Loader.
+5. **R6 (V42)**: Mess-Treiber + Welch-Test ueber tausende Permutationen.
+6. **R7 (V42)**: F15-Auswertung schnellstes "Tier" + Virus-Vergleich.
+
+**Geschaetzte Restzeit bis F15-Forschungsmissions-Ergebnis:** 3-5 Wochen autonome Arbeit.
+
+---
+
+**Ende Teil II R5.C.A2 (Stand 2026-05-27 frueh).**
+
+**Diese Teil-II-Sektion ist die aktuelle Architektur-Wahrheit. Teil I (R3-R5.C.A)
+bleibt als historische Aufzeichnung erhalten.**
