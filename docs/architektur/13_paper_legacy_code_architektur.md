@@ -1161,3 +1161,170 @@ cache-engine `ext/`-Submodule sind bereits topic-strukturiert
 ---
 
 **Ende Teil D (Stand 2026-05-26 noch spaeter — Phase B.2.D.b2 Endstand).**
+
+---
+
+# Teil E — Traversal Roll-out (P2.D.tr.s1) + Luecken-Pattern + Build-Hinweise
+
+> **Anmerkung [[never-delete-documentation]]:** Teil A+B+C+D bleiben unangetastet.
+> Teil E dokumentiert User-Direktive zur Luecken-Markierung (per-Function is_original)
+> + Mixin-Refactor + traversal Roll-out s1 + CLion-Build-Note. Bei Konflikten verbindlich.
+
+---
+
+## §26 Luecken-Pattern (User-Direktive 2026-05-26 noch spaeter)
+
+User-Klarstellung:
+> "per-Function is_original markiert nur ob die Funktion original ist. Ist eine
+> Luecke da, ist es auch false. Es ist nur true, wenn der Original code vorliegt."
+
+Plus User-Direktive zu Lücken-Strategie:
+> "Wir benoetigen einige zusaetzliche Funktionen, die noch nicht implementiert sind,
+> aber ohne die der gesamte Experiment Aufbau nicht funktioniert. Es ist unsere
+> Aufgabe diese Luecken zu fuellen und die Probleme zu loesen, aber wir muessen
+> diese Funktionen als nicht original markieren. So koennen wir in der Permutation
+> Engine ueber die Konfiguration der CacheEngineBuilder spaeter Kombinationen
+> abwaehlen, die bestimmte Voraussetzungen nicht erfuellen."
+
+**Konsequenz: 3 Wrapper-Klassen-Kategorien:**
+
+| Kategorie | get_compiler() | is_original_<fn>() | is_original_module() | Beispiel |
+|---|---|---|---|---|
+| **Pure-Original** | "gcc-9.5" via Mixin | true (alle Funktionen) | true | OriginalArtSearchAlgo (4/4) |
+| **Teil-Original mit Luecken** | "gcc-9.5" via Mixin | true (Paper-API), false (Luecken-Fueller) | false | OriginalHotSearchAlgo (2/4) |
+| **Re-Impl ohne Paper-Binding** | "self" oder "original" Default | false (alle) | false | Array256, VectorU8U8 (existing) |
+
+**PermutationEngine-Filter (zukuenftig):**
+- `HasOriginalCode<W>`: `get_compiler() != "original"/"self"/"system"` — Paper-Bindung
+- `PaperOriginalValidated<W>`: `is_original_module() == true` — ALLE Functions origin
+- Custom-Concept "PartialPaperOriginal": `HasOriginalCode && !PaperOriginalValidated` — Mixed
+
+---
+
+## §27 Mixin-Refactor — if constexpr requires fuer fehlende Felder
+
+**Problem:** Paper mit Teil-API (HOT/START kein remove/clear) → Tool generiert
+PaperManifest mit weniger Feldern. Achs-Mixin erwartete vorher ALLE Felder → Compile-Error.
+
+**Loesung:** Alle 6 Achs-Mixins refactored mit `if constexpr (requires { PaperManifest::kIsOriginal_<fn>; })`:
+
+```cpp
+[[nodiscard]] static constexpr bool is_original_erase() noexcept {
+    if constexpr (requires { PaperManifest::kIsOriginal_erase; })
+        return PaperManifest::kIsOriginal_erase;
+    else
+        return false;  // Luecke: Function nicht im Paper, eigene Erweiterung
+}
+```
+
+**Backward-Compatible:** Existing Wrappers mit kompletten PaperManifest-Fields liefern weiter
+unveraendert. NEUE Wrappers mit Teil-Manifest defaulten fehlende auf false.
+
+**Refactored Files (alle 6 Achsen):**
+- axis_06_allocator_original_code_mixin.hpp (2 Functions)
+- axis_q1_queuing_original_code_mixin.hpp (6 Functions)
+- axis_q2_queuing_original_code_mixin.hpp (2 Functions)
+- axis_03a_search_algo_original_code_mixin.hpp (4 Functions)
+- axis_03b_cache_traversal_original_code_mixin.hpp (4 Functions)
+- axis_03m_mapping_original_code_mixin.hpp (4 Functions)
+
+---
+
+## §28 Traversal Roll-out s1 — 3 Paper-Skelette (axis_03a_search_algo)
+
+| Paper | Wrapper-Name (TODO s2) | Source | API-Mapping |
+|---|---|---|---|
+| **P01 ART** (Leis ICDE 2013) | OriginalArtSearchAlgo | ext/P01-ART/unodb/art.hpp | insert→insert_internal, lookup→get, erase→remove_internal, clear→clear (4/4) |
+| **P02 HOT** (Binna PVLDB 2018) | OriginalHotSearchAlgo | ext/P02-HOT/hot/.../HOTRowex.hpp | insert→insert, lookup→lookup (2/4 — erase+clear LUECKEN) |
+| **P05 START** (Mertens ICDE 2024) | OriginalStartSearchAlgo | ext/P05-START/START/sosd-competitor-adapter-START.h | insert→insertLater, lookup→EqualityLookup (2/4 — erase+clear LUECKEN) |
+
+**s1 Status (heute):**
+- ✅ legacy_code/paper_p0X_xxx/ Skelette (5-6 Files je: LICENSE/README/manifest/compiler_info/MODIFICATIONS/.gitignore)
+- ✅ Helper-Aufrufe in CMakeLists.txt mit AXIS_MIXIN_TYPE = SearchAlgoOriginalCodeMixin
+- ✅ Tool-Pipeline ART (4/4) + HOT (2/4) + START (2/4 via insertLater)
+- ✅ sha256_locked.txt fuer alle 3 commit-ready
+- ✅ Mixin if constexpr requires → fehlende Felder default false
+
+**Pending:**
+- **s2** Wrapper-Klassen (Concept-Conformance + Body-Stubs)
+- **s4** Library-Build mit Original-Compiler + Linking gegen Paper-Lib
+
+---
+
+## §29 User-Direktive: extern Linking Original-Compiler-Build + Fallback
+
+**User-Direktive heute:**
+> "Zur Entdeckung war die direktive: extern ueber Wrapper den Original code mit
+> original compiler bauen und linken und eigene Implementierung nur als fallback."
+
+**Dokumentations-Status (verifiziert):** Direktive bereits dokumentiert in:
+- Doku 13 §1 Z28: "Original-Code mit jeweils Original-Compiler kompiliert"
+- Doku 13 §1 Z34: "Code wird gelinkt statt kopiert"
+- Doku 13 §5: cmake/compiler_cache.cmake (gcc-9.5 fetch + build)
+- Doku 13 §6: cmake/paper_binary.cmake (compile mit Paper-Compiler)
+- Doku 13 §8 Pflicht-API: extern "C" Adapter Pattern
+- Memory [[paper-original-code-pattern]]: Coexistence
+- Memory [[experiment-compiler-property]]: Compiler-Cache via mp_filter
+
+**Implementation-Realitaet (LUECKE):**
+
+| Komponente | Stand |
+|---|---|
+| SHA-Validierung Source-Identity | ✅ aktiv |
+| Mixin liefert get_compiler="gcc-9.5" | ✅ aktiv |
+| Compiler-Cache (compiler_cache.cmake) | ❌ nur Skelett P2.A, NICHT aktiv |
+| Paper-Library mit Original-Compiler gebaut | ❌ NICHT aktiv |
+| Wrapper-Methods linken gegen Paper-Original-built-Library | ⚠️ aktuell System-built |
+| Eigene Implementation als Fallback | ✅ vendor_includes/-Shim-Pattern |
+
+**Folge-Sprint P2.A.W + P2.D.tr.s4:** Library-Build mit Original-Compiler aktivieren.
+Cross-Platform-Komplexitaet (3 OS + 4 ISAs).
+
+---
+
+## §30 CLion-Build-Hinweis (User-Bug 2026-05-26 spaet)
+
+**Bug-Report:**
+```
+cmake -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles"
+      -S .../Modules/comdare-cacheengine-all/comdare-cache-engine
+      -B .../Modules/comdare-cacheengine-all/comdare-cache-engine/cmake-build-release
+...
+CMake Error: The current CMakeCache.txt directory
+  .../cmake-build-release/_deps/googletest-subbuild/CMakeCache.txt
+is different than the directory
+  c:/Users/benja/OneDrive/Desktop/Projekte/Research/comdare-cache-engine/cmake-build-release/_deps/googletest-subbuild
+where CMakeCache.txt was created.
+```
+
+**Root-Cause:** `cmake-build-release/` enthaelt einen stale Cache, der auf
+**Research/comdare-cache-engine** zeigt — aber CLion will jetzt aus
+**Modules/comdare-cacheengine-all/comdare-cache-engine** bauen.
+
+**Loesung:**
+
+```powershell
+# Stale Build-Cache loeschen
+Remove-Item -Recurse -Force `
+    C:\Users\benja\OneDrive\Desktop\Projekte\Modules\comdare-cacheengine-all\comdare-cache-engine\cmake-build-release
+
+# Dann CLion neu konfigurieren oder via Kommandozeile:
+C:\Users\benja\AppData\Local\Programs\CLion\bin\cmake\win\x64\bin\cmake.exe `
+    -DCMAKE_BUILD_TYPE=Release `
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON `
+    -G "MinGW Makefiles" `
+    -S C:\Users\benja\OneDrive\Desktop\Projekte\Modules\comdare-cacheengine-all\comdare-cache-engine `
+    -B C:\Users\benja\OneDrive\Desktop\Projekte\Modules\comdare-cacheengine-all\comdare-cache-engine\cmake-build-release
+```
+
+**Pflicht-Disziplin:** Pro Source-Pfad einen eigenen Build-Pfad. Nicht zwischen
+`Modules/...` und `Research/...` mit demselben `cmake-build-release/` mixen.
+
+**Empfohlene Source-Aufraeumung (separate Task):** Pruefen ob `Research/comdare-cache-engine/`
+noch verwendet wird oder veraltet (Backup-Pfad?). Wenn nicht aktiv: archivieren oder
+loeschen. `[[never-delete-documentation]]` gilt nur fuer `docs/`, NICHT fuer redundante
+Source-Klone.
+
+---
+
+**Ende Teil E (Stand 2026-05-26 nacht — P2.D.tr.s1 + Mixin-Refactor + CLion-Build-Hinweis).**
