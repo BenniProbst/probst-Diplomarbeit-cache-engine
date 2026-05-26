@@ -522,13 +522,57 @@ unterscheiden (16 andere Achsen identisch).
 
 **KEINE Loeschung** der OriginalXxx-Wrappers — sie bleiben legitime Achsen-Werte.
 
-### §14.3 Phase R4 — PermutationEngine + Cartesian
+### §14.3 Phase R4 — PermutationEngine + AdHocComposition + AnatomyPermutationDriver (DONE)
 
-1. `src/permutations/permutation_engine.hpp` mit `mp_product` ueber alle 15 Achsen-Listen
-2. Pro Permutation: `using AdHocComposition = make_composition_from_tuple<...>::type;`
-3. PermutationEngine instantiiert `SearchAlgorithmAnatomy<AdHocComposition>` ueber alle Punkte
-4. CacheEngineBuilder linkt pro Permutation .so/.dll
-5. Mess-Treiber loadet .so/.dll und misst Performance
+**Implementation (2026-05-26 sehr spät):**
+
+1. **`libs/cache_engine/anatomy/composition_factory.hpp`** — `AdHocComposition<T0...T16>`
+   Template-Struct mit 17 named using-Aliases. Topic-Slot-Convention fixiert:
+   - T0=search_algo, T1=cache_traversal, T2=mapping (traversal)
+   - T3=path_compression, T4=node_type (nodes)
+   - T5=memory_layout, T6=allocator, T7=prefetch, T8=concurrency
+   - T9=serialization, T10=telemetry, T11=value_handle, T12=isa
+   - T13=index_organization, T14=io_dispatch, T15=migration_policy, T16=filter
+
+2. **`CompositionFromPermTuple<PermT>`** — Helper Template (template-template partial
+   specialization) das PermTuple<V0...V16> in AdHocComposition<V0...V16> umwandelt.
+   `IsPermTuple17` Concept validiert 17-Slot-Arity.
+
+3. **`libs/cache_engine/anatomy/anatomy_permutation_driver.hpp`** —
+   `AnatomyPermutationDriver<TopicConfigSets...>` Facade ueber PermutationEngine:
+   - `for_each_animal(visitor)` — iteriert alle Permutationen, instantiiert
+     SearchAlgorithmAnatomy<AdHoc> + ruft visitor(algo_instance, name)
+   - `for_each_composition_type(visitor)` — Compile-Time-Visitor pro Composition-Type
+     (fuer CacheEngineBuilder/.so/.dll-Generation in R5)
+
+4. **Tests `tests/unit/test_v41_anatomy_r4_driver.cpp`** — 10 Tests grün:
+   - §1 AdHocComposition IsComposition + Instantiation in Anatomie
+   - §2 CompositionFromPermTuple Materialization + IsPermTuple17 Concept
+   - §3 AnatomyPermutationDriver Arity/Count (Pilot 3×2×1^15 = 6)
+   - §4 EachPermutationIsDistinctTier (Set-Diversity-Check)
+   - §5 AllSixTiereRoundtripIndependently (insert/lookup/erase/clear pro Tier)
+   - §6 NonEmptyAxisCountMatchesArity (PermutationEngine min-1-Constraint)
+
+**Pilot-Demonstration (6 Permutationen):**
+```
+search_algo:     {Array256, VectorU8U8, VectorU16U16}  (3 Werte)
+cache_traversal: {LinearFanout, HashLookup}            (2 Werte)
+15 weitere:      {Default}                              (1^15)
+→ Cartesian:     3 × 2 × 1^15 = 6 distinkte Tiere
+```
+
+**Skalierung-Pfad (R5/V42):**
+Bei Vollausbau aller 15 Topics mit ihren Stufe-A-Wrappers:
+- search_algo 8, cache_traversal 2, mapping 2, allocator 24+, isa 4, weitere 1-4 → 10⁴-10⁵ Tiere
+- Pro Tier wird `for_each_composition_type` zu einem .so/.dll-Build (R5)
+- Mess-Treiber loadet .so/.dll und misst Performance (R6/V42)
+
+**Bezug zur PermutationEngine V41.F.6.1.D (existing):**
+AnatomyPermutationDriver ist eine Facade ueber `pe::PermutationEngine<TopicConfigSets...>`
+(in `libs/cache_engine/src/permutations/permutation_engine.hpp`). Die existing
+mp_product + for_each_permutation + iterable_aspect-Mechanik bleibt unveraendert;
+R4 fuegt nur Composition-Materialization + Anatomie-Instantiation als bequeme
+Visitor-Schicht hinzu.
 
 ---
 
@@ -538,7 +582,7 @@ unterscheiden (16 andere Achsen identisch).
 |---|---|---|
 | **R3 jetzt** | SearchAlgorithmAnatomy<C> Template-Skelett | `libs/cache_engine/anatomy/` |
 | **R3.2 done** | OriginalXxx Promotion (5 PaperBinding-Compositions) | `libs/cache_engine/compositions/*_paper_binding_reference.hpp` |
-| **R4** | PermutationEngine mp_product 15 Achsen | `src/permutations/` |
+| **R4 done** | AnatomyPermutationDriver + AdHocComposition + CompositionFromPermTuple | `libs/cache_engine/anatomy/composition_factory.hpp` + `anatomy_permutation_driver.hpp` |
 | **R5** | CacheEngineBuilder pro Permutation .so/.dll | `apps/cache_engine_builder/` |
 | **R6 (V42)** | Mess-Treiber + Welch-Test ueber tausende Permutationen | `Diplomarbeit/Code/02_messung_driver/` |
 | **R7 (V42)** | F15-Auswertung: schnellste Permutation identifizieren | `Diplomarbeit/06_auswertung/` |
