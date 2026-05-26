@@ -1901,3 +1901,78 @@ comdare_create_anatomy() {
 
 **Ende Teil 7 §42 (Stand 2026-05-27 vormittag — R5.C.B SearchAlgorithmPermutationEngine
 Genus-Specialization + Slot-Genus-Detection + 15 Tests).**
+
+---
+
+# Teil 8 — IExecutionEngine.run() Lifecycle-Vervollstaendigung (R5.C.A4)
+
+## §43 R5.C.A4 — Lifecycle-Hook run() ergaenzt
+
+### §43.1 User-Bemerkung 2026-05-27 mittag
+
+> "Das folgende war schon richtig fehlte noch run(). Ansonsten waren die uebrigen
+> geloeschten Funktions-Features auch richtig — muessen nur in technische
+> Aequivalente uebersetzt werden bezueglich des Kontextes, das gilt global fuer
+> alle Benennungen → bitte Umbenennungsaufgabe ans Ende aller Aufgaben in der
+> TODO Liste planen, wenn wir passendere technische Begriffe als Uebersetzung
+> der Methaphern gefunden haben, wir behalten fuer das Verstaendnis die
+> Methaphern noch fuer die Zeit der Entwicklung bei, weil es die
+> Abstraktions-Hierarchien klarer hervorhebt."
+
+### §43.2 Befund vor Fix
+
+`IExecutionEngine` hatte `EngineLifecycleState::Running` als Enum-Wert, aber keine
+`run()`-Methode zum Aktivieren. Lifecycle-Sequenz war nur teilweise dispatcht:
+`warm_up() → ??? → reset()/shutdown()`. Der Uebergang `Warming → Running` war
+nicht aufrufbar — Mess-Schicht haette `state_ = Running` nur durch direkten
+Member-Zugriff setzen koennen (Verstoss gegen Polymorphie-Pattern).
+
+### §43.3 Lieferung R5.C.A4
+
+| Datei | Aenderung |
+|---|---|
+| `execution_engine_base.hpp` | `virtual void run() = 0` ergaenzt + Doku-Kommentar (Pflicht aller ExecutionEngines) |
+| `abi_adapter.hpp` | `SearchAlgorithmAbiAdapter::run()` setzt `state_ = Running` |
+| `test_v41_execution_engine.cpp` | `GraphBfsVirusStub::run()` + 3 Tests erweitert (full Lifecycle-Roundtrip warm_up→run→reset→shutdown) |
+| `test_v41_anatomy_base.cpp` | Adapter-Lifecycle-Test um run() erweitert |
+| `test_v41_search_algorithm_permutation_engine.cpp` | `for_each_abi_adapter` Mess-Loop nutzt run() vor Workload |
+
+### §43.4 Vollstaendige Lifecycle-Sequenz (Pflicht-Pattern fuer R5.D Mess-Treiber)
+
+```cpp
+IExecutionEngine& engine = ...;
+engine.warm_up();   // Uninitialized → Warming    (Cache-Preheat, Bulk-Load)
+engine.run();       // Warming → Running          (R5.C.A4 NEU, Workload-Driver dispatched)
+// ... Workload-Phase (Insert/Lookup/Erase Commands) ...
+engine.reset();     // Running → Idle             (Statistik-Reset zwischen Mess-Reihen)
+engine.shutdown();  // Idle → Shutdown            (Resources freigeben)
+```
+
+CacheEngineBuilder (R5.D) wird `warm_up()→run()→reset()→shutdown()` als Pflicht-
+Sequenz fuer jeden Mess-Pass enforcen.
+
+### §43.5 ExecutionEngineConcept bleibt unveraendert
+
+`ExecutionEngineConcept` definiert nur die Compile-Time-Pflicht-Members
+(`measurement_snapshot_t`, `engine_name()`, `engine_kind()`). Die Lifecycle-API
+(`warm_up/run/reset/shutdown`) liegt ausschliesslich im Virtual-Interface
+`IExecutionEngine` — Compile-Time-Concepts pruefen statische Konstanten,
+Runtime-Polymorphie regelt Lifecycle-Hooks.
+
+### §43.6 Cleanup-Sprint-Planung (User-Direktive R5.C.A4 + Task #704)
+
+User-Direktive: Metaphern (Tier/Saeugetier/Mammal/Bird/Reptile/Invertebrate/
+Plant/Frankenstein) **bleiben waehrend der Entwicklung erhalten** weil sie die
+Abstraktion-Hierarchien klarer hervorheben. **Cleanup-Sprint am Ende aller
+Implementierungs-Aufgaben** (Task #704 V41.Z.1, vor finaler Release):
+- grep-Audit nach Metapher-Code-Identifiern in libs/+tests/+apps/
+- Pro Treffer technische Uebersetzung suchen (vom Anwendungs-Domain)
+- Kommentare + Architektur-Doku behalten Metaphern als didaktische Bruecke
+
+R5.C.A3 SearchAlgorithmAbiAdapter-Umbenennung war einzelner Vorgriff (zentraler
+Adapter-Klassen-Name). Restliche Metapher-Identifier bleiben bis V41.Z.1.
+
+---
+
+**Ende Teil 8 §43 (Stand 2026-05-27 mittag — R5.C.A4 run() Lifecycle-Hook ergaenzt +
+Cleanup-Sprint V41.Z.1 fuer Endphase geplant).**
