@@ -1328,3 +1328,177 @@ Source-Klone.
 ---
 
 **Ende Teil E (Stand 2026-05-26 nacht — P2.D.tr.s1 + Mixin-Refactor + CLion-Build-Hinweis).**
+
+---
+
+# Teil F — Traversal Roll-out s2: 3 NEUE Original-Wrapper-Klassen (2026-05-26 spaeter)
+
+> **Anmerkung [[never-delete-documentation]]:** Teil A-E unangetastet. Teil F dokumentiert
+> P2.D.tr.s2 — die 3 NEUEN Wrapper-Klassen (OriginalArt/Hot/StartSearchAlgo) parallel zu
+> den existing Re-Impl-Wrappern (Array256/VectorU8U8/VectorU16U16). Konsequente Umsetzung
+> der User-Direktive Option B aus s1 (NEUE Wrapper-Klassen, NICHT existing umbauen).
+
+---
+
+## §31 P2.D.tr.s2 — 3 NEUE Original-Wrapper-Klassen (axis_03a)
+
+| Wrapper | Family | Subaxis | Paper | Mixin-Inheritance | is_original_module() |
+|---|:-:|---|---|---|:-:|
+| **OriginalArtSearchAlgo** | S04 | SA1 dense | P01 ART (Leis ICDE 2013) | `generated::p01_art::OriginalCodeMixin` | **true** (4/4) |
+| **OriginalHotSearchAlgo** | S05 | SA2 sparse | P02 HOT (Binna PVLDB 2018) | `generated::p02_hot::OriginalCodeMixin` | **false** (2/4 Lücken) |
+| **OriginalStartSearchAlgo** | S06 | SA3 multilevel | P05 START (Mertens ICDE 2024) | `generated::p05_start::OriginalCodeMixin` | **false** (2/4 Lücken) |
+
+Alle 3 liefern `get_compiler() = "gcc-9.5"` via Mixin (AxisBase-Default "original" wird per Diamond-using-Disambiguation überschrieben).
+
+---
+
+## §32 Body-Strategie (Cache-Engine Standalone in s2, extern Linking in s4)
+
+**s2-Pattern:** Body ist Standalone-Re-Impl analog existing Re-Impl-Wrappers
+(`Array256`/`VectorU8U8`/`VectorU16U16`). Konkretes Schema pro Wrapper:
+
+| Wrapper | Body s2 | Wrapper-Vorlage | Body s4 (Plan) |
+|---|---|---|---|
+| OriginalArtSearchAlgo | `std::array<optional<u64>, 256>` direct addressed | Array256 | extern "C" Adapter zu `unodb::db<K,V>::insert_internal/get/remove_internal/clear` |
+| OriginalHotSearchAlgo | `std::vector<u8>` + `std::vector<u64>` sorted (lower_bound) | VectorU8U8 | extern "C" Adapter zu `HOTRowex<KeyType, u64>::insert/lookup` (erase/clear bleiben Re-Impl) |
+| OriginalStartSearchAlgo | `std::vector<u16>` + `std::vector<u64>` sorted | VectorU16U16 | extern "C" Adapter zu `START::insertLater/EqualityLookup` (erase/clear bleiben Re-Impl) |
+
+Pattern `if constexpr (enabled) { ... } else { (void)k; }` macht den s2-Body neutral —
+bei OFF wird der Wrapper konsequent zur Compile-Time eliminiert via Dead-Code-Elimination.
+Pflicht-API-Returns (`optional<u64>`, `bool`, etc.) liefern konsistent leere Werte.
+
+---
+
+## §33 Diamond-Vererbung (Mixin wins) — Praezisierung
+
+```
+SearchAlgoBase<Derived>           generated::p0X_xxx::OriginalCodeMixin
+       │                                       │ (= SearchAlgoOriginalCodeMixin<PaperManifest>)
+       │ : public AxisBase                     │ : OriginalCodeMixinBase<PaperManifest>
+       │                                       │ : public AxisBase
+       │                                       │
+       │                                       │
+       └────────────────┬──────────────────────┘
+                        ▼
+              class OriginalArtSearchAlgo
+                : public SearchAlgoBase<OriginalArtSearchAlgo>,
+                  public generated::p01_art::OriginalCodeMixin
+```
+
+**Diamond:** beide Pfade enden in `AxisBase` (kein State, nur `static constexpr`). Da
+beide Pfade `get_compiler()` und `is_original_module()` liefern (Default in AxisBase,
+Override in Mixin), gibt es ohne explizite Disambiguation einen ambiguous-Compile-Error.
+
+**Loesung im Wrapper (s2-Pattern):**
+```cpp
+class OriginalArtSearchAlgo
+    : public SearchAlgoBase<OriginalArtSearchAlgo>,
+      public generated::p01_art::OriginalCodeMixin {
+public:
+    using generated::p01_art::OriginalCodeMixin::get_compiler;       // → "gcc-9.5"
+    using generated::p01_art::OriginalCodeMixin::is_original_insert; // → kIsOriginal_insert (true)
+    using generated::p01_art::OriginalCodeMixin::is_original_lookup;
+    using generated::p01_art::OriginalCodeMixin::is_original_erase;
+    using generated::p01_art::OriginalCodeMixin::is_original_clear;
+    using generated::p01_art::OriginalCodeMixin::is_original_module; // → mp_all_of (true)
+    ...
+};
+```
+
+Mixin-Pfad wins — Habich-Compliance erfuellt.
+
+---
+
+## §34 Tests-Architektur s2 (TYPED_TEST_SUITE Auto-Skalierung)
+
+Pattern-Disziplin [[cross-axis-defaults-no-bloat]]: 2 separate TYPED_TEST_SUITE-Klassen,
+jeweils mit unterschiedlicher Assertion-Semantik:
+
+### §34.1 FullOriginalSearchAlgoConformance (alle 4 Functions originall)
+
+```cpp
+using FullOriginalSearchAlgoList = ::testing::Types<OriginalArtSearchAlgo>;
+TYPED_TEST_SUITE(FullOriginalSearchAlgoConformance, FullOriginalSearchAlgoList);
+```
+
+**10 Tests pro Wrapper:** AxisBaseConcept / LegacyOriginalCodePflichtConcept /
+HasOriginalCodeConcept / **PaperOriginalValidatedConcept (true)** /
+GetCompilerOverridesAxisBaseDefault / IsOriginalInsert / IsOriginalLookup /
+IsOriginalErase / IsOriginalClear / IsOriginalModuleAggregation (true).
+
+### §34.2 PartialOriginalSearchAlgoConformance (2/4 + Lücken)
+
+```cpp
+using PartialOriginalSearchAlgoList = ::testing::Types<OriginalHotSearchAlgo, OriginalStartSearchAlgo>;
+TYPED_TEST_SUITE(PartialOriginalSearchAlgoConformance, PartialOriginalSearchAlgoList);
+```
+
+**7 Tests pro Wrapper:** AxisBaseConcept / LegacyOriginalCodePflichtConcept /
+HasOriginalCodeConcept / **NotPaperOriginalValidated (false)** /
+GetCompilerOverridesAxisBaseDefault / **PaperApiFunctionsOriginal (insert+lookup true)** /
+**LueckenFunctionsNotOriginal (erase+clear false)**.
+
+### §34.3 Skalierung bei Roll-out
+
+Bei zukünftigen Original-SearchAlgo-Wrappers (z.B. OriginalMasstreeSearchAlgo) reicht
+das Hinzufügen zum entsprechenden Type-Liste-Eintrag — alle 10 (Full) bzw. 7 (Partial)
+Tests werden automatisch ausgeführt. ZERO Test-Code-Aenderung pro Roll-out.
+
+---
+
+## §35 Test-Bilanz s2 Endstand
+
+| Test-Target | Tests s1 | Tests s2 | Delta | Bemerkung |
+|---|:-:|:-:|:-:|---|
+| test_v41_topic_allocator_axis_06 | 252 | 252 | 0 | unveraendert |
+| test_v41_topic_queuing | 205 | 205 | 0 | unveraendert |
+| test_v41_topic_traversal | 95 | 131 | +36 | TYPED_TEST Auto-Skalierung ueber 6 statt 3 Wrappers + PropertyFilter-Count-Anpassung |
+| test_v41_paper_legacy_code | 102 | 126 | +24 | 10 Full + 14 Partial Original-SearchAlgo |
+| **TOTAL cache-engine** | **654** | **714** | **+60** | |
+
+---
+
+## §36 PermutationEngine-Filter (Concept-API fuer CacheEngineBuilder)
+
+Mit den 3 NEUEN Wrappers ergibt sich folgendes Filter-Verhalten (Compile-Time):
+
+```cpp
+// EnabledStrategies = mp_filter<is_enabled, AllStrategies>  (alle 6 Wrappers ON Default)
+
+using HasOriginalCodeSubset =
+    mp::mp_filter<HasOriginalCodePred, EnabledStrategies>;
+// → {OriginalArtSearchAlgo, OriginalHotSearchAlgo, OriginalStartSearchAlgo}  (3 von 6)
+
+using PaperOriginalValidatedSubset =
+    mp::mp_filter<PaperOriginalValidatedPred, EnabledStrategies>;
+// → {OriginalArtSearchAlgo}  (nur 1 — ART ist 4/4)
+
+// Re-Impl ohne Paper-Bindung: {Array256, VectorU8U8, VectorU16U16}
+// Teil-Original mit Luecken:  {OriginalHotSearchAlgo, OriginalStartSearchAlgo}
+// Pure-Original:              {OriginalArtSearchAlgo}
+```
+
+**Konsequenz fuer Mess-Reihen:** CacheEngineBuilder kann Permutationen pro Klasse separat
+generieren — Reviewer kann (bei Habich-Mess-Reihe) `PaperOriginalValidatedSubset` als
+Subset waehlen fuer maximal-strikte Paper-Konformitaet.
+
+---
+
+## §37 Pending Sub-Stufen — Reihenfolge (Stand nach s2)
+
+| Sub-Task | Stand | Bemerkung |
+|---|---|---|
+| ~~P2.D.tr.s1~~ Skelette + Mixin-Refactor | ✅ vorherige Phase |
+| ~~P2.D.tr.s2~~ 3 NEUE Wrapper-Klassen | ✅ **heute** |
+| **P2.D.tr.s4** Library-Build Original-Compiler + extern Linking | **pending** Task #689 |
+| **P2.D.t2** 4 deferred Allocator (Bazel + Custom-Shims) | **pending** Task #685 |
+| **P2.D.q** queuing Paper-Source-Audit | **pending** Task #687 |
+
+Empfohlene Naechst-Reihenfolge:
+1. **P2.D.q** queuing-Audit (analog Allocator-Pattern, ohne Library-Build-Komplexitaet)
+2. **P2.D.t2** 4 deferred Allocator (Custom-Shims für Hoard/Michael-LF/Scalloc + Bazel-Build für tcmalloc)
+3. **P2.A.W + P2.D.tr.s4** Library-Build Original-Compiler (separater Sprint, Cross-Platform 3 OS + 4 ISAs)
+
+---
+
+**Ende Teil F (Stand 2026-05-26 spaeter — P2.D.tr.s2: 3 NEUE Original-Wrapper-Klassen + TYPED_TEST Suites).**
