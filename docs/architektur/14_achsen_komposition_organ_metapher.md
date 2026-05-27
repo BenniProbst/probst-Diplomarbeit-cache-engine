@@ -2533,3 +2533,149 @@ gleichem Namen. Fix: Executable in `comdare_anatomy_codegen_cli` umbenannt
 
 **Ende Teil 13 §48 (Stand 2026-05-27 spaet — R5.F anatomy_codegen_tool CLI mit
 11 known Compositions + 14 Tests).**
+
+---
+
+# Teil 14 — Composition-Location-Traits + descriptor_from_composition<C>() (R5.G)
+
+## §49 R5.G — HasCompositionLocation Concept + Compile-Time-Extraktion
+
+### §49.1 Architektur-Bruecke: Compile-Time ↔ Build-System
+
+R5.F nutzt eine hardcoded Tabelle in `anatomy_codegen_tool.cpp`. Diese muss
+manuell synchron gehalten werden wenn neue Compositions hinzukommen.
+
+**R5.G loest das durch Compile-Time-Traits an jeder Reference-Composition:**
+jede Composition deklariert `cpp_type_name` + `header_include` als
+`static constexpr std::string_view`. Tool kann via Template-Funktion
+`descriptor_from_composition<C>()` den `CompositionDescriptor` direkt
+aus dem C++-Type extrahieren.
+
+### §49.2 Lieferung
+
+| Datei | Inhalt |
+|---|---|
+| `anatomy/composition_concept.hpp` (erweitert) | `HasCompositionLocation` Concept + `COMDARE_DEFINE_COMPOSITION_LOCATION` Macro |
+| 11 Reference-Composition-Headers (erweitert) | je +2 Includes + +3 Zeilen (Macro-Aufruf nach `name`/`paper_id`) |
+| `builder/anatomy_codegen_tool/anatomy_codegen_tool.hpp` (erweitert) | `descriptor_from_composition<C>()` Template |
+| `tests/unit/test_v41_anatomy_codegen_tool_traits.cpp` (NEU) | 8 Tests (Concept-Conformance, AdHoc-Negativ, Descriptor-Extraktion, Tabellen-Konsistenz) |
+
+### §49.3 HasCompositionLocation Concept
+
+```cpp
+template <typename C>
+concept HasCompositionLocation = IsComposition<C> && requires {
+    { C::cpp_type_name  } -> std::convertible_to<std::string_view>;
+    { C::header_include } -> std::convertible_to<std::string_view>;
+};
+
+#define COMDARE_DEFINE_COMPOSITION_LOCATION(TYPE_NAME, HEADER_PATH)               \
+    static constexpr std::string_view cpp_type_name  = TYPE_NAME;                 \
+    static constexpr std::string_view header_include = HEADER_PATH
+```
+
+**Optional vs. Pflicht:** `HasCompositionLocation` ist OPTIONALES Concept zu
+`IsComposition`. Reference-Compositions (11 known) erfuellen es; AdHocComposition
+NICHT (generisches Cartesian-Element ohne fixe Datei-Lokation).
+
+### §49.4 Composition-Header-Pattern
+
+Vor R5.G:
+```cpp
+struct ArtComposition {
+    using search_algo = ...;
+    // ... 16 weitere using-Aliases ...
+    static constexpr std::string_view paper_id = "P01 ...";
+    static constexpr std::string_view name     = "ArtComposition";
+};
+```
+
+Nach R5.G:
+```cpp
+#include "../anatomy/composition_concept.hpp"   // fuer Macro
+
+struct ArtComposition {
+    // ... 17 using-Aliases ...
+    static constexpr std::string_view paper_id = "P01 ...";
+    static constexpr std::string_view name     = "ArtComposition";
+
+    // R5.G CMake-Codegen-Location
+    COMDARE_DEFINE_COMPOSITION_LOCATION(
+        "::comdare::cache_engine::compositions::ArtComposition",
+        "compositions/art_reference.hpp");
+};
+```
+
+### §49.5 descriptor_from_composition<C>() Template
+
+```cpp
+template <HasCompositionLocation C>
+[[nodiscard]] constexpr CompositionDescriptor
+descriptor_from_composition() noexcept {
+    return CompositionDescriptor{
+        C::name,              // short_name
+        C::cpp_type_name,
+        C::header_include
+    };
+}
+```
+
+Verwendung Compile-Time:
+```cpp
+constexpr auto art_desc = descriptor_from_composition<ArtComposition>();
+static_assert(art_desc.cpp_type_name ==
+    "::comdare::cache_engine::compositions::ArtComposition");
+```
+
+### §49.6 Tabellen-Konsistenz (R5.F hardcoded ↔ R5.G Traits)
+
+Beide Quellen muessen identische Werte liefern. Test verifiziert das fuer alle
+11 Compositions paarweise:
+```cpp
+for_each_composition: descriptor_from_composition<C>() == *find_composition(name)
+```
+
+Bei Diskrepanz fehlt's der hardcoded Tabelle (R5.F) → Sync nach Edit der
+Reference-Composition pflicht. Spaeter wird Tabelle ganz wegfallen wenn
+PermutationEngine direkt iteriert (R5.H).
+
+### §49.7 11 Reference-Compositions ergaenzt
+
+| Composition | cpp_type_name | header_include |
+|---|---|---|
+| ArtComposition | `::...ArtComposition` | `compositions/art_reference.hpp` |
+| HotComposition | `::...HotComposition` | `compositions/hot_reference.hpp` |
+| WormholeComposition | `::...WormholeComposition` | `compositions/wormhole_reference.hpp` |
+| SurfComposition | `::...SurfComposition` | `compositions/surf_reference.hpp` |
+| MasstreeComposition | `::...MasstreeComposition` | `compositions/masstree_reference.hpp` |
+| StartComposition | `::...StartComposition` | `compositions/start_reference.hpp` |
+| ArtPaperBindingComposition | `::...ArtPaperBindingComposition` | `compositions/art_paper_binding_reference.hpp` |
+| HotPaperBindingComposition | `::...HotPaperBindingComposition` | `compositions/hot_paper_binding_reference.hpp` |
+| StartPaperBindingComposition | `::...StartPaperBindingComposition` | `compositions/start_paper_binding_reference.hpp` |
+| WormholePaperBindingComposition | `::...WormholePaperBindingComposition` | `compositions/wormhole_paper_binding_reference.hpp` |
+| SurfPaperBindingComposition | `::...SurfPaperBindingComposition` | `compositions/surf_paper_binding_reference.hpp` |
+
+### §49.8 Tests-Snapshot R5.G (8 Tests, 3 Suites)
+
+| § | Suite | Tests |
+|---|---|---|
+| §1 | R5G_CompositionLocation (Concept-Conformance 11 Compositions) | 2 |
+| §2 | R5G_CompositionLocation (AdHoc-Negativ-Test) | 1 |
+| §3 | R5G_DescriptorFromComposition (Art + HotPaperBinding) | 2 |
+| §4 | R5G_TableConsistency (R5.F-Tabelle ↔ R5.G-Trait paarweise) | 3 |
+
+Anatomy+Compositions-Tests gesamt nach R5.G: **187 grün** (15 Test-Files, +8 vs R5.F).
+
+### §49.9 NEXT R5.H
+
+| Sprint | Was |
+|---|---|
+| R5.H | Hardcoded Tabelle in `anatomy_codegen_tool.cpp` entfernen, durch `descriptor_from_composition<C>()` ueber alle 11 known_algorithms.hpp-Aliases ersetzen; Tool bekommt `--from-permutation-engine` Modus |
+| R5.I | 2-Pass-Build: Tool via `execute_process` zur CMake-Configure-Time, Output sofort include-t |
+| R6 (V42) | Workload-Driver (YCSB) pro geladenem Modul |
+| R7 (V42) | F15-Auswertung |
+
+---
+
+**Ende Teil 14 §49 (Stand 2026-05-27 spaet — R5.G HasCompositionLocation Concept
++ 11 Composition-Trait-Erweiterungen + 8 Tests).**
