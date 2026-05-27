@@ -2679,3 +2679,108 @@ Anatomy+Compositions-Tests gesamt nach R5.G: **187 grün** (15 Test-Files, +8 vs
 
 **Ende Teil 14 §49 (Stand 2026-05-27 spaet — R5.G HasCompositionLocation Concept
 + 11 Composition-Trait-Erweiterungen + 8 Tests).**
+
+---
+
+# Teil 15 — Trait-driven Tool-Tabelle (R5.H Drift-Eliminierung)
+
+## §50 R5.H — make_desc<C>() ersetzt hardcoded String-Tabelle
+
+### §50.1 Befund vor R5.H
+
+`anatomy_codegen_tool.cpp` enthielt eine hardcoded Tabelle:
+```cpp
+constexpr std::array<CompositionDescriptor, 11> kKnownCompositionsImpl = {{
+    {"art", "::comdare::cache_engine::compositions::ArtComposition", "compositions/art_reference.hpp"},
+    // ... 10 weitere ...
+}};
+```
+
+Problem: bei Aenderung eines `cpp_type_name` oder `header_include` in einer
+Composition (z.B. Rename oder Verschiebung) waere die Tool-Tabelle out-of-sync.
+R5.G's TableConsistency-Tests faengt das ab — aber erst zur Test-Laufzeit,
+nicht zur Compile-Zeit.
+
+### §50.2 Lieferung R5.H
+
+`anatomy_codegen_tool.cpp` nutzt jetzt einen Helper:
+```cpp
+template <HasCompositionLocation C>
+constexpr CompositionDescriptor make_desc(std::string_view short_name) noexcept {
+    auto d = descriptor_from_composition<C>();  // R5.G Trait-Extraktion
+    d.short_name = short_name;                  // User-friendly CLI-Override
+    return d;
+}
+
+constexpr std::array<CompositionDescriptor, 11> kKnownCompositionsImpl = {{
+    make_desc<comp::ArtComposition>("art"),
+    make_desc<comp::HotComposition>("hot"),
+    make_desc<comp::WormholeComposition>("wormhole"),
+    make_desc<comp::SurfComposition>("surf"),
+    make_desc<comp::MasstreeComposition>("masstree"),
+    make_desc<comp::StartComposition>("start"),
+    make_desc<comp::ArtPaperBindingComposition>("art_pb"),
+    make_desc<comp::HotPaperBindingComposition>("hot_pb"),
+    make_desc<comp::StartPaperBindingComposition>("start_pb"),
+    make_desc<comp::WormholePaperBindingComposition>("wormhole_pb"),
+    make_desc<comp::SurfPaperBindingComposition>("surf_pb"),
+}};
+```
+
+`cpp_type_name` + `header_include` kommen direkt aus den Composition-Traits.
+Nur der User-friendly CLI-Short-Name ("art" statt "ArtComposition") bleibt
+Tool-spezifisch.
+
+### §50.3 Konsequenzen
+
+**Drift-Eliminierung:** Aenderung eines Composition-Traits propagiert
+automatisch in die Tool-Tabelle — Compile-Time-Garantie.
+
+**Build-System-Erweiterungen:** Tool-Lib braucht jetzt:
+- Includes fuer alle 11 Composition-Headers
+- `${CMAKE_SOURCE_DIR}/libs/cache_engine/src` Include-Pfad (transitiv ueber
+  Composition → Concepts → measurement)
+- `${CMAKE_BINARY_DIR}/generated` Include-Pfad (configure_file-generierte
+  axis_*_flags.hpp Headers)
+- `Boost::mp11` Public-Dependency (transitiv ueber observer_aggregate)
+
+**Externes Verhalten unveraendert:** alle 22 Tool-Tests (R5.F 14 + R5.G 8) bleiben
+grün ohne Modifikation — Refactor verändert Struktur, nicht API/Output.
+
+### §50.4 Verifikation
+
+CLI-Smoke produziert identisches Output wie R5.F:
+```
+$ comdare-anatomy-codegen-tool --output /tmp/r5h_smoke.cmake --names art,hot,art_pb
+comdare-anatomy-codegen-tool: wrote 3 composition entries (library_type=SHARED)
+
+$ cat /tmp/r5h_smoke.cmake
+set(COMDARE_PERMUTATION_LIBRARY_TYPE "SHARED")
+set(COMDARE_PERMUTATION_COMPOSITIONS
+    "::comdare::cache_engine::compositions::ArtComposition|compositions/art_reference.hpp"
+    "::comdare::cache_engine::compositions::HotComposition|compositions/hot_reference.hpp"
+    "::comdare::cache_engine::compositions::ArtPaperBindingComposition|compositions/art_paper_binding_reference.hpp"
+)
+```
+
+### §50.5 Tests-Snapshot R5.H
+
+Kein neuer Test-File — R5.H ist reiner Refactor. R5.G TableConsistency-Tests
+bleiben gueltig + relevant (sie testen das Konsistenz-Invariant das R5.H jetzt
+strukturell garantiert).
+
+Anatomy+Compositions-Tests gesamt nach R5.H: **187 grün** (15 Test-Files,
+identisch zu R5.G).
+
+### §50.6 NEXT R5.I (Tool als Configure-Time-Codegen)
+
+R5.H eliminiert Manual-Drift; R5.I integriert Tool in CMake-Configure-Pass:
+- Tool wird via `execute_process()` zur Configure-Time aufgerufen
+- Output landet direkt in `${CMAKE_BINARY_DIR}/generated/perm_list.cmake`
+- Sofortiges `include()` + `comdare_codegen_anatomy_module_list()`-Aufruf
+- 2-Pass-Build: erst Tool gebaut, dann Configure ruft Tool
+
+---
+
+**Ende Teil 15 §50 (Stand 2026-05-27 spaet — R5.H Trait-driven Tool-Tabelle
+mit make_desc<C>() Helper, Drift-Eliminierung garantiert).**
