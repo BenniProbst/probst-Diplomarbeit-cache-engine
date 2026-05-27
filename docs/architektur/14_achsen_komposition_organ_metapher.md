@@ -3234,3 +3234,118 @@ IAnatomyBase ueber die DLL-Grenze.
 
 **Ende Teil 18 §53 (Stand 2026-05-27 nacht — R6.A WorkloadConfig + deterministischer
 WorkloadGenerator + 21 Tests, Pflicht-Reproduzierbarkeit garantiert).**
+
+---
+
+# Teil 19 — Audit-Zwischenstand + Roadmap (2026-05-27 nacht)
+
+## §54 User-Hinweise + 3-Agent-Audit-Resultate
+
+### §54.1 User-Direktive verbatim (2026-05-27 nacht)
+
+> "Wir hatten unter den topics und deren Achsen noch nicht alle Achsen
+> implementiert, dort ist vieles noch stubs. Lass uns das zuerst nachholen.
+> Danach haben die letzten 10 sessions und die letzten 6 Architektur Dokumente
+> noch einen ganzen Stapel an offener Arbeit bezueglich des Aufraeumens der
+> Struktur und Einbindung des prt-art als Pruefling gegen die cache-engine."
+
+### §54.2 Audit-Resultat #1: Topics-Stub-Status (20 Achsen, alle PARTIAL)
+
+15 Topics × 20 Achsen × 99 Wrapper-Dateien insgesamt. **0 Achsen voll
+ausgebaut**, **20 Achsen PARTIAL** (Skelett vorhanden, Algorithmus-Bodies
+fehlen). Alle 11 Reference-Compositions referenzieren konsistent 15 dieser
+Achsen — Compositions sind valid, aber dahinterliegende Algorithmen sind
+Marker-Klassen.
+
+**Sprint-Plan Achsen-Vollausbau (5 Phasen, ~150-180 SP):**
+
+| Sprint | Achsen | SP |
+|---|---|---|
+| Sprint 1 Foundation | axis_12_general_hardware (EMPTY), axis_05_memory_layout, axis_02/04_nodes | 5+3+5+5=18 |
+| Sprint 2 Traversal | axis_03a_search_algo, axis_03b_cache_traversal, axis_03m_mapping | 21+13+8=42 |
+| Sprint 3 Queuing+Concurrency | axis_q1/q2_queuing, axis_08_concurrency | 13+8+8=29 |
+| Sprint 4 Allocators | axis_06_allocator (27 Wrapper) | 34 |
+| Sprint 5 Optional | filter/io/migration/serialization/telemetry/search_engine/hardware/prefetch/value_handle | 40 |
+
+### §54.3 Audit-Resultat #2: Offene TODOs aus Sessions + Dokus
+
+**Pflicht-Folge-Sprints aus Doku 14:**
+- R5.C.2 Pruefling-Namespace-Slot-Pattern fuer prt-art (Stufe 2 + 3 Joins implementieren — pruefling_merge.hpp hat Skelett, prt-art-Slots fehlen)
+- R5.C.3 Cross-Constraints fuer queuing (Q-EPOCH+F-EAGER, Q-COW+F-ADAPTIVE etc.)
+
+**Pflicht-Folge-Sprints aus Doku 13:**
+- Teil E (Tool-Dokumentation) unvollstaendig — sollte VOR P2.D.t2 komplettiert sein
+
+**Pflicht-Folge-Sprints aus Doku 11:**
+- §11.7.E-Q — 13 weitere Topics analog Allocator/Queuing/Traversal vollstaendig spezifizieren
+
+**Pflicht-Folge-Sprints aus Doku 10:**
+- §0.4 V32-Implementierungs-Konsequenzen (CEB ICommand-Hierarchie + CacheEngine selbst als ExecutionEngine + drawio Tab CC.1)
+
+**Bausteine-Matrix Konsolidierung:**
+- `docs/bausteine/` Komplette Doku erneuern (Organ-Taxonomie statt alte Tier-Matrix)
+
+### §54.4 Audit-Resultat #3: prt-art-Einbindung-Plan
+
+**Befund:** prt-art existiert als eigenes Repo in `Diplomarbeit/Code/external/comdare-prt-art/` mit:
+- identity/ (PrtArtIdentity.hpp PermutationFlags-Composer) ✅
+- default_lookup/ (9 Achsen-Defaults: 3b, 9, 11, 12, 13, 62, 63, 64, 82) ✅
+- internal_search/ (4 Node-Typen: Array256, Array65535, VectorU8U8, VectorU16U16) ✅
+- memory_layout/, allocator/, concurrency/, measurement/ ✅
+- **FEHLT:** Achsen-Slot-Deklarationen (PrueflingSlot, PrtArtComposition, HasCompositionLocation)
+
+**5-Phasen-Plan (~20h, 2.5 Sprint-Days):**
+
+| Phase | Was | Owner |
+|---|---|---|
+| 1 (2h) | Audit existing prt-art Axis-Wrapper-Inventar | prt-art |
+| 2 (6h) | 9 axis_*_slot.hpp generieren (Slot pro Achse mit PrueflingVariants + has_pruefling + genus=SearchAlgorithm) | prt-art |
+| 3 (4h) | PrtArtComposition + HasCompositionLocation-Trait | prt-art |
+| 4 (2h) | Entry-Wrapper fuer known_compositions_list.hpp + CMake-Integration | prt-art + cache-engine |
+| 5 (3h) | End-to-End: SearchAlgorithmPermutationEngine::assert_pruefling_slot_genus<prt_art::axis_03b::Slot>() + Stufe-2-Codegen + Stufe-3-Union | cache-engine |
+
+**Pflicht-Reihenfolge:**
+1. **ZUERST** Topics-Stubs-Vollausbau (User-Direktive, Sprint 1-5 oben)
+2. **DANN** prt-art-Einbindung (5-Phasen-Plan)
+
+### §54.5 Priorisierung der naechsten Sprints
+
+| Prio | Sprint | Was | Abhaengigkeit |
+|---|---|---|---|
+| **1** | **R7.1 Achsen-Vollausbau-Sprint-1** | Foundation (axis_12 + axis_05 + axis_02/04) | keine |
+| 2 | R7.2 | Traversal (axis_03a/b/m echte Algorithmus-Bodies) | R7.1 |
+| 3 | R7.3 | Queuing+Concurrency Vollausbau | R7.2 |
+| 4 | R7.4 | Allocator-Vollausbau (27 Wrapper Body-Erweiterung) | R7.3 |
+| 5 | R7.5 | Optional-Topics (filter/io/migration/serialization/telemetry/hardware) | R7.4 |
+| **6** | **R8 prt-art-Einbindung** | 5-Phasen-Plan oben | R7.* |
+| 7 | R5.C.2 | Stufe-2/3 Pruefling-Merge in cache-engine aktivieren | R8 Phase 2-4 |
+| 8 | R6.B/R6.C | Workload-Driver Integration + Mess-Aggregation | R5.D-R5.E (DONE) + R7.* |
+| 9 | F15-Auswertung V42 | tausende Permutationen messen + schnellste identifizieren | R6.C |
+
+### §54.6 CMake-Robustness-Fix (CLion-Konfigurations-Problem)
+
+User-Befund 2026-05-27 nacht: CLion-Configure schlug fehl mit
+> "The current CMakeCache.txt directory ... is different than the directory ... where CMakeCache.txt was created."
+
+Ursache: Repo wurde von `Research/comdare-cache-engine/` nach
+`Modules/comdare-cacheengine-all/comdare-cache-engine/` umgezogen. Stale
+FetchContent-Subbuild-Cache zeigte noch auf alten Pfad.
+
+**Fix:**
+- NEU `cmake/fetchcontent_stale_cleanup.cmake` mit
+  `comdare_clean_stale_fetchcontent_subbuild(<name>)` Function
+- Prueft `CMAKE_HOME_DIRECTORY` im subbuild-Cache → bei Mismatch
+  `file(REMOVE_RECURSE)` + WARNING
+- Pfad-Normalisierung (lowercase + Forward-Slash) fuer Windows
+- Sicher: betrifft NUR `_deps/<name>-subbuild/`, nicht User-Code
+- In `cmake/gtest_setup.cmake` + `cmake/boost_mp11_setup.cmake` als Pre-Step
+  vor `FetchContent_MakeAvailable` aufgerufen
+
+**Konsequenz:** robust gegen Repo-Umzuege; jede neue FetchContent-Dependency
+braucht nur einen 1-Liner-Aufruf.
+
+---
+
+**Ende Teil 19 §54 (Stand 2026-05-27 nacht — User-Hinweise + 3-Agent-Audit-
+Resultate dokumentiert + Priorisierung der naechsten Sprints + CMake-Robustness-
+Fix dokumentiert).**
