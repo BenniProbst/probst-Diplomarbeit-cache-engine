@@ -2784,3 +2784,157 @@ R5.H eliminiert Manual-Drift; R5.I integriert Tool in CMake-Configure-Pass:
 
 **Ende Teil 15 §50 (Stand 2026-05-27 spaet — R5.H Trait-driven Tool-Tabelle
 mit make_desc<C>() Helper, Drift-Eliminierung garantiert).**
+
+---
+
+# Teil 16 — Configure-Time-Codegen via execute_process (R5.I)
+
+## §51 R5.I — comdare_run_anatomy_codegen_tool() + 2-Pass-Build
+
+### §51.1 Architektur-Problem: Chicken-and-Egg
+
+Tool ist eigenes CMake-Target im selben Repo. Bei erstem CMake-Configure
+existiert das Tool-Binary noch nicht — `execute_process` koennte es nicht
+finden. Klassischer Bootstrap.
+
+**R5.I loest das mit 2-Pass-Build-Pattern:**
+```
+Pass 1: cmake -B build
+  → Function findet Tool nicht, gibt Warning, skipt Codegen
+  → Tool-Target wird zur Build-Phase eingehaengt
+Build:  cmake --build build --target comdare_anatomy_codegen_cli
+Pass 2: cmake -B build  (Re-Configure)
+  → Function findet Tool, ruft execute_process
+  → Output landet in generated/r5i_perm_list.cmake
+  → include() laedt Variablen
+  → comdare_codegen_anatomy_module_list() generiert SHARED-DLLs
+  → Test-Target wird angelegt
+Build:  cmake --build build
+  → Test compiliert + linkt gegen Pilot-DLLs
+```
+
+### §51.2 Lieferung
+
+| Datei | Inhalt |
+|---|---|
+| `cmake/anatomy_codegen_runner.cmake` (NEU) | `comdare_run_anatomy_codegen_tool()` Function mit build-tree-search + Idempotenz + STATUS_OUT |
+| `tests/unit/CMakeLists.txt` (erweitert) | Optional-Block: ruft Function, bei FOUND wird include + module-list + Test-Target erzeugt |
+| `tests/unit/test_v41_anatomy_r5i_configure_codegen.cpp` (NEU) | 4 End-to-End Tests gegen Tool-generierte DLLs |
+
+### §51.3 Function-API
+
+```cmake
+comdare_run_anatomy_codegen_tool(
+    OUTPUT       <path>                   # Pflicht
+    [NAMES       <csv>]                   # default = alle 11
+    [LIBRARY_TYPE SHARED|STATIC]          # default = SHARED
+    [STATUS_OUT  <var>]                   # "FOUND"/"SKIPPED"/"ERROR"
+)
+```
+
+**Build-Tree-Search:** Function sucht das Tool in 5 plattform-spezifischen
+Pfaden (Release/Debug/RelWithDebInfo/MinSizeRel/Root). Wenn keiner existiert
+→ STATUS_OUT="SKIPPED" + Warning.
+
+**Idempotenz:** Wenn Output-File aktueller als Tool-Binary → STATUS_OUT="FOUND"
+ohne Re-Run.
+
+**Tool-Aufruf:** `execute_process()` mit `--output --library-type [--names]`.
+Stdout/stderr werden bei Fehler in WARNING-Message angezeigt.
+
+### §51.4 Optional-Block-Pattern im Aufrufer
+
+```cmake
+include(anatomy_codegen_runner)
+comdare_run_anatomy_codegen_tool(
+    OUTPUT       "${CMAKE_BINARY_DIR}/generated/r5i_perm_list.cmake"
+    NAMES        "art,hot,wormhole"
+    LIBRARY_TYPE SHARED
+    STATUS_OUT   _r5i_status)
+
+if(_r5i_status STREQUAL "FOUND" AND EXISTS "${_r5i_snippet}")
+    include("${_r5i_snippet}")
+    comdare_codegen_anatomy_module_list(
+        PILOT_PREFIX  "r5i_configure_pilot"
+        OUTPUT_DIR    "${_r5i_pilot_dir}"
+        LIBRARY_TYPE  ${COMDARE_PERMUTATION_LIBRARY_TYPE}
+        COMPOSITIONS  ${COMDARE_PERMUTATION_COMPOSITIONS}
+        TARGETS_OUT   _r5i_pilot_targets)
+    # ... Test-Target ...
+endif()
+```
+
+Bei erstem Configure: Block wird uebersprungen ohne Build-Fehler.
+Bei zweitem Configure: Block aktiviert + Test-Target wird angelegt.
+
+### §51.5 Voll-Pipeline R5.F → R5.G → R5.H → R5.D → R5.D.2 → R5.D.3 → R5.E → R5.I
+
+```
+descriptor_from_composition<C>()           ← R5.G Trait (Compile-Time)
+  → make_desc<C>(short_name)               ← R5.H Helper (Drift-frei)
+    → kKnownCompositionsImpl Array         ← R5.F Library
+      → CLI-Tool comdare-anatomy-codegen-tool  ← R5.F App
+        → execute_process zur Configure-Time    ← R5.I NEU
+          → r5i_perm_list.cmake Snippet
+            → include() + Variable-Set
+              → comdare_codegen_anatomy_module_list()  ← R5.D.3
+                → configure_file Template         ← R5.D.2
+                  → COMDARE_DEFINE_ANATOMY_MODULE ← R5.D
+                    → N SHARED-.dll auf Disk
+                      → AnatomyModuleLoader::load_all() ← R5.E
+                        → N IAnatomyBase via Factory
+                          → warm_up / run / reset / shutdown
+```
+
+### §51.6 Pilot-Verifikation (3 Tool-erzeugte DLLs)
+
+```
+generated/
+├── r5i_perm_list.cmake                         (Tool-Output)
+└── r5i_anatomy_modules/
+    ├── anatomy_perm_r5i_configure_pilot_0.cpp  (ArtComposition, Codegen)
+    ├── anatomy_perm_r5i_configure_pilot_1.cpp  (HotComposition)
+    ├── anatomy_perm_r5i_configure_pilot_2.cpp  (WormholeComposition)
+    ├── comdare_anatomy_perm_r5i_configure_pilot_0.dll
+    ├── comdare_anatomy_perm_r5i_configure_pilot_1.dll
+    └── comdare_anatomy_perm_r5i_configure_pilot_2.dll
+```
+
+Test laedt via `load_all()`, verifiziert Set{Art, Hot, Wormhole}-Composition-Namen,
+und fuehrt warm_up→run→shutdown pro Handle aus.
+
+### §51.7 Tests-Snapshot R5.I (4 Tests, 1 Suite)
+
+| § | Test | Beweis |
+|---|---|---|
+| §1 | PilotDirectoryContainsThreeDlls | Tool-erzeugte DLLs auf Disk |
+| §2 | LoadAllReturnsThreeHandles | Loader findet alle 3 |
+| §3 | LoadedCompositionsMatchToolSelection | Set{Art, Hot, Wormhole} match Tool --names |
+| §4 | LifecyclePerModuleFromToolGeneratedSnippet | warm_up→run→shutdown per DLL |
+
+Anatomy+Compositions-Tests gesamt nach R5.I: **191 grün** (16 Test-Files, +4 vs R5.H).
+
+### §51.8 Build-Fail-Toleranz
+
+Bei erstem Configure (Tool fehlt):
+- Function gibt STATUS_OUT="SKIPPED" + Hinweis-Message
+- Optional-Block im Aufrufer wird uebersprungen
+- Build durchlauft + Tool-Target wird gebaut
+- Bei naechstem cmake-Pass ist Tool da → Function liefert FOUND
+
+Damit ist R5.I robust gegen leeren Build-Tree.
+
+### §51.9 NEXT R5.J / V42
+
+R5.D-R5.I Pipeline ist vollstaendig. Naechste Phasen sind in V42-Scope:
+
+| Sprint | Was |
+|---|---|
+| R5.J (optional) | Tool nutzt `for_each_composition_type` aus SearchAlgorithmPermutationEngine — Trait-driven Tabelle ersetzt durch echte Cartesian-Iteration |
+| R6 (V42) | Workload-Driver (YCSB-Insert/Lookup-Sequenz) pro geladenem Modul |
+| R7 (V42) | F15-Auswertung: tausende Permutationen messen + schnellste identifizieren |
+
+---
+
+**Ende Teil 16 §51 (Stand 2026-05-27 nacht — R5.I Configure-Time-Codegen via
+execute_process + 2-Pass-Build-Pattern + 4 Tests).**
