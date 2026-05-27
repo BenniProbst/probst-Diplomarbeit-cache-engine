@@ -153,3 +153,74 @@ Diplomarbeit-Submodule-Bumps: 68a8615, db23ffe (Doku 15), db9cf5e (Phase 1+2), p
 - **Submodule-Bumps:** 4
 
 **Sprint-Dauer:** ~6h autonom (mit pre-read + audit + 7 phasen + commits + doku).
+
+## §12 R7.5.l — Tests + Compositions Stale-Refs Cleanup (Folge-Sprint)
+
+User-Direktive 2026-05-27 (spaeter): ESET-Antivirenprogramm hatte
+`is_original_validator`-Tool-Calls beim ersten Build geblockt. Nach Tool-Build +
+12 Paper-Codegen-Headers wurden 2 zuvor "Tech-Debt"-markierte Tests baubar +
+3 weitere Tests entdeckt mit echten Refactor-Bruechen.
+
+### §12.1 CMakeLists-Fix (zentrale GLOB-Variable)
+
+`tests/unit/CMakeLists.txt` erweitert mit:
+```cmake
+file(GLOB COMDARE_ALL_AXIS_GENERATED_DIRS LIST_DIRECTORIES true
+    "${CMAKE_BINARY_DIR}/generated/topics/*/axis_*")
+```
+3 Tests konsumieren `${COMDARE_ALL_AXIS_GENERATED_DIRS}` statt einzelner Pfade.
+
+### §12.2 Stale Refs gefixt (28 Files via mass-sed)
+
+**axis_09 (14 Files, R7.5.i.2 Aftermath):**
+- includes: scalar/sse2/avx2/neon.hpp → amd64.hpp / aarch64.hpp
+- classes: IsaScalar/IsaSse2/IsaAvx2 → Amd64Isa, IsaNeon → Aarch64Isa
+
+**axis_01 (14 Files, User-Korrektur Gattungen):**
+- includes: std_*_like.hpp → index_organized_table/clustered/non_clustered/heap.hpp
+- classes: StdMapLike → IotIndexOrganization, StdSetLike → ClusteredIndexOrganization,
+  StdMultiMapLike → NonClusteredIndexOrganization, StdUnorderedMapLike → HeapIndexOrganization
+
+**API-Anpassungen test_v41_topics_fundament.cpp:**
+- Z.125: `Amd64Isa::supports_simd()` → `supports_native_simd()` (R7.5.i.2 API-Change)
+- Z.140: `IotIndexOrganization::is_ordered()` entfernt
+
+### §12.3 Build-Verifikation (12 Tests, 533 PASSED)
+
+| Test | Status | Vorher |
+|------|--------|--------|
+| test_v41_topic_traversal | 155/155 PASSED | TECH-DEBT (is_original.hpp) |
+| test_v41_topic_queuing | 216/216 PASSED | TECH-DEBT (is_original.hpp) |
+| test_v41_search_algorithm_permutation_engine | 15/15 PASSED | Refactor-Bruch (axis_09+01) |
+| test_v41_anatomy_r4_driver | 10/10 PASSED | Refactor-Bruch + include-path |
+| test_v41_topics_fundament | 16/16 PASSED | Refactor-Bruch + API-Change |
+| test_v41_axis_02_axis_04_nodes | 13/13 PASSED | Regression Phase 3 |
+| test_v41_axis_05_memory_layout | 14/14 PASSED | Regression Phase 6 |
+| test_v41_axis_07_prefetch | 8/8 PASSED | Regression Phase 7 |
+| test_v41_axis_09b_simd_extension | 40/40 PASSED | Regression Phase 1 |
+| test_v41_axis_12_general_hardware | 17/17 PASSED | Regression Phase 2 |
+| test_v41_axis_14_value_handle | 8/8 PASSED | Regression Phase 6 |
+| test_v41_axis_01_index_organization | 21/21 PASSED | Regression Phase 7 |
+
+**TOTAL: 533/533 Tests PASSED.**
+
+### §12.4 Paper-Codegen-Headers (12 generiert)
+
+- Allocator: a04_mimalloc, a05_jemalloc, a07_snmalloc, a10_rpmalloc, a11_lrmalloc, a20_dlmalloc
+- Traversal: p01_art, p02_hot, p05_start, p07_wormhole, p10_surf
+- Queuing: q01_concurrentqueue
+
+### §12.5 ESET-Lehre
+
+is_original_validator-Tool muss beim ersten Configure-Build von ESET genehmigt
+werden. User muss am Rechner sein + Ausfuehrung bestaetigen. Nach Genehmigung
+laeuft das Tool automatisch fuer alle Folge-Codegen-Aufrufe.
+
+### §12.6 Commits R7.5.l
+
+```
+059c60e V41.F.6.1.R7.5.l Tests + Compositions: Stale Refs (axis_09 + axis_01) bereinigen
+```
+
+Diplomarbeit-Submodule-Bump: (TBD nach diesem Commit).
+
