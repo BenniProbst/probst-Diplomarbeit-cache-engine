@@ -2938,3 +2938,160 @@ R5.D-R5.I Pipeline ist vollstaendig. Naechste Phasen sind in V42-Scope:
 
 **Ende Teil 16 §51 (Stand 2026-05-27 nacht — R5.I Configure-Time-Codegen via
 execute_process + 2-Pass-Build-Pattern + 4 Tests).**
+
+---
+
+# Teil 17 — mp_list-driven Tool-Tabelle (R5.J)
+
+## §52 R5.J — KnownReferenceCompositions mp_list + mp_for_each Iteration
+
+### §52.1 Befund vor R5.J
+
+R5.H hatte hardcoded `std::array<CompositionDescriptor, 11>` mit 11 `make_desc<C>("name")`-
+Aufrufen. Drift fuer cpp_type_name + header_include war via R5.G-Traits
+eliminiert, aber die *Liste* der bekannten Compositions selbst war noch
+manuell hingeschrieben. Eine neue Reference-Composition haette zwei Stellen
+gleichzeitig edits gebraucht:
+
+1. neue Composition-Header anlegen + R5.G-Trait setzen
+2. Tool-Tabelle erweitern um neuen Eintrag
+
+### §52.2 Lieferung R5.J
+
+| Datei | Inhalt |
+|---|---|
+| `compositions/known_compositions_list.hpp` (NEU) | 11 Entry-Wrappers + `KnownReferenceCompositions = mp::mp_list<...>` + `kKnownReferenceCompositionsCount static_assert` |
+| `builder/anatomy_codegen_tool/anatomy_codegen_tool.cpp` (refactort) | hardcoded array → `mp_for_each<KnownReferenceCompositions>` mit Init-on-first-use Static-Vector |
+| `tests/unit/test_v41_anatomy_codegen_tool_mp_list.cpp` (NEU) | 6 Tests: mp_list-Size, Entry-Properties, Iteration, Tool-API-Konsistenz, Descriptor-Match, Duplikat-Check |
+
+### §52.3 Entry-Wrapper-Pattern
+
+Statt einer hardcoded Map oder Auflistung mit redundanten Strings:
+
+```cpp
+struct ArtEntry      { using composition = ArtComposition;      static constexpr std::string_view short_name = "art"; };
+struct HotEntry      { using composition = HotComposition;      static constexpr std::string_view short_name = "hot"; };
+struct WormholeEntry { using composition = WormholeComposition; static constexpr std::string_view short_name = "wormhole"; };
+// ... 8 weitere ...
+
+using KnownReferenceCompositions = boost::mp11::mp_list<
+    ArtEntry, HotEntry, WormholeEntry, SurfEntry, MasstreeEntry, StartEntry,
+    ArtPaperBindingEntry, HotPaperBindingEntry, StartPaperBindingEntry,
+    WormholePaperBindingEntry, SurfPaperBindingEntry
+>;
+
+inline constexpr std::size_t kKnownReferenceCompositionsCount =
+    boost::mp11::mp_size<KnownReferenceCompositions>::value;
+static_assert(kKnownReferenceCompositionsCount == 11);
+```
+
+**Trennung der Concerns:**
+- `composition` Type-Alias → Verbindung zur Composition (R5.G-Traits werden
+  via `descriptor_from_composition<C>()` automatisch verwendet)
+- `short_name` → Tool-spezifischer CLI-User-friendly Bezeichner
+
+Das verhindert Redundanz: cpp_type_name + header_include stehen NUR in der
+Composition selbst (R5.G), short_name stehe NUR im Entry-Wrapper (R5.J).
+
+### §52.4 Tool-Refactor: mp_for_each + Static-Vector
+
+```cpp
+namespace {
+std::vector<CompositionDescriptor> const& known_compositions_storage() {
+    static std::vector<CompositionDescriptor> const tbl = [] {
+        std::vector<CompositionDescriptor> v;
+        v.reserve(comp::kKnownReferenceCompositionsCount);
+        mp::mp_for_each<comp::KnownReferenceCompositions>([&v]<class Entry>(Entry) {
+            using C = typename Entry::composition;
+            auto d = descriptor_from_composition<C>();  // R5.G Trait
+            d.short_name = Entry::short_name;            // R5.J Override
+            v.push_back(d);
+        });
+        return v;
+    }();
+    return tbl;
+}
+}  // anonymous
+```
+
+**Init-on-first-use:** Bei erstem `known_compositions()`-Call wird die Tabelle
+einmalig befuellt + steht danach als const-Span zur Verfuegung. Performance OK
+(11 Iterationen × 4 Membervarianten = vernachlaessigbar).
+
+### §52.5 Bridge-Architektur (R5.F → R5.J Endstand)
+
+```
+Compile-Time:
+  Reference-Compositions (11)
+    ↓ HasCompositionLocation Concept + COMDARE_DEFINE_COMPOSITION_LOCATION Macro  (R5.G)
+  Composition-Traits (cpp_type_name + header_include)
+    ↓ descriptor_from_composition<C>() Template                                    (R5.G)
+  CompositionDescriptor (Type-driven)
+
+  Entry-Wrapper (11)
+    ↓ KnownReferenceCompositions = mp_list<EntryWrapper...>                        (R5.J NEU)
+  Compile-Time-Liste aller bekannten Compositions
+
+Runtime (Tool):
+  mp_for_each<KnownReferenceCompositions>
+    ↓ Visitor extrahiert descriptor_from_composition<C>() + Entry::short_name      (R5.J NEU)
+  std::vector<CompositionDescriptor> (Init-on-first-use)
+    ↓
+  CLI-Tool: --output --names --library-type ...                                    (R5.F)
+    ↓
+  CMake-Snippet
+    ↓ execute_process zur Configure-Time                                           (R5.I)
+  include() + comdare_codegen_anatomy_module_list                                  (R5.D.3)
+    ↓
+  N SHARED-.dll → AnatomyModuleLoader::load_all → N IAnatomyBase                   (R5.E)
+```
+
+### §52.6 Drift-Eliminierung-Beweis
+
+Neue Reference-Composition `FooComposition` registrieren:
+
+1. Composition-Header anlegen mit `COMDARE_DEFINE_COMPOSITION_LOCATION(...)`
+   (R5.G Pflicht)
+2. Entry-Wrapper `FooEntry { using composition = FooComposition;
+   static constexpr short_name = "foo"; }` anlegen
+3. `KnownReferenceCompositions` mp_list um `FooEntry` erweitern
+4. `static_assert(kKnownReferenceCompositionsCount == 12)` Update
+
+→ Tool sieht `foo` automatisch in `--list`, CLI `--names foo` funktioniert.
+KEIN Edit im Tool-cpp noetig. KEIN Edit in find_composition/select_compositions.
+
+### §52.7 Tests-Snapshot R5.J (6 Tests, 1 Suite)
+
+| § | Test | Beweis |
+|---|---|---|
+| §1 | KnownReferenceCompositionsHasElevenEntries | mp::mp_size + static_assert |
+| §2 | EntryWrappersHaveCompositionAndShortName | static_assert composition-Alias + short_name |
+| §3 | ForEachIteratesAllElevenEntries | set<short_name> aus mp_for_each = 11 erwartete Namen |
+| §4 | ToolApiYieldsSameElevenAsMpList | tool::known_compositions() vs mp_for_each Iteration → identisch |
+| §5 | EachEntryDescriptorMatchesToolTable | pro Entry: descriptor_from_composition<C>() == find_composition(short_name) |
+| §6 | NoDuplicateCompositionTypesInMpList | set<cpp_type_name>.size() == 11 |
+
+Anatomy+Compositions-Tests gesamt nach R5.J: **197 grün** (17 Test-Files, +6 vs R5.I).
+
+### §52.8 Konsequenzen
+
+**Drift-Eliminierung jetzt VOLLSTAENDIG:**
+- R5.H eliminierte Drift fuer cpp_type_name + header_include (via Traits)
+- R5.J eliminiert Drift fuer die Composition-LISTE selbst (via mp_list)
+- Verbleibendes Edit fuer neue Composition: 4 Stellen (Header + 2× Entry + static_assert)
+  — alle in einem `compositions/` Modul, Tool-Code unangefasst
+
+**Pipeline-Endstand R5.D-R5.J:** Voll operativ + drift-frei + Compile-Time-validiert.
+
+### §52.9 NEXT R6/R7 V42
+
+| Sprint | Was |
+|---|---|
+| R6 (V42) | Workload-Driver pro geladenem Modul (YCSB-Insert/Lookup-Sequenz) |
+| R7 (V42) | F15-Auswertung: tausende Permutationen messen + Welch-t-Test + schnellste Komposition identifizieren |
+
+---
+
+**Ende Teil 17 §52 (Stand 2026-05-27 nacht — R5.J mp_list-driven Tool-Tabelle
+mit Entry-Wrapper-Pattern + mp_for_each + 6 Tests, Drift-Eliminierung
+VOLLSTAENDIG).**
