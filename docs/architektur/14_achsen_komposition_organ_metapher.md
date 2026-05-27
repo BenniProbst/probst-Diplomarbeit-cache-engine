@@ -3095,3 +3095,142 @@ Anatomy+Compositions-Tests gesamt nach R5.J: **197 grün** (17 Test-Files, +6 vs
 **Ende Teil 17 §52 (Stand 2026-05-27 nacht — R5.J mp_list-driven Tool-Tabelle
 mit Entry-Wrapper-Pattern + mp_for_each + 6 Tests, Drift-Eliminierung
 VOLLSTAENDIG).**
+
+---
+
+# Teil 18 — WorkloadDriver Pilot (R6.A WorkloadConfig + Generator)
+
+## §53 R6.A — WorkloadConfig + deterministischer WorkloadGenerator
+
+### §53.1 User-Direktive verbatim (2026-05-27 nacht, R6-Sprint-Start)
+
+> "Der Workload-Driver wird von der CacheEngineBuilder verwendet, um je
+> Permutations-Binary verschiedene Workloads zu testen und zu dokumentieren.
+> Die Eigenschaften der zu testenden Workloads werden separat vor dem
+> Experiment ueber alle Permutations-Binaries konfiguriert und exakt in
+> Reihenfolge und Umfang fuer jede Binary wiederholt."
+
+### §53.2 R6 Sprint-Plan (3 Atomgroessen)
+
+| Sprint | Was |
+|---|---|
+| **R6.A** (jetzt) | `WorkloadConfig` + deterministischer `WorkloadGenerator` (Pure-Logik, kein DLL/ABI-Integration) |
+| R6.B | ABI-Erweiterung um Container-Ops (`comdare_insert/lookup/erase/clear`) + Adapter mit Pilot-`std::map` + `WorkloadDriver` integriert mit `IAnatomyBase` |
+| R6.C | Mess-Aggregation + Welch-t-Test + `MeasurementResult` Reporting pro Permutation |
+
+### §53.3 Lieferung R6.A
+
+| Datei | Inhalt |
+|---|---|
+| `libs/cache_engine/builder/workload_driver/workload_config.hpp` (NEU) | `WorkloadOpKind` enum, `WorkloadOp` POD, `WorkloadConfig` struct, 4 vorgefertigte Profile (insert_heavy/lookup_heavy/mixed_a/mixed_b) |
+| `libs/cache_engine/builder/workload_driver/workload_generator.{hpp,cpp}` (NEU) | `WorkloadGenerator` mit xorshift64-PRNG, next/reset/generate_all/remaining API |
+| `libs/cache_engine/builder/workload_driver/CMakeLists.txt` (NEU) | `comdare::workload_driver` STATIC-Lib |
+| `tests/unit/test_v41_workload_generator.cpp` (NEU) | 21 Tests in 9 Suites |
+
+### §53.4 WorkloadConfig API
+
+```cpp
+enum class WorkloadOpKind : std::uint8_t { Insert, Lookup, Erase, Clear };
+
+struct WorkloadOp {
+    WorkloadOpKind kind;
+    std::uint64_t  key;
+    std::uint64_t  value;
+};
+
+struct WorkloadConfig {
+    std::uint64_t seed = 42;
+    std::size_t   num_operations = 1000;
+    std::uint64_t key_min = 1;
+    std::uint64_t key_max = 1'000'000;
+    double pct_insert = 0.50;
+    double pct_lookup = 0.40;
+    double pct_erase  = 0.09;
+    double pct_clear  = 0.01;
+    std::string_view name = "DefaultMixedWorkload";
+
+    [[nodiscard]] constexpr bool is_valid() const noexcept;
+};
+```
+
+### §53.5 Reproduzierbarkeit-Garantie (User-Pflicht)
+
+`WorkloadGenerator` mit identischer `WorkloadConfig` produziert IDENTISCHE
+Op-Sequenz. xorshift64-PRNG ist deterministisch ueber alle Plattformen.
+
+Pro Permutations-Binary wird `WorkloadGenerator` neu instantiiert + die
+Sequenz wird gegen das jeweilige Binary abgespielt. Resultat: pro Op-Index
+laesst sich Latenz/Throughput PRO-Permutation vergleichen (selbe Op an selbem
+Index → fairer Vergleich).
+
+### §53.6 PRNG-Wahl: xorshift64
+
+| Aspekt | xorshift64 (gewaehlt) | std::mt19937 |
+|---|---|---|
+| Period | 2^64 - 1 | 2^19937 - 1 |
+| State | uint64_t (8 Byte) | ~2.5 KB |
+| Determinismus | ja | ja |
+| Cross-Plattform | ja (Standard-Bitops) | ja (Standard) |
+| Speed | ~3 cycles/call | ~30-50 cycles/call |
+| Cache-Pressure | minimal | hoch (2.5 KB State) |
+| Crypto-Sicher | nein (nicht relevant fuer Mess) | nein |
+
+xorshift64 ist die richtige Wahl fuer Mess-Reihen: minimale State + maximale
+Speed, period >> num_operations (selbst bei 10^9 Ops nur ~5% des Cycle).
+
+### §53.7 Vorgefertigte Workload-Profile
+
+| Profile | Insert | Lookup | Erase | Clear | YCSB-Analogon |
+|---|---|---|---|---|---|
+| `make_insert_heavy` | 80% | 20% | 0% | 0% | Bulk-Load-Phase |
+| `make_lookup_heavy` | 5% | 95% | 0% | 0% | YCSB-B (read-dominant) |
+| `make_mixed_a` | 50% | 50% | 0% | 0% | YCSB-A |
+| `make_mixed_b` | 5% | 95% | 0% | 0% | YCSB-B (Variante) |
+
+User kann `WorkloadConfig{}` direkt anpassen oder eigene Helper hinzufuegen.
+
+### §53.8 Tests-Snapshot R6.A (21 Tests, 9 Suites)
+
+| Suite | Tests |
+|---|---|
+| R6A_Config (is_valid) | 6 |
+| R6A_Generator (Konstruktor + Normalisierung) | 3 |
+| R6A_Reproducibility (KRITISCH) | 2 |
+| R6A_Reset | 1 |
+| R6A_BulkApi | 2 |
+| R6A_Distribution | 1 |
+| R6A_KeyRange | 1 |
+| R6A_Profiles | 4 |
+| R6A_OpKindName | 1 |
+
+Anatomy+Compositions+Workload-Tests gesamt: **218 grün** (18 Test-Files,
++21 vs R5.J).
+
+### §53.9 Architektur-Bezug: Verantwortlichkeits-Trennung (Doku 14 §17)
+
+Workload-Driver gehoert zur CacheEngineBuilder-Schicht (analog R5.B
+AnatomyExecutionContext + 5 Builder-Commands). NICHT zur AnatomyBase.
+
+Die Anatomie liefert nur die Achsen + ObserverAggregate (Doku 14 §17.2);
+der Builder dispatched Insert/Lookup/Erase als Commands (Doku 14 §17.3).
+R6.A liefert nur den Generator; R6.B verbindet Generator + Commands +
+IAnatomyBase ueber die DLL-Grenze.
+
+### §53.10 NEXT R6.B / R6.C
+
+**R6.B (mittlerer Sprint):**
+- ABI-Erweiterung in `anatomy_module_abi_v1.hpp`: 4 weitere extern "C" Symbole
+  (`comdare_insert/lookup/erase/clear`) als optional-implementiert
+- `SearchAlgorithmAbiAdapter` bekommt internen `std::map` (Pilot)
+- `WorkloadDriver` Klasse: `run(IAnatomyBase&, WorkloadConfig) → MeasurementResult`
+- Integration: WorkloadDriver dispatched Generator-Ops als IAnatomyBase-Methoden-Aufrufe
+
+**R6.C (mittlerer Sprint):**
+- `MeasurementResult` POD mit Per-Op-Latenzen
+- Welch-t-Test ueber N Permutationen
+- Tabular/CSV-Report-Generator
+
+---
+
+**Ende Teil 18 §53 (Stand 2026-05-27 nacht — R6.A WorkloadConfig + deterministischer
+WorkloadGenerator + 21 Tests, Pflicht-Reproduzierbarkeit garantiert).**
