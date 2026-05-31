@@ -1,0 +1,35 @@
+% V41.P1 — Standalone-Demo: beweist die GESCHLOSSENE Kette
+%   Mess-Daten (16-Spalten-CSV) -> Stufe 04 (04_table.tex) + Stufe 05 (05_diagram.tex) -> PDF.
+% Dies ist ein reines BUILD-/ABNAHME-ARTEFAKT, KEIN Thesis-Volltext (D1 bleibt user-manuell).
+% Das Target comdare_pipeline_e2e kopiert diese Datei neben die generierten .tex und baut sie
+% via pdflatex zu pipeline_demo.pdf — der Beleg, dass der Pipeline-Output gueltiges, kompilierbares
+% LaTeX ist und die Kette bis zum PDF schliesst.
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{COMDARE-Pipeline --- E2E-Abnahme-Demonstration (V41.P1)}
+\author{Auto-generiert durch \texttt{comdare\_pipeline\_e2e}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Geschlossener 16-Spalten-Datenfluss}
+Diese Datei bindet die von der Pipeline (Stufe 01 $\to$ 04 $\to$ 05) erzeugten Artefakte
+per \texttt{\textbackslash input} ein und belegt, dass der Datenfluss vom Mess-CSV bis zum
+PDF geschlossen ist (Stufe 04 parst das 16-Spalten-Schema ohne Fehler; Stufe 05 gruppiert
+nach \texttt{workload\_used}).
+
+\bigskip
+\input{04_table.tex}
+
+\bigskip
+\input{05_diagram.tex}
+
+\end{document}

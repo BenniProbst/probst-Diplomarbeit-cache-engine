@@ -314,6 +314,17 @@ add_subdirectory(06_latex_to_pdf)            # final PDF-Build
 # Aufruf: cmake --build <build> --target comdare_pipeline_e2e
 # ─────────────────────────────────────────────────────────────────────────────
 set(_comdare_pipe_dir "${CMAKE_BINARY_DIR}/pipeline_e2e")
+# V41.P1: pdflatex (optional) — schliesst die Kette bis zum PDF (pipeline_demo.pdf), das die
+# generierten Tabelle/Diagramm einbindet. Demo = Build-Artefakt, KEIN Thesis-Volltext (D1/D2 user-manuell).
+find_program(COMDARE_PDFLATEX NAMES pdflatex)
+set(_comdare_pipe_pdf_cmds "")
+if(COMDARE_PDFLATEX)
+    set(_comdare_pipe_pdf_cmds
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_CURRENT_SOURCE_DIR}/06_latex_to_pdf/pipeline_demo.tex" "${_comdare_pipe_dir}/pipeline_demo.tex"
+        COMMAND ${CMAKE_COMMAND} -E chdir "${_comdare_pipe_dir}"
+            "${COMDARE_PDFLATEX}" -interaction=nonstopmode -halt-on-error pipeline_demo.tex)
+endif()
 add_custom_target(comdare_pipeline_e2e
     COMMAND ${CMAKE_COMMAND} -E make_directory "${_comdare_pipe_dir}"
     # Stufe 01: synthetischer 16-Spalten-Mess-Datensatz (Standin bis reale HW-Messung, P3).
@@ -322,7 +333,9 @@ add_custom_target(comdare_pipeline_e2e
     COMMAND $<TARGET_FILE:csv_to_latex_cli> "${_comdare_pipe_dir}/measurements.csv" "${_comdare_pipe_dir}/04_table.tex" "F15 Messreihe" "tab:f15"
     # Stufe 05: CSV -> TikZ-Diagramm, gruppiert nach workload_used (16-Spalten-Schema).
     COMMAND $<TARGET_FILE:diagram_generator_cli> --by-workload "${_comdare_pipe_dir}/measurements.csv" "${_comdare_pipe_dir}/05_diagram.tex"
-    COMMENT "V41.P1 E2E-Pipeline: 01 Sample-CSV -> 04 LaTeX + 05 TikZ (geschlossener 16-Spalten-Fluss)"
+    # Stufe 06 (best-effort, falls pdflatex vorhanden): Demo-PDF aus den generierten Artefakten.
+    ${_comdare_pipe_pdf_cmds}
+    COMMENT "V41.P1 E2E-Pipeline: 01 Sample-CSV -> 04 LaTeX + 05 TikZ -> 06 pipeline_demo.pdf (geschlossener 16-Spalten-Fluss)"
     VERBATIM)
 add_dependencies(comdare_pipeline_e2e
     sample_data_generator csv_to_latex_cli diagram_generator_cli)
