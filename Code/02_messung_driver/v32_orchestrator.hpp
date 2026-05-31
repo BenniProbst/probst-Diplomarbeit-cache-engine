@@ -13,6 +13,7 @@
 #include "cache_engine/builder/commands/compare_engine_command.hpp"
 #include "cache_engine/builder/commands/execute_engine_command.hpp"
 #include "cache_engine/builder/commands/workload.hpp"
+#include "op_type_filter.hpp"  // V41.P5 (G10): wirksame OP-1..OP-6 → WorkloadKind
 #include "prt_art/default_lookup/default_lookup_registry.hpp"
 #include "prt_art/identity/prt_art_execution_engine_adapter.hpp"
 
@@ -121,6 +122,29 @@ public:
 
         report.total_elapsed = std::chrono::steady_clock::now() - start;
         return report;
+    }
+
+    /**
+     * @brief V41.P5 (G10): OP-getriebene Messreihe — wirksame op_type → WorkloadKind
+     *
+     * Schliesst die vom E2E-Abnahme-Audit gefundene Luecke: vorher war die
+     * OP-1..OP-6-Empfehlung (datasets §0) NUR dokumentarisch, der op_type wurde
+     * im Orchestrator ignoriert. Jetzt bildet op_type_filter das XSD-<op_type>-
+     * Token wirksam auf den WorkloadKind ab, bevor die Messreihe laeuft.
+     *
+     * @param op_type_token XSD-Token "OP-1".."OP-6" (messreihe_v32_schema.xsd)
+     * @param base Basis-Workload (record_count/operation_count/seed bleiben erhalten)
+     * @param[out] applied true, wenn das Token erkannt + angewandt wurde
+     * @return MessreiheReport ueber den op_type-spezifischen Workload
+     */
+    [[nodiscard]] MessreiheReport run_messreihe_for_op_type(
+        std::string_view op_type_token,
+        const cmd::Workload& base,
+        bool& applied)
+    {
+        cmd::Workload effective = base;
+        applied = apply_op_type_token(op_type_token, effective);
+        return run_default_lookup_messreihe(effective);
     }
 
     /// V33.C.1 Einzel-Permutation: parallel EE-A + EE-B + Vergleich

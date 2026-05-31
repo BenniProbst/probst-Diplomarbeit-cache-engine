@@ -48,6 +48,15 @@ comdare_da_add_test(test_axis_tree
 target_include_directories(test_axis_tree PRIVATE
     ${CMAKE_SOURCE_DIR}/02_messung_driver)
 
+# V41.P5 (G10, 2026-05-31) - op_type_filter: wirksame OP-1..OP-6 → WorkloadKind
+# (header-only: braucht nur cache-engine workload.hpp + 02_messung_driver → immer gebaut,
+#  unabhaengig vom COMDARE_V32_ENABLE-Gate, das die schweren Orchestrator-Tests bedingt).
+comdare_da_add_test(test_op_type_filter
+    SOURCES unit/test_op_type_filter.cpp)
+target_include_directories(test_op_type_filter PRIVATE
+    ${CMAKE_SOURCE_DIR}/02_messung_driver
+    ${COMDARE_CACHE_ENGINE_DIR}/libs)
+
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
 if(COMDARE_V32_ENABLE)
