@@ -1,5 +1,10 @@
 # Architektur-Master REV7.7 — Aktueller Stand (V31, 2026-05-15)
 
+> ⚠️ **SUPERSEDED (2026-05-31):** Dieser REV7.7/V31-Master ist vom Code überholt (axis-zentrische Restruktur
+> F.2, Plugin-Prüfling-Modell, DLL-F15-Pipeline, sezierte Organe). **IST-treue Single-Source-of-Truth:**
+> `Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md`
+> + `…/20260531-e2e-abnahme-audit-und-entscheidungen.md`. Niemals löschen — nur Banner (Direktive).
+
 **Stand:** 2026-05-15 (K-C.3)
 **Quellen:**
 - REV7-Master: `../termine/20260508 Termin 7/Phase5_UML_Detail/24_architektur_skizze_REV7_2026_05_13.md` (872 Z)

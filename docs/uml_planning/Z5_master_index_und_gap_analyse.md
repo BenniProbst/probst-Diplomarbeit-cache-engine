@@ -1,5 +1,10 @@
 # Z.5 — Master-UML-INDEX + Gap-Analyse Ist-vs-Soll
 
+> ⚠️ **SUPERSEDED (2026-05-31):** Die UML-Planung Y1–Y4 / Z1–Z5 (Stand 2026-05-18, in-process
+> register_engine-Modell, prt-art-als-Submodul-Topologie) ist vom Code überholt (axis-zentrisch + Plugin
+> + DLL-F15). **IST-treue Quelle:** `Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md`.
+> Niemals löschen — nur Banner.
+
 ## §0 KRITISCHE KORREKTUR AA.3 (2026-05-18 spaet)
 
 **User-Direktive 2026-05-18 spaet:** Die in §3 stehende Tabelle markiert mehrere PRT-ART-Sub-Achsen als "FEHLT - NEU". **Das ist GRUNDSAETZLICH FALSCH.**
