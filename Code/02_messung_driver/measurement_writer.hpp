@@ -3,12 +3,13 @@
 //
 // Schreibt binary-File im Format das Stage 03 (binary_to_csv) erwartet:
 //   uint32 magic = 0xC0FFEE02
-//   uint32 version = 1
+//   uint32 version = 2   (V41.P1: v2 fuegt workload_used hinzu; v1 = ohne)
 //   uint64 num_records
 //   foreach record:
 //     uint32 perm_id_len + char[perm_id_len]
 //     uint64 fingerprint
 //     uint8  succeeded
+//     [v2+] uint32 workload_len + char[workload_len]   (workload_used, z.B. "micro"/"YCSB_A")
 //     comdare_measurement_record_v1 (fixed-size POD)
 
 #pragma once
@@ -26,7 +27,7 @@
 namespace comdare::messung_driver {
 
 inline constexpr std::uint32_t kMeasurementMagic   = 0xC0FFEE02u;
-inline constexpr std::uint32_t kMeasurementVersion = 1u;
+inline constexpr std::uint32_t kMeasurementVersion = 2u;  // V41.P1: v2 = + workload_used pro Record
 
 class MeasurementWriter {
 public:
@@ -46,9 +47,12 @@ public:
 
     [[nodiscard]] bool ok() const { return ofs_.is_open() && !ofs_.fail(); }
 
+    // V41.P1: workload_used (z.B. "micro" fuer den Plugin-Mikrobench, "YCSB_A".. fuer echte Reihen)
+    // wird als laengen-praefixierter String VOR dem POD-Record geschrieben (Container-v2).
     void add(std::string_view perm_id,
              std::uint64_t fingerprint,
              bool succeeded,
+             std::string_view workload_used,
              comdare_measurement_record_v1 const& rec) {
         if (!ofs_) return;
         std::uint32_t const id_len = static_cast<std::uint32_t>(perm_id.size());
@@ -57,6 +61,9 @@ public:
         ofs_.write(reinterpret_cast<char const*>(&fingerprint), sizeof(std::uint64_t));
         std::uint8_t const succ_byte = succeeded ? 1u : 0u;
         ofs_.write(reinterpret_cast<char const*>(&succ_byte), sizeof(std::uint8_t));
+        std::uint32_t const wl_len = static_cast<std::uint32_t>(workload_used.size());
+        ofs_.write(reinterpret_cast<char const*>(&wl_len), sizeof(std::uint32_t));
+        ofs_.write(workload_used.data(), static_cast<std::streamsize>(wl_len));
         ofs_.write(reinterpret_cast<char const*>(&rec), sizeof(comdare_measurement_record_v1));
         ++num_records_;
     }

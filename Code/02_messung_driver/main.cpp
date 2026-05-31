@@ -238,11 +238,13 @@ int main(int argc, char* argv[]) {
                 }
 
                 // V41.B1: pro Plugin EIN aggregate binary record (mean us/op)
+                // V41.P1: workload_used = "micro" (der eingebaute Plugin-Mikrobenchmark; echte
+                // YCSB-Reihen setzen hier spaeter das Config-Workload-Label).
                 if (writer.ok() && !samples_us.empty()) {
                     auto rec = comdare::messung_driver::make_record_from_run(
                         static_cast<std::uint64_t>(kRunOps), stats.mean_us);
                     auto fp = comdare::messung_driver::fingerprint_of(p.desc->id);
-                    writer.add(p.desc->id, fp, all_ok, rec);
+                    writer.add(p.desc->id, fp, all_ok, "micro", rec);
                 }
             }
             writer.finalize();

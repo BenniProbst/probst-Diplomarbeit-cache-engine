@@ -25,6 +25,7 @@ struct CsvRow {
     std::string permutation_id;
     std::uint64_t fingerprint            = 0;
     bool         succeeded               = false;
+    std::string  workload_used           = "n/a";  // V41.P1: 16-Spalten-Schema (4. Spalte)
     std::uint64_t op_count               = 0;
     std::uint64_t total_cycles           = 0;
     std::uint64_t cache_misses_l1        = 0;

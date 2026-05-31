@@ -44,24 +44,26 @@ int parse_csv(std::filesystem::path const& in, std::vector<CsvRow>& out_rows) {
     while (std::getline(f, line)) {
         if (line.empty()) continue;
         auto cols = split_line(line);
-        if (cols.size() < 15) return status_parse_error;
+        // V41.P1: 16-Spalten-Schema kanonisch (workload_used als 4. Spalte, Index 3).
+        if (cols.size() < 16) return status_parse_error;
         try {
             CsvRow r;
             r.permutation_id           = cols[0];
             r.fingerprint              = std::stoull(cols[1]);
             r.succeeded                = (cols[2] == "1");
-            r.op_count                 = std::stoull(cols[3]);
-            r.total_cycles             = std::stoull(cols[4]);
-            r.cache_misses_l1          = std::stoull(cols[5]);
-            r.cache_misses_l2          = std::stoull(cols[6]);
-            r.cache_misses_l3          = std::stoull(cols[7]);
-            r.dtlb_misses              = std::stoull(cols[8]);
-            r.coherence_invalidations  = std::stoull(cols[9]);
-            r.energy_micro_joules      = std::stoull(cols[10]);
-            r.bytes_allocated          = std::stoull(cols[11]);
-            r.bytes_in_use_peak        = std::stoull(cols[12]);
-            r.external_frag            = std::stod(cols[13]);
-            r.internal_frag            = std::stod(cols[14]);
+            r.workload_used            = cols[3];
+            r.op_count                 = std::stoull(cols[4]);
+            r.total_cycles             = std::stoull(cols[5]);
+            r.cache_misses_l1          = std::stoull(cols[6]);
+            r.cache_misses_l2          = std::stoull(cols[7]);
+            r.cache_misses_l3          = std::stoull(cols[8]);
+            r.dtlb_misses              = std::stoull(cols[9]);
+            r.coherence_invalidations  = std::stoull(cols[10]);
+            r.energy_micro_joules      = std::stoull(cols[11]);
+            r.bytes_allocated          = std::stoull(cols[12]);
+            r.bytes_in_use_peak        = std::stoull(cols[13]);
+            r.external_frag            = std::stod(cols[14]);
+            r.internal_frag            = std::stod(cols[15]);
             out_rows.push_back(std::move(r));
         } catch (std::exception const&) {
             return status_parse_error;

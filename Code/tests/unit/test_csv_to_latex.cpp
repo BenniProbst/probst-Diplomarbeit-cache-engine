@@ -50,7 +50,7 @@ TEST(CsvToLatex, WriteLatexHasBooktabsStructure) {
     auto tmp = std::filesystem::temp_directory_path()
              / ("da_c2l_test_" + std::to_string(rand()) + ".tex");
     std::vector<c2l::CsvRow> rows;
-    rows.push_back({"perm_test", 0xA, true, 100, 200, 30, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0});
+    rows.push_back({"perm_test", 0xA, true, "micro", 100, 200, 30, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0});
     EXPECT_EQ(c2l::write_latex(tmp.string(), rows, "Test", "tab:test"), c2l::status_ok);
     auto content = read_file(tmp);
     EXPECT_NE(content.find("\\begin{table}"), std::string::npos);

@@ -27,6 +27,12 @@ comdare_da_add_test(test_diagram_generator
     SOURCES unit/test_diagram_generator.cpp
     LIBRARIES comdare::diagram_generator)
 
+# V41.P1 (2026-05-31) — Cross-Stage-Test: 16-Spalten-Schema-Kohärenz Stufe 03 → 04 → 05
+# (deckt den vom E2E-Abnahme-Audit gefundenen CSV-Schema-Bruch ab, der vorher in keinem Test sichtbar war).
+comdare_da_add_test(test_pipeline_cross_stage
+    SOURCES unit/test_pipeline_cross_stage.cpp
+    LIBRARIES comdare::binary_to_csv comdare::csv_to_latex comdare::diagram_generator)
+
 comdare_da_add_test(test_messung_driver
     SOURCES unit/test_messung_driver.cpp
     LIBRARIES

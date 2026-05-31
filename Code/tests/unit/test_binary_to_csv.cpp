@@ -41,6 +41,10 @@ void write_test_binary(std::filesystem::path const& p,
         out.write(reinterpret_cast<char const*>(&r.fingerprint), sizeof(r.fingerprint));
         std::uint8_t succ = r.succeeded ? 1 : 0;
         out.write(reinterpret_cast<char const*>(&succ), sizeof(succ));
+        // V41.P1: Container-v2 schreibt workload_used (laengen-praefixiert) vor dem POD-Record.
+        std::uint32_t wl_len = static_cast<std::uint32_t>(r.workload_used.size());
+        out.write(reinterpret_cast<char const*>(&wl_len), sizeof(wl_len));
+        out.write(r.workload_used.data(), wl_len);
         out.write(reinterpret_cast<char const*>(&r.record), sizeof(r.record));
     }
 }
@@ -52,6 +56,7 @@ TEST_F(BinaryToCsvFixture, RoundtripSingleRecord) {
     r.permutation_id = "test_perm";
     r.fingerprint    = 0xC0FFEE;
     r.succeeded      = true;
+    r.workload_used  = "YCSB_A";  // V41.P1
     r.record.version      = 1;
     r.record.op_count     = 500;
     r.record.total_cycles = 99999;
@@ -64,6 +69,7 @@ TEST_F(BinaryToCsvFixture, RoundtripSingleRecord) {
     ASSERT_EQ(loaded.size(), 1u);
     EXPECT_EQ(loaded[0].permutation_id, "test_perm");
     EXPECT_EQ(loaded[0].fingerprint, 0xC0FFEEu);
+    EXPECT_EQ(loaded[0].workload_used, "YCSB_A");  // V41.P1: roundtrip
     EXPECT_EQ(loaded[0].record.op_count, 500u);
     EXPECT_EQ(loaded[0].record.total_cycles, 99999u);
 }
@@ -101,6 +107,7 @@ TEST_F(BinaryToCsvFixture, WriteCsvHasHeader) {
     std::string line;
     std::getline(in, line);
     EXPECT_NE(line.find("permutation_id"), std::string::npos);
+    EXPECT_NE(line.find("workload_used"), std::string::npos);  // V41.P1: 16-Spalten-Schema
     EXPECT_NE(line.find("op_count"), std::string::npos);
 }
 
