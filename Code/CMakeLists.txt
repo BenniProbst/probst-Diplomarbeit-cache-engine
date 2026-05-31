@@ -305,6 +305,28 @@ add_subdirectory(04_csv_to_latex)            # CSV -> LaTeX-Tabelle
 add_subdirectory(05_diagram_generator)       # CSV -> TikZ-Plot
 add_subdirectory(06_latex_to_pdf)            # final PDF-Build
 
+# ─────────────────────────────────────────────────────────────────────────────
+# V41.P1 (2026-05-31) — E2E-Pipeline-Orchestrierung: treibt EINEN Datensatz GESCHLOSSEN durch die
+# 6-Stufen-Kette und beweist damit den 16-Spalten-Schema-Fluss (Audit-Blocker G1/G2 behoben).
+#   Sample-Pfad (ohne Permutations-DLLs lauffaehig, fuer die Abnahme-Demonstration):
+#     01 -> 16-col CSV -> 04 LaTeX-Tabelle + 05 TikZ-Diagramm (--by-workload) -> 06 PDF (best-effort, braucht pdflatex)
+#   Realer Pfad (mit gebauten DLLs): messung_driver(02) -> .bin -> binary-to-csv(03) -> 04/05/06 (analog).
+# Aufruf: cmake --build <build> --target comdare_pipeline_e2e
+# ─────────────────────────────────────────────────────────────────────────────
+set(_comdare_pipe_dir "${CMAKE_BINARY_DIR}/pipeline_e2e")
+add_custom_target(comdare_pipeline_e2e
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${_comdare_pipe_dir}"
+    # Stufe 01: synthetischer 16-Spalten-Mess-Datensatz (Standin bis reale HW-Messung, P3).
+    COMMAND $<TARGET_FILE:sample_data_generator> "${_comdare_pipe_dir}/measurements.csv"
+    # Stufe 04: CSV -> booktabs-LaTeX-Tabelle (parst jetzt 16 Spalten ohne Wurf).
+    COMMAND $<TARGET_FILE:csv_to_latex_cli> "${_comdare_pipe_dir}/measurements.csv" "${_comdare_pipe_dir}/04_table.tex" "F15 Messreihe" "tab:f15"
+    # Stufe 05: CSV -> TikZ-Diagramm, gruppiert nach workload_used (16-Spalten-Schema).
+    COMMAND $<TARGET_FILE:diagram_generator_cli> --by-workload "${_comdare_pipe_dir}/measurements.csv" "${_comdare_pipe_dir}/05_diagram.tex"
+    COMMENT "V41.P1 E2E-Pipeline: 01 Sample-CSV -> 04 LaTeX + 05 TikZ (geschlossener 16-Spalten-Fluss)"
+    VERBATIM)
+add_dependencies(comdare_pipeline_e2e
+    sample_data_generator csv_to_latex_cli diagram_generator_cli)
+
 if(COMDARE_DA_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
