@@ -36,6 +36,12 @@ comdare_da_add_test(test_messung_driver
 target_include_directories(test_messung_driver PRIVATE
     ${COMDARE_CACHE_ENGINE_DIR}/cache_engine/include)
 
+# V41.G.1 (2026-05-31) - Hierarchischer Achsen-Baum (axis_tree.hpp, pure std → immer gebaut)
+comdare_da_add_test(test_axis_tree
+    SOURCES unit/test_axis_tree.cpp)
+target_include_directories(test_axis_tree PRIVATE
+    ${CMAKE_SOURCE_DIR}/02_messung_driver)
+
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
 if(COMDARE_V32_ENABLE)

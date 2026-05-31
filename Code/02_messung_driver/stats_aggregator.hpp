@@ -11,6 +11,9 @@
 // V41.B3: welch_t_test.hpp aus cache-engine (include-path via target_include_directories)
 #include <cache_engine/builder/commands/welch_t_test.hpp>
 
+// V41.G.1: Achsen-Baum-Parser für per-Achsen-CSV-Spalten.
+#include "axis_tree.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -123,6 +126,28 @@ inline void write_stats_csv(std::filesystem::path const& path,
     }
 }
 
+// V41.G.1 — per-Achsen-Spalten-CSV: zerlegt die `axes`-Sammelspalte in EINE Spalte je Achsen-Schlüssel
+// (z.B. simd,layout,alloc), sodass die Auswertung pro Achsen-Ebene auf-/absteigen kann.
+inline void write_stats_csv_per_axis(std::filesystem::path const& path,
+                                     std::span<const PermStats> stats,
+                                     std::vector<std::string> const& axis_keys) {
+    std::filesystem::create_directories(path.parent_path());
+    std::ofstream f(path);
+    f << "permutation_id,subsystem";
+    for (auto const& k : axis_keys) f << ',' << k;
+    f << ",version,n_runs,mean_us,stddev_us,sem_us,ci95_low,ci95_high,min_us,max_us\n";
+    for (auto const& s : stats) {
+        auto const kv = parse_axes(s.axes);
+        f << s.permutation_id << ',' << s.subsystem;
+        for (auto const& k : axis_keys) {
+            f << ",\"" << axis_value(kv, k).value_or("") << '"';
+        }
+        f << ',' << s.version << ',' << s.n_runs << ','
+          << s.mean_us << ',' << s.stddev << ',' << s.sem << ','
+          << s.ci_low << ',' << s.ci_high << ',' << s.min_us << ',' << s.max_us << '\n';
+    }
+}
+
 struct PairwiseRow {
     std::string a;
     std::string b;
@@ -133,15 +158,21 @@ struct PairwiseRow {
     double      df;
     double      p_value;
     bool        significant_5pc;
+    // V41.G.1 — Achsen-Subtree-Kontext: welche Achse variiert, bei welchem fixierten Rest.
+    std::string varying_axis;   // z.B. "alloc"
+    std::string fixed_context;  // z.B. "simd=avx2;layout=soa"
 };
 
 inline void write_pairwise_csv(std::filesystem::path const& path,
                                std::span<const PairwiseRow> rows) {
     std::filesystem::create_directories(path.parent_path());
     std::ofstream f(path);
-    f << "perm_a,perm_b,mean_a_us,mean_b_us,delta_us,t_statistic,df,p_value,significant_5pc\n";
+    // V41.G.1: varying_axis + fixed_context-Spalten ergänzt (Subtree-restringierte Vergleiche).
+    f << "perm_a,perm_b,varying_axis,fixed_context,mean_a_us,mean_b_us,delta_us,"
+         "t_statistic,df,p_value,significant_5pc\n";
     for (auto const& r : rows) {
-        f << r.a << ',' << r.b << ',' << r.mean_a << ',' << r.mean_b << ','
+        f << r.a << ',' << r.b << ',' << r.varying_axis << ",\"" << r.fixed_context << "\","
+          << r.mean_a << ',' << r.mean_b << ','
           << r.delta << ',' << r.t_stat << ',' << r.df << ',' << r.p_value << ','
           << (r.significant_5pc ? 1 : 0) << '\n';
     }

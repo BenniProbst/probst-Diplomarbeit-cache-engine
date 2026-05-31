@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <regex>
@@ -255,53 +256,95 @@ int main(int argc, char* argv[]) {
             comdare::messung_driver::write_stats_csv(stats_csv, all_stats);
             std::cout << "[V41.B3] " << all_stats.size() << " Stats-Eintraege: " << stats_csv.string() << "\n";
 
-            // Sammle Samples nochmal als map<id, vector<us>> fuer paarweise Welch
+            // ─── V41.G.1: Hierarchische Achsen-Iteration + Auswertung ───
+            namespace md = comdare::messung_driver;
+            // Item 1: aus (id, axes) jeder Permutation den Achsen-Baum bauen.
+            std::vector<md::AxisItem> axis_items;
+            axis_items.reserve(all_stats.size());
+            for (auto const& s : all_stats) {
+                axis_items.push_back(md::make_axis_item(s.permutation_id, s.axes));
+            }
+            auto const axis_keys = md::collect_axis_keys(axis_items);
+            auto const tree = md::build_axis_tree(axis_items, axis_keys);
+
+            // Item 2: hierarchische Ausgabe — Gruppen-Header je Achsen-Ebene "== key=value ==".
+            std::cout << "[V41.G.1] Achsen-Baum (" << axis_keys.size() << " Achsen:";
+            for (auto const& k : axis_keys) std::cout << ' ' << k;
+            std::cout << "):\n";
+            std::function<void(md::AxisTreeNode const&, int)> print_node =
+                [&](md::AxisTreeNode const& n, int depth) {
+                    std::string const indent(static_cast<std::size_t>(depth) * 2, ' ');
+                    if (!n.axis_key.empty()) {
+                        std::cout << indent << "== " << n.axis_key << '=' << n.axis_value
+                                  << " == (" << md::count_leaf_items(n) << " Perm.)\n";
+                    }
+                    for (auto const& c : n.children) print_node(c, depth + 1);
+                    for (auto idx : n.item_indices) {
+                        std::cout << indent << "  - " << all_stats[idx].permutation_id
+                                  << "  " << all_stats[idx].mean_us << " us/op\n";
+                    }
+                };
+            print_node(tree, 0);
+
+            // Item 3: per-Achsen-Spalten-CSV (eine Spalte je Achsen-Schlüssel).
+            std::filesystem::path const per_axis_csv = v41_out_dir / "permutation_stats_per_axis.csv";
+            md::write_stats_csv_per_axis(per_axis_csv, all_stats, axis_keys);
+            std::cout << "[V41.G.1] per-Achsen-CSV (" << axis_keys.size() << " Achsen-Spalten): "
+                      << per_axis_csv.string() << "\n";
+
+            // Samples je id für Welch sammeln.
             std::map<std::string, std::vector<double>> samples_by_id;
             for (auto const& p : plugins) {
                 std::vector<double> samples;
                 for (std::size_t rep = 0; rep < kReps; ++rep) {
                     double micros = 0.0;
-                    if (p.desc->run(kRunOps, &micros) == 0) {
-                        samples.push_back(micros);
-                    }
+                    if (p.desc->run(kRunOps, &micros) == 0) samples.push_back(micros);
                 }
                 samples_by_id[std::string{p.desc->id}] = std::move(samples);
             }
 
-            // Paarweiser Welch: nur fuer interessante Achsen-Paare innerhalb
-            // gleicher SIMD+Layout (Vergleich allokator-Variants).
-            std::vector<comdare::messung_driver::PairwiseRow> pairs;
-            std::vector<std::string> ce_keys;
-            for (auto const& [id, _] : samples_by_id) {
-                if (id.rfind("pa_", 0) != 0) ce_keys.push_back(id);
-            }
-            for (std::size_t i = 0; i < ce_keys.size(); ++i) {
-                for (std::size_t j = i + 1; j < ce_keys.size(); ++j) {
-                    auto const& a = ce_keys[i];
-                    auto const& b = ce_keys[j];
-                    auto const& sa = samples_by_id[a];
-                    auto const& sb = samples_by_id[b];
-                    if (sa.size() < 2 || sb.size() < 2) continue;
-                    auto w = comdare::messung_driver::welch_us(sa, sb);
-                    if (!w.valid) continue;
-                    comdare::messung_driver::PairwiseRow row{};
-                    row.a = a;
-                    row.b = b;
-                    row.mean_a = w.mean_a / 1000.0;  // ns->us
-                    row.mean_b = w.mean_b / 1000.0;
-                    row.delta  = row.mean_a - row.mean_b;
-                    row.t_stat = w.t_statistic;
-                    row.df     = w.degrees_of_freedom;
-                    row.p_value = w.p_value;
-                    row.significant_5pc = (w.p_value < 0.05);
-                    pairs.push_back(row);
+            // Item 4: Welch RESTRINGIERT auf Achsen-Subtrees — je variierender Achse nur Items, die in
+            // ALLEN anderen Achsen übereinstimmen (z.B. gleiche simd+layout, vergleiche Allokator-Varianten).
+            std::vector<md::PairwiseRow> pairs;
+            for (auto const& varying : axis_keys) {
+                auto const groups = md::subtree_groups_varying(axis_items, axis_keys, varying);
+                for (auto const& g : groups) {
+                    std::string fixed;
+                    for (auto const& k : axis_keys) {
+                        if (k == varying) continue;
+                        fixed += (fixed.empty() ? "" : ";") + k + "=" +
+                                 md::axis_value(axis_items[g.front()].axes, k).value_or("<none>");
+                    }
+                    for (std::size_t i = 0; i < g.size(); ++i) {
+                        for (std::size_t j = i + 1; j < g.size(); ++j) {
+                            auto const& a = axis_items[g[i]].id;
+                            auto const& b = axis_items[g[j]].id;
+                            auto const& sa = samples_by_id[a];
+                            auto const& sb = samples_by_id[b];
+                            if (sa.size() < 2 || sb.size() < 2) continue;
+                            auto w = md::welch_us(sa, sb);
+                            if (!w.valid) continue;
+                            md::PairwiseRow row{};
+                            row.a = a; row.b = b;
+                            row.mean_a = w.mean_a / 1000.0;  // ns->us
+                            row.mean_b = w.mean_b / 1000.0;
+                            row.delta  = row.mean_a - row.mean_b;
+                            row.t_stat = w.t_statistic;
+                            row.df     = w.degrees_of_freedom;
+                            row.p_value = w.p_value;
+                            row.significant_5pc = (w.p_value < 0.05);
+                            row.varying_axis = varying;
+                            row.fixed_context = fixed;
+                            pairs.push_back(row);
+                        }
+                    }
                 }
             }
-            std::filesystem::path pairs_csv = v41_out_dir / "welch_pairwise.csv";
-            comdare::messung_driver::write_pairwise_csv(pairs_csv, pairs);
+            std::filesystem::path const pairs_csv = v41_out_dir / "welch_pairwise.csv";
+            md::write_pairwise_csv(pairs_csv, pairs);
             std::size_t sig = 0;
             for (auto const& r : pairs) if (r.significant_5pc) ++sig;
-            std::cout << "[V41.B3] " << pairs.size() << " paarweise Welch-Tests (cache_engine), "
+            std::cout << "[V41.G.1] " << pairs.size() << " subtree-restringierte Welch-Tests, "
                       << sig << " signifikant (p<0.05): " << pairs_csv.string() << "\n";
 
             comdare::messung_driver::unload_all(plugins);
