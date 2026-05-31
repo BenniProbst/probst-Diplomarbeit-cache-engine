@@ -1,5 +1,7 @@
 # Z.4 — Soll-UML Cross-Repo bidirektionale Schnittstellen (M-Modell)
 
+> ⚠️ **SUPERSEDED (2026-05-31):** Überholter Planungs-/Architektur-Stand (axis-zentrische Restruktur F.2, Plugin-Prüfling-Modell, DLL-F15-Pipeline, sezierte Organe). IST-treue Single-Source-of-Truth: `comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md` + `…/20260531-e2e-abnahme-audit-und-entscheidungen.md`. Niemals löschen — nur Banner.
+
 **Stand:** 2026-05-18 (Z.4)
 **Vorgaenger:** `Y4_cross_repo_beziehungen.md` + `../architektur/10_schichten_modell_M.md`
 **Konsequenz:** ABI-Stabilitaet zwischen den 3 Repos

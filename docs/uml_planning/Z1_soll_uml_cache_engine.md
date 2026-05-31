@@ -1,5 +1,7 @@
 # Z.1 — Soll-UML comdare-cache-engine (Master)
 
+> ⚠️ **SUPERSEDED (2026-05-31):** Überholter Planungs-/Architektur-Stand (axis-zentrische Restruktur F.2, Plugin-Prüfling-Modell, DLL-F15-Pipeline, sezierte Organe). IST-treue Single-Source-of-Truth: `comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md` + `…/20260531-e2e-abnahme-audit-und-entscheidungen.md`. Niemals löschen — nur Banner.
+
 **Stand:** 2026-05-18 (Z.1)
 **Vorgaenger:** `Y1_cache_engine_ist_kartografie.md` (Ist-Bestandsaufnahme)
 **Konsequenz:** V32+ Code-Refactoring nach diesen Klassendiagrammen

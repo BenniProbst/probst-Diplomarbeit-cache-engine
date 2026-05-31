@@ -1,5 +1,7 @@
 # UML-Klassen — Konsolidierter Master
 
+> ⚠️ **SUPERSEDED (2026-05-31):** Überholter Planungs-/Architektur-Stand (axis-zentrische Restruktur F.2, Plugin-Prüfling-Modell, DLL-F15-Pipeline, sezierte Organe). IST-treue Single-Source-of-Truth: `comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md` + `…/20260531-e2e-abnahme-audit-und-entscheidungen.md`. Niemals löschen — nur Banner.
+
 **Stand:** 2026-05-15 (K-C.6)
 **Quellen:** Phase5_UML_Detail Doks 01-06 (~1.700 Z) — alle in `../termine/20260508 Termin 7/Phase5_UML_Detail/`
 **Notation:** PlantUML-aehnliche Pseudo-Syntax (siehe Doc 00_README.md §"Notations-Konvention")

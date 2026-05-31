@@ -1,5 +1,7 @@
 # Taxonomien — Cache-Strategie + Algorithmus-Strategie (Konsolidiert)
 
+> ⚠️ **SUPERSEDED (2026-05-31):** Überholter Planungs-/Architektur-Stand (axis-zentrische Restruktur F.2, Plugin-Prüfling-Modell, DLL-F15-Pipeline, sezierte Organe). IST-treue Single-Source-of-Truth: `comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md` + `…/20260531-e2e-abnahme-audit-und-entscheidungen.md`. Niemals löschen — nur Banner.
+
 **Stand:** 2026-05-15 (K-C.10)
 **Quellen:** Phase5_UML_Detail Doks 11+12 (`11_cache_strategy_taxonomie.md` 610 Z + `12_algorithmus_strategie_taxonomie.md` 916 Z)
 **Zweck:** Voll-konsolidierte Taxonomien beider Saeulen — referenziert von Saeule A (`03_konzepte_saeule_a.md`) und Saeule B (`04_konzepte_saeule_b.md`).

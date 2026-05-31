@@ -1,5 +1,7 @@
 # Z.3 — Soll-UML Diplomarbeit/Code/ (messung_driver Outer-Loop + Tool-Chain)
 
+> ⚠️ **SUPERSEDED (2026-05-31):** Überholter Planungs-/Architektur-Stand (axis-zentrische Restruktur F.2, Plugin-Prüfling-Modell, DLL-F15-Pipeline, sezierte Organe). IST-treue Single-Source-of-Truth: `comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md` + `…/20260531-e2e-abnahme-audit-und-entscheidungen.md`. Niemals löschen — nur Banner.
+
 **Stand:** 2026-05-18 (Z.3)
 **Vorgaenger:** `Y3_diplomarbeit_code_ist_kartografie.md`
 **Konsequenz:** V32+ messung_driver-Erweiterung + Tool-Chain-Integration
