@@ -1,7 +1,7 @@
 # binary_to_csv — Deserialisiert measurement_record_v1 binary → CSV
 # Konsumiert cache-engine ABI (module_abi_v1.hpp).
 
-add_library(comdare_binary_to_csv STATIC
+comdare_da_add_library(comdare_binary_to_csv MODULE M03 SOURCES
     binary_to_csv.cpp
 )
 target_compile_features(comdare_binary_to_csv PUBLIC cxx_std_23)

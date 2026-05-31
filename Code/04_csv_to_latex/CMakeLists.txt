@@ -1,7 +1,7 @@
 # csv_to_latex — CSV + Algorithmus-Baustein-Beschreibungen → LaTeX
 # Konsumiert binary_to_csv-Output + bausteine_descriptions JSON/XML.
 
-add_library(comdare_csv_to_latex STATIC
+comdare_da_add_library(comdare_csv_to_latex MODULE M04 SOURCES
     csv_to_latex.cpp
 )
 target_compile_features(comdare_csv_to_latex PUBLIC cxx_std_23)

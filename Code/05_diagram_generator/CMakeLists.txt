@@ -1,7 +1,7 @@
 # diagram_generator — C++ Bildgenerator (TikZ-Output, A4-aware)
 # Liest CSV → schreibt TikZ-Code → wird in LaTeX-Manuskript eingebunden.
 
-add_library(comdare_diagram_generator STATIC
+comdare_da_add_library(comdare_diagram_generator MODULE M05 SOURCES
     diagram_generator.cpp
 )
 target_compile_features(comdare_diagram_generator PUBLIC cxx_std_23)
