@@ -7,20 +7,29 @@
 *.lot
 *.bbl
 *.blg
+*.bcf
+*.run.xml
 *.synctex.gz
 *.fls
 *.fdb_latexmk
-kapitel/*.aux
-anhang/*.aux
 
-# lokale Build-Log-Umleitungen
+# lokale Build-Log-Umleitungen (build.ps1 / manuelle Builds)
+*.p1.txt
+*.p2.txt
+*.p3.txt
+*.bib.txt
 p1.txt
 p2.txt
 p3.txt
 bib.txt
 
-# erzeugtes PDF (lokale Validierung; bei Bedarf zum Overleaf-Abgleich entfernen)
-diplomarbeit.pdf
+# Artefakte mit literalem $job (aus fehlerhaften Builds)
+$job.*
+
+# erzeugte PDFs (lokale Validierung; EN/DE)
+diplomarbeit*.pdf
 
 # EPS->PDF-Konvertat des Logos
 zih_logo_de_sw-eps-converted-to.pdf
+
+# Hinweis: Quell-.aux in kapitel/{en,de} + anhang/{en,de} sind durch *.aux global abgedeckt.

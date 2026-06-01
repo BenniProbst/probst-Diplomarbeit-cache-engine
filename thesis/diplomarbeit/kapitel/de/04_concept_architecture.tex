@@ -1,4 +1,117 @@
 \chapter{Konzept und Architektur}\label{ch:concept}
 
-% TODO(DE): Uebersetzung aus kapitel/en/04_concept_architecture.tex -- \label/\ref/\cite identisch halten.
+Dieses Kapitel präsentiert den Kernbeitrag der Arbeit: ein Achsen-Bibliotheks-Framework, das
+cache-bewusste Suchalgorithmen in austauschbare, orthogonale Bausteine-Achsen zerlegt, die
+geschichtete Engine-Architektur, die es realisiert, die ABI-stabile Modul-Schnittstelle, die
+vierzehn-Achsen-Permutationsmatrix, den Prüfling PRT-ART und den Builder, der die
+Drei-Stufen-Prüfung orchestriert.
 
+\section{Das Achsen-Bibliotheks-Framework}\label{sec:axis-framework}
+
+Die zentrale Idee besteht darin, einen Algorithmus nicht als Monolith zu behandeln, sondern
+als \emph{Komposition orthogonaler Achsen}, wobei jede Achse eine Teilentscheidung eines
+cache-bewussten Index repräsentiert (wie Seiten angeordnet werden, wie Knoten verzweigen, wie
+Speicher alloziert wird, wie Nebenläufigkeit behandelt wird usw.). Ein konkreter Algorithmus
+ist dann ein Punkt im kartesischen Produkt aller Achsen, und ein Stand-der-Technik-Entwurf
+wird als eine explizite Konfiguration rekonstruiert. Die entscheidende Eigenschaft ist die
+\emph{modulare Austauschbarkeit}: Forschende können eine neue Achsen-Variante isoliert
+untersuchen --- und ihren Effekt pro Achse und für den gesamten Algorithmus messen --- ohne
+alle anderen neu zu implementieren. Das macht den Vergleich zweier
+\texttt{std::map}-Implementierungen (Abschnitt~\ref{sec:stdmap-interface}) zu einem
+kontrollierten, reproduzierbaren Experiment.
+
+\section{Vier-Subsystem-Trennung (M-Modell)}\label{sec:m-model}
+
+Die Diplomarbeit, der Cache-Engine-Builder, die Cache-Engine und der Prüfling sind
+\emph{vier formal getrennte Subsysteme} mit unterschiedlichen Verantwortlichkeiten. Die
+Trennung ist orthogonal zur Drei-Repository-Aufteilung (Abschnitt~\ref{sec:repos}): Builder
+und Engine wohnen im selben Repository, sind dort aber eine ausführbare Datei bzw.\ eine
+Bibliothek.
+
+\begin{enumerate}
+  \item \textbf{\texttt{messung\_driver}} (Diplomarbeit/Code) --- der Auswertungs-Orchestrator
+        (äußere Schleife): liest die drei Messreihen-XML-Konfigurationen (A/B/C), triggert pro
+        Reihe den Builder und sammelt die Ergebnisse für den Anhang.
+  \item \textbf{CacheEngineBuilder} (\texttt{cache-engine/apps}) --- ein autonomes
+        Plattform-Ausmess-System, das die Sieben-Phasen-Pipeline implementiert (discover,
+        measure, classify, publish, bind, execute, compare) und je registrierter Engine den
+        Permutationsraum enumeriert.
+  \item \textbf{CacheEngine} (\texttt{cache-engine/libs}) --- die Werkzeug-Bibliothek: zwölf
+        interne Sub-Engines $C_1$--$C_{12}$ (Layout, Pinning, Prefetch, Coherence, Telemetry,
+        Allocation, Migration, Encoding, Heuristik, Topologie, Scheduler, Filter) und die
+        Cache-Strategie-Familien, bereitgestellt als C++23-Concept-API.
+  \item \textbf{Prüfling (PRT-ART)} (\texttt{prt-art}) --- eine bei der Cache-Engine als
+        \texttt{IExecutingEngine} registrierte Algorithmus-Implementierung; sie implementiert
+        die Such-Engine-Schicht für jede Achse und konsumiert Cache-Engine-Dienste während
+        ihrer eigenen Lookup-/Insert-/Scan-Operationen.
+\end{enumerate}
+
+Die definierende Eigenschaft des M-Modells ist die \emph{bidirektionale}
+Cache-Engine~$\leftrightarrow$~Prüfling-Beziehung: (a) die Cache-Engine instantiiert den
+Prüfling je Permutations-Konfiguration (Builder-Phase 5, \textsc{bind}), und (b) der Prüfling
+ruft zur Laufzeit Cache-Engine-Dienste (Telemetry, Prefetch, Heuristik) während seiner eigenen
+Lookups auf (Phase 6, \textsc{execute}). Diese Symmetrie ermöglicht die
+\emph{Multi-Prüfling}-Fähigkeit: Messreihe~A vergleicht PRT-ART gegen viele SOTA-Adapter in
+einer einzigen Builder-Pipeline.
+
+\section{Drei-Schichten-Hierarchie}\label{sec:three-layer}
+
+\begin{verbatim}
+    CacheEngine          (Schicht 1: Stand der Technik, Werkzeug-Bibliothek)
+        ^  erbt
+    ExecutionEngine<ProcessingStrategy>   (Schicht 2: OS-Primitive)
+        ^  erbt
+    SearchEngine<Collection, Config>      (Schicht 3: Such-Muster)
+        ^  spezialisiert
+    PrtArtSearchEngineAdapter             (Prüfling-Anbindung)
+\end{verbatim}
+
+\textbf{Schicht~1 (CacheEngine)} stellt Cache-Page-Topologie, Allokator-Familien,
+Sub-Engines und Telemetrie-Strategien als Bibliothek bereit. \textbf{Schicht~2
+(ExecutionEngine)} kapselt diese zu höheren OS-Primitiven (cache-line-aligned Allokation,
+NUMA-konformes Read-Pin, coherence-aware Write). \textbf{Schicht~3 (SearchEngine)} bietet
+such-spezifische Muster (Trie-Walk, B\textsuperscript{+}-Bereichs-Scan, Hot-Path-Lookup) auf
+den Execution-Primitiven.
+
+\section{ABI-stabiles C++23-Modul-Interface}\label{sec:abi}
+
+Das ABI folgt dem Prinzip variadischer Template-Parameter: ein Parameter $\Rightarrow$
+\texttt{std::vector}-API, zwei Parameter $\Rightarrow$ \texttt{std::map}-API, $N>2 \Rightarrow$
+\texttt{std::map<K,\,std::tuple<V$_1$\ldots V$_N$>>}. Komplexe Schlüssel werden von einer
+Fingerprint-Komponente auf 16-Byte-Binärstrings fester Länge reduziert. Die Modulgrenze ist
+binär-stabil, sodass der Builder vorkompilierte Permutations-Module laden
+(LoadLibrary/dlopen) und den ABI-Vertrag je Modul verifizieren kann.
+
+\section{Die Bausteine-Achsen}\label{sec:axes}
+
+Nach der N-Phasen-Erweiterung umfasst die Matrix \textbf{vierzehn Hauptachsen plus etwa
+dreißig Sub-Achsen}: (1)~Page-Type, (2)~Node-Type, (3)~Traversal (gesplittet in 3.A
+SearchAlgo, 3.B Cache-Memory, 3.M Mapping), (4)~ValueHandle, (5)~Memory-Layout, (6)~Allocator
+(gesplittet in 6.1 Allocation, 6.2 Reclamation, 6.3 NUMA, 6.4 Huge-Page, 6.5 Free-List),
+(7)~Prefetch, (8)~Concurrency (8.1 Pattern, 8.2 Locking-Mode), (9)~ISA, (10)~Measurement,
+(11)~Telemetry, (12)~Hardware-Strategie \emph{(neu)}, (13)~Scheduling-Strategie \emph{(neu)}
+und (14)~Identity. Je Stack-Ebene enumeriert ein \texttt{std::variant} alle
+Konkretisierungen; das kartesische Produkt ergibt mehr als $10^{11}$ Permutationen
+(Abschnitt~\ref{sec:explosion}).
+
+\section{PRT-ART als Prüfling}\label{sec:prt-art}
+
+Der \texttt{PrtArtSearchEngineAdapter} implementiert das \texttt{SearchEngine}-ABI durch
+\emph{Komposition} statt direkter Vererbung, sodass die hybride
+\texttt{PrtArtSearchEngine<Ts\ldots>}-API unberührt bleibt; das Adapter-Muster ermöglicht
+einen Compile-Time-Fallback auf Cache-Engine-Bausteine (\texttt{resolve\_baustein.hpp}) dort,
+wo der Prüfling eine Achse nicht überschreibt. PRT-ART steuert eigene Implementierungen in den
+Achsen Page, Layout, Free-List, Prefetch, Concurrency-Pattern und Measurement bei
+(4+2-Pool-Allokator, Distance-Estimator-Prefetch, OLC mit reservierten Wert-Blöcken sowie die
+H1/H2/H3-Metriken); für die übrigen Achsen verwendet er bestehende SOTA-Bausteine über die
+Permutations-Konfiguration wieder.
+
+\section{CacheEngineBuilder und Drei-Stufen-Prüfung}\label{sec:builder}
+
+Der Builder orchestriert eine Drei-Stufen-Prüfung: \textbf{Stufe~1} (nur Cache-Engine) nutzt
+die Standard-Variante je Achse; \textbf{Stufe~2} (nur Prüfling) ersetzt die überschriebenen
+Achsen durch die Prüfling-Varianten und behält sonst die Cache-Engine-Standards;
+\textbf{Stufe~3} (Full Join, nicht-redundant) kombiniert die Standard- und alle
+Prüfling-Varianten. Jede Stufe erzeugt tausende nicht-redundante Permutations-Binaries, die
+zur Laufzeit jeweils als ABI-stabiles C++23-Modul geladen werden. Die Stufen bilden direkt
+die drei Pflicht-Messreihen aus Kapitel~\ref{ch:methodology} ab.

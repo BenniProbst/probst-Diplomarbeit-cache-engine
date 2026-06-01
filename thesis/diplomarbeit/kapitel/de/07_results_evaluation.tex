@@ -1,4 +1,47 @@
 \chapter{Ergebnisse und Auswertung}\label{ch:results}
 
-% TODO(DE): Uebersetzung aus kapitel/en/07_results_evaluation.tex -- \label/\ref/\cite identisch halten.
+Dieses Kapitel präsentiert die Mess-Ergebnisse. Konkrete Diagramme und Tabellen werden aus den
+Mess-Läufen generiert und aus den (sprachneutralen) Verzeichnissen \texttt{tikz/} und
+\texttt{tabellen/} eingebunden; siehe die Platzhalter unten. Zum Zeitpunkt der Erstellung sind
+die Methodik und die Auswertungs-Pipeline vorhanden und auf Beispieldaten verifiziert; die
+Läufe auf realer Hardware stehen aus (Abschnitt~\ref{sec:limitations}).
 
+\section{Auswertungs-Pipeline}\label{sec:eval-pipeline}
+
+Pro Reihen-Lauf schreibt der \texttt{messung\_driver} unter
+\texttt{Code/\_runs/<date>/<spec\_id>/} die Dateien \texttt{measurements.csv} (eine Zeile je
+Permutation: Cycles, L1/L2/L3-Misses, Branches, Durchsatz), \texttt{measurements.json} und
+optionale binäre Records. Die Auswertung nutzt \texttt{binary\_to\_csv} (deserialisieren und um
+Profil-ID, Paper-Ref, Achsen anreichern), \texttt{csv\_to\_latex} (booktabs-Tabellen mit
+Steckbriefen je Profil) und \texttt{diagram\_generator} (A4-bewusste TikZ-Balkendiagramme,
+Scatter-Plots, Heatmaps). Das Manuskript bindet diese über
+\texttt{\textbackslash input\{tikz/<spec\_id>/\ldots\}} und
+\texttt{\textbackslash input\{tabellen/<spec\_id>\ldots\}} ein.
+
+\section{Messreihe A: PRT-ART vs.\ Stand der Technik}\label{sec:result-a}
+
+% Nach dem ersten messung_driver-Lauf hier z. B. einfügen:
+%   \input{tikz/A_full/cycles_per_permutation.tikz}
+%   \input{tabellen/A_full_summary.tex}
+Die Hypothesen H1--H3 (Abschnitt~\ref{sec:hypotheses}) werden hier ausgewertet, sobald die
+Mess-Daten verfügbar sind.
+
+\section{Messreihe B: Cache-Engine-Permutationen}\label{sec:result-b}
+
+% \input{tikz/B_cache_engine_perms/heatmap.tikz}
+
+\section{Messreihe C: Full Join}\label{sec:result-c}
+
+% \input{tikz/C_merge/comparison.tikz}
+
+\section{Achsen-Sensitivitätsanalyse}\label{sec:sensitivity}
+
+Anhand der Records je Permutation quantifiziert dieser Abschnitt, welche Achse am meisten zur
+Performance-Varianz beiträgt --- die Grundlage für die Empfehlung von Standard-Konfigurationen
+je Workload-Klasse.
+
+\section{Diskussion}\label{sec:discussion}
+
+Die Ergebnisse werden vor dem Leitmotiv der Arbeit diskutiert: dem Übergang vom heuristischen
+zum informierten Cache-Management, d.\,h.\ ob telemetrie-getriebene, automatisch adaptierte
+Konfigurationen statisch gewählte übertreffen.

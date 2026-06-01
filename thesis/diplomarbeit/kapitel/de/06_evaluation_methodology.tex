@@ -1,4 +1,87 @@
 \chapter{Evaluationsmethodik}\label{ch:methodology}
 
-% TODO(DE): Uebersetzung aus kapitel/en/06_evaluation_methodology.tex -- \label/\ref/\cite identisch halten.
+Dieses Kapitel beschreibt, wie gemessen wird; die konkreten Ergebnisse folgen in
+Kapitel~\ref{ch:results}.
 
+\section{Drei Messreihen}\label{sec:series}
+
+Die Architektur sieht drei Messreihen vor, die alle vom \texttt{messung\_driver} über die
+\texttt{ExperimentDriver}-Bibliothek ausgeführt werden, konfiguriert entweder als drei feste
+Reihen oder über eine externe \texttt{messreihen.xml}.
+
+\begin{description}
+  \item[Reihe A --- PRT-ART vs.\ Stand der Technik.] Vergleicht den Prüfling gegen die
+        dokumentierten SOTA-Algorithmen. Zwei Modi: \emph{A\_defined} (schnelle Verifikation
+        gegen die 8 Tier-1-Profile) und \emph{A\_full} (alle 30 SOTA-Profile; der Standard,
+        gemäß der Direktive, so vollständig wie möglich zu messen).
+  \item[Reihe B --- Cache-Engine-Permutationen.] Die reine ``Stand der Technik''-Vergleichsbasis:
+        alle SOTA-Profile ohne den PRT-ART-Prüfling.
+  \item[Reihe C --- Merge alt/neu.] Konkrete Merge-Punkte zwischen PRT-ART-Bausteinen und
+        Cache-Engine-Permutationen, z.\,B.\ PRT-ART OLC + tcmalloc + ART-Page; PRT-ART
+        4+2-Pool + HOT-Page; PRT-ART Path-Prefetch + B\textsuperscript{2}-Baum-Page; PRT-ART
+        MultiLevel-Layout + Wormhole-Page.
+\end{description}
+
+\section{ExperimentDriver-Phasen}\label{sec:experimentdriver}
+
+Der \texttt{ExperimentDriver} durchläuft sieben Phasen je Reihe: (1)~\textbf{Enumerate}
+(XML-Configs parsen und die Permutationsliste aufbauen); (2)~\textbf{Codegen} (ein
+\texttt{comdare\_perm\_<fp>.cpp} je Permutation, plus
+\texttt{generate\_module\_from\_profile} für die SOTA-Profile); (3)~\textbf{Compile};
+(4)~\textbf{Load} (LoadLibrary/dlopen aller Module); (5)~\textbf{Execute}
+(\texttt{create\_instance} + profil-bewusstes \texttt{run\_workload}); (6)~\textbf{Measure}
+(die binären Mess-Records aggregieren); (7)~\textbf{Persist} (\texttt{measurements.csv} +
+\texttt{.json}). Zwei opt-in-Phasen kompilieren fehlende Module hot und verifizieren den
+ABI-Vertrag je Modul.
+
+\section{Hypothesen}\label{sec:hypotheses}
+
+\begin{description}
+  \item[H1 (Page-Type-Kosten)] Die mittleren Zugriffskosten je Page-Type-Variante
+        unterscheiden sich systematisch nach Workload: dichte Page-Typen werden unter
+        Zipf-Verteilung (YCSB-A) erwartet zu gewinnen, bereichsoptimierte Pages unter
+        Bereichs-Scans (YCSB-E).
+  \item[H2 (Code-Qualität pro Quelle)] Der vom Original-Quell-Repository geerbte
+        Code-Qualitäts-Score korreliert messbar mit dem erreichten Durchsatz.
+  \item[H3 (Inline- vs.\ External- vs.\ Chain-Verteilung)] Die beobachtete Verteilung der drei
+        ValueHandle-Varianten korreliert mit der Page-Dichte: dichte Pages bevorzugen Inline,
+        spärliche Pages External und PRT-ART-Heuristiken ChainRef.
+\end{description}
+
+\section{Workloads und Datensätze}\label{sec:workloads}
+
+Phase~5 leitet den YCSB-Workload je Permutation aus dem Traversal-Tag des Profils ab
+(Tabelle~\ref{tab:workload-routing}); Module ohne Profil verwenden den globalen
+Default-Workload.
+
+\begin{table}[h]
+\centering
+\caption{Profil-bewusstes Workload-Routing}\label{tab:workload-routing}
+\begin{tabular}{lll}
+\toprule
+\textbf{Traversal-Tag} & \textbf{YCSB-Workload} & \textbf{Charakteristik} \\
+\midrule
+\texttt{RANGE\_SCAN} / \texttt{RANGE\_HOT\_PATH} & YCSB-E & Bereichsabfragen \\
+\texttt{HOT\_PATH} / \texttt{PRTART\_HOT\_PATH} & YCSB-A & 50/50 Lesen/Aktualisieren, Zipf \\
+\texttt{STANDARD} (Default) & YCSB-C & nur Lesen \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Versuchsplattformen}\label{sec:platforms}
+
+Die Messungen zielen auf eine lokale Workstation zur Entwicklungs-Verifikation und den
+TU-Dresden-ZIH-Cluster (Barnard CPU, Capella GPU) für die vollständigen Sweeps, plus die
+Tier-3-Plattformen (Ryzen~9~9950X3D, Intel~i9~14900KS und eine HBM-Plattform). Ein
+\texttt{IPlatformProbe} (Phase~1) meldet je Plattform die lauffähige Teilmenge der Achsen
+(z.\,B.\ AVX-512 nur dort, wo verfügbar, HBM-aware nur auf HBM-Hardware).
+
+\section{Permutations-Explosion und Reduktion}\label{sec:explosion}
+
+Mit der N-Phasen-Erweiterung von 11 auf 14 Achsen plus $\sim$30 Sub-Achsen wächst der Raum von
+$\sim$5,5 Milliarden auf mehr als $10^{11}$ Permutationen. Drei Mechanismen dämpfen die
+Explosion: (1)~der \texttt{<expected\_workload>}-Profil-Filter routet nur kompatible
+Workloads; (2)~\texttt{MessreihenMode::Defined} führt nur die deklarierten Tupel aus
+($\sim$100--1000 je Reihe), die das Manuskript speisen; (3)~\texttt{Full} (und das
+realistischere \texttt{Full-Sampled}, z.\,B.\ jede 1000.\ Permutation) läuft nur auf dem
+ZIH-Cluster, unter Beachtung der vom Plattform-Probe gemeldeten Achsen-Kompatibilität.
