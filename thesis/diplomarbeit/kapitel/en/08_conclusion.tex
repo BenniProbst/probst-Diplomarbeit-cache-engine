@@ -1,9 +1,46 @@
 \chapter{Conclusion and Outlook}\label{ch:conclusion}
 
 \section{Answering the Research Questions}\label{sec:answers}
-% RQ1 (Composition), RQ2 (Measurement methodology), RQ3 (Probe comparison).
+
+\paragraph{RQ1 (Composition).} The fourteen permutation axes (page, node, traversal,
+value-handle, memory-layout, allocator, prefetch, concurrency, ISA, measurement,
+telemetry, hardware-strategy, scheduling-strategy, identity) span a configuration space of
+more than $10^{11}$ permutations. State-of-the-art designs are reconstructed
+unambiguously through algorithm-profile XMLs: 30 SOTA profiles (8 Tier-1 + 22 Tier-2/3)
+demonstrate that the axis decomposition carries P01--P32. The variadic API
+specialization (1/2/$N$ parameters onto \texttt{std::vector}/\texttt{std::map}/tuple) makes
+both algorithm- and container-oriented patterns expressible on one engine.
+
+\paragraph{RQ2 (Measurement methodology).} Measurement is split into a production mode
+(\texttt{COMDARE\_EXPERIMENT\_MODE=OFF}, no overhead) and an experiment mode (the result
+aggregator is an integral execution-engine member). Profile-aware workload routing selects
+the workload per permutation from the traversal tag, ensuring fair comparison between
+range-query- and point-lookup-oriented designs.
+
+\paragraph{RQ3 (Probe comparison).} The concrete comparison of PRT-ART against the 30 SOTA
+profiles is pending the first measurement runs (Section~\ref{sec:outlook}). The
+architecture is fully prepared: the PRT-ART profile, the three mandatory series templates,
+the \texttt{ExperimentDriver} with auto-pickup of the SOTA profiles, and the ABI-conformant
+adapter with all \texttt{std::map} operations and notify hooks.
 
 \section{Limitations}\label{sec:limitations}
 
+\begin{itemize}
+  \item \textbf{Module bodies are currently stubs:} the code-generation pipeline produces
+        ABI-conformant skeleton modules per profile; the actual per-permutation algorithm
+        body remains for a follow-up phase.
+  \item \textbf{Hardware validation pending:} configuration is green locally, but the full
+        \texttt{ctest} and end-to-end \texttt{messung\_driver} runs across the BlockAO
+        platforms (AVX2/AVX-512, ARM NEON/SVE) are outstanding.
+  \item \textbf{Results chapter:} currently methodological; concrete measurements follow.
+\end{itemize}
+
 \section{Outlook}\label{sec:outlook}
-% e.g. GPU adapter, PIM allocator, further axes, formal verification.
+
+In the short term: the end-to-end run of the three mandatory series on real hardware, the
+generation of the measurement diagrams, and the completion of the per-permutation module
+bodies. In the medium to long term: a GPU adapter (Grace Hopper cluster, ZIH), PIM-allocator
+integration (A16), and formal verification of selected permutation classes
+(StarMalloc-style, A13). The three-repository architecture lets future students add further
+probe algorithms analogously to PRT-ART without modifying the cache-engine tool library ---
+a key design principle for the scalability of the research infrastructure.
