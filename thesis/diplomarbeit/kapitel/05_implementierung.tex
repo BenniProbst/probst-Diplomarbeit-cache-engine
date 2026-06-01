@@ -1,0 +1,20 @@
+\chapter{Implementation}\label{ch:impl}
+
+% Thematic presentation (no chronological sprint logs).
+
+\section{Three-Repository Architecture}\label{sec:repos}
+% cache-engine (tool) / prt-art (probe) / Diplomarbeit-Code (consumer).
+
+\section{Adapters for State-of-the-Art Algorithms and Allocators}\label{sec:adapters}
+
+\section{Permutation Code Generation and Flag System}\label{sec:codegen}
+
+\section{Concept/CRTP Realization of the Axes}\label{sec:concept-crtp}
+
+\section{Concurrency and Reclamation}\label{sec:concurrency}
+
+\section{Telemetry against Cache-Coherence Effects}\label{sec:telemetry}
+% LeafOnly counters instead of per-node (avoiding cache-line ping-pong).
+
+\section{Measurement Pipeline}\label{sec:pipeline}
+% sample_data_generator -> messung_driver -> binary_to_csv -> csv_to_latex -> diagram_generator -> latex_to_pdf.

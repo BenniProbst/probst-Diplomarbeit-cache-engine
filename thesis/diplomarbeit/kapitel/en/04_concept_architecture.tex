@@ -1,0 +1,114 @@
+\chapter{Concept and Architecture}\label{ch:concept}
+
+This chapter presents the core contribution of the thesis: an axis library framework that
+decomposes cache-aware search algorithms into interchangeable, orthogonal building-block
+axes, the layered engine architecture that realizes it, the ABI-stable module interface,
+the fourteen-axis permutation matrix, the probe PRT-ART, and the builder that orchestrates
+the three-stage evaluation.
+
+\section{The Axis Library Framework}\label{sec:axis-framework}
+
+The central idea is to treat an algorithm not as a monolith but as a \emph{composition of
+orthogonal axes}, each axis representing one sub-decision of a cache-aware index (how pages
+are laid out, how nodes branch, how memory is allocated, how concurrency is handled, and so
+on). A concrete algorithm is then a point in the Cartesian product of all axes, and a
+state-of-the-art design is reconstructed as one explicit configuration. The decisive
+property is \emph{modular interchangeability}: a researcher can study one new axis variant
+in isolation --- and measure its effect, per axis and for the whole algorithm --- without
+re-implementing all the others. This turns the comparison of two \texttt{std::map}
+implementations (Section~\ref{sec:stdmap-interface}) into a controlled, reproducible
+experiment.
+
+\section{Four-Subsystem Separation (M Model)}\label{sec:m-model}
+
+The diploma project, the cache-engine builder, the cache engine, and the probe are
+\emph{four formally separated subsystems} with distinct responsibilities. The separation
+is orthogonal to the three-repository split (Section~\ref{sec:repos}): builder and engine
+live in the same repository but are an executable and a library, respectively.
+
+\begin{enumerate}
+  \item \textbf{\texttt{messung\_driver}} (Diplomarbeit/Code) --- the evaluation
+        orchestrator (outer loop): reads the three measurement-series XML configurations
+        (A/B/C), triggers the builder per series, and collects the results for the appendix.
+  \item \textbf{CacheEngineBuilder} (\texttt{cache-engine/apps}) --- an autonomous
+        platform-probing system implementing the seven-phase pipeline (discover, measure,
+        classify, publish, bind, execute, compare) and enumerating the permutation space
+        per registered engine.
+  \item \textbf{CacheEngine} (\texttt{cache-engine/libs}) --- the tool library: twelve
+        internal sub-engines $C_1$--$C_{12}$ (layout, pinning, prefetch, coherence,
+        telemetry, allocation, migration, encoding, heuristics, topology, scheduler,
+        filter) and the cache-strategy families, exposed as a C++23 concept API.
+  \item \textbf{Probe (PRT-ART)} (\texttt{prt-art}) --- an algorithm implementation
+        registered with the cache engine as an \texttt{IExecutingEngine}; it implements the
+        search-engine layer for every axis and consumes cache-engine services during its
+        own lookup/insert/scan operations.
+\end{enumerate}
+
+The defining property of the M model is the \emph{bidirectional} cache-engine~$\leftrightarrow$~probe
+relationship: (a) the cache engine instantiates the probe per permutation configuration
+(builder phase 5, \textsc{bind}), and (b) the probe calls cache-engine services
+(telemetry, prefetch, heuristics) during its own lookups at run time (phase 6,
+\textsc{execute}). This symmetry enables the \emph{multi-probe} capability: measurement
+series~A compares PRT-ART against many SOTA adapters in a single builder pipeline.
+
+\section{Three-Layer Hierarchy}\label{sec:three-layer}
+
+\begin{verbatim}
+    CacheEngine          (layer 1: state of the art, tool library)
+        ^  inherits
+    ExecutionEngine<ProcessingStrategy>   (layer 2: OS primitives)
+        ^  inherits
+    SearchEngine<Collection, Config>      (layer 3: search patterns)
+        ^  specializes
+    PrtArtSearchEngineAdapter             (probe binding)
+\end{verbatim}
+
+\textbf{Layer~1 (CacheEngine)} provides cache-page topology, allocator families, sub-engines,
+and telemetry strategies as a library. \textbf{Layer~2 (ExecutionEngine)} wraps these into
+higher OS primitives (cache-line-aligned allocate, NUMA-conforming read-pin,
+coherence-aware write). \textbf{Layer~3 (SearchEngine)} offers search-specific patterns
+(trie walk, B\textsuperscript{+} range scan, hot-path lookup) on top of the execution
+primitives.
+
+\section{ABI-Stable C++23 Module Interface}\label{sec:abi}
+
+The ABI follows the variadic-template principle: one parameter $\Rightarrow$
+\texttt{std::vector} API, two parameters $\Rightarrow$ \texttt{std::map} API, $N>2
+\Rightarrow$ \texttt{std::map<K,\,std::tuple<V$_1$\ldots V$_N$>>}. Complex keys are reduced
+to fixed-length 16-byte binary strings by a fingerprint component. The module boundary is
+binary-stable so that the builder can load pre-compiled permutation modules
+(LoadLibrary/dlopen) and verify the ABI contract per module.
+
+\section{The Building-Block Axes}\label{sec:axes}
+
+After the N-phase extension (Section~\ref{sec:konsolidierung} of the source draft), the
+matrix comprises \textbf{fourteen main axes plus roughly thirty sub-axes}: (1)~Page-Type,
+(2)~Node-Type, (3)~Traversal (split into 3.A search-algorithm, 3.B cache-memory, 3.M
+mapping), (4)~ValueHandle, (5)~Memory-Layout, (6)~Allocator (split into 6.1 allocation,
+6.2 reclamation, 6.3 NUMA, 6.4 huge-page, 6.5 free-list), (7)~Prefetch, (8)~Concurrency
+(8.1 pattern, 8.2 locking-mode), (9)~ISA, (10)~Measurement, (11)~Telemetry, (12)~Hardware-Strategy
+\emph{(new)}, (13)~Scheduling-Strategy \emph{(new)}, and (14)~Identity. Per stack level a
+\texttt{std::variant} enumerates all concretizations; the Cartesian product yields more
+than $10^{11}$ permutations (Section~\ref{sec:explosion}).
+
+\section{PRT-ART as Probe}\label{sec:prt-art}
+
+The \texttt{PrtArtSearchEngineAdapter} implements the \texttt{SearchEngine} ABI by
+\emph{composition} rather than direct inheritance, so the hybrid
+\texttt{PrtArtSearchEngine<Ts\ldots>} API stays untouched; the adapter pattern enables a
+compile-time fallback onto cache-engine building blocks (\texttt{resolve\_baustein.hpp})
+where the probe does not override an axis. PRT-ART contributes its own implementations in
+the page, layout, free-list, prefetch, concurrency-pattern, and measurement axes
+(4+2 pool allocator, distance-estimator prefetch, OLC with reserved value blocks, and the
+H1/H2/H3 metrics); for the remaining axes it reuses existing SOTA building blocks via
+permutation configuration.
+
+\section{CacheEngineBuilder and Three-Stage Evaluation}\label{sec:builder}
+
+The builder orchestrates a three-stage evaluation: \textbf{stage~1} (cache-engine only)
+uses the default variant per axis; \textbf{stage~2} (probe only) replaces the overridden
+axes with the probe variants and keeps cache-engine defaults elsewhere; \textbf{stage~3}
+(full join, non-redundant) combines the default and all probe variants. Each stage emits
+thousands of non-redundant permutation binaries, each loaded at run time as an ABI-stable
+C++23 module. Stages map directly onto the three mandatory measurement series of
+Chapter~\ref{ch:methodology}.

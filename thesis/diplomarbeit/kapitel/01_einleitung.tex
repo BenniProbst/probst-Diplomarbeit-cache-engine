@@ -1,0 +1,89 @@
+\chapter{Introduction}\label{ch:intro}
+
+\section{Motivation}\label{sec:motivation}
+
+Trie-based index structures are the backbone of modern in-memory databases.
+Since the Adaptive Radix Tree (ART) by Leis et al.~\cite{leis2013art} in 2013,
+research has diversified in several directions: trie-height optimization
+(HOT~\cite{binna2018hot}), hybrid B\textsuperscript{+} structures
+(Masstree~\cite{mao2012masstree}, B\textsuperscript{2}-tree~\cite{schmeisser2022b2tree}),
+succinct representations (CoCo-Trie~\cite{boffa2024coco}, SuRF~\cite{zhang2018surf}),
+and self-tuning approaches (START~\cite{fent2020start}).
+
+In parallel, a dedicated body of research on cache awareness, prefetching, and
+allocation strategies has emerged. Heuristics such as Cache-Sensitive Search
+Trees, cache-oblivious layouts, and hierarchical prefetching each address an
+individual axis of the cache hierarchy --- yet they have never been
+systematically combined within a single, permuted measurement architecture.
+
+This thesis closes that gap with a three-layer cache-engine architecture
+(CacheEngine $\to$ ExecutionEngine $\to$ SearchEngine) whose building blocks are
+decomposed into fourteen orthogonal permutation axes, spanning a configuration
+space of more than $10^{11}$ permutations. As a probe for state-of-the-art
+membership we contribute PRT-ART (a Probst Redirect Tree / ART hybrid) with eight
+building-block layers of its own.
+
+\section{Problem Statement}\label{sec:problem}
+
+Existing cache-aware index designs optimize one or a few aspects in isolation
+and report results that are hard to compare across publications, because each
+work uses its own data structures, workloads, and measurement methodology. There
+is no common framework that (i) decomposes such designs into interchangeable
+axes, (ii) reconstructs published algorithms as explicit configurations, and
+(iii) measures both individual axes and whole algorithms on a single, fair basis.
+
+\section{Research Questions}\label{sec:rqs}
+
+\begin{description}
+  \item[RQ1 (Composition)] Which algorithm axes of a cache-aware trie index can
+        be canonically systematized in a permutation matrix, such that
+        state-of-the-art implementations can be reconstructed as profile
+        configurations?
+  \item[RQ2 (Measurement methodology)] How can a fair, reproducible YCSB workload
+        run be performed per permutation, allowing profile-specific workload
+        selection (e.g.\ a range-scan profile $\to$ YCSB-E) while minimizing the
+        measurement overhead via an opt-in experiment mode?
+  \item[RQ3 (Probe comparison)] How does PRT-ART perform as a probe against the
+        eight Tier-1 SOTA designs (ART, HOT, Masstree, CoCo-Trie, START,
+        B\textsuperscript{2}-tree, Wormhole, SuRF) and the Tier-2/3 SOTA under the
+        three mandatory measurement series A (probe vs.\ SOTA), B (SOTA-only
+        baseline), and C (merge points)?
+\end{description}
+
+\section{Objectives and Contributions}\label{sec:contributions}
+
+The central contributions of this thesis are:
+
+\begin{itemize}
+  \item A three-layer architecture (CacheEngine $\to$ ExecutionEngine $\to$
+        SearchEngine) with ABI-stable C++23 module interfaces and variadically
+        templated hybrid-API specializations (1~parameter $\Rightarrow$
+        \texttt{std::vector} API; 2~parameters $\Rightarrow$ \texttt{std::map}
+        API; $N>2 \Rightarrow$ \texttt{std::map<K, std::tuple<V$_1$\ldots V$_N$>>}).
+  \item A fourteen-axis permutation matrix with \texttt{std::variant} building
+        blocks and compile-time fallback between the probe stack and the
+        state-of-the-art stack.
+  \item Thirty SOTA algorithm profiles as persisted XML configurations (8~Tier-1
+        + 22~Tier-2/3) that the \texttt{ExperimentDriver} transforms automatically
+        into pre-compiled C++23 modules.
+  \item PRT-ART as a probe with eight building-block layers of its own (4+2 pool
+        allocator, optimistic lock coupling with reserved blocks, multi-level
+        layout, path-oriented prefetch, density tracker, hypothesis metrics
+        H1/H2/H3, inline/external/chain-ref value handles, signaling-bit
+        serialization).
+  \item A measurement driver with defined-/full-mode distinction and
+        profile-aware workload routing.
+\end{itemize}
+
+\section{Structure of the Thesis}\label{sec:structure}
+
+Chapter~\ref{ch:fundamentals} introduces the necessary background. Chapter~\ref{ch:sota}
+summarizes the state of the art across six search clusters (A--F) and an
+allocator cluster. Chapter~\ref{ch:concept} presents the axis library framework,
+the layered architecture, the ABI interface, and the fourteen-axis permutation
+matrix. Chapter~\ref{ch:impl} documents the implementation across the three
+repositories. Chapter~\ref{ch:methodology} describes the measurement methodology
+with the three mandatory series and profile-aware workload routing.
+Chapter~\ref{ch:results} presents and discusses the results, including the
+hypotheses H1--H3. Chapter~\ref{ch:conclusion} concludes with a summary and an
+outlook.

@@ -1,0 +1,92 @@
+\chapter{Implementation}\label{ch:impl}
+
+This chapter describes the implementation thematically (not as a chronological development
+log): the three-repository split, the SOTA and allocator adapters, the permutation code
+generation and flag system, the concept/CRTP realization of the axes, concurrency and
+reclamation, the cache-coherence-aware telemetry, and the measurement pipeline.
+
+\section{Three-Repository Architecture}\label{sec:repos}
+
+The implementation is distributed over three Git repositories with clearly separated
+responsibilities:
+
+\begin{itemize}
+  \item \texttt{comdare-cache-engine} --- \textbf{how} things are measured: the tool
+        library and the builder. Key components: the builder (XML config parser,
+        \texttt{generate\_module\_from\_profile} code generation, permutation loop, module
+        loader, and the seven-phase \texttt{ExperimentDriver}); the ABI headers
+        (\texttt{search\_engine}, \texttt{execution\_engine}, \texttt{baustein\_variants},
+        \texttt{resolve\_baustein}); 30 SOTA profiles under
+        \texttt{algorithm\_profiles/sota}; and the test suites. The source tree follows a
+        Pitchfork-style layout (\texttt{apps/} for executables, \texttt{libs/} for
+        libraries, with \texttt{libs/common} for cross-cutting code).
+  \item \texttt{comdare-prt-art} --- the \textbf{probe}: the hybrid
+        \texttt{PrtArtSearchEngine} (vector/map/tuple API), its ABI adapters, its building
+        blocks (4+2 allocator pools, OLC with reserved blocks, multi-level layout,
+        path-oriented prefetch, density tracker, hypothesis metrics H1/H2/H3), and the
+        probe-side reimplementations.
+  \item \texttt{probst-Diplomarbeit-cache-engine} --- \textbf{what} is tested: the
+        \texttt{messung\_driver}, the experiment configurations, the evaluation pipeline,
+        and the manuscript.
+\end{itemize}
+
+\section{Adapters for State-of-the-Art Algorithms and Allocators}\label{sec:adapters}
+
+Each SOTA design and each allocator is integrated through a thin adapter that exposes the
+original implementation behind the engine ABI. The adapters follow a uniform pattern: a
+\texttt{COMDARE\_HAVE\_<X>} compile flag guards an \texttt{\#if defined} block that wires
+the original API, with a safe fallback (e.g.\ \texttt{std::malloc} or a typed exception)
+when the original is unavailable. This keeps the build self-contained while allowing the
+original sources to be activated per dependency. The hierarchical-prefetch integration
+(P27) additionally ships a build-time call-graph analyzer (\texttt{p27\_bundle\_finder}, a
+C++23 port of the original \texttt{hp\_soft} tool) that identifies functions whose subtree
+footprint exceeds a threshold as bundle entry points.
+
+\section{Permutation Code Generation and Flag System}\label{sec:codegen}
+
+The builder turns each profile into a pre-compiled C++23 module
+(\texttt{generate\_module\_from\_profile}). Every permutation is identified by a
+bit-packed \emph{permutation flag} structure. With the N-phase refinement of the matrix,
+the flag system grows from 9 banks ($\sim$50 bit) to 14 banks with sub-bank bitfields and
+a total \textbf{82-bit permutation identifier}, mirroring the fourteen axes and their
+sub-axes. A constraint filter masks out invalid axis combinations before any module is
+generated.
+
+\section{Concept/CRTP Realization of the Axes}\label{sec:concept-crtp}
+
+Each axis is a topic directory containing a two-layer concept (a broad topic concept and a
+narrow axis concept) and a CRTP base class secured by a \texttt{requires} clause. The
+probe-versus-default selection per axis is resolved at compile time via
+\texttt{resolve\_baustein.hpp} (\texttt{std::conditional\_t} over tag specializations), so
+the hot path contains neither \texttt{virtual} calls nor run-time switches --- the
+zero-cost abstraction of Section~\ref{sec:cpp23}.
+
+\section{Concurrency and Reclamation}\label{sec:concurrency}
+
+Concurrency is itself an axis (8.1 pattern, 8.2 locking mode), realized through a
+concurrency manager that coordinates the disciplines OLC, HTM, STM, lock-free, RCU, and
+hazard pointers. Reclamation is a sub-axis of the allocator (6.2): epoch-based, RCU,
+hazard-pointer, and QSBR strategies are selectable per permutation. PRT-ART contributes
+OLC with reserved value blocks as its concurrency variant.
+
+\section{Telemetry against Cache-Coherence Effects}\label{sec:telemetry}
+
+Per-node counters cause cache-line ping-pong on multi-core systems, which distorts the
+very measurements they collect. Following the Kuehn line of work (P28), the telemetry axis
+therefore offers cache-coherence-aware strategies: \emph{leaf-only counters} (the main
+variant), \emph{sampling} (every $N$-th leaf access), and \emph{offline recompute}
+(bottom-up aggregation before reordering); the classic per-node counter is retained only
+as a labeled anti-pattern for comparison.
+
+\section{Measurement Pipeline}\label{sec:pipeline}
+
+The evaluation tool chain is a sequence of small programs:
+\texttt{sample\_data\_generator} (deterministic test data without real hardware)
+$\rightarrow$ \texttt{messung\_driver} (drives the series) $\rightarrow$
+\texttt{binary\_to\_csv} (deserializes the binary measurement records) $\rightarrow$
+\texttt{csv\_to\_latex} (booktabs tables with per-profile algorithm fact sheets)
+$\rightarrow$ \texttt{diagram\_generator} (A4-aware TikZ plots) $\rightarrow$
+\texttt{latex\_to\_pdf}. The measurement path in the execution engine is compiled in only
+under \texttt{-DCOMDARE\_EXPERIMENT\_MODE=ON}, so the production path carries no measurement
+overhead. Continuous integration (GitLab CI plus a mirrored GitHub workflow) runs across
+all three repositories.

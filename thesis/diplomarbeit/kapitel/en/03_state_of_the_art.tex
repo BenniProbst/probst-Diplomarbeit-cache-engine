@@ -1,0 +1,192 @@
+\chapter{State of the Art}\label{ch:sota}
+
+The state of the art in cache-aware trie index structures falls into six thematic
+search clusters (A--F) and a parallel allocator corpus (A01--A23). In total, 33
+search-algorithm papers and 21 allocation papers were studied in depth; the results are
+available as persisted XML configurations under \texttt{algorithm\_profiles/} in the
+\texttt{comdare-cache-engine}. The complete building-block and allocator matrices are
+given in Appendix~\ref{app:blocks}.
+
+\section{Trie Family (Cluster A)}\label{sec:cluster-a}
+
+\textbf{P01 ART}~\cite{leis2013art} introduces the Adaptive Radix Tree with adaptive node
+sizes Node4/16/48/256. \textbf{P02 HOT}~\cite{binna2018hot} optimizes trie height via
+multi-byte prefixes and bit-vector indexes. \textbf{P03 Masstree}~\cite{mao2012masstree}
+combines a trie with B-trees and a per-internal-node permutation index. \textbf{P04
+CoCo-Trie}~\cite{boffa2024coco} uses succinct-encoded compact pages. \textbf{P05
+START}~\cite{fent2020start} extends ART with self-tuning of the node representation. P09
+LOUDS (Jacobson 1989) is the succinct-trie foundation, and \textbf{P10
+SuRF}~\cite{zhang2018surf} uses LOUDS for range filtering.
+
+\section{Hybrid and B\texorpdfstring{\textsuperscript{+}}{+} Family (Cluster B)}\label{sec:cluster-b}
+
+\textbf{P06 B\textsuperscript{2}-tree}~\cite{schmeisser2022b2tree} employs a two-level
+fanout for combined L1+L2 cache awareness. \textbf{P07 Wormhole}~\cite{wu2019wormhole}
+combines a hash table with a linear prefix view. P11 CSS-tree (Rao/Ross 1999) is the first
+cache-sensitive search tree; P12 CSB\textsuperscript{+}-tree (Rao/Ross 2000) develops it
+into a B\textsuperscript{+}-tree; P13 Hankins/Patel (2003) studies the effect of node size
+on cache performance.
+
+\section{Layout Theory (Cluster C)}\label{sec:cluster-c}
+
+P14 Samuel/Pedersen/Bonnet (2005) makes the CSB\textsuperscript{+}-tree
+processor-conscious. P15 Graefe/Larson (2001) studies B-tree indexes versus CPU caches.
+P16 Bender/Demaine/Farach-Colton (2002) introduces cache-oblivious tree layout (van Emde
+Boas); P17 Bender et al.\ (2005) extends it to cache-oblivious B-trees. P18
+Saikkonen/Soisalon-Soininen (2008) and P19 (2016) develop multi-level and
+layout-invariant B-trees.
+
+\section{Prefetching (Clusters D and E)}\label{sec:cluster-de}
+
+P20 ``B-Trees Are Back'' (Mueller/Benson/Leis 2025) demonstrates modern B-tree
+engineering. P21 Chen/Gibbons/Mowry (2001) introduces prefetching B\textsuperscript{+}-trees;
+P22 Chen et al.\ (2002) develops fractal prefetching. P23 Khan (2010) makes cache
+prefetching dynamically adaptive; P24 Naderan-Tahan/Sarbazi-Azad (2016) adds an adaptive
+filter on the cache prefetcher. P25 Mahling/Weisgut/Rabl (2025) combines range scans with
+hot-path caching. P26 Zhang (FGCS 2024) and P27 Zhang (ASPLOS 2025, hierarchical
+prefetching) are the most recent schemes, and P28 Kuehn (DaMoN 2023) motivates
+data-driven cache optimization.
+
+\section{Synchronization (Cluster F)}\label{sec:cluster-f}
+
+P08 ``ART of Practical Synchronization'' (Leis 2016) introduces optimistic lock coupling
+(OLC) for ART. P29 RCU (McKenney, OLS 2001) and P30 Hazard Pointers (Michael 2004) are the
+canonical reclamation schemes. P31 Ungethuem/Habich (2017) and P32 Schmidt/Habich (2025)
+are TU-Dresden-specific hardware-optimization surveys; P33 (VAMPIR poster,
+Berthold/Habich 2023) provides the OTF2 profiler integration.
+
+\section{Allocator Research (A01--A23)}\label{sec:allocators}
+
+The 21 allocation papers are catalogued systematically in the allocator matrix
+(Appendix~\ref{app:blocks}). Tier-1 representatives are Hoard (A01, ASPLOS 2000), Slab
+(A02, USENIX 1994), Michael lock-free (A03, PLDI 2004), mimalloc (A04, MSR-TR-2019-18),
+jemalloc (A05), TCMalloc (A06), snmalloc (A07, ISMM 2019), and NUMAlloc (A09, ISMM 2023).
+Tier-2/3 add CAMA (A12, RTAS 2011), StarMalloc (A13, OOPSLA 2024), Crystalline reclamation
+(A17, PLDI 2024), and PIM-malloc (A16, arXiv 2025).
+
+\section{Profile Schema with the \texorpdfstring{\texttt{<expected\_workload>}}{expected\_workload} Tag}\label{sec:profile-schema}
+
+For each SOTA algorithm and each allocator, a profile XML in
+\texttt{cache\_engine/algorithm\_profiles/} records metadata, the axis assignment (page,
+node, traversal, value\_handle, concurrency, allocator, prefetch, telemetry, isa, layout,
+reclamation), a key--value signature, and an optional \texttt{<expected\_workload>} tag
+that overrides the \texttt{ExperimentDriver} heuristic (Chapter~\ref{ch:methodology}). All
+30 SOTA profiles and all 10 allocator profiles are tagged.
+
+\begin{table}[!htbp]
+\caption{SOTA algorithm profiles with workload affinity}\label{tab:sota-profiles}
+\centering\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Profile} & \textbf{Paper ref.} & \textbf{expected\_workload} \\
+\midrule
+art & P01 (Leis 2013) & YCSB\_C \\
+hot & P02 (Binna 2018) & YCSB\_C \\
+masstree & P03 (Mao 2012) & YCSB\_A \\
+coco\_trie & P04 (Boffa 2024) & YCSB\_C \\
+start & P05 (Fent 2020) & YCSB\_C \\
+b2tree & P06 (Schmeisser 2022) & YCSB\_E \\
+wormhole & P07 (Wu 2019) & YCSB\_A \\
+surf & P10 (Zhang 2018) & YCSB\_A \\
+css\_tree & P11 (Rao/Ross 1999) & YCSB\_C \\
+csb\_tree & P12 (Rao/Ross 2000) & YCSB\_E \\
+hankins & P13 (Hankins 2003) & YCSB\_C \\
+samuel & P14 (Samuel 2005) & YCSB\_C \\
+graefe & P15 (Graefe 2001) & YCSB\_C \\
+bender\_treelayout & P16 (Bender 2002) & YCSB\_C \\
+bender\_cacheoblivious & P17 (Bender 2005) & YCSB\_C \\
+saikkonen\_multilevel & P18 (Saikkonen 2008) & YCSB\_E \\
+saikkonen\_layoutinvariant & P19 (Saikkonen 2016) & YCSB\_E \\
+btreesareback & P20 (Mueller 2025) & YCSB\_E \\
+chen\_prefetch & P21 (Chen 2001) & YCSB\_A \\
+chen\_fractal & P22 (Chen 2002) & YCSB\_A \\
+khan\_adaptive & P23 (Khan 2010) & YCSB\_A \\
+naderan\_tahan & P24 (Naderan-Tahan 2016) & YCSB\_A \\
+mahling & P25 (Mahling 2025) & YCSB\_E \\
+zhang\_fgcs & P26 (Zhang 2024) & YCSB\_A \\
+zhang\_asplos & P27 (Zhang 2025) & YCSB\_A \\
+kuehn & P28 (Kuehn 2023) & YCSB\_C \\
+rcu & P29 (McKenney 2001) & YCSB\_B \\
+hazard\_pointers & P30 (Michael 2004) & YCSB\_B \\
+ungethuem & P31 (Ungethuem 2017) & YCSB\_C \\
+to\_stride & P32 (Schmidt 2025) & YCSB\_C \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The workload distribution is 13$\times$ YCSB\_C (read-heavy), 9$\times$ YCSB\_A (Zipfian
+read+update), 6$\times$ YCSB\_E (range scans), and 2$\times$ YCSB\_B (95/5 read/update).
+PRT-ART itself is tagged YCSB\_F (read--modify--write, for density-tracker updates).
+Table~\ref{tab:allocator-profiles} lists the ten implemented allocator profiles.
+
+\begin{table}[!htbp]
+\caption{Allocator profiles with license and workload affinity}\label{tab:allocator-profiles}
+\centering\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Profile} & \textbf{Family} & \textbf{License} & \textbf{expected\_workload} \\
+\midrule
+hoard & A01 & Apache-2.0 & YCSB\_A \\
+michael\_lockfree & A03 & BSD-3 & YCSB\_B \\
+mimalloc & A04 & MIT & YCSB\_A \\
+jemalloc & A05 & BSD-2 & YCSB\_B \\
+tcmalloc & A06 & BSD-3 & YCSB\_C \\
+snmalloc & A07 & MIT & YCSB\_A \\
+scalloc & A08 & BSD-3 & YCSB\_A \\
+rpmalloc & A10 & Public Domain & YCSB\_C \\
+lrmalloc & A11 & BSD-3 & YCSB\_B \\
+dlmalloc & A20 & CC0 & YCSB\_C \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Hardware and Scheduling Strategy per Paper}\label{sec:hw-sched}
+
+After the N-phase extension of the building-block matrix (Section~\ref{sec:axes}), two
+additional algorithm permutation axes are anchored:
+
+\begin{itemize}
+  \item \textbf{Axis~12 Hardware-Strategy}: which hardware features the algorithm actively
+        uses --- sub-axes 12.1 SIMD family (AVX2/AVX-512/NEON/SVE2/scalar), 12.2
+        cache-level targeting (L1/L2/L3/HBM-aware), 12.3 NUMA strategy, 12.4 prefetch
+        hardware (PREFETCH/PREFETCHNTA/PREFETCHW), 12.5 atomic-instruction family
+        (CAS/LL-SC/RMW-extended).
+  \item \textbf{Axis~13 Scheduling-Strategy}: how work is distributed --- sub-axes 13.1
+        worker-pool layout (thread-per-core / work-stealing / CPU-pinning), 13.2
+        SIMD-worker-count limit (hardware-limited to typically 2 of $N$ cores), 13.3
+        heterogeneous-core dispatch (Intel hybrid P-/E-cores), 13.4 co-routine strategy,
+        13.5 batch granularity.
+\end{itemize}
+
+Table~\ref{tab:hw-sched} shows a selection of these two axes per SOTA paper; the full
+catalogue is in Appendix~\ref{app:blocks}.
+
+\begin{table}[h!]
+\centering\small
+\caption{Hardware and scheduling strategy per SOTA paper (selection)}\label{tab:hw-sched}
+\begin{tabular}{lll}
+\toprule
+\textbf{Paper} & \textbf{Hardware strategy (axis 12)} & \textbf{Scheduling strategy (axis 13)} \\
+\midrule
+P01 ART & AVX2, L1-aware, none, CAS & thread-per-core \\
+P02 HOT & AVX2 (bit-vector), L1-aware, CAS & thread-per-core \\
+P03 Masstree & scalar, L1-aware, CAS & thread-per-core + work-stealing \\
+P05 START & AVX2 (multi-byte span), L1-aware, CAS & thread-per-core \\
+P20 LeanStore & AVX2, HBM-aware, NUMA-aware, CAS & work-stealing + hybrid \\
+P27 hp-soft & PREFETCH (L1/L2/L3 bundle), all-cache, CAS & thread-per-core + co-routine \\
+P28 Kuehn & PREFETCH (scalar counter), L1-aware, CAS & thread-per-core + sampling \\
+P31 Ungethuem & AVX-512 (HBM), HBM-aware, NUMA-aware, CAS & hybrid (P-/E-cores) \\
+P32 Schmidt & AVX-512 (SIMD stride), HBM-aware, NUMA-aware, CAS & hybrid \\
+\midrule
+\textbf{PRT-ART} & \textbf{AVX2, L1-aware (TLB-aligned), local NUMA, PREFETCH, CAS (OLC)} & \textbf{thread-per-core + 2-SIMD-worker limit + hybrid + co-routine + micro-batch} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Research Gap}\label{sec:gap}
+
+Each of the surveyed works optimizes one or a few axes of the cache hierarchy in
+isolation, and the results are reported in incomparable settings. What is missing --- and
+what this thesis contributes --- is a systematic, orthogonal \emph{axis decomposition} of
+these designs together with a permuted measurement architecture that reconstructs them as
+explicit configurations and measures them on one common basis.

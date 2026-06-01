@@ -1,0 +1,9 @@
+bibtex: Sicherheitsrisiko: wird mit erweiterten Privilegien ausgeführt
+This is BibTeX, Version 0.99d (MiKTeX 25.4)
+The top-level auxiliary file: diplomarbeit-en.aux
+The style file: alpha.bst
+Database file #1: literatur.bib
+Warning--I didn't find a database entry for "schmeisser2022b2tree"
+Warning--I didn't find a database entry for "boffa2024coco"
+Warning--I didn't find a database entry for "fent2020start"
+(There were 3 warnings)

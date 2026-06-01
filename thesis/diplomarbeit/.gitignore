@@ -1,0 +1,26 @@
+# LaTeX-Build-Artefakte
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+kapitel/*.aux
+anhang/*.aux
+
+# lokale Build-Log-Umleitungen
+p1.txt
+p2.txt
+p3.txt
+bib.txt
+
+# erzeugtes PDF (lokale Validierung; bei Bedarf zum Overleaf-Abgleich entfernen)
+diplomarbeit.pdf
+
+# EPS->PDF-Konvertat des Logos
+zih_logo_de_sw-eps-converted-to.pdf

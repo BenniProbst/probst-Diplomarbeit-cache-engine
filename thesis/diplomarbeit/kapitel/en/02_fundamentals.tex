@@ -1,0 +1,66 @@
+\chapter{Fundamentals}\label{ch:fundamentals}
+
+This chapter establishes the background needed for the remainder of the thesis: the
+cache hierarchy and the notion of cache awareness, trie-based index structures with
+the Adaptive Radix Tree as the running reference, the unified \texttt{std::map}
+comparison interface, the YCSB workloads, and the C++23 metaprogramming facilities on
+which the cache engine is built.
+
+\section{Cache Hierarchy and Cache Awareness}\label{sec:cache-basics}
+
+Modern processors interpose several levels of cache (L1, L2, L3) between the registers
+and main memory. Data is transferred between these levels in fixed units called
+\emph{cache lines}, typically \SI{64}{\byte}. An access that finds its datum in a cache
+level is cheap; a miss propagates to the next, slower level, and a miss in the last-level
+cache reaches main memory at a cost of hundreds of cycles. Address translation adds a
+second hierarchy: the \emph{translation lookaside buffer} (TLB) caches virtual-to-physical
+mappings, and a dTLB miss is itself expensive. On multi-socket systems, non-uniform memory
+access (NUMA) makes the latency of a reference depend on which node owns the page.
+
+A data structure is \emph{cache-aware} when its layout is tuned to concrete cache
+parameters (line size, level capacities), and \emph{cache-oblivious} when it achieves good
+locality across all levels without knowing them. Both philosophies recur throughout the
+state of the art (Chapter~\ref{ch:sota}) and motivate the layout, prefetch, and hardware
+axes of the proposed engine.
+
+\section{Trie-Based Index Structures}\label{sec:trie-basics}
+
+A \emph{trie} (digital/radix tree) indexes keys by their byte sequence rather than by
+comparison: each level discriminates on one or more key bytes, so the search-path length
+depends on key length, not on the number of stored keys. The \emph{fanout} (branching
+factor) and the \emph{node representation} dominate both space and cache behaviour. The
+Adaptive Radix Tree (ART)~\cite{leis2013art} adapts the node representation to the actual
+fanout, using four node types (Node4, Node16, Node48, Node256), and applies path
+compression (lazy expansion, prefix folding) to keep the tree shallow. ART serves as the
+running reference design throughout this thesis.
+
+\section{The Unified Comparison Interface (\texorpdfstring{\texttt{std::map}}{std::map})}\label{sec:stdmap-interface}
+
+To compare structurally different search algorithms fairly, they are all mapped onto a
+single, well-understood interface: the C++ ordered-map contract
+\texttt{std::map<Key,\,Value>} (\texttt{find}/\texttt{insert}/\texttt{erase}/range
+iteration). The axes introduced in Chapter~\ref{ch:concept} describe the \emph{internal}
+behaviour behind this interface, while the interface itself stays fixed --- comparing two
+conforming \texttt{std::map} implementations is therefore the central measurement act. A
+variadic specialization keeps the interface ergonomic: one template parameter exposes a
+\texttt{std::vector}-like API, two parameters the \texttt{std::map} API, and $N>2$ a
+\texttt{std::map<K,\,std::tuple<\ldots>>}.
+
+\section{YCSB Workloads}\label{sec:ycsb}
+
+The Yahoo!\ Cloud Serving Benchmark (YCSB) defines a family of key--value workloads used
+here as the common load profile: YCSB-A (50/50 read/update, Zipfian), YCSB-B (95/5
+read/update), YCSB-C (read-only), YCSB-D (read-latest), YCSB-E (short range scans), and
+YCSB-F (read--modify--write). Each algorithm profile declares an expected workload
+(Chapter~\ref{ch:sota}), which the measurement driver uses for profile-aware routing
+(Chapter~\ref{ch:methodology}).
+
+\section{C++23 Metaprogramming}\label{sec:cpp23}
+
+The engine relies on compile-time composition to avoid run-time dispatch in the hot path.
+\emph{Concepts} constrain the building-block interfaces; the \emph{curiously recurring
+template pattern} (CRTP) provides static polymorphism; \texttt{if~constexpr} and
+\texttt{std::conditional\_t} select between a probe implementation and a cache-engine
+default per axis; and C++23 \emph{modules} provide an ABI-stable boundary between the
+permutation binaries and the builder. Together these facilities realize the
+zero-cost abstraction on which the permutation matrix depends.
