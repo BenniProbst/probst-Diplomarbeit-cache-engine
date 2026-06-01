@@ -94,17 +94,23 @@ std::string escape_latex(std::string_view s) {
 }
 
 int write_latex(std::filesystem::path const& out, std::span<CsvRow const> rows,
-                std::string const& caption, std::string const& label) {
+                std::string const& caption, std::string const& label,
+                std::string const& lang) {
     std::ofstream f{out};
     if (!f) return status_io_error;
 
-    f << "% AUTO-GENERATED durch csv_to_latex (Diplomarbeit/Code REV 7.6)\n";
+    // C2 (2026-06-01): bilinguale Spaltenkopf-Zeile. de = Diplomarbeit-Deutsch, sonst Englisch.
+    std::string const header = (lang == "de")
+        ? "Permutation & Ops & Zyklen & L1 & L2 & L3 \\\\\n"
+        : "Permutation & ops & cycles & L1 & L2 & L3 \\\\\n";
+
+    f << "% AUTO-GENERATED durch csv_to_latex (Diplomarbeit/Code REV 7.6; lang=" << lang << ")\n";
     f << "\\begin{table}[!htbp]\n";
     f << "\\centering\n";
     f << "\\small\n";
     f << "\\begin{tabular}{lrrrrr}\n";
     f << "\\toprule\n";
-    f << "Permutation & ops & cycles & L1 & L2 & L3 \\\\\n";
+    f << header;
     f << "\\midrule\n";
     for (auto const& r : rows) {
         if (!r.succeeded) continue;

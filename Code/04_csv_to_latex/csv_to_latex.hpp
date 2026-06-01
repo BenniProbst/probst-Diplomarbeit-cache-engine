@@ -46,10 +46,13 @@ struct CsvRow {
 [[nodiscard]] std::string escape_latex(std::string_view s);
 
 // Generiert booktabs-Tabelle mit 6 Hauptspalten.
+// lang = "de" | "en" (C2, 2026-06-01): lokalisiert die Spaltenkopf-Zeile (+ Dezimalkomma für künftige
+// Double-Spalten). Default "en" = rückwärtskompatibel. Die Caption liefert der Aufrufer sprachgerecht.
 [[nodiscard]] int write_latex(std::filesystem::path const& out,
                               std::span<CsvRow const> rows,
                               std::string const& caption,
-                              std::string const& label);
+                              std::string const& label,
+                              std::string const& lang = "en");
 
 // Generiert Steckbrief pro Permutation-ID (parsed `ce_lockfree:art:tcmalloc:..`)
 // → LaTeX-Beschreibungstabelle pro Baustein.
