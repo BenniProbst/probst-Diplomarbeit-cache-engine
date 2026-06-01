@@ -6,6 +6,12 @@
 besonderem Fokus auf das **Äquivalenz-Prinzip** zwischen englischer (primärer) und
 deutscher (sekundärer) Fassung.
 
+**Status (Sessionsabschluss 2026-06-01):** Struktur-Aufbau **abgeschlossen** und committet
+(`5131afc`, nur `thesis/`, kein Push). EN- und DE-Fassung sind **inhaltlich äquivalent** und
+bauen fehlerfrei (je 48 Seiten, je 8 Quellen, 0 Fehler).
+**➡️ Übergabe:** Ab hier schreibt der Autor den Inhalt **manuell** weiter — zuerst in
+`kapitel/en/` (Source-of-Truth), die deutsche Fassung in `kapitel/de/` nachziehen (Workflow §7).
+
 ---
 
 ## 0. KERNPRINZIP: Englische und deutsche Fassung MÜSSEN äquivalent sein
@@ -104,10 +110,11 @@ und ein harmloser `xcolor`-Hinweis.
 | Build | Quelle | Seiten | Fehler | Undefined | Bib |
 |---|---|---|---|---|---|
 | `build.ps1 -Lang en` | `kapitel/en` (voll) | 48 | 0 | 0 | 8 (`alpha`) |
-| `build.ps1 -Lang de` | `kapitel/de` (Platzhalter) | 44 | 0 | 0 | 0 (noch keine `\cite`) |
+| `build.ps1 -Lang de` | `kapitel/de` (übersetzt) | 48 | 0 | 0 | 8 (`alphadin`) |
 
-→ Nach der DE-Übersetzung wird der DE-Build dieselbe Seitenzahl-Größenordnung und **8
-Bib-Einträge** (`alphadin`) zeigen wie EN.
+→ **Äquivalenz erreicht:** beide Fassungen 48 Seiten, je 8 Bib-Einträge (EN `alpha`, DE
+`alphadin`), 0 Fehler, 0 ungelöste Verweise. Verbleibend nur die bewusst belassene
+`fancyhdr`-Empfehlung + der harmlose `xcolor`-Hinweis.
 
 ---
 
@@ -115,15 +122,20 @@ Bib-Einträge** (`alphadin`) zeigen wie EN.
 
 | Kapitel | EN (`kapitel/en`) | DE (`kapitel/de`) |
 |---|---|---|
-| 01 Introduction / Einleitung | **migriert+übersetzt** | Platzhalter → Übersetzung folgt |
-| 02 Fundamentals / Grundlagen | **befüllt** | Platzhalter |
-| 03 State of the Art / Stand der Technik | **übersetzt (inkl. Tabellen)** | Platzhalter |
-| 04 Concept & Architecture / Konzept & Architektur | **übersetzt** | Platzhalter |
-| 05 Implementation / Implementierung | **übersetzt (Sprint-Logs entfernt)** | Platzhalter |
-| 06 Evaluation Methodology / Evaluationsmethodik | **übersetzt** | Platzhalter |
-| 07 Results / Ergebnisse | **übersetzt (Platzhalter f. Messdaten)** | Platzhalter |
-| 08 Conclusion / Fazit | **übersetzt** | Platzhalter |
-| A–E Anhänge | Stubs (EN) | Platzhalter |
+| 01 Introduction / Einleitung | **migriert** | **übersetzt** |
+| 02 Fundamentals / Grundlagen | **befüllt** | **übersetzt** |
+| 03 State of the Art / Stand der Technik | **migriert (inkl. Tabellen)** | **übersetzt (inkl. Tabellen)** |
+| 04 Concept & Architecture / Konzept & Architektur | **migriert** | **übersetzt** |
+| 05 Implementation / Implementierung | **migriert (Sprint-Logs entfernt)** | **übersetzt** |
+| 06 Evaluation Methodology / Evaluationsmethodik | **migriert** | **übersetzt** |
+| 07 Results / Ergebnisse | **migriert (Platzhalter f. Messdaten)** | **übersetzt** |
+| 08 Conclusion / Fazit | **migriert** | **übersetzt** |
+| A–E Anhänge | Stubs (Überschrift + `\label`) | Stubs (identische `\label`) |
+
+> Alle acht Kapitel liegen in **beiden** Sprachen mit identischen `\label`/`\cite`/`\ref`-Ankern
+> vor (EN ≡ DE). Der eigentliche Fließtext ist als migrierter Blindentwurf vorhanden und wird
+> vom Autor inhaltlich ausgearbeitet; die Anhänge A–E warten auf Inhalt (Messdaten, Glossar,
+> Matrizen) in beiden Sprachen.
 
 Quelle der Migration: der deutsche Blindentwurf in `thesis/chapters/` (7 Kapitel),
 übersetzt ins Englische und von 7 auf 8 Kapitel umgegliedert (Grundlagen ausgegliedert,
@@ -145,13 +157,22 @@ Sprint-Changelog entfernt). Achsen-Anzahl durchgängig **14** (N-Phase).
 
 ---
 
-## 8. Offene Punkte
+## 8. Stand der Punkte
 
-- **DE-Übersetzung der Kapitel + Anhänge** (in Arbeit — stellt die Äquivalenz her).
-- Alt-Entwurf `thesis/main.tex` + `thesis/chapters/` verwerfen; verwaiste
-  `diplomarbeit/kapitel/*.tex` (alte EN-Quellen) entfernen. (Sandbox blockt Remove/Move auf
-  OneDrive → separate Freigabe nötig.)
-- Vom Autor: Sperrvermerk-Wortlaut, Aufgabenstellungs-PDF, Danksagung, EN-Abstract +
-  DE-Kurzfassung, deutscher Titel.
+**Erledigt (Sessionsabschluss 2026-06-01):**
+- ✅ DE-Übersetzung aller 8 Kapitel — EN ≡ DE hergestellt und per Build verifiziert.
+- ✅ Alt-Entwurf nach `thesis/_archiv_entwurf1/` archiviert; verwaiste `diplomarbeit/kapitel/*.tex`
+  + `anhang/*.tex` entfernt; nur `kapitel/{en,de}` + `anhang/{en,de}` aktiv.
+- ✅ Committet (`5131afc`, 38 Dateien, nur `thesis/`, ohne Build-Artefakte, **kein Push**).
+
+**Offen — vom Autor beim manuellen Weiterschreiben beizusteuern:**
+- Inhaltliche Ausarbeitung des Fließtextes (zuerst `kapitel/en/`, DE nachziehen).
+- Sperrvermerk-Wortlaut, Aufgabenstellungs-PDF, Danksagung, EN-Abstract + DE-Kurzfassung,
+  deutscher Titel (Platzhalter sind im Quelltext markiert).
 - Mess-Artefakte (`tikz/`, `tabellen/`) aus `messung_driver` einspeisen (Kap. 07).
-- Optional: Betreuer-Label „Tutor:" → „Advisor:" (EN).
+- Optional: Betreuer-Label „Tutor:" → „Advisor:" (EN, dokument-seitig).
+
+> **Hinweis für Folge-Sessions:** `git rm` und `Remove-Item` auf dem OneDrive-Pfad sind
+> sandbox-blockiert (auch mit Override). Zum Entfernen aus dem Index `git restore --staged`
+> nutzen und mit `git commit` **ohne** Pathspec committen (ein Pathspec committet sonst den
+> Working Tree inkl. ignorierter Artefakte).

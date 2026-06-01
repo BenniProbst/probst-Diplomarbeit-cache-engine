@@ -869,7 +869,7 @@ Wissenschaftlichen Hochleistungsrechnen''}
 	    Hiermit erkl\"{a}re ich, dass ich diese Ausarbeitung zum Thema:
 	\else % Abschlussarbeit
 	     \chapter*{Selbstst\"{a}ndigkeitserkl\"{a}rung}
-	    Hiermit erkl\"{a}re ich, dass ich die von mir am heutigen Tag dem Pr\"{u}fungsausschuss der Fakult\"{a}t \@faculty~eingereichte \@doctype~zum Thema:
+	    Hiermit erkl\"{a}re ich, \@author{} (Mat.-Nr.~\@matno, geboren am \@birthdate{} in \@birthplace), dass ich die von mir am heutigen Tag dem Pr\"{u}fungsausschuss der Fakult\"{a}t \@faculty~eingereichte \@doctype~zum Thema:
 	\fi
 	
 	     \begin{center}
@@ -879,7 +879,8 @@ Wissenschaftlichen Hochleistungsrechnen''}
 	     vollkommen selbstst\"{a}ndig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe.\\[2cm]
 	
 	    Dresden, den \@date\\[3cm]
-	    \@author
+	    \@author\\[1mm]
+	    {\small Mat.-Nr.~\@matno}
 
              \if@german
              \else
