@@ -31,8 +31,9 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc < 3) {
-        std::cerr << "Usage: diagram-generator <input.csv> <output.tex> [--lang=de|en]\n"
-                  << "       (Demo: liest 1. Spalte = label, 2. Spalte = value)\n"
+        std::cerr << "Usage: diagram-generator <input.csv> <output.tex> [--lang=de|en] [--body-only]\n"
+                  << "       (Demo: liest 1. Spalte = label, total_cycles = value)\n"
+                  << "       (--body-only: nur tikzpicture, ohne figure/caption — Caller wrappt)\n"
                   << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
                   << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n";
         return 1;
@@ -41,10 +42,14 @@ int main(int argc, char* argv[]) {
     if (!f) { std::cerr << "Input not readable\n"; return 10; }
 
     // C2 (2026-06-01): bilingualer Compile-Schalter --lang=de|en (lokalisiert Titel + Achsen).
+    // C1 (2026-06-01): --body-only emittiert nur den tikzpicture-Rumpf (figure/caption
+    //                  steuert das einbindende Dokument → spec-Caption + \label).
     std::string lang = "en";
+    dg::PageConstraints cnst;
     for (int i = 3; i < argc; ++i) {
         std::string a{argv[i]};
         if (a.rfind("--lang=", 0) == 0) lang = a.substr(7);
+        else if (a == "--body-only") cnst.body_only = true;
     }
     dg::BarChartData bar;
     if (lang == "de") {
@@ -66,12 +71,16 @@ int main(int argc, char* argv[]) {
         bar.labels.push_back(line.substr(0, comma));
         auto next_comma = line.find(',', comma + 1);
         // op_count + total_cycles als value (Spalte 4 nach Schema)
+        // iss beginnt NACH dem ersten Komma: idx0=fingerprint, idx1=succeeded,
+        // idx2=workload_used, idx3=op_count, idx4=total_cycles. Die Y-Achse heißt
+        // "Zyklen/Cycles" (s.o.) → es MUSS total_cycles (idx 4) geplottet werden,
+        // nicht op_count (Korrektheits-Fix 2026-06-01, C1: Achse ↔ Wert konsistent).
         std::istringstream iss{line.substr(comma + 1)};
         std::string token;
         int idx = 0;
         double val = 0.0;
         while (std::getline(iss, token, ',')) {
-            if (idx == 3) {  // total_cycles
+            if (idx == 4) {  // total_cycles
                 try { val = std::stod(token); } catch (...) {}
                 break;
             }
@@ -80,7 +89,7 @@ int main(int argc, char* argv[]) {
         bar.values.push_back(val);
     }
 
-    int rc = dg::write_bar_chart(argv[2], bar);
+    int rc = dg::write_bar_chart(argv[2], bar, cnst);
     if (rc != 0) {
         std::cerr << "write_bar_chart failed: " << rc << "\n";
         return rc;

@@ -35,6 +35,10 @@ struct PageConstraints {
     double height_fraction     = 0.40;    // * \textheight
     bool   keep_aspect_ratio   = true;
     std::string position_hint  = "!htbp"; // LaTeX-Float-Position
+    // C1 (2026-06-01): nur den tikzpicture-Rumpf emittieren (ohne figure/centering/
+    // caption-Mantel), damit das einbindende Dokument Float, Caption und Label selbst
+    // steuert (z. B. spec-spezifische Anhang-Caption + referenzierbares \label).
+    bool   body_only           = false;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

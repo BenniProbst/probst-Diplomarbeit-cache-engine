@@ -68,8 +68,10 @@ int write_bar_chart(std::filesystem::path const& out_path,
     if (!f) return status_io_error;
 
     f << "% AUTO-GENERATED durch diagram_generator (REV 7.6, TikZ-Bar-Chart)\n";
-    f << "\\begin{figure}[" << cnst.position_hint << "]\n";
-    f << "\\centering\n";
+    if (!cnst.body_only) {
+        f << "\\begin{figure}[" << cnst.position_hint << "]\n";
+        f << "\\centering\n";
+    }
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
     f << "    ybar,\n";
@@ -91,8 +93,10 @@ int write_bar_chart(std::filesystem::path const& out_path,
     f << "};\n";
     f << "\\end{axis}\n";
     f << "\\end{tikzpicture}\n";
-    f << "\\caption{" << escape_latex(data.title) << "}\n";
-    f << "\\end{figure}\n";
+    if (!cnst.body_only) {
+        f << "\\caption{" << escape_latex(data.title) << "}\n";
+        f << "\\end{figure}\n";
+    }
     return f.good() ? status_ok : status_io_error;
 }
 
@@ -107,8 +111,10 @@ int write_scatter_plot(std::filesystem::path const& out_path,
     if (!f) return status_io_error;
 
     f << "% AUTO-GENERATED durch diagram_generator (REV 7.6, TikZ-Scatter)\n";
-    f << "\\begin{figure}[" << cnst.position_hint << "]\n";
-    f << "\\centering\n";
+    if (!cnst.body_only) {
+        f << "\\begin{figure}[" << cnst.position_hint << "]\n";
+        f << "\\centering\n";
+    }
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
     write_pgfplots_axis_options(f, cnst, data.title, data.x_label, data.y_label);
@@ -120,8 +126,10 @@ int write_scatter_plot(std::filesystem::path const& out_path,
     f << "};\n";
     f << "\\end{axis}\n";
     f << "\\end{tikzpicture}\n";
-    f << "\\caption{" << escape_latex(data.title) << "}\n";
-    f << "\\end{figure}\n";
+    if (!cnst.body_only) {
+        f << "\\caption{" << escape_latex(data.title) << "}\n";
+        f << "\\end{figure}\n";
+    }
     return f.good() ? status_ok : status_io_error;
 }
 
@@ -137,8 +145,10 @@ int write_heatmap(std::filesystem::path const& out_path,
     std::size_t const ny = data.matrix.size();
 
     f << "% AUTO-GENERATED durch diagram_generator (REV 7.6, TikZ-Heatmap)\n";
-    f << "\\begin{figure}[" << cnst.position_hint << "]\n";
-    f << "\\centering\n";
+    if (!cnst.body_only) {
+        f << "\\begin{figure}[" << cnst.position_hint << "]\n";
+        f << "\\centering\n";
+    }
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
     write_pgfplots_axis_options(f, cnst, data.title, data.x_label, data.y_label);
@@ -175,8 +185,10 @@ int write_heatmap(std::filesystem::path const& out_path,
     f << "};\n";
     f << "\\end{axis}\n";
     f << "\\end{tikzpicture}\n";
-    f << "\\caption{" << escape_latex(data.title) << "}\n";
-    f << "\\end{figure}\n";
+    if (!cnst.body_only) {
+        f << "\\caption{" << escape_latex(data.title) << "}\n";
+        f << "\\end{figure}\n";
+    }
     return f.good() ? status_ok : status_io_error;
 }
 

@@ -1,4 +1,17 @@
 \chapter{Complete Measurement Series}\label{app:measurements}
 
-% Full CSV excerpts from the messung_driver runs (_runs/...).
-% Tables are included via \input{tabellen/<spec_id>_table.tex}.
+% AUTO-FILLED: the tables + diagrams below are produced by the orchestrator
+% generate_measurement_appendix.ps1 from a measurements.csv (16-column schema,
+% Path A / run\_workload) and written to anhang/en/tabellen/. The language follows
+% \thesislang (en): column headers + axis labels are localised.
+% To add a measurement series: run the orchestrator with -SpecId <id> and add the
+% two \input lines (table + diagram) here.
+
+This appendix contains the complete measurement series of the pre-configured tier
+permutations. Table~\ref{tab:measurements:v5_pipeline_demo} lists the metrics
+measured per permutation (operations, clock cycles, cache misses L1--L3);
+Figure~\ref{fig:measurements:v5_pipeline_demo} compares the clock cycles
+graphically.
+
+\input{anhang/en/tabellen/v5_pipeline_demo_table.tex}
+\input{anhang/en/tabellen/v5_pipeline_demo_diagram.tex}
