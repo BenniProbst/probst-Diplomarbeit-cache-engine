@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc < 3) {
-        std::cerr << "Usage: diagram-generator <input.csv> <output.tex>\n"
+        std::cerr << "Usage: diagram-generator <input.csv> <output.tex> [--lang=de|en]\n"
                   << "       (Demo: liest 1. Spalte = label, 2. Spalte = value)\n"
                   << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
                   << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n";
@@ -40,10 +40,22 @@ int main(int argc, char* argv[]) {
     std::ifstream f{argv[1]};
     if (!f) { std::cerr << "Input not readable\n"; return 10; }
 
+    // C2 (2026-06-01): bilingualer Compile-Schalter --lang=de|en (lokalisiert Titel + Achsen).
+    std::string lang = "en";
+    for (int i = 3; i < argc; ++i) {
+        std::string a{argv[i]};
+        if (a.rfind("--lang=", 0) == 0) lang = a.substr(7);
+    }
     dg::BarChartData bar;
-    bar.title   = "Comdare Measurement Comparison";
-    bar.x_label = "Permutation";
-    bar.y_label = "Cycles";
+    if (lang == "de") {
+        bar.title   = "Comdare-Messvergleich";
+        bar.x_label = "Permutation";
+        bar.y_label = "Zyklen";
+    } else {
+        bar.title   = "Comdare Measurement Comparison";
+        bar.x_label = "Permutation";
+        bar.y_label = "Cycles";
+    }
 
     std::string line;
     std::getline(f, line);  // skip header
