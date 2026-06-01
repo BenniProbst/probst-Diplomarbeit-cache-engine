@@ -407,7 +407,11 @@ Wissenschaftlichen Hochleistungsrechnen''}
 \fi
 
 \if@diplominf%
+\if@german
 \renewcommand{\titleheader}[0]{Diplomarbeit \\[1cm]\large zur Erlangung des akademischen Grades\\ Diplom-Informatiker\@female}
+\else
+\renewcommand{\titleheader}[0]{Diploma Thesis \\[1cm]\large submitted for the academic degree\\ Diplom-Informatiker\@female}
+\fi
 \def\@faculty{Informatik}
 \fi
 
@@ -854,33 +858,34 @@ Wissenschaftlichen Hochleistungsrechnen''}
 	\else
 	  \if@noproblem
 	  \else
-	    \textbf{\Large Hier Aufgabenstellung einf\"{u}gen!}
+	    \if@german
+	      \textbf{\Large Hier Aufgabenstellung einf\"{u}gen!}
+	    \else
+	      \textbf{\Large Insert the official thesis assignment here!}
+	    \fi
 	  \fi
 	\fi
 	\cleardoublestandardpage
 	%Selbst‰ndigkeitserklaerung
 	\if@selbststaendigkeit
-             \if@german
-             \else
-               \selectlanguage{ngerman}
-             \fi
+             \if@german\else\selectlanguage{american}\fi
 	\ifx\@empty\@isdiploma % keine Abschlussarbeit
-	     \section*{Selbstst\"{a}ndigkeitserkl\"{a}rung}
+	     \section*{\if@german Selbstst\"{a}ndigkeitserkl\"{a}rung\else Statement of Authorship\fi}
 	    Hiermit erkl\"{a}re ich, dass ich diese Ausarbeitung zum Thema:
 	\else % Abschlussarbeit
-	     \chapter*{Selbstst\"{a}ndigkeitserkl\"{a}rung}
-	    Hiermit erkl\"{a}re ich, \@author{} (Mat.-Nr.~\@matno, geboren am \@birthdate{} in \@birthplace), dass ich die von mir am heutigen Tag dem Pr\"{u}fungsausschuss der Fakult\"{a}t \@faculty~eingereichte \@doctype~zum Thema:
+	     \chapter*{\if@german Selbstst\"{a}ndigkeitserkl\"{a}rung\else Statement of Authorship\fi}
+	    \if@german Hiermit erkl\"{a}re ich, \@author{} (Mat.-Nr.~\@matno, geboren am \@birthdate{} in \@birthplace), dass ich die von mir am heutigen Tag dem Pr\"{u}fungsausschuss der Fakult\"{a}t \@faculty~eingereichte \@doctype~zum Thema:\else I hereby declare that I, \@author{} (Mat.-No.~\@matno, born on \@birthdate{} in \@birthplace), have written the diploma thesis submitted on this day to the examination board of the Faculty of Computer Science on the topic:\fi
 	\fi
 	
 	     \begin{center}
 	     \textit{\@title}
 	     \end{center}
 	
-	     vollkommen selbstst\"{a}ndig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe.\\[2cm]
+	     \if@german vollkommen selbstst\"{a}ndig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe.\else entirely on my own, using no sources or aids other than those indicated, and that I have marked all passages taken from other works, verbatim or in substance, as such.\fi\\[2cm]
 	
-	    Dresden, den \@date\\[3cm]
+	    Dresden, \if@german den \fi\@date\\[3cm]
 	    \@author\\[1mm]
-	    {\small Mat.-Nr.~\@matno}
+	    {\small \if@german Mat.-Nr.\else Mat.-No.\fi~\@matno}
 
              \if@german
              \else
@@ -895,19 +900,9 @@ Wissenschaftlichen Hochleistungsrechnen''}
 	  {\vspace*{2cm}
 	  \minisec{Kurzfassung}
 	  \@abstractde
-	  \vspace{2cm}
- 	  \selectlanguage{american}
-	  \minisec{Abstract}
-	  \@abstracten
-	  \selectlanguage{ngerman}
 	  }
           \else
 	  {\vspace*{2cm}
-  	  \selectlanguage{ngerman}
-	  \minisec{Kurzfassung}
-	  \@abstractde
-	  \selectlanguage{american}
-	  \vspace{2cm}
 	  \minisec{Abstract}
 	  \@abstracten
 	  }

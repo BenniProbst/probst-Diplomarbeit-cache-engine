@@ -16,6 +16,8 @@
 % this \input and \providecommand does not overwrite an existing macro.
 \input{config/language.tex}
 \providecommand{\thesislang}{en}      % hard fallback if config missing
+\edef\thesislang{\thesislang}         % normalise: strip \long so \ifx matches reliably
+                                      % (config path via \providecommand vs. CLI \def)
 \def\langDE{de}
 \newif\ifthesisDE
 \ifx\thesislang\langDE \thesisDEtrue \else \thesisDEfalse \fi
@@ -53,7 +55,7 @@
          Cache Engine for Trie-Based Index Structures}
 \fi
 \matno{4510512}
-\birthday{11. April 1996}
+\ifthesisDE\birthday{11.~April 1996}\else\birthday{11~April 1996}\fi
 \placeofbirth{Potsdam}
 % Hochschullehrer = apl. Prof. Habich (supervising professor + first advisor);
 % Dr. Krause = second advisor.
@@ -61,12 +63,49 @@
 \betreuer{apl.\ Prof.\ Dr.-Ing.\ Dirk Habich, Dr.-Ing.\ Alexander Krause}
 \bibfiles{literatur}                  % style: alpha (EN) / alphadin (DE) — auto via class
 
-\abstracten{% TODO: English abstract (primary; 5-8 sentences).
-Placeholder -- English abstract to follow.}
-\abstractde{% TODO: Deutsche Kurzfassung (Uebersetzung).
-Platzhalter -- deutsche Kurzfassung folgt.}
-\acknowledgments{% TODO: acknowledgments / Danksagung.
-Placeholder acknowledgments.}
+% --- Abstracts: BOTH are typeset (German Kurzfassung + English Abstract). ----
+% EN is the source of truth; DE is the faithful, equivalent translation.
+\abstracten{%
+Trie-based index structures are central to modern in-memory databases. Since the
+Adaptive Radix Tree, numerous cache-aware optimisations---spanning node layout,
+prefetching, succinct representations, and allocation---have been proposed, yet they
+have never been combined and compared within a single, fair measurement framework:
+each publication uses its own data structures, workloads, and methodology, which makes
+results hard to compare across publications. This thesis presents a three-layer
+cache-engine architecture (CacheEngine~$\to$~ExecutionEngine~$\to$~SearchEngine) whose
+building blocks are decomposed into fourteen orthogonal permutation axes, spanning a
+configuration space of more than~$10^{11}$ permutations. State-of-the-art algorithms are
+reconstructed as explicit axis configurations, enabling both per-axis and
+whole-algorithm measurement on a common basis. As a probe for state-of-the-art
+membership, this thesis contributes PRT-ART, a Probst Redirect Tree~/ ART hybrid with
+eight building-block layers of its own. A measurement driver with profile-aware
+workload routing evaluates the probe against eight Tier-1 and several Tier-2/3 designs
+under three mandatory measurement series.}
+\abstractde{%
+Trie-basierte Indexstrukturen sind ein Kernbaustein moderner In-Memory-Datenbanken.
+Seit dem Adaptive Radix Tree wurde eine Vielzahl cache-bewusster Optimierungen
+vorgeschlagen---von Knoten-Layout über Prefetching und Succinct-Repräsentationen bis
+zur Allokation---, doch wurden sie nie in einem einzigen, fairen Messrahmen kombiniert
+und verglichen: Jede Veröffentlichung nutzt eigene Datenstrukturen, Lasten und
+Messmethodik, wodurch Ergebnisse über Veröffentlichungen hinweg schwer vergleichbar
+sind. Diese Arbeit stellt eine dreischichtige Cache-Engine-Architektur
+(CacheEngine~$\to$~ExecutionEngine~$\to$~SearchEngine) vor, deren Bausteine in vierzehn
+orthogonale Permutationsachsen zerlegt sind und einen Konfigurationsraum von mehr
+als~$10^{11}$ Permutationen aufspannen. Algorithmen des Stands der Technik werden als
+explizite Achsen-Konfigurationen rekonstruiert, was sowohl die Messung einzelner Achsen
+als auch ganzer Algorithmen auf gemeinsamer Basis ermöglicht. Als Prüfling für die
+Zugehörigkeit zum Stand der Technik trägt diese Arbeit PRT-ART bei, einen
+Probst-Redirect-Tree-/ART-Hybriden mit acht eigenen Bausteinschichten. Ein Mess-Treiber
+mit profilbewusstem Workload-Routing bewertet den Prüfling gegen acht Tier-1- und
+mehrere Tier-2/3-Entwürfe unter drei verpflichtenden Messreihen.}
+% --- Acknowledgments: single field, switched by language. --------------------
+\ifthesisDE
+  \acknowledgments{% TODO: Danksagung ausformulieren.
+  Platzhalter -- Danksagung folgt.}
+\else
+  \acknowledgments{% TODO: write the acknowledgments.
+  Placeholder -- acknowledgments to follow.}
+\fi
 
 % TODO(Sperrvermerk): confidentiality notice requested -- provide wording + placement.
 % TODO(Aufgabenstellung): bind official task sheet (PDF) instead of the placeholder.

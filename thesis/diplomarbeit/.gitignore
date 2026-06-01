@@ -32,5 +32,10 @@ diplomarbeit*.pdf
 # EPS->PDF-Konvertat des Logos
 zih_logo_de_sw-eps-converted-to.pdf
 
+# Diagnose-/Test-Artefakte (Overleaf-Sprachschalter-Sim, Build-Log-Umleitungen)
+_ovl_*
+_build_*.txt
+_test_*
+
 # Hinweis: Quell-.aux in kapitel/{en,de} + anhang/{en,de} sind durch *.aux global abgedeckt.
 $job.*
