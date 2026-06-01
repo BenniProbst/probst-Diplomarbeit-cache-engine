@@ -29,6 +29,9 @@ if(COMDARE_DA_BUILD_TESTS)
     target_compile_features(test_03_binary_to_csv_cached_fixtures PRIVATE cxx_std_23)
     # Pfad zu den gecachten Fixtures via ENV-Variable (CMake setzt sie als TEST_ENVIRONMENT)
     set(_fix03 "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/cached")
+    # Deterministischer Source-Dir-Fallback (kein CWD-Stray bei manuellem .exe-Start) — 2026-06-01 gehärtet.
+    target_compile_definitions(test_03_binary_to_csv_cached_fixtures PRIVATE
+        "COMDARE_FIXTURES_DIR_03_FALLBACK=\"${_fix03}\"")
     gtest_discover_tests(test_03_binary_to_csv_cached_fixtures
         DISCOVERY_TIMEOUT 30
         PROPERTIES

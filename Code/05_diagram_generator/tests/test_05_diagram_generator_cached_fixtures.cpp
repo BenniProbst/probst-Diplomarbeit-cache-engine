@@ -35,7 +35,12 @@ fs::path fixtures_dir() {
     if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_05"); env != nullptr) {
         return fs::path(env);
     }
-    return fs::current_path() / "fixtures" / "cached";
+#ifdef COMDARE_FIXTURES_DIR_05_FALLBACK
+    // Deterministischer Fallback = per-Stufe Source-Dir (CMake-einkompiliert) — KEIN CWD-Stray (2026-06-01 gehärtet).
+    return fs::path(COMDARE_FIXTURES_DIR_05_FALLBACK);
+#else
+    return fs::current_path() / "fixtures" / "cached";  // letzter Notnagel
+#endif
 }
 
 bool file_contains(fs::path const& p, std::string_view needle) {

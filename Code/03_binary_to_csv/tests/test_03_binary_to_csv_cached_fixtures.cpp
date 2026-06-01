@@ -57,8 +57,14 @@ fs::path fixtures_dir() {
     if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_03"); env != nullptr) {
         return fs::path(env);
     }
-    // Fallback: relativ zur exe (Multi-Config: build/<cfg>/exe -> ../../../../...)
-    return fs::current_path() / "fixtures" / "cached";
+#ifdef COMDARE_FIXTURES_DIR_03_FALLBACK
+    // Deterministischer Fallback = per-Stufe Source-Dir (von CMake einkompiliert) — KEIN CWD-Stray.
+    // Früher: fs::current_path()/"fixtures"/"cached" — legte bei manuellem .exe-Start aus der DA-Wurzel
+    // ein verirrtes fixtures/ an (V35.D.1-Altlast, 2026-06-01 gehärtet).
+    return fs::path(COMDARE_FIXTURES_DIR_03_FALLBACK);
+#else
+    return fs::current_path() / "fixtures" / "cached";  // letzter Notnagel (CMake liefert den Fallback i.d.R.)
+#endif
 }
 
 std::vector<btc::LabeledRecord> make_sample_3_records() {
@@ -176,13 +182,14 @@ TEST(Stufe03Pipeline, FullPipelineThreeStepsBinaryToCsv) {
         std::ifstream in(csv_out);
         std::string header_line;
         std::getline(in, header_line);
-        // Zaehle Kommas: 15-Spalten-Format hat 14 Kommas
+        // Zaehle Kommas: kanonisches 16-Spalten-Format (P1/#50, mit workload_used@idx3) hat 15 Kommas.
+        // (Frühere Erwartung 14 = 15-Spalten-Altschema, vor der 16-col-Migration; 2026-06-01 nachgezogen.)
         header_commas = static_cast<int>(std::count(header_line.begin(), header_line.end(), ','));
 
         std::string row;
         while (std::getline(in, row)) ++data_rows;
     }
-    EXPECT_EQ(header_commas, 14);
+    EXPECT_EQ(header_commas, 15);
     EXPECT_EQ(data_rows, 3);
 
     std::error_code ec;
