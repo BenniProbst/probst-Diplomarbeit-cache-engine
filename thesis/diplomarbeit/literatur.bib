@@ -1,8 +1,9 @@
 % =====================================================================
-%  Literatur fuer die Diplomarbeit  (klassisches BibTeX, Stil: alphadin)
-%  Eingebunden ueber \bibfiles{literatur} in diplomarbeit.tex.
-%  Start-Auswahl der Kern-Paper; wird waehrend des Schreibens erweitert
-%  (Migration der vollstaendigen Liste = TODO aus thesis/literatur.bib).
+%  Bibliography for the diploma thesis  (classic BibTeX)
+%  Included via \bibfiles{literatur}.  Style chosen automatically by the
+%  class:  alpha (EN mode)  /  alphadin (DE mode).
+%  Start set = the eight Tier-1 SOTA designs cited in the chapters; extend
+%  with the full 33-paper + allocator corpus while writing.
 % =====================================================================
 
 @inproceedings{leis2013art,
@@ -10,7 +11,8 @@
   title     = {The Adaptive Radix Tree: {ARTful} Indexing for Main-Memory Databases},
   booktitle = {29th IEEE International Conference on Data Engineering (ICDE)},
   pages     = {38--49},
-  year      = {2013}
+  year      = {2013},
+  doi       = {10.1109/ICDE.2013.6544812}
 }
 
 @inproceedings{binna2018hot,
@@ -18,7 +20,8 @@
   title     = {{HOT}: A Height Optimized Trie Index for Main-Memory Database Systems},
   booktitle = {ACM SIGMOD International Conference on Management of Data},
   pages     = {521--534},
-  year      = {2018}
+  year      = {2018},
+  doi       = {10.1145/3183713.3196896}
 }
 
 @inproceedings{mao2012masstree,
@@ -26,7 +29,37 @@
   title     = {Cache Craftiness for Fast Multicore Key-Value Storage},
   booktitle = {7th ACM European Conference on Computer Systems (EuroSys)},
   pages     = {183--196},
-  year      = {2012}
+  year      = {2012},
+  doi       = {10.1145/2168836.2168855}
+}
+
+@inproceedings{boffa2024coco,
+  author    = {Antonio Boffa and Paolo Ferragina and Francesco Tosoni and Giorgio Vinciguerra},
+  title     = {{CoCo-trie}: A Compact, Cache-Aware Trie Index},
+  booktitle = {Proceedings of the VLDB Endowment},
+  year      = {2024}
+}
+
+@inproceedings{fent2020start,
+  author    = {Philipp Fent and Lukas Jungmair and Andreas Kipf and Thomas Neumann},
+  title     = {{START}: Self-Tuning Adaptive Radix Tree},
+  booktitle = {Proceedings of the VLDB Endowment},
+  year      = {2020}
+}
+
+@inproceedings{schmeisser2022b2tree,
+  author    = {Maximilian Schmeisser and Maximilian Schuele and Viktor Leis and Thomas Neumann and Alfons Kemper},
+  title     = {The {B$^2$}-Tree: Cache-Friendly String Indexing},
+  booktitle = {Proceedings of the VLDB Endowment},
+  year      = {2022}
+}
+
+@inproceedings{wu2019wormhole,
+  author    = {Xingbo Wu and Fan Ni and Song Jiang},
+  title     = {Wormhole: A Fast Ordered Index for In-Memory Data Management},
+  booktitle = {14th ACM European Conference on Computer Systems (EuroSys)},
+  year      = {2019},
+  doi       = {10.1145/3302424.3303955}
 }
 
 @inproceedings{zhang2018surf,
@@ -34,5 +67,6 @@
   title     = {{SuRF}: Practical Range Query Filtering with Fast Succinct Tries},
   booktitle = {ACM SIGMOD International Conference on Management of Data},
   pages     = {323--336},
-  year      = {2018}
+  year      = {2018},
+  doi       = {10.1145/3183713.3196931}
 }

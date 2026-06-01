@@ -66,3 +66,7 @@ desktop.ini
 # drawio Backup-Files (regenerieren sich automatisch)
 *.bkp
 .$*.bkp
+
+# Thesis: bulkige Referenz-/Template-Archive — NICHT tracken (Repo-Bloat), 2026-06-01 (User-Wunsch).
+# Betrifft 20250811_Großer_Beleg_Beispiel.zip (8.8 MB) + zih-latex-template-master-ZIHLatexVorlage.zip.
+thesis/*.zip

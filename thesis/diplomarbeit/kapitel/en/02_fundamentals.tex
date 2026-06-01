@@ -10,7 +10,7 @@ which the cache engine is built.
 
 Modern processors interpose several levels of cache (L1, L2, L3) between the registers
 and main memory. Data is transferred between these levels in fixed units called
-\emph{cache lines}, typically \SI{64}{\byte}. An access that finds its datum in a cache
+\emph{cache lines}, typically 64\,bytes. An access that finds its datum in a cache
 level is cheap; a miss propagates to the next, slower level, and a miss in the last-level
 cache reaches main memory at a cost of hundreds of cycles. Address translation adds a
 second hierarchy: the \emph{translation lookaside buffer} (TLB) caches virtual-to-physical

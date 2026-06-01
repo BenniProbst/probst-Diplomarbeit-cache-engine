@@ -474,15 +474,11 @@ chapter E.
 (kapitel/de/07_results_evaluation.aux) (kapitel/de/08_conclusion.aux)
 (anhang/de/A_measurements.aux) (anhang/de/B_code_structure.aux)
 (anhang/de/C_glossary.aux) (anhang/de/D_building_block_matrix.aux)
-(anhang/de/E_architecture_decisions.aux))
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- )
+(anhang/de/E_architecture_decisions.aux)) )
 (see the transcript file for additional information)<C:/Users/benja/AppData/Loc
 al/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/benja/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/benja/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/benja/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on diplomarbeit-de.pdf (44 pages, 99994 bytes).
+Output written on diplomarbeit-de.pdf (44 pages, 100191 bytes).
 Transcript written on diplomarbeit-de.log.

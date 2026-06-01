@@ -362,9 +362,14 @@ tex.def)
 (C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/bookmark\bkm-pdftex.def
 ))
 (C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
-tex.def)
-No file diplomarbeit-de.aux.
-
+tex.def) (diplomarbeit-de.aux (kapitel/de/01_introduction.aux)
+(kapitel/de/02_fundamentals.aux) (kapitel/de/03_state_of_the_art.aux)
+(kapitel/de/04_concept_architecture.aux) (kapitel/de/05_implementation.aux)
+(kapitel/de/06_evaluation_methodology.aux)
+(kapitel/de/07_results_evaluation.aux) (kapitel/de/08_conclusion.aux)
+(anhang/de/A_measurements.aux) (anhang/de/B_code_structure.aux)
+(anhang/de/C_glossary.aux) (anhang/de/D_building_block_matrix.aux)
+(anhang/de/E_architecture_decisions.aux))
 (C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -384,9 +389,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 93--93
 [5]
 [6]
 [7]
-[8]
-No file diplomarbeit-de.toc.
-
+[8] (diplomarbeit-de.toc)
 [1]
 [2]
 Package pgfplots notification 'compat/show suggested version=true': document ha
@@ -430,53 +433,52 @@ chapter 7.
 chapter 8.
 )
 [17]
-[18]
-No file diplomarbeit-de.bbl.
-No file diplomarbeit-de.lof.
+[18] (diplomarbeit-de.bbl
+chapter without number
 
+LaTeX Warning: Empty `thebibliography' environment or \BreakBibliography
+               before end of `thebibliography' environment on input line 3.
+
+)
 [19]
-[20]
-No file diplomarbeit-de.lot.
-
+[20] (diplomarbeit-de.lof)
 [21]
-[22] (anhang/de/A_measurements.tex
+[22] (diplomarbeit-de.lot)
+[23]
+[24] (anhang/de/A_measurements.tex
 chapter A.
 )
-[23] (anhang/de/B_code_structure.tex
-[24]
+[25] (anhang/de/B_code_structure.tex
+[26]
 chapter B.
 )
-[25] (anhang/de/C_glossary.tex
-[26]
+[27] (anhang/de/C_glossary.tex
+[28]
 chapter C.
 )
-[27] (anhang/de/D_building_block_matrix.tex
-[28]
+[29] (anhang/de/D_building_block_matrix.tex
+[30]
 chapter D.
 )
-[29] (anhang/de/E_architecture_decisions.tex
-[30]
+[31] (anhang/de/E_architecture_decisions.tex
+[32]
 chapter E.
 )
-[31]
-[32]
 [33]
-[34] (diplomarbeit-de.aux (kapitel/de/01_introduction.aux)
+[34]
+[35]
+[36] (diplomarbeit-de.aux (kapitel/de/01_introduction.aux)
 (kapitel/de/02_fundamentals.aux) (kapitel/de/03_state_of_the_art.aux)
 (kapitel/de/04_concept_architecture.aux) (kapitel/de/05_implementation.aux)
 (kapitel/de/06_evaluation_methodology.aux)
 (kapitel/de/07_results_evaluation.aux) (kapitel/de/08_conclusion.aux)
 (anhang/de/A_measurements.aux) (anhang/de/B_code_structure.aux)
 (anhang/de/C_glossary.aux) (anhang/de/D_building_block_matrix.aux)
-(anhang/de/E_architecture_decisions.aux))
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- )
+(anhang/de/E_architecture_decisions.aux)) )
 (see the transcript file for additional information)<C:/Users/benja/AppData/Loc
 al/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/benja/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/benja/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/benja/AppData/
 Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on diplomarbeit-de.pdf (42 pages, 94787 bytes).
+Output written on diplomarbeit-de.pdf (44 pages, 100191 bytes).
 Transcript written on diplomarbeit-de.log.
