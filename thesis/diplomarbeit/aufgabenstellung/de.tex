@@ -1,0 +1,112 @@
+% =====================================================================
+%  Aufgabenstellung (konsolidiert) — DEUTSCH (treue Uebersetzung)
+%  Konsolidiert aus den Projektterminen docs/termine/ (Termin 1-9) UND der
+%  gesamten Architektur-Doku (docs/architektur/14 Organ-Metapher, Bausteine-
+%  Matrix N, Kapitel 01/04). Original (Quelle): en.tex.
+% =====================================================================
+{\large\textbf{Aufgabenstellung}}\\[0.4em]
+{\itshape Aktive cache-bewusste Hardware-Adaption:\\ Eine Cache-Engine für Trie-basierte Indexstrukturen}
+
+\bigskip
+\minisec{Kontext und Motivation}
+Trie-basierte Indexstrukturen sind ein Kernbaustein moderner
+In-Memory-Datenbanksysteme, und die Professur für Datenbanken adressiert
+ausdrücklich die hardware-nahe Optimierung solcher Systeme. Seit dem Adaptive
+Radix Tree wurde eine Vielzahl cache-bewusster Techniken---Knoten-Layout,
+Präfixkompression, Prefetching, Succinct-Repräsentationen und Allokation---vorgeschlagen,
+doch nutzt jede Veröffentlichung eigene Datenstrukturen, Lasten und
+Messmethodik. Es fehlt ein gemeinsames Rahmenwerk, das diese Entwürfe in
+austauschbare Bausteine zerlegt und auf einer einzigen, fairen Basis misst.
+
+\minisec{Zielsetzung}
+Die Arbeit soll ein Achsen-Bibliotheks-Framework (eine \emph{Cache-Engine})
+entwerfen und prototypisch umsetzen, das cache-bewusste Trie-Indizierung in
+orthogonale, unabhängig austauschbare Bausteinachsen zerlegt, Algorithmen des
+Stands der Technik als explizite Achsen-Konfigurationen rekonstruiert und
+sowohl einzelne Achsen als auch ganze Algorithmen auf gemeinsamer, CPU-only
+Basis misst. Als Prüfling für die Zugehörigkeit zum Stand der Technik trägt die
+Arbeit \mbox{PRT-ART} bei (einen Probst-Redirect-Tree-/ART-Hybriden).
+
+\minisec{Methodischer Ansatz: Algorithmen als ``Tiere'', Achsen als ``Organe''}
+Das Framework beruht auf einer anatomischen Metapher. Ein Suchalgorithmus wird
+als \emph{Tier} (Lebewesen) aufgefasst; die Teilaufgaben, die \emph{jeder}
+Algorithmus erfüllen muss, sind seine \emph{Organe}. Jedes Organ ist eine
+orthogonale \emph{Achse}: So wie jeder Wiederkäuer einen Magen besitzt, ihn aber
+Kuh, Reh und Schaf unterschiedlich ausprägen, besitzt jeder Suchalgorithmus ein
+Knoten-Layout-Organ, ein Traversal-Organ, ein Allokations-Organ usw., jeweils in
+anderer Ausprägung. Ein konkreter Algorithmus ist dann \emph{eine Komposition}
+--- ein einzelner Punkt im kartesischen Produkt aller Achsen; ein Entwurf des
+Stands der Technik (ART, HOT, Masstree, \ldots) ist genau ein solcher Punkt. Die
+Permutation der Achsen ist ein \emph{genetisches Experiment}: Der Austausch von
+Organen zwischen Tieren erzeugt neue Komposit-Algorithmen mit bisher unbekannten
+Eigenschaften. Das Forschungsziel ist es, die gemeinsame \emph{Anatomie} eines
+Suchalgorithmus zu finden und im resultierenden Permutationsraum das schnellste
+``Tier'' --- die optimale cache-line-bewusste Komposition --- für ein gegebenes
+datentyp-vorzügliches Lastmuster zu bestimmen.
+
+\minisec{Bausteinachsen und Cache-Line-Relevanz}
+Eine Teilaufgabe der Arbeit ist zu ermitteln, welche Achsen (Organe) jeder
+Suchalgorithmus besitzt. Die konsolidierte Matrix umfasst \textbf{vierzehn
+Hauptachsen plus etwa dreißig Sub-Achsen}: (1)~Page-Type, (2)~Node-Type,
+(3)~Traversal --- aufgeteilt in 3.A~Algorithmus-Seite, 3.B~Cache-Memory-Seite
+und 3.M~Mapping ---, (4)~ValueHandle, (5)~Memory-Layout, (6)~Allocator
+(Allokation, Reclamation, NUMA, Huge-Page, Free-List), (7)~Prefetch,
+(8)~Concurrency (Pattern, Locking-Mode), (9)~ISA, (10)~Measurement,
+(11)~Telemetry, (12)~Hardware-Strategie, (13)~Scheduling-Strategie und
+(14)~Identity. Die \textbf{cache-line-bewusst relevanten} Organe sind
+insbesondere: Node-Type und Memory-Layout (wie Knoten 64-Byte-Cache-Lines
+belegen), die \emph{Cache-Memory-Traversal} (3.B) zusammen mit ihrem
+\emph{Mapping} (3.M, das die nicht-cache-kohärente Algorithmus-Sicht des
+Entwicklers in die tatsächliche Cache-Mechanik auf der Speicherseite übersetzt),
+der Allocator (NUMA-Affinität und Huge-Pages bestimmen Cache-/TLB-Lokalität),
+Prefetch, ISA und die Hardware-Strategie.
+
+\minisec{Warum die vollständige Permutation erforderlich ist}
+Cache-line-bewusstes Verhalten entsteht nicht aus einem einzelnen Organ, sondern
+aus dem \emph{Zusammenspiel} vieler --- Knoten-Layout $\times$ Memory-Layout
+$\times$ Allocator $\times$ Prefetch $\times$ Traversal-Mapping $\times$ ISA. Ein
+Organ lässt sich nicht isoliert cache-line-bewusst optimieren; die
+Wechselwirkungen zwischen den Achsen sind entscheidend. Die Arbeit misst den
+Konfigurationsraum daher \emph{vollständig und permutativ}, ohne Reduktion
+(``Messung immer so vollständig wie möglich''); das kartesische Produkt spannt
+mehr als~$10^{11}$ Permutationen auf, die der Builder als einzelne, ABI-stabile
+Mess-Binaries erzeugt.
+
+\minisec{Teilaufgaben}
+\begin{enumerate}
+  \item Systematisierung der Organe cache-bewusster Trie-Indizes zu einer
+        kanonischen Permutationsmatrix orthogonaler Achsen und Identifikation der
+        cache-line-bewusst relevanten Achsen.
+  \item Rekonstruktion von Entwürfen des Stands der Technik (ART, HOT, Masstree,
+        CoCo-trie, START, B\textsuperscript{2}-Tree, Wormhole, SuRF sowie
+        weitere Tier-2/3-Entwürfe) als explizite Achsen-Kompositionen
+        (Referenz-``Tiere'').
+  \item Entwurf und Implementierung von PRT-ART als Prüfling mit eigenen Organen
+        (Redirect-Knoten, adaptive lokale Suchseiten, externe Value-Arenen,
+        cache-line-bewusstes Layout).
+  \item Aufbau einer reproduzierbaren Mess-Pipeline
+        (Binary~$\to$~CSV~$\to$~LaTeX~$\to$~Diagramm) mit profilbewusstem
+        YCSB-Workload-Routing und Hardware-Counter-Erfassung.
+  \item Vollständige Durchführung der drei verpflichtenden Messreihen:
+        (A)~Prüfling vs.\ Stand der Technik, (B)~Cache-Engine-Permutationen
+        (Allokator~$\times$~Layout~$\times$~Prefetch~$\times$~\ldots),
+        (C)~Merge/Regression alter vs.\ neuer Varianten.
+  \item Identifikation der schnellsten cache-line-bewussten Kompositionen je
+        datentyp-vorzüglichem Lastmuster aus dem vollständigen Permutationsraum
+        (Forschungsziel).
+\end{enumerate}
+
+\minisec{Methodik und Evaluation}
+Die Evaluation ist CPU-only und vergleicht die Kompositionen gegen etablierte
+Baselines unter variierten Datenvolumina, Keylängen, Präfixüberlappungen,
+lokaler Dichte, Skew, Treffer-/Fehlerquoten und Value-Größen (den
+datentyp-vorzüglichen Lastmustern). Gemessen werden Exact-/Prefix-Lookup,
+Prefix-Enumeration, Insert/Update/Delete, p50/p95/p99-Latenz, Durchsatz, Bytes
+pro Key sowie Hardwarezähler (cycles, instructions, L1/L2/LLC- und dTLB-Misses,
+Branch-Mispredictions). Zunächst wird Single-Thread-Verhalten untersucht, danach
+folgen leseparallele Multi-Thread-Szenarien.
+
+\minisec{Umfangsabgrenzung}
+Der Kernbeitrag ist CPU-only und single-threaded mit Lese-Skalierung. GPU liegt
+außerhalb des Umfangs; Schreibparallelität, SIMD und Engine-/Optimierer-Integration
+sind optionale Erweiterungen.

@@ -23,6 +23,15 @@ space of more than $10^{11}$ permutations. As a probe for state-of-the-art
 membership we contribute PRT-ART (a Probst Redirect Tree / ART hybrid) with eight
 building-block layers of its own.
 
+The framework rests on an anatomical metaphor: a search algorithm is an
+\emph{animal} (organism) whose \emph{organs} are the axes --- the sub-tasks every
+algorithm must perform (node layout, traversal, allocation, prefetch, and so on),
+each in a different expression. A concrete algorithm is then one \emph{composition}
+of organ expressions, a single point in the Cartesian product of all axes; permuting
+the axes is a genetic experiment that breeds new composite algorithms with previously
+unknown cache-line behaviour. The research goal is to find this shared anatomy and the
+fastest ``animal'' for a given data-type-favourable load pattern.
+
 \section{Problem Statement}\label{sec:problem}
 
 Existing cache-aware index designs optimize one or a few aspects in isolation

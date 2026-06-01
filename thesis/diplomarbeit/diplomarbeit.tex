@@ -55,7 +55,10 @@
          Cache Engine for Trie-Based Index Structures}
 \fi
 \matno{4510512}
-\ifthesisDE\birthday{11.~April 1996}\else\birthday{11~April 1996}\fi
+% Geburtsdatum in beiden Formaten: Titelseite folgt \thesislang, Erklaerung folgt \declarationlang.
+\newcommand{\birthdateDE}{11.~April 1996}
+\newcommand{\birthdateEN}{11~April 1996}
+\ifthesisDE\birthday{\birthdateDE}\else\birthday{\birthdateEN}\fi
 \placeofbirth{Potsdam}
 % Hochschullehrer = apl. Prof. Habich (supervising professor + first advisor);
 % Dr. Krause = second advisor.
@@ -63,8 +66,19 @@
 \betreuer{apl.\ Prof.\ Dr.-Ing.\ Dirk Habich, Dr.-Ing.\ Alexander Krause}
 \bibfiles{literatur}                  % style: alpha (EN) / alphadin (DE) — auto via class
 
-% --- Abstracts: BOTH are typeset (German Kurzfassung + English Abstract). ----
-% EN is the source of truth; DE is the faithful, equivalent translation.
+% --- Thesis assignment (consolidated from the project meetings docs/termine) --
+% Bilingual via the language switch; replace with the official task sheet if required.
+\ifthesisDE
+  \aufgabenstellung{\input{aufgabenstellung/de}}
+\else
+  \aufgabenstellung{\input{aufgabenstellung/en}}
+\fi
+
+% --- Declaration of authorship: SEPARATE language switch --------------------
+% Values:  de | en | same_as_document  (default: same_as_document = follow \thesislang).
+\providecommand{\declarationlang}{same_as_document}
+
+% --- Abstract (only the document language is typeset; EN = source, DE = faithful). ---
 \abstracten{%
 Trie-based index structures are central to modern in-memory databases. Since the
 Adaptive Radix Tree, numerous cache-aware optimisations---spanning node layout,
@@ -74,7 +88,10 @@ each publication uses its own data structures, workloads, and methodology, which
 results hard to compare across publications. This thesis presents a three-layer
 cache-engine architecture (CacheEngine~$\to$~ExecutionEngine~$\to$~SearchEngine) whose
 building blocks are decomposed into fourteen orthogonal permutation axes, spanning a
-configuration space of more than~$10^{11}$ permutations. State-of-the-art algorithms are
+configuration space of more than~$10^{11}$ permutations. Following an anatomical
+metaphor---a search algorithm is an \emph{animal} whose \emph{organs} are the axes, so a
+concrete design is one composition of organ expressions and permuting the axes breeds
+new composite algorithms---state-of-the-art algorithms are
 reconstructed as explicit axis configurations, enabling both per-axis and
 whole-algorithm measurement on a common basis. As a probe for state-of-the-art
 membership, this thesis contributes PRT-ART, a Probst Redirect Tree~/ ART hybrid with
@@ -91,7 +108,10 @@ Messmethodik, wodurch Ergebnisse über Veröffentlichungen hinweg schwer verglei
 sind. Diese Arbeit stellt eine dreischichtige Cache-Engine-Architektur
 (CacheEngine~$\to$~ExecutionEngine~$\to$~SearchEngine) vor, deren Bausteine in vierzehn
 orthogonale Permutationsachsen zerlegt sind und einen Konfigurationsraum von mehr
-als~$10^{11}$ Permutationen aufspannen. Algorithmen des Stands der Technik werden als
+als~$10^{11}$ Permutationen aufspannen. Einer anatomischen Metapher folgend---ein
+Suchalgorithmus ist ein \emph{Tier}, dessen \emph{Organe} die Achsen sind, sodass ein
+konkreter Entwurf eine Komposition von Organ-Ausprägungen ist und die Permutation der
+Achsen neue Komposit-Algorithmen züchtet---werden Algorithmen des Stands der Technik als
 explizite Achsen-Konfigurationen rekonstruiert, was sowohl die Messung einzelner Achsen
 als auch ganzer Algorithmen auf gemeinsamer Basis ermöglicht. Als Prüfling für die
 Zugehörigkeit zum Stand der Technik trägt diese Arbeit PRT-ART bei, einen

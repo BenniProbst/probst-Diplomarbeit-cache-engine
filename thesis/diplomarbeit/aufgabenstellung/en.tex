@@ -1,0 +1,106 @@
+% =====================================================================
+%  Thesis assignment (consolidated) — ENGLISH (source of truth)
+%  Consolidated from the project meetings docs/termine/ (Termin 1-9) AND the
+%  full architecture docs (docs/architektur/14 organ metaphor, bausteine
+%  matrix N, kapitel 01/04). German counterpart: de.tex.
+% =====================================================================
+{\large\textbf{Thesis Assignment}}\\[0.4em]
+{\itshape Active Cache-Aware Hardware Adaptation:\\ A Cache Engine for Trie-Based Index Structures}
+
+\bigskip
+\minisec{Context and motivation}
+Trie-based index structures are central to modern in-memory database systems,
+and the Chair of Databases focuses explicitly on hardware-conscious optimisation
+of such systems. Since the Adaptive Radix Tree, numerous cache-aware
+techniques---node layout, prefix compression, prefetching, succinct
+representations, and allocation---have been proposed, yet each publication uses
+its own data structures, workloads, and measurement methodology. No common
+framework decomposes these designs into interchangeable building blocks and
+measures them on a single, fair basis.
+
+\minisec{Objective}
+The thesis shall design and prototype an axis-library framework (a
+\emph{cache engine}) that decomposes cache-aware trie indexing into orthogonal,
+independently exchangeable building-block axes, reconstructs state-of-the-art
+algorithms as explicit axis configurations, and measures both individual axes
+and whole algorithms on a common, CPU-only basis. As a probe for
+state-of-the-art membership, the thesis contributes \mbox{PRT-ART} (a Probst
+Redirect Tree~/ ART hybrid).
+
+\minisec{Methodical approach: algorithms as ``animals'', axes as ``organs''}
+The framework rests on an anatomical metaphor. A search algorithm is treated as
+an \emph{animal} (organism); the sub-tasks that \emph{every} algorithm must
+perform are its \emph{organs}. Each organ is one orthogonal \emph{axis}: just as
+every ruminant has a stomach but cow, deer, and sheep realise it differently,
+every search algorithm has a node-layout organ, a traversal organ, an allocation
+organ, and so on, each in a different expression. A concrete algorithm is then
+\emph{one composition} --- a single point in the Cartesian product of all axes;
+a state-of-the-art design (ART, HOT, Masstree, \ldots) is exactly one such
+point. Permuting the axes is a \emph{genetic experiment}: exchanging organs
+between animals yields new composite algorithms with previously unknown
+properties. The research goal is to find the common \emph{anatomy} of a search
+algorithm and, within the resulting permutation space, the fastest ``animal''
+--- the optimal cache-line-aware composition --- for a given data-type-favourable
+load pattern.
+
+\minisec{Building-block axes and cache-line relevance}
+A task of the thesis is to determine which axes (organs) every search algorithm
+exposes. The consolidated matrix comprises \textbf{fourteen main axes plus about
+thirty sub-axes}: (1)~Page-Type, (2)~Node-Type, (3)~Traversal --- split into
+3.A~algorithm-side, 3.B~cache-memory-side and 3.M~mapping ---, (4)~ValueHandle,
+(5)~Memory-Layout, (6)~Allocator (allocation, reclamation, NUMA, huge-page,
+free-list), (7)~Prefetch, (8)~Concurrency (pattern, locking-mode), (9)~ISA,
+(10)~Measurement, (11)~Telemetry, (12)~Hardware-Strategy, (13)~Scheduling-Strategy,
+and (14)~Identity. The \textbf{cache-line-aware-relevant} organs are in
+particular: Node-Type and Memory-Layout (how nodes occupy 64-byte cache lines),
+the \emph{cache-memory traversal} (3.B) together with its \emph{mapping} (3.M,
+which translates the developer's non-cache-coherent algorithm view into the
+actual cache mechanics on the memory side), the Allocator (NUMA affinity and
+huge pages govern cache/TLB locality), Prefetch, ISA, and Hardware-Strategy.
+
+\minisec{Why exhaustive permutation is required}
+Cache-line-aware behaviour does not arise from any single organ but from the
+\emph{interaction} of many --- node layout $\times$ memory layout $\times$
+allocator $\times$ prefetch $\times$ traversal mapping $\times$ ISA. An organ
+cannot be tuned for cache lines in isolation; the cross-effects between axes are
+decisive. The thesis therefore measures the configuration space \emph{fully and
+permutatively}, with no reduction (``measurement always as complete as
+possible''); the Cartesian product spans more than~$10^{11}$ permutations, which
+the builder emits as individual, ABI-stable measurement binaries.
+
+\minisec{Sub-tasks}
+\begin{enumerate}
+  \item Systematise the organs of cache-aware trie indexes into a canonical
+        permutation matrix of orthogonal axes and identify the cache-line-aware-relevant
+        ones.
+  \item Reconstruct state-of-the-art designs (ART, HOT, Masstree, CoCo-trie,
+        START, B\textsuperscript{2}-tree, Wormhole, SuRF, and further Tier-2/3
+        designs) as explicit axis compositions (reference ``animals'').
+  \item Design and implement PRT-ART as a probe with its own organs (redirect
+        nodes, adaptive local search pages, external value arenas,
+        cache-line-aware layout).
+  \item Build a reproducible measurement pipeline
+        (binary~$\to$~CSV~$\to$~LaTeX~$\to$~diagram) with profile-aware YCSB
+        workload routing and hardware-counter collection.
+  \item Conduct the three mandatory measurement series exhaustively: (A)~probe
+        vs.\ state of the art, (B)~cache-engine permutations
+        (allocator~$\times$~layout~$\times$~prefetch~$\times$~\ldots),
+        (C)~merge/regression of old vs.\ new variants.
+  \item Identify, from the full permutation space, the fastest cache-line-aware
+        compositions per data-type-favourable load pattern (research goal).
+\end{enumerate}
+
+\minisec{Method and evaluation}
+The evaluation is CPU-only and compares the compositions against established
+baselines under varied data volumes, key lengths, prefix overlap, local density,
+skew, hit/miss ratios, and value sizes (the data-type-favourable load patterns).
+Measured quantities include exact/prefix lookup, prefix enumeration,
+insert/update/delete, p50/p95/p99 latency, throughput, bytes per key, and
+hardware counters (cycles, instructions, L1/L2/LLC and dTLB misses, branch
+mispredictions). Single-thread behaviour is studied first, followed by
+read-parallel multi-thread scenarios.
+
+\minisec{Scope}
+The core contribution is CPU-only and single-thread with read scaling. GPU is
+out of scope; write parallelism, SIMD, and engine/optimiser integration are
+optional extensions.

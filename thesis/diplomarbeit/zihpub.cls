@@ -216,6 +216,7 @@
 %german-Option verarbeiten
 \newif\if@german
 \@germanfalse
+\newif\if@declde % Sprache der Selbststaendigkeitserklaerung (\declarationlang)
 \DeclareOption{german}{%
   \@germantrue%
 }%
@@ -263,6 +264,8 @@
 \newcommand\betreuer[1]{\def\@betreuer{#1}}
 \newcommand\hsl[1]{\def\@hsl{#1}}
 \newcommand\copyrighterklaerung[1]{\def\@copyrighterklaerung{#1}}
+\newcommand\aufgabenstellung[1]{\def\@aufgabenstellung{#1}}
+\def\@aufgabenstellung{}
 \newcommand\bibfiles[1]{\def\@bibfiles{#1}}
 \newcommand\gutachter[1]{\def\@gutachter{#1}}
 \newcommand\birthday[1]{\def\@birthdate{#1}}
@@ -858,39 +861,48 @@ Wissenschaftlichen Hochleistungsrechnen''}
 	\else
 	  \if@noproblem
 	  \else
-	    \if@german
-	      \textbf{\Large Hier Aufgabenstellung einf\"{u}gen!}
+	    \ifx\@empty\@aufgabenstellung
+	      \if@german
+	        \textbf{\Large Hier Aufgabenstellung einf\"{u}gen!}
+	      \else
+	        \textbf{\Large Insert the official thesis assignment here!}
+	      \fi
 	    \else
-	      \textbf{\Large Insert the official thesis assignment here!}
+	      \@aufgabenstellung
 	    \fi
 	  \fi
 	\fi
 	\cleardoublestandardpage
 	%Selbst‰ndigkeitserklaerung
 	\if@selbststaendigkeit
-             \if@german\else\selectlanguage{american}\fi
+	% Sprache der Erklaerung getrennt waehlbar: \declarationlang = de | en | <sonst = wie Dokument>
+	\providecommand{\declarationlang}{same_as_document}%
+	\providecommand{\birthdateDE}{\@birthdate}\providecommand{\birthdateEN}{\@birthdate}%
+	\edef\@decltmp{\declarationlang}\def\@decldeval{de}\def\@declenval{en}%
+	\ifx\@decltmp\@decldeval\@decldetrue\else
+	  \ifx\@decltmp\@declenval\@decldefalse\else
+	    \if@german\@decldetrue\else\@decldefalse\fi
+	  \fi\fi
+	\if@declde\selectlanguage{ngerman}\else\selectlanguage{american}\fi
 	\ifx\@empty\@isdiploma % keine Abschlussarbeit
-	     \section*{\if@german Selbstst\"{a}ndigkeitserkl\"{a}rung\else Statement of Authorship\fi}
+	     \section*{\if@declde Selbstst\"{a}ndigkeitserkl\"{a}rung\else Statement of Authorship\fi}
 	    Hiermit erkl\"{a}re ich, dass ich diese Ausarbeitung zum Thema:
 	\else % Abschlussarbeit
-	     \chapter*{\if@german Selbstst\"{a}ndigkeitserkl\"{a}rung\else Statement of Authorship\fi}
-	    \if@german Hiermit erkl\"{a}re ich, \@author{} (Mat.-Nr.~\@matno, geboren am \@birthdate{} in \@birthplace), dass ich die von mir am heutigen Tag dem Pr\"{u}fungsausschuss der Fakult\"{a}t \@faculty~eingereichte \@doctype~zum Thema:\else I hereby declare that I, \@author{} (Mat.-No.~\@matno, born on \@birthdate{} in \@birthplace), have written the diploma thesis submitted on this day to the examination board of the Faculty of Computer Science on the topic:\fi
+	     \chapter*{\if@declde Selbstst\"{a}ndigkeitserkl\"{a}rung\else Statement of Authorship\fi}
+	    \if@declde Hiermit erkl\"{a}re ich, \@author{} (Mat.-Nr.~\@matno, geboren am \birthdateDE{} in \@birthplace), dass ich die von mir am heutigen Tag dem Pr\"{u}fungsausschuss der Fakult\"{a}t \@faculty~eingereichte \@doctype~zum Thema:\else I hereby declare that I, \@author{} (Mat.-No.~\@matno, born on \birthdateEN{} in \@birthplace), have written the diploma thesis submitted on this day to the examination board of the Faculty of Computer Science on the topic:\fi
 	\fi
 	
 	     \begin{center}
 	     \textit{\@title}
 	     \end{center}
 	
-	     \if@german vollkommen selbstst\"{a}ndig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe.\else entirely on my own, using no sources or aids other than those indicated, and that I have marked all passages taken from other works, verbatim or in substance, as such.\fi\\[2cm]
+	     \if@declde vollkommen selbstst\"{a}ndig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe.\else entirely on my own, using no sources or aids other than those indicated, and that I have marked all passages taken from other works, verbatim or in substance, as such.\fi\\[2cm]
 	
-	    Dresden, \if@german den \fi\@date\\[3cm]
+	    Dresden, \if@declde den \fi\@date\\[3cm]
 	    \@author\\[1mm]
-	    {\small \if@german Mat.-Nr.\else Mat.-No.\fi~\@matno}
+	    {\small \if@declde Mat.-Nr.\else Mat.-No.\fi~\@matno}
 
-             \if@german
-             \else
-               \selectlanguage{american}
-             \fi
+	\if@german\selectlanguage{ngerman}\else\selectlanguage{american}\fi
 	\fi
 	\cleardoublestandardpage
 	%Zusammenfassung
