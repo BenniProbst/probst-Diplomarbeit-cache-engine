@@ -51,6 +51,60 @@ namespace wg = comdare::workload_generator;
 
 namespace {
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Ladebalken (2026-06-01): ASCII-Fortschrittsbalken ueber ALLE kartesischen
+// Produkte (alle geladenen Plugins, CE + prt-art gemeinsam). Bewusst NUR ASCII
+// (kein Unicode) wegen NAS/bash + Windows-Konsole. Rendert in-place via '\r' auf
+// std::cerr; stdout bleibt fuer Mess-/Record-Ausgaben frei. Lange Permutations-IDs
+// werden gekuerzt, damit die Zeile nicht umbricht; Rest-Zeichen werden geloescht.
+// ─────────────────────────────────────────────────────────────────────────────
+class ProgressBar {
+public:
+    ProgressBar(std::string_view title, std::size_t total)
+        : title_{title}, total_{total} {
+        std::cerr << title_ << " (" << total_ << " Permutationen):\n";
+        render("");
+    }
+    void tick(std::string_view label) {
+        if (cur_ < total_) ++cur_;
+        render(label);
+    }
+    // Meldung oberhalb des Balkens ausgeben, ohne ihn zu zerstoeren.
+    void note(std::string const& msg) {
+        std::cerr << '\r' << std::string(line_len_, ' ') << '\r' << msg << '\n';
+        line_len_ = 0;
+        render(last_label_);
+    }
+    void finish() { std::cerr << '\n'; }
+
+private:
+    void render(std::string_view label) {
+        last_label_ = std::string{label};
+        double const frac = total_ ? static_cast<double>(cur_) / static_cast<double>(total_) : 1.0;
+        int filled = static_cast<int>(frac * kWidth);
+        if (filled > kWidth) filled = kWidth;
+        std::string bar;
+        bar.reserve(static_cast<std::size_t>(kWidth));
+        for (int i = 0; i < kWidth; ++i) bar += (i < filled) ? '=' : ' ';
+        if (filled > 0 && filled < kWidth) bar[static_cast<std::size_t>(filled) - 1] = '>';
+        std::string lbl{label};
+        if (lbl.size() > 48) lbl = lbl.substr(0, 45) + "...";
+        std::ostringstream os;
+        os << '\r' << '[' << bar << "] " << cur_ << '/' << total_
+           << " (" << static_cast<int>(frac * 100.0) << "%) " << lbl;
+        std::string out = os.str();
+        if (out.size() < line_len_) out += std::string(line_len_ - out.size(), ' ');
+        line_len_ = os.str().size();
+        std::cerr << out << std::flush;
+    }
+    static constexpr int kWidth = 40;
+    std::string title_;
+    std::size_t total_;
+    std::size_t cur_ = 0;
+    std::size_t line_len_ = 0;
+    std::string last_label_;
+};
+
 enum class MessreiheKind : std::uint8_t {
     A_PrtArtVsSota    = 0,
     B_CacheEnginePerm = 1,
@@ -210,6 +264,8 @@ int main(int argc, char* argv[]) {
             std::vector<comdare::messung_driver::PermStats> all_stats;
             all_stats.reserve(plugins.size());
 
+            // Ladebalken ueber ALLE kartesischen Produkte (CE + prt-art gemeinsam).
+            ProgressBar bar{"[Mikrobench] Kartesische Achsen-Permutationen", plugins.size()};
             for (auto const& p : plugins) {
                 std::vector<double> samples_us;
                 samples_us.reserve(kReps);
@@ -228,13 +284,10 @@ int main(int argc, char* argv[]) {
                     p.desc->id, subsystem, p.desc->axes, p.desc->version, samples_us);
                 all_stats.push_back(stats);
 
-                if (all_ok && !samples_us.empty()) {
-                    std::cout << "  [OK] " << stats.permutation_id
-                              << "  N=" << stats.n_runs
-                              << "  " << stats.mean_us << " ± " << stats.sem
-                              << " us/op  [" << stats.ci_low << "-" << stats.ci_high << "]\n";
-                } else {
-                    std::cout << "  [ERR] " << p.desc->id << "  ok-samples=" << samples_us.size() << "\n";
+                bar.tick(stats.permutation_id);
+                if (!(all_ok && !samples_us.empty())) {
+                    bar.note(std::string{"[ERR] "} + std::string{p.desc->id}
+                             + "  ok-samples=" + std::to_string(samples_us.size()));
                 }
 
                 // V41.B1: pro Plugin EIN aggregate binary record (mean us/op)
@@ -247,6 +300,7 @@ int main(int argc, char* argv[]) {
                     writer.add(p.desc->id, fp, all_ok, "micro", rec);
                 }
             }
+            bar.finish();
             writer.finalize();
             if (writer.ok() || writer.count() > 0) {
                 std::cout << "[V41.B1] " << writer.count() << " binary records geschrieben: "
@@ -296,14 +350,17 @@ int main(int argc, char* argv[]) {
 
             // Samples je id für Welch sammeln.
             std::map<std::string, std::vector<double>> samples_by_id;
+            ProgressBar welch_bar{"[Welch-Sampling] Kartesische Achsen-Permutationen", plugins.size()};
             for (auto const& p : plugins) {
                 std::vector<double> samples;
                 for (std::size_t rep = 0; rep < kReps; ++rep) {
                     double micros = 0.0;
                     if (p.desc->run(kRunOps, &micros) == 0) samples.push_back(micros);
                 }
+                welch_bar.tick(p.desc->id);
                 samples_by_id[std::string{p.desc->id}] = std::move(samples);
             }
+            welch_bar.finish();
 
             // Item 4: Welch RESTRINGIERT auf Achsen-Subtrees — je variierender Achse nur Items, die in
             // ALLEN anderen Achsen übereinstimmen (z.B. gleiche simd+layout, vergleiche Allokator-Varianten).
@@ -404,9 +461,11 @@ int main(int argc, char* argv[]) {
 
         // REV 7.6 V11.3 — Pro Messreihen-Spec einen ExperimentDriver-Lauf
         int spec_overall_rc = 0;
+        std::size_t spec_idx = 0;
         for (auto const& spec : external_specs) {
             std::cout << "─────────────────────────────────────────────\n";
-            std::cout << "[V11.3] Messreihe " << spec.id << " (mode=" << spec.mode << ")\n";
+            std::cout << "[Reihe " << (++spec_idx) << "/" << external_specs.size() << "] [V11.3] Messreihe "
+                      << spec.id << " (mode=" << spec.mode << ")\n";
             std::cout << "─────────────────────────────────────────────\n";
 
             cb::ExperimentDriverOptions opts;
@@ -450,9 +509,11 @@ int main(int argc, char* argv[]) {
         MessreiheKind::C_MergeAltNeu};
 
     int overall_rc = 0;
+    std::size_t reihe_idx = 0;
     for (auto kind : kinds) {
         std::cout << "─────────────────────────────────────────────\n";
-        std::cout << "Messreihe " << messreihe_name(kind) << "\n";
+        std::cout << "[Reihe " << (++reihe_idx) << "/" << kinds.size() << "] Messreihe "
+                  << messreihe_name(kind) << "\n";
         std::cout << "─────────────────────────────────────────────\n";
 
         auto const reihe_output = output_dir / subdir_for(kind);
