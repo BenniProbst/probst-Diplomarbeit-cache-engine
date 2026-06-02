@@ -389,8 +389,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 93--93
 [5]
 [6]
 [7]
-[8] (diplomarbeit-de.toc)
-[1]
+[8] (diplomarbeit-de.toc
+(C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd)
+(C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd)
+(C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1pcr.fd)
+[1])
 [2]
 Package pgfplots notification 'compat/show suggested version=true': document ha
 s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
@@ -403,71 +406,195 @@ slations-basic-dictionary-english.trsl)
 (C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-ptm.cfg)
 (kapitel/de/01_introduction.tex
 chapter 1.
+
+[3] (C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd)
+Overfull \hbox (132.77052pt too wide) in paragraph at lines 56--61
+\T1/ptm/m/n/10.95 (-20) (1 Pa-ra-me-ter $\OMS/cmsy/m/n/10.95 )$ \T1/pcr/m/n/10.
+95 std::vector\T1/ptm/m/n/10.95 (-20) -API; 2 Pa-ra-me-ter $\OMS/cmsy/m/n/10.95
+ )$ \T1/pcr/m/n/10.95 std::map\T1/ptm/m/n/10.95 (-20) -API; $\OML/cmm/m/it/10.9
+5 N > \OT1/cmr/m/n/10.95 2 \OMS/cmsy/m/n/10.95 )$ \T1/pcr/m/n/10.95 std::map<K,
+std::tuple<V$[]$...V$[]$>>\T1/ptm/m/n/10.95 (-20) ). 
+
+Overfull \hbox (1.50879pt too wide) in paragraph at lines 70--72
+[]\T1/ptm/m/n/10.95 (-20) Ein Mess-Driver mit Defined-/Full-Modus-Unterscheidun
+g und profil-bewusstem Workload-Routing. 
 )
-[3] (kapitel/de/02_fundamentals.tex
-[4]
+[4] (kapitel/de/02_fundamentals.tex
 chapter 2.
-)
-[5] (kapitel/de/03_state_of_the_art.tex
-[6]
+
+[5])
+[6] (kapitel/de/03_state_of_the_art.tex
 chapter 3.
-)
-[7] (kapitel/de/04_concept_architecture.tex
+(C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-cmr.cfg)
+(C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msa.cfg)
+(C:\Users\benja\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msb.cfg)
+[7]
+Overfull \hbox (66.3264pt too wide) in paragraph at lines 70--77
+\T1/ptm/m/n/10.95 (-20) F�r je-den SOTA-Algorithmus und je-den Al-lo-ka-tor h�l
+t ein Profil-XML in \T1/pcr/m/n/10.95 cache_engine/algorithm_profiles/
+
+Overfull \hbox (40.75368pt too wide) in paragraph at lines 70--77
+\T1/ptm/m/n/10.95 (-20) te-le-me-try, isa, lay-out, re-cla-ma-ti-on), ei-ne Sch
+l�ssel-Wert-Signatur und einen op-tio-na-len \T1/pcr/m/n/10.95 <expected_worklo
+ad>\T1/ptm/m/n/10.95 (-20) -
+
+Overfull \hbox (22.84212pt too wide) in paragraph at lines 119--124
+[]\T1/ptm/m/n/10.95 (-20) Die Workload-Verteilung be-tr�gt 13$\OMS/cmsy/m/n/10.
+95 ^^B$ \T1/ptm/m/n/10.95 (-20) YCSB_C (le-s-elas-tig), 9$\OMS/cmsy/m/n/10.95 ^
+^B$ \T1/ptm/m/n/10.95 (-20) YCSB_A (Zipf-verteiltes Le-sen+Aktualisieren),
+
+Overfull \hbox (45.36456pt too wide) in paragraph at lines 152--157
+\T1/ptm/m/n/10.95 (-20) (L1/L2/L3/HBM-aware), 12.3 NUMA-Strategie, 12.4 Prefetc
+h-Hardware (PRE-FET-CH/PRE-FETCHNTA/PRE-
+
 [8]
+[9]
+Overfull \hbox (291.7902pt too wide) in paragraph at lines 170--187
+ [][] 
+)
+[10] (kapitel/de/04_concept_architecture.tex
 chapter 4.
-)
-[9] (kapitel/de/05_implementation.tex
-[10]
-chapter 5.
-)
-[11] (kapitel/de/06_evaluation_methodology.tex
-[12]
-chapter 6.
-)
-[13] (kapitel/de/07_results_evaluation.tex
+
+Overfull \hbox (35.85185pt too wide) in paragraph at lines 3--8
+\T1/ptm/m/n/10.95 (-20) Engine-Architektur, die es rea-li-siert, die ABI-stabil
+e Modul-Schnittstelle, die vierzehn-Achsen-Permutationsmatrix,
+
+[11]
+Overfull \hbox (44.07532pt too wide) in paragraph at lines 67--67
+[]    \T1/pcr/m/n/10.95 CacheEngine          (Schicht 1: Stand der Technik, Wer
+kzeug-Bibliothek)[] 
+
+Overfull \hbox (73.06238pt too wide) in paragraph at lines 99--108
+\T1/ptm/m/n/10.95 (-20) das Adapter-Muster er-m�g-licht einen Compile-Time-Fall
+back auf Cache-Engine-Bausteine (\T1/pcr/m/n/10.95 resolve_baustein.hpp\T1/ptm/
+m/n/10.95 (-20) )
+
+[12])
+[13] (kapitel/de/05_implementation.tex
 [14]
+chapter 5.
+
+Overfull \hbox (31.111pt too wide) in paragraph at lines 3--8
+\T1/ptm/m/n/10.95 (-20) Protokoll): die Drei-Repository-Aufteilung, die SOTA- u
+nd Allokator-Adapter, die Permutations-Codegenerierung
+
+Overfull \hbox (25.8644pt too wide) in paragraph at lines 15--24
+\T1/ptm/m/n/10.95 (-20) Codegenerierung, Permutations-Schleife, Modul-Loader un
+d der sieben-phasige \T1/pcr/m/n/10.95 ExperimentDriver\T1/ptm/m/n/10.95 (-20) 
+);
+
+Overfull \hbox (73.1341pt too wide) in paragraph at lines 15--24
+\T1/ptm/m/n/10.95 (-20) die ABI-Header (\T1/pcr/m/n/10.95 search_engine\T1/ptm/
+m/n/10.95 (-20) , \T1/pcr/m/n/10.95 execution_engine\T1/ptm/m/n/10.95 (-20) , \
+T1/pcr/m/n/10.95 baustein_variants\T1/ptm/m/n/10.95 (-20) , \T1/pcr/m/n/10.95 r
+esolve_baustein\T1/ptm/m/n/10.95 (-20) );
+
+Overfull \hbox (2.13498pt too wide) in paragraph at lines 15--24
+\T1/ptm/m/n/10.95 (-20) ei-nem Pitchfork-Layout (\T1/pcr/m/n/10.95 apps/ \T1/pt
+m/m/n/10.95 (-20) f�r aus-f�hr-ba-re Da-tei-en, \T1/pcr/m/n/10.95 libs/ \T1/ptm
+/m/n/10.95 (-20) f�r Bi-blio-the-ken, \T1/pcr/m/n/10.95 libs/common
+
+Overfull \hbox (40.7452pt too wide) in paragraph at lines 49--56
+\T1/ptm/m/n/10.95 (-20) Der Buil-der �ber-f�hrt je-des Pro-fil in ein vor-kom-p
+i-lier-tes C++23-Modul (\T1/pcr/m/n/10.95 generate_module_from_profile\T1/ptm/m
+/n/10.95 (-20) ).
+
+[15]
+Overfull \hbox (16.15884pt too wide) in paragraph at lines 59--65
+\T1/ptm/m/n/10.95 (-20) Die Pr�fling-gegen-Standard-Auswahl je Ach-se wird zur 
+�ber-set-zungs-zeit �ber \T1/pcr/m/n/10.95 resolve_baustein.hpp
+)
+Overfull \hbox (34.51323pt too wide) in paragraph at lines 85--100
+\T1/ptm/m/n/10.95 (-20) ter-mi-nis-ti-sche Test-da-ten oh-ne rea-le Hard-wa-re)
+ $\OMS/cmsy/m/n/10.95 !$ \T1/pcr/m/n/10.95 messung_driver \T1/ptm/m/n/10.95 (-2
+0) (steu-ert die Rei-hen) $\OMS/cmsy/m/n/10.95 !$ \T1/pcr/m/n/10.95 binary_to_c
+sv
+
+[16] (kapitel/de/06_evaluation_methodology.tex
+chapter 6.
+
+Overfull \hbox (15.95003pt too wide) in paragraph at lines 8--11
+\T1/ptm/m/n/10.95 (-20) Die Ar-chi-tek-tur sieht drei Mess-rei-hen vor, die al-
+le vom \T1/pcr/m/n/10.95 messung_driver \T1/ptm/m/n/10.95 (-20) �ber die \T1/pc
+r/m/n/10.95 ExperimentDriver\T1/ptm/m/n/10.95 (-20) -
+
+Overfull \hbox (46.01611pt too wide) in paragraph at lines 8--11
+\T1/ptm/m/n/10.95 (-20) Bibliothek aus-ge-f�hrt wer-den, kon-fi-gu-riert ent-we
+-der als drei fes-te Rei-hen oder �ber ei-ne ex-ter-ne \T1/pcr/m/n/10.95 messre
+ihen.xml\T1/ptm/m/n/10.95 (-20) . 
+
+Overfull \hbox (3.94029pt too wide) in paragraph at lines 19--23
+[]\T1/ptm/m/n/10.95 (-20) Konkrete Merge-Punkte zwi-schen PRT-ART-Bausteinen un
+d Cache-Engine-
+
+[17])
+Overfull \hbox (35.34642pt too wide) in paragraph at lines 81--101
+\T1/pcr/m/n/10.95 <expected_workload>\T1/ptm/m/n/10.95 (-20) -Profil-Filter rou
+-tet nur kom-pa-ti-ble Workloads; (2) \T1/pcr/m/n/10.95 MessreihenMode::Defined
+
+
+[18] (kapitel/de/07_results_evaluation.tex
 chapter 7.
+
+Overfull \hbox (145.74136pt too wide) in paragraph at lines 11--20
+\T1/ptm/m/n/10.95 (-20) Plots, Heat-maps). Das Ma-nu-skript bin-det die-se �ber
+ \T1/pcr/m/n/10.95 \input{tikz/<spec_id>/...} \T1/ptm/m/n/10.95 (-20) und \T1/p
+cr/m/n/10.95 \input{tabellen/<spec_id>...}
+
+Overfull \hbox (10.3508pt too wide) in paragraph at lines 39--42
+\T1/ptm/m/n/10.95 (-20) Anhand der Re-cords je Per-mu-ta-ti-on quan-ti-fi-ziert
+ die-ser Ab-schnitt, wel-che Ach-se am meis-ten zur Performance-
 )
-[15] (kapitel/de/08_conclusion.tex
-[16]
+[19] (kapitel/de/08_conclusion.tex
+[20]
 chapter 8.
-)
-[17]
-[18] (diplomarbeit-de.bbl
-chapter without number
 
-LaTeX Warning: Empty `thebibliography' environment or \BreakBibliography
-               before end of `thebibliography' environment on input line 3.
+Overfull \hbox (3.94208pt too wide) in paragraph at lines 5--13
+[] []\T1/phv/b/n/10.95 (-20) FF1 (Kom-po-si-ti-on).[][] \T1/ptm/m/n/10.95 (-20)
+ Die vier-zehn Permutations-Achsen (Pa-ge, No-de, Tra-ver-sal, Va-lue-Hand-le, 
+Memory-
 
+Overfull \hbox (4.72762pt too wide) in paragraph at lines 5--13
+\T1/ptm/m/n/10.95 (-20) Tier-1 + 22 Tier-2/3) zei-gen, dass die Achsen-Zerlegun
+g P01--P32 tr�gt. Die va-ria-di-sche API-Spezialisierung
+
+Overfull \hbox (30.92648pt too wide) in paragraph at lines 14--19
+[] []\T1/phv/b/n/10.95 (-20) FF2 (Mess-Methodik).[][] \T1/ptm/m/n/10.95 (-20) D
+ie Mes-sung ist in einen Produktiv-Modus (\T1/pcr/m/n/10.95 COMDARE_EXPERIMENT_
+MODE=OFF\T1/ptm/m/n/10.95 (-20) ,
 )
-[19]
-[20] (diplomarbeit-de.lof)
 [21]
-[22] (diplomarbeit-de.lot)
+[22] (diplomarbeit-de.bbl
+chapter without number
+)
 [23]
-[24] (anhang/de/A_measurements.tex
+[24] (diplomarbeit-de.lof)
+[25]
+[26] (diplomarbeit-de.lot)
+[27]
+[28] (anhang/de/A_measurements.tex
 chapter A.
 )
-[25] (anhang/de/B_code_structure.tex
-[26]
+[29] (anhang/de/B_code_structure.tex
+[30]
 chapter B.
 )
-[27] (anhang/de/C_glossary.tex
-[28]
+[31] (anhang/de/C_glossary.tex
+[32]
 chapter C.
 )
-[29] (anhang/de/D_building_block_matrix.tex
-[30]
+[33] (anhang/de/D_building_block_matrix.tex
+[34]
 chapter D.
 )
-[31] (anhang/de/E_architecture_decisions.tex
-[32]
+[35] (anhang/de/E_architecture_decisions.tex
+[36]
 chapter E.
 )
-[33]
-[34]
-[35]
-[36] (diplomarbeit-de.aux (kapitel/de/01_introduction.aux)
+[37]
+[38]
+[39]
+[40] (diplomarbeit-de.aux (kapitel/de/01_introduction.aux)
 (kapitel/de/02_fundamentals.aux) (kapitel/de/03_state_of_the_art.aux)
 (kapitel/de/04_concept_architecture.aux) (kapitel/de/05_implementation.aux)
 (kapitel/de/06_evaluation_methodology.aux)
@@ -476,9 +603,17 @@ chapter E.
 (anhang/de/C_glossary.aux) (anhang/de/D_building_block_matrix.aux)
 (anhang/de/E_architecture_decisions.aux)) )
 (see the transcript file for additional information)<C:/Users/benja/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/benja/AppData/
-Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/benja/AppData/
-Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/benja/AppData/
-Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on diplomarbeit-de.pdf (44 pages, 100191 bytes).
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/benja/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/
+benja/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C
+:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8
+.pfb><C:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/
+cm/cmsy10.pfb><C:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/urw/cou
+rier/ucrb8a.pfb><C:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/urw/c
+ourier/ucrr8a.pfb><C:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/urw
+/helvetic/uhvb8a.pfb><C:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/
+urw/times/utmb8a.pfb><C:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/
+urw/times/utmr8a.pfb><C:/Users/benja/AppData/Local/Programs/MiKTeX/fonts/type1/
+urw/times/utmri8a.pfb>
+Output written on diplomarbeit-de.pdf (48 pages, 283620 bytes).
 Transcript written on diplomarbeit-de.log.

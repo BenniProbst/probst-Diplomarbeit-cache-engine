@@ -70,3 +70,8 @@ desktop.ini
 # Thesis: bulkige Referenz-/Template-Archive — NICHT tracken (Repo-Bloat), 2026-06-01 (User-Wunsch).
 # Betrifft 20250811_Großer_Beleg_Beispiel.zip (8.8 MB) + zih-latex-template-master-ZIHLatexVorlage.zip.
 thesis/*.zip
+
+# Fremd-Arbeitskopien / nested IDE / extrahierte Vorlagen — nicht tracken (2026-06-02 Sync).
+Code/.idea/
+thesis/diplomarbeit-overleaf/
+thesis/zih-latex-template-master-ZIHLatexVorlage/
