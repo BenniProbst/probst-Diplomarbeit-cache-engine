@@ -11,6 +11,50 @@ zukünftigen Topic+Achsen-Entscheidungen.
 
 ---
 
+> ## KORREKTUR-Banner (korr. 2026-06-03, s. Doc 30 §8.0)
+>
+> **Begriffs-Schärfung gegenüber dem verbindlichen 3-Ebenen-Modell (Doc 30 §8.0;
+> verbatim verankert in Doc 24 §8.8 + diesem Dokument §25).** Dieses Dokument ist
+> das Quell-Dokument der Organ-/Tier-Metapher und verwendet den Begriff **„Gattung"**
+> historisch DOPPELDEUTIG. Ab sofort gilt die folgende strikte Trennung; die
+> Original-Texte/-Tabellen/-Direktiven unten bleiben unangetastet, sind aber im
+> Sinne dieses Banners zu lesen:
+>
+> 1. **GATTUNG = ein INTERFACE für die Außenwelt (= ein Prüf-Dock):**
+>    `SearchAlgorithm` / `Container` / `Graph`. (Doc 24 §8.8: „Prüf-Dock je Gattung —
+>    für Search Algorithm oder Container oder Graphen"; §8.6 „ABI-Interface der API
+>    der Gattung".) NUR dort, wo dieses Dokument „Gattung" im Sinne von
+>    *Interface / Prüf-Dock / Außen-API* meint, ist der Begriff KORREKT.
+>
+> 2. **TIER-UNTERKLASSE = liegt UNTER dem Gattungs-Interface und verwendet einen
+>    FESTEN Achsen-Satz.** HIER lebt die feste Achsen-Konfiguration. Alle Stellen
+>    unten, die „Gattung" / `AnatomyGenus` für die Ebene mit dem festen Achsen-Satz
+>    benutzen — insbesondere die **5 Klassen SearchAlgorithm/Set/Sequence/Adapter/View**
+>    (Säugetier/Vogel/Reptil/Wirbelloses/Pflanze) und die std-Familien **„Gattung A–F"**
+>    in §26 — bezeichnen in Wahrheit **Tier-UNTERKLASSEN**, NICHT Gattungen.
+>    Konkret: Set/Sequence/Adapter/View sind Tier-Unterklassen UNTER dem
+>    **Container**-Interface; die 17/19-Achsen-Komposition (std::map-ähnlich) ist die
+>    **SearchAlgorithm-Tier-Unterklasse** unter dem **SearchAlgorithm**-Interface.
+>
+> 3. **ACHSEN = Organe der Tier-Unterklasse. KEINE Achse ist optional.** Die
+>    Interfaces ALLER Achsen werden in JEDEM Tier-Binary tatsächlich + uniform
+>    getrieben. Ein nicht-pufferndes/nicht-prefetchendes Tier wählt einen KONKRETEN
+>    Durchreich-Algorithmus (NoBuffer/NoFlush/NonePrefetch/NoMigration/None), es wird
+>    NICHT „eine Achse weggelassen". Wo unten „optionale Achse" / „Teilmenge der
+>    Achsen" steht, ist das im Sinne von *Durchreich-Algorithmus* zu lesen (s. die
+>    Schärfungs-Notiz an §28/§32).
+>
+> 4. **queuing q1/q2** sind **Pflicht-ACHSEN der SearchAlgorithm-Tier-Unterklasse**
+>    (kein Interface, keine Gattung) — vgl. §7 (dort bereits korrekt als „Organ"
+>    geführt) und das parallele Code-Ziel AdHocComposition 17→19.
+>
+> **Lese-Regel:** Bei Widerspruch zwischen einer „Gattung"-Stelle unten und diesem
+> Banner hat das 3-Ebenen-Modell (Doc 30 §8.0) Vorrang. Verbatim-User-Direktiven
+> (§1, §10, §16, §25, §33, §41, §43, §53 …) bleiben wörtlich erhalten und werden NUR
+> annotiert, nie umgeschrieben.
+
+---
+
 ## §1 Kern-Metapher (User-Direktive verbatim 2026-05-26)
 
 > "Bei Paarhufer-Mägen gibt es den Magen der Kuh, des Rehs, des Schafes, aber alle
@@ -973,6 +1017,16 @@ Trennung + 3-Kompositionale-Joins + ABI-Stabilitaet).**
 
 ## §26 Web-Recherche Ergebnis — std::-Container-Hierarchie
 
+> **Schärfung 2026-06-03 (Doc 30 §8.0):** Die Bezeichnung „Gattung A–F" in diesem
+> Abschnitt ist im Sinne des verbindlichen 3-Ebenen-Modells eine **Tier-UNTERKLASSEN**-
+> Aufzählung, NICHT eine Gattungs-Aufzählung. Diese std-Container-Familien (Sequence /
+> Ordered Associative / Unordered Associative / Adapter / Flat Associative / View) sind
+> Tier-Unterklassen, die zum Großteil UNTER dem **Container**-Interface (= Gattung)
+> liegen; die K→V-Such-Familien (Ordered/Unordered/Flat Associative, std::map-ähnlich)
+> bilden die **SearchAlgorithm-Tier-Unterklasse** unter dem **SearchAlgorithm**-Interface.
+> „Gattung" im korrekten Sinn = das Außen-Interface Search/Container/Graph (Prüf-Dock).
+> Original-Tabellen bleiben unverändert; nur die Ebenen-Benennung wird geschärft.
+
 5 std-Container-Familien identifiziert (siehe cppreference.com Container library):
 
 ### §26.1 Gattung A — Sequence Containers (V-only indexed)
@@ -1036,6 +1090,17 @@ Pflicht-API: `operator[]/data()/size()` — KEIN insert/erase, non-owning.
 
 ## §27 AnatomyBase — die abstrakte Wurzel aller Lebewesen
 
+> **Schärfung 2026-06-03 (Doc 30 §8.0):** Die hier eingeführten 5 Werte des Enums
+> `AnatomyGenus` (SearchAlgorithm/Sequence/Set/Adapter/View) sowie die Tier-Metapher-
+> Tabelle §27.2 (Säugetier/Vogel/Reptil/Wirbelloses/Pflanze) bezeichnen die Ebene mit
+> dem **festen Achsen-Satz** = **Tier-Unterklasse**, NICHT die Gattung. Im verbindlichen
+> 3-Ebenen-Modell ist **Gattung = das Außen-Interface (Prüf-Dock) Search/Container/Graph**;
+> Set/Sequence/Adapter/View sind Tier-Unterklassen unter dem **Container**-Interface,
+> SearchAlgorithm ist die Tier-Unterklasse unter dem **SearchAlgorithm**-Interface.
+> Der Code-Identifier `AnatomyGenus` und seine Werte bleiben unverändert (technischer
+> Bestands-Bezeichner; Umbenennung wäre ein separater Code-Refactor, vgl. §41/§43
+> Cleanup-Sprint) — gemeint ist jedoch durchgehend die Tier-Unterklassen-Ebene.
+
 User-Direktive: "Alle Anatomie-Gattungen fallen unter die abstrakte Klasse der
 AnatomyBase."
 
@@ -1098,6 +1163,20 @@ public:
 
 ## §28 Achsen-Verteilung pro Gattung
 
+> **Schärfung 2026-06-03 (Doc 30 §8.0):** ZWEI Korrekturen zu diesem Abschnitt.
+> (1) **„pro Gattung" = pro Tier-Unterklasse** (feste Achsen-Konfiguration liegt auf
+> der Tier-Unterklassen-Ebene, nicht auf der Gattungs-/Interface-Ebene).
+> (2) Die Formulierung **„Teilmenge der 17 Achsen" bzw. die „—"-Markierungen in der
+> Tabelle sind im strengen Modell NICHT als „Achse weggelassen" zu verstehen.** KEINE
+> Achse ist optional: jede Tier-Unterklasse treibt die Interfaces ALLER für sie
+> definierten Achsen uniform; wo unten „—" steht, wählt das Tier in Wahrheit einen
+> KONKRETEN **Durchreich-Algorithmus** (None/NoBuffer/NoFlush/NonePrefetch/NoMigration,
+> bei View z.B. non-owning/immutable als konkrete Ausprägung). Die Tabelle beschreibt
+> also, welche Achse je Tier-Unterklasse einen aktiven vs. einen Durchreich-Algorithmus
+> erhält — nicht, ob eine Achse existiert. (Für die aktuell EINZIG gebaute
+> SearchAlgorithm-Tier-Unterklasse sind dies alle 17, im Code-Ziel 19 inkl. queuing
+> q1/q2.) Original-Tabelle bleibt unverändert.
+
 Jede Gattung verwendet eine **Teilmenge** der 17 Achsen:
 
 | Achse | Mammal (Search) | Bird (Set) | Reptile (Sequence) | Invertebrate (Adapter) | Plant (View) |
@@ -1131,6 +1210,15 @@ Gattungen nutzen Teilmengen + ggf. eigene Achsen (NEU axis_inner/axis_growth/etc
 ---
 
 ## §29 PermutationEngine-Spezialisierung pro Gattung
+
+> **Schärfung 2026-06-03 (Doc 30 §8.0):** „pro Gattung" / „pro Anatomie-Gattung" =
+> **pro Tier-Unterklasse** (die feste Achsen-Konfiguration und damit der
+> spezialisierte Permutations-Raum hängen an der Tier-Unterklassen-Ebene). Die
+> verbatim-User-Direktive unten bleibt wörtlich; sie meint mit „Anatomie-Gattung"
+> die Tier-Unterklasse. Gattung im strengen Sinn = das Außen-Interface
+> Search/Container/Graph (Prüf-Dock). Die Code-Marker `genus = AnatomyGenus::...`
+> in §29.1–§29.3 sind technische Bestands-Bezeichner und bezeichnen die
+> Tier-Unterklasse.
 
 User-Direktive: "Die Permutation Engine muss fuer die anatomischen Moeglichkeiten
 jeder Anatomie-Gattungen durch Unterklassen spezifiziert werden, die von der
@@ -1243,6 +1331,19 @@ AnatomyBase + Gattungs-spezialisierte PermutationEngines).**
 ---
 
 ## §32 Gattungs-Constraint fuer Pruefling-Merge (User-Direktive 2026-05-26 sehr spaet)
+
+> **Schärfung 2026-06-03 (Doc 30 §8.0):** Die Kern-Invariante dieses Abschnitts —
+> *nur Algorithmen mit dem EXAKT selben Achsen-Satz dürfen gekreuzt werden* — bleibt
+> uneingeschränkt gültig und richtig. Im 3-Ebenen-Modell ist das aber ein
+> **Tier-UNTERKLASSEN**-Constraint, nicht ein Gattungs-Constraint: gekreuzt werden darf
+> nur INNERHALB derselben Tier-Unterklasse (gleicher fester Achsen-Satz). Überall unten
+> ist „Gattung"/`AnatomyGenus`/„Cross-Genus" daher als **Tier-Unterklasse**/
+> „Cross-Tier-Unterklasse" zu lesen. Gattung im strengen Sinn = das Außen-Interface
+> Search/Container/Graph. — Zusätzlich (§32.2-Tabelle): die Spalte „Pflicht-Achsen-Set
+> (Teilmenge der 17)" und Formulierungen wie „kein search_algo/…" bedeuten NICHT „Achse
+> weggelassen"; jede definierte Achse wird getrieben, fehlende Funktion = konkreter
+> **Durchreich-Algorithmus** (None/delegated als reale Ausprägung). Original-Direktive
+> + Tabelle bleiben unverändert.
 
 ### §32.1 User-Direktive verbatim
 
@@ -1367,6 +1468,16 @@ fuer Pruefling-Merge, R5.C.A-Sprint-Ende-Vertiefung).**
 ---
 
 ## §34 Biologische Klassifikation der Wurzel-Hierarchie
+
+> **Schärfung 2026-06-03 (Doc 30 §8.0):** In der Taxonomie §34.1 ist die Zeile
+> „5 Gattungen: SearchAlgorithm/Set/Sequence/Adapter/View" als **5 Tier-UNTERKLASSEN**
+> zu lesen (Ebene mit dem festen Achsen-Satz). Im verbindlichen 3-Ebenen-Modell ist
+> **Gattung = das Außen-Interface (Prüf-Dock) Search/Container/Graph**; Set/Sequence/
+> Adapter/View liegen als Tier-Unterklassen unter dem **Container**-Interface,
+> SearchAlgorithm ist die Tier-Unterklasse unter dem **SearchAlgorithm**-Interface.
+> Die Wurzel-Hierarchie ExecutionEngine → AnatomyBase → {Tier-Unterklassen} und der
+> Lebewesen-vs-Viren-Schnitt bleiben unverändert korrekt — nur die Wortwahl
+> „Gattung" für die Tier-Unterklassen-Ebene wird geschärft. Original-Diagramm bleibt.
 
 ### §34.1 Drei-Ebenen-Taxonomie (analog Biologie)
 
