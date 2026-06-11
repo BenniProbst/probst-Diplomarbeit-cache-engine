@@ -43,6 +43,47 @@ struct CsvRow {
 [[nodiscard]] int parse_csv(std::filesystem::path const& in,
                             std::vector<CsvRow>& out_rows);
 
+// ── WIDE-Schema (tier×workload, 2026-06-11) ────────────────────────────────────────────────────────────
+// Das Mess-System (cache-engine run_lazy_150 / lazy_csv_header) emittiert das ';'-getrennte WIDE-Schema:
+// binary_id;setting;repetition;n_ops;total_ns;ns_per_op;19×seg_*_ns;13 Counter;…;119 stat_*;…;workload;
+// two_phase_valid. Der Parser ist HEADER-GETRIEBEN (Spalten per Name aufgelöst, Reihenfolge/Breite-agnostisch
+// → robust gegen additive Schema-Erweiterungen); extrahiert werden nur die auswertungs-relevanten Felder.
+
+struct WideMeasurementRow {
+    std::string  binary_id;          // volle statische Rekombination (19 Achsen-Belegungen)
+    std::string  search_algo;        // aus binary_id extrahiert (führendes "search_algo=<wert>/")
+    std::string  workload;           // Lastprofil-id (Achse 2; eigene Spalte "workload")
+    std::uint64_t repetition = 0;
+    std::uint64_t n_ops      = 0;
+    std::uint64_t total_ns   = 0;
+    double        ns_per_op  = 0.0;
+    bool          two_phase_valid = false;   // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
+};
+
+[[nodiscard]] int parse_wide_csv(std::filesystem::path const& in,
+                                 std::vector<WideMeasurementRow>& out_rows);
+
+/// Aggregat einer (search_algo × workload)-Zelle der Bias-Bruch-Matrix: Median (nearest-rank) der
+/// ns_per_op über alle dyn-Settings × Repetitionen — NUR über two_phase_valid-Zeilen (ungültige
+/// Messungen fließen NIE in Thesis-Tabellen).
+struct TierWorkloadAggregate {
+    std::string  search_algo;
+    std::string  workload;
+    std::size_t  samples          = 0;
+    double       median_ns_per_op = 0.0;
+};
+
+[[nodiscard]] std::vector<TierWorkloadAggregate>
+aggregate_tier_workload(std::span<WideMeasurementRow const> rows);
+
+// Bias-Bruch-Matrix als booktabs-Tabelle: Zeilen = search_algo, Spalten = Lastprofile, Zelle = Median-
+// ns/op (resizebox-skaliert; leere Zellen = "--"). lang = "de" | "en" (Spaltenkopf-Lokalisierung).
+[[nodiscard]] int write_bias_matrix_latex(std::filesystem::path const& out,
+                                          std::span<TierWorkloadAggregate const> aggs,
+                                          std::string const& caption,
+                                          std::string const& label,
+                                          std::string const& lang = "en");
+
 [[nodiscard]] std::string escape_latex(std::string_view s);
 
 // Generiert booktabs-Tabelle mit 6 Hauptspalten.
