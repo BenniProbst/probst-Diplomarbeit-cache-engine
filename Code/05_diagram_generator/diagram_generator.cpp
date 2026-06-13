@@ -1,10 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "diagram_generator.hpp"
 
+// L2 (2026-06-13): die 3D-Surfaces verzehren das L1-Aggregat aus Stufe 04. Diese .cpp ist die EINZIGE
+// Übersetzungseinheit, die csv_to_latex einbindet — der diagram_generator-Header bleibt frei von dieser
+// Abhängigkeit (Surface3dModelBuilder::build ist bewusst ein Template, hier explizit instanziiert).
+#include "../04_csv_to_latex/csv_to_latex.hpp"
+
 #include <algorithm>
 #include <charconv>
 #include <fstream>
 #include <iomanip>
+#include <map>
+#include <set>
 #include <sstream>
 #include <string_view>
 
@@ -286,6 +293,234 @@ int write_throughput_by_workload(std::filesystem::path const& out_tikz,
         bar.values.push_back(tput_ops_per_sec / 1.0e6);  // in Millionen
     }
     return write_bar_chart(out_tikz, bar, cnst);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// L2 (2026-06-13) — 3D-pgfplots-Surface je Interface-Funktion (wide3d-Modus)
+// ─────────────────────────────────────────────────────────────────────────────
+
+namespace csv = comdare::da::csv_to_latex;
+
+namespace {
+
+// Stabile y-Ordnung: 19-Tupel-Achsen-Lexikografie. Vergleicht binary_ids über ihr geparstes Achsen-Tupel
+// (NICHT die rohe Zeichenkette), damit die Tier-Reihenfolge der Achsen-Semantik folgt (L2-Spec: "stabil
+// sortiert nach Achsen-Lexikografie des 19-Tupels"). Bei identischem Tupel-Präfix entscheidet die Länge.
+[[nodiscard]] bool axis_tuple_less(std::string const& lhs_binary, std::string const& rhs_binary) {
+    auto const a = csv::parse_axis_tuple(lhs_binary);
+    auto const b = csv::parse_axis_tuple(rhs_binary);
+    std::size_t const n = std::min(a.size(), b.size());
+    for (std::size_t i = 0; i < n; ++i) {
+        if (a[i].axis  != b[i].axis)  return a[i].axis  < b[i].axis;
+        if (a[i].value != b[i].value) return a[i].value < b[i].value;
+    }
+    if (a.size() != b.size()) return a.size() < b.size();
+    return lhs_binary < rhs_binary;  // totale Ordnung (Determinismus auch bei gleichem Tupel)
+}
+
+[[nodiscard]] std::string fmt_z(double d) {
+    std::ostringstream s;
+    s << std::fixed << std::setprecision(2) << d;
+    return s.str();
+}
+
+}  // anonymous namespace
+
+std::vector<std::string> default_excluded_scan_workloads() {
+    // Scan-Profile sind bis A1a/M3 invalide (s. L2-Limitierung) → standardmäßig aus den Surfaces raus.
+    return {"ycsb_e", "lp_range_scan"};
+}
+
+// Builder (Lehrbuch-Pattern): baut die 6 Op-Art-Surface-Modelle deterministisch aus den L1-Aggregaten.
+// Template über den Aggregat-Span, damit der Header frei von csv_to_latex bleibt; unten explizit instanziiert.
+template <class AggregateSpan>
+std::array<Surface3dModel, 6>
+Surface3dModelBuilder::build(AggregateSpan const& aggregates,
+                             std::span<std::string const> excluded_workloads) const {
+    std::set<std::string> excluded{excluded_workloads.begin(), excluded_workloads.end()};
+
+    // 1) Stabile Achsen-Legenden sammeln: workloads lexikografisch (x), tiers per 19-Tupel-Lexikografie (y).
+    std::set<std::string> workload_set;          // lexikografisch sortiert → x-Index
+    std::set<std::string> tier_set_raw;
+    for (auto const& agg : aggregates) {
+        if (excluded.contains(agg.workload)) continue;
+        workload_set.insert(agg.workload);
+        tier_set_raw.insert(agg.binary_id);
+    }
+    std::vector<std::string> workloads{workload_set.begin(), workload_set.end()};
+    std::vector<std::string> tiers{tier_set_raw.begin(), tier_set_raw.end()};
+    std::sort(tiers.begin(), tiers.end(), axis_tuple_less);
+
+    // Index-Maps (Flyweight-artige Legenden-Wiederverwendung: jede Surface teilt dieselbe x/y-Ordnung).
+    std::map<std::string, std::size_t> workload_x;
+    for (std::size_t i = 0; i < workloads.size(); ++i) workload_x[workloads[i]] = i;
+    std::map<std::string, std::size_t> tier_y;
+    for (std::size_t i = 0; i < tiers.size(); ++i) tier_y[tiers[i]] = i;
+
+    // 2) z-Werte je Op-Art in (tier_y, workload_x)-Zellen ablegen. has_value entscheidet echte Zelle ↔ nan-Lücke.
+    //    csv::kOpKindNames ist die Single-Source der Op-Reihenfolge (kein Re-Def in diesem Modul).
+    std::array<Surface3dModel, 6> models{};
+    for (std::size_t op = 0; op < csv::kOpKindCount; ++op) {
+        Surface3dModel& m = models[op];
+        m.op_name      = std::string{csv::kOpKindNames[op]};
+        m.op_index     = op;
+        m.workload_ids = workloads;
+        m.tier_ids     = tiers;
+        // Dichtes Gitter (y außen, x innen), Default = Lücke (nan).
+        m.cells.resize(tiers.size() * workloads.size());
+        for (std::size_t y = 0; y < tiers.size(); ++y)
+            for (std::size_t x = 0; x < workloads.size(); ++x) {
+                Surface3dCell& c = m.cells[y * workloads.size() + x];
+                c.x_workload_index = x;
+                c.y_tier_index     = y;
+                c.has_value        = false;
+            }
+    }
+    for (auto const& agg : aggregates) {
+        if (excluded.contains(agg.workload)) continue;
+        auto const wx = workload_x.find(agg.workload);
+        auto const ty = tier_y.find(agg.binary_id);
+        if (wx == workload_x.end() || ty == tier_y.end()) continue;
+        std::size_t const x = wx->second, y = ty->second;
+        for (std::size_t op = 0; op < csv::kOpKindCount; ++op) {
+            double const z = agg.median_p50_ns_per_op[op];
+            // Ehrlich: z<=0 = Op nicht ausgeführt (z.B. scan in Lookup-Profilen) → Lücke (nan), NIE 0 faken.
+            if (z <= 0.0) continue;
+            Surface3dCell& c = models[op].cells[y * workloads.size() + x];
+            if (!c.has_value) ++models[op].real_cell_count;
+            c.z_median_p50_ns = z;
+            c.has_value       = true;
+        }
+    }
+    return models;
+}
+
+// Explizite Instanziierung für den konkreten L1-Aggregat-Span (hält den Header csv_to_latex-frei).
+template std::array<Surface3dModel, 6>
+Surface3dModelBuilder::build<std::span<csv::TierWorkloadOpAggregate const>>(
+    std::span<csv::TierWorkloadOpAggregate const> const&, std::span<std::string const>) const;
+
+namespace {
+
+// Template-Method-Kern: emittiert den \begin{axis}…\end{axis}-Rumpf EINER Surface (von beiden Varianten geteilt).
+// Lücken-Zeilen werden ehrlich als `nan` geschrieben; pgfplots/surf interpoliert sie als Loch (unmeshed=false).
+void write_surface_axis_body(std::ostream& f, Surface3dModel const& model) {
+    std::size_t const nx = model.workload_ids.size();
+    std::size_t const ny = model.tier_ids.size();
+
+    // workload→x-Map als Achsenbeschriftung/Kommentar dokumentieren (L2-Pflicht).
+    f << "  % x = Testdaten-Konfig (Workload-Index). workload->x-Map (stabil, lexikografisch):\n";
+    for (std::size_t x = 0; x < nx; ++x)
+        f << "  %   x=" << x << " : " << model.workload_ids[x] << "\n";
+    f << "  % y = Tier-Index (stabil nach 19-Tupel-Achsen-Lexikografie der binary_ids):\n";
+    for (std::size_t y = 0; y < ny; ++y)
+        f << "  %   y=" << y << " : " << model.tier_ids[y] << "\n";
+    f << "  % z = median_p50_ns je Operation '" << model.op_name << "' (nan = Op nicht ausgefuehrt).\n";
+
+    f << "\\begin{axis}[\n";
+    f << "    width=0.95\\textwidth,\n";
+    f << "    height=0.45\\textwidth,\n";
+    f << "    title={Surface: median p50 ns/op -- " << escape_latex(model.op_name) << "},\n";
+    f << "    xlabel={Testdaten-Konfig (workload index)},\n";
+    f << "    ylabel={Tier index},\n";
+    f << "    zlabel={median p50 (ns/op)},\n";
+    f << "    grid=both,\n";
+    f << "    colormap/viridis,\n";
+    f << "    colorbar,\n";
+    f << "    view={45}{30},\n";
+    f << "    mesh/ordering=y varies,\n";  // Datenpunkte: y außen, x innen (matcht unsere Zeilen-major-Ordnung)
+    f << "]\n";
+    // surf-Plot mit Gitter-Ausdehnung; nan-Zellen bleiben Löcher (ehrliche Lücke).
+    f << "\\addplot3[surf, shader=interp, mesh/rows=" << ny << ", mesh/cols=" << nx << "] coordinates {\n";
+    for (std::size_t y = 0; y < ny; ++y) {
+        for (std::size_t x = 0; x < nx; ++x) {
+            Surface3dCell const& c = model.cells[y * nx + x];
+            f << "    (" << x << "," << y << ",";
+            if (c.has_value) f << fmt_z(c.z_median_p50_ns);
+            else             f << "nan";
+            f << ")\n";
+        }
+        f << "\n";  // Leerzeile = Gitter-Zeilen-Trenner für surf
+    }
+    f << "};\n";
+    f << "\\end{axis}\n";
+}
+
+}  // anonymous namespace
+
+int write_op_surface(std::filesystem::path const& out_path,
+                     Surface3dModel const& model,
+                     PageConstraints const& cnst) {
+    if (model.workload_ids.empty() || model.tier_ids.empty()) return status_empty_input;
+
+    std::ofstream f{out_path};
+    if (!f) return status_io_error;
+
+    f << "% AUTO-GENERATED durch diagram_generator (L2, 3D-Surface je Interface-Funktion)\n";
+    f << "% Op-Art = " << model.op_name << " | echte z-Zellen = " << model.real_cell_count
+      << " von " << (model.workload_ids.size() * model.tier_ids.size()) << "\n";
+    f << "% LIMITIERUNG: Scan-Profile (ycsb_e, lp_range_scan) sind bis A1a/M3 invalide und hier ausgeschlossen.\n";
+    if (!cnst.body_only) {
+        // Strategy A: standalone — eigene Präambel, separat zu PDF kompilierbar.
+        f << "\\documentclass[border=2mm]{standalone}\n";
+        f << "\\usepackage{pgfplots}\n";
+        f << "\\pgfplotsset{compat=1.18}\n";
+        f << "\\begin{document}\n";
+        f << "\\begin{tikzpicture}\n";
+        write_surface_axis_body(f, model);
+        f << "\\end{tikzpicture}\n";
+        f << "\\end{document}\n";
+    } else {
+        // Strategy B: body-only — nur \begin{axis}…\end{axis} (L4-Appendix wrappt tikzpicture/figure selbst).
+        write_surface_axis_body(f, model);
+    }
+    return f.good() ? status_ok : status_io_error;
+}
+
+int generate_wide3d_surfaces(std::filesystem::path const& csv_path,
+                             std::filesystem::path const& out_dir,
+                             std::vector<Surface3dModel>& out_models,
+                             std::span<std::string const> excluded_workloads) {
+    // 1) L1-Parsen (KEINE Parallel-Implementierung des Parsers — Stufe 04 ist Single-Source).
+    std::vector<csv::WideMeasurementRow> rows;
+    if (csv::parse_wide_csv(csv_path, rows) != csv::status_ok) return status_io_error;
+    if (rows.empty()) return status_empty_input;
+
+    // 2) L1-Aggregat je (binary_id × workload) × Op-Art (nearest-rank-Median p50, nur two_phase_valid).
+    auto const aggregates = csv::aggregate_tier_workload_per_op(rows);
+    if (aggregates.empty()) return status_empty_input;
+
+    // 3) Ausschlussliste: explizit übergeben ODER Default-Scan-Profile.
+    std::vector<std::string> excluded_store;
+    std::span<std::string const> excluded = excluded_workloads;
+    if (excluded.empty()) {
+        excluded_store = default_excluded_scan_workloads();
+        excluded = excluded_store;
+    }
+
+    // 4) Builder → 6 Surface-Modelle.
+    Surface3dModelBuilder builder;
+    auto const models = builder.build(std::span<csv::TierWorkloadOpAggregate const>{aggregates}, excluded);
+
+    // 5) Je Op-Art zwei Dateien: standalone (<op>.tex) + body-only (<op>_body.tex). RELATIVE Dateinamen.
+    std::error_code ec;
+    std::filesystem::create_directories(out_dir, ec);  // best-effort; Fehler fällt unten via ofstream auf
+    out_models.clear();
+    out_models.reserve(6);
+    int first_error = status_ok;
+    for (auto const& m : models) {
+        out_models.push_back(m);
+        PageConstraints standalone_cnst;  // body_only = false → standalone
+        PageConstraints body_cnst;
+        body_cnst.body_only = true;
+        std::filesystem::path const standalone_file = out_dir / (m.op_name + ".tex");
+        std::filesystem::path const body_file       = out_dir / (m.op_name + "_body.tex");
+        int const rc_a = write_op_surface(standalone_file, m, standalone_cnst);
+        int const rc_b = write_op_surface(body_file, m, body_cnst);
+        if (first_error == status_ok && rc_a != status_ok) first_error = rc_a;
+        if (first_error == status_ok && rc_b != status_ok) first_error = rc_b;
+    }
+    return first_error;
 }
 
 }  // namespace comdare::da::diagram_generator

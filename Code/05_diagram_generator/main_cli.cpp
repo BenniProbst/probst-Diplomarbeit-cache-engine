@@ -6,12 +6,69 @@
 
 #include <fstream>
 #include <iostream>
+#include <span>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace dg = comdare::da::diagram_generator;
 
+// L2 (2026-06-13) — wide3d-Modus: aus der WIDE-CSV (Stufe 04 / L1) je Interface-Funktion EIN
+// 3D-pgfplots-Surface erzeugen. CLI: diagram-generator --mode=wide3d --csv <pfad> --out <dir>
+// [--exclude=<wl1,wl2,...>]. Bricht die bestehenden Modi NICHT (separater, früher Pfad).
+namespace {
+[[nodiscard]] std::vector<std::string> split_comma(std::string const& s) {
+    std::vector<std::string> out;
+    std::string cur;
+    for (char c : s) { if (c == ',') { if (!cur.empty()) out.push_back(cur); cur.clear(); } else cur.push_back(c); }
+    if (!cur.empty()) out.push_back(cur);
+    return out;
+}
+
+[[nodiscard]] int run_wide3d(int argc, char* argv[]) {
+    std::string csv_path, out_dir;
+    std::vector<std::string> excluded;
+    for (int i = 2; i < argc; ++i) {
+        std::string a{argv[i]};
+        if (a.rfind("--csv=", 0) == 0)          csv_path = a.substr(6);
+        else if (a == "--csv" && i + 1 < argc)  csv_path = argv[++i];
+        else if (a.rfind("--out=", 0) == 0)     out_dir  = a.substr(6);
+        else if (a == "--out" && i + 1 < argc)  out_dir  = argv[++i];
+        else if (a.rfind("--exclude=", 0) == 0) excluded = split_comma(a.substr(10));
+    }
+    if (csv_path.empty() || out_dir.empty()) {
+        std::cerr << "Usage: diagram-generator --mode=wide3d --csv <wide.csv> --out <dir> "
+                     "[--exclude=ycsb_e,lp_range_scan]\n";
+        return 1;
+    }
+    std::vector<dg::Surface3dModel> models;
+    std::span<std::string const> exc = excluded.empty()
+        ? std::span<std::string const>{}    // Builder nimmt Default-Scan-Ausschluss
+        : std::span<std::string const>{excluded};
+    int const rc = dg::generate_wide3d_surfaces(csv_path, out_dir, models, exc);
+    if (rc != 0) {
+        std::cerr << "generate_wide3d_surfaces failed: " << rc << "\n";
+        return rc;
+    }
+    std::size_t total_real = 0;
+    for (auto const& m : models) {
+        std::cout << "  surface[" << m.op_name << "] : "
+                  << m.real_cell_count << " echte z-Zellen ("
+                  << m.tier_ids.size() << " tiers x " << m.workload_ids.size() << " workloads)\n";
+        total_real += m.real_cell_count;
+    }
+    std::cout << "diagram-generator wide3d: " << models.size() << " surfaces, "
+              << total_real << " echte z-Zellen gesamt -> " << out_dir << "\n";
+    return 0;
+}
+}  // anonymous namespace
+
 int main(int argc, char* argv[]) {
+    // L2 — wide3d-Modus (3D-Surfaces je Interface-Funktion); separater, früher Pfad.
+    if (argc >= 2 && std::string{argv[1]} == "--mode=wide3d") {
+        return run_wide3d(argc, argv);
+    }
+
     // V22.1 — neuer Subcommand --by-workload erzeugt gruppierten Bar-Chart aus
     // V20.3-konformer measurements.csv (16 Spalten inkl. workload_used).
     if (argc >= 4 && std::string{argv[1]} == "--by-workload") {
@@ -35,7 +92,9 @@ int main(int argc, char* argv[]) {
                   << "       (Demo: liest 1. Spalte = label, total_cycles = value)\n"
                   << "       (--body-only: nur tikzpicture, ohne figure/caption — Caller wrappt)\n"
                   << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
-                  << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n";
+                  << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n"
+                  << "  oder: diagram-generator --mode=wide3d --csv <wide.csv> --out <dir> [--exclude=wl1,wl2]\n"
+                  << "       (L2: 3D-Surface je Interface-Funktion; Scan-Profile ycsb_e/lp_range_scan ausgeschlossen)\n";
         return 1;
     }
     std::ifstream f{argv[1]};
