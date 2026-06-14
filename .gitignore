@@ -75,3 +75,7 @@ thesis/*.zip
 Code/.idea/
 thesis/diplomarbeit-overleaf/
 thesis/zih-latex-template-master-ZIHLatexVorlage/
+
+# thesis/diplomarbeit ist ab 2026-06-14 ein EIGENES Git (Remote 20260931-Overleaf-Diplomarbeit,
+# Overleaf-Sync) — herausgeloest aus diesem Haupt-Repo, hier nicht mehr getrackt.
+thesis/diplomarbeit/
