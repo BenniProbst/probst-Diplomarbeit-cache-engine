@@ -105,13 +105,13 @@ SOTA) / B (systematische Variation) / C (Merge/Regression); **Mess-Pipeline** Bi
 
 ## 4. ARCHITEKTUR-LANDKARTE (aus dem 4-Strang-Audit, code-verifiziert)
 
-### 4.1 Die vier Konzept-Ebenen (innerhalb einer Bibliothek)
+### 4.1 Die vier Konzept-Ebenen (innerhalb einer Bibliothek; „3-Ebenen-Modell" = 4 verschachtelte Ebenen)
 | Ebene | Begriff | Code-Anker | Anzahl |
 |---|---|---|---|
 | 1 | **Gattung** = Außen-Interface / Prüf-Dock | `enum AnatomyGattung` | **3**: SearchAlgorithm · Container · Graph |
 | 2 | **Lebewesen-Unterklasse** (hist. „Tier-Unterklasse") = fester Achsen-Satz | `enum AnatomyGenus` | **5**: SearchAlgorithm · Set · Sequence · Adapter · View |
 | 3 | **Achse = Organ** = permutierbare Teilentscheidung (keine optional) | `topics/`→`axes/` | **19** (SearchAlgorithm) |
-| 4 | **Sub-Achse = Organ-Bestandteil** | `*_subaxes_*.hpp` | **~57–279** |
+| 4 | **Sub-Achse = Organ-Bestandteil** = orthogonale Dimension im Organ | `*_subaxes_*.hpp` | **~57–279** |
 
 `gattung_of()`: SearchAlgorithm → eigene Gattung; Set/Sequence/Adapter/View → alle Container.
 Achsen-Sätze (`genus_binding_traits.hpp`): SearchAlgorithm **19**, Set **15**, Sequence **11**,
@@ -144,32 +144,47 @@ concurrency/memory_layout/isa/telemetry). Eine eigene Gattung zu erheben wäre d
   historische „22".)
 - **Sub-Achsen-Bestand** (code-gezählt): 74 Tag-Structs + 54 Strategy-Concepts + 151 Wrapper =
   **~279 Organ-Bestandteile** (Goldstandard `axis_06_allocator`: 7 Tags + 6 Concepts + 25 Wrapper).
-  Manuskript-Zahl **„~57"** = Tag-Näherung (beibehalten).
+  Manuskript-Zahl **„~57"** = Tag-Näherung (beibehalten; je nach Zählkonvention Tags / +Concepts /
+  +Wrapper / +composable schwankend).
 
 ### 4.4 Getrennte Architektur: Aufbau-Seite ⊥ Mess-Seite (die Schichtung)
-Die Schichtung trennt **wie ein Lebewesen aufgebaut ist** (Aufbau-Seite, ①) von **wie es gemessen/
-getrieben wird** (Mess-Seite, ②). Code-Direktive (`idriveable_tier.hpp:6`): **„Anatomy-ABI ⊥
-Observer-Tier-Schnittstelle"** — diese Orthogonalität ist die eigentliche Grundlage des Frameworks.
+Die Schichtung trennt **wie ein Lebewesen aufgebaut ist** (Aufbau-Seite, ①, fachlich, permutierbar)
+von **wie es gemessen/getrieben wird** (Mess-Seite, ②, methodisch, ABI-stabil). Code-Direktive
+(`idriveable_tier.hpp:6`): **„Anatomy-ABI ⊥ Observer-Tier-Schnittstelle"** — diese Orthogonalität ist
+die eigentliche Grundlage des Frameworks.
 
 **Aufbau-Seite (①):**
-1. **Bibliothek** (cache-engine/PRT-ART) — stellt **je Achse einen Katalog** von Organ-Varianten bereit.
+1. **Bibliothek** (cache-engine/PRT-ART) — stellt **je Achse einen Katalog** von Organ-Varianten bereit
+   (z. B. allocator: 25 Vendor-Wrapper; node_type: Node4/16/48/256; concurrency: 9 Wrapper).
 2. **`XxxComposition`** (`*_composition.hpp`) — compile-time **Typ-Liste** der gewählten
-   Achsen-Ausprägungen (T0..Tn); trägt die **Identität**, keine Logik. Kein „Tier".
+   Achsen-Ausprägungen (T0..Tn); trägt die **Identität** (welche Organe), keine Logik. Kein „Tier".
 3. **`XxxAnatomy<Composition>`** (`*_anatomy.hpp`) — das **konkrete Lebewesen in-process**: hält die
    Organe, treibt sie funktional, liefert `observe_all()`/`genus()`/`organ_count()`. Technischer Name.
+4. **Achse = Organ** (19) · **Sub-Achse = Organ-Bestandteil** (~279). Eine nicht zutreffende Achse wird
+   **nie weggelassen**, sondern mit einem konkreten Durchreich-Organ (`None`/…) belegt. Ein konkretes
+   Lebewesen = eine **Permutation/Rekombination** der Organe = ein Punkt im Entwurfsraum.
 
 **Mess-Seite (②, ⊥ Aufbau):**
-4. **`IXxxTier`→`IXxxSubject`** (`*_tier.hpp`) — ABI-Schnittstelle über die DLL-Grenze; **hängt NICHT
-   an `IAnatomyBase`** (eigenständig, per `dynamic_cast` abgefragt).
-5. **`XxxAbiAdapter`** (`abi_adapter.hpp`, `*_abi_adapter.hpp`) — die **Brücke**: erbt `IAnatomyBase`
-   (Aufbau) **und** `IXxxSubject` (Messung), hält eine `XxxAnatomy`. **106 „Tier"-Treffer** (größter Block).
-6. **Host** (Prüf-Dock/CacheEngineBuilder) — treibt + misst (Teilaufgabe 5) + **mappt + persistiert**.
+5. **`IXxxTier`→`IXxxSubject`** (`*_tier.hpp`) — ABI-Schnittstelle über die DLL-Grenze; **hängt NICHT
+   an `IAnatomyBase`** (eigenständige Sub-Interfaces, vom genus-typisierten Adapter *zusätzlich* geerbt,
+   vom Host per `dynamic_cast` [1× kalt je Modul, nie im Hot-Loop] abgefragt).
+6. **`XxxAbiAdapter`** (`abi_adapter.hpp`, `*_abi_adapter.hpp`) — die **Brücke**: erbt `IAnatomyBase`
+   (Aufbau) **und** `IXxxSubject` (Messung), hält eine `XxxAnatomy` und **leitet die ABI-Aufrufe an sie
+   weiter**. **Einzige Stelle, die beide Seiten verbindet** (106 „Tier"-Treffer — größter Block).
+7. **Host** (Prüf-Dock/CacheEngineBuilder) — treibt + misst (Teilaufgabe 5) + **mappt + persistiert**.
 
-**Orthogonalität in Funktion:** `IDriveableSubject` (funktionaler Antrieb) ist **IMMER einkompiliert**
-(auch Release-DLL ohne Messung); `IObservableSubject` (Observer→Snapshot) **NUR bei Messung-AN**
-(`COMDARE_MEASUREMENT_ON`). → Die Messung lässt sich **an-/abschalten, ohne den Aufbau zu ändern**;
-der Observer-Snapshot (`ComdareTierObserverSnapshot`, `axis_stats[19][8]`+`seg_ns[19]`) quert die
-Grenze als **flacher, komposition-UNABHÄNGIGER POD** → derselbe Mess-Apparat greift auf jede Permutation.
+**Orthogonalität in Funktion:** `IDriveableSubject` (funktionaler Antrieb: insert/lookup/erase/clear/
+size, uint64-Key/Value) ist **IMMER einkompiliert** (auch Release-/funktional-only-DLL ohne Messung) —
+darüber fährt der Host generisch das **`std::map`-Konformitäts-Gate UND die Last**. `IObservableSubject`
+(Observer→Snapshot) wird **NUR bei Messung-AN** (`COMDARE_MEASUREMENT_ON`) vererbt/exportiert; ebenso
+`IRollbackableSubject` (Memento) etc. → Die Messung lässt sich **an-/abschalten, ohne den Aufbau zu
+ändern**: die Anatomie ist mess-agnostisch, die Messung ein orthogonales, optionales Sub-Interface. Der
+Observer-Snapshot (`ComdareTierObserverSnapshot`, `axis_stats[19][8]`+`seg_ns[19]`+Meta) quert die
+Grenze als **flacher, komposition-UNABHÄNGIGER POD** (memcpy-fähig) → derselbe Mess-Apparat greift auf
+jede Permutation.
+
+> **Folge für die Begriffe:** ① (Aufbau/Lebewesen) und ② (Mess-Schicht/Subject) MÜSSEN getrennte
+> Begriffe behalten — sie sind zwei orthogonale Seiten desselben Adapters, nicht dasselbe.
 
 ### 4.5 prt-art: 8 Bausteinschichten + die ③-Einordnung von `CacheTier`
 8 Schichten (`PROJECT_LAYER_MAP.md`, code-verifiziert gegen `PrtArtComponents`): **L1 Identität**
@@ -242,6 +257,7 @@ cache-engine: `TierBasedMigration`/`kTiers`/`tier_index_sum`/`tier_moves` (migra
    „Permutations-Lebewesen/Rekombination", nie „Probe". „probe"(EN) nur = Prüfling.
 5. **Bibliothek ≠ Lebewesen:** cache-engine/PRT-ART sind **Bibliotheken**, keine Lebewesen.
    Formulierungen wie „das Lebewesen cache-engine" sind falsch — es *erzeugt* Lebewesen.
+   **Aufbau ≠ Messung:** Anatomie (①) und Subject-ABI (②) sind orthogonal (s. §4.4).
 6. **ABI-Konsequenz (②):** `tier_*` = vtable über DLL-Grenze, `ComdareTierObserverSnapshot` =
    cross-boundary-POD → Umbenennung **ABI-brechend**: Host (`anatomy_module_abi_v1_decl.hpp`,
    Loader) + alle Prüflings-DLLs synchron + **ABI-Major-Bump 3→4**.
