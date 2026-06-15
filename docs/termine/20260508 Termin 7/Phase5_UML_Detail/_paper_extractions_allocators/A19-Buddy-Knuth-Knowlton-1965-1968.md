@@ -111,7 +111,7 @@ free(block, n):
 
 ## Bausteine-Achsen-Mapping fuer Cache-Engine
 
-Buddy ist als **eines** der Tier-1-Schemata in `c06_allocation_engine.aa1_freelist_topology` zu fuehren — neben Slab (A02), Hoard's Superblocks (A01), und Michael's Lock-Free-Anchor-Bins (A03).
+Buddy ist als **eines** der Rang-1-Schemata in `c06_allocation_engine.aa1_freelist_topology` zu fuehren — neben Slab (A02), Hoard's Superblocks (A01), und Michael's Lock-Free-Anchor-Bins (A03).
 
 ## Bedeutung fuer Comdare-CacheEngine
 

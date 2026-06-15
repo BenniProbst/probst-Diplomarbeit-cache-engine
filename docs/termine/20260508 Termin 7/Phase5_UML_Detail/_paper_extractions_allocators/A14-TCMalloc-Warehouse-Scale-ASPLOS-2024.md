@@ -20,9 +20,9 @@
 
 ## Production-Daten — Allocation Latency-Hierarchie
 
-Mean allocation latency hitting different cache tiers:
+Mean allocation latency hitting different Cache-Ebenen:
 
-| Tier | Latenz | Mechanismus |
+| Ebene | Latenz | Mechanismus |
 |------|--------|-------------|
 | **Per-CPU Cache** | **3.1 ns** | RSEQ fast path (~40 hand-coded x86 instructions) |
 | **Transfer Cache** | 59.9 ns | Per-CPU cache empty → mutex-protected |
@@ -51,7 +51,7 @@ Mean allocation latency hitting different cache tiers:
 - **Fleet-wide fragmentation ratio:** 22.2%
   - **External:** 18.8% (unused memory cached by allocator)
   - **Internal:** 3.4% (size-class-rounding slack)
-- **Fragmentation-Verteilung pro Cache-Tier:**
+- **Fragmentation-Verteilung pro Cache-Ebene:**
   - Pagination: 51% (Hugepage-Filler-Effekt!)
   - Central FreeList: 29%
   - Internal: 15%
@@ -61,7 +61,7 @@ Mean allocation latency hitting different cache tiers:
 
 - **98% der Objects ≤ 1 KiB** in Anzahl
 - **>50% der Memory ist in Objects > 8 KiB** (Heavy-tailed)
-- **256 KiB:** Maximum Cache-Tier Size; darueber direkt PageHeap
+- **256 KiB:** Maximum Cache-Ebenen-Size; darueber direkt PageHeap
 - Object-Lifetime-Diversity: gleiche Size-Class kann sowohl <1 ms als auch ≥7 days leben!
 - 65% der Objects > 1 GiB leben > 1 Tag
 

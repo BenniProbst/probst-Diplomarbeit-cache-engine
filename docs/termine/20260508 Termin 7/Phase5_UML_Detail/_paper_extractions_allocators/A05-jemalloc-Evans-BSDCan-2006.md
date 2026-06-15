@@ -60,7 +60,7 @@ malloc(size)
 | Achse | jemalloc-Konkretisierung |
 |-------|---------------------------|
 | **AA1 FreeList-Topologie** | Bitmap-basiert pro Run (Region-Allokation); Red-Black-Tree fuer freie Runs/Chunks pro Arena; lock-frei in tcache (modern) |
-| **AA2 Size-Class-Schema** | 4 Tiers (Tiny/Quantum-spaced/Sub-page/Large) + Huge separately; ~64 Size Classes (genaue Anzahl variiert nach Konfig) |
+| **AA2 Size-Class-Schema** | 4 Stufen (Tiny/Quantum-spaced/Sub-page/Large) + Huge separately; ~64 Size Classes (genaue Anzahl variiert nach Konfig) |
 | **AA3 Thread-Locality** | tcache per-thread + Multiple Arenas (4*ncpu) zur Reduktion von Lock-Pressure; Threads zur Arena via Round-Robin |
 | **AA4 Synchronization** | Per-Arena `chunk_alloc_lock` + per-Arena per-bin `bin_lock`; tcache lockless |
 | **AA5 Allocation-Policy** | tcache → Arena Bin → Run → Chunk-Split (recursive); RB-Tree-Suche fuer best-fit Chunks |
@@ -89,7 +89,7 @@ Seit Facebook-Adoption 2009 + nachfolgender Entwicklung:
 ## Bedeutung fuer Comdare-CacheEngine
 
 1. **Multiple Arenas** = Standard-Pattern fuer **Per-Thread-Locality ohne harte Per-Thread-Bindung** — wertvoll fuer **Multi-Tenant Workloads** wo Thread-Lifetime unbekannt
-2. **Size Class Tiers (Tiny/Quantum/Sub-page/Large/Huge)** = **multi-tier Pattern** fuer Comdare's Allokator-Subdivision
+2. **Size-Class-Stufen (Tiny/Quantum/Sub-page/Large/Huge)** = **Multi-Stufen-Pattern** fuer Comdare's Allokator-Subdivision
 3. **Red-Black-Tree fuer Free-Chunk-Indexing** = O(log n) Best-Fit-Lookup als alternative zu Hoard's Fullness-Groups
 4. **Bitmap-Region-Allokation** = Vorlage fuer dichtes State-Tracking (analog PRT-ART Density-Tracker fuer Pool A 256B Slots)
 5. **Decay-based Purging** als `c10_topologie_engine` Atom — adaptive OS-Memory-Release

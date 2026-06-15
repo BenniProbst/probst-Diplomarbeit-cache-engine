@@ -7,7 +7,7 @@
 - T6-AA: `20260416 Termin 6__20260416_Arbeitsaufstellung_PRT_ART_Termin6_final.docx.txt` (Arbeitsaufstellung Termin 6)
 - T6-SF: `20260416 Termin 6__20260416_PRT_ART_Termin6_Scope_Freeze_final.docx.txt` (Scope-Freeze Termin 6)
 
-**Hinweis:** Block AN/AO/AP und eine eigenstaendige "Telemetry-Strategie" sind in Termin 5/6 nicht woertlich genannt — Termin 6 nennt jedoch konkrete Telemetrie-/Mess-Pflichten (Abschnitt F). Kuehn (P28 DaMoN 2023) wird in Termin 5/6 ebenfalls nicht namentlich erwaehnt; Kuehn-Erkenntnisse stammen aus Tier-3-Lektuere (siehe Memory).
+**Hinweis:** Block AN/AO/AP und eine eigenstaendige "Telemetry-Strategie" sind in Termin 5/6 nicht woertlich genannt — Termin 6 nennt jedoch konkrete Telemetrie-/Mess-Pflichten (Abschnitt F). Kuehn (P28 DaMoN 2023) wird in Termin 5/6 ebenfalls nicht namentlich erwaehnt; Kuehn-Erkenntnisse stammen aus Rang-3-Lektuere (siehe Memory).
 
 ---
 
@@ -215,7 +215,7 @@ Aus den 5 Clustern kommen IM SCOPE:
 
 ### F.1 Kuehn (P28 DaMoN 2023) in Termin 5/6
 
-**Befund:** Kuehn et al. wird in Termin 5/6 NICHT namentlich genannt. Suche in `_extracted_text` ergab keine Treffer fuer "Kuehn|Kühn|DaMoN|P28" in den Termin-5/6-Dateien. Die Kuehn-Erkenntnisse stammen aus der Tier-3-Lektuere (Task #56, P28 abgeschlossen) und wurden in Bausteine_Matrix + Domaenenmodell bereits eingearbeitet (Task #94 completed, Memory).
+**Befund:** Kuehn et al. wird in Termin 5/6 NICHT namentlich genannt. Suche in `_extracted_text` ergab keine Treffer fuer "Kuehn|Kühn|DaMoN|P28" in den Termin-5/6-Dateien. Die Kuehn-Erkenntnisse stammen aus der Rang-3-Lektuere (Task #56, P28 abgeschlossen) und wurden in Bausteine_Matrix + Domaenenmodell bereits eingearbeitet (Task #94 completed, Memory).
 
 ### F.2 Block AN/AO/AP
 

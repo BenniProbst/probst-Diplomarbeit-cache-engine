@@ -219,7 +219,7 @@ ID: ALLOC_SIZECLASS_OBJECT_CACHE_SLAB
 ID: ALLOC_SIZECLASS_TIERED_JEMALLOC
    QUELLE        A05 jemalloc (Evans 2006)
    CLUSTER       AC2 Modern Production
-   BESCHREIBUNG  4 Tiers: Tiny (2-16B pow2), Quantum-spaced (16-496B 16B-
+   BESCHREIBUNG  4 Stufen: Tiny (2-16B pow2), Quantum-spaced (16-496B 16B-
                  quantum), Sub-page (512-2048B pow2), Large (page-multiples),
                  Huge (chunk-multiples).
 
