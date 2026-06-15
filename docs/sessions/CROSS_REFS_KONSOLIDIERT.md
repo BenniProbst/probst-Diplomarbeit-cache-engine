@@ -69,7 +69,7 @@ Wer eine alte Session liest und sich orientieren will, sollte **zusaetzlich** le
 | `*P10_SuRF*`, `*P13_*`, `*P14_*`, `*P15_*`, `*cluster_C*` | `../forschungslandkarte/04_cluster_C_layout_theorie.md` |
 | `*P16_*`, `*P17_*`, `*P18_*`, `*P19_*`, `*cluster_D*` | `../forschungslandkarte/05_cluster_D_prefetching_1.md` |
 | `*P20_*`, `*P22_*`, `*P24_*`, `*P25_*`, `*P27_hp*`, `*cluster_E*` | `../forschungslandkarte/06_cluster_E_prefetching_telemetry.md` |
-| `*P26_*`, `*P28_*`, `*P29_RCU*`, `*P30_Hazard*`, `*P31*P32*P33*`, `*Habich*Tier3*`, `*cluster_F*` | `../forschungslandkarte/07_cluster_F_sync_tud_habich.md` |
+| `*P26_*`, `*P28_*`, `*P29_RCU*`, `*P30_Hazard*`, `*P31*P32*P33*`, `*Habich*Rang3*`, `*cluster_F*` | `../forschungslandkarte/07_cluster_F_sync_tud_habich.md` |
 | `*A01*A23*`, `*allokator_cluster*`, `*AC1*AC5*` | `../forschungslandkarte/08_allokator_cluster_AC1_AC5.md` |
 
 ### 1.5 Sessions zu Terminen 1-8

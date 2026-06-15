@@ -90,7 +90,7 @@ auf `full`/`full_coverage` heben).
 ### 5.2 Bauen
 ```powershell
 cmake --build --preset msvc-release                       # alles
-cmake --build build/msvc-release --target comdare_perms_all   # Tier-Binaries (CE + prt-art Permutations-DLLs)
+cmake --build build/msvc-release --target comdare_perms_all   # Lebewesen-Binaries (CE + prt-art Permutations-DLLs)
 ```
 
 ### 5.3 Messen (F15 / Prüf-Dock)
