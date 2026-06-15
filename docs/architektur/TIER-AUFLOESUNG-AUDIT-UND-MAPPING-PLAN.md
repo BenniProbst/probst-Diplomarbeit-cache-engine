@@ -317,9 +317,12 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 **Bewusst belassen** (überall gleich): Tierwelt-Zitate (verbatim), Audit-Regexe, Code-Identifier
 (`TierBasedMigration`, `tier_observe_trace_abi`, `EachPermutationIsDistinctTier`, `AllSixTiere…`,
 `tier_fill_level`), Code-Pfade (`thesis_tiere/`), Metapher-Code-Listen. Commits bis `8c4d2bf` + finale.
-**OFFEN (nur noch Submodule + Manuskript, Haupt-Repo `docs/` fertig):** **B** cache-engine-`docs/` (648!, Submodul-Koordination
-mit Implementierungs-Agent) · **C** prt-art-`docs/` (1) · **D** Manuskript-Metapher `thesis/` (DE+EN, danach `build.ps1` grün) ·
-**E** konz. Doku/Übergaben (`2026-06-15-*`) + `thesis/_archiv_entwurf1` (13). ~~A4-Rest~~ ✅ ERLEDIGT `43b3221`.
+**OFFEN:** **B** cache-engine-`docs/` (648!) — ⚠️ **Submodul-Koordination nötig** (Direktive „cache-engine = paralleler
+Implementierungs-Agent, never touch"; working-tree gerade fast clean [nur 2 generierte `thesis_tiere/`-CSVs], HEAD `0556e3a`) ·
+**D** Manuskript `thesis/diplomarbeit/` (LaTeX-Repo, DE+EN, danach `build.ps1 -Lang` grün halten) — **klassifiziert:** ① „Tier-Permutationen"
+(Anhang `A_measurements.tex` + `generate_measurement_appendix.ps1` + Tabellen-`.tex` + EN) / „Tier-Unterklassen" (`docs/quellhinweise`) /
+Kap.4-Metapher „Lebewesen (ein Tier)" / „Tier/Organ-Metapher" (Aufgabenstellung-Kommentar) → **Lebewesen**; ④ „Tier-1 SOTA" (`literatur.bib`) → **Rang/Rank** ·
+**E** `thesis/_archiv_entwurf1` (13, alter Entwurf). ~~A4-Rest~~ ✅ `43b3221` · ~~**C** prt-art~~ ✅ `3c971f4` (Pointer `2bb6cd6`).
 <!-- HISTORIE A4-Rest (erledigt): `Phase5_UML_Detail/`: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 ·
 24_REV7 8 + **`.drawio` REV3-7** [REV5/6/7 je 25!] + `_paper_extractions` cluster_D 19/cluster_F 2 + `_rev5_extractions`
 cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 + `_paper_extractions_allocators` A05/A14/A19
