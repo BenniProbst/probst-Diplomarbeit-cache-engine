@@ -302,11 +302,16 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 
 **STAND 2026-06-15 (laufend):** ✅ erledigt+committet: **A1** (7) · **A2** (10) · **Doc 14** (67/72) ·
 **A3 Sessions KOMPLETT** (alle ~22 Session-Dateien: 12 ④Rang + anatomie-① + ③/④-Reste + Glob-Pattern + .txt).
+**A4 teilweise** (Commits `ddb1ccd`→`00bdca0`): `Phase5_UML_Detail/11`+`12_*taxonomie` (③ Ebene; CamelCase-Code-Identifier
+`MultiTierCacheStrategy`/`IMultiTierHeuristic`/`TierLatencies[]`/`DiskTierTraversalCommand`/… belassen) + HABICH-T7/T8
++ Termin-8-Trio (Arbeitsplan/-ergebnis/Praesentation; SOTA ④ Rang).
 **Bewusst belassen** (überall gleich): Tierwelt-Zitate (verbatim), Audit-Regexe, Code-Identifier
 (`TierBasedMigration`, `tier_observe_trace_abi`, `EachPermutationIsDistinctTier`, `AllSixTiere…`,
 `tier_fill_level`), Code-Pfade (`thesis_tiere/`), Metapher-Code-Listen. Commits bis `8c4d2bf` + finale.
-**OFFEN:** **A4** Termine (~16 Dateien; bes. `Phase5_UML_Detail/11`+`12_*taxonomie` je 17, `_paper_extractions`
-+`_rev5_extractions` je 15-19) · **B** cache-engine-`docs/` · **C** prt-art-`docs/` · **D** Manuskript-Metapher
+**OFFEN:** **A4-Rest** (`Phase5_UML_Detail/`: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 ·
+24_REV7 8 + **`.drawio` REV3-7** [REV5/6/7 je 25!] + `_paper_extractions` cluster_D 19/cluster_F 2 + `_rev5_extractions`
+cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 + `_paper_extractions_allocators` A05/A14/A19
++ `Allokator_Matrix.txt` 1) · **B** cache-engine-`docs/` (648!) · **C** prt-art-`docs/` · **D** Manuskript-Metapher
 (DE+EN) · **E** konz. Doku/Übergaben (`2026-06-15-*`).
 
 > ⚠️ **SCOPE-KORREKTUR 2026-06-15 (User-Einwand):** Der erste Grep war `*.md` → **`.drawio`-Diagramme**
@@ -336,9 +341,9 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 - [ ] `sessions/20260526-…` (① anatomie: P2-D-q=5, R3-skelett=7, R3-R5CA=11, R5A=3) · `sessions/CROSS_REFS_KONSOLIDIERT.md`
 
 **A4 — Termine (historisch, gemischt):**
-- [ ] `termine/20260515 Termin 8/` (Arbeitsplan 1 · Praesentation 1 · Arbeitsergebnis 1)
-- [ ] `termine/20260508 Termin 7/` (HABICH_TERMIN8_VORB 4 · TERMIN7_ZUS 2)
-- [ ] `termine/20260508 Termin 7/Phase5_UML_Detail/` (02_uml 2 · 10_korrektur 5 · 11_cache_strategy 17 · 12_algorithmus 17 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 · 24_REV7 8)
+- [x] `termine/20260515 Termin 8/` (Arbeitsplan · Praesentation · Arbeitsergebnis) ✅ ④ Rang (`00bdca0`)
+- [x] `termine/20260508 Termin 7/` (HABICH_TERMIN8_VORB · TERMIN7_ZUS) ✅ ④ Rang (`00bdca0`)
+- [~] `termine/20260508 Termin 7/Phase5_UML_Detail/`: [x] 11_cache_strategy + [x] 12_algorithmus (③ Ebene; `ddb1ccd`/`1d611d8`) — OFFEN: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 · 24_REV7 8 + **`.drawio` REV3/REV3_NACHARB/REV4/REV5/REV6/REV7 (6/4/4/25/25/25)**
 - [ ] `…/Phase5_UML_Detail/_paper_extractions/` (cluster_D 19 · cluster_F 2) · `_rev5_extractions/` (cache_engine_families 19 · rev4_delta 6 · termin5_6 2 · taxonomien 7 · state_visitor 15) · `_paper_extractions_allocators/` (A05 2 · A19 1 · A14 3)
 
 ### B. cache-engine `docs/` (Submodul `comdare-cache-engine` — noch per Grep zu erfassen; eigener Commit, Koordination Implementierungsagent)
