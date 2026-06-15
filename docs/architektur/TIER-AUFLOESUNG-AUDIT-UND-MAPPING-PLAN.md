@@ -300,6 +300,12 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 > unangetastet** (sie *beschreibt* die Umstellung). `TIER3` (ZIH-HPC, Großschreibung) nie ändern;
 > Bio-Beinamen (Säugetier/Vogel/…) bleiben.
 
+**STAND 2026-06-15 (laufend):** ✅ erledigt + committet: **A1** (7 konzeptionelle Dateien) ·
+**A2** (10 Rang/Ebene) · **Doc 14** (Metapher-Hauptquelle, 67/72; 5 bewusst belassen = 2 Code-Ident.
++ Audit-Regex + 2 verbatim Tierwelt-Zitate). Commits `9ce5c97` (A2) · `42b7d8d` (A1) · `f5f2b55` (Doc 14).
+**OFFEN:** **A3** Sessions · **A4** Termine (~44 Dateien, ~208 Vorkommen, gemischt ①/④/③) · **B**
+cache-engine-`docs/` · **C** prt-art-`docs/` · **D** Manuskript-Metapher (DE+EN) · **E** konz. Doku/Übergaben.
+
 ### A. Haupt-Repo `docs/` (356 Vorkommen / 60 Dateien; Stand-Grep 2026-06-15)
 
 **A1 — Konzeptionell (Priorität; ① Metapher / gemischt):**
