@@ -120,7 +120,7 @@ REV5 K08 (Doc 22 §8.2) ergaenzte:
 - **NUMA-Awareness**: Multi-Socket-Topologie, Node-Distance-Matrix, Memory-Affinity
 - **TLB-Modell**: Hugepages 2 MB / 1 GB, TLB-Reach, dTLB-Miss-Pattern
 - **Hardware-Counter-Feedback**: perf-Counter (P31 Ungethuem TUD, P32 Schmidt TUD)
-- **NVRAM/Persistent-Memory**: Persistent-Memory-Tier
+- **NVRAM/Persistent-Memory**: Persistent-Memory-Ebene
 - **6-Flavor-RCU-Klassifikation**: Memory-Barrier-Variants (P29 McKenney 2001)
 
 ---

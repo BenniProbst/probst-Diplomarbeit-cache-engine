@@ -8,10 +8,10 @@ Kurzanleitung im Repo: `Code/external/comdare-cache-engine/README.md` → Abschn
 
 ## 1. Das Modell in einem Absatz
 
-Die Diplomarbeit zerlegt jeden Suchalgorithmus in **Achsen = Organe** (Doku 14). Ein **„Tier"** ist EIN kompiliertes
+Die Diplomarbeit zerlegt jeden Suchalgorithmus in **Achsen = Organe** (Doku 14). Ein **„Lebewesen"** ist EIN kompiliertes
 Binary = eine Komposition fester Achsen-Wahl (17 SearchAlgorithm-Anatomie-Achsen + 3 Build-Achsen). Gemessen wird je
-Tier über die echte DLL-Grenze: `n` Inserts + `n` Lookups → ein Observer-Snapshot (`result_ingest`-Zeile). Der
-**Mess-Anhang** entsteht, indem man systematisch Tiere variiert (eine Achse ändern, alle anderen fixieren = isolierter
+Lebewesen über die echte DLL-Grenze: `n` Inserts + `n` Lookups → ein Observer-Snapshot (`result_ingest`-Zeile). Der
+**Mess-Anhang** entsteht, indem man systematisch Lebewesen variiert (eine Achse ändern, alle anderen fixieren = isolierter
 Achsen-Vergleich, F15) und ihre Snapshots gegenüberstellt.
 
 > **Kanonische Bestandteile (Literatur-validiert, s. `Code/external/comdare-cache-engine/docs/architecture/30_audit_achsen_delegation_pflichtachsen.md`):**
@@ -30,18 +30,18 @@ Im cache-engine-Repo (`Code/external/comdare-cache-engine`):
 cmake --preset msvc-release
 cmake --build build/msvc-release --target perm_runner --config Release
 ```
-Damit existieren `build/msvc-release/generated/` (Achsen-Flags) und `perm_runner.exe` (der Mess-Treiber je Tier).
+Damit existieren `build/msvc-release/generated/` (Achsen-Flags) und `perm_runner.exe` (der Mess-Treiber je Lebewesen).
 
 ---
 
 ## 3. Messwerte erzeugen
 
 ```powershell
-# A) Mehrere Tiere bauen + messen → CSV
+# A) Mehrere Lebewesen bauen + messen → CSV
 pwsh tests/unit/thesis_tiere/build_and_measure_thesis_tiere.ps1
 #    Ergebnis: build/thesis_tiere/thesis_measurements.csv
 
-# B) Ein einzelnes Tier messen
+# B) Ein einzelnes Lebewesen messen
 build/msvc-release/apps/perm_runner/Release/perm_runner.exe build/thesis_tiere/thesis_sa_btree.dll thesis_sa_btree 2000
 ```
 Die 13 Observer-Felder je Zeile (`result_ingest.hpp`):
@@ -54,7 +54,7 @@ Die 13 Observer-Felder je Zeile (`result_ingest.hpp`):
 
 ## 4. Vom CSV zum Mess-Anhang
 
-1. **Achse isolieren:** alle Tiere eines Vergleichs unterscheiden sich in GENAU einer Achse (z.B. `thesis_sa_*` variieren
+1. **Achse isolieren:** alle Lebewesen eines Vergleichs unterscheiden sich in GENAU einer Achse (z.B. `thesis_sa_*` variieren
    nur axis_03a). Der gemessene Unterschied ist dieser Achse zurechenbar.
 2. **Tabelle bilden:** Organ × `n_ops` × {gemessene Felder}. Vorlage:
    `Code/external/comdare-cache-engine/docs/sessions/20260603-l-meas-thesis-searchalgo-tiere.md`.
@@ -67,7 +67,7 @@ Die 13 Observer-Felder je Zeile (`result_ingest.hpp`):
 
 **Stand 2026-06-03 (Audit Doc 30):** Die aktuellen `axis_03a`-Such-Organe (Array256, BST, …) sind noch **Monolithen mit
 Eigenspeicher** und delegieren NICHT an die Speicher-Achsen (node_type/layout/allocator). Folge: Variation von axis_04/05
-ist derzeit wirkungslos; die Tiere durchlaufen NICHT uniform alle Organ-Interfaces. Ein darauf gestützter Befund misst
+ist derzeit wirkungslos; die Lebewesen durchlaufen NICHT uniform alle Organ-Interfaces. Ein darauf gestützter Befund misst
 die *interne Struktur des Monolithen*, nicht ein zerlegtes Achsen-System.
 
 **Korrekter, delegierender Aufbau ist belegt + ausführbar** (vertikaler Beweis-Schnitt):
@@ -78,14 +78,14 @@ pwsh tests/unit/thesis_tiere/build_node_delegation_proof.ps1
 ```
 **Vor der Verwendung als Diplomarbeit-Kernmesswert** ist der Fix-Plan (Doc 30 §4) umzusetzen: alle Such-Organe als
 delegierende Traversal-Organe + Adapter auf EINEN Store + bounded Node-Store + V2-Mess-POD. Zielbild (User-Entscheidung):
-jedes Tier nutzt uniform alle Achsen (inkl. queuing → 22 pro Tier).
+jedes Lebewesen nutzt uniform alle Achsen (inkl. queuing → 22 pro Lebewesen).
 
 ---
 
 ## 6. Grenzen + Cluster (GATE-MAXIMAL)
 
 - **Lokal nicht messbar:** Per-Achsen-Timing/Hardware-Counter (PMC). Braucht privilegierten CPU-Counter-Zugriff → ZIH.
-- **Cluster-Skalierung:** dieselben Tiere bauen+messen auf ZIH (Apptainer + SLURM-Array + `perm_runner` + Webhook →
+- **Cluster-Skalierung:** dieselben Lebewesen bauen+messen auf ZIH (Apptainer + SLURM-Array + `perm_runner` + Webhook →
   `result_ingest`). Das Zeilenformat ist MSVC↔gcc identisch → lokale + Cluster-Zahlen fließen in DENSELBEN Mess-Anhang.
   Die ZIH-Ausführung ist **absprachepflichtig** (Nutzungsbedingungen) und an den Infrastruktur-Agenten delegiert
   (Wunsch-Katalog „CE-D1…D5" in der Cluster-K78).

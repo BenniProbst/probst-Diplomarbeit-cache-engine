@@ -20,14 +20,14 @@ fuer Cache-Engine. **User-Entscheidung 2026-05-26: 2 Achsen mit Cartesian-Produc
 
 > **Einordnung ins 3-Ebenen-Modell (korr. 2026-06-03, s. Doc 30 §8.0):**
 > `queuing` ist ein **Topic** und damit **kein Interface/keine Gattung** und auch keine
-> eigene Tier-Unterklasse. `axis_q1_queuing` und `axis_q2_queuing` sind **Pflicht-Achsen
-> (Organe) DERSELBEN aktuell gebauten Tier-Unterklasse** (die std::map-ähnliche
-> SearchAlgorithm-Tier-Unterklasse, die UNTER dem SearchAlgorithm-**Gattungs-Interface**
+> eigene Lebewesen-Unterklasse. `axis_q1_queuing` und `axis_q2_queuing` sind **Pflicht-Achsen
+> (Organe) DERSELBEN aktuell gebauten Lebewesen-Unterklasse** (die std::map-ähnliche
+> SearchAlgorithm-Lebewesen-Unterklasse, die UNTER dem SearchAlgorithm-**Gattungs-Interface**
 > liegt und einen festen Achsen-Satz verwendet). Q1 (Buffer) und Q2 (Flush) sind also
 > **nicht optional** und kein eigenes Außen-Interface — ein nicht-pufferndes/nicht-spülendes
-> Tier wählt den konkreten Durchreich-Algorithmus (`NoBuffer` Q01 bzw. `LazyFlush`/`NoFlush`),
+> Lebewesen wählt den konkreten Durchreich-Algorithmus (`NoBuffer` Q01 bzw. `LazyFlush`/`NoFlush`),
 > NICHT „Achse weglassen". Das u. g. Cartesian-Product Q1 × Q2 ist die Permutation INNERHALB
-> dieser einen Tier-Unterklasse, nicht eine Kombination von Gattungen.
+> dieser einen Lebewesen-Unterklasse, nicht eine Kombination von Gattungen.
 
 ---
 
@@ -77,7 +77,7 @@ statistics() / snapshot() / reset() / observer()
 
 | Family | Klasse | Subaxis (QS) | Bounded | TLS-Cache | ProgressGuarantee | Sonderfall |
 |:------:|--------|:-----------:|:-------:|:---------:|:-----------------:|------------|
-| Q01 | `NoBuffer` | QS1 sequential | true (cap=0) | false | **WaitFree** (trivially) | no-op Passthrough (= **Durchreich-Algorithmus** für ein nicht-pufferndes Tier; korr. 2026-06-03, s. Doc 30 §8.0 — die Q1-Achse bleibt Pflicht und wird getrieben, sie wird NICHT weggelassen) |
+| Q01 | `NoBuffer` | QS1 sequential | true (cap=0) | false | **WaitFree** (trivially) | no-op Passthrough (= **Durchreich-Algorithmus** für ein nicht-pufferndes Lebewesen; korr. 2026-06-03, s. Doc 30 §8.0 — die Q1-Achse bleibt Pflicht und wird getrieben, sie wird NICHT weggelassen) |
 | Q03 | `FIFOQueue` | QS1 sequential | false (unbounded) | false | Blocking | std::deque-basiert |
 | Q04 | `LIFOStack` | QS1 sequential | false (unbounded) | false | Blocking | std::vector-basiert; peek_front=top |
 | Q05 | `BoundedRing` | QS3 cyclic | true | false | Blocking | iterable_aspect_t {8/64/1024/16384/65536}; **cap=0 throws** |

@@ -406,7 +406,7 @@
 
 Identisch zu v3, vollstaendige Vollangaben siehe `../forschungslandkarte/01_quellen_gesamtkatalog.md` (K-F.2 in Arbeit).
 
-| P-ID | Kurzform | Tier |
+| P-ID | Kurzform | Rang |
 |---|---|---|
 | P01 | ART (Leis 2013) | 1 |
 | P02 | HOT (Binna 2018) | 1 |

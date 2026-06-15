@@ -21,7 +21,7 @@ Vor jeder neuen Session zuerst:
 |---|---|---|---|---|
 | `MASTERPLAN_KONSOLIDIERUNG_TERMINE.md` | ✅ | K-A | 10-Phasen-Konsolidierungs-Plan | 1 |
 | `NAMING_CONVENTIONS.md` | ✅ (V12.5) | (vor K-A) | Naming-Konventionen | 1 |
-| `anleitung_messwerte_erzeugen.md` | ✅ (2026-06-03) | — | Kommandozeilen-Anleitung: echte Messwerte aus cache-engine-Tieren erzeugen (Sicht Mess-Anhang) | 1 |
+| `anleitung_messwerte_erzeugen.md` | ✅ (2026-06-03) | — | Kommandozeilen-Anleitung: echte Messwerte aus cache-engine-Lebewesen erzeugen (Sicht Mess-Anhang) | 1 |
 | `glossar/` | ✅ | K-D | Begriffsglossar v7 + Domaenenmodell v4 + Versionshistorie | 4 |
 | `bausteine/` | ✅ | K-E | Bausteine + Allokator + Cross-Paper + F1-F15 + Flag-System + Eigenschaften | 7 |
 | `architektur/` | ⏳ in Arbeit | K-C | REV-Historie + REV7.7-Master + UML + ER + Cross-Refs + Taxonomien | 0/10 |

@@ -32,7 +32,7 @@ Detail-Auflistung in `03_konzepte_saeule_a.md` §3.
 | F2 ISuccinctEncodingStrategy | P10 SuRF | LOUDS-Dense-Command + LOUDS-Sparse-Command |
 | F2 ISuccinctEncodingStrategy | P04 CoCo | EF-Encoding + PA-Encoding + BV-Encoding + DE-Encoding (Pool) |
 | F1 IAdaptiveFootprintStrategy | P02 HOT | Single-Mask-Command + Multi-Mask-Command (9 Layout-Varianten) |
-| F4 IMultiCacheLineNodeStrategy | P22 Fractal | Disk-Tier-Command + Cache-Tier-Command (in-page Tree mit adaptive Width pro Tier) |
+| F4 IMultiCacheLineNodeStrategy | P22 Fractal | Disk-Ebene-Command + Cache-Ebene-Command (in-page Tree mit adaptive Width pro Ebene) |
 | F5 ISoftwarePrefetchStrategy | P26 Zhang FGCS | CP (Counter-Prefetcher) + PP (Path-Prefetcher) + MP (Memory-Prefetcher) |
 | F8 IPathCollapseStrategy | P01 ART, P05 START | Path-Compression-Command + Lazy-Expansion-Command + Rewiring-Command |
 | F11 IPrefetchHintHeaderStrategy | P11/P22/P26 | CSS-Header-Command + Fractal-In-Page-Command + Zhang-Read-Counter-Command |

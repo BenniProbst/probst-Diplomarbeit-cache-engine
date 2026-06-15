@@ -1626,7 +1626,7 @@ PermutationEngine erkennt `iterable_aspect_t != void` → generiert Hybrid-Permu
 
 §15.5 ist die generelle Realisierung des in §14.8 fuer concurrency-Sonderfall beschriebenen
 hybriden Ansatzes — als optionaler Aspekt pro Achs-Variant. Andere Achsen koennen es ebenfalls
-nutzen (z.B. Buffer-Size-Thresholds in queuing-Topic, Cache-Tier-Levels in prefetch-Topic).
+nutzen (z.B. Buffer-Size-Thresholds in queuing-Topic, Cache-Ebenen-Schwellen in prefetch-Topic).
 
 ### §15.7 Topic-constexpr-Konfigurations-Set + CacheEngineBuilder als C++-App-Orchestrator
 
