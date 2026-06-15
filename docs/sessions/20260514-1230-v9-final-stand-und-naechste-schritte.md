@@ -12,7 +12,7 @@
 |---|---|---|---|
 | V9.0 | V9-Anker-Session | DONE | (Diplomarbeit, in diesem Push) |
 | V9.4 | legacy_reimpl physisch nach prt-art verschoben (14 Subordner) | DONE | prt-art `fbda49c` |
-| V9.5 | 22 Tier-2/3 SOTA-Profile (P11-P32) | DONE | cache-engine `ded3221` |
+| V9.5 | 22 Rang-2/3 SOTA-Profile (P11-P32) | DONE | cache-engine `ded3221` |
 | V9.1 | 3 konkrete PrtArtSearchEngineAdapter-Subklassen (Map/Vector/Tuple) | DONE | prt-art `fbda49c` |
 | V9.2 | baustein_variants.hpp mit Tag-Strukturen pro 11 Achsen | DONE | cache-engine `ded3221` |
 | V9.3 | CodegenEngine::generate_module_from_profile + CMakeLists | DONE | cache-engine `ded3221` |
@@ -49,7 +49,7 @@
 
 ## §4 Was V9 erreicht hat (User-Sicht)
 
-- **30 SOTA-Profile** in cache-engine (8 Tier-1 + 22 Tier-2/3): vollstaendige
+- **30 SOTA-Profile** in cache-engine (8 Rang-1 + 22 Rang-2/3): vollstaendige
   Persistenz aller Suchalgorithmen aus dem 33-Paper-Korpus.
 - **Konkrete Adapter-Subklassen** in prt-art: PrtArtSearchEngineAdapterMap,
   Vector, Tuple — instantiierbar (nicht mehr abstract).
@@ -113,7 +113,7 @@ Standardmaessig steht ctest noch aus. Sollte vor naechstem User-Sync laufen.
 | §4.3 algorithm_profiles → Codegen-Pipeline | V9.3 — generate_module_from_profile | ✅ DONE |
 | §4.4 Defined-Mode E2E in messung_driver | V9.6 — messreihen.xml-Reader | ✅ TEILWEISE (ExperimentDriver-Verdrahtung folgt V10.6) |
 | §4.5 prt_art/legacy_reimpl physisch verschieben | V9.4 — gestaffelt verschoben (cache-engine bleibt DEPRECATED) | ✅ DONE (Loeschung folgt V10.1) |
-| §4.6 Tier-2 + Tier-3 SOTA-Profile | V9.5 — 22 Profile (P11-P32) | ✅ DONE |
+| §4.6 Rang-2 + Rang-3 SOTA-Profile | V9.5 — 22 Profile (P11-P32) | ✅ DONE |
 | §4.7 Full ctest | OFFEN — V10.7 | ⏳ |
 
 6 von 7 vollstaendig DONE, 1 teilweise.

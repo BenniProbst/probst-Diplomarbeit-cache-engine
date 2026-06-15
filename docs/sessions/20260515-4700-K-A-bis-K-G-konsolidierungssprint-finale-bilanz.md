@@ -110,7 +110,7 @@ Alle 5 wurden gelesen — Konsistenz mit Vorgaenger-Sessions verifiziert.
 | 04_cluster_C_layout_theorie.md | P06 SuRF, P07 RSS, P08 ALEX, P13 PiBox, P15 Helm |
 | 05_cluster_D_prefetching_1.md | P16 ROART, P17 Hyrise, P18 GRT, P22 SwitchTree, P23 ANN-PRE |
 | 06_cluster_E_prefetching_telemetry.md | P14 Hist-Sample, P20 PIBA, P24 SignedDist, P25 PRESS, P27 hp-soft |
-| 07_cluster_F_sync_tud_habich.md | P26 Wittenburg, P28 Kuehn-DaMoN, P29 Knoth, P30 Schiele, P31-P33 Tier-3 HABICH |
+| 07_cluster_F_sync_tud_habich.md | P26 Wittenburg, P28 Kuehn-DaMoN, P29 Knoth, P30 Schiele, P31-P33 Rang-3 HABICH |
 | 08_allokator_cluster_AC1_AC5.md | A01-A23 in 5 Cluster AC1-AC5 (Allgemein + Cache + Lock-free + Persistent + Special) |
 
 **Pro Paper:** V31-Adapter-Status, Bausteine-Mapping, ADR-Bezug, Cluster-Position.

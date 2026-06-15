@@ -123,7 +123,7 @@ Singularity-Container-Upload + SLURM-Job-Templates explizit als
 - Deterministisch (mt19937_64 mit Seed 42)
 - Schreibt V20.3-konforme CSV mit 16 Spalten
 - Output: `Code/experiment_config/sample_data/v21_sample_measurements.csv`
-- Pseudo-realistische Werte (5 SOTA Tier-1 + 4 weitere + prtart-Baseline)
+- Pseudo-realistische Werte (5 SOTA Rang-1 + 4 weitere + prtart-Baseline)
 
 Workload-Verteilung:
 | Workload | Profile |

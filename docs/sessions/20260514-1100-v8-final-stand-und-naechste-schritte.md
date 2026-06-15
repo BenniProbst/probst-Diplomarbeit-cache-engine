@@ -120,9 +120,9 @@ es konkret:
 - V8.2 hat den Migrations-Plan dokumentiert + Build deaktiviert. Folge-
   Phase verschiebt die 14 Subordner physisch nach prt-art Repo.
 
-### §4.6 Tier-2 + Tier-3 SOTA-Profile (P11-P30)
-- Heute 8 Tier-1-SOTA-Profile angelegt (art, hot, masstree, coco, start,
-  b2tree, wormhole, surf). Folge-Phase: P11-P30 (Tier-2 + Tier-3) als
+### §4.6 Rang-2 + Rang-3 SOTA-Profile (P11-P30)
+- Heute 8 Rang-1-SOTA-Profile angelegt (art, hot, masstree, coco, start,
+  b2tree, wormhole, surf). Folge-Phase: P11-P30 (Rang-2 + Rang-3) als
   weitere `*.profile.xml` ergaenzen.
 
 ### §4.7 Full ctest in allen 3 Repos
@@ -180,7 +180,7 @@ gemacht. `git pull --rebase` reichte aus, kein Konflikt-Resolution noetig.
 3. **std::variant Pattern operationalisieren** in cache-engine (V9.2).
 4. **algorithm_profiles → codegen Pipeline** (V9.3).
 5. **physische Verschiebung von prt_art/legacy_reimpl/** cache-engine → prt-art (V9.4).
-6. **Tier-2 + Tier-3 SOTA-Profile** ergaenzen (V9.5).
+6. **Rang-2 + Rang-3 SOTA-Profile** ergaenzen (V9.5).
 7. **End-to-End-Lauf der drei Messreihen** im Diplomarbeit-messung_driver (V9.6).
 
 ---

@@ -10,7 +10,7 @@
 | # | Task | Repo | Abhaengigkeit |
 |---|---|---|---|
 | V9.4 | legacy_reimpl physisch verschieben | cache-engine + prt-art | unabhaengig — zuerst (cleanup) |
-| V9.5 | Tier-2 + Tier-3 SOTA-Profile (P11-P30) | cache-engine | unabhaengig |
+| V9.5 | Rang-2 + Rang-3 SOTA-Profile (P11-P30) | cache-engine | unabhaengig |
 | V9.1 | konkrete Adapter-Subklassen | prt-art | nutzt PrtArtSearchEngineAdapter (V8.9) |
 | V9.2 | std::variant Bausteine operationalisieren | cache-engine | nutzt algorithm_baustein.hpp (V8.8) |
 | V9.3 | algorithm_profiles → codegen | cache-engine | benoetigt V9.2 + V9.5 |
@@ -28,7 +28,7 @@
   DEPRECATED-Marker.
 - prt-art bekommt eigene CMakeLists.txt + README in legacy_reimpl/.
 
-### §2.2 V9.5 Tier-2/3 Profile
+### §2.2 V9.5 Rang-2/3 Profile
 - Pro Paper ein vollstaendiges Profil mit allen 11 Achsen.
 - Wert-Auswahl pro Achse anhand der Tieflektuere (P11-P33 Cluster A-F).
 - 22 Profile: P11 P12 P13 P14 P15 P16 P17 P18 P19 P20 P21 P22 P23 P24 P25 P26
@@ -63,7 +63,7 @@
 
 - [ ] cache-engine `prt_art/legacy_reimpl/P*/` Ordner sind leer / entfernt
 - [ ] prt-art `prt_art/legacy_reimpl/P*/` Ordner enthalten 14 Subordner
-- [ ] cache-engine `algorithm_profiles/sota/` enthaelt 30 Profile (8 Tier-1 + 22 Tier-2/3)
+- [ ] cache-engine `algorithm_profiles/sota/` enthaelt 30 Profile (8 Rang-1 + 22 Rang-2/3)
 - [ ] prt-art `prt_art/identity/prt_art_search_engine_adapter.hpp` definiert 3 konkrete Subklassen
 - [ ] cache-engine `algorithm_baustein.hpp` definiert echte Variants pro 11 Achsen
 - [ ] cache-engine codegen kann ein Profil zu C++-Modul-Quelle transformieren
