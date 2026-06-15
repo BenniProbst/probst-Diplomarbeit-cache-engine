@@ -325,7 +325,13 @@ Tier-Unterklassen→Lebewesen-Unterklassen; `literatur.bib` Tier-1→Rank-1; Auf
 ④-Kapitel-Rang war bereits `007995a`. Reine Text/Caption-Edits → Build syntaktisch sicher. <!-- war klassifiziert: ① „Tier-Permutationen"
 (Anhang `A_measurements.tex` + `generate_measurement_appendix.ps1` + Tabellen-`.tex` + EN) / „Tier-Unterklassen" (`docs/quellhinweise`) /
 Kap.4-Metapher / „Tier/Organ-Metapher" → **Lebewesen**; ④ „Tier-1 SOTA" → **Rang/Rank** --> ·
-**E** `thesis/_archiv_entwurf1` (13, alter Entwurf). ~~A4-Rest~~ ✅ `43b3221` · ~~**C** prt-art~~ ✅ `3c971f4` (Pointer `2bb6cd6`).
+~~**E** `_archiv_entwurf1`~~ ✅ `3576621` (SOTA Tier-1/2-3→Rang). ~~A4-Rest~~ ✅ `43b3221` · ~~**C** prt-art~~ ✅ `3c971f4`/`2bb6cd6` · ~~**D** Manuskript~~ ✅ `5d11dce`/`146eb2b`.
+
+> ✅ **STAND 2026-06-15:** A (Haupt-Repo `docs/` komplett) + C (prt-art) + D (Manuskript DE+EN) + E (_archiv) **ERLEDIGT, committet, gepusht.**
+> **➡ EINZIG VERBLEIBEND: B = cache-engine-`docs/`** (648 Vork./50+ Dateien) — erfordert Anfassen des cache-engine-Submoduls; Direktive
+> „cache-engine = paralleler Implementierungs-Agent, **never touch**". Working-tree gerade fast clean (HEAD `0556e3a`, nur 2 generierte
+> `thesis_tiere/`-CSVs). **Vor Bearbeitung mit User klären** (Konflikt-Risiko) — sonst analog: ③ Cache/Memory/Multi-Tier-Prosa→Ebene,
+> ④ SOTA-Tier-N→Rang, ① Lebewesen, Code-Identifier (`IObservableTier`/`tier_*`/`CacheTier`/`MultiTier*`/`TierKind`…) belassen.
 <!-- HISTORIE A4-Rest (erledigt): `Phase5_UML_Detail/`: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 ·
 24_REV7 8 + **`.drawio` REV3-7** [REV5/6/7 je 25!] + `_paper_extractions` cluster_D 19/cluster_F 2 + `_rev5_extractions`
 cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 + `_paper_extractions_allocators` A05/A14/A19
