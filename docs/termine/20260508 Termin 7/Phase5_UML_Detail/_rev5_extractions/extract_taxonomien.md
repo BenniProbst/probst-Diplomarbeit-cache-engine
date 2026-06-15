@@ -15,7 +15,7 @@
 | F3 | `ICacheLineAlignedStrategy` | P01 ART (16B Header), P02 HOT (Compound 64-472B), P07 Wormhole (64B Hash-Slot), P11 CSS, P12 CSB+, P14, P15 Survey, P32 To-Stride | **ATOMAR** (alle Konkretisierungen sind atomare Aligning-Strategien) |
 | F4 | `IMultiCacheLineNodeStrategy` | P03 Masstree (256B=4 Lines), P13 Hankins/Patel (256-512B), P21 Chen pB+ (Wide-Node w=8), P22 Chen Fractal (in-page Tree mit adaptive Width) | **HYBRID** (P22 Fractal in-page+adaptive, P21 Wide+JumpPointer+ChunkedList, P13 Cost-Modell-getrieben) |
 | F5 | `ISoftwarePrefetchStrategy` | P02 HOT, P03 Masstree, P10 SuRF, P14 Itanium (lfetch), P15 Graefe Survey, P21 Chen, P22 Chen Fractal (Dual-Jump), P25 Mahling Coro (Full+Half), P26 Zhang Index (3 Prefetcher CP+PP+MP), P27 Zhang Hierarchical | **HYBRID** (P26 3-Komponenten, P22 DualJump, P25 Full+Half, P14 lfetch+RangeScan, P15 Multi-Cache+IndirVec+Multi-Record, P21 Wide+JumpPointer) |
-| F6 | `IPointerChasingResolutionStrategy` | P21 Chen pB+ (JumpPointerArray ext+int), P22 Fractal (DualJumpPointer), P26 Zhang (JumpPointerQueue MVCC) | **HYBRID** (P22 Dual-Tier, P26 Queue+MVCC+2-ahead) |
+| F6 | `IPointerChasingResolutionStrategy` | P21 Chen pB+ (JumpPointerArray ext+int), P22 Fractal (DualJumpPointer), P26 Zhang (JumpPointerQueue MVCC) | **HYBRID** (P22 Dual-Ebene, P26 Queue+MVCC+2-ahead) |
 | F7 | `ISimdAcceleratedLookupStrategy` | P01 ART (SSE Node16), P02 HOT (AVX2+PEXT/PDEP), P03 Masstree, P10 SuRF (128-Bit SSE Sparse), P20 B-Tree adaptive, P31 Ungethuem Tomahawk-PE | **ATOMAR** (Konkretisierungen sind atomare SIMD-Strategien); P02 HOT BMI2+AVX2+SingleMask+MultiMask Bestandteil F1-Aufloesung |
 | F8 | `IPathCollapseStrategy` | P01 ART (Lazy+Pessimistic+Optimistic), P02 HOT (k-constrained Compound), P04 CoCo (Macro-Node Collapsing), P05 START (Multilevel), P06 B^2-Tree (Span LCP), P07 Wormhole (Anchor+LeafList+MetaTrieHT), P08 ART OLC | **ATOMAR** (Konkretisierungen sind atomare Collapse-Tactics — keine Aufloesung in §10) |
 | F9 | `ILayerDependentEncodingStrategy` | P02 HOT (k-constrained oben), P05 START (Multilevel oben), P10 SuRF (Dense oben+Sparse unten Cutoff R=64), P20 (AdaptiveLeafSelector), P28 Kuehn (HotPath) | **TEILWEISE HYBRID** (P10 SuRF Cutoff aufgeloest in F2; P20 KeyAdaption+OperationAdaption aufgeloest in F1) |
@@ -36,7 +36,7 @@
 | F24 | `ITelemetryDrivenStrategy` (Achse 11) | P26 Zhang Index (PathReadCounter + MonitorClustering), P27 Zhang Hierarchical (Bundle 200KB Threshold), P28 Kuehn (PerNodeHistogram), **P28 Kuehn-Mail 2026-05-08 NEU** (LeafOnlyCounter, LeafOnlySampledCounter\<N\>, RetroactiveAggregation, ProbabilityHintsHeader) | **HYBRID** (P28 Kuehn HotPath: LeafOnlyCounter+RetroactiveAggregation+GreedyHotPath → `KuehnHotPathOptimizationCompositionCommand`; P26 in F5 als 3-Prefetcher) |
 | F25 | `ISyncMechanikenStrategy` | P03 Masstree (Hand-over-Hand OLC), P06 B^2 (OLC), P07 Wormhole (QSBR-RCU + RW-Lock + MutEx 3-Klassen), P08 ART OLC (5-Schritt+4-Schritt), P29 RCU McKenney (Grace+QS), P30 Hazard Pointers, P02 HOT (CoW Obsolete-Marker ROWEX) | **HYBRID** (P07 3-Klassen-Sync; P08 OLC+ROWEX 2 alternative Mechaniken) |
 | F26 | `IStrideAccessPatternStrategy` | P32 To-Stride TUD (strided-unrolled Partition 30-42, 127.32 MiB Stride) | **ATOMAR** |
-| F27 | `INfpDecoratorStrategy` | P33 VAMPIR (NFP-Decorator+V-malloc+Compensation/Migration), P25 Mahling (DDR4/HBM2/HBM3/LPDDR5X/GDDR), P22 Chen Fractal (MultiTier Cache+Disk) | **HYBRID** (P33 Decorator+V-malloc+Compensation; P25 multi-tier-Allocator) |
+| F27 | `INfpDecoratorStrategy` | P33 VAMPIR (NFP-Decorator+V-malloc+Compensation/Migration), P25 Mahling (DDR4/HBM2/HBM3/LPDDR5X/GDDR), P22 Chen Fractal (Multi-Ebenen Cache+Disk) | **HYBRID** (P33 Decorator+V-malloc+Compensation; P25 Multi-Ebenen-Allocator) |
 | F28 | `IHardwareOffloadStrategy` | P31 Ungethuem TUD (iDMA Configurator/AGU/DataFetcher/Crawler + WAH/Hash/MergeSort auf Tomahawk-PE) | **HYBRID** (iDMA-Komponenten als Sub-Atome) |
 | F29 | `IFilterStrategy` (Geschwister von ISearchPage) | P10 SuRF (FPR-Tuning, 4 Encoding-Varianten) | **ATOMAR** (Filter-Concept; orthogonal zu BaseEngine/CacheEngine) |
 
@@ -170,7 +170,7 @@
 
 ## E) AUS 12: Sind ALLE Algorithmus-Hybride zerlegt? Welche fehlen?
 
-§9 von 12_md sagt explizit: "WO IMMER eine Strategy oder ein Pattern als hybrid/composite/mixed/dual-tier/dual-layer/triple-layer/N-prefetcher/hierarchical/heterogen beschrieben ist, ist eine Command-Pattern-Aufloesung Pflicht." Tabelle hat 17/18 Eintraege.
+§9 von 12_md sagt explizit: "WO IMMER eine Strategy oder ein Pattern als hybrid/composite/mixed/dual-ebene/dual-layer/triple-layer/N-prefetcher/hierarchical/heterogen beschrieben ist, ist eine Command-Pattern-Aufloesung Pflicht." Tabelle hat 17/18 Eintraege.
 
 ### Bereits abgedeckt durch §9 (vollstaendig):
 - Alle 4 LayerMixPattern-Konkretisierungen (P03/P10/P04/P22)
@@ -345,7 +345,7 @@
 19. `IHardwareExtension` Sub-Hierarchie — WAH/PLWAH/COMPAX (Bitmap), Hash+Lookup/Insert/CityHash32/Sampling, MergeSort/Intersection/Union/Difference/SortMergeJoin/SortMergeAggregation, RiscBaseISA, SSE/AVX/SGX/THUMB/NEON (P31 TUD Goldstandard)
 20. `IMemoryDecorator` (NFP) — latency/throughput/transience/reliability/wearout/random-accessibility/cache-coherence (P33 VAMPIR)
 21. `IHeterogeneousAllocator` (V-malloc) — heterogene Memory-Auswahl (P33)
-22. `IMigrationPolicy` — transparente Daten-Migration zwischen Memory-Tiers (P33 Compensation)
+22. `IMigrationPolicy` — transparente Daten-Migration zwischen Memory-Ebenen (P33 Compensation)
 23. `ICompileTimeNegotiator` — Multi-Query Compile-Time-Negotiation (P33)
 24. `IPipelineScheduler` — Operation-Pipelines mit Memory-Awareness (P33)
 25. `IAccessPatternStrategy` — sequential/strided/simd (P32 To-Stride)

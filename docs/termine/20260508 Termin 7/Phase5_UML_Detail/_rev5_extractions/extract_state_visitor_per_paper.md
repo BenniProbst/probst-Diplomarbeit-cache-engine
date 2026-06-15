@@ -151,9 +151,9 @@
 - **E) Rueckgaben:** "w_optimal = 8 Cache-Lines fuer typische Parameter", "k=2-3 Prefetches voraus", "Internal-vs-External-Jump-Array nach w/k-Verhaeltnis", "Wider-Nodes verbessern UPDATE Performance (gegen Intuition)".
 
 ### P22 Chen et al. (2002) — Fractal Prefetching B+-Trees
-- **A/B/C:** GranularityTier ∈ {Cacheline, Page, Disk}; Mode ∈ {Disk-First, Cache-First}; Mismatch + Overflow-Pages; Two-Granularity-Insert mit Cache-/Page-Split; Tier-Latencies T1+T_next+Disk-Seek+Page-IO.
+- **A/B/C:** GranularityTier ∈ {Cacheline, Page, Disk}; Mode ∈ {Disk-First, Cache-First}; Mismatch + Overflow-Pages; Two-Granularity-Insert mit Cache-/Page-Split; Ebenen-Latencies T1+T_next+Disk-Seek+Page-IO.
 - **D) Visitor:** IFractalLayoutStrategy<Outer,Inner> rekursiv; IGranularityMismatchResolver (Overflow/OffsetCompression/AdaptiveNodeSize).
-- **E) Rueckgaben:** "Disk-First fuer Insert/Update-heavy", "Cache-First fuer Search-heavy", "DualJumpPointerArray: Internal Cache-Tier, External I/O-Tier".
+- **E) Rueckgaben:** "Disk-First fuer Insert/Update-heavy", "Cache-First fuer Search-heavy", "DualJumpPointerArray: Internal Cache-Ebene, External I/O-Ebene".
 
 ### P23 Khan (2010) — Dynamic Adaptation Cache Prefetching
 - **A) Zustaende:** `Compile-Time-Template-State` (mit Konstanten A, B); `Runtime-Specializer-State`; `Cost-Benefit-Gate ∈ {ON, OFF}` (Equation 4); `Affine-Distance I = O*A+B`.
@@ -230,7 +230,7 @@
 - **E) Rueckgaben:** "Push-Down Operations zum Memory-Controller", "Burst=8 fuer 64B Cacheline", "Local Data Memory 0+1 simultane Streams".
 
 ### P32 Schmidt/Habich TUD (2025) — "To Stride or Not to Stride"
-- **A) Zustaende:** **DTLB/STLB-Capacity-State** (Sapphire 96/2048, Cascade 64/1536); **L2-Hardware-Prefetcher-Stream-Limit** (Sapphire 72, Cascade 32); `Cache-Set-Thrashing-State` (bei Multiples of 8/16/24); `Memory-Tier ∈ {Local-DRAM, Remote-DRAM, Local-HBM, Remote-HBM}`; `Access-Pattern ∈ {sequential, simd-sequential, strided, strided-unrolled}`.
+- **A) Zustaende:** **DTLB/STLB-Capacity-State** (Sapphire 96/2048, Cascade 64/1536); **L2-Hardware-Prefetcher-Stream-Limit** (Sapphire 72, Cascade 32); `Cache-Set-Thrashing-State` (bei Multiples of 8/16/24); `Memory-Ebene ∈ {Local-DRAM, Remote-DRAM, Local-HBM, Remote-HBM}`; `Access-Pattern ∈ {sequential, simd-sequential, strided, strided-unrolled}`.
 - **B) Transitions:** **4 Hauptbeobachtungen als State-Transitions:** (Obs 0) Partition-Count >4096 → niedrig; (Obs 1) 1024-4096 → erster Anstieg (TLB); (Obs 2) <64 → zweiter Anstieg (Prefetcher); (Obs 3) 8/16/24 → Downward-Outlier (Cache-Associativity).
 - **C) Monitor:** **LIVE-PROBING der TLB/Prefetcher/Associativity-Limits**; Hardware-Prefetcher kann (de-)aktiviert werden; numactl Pinning; gemessene Throughput pro Memory-Tier.
 - **D) Visitor-Strukturen:** **Stride-Strategie als ICacheStrategy-Visitor**; `IAccessPatternStrategy` als State-Visitor mit 4 ConcreteStates.
@@ -270,7 +270,7 @@
 | P19   | LayoutInvariant + BrokenSet    | 1+7         | Strukturmod (Insert/Del/Rot)     | TPC-C-Benchmark              |
 | P20   | LeafLayout                     | 4           | **Op-Counter ±1, KeyAdaption**   | **Per-Leaf 1B + Sampling**   |
 | P21   | NodeWidth + PrefetchDist       | continuous  | Cost-Model + Scan-Phase          | Total-Stall-Equation         |
-| P22   | GranularityTier × Mode         | 3×2         | Insert-Split per Tier            | Tier-Latency + OptWidth-Tab  |
+| P22   | GranularityTier × Mode         | 3×2         | Insert-Split per Ebene           | Ebenen-Latency + OptWidth-Tab|
 | P23   | RuntimeAffine                  | continuous  | **Cost-Gate, Loop-Iteration**    | **HW-Perf-Counter**          |
 | P24   | WorkloadType                   | 3           | Coverage<0 → disable             | Coverage% + Overpred%        |
 | P25   | PrefetchLoc + FB-Reliability   | 4×3+2+2     | **FB_FULL, Microbench**          | **Perf-Counter+Microbench**  |

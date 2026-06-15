@@ -185,13 +185,13 @@ TotalStallTime = T_next * (log_{wm/(wm-1)}(N/(wm-1)) + 1) * (B + ceil(3w/4) - 1)
 
 ### Sektion 5: Verallgemeinerungs-Vorschlaege
 
-- **MultiTierCacheStrategy** als generalisierte Concept-Klasse: `ICacheStrategy<TierGranularity[]>` mit getrennten Strategien pro Tier (z. B. `[CacheLine, Page, Disk]`). Speziell relevant fuer **ICacheTopology multi-tier**.
-- **IFractalLayoutStrategy<OuterTier, InnerTier>**: Auessere Granularitaet (z. B. Page) enthaelt vollstaendiges inneres Layout (z. B. Cache-optimaler Tree). Rekursiv anwendbar (3+ Tiers).
-- **IGranularityMismatchResolver**: Strategien zur Behandlung von Mismatch zwischen optimalen Sizes auf verschiedenen Tiers:
+- **MultiTierCacheStrategy** als generalisierte Concept-Klasse: `ICacheStrategy<TierGranularity[]>` mit getrennten Strategien pro Ebene (z. B. `[CacheLine, Page, Disk]`). Speziell relevant fuer **ICacheTopology multi-Ebenen**.
+- **IFractalLayoutStrategy<OuterTier, InnerTier>**: Auessere Granularitaet (z. B. Page) enthaelt vollstaendiges inneres Layout (z. B. Cache-optimaler Tree). Rekursiv anwendbar (3+ Ebenen).
+- **IGranularityMismatchResolver**: Strategien zur Behandlung von Mismatch zwischen optimalen Sizes auf verschiedenen Ebenen:
   - `OverflowResolverStrategy` (Cache-First)
   - `OffsetCompressionResolverStrategy` (Disk-First — kuerzere Pointer)
   - `AdaptiveNodeSizeResolverStrategy` (verschiedene Node-Groessen pro Level)
-- **IDualJumpPointerArrayStrategy**: Zwei separate Prefetching-Arrays (Cache-Tier vs I/O-Tier) als Pattern fuer multi-tier Range-Scan.
+- **IDualJumpPointerArrayStrategy**: Zwei separate Prefetching-Arrays (Cache-Ebene vs I/O-Ebene) als Pattern fuer Multi-Ebenen Range-Scan.
 - **IHeuristic-Klassen**:
   - `OptimalWidthHeuristic(TierLatencies, FanOutGoal)` (Equation cost = (L-1)(T1+(w-1)T_next) + T1+(x-1)T_next)
   - `OverflowVsOffloadHeuristic` (Aggressive Placement vs Overflow-Page fuer Leaf-Parents)
@@ -200,8 +200,8 @@ TotalStallTime = T_next * (log_{wm/(wm-1)}(N/(wm-1)) + 1) * (B + ceil(3w/4) - 1)
 
 - OFFEN: Cache-First fuer Mature Trees ueber 36 % Space-Overhead — Aggressive-Placement skaliert nicht gut bei vielen Inserts.
 - OFFEN: Konkurrenzkontroll bei Page-Splits mit DualJumpPointerArrays nicht behandelt.
-- OFFEN: Cache-Oblivious-Alternativen (Bender 2000) nicht direkt verglichen — fpB+-Tree benoetigt explizite Tier-Konfiguration.
-- OFFEN: 3+ Tier-Hierarchien (NUMA L1/L2/L3 + DRAM + NVMe + Disk) nicht generalisiert; Paper bleibt bei 2 Tiers (Cache + Disk).
+- OFFEN: Cache-Oblivious-Alternativen (Bender 2000) nicht direkt verglichen — fpB+-Tree benoetigt explizite Ebenen-Konfiguration.
+- OFFEN: 3+ Ebenen-Hierarchien (NUMA L1/L2/L3 + DRAM + NVMe + Disk) nicht generalisiert; Paper bleibt bei 2 Ebenen (Cache + Disk).
 - OFFEN: Compression-Integration (Key-Compression, Bohannon-Style Partial-Keys) nicht evaluiert.
 
 ---
@@ -289,13 +289,13 @@ Powers-of-2 fuer Performance-Counter-Berechnung (Shift-Operations statt Multipli
 
 **Jump-Pointer-Arrays (P21, P22):**
 - P21 konzipiert: external chunked-list mit Hint-Pointers UND internal (parents-of-leaves).
-- P22 erweitert auf zwei Granularitaeten: Internal-Array fuer Cache-Tier, External-Array fuer Disk-Tier — DUAL.
-- **Generalisierung**: `IJumpPointerArrayStrategy<Tier>` mit Tier-Parameter; Multi-Tier ueber Comp-Pattern.
+- P22 erweitert auf zwei Granularitaeten: Internal-Array fuer Cache-Ebene, External-Array fuer Disk-Ebene — DUAL.
+- **Generalisierung**: `IJumpPointerArrayStrategy<Tier>` mit Tier-Parameter; Multi-Ebenen ueber Comp-Pattern.
 
 **Multi-Granularitaeten (P22, partiell P20):**
-- P22 ist DAS Multi-Granularitaeten-Paper: Cache-Line + Disk-Page als getrennt optimierte Tiers, fractal selbst-aehnlich.
+- P22 ist DAS Multi-Granularitaeten-Paper: Cache-Line + Disk-Page als getrennt optimierte Ebenen, fractal selbst-aehnlich.
 - P20 hat implizit 2 Granularitaeten: Cache-Line (Heads, Fingerprint) + Page (4 KiB für vmcache).
-- **Generalisierung — direkt fuer ICacheTopology**: `IMultiTierCacheStrategy<Tier[]>` mit fractaler oder distinkter Layout-Wahl pro Tier.
+- **Generalisierung — direkt fuer ICacheTopology**: `IMultiTierCacheStrategy<Tier[]>` mit fractaler oder distinkter Layout-Wahl pro Ebene.
 
 ### Software-Prefetch vs Hardware-Prefetch
 
@@ -327,8 +327,8 @@ Powers-of-2 fuer Performance-Counter-Berechnung (Shift-Operations statt Multipli
 - `OptimalPrefetchDistanceHeuristic(B, w) → k_optimal` — Range-Scan-Distance
 - `OptimalChunkSizeHeuristic(B, m) → c_optimal` — Jump-Pointer-Array-Granularitaet
 
-**Aus P22 (Multi-Tier Cost Model):**
-- `OptimalWidthMultiTierHeuristic(TierLatencies[], FanOutGoal)` — pro Tier separat
+**Aus P22 (Multi-Ebenen Cost Model):**
+- `OptimalWidthMultiTierHeuristic(TierLatencies[], FanOutGoal)` — pro Ebene separat
 - `OverflowVsOffloadHeuristic(PageSize, OptimalNodeSize, MismatchRatio)` — Aggressive-Placement-Decision
 - `DiskFirstVsCacheFirstHeuristic(MemoryFootprint, IORatio)` — Architektur-Wahl
 
@@ -370,7 +370,7 @@ Aus Hierarchie `ICacheStrategy = VISITOR: BaseEngineStrategy | CacheEngineStrate
 **CacheEngineStrategy** (mit Cache-Optimierungen):
 - **Layout-Komposition** (P20): Heads + Hints + Fingerprint + Dense → AdaptiveLeafSelector
 - **Prefetch-Komposition** (P21): WideNodePrefetch + JumpPointerScan
-- **Multi-Tier-Komposition** (P22): FractalPrefetching (Cache + Disk)
+- **Multi-Ebenen-Komposition** (P22): FractalPrefetching (Cache + Disk)
 - **Runtime-Adaptation-Komposition** (P23): TemplateSpecializer + RuntimeDistanceAdaptation
 
 **Visitor-Methoden** auf ISearchPage:
@@ -389,7 +389,7 @@ Gemaess REV-2-Hierarchie hat eine IFanout (Branching-Faktor) genau eine ISearchP
 **Konsolidierter Vorschlag**: `ISearchPagesStrategyPattern` sollte mindestens vier Konkretisierungen erlauben:
 1. **HomogeneousPattern** (P21) — alle Knoten gleich
 2. **HeterogeneousAdaptivePattern** (P20) — pro Knoten verschieden, gewaehlt durch Heuristic
-3. **HierarchicalFractalPattern** (P22) — pro Tier verschieden, rekursiv komponiert
+3. **HierarchicalFractalPattern** (P22) — pro Ebene verschieden, rekursiv komponiert
 4. **OrthogonalRuntimeParametrizedPattern** (P23) — gleicher Algorithmus, parametrisiert per Runtime
 
 ### Hardware-Interaktion mit ILivePlatformModel
@@ -404,7 +404,7 @@ Dies fuegt sich nahtlos in die geplante DecisionLambdaTree-Architektur ein — L
 
 ### Offene cluster-uebergreifende Punkte
 
-- **OFFEN**: Wie unifizieren wir P22's Multi-Tier-Granularitaet mit P20's Page-Level-Adaptive-Layout? Beide sind orthogonal, koennten aber kombiniert werden zu einer "Multi-Tier-Adaptive-Layout-Strategy".
+- **OFFEN**: Wie unifizieren wir P22's Multi-Ebenen-Granularitaet mit P20's Page-Level-Adaptive-Layout? Beide sind orthogonal, koennten aber kombiniert werden zu einer "Multi-Ebenen-Adaptive-Layout-Strategy".
 - **OFFEN**: P23's Runtime-Adaptation ist nur fuer Stride-Prefetch beschrieben. Generalisierung auf P21's Pointer-Chasing-Strategien (Jump-Pointer-Arrays) ist konzeptuell moeglich aber nicht im Paper — koennte ein eigener Beitrag der Diplomarbeit sein.
 - **OFFEN**: Prefetch-Cost-Modelle gehen alle von einheitlicher Cache-Architektur aus. Heterogene Multi-Core-Plattformen (z. B. P-Cores + E-Cores Intel 12th Gen, NUMA-Aware-Prefetching) sind nicht abgedeckt.
-- **OFFEN**: P20's vmcache-Integration zeigt OOM-Performance, aber kein expliziter Prefetch-Mechanismus fuer SSD-Tier — koennte um P22's External-Jump-Pointer-Array erweitert werden.
+- **OFFEN**: P20's vmcache-Integration zeigt OOM-Performance, aber kein expliziter Prefetch-Mechanismus fuer SSD-Ebene — koennte um P22's External-Jump-Pointer-Array erweitert werden.

@@ -37,12 +37,12 @@ Format der folgenden Sektionen entspricht ISearchEngine-Familien S1-S30:
 | ID | Name | Hauptkategorie | Verzeichnis | F-Mapping | Familien-Quelle |
 |----|------|----------------|-------------|-----------|-----------------|
 | **C1** | Cache-Layout-Engine | Knoten-Format & Footprint | `cache_engine/layout/` | F1, F2, F3, F4, F8, F11, F12, F13, F14, F15, F16, F17, F19, F22 | P01-P22, P32 |
-| **C2** | Cache-Pinning-Engine | NUMA/Core/Tier-Bindung | `cache_engine/pinning/` | (ergaenzt F18, F25) | P03, P25, P28, P29, P31, P32, P33 |
+| **C2** | Cache-Pinning-Engine | NUMA/Core/Ebenen-Bindung | `cache_engine/pinning/` | (ergaenzt F18, F25) | P03, P25, P28, P29, P31, P32, P33 |
 | **C3** | Cache-Prefetch-Engine | Latenz-Hiding | `cache_engine/prefetch/` | F4, F5, F6, F23, F26 | P02-P05, P14, P15, P21-P28 |
 | **C4** | Cache-Coherence-Engine | Reader/Writer-Asymmetrie, Sync | `cache_engine/coherence/` | F18, F25, F26 | P03, P06-P08, P28-P30 |
 | **C5** | Cache-Telemetry-Engine | Mess- + Probe-Strategien | `cache_engine/telemetry/` | F23, F24 | P05, P13, P23-P28, P32 |
-| **C6** | Cache-Allocation-Engine | Allocator + Tier-Auswahl | `cache_engine/allocation/` | F1, F12, F21, F27 | P05, P22, P25, P31, P33 |
-| **C7** | Cache-Migration-Engine | Tier-Migration & Compensation | `cache_engine/migration/` | F9, F19, F27 | P22, P25, P33 |
+| **C6** | Cache-Allocation-Engine | Allocator + Ebenen-Auswahl | `cache_engine/allocation/` | F1, F12, F21, F27 | P05, P22, P25, P31, P33 |
+| **C7** | Cache-Migration-Engine | Ebenen-Migration & Compensation | `cache_engine/migration/` | F9, F19, F27 | P22, P25, P33 |
 | **C8** | Cache-Encoding-Engine | Topologie + Bit-Packing | `cache_engine/encoding/` | F2, F10, F16, F17, F19, F20 | P01, P02, P04, P09, P10, P11, P12 |
 | **C9** | Cache-Heuristik-Engine | Decision-Logik + Cost-Modell | `cache_engine/heuristic/` | (orthogonal zu allen) | alle 33 Paper |
 | **C10** | Cache-Topologie-Engine | Plattform-Probe + Discovery | `cache_engine/topology/` | (Saeule B Adapter) | P05, P25, P28, P32, P33 |
@@ -341,7 +341,7 @@ cache_engine/telemetry/
 ## 7. C6 — Cache-Allocation-Engine-Familie
 
 **Concept-Klasse:** `ICacheAllocationEngine`
-**Dach-Idee:** Allokiert Knoten-Speicher in passenden Tier (DRAM/HBM/NVRAM/Disk), beruecksichtigt Page-Sharing, NFP-Decorator, Tier-Properties.
+**Dach-Idee:** Allokiert Knoten-Speicher in passende Ebene (DRAM/HBM/NVRAM/Disk), beruecksichtigt Page-Sharing, NFP-Decorator, Ebenen-Properties.
 
 ### 7.1 Atomare Bausteine
 
@@ -355,8 +355,8 @@ cache_engine/telemetry/
 | `RewiredVirtualPhysicalAllocatorAtom` | P05 START | virtual<->physical via memfd + multiple mmap |
 | `HugePagesAtom` | (Linux/POSIX) | 2 MiB / 1 GiB Pages |
 | `NumaLocalAllocatorAtom` | P25, P32 | numactl/mbind, first-touch |
-| `HbmAllocationAtom` | P25 Mahling, P33 VAMPIR | HBM-Tier auto-discovered |
-| `LpddrAllocationAtom` | P25 Grace | LPDDR5X Tier |
+| `HbmAllocationAtom` | P25 Mahling, P33 VAMPIR | HBM-Ebene auto-discovered |
+| `LpddrAllocationAtom` | P25 Grace | LPDDR5X Ebene |
 | `NvramAllocationAtom` | P33 VAMPIR | Persistent NVDIMM / Optane |
 | `CxlAllocationAtom` | P25 Future-Trend | CXL-Memory-Pool |
 | `PoolAllocatorAtom` | (typisch DBMS) | Arena fuer kleinere Knoten |
@@ -371,7 +371,7 @@ cache_engine/telemetry/
 |--------|------------|---------------------|
 | **VAMPIR V-malloc + Compensation** (P33) | `VMallocCommand` + `NfpDecoratorCommand` + `CompensationMigrationCommand` | `VampirVMallocCompositionCommand` |
 | **START Rewiring + memfd** (P05) | `MemfdCreateCommand` + `RewiredVirtualPhysicalCommand` + `MmapMappingCommand` | `StartRewiringCompositionCommand` |
-| **Multi-Tier-Allocator (HBM+DRAM+NVRAM)** (P25+P33) | `HbmAllocationCommand` + `MallocCommand` + `NvramAllocationCommand` + `TierDispatchCommand` | `HeterogeneousMemoryCompositionCommand` |
+| **Multi-Ebenen-Allocator (HBM+DRAM+NVRAM)** (P25+P33) | `HbmAllocationCommand` + `MallocCommand` + `NvramAllocationCommand` + `TierDispatchCommand` | `HeterogeneousMemoryCompositionCommand` |
 
 ### 7.3 F-Mapping
 
@@ -394,7 +394,7 @@ cache_engine/allocation/
 ## 8. C7 — Cache-Migration-Engine-Familie
 
 **Concept-Klasse:** `ICacheMigrationEngine`
-**Dach-Idee:** Verschiebt Knoten zwischen Cache-Tiers (Hot/Cold, DRAM↔HBM, Cache↔Disk). Periodisches oder Trigger-getriebenes Re-Layouting.
+**Dach-Idee:** Verschiebt Knoten zwischen Cache-Ebenen (Hot/Cold, DRAM↔HBM, Cache↔Disk). Periodisches oder Trigger-getriebenes Re-Layouting.
 
 ### 8.1 Atomare Bausteine
 
@@ -402,9 +402,9 @@ cache_engine/allocation/
 |---------------|--------|--------------|
 | `HotColdSegregationAtom` | P02 HOT, P05 START, P10 SuRF | Hot-Pages oben, Cold-Pages unten |
 | `LayerCutoffAtom(R=64)` | P10 SuRF | Cutoff-Level R=64 zwischen Dense/Sparse |
-| `MultiTierMigrationAtom(Cache,Disk)` | P22 Chen Fractal | Cache-Tier ↔ Disk-Tier |
+| `MultiTierMigrationAtom(Cache,Disk)` | P22 Chen Fractal | Cache-Ebene ↔ Disk-Ebene |
 | `DramHbmMigrationAtom` | P25, P33 | HBM-DRAM-Migration (V-malloc-gesteuert) |
-| `CompensationMigrationAtom` | P33 VAMPIR | Transparente Daten-Migration zwischen NFP-Tiers |
+| `CompensationMigrationAtom` | P33 VAMPIR | Transparente Daten-Migration zwischen NFP-Ebenen |
 | `LocalRelocationAtom(α=1..6)` | P19 Saikkonen | 1-6 Knoten lokal verschieben (wait-free) |
 | `GlobalRelocationAtom` | P19 Saikkonen | BFS-Periodic globale Reorganisation |
 | `LayoutInvariantPreservationAtom` | P19 Saikkonen | Invarianten-Erhaltung |
@@ -702,7 +702,7 @@ cache_engine/filter/
 | **Wormhole P07 (Hash + B+ + LinkedList)** | C1 + C8 + C11 | `TripleLayerLookupCompositionCommand` |
 | **Masstree P03 (Slice-Trie + B+-pro-Layer)** | C1 + C3 + C4 | `MasstreeSliceLayeredCompositionCommand` |
 | **B²-Tree P06 (Outer-B+ + Inner-Decision/Span)** | C1 + C8 + C4 | `B2TreeRecursiveCommonPrefixCompositionCommand` |
-| **Fractal P22 (Cache-Tier + Disk-Tier + Dual-JumpPointer)** | C3 + C6 + C7 | `FractalHierarchicalCompositionCommand` |
+| **Fractal P22 (Cache-Ebene + Disk-Ebene + Dual-JumpPointer)** | C3 + C6 + C7 | `FractalHierarchicalCompositionCommand` |
 | **Khan P23 + Mahling P25 (RuntimeAdaptive + Coroutine)** | C3 + C5 + C9 | `KhanMahlingAdaptiveCoroutineCompositionCommand` |
 | **Block AO Production-Dispatch** (alle 12 Familien) | C1+...+C12 | `BlockAOProductionDispatchCompositionCommand` |
 
@@ -737,12 +737,12 @@ Cross-Familien-Permutationen (12 Familien, je ein Atom-Baustein gewaehlt) ergibt
 **12 ICacheEngine-Familien (C1-C12) als Pendant zu ISearchEngine-Familien S1-S30:**
 
 1. **C1 Cache-Layout** — Knoten-Format & Footprint (F1, F3, F4, F8, F11, F12, F13, F14, F15, F16, F17, F19, F22)
-2. **C2 Cache-Pinning** — NUMA/Core/Tier-Bindung
+2. **C2 Cache-Pinning** — NUMA/Core/Ebenen-Bindung
 3. **C3 Cache-Prefetch** — Latenz-Hiding (F4, F5, F6, F23, F26)
 4. **C4 Cache-Coherence** — Reader/Writer-Asymmetrie & Sync (F18, F25)
 5. **C5 Cache-Telemetry** — Mess- + Probe-Strategien (F23, F24)
-6. **C6 Cache-Allocation** — Allocator + Tier-Auswahl (F1, F12, F21, F27)
-7. **C7 Cache-Migration** — Tier-Migration & Compensation (F9, F19, F27)
+6. **C6 Cache-Allocation** — Allocator + Ebenen-Auswahl (F1, F12, F21, F27)
+7. **C7 Cache-Migration** — Ebenen-Migration & Compensation (F9, F19, F27)
 8. **C8 Cache-Encoding** — Topologie + Bit-Packing (F2, F10, F16, F17, F19, F20)
 9. **C9 Cache-Heuristik** — Decision-Logik + Cost-Modell (orthogonal)
 10. **C10 Cache-Topologie** — Plattform-Probe + Discovery (Saeule-B-Adapter)

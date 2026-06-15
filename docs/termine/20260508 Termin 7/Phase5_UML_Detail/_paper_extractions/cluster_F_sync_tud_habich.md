@@ -585,7 +585,7 @@ Matrix (X = optimal anwendbar, M = mit Aufwand, - = nicht anwendbar):
 **P33 (VAMPIR) — Architektur-Framework-Beitraege fuer Saeule B:**
 - **NFP-Decorator-Pattern:** Allokationen tragen NFP-Kontext — verallgemeinerbar als IMemoryDecorator.
 - **V-malloc:** Heterogene Memory-Allocator-Strategie. → IHeterogeneousAllocator.
-- **Compensation/Migration:** Transparente Daten-Migration zwischen Memory-Tiers. → IMigrationPolicy unter ILivePlatformModel.
+- **Compensation/Migration:** Transparente Daten-Migration zwischen Memory-Ebenen. → IMigrationPolicy unter ILivePlatformModel.
 - **Pipeline-Scheduler-Negotiation:** Compile-Time-Negotiation fuer Multi-Query-Optimierung. → ICompileTimeNegotiator.
 
 ### Wie verhalten sich Hardware-Optimierungen (P31) zur Cache-Engine-Plattform-Modellierung?
@@ -617,7 +617,7 @@ Mapping zur Cache-Engine-Plattform-Modellierung:
 **Komplementaritaet zwischen Papern:**
 - **P31 (TUD 2017):** Statisches Plattform-Modell — manufactured chip, fixed ISA-Extensions.
 - **P32 (TUD 2025):** Dynamisches Performance-Modell — runtime-detected TLB/Prefetcher/Associativity-Limits.
-- **P33 (TUD 2023):** Virtualisierungs-Framework — ueber heterogene Memory-Tiers.
+- **P33 (TUD 2023):** Virtualisierungs-Framework — ueber heterogene Memory-Ebenen.
 - **P08 (TUM 2016):** Synchronisation-Mechaniken (OLC, ROWEX) auf TOP der Plattform.
 - **P29 (IBM 2001):** RCU als Synchronisations-Mechanik mit IScheduler-Integration.
 - **P30 (IBM 2004):** HazardPointers als wait-free Synchronisations-Mechanik OHNE Scheduler-Support.
