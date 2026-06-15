@@ -52,7 +52,7 @@ Stand 2026-05-15 · Benjamin Probst · TU Dresden
 - V14: 76 neue Tests + CI Test-Discovery-Workaround + Manuskript Kapitel 02-04
 - V15: Manuskript Kapitel 01+05+06+07
 - V16: Build-Verifikation + ART (P01) Module-Body Vorlage
-- V17: 7 Tier-1 SOTA-Module-Body-Templates
+- V17: 7 Rang-1 SOTA-Module-Body-Templates
 - V18: Codegen Multi-Template-Path (cache-engine + prt-art)
 
 ---

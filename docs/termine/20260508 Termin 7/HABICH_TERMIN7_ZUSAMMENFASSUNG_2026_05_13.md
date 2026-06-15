@@ -120,7 +120,7 @@ V7.6-Architektur-Stand vollstaendig in Code ueberfuehren. Wesentliche
 Neuerungen seit dem ursprunglichen Termin-7-Stand:
 
 ### 7.1 cache-engine
-- **30 SOTA-Profile** in `algorithm_profiles/sota/` (8 Tier-1 + 22 Tier-2/3
+- **30 SOTA-Profile** in `algorithm_profiles/sota/` (8 Rang-1 + 22 Rang-2/3
   fuer P11-P32) als XML/JSON-Persistenz aller Suchalgorithmen
 - **CMake-Flag `COMDARE_EXPERIMENT_MODE`** (default OFF) aktiviert den
   ResultAggregator als integralen Bestandteil der ExecutionEngine
@@ -191,7 +191,7 @@ Detail-Snapshot fuer Termin 8 in `docs/termine/20260515 Termin 8/`.
 |---|---|
 | V15 | Manuskript Kapitel 01+05+06+07 + PROJECT_LAYER_MAPs §11 V12-V14 Delta |
 | V16 | Build-Verifikation + ART (P01) Module-Body Vorlage |
-| V17 | Codegen Template-Substitution + 7 Tier-1 SOTA-Module-Body-Templates |
+| V17 | Codegen Template-Substitution + 7 Rang-1 SOTA-Module-Body-Templates |
 | V18 | Codegen Multi-Template-Path (cache-engine + prt-art) |
 
 ### 8.3 Sprint-Block V19-V22 (Profile-Stack + Mess-Pipeline E2E)

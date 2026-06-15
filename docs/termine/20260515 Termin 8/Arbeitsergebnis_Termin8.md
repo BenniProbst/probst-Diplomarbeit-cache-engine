@@ -38,7 +38,7 @@ Alle 3 Repos GitHub-gepusht; cache-engine + prt-art parallele Submodules in Dipl
 
 ### 2.3 Codegen-Templates (V17-V18)
 - art_body.hpp.template (P01-ART Vorlage)
-- 7 weitere Tier-1 SOTA-Templates (P02-P08)
+- 7 weitere Rang-1 SOTA-Templates (P02-P08)
 - prtart_body.hpp.template (im prt-art Repo)
 - Multi-Template-Path (cache-engine + prt-art) mit Fallback
 

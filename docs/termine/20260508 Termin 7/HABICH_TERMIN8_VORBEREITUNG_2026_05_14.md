@@ -85,7 +85,7 @@ Auswertung (06) wartet auf erste Mess-Daten; Fazit (07) Skelett.
 ### 3.4 Module-Bodies pro Permutation
 **Status:** Codegen erzeugt aktuell ABI-konforme Skelett-Module.
 **Frage:** Welche SOTA-Algorithmen sind fuer "echte" Module-Bodies
-priorisiert? (Vorschlag: erst die 8 Tier-1-Profile + PRT-ART)
+priorisiert? (Vorschlag: erst die 8 Rang-1-Profile + PRT-ART)
 
 ### 3.5 Compile-Time-Permutationsexplosion
 **Status:** 11 × 8 × 5 × 3 × 6 × 16 × 6 × 5 × 6 × 6 × 5 ≈ 5,5 × 10^9
@@ -105,14 +105,14 @@ nur fuer die ZIH-Cluster-Laeufe.)
 - Drei-Repo-Architektur klargestellt
 - COMDARE_EXPERIMENT_MODE CMake flag
 - ResultAggregator in ExecutionEngine
-- algorithm_profiles/ Ordner mit 8 Tier-1-Profilen
+- algorithm_profiles/ Ordner mit 8 Rang-1-Profilen
 - defined/full mode in xml_config_parser
 - algorithm_baustein.hpp std::variant Pattern
 - PrtArtSearchEngineAdapter (Komposition)
 - prt-art TestDataSetAccumulationEngine im Constructor
 
 ### 4.2 V9 (Vollausbau)
-- 22 weitere Tier-2/3-Profile (P11-P32) — total 30 SOTA
+- 22 weitere Rang-2/3-Profile (P11-P32) — total 30 SOTA
 - baustein_variants.hpp mit 11 Achsen × Tag-Strukturen
 - generate_module_from_profile (Codegen-API)
 - legacy_reimpl/ physisch nach prt-art verschoben
@@ -188,7 +188,7 @@ Termin 8 in den 3 dedizierten Dokumenten unter
 | Sprint | Schwerpunkt |
 |---|---|
 | V16 | Build-Verifikation aller 3 Repos + thesis/main.tex pdflatex Build + ART (P01) Module-Body Vorlage |
-| V17 | Codegen Template-Substitution + 7 weitere Tier-1 SOTA-Module-Body-Templates |
+| V17 | Codegen Template-Substitution + 7 weitere Rang-1 SOTA-Module-Body-Templates |
 | V18 | Codegen Multi-Template-Path (cache-engine + prt-art) + prtart_body.hpp.template |
 
 ### 6.2 Sprint-Block V19-V22 (Profile-Stack + Mess-Pipeline)

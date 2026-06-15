@@ -35,7 +35,7 @@ Alle 3 Repos gepusht auf GitHub (BenniProbst-Account, privat).
 |---|---|---|
 | V15 | Manuskript Kapitel 01+05+06+07 + PROJECT_LAYER_MAPs §11 V12-V14 Delta | DONE |
 | V16 | Build-Verifikation + thesis/main.tex pdflatex Build + ART (P01) Module-Body Vorlage | DONE |
-| V17 | Codegen Template-Substitution + 7 Tier-1 SOTA-Module-Body-Templates | DONE |
+| V17 | Codegen Template-Substitution + 7 Rang-1 SOTA-Module-Body-Templates | DONE |
 | V18 | Codegen Multi-Template-Path (cache-engine + prt-art) | DONE |
 
 ### 2.3 Sprint-Block V19-V22 (Profile-Stack + Mess-Pipeline)
