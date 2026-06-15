@@ -328,10 +328,13 @@ Kap.4-Metapher / „Tier/Organ-Metapher" → **Lebewesen**; ④ „Tier-1 SOTA" 
 ~~**E** `_archiv_entwurf1`~~ ✅ `3576621` (SOTA Tier-1/2-3→Rang). ~~A4-Rest~~ ✅ `43b3221` · ~~**C** prt-art~~ ✅ `3c971f4`/`2bb6cd6` · ~~**D** Manuskript~~ ✅ `5d11dce`/`146eb2b`.
 
 > ✅ **STAND 2026-06-15:** A (Haupt-Repo `docs/` komplett) + C (prt-art) + D (Manuskript DE+EN) + E (_archiv) **ERLEDIGT, committet, gepusht.**
-> **➡ EINZIG VERBLEIBEND: B = cache-engine-`docs/`** (648 Vork./50+ Dateien) — erfordert Anfassen des cache-engine-Submoduls; Direktive
+> **➡ EINZIG VERBLEIBEND: B = cache-engine-`docs/`** (677 Vork./60 Dateien) — erfordert Anfassen des cache-engine-Submoduls; Direktive
 > „cache-engine = paralleler Implementierungs-Agent, **never touch**". Working-tree gerade fast clean (HEAD `0556e3a`, nur 2 generierte
-> `thesis_tiere/`-CSVs). **Vor Bearbeitung mit User klären** (Konflikt-Risiko) — sonst analog: ③ Cache/Memory/Multi-Tier-Prosa→Ebene,
-> ④ SOTA-Tier-N→Rang, ① Lebewesen, Code-Identifier (`IObservableTier`/`tier_*`/`CacheTier`/`MultiTier*`/`TierKind`…) belassen.
+> `thesis_tiere/`-CSVs). **User-Entscheid 2026-06-15: „jetzt bearbeiten"** (Risiko akzeptiert) → **B IN ARBEIT** (Fortschritts-Log §10).
+> **KERN-ERKENNTNIS (Doc 24 vollständig analysiert = Muster):** „Tier" ist in der cache-engine-Doku **überwiegend ① LEBEWESEN**
+> (= ganzer/composite Suchalgorithmus). **BELASSEN:** verbatim `> „…"`-User-Zitate (mit „Tier") + Code-Identifier
+> (`IObservableTier`/`tier_observe*`/`ComdareTierObserverSnapshot`/`tier_to_organ_mapping`/`CacheTier`/`MultiTier*`/`TierKind`). Sonst analog: ③ Cache/Memory/Multi-Tier-Prosa→Ebene,
+> ④ SOTA-Tier-N→Rang, ① Lebewesen, Code-Identifier belassen. Methodik: je Datei vollständig lesen → Prosa vs `> „…"`-Zitat vs Code trennen.
 <!-- HISTORIE A4-Rest (erledigt): `Phase5_UML_Detail/`: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 ·
 24_REV7 8 + **`.drawio` REV3-7** [REV5/6/7 je 25!] + `_paper_extractions` cluster_D 19/cluster_F 2 + `_rev5_extractions`
 cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 + `_paper_extractions_allocators` A05/A14/A19
@@ -375,3 +378,20 @@ cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 
 ### C. prt-art `docs/` + READMEs (Submodul `comdare-prt-art` — noch zu erfassen)
 ### D. Manuskript `thesis/diplomarbeit/` (① Metapher noch offen; ④ Rang bereits erledigt) — eigenes LaTeX-Repo, bilingual DE+EN, danach `build.ps1` grün halten
 ### E. Konz. Doku + Übergaben selbst nachziehen: `sessions/2026-06-15-konzeptionelle-…`, `2026-06-15-tier-…-uebergabe.md` (nutzen „Tier-Unterklasse" → „Lebewesen-Unterklasse")
+
+---
+
+## §10 — B-Fortschritts-Log (cache-engine `docs/`, LIVE, Resume-fähig)
+
+**Scope (Grep `\bTier`, Stand 2026-06-15):** **673 Treffer / 83 `.md`-Dateien.** Methodik je Datei: lesen → Prosa ① „Tier"→**Lebewesen** / ③ Cache-/Memory-/Multi-Tier→**Ebene** / ④ SOTA-Tier-N→**Rang**; **BELASSEN** `>`-verbatim-Zitate (mit „Tier") + Code-Identifier (`IObservableTier`/`tier_observe*`/`ComdareTierObserverSnapshot`/`CacheTier`/`MultiTier*`/`TierKind`/`TierBudget`/`tier_to_organ_mapping`) + Bio-Beinamen (Säugetier/Reptil/**Schnabeltier**). Commit nur `docs/` (CSVs/Code NIE). Verifikation je Datei: `\bTier`-Grep → nur noch `>`-Zeilen + Code-Identifier übrig.
+
+**architecture/ (kanonisch, zuerst):**
+- [x] `24` (ce `c115438` + `46b36f3`-Nachzug §8.8) · `26`/`27`/`28`/`29` (ce `46b36f3`) · `30` (ce `3c7ab5f`) — alle ✅ gepusht (~226 Treffer).
+- **METHODIK-VERFEINERUNG (wichtig für Resume):** „Tier-Unterklasse"/„Tier-Binary" sind **redaktionelle Terme** (der User sagte ursprünglich „Gattung"; die `[korr.]`-Notizen führten „Tier-Unterklasse" ein) → überall ① **Lebewesen**, **AUCH in rein redaktionellen `>`-KORREKTUR-Notizen**. **BELASSEN nur: (a) verbatim `> „…"`-User-Zitate** (markiert „User … verbatim-tragend" / echte Zitatsätze; z.B. Doc 30 Z.3-6, Doc 24 §2.1/§7-Direktive/§8.x), **(b) Code-Identifier** (`tier_insert`/`tier_lookup`/`tier_observe`/`IObservableTier`/`*Tier`-Typnamen wie `AdapterTier`, `tier_to_organ_mapping`), **(c) Bio-Beinamen** (Säugetier/Reptil/**Schnabeltier**), **(d) Code-Pfade** (`thesis_tiere/`). „Tier-X" wo `tier_x` ein echter Code-Identifier ist (insert/lookup/erase/clear/size/observe) = ② Subject-Code → BELASSEN; rein beschreibendes „Tier-X" (Binary/Wall-Clock/Modul/Unterklasse/Metapher/Quellen) → ① Lebewesen. **ACHTUNG Zeilenumbruch:** mehrwort-Terme können über `\n` getrennt sein → `replace_all` verfehlt sie; **immer `\bTier`-Grep zur Verifikation je Datei** (zeigt Resttreffer = nur Zitate/Code erlaubt).
+- [ ] **architecture-Rest:** `31`(2) `33`(13) `34`(25) · `abhaengigkeitskette_…`(27) · `messarchitektur_v5_design`(20) `_klarstellungen…`(15) `_v5_entscheidungen`(14) `_design_observer…`(9) · klein: `15`(3)/`17`(1)/`18`(2)/`19`(3)/`20`(4)/`21`(4)/`22`(4)/`32`(2)/`messarchitektur_v5_drei_profile`(1)/`_i8…`(1)
+
+**sessions/ + email/ + quality_audit/ (danach):** ~60 Dateien, 1–31 Treffer. Überwiegend ④ SOTA-Tier-N→Rang + Code-Identifier; ① Lebewesen-lastig: `20260613-A1-lesenotizen`(31), `SESSION-HANDOFF-organ-metapher`(20), `20260603-gattungs-kategorienfehler…`(19), `20260603-queuing-migration-und-87-container-tier-unterklasse`(16), `20260611-…undolog-fertig-audits-pausiert`(17), `GOAL-MESSUNG-AUDIT-APPENDIX`(17).
+
+**Pointer-Bump Haupt-Repo:** am Ende der B-Gesamtgruppe (cache-engine-Submodul-Pointer `0556e3a`→finaler B-HEAD).
+
+**OFFENER PRÜFPUNKT A4 (Inkonsistenz):** Zeile 375 markiert `_paper_extractions/` (cluster_D/F) + `_rev5_extractions/` (cache_engine_families/state_visitor/taxonomien/rev4_delta) als OFFEN, Zeile 373 + HISTORIE als erledigt (`23c6462`). Nach B-Architektur-Block per Grep verifizieren + Häkchen konsolidieren.
