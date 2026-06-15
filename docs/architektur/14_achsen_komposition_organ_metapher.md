@@ -15,7 +15,7 @@ zukünftigen Topic+Achsen-Entscheidungen.
 >
 > **Begriffs-Schärfung gegenüber dem verbindlichen 3-Ebenen-Modell (Doc 30 §8.0;
 > verbatim verankert in Doc 24 §8.8 + diesem Dokument §25).** Dieses Dokument ist
-> das Quell-Dokument der Organ-/Tier-Metapher und verwendet den Begriff **„Gattung"**
+> das Quell-Dokument der Organ-/Lebewesen-Metapher und verwendet den Begriff **„Gattung"**
 > historisch DOPPELDEUTIG. Ab sofort gilt die folgende strikte Trennung; die
 > Original-Texte/-Tabellen/-Direktiven unten bleiben unangetastet, sind aber im
 > Sinne dieses Banners zu lesen:
@@ -31,20 +31,20 @@ zukünftigen Topic+Achsen-Entscheidungen.
 >    unten, die „Gattung" / `AnatomyGenus` für die Ebene mit dem festen Achsen-Satz
 >    benutzen — insbesondere die **5 Klassen SearchAlgorithm/Set/Sequence/Adapter/View**
 >    (Säugetier/Vogel/Reptil/Wirbelloses/Pflanze) und die std-Familien **„Gattung A–F"**
->    in §26 — bezeichnen in Wahrheit **Tier-UNTERKLASSEN**, NICHT Gattungen.
->    Konkret: Set/Sequence/Adapter/View sind Tier-Unterklassen UNTER dem
+>    in §26 — bezeichnen in Wahrheit **Lebewesen-UNTERKLASSEN**, NICHT Gattungen.
+>    Konkret: Set/Sequence/Adapter/View sind Lebewesen-Unterklassen UNTER dem
 >    **Container**-Interface; die 17/19-Achsen-Komposition (std::map-ähnlich) ist die
->    **SearchAlgorithm-Tier-Unterklasse** unter dem **SearchAlgorithm**-Interface.
+>    **SearchAlgorithm-Lebewesen-Unterklasse** unter dem **SearchAlgorithm**-Interface.
 >
-> 3. **ACHSEN = Organe der Tier-Unterklasse. KEINE Achse ist optional.** Die
->    Interfaces ALLER Achsen werden in JEDEM Tier-Binary tatsächlich + uniform
->    getrieben. Ein nicht-pufferndes/nicht-prefetchendes Tier wählt einen KONKRETEN
+> 3. **ACHSEN = Organe der Lebewesen-Unterklasse. KEINE Achse ist optional.** Die
+>    Interfaces ALLER Achsen werden in JEDEM Lebewesen-Binary tatsächlich + uniform
+>    getrieben. Ein nicht-pufferndes/nicht-prefetchendes Lebewesen wählt einen KONKRETEN
 >    Durchreich-Algorithmus (NoBuffer/NoFlush/NonePrefetch/NoMigration/None), es wird
 >    NICHT „eine Achse weggelassen". Wo unten „optionale Achse" / „Teilmenge der
 >    Achsen" steht, ist das im Sinne von *Durchreich-Algorithmus* zu lesen (s. die
 >    Schärfungs-Notiz an §28/§32).
 >
-> 4. **queuing q1/q2** sind **Pflicht-ACHSEN der SearchAlgorithm-Tier-Unterklasse**
+> 4. **queuing q1/q2** sind **Pflicht-ACHSEN der SearchAlgorithm-Lebewesen-Unterklasse**
 >    (kein Interface, keine Gattung) — vgl. §7 (dort bereits korrekt als „Organ"
 >    geführt) und das parallele Code-Ziel AdHocComposition 17→19.
 >
@@ -63,7 +63,7 @@ zukünftigen Topic+Achsen-Entscheidungen.
 > Ausprägung einem Anwendungsfall entspricht. Hier ist es also so, dass eine Achse
 > einen speziellen Algorithmus für einen Anwendungsfall bereitstellt. Im Anschluss
 > ist die Permutation der Achsen gegeneinander nichts anderes, als wenn wir
-> genetische Experimente an den Tieren unternehmen und deren Organe testweise
+> genetische Experimente an den Lebewesen unternehmen und deren Organe testweise
 > gegeneinander tauschen. Genauso tauschen wir die Algorithmen aller Achsen
 > gegeneinander aus, um neue Gesamt-Suchalgorithmen zu erhalten, die unbekannte
 > Eigenschaften besitzen."
@@ -71,7 +71,7 @@ zukünftigen Topic+Achsen-Entscheidungen.
 ### §1.1 Anti-Pattern (das was kritisiert wurde)
 
 > "Ein Reh hat 4 Beine, eine Kuh hat vier Beine, ein Schaf hat vier Beine, also
-> sind alle Pflanzenfresser und Paarhufer. Dabei hat jedes Tier dieselben Organe,
+> sind alle Pflanzenfresser und Paarhufer. Dabei hat jedes Lebewesen dieselben Organe,
 > dieselbe Grund DNA in unterschiedlicher Ausprägung."
 
 **Übertragen auf Cache-Engine:** Wenn wir ART, HOT, Wormhole, Masstree als
@@ -80,7 +80,7 @@ EINZELNE Wrappers in `axis_03a_search_algo` ablegen — dann sagen wir
 Wormhole hat 4 Functions" — und folgern fälschlicherweise: alle sind
 "Such-Algorithmen", also gehören in EINE Achse. Das ist genauso fehlerhaft
 wie "alle haben vier Beine → alle sind Paarhufer". Die Achse beschreibt
-nicht das "Tier" (= ganzer Algorithmus), sondern ein einzelnes "Organ".
+nicht das "Lebewesen" (= ganzer Algorithmus), sondern ein einzelnes "Organ".
 
 ### §1.2 Bottom-Up-Permutation als genetisches Experiment
 
@@ -88,11 +88,11 @@ nicht das "Tier" (= ganzer Algorithmus), sondern ein einzelnes "Organ".
 > Gesamt-Suchalgorithmen zu erhalten, die unbekannte Eigenschaften besitzen."
 
 **Konsequenz:** Eine Permutation ist die kontrollierte Veränderung **eines
-einzelnen Organs** bei gleichbleibender Tier-Anatomie. Im Cache-Engine-Kontext:
+einzelnen Organs** bei gleichbleibender Lebewesen-Anatomie. Im Cache-Engine-Kontext:
 - Achse X = ein konkretes Organ (z.B. "Node-Layout")
 - Permutations-Element der Achse = eine Ausprägung des Organs (z.B. "Node256",
   "Patricia-comprimiert", "PrtArt-BPlus")
-- Eine Permutations-Konfiguration = ein konkretes Tier (= konkreter Such-Algorithmus)
+- Eine Permutations-Konfiguration = ein konkretes Lebewesen (= konkreter Such-Algorithmus)
 
 ---
 
@@ -132,7 +132,7 @@ JEDER von ihnen?
 
 **Erkenntnis:** Jeder Algorithmus hat ALLE diese "Organe" — nur in unterschiedlichen
 Ausprägungen. Die Achse beschreibt das Organ-Konzept (z.B. "Node-Type"), nicht das
-fertige Tier (z.B. "ART").
+fertige Lebewesen (z.B. "ART").
 
 ### §2.3 Anti-Pattern in heutiger axis_03a_search_algo
 
@@ -212,19 +212,19 @@ Die ursprüngliche Habich-Direktive (Original-Code mit Original-Compiler bauen
 und linken) gilt weiterhin:
 - Die einzelnen Achsen-Klassen (`Node256AdaptiveArt`, `OlcOptimistic` etc.)
   können jeweils Paper-Mixin-Inheritance haben (`get_compiler="gcc-9.5"`)
-- Das Original-Linking erfolgt pro Achse (Organ), nicht pro Composition (Tier)
+- Das Original-Linking erfolgt pro Achse (Organ), nicht pro Composition (Lebewesen)
 
 ---
 
 ## §4 Pflicht-Disziplinen für alle zukünftigen Topic+Achsen
 
-### §4.1 Pflicht: Achse = Organ, nicht Tier
+### §4.1 Pflicht: Achse = Organ, nicht Lebewesen
 
 **Vor Anlegen einer neuen Achse Pflicht-Frage:**
 > "Ist das eine Sub-Aufgabe die JEDER Such-Algorithmus in irgendeiner Form
-> ausführt (= Organ)? Oder ist das ein kompletter Algorithmus (= Tier)?"
+> ausführt (= Organ)? Oder ist das ein kompletter Algorithmus (= Lebewesen)?"
 
-Wenn Tier → falsche Achse → Composition-Template.
+Wenn Lebewesen → falsche Achse → Composition-Template.
 Wenn Organ → richtige Achse → permutationsfähiges Interface.
 
 ### §4.2 Pflicht: Universalität-Check
@@ -318,7 +318,7 @@ Templates die Sub-Achsen orchestrieren.
 
 | Topic / Achse | Status | Begründung |
 |---|---|---|
-| **`axis_03a_search_algo`** (8 Wrappers, davon 5 OriginalXxx) | ❌ **REFACTORING-PFLICHT** | Tiere statt Organe — Refactoring per §6 |
+| **`axis_03a_search_algo`** (8 Wrappers, davon 5 OriginalXxx) | ❌ **REFACTORING-PFLICHT** | Lebewesen statt Organe — Refactoring per §6 |
 
 ---
 
@@ -343,7 +343,7 @@ Templates die Sub-Achsen orchestrieren.
 
 **Algorithmus = Permutations-Konfiguration aller Achsen.**
 
-**Permutation = genetisches Experiment am Tier (= Cache-Engine).**
+**Permutation = genetisches Experiment am Lebewesen (= Cache-Engine).**
 
 **Bottom-Up-Pflicht:** Abstrahiere vom Detail (Algorithmus) zum Gesamt-Bild (Organ-
 Aufgaben). Definiere Achsen NUR für Sub-Aufgaben die in jedem Algorithmus
@@ -371,7 +371,7 @@ auftreten. Kompositioniere Algorithmen NUR aus den definierten Achsen-Ausprägun
 > finden, was bedeutet, dass wir anhand des Gesamtbildes der Kompositionen und
 > der nun fertiggestellten Zerlegung eine Implementierung finden können, welche
 > zentral für alle Kompositionen passen wird, und die sich nur anhand der
-> Ausprägung der Merkmale jeder Achse/Organe (ähnlich Tier-Metapher) zum finalen
+> Ausprägung der Merkmale jeder Achse/Organe (ähnlich Lebewesen-Metapher) zum finalen
 > eindeutigen Komposit-Algorithmus zusammensetzt."
 
 > "Methapher: Alle Säugetiere haben im Kern hauptsächlich dieselben Organe und
@@ -379,7 +379,7 @@ auftreten. Kompositioniere Algorithmen NUR aus den definierten Achsen-Ausprägun
 > Ausprägungen."
 
 > "Das finale Ziel der Diplomarbeit ist es, die Anatomie eines Suchalgorithmus
-> zu finden und das schnellste 'Tier' bzw. die schnellste Rekombination aller
+> zu finden und das schnellste 'Lebewesen' bzw. die schnellste Rekombination aller
 > Achsen zu finden und ansonsten alle Achsen-Permutationen bis ins Detail über
 > ihr Verhalten zu studieren und auszuwerten."
 
@@ -442,7 +442,7 @@ using SuRF      = SearchAlgorithmAnatomy<compositions::SurfComposition>;
 using Masstree  = SearchAlgorithmAnatomy<compositions::MasstreeComposition>;
 using Start     = SearchAlgorithmAnatomy<compositions::StartComposition>;
 
-// Eine NEUE Permutation = neues Tier (z.B. ART-Node mit Wormhole-Hash-Lookup):
+// Eine NEUE Permutation = neues Lebewesen (z.B. ART-Node mit Wormhole-Hash-Lookup):
 struct FrankensteinComposition {
     using search_algo     = traversal::axis_03a::Array256;
     using cache_traversal = traversal::axis_03b::HashLookup;  // ← von Wormhole
@@ -477,7 +477,7 @@ using Frankenstein = SearchAlgorithmAnatomy<FrankensteinComposition>;
 **Wissenschaftlicher Beitrag der Diplomarbeit:**
 - Bewies dass Such-Algorithmen eine gemeinsame Anatomie haben (Reduktion auf 15 Achsen)
 - Erschloss neuen Permutations-Raum (Cartesian aller Achsen-Sub-Werte)
-- Identifizierte schnellstes "Tier" (optimale Komposit-Konfiguration) systematisch
+- Identifizierte schnellstes "Lebewesen" (optimale Komposit-Konfiguration) systematisch
 
 ---
 
@@ -504,9 +504,9 @@ using Frankenstein = SearchAlgorithmAnatomy<FrankensteinComposition>;
 | **Filter** (filter) | None | None | None | **(= Funktion!)** | None | None |
 
 **Beobachtungen:**
-- SuRF ist das einzige Tier wo `filter` Composition-konstitutiv ist (SuRF **IST** ein Filter)
-- Wormhole als einziges Tier nutzt HashLookup statt LinearWalk fuer cache_traversal
-- Viele Organe sind ueber alle 6 Tiere identisch (value_handle Inline, io_dispatch InMemory, migration None) → kleine echte Variation
+- SuRF ist das einzige Lebewesen wo `filter` Composition-konstitutiv ist (SuRF **IST** ein Filter)
+- Wormhole als einziges Lebewesen nutzt HashLookup statt LinearWalk fuer cache_traversal
+- Viele Organe sind ueber alle 6 Lebewesen identisch (value_handle Inline, io_dispatch InMemory, migration None) → kleine echte Variation
 - 3 Skelett-Gruppen (BYTEBYBYTE/DISCRIMINATIVE_BITS+HASH_ANCHOR/LAYER_SLICE+MULTIBYTE_SPAN+LOUDS_BITPOS) sind die dominanten search_algo-Cluster
 
 **Permutations-Raum-Schaetzung** (heute mit Stufe-A-Defaults):
@@ -594,7 +594,7 @@ unterscheiden (16 andere Achsen identisch).
    - §2 CompositionFromPermTuple Materialization + IsPermTuple17 Concept
    - §3 AnatomyPermutationDriver Arity/Count (Pilot 3×2×1^15 = 6)
    - §4 EachPermutationIsDistinctTier (Set-Diversity-Check)
-   - §5 AllSixTiereRoundtripIndependently (insert/lookup/erase/clear pro Tier)
+   - §5 AllSixTiereRoundtripIndependently (insert/lookup/erase/clear pro Lebewesen)
    - §6 NonEmptyAxisCountMatchesArity (PermutationEngine min-1-Constraint)
 
 **Pilot-Demonstration (6 Permutationen):**
@@ -602,13 +602,13 @@ unterscheiden (16 andere Achsen identisch).
 search_algo:     {Array256, VectorU8U8, VectorU16U16}  (3 Werte)
 cache_traversal: {LinearFanout, HashLookup}            (2 Werte)
 15 weitere:      {Default}                              (1^15)
-→ Cartesian:     3 × 2 × 1^15 = 6 distinkte Tiere
+→ Cartesian:     3 × 2 × 1^15 = 6 distinkte Lebewesen
 ```
 
 **Skalierung-Pfad (R5/V42):**
 Bei Vollausbau aller 15 Topics mit ihren Stufe-A-Wrappers:
-- search_algo 8, cache_traversal 2, mapping 2, allocator 24+, isa 4, weitere 1-4 → 10⁴-10⁵ Tiere
-- Pro Tier wird `for_each_composition_type` zu einem .so/.dll-Build (R5)
+- search_algo 8, cache_traversal 2, mapping 2, allocator 24+, isa 4, weitere 1-4 → 10⁴-10⁵ Lebewesen
+- Pro Lebewesen wird `for_each_composition_type` zu einem .so/.dll-Build (R5)
 - Mess-Treiber loadet .so/.dll und misst Performance (R6/V42)
 
 **Bezug zur PermutationEngine V41.F.6.1.D (existing):**
@@ -1018,12 +1018,12 @@ Trennung + 3-Kompositionale-Joins + ABI-Stabilitaet).**
 ## §26 Web-Recherche Ergebnis — std::-Container-Hierarchie
 
 > **Schärfung 2026-06-03 (Doc 30 §8.0):** Die Bezeichnung „Gattung A–F" in diesem
-> Abschnitt ist im Sinne des verbindlichen 3-Ebenen-Modells eine **Tier-UNTERKLASSEN**-
+> Abschnitt ist im Sinne des verbindlichen 3-Ebenen-Modells eine **Lebewesen-UNTERKLASSEN**-
 > Aufzählung, NICHT eine Gattungs-Aufzählung. Diese std-Container-Familien (Sequence /
 > Ordered Associative / Unordered Associative / Adapter / Flat Associative / View) sind
-> Tier-Unterklassen, die zum Großteil UNTER dem **Container**-Interface (= Gattung)
+> Lebewesen-Unterklassen, die zum Großteil UNTER dem **Container**-Interface (= Gattung)
 > liegen; die K→V-Such-Familien (Ordered/Unordered/Flat Associative, std::map-ähnlich)
-> bilden die **SearchAlgorithm-Tier-Unterklasse** unter dem **SearchAlgorithm**-Interface.
+> bilden die **SearchAlgorithm-Lebewesen-Unterklasse** unter dem **SearchAlgorithm**-Interface.
 > „Gattung" im korrekten Sinn = das Außen-Interface Search/Container/Graph (Prüf-Dock).
 > Original-Tabellen bleiben unverändert; nur die Ebenen-Benennung wird geschärft.
 
@@ -1091,15 +1091,15 @@ Pflicht-API: `operator[]/data()/size()` — KEIN insert/erase, non-owning.
 ## §27 AnatomyBase — die abstrakte Wurzel aller Lebewesen
 
 > **Schärfung 2026-06-03 (Doc 30 §8.0):** Die hier eingeführten 5 Werte des Enums
-> `AnatomyGenus` (SearchAlgorithm/Sequence/Set/Adapter/View) sowie die Tier-Metapher-
+> `AnatomyGenus` (SearchAlgorithm/Sequence/Set/Adapter/View) sowie die Lebewesen-Metapher-
 > Tabelle §27.2 (Säugetier/Vogel/Reptil/Wirbelloses/Pflanze) bezeichnen die Ebene mit
-> dem **festen Achsen-Satz** = **Tier-Unterklasse**, NICHT die Gattung. Im verbindlichen
+> dem **festen Achsen-Satz** = **Lebewesen-Unterklasse**, NICHT die Gattung. Im verbindlichen
 > 3-Ebenen-Modell ist **Gattung = das Außen-Interface (Prüf-Dock) Search/Container/Graph**;
-> Set/Sequence/Adapter/View sind Tier-Unterklassen unter dem **Container**-Interface,
-> SearchAlgorithm ist die Tier-Unterklasse unter dem **SearchAlgorithm**-Interface.
+> Set/Sequence/Adapter/View sind Lebewesen-Unterklassen unter dem **Container**-Interface,
+> SearchAlgorithm ist die Lebewesen-Unterklasse unter dem **SearchAlgorithm**-Interface.
 > Der Code-Identifier `AnatomyGenus` und seine Werte bleiben unverändert (technischer
 > Bestands-Bezeichner; Umbenennung wäre ein separater Code-Refactor, vgl. §41/§43
-> Cleanup-Sprint) — gemeint ist jedoch durchgehend die Tier-Unterklassen-Ebene.
+> Cleanup-Sprint) — gemeint ist jedoch durchgehend die Lebewesen-Unterklassen-Ebene.
 
 User-Direktive: "Alle Anatomie-Gattungen fallen unter die abstrakte Klasse der
 AnatomyBase."
@@ -1149,9 +1149,9 @@ public:
 }  // namespace
 ```
 
-### §27.2 Tier-Metapher-Mapping
+### §27.2 Lebewesen-Metapher-Mapping
 
-| Tierwelt-Gattung | Anatomie-Gattung | std::-Container Beispiele | Stoffwechsel |
+| Lebewesen-Klasse | Anatomie-Gattung | std::-Container Beispiele | Stoffwechsel |
 |---|---|---|---|
 | **Saeugetier** | `SearchAlgorithm` | std::map, std::unordered_map, std::flat_map | Vollstaendige Anatomie mit allen 17 Achsen |
 | **Vogel** | `Set` | std::set, std::unordered_set | Reduzierte Anatomie (K-only, kein V-Suchorgan) |
@@ -1164,17 +1164,17 @@ public:
 ## §28 Achsen-Verteilung pro Gattung
 
 > **Schärfung 2026-06-03 (Doc 30 §8.0):** ZWEI Korrekturen zu diesem Abschnitt.
-> (1) **„pro Gattung" = pro Tier-Unterklasse** (feste Achsen-Konfiguration liegt auf
-> der Tier-Unterklassen-Ebene, nicht auf der Gattungs-/Interface-Ebene).
+> (1) **„pro Gattung" = pro Lebewesen-Unterklasse** (feste Achsen-Konfiguration liegt auf
+> der Lebewesen-Unterklassen-Ebene, nicht auf der Gattungs-/Interface-Ebene).
 > (2) Die Formulierung **„Teilmenge der 17 Achsen" bzw. die „—"-Markierungen in der
 > Tabelle sind im strengen Modell NICHT als „Achse weggelassen" zu verstehen.** KEINE
-> Achse ist optional: jede Tier-Unterklasse treibt die Interfaces ALLER für sie
-> definierten Achsen uniform; wo unten „—" steht, wählt das Tier in Wahrheit einen
+> Achse ist optional: jede Lebewesen-Unterklasse treibt die Interfaces ALLER für sie
+> definierten Achsen uniform; wo unten „—" steht, wählt das Lebewesen in Wahrheit einen
 > KONKRETEN **Durchreich-Algorithmus** (None/NoBuffer/NoFlush/NonePrefetch/NoMigration,
 > bei View z.B. non-owning/immutable als konkrete Ausprägung). Die Tabelle beschreibt
-> also, welche Achse je Tier-Unterklasse einen aktiven vs. einen Durchreich-Algorithmus
+> also, welche Achse je Lebewesen-Unterklasse einen aktiven vs. einen Durchreich-Algorithmus
 > erhält — nicht, ob eine Achse existiert. (Für die aktuell EINZIG gebaute
-> SearchAlgorithm-Tier-Unterklasse sind dies alle 17, im Code-Ziel 19 inkl. queuing
+> SearchAlgorithm-Lebewesen-Unterklasse sind dies alle 17, im Code-Ziel 19 inkl. queuing
 > q1/q2.) Original-Tabelle bleibt unverändert.
 
 Jede Gattung verwendet eine **Teilmenge** der 17 Achsen:
@@ -1212,13 +1212,13 @@ Gattungen nutzen Teilmengen + ggf. eigene Achsen (NEU axis_inner/axis_growth/etc
 ## §29 PermutationEngine-Spezialisierung pro Gattung
 
 > **Schärfung 2026-06-03 (Doc 30 §8.0):** „pro Gattung" / „pro Anatomie-Gattung" =
-> **pro Tier-Unterklasse** (die feste Achsen-Konfiguration und damit der
-> spezialisierte Permutations-Raum hängen an der Tier-Unterklassen-Ebene). Die
+> **pro Lebewesen-Unterklasse** (die feste Achsen-Konfiguration und damit der
+> spezialisierte Permutations-Raum hängen an der Lebewesen-Unterklassen-Ebene). Die
 > verbatim-User-Direktive unten bleibt wörtlich; sie meint mit „Anatomie-Gattung"
-> die Tier-Unterklasse. Gattung im strengen Sinn = das Außen-Interface
+> die Lebewesen-Unterklasse. Gattung im strengen Sinn = das Außen-Interface
 > Search/Container/Graph (Prüf-Dock). Die Code-Marker `genus = AnatomyGenus::...`
 > in §29.1–§29.3 sind technische Bestands-Bezeichner und bezeichnen die
-> Tier-Unterklasse.
+> Lebewesen-Unterklasse.
 
 User-Direktive: "Die Permutation Engine muss fuer die anatomischen Moeglichkeiten
 jeder Anatomie-Gattungen durch Unterklassen spezifiziert werden, die von der
@@ -1297,7 +1297,7 @@ aehnlichen Anatomie Permutationen."
 
 | Sprint | Was | Status |
 |---|---|---|
-| **R5.C.0** | AnatomyBase + AnatomyConcept + AnatomyGenus enum + Tier-Metapher-Doku | Doku 14 §27-§29 done |
+| **R5.C.0** | AnatomyBase + AnatomyConcept + AnatomyGenus enum + Lebewesen-Metapher-Doku | Doku 14 §27-§29 done |
 | **R5.C.A** | SearchAlgorithmAnatomy explizit als Gattung markieren (genus() = SearchAlgorithm) | NEXT |
 | **R5.C.B** | SearchAlgorithmPermutationEngine als Spezialisierung anlegen | folgt |
 | **R5.C.C** | Pruefling-Merge Stufe 2 + 3 (war urspruenglich R5.C-Plan) | folgt |
@@ -1321,7 +1321,7 @@ Bestehendes muss um Gattungs-Marker ergaenzt werden:
 | `5 Builder-Commands` | unveraendert (Search-spezifisch ok fuer jetzt) |
 
 **Memory-Updates:**
-- NEU `[[anatomie-gattungen]]` — 5 Gattungen + Tier-Metapher + AnatomyBase
+- NEU `[[anatomie-gattungen]]` — 5 Gattungen + Lebewesen-Metapher + AnatomyBase
 
 ---
 
@@ -1335,10 +1335,10 @@ AnatomyBase + Gattungs-spezialisierte PermutationEngines).**
 > **Schärfung 2026-06-03 (Doc 30 §8.0):** Die Kern-Invariante dieses Abschnitts —
 > *nur Algorithmen mit dem EXAKT selben Achsen-Satz dürfen gekreuzt werden* — bleibt
 > uneingeschränkt gültig und richtig. Im 3-Ebenen-Modell ist das aber ein
-> **Tier-UNTERKLASSEN**-Constraint, nicht ein Gattungs-Constraint: gekreuzt werden darf
-> nur INNERHALB derselben Tier-Unterklasse (gleicher fester Achsen-Satz). Überall unten
-> ist „Gattung"/`AnatomyGenus`/„Cross-Genus" daher als **Tier-Unterklasse**/
-> „Cross-Tier-Unterklasse" zu lesen. Gattung im strengen Sinn = das Außen-Interface
+> **Lebewesen-UNTERKLASSEN**-Constraint, nicht ein Gattungs-Constraint: gekreuzt werden darf
+> nur INNERHALB derselben Lebewesen-Unterklasse (gleicher fester Achsen-Satz). Überall unten
+> ist „Gattung"/`AnatomyGenus`/„Cross-Genus" daher als **Lebewesen-Unterklasse**/
+> „Cross-Lebewesen-Unterklasse" zu lesen. Gattung im strengen Sinn = das Außen-Interface
 > Search/Container/Graph. — Zusätzlich (§32.2-Tabelle): die Spalte „Pflicht-Achsen-Set
 > (Teilmenge der 17)" und Formulierungen wie „kein search_algo/…" bedeuten NICHT „Achse
 > weggelassen"; jede definierte Achse wird getrieben, fehlende Funktion = konkreter
@@ -1402,7 +1402,7 @@ prt-art ist ein Adaptive-Radix-Tree Pruefling — passt zur **Mammal-Gattung** (
 
 ### §32.5 Cross-Genus-Vergleich: nur als Wissenschaftliche Mess-Ebene (NICHT als Permutation)
 
-Mess-Reihen koennen Mammal-Tier vs Reptile-Tier **vergleichen** (Performance-Studie
+Mess-Reihen koennen Mammal-Lebewesen vs Reptile-Lebewesen **vergleichen** (Performance-Studie
 "std::map vs std::vector"), aber NICHT als gemischte Permutationen kombinieren.
 Diese Cross-Genus-Mess-Reihen liegen in `CacheEngineBuilder` Ebene (R6/V42), NICHT
 in der PermutationEngine.
@@ -1470,14 +1470,14 @@ fuer Pruefling-Merge, R5.C.A-Sprint-Ende-Vertiefung).**
 ## §34 Biologische Klassifikation der Wurzel-Hierarchie
 
 > **Schärfung 2026-06-03 (Doc 30 §8.0):** In der Taxonomie §34.1 ist die Zeile
-> „5 Gattungen: SearchAlgorithm/Set/Sequence/Adapter/View" als **5 Tier-UNTERKLASSEN**
+> „5 Gattungen: SearchAlgorithm/Set/Sequence/Adapter/View" als **5 Lebewesen-UNTERKLASSEN**
 > zu lesen (Ebene mit dem festen Achsen-Satz). Im verbindlichen 3-Ebenen-Modell ist
 > **Gattung = das Außen-Interface (Prüf-Dock) Search/Container/Graph**; Set/Sequence/
-> Adapter/View liegen als Tier-Unterklassen unter dem **Container**-Interface,
-> SearchAlgorithm ist die Tier-Unterklasse unter dem **SearchAlgorithm**-Interface.
-> Die Wurzel-Hierarchie ExecutionEngine → AnatomyBase → {Tier-Unterklassen} und der
+> Adapter/View liegen als Lebewesen-Unterklassen unter dem **Container**-Interface,
+> SearchAlgorithm ist die Lebewesen-Unterklasse unter dem **SearchAlgorithm**-Interface.
+> Die Wurzel-Hierarchie ExecutionEngine → AnatomyBase → {Lebewesen-Unterklassen} und der
 > Lebewesen-vs-Viren-Schnitt bleiben unverändert korrekt — nur die Wortwahl
-> „Gattung" für die Tier-Unterklassen-Ebene wird geschärft. Original-Diagramm bleibt.
+> „Gattung" für die Lebewesen-Unterklassen-Ebene wird geschärft. Original-Diagramm bleibt.
 
 ### §34.1 Drei-Ebenen-Taxonomie (analog Biologie)
 
@@ -1693,7 +1693,7 @@ zukuenftigen Architektur-Iteration referenziert.
 | R5.D | CacheEngineBuilder CLI + extern "C" ABI (ExecutionEngine-Factory) | `apps/anatomy_binary/` |
 | R5.E | dlopen/LoadLibrary Module-Loader (IExecutionEngine Factory) | `builder/module_loader/` |
 | R6 (V42) | VirusExecutionEngine fuer Graphen-Algorithmen (erste Virus-Implementation) | `libs/cache_engine/virus/` |
-| R7 (V42) | F15-Auswertung schnellstes Tier + Virus-Vergleich | `Diplomarbeit/06_auswertung/` |
+| R7 (V42) | F15-Auswertung schnellstes Lebewesen + Virus-Vergleich | `Diplomarbeit/06_auswertung/` |
 
 ---
 
@@ -1736,12 +1736,12 @@ als Wurzel ueber AnatomyBase + Virus-Analogie fuer Nicht-Lebewesen).**
 | Schicht | Erlaubte Sprache | Beispiele |
 |---|---|---|
 | **Code-Identifier** (Klassen/Funktionen/Variablen) | NUR technisch | `SearchAlgorithmAbiAdapter`, `AnatomyGenus::SearchAlgorithm` |
-| **Doku-Kommentare im Code** | beides erlaubt (Doku-Text) | "Saeugetier-Anatomie-Metapher", "Mammal-Gattung in Tier-Metapher" |
+| **Doku-Kommentare im Code** | beides erlaubt (Doku-Text) | "Saeugetier-Anatomie-Metapher", "Mammal-Gattung in Lebewesen-Metapher" |
 | **Architektur-Doku (.md)** | beides erlaubt | siehe Teil 1-5 oben |
 
 **Begruendung:** Code-Identifier sind API-Vertrag → muessen aus dem Anwendungs-
 domain (Search-Algorithm) lesbar sein. Kommentare/Doku-Text erlauben die
-Tier-Metapher als didaktische Hilfe.
+Lebewesen-Metapher als didaktische Hilfe.
 
 ### §41.3 Pre-existing Befund: test_v41_anatomy_base.cpp war seit R5.C.A2 broken
 
@@ -2072,7 +2072,7 @@ Runtime-Polymorphie regelt Lifecycle-Hooks.
 
 ### §43.6 Cleanup-Sprint-Planung (User-Direktive R5.C.A4 + Task #704)
 
-User-Direktive: Metaphern (Tier/Saeugetier/Mammal/Bird/Reptile/Invertebrate/
+User-Direktive: Metaphern (Lebewesen/Saeugetier/Mammal/Bird/Reptile/Invertebrate/
 Plant/Frankenstein) **bleiben waehrend der Entwicklung erhalten** weil sie die
 Abstraktion-Hierarchien klarer hervorheben. **Cleanup-Sprint am Ende aller
 Implementierungs-Aufgaben** (Task #704 V41.Z.1, vor finaler Release):
@@ -3394,7 +3394,7 @@ Marker-Klassen.
 - §0.4 V32-Implementierungs-Konsequenzen (CEB ICommand-Hierarchie + CacheEngine selbst als ExecutionEngine + drawio Tab CC.1)
 
 **Bausteine-Matrix Konsolidierung:**
-- `docs/bausteine/` Komplette Doku erneuern (Organ-Taxonomie statt alte Tier-Matrix)
+- `docs/bausteine/` Komplette Doku erneuern (Organ-Taxonomie statt alte Lebewesen-Matrix)
 
 ### §54.4 Audit-Resultat #3: prt-art-Einbindung-Plan
 
