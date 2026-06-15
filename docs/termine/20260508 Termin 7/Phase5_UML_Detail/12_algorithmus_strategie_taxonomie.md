@@ -55,11 +55,11 @@ ISearchPagesStrategyPattern entscheidet, WIE eine `IFanout` ihre `ISearchPagesSt
 | Pattern-Name | Paper-Quelle | Kategorie | Beschreibung |
 |--------------|--------------|-----------|--------------|
 | `AllPagesUniformPattern` | P11 CSS, P12 CSB+, P14 (CSB+/Itanium2), P21 pB+-Tree | homogen | Alle ISearchPages haben dieselbe ISearchPageStrategy (klassische B+/CSS); Branching-Faktor und Knotenlayout sind global identisch |
-| `LayerMixPattern` (Slice-Layered Trie of B+) | P03 Masstree, P10 SuRF (LOUDS-DS Hybrid), P04 CoCo (Macro-Levels), P22 fpB+ (Disk-Layer + In-Page-Layer) | heterogen pro Layer | Pro Layer/Tier eine andere Pluralstrategie (z.B. Trie-Layer + B+-Pro-Layer; LOUDS-Dense oben + LOUDS-Sparse unten); rekursive oder Layer-weise Komposition |
+| `LayerMixPattern` (Slice-Layered Trie of B+) | P03 Masstree, P10 SuRF (LOUDS-DS Hybrid), P04 CoCo (Macro-Levels), P22 fpB+ (Disk-Layer + In-Page-Layer) | heterogen pro Layer | Pro Layer/Ebene eine andere Pluralstrategie (z.B. Trie-Layer + B+-Pro-Layer; LOUDS-Dense oben + LOUDS-Sparse unten); rekursive oder Layer-weise Komposition |
 | `InnerVsLeafPattern` | P02 HOT (Compound Inner/Leaf), P10 SuRF (Dense vs. Sparse Cutoff), P04 CoCo (Macro-Levels nahe Leaf), P19 Saikkonen (α-Connected-Subgraph), P22 (Inner vs Leaf Knotengroessen) | heterogen pro Rolle | Strikt unterschiedliche Strategien fuer Innere und Leaf-Pages; Rolle bestimmt Layout |
 | `HotVsColdPattern` | P26 Zhang FGCS (Path Prefetcher Table), P28 Kuehn DaMoN (Hot-Path-Layout), P10 SuRF (Hot Upper Levels) | dynamisch heterogen | Telemetry-getriggert: hot Pages werden anders enkodiert/angeordnet als cold; Greedy-Highest-Probability-Auswahl |
 | `DynamicRebalancePattern` | P05 START (Self-Tuning Multilevel), P18 Saikkonen (Global Relocation), P19 Saikkonen (Local Relocation), P20 Mueller-Benson-Leis (Adaptive Layout-Selector) | dynamisch | Periodische oder einlauf-getriggerte Reorganisation der Layout-Strategien |
-| `HierarchicalFractalPattern` | P22 fpB+-Tree, P15 (B-Trees of Cache-Lines), P06 B^2-Tree | rekursiv | Selbst-aehnliche Struktur: Outer-Tier-Pattern enthaelt vollstaendiges Inner-Tier-Pattern (z.B. Disk-Page-Tree → In-Page-Tree) |
+| `HierarchicalFractalPattern` | P22 fpB+-Tree, P15 (B-Trees of Cache-Lines), P06 B^2-Tree | rekursiv | Selbst-aehnliche Struktur: Outer-Ebenen-Pattern enthaelt vollstaendiges Inner-Ebenen-Pattern (z.B. Disk-Page-Tree → In-Page-Tree) |
 | `OrthogonalRuntimeParametrizedPattern` | P23 Khan (Runtime-Adaptive Prefetch), P26 (Cache/Path/Monitor-Prefetcher Mix), P14 (ConfigurationTable) | parametriert | Gleiche Algorithmik, aber Parameter (Distance, Stride, Layout-Variante) zur Laufzeit pro Knoten anders |
 | `MultiStrategyOrchestrationPattern` | P07 Wormhole (Hash + Trie + LinkedList), P26 (3 Prefetcher-Komponenten), P15 (Strategy-Compatibility-Matrix) | orchestrierend heterogen | Pattern komponiert verschiedene Tree-Familien (nicht nur Layouts) — Lookup orchestriert mehrere Sub-Strategien sequenziell |
 | `HeterogeneousAdaptivePattern` | P20 Mueller-Benson-Leis (KeyAdaption + OperationAdaption Selector) | dynamisch heterogen | Layout-Wahl pro Knoten via Heuristic-Counter (Comparison/Fingerprint/SDL/FDL) |
@@ -131,7 +131,7 @@ ISearchPagesStrategy steuert die `ISearchPageStructure` (also wie Pages zueinand
 | `EmbeddedDecisionSpanTreeStrategy (B^2)` | P06 | Decision-Nodes (1 Byte Range) + Span-Nodes (longest common prefix) gemischt |
 | `JumpPointerArrayStrategy (External chunked)` | P21 | External Array von Leaf-Adressen; Hint-Pointer in Leaf zeigt ungefaehr auf Chunk |
 | `JumpPointerArrayStrategy (Internal)` | P21 | Bottom-Non-Leaves als Jump-Pointer-Array |
-| `DualJumpPointerArrayStrategy` | P22 | Internal Array (Cache-Tier) + External Array (Disk-Tier) |
+| `DualJumpPointerArrayStrategy` | P22 | Internal Array (Cache-Ebene) + External Array (Disk-Ebene) |
 | `JumpPointerVersionChainStrategy` | P26 | 2-ahead Jump Pointers fuer MVCC Version-Chains; chunked linked list (chunk size 8 = 1 cache line) |
 | `MicroIndexingStrategy (Lomet)` | P22 (referenziert) | Erstes Key jeder Cache-Line in kleinem Sub-Array; gefolgt von Standard-Binary-Search |
 
@@ -277,7 +277,7 @@ IHeuristics sind Funktionen `(Inputs) → Werte`, die Strategien parametrieren. 
 | `OptimalPrefetchDistanceHeuristic` | P21 Chen-Gibbons-Mowry | (B = T1/T_next, w) → k_optimal = ceil(B/w) |
 | `OptimalChunkSizeHeuristic` | P21 | (B, m children-per-cacheline) → c_optimal = ceil(B/(2m)) |
 | `OptimalNodeWidthHeuristic (pB+)` | P21 (Equation 1) | (B, m, N) → w_optimal = 8 (typisch) |
-| `OptimalWidthMultiTierHeuristic` | P22 fpB+ | (TierLatencies[], FanOutGoal) → pro Tier optimale Knotengroesse |
+| `OptimalWidthMultiTierHeuristic` | P22 fpB+ | (TierLatencies[], FanOutGoal) → pro Ebene optimale Knotengroesse |
 | `CardenasFormulaCacheHitRateHeuristic` | P13 (Eq. 9) | (lambda, q) → X_D Steady-State Cache Occupancy |
 | `BranchMispredictionCountingHeuristic` | P13 (Eq. 16) | (h, sigma) → B = h + log_2(sigma)/2 |
 | `TLBMissCountingHeuristic` | P13 (Eq. 18) | (tlb_cap, page_sz, levels) → erwartete TLB-Misses |
@@ -296,7 +296,7 @@ IHeuristics sind Funktionen `(Inputs) → Werte`, die Strategien parametrieren. 
 | `SegmentationPolicyHeuristic (CSB+)` | P12 | (Workload, Space-Budget) → Anzahl Segmente |
 | `HardcodedSearchVariantHeuristic (CSB+)` | P12 | (Compiler-Capability, Workload) → basic / uniform / variable |
 | `OptimalPartitionCountHeuristic (P32)` | P32 Schmidt (TUD) | (DTLB-Cap, STLB-Cap, Prefetcher-Streams, Cache-Associativity) → optimal Partition-Count |
-| `OptimalStrideSizeHeuristic (P32)` | P32 | (Memory-Tier, Padding) → optimal Stride (z.B. 127.32 MiB bei Sapphire Rapids) |
+| `OptimalStrideSizeHeuristic (P32)` | P32 | (Memory-Ebene, Padding) → optimal Stride (z.B. 127.32 MiB bei Sapphire Rapids) |
 | `BurstLengthHeuristic (P31)` | P31 Ungethuem | (cache_line, bus_width) → Burst Length 4 oder 8 |
 
 ### 4.2 Adaptive/Runtime-Heuristiken
@@ -367,7 +367,7 @@ IHeuristics sind Funktionen `(Inputs) → Werte`, die Strategien parametrieren. 
 | Heuristic-Name | Paper | Eingang → Ausgang |
 |----------------|-------|--------------------|
 | `ClflushNodeProbeHeuristic` | P05 START (IV.A) | CLFLUSH + LFENCE-basiert → live Cache-Cost-Messung |
-| `LatencyProbeHeuristic` | P05, P25 | live → memory-latency je Tier |
+| `LatencyProbeHeuristic` | P05, P25 | live → memory-latency je Ebene |
 | `BranchPredictorProbeHeuristic` | (Empfehlung) | live mispredict-rate |
 | `SimdThroughputProbeHeuristic` | (Empfehlung) | live SIMD throughput |
 | `DTLBSTLBCapacityProbeHeuristic (P32)` | P32 | live DTLB/STLB-Capacity → Partition-Count |
@@ -407,7 +407,7 @@ Iteratoren sind die Querschnitts-Schicht zwischen Nodes/Pages/Strategien und Kon
 | `PerLevelCursorRangeIterator (SuRF)` | P10 (Sec. 2.4) | Cursor pro Level vermeidet teure rank/select-Calls fuer move-to-parent/move-to-child |
 | `JumpPointerRangeIterator (External chunked)` | P21, P22 | Externes Array von Leaf-Adressen; k Leaves voraus prefetched; chunked-list mit Hint-Pointer |
 | `JumpPointerRangeIterator (Internal)` | P21 | Bottom-Non-Leaves dienen als Jump-Pointer-Array |
-| `DualJumpPointerRangeIterator` | P22 | Internal Array (Cache-Tier) + External Array (Disk-Tier) |
+| `DualJumpPointerRangeIterator` | P22 | Internal Array (Cache-Ebene) + External Array (Disk-Ebene) |
 | `JumpPointerVersionChainIterator (P26)` | P26 | 2-ahead Jump Pointers fuer MVCC Version-Chains |
 | `WormholeLinkedLeafIterator` | P07 | Doppelt verkettete Leaves mit Anchor-Boundaries |
 | `LazySortRangeIterator (Fingerprinting)` | P20 | Sort vor Scan triggert (downside fuer Concurrent-Scan) |
@@ -499,7 +499,7 @@ Die Paper-Lektuere enthuellt zahlreiche Konzepte, die in REV 2 entweder fehlen o
 | `IJumpPointerStorage` | D (P21 internal vs external) | Architektur-Entscheidung Jump-Pointer im Tree oder extern |
 | `IGranularityMismatchResolver` | D (P22 fpB+) | OverflowResolverStrategy / OffsetCompressionResolverStrategy / AdaptiveNodeSizeResolverStrategy |
 | `IFractalLayoutStrategy<OuterTier, InnerTier>` | D (P22 fpB+) | Auessere Granularitaet enthaelt vollstaendiges inneres Layout (rekursiv anwendbar) |
-| `IMultiTierCacheStrategy<Tier[]>` | D (P22, partiell P20) | Getrennte Strategien pro Tier (z.B. [CacheLine, Page, Disk]) |
+| `IMultiTierCacheStrategy<Tier[]>` | D (P22, partiell P20) | Getrennte Strategien pro Ebene (z.B. [CacheLine, Page, Disk]) |
 | `IRuntimeAdaptiveHeuristic` | D (P23) | getCurrentLatency / computeOptimalDistance / shouldPrefetch |
 | `IDistanceComputationHeuristic` | D (P23) | Affine I = O*A + B als generisches Pattern |
 | `ITemplateSpecializerStrategy` | D (P23) | Template-Code-Pattern fuer JIT-aehnliche Anpassung ohne Code-Generation |
@@ -542,7 +542,7 @@ Die Paper-Lektuere enthuellt zahlreiche Konzepte, die in REV 2 entweder fehlen o
 | `IHardwareExtension` (umfangreiche Sub-Hierarchie) | F (P31 TUD) | WAH/PLWAH/COMPAX (Bitmap), Hash+Lookup/Insert, CityHash32, Hash Sampling, MergeSort, Intersection/Union/Difference, SortMergeJoin, SortMergeAggregation |
 | `IMemoryDecorator` (NFP-Kontext) | F (P33 VAMPIR) | Allokationen tragen NFP-Kontext (latency, throughput, transience, reliability, wearout, random accessibility, cache coherence) |
 | `IHeterogeneousAllocator` (V-malloc) | F (P33 VAMPIR) | Heterogene Memory-Auswahl pro Allokation |
-| `IMigrationPolicy` | F (P33 VAMPIR Compensation) | Transparente Daten-Migration zwischen Memory-Tiers |
+| `IMigrationPolicy` | F (P33 VAMPIR Compensation) | Transparente Daten-Migration zwischen Memory-Ebenen |
 | `ICompileTimeNegotiator` | F (P33 VAMPIR Multi-Query Negotiation) | Compile-Time-Negotiation fuer Multi-Query-Optimierung |
 | `IPipelineScheduler` | F (P33 VAMPIR) | Operation-Pipelines mit Memory-Awareness |
 | `IAccessPatternStrategy` (sequential vs strided vs simd) | F (P32 To-Stride) | Wahl Access-Pattern; "Strided > SIMD" als Re-Denken |
@@ -708,7 +708,7 @@ Konkrete Aenderungen, die in der Hauptskizze gemacht werden sollten:
 - **Section 3.X: IMemoryDecorator + IHeterogeneousAllocator + IMigrationPolicy** (VAMPIR-Pattern)
   - NFP-Kontext pro Allokation
   - V-malloc Strategie
-  - Compensation/Migration zwischen Tiers
+  - Compensation/Migration zwischen Ebenen
 
 - **Section 3.X: IAccessPatternStrategy + IPaddingStrategy** (P32)
   - Sequential vs Strided vs SIMD
@@ -813,7 +813,7 @@ Workload-Modellierung als Strategy-Input (P16, P28):
 | A (Trie) | P01 ART, P02 HOT, P04 CoCo, P05 START, P09 Jacobson LOUDS, P10 SuRF | Trie-Familie, Adaptive Layouts, Succinct Encoding, Cache-Cost-Models, Filter |
 | B (Hybrid + B+) | P03 Masstree, P06 B^2-Tree, P07 Wormhole, P11 CSS, P12 CSB+, P13 Hankins/Patel | Hybrid-Strukturen, B+-Familie, Cost-Model fuer Knotengroesse |
 | C (Layout-Theorie) | P14 Samuel/Pedersen/Bonnet, P15 Graefe/Larson Survey, P16 Bender ESA, P17 Bender vEB B-Trees, P18 Saikkonen Static, P19 Saikkonen Dynamic | Cache-Awareness vs Cache-Obliviousness, Probability-Weighted Layout, Layout-Invarianten |
-| D (Prefetching 1) | P20 Mueller/Benson/Leis Adaptive B-Tree, P21 Chen/Gibbons/Mowry pB+, P22 Chen et al fpB+, P23 Khan Runtime-Adaptive | Prefetching fuer B+-Tree, Multi-Tier Fractal, Runtime-Adaptation |
+| D (Prefetching 1) | P20 Mueller/Benson/Leis Adaptive B-Tree, P21 Chen/Gibbons/Mowry pB+, P22 Chen et al fpB+, P23 Khan Runtime-Adaptive | Prefetching fuer B+-Tree, Multi-Ebenen Fractal, Runtime-Adaptation |
 | E (Prefetching 2 + Telemetry) | P24 Naderan-Tahan Negativ, P25 Mahling Reliability, P26 Zhang FGCS, P27 Zhang ASPLOS, P28 Kuehn DaMoN | Prefetching-Negativ-Befunde, Reliability, Path-Prefetcher, Bundle-Identifikation, Hot-Path-Layout |
 | F (Sync + TUD-Habich) | P08 ART OLC/ROWEX, P29 RCU, P30 Hazard Pointers, P31 Ungethuem TUD, P32 Schmidt To-Stride, P33 VAMPIR Poster | Synchronisations-Mechaniken, Hardware-Optimization-Survey, Live-Plattform-Modell, NFP-Framework |
 
@@ -836,7 +836,7 @@ Workload-Modellierung als Strategy-Input (P16, P28):
    - composition_rule : ICompositionRule           (sequenziell, parallel, conditional, recursive)
 ```
 
-**Pruefungs-Regel:** WO IMMER in dieser Datei eine Strategy oder ein Pattern als „hybrid" / „composite" / „mixed" / „dual-tier" / „dual-layer" / „triple-layer" / „N-prefetcher" / „hierarchical" / „heterogen" beschrieben ist, ist eine Command-Pattern-Aufloesung Pflicht.
+**Pruefungs-Regel:** WO IMMER in dieser Datei eine Strategy oder ein Pattern als „hybrid" / „composite" / „mixed" / „dual-ebene" / „dual-layer" / „triple-layer" / „N-prefetcher" / „hierarchical" / „heterogen" beschrieben ist, ist eine Command-Pattern-Aufloesung Pflicht.
 
 **Aufloesungs-Tabelle (vollstaendig fuer hier dokumentierte Hybride):**
 
@@ -845,13 +845,13 @@ Workload-Modellierung als Strategy-Input (P16, P28):
 | §1.1 `LayerMixPattern` (P03 Masstree) | Trie-Layer + B+-pro-Layer | `SliceLayerJumpCommand` + `BPlusPerLayerCommand` + `PermutationFieldInsertCommand` | `MasstreeSliceLayeredCompositionCommand` |
 | §1.1 `LayerMixPattern` (P10 SuRF) | LOUDS-Dense + LOUDS-Sparse | `LoudsDenseEncodingCommand` + `LoudsSparseEncodingCommand` | `CutoffLevelLoudsCompositionCommand` |
 | §1.1 `LayerMixPattern` (P04 CoCo) | Macro-Levels + Patricia-Inner | `MacroNodeCollapseCommand` + `PatriciaInnerExpandCommand` + `SuccinctEncodingPoolCommand` | `CoCoLevelLDecisionCompositionCommand` |
-| §1.1 `LayerMixPattern` (P22 fpB+) | Disk-Tier + In-Page-Tier | `DiskTierTraversalCommand` + `CacheTierTraversalCommand` | `FractalHierarchicalCompositionCommand` |
+| §1.1 `LayerMixPattern` (P22 fpB+) | Disk-Ebene + In-Page-Ebene | `DiskTierTraversalCommand` + `CacheTierTraversalCommand` | `FractalHierarchicalCompositionCommand` |
 | §1.1 `InnerVsLeafPattern` (P02 HOT) | Compound-Inner + BiNode-Subtree | `CompoundContainerCommand` + `BiNodeSubtreeCommand` + `SingleMaskPartialKeyCommand` + `MultiMaskPartialKeyCommand` | `HOTCompoundCompositionCommand` |
 | §1.1 `InnerVsLeafPattern` (P19 Saikkonen α-Connected-Subgraph) | Inner-Layout + Leaf-Layout-Switch | `InnerSubgraphLayoutCommand` + `LeafSubgraphLayoutCommand` | `AlphaConnectedSubgraphCompositionCommand` |
 | §1.1 `HotVsColdPattern` (P28 Kuehn) | Hot-Path-Layout monolithisch | `LeafOnlyCounterCommand` + `RetroactiveAggregationCommand` + `GreedyHotPathLayoutCommand` | `KuehnHotPathOptimizationCompositionCommand` |
 | §1.1 `HotVsColdPattern` (P26 Zhang FGCS) | Path-Prefetcher-Table monolithisch | `CachePrefetcherCommand (CP)` + `PathPrefetcherCommand (PP)` + `MonitorPrefetcherCommand (MP)` | `ThreePrefetcherOrchestrationCompositionCommand` |
 | §1.1 `DynamicRebalancePattern` (P05 START) | Self-Tuning Multilevel monolithisch | `OfflineCostMeasureCommand` + `BellmanDPLayoutCommand` + `LkmRewireCommand` + `MultilevelRebuildCommand` | `STARTSelfTuningCompositionCommand` |
-| §1.1 `HierarchicalFractalPattern` (P22 fpB+) | Outer-Tier + Inner-Tier | (siehe oben) | (siehe oben) |
+| §1.1 `HierarchicalFractalPattern` (P22 fpB+) | Outer-Ebene + Inner-Ebene | (siehe oben) | (siehe oben) |
 | §1.1 `HierarchicalFractalPattern` (P15 B-Trees of Cache-Lines) | Cache-Line-Sub-Tree + Inter-Line-Tree | `IntraCachelineSubtreeCommand` + `InterCachelineTreeCommand` | `BTreesOfCachelinesCompositionCommand` |
 | §1.1 `HierarchicalFractalPattern` (P06 B²-Tree) | Outer-B+ + Inner-Decision/Span | `OuterBPlusPageCommand` + `DecisionPageStrategyCommand` + `SpanPageStrategyCommand` | `B2TreeRecursiveCommonPrefixCompositionCommand` |
 | §1.1 `MultiStrategyOrchestrationPattern` (P07 Wormhole) | Hash + B+ + LinkedList | `HashAnchorLookupCommand` + `BPlusHopLookupCommand` + `LeafLinkedListScanCommand` | `TripleLayerLookupCompositionCommand` |
