@@ -1,7 +1,7 @@
 \chapter{Messverfahren}\label{ch:messverfahren}
 
 % [Cross-Ref Konsolidierte Doku, K-I.2 2026-05-15]
-% Plattform-Modell + Hardware-Klassen (Termin 6 + Tier-3 P31-P33): docs/architektur/04_konzepte_saeule_b.md
+% Plattform-Modell + Hardware-Klassen (Termin 6 + Rang-3 P31-P33): docs/architektur/04_konzepte_saeule_b.md
 % Cache-Strategy 29 Familien: docs/architektur/09_taxonomien.md
 % Mess-Pipeline Sessions V19-V22: docs/sessions/20260514-4500-habich-termin-8-briefing-refresh-v19-v31.md
 % Termin 3 (Benchmark + Datensatzplan, YCSB): docs/termine_konsolidiert/03_termin_3.md
@@ -22,13 +22,13 @@ Messreihe~A vergleicht PRT-ART als Pruefling gegen alle in der
 Algorithmen. Zwei Modi sind verfuegbar:
 
 \begin{description}
-    \item[A\_defined] Schnelle Vorab-Verifikation gegen die 8~Tier-1-
+    \item[A\_defined] Schnelle Vorab-Verifikation gegen die 8~Rang-1-
           Profile (art, hot, masstree, coco\_trie, start, b2tree,
           wormhole, surf). Mode \texttt{defined} mit
           \texttt{sota\_profile\_filter} in
           \texttt{ExperimentDriverOptions}.
     \item[A\_full] Vollstaendige Messung gegen alle 30~SOTA-Profile
-          (Tier-1 + Tier-2/3 fuer P11--P32). Mode \texttt{full} ist
+          (Rang-1 + Rang-2/3 fuer P11--P32). Mode \texttt{full} ist
           Default gemaess Habich-Direktive 2026-05-14
           (``Messung immer so vollstaendig wie moeglich'').
 \end{description}
@@ -184,7 +184,7 @@ Nicht alle 14~Achsen sind auf allen Plattformen variierbar. Beispielsweise:
     Server-Plattformen verfuegbar (i9 14900KS hat keine
     AVX-512-Encoding-Unit).
     \item Achse~12.2 Cache-Level-Targeting: HBM-aware ist nur auf
-    HBM-Hardware sinnvoll (P31-Tier-3).
+    HBM-Hardware sinnvoll (P31-Rang-3).
     \item Achse~13.2 SIMD-Worker-Count-Limit: hardware-limitiert
     durch die Anzahl physischer SIMD-Einheiten (typisch~2 von $N$
     Cores), nicht durch Software.
