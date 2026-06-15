@@ -304,7 +304,13 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 **A3 Sessions KOMPLETT** (alle ~22 Session-Dateien: 12 ④Rang + anatomie-① + ③/④-Reste + Glob-Pattern + .txt).
 **A4 teilweise** (Commits `ddb1ccd`→`00bdca0`): `Phase5_UML_Detail/11`+`12_*taxonomie` (③ Ebene; CamelCase-Code-Identifier
 `MultiTierCacheStrategy`/`IMultiTierHeuristic`/`TierLatencies[]`/`DiskTierTraversalCommand`/… belassen) + HABICH-T7/T8
-+ Termin-8-Trio (Arbeitsplan/-ergebnis/Praesentation; SOTA ④ Rang).
++ Termin-8-Trio (Arbeitsplan/-ergebnis/Praesentation; SOTA ④ Rang) + Allokator-Extraktionen A05/A14/A19/extract_termin5_6/Allokator_Matrix.txt
+(Size-Class-Tiers→**Stufen**, Cache-Latenz-Tiers→**Ebene**, SOTA-Tier-1/3→**Rang**) — Commits bis `f0537fe`.
+
+> ⚠️ **FALSE-POSITIVE-WARNUNG (Grep):** lowercase `tier` matcht als Teilstring in deutschen Wörtern — `Implemen`**`tier`**`ungs`,
+> `sor`**`tier`**`t`, `garan`**`tier`**`t`, `Hierarchie`, `Kalibrierung`, `Kategorie`… — das ist **NIE** das gemeinte Wort! Echt sind NUR:
+> **Groß-`Tier`** (dt. Substantiv ① / SOTA `Tier-N` ④ / Komposita `Cache-Tier` ③) + engl. kleingeschriebenes `cache tiers`/`multi-tier`.
+> Grep-Pattern: `\bTier` für Treffer, NICHT `tier`. Belassen: all-caps Code-IDs (`ALLOC_SIZECLASS_TIERED`), CamelCase (`MultiTier…`), snake `tier_*`.
 **Bewusst belassen** (überall gleich): Tierwelt-Zitate (verbatim), Audit-Regexe, Code-Identifier
 (`TierBasedMigration`, `tier_observe_trace_abi`, `EachPermutationIsDistinctTier`, `AllSixTiere…`,
 `tier_fill_level`), Code-Pfade (`thesis_tiere/`), Metapher-Code-Listen. Commits bis `8c4d2bf` + finale.
@@ -344,7 +350,8 @@ cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 
 - [x] `termine/20260515 Termin 8/` (Arbeitsplan · Praesentation · Arbeitsergebnis) ✅ ④ Rang (`00bdca0`)
 - [x] `termine/20260508 Termin 7/` (HABICH_TERMIN8_VORB · TERMIN7_ZUS) ✅ ④ Rang (`00bdca0`)
 - [~] `termine/20260508 Termin 7/Phase5_UML_Detail/`: [x] 11_cache_strategy + [x] 12_algorithmus (③ Ebene; `ddb1ccd`/`1d611d8`) — OFFEN: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 · 24_REV7 8 + **`.drawio` REV3/REV3_NACHARB/REV4/REV5/REV6/REV7 (6/4/4/25/25/25)**
-- [ ] `…/Phase5_UML_Detail/_paper_extractions/` (cluster_D 19 · cluster_F 2) · `_rev5_extractions/` (cache_engine_families 19 · rev4_delta 6 · termin5_6 2 · taxonomien 7 · state_visitor 15) · `_paper_extractions_allocators/` (A05 2 · A19 1 · A14 3)
+- [x] `Allokator_Matrix.txt` (③ Stufe) · `_paper_extractions_allocators/` A05 + A14 + A19 (③ Stufe/Ebene + ④ Rang) · `_rev5_extractions/extract_termin5_6` (④ Rang) — `f0537fe`
+- [ ] **OFFEN** `_paper_extractions/` cluster_D 19 · cluster_F 2 (③ Memory-Ebene + Cluster F = Sync/RCU, viele lowercase-FALSE-POSITIVES — sorgfältig!) · `_rev5_extractions/` cache_engine_families 19 · state_visitor 15 · taxonomien 7 · rev4_delta 6
 
 ### B. cache-engine `docs/` (Submodul `comdare-cache-engine` — noch per Grep zu erfassen; eigener Commit, Koordination Implementierungsagent)
 ### C. prt-art `docs/` + READMEs (Submodul `comdare-prt-art` — noch zu erfassen)
