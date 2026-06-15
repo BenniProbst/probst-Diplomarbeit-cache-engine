@@ -288,3 +288,45 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
    persistiert (Teilaufgabe 5).
 6. Gemessenes ganzes Lebewesen = **„Permutations-Lebewesen/Rekombination"** (nie „Probe"); Prüfling =
    abstraktes Lebewesen (einige eigene Organe + Rest aus cache-engine-Katalog je Achse).
+
+---
+
+## 9. Arbeits-Checkliste: betroffene Dateien (MANUELLE Umstellung, Dokument für Dokument)
+
+> **Vorgehen (User-Direktive 2026-06-15):** JEDE Datei wird **manuell im Gesamtkontext gelesen** und
+> präzise umformuliert — **kein Wort-Ersetzen** (Code-Spans, Satzbau, Bedeutung je Stelle prüfen;
+> ein Agent-Versuch wurde verworfen). Pro Datei ALLE Cluster (①Lebewesen / ④Rang / ②Subject /
+> ③Band) zusammen abarbeiten. Status: `[ ]` offen · `[x]` erledigt. **Diese Datei selbst bleibt
+> unangetastet** (sie *beschreibt* die Umstellung). `TIER3` (ZIH-HPC, Großschreibung) nie ändern;
+> Bio-Beinamen (Säugetier/Vogel/…) bleiben.
+
+### A. Haupt-Repo `docs/` (356 Vorkommen / 60 Dateien; Stand-Grep 2026-06-15)
+
+**A1 — Konzeptionell (Priorität; ① Metapher / gemischt):**
+- [ ] `architektur/14_achsen_komposition_organ_metapher.md` (72) — ① Metapher-Hauptquelle
+- [ ] `anleitung_messwerte_erzeugen.md` (10) — ① Metapher
+- [ ] `architektur/12_queuing_topic_achsen_eigenschaften.md` (6)
+- [ ] `architektur/09_taxonomien.md` (1) · `11_konzept_achsen_extension_visitor_pattern.md` (1) · `04_konzepte_saeule_b.md` (1)
+- [ ] `glossar/01_begriffsglossar_v7_master.md` (1) · `INDEX.md` (1)
+
+**A2 — ④ Rang (SOTA-/Allokator-Reifegrad):**
+- [ ] `EMAIL_KONTAKTE.md` (3) · `architektur/01_REV_Historie.md` (2)
+- [ ] `forschungslandkarte/00_INDEX.md` (1) · `01_quellen_gesamtkatalog.md` (3) · `05_cluster_D_prefetching_1.md` (3) · `07_cluster_F_sync_tud_habich.md` (2) · `08_allokator_cluster_AC1_AC5.md` (1)
+- [ ] `bausteine/03_cross_paper_konzeptmatrix.md` (6) · `02_allokator_matrix.md` (1)
+- [ ] `termine_konsolidiert/06_termin_6.md` (1)
+
+**A3 — Sessions (historisch, gemischt ④/①):**
+- [ ] `sessions/20260514-*` (v8 1100=4, v9 1130=3, v9 1230=3, v13 1830=1, v14 2000=1, v15 2100=1, v16 2130=1, v16 2200=3, v17 2230=2, v17 2300=3, V19-V22 2900=1)
+- [ ] `sessions/20260515-4700-…bilanz.md` (1) · `sessions/20260524-V41-open-todos.md` (1) · `sessions/20260525-…prt-art-header-audit.md` (1)
+- [ ] `sessions/20260526-…` (① anatomie: P2-D-q=5, R3-skelett=7, R3-R5CA=11, R5A=3) · `sessions/CROSS_REFS_KONSOLIDIERT.md`
+
+**A4 — Termine (historisch, gemischt):**
+- [ ] `termine/20260515 Termin 8/` (Arbeitsplan 1 · Praesentation 1 · Arbeitsergebnis 1)
+- [ ] `termine/20260508 Termin 7/` (HABICH_TERMIN8_VORB 4 · TERMIN7_ZUS 2)
+- [ ] `termine/20260508 Termin 7/Phase5_UML_Detail/` (02_uml 2 · 10_korrektur 5 · 11_cache_strategy 17 · 12_algorithmus 17 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 · 24_REV7 8)
+- [ ] `…/Phase5_UML_Detail/_paper_extractions/` (cluster_D 19 · cluster_F 2) · `_rev5_extractions/` (cache_engine_families 19 · rev4_delta 6 · termin5_6 2 · taxonomien 7 · state_visitor 15) · `_paper_extractions_allocators/` (A05 2 · A19 1 · A14 3)
+
+### B. cache-engine `docs/` (Submodul `comdare-cache-engine` — noch per Grep zu erfassen; eigener Commit, Koordination Implementierungsagent)
+### C. prt-art `docs/` + READMEs (Submodul `comdare-prt-art` — noch zu erfassen)
+### D. Manuskript `thesis/diplomarbeit/` (① Metapher noch offen; ④ Rang bereits erledigt) — eigenes LaTeX-Repo, bilingual DE+EN, danach `build.ps1` grün halten
+### E. Konz. Doku + Übergaben selbst nachziehen: `sessions/2026-06-15-konzeptionelle-…`, `2026-06-15-tier-…-uebergabe.md` (nutzen „Tier-Unterklasse" → „Lebewesen-Unterklasse")
