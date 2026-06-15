@@ -25,7 +25,7 @@ Etliche Familien unten enthalten **Hybrid-Konkretisierungen**: monolithisch besc
 - F2 `ISuccinctEncodingStrategy`: P10 SuRF (LOUDS-Dense + LOUDS-Sparse Hybrid)
 - F2: P04 CoCo (Pool aus EF+PA+BV+DE-Encodings)
 - F1 `IAdaptiveFootprintStrategy`: P02 HOT (Single-Mask + Multi-Mask-Hybrid mit 9 Layout-Varianten)
-- F4 `IMultiCacheLineNodeStrategy`: P22 Fractal (in-page Tree mit adaptive Width pro Tier — Disk-Tier + Cache-Tier)
+- F4 `IMultiCacheLineNodeStrategy`: P22 Fractal (in-page Tree mit adaptive Width pro Ebene — Disk-Ebene + Cache-Ebene)
 - F5 `ISoftwarePrefetchStrategy`: P26 Zhang Index (3 Prefetcher-Komponenten CP+PP+MP)
 - ... (weitere Hybrid-Eintraege siehe systematische Pruefung in §10 unten)
 
@@ -86,7 +86,7 @@ Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **
   * P03 Masstree (Cluster B): 256 B = 4 Cache-Lines, alle vor Verwendung parallel geprefetched
   * P13 Hankins/Patel (Cluster B): 256-512 B Knoten, 8-16x Cache-Line; analytisches Cost-Modell mit (I, M, B, T)
   * P21 Chen pB+-Tree (Cluster D): WideNodePrefetchStrategy mit w = 8 Cache-Lines, w_optimal aus B = T1/T_next
-  * P22 Chen Fractal (Cluster D): in-page Tree mit adaptive Width pro Tier
+  * P22 Chen Fractal (Cluster D): in-page Tree mit adaptive Width pro Ebene
 - **Visitor-Variante:** `CacheEngineStrategy` (Software-Prefetch-ISA-Feature noetig)
 - **Verbindung zu Saeule B:** Verbraucht `IMemoryBandwidthModel` (B = T1/T_next) und `IIsaFeatureSet` (Prefetch-Instruktion).
 
@@ -100,7 +100,7 @@ Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **
   * P14 CSB+ Itanium (Cluster C): ItaniumExplicitPrefetchStrategy (lfetch) + TwoNodesAheadRangeScanPrefetch
   * P15 Graefe/Larson Survey (Cluster C): Multi-Cache-Line, Indirection-Vector, 2-candidate, Post-Location, Multi-Record
   * P21 Chen pB+-Tree (Cluster D): WideNodePrefetch + JumpPointerArrayPrefetch (k voraus)
-  * P22 Chen Fractal (Cluster D): DualJumpPointerArrayStrategy fuer Cache-Tier + Disk-Tier
+  * P22 Chen Fractal (Cluster D): DualJumpPointerArrayStrategy fuer Cache-Ebene + Disk-Ebene
   * P25 Mahling Coro (Cluster E): Coroutine-basierter Prefetch (Full Node + Half Node)
   * P26 Zhang Index (Cluster E): __builtin_prefetch L3 + 3 Strategien (CP, PP, MP)
   * P27 Zhang Hierarchical (Cluster E): Bundle-basierter Prefetch (Distance 90 Cache-Blocks)
@@ -112,7 +112,7 @@ Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **
 - **Dach-Idee:** Pointer-basierte Datenstrukturen verhindern Latency-Hiding (n_{i+1} unbekannt vor Fetch von n_i). Loesung: data-linearization ODER history-pointers (Jump-Pointer-Arrays).
 - **Konkretisierungen:**
   * P21 Chen pB+-Tree (Cluster D): JumpPointerArrayPrefetchStrategy (extern oder intern), Chunked-Linked-List mit Hint-Pointers
-  * P22 Chen Fractal (Cluster D): DualJumpPointerArrayStrategy — internal Cache-Tier + external Disk-Tier
+  * P22 Chen Fractal (Cluster D): DualJumpPointerArrayStrategy — internal Cache-Ebene + external Disk-Ebene
   * P26 Zhang Index (Cluster E): JumpPointerQueue fuer MVCC-Version-Chains, 2-ahead Lookups
 - **Visitor-Variante:** `CacheEngineStrategy`
 - **Verbindung zu Saeule B:** Verbraucht `IMemoryBandwidthModel` zur Bestimmung der optimalen Distance k.
@@ -144,7 +144,7 @@ Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **
 - **Visitor-Variante:** `CacheEngineStrategy`
 - **Verbindung zu Saeule B:** Indirekt — reduziert Working-Set, profitiert von kleinerem `ICacheLevel.size_bytes`.
 
-### Familie F9: LayerDependentEncodingStrategy (Hot/Cold-Tier-Trennung)
+### Familie F9: LayerDependentEncodingStrategy (Hot/Cold-Ebenen-Trennung)
 - **Concept-Klasse:** `ILayerDependentEncodingStrategy` (Konkretisierung von `ICacheStrategy`)
 - **Dach-Idee:** Obere Trie-Levels (wenige Knoten, viele Accesses, "warm/hot") werden anders enkodiert als untere ("cold"). Layout adaptiert an Cache-Temperature.
 - **Konkretisierungen:**
@@ -191,14 +191,14 @@ Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **
 - **Visitor-Variante:** `CacheEngineStrategy`
 - **Verbindung zu Saeule B:** Profitiert von atomaren 64-Bit-Stores (`IIsaFeatureSet.atomic_int64`).
 
-### Familie F13: CacheObliviousLayoutStrategy (Levels-Unkenntlich, optimal pro Tier)
+### Familie F13: CacheObliviousLayoutStrategy (Levels-Unkenntlich, optimal pro Ebene)
 - **Concept-Klasse:** `ICacheObliviousLayoutStrategy` (Konkretisierung von `ICacheStrategy`)
 - **Dach-Idee:** Layout funktioniert OPTIMAL auf jedem Cache-Level innerhalb Konstanten-Faktor, OHNE Block-Size B zu kennen. Rekursive selbst-aehnliche Aufteilung.
 - **Konkretisierungen:**
   * P16 Bender (Cluster C): CacheObliviousProbabilityLayoutStrategy (Greedy mit unbekanntem B; 4× optimal)
   * P17 Bender Cache-Oblivious B-Trees (Cluster C): VanEmdeBoasLayoutStrategy + DynamicVEBWithPackedMemory
   * P18 Saikkonen (Cluster C): CacheObliviousVEBProductionStrategy als Special Case (B_i geometrisch)
-  * P22 Chen Fractal (Cluster D): FractalPrefetchingStrategy als Mischform (Cache-Aware mit Tier-Konfiguration, aber selbst-aehnlich)
+  * P22 Chen Fractal (Cluster D): FractalPrefetchingStrategy als Mischform (Cache-Aware mit Ebenen-Konfiguration, aber selbst-aehnlich)
 - **Visitor-Variante:** `CacheEngineStrategy` (mit Awareness=CacheOblivious)
 - **Verbindung zu Saeule B:** KEINE konkreten Cache-Parameter noetig (cache-oblivious by definition).
 
@@ -333,11 +333,11 @@ Eine vollstaendige Tabelle der Hybrid → Command-Pattern Aufloesungen ist in **
 
 ### Familie F27: NFP-DecoratorStrategy (Heterogene Memory-NFP-Awareness)
 - **Concept-Klasse:** `INfpDecoratorStrategy` (Konkretisierung von `ICacheStrategy`, Saeule-B-naehernd)
-- **Dach-Idee:** Allokationen tragen Non-Functional-Memory-Properties (latency, throughput, persistence, reliability, wearout, random accessibility, cache coherence) als Decorator; V-malloc waehlt Tier (DRAM/HBM/NVRAM/CXL).
+- **Dach-Idee:** Allokationen tragen Non-Functional-Memory-Properties (latency, throughput, persistence, reliability, wearout, random accessibility, cache coherence) als Decorator; V-malloc waehlt Ebene (DRAM/HBM/NVRAM/CXL).
 - **Konkretisierungen:**
   * P33 VAMPIR Poster (Cluster F): NFP-Decorator + V-malloc + Compensation/Migration
   * P25 Mahling (Cluster E): Local vs. Remote Latency, DDR4/HBM2/HBM3/LPDDR5X/GDDR Heterogenitaet
-  * P22 Chen Fractal (Cluster D): MultiTierCacheStrategy mit Cache-Tier + Disk-Tier
+  * P22 Chen Fractal (Cluster D): MultiTierCacheStrategy mit Cache-Ebene + Disk-Ebene
 - **Visitor-Variante:** `CacheEngineStrategy`
 - **Verbindung zu Saeule B:** Verbraucht `IMemoryBandwidthModel`, `IInterconnect`, `IStorageMedium`.
 
@@ -434,7 +434,7 @@ Legende: ✓ = Familie zentral im Paper / (✓) = nur peripher erwaehnt
 - `ICodeSpecializationStrategy` (P11, P12, P14, P23) — compile-time loop-unrolling
 - `IHardwareOffloadStrategy` (P31) — iDMA, FPGA, Tomahawk-PE
 
-### Paket E: NFP, Filter, Tiering
+### Paket E: NFP, Filter, Schichtung
 - `INfpDecoratorStrategy` (P22, P25, P33) — heterogene Memory-NFP
 - `IFilterStrategy` / `IApproximateMembershipStrategy` (P10) — Geschwister von ISearchPageStrategy
 - `IHotColdLayerEncodingStrategy` (P10) — Spezialform F19 fuer Filter
@@ -495,7 +495,7 @@ Legende: ✓ = Familie zentral im Paper / (✓) = nur peripher erwaehnt
 - **P26 Cost Model (Eq. 1-4)** — sollte als generisches `ICacheCostModel` formalisiert werden (NEU).
 - **P27 Bundle-Identification Algorithm 1** — Coarse-grained Path-Prefetch fuer Instruktionen; analog auf Daten uebertragbar (`BundleDataPrefetchStrategy` waere offen).
 - **P32 Memory-/Bank-/Rank-Level-Parallelism** (Refs [6, 13, 22]) — noch nicht als Concept-Klasse formalisiert.
-- **P33 Compensation/Migration** — transparente Daten-Migration zwischen Memory-Tiers; fehlt als Concept (`IMigrationPolicy`).
+- **P33 Compensation/Migration** — transparente Daten-Migration zwischen Memory-Ebenen; fehlt als Concept (`IMigrationPolicy`).
 - **P28 Kuehn-Mail 2026-05-08 Erweiterungen** — LeafOnlyCounter, RetroactiveAggregation als BARRIERE; sind PRT-ART-Innovation nicht im Paper.
 
 ### 4.3 Welche zusaetzlichen Concept-Klassen koennten sinnvoll sein?
@@ -503,8 +503,8 @@ Legende: ✓ = Familie zentral im Paper / (✓) = nur peripher erwaehnt
 **Aus der Synthese der Cluster-Synthese-Sektionen abgeleitet:**
 
 1. **`IBudgetGuarantee`** — Worst-Case-Bytes pro Key als Invariante (P01 ART 52 B/Key, P05 START gleich, P09 Jacobson 2n+o(n)).
-2. **`ITwoGranularitySearchStrategy`** — Search ueber zwei Tier-Ebenen (Cache-Page + in-page Tree), eine Variante von `IEmbeddedSecondaryIndexStrategy` (P22).
-3. **`IDualJumpPointerArrayStrategy`** — Dual-Tier-Prefetching (Cache + Disk), Spezialisierung von F6 (P22).
+2. **`ITwoGranularitySearchStrategy`** — Search ueber zwei Ebenen (Cache-Page + in-page Tree), eine Variante von `IEmbeddedSecondaryIndexStrategy` (P22).
+3. **`IDualJumpPointerArrayStrategy`** — Dual-Ebenen-Prefetching (Cache + Disk), Spezialisierung von F6 (P22).
 4. **`IGranularityMismatchResolver`** mit Sub-Klassen `OverflowResolverStrategy`, `OffsetCompressionResolverStrategy`, `AdaptiveNodeSizeResolverStrategy` (P22).
 5. **`IRuntimeAdaptiveHeuristic`** — Lambda-basierte Heuristik mit Live-Counter-Inputs; passt zu DecisionLambdaTree-Architektur (P23).
 6. **`IFractalLayoutStrategy<OuterTier, InnerTier>`** — selbst-aehnliche Layout-Composition (P22).
@@ -535,7 +535,7 @@ Es kristallisieren sich **drei Meta-Achsen** heraus, die in REV 3 explizit model
 **Meta-Achse 2: Compositionality**
 - Homogen (P01, P11, P12, P21) — alle Knoten gleich
 - Heterogen-Adaptiv (P02, P05, P20) — pro Knoten verschieden, gewaehlt durch Heuristic
-- Hierarchisch-Fraktal (P22) — pro Tier verschieden, rekursiv komponiert
+- Hierarchisch-Fraktal (P22) — pro Ebene verschieden, rekursiv komponiert
 - Orthogonal-Runtime-Parametriert (P23) — gleicher Algorithmus, parametrisiert per Runtime
 
 **Meta-Achse 3: Dynamicity**
@@ -580,7 +580,7 @@ Aus den paper-spezifischen OFFEN-Listen sind die folgenden Punkte fuer die Diplo
 | F2 | P11 CSS-Tree Pointer-Elimination | (atomar — keine Aufloesung noetig) | — |
 | F2 | P12 CSB+ Partial-Pointer-Elimination | (atomar — keine Aufloesung noetig) | — |
 | **F3 ICacheLineAlignedStrategy** | (alle Konkretisierungen sind atomare Cache-Line-Aligning-Strategien) | — keine Aufloesung noetig — | — |
-| **F4 IMultiCacheLineNodeStrategy** | P22 Fractal (in-page Tree mit adaptive Width pro Tier) | (in §9 oben aufgeloest) | `FractalHierarchicalCompositionCommand` |
+| **F4 IMultiCacheLineNodeStrategy** | P22 Fractal (in-page Tree mit adaptive Width pro Ebene) | (in §9 oben aufgeloest) | `FractalHierarchicalCompositionCommand` |
 | F4 | P21 Chen pB+ (Wide-Node + JumpPointerArray + ChunkedLinkedList) | `WideNodePrefetchCommand` + `JumpPointerArrayPrefetchCommand` + `ChunkedLinkedListHintCommand` | `ChenPrefetchedBPlusCompositionCommand` |
 | F4 | P13 Hankins/Patel (Cost-Modell-getriebene Knotengroesse) | `CostModelEvaluationCommand` + `NodeSizeSelectionCommand` + `LargeNodePrefetchCommand` | `HankinsPatelCostModelCompositionCommand` |
 | **F5 ISoftwarePrefetchStrategy** | P26 Zhang Index (3 Prefetcher-Komponenten CP+PP+MP) | (in §9 oben aufgeloest) | `ThreePrefetcherOrchestrationCompositionCommand` |
@@ -601,7 +601,7 @@ Aus den paper-spezifischen OFFEN-Listen sind die folgenden Punkte fuer die Diplo
 
 **Anmerkungen zur systematischen Pruefung:**
 - Wo §9 in 12_algorithmus_strategie_taxonomie.md eine Aufloesung bereits dokumentiert, wird hier nur referenziert (keine Doppelung).
-- F8-F29 sind ueberwiegend atomare Strategien (z.B. CacheLineAligned, RankSelectPrimitive, NUMA-Local-Allocator, SIMD-Compare). Wo Hybrid-Konkretisierungen existieren (z.B. Multi-Tier-Allocator), gilt das Schema analog.
+- F8-F29 sind ueberwiegend atomare Strategien (z.B. CacheLineAligned, RankSelectPrimitive, NUMA-Local-Allocator, SIMD-Compare). Wo Hybrid-Konkretisierungen existieren (z.B. Multi-Ebenen-Allocator), gilt das Schema analog.
 - Die exakte Sub-Command-Granularitaet ist Phase-6+-Implementations-Aufgabe — die Aufloesungs-Vorschlaege hier sind Architektur-Slots.
 
 **Permutations-Raum-Auswirkung der Aufloesung:**
