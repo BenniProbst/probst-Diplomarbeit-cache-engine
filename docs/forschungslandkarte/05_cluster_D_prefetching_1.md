@@ -24,7 +24,7 @@
 | Paper | Strategie |
 |---|---|
 | P21 Chen 2001 | PB-Trees: Software-Prefetching mit fester Distanz |
-| P22 Chen 2002 | Fractal Prefetching: in-page Tree mit adaptive Width pro Tier (Disk-Tier + Cache-Tier) |
+| P22 Chen 2002 | Fractal Prefetching: in-page Tree mit adaptive Width pro Ebene (Disk-Ebene + Cache-Ebene) |
 | P23 Khan 2010 | Dynamic Adaptation of Prefetch Distance |
 | P20 Mueller 2025 | Adaptive Layout-Selection (6 Layouts + adaptive selection at runtime) |
 
@@ -40,8 +40,8 @@ Direkter Bezug zu V31-Adapter: `comdare::adapter::p20_leanstore::LeanStoreAdapte
 ### 2.3 Hybrid-Aufloesung (REV5 K3.4)
 
 P22 Fractal Prefetching ist "hybrid" → wird in atomare Commands zerlegt:
-- Disk-Tier-Command
-- Cache-Tier-Command
+- Disk-Ebene-Command
+- Cache-Ebene-Command
 - Adaptive-Width-Command
 
 (Detail: `../architektur/09_taxonomien.md` §3.2)

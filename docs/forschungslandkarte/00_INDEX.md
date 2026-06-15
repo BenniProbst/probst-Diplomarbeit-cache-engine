@@ -80,7 +80,7 @@ referenzieren nur (Pfad+Zeile), kopieren nicht voll-Inhalt.
 | AC3 | 4 | NUMA + Hardware (A09, A14, A15, A16) |
 | AC4 | 6 | Concurrent + Formal (A03, A07, A11, A13, A17, A22) |
 | AC5 | 6 | Standard + Optimizing (A01, A08, A10, A18, A19, A23) |
-| (Tier-extra) | 2 | Tier 2 Specialized (A12 CAMA) + nicht-eingegliederte (A02 Bonwick Slab) |
+| (Rang-extra) | 2 | Rang 2 Specialized (A12 CAMA) + nicht-eingegliederte (A02 Bonwick Slab) |
 | **Total** | **23** | A01-A23 abgedeckt |
 
 ---

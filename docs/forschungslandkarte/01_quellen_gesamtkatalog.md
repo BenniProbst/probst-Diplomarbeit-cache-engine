@@ -78,7 +78,7 @@
 
 Detail siehe `../bausteine/02_allokator_matrix.md`.
 
-### Tier 1 — Foundational + Production-Grade (10)
+### Rang 1 — Foundational + Production-Grade (10)
 
 | ID | Paper / Allokator | Autoren / Jahr / Venue | V31 Status |
 |---|---|---|---|
@@ -93,7 +93,7 @@ Detail siehe `../bausteine/02_allokator_matrix.md`.
 | **A09** | NUMAlloc | Liu/Berger (2023, ISMM) | (nicht geklont) |
 | **A10** | rpmalloc | Mattias Jansson (2017+, kein formales Paper) | ✅ Adapter |
 
-### Tier 2 — Modern + Specialized (3+)
+### Rang 2 — Modern + Specialized (3+)
 
 | ID | Paper / Allokator | Autoren / Jahr / Venue | V31 Status |
 |---|---|---|---|
@@ -101,7 +101,7 @@ Detail siehe `../bausteine/02_allokator_matrix.md`.
 | **A12** | CAMA | Herter/Marwedel/Falk (2011, RTAS) | (Forschungsprototyp) |
 | **A13** | StarMalloc | Bourgeat/Erbsen et al. (2024, arXiv 2403.09435) | (komplexer F* Build) |
 
-### Tier 3 — Kernel + Standard-Library + Classic (10+)
+### Rang 3 — Kernel + Standard-Library + Classic (10+)
 
 | ID | Paper / Allokator | Autoren / Jahr / Venue | V31 Status |
 |---|---|---|---|

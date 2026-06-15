@@ -46,7 +46,7 @@
 
 **P31 Ungethuem 2017** — Survey: Overview of Hardware Optimizations for Database Engines. Sicht in Plattform-Modell (siehe `../architektur/04_konzepte_saeule_b.md`).
 
-**P32 Schmidt 2025 DIMES** — "To Stride or Not to Stride" — Untersuchung von Hardware-Stride-Prefetching. **HBM-Tier-Awareness** + Hugepage-Lehre.
+**P32 Schmidt 2025 DIMES** — "To Stride or Not to Stride" — Untersuchung von Hardware-Stride-Prefetching. **HBM-Ebenen-Awareness** + Hugepage-Lehre.
 
 **P33 VAMPIR 2023** — TUD Tool fuer Performance-Tracing. Branch-Prediction-Awareness.
 
@@ -92,7 +92,7 @@ Detail-Konzept-Extraktionen pro Paper:
 | P29 | F23 IConcurrencyStrategy (RCU); F-EXTRA-6 DecisionLambdaTrees |
 | P30 | F12-K (Hazard Pointers ENTFERNT, RCU bevorzugt) — siehe Memory-Direktive `feedback_allocator_basisdisziplin_and_abi_interface` |
 | P31 | F13 Cross-Compilation-Toolchain (TUD-Hardware-Survey) |
-| P32 | F-EXTRA-7 (HBM-Tier-Awareness, Hugepage-Lehre) |
+| P32 | F-EXTRA-7 (HBM-Ebenen-Awareness, Hugepage-Lehre) |
 | P33 | F27 IBranchPredictionAwareStrategy (VAMPIR-Tool-Verweis) |
 
 ---

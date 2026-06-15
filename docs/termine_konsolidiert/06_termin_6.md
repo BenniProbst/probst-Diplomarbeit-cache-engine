@@ -34,7 +34,7 @@
   - Bausteine-Quer-Permutation (F15)
   - Drei-Saeulen-Architektur
 - **UML-Detail Phase 5 vorbereitet** — Habich-Direktive H1 fuer maximales Detail
-- **Hardware-Plattform-Matrix** verankert (P31, P32, P33 Tier-3 HABICH)
+- **Hardware-Plattform-Matrix** verankert (P31, P32, P33 Rang-3 HABICH)
 
 ---
 

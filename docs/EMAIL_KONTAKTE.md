@@ -13,7 +13,7 @@
 | **P06** | Maximilian E. Schuele (Uni Bamberg, +Habich Cc) | 2026-05-07 + 2026-05-08 | ✅ **ANTWORT 2026-05-08 23:37** (2 Nextcloud-Links) | voll, in `Forschungsarbeiten/code/P06-B2tree/{b2-tree-master, bart-master}/` |
 | **P27** | Tingji Zhang (Tsinghua, via Boris Grot Edinburgh, +Habich Cc, +zyh02 Cc) | 2026-05-08 18:59 | ✅ **ANTWORT 2026-05-11 14:16** (hp-soft.zip Demo-Paket) | hp_soft.py + readme.txt in `Forschungsarbeiten/code/P27-Zhang-ASPLOS-Hierarchical/hp-soft/` |
 | **P28** | Roland Kuehn (TU Dortmund DBIS, +Habich Cc) | 2026-05-07 02:45 + 2026-05-08 17:48 | ✅ **ANTWORT 2026-05-08 10:35** (Code zugesagt + Aufraeumen vorher) | noch nicht eingegangen, aber zugesagt |
-| **P31** | Habich-Team (Ungethuem 2017) | (intern via Habich-Sprechstunde) | ⏸ **KEINE FORMAL-MAIL** — User-Direktive 2026-05-18: keine Folge-Mails | im Cluster F via Habich-Tier-3 dokumentiert |
+| **P31** | Habich-Team (Ungethuem 2017) | (intern via Habich-Sprechstunde) | ⏸ **KEINE FORMAL-MAIL** — User-Direktive 2026-05-18: keine Folge-Mails | im Cluster F via Habich-Rang-3 dokumentiert |
 | **P32** | Habich-Team (Schmidt 2025) | (intern via Habich-Sprechstunde) | ⏸ **KEINE FORMAL-MAIL** | im Cluster F dokumentiert |
 | **P33** | Habich-Team (VAMPIR Poster 2023) | (intern via Habich-Sprechstunde) | ⏸ **KEINE FORMAL-MAIL** | im Cluster F dokumentiert |
 
@@ -139,7 +139,7 @@ Roland
 
 ---
 
-## §5 P31/P32/P33 — Habich-Tier-3 (intern, keine Formal-Mails)
+## §5 P31/P32/P33 — Habich-Rang-3 (intern, keine Formal-Mails)
 
 | Paper | Autor | Quelle |
 |---|---|---|
@@ -147,7 +147,7 @@ Roland
 | P32 | Schmidt/Habich et al. 2025 | To Stride or Not to Stride |
 | P33 | Berthold/Habich et al. 2023 | VAMPIR Poster (SOSP'23) |
 
-Diese 3 Tier-3-Paper sind direkt in der Habich-Forschungslinie. Habich-Sprechstunde 2026-05-08 hat die Architektur-Direktiven dazu festgelegt. Keine Formal-Mails erforderlich.
+Diese 3 Rang-3-Paper sind direkt in der Habich-Forschungslinie. Habich-Sprechstunde 2026-05-08 hat die Architektur-Direktiven dazu festgelegt. Keine Formal-Mails erforderlich.
 
 **STATUS:** dokumentiert in `docs/forschungslandkarte/07_cluster_F_sync_tud_habich.md` (Cluster F).
 

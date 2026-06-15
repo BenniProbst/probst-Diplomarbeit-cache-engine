@@ -139,7 +139,7 @@ Die urspruengliche REV6-Version hatte faelschlicherweise die "6 Seitentypen" aus
 
 **REV7-Erweiterungen:**
 - §1 Allokator-Basisdisziplin: Cache-Engine hat zwei parallele Bausteine-Stacks (Such-Algorithmen + Allokationsmethoden)
-- §2 Allokator-Paper-Tier-1-Liste: 21 Paper-Quellen + 14 produktive Allokatoren (A01-A23)
+- §2 Allokator-Paper-Rang-1-Liste: 21 Paper-Quellen + 14 produktive Allokatoren (A01-A23)
 - §3 C++ std-Container-Kompatibilitaet (typsicher std::allocator, std::pmr, Concurrency-Modelle)
 - §4 ABI-stabiles C++23-Modul-Interface (Drei-Schichten-Hierarchie: execution_engine → search_engine → konkrete Suchalgorithmen wie prt_art)
 - §5 CacheEngineBuilder als eigenstaendiges Programm (XML-Konfiguration zulaessiger CacheEngine-Rekombinationen)
@@ -230,5 +230,5 @@ Die urspruengliche REV6-Version hatte faelschlicherweise die "6 Seitentypen" aus
 - V12-V31-Stand-Doku: `../sessions/20260514-4600-fortschrittsdokumentation-v30-v31.md`
 - thesis-Manuskript Kapitel 03+04: `../../thesis/chapters/03_architektur.tex` + `04_implementation.tex`
 - Bausteine-Matrix (operationalisiert REV7-Permutationen): `../bausteine/01_bausteine_matrix.md`
-- Allokator-Matrix (REV7 §2 Allokator-Paper-Tier-1-Liste): `../bausteine/02_allokator_matrix.md`
+- Allokator-Matrix (REV7 §2 Allokator-Paper-Rang-1-Liste): `../bausteine/02_allokator_matrix.md`
 - Architekturentscheidungen F1-F15 + F-EXTRA: `../bausteine/04_architekturentscheidungen_F1_F15.md`

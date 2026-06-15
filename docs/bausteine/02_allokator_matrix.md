@@ -196,7 +196,7 @@ Nach N: Allokatoren als Bausteine in Sub-Achsen 6.1-6.5 der Bausteine-Matrix.
 | A19 Coz (Causal) | wrapper + profiling | mark-sweep | local | none | first-fit |
 | A20 dlmalloc | best-fit | mark-sweep | none | none | best-fit |
 | A21 LZ-FAST | size-class | epoch | NUMA-aware | transparent | size-class |
-| A22 Multi-Tier (HBM+DRAM+NVRAM) | region + tier-cache | epoch | preferred (HBM) | explicit | best-fit |
+| A22 Multi-Ebenen (HBM+DRAM+NVRAM) | region + Ebenen-Cache | epoch | preferred (HBM) | explicit | best-fit |
 | A23 Idma-Allocator | region | mark-sweep | NUMA-aware | explicit | best-fit |
 
 ### §10.3 5 Cluster AC1-AC5 (BLEIBEN als Cluster, orthogonal zu Sub-Achsen)

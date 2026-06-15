@@ -147,8 +147,8 @@ Pro Paper sind 2 neue Konzept-Spalten hinzuzufuegen (Achse 12 + 13 aus N-Phase):
 | P08 ART-Sync | scalar, L1-aware, none, OLC-CAS | thread-per-core + OLC | Leis 2016 |
 | P09 LOUDS | scalar (Bit-Tricks), L1-aware, none, none | thread-per-core | Jacobson 1989 |
 | P10 SuRF | scalar, L1-aware, none, none | thread-per-core | Zhang 2018 |
-| P11-P14 CSS/CSB+/Hankins/Samuel | SIMD (NEON-aehnlich), L1-aware, none, CAS | thread-per-core | Tier-2 |
-| P15-P19 Layout-Theorie | scalar, Cache-Oblivious, none, none | thread-per-core | Tier-2 |
+| P11-P14 CSS/CSB+/Hankins/Samuel | SIMD (NEON-aehnlich), L1-aware, none, CAS | thread-per-core | Rang-2 |
+| P15-P19 Layout-Theorie | scalar, Cache-Oblivious, none, none | thread-per-core | Rang-2 |
 | P20 LeanStore | AVX2, HBM-aware, NUMA-aware, CAS | work-stealing, hybrid-aware | Mueller 2025 |
 | P21+P22 Chen Prefetching | PREFETCH (Stride), L1+L2-aware, none, CAS | thread-per-core + Stride-Worker | Chen 2001/2002 |
 | P23 Khan Dynamic | PREFETCH (adaptive), L2-aware, none, CAS | thread-per-core | Khan 2010 |
@@ -159,9 +159,9 @@ Pro Paper sind 2 neue Konzept-Spalten hinzuzufuegen (Achse 12 + 13 aus N-Phase):
 | **P28 Kuehn** | PREFETCH (none, scalar Counter), L1-aware Counter, none, CAS | thread-per-core + Sampling-Worker | Kuehn 2023 DaMoN |
 | P29 RCU | CAS (atomic load), L1-aware, none, atomic-load | thread-per-core + Read-Side-Critical | McKenney 2001 |
 | P30 Hazard | CAS, L1-aware, none, CAS + LL-SC | thread-per-core + HP-Cleanup | Michael 2004 |
-| **P31 Ungethuem** | AVX-512 (HBM), HBM-aware, NUMA-aware, CAS | hybrid-aware (P-cores + E-cores) | Habich Tier-3 |
-| **P32 Schmidt** | AVX-512 (SIMD-Stride), HBM-aware, NUMA-aware, CAS | hybrid-aware | Habich Tier-3 |
-| **P33 VAMPIR** | AVX-512 (Profiler), all-Cache-Level, NUMA-aware, none | hybrid-aware + Profiler-Worker | Habich Tier-3 |
+| **P31 Ungethuem** | AVX-512 (HBM), HBM-aware, NUMA-aware, CAS | hybrid-aware (P-cores + E-cores) | Habich Rang-3 |
+| **P32 Schmidt** | AVX-512 (SIMD-Stride), HBM-aware, NUMA-aware, CAS | hybrid-aware | Habich Rang-3 |
+| **P33 VAMPIR** | AVX-512 (Profiler), all-Cache-Level, NUMA-aware, none | hybrid-aware + Profiler-Worker | Habich Rang-3 |
 
 ### §6.2 PRT-ART-Konsequenz
 
@@ -174,7 +174,7 @@ PRT-ART soll auf Achse 12 + 13 eine eigene Spalte fuer den Vergleich erhalten:
 ## §5 Querverweise
 
 - Original-Quelle (UNVERAENDERT): `../termine/20260508 Termin 7/Cross_Paper_Konzeptmatrix.txt`
-- 33 Paper-Notizen (Tier-1/2/3): `../termine/20260508 Termin 7/_review/papers/P01-P33-*.md`
+- 33 Paper-Notizen (Rang-1/2/3): `../termine/20260508 Termin 7/_review/papers/P01-P33-*.md`
 - Bausteine-Matrix (Operationalisierung der Konzepte): `01_bausteine_matrix.md` (K-E.2)
 - Begriffsglossar v7 Master: `../glossar/01_begriffsglossar_v7_master.md`
 - Forschungslandkarte (33 Paper Vollangaben): `../forschungslandkarte/01_quellen_gesamtkatalog.md` (K-F.2)

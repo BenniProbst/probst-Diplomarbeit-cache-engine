@@ -60,7 +60,7 @@ Detail: `../bausteine/02_allokator_matrix.md` §2.
 | A15 | HMalloc | (IEEE Code unklar) |
 | A16 | PIM-malloc | (UPMEM-Hardware-only) |
 
-**Charakter:** NUMA-aware Allocation, Cache-Locality. HBM-Tier-Awareness (P32 Schmidt TUD).
+**Charakter:** NUMA-aware Allocation, Cache-Locality. HBM-Ebenen-Awareness (P32 Schmidt TUD).
 
 ### AC4 — Concurrent + Formal
 
