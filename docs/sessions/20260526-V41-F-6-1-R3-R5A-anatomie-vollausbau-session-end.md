@@ -148,9 +148,9 @@ als bequeme Visitor-Facade hinzu.
 
 ---
 
-## §5 Saeugetier-Anatomie-Tabelle (11 Tiere stand R3.2)
+## §5 Saeugetier-Anatomie-Tabelle (11 Lebewesen stand R3.2)
 
-| Tier | Composition | search_algo | Distinguishing Organ |
+| Lebewesen | Composition | search_algo | Distinguishing Organ |
 |---|---|---|---|
 | Art | ArtComposition | Array256 | Dense Skelett |
 | Hot | HotComposition | VectorU8U8 | Sparse-Klein |
@@ -188,7 +188,7 @@ Algorithmen reproduziert UND systematische Suche im Permutations-Raum erlaubt?
 | 5c | PermutationEngine Pruefling-Merge | ⏳ R5.C |
 | 5d | dlopen/LoadLibrary Module-Loader | ⏳ R5.E |
 | 6 | Mess-Treiber + Welch-Test | ⏳ R6/V42 |
-| 7 | F15-Auswertung schnellstes Tier | ⏳ R7/V42 |
+| 7 | F15-Auswertung schnellstes Lebewesen | ⏳ R7/V42 |
 
 ---
 

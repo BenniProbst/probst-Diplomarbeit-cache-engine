@@ -217,7 +217,7 @@ PrtArtComposition + HasCompositionLocation.
 | Task # | Was |
 |---|---|
 | R6 V42 | VirusExecutionEngine fuer Graphen-Algorithmen (erste Virus-Implementation) |
-| R7 V42 | F15-Auswertung schnellstes Tier + Virus-Vergleich |
+| R7 V42 | F15-Auswertung schnellstes Lebewesen + Virus-Vergleich |
 | #648 V42.P0.1 | H1/H2/H3 Hypothesen als formale Mess-Achse pro Permutation |
 | #649 V42.P0.2 | V1-V4 Engine-Choice-Dimension (Meta-Achse) in Codegen |
 | #650 V42.P0.3 | IPlatformProbe Auto-Discovery + Live-Tuning |
@@ -232,7 +232,7 @@ PrtArtComposition + HasCompositionLocation.
 | Doku 13 Teil E | Tool-Dokumentation (Auto-Discovery Regex + Brace-Balancer + Lock-File + Multi-File-Paper-Support + Mixin-Generation) |
 | Doku 11 §11.7.E-Q | 13 weitere Topics vollstaendig spezifizieren (analog Allocator/Queuing/Traversal) |
 | Doku 10 §0.4 | V32-Implementierungs-Konsequenzen (CEB ICommand-Hierarchie + CacheEngine selbst als ExecutionEngine + drawio Tab CC.1) |
-| bausteine/ | Komplette Doku erneuern (Organ-Taxonomie statt alte Tier-Matrix) |
+| bausteine/ | Komplette Doku erneuern (Organ-Taxonomie statt alte Lebewesen-Matrix) |
 
 ---
 
@@ -258,7 +258,7 @@ Achsen sondern Stubs.**
 ### §5.2 [[technical-identifiers-over-metaphor]] (R5.C.A3, bestätigt R5.G)
 
 Code-Identifier MUESSEN technisch sein (z.B. `SearchAlgorithmAbiAdapter`,
-NICHT `MammalAbiAdapter`). Tier-Metapher (`Tier/Saeugetier/Mammal/Bird/
+NICHT `MammalAbiAdapter`). Lebewesen-Metapher (`Tier/Saeugetier/Mammal/Bird/
 Reptile/Invertebrate/Plant/Frankenstein`) NUR in Kommentaren + Architektur-
 `.md`. Pflicht-Audit vor jedem Code-Commit.
 

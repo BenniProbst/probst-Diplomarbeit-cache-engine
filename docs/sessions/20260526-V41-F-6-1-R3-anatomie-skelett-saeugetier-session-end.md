@@ -76,7 +76,7 @@ Organ-Metapher und der Phasen-Reihenfolge R2 → R3 → R3.2 → R4."
 > finden, was bedeutet, dass wir anhand des Gesamtbildes der Kompositionen und
 > der nun fertiggestellten Zerlegung eine Implementierung finden können, welche
 > zentral für alle Kompositionen passen wird, und die sich nur anhand der
-> Ausprägung der Merkmale jeder Achse/Organe (ähnlich Tier-Metapher) zum finalen
+> Ausprägung der Merkmale jeder Achse/Organe (ähnlich Lebewesen-Metapher) zum finalen
 > eindeutigen Komposit-Algorithmus zusammensetzt."
 
 > "Methapher: Alle Säugetiere haben im Kern hauptsächlich dieselben Organe und
@@ -84,7 +84,7 @@ Organ-Metapher und der Phasen-Reihenfolge R2 → R3 → R3.2 → R4."
 > Ausprägungen."
 
 > "Das finale Ziel der Diplomarbeit ist es, die Anatomie eines Suchalgorithmus
-> zu finden und das schnellste 'Tier' bzw. die schnellste Rekombination aller
+> zu finden und das schnellste 'Lebewesen' bzw. die schnellste Rekombination aller
 > Achsen zu finden und ansonsten alle Achsen-Permutationen bis ins Detail über
 > ihr Verhalten zu studieren und auszuwerten."
 
@@ -180,7 +180,7 @@ using Start    = SearchAlgorithmAnatomy<compositions::StartComposition>;
 
 ### §4.4 `libs/cache_engine/anatomy/README.md`
 
-Erlaeutert Säugetier-Anatomie-Metapher, distinguishing organ pro Tier, Phasen-Plan R3→R7, Forschungs-Ziel-Frage.
+Erlaeutert Säugetier-Anatomie-Metapher, distinguishing organ pro Lebewesen, Phasen-Plan R3→R7, Forschungs-Ziel-Frage.
 
 ---
 
@@ -193,7 +193,7 @@ Erlaeutert Säugetier-Anatomie-Metapher, distinguishing organ pro Tier, Phasen-P
 | §3 | `AnatomyPilotApi` (TYPED_TEST_SUITE) | 6 (1×6) | insert/lookup/erase/clear Roundtrip pro Algo |
 | §4 | `AnatomyR3_Inspection` | 2 | composition_name/paper_id/organ_count statisch korrekt |
 | §5 | `AnatomyR3_MammalProof` | 2 | Alle 6 nutzen DIESELBE Anatomie-Template; verschiedene composition_t |
-| §6 | `AnatomyR3_Frankenstein` | 1 | AdHoc-Composition (ART+Wormhole+SuRF Mix) instantiiert neues Tier |
+| §6 | `AnatomyR3_Frankenstein` | 1 | AdHoc-Composition (ART+Wormhole+SuRF Mix) instantiiert neues Lebewesen |
 
 **Endstand:** 14/14 grün (Release build-pilot, MSVC 17.14).
 
@@ -217,7 +217,7 @@ using Frankenstein = ana::SearchAlgorithmAnatomy<FrankensteinComposition>;
 ```
 
 **Beweis:** Bei keiner Code-Anderung am Template + keiner Doku-Anderung wurde
-ein NEUES Tier erzeugt das ART-Skelett + Wormhole-Verdauung + SuRF-Nervensystem
+ein NEUES Lebewesen erzeugt das ART-Skelett + Wormhole-Verdauung + SuRF-Nervensystem
 kombiniert. Insert/Lookup funktionieren. Genau das Verhalten dass R4 in der
 PermutationEngine via mp_product systematisch fuer alle Cartesian-Punkte erzeugt.
 
@@ -246,7 +246,7 @@ ungleich verteilt ist:
 ## §8 OriginalXxx-Wrappers — Audit-Korrektur (R3.2 ergaenzt 2026-05-26 spät)
 
 **Initial-Annahme (FALSCH, korrigiert beim R3.2-Start):**
-> "5 monolithische Wrappers — Permutations-PUNKTE (ganze Tiere) als Achsen-Varianten
+> "5 monolithische Wrappers — Permutations-PUNKTE (ganze Lebewesen) als Achsen-Varianten
 > verkleidet. Loesung: Deprecation, durch SearchAlgorithmAnatomy<XxxComposition> ersetzen."
 
 **Tatsaechlicher Befund (Audit bei R3.2-Start):**
@@ -386,7 +386,7 @@ User-Direktive [[no-quick-fixes]] und [[no-mock]] werden eingehalten:
 2. R4 PermutationEngine (Task #696) — F15-Forschungsmission-Kern
 3. R5 CacheEngineBuilder pro Permutation .so/.dll
 4. R6 Mess-Treiber (V42)
-5. R7 F15-Auswertung schnellstes Tier (V42)
+5. R7 F15-Auswertung schnellstes Lebewesen (V42)
 
 ### Pending unbeeinflusst
 - #685 P2.D.t2 Allocator-Bazel-Roll-out

@@ -13,7 +13,7 @@ Single-Source-of-Truth für offene/erledigte Punkte bleibt das **Ledger**:
 
 | Repo | Rolle | Pfad |
 |------|-------|------|
-| **cache-engine** | Anatomie-Generator (Achsen→Tier-Binaries) + Prüf-Dock (misst Binaries) — der „Stand der Technik" | `Code/external/comdare-cache-engine/` |
+| **cache-engine** | Anatomie-Generator (Achsen→Lebewesen-Binaries) + Prüf-Dock (misst Binaries) — der „Stand der Technik" | `Code/external/comdare-cache-engine/` |
 | **prt-art** | Prüfling (experimenteller Hybrid-Suchalgorithmus), wird gegen den Stand der Technik geprüft | `Code/external/comdare-prt-art/` |
 | **Diplomarbeit (Superprojekt)** | 6-Stufen-LaTeX-Pipeline: fragt Messwerte ab → CSV → LaTeX-Tabellen/Diagramme → PDF | `Code/` (+ Repo-Wurzel) |
 
@@ -64,7 +64,7 @@ Vollständig in `…/20260531-mess-abstraktion-cross-platform-architektur-plan.m
 - **R1** `IMeasurementSource` (= `IPmcSource`) als Wurzel; Intel PCM / AMD uProf / ARM PMU·PAPI / Wall-Clock = **gleichrangige** Implementierungen; Compile-Time-Selektor `COMDARE_MEASUREMENT_VENDOR`.
 - **EIN ABI-POD** (User-Entscheidung): `comdare_hw_counters_v1` wird per Major-Bump auf die volle Mess-Spaltenmenge erweitert; `pull_live_counters` (bereits im ABI vorhanden, nie befüllt) wird verkabelt.
 - **R2** Anknüpfung an f15_compare / Prüf-Dock / `tier_observe_trace_abi` / `measurement_writer` (kein Neubau) + P5: zwei Mess-Pfade → EINE autoritative Quelle.
-- **R3** `ArchEvaluator` am Prüf-Dock bewertet Tier-Binaries gegen das ISA-Kostenmodell (AMD/Intel).
+- **R3** `ArchEvaluator` am Prüf-Dock bewertet Lebewesen-Binaries gegen das ISA-Kostenmodell (AMD/Intel).
 - **R4/R5/R6** Build-Metaprogrammierung + Plattform-Fingerprint-Fit-Check (Binary passt zur Plattform? sonst Rebuild) + Precompile-Modus für ZIH (vorkompilierte Binaries mitbringen, dort nur run+measure).
 - **Ehrliche ZIH-Realität:** PCM/RAPL brauchen Admin → auf ZIH-Knoten gesperrt; dort Fallback auf PAPI/perf-user-level bzw. Wall-Clock, **Energie nicht erhebbar**. Volle PMC-Tiefe nur auf deinem Laptop.
 

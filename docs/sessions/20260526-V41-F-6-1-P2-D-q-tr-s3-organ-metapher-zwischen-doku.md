@@ -44,7 +44,7 @@ Doku 13 ist jetzt **9-teilig (A-I)**, ~1900 Zeilen:
 
 ---
 
-## §2 Kritischer User-Erkenntnis-Punkt: Achse ist Organ, nicht Tier
+## §2 Kritischer User-Erkenntnis-Punkt: Achse ist Organ, nicht Lebewesen
 
 ### §2.1 User-Direktive verbatim (2026-05-26 spaet)
 
@@ -52,9 +52,9 @@ Doku 13 ist jetzt **9-teilig (A-I)**, ~1900 Zeilen:
 > es ist nicht möglich diese Komponente in unserem derzeitigen Bottom Up Ansatz
 > später wieder zu verknüpfen."
 
-Plus elaborate Tier-Organ-Metapher: Achse = Organ (Sub-Aufgabe jedes Algorithmus),
+Plus elaborate Lebewesen-Organ-Metapher: Achse = Organ (Sub-Aufgabe jedes Algorithmus),
 Algorithmus = Komposition aller Achsen-Ausprägungen. Permutation = "genetisches
-Experiment am Tier".
+Experiment am Lebewesen".
 
 ### §2.2 Architektur-Diagnose
 
@@ -75,7 +75,7 @@ Struktur von axis_3.A:
 
 ### §2.3 Klarheit-Gewinn
 
-Die monolithischen Wrappers sind **bestimmte Permutations-Punkte** (= Tiere),
+Die monolithischen Wrappers sind **bestimmte Permutations-Punkte** (= Lebewesen),
 nicht Permutations-Elemente (= Organe). Sie enthalten implicit Node-Type +
 Layout + Allocator + Concurrency + Prefetch — Redundanz zu existing Achsen.
 
@@ -232,7 +232,7 @@ Analog HotComposition, MasstreeComposition, WormholeComposition, SurfComposition
 
 ### §6.2 Pflicht-Disziplin bei R2
 
-- **KEINE neuen monolithischen Wrappers** mehr in axis_03a (Tier-Anti-Pattern)
+- **KEINE neuen monolithischen Wrappers** mehr in axis_03a (Lebewesen-Anti-Pattern)
 - Wenn Sub-Achse fehlt (z.B. axis_03a `ByteByByteTraversal` existiert noch nicht): **NEU anlegen** als 3.A-Variante
 - Composition-Templates sind reine **using-Tupel** ohne eigene Methods
 - PermutationEngine kann ueber Cartesian der Sub-Achsen iterieren

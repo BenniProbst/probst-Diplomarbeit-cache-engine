@@ -123,9 +123,9 @@ User-Direktive geschrieben. Lehre: nicht Doku auf "spaeter" verschieben.
 
 ---
 
-## §4 Saeugetier-Anatomie-Tabelle (11 Mammal-Tiere)
+## §4 Saeugetier-Anatomie-Tabelle (11 Mammal-Lebewesen)
 
-| Tier | Composition | search_algo | Genus |
+| Lebewesen | Composition | search_algo | Genus |
 |---|---|---|---|
 | Art | ArtComposition | Array256 | Mammal |
 | Hot | HotComposition | VectorU8U8 | Mammal |
@@ -162,7 +162,7 @@ in Doku 14 §28+§29, Implementation noch nicht.
 | 5b | dlopen/LoadLibrary Module-Loader | ⏳ R5.E |
 | 5c | Gattungs-spezialisierte PermutationEngine | ⏳ R5.C.B (nach R5.D) |
 | 6 | Mess-Treiber + Welch-Test | ⏳ R6/V42 (B1+B3 done) |
-| 7 | F15-Auswertung schnellstes Tier | ⏳ R7/V42 |
+| 7 | F15-Auswertung schnellstes Lebewesen | ⏳ R7/V42 |
 
 **Anatomie-Saeule jetzt strukturell komplett — R5.D Builder-CLI startet als naechstes.**
 
@@ -218,7 +218,7 @@ Diff R3-Sprint-Start (809) → R5.C.A-Sprint-End (890): **+81 Tests** in 7 Sub-S
 - **R5.D** CacheEngineBuilder CLI + extern "C" ABI pro Permutations-Binary
 - **R5.E** dlopen/LoadLibrary Module-Loader (IAnatomyBase Factory)
 - **R6 (V42)** Mess-Treiber + Welch-Test ueber tausende Permutationen
-- **R7 (V42)** F15-Auswertung schnellstes Tier identifizieren
+- **R7 (V42)** F15-Auswertung schnellstes Lebewesen identifizieren
 - **V42 optional** Gattungs-Erweiterung (Sequence/Set/Adapter/View)
 
 ### Pending unbeeinflusst (Liste-Cleanup TODO)
@@ -236,7 +236,7 @@ Diff R3-Sprint-Start (809) → R5.C.A-Sprint-End (890): **+81 Tests** in 7 Sub-S
 **Neue Direktiven dieser Session:**
 - `[[anatomie-nur-achsen-und-observer]]` — KRITISCH: Anatomie nur Achsen + Observer (R5.A)
 - `[[3-kompositionale-joins-anatomie]]` — Pflicht-Reference fuer 3 Joins (R5.A)
-- `[[anatomie-gattungen]]` — 5 Gattungen + Tier-Metapher (R5.C)
+- `[[anatomie-gattungen]]` — 5 Gattungen + Lebewesen-Metapher (R5.C)
 - `[[gattungs-constraint-pruefling-merge]]` — KRITISCH: Cross-Genus-Joins unmoeglich (R5.C.A spaet)
 
 **Bestaetigt durch User-Direktiven dieser Session:**
@@ -450,7 +450,7 @@ IExecutionEngine                         ← R5.C.A2 NEUE WURZEL
 | 5b | CacheEngineBuilder CLI + extern "C" ABI | ⏳ R5.D |
 | 5c | dlopen/LoadLibrary Module-Loader | ⏳ R5.E |
 | 6 | VirusExecutionEngine fuer Graphen (erste Virus-Implementation) | ⏳ R6/V42 |
-| 7 | F15-Auswertung schnellstes Tier + Virus-Vergleich | ⏳ R7/V42 |
+| 7 | F15-Auswertung schnellstes Lebewesen + Virus-Vergleich | ⏳ R7/V42 |
 
 ---
 
@@ -504,7 +504,7 @@ Empfohlene Sprint-Reihenfolge nach Pre-Read:
 4. **R5.E** (groesserer Sprint): dlopen/LoadLibrary Module-Loader fuer .so/.dll-
    Iteration. Wechselt zwischen Anatomy-Loader und (V42) Virus-Loader.
 5. **R6 (V42)**: Mess-Treiber + Welch-Test ueber tausende Permutationen.
-6. **R7 (V42)**: F15-Auswertung schnellstes "Tier" + Virus-Vergleich.
+6. **R7 (V42)**: F15-Auswertung schnellstes "Lebewesen" + Virus-Vergleich.
 
 **Geschaetzte Restzeit bis F15-Forschungsmissions-Ergebnis:** 3-5 Wochen autonome Arbeit.
 
@@ -591,7 +591,7 @@ Frankenstein|Saeugetier|Vogel|Reptil|Wirbelloses|Pflanze|Tier`) in
 | `MammalAbiAdapter` (abi_adapter.hpp + 2 Test-Files) | umbenannt zu `SearchAlgorithmAbiAdapter` |
 | Test-Macro-Namen mit "Mammal" (z.B. `AllElevenAnatomiesAreMammal`) | OK (Test-internal Reasoning-Text) |
 | `Frankenstein` / `FrankensteinComposition` (test_v41_anatomy.cpp) | OK (Test-Demo-Helper, kein API) |
-| Kommentare "Saeugetier-Anatomie-Metapher" / "Tier-Organ-Metapher" | OK (didaktischer Doku-Text) |
+| Kommentare "Saeugetier-Anatomie-Metapher" / "Lebewesen-Organ-Metapher" | OK (didaktischer Doku-Text) |
 | Architektur-Doku 14 Sektions-Texte | OK (Metapher etabliert in Architektur-Doku) |
 
 **Konsequenz:** Nur 3 Code-Identifier-Stellen umzubenennen waren — Restliche
@@ -656,7 +656,7 @@ tatsaechlich grün.
 | 5b | CacheEngineBuilder CLI + extern "C" ABI | ⏳ R5.D |
 | 5c | dlopen/LoadLibrary Module-Loader | ⏳ R5.E |
 | 6 | Mess-Treiber + VirusExecutionEngine | ⏳ R6/V42 |
-| 7 | F15-Auswertung schnellstes Tier + Virus-Vergleich | ⏳ R7/V42 |
+| 7 | F15-Auswertung schnellstes Lebewesen + Virus-Vergleich | ⏳ R7/V42 |
 
 ---
 
