@@ -68,14 +68,14 @@ Damit ist Block AO ein TESTFALL fuer die Auto-Discovery, nicht eine Implementier
 - **P19 Saikkonen 2016 (Cluster C)**: 4 verschiedene CPUs (Athlon XP, Sempron 3000+, Atom N270, Core2 Quad) — alle mit 64B-Cacheline.
 - **P20 B-Tree adaptive (Cluster D)**: AMD Ryzen 9 7950X mit `L1=32KiB, L2=1MiB, L3=32MiB`, Frequency-Boost off bei 4.5 GHz.
 - **P21 Chen pB+-Tree (Cluster D)**: Compaq ES40 simuliert — 64 KB L1 D-Cache 2-way, 64 KB L1 I-Cache 2-way, 2 MB L2 direct-mapped, 64 Byte Lines; L1→L2 Miss=15 cycles, L1→Memory Miss=150 cycles.
-- **P22 Chen Fractal (Cluster D)**: dieselbe Compaq ES40 Spec wie P21; multi-tier Cache+Disk mit (T1, T_next) und (Disk Seek Time, IO Throughput).
+- **P22 Chen Fractal (Cluster D)**: dieselbe Compaq ES40 Spec wie P21; Multi-Ebenen Cache+Disk mit (T1, T_next) und (Disk Seek Time, IO Throughput).
 - **P25 Mahling (Cluster E)**: 7 CPU-Plattformen (EPYC-2/3, Xeon-E5/2/3, A64FX, Grace) mit konkreten lokalen/remote Latenzen (Tab. 1, 76-215 ns lokal, 130-760 ns remote).
 - **P26 Zhang Index (Cluster E)**: L1 (32KB), L2 (256KB-1MB), L3 (8-28MB), DRAM (200-220 cycles); Coffee Lake (E-2224G, 4 cores) + Cascade Lake (Gold 5218R, 20 cores).
 - **P27 Zhang Hierarchical (Cluster E)**: L1-I 32 KB 8-way 2 cycles 16 MSHRs, L1-D 48 KB 12-way 4 cycles 16 MSHRs, L2 512 KB 8-way 14 cycles 32 MSHRs, LLC 2 MB/core 16-way 50 cycles 64 MSHRs, Memory DDR4 2400 MHz.
 - **P28 Kuehn (Cluster E)**: 2× Intel Xeon Gold 6230, 2.1 GHz, 20 Cores each; L1D 32 KB, L2 1 MB, L3 27.5 MB; TLB Level 1: 64 entries, TLB Level 2: 1536 entries; 192 GB DDR4 RAM.
 - **P32 To-Stride TUD (Cluster F)**: Cascade Lake (Xeon Gold 6240R, L1D 32KiB, L2 1MiB, L3 35.75MiB, DTLB 64, STLB 1536) vs. Sapphire Rapids (Xeon Gold 9468, L1D 48KiB, L2 2MiB, L3 105MiB, DTLB 96, STLB 2048).
 
-**Multi-Tier-Verallgemeinerung (P22 + P26 + P28 konvergieren):** `ICacheTopology` muss mindestens 3-4 Tiers (L1/L2/L3/Memory) + TLB-Levels modellieren. P14 zeigt zusaetzlich, dass `ICacheLine.size_bytes` PRO LEVEL variieren kann (64B vs 128B). P25 zeigt heterogene Memory-Backends (DDR4/HBM2/HBM3/LPDDR5X/GDDR).
+**Multi-Ebenen-Verallgemeinerung (P22 + P26 + P28 konvergieren):** `ICacheTopology` muss mindestens 3-4 Ebenen (L1/L2/L3/Memory) + TLB-Levels modellieren. P14 zeigt zusaetzlich, dass `ICacheLine.size_bytes` PRO LEVEL variieren kann (64B vs 128B). P25 zeigt heterogene Memory-Backends (DDR4/HBM2/HBM3/LPDDR5X/GDDR).
 
 ---
 
@@ -351,7 +351,7 @@ Damit ist Block AO ein TESTFALL fuer die Auto-Discovery, nicht eine Implementier
 - **`OptimalNodeWidthHeuristic`** (P21 Chen) — w_optimal aus B = T1/T_next
 - **`OptimalPrefetchDistanceHeuristic`** (P21 Chen) — k_optimal aus B und w
 - **`OptimalChunkSizeHeuristic`** (P21 Chen) — c = ceil(B/(2m))
-- **`OptimalWidthMultiTierHeuristic`** (P22 Chen Fractal) — pro Tier separat
+- **`OptimalWidthMultiTierHeuristic`** (P22 Chen Fractal) — pro Ebene separat
 - **`OverflowVsOffloadHeuristic`** (P22 Chen Fractal) — Aggressive-Placement-Decision
 - **`DiskFirstVsCacheFirstHeuristic`** (P22 Chen Fractal) — Architektur-Wahl
 - **`ConflictMissPredictionHeuristic`** (P18 Saikkonen) — SetAssociativity, BlockHierarchy → erwartete Konflikt-Miss-Rate
@@ -579,7 +579,7 @@ IHeuristic
    - **i9-14900KS:** **NUR AVX2 verfuegbar (AVX-512 disabled in Hybrid-CPU!)** → SimdAccelerated Lookup mit AVX2 + PEXT/PDEP
    - Compile-Time Detection via `__AVX512F__` Macro
 
-3. **`Ddr5BandwidthHeuristic`** (NEU, aus P32 Multi-Tier-Stride):
+3. **`Ddr5BandwidthHeuristic`** (NEU, aus P32 Multi-Ebenen-Stride):
    - DDR5-5600 CL36 Dual-Channel → 153.6 GB/s aggregierte Bandwidth
    - Fuer AggSum-aehnliche Operationen: scalar-strided mit Partition-Count 30-42 (P32 Sapphire Rapids Wert direkt uebertragbar)
    - Stride-Size NICHT power-of-2 (P32 Empfehlung)

@@ -130,7 +130,7 @@ executing_engine/
 
 «concrete» CacheEngineStrategy : ICacheStrategy          (CACHE-ENGINE-OPTIMIERT)
    - konsumiert ILivePlatformModel + ICacheResidency + IHeuristic (Ebene 3)
-   - kann Read/Write umrouten auf besseres Cache-Tier
+   - kann Read/Write umrouten auf bessere Cache-Ebene
    - kann Page-Layout vor Write rearrangieren
 ```
 
@@ -301,7 +301,7 @@ executing_engine/search_engine/
 ### 3.4 IScheduler + IHeuristic (mit ~80 paper-abgeleiteten Heuristiken)
 
 ```
-«concept» IScheduler<S>           - Thread→Core + Task→Tier
+«concept» IScheduler<S>           - Thread→Core + Task→Ebene
 «concept» IHeuristic<H>           - Wert-Berechnungen auf dem Live-Modell
                                     Konkretisierungen siehe 13 (~80 Heuristiken aus 33 Papern)
 ```

@@ -19,7 +19,7 @@
 | Sektion | Inhalt |
 |---------|--------|
 | §1 Allokator-Basisdisziplin | Cache-Engine hat zwei parallele Bausteine-Stacks: **Such-Algorithmen** und **Allokationsmethoden**. Allokation wurde bisher nur als ein Achsen-Eintrag (Achse 6) behandelt — REV 7 hebt sie auf gleiche Ebene wie Suche. |
-| §2 Allokator-Paper-Tier-1-Liste | 21 Paper-Quellen + 14 produktive Allokatoren als Bausteine-Familien (mit Code-Quellen). |
+| §2 Allokator-Paper-Rang-1-Liste | 21 Paper-Quellen + 14 produktive Allokatoren als Bausteine-Familien (mit Code-Quellen). |
 | §3 C++ std-Container-Kompatibilitaet | Anforderungen an typsichere `std::allocator`-Erweiterung, `std::pmr::memory_resource`, Concurrency-Modelle (single-write/multi-read default, optional multi-write mit Cache-Page-Awareness via C++17-Locks). |
 | §4 ABI-stabiles C++23-Modul-Interface | Drei-Schichten-Hierarchie: `execution_engine` (erbt CacheEngine) → `search_engine` → konkrete Suchalgorithmen wie `prt_art`. Variadic-Template-Magie + Fingerprint-Hash. |
 | §5 CacheEngineBuilder als eigenstaendiges Programm | XML-Konfiguration zulaessiger CacheEngine-Rekombinationen + abhaengiger Suchalgorithmus-Builds. |
@@ -85,18 +85,18 @@ Recherche-Ergebnis (siehe §2.6 fuer Literatur):
 | `std::scoped_lock` (C++17) | Mehrere Mutexe atomar (deadlock-vermeidend) | Spezifisch fuer Multi-Page-Akquisition |
 | `std::lock_guard` (C++11) | Einzel-Mutex RAII | Pro-Page-Verwendung |
 | `std::unique_lock` (C++11) | Deferred/Try-Lock | Pro-Page mit Try-Logik |
-| Hierarchical Locks (User-Code) | Strict-Ordering pro Cache-Page-Tier | Explizite Cache-Page-Hierarchie-Verwendung |
+| Hierarchical Locks (User-Code) | Strict-Ordering pro Cache-Page-Ebene | Explizite Cache-Page-Hierarchie-Verwendung |
 | RCU (Task #104) | Wait-free Reader | Per-Cache-Line-Quiescent-State |
 
 REV-7-Direktive: **Pro Allokator-Baustein** waehlt der Builder zur Compile-Time aus einer Lock-Variante. Die Default-Variante ist `std::shared_mutex`. Cache-Page-aware Multi-Writer-Variante nutzt `std::scoped_lock` ueber pro-Page-Mutexe (vermeidet Cross-Page-Contention bei Multi-Threading).
 
 ---
 
-## 2. Allokator-Paper-Tier-1-Liste (REV 7 Pflicht-Recherche)
+## 2. Allokator-Paper-Rang-1-Liste (REV 7 Pflicht-Recherche)
 
 Diese Liste folgt der Konvention der 33 Suchalgorithmus-Paper (P01-P33). Allokator-Paper bekommen das Praefix `A`:
 
-### 2.1 Tier 1 — Foundational + Production-Grade
+### 2.1 Rang 1 — Foundational + Production-Grade
 
 | ID | Paper / Allokator | Autoren / Jahr / Venue | Quelle |
 |----|-------------------|------------------------|--------|
@@ -111,7 +111,7 @@ Diese Liste folgt der Konvention der 33 Suchalgorithmus-Paper (P01-P33). Allokat
 | **A09** | NUMAlloc: A Faster NUMA Memory Allocator | Liu, Berger — ISMM 2023 | https://dl.acm.org/doi/10.1145/3591195.3595276 |
 | **A10** | rpmalloc — Public Domain Lock-Free Thread-Caching Allocator | Mattias Jansson — kein formaler Paper, Code + Docs | https://github.com/mjansson/rpmalloc |
 
-### 2.2 Tier 2 — Modern + Specialized
+### 2.2 Rang 2 — Modern + Specialized
 
 | ID | Paper / Allokator | Autoren / Jahr / Venue | Quelle |
 |----|-------------------|------------------------|--------|
@@ -124,7 +124,7 @@ Diese Liste folgt der Konvention der 33 Suchalgorithmus-Paper (P01-P33). Allokat
 | **A17** | A Family of Fast and Memory Efficient Lock- and Wait-Free Reclamation | — PLDI 2024 | https://dl.acm.org/doi/10.1145/3658851 |
 | **A18** | Exgen-Malloc: Optimizing Single-threaded Applications | — arXiv 2510.10219, 2025 | https://arxiv.org/html/2510.10219v1 |
 
-### 2.3 Tier 3 — Kernel + Standard-Library + Classic
+### 2.3 Rang 3 — Kernel + Standard-Library + Classic
 
 | ID | Paper / Allokator | Autoren / Jahr / Venue | Quelle |
 |----|-------------------|------------------------|--------|
@@ -146,7 +146,7 @@ Diese Liste folgt der Konvention der 33 Suchalgorithmus-Paper (P01-P33). Allokat
 
 Analog 7 Suchalgorithmus-Achsen schlage ich 7 Allokator-Achsen vor:
 
-| Achse | Konzept | Beispiele aus Tier-1-Paper |
+| Achse | Konzept | Beispiele aus Rang-1-Paper |
 |-------|---------|-----------------------------|
 | AA1 — **Free-List-Topologie** | Wie sind freie Blocks organisiert? | A04 Free-List-Sharding (multiple lists per page), A07 Per-thread Caching, A19 Buddy-Tree |
 | AA2 — **Size-Class-Schema** | Wie werden Block-Groessen klassifiziert? | A02 Slab-per-Objektgroesse, A20 dlmalloc bins, A05 jemalloc size-classes, A08 scalloc spans |
@@ -712,7 +712,7 @@ Conversion ist **Pflicht-Bestandteil des Messmoduls**, aber wird **NIE waehrend 
 |-------|--------|--------|
 | **6.1** | (laeuft / abgeschlossen) PRT-ART REV 6 §5.17 | Pushed: `comdare-prt-art` development 002c326 |
 | **6.2.A** | Diese Doku-Phase (REV 7 mit hoechster Praezision) | **WIP** (dieses Dokument) |
-| **6.2.B** | Allokator-Paper-Recherche analog Phase 3.B (Tieflektuere alle 21 Tier-1 + Tier-2 + Tier-3 Paper) | TBD nach User-OK |
+| **6.2.B** | Allokator-Paper-Recherche analog Phase 3.B (Tieflektuere alle 21 Rang-1 + Rang-2 + Rang-3 Paper) | TBD nach User-OK |
 | **6.2.C** | Code-Quellen klonen + Lizenz-Analyse + Adapter-Skelette (analog Phase 4.B-detail) | TBD nach User-OK |
 | **6.2.D** | `Allokator_Matrix.txt` analog `Bausteine_Matrix.txt` mit AA1-AA7 Achsen | TBD nach User-OK |
 | **6.2.E** | Cache-Engine-Allokator-Bibliothek (Concept-Wurzeln + Konkretisierungen, std::allocator + std::pmr-konform) | TBD |

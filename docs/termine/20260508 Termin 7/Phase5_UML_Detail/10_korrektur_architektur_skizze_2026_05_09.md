@@ -244,7 +244,7 @@ Zwei Saeulen:
 «concept» ICacheStrategy<CS>                           (steuert Abbildung ISearchPage → ICachePage[s])
    - decides: cache_line_formation
    - decides: page_size
-   - decides: tier (L1/L2/L3/HBM/V-Cache, siehe Saeule B)
+   - decides: Ebene (L1/L2/L3/HBM/V-Cache, siehe Saeule B)
 ```
 
 ### 1.2 Strukturelle Anordnung mehrerer Such-Seiten
@@ -297,7 +297,7 @@ Zwei Saeulen:
 «concrete» CacheEngineStrategy : ICacheStrategy
    - ruft die CACHEENGINE auf, um Speicher-optimiert zu lesen/schreiben
    - konsultiert ILivePlatformModel + ICacheResidency + IHeuristic (Saeule B)
-   - kann Read/Write umrouten auf besseres Cache-Tier (L1/L2/L3/HBM/V-Cache)
+   - kann Read/Write umrouten auf bessere Cache-Ebene (L1/L2/L3/HBM/V-Cache)
    - kann Page-Layout vor Write rearrangieren (cache_line_formation aendern)
    - Forschungs-Pfad fuer F15-Vergleich
 
@@ -440,7 +440,7 @@ class comdare::prt_art<Key, Value>
 ### 2.6 Scheduling + Heuristik (auf dem Live-Modell)
 
 ```
-«concept» IScheduler<S>                                (entscheidet Thread-zu-Kern + Task-zu-Tier)
+«concept» IScheduler<S>                                (entscheidet Thread-zu-Kern + Task-zu-Ebene)
    - input: ILivePlatformModel
    - output: ICoreToThreadMap-Updates + ICacheResidency-Hints
    - reacts_to: SchedulingEvent (siehe ObserverRegistry)
@@ -502,7 +502,7 @@ DecisionLambdaTrees (siehe 02_uml_cache_engine.md §2)
 | **P19 Saikkonen 2016** | Layout-Invariante mit konstanten Update-Ops | ISearchPageStrategy mit Invariante-Checks |
 | **P20 B-Trees Are Back** | 6 Layout-Optimierungen + adaptive Selection | ISearchPagesStrategy „adaptive-layout-selection" + ICacheStrategy mit 6 Varianten |
 | **P21 Chen 2001** | Wider Nodes via Software-Prefetch | ICacheStrategy „wider-page-with-prefetch" + IHeuristic „prefetch-distance" |
-| **P22 Chen 2002 Fractal** | Multi-Granularitaet (Disk + Cache) | ICacheTopology Multi-Tier (analog Block AO Hybrid) |
+| **P22 Chen 2002 Fractal** | Multi-Granularitaet (Disk + Cache) | ICacheTopology Multi-Ebenen (analog Block AO Hybrid) |
 | **P23 Khan** | Runtime-adaptierte Prefetch-Distanz | IHeuristic „adaptive-prefetch-distance" + DecisionLambdaTree (PrefetchAdjustmentTree) |
 | **P24 Naderan-Tahan** | Negativer Befund (Prefetch hilft nicht immer) | IHeuristic „prefetch-effectiveness-detector" → DecisionLambdaTree „SKIP" |
 | **P25 Mahling** | Fill-Buffer-Aware + NUMA + Coroutined Prefetch | IHeuristic „fill-buffer-occupancy" + ICoreToThreadMap NUMA-Routing |

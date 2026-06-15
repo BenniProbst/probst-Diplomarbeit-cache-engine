@@ -135,7 +135,7 @@ EBENE 3 - CacheEngine + Plattform-Modell (Saeule B)
 
 «concrete» CacheEngineStrategy : ICacheStrategy          (CACHE-ENGINE-OPTIMIERT)
    - konsumiert ILivePlatformModel + ICacheResidency + IHeuristic (Ebene 3)
-   - kann Read/Write umrouten auf besseres Cache-Tier
+   - kann Read/Write umrouten auf bessere Cache-Ebene
    - kann Page-Layout vor Write rearrangieren via visit(layout_op)
 ```
 
@@ -458,7 +458,7 @@ NEU REV 5 (aus 13_md §7.1+§7.2 als zwingend identifiziert):
 18. «concept» IHardwareExtension Sub-Hierarchie - WAH/PLWAH/COMPAX, Hash-Lookup, MergeSort, RiscBaseISA, SSE/AVX/SGX/THUMB/NEON
 19. «concept» IMemoryDecorator (NFP)  - latency/throughput/transience/reliability/wearout (P33)
 20. «concept» IHeterogeneousAllocator (V-malloc) - heterogene Memory-Auswahl (P33)
-21. «concept» IMigrationPolicy        - transparente Migration zwischen Memory-Tiers (P33)
+21. «concept» IMigrationPolicy        - transparente Migration zwischen Memory-Ebenen (P33)
 22. «concept» ICompileTimeNegotiator  - Multi-Query Compile-Time-Negotiation (P33)
 23. «concept» IPipelineScheduler      - Operation-Pipelines mit Memory-Awareness (P33)
 24. «concept» IAccessPatternStrategy  - sequential/strided/simd (P32)
@@ -657,7 +657,7 @@ Phase 6 - EXECUTE  (REV 5.2 erweitert mit Visitor-Interface)
            ISearchPageStrategy konsumiert Recommendation:
              - Allocate? -> verwendet alloc_hint fuer neue Page
              - Reshape?  -> wechselt ISearchPageStructure
-             - Migrate?  -> verschiebt Daten zu anderem Tier
+             - Migrate?  -> verschiebt Daten zu anderer Ebene
              - Hint?     -> aktualisiert Prefetch-Distance
              - Abort?    -> bricht Operation ab + reportet Telemetry
 v
@@ -985,12 +985,12 @@ class ISearchPageStructure {
 | ID | Name | Atoms | F-Mapping | Hauptzweck |
 |----|------|-------|-----------|------------|
 | C1 | Cache-Layout-Engine | ~26 | F1/F3/F4/F8/F11-F17/F19/F22 | Knoten-Format + Footprint |
-| C2 | Cache-Pinning-Engine | ~10 | F18/F25 | NUMA/Core/Tier-Bindung |
+| C2 | Cache-Pinning-Engine | ~10 | F18/F25 | NUMA/Core/Ebenen-Bindung |
 | C3 | Cache-Prefetch-Engine | ~25 | F4/F5/F6/F23/F26 | Latenz-Hiding |
 | C4 | Cache-Coherence-Engine | ~12 | F18/F25/F26 | Reader/Writer-Sync |
 | C5 | Cache-Telemetry-Engine | ~22 | F23/F24 | Mess- + Probe |
-| C6 | Cache-Allocation-Engine | ~17 | F1/F12/F21/F27 | Allocator + Tier |
-| C7 | Cache-Migration-Engine | ~12 | F9/F19/F27 | Tier-Migration |
+| C6 | Cache-Allocation-Engine | ~17 | F1/F12/F21/F27 | Allocator + Ebene |
+| C7 | Cache-Migration-Engine | ~12 | F9/F19/F27 | Ebenen-Migration |
 | C8 | Cache-Encoding-Engine | ~28 | F2/F10/F16/F17/F19/F20 | Topologie + Bit-Packing |
 | C9 | Cache-Heuristik-Engine | ~73 | orthogonal | Decision + Cost-Modell |
 | C10 | Cache-Topologie-Engine | ~17 | Saeule-B-Adapter | Plattform-Probe + Discovery |
