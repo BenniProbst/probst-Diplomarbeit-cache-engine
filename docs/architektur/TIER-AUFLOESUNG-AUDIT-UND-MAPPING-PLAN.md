@@ -302,10 +302,13 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 
 **STAND 2026-06-15 (laufend):** ✅ erledigt+committet: **A1** (7) · **A2** (10) · **Doc 14** (67/72) ·
 **A3 Sessions KOMPLETT** (alle ~22 Session-Dateien: 12 ④Rang + anatomie-① + ③/④-Reste + Glob-Pattern + .txt).
-**A4 teilweise** (Commits `ddb1ccd`→`00bdca0`): `Phase5_UML_Detail/11`+`12_*taxonomie` (③ Ebene; CamelCase-Code-Identifier
+**A4 KOMPLETT** (Commits `ddb1ccd`→`43b3221`): `Phase5_UML_Detail/11`+`12_*taxonomie` (③ Ebene; CamelCase-Code-Identifier
 `MultiTierCacheStrategy`/`IMultiTierHeuristic`/`TierLatencies[]`/`DiskTierTraversalCommand`/… belassen) + HABICH-T7/T8
 + Termin-8-Trio (Arbeitsplan/-ergebnis/Praesentation; SOTA ④ Rang) + Allokator-Extraktionen A05/A14/A19/extract_termin5_6/Allokator_Matrix.txt
-(Size-Class-Tiers→**Stufen**, Cache-Latenz-Tiers→**Ebene**, SOTA-Tier-1/3→**Rang**) — Commits bis `f0537fe`.
+(Size-Class-Tiers→**Stufen**, Cache-Latenz-Tiers→**Ebene**, SOTA-Tier-1/3→**Rang**) — bis `f0537fe` · UML-Skizzen 10/13/20/22/24
+(`20e4e52`) · _extractions cluster_D/F + taxonomien/state_visitor/cache_engine_families (`23c6462`) · **alle `.drawio` REV3/3-NACHARB/5/6/7**
+(`43b3221`; ③ Cache/Memory/Multi-Tier→Ebene, ④ alle-Tier-3→Rang). **02_uml / REV4 / extract_rev4_delta = nur Code-Identifier, unverändert.**
+**➡ GESAMTER Haupt-Repo `docs/` KOMPLETT** (A1+A2+A3+A4+Doc 14); verbleibende `Tier` überall = bewusst belassene Code-Identifier/Zitate/Regexe.
 
 > ⚠️ **FALSE-POSITIVE-WARNUNG (Grep):** lowercase `tier` matcht als Teilstring in deutschen Wörtern — `Implemen`**`tier`**`ungs`,
 > `sor`**`tier`**`t`, `garan`**`tier`**`t`, `Hierarchie`, `Kalibrierung`, `Kategorie`… — das ist **NIE** das gemeinte Wort! Echt sind NUR:
@@ -314,11 +317,14 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 **Bewusst belassen** (überall gleich): Tierwelt-Zitate (verbatim), Audit-Regexe, Code-Identifier
 (`TierBasedMigration`, `tier_observe_trace_abi`, `EachPermutationIsDistinctTier`, `AllSixTiere…`,
 `tier_fill_level`), Code-Pfade (`thesis_tiere/`), Metapher-Code-Listen. Commits bis `8c4d2bf` + finale.
-**OFFEN:** **A4-Rest** (`Phase5_UML_Detail/`: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 ·
+**OFFEN (nur noch Submodule + Manuskript, Haupt-Repo `docs/` fertig):** **B** cache-engine-`docs/` (648!, Submodul-Koordination
+mit Implementierungs-Agent) · **C** prt-art-`docs/` (1) · **D** Manuskript-Metapher `thesis/` (DE+EN, danach `build.ps1` grün) ·
+**E** konz. Doku/Übergaben (`2026-06-15-*`) + `thesis/_archiv_entwurf1` (13). ~~A4-Rest~~ ✅ ERLEDIGT `43b3221`.
+<!-- HISTORIE A4-Rest (erledigt): `Phase5_UML_Detail/`: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 ·
 24_REV7 8 + **`.drawio` REV3-7** [REV5/6/7 je 25!] + `_paper_extractions` cluster_D 19/cluster_F 2 + `_rev5_extractions`
 cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 + `_paper_extractions_allocators` A05/A14/A19
 + `Allokator_Matrix.txt` 1) · **B** cache-engine-`docs/` (648!) · **C** prt-art-`docs/` · **D** Manuskript-Metapher
-(DE+EN) · **E** konz. Doku/Übergaben (`2026-06-15-*`).
+(DE+EN) · **E** konz. Doku/Übergaben (`2026-06-15-*`). -->
 
 > ⚠️ **SCOPE-KORREKTUR 2026-06-15 (User-Einwand):** Der erste Grep war `*.md` → **`.drawio`-Diagramme**
 > (`Phase5_UML_Detail/phase5_uml_detail_REV5/REV6/REV7.drawio` je **25** Vork., REV3/4 je 4-6) und **`.txt`**
@@ -349,7 +355,7 @@ cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 
 **A4 — Termine (historisch, gemischt):**
 - [x] `termine/20260515 Termin 8/` (Arbeitsplan · Praesentation · Arbeitsergebnis) ✅ ④ Rang (`00bdca0`)
 - [x] `termine/20260508 Termin 7/` (HABICH_TERMIN8_VORB · TERMIN7_ZUS) ✅ ④ Rang (`00bdca0`)
-- [~] `termine/20260508 Termin 7/Phase5_UML_Detail/`: [x] 11_cache_strategy + [x] 12_algorithmus (③ Ebene; `ddb1ccd`/`1d611d8`) — OFFEN: 02_uml 2 · 10_korrektur 5 · 13_saeule_b 4 · 20_REV3 3 · 22_REV5 7 · 24_REV7 8 + **`.drawio` REV3/REV3_NACHARB/REV4/REV5/REV6/REV7 (6/4/4/25/25/25)**
+- [x] `termine/20260508 Termin 7/Phase5_UML_Detail/` **KOMPLETT**: 11_cache_strategy + 12_algorithmus (③ Ebene; `ddb1ccd`/`1d611d8`) · 10_korrektur/13_saeule_b/20_REV3/22_REV5/24_REV7 (③ Ebene + ④ Rang; `20e4e52`) · _paper_extractions cluster_D/F + _rev5_extractions taxonomien/state_visitor/cache_engine_families (`23c6462`) · **`.drawio` REV3/REV3_NACHARB/REV5/REV6/REV7** (`43b3221`) — **02_uml, REV4, extract_rev4_delta = nur Code-Identifier (TierKind/TierPair/MultiTier*…), unverändert**
 - [x] `Allokator_Matrix.txt` (③ Stufe) · `_paper_extractions_allocators/` A05 + A14 + A19 (③ Stufe/Ebene + ④ Rang) · `_rev5_extractions/extract_termin5_6` (④ Rang) — `f0537fe`
 - [ ] **OFFEN** `_paper_extractions/` cluster_D 19 · cluster_F 2 (③ Memory-Ebene + Cluster F = Sync/RCU, viele lowercase-FALSE-POSITIVES — sorgfältig!) · `_rev5_extractions/` cache_engine_families 19 · state_visitor 15 · taxonomien 7 · rev4_delta 6
 
