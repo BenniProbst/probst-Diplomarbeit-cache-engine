@@ -131,7 +131,7 @@ Pro File die **7 Pflicht-Pruefungen** aus `20260524-V41-open-todos.md` §-3 V41.
 |------|----|----|----|----|----|----|----|
 | `byte_path.hpp` | **BASIS** | Inhalt (~46 LOC, BytePath-Cursor fuer Konsumieren von Bytes) | nein | nein | nein | nein | implicit |
 | `cache_line_aligned_layout.hpp` | **BASIS** | Inhalt (~49 LOC, 64-Byte-aligned Utilities) | nein | nein | nein | nein | implicit |
-| `multi_level_layout.hpp` | **BASIS** | Inhalt (~64 LOC, L1/L2/L3-Tier-Resolver) | nein | nein | nein | `cache_line_aligned_layout.hpp`, `virtual_offset_address.hpp` | implicit |
+| `multi_level_layout.hpp` | **BASIS** | Inhalt (~64 LOC, L1/L2/L3-Ebenen-Resolver) | nein | nein | nein | `cache_line_aligned_layout.hpp`, `virtual_offset_address.hpp` | implicit |
 | `virtual_offset_address.hpp` | **BASIS** | Inhalt (~54 LOC, TLB-inspirierte Adressierung) | nein | nein | nein | nein | implicit |
 
 **Achsen-Bewertung:** ALLE 4 sind BASIS. Cache-aligned Memory-Layout-Strategien sind generisch verwendbar. Migration nach `cache_engine/layout/`.

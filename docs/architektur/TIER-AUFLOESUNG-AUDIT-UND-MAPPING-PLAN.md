@@ -300,10 +300,13 @@ Aufgabenstellung bleibt metaphern-/achsenfrei (nur „Entwurfsbestandteil").
 > unangetastet** (sie *beschreibt* die Umstellung). `TIER3` (ZIH-HPC, Großschreibung) nie ändern;
 > Bio-Beinamen (Säugetier/Vogel/…) bleiben.
 
-**STAND 2026-06-15 (laufend):** ✅ erledigt + committet: **A1** (7 konzeptionelle Dateien) ·
-**A2** (10 Rang/Ebene) · **Doc 14** (Metapher-Hauptquelle, 67/72; 5 bewusst belassen = 2 Code-Ident.
-+ Audit-Regex + 2 verbatim Tierwelt-Zitate). Commits `9ce5c97` (A2) · `42b7d8d` (A1) · `f5f2b55` (Doc 14).
-**OFFEN:** **A3** Sessions · **A4** Termine (~44 Dateien, ~208 Vorkommen, gemischt ①/④/③) · **B**
+**STAND 2026-06-15 (laufend):** ✅ erledigt+committet: **A1** (7) · **A2** (10) · **Doc 14** (67/72) ·
+**A3 Sessions Teil 1** = 12 ④Rang-Sessions (20260514-* + 4700) + 20260524 (① „Tiere"→Lebewesen) +
+20260525 (③ L1/L2/L3-Ebenen-Resolver). Commits bis `374c18c`.
+**OFFEN:** **A3-Rest** = ① Lebewesen-Sessions (20260526-P2-D-q/R3-skelett/R3-R5A/R3-R5CA · 20260527-R5CA3/
+R7-6-b · 20260531 · CROSS_REFS) — Tier→Lebewesen; **belassen**: Tierwelt-Zitate, Audit-Regexe, Code-Ident.
+`TierBasedMigration`/`tier_observe_trace_abi`, Tabellenspalte „Tier"→„Lebewesen", „schnellstes Tier"→„…Lebewesen".
+· **A4** Termine (~16 Dateien; bes. 11/12_*taxonomie je 17, _paper/_rev5_extractions je 15-19) · **B**
 cache-engine-`docs/` · **C** prt-art-`docs/` · **D** Manuskript-Metapher (DE+EN) · **E** konz. Doku/Übergaben.
 
 ### A. Haupt-Repo `docs/` (356 Vorkommen / 60 Dateien; Stand-Grep 2026-06-15)
