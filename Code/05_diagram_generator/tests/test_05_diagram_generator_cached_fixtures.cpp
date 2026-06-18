@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace dg = comdare::da::diagram_generator;
 namespace fs = std::filesystem;
@@ -116,6 +117,62 @@ TEST(Stufe05Pipeline, WriteThroughputByWorkloadFromCachedCsv) {
 
     std::error_code ec;
     fs::remove(out, ec);
+}
+
+// L-c (2026-06-18) — WIDE-Schema (';') header-getriebener Parser + Surface-Emitter.
+namespace {
+void write_sample_wide_csv(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    // Minimal-Header mit allen Pflichtspalten + 1 Füll-Spalte (Reihenfolge-agnostisch testen).
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;"
+      << "op_scan_p50_ns;op_rmw_p50_ns;filler;workload;two_phase_valid\n";
+    f << "search_algo=k_ary/mapping=direct;42.5;30.0;25.0;28.0;500.0;40.0;x;ycsb_c;1\n";
+    f << "search_algo=eytzinger/mapping=direct;55.0;33.0;20.0;31.0;600.0;45.0;x;ycsb_a;1\n";
+    // two_phase_valid=0 → muss von der Aggregation ignoriert werden.
+    f << "search_algo=k_ary/mapping=direct;9999.0;1.0;1.0;1.0;1.0;1.0;x;ycsb_c;0\n";
+}
+}  // namespace
+
+TEST(Stufe05Pipeline, ParseWideCsvHeaderDriven) {
+    auto p = fs::temp_directory_path() / "lc_wide_sample.csv";
+    write_sample_wide_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_EQ(rows.size(), 3u);
+    EXPECT_EQ(rows[0].search_algo, "k_ary");      // Prefix-Extraktion
+    EXPECT_EQ(rows[1].search_algo, "eytzinger");
+    EXPECT_FALSE(rows[0].search_algo.empty());
+    EXPECT_GT(rows[0].ns_per_op, 0.0);
+    EXPECT_DOUBLE_EQ(rows[0].op_scan_p50_ns, 500.0);
+    EXPECT_TRUE(rows[0].two_phase_valid);
+    EXPECT_FALSE(rows[2].two_phase_valid);
+    std::error_code ec;
+    fs::remove(p, ec);
+}
+
+TEST(Stufe05Pipeline, WriteSurfaceHeatmapFromWide) {
+    auto p = fs::temp_directory_path() / "lc_wide_sample2.csv";
+    write_sample_wide_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto out = fs::temp_directory_path() / "lc_surface_nsperop.tex";
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "ns_per_op", "en"),
+              dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "addplot3"));
+    EXPECT_TRUE(file_contains(out, "colormap/viridis"));
+
+    auto out3d = fs::temp_directory_path() / "lc_surface3d_nsperop.tex";
+    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out3d, rows, "ns_per_op", "en"),
+              dg::status_ok);
+    EXPECT_TRUE(file_contains(out3d, "addplot3[surf]"));
+    EXPECT_TRUE(file_contains(out3d, "zmode=log"));
+
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(out3d, ec);
+    fs::remove(p, ec);
 }
 
 TEST(Stufe05Pipeline, EmptyInputReturnsEmpty) {

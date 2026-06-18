@@ -122,4 +122,59 @@ load_csv_with_workload_used(std::filesystem::path const& csv_path);
     std::span<CsvRow const> rows,
     PageConstraints const& cnst = {});
 
+// ─────────────────────────────────────────────────────────────────────────────
+// L-c (2026-06-18) — WIDE-Schema-Reader + Surface/Heatmap je Interface-Funktion
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Das Mess-System (cache-engine run_lazy_150 / lazy_csv_header) emittiert das
+// ';'-getrennte WIDE-Schema (154 Spalten). Der Parser ist HEADER-GETRIEBEN (Spalten
+// per Name aufgelöst, Reihenfolge-/Breite-agnostisch → robust gegen additive
+// Schema-Erweiterungen); 1:1 portiert aus 04_csv_to_latex/csv_to_latex.cpp:158-201.
+// Extrahiert werden nur die L-c-auswertungs-relevanten Felder (ns_per_op-Gesamt +
+// die 5 Interface-Funktions-p50: insert/lookup/erase/scan/rmw).
+
+struct WideMeasurementRow {
+    std::string  binary_id;          // volle statische Rekombination (19 Achsen-Belegungen)
+    std::string  search_algo;        // aus binary_id extrahiert (führendes "search_algo=<wert>/")
+    std::string  workload;           // Lastprofil-id (eigene Spalte "workload")
+    double       ns_per_op        = 0.0;  // Gesamt-Latenz (alle Operationen gemischt)
+    double       op_insert_p50_ns = 0.0;  // Interface-Funktions-Latenzen (p50, nearest-rank)
+    double       op_lookup_p50_ns = 0.0;
+    double       op_erase_p50_ns  = 0.0;
+    double       op_scan_p50_ns   = 0.0;
+    double       op_rmw_p50_ns    = 0.0;
+    bool         two_phase_valid  = false;  // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
+};
+
+// HEADER-GETRIEBENER ';'-Parser (Spalten per Name → Index-Map). Pflichtspalten:
+// binary_id, ns_per_op, workload, two_phase_valid + die 5 op_*_p50_ns.
+// Rückgabe: status_ok | status_io_error | status_empty_input (Header/Parse-Fehler).
+[[nodiscard]] int parse_wide_csv(std::filesystem::path const& in,
+                                 std::vector<WideMeasurementRow>& out_rows);
+
+// Aggregiert die (search_algo × workload)-WIDE-Matrix zu einer Heatmap/Surface des
+// gewählten z-Feldes (nearest-rank-Median je Zelle, NUR two_phase_valid==true). Zeilen
+// (y) = distinct search_algo (sortiert), Spalten (x) = distinct workload (sortiert).
+//   z_field ∈ {"ns_per_op", "op_insert_p50_ns", "op_lookup_p50_ns", "op_erase_p50_ns",
+//              "op_scan_p50_ns", "op_rmw_p50_ns"}.
+// Beim scan-Surface (z_field=="op_scan_p50_ns") werden die No-Op-Scan-Profile
+// "ycsb_e" und "lp_range_scan" ausgeschlossen (für Scan invalide).
+// Befüllt HeatmapData und ruft das vorhandene write_heatmap (view={0}{90}, viridis).
+[[nodiscard]] int write_surface_search_algo_x_workload(
+    std::filesystem::path const& out,
+    std::span<WideMeasurementRow const> rows,
+    std::string const& z_field,
+    std::string const& lang = "en",
+    PageConstraints const& cnst = {});
+
+// Additive echte-3D-Variante (view={45}{30}, \addplot3[surf], z LOG-skaliert wegen
+// ~14000× Workload-Spanne). Gleiche Aggregation wie write_surface_search_algo_x_workload,
+// nur andere pgfplots-Projektion. Bricht write_heatmap NICHT.
+[[nodiscard]] int write_surface3d_search_algo_x_workload(
+    std::filesystem::path const& out,
+    std::span<WideMeasurementRow const> rows,
+    std::string const& z_field,
+    std::string const& lang = "en",
+    PageConstraints const& cnst = {});
+
 }  // namespace comdare::da::diagram_generator

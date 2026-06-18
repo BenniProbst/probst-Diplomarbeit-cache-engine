@@ -8,10 +8,52 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace dg = comdare::da::diagram_generator;
 
 int main(int argc, char* argv[]) {
+    // L-c (2026-06-18) — Surface/Heatmap je Interface-Funktion aus der WIDE-Matrix.
+    //   diagram-generator --surface=<z_field> <wide.csv> <out.tex> [--lang=de|en]
+    //                     [--3d] [--body-only]
+    //   z_field ∈ {ns_per_op, op_insert_p50_ns, op_lookup_p50_ns, op_erase_p50_ns,
+    //              op_scan_p50_ns, op_rmw_p50_ns}.
+    // --3d → echte 3D-Surface (view={45}{30}, z log-skaliert); sonst 2D-Heatmap (viridis).
+    if (argc >= 4 && std::string{argv[1]}.rfind("--surface=", 0) == 0) {
+        std::string const z_field = std::string{argv[1]}.substr(10);
+        char const* in_csv  = argv[2];
+        char const* out_tex = argv[3];
+        std::string lang = "en";
+        bool want_3d = false;
+        dg::PageConstraints cnst;
+        for (int i = 4; i < argc; ++i) {
+            std::string a{argv[i]};
+            if (a.rfind("--lang=", 0) == 0) lang = a.substr(7);
+            else if (a == "--3d") want_3d = true;
+            else if (a == "--body-only") cnst.body_only = true;
+        }
+
+        std::vector<dg::WideMeasurementRow> rows;
+        int const prc = dg::parse_wide_csv(in_csv, rows);
+        if (prc != 0) {
+            std::cerr << "parse_wide_csv failed: " << prc << " (10=io,11=empty/header/parse)\n";
+            return prc;
+        }
+        if (rows.empty()) { std::cerr << "parse_wide_csv: 0 rows\n"; return 11; }
+
+        int const rc = want_3d
+            ? dg::write_surface3d_search_algo_x_workload(out_tex, rows, z_field, lang, cnst)
+            : dg::write_surface_search_algo_x_workload(out_tex, rows, z_field, lang, cnst);
+        if (rc != 0) {
+            std::cerr << "write_surface failed: " << rc << "\n";
+            return rc;
+        }
+        std::cout << "diagram-generator: surface z=" << z_field
+                  << (want_3d ? " [3d]" : " [heatmap]")
+                  << " from " << rows.size() << " wide rows -> " << out_tex << "\n";
+        return 0;
+    }
+
     // V22.1 — neuer Subcommand --by-workload erzeugt gruppierten Bar-Chart aus
     // V20.3-konformer measurements.csv (16 Spalten inkl. workload_used).
     if (argc >= 4 && std::string{argv[1]} == "--by-workload") {
@@ -35,7 +77,10 @@ int main(int argc, char* argv[]) {
                   << "       (Demo: liest 1. Spalte = label, total_cycles = value)\n"
                   << "       (--body-only: nur tikzpicture, ohne figure/caption — Caller wrappt)\n"
                   << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
-                  << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n";
+                  << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n"
+                  << "  oder: diagram-generator --surface=<z_field> <wide.csv> <output.tex> [--lang=de|en] [--3d] [--body-only]\n"
+                  << "       (L-c: WIDE-Matrix → Surface/Heatmap je Interface-Funktion;\n"
+                  << "        z_field: ns_per_op|op_insert_p50_ns|op_lookup_p50_ns|op_erase_p50_ns|op_scan_p50_ns|op_rmw_p50_ns)\n";
         return 1;
     }
     std::ifstream f{argv[1]};
