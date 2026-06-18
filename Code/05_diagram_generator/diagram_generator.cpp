@@ -159,6 +159,7 @@ int write_heatmap(std::filesystem::path const& out_path,
     f << "    view={0}{90},\n";
     f << "    colorbar,\n";
     f << "    colormap/viridis,\n";
+    f << "    mesh/cols=" << nx << ",\n";   // PFLICHT fuer matrix plot* (sonst 'matrix input=image' unsupported)
     f << "    xtick={0,1,...," << (nx - 1) << "},\n";
     f << "    ytick={0,1,...," << (ny - 1) << "},\n";
     if (!data.x_labels.empty()) {
