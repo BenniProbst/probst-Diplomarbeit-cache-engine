@@ -2,10 +2,13 @@
 #include "csv_to_latex.hpp"
 
 #include <algorithm>
+#include <cstdint>
+#include <cstdio>
 #include <fstream>
 #include <map>
 #include <set>
 #include <sstream>
+#include <tuple>
 #include <unordered_map>
 
 namespace comdare::da::csv_to_latex {
@@ -260,6 +263,449 @@ int write_bias_matrix_latex(std::filesystem::path const& out, std::span<TierWork
     f << "\\caption{" << escape_latex(caption) << "}\n";
     f << "\\label{" << label << "}\n";
     f << "\\end{table}\n";
+    return f.good() ? status_ok : status_io_error;
+}
+
+// ── L-d / L-e Implementierung (Phase L, 2026-06-18) ──────────────────────────────────────────────────────
+
+namespace {
+
+// Parst die binary_id (achse=wert/achse=wert/...) in eine (achse→wert)-Map. Wert = alles zwischen '=' und
+// dem nächsten '/'. Wert-Präfixe (z.B. memory_layout=memory_layout_soa) bleiben unangetastet — verglichen
+// wird die volle Wert-Zeichenkette, sodass Geschwister-Identität exakt ist.
+[[nodiscard]] std::map<std::string, std::string> parse_axis_tuple(std::string const& binary_id) {
+    std::map<std::string, std::string> axes;
+    std::size_t pos = 0;
+    while (pos < binary_id.size()) {
+        std::size_t const slash = binary_id.find('/', pos);
+        std::size_t const end   = (slash == std::string::npos) ? binary_id.size() : slash;
+        std::string_view token{binary_id.data() + pos, end - pos};
+        std::size_t const eq = token.find('=');
+        if (eq != std::string_view::npos) {
+            axes.emplace(std::string{token.substr(0, eq)}, std::string{token.substr(eq + 1)});
+        }
+        if (slash == std::string::npos) break;
+        pos = slash + 1;
+    }
+    return axes;
+}
+
+// p25/median/p75 (nearest-rank, konsistent zu nearest_rank_median) auf einer Kopie der Stichprobe.
+struct Quartiles { double p25 = 0.0, p50 = 0.0, p75 = 0.0; };
+[[nodiscard]] Quartiles nearest_rank_quartiles(std::vector<double> v) {
+    Quartiles q;
+    if (v.empty()) return q;
+    std::sort(v.begin(), v.end());
+    auto pick = [&v](double p) {
+        std::size_t rank = static_cast<std::size_t>(p * static_cast<double>(v.size() - 1) + 0.5);
+        if (rank >= v.size()) rank = v.size() - 1;
+        return v[rank];
+    };
+    q.p25 = pick(0.25);
+    q.p50 = pick(0.50);
+    q.p75 = pick(0.75);
+    return q;
+}
+
+// 2 No-Op-Scan-Profile: bei scan-bezogenen Diffs auszuschließen (19 valide Workloads).
+[[nodiscard]] bool is_noop_scan_workload(std::string const& w) {
+    return w == "ycsb_e" || w == "lp_range_scan";
+}
+
+// Auswahl der Interface-Funktions-p50-Spalte einer Zeile (oder ns_per_op).
+[[nodiscard]] double interface_value(WideFullRow const& r, std::string_view fn) {
+    if (fn == "insert")    return r.op_insert_p50;
+    if (fn == "lookup")    return r.op_lookup_p50;
+    if (fn == "erase")     return r.op_erase_p50;
+    if (fn == "scan")      return r.op_scan_p50;
+    if (fn == "rmw")       return r.op_rmw_p50;
+    return r.ns_per_op;  // "ns_per_op"
+}
+
+}  // anonymous namespace
+
+int parse_wide_csv_full(std::filesystem::path const& in, std::vector<WideFullRow>& out_rows) {
+    std::ifstream f{in};
+    if (!f) return status_io_error;
+    std::string header_line;
+    if (!std::getline(f, header_line)) return status_parse_error;
+
+    // HEADER-GETRIEBEN (wie parse_wide_csv): Spalten per NAME auflösen → robust gegen Schema-Breite/-Ordnung.
+    auto const header = split_semicolons(header_line);
+    std::unordered_map<std::string, std::size_t> col;
+    for (std::size_t i = 0; i < header.size(); ++i) col.emplace(header[i], i);
+    char const* required[] = {"binary_id", "ns_per_op", "workload", "two_phase_valid",
+                              "op_insert_p50_ns", "op_lookup_p50_ns", "op_erase_p50_ns",
+                              "op_scan_p50_ns", "op_rmw_p50_ns"};
+    for (char const* name : required)
+        if (col.find(name) == col.end()) return status_parse_error;
+
+    std::string line;
+    while (std::getline(f, line)) {
+        if (line.empty() || line == "\r") continue;
+        auto cols = split_semicolons(line);
+        if (cols.size() != header.size()) return status_parse_error;
+        try {
+            WideFullRow r;
+            r.binary_id       = cols[col["binary_id"]];
+            r.workload        = cols[col["workload"]];
+            r.two_phase_valid = (cols[col["two_phase_valid"]] == "1");
+            r.ns_per_op       = std::stod(cols[col["ns_per_op"]]);
+            r.op_insert_p50   = std::stod(cols[col["op_insert_p50_ns"]]);
+            r.op_lookup_p50   = std::stod(cols[col["op_lookup_p50_ns"]]);
+            r.op_erase_p50    = std::stod(cols[col["op_erase_p50_ns"]]);
+            r.op_scan_p50     = std::stod(cols[col["op_scan_p50_ns"]]);
+            r.op_rmw_p50      = std::stod(cols[col["op_rmw_p50_ns"]]);
+            r.axes            = parse_axis_tuple(r.binary_id);
+            out_rows.push_back(std::move(r));
+        } catch (std::exception const&) {
+            return status_parse_error;
+        }
+    }
+    return status_ok;
+}
+
+std::vector<ExchangeAggregate>
+aggregate_exchange(std::span<WideFullRow const> rows, std::vector<SiblingPairCount>& out_counts) {
+    out_counts.clear();
+
+    // 1) Pro (binary_id × workload) den Median je Interface-Funktion + ns_per_op über alle Repetitionen
+    //    bilden — NUR two_phase_valid. Erst danach Geschwister-Paare bilden (Paar = 2 Lebewesen, 1 Workload).
+    //    Schlüssel: binary_id → (workload → (fn → Median)).
+    std::map<std::string, std::map<std::string, std::map<std::string, double>>> cell;
+    {
+        std::map<std::tuple<std::string, std::string, std::string>, std::vector<double>> acc;
+        // Achsen-Tupel je binary_id einmalig cachen.
+        for (auto const& r : rows) {
+            if (!r.two_phase_valid) continue;
+            for (auto fn : kInterfaceFns)
+                acc[{r.binary_id, r.workload, std::string{fn}}].push_back(interface_value(r, fn));
+            acc[{r.binary_id, r.workload, "ns_per_op"}].push_back(r.ns_per_op);
+        }
+        for (auto& [key, samples] : acc) {
+            auto const& [bid, wl, fn] = key;
+            cell[bid][wl][fn] = nearest_rank_median(std::move(samples));
+        }
+    }
+
+    // binary_id → Achsen-Tupel (genau ein Tupel je distinkter binary_id).
+    std::map<std::string, std::map<std::string, std::string>> tuple_of;
+    for (auto const& r : rows) tuple_of.emplace(r.binary_id, r.axes);
+
+    // 2) Je VARIABLER Achse a: alle binary_id-Paare finden, deren Tupel sich NUR in a unterscheiden.
+    //    Aggregat-Schlüssel: (axis, v_from, v_to, fn) → Liste rel-Deltas + Liste abs-Deltas (über Paare×WL).
+    //    v_from/v_to lexikographisch geordnet (kanonische Richtung → ein Eintrag je ungeordnetem Paar).
+    struct Acc { std::vector<double> rel; std::vector<double> abs_; };
+    std::map<std::tuple<std::string, std::string, std::string, std::string>, Acc> agg;
+
+    std::vector<std::string> ids;
+    ids.reserve(tuple_of.size());
+    for (auto const& [bid, _] : tuple_of) ids.push_back(bid);
+
+    for (auto axis_sv : kVariableAxes) {
+        std::string const axis{axis_sv};
+        std::size_t pair_count = 0;
+        for (std::size_t i = 0; i < ids.size(); ++i) {
+            for (std::size_t j = i + 1; j < ids.size(); ++j) {
+                auto const& ta = tuple_of[ids[i]];
+                auto const& tb = tuple_of[ids[j]];
+                // Geschwister-Test: identisch in ALLEN Achsen außer genau a (und a verschieden).
+                bool sibling = true;
+                for (auto const& [k, va] : ta) {
+                    auto const it = tb.find(k);
+                    if (it == tb.end()) { sibling = false; break; }
+                    if (k == axis) { if (va == it->second) { sibling = false; break; } }
+                    else            { if (va != it->second) { sibling = false; break; } }
+                }
+                if (!sibling) continue;
+                ++pair_count;
+
+                std::string vf = ta.at(axis), vt = tb.at(axis);
+                bool swap_dir = (vf > vt);
+                if (swap_dir) std::swap(vf, vt);
+                std::string const& id_from = swap_dir ? ids[j] : ids[i];
+                std::string const& id_to   = swap_dir ? ids[i] : ids[j];
+
+                // Diff je Workload × Interface-Fn (+ ns_per_op). v_from = Bezugswert des rel-Deltas.
+                auto const& cf = cell[id_from];
+                auto const& ct = cell[id_to];
+                for (auto const& [wl, fns_from] : cf) {
+                    auto const wit = ct.find(wl);
+                    if (wit == ct.end()) continue;
+                    auto const& fns_to = wit->second;
+                    bool const noop_scan = is_noop_scan_workload(wl);
+                    auto consider = [&](std::string const& fn) {
+                        // scan-bezogene Diffs in den 2 No-Op-Scan-Profilen ausschließen.
+                        if (noop_scan && fn == "scan") return;
+                        auto const a_it = fns_from.find(fn);
+                        auto const b_it = fns_to.find(fn);
+                        if (a_it == fns_from.end() || b_it == fns_to.end()) return;
+                        double const base = a_it->second, other = b_it->second;
+                        double const d = other - base;
+                        auto& slot = agg[{axis, vf, vt, fn}];
+                        slot.abs_.push_back(d);
+                        if (base > 0.0) slot.rel.push_back(d / base);   // Zero-Baseline → kein rel-Delta
+                    };
+                    for (auto fn : kInterfaceFns) consider(std::string{fn});
+                    consider("ns_per_op");
+                }
+            }
+        }
+        out_counts.push_back({axis, pair_count});
+    }
+
+    std::vector<ExchangeAggregate> out;
+    out.reserve(agg.size());
+    for (auto& [key, a] : agg) {
+        auto const& [axis, vf, vt, fn] = key;
+        ExchangeAggregate e;
+        e.axis = axis; e.value_from = vf; e.value_to = vt; e.interface_fn = fn;
+        e.pair_workload_samples = a.rel.size();
+        e.median_abs_delta_ns   = nearest_rank_median(a.abs_);
+        auto const q = nearest_rank_quartiles(a.rel);
+        e.median_rel_delta = q.p50;
+        e.iqr_rel_delta    = q.p75 - q.p25;
+        out.push_back(std::move(e));
+    }
+    return out;
+}
+
+namespace {
+
+// Vorbehalt-Klassifikation der 4 variablen Achsen (Plan-Default-Auflösung L-d.2).
+[[nodiscard]] bool axis_has_q2_caveat(std::string const& axis) {
+    return axis == "node_type" || axis == "memory_layout";   // Q2-Schritt-4-Beschattung möglich
+}
+
+// Anzeige-Reihenfolge der Interface-Funktionen in der Tabelle.
+inline constexpr std::array<std::string_view, 6> kFnOrder = {
+    "ns_per_op", "insert", "lookup", "erase", "scan", "rmw"};
+
+[[nodiscard]] int fn_rank(std::string const& fn) {
+    for (std::size_t i = 0; i < kFnOrder.size(); ++i)
+        if (kFnOrder[i] == fn) return static_cast<int>(i);
+    return 99;
+}
+
+}  // anonymous namespace
+
+int write_exchange_longtables(std::filesystem::path const& out_dir,
+                              std::span<ExchangeAggregate const> aggs,
+                              std::span<SiblingPairCount const> counts,
+                              std::string const& lang) {
+    bool const de = (lang == "de");
+
+    // Paar-Zahl je Achse für die Fußnote nachschlagen.
+    std::map<std::string, std::size_t> pairs_by_axis;
+    for (auto const& c : counts) pairs_by_axis[c.axis] = c.pairs;
+
+    for (auto axis_sv : kVariableAxes) {
+        std::string const axis{axis_sv};
+        std::filesystem::path const out = out_dir / ("ld_exchange_" + axis + ".tex");
+        std::ofstream f{out};
+        if (!f) return status_io_error;
+
+        // Zeilen dieser Achse sammeln + sortieren (v_from, v_to, fn-Reihenfolge).
+        std::vector<ExchangeAggregate> rows;
+        for (auto const& a : aggs) if (a.axis == axis) rows.push_back(a);
+        std::sort(rows.begin(), rows.end(), [](ExchangeAggregate const& x, ExchangeAggregate const& y) {
+            if (x.value_from != y.value_from) return x.value_from < y.value_from;
+            if (x.value_to   != y.value_to)   return x.value_to   < y.value_to;
+            return fn_rank(x.interface_fn) < fn_rank(y.interface_fn);
+        });
+
+        bool const caveat = axis_has_q2_caveat(axis);
+        std::string const conf = caveat
+            ? (de ? "Vorbehalt" : "caveat")
+            : (de ? "am wenigsten konfundiert" : "least confounded");
+
+        f << "% AUTO-GENERATED durch csv_to_latex::write_exchange_longtables (L-d Achsen-Austauschbarkeit; "
+          << "achse=" << axis << "; lang=" << lang << ")\n";
+        f << "% Zeile = (Wertepaar v->v', Interface-Funktion); Delta = Median(rel. Delta ns/op bzgl. v) "
+          << "ueber Geschwister-Paare x valide Lastprofile; nur two_phase_valid.\n";
+        if (caveat)
+            f << "% VORBEHALT-ACHSE: Q2-Schritt-4 search_organ_-Beschattung -> Apparat-Artefakt moeglich "
+              << "(Plan-Default, NICHT entfernen).\n";
+        else
+            f << "% Diese Achse ist am wenigsten konfundiert (search_algo/prefetch).\n";
+
+        std::string const cap = de
+            ? ("Achsen-Austauschbarkeit: " + escape_latex(axis)
+               + " (Geschwister-Paar-Diffs, Median rel.\\ $\\Delta$ ns/op bzgl.\\ $v$; "
+               + std::to_string(pairs_by_axis[axis]) + " Geschwister-Paare; Konfundierung: " + conf + ")")
+            : ("Axis exchangeability: " + escape_latex(axis)
+               + " (sibling-pair diffs, median rel.\\ $\\Delta$ ns/op w.r.t.\\ $v$; "
+               + std::to_string(pairs_by_axis[axis]) + " sibling pairs; confounding: " + conf + ")");
+
+        std::string const colhead = de
+            ? "$v$ & $v'$ & Funktion & Median abs.\\ $\\Delta$ (ns) & Median rel.\\ $\\Delta$ & IQR rel. & "
+              "$n$ & Diagnose \\\\"
+            : "$v$ & $v'$ & function & median abs.\\ $\\Delta$ (ns) & median rel.\\ $\\Delta$ & IQR rel. & "
+              "$n$ & diagnostic \\\\";
+
+        // Diagnose-Flag: verschiedene binary_id = nachweislich verschiedener Organ-Pfad (Audit-Meta-Lehre 3).
+        std::string const diag_distinct = de ? "verschiedener Organ-Pfad" : "distinct organ path";
+        std::string const diag_caveat   = de
+            ? "Vorbehalt: Q2-Schritt-4 search\\_organ\\_-Beschattung, Apparat-Artefakt moeglich"
+            : "caveat: Q2 step-4 search\\_organ\\_ shadowing, apparatus artefact possible";
+
+        f << "\\begin{scriptsize}\n";
+        f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{2.2cm} "
+          << ">{\\raggedright\\arraybackslash}p{2.2cm} l r r r r "
+          << ">{\\raggedright\\arraybackslash}p{3.4cm}@{}}\n";
+        f << "\\caption{" << cap << "}\\label{tab:ld:exchange:" << axis << "}\\\\\n";
+        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+        f << "\\multicolumn{8}{c}{\\tablename\\ \\thetable{} -- "
+          << (de ? "Fortsetzung" : "continued") << "}\\\\\n";
+        f << "\\toprule\n" << colhead << "\n\\midrule\n\\endhead\n";
+        f << "\\midrule\n\\multicolumn{8}{r}{"
+          << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page") << "}\\\\\n\\endfoot\n";
+        f << "\\bottomrule\n\\endlastfoot\n";
+
+        for (auto const& a : rows) {
+            // n=0 (kein definiertes rel-Delta, z.B. scan-only-Zellen mit durchweg 0-Baseline) NICHT als
+            // „+0.000"-Zeile zeigen — das wäre irreführend (suggeriert „kein Unterschied"). Der scan-Vorbehalt
+            // ist in der L-e-Limitierungs-Tabelle ehrlich dokumentiert (kein Befund verfällt still).
+            if (a.pair_workload_samples == 0) continue;
+            // Diagnose-Spalte: immer „verschiedener Organ-Pfad" + bei Vorbehalt-Achsen zusätzlich Marker.
+            std::string diag = diag_distinct;
+            if (caveat) diag += "; " + diag_caveat;
+            f << escape_latex(a.value_from) << " & " << escape_latex(a.value_to)
+              << " & " << escape_latex(a.interface_fn)
+              << " & " << static_cast<std::int64_t>(a.median_abs_delta_ns >= 0
+                            ? a.median_abs_delta_ns + 0.5 : a.median_abs_delta_ns - 0.5);
+            // rel-Delta + IQR mit fester Genauigkeit (Dezimalpunkt; sprachneutral belassen).
+            char buf[64];
+            std::snprintf(buf, sizeof(buf), "%+.3f", a.median_rel_delta);
+            f << " & " << buf;
+            std::snprintf(buf, sizeof(buf), "%.3f", a.iqr_rel_delta);
+            f << " & " << buf
+              << " & " << a.pair_workload_samples
+              << " & " << diag << " \\\\\n";
+        }
+
+        f << "\\end{longtable}\n\\end{scriptsize}\n";
+        if (!f.good()) return status_io_error;
+    }
+    return status_ok;
+}
+
+int write_limitations_longtable(std::filesystem::path const& out, std::string const& lang) {
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    bool const de = (lang == "de");
+
+    f << "% AUTO-GENERATED durch csv_to_latex::write_limitations_longtable (L-e ehrliche Limitierung; lang="
+      << lang << ")\n";
+    f << "% EINE longtable, je Zeile EIN nicht-gefixter Vorbehalt. Zeile 1 = Cache-Misses/PMC (Kernmetrik).\n";
+
+    std::string const cap = de
+        ? "Ehrliche Limitierungen: nicht-gefixte Vorbehalte (kein Befund verf\\\"allt still)"
+        : "Honest limitations: unresolved caveats (no finding silently lapses)";
+    std::string const colhead = de
+        ? "\\# & Vorbehalt & Status / Konsequenz \\\\"
+        : "\\# & Caveat & Status / consequence \\\\";
+
+    f << "\\begin{scriptsize}\n";
+    f << "\\begin{longtable}{@{}r >{\\raggedright\\arraybackslash}p{5.0cm} "
+      << ">{\\raggedright\\arraybackslash}p{8.0cm}@{}}\n";
+    f << "\\caption{" << cap << "}\\label{tab:le:limitierung}\\\\\n";
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    f << "\\multicolumn{3}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
+      << "}\\\\\n\\toprule\n" << colhead << "\n\\midrule\n\\endhead\n";
+    f << "\\midrule\n\\multicolumn{3}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
+      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+
+    // Zeilen als (Vorbehalt, Status)-Paare. Reihenfolge bindend: Zeile 1 = Cache-Misses/PMC.
+    struct Row { std::string caveat; std::string status; };
+    std::vector<Row> rows;
+
+    if (de) {
+        rows.push_back({
+            "\\textbf{Cache-Misses (Kernmetrik):} L1/L2/L3 + dTLB + Coherence + Energy = 0 / nicht erhoben",
+            "NullPmcSource, available=false; Intel-PCM-Windows-Treiber + Linux-PAPI ausstehend (\\#26/P4); "
+            "Cache-Verhalten nur indirekt \\\"uber Wall-Clock-Proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
+        rows.push_back({
+            "15 gepinnte Achsen = 0 Austauschbarkeits-Belege",
+            "Nur 4 Achsen variieren (search\\_algo, node\\_type, memory\\_layout, prefetch). Gepinnt (je 1 Wert): "
+            "cache\\_traversal, mapping, path\\_compression, allocator, concurrency, serialization, telemetry, "
+            "value\\_handle, isa, index\\_organization, io\\_dispatch, migration\\_policy, filter, queuing\\_q1, "
+            "queuing\\_q2."});
+        rows.push_back({
+            "Observer-Proben-Z\\\"ahler ($\\ast$\\_find/$\\ast$\\_probe/$\\ast$\\_get) by-design $\\approx 1$",
+            "Erwartetes Verhalten, kein Phantom: je Lookup eine Probe. Keine Aussage \\\"uber interne Iterationen."});
+        rows.push_back({
+            "Honest-0 inaktiver Sub-Features gepinnter Strategien",
+            "concurrency/migration/io/value\\_handle melden 0 (Feature inaktiv), nicht Mess-Fehler."});
+        rows.push_back({
+            "Wall-Clock nicht bit-reproduzierbar",
+            "Seed steuert Keys (deterministisch), NICHT das CPU-Timing; Wall-Clock variiert lauf-zu-lauf."});
+        rows.push_back({
+            "RC-Dimension nur nominal",
+            "K1: $\\times 18 \\to \\times 3$ degeneriert; RC-Achse liefert keine volle Auspr\\\"agungs-Breite."});
+        rows.push_back({
+            "2/21 Scan-Profile = No-Op (ausgeschlossen)",
+            "ycsb\\_e und lp\\_range\\_scan f\\\"uhren keinen echten Scan aus; bei scan-Diffs ausgeschlossen "
+            "(19 valide Lastprofile)."});
+        rows.push_back({
+            "Insert-Profile messen Upserts; stat\\_$\\ast$-Spalten enthalten Load-Phase",
+            "Insert-Pfad ist faktisch Upsert; die stat\\_$\\ast$-Z\\\"ahler akkumulieren die Lade-Phase mit."});
+        rows.push_back({
+            "prefetch misst Key-Werte als Pseudo-Adressen (K9)",
+            "Prefetch-Achse interpretiert Schl\\\"ussel-Werte als Adressen; kein echter Speicher-Prefetch."});
+        rows.push_back({
+            "node\\_type + memory\\_layout: Q2-Schritt-4-Beschattung",
+            "Apparat-Artefakt m\\\"oglich (search\\_organ\\_-Beschattung); search\\_algo + prefetch sind am "
+            "wenigsten konfundiert."});
+        rows.push_back({
+            "memory\\_layout-Effekt teils sub-noise",
+            "Teil der Layout-Differenzen liegt unter dem Mess-Rauschen $\\to$ PMC extern-gated (\\#26)."});
+    } else {
+        rows.push_back({
+            "\\textbf{Cache misses (core metric):} L1/L2/L3 + dTLB + coherence + energy = 0 / not collected",
+            "NullPmcSource, available=false; Intel PCM Windows driver + Linux PAPI pending (\\#26/P4); "
+            "cache behaviour only indirect via wall-clock proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
+        rows.push_back({
+            "15 pinned axes = 0 exchangeability evidence",
+            "Only 4 axes vary (search\\_algo, node\\_type, memory\\_layout, prefetch). Pinned (1 value each): "
+            "cache\\_traversal, mapping, path\\_compression, allocator, concurrency, serialization, telemetry, "
+            "value\\_handle, isa, index\\_organization, io\\_dispatch, migration\\_policy, filter, queuing\\_q1, "
+            "queuing\\_q2."});
+        rows.push_back({
+            "Observer probe counters ($\\ast$\\_find/$\\ast$\\_probe/$\\ast$\\_get) by design $\\approx 1$",
+            "Expected behaviour, no phantom: one probe per lookup. Says nothing about internal iterations."});
+        rows.push_back({
+            "Honest-0 of inactive sub-features of pinned strategies",
+            "concurrency/migration/io/value\\_handle report 0 (feature inactive), not a measurement error."});
+        rows.push_back({
+            "Wall-clock not bit-reproducible",
+            "Seed drives keys (deterministic), NOT CPU timing; wall-clock varies run-to-run."});
+        rows.push_back({
+            "RC dimension only nominal",
+            "K1: $\\times 18 \\to \\times 3$ degenerated; RC axis does not provide full value breadth."});
+        rows.push_back({
+            "2/21 scan profiles = no-op (excluded)",
+            "ycsb\\_e and lp\\_range\\_scan perform no real scan; excluded for scan diffs (19 valid workloads)."});
+        rows.push_back({
+            "Insert profiles measure upserts; stat\\_$\\ast$ columns include load phase",
+            "The insert path is effectively an upsert; the stat\\_$\\ast$ counters also accumulate the load phase."});
+        rows.push_back({
+            "prefetch measures key values as pseudo-addresses (K9)",
+            "The prefetch axis interprets key values as addresses; no real memory prefetch."});
+        rows.push_back({
+            "node\\_type + memory\\_layout: Q2 step-4 shadowing",
+            "Apparatus artefact possible (search\\_organ\\_ shadowing); search\\_algo + prefetch are the "
+            "least confounded."});
+        rows.push_back({
+            "memory\\_layout effect partly sub-noise",
+            "Part of the layout differences lies below the measurement noise $\\to$ PMC externally gated (\\#26)."});
+    }
+
+    int n = 1;
+    for (auto const& r : rows)
+        f << n++ << " & " << r.caveat << " & " << r.status << " \\\\\n";
+
+    f << "\\end{longtable}\n\\end{scriptsize}\n";
     return f.good() ? status_ok : status_io_error;
 }
 
