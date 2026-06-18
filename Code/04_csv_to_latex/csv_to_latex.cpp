@@ -660,6 +660,23 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
         rows.push_back({
             "memory\\_layout-Effekt teils sub-noise",
             "Teil der Layout-Differenzen liegt unter dem Mess-Rauschen $\\to$ PMC extern-gated (\\#26)."});
+        // Audit A1 / MINOR-MESS-04+09 (uint16-Saturierung): die SEKUNDAEREN, gepinnten Indirektions-Organe
+        // (cache\_traversal/mapping) tragen schmalere key\_type/slot\_index\_type als der uint64-Primaerschluessel;
+        // im tier\_insert wird der uint64-Key per static\_cast dorthin verengt → bei records > Typbreite kollidieren
+        // ihre Beobachter-Eintraege (low-bits). Ehrlich, weil diese Achsen gepinnt + Observer-only sind (s. Zeile 2/4).
+        rows.push_back({
+            "Sekund\\\"are Indirektions-Organe (cache\\_traversal/mapping): uint16-Schl\\\"ussel-S\\\"attigung",
+            "Der uint64-Prim\\\"arschl\\\"ussel wird beim Auto-Koppeln in die schmaleren slot\\_index/key\\_type-Felder "
+            "der GEPINNTEN cache\\_traversal-/mapping-Organe verengt (low-bits); bei records $>$ Typbreite kollidieren "
+            "deren Observer-Eintr\\\"age. Betrifft NICHT den Prim\\\"ar-Lookup (uint64); reine Observer-Limitierung "
+            "gepinnter Achsen (vgl. Zeile 2/4)."});
+        // Audit A1 / MINOR-MESS-02-Rest: nach aussen propagiertes OOM wird jetzt two\_phase\_valid=false (gefixt);
+        // ein vom Tier INTERN via catch(...) verschluckter OOM bleibt als ehrliche Restlimitierung.
+        rows.push_back({
+            "Kapsel-internes (verschlucktes) OOM in einer Mess-Op",
+            "Nach aussen geworfenes OOM entwertet die Messung jetzt hart (two\\_phase\\_valid=false). Ein vom "
+            "Tier-Code INTERN per catch(...) gefangenes OOM (z.B. defensiver Memento-Verzicht) ist von aussen nicht "
+            "beobachtbar → konservativ als Restvorbehalt dokumentiert, nicht erzwungen."});
     } else {
         rows.push_back({
             "\\textbf{Cache misses (core metric):} L1/L2/L3 + dTLB + coherence + energy = 0 / not collected",
@@ -699,6 +716,19 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
         rows.push_back({
             "memory\\_layout effect partly sub-noise",
             "Part of the layout differences lies below the measurement noise $\\to$ PMC externally gated (\\#26)."});
+        // Audit A1 / MINOR-MESS-04+09 (EN pendant of the uint16 saturation caveat).
+        rows.push_back({
+            "Secondary indirection organs (cache\\_traversal/mapping): uint16 key saturation",
+            "The uint64 PRIMARY key is narrowed (static\\_cast) into the smaller slot\\_index/key\\_type fields of the "
+            "PINNED cache\\_traversal/mapping organs when auto-coupling (low bits); for records $>$ type width their "
+            "observer entries collide. Does NOT affect the primary lookup (uint64); observer-only limitation of "
+            "pinned axes (cf. rows 2/4)."});
+        // Audit A1 / MINOR-MESS-02 residual (EN pendant).
+        rows.push_back({
+            "Capsule-internal (swallowed) OOM in a measured op",
+            "An OOM propagated outward now hard-invalidates the measurement (two\\_phase\\_valid=false). An OOM caught "
+            "INTERNALLY by tier code via catch(...) (e.g. defensive memento skip) is not observable from outside $\\to$ "
+            "documented as a conservative residual caveat, not forced."});
     }
 
     int n = 1;
