@@ -2,7 +2,6 @@
 # Im Repo immer LF, auf Windows KEINE CRLF-Konversion beim Checkout → beendet die
 # "LF will be replaced by CRLF"-Warnungsflut.
 * text=auto eol=lf
-
 # Binär — niemals als Text behandeln/normalisieren (LaTeX-/Mess-/Archiv-Artefakte).
 *.bin   binary
 *.pdf   binary
@@ -22,8 +21,8 @@
 *.o     binary
 *.obj   binary
 *.pdb   binary
-
 # Windows-Skripte brauchen CRLF.
 *.bat   text eol=crlf
 *.cmd   text eol=crlf
 *.ps1   text eol=crlf
+Messdaten-Backup/*.csv filter=lfs diff=lfs merge=lfs -text

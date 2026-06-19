@@ -1,0 +1,537 @@
+{
+  "file": "tier150_measurements_INDEX320_cowfix-v1_2026-06-18.csv",
+  "rows_valid": 120960,
+  "binaries": 320,
+  "varied_axes": [
+    "search_algo",
+    "node_type",
+    "memory_layout",
+    "prefetch"
+  ],
+  "fixed_axes": {
+    "cache_traversal": "linear_fanout",
+    "mapping": "direct_placement",
+    "path_compression": "path_compression_none",
+    "allocator": "std_malloc",
+    "concurrency": "concurrency_none",
+    "serialization": "serialization_raw_binary",
+    "telemetry": "telemetry_leaf_only_counter",
+    "value_handle": "value_handle_inline",
+    "isa": "isa_amd64",
+    "index_organization": "index_org_heap",
+    "io_dispatch": "io_in_memory_only",
+    "migration_policy": "migration_none",
+    "filter": "filter_bloom",
+    "queuing_q1": "no_buffer",
+    "queuing_q2": "eager_flush"
+  },
+  "global_median_ns": 15760.5,
+  "outlier_pct": 9.13,
+  "marginal": {
+    "search_algo": {
+      "median": {
+        "k_ary": 6843.9,
+        "eytzinger": 13635.5,
+        "interpolation": 16439.6,
+        "linear_scan": 22505.6
+      },
+      "rel_to_best": {
+        "k_ary": 1.0,
+        "eytzinger": 1.992,
+        "interpolation": 2.402,
+        "linear_scan": 3.288
+      },
+      "n": {
+        "eytzinger": 30240,
+        "interpolation": 30240,
+        "k_ary": 30240,
+        "linear_scan": 30240
+      }
+    },
+    "node_type": {
+      "median": {
+        "node16": 12704.1,
+        "node48": 14672.6,
+        "node256": 16524.6,
+        "node4": 20094.7
+      },
+      "rel_to_best": {
+        "node16": 1.0,
+        "node48": 1.155,
+        "node256": 1.301,
+        "node4": 1.582
+      },
+      "n": {
+        "node16": 30240,
+        "node256": 30240,
+        "node4": 30240,
+        "node48": 30240
+      }
+    },
+    "memory_layout": {
+      "median": {
+        "memory_layout_packed_bitmap": 13865.1,
+        "memory_layout_aosoa": 15801.8,
+        "memory_layout_cache_line_aligned": 16255.1,
+        "memory_layout_aos_strict": 16292.5,
+        "memory_layout_soa": 16828.7
+      },
+      "rel_to_best": {
+        "memory_layout_packed_bitmap": 1.0,
+        "memory_layout_aosoa": 1.14,
+        "memory_layout_cache_line_aligned": 1.172,
+        "memory_layout_aos_strict": 1.175,
+        "memory_layout_soa": 1.214
+      },
+      "n": {
+        "memory_layout_aos_strict": 24192,
+        "memory_layout_aosoa": 24192,
+        "memory_layout_cache_line_aligned": 24192,
+        "memory_layout_packed_bitmap": 24192,
+        "memory_layout_soa": 24192
+      }
+    },
+    "prefetch": {
+      "median": {
+        "prefetch_none": 15378.8,
+        "prefetch_hardware": 15652.1,
+        "prefetch_path_oriented": 15722.6,
+        "prefetch_distance_estimator": 16301.4
+      },
+      "rel_to_best": {
+        "prefetch_none": 1.0,
+        "prefetch_hardware": 1.018,
+        "prefetch_path_oriented": 1.022,
+        "prefetch_distance_estimator": 1.06
+      },
+      "n": {
+        "prefetch_distance_estimator": 30240,
+        "prefetch_hardware": 30240,
+        "prefetch_none": 30240,
+        "prefetch_path_oriented": 30240
+      }
+    }
+  },
+  "controlled": {
+    "node_type": {
+      "median": {
+        "node16": 2769.1,
+        "node4": 2796.8,
+        "node48": 2834.1,
+        "node256": 2988.8
+      },
+      "rel_to_best": {
+        "node16": 1.0,
+        "node4": 1.01,
+        "node48": 1.023,
+        "node256": 1.079
+      },
+      "n": {
+        "node16": 1080,
+        "node256": 1080,
+        "node4": 1080,
+        "node48": 1080
+      }
+    },
+    "memory_layout": {
+      "median": {
+        "memory_layout_aos_strict": 2804.1,
+        "memory_layout_cache_line_aligned": 2815.1,
+        "memory_layout_soa": 2818.3,
+        "memory_layout_packed_bitmap": 2844.4,
+        "memory_layout_aosoa": 2846.7
+      },
+      "rel_to_best": {
+        "memory_layout_aos_strict": 1.0,
+        "memory_layout_cache_line_aligned": 1.004,
+        "memory_layout_soa": 1.005,
+        "memory_layout_packed_bitmap": 1.014,
+        "memory_layout_aosoa": 1.015
+      },
+      "n": {
+        "memory_layout_aos_strict": 864,
+        "memory_layout_aosoa": 864,
+        "memory_layout_cache_line_aligned": 864,
+        "memory_layout_packed_bitmap": 864,
+        "memory_layout_soa": 864
+      }
+    },
+    "prefetch": {
+      "median": {
+        "prefetch_distance_estimator": 2802.3,
+        "prefetch_none": 2804.1,
+        "prefetch_hardware": 2821.7,
+        "prefetch_path_oriented": 2862.3
+      },
+      "rel_to_best": {
+        "prefetch_distance_estimator": 1.0,
+        "prefetch_none": 1.001,
+        "prefetch_hardware": 1.007,
+        "prefetch_path_oriented": 1.021
+      },
+      "n": {
+        "prefetch_distance_estimator": 1080,
+        "prefetch_hardware": 1080,
+        "prefetch_none": 1080,
+        "prefetch_path_oriented": 1080
+      }
+    }
+  },
+  "stats": {
+    "search_algo": [
+      {
+        "a": "k_ary",
+        "b": "interpolation",
+        "p": 0.0,
+        "delta": -0.718,
+        "med_a": 2824.0,
+        "med_b": 3665.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "large"
+      },
+      {
+        "a": "k_ary",
+        "b": "eytzinger",
+        "p": 0.0,
+        "delta": -0.921,
+        "med_a": 2824.0,
+        "med_b": 4674.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "large"
+      },
+      {
+        "a": "k_ary",
+        "b": "linear_scan",
+        "p": 0.0,
+        "delta": -0.999,
+        "med_a": 2824.0,
+        "med_b": 11490.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "large"
+      },
+      {
+        "a": "interpolation",
+        "b": "eytzinger",
+        "p": 0.0,
+        "delta": -0.438,
+        "med_a": 3665.0,
+        "med_b": 4674.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "medium"
+      },
+      {
+        "a": "interpolation",
+        "b": "linear_scan",
+        "p": 0.0,
+        "delta": -0.974,
+        "med_a": 3665.0,
+        "med_b": 11490.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "large"
+      },
+      {
+        "a": "eytzinger",
+        "b": "linear_scan",
+        "p": 0.0,
+        "delta": -0.88,
+        "med_a": 4674.0,
+        "med_b": 11490.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "large"
+      }
+    ],
+    "node_type": [
+      {
+        "a": "node16",
+        "b": "node4",
+        "p": 1.3977057200520449e-07,
+        "delta": -0.131,
+        "med_a": 2769.0,
+        "med_b": 2797.0,
+        "p_holm": 2.7954114401040897e-07,
+        "sig": true,
+        "mag": "negligible"
+      },
+      {
+        "a": "node16",
+        "b": "node48",
+        "p": 0.0,
+        "delta": -0.223,
+        "med_a": 2769.0,
+        "med_b": 2834.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "small"
+      },
+      {
+        "a": "node16",
+        "b": "node256",
+        "p": 0.0,
+        "delta": -0.441,
+        "med_a": 2769.0,
+        "med_b": 2989.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "medium"
+      },
+      {
+        "a": "node4",
+        "b": "node48",
+        "p": 0.00012690834133977091,
+        "delta": -0.095,
+        "med_a": 2797.0,
+        "med_b": 2834.0,
+        "p_holm": 0.00012690834133977091,
+        "sig": true,
+        "mag": "negligible"
+      },
+      {
+        "a": "node4",
+        "b": "node256",
+        "p": 0.0,
+        "delta": -0.343,
+        "med_a": 2797.0,
+        "med_b": 2989.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "medium"
+      },
+      {
+        "a": "node48",
+        "b": "node256",
+        "p": 0.0,
+        "delta": -0.282,
+        "med_a": 2834.0,
+        "med_b": 2989.0,
+        "p_holm": 0.0,
+        "sig": true,
+        "mag": "small"
+      }
+    ],
+    "memory_layout": [
+      {
+        "a": "memory_layout_aos_strict",
+        "b": "memory_layout_cache_line_aligned",
+        "p": 0.3811084321277942,
+        "delta": -0.024,
+        "med_a": 2804.0,
+        "med_b": 2815.0,
+        "p_holm": 0.9442524810002495,
+        "sig": false,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_aos_strict",
+        "b": "memory_layout_soa",
+        "p": 0.13788729521301057,
+        "delta": -0.041,
+        "med_a": 2804.0,
+        "med_b": 2818.0,
+        "p_holm": 0.5515491808520423,
+        "sig": false,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_aos_strict",
+        "b": "memory_layout_packed_bitmap",
+        "p": 4.416902831039238e-05,
+        "delta": -0.113,
+        "med_a": 2804.0,
+        "med_b": 2844.0,
+        "p_holm": 0.000353352226483139,
+        "sig": true,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_aos_strict",
+        "b": "memory_layout_aosoa",
+        "p": 9.875793471891825e-08,
+        "delta": -0.148,
+        "med_a": 2804.0,
+        "med_b": 2847.0,
+        "p_holm": 9.875793471891825e-07,
+        "sig": true,
+        "mag": "small"
+      },
+      {
+        "a": "memory_layout_cache_line_aligned",
+        "b": "memory_layout_soa",
+        "p": 0.4886486343721801,
+        "delta": -0.019,
+        "med_a": 2815.0,
+        "med_b": 2818.0,
+        "p_holm": 0.9442524810002495,
+        "sig": false,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_cache_line_aligned",
+        "b": "memory_layout_packed_bitmap",
+        "p": 0.0008493876522877031,
+        "delta": -0.093,
+        "med_a": 2815.0,
+        "med_b": 2844.0,
+        "p_holm": 0.0050963259137262185,
+        "sig": true,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_cache_line_aligned",
+        "b": "memory_layout_aosoa",
+        "p": 4.739927823349532e-06,
+        "delta": -0.127,
+        "med_a": 2815.0,
+        "med_b": 2847.0,
+        "p_holm": 4.265935041014579e-05,
+        "sig": true,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_soa",
+        "b": "memory_layout_packed_bitmap",
+        "p": 0.006782124348285068,
+        "delta": -0.075,
+        "med_a": 2818.0,
+        "med_b": 2844.0,
+        "p_holm": 0.03391062174142534,
+        "sig": true,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_soa",
+        "b": "memory_layout_aosoa",
+        "p": 8.991636809718706e-05,
+        "delta": -0.109,
+        "med_a": 2818.0,
+        "med_b": 2847.0,
+        "p_holm": 0.0006294145766803094,
+        "sig": true,
+        "mag": "negligible"
+      },
+      {
+        "a": "memory_layout_packed_bitmap",
+        "b": "memory_layout_aosoa",
+        "p": 0.31475082700008317,
+        "delta": -0.028,
+        "med_a": 2844.0,
+        "med_b": 2847.0,
+        "p_holm": 0.9442524810002495,
+        "sig": false,
+        "mag": "negligible"
+      }
+    ],
+    "prefetch": [
+      {
+        "a": "prefetch_distance_estimator",
+        "b": "prefetch_none",
+        "p": 0.5775105642872207,
+        "delta": 0.014,
+        "med_a": 2802.0,
+        "med_b": 2804.0,
+        "p_holm": 0.7902752800879691,
+        "sig": false,
+        "mag": "negligible"
+      },
+      {
+        "a": "prefetch_distance_estimator",
+        "b": "prefetch_hardware",
+        "p": 0.39513764004398455,
+        "delta": -0.021,
+        "med_a": 2802.0,
+        "med_b": 2822.0,
+        "p_holm": 0.7902752800879691,
+        "sig": false,
+        "mag": "negligible"
+      },
+      {
+        "a": "prefetch_distance_estimator",
+        "b": "prefetch_path_oriented",
+        "p": 1.0781078252364296e-09,
+        "delta": -0.152,
+        "med_a": 2802.0,
+        "med_b": 2862.0,
+        "p_holm": 5.390539126182148e-09,
+        "sig": true,
+        "mag": "small"
+      },
+      {
+        "a": "prefetch_none",
+        "b": "prefetch_hardware",
+        "p": 0.15575166132325036,
+        "delta": -0.035,
+        "med_a": 2804.0,
+        "med_b": 2822.0,
+        "p_holm": 0.46725498396975107,
+        "sig": false,
+        "mag": "negligible"
+      },
+      {
+        "a": "prefetch_none",
+        "b": "prefetch_path_oriented",
+        "p": 4.551914400963142e-12,
+        "delta": -0.172,
+        "med_a": 2804.0,
+        "med_b": 2862.0,
+        "p_holm": 2.731148640577885e-11,
+        "sig": true,
+        "mag": "small"
+      },
+      {
+        "a": "prefetch_hardware",
+        "b": "prefetch_path_oriented",
+        "p": 3.505361778621818e-08,
+        "delta": -0.137,
+        "med_a": 2822.0,
+        "med_b": 2862.0,
+        "p_holm": 1.4021447114487273e-07,
+        "sig": true,
+        "mag": "negligible"
+      }
+    ]
+  },
+  "seg": {
+    "coverage_pct_of_wallclock": 33.6,
+    "median_share_pct": {
+      "mapping": 15.9,
+      "cache_traversal": 15.7,
+      "filter": 2.3,
+      "node_type": 0.8,
+      "search_algo": 0.2,
+      "index_organization": 0.2,
+      "isa": 0.2,
+      "memory_layout": 0.1,
+      "io_dispatch": 0.1,
+      "serialization": 0.1,
+      "value_handle": 0.1,
+      "path_compression": 0.0,
+      "concurrency": 0.0,
+      "queuing_q2": 0.0,
+      "queuing_q1": 0.0,
+      "telemetry": 0.0,
+      "prefetch": 0.0,
+      "migration_policy": 0.0,
+      "allocator": 0.0
+    }
+  },
+  "clu_pct": {
+    "memory_layout_aos_strict": 0.39,
+    "memory_layout_aosoa": 6.25,
+    "memory_layout_cache_line_aligned": 6.25,
+    "memory_layout_packed_bitmap": 3.12,
+    "memory_layout_soa": 6.25
+  },
+  "clu_usable": false,
+  "ff_conclusions": {
+    "FF0": "Aktiv cache-bewusste SUCH-Entscheidung wirkt am staerksten: k_ary=6844 vs linear_scan=22506 ns/op (-70%). ABER prefetch verschlechtert (none=best), memory_layout-Effekt kontrolliert ~1.5% (vernachlaessigbar). Plattform-Variation NICHT testbar (nur isa=isa_amd64). Signifikanz: k_ary vs linear_scan p_holm=0.0e+00, Cliff's delta=-1.00 (large).",
+    "FF1": "Orthogonale Permutationsmatrix bestaetigt: 320 Binaries als Vollfaktoriell 4×4×5×4 (['search_algo', 'node_type', 'memory_layout', 'prefetch']). Starke Achse×Workload-Kopplung: node_type-Ranking kippt zwischen Lese- und Schreib/Scan-Last (node4 lese-gut, schreib-schlecht). Achsen-Kopplung node_type×SIMD×path_compression NICHT testbar (isa/path fix).",
+    "FF2": "Knoten-/Cache-Line-Groessen-Streit (1 CL CSS/CSB+ vs 16 Hankins): kontrolliert (Lese) node256 am schlechtesten, kleine Knoten besser => Tendenz pro KLEINER Knoten, ABER Sweet-Spot node16 (node4 unter Schreiblast schlecht). Pipeline: two_phase_valid=100%, aber 9.13% Tail-Ausreisser + CLU-Bug => Mediane/Trim noetig, PMC fehlt. Signifikanz node16 vs node256: p_holm=0.0e+00, delta=-0.44 (medium).",
+    "FF3": "NICHT beantwortbar mit diesem Lauf: kein PRT-ART/SOTA-Lebewesen (prt_art im Datensatz=False; variiert werden Such-METHODEN k_ary/eytzinger/..., nicht ART/HOT/...). Mikroarch-Kennzahlen (CLU/LLC/dTLB) fehlen bzw. CLU defekt => FF3 offen. Segment-Attribution: 'mapping' dominiert die beobachtete Organ-Zeit (16% Mediananteil); die Segmente decken nur ~34% der Wall-Clock ab (Observer-Relativwert, keine absolute Zeit-Attribution).",
+    "FF4": "Compile-Time-Achsen (search_algo/node_type/memory_layout/prefetch) dominieren und sind je Binary provenienz-codiert (binary_id). Laufzeit-Sub-Achsen: thread_count=3 Auspraegung(en), prefetch_distance=2 Auspraegung(en). prefetch_distance wird gesweept => Laufzeit-Adaption teilweise getestet."
+  }
+}
