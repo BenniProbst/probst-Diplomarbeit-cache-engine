@@ -105,6 +105,15 @@ struct WideFullRow {
     double      op_rmw_p50      = 0.0;
     // 19-Achsen-Tupel als (achse→wert)-Map, aus binary_id geparst (achse=wert/achse=wert/...).
     std::map<std::string, std::string> axes;
+    // ── M3v2-Tag-Spalten (Task #156, ans Schema-Ende gehängt) ──────────────────────────────────────
+    // OPTIONAL/header-getrieben: fehlt die Spalte (cowfix-v1-Schema), bleibt das Feld leer/0 (n/a) —
+    // diese Felder stehen NIEMALS in required[], damit der cowfix-v1-Lauf unverändert durchläuft.
+    std::string  series;             // SOTA-Reihe (A/B/C/-); leer = Spalte fehlt
+    std::string  sweep_axis;         // gesweepte Achse (z.B. migration_policy); leer = Spalte fehlt
+    std::uint64_t working_set_n = 0;
+    bool         has_working_set_n = false;
+    double       seg_coverage    = 0.0;  // Σseg_ns/run_total (Mess-Validität)
+    bool         has_seg_coverage = false;
 };
 
 [[nodiscard]] int parse_wide_csv_full(std::filesystem::path const& in,
@@ -157,6 +166,37 @@ aggregate_exchange(std::span<WideFullRow const> rows, std::vector<SiblingPairCou
 // Zeile 1 (Spitzenplatz) = Cache-Misses/PMC = 0/nicht-erhoben (Kernmetrik). Inhalt ist statisch (die
 // nicht-gefixten Vorbehalte); KEINE CSV nötig. lang = "de" | "en".
 [[nodiscard]] int write_limitations_longtable(std::filesystem::path const& out,
+                                              std::string const& lang = "en");
+
+// ── A1 / A3 / A4 (m3v2-Outputs, Phase L L2/L3/L4, 2026-06-20) ────────────────────────────────────────────
+// Alle drei konsumieren WideFullRow (parse_wide_csv_full) und lesen die OPTIONALEN m3v2-Felder
+// (series/sweep_axis/working_set_n/seg_coverage) header-getrieben: fehlt das Feld (cowfix-v1-Schema),
+// wird die jeweilige Ausgabe ehrlich leer / "--" / übersprungen — NIE Crash. Alle Tabellen werden
+// breiten-sicher emittiert (\resizebox{\textwidth}{!} + \scriptsize + \tabcolsep=2pt; Aufgabe B).
+
+// A1: SOTA-Reihen-Vergleich A/B/C. Zeile = (Reihe series × Lebewesen binary_id), Spalte = Median ns/op
+// je Interface-Funktion (nur two_phase_valid). Die Reihen A/B/C tragen die 3 Kompositionalen Joins
+// (PRT-ART vs SOTA je Reihe). Breiten-sicher (WIDE-Tabelle).
+[[nodiscard]] int write_sota_series_table(std::filesystem::path const& out,
+                                          std::span<WideFullRow const> rows,
+                                          std::string const& caption,
+                                          std::string const& label,
+                                          std::string const& lang = "en");
+
+// A3: 9-Achsen-Austauschbarkeits-longtable je sweep_axis. Bestimmt die gesweepte Achse (sweep_axis-
+// Spalte), aggregiert je Ausprägung den Median ns/op je Interface-Funktion + zählt distinkte binary_ids
+// (Diff-Beleg = nachweislich verschiedener Organ-Pfad). Fehlt sweep_axis → leere Tabelle (n/a).
+[[nodiscard]] int write_sweep_axis_longtable(std::filesystem::path const& out,
+                                             std::span<WideFullRow const> rows,
+                                             std::string const& caption_prefix,
+                                             std::string const& lang = "en");
+
+// A4: seg_coverage als Mess-Validitäts-Spalte (Appendix). Je Lebewesen min/median/max seg_coverage
+// (Σseg_ns/seg_run_total_ns; ~1.0 = vollständige Pfad-B-Abdeckung). Fehlt seg_coverage → leer (n/a).
+[[nodiscard]] int write_seg_coverage_appendix(std::filesystem::path const& out,
+                                              std::span<WideFullRow const> rows,
+                                              std::string const& caption,
+                                              std::string const& label,
                                               std::string const& lang = "en");
 
 [[nodiscard]] std::string escape_latex(std::string_view s);

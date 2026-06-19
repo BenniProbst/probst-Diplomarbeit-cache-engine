@@ -47,6 +47,47 @@ int main(int argc, char* argv[]) {
                 std::cout << "csv-to-latex (limitierung,lang=" << lang_ld << "): -> " << out << "\n";
                 return 0;
             }
+            // ── A1 / A3 / A4 (m3v2-Outputs, 2026-06-20) — alle drei: <csv> <out.tex> [--lang]. ─────────
+            //   --sota-series=<csv> <out.tex>   → A1 SOTA-Reihen A/B/C (series-getrieben).
+            //   --sweep-axis=<csv>  <out.tex>   → A3 9-Achsen-Austauschbarkeit (sweep_axis-getrieben).
+            //   --seg-coverage=<csv> <out.tex>  → A4 seg_coverage Mess-Validitäts-Appendix.
+            auto find_outpath = [&](int self) -> std::string {
+                for (int j = 1; j < argc; ++j) {
+                    std::string b{argv[j]};
+                    if (j != self && b.rfind("--", 0) != 0) return b;
+                }
+                return {};
+            };
+            if (a.rfind("--sota-series=", 0) == 0 || a.rfind("--sweep-axis=", 0) == 0 ||
+                a.rfind("--seg-coverage=", 0) == 0) {
+                std::size_t const eq = a.find('=');
+                std::string const mode = a.substr(2, eq - 2);
+                std::string const csv  = a.substr(eq + 1);
+                std::string const out  = find_outpath(i);
+                if (out.empty()) { std::cerr << "csv-to-latex --" << mode << ": <out.tex> fehlt\n"; return 1; }
+                std::vector<c2l::WideFullRow> rows;
+                int rc = c2l::parse_wide_csv_full(csv, rows);
+                if (rc != 0) { std::cerr << "csv-to-latex: parse_wide_csv_full failed " << rc << "\n"; return rc; }
+                bool const de = (lang_ld == "de");
+                if (mode == "sota-series") {
+                    std::string const cap = de
+                        ? "SOTA-Reihen-Vergleich A/B/C: Median ns/op je Interface-Funktion (PRT-ART vs SOTA je Reihe)"
+                        : "SOTA series comparison A/B/C: median ns/op per interface function (PRT-ART vs SOTA per series)";
+                    rc = c2l::write_sota_series_table(out, rows, cap, "tab:m3v2:sota:series", lang_ld);
+                } else if (mode == "sweep-axis") {
+                    rc = c2l::write_sweep_axis_longtable(out, rows, de ? "Sweep" : "Sweep", lang_ld);
+                } else {
+                    // Plain-Text-Caption (escape_latex im Writer kümmert sich um _, ", etc. → kein Doppel-Escape).
+                    std::string const cap = de
+                        ? "Mess-Validitaet: seg_coverage je Lebewesen (Pfad-B-Abdeckung Sum(seg)/run_total)"
+                        : "Measurement validity: seg_coverage per living being (path-B coverage Sum(seg)/run_total)";
+                    rc = c2l::write_seg_coverage_appendix(out, rows, cap, "tab:m3v2:seg:coverage", lang_ld);
+                }
+                if (rc != 0) { std::cerr << "csv-to-latex --" << mode << ": write failed " << rc << "\n"; return rc; }
+                std::cout << "csv-to-latex (" << mode << ",lang=" << lang_ld << "): " << rows.size()
+                          << " rows -> " << out << "\n";
+                return 0;
+            }
         }
     }
 

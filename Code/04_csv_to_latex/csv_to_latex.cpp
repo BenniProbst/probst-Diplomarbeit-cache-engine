@@ -357,6 +357,19 @@ int parse_wide_csv_full(std::filesystem::path const& in, std::vector<WideFullRow
             r.op_scan_p50     = std::stod(cols[col["op_scan_p50_ns"]]);
             r.op_rmw_p50      = std::stod(cols[col["op_rmw_p50_ns"]]);
             r.axes            = parse_axis_tuple(r.binary_id);
+            // M3v2-Tag-Spalten OPTIONAL/header-getrieben (NIE in required[] → cowfix-v1 bricht nicht):
+            // fehlt die Spalte (154-Spalten-cowfix), bleibt das Feld leer/0 (n/a). col.find() schützt
+            // gegen Out-of-range — KEIN status_parse_error für fehlende m3v2-Spalten.
+            if (auto it = col.find("series"); it != col.end()) r.series = cols[it->second];
+            if (auto it = col.find("sweep_axis"); it != col.end()) r.sweep_axis = cols[it->second];
+            if (auto it = col.find("working_set_n"); it != col.end() && !cols[it->second].empty()) {
+                try { r.working_set_n = std::stoull(cols[it->second]); r.has_working_set_n = true; }
+                catch (std::exception const&) { /* leere/ungültige Zelle = n/a, kein Crash */ }
+            }
+            if (auto it = col.find("seg_coverage"); it != col.end() && !cols[it->second].empty()) {
+                try { r.seg_coverage = std::stod(cols[it->second]); r.has_seg_coverage = true; }
+                catch (std::exception const&) { /* n/a */ }
+            }
             out_rows.push_back(std::move(r));
         } catch (std::exception const&) {
             return status_parse_error;
@@ -735,6 +748,249 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
     for (auto const& r : rows)
         f << n++ << " & " << r.caveat << " & " << r.status << " \\\\\n";
 
+    f << "\\end{longtable}\n\\end{scriptsize}\n";
+    return f.good() ? status_ok : status_io_error;
+}
+
+// ── A1 / A3 / A4 (m3v2-Outputs, Phase L L2/L3/L4, 2026-06-20) ────────────────────────────────────────────
+// Alle drei header-getrieben (lesen die OPTIONALEN m3v2-Felder series/sweep_axis/working_set_n/seg_coverage
+// aus WideFullRow; fehlt das Feld → leer/übersprungen, NIE Crash). Alle Ausgaben breiten-sicher:
+// \resizebox{\textwidth}{!}{...} + \scriptsize + \setlength{\tabcolsep}{2pt} (Aufgabe-B-Konformität).
+
+namespace {
+
+// Lesbarer „Lebewesen-Name" aus der binary_id: bei SOTA-Reihen-Tieren das letzte ::-Segment von
+// "sota_tier=sota::A::PrtArtComposition", sonst der search_algo-Wert, sonst die volle binary_id.
+[[nodiscard]] std::string living_being_name(std::string const& binary_id) {
+    constexpr std::string_view kSota = "sota_tier=";
+    if (binary_id.rfind(kSota, 0) == 0) {
+        std::string v = binary_id.substr(kSota.size());
+        std::size_t const last = v.rfind("::");
+        return (last == std::string::npos) ? v : v.substr(last + 2);
+    }
+    constexpr std::string_view kSa = "search_algo=";
+    if (binary_id.rfind(kSa, 0) == 0) {
+        std::size_t const end = binary_id.find('/', kSa.size());
+        return binary_id.substr(kSa.size(),
+            (end == std::string::npos ? binary_id.size() : end) - kSa.size());
+    }
+    return binary_id;
+}
+
+// Median je (binary_id × Interface-Fn) über alle two_phase_valid-Zeilen (nearest-rank), gefiltert
+// nach einem Prädikat (z.B. series==X). Liefert auch die Probenzahl je binary_id.
+struct BeingFnMedians {
+    std::string  series;
+    std::string  binary_id;
+    std::string  name;
+    std::size_t  samples = 0;
+    std::map<std::string, double> fn_median;   // "insert"|"lookup"|... → Median ns
+};
+
+}  // anonymous namespace
+
+int write_sota_series_table(std::filesystem::path const& out, std::span<WideFullRow const> rows,
+                            std::string const& caption, std::string const& label,
+                            std::string const& lang) {
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    bool const de = (lang == "de");
+
+    // Pro (series, binary_id) Mediane je Interface-Fn + ns_per_op bilden. NUR two_phase_valid.
+    // Fehlt die series-Spalte (cowfix-v1), bleibt series leer → alle Zeilen landen in der Reihe "".
+    std::map<std::pair<std::string, std::string>, std::map<std::string, std::vector<double>>> acc;
+    for (auto const& r : rows) {
+        if (!r.two_phase_valid) continue;
+        auto& slot = acc[{r.series, r.binary_id}];
+        slot["insert"].push_back(r.op_insert_p50);
+        slot["lookup"].push_back(r.op_lookup_p50);
+        slot["erase"].push_back(r.op_erase_p50);
+        slot["scan"].push_back(r.op_scan_p50);
+        slot["rmw"].push_back(r.op_rmw_p50);
+        slot["ns_per_op"].push_back(r.ns_per_op);
+    }
+    if (acc.empty()) {   // ehrlich leer (keine gültigen Zeilen) → leere Tabelle, KEIN Crash
+        f << "% (keine two_phase_valid-Zeilen — SOTA-Reihen-Tabelle leer)\n";
+        return f.good() ? status_ok : status_io_error;
+    }
+
+    std::vector<BeingFnMedians> beings;
+    for (auto& [key, fns] : acc) {
+        BeingFnMedians b;
+        b.series = key.first; b.binary_id = key.second; b.name = living_being_name(key.second);
+        for (auto& [fn, samples] : fns) {
+            if (fn == "ns_per_op") b.samples = samples.size();
+            b.fn_median[fn] = nearest_rank_median(std::move(samples));
+        }
+        beings.push_back(std::move(b));
+    }
+
+    // Anzeige-Reihenfolge der Spalten = kFnOrder (ns_per_op zuerst, dann insert/lookup/erase/scan/rmw).
+    static constexpr std::array<std::string_view, 6> kCol = {
+        "ns_per_op", "insert", "lookup", "erase", "scan", "rmw"};
+
+    std::string const series_h = de ? "Reihe"     : "series";
+    std::string const being_h  = de ? "Lebewesen" : "living being";
+    std::string const n_h      = de ? "$n$"       : "$n$";
+
+    f << "% AUTO-GENERATED durch csv_to_latex::write_sota_series_table (A1 SOTA-Reihen A/B/C; lang="
+      << lang << ")\n";
+    f << "% Zeile = (Reihe × Lebewesen); Spalte = Median ns/op je Interface-Funktion (nearest-rank, nur\n";
+    f << "% two_phase_valid). Reihen A/B/C tragen die 3 Kompositionalen Joins (PRT-ART vs SOTA je Reihe).\n";
+    f << "\\begin{table}[!htbp]\n\\centering\n";
+    f << "\\scriptsize\n\\setlength{\\tabcolsep}{2pt}\n";              // Aufgabe-B: WIDE-Tabelle breiten-sicher
+    f << "\\resizebox{\\textwidth}{!}{%\n";                            // + harte \textwidth-Kapsel
+    f << "\\begin{tabular}{ll";
+    for (std::size_t i = 0; i < kCol.size(); ++i) f << "r";
+    f << "r}\n\\toprule\n";
+    f << series_h << " & " << being_h;
+    for (auto c : kCol) f << " & " << escape_latex(std::string{c});
+    f << " & " << n_h << " \\\\\n\\midrule\n";
+
+    // Stabil sortiert: nach series, dann nach name.
+    std::sort(beings.begin(), beings.end(), [](BeingFnMedians const& a, BeingFnMedians const& b) {
+        if (a.series != b.series) return a.series < b.series;
+        return a.name < b.name;
+    });
+    std::string prev_series = "\x01";  // unmöglicher Initialwert → erster Block druckt series
+    for (auto const& b : beings) {
+        std::string const ser_disp = b.series.empty() ? (de ? "(ohne)" : "(none)") : b.series;
+        f << (b.series == prev_series ? std::string{} : escape_latex(ser_disp));
+        prev_series = b.series;
+        f << " & " << escape_latex(b.name);
+        for (auto c : kCol) {
+            auto const it = b.fn_median.find(std::string{c});
+            if (it == b.fn_median.end()) f << " & --";          // fehlende Spalte → ehrlich "--"
+            else f << " & " << static_cast<std::uint64_t>(it->second + 0.5);
+        }
+        f << " & " << b.samples << " \\\\\n";
+    }
+    f << "\\bottomrule\n\\end{tabular}%\n}\n";
+    f << "\\caption{" << escape_latex(caption) << "}\n\\label{" << label << "}\n\\end{table}\n";
+    return f.good() ? status_ok : status_io_error;
+}
+
+int write_sweep_axis_longtable(std::filesystem::path const& out, std::span<WideFullRow const> rows,
+                               std::string const& caption_prefix, std::string const& lang) {
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    bool const de = (lang == "de");
+
+    // Die gesweepte Achse bestimmen (erster nicht-leerer sweep_axis-Wert ≠ "-"). Fehlt sie → leere Tabelle.
+    std::string sweep_axis;
+    for (auto const& r : rows)
+        if (!r.sweep_axis.empty() && r.sweep_axis != "-") { sweep_axis = r.sweep_axis; break; }
+    if (sweep_axis.empty()) {
+        f << "% (keine sweep_axis-Spalte/-Werte — 9-Achsen-Austauschbarkeits-Tabelle n/a)\n";
+        return f.good() ? status_ok : status_io_error;
+    }
+
+    // Je Ausprägung der gesweepten Achse (Wert in binary_id) Median je Interface-Fn + ns_per_op bilden,
+    // NUR two_phase_valid. Diff-Beleg: distinkte binary_id = nachweislich verschiedener Organ-Pfad.
+    std::map<std::string, std::map<std::string, std::vector<double>>> by_value;   // wert → fn → samples
+    std::map<std::string, std::set<std::string>> ids_by_value;                    // wert → distinkte binary_ids
+    std::string const needle = sweep_axis + "=";
+    for (auto const& r : rows) {
+        if (!r.two_phase_valid) continue;
+        auto const it = r.axes.find(sweep_axis);
+        if (it == r.axes.end()) continue;
+        std::string const& v = it->second;
+        auto& slot = by_value[v];
+        slot["insert"].push_back(r.op_insert_p50);
+        slot["lookup"].push_back(r.op_lookup_p50);
+        slot["erase"].push_back(r.op_erase_p50);
+        slot["scan"].push_back(r.op_scan_p50);
+        slot["rmw"].push_back(r.op_rmw_p50);
+        slot["ns_per_op"].push_back(r.ns_per_op);
+        ids_by_value[v].insert(r.binary_id);
+    }
+
+    static constexpr std::array<std::string_view, 6> kCol = {
+        "ns_per_op", "insert", "lookup", "erase", "scan", "rmw"};
+
+    std::string const cap = (de
+        ? (caption_prefix + ": Achsen-Austauschbarkeit \\texttt{" + escape_latex(sweep_axis)
+           + "} (je Auspr\\\"agung Median ns/op je Interface-Funktion, nur two\\_phase\\_valid; "
+             "Diff-Beleg = distinkter Organ-Pfad)")
+        : (caption_prefix + ": axis exchangeability \\texttt{" + escape_latex(sweep_axis)
+           + "} (per value median ns/op per interface function, only two\\_phase\\_valid; "
+             "diff evidence = distinct organ path)"));
+    std::string const colhead = de
+        ? "Auspr\\\"agung & ns/op & insert & lookup & erase & scan & rmw & Pfade & Diagnose \\\\"
+        : "value & ns/op & insert & lookup & erase & scan & rmw & paths & diagnostic \\\\";
+    std::string const diag = de ? "verschiedener Organ-Pfad" : "distinct organ path";
+
+    f << "% AUTO-GENERATED durch csv_to_latex::write_sweep_axis_longtable (A3 9-Achsen-Austauschbarkeit;\n";
+    f << "% sweep_axis=" << sweep_axis << "; lang=" << lang << ")\n";
+    f << "\\begin{scriptsize}\n\\setlength{\\tabcolsep}{2pt}\n";       // Aufgabe-B: breiten-sicher
+    f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{2.6cm} r r r r r r r "
+      << ">{\\raggedright\\arraybackslash}p{3.0cm}@{}}\n";
+    f << "\\caption{" << cap << "}\\label{tab:m3v2:sweep:" << sweep_axis << "}\\\\\n";
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    f << "\\multicolumn{9}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
+      << "}\\\\\n\\toprule\n" << colhead << "\n\\midrule\n\\endhead\n";
+    f << "\\midrule\n\\multicolumn{9}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
+      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+
+    for (auto& [v, fns] : by_value) {
+        f << escape_latex(v);
+        for (auto c : kCol) {
+            auto const it = fns.find(std::string{c});
+            if (it == fns.end()) { f << " & --"; continue; }
+            f << " & " << static_cast<std::uint64_t>(nearest_rank_median(it->second) + 0.5);
+        }
+        f << " & " << ids_by_value[v].size() << " & " << diag << " \\\\\n";
+    }
+    f << "\\end{longtable}\n\\end{scriptsize}\n";
+    return f.good() ? status_ok : status_io_error;
+}
+
+int write_seg_coverage_appendix(std::filesystem::path const& out, std::span<WideFullRow const> rows,
+                                std::string const& caption, std::string const& label,
+                                std::string const& lang) {
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    bool const de = (lang == "de");
+
+    // Je Lebewesen (binary_id) seg_coverage aggregieren (min/median/max), NUR Zeilen MIT seg_coverage.
+    // Fehlt die Spalte komplett (cowfix-v1), bleibt die Tabelle ehrlich leer (n/a, KEIN Crash).
+    std::map<std::string, std::vector<double>> cov;
+    for (auto const& r : rows) {
+        if (!r.has_seg_coverage) continue;
+        cov[r.binary_id].push_back(r.seg_coverage);
+    }
+    if (cov.empty()) {
+        f << "% (keine seg_coverage-Spalte — Mess-Validitaets-Tabelle n/a)\n";
+        return f.good() ? status_ok : status_io_error;
+    }
+
+    std::string const being_h = de ? "Lebewesen" : "living being";
+    std::string const cols_h  = de ? "min & Median & max & $n$" : "min & median & max & $n$";
+
+    f << "% AUTO-GENERATED durch csv_to_latex::write_seg_coverage_appendix (A4 seg_coverage Mess-Validitaet;\n";
+    f << "% lang=" << lang << "). seg_coverage = Sum(seg_ns)/seg_run_total_ns (Pfad-B-Abdeckung; ~1.0 = gut).\n";
+    f << "\\begin{scriptsize}\n\\setlength{\\tabcolsep}{2pt}\n";
+    f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{8.5cm} r r r r@{}}\n";
+    f << "\\caption{" << escape_latex(caption) << "}\\label{" << label << "}\\\\\n";
+    std::string const colhead = being_h + " & " + cols_h + " \\\\";
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    f << "\\multicolumn{5}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
+      << "}\\\\\n\\toprule\n" << colhead << "\n\\midrule\n\\endhead\n";
+    f << "\\midrule\n\\multicolumn{5}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
+      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+
+    char buf[64];
+    for (auto& [bid, samples] : cov) {
+        std::sort(samples.begin(), samples.end());
+        double const mn = samples.front();
+        double const mx = samples.back();
+        double const md = nearest_rank_median(samples);
+        f << escape_latex(living_being_name(bid));
+        std::snprintf(buf, sizeof(buf), "%.4f", mn); f << " & " << buf;
+        std::snprintf(buf, sizeof(buf), "%.4f", md); f << " & " << buf;
+        std::snprintf(buf, sizeof(buf), "%.4f", mx); f << " & " << buf;
+        f << " & " << samples.size() << " \\\\\n";
+    }
     f << "\\end{longtable}\n\\end{scriptsize}\n";
     return f.good() ? status_ok : status_io_error;
 }

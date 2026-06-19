@@ -31,7 +31,12 @@ inline constexpr int status_empty_input = 11;
 
 // A4-Seitenformat-Constraints
 struct PageConstraints {
-    double width_fraction      = 0.95;    // * \textwidth
+    // TODO-4/#173 (2026-06-20): width_fraction von 0.95 → 0.78 gesenkt. Wurzel des Overfull-Bugs
+    // (184 Boxen, 134 > 10pt): bei `scale only axis` gilt width= NUR fuer die Achsenflaeche; Titel,
+    // Y-Label, Colorbar und rotierte Tick-Labels kommen ZUSAETZLICH dazu → Gesamtbox > \textwidth.
+    // 0.78 laesst Platz fuer Colorbar + Y-Label. Zusaetzlich kapselt resizebox_wrap (s.u.) das gesamte
+    // tikzpicture hart auf \textwidth (robust gegen verbleibende Zusatzbreite) — Decorator-Pattern.
+    double width_fraction      = 0.78;    // * \textwidth  (war 0.95; #173-Breiten-Fix)
     double height_fraction     = 0.40;    // * \textheight
     bool   keep_aspect_ratio   = true;
     std::string position_hint  = "!htbp"; // LaTeX-Float-Position
@@ -39,6 +44,12 @@ struct PageConstraints {
     // caption-Mantel), damit das einbindende Dokument Float, Caption und Label selbst
     // steuert (z. B. spec-spezifische Anhang-Caption + referenzierbares \label).
     bool   body_only           = false;
+    // TODO-4/#173 (2026-06-20): kapselt das gesamte \begin{tikzpicture}...\end{tikzpicture} in
+    // \resizebox{\textwidth}{!}{...} (Decorator-Pattern um den Plot-Rumpf). Erzwingt die Gesamt-
+    // breite hart auf \textwidth UNABHAENGIG von Colorbar/Title/Label-Zusatzbreite → 0 Overfull.
+    // Default true (alle pgfplots-Figuren breiten-sicher). Auf false setzbar, falls ein Aufrufer
+    // die Skalierung selbst steuert.
+    bool   resizebox_wrap      = true;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -144,6 +155,14 @@ struct WideMeasurementRow {
     double       op_scan_p50_ns   = 0.0;
     double       op_rmw_p50_ns    = 0.0;
     bool         two_phase_valid  = false;  // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
+    // M3v2-Tag-Spalten (Task #156, ans Schema-Ende gehängt). OPTIONAL/header-getrieben aufgelöst:
+    // fehlt die Spalte (cowfix-v1-Schema), bleibt das Feld leer/0 — KEIN Parse-Fehler (n/a).
+    std::string  series;            // SOTA-Reihe (A/B/C/-); leer falls Spalte fehlt
+    std::string  sweep_axis;        // gesweepte Achse (z.B. migration_policy); leer falls Spalte fehlt
+    std::uint64_t working_set_n = 0;  // Arbeitsmengen-Größe (0 = Spalte fehlt / nicht gesetzt)
+    bool         has_working_set_n = false;  // true ⇔ working_set_n-Spalte vorhanden und nicht-leer
+    double       seg_coverage    = 0.0;  // Σseg_ns/run_total (Mess-Validität); 0 falls Spalte fehlt
+    bool         has_seg_coverage = false;
 };
 
 // HEADER-GETRIEBENER ';'-Parser (Spalten per Name → Index-Map). Pflichtspalten:
@@ -171,6 +190,20 @@ struct WideMeasurementRow {
 // ~14000× Workload-Spanne). Gleiche Aggregation wie write_surface_search_algo_x_workload,
 // nur andere pgfplots-Projektion. Bricht write_heatmap NICHT.
 [[nodiscard]] int write_surface3d_search_algo_x_workload(
+    std::filesystem::path const& out,
+    std::span<WideMeasurementRow const> rows,
+    std::string const& z_field,
+    std::string const& lang = "en",
+    PageConstraints const& cnst = {});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// A2 / m3v2 (2026-06-20) — Working-Set-Sweep-Kurve (Metrik über working_set_n)
+// ─────────────────────────────────────────────────────────────────────────────
+// Trägt das z-Feld (nearest-rank-Median, nur two_phase_valid) über working_set_n auf, eine Kurve je
+// gesweepter Achsen-Ausprägung (sweep_axis-getrieben; sonst search_algo). HEADER-GETRIEBEN/n/a-tolerant:
+// fehlt die working_set_n-Spalte (cowfix-v1), liefert die Funktion status_empty_input (ehrlich leer,
+// KEIN Crash). Breiten-sicher via PageConstraints (resizebox_wrap default an).
+[[nodiscard]] int write_working_set_sweep_curve(
     std::filesystem::path const& out,
     std::span<WideMeasurementRow const> rows,
     std::string const& z_field,

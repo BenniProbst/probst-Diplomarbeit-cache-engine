@@ -39,6 +39,17 @@ void write_pgfplots_axis_options(std::ostream& out,
     out << "    enlargelimits=0.05,\n";
 }
 
+// TODO-4/#173 (2026-06-20): Breiten-Decorator. Oeffnet/schliesst die \resizebox{\textwidth}{!}{...}-
+// Kapsel um das tikzpicture, WENN cnst.resizebox_wrap. Das erzwingt die Gesamtbreite (inkl. Colorbar,
+// Title, Y-Label, rotierte Tick-Labels) hart auf \textwidth → eliminiert die scale-only-axis-Overfull-
+// Boxen an der Wurzel, ohne die einzelnen Plot-Funktionen zu duplizieren (eine zentrale Stelle).
+void open_resizebox(std::ostream& out, PageConstraints const& cnst) {
+    if (cnst.resizebox_wrap) out << "\\resizebox{\\textwidth}{!}{%\n";
+}
+void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
+    if (cnst.resizebox_wrap) out << "}%\n";
+}
+
 }  // anonymous namespace
 
 std::string escape_latex(std::string_view s) {
@@ -76,6 +87,7 @@ int write_bar_chart(std::filesystem::path const& out_path,
         f << "\\begin{figure}[" << cnst.position_hint << "]\n";
         f << "\\centering\n";
     }
+    open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
     f << "    ybar,\n";
@@ -97,6 +109,7 @@ int write_bar_chart(std::filesystem::path const& out_path,
     f << "};\n";
     f << "\\end{axis}\n";
     f << "\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
     if (!cnst.body_only) {
         f << "\\caption{" << escape_latex(data.title) << "}\n";
         f << "\\end{figure}\n";
@@ -119,6 +132,7 @@ int write_scatter_plot(std::filesystem::path const& out_path,
         f << "\\begin{figure}[" << cnst.position_hint << "]\n";
         f << "\\centering\n";
     }
+    open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
     write_pgfplots_axis_options(f, cnst, data.title, data.x_label, data.y_label);
@@ -130,6 +144,7 @@ int write_scatter_plot(std::filesystem::path const& out_path,
     f << "};\n";
     f << "\\end{axis}\n";
     f << "\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
     if (!cnst.body_only) {
         f << "\\caption{" << escape_latex(data.title) << "}\n";
         f << "\\end{figure}\n";
@@ -153,6 +168,7 @@ int write_heatmap(std::filesystem::path const& out_path,
         f << "\\begin{figure}[" << cnst.position_hint << "]\n";
         f << "\\centering\n";
     }
+    open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
     write_pgfplots_axis_options(f, cnst, data.title, data.x_label, data.y_label);
@@ -190,6 +206,7 @@ int write_heatmap(std::filesystem::path const& out_path,
     f << "};\n";
     f << "\\end{axis}\n";
     f << "\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
     if (!cnst.body_only) {
         f << "\\caption{" << escape_latex(data.title) << "}\n";
         f << "\\end{figure}\n";
@@ -423,6 +440,18 @@ int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementR
                 r.search_algo = r.binary_id.substr(kPrefix.size(),
                     (end == std::string::npos ? r.binary_id.size() : end) - kPrefix.size());
             }
+            // M3v2-Tag-Spalten OPTIONAL/header-getrieben (NICHT in required[] → cowfix-v1 bricht nicht):
+            // fehlt die Spalte, bleibt das Feld leer/0 (n/a). col.find() schützt vor Out-of-range.
+            if (auto it = col.find("series"); it != col.end()) r.series = cols[it->second];
+            if (auto it = col.find("sweep_axis"); it != col.end()) r.sweep_axis = cols[it->second];
+            if (auto it = col.find("working_set_n"); it != col.end() && !cols[it->second].empty()) {
+                try { r.working_set_n = std::stoull(cols[it->second]); r.has_working_set_n = true; }
+                catch (std::exception const&) { /* leere/ungültige Zelle = n/a, kein Crash */ }
+            }
+            if (auto it = col.find("seg_coverage"); it != col.end() && !cols[it->second].empty()) {
+                try { r.seg_coverage = std::stod(cols[it->second]); r.has_seg_coverage = true; }
+                catch (std::exception const&) { /* n/a */ }
+            }
             out_rows.push_back(std::move(r));
         } catch (std::exception const&) {
             return status_empty_input;
@@ -472,6 +501,7 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out,
         f << "\\begin{figure}[" << cnst.position_hint << "]\n";
         f << "\\centering\n";
     }
+    open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
     write_pgfplots_axis_options(f, cnst,
@@ -521,9 +551,100 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out,
     f << "};\n";
     f << "\\end{axis}\n";
     f << "\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
     if (!cnst.body_only) {
         f << "\\caption{" << escape_latex(data.title) << "}\n";
         f << "\\end{figure}\n";
+    }
+    return f.good() ? status_ok : status_io_error;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// A2 / m3v2 (2026-06-20) — Working-Set-Sweep-Kurve (Metrik über working_set_n)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Aufgabe-A2-Mapping (GOAL Phase L L3): eine Kurve je Reihe = Metrik (z-Feld) aufgetragen über
+// working_set_n. Reihen-Schlüssel = die gesweepte Achsen-Ausprägung, header-getrieben gewählt:
+//   sweep_axis != "-"  → Reihe = der Achsenwert dieser Achse in der binary_id (z.B. migration_none).
+//   sonst              → Reihe = search_algo (oder binary_id-Kopf), eine Kurve je Lebewesen.
+// HEADER-GETRIEBEN/n/a-tolerant: hat die CSV keine working_set_n-Spalte (cowfix-v1), gibt es keine
+// Punkte → status_empty_input (ehrlich leer, KEIN Crash). Hat der Pilot nur EINEN working_set_n-Wert,
+// entsteht eine 1-Punkt-Kurve (mark-only) — das ist der ehrliche Mess-Stand, nicht erzwungen.
+
+namespace {
+
+// Die gesweepte Achse aus der binary_id extrahieren (token "sweep_axis=wert" via parse), sonst search_algo.
+[[nodiscard]] std::string sweep_series_key(WideMeasurementRow const& r) {
+    if (!r.sweep_axis.empty() && r.sweep_axis != "-") {
+        // Achsenwert dieser Achse in der binary_id suchen: "<sweep_axis>=<wert>/".
+        std::string const needle = r.sweep_axis + "=";
+        std::size_t const p = r.binary_id.find(needle);
+        if (p != std::string::npos) {
+            std::size_t const start = p + needle.size();
+            std::size_t const slash = r.binary_id.find('/', start);
+            return r.binary_id.substr(start,
+                (slash == std::string::npos ? r.binary_id.size() : slash) - start);
+        }
+    }
+    if (!r.search_algo.empty()) return r.search_algo;
+    return r.binary_id;
+}
+
+}  // anonymous namespace
+
+int write_working_set_sweep_curve(std::filesystem::path const& out,
+                                  std::span<WideMeasurementRow const> rows,
+                                  std::string const& z_field,
+                                  std::string const& lang,
+                                  PageConstraints const& cnst) {
+    if (rows.empty()) return status_empty_input;
+    bool const de = (lang == "de");
+    bool const is_scan = (z_field == "op_scan_p50_ns");
+
+    // (Reihe → (working_set_n → Stichprobe des z-Feldes)); NUR two_phase_valid + working_set_n vorhanden.
+    std::map<std::string, std::map<std::uint64_t, std::vector<double>>> series;
+    for (auto const& r : rows) {
+        if (!r.two_phase_valid) continue;
+        if (!r.has_working_set_n) continue;   // header-getrieben: fehlt die Spalte → kein Punkt (n/a)
+        if (is_scan && (r.workload == "ycsb_e" || r.workload == "lp_range_scan")) continue;
+        series[sweep_series_key(r)][r.working_set_n].push_back(pick_z_field(r, z_field));
+    }
+    if (series.empty()) return status_empty_input;   // keine working_set_n-Daten → ehrlich leer
+
+    std::string const metric = z_field_human(z_field, lang);
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    f << "% AUTO-GENERATED durch diagram_generator (A2/m3v2, Working-Set-Sweep-Kurve; z=" << z_field
+      << "; lang=" << lang << ")\n";
+    f << "% Eine Kurve je gesweepter Achsen-Auspraegung; X=working_set_n (log2), Y=" << z_field
+      << " (nearest-rank-Median, nur two_phase_valid).\n";
+    if (!cnst.body_only) {
+        f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n";
+    }
+    open_resizebox(f, cnst);
+    f << "\\begin{tikzpicture}\n\\begin{axis}[\n";
+    write_pgfplots_axis_options(f, cnst,
+        (de ? "Working-Set-Sweep: " : "working-set sweep: ") + metric,
+        (de ? "Arbeitsmenge $n$ (Schl\\\"ussel)" : "working set $n$ (keys)"),
+        metric);
+    f << "    xmode=log,\n    log basis x=2,\n";
+    f << "    legend pos=north west,\n    legend style={font=\\tiny},\n";
+    f << "    mark size=2pt,\n";
+    f << "]\n";
+    for (auto const& [key, points] : series) {
+        f << "\\addplot+[mark=*] coordinates {\n";
+        for (auto const& [wsn, samples] : points) {
+            f << "    (" << wsn << "," << fmt_double(nearest_rank_median(samples)) << ")\n";
+        }
+        f << "};\n";
+        f << "\\addlegendentry{" << escape_latex(key) << "}\n";
+    }
+    f << "\\end{axis}\n\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
+    if (!cnst.body_only) {
+        f << "\\caption{" << escape_latex((de ? "Working-Set-Sweep: " : "working-set sweep: ") + metric)
+          << "}\n\\end{figure}\n";
     }
     return f.good() ? status_ok : status_io_error;
 }

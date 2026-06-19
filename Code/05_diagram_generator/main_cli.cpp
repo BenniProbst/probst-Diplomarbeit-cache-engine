@@ -54,6 +54,34 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    // A2/m3v2 (2026-06-20) — Working-Set-Sweep-Kurve: Metrik über working_set_n, eine Kurve je
+    //   gesweepter Achsen-Ausprägung. Header-getrieben/n/a-tolerant (fehlt working_set_n → empty).
+    //   diagram-generator --sweep-curve=<z_field> <wide.csv> <out.tex> [--lang=de|en] [--body-only]
+    if (argc >= 4 && std::string{argv[1]}.rfind("--sweep-curve=", 0) == 0) {
+        std::string const z_field = std::string{argv[1]}.substr(14);
+        char const* in_csv  = argv[2];
+        char const* out_tex = argv[3];
+        std::string lang = "en";
+        dg::PageConstraints cnst;
+        for (int i = 4; i < argc; ++i) {
+            std::string a{argv[i]};
+            if (a.rfind("--lang=", 0) == 0) lang = a.substr(7);
+            else if (a == "--body-only") cnst.body_only = true;
+        }
+        std::vector<dg::WideMeasurementRow> rows;
+        int const prc = dg::parse_wide_csv(in_csv, rows);
+        if (prc != 0) { std::cerr << "parse_wide_csv failed: " << prc << "\n"; return prc; }
+        int const rc = dg::write_working_set_sweep_curve(out_tex, rows, z_field, lang, cnst);
+        if (rc == dg::status_empty_input) {
+            std::cerr << "sweep-curve: keine working_set_n-Daten (n/a, ehrlich leer) -> nichts geschrieben\n";
+            return rc;
+        }
+        if (rc != 0) { std::cerr << "write_working_set_sweep_curve failed: " << rc << "\n"; return rc; }
+        std::cout << "diagram-generator: sweep-curve z=" << z_field
+                  << " from " << rows.size() << " wide rows -> " << out_tex << "\n";
+        return 0;
+    }
+
     // V22.1 — neuer Subcommand --by-workload erzeugt gruppierten Bar-Chart aus
     // V20.3-konformer measurements.csv (16 Spalten inkl. workload_used).
     if (argc >= 4 && std::string{argv[1]} == "--by-workload") {
