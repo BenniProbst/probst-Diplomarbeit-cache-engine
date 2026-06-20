@@ -500,6 +500,24 @@ inline constexpr std::array<std::string_view, 6> kFnOrder = {
     return 99;
 }
 
+// TODO-4/#154 L-i (2026-06-20): Breiten-sicherer Identifier in einer SCHMALEN p{}-Spalte. Die langen
+// Achsen-Werte (z.B. memory_layout_aos_strict, ~24 Zeichen) haben in TeX an "\_" KEINEN Umbruchpunkt →
+// 21pt-Overfull im p{2.2cm}-$v$/$v'$-Feld. Fix (kein neues Paket, NICHT die Vorlage anfassen): nach jedem
+// escapeten "\_" ein "\allowbreak" injizieren → der Wert darf am Unterstrich umbrechen, kein Datenverlust.
+[[nodiscard]] std::string breakable_identifier(std::string_view s) {
+    std::string out = escape_latex(s);
+    std::string res;
+    res.reserve(out.size() + 16);
+    for (std::size_t i = 0; i < out.size(); ++i) {
+        res += out[i];
+        if (i + 1 < out.size() && out[i] == '\\' && out[i + 1] == '_') {
+            res += "_\\allowbreak{}";  // "\_" -> "\_\allowbreak{}"
+            ++i;                        // das '_' bereits konsumiert
+        }
+    }
+    return res;
+}
+
 }  // anonymous namespace
 
 int write_exchange_longtables(std::filesystem::path const& out_dir,
@@ -563,9 +581,14 @@ int write_exchange_longtables(std::filesystem::path const& out_dir,
             : "caveat: Q2 step-4 search\\_organ\\_ shadowing, apparatus artefact possible";
 
         f << "\\begin{scriptsize}\n";
+        // TODO-4/#173 + #154 L-i (2026-06-20): breiten-sicher. Die 8-Spalten-longtable (2x p{2.2cm}
+        // + 4 r + Diagnose-p{3.4cm}) lief 34.8pt ueber \textwidth (der Diagnose-Text + 6 inter-column
+        // tabcolsep). Fix (gleicher \setlength-Decorator wie write_sweep_axis_longtable/seg_coverage):
+        // tabcolsep 6pt->2pt (spart ~7*2*2pt) + Diagnose-Spalte 3.4cm->3.0cm. -> 0 Overfull.
+        f << "\\setlength{\\tabcolsep}{2pt}\n";
         f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{2.2cm} "
           << ">{\\raggedright\\arraybackslash}p{2.2cm} l r r r r "
-          << ">{\\raggedright\\arraybackslash}p{3.4cm}@{}}\n";
+          << ">{\\raggedright\\arraybackslash}p{3.0cm}@{}}\n";
         f << "\\caption{" << cap << "}\\label{tab:ld:exchange:" << axis << "}\\\\\n";
         f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
         f << "\\multicolumn{8}{c}{\\tablename\\ \\thetable{} -- "
@@ -583,7 +606,7 @@ int write_exchange_longtables(std::filesystem::path const& out_dir,
             // Diagnose-Spalte: immer „verschiedener Organ-Pfad" + bei Vorbehalt-Achsen zusätzlich Marker.
             std::string diag = diag_distinct;
             if (caveat) diag += "; " + diag_caveat;
-            f << escape_latex(a.value_from) << " & " << escape_latex(a.value_to)
+            f << breakable_identifier(a.value_from) << " & " << breakable_identifier(a.value_to)
               << " & " << escape_latex(a.interface_fn)
               << " & " << static_cast<std::int64_t>(a.median_abs_delta_ns >= 0
                             ? a.median_abs_delta_ns + 0.5 : a.median_abs_delta_ns - 0.5);
