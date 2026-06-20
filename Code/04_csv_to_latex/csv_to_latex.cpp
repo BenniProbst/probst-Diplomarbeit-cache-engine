@@ -713,6 +713,13 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
             "Nach aussen geworfenes OOM entwertet die Messung jetzt hart (two\\_phase\\_valid=false). Ein vom "
             "Tier-Code INTERN per catch(...) gefangenes OOM (z.B. defensiver Memento-Verzicht) ist von aussen nicht "
             "beobachtbar → konservativ als Restvorbehalt dokumentiert, nicht erzwungen."});
+        // G5-Audit (w289llo0o): de
+        rows.push_back({
+            "Timer-Overhead (\\texttt{clock::now()}) nicht kalibriert",
+            "Die Wall-Clock-Segmentzeiten enthalten den nicht subtrahierten Eigen-Overhead der \\texttt{std::chrono::steady\\_clock::now()}-Aufrufe (eine additive, lauf-stabile ns-Komponente je gemessenem Segment). Es findet KEINE Leer-Schleifen-Kalibrierung statt $\\to$ dokumentierter Vorbehalt; betrifft den absoluten ns-Nullpunkt, nicht die relativen Achsen-Vergleiche (G5-Audit, MESS-MINOR-7)."});
+        rows.push_back({
+            "Entwurfs-Etiketten = Namenskonvention, kein Mess-Einfluss",
+            "Einzelne Pattern-Etiketten im Code/Doku sind Benennungs-/Entwurfsvorbehalte ohne Mess-Wirkung: „hybrider Visitor\" (real ein Memento, kein \\texttt{accept()}/Host-Besuch), sowie Interpreter-/Template-/Decorator-Etiketten und \\texttt{reserve}-/\\texttt{if constexpr}-Hygiene. Reine Naming-Konvention $\\to$ als Vorbehalt dokumentiert, kein Einfluss auf Messwerte (G5-Audit, PATTERN-MINOR-1..7)."});
     } else {
         rows.push_back({
             "\\textbf{Cache misses (core metric):} L1/L2/L3 + dTLB + coherence + energy = 0 / not collected",
@@ -765,6 +772,13 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
             "An OOM propagated outward now hard-invalidates the measurement (two\\_phase\\_valid=false). An OOM caught "
             "INTERNALLY by tier code via catch(...) (e.g. defensive memento skip) is not observable from outside $\\to$ "
             "documented as a conservative residual caveat, not forced."});
+        // G5-Audit (w289llo0o): en
+        rows.push_back({
+            "Timer overhead (\\texttt{clock::now()}) not calibrated",
+            "The wall-clock segment timings include the non-subtracted intrinsic overhead of the \\texttt{std::chrono::steady\\_clock::now()} calls (an additive, run-stable ns component per measured segment). NO empty-loop calibration is performed $\\to$ documented caveat; affects the absolute ns origin, not the relative per-axis comparisons (G5 audit, MESS-MINOR-7)."});
+        rows.push_back({
+            "Design labels = naming convention, no measurement effect",
+            "A few pattern labels in code/docs are naming/design caveats with no measurement effect: ``hybrid visitor'' (in reality a memento, no \\texttt{accept()}/host visit), plus interpreter/template/decorator labels and \\texttt{reserve}/\\texttt{if constexpr} hygiene. Pure naming convention $\\to$ documented as a caveat, no influence on measured values (G5 audit, PATTERN-MINOR-1..7)."});
     }
 
     int n = 1;
