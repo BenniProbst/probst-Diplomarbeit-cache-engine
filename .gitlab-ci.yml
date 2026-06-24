@@ -1,46 +1,80 @@
-# probst-Diplomarbeit-cache-engine — GitLab CI (REV 7.6 V11.7)
-# Synchron mit .github/workflows/ci.yml
+# probst-Diplomarbeit-cache-engine — GitLab CI/CD (REV 8, 2026-06-24): Diplomarbeit Mess→PDF-Flow
+# ─────────────────────────────────────────────────────────────────────────────
+# Die Diplomarbeit bindet als Submodule (relative, AIR-GAP-taugliche URLs in .gitmodules):
+#   Code/external/comdare-cache-engine  (LOSE externe Abhaengigkeit: separat auf Bare-Metal gebaut+gemessen)
+#   Code/external/comdare-prt-art        (Pruefling — wird ueber die cache-engine dynamisch als Modul gekoppelt)
+#   thesis/diplomarbeit                  (Overleaf-LaTeX-Quelle)
+# Flow: Submodule ziehen -> Auswertungswerkzeuge bauen + cache-engine-Mess-Artefakte konsumieren
+#       -> Diplomarbeit-PDF mit REALEN Cache-Miss-Ergebnissen kompilieren.
+#
+# Infra-Hinweise: (1) Damit die CI die PRIVATEN Submodul-Projekte klonen kann, muss der CI_JOB_TOKEN dieses
+# Projekts in comdare/research/{comdare-cache-engine,comdare-prt-art,20260931-overleaf-diplomarbeit} erlaubt
+# sein (Settings -> CI/CD -> Job-Token-Allowlist). (2) Bare-Metal-Runner (prod1/prod2, shell) tragen die
+# Toolchain; TeX (texlive/latexmk) auf dem Runner ist Infra-Voraussetzung fuer den PDF-Job.
+# Tag-Pipelines unterdrueckt (workflow), Jobs entkoppelt (needs).
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$CI_COMMIT_BRANCH'
 
 stages:
-  - configure
-  - test
+  - submodules
+  - analyse
+  - thesis-pdf
 
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-  CMAKE_BUILD_PARALLEL_LEVEL: "4"
+  GIT_SUBMODULE_STRATEGY: recursive       # zieht cache-engine + prt-art + thesis ueber relative URLs
+  GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
+  CMAKE_BUILD_PARALLEL_LEVEL: "8"
 
-.linux_base:
-  image: debian:bookworm
-  before_script:
-    - apt-get update -qq
-    - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
-        build-essential cmake ninja-build git ca-certificates
-
-configure:diplomarbeit_code:
-  extends: .linux_base
-  stage: configure
+# ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (leichtgewichtig) ──
+verify:submodules:
+  stage: submodules
+  tags: [baremetal]
+  needs: []
   script:
+    - 'echo "== Submodule =="; git submodule status'
+    - 'test -e Code/external/comdare-cache-engine/CMakeLists.txt && echo "cache-engine OK"'
+    - 'test -e Code/external/comdare-prt-art/CMakeLists.txt && echo "prt-art OK"'
+    - 'test -d thesis/diplomarbeit && (ls thesis/diplomarbeit/*.tex >/dev/null 2>&1 && echo "thesis-LaTeX OK" || echo "thesis vorhanden")'
+
+# ── Stage analyse: Auswertungswerkzeuge bauen + cache-engine-Mess-Artefakte (lose Abhaengigkeit) konsumieren ──
+# Liegen frische Bare-Metal-Mess-Artefakte der cache-engine vor (measure:amd), fliessen die REALEN
+# Cache-Miss-Werte in die LaTeX-Tabellen/-Diagramme; sonst baut der Flow mit dem committeten Bestand.
+analyse:thesis-data:
+  stage: analyse
+  tags: [baremetal]
+  needs: ["verify:submodules"]
+  script:
+    - 'echo "== cache-engine-Mess-Artefakte (LOSE externe Abhaengigkeit) holen =="'
+    - 'curl -sf -o ce-measure.zip "${CI_API_V4_URL}/projects/comdare%2Fresearch%2Fcomdare-cache-engine/jobs/artifacts/main/download?job=measure:amd" -H "JOB-TOKEN: ${CI_JOB_TOKEN}" && unzip -o -q ce-measure.zip -d ce-measure && echo "-> cache-engine-Mess-Artefakte uebernommen (reale Cache-Misses)" || echo "-> keine frischen cache-engine-Mess-Artefakte (measure:amd) -> baue mit committetem Bestand/Demo"'
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
-    - cmake -B build -G Ninja
-    - cmake --build build --target comdare-messung-driver
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator -j "$(nproc)"
   artifacts:
     paths:
-      - Code/build/CMakeCache.txt
+      - Code/build/
     expire_in: 1 day
     when: always
 
-test:messung_driver:
-  extends: .linux_base
-  stage: test
-  needs: ["configure:diplomarbeit_code"]
+# ── Stage thesis-pdf: Diplomarbeit-PDF mit den Mess-Ergebnissen kompilieren (TeX = Infra-Voraussetzung) ──
+thesis:pdf:
+  stage: thesis-pdf
+  tags: [baremetal]
+  needs: ["analyse:thesis-data"]
   script:
-    - cd Code
-    - cmake -B build-test -G Ninja
-    - cmake --build build-test
-    # REV 7.6 V14.3 — Direkt-Ausfuehrung umgeht gtest_discover_tests MSB3073
-    - ./build-test/tests/test_messung_driver
+    - 'command -v latexmk >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1 || { echo "TeX-Toolchain (texlive/latexmk) fehlt auf dem Runner — Infra-Voraussetzung (CE-DL-artig)"; exit 1; }'
+    - cd thesis/diplomarbeit
+    - 'echo "thesis-Quellen:"; ls *.tex build.* 2>/dev/null | head'
+    - 'main=$(grep -lE "\\\\documentclass" *.tex 2>/dev/null | head -1); echo "main-tex=$main"; test -n "$main" && latexmk -pdf -interaction=nonstopmode -halt-on-error "$main"'
   artifacts:
     paths:
-      - Code/build-test/Testing/
-    expire_in: 1 week
+      - thesis/diplomarbeit/*.pdf
     when: always
+    expire_in: 4 weeks

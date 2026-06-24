@@ -1,6 +1,9 @@
 [submodule "Code/external/comdare-prt-art"]
 	path = Code/external/comdare-prt-art
-	url = https://github.com/BenniProbst/comdare-prt-art.git
+	url = ../comdare-prt-art.git
 [submodule "Code/external/comdare-cache-engine"]
 	path = Code/external/comdare-cache-engine
-	url = https://github.com/BenniProbst/comdare-cache-engine.git
+	url = ../comdare-cache-engine.git
+[submodule "thesis/diplomarbeit"]
+	path = thesis/diplomarbeit
+	url = ../20260931-overleaf-diplomarbeit.git
