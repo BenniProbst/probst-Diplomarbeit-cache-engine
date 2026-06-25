@@ -182,6 +182,39 @@ Während des Mess-Laufs: ein **Mess-Drift-Detektor** überwacht die Streuung (Me
 
 ---
 
+## 8b. dev-First-Deploy-Gate: prod→dev DB-Sync + Korrektheits-Verifikation vor prod (User 2026-06-25)
+
+**Direktive (gilt mindestens für die Diplomarbeit-Pipeline, generalisierbar):** In Zukunft kopieren
+Production-Programme ihre Datenbanken **exakt** auf den **dev-Cluster**, um dort via **Chaos-Engineering
+ISOLIERT** eine reale Umgebung zu simulieren und neue Programm-/Produktversionen zu testen. Für die
+Diplomarbeit ist daher **nach dem Build (auf prod)** und **vor dem prod-Deploy** folgendes Gate verbindlich.
+
+**Flow (um die Deploy-Stufen 8–10):**
+`build(prod) → [GATE: ALLE prod-DBs NUR-LESEND → dev-Cluster syncen] → dev-Test-Deploy (isoliert, reale
+Datenkopie, Chaos-Eng.) → dev-Artefakt-Korrektheitsprüfung → (NUR bei dev-OK) prod-Deploy`
+
+**Warum (Diplomarbeit-Bezug):** Jede Code-Änderung erzeugt **neue Messwerte + Artefakte**. Deren
+**Korrektheit muss zuerst abgesichert** werden — getrennt auf dem dev-Cluster, mit einer **realen
+prod-Datenkopie**, **bevor** der prod-Deploy (und damit die autoritative Messung) erfolgt. So läuft **nie
+unverifizierter Code** auf der prod-Mess-Umgebung.
+
+**Harte Randbedingungen (Sicherheit/Architektur):**
+- **NUR LESEND auf prod:** der Sync liest die prod-DBs und schreibt ausschließlich nach dev — die prod-DB
+  wird **nie** geschrieben (Schutz der Produktionsdaten; „Messdaten nie löschen").
+- **Über die CI-Brücke:** der prod→dev-Sync nutzt **eine der genau 2 sanktionierten dev/prod-Brücken**
+  (Witness + CI) — **kein** neuer Bypass der dev/prod-Trennung.
+- **DB-Heimat:** dev-DB = V90, prod-DB = V91; Cross-VLAN via Samba-DNS + `.1`-SNI.
+- **dev bleibt isoliert** (Chaos-Eng., reale-Umgebungs-Simulation).
+- **Mess-Autorität bleibt prod:** dev ist das **Korrektheits-/Chaos-Gate**; die autoritative PMC-Messung
+  läuft weiter auf prod-bare-metal **nach** dem dev-Sign-off.
+
+**Stufen-Einordnung:** konkretisiert/erweitert Stufe **9 (deploy staging → dev-Cluster-Deploy mit
+prod-DB-Kopie)** + die Übergabe nach Stufe **10 (smoke/canary → prod-Deploy nach dev-Verifikation)**, mit
+dem prod→dev-DB-Read-Only-Sync als neuem Vor-Gate. **Großteils infra-gated** (braucht dev+prod-Cluster, DBs,
+Sync-Mechanik) → Teil von **P1f**, blockiert P1a (lint/build/contract) nicht.
+
+---
+
 ## 9. Priorisierung + Einreihung in die TODOs
 
 **Einordnung:** Dies ist ein **EPIC (P1)**, das die langfristige „Diplomarbeit = Haupt-Pipeline"-Vision

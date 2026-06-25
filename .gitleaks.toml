@@ -1,0 +1,28 @@
+# gitleaks-Konfiguration — probst-Diplomarbeit-cache-engine (Super, CI-Stufe lint:secrets, HART)
+# Erweitert die Default-Regeln; allowlistet Submodule (Code/external/*), thesis/, Forschungs-/
+# Build-/Archiv-Pfade — diese werden in ihren EIGENEN Pipelines geprüft bzw. sind Fremd-/Doku-Inhalte.
+title = "probst-Diplomarbeit-cache-engine (Super) gitleaks"
+
+[extend]
+useDefault = true
+# `generic-api-key` (entropie-basiert) wirft systematische False-Positives auf C++-Doku-Kommentaren;
+# deaktiviert — die spezifischen High-Confidence-Regeln bleiben aktiv.
+disabledRules = ["generic-api-key"]
+
+[[allowlists]]
+description = "Submodule + thesis + Fremd-/Doku-/Build-/Archiv-Pfade (keine echten Secrets im Super)"
+paths = [
+  '''(^|/)Code/external/''',
+  '''(^|/)thesis/''',
+  '''(^|/)Forschungsarbeiten/''',
+  '''(^|/)_archive_code_pre_migration/''',
+  '''(^|/)Code/build/''',
+  '''(^|/)build[^/]*/''',
+  '''(^|/)cmake-build-[^/]*/''',
+  '''(^|/)\.citools/''',
+]
+
+[[allowlists]]
+description = "Test-Fixtures mit absichtlichen Pseudo-Schlüsseln"
+regexTarget = "match"
+regexes = [ '''(?i)(example|dummy|sample|test|fake|placeholder)[-_]?(key|token|secret|pw|password)''' ]

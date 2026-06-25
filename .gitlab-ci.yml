@@ -1,17 +1,14 @@
-# probst-Diplomarbeit-cache-engine — GitLab CI/CD (REV 8, 2026-06-24): Diplomarbeit Mess→PDF-Flow
+# probst-Diplomarbeit-cache-engine (Super) — GitLab CI/CD (REV 9, 2026-06-25): ci-templates-Lint + Mess→PDF-Flow
 # ─────────────────────────────────────────────────────────────────────────────
-# Die Diplomarbeit bindet als Submodule (relative, AIR-GAP-taugliche URLs in .gitmodules):
-#   Code/external/comdare-cache-engine  (LOSE externe Abhaengigkeit: separat auf Bare-Metal gebaut+gemessen)
-#   Code/external/comdare-prt-art        (Pruefling — wird ueber die cache-engine dynamisch als Modul gekoppelt)
-#   thesis/diplomarbeit                  (Overleaf-LaTeX-Quelle)
-# Flow: Submodule ziehen -> Auswertungswerkzeuge bauen + cache-engine-Mess-Artefakte konsumieren
-#       -> Diplomarbeit-PDF mit REALEN Cache-Miss-Ergebnissen kompilieren.
-#
-# Infra-Hinweise: (1) Damit die CI die PRIVATEN Submodul-Projekte klonen kann, muss der CI_JOB_TOKEN dieses
-# Projekts in comdare/research/{comdare-cache-engine,comdare-prt-art,20260931-overleaf-diplomarbeit} erlaubt
-# sein (Settings -> CI/CD -> Job-Token-Allowlist). (2) Bare-Metal-Runner (prod1/prod2, shell) tragen die
-# Toolchain; TeX (texlive/latexmk) auf dem Runner ist Infra-Voraussetzung fuer den PDF-Job.
-# Tag-Pipelines unterdrueckt (workflow), Jobs entkoppelt (needs).
+# Bindet die ci-templates-Lint-Stage ein (über Code/, ohne die Submodul-Quellen unter Code/external/)
+# und bewahrt den Diplomarbeit-Mess→PDF-Flow (Submodule ziehen → Auswertungswerkzeuge bauen +
+# cache-engine-Mess-Artefakte konsumieren → Diplomarbeit-PDF mit REALEN Cache-Misses).
+# Lint: gitleaks HART · clang-format/cppcheck ADVISORY (bis #179), baremetal-hermetisch.
+
+include:
+  - project: 'comdare/cluster/ci-templates'
+    ref: development
+    file: '/base-pipeline.yml'
 
 workflow:
   rules:
@@ -23,6 +20,7 @@ workflow:
     - if: '$CI_COMMIT_BRANCH'
 
 stages:
+  - lint
   - submodules
   - analyse
   - thesis-pdf
@@ -31,6 +29,22 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive       # zieht cache-engine + prt-art + thesis ueber relative URLs
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
   CMAKE_BUILD_PARALLEL_LEVEL: "8"
+  # Lint nur ueber die Super-eigenen Auswertungswerkzeuge (Code/), NICHT die Submodule unter Code/external/
+  COMDARE_LINT_PATHS: "Code"
+  COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
+
+# ── Stufe 1: Lint (aus ci-templates, baremetal-hermetisch) ──
+lint:secrets:
+  extends: .lint-secrets
+  tags: [baremetal]
+lint:format:
+  extends: .lint-format
+  tags: [baremetal]
+  allow_failure: true
+lint:static:
+  extends: .lint-static
+  tags: [baremetal]
+  allow_failure: true
 
 # ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (leichtgewichtig) ──
 verify:submodules:
@@ -44,8 +58,6 @@ verify:submodules:
     - 'test -d thesis/diplomarbeit && (ls thesis/diplomarbeit/*.tex >/dev/null 2>&1 && echo "thesis-LaTeX OK" || echo "thesis vorhanden")'
 
 # ── Stage analyse: Auswertungswerkzeuge bauen + cache-engine-Mess-Artefakte (lose Abhaengigkeit) konsumieren ──
-# Liegen frische Bare-Metal-Mess-Artefakte der cache-engine vor (measure:amd), fliessen die REALEN
-# Cache-Miss-Werte in die LaTeX-Tabellen/-Diagramme; sonst baut der Flow mit dem committeten Bestand.
 analyse:thesis-data:
   stage: analyse
   tags: [baremetal]
@@ -56,7 +68,8 @@ analyse:thesis-data:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
-    - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator -j "$(nproc)"
+    # Build-Parallelität via CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25)
+    - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator
   artifacts:
     paths:
       - Code/build/
