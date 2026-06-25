@@ -153,3 +153,23 @@ er damit ist.
 - [Setting Up Code Quality Gates in Your CI/CD Pipeline — Propel Code](https://www.propelcode.ai/blog/continuous-integration-code-quality-gates-setup-guide)
 - [Building a Production-Ready CI/CD Pipeline: Complete 2026 Guide — Medium](https://medium.com/@krishnafattepurkar/building-a-production-ready-ci-cd-pipeline-the-complete-2026-guide-b3d6a661ecd8)
 - [Clang-Tidy / cppcheck / IWYU (Stufe-1-Tools, s. Vorgänger-Doc §10)](https://clang.llvm.org/extra/clang-tidy/)
+
+---
+
+## NACHTRAG — autonome Fortsetzung 2026-06-25 (gate-freie Analyse, verify-before-acting)
+
+- **#190 ERLEDIGT:** ch6 (`06_evaluation_methodology.tex` `sec:series`) ist **bereits ch4-§4.8-konform**
+  (Reihe A = Prüfling vs SOTA · B = systematische Variation · C = Merge/Regression alt-neu). Der Text-Agent
+  hat es angeglichen → **kein Text-Agent-Handoff nötig**; die Thesis ist konsistenter Soll.
+- **#178 TIEFER-BEFUND (→ #162/P2):** der Stufe→Reihe-Fix ist eine **Mess-Architektur-Umstrukturierung**, NICHT
+  nur `sota_module_for`. ch4 §4.8: **Reihe C = build-übergreifend = KEINE Stufe-sota_series** → das aktuelle
+  3-sota_series-Modell (A=St1, B=St2, C=St3) muss zu **A=St1∪St2 / B=St3 / C-raus-aus-sota_series** umgebaut
+  werden, mit RIPPLE durch `test_sota_series_pilot.cpp:115/119/123` + 3 Profile + `messung_driver`
+  `MessreiheKind::C`. Gehört per **A7 (Pipeline zuerst)** zu **#162 (P2)** — nicht isoliert überstürzen.
+- **#188 DIFF-EINSTIEGSPUNKTE lokalisiert:** zentrale Steuerung = `builder/experiment_tree/experiment_tree.hpp`
+  + `perm_runner.hpp`; SOLL-Muster = `axes/lookup/composable/store_traversable_search_algo.hpp` (Weg-A routet
+  T0 durch den Store); IST = `abi_adapter.hpp` `fill_observer_v3` (`search_organ_.statistics()` ~:924) +
+  `tier_search_routes_through_store()==false` (~:1490). SOLL: Weg-B (Tree/Trie/Hash/k-ary/eytzinger) über
+  T4/T5/T6 statt `search_organ_`-Monolith. GROSS → fokussierte Ausführung (frischer Kontext empfohlen).
+- **Priorität bestätigt (A6/A7):** CI/CD-Fundament (#186) = **P0 zuerst** · #188-Arch-Fix = P1 ·
+  #178 + Mess-Lauf (#162) = P2 (nach der Pipeline).
