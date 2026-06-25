@@ -137,7 +137,16 @@
 
 ---
 
-## §6 — EMPFOHLENER NÄCHSTER SCHRITT
-Per A6/A7 ist **#186 CI/CD-Fundament (P1a: lint+build+contract-Templates)** die logische Nr. 1 — ABER teils infra-gated
-(Runner-Tools). Der **#188-Arch-Fix** ist gate-frei + lokal MSVC-verifizierbar, aber Kern-Substrat-Chirurgie. Beide sind
-„eine fokussierte Session" wert. Konkrete Rückfragen an den User stehen unten / im Chat.
+## §6 — NÄCHSTER SCHRITT (User-Entscheidung 2026-06-25, VERBINDLICH)
+
+**1. START der nächsten Session = #186 CI/CD-Fundament P1a** — lint+build+contract als wiederverwendbare
+`comdare/cluster/ci-templates`-Stage-Templates (Stufe 1+2+4 des 10-Stufen-Prinzips). Die Templates schreiben
++ via **GitLab-CI-Lint-API validieren** (YAML-Korrektheit, da kein lokaler Runner-Build); der REALE Runner-Lauf
+wartet auf die Infra-Tools (clang-format/cppcheck/gitleaks je Runner → #189). **NICHT mit dem Messlauf starten** (A7).
+Reihenfolge danach: P1b sanitize → P1c thesis-gate → P1d super-smoke → P1e Infra-Matrix → P1f chaos/deploy/canary.
+
+**2. #188-Kern-Refactor = DESIGN ERST VORLEGEN (User-Entscheidung):** BEVOR die Kern-Substrat-Chirurgie
+(`search_organ_`→`container_`) beginnt, das **`container_`-ComposedSearch-Substrat-Redesign ENTWERFEN** (wie die
+Pool-Familie Hash/BST/BTree/Tree/Trie an node/layout/allocator bindet) **+ dem User zur Freigabe vorlegen**
+(verify-before-acting bei Kern-Datenpfad). Erst NACH OK die 4a/4b/4c-Umsetzung je-Schritt-grün. (#188 ist NICHT
+der nächste Session-Start, sondern folgt dem CI/CD-Fundament — aber wenn an #188 gearbeitet wird, gilt: Design zuerst.)
