@@ -215,6 +215,13 @@ canary). **Sinnvolle Priorität:**
 ---
 
 ## 11. Offene Fragen an den User (vor Voll-Umsetzung zu klären)
+
+> ✅ **ALLE BEANTWORTET 2026-06-25** — verbindliche Antworten + Aktionen + Konsolidierung:
+> **`20260625-USER-ANTWORTEN-13-ENTSCHEIDUNGEN-CICD-MESS-ARCHITEKTUR.md`**. Kurz: Deploy-Artefakte =
+> NAS-Mess-Writeback + beste-Tier-Binary-Release (#172.1) + Thesis-PDF gegen Messwert-Export (UltiHash-Konzept
+> ohne Code); Matrix **3D** (ISA×OS×{bare-metal/docker/k8s}) + Win-Server-2022-KVM + ZIH-Power/AArch64;
+> Drift-Gate >5 % → 3×-Wdh + Warnung; **CI/CD = P0-Fundament VOR Messlauf** (Code noch nicht wartbar, nur lokal getestet).
+
 1. **Deploy-Ziel:** Was ist das „Produktions"-Artefakt der Diplomarbeit-Pipeline im Deploy/Canary-Sinn —
    das Thesis-PDF? Die „beste Binary" (#172.1, beste-Permutation-Auslieferung)? Beides?
 2. **macOS-Runner:** sind die stale Mac-Runner (node5/node6) noch physisch verfügbar oder durch
