@@ -1,9 +1,12 @@
-# probst-Diplomarbeit-cache-engine (Super) — GitLab CI/CD (REV 9, 2026-06-25): ci-templates-Lint + Mess→PDF-Flow
+# probst-Diplomarbeit-cache-engine (Super) — GitLab CI/CD (REV 10, 2026-06-26): ci-templates-Lint + Mess→PDF
 # ─────────────────────────────────────────────────────────────────────────────
-# Bindet die ci-templates-Lint-Stage ein (über Code/, ohne die Submodul-Quellen unter Code/external/)
-# und bewahrt den Diplomarbeit-Mess→PDF-Flow (Submodule ziehen → Auswertungswerkzeuge bauen +
-# cache-engine-Mess-Artefakte konsumieren → Diplomarbeit-PDF mit REALEN Cache-Misses).
-# Lint: gitleaks HART · clang-format/cppcheck ADVISORY (bis #179), baremetal-hermetisch.
+# REV 10 (Debug-Befunde 6951 + User-Entscheidungen):
+#  - Lint scannt NUR super-eigenen Code (GIT_SUBMODULE_STRATEGY:none je Lint-Job) — die Submodule
+#    cache-engine/prt-art/thesis werden in IHREN Pipelines gelintet, nicht hier doppelt (schnell + keine Cross-FPs).
+#  - analyse: KEIN Code/build/-Artefakt (Object-Storage-500 post-swap; Beleg = Build-Log). Mess-Daten via NAS-Writeback.
+#  - thesis:pdf bis TeXLive-via-Infra (User-Wahl P1c) per Variable gegatet (sonst sicherer Fail an "latexmk fehlt").
+#  - cache-engine-Mess-Artefakt-Fetch: job=pmc:amd (REV-10-Name), bleibt optionaler Fallback.
+# Bewahrt den Mess→PDF-Flow (Submodule ziehen → Auswertungswerkzeuge bauen → Diplomarbeit-PDF mit REALEN Cache-Misses).
 
 include:
   - project: 'comdare/cluster/ci-templates'
@@ -26,27 +29,32 @@ stages:
   - thesis-pdf
 
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive       # zieht cache-engine + prt-art + thesis ueber relative URLs
+  GIT_SUBMODULE_STRATEGY: recursive       # Default fuer die Build-Stages; Lint ueberschreibt auf none
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
   CMAKE_BUILD_PARALLEL_LEVEL: "8"
-  # Lint nur ueber die Super-eigenen Auswertungswerkzeuge (Code/), NICHT die Submodule unter Code/external/
   COMDARE_LINT_PATHS: "Code"
   COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
 
-# ── Stufe 1: Lint (aus ci-templates, baremetal-hermetisch) ──
+# ── Stufe 1: Lint (aus ci-templates) — NUR super-eigener Code, KEINE Submodule ──
 lint:secrets:
   extends: .lint-secrets
   tags: [baremetal]
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
 lint:format:
   extends: .lint-format
   tags: [baremetal]
   allow_failure: true
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
 lint:static:
   extends: .lint-static
   tags: [baremetal]
   allow_failure: true
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
 
-# ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (leichtgewichtig) ──
+# ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (braucht recursive) ──
 verify:submodules:
   stage: submodules
   tags: [baremetal]
@@ -57,32 +65,32 @@ verify:submodules:
     - 'test -e Code/external/comdare-prt-art/CMakeLists.txt && echo "prt-art OK"'
     - 'test -d thesis/diplomarbeit && (ls thesis/diplomarbeit/*.tex >/dev/null 2>&1 && echo "thesis-LaTeX OK" || echo "thesis vorhanden")'
 
-# ── Stage analyse: Auswertungswerkzeuge bauen + cache-engine-Mess-Artefakte (lose Abhaengigkeit) konsumieren ──
+# ── Stage analyse: Auswertungswerkzeuge bauen (KEIN grosses Artefakt) ──
 analyse:thesis-data:
   stage: analyse
   tags: [baremetal]
   needs: ["verify:submodules"]
   script:
-    - 'echo "== cache-engine-Mess-Artefakte (LOSE externe Abhaengigkeit) holen =="'
-    - 'curl -sf -o ce-measure.zip "${CI_API_V4_URL}/projects/comdare%2Fresearch%2Fcomdare-cache-engine/jobs/artifacts/main/download?job=measure:amd" -H "JOB-TOKEN: ${CI_JOB_TOKEN}" && unzip -o -q ce-measure.zip -d ce-measure && echo "-> cache-engine-Mess-Artefakte uebernommen (reale Cache-Misses)" || echo "-> keine frischen cache-engine-Mess-Artefakte (measure:amd) -> baue mit committetem Bestand/Demo"'
+    - 'echo "== cache-engine-Mess-Artefakte (LOSE, optional) holen =="'
+    - 'curl -sf -o ce-measure.zip "${CI_API_V4_URL}/projects/comdare%2Fresearch%2Fcomdare-cache-engine/jobs/artifacts/main/download?job=pmc:amd" -H "JOB-TOKEN: ${CI_JOB_TOKEN}" && unzip -o -q ce-measure.zip -d ce-measure && echo "-> Mess-Artefakte uebernommen" || echo "-> keine CI-Mess-Artefakte (NAS-Writeback-Modell) -> baue mit committetem Bestand"'
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
-    # Build-Parallelität via CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25)
+    # Build-Parallelitaet via CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25)
     - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator
-  artifacts:
-    paths:
-      - Code/build/
-    expire_in: 1 day
-    when: always
+  # KEIN Code/build/-Artefakt (Object-Storage-500 post-swap; analyse-Erfolg = Tools bauen, Beleg im Log).
 
-# ── Stage thesis-pdf: Diplomarbeit-PDF mit den Mess-Ergebnissen kompilieren (TeX = Infra-Voraussetzung) ──
+# ── Stage thesis-pdf: Diplomarbeit-PDF (TeXLive = Infra-Voraussetzung, User-Wahl P1c) ──
 thesis:pdf:
   stage: thesis-pdf
   tags: [baremetal]
   needs: ["analyse:thesis-data"]
+  # TeXLive/latexmk = Runner-Voraussetzung (Infra installiert texlive vor). Bis dahin gegatet
+  # (sonst sicherer Fail an "latexmk fehlt"). Reaktivieren: CI-Variable COMDARE_TEXLIVE_AVAILABLE="true".
+  rules:
+    - if: '$COMDARE_TEXLIVE_AVAILABLE == "true"'
   script:
-    - 'command -v latexmk >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1 || { echo "TeX-Toolchain (texlive/latexmk) fehlt auf dem Runner — Infra-Voraussetzung (CE-DL-artig)"; exit 1; }'
+    - 'command -v latexmk >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1 || { echo "TeX-Toolchain (texlive/latexmk) fehlt auf dem Runner — Infra-Voraussetzung (P1c)"; exit 1; }'
     - cd thesis/diplomarbeit
     - 'echo "thesis-Quellen:"; ls *.tex build.* 2>/dev/null | head'
     - 'main=$(grep -lE "\\\\documentclass" *.tex 2>/dev/null | head -1); echo "main-tex=$main"; test -n "$main" && latexmk -pdf -interaction=nonstopmode -halt-on-error "$main"'
