@@ -35,9 +35,9 @@
 | 2 | build | **partiell** | prod1/AMD **HART**; Intel/prod2 + ISA/OS-Matrix **fehlen** |
 | 3 | sanitize | **partiell** | ASan+UBSan **advisory** (`allow_failure`, Wave-3 auf cache-engine+prt-art); TSan + matrix-weit + HART fehlt |
 | 4 | contract | **partiell** | ABI-Contract (`test_abi_interface`) da; **config-durability/fuzz fehlt** |
-| 5 | integration | **fehlt** | storage/db + E2E-Mess-Kette `messung_driver→bin→csv→tex→pdf` |
-| 6 | chaos | **fehlt** | Drift-Detektor + Rerun-Gate (>5 % → 3× + Warn-Log) |
-| 7 | manifest+prebackup | **fehlt** | Build-/Mess-Manifest + additives Prebackup vor Überschreiben |
+| 5 | integration | **DONE** (#196) | E2E-Auswerte-Kette record.bin→CSV→LaTeX/TikZ als `integration:smoke` (super-Root), prod-Runner grün |
+| 6 | chaos | **DONE** (#197, 2026-06-27) | Drift-Detektor + Rerun-Gate (`drift_detector.hpp` + `test_chaos_drift_gate`); Job `chaos:drift` grün (cache-engine-Pipeline 7041, prod1). Real-PMC-Anwendung + Schwellen-Kalibrierung = #156-gegatet (dünner perm_runner-Adapter → Quality-Flag #165) |
+| 7 | manifest+prebackup | **DONE** (#198, 2026-06-27) | `manifest:provenance` (super-SHA + Submodul-SHAs recursive + Toolchain + OS/ISA + Profil-Hash) + `prebackup:measurements` (additiv + sha256-verifiziert, nie überschreiben) am Super-Root; beide grün (Super-Pipeline 7042 = success, alle 3 Bridges grün). Reales NAS/MinIO-Writeback = #202-gegatet |
 | 8 | k8s-deploy | **fehlt** | Mess-/Build-Last als prod-K8s-Pod (KubeVirt/Talos) |
 | 9 | deploy-staging | **fehlt** | prod→dev-DB-Read-Only-Sync-Gate (§8b) |
 | 10 | smoke-canary | **fehlt** | canary-loggate → canary-promote |
