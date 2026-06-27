@@ -1,5 +1,7 @@
 # Diplomarbeit/Code — Stack-Anleitung (REV 7.6 + V8-V11 Updates)
 
+> ⚠️ **TEILS VERALTET (2026-06-27, Codex-Befund):** einzelne Targets/Exe-Namen/CLI-Argumente unten sind stale. **Für den manuellen Self-Test ist `Code/MANUAL_RUN.md` autoritativ** (verifizierter Hand-Flow; Task #193). Abweichungen bitte dort pflegen.
+
 Diese Anleitung beschreibt die **vollstaendige Befehlskette** vom frischen
 Klonen des Repos bis zum fertigen PDF mit eingebetteten LaTeX-Tabellen
 und TikZ-Diagrammen. Sie ist explizit als Schritt-fuer-Schritt-Skript
