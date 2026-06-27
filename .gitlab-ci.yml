@@ -70,6 +70,9 @@ trigger:cache-engine:
     project: comdare/research/comdare-cache-engine
     branch: main
     strategy: depend
+    forward:                       # FIX 2026-06-27: super-Variablen (GIT_SUBMODULE_STRATEGY:recursive, COMDARE_CITOOLS_DIR) NICHT in die Modul-Pipeline forwarden — sie sollen ihren EIGENEN Kontext nutzen (sonst /.citools-mkdir + Submodul-Checkout -> lint:secrets failt)
+      yaml_variables: false
+      pipeline_variables: false
 trigger:prt-art:
   stage: orchestrate
   needs: ["lint:secrets"]
@@ -77,6 +80,9 @@ trigger:prt-art:
     project: comdare/research/comdare-prt-art
     branch: main
     strategy: depend
+    forward:
+      yaml_variables: false
+      pipeline_variables: false
 trigger:thesis:
   stage: orchestrate
   needs: ["lint:secrets"]
@@ -84,6 +90,9 @@ trigger:thesis:
     project: comdare/research/20260931-overleaf-diplomarbeit
     branch: main
     strategy: depend
+    forward:
+      yaml_variables: false
+      pipeline_variables: false
 
 # ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (braucht recursive) ──
 verify:submodules:
