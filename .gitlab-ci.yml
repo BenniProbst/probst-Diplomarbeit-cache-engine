@@ -27,6 +27,7 @@ stages:
   - orchestrate          # REV13 (#186 §5.4): Haupt-Pipeline triggert die 3 Modul-Pipelines (strategy:depend = synchron + gated)
   - submodules
   - analyse
+  - integration
   - thesis-pdf
 
 variables:
@@ -119,6 +120,44 @@ analyse:thesis-data:
     # Build-Parallelitaet via CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25)
     - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator
   # KEIN Code/build/-Artefakt (Object-Storage-500 post-swap; analyse-Erfolg = Tools bauen, Beleg im Log).
+
+# ── Stage integration (#196, EPIC #186): E2E-Auswerte-Smoke auf Linux-bare-metal ──
+# Beweist, dass der Mess-AUSWERTE-Pfad real funktioniert: baut die 4 leichten Auswerte-Tools (01/03/04/05,
+# keine cache-engine-Lib/DLLs nötig) + fährt die reale Kette record.bin -> CSV -> LaTeX-Tabelle + CSV -> TikZ
+# auf committeten Fixtures. KEIN perms-DLL-Bau, KEIN PMC, KEINE Infra (K8s/MinIO/NAS) — der schwere reale
+# Mess-Lauf (messung_driver: 3x 1M Keys/5M Ops + ~43 DLLs) ist bewusst NICHT hier (= mehrtaegiger Lauf #156).
+# Submodule kommen aus dem globalen recursive-Checkout (03_binary_to_csv braucht einen cache-engine-Header).
+integration:smoke:
+  stage: integration
+  tags: [baremetal]
+  needs: ["verify:submodules"]   # erst nach Submodul-Verifikation (transitiv nach lint:secrets)
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    - cmake -B build-integration -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
+    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc.
+    - cmake --build build-integration --target sample_data_generator binary_to_csv_cli csv_to_latex_cli diagram_generator_cli
+    - |
+      set -euo pipefail
+      find_exe() { find build-integration -type f -name "$1" 2>/dev/null | head -1; }
+      B2C=$(find_exe binary-to-csv); SDG=$(find_exe sample_data_generator)
+      C2L=$(find_exe csv-to-latex); DG=$(find_exe diagram-generator)
+      echo "exes: b2c=$B2C sdg=$SDG c2l=$C2L dg=$DG"
+      for e in "$B2C" "$SDG" "$C2L" "$DG"; do test -n "$e" -a -x "$e" || { echo "Auswerte-Exe fehlt/nicht-ausfuehrbar: $e"; exit 1; }; done
+      OUT=integration_out; mkdir -p "$OUT"
+      FIX=03_binary_to_csv/tests/fixtures/cached/sample_3_records.bin
+      test -s "$FIX" || { echo "Fixture fehlt: $FIX"; exit 1; }
+      "$B2C" "$FIX" "$OUT/measurements_from_records.csv"           # reales Stufe-2-Binaerformat -> CSV
+      "$SDG" "$OUT/measurements_sample.csv"                        # synthetische kanonische CSV (workload_used-Spalte)
+      "$C2L" "$OUT/measurements_from_records.csv" "$OUT/table_records.tex" --caption="Integration Smoke" --label=tab:smoke --lang=de
+      "$DG" --by-workload "$OUT/measurements_sample.csv" "$OUT/diagram_sample.tex"
+      for f in "$OUT/measurements_from_records.csv" "$OUT/table_records.tex" "$OUT/diagram_sample.tex"; do
+        test -s "$f" || { echo "LEER/FEHLT: $f"; exit 1; }
+      done
+      echo "=== integration:smoke OK (E2E-Auswerte-Kette real durchlaufen) ==="
+      echo "-- table_records.tex (head) --"; head -n 6 "$OUT/table_records.tex"
+  artifacts:
+    paths: []
 
 # ── Stage thesis-pdf: Diplomarbeit-PDF (TeXLive = Infra-Voraussetzung, User-Wahl P1c) ──
 thesis:pdf:
