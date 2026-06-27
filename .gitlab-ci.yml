@@ -1,4 +1,4 @@
-# probst-Diplomarbeit-cache-engine (Super) — GitLab CI/CD (REV 10, 2026-06-26): ci-templates-Lint + Mess→PDF
+# probst-Diplomarbeit-cache-engine (Super) — GitLab CI/CD (REV 13, 2026-06-27): Haupt-Pipeline orchestriert die 3 Modul-Pipelines (#186 §5.4); ci-templates-Lint + Mess→PDF
 # ─────────────────────────────────────────────────────────────────────────────
 # REV 10 (Debug-Befunde 6951 + User-Entscheidungen):
 #  - Lint scannt NUR super-eigenen Code (GIT_SUBMODULE_STRATEGY:none je Lint-Job) — die Submodule
@@ -24,6 +24,7 @@ workflow:
 
 stages:
   - lint
+  - orchestrate          # REV13 (#186 §5.4): Haupt-Pipeline triggert die 3 Modul-Pipelines (strategy:depend = synchron + gated)
   - submodules
   - analyse
   - thesis-pdf
@@ -57,6 +58,32 @@ lint:static:
     GIT_SUBMODULE_STRATEGY: none
   rules:
     - when: manual
+
+# ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
+# Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.
+# strategy: depend = dieser Bridge-Job spiegelt den Kind-Pipeline-Status -> Super wird ROT, wenn ein Modul rot ist (= echtes Gate).
+# needs: [lint:secrets] = erst nach Supers hartem Secrets-Gate triggern. Projektpfade aus .gitmodules (relative URLs -> comdare/research/<repo>).
+trigger:cache-engine:
+  stage: orchestrate
+  needs: ["lint:secrets"]
+  trigger:
+    project: comdare/research/comdare-cache-engine
+    branch: main
+    strategy: depend
+trigger:prt-art:
+  stage: orchestrate
+  needs: ["lint:secrets"]
+  trigger:
+    project: comdare/research/comdare-prt-art
+    branch: main
+    strategy: depend
+trigger:thesis:
+  stage: orchestrate
+  needs: ["lint:secrets"]
+  trigger:
+    project: comdare/research/20260931-overleaf-diplomarbeit
+    branch: main
+    strategy: depend
 
 # ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (braucht recursive) ──
 verify:submodules:
