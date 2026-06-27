@@ -62,7 +62,7 @@ lint:static:
 verify:submodules:
   stage: submodules
   tags: [baremetal]
-  needs: []
+  needs: ["lint:secrets"]   # Codex-Review 06-27: hart auf den Secrets-Gate warten
   script:
     - 'echo "== Submodule =="; git submodule status'
     - 'test -e Code/external/comdare-cache-engine/CMakeLists.txt && echo "cache-engine OK"'
