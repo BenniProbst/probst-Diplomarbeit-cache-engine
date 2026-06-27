@@ -25,14 +25,14 @@
 | 7 | axes/node/axis_04_node_type_layout_aware_store.hpp | hoch | L | axis-god-header (node/layout/alloc/observer/migration/...); in Gänze lesen (:86/192/271/388) | ⬜ |
 | 8 | axes/node/axis_04_node_type_chunked_store.hpp | med-hoch | M | Duplikat-Scaffolding zu layout-aware (insert/erase/flatten/observer) | ⬜ |
 | 9 | axes/alloc/* wrappers | med-hoch | M-L | copy-paste (realloc-fallback/stats/observer/original-mixin); base+registry+1 Paar lesen | ⬜ |
-| 10 | axes/alloc/axis_06_allocator_registry.hpp | med | S | stale „Stage 1 / dummy is_enabled" vs Stage-2-Prädikat (:118) | ⬜ |
+| 10 | axes/alloc/axis_06_allocator_registry.hpp | med | S | stale „Stage 1 / dummy is_enabled" vs Stage-2-Prädikat (:118) | ✅ 2026-06-27 INC-2 (HINWEIS+@stand+LIVE/HEUTE → wahrheitsgemäß Stufe 2, comment-only) |
 | 11 | axes/lookup/composable/art_trie_node_pool_store.hpp | med | M | switch-heavy + stale „KEIN Shrink" neben Shrink-Code; in Gänze lesen | ⬜ |
 | 12 | axes/lookup/composable/*_node_pool_store.hpp | med | M | NodeRef-Bit-Packing/free-list wiederholt (ART/HOT-Patricia/Masstree) | ⬜ |
 | 13 | axes/lookup/axis_03a_search_algo_btree.hpp | med | M | dichte B-Baum-erase/split/merge + magic consts (kT/kNil/density :142); in Gänze lesen | ⬜ |
 | 14 | axes/axis_centric_namespaces.hpp | med | M | Header-Hygiene (alte `topics/*`-Includes) + `pruefling`-Naming (:146) | ⬜ |
 | 15 | topics/* (Legacy-Spiegel) | med-hoch | L | 389 divergente Dateien — SEPARATER Cleanup-Track, NICHT im axes-Sweep | ⬜ |
 | 16 | anatomy/observable_tier.hpp | med | M | `kV3*`-Naming nach V1/V2/V3-Konsolidierung (Naming-Falle); mit measurable_workload.hpp lesen | ⬜ |
-| 17 | builder/experiment_tree/axis_operability_classification.hpp | med | S-M | „17 SearchAlgorithm-Komposition-Achsen" + `std::array<...,17>` (:34) stale | ⬜ |
+| 17 | builder/experiment_tree/axis_operability_classification.hpp | med | S-M | „17 SearchAlgorithm-Komposition-Achsen" + `std::array<...,17>` (:34) stale | ✅ 2026-06-27 INC-2 (Wording → „17 Kern-Achsen T0..T16"; array<…,17> + note-constexpr-Strings UNANGETASTET) |
 | 18 | modules/* (Spiegel) | hoch | M-L | stale ABI/Observer/Memento-Kopien — eigener Spiegel-Autoritäts-Cleanup | ⬜ |
 
 ## Sweep-Plan (Increments, je grün + Codex-Review + committen)
@@ -42,5 +42,13 @@
 - **Boilerplate-Pass:** Files 8/9/12 (Helper-Extraktion — vorsichtig, das ändert Code → Build+Test).
 - **Separate Tracks (eigene Entscheidung):** `topics/*` (15) + `modules/*` (18) Spiegel-Autorität — GROSS, mit User abstimmen (löschen vs. konsolidieren; Messdaten/ABI-Vorsicht).
 - **Abschluss #179:** lint:format/static → HART (CI-rules von `when:manual` entfernen) + test_v41-Linux-Vollbau.
+
+## INC-2 Stand (2026-06-27, Session 6) — comment-only Batch (Codex-gesweept + selbst verifiziert)
+- ✅ **Hotspot 10** `axis_06_allocator_registry.hpp`: stale „Stufe 1 / Dummy is_enabled"-HINWEIS (Z.18-20) widersprach dem Code (`is_enabled = mp_bool<T::enabled>`, echtes Stufe-2-Prädikat) → wahrheitsgemäß umgeschrieben; @stand Stufe 1→2; „Stufe 2 LIVE/(HEUTE)" timeless. comment-only.
+- ✅ **Hotspot 17** `axis_operability_classification.hpp`: „17 (Komposition-)Achsen" → „17 Kern-Achsen T0..T16" (autoritatives Modell, 4 Kommentare); `array<…,17>` + die constexpr-`note`-Strings UNANGETASTET (Codex korrekt als „nicht comment-only" separiert).
+- ✅ **README.md**: Status-Drift (Z.11 „Phase 4.B Skelett/Implementierung ausstehend" ↔ Z.48/93 „lauffähig") angeglichen; Achsenmodell Z.94 „17 Anatomie + 3 Build" → „19 Slots T0..T18 (17 Kern + q1/q2) + 3 Build"; **P08 in Z.176-Email-Liste ergänzt** (33−11 geklont−14 Reimpl−2 Konzept = 6 = {P06,P08,P28,P31,P32,P33}; Zahl 6 war korrekt, P08 fehlte).
+- ⚠️ **CODEX-CAVEAT (kritisch für künftige Increments):** Codex' Umgebung RENDERT UTF-8 FALSCH (Box-Zeichen `───`→`ДДД`/`ﾄﾄﾄ`, Umlaute `Ä`→`Ž`, `…`→`??`). Die Dateien sind sauberes UTF-8 — Codex' „Mojibake/Encoding-Artefakt"-Funde sind FALSCH-POSITIV → NIE blind anwenden (verschlechtert korrekte Zeichen). Jede Datei selbst lesen zur Encoding-Verifikation. Codex bleibt valide für stale-Wording + Logik↔Kommentar-Mismatch (Text, den es korrekt liest) — und fand real die P08-Lücke-Umgebung (Zähl-Kontext), auch wenn sein konkreter Vorschlag 6→5 falsch war (Verifikation nötig, „keine blinden Merges").
+- **DEFERRED** (build-verifizierter Increment, NICHT comment-only): `axis_centric_namespaces` topics/*-Include-Hygiene + `pruefling`-Rename; `README:120` Makro-Arität „<17 Achsen>" (Makro-Signatur prüfen → ggf. 19); `observable_tier` kV3*-Naming (Rename-Ripple). Hotspot 14 (axis_centric) daher noch ⬜.
+- **Nächster Increment:** god-header (Hotspot 1 `abi_adapter.hpp` IN GÄNZE lesen) — braucht frisches Kontext-Budget (L). Danach Boilerplate (8/9/12) + die DEFERRED-build-Items als eigene verifizierte Increments.
 
 ## Danach: prt-art + super + thesis(LaTeX-Lint) analog scopen (eigene Codex-Scoping-Pässe).
