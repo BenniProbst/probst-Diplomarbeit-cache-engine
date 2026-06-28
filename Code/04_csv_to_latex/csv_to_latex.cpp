@@ -693,6 +693,18 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
             "node\\_type + memory\\_layout: Q2-Schritt-4-Beschattung",
             "Apparat-Artefakt m\\\"oglich (search\\_organ\\_-Beschattung); search\\_algo + prefetch sind am "
             "wenigsten konfundiert."});
+        // #226 (2026-06-28): #211 container_-Spiegel-Rebuild — in cowfix-v1 (Weg-B) wirksam, bis-M3 ungefixt.
+        // Distinkt von der Q2-Beschattung (Observer-Slot) oben: dies betrifft die ns_per_op-Ueberhoehung.
+        // Codex-praezisiert: nur NEU-Inserts + erfolgreiche Erases bauen um; Ausschluss = der ZUSATZ-Spiegel
+        // (Weg-A nutzt denselben O(n)-Rebuild als ECHTEN Struktur-Kosten, nicht als Artefakt).
+        rows.push_back({
+            "container\\_-Spiegel (Weg-B): O(n)-Flatten+Rebuild als Zusatz-Apparat",
+            "Weg-B-Lebewesen (SOTA-B\\\"aume/Tries/Hash) halten neben dem echten Such-Organ einen sortierten "
+            "container\\_-Spiegel; dessen O(n)-Flatten+Rebuild (bei NEU-Inserts + erfolgreichen Erases; \\#211, "
+            "bis-M3 ungefixt) ist ZUS\\\"ATZLICHER Apparat-Aufwand, den die echte Baumstruktur nicht hat $\\to$ die "
+            "gemessene ns\\_per\\_op der Weg-B-Tiere ist um diesen Spiegel-Anteil \\\"uberh\\\"oht. (Bei der Weg-A-"
+            "Array-Familie ist derselbe O(n)-Rebuild der ECHTE Struktur-Kostenanteil, kein Zusatz-Artefakt.) "
+            "Behebung mit \\#188/\\#211 + Nachfolge-Neubau (\\#215)."});
         rows.push_back({
             "memory\\_layout-Effekt teils sub-noise",
             "Teil der Layout-Differenzen liegt unter dem Mess-Rauschen $\\to$ PMC extern-gated (\\#26)."});
@@ -756,6 +768,14 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
             "node\\_type + memory\\_layout: Q2 step-4 shadowing",
             "Apparatus artefact possible (search\\_organ\\_ shadowing); search\\_algo + prefetch are the "
             "least confounded."});
+        // #226 (2026-06-28): #211 container_ mirror rebuild — present in cowfix-v1 (path B), unresolved as of M3.
+        rows.push_back({
+            "container\\_ mirror (path B): O(n) flatten+rebuild as extra apparatus",
+            "Path-B creatures (SOTA trees/tries/hash) keep a sorted container\\_ mirror alongside the real search "
+            "organ; its O(n) flatten+rebuild (on new inserts + successful erases; \\#211, unresolved as of M3) is "
+            "EXTRA apparatus work the real tree does not incur $\\to$ the measured ns\\_per\\_op of path-B tiers is "
+            "inflated by this mirror share. (For the path-A array family the same O(n) rebuild is the GENUINE "
+            "structural cost, not an extra artefact.) Resolved with \\#188/\\#211 + successor rebuild (\\#215)."});
         rows.push_back({
             "memory\\_layout effect partly sub-noise",
             "Part of the layout differences lies below the measurement noise $\\to$ PMC externally gated (\\#26)."});
