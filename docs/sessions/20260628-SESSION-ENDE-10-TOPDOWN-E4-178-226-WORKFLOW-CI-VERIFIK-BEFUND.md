@@ -39,7 +39,9 @@ Reihenfolge **E4→E3→E2→E1→E0** (E0 = Schlussphase, zuletzt). Plan = Doss
 - **E1:** **#221** (`build_setters_new`; niedrig-gekoppelt zuerst) · #216 · #225 (User-Diskussion).
 - **E0 (Schlussphase):** #230 (CI-Harness-Gate) · #179/#186/#193/#210/#228/#229 …
 
-**Empfehlung nächster Start:** E4 **#165** (winsor-Mittel in Appendix-Tabellen spiegeln — klein) ODER, falls E4-Rest als „grün genug" gilt, **E3 #223** (klein, pipeline-unabhängig) als Sprungbrett VOR dem großen **E2 #188**.
+**Empfehlung nächster Start:** **E3 #223** (klein, isoliert, pipeline-unabhängig) als Sprungbrett VOR dem großen **E2 #188**.
+
+> **Nachtrag (post-Übergabe, 2026-06-28):** **#165 verifiziert code-complete** — `winsorized_mean_ns` (latency_stats.hpp:72, d60f7b0) + `quality_flag` (iterator:381-405) + **Perzentil-robuster Appendix** (`nearest_rank_median` + p25/p50/p75 + IQR durchgängig in csv_to_latex); es gibt KEINEN Plain-Mean im Appendix, den man winsorisieren müsste (Workflow-Verdacht war spekulativ, §11-Disziplin). Residual = nur **P-MD2 quiesziertes Experiment-OS** = runtime/infra, gated mit #156. #184 (Dataset-Loader) = optionales low-prio E4-Feature. ⟹ **E4-jetzt-machbare Strecke KOMPLETT**; nächster Start = **E3 #223**, dann **E2 #188**.
 
 ## §5 Fallstricke
 1. **CI ≠ Harness-Compile (§3A):** „grün" für E4/Harness = non-regression. Echte Verifik. = Codex + #162-Harness-Bau.
