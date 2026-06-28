@@ -78,6 +78,8 @@ Sequenz: **4a** (k-ary/Eytzinger-StoreTraversable-Organe; Eytzinger-Design zuers
 - Auswertungs-Tools (super, lokal/msvc, NICHT CI): `Code/04_csv_to_latex` + `Code/05_diagram_generator`; Orchestrator `thesis/diplomarbeit/generate_wide_appendix.ps1`; Daten `Messdaten-Backup/tier150_…_cowfix-v1_2026-06-18.csv`.
 - Codex-MCP: nur Code-Repos (cache-engine/prt-art/super/thesis), NIE Cluster/keys; sandbox read-only, approval never, `model_reasoning_effort: xhigh`.
 
-## §9 Offene Rückfragen (User schaut zu — erste Instanz)
-1. **#188-4a Eytzinger-Design (zentral, blockt den 4a-Start):** EytzingerTraversal über den flachen `LayoutAwareChunkedStore` braucht eine Repräsentations-Entscheidung — **(a)** Organ hält einen internen BFS-/Eytzinger-Index über die sortierten Slots (Store unverändert; organ-lokal; meine Empfehlung) ODER **(b)** der Store wird via memory_layout-Achse echt Eytzinger-arrangiert (layout-gekoppelt, größer). Welche?
-2. **Reihenfolge-Bestätigung:** strikt top-down **E2 #188 (4a) zuerst** — oder die **#221-niedrig-gekoppelten RC-Setter** (prefetch_distance/thread_count, machbar OHNE #188) als schnellerer E1-Vorzieh-Gewinn vor dem großen #188?
+## §9 Rückfragen — BEANTWORTET (User 2026-06-28)
+1. **#188-4a Eytzinger-Design → ENTSCHIEDEN: Option (b) — Store ECHT Eytzinger-/BFS-arrangiert** (NICHT organ-lokaler Index; der „echte Weg"). Konsequenz: 4a ist größer — der `LayoutAwareChunkedStore` bekommt eine Eytzinger/BFS-**Slot-Ordnungs**-Variante (Abgrenzung zur memory_layout-aos/soa-Achse: Eytzinger = Slot-ORDNUNG, nicht Feld-Layout); Detail-Store-Arrangement-Design = erster 4a-Schritt; std::map-Konformität (Gate + scan-Test) ist die Bar. KAryTraversal bleibt organ-lokal. **Dossier §17 entsprechend aktualisiert.**
+2. **Reihenfolge → ENTSCHIEDEN: E2 #188 (4a) zuerst** (strikt top-down; der Wurzel-Hebel). #221 (auch die niedrig-gekoppelten RC-Setter) folgt NACH #188.
+
+**⟹ Nächste Session startet DIREKT mit #188-Inkrement-4a** (Dossier §17): Schritt 1 KAryTraversal (organ-lokal, sortierter Store) + Schritt 2 Eytzinger-Store-Arrangement-Design → EytzingerTraversal; je gegen `test_conformance_gate` + scan-Test; frischer Kontext.
