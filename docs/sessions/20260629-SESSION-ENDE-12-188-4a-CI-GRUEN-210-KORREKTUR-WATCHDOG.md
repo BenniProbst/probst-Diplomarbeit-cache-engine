@@ -184,7 +184,8 @@ public:
 2. **#188-C3-Sequenz:** C3-Kern (CI-verifizierbar: Interface+Forwarder+Test) als eigenen Commit ZUERST, dann C3c/C4/C5 harness-gated — ODER ganz C3-C5 als ein harness-gated Block?
 3. **#230 vorziehen?** thesis_tiere-Harness in CI compile-gaten würde C3c/C4/C5 + alle künftige abi_adapter-Arbeit CI-verifizierbar machen (schließt §4-Lücke dauerhaft) — lohnt der Vorzug vor C3c?
 
-**Antworten (vom User in dieser Session) hier nachtragen, bevor die nächste Session startet:**
-- (1) …
-- (2) …
-- (3) …
+**Antworten (vom User, 2026-06-29):**
+- **(1) → „#188-C3 weiter".** Nächste Session: Watchdog-Mitigation behalten (CI läuft, #210-Wurzel NICHT-Notfall), den **iterable-Kanal C3-Kern** bauen (IIterableAspectTier-Interface + ObservableComposedSearch-Forwarder + test_conformance_gate-Block, Verbatim-Code §5) → CI-verifizierbar (`contract:conformance`) → committen/pushen → DANN C3c/C4/C5 (abi_adapter-Adoption + IterableAspectLoop/profile_to_tree + Marker/Registry-Flip) harness-gated (#162) mit Codex.
+- **(2) impliziert:** C3-Kern (CI-verifizierbar) ZUERST als eigener Commit, Rest harness — wie empfohlen.
+- **(3) impliziert:** #230 (Harness-in-CI) NICHT vorgezogen; #210-Wurzel-Fix später (mit User, OPNsense kritisch). Watchdog-Timer bis dahin AN lassen.
+- **START-HIER nächste Session:** §5 „C3-Kern" — Verbatim-Code ist reproduzierbar (pristine 7fdb179). Achte auf die Edit-Anchor-Falle (§7).
