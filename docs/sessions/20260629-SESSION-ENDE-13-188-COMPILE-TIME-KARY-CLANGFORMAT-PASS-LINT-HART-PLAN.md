@@ -73,3 +73,15 @@ Diese #188-4a-Schritte waren als Nächstes dran, wurden aber von der Lint-Härtu
 1. **(a)** `COMDARE_LLVM_SHA256_PIN` setzen (sha256 LLVM-22.1.8-Linux-X64.tar.xz) → lint:format@22.1.8 grün → lint:static (cppcheck) sauber → beide auf hart flippen (.gitlab-ci.yml Z.46-57). Runner ggf. kicken (#210).
 2. **(b)** #210-Wurzel: runner 19.1.1-Upgrade (#208) zuerst, dann ggf. HAProxy timeout tunnel — mit User, tcpdump-diagnostiziert.
 3. Danach #188: C5 (Marker-Flip + per-K-StaticAxisNode-Build, harness) → 4b → 4c → #215.
+
+---
+
+## 6. Session-Ende-Stand (Nachtrag, nach §1–§5 — letzte Aktionen, alles persistiert)
+- **LLVM-Bootstrap-Pin GESETZT (Option-a-Blocker behoben):** CI-Variable **`COMDARE_LLVM_SHA256_PIN = df0e1ecf16caf3489a272a5eea4eec9b0d82878f6477fa309504f918a0006384`** (Projekt 286, unmaskiert/unprotected; = sha256 von `LLVM-22.1.8-Linux-X64.tar.xz`, via prod1 streamend ermittelt). ⟹ der `.lint-base`-Bootstrap kann clang-format jetzt **gh-frei** verifizieren+installieren (`sha256sum -c`-Pfad). Das war der Grund, warum lint:format scheiterte (NICHT Format).
+- **lint:format re-triggert:** auf Pipeline 7154 als **job 190668** (pending → läuft mit dem Pin). **NÄCHSTE SESSION ZUERST:** `GET /projects/286/jobs/190668` bzw. dessen Trace prüfen (Poller-Output `scratchpad/poll_lintfmt.sh` → `tasks/<id>.output`):
+  - Bootstrap grün **und** `clang-format --dry-run -Werror` über libs/apps/tests grün ⟹ Format-Pass @22.1.8 **verifiziert** → `lint:format` in `comdare-cache-engine/.gitlab-ci.yml` (Z.46-51) auf **hart+auto** flippen (`rules: - when: manual` + `allow_failure: true` raus).
+  - Falls rot wegen 22.1.5↔22.1.8-**Drift**: die gemeldeten Dateien lokal (clang-format 22.1.5) re-formatieren + committen, bis @22.1.8 grün — DANN flippen.
+- **contract:conformance@7154 war GRÜN** = der 1256-Datei-clang-format-Pass ist **compile-sicher** (k_ary<Arity=2/4/8/16> 4249/4249).
+- **Runner** zuletzt gekickt **13:17:10Z** (#210-Mitigation); bei „pending"/„will-nicht-starten" erneut `ssh -i ~/.ssh/cluster root@10.0.10.211 systemctl restart gitlab-runner`.
+- **HEADs:** cache-engine **`15655b4`** · super **`a4fb6ba`** (beide Remotes, sauber). clang-format 22.1.5 lokal (pip, `…\clang_format\data\bin\clang-format.exe`).
+- **Verbleibend Option a:** (1) lint:format@22.1.8 verifizieren→flippen (s.o.); (2) **lint:static = cppcheck 2.21** lokal beschaffen + `--enable=warning,portability --std=c++23` über libs/apps/tests sauber machen (fix/inline-suppr bis exit 0) → flippen. **Option b:** #210-Wurzel (runner 19.1.1 #208 zuerst, dann ggf. HAProxy timeout tunnel — mit User, tcpdump-diagnostiziert).
