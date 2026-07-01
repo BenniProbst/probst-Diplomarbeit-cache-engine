@@ -102,6 +102,8 @@ Gestartet am Kontext-Ende, um den 4b-Plan gegen das **Verständnis der Diplomarb
 
 ---
 
-## §9 RÜCKFRAGEN — für die nächste Session (User beantwortet, wird hier nachgetragen)
-1. **Sequenzierung B vs direkt-D:** erst der de-scoped B-Zwischenschritt (search_organ_-Entfall, Storage-Achsen noch Spiegel; entsperrt 4c schnell), ODER direkt auf D (native `<N,L,A>`-Container via Container-Achse, echte Messung — „vollständigste Variante")?
-2. **User-Review-Gate:** nach Workflow-Konsolidierung + Gattungs-Recherche + Design-Finalisierung — soll ich VOR der ersten Code-Implementierung den finalen 4b-Entwurf zur Freigabe vorlegen, oder autonom mit dem `organ_for_search_algo`-Fundament starten?
+## §9 RÜCKFRAGEN — BEANTWORTET (User 2026-07-01, Kontext-Ende)
+1. **Sequenzierung → B→D INKREMENTELL.** Erst B (search_organ_-Entfall via bestehender `ObservableComposedContainer`, entsperrt 4c; die Pool-node/layout/allocator-Achsen bleiben in DIESER Etappe noch Spiegel/honest-0), DANN D (native `<N,L,A>`-Container-Gattungs-Container via Container-Achse, echte Messung, Spiegel-Retirement), je Familie. KEIN Direkt-Sprung auf D.
+2. **User-Review-Gate → JA (Freigabe-Gate).** Nach Workflow-Konsolidierung + Gattungs-Recherche + Design-Finalisierung den finalen 4b-Entwurf (Container-Achsen-Mechanik, `PoolStore<N,L,A>`-Form, Wrapper-Fassaden, betroffene Achsen je Gattung) ZUR FREIGABE vorlegen — ERST DANN implementieren. Ab Freigabe autonom je Increment (Codex je Commit).
+
+⟹ **START-HIER nächste Session (final):** (1) ultracode-Workflow-Ergebnis `wf_c427ab03-472` konsolidieren; (2) Memory `reference_188_4b_…` lesen; (3) Gattungs-Architektur-CODE-Recherche (Explore+Codex-Paar) — v.a. „existiert die Container-Achse?"; (4) 4b-Design finalisieren → **User-Freigabe einholen**; (5) DANN inkrementell **B→D** bauen (organ_for_search_algo-Trait zuerst).
