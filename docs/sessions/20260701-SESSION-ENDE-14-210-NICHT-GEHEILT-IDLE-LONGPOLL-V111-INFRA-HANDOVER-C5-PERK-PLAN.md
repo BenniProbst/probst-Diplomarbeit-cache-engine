@@ -133,6 +133,8 @@ Der Mess-Blocker war fast vollständig **cluster-intern** (nicht extern): prod2-
 
 ---
 
-## §11 Offene Rückfragen (User schaut zu)
-1. **#210-Grenze:** Soll ICH die idle-Long-Poll-Wurzel nächste Session re-diagnostizieren (tcpdump der idle Verbindung + Workhorse/Redis-Health), oder gehört das jetzt **vollständig** in die Infra-Domäne (der Infra-Agent besitzt+konfiguriert den Runner, hat ihn auf docker+machine umgestellt)?
-2. **Nächster Fokus:** #188 per-K Increment 1 (top-down E2, mein Default) — oder verschiebt der jetzt-stabile prod2 die Priorität (z.B. PMC/#152/#156-Mess-Vorbereitung, sobald CI/#210 wieder trägt)?
+## §11 Rückfragen — BEANTWORTET (User 2026-07-01, Session-Ende)
+1. **#210-Grenze → VOLLSTÄNDIG INFRA-DOMÄNE.** Der Infra-Agent besitzt+konfiguriert den Runner (shell→docker+machine) + hat Cluster-Zugang. Ich re-diagnostiziere NICHT selbst; ich koordiniere nur (Handover-#210-Abschnitt korrigieren / Infra informieren) + fokussiere auf die Thesis-Code-Strecke. Watchdog trägt CI derweil.
+2. **Nächster Fokus → #188 per-K Increment 1** (top-down E2, Plan in Task #188). Code-complete + Codex + `[skip ci]` (CI #210-blockiert → später testen). Kein Prioritäts-Shift trotz stabilem prod2.
+
+⟹ **START-HIER nächste Session = #188 per-K Increment 1** (nach kurzem Infra-Handback-/Cluster-Ledger-Check, §9). #210 nicht selbst anfassen (Infra-Domäne).
