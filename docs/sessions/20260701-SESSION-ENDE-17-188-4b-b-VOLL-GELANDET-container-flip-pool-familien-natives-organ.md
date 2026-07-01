@@ -137,3 +137,10 @@
 1. **Verifikations-Reihenfolge:** Erst die 4b-b-Strecke real pipeline/harness-**compilieren** (grüner Beleg) BEVOR 4b-c/D — oder direkt 4b-c/D und am Ende alles zusammen compilieren? (Empfehlung: erst compilieren — kein Aufbau auf unverifiziertem Fundament.)
 2. **DEG-1-Timing:** Key-Ernte-Capability (ObservableComposedContainer.save_state/for_each_record) als EIGENER früher Increment (behebt alle Pool-seg_ns auf einmal), oder gebündelt in die erste Node-Shape-Familie (BTree)?
 3. **Node-Shape-Achsen-Granularität:** 4 separate Achsen (BtreeOrder/SkipListShape/BstShape/HashProbeShape) — bestätigt (R2)? Oder beim Bauen doch EINE `node_shape`-Achse mit familien-getaggten Levels erwägen, falls der Registry-/Flags-Overhead von 4 Achsen zu groß wird?
+
+### ⟹ BEANTWORTET (User 2026-07-01, Kontext-Ende) — VERBINDLICHE REIHENFOLGE nächste Session
+1. **Verifikation → ERST 4b-b real compilieren, DANN 4b-c/D.** Die 4b-b-Strecke (`cd25b9b`) zuerst über Pipeline/Harness bauen (grüner, LITERALER Compile-Beleg) — kein Aufbau auf nur-Codex-verifiziertem Fundament. Das ist **PHASE V, der allererste Schritt** (nach Memory-Lesen). Fängt einen etwaigen `type_identity`-Metaprogramm-/Routing-Fehler früh.
+2. **DEG-1 → eigener FRÜHER Increment ZUERST** (vor den Node-Shape-Familien): Key-Ernte-Capability (`save_state()`/`for_each_record()` an `ObservableComposedContainer`, delegiert ans Organ falls MementoAxis) → behebt die per-op-`seg_ns`-Degeneration für ALLE 9 Pool-Familien auf einmal, sauber isoliert.
+3. (Q3 Node-Shape-Granularität: R2 = per-Familie 4 Achsen bleibt; EINE getaggte Achse nur als Notfall-Option, falls der 4-Achsen-Overhead beim Bauen real zu groß wird — Impl-Entscheid, kein neuer User-Gate.)
+
+⟹ **START-HIER-REIHENFOLGE (final):** Memory lesen → **PHASE V (4b-b compilieren, grün belegen)** → **DEG-1-Fix (Key-Ernte-Capability, eigener Increment)** → **4b-c/D per-Familie Node-Shape-Achse (BTree→SkipList→BST→Hash)** → 4a-Eytzinger → #215 → #156/#162. PMC=4c separat.
