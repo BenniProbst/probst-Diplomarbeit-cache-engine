@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     std::vector<btc::LabeledRecord> records;
-    int rc = btc::read_binary(argv[1], records);
+    int                             rc = btc::read_binary(argv[1], records);
     if (rc != 0) {
         std::cerr << "binary-to-csv: read_binary failed (status=" << rc << ")\n";
         return rc;

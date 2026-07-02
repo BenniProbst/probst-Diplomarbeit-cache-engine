@@ -22,13 +22,13 @@ namespace comdare::diplomarbeit::messung_driver::v32 {
 
 struct ValidationIssue {
     enum class Severity { Error, Warning };
-    Severity severity {Severity::Error};
+    Severity    severity{Severity::Error};
     std::string message;
 };
 
 struct ValidationReport {
     std::vector<ValidationIssue> issues;
-    bool valid {false};
+    bool                         valid{false};
 
     [[nodiscard]] bool has_errors() const noexcept {
         for (const auto& i : issues) {
@@ -37,9 +37,8 @@ struct ValidationReport {
         return false;
     }
     [[nodiscard]] std::size_t error_count() const noexcept {
-        return std::ranges::count_if(issues, [](const auto& i) {
-            return i.severity == ValidationIssue::Severity::Error;
-        });
+        return std::ranges::count_if(issues,
+                                     [](const auto& i) { return i.severity == ValidationIssue::Severity::Error; });
     }
 };
 
@@ -49,9 +48,7 @@ public:
         ValidationReport report;
 
         // Pflicht: XML-Header
-        if (xml.find("<?xml") == std::string_view::npos) {
-            add_error(report, "Missing <?xml declaration");
-        }
+        if (xml.find("<?xml") == std::string_view::npos) { add_error(report, "Missing <?xml declaration"); }
 
         // Pflicht: <messreihe version="32"> Root-Element
         if (xml.find("<messreihe") == std::string_view::npos) {
@@ -64,9 +61,9 @@ public:
         require_element(report, xml, "<metadata>", "metadata block");
         require_element(report, xml, "<name>", "metadata/name");
         require_element(report, xml, "<mode>", "metadata/mode");
-        if (xml.find("<mode>defined</mode>") == std::string_view::npos
-            && xml.find("<mode>full</mode>") == std::string_view::npos
-            && xml.find("<mode>full_sampled</mode>") == std::string_view::npos) {
+        if (xml.find("<mode>defined</mode>") == std::string_view::npos &&
+            xml.find("<mode>full</mode>") == std::string_view::npos &&
+            xml.find("<mode>full_sampled</mode>") == std::string_view::npos) {
             add_error(report, "metadata/mode must be 'defined', 'full', or 'full_sampled'");
         }
 
@@ -74,21 +71,18 @@ public:
         require_element(report, xml, "<execution_engines>", "execution_engines block");
         const auto engine_count = count_occurrences(xml, "<engine ");
         if (engine_count != 2) {
-            add_error(report, "execution_engines must contain exactly 2 <engine>, found "
-                + std::to_string(engine_count));
+            add_error(report,
+                      "execution_engines must contain exactly 2 <engine>, found " + std::to_string(engine_count));
         }
 
         // Pflicht: mindestens 1 <tupel>
         const auto tupel_count = count_occurrences(xml, "<tupel ");
-        if (tupel_count == 0) {
-            add_error(report, "At least one <tupel> required");
-        }
+        if (tupel_count == 0) { add_error(report, "At least one <tupel> required"); }
         // Pro tupel: <workload>
         const auto workload_count = count_occurrences(xml, "<workload ");
         if (workload_count < tupel_count) {
-            add_error(report, "Every <tupel> needs a <workload>, found "
-                + std::to_string(workload_count) + " workloads for "
-                + std::to_string(tupel_count) + " tupels");
+            add_error(report, "Every <tupel> needs a <workload>, found " + std::to_string(workload_count) +
+                                  " workloads for " + std::to_string(tupel_count) + " tupels");
         }
 
         // Pflicht: <output> mit Pfaden
@@ -98,15 +92,13 @@ public:
         require_element(report, xml, "<latex_path>", "output/latex_path");
 
         // Optional: <axes_default_lookup enabled="...">
-        if (xml.find("<axes_default_lookup") != std::string_view::npos
-            && xml.find("enabled=\"") == std::string_view::npos) {
+        if (xml.find("<axes_default_lookup") != std::string_view::npos &&
+            xml.find("enabled=\"") == std::string_view::npos) {
             add_warning(report, "axes_default_lookup present but enabled-attribute missing");
         }
 
         // Closing tag
-        if (xml.find("</messreihe>") == std::string_view::npos) {
-            add_error(report, "Missing closing </messreihe>");
-        }
+        if (xml.find("</messreihe>") == std::string_view::npos) { add_error(report, "Missing closing </messreihe>"); }
 
         report.valid = !report.has_errors();
         return report;
@@ -131,17 +123,16 @@ private:
     static void add_warning(ValidationReport& report, const std::string& msg) {
         report.issues.push_back({ValidationIssue::Severity::Warning, msg});
     }
-    static void require_element(ValidationReport& report, std::string_view xml,
-                                std::string_view needle, std::string_view human) {
+    static void require_element(ValidationReport& report, std::string_view xml, std::string_view needle,
+                                std::string_view human) {
         if (xml.find(needle) == std::string_view::npos) {
-            add_error(report, "Missing " + std::string(human) + " (needle: "
-                + std::string(needle) + ")");
+            add_error(report, "Missing " + std::string(human) + " (needle: " + std::string(needle) + ")");
         }
     }
     static std::size_t count_occurrences(std::string_view haystack, std::string_view needle) {
         if (needle.empty()) return 0;
         std::size_t count = 0;
-        std::size_t pos = 0;
+        std::size_t pos   = 0;
         while ((pos = haystack.find(needle, pos)) != std::string_view::npos) {
             ++count;
             pos += needle.size();
@@ -150,4 +141,4 @@ private:
     }
 };
 
-}  // namespace comdare::diplomarbeit::messung_driver::v32
+} // namespace comdare::diplomarbeit::messung_driver::v32

@@ -27,20 +27,27 @@ TEST(PipelineCrossStage, Stage03OutputFlowsInto04And05) {
 
     // --- Stufe 03: zwei Records mit UNTERSCHIEDLICHEM workload_used → 16-Spalten-CSV ---
     std::vector<btc::LabeledRecord> recs(2);
-    recs[0].permutation_id = "ce:art:tcmalloc:none";
-    recs[0].fingerprint = 1; recs[0].succeeded = true; recs[0].workload_used = "YCSB_A";
-    recs[0].record.op_count = 1000; recs[0].record.total_cycles = 25000;
-    recs[1].permutation_id = "pa:hot:mimalloc:zipf";
-    recs[1].fingerprint = 2; recs[1].succeeded = true; recs[1].workload_used = "YCSB_C";
-    recs[1].record.op_count = 2000; recs[1].record.total_cycles = 48000;
+    recs[0].permutation_id      = "ce:art:tcmalloc:none";
+    recs[0].fingerprint         = 1;
+    recs[0].succeeded           = true;
+    recs[0].workload_used       = "YCSB_A";
+    recs[0].record.op_count     = 1000;
+    recs[0].record.total_cycles = 25000;
+    recs[1].permutation_id      = "pa:hot:mimalloc:zipf";
+    recs[1].fingerprint         = 2;
+    recs[1].succeeded           = true;
+    recs[1].workload_used       = "YCSB_C";
+    recs[1].record.op_count     = 2000;
+    recs[1].record.total_cycles = 48000;
     ASSERT_EQ(btc::write_csv(csv, recs), btc::status_ok);
 
     // Stufe-03-Output MUSS 16 Spalten haben (workload_used an Index 3).
     std::ifstream in{csv};
-    std::string header;
+    std::string   header;
     std::getline(in, header);
     int ncols = 1;
-    for (char c : header) if (c == ',') ++ncols;
+    for (char c : header)
+        if (c == ',') ++ncols;
     EXPECT_EQ(ncols, 16);
     EXPECT_NE(header.find("workload_used"), std::string::npos);
 
@@ -49,7 +56,7 @@ TEST(PipelineCrossStage, Stage03OutputFlowsInto04And05) {
     ASSERT_EQ(c2l::parse_csv(csv.string(), latex_rows), c2l::status_ok);
     ASSERT_EQ(latex_rows.size(), 2u);
     EXPECT_EQ(latex_rows[0].workload_used, "YCSB_A");
-    EXPECT_EQ(latex_rows[0].op_count, 1000u);  // op_count an der korrekt verschobenen Spalte (Index 4)
+    EXPECT_EQ(latex_rows[0].op_count, 1000u); // op_count an der korrekt verschobenen Spalte (Index 4)
     EXPECT_EQ(latex_rows[1].workload_used, "YCSB_C");
     EXPECT_EQ(latex_rows[1].op_count, 2000u);
 

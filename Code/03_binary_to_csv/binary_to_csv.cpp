@@ -5,17 +5,16 @@
 
 namespace comdare::da::binary_to_csv {
 
-int read_binary(std::filesystem::path const& in,
-                std::vector<LabeledRecord>& out_records) {
+int read_binary(std::filesystem::path const& in, std::vector<LabeledRecord>& out_records) {
     std::ifstream f{in, std::ios::binary};
     if (!f) return status_io_error;
 
     std::uint32_t magic   = 0;
     std::uint32_t version = 0;
     std::uint64_t n       = 0;
-    f.read(reinterpret_cast<char*>(&magic),   sizeof(magic));
+    f.read(reinterpret_cast<char*>(&magic), sizeof(magic));
     f.read(reinterpret_cast<char*>(&version), sizeof(version));
-    f.read(reinterpret_cast<char*>(&n),       sizeof(n));
+    f.read(reinterpret_cast<char*>(&n), sizeof(n));
     if (magic != kBinaryMagic) return status_invalid_format;
     // V41.P1: v2 (mit workload_used) UND v1 (legacy, ohne) lesbar.
     if (version != kBinaryVersion && version != kBinaryVersionV1) return status_invalid_format;
@@ -49,8 +48,7 @@ int read_binary(std::filesystem::path const& in,
     return status_ok;
 }
 
-int write_csv(std::filesystem::path const& out,
-              std::span<LabeledRecord const> records) {
+int write_csv(std::filesystem::path const& out, std::span<LabeledRecord const> records) {
     std::ofstream f{out};
     if (!f) return status_io_error;
 
@@ -62,24 +60,13 @@ int write_csv(std::filesystem::path const& out,
 
     for (auto const& r : records) {
         auto const& m = r.record;
-        f << r.permutation_id << ','
-          << r.fingerprint << ','
-          << (r.succeeded ? 1 : 0) << ','
-          << r.workload_used << ','
-          << m.op_count << ','
-          << m.total_cycles << ','
-          << m.cache_misses_l1 << ','
-          << m.cache_misses_l2 << ','
-          << m.cache_misses_l3 << ','
-          << m.dtlb_misses << ','
-          << m.coherence_invalidations << ','
-          << m.energy_micro_joules << ','
-          << m.bytes_allocated << ','
-          << m.bytes_in_use_peak << ','
-          << m.external_fragmentation << ','
-          << m.internal_fragmentation << '\n';
+        f << r.permutation_id << ',' << r.fingerprint << ',' << (r.succeeded ? 1 : 0) << ',' << r.workload_used << ','
+          << m.op_count << ',' << m.total_cycles << ',' << m.cache_misses_l1 << ',' << m.cache_misses_l2 << ','
+          << m.cache_misses_l3 << ',' << m.dtlb_misses << ',' << m.coherence_invalidations << ','
+          << m.energy_micro_joules << ',' << m.bytes_allocated << ',' << m.bytes_in_use_peak << ','
+          << m.external_fragmentation << ',' << m.internal_fragmentation << '\n';
     }
     return f.good() ? status_ok : status_io_error;
 }
 
-}  // namespace comdare::da::binary_to_csv
+} // namespace comdare::da::binary_to_csv

@@ -64,16 +64,12 @@ void ensure_cached_minimal_tex(fs::path const& p) {
 }
 
 fs::path fixtures_dir() {
-    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_06"); env != nullptr) {
-        return fs::path(env);
-    }
+    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_06"); env != nullptr) { return fs::path(env); }
     return fs::current_path() / "fixtures" / "cached";
 }
 
 fs::path module_source_dir() {
-    if (auto* env = std::getenv("COMDARE_MODULE_SOURCE_DIR_06"); env != nullptr) {
-        return fs::path(env);
-    }
+    if (auto* env = std::getenv("COMDARE_MODULE_SOURCE_DIR_06"); env != nullptr) { return fs::path(env); }
     return fs::current_path();
 }
 
@@ -86,7 +82,7 @@ bool tool_available(std::string_view tool) {
     return std::system(cmd.c_str()) == 0;
 }
 
-}  // namespace
+} // namespace
 
 TEST(Stufe06Pipeline, CachedMinimalTexFixtureExistsOrIsGenerated) {
     auto dir = fixtures_dir();
@@ -99,7 +95,7 @@ TEST(Stufe06Pipeline, MinimalTexContainsExpectedSections) {
     auto dir = fixtures_dir();
     ensure_cached_minimal_tex(dir / "minimal_main.tex");
     std::ifstream in(dir / "minimal_main.tex");
-    std::string content((std::istreambuf_iterator<char>(in)), {});
+    std::string   content((std::istreambuf_iterator<char>(in)), {});
     EXPECT_NE(content.find("\\documentclass"), std::string::npos);
     EXPECT_NE(content.find("\\begin{document}"), std::string::npos);
     EXPECT_NE(content.find("\\begin{tabular}"), std::string::npos);
@@ -116,13 +112,13 @@ TEST(Stufe06Pipeline, BuildThesisShellScriptExists) {
 }
 
 TEST(Stufe06Pipeline, BuildThesisScriptsReferencePdflatex) {
-    auto src = module_source_dir();
+    auto          src = module_source_dir();
     std::ifstream in_sh(src / "build_thesis.sh");
-    std::string sh_content((std::istreambuf_iterator<char>(in_sh)), {});
+    std::string   sh_content((std::istreambuf_iterator<char>(in_sh)), {});
     EXPECT_NE(sh_content.find("pdflatex"), std::string::npos);
 
     std::ifstream in_bat(src / "build_thesis.bat");
-    std::string bat_content((std::istreambuf_iterator<char>(in_bat)), {});
+    std::string   bat_content((std::istreambuf_iterator<char>(in_bat)), {});
     EXPECT_NE(bat_content.find("pdflatex"), std::string::npos);
 }
 
@@ -140,13 +136,10 @@ TEST(Stufe06Pipeline, PdfBuildSkippedIfPdflatexAbsent) {
     fs::copy_file(dir / "minimal_main.tex", in_tex, fs::copy_options::overwrite_existing);
 
     // pdflatex -interaction=nonstopmode -halt-on-error -output-directory=work_dir main.tex
-    std::string cmd = std::string("pdflatex -interaction=nonstopmode -halt-on-error ")
-        + "-output-directory=\"" + work_dir.string() + "\" \""
-        + in_tex.string() + "\" >NUL 2>&1";
-    int rc = std::system(cmd.c_str());
-    if (rc != 0) {
-        GTEST_SKIP() << "pdflatex run failed (rc=" << rc << ") — vermutlich fehlen Pakete";
-    }
+    std::string cmd = std::string("pdflatex -interaction=nonstopmode -halt-on-error ") + "-output-directory=\"" +
+                      work_dir.string() + "\" \"" + in_tex.string() + "\" >NUL 2>&1";
+    int         rc  = std::system(cmd.c_str());
+    if (rc != 0) { GTEST_SKIP() << "pdflatex run failed (rc=" << rc << ") — vermutlich fehlen Pakete"; }
     auto pdf = work_dir / "main.pdf";
     EXPECT_TRUE(fs::exists(pdf));
     EXPECT_GT(fs::file_size(pdf), 1000u);

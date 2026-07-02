@@ -31,18 +31,16 @@ void ensure_cached_csv(fs::path const& p) {
 }
 
 fs::path fixtures_dir() {
-    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_04"); env != nullptr) {
-        return fs::path(env);
-    }
+    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_04"); env != nullptr) { return fs::path(env); }
 #ifdef COMDARE_FIXTURES_DIR_04_FALLBACK
     // Deterministischer Fallback = per-Stufe Source-Dir (CMake-einkompiliert) — KEIN CWD-Stray (2026-06-01 gehärtet).
     return fs::path(COMDARE_FIXTURES_DIR_04_FALLBACK);
 #else
-    return fs::current_path() / "fixtures" / "cached";  // letzter Notnagel
+    return fs::current_path() / "fixtures" / "cached"; // letzter Notnagel
 #endif
 }
 
-}  // namespace
+} // namespace
 
 TEST(Stufe04Pipeline, CachedCsvFixtureExistsOrIsGenerated) {
     auto dir = fixtures_dir();
@@ -89,10 +87,9 @@ TEST(Stufe04Pipeline, BausteinDescriptionFromPermutationId) {
     auto desc = c2l::generate_baustein_description("ce_lockfree:art:tcmalloc:leaf_only_counter");
     EXPECT_FALSE(desc.empty());
     // Steckbrief sollte ART und tcmalloc nennen
-    bool mentions_art = desc.find("art") != std::string::npos
-                     || desc.find("ART") != std::string::npos;
+    bool mentions_art      = desc.find("art") != std::string::npos || desc.find("ART") != std::string::npos;
     bool mentions_tcmalloc = desc.find("tcmalloc") != std::string::npos;
-    EXPECT_TRUE(mentions_art || mentions_tcmalloc);  // mindestens einer
+    EXPECT_TRUE(mentions_art || mentions_tcmalloc); // mindestens einer
 }
 
 TEST(Stufe04Pipeline, EscapeLatexHandlesSpecialChars) {
@@ -124,7 +121,7 @@ void write_wide_sample_csv(fs::path const& p) {
     f << "search_algo=eytzinger/node_type=node4;s=1/rep=1;1;1000;90000;90.0;1000;64000;ycsb_c;0\n";
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
 TEST(Stufe04Pipeline, ParseWideCsvHeaderDriven) {
     auto dir = fixtures_dir();
@@ -146,14 +143,14 @@ TEST(Stufe04Pipeline, AggregateTierWorkloadMedianAndValidityFilter) {
     std::vector<c2l::WideMeasurementRow> rows;
     ASSERT_EQ(c2l::parse_wide_csv(dir / "sample_wide_rows.csv", rows), c2l::status_ok);
     auto const aggs = c2l::aggregate_tier_workload(rows);
-    ASSERT_EQ(aggs.size(), 3u);   // (eytzinger,ycsb_c) (k_ary,ih) (k_ary,ycsb_c) — map-sortiert
+    ASSERT_EQ(aggs.size(), 3u); // (eytzinger,ycsb_c) (k_ary,ih) (k_ary,ycsb_c) — map-sortiert
     EXPECT_EQ(aggs[0].search_algo, "eytzinger");
-    EXPECT_EQ(aggs[0].samples, 1u);                       // das two_phase_valid=0-Sample ist GEFILTERT
+    EXPECT_EQ(aggs[0].samples, 1u); // das two_phase_valid=0-Sample ist GEFILTERT
     EXPECT_DOUBLE_EQ(aggs[0].median_ns_per_op, 150.0);
     EXPECT_EQ(aggs[2].search_algo, "k_ary");
     EXPECT_EQ(aggs[2].workload, "ycsb_c");
     EXPECT_EQ(aggs[2].samples, 3u);
-    EXPECT_DOUBLE_EQ(aggs[2].median_ns_per_op, 200.0);    // nearest-rank-Median von {100,200,300}
+    EXPECT_DOUBLE_EQ(aggs[2].median_ns_per_op, 200.0); // nearest-rank-Median von {100,200,300}
 }
 
 TEST(Stufe04Pipeline, WriteBiasMatrixLatex) {
@@ -171,11 +168,11 @@ TEST(Stufe04Pipeline, WriteBiasMatrixLatex) {
         std::ifstream in(out);
         content.assign((std::istreambuf_iterator<char>(in)), {});
     }
-    EXPECT_NE(content.find("\\begin{tabular}{lrr}"), std::string::npos);   // 2 Workload-Spalten (ih, ycsb_c)
-    EXPECT_NE(content.find("Suchverfahren"), std::string::npos);           // lang=de
+    EXPECT_NE(content.find("\\begin{tabular}{lrr}"), std::string::npos); // 2 Workload-Spalten (ih, ycsb_c)
+    EXPECT_NE(content.find("Suchverfahren"), std::string::npos);         // lang=de
     EXPECT_NE(content.find("k\\_ary"), std::string::npos);
-    EXPECT_NE(content.find("& 200"), std::string::npos);                   // Median-Zelle k_ary×ycsb_c
-    EXPECT_NE(content.find("& --"), std::string::npos);                    // leere Zelle eytzinger×ih
+    EXPECT_NE(content.find("& 200"), std::string::npos); // Median-Zelle k_ary×ycsb_c
+    EXPECT_NE(content.find("& --"), std::string::npos);  // leere Zelle eytzinger×ih
     std::error_code ec;
     fs::remove(out, ec);
 }

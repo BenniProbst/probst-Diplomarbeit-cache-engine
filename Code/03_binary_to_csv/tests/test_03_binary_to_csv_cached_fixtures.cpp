@@ -23,11 +23,10 @@ namespace fs  = std::filesystem;
 namespace {
 
 /// V35.D.1 Helper — schreibt Binary-Records im Format von Stufe 02_messung_driver
-void write_binary_fixture(fs::path const& p,
-                          std::vector<btc::LabeledRecord> const& records) {
+void write_binary_fixture(fs::path const& p, std::vector<btc::LabeledRecord> const& records) {
     fs::create_directories(p.parent_path());
     std::ofstream out{p, std::ios::binary | std::ios::trunc};
-    out.write(reinterpret_cast<char const*>(&btc::kBinaryMagic),   sizeof(btc::kBinaryMagic));
+    out.write(reinterpret_cast<char const*>(&btc::kBinaryMagic), sizeof(btc::kBinaryMagic));
     out.write(reinterpret_cast<char const*>(&btc::kBinaryVersion), sizeof(btc::kBinaryVersion));
     std::uint64_t n = records.size();
     out.write(reinterpret_cast<char const*>(&n), sizeof(n));
@@ -43,36 +42,31 @@ void write_binary_fixture(fs::path const& p,
 }
 
 /// V35.D.1 Helper — ensure_cached_fixture: generiert wenn nicht existiert
-void ensure_cached_fixture(fs::path const& p,
-                           std::vector<btc::LabeledRecord> const& records) {
-    if (!fs::exists(p)) {
-        write_binary_fixture(p, records);
-    }
+void ensure_cached_fixture(fs::path const& p, std::vector<btc::LabeledRecord> const& records) {
+    if (!fs::exists(p)) { write_binary_fixture(p, records); }
 }
 
 /// V35.D.1 — Fixture-Pfade unter <repo>/Code/03_binary_to_csv/tests/fixtures/cached/
 /// Resolution: COMDARE_FIXTURES_DIR env-var > Source-Dir relative
 fs::path fixtures_dir() {
     // CMake-Helper: in tests/CMakeLists.txt setzen wir COMDARE_FIXTURES_DIR_03=...
-    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_03"); env != nullptr) {
-        return fs::path(env);
-    }
+    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_03"); env != nullptr) { return fs::path(env); }
 #ifdef COMDARE_FIXTURES_DIR_03_FALLBACK
     // Deterministischer Fallback = per-Stufe Source-Dir (von CMake einkompiliert) — KEIN CWD-Stray.
     // Früher: fs::current_path()/"fixtures"/"cached" — legte bei manuellem .exe-Start aus der DA-Wurzel
     // ein verirrtes fixtures/ an (V35.D.1-Altlast, 2026-06-01 gehärtet).
     return fs::path(COMDARE_FIXTURES_DIR_03_FALLBACK);
 #else
-    return fs::current_path() / "fixtures" / "cached";  // letzter Notnagel (CMake liefert den Fallback i.d.R.)
+    return fs::current_path() / "fixtures" / "cached"; // letzter Notnagel (CMake liefert den Fallback i.d.R.)
 #endif
 }
 
 std::vector<btc::LabeledRecord> make_sample_3_records() {
     std::vector<btc::LabeledRecord> v(3);
     for (std::size_t i = 0; i < 3; ++i) {
-        v[i].permutation_id = "perm_zipf_" + std::to_string(i);
-        v[i].fingerprint    = 0xCAFE0000ULL + i;
-        v[i].succeeded      = true;
+        v[i].permutation_id           = "perm_zipf_" + std::to_string(i);
+        v[i].fingerprint              = 0xCAFE0000ULL + i;
+        v[i].succeeded                = true;
         v[i].record.version           = 1;
         v[i].record.op_count          = (i + 1) * 1000;
         v[i].record.total_cycles      = (i + 1) * 25'000;
@@ -87,14 +81,14 @@ std::vector<btc::LabeledRecord> make_sample_3_records() {
 
 std::vector<btc::LabeledRecord> make_failed_run() {
     std::vector<btc::LabeledRecord> v(1);
-    v[0].permutation_id = "perm_failed";
-    v[0].fingerprint    = 0xDEAD;
-    v[0].succeeded      = false;
+    v[0].permutation_id  = "perm_failed";
+    v[0].fingerprint     = 0xDEAD;
+    v[0].succeeded       = false;
     v[0].record.op_count = 0;
     return v;
 }
 
-}  // namespace
+} // namespace
 
 // ============================================================================
 // V35.D.1 — Fixture-Setup (Generator-as-Test)
@@ -103,7 +97,7 @@ std::vector<btc::LabeledRecord> make_failed_run() {
 TEST(Stufe03Pipeline, CachedFixturesExistOrAreGenerated) {
     auto dir = fixtures_dir();
     ensure_cached_fixture(dir / "sample_3_records.bin", make_sample_3_records());
-    ensure_cached_fixture(dir / "sample_failed.bin",    make_failed_run());
+    ensure_cached_fixture(dir / "sample_failed.bin", make_failed_run());
 
     EXPECT_TRUE(fs::exists(dir / "sample_3_records.bin"));
     EXPECT_TRUE(fs::exists(dir / "sample_failed.bin"));
@@ -151,14 +145,14 @@ TEST(Stufe03Pipeline, WriteCsvFromCachedFixture) {
     {
         std::ifstream in(csv_out);
         content.assign((std::istreambuf_iterator<char>(in)), {});
-    }  // ifstream out-of-scope -> Datei wird geschlossen
+    } // ifstream out-of-scope -> Datei wird geschlossen
     EXPECT_NE(content.find("permutation_id,fingerprint,succeeded"), std::string::npos);
     EXPECT_NE(content.find("perm_zipf_0"), std::string::npos);
     EXPECT_NE(content.find("perm_zipf_1"), std::string::npos);
     EXPECT_NE(content.find("perm_zipf_2"), std::string::npos);
 
     std::error_code ec;
-    fs::remove(csv_out, ec);  // best-effort cleanup
+    fs::remove(csv_out, ec); // best-effort cleanup
 }
 
 TEST(Stufe03Pipeline, FullPipelineThreeStepsBinaryToCsv) {
@@ -176,11 +170,11 @@ TEST(Stufe03Pipeline, FullPipelineThreeStepsBinaryToCsv) {
     ASSERT_EQ(btc::write_csv(csv_out, records), btc::status_ok);
 
     // Schritt C: Verifiziere CSV-Schema-Konsistenz
-    int data_rows = 0;
+    int data_rows     = 0;
     int header_commas = 0;
     {
         std::ifstream in(csv_out);
-        std::string header_line;
+        std::string   header_line;
         std::getline(in, header_line);
         // Zaehle Kommas: kanonisches 16-Spalten-Format (P1/#50, mit workload_used@idx3) hat 15 Kommas.
         // (Frühere Erwartung 14 = 15-Spalten-Altschema, vor der 16-col-Migration; 2026-06-01 nachgezogen.)

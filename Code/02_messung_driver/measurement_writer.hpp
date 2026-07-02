@@ -27,21 +27,18 @@
 namespace comdare::messung_driver {
 
 inline constexpr std::uint32_t kMeasurementMagic   = 0xC0FFEE02u;
-inline constexpr std::uint32_t kMeasurementVersion = 2u;  // V41.P1: v2 = + workload_used pro Record
+inline constexpr std::uint32_t kMeasurementVersion = 2u; // V41.P1: v2 = + workload_used pro Record
 
 class MeasurementWriter {
 public:
-    explicit MeasurementWriter(std::filesystem::path const& path)
-        : path_{path} {
+    explicit MeasurementWriter(std::filesystem::path const& path) : path_{path} {
         std::filesystem::create_directories(path.parent_path());
         ofs_.open(path, std::ios::binary | std::ios::trunc);
-        if (!ofs_) {
-            return;
-        }
+        if (!ofs_) { return; }
         // Header schreiben (num_records vorerst 0, am Ende ueberschrieben)
         ofs_.write(reinterpret_cast<char const*>(&kMeasurementMagic), sizeof(std::uint32_t));
         ofs_.write(reinterpret_cast<char const*>(&kMeasurementVersion), sizeof(std::uint32_t));
-        std::uint64_t zero {0};
+        std::uint64_t zero{0};
         ofs_.write(reinterpret_cast<char const*>(&zero), sizeof(std::uint64_t));
     }
 
@@ -49,10 +46,7 @@ public:
 
     // V41.P1: workload_used (z.B. "micro" fuer den Plugin-Mikrobench, "YCSB_A".. fuer echte Reihen)
     // wird als laengen-praefixierter String VOR dem POD-Record geschrieben (Container-v2).
-    void add(std::string_view perm_id,
-             std::uint64_t fingerprint,
-             bool succeeded,
-             std::string_view workload_used,
+    void add(std::string_view perm_id, std::uint64_t fingerprint, bool succeeded, std::string_view workload_used,
              comdare_measurement_record_v1 const& rec) {
         if (!ofs_) return;
         std::uint32_t const id_len = static_cast<std::uint32_t>(perm_id.size());
@@ -79,38 +73,33 @@ public:
         ofs_.close();
     }
 
-    ~MeasurementWriter() {
-        finalize();
-    }
+    ~MeasurementWriter() { finalize(); }
 
-    [[nodiscard]] std::uint64_t count() const { return num_records_; }
+    [[nodiscard]] std::uint64_t                count() const { return num_records_; }
     [[nodiscard]] std::filesystem::path const& path() const { return path_; }
 
 private:
     std::filesystem::path path_;
     std::ofstream         ofs_;
-    std::uint64_t         num_records_ {0};
+    std::uint64_t         num_records_{0};
 };
 
 // Helper: us/op + Achsen-Info -> measurement_record_v1
-inline comdare_measurement_record_v1 make_record_from_run(
-    std::uint64_t n_ops,
-    double micros_per_op)
-{
+inline comdare_measurement_record_v1 make_record_from_run(std::uint64_t n_ops, double micros_per_op) {
     comdare_measurement_record_v1 r{};
-    r.version       = kMeasurementVersion;
-    r.op_count      = n_ops;
+    r.version  = kMeasurementVersion;
+    r.op_count = n_ops;
     // total_cycles approximieren aus us/op (1 us ~ 3000 cycles bei 3 GHz)
     // (Phase 6+: PerfCounter ablesen statt approximieren)
-    double total_us     = micros_per_op * static_cast<double>(n_ops);
-    r.total_cycles  = static_cast<std::uint64_t>(total_us * 3000.0);
-    r.cache_misses_l1 = 0;  // Phase 6+: PMU-Counter
-    r.cache_misses_l2 = 0;
-    r.cache_misses_l3 = 0;
-    r.dtlb_misses     = 0;
+    double total_us           = micros_per_op * static_cast<double>(n_ops);
+    r.total_cycles            = static_cast<std::uint64_t>(total_us * 3000.0);
+    r.cache_misses_l1         = 0; // Phase 6+: PMU-Counter
+    r.cache_misses_l2         = 0;
+    r.cache_misses_l3         = 0;
+    r.dtlb_misses             = 0;
     r.coherence_invalidations = 0;
     r.energy_micro_joules     = 0;
-    r.bytes_allocated         = n_ops * 64;  // Schaetzung: HashSet-Bucket-Size
+    r.bytes_allocated         = n_ops * 64; // Schaetzung: HashSet-Bucket-Size
     r.bytes_in_use_peak       = r.bytes_allocated;
     r.external_fragmentation  = 0.0;
     r.internal_fragmentation  = 0.0;
@@ -127,4 +116,4 @@ inline std::uint64_t fingerprint_of(std::string_view s) {
     return h;
 }
 
-}  // namespace comdare::messung_driver
+} // namespace comdare::messung_driver

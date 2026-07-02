@@ -20,37 +20,41 @@ int main(int argc, char* argv[]) {
     //              op_scan_p50_ns, op_rmw_p50_ns}.
     // --3d → echte 3D-Surface (view={45}{30}, z log-skaliert); sonst 2D-Heatmap (viridis).
     if (argc >= 4 && std::string{argv[1]}.rfind("--surface=", 0) == 0) {
-        std::string const z_field = std::string{argv[1]}.substr(10);
-        char const* in_csv  = argv[2];
-        char const* out_tex = argv[3];
-        std::string lang = "en";
-        bool want_3d = false;
+        std::string const   z_field = std::string{argv[1]}.substr(10);
+        char const*         in_csv  = argv[2];
+        char const*         out_tex = argv[3];
+        std::string         lang    = "en";
+        bool                want_3d = false;
         dg::PageConstraints cnst;
         for (int i = 4; i < argc; ++i) {
             std::string a{argv[i]};
-            if (a.rfind("--lang=", 0) == 0) lang = a.substr(7);
-            else if (a == "--3d") want_3d = true;
-            else if (a == "--body-only") cnst.body_only = true;
+            if (a.rfind("--lang=", 0) == 0)
+                lang = a.substr(7);
+            else if (a == "--3d")
+                want_3d = true;
+            else if (a == "--body-only")
+                cnst.body_only = true;
         }
 
         std::vector<dg::WideMeasurementRow> rows;
-        int const prc = dg::parse_wide_csv(in_csv, rows);
+        int const                           prc = dg::parse_wide_csv(in_csv, rows);
         if (prc != 0) {
             std::cerr << "parse_wide_csv failed: " << prc << " (10=io,11=empty/header/parse)\n";
             return prc;
         }
-        if (rows.empty()) { std::cerr << "parse_wide_csv: 0 rows\n"; return 11; }
+        if (rows.empty()) {
+            std::cerr << "parse_wide_csv: 0 rows\n";
+            return 11;
+        }
 
-        int const rc = want_3d
-            ? dg::write_surface3d_search_algo_x_workload(out_tex, rows, z_field, lang, cnst)
-            : dg::write_surface_search_algo_x_workload(out_tex, rows, z_field, lang, cnst);
+        int const rc = want_3d ? dg::write_surface3d_search_algo_x_workload(out_tex, rows, z_field, lang, cnst)
+                               : dg::write_surface_search_algo_x_workload(out_tex, rows, z_field, lang, cnst);
         if (rc != 0) {
             std::cerr << "write_surface failed: " << rc << "\n";
             return rc;
         }
-        std::cout << "diagram-generator: surface z=" << z_field
-                  << (want_3d ? " [3d]" : " [heatmap]")
-                  << " from " << rows.size() << " wide rows -> " << out_tex << "\n";
+        std::cout << "diagram-generator: surface z=" << z_field << (want_3d ? " [3d]" : " [heatmap]") << " from "
+                  << rows.size() << " wide rows -> " << out_tex << "\n";
         return 0;
     }
 
@@ -58,27 +62,35 @@ int main(int argc, char* argv[]) {
     //   gesweepter Achsen-Ausprägung. Header-getrieben/n/a-tolerant (fehlt working_set_n → empty).
     //   diagram-generator --sweep-curve=<z_field> <wide.csv> <out.tex> [--lang=de|en] [--body-only]
     if (argc >= 4 && std::string{argv[1]}.rfind("--sweep-curve=", 0) == 0) {
-        std::string const z_field = std::string{argv[1]}.substr(14);
-        char const* in_csv  = argv[2];
-        char const* out_tex = argv[3];
-        std::string lang = "en";
+        std::string const   z_field = std::string{argv[1]}.substr(14);
+        char const*         in_csv  = argv[2];
+        char const*         out_tex = argv[3];
+        std::string         lang    = "en";
         dg::PageConstraints cnst;
         for (int i = 4; i < argc; ++i) {
             std::string a{argv[i]};
-            if (a.rfind("--lang=", 0) == 0) lang = a.substr(7);
-            else if (a == "--body-only") cnst.body_only = true;
+            if (a.rfind("--lang=", 0) == 0)
+                lang = a.substr(7);
+            else if (a == "--body-only")
+                cnst.body_only = true;
         }
         std::vector<dg::WideMeasurementRow> rows;
-        int const prc = dg::parse_wide_csv(in_csv, rows);
-        if (prc != 0) { std::cerr << "parse_wide_csv failed: " << prc << "\n"; return prc; }
+        int const                           prc = dg::parse_wide_csv(in_csv, rows);
+        if (prc != 0) {
+            std::cerr << "parse_wide_csv failed: " << prc << "\n";
+            return prc;
+        }
         int const rc = dg::write_working_set_sweep_curve(out_tex, rows, z_field, lang, cnst);
         if (rc == dg::status_empty_input) {
             std::cerr << "sweep-curve: keine working_set_n-Daten (n/a, ehrlich leer) -> nichts geschrieben\n";
             return rc;
         }
-        if (rc != 0) { std::cerr << "write_working_set_sweep_curve failed: " << rc << "\n"; return rc; }
-        std::cout << "diagram-generator: sweep-curve z=" << z_field
-                  << " from " << rows.size() << " wide rows -> " << out_tex << "\n";
+        if (rc != 0) {
+            std::cerr << "write_working_set_sweep_curve failed: " << rc << "\n";
+            return rc;
+        }
+        std::cout << "diagram-generator: sweep-curve z=" << z_field << " from " << rows.size() << " wide rows -> "
+                  << out_tex << "\n";
         return 0;
     }
 
@@ -95,8 +107,7 @@ int main(int argc, char* argv[]) {
             std::cerr << "write_throughput_by_workload failed: " << rc << "\n";
             return rc;
         }
-        std::cout << "diagram-generator: " << rows.size()
-                  << " rows by workload -> " << argv[3] << "\n";
+        std::cout << "diagram-generator: " << rows.size() << " rows by workload -> " << argv[3] << "\n";
         return 0;
     }
 
@@ -106,23 +117,30 @@ int main(int argc, char* argv[]) {
                   << "       (--body-only: nur tikzpicture, ohne figure/caption — Caller wrappt)\n"
                   << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
                   << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n"
-                  << "  oder: diagram-generator --surface=<z_field> <wide.csv> <output.tex> [--lang=de|en] [--3d] [--body-only]\n"
+                  << "  oder: diagram-generator --surface=<z_field> <wide.csv> <output.tex> [--lang=de|en] [--3d] "
+                     "[--body-only]\n"
                   << "       (L-c: WIDE-Matrix → Surface/Heatmap je Interface-Funktion;\n"
-                  << "        z_field: ns_per_op|op_insert_p50_ns|op_lookup_p50_ns|op_erase_p50_ns|op_scan_p50_ns|op_rmw_p50_ns)\n";
+                  << "        z_field: "
+                     "ns_per_op|op_insert_p50_ns|op_lookup_p50_ns|op_erase_p50_ns|op_scan_p50_ns|op_rmw_p50_ns)\n";
         return 1;
     }
     std::ifstream f{argv[1]};
-    if (!f) { std::cerr << "Input not readable\n"; return 10; }
+    if (!f) {
+        std::cerr << "Input not readable\n";
+        return 10;
+    }
 
     // C2 (2026-06-01): bilingualer Compile-Schalter --lang=de|en (lokalisiert Titel + Achsen).
     // C1 (2026-06-01): --body-only emittiert nur den tikzpicture-Rumpf (figure/caption
     //                  steuert das einbindende Dokument → spec-Caption + \label).
-    std::string lang = "en";
+    std::string         lang = "en";
     dg::PageConstraints cnst;
     for (int i = 3; i < argc; ++i) {
         std::string a{argv[i]};
-        if (a.rfind("--lang=", 0) == 0) lang = a.substr(7);
-        else if (a == "--body-only") cnst.body_only = true;
+        if (a.rfind("--lang=", 0) == 0)
+            lang = a.substr(7);
+        else if (a == "--body-only")
+            cnst.body_only = true;
     }
     dg::BarChartData bar;
     if (lang == "de") {
@@ -136,7 +154,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string line;
-    std::getline(f, line);  // skip header
+    std::getline(f, line); // skip header
     while (std::getline(f, line)) {
         if (line.empty()) continue;
         auto comma = line.find(',');
@@ -149,12 +167,14 @@ int main(int argc, char* argv[]) {
         // "Zyklen/Cycles" (s.o.) → es MUSS total_cycles (idx 4) geplottet werden,
         // nicht op_count (Korrektheits-Fix 2026-06-01, C1: Achse ↔ Wert konsistent).
         std::istringstream iss{line.substr(comma + 1)};
-        std::string token;
-        int idx = 0;
-        double val = 0.0;
+        std::string        token;
+        int                idx = 0;
+        double             val = 0.0;
         while (std::getline(iss, token, ',')) {
-            if (idx == 4) {  // total_cycles
-                try { val = std::stod(token); } catch (...) {}
+            if (idx == 4) { // total_cycles
+                try {
+                    val = std::stod(token);
+                } catch (...) {}
                 break;
             }
             ++idx;
@@ -167,7 +187,6 @@ int main(int argc, char* argv[]) {
         std::cerr << "write_bar_chart failed: " << rc << "\n";
         return rc;
     }
-    std::cout << "diagram-generator: " << bar.labels.size()
-              << " bars -> " << argv[2] << "\n";
+    std::cout << "diagram-generator: " << bar.labels.size() << " bars -> " << argv[2] << "\n";
     return 0;
 }

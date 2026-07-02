@@ -23,8 +23,8 @@ namespace comdare::diplomarbeit::messung_driver::v32 {
 
 struct ExportStatus {
     enum class Code { Ok, IoError, EmptyReport };
-    Code code {Code::Ok};
-    std::string message;
+    Code               code{Code::Ok};
+    std::string        message;
     [[nodiscard]] bool ok() const noexcept { return code == Code::Ok; }
 };
 
@@ -41,53 +41,37 @@ struct ExportStatus {
 class MessreiheReportExporter {
 public:
     /// CSV-Export: 12 Spalten pro PermutationOutcome
-    [[nodiscard]] ExportStatus write_csv(const MessreiheReport& report,
-                                         const std::filesystem::path& out_path) const {
-        if (report.outcomes.empty()) {
-            return {ExportStatus::Code::EmptyReport, "report has no outcomes"};
-        }
+    [[nodiscard]] ExportStatus write_csv(const MessreiheReport& report, const std::filesystem::path& out_path) const {
+        if (report.outcomes.empty()) { return {ExportStatus::Code::EmptyReport, "report has no outcomes"}; }
         std::ofstream f(out_path);
-        if (!f.is_open()) {
-            return {ExportStatus::Code::IoError, "cannot open output: " + out_path.string()};
-        }
+        if (!f.is_open()) { return {ExportStatus::Code::IoError, "cannot open output: " + out_path.string()}; }
         f << "axis_id,variant_name,verdict,welch_p_value,throughput_ratio,"
           << "ee_a_engine,ee_a_throughput,ee_a_p99_ns,ee_a_cache_misses,"
           << "ee_b_engine,ee_b_throughput,ee_b_p99_ns\n";
         for (const auto& outcome : report.outcomes) {
-            f << outcome.axis_id << ','
-              << outcome.variant_name << ','
-              << verdict_string(outcome.verdict) << ','
-              << outcome.welch_p_value << ','
-              << outcome.throughput_ratio << ','
-              << outcome.ee_a_result.engine_name << ','
-              << outcome.ee_a_result.throughput_ops_per_sec << ','
-              << outcome.ee_a_result.latency_p99.count() << ','
-              << outcome.ee_a_result.total_cache_misses << ','
-              << outcome.ee_b_result.engine_name << ','
-              << outcome.ee_b_result.throughput_ops_per_sec << ','
-              << outcome.ee_b_result.latency_p99.count() << '\n';
+            f << outcome.axis_id << ',' << outcome.variant_name << ',' << verdict_string(outcome.verdict) << ','
+              << outcome.welch_p_value << ',' << outcome.throughput_ratio << ',' << outcome.ee_a_result.engine_name
+              << ',' << outcome.ee_a_result.throughput_ops_per_sec << ',' << outcome.ee_a_result.latency_p99.count()
+              << ',' << outcome.ee_a_result.total_cache_misses << ',' << outcome.ee_b_result.engine_name << ','
+              << outcome.ee_b_result.throughput_ops_per_sec << ',' << outcome.ee_b_result.latency_p99.count() << '\n';
         }
         return {};
     }
 
     /// TikZ-Summary: Stacked-Bar Wins/Ties/Losses pro Achse
-    [[nodiscard]] ExportStatus write_tikz_summary(const MessreiheReport& report,
+    [[nodiscard]] ExportStatus write_tikz_summary(const MessreiheReport&       report,
                                                   const std::filesystem::path& out_path) const {
-        if (report.outcomes.empty()) {
-            return {ExportStatus::Code::EmptyReport, "report has no outcomes"};
-        }
+        if (report.outcomes.empty()) { return {ExportStatus::Code::EmptyReport, "report has no outcomes"}; }
         std::ofstream f(out_path);
-        if (!f.is_open()) {
-            return {ExportStatus::Code::IoError, "cannot open output: " + out_path.string()};
-        }
+        if (!f.is_open()) { return {ExportStatus::Code::IoError, "cannot open output: " + out_path.string()}; }
 
-        std::map<std::string, std::array<std::size_t, 3>> per_axis;  // [ee_a_wins, ee_b_wins, ties]
+        std::map<std::string, std::array<std::size_t, 3>> per_axis; // [ee_a_wins, ee_b_wins, ties]
         for (const auto& o : report.outcomes) {
             auto& bucket = per_axis[o.axis_id];
             switch (o.verdict) {
                 case cmd::CompareEngineCommand::Verdict::EE_A_Wins: ++bucket[0]; break;
                 case cmd::CompareEngineCommand::Verdict::EE_B_Wins: ++bucket[1]; break;
-                case cmd::CompareEngineCommand::Verdict::Tie:       ++bucket[2]; break;
+                case cmd::CompareEngineCommand::Verdict::Tie: ++bucket[2]; break;
                 default: break;
             }
         }
@@ -111,28 +95,19 @@ public:
           << "    xtick=data,\n"
           << "    ymin=0]\n"
           << "\\addplot+[fill=green!60] coordinates {";
-        for (const auto& [axis_id, b] : per_axis) {
-            f << "(" << axis_id << ',' << b[0] << ") ";
-        }
+        for (const auto& [axis_id, b] : per_axis) { f << "(" << axis_id << ',' << b[0] << ") "; }
         f << "};\n"
           << "\\addplot+[fill=orange!60] coordinates {";
-        for (const auto& [axis_id, b] : per_axis) {
-            f << "(" << axis_id << ',' << b[1] << ") ";
-        }
+        for (const auto& [axis_id, b] : per_axis) { f << "(" << axis_id << ',' << b[1] << ") "; }
         f << "};\n"
           << "\\addplot+[fill=gray!40] coordinates {";
-        for (const auto& [axis_id, b] : per_axis) {
-            f << "(" << axis_id << ',' << b[2] << ") ";
-        }
+        for (const auto& [axis_id, b] : per_axis) { f << "(" << axis_id << ',' << b[2] << ") "; }
         f << "};\n"
           << "\\legend{EE-A wins (CacheEngine), EE-B wins (PrtArt), Tie}\n"
           << "\\end{axis}\n"
           << "\\end{tikzpicture}\n";
-        f << "% Total: axes=" << report.total_axes
-          << " variants=" << report.total_variants
-          << " ee_a_wins=" << report.ee_a_wins
-          << " ee_b_wins=" << report.ee_b_wins
-          << " ties=" << report.ties
+        f << "% Total: axes=" << report.total_axes << " variants=" << report.total_variants
+          << " ee_a_wins=" << report.ee_a_wins << " ee_b_wins=" << report.ee_b_wins << " ties=" << report.ties
           << " elapsed_ns=" << report.total_elapsed.count() << "\n";
         return {};
     }
@@ -140,13 +115,13 @@ public:
 private:
     static std::string_view verdict_string(cmd::CompareEngineCommand::Verdict v) {
         switch (v) {
-            case cmd::CompareEngineCommand::Verdict::EE_A_Wins:        return "EE_A_Wins";
-            case cmd::CompareEngineCommand::Verdict::EE_B_Wins:        return "EE_B_Wins";
-            case cmd::CompareEngineCommand::Verdict::Tie:              return "Tie";
+            case cmd::CompareEngineCommand::Verdict::EE_A_Wins: return "EE_A_Wins";
+            case cmd::CompareEngineCommand::Verdict::EE_B_Wins: return "EE_B_Wins";
+            case cmd::CompareEngineCommand::Verdict::Tie: return "Tie";
             case cmd::CompareEngineCommand::Verdict::InconclusiveData: return "Inconclusive";
         }
         return "Unknown";
     }
 };
 
-}  // namespace comdare::diplomarbeit::messung_driver::v32
+} // namespace comdare::diplomarbeit::messung_driver::v32

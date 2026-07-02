@@ -48,9 +48,8 @@ struct ScopedTempDir {
     explicit ScopedTempDir(std::string_view name_hint) {
         auto base = fs::temp_directory_path() / "comdare_test";
         fs::create_directories(base);
-        path = base / (std::string{name_hint} + "_"
-                       + std::to_string(::getpid()) + "_"
-                       + std::to_string(reinterpret_cast<std::uintptr_t>(this)));
+        path = base / (std::string{name_hint} + "_" + std::to_string(::getpid()) + "_" +
+                       std::to_string(reinterpret_cast<std::uintptr_t>(this)));
         fs::create_directories(path);
     }
     ~ScopedTempDir() {
@@ -110,17 +109,17 @@ void write_minimal_xml_configs(fs::path const& config_dir) {
 
 cb::WorkloadOptions make_small_workload() {
     cb::WorkloadOptions w;
-    w.config.random_seed    = 42;
-    w.config.key_size_bytes = 16;
+    w.config.random_seed      = 42;
+    w.config.key_size_bytes   = 16;
     w.config.value_size_bytes = 64;
-    w.config.num_keys       = 1000;
-    w.config.num_operations = 5000;
-    w.config.zipfian_theta  = 0.99;
-    w.workload              = wg::YcsbWorkload::C;
+    w.config.num_keys         = 1000;
+    w.config.num_operations   = 5000;
+    w.config.zipfian_theta    = 0.99;
+    w.workload                = wg::YcsbWorkload::C;
     return w;
 }
 
-}  // anonymous
+} // namespace
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Test-Group 1: ExperimentDriver Konstruktion + Lifetime
@@ -134,7 +133,7 @@ TEST(MessungDriver_Construction, DefaultOptionsAreSane) {
 }
 
 TEST(MessungDriver_Construction, ConstructWithOptions) {
-    ScopedTempDir tmp("ctor");
+    ScopedTempDir               tmp("ctor");
     cb::ExperimentDriverOptions opts;
     opts.config_dir   = tmp.path / "configs";
     opts.output_dir   = tmp.path / "out";
@@ -153,7 +152,7 @@ TEST(MessungDriver_Construction, ConstructWithOptions) {
 
 TEST(MessungDriver_Phase1, EnumerateValidConfigYieldsOnePermutation) {
     ScopedTempDir tmp("phase1");
-    auto cfg = tmp.path / "configs";
+    auto          cfg = tmp.path / "configs";
     write_minimal_xml_configs(cfg);
 
     cb::ExperimentDriverOptions opts;
@@ -162,28 +161,26 @@ TEST(MessungDriver_Phase1, EnumerateValidConfigYieldsOnePermutation) {
     opts.comdare_root = fs::current_path();
     opts.verbose      = false;
 
-    cb::ExperimentDriver driver{opts};
+    cb::ExperimentDriver                         driver{opts};
     std::vector<cb::loop::PermutationDescriptor> descs;
-    int rc = driver.phase1_enumerate(descs);
+    int                                          rc = driver.phase1_enumerate(descs);
 
     EXPECT_EQ(rc, cb::status_ok);
     EXPECT_FALSE(descs.empty());
-    if (!descs.empty()) {
-        EXPECT_NE(descs.front().fingerprint, 0u);
-    }
+    if (!descs.empty()) { EXPECT_NE(descs.front().fingerprint, 0u); }
 }
 
 TEST(MessungDriver_Phase1, MissingConfigDirYieldsError) {
-    ScopedTempDir tmp("phase1_missing");
+    ScopedTempDir               tmp("phase1_missing");
     cb::ExperimentDriverOptions opts;
     opts.config_dir   = tmp.path / "nonexistent";
     opts.output_dir   = tmp.path / "out";
     opts.comdare_root = fs::current_path();
     opts.verbose      = false;
 
-    cb::ExperimentDriver driver{opts};
+    cb::ExperimentDriver                         driver{opts};
     std::vector<cb::loop::PermutationDescriptor> descs;
-    int rc = driver.phase1_enumerate(descs);
+    int                                          rc = driver.phase1_enumerate(descs);
 
     EXPECT_NE(rc, cb::status_ok);
     EXPECT_EQ(rc, cb::status_xml_parse_failed);
@@ -195,8 +192,8 @@ TEST(MessungDriver_Phase1, MissingConfigDirYieldsError) {
 
 TEST(MessungDriver_Phase2, GenerateProducesAggregatorCMake) {
     ScopedTempDir tmp("phase2");
-    auto cfg = tmp.path / "configs";
-    auto out = tmp.path / "out";
+    auto          cfg = tmp.path / "configs";
+    auto          out = tmp.path / "out";
     write_minimal_xml_configs(cfg);
 
     cb::ExperimentDriverOptions opts;
@@ -205,7 +202,7 @@ TEST(MessungDriver_Phase2, GenerateProducesAggregatorCMake) {
     opts.comdare_root = fs::current_path();
     opts.verbose      = false;
 
-    cb::ExperimentDriver driver{opts};
+    cb::ExperimentDriver                         driver{opts};
     std::vector<cb::loop::PermutationDescriptor> descs;
     ASSERT_EQ(driver.phase1_enumerate(descs), cb::status_ok);
     ASSERT_FALSE(descs.empty());
@@ -214,8 +211,7 @@ TEST(MessungDriver_Phase2, GenerateProducesAggregatorCMake) {
     EXPECT_EQ(rc, cb::status_ok);
 
     auto aggregator = out / "generated" / "CMakeLists.txt";
-    EXPECT_TRUE(fs::exists(aggregator))
-        << "Erwartet: Aggregator-CMakeLists in " << aggregator.string();
+    EXPECT_TRUE(fs::exists(aggregator)) << "Erwartet: Aggregator-CMakeLists in " << aggregator.string();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -224,8 +220,8 @@ TEST(MessungDriver_Phase2, GenerateProducesAggregatorCMake) {
 
 TEST(MessungDriver_EnumerateOnly, FullPipelineWithEnumerateOnlyDoesNotCodegen) {
     ScopedTempDir tmp("enum_only");
-    auto cfg = tmp.path / "configs";
-    auto out = tmp.path / "out";
+    auto          cfg = tmp.path / "configs";
+    auto          out = tmp.path / "out";
     write_minimal_xml_configs(cfg);
 
     cb::ExperimentDriverOptions opts;
@@ -236,7 +232,7 @@ TEST(MessungDriver_EnumerateOnly, FullPipelineWithEnumerateOnlyDoesNotCodegen) {
     opts.enumerate_only = true;
 
     cb::ExperimentDriver driver{opts};
-    int rc = driver.run_pipeline_full(make_small_workload());
+    int                  rc = driver.run_pipeline_full(make_small_workload());
     EXPECT_EQ(rc, cb::status_ok);
 
     // Codegen-Output sollte NICHT existieren.
@@ -249,8 +245,8 @@ TEST(MessungDriver_EnumerateOnly, FullPipelineWithEnumerateOnlyDoesNotCodegen) {
 
 TEST(MessungDriver_SkipBuild, GeneratesCodeButDoesNotInvokeCMake) {
     ScopedTempDir tmp("skip_build");
-    auto cfg = tmp.path / "configs";
-    auto out = tmp.path / "out";
+    auto          cfg = tmp.path / "configs";
+    auto          out = tmp.path / "out";
     write_minimal_xml_configs(cfg);
 
     cb::ExperimentDriverOptions opts;
@@ -261,13 +257,11 @@ TEST(MessungDriver_SkipBuild, GeneratesCodeButDoesNotInvokeCMake) {
     opts.skip_build   = true;
 
     cb::ExperimentDriver driver{opts};
-    int rc = driver.run_pipeline_full(make_small_workload());
+    int                  rc = driver.run_pipeline_full(make_small_workload());
     EXPECT_EQ(rc, cb::status_ok);
 
-    EXPECT_TRUE(fs::exists(out / "generated" / "CMakeLists.txt"))
-        << "Codegen-Output muss existieren bei --skip-build.";
-    EXPECT_FALSE(fs::exists(out / "build-perms"))
-        << "build-perms darf NICHT existieren bei --skip-build.";
+    EXPECT_TRUE(fs::exists(out / "generated" / "CMakeLists.txt")) << "Codegen-Output muss existieren bei --skip-build.";
+    EXPECT_FALSE(fs::exists(out / "build-perms")) << "build-perms darf NICHT existieren bei --skip-build.";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -276,7 +270,7 @@ TEST(MessungDriver_SkipBuild, GeneratesCodeButDoesNotInvokeCMake) {
 
 TEST(MessungDriver_Phase7, ExportCsvAndJsonFiles) {
     ScopedTempDir tmp("phase7");
-    auto out = tmp.path / "out";
+    auto          out = tmp.path / "out";
     fs::create_directories(out);
 
     cb::ExperimentDriverOptions opts;
@@ -288,7 +282,7 @@ TEST(MessungDriver_Phase7, ExportCsvAndJsonFiles) {
     cb::ExperimentDriver driver{opts};
 
     // Synthetische Aggregator-Daten ohne echte Modul-Loads.
-    cex::ResultAggregator agg;
+    cex::ResultAggregator  agg;
     cex::PermutationResult pr;
     pr.permutation_id = "synthetic_perm_0";
     pr.fingerprint    = 0xDEADBEEFu;
@@ -308,24 +302,23 @@ TEST(MessungDriver_Phase7, ExportCsvAndJsonFiles) {
 
 TEST(MessungDriver_DreiMessreihen, ProducesPerReiheSubdirectories) {
     ScopedTempDir tmp("drei_reihen");
-    auto cfg = tmp.path / "configs";
-    auto out = tmp.path / "out";
+    auto          cfg = tmp.path / "configs";
+    auto          out = tmp.path / "out";
     write_minimal_xml_configs(cfg);
 
-    constexpr std::array<std::string_view, 3> reihen{
-        "A_PRT_ART_vs_SOTA", "B_CacheEngine_Perms", "C_Merge_Alt_Neu"};
+    constexpr std::array<std::string_view, 3> reihen{"A_PRT_ART_vs_SOTA", "B_CacheEngine_Perms", "C_Merge_Alt_Neu"};
 
     for (auto reihe : reihen) {
-        auto reihe_out = out / std::string{reihe};
+        auto                        reihe_out = out / std::string{reihe};
         cb::ExperimentDriverOptions opts;
         opts.config_dir     = cfg;
         opts.output_dir     = reihe_out;
         opts.comdare_root   = fs::current_path();
         opts.verbose        = false;
-        opts.enumerate_only = true;  // wir testen nur das Layout
+        opts.enumerate_only = true; // wir testen nur das Layout
 
         cb::ExperimentDriver driver{opts};
-        int rc = driver.run_pipeline_full(make_small_workload());
+        int                  rc = driver.run_pipeline_full(make_small_workload());
         EXPECT_EQ(rc, cb::status_ok) << "Messreihe " << reihe << " failed";
         EXPECT_TRUE(fs::exists(reihe_out));
     }
@@ -336,23 +329,20 @@ TEST(MessungDriver_DreiMessreihen, ProducesPerReiheSubdirectories) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 TEST(MessungDriver_StatusCodes, AllErrorCodesAreDistinct) {
-    std::array<int, 7> codes{
-        cb::status_ok,
-        cb::status_xml_parse_failed,
-        cb::status_codegen_failed,
-        cb::status_cmake_configure_failed,
-        cb::status_cmake_build_failed,
-        cb::status_no_modules_loaded,
-        cb::status_export_failed};
+    std::array<int, 7> codes{cb::status_ok,
+                             cb::status_xml_parse_failed,
+                             cb::status_codegen_failed,
+                             cb::status_cmake_configure_failed,
+                             cb::status_cmake_build_failed,
+                             cb::status_no_modules_loaded,
+                             cb::status_export_failed};
 
     for (std::size_t i = 0; i < codes.size(); ++i) {
         for (std::size_t j = i + 1; j < codes.size(); ++j) {
-            EXPECT_NE(codes[i], codes[j])
-                << "Status-Codes ueberlappen: idx " << i << " == idx " << j;
+            EXPECT_NE(codes[i], codes[j]) << "Status-Codes ueberlappen: idx " << i << " == idx " << j;
         }
     }
-    EXPECT_EQ(cb::status_ok, 0)
-        << "Konvention: status_ok muss 0 sein (errno-style).";
+    EXPECT_EQ(cb::status_ok, 0) << "Konvention: status_ok muss 0 sein (errno-style).";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -383,7 +373,7 @@ TEST(MessungDriver_MessreihenMode, DefaultIsFullMode) {
 
 TEST(MessungDriver_MessreihenMode, DefinedModeFilterIsSettable) {
     cb::ExperimentDriverOptions opts;
-    opts.messreihen_mode = cb::ExperimentDriverOptions::MessreihenMode::Defined;
+    opts.messreihen_mode     = cb::ExperimentDriverOptions::MessreihenMode::Defined;
     opts.sota_profile_filter = {"art", "hot", "masstree"};
     EXPECT_EQ(opts.messreihen_mode, cb::ExperimentDriverOptions::MessreihenMode::Defined);
     EXPECT_EQ(opts.sota_profile_filter.size(), 3u);
@@ -403,7 +393,7 @@ TEST(MessungDriver_MessreihenMode, RuntimeCodegenAndFunctionalTestsAreOptIn) {
 
 TEST(MessungDriver_Reproducibility, SameConfigYieldsSameFingerprints) {
     ScopedTempDir tmp("reproduce");
-    auto cfg = tmp.path / "configs";
+    auto          cfg = tmp.path / "configs";
     write_minimal_xml_configs(cfg);
 
     std::vector<std::uint64_t> fps_run1, fps_run2;
@@ -414,7 +404,7 @@ TEST(MessungDriver_Reproducibility, SameConfigYieldsSameFingerprints) {
         opts.comdare_root = fs::current_path();
         opts.verbose      = false;
 
-        cb::ExperimentDriver driver{opts};
+        cb::ExperimentDriver                         driver{opts};
         std::vector<cb::loop::PermutationDescriptor> descs;
         ASSERT_EQ(driver.phase1_enumerate(descs), cb::status_ok);
 
@@ -424,7 +414,6 @@ TEST(MessungDriver_Reproducibility, SameConfigYieldsSameFingerprints) {
 
     ASSERT_EQ(fps_run1.size(), fps_run2.size());
     for (std::size_t i = 0; i < fps_run1.size(); ++i) {
-        EXPECT_EQ(fps_run1[i], fps_run2[i])
-            << "Fingerprint divergiert in run 2 bei idx " << i;
+        EXPECT_EQ(fps_run1[i], fps_run2[i]) << "Fingerprint divergiert in run 2 bei idx " << i;
     }
 }

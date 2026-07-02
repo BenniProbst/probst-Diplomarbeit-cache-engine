@@ -34,7 +34,7 @@ namespace detail {
     std::size_t const b = s.find_last_not_of(" \t");
     return std::string{s.substr(a, b - a + 1)};
 }
-}  // namespace detail
+} // namespace detail
 
 // Parst den codegen-`axes`-String in geordnete Achsen-Paare.
 // "simd=avx2,layout=soa,alloc=std (real=mimalloc)"
@@ -42,9 +42,9 @@ namespace detail {
 // Tokens ohne '=' werden als positionale Werte (leerer Key) aufgenommen.
 [[nodiscard]] inline std::vector<AxisKV> parse_axes(std::string_view axes) {
     std::vector<AxisKV> out;
-    std::size_t pos = 0;
+    std::size_t         pos = 0;
     while (pos <= axes.size()) {
-        std::size_t const comma = axes.find(',', pos);
+        std::size_t const      comma = axes.find(',', pos);
         std::string_view const tok =
             axes.substr(pos, comma == std::string_view::npos ? std::string_view::npos : comma - pos);
         std::string const t = detail::trim(tok);
@@ -64,8 +64,7 @@ namespace detail {
 }
 
 // Wert einer benannten Achse (falls vorhanden).
-[[nodiscard]] inline std::optional<std::string>
-axis_value(std::vector<AxisKV> const& axes, std::string_view key) {
+[[nodiscard]] inline std::optional<std::string> axis_value(std::vector<AxisKV> const& axes, std::string_view key) {
     for (auto const& kv : axes) {
         if (kv.key == key) return kv.value;
     }
@@ -74,7 +73,7 @@ axis_value(std::vector<AxisKV> const& axes, std::string_view key) {
 
 // Generisches Achsen-Item (entkoppelt von LoadedPlugin → testbar).
 struct AxisItem {
-    std::string id;
+    std::string         id;
     std::vector<AxisKV> axes;
 };
 
@@ -87,8 +86,7 @@ struct AxisItem {
     std::vector<std::string> keys;
     for (auto const& it : items) {
         for (auto const& kv : it.axes) {
-            if (!kv.key.empty() &&
-                std::find(keys.begin(), keys.end(), kv.key) == keys.end()) {
+            if (!kv.key.empty() && std::find(keys.begin(), keys.end(), kv.key) == keys.end()) {
                 keys.push_back(kv.key);
             }
         }
@@ -98,16 +96,16 @@ struct AxisItem {
 
 // Hierarchischer Achsen-Baum.
 struct AxisTreeNode {
-    std::string axis_key;                  // gruppierende Achse dieser Ebene ("" = Wurzel)
-    std::string axis_value;                // Wert dieser Ebene ("" = Wurzel)
+    std::string               axis_key;   // gruppierende Achse dieser Ebene ("" = Wurzel)
+    std::string               axis_value; // Wert dieser Ebene ("" = Wurzel)
     std::vector<AxisTreeNode> children;
-    std::vector<std::size_t> item_indices; // nur an Blättern (depth == axis_order.size()) gefüllt
+    std::vector<std::size_t>  item_indices; // nur an Blättern (depth == axis_order.size()) gefüllt
 };
 
 namespace detail {
 inline void build_subtree(AxisTreeNode& node, std::vector<AxisItem> const& items,
-                          std::vector<std::size_t> const& subset,
-                          std::vector<std::string> const& axis_order, std::size_t depth) {
+                          std::vector<std::size_t> const& subset, std::vector<std::string> const& axis_order,
+                          std::size_t depth) {
     if (depth >= axis_order.size()) {
         node.item_indices = subset;
         return;
@@ -115,23 +113,21 @@ inline void build_subtree(AxisTreeNode& node, std::vector<AxisItem> const& items
     std::string const& key = axis_order[depth];
     // std::map ⇒ deterministische, wertsortierte Gruppen-Reihenfolge.
     std::map<std::string, std::vector<std::size_t>> groups;
-    for (auto idx : subset) {
-        groups[axis_value(items[idx].axes, key).value_or("<none>")].push_back(idx);
-    }
+    for (auto idx : subset) { groups[axis_value(items[idx].axes, key).value_or("<none>")].push_back(idx); }
     for (auto const& [val, sub] : groups) {
         AxisTreeNode child;
-        child.axis_key = key;
+        child.axis_key   = key;
         child.axis_value = val;
         build_subtree(child, items, sub, axis_order, depth + 1);
         node.children.push_back(std::move(child));
     }
 }
-}  // namespace detail
+} // namespace detail
 
 // Baut den Achsen-Baum, der die Items entlang axis_order hierarchisch gruppiert.
-[[nodiscard]] inline AxisTreeNode
-build_axis_tree(std::vector<AxisItem> const& items, std::vector<std::string> const& axis_order) {
-    AxisTreeNode root;
+[[nodiscard]] inline AxisTreeNode build_axis_tree(std::vector<AxisItem> const&    items,
+                                                  std::vector<std::string> const& axis_order) {
+    AxisTreeNode             root;
     std::vector<std::size_t> all(items.size());
     for (std::size_t i = 0; i < items.size(); ++i) all[i] = i;
     detail::build_subtree(root, items, all, axis_order, 0);
@@ -150,8 +146,7 @@ build_axis_tree(std::vector<AxisItem> const& items, std::vector<std::string> con
 // Innerhalb jeder zurückgegebenen Gruppe variiert NUR `varying_axis` → das ist der saubere
 // „gleiche SIMD+Layout, vergleiche Allokator-Varianten"-Vergleich. Nur Gruppen mit ≥2 Items.
 [[nodiscard]] inline std::vector<std::vector<std::size_t>>
-subtree_groups_varying(std::vector<AxisItem> const& items,
-                       std::vector<std::string> const& axis_keys,
+subtree_groups_varying(std::vector<AxisItem> const& items, std::vector<std::string> const& axis_keys,
                        std::string_view varying_axis) {
     std::map<std::string, std::vector<std::size_t>> buckets;
     for (std::size_t i = 0; i < items.size(); ++i) {
@@ -169,4 +164,4 @@ subtree_groups_varying(std::vector<AxisItem> const& items,
     return out;
 }
 
-}  // namespace comdare::messung_driver
+} // namespace comdare::messung_driver

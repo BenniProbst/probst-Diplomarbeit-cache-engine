@@ -13,11 +13,12 @@ namespace c2l = comdare::da::csv_to_latex;
 
 namespace {
 [[nodiscard]] std::string read_file(std::filesystem::path const& p) {
-    std::ifstream in{p};
-    std::stringstream ss; ss << in.rdbuf();
+    std::ifstream     in{p};
+    std::stringstream ss;
+    ss << in.rdbuf();
     return ss.str();
 }
-}
+} // namespace
 
 TEST(CsvToLatex, EscapesSpecialCharacters) {
     EXPECT_EQ(c2l::escape_latex("a_b"), "a\\_b");
@@ -47,8 +48,7 @@ TEST(CsvToLatex, ParseCsvOnNonExistentFails) {
 }
 
 TEST(CsvToLatex, WriteLatexHasBooktabsStructure) {
-    auto tmp = std::filesystem::temp_directory_path()
-             / ("da_c2l_test_" + std::to_string(rand()) + ".tex");
+    auto tmp = std::filesystem::temp_directory_path() / ("da_c2l_test_" + std::to_string(rand()) + ".tex");
     std::vector<c2l::CsvRow> rows;
     rows.push_back({"perm_test", 0xA, true, "micro", 100, 200, 30, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0});
     EXPECT_EQ(c2l::write_latex(tmp.string(), rows, "Test", "tab:test"), c2l::status_ok);

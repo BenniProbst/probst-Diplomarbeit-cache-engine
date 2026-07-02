@@ -30,18 +30,18 @@ enum class CompilerFamily { Unknown, GCC, Clang, AppleClang, MSVC };
  * Hier vereinfacht als Compile-time bzw. constructor-init Wert.
  */
 struct HostCapabilities {
-    bool supports_avx2 {false};
-    bool supports_avx512 {false};
-    bool supports_neon {false};
-    bool supports_sve2 {false};
-    bool numa_available {false};
-    bool huge_pages_2mb {false};
-    bool huge_pages_1gb {false};
-    std::size_t num_p_cores {0};
-    std::size_t num_e_cores {0};
+    bool        supports_avx2{false};
+    bool        supports_avx512{false};
+    bool        supports_neon{false};
+    bool        supports_sve2{false};
+    bool        numa_available{false};
+    bool        huge_pages_2mb{false};
+    bool        huge_pages_1gb{false};
+    std::size_t num_p_cores{0};
+    std::size_t num_e_cores{0};
 
     /// V35.B.2 — Compiler-Family (Achse 15.1) erfasst beim Build dieses Binaries
-    CompilerFamily compiler_family {CompilerFamily::Unknown};
+    CompilerFamily compiler_family{CompilerFamily::Unknown};
 
     /// Default-Konstruktor mit konservativen Annahmen (alles false ausser scalar)
     constexpr HostCapabilities() noexcept = default;
@@ -78,11 +78,11 @@ struct HostCapabilities {
 /// V35.B.2 — Compiler-Family string conversion
 [[nodiscard]] inline std::string_view compiler_family_name(CompilerFamily f) noexcept {
     switch (f) {
-        case CompilerFamily::GCC:        return "GCC";
-        case CompilerFamily::Clang:      return "Clang";
+        case CompilerFamily::GCC: return "GCC";
+        case CompilerFamily::Clang: return "Clang";
         case CompilerFamily::AppleClang: return "AppleClang";
-        case CompilerFamily::MSVC:       return "MSVC";
-        case CompilerFamily::Unknown:    return "Unknown";
+        case CompilerFamily::MSVC: return "MSVC";
+        case CompilerFamily::Unknown: return "Unknown";
     }
     return "Unknown";
 }
@@ -92,15 +92,15 @@ struct HostCapabilities {
  * @subsystem MessungDriver
  */
 struct HardwareRequest {
-    std::string simd;                ///< z.B. "AVX2", "AVX512", "Scalar", "NEON", "SVE2"
-    std::string cache_level;         ///< z.B. "L1Aware", "L2Aware", "L3Aware", "HBMAware"
-    std::string numa;                ///< z.B. "Local", "Interleave", "Preferred", "Bind"
-    std::string prefetch_distance;   ///< z.B. "PrefetchT0", "PrefetchT1", "PrefetchNTA"
-    std::string atomic_granularity;  ///< z.B. "CAS_64", "CAS_128", "LL_SC"
+    std::string simd;               ///< z.B. "AVX2", "AVX512", "Scalar", "NEON", "SVE2"
+    std::string cache_level;        ///< z.B. "L1Aware", "L2Aware", "L3Aware", "HBMAware"
+    std::string numa;               ///< z.B. "Local", "Interleave", "Preferred", "Bind"
+    std::string prefetch_distance;  ///< z.B. "PrefetchT0", "PrefetchT1", "PrefetchNTA"
+    std::string atomic_granularity; ///< z.B. "CAS_64", "CAS_128", "LL_SC"
 
     [[nodiscard]] bool empty() const noexcept {
-        return simd.empty() && cache_level.empty() && numa.empty()
-            && prefetch_distance.empty() && atomic_granularity.empty();
+        return simd.empty() && cache_level.empty() && numa.empty() && prefetch_distance.empty() &&
+               atomic_granularity.empty();
     }
 };
 
@@ -111,15 +111,14 @@ struct HardwareRequest {
  * Achse 15: 15.1 family, 15.2 opt_level, 15.3 lto, 15.4 pgo, 15.5 target_arch.
  */
 struct CompilerRequest {
-    std::string family;          ///< "GCC", "Clang", "AppleClang", "MSVC"
-    std::string opt_level;       ///< "O0".."O3", "Ofast", "MSVC_Od", "MSVC_O1", "MSVC_O2"
-    std::string lto;             ///< "None", "ThinLTO", "FullLTO", "MSVC_LTCG"
-    std::string pgo;             ///< "None", "Generate", "Use", "SamplePGO"
-    std::string target_arch;     ///< "native", "x86-64-v3", "x86-64-v4", "znver4", "armv9-a", "generic"
+    std::string family;      ///< "GCC", "Clang", "AppleClang", "MSVC"
+    std::string opt_level;   ///< "O0".."O3", "Ofast", "MSVC_Od", "MSVC_O1", "MSVC_O2"
+    std::string lto;         ///< "None", "ThinLTO", "FullLTO", "MSVC_LTCG"
+    std::string pgo;         ///< "None", "Generate", "Use", "SamplePGO"
+    std::string target_arch; ///< "native", "x86-64-v3", "x86-64-v4", "znver4", "armv9-a", "generic"
 
     [[nodiscard]] bool empty() const noexcept {
-        return family.empty() && opt_level.empty() && lto.empty()
-            && pgo.empty() && target_arch.empty();
+        return family.empty() && opt_level.empty() && lto.empty() && pgo.empty() && target_arch.empty();
     }
 };
 
@@ -129,8 +128,8 @@ struct CompilerRequest {
  */
 struct FilterDecision {
     enum class Verdict { Pass, Skip };
-    Verdict verdict {Verdict::Pass};
-    std::string reason;  ///< Begruendung wenn Skip
+    Verdict            verdict{Verdict::Pass};
+    std::string        reason; ///< Begruendung wenn Skip
     [[nodiscard]] bool passes() const noexcept { return verdict == Verdict::Pass; }
 };
 
@@ -146,9 +145,7 @@ public:
     explicit HardwareFilter(HostCapabilities host) noexcept : host_{host} {}
 
     [[nodiscard]] FilterDecision evaluate(const HardwareRequest& req) const {
-        if (req.empty()) {
-            return {FilterDecision::Verdict::Pass, "no hardware constraints"};
-        }
+        if (req.empty()) { return {FilterDecision::Verdict::Pass, "no hardware constraints"}; }
 
         if (!req.simd.empty()) {
             if (req.simd == "AVX2" && !host_.supports_avx2) {
@@ -167,8 +164,7 @@ public:
         }
 
         if (!req.numa.empty() && req.numa != "Local" && !host_.numa_available) {
-            return {FilterDecision::Verdict::Skip,
-                "NUMA strategy '" + req.numa + "' requires NUMA support"};
+            return {FilterDecision::Verdict::Skip, "NUMA strategy '" + req.numa + "' requires NUMA support"};
         }
 
         // Cache-Level + Prefetch + Atomic-Granularity sind Soft-Constraints (kein Skip)
@@ -179,24 +175,20 @@ public:
     /// Soft-Filter: prueft nur ob die geforderte Family auf dem Host verfuegbar ist.
     /// LTO/PGO/OptLevel sind reine Compile-Time-Konfigurationen und werden hier nicht gefiltert.
     [[nodiscard]] FilterDecision evaluate(const CompilerRequest& req) const {
-        if (req.empty()) {
-            return {FilterDecision::Verdict::Pass, "no compiler constraints"};
-        }
+        if (req.empty()) { return {FilterDecision::Verdict::Pass, "no compiler constraints"}; }
         if (!req.family.empty()) {
             const auto host_family_name = compiler_family_name(host_.compiler_family);
             if (req.family != host_family_name) {
-                return {FilterDecision::Verdict::Skip,
-                    "compiler '" + req.family + "' requested but host built with '"
-                    + std::string(host_family_name) + "'"};
+                return {FilterDecision::Verdict::Skip, "compiler '" + req.family + "' requested but host built with '" +
+                                                           std::string(host_family_name) + "'"};
             }
         }
         if (req.target_arch == "armv9-a" && !host_.supports_neon) {
             return {FilterDecision::Verdict::Skip,
-                "target_arch 'armv9-a' requires ARM host but x86-Detection fehlt NEON"};
+                    "target_arch 'armv9-a' requires ARM host but x86-Detection fehlt NEON"};
         }
         if (req.target_arch == "x86-64-v4" && !host_.supports_avx512) {
-            return {FilterDecision::Verdict::Skip,
-                "target_arch 'x86-64-v4' requires AVX-512"};
+            return {FilterDecision::Verdict::Skip, "target_arch 'x86-64-v4' requires AVX-512"};
         }
         // OptLevel / LTO / PGO sind Compile-Time-only -> kein Skip
         return {FilterDecision::Verdict::Pass, "compiler constraints satisfied"};
@@ -208,4 +200,4 @@ private:
     HostCapabilities host_;
 };
 
-}  // namespace comdare::diplomarbeit::messung_driver::v32
+} // namespace comdare::diplomarbeit::messung_driver::v32

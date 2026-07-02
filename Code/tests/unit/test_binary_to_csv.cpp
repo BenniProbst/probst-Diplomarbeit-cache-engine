@@ -16,8 +16,8 @@ namespace {
 class BinaryToCsvFixture : public ::testing::Test {
 protected:
     void SetUp() override {
-        tmp_ = std::filesystem::temp_directory_path()
-             / ("da_btc_test_" + std::to_string(::testing::UnitTest::GetInstance()->random_seed()));
+        tmp_ = std::filesystem::temp_directory_path() /
+               ("da_btc_test_" + std::to_string(::testing::UnitTest::GetInstance()->random_seed()));
         std::filesystem::create_directories(tmp_);
     }
     void TearDown() override {
@@ -27,8 +27,7 @@ protected:
     std::filesystem::path tmp_;
 };
 
-void write_test_binary(std::filesystem::path const& p,
-                       std::vector<btc::LabeledRecord> const& records) {
+void write_test_binary(std::filesystem::path const& p, std::vector<btc::LabeledRecord> const& records) {
     std::ofstream out{p, std::ios::binary};
     out.write(reinterpret_cast<char const*>(&btc::kBinaryMagic), sizeof(btc::kBinaryMagic));
     out.write(reinterpret_cast<char const*>(&btc::kBinaryVersion), sizeof(btc::kBinaryVersion));
@@ -49,14 +48,14 @@ void write_test_binary(std::filesystem::path const& p,
     }
 }
 
-}  // namespace
+} // namespace
 
 TEST_F(BinaryToCsvFixture, RoundtripSingleRecord) {
     btc::LabeledRecord r;
-    r.permutation_id = "test_perm";
-    r.fingerprint    = 0xC0FFEE;
-    r.succeeded      = true;
-    r.workload_used  = "YCSB_A";  // V41.P1
+    r.permutation_id      = "test_perm";
+    r.fingerprint         = 0xC0FFEE;
+    r.succeeded           = true;
+    r.workload_used       = "YCSB_A"; // V41.P1
     r.record.version      = 1;
     r.record.op_count     = 500;
     r.record.total_cycles = 99999;
@@ -69,7 +68,7 @@ TEST_F(BinaryToCsvFixture, RoundtripSingleRecord) {
     ASSERT_EQ(loaded.size(), 1u);
     EXPECT_EQ(loaded[0].permutation_id, "test_perm");
     EXPECT_EQ(loaded[0].fingerprint, 0xC0FFEEu);
-    EXPECT_EQ(loaded[0].workload_used, "YCSB_A");  // V41.P1: roundtrip
+    EXPECT_EQ(loaded[0].workload_used, "YCSB_A"); // V41.P1: roundtrip
     EXPECT_EQ(loaded[0].record.op_count, 500u);
     EXPECT_EQ(loaded[0].record.total_cycles, 99999u);
 }
@@ -86,7 +85,7 @@ TEST_F(BinaryToCsvFixture, InvalidMagicReturnsFormatError) {
         std::uint32_t bad_magic = 0xDEADBEEF;
         out.write(reinterpret_cast<char const*>(&bad_magic), sizeof(bad_magic));
         std::uint32_t ver = 1;
-        std::uint64_t n = 0;
+        std::uint64_t n   = 0;
         out.write(reinterpret_cast<char const*>(&ver), sizeof(ver));
         out.write(reinterpret_cast<char const*>(&n), sizeof(n));
     }
@@ -96,27 +95,27 @@ TEST_F(BinaryToCsvFixture, InvalidMagicReturnsFormatError) {
 
 TEST_F(BinaryToCsvFixture, WriteCsvHasHeader) {
     btc::LabeledRecord r;
-    r.permutation_id = "test";
-    r.fingerprint    = 1;
-    r.succeeded      = true;
+    r.permutation_id  = "test";
+    r.fingerprint     = 1;
+    r.succeeded       = true;
     r.record.op_count = 100;
-    auto csv_path = tmp_ / "test.csv";
+    auto csv_path     = tmp_ / "test.csv";
     EXPECT_EQ(btc::write_csv(csv_path, {&r, 1}), btc::status_ok);
 
     std::ifstream in{csv_path};
-    std::string line;
+    std::string   line;
     std::getline(in, line);
     EXPECT_NE(line.find("permutation_id"), std::string::npos);
-    EXPECT_NE(line.find("workload_used"), std::string::npos);  // V41.P1: 16-Spalten-Schema
+    EXPECT_NE(line.find("workload_used"), std::string::npos); // V41.P1: 16-Spalten-Schema
     EXPECT_NE(line.find("op_count"), std::string::npos);
 }
 
 TEST_F(BinaryToCsvFixture, RoundtripThreeRecords) {
     std::vector<btc::LabeledRecord> records(3);
     for (std::size_t i = 0; i < 3; ++i) {
-        records[i].permutation_id = "perm_" + std::to_string(i);
-        records[i].fingerprint    = 0xA0 + i;
-        records[i].succeeded      = true;
+        records[i].permutation_id  = "perm_" + std::to_string(i);
+        records[i].fingerprint     = 0xA0 + i;
+        records[i].succeeded       = true;
         records[i].record.op_count = 100 * (i + 1);
     }
     auto bin_path = tmp_ / "three.bin";

@@ -31,14 +31,12 @@ constexpr std::string_view kValidXml = R"(<?xml version="1.0" encoding="UTF-8"?>
   </output>
 </messreihe>)";
 
-}  // namespace
+} // namespace
 
 TEST(MessreiheV32Validator, ValidXmlPassesValidation) {
     auto report = v32::MessreiheV32Validator::validate_string(kValidXml);
     EXPECT_TRUE(report.valid) << "Errors: " << report.error_count();
-    for (const auto& issue : report.issues) {
-        ADD_FAILURE() << "Unexpected issue: " << issue.message;
-    }
+    for (const auto& issue : report.issues) { ADD_FAILURE() << "Unexpected issue: " << issue.message; }
 }
 
 TEST(MessreiheV32Validator, MissingMessreiheRoot) {
@@ -49,7 +47,7 @@ TEST(MessreiheV32Validator, MissingMessreiheRoot) {
 
 TEST(MessreiheV32Validator, WrongVersionFails) {
     std::string xml = std::string(kValidXml);
-    auto pos = xml.find("version=\"32\"");
+    auto        pos = xml.find("version=\"32\"");
     ASSERT_NE(pos, std::string::npos);
     xml.replace(pos, std::string("version=\"32\"").size(), "version=\"31\"");
     auto report = v32::MessreiheV32Validator::validate_string(xml);
@@ -58,7 +56,7 @@ TEST(MessreiheV32Validator, WrongVersionFails) {
 
 TEST(MessreiheV32Validator, OnlyOneEngineFails) {
     std::string xml = std::string(kValidXml);
-    auto pos = xml.find("<engine id=\"ee_b\"");
+    auto        pos = xml.find("<engine id=\"ee_b\"");
     ASSERT_NE(pos, std::string::npos);
     auto end = xml.find("/>", pos);
     xml.erase(pos, end - pos + 2);
@@ -68,8 +66,8 @@ TEST(MessreiheV32Validator, OnlyOneEngineFails) {
 
 TEST(MessreiheV32Validator, NoTupelFails) {
     std::string xml = std::string(kValidXml);
-    auto pos = xml.find("<tupel");
-    auto end = xml.find("</tupel>", pos);
+    auto        pos = xml.find("<tupel");
+    auto        end = xml.find("</tupel>", pos);
     xml.erase(pos, end - pos + std::string("</tupel>").size());
     auto report = v32::MessreiheV32Validator::validate_string(xml);
     EXPECT_FALSE(report.valid);
@@ -77,18 +75,17 @@ TEST(MessreiheV32Validator, NoTupelFails) {
 
 TEST(MessreiheV32Validator, InvalidModeFails) {
     std::string xml = std::string(kValidXml);
-    auto pos = xml.find("<mode>defined</mode>");
+    auto        pos = xml.find("<mode>defined</mode>");
     xml.replace(pos, std::string("<mode>defined</mode>").size(), "<mode>weird</mode>");
     auto report = v32::MessreiheV32Validator::validate_string(xml);
     EXPECT_FALSE(report.valid);
 }
 
 TEST(MessreiheV32Validator, ValidatesShippedExampleFile) {
-    auto report = v32::MessreiheV32Validator::validate_file(
-        "test_data_xml/messreihe_v32_schema_example.xml");
+    auto report = v32::MessreiheV32Validator::validate_file("test_data_xml/messreihe_v32_schema_example.xml");
     // Wenn das File nicht gefunden -> Skip (CTest WORKING_DIRECTORY-Problem)
-    if (!report.valid && report.issues.size() == 1
-        && report.issues[0].message.find("Cannot open") != std::string::npos) {
+    if (!report.valid && report.issues.size() == 1 &&
+        report.issues[0].message.find("Cannot open") != std::string::npos) {
         GTEST_SKIP() << "Working dir mismatch: " << report.issues[0].message;
     }
     EXPECT_TRUE(report.valid) << "Real example XML failed validation";

@@ -19,17 +19,17 @@
 #include <vector>
 
 #if defined(_WIN32)
-  #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-  #endif
-  #ifndef NOMINMAX
-    #define NOMINMAX
-  #endif
-  #include <windows.h>
-  using PluginHandle = HMODULE;
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+using PluginHandle = HMODULE;
 #else
-  #include <dlfcn.h>
-  using PluginHandle = void*;
+#include <dlfcn.h>
+using PluginHandle = void*;
 #endif
 
 namespace comdare::messung_driver {
@@ -43,8 +43,8 @@ struct PermDescriptor {
 };
 
 struct LoadedPlugin {
-    PluginHandle handle {};
-    PermDescriptor const* desc {nullptr};
+    PluginHandle          handle{};
+    PermDescriptor const* desc{nullptr};
     std::filesystem::path path;
 };
 
@@ -77,11 +77,9 @@ inline LoadedPlugin load_perm_plugin(std::filesystem::path const& p) {
     LoadedPlugin lp;
     lp.path   = p;
     lp.handle = plugin_open(p);
-    if (!lp.handle) {
-        return lp;
-    }
+    if (!lp.handle) { return lp; }
     using DescFn = const PermDescriptor* (*)();
-    auto fn = reinterpret_cast<DescFn>(plugin_sym(lp.handle, "comdare_perm_descriptor"));
+    auto fn      = reinterpret_cast<DescFn>(plugin_sym(lp.handle, "comdare_perm_descriptor"));
     if (!fn) {
         plugin_close(lp.handle);
         lp.handle = nullptr;
@@ -95,21 +93,17 @@ inline LoadedPlugin load_perm_plugin(std::filesystem::path const& p) {
 // nach .dll/.so/.dylib-Dateien (alle Plugin-Dateien).
 inline std::vector<std::filesystem::path> discover_plugin_paths(std::filesystem::path const& root) {
     std::vector<std::filesystem::path> out;
-    if (!std::filesystem::exists(root)) {
-        return out;
-    }
+    if (!std::filesystem::exists(root)) { return out; }
     namespace fs = std::filesystem;
     for (auto& entry : fs::recursive_directory_iterator(root)) {
         if (!entry.is_regular_file()) continue;
         auto const& path = entry.path();
-        auto ext = path.extension().string();
+        auto        ext  = path.extension().string();
         // Windows: .dll  Linux: .so  macOS: .dylib
         if (ext == ".dll" || ext == ".so" || ext == ".dylib") {
             // Filter: nur Dateien die mit "perm_" anfangen
             auto name = path.stem().string();
-            if (name.rfind("perm_", 0) == 0) {
-                out.push_back(path);
-            }
+            if (name.rfind("perm_", 0) == 0) { out.push_back(path); }
         }
     }
     return out;
@@ -119,8 +113,8 @@ inline std::vector<std::filesystem::path> discover_plugin_paths(std::filesystem:
 // perm_root = ${BINARY_DIR}/perm
 inline std::vector<LoadedPlugin> load_all_perm_plugins(std::filesystem::path const& perm_root) {
     std::vector<LoadedPlugin> out;
-    auto ce_paths = discover_plugin_paths(perm_root / "cache_engine");
-    auto pa_paths = discover_plugin_paths(perm_root / "prt_art");
+    auto                      ce_paths = discover_plugin_paths(perm_root / "cache_engine");
+    auto                      pa_paths = discover_plugin_paths(perm_root / "prt_art");
     out.reserve(ce_paths.size() + pa_paths.size());
     for (auto& p : ce_paths) {
         auto lp = load_perm_plugin(p);
@@ -152,4 +146,4 @@ inline void unload_all(std::vector<LoadedPlugin>& plugins) {
     plugins.clear();
 }
 
-}  // namespace comdare::messung_driver
+} // namespace comdare::messung_driver

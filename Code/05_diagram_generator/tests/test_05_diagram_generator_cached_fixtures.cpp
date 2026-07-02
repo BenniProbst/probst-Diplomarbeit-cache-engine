@@ -33,24 +33,22 @@ void ensure_cached_csv(fs::path const& p) {
 }
 
 fs::path fixtures_dir() {
-    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_05"); env != nullptr) {
-        return fs::path(env);
-    }
+    if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_05"); env != nullptr) { return fs::path(env); }
 #ifdef COMDARE_FIXTURES_DIR_05_FALLBACK
     // Deterministischer Fallback = per-Stufe Source-Dir (CMake-einkompiliert) — KEIN CWD-Stray (2026-06-01 gehärtet).
     return fs::path(COMDARE_FIXTURES_DIR_05_FALLBACK);
 #else
-    return fs::current_path() / "fixtures" / "cached";  // letzter Notnagel
+    return fs::current_path() / "fixtures" / "cached"; // letzter Notnagel
 #endif
 }
 
 bool file_contains(fs::path const& p, std::string_view needle) {
     std::ifstream in(p);
-    std::string content((std::istreambuf_iterator<char>(in)), {});
+    std::string   content((std::istreambuf_iterator<char>(in)), {});
     return content.find(needle) != std::string::npos;
 }
 
-}  // namespace
+} // namespace
 
 TEST(Stufe05Pipeline, CachedCsvFixtureExistsOrIsGenerated) {
     auto dir = fixtures_dir();
@@ -94,8 +92,8 @@ TEST(Stufe05Pipeline, WriteScatterPlot) {
     data.title   = "v35d3 Scatter";
     data.x_label = "alloc_size";
     data.y_label = "latency";
-    data.xs = {16.0, 64.0, 256.0, 1024.0};
-    data.ys = {100.0, 250.0, 800.0, 3500.0};
+    data.xs      = {16.0, 64.0, 256.0, 1024.0};
+    data.ys      = {100.0, 250.0, 800.0, 3500.0};
 
     auto out = fs::temp_directory_path() / "v35d3_scatter.tex";
     ASSERT_EQ(dg::write_scatter_plot(out, data), dg::status_ok);
@@ -132,7 +130,7 @@ void write_sample_wide_csv(fs::path const& p) {
     // two_phase_valid=0 → muss von der Aggregation ignoriert werden.
     f << "search_algo=k_ary/mapping=direct;9999.0;1.0;1.0;1.0;1.0;1.0;x;ycsb_c;0\n";
 }
-}  // namespace
+} // namespace
 
 TEST(Stufe05Pipeline, ParseWideCsvHeaderDriven) {
     auto p = fs::temp_directory_path() / "lc_wide_sample.csv";
@@ -140,7 +138,7 @@ TEST(Stufe05Pipeline, ParseWideCsvHeaderDriven) {
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
     ASSERT_EQ(rows.size(), 3u);
-    EXPECT_EQ(rows[0].search_algo, "k_ary");      // Prefix-Extraktion
+    EXPECT_EQ(rows[0].search_algo, "k_ary"); // Prefix-Extraktion
     EXPECT_EQ(rows[1].search_algo, "eytzinger");
     EXPECT_FALSE(rows[0].search_algo.empty());
     EXPECT_GT(rows[0].ns_per_op, 0.0);
@@ -158,14 +156,12 @@ TEST(Stufe05Pipeline, WriteSurfaceHeatmapFromWide) {
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
     auto out = fs::temp_directory_path() / "lc_surface_nsperop.tex";
-    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "ns_per_op", "en"),
-              dg::status_ok);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "ns_per_op", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "addplot3"));
     EXPECT_TRUE(file_contains(out, "colormap/viridis"));
 
     auto out3d = fs::temp_directory_path() / "lc_surface3d_nsperop.tex";
-    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out3d, rows, "ns_per_op", "en"),
-              dg::status_ok);
+    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out3d, rows, "ns_per_op", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out3d, "addplot3[surf]"));
     EXPECT_TRUE(file_contains(out3d, "zmode=log"));
 
@@ -178,8 +174,8 @@ TEST(Stufe05Pipeline, WriteSurfaceHeatmapFromWide) {
 TEST(Stufe05Pipeline, EmptyInputReturnsEmpty) {
     dg::BarChartData empty;
     empty.title = "empty";
-    auto out = fs::temp_directory_path() / "v35d3_empty.tex";
-    int rc = dg::write_bar_chart(out, empty);
+    auto out    = fs::temp_directory_path() / "v35d3_empty.tex";
+    int  rc     = dg::write_bar_chart(out, empty);
     // Erwartung: entweder status_empty_input ODER status_ok mit leerer Datei
     EXPECT_TRUE(rc == dg::status_ok || rc == dg::status_empty_input);
     std::error_code ec;

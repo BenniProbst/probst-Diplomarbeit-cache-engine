@@ -27,9 +27,9 @@
 
 #include "experiment_driver/experiment_driver.hpp"
 #include "xml_config_parser/xml_config_parser.hpp"
-#include "permutations_runtime_check.hpp"  // V36.D
-#include "measurement_writer.hpp"          // V41.B1
-#include "stats_aggregator.hpp"            // V41.B3
+#include "permutations_runtime_check.hpp" // V36.D
+#include "measurement_writer.hpp"         // V41.B1
+#include "stats_aggregator.hpp"           // V41.B3
 
 #include <comdare/workload_generator/workload_generator.hpp>
 
@@ -37,13 +37,13 @@
 // MUSS am Ende stehen, sonst clash mit STL via Windows-Makros.
 // V38.C.2 Workaround: windows.h definiert auf manchen SDK-Versionen Macros
 // die das raw-string-Parsing in main.cpp stoeren. #undef vor Includes setzen.
-#include "plugin_loader.hpp"               // V38.C
+#include "plugin_loader.hpp" // V38.C
 // Defensiv: einige potentielle Macro-Konflikte zwischen Win32-SDK + C++ Source
 #ifdef R
-  #undef R
+#undef R
 #endif
 #ifdef S
-  #undef S
+#undef S
 #endif
 
 namespace cb = comdare::builder;
@@ -60,8 +60,7 @@ namespace {
 // ─────────────────────────────────────────────────────────────────────────────
 class ProgressBar {
 public:
-    ProgressBar(std::string_view title, std::size_t total)
-        : title_{title}, total_{total} {
+    ProgressBar(std::string_view title, std::size_t total) : title_{title}, total_{total} {
         std::cerr << title_ << " (" << total_ << " Permutationen):\n";
         render("");
     }
@@ -79,9 +78,9 @@ public:
 
 private:
     void render(std::string_view label) {
-        last_label_ = std::string{label};
-        double const frac = total_ ? static_cast<double>(cur_) / static_cast<double>(total_) : 1.0;
-        int filled = static_cast<int>(frac * kWidth);
+        last_label_         = std::string{label};
+        double const frac   = total_ ? static_cast<double>(cur_) / static_cast<double>(total_) : 1.0;
+        int          filled = static_cast<int>(frac * kWidth);
         if (filled > kWidth) filled = kWidth;
         std::string bar;
         bar.reserve(static_cast<std::size_t>(kWidth));
@@ -90,19 +89,19 @@ private:
         std::string lbl{label};
         if (lbl.size() > 48) lbl = lbl.substr(0, 45) + "...";
         std::ostringstream os;
-        os << '\r' << '[' << bar << "] " << cur_ << '/' << total_
-           << " (" << static_cast<int>(frac * 100.0) << "%) " << lbl;
+        os << '\r' << '[' << bar << "] " << cur_ << '/' << total_ << " (" << static_cast<int>(frac * 100.0) << "%) "
+           << lbl;
         std::string out = os.str();
         if (out.size() < line_len_) out += std::string(line_len_ - out.size(), ' ');
         line_len_ = os.str().size();
         std::cerr << out << std::flush;
     }
     static constexpr int kWidth = 40;
-    std::string title_;
-    std::size_t total_;
-    std::size_t cur_ = 0;
-    std::size_t line_len_ = 0;
-    std::string last_label_;
+    std::string          title_;
+    std::size_t          total_;
+    std::size_t          cur_      = 0;
+    std::size_t          line_len_ = 0;
+    std::string          last_label_;
 };
 
 enum class MessreiheKind : std::uint8_t {
@@ -113,23 +112,21 @@ enum class MessreiheKind : std::uint8_t {
 
 [[nodiscard]] std::string_view messreihe_name(MessreiheKind k) noexcept {
     switch (k) {
-        case MessreiheKind::A_PrtArtVsSota:    return "A_PRT_ART_vs_SOTA";
+        case MessreiheKind::A_PrtArtVsSota: return "A_PRT_ART_vs_SOTA";
         case MessreiheKind::B_CacheEnginePerm: return "B_CacheEngine_Perms";
-        case MessreiheKind::C_MergeAltNeu:     return "C_Merge_Alt_Neu";
+        case MessreiheKind::C_MergeAltNeu: return "C_Merge_Alt_Neu";
     }
     return "Unknown";
 }
 
-[[nodiscard]] std::filesystem::path subdir_for(MessreiheKind k) {
-    return std::string{messreihe_name(k)};
-}
+[[nodiscard]] std::filesystem::path subdir_for(MessreiheKind k) { return std::string{messreihe_name(k)}; }
 
 [[nodiscard]] cb::WorkloadOptions default_workload_for(MessreiheKind k) {
     cb::WorkloadOptions w;
-    w.config.random_seed    = 42;
-    w.config.key_size_bytes = 16;
+    w.config.random_seed      = 42;
+    w.config.key_size_bytes   = 16;
     w.config.value_size_bytes = 64;
-    w.config.zipfian_theta  = 0.99;
+    w.config.zipfian_theta    = 0.99;
 
     switch (k) {
         case MessreiheKind::A_PrtArtVsSota:
@@ -168,8 +165,8 @@ void print_usage() {
 
 // REV 7.6 V9.6 — minimaler XML-Reader fuer messreihe-Tags (defined/full Mode)
 struct MessreihenSpec {
-    std::string id;
-    std::string mode;           // "defined" oder "full"
+    std::string              id;
+    std::string              mode; // "defined" oder "full"
     std::vector<std::string> sota_profiles;
 };
 
@@ -177,54 +174,54 @@ struct MessreihenSpec {
     std::vector<MessreihenSpec> result;
     if (!std::filesystem::exists(xml_path)) return result;
 
-    std::ifstream in{xml_path};
+    std::ifstream      in{xml_path};
     std::ostringstream ss;
     ss << in.rdbuf();
     auto content = ss.str();
 
     std::regex reihe_re{"<messreihe\\s+id\\s*=\\s*\"([^\"]+)\"[^>]*>([\\s\\S]*?)</messreihe>"};
-    auto it = std::sregex_iterator(content.begin(), content.end(), reihe_re);
-    auto end = std::sregex_iterator();
+    auto       it  = std::sregex_iterator(content.begin(), content.end(), reihe_re);
+    auto       end = std::sregex_iterator();
     for (; it != end; ++it) {
         MessreihenSpec spec;
-        spec.id = (*it)[1].str();
+        spec.id           = (*it)[1].str();
         std::string inner = (*it)[2].str();
 
-        std::regex mode_re{"<mode>(\\w+)</mode>"};
+        std::regex  mode_re{"<mode>(\\w+)</mode>"};
         std::smatch mm;
-        if (std::regex_search(inner, mm, mode_re)) spec.mode = mm[1].str();
-        else                                        spec.mode = "defined";
+        if (std::regex_search(inner, mm, mode_re))
+            spec.mode = mm[1].str();
+        else
+            spec.mode = "defined";
 
         std::regex prof_re{"<profile>([^<]+)</profile>"};
-        auto pit = std::sregex_iterator(inner.begin(), inner.end(), prof_re);
-        auto pend = std::sregex_iterator();
-        for (; pit != pend; ++pit) {
-            spec.sota_profiles.push_back((*pit)[1].str());
-        }
+        auto       pit  = std::sregex_iterator(inner.begin(), inner.end(), prof_re);
+        auto       pend = std::sregex_iterator();
+        for (; pit != pend; ++pit) { spec.sota_profiles.push_back((*pit)[1].str()); }
         result.push_back(std::move(spec));
     }
     return result;
 }
 
-}  // anonymous
+} // namespace
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) { print_usage(); return 1; }
+    if (argc < 3) {
+        print_usage();
+        return 1;
+    }
 
     // V36.D: Pre-Build-Permutationen-Check. Wenn KEINE Permutationen
     // vorhanden sind, hat das Experiment keinen Sinn -> Fatal mit Exit 2.
-    if (int rc = comdare::messung_driver::assert_permutations_available_or_die(); rc != 0) {
-        return rc;
-    }
+    if (int rc = comdare::messung_driver::assert_permutations_available_or_die(); rc != 0) { return rc; }
 
     // V37.C (2026-05-23): Manifest-Iteration — pro Permutation ein Eintrag.
     {
         auto perms = comdare::messung_driver::load_all_permutations();
         std::cout << "[V37.C] Permutations-Inventar: " << perms.size() << " Eintraege\n";
-        std::size_t i {0};
+        std::size_t i{0};
         for (auto const& p : perms) {
-            std::cout << "  [" << (++i) << "/" << perms.size() << "] "
-                      << p.subsystem << " :: " << p.id << "\n";
+            std::cout << "  [" << (++i) << "/" << perms.size() << "] " << p.subsystem << " :: " << p.id << "\n";
         }
     }
 
@@ -239,16 +236,17 @@ int main(int argc, char* argv[]) {
         // heuristische Suche nach perm/-Wurzel
         auto perm_root = exe_dir / "perm";
         for (int up = 0; up < 4 && !std::filesystem::exists(perm_root); ++up) {
-            exe_dir = exe_dir.parent_path();
+            exe_dir   = exe_dir.parent_path();
             perm_root = exe_dir / "perm";
         }
         if (!std::filesystem::exists(perm_root)) {
             std::cerr << "[V38.C] perm-Root nicht gefunden, ueberspringe Plugin-Mikrobenchmark\n";
         } else {
             std::cout << "[V38.C] lade Plugins aus: " << perm_root.string() << "\n";
-            auto plugins = comdare::messung_driver::load_all_perm_plugins(perm_root);
+            auto                    plugins = comdare::messung_driver::load_all_perm_plugins(perm_root);
             constexpr unsigned long kRunOps = 1000;
-            std::cout << "[V38.C] " << plugins.size() << " Plugins geladen, fuehre Mikrobenchmark aus (N=" << kRunOps << ")\n";
+            std::cout << "[V38.C] " << plugins.size() << " Plugins geladen, fuehre Mikrobenchmark aus (N=" << kRunOps
+                      << ")\n";
 
             // V41.B1: ein Aggregat-File fuer alle Permutationen
             std::filesystem::path const v41_out_dir = std::filesystem::path{argv[2]} / "measurements";
@@ -260,7 +258,7 @@ int main(int argc, char* argv[]) {
             }
 
             // V41.B3: pro Plugin N_REPS Runs sammeln (statt 1) fuer Statistik
-            constexpr std::size_t kReps = 10;
+            constexpr std::size_t                           kReps = 10;
             std::vector<comdare::messung_driver::PermStats> all_stats;
             all_stats.reserve(plugins.size());
 
@@ -272,7 +270,7 @@ int main(int argc, char* argv[]) {
                 bool all_ok = true;
                 for (std::size_t rep = 0; rep < kReps; ++rep) {
                     double micros = 0.0;
-                    int rc = p.desc->run(kRunOps, &micros);
+                    int    rc     = p.desc->run(kRunOps, &micros);
                     if (rc == 0) {
                         samples_us.push_back(micros);
                     } else {
@@ -280,31 +278,31 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 std::string subsystem = (std::string{p.desc->id}.rfind("pa_", 0) == 0) ? "prt_art" : "cache_engine";
-                auto stats = comdare::messung_driver::compute_stats(
-                    p.desc->id, subsystem, p.desc->axes, p.desc->version, samples_us);
+                auto        stats     = comdare::messung_driver::compute_stats(p.desc->id, subsystem, p.desc->axes,
+                                                                               p.desc->version, samples_us);
                 all_stats.push_back(stats);
 
                 bar.tick(stats.permutation_id);
                 if (!(all_ok && !samples_us.empty())) {
-                    bar.note(std::string{"[ERR] "} + std::string{p.desc->id}
-                             + "  ok-samples=" + std::to_string(samples_us.size()));
+                    bar.note(std::string{"[ERR] "} + std::string{p.desc->id} +
+                             "  ok-samples=" + std::to_string(samples_us.size()));
                 }
 
                 // V41.B1: pro Plugin EIN aggregate binary record (mean us/op)
                 // V41.P1: workload_used = "micro" (der eingebaute Plugin-Mikrobenchmark; echte
                 // YCSB-Reihen setzen hier spaeter das Config-Workload-Label).
                 if (writer.ok() && !samples_us.empty()) {
-                    auto rec = comdare::messung_driver::make_record_from_run(
-                        static_cast<std::uint64_t>(kRunOps), stats.mean_us);
-                    auto fp = comdare::messung_driver::fingerprint_of(p.desc->id);
+                    auto rec = comdare::messung_driver::make_record_from_run(static_cast<std::uint64_t>(kRunOps),
+                                                                             stats.mean_us);
+                    auto fp  = comdare::messung_driver::fingerprint_of(p.desc->id);
                     writer.add(p.desc->id, fp, all_ok, "micro", rec);
                 }
             }
             bar.finish();
             writer.finalize();
             if (writer.ok() || writer.count() > 0) {
-                std::cout << "[V41.B1] " << writer.count() << " binary records geschrieben: "
-                          << writer.path().string() << "\n";
+                std::cout << "[V41.B1] " << writer.count() << " binary records geschrieben: " << writer.path().string()
+                          << "\n";
             }
 
             // V41.B3: Stats-CSV + paarweise Welch-Vergleiche
@@ -317,36 +315,33 @@ int main(int argc, char* argv[]) {
             // Item 1: aus (id, axes) jeder Permutation den Achsen-Baum bauen.
             std::vector<md::AxisItem> axis_items;
             axis_items.reserve(all_stats.size());
-            for (auto const& s : all_stats) {
-                axis_items.push_back(md::make_axis_item(s.permutation_id, s.axes));
-            }
+            for (auto const& s : all_stats) { axis_items.push_back(md::make_axis_item(s.permutation_id, s.axes)); }
             auto const axis_keys = md::collect_axis_keys(axis_items);
-            auto const tree = md::build_axis_tree(axis_items, axis_keys);
+            auto const tree      = md::build_axis_tree(axis_items, axis_keys);
 
             // Item 2: hierarchische Ausgabe — Gruppen-Header je Achsen-Ebene "== key=value ==".
             std::cout << "[V41.G.1] Achsen-Baum (" << axis_keys.size() << " Achsen:";
             for (auto const& k : axis_keys) std::cout << ' ' << k;
             std::cout << "):\n";
-            std::function<void(md::AxisTreeNode const&, int)> print_node =
-                [&](md::AxisTreeNode const& n, int depth) {
-                    std::string const indent(static_cast<std::size_t>(depth) * 2, ' ');
-                    if (!n.axis_key.empty()) {
-                        std::cout << indent << "== " << n.axis_key << '=' << n.axis_value
-                                  << " == (" << md::count_leaf_items(n) << " Perm.)\n";
-                    }
-                    for (auto const& c : n.children) print_node(c, depth + 1);
-                    for (auto idx : n.item_indices) {
-                        std::cout << indent << "  - " << all_stats[idx].permutation_id
-                                  << "  " << all_stats[idx].mean_us << " us/op\n";
-                    }
-                };
+            std::function<void(md::AxisTreeNode const&, int)> print_node = [&](md::AxisTreeNode const& n, int depth) {
+                std::string const indent(static_cast<std::size_t>(depth) * 2, ' ');
+                if (!n.axis_key.empty()) {
+                    std::cout << indent << "== " << n.axis_key << '=' << n.axis_value << " == ("
+                              << md::count_leaf_items(n) << " Perm.)\n";
+                }
+                for (auto const& c : n.children) print_node(c, depth + 1);
+                for (auto idx : n.item_indices) {
+                    std::cout << indent << "  - " << all_stats[idx].permutation_id << "  " << all_stats[idx].mean_us
+                              << " us/op\n";
+                }
+            };
             print_node(tree, 0);
 
             // Item 3: per-Achsen-Spalten-CSV (eine Spalte je Achsen-Schlüssel).
             std::filesystem::path const per_axis_csv = v41_out_dir / "permutation_stats_per_axis.csv";
             md::write_stats_csv_per_axis(per_axis_csv, all_stats, axis_keys);
-            std::cout << "[V41.G.1] per-Achsen-CSV (" << axis_keys.size() << " Achsen-Spalten): "
-                      << per_axis_csv.string() << "\n";
+            std::cout << "[V41.G.1] per-Achsen-CSV (" << axis_keys.size()
+                      << " Achsen-Spalten): " << per_axis_csv.string() << "\n";
 
             // Samples je id für Welch sammeln.
             std::map<std::string, std::vector<double>> samples_by_id;
@@ -376,24 +371,25 @@ int main(int argc, char* argv[]) {
                     }
                     for (std::size_t i = 0; i < g.size(); ++i) {
                         for (std::size_t j = i + 1; j < g.size(); ++j) {
-                            auto const& a = axis_items[g[i]].id;
-                            auto const& b = axis_items[g[j]].id;
+                            auto const& a  = axis_items[g[i]].id;
+                            auto const& b  = axis_items[g[j]].id;
                             auto const& sa = samples_by_id[a];
                             auto const& sb = samples_by_id[b];
                             if (sa.size() < 2 || sb.size() < 2) continue;
                             auto w = md::welch_us(sa, sb);
                             if (!w.valid) continue;
                             md::PairwiseRow row{};
-                            row.a = a; row.b = b;
-                            row.mean_a = w.mean_a / 1000.0;  // ns->us
-                            row.mean_b = w.mean_b / 1000.0;
-                            row.delta  = row.mean_a - row.mean_b;
-                            row.t_stat = w.t_statistic;
-                            row.df     = w.degrees_of_freedom;
-                            row.p_value = w.p_value;
+                            row.a               = a;
+                            row.b               = b;
+                            row.mean_a          = w.mean_a / 1000.0; // ns->us
+                            row.mean_b          = w.mean_b / 1000.0;
+                            row.delta           = row.mean_a - row.mean_b;
+                            row.t_stat          = w.t_statistic;
+                            row.df              = w.degrees_of_freedom;
+                            row.p_value         = w.p_value;
                             row.significant_5pc = (w.p_value < 0.05);
-                            row.varying_axis = varying;
-                            row.fixed_context = fixed;
+                            row.varying_axis    = varying;
+                            row.fixed_context   = fixed;
                             pairs.push_back(row);
                         }
                     }
@@ -402,9 +398,10 @@ int main(int argc, char* argv[]) {
             std::filesystem::path const pairs_csv = v41_out_dir / "welch_pairwise.csv";
             md::write_pairwise_csv(pairs_csv, pairs);
             std::size_t sig = 0;
-            for (auto const& r : pairs) if (r.significant_5pc) ++sig;
-            std::cout << "[V41.G.1] " << pairs.size() << " subtree-restringierte Welch-Tests, "
-                      << sig << " signifikant (p<0.05): " << pairs_csv.string() << "\n";
+            for (auto const& r : pairs)
+                if (r.significant_5pc) ++sig;
+            std::cout << "[V41.G.1] " << pairs.size() << " subtree-restringierte Welch-Tests, " << sig
+                      << " signifikant (p<0.05): " << pairs_csv.string() << "\n";
 
             comdare::messung_driver::unload_all(plugins);
         }
@@ -413,7 +410,7 @@ int main(int argc, char* argv[]) {
     std::filesystem::path config_dir{argv[1]};
     std::filesystem::path output_dir{argv[2]};
     std::filesystem::path comdare_root = std::filesystem::current_path();
-    std::filesystem::path messreihen_xml;  // V9.6: optional
+    std::filesystem::path messreihen_xml; // V9.6: optional
 
     for (int i = 3; i < argc; ++i) {
         std::string a{argv[i]};
@@ -452,68 +449,63 @@ int main(int argc, char* argv[]) {
     // REV 7.6 V9.6 — Externe Messreihen-Spec (defined/full Mode)
     auto external_specs = load_messreihen(messreihen_xml);
     if (!external_specs.empty()) {
-        std::cout << "[V9.6] Geladen aus " << messreihen_xml.string()
-                  << ": " << external_specs.size() << " Messreihe(n).\n";
+        std::cout << "[V9.6] Geladen aus " << messreihen_xml.string() << ": " << external_specs.size()
+                  << " Messreihe(n).\n";
         for (auto const& s : external_specs) {
-            std::cout << "  - " << s.id << " (mode=" << s.mode
-                      << ", profiles=" << s.sota_profiles.size() << ")\n";
+            std::cout << "  - " << s.id << " (mode=" << s.mode << ", profiles=" << s.sota_profiles.size() << ")\n";
         }
 
         // REV 7.6 V11.3 — Pro Messreihen-Spec einen ExperimentDriver-Lauf
-        int spec_overall_rc = 0;
-        std::size_t spec_idx = 0;
+        int         spec_overall_rc = 0;
+        std::size_t spec_idx        = 0;
         for (auto const& spec : external_specs) {
             std::cout << "─────────────────────────────────────────────\n";
-            std::cout << "[Reihe " << (++spec_idx) << "/" << external_specs.size() << "] [V11.3] Messreihe "
-                      << spec.id << " (mode=" << spec.mode << ")\n";
+            std::cout << "[Reihe " << (++spec_idx) << "/" << external_specs.size() << "] [V11.3] Messreihe " << spec.id
+                      << " (mode=" << spec.mode << ")\n";
             std::cout << "─────────────────────────────────────────────\n";
 
             cb::ExperimentDriverOptions opts;
-            opts.config_dir   = config_dir;
-            opts.output_dir   = output_dir / spec.id;
-            opts.comdare_root = comdare_root;
-            opts.messreihen_mode = (spec.mode == "full")
-                ? cb::ExperimentDriverOptions::MessreihenMode::Full
-                : cb::ExperimentDriverOptions::MessreihenMode::Defined;
+            opts.config_dir          = config_dir;
+            opts.output_dir          = output_dir / spec.id;
+            opts.comdare_root        = comdare_root;
+            opts.messreihen_mode     = (spec.mode == "full") ? cb::ExperimentDriverOptions::MessreihenMode::Full
+                                                             : cb::ExperimentDriverOptions::MessreihenMode::Defined;
             opts.sota_profile_filter = spec.sota_profiles;
 
-            cb::ExperimentDriver  driver{opts};
-            cb::WorkloadOptions   w;  // Default-Workload (V11.2 routet pro Profil)
-            w.config.random_seed     = 42;
-            w.config.key_size_bytes  = 16;
+            cb::ExperimentDriver driver{opts};
+            cb::WorkloadOptions  w; // Default-Workload (V11.2 routet pro Profil)
+            w.config.random_seed      = 42;
+            w.config.key_size_bytes   = 16;
             w.config.value_size_bytes = 64;
-            w.config.num_keys        = 1000000;
-            w.config.num_operations  = 5000000;
-            w.config.zipfian_theta   = 0.99;
-            w.workload               = wg::YcsbWorkload::C;
+            w.config.num_keys         = 1000000;
+            w.config.num_operations   = 5000000;
+            w.config.zipfian_theta    = 0.99;
+            w.workload                = wg::YcsbWorkload::C;
 
             int rc = driver.run_pipeline_full(w);
             if (rc != cb::status_ok) {
                 std::cerr << "[V11.3] Spec " << spec.id << " FAILED (status=" << rc << ")\n";
                 spec_overall_rc = rc;
             } else {
-                std::cout << "[V11.3] Spec " << spec.id << " OK -> "
-                          << opts.output_dir.string() << "\n\n";
+                std::cout << "[V11.3] Spec " << spec.id << " OK -> " << opts.output_dir.string() << "\n\n";
             }
         }
 
         std::cout << "==== V11.3 Spec-Lauf ";
         std::cout << (spec_overall_rc == 0 ? "(OK)" : "(MIT FEHLERN)");
         std::cout << " ====\n";
-        return spec_overall_rc;  // Bei Spec-Mode beenden wir hier (kein 3-Reihen-Fallback)
+        return spec_overall_rc; // Bei Spec-Mode beenden wir hier (kein 3-Reihen-Fallback)
     }
 
-    constexpr std::array<MessreiheKind, 3> kinds{
-        MessreiheKind::A_PrtArtVsSota,
-        MessreiheKind::B_CacheEnginePerm,
-        MessreiheKind::C_MergeAltNeu};
+    constexpr std::array<MessreiheKind, 3> kinds{MessreiheKind::A_PrtArtVsSota, MessreiheKind::B_CacheEnginePerm,
+                                                 MessreiheKind::C_MergeAltNeu};
 
-    int overall_rc = 0;
-    std::size_t reihe_idx = 0;
+    int         overall_rc = 0;
+    std::size_t reihe_idx  = 0;
     for (auto kind : kinds) {
         std::cout << "─────────────────────────────────────────────\n";
-        std::cout << "[Reihe " << (++reihe_idx) << "/" << kinds.size() << "] Messreihe "
-                  << messreihe_name(kind) << "\n";
+        std::cout << "[Reihe " << (++reihe_idx) << "/" << kinds.size() << "] Messreihe " << messreihe_name(kind)
+                  << "\n";
         std::cout << "─────────────────────────────────────────────\n";
 
         auto const reihe_output = output_dir / subdir_for(kind);
@@ -528,13 +520,12 @@ int main(int argc, char* argv[]) {
 
         int rc = driver.run_pipeline_full(w);
         if (rc != cb::status_ok) {
-            std::cerr << "Messreihe " << messreihe_name(kind)
-                      << " FAILED (status=" << rc << ")\n";
+            std::cerr << "Messreihe " << messreihe_name(kind) << " FAILED (status=" << rc << ")\n";
             overall_rc = rc;
             continue;
         }
-        std::cout << "Messreihe " << messreihe_name(kind) << " OK -> "
-                  << (reihe_output / "measurements.csv").string() << "\n\n";
+        std::cout << "Messreihe " << messreihe_name(kind) << " OK -> " << (reihe_output / "measurements.csv").string()
+                  << "\n\n";
     }
 
     std::cout << "==== Messung-Driver komplett ";

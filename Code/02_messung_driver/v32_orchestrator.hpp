@@ -13,7 +13,7 @@
 #include "cache_engine/builder/commands/compare_engine_command.hpp"
 #include "cache_engine/builder/commands/execute_engine_command.hpp"
 #include "cache_engine/builder/commands/workload.hpp"
-#include "op_type_filter.hpp"  // V41.P5 (G10): wirksame OP-1..OP-6 → WorkloadKind
+#include "op_type_filter.hpp" // V41.P5 (G10): wirksame OP-1..OP-6 → WorkloadKind
 #include "prt_art/default_lookup/default_lookup_registry.hpp"
 #include "prt_art/identity/prt_art_execution_engine_adapter.hpp"
 
@@ -27,20 +27,20 @@
 namespace comdare::diplomarbeit::messung_driver::v32 {
 
 namespace cmd = comdare::cache_engine::builder::commands;
-namespace dl = comdare::prt_art::default_lookup;
+namespace dl  = comdare::prt_art::default_lookup;
 
 /**
  * @brief PermutationOutcome - Ergebnis einer Permutation (EE-A vs EE-B Vergleich)
  * @subsystem MessungDriver
  */
 struct PermutationOutcome {
-    std::string axis_id;
-    std::string variant_name;
-    cmd::ExecutionResult ee_a_result;
-    cmd::ExecutionResult ee_b_result;
-    cmd::CompareEngineCommand::Verdict verdict {cmd::CompareEngineCommand::Verdict::InconclusiveData};
-    double welch_p_value {1.0};
-    double throughput_ratio {0.0};
+    std::string                        axis_id;
+    std::string                        variant_name;
+    cmd::ExecutionResult               ee_a_result;
+    cmd::ExecutionResult               ee_b_result;
+    cmd::CompareEngineCommand::Verdict verdict{cmd::CompareEngineCommand::Verdict::InconclusiveData};
+    double                             welch_p_value{1.0};
+    double                             throughput_ratio{0.0};
 };
 
 /**
@@ -49,12 +49,12 @@ struct PermutationOutcome {
  */
 struct MessreiheReport {
     std::vector<PermutationOutcome> outcomes;
-    std::size_t total_axes {0};
-    std::size_t total_variants {0};
-    std::size_t ee_a_wins {0};
-    std::size_t ee_b_wins {0};
-    std::size_t ties {0};
-    std::chrono::nanoseconds total_elapsed {};
+    std::size_t                     total_axes{0};
+    std::size_t                     total_variants{0};
+    std::size_t                     ee_a_wins{0};
+    std::size_t                     ee_b_wins{0};
+    std::size_t                     ties{0};
+    std::chrono::nanoseconds        total_elapsed{};
 };
 
 /**
@@ -78,8 +78,7 @@ public:
     }
 
     /// V32.GG.1 Skelett-Kompatibilitaet (existierende Tests)
-    int execute_messreihe(std::string_view config_xml,
-                          std::string_view mode = "defined") {
+    int execute_messreihe(std::string_view config_xml, std::string_view mode = "defined") {
         (void)config_xml;
         (void)mode;
         return 0;
@@ -100,10 +99,10 @@ public:
      */
     [[nodiscard]] MessreiheReport run_default_lookup_messreihe(const cmd::Workload& workload) {
         MessreiheReport report;
-        const auto start = std::chrono::steady_clock::now();
+        const auto      start = std::chrono::steady_clock::now();
 
         constexpr auto default_axes = dl::DefaultLookupRegistry::enumerate();
-        report.total_axes = default_axes.size();
+        report.total_axes           = default_axes.size();
 
         for (const auto& axis : default_axes) {
             auto variants = cmd::AxisLibraryRegistry::lookup(std::string(axis.axis_id));
@@ -113,7 +112,7 @@ public:
                 switch (outcome.verdict) {
                     case cmd::CompareEngineCommand::Verdict::EE_A_Wins: ++report.ee_a_wins; break;
                     case cmd::CompareEngineCommand::Verdict::EE_B_Wins: ++report.ee_b_wins; break;
-                    case cmd::CompareEngineCommand::Verdict::Tie:       ++report.ties;       break;
+                    case cmd::CompareEngineCommand::Verdict::Tie: ++report.ties; break;
                     default: break;
                 }
                 report.outcomes.push_back(std::move(outcome));
@@ -137,29 +136,23 @@ public:
      * @param[out] applied true, wenn das Token erkannt + angewandt wurde
      * @return MessreiheReport ueber den op_type-spezifischen Workload
      */
-    [[nodiscard]] MessreiheReport run_messreihe_for_op_type(
-        std::string_view op_type_token,
-        const cmd::Workload& base,
-        bool& applied)
-    {
+    [[nodiscard]] MessreiheReport run_messreihe_for_op_type(std::string_view op_type_token, const cmd::Workload& base,
+                                                            bool& applied) {
         cmd::Workload effective = base;
-        applied = apply_op_type_token(op_type_token, effective);
+        applied                 = apply_op_type_token(op_type_token, effective);
         return run_default_lookup_messreihe(effective);
     }
 
     /// V33.C.1 Einzel-Permutation: parallel EE-A + EE-B + Vergleich
     /// V34.A.3 (2026-05-21): nutzt echte Adapter mit as_engine_callable() statt Simulation
-    [[nodiscard]] PermutationOutcome execute_one_permutation(
-        std::string_view axis_id,
-        std::string_view variant_name,
-        const cmd::Workload& workload)
-    {
+    [[nodiscard]] PermutationOutcome execute_one_permutation(std::string_view axis_id, std::string_view variant_name,
+                                                             const cmd::Workload& workload) {
         PermutationOutcome outcome;
-        outcome.axis_id = std::string(axis_id);
+        outcome.axis_id      = std::string(axis_id);
         outcome.variant_name = std::string(variant_name);
 
         comdare::cache_engine::abi::CacheEngineExecutionEngineAdapter<> ee_a;
-        comdare::prt_art::identity::PrtArtExecutionEngineAdapter<> ee_b;
+        comdare::prt_art::identity::PrtArtExecutionEngineAdapter<>      ee_b;
 
         auto callable_a = ee_a.as_engine_callable();
         auto callable_b = ee_b.as_engine_callable();
@@ -180,13 +173,11 @@ public:
 
         cmd::CompareEngineCommand compare(outcome.ee_a_result, outcome.ee_b_result);
         compare.execute();
-        outcome.verdict = compare.verdict();
+        outcome.verdict          = compare.verdict();
         outcome.throughput_ratio = compare.throughput_ratio();
-        if (compare.welch().valid) {
-            outcome.welch_p_value = compare.welch().p_value;
-        }
+        if (compare.welch().valid) { outcome.welch_p_value = compare.welch().p_value; }
         return outcome;
     }
 };
 
-}  // namespace comdare::diplomarbeit::messung_driver::v32
+} // namespace comdare::diplomarbeit::messung_driver::v32

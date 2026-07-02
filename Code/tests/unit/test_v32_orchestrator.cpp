@@ -25,32 +25,29 @@ TEST(V32Orchestrator, SubmitToBuilder) {
 
 TEST(V32Orchestrator, ExecuteMessreiheDefined) {
     v32::V32Orchestrator orchestrator;
-    int rc = orchestrator.execute_messreihe(
-        "test_data_xml/messreihe_v32_schema_example.xml", "defined");
+    int rc = orchestrator.execute_messreihe("test_data_xml/messreihe_v32_schema_example.xml", "defined");
     EXPECT_EQ(rc, 0);
 }
 
 TEST(V32Orchestrator, ExecuteMessreiheFull) {
     v32::V32Orchestrator orchestrator;
-    int rc = orchestrator.execute_messreihe(
-        "test_data_xml/messreihe_v32_schema_example.xml", "full");
+    int                  rc = orchestrator.execute_messreihe("test_data_xml/messreihe_v32_schema_example.xml", "full");
     EXPECT_EQ(rc, 0);
 }
 
 TEST(V32Orchestrator, ExecuteMessreiheFullSampled) {
     v32::V32Orchestrator orchestrator;
-    int rc = orchestrator.execute_messreihe(
-        "test_data_xml/messreihe_v32_schema_example.xml", "full_sampled");
+    int rc = orchestrator.execute_messreihe("test_data_xml/messreihe_v32_schema_example.xml", "full_sampled");
     EXPECT_EQ(rc, 0);
 }
 
 TEST(V32Orchestrator, ExecuteOnePermutationParallelEEs) {
     v32::V32Orchestrator orchestrator;
-    cmd::Workload w {};
-    w.kind = cmd::WorkloadKind::YCSB_C_ReadOnly;
-    w.record_count = 100;
+    cmd::Workload        w{};
+    w.kind            = cmd::WorkloadKind::YCSB_C_ReadOnly;
+    w.record_count    = 100;
     w.operation_count = 20;
-    w.name = "v33-c2-smoke";
+    w.name            = "v33-c2-smoke";
 
     auto outcome = orchestrator.execute_one_permutation("11", "LeafOnlyCounter", w);
     EXPECT_EQ(outcome.axis_id, "11");
@@ -65,11 +62,11 @@ TEST(V32Orchestrator, ExecuteOnePermutationParallelEEs) {
 
 TEST(V32Orchestrator, RunDefaultLookupMessreihe) {
     v32::V32Orchestrator orchestrator;
-    cmd::Workload w {};
-    w.kind = cmd::WorkloadKind::YCSB_C_ReadOnly;
-    w.record_count = 50;
-    w.operation_count = 10;  // klein, sonst dauert der Test zu lange
-    w.name = "v33-c2-default-lookup";
+    cmd::Workload        w{};
+    w.kind            = cmd::WorkloadKind::YCSB_C_ReadOnly;
+    w.record_count    = 50;
+    w.operation_count = 10; // klein, sonst dauert der Test zu lange
+    w.name            = "v33-c2-default-lookup";
 
     auto report = orchestrator.run_default_lookup_messreihe(w);
     // 9 default-lookup-Achsen aus DefaultLookupRegistry

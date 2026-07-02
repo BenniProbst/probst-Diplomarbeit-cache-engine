@@ -12,15 +12,15 @@
 
 namespace comdare::da::binary_to_csv {
 
-inline constexpr int status_ok               = 0;
-inline constexpr int status_io_error         = 10;
-inline constexpr int status_invalid_format   = 11;
+inline constexpr int status_ok             = 0;
+inline constexpr int status_io_error       = 10;
+inline constexpr int status_invalid_format = 11;
 
 struct LabeledRecord {
     std::string                   permutation_id;
-    std::uint64_t                 fingerprint = 0;
-    bool                          succeeded   = true;
-    std::string                   workload_used = "n/a";  // V41.P1: aus Container-v2; "n/a" bei v1
+    std::uint64_t                 fingerprint   = 0;
+    bool                          succeeded     = true;
+    std::string                   workload_used = "n/a"; // V41.P1: aus Container-v2; "n/a" bei v1
     comdare_measurement_record_v1 record{};
 };
 
@@ -34,16 +34,14 @@ struct LabeledRecord {
 //     uint8  succeeded
 //     [v2+] uint32 workload_len + char[workload_len]   (V41.P1)
 //     comdare_measurement_record_v1 record  (fixed-size)
-[[nodiscard]] int read_binary(std::filesystem::path const& in,
-                              std::vector<LabeledRecord>& out_records);
+[[nodiscard]] int read_binary(std::filesystem::path const& in, std::vector<LabeledRecord>& out_records);
 
 // Schreibt CSV mit 16 Spalten (V41.P1 kanonisch: workload_used als 4. Spalte; kompatibel zu
 // Stufe 01/04/05 + ResultAggregator).
-[[nodiscard]] int write_csv(std::filesystem::path const& out,
-                            std::span<LabeledRecord const> records);
+[[nodiscard]] int write_csv(std::filesystem::path const& out, std::span<LabeledRecord const> records);
 
-inline constexpr std::uint32_t kBinaryMagic       = 0xC0FFEE02u;
-inline constexpr std::uint32_t kBinaryVersion     = 2u;   // V41.P1: aktuelles Schreib-/Lese-Format
-inline constexpr std::uint32_t kBinaryVersionV1   = 1u;   // legacy (ohne workload_used) weiter lesbar
+inline constexpr std::uint32_t kBinaryMagic     = 0xC0FFEE02u;
+inline constexpr std::uint32_t kBinaryVersion   = 2u; // V41.P1: aktuelles Schreib-/Lese-Format
+inline constexpr std::uint32_t kBinaryVersionV1 = 1u; // legacy (ohne workload_used) weiter lesbar
 
-}  // namespace comdare::da::binary_to_csv
+} // namespace comdare::da::binary_to_csv
