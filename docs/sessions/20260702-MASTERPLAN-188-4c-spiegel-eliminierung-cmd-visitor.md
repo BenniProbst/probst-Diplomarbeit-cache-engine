@@ -75,10 +75,14 @@ versionierter POD-Bruch statt zwei) — axis_stats[19][8] wird NICHT still umged
   Mess-Achsen haben eine **separate Mess-Basis** — „das ist schon der Ansatz dieses Systems"; CMD-1 räumt das
   **Chaos der Parallelitäten** auf (ICommand/builder-commands · IStrategyCommand-Insel · Anatomy*Command ·
   algorithm_visitor-Platzhalter → konsolidieren/ersetzen unter der Zwei-Wurzel-Struktur).
-- **E3 (4c-iv) OFFEN:** Rename-Zielname für container_: `storage_organ_` (Namensnähe zum StorageOrgan-Concept —
-  nach 4c trägt der Member aber AUCH native Such-Organe/Referenz-Hüllen, nicht nur Stores) vs. Alternative
-  (`tier_substrate_` / `substrate_organ_` — Empfehlung: **tier_substrate_**, da es das authoritative
-  Tier-Substrat jeder Familie bezeichnet, nicht nur Storage).
+- **E3 (4c-iv) ✅ ENTSCHIEDEN (User 2026-07-02): Benennungs-Schema `ContainerAlgorithm` analog zu
+  `SearchAlgorithm`** — Member `container_` → `container_algorithm_`, Typen `container_t` →
+  `container_algorithm_t` usw. (exakte Liste im 4c-iv-Dossier). Semantik: Das Substrat ist der
+  Container-ALGORITHMUS-Anteil innerhalb des Such-Algorithmus (deckt sich mit CMD-2: Container = erheblicher
+  Zugriffs-Anteil der SA). Member-Kommentar MUSS die Abgrenzung zur Container-GATTUNG (AnatomyGattung::Container,
+  Set/Sequence/Adapter/View) explizit dokumentieren, damit die alte Verwechslungs-Falle nicht wiederkehrt.
+- **✅ VOLLES GO (User 2026-07-02): sämtliche Plan-Punkte OHNE weitere Gates durchziehen** („wir haben genug
+  geplant") — 4c-0→4c-i→4c-ii→4c-iii→4c-iv → CMD-1/CMD-2, je im Manager-Zyklus, autonom.
 - Gesetzt (Integrator, konventionsgedeckt): 4c-0-Gate zuerst · 4c-i-Mechanik = dritter Weg · honest-0 der
   Referenz-Speicherachsen bis observe-Hooks · IStrategyCommand-Insel wird durch CMD-1 ersetzt ·
   Command/Visitor wird durch CMD-1 zur STRUKTUR (Text/fig:patterns/le_limitierung Z.15 ziehen danach nach).
