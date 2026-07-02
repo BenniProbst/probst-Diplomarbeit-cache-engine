@@ -188,3 +188,22 @@ Shape-Dimension im 320-Baum aktiviert werden soll (sonst bleiben Varianten opt-i
 2. **#225:** Grundsatz Second-Execution vs Zwei-Phasen-Pflicht — MUSS vor W6/M3 entschieden sein.
 3. **#224 GO/NO-GO:** GoF-Renames im W4-Exklusiv-Fenster VOR #215 (GO = finale Namen in den Abgabe-Daten;
    NO-GO = bewusst zweiter 320-Neubau nach M3).
+
+## §11 NACHTRAG (2026-07-02 02:40, zweites Kontext-Ende) — USER-GOs, TIMER, LAUFENDE AGENTEN
+**USER-GOs (liegen vor, keine Rückfrage mehr nötig):** (1) 234-K-Teil-Diff OHNE vollständigen Codex-Bericht →
+VERWERFEN + frischer `codex exec` mit dem persistierten Dossier (§7); (2) nach 234-K-Grün den **W2-4×-Fanout
+F1-F4 DIREKT parallel** starten (ohne Zwischen-Gate); (3) zusätzliche autonome Arbeit erlaubt, soweit
+dokumentations-gedeckt ohne User-Entscheid.
+**INFRA:** Der Infra-Agent hat das P-INFRA-Handover (§1.5) ERHALTEN — Rückmeldung wird ~4h nach 02:30 erwartet;
+Prüfung + read-only-Verify-Slots dann fällig (208-rest Runner/auto-cancel, pmc:intel-Variable, #231 nur nach
+Vollzugsmeldung).
+**3 CRON-TIMER GESETZT (⚠️ SESSION-ONLY — bei Session-Tod weg; Prompts sind selbsterklärend formuliert):**
+- 04:36 `0609089a` — RESUME-WECKRUF: alle unvollständigen Agenten fortsetzen (234-K-Codex fertig→§8-Korrektur-Pass /
+  tot→verwerfen+frisch; #206-Recherche prüfen/neu starten; dann W2-Fanout).
+- 05:16 `3353026b` — 5h-Limit-Checkpoint: autonom im Wellen-Plan weiter.
+- 06:33 `53d859d6` — Infra-Rückmeldungs-Check + Verify-Slots.
+**Falls die Timer mit der Session sterben:** dieselben drei Aufgaben manuell in dieser Reihenfolge abarbeiten.
+**LAUFENDE HINTERGRUND-LÄUFE bei diesem Kontext-Ende:** (a) 234-K-Codex (`tasks/b0mxqes2w.output`; zuletzt ~346
+Transcript-Zeilen, Arbeitsbaum noch sauber) → §8-Prozedur; (b) #206-Gate-Recherche-Agent (general-purpose,
+WebSearch; Ziel `scratchpad/206_pipeline_gates_recherche.md` — bei Erfolg nach docs/sessions kopieren+committen,
+speist #203/#204/#205).
