@@ -37,6 +37,9 @@ variables:
   CMAKE_BUILD_PARALLEL_LEVEL: "4"          # A-Folge (User 2026-06-26): 8 Kern-cgroup / concurrent=2 = 4
   COMDARE_LINT_PATHS: "Code"
   COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
+  # cppcheck-Pendant zur EXCLUDE_RE (Template 237b6ec): OHNE external/thesis scannt lint:static die
+  # Submodule mit, die auf dem persistenten Workspace aus recursive-Jobs liegen (Job 192672).
+  COMDARE_CPPCHECK_IGNORE_DIRS: "ext build _archive_code_pre_migration modules external thesis"
 
 # ── Stufe 1: Lint (aus ci-templates) — NUR super-eigener Code, KEINE Submodule ──
 lint:secrets:
