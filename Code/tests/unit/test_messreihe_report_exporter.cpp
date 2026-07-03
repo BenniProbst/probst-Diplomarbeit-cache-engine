@@ -109,7 +109,8 @@ TEST(MessreiheReportExporter, CsvRowsMatchOutcomeCount) {
     v32::MessreiheReportExporter exporter;
     auto                         report = make_sample_report();
     auto                         path   = std::filesystem::temp_directory_path() / "v34_b_rowcount.csv";
-    exporter.write_csv(report, path);
+    auto                         status = exporter.write_csv(report, path);
+    EXPECT_TRUE(status.ok()) << status.message;
     auto content = read_all(path);
     // 1 header + 4 outcomes = 5 newlines
     std::size_t newlines = std::count(content.begin(), content.end(), '\n');

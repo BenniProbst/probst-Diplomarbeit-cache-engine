@@ -21,10 +21,10 @@ namespace {
 
 struct SampleProfile {
     std::string   id;
-    std::string   workload_used;   // V20.1: YCSB_A..F
-    std::uint64_t base_throughput; // ops/sec
-    std::uint64_t base_cache_misses_l1;
-    std::uint64_t base_bytes_in_use_peak;
+    std::string   workload_used;     // V20.1: YCSB_A..F
+    std::uint64_t base_throughput{}; // ops/sec
+    std::uint64_t base_cache_misses_l1{};
+    std::uint64_t base_bytes_in_use_peak{};
 };
 
 [[nodiscard]] std::vector<SampleProfile> sample_profiles() {

@@ -144,13 +144,13 @@ inline void write_stats_csv_per_axis(std::filesystem::path const& path, std::spa
 struct PairwiseRow {
     std::string a;
     std::string b;
-    double      mean_a;
-    double      mean_b;
-    double      delta;
-    double      t_stat;
-    double      df;
-    double      p_value;
-    bool        significant_5pc;
+    double      mean_a{};
+    double      mean_b{};
+    double      delta{};
+    double      t_stat{};
+    double      df{};
+    double      p_value{};
+    bool        significant_5pc{};
     // V41.G.1 — Achsen-Subtree-Kontext: welche Achse variiert, bei welchem fixierten Rest.
     std::string varying_axis;  // z.B. "alloc"
     std::string fixed_context; // z.B. "simd=avx2;layout=soa"

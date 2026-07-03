@@ -114,10 +114,10 @@ struct HeatmapData {
 struct CsvRow {
     std::string   permutation_id;
     std::string   workload_used; // YCSB_A..F (V20.1)
-    std::uint64_t op_count;
-    std::uint64_t total_cycles;
-    std::uint64_t cache_misses_l1;
-    std::uint64_t bytes_in_use_peak;
+    std::uint64_t op_count{};
+    std::uint64_t total_cycles{};
+    std::uint64_t cache_misses_l1{};
+    std::uint64_t bytes_in_use_peak{};
 };
 
 [[nodiscard]] std::vector<CsvRow> load_csv_with_workload_used(std::filesystem::path const& csv_path);
