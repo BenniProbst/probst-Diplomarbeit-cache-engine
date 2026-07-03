@@ -27,6 +27,7 @@ stages:
   - orchestrate          # REV13 (#186 §5.4): Haupt-Pipeline triggert die 3 Modul-Pipelines (strategy:depend = synchron + gated)
   - submodules
   - analyse
+  - test                 # Stufe 3 (User 2026-07-03): VOLLE super-Unit-Suite bauen+AUSFUEHREN (Korrektheitsbeweis, nicht nur kompilieren)
   - integration
   - manifest             # Stufe 7 (#198, EPIC #186): Build-/Mess-Manifest (Provenance) + additives Prebackup
   - thesis-pdf
@@ -57,6 +58,22 @@ lint:static:
   tags: [baremetal]
   variables:
     GIT_SUBMODULE_STRATEGY: none
+
+# ── Stufe 3: Test (aus ci-templates .test) — VOLLE super-Unit-Suite (11 Tests, Code/tests) bauen + AUSFUEHREN ──
+# Heute lief 0 super-Unit-Test in der GitLab-CI (integration:smoke baut mit DA_BUILD_TESTS=OFF). Dieser Job
+# baut Code/ mit Tests+V32 in EIGENEM Build-Ordner und faehrt ctest ueber alle 11. Probelauf-Modus
+# (when:manual + allow_failure) bis zum ersten gruenen Beweis, dann scharf (allow_failure raus) — SE-21b-F3.
+test:unit:
+  extends: .test
+  tags: [baremetal]
+  rules:
+    - when: manual
+      allow_failure: true
+  variables:
+    COMDARE_TEST_CMAKE_SOURCE_DIR: "Code"
+    COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test"
+    COMDARE_TEST_CONFIGURE_FLAGS: "-DCOMDARE_DA_BUILD_TESTS=ON -DCOMDARE_V32_ENABLE=ON"
+    COMDARE_TEST_BUILD_TARGET: "all"
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.
