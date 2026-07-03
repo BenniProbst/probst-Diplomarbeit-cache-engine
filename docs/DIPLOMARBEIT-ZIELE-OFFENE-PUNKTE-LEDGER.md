@@ -12,6 +12,46 @@
 
 ---
 
+## §0 GOAL / MISSION (autoritativ — Referenz für `/goal`)
+
+**Übergeordnetes Ziel.** Die Diplomarbeit implementierungsseitig **top-down vollenden**, sodass die fünf
+Forschungsfragen **FF0–FF4** (§1) mit **realen, CI-verifizierten Messwerten** beantwortet werden — nicht mit
+Stubs, Schein-Grün oder Phantomspalten. Die cache-engine-Permutations-Architektur (SearchAlgorithm-Achsen,
+ABI-Adapter, Mess-Pfad) wird bis zur wissenschaftlich belastbaren M3-Gesamtmessung fertiggestellt, die
+Thesis-PDF-Kette bleibt grün, und die Lösung ist am Ende **manuell bedienbar** (#193).
+
+**Definition of Done (Abbruch-Kriterium der Mission).**
+1. **Spur-S-ABI-Kette (§3) grün abgeschlossen** (S1✅ … S9), jeder Increment Pipeline-belegt, unter striktem
+   **ABI-Freeze (§4): nach 3→4 genau EIN weiterer Bump 4→5**, der EINE 320-DLL-Neubau bei #215.
+2. **Alle 8 Blocker (§2) geräumt** (B2/B7 ✅) — insbesondere Decoy-Pfad-Sperre (B5), Single-Owner-Disjunktheit
+   (B6), 2-Pass-CI-Pflicht (B3), AP-2-Hart-Gate (B8).
+3. **Alle vier Projekte bauen UND führen ihre volle Test-Suite in der CI aus** (§7): grün = „Tests bestehen",
+   nicht nur „kompiliert" — cache-engine ~170, prt-art 12 (nach `array_256.hpp`-Fix), super 11, thesis PDF-Gate.
+4. **FF3-Mess-Kette echt:** AP-2-Echtpfad (90ns-Stub raus) → #162 (≥8 Rang-1-SOTA-Lebewesen) → M3-Gesamtlauf
+   (#156) mit realen Cache-Misses/PMC → Thesis-Anhang mit belastbaren Werten.
+5. **#193 erfüllt:** Lösung von Hand start- und reproduzierbar (EXPERIMENT_MODE, MANUAL_RUN.md, finaler Hand-Lauf).
+
+**Arbeitsdoktrin (aus den Validierungs-Erkenntnissen).**
+- **Zwei Spuren, nebenläufig:** Spur S strikt seriell im god-header/Mess-POD-Sperrbereich; Spur P nur über
+  **belegt-dateidisjunkte** Worktrees mit **Single-Owner** je geteilter Fläche (`platform/`→AP-3,
+  `execution_result.hpp`, `permutation_axes.xml` erst im seriellen Integrations-Commit).
+- **ABI-Sparsamkeit ist Gesetz:** kein Increment nimmt einen ABI-/POD-Bruch, der bündelbar ist; der nächste
+  und LETZTE Bump vor #215 ist 4→5. Vertrags-Freezes (RC-apply vor #221) verhindern Nacharbeit.
+- **Kein Schein-Fortschritt:** vor jedem Fan-out Pfade gegen **aktives development** re-verifizieren, Decoy-/
+  Spiegel-Bäume gesperrt; CI beweist Korrektheit durch **ausgeführte** Tests (2-Pass erzwungen); Verify NUR
+  Pipeline; keine Erfolgsmarke ohne literale Tool-Ausgabe.
+- **Sauberster, nie einfachster Weg:** Manager-Modus (Codex aus Dossier, Claude korrigiert + adversarischer
+  Review), god-header max. 1 offen, `modules/**`/`ext/**`/golden/Registry-mp_list TABU, Push beide Remotes je
+  Increment, `#188` nie halb committen. Bei NEUER echter Architektur-Entscheidung anhalten.
+
+**Aktuelle Front (nächste konkrete Schritte).** **Phase 0** (Sequenz §sequencing: 0a Push ✅ · 0b Pfad-Re-Verify
+gegen development · 0c Spiegel-Sperre · 0d `.test`-Expansion je Projekt verifizieren · 0e ABI-Freeze deklariert)
+→ dann **S2 #217** (serielle Kette) NEBENLÄUFIG zu **P-0 #193** (manuelle Bedienbarkeit, TOP-PRIO). Fortschritt
+wird in §12 datiert fortgeschrieben; dieser Ledger ist die Single-Source und schlägt bei Widerspruch alle
+Session-Docs.
+
+---
+
 ## §1 FORSCHUNGSFRAGEN FF0–FF4 ⟷ TASKS (Abgabe-Blocker)
 Die Thesis stellt **FÜNF** Fragen (nicht drei) — je FF die besitzenden Tasks + was die Abgabe blockiert:
 | FF | Inhalt | Besitzende Tasks | Abgabe-Blocker |
