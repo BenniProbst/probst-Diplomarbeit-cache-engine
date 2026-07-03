@@ -34,7 +34,7 @@ stages:
 variables:
   GIT_SUBMODULE_STRATEGY: recursive       # Default fuer die Build-Stages; Lint ueberschreibt auf none
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
-  CMAKE_BUILD_PARALLEL_LEVEL: "4"          # A-Folge (User 2026-06-26): 8 Kern-cgroup / concurrent=2 = 4
+  CMAKE_BUILD_PARALLEL_LEVEL: "8"          # User 2026-07-03: 8 Kerne = 8 GB (1 GB/Kern) bei prod concurrent=1 (revidiert 4)
   COMDARE_LINT_PATHS: "Code"
   COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
   # cppcheck-Pendant zur EXCLUDE_RE (Template 237b6ec): OHNE external/thesis scannt lint:static die
