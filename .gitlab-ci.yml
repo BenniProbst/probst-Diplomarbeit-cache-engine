@@ -50,19 +50,13 @@ lint:secrets:
 lint:format:
   extends: .lint-format
   tags: [baremetal]
-  allow_failure: true
   variables:
     GIT_SUBMODULE_STRATEGY: none
-  rules:                          # B (User 2026-06-26): bis #179-Format-Pass MANUELL (harte Gates bleiben)
-    - when: manual
 lint:static:
   extends: .lint-static
   tags: [baremetal]
-  allow_failure: true
   variables:
     GIT_SUBMODULE_STRATEGY: none
-  rules:
-    - when: manual
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.
