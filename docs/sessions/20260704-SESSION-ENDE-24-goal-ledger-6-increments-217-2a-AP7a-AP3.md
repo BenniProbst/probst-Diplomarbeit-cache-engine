@@ -7,15 +7,29 @@
 > bearbeite solange TODOs in optimaler strategischer Reihenfolge, bis alles erledigt ist; Codex implementiert aus
 > SEHR elaboratem Dossier, Claude kontrolliert die Files danach manuell."**
 
-## §0 SOFORT-STATUS (nächster konkreter Schritt)
-**AP-5/#239 (Full-Sampled-Modus) — KARTIERUNG IN FLIGHT beim Kontext-Ende.** Zwei read-only-Agenten liefen noch:
-Explore + Codex (`scratchpad/ap5_kartierung.txt` = Auftrag). Codex-Report → `scratchpad/ap5_codex_karte.txt`
-(GROSS, ~9k Zeilen mit Orchestrator-Rauschen → **grep die Anker, nicht ganz lesen**). Explore-Report kommt per
-task-notification ( evtl. über Session-Grenze verloren → dann Kartierung neu starten). **Dossier-Gerüst steht:
-`scratchpad/ap5_dossier.md`** (fixe Auflagen gefüllt, §5/§6 = Platzhalter). **NÄCHSTE HANDLUNG:** (a) prüfen ob die
-2 AP-5-Kartierungen fertig sind (Output-Dateien existieren) → Mappings abgleichen → Dossier §5/§6 file:line füllen
-(keep-Prädikat aus dem **existierenden Permutations-Fingerprint** + Seed, `splitmix64(fp XOR seed) % 1000 == 0`) →
-Impl-Codex → manuelle Kontrolle → Compile + Determinismus-Test → Commit/Push. Falls Kartierung verloren: neu starten.
+## §0 SOFORT-STATUS (nächster konkreter Schritt) — AP-5 KARTIERUNG FERTIG (Explore), hier persistiert
+**AP-5/#239 (Full-Sampled-Modus) — Explore-Kartierung ABGESCHLOSSEN** (Scratchpad session-flüchtig → Essenz HIER durabel).
+Codex-Cross-Check lief noch (`scratchpad/ap5_codex_karte.txt`, falls vorhanden grep-Anker; sonst ignorieren, Explore reicht).
+**Sofort umsetzbar (nächste Session: Dossier aus dieser Map füllen → Impl-Codex):**
+- **Enum-Andockpunkt:** `builder/experiment_driver/experiment_driver.hpp:54` `enum class MessreihenMode { Defined, Full }`
+  (Default Full) → **`{ Defined, Full, FullSampled }`** + NEUE Felder `std::uint32_t sample_rate=1000; std::uint64_t sample_seed=0;`.
+- **Full-Enumeration (Kartesik-Kostenort):** `builder/permutation_loop/permutation_loop.cpp:7-29` (4-fach-Loop);
+  `push_back` `:23` = **1:1000-Einhäng-Punkt**. Deterministischer Fingerprint bereits da: FNV-1a `:18`+`:31-44`
+  (`compute_fingerprint`, public static → direkt testbar). **ZWEITER Strom (SOTA-Profile, Phase 2):** `experiment_driver.cpp:154-163`,
+  Profil-FP `:156` → **Guard in BEIDEN Strömen** (sonst Mengen-Bias).
+- **keep-Prädikat:** `keep = splitmix64(fingerprint ^ seed) % sample_rate == 0`. **splitmix64 existiert** in
+  `workload_driver/workload_generator.cpp:116-121` (`static` → in kleinen Header ziehen ODER 4 Zeilen inline; Konstanten EXAKT übernehmen).
+- **CLI:** `apps/cache_engine_builder/main.cpp:88-97` (else-if-Kette) → `--mode=full-sampled`, `--sample-rate=`, `--sample-seed=`.
+- **ABI:** host-seitige Descriptor-Verwerfung VOR Codegen → neutral. (Merke: der Enumerations-ABI ist `COMDARE_ABI_VERSION`,
+  `include/cache_engine/abi/module_abi_v1.hpp:17` — NICHT `COMDARE_ANATOMY_ABI_MAJOR`; letzterer ist der Tier-Modul-ABI, unberührt.)
+- **Test:** `tests/unit/test_experiment_driver_v13.cpp` (Muster :44/:94) — 2 Läufe identische ID-Menge (seed-stabil) + Rate≈∏/1000.
+- **⚠️ KRITISCHES DETERMINISMUS-RISIKO (im Dossier als HARTE Auflage setzen):** `compute_fingerprint` nutzt
+  `std::hash<string_view>` (`permutation_loop.cpp:33`) = **implementierungsdefiniert** → Sampling-Menge stabil NUR innerhalb
+  EINER Toolchain, NICHT reproduzierbar über Compiler/STL/OS (Windows-Build ≠ ZIH-Linux!). Für cross-plattform-stabile Menge
+  MUSS der Sampling-Key einen FIXEN Byte-Hash der `id` nutzen (FNV/splitmix über die ID-Zeichen), NICHT `std::hash`. Gleiches für Profil-FP `:156`.
+- **Bias-Auflagen:** splitmix64-Mischung VOR dem `% rate` (nicht roher FP % 1000); Guard in beiden Strömen; kleines ∏ → evtl.
+  0 Treffer (Mindestmenge/Fallback benennen). Lazy-Iterator/`coverage_selection`/`max_binaries` NICHT vermischen (kappt schon, kein ∏).
+**Defined/Full-Verhalten unverändert (nicht-invasiv); bestehender `test_experiment_driver_v13` bleibt grün.**
 
 ## §1 DIESE SESSION GELEISTET — 6 verifizierte Increments (alle beide Remotes, alle test-belegt)
 | # | Increment | Verifikation (literal) | cache-engine · super |
