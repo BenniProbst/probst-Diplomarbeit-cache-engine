@@ -81,3 +81,7 @@ thesis/zih-latex-template-master-ZIHLatexVorlage/
 
 # #260: Workflow-Rohdaten-Backups (32M+, STRIKT ADDITIV lokal + OneDrive-versioniert; zu gross fuer Repo)
 _workflow-raw-backups/
+
+# #260: IDE-/Tool-Reste (lokal)
+.claude/
+thesis/.idea/
