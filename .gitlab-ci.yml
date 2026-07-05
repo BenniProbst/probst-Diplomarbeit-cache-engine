@@ -53,6 +53,7 @@ toolchain:probe:
 # #273: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang (COMDARE_CLANG_MATRIX=1 oben).
 build:clang:
   extends: .build-clang-latest
+  stage: analyse   # super hat keinen 'build'-Stage (Lint-API 05.07.: chosen stage build does not exist)
   tags: [baremetal]
 
 lint:secrets:
