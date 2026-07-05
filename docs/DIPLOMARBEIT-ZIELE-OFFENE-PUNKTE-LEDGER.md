@@ -178,6 +178,8 @@ Widerspruch **#193 = TOP-PRIO (User 06-27) vs. Task-Feld [E0]-ZULETZT**: AUFGEL�
 
 - **2026-07-05 (spät, S7-3/#261 DONE — SkipList-Pool, 3. honest-0-DEG echt):** ce `dd704d67`, beide Remotes. Doppelt kartiert (Explore+Codex konvergent); SkipList-Spezifika: keine Free-List (Tombstone) → free_-Zweig entfällt; per-Node-TOWER-Vektoren = dominante Allokation → `record_tower_allocation_(level)` an allocate_node/init_head UND FwdAlloc-Rebind bis in `Node::next` (Entscheid „sauberste statt einfachste": voll gethreadeter Allocator statt Teil-Parametrisierung); live_nodes ≡ vorhandenes live_count_ (1:1, kein Doppelzähler); rng_/draw_level/Seed unangetastet — `test_234_f2_skip_list_shape` grün beweist Bit-Treue. **Literal: Build EXIT 0, ctest 6/6 Passed, `S7-3 T6-DEG alloc_cnt=21 bytes_alloc=1168 bytes_in_use=1168` + `[ PASSED ] 4 tests`; clang-format 0, Mojibake 0.** T6-Naht griff erneut ohne Adapter-Änderung (Muster bestätigt sich zum 3. Mal). **S7-Restplan: S7-4 Hash → S7-5..8 OriginalXxx → S7-9 SuRF → S7-10 Swiss(A-Teil) → 234-V.**
 
+- **2026-07-05 (spät, #271/DEG-5 DONE — perm_runner-CMake-Fix):** ce `19d7f701`, beide Remotes. E-E-Bedingung erfüllt: `apps/perm_runner/main.cpp` ist auf prod1/comdare NICHT user-dirty (frischer Klon). Fix exakt wie im Ledger vorgezeichnet: `libs/common` auf den schlanken Include-Pfad (keine neue Link-Dependency). **Literal: Build comdare_perm_runner VORHER Exit 1 (xml_reader.hpp fatal, auf Linux reproduziert), NACHHER Exit 0, Binary 202080 Bytes.** Degeneration §4-5 des Session-Handovers damit geschlossen.
+
 ---
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
@@ -213,7 +215,7 @@ Widerspruch **#193 = TOP-PRIO (User 06-27) vs. Task-Feld [E0]-ZULETZT**: AUFGEL�
 - **#268 [K2][P1] CMD-2-Reserve-Prüfung (#252):** Container-Metriken-Bedarf bestimmen; ≤2 → axis_stats[0][6..7] layout-neutral (sizeof==1416 bleibt); >2 → STOPP + explizite User-Freigabe für den EINEN 4→5-Bump. *(DONE 05.07.: Bericht docs/sessions/20260705-268-…-BERICHT.md — RESERVE-REICHT, 0 Spalten unter E2-Sidecar, kein Bump; User-Klärfrage E2-Sidecar↔Reserve dokumentiert.)*
 - **#269 [K2][P1] AP-10-Datensatz-Registrierung:** BRAUCHT User-Liste (Termin 7/Datasets_Spezifikation.txt); Option A (Hash); 8/8 Akten gegen ECHTE Dateien, keine erfundenen Soll-Werte.
 - **#270 [K2][P2] AP-13-Rest:** (a) P/E-Core-Auto (CPUID 0x1A) als eigener Increment — ändert verriegelte Plattform-Tests → User-Sichtung; (b) 3-ISA-Matrix ← blockiert von #265.
-- **#271 [K2→Default E-E][P2] perm_runner-CMake-Fix:** libs/common in apps/perm_runner/CMakeLists.txt — NUR wenn Datei nicht user-dirty; Akzeptanz: perm_runner baut lokal Exit 0.
+- **#271 [K2→Default E-E][P2] perm_runner-CMake-Fix:** libs/common in apps/perm_runner/CMakeLists.txt — NUR wenn Datei nicht user-dirty; Akzeptanz: perm_runner baut lokal Exit 0. *(DONE 05.07.: ce 19d7f701, vorher Exit 1 / nachher Exit 0 literal belegt.)*
 - **#272 [K3][P1] Infra-Handover-Paket:** HO-1..HO-10 (A8) als Handover-Dokument committen; inkl. keeper-adminmgmt-403-Klärung + GCC-16-ICE-Workaround-Entscheid csv_to_latex + thesis-texlive-Gate #205.
 
 ### 13.4 GOAL-TEXT V2 (aktivierbar; Defaults gelten mit Aktivierung als freigegeben — beim Aktivieren streich-/änderbar)
