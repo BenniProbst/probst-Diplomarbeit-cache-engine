@@ -78,3 +78,6 @@ thesis/zih-latex-template-master-ZIHLatexVorlage/
 
 # thesis/diplomarbeit = eigenes Git (Remote 20260931-Overleaf-Diplomarbeit, Overleaf-Sync),
 # ab 2026-06-24 als SUBMODUL eingebunden (siehe .gitmodules) — NICHT mehr ignorieren.
+
+# #260: Workflow-Rohdaten-Backups (32M+, STRIKT ADDITIV lokal + OneDrive-versioniert; zu gross fuer Repo)
+_workflow-raw-backups/
