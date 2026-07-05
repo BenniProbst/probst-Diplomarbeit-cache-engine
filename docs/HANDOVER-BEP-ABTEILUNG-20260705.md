@@ -54,5 +54,9 @@ HO-1..HO-10 aus Ledger/Audit-A8 PLUS NEU: **HO-11** gcc-15.3 auf allen Shell-Run
 2. **7b-3-Andockpunkt:** isa-Achse T12 direkt vs. Verfeinerung über axis_09b `vector_width_bits`. (Empfehlung: T12 direkt, 09b später.)
 3. **AP-15-Scope:** analoge Dagger-Gatter für Set/Sequence/View-Gattungen als Folge-TODO? (Empfehlung: ja, nach M3-Kette.)
 
+## 5b. ANHÄNGE (User-Auftrag 05.07., Goal gestoppt)
+- **`docs/HANDOVER-ANHANG-TODO-BOARD-20260705.md`** — vollständiger Snapshot der user-sichtbaren TODO-Liste (275 Einträge: alle offenen mit Strang-Zuordnung, alle erledigten als Beleg-Kurzform).
+- **`docs/HANDOVER-ANHANG-MEMORIES-20260705/`** — 58 projektrelevante Assistenten-Memories (Direktiven/Feedback/Referenzen zu Kadenz, Codex, Thesis, Buildsystem, Matrix; Secrets redacted). Diese ersetzen das persönliche Memory des bisherigen Assistenten für die account-fremde Weiterarbeit.
+
 ## 6. LAUFENDE/EXTERNE VORGÄNGE bei Übergabe
 Pipeline 7930 (ce, `c9a7e44e`) pending im Runner-Stau + die durch DIESEN Push entstehenden Pipelines (super: erstmals mit `toolchain:probe` + `build:clang` — deren Ergebnis ist der Strang-A-Einstieg!) · kein lokaler Build/Agent offen · 2 codex.exe-Prozesse absichtlich am Leben (1 aktiver + 1 arbeitender), 12 Zombies wurden beendet · `apps/perm_runner/main.cpp` bleibt user-dirty (bewusst) · thesis-Submodul dirty = Text-Agent-PDF (bewusst).
