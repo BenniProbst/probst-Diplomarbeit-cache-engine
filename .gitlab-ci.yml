@@ -33,6 +33,7 @@ stages:
   - thesis-pdf
 
 variables:
+  COMDARE_CLANG_MATRIX: "1"   # #273: neueste-clang-Pflicht (User-E2), Rollout-Start super
   GIT_SUBMODULE_STRATEGY: recursive       # Default fuer die Build-Stages; Lint ueberschreibt auf none
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
   CMAKE_BUILD_PARALLEL_LEVEL: "8"          # User 2026-07-03: 8 Kerne = 8 GB (1 GB/Kern) bei prod concurrent=1 (revidiert 4)
@@ -43,6 +44,17 @@ variables:
   COMDARE_CPPCHECK_IGNORE_DIRS: "ext build _archive_code_pre_migration modules external thesis"
 
 # ── Stufe 1: Lint (aus ci-templates) — NUR super-eigener Code, KEINE Submodule ──
+# #273 T1 (User-E2 2026-07-05): Compiler-Inventar je Runner-Host via CI (Cluster read-only) — Grundlage
+# fuer den gcc-15.3-Pin (T2) + die neueste-clang-Pflichtmatrix. Rollout beginnt hier (super).
+toolchain:probe:
+  extends: .toolchain-probe
+  tags: [baremetal]
+
+# #273: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang (COMDARE_CLANG_MATRIX=1 oben).
+build:clang:
+  extends: .build-clang-latest
+  tags: [baremetal]
+
 lint:secrets:
   extends: .lint-secrets
   tags: [baremetal]
