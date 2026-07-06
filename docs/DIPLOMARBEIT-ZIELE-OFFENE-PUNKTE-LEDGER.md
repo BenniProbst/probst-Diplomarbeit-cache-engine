@@ -180,6 +180,8 @@ Widerspruch **#193 = TOP-PRIO (User 06-27) vs. Task-Feld [E0]-ZULETZT**: AUFGEL�
 
 - **2026-07-05 (spät, #271/DEG-5 DONE — perm_runner-CMake-Fix):** ce `19d7f701`, beide Remotes. E-E-Bedingung erfüllt: `apps/perm_runner/main.cpp` ist auf prod1/comdare NICHT user-dirty (frischer Klon). Fix exakt wie im Ledger vorgezeichnet: `libs/common` auf den schlanken Include-Pfad (keine neue Link-Dependency). **Literal: Build comdare_perm_runner VORHER Exit 1 (xml_reader.hpp fatal, auf Linux reproduziert), NACHHER Exit 0, Binary 202080 Bytes.** Degeneration §4-5 des Session-Handovers damit geschlossen.
 
+- **2026-07-06 (früh, S7-4/#261 DONE — Hash-Pool, 4. honest-0-DEG echt):** ce `b9cc4fdb`, beide Remotes. Doppelt kartiert (Explore+Codex konvergent). Hash-Spezifika: `storage_t = conditional_t<kOpenAddressing, OaData, ChainData>` — BEIDE Zweige rebound + per neuem `ChainingBranchCompilesAndMeters`-Test kompiliert-bewiesen; Slot-Typen nach detail (Felder exakt), `node_type = conditional_t` über die Shape, Default `A = std::allocator<node_type>` (Serien-Assertion hält); Rehash zählt ehrlich (OA voller Neu-Buffer nach swap, Chaining heads-Delta); `live_nodes ≡ size_` (Tombstones/Free-Nodes zählen nicht). **Literal: Build EXIT 0, ctest 7/7 Passed (+234_f4-Regression), `S7-4 T6-DEG alloc_cnt=2 bytes_alloc=1152 bytes_in_use=1152` + `[ PASSED ] 5 tests`; clang-format 0, Mojibake 0.** T6-Naht griff zum 4. Mal ohne Adapter-Änderung. **S7-Rest: S7-5..8 OriginalXxx (ART/HOT/START/Wormhole — anderes Strukturmuster, neue Kartierung nötig) → S7-9 SuRF → S7-10 Swiss(A-Teil) → 234-V.**
+
 ---
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
