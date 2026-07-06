@@ -46,7 +46,10 @@ namespace {
 struct ScopedTempDir {
     fs::path path;
     explicit ScopedTempDir(std::string_view name_hint) {
-        auto base = fs::temp_directory_path() / "comdare_test";
+        // Basis-Verzeichnis MUSS benutzer-eindeutig sein: /tmp ist host-weit geteilt, und auf prod1 laufen
+        // lokale Laeufe (comdare) und CI (gitlab-runner) auf demselben Host — ein fester Pfad gehoert dem
+        // Erst-Ersteller und blockt den anderen Benutzer (8076/Job 213506: Permission denied).
+        auto base = fs::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
         fs::create_directories(base);
         path = base / (std::string{name_hint} + "_" + std::to_string(::getpid()) + "_" +
                        std::to_string(reinterpret_cast<std::uintptr_t>(this)));
