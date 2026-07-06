@@ -188,6 +188,8 @@ Widerspruch **#193 = TOP-PRIO (User 06-27) vs. Task-Feld [E0]-ZULETZT**: AUFGEL�
 
 - **2026-07-06 (früh, S7-7/#261 DONE — START-Pool, 7. honest-0-DEG echt):** ce `67acf1f4`, beide Remotes. Inner → `detail::StartTrieInner<FwdAlloc>` mit ZWEI inneren Rebinds (disc uint32 / kids size_t); add_child hookt beide inserts (per-Inner-Tower-Muster, dominantes Wachstum ehrlich); live_nodes on-demand. **Literal: Build EXIT 0, ctest 11/11 Passed, `S7-7 T6-DEG alloc_cnt=16 bytes_alloc=512 bytes_in_use=512` + `[ PASSED ] 4 tests`; clang-format 0, Mojibake 0.** Stand: 8/10 Familien ECHT — Rest: S7-8 Wormhole (std::map-Allocator-Durchreiche) → S7-9 SuRF → S7-10 Swiss-A → 234-V.
 
+- **2026-07-06 (früh, S7-8/#261 DONE — Wormhole-Pool, ALLE 4 Original*-Familien fertig):** ce `514d8a88`, beide Remotes. std::map-Anchor-Index mit rebound map_allocator_type; RB-Node-Zählung ehrlich via try_emplace-inserted (nur NEUE Keys) mit sizeof(map_value_type) als dokumentierter konservativer Untergrenze; live_nodes = leaves−fl_leaf (Map==Anker==Leaf, keine Doppelzählung). **Literal: Build EXIT 0, ctest 12/12 Passed, `S7-8 T6-DEG alloc_cnt=6 bytes_alloc=752 bytes_in_use=752` + `[ PASSED ] 4 tests`; clang-format 0, Mojibake 0.** *(Zählkorrektur: der S7-7-Eintrag nannte vorzeitig „8/10" — dort waren es 7/10; MIT S7-8 jetzt tatsächlich **8/10 Familien ECHT**: BST/BTree/SkipList/Hash/ART/HOT/START/Wormhole.)* **S7-Rest: S7-9 SuRF → S7-10 Swiss(A-Teil) → danach 234-V (eigener Increment).**
+
 ---
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
