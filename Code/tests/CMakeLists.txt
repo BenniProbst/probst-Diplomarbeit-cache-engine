@@ -6,13 +6,15 @@ include(GoogleTest)
 function(comdare_da_add_test name)
     cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES" ${ARGN})
     add_executable(${name} ${ARG_SOURCES})
+    # CI-Registry (User 06.07.: Tests nie manual/auslassen): Root sammelt zu comdare_da_unit_tests.
+    set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS ${name})
     target_link_libraries(${name} PRIVATE
         gtest gtest_main
         ${ARG_LIBRARIES})
     target_compile_features(${name} PRIVATE cxx_std_23)
     gtest_discover_tests(${name}
         DISCOVERY_TIMEOUT 30
-        PROPERTIES TIMEOUT 60)
+        PROPERTIES TIMEOUT 60 LABELS da_unit)
 endfunction()
 
 comdare_da_add_test(test_binary_to_csv
@@ -71,6 +73,10 @@ if(COMDARE_V32_ENABLE)
     # V33.D.3 (2026-05-21) - MessreiheV32Validator-Tests
     comdare_da_add_test(test_messreihe_v32_validator
         SOURCES unit/test_messreihe_v32_validator.cpp)
+    # CWD-Stray-Haertung (Fix 2026-07-06, Muster COMDARE_FIXTURES_DIR_03_FALLBACK): Source-Dir-Fallback
+    # fuer das gelieferte Beispiel-XML — der fruehere GTEST_SKIP maskierte den Test in CI/ctest komplett.
+    target_compile_definitions(test_messreihe_v32_validator PRIVATE
+        "COMDARE_TEST_DATA_XML_DIR_FALLBACK=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_data_xml\"")
     target_include_directories(test_messreihe_v32_validator PRIVATE
         ${CMAKE_SOURCE_DIR}/02_messung_driver)
 

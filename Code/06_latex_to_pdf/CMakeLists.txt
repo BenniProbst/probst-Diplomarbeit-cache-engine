@@ -38,5 +38,6 @@ if(COMDARE_DA_BUILD_TESTS)
         DISCOVERY_TIMEOUT 30
         PROPERTIES
             TIMEOUT 120
+            LABELS da_unit
             ENVIRONMENT "COMDARE_FIXTURES_DIR_06=${_fix06};COMDARE_MODULE_SOURCE_DIR_06=${_src06}")
 endif()

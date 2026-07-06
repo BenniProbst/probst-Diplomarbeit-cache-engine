@@ -17,17 +17,21 @@ namespace {
 void write_sample_csv(fs::path const& p) {
     fs::create_directories(p.parent_path());
     std::ofstream f(p);
-    f << "permutation_id,fingerprint,succeeded,op_count,total_cycles,"
+    // V41.P1-KANONISCH: 16 Spalten, workload_used als 4. Spalte (parse_csv verlangt cols>=16 —
+    // Fix 2026-07-06: der alte 15-Spalten-Writer erzeugte status_parse_error).
+    f << "permutation_id,fingerprint,succeeded,workload_used,op_count,total_cycles,"
       << "cache_misses_l1,cache_misses_l2,cache_misses_l3,dtlb_misses,"
       << "coherence_invalidations,energy_micro_joules,"
       << "bytes_allocated,bytes_in_use_peak,external_frag,internal_frag\n";
-    f << "ce_lockfree:art:tcmalloc:none,3405691582,1,1000,25000,50,10,2,1,0,12345,4096,3072,0.05,0.02\n";
-    f << "pa_olc:hot:mimalloc:zipf,3405691583,1,2000,48000,100,20,5,2,0,23456,8192,6144,0.04,0.03\n";
-    f << "ce_lockfree:masstree:jemalloc:none,3405691584,0,500,12000,0,0,0,0,0,0,0,0,0.0,0.0\n";
+    f << "ce_lockfree:art:tcmalloc:none,3405691582,1,ycsb_a,1000,25000,50,10,2,1,0,12345,4096,3072,0.05,0.02\n";
+    f << "pa_olc:hot:mimalloc:zipf,3405691583,1,ycsb_b,2000,48000,100,20,5,2,0,23456,8192,6144,0.04,0.03\n";
+    f << "ce_lockfree:masstree:jemalloc:none,3405691584,0,ycsb_a,500,12000,0,0,0,0,0,0,0,0,0.0,0.0\n";
 }
 
 void ensure_cached_csv(fs::path const& p) {
-    if (!fs::exists(p)) write_sample_csv(p);
+    // IMMER schreiben (selbstheilend gegen Schema-Drift alter gecachter Dateien);
+    // die Datei bleibt danach als inspizierbares Fixture liegen (Habich-Doktrin).
+    write_sample_csv(p);
 }
 
 fs::path fixtures_dir() {

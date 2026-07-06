@@ -65,44 +65,50 @@ struct ScopedTempDir {
 // durchlaufen.
 void write_minimal_xml_configs(fs::path const& config_dir) {
     fs::create_directories(config_dir);
-
+    // KANONISCHES Element-Schema des XmlConfigParser (parse_one sucht <cache_engine_permutation>/
+    // <search_algorithm>/<allocator_permutation>/<test_data_set> mit id-Attribut + VOLLEM Schliess-Tag —
+    // KEINE self-closing Tags; Fix 2026-07-06: alte <permutation>-Tags parsten zu 0 Eintraegen).
     {
         std::ofstream f(config_dir / "cache_engine_permutations.xml");
         f << R"(<?xml version="1.0" encoding="UTF-8"?>
-<cache_engine_permutations>
-  <permutation id="ce_minimal">
-    <concurrency>single_writer_multi_reader</concurrency>
-    <prefetch>none</prefetch>
-    <telemetry>off</telemetry>
-  </permutation>
-</cache_engine_permutations>
+<comdare>
+  <cache_engine_permutation id="ce_minimal">
+    <concurrency_mechanic>OLC</concurrency_mechanic>
+    <prefetch>NONE</prefetch>
+    <telemetry_strategy>OFF</telemetry_strategy>
+  </cache_engine_permutation>
+</comdare>
 )";
     }
     {
         std::ofstream f(config_dir / "search_algorithm_permutations.xml");
         f << R"(<?xml version="1.0" encoding="UTF-8"?>
-<search_algorithm_permutations>
-  <permutation id="prt_art_v1"/>
-</search_algorithm_permutations>
+<comdare>
+  <search_algorithm id="prt_art_v1">
+    <traversal>PRTART_HOT_PATH</traversal>
+  </search_algorithm>
+</comdare>
 )";
     }
     {
         std::ofstream f(config_dir / "allocator_permutations.xml");
         f << R"(<?xml version="1.0" encoding="UTF-8"?>
-<allocator_permutations>
-  <permutation id="a20_dlmalloc"/>
-</allocator_permutations>
+<comdare>
+  <allocator_permutation id="a20_dlmalloc">
+    <family>dlmalloc</family>
+  </allocator_permutation>
+</comdare>
 )";
     }
     {
         std::ofstream f(config_dir / "test_data_sets.xml");
         f << R"(<?xml version="1.0" encoding="UTF-8"?>
-<test_data_sets>
-  <data_set id="ycsb_c_small">
+<comdare>
+  <test_data_set id="ycsb_c_small">
     <num_keys>1000</num_keys>
     <num_operations>5000</num_operations>
-  </data_set>
-</test_data_sets>
+  </test_data_set>
+</comdare>
 )";
     }
 }

@@ -80,21 +80,20 @@ lint:static:
   variables:
     GIT_SUBMODULE_STRATEGY: none
 
-# ── Stufe 3: Test (aus ci-templates .test) — VOLLE super-Unit-Suite (11 Tests, Code/tests) bauen + AUSFUEHREN ──
-# Heute lief 0 super-Unit-Test in der GitLab-CI (integration:smoke baut mit DA_BUILD_TESTS=OFF). Dieser Job
-# baut Code/ mit Tests+V32 in EIGENEM Build-Ordner und faehrt ctest ueber alle 11. Probelauf-Modus
-# (when:manual + allow_failure) bis zum ersten gruenen Beweis, dann scharf (allow_failure raus) — SE-21b-F3.
+# ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
+# User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
+# lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
+# bewusst NICHT Target "all": das zöge die komplette ce-Suite (888 Targets) doppelt, die ihr EIGENES
+# test:unit im ce-Repo hat (dort advisory bis 58er-Fix-Strecke/264-d).
 test:unit:
   extends: .test
   tags: [baremetal]
-  rules:
-    - when: manual
-      allow_failure: true
   variables:
     COMDARE_TEST_CMAKE_SOURCE_DIR: "Code"
     COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test"
     COMDARE_TEST_CONFIGURE_FLAGS: "-DCOMDARE_DA_BUILD_TESTS=ON -DCOMDARE_V32_ENABLE=ON"
-    COMDARE_TEST_BUILD_TARGET: "all"
+    COMDARE_TEST_BUILD_TARGET: "comdare_da_unit_tests"
+    COMDARE_TEST_CTEST_ARGS: "-L da_unit"
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.

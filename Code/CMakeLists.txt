@@ -356,6 +356,25 @@ add_custom_target(comdare_da_tools
 
 if(COMDARE_DA_BUILD_TESTS)
     add_subdirectory(tests)
+    # ── User-Direktive 06.07. (strikt grün, Tests nie manual/auslassen): Sammel-Target NUR der
+    # super-eigenen Tests (11 Code/tests via Registry + 4 Stufen-Fixture-Tests; ce-Suite hat ihr
+    # EIGENES test:unit im ce-Repo). CI: test:unit baut dieses Target + ctest -L da_unit.
+    get_property(_comdare_da_tests GLOBAL PROPERTY COMDARE_DA_TEST_TARGETS)
+    add_custom_target(comdare_da_unit_tests)
+    foreach(_t IN LISTS _comdare_da_tests)
+        if(TARGET ${_t})
+            add_dependencies(comdare_da_unit_tests ${_t})
+        endif()
+    endforeach()
+    foreach(_t
+            test_03_binary_to_csv_cached_fixtures
+            test_04_csv_to_latex_cached_fixtures
+            test_05_diagram_generator_cached_fixtures
+            test_06_latex_to_pdf_cached_fixtures)
+        if(TARGET ${_t})
+            add_dependencies(comdare_da_unit_tests ${_t})
+        endif()
+    endforeach()
 endif()
 
 # ─────────────────────────────────────────────────────────────────────────────
