@@ -80,19 +80,11 @@ lint:secrets:
 lint:format:
   extends: .lint-format
   tags: [baremetal]
-  rules:   # #277 Lazy: docs-only-Pushes brauchen keinen C++-Lint (changes-Filter garantiert Code-Unberuehrtheit); api/web = immer
-    - if: '$CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline"'
-    - changes:
-        paths: ["Code/**/*", ".gitlab-ci.yml", ".clang-format"]
   variables:
     GIT_SUBMODULE_STRATEGY: none
 lint:static:
   extends: .lint-static
   tags: [baremetal]
-  rules:   # #277 Lazy: docs-only-Pushes brauchen keinen C++-Lint (changes-Filter garantiert Code-Unberuehrtheit); api/web = immer
-    - if: '$CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline"'
-    - changes:
-        paths: ["Code/**/*", ".gitlab-ci.yml", ".clang-format"]
   variables:
     GIT_SUBMODULE_STRATEGY: none
 
@@ -118,10 +110,6 @@ test:unit:
 trigger:cache-engine:
   stage: orchestrate
   needs: ["lint:secrets"]
-  rules:   # #277 Lazy (User 06.07.): Kind-Pipeline nur bei geaendertem Submodul-Pointer; api/web-Quellen = immer (Voll-Beweis)
-    - if: '$CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline"'
-    - changes:
-        paths: ["Code/external/comdare-cache-engine"]
   trigger:
     project: comdare/research/comdare-cache-engine
     branch: main
@@ -132,10 +120,6 @@ trigger:cache-engine:
 trigger:prt-art:
   stage: orchestrate
   needs: ["lint:secrets"]
-  rules:   # #277 Lazy (User 06.07.): Kind-Pipeline nur bei geaendertem Submodul-Pointer; api/web-Quellen = immer (Voll-Beweis)
-    - if: '$CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline"'
-    - changes:
-        paths: ["Code/external/comdare-prt-art"]
   trigger:
     project: comdare/research/comdare-prt-art
     branch: main
@@ -146,10 +130,6 @@ trigger:prt-art:
 trigger:thesis:
   stage: orchestrate
   needs: ["lint:secrets"]
-  rules:   # #277 Lazy (User 06.07.): Kind-Pipeline nur bei geaendertem Submodul-Pointer; api/web-Quellen = immer (Voll-Beweis)
-    - if: '$CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline"'
-    - changes:
-        paths: ["thesis/diplomarbeit"]
   trigger:
     project: comdare/research/20260931-overleaf-diplomarbeit
     branch: main
