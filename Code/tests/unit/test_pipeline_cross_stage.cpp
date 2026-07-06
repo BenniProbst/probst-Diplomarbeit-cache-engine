@@ -15,13 +15,24 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <unistd.h>
 
 namespace btc = comdare::da::binary_to_csv;
 namespace c2l = comdare::da::csv_to_latex;
 namespace dg  = comdare::da::diagram_generator;
 
+namespace {
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
+} // namespace
+
 TEST(PipelineCrossStage, Stage03OutputFlowsInto04And05) {
-    auto dir = std::filesystem::temp_directory_path() / "da_xstage_test";
+    auto dir = comdare_user_tmp() / "da_xstage_test";
     std::filesystem::create_directories(dir);
     auto const csv = dir / "stage03_out.csv";
 

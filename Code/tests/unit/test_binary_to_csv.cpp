@@ -8,16 +8,25 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <unistd.h>
 
 namespace btc = comdare::da::binary_to_csv;
 
 namespace {
 
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
+
 class BinaryToCsvFixture : public ::testing::Test {
 protected:
     void SetUp() override {
-        tmp_ = std::filesystem::temp_directory_path() /
-               ("da_btc_test_" + std::to_string(::testing::UnitTest::GetInstance()->random_seed()));
+        tmp_ =
+            comdare_user_tmp() / ("da_btc_test_" + std::to_string(::testing::UnitTest::GetInstance()->random_seed()));
         std::filesystem::create_directories(tmp_);
     }
     void TearDown() override {

@@ -8,10 +8,20 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <unistd.h>
 
 namespace dg = comdare::da::diagram_generator;
 
 namespace {
+
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
+
 [[nodiscard]] std::string read_file(std::filesystem::path const& p) {
     std::ifstream     in{p};
     std::stringstream ss;
@@ -23,7 +33,7 @@ namespace {
 TEST(DiagramGenerator, EscapesUnderscoresInLabel) { EXPECT_EQ(dg::escape_latex("ce_lockfree"), "ce\\_lockfree"); }
 
 TEST(DiagramGenerator, BarChartProducesValidTikz) {
-    auto             tmp = std::filesystem::temp_directory_path() / "da_dg_bar.tex";
+    auto             tmp = comdare_user_tmp() / "da_dg_bar.tex";
     dg::BarChartData data;
     data.title   = "Test";
     data.x_label = "Perm";
@@ -41,13 +51,13 @@ TEST(DiagramGenerator, BarChartProducesValidTikz) {
 }
 
 TEST(DiagramGenerator, BarChartEmptyReturnsError) {
-    auto             tmp = std::filesystem::temp_directory_path() / "da_dg_empty.tex";
+    auto             tmp = comdare_user_tmp() / "da_dg_empty.tex";
     dg::BarChartData data;
     EXPECT_EQ(dg::write_bar_chart(tmp, data), dg::status_empty_input);
 }
 
 TEST(DiagramGenerator, A4ConstraintsAppliedCorrectly) {
-    auto             tmp = std::filesystem::temp_directory_path() / "da_dg_a4.tex";
+    auto             tmp = comdare_user_tmp() / "da_dg_a4.tex";
     dg::BarChartData data;
     data.title  = "A4 Test";
     data.labels = {"X"};
@@ -64,7 +74,7 @@ TEST(DiagramGenerator, A4ConstraintsAppliedCorrectly) {
 }
 
 TEST(DiagramGenerator, ScatterPlotProducesValidTikz) {
-    auto            tmp = std::filesystem::temp_directory_path() / "da_dg_scatter.tex";
+    auto            tmp = comdare_user_tmp() / "da_dg_scatter.tex";
     dg::ScatterData data;
     data.title = "Scatter Test";
     data.xs    = {1.0, 2.0, 3.0};
@@ -78,7 +88,7 @@ TEST(DiagramGenerator, ScatterPlotProducesValidTikz) {
 }
 
 TEST(DiagramGenerator, HeatmapProducesValidTikz) {
-    auto            tmp = std::filesystem::temp_directory_path() / "da_dg_heatmap.tex";
+    auto            tmp = comdare_user_tmp() / "da_dg_heatmap.tex";
     dg::HeatmapData data;
     data.title    = "Heatmap Test";
     data.x_labels = {"X1", "X2"};

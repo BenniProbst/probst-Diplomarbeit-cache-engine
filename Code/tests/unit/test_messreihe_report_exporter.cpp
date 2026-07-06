@@ -9,11 +9,20 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unistd.h>
 
 namespace v32 = comdare::diplomarbeit::messung_driver::v32;
 namespace cmd = comdare::cache_engine::builder::commands;
 
 namespace {
+
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
 
 v32::MessreiheReport make_sample_report() {
     v32::MessreiheReport rep;
@@ -62,7 +71,7 @@ std::string read_all(const std::filesystem::path& p) {
 TEST(MessreiheReportExporter, WriteCsvHappyPath) {
     v32::MessreiheReportExporter exporter;
     auto                         report = make_sample_report();
-    auto                         path   = std::filesystem::temp_directory_path() / "v34_b_report.csv";
+    auto                         path   = comdare_user_tmp() / "v34_b_report.csv";
     auto                         status = exporter.write_csv(report, path);
     EXPECT_TRUE(status.ok()) << status.message;
 
@@ -77,7 +86,7 @@ TEST(MessreiheReportExporter, WriteCsvHappyPath) {
 TEST(MessreiheReportExporter, WriteTikzSummary) {
     v32::MessreiheReportExporter exporter;
     auto                         report = make_sample_report();
-    auto                         path   = std::filesystem::temp_directory_path() / "v34_b_summary.tex";
+    auto                         path   = comdare_user_tmp() / "v34_b_summary.tex";
     auto                         status = exporter.write_tikz_summary(report, path);
     EXPECT_TRUE(status.ok()) << status.message;
 
@@ -92,7 +101,7 @@ TEST(MessreiheReportExporter, WriteTikzSummary) {
 TEST(MessreiheReportExporter, EmptyReportFails) {
     v32::MessreiheReportExporter exporter;
     v32::MessreiheReport         empty;
-    auto status = exporter.write_csv(empty, std::filesystem::temp_directory_path() / "empty.csv");
+    auto                         status = exporter.write_csv(empty, comdare_user_tmp() / "empty.csv");
     EXPECT_FALSE(status.ok());
     EXPECT_EQ(status.code, v32::ExportStatus::Code::EmptyReport);
 }
@@ -108,7 +117,7 @@ TEST(MessreiheReportExporter, IoErrorOnInvalidPath) {
 TEST(MessreiheReportExporter, CsvRowsMatchOutcomeCount) {
     v32::MessreiheReportExporter exporter;
     auto                         report = make_sample_report();
-    auto                         path   = std::filesystem::temp_directory_path() / "v34_b_rowcount.csv";
+    auto                         path   = comdare_user_tmp() / "v34_b_rowcount.csv";
     auto                         status = exporter.write_csv(report, path);
     EXPECT_TRUE(status.ok()) << status.message;
     auto content = read_all(path);

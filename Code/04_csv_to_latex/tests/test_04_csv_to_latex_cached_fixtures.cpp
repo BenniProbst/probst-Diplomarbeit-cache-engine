@@ -8,11 +8,20 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <unistd.h>
 
 namespace c2l = comdare::da::csv_to_latex;
 namespace fs  = std::filesystem;
 
 namespace {
+
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
 
 void write_sample_csv(fs::path const& p) {
     fs::create_directories(p.parent_path());
@@ -71,7 +80,7 @@ TEST(Stufe04Pipeline, WriteLatexFromCachedFixture) {
     std::vector<c2l::CsvRow> rows;
     ASSERT_EQ(c2l::parse_csv(dir / "sample_3_rows.csv", rows), c2l::status_ok);
 
-    auto out = fs::temp_directory_path() / "v35d2_table.tex";
+    auto out = comdare_user_tmp() / "v35d2_table.tex";
     ASSERT_EQ(c2l::write_latex(out, rows, "Pipeline-Stage-04 Test", "tab:v35d2"), c2l::status_ok);
 
     std::string content;
@@ -164,7 +173,7 @@ TEST(Stufe04Pipeline, WriteBiasMatrixLatex) {
     ASSERT_EQ(c2l::parse_wide_csv(dir / "sample_wide_rows.csv", rows), c2l::status_ok);
     auto const aggs = c2l::aggregate_tier_workload(rows);
 
-    auto out = fs::temp_directory_path() / "wide_bias_matrix.tex";
+    auto out = comdare_user_tmp() / "wide_bias_matrix.tex";
     ASSERT_EQ(c2l::write_bias_matrix_latex(out, aggs, "Bias-Bruch-Matrix Test", "tab:biasmatrix", "de"),
               c2l::status_ok);
     std::string content;
