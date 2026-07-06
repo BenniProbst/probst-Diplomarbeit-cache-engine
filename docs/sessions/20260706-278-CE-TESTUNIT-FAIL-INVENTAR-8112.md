@@ -83,3 +83,6 @@
 
 ## LAUFZEITBILD 1/7 (Trace 214367): test_migration_two_tier
 `[ERR] HotCold: tier_migrate_step Rueckgabe > 0 (ECHTER Move, keine Simulation)` — moved=0 bei tier0=4096/tier1=0. IMigratableTier (abi_adapter ~:1557, P4/#123) bewegt im Standalone-CI-Kontext nichts; ERSTLAUF-Befund (phase_e-standalone lief nie in CI). Analyse-Increment: Bedingungen von tier_migrate_step gegen die HotCold-Test-Komposition (Move-Kriterien/Schwellen) — Mess-Pfad-relevant, KEIN Schnellfix.
+
+## ERNTE 8169/Job 214584 (fe80a36c): Not-Run-(b)-Sweep zog die nächste Schicht — 3 WINDOWS-ONLY-TUs
+`fatal error: windows.h` in test_buildvariant_dll.cpp, test_adhoc_buildvariant_dll.cpp, test_v5_io_real_fixture.cpp — die (b)-Gruppe wurde nie auf Linux gebaut (Windows-Ära). WinAPI-Umfang je TU minimal: LoadLibraryA/GetProcAddress/FreeLibrary (+ HMODULE). FIX-PLAN (nächster Zyklus, mechanisch): portables Shim je TU — `#ifdef _WIN32` windows.h/LoadLibraryA/GetProcAddress/FreeLibrary/HMODULE `#else` dlfcn.h/dlopen(RTLD_NOW)/dlsym/dlclose/void* — KEIN Gate/Skip (Tests sollen auf Linux-CI echt laufen; Symbol-Lookup identisch). Danach zeigt die nächste Ernte die Laufzeitbilder dieser 3 + der restlichen (b)-Tests.
