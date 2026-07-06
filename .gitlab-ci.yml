@@ -51,10 +51,18 @@ toolchain:probe:
   tags: [baremetal]
 
 # #273: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang (COMDARE_CLANG_MATRIX=1 oben).
+# #258-Fix (2026-07-06, Pipeline 8048/Job 213091): Template-Default cmake -S "." fand kein CMakeLists —
+# super-Quelle liegt unter Code/. Scope = Sammel-Target comdare_da_tools (Code/CMakeLists.txt, super-eigene
+# Werkzeugflaeche analog analyse+integration; Konfiguration spiegelt analyse:thesis-data: Ninja/Release/V32).
 build:clang:
   extends: .build-clang-latest
   stage: analyse   # super hat keinen 'build'-Stage (Lint-API 05.07.: chosen stage build does not exist)
   tags: [baremetal]
+  variables:
+    COMDARE_CMAKE_SOURCE_DIR: "Code"
+    COMDARE_AUDIT_BUILD_TYPE: "Release"
+    COMDARE_CMAKE_CONFIGURE_FLAGS: "-G Ninja -DCOMDARE_V32_ENABLE=ON"
+    COMDARE_CMAKE_BUILD_TARGET: "comdare_da_tools"
 
 lint:secrets:
   extends: .lint-secrets

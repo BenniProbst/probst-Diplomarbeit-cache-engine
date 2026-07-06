@@ -340,6 +340,20 @@ add_custom_target(comdare_pipeline_e2e
 add_dependencies(comdare_pipeline_e2e
     sample_data_generator csv_to_latex_cli diagram_generator_cli)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# #273/A3 (2026-07-06) — Sammel-Target fuer die clang-Matrix (build:clang, ci-templates
+# .build-clang-latest baut genau EIN COMDARE_CMAKE_BUILD_TARGET; Muster: ce comdare_tests, 264-a).
+# Scope = super-eigene C++-Werkzeugflaeche (analyse:thesis-data ∪ integration:smoke):
+# Libs M03-M05 + alle CLI-/Treiber-Executables 01-05. Tests/DLL-Codegen bewusst NICHT enthalten.
+# ─────────────────────────────────────────────────────────────────────────────
+add_custom_target(comdare_da_tools
+    DEPENDS
+        sample_data_generator
+        messung_driver
+        comdare_binary_to_csv    binary_to_csv_cli
+        comdare_csv_to_latex     csv_to_latex_cli
+        comdare_diagram_generator diagram_generator_cli)
+
 if(COMDARE_DA_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
