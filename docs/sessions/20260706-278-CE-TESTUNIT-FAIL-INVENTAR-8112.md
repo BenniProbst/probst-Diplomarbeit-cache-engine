@@ -91,3 +91,9 @@
 - dlopen-Shims WIRKEN: beide DLL-Roundtrip-Tests bauen auf Linux (lokal 2/2 Passed, echte .so-Symbol-Inspektion).
 - Rest: 14 Failed + 1 aborted (echte Laufzeitliste) + 5 Not Run (= exakt die Job-Scope-Kollisionen contract|pmc).
 - SCOPE-FIX gelandet (ce e62b8cf6): COMDARE_TEST_CTEST_ARGS="-LE contract|pmc" im unit-Job — die 5 laufen hart in contract:*/pmc:amd; unit-Scope sauber. Erwartete nächste Ernte: ~15 echte Laufzeit-Fails als finale #278-Arbeitsliste (dann Einzelfix-Serie: migration moved=0 [erfasst], d_v42 aborted, seg_coverage, prefetch-Paar, cow_memento, d1_d2, A1-Vierer, CI-only-Rest).
+
+## ✅ FINALE LAUFZEITLISTE — Ernte 8180/Job 214698 (e62b8cf6): 15 Fails, 0 Not Run, 91% (164 Tests im sauberen unit-Scope)
+Kurve des Abends: **62 → 29 → 20 → 15.** Scope-Fix wirkt exakt (contract|pmc laufen in eigenen Jobs).
+Die 15 = Einzelfix-Serie (Fehlerbilder ALLER 15 in `20260706-278-rohdaten-trace-214698-final15.txt`):
+8× Pilot-DLL/Umgebungs-Klasse (permutation_engine, multi_codegen, codegen_tool, r5i_configure, f15_measurement, ap10_dataset_akte, v5_disk_memento, adhoc_dll_load) + 7× phase_d/e (d1_d2_selection, d_v42 ABORT, migration_two_tier [moved=0, erfasst], seg_coverage, prefetch_real, prefetch_adversarial_verify, cow_memento).
+Nach 15×Fix → allow_failure raus (#278-Ziel) + sanitize-Härtung.
