@@ -38,3 +38,11 @@ G1 Schritt-0-Anlage · G2 metrics-Transfer + Anker-Entscheid · G3 foundation-Er
 ## 6. Offene Fragen (14, Volltext in Rohdaten; wichtigste)
 
 (1) Normativer Anker comdare-metrics (3 belegte Verortungen) · (2) comdare-tracing mit in measurement-all? · (3) HDR-Verortung bestätigen · (4) axis_09-Schnitt + topics/-Zuordnung · (5) Duplikat-Ownership (measurement_snapshot/pruef_dock in mehreren Skeletten) · (6) provenance-Zweiteilung akzeptiert? · (7) TestDataSetAccumulationEngine → workloads vs. comdare-db-benchmarks · (13) Skelette nach Transfer = Archiv (Empfehlung: Extraktion frisch aus Scratch-Kopie) · (14) Baseline-Stufennamen der measurement-all mit Matrix-Owner abgleichen (Abgrenzung zu network-protocols-Stufe-5-Measurement-TRANSPORT dokumentieren).
+
+---
+
+## ADDENDUM (2026-07-06, nach §9-Doktrin + Research=early-Products — Ledger §13.12/Korrekturliste)
+
+1. **Schritt 13 (Research-Verdrahtung) SUPERSEDIERT im Mechanismus:** Statt nackter Direkt-Links (`source="modules"` + Übergangs-Aliase) konsumiert die Diplomarbeit die Module über **EIGENE Research-Matrix-Instanziierungs-Zellen** (Research = early Products; die Tier-DLLs anatomy_module_abi_v1 sind bereits die binary End-Interfaces — nur die Konsum-Kanten ändern sich). Der Schritt wird bei User-GO entsprechend neu geschnitten.
+2. **Normativ-Verweis qualifiziert:** MATRIX-GRUNDLAGEN-GOALV2.md bleibt normativ AUSSER Teil 4 / Teil-1.3-Fassaden-Geltungsbereich — dort gilt Ledger §9 (Metaprogrammierungs-/Interface-Doktrin, Product-/Research-Matrix-Instanziierung).
+3. **Quellreferenz-Pflicht ergänzt:** Jeder Extraktions-/Vendoring-Schritt (5–12) führt ein Provenienz-Artefakt (Quell-Repo + SHA + Datum + Kopie-Beleg, REPOS_OVERVIEW.md-Muster; Präzedenz #265-a ce 80bfab51).
