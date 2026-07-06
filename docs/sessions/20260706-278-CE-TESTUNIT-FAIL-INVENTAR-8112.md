@@ -97,3 +97,12 @@ Kurve des Abends: **62 → 29 → 20 → 15.** Scope-Fix wirkt exakt (contract|p
 Die 15 = Einzelfix-Serie (Fehlerbilder ALLER 15 in `20260706-278-rohdaten-trace-214698-final15.txt`):
 8× Pilot-DLL/Umgebungs-Klasse (permutation_engine, multi_codegen, codegen_tool, r5i_configure, f15_measurement, ap10_dataset_akte, v5_disk_memento, adhoc_dll_load) + 7× phase_d/e (d1_d2_selection, d_v42 ABORT, migration_two_tier [moved=0, erfasst], seg_coverage, prefetch_real, prefetch_adversarial_verify, cow_memento).
 Nach 15×Fix → allow_failure raus (#278-Ziel) + sanitize-Härtung.
+
+## ✅ EINZELFIX-SERIE ABGESCHLOSSEN (Zyklus 10, 21:15) — 15 → 0 lokal (164/164), CI-Wellen 9754d692 + 861dce2d
+- **W1 Pilot-DLL (4 Tests):** `lib`-Präfix vs Loader-Pattern `comdare_anatomy_perm_*` → `PREFIX ""` an 3 Erzeugungsstellen (b0f2a92f). A1-Wurzel war NICHT der R5G-2-Pass — der 2-Pass funktionierte; der Dateiname brach den Filter.
+- **W2 prefetch (2):** Array256-Domänen-Treue seit #188-4c-ii vs gespreizte u64-Treiber-Keys → 0xFF-Klemme (473301de).
+- **W3 honest-0-Einlösung (3):** f15/seg_coverage/cow_memento auf CMD-1-b-Echtmessung nachgezogen; fill_segment_timing_v3 mit Mindest-Op 256 (Masstree-Coverage 0.58→0.994) (074a97f9).
+- **W4 d_v42_memory_layout (1):** P-MD1-#167 (32 statt 16) (9cf14469).
+- **W5 migration (1):** store-backed AdHoc Array65535 statt Hülle → moved=2048 echt (9754d692).
+- **W6 /tmp-Kollisionsklasse (5, NUR CI-frisch rot):** permutation_engine/codegen_tool/ap10/v5_disk_memento/d1_d2 → comdare_test_tmp.hpp-Helper (861dce2d). Job 214810: 159/164 → Beweis-Pipeline 8191 für 164/164 läuft.
+- d_v42-„Subprocess aborted" war test_d_v42_memory_layout_observable (assert = W4); seg_coverage-Masstree-Abnahme (<0.90) war KEIN CMD-1-b-Schaden, sondern nk=1-Fixkosten (auch in 214698 identisch 0.58).
