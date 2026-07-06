@@ -1,0 +1,57 @@
+# DOSSIER #267 / CMD-1 (#251) — Compile-time-Command-Basis + Mess-Visitor + Insel-Konsolidierung (für Codex-Erstimplementierung)
+
+**Auftraggeber-Direktive (User 02.07., bindend):** „Basis-Interface nach dem Command Pattern per Metaprogrammierung, sodass jede Achse die Mess-Achsen-Bestandteile als **Visitor** im Interface mitführt → **Limitations-Interface**. Im großen Bild ein Command Pattern bezüglich der Achsen — Hierarchie deutlich sichtbar, hauptsächlich compile-time." F1-Präzisierung: Organ-Achsen = IExecutionEngine-Basis; Mess-Achsen = **separate Mess-Basis**; CMD-1 räumt die PARALLELITÄTEN auf.
+**Bindende Grenzen (E-B + §13.9-ABI-Kanon + V3):** **ABI-NEUTRAL** — KEIN Re-Root der Runtime-Hierarchie (Re-Root ist explizit VERWORFEN); die „separate Mess-Basis" entsteht auf der **compile-time-Achsen-Ebene**, NICHT durch Herausschneiden aus `IExecutionEngine` (dessen Mess-Block :108-118 bleibt UNVERÄNDERT). v5/Mess-POD exklusiv CMD-2 (hier NICHT anfassen). Magic `.A4.`/golden-neutral.
+**Kartierung:** SE-22 §5 (03.07.) + **HEAD-Refresh 06.07.** (wf_d56a6d5b, 3 Verifikatoren, Rohdaten im Workflow-Journal; HEAD `80bfab51`). Alle Anker unten sind HEAD-verifiziert.
+
+---
+
+## 0. TABUS (jede Verletzung = Abbruch, Konflikt in Ledger melden)
+- `golden_fullpilot_320_binary_ids.txt` / AllStrategies-Ordnung / First-4 / EnabledStrategies / POD 1416 / v5 / conformance-Oracle `std::map<u64,u64>` / Magic `.A4.` — unantastbar. `test_profile_roundtrip` mismatch 0 Pflicht.
+- **KEINE compile-time→runtime-Degradation** (V3-Kadenz-Auflage): alles per Templates/`if constexpr`/`requires`/Concepts/mp11; KEINE neuen virtuals, kein `std::function`, keine Heap-Indirektion. `dynamic_cast` NUR an der bestehenden ABI-Grenze (Präzedenz IAllocatorProxyTier).
+- `fill_observer_v3` (abi_adapter, Banner greppen) bleibt **verhaltens-byte-stabil** — die T0..T18-`if constexpr`-Kette ist bereits die compile-time-Iteration; sie wird NICHT umgebaut (nur ggf. Kommentar-Verweis auf die neue Basis).
+- Runtime-Wurzeln UNVERÄNDERT: `execution_engine_base.hpp` (IExecutionEngine :98, Mess-Block :108-118), `anatomy_base.hpp` (:133), `virus_execution_engine.hpp` (:33), `observable_tier.hpp`, `resource_controllable_tier.hpp:56` (= die RUNTIME-Limitations-Auskunft, BEHALTEN), `allocator_proxy_tier.hpp`.
+- **Lasttragende Nachbarn NICHT anfassen:** `builder/anatomy_commands/tier_observe_trace_abi.hpp` + `tier_observe_trace.hpp` (produktiv: `workload_orchestrator.hpp:20`, `pruef_dock.hpp:21`) · Statistik-Header in `builder/commands/` (`latency_stats.hpp`, `welch_t_test.hpp`, `drift_detector.hpp`, `result_aggregator.hpp`, `multi_compare.hpp`, `multiple_comparison.hpp` — Konsumenten in experiment_driver/f15_compare/6 Tests) — sie bleiben AN ORT UND STELLE (Umzug = separates Increment, nicht CMD-1).
+- AP-15-3-CRTP (`pruef_dock/driveable_map_contract.hpp:34-170`) ist der kanonische Host-Kompositionspunkt für Map-Ops — NICHT duplizieren, NICHT als Command/Visitor umetikettieren.
+- `ext/**`, `modules/**`, golden/, Registry-mp_list-POPULATION tabu. Keine `$null`-Artefakte stagen. Fehlende Zielverzeichnisse: **in diesem Dossier werden KEINE neuen Verzeichnisse benötigt** (alle neuen Dateien liegen in existierenden Ordnern).
+
+## 1. IST (HEAD-verifiziert, 06.07.)
+- **AxisBase** `topics/axis_base.hpp:52` — plain struct, non-CRTP; Statik `get_compiler()`:64 + `is_original_module()`:78 (⚠️ §5 nannte fälschlich „enabled" — existiert nicht); `AxisBaseConcept`:91-94. **27 Erben:** 17 Strategie-Basen unter `axes/` + 9 unter `topics/` + `OriginalCodeMixinBase` (`src/concepts/axis_original_code_mixin_base.hpp:43`) — exakte Liste im Refresh-Journal.
+- **Adapter-Erbmatrix** (`abi_adapter.hpp`, Klassenkopf :155): IMMER = IAnatomyBase:156 + IResourceControllableTier:157 + **IAllocatorProxyTier:158 (NEU, AP-15-2)**; messungs-gated :162-171 (IMeasurableWorkload/V2/V3, IRollbackableTier, IMigratableTier, IScannableTier, IObservableTier→IDriveableTier). Zeilen-Anker im god-header driften — **Banner-grep verwenden** (Datei deklariert Anker selbst als approximativ :27-28).
+- **T6-Spiegel-Invariante (NEU):** dieselbe requires-Kaskade doppelt — `tier_get_allocator` :253-288 UND `fill_observer_v3` :1083-1108, per Kommentar :242-243 absichtlich synchron.
+- **observe_all-Lage (zwei Welten):** builder-seitig `anatomy_execution_context.hpp:87-103` (ObserverAggregate-POD, überschreibt search_algo-:92-94 + allocator-Slot :97-100) + anatomie-seitig `anatomy/search_algorithm_anatomy.hpp:62 ff.`; der Adapter hat KEIN observe_all (nur Kommentar-Marken).
+- **CMD-1-Ziel-Marke:** `anatomy_execution_context.hpp:115-116` wortgleich: „Konsolidierung dieses search_organ_/container_-Paars folgt mit CMD-1 (#251)" — Builder-Member heißen dort noch `container_`:117 + `search_organ_`:122 (bewusst nicht im 4c-iv-Rename).
+- **Inseln (Blast-Radius exakt):** (I1) `builder/commands/i_command.hpp` ICommand:25-37, 8 Ableitungen (5 anatomy_*_command + compare_engine/auto_permutate_axis/execute_engine_command), 2 Testdateien, **0 Produktions-Konsumenten** (V32-Pfad default OFF). (I2) `builder/anatomy_commands/`: 5 Command-Klassen + Context (Trace-Header bleiben!), 1 Test `test_v41_builder_anatomy_commands.cpp` (CMakeLists:421-430). (I3) `include/cache_engine/strategy_command/`: 3 Header, 1 Test `test_strategy_command.cpp` (CMakeLists:134-135), 0 Produktions-Konsumenten. (I4) `builder/algorithm_visitor/`: .gitkeep + CMakeLists (ungelinktes INTERFACE-Target, 0 Konsumenten) + `builder/CMakeLists.txt:27`-Eintrag.
+- **BEHALTEN:** WorkloadOp-switch `builder/workload_driver/workload_orchestrator.hpp` for:75 / switch:76-159 (6 Ops inkl. Scan/RMW — Command-als-Daten IM Mess-Pfad). `RuntimeMeasureVisitor` `builder/experiment_tree/runtime_measure_visitor.hpp:29` — K10-Disclaimer :27 („kein GoF-Visitor"), 0 Produktions-Konsumenten, genau 2 Test-Callsites (`test_d13_runtime_measure.cpp:92`, `test_d13_dll_runtime_measure.cpp:102`) + 2 Kommentare (`experiment_tree.hpp:62`, `tests/unit/CMakeLists.txt:1439`).
+
+## 2. SOLL — vier Teil-Increments (je EIN Commit, seriell; #188-4c-Muster)
+
+### CMD-1-a — Compile-time-Command-Basis + Mess-Visitor-Slot + Limitations-Interface (ADDITIV, kein Konsumwechsel)
+Neue Datei `libs/cache_engine/topics/axis_command_base.hpp` (Ordner existiert):
+1. `template <class Axis> concept AxisCommand` — formalisiert das Command-Muster der Achsen compile-time: verlangt die AxisBase-Statik (`get_compiler`, `is_original_module`) + `name()`-Identität (gegen AxisBaseConcept:91-94 prüfen, exakt dessen Anforderungen wiederverwenden — KEINE Doppel-Definition, Concept refined AxisBaseConcept).
+2. **Mess-Visitor-Slot compile-time:** `template <class Axis, class Visitor> concept MeasurementVisitable` + statische Durchreiche `template <class Axis, class V> constexpr void axis_accept_measurement(V&& v)` — `if constexpr (ObservableAxis<Axis>)`-gated (bestehendes `ObservableAxis`-Concept aus `observer_aggregate.hpp` wiederverwenden!); Default = no-op (honest, kein Fabrikat). KEIN Runtime-Dispatch, kein POD (v5 exklusiv CMD-2).
+3. **Limitations-Interface compile-time:** `template <class Axis> struct AxisLimitations` — constexpr-Auskunft (steuerbar? observierbar? original-Modul? compiler) als maschinenlesbare statische Struktur; MUSS die 5-Achsen-Steuerbarkeits-Semantik von `tier_query_resource_caps` (resource_controllable_tier.hpp:56, RUNTIME-Pendant) referenzieren, nicht duplizieren (Kommentar-Querverweis; Werte compile-time aus den Achsen-Concepts abgeleitet).
+4. static_assert-Selbstbeweise am Ende der Datei über 3 repräsentative Achsen (z.B. axis_06-Strategie, axis_11-Telemetrie, BtreeOrder-Shape) — Muster „Selbstbeweis" wie organ_for (3-Wege-Split-Asserts).
+DoD-a: Header kompiliert in eigener Test-TU `tests/unit/test_cmd1_a_axis_command_base.cpp` (neuer Test, COMDARE_add_test-Muster S7-Serie inkl. Include-Satz + `${COMDARE_ALL_AXIS_GENERATED_DIRS}`); alle 27 AxisBase-Erben erfüllen AxisCommand (mp11-Liste im Test, mp_for_each-static_assert); KEINE bestehende Datei angefasst außer `tests/unit/CMakeLists.txt`.
+
+### CMD-1-b — observe_all→Visitor-Iteration (Builder-Kontext-Konsolidierung + Ein-Speicher-Umstellung)
+`builder/anatomy_commands/anatomy_execution_context.hpp`: das :115-116-markierte Paar (`container_`:117 + `search_organ_`:122) auf die **adapter-analoge Ein-Speicher-Architektur** umstellen (container_algorithm_-Analogie aus 4c-iii/iv; EIN konstitutiver Speicher) + die observe_all-Iteration :87-103 auf `axis_accept_measurement`-Basis aus CMD-1-a heben (compile-time, verhaltensgleich: gleiche Slots, gleiche Überschreib-Reihenfolge search_algo→allocator). Builder-Pilot-Test `test_v41_builder_anatomy_commands.cpp` bleibt grün (Verhaltens-Identität!); anatomie-seitiges observe_all (`search_algorithm_anatomy.hpp:62 ff.`) nur ANSCHLIESSEN wenn verhaltensgleich beweisbar, sonst dokumentiert lassen.
+DoD-b: bestehender Pilot-Test + `test_216h2` + `test_s7_1` grün; kein Adapter-Diff.
+
+### CMD-1-c — Insel-Subsumption (nach a+b; präziser Schnitt!)
+1. I3 strategy_command: 3 Header + Test + CMakeLists:134-135-Block ersatzlos entfernen (0 Konsumenten; Doku nie löschen gilt für docs/, nicht für toten Code — im Commit-Text den Ledger-Beleg zitieren).
+2. I4 algorithm_visitor: Verzeichnis (.gitkeep + CMakeLists) + `builder/CMakeLists.txt:27`-add_subdirectory entfernen; K10-Disposition im Commit-Text zitieren.
+3. I1/I2 Command-Klassen: die 5 `anatomy_*_command.hpp` + `i_command.hpp` + `compare_engine/auto_permutate_axis/execute_engine_command.hpp` entfernen NUR falls nach CMD-1-b wirklich 0 Konsumenten (V32-Pfad prüfen: `builder/commands/CMakeLists.txt:11` + beide Testdateien mit-entfernen/anpassen); **Statistik-Header + tier_observe_trace*-Header bleiben unangetastet an Ort und Stelle.** Falls execute_engine_command vom V32-Demo-Pfad gebraucht: als dokumentierte Ausnahme stehen lassen (GEPARKT-Notiz), NICHT raten.
+DoD-c: Vollbau `comdare_tests` 788/788-Klasse (Sammel-Target) + ctest-Kerngates grün; grep beweist 0 Rest-Referenzen auf entfernte Symbole.
+
+### CMD-1-d — Etiketten-Hygiene
+`RuntimeMeasureVisitor` → `HostMeasureLoop` (Begründung = K10-Disclaimer :27 wörtlich); 2 Test-Callsites + 2 Kommentare nachziehen. OPTIONAL (nur wenn trivial sauber): gemeinsame private Helper-Route für die T6-Spiegel-Kaskade (tier_get_allocator ↔ fill_observer_v3) — NUR wenn byte-gleiches Verhalten literal beweisbar (beide Tests + golden), sonst GEPARKT-Notiz.
+DoD-d: alle Suiten grün; Mojibake 0; clang-format-22.1.8 dry-run 0.
+
+## 3. VERIFIKATION (je Increment, V3-Kadenz)
+Build EXIT 0 (g++-16 = Runner-Compiler) · ctest: `test_cmd1_a_*`, `test_v41_builder_anatomy_commands`, `test_216h2`, `test_s7_1`, `test_188_4bbV`, `test_conformance_gate`, `test_ap15_2/3`, `test_profile_roundtrip` (golden mismatch 0) · clang-format 0 · Mojibake 0 · danach Push beide Remotes + super-Bump + Pipeline STRIKT GRÜN vor nächstem Teil-Increment.
+
+## 4. OFFENE ENTSCHEIDE (nicht vorentscheiden — GEPARKT falls erreicht)
+- execute_engine_command/V32-Demo-Pfad-Verbleib (s. CMD-1-c-3).
+- T6-Helper-Konsolidierung (CMD-1-d optional).
+- Anatomie-seitiges observe_all-Anschließen (CMD-1-b, nur bei beweisbarer Verhaltensgleichheit).
