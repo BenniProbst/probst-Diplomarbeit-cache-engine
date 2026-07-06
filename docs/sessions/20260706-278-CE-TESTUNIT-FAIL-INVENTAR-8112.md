@@ -63,3 +63,8 @@
 181 - test_d13_dll_runtime_measure (Not Run)            dll_roundtrip goal_v6 phase_d
 182 - test_cacheline_policy_selector (Not Run)          cacheline strategy tools
 183 - test_load_profile_writer (Not Run)                tools workload_driver xml_export
+
+## KLASSIFIKATION (19:15)
+- **Klasse A — 10 echte Laufzeit-Fails (Wurzeln):** test_module_loader · test_v41_search_algorithm_permutation_engine · test_v41_anatomy_multi_codegen · test_v41_anatomy_codegen_tool · test_v41_workload_generator · test_v41_anatomy_r5i_configure_codegen · test_v41_anatomy_f15_measurement · test_ap10_dataset_akte · test_v5_disk_memento · test_v41_anatomy_adhoc_dll_load. Fehlerdetails im CI-Trace nicht enthalten (nur Summary) → lokal reproduzieren: `cmake --build build-cmd1b --target <die 10>` + ctest einzeln.
+- **Klasse B — 52 „Not Run":** Executables fehlen unter `build-test/tests/unit/Development/…` — die Development-Testgruppe ist per add_test registriert, hängt aber NICHT am comdare_tests-Sammel-Target → EIN Registrierungs-Fix (Development-Targets in COMDARE_TEST_TARGETS/Sammel-Kante) löst alle 52.
+- Fix-Reihenfolge nächster Goal-Zyklus: (1) Klasse-B-Sammel-Kante (ein CMake-Fix, 52 Tests), (2) Klasse A einzeln lokal reproduzieren+fixen (Verdacht-Überschneidungen: /tmp-Klasse Task #24, DLL-/CWD-Pfade), (3) allow_failure raus (#278).
