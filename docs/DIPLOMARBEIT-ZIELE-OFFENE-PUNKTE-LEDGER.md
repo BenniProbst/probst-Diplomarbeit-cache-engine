@@ -186,6 +186,8 @@ Widerspruch **#193 = TOP-PRIO (User 06-27) vs. Task-Feld [E0]-ZULETZT**: AUFGEL�
 
 - **2026-07-06 (früh, S7-5/#261 DONE — ART-Pool, 6. honest-0-DEG echt):** ce `83a51faf`, beide Remotes. 5 heterogene Knoten-Vektoren + 5 Free-Lists; Grow/Shrink-Free-List-Bypass durch **live_nodes ON-DEMAND** (`live_node_count_()` = Σ Knoten − Σ Free) neutralisiert; alle Wachstums-Sites gehookt (5 new_* + free_node-Switch + Grow-Transitions). Node-Structs nach detail (inkl. Node48/Node256-Konstruktor-Fills exakt); `<>`-Nachzüge tier_mapping/Asserts/tier_organ_equivalence:185. **Literal: Build EXIT 0, ctest 10/10 Passed, `S7-5 T6-DEG alloc_cnt=8 bytes_alloc=472 bytes_in_use=472` + `[ PASSED ] 4 tests`; clang-format 0, Mojibake 0.** Stand S7-Serie: 6/10 Familien ECHT (BST/BTree/SkipList/Hash/HOT/ART) — Rest: START (Tower-Muster disc/kids) → Wormhole (std::map-Durchreiche) → SuRF (S7-9) → Swiss-A (S7-10) → 234-V.
 
+- **2026-07-06 (früh, S7-7/#261 DONE — START-Pool, 7. honest-0-DEG echt):** ce `67acf1f4`, beide Remotes. Inner → `detail::StartTrieInner<FwdAlloc>` mit ZWEI inneren Rebinds (disc uint32 / kids size_t); add_child hookt beide inserts (per-Inner-Tower-Muster, dominantes Wachstum ehrlich); live_nodes on-demand. **Literal: Build EXIT 0, ctest 11/11 Passed, `S7-7 T6-DEG alloc_cnt=16 bytes_alloc=512 bytes_in_use=512` + `[ PASSED ] 4 tests`; clang-format 0, Mojibake 0.** Stand: 8/10 Familien ECHT — Rest: S7-8 Wormhole (std::map-Allocator-Durchreiche) → S7-9 SuRF → S7-10 Swiss-A → 234-V.
+
 ---
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
