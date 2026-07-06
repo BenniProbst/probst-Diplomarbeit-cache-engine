@@ -86,3 +86,8 @@
 
 ## ERNTE 8169/Job 214584 (fe80a36c): Not-Run-(b)-Sweep zog die nächste Schicht — 3 WINDOWS-ONLY-TUs
 `fatal error: windows.h` in test_buildvariant_dll.cpp, test_adhoc_buildvariant_dll.cpp, test_v5_io_real_fixture.cpp — die (b)-Gruppe wurde nie auf Linux gebaut (Windows-Ära). WinAPI-Umfang je TU minimal: LoadLibraryA/GetProcAddress/FreeLibrary (+ HMODULE). FIX-PLAN (nächster Zyklus, mechanisch): portables Shim je TU — `#ifdef _WIN32` windows.h/LoadLibraryA/GetProcAddress/FreeLibrary/HMODULE `#else` dlfcn.h/dlopen(RTLD_NOW)/dlsym/dlclose/void* — KEIN Gate/Skip (Tests sollen auf Linux-CI echt laufen; Symbol-Lookup identisch). Danach zeigt die nächste Ernte die Laufzeitbilder dieser 3 + der restlichen (b)-Tests.
+
+## ERNTE 8175/Job 214641 (e6196da1): 62 → 29 → 20 Fails (89% passed), Build sauber
+- dlopen-Shims WIRKEN: beide DLL-Roundtrip-Tests bauen auf Linux (lokal 2/2 Passed, echte .so-Symbol-Inspektion).
+- Rest: 14 Failed + 1 aborted (echte Laufzeitliste) + 5 Not Run (= exakt die Job-Scope-Kollisionen contract|pmc).
+- SCOPE-FIX gelandet (ce e62b8cf6): COMDARE_TEST_CTEST_ARGS="-LE contract|pmc" im unit-Job — die 5 laufen hart in contract:*/pmc:amd; unit-Scope sauber. Erwartete nächste Ernte: ~15 echte Laufzeit-Fails als finale #278-Arbeitsliste (dann Einzelfix-Serie: migration moved=0 [erfasst], d_v42 aborted, seg_coverage, prefetch-Paar, cow_memento, d1_d2, A1-Vierer, CI-only-Rest).
