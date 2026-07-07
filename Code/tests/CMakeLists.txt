@@ -59,6 +59,25 @@ target_include_directories(test_op_type_filter PRIVATE
     ${CMAKE_SOURCE_DIR}/02_messung_driver
     ${COMDARE_CACHE_ENGINE_DIR}/libs)
 
+# #279-a (2026-07-07) - Tier-Binary-Build-Sichtbarkeit + Interface-Roster
+# (reine std-Logik: parse_manifest/scan_built/compute_visibility/format_* ->
+#  immer gebaut, unabhaengig vom V32-Gate). Fixtures via Source-Dir-Fallback.
+comdare_da_add_test(test_279_tier_binary_report
+    SOURCES unit/test_279_tier_binary_report.cpp
+    LIBRARIES comdare::tier_binary_report)
+# Manifeste (.txt) liegen committet im Source-Baum. Die "gebauten" Tier-Binary-
+# Dateien (.so) sind Build-Artefakte (.gitignore ignoriert *.so bewusst) -> sie
+# werden bei configure synthetisch im Build-Baum erzeugt statt committet.
+set(_fix279_src  "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/tier_binary_report")
+set(_fix279_perm "${CMAKE_CURRENT_BINARY_DIR}/fixtures_279_perm")
+file(MAKE_DIRECTORY "${_fix279_perm}/cache_engine" "${_fix279_perm}/prt_art")
+file(WRITE "${_fix279_perm}/cache_engine/perm_aaa.so" "fixture perm lib aaa (nur Dateiscan)\n")
+file(WRITE "${_fix279_perm}/cache_engine/perm_bbb.so" "fixture perm lib bbb (nur Dateiscan)\n")
+file(WRITE "${_fix279_perm}/cache_engine/notperm.so" "decoy ohne perm_-Praefix (muss ignoriert werden)\n")
+target_compile_definitions(test_279_tier_binary_report PRIVATE
+    "COMDARE_FIXTURE_DIR_279=\"${_fix279_src}\""
+    "COMDARE_FIXTURE_PERM_DIR_279=\"${_fix279_perm}\"")
+
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
 if(COMDARE_V32_ENABLE)

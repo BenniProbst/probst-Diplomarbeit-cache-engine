@@ -59,6 +59,17 @@ endif()
 
 option(COMDARE_DA_BUILD_TESTS "Build Diplomarbeit-Code Tests" ON)
 
+# #279 (User 2026-07-06, VORLETZTE Aufgabe): konfigurierbare Mess-Durchfuehrung.
+#   debug_sample   - Default. Die E2E-Pipeline (comdare_pipeline_e2e) speist die
+#                    PDF aus synthetischen Sample-Daten -> schnell, CI-tauglich.
+#   release_measure - Fuehrt VOR der PDF den echten messung_driver-Lauf ueber
+#                    experiment_config aus (comdare_pipeline_release). Der schwere
+#                    Mess-Lauf (#156, mehrtaegig) bleibt bewusst opt-in/lokal und
+#                    wird NICHT in der Standard-CI getriggert.
+set(COMDARE_DA_PIPELINE_MODE "debug_sample" CACHE STRING
+    "Mess-Durchfuehrung der Pipeline: debug_sample (synthetisch, Default) | release_measure (echter Lauf vor PDF)")
+set_property(CACHE COMDARE_DA_PIPELINE_MODE PROPERTY STRINGS debug_sample release_measure)
+
 # V37.G (2026-05-23): Dynamische CPU-Core-Erkennung fuer optimale
 # Parallelisierung der Permutations-Builds. User-Direktive:
 # "Anzahl verfuegbarer Kerne messen, jedem parallelen Build 2 Threads als
@@ -304,6 +315,7 @@ add_subdirectory(03_binary_to_csv)           # binary records -> CSV
 add_subdirectory(04_csv_to_latex)            # CSV -> LaTeX-Tabelle
 add_subdirectory(05_diagram_generator)       # CSV -> TikZ-Plot
 add_subdirectory(06_latex_to_pdf)            # final PDF-Build
+add_subdirectory(07_tier_binary_report)      # #279 Build-Sichtbarkeit + Interface-Roster
 
 # ─────────────────────────────────────────────────────────────────────────────
 # V41.P1 (2026-05-31) — E2E-Pipeline-Orchestrierung: treibt EINEN Datensatz GESCHLOSSEN durch die
@@ -341,6 +353,80 @@ add_dependencies(comdare_pipeline_e2e
     sample_data_generator csv_to_latex_cli diagram_generator_cli)
 
 # ─────────────────────────────────────────────────────────────────────────────
+# #279 (User 2026-07-06) — release_measure: echter Mess-Lauf VOR der PDF.
+# Nur aktiv bei -DCOMDARE_DA_PIPELINE_MODE=release_measure; Default debug_sample
+# laesst comdare_pipeline_e2e (synthetisch) unberuehrt. Der schwere Lauf (#156,
+# mehrtaegig) ist bewusst opt-in/lokal und wird NICHT in der Standard-CI getriggert.
+# ─────────────────────────────────────────────────────────────────────────────
+set(_comdare_release_dir "${CMAKE_BINARY_DIR}/pipeline_release")
+if(COMDARE_DA_PIPELINE_MODE STREQUAL "release_measure")
+    set(_comdare_release_deps
+        messung_driver binary_to_csv_cli csv_to_latex_cli diagram_generator_cli)
+    if(TARGET comdare_perms_all)
+        list(APPEND _comdare_release_deps comdare_perms_all)  # alle Tier-Binaries PFLICHT vor dem Lauf
+    elseif(TARGET comdare_perms_ce)
+        list(APPEND _comdare_release_deps comdare_perms_ce)
+    endif()
+    # Best-effort finale PDF (nur wenn pdflatex vorhanden) — analog comdare_pipeline_e2e.
+    set(_comdare_release_pdf_cmds "")
+    if(COMDARE_PDFLATEX)
+        set(_comdare_release_pdf_cmds
+            COMMAND ${CMAKE_COMMAND} -E copy
+                "${CMAKE_CURRENT_SOURCE_DIR}/06_latex_to_pdf/pipeline_demo.tex"
+                "${_comdare_release_dir}/pipeline_demo.tex"
+            COMMAND ${CMAKE_COMMAND} -E chdir "${_comdare_release_dir}"
+                "${COMDARE_PDFLATEX}" -interaction=nonstopmode -halt-on-error pipeline_demo.tex)
+    endif()
+    # Voller RELEASE-Fluss VOR der PDF: echter Mess-Lauf -> binaere Records -> 16-Spalten-CSV
+    # -> Stufe 04 (LaTeX-Tabelle) + Stufe 05 (TikZ) -> Stufe 06 (PDF, best-effort). Namen der
+    # .tex-Artefakte (04_table.tex/05_diagram.tex) spiegeln die \input von pipeline_demo.tex.
+    add_custom_target(comdare_pipeline_release
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${_comdare_release_dir}"
+        COMMAND $<TARGET_FILE:messung_driver>
+            "${CMAKE_CURRENT_SOURCE_DIR}/experiment_config"
+            "${_comdare_release_dir}"
+            "--messreihen-xml=${CMAKE_CURRENT_SOURCE_DIR}/experiment_config/messreihen.xml"
+        COMMAND $<TARGET_FILE:binary_to_csv_cli>
+            "${_comdare_release_dir}/measurements/all_permutations.bin"
+            "${_comdare_release_dir}/measurements.csv"
+        COMMAND $<TARGET_FILE:csv_to_latex_cli>
+            "${_comdare_release_dir}/measurements.csv" "${_comdare_release_dir}/04_table.tex"
+            "Release Messreihe" "tab:release"
+        COMMAND $<TARGET_FILE:diagram_generator_cli>
+            --by-workload "${_comdare_release_dir}/measurements.csv" "${_comdare_release_dir}/05_diagram.tex"
+        ${_comdare_release_pdf_cmds}
+        COMMENT "#279 release_measure: echter Mess-Lauf -> CSV -> LaTeX-Tabelle+Diagramm -> PDF (opt-in, nicht in Standard-CI)"
+        VERBATIM)
+    add_dependencies(comdare_pipeline_release ${_comdare_release_deps})
+else()
+    # Stub, damit das Target immer existiert (dokumentiert den Schalter).
+    add_custom_target(comdare_pipeline_release
+        COMMAND ${CMAKE_COMMAND} -E echo
+            "#279: comdare_pipeline_release INAKTIV (COMDARE_DA_PIPELINE_MODE=${COMDARE_DA_PIPELINE_MODE}). Aktivieren mit -DCOMDARE_DA_PIPELINE_MODE=release_measure."
+        COMMENT "#279 release_measure INAKTIV (Default debug_sample)"
+        VERBATIM)
+endif()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# #279 — dynamische Tier-Binary-Build-Sichtbarkeit (comdare_tier_binary_visibility):
+# rostert geplante vs. gebaute vs. offene Rekombinationen + CacheEngineBuilder-Status
+# ueber das committete Tool tier-binary-report. Liest das ce-Codegen-Manifest
+# (bei configure erzeugt, wenn COMDARE_BUILD_PERMUTATIONS=ON) + die perm/-Wurzel.
+# ─────────────────────────────────────────────────────────────────────────────
+set(_comdare_ce_manifest "${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt")
+set(_comdare_visibility_cmd
+    $<TARGET_FILE:tier_binary_report_cli> --visibility
+        "${_comdare_ce_manifest}" "${CMAKE_BINARY_DIR}/perm")
+if(TARGET comdare-cache-engine-builder)
+    list(APPEND _comdare_visibility_cmd "--builder-exe=$<TARGET_FILE:comdare-cache-engine-builder>")
+endif()
+add_custom_target(comdare_tier_binary_visibility
+    COMMAND ${_comdare_visibility_cmd}
+    DEPENDS tier_binary_report_cli
+    COMMENT "#279 Build-Sichtbarkeit: geplante/gebaute/offene Tier-Binaries + CacheEngineBuilder-Status"
+    VERBATIM)
+
+# ─────────────────────────────────────────────────────────────────────────────
 # #273/A3 (2026-07-06) — Sammel-Target fuer die clang-Matrix (build:clang, ci-templates
 # .build-clang-latest baut genau EIN COMDARE_CMAKE_BUILD_TARGET; Muster: ce comdare_tests, 264-a).
 # Scope = super-eigene C++-Werkzeugflaeche (analyse:thesis-data ∪ integration:smoke):
@@ -352,7 +438,8 @@ add_custom_target(comdare_da_tools
         messung_driver
         comdare_binary_to_csv    binary_to_csv_cli
         comdare_csv_to_latex     csv_to_latex_cli
-        comdare_diagram_generator diagram_generator_cli)
+        comdare_diagram_generator diagram_generator_cli
+        tier_binary_report_cli)   # #279 Build-Sichtbarkeit/Interface-Roster-Tool
 
 if(COMDARE_DA_BUILD_TESTS)
     add_subdirectory(tests)
