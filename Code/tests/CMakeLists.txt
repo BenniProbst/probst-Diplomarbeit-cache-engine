@@ -69,6 +69,9 @@ if(COMDARE_V32_ENABLE)
         ${COMDARE_CACHE_ENGINE_DIR}/libs
         ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
         ${COMDARE_PRT_ART_DIR}/prt_art/include)
+    # #265-b: die AP-3-Bruecke (via auto_permutator) konsumiert die vendored foundation-Zelle
+    # comdare::platform — MATRIX-WEIT-Regel: super-Konsumenten der ce-Header linken das Target mit.
+    target_link_libraries(test_v32_orchestrator PRIVATE comdare::platform)
 
     # V33.D.3 (2026-05-21) - MessreiheV32Validator-Tests
     comdare_da_add_test(test_messreihe_v32_validator
@@ -94,4 +97,6 @@ if(COMDARE_V32_ENABLE)
         ${COMDARE_CACHE_ENGINE_DIR}/libs
         ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
         ${COMDARE_PRT_ART_DIR}/prt_art/include)
+    # #265-b: s.o. — messreihe_report_exporter.hpp zieht v32_orchestrator -> Bruecke -> comdare::platform.
+    target_link_libraries(test_messreihe_report_exporter PRIVATE comdare::platform)
 endif()
