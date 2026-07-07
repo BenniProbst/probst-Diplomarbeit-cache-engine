@@ -19,5 +19,20 @@
   <local_path>tests/fixtures/external/english_words/words.txt</local_path>
   <fetch_script>tools/fetch_testdata.sh --dataset english_words</fetch_script>
 
+  <!-- #269/#244 (2026-07-07): Akte gegen die ECHTE gefetchte Datei, via offizieller Mechanik
+       compute_dataset_akte (FNV-1a-64 ueber Datei-Bytes + \n-Zaehlung; kein Hand-Hash). Real files
+       bleiben gitignored/on-demand — diese Akte ist die committete Provenienz. -->
+  <dataset_akte>
+    <checksum>0x69e841344f4d0b37</checksum>
+    <line_count>466550</line_count>
+    <preprocessing>none</preprocessing>
+  </dataset_akte>
+
+  <!-- #184: Loader-Verdrahtung — dataset_source == Registry-loader_id, dataset_id == Datei-Pfad. -->
+  <loader>
+    <dataset_source>string_corpus</dataset_source>
+    <dataset_id>tests/fixtures/external/english_words/words.txt</dataset_id>
+  </loader>
+
   <expected_workload>YCSB_A</expected_workload>
 </comdare_test_data>

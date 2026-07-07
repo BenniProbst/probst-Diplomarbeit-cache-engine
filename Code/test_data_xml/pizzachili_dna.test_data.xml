@@ -19,5 +19,14 @@
   <local_path>tests/fixtures/external/pizzachili/dna</local_path>
   <fetch_script>tools/fetch_testdata.sh --dataset pizzachili_dna</fetch_script>
 
+  <!-- #269/#244 (2026-07-07): Akte gegen die ECHTE (gunzip-te) Datei via compute_dataset_akte.
+       Die DNA ist eine quasi-durchgaengige Sequenz (line_count = rohe \n-Bytes, semantik-agnostisch);
+       die semantische Zeilen-/String-Aufschluesselung fuer den Loader ist Teil des offenen 6-vs-48-Gates. -->
+  <dataset_akte>
+    <checksum>0x4024dd781795cdae</checksum>
+    <line_count>1866</line_count>
+    <preprocessing>gunzip</preprocessing>
+  </dataset_akte>
+
   <expected_workload>YCSB_C</expected_workload>
 </comdare_test_data>
