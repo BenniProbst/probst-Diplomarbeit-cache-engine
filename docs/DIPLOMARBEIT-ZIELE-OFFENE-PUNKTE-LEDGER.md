@@ -468,3 +468,45 @@ Ein wörtlicher Begriff "4 Schichten der Diplomarbeit" existiert nirgends; die d
 - Gate 'AP-10-Datensatzliste NUR vom User' (#269-Alt/E-D): GESCHLOSSEN per D1 (Z.304) + W5 (Z.346) — keine User-Liste; Termin-7-Verweis gestrichen (anderer 48er-Katalog). Folge-Klärfrage 6-vs-48 bleibt als User-Gate.
 - Blocker B1 (#193 fehlt im Plan): ERLEDIGT — Kern A+B+C+D DONE + verifiziert (Z.152), Residual an #215 gekoppelt.
 - … + 19 weitere (KORREKTURLISTE-VOLL.md §Geschlossene Punkte).
+
+---
+
+## §14 — KONSOLIDIERTE USER-GATE-SAMMLUNG + SESSION-HANDOVER (2026-07-07, Goal-V3-STOP-BEDINGUNG)
+
+**Anlass (Task #18 + §-STOP-BEDINGUNG Z.450):** Die V3-Arbeitsreihenfolge ist bis einschließlich Punkt (7) durchgearbeitet; alle nicht-gegateten Punkte in Agent-Zone sind erledigt und CI-grün bewiesen. Was übrig ist, ist ausschließlich user-/infra-gated, GEPARKT oder HELD. Diese Sektion bündelt ALLE offenen User-Gates mit Empfehlung an EINER Stelle (Sammelantwort „alle wie empfohlen" genügt), listet die Infra-HOs und den literalen Pipeline-Endstand. **Verfallsvermerk:** bei Widerspruch gewinnen die jüngeren §12-Einträge + die konkreten Ledger-Entscheid-Abschnitte (§13.9/§13.10).
+
+### 14.1 OFFENE USER-GATES (mit Empfehlung — Sammelantwort möglich)
+
+| # | Gate | Kontext | EMPFEHLUNG |
+|---|------|---------|-----------|
+| G-Q2 | **config-Owner** foundation-b1 vs. config-all (blockt #266-P1) | §13.6-Q2, einziges offenes der 13 Matrix-Gates | **config-all** als Owner |
+| G-234V-a | 234-V Option A **per-Source-Emission** bestätigen? | §12 Z.198 (Doppel-Kartierung, Strang B pausiert) | **Ja, Option A** (additives Makro `…_ADHOC_SHAPED`, 19-Slot-ABI bleibt) |
+| G-234V-b | darf `binary_id` ein **Shape-Segment** bekommen (nur Pool-Familien, default-OFF)? | golden-320 unberührt | **Ja** (default-OFF → golden-neutral) |
+| G-6v48 | **Datensatz-Set 6 vs. 48** (blockt #269-Rest: 5 neue Akten + Loader-Format-Zuordnung) | §13.10-W5; Thesis-tab:datasets = Soll bis zur Antwort | **Thesis-tab:datasets** als kanonischer Set (nicht der alte 48er-Termin-7-Katalog) |
+| G-7b3 | **7b-3-Andockpunkt** T12-ISA direkt vs. axis_09b | §13.10-D2 | **axis_09b** (feinere Vektorbreiten-Quelle existiert bereits) |
+| G-270a | #270a P/E-Core-Auto (CPUID 0x1A) — ändert verriegelte Plattform-Tests | User-Sichtung nötig | eigener Increment NACH User-Sichtung der verriegelten Tests |
+| G-AP15 | AP-15 **Set/Sequence-Gattungs-Folge** (map-Gattung DONE) | §12 Z.313, D4 offen | Folge-Gattungen als eigene Increments, je nach User-Priorität |
+| G-274 | **#274/#256 Migrationsplan-GO** (G1–G12, 14 Fragen) | `docs/sessions/20260706-274-MATRIX-MIGRATIONSPLAN-ENTWURF.md`; KEIN Schritt ausgeführt | **„alle wie empfohlen"** genügt; KEIN Umbrella-0, KEIN comdare-cacheengine-all (A7-Tabu), Transfer-ohne-Löschen |
+| G-268 | künftiger **ABI-MAJOR-Bump** (CMD-2) — Reserve unverbraucht, Bedarf 0 | HARTES TABU ohne User-Freigabe | derzeit KEIN Bump nötig; nur mit expliziter Freigabe |
+
+### 14.2 INFRA-HANDOVER (Montag mit User — Cluster READ-ONLY bis dahin)
+
+- **Task #23 / K87b-Runner-Freeze-Endstrecke (H11–H18):** H11 CoreDNS `10.0.90.224 minio.comdare.de` nur LIVE → in deklarative Quelle (KRITISCH, sonst nächster apply-Ausfall); H12 Sidekiq-Dead-Set leeren; H13 queue_size; H18 serverseitigen Job-Acceptance-Freeze beweisen (Leer-Poll NUR bei leerer Queue) → dann Watchdog+GODEBUG-Rückbau + Runner-Versions-Entscheid. **NEU 07.07.: node7-rpi5-arm64 reproduziert den Freeze** (online+idle+arm64, nimmt aber keinen Job an >4,5min) → Freeze betrifft NICHT nur prod1 → stützt H18-Server-These. Zusätzlich API/Ingress-Blip 06.07. 23:08 (Artefakt-Upload TLS-timeout instanzweit).
+- **#270b arm64-Grün-Beweis:** nach node7-Freeze-Fix `COMDARE_ISA_MATRIX=true`-Pipeline triggern (Job `build:arm64-smoke` ist instanziiert).
+- **#272 Infra-HO-Paket (Task #17):** HO-1..12 + WCM-/Vault-Rotation + keeper-403 + cppcheck-j6 als Handover-Dokument (Cluster-Repo).
+- **#21 Runner-Cache-Vereinheitlichung [TOP-PRIO]:** ALLE Nodes → dev-MinIO; k8s-Runner ohne `[runners.cache]` anbinden (H15); ccache-S3-Größen nach warmen Läufen messen (2–5-GB-MAXSIZE-Risiko).
+- **#273-T2/T3 (Task #20):** gcc-15.3-Pin (fehlt = HO-11) + clang-Matrix-Rollout — toolchain-gated.
+- **#276 (ALLERLETZTE):** 3-ISA-Teilmatrix als HARTE CI-PFLICHT scharfschalten — nach node7-Fix + riscv64/mac-Runner-Wiederherstellung (H2–H4).
+- **#279 (VORLETZTE):** konfigurierbare Mess-Durchführung (Release) + dynamische Tier-Binary-Build-Sichtbarkeit — Cluster-/Pipeline-nah.
+
+### 14.3 HELD
+
+- **#156/#215/#216-Kette:** Voll-per-Host-Messlauf (mehrtägiges Experiment, Pipeline 286 — NICHT aktiv pollen).
+
+### 14.4 PIPELINE-ENDSTAND (literal, 2026-07-07 ~02:43)
+
+Alle 4 Repos STRIKT GRÜN, HEAD-SHAs: **super `c069c0f`** · **ce `41ab5522`** · **prt-art `7d10003`** (main+development) · **thesis `35b7d54`**. Letzte Voll-Wellen alle success (super 8282 + Kinder 8281/8283/8284/8285). 0 allow_failure im Matrix-System (Ausnahme by design: ce is_original:relock manual). Working Trees sauber.
+
+### 14.5 IN DIESER SESSION-STRECKE ABGESCHLOSSEN (07.07., je CI-grün bewiesen)
+
+#278 (harte Gates, test:unit 62→0) · thesis-lint (964→0, lint:latex HART) · #24 (/tmp-Klasse + JUnit-Pfad) · #267 CMD-1 (a–d) · #265 (a+b) · #12 (Skip-Audit) · AP-2-neu/#236 (Katalog-Pfad-Gate + Alt-Pfad-Quarantäne) · #184 (Loader-Verdrahtung) · #269/#244 (2 Bestands-Akten, Rest 6-vs-48-gated) · #270b (CI instanziiert, Grün-Beweis node7-gated) · #19/W2 (L-für-Node-Pools Doc 30 §8.2). REGELKONFORM GEPARKT: #266 (Q2), #269-Rest (6-vs-48).
