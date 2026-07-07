@@ -517,3 +517,7 @@ Das lint-Cache-Redesign (ci-templates 269@d68050d5, je Tool eigener Mini-Cache) 
 - **clang-format** (`citool-clang-format-22.1.8-protected`): HIT auf ce (Job 215881), super (215859), prt-art (215875) — je „cache.zip is up to date" (kein Re-Download des 1,3-GB-Tarballs).
 - **cppcheck** (`citool-cppcheck-2.21.0-protected`): HIT auf ce (Job 215882) — „cache.zip is up to date" + „**Successfully extracted cache**", Job-Dauer 12,3 s, **0 cppcheck-Compile-Zeilen** (kein Bootstrap-Rebuild).
 Damit ist #277 (Pipeline-Lazy-Caching) inhaltlich vollständig bewiesen; OFFEN bleibt nur die ccache-S3-Archivgrößen-Messung nach warmen Läufen (2–5-GB-MAXSIZE-Risiko) + die k8s-Runner-`[runners.cache]`-Anbindung (H15) — beides unter #21/Montag.
+
+### 14.7 #272 INFRA-HO-PAKET als Dokument ERLEDIGT (2026-07-07)
+
+Der Dokument-Teil von #272 (Handover-Text, Impl-Agent-Zone) ist geliefert: **`Cluster-Repo docs/sessions/K88-INFRA-HANDOVER-PAKET-272-KONSOLIDIERT-20260707.md`** (d0a8a36) bündelt HO-1..H18 + WCM/Vault-Rotations-Befund + keeper-403 + cppcheck-j6 + GCC-16-ICE/HO-11 + texlive-#205 in EIN Index-Paket (verlinkt K87/K87b/K86/§13.11, dupliziert nicht) und trägt die 07.07.-Deltas nach (node7-arm64-Freeze-Datenpunkt → stützt H18-Server-These; API-Blip 23:08; bare-metal-Cache-Hit-Beweise). Reine Doku, KEIN Infra-Eingriff — alle SCHREIBENDEN Fixes bleiben Montag mit User (Cluster READ-ONLY). Damit ist Task #17 (Dokument-Deliverable) erledigt; die Infra-AUSFÜHRUNG bleibt Montag-gated (Task #23).
