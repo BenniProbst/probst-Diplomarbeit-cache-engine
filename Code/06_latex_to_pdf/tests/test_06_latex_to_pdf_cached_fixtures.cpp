@@ -137,8 +137,7 @@ TEST(Stufe06Pipeline, PdfBuildSkippedIfPdflatexAbsent) {
 #if defined(_WIN32)
     auto work_dir = fs::temp_directory_path() / "v35d4_pdflatex_smoke";
 #else
-    auto work_dir = fs::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid())) /
-                    "v35d4_pdflatex_smoke";
+    auto work_dir = fs::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid())) / "v35d4_pdflatex_smoke";
 #endif
     fs::create_directories(work_dir);
     auto in_tex = work_dir / "main.tex";
