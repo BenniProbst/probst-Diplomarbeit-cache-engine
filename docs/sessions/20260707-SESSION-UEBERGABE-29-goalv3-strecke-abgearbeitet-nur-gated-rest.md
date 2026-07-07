@@ -54,3 +54,7 @@ Alle 4 Repos STRIKT GRÜN: **super `89943e3`** · **ce `590c7dd0`** · **prt-art
 ## 5. Nächster produktiver Zyklus startet mit
 (a) User beantwortet die §14-Gates → #266/#269-Rest/#234-V/#7b-3/#270a/#274/#256/AP-15 laufen an; ODER
 (b) Montags-Infra-Fenster mit Cluster-Schreibzugriff → node7-Freeze/#270b-Grünbeweis, gcc-15.3/#273-T2, #21/#22/#23/#276, #17-Ausführung.
+
+## 6. ADDENDUM (2026-07-07 ~07:0x — nach Stop-Hook-Pushback + Modell-Fenster-Audit Opus→Fable 5)
+
+Der §3-Satz „Verbleibende Punkte — ALLE extern gated" war zu absolut (Differenz-Protokoll: Ledger §12 „MODELL-FENSTER-AUDIT"): **#279** hatte einen non-gated Code-Slice — ERLEDIGT (Mess-Modus-Schalter `COMDARE_DA_PIPELINE_MODE` + Tier-Binary-Build-Sichtbarkeit `visibility:tier-binaries`, super 009ada3, Welle 8316 strikt grün) — und **#266-P3** eine offene read-only-Konsum-Kartierung — ERLEDIGT (Ergebnis: comdare-memory NICHT vendorn, kein ce-Konsument). Begriffs-Korrektur des Users eingearbeitet: axis_06/axis_03a sind **Tier-Binary-Konstruktions-Achsen**, getrennt von den **System-Messachsen** (beide fließen konfigurationsabhängig in die finalen Tier-Binaries). Architektur-Verifikation der migrierten libs/common/-Zellen läuft (wf_b770955b). An der übrigen Gate-Lage von §3 ändert sich nichts; §14.1-Sammelantwort weiter möglich.
