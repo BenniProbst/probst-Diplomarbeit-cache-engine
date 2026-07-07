@@ -510,3 +510,10 @@ Alle 4 Repos STRIKT GRÜN, HEAD-SHAs: **super `c069c0f`** · **ce `41ab5522`** �
 ### 14.5 IN DIESER SESSION-STRECKE ABGESCHLOSSEN (07.07., je CI-grün bewiesen)
 
 #278 (harte Gates, test:unit 62→0) · thesis-lint (964→0, lint:latex HART) · #24 (/tmp-Klasse + JUnit-Pfad) · #267 CMD-1 (a–d) · #265 (a+b) · #12 (Skip-Audit) · AP-2-neu/#236 (Katalog-Pfad-Gate + Alt-Pfad-Quarantäne) · #184 (Loader-Verdrahtung) · #269/#244 (2 Bestands-Akten, Rest 6-vs-48-gated) · #270b (CI instanziiert, Grün-Beweis node7-gated) · #19/W2 (L-für-Node-Pools Doc 30 §8.2). REGELKONFORM GEPARKT: #266 (Q2), #269-Rest (6-vs-48).
+
+### 14.6 #277-RESTBEWEISE (per-Tool-Cache-Hits, read-only verifiziert 2026-07-07 02:48)
+
+Das lint-Cache-Redesign (ci-templates 269@d68050d5, je Tool eigener Mini-Cache) ist jetzt für ALLE drei Tools über ALLE drei Projekte cache-hit-BELEGT (vorher nur gitleaks):
+- **clang-format** (`citool-clang-format-22.1.8-protected`): HIT auf ce (Job 215881), super (215859), prt-art (215875) — je „cache.zip is up to date" (kein Re-Download des 1,3-GB-Tarballs).
+- **cppcheck** (`citool-cppcheck-2.21.0-protected`): HIT auf ce (Job 215882) — „cache.zip is up to date" + „**Successfully extracted cache**", Job-Dauer 12,3 s, **0 cppcheck-Compile-Zeilen** (kein Bootstrap-Rebuild).
+Damit ist #277 (Pipeline-Lazy-Caching) inhaltlich vollständig bewiesen; OFFEN bleibt nur die ccache-S3-Archivgrößen-Messung nach warmen Läufen (2–5-GB-MAXSIZE-Risiko) + die k8s-Runner-`[runners.cache]`-Anbindung (H15) — beides unter #21/Montag.
