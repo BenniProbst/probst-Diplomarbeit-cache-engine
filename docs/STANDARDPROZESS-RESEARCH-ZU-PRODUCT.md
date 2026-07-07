@@ -22,6 +22,14 @@
 8. **Build-Übergang:** bis das hauseigene Buildsystem fertig ist, läuft die Direktentwicklung PARALLEL über CI+CMake; `buildsystem.xml` bleibt unangetastet (eigener Buildsystem-Agent). Halbfertige Funktionen in notwendigen Modulen werden fertiggestellt.
 9. **Beweis-Disziplin:** jeder Schritt lokal + CI strikt grün; Ledger additiv; Doku nie löschen.
 
+## 1b. Ergänzungen aus den User-Antworten A–D (07.07., zweite Runde)
+
+- **Product-Familien heißen `comdare-<familie>-product`** (NICHT `-all`) und beherbergen **nur das benötigte SUBSET** der für das Product relevanten Module unter den Baselines. **Ist eine Baseline leer, wird ihr Ordner NICHT angelegt.** Products sind die **Instanzen** der Module (binary-kompilierbar) mit **eigener Gruppenstruktur als Subset-Abklatsch** der generischen Modulschicht.
+- **cache-engine-Familie bestätigt** (B „wie empfohlen" = GOALV2-Teil-2-Stufung 0-isa/1-measurement/2-core/3-search-engine/4-build-tools+test-system als Empfehlungsbasis): der domänenspezifische Kern wird eigene Modules-Familie; **prt-art ist eine abstrakte Anordnung neuer Algorithmen unter BESTEHENDEN Achsen → Achsen-erweiterndes Metaprogrammierungs-Modul IN der cache-engine-Familie** (kein eigenes Familien-Repo).
+- **D-Prinzip:** Beim Anlegen neuer Familien-/Product-Matrizen wird vom **Prinzip und System** der bestehenden Strukturen abgeleitet, NICHT von den Themen der einzelnen Baselines — die Stufen-NAMEN sind je Familie individuell.
+- **Normative Quelle gefunden:** `docs/sessions/20260705-matrix-grundlagen-goalv2/MATRIX-GRUNDLAGEN-GOALV2.md` (Teil 1 = kanonische Regeln INV-1..4 + Zellen-Konventionen; Teil 4/1.3-Fassaden per Ledger-§9-Doktrin qualifiziert).
+- **GitLab-Abbildungs-Constraint (technisch):** GitLab kann Projekte nicht UNTER Projekten nesten — der lokale Umbrella-Ordner (zugleich Repo UND Container der Zellen) wird als **Familien-GRUPPE + Umbrella-PROJEKT darin** gespiegelt; Baseline-Stufen als UNTERGRUPPEN mit den Zellen-Projekten. Massen-Nachzug (B6) erst nach expliziter Konventions-Bestätigung je Kategorie.
+
 ## 2. Taxonomie-Anker des Piloten (verbindlich, User 07.07.)
 
 - **comdare-cache-engine = Framework-MODUL** (Mess-/Achsen-Framework); **die Diplomarbeit = dessen PRODUCT und Außeninterface.**
