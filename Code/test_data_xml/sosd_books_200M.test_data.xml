@@ -20,5 +20,12 @@
   <local_path>tests/fixtures/external/sosd/books_200M_uint64</local_path>
   <fetch_script>tools/fetch_testdata.sh --dataset sosd_books_200M</fetch_script>
 
+  <!-- #45 (2026-07-08): SOSD-Binaer-Loader existiert nun — sosd_uint64 (LE 8-Byte-Count + N*uint64 LE).
+       KEINE <dataset_akte>: Datei nicht lokal (honest-0); Akte folgt nach fetch. -->
+  <loader>
+    <dataset_source>sosd_uint64</dataset_source>
+    <dataset_id>tests/fixtures/external/sosd/books_200M_uint64</dataset_id>
+  </loader>
+
   <expected_workload>YCSB_E</expected_workload>
 </comdare_test_data>

@@ -66,9 +66,11 @@ Die vier echten CoCo-Akten sind gegen die IM ce-Repo COMMITTETEN CoCo-trie-prepr
 `_no_suffixes_small`-Dateien berechnet (`preprocessing=coco-trie:no_suffixes_small` benennt die
 Teilmengen-Vorverarbeitung ehrlich; es sind NICHT die rohen Voll-Korpora) und in CI durch
 `test_25_kanon_dataset_akten` (ce) reproduzierbarkeits-verifiziert. `xml`+`sosd` = honest-0: keine
-erfundene Pruefsumme, Akte folgt nach fetch. **OFFEN (Folge-Increment):** ein binaerer SOSD-uint64-
-Loader (LE 8-Byte-Count + N×uint64) existiert noch nicht — der 6er-Kanon braucht ihn nicht (alle
-String-Korpora ueber `string_corpus`); sosd (Bestands-Extra) waere echte Loader-Neuarbeit.
+erfundene Pruefsumme, Akte folgt nach fetch. **#45 (2026-07-08) ERLEDIGT:** der binaere SOSD-uint64-
+Loader (`sosd_uint64`: LE 8-Byte-Count + N×uint64 LE → Read-Ops) existiert nun (ce
+`libs/common/measurement/dataset_loader/loaders/sosd_uint64_loader.hpp`, verifiziert `test_45_sosd_uint64_loader`
+mit synthetischen Blobs) und ist in `sosd_books_200M.test_data.xml` als `<loader>` verdrahtet; sosd-`<dataset_akte>`
+bleibt honest-0 bis zum fetch. Der 6er-Kanon selbst braucht ihn nicht (alle String-Korpora ueber `string_corpus`).
 
 ## Querverweis
 
