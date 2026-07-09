@@ -59,6 +59,17 @@ Prinzip: **jede Schicht ist gegen einen Fake ihrer Nachbar-Ebene testbar** — s
 
 Goal-V3-Kadenz (LEDGER:567) gilt je Schicht-Increment vollständig. Ergänzt (User 09.07.): **(a)** Erstimplementierung IMMER Codex (gpt-5.5/xhigh, danger-full-access, elaborates Dossier mit allen Referenzen + Thesis-Ankern) → Zeile-für-Zeile-Review; **Eskalation:** Codex scheitert komplett → selbst implementieren; kleinere Verstöße → nur betroffene Abschnitte manuell korrigieren. **(b)** Vor teurer Neu-Recherche die **Workflow-Backups** (`docs/sessions/backups/…` mit Rohdaten `ERGEBNIS-wf_*.json`/`journal.jsonl`) per ultracode durchsuchen. **(c)** Thesis-LaTeX = Design-Quelle; jeder Spec zitiert die Kapitel-Anker. **(d)** super-Sub-Build + adversarialer max-Effort-Review vor „fertig" (Lehre beider Reverts). **(e)** Task-Store-Verluste bei /goal//model-Wechseln einkalkulieren: laufende Agenten vor solchen Wechseln abschließen; Wahrheit = git+Dossiers+Ledger.
 
+## TEIL G — BETRIEBSREGIME-VISION: MESS- → AUSWERTUNGS- → ARBEITSMODUS (User 09.07. abends, bindend)
+
+**Abstraktions-Semantik der Schichten (User-verbatim-nah):** **E4 ist die abstrakteste Ebene der cache-engine — die Ebene, die ein ANWENDER des Frameworks in der Regel verwendet**; **E1/E0 ist die präziseste Detailimplementierung des Baumes.** Die Schicht-Hierarchie ist also zugleich die Anwender-Sicht-Hierarchie (oben deklarativ, unten mechanisch).
+
+**Die drei Betriebsmodi des CacheEngineBuilder-Interfaces:**
+1. **Messmodus (Schritt 1):** Nach der Messung kennt das Framework **die Eigenschaften aller zugelassenen Achsen-Algorithmen gegen die Rekombination aller zugelassenen Frameworks × Workloads**.
+2. **Auswertungsmodus:** Aus den Messungen ergeben sich **minimale Stränge der Permutationen aller Eigenschaften gegeneinander für bestimmte Workload-CLUSTER**. Die Cluster-Bildung (wie Workloads zu Clustern aggregiert werden, welche Cluster-Verfahren) ist **per deep research zu ergründen** (→ neuer Forschungs-Task; verwandt: E4′-Heuristik-Kurven + Pareto-BEFUND-Objectives).
+3. **Arbeitsmodus (das Produktions-Ziel):** Danach steht das CEB-Interface im **Arbeitsmodus** zur Verfügung: es hält **alle relevanten Tier-Binaries für die aktuell stochastisch häufig auftretende Workload-Last und Interface-Funktion hot im RAM** und **switcht die Tier-Binary mit ihren speziell optimalen Achsen-Permutationen unter der Haube hot auf das ABI-stabile Interface**, um optimale Verarbeitungszeiten der Anfrage zu erzielen.
+
+**Architektur-Konsequenzen (ebenen-richtig):** Der Hot-Switch geschieht am **ABI-stabilen Interface** (E2-Grenze: `IObservableTier`/DLL-Wechsel — der bestehende „CacheEngineBuilder wechselt die GANZE Binary"-Mechanismus, jetzt last-getrieben statt mess-getrieben) — **kein** Runtime-Switch IM Tier (Metaprogrammierungs-Doktrin bleibt: die Binaries selbst sind compile-time-permutiert; der Wechsel ZWISCHEN vorgeladenen Binaries an der bewussten ABI-Grenze ist der erlaubte dynamische Ladepunkt). Die Workload-Erkennung (stochastisch häufige Last) ist eine Auswertungs-/E4-Funktion, die den Heuristik-Schätzer (E4′, `cacheline_policy_selector`-Familie + Objectives) zur Laufzeit konsumiert. **Einordnung in die Rest-Strecke:** Arbeitsmodus = nach E4′ (braucht Messdaten #156 + Cluster-Research); als eigener Increment NACH den Schichten zu planen.
+
 ## TEIL F — VERIFIKATION DES DOSSIERS
 
 - Schicht-Verträge decken alle vier ORIGIN-§13-Ebenen + Rückkanal + M ab; keine Aufgabe der Dossier-17/18-Roadmaps ist verloren (Teil C bildet alle auf Schichten ab; Rest-Strecke explizit).
