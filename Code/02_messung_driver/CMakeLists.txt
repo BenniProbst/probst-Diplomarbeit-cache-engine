@@ -18,6 +18,27 @@ set_target_properties(messung_driver PROPERTIES
     OUTPUT_NAME "comdare-messung-driver"
 )
 
+# ─────────────────────────────────────────────────────────────────────────────
+# #230 (E4-XML-Vollvision-Roadmap, Phase 1) — PRODUKTIV-ANDOCKUNG von run_profile.
+# Die umbrella-schwere CEB-Eintritts-API run_profile ist in comdare::profile_run_facade
+# (ce libs/cache_engine/builder/profile_facade) hinter einer .cpp-Grenze isoliert; main.cpp
+# sieht nur den schlanken POD-Header. GUARDED: bricht den super-Build nicht, falls gegen eine
+# ce-Variante ohne die Fassade gebaut wird (dann laeuft nur der klassische ExperimentDriver-Pfad).
+# ─────────────────────────────────────────────────────────────────────────────
+if(TARGET comdare::profile_run_facade)
+    target_link_libraries(messung_driver PRIVATE comdare::profile_run_facade)
+    target_compile_definitions(messung_driver PRIVATE COMDARE_MESSUNG_HAVE_E4_FACADE=1)
+    # Default-Profil (env COMDARE_THESIS_PROFILE ueberschreibt zur Laufzeit). Der eigentliche schwere
+    # E4-XML-Lauf ist opt-in (env COMDARE_RUN_E4_XML=1) — siehe main.cpp.
+    set(_comdare_default_thesis_profile
+        "${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/m3v2_study.profile.xml")
+    target_compile_definitions(messung_driver PRIVATE
+        "COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE=\"${_comdare_default_thesis_profile}\"")
+    message(STATUS "[messung_driver] #230 E4-XML-Fassade angedockt (comdare::profile_run_facade, opt-in COMDARE_RUN_E4_XML=1)")
+else()
+    message(WARNING "[messung_driver] #230: comdare::profile_run_facade nicht verfuegbar — E4-XML-Andockung inaktiv, nur klassischer ExperimentDriver-Pfad")
+endif()
+
 # V32.JJ.2 (2026-05-18 spaet) - V32 Orchestrator-Header verfuegbar machen
 option(COMDARE_V32_ENABLE "Enable V32 Orchestrator (parallele EE-Submission via Command-Pattern)" OFF)
 if(COMDARE_V32_ENABLE)

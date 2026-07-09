@@ -14,6 +14,7 @@
 // damit <regex> & co. nicht durch Windows-Makros gestoert werden.
 #include <array>
 #include <cstdint>
+#include <cstdlib> // #230: std::getenv / std::strtoull (E4-XML-Andockung, unten)
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -32,6 +33,14 @@
 #include "stats_aggregator.hpp"           // V41.B3
 
 #include <comdare/workload_generator/workload_generator.hpp>
+
+// #230 (E4-XML-Vollvision-Roadmap, Phase 1): die SCHLANKE, umbrella-freie Fassade um die XML-getriebene
+// CacheEngineBuilder-Eintritts-API run_profile. NUR POD-Typen in der Signatur — zieht KEINEN all_axes_umbrella
+// in main.cpp (der Umbrella liegt hinter der Fassaden-Lib comdare::profile_run_facade). STL-only-Header.
+// GUARDED: COMDARE_MESSUNG_HAVE_E4_FACADE wird von CMake nur gesetzt, wenn die Fassade gelinkt ist.
+#ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
+#include <builder/profile_facade/profile_run_facade.hpp>
+#endif
 
 // V38.C - bringt windows.h auf Win32 (LEAN_AND_MEAN + NOMINMAX gesetzt).
 // MUSS am Ende stehen, sonst clash mit STL via Windows-Makros.
@@ -445,6 +454,72 @@ int main(int argc, char* argv[]) {
     std::cout << "\n";
 
     std::filesystem::create_directories(output_dir);
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // #230 (E4-XML-Vollvision-Roadmap, Phase 1) — PRODUKTIV-ANDOCKUNG der XML-getriebenen
+    // CacheEngineBuilder-Kette (run_profile) via der umbrella-freien Fassade
+    // comdare::cache_engine::builder::profile_facade. Die Fassade parst EIN comdare_thesis_profile
+    // (m3v2_study.profile.xml) und faehrt die volle #229-Kette (Basis-320 ∪ SOTA-Reihen → EINE CSV).
+    // Damit triggert der messung_driver — wie profile_run_entry.hpp:2-4 es seit jeher behauptet — endlich
+    // die #229-Maschinerie produktiv (bisher lief sie nur im tests/unit/thesis_tiere-Harness).
+    //
+    // ADDITIV & OPT-IN: der schwere XML-getriebene DLL-Bau+Messlauf (#156, mehrtaegig, Cluster) ist bewusst
+    // NICHT der Standard-Pfad — er laeuft NUR bei explizitem env COMDARE_RUN_E4_XML=1 (analog zum
+    // release_measure-Opt-in, Code/CMakeLists.txt:356-408). Ist er inaktiv, bleibt der klassische
+    // ExperimentDriver-Pfad (A/B/C, unten) UNVERAENDERT der Standard (Fallback). Diese Andockung bricht
+    // KEINEN bestehenden Lauf und triggert in der Standard-CI KEINEN schweren Bau.
+    // GUARDED: nur aktiv, wenn die Fassade gelinkt ist (COMDARE_MESSUNG_HAVE_E4_FACADE, von CMake gesetzt).
+    // ─────────────────────────────────────────────────────────────────────────────
+#ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
+    {
+        namespace pf = comdare::cache_engine::builder::profile_facade;
+
+        // Profil-Pfad: env COMDARE_THESIS_PROFILE (wie run_lazy_150) > CMake-Default (m3v2_study.profile.xml).
+        std::string thesis_profile;
+        if (char const* e = std::getenv("COMDARE_THESIS_PROFILE"); e != nullptr && *e != '\0') thesis_profile = e;
+#ifdef COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE
+        if (thesis_profile.empty()) thesis_profile = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+#endif
+        char const* const e4_flag  = std::getenv("COMDARE_RUN_E4_XML");
+        bool const        want_e4  = (e4_flag != nullptr && std::string_view{e4_flag} == "1");
+
+        if (!want_e4) {
+            std::cout << "[#230] E4-XML-Andockung (run_profile-Fassade) VERFUEGBAR, aber INAKTIV "
+                         "(Opt-in: env COMDARE_RUN_E4_XML=1). Standard bleibt ExperimentDriver A/B/C.\n";
+            if (!thesis_profile.empty()) std::cout << "        (Profil bereit: " << thesis_profile << ")\n";
+        } else if (thesis_profile.empty() || !std::filesystem::exists(thesis_profile)) {
+            std::cerr << "[#230] COMDARE_RUN_E4_XML=1, aber kein gueltiges thesis_profile ("
+                      << (thesis_profile.empty() ? std::string{"<leer>"} : thesis_profile)
+                      << "). E4-XML-Lauf uebersprungen; klassischer Pfad laeuft weiter.\n";
+        } else {
+            auto const e4_dir = output_dir / "e4_xml_profile";
+            std::filesystem::create_directories(e4_dir);
+            pf::ProfileRunArgs pa;
+            pa.profile_path  = thesis_profile;
+            pa.out_csv       = e4_dir / "measurements.csv";
+            pa.src_dir       = e4_dir / "src";
+            pa.dll_dir       = e4_dir / "dll";
+            pa.build_version = "m3v2";
+            // Optional: XML-Lastprofile (Achse 2) aus env COMDARE_LOAD_PROFILE_DIR.
+            if (char const* lpd = std::getenv("COMDARE_LOAD_PROFILE_DIR"); lpd != nullptr && *lpd != '\0')
+                pa.load_profile_dir = lpd;
+            // cap-Override via env (0 = <run_options>.cap aus dem Profil).
+            if (char const* cap = std::getenv("COMDARE_E4_CAP"); cap != nullptr && *cap != '\0')
+                pa.max_binaries = std::strtoull(cap, nullptr, 10);
+
+            std::cout << "[#230] E4-XML-Lauf (run_profile-Fassade): profile=" << thesis_profile << " → "
+                      << pa.out_csv.string() << "\n";
+            pf::ProfileRunResult const rr = pf::run_profile_facade(pa);
+            std::cout << "[#230] E4-XML fertig: exit=" << rr.exit_code << " basis_rows=" << rr.basis_rows
+                      << " sota_rows=" << rr.sota_rows << " (basis_ids=" << rr.basis_binary_ids
+                      << " sota_ids=" << rr.sota_binary_ids << " measured=" << rr.measured
+                      << " resumed=" << rr.resumed << ")\n";
+            if (rr.exit_code != 0)
+                std::cerr << "[#230] WARN: E4-XML-Lauf exit=" << rr.exit_code
+                          << " — klassischer ExperimentDriver-Pfad laeuft dennoch weiter (additiv).\n";
+        }
+    }
+#endif // COMDARE_MESSUNG_HAVE_E4_FACADE
 
     // REV 7.6 V9.6 — Externe Messreihen-Spec (defined/full Mode)
     auto external_specs = load_messreihen(messreihen_xml);
