@@ -105,4 +105,31 @@ Lokale ctest + golden-Roundtrip sind **unzureichend** — sie prüfen nur Happy-
 - **honest-0 > Phantom:** nie einen Achsen-Effekt faken, um ein Signal zu erzeugen — lieber ehrlich „nicht laufzeit-variabel".
 - **Backups:** jeder Analyse-/Review-Lauf additiv → `docs/sessions/backups/`.
 
-*Nach Freigabe wird dieses Dossier zur autoritativen Mess-Methodik-Doku; Dossier 17 Phase 2/6 werden durch Teil C hier präzisiert.*
+---
+
+# TEIL F — M0-DEEP-RESEARCH-BEFUND (Kernergebnis, Backup `20260709-axes-optimization-deep-research/BEFUND.md`, 462 Z.)
+
+Der M0-Lauf hat die Achsen-Optimierungs-Semantik grounded (Thesis + peer-reviewed Literatur + code-verankert) und **die #221-Methodik-Frage aufgelöst**:
+
+## F.1 Genau 5 RC-steuerbare Achsen (code-verankert `ComdareResourceControlV1`, 5 Felder)
+- **T7 prefetch** (`prefetch_distance`) → MIN Memory-Latenz / MAX MLP·IPC — **einzig vollständig verdrahtet + literal verifiziert** (default=4/rc=2/rc=9), #221 dafür GESCHLOSSEN.
+- **#221-Rest (Setter fehlen = Phantom):** **T6 allocator** (`pool_budget_bytes`) → MAX Alloc-Durchsatz ∧ MIN Fragmentierung/p99 · **T8 concurrency** (`thread_count`) → MAX Multicore-Durchsatz ∧ MIN Contention · **T1 cache_traversal** (`batch_size`) → MIN Cache-Misses (→O(log_B N)) · **T11 value_handle** (`inline_threshold_bytes`) → MIN Wert-Indirektion vs. MAX Knoten-Dichte (Schwelle).
+
+## F.2 14 honest-0-Achsen (ehrlich compile-time-only auf RC-Kanal, KEIN Defekt)
+T0, T2, T3, T4, T5, T9, T10, T12, T13, T14, T15, T16, T17, T18. → für #221 **NICHT verdrahten** (kein Phantom). Nuancen als künftige RC-Feld-Kandidaten: T5 (IMC-NUMA), T17 (Queue-Kapazität), T18 (Flush-Threshold), T15 (migration laufzeit-verhaltend).
+
+## F.3 Der Schlüssel-Fund für die Heuristik-Auswertung (E4′)
+Die messgetriebene **Autotuning-Kurve über die 5 RC-Felder ist bereits als GoF-Strategy prototypisiert**: `cacheline_policy_selector.hpp` leitet sie aus `scan_share`/`write_share`/`working_set_n` ab (prefetch_distance monoton mit scan; batch_size ∝ Working-Set; pool_budget linear; inline_threshold per write_share; thread_count ehrlich 0). = die Heuristik-Kurve (A.4/E4′) in nuce — **die Endauswertung baut auf diesem Selektor auf**, nicht neu.
+
+## F.4 Wichtige methodische Präzisierung (überstimmt die naive „1 Min/Max je Achse")
+Multi-objektive Achsen (**T6, T18, T5**) haben **kein Einzelextremum, sondern einen Pareto-Punkt** — die Heuristik wählt entlang einer explizit zu benennenden Objective (`ScanOptimizing` vs. `LatencyOptimizing`). **SOLL: die Endauswertung macht je Achse die Objective explizit.** Für die 14 compile-time-Achsen ist „Optimierung" eine **Binary-Auswahl je Lastprofil** (die noch nicht implementierte ML-Klassifikation nach Persist) — existiert erst nach dem Voll-Messlauf (#156/#162, HELD), keine RC-Feld-Kurve.
+
+## F.5 Offene Einzel-Recherchen (vor Attribution vertiefen)
+T2 mapping (dünn, evtl. Sub-Aspekt T0/T11) · T1 cache_traversal (überlappt T5+T7, Attribution schwer = Apparat-Artefakt-Risiko wie #188) · T10 telemetry (Bolosky/Scott 1993 nachziehen) · T13 (Graefe FnT 2011) · T18 (Dayan/Idreos *Monkey*/*Dostoevsky* SIGMOD 2017/18) · T14/T15 (nur bei out-of-core-Läufen).
+
+## F.6 Konsequenz für die Roadmap (präzisiert Teil C/D)
+**2′ (#221 ehrlich neu) = genau T6/T8/T1/T11 verdrahten** (mit den F.1-Min/Max-Semantiken als Observer-Strategy + den B.2-Constraints), **T7 bleibt wie ist**, die 14 honest-0-Achsen bleiben unangetastet. **M4-Methodik-Fragen (Teil D) beantwortet:** thread_count IST ein realer Knopf (MAX Multicore ∧ MIN Contention — aber der ALTE sequenzielle „0-Contention"-Effekt war falsch; echte Contention-Semantik nötig); pool_budget ist real (aber Store-Invariante wahren, B.2); value_handle real (Schwellen-Semantik, Accounting koexistieren). Offen bleibt nur T6/T18/T5-**Objective-Wahl** (Pareto, F.4) = User/Thesis-Entscheidung.
+
+---
+
+*Nach Freigabe wird dieses Dossier zur autoritativen Mess-Methodik-Doku; Dossier 17 Phase 2/6 werden durch Teil C+F hier präzisiert. Der M0-Befund (BEFUND.md) ist die zitierbare Grundlage.*
