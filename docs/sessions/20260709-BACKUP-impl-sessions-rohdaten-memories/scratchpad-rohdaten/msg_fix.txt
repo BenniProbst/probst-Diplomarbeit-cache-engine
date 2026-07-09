@@ -1,0 +1,19 @@
+#212 (Audit A2 / K5b, P5/P8): NullNotify -- per-Achsen std::function-notify aus dem Mess-Hot-Pfad (zero-cost)
+
+MeasurableObserver<Snapshot> (measurement/measurable_concept.hpp): der per-Op std::function-Push
+(callback_/on_event/notify/has_callback) lief im Mess-Build ohne Subscriber (toter Apparat-Overhead
+auf der gemessenen Wall-Clock = K5b). Jetzt OPT-IN hinter COMDARE_CE_ENABLE_OBSERVER_PUSH:
+- Default AUS => zero-cost NullNotify (notify() = leerer NullObject, KEIN std::function-Member, KEIN
+  per-Op-Branch; Apparat-Reinheit Meta #6). 0 Call-Site-Aenderungen; Typ MeasurableObserver unveraendert
+  => Concept MeasurableComponent (same_as) bleibt erfuellt; NULL ABI-Blast-Radius (Observer ist von
+  ObserverAggregate/ComdareTierObserverSnapshot entkoppelt -- pull via statistics()).
+- CMakeLists.txt: option(COMDARE_CE_ENABLE_OBSERVER_PUSH ... OFF), genistet unter STATISTICS.
+- tests/unit/CMakeLists.txt: die 3 Observer-Mechanik-Tests (allocator_axis_06/queuing/traversal)
+  schalten den Push per target_compile_definitions AN -> bleiben unveraendert gruen.
+
+Ergaenzt A2.1 (38b1374), das den Notify bereits aus den 2 Huellen entfernt hatte; #212 = der per-Achsen-Rest.
+Codex-Cross-Review: 1 Befund (notify im OFF private) als False Positive verifiziert (private: liegt im
+#ifdef-Push-Zweig, im Default-Build entfernt -> notify public) + defensiv explizites public: ergaenzt;
+uebrige 4 Punkte bestaetigt. Verifikation: Pipeline (Doppel-Build). Dossier docs/sessions/20260628-KONTEXT-DOSSIER-...-A2welle.md Abschnitt 6.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

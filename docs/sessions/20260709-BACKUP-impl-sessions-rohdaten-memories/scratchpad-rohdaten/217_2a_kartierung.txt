@@ -1,0 +1,52 @@
+#217-2a KARTIERUNG (nur kartieren, KEINE Aenderung) — Repo comdare-cache-engine.
+
+Ziel des spaeteren Increments: ABI-NEUTRALE generische Container-Kapazitaets-Constraint
++ EHRLICHER Guard statt STILLER uint16->uint64-Trunkierung + Korrektur stale
+"uint64-Organ-Invariante"-Kommentare.
+
+User-Entscheid (bindend): Array ist ein spezieller Container STATISCHER Groesse, aber ein
+Container und KEINE neue Gattung. Manche Container haben minimale/maximale Groessen bzw.
+Fuellmengen -> Kapazitaets-Constraint als Container-Concept-Eigenschaft, die max_fanout
+verallgemeinert. Key/Value AUSSERHALB der deklarierten Kapazitaet (z.B. >65535 auf einem
+Array65535) = EHRLICHE Limitierung (Guard/Meldung), NICHT stille uint16-Trunkierung.
+Scope 2a = NUR der ABI-neutrale Teil (Registry/Traversal-Mapping + Bereichs-Guard +
+Kommentar-Korrektur). NICHT der volle native-Breite-Container-Umbau/rekursive node_type-
+Fanout-Einhaengung (= #217-2b, deferred, #188/#234-entangelt).
+
+Bitte kartiere PRAEZISE (file:line + kurzer Codeausschnitt je Punkt; lies die Dateien selbst):
+
+1. STILLE Trunkierungs-Stelle(n): Wo wird ein breiterer Key/Value auf uint16 (oder eine
+   schmalere Container-Breite) verengt OHNE Guard? Insb. der container_algorithm_t /
+   container_algorithm_traversal_t / flat_container_algorithm_t-Pfad in
+   libs/cache_engine/anatomy/abi_adapter.hpp. Zeige die exakte Cast-/Zuweisungs-Stelle +
+   umgebende Logik (Insert/Lookup/Key-Mapping).
+
+2. LayoutAwareChunkedStore::key_type (libs/cache_engine/axes/node/axis_04_node_type_chunked_store.hpp):
+   Wo hartkodiert (Zeile)? Wie fliesst key_type in Store/Traversal? Ist es wirklich hart uint64?
+
+3. ALLE max_fanout-Deklarationen (array256, array65535, evtl. weitere Container-Achsen) +
+   wo/wie max_fanout verwendet wird (bestehende Kapazitaets-Constraint-Vorlage, die
+   verallgemeinert werden soll). file:line je Vorkommen.
+
+4. Container-Concept-Definition(en) (storage_organ_concept / container-Concept):
+   Wo wuerde eine generische Kapazitaets-Eigenschaft (min/max size/fill) sauber andocken?
+   Bestehende Concept-Anforderungen auflisten (Signaturen).
+
+5. Stale "uint64-Organ-Invariante"-Kommentare (u.a. direct_address_traversal_organ.hpp,
+   composable_search.hpp) — exakte Zeilen + Wortlaut; warum widersprechen sie dem #217-Beschluss?
+
+6. ABI-NEUTRALITAET (Beleg): container_algorithm_ ist INTERNER Member (nicht extern sichtbar)?
+   Die extern-C-Naht (COMDARE_ANATOMY_ABI / create_instance / tier_insert / tier_lookup etc.)
+   ist uint64-only? Der Mess-POD (ComdareTierObserverSnapshot o.ae.) ist NICHT betroffen?
+   Zeige die extern-C-Signatur(en) + POD-Definition (file:line).
+
+7. Betroffene Tests (Container-Kapazitaet / Array-Container / key_type / max_fanout) —
+   Liste file:line, damit der Umsetzungs-Increment sie mitzieht.
+
+8. Empfohlene MINIMALE ABI-neutrale Umsetzung fuer 2a: konkret welche Dateien/Zeilen,
+   welcher Guard-Mechanismus (compile-time static_assert wo Key-Breite statisch bekannt +
+   runtime-Guard/ehrliche Meldung wo dynamisch), Signatur der generischen Kapazitaets-
+   Concept-Eigenschaft, und was BEWUSST fuer 2b ausgeklammert bleibt.
+
+Output: strukturierte Mappe mit den 8 Punkten (file:line-genau) + kurze Risikoliste
+(was koennte ABI brechen / was ist heikel / welche golden/Registry-mp_list-Dateien sind TABU).

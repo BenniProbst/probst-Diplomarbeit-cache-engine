@@ -1,0 +1,19 @@
+NUR-LESE-KARTIERUNG (keine Änderungen, kein Commit). Repo = comdare-cache-engine (Working Dir).
+
+KONTEXT: Aufgabe #216-H2 ("seg_ns n>1 für die 320 + stat_*-Reset NACH Load"). #188-4c ist fertig; der
+Member heißt jetzt `container_algorithm_` (früher `container_`). Masterplan-Notiz: der stat-Reset-Träger
+ist `container_algorithm_.reset()`; die Load-Phasen-Akkumulation ist orthogonal → #216-H2 = Mini.
+
+BERICHTE PRÄZISE mit file:line + Kurzzitaten:
+1. abi_adapter.hpp: reset()/tier_clear()-Methode — was resettet sie genau (Statistik-/Observer-Member,
+   container_algorithm_-Aufrufe)? Zeilen + Zitate.
+2. Host-Zwei-Phasen-Ablauf Load→Run in perm_runner.hpp (+ cache_engine_builder_iterator.hpp): Wo laufen
+   die N Load-Ops, wo die Run/Measure-Ops, und WANN werden die Observer-Statistiken (axis_stats)
+   zurückgesetzt — VOR oder NACH der Load-Phase?
+3. KERNFRAGE: Messen die per-Achsen-Statistiken (axis_stats/stat_*) aktuell NUR die Run-Phase, oder
+   akkumulieren sie die Load-Phase fälschlich mit? Zitiere die Reset-Aufruf-Stelle relativ zur Load/Run-Grenze.
+4. Bestehende #216-/stat-Reset-Marker/TODOs? grep "#216", "stat_*-Reset", "NACH Load", "warmup", "load phase".
+5. seg_ns[]: Wo gemessen, in wie vielen Wiederholungen (n)? grep "seg_ns", "n>1", "batches_measured",
+   "repetition". Nur 1× oder über mehrere Läufe gemittelt?
+
+Antworte als strukturierter Bericht mit exakten file:line-Fundstellen. Keine Vermutungen ohne Beleg.

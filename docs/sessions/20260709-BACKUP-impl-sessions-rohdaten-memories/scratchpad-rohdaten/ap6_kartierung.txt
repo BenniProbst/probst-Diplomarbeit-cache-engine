@@ -1,0 +1,31 @@
+AP-6/#240 KARTIERUNG (nur kartieren, KEINE Aenderung) — Repo comdare-cache-engine.
+
+Ziel des spaeteren Increments: "Profil-XML-Vollabdeckung 33/33 SOTA + 23/23 Allokator". Reine Daten/
+Profile (Welle P-B), ABI-neutral. #170 (DONE) brachte SOTA-Profile auf P01-P33. AP-6 = die Abdeckung
+lueckenlos machen: alle 33 SOTA-Paper-Profile + alle 23 Allokatoren als XML vorhanden + korrekt.
+
+Bitte kartiere PRAEZISE (file:line + kurzer Ausschnitt je Punkt; lies die Dateien selbst):
+
+1. SOTA-Profil-XMLs: WO liegen sie (Verzeichnis)? Wieviele existieren aktuell, mit welchen IDs/Paper-Refs
+   (P01..P33)? Welche der 33 FEHLEN? (grep/glob nach *.profile.xml, paper_ref, P01..P33). Schema eines
+   SOTA-Profils (Pflichtfelder). file:line der Verzeichnis-/Katalog-Definition.
+
+2. Allokator-Abdeckung: WO sind die 23 Allokatoren definiert (XML / Achse / Liste)? Welche existieren,
+   welche der 23 FEHLEN? Woher stammt die Zahl 23 (Doku/Liste)? Schema eines Allokator-Eintrags.
+
+3. Abdeckungs-Pruefung: gibt es einen Test/Manifest, der die Vollstaendigkeit (33/33, 23/23) prueft
+   (z.B. Coverage-Count, ein test_*.cpp, ein Katalog-static_assert)? file:line — Vorlage fuer ein
+   AP-6-Coverage-Gate.
+
+4. Referenz-Wahrheit: WO steht autoritativ, welche 33 Paper + 23 Allokatoren gefordert sind (Thesis-Doku,
+   PAPER_REFERENCES.md, sota_catalog, ein Kanon)? Damit die zu ergaenzenden Eintraege exakt bestimmbar sind.
+
+5. ABI-Neutralitaet: reine Daten/XML + evtl. Discovery — kein COMDARE_ANATOMY_ABI_MAJOR / POD / extern-C.
+   Beleg.
+
+6. Empfohlene MINIMALE Umsetzung: welche konkreten XMLs/Eintraege fehlen (Liste), wo sie hingehoeren,
+   welches Schema, ob ein Coverage-Test ergaenzt wird. Exakte Anfass-Stellen (file:line). Was BEWUSST
+   ausgeklammert bleibt (z.B. echtes Linken der Allokatoren = separater Task #19).
+
+Output: strukturierte 6-Punkte-Mappe (file:line) + FEHLLISTE (welche SOTA-IDs + welche Allokatoren fehlen)
++ Risiken (Schema-Bruch / Doppel-IDs / TABU golden-320/Registry-mp_list/modules/ext).

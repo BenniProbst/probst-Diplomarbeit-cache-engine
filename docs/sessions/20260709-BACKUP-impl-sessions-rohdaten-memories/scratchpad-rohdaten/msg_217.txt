@@ -1,0 +1,9 @@
+[skip ci] docs(#217): Dossier §10 RESOLUTION -- Array=Container + Metaprogrammierung-Rekursion (Entscheid geklaert)
+
+Array ist grundsaetzlich Container (Container-Gattung); jede Achse = uniformes compile-time-metaprogrammiertes
+Interface, das Dienste anderer Achsen anbietet. Container-Achse ruft Container-Algorithmen (Array) unter der
+Haube auf -> in Baum-Fanout (node_type) integriert = Metaprogrammierung-Rekursion. uint16 = Fanout-Diskriminator
+(korrekt), KEIN uint16->uint64-Key-Width-Fix. Implementierung der Container-Achsen->Fanout-Rekursion = Architektur
+(node_type, verwandt #188); bis dahin standalone Array256/65535 = Narrow-Diskriminator-Pilots [LIMIT].
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

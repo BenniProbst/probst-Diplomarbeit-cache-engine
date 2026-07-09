@@ -1,0 +1,9 @@
+[skip ci] docs(#214/#217/#220/#222): Dossier §10 Array-Achse über 2 Gattungen + §11 stale-NACHTRAG-Reconciliation
+
+#214 = #188-entangelt (GoF-Iterator ueber Strukturen) -> re-scoped, nicht contained.
+#217 = Array-Fanout-Achse ueber Container- vs SearchAlgorithm-Gattung (User-Hinweis) = USER-Entscheid,
+kein Key-Width-Fix (uint16 = Radix-Diskriminator). #220 (K7b) + #222 (K7c) code-verifiziert BEREITS ERLEDIGT
+(durcharbeitung-Disposition stale). Direktive: #21x-Tasks zuerst gegen Code verifizieren. Reale Rest-Arbeit
+= #188 + #215/A2.8 + User-Entscheide (#217/#221/#225) + Doku (#226).
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

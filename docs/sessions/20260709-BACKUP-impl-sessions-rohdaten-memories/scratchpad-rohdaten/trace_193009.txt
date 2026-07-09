@@ -1,0 +1,371 @@
+2026-07-02T23:57:16.979430Z 00O [0KRunning with gitlab-runner 19.1.1 (24b9b726)[0;m
+2026-07-02T23:57:16.979483Z 00O [0K  on prod-baremetal-prod2 tyXhWqv1v, system ID: s_0899959f8a36[0;m
+2026-07-02T23:57:16.979610Z 00O section_start:1783036636:prepare_executor[0K
+2026-07-02T23:57:16.979625Z 00O+[0K[36;1mPreparing the "shell" executor[0;m[0;m
+2026-07-02T23:57:16.980042Z 00O [0KUsing Shell (bash) executor...[0;m
+2026-07-02T23:57:16.980052Z 00O section_end:1783036636:prepare_executor[0K
+2026-07-02T23:57:16.980570Z 00O+section_start:1783036636:prepare_script[0K
+2026-07-02T23:57:16.980584Z 00O+[0K[36;1mPreparing environment[0;m[0;m
+2026-07-02T23:57:17.048489Z 01O Running on prod2...
+2026-07-02T23:57:17.057026Z 00O section_end:1783036637:prepare_script[0K
+2026-07-02T23:57:17.058893Z 00O+section_start:1783036637:get_sources[0K
+2026-07-02T23:57:17.058922Z 00O+[0K[36;1mGetting source from Git repository[0;m[0;m
+2026-07-02T23:57:17.187735Z 01O [32;1mGitaly correlation ID: 01KWJM7SNK7XZQWNPGFF0VJ113[0;m
+2026-07-02T23:57:17.214883Z 01O [32;1mFetching changes with git depth set to 20...[0;m
+2026-07-02T23:57:17.219443Z 01O Reinitialized existing Git repository in /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.git/
+2026-07-02T23:57:23.079250Z 01O [32;1mChecking out d397691d as detached HEAD (ref is main)...[0;m
+2026-07-02T23:57:23.202299Z 01O Removing .citools/
+2026-07-02T23:57:23.204558Z 01O [32;1mSkipping Git submodules setup[0;m
+2026-07-02T23:57:23.206267Z 00O section_end:1783036643:get_sources[0K
+2026-07-02T23:57:23.774715Z 00O+section_start:1783036643:restore_cache[0K
+2026-07-02T23:57:23.774732Z 00O+[0K[36;1mRestoring cache[0;m[0;m
+2026-07-02T23:57:23.924700Z 01O [32;1mChecking cache for citools-8.30.1-22.1.8-2.21.0-protected...[0;m
+2026-07-02T23:57:23.965742Z 01E Runtime platform                                  [0;m  arch[0;m=amd64 os[0;m=linux pid[0;m=66864 revision[0;m=24b9b726 version[0;m=19.1.1
+2026-07-02T23:57:23.965749Z 01E Using presigned URL for cache download            [0;m 
+2026-07-02T23:57:25.339401Z 01E Selecting primary cache URL                       [0;m  alternate_modified[0;m=0001-01-01 00:00:00 +0000 UTC alternate_url[0;m=https://minio.prod.comdare.de/gitlab-runner-cache/project/288/d9/d98526549dc0f2e0511b1a55f897a0ab541a785b4ca3119b48d9918a2a05ac31 primary_modified[0;m=2026-07-02 23:57:06 +0000 UTC primary_url[0;m=https://minio.prod.comdare.de/gitlab-runner-cache/project/288/citools-8.30.1-22.1.8-2.21.0-protected
+2026-07-02T23:57:25.467850Z 01E Downloading cache from https://minio.prod.comdare.de/gitlab-runner-cache/project/288/citools-8.30.1-22.1.8-2.21.0-protected[0;m  etag[0;m="d6f548a641eb94085eec7acc47f52d44"
+2026-07-03T00:03:04.450298Z 01O [32;1mSuccessfully extracted cache[0;m
+2026-07-03T00:03:04.451888Z 00O section_end:1783036984:restore_cache[0K
+2026-07-03T00:03:04.452319Z 00O+section_start:1783036984:step_script[0K
+2026-07-03T00:03:04.452323Z 00O+[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+2026-07-03T00:03:04.531046Z 01O [32;1m$ set -euo pipefail # collapsed multi-line command[0;m
+2026-07-03T00:03:04.534962Z 01E [bootstrap] cppcheck 2.21.0 (build-from-source)
+2026-07-03T00:03:04.539204Z 01E Cloning into '/home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src'...
+2026-07-03T00:03:07.583610Z 01E Note: switching to 'e73bf44c3e49686b7495fab352d03a6c6075516b'.
+2026-07-03T00:03:07.583628Z 01E 
+2026-07-03T00:03:07.583631Z 01E You are in 'detached HEAD' state. You can look around, make experimental
+2026-07-03T00:03:07.583635Z 01E changes and commit them, and you can discard any commits you make in this
+2026-07-03T00:03:07.583638Z 01E state without impacting any branches by switching back to a branch.
+2026-07-03T00:03:07.583640Z 01E 
+2026-07-03T00:03:07.583642Z 01E If you want to create a new branch to retain commits you create, you may
+2026-07-03T00:03:07.583645Z 01E do so (now or later) by using -c with the switch command. Example:
+2026-07-03T00:03:07.583647Z 01E 
+2026-07-03T00:03:07.583649Z 01E   git switch -c <new-branch-name>
+2026-07-03T00:03:07.583651Z 01E 
+2026-07-03T00:03:07.583653Z 01E Or undo this operation with:
+2026-07-03T00:03:07.583654Z 01E 
+2026-07-03T00:03:07.583656Z 01E   git switch -
+2026-07-03T00:03:07.583658Z 01E 
+2026-07-03T00:03:07.583659Z 01E Turn off this advice by setting config variable advice.detachedHead to false
+2026-07-03T00:03:07.583662Z 01E 
+2026-07-03T00:03:07.721714Z 01O -- The CXX compiler identification is GNU 16.0.1
+2026-07-03T00:03:07.733068Z 01O -- Detecting CXX compiler ABI info
+2026-07-03T00:03:07.829016Z 01O -- Detecting CXX compiler ABI info - done
+2026-07-03T00:03:07.836448Z 01O -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-07-03T00:03:07.836581Z 01O -- Detecting CXX compile features
+2026-07-03T00:03:07.836926Z 01O -- Detecting CXX compile features - done
+2026-07-03T00:03:07.846333Z 01O -- Non-debug build detected - enabling matchcompiler
+2026-07-03T00:03:08.008866Z 01O -- Found Python: /usr/bin/python3.12 (found version "3.12.3") found components: Interpreter
+2026-07-03T00:03:08.009487Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-07-03T00:03:08.075410Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-07-03T00:03:08.076457Z 01O -- Found Threads: TRUE
+2026-07-03T00:03:08.080253Z 01O -- Performing Test HAS_CXX_FLAG_Wuseless_cast
+2026-07-03T00:03:08.178390Z 01O -- Performing Test HAS_CXX_FLAG_Wuseless_cast - Success
+2026-07-03T00:03:08.178903Z 01O -- Looking for C++ include execinfo.h
+2026-07-03T00:03:08.257737Z 01O -- Looking for C++ include execinfo.h - found
+2026-07-03T00:03:08.258011Z 01O -- ------------------ General configuration for Cppcheck 2.21.0 -----------------
+2026-07-03T00:03:08.258011Z 01O -- 
+2026-07-03T00:03:08.258012Z 01O -- CMake Version =         4.3.4
+2026-07-03T00:03:08.258014Z 01O -- CMake Generator =       Ninja
+2026-07-03T00:03:08.258016Z 01O -- 
+2026-07-03T00:03:08.258018Z 01O -- Compiler =              GNU
+2026-07-03T00:03:08.258019Z 01O -- Compiler Version =      16.0.1
+2026-07-03T00:03:08.258023Z 01O -- Build type =            Release
+2026-07-03T00:03:08.258023Z 01O -- CMake C++ Standard =    11
+2026-07-03T00:03:08.258027Z 01O -- CMAKE_INSTALL_PREFIX =  /usr/local
+2026-07-03T00:03:08.258028Z 01O -- CMAKE_DISABLE_PRECOMPILE_HEADERS = Off
+2026-07-03T00:03:08.258029Z 01O -- C++ flags (General) =   
+2026-07-03T00:03:08.258033Z 01O -- C++ flags (Release) =   -O3 -DNDEBUG
+2026-07-03T00:03:08.258034Z 01O -- C++ flags (RelWithDebInfo) = -O2 -g -DNDEBUG
+2026-07-03T00:03:08.258035Z 01O -- C++ flags (Debug) =     -g
+2026-07-03T00:03:08.258038Z 01O -- CMAKE_EXE_LINKER_FLAGS = 
+2026-07-03T00:03:08.258039Z 01O -- CPPCHK_GLIBCXX_DEBUG =  ON
+2026-07-03T00:03:08.258043Z 01O -- HAVE_EXECINFO_H =       1
+2026-07-03T00:03:08.258056Z 01O -- COMPILE_DEFINITIONS (global) =  HAVE_BOOST;HAVE_EXECINFO_H=1;FILESDIR="/usr/local/share/Cppcheck"
+2026-07-03T00:03:08.258056Z 01O -- COMPILE_OPTIONS (global) =  -O2;-pedantic;-Wall;-Wextra;-Wcast-qual;-Wfloat-equal;-Wmissing-declarations;-Wmissing-format-attribute;-Wno-long-long;-Wpacked;-Wredundant-decls;-Wundef;-Wno-sign-compare;-Wno-multichar;-Woverloaded-virtual;-pipe;-Wsuggest-attribute=noreturn;-Wuseless-cast
+2026-07-03T00:03:08.258057Z 01O -- 
+2026-07-03T00:03:08.258059Z 01O -- Python_VERSION =        3.12.3
+2026-07-03T00:03:08.258062Z 01O -- Python_EXECUTABLE =     /usr/bin/python3.12
+2026-07-03T00:03:08.258063Z 01O -- 
+2026-07-03T00:03:08.258064Z 01O -- ---------------------------------------------------------
+2026-07-03T00:03:08.258066Z 01O -- ANALYZE_MEMORY =        OFF
+2026-07-03T00:03:08.258067Z 01O -- ANALYZE_ADDRESS =       OFF
+2026-07-03T00:03:08.258070Z 01O -- ANALYZE_THREAD =        OFF
+2026-07-03T00:03:08.258070Z 01O -- ANALYZE_UNDEFINED =     OFF
+2026-07-03T00:03:08.258072Z 01O -- ANALYZE_TYPE =          OFF
+2026-07-03T00:03:08.258073Z 01O -- 
+2026-07-03T00:03:08.258077Z 01O -- WARNINGS_ARE_ERRORS =   OFF
+2026-07-03T00:03:08.258077Z 01O -- EXTERNALS_AS_SYSTEM =   OFF
+2026-07-03T00:03:08.258078Z 01O -- 
+2026-07-03T00:03:08.258081Z 01O -- USE_MATCHCOMPILER =     Auto
+2026-07-03T00:03:08.258082Z 01O -- USE_MATCHCOMPILER_OPT = On
+2026-07-03T00:03:08.258083Z 01O -- 
+2026-07-03T00:03:08.258085Z 01O -- NO_UNIX_SIGNAL_HANDLING = OFF
+2026-07-03T00:03:08.258085Z 01O -- NO_UNIX_BACKTRACE_SUPPORT = OFF
+2026-07-03T00:03:08.258087Z 01O -- NO_WINDOWS_SEH =        OFF
+2026-07-03T00:03:08.258088Z 01O -- 
+2026-07-03T00:03:08.258089Z 01O -- ENABLE_CSA_ALPHA =      OFF
+2026-07-03T00:03:08.258090Z 01O -- 
+2026-07-03T00:03:08.258095Z 01O -- BUILD_SHARED_LIBS =     OFF
+2026-07-03T00:03:08.258096Z 01O -- LIBXML2_XMLLINT_EXECUTABLE = /usr/bin/xmllint
+2026-07-03T00:03:08.258098Z 01O -- BUILD_CORE_DLL =        OFF
+2026-07-03T00:03:08.258100Z 01O -- BUILD_TESTS =           OFF
+2026-07-03T00:03:08.258101Z 01O -- BUILD_TESTING =         OFF
+2026-07-03T00:03:08.258104Z 01O -- ENABLE_CHECK_INTERNAL = OFF
+2026-07-03T00:03:08.258105Z 01O -- DISABLE_DMAKE =         OFF
+2026-07-03T00:03:08.258107Z 01O -- BUILD_MANPAGE =         OFF
+2026-07-03T00:03:08.258107Z 01O -- 
+2026-07-03T00:03:08.258109Z 01O -- BUILD_CLI =             ON
+2026-07-03T00:03:08.258110Z 01O -- 
+2026-07-03T00:03:08.258111Z 01O -- BUILD_GUI =             OFF
+2026-07-03T00:03:08.258115Z 01O -- 
+2026-07-03T00:03:08.258115Z 01O -- HAVE_RULES =            OFF
+2026-07-03T00:03:08.258119Z 01O -- 
+2026-07-03T00:03:08.258119Z 01O -- DISALLOW_THREAD_EXECUTOR = OFF
+2026-07-03T00:03:08.258121Z 01O -- DISALLOW_PROCESS_EXECUTOR = OFF
+2026-07-03T00:03:08.258122Z 01O -- CMAKE_THREAD_LIBS_INIT = 
+2026-07-03T00:03:08.258123Z 01O -- 
+2026-07-03T00:03:08.258125Z 01O -- USE_BUNDLED_TINYXML2 =  ON
+2026-07-03T00:03:08.258129Z 01O -- 
+2026-07-03T00:03:08.258129Z 01O -- USE_BOOST =             Auto
+2026-07-03T00:03:08.258132Z 01O -- Boost_FOUND =           1
+2026-07-03T00:03:08.258136Z 01O -- Boost_VERSION_STRING =  
+2026-07-03T00:03:08.258136Z 01O -- Boost_INCLUDE_DIRS =    
+2026-07-03T00:03:08.258138Z 01O -- USE_BOOST_INT128 =      OFF
+2026-07-03T00:03:08.258138Z 01O -- 
+2026-07-03T00:03:08.258140Z 01O -- USE_LIBCXX =            OFF
+2026-07-03T00:03:08.258141Z 01O -- 
+2026-07-03T00:03:08.258144Z 01O -- FILESDIR =              OFF
+2026-07-03T00:03:08.258145Z 01O -- FILESDIR_DEF =          /usr/local/share/Cppcheck
+2026-07-03T00:03:08.258145Z 01O -- 
+2026-07-03T00:03:08.258617Z 01O -- Using bundled version of tinyxml2
+2026-07-03T00:03:08.263991Z 01O -- Cannot use non-Clang compiler with clang-tidy when precompiled headers are enabled - skipping 'run-clang-tidy'/'run-clang-tidy-csa' target generation
+2026-07-03T00:03:08.264416Z 01O -- Configuring done (0.6s)
+2026-07-03T00:03:08.290613Z 01O -- Generating done (0.0s)
+2026-07-03T00:03:08.290873Z 01O -- Build files have been written to: /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build
+2026-07-03T00:03:08.306350Z 01O [1/170] Removing unsigned platforms files from /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:03:08.307944Z 01O [2/170] Copying addons files to /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:03:08.312686Z 01O [3/170] Copying cfg files to /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:03:08.312716Z 01O [4/170] Copying platforms files to /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:03:09.022584Z 01O [5/170] Building CXX object externals/tinyxml2/CMakeFiles/tinyxml2.dir/tinyxml2.cpp.o
+2026-07-03T00:03:09.043951Z 01O [6/170] Linking CXX static library lib/libtinyxml2.a
+2026-07-03T00:03:11.006500Z 01O [7/170] Building CXX object externals/simplecpp/CMakeFiles/simplecpp.dir/simplecpp.cpp.o
+2026-07-03T00:03:11.026844Z 01O [8/170] Linking CXX static library lib/libsimplecpp.a
+2026-07-03T00:03:11.063066Z 01O [9/170] Generating build/mc_checkbool.cpp
+2026-07-03T00:03:11.063074Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkbool.cpp => build/mc_checkbool.cpp
+2026-07-03T00:03:11.063344Z 01O [10/170] Generating build/mc_checkersreport.cpp
+2026-07-03T00:03:11.063348Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkersreport.cpp => build/mc_checkersreport.cpp
+2026-07-03T00:03:11.063883Z 01O [11/170] Generating build/mc_checkexceptionsafety.cpp
+2026-07-03T00:03:11.063887Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkexceptionsafety.cpp => build/mc_checkexceptionsafety.cpp
+2026-07-03T00:03:11.063995Z 01O [12/170] Generating build/mc_checkersidmapping.cpp
+2026-07-03T00:03:11.064006Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkersidmapping.cpp => build/mc_checkersidmapping.cpp
+2026-07-03T00:03:11.064137Z 01O [13/170] Generating build/mc_checkpostfixoperator.cpp
+2026-07-03T00:03:11.064139Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkpostfixoperator.cpp => build/mc_checkpostfixoperator.cpp
+2026-07-03T00:03:11.065683Z 01O [14/170] Generating build/mc_addoninfo.cpp
+2026-07-03T00:03:11.065690Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/addoninfo.cpp => build/mc_addoninfo.cpp
+2026-07-03T00:03:11.065948Z 01O [15/170] Generating build/mc_checknullpointer.cpp
+2026-07-03T00:03:11.065969Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checknullpointer.cpp => build/mc_checknullpointer.cpp
+2026-07-03T00:03:11.066197Z 01O [16/170] Generating build/mc_check64bit.cpp
+2026-07-03T00:03:11.066199Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/check64bit.cpp => build/mc_check64bit.cpp
+2026-07-03T00:03:11.066437Z 01O [17/170] Generating build/mc_checkassert.cpp
+2026-07-03T00:03:11.066440Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkassert.cpp => build/mc_checkassert.cpp
+2026-07-03T00:03:11.069007Z 01O [18/170] Generating build/mc_checkbufferoverrun.cpp
+2026-07-03T00:03:11.069012Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkbufferoverrun.cpp => build/mc_checkbufferoverrun.cpp
+2026-07-03T00:03:11.069224Z 01O [19/170] Generating build/mc_checkcondition.cpp
+2026-07-03T00:03:11.069242Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkcondition.cpp => build/mc_checkcondition.cpp
+2026-07-03T00:03:11.069627Z 01O [20/170] Generating build/mc_checkfunctions.cpp
+2026-07-03T00:03:11.069628Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkfunctions.cpp => build/mc_checkfunctions.cpp
+2026-07-03T00:03:11.069765Z 01O [21/170] Generating build/mc_checkinternal.cpp
+2026-07-03T00:03:11.069767Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkinternal.cpp => build/mc_checkinternal.cpp
+2026-07-03T00:03:11.069891Z 01O [22/170] Generating build/mc_checkleakautovar.cpp
+2026-07-03T00:03:11.069939Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkleakautovar.cpp => build/mc_checkleakautovar.cpp
+2026-07-03T00:03:11.070088Z 01O [23/170] Generating build/mc_checkmemoryleak.cpp
+2026-07-03T00:03:11.070090Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkmemoryleak.cpp => build/mc_checkmemoryleak.cpp
+2026-07-03T00:03:11.070307Z 01O [24/170] Generating build/mc_checkautovariables.cpp
+2026-07-03T00:03:11.070308Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkautovariables.cpp => build/mc_checkautovariables.cpp
+2026-07-03T00:03:11.070505Z 01O [25/170] Generating build/mc_checktype.cpp
+2026-07-03T00:03:11.070507Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checktype.cpp => build/mc_checktype.cpp
+2026-07-03T00:03:11.071154Z 01O [26/170] Generating build/mc_checkuninitvar.cpp
+2026-07-03T00:03:11.071157Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkuninitvar.cpp => build/mc_checkuninitvar.cpp
+2026-07-03T00:03:11.071205Z 01O [27/170] Generating build/mc_checkimpl.cpp
+2026-07-03T00:03:11.071206Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkimpl.cpp => build/mc_checkimpl.cpp
+2026-07-03T00:03:11.071459Z 01O [28/170] Generating build/mc_checkstring.cpp
+2026-07-03T00:03:11.071461Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkstring.cpp => build/mc_checkstring.cpp
+2026-07-03T00:03:11.071664Z 01O [29/170] Generating build/mc_analyzerinfo.cpp
+2026-07-03T00:03:11.071666Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/analyzerinfo.cpp => build/mc_analyzerinfo.cpp
+2026-07-03T00:03:11.071790Z 01O [30/170] Generating build/mc_checkers.cpp
+2026-07-03T00:03:11.071792Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkers.cpp => build/mc_checkers.cpp
+2026-07-03T00:03:11.071961Z 01O [31/170] Generating build/mc_checkclass.cpp
+2026-07-03T00:03:11.071972Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkclass.cpp => build/mc_checkclass.cpp
+2026-07-03T00:03:11.074172Z 01O [32/170] Generating build/mc_checkio.cpp
+2026-07-03T00:03:11.074178Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkio.cpp => build/mc_checkio.cpp
+2026-07-03T00:03:11.074466Z 01O [33/170] Generating build/mc_checks.cpp
+2026-07-03T00:03:11.074469Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checks.cpp => build/mc_checks.cpp
+2026-07-03T00:03:11.075918Z 01O [34/170] Generating build/mc_checksizeof.cpp
+2026-07-03T00:03:11.075938Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checksizeof.cpp => build/mc_checksizeof.cpp
+2026-07-03T00:03:11.081089Z 01O [35/170] Generating build/mc_checkother.cpp
+2026-07-03T00:03:11.081097Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkother.cpp => build/mc_checkother.cpp
+2026-07-03T00:03:11.085015Z 01O [36/170] Generating build/mc_valueflow.cpp
+2026-07-03T00:03:11.085025Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/valueflow.cpp => build/mc_valueflow.cpp
+2026-07-03T00:03:11.087404Z 01O [37/170] Generating build/mc_checkstl.cpp
+2026-07-03T00:03:11.087411Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkstl.cpp => build/mc_checkstl.cpp
+2026-07-03T00:03:11.090006Z 01O [38/170] Generating build/mc_astutils.cpp
+2026-07-03T00:03:11.090030Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.cpp => build/mc_astutils.cpp
+2026-07-03T00:03:11.090605Z 01O [39/170] Generating build/mc_symboldatabase.cpp
+2026-07-03T00:03:11.090609Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/symboldatabase.cpp => build/mc_symboldatabase.cpp
+2026-07-03T00:03:11.092054Z 01O [40/170] Generating build/mc_color.cpp
+2026-07-03T00:03:11.092061Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/color.cpp => build/mc_color.cpp
+2026-07-03T00:03:11.094261Z 01O [41/170] Generating build/mc_errortypes.cpp
+2026-07-03T00:03:11.094270Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/errortypes.cpp => build/mc_errortypes.cpp
+2026-07-03T00:03:11.094503Z 01O [42/170] Generating build/mc_checkunusedfunctions.cpp
+2026-07-03T00:03:11.094506Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkunusedfunctions.cpp => build/mc_checkunusedfunctions.cpp
+2026-07-03T00:03:11.095036Z 01O [43/170] Generating build/mc_checkvaarg.cpp
+2026-07-03T00:03:11.095039Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkvaarg.cpp => build/mc_checkvaarg.cpp
+2026-07-03T00:03:11.097179Z 01O [44/170] Generating build/mc_errorlogger.cpp
+2026-07-03T00:03:11.097187Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/errorlogger.cpp => build/mc_errorlogger.cpp
+2026-07-03T00:03:11.097685Z 01O [45/170] Generating build/mc_ctu.cpp
+2026-07-03T00:03:11.097691Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/ctu.cpp => build/mc_ctu.cpp
+2026-07-03T00:03:11.097871Z 01O [46/170] Generating build/mc_keywords.cpp
+2026-07-03T00:03:11.097891Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/keywords.cpp => build/mc_keywords.cpp
+2026-07-03T00:03:11.098491Z 01O [47/170] Generating build/mc_checkunusedvar.cpp
+2026-07-03T00:03:11.098494Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/checkunusedvar.cpp => build/mc_checkunusedvar.cpp
+2026-07-03T00:03:11.098517Z 01O [48/170] Generating build/mc_clangimport.cpp
+2026-07-03T00:03:11.098519Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/clangimport.cpp => build/mc_clangimport.cpp
+2026-07-03T00:03:11.098536Z 01O [49/170] Generating build/mc_infer.cpp
+2026-07-03T00:03:11.098537Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/infer.cpp => build/mc_infer.cpp
+2026-07-03T00:03:11.098994Z 01O [50/170] Generating build/mc_findtoken.cpp
+2026-07-03T00:03:11.098996Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/findtoken.cpp => build/mc_findtoken.cpp
+2026-07-03T00:03:11.099135Z 01O [51/170] Generating build/mc_fwdanalysis.cpp
+2026-07-03T00:03:11.099135Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/fwdanalysis.cpp => build/mc_fwdanalysis.cpp
+2026-07-03T00:03:11.099606Z 01O [52/170] Generating build/mc_forwardanalyzer.cpp
+2026-07-03T00:03:11.099608Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/forwardanalyzer.cpp => build/mc_forwardanalyzer.cpp
+2026-07-03T00:03:11.100528Z 01O [53/170] Generating build/mc_cppcheck.cpp
+2026-07-03T00:03:11.100532Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/cppcheck.cpp => build/mc_cppcheck.cpp
+2026-07-03T00:03:11.102202Z 01O [54/170] Generating build/mc_library.cpp
+2026-07-03T00:03:11.102208Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/library.cpp => build/mc_library.cpp
+2026-07-03T00:03:11.102576Z 01O [55/170] Generating build/mc_platform.cpp
+2026-07-03T00:03:11.102580Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/platform.cpp => build/mc_platform.cpp
+2026-07-03T00:03:11.102726Z 01O [56/170] Generating build/mc_path.cpp
+2026-07-03T00:03:11.102728Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/path.cpp => build/mc_path.cpp
+2026-07-03T00:03:11.102899Z 01O [57/170] Generating build/mc_pathanalysis.cpp
+2026-07-03T00:03:11.102901Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/pathanalysis.cpp => build/mc_pathanalysis.cpp
+2026-07-03T00:03:11.104223Z 01O [58/170] Generating build/mc_mathlib.cpp
+2026-07-03T00:03:11.104226Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/mathlib.cpp => build/mc_mathlib.cpp
+2026-07-03T00:03:11.104732Z 01O [59/170] Generating build/mc_pathmatch.cpp
+2026-07-03T00:03:11.104735Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/pathmatch.cpp => build/mc_pathmatch.cpp
+2026-07-03T00:03:11.105272Z 01O [60/170] Generating build/mc_importproject.cpp
+2026-07-03T00:03:11.105274Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/importproject.cpp => build/mc_importproject.cpp
+2026-07-03T00:03:11.107036Z 01O [61/170] Generating build/mc_reverseanalyzer.cpp
+2026-07-03T00:03:11.107042Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/reverseanalyzer.cpp => build/mc_reverseanalyzer.cpp
+2026-07-03T00:03:11.107169Z 01O [62/170] Generating build/mc_preprocessor.cpp
+2026-07-03T00:03:11.107170Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/preprocessor.cpp => build/mc_preprocessor.cpp
+2026-07-03T00:03:11.107278Z 01O [63/170] Generating build/mc_programmemory.cpp
+2026-07-03T00:03:11.107280Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/programmemory.cpp => build/mc_programmemory.cpp
+2026-07-03T00:03:11.108608Z 01O [64/170] Generating build/mc_tokenize.cpp
+2026-07-03T00:03:11.108610Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/tokenize.cpp => build/mc_tokenize.cpp
+2026-07-03T00:03:11.108769Z 01O [65/170] Generating build/mc_regex.cpp
+2026-07-03T00:03:11.108770Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/regex.cpp => build/mc_regex.cpp
+2026-07-03T00:03:11.113433Z 01O [66/170] Generating build/mc_settings.cpp
+2026-07-03T00:03:11.113440Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/settings.cpp => build/mc_settings.cpp
+2026-07-03T00:03:11.113922Z 01O [67/170] Generating build/mc_sarifreport.cpp
+2026-07-03T00:03:11.113925Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/sarifreport.cpp => build/mc_sarifreport.cpp
+2026-07-03T00:03:11.114457Z 01O [68/170] Generating build/mc_utils.cpp
+2026-07-03T00:03:11.114459Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/utils.cpp => build/mc_utils.cpp
+2026-07-03T00:03:11.117305Z 01O [69/170] Generating build/mc_standards.cpp
+2026-07-03T00:03:11.117310Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/standards.cpp => build/mc_standards.cpp
+2026-07-03T00:03:11.117312Z 01O [70/170] Generating build/mc_vfvalue.cpp
+2026-07-03T00:03:11.117313Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/vfvalue.cpp => build/mc_vfvalue.cpp
+2026-07-03T00:03:11.117497Z 01O [71/170] Generating build/mc_summaries.cpp
+2026-07-03T00:03:11.117497Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/summaries.cpp => build/mc_summaries.cpp
+2026-07-03T00:03:11.117741Z 01O [72/170] Generating build/mc_token.cpp
+2026-07-03T00:03:11.117742Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.cpp => build/mc_token.cpp
+2026-07-03T00:03:11.118574Z 01O [73/170] Generating build/mc_vf_settokenvalue.cpp
+2026-07-03T00:03:11.118575Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/vf_settokenvalue.cpp => build/mc_vf_settokenvalue.cpp
+2026-07-03T00:03:11.119462Z 01O [74/170] Generating build/mc_templatesimplifier.cpp
+2026-07-03T00:03:11.119462Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/templatesimplifier.cpp => build/mc_templatesimplifier.cpp
+2026-07-03T00:03:11.120678Z 01O [75/170] Generating build/mc_timer.cpp
+2026-07-03T00:03:11.120684Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/timer.cpp => build/mc_timer.cpp
+2026-07-03T00:03:11.123475Z 01O [76/170] Generating build/mc_suppressions.cpp
+2026-07-03T00:03:11.123477Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/suppressions.cpp => build/mc_suppressions.cpp
+2026-07-03T00:03:11.125639Z 01O [77/170] Generating build/mc_vf_common.cpp
+2026-07-03T00:03:11.125640Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/vf_common.cpp => build/mc_vf_common.cpp
+2026-07-03T00:03:11.126332Z 01O [78/170] Generating build/mc_tokenlist.cpp
+2026-07-03T00:03:11.126334Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/tokenlist.cpp => build/mc_tokenlist.cpp
+2026-07-03T00:03:11.126553Z 01O [79/170] Generating build/mc_vf_analyzers.cpp
+2026-07-03T00:03:11.126553Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/vf_analyzers.cpp => build/mc_vf_analyzers.cpp
+2026-07-03T00:03:11.344323Z 01O [80/170] Building CXX object frontend/CMakeFiles/frontend.dir/frontend.cpp.o
+2026-07-03T00:03:11.691591Z 01O [81/170] Building CXX object cli/CMakeFiles/cli.dir/cmake_pch.hxx.gch
+2026-07-03T00:03:11.737876Z 01O [82/170] Building CXX object cli/CMakeFiles/cli.dir/sehwrapper.cpp.o
+2026-07-03T00:03:11.741947Z 01O [83/170] Building CXX object cli/CMakeFiles/cli.dir/stacktrace.cpp.o
+2026-07-03T00:03:11.794801Z 01O [84/170] Building CXX object cli/CMakeFiles/cli.dir/singleexecutor.cpp.o
+2026-07-03T00:03:11.816254Z 01O [85/170] Building CXX object cli/CMakeFiles/cli.dir/signalhandler.cpp.o
+2026-07-03T00:03:11.924967Z 01O [86/170] Building CXX object cli/CMakeFiles/cli.dir/executor.cpp.o
+2026-07-03T00:03:12.028496Z 01O [87/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx.gch
+2026-07-03T00:03:12.028502Z 01O FAILED: [code=1] lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx.gch 
+2026-07-03T00:03:12.028504Z 01O /usr/bin/c++ -DFILESDIR=\"/usr/local/share/Cppcheck\" -DHAVE_BOOST -DHAVE_EXECINFO_H=1 -I/home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/lib -I/home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib -I/home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/. -I/home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/externals/tinyxml2/. -I/home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/externals/simplecpp/. -I/home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/externals/picojson/. -O3 -DNDEBUG -std=c++11 -O2 -pedantic -Wall -Wextra -Wcast-qual -Wfloat-equal -Wmissing-declarations -Wmissing-format-attribute -Wno-long-long -Wpacked -Wredundant-decls -Wundef -Wno-sign-compare -Wno-multichar -Woverloaded-virtual -pipe -Wsuggest-attribute=noreturn -Wuseless-cast -Winvalid-pch -x c++-header -include /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx -MD -MT lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx.gch -MF lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx.gch.d -o lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx.gch -c /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx.cxx
+2026-07-03T00:03:12.028509Z 01O In file included from /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h:37,
+2026-07-03T00:03:12.028510Z 01O                  from /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/precompiled.h:22,
+2026-07-03T00:03:12.028511Z 01O                  from /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/build/lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx:5,
+2026-07-03T00:03:12.028512Z 01O                  from <command-line>:
+2026-07-03T00:03:12.028513Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/smallvector.h:30:21: error: ‘boost’ does not name a type
+2026-07-03T00:03:12.028514Z 01O    30 | using SmallVector = boost::container::small_vector<T, N>;
+2026-07-03T00:03:12.028515Z 01O       |                     ^~~~~
+2026-07-03T00:03:12.028515Z 01O In file included from /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h:38:
+2026-07-03T00:03:12.028516Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:172:25: error: ‘SmallVector’ was not declared in this scope; did you mean ‘smallvectorH’?
+2026-07-03T00:03:12.028534Z 01O   172 |         std::unique_ptr<SmallVector<ReferenceToken>> mRefs;
+2026-07-03T00:03:12.028535Z 01O       |                         ^~~~~~~~~~~
+2026-07-03T00:03:12.028535Z 01O       |                         smallvectorH
+2026-07-03T00:03:12.028536Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:172:37: error: template argument 1 is invalid
+2026-07-03T00:03:12.028537Z 01O   172 |         std::unique_ptr<SmallVector<ReferenceToken>> mRefs;
+2026-07-03T00:03:12.028537Z 01O       |                                     ^~~~~~~~~~~~~~
+2026-07-03T00:03:12.028538Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:172:37: error: template argument 2 is invalid
+2026-07-03T00:03:12.028538Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:172:51: error: expected unqualified-id before ‘>’ token
+2026-07-03T00:03:12.028539Z 01O   172 |         std::unique_ptr<SmallVector<ReferenceToken>> mRefs;
+2026-07-03T00:03:12.028539Z 01O       |                                                   ^~
+2026-07-03T00:03:12.028540Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:173:25: error: ‘SmallVector’ was not declared in this scope; did you mean ‘smallvectorH’?
+2026-07-03T00:03:12.028541Z 01O   173 |         std::unique_ptr<SmallVector<ReferenceToken>> mRefsTemp;
+2026-07-03T00:03:12.028541Z 01O       |                         ^~~~~~~~~~~
+2026-07-03T00:03:12.028542Z 01O       |                         smallvectorH
+2026-07-03T00:03:12.028542Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:173:37: error: template argument 1 is invalid
+2026-07-03T00:03:12.028543Z 01O   173 |         std::unique_ptr<SmallVector<ReferenceToken>> mRefsTemp;
+2026-07-03T00:03:12.028543Z 01O       |                                     ^~~~~~~~~~~~~~
+2026-07-03T00:03:12.028543Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:173:37: error: template argument 2 is invalid
+2026-07-03T00:03:12.028544Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:173:51: error: expected unqualified-id before ‘>’ token
+2026-07-03T00:03:12.028545Z 01O   173 |         std::unique_ptr<SmallVector<ReferenceToken>> mRefsTemp;
+2026-07-03T00:03:12.028545Z 01O       |                                                   ^~
+2026-07-03T00:03:12.028546Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/token.h:1366:11: error: ‘SmallVector’ does not name a type; did you mean ‘smallvectorH’?
+2026-07-03T00:03:12.028546Z 01O  1366 |     const SmallVector<ReferenceToken>& refs(bool temporary = true) const;
+2026-07-03T00:03:12.028547Z 01O       |           ^~~~~~~~~~~
+2026-07-03T00:03:12.028547Z 01O       |           smallvectorH
+2026-07-03T00:03:12.028548Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h: In function ‘void visitAstNodes(T*, const TFunc&)’:
+2026-07-03T00:03:12.028548Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h:66:5: error: ‘SmallVector’ was not declared in this scope; did you mean ‘smallvectorH’? [-Wtemplate-body]
+2026-07-03T00:03:12.028549Z 01O    66 |     SmallVector<T *, 8 + 1> tokens;
+2026-07-03T00:03:12.028550Z 01O       |     ^~~~~~~~~~~
+2026-07-03T00:03:12.028550Z 01O       |     smallvectorH
+2026-07-03T00:03:12.028550Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h:66:19: error: expected primary-expression before ‘*’ token [-Wtemplate-body]
+2026-07-03T00:03:12.028554Z 01O    66 |     SmallVector<T *, 8 + 1> tokens;
+2026-07-03T00:03:12.028555Z 01O       |                   ^
+2026-07-03T00:03:12.028555Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h:66:20: error: expected primary-expression before ‘,’ token [-Wtemplate-body]
+2026-07-03T00:03:12.028556Z 01O    66 |     SmallVector<T *, 8 + 1> tokens;
+2026-07-03T00:03:12.028557Z 01O       |                    ^
+2026-07-03T00:03:12.028561Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h:66:29: error: ‘tokens’ was not declared in this scope; did you mean ‘tokenH’? [-Wtemplate-body]
+2026-07-03T00:03:12.028562Z 01O    66 |     SmallVector<T *, 8 + 1> tokens;
+2026-07-03T00:03:12.028563Z 01O       |                             ^~~~~~
+2026-07-03T00:03:12.028563Z 01O       |                             tokenH
+2026-07-03T00:03:12.028564Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h: At global scope:
+2026-07-03T00:03:12.028564Z 01O /home/gitlab-runner/builds/tyXhWqv1v/0/comdare/research/probst-diplomarbeit-cache-engine/.citools/dl/cppcheck-src/lib/astutils.h:257:1: error: ‘SmallVector’ does not name a type; did you mean ‘smallvectorH’?
+2026-07-03T00:03:12.028565Z 01O   257 | SmallVector<ReferenceToken> followAllReferences(const Token* tok, bool temporary = true);
+2026-07-03T00:03:12.028565Z 01O       | ^~~~~~~~~~~
+2026-07-03T00:03:12.028566Z 01O       | smallvectorH
+2026-07-03T00:03:12.049170Z 01O [88/170] Building CXX object cli/CMakeFiles/cli.dir/filelister.cpp.o
+2026-07-03T00:03:12.221827Z 01O [89/170] Building CXX object cli/CMakeFiles/cli.dir/threadexecutor.cpp.o
+2026-07-03T00:03:12.331665Z 01O [90/170] Building CXX object cli/CMakeFiles/cli.dir/processexecutor.cpp.o
+2026-07-03T00:03:12.399267Z 01O [91/170] Building CXX object tools/dmake/CMakeFiles/dmake.dir/dmake.cpp.o
+2026-07-03T00:03:12.804262Z 01O [92/170] Building CXX object cli/CMakeFiles/cli.dir/cppcheckexecutor.cpp.o
+2026-07-03T00:03:13.208633Z 01O [93/170] Building CXX object cli/CMakeFiles/cli.dir/cmdlineparser.cpp.o
+2026-07-03T00:03:13.208644Z 01O ninja: build stopped: subcommand failed.
+2026-07-03T00:03:13.211458Z 00O section_end:1783036993:step_script[0K
+2026-07-03T00:03:13.212079Z 00O+section_start:1783036993:cleanup_file_variables[0K
+2026-07-03T00:03:13.212082Z 00O+[0K[36;1mCleaning up project directory and file based variables[0;m[0;m
+2026-07-03T00:03:13.296670Z 00O section_end:1783036993:cleanup_file_variables[0K
+2026-07-03T00:03:13.296961Z 00O [31;1mERROR: Job failed: exit status 1[0;m

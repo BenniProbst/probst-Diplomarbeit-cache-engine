@@ -1,0 +1,18 @@
+#197 chaos: Mess-Drift-Detektor + Rerun-Gate (Pipeline-Stufe 6, EPIC #186)
+
+- drift_detector.hpp (NEU): assess_drift = Median-relative Drift (max-min)/median ueber
+  stats::percentile_ns (Single-Source-Statistik aus latency_stats.hpp, KEINE Duplikation),
+  crash-frei an Raendern (leer/1-Sample/median<=0). run_with_drift_gate = reps (Default 3)
+  Wiederholungen; >threshold -> ganze Gruppe bis max_reruns neu + Warn-Log; erschoepft ->
+  advisory die stabilste Gruppe (Selbstheilung statt stiller Korruption, kein Abbruch).
+- test_chaos_drift_gate.cpp (NEU): deterministischer Mechanismus-GTest (Klassifikation stabil/
+  instabil, striktes >, Selbstheilung, Erschoepfung-advisory, reps==0-Guard, nullptr-warn) +
+  CMake-Registrierung (header-only, Include-Root libs/cache_engine wie #195).
+- .gitlab-ci.yml: stage `chaos` + Job chaos:drift (eigener Build build-chaos, kein Artefakt,
+  needs lint:secrets) -> verifiziert den Mechanismus hart auf dem prod-Runner.
+
+Scope: Anwendung auf reale PMC-Messungen + Schwellen-Kalibrierung = #156-gegatet (mehrtaegiger
+Voll-Lauf); Folgeschritt = duenner perm_runner-Adapter (echte 2-Phasen-Proben -> Quality-Flag
+#165). Codex-Gegenreview (gpt-5.5/xhigh, read-only): keine BLOCKER/MAJOR; 3 NITs umgesetzt.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

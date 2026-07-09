@@ -1,0 +1,40 @@
+AP-4/#238 KARTIERUNG (nur kartieren, KEINE Aenderung) — Repo comdare-cache-engine.
+
+Ziel des spaeteren Increments: "Stufe-3-Full-Join + Messreihe B echt (statt A_full-Kopie)".
+Kontext (#178 DONE): sota_catalog hat ein Stufe->Reihe-Mapping (Stufe1+Stufe2 -> Messreihe A,
+Stufe3 -> Messreihe B, C = build-uebergreifend). Der DEFEKT: Messreihe B wird aktuell als KOPIE
+von "A_full" gebildet statt als echter Stufe-3-Full-Join. AP-4 soll B real aus den Stufe-3-
+Profilen als Full-Join aufbauen. Erwartung: ABI-neutral (host-seitige Reihen-/Enumerations-Logik).
+
+Bitte kartiere PRAEZISE (file:line + kurzer Codeausschnitt je Punkt; lies die Dateien selbst):
+
+1. sota_catalog: WO ist das Stufe->Reihe-Mapping definiert (Stufe1/2->A, Stufe3->B)? file:line.
+   Welche Datentypen/Enums fuer Stufe (stage/tier) und Reihe (series A/B/C)? Wie wird eine Profil-
+   Menge einer Reihe zugeordnet? (Suche sota_catalog, "Messreihe", "series", "stage", "Stufe",
+   "A_full", "full_join", "MessreihenSeries", "SeriesKind").
+
+2. Messreihen-Assembly: WO werden die Messreihen A/B/C konkret zusammengestellt (welche Profile/
+   Permutationen in welche Reihe)? Insb. wo Messreihe B = "A_full-Kopie" entsteht (die Stelle, die
+   AP-4 durch einen echten Stufe-3-Full-Join ersetzt). file:line + Codeausschnitt.
+
+3. "Full-Join"-Semantik: was bedeutet "Full-Join" hier konkret (kartesisches Full ueber Stufe-3-
+   Profile? Join Stufe-3 x Achsen? join mit was?)? Wo gibt es bereits einen "A_full"/Full-Aufbau,
+   den B falsch kopiert? Wie unterscheidet sich der SOLL-B (Stufe-3-Full-Join) vom IST-B (A-Kopie)?
+
+4. Beruehrung zu MessreihenMode (Defined/Full/FullSampled): nutzt die Reihen-Assembly denselben
+   ExperimentDriver-Pfad (permutation_loop::enumerate / SOTA-Profil-Pickup, experiment_driver.cpp)?
+   ODER ist die Reihen-Logik separat (eigener sota_catalog-/messung_driver-Pfad)? file:line.
+
+5. ABI-Neutralitaet: aendert AP-4 COMDARE_ANATOMY_ABI_MAJOR / Mess-POD / extern-C / Codegen-Structs?
+   (Erwartung NEIN — host-seitige Katalog-/Reihen-Assembly.) Beleg.
+
+6. Test-Vorlage: welche Tests decken sota_catalog / Stufe->Reihe / Messreihen-Assembly ab (z.B.
+   test_sota_catalog o.ae.)? file:line — Vorlage fuer einen AP-4-Test (B != A-Kopie; B = Stufe-3-
+   Full-Join korrekt).
+
+7. Empfohlene MINIMALE Umsetzung: welche Dateien/Zeilen, wie der echte Stufe-3-Full-Join fuer B
+   gebildet wird (statt A-Kopie), welche Struktur/Funktion neu/geaendert, was BEWUSST ausgeklammert
+   bleibt. Exakte Anfass-Stellen (file:line).
+
+Output: strukturierte 7-Punkte-Mappe (file:line) + Risikoliste (ABI / A-B-Vermischung / Stufe-
+Klassifikations-Fehler / TABU-Dateien golden-320/Registry-mp_list/modules/ext).

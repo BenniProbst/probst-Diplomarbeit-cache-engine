@@ -1,0 +1,157 @@
+=== (a) ROUND-TRIP (parse -> write -> parse, feld-identisch) ===
+  [PASS] parse#1 ycsb_c.xml
+  [PASS] writer emits lp_id ycsb_c.xml
+  [PASS] write ycsb_c.xml
+  [PASS] parse#2 ycsb_c.xml
+  [PASS] field-identity ycsb_c.xml
+  [PASS] ROUND-TRIP ycsb_c.xml
+  [PASS] parse#1 ycsb_a.xml
+  [PASS] write ycsb_a.xml
+  [PASS] parse#2 ycsb_a.xml
+  [PASS] field-identity ycsb_a.xml
+  [PASS] ROUND-TRIP ycsb_a.xml
+  [PASS] parse#1 coco_p04_neg25.xml
+  [PASS] writer emits lp_id coco_p04_neg25.xml
+  [PASS] write coco_p04_neg25.xml
+  [PASS] parse#2 coco_p04_neg25.xml
+  [PASS] field-identity coco_p04_neg25.xml
+  [PASS] ROUND-TRIP coco_p04_neg25.xml
+  [PASS] parse#1 ycsb_e.xml
+  [PASS] write ycsb_e.xml
+  [PASS] parse#2 ycsb_e.xml
+  [PASS] field-identity ycsb_e.xml
+  [PASS] ROUND-TRIP ycsb_e.xml
+  [PASS] at least one round-trip executed
+
+=== (ap11) LP-ID-KATALOG (Doc 32 mapping, no synthetic files) ===
+  [PASS] discover_load_profiles returns real profiles
+  [PASS] parse discovered coco_p04_neg0.xml
+  [PASS] catalog-tagged file is expected: coco_p04_neg0.xml
+  [PASS] catalog lp_id mapping coco_p04_neg0.xml -> LP06
+  [PASS] catalog op_mix faithful coco_p04_neg0.xml
+  [PASS] catalog negative_query_pct faithful coco_p04_neg0.xml
+  [PASS] parse discovered coco_p04_neg100.xml
+  [PASS] catalog-tagged file is expected: coco_p04_neg100.xml
+  [PASS] catalog lp_id mapping coco_p04_neg100.xml -> LP06
+  [PASS] catalog op_mix faithful coco_p04_neg100.xml
+  [PASS] catalog negative_query_pct faithful coco_p04_neg100.xml
+  [PASS] parse discovered coco_p04_neg25.xml
+  [PASS] catalog-tagged file is expected: coco_p04_neg25.xml
+  [PASS] catalog lp_id mapping coco_p04_neg25.xml -> LP06
+  [PASS] catalog op_mix faithful coco_p04_neg25.xml
+  [PASS] catalog negative_query_pct faithful coco_p04_neg25.xml
+  [PASS] parse discovered coco_p04_neg50.xml
+  [PASS] catalog-tagged file is expected: coco_p04_neg50.xml
+  [PASS] catalog lp_id mapping coco_p04_neg50.xml -> LP06
+  [PASS] catalog op_mix faithful coco_p04_neg50.xml
+  [PASS] catalog negative_query_pct faithful coco_p04_neg50.xml
+  [PASS] parse discovered coco_p04_neg75.xml
+  [PASS] catalog-tagged file is expected: coco_p04_neg75.xml
+  [PASS] catalog lp_id mapping coco_p04_neg75.xml -> LP06
+  [PASS] catalog op_mix faithful coco_p04_neg75.xml
+  [PASS] catalog negative_query_pct faithful coco_p04_neg75.xml
+  [PASS] parse discovered ih.xml
+  [PASS] parse discovered lh.xml
+  [PASS] parse discovered lp_balanced_5050.xml
+  [PASS] catalog-tagged file is expected: lp_balanced_5050.xml
+  [PASS] catalog lp_id mapping lp_balanced_5050.xml -> LP09
+  [PASS] catalog op_mix faithful lp_balanced_5050.xml
+  [PASS] catalog negative_query_pct faithful lp_balanced_5050.xml
+  [PASS] parse discovered lp_bulk_insert.xml
+  [PASS] catalog-tagged file is expected: lp_bulk_insert.xml
+  [PASS] catalog lp_id mapping lp_bulk_insert.xml -> LP01
+  [PASS] catalog op_mix faithful lp_bulk_insert.xml
+  [PASS] catalog negative_query_pct faithful lp_bulk_insert.xml
+  [PASS] parse discovered lp_concurrent_rmw.xml
+  [PASS] catalog-tagged file is expected: lp_concurrent_rmw.xml
+  [PASS] catalog lp_id mapping lp_concurrent_rmw.xml -> LP12
+  [PASS] catalog op_mix faithful lp_concurrent_rmw.xml
+  [PASS] catalog negative_query_pct faithful lp_concurrent_rmw.xml
+  [PASS] parse discovered lp_delete_heavy.xml
+  [PASS] catalog-tagged file is expected: lp_delete_heavy.xml
+  [PASS] catalog lp_id mapping lp_delete_heavy.xml -> LP10
+  [PASS] catalog op_mix faithful lp_delete_heavy.xml
+  [PASS] catalog negative_query_pct faithful lp_delete_heavy.xml
+  [PASS] parse discovered lp_dynamic_trace.xml
+  [PASS] catalog-tagged file is expected: lp_dynamic_trace.xml
+  [PASS] catalog lp_id mapping lp_dynamic_trace.xml -> LP14
+  [PASS] catalog op_mix faithful lp_dynamic_trace.xml
+  [PASS] catalog negative_query_pct faithful lp_dynamic_trace.xml
+  [PASS] parse discovered lp_mixed_oltp.xml
+  [PASS] catalog-tagged file is expected: lp_mixed_oltp.xml
+  [PASS] catalog lp_id mapping lp_mixed_oltp.xml -> LP11
+  [PASS] catalog op_mix faithful lp_mixed_oltp.xml
+  [PASS] catalog negative_query_pct faithful lp_mixed_oltp.xml
+  [PASS] parse discovered lp_range_scan.xml
+  [PASS] catalog-tagged file is expected: lp_range_scan.xml
+  [PASS] catalog lp_id mapping lp_range_scan.xml -> LP08
+  [PASS] catalog op_mix faithful lp_range_scan.xml
+  [PASS] catalog negative_query_pct faithful lp_range_scan.xml
+  [PASS] parse discovered lp_read_uniform.xml
+  [PASS] catalog-tagged file is expected: lp_read_uniform.xml
+  [PASS] catalog lp_id mapping lp_read_uniform.xml -> LP04
+  [PASS] catalog op_mix faithful lp_read_uniform.xml
+  [PASS] catalog negative_query_pct faithful lp_read_uniform.xml
+  [PASS] parse discovered ycsb_a.xml
+  [PASS] parse discovered ycsb_b.xml
+  [PASS] parse discovered ycsb_c.xml
+  [PASS] catalog-tagged file is expected: ycsb_c.xml
+  [PASS] catalog lp_id mapping ycsb_c.xml -> LP05
+  [PASS] catalog op_mix faithful ycsb_c.xml
+  [PASS] catalog negative_query_pct faithful ycsb_c.xml
+  [PASS] parse discovered ycsb_d.xml
+  [PASS] parse discovered ycsb_e.xml
+  [PASS] parse discovered ycsb_f.xml
+  [PASS] exactly 14 real catalog files carry lp_id
+  [PASS] explicit catalog file present+tagged coco_p04_neg0.xml
+  [PASS] explicit catalog file present+tagged coco_p04_neg100.xml
+  [PASS] explicit catalog file present+tagged coco_p04_neg25.xml
+  [PASS] explicit catalog file present+tagged coco_p04_neg50.xml
+  [PASS] explicit catalog file present+tagged coco_p04_neg75.xml
+  [PASS] explicit catalog file present+tagged lp_balanced_5050.xml
+  [PASS] explicit catalog file present+tagged lp_bulk_insert.xml
+  [PASS] explicit catalog file present+tagged lp_concurrent_rmw.xml
+  [PASS] explicit catalog file present+tagged lp_delete_heavy.xml
+  [PASS] explicit catalog file present+tagged lp_dynamic_trace.xml
+  [PASS] explicit catalog file present+tagged lp_mixed_oltp.xml
+  [PASS] explicit catalog file present+tagged lp_range_scan.xml
+  [PASS] explicit catalog file present+tagged lp_read_uniform.xml
+  [PASS] explicit catalog file present+tagged ycsb_c.xml
+  [PASS] covered LP-ID count LP01
+  [PASS] covered LP-ID count LP04
+  [PASS] covered LP-ID count LP05
+  [PASS] covered LP-ID count LP06
+  [PASS] covered LP-ID count LP08
+  [PASS] covered LP-ID count LP09
+  [PASS] covered LP-ID count LP10
+  [PASS] covered LP-ID count LP11
+  [PASS] covered LP-ID count LP12
+  [PASS] covered LP-ID count LP14
+  [PASS] no unknown/non-realized catalog LP-ID LP01
+  [PASS] no unknown/non-realized catalog LP-ID LP04
+  [PASS] no unknown/non-realized catalog LP-ID LP05
+  [PASS] no unknown/non-realized catalog LP-ID LP06
+  [PASS] no unknown/non-realized catalog LP-ID LP08
+  [PASS] no unknown/non-realized catalog LP-ID LP09
+  [PASS] no unknown/non-realized catalog LP-ID LP10
+  [PASS] no unknown/non-realized catalog LP-ID LP11
+  [PASS] no unknown/non-realized catalog LP-ID LP12
+  [PASS] no unknown/non-realized catalog LP-ID LP14
+  [PASS] documented absence is not materialized as XML LP02
+  [PASS] documented absence is not materialized as XML LP03
+  [PASS] documented absence is not materialized as XML LP07
+  [PASS] documented absence is not materialized as XML LP13
+  [PASS] SCHEMA.md readable for absence documentation
+  [PASS] SCHEMA.md documents absence LP02
+  [PASS] SCHEMA.md documents absence LP03
+  [PASS] SCHEMA.md documents absence LP07
+  [PASS] SCHEMA.md documents absence LP13
+
+=== (b) EXTRAKTION (Pilot-CSV je search_algo -> XML, re-konsumierbar) ===
+  [FAIL] extract 'k_ary' -> nullopt
+  [FAIL] extract 'sota::A::ArtComposition' -> nullopt
+  [FAIL] extract 'sota::A::PrtArtComposition' -> nullopt
+  [FAIL] extract 'sota::B::HotPrtStufe2ReplaceComposition' -> nullopt
+  [FAIL] all foci extracted
+
+=== RESULT: FAILURES (failures=5) ===

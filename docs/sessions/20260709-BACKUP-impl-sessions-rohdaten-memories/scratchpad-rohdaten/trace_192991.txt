@@ -1,0 +1,420 @@
+2026-07-02T23:59:22.344927Z 00O [0KRunning with gitlab-runner 19.1.1 (24b9b726)[0;m
+2026-07-02T23:59:22.344940Z 00O [0K  on prod-baremetal-prod1 GjoKPir1B, system ID: s_409f14fb9041[0;m
+2026-07-02T23:59:22.344969Z 00O section_start:1783036762:prepare_executor[0K
+2026-07-02T23:59:22.344973Z 00O+[0K[36;1mPreparing the "shell" executor[0;m[0;m
+2026-07-02T23:59:22.345059Z 00O [0KUsing Shell (bash) executor...[0;m
+2026-07-02T23:59:22.345061Z 00O section_end:1783036762:prepare_executor[0K
+2026-07-02T23:59:22.345173Z 00O+section_start:1783036762:prepare_script[0K
+2026-07-02T23:59:22.345176Z 00O+[0K[36;1mPreparing environment[0;m[0;m
+2026-07-02T23:59:22.367571Z 01O Running on prod1...
+2026-07-02T23:59:22.368853Z 00O section_end:1783036762:prepare_script[0K
+2026-07-02T23:59:22.369107Z 00O+section_start:1783036762:get_sources[0K
+2026-07-02T23:59:22.369111Z 00O+[0K[36;1mGetting source from Git repository[0;m[0;m
+2026-07-02T23:59:22.386428Z 01O [32;1mGitaly correlation ID: 01KWJMBKHTRV4WCZZBYC13K32T[0;m
+2026-07-02T23:59:22.389021Z 01O [32;1mFetching changes with git depth set to 20...[0;m
+2026-07-02T23:59:22.389765Z 01O Reinitialized existing Git repository in /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.git/
+2026-07-02T23:59:26.449291Z 01O [32;1mChecking out d73ffef6 as detached HEAD (ref is main)...[0;m
+2026-07-02T23:59:26.567155Z 01O Removing .citools/
+2026-07-02T23:59:26.569378Z 01O [32;1mSkipping Git submodules setup[0;m
+2026-07-02T23:59:26.570542Z 00O section_end:1783036766:get_sources[0K
+2026-07-02T23:59:27.190995Z 00O+section_start:1783036767:restore_cache[0K
+2026-07-02T23:59:27.191003Z 00O+[0K[36;1mRestoring cache[0;m[0;m
+2026-07-02T23:59:27.247557Z 01O [32;1mChecking cache for citools-8.30.1-22.1.8-2.21.0-protected...[0;m
+2026-07-02T23:59:27.270136Z 01E Runtime platform                                  [0;m  arch[0;m=amd64 os[0;m=linux pid[0;m=247378 revision[0;m=24b9b726 version[0;m=19.1.1
+2026-07-02T23:59:27.270143Z 01E Using presigned URL for cache download            [0;m 
+2026-07-02T23:59:32.072021Z 01E Selecting primary cache URL                       [0;m  alternate_modified[0;m=0001-01-01 00:00:00 +0000 UTC alternate_url[0;m=https://minio.prod.comdare.de/gitlab-runner-cache/project/286/d9/d98526549dc0f2e0511b1a55f897a0ab541a785b4ca3119b48d9918a2a05ac31 primary_modified[0;m=2026-07-02 23:59:13 +0000 UTC primary_url[0;m=https://minio.prod.comdare.de/gitlab-runner-cache/project/286/citools-8.30.1-22.1.8-2.21.0-protected
+2026-07-02T23:59:32.148477Z 01E Downloading cache from https://minio.prod.comdare.de/gitlab-runner-cache/project/286/citools-8.30.1-22.1.8-2.21.0-protected[0;m  etag[0;m="7eb39d0e768b45efbf6e72dfdae54bf9"
+2026-07-03T00:05:33.300727Z 01O [32;1mSuccessfully extracted cache[0;m
+2026-07-03T00:05:33.301906Z 00O section_end:1783037133:restore_cache[0K
+2026-07-03T00:05:33.302214Z 00O+section_start:1783037133:step_script[0K
+2026-07-03T00:05:33.302219Z 00O+[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+2026-07-03T00:05:33.333304Z 01O [32;1m$ set -euo pipefail # collapsed multi-line command[0;m
+2026-07-03T00:05:33.333855Z 01E [bootstrap] cppcheck 2.21.0 (build-from-source)
+2026-07-03T00:05:33.334398Z 01E Cloning into '/home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src'...
+2026-07-03T00:05:36.104696Z 01E Note: switching to 'e73bf44c3e49686b7495fab352d03a6c6075516b'.
+2026-07-03T00:05:36.104705Z 01E 
+2026-07-03T00:05:36.104705Z 01E You are in 'detached HEAD' state. You can look around, make experimental
+2026-07-03T00:05:36.104707Z 01E changes and commit them, and you can discard any commits you make in this
+2026-07-03T00:05:36.104708Z 01E state without impacting any branches by switching back to a branch.
+2026-07-03T00:05:36.104708Z 01E 
+2026-07-03T00:05:36.104709Z 01E If you want to create a new branch to retain commits you create, you may
+2026-07-03T00:05:36.104709Z 01E do so (now or later) by using -c with the switch command. Example:
+2026-07-03T00:05:36.104710Z 01E 
+2026-07-03T00:05:36.104710Z 01E   git switch -c <new-branch-name>
+2026-07-03T00:05:36.104711Z 01E 
+2026-07-03T00:05:36.104711Z 01E Or undo this operation with:
+2026-07-03T00:05:36.104711Z 01E 
+2026-07-03T00:05:36.104711Z 01E   git switch -
+2026-07-03T00:05:36.104712Z 01E 
+2026-07-03T00:05:36.104712Z 01E Turn off this advice by setting config variable advice.detachedHead to false
+2026-07-03T00:05:36.104713Z 01E 
+2026-07-03T00:05:36.179593Z 01O -- The CXX compiler identification is GNU 16.0.1
+2026-07-03T00:05:36.183014Z 01O -- Detecting CXX compiler ABI info
+2026-07-03T00:05:36.208934Z 01O -- Detecting CXX compiler ABI info - done
+2026-07-03T00:05:36.215719Z 01O -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-07-03T00:05:36.215864Z 01O -- Detecting CXX compile features
+2026-07-03T00:05:36.216175Z 01O -- Detecting CXX compile features - done
+2026-07-03T00:05:36.220441Z 01O -- Non-debug build detected - enabling matchcompiler
+2026-07-03T00:05:36.285899Z 01O -- Found Python: /usr/bin/python3.12 (found version "3.12.3") found components: Interpreter
+2026-07-03T00:05:36.286355Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-07-03T00:05:36.314509Z 01O -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-07-03T00:05:36.314947Z 01O -- Found Threads: TRUE
+2026-07-03T00:05:36.317126Z 01O -- Performing Test HAS_CXX_FLAG_Wuseless_cast
+2026-07-03T00:05:36.342635Z 01O -- Performing Test HAS_CXX_FLAG_Wuseless_cast - Success
+2026-07-03T00:05:36.342863Z 01O -- Looking for C++ include execinfo.h
+2026-07-03T00:05:36.366379Z 01O -- Looking for C++ include execinfo.h - found
+2026-07-03T00:05:36.366605Z 01O -- ------------------ General configuration for Cppcheck 2.21.0 -----------------
+2026-07-03T00:05:36.366606Z 01O -- 
+2026-07-03T00:05:36.366606Z 01O -- CMake Version =         4.3.3
+2026-07-03T00:05:36.366607Z 01O -- CMake Generator =       Ninja
+2026-07-03T00:05:36.366607Z 01O -- 
+2026-07-03T00:05:36.366609Z 01O -- Compiler =              GNU
+2026-07-03T00:05:36.366609Z 01O -- Compiler Version =      16.0.1
+2026-07-03T00:05:36.366611Z 01O -- Build type =            Release
+2026-07-03T00:05:36.366612Z 01O -- CMake C++ Standard =    11
+2026-07-03T00:05:36.366614Z 01O -- CMAKE_INSTALL_PREFIX =  /usr/local
+2026-07-03T00:05:36.366615Z 01O -- CMAKE_DISABLE_PRECOMPILE_HEADERS = Off
+2026-07-03T00:05:36.366616Z 01O -- C++ flags (General) =   
+2026-07-03T00:05:36.366617Z 01O -- C++ flags (Release) =   -O3 -DNDEBUG
+2026-07-03T00:05:36.366619Z 01O -- C++ flags (RelWithDebInfo) = -O2 -g -DNDEBUG
+2026-07-03T00:05:36.366620Z 01O -- C++ flags (Debug) =     -g
+2026-07-03T00:05:36.366621Z 01O -- CMAKE_EXE_LINKER_FLAGS = 
+2026-07-03T00:05:36.366622Z 01O -- CPPCHK_GLIBCXX_DEBUG =  ON
+2026-07-03T00:05:36.366626Z 01O -- HAVE_EXECINFO_H =       1
+2026-07-03T00:05:36.366644Z 01O -- COMPILE_DEFINITIONS (global) =  HAVE_BOOST;HAVE_EXECINFO_H=1;FILESDIR="/usr/local/share/Cppcheck"
+2026-07-03T00:05:36.366645Z 01O -- COMPILE_OPTIONS (global) =  -O2;-pedantic;-Wall;-Wextra;-Wcast-qual;-Wfloat-equal;-Wmissing-declarations;-Wmissing-format-attribute;-Wno-long-long;-Wpacked;-Wredundant-decls;-Wundef;-Wno-sign-compare;-Wno-multichar;-Woverloaded-virtual;-pipe;-Wsuggest-attribute=noreturn;-Wuseless-cast
+2026-07-03T00:05:36.366645Z 01O -- 
+2026-07-03T00:05:36.366645Z 01O -- Python_VERSION =        3.12.3
+2026-07-03T00:05:36.366646Z 01O -- Python_EXECUTABLE =     /usr/bin/python3.12
+2026-07-03T00:05:36.366646Z 01O -- 
+2026-07-03T00:05:36.366646Z 01O -- ---------------------------------------------------------
+2026-07-03T00:05:36.366646Z 01O -- ANALYZE_MEMORY =        OFF
+2026-07-03T00:05:36.366647Z 01O -- ANALYZE_ADDRESS =       OFF
+2026-07-03T00:05:36.366647Z 01O -- ANALYZE_THREAD =        OFF
+2026-07-03T00:05:36.366647Z 01O -- ANALYZE_UNDEFINED =     OFF
+2026-07-03T00:05:36.366648Z 01O -- ANALYZE_TYPE =          OFF
+2026-07-03T00:05:36.366648Z 01O -- 
+2026-07-03T00:05:36.366648Z 01O -- WARNINGS_ARE_ERRORS =   OFF
+2026-07-03T00:05:36.366650Z 01O -- EXTERNALS_AS_SYSTEM =   OFF
+2026-07-03T00:05:36.366650Z 01O -- 
+2026-07-03T00:05:36.366653Z 01O -- USE_MATCHCOMPILER =     Auto
+2026-07-03T00:05:36.366653Z 01O -- USE_MATCHCOMPILER_OPT = On
+2026-07-03T00:05:36.366654Z 01O -- 
+2026-07-03T00:05:36.366657Z 01O -- NO_UNIX_SIGNAL_HANDLING = OFF
+2026-07-03T00:05:36.366657Z 01O -- NO_UNIX_BACKTRACE_SUPPORT = OFF
+2026-07-03T00:05:36.366658Z 01O -- NO_WINDOWS_SEH =        OFF
+2026-07-03T00:05:36.366659Z 01O -- 
+2026-07-03T00:05:36.366660Z 01O -- ENABLE_CSA_ALPHA =      OFF
+2026-07-03T00:05:36.366661Z 01O -- 
+2026-07-03T00:05:36.366665Z 01O -- BUILD_SHARED_LIBS =     OFF
+2026-07-03T00:05:36.366666Z 01O -- LIBXML2_XMLLINT_EXECUTABLE = /usr/bin/xmllint
+2026-07-03T00:05:36.366667Z 01O -- BUILD_CORE_DLL =        OFF
+2026-07-03T00:05:36.366668Z 01O -- BUILD_TESTS =           OFF
+2026-07-03T00:05:36.366669Z 01O -- BUILD_TESTING =         OFF
+2026-07-03T00:05:36.366673Z 01O -- ENABLE_CHECK_INTERNAL = OFF
+2026-07-03T00:05:36.366673Z 01O -- DISABLE_DMAKE =         OFF
+2026-07-03T00:05:36.366674Z 01O -- BUILD_MANPAGE =         OFF
+2026-07-03T00:05:36.366674Z 01O -- 
+2026-07-03T00:05:36.366677Z 01O -- BUILD_CLI =             ON
+2026-07-03T00:05:36.366677Z 01O -- 
+2026-07-03T00:05:36.366678Z 01O -- BUILD_GUI =             OFF
+2026-07-03T00:05:36.366682Z 01O -- 
+2026-07-03T00:05:36.366682Z 01O -- HAVE_RULES =            OFF
+2026-07-03T00:05:36.366683Z 01O -- 
+2026-07-03T00:05:36.366685Z 01O -- DISALLOW_THREAD_EXECUTOR = OFF
+2026-07-03T00:05:36.366686Z 01O -- DISALLOW_PROCESS_EXECUTOR = OFF
+2026-07-03T00:05:36.366686Z 01O -- CMAKE_THREAD_LIBS_INIT = 
+2026-07-03T00:05:36.366687Z 01O -- 
+2026-07-03T00:05:36.366689Z 01O -- USE_BUNDLED_TINYXML2 =  ON
+2026-07-03T00:05:36.366692Z 01O -- 
+2026-07-03T00:05:36.366693Z 01O -- USE_BOOST =             Auto
+2026-07-03T00:05:36.366695Z 01O -- Boost_FOUND =           1
+2026-07-03T00:05:36.366697Z 01O -- Boost_VERSION_STRING =  1.91.0
+2026-07-03T00:05:36.366698Z 01O -- Boost_INCLUDE_DIRS =    /usr/local/include
+2026-07-03T00:05:36.366699Z 01O -- USE_BOOST_INT128 =      OFF
+2026-07-03T00:05:36.366700Z 01O -- 
+2026-07-03T00:05:36.366701Z 01O -- USE_LIBCXX =            OFF
+2026-07-03T00:05:36.366702Z 01O -- 
+2026-07-03T00:05:36.366703Z 01O -- FILESDIR =              OFF
+2026-07-03T00:05:36.366704Z 01O -- FILESDIR_DEF =          /usr/local/share/Cppcheck
+2026-07-03T00:05:36.366705Z 01O -- 
+2026-07-03T00:05:36.367112Z 01O -- Using bundled version of tinyxml2
+2026-07-03T00:05:36.372250Z 01O -- Cannot use non-Clang compiler with clang-tidy when precompiled headers are enabled - skipping 'run-clang-tidy'/'run-clang-tidy-csa' target generation
+2026-07-03T00:05:36.372536Z 01O -- Configuring done (0.2s)
+2026-07-03T00:05:36.392927Z 01O -- Generating done (0.0s)
+2026-07-03T00:05:36.393059Z 01O -- Build files have been written to: /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/build
+2026-07-03T00:05:36.401162Z 01O [1/170] Removing unsigned platforms files from /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:05:36.402262Z 01O [2/170] Copying addons files to /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:05:36.402539Z 01O [3/170] Copying cfg files to /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:05:36.402935Z 01O [4/170] Copying platforms files to /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/build/bin/.
+2026-07-03T00:05:37.114244Z 01O [5/170] Building CXX object externals/tinyxml2/CMakeFiles/tinyxml2.dir/tinyxml2.cpp.o
+2026-07-03T00:05:37.128559Z 01O [6/170] Linking CXX static library lib/libtinyxml2.a
+2026-07-03T00:05:39.065867Z 01O [7/170] Building CXX object externals/simplecpp/CMakeFiles/simplecpp.dir/simplecpp.cpp.o
+2026-07-03T00:05:39.081426Z 01O [8/170] Linking CXX static library lib/libsimplecpp.a
+2026-07-03T00:05:39.103711Z 01O [9/170] Generating build/mc_analyzerinfo.cpp
+2026-07-03T00:05:39.103720Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/analyzerinfo.cpp => build/mc_analyzerinfo.cpp
+2026-07-03T00:05:39.103980Z 01O [10/170] Generating build/mc_check64bit.cpp
+2026-07-03T00:05:39.103982Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/check64bit.cpp => build/mc_check64bit.cpp
+2026-07-03T00:05:39.106410Z 01O [11/170] Generating build/mc_checkimpl.cpp
+2026-07-03T00:05:39.106417Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkimpl.cpp => build/mc_checkimpl.cpp
+2026-07-03T00:05:39.106522Z 01O [12/170] Generating build/mc_checkautovariables.cpp
+2026-07-03T00:05:39.106524Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkautovariables.cpp => build/mc_checkautovariables.cpp
+2026-07-03T00:05:39.106597Z 01O [13/170] Generating build/mc_checkfunctions.cpp
+2026-07-03T00:05:39.106599Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkfunctions.cpp => build/mc_checkfunctions.cpp
+2026-07-03T00:05:39.106722Z 01O [14/170] Generating build/mc_checkinternal.cpp
+2026-07-03T00:05:39.106725Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkinternal.cpp => build/mc_checkinternal.cpp
+2026-07-03T00:05:39.106812Z 01O [15/170] Generating build/mc_addoninfo.cpp
+2026-07-03T00:05:39.106814Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/addoninfo.cpp => build/mc_addoninfo.cpp
+2026-07-03T00:05:39.108376Z 01O [16/170] Generating build/mc_checkers.cpp
+2026-07-03T00:05:39.108378Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkers.cpp => build/mc_checkers.cpp
+2026-07-03T00:05:39.108409Z 01O [17/170] Generating build/mc_checkmemoryleak.cpp
+2026-07-03T00:05:39.108410Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkmemoryleak.cpp => build/mc_checkmemoryleak.cpp
+2026-07-03T00:05:39.108538Z 01O [18/170] Generating build/mc_checkstring.cpp
+2026-07-03T00:05:39.108538Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkstring.cpp => build/mc_checkstring.cpp
+2026-07-03T00:05:39.109074Z 01O [19/170] Generating build/mc_checkersidmapping.cpp
+2026-07-03T00:05:39.109076Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkersidmapping.cpp => build/mc_checkersidmapping.cpp
+2026-07-03T00:05:39.109264Z 01O [20/170] Generating build/mc_checks.cpp
+2026-07-03T00:05:39.109265Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checks.cpp => build/mc_checks.cpp
+2026-07-03T00:05:39.110168Z 01O [21/170] Generating build/mc_checkpostfixoperator.cpp
+2026-07-03T00:05:39.110170Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkpostfixoperator.cpp => build/mc_checkpostfixoperator.cpp
+2026-07-03T00:05:39.112478Z 01O [22/170] Generating build/mc_checkbufferoverrun.cpp
+2026-07-03T00:05:39.112480Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkbufferoverrun.cpp => build/mc_checkbufferoverrun.cpp
+2026-07-03T00:05:39.113201Z 01O [23/170] Generating build/mc_checktype.cpp
+2026-07-03T00:05:39.113202Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checktype.cpp => build/mc_checktype.cpp
+2026-07-03T00:05:39.113376Z 01O [24/170] Generating build/mc_checkbool.cpp
+2026-07-03T00:05:39.115389Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkbool.cpp => build/mc_checkbool.cpp
+2026-07-03T00:05:39.115573Z 01O [25/170] Generating build/mc_checkio.cpp
+2026-07-03T00:05:39.115574Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkio.cpp => build/mc_checkio.cpp
+2026-07-03T00:05:39.115749Z 01O [26/170] Generating build/mc_checkclass.cpp
+2026-07-03T00:05:39.115750Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkclass.cpp => build/mc_checkclass.cpp
+2026-07-03T00:05:39.117401Z 01O [27/170] Generating build/mc_checkcondition.cpp
+2026-07-03T00:05:39.117403Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkcondition.cpp => build/mc_checkcondition.cpp
+2026-07-03T00:05:39.117529Z 01O [28/170] Generating build/mc_checknullpointer.cpp
+2026-07-03T00:05:39.117529Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checknullpointer.cpp => build/mc_checknullpointer.cpp
+2026-07-03T00:05:39.117707Z 01O [29/170] Generating build/mc_checkstl.cpp
+2026-07-03T00:05:39.117709Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkstl.cpp => build/mc_checkstl.cpp
+2026-07-03T00:05:39.117850Z 01O [30/170] Generating build/mc_checkersreport.cpp
+2026-07-03T00:05:39.117862Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkersreport.cpp => build/mc_checkersreport.cpp
+2026-07-03T00:05:39.117980Z 01O [31/170] Generating build/mc_checkother.cpp
+2026-07-03T00:05:39.117990Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkother.cpp => build/mc_checkother.cpp
+2026-07-03T00:05:39.118529Z 01O [32/170] Generating build/mc_checkassert.cpp
+2026-07-03T00:05:39.118530Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkassert.cpp => build/mc_checkassert.cpp
+2026-07-03T00:05:39.123485Z 01O [33/170] Generating build/mc_checkexceptionsafety.cpp
+2026-07-03T00:05:39.123505Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkexceptionsafety.cpp => build/mc_checkexceptionsafety.cpp
+2026-07-03T00:05:39.123815Z 01O [34/170] Generating build/mc_valueflow.cpp
+2026-07-03T00:05:39.123817Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/valueflow.cpp => build/mc_valueflow.cpp
+2026-07-03T00:05:39.124378Z 01O [35/170] Generating build/mc_astutils.cpp
+2026-07-03T00:05:39.124380Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/astutils.cpp => build/mc_astutils.cpp
+2026-07-03T00:05:39.124564Z 01O [36/170] Generating build/mc_checkleakautovar.cpp
+2026-07-03T00:05:39.124565Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkleakautovar.cpp => build/mc_checkleakautovar.cpp
+2026-07-03T00:05:39.124703Z 01O [37/170] Generating build/mc_checksizeof.cpp
+2026-07-03T00:05:39.124704Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checksizeof.cpp => build/mc_checksizeof.cpp
+2026-07-03T00:05:39.126466Z 01O [38/170] Generating build/mc_checkuninitvar.cpp
+2026-07-03T00:05:39.126468Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkuninitvar.cpp => build/mc_checkuninitvar.cpp
+2026-07-03T00:05:39.126720Z 01O [39/170] Generating build/mc_checkunusedfunctions.cpp
+2026-07-03T00:05:39.126722Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkunusedfunctions.cpp => build/mc_checkunusedfunctions.cpp
+2026-07-03T00:05:39.127461Z 01O [40/170] Generating build/mc_symboldatabase.cpp
+2026-07-03T00:05:39.127462Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/symboldatabase.cpp => build/mc_symboldatabase.cpp
+2026-07-03T00:05:39.127688Z 01O [41/170] Generating build/mc_color.cpp
+2026-07-03T00:05:39.127689Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/color.cpp => build/mc_color.cpp
+2026-07-03T00:05:39.127907Z 01O [42/170] Generating build/mc_checkvaarg.cpp
+2026-07-03T00:05:39.127909Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkvaarg.cpp => build/mc_checkvaarg.cpp
+2026-07-03T00:05:39.129373Z 01O [43/170] Generating build/mc_ctu.cpp
+2026-07-03T00:05:39.129375Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/ctu.cpp => build/mc_ctu.cpp
+2026-07-03T00:05:39.129624Z 01O [44/170] Generating build/mc_errorlogger.cpp
+2026-07-03T00:05:39.129635Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/errorlogger.cpp => build/mc_errorlogger.cpp
+2026-07-03T00:05:39.131508Z 01O [45/170] Generating build/mc_cppcheck.cpp
+2026-07-03T00:05:39.131510Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/cppcheck.cpp => build/mc_cppcheck.cpp
+2026-07-03T00:05:39.131587Z 01O [46/170] Generating build/mc_clangimport.cpp
+2026-07-03T00:05:39.131596Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/clangimport.cpp => build/mc_clangimport.cpp
+2026-07-03T00:05:39.133202Z 01O [47/170] Generating build/mc_forwardanalyzer.cpp
+2026-07-03T00:05:39.133204Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/forwardanalyzer.cpp => build/mc_forwardanalyzer.cpp
+2026-07-03T00:05:39.134409Z 01O [48/170] Generating build/mc_errortypes.cpp
+2026-07-03T00:05:39.134411Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/errortypes.cpp => build/mc_errortypes.cpp
+2026-07-03T00:05:39.134442Z 01O [49/170] Generating build/mc_checkunusedvar.cpp
+2026-07-03T00:05:39.134442Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/checkunusedvar.cpp => build/mc_checkunusedvar.cpp
+2026-07-03T00:05:39.137150Z 01O [50/170] Generating build/mc_tokenize.cpp
+2026-07-03T00:05:39.137151Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/tokenize.cpp => build/mc_tokenize.cpp
+2026-07-03T00:05:39.138014Z 01O [51/170] Generating build/mc_findtoken.cpp
+2026-07-03T00:05:39.138017Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/findtoken.cpp => build/mc_findtoken.cpp
+2026-07-03T00:05:39.138618Z 01O [52/170] Generating build/mc_infer.cpp
+2026-07-03T00:05:39.138618Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/infer.cpp => build/mc_infer.cpp
+2026-07-03T00:05:39.139504Z 01O [53/170] Generating build/mc_pathmatch.cpp
+2026-07-03T00:05:39.139512Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/pathmatch.cpp => build/mc_pathmatch.cpp
+2026-07-03T00:05:39.139870Z 01O [54/170] Generating build/mc_fwdanalysis.cpp
+2026-07-03T00:05:39.140445Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/fwdanalysis.cpp => build/mc_fwdanalysis.cpp
+2026-07-03T00:05:39.141364Z 01O [55/170] Generating build/mc_pathanalysis.cpp
+2026-07-03T00:05:39.141381Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/pathanalysis.cpp => build/mc_pathanalysis.cpp
+2026-07-03T00:05:39.141699Z 01O [56/170] Generating build/mc_mathlib.cpp
+2026-07-03T00:05:39.141711Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/mathlib.cpp => build/mc_mathlib.cpp
+2026-07-03T00:05:39.141928Z 01O [57/170] Generating build/mc_library.cpp
+2026-07-03T00:05:39.141938Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/library.cpp => build/mc_library.cpp
+2026-07-03T00:05:39.143499Z 01O [58/170] Generating build/mc_path.cpp
+2026-07-03T00:05:39.143516Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/path.cpp => build/mc_path.cpp
+2026-07-03T00:05:39.143624Z 01O [59/170] Generating build/mc_importproject.cpp
+2026-07-03T00:05:39.143626Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/importproject.cpp => build/mc_importproject.cpp
+2026-07-03T00:05:39.146383Z 01O [60/170] Generating build/mc_platform.cpp
+2026-07-03T00:05:39.146392Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/platform.cpp => build/mc_platform.cpp
+2026-07-03T00:05:39.146396Z 01O [61/170] Generating build/mc_summaries.cpp
+2026-07-03T00:05:39.146397Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/summaries.cpp => build/mc_summaries.cpp
+2026-07-03T00:05:39.148216Z 01O [62/170] Generating build/mc_programmemory.cpp
+2026-07-03T00:05:39.148218Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/programmemory.cpp => build/mc_programmemory.cpp
+2026-07-03T00:05:39.149044Z 01O [63/170] Generating build/mc_standards.cpp
+2026-07-03T00:05:39.149046Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/standards.cpp => build/mc_standards.cpp
+2026-07-03T00:05:39.149332Z 01O [64/170] Generating build/mc_suppressions.cpp
+2026-07-03T00:05:39.149334Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/suppressions.cpp => build/mc_suppressions.cpp
+2026-07-03T00:05:39.150025Z 01O [65/170] Generating build/mc_preprocessor.cpp
+2026-07-03T00:05:39.150033Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/preprocessor.cpp => build/mc_preprocessor.cpp
+2026-07-03T00:05:39.150188Z 01O [66/170] Generating build/mc_sarifreport.cpp
+2026-07-03T00:05:39.150192Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/sarifreport.cpp => build/mc_sarifreport.cpp
+2026-07-03T00:05:39.150328Z 01O [67/170] Generating build/mc_utils.cpp
+2026-07-03T00:05:39.150330Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/utils.cpp => build/mc_utils.cpp
+2026-07-03T00:05:39.150990Z 01O [68/170] Generating build/mc_vf_common.cpp
+2026-07-03T00:05:39.150991Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/vf_common.cpp => build/mc_vf_common.cpp
+2026-07-03T00:05:39.151142Z 01O [69/170] Generating build/mc_vf_settokenvalue.cpp
+2026-07-03T00:05:39.151143Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/vf_settokenvalue.cpp => build/mc_vf_settokenvalue.cpp
+2026-07-03T00:05:39.151696Z 01O [70/170] Generating build/mc_settings.cpp
+2026-07-03T00:05:39.151699Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/settings.cpp => build/mc_settings.cpp
+2026-07-03T00:05:39.152492Z 01O [71/170] Generating build/mc_vf_analyzers.cpp
+2026-07-03T00:05:39.152495Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/vf_analyzers.cpp => build/mc_vf_analyzers.cpp
+2026-07-03T00:05:39.152832Z 01O [72/170] Generating build/mc_keywords.cpp
+2026-07-03T00:05:39.152833Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/keywords.cpp => build/mc_keywords.cpp
+2026-07-03T00:05:39.154393Z 01O [73/170] Generating build/mc_regex.cpp
+2026-07-03T00:05:39.154395Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/regex.cpp => build/mc_regex.cpp
+2026-07-03T00:05:39.154406Z 01O [74/170] Generating build/mc_token.cpp
+2026-07-03T00:05:39.154406Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/token.cpp => build/mc_token.cpp
+2026-07-03T00:05:39.154534Z 01O [75/170] Generating build/mc_reverseanalyzer.cpp
+2026-07-03T00:05:39.154534Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/reverseanalyzer.cpp => build/mc_reverseanalyzer.cpp
+2026-07-03T00:05:39.154619Z 01O [76/170] Generating build/mc_timer.cpp
+2026-07-03T00:05:39.154619Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/timer.cpp => build/mc_timer.cpp
+2026-07-03T00:05:39.154751Z 01O [77/170] Generating build/mc_vfvalue.cpp
+2026-07-03T00:05:39.154752Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/vfvalue.cpp => build/mc_vfvalue.cpp
+2026-07-03T00:05:39.155872Z 01O [78/170] Generating build/mc_tokenlist.cpp
+2026-07-03T00:05:39.155874Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/tokenlist.cpp => build/mc_tokenlist.cpp
+2026-07-03T00:05:39.161465Z 01O [79/170] Generating build/mc_templatesimplifier.cpp
+2026-07-03T00:05:39.161468Z 01O /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/lib/templatesimplifier.cpp => build/mc_templatesimplifier.cpp
+2026-07-03T00:05:39.359304Z 01O [80/170] Building CXX object frontend/CMakeFiles/frontend.dir/frontend.cpp.o
+2026-07-03T00:05:39.742679Z 01O [81/170] Building CXX object cli/CMakeFiles/cli.dir/cmake_pch.hxx.gch
+2026-07-03T00:05:39.769200Z 01O [82/170] Building CXX object cli/CMakeFiles/cli.dir/sehwrapper.cpp.o
+2026-07-03T00:05:39.788769Z 01O [83/170] Building CXX object cli/CMakeFiles/cli.dir/stacktrace.cpp.o
+2026-07-03T00:05:39.837875Z 01O [84/170] Building CXX object cli/CMakeFiles/cli.dir/singleexecutor.cpp.o
+2026-07-03T00:05:39.851000Z 01O [85/170] Building CXX object cli/CMakeFiles/cli.dir/signalhandler.cpp.o
+2026-07-03T00:05:39.890708Z 01O [86/170] Building CXX object cli/CMakeFiles/cli.dir/executor.cpp.o
+2026-07-03T00:05:39.975536Z 01O [87/170] Building CXX object cli/CMakeFiles/cli.dir/filelister.cpp.o
+2026-07-03T00:05:40.142734Z 01O [88/170] Building CXX object cli/CMakeFiles/cli.dir/threadexecutor.cpp.o
+2026-07-03T00:05:40.237165Z 01O [89/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/cmake_pch.hxx.gch
+2026-07-03T00:05:40.319549Z 01O [90/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkinternal.cpp.o
+2026-07-03T00:05:40.347660Z 01O [91/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkersidmapping.cpp.o
+2026-07-03T00:05:40.398104Z 01O [92/170] Building CXX object cli/CMakeFiles/cli.dir/processexecutor.cpp.o
+2026-07-03T00:05:40.484638Z 01O [93/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkpostfixoperator.cpp.o
+2026-07-03T00:05:40.486864Z 01O [94/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_check64bit.cpp.o
+2026-07-03T00:05:40.488183Z 01O [95/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkimpl.cpp.o
+2026-07-03T00:05:40.605713Z 01O [96/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkassert.cpp.o
+2026-07-03T00:05:40.702173Z 01O [97/170] Building CXX object tools/dmake/CMakeFiles/dmake.dir/dmake.cpp.o
+2026-07-03T00:05:40.737555Z 01O [98/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkersreport.cpp.o
+2026-07-03T00:05:40.768391Z 01O [99/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkers.cpp.o
+2026-07-03T00:05:40.809736Z 01O [100/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checks.cpp.o
+2026-07-03T00:05:40.810605Z 01O [101/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkbool.cpp.o
+2026-07-03T00:05:40.906902Z 01O [102/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_color.cpp.o
+2026-07-03T00:05:40.954682Z 01O [103/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkexceptionsafety.cpp.o
+2026-07-03T00:05:41.028982Z 01O [104/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checksizeof.cpp.o
+2026-07-03T00:05:41.096696Z 01O [105/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_analyzerinfo.cpp.o
+2026-07-03T00:05:41.101432Z 01O [106/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_errortypes.cpp.o
+2026-07-03T00:05:41.134982Z 01O [107/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkvaarg.cpp.o
+2026-07-03T00:05:41.212725Z 01O [108/170] Building CXX object cli/CMakeFiles/cli.dir/cppcheckexecutor.cpp.o
+2026-07-03T00:05:41.304012Z 01O [109/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_findtoken.cpp.o
+2026-07-03T00:05:41.310463Z 01O [110/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checktype.cpp.o
+2026-07-03T00:05:41.349941Z 01O [111/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkstring.cpp.o
+2026-07-03T00:05:41.378655Z 01O [112/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkautovariables.cpp.o
+2026-07-03T00:05:41.393615Z 01O [113/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_addoninfo.cpp.o
+2026-07-03T00:05:41.450303Z 01O [114/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_keywords.cpp.o
+2026-07-03T00:05:41.546704Z 01O [115/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkfunctions.cpp.o
+2026-07-03T00:05:41.615611Z 01O [116/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checknullpointer.cpp.o
+2026-07-03T00:05:41.699648Z 01O [117/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_pathmatch.cpp.o
+2026-07-03T00:05:41.794507Z 01O [118/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_regex.cpp.o
+2026-07-03T00:05:41.871968Z 01O [119/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_pathanalysis.cpp.o
+2026-07-03T00:05:41.913833Z 01O [120/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_fwdanalysis.cpp.o
+2026-07-03T00:05:41.917517Z 01O [121/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkmemoryleak.cpp.o
+2026-07-03T00:05:42.012910Z 01O [122/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_path.cpp.o
+2026-07-03T00:05:42.092639Z 01O [123/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkleakautovar.cpp.o
+2026-07-03T00:05:42.105626Z 01O [124/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_platform.cpp.o
+2026-07-03T00:05:42.112650Z 01O [125/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_infer.cpp.o
+2026-07-03T00:05:42.157397Z 01O [126/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_standards.cpp.o
+2026-07-03T00:05:42.179042Z 01O [127/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkunusedfunctions.cpp.o
+2026-07-03T00:05:42.210379Z 01O [128/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_forwardanalyzer.cpp.o
+2026-07-03T00:05:42.327089Z 01O [129/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkunusedvar.cpp.o
+2026-07-03T00:05:42.376640Z 01O [130/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_ctu.cpp.o
+2026-07-03T00:05:42.420522Z 01O [131/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_reverseanalyzer.cpp.o
+2026-07-03T00:05:42.456705Z 01O [132/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_mathlib.cpp.o
+2026-07-03T00:05:42.469494Z 01O [133/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_utils.cpp.o
+2026-07-03T00:05:42.494739Z 01O [134/170] Building CXX object cli/CMakeFiles/cli.dir/cmdlineparser.cpp.o
+2026-07-03T00:05:42.593946Z 01O [135/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkbufferoverrun.cpp.o
+2026-07-03T00:05:42.700616Z 01O [136/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkuninitvar.cpp.o
+2026-07-03T00:05:42.733907Z 01O [137/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_vfvalue.cpp.o
+2026-07-03T00:05:42.869577Z 01O [138/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_summaries.cpp.o
+2026-07-03T00:05:42.919684Z 01O [139/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkcondition.cpp.o
+2026-07-03T00:05:42.939888Z 01O [140/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_timer.cpp.o
+2026-07-03T00:05:43.081596Z 01O [141/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_errorlogger.cpp.o
+2026-07-03T00:05:43.219244Z 01O [142/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkio.cpp.o
+2026-07-03T00:05:43.276479Z 01O [143/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_vf_common.cpp.o
+2026-07-03T00:05:43.378681Z 01O [144/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_sarifreport.cpp.o
+2026-07-03T00:05:43.423391Z 01O [145/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_clangimport.cpp.o
+2026-07-03T00:05:43.634284Z 01O [146/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_settings.cpp.o
+2026-07-03T00:05:43.729980Z 01O [147/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_suppressions.cpp.o
+2026-07-03T00:05:43.754442Z 01O [148/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_vf_settokenvalue.cpp.o
+2026-07-03T00:05:43.939177Z 01O [149/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_preprocessor.cpp.o
+2026-07-03T00:05:44.204236Z 01O [150/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_astutils.cpp.o
+2026-07-03T00:05:44.374740Z 01O [151/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_cppcheck.cpp.o
+2026-07-03T00:05:44.451526Z 01O [152/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_vf_analyzers.cpp.o
+2026-07-03T00:05:44.546320Z 01O [153/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_tokenlist.cpp.o
+2026-07-03T00:05:44.577684Z 01O [154/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_importproject.cpp.o
+2026-07-03T00:05:44.674450Z 01O [155/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_token.cpp.o
+2026-07-03T00:05:44.755415Z 01O [156/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkstl.cpp.o
+2026-07-03T00:05:44.818035Z 01O [157/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkclass.cpp.o
+2026-07-03T00:05:44.998724Z 01O [158/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_programmemory.cpp.o
+2026-07-03T00:05:45.082262Z 01O [159/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_checkother.cpp.o
+2026-07-03T00:05:45.289539Z 01O [160/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_library.cpp.o
+2026-07-03T00:05:46.263530Z 01O [161/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_templatesimplifier.cpp.o
+2026-07-03T00:05:47.673051Z 01O [162/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_symboldatabase.cpp.o
+2026-07-03T00:05:49.602918Z 01O [163/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_valueflow.cpp.o
+2026-07-03T00:05:50.779788Z 01O [164/170] Building CXX object lib/CMakeFiles/cppcheck-core.dir/build/mc_tokenize.cpp.o
+2026-07-03T00:05:50.818535Z 01O [165/170] Linking CXX static library lib/libfrontend.a
+2026-07-03T00:05:50.857792Z 01O [166/170] Linking CXX static library lib/libcli.a
+2026-07-03T00:05:50.920165Z 01O [167/170] Linking CXX executable bin/dmake
+2026-07-03T00:05:50.970503Z 01O [168/170] cd /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src && /home/gitlab-runner/builds/GjoKPir1B/0/comdare/research/comdare-cache-engine/.citools/dl/cppcheck-src/build/bin/dmake
+2026-07-03T00:05:51.131528Z 01O [169/170] Building CXX object cli/CMakeFiles/cppcheck.dir/main.cpp.o
+2026-07-03T00:05:51.193149Z 01O [170/170] Linking CXX executable bin/cppcheck
+2026-07-03T00:05:51.198375Z 01O [32;1m$ export PATH="${COMDARE_CITOOLS_DIR}/bin:$PATH"[0;m
+2026-07-03T00:05:51.198384Z 01O [32;1m$ set -euo pipefail # collapsed multi-line command[0;m
+2026-07-03T00:05:54.447100Z 01E tests/unit/test_prefetch_patha_t7.cpp:58:1: error: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: HardwarePrefetch >' [ctuOneDefinitionRuleViolation]
+2026-07-03T00:05:54.447109Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447110Z 01E ^
+2026-07-03T00:05:54.447111Z 01E tests/unit/test_prefetch_real.cpp:185:1: note: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: HardwarePrefetch >'
+2026-07-03T00:05:54.447112Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447113Z 01E ^
+2026-07-03T00:05:54.447113Z 01E tests/unit/test_prefetch_patha_t7.cpp:58:1: note: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: HardwarePrefetch >'
+2026-07-03T00:05:54.447114Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447115Z 01E ^
+2026-07-03T00:05:54.447115Z 01E tests/unit/test_prefetch_patha_t7.cpp:58:1: error: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: DistanceEstimatorPrefetch >' [ctuOneDefinitionRuleViolation]
+2026-07-03T00:05:54.447116Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447116Z 01E ^
+2026-07-03T00:05:54.447117Z 01E tests/unit/test_prefetch_real.cpp:185:1: note: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: DistanceEstimatorPrefetch >'
+2026-07-03T00:05:54.447117Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447118Z 01E ^
+2026-07-03T00:05:54.447118Z 01E tests/unit/test_prefetch_patha_t7.cpp:58:1: note: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: DistanceEstimatorPrefetch >'
+2026-07-03T00:05:54.447119Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447149Z 01E ^
+2026-07-03T00:05:54.447154Z 01E tests/unit/test_prefetch_patha_t7.cpp:58:1: error: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: PathOrientedPrefetch >' [ctuOneDefinitionRuleViolation]
+2026-07-03T00:05:54.447155Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447156Z 01E ^
+2026-07-03T00:05:54.447156Z 01E tests/unit/test_prefetch_real.cpp:185:1: note: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: PathOrientedPrefetch >'
+2026-07-03T00:05:54.447157Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447157Z 01E ^
+2026-07-03T00:05:54.447157Z 01E tests/unit/test_prefetch_patha_t7.cpp:58:1: note: The one definition rule is violated, different classes/structs have the same name 'PFComposition < :: comdare :: cache_engine :: prefetch_axis :: PathOrientedPrefetch >'
+2026-07-03T00:05:54.447158Z 01E struct PFComposition : comp::HotComposition {
+2026-07-03T00:05:54.447159Z 01E ^
+2026-07-03T00:05:54.450101Z 00O section_end:1783037154:step_script[0K
+2026-07-03T00:05:54.450526Z 00O+section_start:1783037154:cleanup_file_variables[0K
+2026-07-03T00:05:54.450529Z 00O+[0K[36;1mCleaning up project directory and file based variables[0;m[0;m
+2026-07-03T00:05:54.487599Z 00O section_end:1783037154:cleanup_file_variables[0K
+2026-07-03T00:05:54.487686Z 00O [31;1mERROR: Job failed: exit status 2[0;m

@@ -1,0 +1,63 @@
+AUFGABE S1/#216-H2: daten-ERHALTENDER Statistik-Reset NACH der Load-Phase im Workload-Mess-Pfad.
+Repo = comdare-cache-engine, Working Dir = DIESER Worktree (Branch wt-216h2). C++23, GTest, Namespace comdare::*.
+
+## PROBLEM (im Code verifiziert, konvergent Explore+Codex)
+`run_workload_perm` (libs/cache_engine/builder/experiment_tree/perm_runner.hpp:210) treibt EINE Load-Phase VOR der
+gemessenen Run-Phase: `:261 tier.tier_clear();` → `:262 for i=1..records: tier.tier_insert(i, i*7u+1u);` (LOAD, UNGEMESSEN)
+→ `:268 pmc->begin();` → `:269 run_workload_profile(...)` (RUN) → [später `tier.tier_observe(&r.unified)`].
+Die Load-Inserts treiben die auto-gekoppelten Achsen-Statistiken (T0/T1/T2/T3/T7/T8/T10/T17/T18) hoch; der finale
+`tier_observe` liest daher axis_stats = LOAD+RUN statt nur RUN. `run_observable_perm` (:157) hat KEINEN separaten Load
+(die n_ops-Ops SIND die Messung) → dort ist das Problem NICHT vorhanden.
+`tier_clear()` (anatomy/abi_adapter.hpp:870) nullt die Stats (`:902 container_algorithm_.reset()` + `:916-933`
+ct/map/queuing_q1/q2/telemetry/pf/cc/pc_organ_.reset()) ABER löscht auch die DATEN (container_algorithm_.clear() etc.)
+→ ungeeignet zwischen Load und Run (read/scan-Profile brauchen die geladenen Daten).
+
+## FIX (der saubere, offizielle Weg — KEIN throwaway-observe-Behelf, Cache-neutral)
+### (1) NEUE ABI-Methode `tier_reset_statistics()` — daten-erhaltend
+- Deklariere `virtual void tier_reset_statistics() noexcept = 0;` auf `IObservableTier` (anatomy/observable_tier.hpp) —
+  das ist das Interface, das `run_workload_perm` ohnehin hält (`anatomy::IObservableTier& tier`, perm_runner.hpp:210) →
+  KEIN dynamic_cast nötig. NICHT als neues Sub-Interface (das wäre der bei I1/#127 abgeschaffte dynamic-cast-Weg).
+- Implementiere sie in `SearchAlgorithmAbiAdapter` (abi_adapter.hpp): extrahiere GENAU die Statistik-`.reset()`-Aufrufe
+  aus `tier_clear()` (`:902` container_algorithm_.reset() + `:916-933` ct/map/queuing_q1/q2/telemetry/pf/cc/pc_organ_.reset())
+  in eine private Helfer-Methode (z.B. `reset_axis_statistics_() noexcept`), OHNE die Daten-clears (KEIN .clear()/.clear_filter()/
+  .clear_slots()/.clear_trie()). `tier_clear()` ruft diese Helfer-Methode DRY intern (die reset-Sequenz nur EINMAL definiert:
+  tier_clear = Daten-clear + reset_axis_statistics_). `tier_reset_statistics()` = nur reset_axis_statistics_(). Gate wie tier_clear:
+  `#if COMDARE_MEASUREMENT_ON` (bei OFF: leere/no-op-Methode, damit die vtable in beiden Build-Modi konsistent bleibt — prüfe
+  wie tier_clear/tier_observe unter dem Gate deklariert sind und spiegele das EXAKT).
+### (2) ABI-Major-Bump (vtable-Änderung an IObservableTier)
+- Eine neue pure-virtual Methode auf IObservableTier ändert die vtable → INKOMPATIBEL mit alt gebauten Modul-DLLs.
+  Bumpe die ABI-Major-Version nach der bei I1/#127 etablierten Mechanik: `include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp`
+  (COMDARE_ANATOMY_ABI_MAJOR + zugehörige Magic/Version-Konstante) + Loader-Reject-Konstante in
+  `builder/anatomy_module_loader/anatomy_module_loader.{hpp,cpp}`. Suche die EXAKTEN Stellen (grep COMDARE_ANATOMY_ABI_MAJOR /
+  Magic / kHostAnatomyAbi) und bumpe Major (+ Minor→0) KONSISTENT wie beim letzten Bump (git log dieser Dateien zeigt das Muster).
+  Ziel: der Loader lehnt vor-#216-H2-DLLs per Major-Mismatch ab (kein UB durch fehlenden vtable-Slot). KEIN POD-Feld ändern
+  (der ComdareTierObserverSnapshot bleibt unverändert — kein POD-Bruch).
+### (3) Host-Aufruf perm_runner.hpp
+- In `run_workload_perm` NACH der Load-Schleife (nach `:262`, VOR `:268 pmc->begin()`): `tier.tier_reset_statistics();`
+  mit Kommentar: „#216-H2: Observer-Statistik nach Load nullen (daten-erhaltend) → axis_stats misst nur die Run-Phase;
+  Wall-Clock/PMC klammern weiterhin nur die Run-Phase." (Die geladenen Daten bleiben erhalten → read/scan-Profile gültig.)
+### (4) Stale-Kommentare (search_organ_ → container_algorithm_, #188-4c-Rename)
+- perm_runner.hpp:11-12, :165, :188, :191 referenzieren `search_organ_.reset()` — ersetze durch `container_algorithm_.reset()`
+  (der Member wurde in #188-4c umbenannt). NUR die Kommentare, keine Logik.
+### (5) iterator-Doku präzisieren
+- libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:177-185 (die stat_*-„PER-MESSUNG/WARMUP-FREI"-
+  Zusage) gilt bislang nur run_observable_perm; ergänze, dass sie DANK tier_reset_statistics() nach Load jetzt AUCH für den
+  Workload-Pfad (run_workload_perm) gilt.
+### (6) NEUER Test tests/unit/test_216h2_stat_reset_after_load.cpp
+- Baue ein store-backed Tier (Muster aus test_obs_phaseA/test_pathb_segment_timer übernehmen). Mache N Load-Inserts, rufe
+  `tier.tier_reset_statistics()`, dann M Run-Ops (Lookups/Inserts), dann `tier.tier_observe(&snap)`. Asserte, dass die
+  insert-getriebene T0-Statistik (axis_stats[0][...], z.B. via container_algorithm_.occupied_count()-Bezug) NUR die M Run-Ops
+  widerspiegelt, NICHT N+M — und dass die geladenen N Daten nach dem Reset noch da sind (ein Lookup auf einen Load-Key trifft).
+  Registriere den Test in tests/unit/CMakeLists.txt nach dem Muster benachbarter Tests (+ is_original-Codegen-Konsumenten-Liste
+  NUR falls der Test Achsen-Header mit is_original zieht).
+
+## HARTE CONSTRAINTS
+- god-header: EIN kohärenter Increment (abi_adapter.hpp + observable_tier.hpp-Deklaration + ABI-Version-Header + Loader +
+  perm_runner.hpp + iterator.hpp-Doku + Test). Keine anderen Achsen/Interfaces umbauen.
+- NIE anfassen: modules/**, ext/**, golden-Dateien, Registry-mp_list (Struktur/Reihenfolge).
+- Bestehenden Stil + clang-format-Konformität wahren (LLVM-basiert, 4-space, 120 cols; es gibt eine .clang-format im Repo-Root —
+  halte dich exakt daran, die CI prüft `clang-format --dry-run -Werror`).
+- cppcheck-sauber (die CI lint:static ist HART): keine uninitMember, keine ignoredReturnValue.
+- GIT: committe deine Änderungen IM Worktree auf dem Branch wt-216h2, message-Präfix „fix(#216-H2): ", mit Trailer-Zeile
+  „Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>". NICHT pushen, NICHT mergen (der Integrator merged+pusht).
+- Am Ende: liste die geänderten Dateien + 6-Zeilen-Zusammenfassung + ob/wie du den ABI-Major gebumpt hast (alte→neue Version).

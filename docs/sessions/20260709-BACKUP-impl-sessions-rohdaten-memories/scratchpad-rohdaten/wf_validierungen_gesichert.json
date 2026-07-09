@@ -1,0 +1,299 @@
+[
+ {
+  "dimension": "CI-Test-Strategie: Baubarkeit+Ausfuehrbarkeit ALLER Tests in der CI (Sammel-Target comdare_tests, air-gap gtest/Boost, 2-Pass-Codegen, prod2-OOM, super-Test vs integration:smoke, prt-art-Defekt)",
+  "verdict": "VALID_WITH_CORRECTIONS",
+  "findings": [
+   {
+    "severity": "blocker",
+    "claim": "Q3: Der 2-Pass-Codegen ist NICHT optional, sondern Pflicht. R5.I/F15/F.5 werden bei EINEM configure->build->ctest STILL SKIPPED (Targets werden gar nicht erzeugt) -> die Suite laeuft GRUEN, obwohl diese Codegen-DLL-Tests nie gebaut/ausgefuehrt wurden = genau der Schein-Korrektheitsbeweis, den der User verbietet. Die .test-Vorlage MUSS: configure -> build comdare_anatomy_codegen_cli -> RE-configure (gleiches Build-Dir) -> comdare_tests neu aggregieren (r5i/f15-Targets existieren erst nach Pass 2) -> ctest.",
+    "evidence": "Code/external/comdare-cache-engine/tests/unit/CMakeLists.txt:951-956 (R5.I 'SKIPPED ... Build the tool first ... then re-configure'), :1057-1059 (F15 SKIPPED), :988-989 (F.5 SKIPPED)"
+   },
+   {
+    "severity": "major",
+    "claim": "SEQUENZ-Prerequisite: Die .test-Vorlage EXISTIERT NOCH NICHT in ci-templates. development-HEAD (0eda655, 2026-07-03) hat nur .lint-secrets/.lint-format/.lint-static/.contract. Der super-Job 'test:unit: extends: .test' schlaegt bei der YAML-Expansion fehl, bis .test (mit COMDARE_TEST_CMAKE_BUILD_DIR/BUILD_TARGET + ctest --output-junit) nach development gemergt ist. Muss ZUERST landen.",
+    "evidence": "Cluster/_infra/ci-templates/base-pipeline.yml (grep: .test NICHT vorhanden) vs Diplomarbeit-Datenbanken/.gitlab-ci.yml:67 'extends: .test'"
+   },
+   {
+    "severity": "major",
+    "claim": "Q4: OOM-Vektor ist die Template-Compile-RAM (Boost.mp11 + ${COMDARE_ALL_AXIS_GENERATED_DIRS} in ~113 test_v41_*), NICHT ext/. Ein einziger Mega-Job der ~113+ schweren cc1plus baut, wird auf prod2 (earlyoom cc1plus-Kill + I/O-Stall) getroffen. g++-13+Resume-Retry heilt nur TRANSIENTE Kills; ein systematisch zu hohes -j thrasht weiter. -j-Cap (z.B. -j2 auf prod2) und/oder Split in Sub-Jobs (concepts/anatomy/codegen) muss PFLICHT sein, nicht optional; besser prod(amd) statt prod2 fuer den Schwer-Job.",
+    "evidence": "tests/unit/CMakeLists.txt:333-344/359-367 (mp11+alle Achsen je Test); cache-engine .gitlab-ci.yml:35 CMAKE_BUILD_PARALLEL_LEVEL=4, super .gitlab-ci.yml:38 =8 '1 GB/Kern'; Memory project_prod2_hardware_verdict_io_not_cpu"
+   },
+   {
+    "severity": "major",
+    "claim": "prt-art-Fix ist ECHTE Implementierung, kein Stub: array_256.hpp fehlt komplett (nur Geschwister array_65535.hpp existiert), test_internal_search.cpp inkludiert es hart. Der neue Header muss real COMPILIEREN UND BESTEHEN, danach muss build:standalone von '--target test_prt_art_identity' auf Sammel-Target/all + ctest ueber ALLE 12 umgestellt werden (sonst bleibt 12/1).",
+    "evidence": "comdare-prt-art/tests/unit/test_internal_search.cpp:3 '#include <prt_art/internal_search/array_256.hpp>'; ls internal_search -> nur array_65535.hpp; comdare-prt-art/.gitlab-ci.yml:59-61"
+   },
+   {
+    "severity": "ok",
+    "claim": "Q1 WIDERLEGT: comdare_tests ist ohne ext/ baubar. Die 'schweren' Adapter A05-jemalloc/P03-Masstree/P10-SuRF sind INTERFACE-Libs, real gelinkt nur bei COMDARE_HAVE_* (Default OFF); kein Unit-Test linkt unbedingt vendor_/comdare_paper_/ext-Targets. ext/ darf im Runner leer sein (is_original-Codegen ist auf ext-Quell-Existenz gegated).",
+    "evidence": "adapters/A05-jemalloc/CMakeLists.txt:2 'option(COMDARE_HAVE_JEMALLOC ... OFF)' + INTERFACE; P03/P10 identisch; grep vendor_/comdare_paper_ in tests/unit/CMakeLists.txt = leer; CMakeLists.txt:505-535 codegen gated auf ext-Quellen"
+   },
+   {
+    "severity": "ok",
+    "claim": "Q2 WIDERLEGT: Air-Gap bricht NICHT. gtest-1.15.2-Tarball UND boost-mp11-Header sind vendored UND git-getrackt; die Setup-cmakes nutzen zuerst die lokalen Kopien; Netz-FetchContent ist nur Fallback (FATAL mit klarer Meldung bei Air-Gap). Da es KEINE Submodule sind, ist GIT_SUBMODULE_STRATEGY:none/FORCE_HTTPS irrelevant fuer sie.",
+    "evidence": "git ls-files -> cmake/third_party/googletest-1.15.2.tar.gz getrackt; .gitignore:92-97 ignoriert nur prerequisites/*.tar.gz; gtest_setup.cmake:16-28 (EXISTS local -> URL local); boost_mp11_setup.cmake:69-73 (vendored zuerst)"
+   },
+   {
+    "severity": "ok",
+    "claim": "Q5 WIDERLEGT (keine Build-Ordner-Kollision): test:unit baut in Code/build-test (DA_BUILD_TESTS=ON+V32), integration:smoke in Code/build-integration (DA_BUILD_TESTS=OFF), analyse in Code/build = 3 disjunkte Build-Trees, kein CMakeCache-Konflikt. Zusaetzlich sind cache-engine+prt-art in Code EXCLUDE_FROM_ALL -> super 'all' kaskadiert NICHT in cache-engines ~113 Tests (baut nur Code-Treiber + Code/tests 11).",
+    "evidence": "super .gitlab-ci.yml:74 (Code/build-test) vs :152 (build-integration) vs :134 (Code/build); Code/CMakeLists.txt:172-174 + :181-183 EXCLUDE_FROM_ALL"
+   },
+   {
+    "severity": "minor",
+    "claim": "Sammel-Target braucht einen Namens-Sammelmechanismus: Es gibt heute KEINE Aggregation, nur 'ein add_test je Binary'. add_custom_target(comdare_tests DEPENDS <handgepflegte Liste>) veraltet leicht; sauber = GLOBAL-Property, an die comdare_add_test jeden Target-Namen anhaengt (auch in den if(FOUND)-2-Pass-Bloecken), am Ende in DEPENDS aufloesen.",
+    "evidence": "gtest_setup.cmake:83-86 (add_test je Binary, keine Sammlung); CMakeLists.txt:628 add_custom_target existiert nur fuer comdare_run_builder"
+   },
+   {
+    "severity": "minor",
+    "claim": "R5.G ist im Plan falsch als 2-Pass gelistet: test_v41_anatomy_adhoc_codegen_macro braucht KEIN Codegen-Tool/2-Pass und baut Single-Pass. Nur R5.I und F15 (und pruefling-gated F.5) sind echt 2-Pass. Plan-Formulierung 'R5.I/F15/R5.G' korrigieren.",
+    "evidence": "tests/unit/CMakeLists.txt:1062-1064 'CE-only, kein Codegen-Tool/2-Pass noetig'"
+   },
+   {
+    "severity": "minor",
+    "claim": "F.5/full-join-Codegen-Tests sind ZUSAETZLICH auf COMDARE_CE_PRUEFLINGE (prt-art als Pruefling) gegated — ohne prt-art-Wiring bleiben sie auch mit 2-Pass geskippt. Der cache-engine-Test-Job muss entweder COMDARE_CE_PRUEFLINGE=<prt-art> setzen oder diese Stufe-2/3-Tests explizit als out-of-scope deklarieren (sonst stille Luecke).",
+    "evidence": "tests/unit/CMakeLists.txt:962 'if(COMDARE_PRUEFLING_INCLUDE_DIRS)'"
+   },
+   {
+    "severity": "minor",
+    "claim": "Hermetik-Audit noetig: Einige Tests nehmen Laufzeit-Artefakt-Pfade (thesis_tiere-CSV) als ctest-Argument; auf sauberem CI-Checkout fehlen sie. Meist self-skipping, aber vor Scharfschaltung pruefen, dass jeder Test ohne un-getrackte build/thesis_tiere-Daten sauber PASST/SKIPPT.",
+    "evidence": "tests/unit/CMakeLists.txt (Tail) test_cacheline_policy_selector add_test arg 'build/thesis_tiere/m3v2_sota_pilot_measurements.csv' (Kommentar: 'fehlt sie, SKIPt der Test ... sauber')"
+   },
+   {
+    "severity": "ok",
+    "claim": "cache-engine 'all' (im EIGENEN Pipeline-Kontext, nicht EXCLUDE_FROM_ALL) wuerde apps/tools/benchmarks + ext + Paper-Binaries mitziehen -> das Sammel-Target comdare_tests statt 'all' ist dort korrekt und noetig. Fuer die super (Code) ist 'all' dagegen akzeptabel (EXCLUDE_FROM_ALL schuetzt).",
+    "evidence": "CE CMakeLists.txt:596 add_subdirectory(tools), :597 apps, :599-601 benchmarks, :603-605 tests, :567-570 adapters+ext"
+   }
+  ],
+  "missing_todos": [
+   "ci-templates: .test-Vorlage (mit COMDARE_TEST_CMAKE_SOURCE_DIR/BUILD_DIR/CONFIGURE_FLAGS/BUILD_TARGET + optionalem 2-Pass-Codegen-Prebuild + ctest --output-junit + g++-13/Resume-Retry) nach development mergen — HARTE Voraussetzung VOR allen Projekt-Test-Stages (existiert heute nicht)",
+   "cache-engine: Sammel-Target comdare_tests via GLOBAL-Property-Registry (comdare_add_test haengt Namen an) statt handgepflegter DEPENDS-Liste — inkl. der erst nach Pass-2 erzeugten r5i/f15-Targets",
+   "cache-engine: Entscheidung+Doku zu den pruefling-gated F.5/full-join-Codegen-Tests (COMDARE_CE_PRUEFLINGE=prt-art im Test-Job verdrahten ODER explizit out-of-scope, damit keine stille Skip-Luecke bleibt)",
+   "Hermetik-Audit: jeden Test mit Laufzeit-Artefakt-Argument (thesis_tiere-CSV etc.) auf sauberem CI-Checkout auf sauberes PASS/SKIP verifizieren",
+   "prt-art: NACH array_256.hpp die build:standalone-Stage von '--target test_prt_art_identity' auf Sammel-Target/all + ctest ueber alle 12 umstellen (sonst bleibt 12/1); sanitize mitziehen",
+   "Explizite -j-/RAM-Politik pro Runner-Tag festschreiben (prod2 niedriger als prod-amd) statt globalem CMAKE_BUILD_PARALLEL_LEVEL — Split der Schwer-Suite als Option vorsehen",
+   "allow_failure/when:manual erst nach erstem gruenen Probelauf entfernen (Hard-Gate) — je Projekt dokumentieren"
+  ],
+  "sequencing_corrections": [
+   "1) ZUERST ci-templates .test nach development mergen + verifizieren (Job expandiert) — erst DANN duerfen super/cache-engine/prt-art 'extends: .test' referenzieren",
+   "2) cache-engine: erst comdare_tests-Sammel-Target + Namens-Registry + Hermetik-Fixes -> DANN Test-Stage aktiv schalten",
+   "3) cache-engine-Test-Job MUSS 2-Pass ausfuehren: configure -> cmake --build --target comdare_anatomy_codegen_cli -> RE-configure (gleiches Build-Dir) -> cmake --build --target comdare_tests -> ctest --output-junit; sonst fehlen R5.I/F15 still",
+   "4) prt-art: array_256.hpp erst REAL implementieren + lokal alle 12 build+pass verifizieren -> DANN CI auf Sammel-Target+run umstellen",
+   "5) -j-Cap/Split setzen BEVOR der Voll-Suite-Job zum Hard-Gate wird; Probelauf (allow_failure) zuerst, Scharfschaltung erst nach erstem gruenen Beweis",
+   "6) super braucht KEIN Sammel-Target (EXCLUDE_FROM_ALL schuetzt 'all'); Aufwand fuer 'statt all bauen' auf cache-engine (und ggf. prt-art) fokussieren"
+  ]
+ },
+ {
+  "dimension": "Serielle god-header-ABI-Increment-Kette (Spur S): ABI-Bruch-Buchhaltung, Buendelung & Reihenfolge (#216-H2 → #217 → AP-7 → #221 → CMD-1 → CMD-2/S6 → #234 → #215 → #224)",
+  "verdict": "VALID_WITH_CORRECTIONS",
+  "findings": [
+   {
+    "severity": "major",
+    "claim": "Q1: #216-H2 ist KEIN 'niedrig'-Risiko-Mini-Increment wie im Plan etikettiert, sondern ein VOLLER ABI-Major-Bruch (3->4): neue rein-virtuelle IObservableTier::tier_reset_statistics() = vtable-Layout-Bruch + Magic A3->A4 + Loader-Reject ALLER Alt-DLLs. Der Mess-POD bleibt UNVERAENDERT -> der Bruch dient EINEM host-aufgerufenen Mess-Buchhaltungs-Slot, der cache-neutral OHNE Bruch machbar gewesen waere (host-seitiges post-pre-Delta ueber den bestehenden tier_observe-Slot = das eigene Vorgaenger-Muster der Codebasis). Reset-Ansatz ist verteidigbar (Reader-Klarheit), aber der ABI-VERSIONS-Bump war vermeidbar/bündelbar.",
+    "evidence": "observable_tier.hpp:179 (neue `virtual void tier_reset_statistics() noexcept = 0`); anatomy_module_abi_v1_decl.hpp:40-43,47 ('#216-H2 ABI-Bruch Major 3->4 ... der Observer-POD bleibt unveraendert', Magic A4); Plan MASTER-EXECUTION-PLAN:14 stuft S1 als 'Risiko niedrig' ein, 188-4c-masterplan:35-37 als 'Mini-Increment (verkleinert)'; Alternativpfad belegt perm_runner.hpp:163,188 ('KEIN post-pre-Delta mehr noetig'/'V1-Delta-Block'); commit 919db6c"
+   },
+   {
+    "severity": "major",
+    "claim": "Q3: Zwei ABI-Major-Brueche im seriellen Strang OHNE Zwischen-Verbraucher: S1 #216-H2 (3->4, bereits committet) und S6 CMD-2+AP-1+AP-8 (POD-Bruch, ->5). Zwischen S1 und dem EINZIGEN 320-DLL-Neubau (#215/S8) findet KEINE Messung statt (M3/#156 gated). Der Zwischenstand ABI-4 produziert nichts -> der S1-Bump ist standalone verschwendet: er invalidiert nur DLLs, die S8 ohnehin neu baut, + erzwingt doppelte Hardcoded-Version-Pflege. Buendeln: #216-H2 ABI-neutral halten (Delta) und den EINEN Bump erst bei S6 nehmen.",
+    "evidence": "MASTER-EXECUTION-PLAN:24 (S6 'ABI-Major-Bump; alle DLLs neu'), :26 (S8 #215 '320-DLL-Neubau'), :52-53 (M3 #156 'HELD bis Linux+PMC', AUSSERHALB-GO); anatomy_module_abi_v1_decl.hpp:113-116 (host_compatible_with: exakter Major-Match -> jeder Bump rejectet ALLE Alt-DLLs); commit 919db6c aenderte test_v41_anatomy_module_abi + test_d13 + test_d14b + 3 v5-Tests (je Bump erneute Version-Hardcode-Pflege)"
+   },
+   {
+    "severity": "major",
+    "claim": "Q3/Q5-Luecke: CMD-1-i/ii (S5, Plan-Risiko 'HOCH') spaltet eine SEPARATE Mess-Wurzel von IExecutionEngine ab und re-rootet die Tier-Interface-Hierarchie — IAnatomyBase ist der Factory-Rueckgabetyp der ABI. Das ist mit hoher Wahrscheinlichkeit ein DRITTER ABI-Major-Bruch, den die Plan-ABI-Buchhaltung (die ABI-Major NUR bei S1 und S6 nennt) NICHT budgetiert. Ohne explizite Zuordnung droht ein weiterer ungeplanter Bump + 320-Rebuild.",
+    "evidence": "SE-22 §5:96,108 (CMD-1-i 'separate Mess-Basis von IExecutionEngine abspalten', execution_engine_base.hpp + anatomy_base.hpp; abi_adapter erbt IResourceControllableTier:145 + IObservableTier:150 + IDriveableTier:158); anatomy_module_abi_v1_decl.hpp:17,84 (IAnatomyBase = Rueckgabetyp comdare_create_anatomy()); Plan nennt ABI-Major nur MASTER-EXECUTION-PLAN:14 (S1) + :24 (S6)"
+   },
+   {
+    "severity": "minor",
+    "claim": "Q2-Naht: #221 (RC/DynamicVariableNode) und CMD-1-ii teilen die RC/Limitations-Flaeche (resource_controllable_tier.hpp + RC-apply abi_adapter:187-204). Der Plan sequenziert #221 VOR CMD-1, ohne die Ueberlappung vertraglich festzunageln. Falls CMD-1 IResourceControllableTier re-homed, droht Nacharbeit an der frisch gelandeten DynamicVariableNode-Verdrahtung. Kein harter Umordnungszwang (Plan-Intent = 'BEHALTEN'), aber ein offener Vertrags-Seam.",
+    "evidence": "MASTER-EXECUTION-PLAN:17 (S4 #221: RC-apply abi_adapter:187-204 + resource_controllable_tier.hpp + runtime_variable_loop:103); 188-4c-masterplan:49 (CMD-1 konsolidiert '4 Limitations-Bausteine' inkl. IResourceControllableTier-caps); SE-22 §5:98 (resource_controllable_tier.hpp:56 'BEHALTEN' — Intent, nicht vertraglich fixiert)"
+   },
+   {
+    "severity": "ok",
+    "claim": "Q2: #217 (Array-Gattung, container_algorithm_t) und AP-7 (SwissTable S22) haben KEINE versteckte CMD-1-Abhaengigkeit — sie erweitern nur die axis_03a-Registry + container_traversal_t unter der BESTEHENDEN Struktur (kein POD-/vtable-Layout-Bruch, keine neue Achse). Reihenfolge (AP-7 nach #217, beide seriell wegen geteilter Registry + god-header) ist korrekt; kein Umordnen noetig. Plan-Zeilennummern hier verifiziert exakt.",
+    "evidence": "axis_03a_search_algo_registry.hpp:69 (S14 HashSearchAlgo), :83 (AllStrategies endet S21 KArySearchAlgoK16), :114 (per-K -> container_traversal_t abi_adapter:1890) — bestaetigt SE-22 §3:66 ('S14=Hash:69 endet S21:83 -> +S22 ... AP-7 teilt Registry mit #217 -> nach #217')"
+   },
+   {
+    "severity": "ok",
+    "claim": "Q4: #224 (Etiketten-Hygiene) ZULETZT ist KORREKT. Es ist querschnittlich (abi_adapter:1871 + Mess-POD + viele Achsen) und muss NACH allen struktur-/namensaendernden Schritten laufen (4c-iv ContainerAlgorithm-Rename bereits DONE, CMD-1 RuntimeMeasureVisitor-Rename, CMD-2, #217-ContainerAlgorithm/Array-Namen), sonst Re-Rename-Churn. Reines Umbenennen -> KEIN zusaetzlicher ABI-Major (Feld-Offsets unveraendert).",
+    "evidence": "MASTER-EXECUTION-PLAN:27 (S9 #224 'ZULETZT, alle Namen final'); SE-22 §3:64 (#224 Querschnitt abi_adapter:1871 + Mess-POD + viele axes); Task #250 (4c-iv ContainerAlgorithm-Rename bereits abgeschlossen)"
+   },
+   {
+    "severity": "ok",
+    "claim": "Q5: Die god-header-Regel (max 1 offener abi_adapter/POD-Increment) ist im Plan GEWAHRT. Spur S ist strikt seriell mit Gruen-Gate; ALLE POD-Beruehrungen sind serialisiert (AP-1 in S6; AP-8 p50/95/99-POD-Surface bewusst aus Spur P herausgezogen nach S6, nur Vendoring/Impl parallel). Kein Spur-P-Task fasst abi_adapter/observable_tier/measurement_snapshot an. Keine Regel-Verletzung in der Kette.",
+    "evidence": "MASTER-EXECUTION-PLAN:37 ('AP-8-Vendoring ... ⚠️ P50/95/99-POD-Surface = S6'), :24 (AP-1 branch_misses+throughput in S6-POD); SE-22 §2:46-48 (god-header-Sperrbereich-Definition), §3:68-77 (PARALLEL-Tasks dateidisjunkt von abi_adapter/POD)"
+   },
+   {
+    "severity": "minor",
+    "claim": "Prozess/Staleness: cache-engine main ist 'ahead 1' (UNPUSHED) und traegt bereits #216-H2 (919db6c + 20e24ff). Der Plan laesst Spur P parallel von main branchen; wird S1 nicht ZUERST zu origin+gitlab gepusht, branchen (extern/parallel) angelegte Worktrees ggf. von einem god-header-Stand OHNE #216-H2 -> Inkonsistenz-/Merge-Risiko. Zudem sind die Plan-Docs stale: sie planen #216-H2 noch als 'NEU implementieren', obwohl es bereits committet ist.",
+    "evidence": "git: 'main...origin/main [ahead 1]'; HEAD 20e24ff/919db6c (#216-H2 committet, 'ABI-Major 3->4'); Addendum §B:11-16 + §D:27-28 planen #216-H2 noch als neu zu implementieren; Push-Protokoll MASTER-EXECUTION-PLAN:62-63 ('Push origin+gitlab ... je Merge-Runde')"
+   }
+  ],
+  "missing_todos": [
+   "Explizite ABI-Bump-Budget-/Freeze-Politik fehlt: EINEN konsolidierten verbleibenden ABI-Major-Bump deklarieren, der CMD-1-Interface-Re-Root (S5) + CMD-2 + AP-1 + AP-8-POD (S6) zusammenfasst, und Zwischen-Bumps verbieten, bis der einzelne #215-320-Neubau (S8) laeuft.",
+   "CMD-1-i/ii als potenzieller ABI-Major (IExecutionEngine/IAnatomyBase-Re-Root) ist in der Plan-ABI-Buchhaltung NICHT erfasst — entweder als eigener Bruch budgetieren ODER (besser) in den S6-Bump falten.",
+   "Vertrags-Freeze fuer IResourceControllableTier / RC-apply (abi_adapter:187-204) fehlt als Schritt, damit #221 und CMD-1 kollisionsfrei bleiben.",
+   "Explizite Vorbedingung 'S1/#216-H2 (main ahead 1) zu origin+gitlab pushen' VOR dem Spur-P-Worktree-Fan-out fehlt (Plan-Protokoll verlangt Push je Increment).",
+   "Aktualisierung der Plan-Docs auf Ist-Stand fehlt (#216-H2 ist bereits committet, nicht mehr 'neu zu implementieren' wie in Addendum §B/§D)."
+  ],
+  "sequencing_corrections": [
+   "ABI-Bruch buendeln: #216-H2 ABI-neutral ueber host-seitiges post-pre-Delta (bestehender tier_observe-Slot, perm_runner.hpp:163,188) statt neuer virtueller Methode. Da S1 aber bereits als Major 3->4 committet ist: sicherstellen, dass ALLE weiteren god-header-Interface/POD-Aenderungen (CMD-1-i/ii + CMD-2 + AP-1 + AP-8-POD) in GENAU EINEN weiteren Bump 4->5 VOR #215 fallen — NICHT erneut bei CMD-1 UND bei S6 bumpen.",
+   "#221 nach CMD-1-ii ziehen (DynamicVariableNode auf die FINALE Limitations-Basis bauen) ODER den IResourceControllableTier-Vertrag vor #221 einfrieren, damit CMD-1 keine Nacharbeit an der RC-Verdrahtung erzwingt.",
+   "S1 (#216-H2, main ahead 1) zu origin+gitlab pushen, BEVOR die Spur-P-Worktrees von main abzweigen — sonst branchen Parallel-Laeufe von einem god-header-Stand ohne #216-H2.",
+   "Reihenfolge #216-H2 -> #217 -> AP-7 -> #221 -> CMD-1 -> CMD-2/S6 -> #234 -> #215 -> #224 im Kern BESTAETIGT (kleine god-header-Stuecke zuerst, #224-Namenshygiene zuletzt, POD-Bruch gebuendelt in S6, 320-Rebuild einmal in #215) — nur die ABI-Bump-Konsolidierung und der #221/CMD-1-Seam sind zu korrigieren."
+  ]
+ },
+ {
+  "dimension": "Vollständigkeit der Diplomarbeit-Planung: MASTER-EXECUTION-PLAN (2026-07-03) vs. ALLE dokumentierten offenen Ziele/TODOs + Thesis-Forschungsfragen FF0–FF4",
+  "verdict": "VALID_WITH_CORRECTIONS",
+  "findings": [
+   {
+    "severity": "blocker",
+    "claim": "Der Plan trägt den Titel \"/goal Gesamtumfang\" und beruft sich auf User \"GO für alles / maximale Parallelität\", LÄSST aber #193 (manuelle Bedienbarkeit / User-Self-Test) VOLLSTÄNDIG weg — die am 2026-06-27 als \"NEUE TOP-PRIORITÄT\" markierte, noch in_progress-Aufgabe. Sie steht weder in Spur S/P noch im 'AUSSERHALB-GO'-Deferred-Block.",
+    "evidence": "grep '193|manuell|self-test' über alle 3 GO-Docs = No matches; 20260627-TODO-KONSOLIDIERUNG-ELABORAT.md:24 (L4 'NEUE TOP-PRIORITÄT') + :197-237 (6 Facetten, meist lokal/gate-frei)"
+   },
+   {
+    "severity": "major",
+    "claim": "#179 (Wartbarkeits-/Lesbarkeits-Sweep ALLER C++-Dateien aller 4 Projekte, User 2026-06-25, in_progress, XL) fehlt im Plan; nur ein Fragment (685 Format-Verstöße) überlebt eingebettet in das bereits abgeschlossene #203. Der eigentliche Voll-Sweep ist gate-frei (lokal+Codex) und nicht messgebunden.",
+    "evidence": "grep '#179' 3 GO-Docs = No matches; TODO-ELABORAT.md:26 (L5 'NICHT fertig bis JEDE Datei geprüft') + :243-248"
+   },
+   {
+    "severity": "major",
+    "claim": "Mehrere genuin offene pending-Tasks fehlen in BEIDEN Blöcken (weder in-scope noch explizit deferred): #10 (V42 Nicht-SA-Gattungs-Docks, XL), #19 (Allokatoren jemalloc/tcmalloc/hoard/scalloc ECHT linken — nur mimalloc+snmalloc real), #125 (lazy-DLL Content-Hash), #149 (MP-E Meta), #229 (Top-Down-Audit-Strecke + XML-only RC).",
+    "evidence": "grep '#(10|19|125|149|229)' 3 GO-Docs = No matches; TODO-ELABORAT.md:352-357 (#19), :359-364 (#125), :405-410 (#10), :370-375+#188 vs #229"
+   },
+   {
+    "severity": "major",
+    "claim": "#187 (PMC-Auto-Adaption) und #165 (quality_flag/quiesced-OS-Residual) sind messgebunden, werden aber im 'AUSSERHALB-GO'-Block NICHT genannt (dort nur #156/#152/#163/#162). Damit fallen zwei mess-gegatete Ziele durch das Deferred-Raster.",
+    "evidence": "MASTER-EXECUTION-PLAN.md:52-56 nennt weder #187 noch #165; TODO-ELABORAT.md:303-308 (#187) + :345-350 (#165)"
+   },
+   {
+    "severity": "major",
+    "claim": "Der Plan bildet Tasks NIRGENDS auf die Thesis-Forschungsfragen ab, und die Thesis hat FF0 (Hauptfrage) + FF1–FF4 = FÜNF Fragen (nicht FF1-FF3). FF0 (aktiv vs. passiv, Multi-Plattform inkl. Sapphire Rapids) hängt an Infra (#189/#163), die gated/unsicher ist → Risiko, dass die HAUPTfrage nicht voll beantwortbar ist; kein Task besitzt 'Sapphire Rapids' explizit.",
+    "evidence": "thesis/diplomarbeit/kapitel/de/01_einleitung.tex:78-118 (FF0-FF4, FF0 'Hybrid-CPUs, Sapphire Rapids'); Plan referenziert keine FF"
+   },
+   {
+    "severity": "major",
+    "claim": "AP-2/#236 (echter PRT-ART-Pfad, '90ns-Stub raus') ist laut Doku mess-validitäts-KRITISCHE Vorbedingung für FF3 ('sonst ist der ganze Lauf wertlos') und blockiert #162/#156 — im Plan aber nur als 'Welle P-A sofort parallel' geführt, ohne Gate-Markierung 'blockt #162/#156'.",
+    "evidence": "MASTER-EXECUTION-PLAN.md:34; TODO-ELABORAT.md:317-322 ('mess-validitäts-kritisch; Vorbedingung für #162') + :291 (FF3)"
+   },
+   {
+    "severity": "minor",
+    "claim": "Gating-Label von #156 ('HELD bis Linux+PMC-Fenster') ist ungenau: Linux+PMC ist auf prod1 vorhanden (#153 Windows-PCM + prod1-perf) → #156 ist 'grundsätzlich ENTSPERRT'; echter Gate = mehrtägiges USER-Zeitfenster + MinIO-500-Artefakt-Storage-Fix + grüne Pipeline. Klassifikation korrekt 'gated', aber Grund falsch benannt.",
+    "evidence": "TODO-ELABORAT.md:289-294 ('durch Linux+PMC auf prod1 grundsätzlich ENTSPERRT ... braucht mehrtägiges User-Zeitfenster + MinIO-500-Fix')"
+   },
+   {
+    "severity": "minor",
+    "claim": "#184/#185 im Plan als 'Text-Agent (Dataset-Doc/TPIE)' klassifiziert, sind laut 06-27-Elaborat aber Impl-Agent-CODE-Aufgaben (cache-engine-Revier: Dataset-Loader-Slot / TPIE-EM-BFS als Achsen-Organe, 'keine harten Blocker (Code)') — Fehlklassifikation der Ausführungsrolle.",
+    "evidence": "MASTER-EXECUTION-PLAN.md:56 vs TODO-ELABORAT.md:377-389 (architecture-gap, lokal+Codex)"
+   },
+   {
+    "severity": "ok",
+    "claim": "Die USER-Gating-Klassifikationen #225 (Second-Execution-Grundsatz = NUR Diskussion) und #25 (Diplomarbeit-Text = User schreibt manuell) sind korrekt; ebenso #189/#199-210/#231 grob als Infra-Handoff (read-only-verify).",
+    "evidence": "Task #225 'NUR Diskussion, USER'; Task #25 'User schreibt manuell'; TODO-ELABORAT.md:100-105/142-168 (Infra-gated)"
+   },
+   {
+    "severity": "ok",
+    "claim": "Alle 15 AP-Tasks (#235-249), CMD-1/CMD-2 (#251/#252) und die S-Spur-Audit-Tasks (#215/#216/#217/#221/#224/#234) sind vorhanden und sinnvoll auf serieller god-header-Kette (abi_adapter/Mess-POD) vs. dateidisjunkter Parallel-Schwarm verteilt; AP-8 korrekt in Vendoring (P-A) + POD-Surface (S6) gesplittet.",
+    "evidence": "MASTER-EXECUTION-PLAN.md:9-50 (vollständige S1-S9 + P-A/B/C-Zuordnung); SE-22 §3 Disjunktheits-Matrix"
+   },
+   {
+    "severity": "minor",
+    "claim": "Drei nicht-versöhnte Prioritäts-Taxonomien koexistieren (06-27 P0/P1/P2; 06-28 E0-E4; 07-03 Spur S/P/gated). E0-E4 sind EXPERIMENT-Maschinerie-EBENEN (E4=XML/Auswertung … E1=RC-Runtime; E0=finale Gesamtüberarbeitung, ZULETZT) — eine Architektur-Audit-Traverse, KEINE Abgabe-Priorität. Der 07-03-Plan mappt nicht zurück, was Vollständigkeits-Prüfung nur per Handabgleich (= diese Lücken) ermöglicht.",
+    "evidence": "SESSION-ENDE-9:28 ('E1-E4=EXPERIMENT-Maschinerie'); SESSION-ENDE-10:13,35,56 ('E4→E3→E2→E1→E0; E0=Schlussphase ZULETZT')"
+   },
+   {
+    "severity": "major",
+    "claim": "Sequenzierungs-Widerspruch: das E0-zuletzt-Schema bucketet #193 als [E0]=ZULETZT, obwohl #193 gleichzeitig TOP-PRIO ist; und die strikt serielle 9-Increment-god-header-Kette (Spur S) stellt Architektur-Reinheit/Benennung (#224 Etiketten, CMD-Renames) VOR den echten Abgabe-kritischen Mess-Pfad — auf nachweislich instabilen Runnern (#210 Idle-Stall, prod2 pausiert).",
+    "evidence": "Task #193 '[E0] TOP-PRIO' (Widerspruch); MASTER-EXECUTION-PLAN.md:18-27 (S5-S9 seriell); Task #210/#207 (Runner-Instabilität)"
+   }
+  ],
+  "missing_todos": [
+   "#193 (manuelle Bedienbarkeit / User-Self-Test, TOP-PRIO, in_progress) — komplett fehlend; die gate-freien Facetten (EXPERIMENT_MODE-Preset-Entscheid, ExperimentDriver-SOTA-Profil-Pfad-Fix, USAGE-CLI-Korrektur, MANUAL_RUN.md finalisieren) sind lokal machbar, nur der finale Hand-Lauf braucht einen Runner.",
+   "#179 (Wartbarkeits-/Lesbarkeits-Voll-Sweep ALLER Dateien aller 4 Projekte, User-mandatiert, XL) — nur ein Format-Fragment via #203 vorhanden; god-header-Review + Boilerplate-Dedup + topics/*-vs-modules/*-Autorität fehlen.",
+   "#10 (V42: Nicht-SearchAlgorithm-Gattungs-Docks Set/Sequence/Adapter/View × 22 Achsen, GOAL-V6-Gate-Kriterien) — fehlt in-scope UND im Deferred-Block.",
+   "#19 (Allokatoren jemalloc/tcmalloc/hoard/scalloc ECHT linken statt std::malloc-Fallback) — distinkt von AP-6 (nur Profil-XML-Abdeckung); fehlt.",
+   "#125 (lazy-DLL Content-Hash-Versionierung) — bewusst niedrig-Prio/deferred, aber nirgends im Plan als deferred vermerkt.",
+   "#149 (MP-E: Meta — eine Aufgabe/Session gegen Audit) und #229 (Top-Down-Audit-Ebene-4→1-Strecke + XML-only RC-Vollaktivierung) — Meta/E0-Strecken, im Plan nicht adressiert (DynamicVariableNode-Teil nur via S4/#221 abgedeckt).",
+   "#187 (PMC-Auto-Adaption je ISA/OS/Counter) und #165-Residual (quiesced-OS system_disturbed-Provenienz) — messgebunden, aber im 'AUSSERHALB-GO'-Block NICHT gelistet.",
+   "Explizite Task→FF-Zuordnung fehlt; kein Task-Owner für die FF0-Multi-Plattform-Anforderung 'Sapphire Rapids' (nur implizit über gated #163/#189) — Risiko für die HAUPTfrage FF0.",
+   "#184/#185 sind als Code-Aufgaben (Dataset-Loader-Slot / TPIE+EM-BFS-Achsen-Organe) neu einzuordnen, nicht als 'Text-Agent'."
+  ],
+  "sequencing_corrections": [
+   "#193 als sofortige Welle P-0 aufnehmen (VOR Spur-S-Politur wie #224/#179-god-header): seine EXPERIMENT_MODE-/Profil-Pfad-/USAGE-CLI-/MANUAL_RUN-Fixes sind dateidisjunkt-lokal und gate-frei; nur die finale Hand-Lauf-Verifikation braucht ein Runner-Fenster. Es ist die #1-User-Priorität und darf nicht als [E0]=ZULETZT rangieren.",
+   "AP-2/#236 (echter PRT-ART-Pfad, 90ns-Stub raus) als HARTES Vorbedingungs-Gate für #162 und #156 (FF3-Validität) markieren und an den Kopf von Welle P-A stellen — nicht nur 'sofort parallel'; sonst ist der Gesamt-Mess-Lauf wertlos.",
+   "E0-E4 gegen den Plan versöhnen: entweder E0-E4 fallen lassen oder explizit festhalten, dass Spur S/P das Schema ablöst; den Widerspruch #193=TOP-PRIO vs. [E0]=ZULETZT auflösen. Ein Task→FF0-FF4-Abbild ergänzen, damit Abgabe-Blocker sichtbar werden (FF0/FF3 = Mess-Pfad + Text).",
+   "Die abwesenden pendings (#10/#19/#125/#149/#229/#187/#165 + #184/#185 als Code) entweder in eine Welle einreihen ODER explizit in den 'AUSSERHALB-GO'-Deferred-Block aufnehmen, damit der Plan seinem Titel 'Gesamtumfang' wahrheitsgemäß entspricht.",
+   "Angesichts der Runner-Instabilität (#210 Idle-Stall, prod2 pausiert) die strikt 9-tiefe serielle god-header-Kette (Spur S) entzerren: dateidisjunkte god-header-Increments bündeln/checkpointen statt jede Stufe an eine grüne Voll-Pipeline zu gaten; #224 (Etiketten-Hygiene, reine Politur) klar ans Ende nach dem Abgabe-kritischen Mess-Prep.",
+   "Gating-Grund für #156 korrigieren: nicht 'HELD bis Linux+PMC' (PMC ist auf prod1 verfügbar), sondern 'gated auf mehrtägiges User-Zeitfenster + MinIO-500-Artefakt-Storage-Fix + grüne Pipeline'."
+  ]
+ },
+ {
+  "dimension": "Spur-P parallele dateidisjunkte Worktree-Matrix — Disjunktheit / Pfad-Korrektheit / Merge-Serialisierung / Track-S-Leakage (cache-engine)",
+  "verdict": "VALID_WITH_CORRECTIONS",
+  "findings": [
+   {
+    "severity": "blocker",
+    "claim": "AP-8 (HDR-Histogramm / LatencyHistogram-Observer p50/p95/p99) ist NICHT parallel-tauglich in P-A: es haengt an den Track-S-Mess-/Observer-Dateien und teilt execution_result.hpp mit AP-1/AP-2. Nach dem Kriterium der Aufgabe (Q4) gehoert es in Spur S, nicht in die dateidisjunkte P-A-Welle.",
+    "evidence": "libs/cache_engine/builder/commands/execution_result.hpp:28-29 (latency_p50/latency_p99) + :41 (latency_samples_ns) — genau die Felder, die ein p50/p95/p99-Histogramm-Observer erweitern/konsumieren muss; Observer-Interface libs/cache_engine/include/cache_engine/concepts/i_observer.hpp"
+   },
+   {
+    "severity": "blocker",
+    "claim": "AP-3 und AP-13 sind in derselben P-A-Welle NICHT dateidisjunkt: beide arbeiten am geteilten platform/-Konzeptheader. PlatformPropertySet traegt genau die Pinning-/Hybrid-/SIMD-Felder, die AP-3 (Probe) FUELLT und AP-13 (P/E-Pinning + 3-ISA-Matrix) KONSUMIERT/erweitert.",
+    "evidence": "libs/cache_engine/include/cache_engine/platform/i_platform_probe.hpp:16 has_hybrid_cores, :20 cpu_core_atom_perf_separation, :21 preferred_pinning_policy, :22 usable_simd_width_bytes; dieselbe platform/-Dir enthaelt core_layout.hpp und isa_features.hpp (beide von AP-13 benoetigt)"
+   },
+   {
+    "severity": "major",
+    "claim": "AP-2 und AP-8 kollidieren am Verzeichnis builder/commands/: die von AP-1/AP-8 zu erweiternde execution_result.hpp liegt PHYSISCH in AP-2s eigenem Bearbeitungs-Verzeichnis, das zusaetzlich eine eigene CMakeLists.txt fuehrt. Verzeichnis-Eigentum (ein Worktree = ein Ordner) ist damit verletzt.",
+    "evidence": "libs/cache_engine/builder/commands/ enthaelt zugleich execute_engine_command.hpp (AP-2), execution_result.hpp (AP-1/AP-8-Naht) UND CMakeLists.txt (gemeinsame Registrierung)"
+   },
+   {
+    "severity": "major",
+    "claim": "Pfad-Klasse-Fehler wie beim algorithm_profiles-Praezedenzfall: die Matrix-Kurzpfade (include/cache_engine/abi/…, builder/commands/…, platform_probe/, subsystems/c02_pinning_engine/, platform/) sind NUR unter libs/cache_engine/ real. Ein gleichnamiger, LEERER Spiegelbaum cache_engine/ existiert als Falle — un-praefixierte Pfade zeigen auf die leere Attrappe.",
+    "evidence": "REAL: libs/cache_engine/include/cache_engine/abi/ = 13 Header inkl. cache_engine_execution_engine_adapter.hpp; DECOY: cache_engine/include/cache_engine/abi/ = leer (ls -la nur . und ..), cache_engine/builder/commands/ existiert gar nicht"
+   },
+   {
+    "severity": "major",
+    "claim": "Merge-Serialisierung 'dateidisjunkt -> konfliktfrei nach main' ist unsicher wegen Spiegel-Duplikation: cache_engine/ vs libs/cache_engine/ UND measurement/ vs libs/common/measurement/ tragen dieselben logischen Komponenten in zwei physischen Baeumen (bekanntes 'modules-Spiegel'-/Nested-cleanup-Thema). Ein Worktree editiert libs/-Kanon, ein Spiegel-Sync den Top-Level — semantische/Build-Kollision trotz Text-Disjunktheit.",
+    "evidence": "Doppel-Treffer je Ziel: platform_probe unter cache_engine/ UND libs/cache_engine/ UND libs/common/measurement/ UND measurement/; hdr_histogram_wrapper unter libs/common/measurement/ UND measurement/"
+   },
+   {
+    "severity": "major",
+    "claim": "CMake/CI-Naht AP-6/AP-8/AP-13 ist real und muss serialisiert werden: AP-8 (Vendoring nach ext/) und AP-6 (23 Allokatoren aus ext/A0x linken) teilen den ext/-Teilbaum + dessen add_subdirectory; AP-13 (3-ISA-Build-Matrix) ist eine globale Top-Level-CMake-Aenderung.",
+    "evidence": "CMakeLists.txt:122 add_subdirectory(ext) (AP-8+AP-6); libs/cache_engine/CMakeLists.txt:6 add_subdirectory(subsystems) (AP-13); ext/ enthaelt A01-hoard…A20-dlmalloc (AP-6-Allokatoren)"
+   },
+   {
+    "severity": "major",
+    "claim": "AP-11-Pfad 'load_profiles/lp_*.xml' ist im Code NICHT verifizierbar: es existiert kein Verzeichnis load_profiles/ und keine einzige lp_*.xml irgendwo in der cache-engine. Entweder Pfad falsch oder (wahrscheinlicher) Juni-Artefakt, das im vorliegenden Klon fehlt — vor Parallelisierung zwingend am aktiven development-Stand zu bestaetigen.",
+    "evidence": "find libs -name 'lp_*.xml' = 0 Treffer; find -type d -name load_profiles = 0 Treffer; einzige *.xml unter libs sind algorithm_profiles/{sota,allocators}/*.profile.xml"
+   },
+   {
+    "severity": "major",
+    "claim": "KRITISCHE VERIFIKATIONSGRENZE: die zu pruefenden Planungsdokumente (20260703-MASTER-EXECUTION-PLAN…, MASTERPLAN_KONSOLIDIERUNG_TERMINE.md, SESSION-ENDE-22*, 20260702-MASTERPLAN-188-4c*) sind auf dieser Maschine in KEINEM Repo vorhanden; die cache-engine-Klone sind veraltete Mai-Staende. Validierung erfolgte gegen Code, nicht gegen den Doku-Wortlaut.",
+    "evidence": "cache-engine lokal nur Branch main@fe0a864f (2026-05-21), kein development gefetcht; Modules-Klon main@c6634d8 (2026-05-28); prt-art(development) + git ls-files: 0 Treffer fuer MASTER-EXECUTION/KONSOLIDIERUNG/SESSION-ENDE-22"
+   },
+   {
+    "severity": "minor",
+    "claim": "Geteilte Achsen-Registry permutation_axes.xml ist ein weiterer, in der Naht-Liste NICHT genannter Kollisionspunkt: AP-6 (SOTA/Allokator als Achsen-Level) und AP-7 (SwissTable S22 als eigener T0-Baustein) editieren dieselbe Registry.",
+    "evidence": "libs/cache_engine/algorithm_profiles/permutation_axes.xml (zentrale Achsen-Enable-Liste neben sota/ und allocators/)"
+   },
+   {
+    "severity": "ok",
+    "claim": "Positiv bestaetigt: AP-6 und AP-10 Pfade sind korrekt und liegen in eigenen, von P-A disjunkten Datenteilbaeumen — der reine Datei-Additions-Anteil von P-B (Profile/Datasets) ist tatsaechlich weitgehend disjunkt.",
+    "evidence": "AP-6: libs/cache_engine/algorithm_profiles/sota/*.profile.xml (art,b2tree,hot,masstree,coco_trie,…) + allocators/*.profile.xml (jemalloc,tcmalloc,hoard,mimalloc,snmalloc,scalloc,…); AP-10: libs/common/measurement/dataset_loader/"
+   }
+  ],
+  "missing_todos": [
+   "AP-8 hat keine explizite Abhaengigkeit zu AP-1 modelliert: die p50/p95/p99-Ausgabe erfordert Erweiterung des Mess-/CSV-Schemas (execution_result.hpp / measurement_record.hpp / i_observer.hpp = Track-S). Ohne AP-1-vorher ist AP-8 nicht mergebar.",
+   "Kein Schritt fuer die Spiegelbaum-Konsolidierung/Sperre (cache_engine/ vs libs/cache_engine/, measurement/ vs libs/common/measurement/) vor Start der Parallel-Welle — sonst Build-/Merge-Bruch trotz Datei-Disjunktheit.",
+   "Geteilte Registry permutation_axes.xml (AP-6 vs AP-7) und die gemeinsamen CMakeLists (Top-Level, ext/, subsystems/) brauchen einen dedizierten seriellen 'Integrations-Commit' nach der Welle — fehlt in der Matrix.",
+   "Pflicht-Vorabschritt: alle P-A/P-B-Pfade am AKTIVEN development-Stand (nicht am Mai-Klon) re-verifizieren, insb. AP-11 load_profiles/lp_*.xml und die Existenz/Identitaet von abi_adapter.hpp vs cache_engine_execution_engine_adapter.hpp.",
+   "Klaerung, ob AP-2s 'echter Adapter' den Observer-/abi_adapter-Mess-Pfad (Track-S) benutzt; falls ja, AP-2 ebenfalls aus P-A herausnehmen bzw. nach AP-1 serialisieren."
+  ],
+  "sequencing_corrections": [
+   "AP-8 aus P-A nach Spur S verschieben (oder strikt NACH AP-1 serialisieren): gemeinsamer Schreibzugriff auf builder/commands/execution_result.hpp (+ measurement_record.hpp / i_observer.hpp).",
+   "AP-3 und AP-13 duerfen NICHT in derselben dateidisjunkten Welle laufen: platform/-Konzeptheader (i_platform_probe.hpp/PlatformPropertySet, core_layout.hpp, isa_features.hpp) EINEM Owner (AP-3) zuweisen, AP-13 danach rebasen.",
+   "AP-2 und AP-8 am Verzeichnis builder/commands/ serialisieren; execution_result.hpp als Single-Owner-Datei behandeln (nur eine Spur editiert die Struktur).",
+   "AP-6/AP-8/AP-13 CMake-Kanten (Top-Level CMakeLists.txt:122 ext/, libs/cache_engine/CMakeLists.txt:6 subsystems, ext/CMakeLists.txt, 3-ISA-Matrix) in einen separaten seriellen CMake-Integrationsschritt nach der Parallel-Welle buendeln.",
+   "Alle Matrix-Kurzpfade auf das reale libs/cache_engine/- bzw. libs/common/-Praefix umschreiben und jede Referenz auf den leeren Top-Level-Spiegel cache_engine/ entfernen (gleiche Fehlerklasse wie der bereits korrigierte algorithm_profiles-Pfad)."
+  ]
+ }
+]

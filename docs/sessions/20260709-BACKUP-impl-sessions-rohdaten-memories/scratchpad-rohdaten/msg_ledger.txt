@@ -1,0 +1,3 @@
+[skip ci] docs(#212): E-Welle-A2-Ledger Abschnitt 12 -- NullNotify per-Achsen-Rest DONE (Pipeline 7054 success)
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

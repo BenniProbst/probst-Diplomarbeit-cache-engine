@@ -1,0 +1,7 @@
+[skip ci] chore(submodule): bump comdare-cache-engine -> 6e484c6 (#212 NullNotify + #227 Kontext-Dossier)
+
+#212 (Audit A2/K5b): per-Achsen std::function-notify als Opt-in COMDARE_CE_ENABLE_OBSERVER_PUSH
+(Default zero-cost NullNotify). + Kontext-Dossier (A2-Welle #211-226 + #188). Holt den seit ef6ecd6
+ausstehenden Submodul-Bump nach.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

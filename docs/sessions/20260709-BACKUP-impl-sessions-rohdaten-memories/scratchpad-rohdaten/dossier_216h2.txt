@@ -1,0 +1,25 @@
+AUFGABE #216-H2: stat_*-Reset NACH der Load-Phase (daten-erhaltend). Repo = comdare-cache-engine (Working Dir = Worktree wt-216h2). Implementiere; NUR editieren, KEIN git commit/push/add (der Integrator committet).
+
+## PROBLEM (durch Doppel-Kartierung Explore+Codex bestätigt, konvergent)
+Im Workload-Mess-Pfad (`run_workload_perm`) wird `tier_clear()` NUR VOR der Load-Phase gerufen. Die Load-Inserts treiben danach die Observer-Statistik hoch, und der Observer wird erst am Run-Ende gelesen → `axis_stats` enthält fälschlich LOAD + RUN statt nur RUN. Es fehlt eine daten-ERHALTENDE Statistik-Reset-Fläche im ABI (tier_clear löscht auch die Daten, ist also ungeeignet, weil read/scan-Profile die geladenen Daten brauchen).
+
+## FUNDSTELLEN (verifiziert)
+- `libs/cache_engine/anatomy/abi_adapter.hpp:870-935` = `tier_clear()`: löscht Daten (`:876` container_algorithm_.clear(), `:879` container_algorithm_tier1_.clear()) UND nullt (unter `#if COMDARE_MEASUREMENT_ON`) die Observer-Stats: `:902` `if constexpr(requires{container_algorithm_.reset();}) container_algorithm_.reset();` (T0+T6), `:915-933` ct_organ_/map_organ_/queuing_q1/q2/telemetry/pf/cc/pc_organ_.reset() (T1/T2/T17/T18/T10/T7/T8/T3), plus DATEN-clears `:889` flt_organ_.clear_filter() (T16), `:893` vh_organ_.clear_slots() (T11), `:897` pc_organ_.clear_trie() (T3).
+- `libs/cache_engine/builder/experiment_tree/perm_runner.hpp:260-270` = run_workload_perm: `:261` tier_clear() (vor Load), `:262` LOAD-Schleife (records Inserts), `:269` run_workload_profile (RUN). KEIN Reset zwischen :262 und :269.
+- `libs/cache_engine/builder/workload_driver/workload_orchestrator.hpp:155` = tier_observe(&r.observer) am Lauf-Ende (liest axis_stats).
+- `libs/cache_engine/anatomy/observable_tier.hpp` = IObservableTier (Basis-Interface, erbt IDriveableTier).
+- Doku-Widerspruch: `cache_engine_builder_iterator.hpp:177-185` behauptet stat_* seien "PER-MESSUNG, WARMUP-FREI" — gilt nur für run_observable_perm, NICHT run_workload_perm.
+- STALE-Kommentare (mit-korrigieren): `perm_runner.hpp:12,165,188,191` referenzieren `search_organ_` statt `container_algorithm_` (#188-4c hat umbenannt).
+
+## ZU IMPLEMENTIEREN
+1. NEUE ABI-Methode in abi_adapter.hpp: `void tier_reset_statistics() noexcept` — extrahiere GENAU die Statistik-`.reset()`-Aufrufe aus tier_clear() (die :902-Zeile container_algorithm_.reset() + ct/map/queuing_q1/q2/telemetry/pf/cc/pc_organ_.reset()), OHNE die Daten-clears (kein .clear()/.clear_filter()/.clear_slots()/.clear_trie()). Gate: `#if COMDARE_MEASUREMENT_ON` (bei OFF leere/no-op-Methode). Refaktoriere so, dass tier_clear() diese neue Methode INTERN aufruft (DRY — die reset-Sequenz nur EINMAL definieren, tier_clear = clear-Daten + tier_reset_statistics). Deklariere sie im passenden Tier-Interface, sodass der Host sie aufrufen kann — prüfe ob IObservableTier oder IDriveableTier der richtige Ort ist; wähle das Interface, über das perm_runner den Tier bereits hält, damit KEIN dynamic_cast nötig wird. Falls ABI-Major-relevant: additive Methode, kein POD-Bruch.
+2. perm_runner.hpp run_workload_perm: NACH der Load-Schleife (nach :262, VOR dem PMC-begin/run bei :268-269) `tier.tier_reset_statistics();` aufrufen. Kommentar: "#216-H2: Observer-Statistik nach Load nullen (daten-erhaltend) → axis_stats misst nur die Run-Phase". Der Wall-Clock-Timer (PMC) klammert weiterhin nur die Run-Phase.
+3. STALE-Kommentare perm_runner.hpp:12/165/188/191: search_organ_ → container_algorithm_.
+4. iterator.hpp:177-185 Doku präzisieren: die WARMUP-FREI-Zusage gilt jetzt auch für run_workload_perm (dank tier_reset_statistics nach Load).
+5. NEUER Test tests/unit/ (z.B. test_216h2_stat_reset_after_load.cpp): baue ein store-backed Tier, mache N Load-Inserts, rufe tier_reset_statistics(), dann M Run-Ops, dann tier_observe → asserte dass die insert-getriebene T0-Statistik (axis_stats[0]) NUR die M Run-Ops zählt (nicht N+M). Registriere den Test in tests/unit/CMakeLists.txt nach dem Muster benachbarter Tests UND in der Haupt-CMakeLists is_original-Codegen-Konsumenten-Liste FALLS der Test Achsen-Header mit is_original zieht (sonst nicht nötig).
+
+## HARTE CONSTRAINTS
+- god-header: NUR abi_adapter.hpp als Kern-Increment; keine anderen anatomy-Interfaces umbauen außer der einen additiven Methoden-Deklaration.
+- NIE anfassen: `modules/**`, `ext/**`, golden-Dateien, Registry-mp_list (Struktur/Reihenfolge).
+- C++23, GTest, Namespace comdare::*. Bestehenden Stil + clang-format-Konformität (LLVM-basiert, 4-space, 120 cols) wahren.
+- KEIN git. Am Ende: liste die geänderten Dateien + eine 5-Zeilen-Zusammenfassung was du getan hast.

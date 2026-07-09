@@ -1,0 +1,881 @@
+OpenAI Codex v0.142.2
+--------
+workdir: C:\Users\benja\comdare-wt\216h2
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019f25e7-ffd3-75e2-9f44-61a586e1674b
+--------
+user
+AUFGABE S1/#216-H2: daten-ERHALTENDER Statistik-Reset NACH der Load-Phase im Workload-Mess-Pfad.
+Repo = comdare-cache-engine, Working Dir = DIESER Worktree (Branch wt-216h2). C++23, GTest, Namespace comdare::*.
+
+## PROBLEM (im Code verifiziert, konvergent Explore+Codex)
+`run_workload_perm` (libs/cache_engine/builder/experiment_tree/perm_runner.hpp:210) treibt EINE Load-Phase VOR der
+gemessenen Run-Phase: `:261 tier.tier_clear();` → `:262 for i=1..records: tier.tier_insert(i, i*7u+1u);` (LOAD, UNGEMESSEN)
+→ `:268 pmc->begin();` → `:269 run_workload_profile(...)` (RUN) → [später `tier.tier_observe(&r.unified)`].
+Die Load-Inserts treiben die auto-gekoppelten Achsen-Statistiken (T0/T1/T2/T3/T7/T8/T10/T17/T18) hoch; der finale
+`tier_observe` liest daher axis_stats = LOAD+RUN statt nur RUN. `run_observable_perm` (:157) hat KEINEN separaten Load
+(die n_ops-Ops SIND die Messung) → dort ist das Problem NICHT vorhanden.
+`tier_clear()` (anatomy/abi_adapter.hpp:870) nullt die Stats (`:902 container_algorithm_.reset()` + `:916-933`
+ct/map/queuing_q1/q2/telemetry/pf/cc/pc_organ_.reset()) ABER löscht auch die DATEN (container_algorithm_.clear() etc.)
+→ ungeeignet zwischen Load und Run (read/scan-Profile brauchen die geladenen Daten).
+
+## FIX (der saubere, offizielle Weg — KEIN throwaway-observe-Behelf, Cache-neutral)
+### (1) NEUE ABI-Methode `tier_reset_statistics()` — daten-erhaltend
+- Deklariere `virtual void tier_reset_statistics() noexcept = 0;` auf `IObservableTier` (anatomy/observable_tier.hpp) —
+  das ist das Interface, das `run_workload_perm` ohnehin hält (`anatomy::IObservableTier& tier`, perm_runner.hpp:210) →
+  KEIN dynamic_cast nötig. NICHT als neues Sub-Interface (das wäre der bei I1/#127 abgeschaffte dynamic-cast-Weg).
+- Implementiere sie in `SearchAlgorithmAbiAdapter` (abi_adapter.hpp): extrahiere GENAU die Statistik-`.reset()`-Aufrufe
+  aus `tier_clear()` (`:902` container_algorithm_.reset() + `:916-933` ct/map/queuing_q1/q2/telemetry/pf/cc/pc_organ_.reset())
+  in eine private Helfer-Methode (z.B. `reset_axis_statistics_() noexcept`), OHNE die Daten-clears (KEIN .clear()/.clear_filter()/
+  .clear_slots()/.clear_trie()). `tier_clear()` ruft diese Helfer-Methode DRY intern (die reset-Sequenz nur EINMAL definiert:
+  tier_clear = Daten-clear + reset_axis_statistics_). `tier_reset_statistics()` = nur reset_axis_statistics_(). Gate wie tier_clear:
+  `#if COMDARE_MEASUREMENT_ON` (bei OFF: leere/no-op-Methode, damit die vtable in beiden Build-Modi konsistent bleibt — prüfe
+  wie tier_clear/tier_observe unter dem Gate deklariert sind und spiegele das EXAKT).
+### (2) ABI-Major-Bump (vtable-Änderung an IObservableTier)
+- Eine neue pure-virtual Methode auf IObservableTier ändert die vtable → INKOMPATIBEL mit alt gebauten Modul-DLLs.
+  Bumpe die ABI-Major-Version nach der bei I1/#127 etablierten Mechanik: `include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp`
+  (COMDARE_ANATOMY_ABI_MAJOR + zugehörige Magic/Version-Konstante) + Loader-Reject-Konstante in
+  `builder/anatomy_module_loader/anatomy_module_loader.{hpp,cpp}`. Suche die EXAKTEN Stellen (grep COMDARE_ANATOMY_ABI_MAJOR /
+  Magic / kHostAnatomyAbi) und bumpe Major (+ Minor→0) KONSISTENT wie beim letzten Bump (git log dieser Dateien zeigt das Muster).
+  Ziel: der Loader lehnt vor-#216-H2-DLLs per Major-Mismatch ab (kein UB durch fehlenden vtable-Slot). KEIN POD-Feld ändern
+  (der ComdareTierObserverSnapshot bleibt unverändert — kein POD-Bruch).
+### (3) Host-Aufruf perm_runner.hpp
+- In `run_workload_perm` NACH der Load-Schleife (nach `:262`, VOR `:268 pmc->begin()`): `tier.tier_reset_statistics();`
+  mit Kommentar: „#216-H2: Observer-Statistik nach Load nullen (daten-erhaltend) → axis_stats misst nur die Run-Phase;
+  Wall-Clock/PMC klammern weiterhin nur die Run-Phase." (Die geladenen Daten bleiben erhalten → read/scan-Profile gültig.)
+### (4) Stale-Kommentare (search_organ_ → container_algorithm_, #188-4c-Rename)
+- perm_runner.hpp:11-12, :165, :188, :191 referenzieren `search_organ_.reset()` — ersetze durch `container_algorithm_.reset()`
+  (der Member wurde in #188-4c umbenannt). NUR die Kommentare, keine Logik.
+### (5) iterator-Doku präzisieren
+- libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:177-185 (die stat_*-„PER-MESSUNG/WARMUP-FREI"-
+  Zusage) gilt bislang nur run_observable_perm; ergänze, dass sie DANK tier_reset_statistics() nach Load jetzt AUCH für den
+  Workload-Pfad (run_workload_perm) gilt.
+### (6) NEUER Test tests/unit/test_216h2_stat_reset_after_load.cpp
+- Baue ein store-backed Tier (Muster aus test_obs_phaseA/test_pathb_segment_timer übernehmen). Mache N Load-Inserts, rufe
+  `tier.tier_reset_statistics()`, dann M Run-Ops (Lookups/Inserts), dann `tier.tier_observe(&snap)`. Asserte, dass die
+  insert-getriebene T0-Statistik (axis_stats[0][...], z.B. via container_algorithm_.occupied_count()-Bezug) NUR die M Run-Ops
+  widerspiegelt, NICHT N+M — und dass die geladenen N Daten nach dem Reset noch da sind (ein Lookup auf einen Load-Key trifft).
+  Registriere den Test in tests/unit/CMakeLists.txt nach dem Muster benachbarter Tests (+ is_original-Codegen-Konsumenten-Liste
+  NUR falls der Test Achsen-Header mit is_original zieht).
+
+## HARTE CONSTRAINTS
+- god-header: EIN kohärenter Increment (abi_adapter.hpp + observable_tier.hpp-Deklaration + ABI-Version-Header + Loader +
+  perm_runner.hpp + iterator.hpp-Doku + Test). Keine anderen Achsen/Interfaces umbauen.
+- NIE anfassen: modules/**, ext/**, golden-Dateien, Registry-mp_list (Struktur/Reihenfolge).
+- Bestehenden Stil + clang-format-Konformität wahren (LLVM-basiert, 4-space, 120 cols; es gibt eine .clang-format im Repo-Root —
+  halte dich exakt daran, die CI prüft `clang-format --dry-run -Werror`).
+- cppcheck-sauber (die CI lint:static ist HART): keine uninitMember, keine ignoredReturnValue.
+- GIT: committe deine Änderungen IM Worktree auf dem Branch wt-216h2, message-Präfix „fix(#216-H2): ", mit Trailer-Zeile
+  „Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>". NICHT pushen, NICHT mergen (der Integrator merged+pusht).
+- Am Ende: liste die geänderten Dateien + 6-Zeilen-Zusammenfassung + ob/wie du den ABI-Major gebumpt hast (alte→neue Version).
+
+warning: skipping async hook in C:\Users\benja\.codex\plugins\cache\barkain-plugins\workflow-orchestrator\2.1.1\hooks\plugin-hooks.json: async hooks are not supported yet
+warning: skipping async hook in C:\Users\benja\.codex\plugins\cache\barkain-plugins\workflow-orchestrator\2.1.1\hooks\plugin-hooks.json: async hooks are not supported yet
+hook: SessionStart
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+codex
+Ich muss die Orchestrator-Regel aus dem lokalen Stub berücksichtigen. Da kein explizites `/workflow-orchestrator:delegate`-Tool verfügbar ist, delegiere ich die eigentliche Implementierung als vollständigen Worker-Task und prüfe danach Integration, Tests und Commit.
+hook: PreToolUse
+hook: PreToolUse
+2026-07-03T02:57:21.005429Z ERROR codex_core::tools::router: error=Full-history forked agents inherit the parent agent type, model, and reasoning effort; omit agent_type, model, and reasoning_effort, or spawn without a full-history fork.
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: SpawnAgent
+codex
+Der erste Delegationsaufruf wurde wegen einer Tool-Einschränkung abgewiesen: ein Full-History-Fork darf keine Agentenrolle überschreiben. Ich starte denselben Worker-Auftrag ohne Fork und gebe alle relevanten Anforderungen explizit mit.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: SpawnAgent
+hook: PostToolUse
+hook: PostToolUse Completed
+codex
+Der Worker hat jetzt den vollständigen Implementierungsauftrag inklusive Commit-Anforderung. Ich warte auf das Ergebnis und prüfe anschließend, ob noch Integrations- oder Verifikationslücken offen sind.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: Wait
+2026-07-03T02:58:37.260526Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 26.3 seconds
+Output:
+command timed out after 26252 milliseconds
+
+2026-07-03T02:59:15.727895Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 12.9 seconds
+Total output lines: 661
+Output:
+command timed out after 12937 milliseconds
+#pragma once
+// V41.F.6.1.R5.C.A3 — MammalAbiAdapter Production-Header (Module-Loader-Bruecke)
+//
+// User-Direktive 2026-05-27 frueh (Session-Doku Teil II §18, NEXT-Action R5.C.A3):
+// "AnatomyAbiAdapter Template von Test §5 in eigenen Production-Header verschieben
+//  (anatomy/abi_adapter.hpp). Wird in R5.E fuer Module-Factory benoetigt."
+//
+// Architektur-Rolle:
+// `MammalAbiAdapter<A>` bridge eine konkrete `SearchAlgorithmAnatomy<Composition>`
+// (Mammal-Gattung, Compile-Time-Concept) zur Runtime-ABI-Schicht (`IAnatomyBase`
+// → `IExecutionEngine`). Ein generierter Permutations-Binary (.so/.dll) wird in
+// R5.D/R5.E exakt EINEN solchen Adapter via `extern "C"` Factory exportieren.
+//
+// Bisheriger Stand: Adapter-Pattern war in tests/ lokal dupliziert in zwei Varianten:
+//   - test_v41_anatomy_base.cpp:110 AnatomyAbiAdapter (unvollstaendig, fehlte
+//     Lifecycle-Override — broken seit R5.C.A2 Wurzel-Inheritance)
+//   - test_v41_execution_engine.cpp:115 MammalAbiAdapter (vollstaendig, Vorlage)
+//
+// R5.C.A3 promoviert die vollstaendige Variante zum Production-Header und ersetzt
+// beide lokalen Test-Klassen.
+//
+// @doku docs/architektur/14_achsen_komposition_organ_metapher.md §35.3 + Session-Doku Teil II §18
+// @task #702 V41.F.6.1.R5.C.A3
+// @related [[execution-engine-als-wurzel]] [[anatomie-gattungen]]
+//          [[anatomie-nur-achsen-und-observer]]
+//
+// ── DATEI-NAVIGATION (god-header ~1805 Z.: EIN Adapter, viele ABI-Belange; bei Anker-Drift den
+//    jeweiligen `// ───`-Banner greppen — Zeilen-Anker sind approximativ) ──────────────────────────
+//   • SearchAlgorithmAbiAdapter<A>    — Klassen-Doku + Vererbungs-Matrix (MESSUNG-AN vs -AUS)     (~:127)
+//   • IExecutionEngine-Override       — Lifecycle warm_up/run/reset/shutdown + engine_name        (~:150)
+//   • IResourceControllableTier (KF-4)— tier_query_resource_caps / tier_apply_resource_control    (~:180)
+//        IMMER verfuegbar; 5 steuerbare Achsen (concurrency/prefetch/allocator/traversal/value_handle)
+//   • IAnatomyBase-Override           — composition_name / paper_id / genus / organ_count          (~:212)
+//   • IMeasurableWorkload (Pfad A)    — run_workload / _segmented (4 Seg) / _segmented_v2 (19 Seg)  (~:232)
+//   • IDriveableTier-Antrieb (IMMER)  — tier_insert/lookup/erase/clear/size (Pfad-B Observer-Auto-Kopplung)(~:672)
+//        + Observer (MESSUNG-AN)      — fill_observer_v3 (~:907) · fill_segment_timing_v3 (~:1136) · tier_observe (~:1312)
+//   • IRollbackableTier (MESSUNG-AN)  — memento_all: tier_save_all / tier_rollback_all (CoW)        (~:1331)
+//   • §3.3-Delegations-Diagnose       — const-Diagnosen, KEINE ABI-Flaeche (tier_rollback_is_exact …)(~:1463)
+//   • IScannableTier (MESSUNG-AN)     — tier_scan (YCSB-E Range-Scan)                               (~:1511)
+//   • IMigratableTier (MESSUNG-AN)    — tier_migrate_step (echter 2-Ebenen-Move, P4 #123)           (~:1557)
+//   • private Member (~:1631)         — container_algorithm_ (LayoutAwareChunkedStore<N,L,A>, ~:1680) + Mess-Organe + state_
+
+#include "anatomy_base.hpp"
+#include "measurable_workload.hpp"        // F15/Stufe B: optionales Mess-Sub-Interface (ABI-sicher)
+#include "observable_tier.hpp"            // R6/Pfad B: ABI-stabiler Observer-Zugriff (Doku 24 §8.6)
+#include "rollbackable_tier.hpp"          // V5-I6: memento_all-ABI-Sub-Interface (tier_save_all/tier_rollback_all)
+#include "scannable_tier.hpp"             // V5-#49-E: Range-Scan-ABI-Sub-Interface (tier_scan, YCSB-E)
+#include "resource_controllable_tier.hpp" // KF-4/L-MEAS: Laufzeit-Steuer-Sub-Interface (IMMER, nicht messungs-gated)
+#include "observer_aggregate.hpp"         // ObservableAxis + ObserverAggregate (observable_count)
+#include "memento_aggregate.hpp" // V5-I6-SUBSTANZ (#44): MementoAxis + save_axis/restore_axis (per-Achsen-Memento)
+#include "../execution_engine/execution_engine_base.hpp"
+// R6 Inkrement 2b: die allocator-Achse im Cross-ABI-Observer-POD — der ComposedStore<N,L,A>-Vector-Growth
+// treibt die Allocator-Statistik REAL (2. Mess-Achse, spiegelt builder/AnatomyExecutionContext). Da der
+// host-seitige Loader jetzt das LEICHTE anatomy_module_abi_v1_decl.hpp nutzt (NICHT mehr abi_adapter.hpp),
+// belasten diese topics/-Includes nur die Voll-Header-Konsumenten (DLLs/Tests, die die Pfade ohnehin haben).
+#include "../topics/traversal/axis_03a_search_algo/composable/observable_composed_search.hpp"
+// (E-Welle-A2 / Befund-2 / A2.5) Klassifikation + Mapping store-traversierbarer Such-Algos (für die container_algorithm_t-Traversal-Wahl)
+#include <axes/lookup/composable/store_traversable_search_algo.hpp>
+#include <axes/lookup/composable/traversal_for_search_algo.hpp>
+#include <axes/lookup/composable/organ_for_search_algo.hpp>         // #188-4b-b1b: organ_for_search_algo_t (Pool→Organ)
+#include <axes/lookup/composable/observable_composed_container.hpp> // #188-4b-b1b: ObservableComposedContainer<Organ>
+#include "../axes/node/axis_04_node_type_layout_aware_store.hpp" // Plan v2 S1: layout-honorierender Store (CLA-Stride echt, OOB behoben)
+// (X): ByteWiseKeyPrefix als kanonisches T3-Mess-Organ — IMMER deklariert (auch wenn die Composition
+// PatriciaPathCompression/PathCompressionNone trägt; der `else`-Zweig der T3-Treibe-Op qualifiziert den Namen).
+#include "../axes/path_compression/axis_02_path_compression_byte_wise.hpp"
+// Phase B (2026-06-04): Per-Achsen-Observer-Hüllen für T7 prefetch + T8 concurrency. Diese Hüllen halten ein
+// Mess-Organ (ObservablePrefetch<Strategy>/ObservableConcurrency<Strategy>) um die NACKTE Composition-Strategie
+// (anders als telemetry/memory_layout/… trägt die Composition für prefetch/concurrency die rohe Strategie, s.
+// art_reference.hpp). Der abi_adapter koppelt sie in tier_insert/lookup an die Tier-Op (Pfad-B Auto-Kopplung).
+#include "../axes/prefetch_axis/axis_07_prefetch_observable.hpp"
+#include "../axes/concurrency_axis/axis_08_concurrency_observable.hpp"
+// Phase B (2026-06-04): die value_handle- (T11) + isa- (T12) Observer-HÜLLEN. Analog T7/T8: gehalten als
+// EXPLIZITE Member-Organe über Composition::value_handle/isa (die — anders als memory_layout/telemetry — NICHT
+// per Registry-make_observable_* vorab dekoriert sind), getrieben über das ECHTE container_algorithm_-Slot-Backing
+// (store_observe_value_handle/store_observe_isa → NodeChunkedStore::organ_observe_*, analog layout/serialization).
+#include "../axes/value_handle_axis/axis_14_value_handle_observable.hpp"
+#include "../axes/simd/axis_09_isa_observable.hpp"
+// Phase B (2026-06-04) Abschluss: die 5 verbleibenden Observer-HÜLLEN. T3 path_compression (Instanz-Driver compress(),
+// auto-gekoppelt in tier_insert/lookup wie T1/T2) + T13 index_org / T14 io_dispatch / T15 migration_policy / T16 filter
+// (scan-Achsen, getrieben über das ECHTE container_algorithm_-Slot-Backing in fill_observer_v3, store_observe_* → NodeChunkedStore::
+// organ_observe_*, idempotenter reset()+scan, analog value_handle/isa/memory_layout/serialization). Anders als
+// telemetry/q1/q2 trägt die Composition für T3/T13/T14/T15/T16 die NACKTE Strategie (kein statistics()) → die Hülle hält
+// das Mess-Organ.
+#include "../axes/path_compression/axis_02_path_compression_observable.hpp"
+#include "../axes/index_organization/axis_01_index_organization_observable.hpp"
+#include "../axes/io_dispatch/axis_io_dispatch_observable.hpp"
+#include "../axes/migration_policy/axis_migration_observable.hpp"
+#include "../axes/filter_axis/axis_filter_observable.hpp"
+
+#include <array>
+#include <chrono>
+#include <cstring> // (X) std::memcpy in den 19-Segment-Treibe-Ops
+#if defined(_M_X64) || defined(__x86_64__)
+#include <xmmintrin.h> // (X) _mm_prefetch für das T7-Prefetch-Segment (MSVC/x86_64-Mess-Build)
+#endif
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <random>
+#include <string_view>
+#include <type_traits> // V5-I6: is_copy_constructible/assignable-Guards für die In-Memory-Memento-Kopie
+#include <utility>     // #133 CoW-Memento: std::declval im OrganStatsSnap-Typ-Extrakt
+#include <vector>      // keys-Ernte (Per-Achsen-Seg-Timing) + Memento-Snapshot-Listen (save_state)
+
+namespace comdare::cache_engine::anatomy {
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SearchAlgorithmAbiAdapter — bridge AnatomyConcept-konformer SearchAlgorithm-
+// Anatomie zu IAnatomyBase (Mammal-Gattung in Tier-Metapher, Doku 14 §27.2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// SearchAlgorithmAbiAdapter<A> — generischer Runtime-ABI-Adapter fuer die
+/// SearchAlgorithm-Gattung (Mammal in Tier-Metapher).
+///
+/// I1-Vereinheitlichung (Doc 36 §2.5/§4, TODO-6, 2026-06-25): DIES ist die EINE
+/// ABI-Laufzeit-SICHT des SearchAlgorithm-Lebewesens — in der Thesis (ch4 fig:abi)
+/// „SearchEngine" genannt. Es gibt KEINE zweite, achsentragende Engine-Hierarchie:
+/// die frueheren Legacy-Klassen comdare::search_engine<> / comdare::execution_engine<>
+/// (REV-7-„Drei-Schichten") waren ein toter Parallel-Baum und wurden ENTFERNT. Die 19
+/// Organe leben GENAU EINMAL in SearchAlgorithmAnatomy<A::composition_t>; die variadische
+/// Hybrid-Kollektion (1=>vector / 2=>map / N=>map<K,tuple>) lebt in search_algorithm_type_collection.
+/// Lebewesen == SearchAlgorithm; Anatomie = sein Koerper; „SearchEngine" = nur diese Sicht.
+///
+/// Vorbedingung: `A` erfuellt `AnatomyConcept` UND `A::genus() ==
+/// AnatomyGenus::SearchAlgorithm`. Der `static_assert` im Klassen-Body validiert
+/// die Gattung zur Compile-Zeit (Doku 14 §32 Gattungs-Constraint).
+///
+/// Verwendung (R5.E Module-Factory-Pattern):
+/// ```cpp
+/// // In generiertem Permutations-Binary (.so/.dll):
+/// extern "C" comdare::cache_engine::anatomy::IAnatomyBase*
+/// comdare_create_anatomy() {
+///     using A = comdare::cache_engine::anatomy::SearchAlgorithmAnatomy<MyComposition>;
+///     return new comdare::cache_engine::anatomy::SearchAlgorithmAbiAdapter<A>{};
+/// }
+/// ```
+///
+/// Lifecycle-Implementierung: der interne `state_` reflektiert die Pflicht-
+/// Phasen `Uninitialized → Warming → Running → Idle → Shutdown`; die Lifecycle-Hooks
+/// (warm_up/run/reset/shutdown) setzen NUR `state_` (kein eigener Preheat). Die echte
+/// Mess-Last/Bulk-Load laeuft separat ueber den Workload-Treiber (run_workload, s.u. IMeasurableWorkload).
+template <AnatomyConcept A>
+class SearchAlgorithmAbiAdapter final
+    : public IAnatomyBase,
+      public IResourceControllableTier, // KF-4/L-MEAS: IMMER (auch Messung-aus), eigenständiges Sub-Interface (dynamic_cast)
+// V5-I2.2/I6: Antrieb ⊥ Observer ⊥ Memento compile-time disjunkt (kein Diamond — IObservableTier/IRollbackableTier IS-A nichts Gemeinsames; IDriveableTier kommt über IObservableTier).
+//   MESSUNG-AN  : IObservableTier (Antrieb + tier_observe/observer_all) + IMeasurableWorkload (Pfad-A, host-relokal. I9) + IRollbackableTier (memento_all, V5-I6) + IScannableTier (Range-Scan, V5-#49-E).
+//   MESSUNG-AUS : NUR IDriveableTier (funktionaler Antrieb) → Release-/funktional-only-DLL OHNE jeden Mess-Overhead (kein Observer-, kein Memento-, kein Scan-vtable-Slot).
+#if COMDARE_MEASUREMENT_ON
+      public IObservableTier, // I1: GENAU EINE Observer-Schnittstelle (V2/V3/V4 konsolidiert, s. docs/architecture/31_*)
+      public IMeasurableWorkload,
+      public IMeasurableWorkloadV2, // (C-2): eigenständiges V2-Sub-Interface — per-Segment-Timer (4 Achsen)
+      public IMeasurableWorkloadV3, // (X): eigenständiges V3-Sub-Interface — per-Segment-Timer ALLER 19 Achsen
+      public IRollbackableTier,
+      public IMigratableTier, // P4 (#123): ECHTER 2-Ebenen-Migrations-Schritt (tier_moves real > 0)
+      public IScannableTier {
+#else
+      public IDriveableTier {
+#endif
+    static_assert(A::genus() == AnatomyGenus::SearchAlgorithm,
+                  "SearchAlgorithmAbiAdapter erwartet eine SearchAlgorithm-Gattung-"
+                  "Anatomie (AnatomyGenus::SearchAlgorithm). Cross-Genus-Adapter "
+                  "sind type-system-mathematisch unmoeglich — Doku 14 §32.");
+
+public:
+    // ─────────────────────────────────────────────────────────────────────
+    // IExecutionEngine-Pflicht-Override (R5.C.A2 Wurzel-Schicht)
+    // ─────────────────────────────────────────────────────────────────────
+
+    [[nodiscard]] std::string_view engine_name() const noexcept override { return A::composition_name(); }
+
+    [[nodiscard]] ::comdare::cache_engine::execution_engine::EngineLifecycleState
+    lifecycle_state() const noexcept override {
+        return state_;
+    }
+
+    void warm_up() override { state_ = ::comdare::cache_engine::execution_engine::EngineLifecycleState::Warming; }
+
+    /// R5.C.A4: Mess-Phase aktivieren — Lifecycle Warming/Idle → Running.
+    void run() override { state_ = ::comdare::cache_engine::execution_engine::EngineLifecycleState::Running; }
+
+    void reset() override { state_ = ::comdare::cache_engine::execution_engine::EngineLifecycleState::Idle; }
+
+    void shutdown() override { state_ = ::comdare::cache_engine::execution_engine::EngineLifecycleState::Shutdown; }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // KF-4 / L-MEAS — IResourceControllableTier (IMMER verfügbar, auch Messung-aus). Die SearchAlgorithm-Gattungs-
+    // Komposition trägt genau 5 laufzeit-steuerbare Achsen (concurrency/prefetch/allocator/traversal/value_handle);
+    // der Host-Loop (RuntimeVariableLoop) quert die Caps + wendet je dyn. Einstellung an (kein Reload). apply klammert
+    // an die Caps + merkt die zuletzt angewandte Steuerung (applied_rc_). Eigenständiges Sub-Interface (dynamic_cast).
+    // ─────────────────────────────────────────────────────────────────────
+    void tier_query_resource_caps(ComdareResourceControlV1* out_caps) const noexcept override {
+        if (out_caps == nullptr) return;
+        *out_caps                         = ComdareResourceControlV1{};
+        out_caps->thread_count            = 64;                       // concurrency (axis_08)
+        out_caps->prefetch_distance       = 64;                       // prefetch (axis_07), in Cache-Lines
+        out_caps->pool_budget_bytes       = (std::uint64_t{1} << 30); // allocator (axis_06), 1 GiB Arena-Obergrenze
+        out_caps->batch_size              = 4096;                     // traversal (axis_03a) Working-Set
+        out_caps->inline_threshold_bytes  = 256;                      // value_handle (axis_14)
+        out_caps->controllable_axis_count = 5;                        // genus-invariant: 5 steuerbare Achsen
+    }
+    [[nodiscard]] std::uint64_t tier_apply_resource_control(ComdareResourceControlV1 const* in) noexcept override {
+        if (in == nullptr) return 0;
+        ComdareResourceControlV1 caps{};
+        tier_query_resource_caps(&caps);
+        std::uint64_t applied = 0;
+        auto          apply1  = [&applied](std::uint64_t v, std::uint64_t cap, std::uint64_t& dst) noexcept {
+            if (v != 0) {
+                dst = (cap != 0 && v > cap) ? cap : v;
+                ++applied;
+            } // 0 = Default beibehalten; sonst an cap klammern
+        };
+        apply1(in->thread_count, caps.thread_count, applied_rc_.thread_count);
+        apply1(in->prefetch_distance, caps.prefetch_distance, applied_rc_.prefetch_distance);
+        apply1(in->pool_budget_bytes, caps.pool_budget_bytes, applied_rc_.pool_budget_bytes);
+        apply1(in->batch_size, caps.batch_size, applied_rc_.batch_size);
+        apply1(in->inline_threshold_bytes, caps.inline_threshold_bytes, applied_rc_.inline_threshold_bytes);
+        return applied;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // IAnatomyBase-Pflicht-Override (R5.C.A Anatomie-Schicht)
+    // ─────────────────────────────────────────────────────────────────────
+
+    [[nodiscard]] std::string_view composition_name() const noexcept override { return A::composition_name(); }
+
+    [[nodiscard]] std::string_view paper_id() const noexcept override { return A::paper_id(); }
+
+    [[nodiscard]] AnatomyGenus genus() const noexcept override { return A::genus(); }
+
+    [[nodiscard]] std::size_t organ_count() const noexcept override { return A::organ_count(); }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // IMeasurableWorkload-Override (F15 / Stufe B): Mess-Last DURCH die DLL
+    // ─────────────────────────────────────────────────────────────────────
+
+    // (C-2): Akkumulator der 4 per-Segment-ns über die Batches (nur Mess-Hilfsstruktur, quert die ABI NICHT).
+    struct SegmentAccumulator {
+        std::int64_t s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+    };
+
+    /// KOMPOSIT-Mess-Last (R5.B, F15 Stufe B) — uebt VIER Achsen der geladenen Komposition aus:
+    ///   Segment 1: insert/lookup auf A::composition_t::search_algo  (search_algo-Achse)
+    ///   Segment 2: alloc/dealloc-Churn ueber A::composition_t::allocator (allocator-Achse)
+    ///   Segment 3: Feld-Scan ueber A::composition_t::memory_layout (memory_layout-Achse; AoS-strided
+    ///              vs SoA-contiguous → echter Cache-Effekt)
+    ///   Segment 4: Encode-Scan ueber A::composition_t::serialization (serialization-Achse; raw <
+    ///              compressed < var_len < succinct CPU-Aufwand, Doku 22 §4)
+    /// Alle vier kompiliert IN der DLL; die Batch-Latenz misst die GANZE Komposition entlang der
+    /// variierten Achsen. F15s paarweiser Holm-Test isoliert jede Achse (Paare, die sich nur in einer
+    /// Achse unterscheiden) — Dominanz/Balance der Segmente ist dafuer irrelevant.
+#if COMDARE_MEASUREMENT_ON // V5-I2.2: Pfad-A run_workload NUR bei Messung-AN (V3-Designfehler; host-relokalisiert in I9)
+    [[nodiscard]] std::uint64_t run_workload(std::uint64_t ops_per_batch, std::uint64_t batches, std::uint64_t seed,
+                                             std::int64_t* out_latencies_ns,
+                                             std::uint64_t out_capacity) noexcept override {
+        if (out_latencies_ns == nullptr || out_capacity == 0 || batches == 0 || ops_per_batch == 0) { return 0; }
+        try {
+            using SearchAlgo = typenam…1824 tokens truncated…                 alloc;
+            constexpr std::size_t     kChurn = 2048;
+            constexpr std::size_t     kAlign = 16;
+            std::array<void*, kChurn> blocks{};
+            auto const churn_size = [](std::size_t j) noexcept { return std::size_t{16} + ((j * 16u) & 0xF0u); };
+            // LAYOUT-FIX (X-§4): kRecordSize=48 + kLbufBytes nach größtmöglichem Layout-Stride (64) dimensioniert
+            // (OOB-Schutz), identisch zu run_workload. So differenziert die memory_layout-Achse aos_strict(48) vs
+            // cache_line_aligned(64).
+            constexpr std::size_t kRecords    = 16384;
+            constexpr std::size_t kRecordSize = 48;
+            constexpr std::size_t kLbufBytes  = kRecords * 64; // OOB-Schutz: größtmöglicher Layout-Stride (64)
+            unsigned char*        lbuf        = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, 64));
+            for (std::size_t i = 0; i < kLbufBytes; ++i) lbuf[i] = static_cast<unsigned char>(i * 31u + 7u);
+            std::mt19937_64 rng{seed};
+            using clock = std::chrono::steady_clock;
+            auto seg_ns = [](clock::time_point a, clock::time_point b) noexcept -> std::int64_t {
+                return std::chrono::duration_cast<std::chrono::nanoseconds>(b - a).count();
+            };
+            SegmentAccumulator acc{};
+            std::uint64_t      sink         = 0;
+            auto               do_seg_batch = [&]() {
+                auto const s1a = clock::now();
+                for (std::uint64_t i = 0; i < ops_per_batch; ++i) {
+                    auto v = algo.lookup(static_cast<K>(rng() & 0xFFu));
+                    if (v) sink += *v;
+                }
+                auto const s1b = clock::now();
+                for (std::size_t j = 0; j < kChurn; ++j) {
+                    void* p                         = alloc.allocate(churn_size(j), kAlign);
+                    *static_cast<unsigned char*>(p) = static_cast<unsigned char>(j);
+                    sink += *static_cast<unsigned char*>(p);
+                    blocks[j] = p;
+                }
+                for (std::size_t j = 0; j < kChurn; ++j) alloc.deallocate(blocks[j], churn_size(j), kAlign);
+                auto const s2b = clock::now();
+                sink += MemLayout::scan_field_sum(lbuf, kRecords, kRecordSize);
+                auto const s3b = clock::now();
+                sink += Serializer::serialize_scan(lbuf, kRecords, kRecordSize);
+                auto const s4b = clock::now();
+                acc.s1 += seg_ns(s1a, s1b);
+                acc.s2 += seg_ns(s1b, s2b);
+                acc.s3 += seg_ns(s2b, s3b);
+                acc.s4 += seg_ns(s3b, s4b);
+            };
+            do_seg_batch(); // Warmup (verworfen) — acc zurücksetzen
+            acc = SegmentAccumulator{};
+            for (std::uint64_t b = 0; b < batches; ++b) do_seg_batch();
+            alloc.deallocate(lbuf, kLbufBytes, 64);
+            out->seg_search_algo_ns   = (sink == ~0ull) ? (acc.s1 ^ 1) : acc.s1; // sink-Nutzung gegen Wegoptimierung
+            out->seg_allocator_ns     = acc.s2;
+            out->seg_memory_layout_ns = acc.s3;
+            out->seg_serialization_ns = acc.s4;
+            out->total_ns             = acc.s1 + acc.s2 + acc.s3 + acc.s4;
+            out->batches_measured     = batches;
+            return batches;
+        } catch (...) {
+            *out = ComdareSegmentLatencyV1{};
+            return 0;
+        }
+    }
+
+    // (X): per-Segment-Timer-Variante auf ALLE 19 SearchAlgorithm-Achsen ausgeweitet. Je Achse ein eigener
+    // steady_clock-Timer, über die batches AUFSUMMIERT → echte per-Achsen-ns für T0..T18 (kein n/a mehr).
+    // Seg-Index = kCompositionAxisNames-Reihenfolge (axis_path_serialization.hpp): 0 search_algo … 18 queuing_q2.
+    // Setup je Achse EINMAL vor der Batch-Schleife (Instanz + register/fill), gemessen wird nur die Op-Schleife.
+    // sink-Akkumulation gegen Wegoptimierung. COMDARE_MEASUREMENT_ON-gegated (wie run_workload_segmented).
+    //
+    // EHRLICHKEIT [[no-success-marks-without-literal-output]]: jede Achse treibt eine REALE, strategie-abhängige
+    // Op (die in §5 der Spec deklarierten synthetischen Mindest-Ops sind in den jeweiligen Wrapper-Doc-Kommentaren
+    // als SIMULATION gekennzeichnet — keine konstanten/erfundenen Werte). None-artige Strategien (prefetch_none,
+    // concurrency_none, migration_none) sind bewusste 0-Overhead-Baselines (so deklariert), KEINE n/a.
+    [[nodiscard]] std::uint64_t run_workload_segmented_v2(std::uint64_t ops_per_batch, std::uint64_t batches,
+                                                          std::uint64_t            seed,
+                                                          ComdareSegmentLatencyV2* out) noexcept override {
+        if (out == nullptr) return 0;
+        *out = ComdareSegmentLatencyV2{};
+        if (batches == 0 || ops_per_batch == 0) return 0;
+        try {
+            using SearchAlgo      = typename A::composition_t::search_algo;
+            using CacheTraversal  = typename A::composition_t::cache_traversal;
+            using Mapping         = typename A::composition_t::mapping;
+            using PathCompression = typename A::composition_t::path_compression;
+            using NodeType        = typename A::composition_t::node_type;
+            using MemLayout       = typename A::composition_t::memory_layout;
+            using Allocator       = typename A::composition_t::allocator;
+            using Prefetch        = typename A::composition_t::prefetch;
+            using Concurrency     = typename A::composition_t::concurrency;
+            using Serializer      = typename A::composition_t::serialization;
+            using Telemetry       = typename A::composition_t::telemetry;
+            using ValueHandle     = typename A::composition_t::value_handle;
+            using Isa             = typename A::composition_t::isa;
+            using IndexOrg        = typename A::composition_t::index_organization;
+            using IoDispatch      = typename A::composition_t::io_dispatch;
+            using Migration       = typename A::composition_t::migration_policy;
+            using Filter          = typename A::composition_t::filter;
+            using QueuingQ1       = typename A::composition_t::queuing_q1;
+            using QueuingQ2       = typename A::composition_t::queuing_q2;
+            using K               = typename SearchAlgo::key_type;
+
+            // ── Setup (EINMAL, NICHT gemessen) ───────────────────────────────────────────────────────────
+            SearchAlgo algo;
+            for (int k = 0; k < 256; ++k) algo.insert(static_cast<K>(k), static_cast<std::uint64_t>(k) * 7u + 1u);
+
+            CacheTraversal traversal; // T1: register K Einträge → resolve N-fach
+            using TV                    = typename CacheTraversal::value_type;
+            constexpr std::size_t kTrav = 256;
+            for (std::size_t k = 0; k < kTrav; ++k)
+                traversal.register_entry(static_cast<typename CacheTraversal::key_type>(k),
+                                         static_cast<TV>(k * 7u + 1u));
+
+            Mapping               mapping; // T2: register K Slots → resolve_offset N-fach
+            constexpr std::size_t kSlots = 256;
+            for (std::size_t s = 0; s < kSlots; ++s)
+                mapping.register_slot(static_cast<typename Mapping::slot_index_type>(s),
+                                      static_cast<typename Mapping::offset_type>(s * 64u));
+
+            Allocator                 alloc;
+            constexpr std::size_t     kChurn = 2048;
+            constexpr std::size_t     kAlign = 16;
+            std::array<void*, kChurn> blocks{};
+            auto const churn_size = [](std::size_t j) noexcept { return std::size_t{16} + ((j * 16u) & 0xF0u); };
+
+            // LAYOUT-FIX (X-§4): kRecordSize=48; Lbuf nach größtmöglichem Stride (64) dimensioniert (OOB-Schutz).
+            // path_descend_scan (T3 Patricia) liest 8 B/Record → record_size>=8 sicher (letzter Read (kRecords-1)*48+8).
+            constexpr std::size_t kRecords    = 16384;
+            constexpr std::size_t kRecordSize = 48;
+            constexpr std::size_t kLbufBytes  = kRecords * 64;
+            unsigned char*        lbuf        = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, 64));
+            for (std::size_t i = 0; i < kLbufBytes; ++i) lbuf[i] = static_cast<unsigned char>(i * 31u + 7u);
+
+            // Query-Puffer für T16 filter_probe_scan (1 Byte je Query).
+            constexpr std::size_t               kQueries = 4096;
+            std::array<unsigned char, kQueries> qbuf{};
+            for (std::size_t i = 0; i < kQueries; ++i) qbuf[i] = static_cast<unsigned char>(i * 53u + 11u);
+
+            Telemetry telemetry_local; // T10: eigenes Segment (entkoppelt vom Cross-ABI-Auto-Coupling)
+            QueuingQ1 q1_local;        // T17: put/get-Churn
+            QueuingQ2 q2_local;        // T18: should_flush/on_flush_complete
+            using QElem = typename QueuingQ1::element_type;
+
+            // GAP #2 Re-Grounding (P5d-Rest, User-Plan dynamic-frolicking-truffle Step 3, 2026-06-18): das T7-Segment
+            // (Pfad-A, isolierte Achsen-Zeit seg_prefetch_ns) misst NICHT MEHR nur synthetisches lbuf-Prefetch, sondern
+            // den REALEN Descent-Prefetch auf einen lokalen LayoutAwareChunkedStore mit echten Records — STRATEGIE-DISTINKT
+            // via der bereits committeten PrefetchDescentPolicy<Prefetch> / observe_prefetch_descent (K9-Fix). Damit ist
+            // seg_prefetch_ns real + per-Strategie differenziert (none=0 _mm_prefetch / hardware/distance/path>0), genau
+            // wie der Pfad-B-Hot-Path (Z.1150 ff). Setup EINMAL (NICHT gemessen), gleicher Store-Typ wie container_algorithm_:
+            // LayoutAwareChunkedStore<node_type, memory_layout, allocator> der Composition. Die anderen 18 Segmente
+            // bleiben UNVERAENDERT (rein additiv im T7). @related [[reference_thesis_core_contribution_axis_library]]
+            using PfStore = ::comdare::cache_engine::node::LayoutAwareChunkedStore<NodeType, MemLayout, Allocator>;
+            PfStore               pf_store;        // T7: lokaler realer Store (echte Slot-Adressen)
+            constexpr std::size_t kPfSlots = 4096; // genug echte Records fuer Distance/Path-Voraus
+            for (std::size_t i = 0; i < kPfSlots; ++i)
+                pf_store.append_slot(static_cast<typename PfStore::key_type>(i * 2654435761ull + 1u),
+                                     static_cast<typename PfStore::value_type>(i * 7u + 1u));
+            ::comdare::cache_engine::prefetch_axis::ObservablePrefetch<Prefetch> pf_seg_organ{}; // T7-Mess-Organ
+
+            std::mt19937_64 rng{seed};
+            using clock = std::chrono::steady_clock;
+            auto seg_ns = [](clock::time_point a, clock::time_point b) noexcept -> std::int64_t {
+                return std::chrono::duration_cast<std::chrono::nanoseconds>(b - a).count();
+            };
+            std::int64_t  acc[19] = {};
+            std::uint64_t sink    = 0;
+
+            // ── EIN Batch: die 19 Achsen-Segmente, jedes einzeln gezeitet (Index = Seg-Map T0..T18) ─────────
+            auto do_seg19 = [&]() {
+                clock::time_point t0, t1;
+                // T0 search_algo: Lookups auf der geladenen Such-Struktur.
+                t0 = clock::now();
+                for (std::uint64_t i = 0; i < ops_per_batch; ++i) {
+                    auto v = algo.lookup(static_cast<K>(rng() & 0xFFu));
+                    if (v) sink += *v;
+                }
+                t1 = clock::now();
+                acc[0] += seg_ns(t0, t1);
+                // T1 cache_traversal: resolve N-fach.
+                t0 = clock::now();
+                for (std::uint64_t i = 0; i < ops_per_batch; ++i) {
+                    auto v = traversal.resolve(static_cast<typename CacheTraversal::key_type>(rng() % kTrav));
+                    if (v) sink += static_cast<std::uint64_t>(*v);
+                }
+                t1 = clock::now();
+                acc[1] += seg_ns(t0, t1);
+                // T2 mapping: resolve_offset N-fach.
+                t0 = clock::now();
+                for (std::uint64_t i = 0; i < ops_per_batch; ++i) {
+                    auto o = mapping.resolve_offset(static_cast<typename Mapping::slot_index_type>(rng() % kSlots));
+                    if (o) sink += static_cast<std::uint64_t>(*o);
+                }
+                t1 = clock::now();
+                acc[2] += seg_ns(t0, t1);
+                // T3 path_compression: Patricia → path_descend_scan; sonst (ByteWise/None) → kanonisches
+                // ByteWiseKeyPrefix::common_prefix_len-Organ über den Record-Puffer (echtes Mess-Organ der Achse).
+                t0 = clock::now();
+                if constexpr (requires { PathCompression::path_descend_scan(lbuf, kRecords, kRecordSize); }) {
+                    sink += PathCompression::path_descend_scan(lbuf, kRecords, kRecordSize);
+                } else {
+                    for (std::size_t i = 0; i < kRecords; ++i) {
+                        std::uint64_t key;
+                        std::memcpy(&key, lbuf + i * kRecordSize, sizeof(key));
+                        auto const prefix =
+                            ::comdare::cache_engine::path_compression::ByteWiseKeyPrefix::from_bytes(key, 7u);
+                        sink += prefix.common_prefix_len(key >> 8U);
+                    }
+                }
+                t1 = clock::now();
+                acc[3] += seg_ns(t0, t1);
+                // T4 node_type: node_find_scan (KF-6 Pflicht-API, order-sensitiver Probe-Scan).
+                t0 = clock::now();
+                sink += NodeType::node_find_scan(lbuf, kRecords, qbuf.data(), kQueries);
+                t1 = clock::now();
+                acc[4] += seg_ns(t0, t1);
+                // T5 memory_layout: scan_field_sum (layout-charakteristischer Stride; aos_strict 48 vs CLA 64).
+                t0 = clock::now();
+                sink += MemLayout::scan_field_sum(lbuf, kRecords, kRecordSize);
+                t1 = clock::now();
+                acc[5] += seg_ns(t0, t1);
+                // T6 allocator: alloc → touch → dealloc-Churn (Pool reused Free-Lists).
+                t0 = clock::now();
+                for (std::size_t j = 0; j < kChurn; ++j) {
+                    void* p                         = alloc.allocate(churn_size(j), kAlign);
+                    *static_cast<unsigned char*>(p) = static_cast<unsigned char>(j);
+                    sink += *static_cast<unsigned char*>(p);
+                    blocks[j] = p;
+                }
+                for (std::size_t j = 0; j < kChurn; ++j) alloc.deallocate(blocks[j], churn_size(j), kAlign);
+                t1 = clock::now();
+                acc[6] += seg_ns(t0, t1);
+                // T7 prefetch: GAP #2 Re-Grounding (P5d-Rest, 2026-06-18) — der isolierte Pfad-A-Achsen-Timer misst jetzt
+                // den REALEN Descent-Prefetch auf den lokalen pf_store (echte Slot-Adressen), STRATEGIE-DISTINKT via der
+                // committeten PrefetchDescentPolicy<Prefetch> / observe_prefetch_descent (identisch zum Pfad-B-Hot-Path):
+                //   • none      → 0 reale _mm_prefetch (0-Overhead-Baseline; kleinste Latenz, ehrlich).
+                //   • hardware  → 1 _mm_prefetch je Op auf den aktuellen realen Slot.
+                //   • distance  → 1 _mm_prefetch auf den realen Slot i+N voraus.
+                //   • path      → MEHRERE _mm_prefetch (Bundle entlang des Pfads).
+                // Damit ist seg_prefetch_ns REAL + per-Strategie differenziert statt synthetisches-lbuf-Prefetch. Der
+                // descent-Slot je Op ist eine echte (geklemmte) Position im realen Backing (kein OOB, descent_for_pf_).
+                // is_active() statisch → kein zusaetzlicher Instanz-Bedarf der Strategie selbst (pf_seg_organ haelt die Huelle).
+                t0 = clock::now();
+                {
+                    std::size_t const pf_n = pf_store.slot_count();
+                    if (pf_n != 0) {
+                        for (std::uint64_t i = 0; i < ops_per_batch; ++i) {
+                            std::size_t const slot =
+                                static_cast<std::size_t>(rng()) % pf_n; // echter, in-range Descent-Slot
+                            pf_seg_organ.observe_prefetch_descent(pf_store,
+                                                                  slot); // REALES _mm_prefetch (strat-distinkt)
+                        }
+                    }
+                }
+                sink += MemLayout::scan_field_sum(lbuf, kRecords,
+                                                  kRecordSize); // Re-Scan (Prefetch-Hint-Wirkung auf den Layout-Scan)
+                t1 = clock::now();
+                acc[7] += seg_ns(t0, t1);
+                // T8 concurrency: acquire/release um eine Mini-Critical-Section N-fach (strategie-charakteristisches
+                // Sync-Primitiv: None=no-op, Blocking=mutex, LockFree=CAS, …). if-constexpr-detektiert (optionale Op).
+                t0 = clock::now();
+                if constexpr (requires {
+                                  Concurrency::acquire();
+                                  Concurrency::release();
+                              }) {
+                    for (std::uint64_t i = 0; i < ops_per_batch; ++i) {
+                        Concurrency::acquire();
+                        sink += (i & 1u);
+                        Concurrency::release();
+                    }
+                } else {
+                    for (std::uint64_t i = 0; i < ops_per_batch; ++i)
+                        sink += (i & 1u); // ehrlicher No-Sync-Baseline-Fall
+                }
+                t1 = clock::now();
+                acc[8] += seg_ns(t0, t1);
+                // T9 serialization: serialize_scan (strategie-charakteristischer Encode-CPU-Aufwand).
+                t0 = clock::now();
+                sink += Serializer::serialize_scan(lbuf, kRecords, kRecordSize);
+                t1 = clock::now();
+                acc[9] += seg_ns(t0, t1);
+                // T10 telemetry: record_node_touch N-fach (eigenes Segment, lokales Organ).
+                t0 = clock::now();
+                if constexpr (requires { telemetry_local.record_node_touch(true); }) {
+                    for (std::uint64_t i = 0; i < ops_per_batch; ++i) {
+                        telemetry_local.record_node_touch((i & 1u) != 0u);
+                    }
+                    sink += static_cast<std::uint64_t>(ops_per_batch);
+                } else {
+                    sink += static_cast<std::uint64_t>(ops_per_batch);
+                }
+                t1 = clock::now();
+                acc[10] += seg_ns(t0, t1);
+                // T11 value_handle: value_access_scan (strategie-charakteristische Deref-Last).
+                t0 = clock::now();
+                sink += ValueHandle::value_access_scan(lbuf, kRecords, kRecordSize);
+                t1 = clock::now();
+                acc[11] += seg_ns(t0, t1);
+                // T12 isa: simd_field_sum (SSE2 bei Amd64 / Scalar-Fallback sonst). Nur (buf,n) — kein record_size.
+                t0 = clock::now();
+                sink += Isa::simd_field_sum(lbuf, kRecords);
+                t1 = clock::now();
+                acc[12] += seg_ns(t0, t1);
+                // T13 index_organization: index_org_scan (sequential/random/embedded/unordered je Strategie).
+                t0 = clock::now();
+                sink += IndexOrg::index_org_scan(lbuf, kRecords, kRecordSize);
+
+2026-07-03T03:00:37.338904Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 7.5 seconds
+Output:
+rg: tests\unit\test_*.cpp: IO error for operation on tests\unit\test_*.cpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+
+2026-07-03T03:01:03.088198Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 5.5 seconds
+Output:
+
+2026-07-03T03:01:03.126698Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 5.4 seconds
+Output:
+
+2026-07-03T03:02:23.210250Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to read file to update C:\Users\benja\comdare-wt\216h2\libs\cache_engine\anatomy\observable_tier.hpp: failed to prepare fs sandbox: failed to prepare windows sandbox wrapper: windows unelevated restricted-token sandbox cannot enforce split writable root sets directly; refusing to run unsandboxed
+2026-07-03T03:02:41.514190Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to read file to update C:\Users\benja\comdare-wt\216h2\libs\cache_engine\anatomy\observable_tier.hpp: failed to prepare fs sandbox: failed to prepare windows sandbox wrapper: windows unelevated restricted-token sandbox cannot enforce split writable root sets directly; refusing to run unsandboxed
+2026-07-03T03:04:14.217678Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 4.2 seconds
+Output:
+[31;1mException: [0m
+[31;1m[36;1mLine |[0m
+[31;1m[36;1m[36;1m 122 | [0m if (-not $s.Contains($anchor)) { [36;1mthrow 'private anchor not found'[0m }[0m
+[31;1m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[31;1m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mprivate anchor not found[0m
+
+2026-07-03T03:05:25.966542Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 4.3 seconds
+Output:
+[31;1mException: [0m
+[31;1m[36;1mLine |[0m
+[31;1m[36;1m[36;1m 118 | [0m if (-not $s.Contains($anchor)) { [36;1mthrow 'private anchor not found'[0m }[0m
+[31;1m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[31;1m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mprivate anchor not found[0m
+
+codex
+Die Delegation läuft noch länger als erwartet, was bei ABI-Bump plus Testeinbau plausibel ist. Ich lasse den Worker weiterlaufen und warte auf den Abschluss, bevor ich etwas final bewerte.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: Wait
+2026-07-03T03:13:12.106017Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 3.5 seconds
+Output:
+
+2026-07-03T03:13:25.809136Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 2.8 seconds
+Output:
+
+    Directory: C:\Users\benja\comdare-wt\216h2
+
+[32;1mMode   [0m[32;1m              LastWriteTime[0m[32;1m         Length[0m[32;1m Name[0m
+[32;1m----   [0m [32;1m             -------------[0m [32;1m        ------[0m [32;1m----[0m
+-a---          03.07.2026    04:50           1770 .clang-format
+C:\Program Files\CMake\bin\cmake.exe
+
+
+2026-07-03T03:13:59.587545Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 1 seconds
+Output:
+CMake Error: Unable to (re)create the private pkgRedirects directory:
+  C:/Users/benja/comdare-wt/216h2/build/msvc-release/CMakeFiles/pkgRedirects
+This may be caused by not having read/write access to the build directory.
+Try specifying a location with read/write access like:
+  cmake -B build
+If using a CMake presets file, ensure that preset parameter
+'binaryDir' expands to a writable directory.
+
+
+2026-07-03T03:14:32.073485Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 1 seconds
+Output:
+
+2026-07-03T03:14:41.320148Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.9 seconds
+Output:
+CMake Error: Unable to (re)create the private pkgRedirects directory:
+  C:/tmp/comdare-216h2-build/CMakeFiles/pkgRedirects
+This may be caused by not having read/write access to the build directory.
+Try specifying a location with read/write access like:
+  cmake -B build
+If using a CMake presets file, ensure that preset parameter
+'binaryDir' expands to a writable directory.
+
+
+2026-07-03T03:17:22.924645Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 71.5 seconds
+Output:
+MSBuild-Version 17.14.40+3e7442088 für .NET Framework
+
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(548,5): warning MSB8029: Das Zwischenverzeichnis oder das Ausgabeverzeichnis darf nicht im temporären Verzeichnis enthalten sein, da dies zu Problemen mit dem inkrementellen Build führen kann. [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\ZERO_CHECK.vcxproj]
+  Checking File Globs
+  1>Checking Build System
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(548,5): warning MSB8029: Das Zwischenverzeichnis oder das Ausgabeverzeichnis darf nicht im temporären Verzeichnis enthalten sein, da dies zu Problemen mit dem inkrementellen Build führen kann. [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\_deps\googletest-build\googletest\gtest.vcxproj]
+  Building Custom Rule C:/Users/benja/AppData/Local/Temp/comdare-216h2-build/_deps/googletest-src/googletest/CMakeLists.txt
+  gtest-all.cc
+  gtest.vcxproj -> C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\lib\Release\gtest.lib
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(548,5): warning MSB8029: Das Zwischenverzeichnis oder das Ausgabeverzeichnis darf nicht im temporären Verzeichnis enthalten sein, da dies zu Problemen mit dem inkrementellen Build führen kann. [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\_deps\googletest-build\googletest\gtest_main.vcxproj]
+  Building Custom Rule C:/Users/benja/AppData/Local/Temp/comdare-216h2-build/_deps/googletest-src/googletest/CMakeLists.txt
+  gtest_main.cc
+  gtest_main.vcxproj -> C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\lib\Release\gtest_main.lib
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(548,5): warning MSB8029: Das Zwischenverzeichnis oder das Ausgabeverzeichnis darf nicht im temporären Verzeichnis enthalten sein, da dies zu Problemen mit dem inkrementellen Build führen kann. [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\tests\unit\test_216h2_stat_reset_after_load.vcxproj]
+  Building Custom Rule C:/Users/benja/comdare-wt/216h2/tests/unit/CMakeLists.txt
+  Quellen werden auf Modulabhängigkeiten überprüft...
+  test_216h2_stat_reset_after_load.cpp
+C:\Users\benja\comdare-wt\216h2\libs\cache_engine\axes\alloc\axis_06_allocator_mimalloc.hpp(38,10): error C1083: Datei (Include) kann nicht geöffnet werden: "topics/allocator/axis_06_allocator/legacy_code/paper_a04_mimalloc_is_original.hpp": No such file or directory [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\tests\unit\test_216h2_stat_reset_after_load.vcxproj]
+  (Quelldatei „../../../../../../comdare-wt/216h2/tests/unit/test_216h2_stat_reset_after_load.cpp“ wird kompiliert)
+  
+C:\Users\benja\comdare-wt\216h2\libs\cache_engine\axes/alloc/axis_06_allocator_mimalloc.hpp(38,10): fatal  error C1083: Datei (Include) kann nicht ge├Âffnet werden: "topics/allocator/axis_06_allocator/legacy_code/paper_a04_mimalloc_is_original.hpp": No such file or directory [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\tests\unit\test_216h2_stat_reset_after_load.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(532,5): warning MSB8074: Die Modulabhängigkeitsdatei "test_216h2_stat_reset_after_load.dir\Release\test_216h2_stat_reset_after_load.cpp.module.json" kann nicht gelesen werden: Element "root" aus Namespace "" wird erwartet.. Gefunden: "None" mit dem Namen "", Namespace "". . Die Buildreihenfolge ist möglicherweise falsch. [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\tests\unit\test_216h2_stat_reset_after_load.vcxproj]
+  Kompilieren...
+  test_216h2_stat_reset_after_load.cpp
+C:\Users\benja\comdare-wt\216h2\libs\cache_engine\axes\alloc\axis_06_allocator_mimalloc.hpp(38,10): error C1083: Datei (Include) kann nicht geöffnet werden: "topics/allocator/axis_06_allocator/legacy_code/paper_a04_mimalloc_is_original.hpp": No such file or directory [C:\Users\benja\AppData\Local\Temp\comdare-216h2-build\tests\unit\test_216h2_stat_reset_after_load.vcxproj]
+  (Quelldatei „../../../../../../comdare-wt/216h2/tests/unit/test_216h2_stat_reset_after_load.cpp“ wird kompiliert)
+  
+
+codex
+Der Worker ist nach zwei langen Warteschritten noch nicht fertig. Ich frage jetzt gezielt nach Status, damit wir nicht auf einen hängenden Build oder Testlauf warten.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: SendInput
+codex
+Ich habe den laufenden Worker um einen konkreten Status gebeten. Wenn er blockiert ist, werde ich die verbleibenden Schritte gezielt übernehmen oder die Blockade transparent machen.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: Wait
+2026-07-03T03:25:49.475361Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 1 seconds
+Output:
+Traceback (most recent call last):
+  File "<stdin>", line 20, in <module>
+  File "C:\Users\benja\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u22a5' in position 73: character maps to <undefined>
+
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: CloseAgent
+codex
+S1/#216-H2 ist implementiert und verifiziert, aber **nicht committed**: `git add` scheitert, weil der echte Gitdir außerhalb des schreibbaren Sandbox-Bereichs liegt (`.../.git/modules/.../worktrees/216h21`). Ich kann ohne erweiterte Rechte hier keinen `index.lock` anlegen.
+
+Geänderte Dateien:
+- `libs/cache_engine/anatomy/observable_tier.hpp`
+- `libs/cache_engine/anatomy/abi_adapter.hpp`
+- `libs/cache_engine/builder/experiment_tree/perm_runner.hpp`
+- `libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp`
+- `include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp`
+- `libs/cache_engine/builder/anatomy_module_loader/best_binary_selector.hpp`
+- `tests/unit/CMakeLists.txt`
+- `tests/unit/test_216h2_stat_reset_after_load.cpp`
+- zusätzlich betroffene Mock/ABI-Teststellen
+
+Zusammenfassung:
+1. `IObservableTier::tier_reset_statistics() noexcept` als neue ABI-Methode ergänzt.
+2. `SearchAlgorithmAbiAdapter` nutzt jetzt `reset_axis_statistics_()` daten-erhaltend.
+3. `tier_clear()` bleibt Daten-clear + Statistik-reset; `tier_reset_statistics()` resetet nur Stats.
+4. `run_workload_perm` ruft nach Load und vor PMC/Run den Statistik-reset auf.
+5. Iterator-Doku und stale `search_organ_`-Kommentare aktualisiert.
+6. Neuer Regressionstest belegt: Load-Daten bleiben erhalten, T0 zählt nur Run-Inserts.
+
+ABI-Bump: `3.0 -> 4.0`, Magic `.A3.` -> `.A4.`.
+
+Verifikation:
+- `git diff --check`: passed
+- CMake configure: passed
+- Targeted tests: 7/7 passed
+- `clang-format` war nicht auf `PATH`, daher nicht direkt ausführbar.
+hook: Stop
+hook: Stop Failed
+tokens used
+63.955
+S1/#216-H2 ist implementiert und verifiziert, aber **nicht committed**: `git add` scheitert, weil der echte Gitdir außerhalb des schreibbaren Sandbox-Bereichs liegt (`.../.git/modules/.../worktrees/216h21`). Ich kann ohne erweiterte Rechte hier keinen `index.lock` anlegen.
+
+Geänderte Dateien:
+- `libs/cache_engine/anatomy/observable_tier.hpp`
+- `libs/cache_engine/anatomy/abi_adapter.hpp`
+- `libs/cache_engine/builder/experiment_tree/perm_runner.hpp`
+- `libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp`
+- `include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp`
+- `libs/cache_engine/builder/anatomy_module_loader/best_binary_selector.hpp`
+- `tests/unit/CMakeLists.txt`
+- `tests/unit/test_216h2_stat_reset_after_load.cpp`
+- zusätzlich betroffene Mock/ABI-Teststellen
+
+Zusammenfassung:
+1. `IObservableTier::tier_reset_statistics() noexcept` als neue ABI-Methode ergänzt.
+2. `SearchAlgorithmAbiAdapter` nutzt jetzt `reset_axis_statistics_()` daten-erhaltend.
+3. `tier_clear()` bleibt Daten-clear + Statistik-reset; `tier_reset_statistics()` resetet nur Stats.
+4. `run_workload_perm` ruft nach Load und vor PMC/Run den Statistik-reset auf.
+5. Iterator-Doku und stale `search_organ_`-Kommentare aktualisiert.
+6. Neuer Regressionstest belegt: Load-Daten bleiben erhalten, T0 zählt nur Run-Inserts.
+
+ABI-Bump: `3.0 -> 4.0`, Magic `.A3.` -> `.A4.`.
+
+Verifikation:
+- `git diff --check`: passed
+- CMake configure: passed
+- Targeted tests: 7/7 passed
+- `clang-format` war nicht auf `PATH`, daher nicht direkt ausführbar.

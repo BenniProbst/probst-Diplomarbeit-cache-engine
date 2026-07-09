@@ -1,0 +1,53 @@
+AP-7/#241 KARTIERUNG (nur kartieren, KEINE Aenderung) — Repo comdare-cache-engine.
+
+Ziel des spaeteren Increments: SwissTable als EIGENER T0-Such-Baustein "S22" NEBEN dem
+bestehenden S14, beide PERMUTIERT (im Kompositions-Permutationsraum verfuegbar). ABI-neutral.
+
+Bitte kartiere PRAEZISE (file:line + kurzer Codeausschnitt je Punkt; lies die Dateien selbst):
+
+1. S14 = welcher bestehende Baustein? Finde den SearchAlgo mit family_id S14 (grep
+   `family_id` / `std::integral_constant<int, 14>` in libs/cache_engine/axes/lookup/).
+   Zeige seine VOLLSTAENDIGE Struktur als VORLAGE: Datei, class-Name, alle static-Properties
+   (enabled/axis_tag/family_id/key_type/value_type/max_fanout/name/family_name/flag_suffix/
+   is_thread_safe), insert/lookup/erase/clear-API, StoreTraversable-vs-organ-Klassifikation.
+   Ist S14 die generische Open-Addressing-Hash (hash_search)? Wodurch unterscheidet sich
+   SwissTable fachlich (SIMD-Metadaten-Gruppen-Probe, tombstones, H1/H2-Split)?
+
+2. Ist SwissTable/abseil bereits als ext/-Quelle vendored (grep ext/ nach swiss/abseil/
+   flat_hash/raw_hash/H2/group)? Falls JA → welcher Pfad, wrappbar wie die anderen
+   ext/-Paper-Wrapper (is_original-Mixin)? Falls NEIN → muss S22 als FAITHFUL-Eigenimpl
+   (SwissTable-Design: 1-Byte-Control-Metadaten je Slot, Gruppen von 16, H1=Position/
+   H2=7-Bit-Fingerprint) neu geschrieben werden. Welche Variante ist repo-konform?
+
+3. Freie family_id/S-Nummer: ist S22 (integral_constant<int,22>) noch frei? Liste die
+   BELEGTEN S-Nummern (grep family_id-Werte). Welche Enum/Registry-Datei fuehrt die
+   S-Nummern-Vergabe?
+
+4. Permutations-Registrierung (KRITISCH fuer TABU): Wie wird ein Baustein "permutiert"?
+   - axis_03a_search_algo_registry.hpp (Golden-320 / Registry-mp_list) = TABU.
+   - permutation_axes.xml (Ledger §5: "permutation_axes.xml (AP-6/AP-7)") — Pfad + Struktur?
+   - axis_03a_search_algo_flags.hpp (enabled-Flags) — wie ein neuer Baustein aktiviert wird.
+   - Klaere: kann S22 hinzugefuegt + permutiert werden OHNE die golden-mp_list zu mutieren?
+     Wenn die Registry-Enabled-Liste angefasst werden MUSS, ist das noch 2a-scope oder gate?
+
+5. Concept-Pflichten fuer einen neuen SearchAlgo: alle requires aus
+   axis_03a_search_algo_cache_engine_permutation_concept.hpp + StorageOrgan/StoreTraversable-
+   Klassifikation. Muss S22 store-traversierbar sein (wie Array) ODER eine organ_for_search_algo-
+   Familie (Pool) ODER eine Reference-Huelle? Was ist fuer eine Hash-Struktur korrekt?
+   Ist die #217-2a container_capacity() relevant (Hash = Advisory, unbounded)?
+
+6. ABI-Neutralitaet: aendert das Hinzufuegen von S22 den COMDARE_ANATOMY_ABI_MAJOR, die
+   extern-C-Naht oder den Mess-POD? (Erwartung: NEIN — neuer Baustein = neue Kompositions-
+   Option.) Beleg.
+
+7. Betroffene/analoge Tests: wie wird ein bestehender Baustein (z.B. S14/hash_search oder
+   Array) getestet (Konformitaet gegen std::map, Round-Trip)? file:line — Vorlage fuer einen
+   test_ap7_swisstable-Test.
+
+8. Empfohlene MINIMALE Umsetzung: welche NEUEN Dateien (axis_03a_search_algo_swisstable.hpp
+   + flags-Eintrag + permutation_axes.xml-Eintrag + Test), welche Registry-/Concept-Andockung,
+   welche SwissTable-Kern-Mechanik (faithful ODER ext/-Wrap), und was BEWUSST ausgeklammert
+   bleibt (SIMD-Achse? nur Scalar-Group-Probe in 2a?). Nenne die exakten Registrierungs-Stellen.
+
+Output: strukturierte 8-Punkte-Mappe (file:line) + Risikoliste (ABI/golden-Registry-TABU/
+Permutations-Explosion-Kosten/was ist heikel).

@@ -1,0 +1,16 @@
+Fokussiertes Code-Review (nur bewerten, KEINE Aenderung). Lies die Datei selbst.
+
+Repo: comdare-cache-engine. Datei: apps/cache_engine_builder/main.cpp
+Aenderung (#193-D): print_usage() nimmt jetzt std::ostream& statt hart std::cerr; die zwei
+Fehlerpfade rufen print_usage(std::cerr), der neue -h/--help-Scan am main-Anfang ruft
+print_usage(std::cout) und return 0. Der Scan laeuft VOR der argc<3-Pruefung.
+
+Pruefe NUR:
+1. -h/--help wird korrekt VOR der argc<3-Pruefung erkannt und liefert Status 0 (stdout).
+2. Keine Regression: bestehende Optionen (--enumerate-only/--skip-build/--quiet/--comdare-root=)
+   und die argc<3-Fehlerbehandlung unveraendert korrekt.
+3. Stream-Wahl korrekt (std::cout fuer Hilfe, std::cerr fuer Fehler) + noetige Includes vorhanden.
+4. Sonstige echte Bugs.
+
+Bereits gebaut + ausgefuehrt: "--help" -> Usage auf stdout + exit 0; "--enumerate-only"-Lauf
+gegen example_configs -> exit 0. Verdikt EINE Zeile: "VERDICT: SHIP" oder "VERDICT: <Datei:Zeile Bug>".

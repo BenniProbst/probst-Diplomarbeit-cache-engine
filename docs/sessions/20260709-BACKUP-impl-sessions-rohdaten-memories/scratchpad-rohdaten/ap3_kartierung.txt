@@ -1,0 +1,40 @@
+AP-3/#237 KARTIERUNG (nur kartieren, KEINE Aenderung) — Repo comdare-cache-engine.
+
+Ziel des spaeteren Increments: IPlatformProbe implementieren (CPUID auf Windows/x86 + sysfs
+bzw. /proc/cpuinfo auf Linux) + in den HardwareFilter/Phase-1 verdrahten (#650). ABI-neutral.
+Kontext: Ledger nennt vorhandene Anker `platform/i_platform_probe` + `platform_probe/cpuid_probe`.
+
+Bitte kartiere PRAEZISE (file:line + kurzer Codeausschnitt je Punkt; lies die Dateien selbst):
+
+1. IPlatformProbe-Interface: WO deklariert (i_platform_probe.hpp o.ae.)? Vollstaendige
+   Signatur/virtuelle Methoden (welche Plattform-Infos: vendor/family/model, ISA-Features
+   SSE/AVX/AVX2/AVX512/NEON, Cache-Groessen L1/L2/L3, core-Topologie P/E)? Ist es reines
+   Interface (pure virtual) oder gibt es schon eine Teil-Implementierung/Stub?
+
+2. cpuid_probe / platform_probe: WO liegt die (Teil-)Implementierung? Was ist schon da vs.
+   was fehlt (Stub/TODO/leer)? Wie ist der OS-Guard (Windows __cpuid vs Linux)?
+
+3. HardwareFilter / Phase-1 (#650): WO wird die Plattform-Info konsumiert? Die exakte
+   Verdrahtungs-Stelle (der HardwareFilter, der Bausteine/Builds je HW filtert — z.B.
+   AVX512-Binary nur auf AVX512-faehiger HW). Wie ist der aktuelle Zustand (hardkodiert?
+   Stub? gar nicht verdrahtet?)?
+
+4. platform/-Verzeichnis: vollstaendige Struktur (welche Dateien, Single-Owner-Abgrenzung zu
+   AP-13/core_layout.hpp — AP-3 ist Single-Owner platform/, AP-13 rebased danach). Welche
+   Dateien darf AP-3 anfassen, welche gehoeren AP-13 (core_layout.hpp / pinning)?
+
+5. Cross-Platform-Mechanik: wie erkennt der Build Windows vs Linux (CMake-Guard / #ifdef _WIN32)?
+   Wie machen andere OS-abhaengige Komponenten das (z.B. WindowsPcmPmcSource/PMC #153 als Vorlage)?
+
+6. ABI-Neutralitaet: aendert IPlatformProbe den COMDARE_ANATOMY_ABI_MAJOR / Mess-POD / extern-C?
+   (Erwartung NEIN — Host-seitige Build-/Filter-Komponente, nicht im Tier-ABI.) Beleg.
+
+7. Test-Vorlage: wie werden Host-seitige Komponenten getestet (Smoke: Probe liefert sane
+   Werte auf dem aktuellen Host)? file:line einer analogen Vorlage.
+
+8. Empfohlene MINIMALE Umsetzung: welche Dateien (cpuid_probe.cpp/.hpp fuellen +
+   HardwareFilter-Verdrahtung + Test), welcher Guard-/OS-Split, was BEWUSST ausgeklammert
+   bleibt (Linux-sysfs falls nur Windows-Host testbar? NEON/ARM?). Exakte Anfass-Stellen.
+
+Output: strukturierte 8-Punkte-Mappe (file:line) + Risikoliste (ABI / AP-13-Single-Owner-Kollision /
+OS-Portabilitaet / was ist heikel / TABU-Dateien).

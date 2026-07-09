@@ -1,0 +1,16 @@
+#179 INC-2 (Wartbarkeits-Sweep, comment-only): axis_06_registry + axis_operability + README
+
+- axis_06_allocator_registry.hpp: stale „Stufe 1 / Dummy is_enabled"-HINWEIS widersprach dem Code
+  (is_enabled = mp_bool<T::enabled>, echtes Stufe-2-Praedikat) -> wahrheitsgemaess umgeschrieben;
+  @stand 1->2; „Stufe 2 LIVE/(HEUTE)" timeless. (Hotspot 10)
+- axis_operability_classification.hpp: „17 (Komposition-)Achsen" -> „17 Kern-Achsen T0..T16"
+  (autoritatives Achsenmodell, 4 Kommentare); array<…,17> + constexpr note-Strings UNANGETASTET. (Hotspot 17)
+- README.md: Status-Drift (Z.11 „Phase 4.B Skelett" <-> Z.48/93 „lauffaehig") angeglichen; Achsenmodell
+  „17 Anatomie + 3 Build" -> „19 Slots T0..T18 (17 Kern + q1/q2) + 3 Build"; P08 in Email-Liste ergaenzt
+  (33-11-14-2=6={P06,P08,P28,P31,P32,P33}; Zahl 6 korrekt, P08 fehlte).
+
+Reiner Kommentar-/Doku-Sweep, KEINE Verhaltensaenderung. Codex-gesweept (gpt-5.5/xhigh) + selbst
+verifiziert: Codex-„Mojibake"-Funde = Fehl-Rendering von sauberem UTF-8 (verworfen); P08-Korrektur
+entgegen Codex' falschem 6->5-Vorschlag (keine blinden Merges).
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

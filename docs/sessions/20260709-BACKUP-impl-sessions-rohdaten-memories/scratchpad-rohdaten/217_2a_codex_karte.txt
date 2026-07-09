@@ -1,0 +1,884 @@
+Reading additional input from stdin...
+OpenAI Codex v0.142.2
+--------
+workdir: C:\Users\benja\OneDrive\Desktop\Diplomarbeit - Datenbanken\Code\external\comdare-cache-engine
+model: gpt-5.5
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 019f2759-992f-7202-9cae-36558249a47c
+--------
+user
+#217-2a KARTIERUNG (nur kartieren, KEINE Aenderung) — Repo comdare-cache-engine.
+
+Ziel des spaeteren Increments: ABI-NEUTRALE generische Container-Kapazitaets-Constraint
++ EHRLICHER Guard statt STILLER uint16->uint64-Trunkierung + Korrektur stale
+"uint64-Organ-Invariante"-Kommentare.
+
+User-Entscheid (bindend): Array ist ein spezieller Container STATISCHER Groesse, aber ein
+Container und KEINE neue Gattung. Manche Container haben minimale/maximale Groessen bzw.
+Fuellmengen -> Kapazitaets-Constraint als Container-Concept-Eigenschaft, die max_fanout
+verallgemeinert. Key/Value AUSSERHALB der deklarierten Kapazitaet (z.B. >65535 auf einem
+Array65535) = EHRLICHE Limitierung (Guard/Meldung), NICHT stille uint16-Trunkierung.
+Scope 2a = NUR der ABI-neutrale Teil (Registry/Traversal-Mapping + Bereichs-Guard +
+Kommentar-Korrektur). NICHT der volle native-Breite-Container-Umbau/rekursive node_type-
+Fanout-Einhaengung (= #217-2b, deferred, #188/#234-entangelt).
+
+Bitte kartiere PRAEZISE (file:line + kurzer Codeausschnitt je Punkt; lies die Dateien selbst):
+
+1. STILLE Trunkierungs-Stelle(n): Wo wird ein breiterer Key/Value auf uint16 (oder eine
+   schmalere Container-Breite) verengt OHNE Guard? Insb. der container_algorithm_t /
+   container_algorithm_traversal_t / flat_container_algorithm_t-Pfad in
+   libs/cache_engine/anatomy/abi_adapter.hpp. Zeige die exakte Cast-/Zuweisungs-Stelle +
+   umgebende Logik (Insert/Lookup/Key-Mapping).
+
+2. LayoutAwareChunkedStore::key_type (libs/cache_engine/axes/node/axis_04_node_type_chunked_store.hpp):
+   Wo hartkodiert (Zeile)? Wie fliesst key_type in Store/Traversal? Ist es wirklich hart uint64?
+
+3. ALLE max_fanout-Deklarationen (array256, array65535, evtl. weitere Container-Achsen) +
+   wo/wie max_fanout verwendet wird (bestehende Kapazitaets-Constraint-Vorlage, die
+   verallgemeinert werden soll). file:line je Vorkommen.
+
+4. Container-Concept-Definition(en) (storage_organ_concept / container-Concept):
+   Wo wuerde eine generische Kapazitaets-Eigenschaft (min/max size/fill) sauber andocken?
+   Bestehende Concept-Anforderungen auflisten (Signaturen).
+
+5. Stale "uint64-Organ-Invariante"-Kommentare (u.a. direct_address_traversal_organ.hpp,
+   composable_search.hpp) — exakte Zeilen + Wortlaut; warum widersprechen sie dem #217-Beschluss?
+
+6. ABI-NEUTRALITAET (Beleg): container_algorithm_ ist INTERNER Member (nicht extern sichtbar)?
+   Die extern-C-Naht (COMDARE_ANATOMY_ABI / create_instance / tier_insert / tier_lookup etc.)
+   ist uint64-only? Der Mess-POD (ComdareTierObserverSnapshot o.ae.) ist NICHT betroffen?
+   Zeige die extern-C-Signatur(en) + POD-Definition (file:line).
+
+7. Betroffene Tests (Container-Kapazitaet / Array-Container / key_type / max_fanout) —
+   Liste file:line, damit der Umsetzungs-Increment sie mitzieht.
+
+8. Empfohlene MINIMALE ABI-neutrale Umsetzung fuer 2a: konkret welche Dateien/Zeilen,
+   welcher Guard-Mechanismus (compile-time static_assert wo Key-Breite statisch bekannt +
+   runtime-Guard/ehrliche Meldung wo dynamisch), Signatur der generischen Kapazitaets-
+   Concept-Eigenschaft, und was BEWUSST fuer 2b ausgeklammert bleibt.
+
+Output: strukturierte Mappe mit den 8 Punkten (file:line-genau) + kurze Risikoliste
+(was koennte ABI brechen / was ist heikel / welche golden/Registry-mp_list-Dateien sind TABU).
+warning: skipping async hook in C:\Users\benja\.codex\plugins\cache\barkain-plugins\workflow-orchestrator\2.1.1\hooks\plugin-hooks.json: async hooks are not supported yet
+warning: skipping async hook in C:\Users\benja\.codex\plugins\cache\barkain-plugins\workflow-orchestrator\2.1.1\hooks\plugin-hooks.json: async hooks are not supported yet
+hook: SessionStart
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+codex
+Ich nutze die Orchestrator-Route fuer diese reine Kartierung, weil sie repo-weite Suche und Dateilekture erfordert.
+hook: PreToolUse
+hook: PreToolUse
+2026-07-03T09:41:01.705761Z ERROR codex_core::tools::router: error=Full-history forked agents inherit the parent agent type, model, and reasoning effort; omit agent_type, model, and reasoning_effort, or spawn without a full-history fork.
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: SpawnAgent
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: SpawnAgent
+hook: PostToolUse
+hook: PostToolUse Completed
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: SpawnAgent
+hook: PostToolUse
+hook: PostToolUse Failed
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: SpawnAgent
+hook: PostToolUse
+hook: PostToolUse Failed
+2026-07-03T09:42:11.961513Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 19.1 seconds
+Output:
+command timed out after 19139 milliseconds
+
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: SpawnAgent
+hook: PostToolUse
+hook: PostToolUse Failed
+codex
+Ich habe die Kartierung in vier unabhaengige Lese-Slices geteilt: Trunkierung/key_type, max_fanout/Concepts, Kommentare/ABI-Naht und Tests/Umsetzungsvorschlag. Ich warte jetzt die Rueckmeldungen zusammen und fuehre sie zu einer einzelnen Mappe zusammen.
+2026-07-03T09:42:43.101792Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 27.8 seconds
+Output:
+command timed out after 27840 milliseconds
+
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: Wait
+2026-07-03T09:43:23.208606Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 29.1 seconds
+Output:
+
+2026-07-03T09:43:24.091496Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 6.4 seconds
+Output:
+
+2026-07-03T09:43:24.113788Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 6.4 seconds
+Output:
+
+2026-07-03T09:43:28.673194Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 6.7 seconds
+Output:
+
+2026-07-03T09:43:41.455587Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 10.5 seconds
+Output:
+command timed out after 10496 milliseconds
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\docs\sessions\K81-38-MASTERPLAN-GESAMT-20260622.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260111-00-00-001036-hybrid-ha-architecture-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260112-11-30-000013-hybrid-ha-architecture-masterplan-v3.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260112-15-00-000016-hybrid-ha-architecture-masterplan-v4.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260112-18-30-000019-hybrid-ha-architecture-masterplan-v4.1.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260127-00-00-002741-dns-firewall-bgp-migration-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260203-00-00-002814-architektur-migrations-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260203-00-00-002815-comodare-cluster-masterplan-v5.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260203-00-00-002816-comodare-cluster-masterplan-v6.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260210-00-00-002878-opnsense-ip-migration-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260214-00-00-002904-live-audit-und-masterplan-v7.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260214-00-00-002905-masterplan-v7-phasen-0-9.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260506-22-30-003104-masterplan-v8-fortigate-edge-cbs250-dev-prod-split.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260508-23-00-003105-K59-fortigate-31g-ersteinrichtung-und-masterplan-v8.md
+C:\Users\benja\OneDrive\Desktop\Projekte\Cluster\sessions\20260518-23-00-003116-K67-PROD-MIGRATION-MASTERPLAN-v9.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\archive\masterplan\root\MASTERPLAN_140_200.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\archive\masterplan_updates\MASTERPLAN_UPDATE_SESSION_08.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\archive\masterplan_updates\MASTERPLAN_UPDATES_SESSION_09_10.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\en\MASTERPLAN_UPDATE_2025-11-09.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\masterplan\architecture\MASTERPLAN_ARCHITECTURE.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\masterplan\buildsystem\MASTERPLAN_BUILDSYSTEM.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\masterplan\infrastructure\MASTERPLAN_INFRASTRUCTURE.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\masterplan\masterplan\MASTERPLAN_OVERARCHING.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251107-00-00-000064-masterplan-updates-session-24.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251128-00-00-000138-infrastructure-masterplan-updates.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251215-00-00-000305-script-synchronisation-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251221-00-00-000350-masterplan-140-200.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251221-00-00-000351-masterplan-analyse-und-tiefenanalyse.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251222-00-00-000371-session-summary-191-195-xml-templating-and-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251225-00-00-000383-masterplan-und-architektur-konsolidierung.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251226-00-00-000392-architecture-masterplan-update.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20251226-00-00-000393-buildsystem-masterplan-status.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20260106-00-00-000654-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20260107-00-00-000666-hauntedrequest9-10-audit-masterplan.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20260108-00-00-000799-masterplan-hr9-hr10-audit.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20260108-00-00-000800-masterplan-hr9-hr10-todos.md
+C:\Users\benja\OneDrive\Desktop\Projekte\docs\sessions\20260108-18-52-000840-masterplan-hr9-audit-update.md
+
+2026-07-03T09:43:57.589831Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 10.1 seconds
+Output:
+command timed out after 10076 milliseconds
+
+2026-07-03T09:43:58.705946Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 11.1 seconds
+Output:
+command timed out after 11141 milliseconds
+
+2026-07-03T09:44:09.539299Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 11.3 seconds
+Output:
+
+2026-07-03T09:44:19.573563Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 21.2 seconds
+Output:
+
+2026-07-03T09:44:23.733467Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 23.6 seconds
+Output:
+
+2026-07-03T09:45:01.406826Z ERROR codex_models_manager::manager: failed to renew cache TTL: trailing characters at line 346 column 2
+codex
+Die erste Wartephase ist noch nicht komplett durch. Die Suche ist breiter als nur eine Datei, besonders wegen Registry-/Test-Vorkommen; ich lasse die Agenten weiterlaufen, statt Ergebnisse halb zu raten.
+hook: PreToolUse
+hook: PreToolUse
+2026-07-03T09:45:09.203710Z ERROR codex_models_manager::manager: failed to renew cache TTL: trailing characters at line 346 column 2
+2026-07-03T09:45:09.309169Z ERROR codex_models_manager::manager: failed to renew cache TTL: trailing characters at line 346 column 2
+2026-07-03T09:45:10.300891Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 12.6 seconds
+Output:
+rg: regex parse error:
+    (?:comdare_anatomy_abi_version|comdare_anatomy_abi_magic|comdare_create_anatomy|comdare_destroy_anatomy|extern \)
+    ^
+error: unclosed group
+
+hook: PreToolUse Failed
+hook: PreToolUse Failed
+collab: Wait
+2026-07-03T09:45:12.026646Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 14 seconds
+Output:
+libs\cache_engine\anatomy\observable_tier.hpp-4-//
+libs\cache_engine\anatomy\observable_tier.hpp-5-// Doku 24 §8.6/§8.7 (HYBRID-Mess-Modell, User-Direktive 2026-05-30): Der composite Tier wird als separates,
+libs\cache_engine\anatomy\observable_tier.hpp-6-// dynamisch ladbares C++23-Modul (.so/.dll) gebaut; die CacheEngineBuilder kommuniziert mit ihm AUSSCHLIESSLICH
+libs\cache_engine\anatomy\observable_tier.hpp-7-// über das ABI-stabile Interface der GATTUNG (SearchAlgorithm). Der Builder
+libs\cache_engine\anatomy\observable_tier.hpp:8://   (1) testet die Gattungs-API durch (tier_insert/lookup/erase),
+libs\cache_engine\anatomy\observable_tier.hpp-9-//   (2) misst die IM Tier eingebauten Observer (tier_observe → Snapshot),
+libs\cache_engine\anatomy\observable_tier.hpp-10-//   (3) zieht den Snapshot als flachen POD durch die Schnittstelle, und
+libs\cache_engine\anatomy\observable_tier.hpp-11-//   (4) persistiert die korrelierten (wall_clock ↔ Observer)-Ergebnisse.
+libs\cache_engine\anatomy\observable_tier.hpp-12-//
+--
+libs\cache_engine\anatomy\observable_tier.hpp-127-struct ComdareTierObserverSnapshot {
+libs\cache_engine\anatomy\observable_tier.hpp-128-    std::uint64_t axis_stats[kV3AxisCount][kV3FieldCount] = {}; // T0..T18 × 8 Felder (Schema = kV3AxisSchema)
+libs\cache_engine\anatomy\observable_tier.hpp-129-    std::int64_t  seg_ns[kV3AxisCount]                    = {}; // Pfad-B Per-Achsen-Timing (ns, je Achse)
+libs\cache_engine\anatomy\observable_tier.hpp-130-    std::uint64_t observable_axis_count                   = 0;  // Meta: # observable Achsen (in-process)
+libs\cache_engine\anatomy\observable_tier.hpp:131:    std::uint64_t tier_fill_level                         = 0;  // Meta: aktueller Füllstand (tier_size)
+libs\cache_engine\anatomy\observable_tier.hpp-132-    std::uint64_t filled_axis_count                       = 0;  // Meta: # Achsen mit Observer-Werten
+libs\cache_engine\anatomy\observable_tier.hpp-133-    std::uint64_t batches_measured                        = 0;  // Meta: # Timing-Batches (Warmup verworfen)
+libs\cache_engine\anatomy\observable_tier.hpp-134-    // P-MD3 (Coverage-Versöhnung, 2026-06-18): der kommensurable Nenner + benannte Rest des Pfad-B-Per-Achsen-Timings.
+libs\cache_engine\anatomy\observable_tier.hpp-135-    // seg_run_total_ns = äußere Wall-Clock des Segment-Mess-Laufs (fill_segment_timing_v3); seg_framework_ns =
+--
+libs\cache_engine\anatomy\observable_tier.hpp-157-// ─────────────────────────────────────────────────────────────────────────────
+libs\cache_engine\anatomy\observable_tier.hpp-158-
+libs\cache_engine\anatomy\observable_tier.hpp-159-/// IObservableTier — optionales Sub-Interface einer geladenen Tier-Anatomie (Pfad B, Doku 24 §8.6).
+libs\cache_engine\anatomy\observable_tier.hpp-160-///
+libs\cache_engine\anatomy\observable_tier.hpp:161:/// Der host-seitige CacheEngineBuilder treibt damit die Gattungs-API des Tier-Moduls (tier_insert/lookup/
+libs\cache_engine\anatomy\observable_tier.hpp-162-/// erase über uint64 — der gemeinsame Key-Raum nach Umstufung-B) und zieht dessen eingebaute Observer als
+libs\cache_engine\anatomy\observable_tier.hpp-163-/// flachen POD (tier_observe). Beide Trigger-Modi aus §8.7 (Zeitschritt-Sync / Zustands-Manipulation)
+libs\cache_engine\anatomy\observable_tier.hpp-164-/// realisiert der Host, indem er nach Operationen bzw. Intervallen tier_observe() aufruft und den Snapshot
+libs\cache_engine\anatomy\observable_tier.hpp-165-/// mit einem Wall-Clock-Zeitstempel korreliert + persistiert.
+--
+libs\cache_engine\anatomy\idriveable_tier.hpp-3-//
+libs\cache_engine\anatomy\idriveable_tier.hpp-4-// Doku: docs/architecture/messarchitektur_v5_design.md §5.2/§8.1 (Interface-Split), §7 (compile-time-Disjunktheit).
+libs\cache_engine\anatomy\idriveable_tier.hpp-5-//
+libs\cache_engine\anatomy\idriveable_tier.hpp-6-// Trennung der Belange (User-Direktive „Anatomy-ABI ⊥ Observer-Tier-Schnittstelle"):
+libs\cache_engine\anatomy\idriveable_tier.hpp:7://   - IDriveableTier  = der reine FUNKTIONALE Gattungs-Antrieb (tier_insert/lookup/erase/clear/size, uint64-Key/Value).
+libs\cache_engine\anatomy\idriveable_tier.hpp-8-//                       IMMER in jeder Tier-Binary einkompiliert — auch in der Release-/funktional-only-DLL ohne Messung.
+libs\cache_engine\anatomy\idriveable_tier.hpp-9-//                       Über diese Schnittstelle treibt der host-seitige Prüfdock (abstract-factory-ähnlich) jede geladene
+libs\cache_engine\anatomy\idriveable_tier.hpp-10-//                       Binary generisch + fährt das std::map-Konformitäts-Gate (§6), unabhängig von der Mess-Ausstattung.
+libs\cache_engine\anatomy\idriveable_tier.hpp-11-//   - IObservableTier = NUR der Observer-Zugriff (tier_observe → Snapshot-POD); erbt IDriveableTier, wird aber NUR bei
+--
+libs\cache_engine\anatomy\idriveable_tier.hpp-24-///
+libs\cache_engine\anatomy\idriveable_tier.hpp-25-/// Gemeinsamer uint64-Key/Value-Raum nach Umstufung-B (alle sezierten Such-Organe einheitlich uint64). Der Host
+libs\cache_engine\anatomy\idriveable_tier.hpp-26-/// (CacheEngineBuilder/Prüfdock) treibt darüber generisch jede geladene Binary — für das Konformitäts-Gate gegen
+libs\cache_engine\anatomy\idriveable_tier.hpp-27-/// std::map UND für die eigentliche Last (Lastenprofil). KEIN Observer, KEIN Memento — rein funktional.
+libs\cache_engine\anatomy\idriveable_tier.hpp:28:class IDriveableTier {
+libs\cache_engine\anatomy\idriveable_tier.hpp-29-public:
+libs\cache_engine\anatomy\idriveable_tier.hpp-30-    virtual ~IDriveableTier() = default;
+libs\cache_engine\anatomy\idriveable_tier.hpp-31-
+libs\cache_engine\anatomy\idriveable_tier.hpp-32-    /// Fügt (key,value) ein bzw. aktualisiert. Rückgabe: true wenn ein NEUER Schlüssel entstand.
+libs\cache_engine\anatomy\idriveable_tier.hpp:33:    [[nodiscard]] virtual bool tier_insert(std::uint64_t key, std::uint64_t value) noexcept = 0;
+libs\cache_engine\anatomy\idriveable_tier.hpp-34-
+libs\cache_engine\anatomy\idriveable_tier.hpp-35-    /// Sucht key. Bei Treffer wird *out_value gesetzt (falls out_value != nullptr) und true geliefert.
+libs\cache_engine\anatomy\idriveable_tier.hpp:36:    [[nodiscard]] virtual bool tier_lookup(std::uint64_t key, std::uint64_t* out_value) const noexcept = 0;
+libs\cache_engine\anatomy\idriveable_tier.hpp-37-
+libs\cache_engine\anatomy\idriveable_tier.hpp-38-    /// Entfernt key. Rückgabe: true wenn key vorhanden war.
+libs\cache_engine\anatomy\idriveable_tier.hpp:39:    [[nodiscard]] virtual bool tier_erase(std::uint64_t key) noexcept = 0;
+libs\cache_engine\anatomy\idriveable_tier.hpp-40-
+libs\cache_engine\anatomy\idriveable_tier.hpp-41-    /// Leert den Tier-Zustand (Schlüssel; Statistik-Reset ist separat über reset()).
+libs\cache_engine\anatomy\idriveable_tier.hpp:42:    virtual void tier_clear() noexcept = 0;
+libs\cache_engine\anatomy\idriveable_tier.hpp-43-
+libs\cache_engine\anatomy\idriveable_tier.hpp-44-    /// Logische Schlüsselzahl (Füllstand).
+libs\cache_engine\anatomy\idriveable_tier.hpp:45:    [[nodiscard]] virtual std::uint64_t tier_size() const noexcept = 0;
+libs\cache_engine\anatomy\idriveable_tier.hpp-46-};
+libs\cache_engine\anatomy\idriveable_tier.hpp-47-
+libs\cache_engine\anatomy\idriveable_tier.hpp-48-} // namespace comdare::cache_engine::anatomy
+--
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-4-//
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-5-// Doku 24 §8.6/§8.7 (HYBRID-Mess-Modell, User-Direktive 2026-05-30): Der composite Tier wird als
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-6-// separates, dynamisch ladbares C++23-Modul (.so/.dll) gebaut; die CacheEngineBuilder kommuniziert mit
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-7-// ihm AUSSCHLIESSLICH über das ABI-stabile Interface der GATTUNG (SearchAlgorithm). Der Builder
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:8://   (1) testet die Gattungs-API durch (tier_insert/lookup/erase),
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-9-//   (2) misst die IM Tier eingebauten Observer (tier_observe → Snapshot),
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-10-//   (3) zieht den Snapshot als flachen POD durch die Schnittstelle, und
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-11-//   (4) persistiert die korrelierten (wall_clock ↔ Observer)-Ergebnisse.
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-12-//
+--
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-28-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-29-namespace comdare::cache_engine::anatomy {
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-30-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-31-// ─────────────────────────────────────────────────────────────────────────────
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:32:// ComdareTierObserverSnapshotV1 — flacher, ABI-stabiler Observer-Snapshot
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-33-// ─────────────────────────────────────────────────────────────────────────────
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-34-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-35-/// Komposition-UNABHÄNGIGER POD-Snapshot, der die Per-Achsen-Observer eines composite Tiers über die
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-36-/// Modul-Binary-ABI-Grenze trägt. Anders als ObserverAggregate<Composition> (dessen Layout je Composition
+--
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-38-/// NUR uint64-Felder → garantiert standard_layout + trivially_copyable, identisches Layout in Host + Modul.
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-39-///
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-40-/// V1 trägt die beiden bereits real getriebenen Achsen (search_algo + allocator, Doku 24 §5.4/§8.5) plus
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-41-/// Meta. Erweiterung um weitere Achsen = NEUE Snapshot-Version (V2…), das Interface bleibt ABI-stabil.
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:42:struct ComdareTierObserverSnapshotV1 {
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-43-    // ── Achse search_algo (axis_03a) — SearchAlgoStatistics, gespiegelt ──
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-44-    std::uint64_t search_lookup_count   = 0;
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-45-    std::uint64_t search_hit_count      = 0;
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-46-    std::uint64_t search_miss_count     = 0;
+--
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-54-    std::uint64_t alloc_deallocation_count = 0;
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-55-    std::uint64_t alloc_failure_count   = 0;
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-56-    // ── Meta ──
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-57-    std::uint64_t observable_axis_count = 0;   // ObserverAggregate::observable_count() — Diagnose
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:58:    std::uint64_t tier_fill_level       = 0;   // tier_size() zum Snapshot-Zeitpunkt
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-59-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:60:    [[nodiscard]] constexpr bool operator==(ComdareTierObserverSnapshotV1 const&) const noexcept = default;
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-61-};
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-62-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:63:static_assert(std::is_standard_layout_v<ComdareTierObserverSnapshotV1>,
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-64-              "ABI-Pflicht: Cross-Boundary-Snapshot muss standard_layout sein");
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:65:static_assert(std::is_trivially_copyable_v<ComdareTierObserverSnapshotV1>,
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-66-              "ABI-Pflicht: Cross-Boundary-Snapshot muss memcpy-fähig (trivially_copyable) sein");
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-67-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-68-/// ABI-Version des Snapshot-Formats. Major-Bump bei Layout-Änderung (neue Achse = neuer Snapshot-Typ V2).
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-69-inline constexpr std::uint32_t kTierObserverSnapshotVersion = 1;
+--
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-73-// ─────────────────────────────────────────────────────────────────────────────
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-74-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-75-/// IObservableTier — optionales Sub-Interface einer geladenen Tier-Anatomie (Pfad B, Doku 24 §8.6).
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-76-///
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:77:/// Der host-seitige CacheEngineBuilder treibt damit die Gattungs-API des Tier-Moduls (tier_insert/lookup/
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-78-/// erase über uint64 — der gemeinsame Key-Raum nach Umstufung-B) und zieht dessen eingebaute Observer als
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-79-/// flachen POD (tier_observe). Beide Trigger-Modi aus §8.7 (Zeitschritt-Sync / Zustands-Manipulation)
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-80-/// realisiert der Host, indem er nach Operationen bzw. Intervallen tier_observe() aufruft und den Snapshot
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-81-/// mit einem Wall-Clock-Zeitstempel korreliert + persistiert.
+--
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-89-    // ── Observer-Zugriff: die IM Tier eingebauten Observer als flachen POD durch die ABI-Grenze ziehen ──
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-90-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-91-    /// Schreibt den aktuellen Observer-Snapshot (observe_all → flacher POD) nach *out. out != nullptr.
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-92-    /// noexcept (reines Auslesen von Zählern). Der Host stempelt das Resultat mit Wall-Clock + persistiert.
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp:93:    virtual void tier_observe(ComdareTierObserverSnapshotV1* out) const noexcept = 0;
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-94-};
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-95-
+modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\observable_tier.hpp-96-}  // namespace comdare::cache_engine::anatomy
+rg: modules\comdare-cache-engine-core\include\comdare-cache-engine-core\anatomy\idriveable_tier.hpp: Das System kann die angegebene Datei nicht finden. (os error 2)
+
+2026-07-03T09:45:13.463281Z ERROR codex_models_manager::manager: failed to renew cache TTL: trailing characters at line 346 column 2
+2026-07-03T09:45:21.356176Z ERROR codex_models_manager::manager: failed to renew cache TTL: trailing characters at line 346 column 2
+2026-07-03T09:45:56.385544Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 25.6 seconds
+Output:
+
+2026-07-03T09:45:57.313013Z ERROR codex_core::tools::router: error=Exit code: 124
+Wall time: 22.9 seconds
+Output:
+command timed out after 22886 milliseconds
+
+2026-07-03T09:46:21.021192Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 50.2 seconds
+Output:
+
+2026-07-03T09:48:01.287295Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.7 seconds
+Output:
+libs/cache_engine/axes/mapping\axis_03m_mapping_base.hpp:23:                      "(register_slot/resolve_offset/reverse_lookup/mapped_count/clear)");
+libs/cache_engine/axes/mapping\axis_03m_mapping_pool_relative.hpp:45:    using slot_index_type = std::uint16_t;
+libs/cache_engine/axes/mapping\axis_03m_mapping_pool_relative.hpp:46:    using offset_type     = std::size_t;
+libs/cache_engine/axes/mapping\axis_03m_mapping_pool_relative.hpp:60:    [[nodiscard]] static constexpr bool supports_reverse_lookup() noexcept { return true; }
+libs/cache_engine/axes/mapping\axis_03m_mapping_pool_relative.hpp:74:    void register_slot(slot_index_type s, offset_type absolute_offset) {
+libs/cache_engine/axes/mapping\axis_03m_mapping_pool_relative.hpp:90:    [[nodiscard]] std::optional<offset_type> resolve_offset(slot_index_type s) const {
+libs/cache_engine/axes/mapping\axis_03m_mapping_pool_relative.hpp:104:    [[nodiscard]] std::optional<slot_index_type> reverse_lookup(offset_type absolute_offset) const {
+libs/cache_engine/axes/mapping\axis_03m_mapping_pool_relative.hpp:110:        ++stats_.total_reverse_lookup_count;
+libs/cache_engine/axes/mapping\axis_03m_mapping_direct_placement.hpp:40:    using slot_index_type = std::uint16_t;
+libs/cache_engine/axes/mapping\axis_03m_mapping_direct_placement.hpp:41:    using offset_type     = std::size_t;
+libs/cache_engine/axes/mapping\axis_03m_mapping_direct_placement.hpp:55:    [[nodiscard]] static constexpr bool supports_reverse_lookup() noexcept { return true; } // linear-scan
+libs/cache_engine/axes/mapping\axis_03m_mapping_direct_placement.hpp:65:    void register_slot(slot_index_type s, offset_type o) {
+libs/cache_engine/axes/mapping\axis_03m_mapping_direct_placement.hpp:79:    [[nodiscard]] std::optional<offset_type> resolve_offset(slot_index_type s) const {
+libs/cache_engine/axes/mapping\axis_03m_mapping_direct_placement.hpp:93:    [[nodiscard]] std::optional<slot_index_type> reverse_lookup(offset_type o) const {
+libs/cache_engine/axes/mapping\axis_03m_mapping_direct_placement.hpp:96:        ++stats_.total_reverse_lookup_count;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_interface_functions.hpp:14:    "register_slot",
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_interface_functions.hpp:15:    "resolve_offset",
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_interface_functions.hpp:16:    "reverse_lookup",
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:15: *   - kIsOriginal_register_slot / resolve_offset / reverse_lookup / clear
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:20:    [[nodiscard]] static constexpr bool is_original_register_slot() noexcept {
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:21:        if constexpr (requires { PaperManifest::kIsOriginal_register_slot; })
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:22:            return PaperManifest::kIsOriginal_register_slot;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:26:    [[nodiscard]] static constexpr bool is_original_resolve_offset() noexcept {
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:27:        if constexpr (requires { PaperManifest::kIsOriginal_resolve_offset; })
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:28:            return PaperManifest::kIsOriginal_resolve_offset;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:32:    [[nodiscard]] static constexpr bool is_original_reverse_lookup() noexcept {
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:33:        if constexpr (requires { PaperManifest::kIsOriginal_reverse_lookup; })
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:34:            return PaperManifest::kIsOriginal_reverse_lookup;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_original_code_mixin.hpp:46:        return is_original_register_slot() && is_original_resolve_offset() && is_original_reverse_lookup() &&
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_concept.hpp:10://   - typename slot_index_type  (std::uint16_t)
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_concept.hpp:13://   - register_slot(slot, offset) -> void
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_concept.hpp:14://   - resolve_offset(slot) const  -> std::optional<offset_type>
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_concept.hpp:15://   - reverse_lookup(offset) const -> std::optional<slot_index_type>
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_concept.hpp:41:    { m.register_slot(s, o) } -> std::same_as<void>;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_concept.hpp:43:    { mc.resolve_offset(s) } -> std::same_as<std::optional<typename M::offset_type>>;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_concept.hpp:44:    { mc.reverse_lookup(o) } -> std::same_as<std::optional<typename M::slot_index_type>>;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_cache_engine_permutation_concept.hpp:22:    std::uint64_t total_reverse_lookup_count = 0;
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_cache_engine_permutation_concept.hpp:31: *   - supports_reverse_lookup() — O(1)-rueckwaerts-Mapping?
+libs/cache_engine/axes/mapping\concepts\axis_03m_mapping_cache_engine_permutation_concept.hpp:46:        { M::supports_reverse_lookup() } -> std::convertible_to<bool>;
+rg: libs/cache_engine/topics/mapping: Das System kann die angegebene Datei nicht finden. (os error 2)
+
+2026-07-03T09:48:25.822010Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 1.4 seconds
+Output:
+rg: libs\cache_engine\topics\nodes\axis_04_node_type\axis_04_node_type_node*.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+rg: libs\cache_engine\topics\nodes\axis_btree_order\axis_btree_order_kt*.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+rg: libs\cache_engine\topics\nodes\axis_hash_probe_shape\axis_hash_probe_shape_*.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+rg: libs\cache_engine\topics\nodes\axis_skip_list_shape\axis_skip_list_shape_*.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+rg: libs\cache_engine\axes\node\axis_04_node_type_node*.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+
+2026-07-03T09:48:25.920640Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 1.4 seconds
+Output:
+rg: libs\cache_engine\axes\lookup\composable\*_concept.hpp: IO error for operation on libs\cache_engine\axes\lookup\composable\*_concept.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+
+2026-07-03T09:48:48.346232Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 4 seconds
+Output:
+rg: libs\cache_engine\axes\lookup\composable\composed_*_search.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+rg: libs\cache_engine\axes\lookup\composable\*_store.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+
+codex
+Noch keine finale Rueckgabe aus den Subtasks. Ich pruefe jetzt gezielt je Agent, ob einer schon fertig ist, damit ich verwertbare Teilergebnisse nicht blockiere.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: Wait
+2026-07-03T09:49:40.568217Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.6 seconds
+Output:
+libs/cache_engine/axes/lookup/composable/eytzinger_layout_store.hpp:27:    using key_type   = std::uint64_t;
+libs/cache_engine/axes/lookup/composable/eytzinger_layout_store.hpp:28:    using value_type = std::uint64_t;
+rg: libs/cache_engine/axes/lookup/composable/*_pool_store.hpp: Die Syntax für den Dateinamen, Verzeichnisnamen oder die Datenträgerbezeichnung ist falsch. (os error 123)
+
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: SendInput
+codex
+Ein Teil ist fertig: Kommentare/ABI-Naht sind kartiert. Ich hole jetzt die drei noch offenen Slices ein; falls sie weiterlaufen, fordere ich kompakte Teilresultate an.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: SendInput
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: SendInput
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: Wait
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: Wait
+codex
+max_fanout und Concept-Andockpunkte sind jetzt da. Es fehlt nur noch die Test-/Risiko-/Minimalumsetzungs-Scheibe; danach fasse ich alles als die gewuenschte 8-Punkte-Mappe zusammen.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: Wait
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: CloseAgent
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: CloseAgent
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: CloseAgent
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+collab: CloseAgent
+codex
+Kartierung abgeschlossen, keine Aenderungen vorgenommen. Scope war Repo-Quellen/Tests/Doku, ohne `build/`, `ext/` und Binaerartefakte.
+
+**1. Stille Trunkierung**
+Im Hauptpfad `container_algorithm_t` sehe ich keine direkte stille `uint64 -> uint16`-Trunkierung. Insert/Lookup bleiben breit:
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:733`
+```cpp
+[[nodiscard]] bool tier_insert(std::uint64_t key, std::uint64_t value) noexcept override {
+    ...
+    bool const m8_new_flag = container_algorithm_.insert(key, value);
+}
+```
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:819`
+```cpp
+auto const cv     = container_algorithm_.lookup(key);
+bool const m8_hit = cv.has_value();
+if (m8_hit && out_value != nullptr) *out_value = static_cast<std::uint64_t>(*cv);
+```
+
+Die bestaetigte unguarded Trunkierung liegt im Mapping-/Observer-Seitenpfad:
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:762`
+```cpp
+ct_organ_.register_entry(static_cast<typename Composition::cache_traversal::key_type>(key),
+                         static_cast<typename Composition::cache_traversal::value_type>(value));
+map_organ_.register_slot(static_cast<typename Composition::mapping::slot_index_type>(key),
+                         static_cast<typename Composition::mapping::offset_type>(value));
+```
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:831`
+```cpp
+(void)ct_organ_.resolve(static_cast<typename Composition::cache_traversal::key_type>(key));
+(void)map_organ_.resolve_offset(static_cast<typename Composition::mapping::slot_index_type>(key));
+```
+
+Dazu passt die schmale Mapping-Breite:
+
+`libs/cache_engine/axes/mapping/axis_03m_mapping_direct_placement.hpp:40`
+```cpp
+using slot_index_type = std::uint16_t;
+```
+
+`libs/cache_engine/axes/mapping/axis_03m_mapping_pool_relative.hpp:45`
+```cpp
+using slot_index_type = std::uint16_t;
+```
+
+**2. LayoutAwareChunkedStore::key_type**
+Die harte `uint64_t`-Definition liegt nicht in `axis_04_node_type_chunked_store.hpp`, sondern hier:
+
+`libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:73`
+```cpp
+using key_type       = std::uint64_t; // GEMEINSAMER breiter Key
+using value_type     = std::uint64_t;
+```
+
+Flow in Traversal/Store:
+
+`libs/cache_engine/axes/lookup/composable/observable_composed_search.hpp:33`
+```cpp
+using key_type   = typename Store::key_type;
+using value_type = typename Store::value_type;
+bool insert(key_type k, value_type v) {
+```
+
+Physisch gibt es `uint16_t` nur als verlustfreie Low/High-Splittung:
+
+`axis_04_node_type_layout_aware_store.hpp:387`
+```cpp
+std::uint16_t const hot  = static_cast<std::uint16_t>(k & 0xFFFFu);
+std::uint64_t const cold = k >> 16;
+return static_cast<key_type>(hot) | (cold << 16);
+```
+
+**3. max_fanout**
+Deklarationen:
+
+`array256:56 -> 256`, `array65535:74 -> 65536`, `bst:51`, `btree:61`, `eytzinger:67`, `hash_search:54`, `interpolation:62`, `k_ary:86`, `k_ary:319`, `linear_scan:55`, `original_start:72`, `skip_list:68`, `vector_u16u16:56` jeweils `65536`; `original_art:71`, `original_hot:77`, `original_surf:60`, `original_wormhole:59`, `vector_u8u8:74` jeweils `256`.
+
+Concept-/Nutzstellen:
+
+`libs/cache_engine/axes/lookup/concepts/axis_03a_search_algo_cache_engine_permutation_concept.hpp:64`
+```cpp
+{ S::max_fanout() } -> std::convertible_to<std::size_t>;
+```
+
+Tests: `tests/unit/test_v41_topic_traversal.cpp:91`, `:191`, `:229`, `:305`.
+
+**4. Container-/Storage-Concept**
+Sauberer Andockpunkt: additives Capability-Concept neben `StorageOrgan`, nicht in `TraversalOrgan`.
+
+`libs/cache_engine/axes/lookup/composable/storage_organ_concept.hpp:30`
+```cpp
+concept StorageOrgan =
+    requires { typename S::key_type; typename S::value_type; }
+    && std::same_as<typename S::key_type, std::uint64_t>
+    && std::same_as<typename S::value_type, std::uint64_t>
+```
+
+Bestehende Anforderungen: `slot_count`, `key_at`, `value_at`, `set_value_at`, `append_slot`, `insert_slot_at`, `erase_slot_at`, `clear`.
+
+Container-Konvention ohne eigenes Concept: `observable_composed_container.hpp:51` beschreibt `insert/lookup/erase/clear/occupied_count`, optional `for_each_record` bei `:107`.
+
+Verwandte Capacity-Formen: `axis_04_node_type_concept.hpp:17` (`max_capacity()`), BTree `kMaxKeys/kMaxChildren`, Hash `kLoad*`, SkipList `kMaxLevel`.
+
+**5. Stale uint64-Kommentare**
+`direct_address_traversal_organ.hpp:44`
+```cpp
+bei der u64-Organ-Invariante identisch
+```
+
+`direct_address_traversal_organ.hpp:8-10`: spricht von kompaktiertem, sortiertem `uint64`-Store und Direct Addressing via `key - store.key_at(0)`.
+
+`composable_search.hpp:13`
+```cpp
+ueber einem GEMEINSAMEN breiten Key (uint64)
+```
+
+Weitere Wortlaute: `composable_search.hpp:35` “Slots (key,value) ueber GEMEINSAMEM uint64-Key”, `:39` “GEMEINSAMER breiter Key”, `:181` “Ueber GEMEINSAMEM Store-Key (uint64)”.
+
+Widerspruch: Nach #217 ist `uint64` ABI-/Carrier-Breite, aber keine Organ-Invariante. Arrays bleiben Container mit deklarierter Kapazitaet; Out-of-range braucht Guard/Meldung statt stiller Normalisierung.
+
+**6. ABI-Neutralitaet**
+`container_algorithm_` ist interner Member:
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:1873`
+```cpp
+container_algorithm_t container_algorithm_{};
+```
+
+Die Klasse ist `final` bei `abi_adapter.hpp:143`, privater Bereich beginnt bei `:1759`.
+
+Extern-C-Naht:
+
+`libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp:76`
+```cpp
+COMDARE_ANATOMY_ABI_EXPORT std::uint64_t comdare_anatomy_abi_version() noexcept;
+```
+
+`:79` `comdare_anatomy_abi_magic()`, `:83-84` `IAnatomyBase* comdare_create_anatomy() noexcept`, `:88-89` `comdare_destroy_anatomy(...)`.
+
+Tier-API bleibt `uint64`:
+
+`libs/cache_engine/anatomy/idriveable_tier.hpp:33`
+```cpp
+tier_insert(std::uint64_t key, std::uint64_t value)
+```
+
+`:36` `tier_lookup(uint64_t, uint64_t*)`, `:39` `tier_erase(uint64_t)`, `:42` `tier_clear()`, `:45` `tier_size()`.
+
+POD nicht betroffen: `libs/cache_engine/anatomy/observable_tier.hpp:127-141` `ComdareTierObserverSnapshot`, Layout-Assertions `:145-148`.
+
+**7. Betroffene Tests**
+Relevante Anker:
+
+`tests/unit/test_188_4cii_flat_wrapper_traversal.cpp:85` Direct-address sparse/gappy Traversal; `:140` Wide-`uint64_t` Roundtrip.
+
+`tests/unit/test_188_4bb0_pool_organ_wide_key_conformance.cpp:72`
+```cpp
+static_assert(std::is_same_v<typename Container::key_type, std::uint64_t>);
+```
+`:110` prueft, dass `0` und `65536` nicht aliasen.
+
+Weitere: `test_234_f1_btree_order_shape.cpp:174`, `test_234_f2_skip_list_shape.cpp:77`, `test_234_f3_bst_shape.cpp:72` und `:201`, `test_234_f4_hash_probe_shape.cpp:73` und `:160`, `test_v41_axis_03a_tier_organ_equivalence.cpp:212`, `test_d_v42_node_type_observable.cpp:27`, `thesis_tiere/test_node_delegation_proof.cpp:46`.
+
+**8. Minimale ABI-neutrale 2a-Umsetzung**
+Empfohlen: additive Capacity-Eigenschaft + Guards im Adapter-/Container-Inneren, ohne ABI-Signaturen zu aendern.
+
+Andockstellen: `abi_adapter.hpp:1846` nach `container_algorithm_t`-Auswahl; runtime guard vor den Casts bei `abi_adapter.hpp:762` und `:831`.
+
+Concept-Form:
+```cpp
+template<class C>
+concept StaticElementCapacity =
+  requires { { C::static_element_capacity() } noexcept -> std::convertible_to<std::size_t>; };
+
+template<class C>
+concept RuntimeElementCapacity =
+  requires(C const& c) { { c.capacity() } noexcept -> std::convertible_to<std::size_t>; };
+```
+
+Guard-Mechanik: `static_assert` fuer bekannte Key-/Capacity-Domains; runtime Range-Check vor `slot_index_type`-Casts. In non-ABI APIs ehrlich `status_capacity_exceeded` (`status_code.hpp:27`) oder `length_error` nach Vorbild `axis_04_node_type_slot_store.hpp:54`. In `tier_insert(...) noexcept -> bool` keine neue Fehlersemantik einschleusen.
+
+Bewusst 2b-out: keine native-Breiten-Container-Umstellung, keine rekursive `node_type`-Fanout-Einhaengung, keine ABI-/Virtual-Method-Aenderung, kein Rename von `max_fanout`, keine Registry-/Golden-/mp_list-Churn.
+
+Risiko/TABU: `tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt`, `gen_golden_fullpilot.cpp`, `source_catalog.hpp`, `profile_runner.hpp`, `libs/cache_engine/axes/lookup/axis_03a_search_algo_registry.hpp:52`, `libs/cache_engine/compositions/known_compositions_list.hpp:97`, `tests/unit/test_v41_anatomy_codegen_tool_mp_list.cpp:38`.
+hook: Stop
+hook: Stop Failed
+tokens used
+86.979
+Kartierung abgeschlossen, keine Aenderungen vorgenommen. Scope war Repo-Quellen/Tests/Doku, ohne `build/`, `ext/` und Binaerartefakte.
+
+**1. Stille Trunkierung**
+Im Hauptpfad `container_algorithm_t` sehe ich keine direkte stille `uint64 -> uint16`-Trunkierung. Insert/Lookup bleiben breit:
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:733`
+```cpp
+[[nodiscard]] bool tier_insert(std::uint64_t key, std::uint64_t value) noexcept override {
+    ...
+    bool const m8_new_flag = container_algorithm_.insert(key, value);
+}
+```
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:819`
+```cpp
+auto const cv     = container_algorithm_.lookup(key);
+bool const m8_hit = cv.has_value();
+if (m8_hit && out_value != nullptr) *out_value = static_cast<std::uint64_t>(*cv);
+```
+
+Die bestaetigte unguarded Trunkierung liegt im Mapping-/Observer-Seitenpfad:
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:762`
+```cpp
+ct_organ_.register_entry(static_cast<typename Composition::cache_traversal::key_type>(key),
+                         static_cast<typename Composition::cache_traversal::value_type>(value));
+map_organ_.register_slot(static_cast<typename Composition::mapping::slot_index_type>(key),
+                         static_cast<typename Composition::mapping::offset_type>(value));
+```
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:831`
+```cpp
+(void)ct_organ_.resolve(static_cast<typename Composition::cache_traversal::key_type>(key));
+(void)map_organ_.resolve_offset(static_cast<typename Composition::mapping::slot_index_type>(key));
+```
+
+Dazu passt die schmale Mapping-Breite:
+
+`libs/cache_engine/axes/mapping/axis_03m_mapping_direct_placement.hpp:40`
+```cpp
+using slot_index_type = std::uint16_t;
+```
+
+`libs/cache_engine/axes/mapping/axis_03m_mapping_pool_relative.hpp:45`
+```cpp
+using slot_index_type = std::uint16_t;
+```
+
+**2. LayoutAwareChunkedStore::key_type**
+Die harte `uint64_t`-Definition liegt nicht in `axis_04_node_type_chunked_store.hpp`, sondern hier:
+
+`libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:73`
+```cpp
+using key_type       = std::uint64_t; // GEMEINSAMER breiter Key
+using value_type     = std::uint64_t;
+```
+
+Flow in Traversal/Store:
+
+`libs/cache_engine/axes/lookup/composable/observable_composed_search.hpp:33`
+```cpp
+using key_type   = typename Store::key_type;
+using value_type = typename Store::value_type;
+bool insert(key_type k, value_type v) {
+```
+
+Physisch gibt es `uint16_t` nur als verlustfreie Low/High-Splittung:
+
+`axis_04_node_type_layout_aware_store.hpp:387`
+```cpp
+std::uint16_t const hot  = static_cast<std::uint16_t>(k & 0xFFFFu);
+std::uint64_t const cold = k >> 16;
+return static_cast<key_type>(hot) | (cold << 16);
+```
+
+**3. max_fanout**
+Deklarationen:
+
+`array256:56 -> 256`, `array65535:74 -> 65536`, `bst:51`, `btree:61`, `eytzinger:67`, `hash_search:54`, `interpolation:62`, `k_ary:86`, `k_ary:319`, `linear_scan:55`, `original_start:72`, `skip_list:68`, `vector_u16u16:56` jeweils `65536`; `original_art:71`, `original_hot:77`, `original_surf:60`, `original_wormhole:59`, `vector_u8u8:74` jeweils `256`.
+
+Concept-/Nutzstellen:
+
+`libs/cache_engine/axes/lookup/concepts/axis_03a_search_algo_cache_engine_permutation_concept.hpp:64`
+```cpp
+{ S::max_fanout() } -> std::convertible_to<std::size_t>;
+```
+
+Tests: `tests/unit/test_v41_topic_traversal.cpp:91`, `:191`, `:229`, `:305`.
+
+**4. Container-/Storage-Concept**
+Sauberer Andockpunkt: additives Capability-Concept neben `StorageOrgan`, nicht in `TraversalOrgan`.
+
+`libs/cache_engine/axes/lookup/composable/storage_organ_concept.hpp:30`
+```cpp
+concept StorageOrgan =
+    requires { typename S::key_type; typename S::value_type; }
+    && std::same_as<typename S::key_type, std::uint64_t>
+    && std::same_as<typename S::value_type, std::uint64_t>
+```
+
+Bestehende Anforderungen: `slot_count`, `key_at`, `value_at`, `set_value_at`, `append_slot`, `insert_slot_at`, `erase_slot_at`, `clear`.
+
+Container-Konvention ohne eigenes Concept: `observable_composed_container.hpp:51` beschreibt `insert/lookup/erase/clear/occupied_count`, optional `for_each_record` bei `:107`.
+
+Verwandte Capacity-Formen: `axis_04_node_type_concept.hpp:17` (`max_capacity()`), BTree `kMaxKeys/kMaxChildren`, Hash `kLoad*`, SkipList `kMaxLevel`.
+
+**5. Stale uint64-Kommentare**
+`direct_address_traversal_organ.hpp:44`
+```cpp
+bei der u64-Organ-Invariante identisch
+```
+
+`direct_address_traversal_organ.hpp:8-10`: spricht von kompaktiertem, sortiertem `uint64`-Store und Direct Addressing via `key - store.key_at(0)`.
+
+`composable_search.hpp:13`
+```cpp
+ueber einem GEMEINSAMEN breiten Key (uint64)
+```
+
+Weitere Wortlaute: `composable_search.hpp:35` “Slots (key,value) ueber GEMEINSAMEM uint64-Key”, `:39` “GEMEINSAMER breiter Key”, `:181` “Ueber GEMEINSAMEM Store-Key (uint64)”.
+
+Widerspruch: Nach #217 ist `uint64` ABI-/Carrier-Breite, aber keine Organ-Invariante. Arrays bleiben Container mit deklarierter Kapazitaet; Out-of-range braucht Guard/Meldung statt stiller Normalisierung.
+
+**6. ABI-Neutralitaet**
+`container_algorithm_` ist interner Member:
+
+`libs/cache_engine/anatomy/abi_adapter.hpp:1873`
+```cpp
+container_algorithm_t container_algorithm_{};
+```
+
+Die Klasse ist `final` bei `abi_adapter.hpp:143`, privater Bereich beginnt bei `:1759`.
+
+Extern-C-Naht:
+
+`libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp:76`
+```cpp
+COMDARE_ANATOMY_ABI_EXPORT std::uint64_t comdare_anatomy_abi_version() noexcept;
+```
+
+`:79` `comdare_anatomy_abi_magic()`, `:83-84` `IAnatomyBase* comdare_create_anatomy() noexcept`, `:88-89` `comdare_destroy_anatomy(...)`.
+
+Tier-API bleibt `uint64`:
+
+`libs/cache_engine/anatomy/idriveable_tier.hpp:33`
+```cpp
+tier_insert(std::uint64_t key, std::uint64_t value)
+```
+
+`:36` `tier_lookup(uint64_t, uint64_t*)`, `:39` `tier_erase(uint64_t)`, `:42` `tier_clear()`, `:45` `tier_size()`.
+
+POD nicht betroffen: `libs/cache_engine/anatomy/observable_tier.hpp:127-141` `ComdareTierObserverSnapshot`, Layout-Assertions `:145-148`.
+
+**7. Betroffene Tests**
+Relevante Anker:
+
+`tests/unit/test_188_4cii_flat_wrapper_traversal.cpp:85` Direct-address sparse/gappy Traversal; `:140` Wide-`uint64_t` Roundtrip.
+
+`tests/unit/test_188_4bb0_pool_organ_wide_key_conformance.cpp:72`
+```cpp
+static_assert(std::is_same_v<typename Container::key_type, std::uint64_t>);
+```
+`:110` prueft, dass `0` und `65536` nicht aliasen.
+
+Weitere: `test_234_f1_btree_order_shape.cpp:174`, `test_234_f2_skip_list_shape.cpp:77`, `test_234_f3_bst_shape.cpp:72` und `:201`, `test_234_f4_hash_probe_shape.cpp:73` und `:160`, `test_v41_axis_03a_tier_organ_equivalence.cpp:212`, `test_d_v42_node_type_observable.cpp:27`, `thesis_tiere/test_node_delegation_proof.cpp:46`.
+
+**8. Minimale ABI-neutrale 2a-Umsetzung**
+Empfohlen: additive Capacity-Eigenschaft + Guards im Adapter-/Container-Inneren, ohne ABI-Signaturen zu aendern.
+
+Andockstellen: `abi_adapter.hpp:1846` nach `container_algorithm_t`-Auswahl; runtime guard vor den Casts bei `abi_adapter.hpp:762` und `:831`.
+
+Concept-Form:
+```cpp
+template<class C>
+concept StaticElementCapacity =
+  requires { { C::static_element_capacity() } noexcept -> std::convertible_to<std::size_t>; };
+
+template<class C>
+concept RuntimeElementCapacity =
+  requires(C const& c) { { c.capacity() } noexcept -> std::convertible_to<std::size_t>; };
+```
+
+Guard-Mechanik: `static_assert` fuer bekannte Key-/Capacity-Domains; runtime Range-Check vor `slot_index_type`-Casts. In non-ABI APIs ehrlich `status_capacity_exceeded` (`status_code.hpp:27`) oder `length_error` nach Vorbild `axis_04_node_type_slot_store.hpp:54`. In `tier_insert(...) noexcept -> bool` keine neue Fehlersemantik einschleusen.
+
+Bewusst 2b-out: keine native-Breiten-Container-Umstellung, keine rekursive `node_type`-Fanout-Einhaengung, keine ABI-/Virtual-Method-Aenderung, kein Rename von `max_fanout`, keine Registry-/Golden-/mp_list-Churn.
+
+Risiko/TABU: `tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt`, `gen_golden_fullpilot.cpp`, `source_catalog.hpp`, `profile_runner.hpp`, `libs/cache_engine/axes/lookup/axis_03a_search_algo_registry.hpp:52`, `libs/cache_engine/compositions/known_compositions_list.hpp:97`, `tests/unit/test_v41_anatomy_codegen_tool_mp_list.cpp:38`.

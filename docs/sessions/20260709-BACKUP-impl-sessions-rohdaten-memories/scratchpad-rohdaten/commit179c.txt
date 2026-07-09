@@ -1,0 +1,15 @@
+#179 INC-3 (Wartbarkeits-Sweep, comment-only): god-header abi_adapter.hpp
+
+- DATEI-NAVIGATION-Map (11 ABI-Belange) in den Datei-Header + Observer-Sub-Banner vor fill_observer_v3
+  (Navigation fuer den ~1805-Z.-god-header; hoechster Lesbarkeitswert ohne Verhaltensaenderung).
+- 6 stale-Kommentar-Fixes (Codex gpt-5.5/xhigh-gesweept + jede Stelle selbst gegen den Code verifiziert):
+  * „DREI Achsen" -> „VIER" (run_workload misst real 4 Segmente inkl. serialization)
+  * „Pilot R5.C.A3 / echte Cache-Preheat kommt mit R5.D" -> Ist-Zustand (Hooks setzen nur state_)
+  * memento „Checkpoint-save_state folgt in V5-I8" -> V5-I8 umgesetzt (per-Achsen-MementoAxis)
+  * Delegations-Diagnose „AKTUELL: false … aus search_organ_ (:788)" -> „per-Komposition CONDITIONAL"
+    (Code Z.938 ist StoreTraversableSearchAlgo-conditional; Methode Z.1513 gibt genau das zurueck)
+  * Nav-Map +tier_size + korrigierter private-Anker
+- Befund: KEIN toter auskommentierter Code, kein #if 0, Achsenmodell konsistent (19 Slots T0..T18).
+  Reiner Doku-/Kommentar-Sweep, KEINE Verhaltensaenderung.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

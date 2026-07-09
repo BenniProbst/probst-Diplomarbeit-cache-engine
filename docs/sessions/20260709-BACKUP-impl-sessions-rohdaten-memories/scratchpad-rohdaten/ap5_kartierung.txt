@@ -1,0 +1,36 @@
+AP-5/#239 KARTIERUNG (nur kartieren, KEINE Aenderung) — Repo comdare-cache-engine.
+
+Ziel des spaeteren Increments: Full-Sampled-Modus — ein DETERMINISTISCHES 1:1000-Sampling
+(seed-stabil, reproduzierbar ueber Laeufe) fuer den Full-Messreihen-Modus, damit Full-Abdeckung
+OHNE die volle Kombinatorik-Kosten moeglich ist. ABI-neutral (host-seitige Enumerations-Logik).
+
+Bitte kartiere PRAEZISE (file:line + kurzer Codeausschnitt je Punkt; lies die Dateien selbst):
+
+1. Messreihen-Modus-Enum: WO ist der bestehende Modus definiert (MessreihenMode Defined/Full o.ae.)?
+   file:line. Wie wird zwischen Defined und Full unterschieden, und WO wird der Modus konsumiert
+   (Enumeration/Filter der Permutationen)? Insb. experiment_driver.cpp/.hpp + Iterator/Engine.
+
+2. Full-Enumeration: WO werden im Full-Modus ALLE Permutationen/Descriptors erzeugt (die Stelle,
+   an der das 1:1000-Sampling eingehaengt wird)? Zeige die Descriptor-Erzeugung (fingerprint,
+    id) — es gibt einen deterministischen Fingerprint je Permutation (aus fru
+   heren Sessions: std::hash / fp). file:line.
+
+3. Seed/Determinismus: gibt es bereits einen seed-stabilen Mechanismus (splitmix64/Fibonacci-Hash/
+   deterministischer fingerprint)? Wie wird Reproduzierbarkeit heute sichergestellt (kein
+   Math.random)? Welcher Wert ist stabil ueber Laeufe (fingerprint)?
+
+4. Config/CLI-Anbindung: wie wird der Modus gewaehlt (messreihen.xml / CLI-Flag / ExperimentDriverOptions)?
+   WO wuerde ein "FullSampled"-Modus + Sampling-Rate (1:1000) + optionaler seed angedockt? file:line.
+
+5. ABI-Neutralitaet: aendert der Sampling-Modus den COMDARE_ANATOMY_ABI_MAJOR / Mess-POD / extern-C?
+   (Erwartung NEIN — host-seitige Enumerations-/Filter-Logik.) Beleg.
+
+6. Test-Vorlage: wie werden Enumerations-/Driver-Aspekte getestet (z.B. test_experiment_driver_v13)?
+   file:line — Vorlage fuer einen Determinismus-Test (gleiche Menge ueber 2 Laeufe, ~1:1000-Rate).
+
+7. Empfohlene MINIMALE Umsetzung: welche Dateien/Zeilen, welcher deterministische Sampling-Praedikat
+   (z.B. keep = (mix64(fingerprint XOR seed) % 1000 == 0), seed-parametrisiert), wie der Modus im
+   Enum/Config ergaenzt wird, und was BEWUSST ausgeklammert bleibt. Exakte Anfass-Stellen.
+
+Output: strukturierte 7-Punkte-Mappe (file:line) + Risikoliste (ABI / Determinismus-Fallen /
+Sampling-Bias / TABU-Dateien).

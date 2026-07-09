@@ -1,0 +1,12 @@
+#198 manifest+prebackup (Pipeline-Stufe 7, EPIC #186) + cache-engine-Submodul-Bump -> ef6ecd6 (#197)
+
+- .gitlab-ci.yml: stage `manifest` + Job manifest:provenance (super-SHA + Commit-SHAs ALLER Submodule
+  recursive + Toolchain cmake/Compiler/ninja + OS/ISA + Profil-Hash aller Lastprofil-XMLs -> EIN
+  Manifest-Artefakt) + Job prebackup:measurements (additiv + sha256-verifiziert, NIE ueberschreiben;
+  Selbsttest 2 Versionen + Idempotenz + Overwrite-Schutz rc=3). needs:[verify:submodules].
+  Reales NAS/MinIO-Storage-Ziel = #202-gegatet (hier Mechanismus-Beleg als Artefakt).
+- Submodul cache-engine 07220a2 -> ef6ecd6 (#197 chaos:drift-Gate; cache-engine-Pipeline 7041 grün auf prod1).
+- Codex-Gegenreview (gpt-5.5/xhigh, read-only): keine BLOCKER/MAJOR; 3 NITs umgesetzt
+  (submodule-SHA-Prefix-Strip, cpu_flags-Einzelwert statt Doppelzeile, Overwrite-Schutz rc=3-praezise).
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

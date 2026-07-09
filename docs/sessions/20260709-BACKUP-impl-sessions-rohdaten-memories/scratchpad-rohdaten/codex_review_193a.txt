@@ -1,0 +1,22 @@
+Fokussiertes Code-Review (KEINE Aenderungen vornehmen, nur bewerten).
+
+Repo: comdare-cache-engine. Datei: libs/cache_engine/builder/experiment_driver/experiment_driver.cpp
+
+Kontext (#193-A): Der SOTA-Profil-Verzeichnis-Fallback war fehlerhaft: er zeigte auf
+comdare_root / "cache_engine" / "algorithm_profiles" / "sota", aber seit dem libs/-Move liegt das
+reale Verzeichnis unter libs/cache_engine/algorithm_profiles/sota. Zudem war er CWD-abhaengig
+(comdare_root = std::filesystem::current_path() in apps/cache_engine_builder/main.cpp). Fix: neue
+Helper-Funktion resolve_sota_profiles_dir(config_dir, comdare_root) in der anonymen Namespace,
+aufgerufen an zwei Stellen (Phase-2-Modulgenerierung + fp_to_workload-Vorberechnung).
+
+Bitte pruefe NUR (lies die Datei selbst):
+1. Korrektheit von resolve_sota_profiles_dir: Endlosschleifen-Sicherheit der Aufwaerts-Discovery
+   (parent_path bis root_path), weakly_canonical-Fehlerbehandlung mit error_code, std::array-Init,
+   Reihenfolge/Vollstaendigkeit der rel_variants.
+2. Regressionsfreiheit: Wird der bisherige Primaerpfad config_dir / "algorithm_profiles" / "sota"
+   weiterhin ZUERST getroffen (via Variante 3), sodass bestehende gruene Aufrufe unveraendert bleiben?
+3. Portabilitaet Linux g++ (C++23) - irgendein MSVC-only-Konstrukt oder UB?
+4. Sonstige echte Bugs an den zwei Call-Sites (Phase 2 und fp_to_workload).
+
+Gib am Ende ein knappes Verdikt in EINER Zeile: "VERDICT: SHIP" oder "VERDICT: <Datei:Zeile Bug>".
+Kompiliert bereits gruen mit MSVC (nur zur Info). Keine Datei aendern.

@@ -1,0 +1,25 @@
+import os, sys
+root = r'C:/Users/benja/OneDrive/Desktop/Diplomarbeit - Datenbanken/Code/external/comdare-cache-engine'
+hard = r'C:\Users\benja\OneDrive\Desktop\Diplomarbeit - Datenbanken\Code\external\comdare-cache-engine'
+with open(sys.argv[1], encoding='utf-8') as f:
+    tracked = [l.strip() for l in f if l.strip()]
+changed = []
+for rel in tracked:
+    p = os.path.join(root, rel.replace('/', os.sep))
+    if not os.path.isfile(p):
+        continue
+    with open(p, encoding='utf-8-sig') as f:
+        txt = f.read()
+    if hard not in txt:
+        continue
+    depth = rel.count('/')
+    ups = '/'.join(['..'] * depth)
+    repl = "(Resolve-Path (Join-Path $PSScriptRoot '" + ups + "')).Path"
+    new = txt.replace('"' + hard + '"', repl)
+    if new != txt:
+        with open(p, 'w', encoding='utf-8') as f:
+            f.write(new)
+        changed.append((rel, depth))
+print('geaenderte tracked .ps1:', len(changed))
+for rel, d in changed:
+    print('  d' + str(d) + '  ' + rel)

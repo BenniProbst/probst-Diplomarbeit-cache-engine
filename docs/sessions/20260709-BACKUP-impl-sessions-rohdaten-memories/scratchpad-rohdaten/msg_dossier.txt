@@ -1,0 +1,9 @@
+[skip ci] docs(#227/#212): Kontext-Dossier Mess-Echtheit/Gattungen/Observer-Pruefdock (A2-Welle #211-226 + #188)
+
+Geerdeter Kontext-Anker (das Problem, mit dem die Session begann): Drei-Ebenen-Modell
+Gattung/Unterklasse/Organe + FOSD-Mapping (Anatomie=Verdrahtung=Feature-Interaktion);
+Observer-Aufbau durch das Pruef-Dock (I1/Q1/PULL/two-mode); Apparat-Reinheit + Meta-Lehre #3;
+code-verifiziertes Audit-Verdikt (SOTA-Baeume Weg-B = paralleler Apparat -> #188 = Haupthebel);
+alle Referenz-Doc-Pfade; Abschnitt 6 elaborierte #212-Spec.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
