@@ -242,3 +242,13 @@ Volle Disambiguierungs-Tabelle jetzt in Ledger `§10.1 (2)`.
 | `MATRIX-GRUNDLAGEN-GOALV2.md` | Kopf-Vermerk | Baseline-Schichten ⊥ E-Ebenen |
 
 **Nächster Block:** Phase 0.5 (**G2** — Revert `88738285`+`4d8aedce`), dann Phase 4/#31 (E4-XML, nach V32-Fork-Bestätigung). Roadmap #188→#221→#223→#215→#156 unverändert.
+
+## I.4 V32-Fork-Wahrheit (Phase-4-Vorbereitung, Explore-Analyse, Backup `docs/sessions/backups/20260709-v32-fork-analyse-31-e4xml/`)
+
+Die live-Verifikation korrigiert Teil D/H erheblich — der Fork war falsch gerahmt: **(1)** `comdare_experiment` (config_a/b/c) ist **toter Code** (von nichts konsumiert). **(2)** Der V32-Orchestrator ist **NICHT in den Produktions-Driver verdrahtet** (`main.cpp` inkludiert `v32_orchestrator.hpp` nie; `execute_messreihe:81-85` = Stub; kein V32-XML→Struct-Parser existiert; `COMDARE_V32_ENABLE` ist unter jedem Preset ON, aber **No-Op** fürs Driver-Binary). **(3)** Der reale produktive Pfad = viertes Ad-hoc-Format `<comdare_messreihen>` (`experiment_config/messreihen.xml`, per Regex in `load_messreihen` `main.cpp:167-204`; `MessreihenSpec` ohne workload/dataset/measurement_category → Workload hartkodiert `main.cpp:135/140/145/483`).
+
+**Neu gerahmter Fork** (golden/ABI-neutral verifiziert — Workload×Dataset×Kategorie = Mess-INPUTS, keine Binary-Achsen; `permutation_axes.xml`/`golden_fullpilot_320`/POD tragen sie nicht):
+- **Option A (empfohlen):** `<comdare_messreihen>`/`MessreihenSpec`/`load_messreihen` + die 4 Hartkodierungen erweitern (**1 Code-Datei + 1 XML-Template**; additiv, Fallback=heute, kein Parser/Orchestrator).
+- **Option B:** V32 wiederbeleben (XSD-Erweiterung + ~200 LOC neuer Parser + Orchestrator-Stub vollenden + Verdrahtung; reicher: op_type OP-1..6, XSD-validiert; bricht V31.F-Freeze).
+
+**Doppeltes Gate für Phase 4:** **(R1)** Reicht `YcsbWorkload` A–F, oder braucht die Mess-Kategorie OP-1..6 (Bulk-Insert/Range-Delete)? **(R2)** Treibt messreihe-`<workload>` die `WorkloadOptions`, oder bleibt `test_data_sets.xml` autoritativ (Doppelquelle vermeiden)? **+ main.cpp-V31.F-Freeze** (`v32_orchestrator.hpp:7`, „V31.F-Code in main.cpp bleibt unveraendert"). Beides = **User-GO nötig**; kein Blind-Bau. Volldetails: Backup-`BEFUND.md`.
