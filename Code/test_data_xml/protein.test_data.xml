@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Diplomarbeit Testdatensatz: protein (Pizza&Chili protein-Sequenzen)
+     6er-Kanon (tab:datasets): biologische Sequenzen, kleines bis mittleres Alphabet.
+     Quelle uebernommen aus P04 CoCo-trie (Boffa et al.). #25 (2026-07-08). -->
+<comdare_test_data id="protein" source="Pizza&Chili protein (via CoCo-trie P04)">
+  <metadata>
+    <name>Pizza&Chili proteins.distinct (no_suffixes_small)</name>
+    <license>research use — siehe source_url (Pizza&Chili)</license>
+    <size_bytes>511956</size_bytes>
+    <source_url>http://pizzachili.dcc.uchile.cl/texts/protein/</source_url>
+    <referenced_in_paper>P04 CoCo-trie (Boffa/Ferragina/Vinciguerra 2022)</referenced_in_paper>
+  </metadata>
+
+  <key_value_signature>
+    <key_types>std::string</key_types>
+    <value_types>std::uint64_t</value_types>
+  </key_value_signature>
+
+  <local_path>external/comdare-cache-engine/ext/traversal/P04-CoCo-trie/CoCo-trie/dataset/proteins.distinct_no_suffixes_small</local_path>
+
+  <!-- #25 (2026-07-08): Akte gegen die ECHTE, im ce-Repo committete CoCo-trie-preprocessed Datei,
+       via compute_dataset_akte. preprocessing benennt die CoCo-trie-Vorverarbeitung EHRLICH. -->
+  <dataset_akte>
+    <checksum>0xd7b59914049ee21a</checksum>
+    <line_count>14411</line_count>
+    <preprocessing>coco-trie:no_suffixes_small</preprocessing>
+  </dataset_akte>
+
+  <loader>
+    <dataset_source>string_corpus</dataset_source>
+    <dataset_id>external/comdare-cache-engine/ext/traversal/P04-CoCo-trie/CoCo-trie/dataset/proteins.distinct_no_suffixes_small</dataset_id>
+  </loader>
+
+  <expected_workload>YCSB_C</expected_workload>
+</comdare_test_data>

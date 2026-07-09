@@ -149,7 +149,7 @@ int write_latex(std::filesystem::path const& out, std::span<CsvRow const> rows, 
     }
     f << "\\bottomrule\n";
     f << "\\end{tabular}\n";
-    f << "\\caption{" << escape_latex(caption) << "}\n";
+    f << "\\caption{" << escape_latex(caption) << "}%\n";
     f << "\\label{" << label << "}\n";
     f << "\\end{table}\n";
     return f.good() ? status_ok : status_io_error;
@@ -256,7 +256,7 @@ int write_bias_matrix_latex(std::filesystem::path const& out, std::span<TierWork
         f << " \\\\\n";
     }
     f << "\\bottomrule\n\\end{tabular}%\n}\n";
-    f << "\\caption{" << escape_latex(caption) << "}\n";
+    f << "\\caption{" << escape_latex(caption) << "}%\n";
     f << "\\label{" << label << "}\n";
     f << "\\end{table}\n";
     return f.good() ? status_ok : status_io_error;

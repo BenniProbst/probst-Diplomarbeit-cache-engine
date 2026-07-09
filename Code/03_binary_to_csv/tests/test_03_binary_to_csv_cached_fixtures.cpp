@@ -16,11 +16,20 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <unistd.h>
 
 namespace btc = comdare::da::binary_to_csv;
 namespace fs  = std::filesystem;
 
 namespace {
+
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
 
 /// V35.D.1 Helper — schreibt Binary-Records im Format von Stufe 02_messung_driver
 void write_binary_fixture(fs::path const& p, std::vector<btc::LabeledRecord> const& records) {
@@ -138,7 +147,7 @@ TEST(Stufe03Pipeline, WriteCsvFromCachedFixture) {
     std::vector<btc::LabeledRecord> loaded;
     ASSERT_EQ(btc::read_binary(dir / "sample_3_records.bin", loaded), btc::status_ok);
 
-    auto csv_out = fs::temp_directory_path() / "v35d1_pipeline_test.csv";
+    auto csv_out = comdare_user_tmp() / "v35d1_pipeline_test.csv";
     ASSERT_EQ(btc::write_csv(csv_out, loaded), btc::status_ok);
 
     std::string content;
@@ -166,7 +175,7 @@ TEST(Stufe03Pipeline, FullPipelineThreeStepsBinaryToCsv) {
     ASSERT_EQ(records.size(), 3u);
 
     // Schritt B: Write CSV (= Stufe 04 Input)
-    auto csv_out = fs::temp_directory_path() / "v35d1_pipeline_intermediate.csv";
+    auto csv_out = comdare_user_tmp() / "v35d1_pipeline_intermediate.csv";
     ASSERT_EQ(btc::write_csv(csv_out, records), btc::status_ok);
 
     // Schritt C: Verifiziere CSV-Schema-Konsistenz

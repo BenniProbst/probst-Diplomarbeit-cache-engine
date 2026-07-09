@@ -8,26 +8,39 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <unistd.h>
 
 namespace c2l = comdare::da::csv_to_latex;
 namespace fs  = std::filesystem;
 
 namespace {
 
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
+
 void write_sample_csv(fs::path const& p) {
     fs::create_directories(p.parent_path());
     std::ofstream f(p);
-    f << "permutation_id,fingerprint,succeeded,op_count,total_cycles,"
+    // V41.P1-KANONISCH: 16 Spalten, workload_used als 4. Spalte (parse_csv verlangt cols>=16 —
+    // Fix 2026-07-06: der alte 15-Spalten-Writer erzeugte status_parse_error).
+    f << "permutation_id,fingerprint,succeeded,workload_used,op_count,total_cycles,"
       << "cache_misses_l1,cache_misses_l2,cache_misses_l3,dtlb_misses,"
       << "coherence_invalidations,energy_micro_joules,"
       << "bytes_allocated,bytes_in_use_peak,external_frag,internal_frag\n";
-    f << "ce_lockfree:art:tcmalloc:none,3405691582,1,1000,25000,50,10,2,1,0,12345,4096,3072,0.05,0.02\n";
-    f << "pa_olc:hot:mimalloc:zipf,3405691583,1,2000,48000,100,20,5,2,0,23456,8192,6144,0.04,0.03\n";
-    f << "ce_lockfree:masstree:jemalloc:none,3405691584,0,500,12000,0,0,0,0,0,0,0,0,0.0,0.0\n";
+    f << "ce_lockfree:art:tcmalloc:none,3405691582,1,ycsb_a,1000,25000,50,10,2,1,0,12345,4096,3072,0.05,0.02\n";
+    f << "pa_olc:hot:mimalloc:zipf,3405691583,1,ycsb_b,2000,48000,100,20,5,2,0,23456,8192,6144,0.04,0.03\n";
+    f << "ce_lockfree:masstree:jemalloc:none,3405691584,0,ycsb_a,500,12000,0,0,0,0,0,0,0,0,0.0,0.0\n";
 }
 
 void ensure_cached_csv(fs::path const& p) {
-    if (!fs::exists(p)) write_sample_csv(p);
+    // IMMER schreiben (selbstheilend gegen Schema-Drift alter gecachter Dateien);
+    // die Datei bleibt danach als inspizierbares Fixture liegen (Habich-Doktrin).
+    write_sample_csv(p);
 }
 
 fs::path fixtures_dir() {
@@ -67,7 +80,7 @@ TEST(Stufe04Pipeline, WriteLatexFromCachedFixture) {
     std::vector<c2l::CsvRow> rows;
     ASSERT_EQ(c2l::parse_csv(dir / "sample_3_rows.csv", rows), c2l::status_ok);
 
-    auto out = fs::temp_directory_path() / "v35d2_table.tex";
+    auto out = comdare_user_tmp() / "v35d2_table.tex";
     ASSERT_EQ(c2l::write_latex(out, rows, "Pipeline-Stage-04 Test", "tab:v35d2"), c2l::status_ok);
 
     std::string content;
@@ -160,7 +173,7 @@ TEST(Stufe04Pipeline, WriteBiasMatrixLatex) {
     ASSERT_EQ(c2l::parse_wide_csv(dir / "sample_wide_rows.csv", rows), c2l::status_ok);
     auto const aggs = c2l::aggregate_tier_workload(rows);
 
-    auto out = fs::temp_directory_path() / "wide_bias_matrix.tex";
+    auto out = comdare_user_tmp() / "wide_bias_matrix.tex";
     ASSERT_EQ(c2l::write_bias_matrix_latex(out, aggs, "Bias-Bruch-Matrix Test", "tab:biasmatrix", "de"),
               c2l::status_ok);
     std::string content;

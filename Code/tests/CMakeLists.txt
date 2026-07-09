@@ -6,13 +6,15 @@ include(GoogleTest)
 function(comdare_da_add_test name)
     cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES" ${ARGN})
     add_executable(${name} ${ARG_SOURCES})
+    # CI-Registry (User 06.07.: Tests nie manual/auslassen): Root sammelt zu comdare_da_unit_tests.
+    set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS ${name})
     target_link_libraries(${name} PRIVATE
         gtest gtest_main
         ${ARG_LIBRARIES})
     target_compile_features(${name} PRIVATE cxx_std_23)
     gtest_discover_tests(${name}
         DISCOVERY_TIMEOUT 30
-        PROPERTIES TIMEOUT 60)
+        PROPERTIES TIMEOUT 60 LABELS da_unit)
 endfunction()
 
 comdare_da_add_test(test_binary_to_csv
@@ -57,6 +59,25 @@ target_include_directories(test_op_type_filter PRIVATE
     ${CMAKE_SOURCE_DIR}/02_messung_driver
     ${COMDARE_CACHE_ENGINE_DIR}/libs)
 
+# #279-a (2026-07-07) - Tier-Binary-Build-Sichtbarkeit + Interface-Roster
+# (reine std-Logik: parse_manifest/scan_built/compute_visibility/format_* ->
+#  immer gebaut, unabhaengig vom V32-Gate). Fixtures via Source-Dir-Fallback.
+comdare_da_add_test(test_279_tier_binary_report
+    SOURCES unit/test_279_tier_binary_report.cpp
+    LIBRARIES comdare::tier_binary_report)
+# Manifeste (.txt) liegen committet im Source-Baum. Die "gebauten" Tier-Binary-
+# Dateien (.so) sind Build-Artefakte (.gitignore ignoriert *.so bewusst) -> sie
+# werden bei configure synthetisch im Build-Baum erzeugt statt committet.
+set(_fix279_src  "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/tier_binary_report")
+set(_fix279_perm "${CMAKE_CURRENT_BINARY_DIR}/fixtures_279_perm")
+file(MAKE_DIRECTORY "${_fix279_perm}/cache_engine" "${_fix279_perm}/prt_art")
+file(WRITE "${_fix279_perm}/cache_engine/perm_aaa.so" "fixture perm lib aaa (nur Dateiscan)\n")
+file(WRITE "${_fix279_perm}/cache_engine/perm_bbb.so" "fixture perm lib bbb (nur Dateiscan)\n")
+file(WRITE "${_fix279_perm}/cache_engine/notperm.so" "decoy ohne perm_-Praefix (muss ignoriert werden)\n")
+target_compile_definitions(test_279_tier_binary_report PRIVATE
+    "COMDARE_FIXTURE_DIR_279=\"${_fix279_src}\""
+    "COMDARE_FIXTURE_PERM_DIR_279=\"${_fix279_perm}\"")
+
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
 if(COMDARE_V32_ENABLE)
@@ -67,10 +88,17 @@ if(COMDARE_V32_ENABLE)
         ${COMDARE_CACHE_ENGINE_DIR}/libs
         ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
         ${COMDARE_PRT_ART_DIR}/prt_art/include)
+    # #265-b: die AP-3-Bruecke (via auto_permutator) konsumiert die vendored foundation-Zelle
+    # comdare::platform — MATRIX-WEIT-Regel: super-Konsumenten der ce-Header linken das Target mit.
+    target_link_libraries(test_v32_orchestrator PRIVATE comdare::platform)
 
     # V33.D.3 (2026-05-21) - MessreiheV32Validator-Tests
     comdare_da_add_test(test_messreihe_v32_validator
         SOURCES unit/test_messreihe_v32_validator.cpp)
+    # CWD-Stray-Haertung (Fix 2026-07-06, Muster COMDARE_FIXTURES_DIR_03_FALLBACK): Source-Dir-Fallback
+    # fuer das gelieferte Beispiel-XML — der fruehere GTEST_SKIP maskierte den Test in CI/ctest komplett.
+    target_compile_definitions(test_messreihe_v32_validator PRIVATE
+        "COMDARE_TEST_DATA_XML_DIR_FALLBACK=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_data_xml\"")
     target_include_directories(test_messreihe_v32_validator PRIVATE
         ${CMAKE_SOURCE_DIR}/02_messung_driver)
 
@@ -88,4 +116,6 @@ if(COMDARE_V32_ENABLE)
         ${COMDARE_CACHE_ENGINE_DIR}/libs
         ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
         ${COMDARE_PRT_ART_DIR}/prt_art/include)
+    # #265-b: s.o. — messreihe_report_exporter.hpp zieht v32_orchestrator -> Bruecke -> comdare::platform.
+    target_link_libraries(test_messreihe_report_exporter PRIVATE comdare::platform)
 endif()

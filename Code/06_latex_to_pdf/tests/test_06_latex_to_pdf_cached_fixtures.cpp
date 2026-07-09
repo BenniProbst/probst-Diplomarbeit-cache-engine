@@ -13,6 +13,9 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#if !defined(_WIN32)
+#include <unistd.h> // Skip-Audit #12: ::getuid fuer per-User-Tempdir
+#endif
 
 namespace fs = std::filesystem;
 
@@ -130,16 +133,28 @@ TEST(Stufe06Pipeline, PdfBuildSkippedIfPdflatexAbsent) {
     auto dir = fixtures_dir();
     ensure_cached_minimal_tex(dir / "minimal_main.tex");
 
+    // Skip-Audit #12 (2026-07-07): per-User-Tempdir (CI-/tmp-Kollisionsklasse, Muster comdare_user_tmp).
+#if defined(_WIN32)
     auto work_dir = fs::temp_directory_path() / "v35d4_pdflatex_smoke";
+#else
+    auto work_dir = fs::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid())) / "v35d4_pdflatex_smoke";
+#endif
     fs::create_directories(work_dir);
     auto in_tex = work_dir / "main.tex";
     fs::copy_file(dir / "minimal_main.tex", in_tex, fs::copy_options::overwrite_existing);
 
     // pdflatex -interaction=nonstopmode -halt-on-error -output-directory=work_dir main.tex
+#if defined(_WIN32)
+    char const* devnull = ">NUL 2>&1";
+#else
+    char const* devnull = ">/dev/null 2>&1"; // Skip-Audit #12: ">NUL" erzeugte auf Linux eine Junk-Datei ./NUL
+#endif
     std::string cmd = std::string("pdflatex -interaction=nonstopmode -halt-on-error ") + "-output-directory=\"" +
-                      work_dir.string() + "\" \"" + in_tex.string() + "\" >NUL 2>&1";
+                      work_dir.string() + "\" \"" + in_tex.string() + "\" " + devnull;
     int         rc  = std::system(cmd.c_str());
-    if (rc != 0) { GTEST_SKIP() << "pdflatex run failed (rc=" << rc << ") — vermutlich fehlen Pakete"; }
+    // Skip-Audit #12 (2026-07-07): rc != 0 war frueher ein GTEST_SKIP — das MASKIERTE einen echten
+    // Stufe-06-Defekt (pdflatex vorhanden, Lauf scheitert = kaputte Toolchain/Fixture). Jetzt HART.
+    ASSERT_EQ(rc, 0) << "pdflatex-Lauf scheiterte (rc=" << rc << ") — Stufe-06-Toolchain/Pakete pruefen";
     auto pdf = work_dir / "main.pdf";
     EXPECT_TRUE(fs::exists(pdf));
     EXPECT_GT(fs::file_size(pdf), 1000u);

@@ -8,10 +8,20 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <unistd.h>
 
 namespace c2l = comdare::da::csv_to_latex;
 
 namespace {
+
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
+// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
+
 [[nodiscard]] std::string read_file(std::filesystem::path const& p) {
     std::ifstream     in{p};
     std::stringstream ss;
@@ -48,7 +58,7 @@ TEST(CsvToLatex, ParseCsvOnNonExistentFails) {
 }
 
 TEST(CsvToLatex, WriteLatexHasBooktabsStructure) {
-    auto tmp = std::filesystem::temp_directory_path() / ("da_c2l_test_" + std::to_string(rand()) + ".tex");
+    auto                     tmp = comdare_user_tmp() / ("da_c2l_test_" + std::to_string(rand()) + ".tex");
     std::vector<c2l::CsvRow> rows;
     rows.push_back({"perm_test", 0xA, true, "micro", 100, 200, 30, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0});
     EXPECT_EQ(c2l::write_latex(tmp.string(), rows, "Test", "tab:test"), c2l::status_ok);

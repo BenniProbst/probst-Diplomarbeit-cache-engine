@@ -1,0 +1,6 @@
+# permutations_manifest.txt (Fixture #279-a, reale ce-Codegen-Form)
+# Profile=smoke ISA=auto Mode=on_build_on_demand
+# count=3
+perm_aaa
+perm_bbb
+perm_ccc

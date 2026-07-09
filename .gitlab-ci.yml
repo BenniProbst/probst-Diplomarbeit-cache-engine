@@ -32,11 +32,19 @@ stages:
   - manifest             # Stufe 7 (#198, EPIC #186): Build-/Mess-Manifest (Provenance) + additives Prebackup
   - thesis-pdf
 
+# #277/#21 (User 06.07.): ccache-Bestand liegt auf dev-MinIO (runners.cache -> minio.comdare.de:9000/buildsystem-cache).
+# CCACHE_DIR projektlokal, damit GitLab-cache ihn synct; MAXSIZE klein halten (Zip-Transfer je Job).
+cache:
+  key: "ccache-$CI_PROJECT_NAME"
+  paths: [".ccache"]
+
 variables:
+  CCACHE_DIR: "$CI_PROJECT_DIR/.ccache"
+  CCACHE_MAXSIZE: "3G"
   COMDARE_CLANG_MATRIX: "1"   # #273: neueste-clang-Pflicht (User-E2), Rollout-Start super
   GIT_SUBMODULE_STRATEGY: recursive       # Default fuer die Build-Stages; Lint ueberschreibt auf none
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
-  CMAKE_BUILD_PARALLEL_LEVEL: "8"          # User 2026-07-03: 8 Kerne = 8 GB (1 GB/Kern) bei prod concurrent=1 (revidiert 4)
+  CMAKE_BUILD_PARALLEL_LEVEL: "6"          # User 2026-07-06: 2x6 Kerne bei concurrent=2 (prod1 16C/60G, 17G frei, kein earlyoom; revidiert 8@concurrent=1)
   COMDARE_LINT_PATHS: "Code"
   COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
   # cppcheck-Pendant zur EXCLUDE_RE (Template 237b6ec): OHNE external/thesis scannt lint:static die
@@ -51,10 +59,18 @@ toolchain:probe:
   tags: [baremetal]
 
 # #273: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang (COMDARE_CLANG_MATRIX=1 oben).
+# #258-Fix (2026-07-06, Pipeline 8048/Job 213091): Template-Default cmake -S "." fand kein CMakeLists —
+# super-Quelle liegt unter Code/. Scope = Sammel-Target comdare_da_tools (Code/CMakeLists.txt, super-eigene
+# Werkzeugflaeche analog analyse+integration; Konfiguration spiegelt analyse:thesis-data: Ninja/Release/V32).
 build:clang:
   extends: .build-clang-latest
   stage: analyse   # super hat keinen 'build'-Stage (Lint-API 05.07.: chosen stage build does not exist)
   tags: [baremetal]
+  variables:
+    COMDARE_CMAKE_SOURCE_DIR: "Code"
+    COMDARE_AUDIT_BUILD_TYPE: "Release"
+    COMDARE_CMAKE_CONFIGURE_FLAGS: "-G Ninja -DCOMDARE_V32_ENABLE=ON"
+    COMDARE_CMAKE_BUILD_TARGET: "comdare_da_tools"
 
 lint:secrets:
   extends: .lint-secrets
@@ -72,21 +88,20 @@ lint:static:
   variables:
     GIT_SUBMODULE_STRATEGY: none
 
-# ── Stufe 3: Test (aus ci-templates .test) — VOLLE super-Unit-Suite (11 Tests, Code/tests) bauen + AUSFUEHREN ──
-# Heute lief 0 super-Unit-Test in der GitLab-CI (integration:smoke baut mit DA_BUILD_TESTS=OFF). Dieser Job
-# baut Code/ mit Tests+V32 in EIGENEM Build-Ordner und faehrt ctest ueber alle 11. Probelauf-Modus
-# (when:manual + allow_failure) bis zum ersten gruenen Beweis, dann scharf (allow_failure raus) — SE-21b-F3.
+# ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
+# User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
+# lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
+# bewusst NICHT Target "all": das zöge die komplette ce-Suite (888 Targets) doppelt, die ihr EIGENES
+# test:unit im ce-Repo hat (dort advisory bis 58er-Fix-Strecke/264-d).
 test:unit:
   extends: .test
   tags: [baremetal]
-  rules:
-    - when: manual
-      allow_failure: true
   variables:
     COMDARE_TEST_CMAKE_SOURCE_DIR: "Code"
     COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test"
     COMDARE_TEST_CONFIGURE_FLAGS: "-DCOMDARE_DA_BUILD_TESTS=ON -DCOMDARE_V32_ENABLE=ON"
-    COMDARE_TEST_BUILD_TARGET: "all"
+    COMDARE_TEST_BUILD_TARGET: "comdare_da_unit_tests"
+    COMDARE_TEST_CTEST_ARGS: "-L da_unit"
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.
@@ -148,6 +163,35 @@ analyse:thesis-data:
     # Build-Parallelitaet via CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25)
     - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator
   # KEIN Code/build/-Artefakt (Object-Storage-500 post-swap; analyse-Erfolg = Tools bauen, Beleg im Log).
+
+# ── Stage analyse: #279 dynamische Tier-Binary-Build-Sichtbarkeit ──
+# Surfacet im CI-Log, welche Tier-Binary-Rekombinationen geplant/gebaut/offen sind + ob der
+# CacheEngineBuilder-Orchestrator gebaut ist. BILLIG: der ce-Codegen schreibt das
+# permutations_manifest.txt bereits bei CONFIGURE (KEIN Lib-Compile); es wird NUR das committete
+# Tool tier-binary-report gebaut + --visibility ausgefuehrt. KEIN schwerer Perm-/Mess-Lauf
+# (mehrtaegiger Lauf #156 bleibt HELD). Hart (kein allow_failure).
+visibility:tier-binaries:
+  stage: analyse
+  tags: [baremetal]
+  needs: ["verify:submodules"]
+  script:
+    - 'echo "== Toolchain =="; cmake --version'
+    - cd Code
+    # Configure triggert den ce-Permutations-Codegen (COMDARE_BUILD_PERMUTATIONS=ON = super-Default)
+    # -> generated/permutations_manifest.txt; Tests aus fuer schnelles Configure (kein gtest-Fetch).
+    - cmake -B build-visibility -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
+    - cmake --build build-visibility --target tier_binary_report_cli
+    - |
+      set -euo pipefail
+      REPORT=$(find build-visibility -type f -name "tier-binary-report" 2>/dev/null | head -1)
+      test -n "$REPORT" -a -x "$REPORT" || { echo "tier-binary-report fehlt: $REPORT"; exit 1; }
+      MANIFEST=build-visibility/generated/permutations_manifest.txt
+      test -s "$MANIFEST" || { echo "Codegen-Manifest fehlt (COMDARE_BUILD_PERMUTATIONS?): $MANIFEST"; exit 1; }
+      echo "-- permutations_manifest.txt (head) --"; head -n 5 "$MANIFEST"
+      "$REPORT" --visibility "$MANIFEST" build-visibility/perm --out=build-visibility/BUILD_VISIBILITY.txt
+      echo "=== visibility:tier-binaries OK (Build-Sichtbarkeit im Log surfaced) ==="
+  artifacts:
+    paths: []
 
 # ── Stage integration (#196, EPIC #186): E2E-Auswerte-Smoke auf Linux-bare-metal ──
 # Beweist, dass der Mess-AUSWERTE-Pfad real funktioniert: baut die 4 leichten Auswerte-Tools (01/03/04/05,

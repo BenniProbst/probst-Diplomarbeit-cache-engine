@@ -3,6 +3,8 @@
 #include "../../02_messung_driver/messreihe_v32_validator.hpp"
 
 #include <gtest/gtest.h>
+
+#include <filesystem>
 #include <string>
 
 namespace v32 = comdare::diplomarbeit::messung_driver::v32;
@@ -82,11 +84,16 @@ TEST(MessreiheV32Validator, InvalidModeFails) {
 }
 
 TEST(MessreiheV32Validator, ValidatesShippedExampleFile) {
-    auto report = v32::MessreiheV32Validator::validate_file("test_data_xml/messreihe_v32_schema_example.xml");
-    // Wenn das File nicht gefunden -> Skip (CTest WORKING_DIRECTORY-Problem)
-    if (!report.valid && report.issues.size() == 1 &&
-        report.issues[0].message.find("Cannot open") != std::string::npos) {
-        GTEST_SKIP() << "Working dir mismatch: " << report.issues[0].message;
+    // CWD-Stray-Haertung (2026-07-06): erst relativer Pfad (manueller Start im Code/-Root), dann
+    // deterministischer Source-Dir-Fallback (CMake-einkompiliert) — der fruehere GTEST_SKIP
+    // maskierte den Test unter ctest dauerhaft (User-Direktive: Tests nie auslassen).
+    std::string xml_path = "test_data_xml/messreihe_v32_schema_example.xml";
+    if (!std::filesystem::exists(xml_path)) {
+#ifdef COMDARE_TEST_DATA_XML_DIR_FALLBACK
+        xml_path = std::string{COMDARE_TEST_DATA_XML_DIR_FALLBACK} + "/messreihe_v32_schema_example.xml";
+#endif
     }
+    ASSERT_TRUE(std::filesystem::exists(xml_path)) << "Beispiel-XML nicht gefunden: " << xml_path;
+    auto report = v32::MessreiheV32Validator::validate_file(xml_path);
     EXPECT_TRUE(report.valid) << "Real example XML failed validation";
 }
