@@ -266,4 +266,19 @@ Dies entspricht **Messreihe A** (PRT-ART vs SOTA). Die anderen Pruefling-Wrapper
 
 ---
 
+## §9 S↔E-KREUZ-MAP (Nachtrag 2026-07-09 — additiv, autoritativ)
+
+**Bezug:** `docs/architektur/16_E1_E4_KONSOLIDIERUNG_DOSSIER.md` (Teil B.2), Ledger `§10.1`. Dieses hier definierte **4-Subsystem-Modell M (S1-S4)** ist die grobe Subsystem-/Ownership-Sicht; die **E0-E4-Experiment-Maschinerie** ist die feinere Experiment-Pipeline-Sicht. Beide beschreiben dieselben Subsysteme in derselben physischen Reihenfolge, aber **gegenläufig nummeriert**:
+
+| S (dieses Modell, 1→4 top-down) | E (Experiment-Maschinerie, 4→1 top-down) | Deckung | Verschobene Kante |
+|---|---|---|---|
+| **S1** messung_driver (Auswertung/OUTER-LOOP, §2) | **E4** XML-Experiment-Definition + Auswertung (`03`–`06`) | deckungsgleich | E4 hat zusätzlich den XML-Eingang (#229) |
+| **S2** CacheEngineBuilder (Permutations-Enumeration, §2/§4) | **E3** Permutations-B+-Baum pro Gattung | deckungsgleich | CEB-Enumeration = Baum-Traversal |
+| **S3** CacheEngine (Werkzeug-Bibliothek, §2/§4) | **E2** Tier-Binaries compile-time (DLLs) | verschoben | Library (S3) vs. daraus emittierte DLL-Artefakte (E2) |
+| **S4** Prüfling PRT-ART (Mess-Objekt, §2/§3) | **E1** RC-Laufzeit (`DynamicVariableNode`) | verschoben | Mess-Objekt (S4) vs. Laufzeit-Mechanismus (E1) |
+
+**Merksätze:** (a) **S-Sicht zählt 1→4** (Treiber→Prüfling, Subsystem-Ownership), **E-Sicht zählt 4→1** (XML→Laufzeit, Experiment-Fluss) — dieselbe physische Reihenfolge, invers nummeriert. (b) Die Ledger-„4 Schichten" (`§13.10 W5`, `:498/:500/:510`) = dieses S1-S4. (c) **Spur-S (S1-S9, Ledger `§3`)** ist ein DRITTER, unabhängiger „S"-Scope (serielle God-Header/ABI-Kette) — NICHT mit S1-S4 verwechseln. (d) `E-A..E-E` (Ledger, jetzt `DD-A..DD-E`) und die `§13.9-Gate-E1/E2/E3` sind wieder ANDERE „E"-Achsen — s. Ledger `§10.1 (2)`.
+
+---
+
 **Ende docs/architektur/10_schichten_modell_M.md (Phase M.2 DONE).**

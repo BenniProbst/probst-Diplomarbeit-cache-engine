@@ -1,5 +1,7 @@
 # MATRIX-GRUNDLAGEN-DOKUMENT (Goal V2) — Synthese aus L1–L4
 
+> **Nachtrag 2026-07-09 (additiv, orthogonal):** Die kanonischen **Baseline-Schichten 0-6** dieser Matrix (Modul-/Layering-Struktur) sind **orthogonal** zu den **E0-E4-Experiment-Ebenen** (Experiment-Pipeline, `docs/architektur/16_E1_E4_KONSOLIDIERUNG_DOSSIER.md` + Ledger `§10.1`). „Baseline-Schicht N" (WO lebt Code) ≠ „E-Ebene N" (WELCHE Experiment-Stufe). Beide Begriffe nie vermischen.
+
 ## TEIL 1: KANONISCHE MATRIX-REGELN
 
 **1.1 Baseline-Schichten** (normativ `baseline-system.md:105-113` [L2]; gleichlautend WEJ:270 [L1] — Semantik überall gleich, NAMEN variieren pro Zeile, nicht jede Zeile prägt alle Stufen aus):

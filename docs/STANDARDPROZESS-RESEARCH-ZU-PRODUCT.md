@@ -2,6 +2,8 @@
 
 **Quelle:** User-Definition 07.07. (Chat, wörtlich verankert in Ledger §12) · Pilot = Diplomarbeit/cache-engine (#274). Dieses Dokument ist der wiederverwendbare Prozess für JEDES künftige Research-Projekt, das Product werden will.
 
+> **Nachtrag 2026-07-09 (additiv, orthogonal):** Die hier definierte **3D-Matrix (Familien × Baseline-Stufen × Module)** ist die **Modul-/Instanziierungs-Struktur (E0-Querschnitt + Product/Research-Matrix)** — sie ist **orthogonal** zur **E0-E4-Experiment-Maschinerie** (Experiment-Pipeline-Modell der Diplomarbeit, `docs/architektur/16_E1_E4_KONSOLIDIERUNG_DOSSIER.md` + Ledger `§10.1`). Die Matrix ordnet den CODE (WO lebt ein Modul); E0-E4 fährt das EXPERIMENT (XML→B+-Baum→Binary→RC). Kein Widerspruch, zwei orthogonale Achsen.
+
 ## 0. Begriffs-Fundament (in Stein gemeißelt)
 
 - Die Matrix ist **dreidimensional: Familien × Baseline-Stufen × Module.** Familien = `comdare-<familie>-all`-Umbrellas; Stufen = `comdare-baseline_N-<name>/`-Ordner (eine Stufe referenziert nur niederwertigere, Regelfall die nächst-kleinere); Module = die Zellen IN einer Stufe (je Zelle ein eigenes Repo).

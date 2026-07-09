@@ -133,6 +133,32 @@ Spiegel-Bäume (`cache_engine/` vs `libs/cache_engine/`, `measurement/` vs `libs
 **E0-E4 = Architektur-Audit-Dimension** (NICHT Termin). **Spur S/P/gated = Scheduling.** **P0-P2 = Handout-06-27-Prio.**
 Widerspruch **#193 = TOP-PRIO (User 06-27) vs. Task-Feld [E0]-ZULETZT**: AUFGELÖST → #193 ist Welle **P-0 (zuerst)**; das [E0] ist die Audit-Ebene, nicht die Reihenfolge. Vollständigkeit per dieser Tabelle prüfbar statt Handabgleich.
 
+### §10.1 NOMENKLATUR-KONSOLIDIERUNG E0-E4 (Nachtrag 2026-07-09 — additiv, autoritativ)
+
+> **Auslöser:** Wiederentdeckung der E0-E4-Experiment-Maschinerie nach dem Wissensverlust (Bruch 02.–03.07.), belegt in `docs/architektur/16_E1_E4_KONSOLIDIERUNG_DOSSIER.md` (GENEHMIGT 09.07.). Dieser Block **rehabilitiert** E0-E4 additiv und löst die **vierfache „E"-Überladung** kollisionsfrei auf. Kein Original wird gelöscht (Memory-Direktive „Doku nie löschen, nur additiv/deprecaten").
+
+**(1) E0-E4-REHABILITIERUNG.** E0-E4 ist die **vierstufige Experiment-Maschinerie** (28.06. etabliert, code-verankert: `experiment_tree.hpp`, `GenusBindingTraits`, `PermutationEngine`), NICHT nur eine „Audit-Dimension":
+- **E4** = XML-Experiment-Definition (`Code/experiment_config` + `02_messung_driver`) + Auswertung (`03`–`06` CSV→LaTeX). Ziel **#229**: das Experiment IST die XML — die Diplomarbeit ändert idealerweise NUR die XML.
+- **E3** = Permutations-B+-Baum PRO GATTUNG (Abstract Factory; `binary_id` = Wurzel→Blatt-Pfad). Gate-1 = 137.594.142.720.000 Binaries, nie voll materialisiert.
+- **E2** = Tier-Binaries compile-time (`StaticAxisNode`; 1 DLL je Permutation via `COMDARE_DEFINE_ANATOMY_MODULE_ADHOC`).
+- **E1** = RC-Laufzeit (`DynamicVariableNode`; For-Schleife auf EINER geladenen Binary; Lastprofil = dynamische Achse, KEIN Neubau).
+- **E0** = Querschnitt (Infra/CI/Modul-Struktur), NICHT Experiment-Pipeline.
+
+Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierung" (`:10`, `:133`) bleibt als **Scheduling-Aussage gültig** (E0-E4 terminiert nicht — Scheduling = Spur S/P/gated), ist aber als **Definition der E-Ebenen verengt**: die Ebenen SIND die Experiment-Maschinerie, die ZUSÄTZLICH als Audit-Raster dient. Voll-Definition: Dossier 16 (Teil A) + ce `docs/architecture/34_KONSOLIDIERTER_MASTER_IST_STAND.md` + ce Dossier `20260628-…A2welle.md §12-17`.
+
+**(2) VIERFACHE „E"-DISAMBIGUIERUNG.** Der Buchstabe „E" ist im Ledger VIERFACH belegt — bei Edits strikt auseinanderhalten:
+
+| Kürzel | Bedeutung | Verankerung | Bei Edits |
+|---|---|---|---|
+| **E0-E4** | Experiment-Maschinerie (s. (1)) | Code + Dossier 16 | kanonisch, rehabilitiert |
+| **DD-A..DD-E** (ex „E-A..E-E") | Goal-V3-Entscheidungs-Defaults | `:423`, `:538` u. a. | umbenannt (s. (3)) |
+| **§13.9-Gate E1/E2/E3** | User-Gate-Labels 05.07. (codex / CI-Toolchain=#273 / Pipelines=#258) | `:472-474`, `:417`, `:537`, `:627` | **UNANGETASTET** (lokale §13.9-Aufzählung, über #-Nummern getrackt) |
+| **E2-Sidecar** | Mess-Mechanik-Entscheid 02.07. | `:178`, `:410`, `:538` | **UNANGETASTET** (zusammengesetzter Begriff) |
+
+**(3) UMBENENNUNG E-A..E-E → DD-A..DD-E** (Decision-Defaults). Die Goal-V3-Entscheidungs-Defaults heißen hinfort **DD-A..DD-E**, um die Kollision mit E0-E4 zu beseitigen. Die Original-Marker „E-A..E-E" (an `:84/:92/:93/:182/:392/:407-409/:413/:423/:436/:441/:510/:537/:538/:554/:557/:568`) bleiben unverändert stehen (additiv); „DD-x" ist ihr kollisionsfreier Alias. Semantik unverändert (V3/`:538` autoritativ: **DD-A** Reuse-Vendorn P2→P1→P3 · **DD-B** CMD-1 neutral compile-time · **DD-C** RC-Rest via #229 deferred · **DD-D** 8er-Liste = Thesis-`tab:datasets` ∪ Bestandsakten · **DD-E** entfällt, #271 DONE).
+
+**(4) S↔E-KREUZ-MAP.** Die im Ledger als „4 Schichten" geführte **S1-S4**-Sicht (`§13.10 W5`, `:498/:500/:510`; `docs/architektur/10_schichten_modell_M.md`) ist die **gegenläufig nummerierte** Sicht derselben Pipeline: S1 messung_driver ↔ E4 · S2 CacheEngineBuilder ↔ E3 · S3 CacheEngine ↔ E2 (Kante: Library vs. emittierte DLL) · S4 Prüfling PRT-ART ↔ E1 (Kante: Laufzeit-Mechanismus vs. Mess-Objekt). Voll-Map in `10_schichten_modell_M.md §9`. **Merksatz:** E-Sicht zählt Treiber→Laufzeit als **4→1**, S-Sicht als **1→4** (dieselbe physische Reihenfolge); **Spur-S (S1-S9, `§3`)** ist ein DRITTER „S"-Scope (serielle God-Header/ABI-Kette), NICHT S1-S4.
+
 ## §11 VOLLSTÄNDIGE OFFENE TODO-LISTE (top-down, user-sichtbar)
 **A #188-Architektur (Spur S):** #216-H2✅ · #217-2a✅ (2b-deferred) · AP-7/#241 · #221 · CMD-1/#251 · CMD-2/#252+AP-1/#235+AP-8/#242 · #234 · #215 · #224. *(Stand 06.07.: S7-1..10-Familien-Hooks KOMPLETT [ce 3a5ae23c]; #234-Rest = 234-V.)*
 **B Mess-Gate P0 (Spur P):** **AP-2/#236 (HART)** · AP-3/#237✅ · AP-4/#238✅ · AP-5/#239✅ · AP-6/#240 · AP-7/#241 (7a✅, 7b deferred). **Nächster ABI-neutraler Runway:** AP-6 → dann #224/#221 → dann der EINE 4→5-Bump (S5/S6) → AP-2. (Voll-per-Host-Messlauf von AP-4/Reihe B bleibt #162-HELD.)

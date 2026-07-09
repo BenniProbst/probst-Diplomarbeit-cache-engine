@@ -4,6 +4,17 @@
 **Bezug:** Ledger-F7 (`docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:298` „die gesamte Matrix aller Mess-Frameworks × Workloads muss noch als Module mit feingliedriger Baseline-2D-Matrix-Struktur abstrahiert werden"), F14-Recherche (Task #30, ADDENDUM 2 Pkt 4), Diplomarbeit `thesis/…/kapitel/de/{03_messsystem_prtart,06_evaluation_methodology}.tex`.
 **Invarianz:** rein additiv, golden/ABI-neutral, INV-1..4-treu. Dieses Dokument definiert die 2D-Achsen und legt den Struktur-Fork offen; es nimmt KEINE Realisierung vorweg. `comdare-measurement-all` (metrics/pmc/workloads), die laufende Mess-Pipeline 286 und der ce-Monolith bleiben unberührt, bis ein konkreter Realisierungs-Increment (eigene Kadenz, ggf. User-GO) folgt.
 
+## 0. E-EBENEN-KORREKTUR (Nachtrag 2026-07-09 — additiv, autoritativ)
+
+> **Bezug:** `docs/architektur/16_E1_E4_KONSOLIDIERUNG_DOSSIER.md` (Teil B.5 + D), Ledger `§10.1` + `:371`. Dieser Nachtrag ordnet die zwei Achsen dieses Plans **ebenen-richtig** in die E0-E4-Experiment-Maschinerie ein — der ursprüngliche Plan (Abschnitte 1-6) liest „Workload als dynamische Achse" teils als compile-time und rahmt M×W ohne E-Bezug. Additiv, golden/ABI-neutral; die Abschnitte 1-6 bleiben als measurement-all-**Modul-Organisations**-Sicht (Option A) gültig, werden aber durch die folgende E-Zuordnung präzisiert.
+
+**Kernsatz (ebenen-richtig):**
+- **Achse M (Mess-Kategorien)** = **compile-time, E0/Tooling** (measurement-all-Modul-Interna). Option A (F6-Metaprogrammierung in den Zellen `metrics`/`pmc`/`workloads`) ist hier KORREKT und golden-orthogonal — es ist die *interne* Code-Organisation der Mess-Module, KEINE Binary-Identitäts-Achse.
+- **Achse W (Workload × Dataset)** = **E4-XML-definiert + E1-Laufzeit** (Workload-Profil-Wahl je Messreihe, `DynamicVariableNode`) **+ E3-Permutation** (Dataset als CEB-„4. Dimension"). **NICHT** compile-time-statisch in der ce-Library. Beleg: Ledger `:371` („Mess-INPUT = DynamicVariableNode-Seite des experiment_tree, KEINE Binary-Identitäts-Achse; `permutation_axes.xml` bleibt TABU").
+- **Dritte Dimension A/B/C × Micro/Makro/Gesamt** = **E4-Auswertung** (Spalten-Projektion im CSV/LaTeX), niemals `mp_product`-Lauffaktor.
+
+**Abgrenzung zum #31-Fehlbau:** Der committete ce-`workload_matrix.hpp` (`mp_product<…, ycsb_profile_list, dataset_list>` = 36 Zellen compile-time in der Library, E2) verwechselt Achse W mit einer Binary-Achse — genau der von diesem Nachtrag ausgeschlossene Fall. Korrektur = **G2-Revert** + **E4-XML-Verortung** (Dossier 16 Teil D). Die measurement-all-Realisierung (Abschnitte 4-5, Option A) bleibt davon unberührt und **gated** hinter Migrationsplan-Schritt 13.
+
 ## 1. Ist-Struktur (verifiziert)
 
 `comdare-measurement-all` ist heute eine **strikt 1D-Baseline-Schichtung** (Familie × Baseline-Stufe, je Stufe genau **eine** Zelle), INV-2-konform `n→n-1`:

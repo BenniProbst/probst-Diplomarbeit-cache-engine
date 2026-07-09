@@ -206,3 +206,39 @@ Konkret: Achse M bleibt Option-A-tauglich als *interne* `measurement-all`-Code-O
 - **Offener Design-Fork zur Bestätigung:** **V32-Schema aktivieren** (`COMDARE_V32_ENABLE`, reicher `TupelType`, löst #229 strukturell — empfohlen) **vs.** produktives `comdare_experiment`-Schema minimal um `<datasets>/<measurement_categories>` erweitern (kleiner, aber zwei Schema-Welten bleiben). Empfehlung: **V32 aktivieren.**
 
 *Nach Freigabe wird dieses Dossier als autoritative E1–E4-Konsolidierungs-Doku ins super-Repo committet (docs/architektur/) und der Ledger additiv nachgezogen.*
+
+---
+
+# TEIL I — NACHTRAG: LEDGER-VERIFIKATION & PHASE-0-VOLLZUG (2026-07-09, nach Genehmigung)
+
+> Additiv nach GO. Präzisiert Teil B/C gegen die live-Ledger-Verifikation (Voll-Read via Agent) und protokolliert den Phase-0-Vollzug. Ändert keine genehmigte Substanz.
+
+## I.1 Ledger-Verifikation (Zeilen bestätigt / korrigiert)
+
+- **Bestätigt exakt:** §10-Degradierung `LEDGER:132-134` (+ Kopf-Legende `:10`, §2-Blocker `:68`); §13.4-Defaults `:423`; §13.12-Defaults (AKTIV) `:538`; AP-10/4-Schichten `:510` (Schichten-Modell selbst `:498/:500`); #31-Revert + „Mess-INPUT = DynamicVariableNode" `:371`.
+- **Korrigiert:** Die im Plan genannten „`§13.4:407-413`" sind **§13.3-Task-Tags** (`[K2→Default E-A/E-B/E-E]` an #265/#266/#267/#271), NICHT §13.4-Fließtext. §13.4 spannt `:419-427`. Die DD-Umbenennung (I.2) deckt beide Bereiche.
+- **Bestätigt:** „E1-E4" / „Experiment-Maschinerie" existieren im Ledger **nicht literal** — er nutzt nur „E0-E4". Deshalb rehabilitiert Phase 0 das bestehende **E0-E4** (statt „E1-E4" neu einzuführen); im Fließtext sind „E1-E4" (Pipeline i. e. S.) und „E0-E4" (inkl. Querschnitt E0) je nach Kontext synonym.
+
+## I.2 Präzisierung Teil B.2: die „E"-Kollision ist VIERFACH (nicht dreifach)
+
+Teil B.2 nannte drei „E/S"-Achsen; die Ledger-Verifikation ergänzt eine vierte + fünfte „E"-Bedeutung:
+1. **E0-E4** = Experiment-Maschinerie (kanonisch).
+2. **DD-A..DD-E** (ex E-A..E-E) = Decision-Defaults.
+3. **§13.9-Gate E1/E2/E3** = User-Gate-Labels 05.07. (codex / CI-Toolchain=#273 / Pipelines=#258; `:472-474`) — **eigenständige, UNANGETASTETE** lokale Aufzählung.
+4. **E2-Sidecar** = Mess-Mechanik-Begriff (`:178/:410/:538`) — unangetastet.
+
+Volle Disambiguierungs-Tabelle jetzt in Ledger `§10.1 (2)`.
+
+## I.3 Phase-0-Vollzug (Task #67, additive Doku-Edits, kein Original gelöscht)
+
+| Datei | additiver Block | Inhalt |
+|---|---|---|
+| `LEDGER` | `§10.1` | E0-E4-Rehabilitierung + Vierfach-E-Disambiguierung + DD-Umbenennung + S↔E-Merksatz |
+| `10_schichten_modell_M.md` | `§9` | S↔E-Kreuz-Map (S1↔E4 … S4↔E1, verschobene Kanten) |
+| `15_F7_…md` | `§0` | E-Ebenen-Korrektur (M=E0 compile-time / W=E4+E1+E3 / A-B-C=E4-Auswertung; #31-Abgrenzung) |
+| `20260709-WORKFLOW-4layer-…md` | Kopf-Vermerk | 4-Layer = ce-intern, der E0-E4-Sicht untergeordnet |
+| `SYNTHESE-13.10.md` | W5-Fußnote | S1-S4 = inverse E0-E4-Sicht |
+| `STANDARDPROZESS-…md` | Kopf-Vermerk | 3D-Matrix ⊥ E0-E4 |
+| `MATRIX-GRUNDLAGEN-GOALV2.md` | Kopf-Vermerk | Baseline-Schichten ⊥ E-Ebenen |
+
+**Nächster Block:** Phase 0.5 (**G2** — Revert `88738285`+`4d8aedce`), dann Phase 4/#31 (E4-XML, nach V32-Fork-Bestätigung). Roadmap #188→#221→#223→#215→#156 unverändert.
