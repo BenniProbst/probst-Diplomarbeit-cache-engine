@@ -51,5 +51,32 @@ Hang mehr (nicht nur ce, alle Projekte). pmc:intel bleibt zusätzlich variablen-
 2. Nach echtem Fix + einem grünen Probe-`cmake`: Runner 17 **entpausieren** (`PUT /runners/17 paused=false`)
    UND `COMDARE_PROD2_AVAILABLE="true"` — erst dann läuft `pmc:intel` (Intel-PMU) wieder.
 
+## ROOT-CAUSE GEFUNDEN — tiefe Diagnose 2026-07-09 (via Diagnose-Job auf prod2, /proc-Inspektion)
+Da SSH als `admin-management` (Vault-PW korrekt) nach der Auth **hängt** (Shell-Init/`chdir($HOME)` reagiert
+nicht) und der gitlab-runner **kein sudo** hat, wurde die Wurzel über einen rules-gated Diagnose-Job (`diag:prod2`)
+auf prod2 selbst lokalisiert. Befunde (literal):
+- **System gesund:** `nproc=32`, load ~27 (75-85 %, NICHT überlastet), Mem 15 Gi frei, Swap 0, `df`/`ls`/`mount`
+  antworten in <1 s, **KEIN stale S3/NFS/FUSE-Mount** (nur `fusectl`). → stale-Mount-/Last-Hypothese **widerlegt**.
+- **Der Hang ist cmake-spezifisch:** `cmake -B build` gibt nach 40 s **null Output** (hängt vor der Compiler-ID).
+  Der cmake-Prozess steht in `State: S, wchan=sigsuspend` → er **wartet auf sein Kind** (Compiler-Check).
+- **Das Kind (cc1plus/g++) steckt in uninterruptible D-state:** `ps` **hängt selbst** beim Lesen von
+  `/proc/PID/wchan` (klassisches D-state-Symptom); der Prozess übersteht **SIGTERM UND SIGKILL** (timeout killt
+  ihn nicht). Solche Zombies sind **nicht aus dem Userspace killbar**.
+- **Runner-Verstopfung:** diese nicht-killbaren D-state-Prozesse blockieren den gitlab-runner-shell-executor →
+  Runner meldet sich `online` + Slots „frei", **nimmt aber keinen neuen Job mehr an** (jeder neue Job bleibt `pending`).
+- **Umfeld:** Kernel **6.17.0-35-generic (experimental)** + Intel **i9-14900KS** + g++-16-experimental-trunk.
+
+**WURZEL:** cmake/cc1plus gehen auf prod2 reproduzierbar in permanenten uninterruptible D-state (Kernel-/Microcode-
+Interaktion, nicht Code/Mount/Last). Sie akkumulieren und verstopfen den Runner.
+
+**FIX (Infra, root — außerhalb meiner Rechte, Multi-VM-Prod-Node):**
+1. **prod2 REBOOTEN** — der einzige Weg, die D-state-Zombies zu reapen + den Runner zu entstopfen. Achtung: prod2
+   trägt VMs/K8s (KubeVirt/Talos + Windows-Runner) → geordnet drainen.
+2. Danach `dmesg`/`journalctl` nach dem Reboot prüfen (I/O-/MCE-/Microcode-Einträge um die Hang-Zeitfenster).
+3. **Kernel 6.17-experimental hinterfragen** — auf einen stabilen LTS-Kernel pinnen; Intel-Microcode aktualisieren.
+   (Verdacht: Compiler-Deadlock im Kernel-Scheduler/MM auf 6.17 + Raptor-Lake.)
+4. Zusätzlich prüfen: warum der `admin-management`-Login-Shell hängt (evtl. dasselbe D-state-Symptom im Profil).
+5. Erst nach Reboot + grünem Probe-`cmake`: Runner 17 entpausieren (`PUT /runners/17 paused=false`) + `COMDARE_PROD2_AVAILABLE="true"`.
+
 ## Verifikation (Historie)
-Pipeline 9093 (sha 3fb7dea8): `pmc:intel` fehlt (nur `pmc:amd`), 17 Jobs, success. 9100: pmc:intel-Hang bestätigt.
+Pipeline 9093 (sha 3fb7dea8): `pmc:intel` fehlt (nur `pmc:amd`), 17 Jobs, success. 9100: pmc:intel-Hang bestätigt. Diagnose-Läufe 9111/9112/9115: D-state-Compiler-Hang belegt, Runner verstopft.
