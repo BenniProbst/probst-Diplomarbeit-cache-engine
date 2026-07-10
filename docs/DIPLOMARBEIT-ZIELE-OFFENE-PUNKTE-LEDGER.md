@@ -444,6 +444,24 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
   Sapphire Rapids, Capella = AMD EPYC 9334). Rohdaten der Architektur-Recherche für den Infra-Agenten:
   `thesis/diplomarbeit/sessions/workflow-backups/20260710-wf-architekturen-recherche/`.
 
+- **2026-07-10 (📚 HABICH-RUNDE 2 — Struktur-Kritik + Konsolidierungs-Auftrag; TEXT-AGENT, TODO AP-H2-0..11):**
+  Prof. Habich: Inhalt top, Struktur mangelhaft (trotz Runde 1). **Direktiven:** (1) Kap. 2 STRIKT nur
+  Stand der Technik/Begriffsdefinitionen/BEKANNTE Konzepte/Paper-Research — KEIN Wort eigener
+  Begriffswelt (eigene Ausführungen + Zeichnungen korrekt, aber falsch platziert → Kap. 3); Kap. 2
+  per deep-research erweitern (Konventionen anderer Arbeiten). (2) Kap. 3 = allgemeines Konzept +
+  Begriffs-Neuschöpfung (Prüfling NICHT führend; §3.1 „Belange der Aufgabenstellung" neu framen);
+  wird zu lang → Software-Architektur STRIKT an Kap. 4 (spezielle Umsetzung). (3) Messsystem: Idee
+  Kap. 3 / Umsetzung Kap. 4; Ebenen erweitert, Achsen/Messparameter/Observer geschärft. (4) E4→E0-
+  Schichten + neue Prüf-Stufen (Schicht-Sequenz der letzten 2 Tage) in die Thesis konsolidieren.
+  (5) Evaluation neu dimensioniert: heuristischer Gegenbeweis (Hybrid-Modus — Rekombination der
+  Tier-Binaries via Heuristiken vs. Paper-Algorithmen). (6) messung_driver-Zeichnung zu groß/
+  Schrift-Endgröße inkonsistent → Sichtprüfung+Fix. (7) Alte Version (pre-habich-Tag) gegenlesen auf
+  vergessene Fakten. **IST festgestellt:** Master included bereits den 6er-Satz (01_einleitung…
+  06_fazit, teils [SKELETT]); alte 8 Kapitel = un-included Inhalts-Quelle („Stufe 3 abschnittsweise
+  umziehen"). Erfassungs-Workflow wf_b1d24420 läuft (Struktur-Kartierung, Kap.2-Konventions-Research,
+  Code-Diff E0-E4→Thesis, Alt-Gegenlese, Zeichnungs-Befund → Refactor-Plan). User-sichtbare TODO-Liste
+  = Tasks #97–#108 (AP-H2-0..11). Alle 4 Repos gesynct (merge; Overleaf/GitHub hatte nichts Neues).
+
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
 ### 13.1 Schaden/Nutzen-Bilanz der autonomen Nacht (03.–05.07., ce 971a0a57..e9cf4f3f = 23 Commits, super 31 Commits)
