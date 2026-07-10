@@ -187,7 +187,7 @@ struct MessreihenSpec {
 // die Bibliothek (XmlConfigParser::load_messreihen, KF-1-DOM) ist die EINE Wahrheitsquelle.
 // MessreihenSpec bleibt die treiberlokale Sicht (string-mode fuer die bestehende Verzweigung).
 [[nodiscard]] std::vector<MessreihenSpec> load_messreihen(std::filesystem::path const& xml_path) {
-    std::vector<MessreihenSpec> result;
+    std::vector<MessreihenSpec>            result;
     comdare::builder::xml::XmlConfigParser parser;
     for (auto const& r : parser.load_messreihen(xml_path)) {
         MessreihenSpec spec;
