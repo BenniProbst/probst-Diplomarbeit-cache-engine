@@ -118,3 +118,24 @@ die tree<axis compile/dynamic>-Wurzel (§G Zeile 1) ist davon UNABHÄNGIG und wi
 5. **framework-Ebenen-Semantik** — {YCSB, LP} (2) vs. 13-Framework-Registry.
 6. **Tuple-Erweiterung** — Doc-20-Blatt ist wörtlich `tuple<property,time>` (EIN Property); Pareto-Befund verlangt Front-MENGE + Objective-Tag je Bestkonfig.
 7. **Sonderstatus-Trio** — T2 eigene Mess-Achse behalten/als Sub-Aspekt entfernen; T10 als Meta-Achse aus den 19 Organ-Slots (berührt kV3AxisCount=19-Verträge!); T1-Attributions-Constraint kodieren.
+
+## I. Konsolidierungs-Constraint für die tree<axis>-Wurzel (Review-Lehre wf_0f5a1d9c, 10.07.)
+
+Ein erster fork-unabhängiger Bau der compile/dynamic-Wurzel als eigenständige consteval-„Blut"-Registry
+(`axis_binding_registry`) wurde gebaut, adversarial reviewt (wf_0f5a1d9c) und **VERWORFEN** — Artefakte
++ Review in `docs/sessions/backups/20260710-axis-binding-registry-VERWORFEN/`. Grund (3 CONFIRMED, selbst
+verifiziert): die 14/5-compile/dynamic-Klassifikation existiert bereits als **autoritative Single-Source**
+in `builder/experiment_tree/profile_to_tree.hpp:68-87` (`is_static`-Flag je `AxisLevel`; die 5 dynamischen
+Achsen concurrency/prefetch/allocator/cache_traversal/value_handle mit exakt den RC-POD-Feldnamen). Diese
+Datei erklärt sich seit der **Doppelquellen-Konsolidierung 18.06.** wörtlich zur „EINZIGEN Quelle dieser
+Dimensionen"; eine parallele Registry hätte genau die weg-konsolidierte Doppelquelle wieder eingeführt
+(zusätzlich: toter cross-layer-Include measurement→builder; Cap-Werte ohne compile-time-Kopplung an
+abi_adapter; null Produktions-Konsumenten).
+
+**Bindende Constraint für den späteren Typsystem-Bau:** Die tree<axis compile/dynamic>-Wurzel ist NICHT
+greenfield. Eine compile-time-enumerierbare Achsen-Klassifikation ist erst dann gerechtfertigt, wenn der
+Typsystem-Bau ihr (a) einen echten Konsumenten gibt UND (b) sie per Contract-Test gegen die
+`is_static`-Ausgabe von `build_axis_levels` gekoppelt wird (Producer-Konsistenz statt drift-anfälliger
+Zweitkopie) — ODER `profile_to_tree` wird der Konsument (build-time-Ableitung), was den golden-sensitiven
+binary_id-Pfad berührt und einen eigenen, golden-verifizierten Increment erfordert. Der Deep-Research-BEFUND
+(§G) liefert die Kardinalitäten dafür; der Bau selbst wartet auf Konsument + die 7 User-Forks (§H).
