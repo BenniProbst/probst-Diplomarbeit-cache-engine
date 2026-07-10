@@ -1,0 +1,98 @@
+// Contract-Gate der Achsen-Binding-Registry (compile/dynamic-Wurzel des Doc-20-Typsystems).
+// Die harten Invarianten laufen als consteval-static_assert im Header; hier die Laufzeit-Sicht
+// + die RC-POD-geerdeten Cap-Werte (abi_adapter tier_query_resource_control).
+
+#include <builder/axis_binding/axis_binding_registry.hpp>
+#include <builder/experiment_tree/axis_path_serialization.hpp>
+
+#include <iostream>
+#include <string>
+#include <string_view>
+
+namespace ab = ::comdare::cache_engine::builder::axis_binding;
+namespace ex = ::comdare::cache_engine::builder::experiment;
+
+namespace {
+
+int g_fail = 0;
+
+void check_true(char const* what, bool ok) {
+    std::cout << (ok ? "  [OK]  " : "  [ERR] ") << what << "\n";
+    if (!ok) ++g_fail;
+}
+
+template <class A, class B>
+void check_eq(char const* what, A const& got, B const& want) {
+    bool const ok = (got == want);
+    std::cout << (ok ? "  [OK]  " : "  [ERR] ") << what;
+    if (!ok) std::cout << "  (abweichend)";
+    std::cout << "\n";
+    if (!ok) ++g_fail;
+}
+
+[[nodiscard]] bool is_dynamic(std::string_view name) {
+    for (auto const& info : ab::kAxisBindingRegistry)
+        if (info.name == name) return info.binding == ab::AxisBinding::Dynamic;
+    return false;
+}
+
+} // namespace
+
+int main() {
+    std::cout << "==== Achsen-Binding-Registry (tree<axis compile/dynamic>-Wurzel) ====\n";
+
+    // (1) Kardinalitaeten (KK-1, Doc 20 §G).
+    check_eq("Registry: 19 Achsen", ab::kAxisBindingRegistry.size(), std::size_t{19});
+    check_eq("count_dynamic == 5", ab::count_dynamic(), std::size_t{5});
+    check_eq("count_compile == 14", ab::count_compile(), std::size_t{14});
+
+    // (2) Die 5 dynamischen Achsen sind EXAKT die RC-POD-steuerbaren (nie geraten).
+    check_true("dynamic: cache_traversal", is_dynamic("cache_traversal"));
+    check_true("dynamic: allocator", is_dynamic("allocator"));
+    check_true("dynamic: prefetch", is_dynamic("prefetch"));
+    check_true("dynamic: concurrency", is_dynamic("concurrency"));
+    check_true("dynamic: value_handle", is_dynamic("value_handle"));
+    check_true("compile: search_algo (nicht dynamic)", !is_dynamic("search_algo"));
+    check_true("compile: node_type (nicht dynamic)", !is_dynamic("node_type"));
+    check_true("compile: queuing_q2 (nicht dynamic)", !is_dynamic("queuing_q2"));
+
+    // (3) Namen positionsidentisch zu kCompositionAxisNames (Single-Source).
+    bool names_ok = true;
+    for (std::size_t i = 0; i < ab::kAxisBindingRegistry.size(); ++i)
+        names_ok = names_ok && (ab::kAxisBindingRegistry[i].name == ex::kCompositionAxisNames[i]);
+    check_true("Namen positionsidentisch zu kCompositionAxisNames", names_ok);
+
+    // (4) RC-Feld-Zuordnung + Caps (abi_adapter.hpp:226-230).
+    auto cap_of = [](std::string_view n) -> std::uint64_t {
+        for (auto const& info : ab::kAxisBindingRegistry)
+            if (info.name == n) return info.rc_cap;
+        return 0;
+    };
+    check_eq("cap concurrency == 64", cap_of("concurrency"), std::uint64_t{64});
+    check_eq("cap prefetch == 64", cap_of("prefetch"), std::uint64_t{64});
+    check_eq("cap allocator == 1 GiB", cap_of("allocator"), std::uint64_t{1} << 30);
+    check_eq("cap cache_traversal == 4096", cap_of("cache_traversal"), std::uint64_t{4096});
+    check_eq("cap value_handle == 256", cap_of("value_handle"), std::uint64_t{256});
+    check_eq("compile-Achse hat Cap 0", cap_of("filter"), std::uint64_t{0});
+
+    // (5) for_each_axis_binding besucht alle 19 + zaehlt die Split-Kardinalitaeten.
+    std::size_t visited = 0, dyn = 0;
+    ab::for_each_axis_binding([&](ab::AxisBindingInfo const& info) {
+        ++visited;
+        if (info.binding == ab::AxisBinding::Dynamic) ++dyn;
+    });
+    check_eq("for_each besucht 19", visited, std::size_t{19});
+    check_eq("for_each zaehlt 5 dynamic", dyn, std::size_t{5});
+
+    // (6) Lookup per Slot-Index.
+    check_true("axis_binding(0) == search_algo/Compile", ab::axis_binding(0).name == std::string_view{"search_algo"} &&
+                                                             ab::axis_binding(0).binding == ab::AxisBinding::Compile);
+    check_true("axis_binding(8) == concurrency/Dynamic/ThreadCount",
+               ab::axis_binding(8).name == std::string_view{"concurrency"} &&
+                   ab::axis_binding(8).binding == ab::AxisBinding::Dynamic &&
+                   ab::axis_binding(8).rc_field == ab::RcField::ThreadCount);
+
+    std::cout << "\n==== Achsen-Binding-Registry: " << (g_fail == 0 ? "ALLE OK" : (std::to_string(g_fail) + " FEHLER"))
+              << " ====\n";
+    return g_fail == 0 ? 0 : 1;
+}
