@@ -21,7 +21,7 @@ Schicht-für-Schicht-Fertigstellung top-down mit Interface-Verträgen + Contract
 ## 3. OFFENE GATES (mit Empfehlungen; Verfallsvermerk: Ledger-Entscheid-Abschnitte gewinnen)
 - **R1/R2 (#31/F7-Extras, E4-XML-Workload/Dataset):** Empfehlung R1 = YcsbWorkload A–F reicht für den Kern (OP-1..6 später additiv); R2 = `test_data_sets.xml` bleibt autoritativ (keine Doppelquelle).
 - **Limits-Entkopplung:** Pre-Build-Codegen-Design liegt (`20260710-schicht-e3-impl/LIMITS-ENTKOPPLUNG-ANALYSE.md`) — Empfehlung: als eigener Increment NACH einem grünen #215-Fenster (golden-heikel).
-- **234-V-Emitter-Verdrahtung:** Entscheide liegen (Option A + Shape-Segment default-OFF) — Empfehlung: mit der Limits-Entkopplung bündeln (beide berühren adhoc_emitter).
+- **234-V-Emitter-Verdrahtung:** ~~Empfehlung: bündeln~~ **KORREKTUR 10.07.: bereits am 08.07. VOLLZOGEN** (Ledger :356, ce fd767073 — Rest-Familien Shaped-Emission + binary_id-Shape-Segment + Baum→Emitter-Verdrahtung, default-OFF). Die Gate-Listung hier war stale.
 - **6-vs-48 (#269/#244), #266 config-Owner (Empfehlung config-all), #270a-Sichtung, 264-d, #272-Infra-HO:** unverändert wie dokumentiert.
 - **E4′/4-Phasen-Auto-Doku + Arbeitsmodus/Hybrid:** gated auf #156-Messdaten; Bau-Grundlagen (Selektor + Objectives + Cluster-BEFUND + SystemAxis-Wurzel) liegen vollständig.
 - **HELD-Kette:** #215 (320-DLL-Neubau, EIN Rebuild, konsumiert alles) → #156/#162 (Cluster-Fenster) → #165/#152/#187/#163. **#276 = ausdrücklich LETZTE Aufgabe.**
