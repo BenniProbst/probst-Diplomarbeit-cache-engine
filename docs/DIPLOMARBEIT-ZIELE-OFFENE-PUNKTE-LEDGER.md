@@ -501,6 +501,26 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     Alle Phasen selbst verifiziert (Builds 164/154 S. 0-Warnungen, DE≡EN, 0 Cite-Verluste, Renders).
     **OFFEN:** Phase G (01/06-Angleich, Glossar/Anhang-Refs, Abschluss-Review = AP-H2-11) + AP-H2-12
     (FINAL: Quellen-Voll-Abgleich + Informationsdichte gegen Ur-Fassung).
+  - **Fortschritt Phase G VOLLZOGEN 2026-07-11 (thesis `60cb3c7`, DE+EN) → AP-H2-11 DONE:**
+    (1) §1.5 „Aufbau der Arbeit" beschreibt die 6er-Struktur jetzt vollständig (Kap.-2-Themenliste
+    inkl. Workloads+Heuristik, Kap.-3-Abschnittsfolge, Kap. 4 = Software-Architektur, Kap. 5 inkl.
+    Gegenbeweis); Drei-Ebenen-Absatz §1.4 geprüft = faktisch gedeckt (drei Ebenen 03:650, Vorarbeit
+    des Autors 03:716, vier Subsysteme 03:933). (2) Offener User-Auftrag SOTA nachgeholt:
+    Begriffs-Definition in §2.1 („Stand der Technik, engl. State of the Art, kurz SOTA") +
+    Ausschreibung am Profil-Absatz (tab:sota-profiles) DE+EN. (3) §3.2-Anfang: abgebrochenen
+    Übergangsrest („…Kataloge liegen hier.") geglättet. (4) Anhang-Remaps nach Analyse-Agent:
+    F 7+6× `sec:software-means`→`sec:measurement-system` (Variadik→`sec:impl-architecture`);
+    Glossar C Anatomie→`sec:anatomy-metaphor`, Drei-Ebenen→`sec:anatomy-levels`; D 20+20×
+    „Kapitel/Chapter"→„Abschnitt/Section" vor `sec:sota-instances`. 06_fazit: OHNE BEFUND.
+    (5) Warnungs-Wurzeln: `\@` aus Build-SIMD-Überschrift (hyperref-Bookmark), 4× `table[h]`→
+    `[!htbp]` Kap. 5. **Beweise:** Builds DE 164 S./EN 154 S., 0 Errors, 0 Log-Warnungen;
+    sequenzieller Verweis-Scan DE≡EN symmetrisch (42 Kapitel-Vorwärtsverweise, alle
+    Grundlage→Vertiefung, 0 unknown); Render-Sichtprüfung TOC/S. 9/S. 11/S. 53.
+    **VERBLEIBEND OFFEN: NUR noch AP-H2-12** (FINAL, User-Qualitäts-Direktive: Quellen-Voll-Abgleich
+    aller literatur.bib-Inhalte gegen Diff aktuell + Diff Ur-Fassung vor Habich-Runde 1
+    [Tag `backup-2026-06-29-pre-habich-restruktur`], dünne Stellen mit Informationsdichte erweitern;
+    Kap. 2 voll durchzitiert als Maßstab). Optional-Reste notiert: sota-/axes-gallery evtl.
+    4-spaltig; Verlustliste NIEDRIG #16–#23; VEGA/AirIndex erst nach web-verifizierten Bib-Einträgen.
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
