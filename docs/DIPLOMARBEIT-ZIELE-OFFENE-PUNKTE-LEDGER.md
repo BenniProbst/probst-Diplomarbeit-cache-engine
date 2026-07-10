@@ -492,6 +492,15 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     (a) das Diff der aktuellen Arbeit und (b) das Diff gegen die allererste Version VOR Habich-
     Runde 1; dünne Stellen mit echten wissenschaftlichen Fakten + hoher Informationsdichte zur neuen
     Kapitelstruktur erweitern.
+  - **Fortschritt Phasen D+E+F VOLLZOGEN (thesis `cba5a04`/`bb6a4b4`, DE+EN):** D = Kap. 4 ausgebaut
+    (4.3.1 Architektur-im-Code, 4.3.2 Builder/Pipeline, NEU 4.4 Contract-Tests je Schicht, NEU 4.5
+    System-Achsen im Code, IsComposition); E = alle 10 MITTEL-Verluste restauriert; Kapitel-3-Titel →
+    „Konzepte eines cache-aware Mess-Systems" (User-Direktive); F = heuristischer Gegenbeweis als 4.
+    Eval-Dimension (3-Varianten-Observer + 4. Schritt Wall-Clock, Paper-Vergleich vorrangig, SOLL/Futur),
+    resizebox-Regel exakt vermessen (4 gestrichen, fig:prtart-demo legitim behalten), NEU fig:toolchain.
+    Alle Phasen selbst verifiziert (Builds 164/154 S. 0-Warnungen, DE≡EN, 0 Cite-Verluste, Renders).
+    **OFFEN:** Phase G (01/06-Angleich, Glossar/Anhang-Refs, Abschluss-Review = AP-H2-11) + AP-H2-12
+    (FINAL: Quellen-Voll-Abgleich + Informationsdichte gegen Ur-Fassung).
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
