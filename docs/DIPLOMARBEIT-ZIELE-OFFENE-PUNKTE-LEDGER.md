@@ -475,6 +475,22 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     Lader). **AP-H2-8 ERLEDIGT:** fig:m-model-resizebox (×1,55-Upscale → 12,4-pt-Schrift) entfernt,
     DE+EN, visuell verifiziert; Regel „resizebox nur verkleinern" etabliert (restliche 5 Upscaler in
     Phase F3 NACH Phase A). Backup-Tag `backup-2026-07-10-pre-h2` gepusht. Builds DE 152/EN 144 grün.
+  - **Fortschritt Phasen A–C VOLLZOGEN (thesis `cbde82a`/`fea6143`/`2307591`/`9fd0ea7`, DE+EN):**
+    A = Kap. 2 entkernt (0 Eigenbegriffe, 0 Cite-Verluste, Anatomie-Modell → neue §3.3, Architektur →
+    Kap. 4); B = Kap. 2 mit Nur-Bekanntem gefüllt (5-§-Gliederung, Heuristik h:M→K + Cracking/learned-
+    indexes + YCSB A–F restauriert, +8 Cites); C = §3.1 neu geframet („Problemstellung und
+    Anforderungen an ein Mess-System", Prüfling raus), NEU §3.3.4 E4→E0-Schichten (fig:e-layers) +
+    Organ-/System-Achsen/Regime/honest-0 in §3.4 + §3.6.2 Vier Betriebsmodi inkl. HYBRID-Gegenbeweis +
+    §3.6.3 Messkurven/Filterkette (SOLL/IST getrennt). Phase D+E läuft (Kap.-4-Ausbau + Verlustliste;
+    inkl. User-Direktive Kapitel-3-Titel → „Konzepte eines cache-aware Mess-Systems").
+  - **🔒 USER-QUALITÄTS-DIREKTIVE (2026-07-10, Memory `feedback_refactor_informationsdichte_
+    quellen_rueckpruefung` + Task #109/AP-H2-12):** Beim Refactoring IMMER Informationsdichte +
+    Research-Qualität gegen ältere Thesis-Fassungen prüfen — Kap. 2 muss VOLL durchzitiert sein
+    (Maßstab: die Ur-Fassung verwertete alle Quellen sinnvoll). **PFLICHT-ABSCHLUSS-SCHRITT
+    (letzter TODO-Punkt AP-H2-12):** Voll-Abgleich aller literatur.bib-Quellen + deren Inhalte gegen
+    (a) das Diff der aktuellen Arbeit und (b) das Diff gegen die allererste Version VOR Habich-
+    Runde 1; dünne Stellen mit echten wissenschaftlichen Fakten + hoher Informationsdichte zur neuen
+    Kapitelstruktur erweitern.
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
