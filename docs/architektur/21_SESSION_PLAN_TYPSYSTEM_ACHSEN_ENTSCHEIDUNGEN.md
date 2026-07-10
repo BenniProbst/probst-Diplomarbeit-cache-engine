@@ -151,8 +151,11 @@ Kadenz-Increment (Dossier → Selbst-Impl → adversarialer Review-Workflow + Ba
 granulare Commits beide Remotes → CI strikt grün).
 
 - **Phase 0 — Provider-Fundament (höchster Hebel):** (1) SIMD-Dispatch (Hebel A: simd an
-  `isa::simd_field_sum` koppeln). (2) general_hardware (12) verdrahten. (3) Allocator-Adapter (Hebel B) in die
-  11 Pools + 4 Shapes.
+  `isa::simd_field_sum` koppeln) — **✅ ce `8175c802`, CI grün 2026-07-10** (uint64-akkumuliert build-invariant
+  über SSE2/AVX2/AVX512; adversarialer Re-Review wf_4e7c94c2). (2) general_hardware (12) verdrahten —
+  **RE-DIAGNOSTIZIERT, s. §F.1** (die Audit-Rahmung „Organe lesen `cache_line_size` aus axis_12" ist widerlegt;
+  design-gated Rest). (3) Allocator-Adapter (Hebel B) in die 11 Pools + 4 Shapes — **jetzt der nächste
+  boundary-saubere Increment**.
 - **Phase 1 — Tag-Spreads materialisieren (K):** je Klassifikations-Tag eine echte `StaticAxisVariants`-Liste
   + kartesisches Kreuzprodukt (zuerst node/allocator/layout mit realem Store-Effekt).
 - **Phase 2 — Prefetch-Unter-Achse (§E):** Shape-Mixin (compile-time) + verbreiterter distance-Setter
@@ -164,6 +167,35 @@ granulare Commits beide Remotes → CI strikt grün).
 - **Phase 5 — page_type materialisieren** (echtes Slot-Layout aus node/layout/allocator; setzt Phase 0 voraus).
 - **Phase 6 — telemetry-Root-Umbau (§D):** telemetry aus Slot T10 zur Root-Visitor-Achse (nur PULL); ABI-/
   Schema-Bruch mit Version, **zuletzt**.
+
+### §F.1 — Re-Diagnose Phase 0.2 „general_hardware (12) verdrahten" (2026-07-10, Deep-Research wf_7bba0921 + Verifikation)
+
+Die Audit-Rahmung „memory_layout/node/allocator lesen `cache_line_size` aus axis_12 **statt eigener
+cacheline-Unterachse**" ist **widerlegt** (Backup `docs/sessions/backups/20260710-phase02-general-hardware-design/BEFUND.md`;
+beide adversarialen Kritiker NEEDS-REVISION inkl. golden-BLOCKER):
+
+1. **`cache_line_size()` in den Layouts ist intrinsische Layout-Semantik, kein HW-Deskriptor:**
+   `packed_bitmap→8`, `aos_strict→1`, sonst 64. Aus axis_12 (immer 64) gespeist würde das packed_bitmap/aos_strict
+   **zerstören**. → keine „duplizierte HW-64" zum Dedup.
+2. **golden-/Registry-mp_list-TABU (Ledger §0):** `CacheLineAlignedMemoryLayout` ist eine **konkrete Klasse** in
+   `AllLayouts = mp_list<…>` (`axis_05_memory_layout_registry.hpp:36`). Templatisieren (naiver Weg) bräche die
+   Permutations-Enumeration → `permutation_axes.xml`/golden. **Verboten.**
+3. **axis_12 IST bereits korrekt konsumiert** — auf **Build-Variant-Ebene**, nicht in den Organ-Blättern:
+   `build_variant_definition.hpp:66` liest `HW::cache_line_size()`/`numa_capable()` in den ABI-POD (die Thesis-
+   Semantik „Cache-Line = plattform-fixer Kompilations-Input", 02_fundamentals.tex:97-104). Die Organe nutzen
+   **korrekt** intrinsische Layout-Werte + den `CacheLineConfig`-NTTP (die permutierbare Mess-Achse = Thesis-Kern).
+4. **Node** trägt zusätzlich `kLineBytes=64` (load-bearing Mess-Stride via `record_phys_bytes()`).
+
+**Folgerung:** Phase 0.2 ist als „Organe lesen HW-Cacheline aus axis_12" **gegenstandslos** (bzw. TABU). Die einzige
+noch fehlende axis_12-Organ-Konsumption ist **NUMA/Page → allocator** (thesis-motiviert AA5/NUMAlloc + Huge-Page/dTLB,
+02_fundamentals.tex:51-53) — aber **Neu-Verdrahtung, nicht Literal-Ersatz**, und die konkreten Feld→Organ-Kanten
+sind thesis-**under-specified** → **design-gated (GO-pflichtig, s. §H-Forks unten)**. **Nächster boundary-sauberer
+Increment ist daher Phase 0.3 (Allocator-Adapter / Hebel B).**
+
+**Design-Forks (Thesis schweigt / TABU → GO-pflichtig, geparkt):** (F-A) Scope: nur Re-Diagnose vs. NUMA/Page→allocator
+jetzt bauen. (F-B) welche Felder→welche Organe, compile-time-gated vs. Varianten-Auswahl. (F-C) Werteset-Divergenz der
+**Mess-Achse** (Thesis KF-5 `{32,64,128}` vs. Code `{B64,B128,B256}`; Line-Größe vs. Knoten-Breite-in-Lines =
+vermutlich zwei Unterachsen) — berührt golden/permutation → **TABU ohne explizites GO**.
 
 **Parallel/übergreifend (das Messkurven-Typsystem selbst, Doc 20 §B–§D mit den H-Entscheidungen):** das
 `tree<...>`-Typsystem als Layer-B+-Baum bauen (Haupt-/Unter-Achsen als Layer, Wurzel=System-Achsen mit
@@ -182,4 +214,7 @@ arm64/#276/gcc-15.3 = **INFRA-gated**. P/E-Core = **HW-gated** (prod2-RMA ~Septe
 Dataset-Wahrheitsquelle + Framework-Bib = **weitere EXTERN-Forks** (durch H1/H5 jetzt konzeptionell entschieden;
 Umsetzung folgt der Bau-Reihenfolge). #256/#274-Matrix-Migration = eigene Strecke.
 
-**Nächster konkreter Increment:** Phase 0.1 — SIMD-Dispatch (Hebel A), der größte Utilization-Hebel.
+**Nächster konkreter Increment:** Phase 0.3 — Allocator-Adapter (Hebel B): `axis_06 as_std_allocator`/
+`StdAllocatorAdapter` in die 11 Pool-Organe + 4 Shapes statt `std::allocator` (`tier_to_organ_mapping.hpp:46-115`),
+boundary-sauber (kein mp_list-Blatt-Templatizing). (Phase 0.1 ✅ ce `8175c802`; Phase 0.2 re-diagnostiziert §F.1 →
+NUMA/Page→allocator + Werteset-Split design-gated/GO-pflichtig.)
