@@ -11,7 +11,7 @@
 // measurement-records pro Messreihe in separate Unterordner.
 
 // V38.C: STL-Header zuerst (windows.h via plugin_loader.hpp am Ende),
-// damit <regex> & co. nicht durch Windows-Makros gestoert werden.
+// damit die STL-Header (frueher u.a. <regex>, Phase 7 entfernt) nicht durch Windows-Makros gestoert werden.
 #include <array>
 #include <cerrno>
 #include <charconv>
@@ -26,7 +26,6 @@
 #include <limits>
 #include <map>
 #include <optional>
-#include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -164,7 +163,8 @@ enum class MessreiheKind : std::uint8_t {
 void print_usage() {
     std::cerr
         << "Usage: comdare-messung-driver <config_dir> <output_dir> [--comdare-root=DIR] [--messreihen-xml=FILE]\n\n"
-        << "Erwartete Files in <config_dir>:\n"
+        << "Erwartete Files in <config_dir> (Legacy-4-Datei-Schema; heutige Konfigs:\n"
+        << "config_a/b/c_*.xml + messreihen.xml — fehlende Dateien werden diagnostiziert):\n"
         << "  cache_engine_permutations.xml\n"
         << "  search_algorithm_permutations.xml\n"
         << "  allocator_permutations.xml\n"
@@ -183,34 +183,17 @@ struct MessreihenSpec {
     std::vector<std::string> sota_profiles;
 };
 
+// Phase 7 (2026-07-10, Parser-Konsolidierung): der lokale Regex-Reader ist entfernt —
+// die Bibliothek (XmlConfigParser::load_messreihen, KF-1-DOM) ist die EINE Wahrheitsquelle.
+// MessreihenSpec bleibt die treiberlokale Sicht (string-mode fuer die bestehende Verzweigung).
 [[nodiscard]] std::vector<MessreihenSpec> load_messreihen(std::filesystem::path const& xml_path) {
     std::vector<MessreihenSpec> result;
-    if (!std::filesystem::exists(xml_path)) return result;
-
-    std::ifstream      in{xml_path};
-    std::ostringstream ss;
-    ss << in.rdbuf();
-    auto content = ss.str();
-
-    std::regex reihe_re{"<messreihe\\s+id\\s*=\\s*\"([^\"]+)\"[^>]*>([\\s\\S]*?)</messreihe>"};
-    auto       it  = std::sregex_iterator(content.begin(), content.end(), reihe_re);
-    auto       end = std::sregex_iterator();
-    for (; it != end; ++it) {
+    comdare::builder::xml::XmlConfigParser parser;
+    for (auto const& r : parser.load_messreihen(xml_path)) {
         MessreihenSpec spec;
-        spec.id           = (*it)[1].str();
-        std::string inner = (*it)[2].str();
-
-        std::regex  mode_re{"<mode>(\\w+)</mode>"};
-        std::smatch mm;
-        if (std::regex_search(inner, mm, mode_re))
-            spec.mode = mm[1].str();
-        else
-            spec.mode = "defined";
-
-        std::regex prof_re{"<profile>([^<]+)</profile>"};
-        auto       pit  = std::sregex_iterator(inner.begin(), inner.end(), prof_re);
-        auto       pend = std::sregex_iterator();
-        for (; pit != pend; ++pit) { spec.sota_profiles.push_back((*pit)[1].str()); }
+        spec.id            = r.id;
+        spec.mode          = std::string{comdare::builder::xml::mode_to_string(r.mode)};
+        spec.sota_profiles = r.sota_profile_refs;
         result.push_back(std::move(spec));
     }
     return result;
@@ -510,15 +493,13 @@ int main(int argc, char* argv[]) {
 
     // REV 7.6 V8.12 — Aktivierung des EXPERIMENT_MODE im Sub-Build (User-Direktive
     // 2026-05-13/14). Default in cache-engine ist OFF (Production-Pfad).
-    // Beim Sub-Build der Permutations-Module muss das Flag explizit ON sein,
-    // damit ResultAggregator + Mess-Hooks in der ExecutionEngine kompiliert werden.
-#ifndef COMDARE_EXPERIMENT_MODE_ON
-    std::cerr << "[V8.12] WARNING: COMDARE_EXPERIMENT_MODE_ON ist NICHT definiert.\n"
-              << "         Der messung_driver wurde ohne Mess-Hooks gebaut.\n"
-              << "         Build mit: cmake -DCOMDARE_EXPERIMENT_MODE=ON\n";
-#else
-    std::cout << "Experiment-Mode: ON (ResultAggregator in ExecutionEngine aktiv)\n";
-#endif
+    // Phase 7 (Review wf_8508f98c): der fruehere #ifndef-Warnblock war ein Fehlalarm in JEDEM
+    // super-Build — der Treiber-HOST erhaelt das Define nie (directory-scoped im ce-Baum,
+    // Facade-Defines PRIVATE) und braucht es nicht: Mess-Hooks leben in den Tier-DLL-Kompilaten
+    // (COMDARE_MEASUREMENT_ON via Facade-Weitergabe); die Invariante Experiment=>Messung
+    // erzwingt der compile-time-Guard in abi_adapter.hpp je Tier-Kompilat.
+    std::cout << "Mess-Hooks: in den Tier-DLL-Kompilaten aktiv (COMDARE_MEASUREMENT_ON via "
+                 "Facade-Defines; Host-Define irrelevant)\n";
     std::cout << "\n";
 
     std::filesystem::create_directories(output_dir);
