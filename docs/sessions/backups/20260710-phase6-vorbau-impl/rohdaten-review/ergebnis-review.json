@@ -1,0 +1,643 @@
+{
+  "summary": "Adversarialer Review Phase-6-Vorbau (IMeasurementSource + Registry + Kurven-Skeleton)",
+  "agentCount": 18,
+  "logs": [
+    "15 Kandidaten, 14 CONFIRMED"
+  ],
+  "result": {
+    "confirmed": [
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp",
+        "line": 65,
+        "title": "read_delta-Ziel builder::PmcCounters kann 3 der 10 beworbenen MeasuredEvents strukturell nie liefern (Cycles/Instructions/MemStall) — Deviation ist breiter als dokumentiert",
+        "severity": "major",
+        "scenario": "Plan §2.2 definiert read_delta als '(end-begin) -> 6+ HW-Spalten', wobei die 6 HW-Spalten laut Plan §2.1 hw_cycles, hw_instructions, hw_l1d_miss, hw_l3_miss, hw_branch_miss, hw_mem_stall sind. builder::PmcCounters (pmc_source.hpp:19-28) hat KEINE Felder fuer cycles, instructions oder mem_stall — und der Bestands-POD ComdareMeasurementSnapshotV1 (measurement_snapshot.hpp:34-66) ebenfalls nicht (total_cycles ist Wall-Clock-ns aus dem Bestands-Pfad, nicht read_delta-gespeist). Folge fuer die Folge-Verdrahtung (Plan §3 Punkt 4/6: Dock fuellt HW-Spalten via read_delta): open({Instructions}) oder open({MemStall}) muss auf JEDER Implementierung fuer immer ins Leere laufen; der Enum wurde woertlich uebernommen, aber das deviierte Ziel kann ihn nicht ausdruecken. Aufloesbar nur durch spaeteren Interface- oder PmcCounters-Bruch (alle Implementoren betroffen). Der Deviations-Kommentar (Z.8-10) dokumentiert nur den Ziel-Tausch, NICHT diesen Spaltenverlust.",
+        "dim": "design-treue",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch reproduziert am echten Code (Compile-Probe gegen die realen Header, g++ -std=c++20, static_asserts + Laufzeit-Output): (1) MeasuredEvent bewirbt 10 Events inkl. Cycles=0/Instructions=1/MemStall=7 (i_measurement_source.hpp:22-34); (2) das read_delta-Ziel builder::PmcCounters (pmc_source.hpp:19-28) hat compile-bewiesen exakt 8 Member (7 Counter + available) und KEIN Feld fuer cycles/instructions/mem_stall in irgendeiner Namensvariante; (3) PmcSourceAdapter::capabilities() konzediert das selbst — woertlicher Output: 'adapter caps: Cycles=0 Instructions=0 MemStall=0'; (4) WallClockSource bewirbt Cycles (caps=1) und open()==Available, aber read_delta liefert nur Nullen — der Plan-§2.2-versprochene Cycles-Proxy ist strukturell unausdrueckbar; (5) Plan §2.1 Z.73 definiert die 6 HW-Spalten als hw_cycles/hw_instructions/hw_l1d_miss/hw_l3_miss/hw_branch_miss/hw_mem_stall — Ueberlappung mit PmcCounters nur 3 von 6; (6) kein Alternativkanal: grep findet mem_stall/hw_cycles/hw_instructions nirgends; cycles/instructions nur in comdare_hw_counters_v1 (module_abi_v1.hpp:47-48) = DLL-seitiger pull_live_counters-Rohkanal, laut Plan §2.2 und Header-Z.4-6 explizit ein anderer Pfad; ComdareMeasurementSnapshotV1 hat die 3 Felder ebenfalls nicht (total_cycles = Wall-Clock-ns aus merged_p50_ns, measurement_snapshot.hpp:42/102), und die PmcCounters-Merge-Ueberladung (Z.119-134) mappt nur die 7 Felder; (7) der Deviations-Kommentar Z.8-10 dokumentiert nur den Ziel-Tausch und nennt PmcCounters sogar 'die 6+1-HW-Spalten', als waeren es die Plan-Spalten — der Verlust von 3 der 10 Events ist undokumentiert. Einzige Nuance: eine ADDITIVE PmcCounters-Erweiterung waere source-kompatibel fuer Implementoren, insofern ist 'alle Implementoren betroffen' leicht ueberzeichnet — aber jede Aufloesung erfordert Bruch/Aenderung an Interface-Signatur oder am im Increment TABU-gestellten pmc_source.hpp. Kern-Szenario (open({Instructions})/open({MemStall}) laeuft auf jeder Implementierung ueber den vendor-neutralen Pfad ins Leere) ist zwingend. Major in Dimension design-treue gerechtfertigt."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp",
+        "line": 77,
+        "title": "WallClockSource: Caps behaupten Cycles-Support, aber begin()/end() erfassen nichts und read_delta liefert immer 0 — Plan-geforderter Cycles-Proxy fehlt und ist mit PmcCounters unimplementierbar",
+        "severity": "major",
+        "scenario": "Plan §2.2 sagt woertlich: 'WallClockSource implementiert alle Methoden, fuellt aber nur Cycles-Proxy aus Wall-Clock ... jetzt aber explizit als degraded source statt Platzhalter.' Gebaut: capabilities() setzt event_supported[Cycles]=true (Z.77, Kommentar 'Wall-Clock-Proxy'), aber begin() (Z.81) und end() (Z.82) nehmen keinerlei Zeitstempel, read_delta (Z.83-85) schreibt immer PmcCounters{} (alle 0). Ein Mess-Planer, der per Caps-Gate Cycles anfordert, waehlt diese Quelle und bekommt fuer immer 0 — die Quelle IST wieder der Platzhalter, den der Plan explizit abloesen wollte. Zudem ist der Proxy mit dem deviierten Ziel gar nicht nachliefer bar: PmcCounters hat kein Cycles-Feld (siehe Finding 1) — keine legitime Skeleton-Stufe, sondern Caps-Behauptung ohne je erfuellbare Semantik. Entweder Caps ehrlich auf false ODER Ziel-POD erweitern.",
+        "dim": "design-treue",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch reproduziert (Compile-Probe gegen echten Header, Scratch-Build): capabilities() behauptet event_supported[Cycles]=true (i_measurement_source.hpp:77) und open({Cycles})==Available, aber begin()/end() sind leere Bodies (:81-82, kein Zeitstempel trotz realem 50-ms-Intervall) und read_delta schreibt immer PmcCounters{} (:83-85) — Planer-Probe liefert available=false, alle Felder 0. Plan §2.2 fordert woertlich 'fuellt aber nur Cycles-Proxy aus Wall-Clock ... explizit als degraded source statt Platzhalter'; gebaut ist funktional exakt der NullPmcSource-Platzhalter plus falscher Caps-Behauptung. Strukturell unerfuellbar bewiesen: builder::PmcCounters hat kein Cycles-Feld (Compile-Error 'no member named cycles'; pmc_source.hpp:19-28), waehrend das urspruengliche Plan-Ziel ComdareMeasurementSnapshotV1 total_cycles besitzt (measurement_snapshot.hpp:42) — die dokumentierte Abweichung (:8-10) deckt den Caps/Delta-Widerspruch nicht. Test test_phase6_vorbau.cpp:55-68 prueft die Cycles-Cap nie gegen gelieferte Daten. Gegenargument available=false-Flag widerlegt: Caps sind laut Header (:46) und Plan die a-priori Gate-Info fuer den Mess-Planer, und open() meldet Available statt EventUnsupported."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp",
+        "line": 100,
+        "title": "PmcSourceAdapter::capabilities() behauptet pauschal 7 Events sobald available() — gegen beide reale IPmcSource-Impls nachweislich falsch (Caps-Luege)",
+        "severity": "major",
+        "scenario": "Bei source_.available()==true werden L1dMiss, L2Miss, L3Miss, DtlbMiss, BranchMiss, CoherenceInval, EnergyUj pauschal als supported markiert (Z.100-103). Real: LinuxPerfPmcSource oeffnet nur L1d/LL(->L3)/dTLB (linux_perf_pmc_source.hpp:202-207); L2 und coherence_invalidations bleiben laut Z.194-195/208 bewusst 0 ('KEIN portabler generischer Counter'), ein Branch-Miss-Counter wird NIRGENDS geoeffnet (branch_misses in der Linux-Impl nie gesetzt), Energie ist best-effort (root-gated). WindowsPcmPmcSource fuellt NUR cache_misses_l2/l3 (windows_pcm_pmc_source.hpp:54-55); L1/dTLB/Branch/Coherence/Energy bleiben 0. available()==true gilt zudem schon ab EINEM offenen Counter (linux_perf_pmc_source.hpp:210) — z.B. nur dTLB offen, Caps behaupten trotzdem alle 7. Zusaetzlich In-sich-Widerspruch: has_energy bleibt false waehrend EnergyUj als supported markiert ist. Ein Gate-basierter Mess-Planer (Plan: Caps = 'Gate-Info') plant Events ein, die als ehrliche 0 zurueckkommen — genau die 'stille 0', die die pmc_source.hpp-Ehrlichkeitsdoktrin (Z.6) verbietet.",
+        "dim": "design-treue",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch am echten Code reproduziert (Scratch-Probe, g++16 -std=c++23 -DCOMDARE_ENABLE_PMC, realer LinuxPerfPmcSource, perf_event_paranoid=1): Adapter-Caps behaupten bei available()==1 alle 7 Events (i_measurement_source.hpp:98-103) inkl. has_energy=0-Widerspruch zu EnergyUj-supported; reale Messung lieferte nur l1=42/dtlb=6, waehrend L2Miss/BranchMiss/CoherenceInval strukturell nie befuellbar sind (linux_perf_pmc_source.hpp:194-195/208/295 bewusst 0; branch_misses hat repo-weit KEINEN Schreiber in irgendeiner IPmcSource-Impl) und Energy root-gated 0 blieb — alles bei avail=1, exakt die 'stille 0' gegen die Ehrlichkeitsdoktrin pmc_source.hpp:6. WindowsPcmPmcSource fuellt nur l2/l3 (Z.54-55), dort sind 5 der 7 behaupteten Events falsch. available() gilt ab EINEM Counter (Z.210), Caps bleiben trotzdem pauschal 7 (Stub-Probe bestaetigt Entkopplung). Design-Quelle §2.2/§2.4 definiert Caps als Gate-Info des Mess-Planers und sieht keine Pauschal-Behauptung vor — Caps-Luege gegen beide reale Impls zwingend. Einzige Milderung: noch kein Planer-Konsument im Repo (nur WallClock-needs_admin-Test), Szenario prospektiv, aber deterministisch sobald konsumiert."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp",
+        "line": 107,
+        "title": "open() ignoriert die Event-Auswahl vollstaendig — EventUnsupported/MultiplexRequired sind toter Code, Plan-Semantik 'Event-Auswahl + Multiplex-Plan' nicht umgesetzt",
+        "severity": "minor",
+        "scenario": "Plan §2.2 kommentiert open() als 'Event-Auswahl + Multiplex-Plan'. Beide Implementierungen verwerfen den events-Span ungeprueft: WallClockSource::open (Z.80) liefert Available selbst fuer open({L3Miss}); PmcSourceAdapter::open (Z.107-109) liefert Available fuer open({BranchMiss}) auf Linux, obwohl Branch-Misses dort nie gemessen werden. Die eigens uebernommenen Stati SourceStatus::EventUnsupported und ::MultiplexRequired sind von keiner Implementierung erreichbar — das errno-style-Fehlermodell des Plans existiert nur als Enum. Zusammen mit der Caps-Luege (Finding 3) hat der Aufrufer KEINEN wahrheitsgemaessen Gate-Kanal.",
+        "dim": "design-treue",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch am echten Header reproduziert (Compile-Probe im Scratch, g++ -std=c++20): WallClockSource::open({L3Miss}) liefert Available obwohl caps.event_supported[L3Miss]==0 (Z.80, Parameter /*events*/ verworfen); PmcSourceAdapter::open({BranchMiss}) um eine available-Quelle liefert Available (Z.107-109, nur source_.available() geprueft), obwohl linux_perf_pmc_source.hpp (Z.202-207) nur L1D/LL/DTLB oeffnet und branch_misses nie fuellt; open(4 Events) bei max_concurrent_events=1 liefert Available statt MultiplexRequired. Repo-weiter grep beweist: EventUnsupported/MultiplexRequired existieren NUR als Enum-Definition (Z.42-43), kein Producer — toter Code. Plan §2.2 Z.114 kommentiert open() woertlich als 'Event-Auswahl + Multiplex-Plan', §2.4 macht capabilities()/open() zur einzigen Laufzeit-Gate-Pruefung; der Header behauptet 'WOERTLICH nach §2.2'. Der Unit-Test prueft open() nur mit dem unterstuetzten {Cycles}. Einordnung als [minor] passt: Plan spezifiziert die Implementierungs-Koerper nicht explizit und capabilities() bleibt bei WallClockSource ein ehrlicher Gate-Kanal — aber die Plan-Semantik von open() ist nachweislich nicht umgesetzt und die beiden Stati sind unerreichbar."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp",
+        "line": 112,
+        "title": "PmcSourceAdapter: last_ wird nie invalidiert — read_delta vor end/nach close/nach re-open liefert das Delta des VORHERIGEN Intervalls mit available=true; doppeltes end() inflationiert Werte",
+        "severity": "minor",
+        "scenario": "last_ (Z.119) wird nur von end() (Z.111) ueberschrieben und weder von open() noch begin() noch close() zurueckgesetzt. Szenario Permutationsschleife: Intervall 1 komplett (end -> last_.available=true); Intervall 2: begin() laeuft, Workload-Pfad bricht vor end() ab (noexcept-Messpfad mit early-return) -> read_delta liefert die Counter von Permutation 1 als available=true fuer Permutation 2 — stille Fehlzuordnung, downstream nicht erkennbar (measurement_from_workload_result stempelt pmc_available=1, measurement_snapshot.hpp:123-131). Doppeltes end() gegen den IPmcSource-Contract ('end() liefert Delta EINMAL'): WindowsPcmPmcSource nimmt einen NEUEN after-Snapshot gegen das alte before_ (windows_pcm_pmc_source.hpp:51) -> Delta waechst um die Zwischenzeit; LinuxPerf-RAPL-Delta waechst analog (rapl_have_start_ bleibt gesetzt, linux_perf_pmc_source.hpp:281-293). Der Adapter reicht beides ungeschuetzt als gueltiges last_ weiter. read_delta VOR dem allerersten end() ist dagegen harmlos (PmcCounters{}, available=false).",
+        "dim": "design-treue",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch am echten Header reproduziert (Scratch-Compile g++ -std=c++20 gegen libs/cache_engine/include, woertliche Ausgabe): last_ (i_measurement_source.hpp:119) wird nur von end() (Z.111) geschrieben, nie von open()/begin()/close() zurueckgesetzt; read_delta (Z.112-114) liefert nach begin() ohne end() (abgebrochenes Intervall 2), nach close() und nach re-open() jeweils das Delta von Intervall 1 mit available=true — stille Fehlzuordnung. Doppeltes end() speichert ein inflationiertes Delta (Repro 100→200) ungeschuetzt als gueltiges last_; Vendor-Verhalten bestaetigt per Code-Read: windows_pcm_pmc_source.hpp:43/51-55 (before_ unveraendert, neuer after-Snapshot je end()) und linux_perf_pmc_source.hpp:231/281-293 (rapl_have_start_/rapl_start_uj_ nie geloescht → RAPL-Delta waechst). Downstream stempelt measurement_snapshot.hpp:123-131 bedingungslos pmc_available=1 bei pmc.available. read_delta VOR dem allerersten end() ist wie behauptet harmlos (available=false, alles 0). Kein Test deckt das ab (test_phase6_vorbau.cpp testet nur den NullPmc-Pfad), kein weiterer Konsument existiert (perm_runner-Verdrahtung gated) — daher zutreffend [minor]/latent, aber mechanisch zwingend sobald ein begin/end-Paar unterbrochen oder die Quelle ueber Permutationen wiederverwendet wird."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.hpp",
+        "line": 22,
+        "title": "Enum-Drift NICHT compile-time-erzwungen: 17. MeasurementCategory kompiliert still mit 16 Registry-Eintraegen; kMeasurementAxisCount ist zweite hartkodierte 16 ohne Kopplung",
+        "severity": "major",
+        "scenario": "EMPIRISCH BELEGT (Shim-Experiment, g++-16 -std=c++23 -Wall): measurement_category.hpp um DRIFT_TEST_CATEGORY_17=16 erweitert -> TU mit #include <measurement_axis_registry.hpp> kompiliert mit EXIT=0; der consteval-static_assert (Z.60) feuert NICHT, denn registry_is_complete() iteriert nur i<kMeasurementAxisCount=16 und referenziert nirgends die Enum-Kardinalitaet. Einziges Signal ist eine -Wswitch-Warnung aus dem TABU-Bestand system_axis.hpp:55 (regime_of) — und die erscheint nur unter -Wall, das weder test_phase6_vorbau noch irgendein -Werror im Repo erzwingt (COMDARE_set_default_warnings wird in tests/unit/CMakeLists.txt nirgends aufgerufen, grep-belegt). Folgeschaden: axis_info(static_cast<MeasurementCategory>(16)) indiziert das 16er-std::array out-of-bounds — im constexpr-Kontext bricht nur die libstdc++-Assertion (belegt), im Release-Runtime ist es stilles UB (Garbage-MeasurementAxisInfo fuer die neue Kategorie). Der Header-Kommentar Z.30 behauptet 'static_assert-gesichert' — die Sicherung deckt nur Index==Kategorie/Regime/Name der vorhandenen 16, nicht Vollstaendigkeit gegen die Enum-Quelle. Zusaetzlich dupliziert kMeasurementAxisCount=16 den bereits im Bestand existierenden Zaehlwert kAllMeasurementCategories.size() (system_axis.hpp:25) statt ihn zu referenzieren; ein consteval-Cross-Check 'jede kAllMeasurementCategories-Kategorie hat einen Registry-Eintrag' fehlt ebenfalls. Volle Drift-Sicherung braeuchte einen Sentinel im (tabu) Enum — mindestens aber die Kopplung an kAllMeasurementCategories.size() plus Abdeckungs-Check; die verbleibende Enum-Luecke waere als gated zu dokumentieren (Doktrin: Metaprogrammierung compile-time ZWINGEND).",
+        "dim": "metaprog-striktheit",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch voll reproduziert (g++-16 -std=c++23, Shim-Kopie von measurement_category.hpp mit DRIFT_TEST_CATEGORY_17=16, Repo unberuehrt): (1) TU mit #include <measurement_axis_registry.hpp> kompiliert EXIT=0 OHNE jede Diagnose unter den Flags, mit denen test_phase6_vorbau real gebaut wird (raw add_executable Z.2583, keine Warn-Flags); der consteval-static_assert feuert nicht, da registry_is_complete() nur i<kMeasurementAxisCount=16 iteriert und die Enum-Quelle nirgends referenziert. (2) Unter -Wall erscheint einzig die -Wswitch-Warnung aus dem TABU-Bestand system_axis.hpp:55 (regime_of), EXIT bleibt 0; -Werror existiert nur in vendored ext/ (SuRF/unodb/snmalloc), nie auf Projekt-Targets; COMDARE_set_default_warnings/COMDARE_add_test: 0 Treffer in tests/unit/CMakeLists.txt — grep-Behauptung des Kandidaten bestaetigt. (3) Folgeschaden belegt: constexpr axis_info(Kategorie 16) bricht nur ueber die libstdc++-Subscript-Assertion (__glibcxx_assert_fail non-constexpr, EXIT=1); zur Laufzeit mit -O2 -DNDEBUG kompiliert und laeuft es still (RUN_EXIT=0) und liefert Garbage-MeasurementAxisInfo (cat=0 regime=0 name.size=0) = undiagnostiziertes OOB-UB. (4) kMeasurementAxisCount=16 (Z.22) dupliziert kAllMeasurementCategories.size() (system_axis.hpp:25) statt zu referenzieren; Header-Kommentar Z.30 'static_assert-gesichert' deckt nur Index/Regime/Name der 16 vorhandenen Eintraege, nicht Vollstaendigkeit gegen die Enum-Quelle. Verstoss gegen die Doktrin compile-time-zwingender Metaprogrammierung in neuem, nicht-TABU Code — konkret reproduzierbar und zwingend."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 8,
+        "title": "Ueberbreiter Include: measurement_axis_registry.hpp eingebunden, aber KEIN Registry-Symbol genutzt — zieht unnoetig die builder->measurement->builder-Rueckkante",
+        "severity": "minor",
+        "scenario": "GREP-BELEGT: curve_fit.hpp nutzt keines von kMeasurementAxisRegistry/axis_info/for_each_measurement_axis/MeasurementAxisInfo/kMeasurementAxisCount/MeasurementRegime — einziges measurement-Symbol ist mm::MeasurementCategory (Z.32, Z.91), das in measurement_category.hpp lebt (dependency-frei ausser <cstdint>). Der Registry-Include schleppt system_axis.hpp und damit ../../anatomy/observable_tier.hpp + ../../builder/pmc_source.hpp in jeden curve_fit-Konsumenten und erzeugt die Verzeichnis-Rueckkante builder/ -> measurement/ -> builder/ ohne Notwendigkeit (kein Datei-Zyklus, pmc_source.hpp inkludiert nur cstdint/string_view — aber die Kante ist heute grundlos schwer). Richtungs-Praezedenz builder->measurement existiert im Bestand (builder/commands/axis_library_registry.hpp), der Verstoss ist also nur die Breite, nicht die Richtung. Fix: Z.8 durch #include <cache_engine/measurement/measurement_category.hpp> ersetzen; die measurement->builder-Kante in i_measurement_source.hpp ist dagegen KEIN Defekt (byte-identisch zur TABU-Bestandskante system_axis.hpp:10). Test-Registrierung ebenfalls sauber: COMDARE_TEST_TARGETS-Append wird von comdare_tests (CMakeLists.txt:1483-1486, Build-Target des CI-Jobs test:unit) aggregiert, Labels m;phase6 matchen den -LE-Filter 'contract|pmc' (.gitlab-ci.yml:385) nicht -> Test laeuft im unit-Job; g++-16 und clang-22 (-Wall -Wextra) kompilieren warnungsfrei, Binary meldet ALLE OK; templated Lambda mit index_sequence ist C++20-Kern (MSVC 19.28+/clang 10+) — keine Faehigkeits-Gefaehrdung.",
+        "dim": "metaprog-striktheit",
+        "verdict": {
+          "real": true,
+          "reason": "CONFIRMED empirisch. (1) Grep: curve_fit.hpp nutzt KEIN Registry-Symbol, nur mm::MeasurementCategory (Z.32/91), das in measurement_category.hpp lebt (nur <cstdint>, CLU vorhanden). (2) g++-16 -H-Trace beweist: der Registry-Include zieht system_axis.hpp -> anatomy/observable_tier.hpp + builder/pmc_source.hpp in jeden Konsumenten (builder->measurement->builder-Rueckkante real; pmc_source.hpp nur cstdint/string_view, kein Datei-Zyklus). (3) Fix-Probe (Z.8 -> measurement_category.hpp): kompiliert warnungsfrei g++-16 UND clang++-22 (-std=c++23 -Wall -Wextra -Werror), 0 schwere Header, Funktions-Probe (fit_log_linear+parse_wide_csv_column) laeuft korrekt. (4) Gegen-Probe: Include ganz entfernt scheitert ('measurement is not a namespace-name') -> der schmale Include ist der zwingende Fix. (5) Echter test_phase6_vorbau.cpp gegen Shadow-Tree mit gefixtem Header: baut clean, meldet 'Phase-6-Vorbau: ALLE OK' (Test inkludiert Registry selbst direkt). EINE Kontext-Ungenauigkeit ohne Invalidierungswirkung: die behauptete Richtungs-Praezedenz builder/commands/axis_library_registry.hpp ist KEINE Include-Kante (Z.181-184 = String-Literal-Metadaten); curve_fit.hpp ist die ERSTE echte builder->measurement-Include-Kante — macht den Befund eher staerker, der Fix minimiert die Kante auf den dependency-freien Enum-Header. Severity minor korrekt."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 62,
+        "title": "fit_log_linear liefert FitStatus::Ok mit NaN-Koeffizienten bei x_working_set_bytes==0 (Phantom-Wert-Verbot verletzt)",
+        "severity": "critical",
+        "scenario": "BEWIESEN (Probe gegen den echten Header, g++ -std=c++23): Kurve {x=0,y=5},{1024,10},{4096,12} => 'status=2 (Ok) a=-nan isnan=1'. Mechanik: log2(0)=-inf (Z.62) => sx=-inf, sxx=+inf => det = n*inf - inf = NaN; der Guard 'det == 0.0' (Z.69) ist fuer NaN false => a,b,residual_rms werden alle NaN und der Status wird trotzdem Ok gesetzt (Z.82). Ein einziger 0-x-Punkt (z.B. der Phantom-Punkt aus dem parse-Defekt unten, oder eine 0-Zeile im CSV) vergiftet den gesamten Fit mit Status Ok — exakt der Phantom-Wert, den die HONEST-EMPTY-Doktrin im Datei-Kopf (Z.4) verbietet. Fehlender Guard: x==0 (und generell !std::isfinite(lx)) muss den Punkt ablehnen oder einen Fehlstatus liefern.",
+        "dim": "honest-skeleton",
+        "verdict": {
+          "real": true,
+          "reason": "Empirically reproduced against the real uncommitted header (g++ -std=c++23, probe in scratchpad): curve {x=0,y=5},{1024,10},{4096,12} yields literally 'status=2 (Ok) a=-nan b=-nan rms=-nan'; the same poison also arrives via parse_wide_csv_column from a CSV row '0,5.0' (points=3, first_x=0, fit again Ok/NaN), while the control curve without x=0 fits finitely (a=1.0, b=0.0). Mechanics verified in source: log2(0)=-inf at curve_fit.hpp:62, det = n*inf - inf = NaN at :68, the sole guard 'det == 0.0' at :69 is false for NaN (IEEE NaN compares unequal), and :82 sets FitStatus::Ok unconditionally — producing NaN coefficients under an Ok status, violating the file's own HONEST-EMPTY doctrine (line 4: 'nie Phantom-Werte'). Missing guard for x==0 / !std::isfinite(lx) confirmed."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 119,
+        "title": "parse_wide_csv_column wandelt nicht-numerische Zellen (inkl. der ehrlichen 'n/a'-Zellen des Bestands-Writers) still in Phantom-Punkte (0,0) um",
+        "severity": "critical",
+        "scenario": "BEWIESEN: CSV 'working_set_bytes,LATENCY_P99\\nn/a,n/a\\n1024,10\\n' => points=2, erster Punkt (x=0,y=0), anschliessender fit_log_linear => 'status=2 (Ok) isnan=1'. strtoull/strtod (Z.119/123) liefern bei Parse-Fehlschlag still 0 und have_x/have_y werden trotzdem true gesetzt — keinerlei Diagnose. Besonders schwer: der echte E1-Writer emittiert WOERTLICH 'n/a' als ehrlichen Leerwert (cache_engine_builder_iterator.hpp:322/342/385, dokumentiert 'ehrlich n/a, NICHT 0') — der neue Leser macht aus genau dieser Ehrlichkeit einen Phantom-Punkt, der via x=0 zusaetzlich den NaN-Ok-Fit aus Finding 1 triggert. Doppelte Doktrin-Verletzung (Phantom-Punkt + NaN-Ok).",
+        "dim": "honest-skeleton",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch reproduziert am echten Repo-Stand (Compile-Probe gegen die Original-Header, g++ -std=c++23, nur Scratchpad): CSV 'working_set_bytes,LATENCY_P99\\nn/a,n/a\\n1024,10\\n' liefert points=2 mit Phantom-Punkt p[0]=(x=0,y=0), und fit_log_linear meldet status=2 (Ok) mit a=-nan/b=-nan/residual_rms=-nan (isnan=1) — woertlich das behauptete Fehl-Szenario. Ursache im Code bestaetigt: curve_fit.hpp Z.119/123 rufen strtoull/strtod mit endptr=nullptr (keinerlei Parse-Fehler-Erkennung), Z.120/124 setzen have_x/have_y bedingungslos, Z.127-130 pushen den Punkt. Gegenprobe verschaerft den Befund: ein CSV mit AUSSCHLIESSLICH n/a-Datenzeilen ergibt points=2 und FitStatus::Ok statt NoData — direkter Widerspruch zur im Dateikopf (Z.4) selbst deklarierten HONEST-EMPTY-Doktrin ('nie Phantom-Werte'). Writer-Bezug bestaetigt: cache_engine_builder_iterator.hpp Z.322/342/346/385/389 emittieren woertlich 'n/a' als dokumentierten ehrlichen Leerwert ('ehrlich n/a, NICHT 0'). Einzige Nuance (widerlegt das Finding nicht): der heutige E1-Writer trennt mit ';', der Parser splittet auf ',' (dokumentiert 'Komma-Spalten') — die aktuellen Semikolon-Dateien wuerden daher ehrlich-leer statt phantom parsen; das behauptete Szenario betrifft das dokumentierte Komma-Eingabeformat des Parsers selbst und ist dort zwingend und deterministisch (x=0 -> log2(0)=-inf -> det=NaN -> NaN-Ok-Fit)."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 69,
+        "title": "det==0.0-Guard faengt identische x bei nicht-dyadischen Werten nicht: Float-Rundung => det!=0 => Ok mit erfundener Steigung",
+        "severity": "major",
+        "scenario": "BEWIESEN: 7 identische Punkte x=1000 (y=0..6) => det=9.09e-13 != 0, Guard greift NICHT => 'status=2 (Ok) a=0.25 b=0.5085...' — eine frei erfundene Steigung fuer ein unterbestimmtes System (Kommentar Z.69 'alle x identisch -> Gerade unterbestimmt' wird nicht eingehalten). Sweep ueber x in {3,10,...,99998} und n in 2..12: 92293 (x,n)-Kombinationen mit komplett identischen x entkommen dem ==0.0-Vergleich (erste: x=3, n=7); nur dyadische x (log2 exakt, z.B. 1024) und n=2 sind sicher. Realistisch erreichbar: Wiederholungsmessungen bei EINEM Working-Set (das sample_count-Feld deutet genau diesen Fall an). Exakter Gleichheits-Check der x-Werte oder Epsilon-relative det-Pruefung noetig.",
+        "dim": "honest-skeleton",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch am echten Header reproduziert (Compile-Probe im Scratch, g++ -std=c++23 -O2): (1) 7 Punkte x=1000, y=0..6 => det=9.0949470177292824e-13 != 0.0, Guard Z.69 greift NICHT, Ergebnis 'status=2 a=0.25 b=0.50855392883447847 rms=2' — exakt der behauptete Phantom-Fit fuer ein unterbestimmtes System, im Widerspruch zum Kommentar 'alle x identisch -> Gerade unterbestimmt' und zur HONEST-EMPTY-Doktrin (Z.4). (2) Dyadische Kontrolle x=1024/n=7 liefert korrekt status=1. (3) Sweep x=3..99998 (Schritt 7), n=2..12: exakt 92293/157146 identische-x-Kombinationen entkommen dem ==0.0-Vergleich, erste x=3/n=7 — deckungsgleich mit dem Kandidaten. (4) Erreichbarkeit ueber die oeffentliche API bewiesen: WIDE-CSV mit 7 Wiederholungszeilen bei ws_bytes=1000 durch parse_wide_csv_column + fit_log_linear ergibt denselben status=2/a=0.25 (keine Deduplizierung im Pfad). Befund [major] bestaetigt."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 103,
+        "title": "Der 'WIDE-CSV-Spalten-Leser' spricht nicht den Dialekt der echten E1-WIDE-CSV: Komma-Split vs. Semikolon-CSV des Bestands => auf realen #156-Daten IMMER still leer",
+        "severity": "major",
+        "scenario": "BEWIESEN: Header der echten Strecke ist semikolon-getrennt — lazy_csv_header (cache_engine_builder_iterator.hpp:189-249) baut 'binary_id;setting;...;working_set_n;...;pmc_cache_misses_l1;...;pmc_available\\n'. Probe mit realem Dialekt 'binary_id;setting;working_set_n;op_search_lookup_p99_ns' => points=0 still (der Komma-Split Z.103/117 sieht EINE Spalte = ganze Headerzeile, x_idx/y_idx=-1). Der Datei-Kopf (Z.5-6) deklariert die Funktion aber explizit als WIDE-CSV-Spalten-Leser fuer die #156-Messdaten — gegen result.csv des Bestands kann sie prinzipiell nie einen Punkt liefern und meldet das als NoData statt als Schema-Fehler. Zusaetzlich Einheiten-Drift: die reale x-Spalte heisst working_set_n und ist eine RECORD-ZAHL (cache_engine_builder_iterator.hpp:142 'N (Record-Zahl)'), waehrend CurvePoint.x_working_set_bytes Bytes behauptet.",
+        "dim": "honest-skeleton",
+        "verdict": {
+          "real": true,
+          "reason": "CONFIRMED by empirical reproduction on the real repo code. (1) Compiled probe (scratchpad, g++ -std=c++23 against libs/cache_engine includes): feeding parse_wide_csv_column the REAL dialect 'binary_id;setting;working_set_n;op_search_lookup_p99_ns' + 3 data rows yields points=0 and FitStatus::NoData silently; the identical content comma-separated yields points=3/Ok. Cause: comma split at curve_fit.hpp:103/:117 sees the whole semicolon header as ONE column, x_idx/y_idx=-1, silent return at :108. (2) The real E1 WIDE CSV is semicolon-only end to end: lazy_csv_header (cache_engine_builder_iterator.hpp:189-249) and format_csv_row (:279ff, every field joined with ';'); both existing measurement CSV fixtures in the repo (tests/unit/thesis_tiere/*.csv) are semicolon-dialect; no comma WIDE CSV exists anywhere in the chain. curve_fit.hpp:5-6 declares the reader as the pre-built block for the #156-gated fit, yet it can structurally never parse that data and reports the schema mismatch as NoData (indistinguishable from 'data gated'), violating the honest-empty doctrine. The unit test only exercises a fabricated comma CSV with column names (working_set_bytes, LATENCY_P99) absent from the real schema, so the green test suite does not cover the real dialect. (3) Units drift also confirmed: real x-column working_set_n is a record count (cache_engine_builder_iterator.hpp:142 'N (Record-Zahl)') while CurvePoint.x_working_set_bytes (curve_fit.hpp:25) claims bytes; no bytes column exists in the real header. The doc comment 'Komma-Spalten' at curve_fit.hpp:86 does not exculpate: against its declared target data the reader always fails silently."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 104,
+        "title": "CRLF-Zeilenenden (Windows-CSVs der Mess-Strecke) brechen still das Header-Matching der letzten Spalte => ganze Datei wird als leer verworfen",
+        "severity": "major",
+        "scenario": "BEWIESEN: 'working_set_bytes,LATENCY_P99\\r\\n1024,10\\r\\n...' mit y=letzter Spalte => points=0 (Header-Zelle ist 'LATENCY_P99\\r' != 'LATENCY_P99', y_idx=-1, Z.104-108) — gueltige Daten werden still zu NoData. Der CRLF-Fall ist real: der Bestands-Writer oeffnet result.csv OHNE std::ios::binary (cache_engine_builder_iterator.hpp:790 'std::ofstream pf{bin_dir / \"result.csv\", std::ios::trunc}') — auf der Windows-Haelfte der Mess-Strecke uebersetzt der Text-Modus jedes \\n zu \\r\\n auf Platte. Liegt die Zielspalte nicht am Zeilenende, parst es scheinbar korrekt (strtod stoppt am \\r), d.h. der Fehler ist positionsabhaengig und dadurch besonders tueckisch. Kein \\r-Trim vorhanden.",
+        "dim": "honest-skeleton",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch reproduziert am echten Header (Compile-Probe im Scratchpad, g++ -std=c++23, curve_fit.hpp unveraendert eingebunden): CSV 'working_set_bytes,LATENCY_P99\\r\\n1024,10\\r\\n...' mit y=letzter Spalte liefert points=0 und FitStatus::NoData (Header-Zelle 'LATENCY_P99\\r' != 'LATENCY_P99', y_idx=-1, Return an Z.108); LF-Kontrolle liefert points=3/Ok. Positionsabhaengigkeit bestaetigt: CRLF mit y NICHT-letzter Spalte parst points=3/Ok (strtod stoppt am \\r). Auch der Datei-Roundtrip (CRLF-Bytes auf Platte, ifstream-Read auf Linux) reproduziert points=0. CRLF-Provenienz real: cache_engine_builder_iterator.hpp:790 oeffnet result.csv als std::ofstream OHNE std::ios::binary, Zeilen mit '\\n' — Windows-Textmodus schreibt \\r\\n; Windows ist first-class Mess-Haelfte (pmc_source_factory.hpp _WIN32/WindowsPcmPmcSource, thread_pinning.hpp _WIN32, DLL/FreeLibrary im Iterator). Kein \\r-Trim in curve_fit.hpp vorhanden; gueltige Daten werden still zu NoData verworfen."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.hpp",
+        "line": 18,
+        "title": "Registry-Behauptung 'exakt der Enum-Name (E4-Reporting/CSV-Spalten-Vokabular)' ist gegenueber dem Bestand erfunden: kein Writer emittiert diese Spaltennamen",
+        "severity": "major",
+        "scenario": "BEWIESEN per grep ueber libs/ + tests/: die Namen des Registry-Vokabulars (LATENCY_P99, CACHE_MISS_L1, working_set_bytes, ...) kommen als CSV-Spalten NIRGENDS im Bestand vor — einziger Treffer ist der neue Test test_phase6_vorbau.cpp:106/114 selbst. Die echten Spalten der E1-Strecke heissen lowercase und anders geschnitten: working_set_n, op_<art>_p99_ns/op_<art>_p50_ns (kein LATENCY_P99), pmc_cache_misses_l1 (nicht CACHE_MISS_L1), pmc_dtlb_misses (nicht DTLB_MISS), pmc_energy_micro_joules (nicht ENERGY_J) — Quelle lazy_csv_header cache_engine_builder_iterator.hpp:189-249. Der Doku-Satz in Z.18 suggeriert eine Namens-Kopplung an bestehende CSV-Spalten, die nicht existiert; der Test validiert das Skeleton nur gegen dieses selbst-erfundene Vokabular, nie gegen den realen Header. Entweder Kommentar ehrlich auf 'kuenftiges E4-Reporting-Vokabular' einschraenken oder eine explizite Mapping-Tabelle Registry-Name -> reale WIDE-Spalte(n) nachziehen.",
+        "dim": "honest-skeleton",
+        "verdict": {
+          "real": true,
+          "reason": "Reproduziert am echten Stand: (1) Grep ueber libs/tests/apps/adapters/modules/benchmarks/scripts/tools — die Registry-Namen (LATENCY_P99, CACHE_MISS_L1, DTLB_MISS, ENERGY_J, ...) kommen als CSV-Spalten NIRGENDS vor; einziger String-Treffer ist der selbst-konstruierte Header im neuen Test test_phase6_vorbau.cpp:100/106. (2) Die reale WIDE-Kopfzeile (lazy_csv_header, libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:188-250 — Pfad im Kandidaten leicht ungenau, Substanz exakt) heisst working_set_n, op_<art>_p50_ns/op_<art>_p99_ns, pmc_cache_misses_l1, pmc_dtlb_misses, pmc_energy_micro_joules — und ist zudem SEMIKOLON-separiert, waehrend parse_wide_csv_column auf Komma splittet (Mismatch noch tiefer als behauptet). (3) Verhaltensbeweis per Scratch-Compile-Probe (g++ -std=c++23, gleiche Include-Dirs/Defines wie das offizielle Test-Target): axis_info(c).name als Spaltenselektor gegen die verbatim reale Kopfzeile => 0/16 Treffer, jeder Fit = FitStatus::NoData; auch die Test-x-Spalte working_set_bytes existiert real nicht (real: working_set_n). (4) Der Test validiert ausschliesslich sein eigenes erfundenes Vokabular, nie den realen Header. Gegenargument geprueft: Z.5 nennt E4-Konsumenten als Folge-Increment, aber Z.18 traegt keinen Zukunfts-Qualifier und curve_fit.hpp:6 nennt sich explizit WIDE-CSV-Spalten-Leser — die naheliegende Lesart (Registry-Name = selektierbare Spalte der bestehenden WIDE-CSV) ist empirisch falsch. Doku-Behauptung 'CSV-Spalten-Vokabular' ist gegenueber dem Bestand erfunden; Remedy (ehrliche Einschraenkung ODER Mapping-Tabelle Registry-Name->reale WIDE-Spalte) trifft zu."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      },
+      {
+        "file": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 117,
+        "title": "Quotes werden nicht unterstuetzt: Zelle mit Komma in Anfuehrungszeichen verschiebt die Spaltenindizes => Werte aus falscher Spalte",
+        "severity": "minor",
+        "scenario": "BEWIESEN: 'tag,working_set_bytes,LATENCY_P99\\n\"a,b\",1024,10\\n' => 1 Punkt mit x=0 (aus '\"a' via strtoull) und y=1024 (der Working-Set-Wert landet in der y-Spalte) — still falsche Daten statt Diagnose. Der naive getline-Split (Z.117) kennt kein RFC-4180-Quoting. Nachrangig, weil der reale Bestands-Writer aktuell nicht quotet — aber in Kombination mit Finding 2 entsteht wieder ein Phantom-Punkt mit Ok-Fit statt eines Fehlers.",
+        "dim": "honest-skeleton",
+        "verdict": {
+          "real": true,
+          "reason": "Empirisch am echten Header reproduziert (Scratch-Compile g++ -std=c++23, warnungsfrei): Input 'tag,working_set_bytes,LATENCY_P99\\n\"a,b\",1024,10\\n' liefert exakt das behauptete Fehlbild — points=1, x=0, y=1024 (Working-Set-Wert rutscht in die y-Spalte), still ohne Diagnose; Kontrollzeile ohne Quotes parst korrekt (x=1024, y=10). Ursache verifiziert: naiver getline-Komma-Split in curve_fit.hpp:117 (und Header-Split Z.103) ohne RFC-4180-Quoting. Eskalation ebenfalls bewiesen: gemischte Datei (1 gequotete + 2 normale Zeilen) ergibt 3 Punkte inkl. Phantom (0,1024) und fit_log_linear meldet FitStatus::Ok mit a=b=rms=NaN (log2(0)=-inf) — wortwörtlich 'Ok-Fit statt Fehler'. Einzige kosmetische Ungenauigkeit im Kandidaten: x=0 stammt aus strtoull über Zelle 'b\"' (Index 1 nach Split), nicht aus '\"a'; das Ergebnis ist identisch. Severity [minor] plausibel, aber eher Untergrenze: das Repo besitzt selbst einen RFC-4180-Writer (detail::csv_quote, builder/commands/result_aggregator.hpp:57, unconditional quoting), gequotete CSVs sind also hausinterne Realität."
+        },
+        "votes": [
+          true
+        ],
+        "confirmed": true
+      }
+    ],
+    "plausible": [
+      {
+        "file": "libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "line": 119,
+        "title": "std::strtoull/std::strtod ohne #include <cstdlib> — kompiliert nur via libstdc++-Transitivitaet; MSVC-/libc++-Bruchrisiko",
+        "severity": "minor",
+        "scenario": "Z.119 (std::strtoull) und Z.123 (std::strtod) benoetigen nach Standard <cstdlib>; die Include-Liste (Z.10-17: cmath, cstddef, cstdint, istream, sstream, string, string_view, vector) enthaelt es nicht. EMPIRISCH: g++-16 und clang-22 gegen libstdc++ kompilieren den Header standalone sauber (transitive Includes); libc++ war auf prod1 nicht installiert (Probe brach an fehlenden libc++-Headern ab, kein Beleg in beide Richtungen). Auf MSVC (/W4 /permissive- laut compiler_flags.cmake, Voll-Plattform-Doktrin 8er-Matrix) und unter libc++ ist der Header-Selbststand nicht garantiert — MSVC-STL-Include-Bereinigungen brechen genau diese Klasse von Code hart. Fix: eine Zeile #include <cstdlib>.",
+        "dim": "metaprog-striktheit",
+        "verdict": {
+          "real": false,
+          "reason": "Faktenbasis stimmt (Z.119 std::strtoull, Z.123 std::strtod, kein <cstdlib> in der gesamten Include-Kette; auf libstdc++ nur transitiv in Tiefe 8 via g++ -H belegt), aber das Fehl-Szenario ist empirisch WIDERLEGT statt reproduziert: Die werkgetreue Std-Header-Union-TU kompiliert fehlerfrei auf MSVC 19.41/19.44/19.50 mit exakt den Projekt-Flags /std:c++latest /permissive- /W4 (Compiler-Explorer-API, Exit 0, 0 Fehler) UND unter libc++ (clang 20.1/21.1/trunk, -std=c++23) UND sogar im libc++-Strikt-Modus -D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES, der genau die behauptete Include-Bereinigungs-Klasse abbildet. Beide namentlich benannten Bruchplattformen halten <cstdlib> in dieser Header-Menge bewusst transitiv bereit. Verbleibt nur die standard-theoretische Nicht-Garantie ([res.on.headers]) als IWYU-Stilpunkt — der Ein-Zeilen-Fix wäre unschädlich-sinnvoll, aber ein konkret reproduzierbarer oder zwingender Bruch existiert auf keiner Toolchain der Plattform-Matrix (9 Konfigurationen getestet, alle grün)."
+        },
+        "votes": [
+          false
+        ],
+        "confirmed": false
+      }
+    ],
+    "total": 15
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Find"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "find:design-treue",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a2f30f5044a4122ce",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701132970,
+      "queuedAt": 1783701132960,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701407893,
+      "tokens": 63829,
+      "toolCalls": 12,
+      "durationMs": 274923,
+      "resultPreview": "{\"findings\":[{\"file\":\"/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp\",\"line\":65,\"title\":\"read_delta-Ziel builder::PmcCounters kann 3 der 10 beworbenen MeasuredEvents strukturell nie liefern (Cycles/Instructions/MemStall) — Deviation ist breiter als dokumentiert\",\"severit…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "find:metaprog-striktheit",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a1bc929feef1ba0fb",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701132971,
+      "queuedAt": 1783701132960,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701511637,
+      "tokens": 68955,
+      "toolCalls": 24,
+      "durationMs": 378666,
+      "resultPreview": "{\"findings\":[{\"file\":\"libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.hpp\",\"line\":22,\"title\":\"Enum-Drift NICHT compile-time-erzwungen: 17. MeasurementCategory kompiliert still mit 16 Registry-Eintraegen; kMeasurementAxisCount ist zweite hartkodierte 16 ohne Kopplung\",\"severity\":\"major\",\"scenario\":\"EMPIRISCH BELEGT (Shim-Experiment, g++-16 -std=c++23 -Wall): measurement…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "find:honest-skeleton",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "abc08ea517c5069e4",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701132971,
+      "queuedAt": 1783701132960,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701549951,
+      "tokens": 62420,
+      "toolCalls": 26,
+      "durationMs": 416980,
+      "resultPreview": "{\"findings\":[{\"file\":\"/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp\",\"line\":62,\"title\":\"fit_log_linear liefert FitStatus::Ok mit NaN-Koeffizienten bei x_working_set_bytes==0 (Phantom-Wert-Verbot verletzt)\",\"severity\":\"critical\",\"scenario\":\"BEWIESEN (Probe gegen den echten Header, g++ -std=c++23)…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "verify:read_delta-Ziel builder::P",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "afd6fb07b4b9f5053",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701407903,
+      "queuedAt": 1783701407895,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch reproduziert am echten Code (Compile-Probe gegen …",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701610594,
+      "tokens": 47825,
+      "toolCalls": 12,
+      "durationMs": 202690,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch reproduziert am echten Code (Compile-Probe gegen die realen Header, g++ -std=c++20, static_asserts + Laufzeit-Output): (1) MeasuredEvent bewirbt 10 Events inkl. Cycles=0/Instructions=1/MemStall=7 (i_measurement_source.hpp:22-34); (2) das read_delta-Ziel builder::PmcCounters (pmc_source.hpp:19-28) hat compile-bewiesen exakt 8 Member (7 Counter + available) und KEIN …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "verify:WallClockSource: Caps beha",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a5bd968ec304f30d8",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701407904,
+      "queuedAt": 1783701407895,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch reproduziert (Compile-Probe gegen echten Header, …",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701524292,
+      "tokens": 36127,
+      "toolCalls": 10,
+      "durationMs": 116388,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch reproduziert (Compile-Probe gegen echten Header, Scratch-Build): capabilities() behauptet event_supported[Cycles]=true (i_measurement_source.hpp:77) und open({Cycles})==Available, aber begin()/end() sind leere Bodies (:81-82, kein Zeitstempel trotz realem 50-ms-Intervall) und read_delta schreibt immer PmcCounters{} (:83-85) — Planer-Probe liefert available=false, a…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "verify:PmcSourceAdapter::capabili",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a7f9512a794f44fab",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701407904,
+      "queuedAt": 1783701407895,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch am echten Code reproduziert (Scratch-Probe, g++16…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701593584,
+      "tokens": 53188,
+      "toolCalls": 13,
+      "durationMs": 185680,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch am echten Code reproduziert (Scratch-Probe, g++16 -std=c++23 -DCOMDARE_ENABLE_PMC, realer LinuxPerfPmcSource, perf_event_paranoid=1): Adapter-Caps behaupten bei available()==1 alle 7 Events (i_measurement_source.hpp:98-103) inkl. has_energy=0-Widerspruch zu EnergyUj-supported; reale Messung lieferte nur l1=42/dtlb=6, waehrend L2Miss/BranchMiss/CoherenceInval strukt…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "verify:open() ignoriert die Event",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "acab3e052ca1afd61",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701407904,
+      "queuedAt": 1783701407895,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch am echten Header reproduziert (Compile-Probe im S…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701567630,
+      "tokens": 38993,
+      "toolCalls": 14,
+      "durationMs": 159725,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch am echten Header reproduziert (Compile-Probe im Scratch, g++ -std=c++20): WallClockSource::open({L3Miss}) liefert Available obwohl caps.event_supported[L3Miss]==0 (Z.80, Parameter /*events*/ verworfen); PmcSourceAdapter::open({BranchMiss}) um eine available-Quelle liefert Available (Z.107-109, nur source_.available() geprueft), obwohl linux_perf_pmc_source.hpp (Z.2…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "verify:PmcSourceAdapter: last_ wi",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a1f939e96ac46937b",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701407904,
+      "queuedAt": 1783701407895,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch am echten Header reproduziert (Scratch-Compile g+…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701545639,
+      "tokens": 38767,
+      "toolCalls": 10,
+      "durationMs": 137735,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch am echten Header reproduziert (Scratch-Compile g++ -std=c++20 gegen libs/cache_engine/include, woertliche Ausgabe): last_ (i_measurement_source.hpp:119) wird nur von end() (Z.111) geschrieben, nie von open()/begin()/close() zurueckgesetzt; read_delta (Z.112-114) liefert nach begin() ohne end() (abgebrochenes Intervall 2), nach close() und nach re-open() jeweils das…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "verify:Enum-Drift NICHT compile-t",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a6feba096f0dc83fd",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701511639,
+      "queuedAt": 1783701511638,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch voll reproduziert (g++-16 -std=c++23, Shim-Kopie …",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701738593,
+      "tokens": 50934,
+      "toolCalls": 16,
+      "durationMs": 226954,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch voll reproduziert (g++-16 -std=c++23, Shim-Kopie von measurement_category.hpp mit DRIFT_TEST_CATEGORY_17=16, Repo unberuehrt): (1) TU mit #include <measurement_axis_registry.hpp> kompiliert EXIT=0 OHNE jede Diagnose unter den Flags, mit denen test_phase6_vorbau real gebaut wird (raw add_executable Z.2583, keine Warn-Flags); der consteval-static_assert feuert nicht,…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "verify:std::strtoull/std::strtod",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ac7be9f671272c956",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701511640,
+      "queuedAt": 1783701511638,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Faktenbasis stimmt (Z.119 std::strtoull, Z.123 std::strtod,…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701837514,
+      "tokens": 42643,
+      "toolCalls": 21,
+      "durationMs": 325874,
+      "resultPreview": "{\"real\":false,\"reason\":\"Faktenbasis stimmt (Z.119 std::strtoull, Z.123 std::strtod, kein <cstdlib> in der gesamten Include-Kette; auf libstdc++ nur transitiv in Tiefe 8 via g++ -H belegt), aber das Fehl-Szenario ist empirisch WIDERLEGT statt reproduziert: Die werkgetreue Std-Header-Union-TU kompiliert fehlerfrei auf MSVC 19.41/19.44/19.50 mit exakt den Projekt-Flags /std:c++latest /permissive- /W4…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "verify:Ueberbreiter Include: meas",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ab628af244c41406b",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701511640,
+      "queuedAt": 1783701511638,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "CONFIRMED empirisch. (1) Grep: curve_fit.hpp nutzt KEIN Reg…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701688780,
+      "tokens": 36275,
+      "toolCalls": 13,
+      "durationMs": 177140,
+      "resultPreview": "{\"real\":true,\"reason\":\"CONFIRMED empirisch. (1) Grep: curve_fit.hpp nutzt KEIN Registry-Symbol, nur mm::MeasurementCategory (Z.32/91), das in measurement_category.hpp lebt (nur <cstdint>, CLU vorhanden). (2) g++-16 -H-Trace beweist: der Registry-Include zieht system_axis.hpp -> anatomy/observable_tier.hpp + builder/pmc_source.hpp in jeden Konsumenten (builder->measurement->builder-Rueckkante real;…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "verify:fit_log_linear liefert Fit",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ae1aefa6b5be1ac80",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701549953,
+      "queuedAt": 1783701549952,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirically reproduced against the real uncommitted header …",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701623445,
+      "tokens": 27114,
+      "toolCalls": 6,
+      "durationMs": 73492,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirically reproduced against the real uncommitted header (g++ -std=c++23, probe in scratchpad): curve {x=0,y=5},{1024,10},{4096,12} yields literally 'status=2 (Ok) a=-nan b=-nan rms=-nan'; the same poison also arrives via parse_wide_csv_column from a CSV row '0,5.0' (points=3, first_x=0, fit again Ok/NaN), while the control curve without x=0 fits finitely (a=1.0, b=0.0). M…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "verify:parse_wide_csv_column wand",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ab3570ff0df73d291",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701549954,
+      "queuedAt": 1783701549952,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch reproduziert am echten Repo-Stand (Compile-Probe …",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701675809,
+      "tokens": 33718,
+      "toolCalls": 10,
+      "durationMs": 125855,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch reproduziert am echten Repo-Stand (Compile-Probe gegen die Original-Header, g++ -std=c++23, nur Scratchpad): CSV 'working_set_bytes,LATENCY_P99\\\\nn/a,n/a\\\\n1024,10\\\\n' liefert points=2 mit Phantom-Punkt p[0]=(x=0,y=0), und fit_log_linear meldet status=2 (Ok) mit a=-nan/b=-nan/residual_rms=-nan (isnan=1) — woertlich das behauptete Fehl-Szenario. Ursache im Code best…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 14,
+      "label": "verify:det==0.0-Guard faengt iden",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a29a069a194a32f37",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701549954,
+      "queuedAt": 1783701549952,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch am echten Header reproduziert (Compile-Probe im S…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701657556,
+      "tokens": 29786,
+      "toolCalls": 8,
+      "durationMs": 107602,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch am echten Header reproduziert (Compile-Probe im Scratch, g++ -std=c++23 -O2): (1) 7 Punkte x=1000, y=0..6 => det=9.0949470177292824e-13 != 0.0, Guard Z.69 greift NICHT, Ergebnis 'status=2 a=0.25 b=0.50855392883447847 rms=2' — exakt der behauptete Phantom-Fit fuer ein unterbestimmtes System, im Widerspruch zum Kommentar 'alle x identisch -> Gerade unterbestimmt' und…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 15,
+      "label": "verify:Der 'WIDE-CSV-Spalten-Lese",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a24bb346515265a1f",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701549954,
+      "queuedAt": 1783701549952,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "CONFIRMED by empirical reproduction on the real repo code. …",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701730467,
+      "tokens": 44356,
+      "toolCalls": 18,
+      "durationMs": 180513,
+      "resultPreview": "{\"real\":true,\"reason\":\"CONFIRMED by empirical reproduction on the real repo code. (1) Compiled probe (scratchpad, g++ -std=c++23 against libs/cache_engine includes): feeding parse_wide_csv_column the REAL dialect 'binary_id;setting;working_set_n;op_search_lookup_p99_ns' + 3 data rows yields points=0 and FitStatus::NoData silently; the identical content comma-separated yields points=3/Ok. Cause: co…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 16,
+      "label": "verify:CRLF-Zeilenenden (Windows-",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a40bebdbfc76a9f2e",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701549954,
+      "queuedAt": 1783701549953,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch reproduziert am echten Header (Compile-Probe im S…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701691076,
+      "tokens": 33419,
+      "toolCalls": 10,
+      "durationMs": 141122,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch reproduziert am echten Header (Compile-Probe im Scratchpad, g++ -std=c++23, curve_fit.hpp unveraendert eingebunden): CSV 'working_set_bytes,LATENCY_P99\\\\r\\\\n1024,10\\\\r\\\\n...' mit y=letzter Spalte liefert points=0 und FitStatus::NoData (Header-Zelle 'LATENCY_P99\\\\r' != 'LATENCY_P99', y_idx=-1, Return an Z.108); LF-Kontrolle liefert points=3/Ok. Positionsabhaengigkei…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 17,
+      "label": "verify:Registry-Behauptung 'exakt",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a1265719fddf51cb2",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701549955,
+      "queuedAt": 1783701549953,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Reproduziert am echten Stand: (1) Grep ueber libs/tests/app…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701771657,
+      "tokens": 56704,
+      "toolCalls": 17,
+      "durationMs": 221702,
+      "resultPreview": "{\"real\":true,\"reason\":\"Reproduziert am echten Stand: (1) Grep ueber libs/tests/apps/adapters/modules/benchmarks/scripts/tools — die Registry-Namen (LATENCY_P99, CACHE_MISS_L1, DTLB_MISS, ENERGY_J, ...) kommen als CSV-Spalten NIRGENDS vor; einziger String-Treffer ist der selbst-konstruierte Header im neuen Test test_phase6_vorbau.cpp:100/106. (2) Die reale WIDE-Kopfzeile (lazy_csv_header, libs/cach…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 18,
+      "label": "verify:Quotes werden nicht unters",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ad868b0b651a023fd",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1783701549955,
+      "queuedAt": 1783701549953,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Empirisch am echten Header reproduziert (Scratch-Compile g+…",
+      "promptPreview": "KONTEXT: DATEN_GATED-Vorbau-Increment (UNCOMMITTED auf ce main 90653f02). ce = /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. NEU: (1) libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp — vendor-neutrale Mess-Quellen-Abstraktion WOERTLICH nach Design-Quelle docs/sessions/20260531-mess-abstraktion-cross-platform-architek…",
+      "lastProgressAt": 1783701677772,
+      "tokens": 30798,
+      "toolCalls": 8,
+      "durationMs": 127817,
+      "resultPreview": "{\"real\":true,\"reason\":\"Empirisch am echten Header reproduziert (Scratch-Compile g++ -std=c++23, warnungsfrei): Input 'tag,working_set_bytes,LATENCY_P99\\\\n\\\"a,b\\\",1024,10\\\\n' liefert exakt das behauptete Fehlbild — points=1, x=0, y=1024 (Working-Set-Wert rutscht in die y-Spalte), still ohne Diagnose; Kontrollzeile ohne Quotes parst korrekt (x=1024, y=10). Ursache verifiziert: naiver getline-Komma-S…"
+    }
+  ],
+  "totalTokens": 795851,
+  "totalToolCalls": 248
+}

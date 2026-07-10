@@ -11,18 +11,26 @@
 // measurement-records pro Messreihe in separate Unterordner.
 
 // V38.C: STL-Header zuerst (windows.h via plugin_loader.hpp am Ende),
-// damit <regex> & co. nicht durch Windows-Makros gestoert werden.
+// damit die STL-Header (frueher u.a. <regex>, Phase 7 entfernt) nicht durch Windows-Makros gestoert werden.
 #include <array>
+#include <cerrno>
+#include <charconv>
+#include <cctype>
 #include <cstdint>
+#include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <map>
-#include <regex>
+#include <optional>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <vector>
 
 #include "experiment_driver/experiment_driver.hpp"
@@ -32,6 +40,10 @@
 #include "stats_aggregator.hpp"           // V41.B3
 
 #include <comdare/workload_generator/workload_generator.hpp>
+
+#ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
+#include <profile_facade/profile_run_facade.hpp>
+#endif
 
 // V38.C - bringt windows.h auf Win32 (LEAN_AND_MEAN + NOMINMAX gesetzt).
 // MUSS am Ende stehen, sonst clash mit STL via Windows-Makros.
@@ -151,7 +163,8 @@ enum class MessreiheKind : std::uint8_t {
 void print_usage() {
     std::cerr
         << "Usage: comdare-messung-driver <config_dir> <output_dir> [--comdare-root=DIR] [--messreihen-xml=FILE]\n\n"
-        << "Erwartete Files in <config_dir>:\n"
+        << "Erwartete Files in <config_dir> (Legacy-4-Datei-Schema; heutige Konfigs:\n"
+        << "config_a/b/c_*.xml + messreihen.xml — fehlende Dateien werden diagnostiziert):\n"
         << "  cache_engine_permutations.xml\n"
         << "  search_algorithm_permutations.xml\n"
         << "  allocator_permutations.xml\n"
@@ -170,37 +183,84 @@ struct MessreihenSpec {
     std::vector<std::string> sota_profiles;
 };
 
+// Phase 7 (2026-07-10, Parser-Konsolidierung): der lokale Regex-Reader ist entfernt —
+// die Bibliothek (XmlConfigParser::load_messreihen, KF-1-DOM) ist die EINE Wahrheitsquelle.
+// MessreihenSpec bleibt die treiberlokale Sicht (string-mode fuer die bestehende Verzweigung).
 [[nodiscard]] std::vector<MessreihenSpec> load_messreihen(std::filesystem::path const& xml_path) {
-    std::vector<MessreihenSpec> result;
-    if (!std::filesystem::exists(xml_path)) return result;
-
-    std::ifstream      in{xml_path};
-    std::ostringstream ss;
-    ss << in.rdbuf();
-    auto content = ss.str();
-
-    std::regex reihe_re{"<messreihe\\s+id\\s*=\\s*\"([^\"]+)\"[^>]*>([\\s\\S]*?)</messreihe>"};
-    auto       it  = std::sregex_iterator(content.begin(), content.end(), reihe_re);
-    auto       end = std::sregex_iterator();
-    for (; it != end; ++it) {
+    std::vector<MessreihenSpec>            result;
+    comdare::builder::xml::XmlConfigParser parser;
+    for (auto const& r : parser.load_messreihen(xml_path)) {
         MessreihenSpec spec;
-        spec.id           = (*it)[1].str();
-        std::string inner = (*it)[2].str();
-
-        std::regex  mode_re{"<mode>(\\w+)</mode>"};
-        std::smatch mm;
-        if (std::regex_search(inner, mm, mode_re))
-            spec.mode = mm[1].str();
-        else
-            spec.mode = "defined";
-
-        std::regex prof_re{"<profile>([^<]+)</profile>"};
-        auto       pit  = std::sregex_iterator(inner.begin(), inner.end(), prof_re);
-        auto       pend = std::sregex_iterator();
-        for (; pit != pend; ++pit) { spec.sota_profiles.push_back((*pit)[1].str()); }
+        spec.id            = r.id;
+        spec.mode          = std::string{comdare::builder::xml::mode_to_string(r.mode)};
+        spec.sota_profiles = r.sota_profile_refs;
         result.push_back(std::move(spec));
     }
     return result;
+}
+
+[[nodiscard]] std::string trim_copy(std::string_view s) {
+    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.front())) != 0) s.remove_prefix(1);
+    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.back())) != 0) s.remove_suffix(1);
+    return std::string{s};
+}
+
+[[nodiscard]] std::string env_trimmed(char const* name) {
+    if (char const* e = std::getenv(name); e != nullptr) return trim_copy(e);
+    return {};
+}
+
+[[nodiscard]] bool e4_opt_in_enabled() {
+    // Nur der getrimmte Wert "1" aktiviert den schweren E4-XML-Lauf.
+    return env_trimmed("COMDARE_RUN_E4_XML") == "1";
+}
+
+[[nodiscard]] std::string compile_time_platform_tag() {
+#if defined(__linux__) && (defined(__x86_64__) || defined(_M_X64))
+    return "linux-x86_64";
+#elif defined(__linux__) && (defined(__aarch64__) || defined(_M_ARM64))
+    return "linux-arm64";
+#elif defined(_WIN32) && (defined(_M_X64) || defined(__x86_64__))
+    return "win-x86_64";
+#elif defined(_WIN32) && defined(_M_ARM64)
+    return "win-arm64";
+#elif defined(__APPLE__) && defined(__aarch64__)
+    return "macos-arm64";
+#elif defined(__APPLE__) && defined(__x86_64__)
+    return "macos-x86_64";
+#elif defined(__linux__) && defined(__riscv) && (__riscv_xlen == 64)
+    return "linux-riscv64";
+#else
+    return "unknown-platform";
+#endif
+}
+
+[[nodiscard]] double parse_min_free_gb_from_env() {
+    std::string const s = env_trimmed("COMDARE_MIN_FREE_GB");
+    if (s.empty()) return 0.0;
+
+    errno      = 0;
+    char*  end = nullptr;
+    double v   = std::strtod(s.c_str(), &end);
+    if (end == s.c_str() || *end != '\0' || errno == ERANGE || v < 0.0) {
+        // Fail-loud statt 0.0: ein Tippfehler ("4,5"/"4gb") wuerde sonst die RAM-Admission
+        // still deaktivieren (B3-Klasse) -- der Abbruch landet im try/catch des E4-Blocks.
+        throw std::runtime_error("COMDARE_MIN_FREE_GB ungueltig: '" + s + "'");
+    }
+    return v;
+}
+
+[[nodiscard]] std::optional<std::size_t> parse_size_env_strict(char const* name) {
+    std::string const s = env_trimmed(name);
+    if (s.empty()) return std::nullopt;
+
+    std::uint64_t value  = 0;
+    auto const [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), value, 10);
+    if (ec != std::errc{} || ptr != s.data() + s.size() ||
+        value > static_cast<std::uint64_t>((std::numeric_limits<std::size_t>::max)())) {
+        throw std::runtime_error(std::string{name} + " ungueltig: '" + s + "'");
+    }
+    return static_cast<std::size_t>(value);
 }
 
 } // namespace
@@ -433,18 +493,88 @@ int main(int argc, char* argv[]) {
 
     // REV 7.6 V8.12 — Aktivierung des EXPERIMENT_MODE im Sub-Build (User-Direktive
     // 2026-05-13/14). Default in cache-engine ist OFF (Production-Pfad).
-    // Beim Sub-Build der Permutations-Module muss das Flag explizit ON sein,
-    // damit ResultAggregator + Mess-Hooks in der ExecutionEngine kompiliert werden.
-#ifndef COMDARE_EXPERIMENT_MODE_ON
-    std::cerr << "[V8.12] WARNING: COMDARE_EXPERIMENT_MODE_ON ist NICHT definiert.\n"
-              << "         Der messung_driver wurde ohne Mess-Hooks gebaut.\n"
-              << "         Build mit: cmake -DCOMDARE_EXPERIMENT_MODE=ON\n";
-#else
-    std::cout << "Experiment-Mode: ON (ResultAggregator in ExecutionEngine aktiv)\n";
-#endif
+    // Phase 7 (Review wf_8508f98c): der fruehere #ifndef-Warnblock war ein Fehlalarm in JEDEM
+    // super-Build — der Treiber-HOST erhaelt das Define nie (directory-scoped im ce-Baum,
+    // Facade-Defines PRIVATE) und braucht es nicht: Mess-Hooks leben in den Tier-DLL-Kompilaten
+    // (COMDARE_MEASUREMENT_ON via Facade-Weitergabe); die Invariante Experiment=>Messung
+    // erzwingt der compile-time-Guard in abi_adapter.hpp je Tier-Kompilat.
+    std::cout << "Mess-Hooks: in den Tier-DLL-Kompilaten aktiv (COMDARE_MEASUREMENT_ON via "
+                 "Facade-Defines; Host-Define irrelevant)\n";
     std::cout << "\n";
 
     std::filesystem::create_directories(output_dir);
+
+    int e4_overall_rc = 0;
+
+#ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
+    {
+        namespace pf = comdare::cache_engine::builder::profile_facade;
+
+        try {
+            std::string thesis_profile = env_trimmed("COMDARE_THESIS_PROFILE");
+#ifdef COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE
+            if (thesis_profile.empty()) thesis_profile = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+#endif
+
+            if (!e4_opt_in_enabled()) {
+                std::cout << "[E4] XML-Andockung verfuegbar, aber inaktiv (Opt-in: COMDARE_RUN_E4_XML=1).\n";
+            } else if (thesis_profile.empty() || !std::filesystem::exists(thesis_profile)) {
+                std::cerr << "[E4] COMDARE_RUN_E4_XML=1, aber thesis_profile fehlt oder existiert nicht: "
+                          << (thesis_profile.empty() ? std::string{"<leer>"} : thesis_profile)
+                          << ". Klassischer Pfad laeuft weiter.\n";
+                e4_overall_rc = 5;
+            } else {
+                std::filesystem::path const e4_dir = output_dir / "e4_xml";
+                std::error_code             ec;
+                std::filesystem::create_directories(e4_dir, ec);
+                if (ec) throw std::runtime_error("create_directories(" + e4_dir.string() + "): " + ec.message());
+
+                pf::ProfileRunArgs pa;
+                pa.profile_path      = thesis_profile;
+                pa.out_csv           = e4_dir / "measurements.csv";
+                pa.src_dir           = e4_dir / "src";
+                pa.dll_dir           = e4_dir / "dll";
+                pa.build_version     = "m3v2";
+                pa.min_free_gb       = parse_min_free_gb_from_env();
+                pa.platform_override = env_trimmed("COMDARE_PLATFORM");
+                if (pa.platform_override.empty()) pa.platform_override = compile_time_platform_tag();
+
+                pa.load_profile_dir = env_trimmed("COMDARE_LOAD_PROFILE_DIR");
+                if (pa.load_profile_dir.empty()) {
+                    // PFLICHT beim produktiven E4-Lauf: ohne XML-Lastprofile (Achse 2) faellt
+                    // run_profile still auf den fixed-workload-Pfad zurueck und JEDE CSV-Zeile
+                    // traegt two_phase_valid=0 = mehrtaegiger, wissenschaftlich UNGUELTIGER Lauf.
+                    throw std::runtime_error(
+                        "COMDARE_RUN_E4_XML=1 erfordert COMDARE_LOAD_PROFILE_DIR (XML-Lastprofile, Achse 2)");
+                }
+                if (auto cap = parse_size_env_strict("COMDARE_E4_CAP")) pa.max_binaries = *cap;
+                if (auto ws = parse_size_env_strict("COMDARE_WORKLOAD_RECORDS"))
+                    pa.working_set_override = static_cast<std::uint64_t>(*ws);
+
+                if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
+                    pa.build_version_tag_override = build_tag;
+                if (env_trimmed("COMDARE_RUN_SOTA") == "0") pa.run_sota_series = false;
+
+                std::cout << "[E4] XML-Lauf via run_profile-Fassade: profile=" << thesis_profile << " -> "
+                          << pa.out_csv.string() << "\n";
+                pf::ProfileRunResult const rr = pf::run_profile_facade(pa);
+                std::cout << "[E4] fertig: exit=" << rr.exit_code << " basis_rows=" << rr.basis_rows
+                          << " sota_rows=" << rr.sota_rows << " basis_ids=" << rr.basis_binary_ids
+                          << " sota_ids=" << rr.sota_binary_ids << " measured=" << rr.measured
+                          << " resumed=" << rr.resumed << "\n";
+                if (rr.exit_code != 0) {
+                    e4_overall_rc = rr.exit_code;
+                    std::cerr << "[E4] WARN: E4-XML-Lauf exit=" << rr.exit_code
+                              << "; klassischer ExperimentDriver-Pfad laeuft weiter.\n";
+                }
+            }
+        } catch (std::exception const& e) {
+            std::cerr << "[E4] Fehler im opt-in-Block: " << e.what()
+                      << "; klassischer ExperimentDriver-Pfad laeuft weiter.\n";
+            if (e4_overall_rc == 0) e4_overall_rc = 1;
+        }
+    }
+#endif
 
     // REV 7.6 V9.6 — Externe Messreihen-Spec (defined/full Mode)
     auto external_specs = load_messreihen(messreihen_xml);
@@ -494,7 +624,7 @@ int main(int argc, char* argv[]) {
         std::cout << "==== V11.3 Spec-Lauf ";
         std::cout << (spec_overall_rc == 0 ? "(OK)" : "(MIT FEHLERN)");
         std::cout << " ====\n";
-        return spec_overall_rc; // Bei Spec-Mode beenden wir hier (kein 3-Reihen-Fallback)
+        return spec_overall_rc != 0 ? spec_overall_rc : e4_overall_rc; // Bei Spec-Mode kein 3-Reihen-Fallback
     }
 
     constexpr std::array<MessreiheKind, 3> kinds{MessreiheKind::A_PrtArtVsSota, MessreiheKind::B_CacheEnginePerm,
@@ -532,5 +662,5 @@ int main(int argc, char* argv[]) {
     std::cout << (overall_rc == 0 ? "(OK)" : "(MIT FEHLERN)");
     std::cout << " ====\n";
     std::cout << "[NAECHSTER SCHRITT] binary_to_csv -> csv_to_latex -> diagram_generator -> latex_to_pdf\n";
-    return overall_rc;
+    return overall_rc != 0 ? overall_rc : e4_overall_rc;
 }
