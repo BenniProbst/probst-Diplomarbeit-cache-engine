@@ -461,6 +461,19 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
   umziehen"). Erfassungs-Workflow wf_b1d24420 läuft (Struktur-Kartierung, Kap.2-Konventions-Research,
   Code-Diff E0-E4→Thesis, Alt-Gegenlese, Zeichnungs-Befund → Refactor-Plan). User-sichtbare TODO-Liste
   = Tasks #97–#108 (AP-H2-0..11). Alle 4 Repos gesynct (merge; Overleaf/GitHub hatte nichts Neues).
+  - **Nachtrag (Erfassung ABGESCHLOSSEN, thesis `1cb4fce`):** wf_b1d24420 fertig (6/6). **Refactor-Plan
+    v1 mit bindender Phasen-Folge A→G** persistiert: `thesis/…/sessions/2026-07-10-habich-runde2-
+    refactor-plan.md` (+ Voll-Backup `sessions/workflow-backups/20260710-wf-habich-runde2-erfassung/`).
+    Kern-Befunde: 6er-Satz voll ausformuliert (Restruktur-Stufen 1–4 waren fertig; einziger TODO =
+    05:108 Ergebnis-Einspeisung); Kap.2-Eigenanteil-Inventar Z.34–159+260–647 (Phase A: → Kap.3/4);
+    Kap.2-Vorbilder = Damme 2020 (TUD Lehner/Habich), Bingmann 2018, Kallis 2018; Code→Thesis-Diff =
+    7 Konzepte (E4→E0+Verträge, Contract-Tests je Schicht, Organ- vs. System-Achsen, SystemAxis/
+    Regime/16 Kategorien, IMeasurementSource/Registry, curve_fit, 4 Modi inkl. Hybrid-Gegenbeweis);
+    Alt-Gegenlese = 23-Punkte-Verlustliste (HOCH: Heuristik-§2.1.6 mit h:M→K, Cracking/learned-
+    indexes-Absatz + 3 Cites, YCSB A–F, Workload-Begriffe/Playbooks, YCSB_F-Affinität, Datensatz-
+    Lader). **AP-H2-8 ERLEDIGT:** fig:m-model-resizebox (×1,55-Upscale → 12,4-pt-Schrift) entfernt,
+    DE+EN, visuell verifiziert; Regel „resizebox nur verkleinern" etabliert (restliche 5 Upscaler in
+    Phase F3 NACH Phase A). Backup-Tag `backup-2026-07-10-pre-h2` gepusht. Builds DE 152/EN 144 grün.
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
