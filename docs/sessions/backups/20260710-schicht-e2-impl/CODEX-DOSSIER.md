@@ -1,0 +1,28 @@
+# CODEX-DOSSIER — Schicht E2 (Erstimplementierung): stale-Kommentar-Wahrheit + E2-ABI-Contract-Test
+
+> Bau-Spezifikation Schicht E2 (Dossier 19 Teil B/E2, non-gated Teil). Wurzeln: super = `/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine`, ce = `super/Code/external/comdare-cache-engine` (main 08322478). Kartierung: Explore+Codex-Doppel 10.07., konvergent.
+
+## 0. HARTE VERBOTE
+Wie E3-Dossier §0 (`../20260710-schicht-e3-impl/CODEX-DOSSIER.md`): golden/permutation_axes/m3v2/GenusBindingTraits/ABI-Header-SEMANTIK/PODs/modules/ext/thesis TABU; kein git; kein Runtime-Switch; deutsche Kommentare (ue/ae/oe). **ZUSÄTZLICH E2-spezifisch:** (a) **234-V-a/b NICHT bauen** (user-entschieden 07.07. [Option A + Shape-Segment default-OFF], aber Bau GEPARKT; SHAPED-Makro/Tests existieren schon — Emitter-Verdrahtung bleibt liegen); (b) **KEIN Organ-/Adapter-CODE ändern** — abi_adapter.hpp, Pool-Stores, Achsen bleiben byte-unberührt (honest-0 ist der DOKUMENTIERTE korrekte IST, Doc 30:307-329 — „keine Attrappen"); (c) docs/**-Dateien (Session-Historie/Architektur-Docs) NICHT anfassen — nur CODE-Kommentare in libs/ + tests/.
+
+## 1. PAKET A — stale `search_organ_`-Kommentare bereinigen (NUR Kommentare, kein Code!)
+`search_organ_` ist als Code VOLLSTÄNDIG getilgt (grep-verifiziert: 0 Nicht-Kommentar-Treffer). 12 stale Kommentar-Stellen in libs/ + tests/ korrigieren — jeweils die Aussage an den vollzogenen Zustand anpassen (Vergangenheitsform/„entfallen seit #188" statt „entfällt künftig/OFFEN"), Kommentar-Stil und Zeilenlänge der Umgebung wahren:
+- `libs/cache_engine/axes/lookup/composable/store_traversable_search_algo.hpp:15,18,20,23` — **inhaltlich am falschesten**: behauptet „Q2 Schritt 4 = OFFEN", der Umbau ist code-seitig vollzogen → als vollzogen umformulieren.
+- `libs/cache_engine/anatomy/rollbackable_tier.hpp:10,14,33,35,42,48` (Memento-Doku-Block) · `anatomy/abi_adapter.hpp:1432` (NUR der Kommentar!) · `anatomy/set_anatomy.hpp:7` · `builder/anatomy_commands/tier_observe_trace_abi.hpp:87` · `builder/experiment_tree/perm_runner.hpp:12` · `axes/lookup/axis_03a_search_algo_k_ary.hpp:62` · `axes/lookup/composable/k_ary_traversal_organ.hpp:10`.
+- Tests: `tests/unit/test_188_4bb0_pool_organ_wide_key_conformance.cpp:11` · `test_pathb_segment_timer.cpp:3` · `test_m8_storetrav_segment.cpp:4`.
+Historische Erwähnungen, die EXPLIZIT als Geschichte formuliert sind („früher search_organ_…"), dürfen bleiben — nur FALSCHE Gegenwarts-/Zukunfts-Behauptungen korrigieren. Jede Änderung ist eine reine Kommentar-Zeile (Diff-Review-Kriterium!).
+
+## 2. PAKET B — E2-ABI-Contract-Test (echte Referenz-DLL, Fake-E1)
+**NEU** `tests/unit/test_e2_contract_abi_vertrag.cpp` + CMake-Block (Muster = E3-Blöcke am Datei-Ende; Label `e2;abi` — NIE `contract`!).
+- **DLL wiederverwenden, NICHT neu bauen:** `test_v41_anatomy_module_loader` (CMake `tests/unit/CMakeLists.txt:602-625`) baut bereits die EINE Wormhole-Referenz-SHARED-DLL via `comdare_codegen_anatomy_module`. Der neue Test bekommt `add_dependencies` auf dasselbe DLL-Target + den Pfad als Compile-Define (`$<TARGET_FILE:…>`, exakt wie der Bestand `COMDARE_R5E_PILOT_DLL` — Bestands-Mechanik übernehmen).
+- **Assertions (der E2→E1-Vertrag, Dossier 19 B/E2):**
+  1. `AnatomyModuleLoader::load` == status_ok (deckt: Datei, dlopen, 4 C-Symbole `comdare_anatomy_abi_version/magic/create/destroy_anatomy`, Magic `0x434F4D444141342E`, Major==4, Minor≤, Factory) — Loader-API `builder/anatomy_module_loader/anatomy_module_loader.hpp:152`, Status-Enum `:35-44`.
+  2. `handle.anatomy()` non-null; `IAnatomyBase`-Pflichten: `genus()==AnatomyGenus::SearchAlgorithm`, `organ_count()>0`, `composition_name()` nicht leer (anatomy_base.hpp:150-159).
+  3. **Interface-Kette per dynamic_cast** aus DEMSELBEN Zeiger: `IObservableTier*` non-null (und via dessen `IDriveableTier`-Basis insert/lookup/size treiben — 3 Ops genügen), `IResourceControllableTier*` non-null (resource_controllable_tier.hpp:56).
+  4. **caps-Antwort exakt** (abi_adapter.hpp:212-220): `tier_query_resource_caps` → `thread_count==64`, `prefetch_distance==64`, `pool_budget_bytes==(1ull<<30)`, `batch_size==4096`, `inline_threshold_bytes==256`, `controllable_axis_count==5`. Null-Guard-Fall: `tier_query_resource_caps(nullptr)` crasht nicht.
+  5. **Fake-E1:** `ComdareResourceControlV1` POD anlegen (statisch asserten: `std::is_standard_layout`+`trivially_copyable`, Version `kResourceControlVersion==1`), Werte ÜBER den caps setzen (z. B. thread_count=999) → `tier_apply_resource_control` aufrufen → kein Crash, Rückgabe/Status prüfen soweit API es hergibt. **KEIN Konsum-Assert** (Wirkung in Organen = Schicht E1, explizit NICHT verlangt).
+  6. RAII: handle out-of-scope → kein Leak/Crash (Lifecycle wie test_v41_anatomy_module_loader — dort abgucken, nicht duplizieren was der schon deckt; unser Fokus = Vertrag 3./4./5., die NIRGENDS getestet sind).
+- **Kartierungs-Divergenz (im Test-Kopf dokumentieren, nichts daran ändern):** unlabeled DLL-Tests laufen via `comdare_tests` + `ctest -LE 'contract|pmc'` vermutlich bereits in test:unit; unser Label `e2;abi` folgt demselben Mechanismus.
+
+## 3. DoD / SELBST-VERIFIKATION
+Eigenes Build-Verzeichnis ce/build-codex-e2 (am Ende löschen): neuer Test baut + ctest grün; Regression: test_v41_anatomy_module_loader + test_e3_contract_* + test_e4_contract_* + 3× test_striktheit_* grün; Paket-A-Diff enthält AUSSCHLIESSLICH Kommentar-Zeilen (git diff -U0 | grep -v '^[+-].*//' als Selbst-Check ausweisen); clang-format-22 (~/tools/cf22/usr/bin/clang-format-22) dry-run==0; Mojibake==0; golden/m3v2 byte-unberührt (git status). NICHTS committen. Abschlussbericht: VOLLSTÄNDIGES Manifest + LITERALE Ausgaben.
