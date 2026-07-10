@@ -74,3 +74,47 @@ Reihenfolge unverändert: DATEN_GATED-Vorbauten ✓ (ce `c022ce05`) → **E4′-
 implementiert dieses Diff** (mit vorgelagertem Eigenschaften-Deep-Research zu Kardinalitäten und
 Heuristik-Systemachse) → Hybrid-Strecke (3-Varianten-Bau + Schritt 4). Gated bleiben: realer Fit
 (#156-Messdaten), PMC-Vollpfad (#215), `<measurement_categories>`-XML.
+
+## G. Kardinalitäts-Synthese (Deep-Research wf_62fe0731, 10.07. — nur Bestand, nie erfunden)
+
+Volle Synthese: `docs/sessions/backups/20260710-kardinalitaeten-deep-research/BEFUND-KARDINALITAETEN.md`
+(4 Quellen-Agenten über Backups/Workload-Kanon/Observer/Achsen → 71 Bestand-Befunde datei:zeile).
+Kardinalität je Typsystem-Ebene (HEUTE gefahren / PLAN-Kanon / GATED):
+
+| Ebene | HEUTE | PLAN | GATED/Fork |
+|---|---|---|---|
+| `tree<axis>` | 19 Slots; Wurzel-Split **5 dynamic / 14 compile**; Registry-Gesamtraum 26 | Compile-Unterklassen 8/2/3 + 2 Laufzeit-Sonderknoten | Sonderstatus-Trio T2/T1/T10 |
+| `map<workload-framework>` | 1 verdrahtet (YCSB) | 13-Kanon → 14 LP abstrahiert | Framework×Workload-Bib EXTERN_GATED |
+| `map<workload-type>` | 6 gefahren (YCSB A–F); 21 LP-XML Bestand | 14 Kanon-LPs | 3-Mengen-Fork #31-Schritt-2 |
+| `map<workload-size>` | 4 Sweep {2¹⁴,2¹⁷,2²⁰,2²³} | ~4 Cache-Regimes + 2 Gates | absolut vs. maschinenrelativ |
+| `map<operation_type>` | 6 Runner (`kOpKindNames`) / 6 XSD (nicht 1:1) | 3-Größen-Aggregat (Heuristik) | Runner↔XSD-Kanon |
+| `map<axis_observer_type>` | 16 MeasurementCategory (9 TimeObserver + 7 PmcCounter); 19×8=152 Slots/97 Felder | Achse×Observer-Matrix 3–5/Achse | PMC-Vollpfad #215 |
+| `tuple<property,time>` | 2 Objectives impl.; Blatt = MeasurementRecord 32B | 19 Min/Max-Semantiken, ≥3 Pareto (T6/T18/T5); 2 Kurven-Klassen | Kurven gated #156/#162 |
+
+**Warnung (belegt):** Die Literalzahl 137.594.142.720.000 ist ein Flag-Snapshot vom 02.06.; für
+Kardinalitäts-Klassen gilt nur die **Produkt-Identität** `binary_count() == Π mp_size(Enabled_i)`,
+nie die Literalzahl. Der Raum wird nie voll materialisiert (C1060).
+
+**Drei Kardinalitäts-Klassen (KK, im Rahmen der gesetzten Patterns P1 compile-time-Metaprog / P2
+Registry-als-Blut / P3 CoR-im-CEB):**
+- **KK-1 compile-time-fix** — Kardinalität = Design-Konstante, consteval-Registry + static_assert
+  (19 Slots, 16 Kategorien, 2 Regimes, 5 RC-Felder, 10 MeasuredEvent, 6 op_type; NEU: 19-Achsen
+  compile/dynamic-Split + Vergleichs-Semantik nach P2-Muster).
+- **KK-2 profil-gebunden** — Kardinalität = Daten-/Profil-Produkt (E4-XML backt sie), Guard =
+  Identitäts-Invariante `binary_count()==Π mp_size(Enabled_i)`; Enabled-Listen 4/3/2/…/15/5,
+  Kataloge 320+16+4+4, compile_dims 6, working_set_sweep 4.
+- **KK-3 runtime-frei** — Laufzeit-Iterationsraum je statischer Binary (DynamicVariableNode-Odometer):
+  RC-5-Felder × Stützstellen, dyn-Settings 27(m3v2)/18(m2), hw_prefetcher 3, repetition 3 (KF-10).
+
+## H. Offene Punkte — NUR User-Entscheid (blockieren die map<>-Ebenen des Typsystems)
+
+Diese sieben Forks bestimmen die Map-Schlüssel-Kardinalitäten und sind laut Bestand NICHT entschieden;
+die tree<axis compile/dynamic>-Wurzel (§G Zeile 1) ist davon UNABHÄNGIG und wird zuerst gebaut.
+
+1. **workload-type-Kanon-Fork** (3 Mengen: 6+3 Custom / 6+2 IH-LH / F7 A/C/E×6) — #31-Schritt-2.
+2. **„Beschaffenheit" (Key/Value-Verteilung, ≥5 Facetten)** — eigene Map-Ebene vs. in workload-type kodiert (= Änderung der wörtlichen Doc-20-Vision).
+3. **workload-size-Semantik** — absolute N-Liste vs. maschinenrelative Cache-Regime-Klassen.
+4. **operation_type-Kanon** — Runner-6 (mit clear) vs. XSD-6 (mit Update/Range-Delete); clear = Op oder Phase?
+5. **framework-Ebenen-Semantik** — {YCSB, LP} (2) vs. 13-Framework-Registry.
+6. **Tuple-Erweiterung** — Doc-20-Blatt ist wörtlich `tuple<property,time>` (EIN Property); Pareto-Befund verlangt Front-MENGE + Objective-Tag je Bestkonfig.
+7. **Sonderstatus-Trio** — T2 eigene Mess-Achse behalten/als Sub-Aspekt entfernen; T10 als Meta-Achse aus den 19 Organ-Slots (berührt kV3AxisCount=19-Verträge!); T1-Attributions-Constraint kodieren.
