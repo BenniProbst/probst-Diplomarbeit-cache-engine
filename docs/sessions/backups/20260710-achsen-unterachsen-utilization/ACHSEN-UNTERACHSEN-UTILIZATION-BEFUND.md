@@ -1,0 +1,241 @@
+Verified directly against HEAD `c022ce05`: `kV3AxisCount = 19` (`observable_tier.hpp:47`), telemetry sits at slot **T10** in the 19-slot Observer-Schema (`observable_tier.hpp:85`) and is a peer member organ (`search_algorithm_anatomy.hpp:183`, `abi_adapter.hpp:2057`). Synthesis follows.
+
+---
+
+# Finaler Befund: Unter-Achsen, Utilization, Zirkularität, Telemetry-Platzierung, HW-Prefetcher, Bau-Reihenfolge
+
+**ce-Wurzel:** `/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine` (HEAD `c022ce05`). Alle `datei:zeile` relativ dazu; `ABI = libs/cache_engine/anatomy/abi_adapter.hpp`.
+
+**Modell-Maßstab (User 10.07.):** Jede Achse = ein Layer; eine statische (compile-time) Achse bildet einen strikten Layer, darunter dynamische Achsen-Nodes bis zur nächsten statischen Einhängung. SPREAD einer Node = alle Variationen EINER Achse, ENTWEDER statisch-compile-time ODER dynamisch-Wert (nie beides). Unter-Achse = VOLL-Achse unter einer compile-time-Haupt-Achse. Ziel = MAXIMALE UTILIZATION: jedes Achsen-Interface muss in allen anderen (nicht-System-)Achsen ECHT angewandt sein; honest-0/no-op = Utilization-Lücke.
+
+---
+
+## 1. Fehlende Unter-Achsen je Haupt-Achse
+
+Zwei Klassen fehlender Unter-Achsen: **(K) Klassifikations-Tag-Kollaps** — deklarierte `*_tag`-Structs, nie als eigene `StaticAxisVariants`-Spreads materialisiert; **(S) Skalar/Struktur-Unter-Achsen** — hartkodierte Konstanten oder RC-POD-Felder, die je eine Voll-Unter-Achse sein müssten.
+
+### 1a. Der querschnittliche Tag-Kollaps (K) — betrifft JEDE Haupt-Achse
+
+Sämtliche deklarierten Klassifikations-Tags sind leere Tag-Structs, je Strategie genau EINER angehängt; das kartesische Sub-Produkt ist kollabiert. Kein Konsument der `*_tag`-Typen (grep leer). Betroffen:
+
+| Haupt-Achse | Deklarierte Tags (Datei) | Status |
+|---|---|---|
+| page_type (01) | PG1 structure_role / PG2 density_class / PG3 path_collapse (`axis_01_page_type_subaxes_pg1_to_pg3.hpp:7-14`) | nur `structure_role_tag` variiert; density/collapse nie; `is_leaf()==false` für alle 6 → Struktur-Rolle degeneriert |
+| path_compression (02) | PC1 granularity / PC2 skip_strategy / PC3 decode_complexity (`axis_02_..._subaxes_pc1_to_pc3.hpp:7-14`) | je Strategie 1 Tag, kein Spread |
+| node_type (04) | NT1 capacity_class / NT2 access_pattern / NT3 compactness (`subaxes_nt1_to_nt3.hpp:7-14`) | nur `capacity_class_tag`; NT2 (Node48/256 direkt-vs-indirekt) nur im Kommentar |
+| allocator (06) | AA1-AA7 freelist/size-class/thread-locality/sync/policy/reclamation/fragmentation (`axis_06_allocator_subaxes_aa1_to_aa7.hpp:20-92`) | Registry filtert NUR über Vendor, nie über AA-Kreuzachsen |
+| memory_layout (05) | HM1-HM4 alignment/data-org/packing/stride (`axis_05_..._subaxes_hm1_to_hm4.hpp:15-24`) | nur Tags |
+| prefetch (07) | PF1 trigger / PF2 distance_heuristic / PF3 granularity (`axis_07_..._subaxes_pf1_to_pf3.hpp:7-14`) | PF2 hat nur `adaptive` real; PF3 = `kBundle=4` hart (`real_descent.hpp:83`) |
+| concurrency (08) | CC1 synchronization_pattern / CC2 reclamation_scheme (`axis_08_..._subaxes_cc1_to_cc2.hpp:13,16`) | CC2 kein eigener Spread; RCU/Hazard sind flache CC1-Strategien |
+| serialization (10) | SR1 byte_order / SR2 density / SR3 compression (`axis_10_..._subaxes_sr1_to_sr3.hpp:6-14`) | 4 Serializer je 1 Tag; SR1×SR2×SR3 kollabiert |
+| telemetry (11) | TM1 scope / TM2 metric_type / TM3 overhead_level (`axis_11_..._subaxes_tm1_to_tm3.hpp:6-13`) | kollabiert |
+| value_handle (14) | VH1 storage_location / VH2 ownership / VH3 versioning (`axis_14_..._subaxes_vh1_to_vh3.hpp:6-13`) | kollabiert (aber inline_threshold-Skalar real, s.u.) |
+| isa (09) | IS1 word_size / IS2 vendor / IS3 cluster_zih (`axes/simd/axis_09_isa_subaxes_is1_to_is3.hpp:11-18`) | 4 Vendors je `vendor_tag` |
+| simd (09b) | SE1 vector_width / SE2 accelerator_type / SE3 compat_family (`axis_09b_..._subaxes_se1_to_se3.hpp:11-18`); + 15 AVX-512-Flags als statische Prädikate (`strategy_base.hpp:36-50`) | kollabiert; Flags kein Spread |
+| general_hardware (12) | HW1-HW4 cpu_family/simd_capability/memory_topology/page_topology (`axis_12_..._subaxes_hw1_to_hw4.hpp:26-41`) | 3 Plattformen je nur `cpu_family_tag`; memory_topology (UMA/NUMA/HBM/CXL) + page_topology (4K/16K/2M/1G) nie als Varianten |
+| index_organization (01) | IO1 storage_order / IO2 index_count / IO3 data_embedding (`axis_01_index_organization_subaxes_io1_to_io3.hpp:9-16`) | IO2 index_count (none/single/multiple) + record_size nie als Varianten |
+| io_dispatch | IO1 persistence / IO2 caching / IO3 write_durability (`axis_io_subaxes_io1_to_io3.hpp:6-13`) | IO3 durability ohne Strategie (kein fsync/atomic); 4 feste Strategien statt Kreuzung |
+| migration | MG1 trigger / MG2 direction / MG3 granularity (`axis_migration_subaxes_mg1_to_mg3.hpp:6-13`) | MG2 (up/down/bidir) nie materialisiert; MG3 tag-only |
+| filter | FT1 query_type / FT2 mutability / FT3 error_profile (`axis_filter_subaxes_ft1_to_ft3.hpp:6-13`) | tag-only |
+| search_algo (03a) | SA1-SA4 dense/sparse/multilevel/direct_multibyte (`axis_03a_..._subaxes_sa1_to_sa3.hpp:12-24`) | tag-only |
+| cache_traversal (03b) | CT1 linear / CT2 hash (`axis_03b_..._subaxes_ct1_to_ct2.hpp:9-12`) | tag-only |
+| queuing_q1 | QS1-QS6 (`subaxes_qs1_to_qs6.hpp:11-27`) | tag-only |
+| queuing_q2 | FS1-FS4 (`subaxes_fs1_to_fs4.hpp:7-10`) | tag-only |
+
+**Was sie brauchen:** je Tag-Dimension eine eigene `StaticAxisVariants`-Liste, aus der die Config-Set-Registry ein echtes kartesisches Kreuzprodukt (Haupt-Variante × Tag-Wert) permutiert — analog zum ISA×SIMD-Compat-Filter (`topic_hardware_config_set.hpp:41-59`), der als EINZIGES Tag-Paar bereits real gekreuzt wird.
+
+### 1b. Die 5 Laufzeit-Skalar-Unter-Achsen (RC-POD) — nur 2 von 5 real gebaut
+
+`resource_controllable_tier.hpp:34-40` deklariert 5 RC-POD-Felder als Laufzeit-Unter-Achsen. Ist-Stand:
+
+| RC-Feld (Zeile) | Zugeordnete Haupt-Achse | Gebaut? | Befund |
+|---|---|---|---|
+| `pool_budget_bytes` (:37) | allocator (06) | **ECHT, gegated** | `set_runtime_pool_budget` (ABI:253-254) → `observable_composed_search.hpp:41-42` reject bei `is_new && !runtime_budget_allows_growth_`; `layout_aware_store.hpp:228-236` |
+| `inline_threshold_bytes` (:39) | value_handle (14) | **ECHT** | `set_runtime_inline_threshold` verzweigt real inline_scan_ vs chain_depth_ (`axis_14_value_handle_observable.hpp:95-171`); via ABI:252-262 |
+| `prefetch_distance` (:36) | prefetch (07) | **PARTIAL** | override der estimate()-Distanz (`real_descent.hpp:123-135`), ABER nur `family_id==1` (`observable.hpp:119-123`) UND nur unter `COMDARE_MEASUREMENT_ON` → im Arbeitsmodus gesetzt aber nie konsumiert |
+| `batch_size` (:38) | traversal/03a (nominell); 03b/cache_traversal (Baum+Observer) | **NO-OP** | KEINE Strategie liest es (grep NONE in `axes/lookup/` + `axes/cache_traversal/`); formt nur das T1-Mess-Fenster `ops_per_batch` (ABI:1044-1051). NAMENS-DRIFT: `resource_controllable_tier.hpp:38` (axis_03a) vs. `profile_to_tree.hpp:84` (cache_traversal) |
+| `thread_count` (:35) | concurrency (08) | **NO-OP** | `runtime_thread_count()` (`observable.hpp:85-87`) hat KEINEN Aufrufer; kein `std::thread/jthread/async` (grep = 0); gesetzt und verworfen |
+
+**Zwei weitere ECHT gebaute Iterable-Unter-Achsen** (außerhalb des RC-POD, `[[no-runtime-switch]]`-Ausnahme):
+- queuing_q1: `iterable_aspect_t` = Kapazität `kIterableCapacities{8,64,1024,16384,65536}` (`axis_q1_queuing_bounded_ring.hpp:50-53`) — nur für `BoundedRingBuffer`, nicht generisch.
+- queuing_q2: `iterable_aspect_t` = Watermark `kIterableWatermarks{50,65,75,85,95}` (`axis_q2_queuing_watermark.hpp:37`).
+
+### 1c. Fehlende hartkodierte Struktur-/Skalar-Unter-Achsen (S) — je Haupt-Achse
+
+| Haupt-Achse | Hartkodierte Konstante, die eine Unter-Achse sein müsste | Fundort |
+|---|---|---|
+| search_algo (03a) | Hash-load-factor 0.7 + Initial-Cap 16; Skip-List kMaxLevel=16 + P=0.5; B-Baum-Fanout 65536 (statt Konsum der btree_order-Achse) | `hash_search.hpp:77,69`; `skip_list.hpp:63,229`; `btree.hpp:61` |
+| memory_layout (05) | AoSoA-Blockbreite `kStoreBlock=10` | `layout_aware_store.hpp:85` |
+| allocator (06) | size-class-Schema / Arena-Zahl als compile-time-Unter-Achse nicht exponiert | `subaxes_aa1_to_aa7.hpp` |
+| prefetch (07) | PathOriented-Bundle-Tiefe `kBundle=4` | `real_descent.hpp:83` |
+| filter | Bloom-Bitmap `kBitmapBytes=8192` + `kHashes=4` (FPR-vs-Space-Tradeoff); Cuckoo-Fingerprint-Bits; SuRF-Suffix-Länge | `axis_filter_bloom.hpp:41-42` |
+| io_dispatch | Block-/Page-Größe (BufferedIo `kPageSize=4096`); DirectIo-Alignment | `axis_io_buffered.hpp:45` |
+| migration | Hotness-/Recency-Cutoff (HotCold `v>=lru_recency` hart); `max_moves`-Batch nicht permutiert | `axis_migration_hot_cold.hpp:50`; ABI:1902 |
+| sequence-growth | FixedChunk-Chunk-Größe (nur `<64>` registriert); GoldenRatio-Faktor fix 1.5 | `axis_growth_registry.hpp:20`; `axis_growth_policies.hpp:27` |
+| bst/btree/hash/skiplist_shape | KEINE cacheline-Unterachse (Cache-Line steckt hart via `alignas(64)` im Store) | `btree_node_pool_store.hpp:29` |
+| path_compression (02) | KEINE cacheline-Unterachse (`PathCompressionStrategyBase` ist blankes `AxisBase`, kein `CacheLineAware` — anders als node/page) | `axis_02_..._strategy_base.hpp:11` |
+| serialization/telemetry | fehlende Laufzeit-Skalar-Unterachse (compression_level bzw. sampling_rate/overhead_budget) — NICHT unter den 5 RC-Achsen | `resource_controllable_tier.hpp:34-40` |
+
+### 1d. Leere Platzhalter-Module (0 Code)
+
+`concurrency_manager/{array,node,path,page,memory_access,data_structure,simd_flow,simd_thread}_concurrency` enthalten NUR `.gitkeep`+`CMakeLists` → die Concurrency-Granularitäts-Unter-Achse (welche Struktur-Ebene gesperrt wird) ist NICHT gebaut.
+
+---
+
+## 2. Utilization-Lücken (honest-0 / no-op) + anzupassende Algorithmen
+
+Von ~30 Achsen haben **20 KEINE echte funktionale Cross-Application-Kante** im Arbeitsmodus. Nur `node_type`, `value_handle`, `sequence-growth` sind durchgängig `echt`; `allocator`/`memory_layout` sind echt aber NUR im node_type-Container-Pfad.
+
+### Kritisch — Achse ohne jeden Arbeitsmodus-Effekt
+
+| # | Achse | Befund (Utilization) | Anzupassender Algorithmus |
+|---|---|---|---|
+| 1 | **page_type (01)** | **no-op**: die 6 Seiten-„Strukturen" tragen nur `page_kind()/is_branch()`, keine operative Op, `is_leaf()==false` für alle 6; reine Labels statt Page-Layouts (`axis_01_page_type_dense_byte.hpp:23-30`) | Die 6 page-Klassen müssen ein ECHTES Slot-Layout aus node_type(04)+memory_layout(05)+allocator(06) materialisieren; aktuell nur cacheline geerbt (`strategy_base.hpp:13`) |
+| 2 | **prefetch (07)** | **nicht-verlinkt**: `drive()` duck-typet nur `slot_address(i)/slot_count()` (`real_descent.hpp:96-99`), Density synthetisch `n/(n+1)` (:122); feuert NUR unter `COMDARE_MEASUREMENT_ON` (ABI:899,950) → Arbeitsmodus 0 Prefetches | s. Abschnitt 5 (SOTA-Einbindung) |
+| 3 | **simd (09b)** | **no-op / definition-only**: `Amd64Isa::simd_field_sum` SSE2-hartkodiert (`axis_09_isa_amd64.hpp:72-90`), liest die gewählte Extension NICHT; kein Organ-Slot (`composition_factory.hpp:51-70` hat kein simd-Feld) | Extension muss den Vektorpfad (128/256/512b) in `isa::simd_field_sum` parametrisieren |
+| 4 | **general_hardware (12)** | **no-op / definition-only**: liefert `cache_line_size/numa_capable/page_size`, von niemandem konsumiert (grep leer außerhalb axis_12+build_variant); layout nutzt eigene cacheline-Unterachse statt axis_12 | memory_layout(05)/allocator(06)/node cache-aware müssen axis_12-Properties lesen |
+| 5 | **thread_count (08-sub)** | **no-op**: gesetzt und verworfen (kein Konsument, keine Threads) | paralleler Workload-Runner / Thread-Pool, der die Anzahl konsumiert |
+| 6 | **cache_traversal (03b)** | **teilweise → SHADOW**: `(void)ct_organ_.resolve(key)` (ABI:935) verworfen vs. echter Lookup über `container_algorithm_` (:925); `batch_size` von keiner Strategie gelesen | Strategie-Wahl (linear/binary/hash-Fanout) muss echtes Routing beeinflussen ODER als reiner Schatten-Index deklariert werden |
+
+### Schwer — Interface real, aber Cross-Anwendung fehlt
+
+| # | Achse | Befund | Anzupassen |
+|---|---|---|---|
+| 7 | **serialization (10) → isa/simd** | `serialize_scan` skalarer memcpy/Add-Loop (`raw_binary.hpp:37-46`); grep `simd_field_sum` in serialization_axis = leer | compressed/succinct-Encode über `Isa::simd_field_sum` (axis_09) |
+| 8 | **filter → hash_probe_shape + isa; + lookup-Gating** | Bloom eigenes double-hashing (`axis_filter_bloom.hpp:45-49`), Bitmap `std::array`; Probe-Ergebnis gated `lookup` NICHT (ABI:925 direkt) | filter über hash-Achse; `tier_lookup` muss `flt_organ_.probe_key` zum Short-Circuit konsultieren |
+| 9 | **11 Pool-Organe + 4 Shapes → allocator (06)** | alle `PoolStore<>`/`PoolStore<Shape>` defaulten `std::allocator` (`tier_to_organ_mapping.hpp:46-115`); `StdAllocatorAdapter` außerhalb axes/alloc nur 1× (ComposedStore) | axis_06-Adapter in BST/BTree/Hash/SkipList/ART/HOT/Wormhole/SuRF/START/Masstree/Swiss verdrahten |
+| 10 | **Shapes (bst/btree/hash/skiplist) → memory_layout** | reine Deskriptoren; Cache-Line hart im Store (`alignas(64)`) | cacheline-/layout-Unterachse statt hartem alignas |
+| 11 | **concurrency (08) → node/value_handle/alloc** | sperrt globalen function-static `std::mutex` (`blocking.hpp:43-45`), NICHT die Datenstruktur; `observe_critical_section` ENTKOPPELT nach der Mutation (ABI:891); tier_erase/clear/scan treiben es nicht; nur `COMDARE_MEASUREMENT_ON` | Lock muss die reale node/value_handle-Struktur schützen; Op-Abdeckung vervollständigen |
+| 12 | **isa (09) → serialization/filter/layout/search** | liefert `simd_field_sum/group_match_mask`, nur via node-OBS + 1 Swiss-Organ genutzt; jede rechenintensive Achse rollt eigenen skalaren `*_scan` | zentraler Isa-Dispatch in alle `*_scan`-Kerne |
+| 13 | **migration → Mess-Workload** | echter 2-Tier-Move existiert (`organ_migrate_step`, `layout_aware_store.hpp:331`), aber `tier_migrate_step` NUR test-getrieben (`test_migration_two_tier.cpp`); repo-weit kein Mess-Workload-Aufrufer → `tier_moves` honest-0 für ALLE Strategien | Migrations-Schritt in den Mess-/Arbeits-Workload einhängen |
+
+### Mittel/Klein
+
+14. **serialization/io_dispatch/index_org/filter = OBS-only**: node treibt Mess-Hüllen über echte Slots (ABI:1121-1330, alle `(void)`), B-Output fließt nicht zurück → 0 funktional.
+15. **q1 → allocator** (`std::vector` default, `bounded_ring.hpp:168`); **q2 → q1** (`should_flush`-Entscheidung `(void)` ABI:883, löst keinen echten Flush aus); **io_dispatch → allocator/serialization** (isolierter Self-Scan); **sequence-growth → allocator** (`reserve` default-alloc); **value_handle → isa** (skalarer `value_access_scan`); **path_compression → cacheline** (fehlt).
+16. **prefetch_distance** nur `family==1`; **hw_prefetcher** MSR-Zustand nie in C++ gelesen (s. Abschnitt 5).
+
+**Die drei größten Hebel** (schließen die meisten Lücken auf einmal):
+- **(A)** isa/simd als echten SIMD-Dispatch in alle `*_scan`-Kerne ziehen → schließt 09/09b/serialization(7)/filter(8)/layout gleichzeitig.
+- **(B)** axis_06-Allocator-Adapter in die 11 Pool-Organe + 4 Shapes statt `std::allocator` (9/10).
+- **(C)** prefetch/concurrency/migration aus dem `COMDARE_MEASUREMENT_ON`-Fenster in den echten Hot-Path heben (2/11/13).
+
+---
+
+## 3. Zirkularitäts-Befund
+
+**Ergebnis: Der Achsen-Interface-Anwendungsgraph ist ein DAG — keine echten Include-Zyklen.** Verifikation: Leaf-Provider `memory_layout`, `allocator`, `cacheline` haben NULL Aufwärts-Includes; Shapes inkludieren nur `*_flags.hpp` + `<string_view>`/`<type_traits>` (die „node"-Treffer waren False-Positives aus dem Verzeichnisnamen `topics/nodes/`).
+
+**Scheinbarer 2-Zyklus node_type ⇄ migration** — aufgelöst:
+- `node_type → migration` (OBS): `store_observe_migration` treibt migration-decide über node-Slots.
+- `migration → node_type` (FUNC): `organ_migrate_step` bewegt Records im node-Store.
+- **KEIN Include-Zyklus**: keine Achse inkludiert die andere; beide werden von `anatomy`/`IMigratableTier` tier-vermittelt orchestriert über generische Store-/Observer-Interfaces. **Auflösung: so lassen** — migration DARF `node_type` nie direkt inkludieren, immer nur das generische Store-Observer-Interface.
+
+**Latenter Zyklus beim telemetry-Umbau** (s. Abschnitt 4): Wird telemetry Root-Visitor UND behält `record_node_touch` (node/tier → telemetry aufwärts), entsteht eine Aufwärts-Kante gegen die Wurzel. → telemetry als Root darf nur **pull** (Visitor über generisches `ObservableAxis`-Snapshot-Interface), nie von unten bepusht werden. Einzige Stelle, an der die Maximal-Utilization-Erweiterung einen Kreis erzeugen könnte.
+
+**Empfohlene Schichtung (topologische Ordnung, alle neuen Kanten abwärts):**
+
+```
+L0 Hardware-Deskriptoren : cacheline, general_hardware(12), isa(09), simd(09b)
+L1 Primitiv-Provider     : memory_layout(05), allocator(06)      [erben cacheline; lesen L0]
+L2 Form-Deskriptoren     : bst/btree/hash/skiplist_shape, sequence-growth
+L3 Strukturen            : node_type(04), page_type(01), path_compression(02),
+                           value_handle(14), filter               [komponieren L1/L2; SIMD aus L0]
+L4 Zugriff/Policy        : search_algo(03a), cache_traversal(03b), io_dispatch,
+                           serialization(10), prefetch(07), concurrency(08),
+                           migration, queuing_q1/q2                [treiben L3; nutzen L0-SIMD]
+L5 System/Root           : telemetry(11) + Mess-Apparat           [Visitor über alles darunter]
+```
+
+Alle in Abschnitt 2 geforderten Lücken-Schließungen respektieren diese Ordnung (compute↓provider, nie provider↑compute) → keine schließt einen Kreis, solange node⇄migration und *→telemetry tier-vermittelt (nicht direkt-inkludiert) bleiben.
+
+---
+
+## 4. Telemetry / Meta==System — Platzierungs-Befund
+
+**Verdikt: telemetry ist FÄLSCHLICH ein Organ-Slot, NICHT die System/Meta-Wurzel.** Direkt am Code verifiziert:
+
+- **Der ABI-Observer-POD kennt genau 19 gleichrangige Achsen-Slots.** `observable_tier.hpp:47`: `inline constexpr std::size_t kV3AxisCount = 19;`. Der POD ist `axis_stats[19][8]` + `seg_ns[19]` (`observable_tier.hpp:130-131`), „T0..T18 in kCompositionAxisNames-Reihenfolge".
+- **telemetry belegt Slot T10** — eine Zeile UNTER 19, strukturell identisch zu node_type(T4)/memory_layout(T5)/serialization(T9): `observable_tier.hpp:85` `/*T10 telemetry*/ {{"events","leaf_updates","node_updates","peak_tracked",...}}`.
+- **In der Komposition ist telemetry ein Peer-Feld**, nicht die Wurzel: `set_composition.hpp:28` `using telemetry = T9;` (axis_11); `composition_factory.hpp:62` `using telemetry = T10;`.
+- **In der Anatomie ist es ein Member-Organ**: `search_algorithm_anatomy.hpp:183` `typename Composition::telemetry axis_telemetry_;` (dokumentiert als „2. real gehaltenes Organ", :71,179); ABI:2057 `mutable typename Composition::telemetry telemetry_organ_;`.
+- **Getrieben wird es wie jedes Organ von unten** (AUFWÄRTS-Push): `telemetry_organ_.record_node_touch(true)` bei jedem `tier_insert` (ABI:858) und `tier_lookup` (ABI:931).
+- **Der reale Wurzel-Mess-Apparat ist ein GETRENNTES Subsystem**: `ObserverAggregate` + `subsystems/c05_telemetry_engine/i_telemetry_engine.hpp` — das Einsammeln der `ObservableAxis snapshot_t` aller Achsen existiert dort, NICHT im telemetry-Achsen-Slot.
+
+**Implikation der `kV3AxisCount=19`:** Die Wurzel-Rolle (Meta==System, Visitor, der Workloads durch alle Nodes durchreicht und Mess-Interfaces einsammelt) ist heute DOPPELT belegt — de facto vom separaten Mess-Subsystem (ObserverAggregate/c05), während der telemetry-AXIS als 20.-degradierter Peer-Organ-Slot (T10) nur `record_node_touch`-Zähler produziert. Nach dem Modell muss telemetry AUS den 19 gemessenen Peer-Achsen HERAUS und ÜBER das `axis_stats[19]`-Array gehoben werden: als Visitor-Wurzel, die die 19 Slots per generischem `ObservableAxis`-Snapshot **pullt** — nie eine der 19 gemessenen Zeilen selbst. Solange telemetry Slot T10 belegt, ist Meta==System==Wurzel strukturell verletzt (Platzierungsfehler, kein Verhaltensfehler: operativ ist `record_node_touch` echt).
+
+---
+
+## 5. HW-Prefetcher — Ist, Lücken, SOTA-Einbindungsplan
+
+### 5a. Ist: drei entkoppelte, nicht ineinandergreifende Formen
+
+| Form | Mechanismus | Aufruforte | Arbeitsmodus |
+|---|---|---|---|
+| **A. axis_07 SW-Prefetch** | `PrefetchDescentPolicy<Strategy>::drive()` mit strategie-distinktem `_mm_prefetch` (None=0 / HW=aktueller Slot / Distance=i+dist / Path=Bundle-4), `real_descent.hpp:72,83,104-156` | AUSSCHLIESSLICH ABI: 698, 899, 950/955, 1492/1498 — auf `container_algorithm_.store()` mit synthetischer `descent_slot_for_`-Schätzung (ABI:1967-1981) | 0 (nur unter `COMDARE_MEASUREMENT_ON`) |
+| **B. cacheline sw_hint** | `cacheline_prefetch()` CRTP-Mixin, compile-time T0/T1/T2/NTA (`cacheline_config.hpp:52-88`) | NUR Node-Organe: `node4.hpp:40`, `node16.hpp:38`, `node48.hpp:39`, `node256.hpp:38` — je EIN Prefetch der BASIS, nicht der Folge-Lines | ja (nur Basis) |
+| **C. hw_prefetcher MSR** | `wrmsr -a 0x1a4 <hex>` (`slurm_launcher.hpp:25,54-55`), Parser `xml_config_parser.cpp:246` | OS-Launcher, umhüllt den GESAMTEN Binary-Lauf; bewusst KEIN POD-Feld (`runtime_variable_loop.hpp:63`) | ja (global, aber nie im C++ gelesen) |
+| **D. RC-sub prefetch_distance** | override der estimate()-Distanz (`real_descent.hpp:123-135`) | ABI:243,250-251 → NUR `DistanceEstimatorPrefetch` (family 1) | 0 (nur MEASUREMENT_ON) |
+
+### 5b. Utilization-Lücken (grep `prefetch` = 0 in den Organ-Bodies)
+
+1. **Eytzinger — die krasseste Lücke**: `family_name()` wirbt mit „branch-free + prefetch" (`axis_03a_search_algo_eytzinger.hpp:70,76`), der Lookup-Loop (Z.112-118) setzt aber KEINEN Prefetch. Genau der `2·k`-Voraus-Prefetch IST laut Khuong/Morin der gesamte Vorteil des Layouts.
+2. **BST / B-Tree / k-ary / Interpolation** (`_bst.hpp`, `_btree.hpp`, `_k_ary.hpp`): 0 Prefetch (kanonische Kind-Node-Prefetch-Sites).
+3. **cache_traversal** (binary_search_fanout/linear_fanout/hash_lookup): 0 Prefetch (Lehrbuch-Ort für Distance-/Path-Prefetch).
+4. **Node48/Node256**: nur `cacheline_prefetch(stored)` (Basis), NIE die Folge-Cache-Lines (anders als HOT/ART).
+5. **Allocator** (`axis_06_allocator_strategy_base.hpp:57-60` ist CacheLineAware-fähig): NIE Prefetch im Free-List-/Pool-Walk (Pointer-Chasing).
+6. **value_handle Chain-/VersionedPointer-Walk + memory_layout/index_org-Scans**: 0 Prefetch.
+7. **axis_07 selbst nur container-, nicht organ-intern getrieben** — auf `descent_slot_for_`-Schätzung statt echtem per-Node-Touch → selbst wo die Achse läuft, ist ihr Prefetch nicht mit dem realen Zugriffsstrom ko-lokalisiert.
+8. **Vorzeige-Referenzen auf `NonePrefetch` gepinnt**: `masstree_reference.hpp:54`, `surf_reference.hpp:50`, `wormhole_reference.hpp:52` (Kommentar :40 „HW-Prefetch typisch genutzt, heute Default None bis axis_07 erweitert"), `hot_paper_binding_reference.hpp:48`, `start_reference.hpp:48`.
+
+Kern: Die vendored `ext/`-Paper prefetchen (HOT `HOTRowexChildPointer.hpp:32-35` prefetcht `node+0/+64/+128/+192`; CoCo-Trie `CoCo-trie_v1.hpp:466`; B2tree `pbtreestaticart.cpp:855-858`; Mahling `ext/traversal/P25-Mahling/`), die ce-EIGENEN `libs/`-Achsen fast nirgends.
+
+### 5c. SOTA-Mapping (Primärquellen → ce-Achse)
+
+| Quelle | Mechanismus | ce-Achse (Status) |
+|---|---|---|
+| Khuong/Morin, JEA 2017 (arXiv:1509.05053) | prefetcht Line von `k·2·B` ~4 Iter. voraus → L2-Klippe verschwindet | eytzinger (0 Prefetch) + DistanceEstimator |
+| Chen/Gibbons/Mowry, SIGMOD 2001 (pB+-Trees) | prefetcht ALLE Cache-Lines eines Node parallel → „breiter Node"; Jump-Pointer für Scan | Node48/256 + cache_traversal + PathOrientedPrefetch (bereits zitiert `real_descent.hpp:24`) |
+| Mao/Kohler/Morris, EuroSys 2012 (Masstree) | SW-Prefetch des ganzen Node, Fanout für Node-Prefetch gewählt | btree/traversal + `masstree_reference` (heute None) |
+| Leis ICDE 2013 (ART) / Binna SIGMOD 2018 (HOT) | prefetcht Kind-Node-Header vor Dispatch (in-tree Beleg HOT) | Node-Achsen + DistanceEstimator (Leis zitiert `real_descent.hpp:21`) |
+| Mahling, DaMoN'25 (in-tree `ext/traversal/P25-Mahling/`) | `SWPrefetcher`-Template + Coroutine-Group-Prefetch, 1.4×-8.2× | direkt harvestbar für libs/-BTree/BinarySearch/Hash |
+
+### 5d. Design: Prefetch-Grad als echte Unter-Achse (modell-konform, zirkularitätsfrei)
+
+**Zwei getrennte Unter-Achsen der Prefetch-Haupt-Achse, als Querschnitt-Mixin in Organ-Achsen injiziert:**
+
+1. **Statische Unter-Achse = SW-Prefetch-SHAPE (compile-time Layer).** Das `CacheLineAware<Cfg>`-Mixin-Muster erweitern: NTTP `PrefetchShape ∈ {none, current, distance-N, path-bundle-B}` — die heutige axis_07-Family-Selektion als **per-Organ compile-time Unter-Achse** heben. Header-only Mixin wie `cacheline_config.hpp`. Strikter Layer (Modell: statische Achse = Layer).
+2. **Dynamische Unter-Achse = prefetch_distance (+ hw_prefetcher).** Der RC-POD-Skalar bleibt (ABI-verdrahtet via `IResourceControllableTier`→`set_runtime_distance`), aber der Setter wird von „nur DistanceEstimator" auf **jedes Organ mit Shape-Mixin** verbreitert. Unter dem statischen Layer `shape=distance` spreadt die dynamische Achse `distance ∈ {0,4,8,16,…}` als `RuntimeVariableLoop`. **hw_prefetcher bleibt SYSTEM-/Umgebungs-Unter-Achse an der Wurzel** (MSR-Toggle um den ganzen Lauf), nicht organ-intern.
+
+**Vier Zirkularitäts-Sperren:**
+1. Abhängigkeit fix leaf→auf: Prefetch-Primitive kennen nur duck-typed `Store` (`slot_count()`/`slot_address(i)`), KEIN Organ-Header. Organe inkludieren das Mixin, nie umgekehrt (schon heute so: `cacheline_config.hpp` hat 0 Organ-Includes).
+2. Die Prefetch-Achse wird selbst NICHT prefetch-dekoriert (Primitive nahe Meta/System; Unter-Achsen hängen an ORGAN-Achsen) → keine Selbst-Anwendung.
+3. Treiber am REALEN Touch ko-lokalisieren: `observe_prefetch_descent` aus dem Container-Level in den Descent jedes Organs verlagern (Organ kennt seinen echten Next-Touch-Index) → ersetzt die synthetische `descent_slot_for_`-Schätzung; Organ→Mixin einseitig.
+4. Statisch/dynamisch fallen nie zusammen (Modell-Regel): Shape = compile-time (Teil der binary_id), distance = runtime (Schleife darunter, kein binary_id — heutiges `is_static=false` in `profile_to_tree.hpp:79-80`).
+
+**Minimale Schnittliste** (je Organ Shape-Mixin + Driver-Call am realen Descent): (1) eytzinger (literatur-zwingend, höchster Wert), (2) bst/btree/k-ary/interpolation, (3) cache_traversal-Fanout, (4) node48/node256 Folge-Lines, (5) allocator Pool-Walk, (6) value_handle Chain-Walk.
+
+---
+
+## 6. Priorisierte Bau-Reihenfolge (compile-time-strikt, zirkularitätsfrei)
+
+Reihenfolge folgt der L0→L5-Schichtung (Abschnitt 3): erst Provider (L0/L1) härten, dann Konsumenten (L3/L4) verdrahten. Jede Stufe ist compile-time (NTTP/CRTP/`if constexpr`), keine Runtime-Switches im Hot-Path.
+
+**Phase 0 — Provider-Fundament (L0/L1), höchster Hebel:**
+1. **SIMD-Dispatch (Hebel A):** simd (09b) als NTTP an `isa::simd_field_sum` koppeln (128/256/512b-Codepfade); `Amd64Isa::simd_field_sum` (`axis_09_isa_amd64.hpp:72-90`) liest die Extension. → schließt 09b(#3), isa(#12), und öffnet den zentralen Dispatch für serialization(#7)/filter(#8)/layout.
+2. **general_hardware (12) verdrahten (#4):** memory_layout/allocator/node lesen `cache_line_size/numa_capable/page_size` aus axis_12 statt eigener cacheline-Unterachse.
+3. **allocator-Adapter (Hebel B, #9/#10):** axis_06 `as_std_allocator`/`StdAllocatorAdapter` in die 11 Pool-Organe + 4 Shapes statt `std::allocator` (`tier_to_organ_mapping.hpp:46-115`).
+
+**Phase 1 — Tag-Spreads materialisieren (K, querschnittlich, Abschnitt 1a):** je Klassifikations-Tag eine echte `StaticAxisVariants`-Sub-Liste + kartesisches Kreuzprodukt in der Config-Set-Registry (Vorbild: ISA×SIMD-Compat-Filter `topic_hardware_config_set.hpp:41-59`). Zuerst die Achsen mit realem Store-Effekt (node/allocator/layout), dann die Deskriptor-Achsen.
+
+**Phase 2 — Prefetch-Unter-Achse (Abschnitt 5d, Hebel C-Teil):** Shape-Mixin (compile-time) + verbreiterter distance-Setter (runtime) in die 6 Organe der Schnittliste; Treiber aus `COMDARE_MEASUREMENT_ON` in den echten Descent verlagern (eytzinger zuerst).
+
+**Phase 3 — restliche Hot-Path-Hebung (Hebel C, #2/#11/#13):** concurrency-Lock auf die reale Datenstruktur (Op-Abdeckung erst/lookup/scan); migration-Move in den Mess-/Arbeits-Workload; filter-Probe als `lookup`-Short-Circuit (ABI:925).
+
+**Phase 4 — fehlende Skalar-/Struktur-Unter-Achsen (S, Abschnitt 1c):** hartkodierte Konstanten (search_algo hash-lf/skiplist/btree-fanout, filter Bloom-Größe, io block-size, migration cutoff, sequence FixedChunk) als iterable/compile-time Unter-Achsen; batch_size + thread_count RC-Felder von no-op auf echt (Namens-Drift axis_03a↔03b auflösen).
+
+**Phase 5 — page_type materialisieren (#1):** die 6 Seiten-Klassen komponieren ein echtes Slot-Layout aus node/layout/allocator (setzt Phase 0 voraus).
+
+**Phase 6 — telemetry-Umbau (Abschnitt 4):** telemetry aus Slot T10 der 19 (`observable_tier.hpp:85`) HERAUS zur Root-Visitor-Achse heben; NUR pull über `ObservableAxis`-Snapshot (Zirkularitäts-Sperre gegen den latenten Aufwärts-Push `record_node_touch`). Zuletzt, weil ABI-Schema-Bruch (`kV3AxisCount`, `axis_stats[19]`) — laut Direktive „ABI/Schema darf brechen, Messdaten nie löschen", also mit Schema-Version.
+
+**Reihenfolge-Rationale:** Provider vor Konsument (kein Konsument kompiliert gegen ein noch nicht gehärtetes Interface); Tag-Spreads vor Prefetch/Skalaren (die Unter-Achsen brauchen die Spread-Maschinerie); telemetry-Root zuletzt (einzige Stelle mit Zyklus-Risiko + ABI-Bruch). Keine Stufe fügt eine Aufwärts-Kante hinzu — alle neuen Cross-Application-Kanten zeigen L(n)→L(<n).

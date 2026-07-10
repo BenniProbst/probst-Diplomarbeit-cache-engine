@@ -85,3 +85,5 @@ _workflow-raw-backups/
 # #260: IDE-/Tool-Reste (lokal)
 .claude/
 thesis/.idea/
+docs/sessions/20260710-SESSION-TRANSKRIPT-VOLLTEXT.jsonl
+docs/sessions/20260710-SESSION-TRANSKRIPT-LESBAR.md

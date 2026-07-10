@@ -139,3 +139,6 @@ Typsystem-Bau ihr (a) einen echten Konsumenten gibt UND (b) sie per Contract-Tes
 Zweitkopie) — ODER `profile_to_tree` wird der Konsument (build-time-Ableitung), was den golden-sensitiven
 binary_id-Pfad berührt und einen eigenen, golden-verifizierten Increment erfordert. Der Deep-Research-BEFUND
 (§G) liefert die Kardinalitäten dafür; der Bau selbst wartet auf Konsument + die 7 User-Forks (§H).
+
+
+> **SUPERSEDIERT/PRÄZISIERT (2026-07-10):** Das „orthogonal compile/dynamic"-Bild aus §I ist durch das autoritative **Layer-/Haupt-Unter-Achsen-Modell** in `21_SESSION_PLAN_TYPSYSTEM_ACHSEN_ENTSCHEIDUNGEN.md` ersetzt (User-Klärung + Achsen-Utilization-Audit wf_73129d50). Die 7 §H-Forks sind dort ALLE entschieden; §H bleibt als Historie stehen.
