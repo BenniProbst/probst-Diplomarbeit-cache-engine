@@ -405,6 +405,22 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
 
 - **2026-07-09 (E0-E4-KONSOLIDIERUNG Phase 0 + G2-Revert — Sofort-Block des genehmigten Dossiers `docs/architektur/16`, Goal-V3):** Nach Wiederentdeckung der **E0-E4-Experiment-Maschinerie** (Bruch 02.–03.07.) den genehmigten Konsolidierungs-Plan umgesetzt. **Phase 0 (Doku, additiv, super `b4d7d3d`, CI 9149 grün):** `§10.1` = E0-E4-Rehabilitierung + **vierfache** „E"-Disambiguierung (E0-E4 Maschinerie / **DD-A..DD-E** ex-E-A..E-E / §13.9-Gate-E1-E3 / E2-Sidecar) + S↔E-Kreuz-Map; Schichten-Modell `§9`, `15_F7 §0` (M=E0 compile-time / W=E4+E1+E3 / A-B-C=E4-Auswertung), WORKFLOW-4layer/SYNTHESE-13.10/STANDARDPROZESS/MATRIX-GRUNDLAGEN Andock-Vermerke, Dossier 16 Teil I. **Phase 0.5 = G2 (ce `8c73ef7c` + super `f01bdaa`, CI 9155/9154 grün):** forward-Revert `88738285`+`4d8aedce` = tote compile-time-Insel `workload_matrix.hpp` (mp_product 36 Zellen, E2-Fehlbau) entfernt; Achse W gehört nach E4-XML/E1 (Mess-INPUT, KEINE Binary-Achse, `:371`); 3/3 Striktheits-Guards grün, `golden_fullpilot_320` unberührt. **Phase 4/#31 (E4-XML) GATED** — Fork-Analyse (Backup `docs/sessions/backups/20260709-v32-fork-analyse-31-e4xml/`) korrigiert die Fork-Rahmung: `comdare_experiment` tot, V32-Orchestrator unverdrahtet (Stub, `execute_messreihe:81-85`), realer Pfad = `<comdare_messreihen>`/Regex (`main.cpp:167-204`). Empfohlene Option A (messreihen.xml + MessreihenSpec erweitern) **doppelt gated** durch User-Fork R1/R2 (YcsbWorkload A–F vs. OP-1..6-Semantik; Dataset-Wahrheitsquelle `test_data_sets.xml`) **+ main.cpp-V31.F-Freeze** (`v32_orchestrator.hpp:7`). Wartet auf GO — kein Blind-Bau (Quick-Fix-Verbot).
 
+- **2026-07-10 (USER-INFO — i9-14900KS GESTORBEN, RMA/Austausch; Rückkehr erst ~September 2026):**
+  Die CPU der Production-Maschine 2 (prod2, Intel i9-14900KS, Hybrid 8P+16E) ist ausgefallen und
+  physisch im Austausch; laut User „kommt erst in ein paar Wochen zurück, wir können ihn wohl nicht
+  verwenden, erst im September nach dem Austausch". Das erklärt rückwirkend vermutlich auch die
+  prod2-D-State-Historie (Einträge 2026-07-09 oben: cmake/cc1plus uninterruptible D-state,
+  Kernel-/Microcode-Verdacht — Raptor-Lake-Degradation als plausible Wurzel). **Konsequenzen:**
+  (1) `pmc:intel`/#175-Smoke + P/E-Core-Messungen (`cpu_core`/`cpu_atom`, Hybrid-Teil von FF0) auf
+  dem 14900KS bis ~September BLOCKIERT; `COMDARE_PROD2_AVAILABLE=false` + Runner 17 pausiert BLEIBEN.
+  (2) Mess-Fleet-Planung: Hybrid-CPU-Klasse hat bis dahin keine freigegebene Messmaschine (i7-1270P
+  wurde 2026-06-15 von Messwerten ausgeschlossen) → Hybrid-Messungen bei Fleet-Planung im September
+  neu ansetzen oder Ausschluss-Entscheid i7-1270P re-evaluieren (User-Entscheid nötig).
+  (3) Thesis-Text bleibt UNVERÄNDERT (Kap. 6 ist prospektiv, Plattform bleibt geplant); Anhang-D-
+  Faktenfehler Barnard/Capella separat am 2026-07-10 korrigiert (Barnard = Xeon Platinum 8470
+  Sapphire Rapids, Capella = AMD EPYC 9334). Rohdaten der Architektur-Recherche für den Infra-Agenten:
+  `thesis/diplomarbeit/sessions/workflow-backups/20260710-wf-architekturen-recherche/`.
+
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
 ### 13.1 Schaden/Nutzen-Bilanz der autonomen Nacht (03.–05.07., ce 971a0a57..e9cf4f3f = 23 Commits, super 31 Commits)
