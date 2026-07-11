@@ -190,16 +190,19 @@ vollständig deklariert — KEINE unbenannten Pflicht-Properties; Organ/System-T
 da, V42-deferred), Graph-Gattung (bewusst-deferred Interface-Stub), Latenz-Perzentile (schon da). **Gated:**
 Heuristik-/Tier-Switch-HYBRID-Systemachse = Diplomarbeits-ZIEL, #156-DATA-gated; IPC_CPI = Cluster-PMC/#156;
 FILL_BUFFER_OCCUPANCY = Design-GO (Regime). **2 TABU-neutral buildbare Wiring-Folge-Increments (Wert erst im
-Cluster-Messlauf; Code scopet sie selbst als „Folge-Increment"):** (H-1) SystemAxis→E4-Reporting-Verdrahtung
-(`measurement_axis_registry.hpp:5` 0 Konsumenten → additive CSV-Spalten der 3 produzierten Kategorien
-CLU/LATENCY_MEAN/THROUGHPUT; Andockpunkt `node_value_measurement.hpp:56`; ABI-/1416-POD-neutral, separater
-Vertrag). **(H-2 AUFGELÖST 2026-07-11 via Semantik-Deep-Research wf_e0e63a16 — honest-0 ist KORREKT, NICHT
+Cluster-Messlauf):** **(H-1 AUFGELÖST 2026-07-11 via Deep-Research wf_59138062 — `correctly-gated-do-not-build`):**
+LATENCY_MEAN+THROUGHPUT = REDUNDANT (golden `measurements.csv` trägt bereits total_cycles/op_count/
+throughput_ops_per_sec aus derselben WallClock-Quelle → doppelter Wert = Anti-Phantom-Verstoß); CLU = echte
+Größe, ABER die golden CSV kommt aus `ResultAggregator::export_csv` (16 Spalten aus flachem 13-Feld-POD
+`comdare_measurement_record_v1`, KEINE axis_stats) → CLU einbauen bräche das thesis-konsumierte CSV-Schema + den
+ABI-POD (TABU), zudem T5=passiver Deskriptor → CLU drohte statischer Phantomwert; sauberer Weg = geplanter
+E1/M2-Single-Source-Replace (kein Parallel-Add), design-gated. **(H-2 AUFGELÖST 2026-07-11 via Semantik-Deep-Research wf_e0e63a16 — honest-0 ist KORREKT, NICHT
 bauen):** `bytes_in_use_peak` (05_evaluation.tex:94-95) = High-Water der LIVE in-use Bytes; buildbar=FALSE (3
 Disqualifikatoren: 123 per-Allokator-Gauge-Call-Sites/26 Dateien ohne Chokepoint + EBO-CRTP-Basis ohne
 Datenmember; 7 Pool-Stores ohne in-use-Gauge → Peak degenerierte je Familie verschieden = Phantom;
 restore_statistics-Memento macht Fenster-Semantik unbestimmt). Direktive „Min/Max erforschen nie erfinden" +
 Anti-Phantom → honest-0 bleibt (`test_m_contract_system_axis_wurzel.cpp:137-138` zementiert es). Damit ist der
-geforderte Deep-Research vollzogen: der Code trägt bereits die korrekte Semantik. **Buildbarer Rest = NUR H-1.**
+geforderte Deep-Research vollzogen: der Code trägt bereits die korrekte Semantik. **BEIDE H-1+H-2 aufgelöst — kein buildbarer Rest (die Verträge sind vollständig; „fertigstellen" = Verifikation, kein Phantom/TABU-Bruch).**
 Backup: `docs/sessions/backups/20260711-tier-system-memory-footprint-deep-research/`. Details:
 [[reference_tier_metaphor_system_axis_properties_verified_complete]].
 
