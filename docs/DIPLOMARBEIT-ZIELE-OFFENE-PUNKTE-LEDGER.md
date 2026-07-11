@@ -193,8 +193,15 @@ FILL_BUFFER_OCCUPANCY = Design-GO (Regime). **2 TABU-neutral buildbare Wiring-Fo
 Cluster-Messlauf; Code scopet sie selbst als „Folge-Increment"):** (H-1) SystemAxis→E4-Reporting-Verdrahtung
 (`measurement_axis_registry.hpp:5` 0 Konsumenten → additive CSV-Spalten der 3 produzierten Kategorien
 CLU/LATENCY_MEAN/THROUGHPUT; Andockpunkt `node_value_measurement.hpp:56`; ABI-/1416-POD-neutral, separater
-Vertrag); (H-2) MEMORY_FOOTPRINT-Peak-Produzent (`system_axis.hpp:267-270` honest-0 → golden-neutraler
-Peak-END-Append statt Momentanwert). Details: [[reference_tier_metaphor_system_axis_properties_verified_complete]].
+Vertrag). **(H-2 AUFGELÖST 2026-07-11 via Semantik-Deep-Research wf_e0e63a16 — honest-0 ist KORREKT, NICHT
+bauen):** `bytes_in_use_peak` (05_evaluation.tex:94-95) = High-Water der LIVE in-use Bytes; buildbar=FALSE (3
+Disqualifikatoren: 123 per-Allokator-Gauge-Call-Sites/26 Dateien ohne Chokepoint + EBO-CRTP-Basis ohne
+Datenmember; 7 Pool-Stores ohne in-use-Gauge → Peak degenerierte je Familie verschieden = Phantom;
+restore_statistics-Memento macht Fenster-Semantik unbestimmt). Direktive „Min/Max erforschen nie erfinden" +
+Anti-Phantom → honest-0 bleibt (`test_m_contract_system_axis_wurzel.cpp:137-138` zementiert es). Damit ist der
+geforderte Deep-Research vollzogen: der Code trägt bereits die korrekte Semantik. **Buildbarer Rest = NUR H-1.**
+Backup: `docs/sessions/backups/20260711-tier-system-memory-footprint-deep-research/`. Details:
+[[reference_tier_metaphor_system_axis_properties_verified_complete]].
 
 **G ERWEITERUNG DES §0-GOAL (bestehendes Ziel, NICHT neu — User 2026-07-11) — Mess-Ergebnis-Rückschreibung/Persistenz als Abschluss des Mess→PDF-Flusses:**
 Die Diplomarbeit-Pipeline soll beim Durchlauf ÜBER die cache-engine die **Auswertungsdokumente** erzeugen
