@@ -119,6 +119,31 @@ besitzt EINE Strategie, extern in die Organe gefaedelt) — loest nested-Contain
 Differenzierung zugleich. **EMPFEHLUNG: 0.3b VOR den restlichen 6 Stores** (der sauberere Weg + Research-Payoff).
 Consumer je Store pruefen (skip_list: +test_234_f2_shape +tier_organ_equivalence).
 
+## 3e. HEBEL-B RE-DIAGNOSE (2026-07-11, Deep-Research wf_3022f41d + Kritiker BLOCKER + eigene Verifikation)
+Der 0.3b-Design-Workflow (2 Research + Design + 2 adversariale Kritiker) fand **beide BLOCKER**: 0.3b (permutierten
+Allocator in die Pool-Stores faedeln) ist **INERT fuer die golden-320**. Empirisch verifiziert an
+`golden_fullpilot_320_binary_ids.txt`:
+- **allocator=std_malloc fuer ALLE 320** (die Allocator-Achse ist NICHT permutiert, single-valued).
+- **search_algo ∈ {eytzinger, interpolation, k_ary, linear_scan}** (je 80) — **0 Pool-Familien** (BST/btree/surf/
+  hash/… gar nicht im Produktions-Katalog; grep leer).
+**Folgerungen:**
+1. Die golden-320-Such-Algos nutzen den **Flat-Store** `LayoutAwareChunkedStore<node,layout,Composition::allocator>`
+   (abi_adapter.hpp:2008-2009), der `Composition::allocator` **BEREITS** faedelt → die Produktions-Allocator-Achse
+   ist schon verdrahtet. Die fehlende Differenzierung liegt daran, dass die Achse **single-valued (std_malloc)** ist
+   = **Katalog-/Permutations-Entscheidung, KEINE Wiring-Luecke.**
+2. Die 0.3a-Pool-Store-Konversionen (BST/btree/surf → axis_06) sind eine **echte Capability** (s7-getestet, CI-gruen,
+   COW-Memento bewiesen), aber diese Stores sind **nicht in der golden-320**. Die Multi-Allocator-/Pool-Algo-
+   Permutation lebt in der **PRT_ART-/extension-Schicht** (`permutation_axes_extension.xml`) = **EXTERN_GATED**.
+3. **0.3b NICHT umsetzen** (inert fuer golden-320 + Hash/SkipList-Shape-Drop-Landmine bei 2-arg-Partial-Specs gegen
+   3-param-Primary). 0.3b + die restlichen 6 Pool-Stores werden **EXTERN_GATED** (nur sinnvoll, wenn der PRT_ART-/
+   extension-Katalog Pool-Algos + Multi-Allocator permutiert → je-Repo-GO, wie Task #3).
+4. Nested-Container-Stores (Group B): der stateful Adapter komponiert nicht mit knoten-eigenen default-konstruierten
+   Containern; der saubere Weg waere ein **STATELESS EBO-Adapter** (Observer/Sink, per-Typ-Stats) — groesserer,
+   separater 0.3c-Increment, ebenfalls EXTERN_GATED (nur fuer den permutierenden Katalog relevant).
+**Netto:** Hebel B ist fuer den cache-engine-Produktionspfad (Flat-Store) **bereits verdrahtet**; die Differenzierung
+ist katalog-gated. Die 0.3a-Capability bleibt (korrekt + getestet, fuer die PRT_ART-Schicht). Der Deep-Research hat
+eine inerte, riskante Implementierung **verhindert** = genau der Zweck der Kadenz.
+
 ## 4. DoD (doppelt-literal, g++-16)
 Voller ctest 100% (inkl. s7_1 neu); clang-format-22==0; Mojibake==0; git status NUR die berührten Dateien;
 golden/POD/ABI byte-unberührt (kein Registry/POD/GenusBindingTraits-Touch — git-diff-Beleg); Verhaltens-Nachweis:

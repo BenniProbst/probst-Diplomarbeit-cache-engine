@@ -154,8 +154,12 @@ granulare Commits beide Remotes → CI strikt grün).
   `isa::simd_field_sum` koppeln) — **✅ ce `8175c802`, CI grün 2026-07-10** (uint64-akkumuliert build-invariant
   über SSE2/AVX2/AVX512; adversarialer Re-Review wf_4e7c94c2). (2) general_hardware (12) verdrahten —
   **RE-DIAGNOSTIZIERT, s. §F.1** (die Audit-Rahmung „Organe lesen `cache_line_size` aus axis_12" ist widerlegt;
-  design-gated Rest). (3) Allocator-Adapter (Hebel B) in die 11 Pools + 4 Shapes — **RE-DIAGNOSTIZIERT §F.2:
-  COW-Wand, NEUE Architektur-Entscheidung (GO-pflichtig), kein punktuelles Refactoring**.
+  design-gated Rest). (3) Allocator-Adapter (Hebel B) — **0.3a ✅ CI-grün: 3 Pool-Stores (BST `96d5c422`/btree
+  `78334902`/surf `21a9af74`) treiben axis_06, COW-safe via Memento-Pattern (§F.2 + DOSSIER 20260711).
+  0.3b (Differenzierung) = EXTERN_GATED: golden-320 permutiert die Allocator-Achse NICHT (allocator=std_malloc
+  ×320) + hat keine Pool-Algos → 0.3b inert; die Multi-Allocator-Permutation lebt in der PRT_ART-/extension-
+  Schicht. Der Produktions-Flat-Store fädelt Composition::allocator bereits (abi_adapter:2008). Rest der Stores
+  ebenfalls EXTERN_GATED.**
 - **Phase 1 — Tag-Spreads materialisieren (K):** je Klassifikations-Tag eine echte `StaticAxisVariants`-Liste
   + kartesisches Kreuzprodukt (zuerst node/allocator/layout mit realem Store-Effekt).
 - **Phase 2 — Prefetch-Unter-Achse (§E):** Shape-Mixin (compile-time) + verbreiterter distance-Setter
