@@ -627,6 +627,18 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     DE 168 S./EN 162 S., 0 Errors/0 Overfull/0 Warnungen; DE≡EN-Cites alle 12 Dateipaare; Verweis-Scan
     44/18/0 symmetrisch regelkonform; Rohdaten `sessions/workflow-backups/20260711-wf-frischleser-review/`.
 
+  - **VIER-REPO-SYNC + READ-ONLY CODE-AUDIT DOKUMENTIERT 2026-07-11:** Superprojekt, cache-engine,
+    prt-art und Thesis GitLab-first synchronisiert; vorhandene GitHub-Spiegel nachgezogen; finaler Stand
+    super **cc4582a**, cache-engine **22ddf94c**, prt-art **faa4e76e**, Thesis **838bf3fc**, Q01 bewusst
+    gepinnt **d655418b**. main ist auf allen vorhandenen Remotes Vorfahr von development;
+    Top-Level-Submodule verfolgen development mit update=merge. git fsck 4/4, msvc-debug-Configure
+    und drei gezielte Tests grün; Thesis-Komplettbuild nach 54 s vor EN abgebrochen und ausdrücklich
+    **kein** Erfolgsbeleg. Vier-Linsen-Review bestätigt 30 offene session-lokale TODOs
+    (REV-CXX-01..05, REV-DATA-01..14, REV-CI-01..06, REV-TEX-01..05; 3 kritisch/19 hoch/
+    7 mittel/1 niedrig), ohne Codefix oder globale #280+-ID-Fabrikation. Autoritative Details,
+    Datei-/Zeilenbelege, Abhängigkeiten, Akzeptanzkriterien, Tests und verworfene Verdachtsmomente:
+    docs/sessions/20260711-SESSION-UEBERGABE-gitlab-sync-submodule-stand-und-readonly-review.md.
+
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
 ### 13.1 Schaden/Nutzen-Bilanz der autonomen Nacht (03.–05.07., ce 971a0a57..e9cf4f3f = 23 Commits, super 31 Commits)
