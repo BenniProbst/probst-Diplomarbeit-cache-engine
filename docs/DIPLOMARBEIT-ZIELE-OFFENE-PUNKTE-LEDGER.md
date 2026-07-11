@@ -606,6 +606,20 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     alle 12 Dateipaare; Verweis-Scan 42/17/0 symmetrisch; Render-Sichtprüfung Anhang B (S. 103) +
     E (S. 145).
 
+  - **FRISCH-LESER-REVIEW VOLLZOGEN 2026-07-11 (User: „wie empfohlen weiter"; thesis `65e477a`):**
+    7-Leser-ultracode-Panel über Kap. 1–6 + neue Anhänge (Fokus: Nahtstellen/Dopplungen/Widersprüche/
+    Zahlen-/Terminologie-Drift nach den ~50 Restaurations-Einschüben) → 79 Befunde (11 HOCH/45 MITTEL/
+    23 NIEDRIG); 73 eingearbeitet, 6 begründet verworfen. Wichtigste HOCH-Fixes: best_binary_selector-
+    Widerspruch Einleitung↔Fazit an Code-Wahrheit aufgelöst (Werkzeug existiert, tools/best_binary_selector/);
+    H2-Qualitäts-Score erstmals im Text definiert (code-verifiziert: quality_audit-Doku 7 Achsen Skala 1–5
+    + is_original); Messreihe-C-Definition vereinheitlicht (Merge/Regression alt gegen neu, 3 Stellen);
+    elf→vierzehn Fallback-Achsen; Tier-2/3→Rang-2/3 (Tier-Metapher-Kollision); TPIE-ESA-Bezug +
+    Saikkonen-Cites + FF2-Routing/Vollmatrix-Brücke. Terminologie-Härtungen: Kap.-1-Apparat-Menge=„Slots"
+    (fig:prtart-demo-Konvention), Workload≡Lastprofil-Synonym-Marker, HdrHistogram/Mikro/Sub-Achsen
+    normiert, Glossar (Prüf-Dock, dynamische Sub-Achsen) an §3.3/§3.4 angeglichen. **Beweise:** Builds
+    DE 168 S./EN 162 S., 0 Errors/0 Overfull/0 Warnungen; DE≡EN-Cites alle 12 Dateipaare; Verweis-Scan
+    44/18/0 symmetrisch regelkonform; Rohdaten `sessions/workflow-backups/20260711-wf-frischleser-review/`.
+
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
 ### 13.1 Schaden/Nutzen-Bilanz der autonomen Nacht (03.–05.07., ce 971a0a57..e9cf4f3f = 23 Commits, super 31 Commits)
