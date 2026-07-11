@@ -217,11 +217,6 @@ struct MessreihenSpec {
     return {};
 }
 
-[[nodiscard]] bool e4_opt_in_enabled() {
-    // Nur der getrimmte Wert "1" aktiviert den schweren E4-XML-Lauf.
-    return env_trimmed("COMDARE_RUN_E4_XML") == "1";
-}
-
 [[nodiscard]] std::string compile_time_platform_tag() {
 #if defined(__linux__) && (defined(__x86_64__) || defined(_M_X64))
     return "linux-x86_64";
@@ -535,12 +530,13 @@ int main(int argc, char* argv[]) {
             if (thesis_profile.empty()) thesis_profile = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
 #endif
 
-            if (!e4_opt_in_enabled()) {
-                std::cout << "[E4] XML-Andockung verfuegbar, aber inaktiv (Opt-in: COMDARE_RUN_E4_XML=1).\n";
-            } else if (thesis_profile.empty() || !std::filesystem::exists(thesis_profile)) {
-                std::cerr << "[E4] COMDARE_RUN_E4_XML=1, aber thesis_profile fehlt oder existiert nicht: "
-                          << (thesis_profile.empty() ? std::string{"<leer>"} : thesis_profile)
-                          << ". Klassischer Pfad laeuft weiter.\n";
+            // P6/#229: E4-XML ist der DEFAULT-/ALLEINWEG. Kein Opt-in mehr — der messung_driver orchestriert den
+            // Gesamtablauf AUSSCHLIESSLICH ueber die Profil-XML. Der Legacy-ExperimentDriver-Pfad (3 Messreihen)
+            // laeuft nur noch bei explizitem COMDARE_LEGACY_MESSREIHEN=1 (Subsumtions-Vergleich waehrend des
+            // golden-320-Voll-Laufs; danach entfaellt er ganz).
+            if (thesis_profile.empty() || !std::filesystem::exists(thesis_profile)) {
+                std::cerr << "[E4] thesis_profile fehlt oder existiert nicht: "
+                          << (thesis_profile.empty() ? std::string{"<leer>"} : thesis_profile) << ".\n";
                 e4_overall_rc = 5;
             } else {
                 std::filesystem::path const e4_dir = output_dir / "e4_xml";
@@ -581,16 +577,20 @@ int main(int argc, char* argv[]) {
                           << " resumed=" << rr.resumed << "\n";
                 if (rr.exit_code != 0) {
                     e4_overall_rc = rr.exit_code;
-                    std::cerr << "[E4] WARN: E4-XML-Lauf exit=" << rr.exit_code
-                              << "; klassischer ExperimentDriver-Pfad laeuft weiter.\n";
+                    std::cerr << "[E4] WARN: E4-XML-Lauf exit=" << rr.exit_code << ".\n";
                 }
             }
         } catch (std::exception const& e) {
-            std::cerr << "[E4] Fehler im opt-in-Block: " << e.what()
-                      << "; klassischer ExperimentDriver-Pfad laeuft weiter.\n";
+            std::cerr << "[E4] Fehler im E4-XML-Block: " << e.what() << ".\n";
             if (e4_overall_rc == 0) e4_overall_rc = 1;
         }
     }
+
+    // P6/#229: E4-XML ist der Alleinweg — nach dem XML-Lauf ist der Gesamtablauf fertig. Der Legacy-
+    // ExperimentDriver-Pfad (3 Messreihen via config_a/b/c) laeuft NUR bei explizitem Opt-in
+    // (COMDARE_LEGACY_MESSREIHEN=1), solange die E4-XML-Subsumtion der 3 Messreihen im golden-320-Voll-Lauf
+    // noch nicht bestaetigt ist. Default: E4-XML allein.
+    if (env_trimmed("COMDARE_LEGACY_MESSREIHEN") != "1") return e4_overall_rc;
 #endif
 
     // REV 7.6 V9.6 — Externe Messreihen-Spec (defined/full Mode)
