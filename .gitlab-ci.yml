@@ -31,6 +31,7 @@ stages:
   - integration
   - manifest             # Stufe 7 (#198, EPIC #186): Build-/Mess-Manifest (Provenance) + additives Prebackup
   - thesis-pdf
+  - measure              # #156/#17 (User 2026-07-11): mehrtaegiger golden-320-Voll-Messlauf (inert-by-default, opt-in COMDARE_RUN_MEASURE)
   - persist              # #22 (Ledger §11-G): Auswertungs-Dokumente sammeln + commit-back nach development (inert-by-default)
 
 # ── Submodul-Auth-Fix (2026-07-11, User-GO „Diplomarbeit-CI fixen"). ──
@@ -395,6 +396,50 @@ thesis:pdf:
     when: always
     expire_in: 4 weeks
 
+# ── Stage measure (#156/#17, User 2026-07-11 „Cluster mess infra wieder online … nochmal anstoßen"): der EINE
+#    offizielle XML-getriebene golden-320-Voll-Messlauf ueber comdare-messung-driver (der mehrtaegige Lauf #156,
+#    bisher bewusst AUS der Pipeline gehalten — hier als OPT-IN triggerbar gemacht, NICHT im Normal-Gesamtlauf).
+#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_RUN_MEASURE=="true" gesetzt ist — der
+#    „Gesamtlauf" (Messung ABGESCHALTET, sonst alles) baut ihn also nie. tags [prod,baremetal,amd] = PMC-Node prod1
+#    (Runner id=16, perf_event_open/MSR). timeout:0 = mehrtaegig. Baut comdare-messung-driver (EXPERIMENT_MODE
+#    aktiviert Measurement-ON im Sub-Build) + faehrt ihn gegen experiment_config (die 3 Messreihen A/B/C, exakt die
+#    lokal verifizierte golden-320-Invocation) -> measure_out/{A,B,C}/measurements.{csv,json}. Die CSVs sammelt der
+#    persist:measurements-Job (#22) additiv nach development; zusaetzlich 12-Wochen-Artefakt als Sicherheitsnetz.
+measure:golden-320:
+  stage: measure
+  tags: [prod, baremetal, amd]
+  timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
+  variables:
+    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
+  needs: ["verify:submodules"]
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'      # (Netz) Bot-Writeback triggert NIE einen Messlauf
+      when: never
+    - if: '$COMDARE_RUN_MEASURE == "true"'     # INERT: nur bei explizitem Opt-in
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
+    - cmake --build build --target comdare-messung-driver
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      echo "== Pre-Flight (--validate, rein lesende Profil-Pruefung gegen die realen config/output-Argumente) =="
+      "$DRIVER" --validate || { echo "Profil-Validierung fehlgeschlagen -> Abbruch vor mehrtaegigem Lauf"; exit 1; }
+      mkdir -p measure_out
+      echo "== golden-320 Voll-Messlauf (mehrtaegig, Measurement-ON, PMC auf prod1) =="
+      "$DRIVER" experiment_config measure_out
+      echo "== Mess-CSVs (Beleg) =="; find measure_out -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
+      test -n "$(find measure_out -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Messlauf lieferte nichts"; exit 1; }
+      echo "=== measure:golden-320 OK (golden-320 gemessen, CSVs unter measure_out/) ==="
+  artifacts:
+    paths:
+      - Code/measure_out/
+    when: always
+    expire_in: 12 weeks
+
 # ── Stage persist (#22, User 2026-07-11, Ledger §0-DoD-6/§11-G): die Auswertungs-Dokumente EINES Laufs additiv
 #    nach measurement/<YYYYMMDD-HHMMSS-p{pipeline}>/ im super-Root sammeln + per commit+MERGE+push nach
 #    development ZURUECKSCHREIBEN — sonst gehen die Mess-Ergebnisse am Pipeline-Ende verloren.
@@ -423,6 +468,9 @@ persist:measurements:
       artifacts: true
     - job: prebackup:measurements   # prebackup_store/ (versionierte Mess-CSV-Sicherungen)
       artifacts: true
+    - job: measure:golden-320       # measure_out/ (golden-320-Mess-CSVs) — OPTIONAL: nur wenn COMDARE_RUN_MEASURE gesetzt war
+      artifacts: true
+      optional: true
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'                                           # (Netz) Bot-Writeback triggert NIE persist
       when: never
@@ -461,6 +509,11 @@ persist:measurements:
       if [ -d prebackup_store ]; then
         cp -r prebackup_store "$DEST/prebackup_store"
         echo "  gesichert: prebackup_store/ ($(find "$DEST/prebackup_store" -type f | wc -l) Dateien, strukturerhaltend)"; persisted=$((persisted+1))
+      fi
+      # measure_out/ = die golden-320-Mess-CSVs des measure:golden-320-Jobs (nur bei COMDARE_RUN_MEASURE-Lauf vorhanden)
+      if [ -d Code/measure_out ]; then
+        cp -r Code/measure_out "$DEST/measure_out"
+        echo "  gesichert: measure_out/ ($(find "$DEST/measure_out" -type f | wc -l) Dateien, strukturerhaltend)"; persisted=$((persisted+1))
       fi
       {
         echo "# persist:measurements Laufordner — Provenance (#22, Ledger §11-G)"
