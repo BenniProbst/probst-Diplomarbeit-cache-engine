@@ -37,6 +37,10 @@ Forschungsarbeiten/code/P28-Kuehn-DAMON/bplustree_reordering/
 
 # Mess-Dumps + LaTeX-Output
 *.csv
+# ABER: die #22-persist-Mess-Ergebnisse unter measurement/ MUESSEN trackbar sein — sonst dropt
+# `git add -- measurement/` die Mess-CSVs (das wichtigste Artefakt) still weg. NUR die CSVs werden
+# re-inkludiert; die DLL-Binaries kopiert der persist-Job gar nicht erst in den Lauf-Ordner.
+!measurement/**/*.csv
 *.binarydump
 *.aux
 *.log
