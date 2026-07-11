@@ -273,6 +273,18 @@ struct MessreihenSpec {
 } // namespace
 
 int main(int argc, char* argv[]) {
+    // --validate [<profil>]: rein-lesende Pre-Flight-Pruefung des Thesis-Profils gegen die realen
+    // EnabledStrategies (P5, migriert von run_lazy_150) — baut KEINE DLL, misst NICHT. Braucht KEINE
+    // <config>/<output>-Argumente; ohne Pfad gilt COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil.
+    for (int i = 1; i < argc; ++i) {
+        std::string const flag{argv[i]};
+        if (flag == "--validate" || flag == "--check") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            return comdare::cache_engine::builder::profile_facade::validate_profile_facade(prof, std::cout);
+        }
+    }
     if (argc < 3) {
         print_usage();
         return 1;
