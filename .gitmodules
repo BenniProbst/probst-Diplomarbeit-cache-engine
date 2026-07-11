@@ -1,9 +1,15 @@
 [submodule "Code/external/comdare-prt-art"]
 	path = Code/external/comdare-prt-art
 	url = ../comdare-prt-art.git
+	branch = development
+	update = merge
 [submodule "Code/external/comdare-cache-engine"]
 	path = Code/external/comdare-cache-engine
 	url = ../comdare-cache-engine.git
+	branch = development
+	update = merge
 [submodule "thesis/diplomarbeit"]
 	path = thesis/diplomarbeit
 	url = ../20260931-overleaf-diplomarbeit.git
+	branch = development
+	update = merge
