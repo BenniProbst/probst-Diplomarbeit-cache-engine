@@ -10,6 +10,12 @@
 
   Pro Messreihe wird ein eigener ExperimentDriver-Lauf gestartet (V11.3),
   Output unter <output_dir>/<id>/measurements.{csv,json}.
+
+  #31 (2026-07-11) E4-XML-Workload-Drive: optionales <workload>-Tag je <messreihe> —
+    <workload>A</workload> .. <workload>F</workload> (oder kanonisch YCSB_A..YCSB_F).
+    Fehlt das Tag, gilt der bisherige Default (C). Damit ist der YCSB-Workload einer Reihe
+    rein aus XML waehlbar (kein hartkodierter Treiber-Default mehr). Gelesen ueber den
+    ce-DOM-Reader (submodul-CI-konform, kein Bump).
 -->
 <comdare_messreihen version="1">
 

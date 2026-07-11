@@ -35,6 +35,7 @@
 
 #include "experiment_driver/experiment_driver.hpp"
 #include "xml_config_parser/xml_config_parser.hpp"
+#include "messreihen_workload.hpp"        // #31: E4-XML Workload-Drive (<workload> via ce-DOM, kein Submodul-Bump)
 #include "permutations_runtime_check.hpp" // V36.D
 #include "measurement_writer.hpp"         // V41.B1
 #include "stats_aggregator.hpp"           // V41.B3
@@ -178,9 +179,10 @@ void print_usage() {
 
 // REV 7.6 V9.6 — minimaler XML-Reader fuer messreihe-Tags (defined/full Mode)
 struct MessreihenSpec {
-    std::string              id;
-    std::string              mode; // "defined" oder "full"
-    std::vector<std::string> sota_profiles;
+    std::string                     id;
+    std::string                     mode; // "defined" oder "full"
+    std::vector<std::string>        sota_profiles;
+    std::optional<wg::YcsbWorkload> workload; // #31: aus <workload> (E4-XML); nullopt = Fallback-Default
 };
 
 // Phase 7 (2026-07-10, Parser-Konsolidierung): der lokale Regex-Reader ist entfernt —
@@ -189,11 +191,16 @@ struct MessreihenSpec {
 [[nodiscard]] std::vector<MessreihenSpec> load_messreihen(std::filesystem::path const& xml_path) {
     std::vector<MessreihenSpec>            result;
     comdare::builder::xml::XmlConfigParser parser;
+    // #31 (submodul-CI-konform): das Zusatz-Tag <workload> ueber den ce-DOM-Reader ergaenzen — der typisierte
+    // XmlConfigParser::load_messreihen bleibt die EINE Quelle fuer id/mode/sota (Phase-7-Konsolidierung); er
+    // exponiert <workload> nicht, und ein neues ce-Parser-Feld wuerde einen nicht-fetchbaren Submodul-Bump brauchen.
+    auto const wl_map = comdare::messung::parse_messreihe_workloads(xml_path);
     for (auto const& r : parser.load_messreihen(xml_path)) {
         MessreihenSpec spec;
         spec.id            = r.id;
         spec.mode          = std::string{comdare::builder::xml::mode_to_string(r.mode)};
         spec.sota_profiles = r.sota_profile_refs;
+        if (auto it = wl_map.find(r.id); it != wl_map.end()) spec.workload = it->second;
         result.push_back(std::move(spec));
     }
     return result;
@@ -610,7 +617,12 @@ int main(int argc, char* argv[]) {
             w.config.num_keys         = 1000000;
             w.config.num_operations   = 5000000;
             w.config.zipfian_theta    = 0.99;
-            w.workload                = wg::YcsbWorkload::C;
+            // #31: Workload aus <workload> je <messreihe> (E4-XML); fehlt das Tag -> heutiger Default (C).
+            w.workload = spec.workload.value_or(wg::YcsbWorkload::C);
+            if (spec.workload) {
+                std::cout << "[V11.3] Spec " << spec.id << " workload aus XML: YCSB_"
+                          << static_cast<char>('A' + static_cast<int>(*spec.workload)) << "\n";
+            }
 
             int rc = driver.run_pipeline_full(w);
             if (rc != cb::status_ok) {

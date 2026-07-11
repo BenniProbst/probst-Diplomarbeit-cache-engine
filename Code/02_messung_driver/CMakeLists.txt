@@ -50,3 +50,16 @@ endif()
 target_compile_definitions(messung_driver PRIVATE
     "COMDARE_PERMUTATIONS_MANIFEST_CE=\"${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt\""
     "COMDARE_PERMUTATIONS_MANIFEST_PA=\"${CMAKE_BINARY_DIR}/generated/prt_art_permutations_manifest.txt\"")
+
+# #31 (2026-07-11) — Regressions-Gate der E4-XML-Workload-Drive (messreihen_workload.hpp): reine Host-Logik
+# ueber den ce-DOM-Reader auf synthetischem XML-String (gate-frei, kein Treiber-Lauf, kein #156-Messdaten).
+add_executable(test_messreihen_workload tests/test_messreihen_workload.cpp)
+target_compile_features(test_messreihen_workload PRIVATE cxx_std_23)
+target_include_directories(test_messreihen_workload PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${COMDARE_CACHE_ENGINE_DIR}/cache_engine/include
+    ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
+    ${COMDARE_CACHE_ENGINE_DIR}/libs/common/serialization
+    ${COMDARE_CACHE_ENGINE_DIR}/libs/test_infra/workload_generator/include
+)
+add_test(NAME test_messreihen_workload COMMAND test_messreihen_workload)
