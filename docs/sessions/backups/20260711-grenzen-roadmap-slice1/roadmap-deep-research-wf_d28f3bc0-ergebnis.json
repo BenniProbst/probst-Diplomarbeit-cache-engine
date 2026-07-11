@@ -1,0 +1,185 @@
+{
+  "summary": "Hook-(6): §B/§D TABU-respektierende Alternativen + #156-215-Gap-Vorbau + DD-A single-repo — je buildbare-JETZT-Slice vs. enabler-gated, grounded",
+  "agentCount": 4,
+  "logs": [],
+  "result": {
+    "bd": {
+      "buildable_now": [],
+      "gated": [
+        "§B (a) profile_to_tree als EINZIGE Quelle konsumieren = bleibt NULL-CONSUMER (verifiziert, #31-Lehre erfuellt: geprueft, nicht blind verworfen). build_axis_levels @ profile_to_tree.hpp:25 hat NULL Nicht-Test-Aufrufer — jede build_axis_levels(-Callsite liegt in tests/ bzw. tests/unit/thesis_tiere/ (test_kf9, test_e4_contract, profile_runner.hpp nur von test_*.cpp inkludiert). Der ECHTE Produktiv-Treiber 02_messung_driver/main.cpp ruft build_axis_levels NIE; er baut seinen EIGENEN Baum (Code/02_messung_driver/axis_tree.hpp, V41.G.1-Auswertung @ main.cpp:380) — aber das ist eine DISJUNKTE Sorge: post-Messung-Ergebnis-GRUPPIERUNG des gemessenen codegen-axes-Strings, NICHT die pre-Messung-Profil-Plan-Enumeration mit is_static. Den Treiber zu zwingen profile_to_tree zu konsumieren waere Falsch-Fit (ThesisProfile-Plan vs. gemessene axes-Strings). profile_to_tree.hpp:68-95 nennt sich selbst schon 'DIE EINZIGE Quelle' der dyn-Dimensionen — eine WURZEL/axis_layer_spine wuerde die is_static-Klassifikation ZUM ZWEITEN MAL materialisieren = die im BEFUND belegte Doppelquelle + axis_binding_registry-Revert-Wiederholung.",
+        "§B grenzen-respektierender Pfad: Enabler = #156 Cluster-Messlauf, der den REALEN E4-Reporting-Kurven-Konsumenten data-entsperrt (measurement_axis_registry.hpp:5 nennt die Konsumenten explizit 'Folge-Increment'). Wenn #156-Daten landen -> E4-Reporting-Konsument bauen der die Kurven-Schluessel liest -> DANN landet die tree<axis>-WURZEL MIT ihm (echter Konsument + Doc-20-§I-Contract-Test gegen build_axis_levels' is_static) = §I-konform. Die 5 map-Ebenen framework/type/size/op/property bleiben honest-empty bis ihre fork-gated Schluessel (H1/H3/H4/H6) materialisieren; jede Schluessel-Vorwegnahme erfaende Kardinalitaet (TABU).",
+        "§D (b) Modus-Enum/Zustandsmaschine {Measurement/Evaluation/Working/Hybrid} als Builder-ueber-State = bleibt gated. Der Enum ist zwar KEIN Duplikat (verifiziert: die disjunkten Bestands-Enums telemetry_mode.hpp:18 TelemetryMode Active/Silent, experiment_driver.hpp:55 MessreihenMode Defined/Full/FullSampled, cache_engine_mode.hpp:9 CacheEngineMode BASELINE/HEURISTIC_STATIC/INFORMED/AUTOMATIC und cache_recommendation.hpp:36 Mode Off/Static/WarmupCalibrated/OnlineAdaptive sind ALLE andere Achsen — Laufzeit-Verhalten bzw. Messreihen-Umfang, keiner ist der CEB-Betriebs-Modus). ABER: (1) NULL-CONSUMER — kein Produktiv-Code dispatcht auf einen {Mess/Auswertung/Arbeit/Hybrid}-Modus (grep: keiner). Die zwei ECHTEN Pfade existieren bereits SEPARAT mit eigenen echten Konsumenten: Measurement = 02_messung_driver (run_pipeline_full @ main.cpp:627/663), Evaluation = best_binary_selector (rank_binaries @ best_binary_selector.hpp:147, echter CLI-Konsument best_binary_selector_main.cpp, NICHT vom Treiber aufgerufen). Ein 4-Zustands-Enum + State-Builder haette daher als einzigen Voll-Fan-out-Konsumenten einen Test = §I-Verstoss = axis_binding_registry-/§B-Falle erneut. (2) Working/Hybrid sind STRUKTURELL TABU, nicht bloss data-gated: hot Tier-Switching braucht die Heuristik-Tier-Systemachse + Arbeits-Dock am ABI-stabilen Interface = genus_binding_traits.hpp:31 (Tier-Bindung) + reservierter ABI-Bump #215 (der EINE 320-DLL-Neubau) + #156-Daten fuer den Hybrid-Gegenbeweis. honest-stub rettet den Enum NICHT: ein honest-stub ist nur gerechtfertigt AUF einer echten Konsumenten-Naht (so wie curve_fit.hpp:44 auf der best_binary/cacheline_policy-CSV-Eval-Naht sitzt) — der Modus-Enum hat keine solche Naht.",
+        "§D grenzen-respektierender Pfad: KEIN neuer buildable Slice noetig/ehrlich — die beiden echten Modi sind als echte Pfade bereits gebaut (Treiber + best_binary_selector), und die Auswertung->Generierung-Feedback-Kante bekam diese Session ihren buildbaren Kern (selection_filter_chain.hpp:87 CoR Slice 1, ce 076b71cf). Der Enum verdient seinen 3./4. Zustand erst, wenn der Arbeits-Dock-Enabler existiert (Heuristik-Tier-Systemachse via genus_binding_traits + ABI-Bump #215 + #156-Daten). Bis dahin: KEIN 4-Modus-Enum einfuehren (waere test-only §I-Artefakt); Working/Hybrid als honest-stub erst additiv, wenn sie auf dem Arbeits-Dock sitzen. Eine best_binary-Verdrahtung in den Treiber als 'Evaluation-Modus' ist bewusst NICHT empfohlen: sie verlagert nur eine bereits real konsumierte Standalone-Faehigkeit (Versprechen-1-CLI) = Make-Work, kein neuer echter Konsument."
+      ],
+      "anchors": [
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/profile_to_tree.hpp:25",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/profile_to_tree.hpp:68",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/02_messung_driver/axis_tree.hpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/02_messung_driver/main.cpp:380",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/best_binary_selector/best_binary_selector.hpp:147",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/best_binary_selector/best_binary_selector_main.cpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/selection_filter_chain.hpp:87",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/genus_binding_traits.hpp:31",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/telemetry_mode.hpp:18",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_driver/experiment_driver.hpp:55",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/concepts/cache_engine_mode.hpp:9",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp:44",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260711-e4prime-messkurven-typsystem-wurzel/BEFUND.md"
+      ]
+    },
+    "gap": {
+      "buildable_now": [
+        "SLICE 1 (der EINE ehrlich buildbare Mechanismus): synthetischer WIDE-CSV-Fixture/Generator (Schema B, SEMIKOLON: 'binary_id;ns_per_op;two_phase_valid;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns[;working_set_n]') + ein Golden-Test, der best_binary_selector::parse_measurement_csv + rank_binaries darauf treibt. ANDOCKPUNKT: /home/comdare/.../libs/cache_engine/builder/best_binary_selector/best_binary_selector.cpp:41-88 (parse_measurement_csv erwartet exakt diese Spalten: :58-66) + :91-114 (rank_binaries, Median/nearest-rank Strategy). ECHTER non-test-Konsument: best_binary_selector ist ein AUSGELIEFERTES CLI-Tool (tools/best_binary_selector/CMakeLists.txt:7 add_executable comdare_best_binary_selector) — sein Parse-/Rank-Pfad ist Produktionscode. KEIN Null-Consumer: anders als das verworfene axis_binding_registry (Doc 20 §I) dupliziert es keine Single-Source; es exerziert reale Produktions-Logik. WARUM JETZT NÖTIG: best_binary_selector ist laut tests/unit/CMakeLists.txt:2467 NUR als add_executable registriert, NICHT als add_test -> parse_measurement_csv/rank_binaries sind heute UNGETESTET; der Fixture+Test schliesst eine echte Coverage-Lücke ohne #156.",
+        "SLICE 1 — Bonus-Konsumenten desselben synthetischen WIDE-CSV (verstärken 'echter Konsument'): curve_fit::parse_wide_csv_column (builder/curve_fit/curve_fit.hpp:165, heute nur mit inline-String in test_phase6_vorbau exerziert) und der Surface-Modus von 05_diagram_generator (Code/05_diagram_generator/diagram_generator.cpp:397-399 required[]={binary_id,ns_per_op,workload,two_phase_valid,op_*_p50_ns}) — beide konsumieren dieselbe Schema-B-Zeile und haben HEUTE keinen synthetischen Produzenten.",
+        "SLICE 1 — Generator-Andockpunkt + KEIN golden/ABI-TABU/Bump: Code/01_sample_data_generator/sample_data_generator.cpp:59-88 emittiert HEUTE NUR Schema A (Komma: permutation_id,...,internal_frag; alloc/frag) — ebenso 03_binary_to_csv (:59-67). KEIN Generator (01 noch 03) produziert die Schema-B-WIDE-CSV. Ein '--wide'-Emit-Modus in 01 ODER eine getrackte Fixture-.csv ist additiv und liegt ABSEITS des golden-Pfads (permutation_axes.xml/mp_list, Doc 21 §F.1); der byte-identitäts-gebundene orch_make_stem-Spiegel (best_binary_selector.hpp:50-76) wird von einem Parse/Rank-Test NICHT berührt -> kein ABI-Bump, kein golden-Bruch."
+      ],
+      "gated": [
+        "Pareto/Dominanz-Handler in der selection_filter_chain: ECHT enabler-gated. Der CoR-Runner run_selection_filter_chain hat NULL Produktions-Konsumenten (grep: nur test_d15; die evaluation->generation-Feedback-Kante in build_orchestrator/provision_all ist NICHT verdrahtet). Ein DominanceHandler jetzt = exakt der Null-Consumer-Trap aus Doc 20 §I (docs/architektur/20_...md:122-141) und braucht semantisch den Gruppierungs-Schlüssel framework×workload×op×size (= Messkurven-Typsystem), der selbst gated ist (Doc 20 §E:64-66; selection_filter_chain.hpp:15-20 markiert Pareto explizit DEFERRED). GRENZEN-RESPEKTIERENDER PFAD: das ehrliche Zuhause einer Pareto-Front JETZT wäre ein additiver Modus in best_binary_selector (reales Tool; MeasurementRow trägt bereits 5-6 Objectives, best_binary_selector.hpp:79-88; realisiert Doc 21 §B H6, 21_...md:49) — aber das ist ein Design-GO auf den Tool-Scope (dokumentierter Zweck = Single-Metric-Ranking + Versand), NICHT ohne Weiteres buildbar; sonst mit Typsystem + #156.",
+        "curve_fit-Produktions-Verdrahtung: ECHT data-gated. Der reale Fit-Konsument ist das E4-Reporting = #156-Messdaten (Doc 21 §G, 21_...md:247; Doc 20 §E:64,69). Das Registry-Name->Bestands-Spalte-Mapping (curve_fit.hpp:5-12 Kopf-Notiz, LATENCY_P99 -> op_<art>_p99_ns) ist ein legitimer Vorbau, bleibt aber Null-Consumer (gleiche Stufe wie der bestehende Phase-6-Vorbau) -> KEIN 'echter Konsument'-Item; landet MIT dem E4-Reporting-Konsumenten, wenn #156 da ist.",
+        "tree<axis>/map Messkurven-Typsystem-WURZEL (Doc 20 §B): GATED, deep-researched, 2 BLOCKER-Kritiker = Null-Consumer-Trap (Doc 20 §E:64 + §I:122-141). Der reale Konsument (E4-Reporting) ist data-gated #156. Grenzen-respektierender Pfad: WURZEL landet gemeinsam MIT dem Konsumenten, sobald Cluster-Daten da sind; Map-Ebenen folgen den in Doc 21 §B entschiedenen H1-H6.",
+        "NICHT gated, aber KEIN neuer Slice — bereits gebaut: der CSV->LaTeX/Diagramm-Auto-Doku-Mechanismus (Tools 04_csv_to_latex + 05_diagram_generator) UND der synthetische Sample-Generator (01) existieren und sind in comdare_pipeline_e2e verdrahtet (Code/CMakeLists.txt:340-353, synthetisch getrieben) + cached-Fixture-Tests test_04/test_05. Einziger offener Sub-Gap: der Schema-B-WIDE-Surface-Pfad von 05 hat keinen synthetischen Input — genau das deckt SLICE 1 ab."
+      ],
+      "anchors": [
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/best_binary_selector/best_binary_selector.cpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/best_binary_selector/best_binary_selector.hpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tools/best_binary_selector/CMakeLists.txt",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/CMakeLists.txt",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/01_sample_data_generator/sample_data_generator.cpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/03_binary_to_csv/binary_to_csv.cpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/05_diagram_generator/diagram_generator.cpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/selection_filter_chain.hpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/test_d15_selection_filter_chain.cpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/test_phase6_vorbau.cpp",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/CMakeLists.txt",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/architektur/20_HEURISTIK_MESSKURVEN_TYPSYSTEM_UND_FILTERKETTE.md",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/architektur/21_SESSION_PLAN_TYPSYSTEM_ACHSEN_ENTSCHEIDUNGEN.md"
+      ]
+    },
+    "dda": {
+      "buildable_now": [
+        "SLICE (empfohlen, single-repo ce, additiv, golden/ABI-neutral): NEUES Kopf-Framework-Header `libs/cache_engine/include/cache_engine/measurement/measurement_framework.hpp` (NICHT unter anatomy/ -- System-Achsen-'Blut'-Wurzel getrennt von Organ-Achsen, feedback_system_axes_measurement_own_abstract_root_blood), das die F7-Matrix Mess-Frameworks x Workloads als compile-time-iterierbare 2D-Struktur abstrahiert -- STRUKTUR 1:1 nach dem #29-Praezedenzfall `libs/cache_engine/anatomy/container_framework.hpp:37-91` (mp11 type_list + type_traits<G> + for_each + self-proving static_asserts). Es RE-EXPORTIERT nur BEREITS GEBAUTE Typen: Achse A = Mess-Quellen-Familie aus `libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp:72-184` (IMeasurementSource/WallClockSource/PmcSourceAdapter, MeasuredEvent) bzw. die 16 System-Achsen aus `measurement_axis_registry.hpp:32` (kMeasurementAxisRegistry + for_each_measurement_axis); Achse B = Workload-Familie aus `libs/test_infra/workload_generator/include/comdare/workload_generator/workload_generator.hpp` (YcsbWorkload A-F + KeyDistribution). Liefert `for_each_source_x_workload` + `matrix_traits<Source,Workload>` (Spiegel von container_framework type_traits) + static_assert cell_count == |sources|*|workloads|.",
+        "ECHTER KONSUMENT (KEIN Null-Consumer): NEUER registrierter Unit-Test `tests/unit/test_XX_measurement_framework.cpp`, verdrahtet EXAKT wie `tests/unit/CMakeLists.txt:1757` (comdare_add_test SOURCES ... ; target_include_directories PRIVATE libs/cache_engine/include + libs/test_infra/workload_generator/include ; target_link_libraries Boost::mp11). Der Test instanziiert/iteriert JEDE Matrix-Zelle und assertet -- das ist der etablierte Kopf-Framework-Konsum-Pfad dieses Repos (test_29 konsumiert container_framework:1757, test_phase6_vorbau:38 konsumiert die Registry), gated CI gruen. #31-Lehre erfuellt: kein spekulativer Header ohne Include, kein Vorrats-POD -- nur Re-Export schon-konsumierter Typen mit einem iterierenden Test.",
+        "WARUM KEIN TABU/BUMP: Header aliasiert/re-exportiert ausschliesslich; KEINE Byte-Aenderung an `abi/module_abi_v1.hpp`, `tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt`, `algorithm_profiles/permutation_axes.xml` (golden/ABI-neutral wie container_framework.hpp:11-17). Alles in EINEM Repo (ce): neuer Header + neuer Test + additive Zeilen in tests/unit/CMakeLists.txt -- KEIN super-Submodul-Bump, KEINE neue Repo-Anlage, KEIN buildsystem.xml (F1: paralleler Weg CMake/CI, Modul-Code = mein Scope)."
+      ],
+      "gated": [
+        "F7 'als MODULE': Extraktion des Kopf-Frameworks in die comdare-measurement-all-Zellen (comdare-pmc baseline_1, comdare-workloads baseline_2, Plan Schritt 5/7) = NEUE GitLab-Repo-Anlage + cross-repo-Transfer + spaeter super-Submodul-Bump. Grenzen-respektierender Pfad: erst den single-repo-Kopf-Framework in ce stabilisieren+testen (oben), dann bei G2/G-GO als Scratch-Split/Transfer in die schon existierende measurement-all-Gruppe (repo 300, Schritt 0 DONE) heben -- Extraktion frisch aus dem ce-Header, nicht neu erfinden.",
+        "buildsystem.xml-Verdrahtung jeglicher Matrix-Teile = ANDERER Agent (F1/ADDENDUM-2 Punkt 1). Wir liefern parallel nur CMake-/CI-Referenzen; die xml-Dependents bleiben unangetastet.",
+        "measurement-all baseline_3-analysis Doku/Skelett (F14-Recherche-Empfehlung, ADDENDUM-2 §4): liegt im measurement-all-Repo (repo 300) = CROSS-REPO relativ zu ce UND leeres Skelett (CI-Leer-Guard) = Null-Consumer-Risiko -> verletzt die #31-Lehre. Grenzen-respektierender Pfad: NICHT jetzt als Code; erst wenn echte Generika-Extraktion einen realen C++-Konsumenten mitbringt (kein Vorrats-Code).",
+        "Load-bearing PRODUKTIONS-Konsument der 2D-Matrix (Runner/Pruef-Dock/E4-Reporting, das real ueber die Workload-Matrix misst) ist explizit 'Folge-Increment/E1-Verweis' -- belegt in `i_measurement_source.hpp:5-6` und `measurement_axis_registry.hpp:5`. Bis dahin ist der registrierte Test der legitime (Praezedenz-)Konsument; der echte Mess-Runner ist gated auf die E1-Dock-Verdrahtung.",
+        "super-Submodul-Bump von ce = verboten (Task + Memory reference_super_ci_cannot_fetch_new_ce_submodule_commits / GitFlow-Doktrin). Der ce-Commit selbst ist erlaubt (single-repo); der Pointer-Bump in super ist der gated Schritt."
+      ],
+      "anchors": [
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/anatomy/container_framework.hpp:1",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/test_29_container_framework.cpp:1",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/CMakeLists.txt:1757",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/i_measurement_source.hpp:72",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.hpp:32",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/measurement_category.hpp:10",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/system_axis.hpp:20",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/test_infra/workload_generator/include/comdare/workload_generator/workload_generator.hpp:1",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/test_phase6_vorbau.cpp:38",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/abi/module_abi_v1.hpp:1",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt:1",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/permutation_axes.xml:1",
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260706-274-MATRIX-MIGRATIONSPLAN-ENTWURF.md:61"
+      ]
+    },
+    "synthese": "Verified the decisive facts (parse/rank are real production logic, the tool is a shipped `add_executable`, and it is registered ONLY as executable — never as `add_test`, confirmed literally at tests/unit/CMakeLists.txt:2467). Verdict follows.\n\n---\n\n# BUILD-VERDIKT\n\n**Es existiert GENAU EINE jetzt-buildbare Slice: ASK-B SLICE 1 (Kern).** Sie ist der einzige Kandidat der drei Asks, dessen Produktiv-Konsument HEUTE existiert statt gated zu sein. ASK-A liefert korrekt [] (beide Kandidaten Null-Consumer/TABU). ASK-C wird als Jetzt-Slice ABGELEHNT — sie ist per eigener Beschreibung test-only-konsumiert und fällt damit unter exakt dieselbe Regel, die §B-WURZEL und den Modus-Enum killt.\n\n---\n\n## (a) DIE EINE buildbare Slice — ASK-B SLICE 1 (Kern)\n\n**Was:** Ein handgeschriebenes WIDE-CSV-Golden-Fixture (Schema B, Semikolon) + ein registrierter Unit-Test, der `parse_measurement_csv` + `rank_binaries` des ausgelieferten `best_binary_selector`-Tools charakterisiert. KEINE Produktivcode-Änderung.\n\n**Andockpunkte (verifiziert):**\n- Parse: `.../builder/best_binary_selector/best_binary_selector.cpp:36` — `parse_measurement_csv`, header-getriebene Spaltenauflösung; Pflichtspalten `binary_id`, `ns_per_op`, `two_phase_valid`; optionale `op_{insert,lookup,erase,scan,rmw}_p50_ns` (fehlt → 0/na).\n- Rank: `best_binary_selector.cpp:93` — `rank_binaries`, Filter `two_phase_valid && value>0`, Median = nearest-rank untere Mitte `vals[(n-1)/2]`, Sort aufsteigend, Tie-Break: mehr Samples → dann `binary_id`.\n- Vertrag: `best_binary_selector.hpp:79-88` (MeasurementRow, 5-6 Objectives) + `RankingCriterion::value_of`.\n- Echter Konsument (verifiziert, KEIN Null-Consumer): `tools/best_binary_selector/CMakeLists.txt:7` — `add_executable(comdare_best_binary_selector best_binary_selector.cpp best_binary_selector_main.cpp)`, #172 „Versprechen (1)\", ausgeliefertes CLI. Der Parse-/Rank-Pfad ist Produktionscode, den die CLI zur Laufzeit auf echten Mess-CSVs fährt.\n- Coverage-Lücke (verifiziert): `tests/unit/CMakeLists.txt:2467` sagt wörtlich „best_binary_selector-Tool = tools/best_binary_selector add_executable\" — d.h. NUR add_executable, NIE add_test. Kein einziges Testfile referenziert es. `parse_measurement_csv`/`rank_binaries` sind heute UNGETESTET.\n\n**Design-Pattern-Rahmung:** `rank_binaries(rows, RankingCriterion)` = **Strategy** (Kriterium wählt das Objective). `parse_measurement_csv` = header-getriebener **Parser/Factory** (breite-/reihenfolge-agnostisch). Der Test = **Characterization/Golden-Master-Test** (Feathers), der ausgeliefertes Verhalten festnagelt. Das Fixture = **Test-Data-Builder / Golden-Fixture**.\n\n**Warum das die Anti-Null-Consumer-Regel NICHT verletzt:** Die Regel verbietet neue Produktions-Abstraktionen, deren einziger Fan-out ein Test ist (§B-WURZEL, Modus-Enum, measurement_framework.hpp). Hier wird KEINE neue Abstraktion gebaut — es wird bestehende, ausgelieferte Produktionslogik mit realem CLI-Konsumenten getestet. Das ist legitime Coverage load-bearing Codes, nicht ein Vorrats-Artefakt.\n\n**Warum kein TABU/Bump:** Fixture + Test sind additiv, liegen abseits des golden-Pfads (`permutation_axes.xml`/`mp_list`); der byte-identitäts-gebundene `orch_make_stem`-Spiegel wird von Parse/Rank nicht berührt. Kein ABI-Bump, kein golden-Bruch, single-repo ce, kein super-Submodul-Bump.\n\n**Test-Plan (sofort baubar):**\n1. Fixture `tests/unit/fixtures/best_binary_wide.csv` (Semikolon), Header `binary_id;ns_per_op;two_phase_valid;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns`. Zeilen so gewählt, dass sie exerzieren: (a) deterministische ns_per_op-Ordnung, (b) `two_phase_valid=0` → ausgeschlossen, (c) `value<=0` → ausgeschlossen, (d) mehrere Samples je binary_id → nearest-rank untere Mitte, (e) Median-Gleichstand → Tie-Break Samples/binary_id, (f) fehlende optionale `op_*`-Spalte → graceful 0/na.\n2. `tests/unit/test_XX_best_binary_selector_parse_rank.cpp`, registriert via `comdare_add_test` **exakt gespiegelt vom bereits als add_test registrierten Tools-Test `test_load_profile_writer`** (Block direkt oberhalb `tests/unit/CMakeLists.txt:2467`: `comdare_add_test` + `set_property GLOBAL APPEND COMDARE_TEST_TARGETS` + `set_tests_properties LABELS \"tools;...\" TIMEOUT`). TU: `best_binary_selector.cpp` mitkompilieren, dessen dir includen.\n3. Assertions: `parse_measurement_csv` liefert erwartete Zeilenzahl + Spalten-Mapping (Stichprobe je :58-66); `rank_binaries` liefert erwarteten geordneten Vektor (Sieger, median_value, samples) unter ≥2 Kriterien (`ns_per_op` + ein `op_*`); Ausschluss invalider/Null-Zeilen; Tie-Break.\n4. CI: single-repo ce-Commit, `ctest` grün, kein Bump.\n\n**Abgrenzung innerhalb der Slice:** Der optionale `--wide`-Emit-Modus in `01_sample_data_generator` und die Bonus-Konsumenten `curve_fit::parse_wide_csv_column` / `05_diagram_generator`-Surface sind NICHT Teil des Kerns — sie fassen Produktions-Tool 01 an. Die Coverage-Lücke schließt das handgeschriebene Fixture allein. `--wide` daher als separater, klar getrennter Folge-Commit oder deferren.\n\n---\n\n## (b) Grenzen-respektierender Vollendungs-Pfad je Ask\n\n**ASK-A (§B tree<axis>-WURZEL / §D Modus-Enum) — Enabler: #156.**\n- §B: Wenn #156-Clusterdaten landen → E4-Reporting-Kurven-Konsument bauen, der die Kurven-Schlüssel liest → die `tree<axis>`-WURZEL landet MIT ihm (echter Konsument + Doc-20-§I-Contract-Test gegen `build_axis_levels`' `is_static`). Rahmung: **Composite** (tree<axis>), materialisiert erst wenn ein echter **Visitor/Reporter** ihn konsumiert. Die 5 map-Ebenen framework/type/size/op/property bleiben honest-empty bis H1/H3/H4/H6 materialisieren. Den Treiber NICHT zwingen `profile_to_tree` zu konsumieren (Falsch-Fit + Doppelquelle).\n- §D: Enabler = Arbeits-Dock (Heuristik-Tier-Systemachse via `genus_binding_traits.hpp:31` + ABI-Bump #215 + #156 für Hybrid-Gegenbeweis). Rahmung: **State/Strategy** über CEB-Modi — aber den 3./4. Zustand (Working/Hybrid) NUR als honest-stub AUF der echten Arbeits-Dock-Naht additiv, nie als 4-Zustands-Enum mit test-only Fan-out. Measurement/Evaluation existieren bereits separat real (02_messung_driver + best_binary_selector); best_binary in den Treiber verdrahten = Make-Work, bewusst NICHT.\n\n**ASK-B (#156-Gap) — Enabler: #156-Clusterdaten.** Entsperrt: (1) `curve_fit`-Produktions-Verdrahtung (echter Fit-Konsument = E4-Reporting) — Rahmung **Strategy** über Fit-Familien, gekeyt durch das Registry-Name→Spalte-Mapping (`curve_fit.hpp:5-12`); (2) die `tree<axis>/map`-WURZEL landet mit ihrem Konsumenten; (3) der Dominance/Pareto-Handler in `selection_filter_chain` — Rahmung **Chain-of-Responsibility** (Slice-1-CoR bereits gelandet, `selection_filter_chain.hpp:87`, ce 076b71cf), bekommt seinen `DominanceHandler` sobald der Gruppierungs-Schlüssel framework×workload×op×size (= Messkurven-Typsystem) existiert. Ehrliches Zwischen-Zuhause einer Pareto-Front: additiver Modus in `best_binary_selector` (reales Tool, MeasurementRow trägt 5-6 Objectives, `hpp:79-88`) — aber das ist ein Design-GO auf den Tool-Scope, nicht frei buildbar.\n\n**ASK-C (F7 Mess-Framework×Workload-Matrix) — Enabler: E1-Dock-Verdrahtung, dann G2/G-GO.** Rahmung: Kopf-Framework = mp11 type_list + `type_traits<G>` + `for_each` (1:1 #29 `container_framework.hpp:37-91`). Den single-repo-ce-Header `measurement_framework.hpp` bauen ERST wenn ein echter Produktiv-Konsument existiert — der E1-Mess-Runner, der real über die source×workload-Matrix misst (laut `i_measurement_source.hpp:5-6` + `measurement_axis_registry.hpp:5` explizit „Folge-Increment/E1-Verweis\"). Bis dahin ist er ein test-only §B-WURZEL-Klasse-Artefakt. Danach: Extraktion frisch aus dem ce-Header in die measurement-all-Zellen (repo 300: baseline_1 pmc, baseline_2 workloads) = neue GitLab-Repo-Anlage + cross-repo-Transfer + super-Submodul-Bump (Letzterer bleibt wegen Job-Token-Gap verboten; ce-Commit selbst erlaubt).\n\n---\n\n## (c) Ranking der buildable_now-Kandidaten (Wert × Sauberkeit)\n\n1. **ASK-B SLICE 1 Kern — Fixture + registrierter Test auf best_binary_selector parse+rank.** HÖCHSTES Wert×Sauberkeit: echter ausgelieferter Konsument, schließt reale Coverage-Lücke auf ungetesteter Produktionslogik, null ABI/golden/Produktionscode-Anfassung, single-repo. **DIE Slice — sofort baubar.**\n2. **ASK-B SLICE 1 Erweiterung — `--wide`-Emit-Modus in 01 (+ Bonus-Konsumenten 05/curve_fit).** Niedrigere Sauberkeit (fasst Produktions-Tool 01 an), Wert = speist 05-Surface-Pfad. Separater Commit oder deferren.\n3. **ASK-C measurement_framework.hpp — ABGELEHNT als Jetzt-Slice.** Einziger Konsument wäre ein neuer Test (Produktiv-Konsument E1-gated) = §B-WURZEL-Falle. Sauberster der GATED-Kandidaten; landet mit dem E1-Mess-Runner.\n4. **ASK-A §B/§D — kein Kandidat.** Beide korrekt gated (Null-Consumer bzw. TABU).\n\n**Sofort-Empfehlung:** Rang 1 (ASK-B SLICE 1 Kern) bauen — ODER, falls du nur committen willst: obige Roadmap ist grenzen-respektierend konsistent, #156 ist der gemeinsame Haupt-Enabler für ASK-A+ASK-B, E1-Dock der für ASK-C."
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Scoping"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Synthese"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "ask-a-bd-alt",
+      "phaseIndex": 1,
+      "phaseTitle": "Scoping",
+      "agentId": "ac836c237a8ee7397",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783757323036,
+      "queuedAt": 1783757323028,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Hook-Ask A: SKIZZIERE die TABU-respektierende Alternative fuer §B (Messkurven-Typsystem-WURZEL) + §D (Hybrid-Modus). Vorbefunde (NICHT wiederholen, darauf aufbauen): §B ist Doppelquelle zu profile_to_tree.hpp (/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260711-e4prime-messkurven-typsystem-wurzel/BEFUND.md); §D ist TABU (genus_binding_traits) + ABI-Bump-…",
+      "lastProgressAt": 1783757815908,
+      "tokens": 126654,
+      "toolCalls": 30,
+      "durationMs": 492872,
+      "resultPreview": "{\"buildable_now\":[],\"gated\":[\"§B (a) profile_to_tree als EINZIGE Quelle konsumieren = bleibt NULL-CONSUMER (verifiziert, #31-Lehre erfuellt: geprueft, nicht blind verworfen). build_axis_levels @ profile_to_tree.hpp:25 hat NULL Nicht-Test-Aufrufer — jede build_axis_levels(-Callsite liegt in tests/ bzw. tests/unit/thesis_tiere/ (test_kf9, test_e4_contract, profile_runner.hpp nur von test_*.cpp inklu…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ask-b-gap-vorbau",
+      "phaseIndex": 1,
+      "phaseTitle": "Scoping",
+      "agentId": "aa88f95e3b30cc038",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783757323036,
+      "queuedAt": 1783757323028,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Hook-Ask B: SCOPE was im #156-#215-Daten-Gap JETZT buildbar ist (Mechanismus ohne echte Messdaten), analog zum bereits gebauten Phase-6-Vorbau (measurement_axis_registry/IMeasurementSource/curve_fit-skeleton, /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement + builder/curve_fit). FRAGE: welche Mech…",
+      "lastProgressAt": 1783757738146,
+      "tokens": 103092,
+      "toolCalls": 27,
+      "durationMs": 415110,
+      "resultPreview": "{\"buildable_now\":[\"SLICE 1 (der EINE ehrlich buildbare Mechanismus): synthetischer WIDE-CSV-Fixture/Generator (Schema B, SEMIKOLON: 'binary_id;ns_per_op;two_phase_valid;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns[;working_set_n]') + ein Golden-Test, der best_binary_selector::parse_measurement_csv + rank_binaries darauf treibt. ANDOCKPUNKT: /home/comdare/.../libs/…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "ask-c-dda-singlerepo",
+      "phaseIndex": 1,
+      "phaseTitle": "Scoping",
+      "agentId": "a0c25759adb8633eb",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783757323036,
+      "queuedAt": 1783757323028,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Hook-Ask C: SCOPE den DD-A/#274-Matrix-Migrations-Anteil, der INNERHALB EINES Repos (kein cross-repo, keine Repo-Anlage, kein Submodul-Bump, kein buildsystem.xml) prototypierbar ist. Plan: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260706-274-MATRIX-MIGRATIONSPLAN-ENTWURF.md + F1-F14-Antworten (Ledger). F1: buildsystem.xml = anderer Agent; PARALLEL CMake/CI + …",
+      "lastProgressAt": 1783757559132,
+      "tokens": 70865,
+      "toolCalls": 15,
+      "durationMs": 236096,
+      "resultPreview": "{\"buildable_now\":[\"SLICE (empfohlen, single-repo ce, additiv, golden/ABI-neutral): NEUES Kopf-Framework-Header `libs/cache_engine/include/cache_engine/measurement/measurement_framework.hpp` (NICHT unter anatomy/ -- System-Achsen-'Blut'-Wurzel getrennt von Organ-Achsen, feedback_system_axes_measurement_own_abstract_root_blood), das die F7-Matrix Mess-Frameworks x Workloads als compile-time-iterierb…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "synthese",
+      "phaseIndex": 2,
+      "phaseTitle": "Synthese",
+      "agentId": "ad8ff0723d77b27ed",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783757815909,
+      "queuedAt": 1783757815908,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "CE=/home/comdare/Projekte/Research/probst-diplomarbeit-cach…",
+      "promptPreview": "Konsolidiere zu einer GRENZEN-RESPEKTIERENDEN VOLLENDUNGS-ROADMAP + einem BUILD-VERDIKT. ASK-A(§B/§D): {\"buildable_now\":[],\"gated\":[\"§B (a) profile_to_tree als EINZIGE Quelle konsumieren = bleibt NULL-CONSUMER (verifiziert, #31-Lehre erfuellt: geprueft, nicht blind verworfen). build_axis_levels @ profile_to_tree.hpp:25 hat NULL Nicht-Test-Aufrufer — jede build_axis_levels(-Callsite liegt in tests/…",
+      "lastProgressAt": 1783758035406,
+      "tokens": 40746,
+      "toolCalls": 3,
+      "durationMs": 219497,
+      "resultPreview": "Verified the decisive facts (parse/rank are real production logic, the tool is a shipped `add_executable`, and it is registered ONLY as executable — never as `add_test`, confirmed literally at tests/unit/CMakeLists.txt:2467). Verdict follows.\n\n---\n\n# BUILD-VERDIKT\n\n**Es existiert GENAU EINE jetzt-buildbare Slice: ASK-B SLICE 1 (Kern).** Sie ist der einzige Kandidat der drei Asks, dessen Produktiv-…"
+    }
+  ],
+  "totalTokens": 341357,
+  "totalToolCalls": 75
+}
