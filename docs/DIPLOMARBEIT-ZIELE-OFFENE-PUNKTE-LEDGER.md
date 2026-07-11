@@ -182,6 +182,20 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
 **F Deferred/gated:** §8-Liste.
 **Fehlende TODOs aus Validierung (23, eingeordnet):** M1→#193(§5) · M2→#179(§11-E) · M3→#10(§8) · M4→#19-Allokatoren-echt-linken · M5→#125(§8) · M6→#149/#229(§8) · M7→#187/#165(§8) · M8→#184/#185 als CODE-Aufgaben (nicht Text-Agent) · M9→FF0-Owner(§1) · M10→ABI-Freeze(§4) · M11→RC-Vertrags-Freeze(§3-S4) · M12→#216-Push✅ · M13→AP-8⟵AP-1(§5) · M14→Spiegel-Sperre(§9) · M15→Integrations-Commit(§5) · M16→P-Pfad-Re-Verify(§5) · M17→AP-2-Track-S-Prüfung(§5) · M18→.test-Merge✅ · M19→comdare_tests-Registry(§7-CI-2) · M20→F.5-Entscheid(§7-CI-3) · M21→Hermetik-Audit(§7) · M22→prt-art-alle-12(§7-CI-4) · M23→-j/RAM-Politik(§7-CI-5).
 
+**H TIER-METAPHER + SYSTEM-ACHSEN — Eigenschafts-Verifikation (deep research 2026-07-11, wf_d15b529f; Ergebnis: Properties VOLLSTÄNDIG):**
+Analog zur 19-Organ-Achsen-Ontologie-Verifikation (die T8/T2/T16/T5 fand) für die Tier-Metapher-Ebene
+(Gattung/Genus/AbiAdapter) + die System-Achsen („Blut"). **Verdikt:** die Eigenschaften/Verträge sind
+vollständig deklariert — KEINE unbenannten Pflicht-Properties; Organ/System-Trennung eigenschaftskonform.
+**Phantom-Gaps (NICHT bauen, adversarial widerlegt):** Container-Genera-Messung (Property in genus-eigener Form
+da, V42-deferred), Graph-Gattung (bewusst-deferred Interface-Stub), Latenz-Perzentile (schon da). **Gated:**
+Heuristik-/Tier-Switch-HYBRID-Systemachse = Diplomarbeits-ZIEL, #156-DATA-gated; IPC_CPI = Cluster-PMC/#156;
+FILL_BUFFER_OCCUPANCY = Design-GO (Regime). **2 TABU-neutral buildbare Wiring-Folge-Increments (Wert erst im
+Cluster-Messlauf; Code scopet sie selbst als „Folge-Increment"):** (H-1) SystemAxis→E4-Reporting-Verdrahtung
+(`measurement_axis_registry.hpp:5` 0 Konsumenten → additive CSV-Spalten der 3 produzierten Kategorien
+CLU/LATENCY_MEAN/THROUGHPUT; Andockpunkt `node_value_measurement.hpp:56`; ABI-/1416-POD-neutral, separater
+Vertrag); (H-2) MEMORY_FOOTPRINT-Peak-Produzent (`system_axis.hpp:267-270` honest-0 → golden-neutraler
+Peak-END-Append statt Momentanwert). Details: [[reference_tier_metaphor_system_axis_properties_verified_complete]].
+
 **G ERWEITERUNG DES §0-GOAL (bestehendes Ziel, NICHT neu — User 2026-07-11) — Mess-Ergebnis-Rückschreibung/Persistenz als Abschluss des Mess→PDF-Flusses:**
 Die Diplomarbeit-Pipeline soll beim Durchlauf ÜBER die cache-engine die **Auswertungsdokumente** erzeugen
 (LaTeX-PDF + Messwerte-CSV = ALLE im Overleaf/Thesis definierten Auswertungsformate der Messwerte-Sektion; die
