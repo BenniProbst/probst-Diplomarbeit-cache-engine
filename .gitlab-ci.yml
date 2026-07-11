@@ -61,11 +61,21 @@ default:
   before_script:
     - |
       if [ -f .gitmodules ] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        # Cross-Projekt-Private-Submodul-Klon mit Group-Deploy-Token. Ursache (DIAG Pipeline 9787): der Runner
+        # setzt KEINEN Auth-extraheader (nur X-Gitaly-Correlation-ID). Die "Access denied" kam daher, dass die
+        # RELATIVEN .gitmodules-URLs (../<repo>.git) gegen origin=CI_REPOSITORY_URL zu
+        # https://gitlab-ci-token:${CI_JOB_TOKEN}@… aufloesen (Parent-Origin-Vererbung) UND `git submodule
+        # update --init` genau diese aufgeloeste Token-URL in .git/config schreibt -> ueberschreibt jedes
+        # vorher gesetzte submodule.<>.url-Override. Fix: die Deploy-Token-URLs DIREKT in .gitmodules setzen
+        # (ephemerer Job-Checkout, danach restauriert), dann liest sync+init sie. Der Deploy-Token hat
+        # read_repository auf alle 3 comdare/research-Repos -> Cross-Projekt-Fetch authentifiziert.
+        for spec in "Code/external/comdare-cache-engine:comdare-cache-engine" "Code/external/comdare-prt-art:comdare-prt-art" "thesis/diplomarbeit:20260931-overleaf-diplomarbeit"; do
+          p="${spec%%:*}"; r="${spec##*:}"
+          git config -f .gitmodules "submodule.${p}.url" "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/${r}.git"
+        done
         git submodule sync --recursive
-        git config submodule.Code/external/comdare-cache-engine.url "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/comdare-cache-engine.git"
-        git config submodule.Code/external/comdare-prt-art.url    "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/comdare-prt-art.git"
-        git config submodule.thesis/diplomarbeit.url              "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/20260931-overleaf-diplomarbeit.git"
-        git -c "http.${CI_SERVER_URL}.extraheader=" submodule update --init --recursive
+        git submodule update --init --recursive
+        git checkout -- .gitmodules 2>/dev/null || true
       fi
 
 # #277/#21 (User 06.07.): ccache-Bestand liegt auf dev-MinIO (runners.cache -> minio.comdare.de:9000/buildsystem-cache).
