@@ -218,11 +218,16 @@ festlegen), sodass ein fertiges Diplomarbeit-PDF NEBEN einem versionierten Messw
 User ist sich der git-Datenakkumulation bewusst — bewusst die einfachste Variante zuerst.
 **Phase 2 (später, additiv):** dieselben datierten Ordner ZUSÄTZLICH PARALLEL nach
 `backup1.comdare.de/Cluster_NFS/cache-engine-experiment` schreiben (beides parallel, doppelte Absicherung).
-**Infra-Vorbedingung G-b:** der Push-Back braucht ein **WRITE-fähiges CI-Credential** (write_repository) —
-der aktuelle Group-Deploy-Token `gitlab+deploy-token-39` ist read_repository-ONLY. Optionen: Project-Access-Token
-mit write_repository (masked, protected) ODER CI-Push via ci-templates-Muster; Loop-Schutz nötig (`[skip ci]`/
-`ci.skip` im Auto-Commit, sonst rekursive Pipeline-Trigger). Baut auf dem REV-17-Submodul-Fetch-Fix auf
-(super kann jetzt über die cache-engine bauen). Cross-Bezug: §0-Goal (Mess→PDF-Fluss),
+**Infra-Vorbedingung G-b GELÖST (2026-07-11, Security-Deep-Research wf_f68bec15):** sicherheits-maximaler
+projekt-lokaler **Project Access Token id=54 `writeback-measurements`** (super 288, write_repository-ONLY,
+Developer, expires 2026-10-09) angelegt — getrennt vom Admin-PAT, admin-PAT-unabhängig rotierbar; Bot-User
+`project_288_bot_…` (enthält `_bot_` → Loop-rule greift). CI-Vars `COMDARE_WRITEBACK_TOKEN` (masked+hidden+
+protected) + `COMDARE_WRITEBACK_USER` (protected) gesetzt; **`development` ist jetzt PROTECTED** (Force-Push aus,
+aktiviert die protected-Var-Boundary; Owner bypassen → kein Push-Regress). **INERT**: `COMDARE_PERSIST_MEASUREMENTS`
+NICHT gesetzt → kein Auto-Push bis Aktivierung. Details + Rotation/Rest-Risiko:
+[[reference_measurement_writeback_token_288_secure]]. **Verbleibend vor Aktivierung: NAS-Backup (User-Reihenfolge)
+— NAS/MinIO-Writeback ist #202-gegatet + braucht Cluster-Zugriff.** Loop-Schutz (`[skip ci]`+`ci.skip`+`_bot_`-rule)
++ FS-sicheres Datum (G-a `YYYYMMDD-HHMMSS`) sind im persist-Job (super `3a2d06d`) bereits gebaut. Cross-Bezug: §0-Goal (Mess→PDF-Fluss),
 [[feedback_ci_gesamtlauf_ist_messung_abgeschaltet_pdf_kompiliert]].
 
 ## §12 FORTSCHREIBUNGS-LOG
