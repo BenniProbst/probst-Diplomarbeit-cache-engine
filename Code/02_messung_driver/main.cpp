@@ -273,6 +273,18 @@ struct MessreihenSpec {
 } // namespace
 
 int main(int argc, char* argv[]) {
+    // --validate [<profil>]: rein-lesende Pre-Flight-Pruefung des Thesis-Profils gegen die realen
+    // EnabledStrategies (P5, migriert von run_lazy_150) — baut KEINE DLL, misst NICHT. Braucht KEINE
+    // <config>/<output>-Argumente; ohne Pfad gilt COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil.
+    for (int i = 1; i < argc; ++i) {
+        std::string const flag{argv[i]};
+        if (flag == "--validate" || flag == "--check") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            return comdare::cache_engine::builder::profile_facade::validate_profile_facade(prof, std::cout);
+        }
+    }
     if (argc < 3) {
         print_usage();
         return 1;
@@ -546,14 +558,12 @@ int main(int argc, char* argv[]) {
                 pa.platform_override = env_trimmed("COMDARE_PLATFORM");
                 if (pa.platform_override.empty()) pa.platform_override = compile_time_platform_tag();
 
+                // Achse-2-Lastprofile: leer ist OK — die run_profile-Fassade defaultet auf die zum Profil
+                // co-lokalisierten Lastprofile (algorithm_profiles/load_profiles/), sodass die XML selbst-
+                // suffizient ist (G1/#229). COMDARE_LOAD_PROFILE_DIR bleibt reiner Override; findet die
+                // Fassade 0 gueltige Profile, bricht SIE mit exit 4 ab (Achse 2 nie still leer =
+                // two_phase_valid=0-Schutz bleibt gewahrt, nur in die WIE-Schicht verlagert).
                 pa.load_profile_dir = env_trimmed("COMDARE_LOAD_PROFILE_DIR");
-                if (pa.load_profile_dir.empty()) {
-                    // PFLICHT beim produktiven E4-Lauf: ohne XML-Lastprofile (Achse 2) faellt
-                    // run_profile still auf den fixed-workload-Pfad zurueck und JEDE CSV-Zeile
-                    // traegt two_phase_valid=0 = mehrtaegiger, wissenschaftlich UNGUELTIGER Lauf.
-                    throw std::runtime_error(
-                        "COMDARE_RUN_E4_XML=1 erfordert COMDARE_LOAD_PROFILE_DIR (XML-Lastprofile, Achse 2)");
-                }
                 if (auto cap = parse_size_env_strict("COMDARE_E4_CAP")) pa.max_binaries = *cap;
                 if (auto ws = parse_size_env_strict("COMDARE_WORKLOAD_RECORDS"))
                     pa.working_set_override = static_cast<std::uint64_t>(*ws);
