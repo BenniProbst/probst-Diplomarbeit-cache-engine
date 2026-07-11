@@ -1,0 +1,270 @@
+{
+  "summary": "Deep-Research: CoR-Filterkette (GoF) im CacheEngineBuilder fuer die Tier-Binary-Generierungs-Kontrolle (Doc 20 §C), compile-time",
+  "agentCount": 5,
+  "logs": [],
+  "result": {
+    "research": [
+      {
+        "findings": [
+          {
+            "q": "(1) Wie fliesst heute die Auswertung (best_binary_selector Ranking) in die Generierung (build_orchestrator BuildJob/provision)? Wo wird aus Permutations-Kandidaten eine Teilmenge zum Bauen ausgewaehlt (CoR-Einbauort)?",
+            "a": "GAR NICHT — es gibt heute KEINEN Rueckfluss Auswertung -> Generierung. Zwei getrennte Halbkreise: (A) GENERIERUNG: BuildOrchestrator::provision_all(view, selection, &stats) (build_orchestrator.hpp:198) baut via provision_core (build_orchestrator.hpp:211) genau K Binaries, wobei die Teilmenge K von aussen als BuildSelection.indices (coverage_selection.hpp:26) hereingereicht wird; die Kandidaten sind View-Indizes in die lazy ∏-StaticBinaryView, je Index -> BinarySpec (build_orchestrator.hpp:253). (B) AUSWERTUNG: best_binary_selector liest die WIDE-Mess-CSV -> rank_binaries (best_binary_selector.hpp:147) -> RankedBinary[] -> ShippedArtifactBuilder liefert nur die GEWINNER-DLL aus. Der Ranking-Output landet ausschliesslich im Versand-Artefakt (best_binary_selector_main.cpp:90 ranked, :105 winner=ranked.front(), :124 [ship]) und NIE zurueck in eine BuildSelection/provision. DER NATUERLICHE CoR-EINBAUORT ist damit exakt die fehlende Kante zwischen rank_binaries (Auswertung) und dem naechsten provision_all-Aufruf (Generierung): eine Filterkette, die aus der aktuellen Kandidaten-BuildSelection + Messkriterien eine reduzierte BuildSelection fuer die naechste Bau-Runde erzeugt.",
+            "evidence": "build_orchestrator.hpp:191-202 (provision_all view/selection), :211-354 (provision_core baut K, Kandidat=view[i]->BinarySpec bei :253); coverage_selection.hpp:25-30 (BuildSelection.indices als endliche gewaehlte Menge); best_binary_selector.hpp:147-148 (rank_binaries); best_binary_selector_main.cpp:90/105/124 (Ranking fliesst nur in ship, nicht in Rebuild). grep RankedBinary/rank_binaries ausserhalb best_binary_selector.* = 0 Treffer -> keine Feedback-Kante existiert."
+          },
+          {
+            "q": "(2) Welche Datentypen sind der CoR-Kandidat (BuildJob/BuildConfig/Permutation/binary_id) und was traegt die Auswertung (RankedBinary/MeasurementRow) an Kriterien?",
+            "a": "CoR-KANDIDAT = ein View-Index (std::size_t) in die StaticBinaryView bzw. die daraus on-demand dekodierte BinarySpec (Traeger des binary_id); die operative Kandidaten-MENGE ist BuildSelection.indices (coverage_selection.hpp:26, std::vector<std::size_t>). NICHT BuildJob/BuildConfig: BuildJob (build_orchestrator.hpp:86) wird erst INNERHALB provision_core je Index erzeugt (nachgelagert, kein Selektions-Objekt); BuildConfig (:54) ist globale Bau-Umgebung. Die AUSWERTUNG traegt die Kriterien in zwei Stufen: MeasurementRow (best_binary_selector.hpp:79) = Roh-Zeile {binary_id, two_phase_valid, ns_per_op, op_insert/lookup/erase/scan/rmw_p50}; verdichtet via RankingCriterion/Metric-Strategy (best_binary_selector.hpp:93,118) zu RankedBinary (:135) {binary_id, median_value(ns, kleiner=besser), samples}. Der JOIN-SCHLUESSEL zwischen Auswertungs-Welt und Generierungs-Welt ist der binary_id (via orch_make_stem-Identitaet, best_binary_selector.hpp:50-53 == build_orchestrator.hpp:153). Ein CoR-Handler filtert also ueber (BinarySpec/binary_id), annotiert/geordnet durch RankedBinary bzw. RankingCriterion-Metriken.",
+            "evidence": "coverage_selection.hpp:25-30 (BuildSelection.indices); experiment_tree.hpp:223 BinarySpec, :266 operator[] (Index->Spec); build_orchestrator.hpp:86 BuildJob (nachgelagert), :54 BuildConfig (global); best_binary_selector.hpp:79-88 MeasurementRow, :93 enum Metric, :118-132 RankingCriterion, :135-139 RankedBinary; binary_id als Bruecke: best_binary_selector.hpp:50-53 vs build_orchestrator.hpp:153."
+          },
+          {
+            "q": "(3) Gibt es bereits Selektions-/Filter-Logik (select/reject/provision_all view+selection), die die CoR ersetzen/kapseln wuerde?",
+            "a": "JA, teilweise — coverage_selection.hpp ist die vorhandene Selektions-Schicht: BuildSelection {indices, provenance} (:25) plus die freien Selektoren select_full (:37), select_one_wise (:53), select_explicit (:66), select_by_pinned_signature (:76). Diese sind die drei orthogonalen Reduktionsstufen S1 Build-Profil / S2 Coverage-Sampling / S3 explizit-pinned (:10-11) und filtern die ∏-View nach STRUKTURELLEN Kriterien (Coverage, gepinnte Paper-Signatur), NICHT nach Messergebnissen. Sie ERSETZEN die CoR NICHT, aber die CoR wuerde sie KAPSELN/KOMPONIEREN: jeder select_* ist bereits faktisch ein Handler, der (indices, provenance) liefert; das provenance-Feld ist genau die Audit-Kette, die eine CoR fortschreibt (kein stilles Truncaten, :24). Die CoR ist also ein NEUES, mess-getriebenes Glied, das RankedBinary/MeasurementRow konsumiert und eine verfeinerte BuildSelection ausgibt, downstream verkettet mit den bestehenden select_*. Sibling-Pattern schon da: Strategy in RankingCriterion (best_binary_selector.hpp:118) und PolicyObjective/ScanOptimizing/LatencyOptimizing (cacheline_policy_selector.hpp:141,180) — CoR ist die fehlende Orchestrierung ueber diese Strategies. e2e_pipeline.hpp:36 zeigt den vorhandenen Konsum-Pfad (StaticBinaryView -> BuildSelection -> je Index MeasureFn), an dessen Ende die CoR die naechste Selektion speist.",
+            "evidence": "coverage_selection.hpp:10-11 (S1/S2/S3), :25-30 (BuildSelection), :37/:53/:66/:76 (select_full/one_wise/explicit/by_pinned_signature), :24/:27 (provenance-Audit); best_binary_selector.hpp:118 + cacheline_policy_selector.hpp:141/180 (Strategy-Vorbilder); e2e_pipeline.hpp:34-53 (Konsum-Pfad View->Selection->Measure)."
+          },
+          {
+            "q": "(4) Ist der CoR-Einbau cold-path (build-time, klassische Handler-Objekte ok) oder beruehrt er den gemessenen Hot-Path (compile-time-strikt)?",
+            "a": "COLD-PATH / build-time — klassische GoF-CoR mit Handler-Objekten ist zulaessig. Die CoR steuert die GENERIERUNG (welche Permutationen als naechstes gebaut/verworfen werden), sie laeuft zwischen Mess-Runde und dem naechsten provision_all-Aufruf, ausserhalb jeder gemessenen Schleife. Beleg: provision_core startet Compiler-Subprozesse (build_orchestrator.hpp:320 compile_, :448-489 cl/g++), BuildSelection ist explizit configure-time (coverage_selection.hpp:10), die Mess-Strecke ist per MeasureFn injiziert (e2e_pipeline.hpp:24). Der gemessene Hot-Path (do_batch-Mess-Loop) liegt gerade NICHT hier: cacheline_policy_selector.hpp:32-34 stellt ausdruecklich fest, dass Selektor+apply_to EINMALIG vor run() laufen und tier_apply_resource_control NICHT im do_batch-Loop liegt. Einzig die derive()-Heuristik in ScanOptimizing/LatencyOptimizing ist constexpr/zero-cost gehalten (cacheline_policy_selector.hpp:142,181) — aber das ist die Strategy-Achse, nicht der CoR-Ort. FAZIT: CoR = cold-path Handler-Objekte OK; keine vtable/Runtime-Switch-Sorge, weil nicht im Hot-Path. Zusatz-Anforderung aus Doc 20 §D fuer die Handler-REIHENFOLGE: der Paper-Vergleich muss VOR dem Permutations-Ranking greifen — RankingCriterion/Metric (best_binary_selector.hpp:93) kennt heute KEIN Paper-Kriterium; ein Paper-Vergleichs-Handler muss als erstes Kettenglied ergaenzt werden.",
+            "evidence": "build_orchestrator.hpp:320 (compile_ Subprozess), :448-489 (reale cl/g++ CompileFn); coverage_selection.hpp:10 (configure-time); e2e_pipeline.hpp:24 (MeasureFn injiziert); cacheline_policy_selector.hpp:32-34 (apply_to einmalig vor run(), NICHT in do_batch = Hot-Path liegt woanders), :142/:181 (derive constexpr, Strategy-Achse); best_binary_selector.hpp:93 (Metric ohne Paper-Kriterium -> Paper-first-Handler fehlt)."
+          }
+        ],
+        "open_questions": [
+          "Wo genau soll die CoR-verfeinerte BuildSelection re-injiziert werden — als neue Reduktionsstufe S4 in coverage_selection.hpp (mess-getrieben, konsumiert RankedBinary) oder als eigener Orchestrierungs-Layer ueber e2e_pipeline.hpp, der nach run_e2e_pipeline die naechste provision_all-Runde speist? Beide sind konsistent mit Monolith-first; die Doku legt es nicht fest.",
+          "Die Auswertungs-Reihenfolge 'Paper-Vergleich VOR Permutations-Ranking' (Doc 20 §D) ist im Code noch nicht abgebildet: enum Metric (best_binary_selector.hpp:93) hat kein Paper-Algorithmus-Kriterium und rank_binaries kennt nur ns-Median ueber two_phase_valid. Woher kommt die Paper-Algorithmus-Referenz-Messung (Wall-Clock gegen bekannte Paper-Algos), die der erste CoR-Handler vergleichen soll — existiert dafuer bereits eine CSV-Spalte/Quelle oder muss sie neu erzeugt werden?",
+          "Der 4. komplementaere Observer-Schritt aus Doc 20 §D (Heuristik-Tier-Binaries OHNE Mikro-/Makro-Benchmarks neu gebaut, reiner Wall-Clock-Vergleich) impliziert einen zweiten, benchmark-freien Build-Pfad — unklar, ob das ueber einen BuildConfig-Schalter (z.B. defines in make_gpp_compile_fn) oder eine separate Permutations-Achse erfolgen soll; beruehrt potenziell die TABU-Zone (permutation_axes.xml/Registry), daher klaerungsbeduerftig vor Impl."
+        ]
+      },
+      {
+        "findings": [
+          {
+            "q": "(1) Welche konkreten Filter-Glieder (CoR-Handler) ergeben sich aus der Auswertungs-Logik? Benenne 3-6 Handler mit Kriterium (nur aus Doc 20/21 + Bestand ableitbar).",
+            "a": "Fuenf Handler sind belegbar ableitbar, jeder verankert in einem bestehenden CEB-Baustein bzw. einer Doc-20/21-Entscheidung (keiner erfunden):\n\nH1 ValidityHandler / Mess-Ehrlichkeits-Filter — Kriterium: Kandidat-Permutation MUSS eine ehrliche Messzeile haben. Reject, wenn die Messzeile NICHT two_phase_valid ist (bzw. MeasuredDelta.valid==false). Erweitert um Doc-20-§D: Reject, wenn die 3-Varianten-Observer-Differenz (alle Tiere / nur Heuristik-Tier / kein Observer) einen Messfehler-durch-Messinstanz signalisiert. Anker: best_binary_selector.hpp:81/145 (rank ueber NUR two_phase_valid), Doc 20 §D:47-52, §E:67.\n\nH2 AlreadyBuiltHandler / Bereits-gebaut-Filter — Kriterium: Reject/Skip (pass-to-next mit skip-Marke), wenn die perm.dll existiert UND ihr .version-Sidecar versions-aktuell ist (dll_is_current). Sonst pass-to-next zum Bauen. Anker: build_orchestrator.hpp:166 dll_is_current, :99/:110 BuildResult.skipped/BuildStats.skipped (Inkrement/Resume KF-16b).\n\nH3 ResourceBudgetHandler / Ressourcen-Budget-Filter — Kriterium: Kandidat nur weiterreichen, wenn sein Bau/Betrieb ins RAM-/Cap-Budget passt; Reject/Defer bei Ueberschreitung. Anker: build_orchestrator.hpp:290-307 RAM-Admission ((active+1)*ram_per_build_bytes+safety_margin > baseline_free), BuildConfig.ram_per_build_bytes:60; Cap-Klammerung im Pruef-Dock (cacheline_policy_selector clamp an Caps 64/64/1GiB/4096/256).\n\nH4 PaperComparisonHandler / Schlechter-als-Paper-Filter (SOTA-Vorrang) — Kriterium: Reject jede Permutation, die auf Wall-Clock schlechter ist als der bekannte Paper-/SOTA-Algorithmus fuer dasselbe Lastprofil. Geht VOR der Permutations-internen Rangbildung. Anker: Doc 20 §D:54-57 (\"Vergleich rein an der Wall-Clock gegen alle Permutationen UND bekannte Paper-Algorithmen; der Paper-Vergleich geht vor\"), §E:68 (sota_catalog, Pfad A/B); Bestand sota_catalog.hpp, algorithm_profiles/sota/.\n\nH5 DominanceHandler / Pareto-Filter — Kriterium: Unter den ueberlebenden Kandidaten je Typsystem-Schluessel (framework x workload x op x size) nur die NICHT-dominierte Menge (Pareto-Front) passieren lassen; dominierte reject. Metrik/Objective ist Strategy-gekapselt (ns kleiner=besser). Anker: Doc 21 §B H6:49 (Pareto-Front statt Einzel-Objective, Blatt tuple<property,time,objective_tag>), best_binary_selector.hpp:93/118 Metric/RankingCriterion, :135 RankedBinary.median_value.\n\nTerminal (Senke, kein Filter): die Ueberlebenden werden als BuildSelection.indices an provision_all(view, selection) uebergeben = \"welche Permutationen als Naechstes gebaut\" (build_orchestrator.hpp:198). Das ist der CoR-Ausgang, keine eigenstaendige Filterstufe.",
+            "evidence": "best_binary_selector.hpp:81 (two_phase_valid), :93 enum Metric, :118 RankingCriterion, :135 RankedBinary, :145 (\"NUR two_phase_valid-Zeilen\"); build_orchestrator.hpp:166 dll_is_current, :198 provision_all(view,selection), :282-307 (Skip + RAM-Admission), BuildConfig:60 ram_per_build_bytes; cacheline_policy_selector.hpp clamp/Caps; Doc 20 §D:47-57, §E:66-68; Doc 21 §B H6:49."
+          },
+          {
+            "q": "(2) Wie kodiert die Kette den Paper-Vergleich-Vorrang (Doc 20 §D: Paper geht vor)?",
+            "a": "Der Vorrang wird als POSITION in der geordneten Kette kodiert, nicht als Gewicht: Doc 20 §D verlangt woertlich, den Paper-Vergleich \"in die Auswertungs-Reihenfolge\" zu kodieren, und CoR IST eine geordnete Reihenfolge. Konkret steht der PaperComparisonHandler (H4) VOR dem Pareto-/Dominanz-Handler (H5). Damit gilt: eine Permutation, die gegen den bekannten Paper-/SOTA-Algorithmus auf Wall-Clock verliert, wird von H4 rejected BEVOR sie ueberhaupt in die permutations-interne Pareto-/Rang-Auswertung gelangt. Nur paper-schlagende Kandidaten fliessen an H5 weiter. Der Paper-Vergleich ist ausdruecklich der komplementaere 4. Schritt OHNE Mikro-/Makro-Benchmarks + Observer (reine Wall-Clock), also nutzt H4 eine andere, observer-freie Messgroesse als die inneren Handler — das unterstreicht seine Vorschaltung.",
+            "evidence": "Doc 20 §D:54-57 (\"komplementaer OHNE Mikro-/Makro-Benchmarks und Observer ... Vergleich rein an der Wall-Clock gegen ... bekannte Paper-Algorithmen; der Paper-Vergleich geht vor\"); Task-Vorgabe \"Vorrang in die Auswertungs-Reihenfolge kodieren\"; CoR = geordnete Kette (GoF)."
+          },
+          {
+            "q": "(3) Reihenfolge der Handler (CoR = geordnete Kette)?",
+            "a": "Abgeleitete Ordnung nach Guenstig-/Gating-Logik (billige Ausschluesse zuerst, teure Rangbildung zuletzt; Paper-Vorrang vor Eigen-Ranking):\n1. H1 ValidityHandler — Mess-Ehrlichkeit zuerst: ohne gueltige Messung/ohne bestandene 3-Varianten-Pruefung ist jeder weitere Vergleich sinnlos.\n2. H2 AlreadyBuiltHandler — Build-Zustand: versions-aktuelle DLLs als skip markieren (Resume), Rest weiterreichen; billiges Dateisystem-/Sidecar-Praedikat.\n3. H3 ResourceBudgetHandler — infeasible (RAM/Cap-sprengend) verwerfen/deferren, bevor teuer ausgewertet wird.\n4. H4 PaperComparisonHandler — SOTA-Vorrang: paper-unterlegene Permutationen raus, VOR jeder Eigen-Rangbildung (Doc 20 §D).\n5. H5 DominanceHandler/Pareto — unter den Ueberlebenden je Schluessel die Pareto-Front behalten.\n-> Terminal: Ueberlebende = BuildSelection.indices fuer provision_all (naechste Generierung).\nDiese Ordnung ist eine begruendete Ableitung; die einzige HART belegte Reihenfolge-Vorgabe aus den Docs ist H4 vor H5 (Paper geht vor). Die relative Stellung von H1-H3 ist plausibel, aber nicht doc-erzwungen (siehe offene Punkte).",
+            "evidence": "Doc 20 §D:57 (Paper vor Eigen-Vergleich = H4 vor H5); build_orchestrator Reihenfolge im worker: erst dll_is_current-Skip (:282) dann RAM-Admission (:290) = H2 vor H3 im Bestand; best_binary_selector rankt nur valide Zeilen (:145) = H1 als Vorbedingung des Rankings H5."
+          },
+          {
+            "q": "(4) Was ist das Handler-Interface (Kandidat rein -> {pass/reject/pass-to-next} + Begruendung)?",
+            "a": "Modell nach GoF-CoR, an den bestehenden Rueckgabe-/Begruendungs-Mustern des Codebestands ausgerichtet:\n\nEingang (Kandidat) = eine Permutations-Identitaet plus ihr Auswertungs-Kontext: binary_id (die 19-Achsen-Perm-ID wie in BuildJob.binary_id / MeasurementRow.binary_id), optional die zugehoerige(n) MeasurementRow(s) samt two_phase_valid, der Build-Zustand (perm.dll + .version), und die geschaetzten Ressourcen-Kosten.\n\nAusgang = ein Verdikt {Pass | Reject | PassToNext} + Begruendungs-String. Das spiegelt die schon existierenden Muster: BuildResult{status, skipped, message} (message z.B. \"uebersprungen (Version aktuell)\", \"compile-exit N\") und das optional<ShippedArtifact>+error-Muster des ShippedArtifactBuilder.\n\nSkizze (cold-path, Handler-Objekte erlaubt):\n  struct FilterVerdict { enum { Pass, Reject, PassToNext } decision; std::string reason; };\n  struct PermutationCandidate { std::string binary_id; std::optional<MeasurementRow> row; /* build-state, cost */ };\n  struct FilterHandler { const FilterHandler* next=nullptr; virtual FilterVerdict handle(PermutationCandidate const&) const = 0; };\n\nDie eigentlichen Kriterien innerhalb eines Handlers sind Strategy-gekapselt (H5 traegt ein RankingCriterion/PolicyObjective, H4 ein Wall-Clock-SOTA-Kriterium) — genau das Strategy-Vorbild aus cacheline_policy_selector (ScanOptimizing/LatencyOptimizing) und best_binary_selector (RankingCriterion.value_of).",
+            "evidence": "build_orchestrator.hpp:95-103 BuildResult{status,skipped,message,ok()}, :285 message \"uebersprungen (Version aktuell)\", :321 \"compile-exit\"; best_binary_selector.hpp:118-132 RankingCriterion.value_of (Strategy), :185 build()->optional+error; cacheline_policy_selector.hpp ScanOptimizing/LatencyOptimizing (Strategy-Punkt)."
+          },
+          {
+            "q": "(5) Ist die Kette compile-time-statisch (Typ-Liste von Handlern) oder runtime-konfigurierbar?",
+            "a": "Runtime-konfigurierbare Kette aus Handler-Objekten (klassische GoF-CoR) — NICHT eine compile-time-Typliste. Begruendung strikt aus den Grenzen: die compile-time-strikte/zero-cost-Doktrin (P1, kein vtable/Runtime-Switch) gilt nur im GEMESSENEN Hot-Path; die CoR ist aber Generierungs-Steuerung im Cold-Path/Build-Time (Doc 20 §C: Auswertung->Filter->welche Permutationen gebaut/verworfen). Die Task-Grenze erlaubt hier ausdruecklich \"eine klassische CoR mit Handler-Objekten, solange sie nicht im gemessenen Hot-Path liegt\". Zusaetzlich belegt der Bestand runtime-Struktur: RankingCriterion und PolicyObjective sind runtime-Structs (kein NTTP), die Auswertung liest CSV zur Laufzeit (best_binary_selector), und Doc 21 §A:24 rahmt die Ablauf-Dimension (bauen->messen->auswerten->Hybrid) als Builder-ueber-State-Pattern — d.h. je CEB-Modus (Mess/Auswertung/Arbeit/Hybrid) kann eine andere Kette komponiert werden. Konsequenz: Kette + Handler-Reihenfolge sind laufzeit-komponiert (ggf. je Messmodus verschieden), die einzelnen Kriterien sind Strategy-swappable. Eine compile-time-Typliste waere nur bei echtem Hot-Path-Bedarf gerechtfertigt — der hier nicht besteht.",
+            "evidence": "Doc 20 §C:41-46 (CoR strikt im CacheEngineBuilder fuer Generierungs-Kontrolle = cold/build-time), §E:66 (\"zero-cost/compile-time wo Hot-Path\" — Konditional); Task-Grenze (klassische CoR mit Handler-Objekten zulaessig ausser Hot-Path); best_binary_selector.hpp:118 RankingCriterion als runtime-struct, :143 parse_measurement_csv (runtime); Doc 21 §A:24 (Builder ueber State fuer die Ablauf-Dimension)."
+          }
+        ],
+        "open_questions": [
+          "Granularitaet der Kette: EINE globale CoR-Instanz oder je Typsystem-Schluessel (framework x workload x op x size, Doc 20 §B-Baum) eine eigene Ketten-Instanz? best_binary_selector rankt bereits je Metrik/Schluessel — nicht entschieden, ob die CoR pro Blatt oder global laeuft.",
+          "Reject-vs-Defer-Semantik von H3 (ResourceBudget): im Bestand ist die RAM-Admission ein SCHEDULER (build_orchestrator cv.wait blockiert/deferred, verwirft NICHT), nicht ein Filter der eine Permutation dauerhaft ausschliesst. Ob der Budget-Handler in der Auswertungs-CoR hart rejected oder nur deferred, ist nicht doc-belegt.",
+          "H4 Paper-Vergleich: hartes Reject (Permutation ganz raus) ODER nur Deprioritisierung/Tag (Vorrang in der Reihenfolge, aber weiter mitgefuehrt)? Doc 20 §D sagt \"geht vor\" (Reihenfolge), nicht zwingend Hart-Schnitt.",
+          "Schwellwert der 3-Varianten-Observer-Messfehler-Erkennung in H1 (wie gross muss die Varianten-Differenz sein, um zu rejecten) ist nicht quantifiziert und DATA-gated (#156/#215).",
+          "Relative Reihenfolge H1-H3 ist eine plausible Ableitung, aber nur H4-vor-H5 ist doc-erzwungen; die uebrige Ordnung braucht eine User-/Design-Entscheidung.",
+          "Build-Order unter der Pareto-Front (H5 liefert eine Front-MENGE je Schluessel, H6): in welcher Reihenfolge die nicht-dominierten Ueberlebenden als Naechstes gebaut werden, ist nicht spezifiziert.",
+          "IST = 0 Code-Treffer fuer die CoR (Doc 20 §E:66) — die gesamte Ableitung ist SOLL; eine Kollision mit realen Interfaces kann erst bei Impl. (E4'-/Arbeitsmodus-Strecke) verifiziert werden."
+        ]
+      }
+    ],
+    "design": {
+      "recommendation": "Klassische GoF Chain of Responsibility mit Handler-Objekten (cold-path/build-time), NICHT als compile-time Typ-Liste. Neue Reduktionsstufe S4 (mess-getrieben) als Geschwister-Header experiment_tree/selection_filter_chain.hpp neben coverage_selection.hpp: sie konsumiert die Auswertung (RankedBinary/MeasurementRow, join ueber binary_id) plus die aktuelle Kandidaten-BuildSelection und liefert eine reduzierte BuildSelection fuer die naechste provision_all-Runde. Damit wird exakt die heute fehlende Feedback-Kante Auswertung->Generierung geschlossen (verifiziert: 0 Treffer fuer rank_binaries ausserhalb best_binary_selector; RankedBinary fliesst heute nur in [ship], nie in eine BuildSelection). ERSTER EIGENSTAENDIGER SLICE (kleinstmoeglich, deterministisch, boundary-sicher): (a) das Ketten-Geruest FilterVerdict{Pass|Reject|PassToNext, reason} + abstrakter FilterHandler mit successor-Link + freier Runner run_selection_filter_chain(); (b) ZWEI vollstaendig belegte Kern-Handler: H1 ValidityHandler (Praedikat two_phase_valid == genau das Kriterium, das rank_binaries schon nutzt, best_binary_selector.hpp:145) und H2 AlreadyBuiltHandler (injizierbares is_current-Praedikat, spiegelt dll_is_current build_orchestrator.hpp:166; Injektion nach Vorbild MeasureFn e2e_pipeline.hpp:24, damit filesystem-frei testbar); (c) Unit-Test test_d15_selection_filter_chain.cpp mit Mock-Kandidaten. H3/H4/H5 sind aus dem Slice AUSGESCHLOSSEN (H4 datentraeger-los: sota_catalog existiert NICHT im Baum; H3 reject-vs-defer ungeklaert; H5 braucht Pareto-Strategy) und werden additiv als weitere Kettenglieder nachgezogen, sobald ihre Datenquellen/Semantik geklaert sind.",
+      "handlers": [
+        "H1 ValidityHandler (SLICE) — Reject, wenn der Kandidat keine two_phase_valid-Messzeile hat (Mess-Ehrlichkeit zuerst; identisch zum Filter in rank_binaries best_binary_selector.hpp:145). Kriterium billig + doc-belegt, ohne Datenluecke.",
+        "H2 AlreadyBuiltHandler (SLICE) — PassToNext mit Skip-Marke, wenn perm.dll existiert UND .version aktuell (injiziertes is_current-Praedikat, spiegelt dll_is_current build_orchestrator.hpp:166; Resume KF-16b). Sonst PassToNext zum Bauen.",
+        "H3 ResourceBudgetHandler (DEFER, nicht Slice) — RAM/Cap-Budget; im Bestand ist die RAM-Admission ein SCHEDULER (cv.wait/defer, build_orchestrator.hpp:290-307), KEIN Hart-Filter. Reject-vs-Defer nicht doc-belegt -> erst nach Klaerung.",
+        "H4 PaperComparisonHandler (DEFER, nicht Slice) — Reject jede Permutation, die auf Wall-Clock schlechter als der bekannte Paper/SOTA-Algo ist; MUSS vor H5 stehen (Doc 20 §D 'Paper geht vor'). BLOCKER: sota_catalog.hpp existiert NICHT im Baum (find: 0 Treffer) -> Datenquelle fehlt, data-gated.",
+        "H5 DominanceHandler/Pareto (DEFER, nicht Slice) — je Typsystem-Schluessel (framework x workload x op x size) nur die nicht-dominierte Pareto-Front passieren lassen; Metrik Strategy-gekapselt via RankingCriterion (best_binary_selector.hpp:118). Nach H4."
+      ],
+      "handler_interface": "GoF-CoR, an bestehende Rueckgabe-/Begruendungs-Muster angelehnt (BuildResult{status,message} build_orchestrator.hpp:95, optional+error ShippedArtifactBuilder). Cold-path -> Handler-Objekte erlaubt. Skizze (header-only C++23): struct FilterVerdict { enum Decision { Pass, Reject, PassToNext } decision; std::string reason; }; struct PermutationCandidate { std::string binary_id; std::optional<MeasurementRow> row; }; class FilterHandler { const FilterHandler* next_ = nullptr; public: void set_next(const FilterHandler* n){ next_ = n; } FilterVerdict dispatch(PermutationCandidate const& c) const { auto v = handle(c); return (v.decision==FilterVerdict::PassToNext && next_) ? next_->dispatch(c) : v; } protected: virtual FilterVerdict handle(PermutationCandidate const&) const = 0; }; Kandidat rein = binary_id (der 19-Achsen-Join-Schluessel, BinarySpec.binary_id experiment_tree.hpp:225) + optionale MeasurementRow; Verdikt raus = {Pass/Reject/PassToNext} + Begruendungs-String (fuellt die BuildSelection.provenance-Audit-Kette fort, kein stilles Truncaten Doc 28 §0). Kriterien innerhalb eines Handlers sind Strategy-swappable (RankingCriterion/PolicyObjective).",
+      "chain_mechanism": "RUNTIME-komponierte GoF-CoR aus Handler-Objekten (successor-Link), NICHT compile-time Typ-Liste. Begruendung strikt aus den Grenzen: die zero-cost/compile-time-strikte Doktrin (kein vtable/Runtime-Switch) bindet NUR den gemessenen Hot-Path; diese Kette ist Generierungs-Steuerung im Cold-Path/Build-Time (Doc 20 §C, laeuft zwischen Mess-Runde und naechstem provision_all, ausserhalb do_batch). Bestand belegt Runtime-Struktur: RankingCriterion/PolicyObjective sind Runtime-Structs (kein NTTP), CSV wird zur Laufzeit gelesen. Komposition: der Runner run_selection_filter_chain(view, in_selection, ordered_handlers, candidate_rows) verdrahtet eine geordnete std::vector<const FilterHandler*> via set_next, laeuft je Kandidat-Index durch dispatch() und sammelt die Pass-Ueberlebenden in eine neue BuildSelection.indices (+ provenance 'filtered:v/ab'). Je CEB-Modus (Mess/Auswertung/Arbeit/Hybrid, Doc 21 §A Builder-ueber-State) kann eine andere Kette komponiert werden. Compile-time Typ-Liste waere nur bei echtem Hot-Path-Bedarf gerechtfertigt — der hier nicht besteht.",
+      "integration_point": "Einhaengung an der heute fehlenden Kante Auswertung->Generierung. Neuer Header: Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/selection_filter_chain.hpp (Geschwister zu coverage_selection.hpp, namespace comdare::cache_engine::builder::experiment) = Reduktionsstufe S4. Ausgang der Kette = reduzierte BuildSelection, re-injiziert am Bau-Eingang build_orchestrator.hpp:198 (provision_all(view, selection)) fuer die naechste Bau-Runde; konsumiert identisch zum bestehenden Selektions-Konsum e2e_pipeline.hpp:36 (run_e2e_pipeline nimmt span<const size_t> selection). Join-Schluessel Auswertung<->Generierung = binary_id (best_binary_selector.hpp:50-53 == build_orchestrator.hpp:153).",
+      "change_surface": [
+        "NEU Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/selection_filter_chain.hpp (~120 Z, header-only C++23): FilterVerdict + FilterHandler(successor) + ValidityHandler(H1) + AlreadyBuiltHandler(H2, injiziertes is_current) + run_selection_filter_chain() -> BuildSelection",
+        "NEU Code/external/comdare-cache-engine/tests/unit/test_d15_selection_filter_chain.cpp: Mock-Kandidaten/MeasurementRows, prueft: invalide two_phase_valid->Reject, aktuelle DLL->Skip-Marke, gueltig+ungebaut->Pass; Ueberlebende->neue BuildSelection.indices + provenance",
+        "EDIT Code/external/comdare-cache-engine/tests/unit/CMakeLists.txt:1500 — eine Zeile 'test_d15_selection_filter_chain' in COMDARE_GOALV6_LIGHT_DTESTS aufnehmen (vor der schliessenden Klammer); Test-Wiring identisch zu test_d1_d2_selection/test_d14c_e2e_pipeline (foreach add_executable, cxx_std_23, COMDARE_TEST_TARGETS-Property, LABELS goal_v6;phase_d)"
+      ],
+      "boundary_compliance": "EINGEHALTEN. TABU unberuehrt: golden_fullpilot_320/permutation_axes.xml/POD sizeof==1416/GenusBindingTraits/ABI-MAJOR==4/Registry-mp_list werden nicht angefasst; build_orchestrator.hpp, best_binary_selector.hpp, coverage_selection.hpp, experiment_tree.hpp bleiben unveraendert (rein additiver Geschwister-Header + neuer Test + 1 CMake-Zeile). Cold-path: die Kette liegt nachweislich NICHT im gemessenen Hot-Path (nicht in do_batch; apply_to laeuft einmalig vor run(), cacheline_policy_selector.hpp:32-34) -> klassische GoF-CoR mit Handler-Objekten zulaessig, kein Runtime-Switch/vtable im Hot-Path verletzt. Nur benannte Lehrbuch-Patterns: CoR (GoF) fuer die Kette, Strategy (bestehend RankingCriterion) fuer Kriterien. Monolith-first: neuer Header im bestehenden builder-Modul, kein neuer Split. Kein Python (header-only C++23 wie Umgebung). Provenance-Audit fortgeschrieben (kein stilles Truncaten, Doc 28 §0). Selbst-implementierbar.",
+      "risks": [
+        "BLOCKER fuer H4: sota_catalog.hpp existiert NICHT im Baum (find liefert 0 Treffer) — entgegen der Research-Behauptung. H4 PaperComparison hat keine Wall-Clock-Referenzquelle; Datenquelle (CSV-Spalte/Katalog) muss ZUERST erzeugt werden, bevor der doc-erzwungene 'Paper-vor-Eigen-Ranking'-Vorrang implementierbar ist.",
+        "Reihenfolge: nur H4-vor-H5 ist doc-erzwungen (Doc 20 §D). Relative Stellung H1-H2-H3 ist plausible Ableitung (billig/Gating zuerst), aber NICHT doc-belegt -> User-/Design-Bestaetigung noetig.",
+        "H3 Semantik-Konflikt: Bestands-RAM-Admission ist ein Scheduler (cv.wait/defer build_orchestrator.hpp:290-307), kein Hart-Filter. Ob der Budget-Handler rejected oder nur deferred, ist offen -> H3 bewusst aus Slice 1 heraus.",
+        "H4 Hart-Schnitt vs. Deprioritisierung: Doc 20 §D sagt 'geht vor' (Reihenfolge), nicht zwingend Reject -> Semantik klaerungsbeduerftig.",
+        "H1-Erweiterung (3-Varianten-Observer-Messfehler-Schwelle) ist quantitativ unbestimmt und DATA-gated (#156/#215) — Slice 1 nutzt NUR das schlichte two_phase_valid-Praedikat, nicht die Varianten-Differenz.",
+        "Ketten-Granularitaet (eine globale Kette vs. je Typsystem-Schluessel framework x workload x op x size) ist nicht entschieden -> Slice 1 laeuft global ueber eine Kandidatenmenge; Per-Key-Wrapping ist additiv nachruestbar.",
+        "Gesamte Ableitung ist SOLL (0 Code-Treffer fuer die CoR, Doc 20 §E): eine Kollision mit realen Interfaces der E4'-/Arbeitsmodus-Strecke ist erst bei Impl. voll verifizierbar."
+      ]
+    },
+    "critiques": [
+      {
+        "verdict": "NEEDS-REVISION",
+        "issues": [
+          {
+            "severity": "major",
+            "issue": "FALSCHE IST-VERIFIKATION (H4-Blocker-Begruendung ungueltig): Die Behauptung 'sota_catalog.hpp existiert NICHT im Baum (find liefert 0 Treffer)' ist falsch. Die Datei existiert: Code/external/comdare-cache-engine/tests/unit/thesis_tiere/sota_catalog.hpp (und Doc 20 §E-Tabelle nennt sie ausdruecklich als Anker). Der reale H4-Datenmangel ist ein ANDERER: sota_catalog ist ein MATERIALISIERUNGS-Katalog (binary_id -> Modul-Quelltext zum BAUEN der SOTA/PRT-ART-Kompositionen), enthaelt aber KEINE Wall-Clock-Referenz-Zeiten der Paper-Algorithmen. Der §D-Paper-Vergleich braucht eine Wall-Clock-Referenzquelle, die es tatsaechlich nicht gibt - aber die vorgetragene 'belegte' Evidenz ist demonstrierbar falsch und untergraebt die Rigorositaet der gesamten IST-Verifikation. Begruendung neu und korrekt fassen."
+          },
+          {
+            "severity": "major",
+            "issue": "CoR-Terminalsemantik in sich widerspruechlich (Mechanik-Defekt, nicht nur Skizze): dispatch() gibt am Ketten-Ende (next_==nullptr) das Handler-Verdikt unveraendert zurueck - also PassToNext, wenn der letzte Handler PassToNext liefert. Der Runner sammelt aber laut Beschreibung die 'Pass-Ueberlebenden'. H1 liefert (gueltig) PassToNext, H2 liefert LAUT Beschreibung IMMER PassToNext ('PassToNext zum Bauen' bzw. 'PassToNext mit Skip-Marke') - kein Handler emittiert je terminal Pass. Damit hat jeder Ueberlebende am Ende Verdikt PassToNext, und der Runner wuerde NULL Kandidaten sammeln. Zudem: emittiert ein frueher Handler terminal Pass, werden nachgelagerte Filter uebersprungen (falsch fuer eine UND-verknuepfte Filterkette). Die Ueberlebens-Regel ('Ende ohne Reject erreicht => survive') ist nicht definiert. Ohne diese Praezisierung ist es zwar strukturell ein echter CoR, aber ein nicht funktionierender."
+          },
+          {
+            "severity": "major",
+            "issue": "H1-Kriteriumsrichtung importiert Auswertungs-Semantik in die GENERIERUNGSsteuerung ohne Rechtfertigung - genau die zu pruefende Verwechslung auf Kriteriumsebene. In rank_binaries (best_binary_selector.cpp:90) schliesst '!two_phase_valid -> continue' invalide Zeilen aus dem RANKING aus (korrekt: kein invalider Sieger). In der Generierungssteuerung (Doc 20 §C: 'welche Permutationen werden als Naechstes gebaut/verworfen') bedeutet H1-Reject-bei-invalid jedoch, dass eine Permutation mit fehlgeschlagener Messung dauerhaft vom Neubau AUSGESCHLOSSEN wird - obwohl eine invalide Messung eher fuer Re-Build/Re-Messung spricht. Dieselbe Praedikat-Semantik hat in Selektion vs. Generierung entgegengesetzte Wirkung; die Uebernahme wird nicht begruendet. (Nebenbefund minor: H1 repliziert nur two_phase_valid, nicht den zweiten Filter v<=0 = 'Metrik nicht ausgeuebt', den rank_binaries ebenfalls anwendet.)"
+          },
+          {
+            "severity": "major",
+            "issue": "H2 AlreadyBuiltHandler: (a) NICHT aus Doc 20 §C/§D ableitbar - Build-Cache-/Resume-Skip ist rein operativ, kein Thesis-Filterkriterium; (b) dupliziert bestehende Orchestrator-Logik: provision_core ueberspringt versions-aktuelle DLLs bereits selbst (build_orchestrator.hpp:282-288, dll_is_current:166, r.skipped=true) VOR der RAM-Admission; (c) H2 liefert laut Beschreibung immer PassToNext, verwirft also NIE einen Kandidaten - es reduziert die BuildSelection nicht und ist damit ein Annotator, kein Filter. Damit besteht der erste Slice aus einem richtungs-fragwuerdigen Handler (H1) und einem nicht-thesis-abgeleiteten, redundanten Nicht-Filter (H2)."
+          },
+          {
+            "severity": "major",
+            "issue": "Der Slice deckt KEIN thesis-spezifisches Filterkriterium ab: Das EINZIGE doc-erzwungene §D-Kriterium ('der Paper-Vergleich geht VOR') ist als H4 vollstaendig aus dem Slice ausgeschlossen, ebenso H5. Der Slice liefert nur das Geruest plus die beiden schwaechsten Handler. Zusaetzlich Scope-Konflation: §D verortet den Paper-Vergleich im '4. Schritt der heuristischen FINALEN ZUSAMMENSTELLUNG' (Wall-Clock der ohne Observer neu gebauten Heuristik-Tier-Binaries) - das ist final-assembly-/selektionsnah, waehrend §C die reine Generierungssteuerung meint. H4 unbesehen als Generierungsfilter zu kodieren vermischt §C und §D-Schritt-4; die Semantik 'geht vor' (Reihenfolge-Vorrang) ist zudem laut Proposal selbst nicht zwingend Reject. §D ist damit weder kodiert noch semantisch geklaert."
+          },
+          {
+            "severity": "minor",
+            "issue": "Zitations-Ungenauigkeit: 'two_phase_valid == genau das Kriterium ... best_binary_selector.hpp:145' verweist auf einen Doku-Kommentar der Deklaration; der reale Filter steht in best_binary_selector.cpp (~Zeile 92, 'if (!r.two_phase_valid) continue;'). Substanz korrekt, aber die belegte Zeilenreferenz zeigt nicht auf den Code."
+          }
+        ]
+      },
+      {
+        "verdict": "SOUND",
+        "issues": [
+          {
+            "severity": "major",
+            "issue": "Faktenfehler in der Risiko-/IST-Verifikation: Der Vorschlag behauptet als H4-BLOCKER 'sota_catalog.hpp existiert NICHT im Baum (find liefert 0 Treffer)'. Die Datei existiert real unter Code/external/comdare-cache-engine/tests/unit/thesis_tiere/sota_catalog.hpp (Materialisierungs-Domaene der benannten SOTA-Kompositionen + PRT-ART). Der Slice (H1+H2) ist davon unberuehrt und bleibt implementierbar, aber die Deferral-Begruendung fuer H4 ist auf einer falschen IST-Aussage aufgebaut (verstoesst gegen die 'nie raten, gegen Ist-Stand verifizieren'-Doktrin). Zu klaeren bleibt separat, ob sota_catalog eine Wall-Clock-Referenzquelle liefert (es ist ein Quell-/Materialisierungskatalog, keine Messreferenz) - die Substanz des H4-Deferrals kann trotzdem bestehen, die konkrete '0 Treffer'-Behauptung ist aber falsch."
+          },
+          {
+            "severity": "minor",
+            "issue": "Kompilations-Vorsicht fuer den LIGHT-Testtarget: best_binary_selector.hpp deklariert rank_binaries()/parse_measurement_csv() im Header, definiert sie aber in best_binary_selector.cpp, die NICHT im COMDARE_GOALV6_LIGHT_DTESTS-Include/Link-Satz haengt. Der neue Header/Test darf ausschliesslich die Struct MeasurementRow (Feld two_phase_valid) verwenden und KEINE dieser Funktionen aufrufen, sonst Link-Fehler. Der Vorschlag beschreibt genau das (schlichtes two_phase_valid-Praedikat), sollte aber explizit sicherstellen, dass keine .cpp-Definition referenziert wird."
+          }
+        ]
+      }
+    ]
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Research"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Design"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Critique"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "research:ceb-flow",
+      "phaseIndex": 1,
+      "phaseTitle": "Research",
+      "agentId": "a92f23e341d650199",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783740589634,
+      "queuedAt": 1783740589626,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist CEB-Flow-Forscher. Lies /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/build_orchestrator/build_orchestrator.hpp + best_binary_selector/best_binary_selector.hpp + cacheline_policy/cacheline_policy_selector.hpp.\nBEANTWORTE (datei:zeile): (1) Wie fliesst heute die Auswertung (best_binary_selector Ranking) in die G…",
+      "lastProgressAt": 1783740701649,
+      "tokens": 54400,
+      "toolCalls": 9,
+      "durationMs": 112015,
+      "resultPreview": "{\"findings\":[{\"q\":\"(1) Wie fliesst heute die Auswertung (best_binary_selector Ranking) in die Generierung (build_orchestrator BuildJob/provision)? Wo wird aus Permutations-Kandidaten eine Teilmenge zum Bauen ausgewaehlt (CoR-Einbauort)?\",\"a\":\"GAR NICHT — es gibt heute KEINEN Rueckfluss Auswertung -> Generierung. Zwei getrennte Halbkreise: (A) GENERIERUNG: BuildOrchestrator::provision_all(view, sel…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "research:cor-handlers",
+      "phaseIndex": 1,
+      "phaseTitle": "Research",
+      "agentId": "a393418698dad24f4",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783740589634,
+      "queuedAt": 1783740589626,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist CoR-Handler-Forscher (Thesis-Sinn). Aus Doc 20 §C/§D + dem Diplomarbeits-Ziel (heuristische Tier-Binary-Auswahl, Paper-Vergleich-Vorrang) leite ab, WELCHE Filter-Glieder (CoR-Handler) die Kette haben MUSS und mit welchen Pass/Reject-Kriterien. Lies /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/architektur/20_HEURISTIK_MESSKURVEN_TYPSYSTEM_UND_FILTERKETTE.md (§C:41-4…",
+      "lastProgressAt": 1783740744976,
+      "tokens": 62076,
+      "toolCalls": 7,
+      "durationMs": 155341,
+      "resultPreview": "{\"findings\":[{\"q\":\"(1) Welche konkreten Filter-Glieder (CoR-Handler) ergeben sich aus der Auswertungs-Logik? Benenne 3-6 Handler mit Kriterium (nur aus Doc 20/21 + Bestand ableitbar).\",\"a\":\"Fuenf Handler sind belegbar ableitbar, jeder verankert in einem bestehenden CEB-Baustein bzw. einer Doc-20/21-Entscheidung (keiner erfunden):\\n\\nH1 ValidityHandler / Mess-Ehrlichkeits-Filter — Kriterium: Kandid…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "design:synth",
+      "phaseIndex": 2,
+      "phaseTitle": "Design",
+      "agentId": "a34b074d43b67b46f",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783740744984,
+      "queuedAt": 1783740744976,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Klassische GoF Chain of Responsibility mit Handler-Objekten…",
+      "promptPreview": "Design-Synthesizer. Aus der Research: das SAUBERSTE, benannte-Pattern-treue (CoR/GoF), boundary-konforme Design fuer die Filterkette im CEB. Entscheide: Handler-Set (3-6, nur ableitbar), Handler-Interface, Ketten-Mechanismus (compile-time Typ-Liste bevorzugt wenn zero-cost gefordert), Integrations-Punkt, minimale Change-Surface (datei:zeile), einen EIGENSTAENDIGEN ersten Slice (die Kette + 1-2 Ker…",
+      "lastProgressAt": 1783740903632,
+      "tokens": 49968,
+      "toolCalls": 13,
+      "durationMs": 158647,
+      "resultPreview": "{\"recommendation\":\"Klassische GoF Chain of Responsibility mit Handler-Objekten (cold-path/build-time), NICHT als compile-time Typ-Liste. Neue Reduktionsstufe S4 (mess-getrieben) als Geschwister-Header experiment_tree/selection_filter_chain.hpp neben coverage_selection.hpp: sie konsumiert die Auswertung (RankedBinary/MeasurementRow, join ueber binary_id) plus die aktuelle Kandidaten-BuildSelection …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "critique:thesis",
+      "phaseIndex": 3,
+      "phaseTitle": "Critique",
+      "agentId": "ae7e586e3e09b0566",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783740903642,
+      "queuedAt": 1783740903634,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NEEDS-REVISION",
+      "promptPreview": "ADVERSARIAL Thesis-Fit: Sind die Handler + Kriterien WIRKLICH aus Doc 20 §C/§D + dem Diplomarbeits-Ziel abgeleitet (nicht erfunden)? Ist der Paper-Vergleich-Vorrang (§D) korrekt kodiert? Filtert die Kette tatsaechlich die GENERIERUNG (welche Permutationen gebaut werden), oder verwechselt sie das mit der finalen Auswahl (best_binary_selector)? Ist es ein echter CoR (geordnete Handler, jeder pass/re…",
+      "lastProgressAt": 1783741113684,
+      "tokens": 63983,
+      "toolCalls": 9,
+      "durationMs": 210042,
+      "resultPreview": "{\"verdict\":\"NEEDS-REVISION\",\"issues\":[{\"severity\":\"major\",\"issue\":\"FALSCHE IST-VERIFIKATION (H4-Blocker-Begruendung ungueltig): Die Behauptung 'sota_catalog.hpp existiert NICHT im Baum (find liefert 0 Treffer)' ist falsch. Die Datei existiert: Code/external/comdare-cache-engine/tests/unit/thesis_tiere/sota_catalog.hpp (und Doc 20 §E-Tabelle nennt sie ausdruecklich als Anker). Der reale H4-Datenman…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "critique:boundary",
+      "phaseIndex": 3,
+      "phaseTitle": "Critique",
+      "agentId": "a6831c1fc9591f344",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783740903643,
+      "queuedAt": 1783740903634,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "SOUND",
+      "promptPreview": "ADVERSARIAL Boundary/Bau: golden/POD/mp_list/ABI beruehrt? Ist die Change-Surface an realen datei:zeile (keine Phantom-Zeilen)? Kompiliert der Vorschlag (Typen existieren)? Ist der compile-time-Anspruch erfuellt wo Hot-Path, ODER liegt die CoR im cold-path (dann Handler-Objekte ok)? Bricht der Integrations-Punkt bestehende build_orchestrator/best_binary_selector-Consumer? Ist der erste Slice eigen…",
+      "lastProgressAt": 1783741025440,
+      "tokens": 47057,
+      "toolCalls": 8,
+      "durationMs": 121797,
+      "resultPreview": "{\"verdict\":\"SOUND\",\"issues\":[{\"severity\":\"major\",\"issue\":\"Faktenfehler in der Risiko-/IST-Verifikation: Der Vorschlag behauptet als H4-BLOCKER 'sota_catalog.hpp existiert NICHT im Baum (find liefert 0 Treffer)'. Die Datei existiert real unter Code/external/comdare-cache-engine/tests/unit/thesis_tiere/sota_catalog.hpp (Materialisierungs-Domaene der benannten SOTA-Kompositionen + PRT-ART). Der Slice…"
+    }
+  ],
+  "totalTokens": 277484,
+  "totalToolCalls": 46
+}
