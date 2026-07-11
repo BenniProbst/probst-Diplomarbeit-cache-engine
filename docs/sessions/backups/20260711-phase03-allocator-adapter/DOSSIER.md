@@ -82,6 +82,29 @@ Threading durch ComposedTreeSearch → Pool-Store) **nahe der Mess-Maschinerie**
 Entscheidung (Ledger §0: anhalten)**, kein punktuelles Refactoring. Berührt das Zwei-Phasen-Mess-Protokoll
 (Thesis-Kern) → GO-pflichtig. Der 0.3a-Versuch wurde vollständig revertiert (sauberer Zustand, ce clean).
 
+## 3c. AUFLOESUNG (2026-07-11) — Option A (Memento) implementiert, COW-safe
+Deep-Research-Workflow wf_ced9827f (2 Research + Design + 2 adversariale Kritiker) → **Option A**: store-besitzende
+axis_06-Strategie (Default ExgenAllocator) + **copy-konstruierbarer/assignable** Store (cow_capable_-Pflicht, weil
+cow_materialize_copy_ unbedingt kopiert); Copy-Ctor/Assign rebinden den StdAllocatorAdapter an das eigene
+allocator_ und verwerfen die COW-Kopier-Pollution per **Memento** `allocator_.restore_statistics(o.statistics())`
+(unter `#ifdef COMDARE_CE_ENABLE_STATISTICS`). Move nicht deklariert → degradiert sicher zu Copy. abi_adapter/
+Anatomie/golden UNBERUEHRT (nur eine Populations-Zeile in tier_get_allocator: `live_nodes` aus `occupied_count()`,
+da live_nodes eine Container-Eigenschaft ist, kein Alloc-Stat — kein POD/ABI/golden-Touch). `restore_statistics`
+additiv auf CRTP-Base + ExgenAllocator (opt-in, kein Concept-Zwang). Kritiker-Fixes alle adressiert:
+- BLOCKER (stats-OFF-Bau): restore_statistics-Aufrufe unter `#ifdef` → **stats-OFF-Compile verifiziert EXIT=0**.
+- MAJOR (Zwei-Phasen-Test fehlt): **NEUER** `TwoPhaseCowT6IsPollutionFree` faehrt save→warmup→rollback→measure ein-
+  vs. zwei-phasig, fordert **counter-clean (2-phasig ≤ 1-phasig)** — beweist die Neutralisierung (1-phasig 8160 vs
+  2-phasig 4064). Der 0.3a-Bug haette hier s2>s1 erzeugt.
+- MAJOR (golden-Verifikation): **golden-320-Roundtrip ALLE OK (Diff leer)**, golden-Datei git-unveraendert.
+  binary_id = Achsen-`::name()` (nicht mangled type) → interner Alloc-Param aendert keine ID (`allocator=std_malloc`).
+- MINOR: exakter Belegungs-Invariant via `occupied_count()==keys.size()`; Downstream-Regression `test_ap15_2`
+  (live_nodes) mit dem occupied_count-Fix behoben.
+Zusatz-Erkenntnis: `total_bytes_allocated > total_bytes_in_use` (vector-Wachstum dealloziert alte Puffer) = echte
+Allocator-Semantik (die alte allocator-unabhaengige Zaehlung hatte allocated==in_use). Verifiziert: voller ctest
+**202/202** gruen, clang-format-22 konform, Mojibake 0. **Scope 0.3a-BST**: nur TreeNodePoolStore; 0.3b (Composition-
+Threading permutierter axis_06 → Store-Alloc, Cross-Allocator-Differenzierung) = Folge-Slice; die uebrigen 9 Stores
+gleiche Folge-Slices (restore_statistics je erreichte Familie).
+
 ## 4. DoD (doppelt-literal, g++-16)
 Voller ctest 100% (inkl. s7_1 neu); clang-format-22==0; Mojibake==0; git status NUR die berührten Dateien;
 golden/POD/ABI byte-unberührt (kein Registry/POD/GenusBindingTraits-Touch — git-diff-Beleg); Verhaltens-Nachweis:
