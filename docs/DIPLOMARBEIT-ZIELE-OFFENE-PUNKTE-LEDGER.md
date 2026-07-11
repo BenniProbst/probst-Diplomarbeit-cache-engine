@@ -480,6 +480,70 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     Lader). **AP-H2-8 ERLEDIGT:** fig:m-model-resizebox (×1,55-Upscale → 12,4-pt-Schrift) entfernt,
     DE+EN, visuell verifiziert; Regel „resizebox nur verkleinern" etabliert (restliche 5 Upscaler in
     Phase F3 NACH Phase A). Backup-Tag `backup-2026-07-10-pre-h2` gepusht. Builds DE 152/EN 144 grün.
+  - **Fortschritt Phasen A–C VOLLZOGEN (thesis `cbde82a`/`fea6143`/`2307591`/`9fd0ea7`, DE+EN):**
+    A = Kap. 2 entkernt (0 Eigenbegriffe, 0 Cite-Verluste, Anatomie-Modell → neue §3.3, Architektur →
+    Kap. 4); B = Kap. 2 mit Nur-Bekanntem gefüllt (5-§-Gliederung, Heuristik h:M→K + Cracking/learned-
+    indexes + YCSB A–F restauriert, +8 Cites); C = §3.1 neu geframet („Problemstellung und
+    Anforderungen an ein Mess-System", Prüfling raus), NEU §3.3.4 E4→E0-Schichten (fig:e-layers) +
+    Organ-/System-Achsen/Regime/honest-0 in §3.4 + §3.6.2 Vier Betriebsmodi inkl. HYBRID-Gegenbeweis +
+    §3.6.3 Messkurven/Filterkette (SOLL/IST getrennt). Phase D+E läuft (Kap.-4-Ausbau + Verlustliste;
+    inkl. User-Direktive Kapitel-3-Titel → „Konzepte eines cache-aware Mess-Systems").
+  - **🔒 USER-QUALITÄTS-DIREKTIVE (2026-07-10, Memory `feedback_refactor_informationsdichte_
+    quellen_rueckpruefung` + Task #109/AP-H2-12):** Beim Refactoring IMMER Informationsdichte +
+    Research-Qualität gegen ältere Thesis-Fassungen prüfen — Kap. 2 muss VOLL durchzitiert sein
+    (Maßstab: die Ur-Fassung verwertete alle Quellen sinnvoll). **PFLICHT-ABSCHLUSS-SCHRITT
+    (letzter TODO-Punkt AP-H2-12):** Voll-Abgleich aller literatur.bib-Quellen + deren Inhalte gegen
+    (a) das Diff der aktuellen Arbeit und (b) das Diff gegen die allererste Version VOR Habich-
+    Runde 1; dünne Stellen mit echten wissenschaftlichen Fakten + hoher Informationsdichte zur neuen
+    Kapitelstruktur erweitern.
+  - **Fortschritt Phasen D+E+F VOLLZOGEN (thesis `cba5a04`/`bb6a4b4`, DE+EN):** D = Kap. 4 ausgebaut
+    (4.3.1 Architektur-im-Code, 4.3.2 Builder/Pipeline, NEU 4.4 Contract-Tests je Schicht, NEU 4.5
+    System-Achsen im Code, IsComposition); E = alle 10 MITTEL-Verluste restauriert; Kapitel-3-Titel →
+    „Konzepte eines cache-aware Mess-Systems" (User-Direktive); F = heuristischer Gegenbeweis als 4.
+    Eval-Dimension (3-Varianten-Observer + 4. Schritt Wall-Clock, Paper-Vergleich vorrangig, SOLL/Futur),
+    resizebox-Regel exakt vermessen (4 gestrichen, fig:prtart-demo legitim behalten), NEU fig:toolchain.
+    Alle Phasen selbst verifiziert (Builds 164/154 S. 0-Warnungen, DE≡EN, 0 Cite-Verluste, Renders).
+    **OFFEN:** Phase G (01/06-Angleich, Glossar/Anhang-Refs, Abschluss-Review = AP-H2-11) + AP-H2-12
+    (FINAL: Quellen-Voll-Abgleich + Informationsdichte gegen Ur-Fassung).
+  - **Fortschritt Phase G VOLLZOGEN 2026-07-11 (thesis `60cb3c7`, DE+EN) → AP-H2-11 DONE:**
+    (1) §1.5 „Aufbau der Arbeit" beschreibt die 6er-Struktur jetzt vollständig (Kap.-2-Themenliste
+    inkl. Workloads+Heuristik, Kap.-3-Abschnittsfolge, Kap. 4 = Software-Architektur, Kap. 5 inkl.
+    Gegenbeweis); Drei-Ebenen-Absatz §1.4 geprüft = faktisch gedeckt (drei Ebenen 03:650, Vorarbeit
+    des Autors 03:716, vier Subsysteme 03:933). (2) Offener User-Auftrag SOTA nachgeholt:
+    Begriffs-Definition in §2.1 („Stand der Technik, engl. State of the Art, kurz SOTA") +
+    Ausschreibung am Profil-Absatz (tab:sota-profiles) DE+EN. (3) §3.2-Anfang: abgebrochenen
+    Übergangsrest („…Kataloge liegen hier.") geglättet. (4) Anhang-Remaps nach Analyse-Agent:
+    F 7+6× `sec:software-means`→`sec:measurement-system` (Variadik→`sec:impl-architecture`);
+    Glossar C Anatomie→`sec:anatomy-metaphor`, Drei-Ebenen→`sec:anatomy-levels`; D 20+20×
+    „Kapitel/Chapter"→„Abschnitt/Section" vor `sec:sota-instances`. 06_fazit: OHNE BEFUND.
+    (5) Warnungs-Wurzeln: `\@` aus Build-SIMD-Überschrift (hyperref-Bookmark), 4× `table[h]`→
+    `[!htbp]` Kap. 5. **Beweise:** Builds DE 164 S./EN 154 S., 0 Errors, 0 Log-Warnungen;
+    sequenzieller Verweis-Scan DE≡EN symmetrisch (42 Kapitel-Vorwärtsverweise, alle
+    Grundlage→Vertiefung, 0 unknown); Render-Sichtprüfung TOC/S. 9/S. 11/S. 53.
+    **VERBLEIBEND OFFEN: NUR noch AP-H2-12** (FINAL, User-Qualitäts-Direktive: Quellen-Voll-Abgleich
+    aller literatur.bib-Inhalte gegen Diff aktuell + Diff Ur-Fassung vor Habich-Runde 1
+    [Tag `backup-2026-06-29-pre-habich-restruktur`], dünne Stellen mit Informationsdichte erweitern;
+    Kap. 2 voll durchzitiert als Maßstab). Optional-Reste notiert: sota-/axes-gallery evtl.
+    4-spaltig; Verlustliste NIEDRIG #16–#23; VEGA/AirIndex erst nach web-verifizierten Bib-Einträgen.
+  - **AP-H2-12 VOLLZOGEN 2026-07-11 (thesis `a457018`+`1a0a6eb`) → HABICH-RUNDE 2 KOMPLETT
+    (AP-H2-0..12 alle DONE):** (1) Mechanischer key-weiser Cite-Abgleich gegen Ur-Fassung
+    (Tag 2026-06-29): 162 Keys, LOST=0. (2) ultracode-Workflow (30 Agenten, 2,66 M Tokens):
+    Quellen-Sweep 20×8 Keys (Inhalts-Verwertung alt↔neu) + 8 Sektions-Dichte-Paarungen + Synthese →
+    Gap-Report mit 33 konsolidierten Gruppen (4 HOCH, ~14 MITTEL; 1 Falsch-Positiv gestrichen;
+    Rohdaten in `sessions/workflow-backups/20260711-wf-ap-h2-12-quellen-dichte/`). (3) ALLE 33
+    Gruppen eingearbeitet (4 Batch-Agenten + eigene Edits, DE+EN): darunter 2 sachliche
+    Verzerrungen behoben (Konstruktvalidität-Definition; Durchreich-Widerspruch der
+    Hash-Gegenprobe zu IsComposition), Bias-Analyse der Lastprofile voll restauriert,
+    Balance-Invarianten in Kap. 2, Hardware-Absätze verdichtet, T4-/T10-Bausteine auch in
+    Anhang D. (4) VEGA (li2025vega, SIGMOD'25) + AirIndex (chockchowwat2023airindex, PACMMOD'23)
+    DBLP/ACM/Crossref-verifiziert neu in bib + §2.1-Fortführungssatz. (5) BEDINGT-Befunde
+    code-verifiziert eingearbeitet (legacy_reimpl P11–P27 prüflingsseitig als
+    Vergleichs-Re-Impls; Adapter-Fallback familienweise: A=std::malloc, P=runtime_error-Stub —
+    dabei alte ungenaue Formulierung korrigiert). **Beweise:** LOST 0, THINNED 18→10 (nur
+    Zähler, Inhalte lt. Sweep geschlossen), 36 GAINED; DE≡EN-Cite-Gleichheit alle 10 Dateipaare;
+    Verweis-Scan 42/15/0 symmetrisch regelkonform; Builds DE 164 S./EN 158 S. (+4 S. Dichte),
+    0 Errors/0 Warnungen; Render-Sichtprüfung. Verbleibende Optional-Reste (kein Auftrag):
+    sota-/axes-gallery 4-spaltig, Verlustliste NIEDRIG #16–#23, THINNED-Rest-Zähler.
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
