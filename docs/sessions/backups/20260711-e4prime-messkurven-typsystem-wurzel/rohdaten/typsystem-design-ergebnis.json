@@ -1,0 +1,289 @@
+{
+  "summary": "Deep-Research: kleinste buildbare tree<axis>-Wurzel-Slice des Messkurven-Typsystems (Doc 20 §B), Kardinalitaeten aus m3v2 (nicht erfinden)",
+  "agentCount": 5,
+  "logs": [],
+  "result": {
+    "research": [
+      {
+        "findings": [
+          {
+            "q": "(1) Was ist die tree<axis>-WURZEL konkret (Map-unabhaengig, zuerst gebaut)? Layer-B+-Knoten je Achse (statisch=strikter Layer, dynamisch=Knoten darunter)?",
+            "a": "Die WURZEL ist NICHT greenfield und keine neue Registry, sondern der bereits existierende achsen-geschichtete Praefixbaum (irrefuehrend historisch 'B+' genannt), dessen Layer die AxisLevels aus build_axis_levels sind, mit den System-/Meta-Achsen (Mess-Registry 'Blut') als oberste Visitor-Wurzel. JA konzeptionell: je Achse = ein Layer; eine statische (compile-time) Achse = strikter Layer (StaticAxisNode, tragt binary_id/Signatur), darunter dynamische Achsen-Knoten (DynamicVariableNode, is_runtime_loop, tragt NICHT zur Signatur bei) bis zur naechsten statischen Konfiguration. Map-Unabhaengigkeit: die Wurzel zaehlt Kardinalitaet rein arithmetisch (binary_count = Produkt der statischen Ebenen) OHNE die verschachtelten map<framework...>-Ebenen zu materialisieren; die Map-Ebenen sind die Blatt-Payload, die auf die 7 Forks wartet. WICHTIGE BINDUNG (Doc 20 §I): die 14/5-compile/dynamic-Klassifikation ist bereits autoritative Single-Source in profile_to_tree.hpp; eine parallele Wurzel-Registry (axis_binding_registry) wurde gebaut und VERWORFEN (null Konsumenten + Doppelquelle). Die Typsystem-Wurzel muss daher KONSUMENT dieser is_static-Ausgabe sein und per Contract-Test daran gekoppelt, nie eine driftende Zweitkopie. SPANNUNG: Doc 21 §A:16-20 fordert strikte Layer-Hierarchie (dynamisch strikt UNTER statisch); experiment_tree.hpp:206-210 modelliert static/dynamic als gleichrangige flache Knoten-Eigenschaft — in der Praxis emittiert profile_to_tree.hpp aber erst alle statischen, dann alle dynamischen Ebenen, was Doc 21 entspricht.",
+            "evidence": "docs/architektur/20_...md:109-113 (Wurzel UNABHAENGIG von Map-Ebenen, zuerst gebaut), :122-141 (§I: axis_binding_registry VERWORFEN, Single-Source profile_to_tree.hpp:68-87, Contract-Test-Pflicht), :144 (supersede durch Doc 21 Layer-Modell); 21_...md:16-20 (Achse=Layer, statisch=strikter Layer, dynamische Nodes darunter, Spread=eine Sorte), :21-22 (Wurzel=System==Meta-Achsen); experiment_tree.hpp:16-25 (nie voll materialisiert, binary_count rein arithmetisch), :98 (NodeKind Static/Dynamic), :116-134 (StaticAxisNode, contributes_to_signature=true), :136-155 (DynamicVariableNode, is_runtime_loop, contributes=false), :189-195 (AxisLevel.is_static), :206-210 (static/dynamic gleichrangig=Knoten-Eigenschaft); profile_to_tree.hpp:33 (tier is_static=true), :54-57 (cacheline compile-time static Sub-Ebenen), :65 (permute_axes static), :75-95 (5 runtime_dynamic is_static=false: concurrency/prefetch/allocator/cache_traversal/value_handle + repetition)"
+          },
+          {
+            "q": "(2) Wie sieht der curve_fit.hpp-Skeleton aus und wie erweitert man ihn additiv zur Wurzel (nicht ersetzen)?",
+            "a": "curve_fit.hpp IST: CurvePoint (x_working_set_bytes,y_value,sample_count), MeasurementCurve = EINE Achse x EINE x-Dimension (Working-Set), FitStatus/FitResult, fit_log_linear (y=a*log2(x)+b, honest-empty: ohne gueltige Daten kein Fit), plus RFC-4180-CSV-Leser parse_wide_csv_column. Header-only, namespace builder::curve_fit, inkludiert nur measurement_category.hpp; die verschachtelte tree/map-Struktur existiert NICHT. ADDITIVE Erweiterung (Monolith/nicht ersetzen): fit_log_linear und den CSV-Leser NICHT anfassen. MeasurementCurve ist die eventuelle Blatt-nahe Payload der workload-size-Map-Dimension (y ueber Working-Set). Ein NEUER Nachbar-Header (z.B. builder/curve_fit/axis_curve_tree.hpp oder builder/experiment_tree/axis_layer_spine.hpp) definiert die tree<axis>-Wurzel als compile-time Achsen-Layer-Spine im Muster der measurement_axis_registry (constexpr std::array + for_each + static_assert-Vollstaendigkeit), gekoppelt an build_axis_levels' is_static (KK-1 compile-time-fix). Die map<framework/type/size/op>-Ebenen bleiben leere/parametrisierte Typ-Slots (honest-empty wie curve_fit), das Blatt tuple<property,time,objective_tag> (H6) mappt auf eine SystemAxisSample-/MeasurementCurve-Familie. Kein golden/permutation/Registry-mp_list-Touch (TABU).",
+            "evidence": "builder/curve_fit/curve_fit.hpp:1-12 (Skeleton-Doktrin honest-empty, data-gated #156), :30-34 (CurvePoint), :37-42 (MeasurementCurve=1 Achse x 1 x-Dim), :44-57 (FitStatus/FitResult), :62-107 (fit_log_linear), :109-204 (CSV-Leser parse_wide_csv_column), :14 (nur measurement_category.hpp); docs/architektur/20_...md:64 (tree/map existiert NICHT, nur Skeleton), :98-108 (KK-1 compile-time-fix consteval-Registry + static_assert, 19-Achsen-Split); measurement_axis_registry.hpp:31-75 (constexpr std::array + registry_is_complete static_assert + for_each_measurement_axis = additives Erweiterungs-Muster)"
+          },
+          {
+            "q": "(3) Wo docken die Mess-System-Achsen (measurement_axis_registry, 'Blut') an die Wurzel an (Doc 20 §B:37-39)?",
+            "a": "Zwei Andockpunkte. (a) An der WURZEL selbst: die System-Achsen sind Meta==System-Achsen an der Wurzel und immer host-seitig praesent (Blut-Invariante system_axes_always_present()==true), unabhaengig von Tier-Permutation/E2-E3-Baum; sie reichen per Visitor die Workloads durch und PULLEN die 19 Organ-Achsen-Snapshots (nie von unten bepusht). Telemetry muss dazu aus Organ-Slot T10 heraus zur Root-Visitor-Achse (Phase 6, ABI-Bruch, zuletzt). (b) An der map<axis_observer_type>-Ebene des Typsystems (Doc 20 Zeile 27): der Observer-Schluesselraum IST die measurement_axis_registry (16 MeasurementCategory, Index==Kategorie, regime_of teilt TimeObserver/PmcCounter). Das Blatt tuple<observer_special_compare_property_type,time> entspricht struktur-gleich einer SystemAxisSample (category,value,valid). Die Root-Visitor-Iteration ist for_each_measurement_axis, die den Observer-Level des Baums aus den gepullten Snapshots (WallClock/ObserverSnapshot/Pmc SystemAxis, CRTP+Concept, zero-vtable) fuellt.",
+            "evidence": "docs/architektur/20_...md:37-39 (Messsystem-Achsen Registry/'Blut' ermoeglichen Auswertung), Zeile 27 (map<axis_observer_type, tuple<property,time>>); 21_...md:21-22 (Wurzel=System-Achsen reichen per Visitor durch), :50 (H7 telemetry=Meta==System an WURZEL, nicht Organ-Slot), :104 (L5 System/Root telemetry+Mess-Apparat Visitor nur PULL), :107-115 (telemetry aus T10 heraus, axis_stats[19] pullen, nie von unten bepusht, Phase 6 ABI-Bruch); measurement_axis_registry.hpp:32-49 (kMeasurementAxisRegistry 16 Kategorien), :70-75 (for_each_measurement_axis Visitor-Iteration); system_axis.hpp:54 (regime_of), :134-138 (SystemAxisSample category/value/valid ~ tuple<property,time>), :145 (system_axes_always_present=true Blut-Invariante), :147-190 (SystemAxis CRTP + SystemAxisConcept zero-vtable), :192/238/283 (WallClock/ObserverSnapshot/Pmc SystemAxis PULL-Quellen)"
+          },
+          {
+            "q": "(4) Welche Doc-21-Patterns (Visitor/Strategy/Builder-ueber-State/Decorator) gehoeren in die WURZEL-Slice vs. spaetere Map-Ebenen?",
+            "a": "WURZEL-Slice: VISITOR ist der Kern — die Wurzel IST der Pull-Visitor ueber die System-/Meta-Achsen (reicht Workloads durch, pullt die 19 Organ-Achsen). DECORATOR-ueber-Visitor-State-Log gehoert konzeptionell ebenfalls an die Wurzel (wrappt das Visitor-Objekt, loggt den Tier-Binary-Wahl-State-Stack beim rekursiven Abstieg) — aber als additiver 2. Increment; der Visitor ist der buildbare Kern. SPAETERE MAP-EBENEN: STRATEGY in den Visitoren (naechster Workload+Wert gegen folgende Achsen benchmarken) = die map<framework/workload/op/sequence>-Ebenen (H1: generische Basisklasse + Strategy je Framework/Workload/Op); braucht die framework/workload-Bibliotheken (EXTERN-gated). NICHT-Wurzel/eigene Strecke: BUILDER-ueber-STATE (bauen->messen->auswerten->Hybrid = die Prozess-/zweite Dimension) ist die CEB-Modus-Maschine, orthogonal zum Baum-Typ; steuert das Bauen des Baums ueber die Zeit, nicht die statische Wurzel — separate Strecke. (Anmerkung: die CoR-Filterkette mit eingebettetem Strategy/RankingCriterion sitzt im CacheEngineBuilder fuer die Generierungs-Kontrolle, nicht in der Baum-Wurzel — Slice 1 bereits gebaut.)",
+            "evidence": "21_...md:22-23 (Visitor reicht Workloads durch; Strategy IN den Visitoren fuer naechsten Workload/Wert), :24-25 (Prozess-Dimension bauen->messen->auswerten->Hybrid = Builder-ueber-State), :26-28 (Decorator ueber Visitor-Objekt loggt State-Stack), :44 (H1 generische Basisklasse+Strategy je Framework/Workload/Op/Sequence=Map-Ebenen), :104 (Root-Visitor nur PULL); selection_filter_chain.hpp:1-20 (CoR+Strategy im CacheEngineBuilder, cold-path, NICHT Hot-Path, Slice 1 gebaut)"
+          },
+          {
+            "q": "(5) Was ist die kleinste eigenstaendig BUILDBARE + unit-testbare Wurzel-Slice (ohne Cluster-Daten)?",
+            "a": "Ein NEUER header-only compile-time Achsen-Layer-Spine (z.B. builder/curve_fit/axis_curve_tree.hpp) der: (1) die tree<axis>-Wurzel als constexpr Enumeration der Achsen-Layer definiert, jede static/dynamic getaggt, ABGELEITET AUS bzw. Contract-getestet gegen build_axis_levels' is_static-Ausgabe (die von Doc 20 §I zwingend geforderte Kopplung, um die axis_binding_registry-Verwerfung nicht zu wiederholen); (2) das for_each-Muster der measurement_axis_registry fuer die Observer-/Kategorie-Dimension wiederverwendet ('Blut'-Dock), Blatt=SystemAxisSample ~ tuple<property,time>; (3) die map<framework/type/size/op>-Ebenen als LEERE/parametrisierte Typ-Slots laesst (honest-empty, keine Schluessel bis Fork-Daten — Wurzel ist fork-unabhaengig); (4) einen Token-Konsumenten mitbringt (der Visitor, der aus den Layern einen Curve-/Observer-Key erzeugt), damit der §I-Fehler 'null Konsumenten' NICHT wiederholt wird. Braucht KEINE Cluster-Daten, KEINE der 7 Fork-Entscheidungen (Wurzel ist davon unabhaengig), beruehrt KEIN golden/permutation/Registry-mp_list/ABI-4 (TABU). Unit-Test analog test_phase6_vorbau / test_m_contract_system_axis_wurzel (tests/unit/, gtest, cxx_std_23, include-dirs libs/cache_engine + libs/cache_engine/include, COMDARE_MEASUREMENT_ON=1): assert (a) static/dynamic-Split des Spine MATCHT build_axis_levels fuer ein Fixture-Profil (der vorgeschriebene Contract-Test), (b) Observer-Dimension enumeriert alle 16 Kategorien, (c) honest-empty: ohne Daten sind die Map-Ebenen leer (kein Phantom).",
+            "evidence": "docs/architektur/20_...md:112 (Wurzel fork-unabhaengig, zuerst gebaut), :135-141 (§I: compile-time-Achsen-Klassifikation nur mit echtem Konsumenten UND Contract-Test gegen build_axis_levels is_static gerechtfertigt; sonst Doppelquelle), :100-102 (KK-1 consteval+static_assert); tests/unit/CMakeLists.txt:2584-2594 (test_phase6_vorbau: header-only, cxx_std_23, include libs/cache_engine+include, COMDARE_MEASUREMENT_ON=1, gtest), :2529-2545 (test_m_contract_system_axis_wurzel Muster, LABELS m;blut); measurement_axis_registry.hpp:52-62 (registry_is_complete consteval static_assert = honest-empty-Muster); profile_to_tree.hpp:25-27 (build_axis_levels-Signatur = der zu koppelnde Producer)"
+          }
+        ],
+        "open_questions": [
+          "Layer-Strenge vs. flache Gleichrangigkeit: Doc 21 §A:16-20 fordert dynamische Achsen STRIKT unter der statischen (Layer-Hierarchie), experiment_tree.hpp:206-210 deklariert static/dynamic explizit als gleichrangige flache Knoten-Eigenschaft (KEINE Block-Hierarchie). In der Praxis emittiert profile_to_tree.hpp:33-95 erst alle statischen dann alle dynamischen Ebenen (konsistent mit Doc 21), aber der Typsystem-Wurzel-Bau muss klaeren, ob er die STRIKTE Layer-Semantik erzwingt (Umbau) oder die bestehende flache Ordnung als hinreichend akzeptiert.",
+          "Doc 20 §I-Contract-Test-Mechanik: Wie genau wird der Achsen-Layer-Spine gegen build_axis_levels' is_static gekoppelt — Runtime-Assert ueber ein Fixture-Profil (KF-9 ThesisProfile) oder build-time-Ableitung (die den golden-sensitiven binary_id-Pfad beruehrt und laut §I:139-140 einen eigenen golden-verifizierten Increment braucht)? Der GO-freie Weg ist vermutlich der Runtime-Contract-Test, aber das Fixture-Profil muss benannt werden (experiment_config/m3v2_study.profile.xml wurde in dieser Analyse nicht verifiziert).",
+          "Blatt-Erweiterung tuple<property,time> -> tuple<property,time,objective_tag> (H6/Fork 6): SystemAxisSample (system_axis.hpp:134-138) hat category/value/valid, aber keinen objective_tag und keine Pareto-Front-Menge. Ob das Wurzel-Blatt direkt auf SystemAxisSample mappt oder ein neuer Blatt-Typ mit objective_tag + Front-Menge noetig ist, ist eine Design-Entscheidung an der Map/Blatt-Grenze (gehoert aber zu den spaeteren Map-Ebenen, nicht zur minimalen Wurzel-Slice).",
+          "Namensraum/Verortung des neuen Wurzel-Headers: builder::curve_fit (neben curve_fit.hpp) vs. builder::experiment_tree (neben experiment_tree.hpp/profile_to_tree.hpp). Letzteres liegt naeher am is_static-Producer (bessere Include-Richtung L4->L5), ersteres naeher an der MeasurementCurve-Blatt-Payload — die saubere Schichtung (Doc 21 §D:97-105, alle Kanten abwaerts, measurement->builder-Include war in §I ein toter cross-layer-Include) sollte die Wahl bestimmen.",
+          "Konsumenten-Anforderung aus §I: der verworfene axis_binding_registry scheiterte u.a. an 'null Produktions-Konsumenten'. Der in Antwort 5 vorgeschlagene Token-Visitor-Konsument muss ein ECHTER (nicht test-only) Konsument werden, sonst wiederholt die minimale Slice den §I-Fehler. Welcher Produktions-Pfad (E4-Reporting? CSV-Mapping Doc 20 §E:69?) den Wurzel-Spine zuerst konsumiert, ist offen."
+        ]
+      },
+      {
+        "findings": [
+          {
+            "q": "(1) framework-Kardinalitaet — H1: 13 Frameworks?",
+            "a": "Im CODE-BESTAND ist die framework-Ebene NICHT als Enum/Registry belegt: nur EIN Framework (YCSB) ist verdrahtet. Die '13 Frameworks' stammen aus der Thesis-Tabelle tab:wl-frameworks (Doc 21 §B H1/H5) und sind KEIN Bestands-Enum. => UNDER-SPECIFIED / User-Fork. Die Forks H1+H5 sind entschieden (framework = statischer Layer ueber workload-type, 13-Kanon als Vokabular/Schluesselraum), aber code-seitig EXTERN_GATED (nur YCSB, Rest gated). HEUTE=1, PLAN=13.",
+            "evidence": "m3v2_study.profile.xml:22-33 (base_tiers=PRT-ART+6 SOTA, kein framework-Enum), :128-129 compile_dims workloads nur YCSB; workload_generator.hpp:22 enum YcsbWorkload (einzige Framework-Enum im Bestand); Doc 21:44,48 (H1/H5: '13 Frameworks Thesis tab:wl-frameworks', 'heute nur YCSB verdrahtet, Rest gated'); Doc 20 §G:87 map<workload-framework>=1 verdrahtet (YCSB), PLAN 13-Kanon, 'Framework×Workload-Bib EXTERN_GATED'"
+          },
+          {
+            "q": "(2) workload-type — YCSB A-F = 6?",
+            "a": "JA, im Bestand belegt = 6. YcsbWorkload {A,B,C,D,E,F}=6 als Enum UND m3v2-Profil compile_dims <workloads>A B C D E F</workloads>=6 (compile-time je Binary gebacken). PLAN-Kanon = 14 Lastprofile LP01-LP14 (Thesis tab:lp-catalog). Fork H1/#31 ist entschieden (generische Klassen+Strategy statt 3-Mengen-Fork); H2 entschieden: Beschaffenheit/Key-Value-Verteilung wird IN den workload-type encodiert (keine eigene Map-Ebene). HEUTE=6, PLAN=14.",
+            "evidence": "workload_generator.hpp:22-29 enum class YcsbWorkload {A..F}=6; workload_config.hpp (zweites YcsbWorkload-Vokabular); m3v2_study.profile.xml:129 <workloads>A B C D E F</workloads> (Kommentar :127 'Workloads = YCSB A..F'); Doc 21:44 (H1: 14 LP01-LP14), :45 (H2: Beschaffenheit in workload-type encodiert); Doc 20 §G:88 '6 gefahren (YCSB A-F); 21 LP-XML Bestand; PLAN 14 Kanon-LPs'"
+          },
+          {
+            "q": "(3) workload-size — Cache-Regime-Map-Key (H3)?",
+            "a": "Bestand = 4 diskrete Working-Set-Stuetzstellen {2^14,2^17,2^20,2^23} = {16384,131072,1048576,8388608} (working_set_sweep). H3 ist entschieden: workload-size = Map ueber die verfuegbaren Cache-Regime-Werte, MASCHINENRELATIV (per Host-Cache-Regime geschluesselt; die absolute N-Liste landet in den Regimen, Infra passt an reale LLC an). Der Regime-Schluessel selbst ist noch kein materialisiertes Enum => Semantik entschieden (H3), Kardinalitaet ~4 Regime + Gates. HEUTE=4 Sweep-Punkte, PLAN=~4 Cache-Regimes (maschinenrelativ).",
+            "evidence": "m3v2_study.profile.xml:125 <working_set_sweep>16384 131072 1048576 8388608</working_set_sweep> (=4), Kommentar :123-124 '{2^14,2^17,2^20,2^23} (Infra-Agent passt an die reale LLC an)'; Doc 21:46 (H3: 'workload-size = map ueber die verfuegbaren Cache-Regime-Werte, maschinenrelativ'); Doc 20 §G:89 '4 Sweep; PLAN ~4 Cache-Regimes + 2 Gates; GATED absolut vs. maschinenrelativ'"
+          },
+          {
+            "q": "(4) operation_type — Metric-Enum insert/lookup/erase/scan/rmw = 6?",
+            "a": "Im Bestand existieren DREI 6-elementige, NICHT 1:1-deckungsgleiche Op-Enums (Doc 20 §G:90 '6 Runner / 6 XSD nicht 1:1'): (a) Metric {ns_per_op, insert, lookup, erase, scan, rmw}=6 — das in der Frage genannte 'Metric-Enum' (ns_per_op als 6. statt reines insert/lookup/erase/scan/rmw=5); (b) WorkloadOpKind {Insert,Lookup,Erase,Clear,Scan,ReadModifyWrite}=6 (Runner-6, 'mit Clear'); (c) OperationKind {Read,Update,Insert,Scan,ReadModifyWrite,Erase}=6. H4 ist entschieden: Op-Achse folgt der std-C++23-assoziativen-Container-Schnittstelle (insert/find/erase/at/operator[]/count/contains/lower_bound/upper_bound/equal_range/emplace/insert_range/...), variadisch metaprogrammiert; BEIDE (Runner-6 UND XSD-6) werden auf dieses groessere Set gehoben => Ziel-Kardinalitaet UNDER-SPECIFIED/expandierend (>6). HEUTE=6 (je Enum), PLAN=std-C++23-Interface-Set.",
+            "evidence": "best_binary_selector.hpp:93 enum class Metric {ns_per_op, insert, lookup, erase, scan, rmw}; workload_config.hpp:26-33 enum class WorkloadOpKind {Insert=0,Lookup=1,Erase=2,Clear=3,Scan=4,ReadModifyWrite=5} + op_kind_name :52-59; workload_generator.hpp:38-45 enum class OperationKind {Read=0,Update=1,Insert=2,Scan=3,ReadModifyWrite=4,Erase=5}; Doc 21:47 (H4: std-C++23-Interface, 'BEIDE Runner-Op-Set UND XSD geaendert'); Doc 20 §G:90 '6 Runner (kOpKindNames)/6 XSD (nicht 1:1)'"
+          },
+          {
+            "q": "(5) axis_observer_type — die Mess-Achsen der Registry?",
+            "a": "Kardinalitaet = 16 (kMeasurementAxisCount = kMeasurementCategoryCount = 16). Die Registry kMeasurementAxisRegistry ('Blut') listet exakt die 16 MeasurementCategory-System-Achsen (CLU, CACHE_MISS_L1/L2/L3, DTLB_MISS, MEMORY_FOOTPRINT, BRANCH_MISS, IPC_CPI, LATENCY_MEAN/P50/P95/P99/P999, THROUGHPUT, ENERGY_J, FILL_BUFFER_OCCUPANCY). Regime-Split (M-Wurzel, regime_of): 9 TimeObserver + 7 PmcCounter. Diese Ebene ist die tree<axis>-WURZEL/System-Achse und laut Doc 20:112 UNABHAENGIG von den 7 Map-Forks (nicht fork-gated). HEUTE=16, split 9/7.",
+            "evidence": "measurement_category.hpp:10-27 enum MeasurementCategory (16 Werte) + :32 kMeasurementCategoryCount=16; measurement_axis_registry.hpp:23 kMeasurementAxisCount=kMeasurementCategoryCount, :32-49 kMeasurementAxisRegistry (16 Eintraege), :61 static_assert '16 Eintraege, Index==Kategorie'; system_axis.hpp:20-22 enum MeasurementRegime {TimeObserver,PmcCounter}, :36 kPmcCounterCategories<7>, :42 kTimeObserverCategories<9>, :54 regime_of; Doc 20 §G:91 '16 MeasurementCategory (9 TimeObserver + 7 PmcCounter)'"
+          },
+          {
+            "q": "(6) property — observer_special_compare_property?",
+            "a": "Der Literal-Name observer_special_compare_property EXISTIERT NICHT im Bestand (grep leer) — er ist ein reiner SOLL-Typsystem-Name aus Doc 20 §B (Blatt tuple<observer_special_compare_property_type, time>). => UNDER-SPECIFIED / User-Fork. Naechster Bestand: das Vergleichs-/Auswahl-Kriterium = 2 implementierte Objectives als GoF-Strategy: ScanOptimizing + LatencyOptimizing (Kommentar nennt 3 scan/latenz/durchsatz, aber nur 2 Structs); zusaetzlich RankingCriterion-Strategy ueber das Metric-Enum. Fork H6 ist ENTSCHIEDEN und SUPERSEDIERT das woertliche Einzel-property: Pareto-Front statt Einzel-Objective, Blatt erweitert auf tuple<property, time, objective_tag> + Front-MENGE je Schluessel. Die property-Ebene ist damit keine feste Kardinalitaet, sondern eine variable Pareto-Front; das objective_tag-Vokabular im Bestand = 2 (Scan/Latency). HEUTE=2 Objectives, PLAN=Pareto-Front + objective_tag (H6).",
+            "evidence": "grep observer_special_compare/compare_property_type in libs/ = LEER (SOLL-Name, kein Code); cacheline_policy_selector.hpp:141 struct ScanOptimizing, :180 struct LatencyOptimizing (GoF Strategy, :201 template<class Objective=ScanOptimizing>), :29 Kommentar 'PolicyObjective: scan-/latenz-/durchsatz-'; best_binary_selector.hpp:117-118 RankingCriterion (Strategy) ueber Metric; measurement_record.hpp:11,24 MeasurementRecord alignas(32)/sizeof==32 (Blatt); Doc 21:49 (H6: 'Pareto-Front... Blatt erweitert auf tuple<property,time,objective_tag> + Front-Menge je Schluessel'); Doc 20 §G:92 '2 Objectives impl.; Blatt=MeasurementRecord 32B'"
+          },
+          {
+            "q": "Zusatz: tree<axis>-Wurzel-Kardinalitaet (fork-unabhaengig, zuerst gebaut)?",
+            "a": "Die tree<axis compile/dynamic>-Wurzel = 19 Achsen-Slots (T0..T18), Split 14 compile-time / 5 dynamic (die 5 dynamischen: concurrency/prefetch/allocator/cache_traversal/value_handle mit RC-POD-Feldnamen). Autoritative Single-Source = profile_to_tree.hpp is_static-Flag je AxisLevel. Diese Wurzel ist laut Doc 20:112 UNABHAENGIG von den 7 §H-Map-Forks und wird ZUERST gebaut. H7 entschieden: alle 19 Slots strukturell intakt; telemetry (heute Organ-Slot T10, kV3AxisCount=19) wandert als System/Meta-Achse zur Visitor-Wurzel (nur PULL) — ABI/Schema-Bruch, zuletzt (Phase 6). Der m3v2-Profil-Beleg: 19 <axis> in permute_axes, 4 variiert (search_algo/node_type/memory_layout/prefetch) + 15 gepinnt.",
+            "evidence": "m3v2_study.profile.xml:35-72 (19 Slots T0..T18, 4 variiert/15 gepinnt); Doc 20 §I:127-132 'profile_to_tree.hpp:68-87 is_static-Flag, 14/5-compile/dynamic, 5 dynamische concurrency/prefetch/allocator/cache_traversal/value_handle'; Doc 20 §G:86 '19 Slots; Wurzel-Split 5 dynamic/14 compile'; Doc 21:50 (H7: 'Alle 19 Slots strukturell intakt; telemetry Meta==System-Achse an der WURZEL, nicht Organ-Slot'); Doc 20:112 'tree<axis>-Wurzel ist von den Forks UNABHAENGIG und wird zuerst gebaut'"
+          }
+        ],
+        "open_questions": [
+          "operation_type Ziel-Kardinalitaet (H4): das std-C++23-assoziative-Container-Interface hat >6 Operationen (insert/find/erase/at/operator[]/count/contains/lower_bound/upper_bound/equal_range/emplace/insert_range/...). Die exakte finale Op-Menge (auf die Runner-6 UND XSD-6 gehoben werden) ist im Bestand noch nicht als konkrete Liste materialisiert — nur die Richtung ist per H4 entschieden.",
+          "workload-size Cache-Regime (H3): die konkrete Anzahl + Grenzen der maschinenrelativen Cache-Regime-Klassen ist noch kein Bestands-Enum; im Bestand existieren nur die 4 absoluten Sweep-Werte. Wie viele Regime + ob 2 zusaetzliche Gates (Doc 20 §G: '~4 Cache-Regimes + 2 Gates') ist under-specified.",
+          "framework (H1/H5): die 13-Framework-Registry existiert nur als Thesis-Vokabular (tab:wl-frameworks), nicht als Code-Enum. Die konkreten 13 Namen + ihre Bibliotheks-Kategorien (Framework×Workload) sind EXTERN_GATED und nicht im geprueften Bestand auffindbar.",
+          "property/objective (H6): das objective_tag-Domain ist im Bestand nur mit 2 Objectives belegt (ScanOptimizing/LatencyOptimizing); der Kommentar nennt eine dritte (durchsatz/throughput), die aber NICHT als Struct implementiert ist. Ob die finale objective_tag-Enumeration 2, 3 oder N ist (fuer die Pareto-Front-Tags), ist offen.",
+          "Ob 'axis_observer_type' im SOLL-Typsystem die 16 MeasurementCategory-Achsen meint (so gelesen) ODER eine Achse×Observer-Matrix (Doc 20 §G:91 PLAN '3-5/Achse', 19×8=152 Slots/97 Felder). Der Bestand belegt 16 Kategorien in der Registry; die Matrix-Aufspannung ist PMC-Vollpfad-gated (#215)."
+        ]
+      }
+    ],
+    "design": {
+      "recommendation": "Baue NUR die fork-FREIE WURZEL-Teil-Slice = Achsen-Layer-Spine + Blut-Observer-Dock, als NEUEN additiven Header, NICHT die volle Wurzel-mit-Map-Ebenen (die 5 Map-Ebenen sind alle fork-abhaengig und bleiben honest-empty Typ-Slots). Konkret: neuer Header libs/cache_engine/builder/experiment_tree/axis_layer_spine.hpp (namespace builder::experiment, NEBEN dem is_static-Producer profile_to_tree.hpp — NICHT in builder::curve_fit, weil die Include-Richtung L4->L5 abwaerts sein muss und der Spine build_axis_levels + AxisLevel aus builder::experiment sowie measurement_axis_registry aus measurement zieht; curve_fit liefert nur die Blatt-Payload und wird in der WURZEL-Slice gar nicht erst inkludiert). Der Spine ist KONSUMENT der is_static-Single-Source (Doc 20 §I: keine driftende Zweitkopie wie die verworfene axis_binding_registry), gekoppelt per RUNTIME-Contract-Test ueber ein ThesisProfile-Fixture (der GO-freie Weg; build-time-Ableitung wuerde den golden-sensitiven binary_id-Pfad beruehren = TABU-nah). curve_fit.hpp (fit_log_linear + CSV-Leser) bleibt UNBERUEHRT; der Spine ist ein additiver Nachbar, kein Ersatz.",
+      "root_structure": "Die WURZEL ist NICHT greenfield, sondern der bestehende achsen-geschichtete Praefix-Spine: jede Achse = ein Layer; die 14 statischen Achsen bilden den STRIKTEN oberen Layer-Block (StaticAxisNode, experiment_tree.hpp:118-131, contributes_to_signature=true :124, traegt binary_id/Signatur), die 5 dynamischen Achsen sind Knoten STRIKT DARUNTER (DynamicVariableNode :140-153, is_runtime_loop=true :148, contributes_to_signature=false :146, tragen NICHT zur Signatur bei) — Doc 21 §A:16-20 Layer-Modell. Map-Unabhaengig: binary_count = Produkt der statischen Ebenen, rein arithmetisch, OHNE die map<framework...>-Ebenen zu materialisieren (= Blatt-Payload, wartet auf die 7 Forks). Root-Visitor = die System-/Meta-Achsen (Blut, measurement_axis_registry.hpp), immer host-praesent, PULLEN die 19 Organ-Achsen-Snapshots (nie von unten bepusht). Der neue Typsystem-Spine ist KONSUMENT von build_axis_levels' is_static-Flag (Single-Source, profile_to_tree.hpp:34/:68-95), realisiert als AxisLayerSpine, der die geordneten AxisLevels in StaticLayer[] UEBER DynamicLayer[] PARTITIONIERT — erzwingt Doc-21-Striktheit an der Typsystem-Grenze OHNE das flache Knoten-Modell (experiment_tree.hpp:192 static/dynamic = gleichrangige Knoten-Eigenschaft) zu mutieren. Die Observer-/Kategorie-Dimension wird compile-time via for_each_measurement_axis gebunden, die framework/type/size/op/property-Map-Ebenen bleiben leere parametrisierte Typ-Slots (honest-empty).",
+      "cardinality_classes": "WURZEL (fork-UNABHAENGIG, Bestand-belegt): 19 Achsen-Layer T0..T18 = 14 static (compile-time, strikter oberer Layer, contributes_to_signature) / 5 dynamic (concurrency, prefetch, allocator, cache_traversal, value_handle + repetition; is_runtime_loop, nicht-Signatur; profile_to_tree.hpp:75-95). Observer/Blut-Dimension = 16 MeasurementCategory (9 TimeObserver / 7 PmcCounter via regime_of; measurement_axis_registry.hpp:32-49, kMeasurementAxisCount=16). Diese zwei Dimensionen sind die EINZIGEN fork-freien.\nMAP-Ebenen (fork-ABHAENGIG = FORK, in dieser Slice honest-empty Typ-Slots): framework HEUTE 1 (nur YCSB verdrahtet) / PLAN 13 [FORK H1+H5, nur Thesis-Vokabular tab:wl-frameworks, KEIN Code-Enum]; workload-type HEUTE 6 (YcsbWorkload A-F) / PLAN 14 LP01-LP14 [FORK H1]; workload-size HEUTE 4 Sweep {2^14,2^17,2^20,2^23} / PLAN ~4 Cache-Regime maschinenrelativ + 2 Gates [FORK H3]; operation_type HEUTE 6 (DREI nicht-1:1-deckungsgleiche Enums Metric/WorkloadOpKind/OperationKind) / PLAN std-C++23-assoziativ-Interface-Set >6 [FORK H4, UNDER-SPECIFIED]; property HEUTE 2 Objectives (ScanOptimizing/LatencyOptimizing; die 3. throughput NUR im Kommentar, nicht impl.) / PLAN Pareto-Front + objective_tag, Blatt tuple<property,time,objective_tag> [FORK H6; SOLL-Name observer_special_compare_property EXISTIERT NICHT im Code].",
+      "patterns_used": "WURZEL-Slice (buildbarer Kern): VISITOR — der Root-Pull-Visitor ueber die System-/Blut-Achsen; for_each_measurement_axis (measurement_axis_registry.hpp:70-75, index_sequence-Fold) wird als Observer-Dimensions-Visitor wiederverwendet. HONEST-EMPTY — curve_fit/Registry-Doktrin fuer die leeren Map-Slots (kein Phantom-Schluessel ohne Fork-Daten). CONSTEXPR-ARRAY + CONSTEVAL-STATIC_ASSERT-Vollstaendigkeit (measurement_axis_registry.hpp:52-62 Muster) fuer die 16-Observer-Dimension. STATIC/DYNAMIC-LAYER-PARTITION (Doc 21 §A) an der Typsystem-Grenze erzwungen. SPAETER / eigene Strecken (NICHT in der WURZEL-Slice): STRATEGY in den Visitoren (naechster Workload/Wert je framework/workload/op = Map-Ebenen, EXTERN-gated); DECORATOR-ueber-Visitor-State-Log (2. Increment, wrappt Visitor, loggt Tier-Wahl-State-Stack); BUILDER-ueber-STATE (CEB-Modus-Maschine bauen->messen->auswerten->Hybrid = orthogonale Prozess-Dimension, separate Strecke, NICHT die statische Wurzel); CoR-Filterkette (selection_filter_chain.hpp, cold-path im CacheEngineBuilder, Slice 1 bereits gebaut).",
+      "change_surface": [
+        "NEU (additiv): libs/cache_engine/builder/experiment_tree/axis_layer_spine.hpp — AxisLayerSpine + Observer-Dock + Token-Visitor-Konsument, namespace comdare::cache_engine::builder::experiment",
+        "read-only Konsum: libs/cache_engine/builder/experiment_tree/profile_to_tree.hpp:25 (build_axis_levels-Signatur = is_static-Producer/Single-Source), :34 + :68-95 (14 static / 5 dynamic Emission)",
+        "read-only Konsum: libs/cache_engine/builder/experiment_tree/experiment_tree.hpp:189-195 (AxisLevel-Struct), :192 (is_static-Klassifikations-Flag)",
+        "read-only Konsum: libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.hpp:70-75 (for_each_measurement_axis, 16 Kategorien)",
+        "NEU: tests/unit/test_m_axis_layer_spine_wurzel.cpp (gtest)",
+        "tests/unit/CMakeLists.txt: neuen Target-Block nach Zeile 2594 einfuegen (Spiegel von test_phase6_vorbau 2584-2594: cxx_std_23, include libs/cache_engine + libs/cache_engine/include, comdare_set_platform_defines, COMDARE_MEASUREMENT_ON=1, LABELS 'm;blut;wurzel')"
+      ],
+      "buildable_slice": "Neuer additiver Header axis_layer_spine.hpp mit: (1) AxisLayerSpine — Runtime-Builder, der build_axis_levels(ThesisProfile) konsumiert und dessen geordnete AxisLevels in einen StaticLayer-Block UEBER einen DynamicLayer-Block PARTITIONIERT (erzwingt Doc-21-Striktheit an der Typsystem-Grenze OHNE experiment_tree's flaches Knoten-Modell zu mutieren); (2) die Observer-Dimension compile-time via for_each_measurement_axis ueber die 16 MeasurementCategory gebunden (constexpr, honest-empty Map-Slots); (3) ein Visitor-Konsument, der je Kategorie einen Observer-/Curve-Key erzeugt (der ECHTE, nicht test-only Konsument — damit die §I-null-Konsumenten-Falle nicht wiederholt wird). Die 5 fork-abhaengigen Map-Ebenen bleiben leere parametrisierte Typ-Slots. Unit-Test test_m_axis_layer_spine_wurzel.cpp assertet: (a) Partition-Totalitaet — jede is_static-Ebene liegt VOR jeder dynamischen fuer ein Fixture-ThesisProfile UND der static/dynamic-Split MATCHT build_axis_levels' is_static (der Doc 20 §I zwingend geforderte Contract-Test); (b) Observer-Dimension enumeriert alle 16 Kategorien; (c) honest-empty — Map-Ebenen tragen ohne Fork-Daten keine Schluessel. Braucht KEINE Cluster-Daten, KEINE der 7 Fork-Entscheidungen, beruehrt KEIN TABU-Artefakt. Falls die volle Wurzel zu fork-abhaengig ist: DIESE Slice IST bereits die kleinste fork-freie Teil-Slice (Spine 19/14-5 + Observer 16 sind die einzigen Bestand-belegten fork-freien Dimensionen).",
+      "boundary_compliance": "TABU strikt unberuehrt: golden / permutation_axes.xml / POD sizeof==1416 / GenusBindingTraits / ABI-MAJOR==4 / Registry-mp_list. Kein Edit an curve_fit.hpp (fit_log_linear + CSV-Leser bleiben, nur Nachbar-Header). Kein Edit an experiment_tree.hpp / profile_to_tree.hpp (rein read-only konsumiert — der binary_id/golden-Pfad wird NICHT beruehrt, deshalb Runtime-Contract-Test statt build-time-Ableitung). Compile-time-strikt: constexpr std::array + std::index_sequence-Fold (for_each-Muster) + consteval static_assert-Vollstaendigkeit fuer die Observer-Dimension; Visitor-Konsument via CRTP+Concept, ZERO vtable im compile-time-Pfad (die bestehenden INodeDescription-virtuals sind cold-path Baum-Bau, nicht in dieser Slice/nicht angefasst). Kein Runtime-Switch im Hot-Path. Single-Source: Klassifikation aus is_static konsumiert, nie zweite Kopie (vermeidet den §I-axis_binding_registry-Fehler). Schichtung Doc 21 §D: alle Include-Kanten abwaerts (builder::experiment -> measurement ist abwaerts/gueltig; der §I-tote cross-layer-Include war measurement -> builder = aufwaerts/verboten, wird vermieden).",
+      "risks": [
+        "§I-null-Konsumenten-Falle: reiner Spine + Test wiederholt das axis_binding_registry-Schicksal, WENN kein echter (nicht-test) Konsument im selben Increment landet. Der vorgesehene E4-Reporting-/CSV-Mapping-Konsument ist datengated (measurement_axis_registry.hpp:5 'Konsumenten = Folge-Increment') — Risiko, dass der Produktions-Konsument deferred wird; Mitigation: Observer-Key-Erzeugung in den bestehenden for_each_measurement_axis-Reporting-Pfad falten.",
+        "Layer-Striktheits-Spannung: Doc 21 §A:16-20 fordert dynamisch STRIKT unter statisch, aber experiment_tree.hpp:192 modelliert static/dynamic als gleichrangige flache Knoten-Eigenschaft. Die Partition-Invariante haengt daran, dass build_axis_levels statisch-vor-dynamisch emittiert (aktuell wahr, profile_to_tree.hpp:33-95) — eine kuenftige Umordnung bricht die Striktheit STILL; deshalb Contract-Test-Pflicht auf die Invariante.",
+        "Fixture-Profil unbenannt: der Contract-Test braucht ein benanntes ThesisProfile-Fixture; m3v2_study.profile.xml wurde in dieser Analyse NICHT als ladbares Fixture verifiziert. Build-time-is_static-Ableitung wuerde den golden-binary_id-Pfad beruehren (TABU-nah, §I:139-140 = eigener golden-verifizierter Increment) — Runtime-Fixture ist daher zwingend, aber das Fixture muss lokalisiert werden.",
+        "Alle Map-Ebenen-Kardinalitaeten fork-gated (framework 1->13 H1/H5, type 6->14 H1, size 4->~4 Regime H3, op 6->std-C++23 H4 under-specified, property 2->Pareto H6): die WURZEL-Slice MUSS sie als honest-empty Typ-Slots ausliefern; jede vorzeitige Schluessel-Materialisierung erfindet Kardinalitaet (verboten).",
+        "property-Blatt-Name observer_special_compare_property existiert NICHT im Code (reiner SOLL-Name Doc 20 §B) — das Blatt muss auf SystemAxisSample/MeasurementCurve mappen; die objective_tag/Pareto-Front-Erweiterung (H6) gehoert zu spaeteren Map-Ebenen, NICHT zur WURZEL-Slice (Blatt-/Map-Grenze).",
+        "Telemetry-Wanderung (H7): der Root-Visitor-PULL der 19 Organ-Achsen aus Organ-Slot T10 zur Wurzel ist ein ABI/Schema-Bruch (Phase 6, zuletzt) — die WURZEL-Slice darf die PULL-Richtung nur strukturell vorbereiten, den ABI-Bruch NICHT in dieser Slice ziehen."
+      ]
+    },
+    "critiques": [
+      {
+        "verdict": "NEEDS-REVISION",
+        "issues": [
+          {
+            "severity": "major",
+            "issue": "CARDINALITY CONFLATION (not an invention, but wrong binding). The proposal presents the WURZEL as '19 Achsen-Layer T0..T18 = 14 static / 5 dynamic' AND claims this equals build_axis_levels' is_static partition (profile_to_tree.hpp:34/68-95). These are THREE distinct structures the code proves do not coincide: (1) the 19-organ registry canon with a 14/5 dynamic-CAPABILITY split — this is the source of '14/5' and IS Doc-20-§G-backed, not invented; (2) build_axis_levels' actual is_static output, which is DATA-DRIVEN — the precedent test test_e4_contract_xml_to_axislevels.cpp:129-159 shows its positive fixture yields 4 static / 7 dynamic (11 levels), and m3v2_study yields ~20 static (tier + 19 permute_axes) / 3 dynamic (concurrency, prefetch, repetition); NEITHER is 14/5. Worse, in build_axis_levels output the SAME axis appears in BOTH blocks (value_handle as static[3] AND dyn-level[9]; prefetch as two dynamic levels), so its partition is NOT a clean set of 19 distinct axes. The proposed contract test 'static/dynamic-split MATCHT build_axis_levels is_static' is itself sound and data-driven, but it cannot and does not assert 14/5; the narrative that equates 14/5 with the build_axis_levels partition would misdirect the test design and misdescribe what the spine actually holds (23 duplicated-name levels for m3v2, not 19). Fix before impl: separate the canonical 14/5 (organ-registry classification) from the data-driven is_static partition the spine consumes, and state which one the spine/test targets."
+          },
+          {
+            "severity": "major",
+            "issue": "DOC-21 LAYER-MODEL FIDELITY OVERSTATED. The buildable_slice frames the spine as partitioning into 'StaticLayer[] block ABOVE DynamicLayer[] block' and calls this 'erzwingt Doc-21-Striktheit'. Doc 21 §A point 1 actually models INTERLEAVED per-main-axis nesting (a static main axis forms a strict layer, its dynamic SUB-axes hang BELOW it, until the next static config is re-inserted — static→dyn→static→dyn), plus §A.5 'sub-axis is a full axis under the compile-time main axis'. A global 'all-static-above-all-dynamic' 2-block partition is the OLD flat model, not the Doc-21 main/sub-axis model. It happens to match the current build_axis_levels emission order, but presenting it as Doc-21-strict fidelity is inaccurate; the proposal's own risk #2 half-acknowledges this but the buildable_slice still asserts the flat partition as the Doc-21 invariant."
+          },
+          {
+            "severity": "major",
+            "issue": "NULL-CONSUMER TRAP (self-disclosed, reinforced by evidence). Doc 20 §I records that the prior fork-free root build (axis_binding_registry) was adversarially reviewed and VERWORFEN partly for 'null Produktions-Konsumenten', and §I sets a BINDING constraint: a compile-time axis classification is justified only with (a) a real consumer AND (b) a contract test against build_axis_levels' is_static. measurement_axis_registry.hpp:5 states the real consumers (E4-Reporting, Pruef-Dock) are a 'Folge-Increment' and are data-gated. The slice's promised 'echter, nicht test-only Konsument' is therefore aspirational; if it ships with only a test consumer it repeats the verworfen fate. Must land a genuine non-test consumer (or fold observer-key emission into the existing for_each_measurement_axis reporting path) in the SAME increment."
+          },
+          {
+            "severity": "minor",
+            "issue": "CHANGE-SURFACE PATHS ARE WRONG. Every path in change_surface omits the real repo prefix 'Code/external/comdare-cache-engine/'. The header lives at Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_tree/... and the CMakeLists at Code/external/comdare-cache-engine/tests/unit/CMakeLists.txt; a top-level libs/cache_engine does not exist (verified). The test_phase6_vorbau mirror block IS at that CMakeLists lines 2584-2594 as claimed (once the prefix is corrected)."
+          },
+          {
+            "severity": "minor",
+            "issue": "PATTERN-LABEL LOOSENESS. for_each_measurement_axis (registry.hpp:70-75) is an index_sequence FOLD-expression over 16 categories; labeling it the GoF 'Visitor' (Doc 21 §A root Visitor over the axis tree) is a stretch — the header itself calls it 'Metaprogrammierungs-Iteration'. Also 'honest-empty' is listed under patterns_used but is a project doctrine (curve_fit/Registry), not a named textbook pattern. Given the 'nur benannte Lehrbuch-Patterns' directive, tighten these labels."
+          },
+          {
+            "severity": "minor",
+            "issue": "REPETITION MISCOUNTED INTO THE 5. The proposal writes '5 dynamic (concurrency, prefetch, allocator, cache_traversal, value_handle + repetition)'. The canonical 14/5 split (Doc 20 §G/§I) is exactly concurrency/prefetch/allocator/cache_traversal/value_handle = 5, and 14+5=19 EXCLUDES repetition. repetition (KF-10) is a separate KK-3 runtime axis (Doc 20 §G KK-3), not one of the 19 organ slots. Folding it into the parenthetical muddies the 19 arithmetic even though repetition is genuinely is_runtime_loop in the code."
+          }
+        ]
+      },
+      {
+        "verdict": "NEEDS-REVISION",
+        "issues": [
+          {
+            "severity": "major",
+            "issue": "NULL-CONSUMER TRAP (Doc 20 §I precedent, verified). buildable_slice item (3) promises 'der ECHTE, nicht test-only Konsument' for the observer-key generation, claiming this avoids the §I null-consumer trap. Verified false: grep across the ce repo shows the ONLY consumer of for_each_measurement_axis / kMeasurementAxisRegistry / axis_info is tests/unit/test_phase6_vorbau.cpp (a test). measurement_axis_registry.hpp:5 itself states 'Konsumenten (E4-Reporting, Pruef-Dock-Verdrahtung) = Folge-Increment'. The E4-reporting/CSV-mapping path the proposal wants to 'fold into' is data-gated on #156 (curve_fit.hpp:5). This is EXACTLY the failure that got the predecessor axis_binding_registry reviewed (wf_0f5a1d9c, 3 CONFIRMED incl. 'null Produktions-Konsumenten') and REVERTED on 2026-07-10 (LEDGER:431, Doc 20 §I). Doc 20 §I's binding constraint requires BOTH (a) a real consumer AND (b) a contract-test against build_axis_levels' is_static. The slice satisfies (b) but not (a). As scoped it risks re-shipping the reverted test-only artifact. Resolve before build: either genuinely land a non-test consumer in the same increment, or descope to explicitly test-gated and confirm §I(a) is met. The proposal's own risk #1 flags this but the recommendation text does not resolve it."
+          },
+          {
+            "severity": "minor",
+            "issue": "CARDINALITY MISLABEL. cardinality_classes/root_structure state '5 dynamic' and attribute '14 static / 5 dynamic Emission' to profile_to_tree.hpp:34 + :68-95. Verified: profile_to_tree.hpp emits SEVEN dynamic AxisLevels (concurrency :76, prefetch/hw_prefetcher :78, prefetch/prefetch_distance :80, allocator :82, cache_traversal :84, value_handle :87, repetition :94) — the '5' is the doc's KK-1 RC-POD organ-axis count, not the emitted is_static==false AxisLevel count. The proposed partition test (assert static-before-dynamic + match is_static) is robust to this, but any naive 'assert 5 dynamic' would fail. Also the '14 static' figure is profile-dependent (tier + active permute_axes), not structural; the static permute_axes emission loop (:50-66) is uncited while :34 (tier) + the dynamic block :68-95 are cited."
+          },
+          {
+            "severity": "minor",
+            "issue": "SIGNATURE SHORTHAND. buildable_slice says the spine 'konsumiert build_axis_levels(ThesisProfile)', but the real signature (profile_to_tree.hpp:25) is build_axis_levels(ThesisProfile const&, std::string mode_name, AxisRegistry const&). The contract-test fixture must supply a mode_name and (possibly empty) AxisRegistry. Not a compile blocker — a ThesisProfile with explicit axis values needs no registry expansion — but the one-arg shorthand understates the fixture setup."
+          },
+          {
+            "severity": "minor",
+            "issue": "CHANGE-SURFACE PATHS OMIT SUBMODULE PREFIX. change_surface lists paths as 'libs/cache_engine/builder/experiment_tree/axis_layer_spine.hpp' etc.; the actual tree lives under Code/external/comdare-cache-engine/. The addresses are repo-relative to the vendored ce submodule (consistent with the IST-VERIFIKATION paths), so acceptable, but the new header and test land inside the external/vendored comdare-cache-engine submodule, not the thesis repo root — worth stating explicitly so the additive files are committed in the correct repo per the dual-remote / vendoring doctrine."
+          }
+        ]
+      }
+    ]
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Research"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Design"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Critique"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "research:typsystem-struct",
+      "phaseIndex": 1,
+      "phaseTitle": "Research",
+      "agentId": "a6a67112ff5c45864",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783741840214,
+      "queuedAt": 1783741840205,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist Typsystem-Struktur-Forscher. Lies Doc 20 §B (:17-40) + Doc 21 (Layer-/Haupt-Unter-Achsen-Modell, Visitor/Strategy/Builder/Decorator §A + die 7 Fork-Entscheidungen) + /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp + measurement_axis_registry.hpp.\nBEANTWORTE (datei:zeile): (1) Was ist die t…",
+      "lastProgressAt": 1783742053168,
+      "tokens": 81722,
+      "toolCalls": 17,
+      "durationMs": 212954,
+      "resultPreview": "{\"findings\":[{\"q\":\"(1) Was ist die tree<axis>-WURZEL konkret (Map-unabhaengig, zuerst gebaut)? Layer-B+-Knoten je Achse (statisch=strikter Layer, dynamisch=Knoten darunter)?\",\"a\":\"Die WURZEL ist NICHT greenfield und keine neue Registry, sondern der bereits existierende achsen-geschichtete Praefixbaum (irrefuehrend historisch 'B+' genannt), dessen Layer die AxisLevels aus build_axis_levels sind, mi…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "research:cardinalities",
+      "phaseIndex": 1,
+      "phaseTitle": "Research",
+      "agentId": "ae245c98db2c8f0cc",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783741840215,
+      "queuedAt": 1783741840205,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist Kardinalitaets-Forscher. Ermittle die Kardinalitaeten je Typsystem-Ebene (framework/type/size/op/observer/property) AUS DEM BESTAND — NICHT erfinden. Lies Doc 20 §G (Kardinalitaets-Synthese, :78-108) + das m3v2-Profil (/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/experiment_config/*.xml bzw. m3v2_study.profile.xml, such nach workloads/datasets/op_types) + measureme…",
+      "lastProgressAt": 1783742090355,
+      "tokens": 79063,
+      "toolCalls": 24,
+      "durationMs": 250140,
+      "resultPreview": "{\"findings\":[{\"q\":\"(1) framework-Kardinalitaet — H1: 13 Frameworks?\",\"a\":\"Im CODE-BESTAND ist die framework-Ebene NICHT als Enum/Registry belegt: nur EIN Framework (YCSB) ist verdrahtet. Die '13 Frameworks' stammen aus der Thesis-Tabelle tab:wl-frameworks (Doc 21 §B H1/H5) und sind KEIN Bestands-Enum. => UNDER-SPECIFIED / User-Fork. Die Forks H1+H5 sind entschieden (framework = statischer Layer ue…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "design:synth",
+      "phaseIndex": 2,
+      "phaseTitle": "Design",
+      "agentId": "a6a6aaae042ba2587",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783742090364,
+      "queuedAt": 1783742090355,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Baue NUR die fork-FREIE WURZEL-Teil-Slice = Achsen-Layer-Sp…",
+      "promptPreview": "Design-Synthesizer. Aus der Research: das SAUBERSTE, thesis-treue (Doc 20 §B woertlich + Doc 21 Layer-Modell), boundary-konforme, compile-time-strikte Design fuer die tree<axis>-WURZEL-Slice des Messkurven-Typsystems. Kardinalitaeten NUR aus Bestand (m3v2/Registry), sonst als Fork markieren. Entscheide: Wurzel-Struktur (Layer-Knoten je Achse), Kardinalitaets-Klassen/Hierarchien, benannte Patterns …",
+      "lastProgressAt": 1783742280990,
+      "tokens": 45321,
+      "toolCalls": 9,
+      "durationMs": 190626,
+      "resultPreview": "{\"recommendation\":\"Baue NUR die fork-FREIE WURZEL-Teil-Slice = Achsen-Layer-Spine + Blut-Observer-Dock, als NEUEN additiven Header, NICHT die volle Wurzel-mit-Map-Ebenen (die 5 Map-Ebenen sind alle fork-abhaengig und bleiben honest-empty Typ-Slots). Konkret: neuer Header libs/cache_engine/builder/experiment_tree/axis_layer_spine.hpp (namespace builder::experiment, NEBEN dem is_static-Producer prof…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "critique:thesis",
+      "phaseIndex": 3,
+      "phaseTitle": "Critique",
+      "agentId": "ab4624ecaceeda97a",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783742280999,
+      "queuedAt": 1783742280992,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NEEDS-REVISION",
+      "promptPreview": "ADVERSARIAL Thesis-Fidelity + Kardinalitaeten: Ist die Wurzel-Struktur WIRKLICH die Doc-20-§B-tree<axis>-Wurzel + Doc-21-Layer-Modell (nicht ein erfundenes Konstrukt)? Sind ALLE Kardinalitaeten aus dem Bestand belegt (m3v2/Registry) oder wurde etwas ERFUNDEN (TABU: Kardinalitaeten nicht erfinden)? Haengt die Wurzel-Slice heimlich von einem der 7 Forks / den Map-Ebenen ab (dann nicht fork-frei)? Si…",
+      "lastProgressAt": 1783742587666,
+      "tokens": 85462,
+      "toolCalls": 13,
+      "durationMs": 306666,
+      "resultPreview": "{\"verdict\":\"NEEDS-REVISION\",\"issues\":[{\"severity\":\"major\",\"issue\":\"CARDINALITY CONFLATION (not an invention, but wrong binding). The proposal presents the WURZEL as '19 Achsen-Layer T0..T18 = 14 static / 5 dynamic' AND claims this equals build_axis_levels' is_static partition (profile_to_tree.hpp:34/68-95). These are THREE distinct structures the code proves do not coincide: (1) the 19-organ regis…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "critique:boundary",
+      "phaseIndex": 3,
+      "phaseTitle": "Critique",
+      "agentId": "a6e20dd764def5df8",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1783742281000,
+      "queuedAt": 1783742280992,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NEEDS-REVISION",
+      "promptPreview": "ADVERSARIAL Boundary/Bau: golden/POD/mp_list/ABI beruehrt? compile-time-strikt (kein Runtime-Switch/vtable Hot-Path)? Change-Surface an realen datei:zeile (keine Phantom-Zeilen)? Kompiliert der Vorschlag (Typen/Concepts existieren)? Ist curve_fit.hpp ADDITIV erweitert (nicht ersetzt, Monolith)? Ist die Slice eigenstaendig unit-testbar OHNE Cluster-Daten? Bricht sie measurement_axis_registry-Consum…",
+      "lastProgressAt": 1783742471098,
+      "tokens": 68112,
+      "toolCalls": 10,
+      "durationMs": 190098,
+      "resultPreview": "{\"verdict\":\"NEEDS-REVISION\",\"issues\":[{\"severity\":\"major\",\"issue\":\"NULL-CONSUMER TRAP (Doc 20 §I precedent, verified). buildable_slice item (3) promises 'der ECHTE, nicht test-only Konsument' for the observer-key generation, claiming this avoids the §I null-consumer trap. Verified false: grep across the ce repo shows the ONLY consumer of for_each_measurement_axis / kMeasurementAxisRegistry / axis_…"
+    }
+  ],
+  "totalTokens": 359680,
+  "totalToolCalls": 73
+}
