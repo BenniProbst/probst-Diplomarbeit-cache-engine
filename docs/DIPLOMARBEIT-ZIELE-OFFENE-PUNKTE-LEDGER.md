@@ -521,6 +521,25 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     [Tag `backup-2026-06-29-pre-habich-restruktur`], dünne Stellen mit Informationsdichte erweitern;
     Kap. 2 voll durchzitiert als Maßstab). Optional-Reste notiert: sota-/axes-gallery evtl.
     4-spaltig; Verlustliste NIEDRIG #16–#23; VEGA/AirIndex erst nach web-verifizierten Bib-Einträgen.
+  - **AP-H2-12 VOLLZOGEN 2026-07-11 (thesis `a457018`+`1a0a6eb`) → HABICH-RUNDE 2 KOMPLETT
+    (AP-H2-0..12 alle DONE):** (1) Mechanischer key-weiser Cite-Abgleich gegen Ur-Fassung
+    (Tag 2026-06-29): 162 Keys, LOST=0. (2) ultracode-Workflow (30 Agenten, 2,66 M Tokens):
+    Quellen-Sweep 20×8 Keys (Inhalts-Verwertung alt↔neu) + 8 Sektions-Dichte-Paarungen + Synthese →
+    Gap-Report mit 33 konsolidierten Gruppen (4 HOCH, ~14 MITTEL; 1 Falsch-Positiv gestrichen;
+    Rohdaten in `sessions/workflow-backups/20260711-wf-ap-h2-12-quellen-dichte/`). (3) ALLE 33
+    Gruppen eingearbeitet (4 Batch-Agenten + eigene Edits, DE+EN): darunter 2 sachliche
+    Verzerrungen behoben (Konstruktvalidität-Definition; Durchreich-Widerspruch der
+    Hash-Gegenprobe zu IsComposition), Bias-Analyse der Lastprofile voll restauriert,
+    Balance-Invarianten in Kap. 2, Hardware-Absätze verdichtet, T4-/T10-Bausteine auch in
+    Anhang D. (4) VEGA (li2025vega, SIGMOD'25) + AirIndex (chockchowwat2023airindex, PACMMOD'23)
+    DBLP/ACM/Crossref-verifiziert neu in bib + §2.1-Fortführungssatz. (5) BEDINGT-Befunde
+    code-verifiziert eingearbeitet (legacy_reimpl P11–P27 prüflingsseitig als
+    Vergleichs-Re-Impls; Adapter-Fallback familienweise: A=std::malloc, P=runtime_error-Stub —
+    dabei alte ungenaue Formulierung korrigiert). **Beweise:** LOST 0, THINNED 18→10 (nur
+    Zähler, Inhalte lt. Sweep geschlossen), 36 GAINED; DE≡EN-Cite-Gleichheit alle 10 Dateipaare;
+    Verweis-Scan 42/15/0 symmetrisch regelkonform; Builds DE 164 S./EN 158 S. (+4 S. Dichte),
+    0 Errors/0 Warnungen; Render-Sichtprüfung. Verbleibende Optional-Reste (kein Auftrag):
+    sota-/axes-gallery 4-spaltig, Verlustliste NIEDRIG #16–#23, THINNED-Rest-Zähler.
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
