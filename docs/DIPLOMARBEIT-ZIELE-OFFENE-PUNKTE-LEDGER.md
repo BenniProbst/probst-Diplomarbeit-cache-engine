@@ -30,6 +30,13 @@ Thesis-PDF-Kette bleibt grün, und die Lösung ist am Ende **manuell bedienbar**
 4. **FF3-Mess-Kette echt:** AP-2-Echtpfad (90ns-Stub raus) → #162 (≥8 Rang-1-SOTA-Lebewesen) → M3-Gesamtlauf
    (#156) mit realen Cache-Misses/PMC → Thesis-Anhang mit belastbaren Werten.
 5. **#193 erfüllt:** Lösung von Hand start- und reproduzierbar (EXPERIMENT_MODE, MANUAL_RUN.md, finaler Hand-Lauf).
+6. **Mess-Ergebnis-Persistenz (Erweiterung 2026-07-11, Detail §11-G):** Der Mess→PDF-Fluss ist erst DONE, wenn die
+   Pipeline beim Durchlauf ÜBER die cache-engine die Auswertungsdokumente erzeugt (LaTeX-PDF + Messwerte-CSV = alle
+   in der Overleaf/Thesis-Messwerte-Sektion definierten Auswertungsformate) UND sie am ENDE des Laufs AUTOMATISCH
+   nach `development` zurückschreibt (commit + push) in einen je-Lauf/Commit datierten Unterordner
+   `measurement/<YYYYMMDD-HHMMSS>/` im Diplomarbeit-Root — sonst gehen die Messergebnisse verloren. Später zusätzlich
+   PARALLEL nach `backup1.comdare.de/Cluster_NFS/cache-engine-experiment` (doppelte Absicherung). Baut auf dem
+   REV-17-Submodul-Fetch-Fix auf; braucht ein WRITE-CI-Credential (Deploy-Token ist read-only) + Loop-Schutz.
 
 **Arbeitsdoktrin (aus den Validierungs-Erkenntnissen).**
 - **Zwei Spuren, nebenläufig:** Spur S strikt seriell im god-header/Mess-POD-Sperrbereich; Spur P nur über
@@ -174,6 +181,25 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
 **E User-Prio:** #193 (P-0 KERN✅: A/B/C/D done+verifiziert, User-Self-Test entsperrt; Residual Voll-Codegen→#215) · #179 (Wartbarkeits-Sweep, XL) · #186 (EPIC CI, laufend).
 **F Deferred/gated:** §8-Liste.
 **Fehlende TODOs aus Validierung (23, eingeordnet):** M1→#193(§5) · M2→#179(§11-E) · M3→#10(§8) · M4→#19-Allokatoren-echt-linken · M5→#125(§8) · M6→#149/#229(§8) · M7→#187/#165(§8) · M8→#184/#185 als CODE-Aufgaben (nicht Text-Agent) · M9→FF0-Owner(§1) · M10→ABI-Freeze(§4) · M11→RC-Vertrags-Freeze(§3-S4) · M12→#216-Push✅ · M13→AP-8⟵AP-1(§5) · M14→Spiegel-Sperre(§9) · M15→Integrations-Commit(§5) · M16→P-Pfad-Re-Verify(§5) · M17→AP-2-Track-S-Prüfung(§5) · M18→.test-Merge✅ · M19→comdare_tests-Registry(§7-CI-2) · M20→F.5-Entscheid(§7-CI-3) · M21→Hermetik-Audit(§7) · M22→prt-art-alle-12(§7-CI-4) · M23→-j/RAM-Politik(§7-CI-5).
+
+**G ERWEITERUNG DES §0-GOAL (bestehendes Ziel, NICHT neu — User 2026-07-11) — Mess-Ergebnis-Rückschreibung/Persistenz als Abschluss des Mess→PDF-Flusses:**
+Die Diplomarbeit-Pipeline soll beim Durchlauf ÜBER die cache-engine die **Auswertungsdokumente** erzeugen
+(LaTeX-PDF + Messwerte-CSV = ALLE im Overleaf/Thesis definierten Auswertungsformate der Messwerte-Sektion; die
+LaTeX-Diplomarbeit generiert in der Messwerte-Sektion automatisch alle Auswertungsformate) UND diese am ENDE des
+Pipelinelaufs **AUTOMATISCH nach `development` zurückschreiben (commit + push)** — sonst gehen die Messergebnisse
+zum Schluss verloren. **Ablage:** je Lauf/Commit ein NEUER datierter Unterordner unter `measurement/` im
+Diplomarbeit-Root: `measurement/<YYYYMMDD-HHMMSS>/` (User-Wunsch-Format „YYYYMMTT-HH:SS"; **offen G-a:** `:` ist
+FS-unsicher auf der Windows-/msvc-Build-Matrix → filesystem-sichere Variante `YYYYMMDD-HHMMSS` bzw. `-HHMM`
+festlegen), sodass ein fertiges Diplomarbeit-PDF NEBEN einem versionierten Messwertebaum je Commit persistiert.
+User ist sich der git-Datenakkumulation bewusst — bewusst die einfachste Variante zuerst.
+**Phase 2 (später, additiv):** dieselben datierten Ordner ZUSÄTZLICH PARALLEL nach
+`backup1.comdare.de/Cluster_NFS/cache-engine-experiment` schreiben (beides parallel, doppelte Absicherung).
+**Infra-Vorbedingung G-b:** der Push-Back braucht ein **WRITE-fähiges CI-Credential** (write_repository) —
+der aktuelle Group-Deploy-Token `gitlab+deploy-token-39` ist read_repository-ONLY. Optionen: Project-Access-Token
+mit write_repository (masked, protected) ODER CI-Push via ci-templates-Muster; Loop-Schutz nötig (`[skip ci]`/
+`ci.skip` im Auto-Commit, sonst rekursive Pipeline-Trigger). Baut auf dem REV-17-Submodul-Fetch-Fix auf
+(super kann jetzt über die cache-engine bauen). Cross-Bezug: §0-Goal (Mess→PDF-Fluss),
+[[feedback_ci_gesamtlauf_ist_messung_abgeschaltet_pdf_kompiliert]].
 
 ## §12 FORTSCHREIBUNGS-LOG
 - **2026-07-03:** Ledger erstellt aus ultracode-Validierung (`wf_eb6a7880-699`, PLAN_VALID_WITH_CORRECTIONS). S1/#216-H2 DONE (`20e24ff`, ABI 3→4). CI-1 `.test`-Vorlage `5e46040`. super-`test:unit` `b37d702` (Probelauf offen). B2/B7/M12/M18 erledigt. Nächster Schritt: Phase-0-Vorbedingungen (§ Sequenz 0a-0e) → dann S2 #217 ∥ P-0 #193.
@@ -449,6 +475,7 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
 
 - **2026-07-11 (SYSTEMATISCHE CHRONOLOGISCHE DISPOSITION F1-F14 + Goal-V3 §13.12 + ADDENDUM-2 — Goal-Hook „TODO-Stack chronologisch abarbeiten" eingelöst; unabhängig live-verifiziert):** Auf die Hook-Anmahnung (chronologische Stack-Abarbeitung statt Insertions) einen Dispositions-Agent (`a43a8e30`, 15 Tool-Calls, git-grep/Read statt Notizen) je Item live gegen Code+git geprüft. **BILANZ (je Item datei:zeile-belegt):** **F1-F14** (`:324` + Migrationsplan ADDENDUM-2): F1 buildsystem-hands-off = **vacuously befolgt** (KEINE buildsystem.xml in unseren Repos, `find`=leer; liegt in Fremd-Repos) · F2/F5/F8/F9/F10/F11/F13 = DIREKTIVEN (befolgt/no-op) · F3 (HDR comdare-metrics), F7 (Mess-Matrix-Module), F12 (Monolith-Split) = **GATED** (Remote-Modul/Repo-Anlage, Migrationsschritte `[GATED]`) · **F4** SIMD = Phase-0.1 DONE (`8175c802`), Modul-Reuse gated · **F6** Achsen-Metaprog = `container_framework.hpp` DONE (`8ffc9c0c`), Genus→Typ-Rest ABI/golden-GO · **F14** Web-Recherche = **DONE** (Ergebnis ADDENDUM-2 §4, Task #30, 3 Sweeps → leere `baseline_3-analysis`-Empfehlung). **§13.12-Arbeitsreihenfolge (1)-(7):** (1) K1-4-Repos-grün DONE · (2) #267/CMD-1 DONE · (3) #265 DONE · (4) #266 config-Owner **GATED** (einziges offenes der 13 Gates, User) · (5) AP-2/#236 DONE · (6) #269/#244/#184 DONE (6-vs-48-Rest user-gated) · (7) #270b 3-ISA **GATED** (node7-Freeze-Infra). Katalog #253-#276 alle DONE/gated (`:414`); Schicht-Sequenz E4→E1 KOMPLETT. **ADDENDUM-2 / Migrationsschritte 2-15:** **KEINER single-repo-additiv im ce-Scope** — alle Remote-Gruppen/Transfer/foundation/buildsystem/286-gated (Fremd-Agent + je-Punkt-User-GO G2-G12); G12/Schritt-0/Schritt-1 bereits DONE. **GENUIN-ACTIONABLE non-gated = KEINES über SLICE 1 hinaus** (je Kandidat Anti-Null-Consumer-geprüft, Doc 20 §I): §B-WURZEL Doppelquelle · §D-Enum Null-Consumer+TABU · DD-A-Framework E1-gated · #31/F7-compile-time-Kopf = Runtime-String-Fork (`workload_profiles.hpp:23`) · #29-Rest ABI-GO · CoR-Rest #156-data. **PRÄZISIONS-KORREKTUR** zu `:441`: `build_axis_levels` hat NICHT 0, sondern **genau 1 Nicht-Test-Aufrufer** (`apps/catalog_codegen_tool/main.cpp:194`) — das **stärkt** die gated-Konklusion (schon ausgeliefert+konsumiert → neue WURZEL = Null-Consumer/Doppelquelle), ändert die Disposition nicht. **⇒ Der vollständige sichtbare TODO-Stack (F1-F14 + §13.12 + Katalog + ADDENDUM-2) ist chronologisch abgearbeitet + je Item belegt: DONE / DIREKTIVE-befolgt / enabler-gated; der einzige autonom-buildbare Rest war SLICE 1 (geliefert). Verbleibend = ausschließlich #156-Cluster / E1-Dock / Job-Token-Allowlist / je-Repo-GO — außerhalb autonomer Reichweite.**
 
+- **2026-07-11 (LEDGER-ERWEITERUNG §0-DoD-6 + §11-G — Mess-Ergebnis-Rückschreibung/Persistenz; User-Direktive, ausdrücklich NICHT neu = Erweiterung des bestehenden §0-Ziels):** Der Mess→PDF-Fluss wird um die AUTOMATISCHE Persistenz erweitert: die Diplomarbeit-Pipeline erzeugt beim Durchlauf ÜBER die cache-engine die Auswertungsdokumente (LaTeX-PDF + Messwerte-CSV = ALLE in der Overleaf/Thesis-Messwerte-Sektion definierten Auswertungsformate, dort automatisch generiert) UND schreibt sie am ENDE des Laufs AUTOMATISCH nach `development` zurück (commit + push) in einen je-Lauf/Commit datierten Unterordner `measurement/<YYYYMMDD-HHMMSS>/` im Diplomarbeit-Root — sonst gehen die Messergebnisse verloren; so liegt neben dem fertigen PDF ein versionierter Messwertebaum je Commit (git-Datenakkumulation dem User bewusst, bewusst einfachste Variante zuerst). **Phase 2:** dieselben Ordner zusätzlich PARALLEL nach `backup1.comdare.de/Cluster_NFS/cache-engine-experiment`. **Offen:** G-a FS-sicheres Datumsformat (`:` bricht die Windows-/msvc-Matrix → `YYYYMMDD-HHMMSS`); G-b **WRITE-CI-Credential** (der REV-17-Deploy-Token ist read_repository-only) + Loop-Schutz (`[skip ci]` im Auto-Commit). Baut auf dem REV-17-Submodul-Fetch-Fix auf (super baut jetzt über die cache-engine, ce-Gitlink auf 270c6c8c). Eingetragen: §0-DoD-6, §11-G, sichtbare Task-Liste, Memory.
 - **2026-07-10 (USER-INFO — i9-14900KS GESTORBEN, RMA/Austausch; Rückkehr erst ~September 2026):**
   Die CPU der Production-Maschine 2 (prod2, Intel i9-14900KS, Hybrid 8P+16E) ist ausgefallen und
   physisch im Austausch; laut User „kommt erst in ein paar Wochen zurück, wir können ihn wohl nicht
