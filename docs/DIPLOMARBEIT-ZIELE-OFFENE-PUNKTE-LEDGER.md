@@ -546,6 +546,59 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     Verweis-Scan 42/15/0 symmetrisch regelkonform; Builds DE 164 S./EN 158 S. (+4 S. Dichte),
     0 Errors/0 Warnungen; Render-Sichtprüfung. Verbleibende Optional-Reste (kein Auftrag):
     sota-/axes-gallery 4-spaltig, Verlustliste NIEDRIG #16–#23, THINNED-Rest-Zähler.
+  - **AP-H2-13 VOLLZOGEN 2026-07-11 (USER-Auftrag „HOCH einarbeiten + alle Optional-Punkte";
+    thesis `4eeb83c`) → SÄMTLICHE Optional-Reste ABGEARBEITET, Habich-Runde 2 restlos geschlossen:**
+    (0) HOCH-Verifikation: alle 4 HOCH-Gaps waren bereits in AP-H2-12 eingearbeitet — grep-belegt
+    DE+EN (Konstruktvalidität dreigliedrig, Leinwand/Zwei-Beobachtungen, Durchreich-Varianten,
+    Bias-Absatz, Wegweiser/Balance-Invarianten). (1) **Verlustliste NIEDRIG #16–#23 KOMPLETT**:
+    3 Punkte waren durch AP-H2-12 gedeckt (Cortex-A76/Neoverse V2 + SiFive U74 in §2.2,
+    upgradeable-Sperrmodus in T8); 5 restauriert (DE+EN, je aus Urfassungs-Fundstelle):
+    GoF-Negativliste in §3.3.3 (Singleton/Flyweight/Bridge; **Command bewusst RAUS** — heute
+    aktiver Befehls-Kanal des Hybrid-Modus, User-Direktive 02.07./#251, stattdessen
+    Positiv-Abgrenzung mit Verweis sec:heuristics-modes) · Biomedizin-Provenienz der
+    Anatomie-Metapher in §3.3.1 · SPL-Feature-Mapping-Vollliste in §3.3.1 (Achse=Feature …
+    Anatomie=Verdrahtung; Anmerkung: Analyst-Item #16 „std::map-Familien" war bereits durch
+    Anhang F voll gedeckt) · Slab-Magazines-/Vmem-Erweiterung (bonwick-Cites, §3.2) ·
+    „alle 30 SOTA- und alle 10 Allokator-Profile sind getaggt" (Profil-Absatz §3.2).
+    (2) **Überbreiten/Figuren-Regel ALLE geschlossen** (sbox-vermessen, DE+EN):
+    fig:sota-gallery 16,91→15,96 cm gestaucht (Kacheln 3,8 cm, Raster 4,05) + resizebox WEG;
+    fig:axes-gallery 17,76→15,91 cm (5×4→4×5 Kacheln) + resizebox WEG; fig:prtart-gallery
+    (14,91 cm) und fig:one-architecture (15,53 cm) waren Aufblasungen → resizebox entfernt;
+    im eingebundenen Kapitelsatz verbleibt EINZIG fig:prtart-demo (0,98×, legitim verkleinernd,
+    kommentiert). (3) **THINNED-Rest-Zähler BEWERTET (kein Handlungsbedarf)**: von den 10
+    verbliebenen Zähler-Verdünnungen hatten 6 Inhalts-Befunde im Sweep, deren verlorene Fakten
+    in AP-H2-12 restauriert wurden — der Zähler bleibt niedriger, weil die Ur-Fassung dieselben
+    Fakten auf mehr Zitierstellen verteilte (bender2002scanning, bender2002treelayout,
+    drepper2007memory, hennessy2019architecture, hoefler2015benchmarking, idreos2018datacalculator);
+    4 waren im Inhalts-Sweep von vornherein OK = reine Konsolidierung ohne Substanzverlust
+    (graefe2001btree, iso_cpp, mimalloc_bench, pugh1990skiplist). **Beweise:** Builds DE 164 S./
+    EN 158 S., 0 Errors/0 Overfull/0 Warnungen; DE≡EN-Cite-Gleichheit alle 10 Dateipaare;
+    Verweis-Scan 42/17/0 symmetrisch regelkonform (2 neue kapitelinterne Vorwärtsverweise =
+    Grundlage→Vertiefung); Render-Sichtprüfung 4 Figuren-Seiten DE+EN. **Damit ist aus
+    Habich-Runde 2 NICHTS mehr offen** — weder Pflicht noch optional.
+  - **ALT-TASK-ABSCHLUSS 2026-07-11 (User: „direkt weiter mit offener Arbeit"; thesis `828310b`+
+    `be4ac6a`): #87 AP-B3 + #89 AP-B4 + #90 AP-B5 alle DONE — damit ist das gesamte Task-Board
+    #59–#110 GESCHLOSSEN (einzig verbleibendes Text-Agent-Gate: Kap.-5-Ergebnisteil wartet auf
+    reale Messdaten, #156-Gate).**
+    (1) **AP-B3 (I/O-Achse):** `arge2002tpie` (ESA 2002, LNCS 2461 — derselbe Band wie der
+    AP-B2-Korpus) + `mehlhorn2008toolbox` neu in bib (DBLP/SpringerLink-verifiziert, 0 Duplikate);
+    T14-Prosa DE+EN verankert die Achse in der External-Memory-Tradition mit regelkonformem
+    Rückverweis auf die §2.2-Blocktransfer-Passage.
+    (2) **AP-B4 (Anhang B Code-Struktur, DE+EN):** reale Struktur der 3 Repos zum Stichtag
+    2026-07-11 (Commits c022ce05/faa4e76/ba3a9ae), 125 Pfade einzeln verifiziert;
+    Verzeichnisbäume + Komponenten-Tabellen; 33/30-Profil-Zählung aufgeklärt (30 SOTA-Profile +
+    olc/rcu/hazard_pointers-Disziplin-Dateien). **Als Nebenprodukt Code-Diskrepanz in §4.1
+    gefunden+gefixt:** die aus der Urfassung restaurierte ABI-Header-Liste war code-widrig
+    (search_engine/execution_engine sind Bibliotheken, keine ABI-Header; korrekt =
+    baustein_variants, resolve_baustein, module_abi_v1).
+    (3) **AP-B5 (Anhang E, DE+EN):** 12 ADRs (Kontext/Entscheidung/Konsequenz/Beleg), alle 15
+    Beleg-Labels beidsprachig verifiziert; nicht im Thesis-Text Belegtes wurde NICHT behauptet
+    (z. B. „std::map-Orakel" auf den belegten Vertrag+Konformitäts-Gatter zurückgeführt);
+    historische, inzwischen revidierte F1–F15-Beschlüsse bewusst außen vor.
+    **Beweise:** Builds DE 168 S./EN 162 S. (+4/+4 S. durch die Anhänge), 0 Errors/0 Overfull/
+    0 Warnungen (18 verbatim-Zeilen ≤80 Zeichen gekürzt, \allowbreak-Fixes); DE≡EN-Cite-Gleichheit
+    alle 12 Dateipaare; Verweis-Scan 42/17/0 symmetrisch; Render-Sichtprüfung Anhang B (S. 103) +
+    E (S. 145).
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
