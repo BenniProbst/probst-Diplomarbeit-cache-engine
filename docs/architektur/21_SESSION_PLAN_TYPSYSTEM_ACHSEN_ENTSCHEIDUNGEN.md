@@ -206,9 +206,22 @@ nahe der Mess-Maschinerie, berührt das Zwei-Phasen-Protokoll (Thesis-Kern) = **
 (Ledger §0: anhalten), GO-pflichtig.** Versuch vollständig revertiert (ce clean). Backup:
 `docs/sessions/backups/20260711-phase03-allocator-adapter/DOSSIER.md §3b`.
 
-**Meta-Befund (0.2 + 0.3):** Beide Phase-0-Utilization-Items sind KEINE „punktuellen Refactorings", sondern
-stoßen an harte Architektur-Grenzen (0.2: golden/mp_list-TABU + intrinsische Layout-Semantik; 0.3: COW-Mess-
-Maschinerie). Das Utilization-Schließen ist Architektur-Arbeit mit GO-Bedarf, nicht der erwartete punktuelle Strom.
+**Meta-Befund (0.2 + 0.3 + Hebel-A-Rest, verifiziert):** KEINES der verbleibenden Phase-0-Utilization-Items ist
+ein „punktuelles Refactoring":
+- **0.2** general_hardware→Organe: golden/mp_list-TABU + `cache_line_size()` ist intrinsische Layout-Semantik
+  (nicht HW-Deskriptor); axis_12 fließt bereits via Build-Variant. → gegenstandslos/design-gated.
+- **0.3** Allocator-Adapter: bricht die COW-Zwei-Phasen-Messung; sauber nur mit Tier-Level-Strategie-Besitz
+  (Mess-Maschinerie). → GO-pflichtig.
+- **Hebel-A-Rest** *_scan-Routing über isa: die *_scan-Kerne sind bewusst **strided Mess-Kerne**, deren
+  ZUGRIFFSMUSTER das Achsen-Signal IST (z.B. `scan_field_sum` round_up(record_size,64) = Layout-Differenzierung
+  cache_line_aligned vs aos_strict). SIMD würde das Muster ändern → **Signal korrumpiert**. NICHT das saubere
+  simd_field_sum-Muster (das war der kontiguierliche Sum der isa-EIGENEN Achse, Phase 0.1). → Fehldiagnose wie 0.2.
+- **Sauber+GO-frei, aber HW-gated:** aarch64-NEON/riscv-RVV `simd_field_sum` (isa-eigene Achse, result-invariant
+  wie 0.1) — aber auf x86-prod1 nur compile-only (kein ARM-Runtime, prod2-RMA ~Sep, INFRA-gated).
+
+**Konsequenz:** Phase 0.1 (isa-eigener SIMD-Kern) war das EINZIGE sauber+verifizierbar+GO-freie Utilization-Item
+auf x86-prod1. Der Rest ist Architektur-Arbeit (GO) oder HW-gated. Die Audit-Rahmung „punktuelle Refactorings"
+trifft für Phase 0 nicht zu — Utilization-Schließen berührt Mess-Semantik/golden/COW und braucht Design-GO.
 
 **Design-Forks (Thesis schweigt / TABU → GO-pflichtig, geparkt):** (F-A) Scope: nur Re-Diagnose vs. NUMA/Page→allocator
 jetzt bauen. (F-B) welche Felder→welche Organe, compile-time-gated vs. Varianten-Auswahl. (F-C) Werteset-Divergenz der
