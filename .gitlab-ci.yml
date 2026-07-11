@@ -37,14 +37,17 @@ stages:
 # via GIT_SUBMODULE_FORCE_HTTPS auf HTTPS umgeschriebenen Submodul-Klone → alle 3 Submodule (ce/prt-art/
 # thesis) klonen UNAUTHENTIFIZIERT → "remote: HTTP Basic: Access denied". Die inbound-job_token_scope-
 # Allowlists sind korrekt (super∈{286,287,289}); es kam nur kein Token an.
-# Fix: pre_get_sources_script (GitLab ≥15.10, hier 18.9) laeuft VOR get_sources und erzwingt die
-# Credential-Injektion fuer ALLE gitlab.comdare.de-URLs → der rekursive Submodul-Fetch nutzt das
-# CI_JOB_TOKEN, das per Allowlist Zugriff auf die 3 Submodul-Projekte hat. Kein Deploy-Token, kein
-# GIT_SUBMODULE_STRATEGY-Umbau, keine ci-templates-Aenderung.
+# Befund (Job 252884): der pre_get_sources_script-Hook LIEF, der Haupt-Repo-Klon klappte, aber der
+# Submodul-Fetch mit CI_JOB_TOKEN failte weiter — d.h. das CI_JOB_TOKEN hat genuin KEINEN Cross-Projekt-
+# Klon-Zugriff auf die privaten Submodule (auch root-getriggert; die Allowlist ist nicht der wirksame
+# Gate fuer den git-Klon). Fix: ein limitiertes Group-Deploy-Token (read_repository, comdare/research,
+# deckt ce/prt-art/thesis) als maskierte CI-Variablen CE_SUBMODULE_USER/CE_SUBMODULE_TOKEN; der Hook
+# injiziert es fuer ALLE gitlab.comdare.de-URLs → der rekursive Submodul-Fetch authentifiziert sich damit.
+# Kein GIT_SUBMODULE_STRATEGY-Umbau, keine ci-templates-Aenderung. Token read-only + jederzeit revoke-bar.
 default:
   hooks:
     pre_get_sources_script:
-      - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/".insteadOf "https://${CI_SERVER_HOST}/"
+      - git config --global url."https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/".insteadOf "https://${CI_SERVER_HOST}/"
 
 # #277/#21 (User 06.07.): ccache-Bestand liegt auf dev-MinIO (runners.cache -> minio.comdare.de:9000/buildsystem-cache).
 # CCACHE_DIR projektlokal, damit GitLab-cache ihn synct; MAXSIZE klein halten (Zip-Transfer je Job).
