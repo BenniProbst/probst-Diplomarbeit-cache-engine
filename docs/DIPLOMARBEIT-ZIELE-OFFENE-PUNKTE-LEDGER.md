@@ -546,6 +546,36 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     Verweis-Scan 42/15/0 symmetrisch regelkonform; Builds DE 164 S./EN 158 S. (+4 S. Dichte),
     0 Errors/0 Warnungen; Render-Sichtprüfung. Verbleibende Optional-Reste (kein Auftrag):
     sota-/axes-gallery 4-spaltig, Verlustliste NIEDRIG #16–#23, THINNED-Rest-Zähler.
+  - **AP-H2-13 VOLLZOGEN 2026-07-11 (USER-Auftrag „HOCH einarbeiten + alle Optional-Punkte";
+    thesis `4eeb83c`) → SÄMTLICHE Optional-Reste ABGEARBEITET, Habich-Runde 2 restlos geschlossen:**
+    (0) HOCH-Verifikation: alle 4 HOCH-Gaps waren bereits in AP-H2-12 eingearbeitet — grep-belegt
+    DE+EN (Konstruktvalidität dreigliedrig, Leinwand/Zwei-Beobachtungen, Durchreich-Varianten,
+    Bias-Absatz, Wegweiser/Balance-Invarianten). (1) **Verlustliste NIEDRIG #16–#23 KOMPLETT**:
+    3 Punkte waren durch AP-H2-12 gedeckt (Cortex-A76/Neoverse V2 + SiFive U74 in §2.2,
+    upgradeable-Sperrmodus in T8); 5 restauriert (DE+EN, je aus Urfassungs-Fundstelle):
+    GoF-Negativliste in §3.3.3 (Singleton/Flyweight/Bridge; **Command bewusst RAUS** — heute
+    aktiver Befehls-Kanal des Hybrid-Modus, User-Direktive 02.07./#251, stattdessen
+    Positiv-Abgrenzung mit Verweis sec:heuristics-modes) · Biomedizin-Provenienz der
+    Anatomie-Metapher in §3.3.1 · SPL-Feature-Mapping-Vollliste in §3.3.1 (Achse=Feature …
+    Anatomie=Verdrahtung; Anmerkung: Analyst-Item #16 „std::map-Familien" war bereits durch
+    Anhang F voll gedeckt) · Slab-Magazines-/Vmem-Erweiterung (bonwick-Cites, §3.2) ·
+    „alle 30 SOTA- und alle 10 Allokator-Profile sind getaggt" (Profil-Absatz §3.2).
+    (2) **Überbreiten/Figuren-Regel ALLE geschlossen** (sbox-vermessen, DE+EN):
+    fig:sota-gallery 16,91→15,96 cm gestaucht (Kacheln 3,8 cm, Raster 4,05) + resizebox WEG;
+    fig:axes-gallery 17,76→15,91 cm (5×4→4×5 Kacheln) + resizebox WEG; fig:prtart-gallery
+    (14,91 cm) und fig:one-architecture (15,53 cm) waren Aufblasungen → resizebox entfernt;
+    im eingebundenen Kapitelsatz verbleibt EINZIG fig:prtart-demo (0,98×, legitim verkleinernd,
+    kommentiert). (3) **THINNED-Rest-Zähler BEWERTET (kein Handlungsbedarf)**: von den 10
+    verbliebenen Zähler-Verdünnungen hatten 6 Inhalts-Befunde im Sweep, deren verlorene Fakten
+    in AP-H2-12 restauriert wurden — der Zähler bleibt niedriger, weil die Ur-Fassung dieselben
+    Fakten auf mehr Zitierstellen verteilte (bender2002scanning, bender2002treelayout,
+    drepper2007memory, hennessy2019architecture, hoefler2015benchmarking, idreos2018datacalculator);
+    4 waren im Inhalts-Sweep von vornherein OK = reine Konsolidierung ohne Substanzverlust
+    (graefe2001btree, iso_cpp, mimalloc_bench, pugh1990skiplist). **Beweise:** Builds DE 164 S./
+    EN 158 S., 0 Errors/0 Overfull/0 Warnungen; DE≡EN-Cite-Gleichheit alle 10 Dateipaare;
+    Verweis-Scan 42/17/0 symmetrisch regelkonform (2 neue kapitelinterne Vorwärtsverweise =
+    Grundlage→Vertiefung); Render-Sichtprüfung 4 Figuren-Seiten DE+EN. **Damit ist aus
+    Habich-Runde 2 NICHTS mehr offen** — weder Pflicht noch optional.
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
