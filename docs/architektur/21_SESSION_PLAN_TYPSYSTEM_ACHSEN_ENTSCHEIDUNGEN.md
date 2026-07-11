@@ -154,8 +154,8 @@ granulare Commits beide Remotes → CI strikt grün).
   `isa::simd_field_sum` koppeln) — **✅ ce `8175c802`, CI grün 2026-07-10** (uint64-akkumuliert build-invariant
   über SSE2/AVX2/AVX512; adversarialer Re-Review wf_4e7c94c2). (2) general_hardware (12) verdrahten —
   **RE-DIAGNOSTIZIERT, s. §F.1** (die Audit-Rahmung „Organe lesen `cache_line_size` aus axis_12" ist widerlegt;
-  design-gated Rest). (3) Allocator-Adapter (Hebel B) in die 11 Pools + 4 Shapes — **jetzt der nächste
-  boundary-saubere Increment**.
+  design-gated Rest). (3) Allocator-Adapter (Hebel B) in die 11 Pools + 4 Shapes — **RE-DIAGNOSTIZIERT §F.2:
+  COW-Wand, NEUE Architektur-Entscheidung (GO-pflichtig), kein punktuelles Refactoring**.
 - **Phase 1 — Tag-Spreads materialisieren (K):** je Klassifikations-Tag eine echte `StaticAxisVariants`-Liste
   + kartesisches Kreuzprodukt (zuerst node/allocator/layout mit realem Store-Effekt).
 - **Phase 2 — Prefetch-Unter-Achse (§E):** Shape-Mixin (compile-time) + verbreiterter distance-Setter
@@ -192,6 +192,24 @@ noch fehlende axis_12-Organ-Konsumption ist **NUMA/Page → allocator** (thesis-
 sind thesis-**under-specified** → **design-gated (GO-pflichtig, s. §H-Forks unten)**. **Nächster boundary-sauberer
 Increment ist daher Phase 0.3 (Allocator-Adapter / Hebel B).**
 
+### §F.2 — Re-Diagnose Phase 0.3 „Allocator-Adapter (Hebel B)" (2026-07-11, Implementierungs-Versuch)
+
+Boundary-Verifikation ergab: KEIN mp_list-Templatizing (gut). ABER der Implementierungs-Versuch (Store besitzt
+axis_06-Strategie, Vektoren via self-referential StdAllocatorAdapter, Copy/Move gelöscht = axis_04-ComposedStore-
+Muster) **bricht** an `abi_adapter.hpp:2176`: die **Zwei-Phasen-Op-Messung** COW-**kopiert** das Such-Organ
+(`saved_container_algorithm_.emplace(container_algorithm_)`). (1) gelöschte Copy/Move → COW nicht konstruierbar;
+(2) rebindender Copy-Ctor → **Stats-Doppelzählung** bei jeder COW-Save → T6 korrumpiert. axis_04 darf Copy/Move
+löschen (Node-Organ, NICHT COW-kopiert); der **Pool-Store im Such-Organ IST COW-kopiert** → das Muster ist
+inapplikabel. **Sauberer Weg = Tier-Level-Strategie-Besitz** (Anatomie besitzt EINE axis_06-Instanz, in die
+Pool-Store-Vektoren gefädelt; COW-Kopien teilen die externe Strategie → korrekte Stats) — mehrschichtiger Umbau
+nahe der Mess-Maschinerie, berührt das Zwei-Phasen-Protokoll (Thesis-Kern) = **NEUE Architektur-Entscheidung
+(Ledger §0: anhalten), GO-pflichtig.** Versuch vollständig revertiert (ce clean). Backup:
+`docs/sessions/backups/20260711-phase03-allocator-adapter/DOSSIER.md §3b`.
+
+**Meta-Befund (0.2 + 0.3):** Beide Phase-0-Utilization-Items sind KEINE „punktuellen Refactorings", sondern
+stoßen an harte Architektur-Grenzen (0.2: golden/mp_list-TABU + intrinsische Layout-Semantik; 0.3: COW-Mess-
+Maschinerie). Das Utilization-Schließen ist Architektur-Arbeit mit GO-Bedarf, nicht der erwartete punktuelle Strom.
+
 **Design-Forks (Thesis schweigt / TABU → GO-pflichtig, geparkt):** (F-A) Scope: nur Re-Diagnose vs. NUMA/Page→allocator
 jetzt bauen. (F-B) welche Felder→welche Organe, compile-time-gated vs. Varianten-Auswahl. (F-C) Werteset-Divergenz der
 **Mess-Achse** (Thesis KF-5 `{32,64,128}` vs. Code `{B64,B128,B256}`; Line-Größe vs. Knoten-Breite-in-Lines =
@@ -214,7 +232,9 @@ arm64/#276/gcc-15.3 = **INFRA-gated**. P/E-Core = **HW-gated** (prod2-RMA ~Septe
 Dataset-Wahrheitsquelle + Framework-Bib = **weitere EXTERN-Forks** (durch H1/H5 jetzt konzeptionell entschieden;
 Umsetzung folgt der Bau-Reihenfolge). #256/#274-Matrix-Migration = eigene Strecke.
 
-**Nächster konkreter Increment:** Phase 0.3 — Allocator-Adapter (Hebel B): `axis_06 as_std_allocator`/
-`StdAllocatorAdapter` in die 11 Pool-Organe + 4 Shapes statt `std::allocator` (`tier_to_organ_mapping.hpp:46-115`),
-boundary-sauber (kein mp_list-Blatt-Templatizing). (Phase 0.1 ✅ ce `8175c802`; Phase 0.2 re-diagnostiziert §F.1 →
-NUMA/Page→allocator + Werteset-Split design-gated/GO-pflichtig.)
+**Nächster konkreter Increment:** OFFEN — die drei Phase-0-Utilization-Items sind alle GO-pflichtig geworden
+(Phase 0.1 ✅ ce `8175c802` CI-grün; Phase 0.2 §F.1 re-diagnostiziert = design-gated; Phase 0.3 §F.2 = COW-
+Architektur-Entscheidung). Boundary-saubere Alternativen ohne GO: die **Tag-Spread-/Skalar-Unter-Achsen
+(Phase 1/4)** oder Prefetch-Unter-Achse (Phase 2) prüfen — ODER User-GO für die Tier-Level-Allocator-Architektur
+(0.3) bzw. die 0.2-Forks einholen. Empfehlung: nächste Phase erst Ist-verifizieren (wie 0.2/0.3 gezeigt: die
+Audit-Rahmung ist optimistisch), bevor als „punktuell" eingeplant.
