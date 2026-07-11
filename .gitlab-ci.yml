@@ -41,21 +41,32 @@ stages:
 # Submodule. Fix: ein limitiertes Group-Deploy-Token (read_repository, comdare/research, deckt ce/prt-art/
 # thesis) als maskierte CI-Variablen CE_SUBMODULE_USER/CE_SUBMODULE_TOKEN.
 #
-# KERN-FIX (REV 14, 2026-07-11, empirisch via GIT_TRACE verifiziert): die REV-13-insteadOf-QUELLE
-# "https://${CI_SERVER_HOST}/" war der Fehler. Alle 3 .gitmodules nutzen RELATIVE URLs (../<repo>.git);
-# `git submodule sync` loest sie gegen remote.origin.url == CI_REPOSITORY_URL auf, das bereits
-# gitlab-ci-token:${CI_JOB_TOKEN}@ traegt → die konkrete Submodul-URL ist
-# https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/comdare/research/<repo>.git (Parent-Origin-
-# Vererbung). git-insteadOf ist ein links-verankerter Prefix-STRING-Match; der credential-freie Prefix
-# "https://${CI_SERVER_HOST}/" ist KEIN Prefix dieser Token-URL → der Rewrite feuerte nie (= die 2
-# Fehlversuche). Loesung: die insteadOf-Quelle ist exakt der credential-behaftete Token-Prefix — dann
-# rewritet git die Auto-Fetch-URL auf das Deploy-Token (GIT_TRACE: git-remote-https kontaktiert die
-# DEPLOY-URL). Kein GIT_SUBMODULE_STRATEGY-Umbau, kein before_script, keine ci-templates-Aenderung; lebt
-# in hooks (kein Job ueberschreibt hooks). CE_SUBMODULE_TOKEN ist masked → kein Leak. Revoke-bar.
+# (REV 13/14 = insteadOf-Ansaetze, SUPERSEDED: der Runner klont die Submodule mit CLEAN URLs
+# https://${CI_SERVER_HOST}/comdare/research/<repo>.git — KEINE URL-Credentials — und liefert den
+# CI_JOB_TOKEN via `http.<host>.extraheader` (AUTHORIZATION: Bearer …, hier vom Runner faelschlich als
+# 'cd-buildsystem-construct'-Token). Deshalb matcht KEINE insteadOf-Variante (weder clean- noch Token-
+# Prefix), und der Header uebertrumpft ohnehin jede URL-Credential → 403 job-token (Pipeline 9707-Trace).
+#
+# KERN-FIX (REV 15, 2026-07-11, gegen den ECHTEN Runner-Trace): GIT_SUBMODULE_STRATEGY:none (unten) schaltet
+# das failende Auto-Fetch in get_sources ab; die 3 Submodule werden hier MANUELL geklont. Zwei Dinge zusammen:
+#  (1) die Submodul-URL traegt die Deploy-Token-Credentials EXPLIZIT (umgeht insteadOf + Parent-Origin-Vererbung),
+#  (2) der Runner-extraheader wird per `-c "http.${CI_SERVER_URL}.extraheader="` (leer = Reset der Header-Liste)
+#      GELEERT — sonst uebertrumpft der Bearer-Header die URL-Basic-Auth und GitLab lehnt ab.
+# Lebt in default:before_script (laeuft NACH get_sources). Lint-Jobs haben ihr eigenes before_script (.lint-base)
+# → sie erben diesen Block NICHT und bleiben submodul-frei (STRATEGY:none). Alle submodul-brauchenden Jobs
+# (verify:submodules/build:clang/test:unit/analyse/integration/manifest/thesis-pdf) haben KEIN eigenes
+# before_script → sie erben ihn. Guard schuetzt Repo-lose Jobs (toolchain:probe = GIT_STRATEGY:none).
+# CE_SUBMODULE_TOKEN ist masked → kein Leak. ci-templates unberuehrt. Token read-only + revoke-bar.
 default:
-  hooks:
-    pre_get_sources_script:
-      - git config --global url."https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/".insteadOf "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/"
+  before_script:
+    - |
+      if [ -f .gitmodules ] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        git submodule sync --recursive
+        git config submodule.Code/external/comdare-cache-engine.url "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/comdare-cache-engine.git"
+        git config submodule.Code/external/comdare-prt-art.url    "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/comdare-prt-art.git"
+        git config submodule.thesis/diplomarbeit.url              "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/20260931-overleaf-diplomarbeit.git"
+        git -c "http.${CI_SERVER_URL}.extraheader=" submodule update --init --recursive
+      fi
 
 # #277/#21 (User 06.07.): ccache-Bestand liegt auf dev-MinIO (runners.cache -> minio.comdare.de:9000/buildsystem-cache).
 # CCACHE_DIR projektlokal, damit GitLab-cache ihn synct; MAXSIZE klein halten (Zip-Transfer je Job).
@@ -67,7 +78,7 @@ variables:
   CCACHE_DIR: "$CI_PROJECT_DIR/.ccache"
   CCACHE_MAXSIZE: "3G"
   COMDARE_CLANG_MATRIX: "1"   # #273: neueste-clang-Pflicht (User-E2), Rollout-Start super
-  GIT_SUBMODULE_STRATEGY: recursive       # Default fuer die Build-Stages; Lint ueberschreibt auf none
+  GIT_SUBMODULE_STRATEGY: none            # REV 15: Auto-Fetch AUS (failt am Runner-extraheader); Submodule via default:before_script manuell mit Deploy-Token
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
   CMAKE_BUILD_PARALLEL_LEVEL: "6"          # User 2026-07-06: 2x6 Kerne bei concurrent=2 (prod1 16C/60G, 17G frei, kein earlyoom; revidiert 8@concurrent=1)
   COMDARE_LINT_PATHS: "Code"
