@@ -105,6 +105,20 @@ Allocator-Semantik (die alte allocator-unabhaengige Zaehlung hatte allocated==in
 Threading permutierter axis_06 → Store-Alloc, Cross-Allocator-Differenzierung) = Folge-Slice; die uebrigen 9 Stores
 gleiche Folge-Slices (restore_statistics je erreichte Familie).
 
+## 3d. SKALIERUNG (2026-07-11) — 3 Stores konvertiert + Grenze von Option A entdeckt
+Option-A-Memento auf 3 Stores repliziert, je CI-grün: **BST** (ce 96d5c422), **btree** (ce 78334902,
++`pool_node_count()`-Plumbing fuer den Shape-Struktur-Consumer test_234_va), **surf** (ce 21a9af74, sauberer
+2-Vektor-Mirror). **GRENZE (wichtig):** Option A (stateful `StdAllocatorAdapter` haelt `&allocator_`) komponiert
+NUR sauber mit Stores, deren Vektoren ELEMENTE direkt halten (2-Vektor). **Nested-Container-Stores brechen es:**
+- `skip_list`: der Knoten `SkipListNodePoolNode<FwdAlloc>` enthaelt SELBST einen `std::vector<size_t,FwdAlloc>`
+  (per-node forward-Indizes) → der per `push_back` default-konstruierte Knoten kann den stateful Adapter nicht halten.
+- `wormhole`: enthaelt eine Map (map_allocator_type).
+- `art` (10 Vektoren), `hash` (8), `start` (6): vielfach-Container.
+Diese brauchen EIGENES Design: (a) stateless Allocator-Variante ODER (b) **0.3b Tier-Level-Threading** (Anatomie
+besitzt EINE Strategie, extern in die Organe gefaedelt) — loest nested-Container UND die Cross-Allocator-
+Differenzierung zugleich. **EMPFEHLUNG: 0.3b VOR den restlichen 6 Stores** (der sauberere Weg + Research-Payoff).
+Consumer je Store pruefen (skip_list: +test_234_f2_shape +tier_organ_equivalence).
+
 ## 4. DoD (doppelt-literal, g++-16)
 Voller ctest 100% (inkl. s7_1 neu); clang-format-22==0; Mojibake==0; git status NUR die berührten Dateien;
 golden/POD/ABI byte-unberührt (kein Registry/POD/GenusBindingTraits-Touch — git-diff-Beleg); Verhaltens-Nachweis:
