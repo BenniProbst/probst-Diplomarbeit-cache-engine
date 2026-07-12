@@ -45,11 +45,11 @@ constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount> kSegme
 // Ziel-Member per Pointer-to-Member) und (b) die Range-Aggregation (p50/p99-Accessor je Op). Reihenfolge =
 // feste Stapel-/Legenden-/x-Reihenfolge. p99_col fehlt für den Parse; die Aggregation nutzt nur die Member.
 struct OpRangeSpec {
-    std::string_view display;             // Anzeigename (insert/lookup/erase/scan/rmw)
-    std::string_view p50_col;             // WIDE-Spaltenname der p50
-    std::string_view p99_col;             // WIDE-Spaltenname der p99
-    double WideMeasurementRow::* p50_mem; // Ziel-Member p50
-    double WideMeasurementRow::* p99_mem; // Ziel-Member p99
+    std::string_view display;                       // Anzeigename (insert/lookup/erase/scan/rmw)
+    std::string_view p50_col;                       // WIDE-Spaltenname der p50
+    std::string_view p99_col;                       // WIDE-Spaltenname der p99
+    double WideMeasurementRow::* p50_mem = nullptr; // Ziel-Member p50 (cppcheck uninitMemberVarNoCtor)
+    double WideMeasurementRow::* p99_mem = nullptr; // Ziel-Member p99 (dito; kRangeOps initialisiert beide)
 };
 constexpr std::array<OpRangeSpec, 5> kRangeOps = {{
     {"insert", "op_insert_p50_ns", "op_insert_p99_ns", &WideMeasurementRow::op_insert_p50_ns,
