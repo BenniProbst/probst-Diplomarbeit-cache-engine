@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -351,5 +352,185 @@ TEST(Stufe05Pipeline, SegAttributionGuardHonestEmptyOnAllNa) {
     EXPECT_EQ(dg::write_segment_attribution_stacked_bar(out, rows, "en"), dg::status_empty_input);
     std::error_code ec;
     fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// P3 (2026-07-12) — Latenz-VERTEILUNG statt Mittelwert (Range-Spanne + Config-ECDF)
+// ─────────────────────────────────────────────────────────────────────────────
+namespace {
+
+// 14-Spalten-WIDE-Zeilen mit p50 UND p99 je op-Art. 0-Werte = Op nicht ausgefuehrt (muss von der Range-
+// Aggregation ausgeschlossen werden, KEIN Phantom-0). scan-Zeile mit workload=ycsb_e ist ein No-Op-Scan
+// (muss von der scan-Aggregation ausgeschlossen werden), zaehlt aber als gueltige Config fuer die ECDF.
+void write_sample_wide_p99_csv(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_insert_p99_ns;op_lookup_p50_ns;op_lookup_p99_ns;"
+      << "op_erase_p50_ns;op_erase_p99_ns;op_scan_p50_ns;op_scan_p99_ns;op_rmw_p50_ns;op_rmw_p99_ns;"
+      << "workload;two_phase_valid\n";
+    // A,B: k_ary ycsb_c (insert+lookup ausgefuehrt, p99>p50). C: k_ary scan_wl (scan p50=500,p99=700).
+    f << "search_algo=k_ary/mapping=direct;1000;100;200;50;90;0;0;0;0;0;0;ycsb_c;1\n";
+    f << "search_algo=k_ary/mapping=direct;1100;120;240;60;100;0;0;0;0;0;0;ycsb_c;1\n";
+    f << "search_algo=k_ary/mapping=direct;5000;0;0;0;0;0;0;500;700;0;0;scan_wl;1\n";
+    // D: k_ary ycsb_e (No-Op-Scan 1/2 → aus scan-Agg ausgeschlossen; ns_per_op=900 zaehlt fuer ECDF).
+    f << "search_algo=k_ary/mapping=direct;900;0;0;0;0;0;0;1;2;0;0;ycsb_e;1\n";
+    // E: eytzinger ycsb_c (insert+lookup). F: eytzinger two_phase_valid=0 → komplett verworfen.
+    f << "search_algo=eytzinger/mapping=direct;2000;200;300;80;120;0;0;0;0;0;0;ycsb_c;1\n";
+    f << "search_algo=eytzinger/mapping=direct;9999;1;1;1;1;1;1;1;1;1;1;ycsb_c;0\n";
+}
+
+std::size_t p3_count(fs::path const& p, std::string_view needle) {
+    std::ifstream in(p);
+    std::string   content((std::istreambuf_iterator<char>(in)), {});
+    std::size_t   n = 0, pos = 0;
+    while ((pos = content.find(needle, pos)) != std::string::npos) {
+        ++n;
+        pos += needle.size();
+    }
+    return n;
+}
+
+} // namespace
+
+// (a) p99-Parse: header-getrieben, n-a-tolerant. Alle 5 op_*_p99_ns numerisch → has_op_p99; EINE "n/a" → false.
+TEST(Stufe05Pipeline, ParseWideCsvOpP99Columns) {
+    auto p = fs::temp_directory_path() / "p3_p99_parse.csv";
+    fs::create_directories(p.parent_path());
+    {
+        std::ofstream f(p);
+        f << "binary_id;ns_per_op;op_insert_p50_ns;op_insert_p99_ns;op_lookup_p50_ns;op_lookup_p99_ns;"
+          << "op_erase_p50_ns;op_erase_p99_ns;op_scan_p50_ns;op_scan_p99_ns;op_rmw_p50_ns;op_rmw_p99_ns;"
+          << "workload;two_phase_valid\n";
+        f << "search_algo=k_ary/mapping=direct;1000;100;200;50;90;10;20;0;0;5;9;ycsb_c;1\n";
+        // op_scan_p99_ns = n/a → has_op_p99=false, KEIN Parse-Gesamtfehler (n-a-tolerant).
+        f << "search_algo=eytzinger/mapping=direct;1200;110;210;55;95;12;22;0;n/a;6;10;ycsb_c;1\n";
+    }
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_EQ(rows.size(), 2u);
+    EXPECT_TRUE(rows[0].has_op_p99);
+    EXPECT_DOUBLE_EQ(rows[0].op_insert_p99_ns, 200.0);
+    EXPECT_DOUBLE_EQ(rows[0].op_rmw_p99_ns, 9.0);
+    EXPECT_FALSE(rows[1].has_op_p99); // eine n/a-Zelle → Zeile ohne p99 (honest)
+    std::error_code ec;
+    fs::remove(p, ec);
+}
+
+// (b) Range-Aggregat: Whisker-Top (Median p99) >= Punkt (Median p50) je Zelle (Monotonie); scan-No-Op- und
+// 0-Op-Ausschluss; op-Arten ohne Daten (erase/rmw) fehlen; nearest-rank-Median deterministisch.
+TEST(Stufe05Pipeline, LatencyRangeAggregateMonotoneAndExclusions) {
+    auto p = fs::temp_directory_path() / "p3_range_agg.csv";
+    write_sample_wide_p99_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto const agg = dg::aggregate_latency_range(rows);
+    ASSERT_EQ(agg.algos.size(), 2u);
+    EXPECT_EQ(agg.algos[0], "eytzinger");
+    EXPECT_EQ(agg.algos[1], "k_ary");
+    // erase/rmw nie ausgefuehrt (p50=0) → NICHT als op-Zeile; scan nur via scan_wl (ycsb_e ausgeschlossen).
+    ASSERT_EQ(agg.ops.size(), 3u);
+    EXPECT_EQ(agg.ops[0], "insert");
+    EXPECT_EQ(agg.ops[1], "lookup");
+    EXPECT_EQ(agg.ops[2], "scan");
+
+    // Monotonie: fuer JEDE vorhandene Zelle gilt Median-p99 >= Median-p50 (Whisker zeigt nach OBEN).
+    for (std::size_t oi = 0; oi < agg.ops.size(); ++oi)
+        for (std::size_t ai = 0; ai < agg.algos.size(); ++ai)
+            if (agg.present[oi][ai]) EXPECT_GE(agg.p99_median[oi][ai], agg.p50_median[oi][ai]);
+
+    // scan nur fuer k_ary (Index 1) vorhanden, NICHT fuer eytzinger; No-Op ycsb_e (1/2) ausgeschlossen →
+    // Median bleibt 500/700 (nicht durch 1/2 verwaessert).
+    EXPECT_FALSE(agg.present[2][0]); // scan × eytzinger
+    ASSERT_TRUE(agg.present[2][1]);  // scan × k_ary
+    EXPECT_DOUBLE_EQ(agg.p50_median[2][1], 500.0);
+    EXPECT_DOUBLE_EQ(agg.p99_median[2][1], 700.0);
+    // k_ary insert nearest-rank-Median [100,120] → 120 (obere), p99 [200,240] → 240.
+    EXPECT_DOUBLE_EQ(agg.p50_median[0][1], 120.0);
+    EXPECT_DOUBLE_EQ(agg.p99_median[0][1], 240.0);
+    std::error_code ec;
+    fs::remove(p, ec);
+}
+
+// (c) Writer: valides pgfplots (Punkt+plus-Whisker, log-y), 1 addplot je op-Art, KEIN Box/Quartil-Artefakt.
+TEST(Stufe05Pipeline, LatencyRangeBarEmitsWhiskersNoBoxplot) {
+    auto p = fs::temp_directory_path() / "p3_range_writer.csv";
+    write_sample_wide_p99_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto out = fs::temp_directory_path() / "p3_latency_range.tex";
+    ASSERT_EQ(dg::write_latency_range_bar(out, rows, "de"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "error bars"));
+    EXPECT_TRUE(file_contains(out, "y dir=plus"));
+    EXPECT_TRUE(file_contains(out, "ymode=log"));
+    EXPECT_TRUE(file_contains(out, "+- (0,")); // plus-Whisker-Syntax
+    EXPECT_EQ(p3_count(out, "\\addplot"), 3u); // insert/lookup/scan
+    // (c) KEIN Box-Plot / erfundene Quartile.
+    EXPECT_FALSE(file_contains(out, "boxplot"));
+    EXPECT_FALSE(file_contains(out, "box plot"));
+    EXPECT_FALSE(file_contains(out, "quartile"));
+    EXPECT_FALSE(file_contains(out, "lower whisker"));
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (d) ECDF: Population = ANZAHL KONFIGURATIONEN (nicht Einzel-Ops), sortiert; Treppe y∈[0,1]; Config-Streuung.
+TEST(Stufe05Pipeline, LatencyEcdfConfigPopulationMonotone) {
+    auto p = fs::temp_directory_path() / "p3_ecdf.csv";
+    write_sample_wide_p99_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto const series = dg::aggregate_latency_ecdf(rows);
+    ASSERT_EQ(series.size(), 2u);
+    EXPECT_EQ(series[0].algo, "eytzinger");
+    EXPECT_EQ(series[1].algo, "k_ary");
+    // k_ary: 4 gueltige Configs (A,B,C,D; ns_per_op 1000,1100,5000,900) — Population = Config-Anzahl.
+    ASSERT_EQ(series[1].sorted_ns_per_op.size(), 4u);
+    EXPECT_DOUBLE_EQ(series[1].sorted_ns_per_op.front(), 900.0); // aufsteigend sortiert
+    EXPECT_DOUBLE_EQ(series[1].sorted_ns_per_op.back(), 5000.0);
+    EXPECT_TRUE(std::is_sorted(series[1].sorted_ns_per_op.begin(), series[1].sorted_ns_per_op.end()));
+    // eytzinger: nur E (F ist two_phase_valid=0 → verworfen).
+    EXPECT_EQ(series[0].sorted_ns_per_op.size(), 1u);
+
+    auto out = fs::temp_directory_path() / "p3_latency_ecdf.tex";
+    ASSERT_EQ(dg::write_latency_ecdf(out, rows, "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "const plot"));
+    EXPECT_TRUE(file_contains(out, "ymin=0, ymax=1"));
+    EXPECT_TRUE(file_contains(out, "xmode=log"));
+    // Titel/xlabel weisen EXPLIZIT die Config-Streuung aus (NICHT Per-Operation).
+    EXPECT_TRUE(file_contains(out, "distribution over configurations"));
+    EXPECT_TRUE(file_contains(out, "1.0000")); // Treppe erreicht y=1
+    EXPECT_EQ(p3_count(out, "\\addplot"), 2u);
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (e) Guard: keine p99 (altes cowfix-v1-Schema ohne op_*_p99_ns) → Range honest leer. ECDF auf leerer Eingabe leer.
+TEST(Stufe05Pipeline, LatencyDistributionGuardsHonestEmpty) {
+    // Range: die bestehende p50-only-Fixture (kein p99) → has_op_p99=false → keine gueltige Zeile.
+    auto p = fs::temp_directory_path() / "p3_no_p99.csv";
+    write_sample_wide_csv(p); // p50-only-Header (L-c), KEINE op_*_p99_ns-Spalten
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    for (auto const& r : rows) EXPECT_FALSE(r.has_op_p99);
+    auto const agg = dg::aggregate_latency_range(rows);
+    EXPECT_TRUE(agg.algos.empty());
+    auto out = fs::temp_directory_path() / "p3_range_empty.tex";
+    EXPECT_EQ(dg::write_latency_range_bar(out, rows, "en"), dg::status_empty_input);
+
+    // ECDF: leere Eingabe → honest leer.
+    std::vector<dg::WideMeasurementRow> none;
+    auto                                out2 = fs::temp_directory_path() / "p3_ecdf_empty.tex";
+    EXPECT_EQ(dg::write_latency_ecdf(out2, none, "en"), dg::status_empty_input);
+    EXPECT_TRUE(dg::aggregate_latency_ecdf(none).empty());
+
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(out2, ec);
     fs::remove(p, ec);
 }

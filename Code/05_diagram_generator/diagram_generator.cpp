@@ -40,6 +40,29 @@ constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount> kSegme
     return s;
 }
 
+// P3 (2026-07-12): die 5 Interface-Funktions-Op-Arten (Teilmenge kOpKindNames = insert/lookup/erase/scan/rmw,
+// spiegelt die 5 in WideMeasurementRow getragenen p50/p99). SINGLE-SOURCE für (a) den p99-Parse (Spaltenname +
+// Ziel-Member per Pointer-to-Member) und (b) die Range-Aggregation (p50/p99-Accessor je Op). Reihenfolge =
+// feste Stapel-/Legenden-/x-Reihenfolge. p99_col fehlt für den Parse; die Aggregation nutzt nur die Member.
+struct OpRangeSpec {
+    std::string_view display;             // Anzeigename (insert/lookup/erase/scan/rmw)
+    std::string_view p50_col;             // WIDE-Spaltenname der p50
+    std::string_view p99_col;             // WIDE-Spaltenname der p99
+    double WideMeasurementRow::* p50_mem; // Ziel-Member p50
+    double WideMeasurementRow::* p99_mem; // Ziel-Member p99
+};
+constexpr std::array<OpRangeSpec, 5> kRangeOps = {{
+    {"insert", "op_insert_p50_ns", "op_insert_p99_ns", &WideMeasurementRow::op_insert_p50_ns,
+     &WideMeasurementRow::op_insert_p99_ns},
+    {"lookup", "op_lookup_p50_ns", "op_lookup_p99_ns", &WideMeasurementRow::op_lookup_p50_ns,
+     &WideMeasurementRow::op_lookup_p99_ns},
+    {"erase", "op_erase_p50_ns", "op_erase_p99_ns", &WideMeasurementRow::op_erase_p50_ns,
+     &WideMeasurementRow::op_erase_p99_ns},
+    {"scan", "op_scan_p50_ns", "op_scan_p99_ns", &WideMeasurementRow::op_scan_p50_ns,
+     &WideMeasurementRow::op_scan_p99_ns},
+    {"rmw", "op_rmw_p50_ns", "op_rmw_p99_ns", &WideMeasurementRow::op_rmw_p50_ns, &WideMeasurementRow::op_rmw_p99_ns},
+}};
+
 void write_pgfplots_axis_options(std::ostream& out, PageConstraints const& cnst, std::string const& title,
                                  std::string const& x_label, std::string const& y_label) {
     out << "    width=" << fmt_double(cnst.width_fraction) << "\\textwidth,\n";
@@ -546,6 +569,32 @@ int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementR
                 } catch (std::exception const&) { /* n/a */
                 }
             }
+            // P3 (2026-07-12): die 5 op_<art>_p99_ns (spiegeln die 5 op_*_p50_ns). OPTIONAL/header-getrieben
+            // (NICHT in required[] → cowfix-v1 ohne p99 bricht nicht). n-a-tolerant: fehlt EINE der 5 Spalten
+            // ODER ist EINE Zelle leer/"n/a"/nicht-numerisch → has_op_p99 bleibt false (Zeile trägt zur Range-
+            // Aggregation nichts bei, wird NICHT als 0 gewhiskert). Der stod-Wurf wird LOKAL geschluckt.
+            {
+                bool all_present = true;
+                for (auto const& spec : kRangeOps) {
+                    auto oit = col.find(std::string{spec.p99_col});
+                    if (oit == col.end()) {
+                        all_present = false;
+                        break;
+                    }
+                    std::string const& cell = cols[oit->second];
+                    if (cell.empty() || cell == "n/a") {
+                        all_present = false;
+                        break;
+                    }
+                    try {
+                        r.*(spec.p99_mem) = std::stod(cell);
+                    } catch (std::exception const&) {
+                        all_present = false;
+                        break;
+                    }
+                }
+                r.has_op_p99 = all_present;
+            }
             out_rows.push_back(std::move(r));
         } catch (std::exception const&) { return status_empty_input; }
     }
@@ -881,6 +930,231 @@ int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std:
         }
         f << "};\n";
         f << "\\addlegendentry{" << escape_latex(agg.segment_labels[s]) << "}\n";
+    }
+    f << "\\end{axis}\n\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
+    if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
+    return f.good() ? status_ok : status_io_error;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// P3 (2026-07-12) — Latenz-VERTEILUNG statt Mittelwert (Range-Balken + Config-ECDF)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// EHRLICHKEIT (zwingend): das WIDE-Schema trägt je Permutation NUR aggregierte Perzentile (op_<art>_p50_ns /
+// op_<art>_p99_ns), NICHT die rohen Einzel-Op-Latenzen. Daher NUR zwei ehrliche Verteilungs-Sichten:
+//   (1) Range: Punkt=p50, Whisker→p99 (2 Perzentile → KEIN Box-Plot mit erfundenen Quartilen = Phantom).
+//   (2) ECDF: Verteilung ÜBER die Konfigurationen (jede gültige Permutation = 1 ns_per_op-Punkt) — Config-
+//       Streuung (Anteil der Configs mit Latenz ≤ x), NICHT eine Per-Operation-Latenz-CDF.
+
+LatencyRangeAggregate aggregate_latency_range(std::span<WideMeasurementRow const> rows) {
+    LatencyRangeAggregate agg;
+
+    // Stichproben je (op-Index × search_algo): p50- und p99-Werte getrennt gesammelt.
+    std::array<std::map<std::string, std::pair<std::vector<double>, std::vector<double>>>, kRangeOps.size()> per_op;
+    std::set<std::string>                                                                                    algo_set;
+    for (auto const& r : rows) {
+        if (!r.two_phase_valid) continue;    // Mess-Gültigkeit
+        if (r.search_algo.empty()) continue; // ohne Gruppen-Schlüssel nicht zuordenbar
+        if (!r.has_op_p99) continue;         // Range braucht p99 (fehlt → Zeile honest ausgelassen, NICHT 0-Whisker)
+        for (std::size_t oi = 0; oi < kRangeOps.size(); ++oi) {
+            bool const is_scan = (kRangeOps[oi].display == "scan");
+            // scan-No-Op-Ausschluss (ycsb_e / lp_range_scan) — konsistent zum Surface-Pfad.
+            if (is_scan && (r.workload == "ycsb_e" || r.workload == "lp_range_scan")) continue;
+            double const p50 = r.*(kRangeOps[oi].p50_mem);
+            double const p99 = r.*(kRangeOps[oi].p99_mem);
+            // 0 ns = Operation in dieser Config NICHT ausgeführt (keine Stichprobe) → NICHT als reale 0-Latenz
+            // mitteln (Phantom-Falle: "nicht gelaufen" ≠ "0 ns"). Nur ausgeführte Ops (p50>0) zählen.
+            if (!(p50 > 0.0)) continue;
+            auto& cell = per_op[oi][r.search_algo];
+            cell.first.push_back(p50);
+            cell.second.push_back(p99);
+            algo_set.insert(r.search_algo);
+        }
+    }
+    if (algo_set.empty()) return agg; // keine gültige Zeile → algos leer (Aufrufer: status_empty_input)
+
+    agg.algos.assign(algo_set.begin(), algo_set.end());
+    // Nur op-Arten MIT Daten aufnehmen (feste Reihenfolge insert..rmw). Ehrlich: eine komplett ausgeschlossene
+    // op-Art (z.B. scan, wenn nur No-Op-Profile vorliegen) erscheint NICHT als leere Zeile.
+    for (std::size_t oi = 0; oi < kRangeOps.size(); ++oi) {
+        if (per_op[oi].empty()) continue;
+        agg.ops.emplace_back(kRangeOps[oi].display);
+        std::vector<double>      p50_row(agg.algos.size(), 0.0);
+        std::vector<double>      p99_row(agg.algos.size(), 0.0);
+        std::vector<std::size_t> cnt_row(agg.algos.size(), 0);
+        std::vector<bool>        pres_row(agg.algos.size(), false);
+        for (std::size_t ai = 0; ai < agg.algos.size(); ++ai) {
+            auto it = per_op[oi].find(agg.algos[ai]);
+            if (it == per_op[oi].end()) continue;
+            p50_row[ai]  = nearest_rank_median(it->second.first);
+            p99_row[ai]  = nearest_rank_median(it->second.second);
+            cnt_row[ai]  = it->second.first.size();
+            pres_row[ai] = true;
+        }
+        agg.p50_median.push_back(std::move(p50_row));
+        agg.p99_median.push_back(std::move(p99_row));
+        agg.counts.push_back(std::move(cnt_row));
+        agg.present.push_back(std::move(pres_row));
+    }
+    return agg;
+}
+
+int write_latency_range_bar(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                            std::string const& lang, PageConstraints const& cnst) {
+    if (rows.empty()) return status_empty_input;
+    LatencyRangeAggregate const agg = aggregate_latency_range(rows);
+    if (agg.algos.empty() || agg.ops.empty()) return status_empty_input; // ehrlich leer, KEIN leerer Plot
+
+    bool const de = (lang == "de");
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+
+    // WICHTIG: write_pgfplots_axis_options schickt title/xlabel/ylabel durch escape_latex → NUR reiner Text
+    // (kein $...$, kein \times/\leq), sonst wird die Mathe literal escaped und als Text gerendert.
+    std::string const title = de ? "Latenz-Spanne p50-p99 je Suchalgorithmus x Operation"
+                                 : "latency spread p50-p99 per search algorithm x operation";
+    std::string const xlab  = de ? "Suchalgorithmus x Operation" : "search algorithm x operation";
+    std::string const ylab =
+        de ? "Latenz (ns, log; Punkt=p50, Whisker bis p99)" : "latency (ns, log; point=p50, whisker to p99)";
+
+    // Symbolische x-Koordinaten = die vorhandenen (algo/op)-Kombis, sortiert algo-primär, op-sekundär (feste
+    // op-Reihenfolge). Kombi-Label "<algo>/<op>". Jede Kombi gehört zu genau EINER op-Art → keine Überlappung.
+    std::vector<std::string> combos;
+    for (std::size_t ai = 0; ai < agg.algos.size(); ++ai) {
+        for (std::size_t oi = 0; oi < agg.ops.size(); ++oi) {
+            if (agg.present[oi][ai]) combos.push_back(agg.algos[ai] + "/" + agg.ops[oi]);
+        }
+    }
+
+    // Datenqualitäts-Zählung: p99<p50 (Whisker würde nach unten zeigen). Wird NICHT gecrasht, sondern der
+    // plus-Whisker auf 0 geklemmt (Punkt sichtbar, keine negative Fehlerbalken-Länge) und hier gezählt/geloggt.
+    std::size_t inversions = 0;
+    for (std::size_t oi = 0; oi < agg.ops.size(); ++oi)
+        for (std::size_t ai = 0; ai < agg.algos.size(); ++ai)
+            if (agg.present[oi][ai] && agg.p99_median[oi][ai] < agg.p50_median[oi][ai]) ++inversions;
+
+    f << "% AUTO-GENERATED durch diagram_generator (P3, Latenz-Verteilung: p50--p99-Spanne, Punkt+Whisker)\n";
+    f << "% EHRLICH: das WIDE-Schema traegt NUR p50/p99 je Permutation, NICHT die rohen Einzel-Op-Latenzen.\n";
+    f << "% Punkt = nearest-rank-Median der p50-Werte; plus-Whisker hoch bis Median der p99-Werte. KEIN Box-Plot\n";
+    f << "% (nur 2 Perzentile -> Quartile waeren erfunden = Phantom). 1 addplot je op-Art (Farbe+Legende).\n";
+    if (inversions > 0)
+        f << "% DATENQUALITAET: " << inversions
+          << " Zelle(n) mit p99<p50 (plus-Whisker auf 0 geklemmt, nicht gecrasht).\n";
+    if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
+    open_resizebox(f, cnst);
+    f << "\\begin{tikzpicture}\n";
+    // Deterministische Kategorienfarben je op-Art (bis zu 5), selbst-enthaltend (kein xcolor-Zusatzpaket).
+    for (std::size_t oi = 0; oi < agg.ops.size(); ++oi) {
+        double const hue = 360.0 * static_cast<double>(oi) / static_cast<double>(agg.ops.size());
+        int          r = 0, g = 0, b = 0;
+        hsv_to_rgb(hue, 0.62, 0.85, r, g, b);
+        f << "\\definecolor{rangeop" << oi << "}{RGB}{" << r << "," << g << "," << b << "}\n";
+    }
+    f << "\\begin{axis}[\n";
+    write_pgfplots_axis_options(f, cnst, title, xlab, ylab);
+    f << "    ymode=log,\n"; // Latenz spannt Dekaden -> log-y (alle Werte >0)
+    f << "    symbolic x coords={";
+    for (std::size_t i = 0; i < combos.size(); ++i) {
+        if (i > 0) f << ",";
+        f << escape_latex(combos[i]);
+    }
+    f << "},\n";
+    f << "    xtick=data,\n";
+    f << "    x tick label style={rotate=60,anchor=east,font=\\tiny},\n";
+    f << "    legend pos=north west,\n    legend style={font=\\tiny,legend cell align=left},\n";
+    f << "    mark size=2.4pt,\n";
+    f << "]\n";
+    for (std::size_t oi = 0; oi < agg.ops.size(); ++oi) {
+        f << "\\addplot[only marks,mark=*,color=rangeop" << oi << ",\n";
+        f << "    error bars/.cd, y dir=plus, y explicit, error bar style={line width=0.7pt,color=rangeop" << oi
+          << "}]\n";
+        f << "coordinates {\n";
+        for (std::size_t ai = 0; ai < agg.algos.size(); ++ai) {
+            if (!agg.present[oi][ai]) continue;
+            double const p50  = agg.p50_median[oi][ai];
+            double const p99  = agg.p99_median[oi][ai];
+            double const plus = (p99 > p50) ? (p99 - p50) : 0.0; // Datenqualitaet: p99<p50 -> 0 (kein Neg-Whisker)
+            f << "    (" << escape_latex(agg.algos[ai] + "/" + agg.ops[oi]) << "," << fmt_double(p50) << ") +- (0,"
+              << fmt_double(plus) << ")\n";
+        }
+        f << "};\n";
+        f << "\\addlegendentry{" << escape_latex(agg.ops[oi]) << "}\n";
+    }
+    f << "\\end{axis}\n\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
+    if (!cnst.body_only) {
+        f << "\\caption{"
+          << escape_latex(de ? "Latenz-Spanne p50-p99 je Suchalgorithmus x "
+                               "Operation; Punkt=p50, Whisker=p99."
+                             : "latency spread p50-p99 per search algorithm x "
+                               "operation; point=p50, whisker=p99.")
+          << "}\n\\end{figure}\n";
+    }
+    return f.good() ? status_ok : status_io_error;
+}
+
+std::vector<LatencyEcdfSeries> aggregate_latency_ecdf(std::span<WideMeasurementRow const> rows) {
+    std::map<std::string, std::vector<double>> by_algo;
+    for (auto const& r : rows) {
+        if (!r.two_phase_valid) continue;
+        if (r.search_algo.empty()) continue;
+        if (!(r.ns_per_op > 0.0)) continue; // ns_per_op<=0 = keine gültige Config-Latenz
+        by_algo[r.search_algo].push_back(r.ns_per_op);
+    }
+    std::vector<LatencyEcdfSeries> out;
+    out.reserve(by_algo.size());
+    for (auto& [algo, vals] : by_algo) {
+        std::sort(vals.begin(), vals.end());
+        out.push_back(LatencyEcdfSeries{algo, std::move(vals)});
+    }
+    return out;
+}
+
+int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                       std::string const& lang, PageConstraints const& cnst) {
+    if (rows.empty()) return status_empty_input;
+    std::vector<LatencyEcdfSeries> const series = aggregate_latency_ecdf(rows);
+    if (series.empty()) return status_empty_input; // ehrlich leer, KEINE erfundene Kurve
+
+    bool const de = (lang == "de");
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+
+    // Titel/xlabel MÜSSEN "Verteilung über Konfigurationen" ausweisen (Config-Streuung, NICHT Per-Operation).
+    // NUR reiner Text (escape_latex-durchgereicht); "ns_per_op" wird korrekt zu ns\_per\_op escaped.
+    std::string const title = de ? "ECDF der Gesamt-Latenz - Verteilung ueber Konfigurationen"
+                                 : "ECDF of overall latency - distribution over configurations";
+    std::string const xlab  = de ? "Gesamt-Latenz je Konfiguration ns_per_op (ns, log)"
+                                 : "overall latency per configuration ns_per_op (ns, log)";
+    std::string const ylab =
+        de ? "Anteil der Konfigurationen mit Latenz <= x" : "share of configurations with latency <= x";
+
+    f << "% AUTO-GENERATED durch diagram_generator (P3, Config-Streuungs-ECDF; lang=" << lang << ")\n";
+    f << "% EHRLICH: Population = die KONFIGURATIONEN (Permutationen), jede = 1 ns_per_op-Punkt. Das ist die\n";
+    f << "% Verteilung UEBER die Konfigurationen (Anteil der Configs mit Latenz <= x), NICHT eine Per-Operation-\n";
+    f << "% Latenz-CDF (die rohen Einzel-Op-Latenzen traegt das WIDE-Schema nicht). 1 Treppe je search_algo.\n";
+    if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
+    open_resizebox(f, cnst);
+    f << "\\begin{tikzpicture}\n\\begin{axis}[\n";
+    write_pgfplots_axis_options(f, cnst, title, xlab, ylab);
+    f << "    xmode=log,\n";
+    f << "    ymin=0, ymax=1,\n";
+    f << "    legend pos=south east,\n    legend style={font=\\tiny,legend cell align=left},\n";
+    f << "]\n";
+    for (auto const& s : series) {
+        std::size_t const n = s.sorted_ns_per_op.size();
+        f << "\\addplot+[const plot,mark=none,thick] coordinates {\n";
+        // Startpunkt auf Baseline y=0 beim kleinsten Wert (die Treppe steigt von 0 nach 1).
+        f << "    (" << fmt_double(s.sorted_ns_per_op.front()) << ",0)\n";
+        for (std::size_t i = 0; i < n; ++i) {
+            double const y = static_cast<double>(i + 1) / static_cast<double>(n); // Rang/N ∈ (0,1]
+            f << "    (" << fmt_double(s.sorted_ns_per_op[i]) << "," << fmt_double(y) << ")\n";
+        }
+        f << "};\n";
+        f << "\\addlegendentry{" << escape_latex(s.algo) << " (N=" << n << ")}\n";
     }
     f << "\\end{axis}\n\\end{tikzpicture}\n";
     close_resizebox(f, cnst);

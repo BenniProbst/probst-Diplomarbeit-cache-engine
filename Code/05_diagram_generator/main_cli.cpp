@@ -131,6 +131,49 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    // P3 (2026-07-12) — Latenz-VERTEILUNG statt Mittelwert:
+    //   diagram-generator --latency-range=<wide.csv> <out.tex> [--lang=de|en] [--body-only]
+    //     Punkt=p50, plus-Whisker->p99 je (search_algo x op-Art), y log. NUR p50/p99 existieren -> KEIN Box-Plot.
+    //   diagram-generator --latency-ecdf=<wide.csv> <out.tex> [--lang=de|en] [--body-only]
+    //     ECDF der ns_per_op-Werte UEBER die Konfigurationen (Config-Streuung), 1 Kurve je search_algo, x log.
+    if (argc >= 3 && (std::string{argv[1]}.rfind("--latency-range=", 0) == 0 ||
+                      std::string{argv[1]}.rfind("--latency-ecdf=", 0) == 0)) {
+        std::string const   arg1    = argv[1];
+        bool const          is_ecdf = arg1.rfind("--latency-ecdf=", 0) == 0;
+        std::string const   in_csv  = arg1.substr(arg1.find('=') + 1);
+        char const*         out_tex = argv[2];
+        std::string         lang    = "en";
+        dg::PageConstraints cnst;
+        for (int i = 3; i < argc; ++i) {
+            std::string a{argv[i]};
+            if (a.rfind("--lang=", 0) == 0)
+                lang = a.substr(7);
+            else if (a == "--body-only")
+                cnst.body_only = true;
+        }
+        std::vector<dg::WideMeasurementRow> rows;
+        int const                           prc = dg::parse_wide_csv(in_csv, rows);
+        if (prc != 0) {
+            std::cerr << "parse_wide_csv failed: " << prc << " (10=io,11=empty/header/parse)\n";
+            return prc;
+        }
+        int const rc = is_ecdf ? dg::write_latency_ecdf(out_tex, rows, lang, cnst)
+                               : dg::write_latency_range_bar(out_tex, rows, lang, cnst);
+        if (rc == dg::status_empty_input) {
+            std::cerr << (is_ecdf ? "latency-ecdf: keine gueltige Config-Zeile"
+                                  : "latency-range: keine gueltige (op ausgefuehrt + p99)-Zeile")
+                      << " -> nichts geschrieben (ehrlich leer)\n";
+            return rc;
+        }
+        if (rc != 0) {
+            std::cerr << (is_ecdf ? "write_latency_ecdf" : "write_latency_range_bar") << " failed: " << rc << "\n";
+            return rc;
+        }
+        std::cout << "diagram-generator: " << (is_ecdf ? "latency-ecdf" : "latency-range") << " from " << rows.size()
+                  << " wide rows -> " << out_tex << "\n";
+        return 0;
+    }
+
     // V22.1 — neuer Subcommand --by-workload erzeugt gruppierten Bar-Chart aus
     // V20.3-konformer measurements.csv (16 Spalten inkl. workload_used).
     if (argc >= 4 && std::string{argv[1]} == "--by-workload") {
@@ -162,7 +205,12 @@ int main(int argc, char* argv[]) {
                "ns_per_op|op_insert_p50_ns|op_lookup_p50_ns|op_erase_p50_ns|op_scan_p50_ns|op_rmw_p50_ns)\n"
             << "  oder: diagram-generator --seg-attribution=<wide.csv> <output.tex> [--lang=de|en] [--body-only]\n"
             << "       (P4: Per-Achsen-Latenz-Attribution als gestapelte Balken; ein Balken je search_algo,\n"
-            << "        20 Segmente (19 Organ-Achsen + framework), Ganzes = seg_run_total_ns)\n";
+            << "        20 Segmente (19 Organ-Achsen + framework), Ganzes = seg_run_total_ns)\n"
+            << "  oder: diagram-generator --latency-range=<wide.csv> <output.tex> [--lang=de|en] [--body-only]\n"
+            << "       (P3: Latenz-Verteilung als p50--p99-Spanne; Punkt=p50, Whisker->p99 je (search_algo x op))\n"
+            << "  oder: diagram-generator --latency-ecdf=<wide.csv> <output.tex> [--lang=de|en] [--body-only]\n"
+            << "       (P3: ECDF der ns_per_op UEBER die Konfigurationen (Config-Streuung), 1 Kurve je "
+               "search_algo)\n";
         return 1;
     }
     std::ifstream f{argv[1]};

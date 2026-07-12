@@ -149,7 +149,18 @@ struct WideMeasurementRow {
     double      op_erase_p50_ns  = 0.0;
     double      op_scan_p50_ns   = 0.0;
     double      op_rmw_p50_ns    = 0.0;
-    bool        two_phase_valid  = false; // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
+    // P3 (2026-07-12) — die 5 Interface-Funktions-p99 (spiegeln EXAKT die 5 op_*_p50_ns; nearest-rank, ns).
+    // OPTIONAL/header-getrieben aufgelöst (NICHT Pflichtspalte): fehlt EINE der 5 op_*_p99_ns-Spalten ODER ist
+    // EINE Zelle leer/"n/a"/nicht-numerisch, bleibt has_op_p99=false (cowfix-v1 ohne p99 bricht NICHT). Das
+    // WIDE-Schema trägt NUR diese Aggregat-Perzentile (p50/p99), NICHT die rohen Einzel-Op-Latenzen → die
+    // Latenz-Verteilung ist ehrlich nur als p50–p99-Spanne (Range) bzw. Config-Streuung (ECDF) darstellbar.
+    double op_insert_p99_ns = 0.0;
+    double op_lookup_p99_ns = 0.0;
+    double op_erase_p99_ns  = 0.0;
+    double op_scan_p99_ns   = 0.0;
+    double op_rmw_p99_ns    = 0.0;
+    bool   has_op_p99       = false; // true ⇔ alle 5 op_*_p99_ns-Spalten vorhanden UND numerisch
+    bool   two_phase_valid  = false; // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
     // M3v2-Tag-Spalten (Task #156, ans Schema-Ende gehängt). OPTIONAL/header-getrieben aufgelöst:
     // fehlt die Spalte (cowfix-v1-Schema), bleibt das Feld leer/0 — KEIN Parse-Fehler (n/a).
     std::string   series;                    // SOTA-Reihe (A/B/C/-); leer falls Spalte fehlt
@@ -242,5 +253,59 @@ struct SegmentAttribution {
                                                         std::span<WideMeasurementRow const> rows,
                                                         std::string const&                  lang = "en",
                                                         PageConstraints const&              cnst = {});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// P3 (2026-07-12) — Latenz-VERTEILUNG statt Mittelwert
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// EHRLICHKEITS-GRUNDLAGE (zwingend): das WIDE-Schema trägt je Permutation NUR aggregierte Perzentile
+// (op_<art>_p50_ns / op_<art>_p99_ns), NICHT die rohen Einzel-Op-Latenzen. Daher gibt es exakt ZWEI ehrliche
+// Verteilungs-Darstellungen:
+//   (1) Range: Punkt=p50, Whisker→p99 je (search_algo × op-Art). NUR 2 Perzentile existieren → KEIN Box-Plot
+//       mit erfundenen Quartilen (das wäre Phantom).
+//   (2) ECDF: die einzige ehrliche CDF-Population ist die Verteilung ÜBER die Konfigurationen (jede gültige
+//       Permutation = 1 Datenpunkt ihres ns_per_op). Das ist eine "Config-Streuung"-ECDF (Anteil der Configs
+//       mit Latenz ≤ x), NICHT eine Per-Operation-Latenz-CDF. Titel/xlabel weisen das EXPLIZIT aus.
+
+// Range-Aggregat: je op-Art (Zeilen) × search_algo (Spalten) der nearest-rank-Median der p50- bzw. p99-Werte
+// über die GÜLTIGEN Zeilen (two_phase_valid ∧ has_op_p99 ∧ op ausgeführt (p50>0)). scan schließt die No-Op-
+// Scan-Profile "ycsb_e"/"lp_range_scan" aus (wie der Surface-Pfad). present[op][algo] ⇔ ≥1 Stichprobe.
+// Für wohlgeformte Daten gilt p99_median[op][algo] ≥ p50_median[op][algo] (Monotonie); p99<p50 = Datenqualität.
+struct LatencyRangeAggregate {
+    std::vector<std::string>         algos;        // search_algo, aufsteigend sortiert (x-Achse)
+    std::vector<std::string>         ops;          // op-Arten MIT Daten, feste Reihenfolge insert..rmw (Legende)
+    std::vector<std::vector<double>> p50_median;   // [op][algo] = nearest-rank-Median der p50-Werte (Punkt, ns)
+    std::vector<std::vector<double>> p99_median;   // [op][algo] = nearest-rank-Median der p99-Werte (Whisker-Top, ns)
+    std::vector<std::vector<std::size_t>> counts;  // [op][algo] = Stichprobenzahl je Zelle
+    std::vector<std::vector<bool>>        present; // [op][algo] = Zelle hat ≥1 gültige Stichprobe
+};
+
+// Aggregiert die (op-Art × search_algo)-Latenz-Spanne. Header-getrieben/n-a-tolerant. Rückgabe mit leerem
+// `algos`, wenn KEINE gültige Zeile existiert (keine p99 / keine ausgeführte Op).
+[[nodiscard]] LatencyRangeAggregate aggregate_latency_range(std::span<WideMeasurementRow const> rows);
+
+// Emittiert einen pgfplots-Punkt-und-Whisker-Plot (only marks + `error bars/y dir=plus, y explicit`): je Gruppe
+// (search_algo × op-Art) ein Punkt bei p50, plus-Whisker hoch bis p99. y LOG (Latenz spannt Dekaden). 1 addplot
+// je op-Art (Farbe+Legende). Guard: keine gültige Zeile → status_empty_input (ehrlich leer). KEIN Box/Quartil.
+// Breiten-sicher (resizebox_wrap). Titel/ylabel beschriften ehrlich "p50–p99-Spanne".
+[[nodiscard]] int write_latency_range_bar(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                                          std::string const& lang = "en", PageConstraints const& cnst = {});
+
+// ECDF-Serie je search_algo: die aufsteigend sortierten ns_per_op-Werte der GÜLTIGEN Konfigurationen
+// (two_phase_valid). Population = Anzahl Konfigurationen (Permutationen), NICHT Einzel-Operationen.
+struct LatencyEcdfSeries {
+    std::string         algo;
+    std::vector<double> sorted_ns_per_op; // aufsteigend, ein Wert je gültiger Konfiguration
+};
+
+// Baut je search_algo eine ECDF-Serie über die ns_per_op-Werte der gültigen Konfigurationen. Leer ⇔ keine
+// gültige Zeile.
+[[nodiscard]] std::vector<LatencyEcdfSeries> aggregate_latency_ecdf(std::span<WideMeasurementRow const> rows);
+
+// Emittiert die ECDF (`const plot`-Treppe) der ns_per_op-Werte ÜBER die Konfigurationen, 1 Kurve je search_algo,
+// y = Rang/N ∈ [0,1], x = ns (LOG wegen der Dekaden). Titel/xlabel weisen EXPLIZIT "Verteilung über
+// Konfigurationen" (Config-Streuung) aus — NICHT Per-Operation. Guard: keine gültige Zeile → status_empty_input.
+[[nodiscard]] int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                                     std::string const& lang = "en", PageConstraints const& cnst = {});
 
 } // namespace comdare::da::diagram_generator
