@@ -7,7 +7,10 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace dg = comdare::da::diagram_generator;
@@ -180,4 +183,173 @@ TEST(Stufe05Pipeline, EmptyInputReturnsEmpty) {
     EXPECT_TRUE(rc == dg::status_ok || rc == dg::status_empty_input);
     std::error_code ec;
     fs::remove(out, ec);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// P4 (2026-07-12) — Per-Achsen-Latenz-Attribution (gestapelte Balken)
+// ─────────────────────────────────────────────────────────────────────────────
+namespace {
+
+constexpr int kSegN = 20; // 19 Organ-Achsen + framework
+
+std::string seg_header() {
+    return "seg_search_algo_ns;seg_cache_traversal_ns;seg_mapping_ns;seg_path_compression_ns;"
+           "seg_node_type_ns;seg_memory_layout_ns;seg_allocator_ns;seg_prefetch_ns;"
+           "seg_concurrency_ns;seg_serialization_ns;seg_telemetry_ns;seg_value_handle_ns;"
+           "seg_isa_ns;seg_index_organization_ns;seg_io_dispatch_ns;seg_migration_policy_ns;"
+           "seg_filter_ns;seg_queuing_q1_ns;seg_queuing_q2_ns;seg_framework_ns";
+}
+
+// Eine schema-treue WIDE-Datenzeile. seg_mult>0 → 20 seg_*_ns = seg_mult*(i+1), seg_run_total_ns = seg_mult*210
+// (== Σ der 20 Segmente, seg_coverage=coverage). na_first=true → seg_search_algo_ns="n/a" (Guard-Test).
+// total_ns wird BEWUSST sehr verschieden von seg_run_total_ns gesetzt (Inkommensurabilitaets-Beleg).
+std::string seg_row(std::string const& algo, long total_ns, int seg_mult, double coverage, bool two_phase,
+                    bool na_first) {
+    std::ostringstream r;
+    r << "search_algo=" << algo << "/mapping=direct;" // binary_id
+      << "42.0;30;25;28;500;40;"                      // ns_per_op + 5 op_*_p50_ns
+      << total_ns << ";";                             // total_ns (DARF NIE Stapel-Ganzes sein)
+    long sum = 0;
+    for (int i = 0; i < kSegN; ++i) {
+        if (i > 0) r << ";";
+        if (i == 0 && na_first) {
+            r << "n/a";
+        } else {
+            long const v = static_cast<long>(seg_mult) * (i + 1);
+            r << v;
+            sum += v;
+        }
+    }
+    long const run_total = na_first ? sum : static_cast<long>(seg_mult) * 210;
+    r << ";" << run_total << ";";
+    r << std::fixed << std::setprecision(6) << coverage << ";";
+    r << "ycsb_c;" << (two_phase ? "1" : "0");
+    return r.str();
+}
+
+void write_sample_wide_seg_csv(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns;"
+      << "total_ns;" << seg_header() << ";seg_run_total_ns;seg_coverage;workload;two_phase_valid\n";
+    f << seg_row("k_ary", 999999, 10, 1.0, true, false) << "\n";        // gueltig  Σ=2100
+    f << seg_row("k_ary", 999999, 10, 1.0, true, false) << "\n";        // gueltig  Σ=2100 (Mittel bleibt 2100)
+    f << seg_row("interpolation", 888888, 5, 1.0, true, false) << "\n"; // gueltig  Σ=1050
+    f << seg_row("k_ary", 777777, 100, 1.0, false, false) << "\n";      // two_phase=0 → verworfen (nicht 0-gestapelt)
+    f << seg_row("k_ary", 666666, 10, 1.0, true, true) << "\n";         // seg_search_algo_ns=n/a → verworfen (Guard d)
+}
+
+// Nur ungueltige Segment-Zeilen (alle seg n/a bzw. two_phase=0) → aggregate liefert leere Gruppen.
+void write_all_invalid_wide_seg_csv(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns;"
+      << "total_ns;" << seg_header() << ";seg_run_total_ns;seg_coverage;workload;two_phase_valid\n";
+    f << seg_row("k_ary", 999999, 10, 1.0, true, true) << "\n";          // seg n/a
+    f << seg_row("interpolation", 888888, 5, 1.0, false, false) << "\n"; // two_phase=0
+}
+
+std::size_t count_occurrences(fs::path const& p, std::string_view needle) {
+    std::ifstream in(p);
+    std::string   content((std::istreambuf_iterator<char>(in)), {});
+    std::size_t   n = 0, pos = 0;
+    while ((pos = content.find(needle, pos)) != std::string::npos) {
+        ++n;
+        pos += needle.size();
+    }
+    return n;
+}
+
+} // namespace
+
+TEST(Stufe05Pipeline, ParseWideCsvSegColumns) {
+    auto p = fs::temp_directory_path() / "p4_wide_seg_parse.csv";
+    write_sample_wide_seg_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_EQ(rows.size(), 5u);
+    // 1. gueltige k_ary-Zeile: alle 20 seg vorhanden, seg_run_total_ns=2100, coverage vorhanden.
+    EXPECT_TRUE(rows[0].has_seg_ns);
+    EXPECT_TRUE(rows[0].has_seg_run_total);
+    EXPECT_TRUE(rows[0].has_seg_coverage);
+    EXPECT_DOUBLE_EQ(rows[0].seg_run_total_ns, 2100.0);
+    EXPECT_DOUBLE_EQ(rows[0].seg_ns[0], 10.0);   // seg_search_algo_ns
+    EXPECT_DOUBLE_EQ(rows[0].seg_ns[19], 200.0); // seg_framework_ns
+    // n/a-Zeile (letzte): seg_search_algo_ns="n/a" → has_seg_ns=false (n-a-tolerant, KEIN Parse-Fehler).
+    EXPECT_FALSE(rows[4].has_seg_ns);
+    std::error_code ec;
+    fs::remove(p, ec);
+}
+
+TEST(Stufe05Pipeline, SegAttributionAggregateSumsToRunTotalNotTotalNs) {
+    auto p = fs::temp_directory_path() / "p4_wide_seg_agg.csv";
+    write_sample_wide_seg_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto const agg = dg::aggregate_segment_attribution(rows);
+    // Deterministisch sortiert: interpolation < k_ary.
+    ASSERT_EQ(agg.groups.size(), 2u);
+    EXPECT_EQ(agg.groups[0], "interpolation");
+    EXPECT_EQ(agg.groups[1], "k_ary");
+    ASSERT_EQ(agg.segment_labels.size(), 20u);
+    EXPECT_EQ(agg.segment_labels[0], "search_algo");
+    EXPECT_EQ(agg.segment_labels[19], "framework");
+    ASSERT_EQ(agg.means.size(), 20u);
+
+    // (a) Die 20 Segmente stapeln je Gruppe zu seg_run_total_ns (Coverage≈1) — NICHT zu total_ns.
+    for (std::size_t g = 0; g < agg.groups.size(); ++g) {
+        double stack = 0.0;
+        for (std::size_t s = 0; s < 20u; ++s) stack += agg.means[s][g];
+        EXPECT_NEAR(stack, agg.group_totals[g], 1e-6);
+        EXPECT_NEAR(stack, agg.run_total_means[g], 1e-6); // == Mittel seg_run_total_ns (kommensurabel)
+        EXPECT_NEAR(agg.coverage_means[g], 1.0, 1e-6);
+    }
+    // k_ary: zwei gueltige Zeilen (Σ=2100 je), n/a- + two_phase=0-Zeile VERWORFEN → Mittel bleibt 2100 (nicht verwaessert).
+    EXPECT_NEAR(agg.group_totals[1], 2100.0, 1e-6);
+    EXPECT_NEAR(agg.group_totals[0], 1050.0, 1e-6); // interpolation
+
+    // (b) total_ns (999999 / 888888) taucht NICHT als Stapel-Ganzes auf.
+    EXPECT_NE(agg.group_totals[1], 999999.0);
+    EXPECT_NE(agg.group_totals[0], 888888.0);
+    std::error_code ec;
+    fs::remove(p, ec);
+}
+
+TEST(Stufe05Pipeline, SegAttributionStackedBarEmitsTwentyAddplots) {
+    auto p = fs::temp_directory_path() / "p4_wide_seg_writer.csv";
+    write_sample_wide_seg_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto out = fs::temp_directory_path() / "p4_seg_attribution.tex";
+    ASSERT_EQ(dg::write_segment_attribution_stacked_bar(out, rows, "de"), dg::status_ok);
+    // (c) valides pgfplots: ybar stacked, exakt 20 \addplot + 20 \addlegendentry.
+    EXPECT_TRUE(file_contains(out, "ybar stacked"));
+    EXPECT_EQ(count_occurrences(out, "\\addplot"), 20u);
+    EXPECT_EQ(count_occurrences(out, "\\addlegendentry"), 20u);
+    EXPECT_TRUE(file_contains(out, "framework")); // letztes Segment als Legende
+    // (b) total_ns darf NICHT im Output stehen (weder als Ganzes noch als Koordinate).
+    EXPECT_FALSE(file_contains(out, "999999"));
+    EXPECT_FALSE(file_contains(out, "888888"));
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+TEST(Stufe05Pipeline, SegAttributionGuardHonestEmptyOnAllNa) {
+    // (d) Guard: keine gueltige Segment-Zeile (alle seg n/a bzw. two_phase=0) → status_empty_input, KEIN leerer Balken.
+    auto p = fs::temp_directory_path() / "p4_wide_seg_allna.csv";
+    write_all_invalid_wide_seg_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto const agg = dg::aggregate_segment_attribution(rows);
+    EXPECT_TRUE(agg.groups.empty());
+
+    auto out = fs::temp_directory_path() / "p4_seg_attribution_empty.tex";
+    EXPECT_EQ(dg::write_segment_attribution_stacked_bar(out, rows, "en"), dg::status_empty_input);
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(p, ec);
 }

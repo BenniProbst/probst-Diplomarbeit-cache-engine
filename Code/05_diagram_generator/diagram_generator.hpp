@@ -16,6 +16,7 @@
 //   height = 0.40 * \textheight  (max 40% Seitenhoehe, damit 2 Diagramme
 //                                 + Text auf eine Seite passen)
 
+#include <array>
 #include <cstdint>
 #include <filesystem>
 #include <span>
@@ -157,6 +158,18 @@ struct WideMeasurementRow {
     bool          has_working_set_n = false; // true ⇔ working_set_n-Spalte vorhanden und nicht-leer
     double        seg_coverage      = 0.0;   // Σseg_ns/run_total (Mess-Validität); 0 falls Spalte fehlt
     bool          has_seg_coverage  = false;
+    // P4 (2026-07-12) — die 20 Stapel-Segmente der Per-Achsen-Latenz-Attribution: 19 Organ-Achsen
+    // (Reihenfolge = kCompositionAxisNames: search_algo..queuing_q2) + seg_framework_ns an Index 19.
+    // Kommensurabel mit seg_run_total_ns (dem eigenen Wall-Clock des 19-Segment-Laufs run_workload_segmented),
+    // NICHT mit total_ns (Real-Workload → 3–29× daneben). Beleg: cache_engine_builder_iterator.hpp:205-214,327-329
+    // (Σ 19 Organ + framework = seg_run_total_ns EXAKT). OPTIONAL/header-getrieben/n-a-tolerant: fehlt EINE der
+    // 20 seg_*_ns-Spalten ODER ist EINE "n/a" (Nicht-Mess-DLL), bleibt has_seg_ns=false → die Zeile wird bei der
+    // Attribution honest ÜBERSPRUNGEN (NICHT 0-gestapelt).
+    static constexpr std::size_t      kSegmentCount = 20;
+    std::array<double, kSegmentCount> seg_ns{};                  // 19 Organ-Achsen + framework (ns)
+    bool                              has_seg_ns        = false; // true ⇔ alle 20 seg_*_ns vorhanden UND numerisch
+    double                            seg_run_total_ns  = 0.0;   // äußere Wall-Clock des Segment-Laufs (100%-Ganzes)
+    bool                              has_seg_run_total = false;
 };
 
 // HEADER-GETRIEBENER ';'-Parser (Spalten per Name → Index-Map). Pflichtspalten:
@@ -195,5 +208,39 @@ struct WideMeasurementRow {
 [[nodiscard]] int write_working_set_sweep_curve(std::filesystem::path const&        out,
                                                 std::span<WideMeasurementRow const> rows, std::string const& z_field,
                                                 std::string const& lang = "en", PageConstraints const& cnst = {});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// P4 (2026-07-12) — Per-Achsen-Latenz-Attribution als GESTAPELTE Balken
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Der bisher unvisualisierte Kern-Beitrag: WELCHE der 19 Organ-Achsen (+ Framework-Overhead) wie viel
+// Latenz beiträgt. Ein Balken je search_algo; das 100%-Ganze je Balken ist seg_run_total_ns (der eigene
+// Wall-Clock des 19-Segment-Laufs), NICHT total_ns (Real-Workload → inkommensurabel). Aggregation: Mittel
+// je Segment über die GÜLTIGEN Segment-Zeilen (two_phase_valid ∧ has_seg_ns ∧ seg_run_total_ns>0 ∧
+// seg_coverage vorhanden). Σ der 20 Segment-Mittel == Mittel seg_run_total_ns (Coverage≈1 → kommensurabel).
+
+// Numerisch prüfbares Aggregat (deterministisch nach search_algo sortiert). means[segment][group] = Mittel ns;
+// Σ_segment means[s][g] == group_totals[g] == run_total_means[g]. groups leer ⇔ keine gültige Segment-Zeile.
+struct SegmentAttribution {
+    std::vector<std::string>         groups;          // search_algo, aufsteigend sortiert (Balken-x)
+    std::vector<std::string>         segment_labels;  // 20 Segment-Namen (Legende, Stapel-Reihenfolge)
+    std::vector<std::vector<double>> means;           // means[segment][group] = Mittel des Segments (ns)
+    std::vector<double>              group_totals;    // Σ_segment means je Gruppe (== Mittel seg_run_total_ns)
+    std::vector<double>              run_total_means; // Mittel seg_run_total_ns je Gruppe (Kommensurabilitäts-Beleg)
+    std::vector<double>              coverage_means;  // Mittel seg_coverage je Gruppe (~1.0)
+};
+
+// Aggregiert die (search_algo)-Gruppen zu Segment-Mitteln. Header-getrieben/n-a-tolerant: Zeilen ohne
+// vollständige seg-Belegung / mit seg_run_total_ns<=0 / mit fehlender seg_coverage werden HONEST übersprungen
+// (NICHT 0-gestapelt). Rückgabe mit leerem `groups`, wenn KEINE gültige Segment-Zeile existiert.
+[[nodiscard]] SegmentAttribution aggregate_segment_attribution(std::span<WideMeasurementRow const> rows);
+
+// Emittiert den pgfplots `ybar stacked` (ein Balken je search_algo, 20 `\addplot`-Segmente, Legende =
+// Achsennamen, lineare y-Achse in ns, deterministische HSV-Kategorienfarben). Guard: keine gültige
+// Segment-Zeile → status_empty_input (ehrlich leer, KEIN leerer Balken). Breiten-sicher (resizebox_wrap).
+[[nodiscard]] int write_segment_attribution_stacked_bar(std::filesystem::path const&        out,
+                                                        std::span<WideMeasurementRow const> rows,
+                                                        std::string const&                  lang = "en",
+                                                        PageConstraints const&              cnst = {});
 
 } // namespace comdare::da::diagram_generator

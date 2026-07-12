@@ -22,6 +22,24 @@ namespace {
     return s.str();
 }
 
+// P4 (2026-07-12): die 20 Stapel-Segment-Spaltennamen in EXAKTER Stapel-/Header-Reihenfolge — 19 Organ-Achsen
+// (single-source = kCompositionAxisNames aus axis_path_serialization.hpp:30-34) + seg_framework_ns an Index 19.
+// Die Legende leitet die Anzeigenamen deterministisch durch Strippen von "seg_"/"_ns" ab (keine zweite Liste → keine Drift).
+constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount> kSegmentColumns = {
+    "seg_search_algo_ns", "seg_cache_traversal_ns",    "seg_mapping_ns",     "seg_path_compression_ns",
+    "seg_node_type_ns",   "seg_memory_layout_ns",      "seg_allocator_ns",   "seg_prefetch_ns",
+    "seg_concurrency_ns", "seg_serialization_ns",      "seg_telemetry_ns",   "seg_value_handle_ns",
+    "seg_isa_ns",         "seg_index_organization_ns", "seg_io_dispatch_ns", "seg_migration_policy_ns",
+    "seg_filter_ns",      "seg_queuing_q1_ns",         "seg_queuing_q2_ns",  "seg_framework_ns"};
+
+// Anzeigename eines Segments = Spaltenname ohne "seg_"-Präfix und "_ns"-Suffix (deterministisch, ein Ort).
+[[nodiscard]] std::string segment_label(std::string_view column) {
+    std::string s{column};
+    if (s.rfind("seg_", 0) == 0) s.erase(0, 4);
+    if (s.size() > 3 && s.compare(s.size() - 3, 3, "_ns") == 0) s.erase(s.size() - 3);
+    return s;
+}
+
 void write_pgfplots_axis_options(std::ostream& out, PageConstraints const& cnst, std::string const& title,
                                  std::string const& x_label, std::string const& y_label) {
     out << "    width=" << fmt_double(cnst.width_fraction) << "\\textwidth,\n";
@@ -493,6 +511,41 @@ int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementR
                 } catch (std::exception const&) { /* n/a */
                 }
             }
+            // P4 (2026-07-12): die 20 Stapel-Segmente (19 Organ-Achsen kCompositionAxisNames + seg_framework_ns) +
+            // seg_run_total_ns. OPTIONAL/header-getrieben (NICHT in required[] → cowfix-v1 bricht nicht). n-a-tolerant:
+            // fehlt EINE der 20 Spalten ODER ist EINE Zelle leer/"n/a"/nicht-numerisch → has_seg_ns bleibt false (Zeile
+            // wird bei der Attribution honest übersprungen, NICHT 0-gestapelt). Der stod-Wurf wird LOKAL geschluckt
+            // (NICHT an die äußere catch weitergereicht), damit eine n/a-Zelle keinen ganzen Parse-Fehler auslöst.
+            {
+                bool all_present = true;
+                for (std::size_t s = 0; s < WideMeasurementRow::kSegmentCount; ++s) {
+                    auto sit = col.find(std::string{kSegmentColumns[s]});
+                    if (sit == col.end()) {
+                        all_present = false;
+                        break;
+                    }
+                    std::string const& cell = cols[sit->second];
+                    if (cell.empty() || cell == "n/a") {
+                        all_present = false;
+                        break;
+                    }
+                    try {
+                        r.seg_ns[s] = std::stod(cell);
+                    } catch (std::exception const&) {
+                        all_present = false;
+                        break;
+                    }
+                }
+                r.has_seg_ns = all_present;
+            }
+            if (auto it = col.find("seg_run_total_ns");
+                it != col.end() && !cols[it->second].empty() && cols[it->second] != "n/a") {
+                try {
+                    r.seg_run_total_ns  = std::stod(cols[it->second]);
+                    r.has_seg_run_total = true;
+                } catch (std::exception const&) { /* n/a */
+                }
+            }
             out_rows.push_back(std::move(r));
         } catch (std::exception const&) { return status_empty_input; }
     }
@@ -671,6 +724,167 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
         f << "\\caption{" << escape_latex((de ? "Working-Set-Sweep: " : "working-set sweep: ") + metric)
           << "}\n\\end{figure}\n";
     }
+    return f.good() ? status_ok : status_io_error;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// P4 (2026-07-12) — Per-Achsen-Latenz-Attribution als GESTAPELTE Balken
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// KERN-SEMANTIK (erforscht+an echten Daten verifiziert): die 20 Stapel-Segmente sind kommensurabel mit
+// seg_run_total_ns (dem eigenen Wall-Clock des 19-Segment-Laufs run_workload_segmented), NICHT mit total_ns
+// (Real-Workload → 3–29× daneben). Beleg cache_engine_builder_iterator.hpp:205-214,327-329:
+// Σ(19 Organ-seg + seg_framework_ns) == seg_run_total_ns EXAKT (seg_coverage ≈ 1.0). Daher ist das
+// 100%-Ganze je Balken = seg_run_total_ns; gegen total_ns zu stapeln wäre PHANTOM (verboten).
+
+SegmentAttribution aggregate_segment_attribution(std::span<WideMeasurementRow const> rows) {
+    SegmentAttribution agg;
+    agg.segment_labels.reserve(WideMeasurementRow::kSegmentCount);
+    for (auto const col : kSegmentColumns) agg.segment_labels.push_back(segment_label(col));
+
+    // Akkumulator je search_algo. std::map → deterministisch sortierte Balken-Reihenfolge.
+    struct Acc {
+        std::array<double, WideMeasurementRow::kSegmentCount> sum{};
+        double                                                run_total_sum = 0.0;
+        double                                                cov_sum       = 0.0;
+        std::size_t                                           n             = 0;
+    };
+    std::map<std::string, Acc> groups;
+    for (auto const& r : rows) {
+        // Guard/Filter (honest überspringen, NICHT 0-stapeln):
+        if (!r.two_phase_valid) continue;                                  // Mess-Gültigkeit
+        if (r.search_algo.empty()) continue;                               // ohne Gruppen-Schlüssel nicht zuordenbar
+        if (!r.has_seg_ns) continue;                                       // eine seg_*_ns-Spalte n/a → Zeile invalide
+        if (!r.has_seg_run_total || !(r.seg_run_total_ns > 0.0)) continue; // seg_run_total_ns<=0/n/a → Guard
+        if (!r.has_seg_coverage) continue;                                 // seg_coverage n/a → Guard
+        auto& a = groups[r.search_algo];
+        for (std::size_t s = 0; s < WideMeasurementRow::kSegmentCount; ++s) a.sum[s] += r.seg_ns[s];
+        a.run_total_sum += r.seg_run_total_ns;
+        a.cov_sum += r.seg_coverage;
+        ++a.n;
+    }
+    if (groups.empty()) return agg; // keine gültige Segment-Zeile → groups leer (Aufrufer: status_empty_input)
+
+    agg.means.assign(WideMeasurementRow::kSegmentCount, {});
+    for (auto& seg : agg.means) seg.reserve(groups.size());
+    agg.groups.reserve(groups.size());
+    agg.group_totals.reserve(groups.size());
+    agg.run_total_means.reserve(groups.size());
+    agg.coverage_means.reserve(groups.size());
+    for (auto const& [key, a] : groups) {
+        agg.groups.push_back(key);
+        double const inv   = 1.0 / static_cast<double>(a.n);
+        double       total = 0.0;
+        for (std::size_t s = 0; s < WideMeasurementRow::kSegmentCount; ++s) {
+            double const m = a.sum[s] * inv;
+            agg.means[s].push_back(m);
+            total += m;
+        }
+        agg.group_totals.push_back(total); // == Mittel seg_run_total_ns (Σ 20 seg je Zeile = seg_run_total)
+        agg.run_total_means.push_back(a.run_total_sum * inv);
+        agg.coverage_means.push_back(a.cov_sum * inv);
+    }
+    return agg;
+}
+
+namespace {
+
+// Deterministische kategoriale Palette: 20 Farben aus dem HSV-Farbkreis (gleichmäßig verteilter Hue,
+// S=0.62). Selbst-enthaltend (KEIN colorbrewer-/xcolor-Zusatzpaket → F-EXTRA-5-konform). Der Wert V
+// alterniert 0.90/0.70 je Index → benachbarte Stapel-Schichten trennen sich zusätzlich in der Helligkeit
+// (kleine Segmente bleiben lesbar; zusätzlich zeichnet jeder Balken einen dünnen Rand).
+void hsv_to_rgb(double h, double s, double v, int& r_out, int& g_out, int& b_out) {
+    double const c  = v * s;
+    double const hp = h / 60.0;
+    double const x  = c * (1.0 - std::fabs(std::fmod(hp, 2.0) - 1.0));
+    double       r = 0.0, g = 0.0, b = 0.0;
+    if (hp < 1.0) {
+        r = c;
+        g = x;
+    } else if (hp < 2.0) {
+        r = x;
+        g = c;
+    } else if (hp < 3.0) {
+        g = c;
+        b = x;
+    } else if (hp < 4.0) {
+        g = x;
+        b = c;
+    } else if (hp < 5.0) {
+        r = x;
+        b = c;
+    } else {
+        r = c;
+        b = x;
+    }
+    double const m = v - c;
+    r_out          = static_cast<int>(std::lround((r + m) * 255.0));
+    g_out          = static_cast<int>(std::lround((g + m) * 255.0));
+    b_out          = static_cast<int>(std::lround((b + m) * 255.0));
+}
+
+} // anonymous namespace
+
+int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                                          std::string const& lang, PageConstraints const& cnst) {
+    if (rows.empty()) return status_empty_input;
+    SegmentAttribution const agg = aggregate_segment_attribution(rows);
+    if (agg.groups.empty()) return status_empty_input; // keine gültige Segment-Zeile → ehrlich leer, KEIN leerer Balken
+
+    bool const de = (lang == "de");
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+
+    std::string const title = de ? "Gestapelte Per-Achsen-Latenz-Attribution" : "stacked per-axis latency attribution";
+    std::string const xlab  = de ? "Suchalgorithmus" : "search algorithm";
+    std::string const ylab  = de ? "Latenz-Attribution je Achse (ns, Segment-Lauf-Wall-Clock)"
+                                 : "per-axis latency attribution (ns, segment run)";
+
+    f << "% AUTO-GENERATED durch diagram_generator (P4, Per-Achsen-Latenz-Attribution, ybar stacked)\n";
+    f << "% Ganzes je Balken = seg_run_total_ns (Wall-Clock des 19-Segment-Laufs), NICHT total_ns (inkommensurabel,\n";
+    f << "% 3-29x daneben). Σ der 20 Segmente == seg_run_total_ns (seg_coverage~1). 19 Organ-Achsen + framework.\n";
+    if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
+    open_resizebox(f, cnst);
+    f << "\\begin{tikzpicture}\n";
+    // 20 deterministische Kategorienfarben je Segment definieren (Stapel-Reihenfolge = kSegmentColumns).
+    for (std::size_t s = 0; s < WideMeasurementRow::kSegmentCount; ++s) {
+        double const hue = 360.0 * static_cast<double>(s) / static_cast<double>(WideMeasurementRow::kSegmentCount);
+        double const val = (s % 2 == 0) ? 0.90 : 0.70;
+        int          r = 0, g = 0, b = 0;
+        hsv_to_rgb(hue, 0.62, val, r, g, b);
+        f << "\\definecolor{segattr" << s << "}{RGB}{" << r << "," << g << "," << b << "}\n";
+    }
+    f << "\\begin{axis}[\n";
+    f << "    ybar stacked,\n";
+    f << "    bar width=22pt,\n";
+    write_pgfplots_axis_options(f, cnst, title, xlab, ylab);
+    f << "    ymin=0,\n";
+    f << "    enlarge x limits={abs=0.75},\n"; // symbolische x-Achse: Rand fuer wenige breite Balken
+    f << "    symbolic x coords={";
+    for (std::size_t i = 0; i < agg.groups.size(); ++i) {
+        if (i > 0) f << ",";
+        f << escape_latex(agg.groups[i]);
+    }
+    f << "},\n";
+    f << "    xtick=data,\n";
+    f << "    x tick label style={font=\\small},\n";
+    // 20-Eintrags-Legende AUSSERHALB rechts (tiny), damit sie den Plot nicht ueberdeckt.
+    f << "    legend style={at={(1.03,1)},anchor=north west,font=\\tiny,legend cell align=left},\n";
+    f << "    reverse legend,\n"; // Legende von oben (letztes Stapel-Segment) nach unten lesbar zum Balken passend
+    f << "]\n";
+    for (std::size_t s = 0; s < WideMeasurementRow::kSegmentCount; ++s) {
+        f << "\\addplot[fill=segattr" << s << ",draw=black!45,very thin] coordinates {";
+        for (std::size_t g = 0; g < agg.groups.size(); ++g) {
+            f << "(" << escape_latex(agg.groups[g]) << "," << fmt_double(agg.means[s][g]) << ")";
+            if (g + 1 < agg.groups.size()) f << " ";
+        }
+        f << "};\n";
+        f << "\\addlegendentry{" << escape_latex(agg.segment_labels[s]) << "}\n";
+    }
+    f << "\\end{axis}\n\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
+    if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
     return f.good() ? status_ok : status_io_error;
 }
 

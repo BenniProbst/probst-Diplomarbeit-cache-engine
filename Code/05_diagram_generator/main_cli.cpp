@@ -94,6 +94,43 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    // P4 (2026-07-12) — Per-Achsen-Latenz-Attribution als GESTAPELTE Balken (Kern-Beitrag):
+    //   diagram-generator --seg-attribution=<wide.csv> <out.tex> [--lang=de|en] [--body-only]
+    // Ein Balken je search_algo; das 100%-Ganze je Balken = seg_run_total_ns (Segment-Lauf-Wall-Clock),
+    // NICHT total_ns (inkommensurabel). 20 Stapel-Segmente = 19 Organ-Achsen + framework.
+    if (argc >= 3 && std::string{argv[1]}.rfind("--seg-attribution=", 0) == 0) {
+        std::string const   in_csv  = std::string{argv[1]}.substr(std::string{"--seg-attribution="}.size());
+        char const*         out_tex = argv[2];
+        std::string         lang    = "en";
+        dg::PageConstraints cnst;
+        for (int i = 3; i < argc; ++i) {
+            std::string a{argv[i]};
+            if (a.rfind("--lang=", 0) == 0)
+                lang = a.substr(7);
+            else if (a == "--body-only")
+                cnst.body_only = true;
+        }
+        std::vector<dg::WideMeasurementRow> rows;
+        int const                           prc = dg::parse_wide_csv(in_csv, rows);
+        if (prc != 0) {
+            std::cerr << "parse_wide_csv failed: " << prc << " (10=io,11=empty/header/parse)\n";
+            return prc;
+        }
+        int const rc = dg::write_segment_attribution_stacked_bar(out_tex, rows, lang, cnst);
+        if (rc == dg::status_empty_input) {
+            std::cerr << "seg-attribution: keine gueltige Segment-Zeile (seg_*_ns n/a / seg_run_total<=0 / "
+                         "seg_coverage n/a) -> nichts geschrieben (ehrlich leer)\n";
+            return rc;
+        }
+        if (rc != 0) {
+            std::cerr << "write_segment_attribution_stacked_bar failed: " << rc << "\n";
+            return rc;
+        }
+        std::cout << "diagram-generator: seg-attribution (stacked bar) from " << rows.size() << " wide rows -> "
+                  << out_tex << "\n";
+        return 0;
+    }
+
     // V22.1 — neuer Subcommand --by-workload erzeugt gruppierten Bar-Chart aus
     // V20.3-konformer measurements.csv (16 Spalten inkl. workload_used).
     if (argc >= 4 && std::string{argv[1]} == "--by-workload") {
@@ -112,16 +149,20 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc < 3) {
-        std::cerr << "Usage: diagram-generator <input.csv> <output.tex> [--lang=de|en] [--body-only]\n"
-                  << "       (Demo: liest 1. Spalte = label, total_cycles = value)\n"
-                  << "       (--body-only: nur tikzpicture, ohne figure/caption — Caller wrappt)\n"
-                  << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
-                  << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n"
-                  << "  oder: diagram-generator --surface=<z_field> <wide.csv> <output.tex> [--lang=de|en] [--3d] "
-                     "[--body-only]\n"
-                  << "       (L-c: WIDE-Matrix → Surface/Heatmap je Interface-Funktion;\n"
-                  << "        z_field: "
-                     "ns_per_op|op_insert_p50_ns|op_lookup_p50_ns|op_erase_p50_ns|op_scan_p50_ns|op_rmw_p50_ns)\n";
+        std::cerr
+            << "Usage: diagram-generator <input.csv> <output.tex> [--lang=de|en] [--body-only]\n"
+            << "       (Demo: liest 1. Spalte = label, total_cycles = value)\n"
+            << "       (--body-only: nur tikzpicture, ohne figure/caption — Caller wrappt)\n"
+            << "  oder: diagram-generator --by-workload <input.csv> <output.tex>\n"
+            << "       (V22.1: V20.3-CSV gruppiert nach workload_used)\n"
+            << "  oder: diagram-generator --surface=<z_field> <wide.csv> <output.tex> [--lang=de|en] [--3d] "
+               "[--body-only]\n"
+            << "       (L-c: WIDE-Matrix → Surface/Heatmap je Interface-Funktion;\n"
+            << "        z_field: "
+               "ns_per_op|op_insert_p50_ns|op_lookup_p50_ns|op_erase_p50_ns|op_scan_p50_ns|op_rmw_p50_ns)\n"
+            << "  oder: diagram-generator --seg-attribution=<wide.csv> <output.tex> [--lang=de|en] [--body-only]\n"
+            << "       (P4: Per-Achsen-Latenz-Attribution als gestapelte Balken; ein Balken je search_algo,\n"
+            << "        20 Segmente (19 Organ-Achsen + framework), Ganzes = seg_run_total_ns)\n";
         return 1;
     }
     std::ifstream f{argv[1]};
