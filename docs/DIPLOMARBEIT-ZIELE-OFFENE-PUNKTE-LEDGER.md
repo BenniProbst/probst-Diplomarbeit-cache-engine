@@ -265,6 +265,17 @@ measure_out` (exakt die lokal verifizierte golden-320-Invocation, `--validate`-P
 geschrieben; zusätzlich 12-Wochen-Artefakt als Sicherheitsnetz. Cross-Bezug: §0-Goal (Mess→PDF-Fluss),
 [[feedback_ci_gesamtlauf_ist_messung_abgeschaltet_pdf_kompiliert]], [[project_mess_ergebnis_rueckschreibung_pipeline_persistiert]].
 
+## §11-I USER-FREIGABEN 2026-07-12 (wörtlich verankert — Arbeitsgrundlage der Folge-Zyklen)
+
+1. **GO 1 ✅ UMGESETZT** — Overleaf-Anhang-Verdrahtung (#24): thesis `73947aa`, super `54d3983`. CI-interaktive Kette END-TO-END geschlossen.
+2. **GO 3 FREIGEGEBEN** — #5 Hebel-A-Rest (*_scan-Routing): Design via Deep-Research-Dossier + autonome Umsetzung der saubersten Option.
+3. **GO 4 FREIGEGEBEN mit Rückfrage-Pflicht** — #8 (F-A/F-B/F-C): Dossier erstellen + dem User eine KONKRETE Empfehlungs-Rückfrage stellen („was soll ich wählen"), DANN umsetzen.
+4. **GO 5 KOMPLETT AUTONOM** — #3 (extern-gated Forks) + #9 (Phase 0.3b): Forks sichten, entscheiden, umsetzen — ohne weitere Rückfrage.
+5. **GO 2 ALS LETZTER PUNKT** — cpp-Codegen-Backend Swap-to-Default (+graceful-skip): ZUM SCHLUSS durchführen, gekoppelt mit der mehrtägigen Messung („damit alles steht wenn wir messen und wir direkt ALLE Fehler erkennen").
+6. **Frage 6 entschieden:** prod1-Runner-concurrency → 3 (root nötig → Infra-Handover). Der laufende Voll-Lauf (#9916) = bewusster Proof-of-Concept UNTER Fremdlast (Maschine wird parallel gebraucht; Geduld vorhanden); echte Messkampagne später auf lastisolierter Maschine. **ZUSÄTZLICH ein Smoke-/Coverage-MESS-Profil bauen, das ALLE Features des Gesamtsystems einmal berührt (erweitert die 320er umfassend) → Ablauf künftig: erst Smoke, DANN Voll-Lauf.** CI-Drosselung wird akzeptiert, keine Drossel-Maßnahmen ohne User-Freigabe.
+7. **Frage 7 entschieden:** NAS-Writeback via V80-FILTERPOD über V20-NAS, SNI-DNS strikt cluster-seitig; V60-Runner (extern geteilt) dürfen Cluster_NFS NIE sehen/lesen, nur Schreiben in `cache-engine-experiment` via Filterpod; KEIN V20-Vollzugriff (externe Mandanten). → **INFRA-HANDOVER geschrieben** (`docs/sessions/20260712-INFRA-HANDOVER-nas-writeback-filterpod-und-runner-concurrency.md`), User überreicht es dem Infra-Agenten.
+8. **Generelle Freigabe: „Ich gebe die vollautonome Arbeit frei."**
+
 ## §12 FORTSCHREIBUNGS-LOG
 - **2026-07-03:** Ledger erstellt aus ultracode-Validierung (`wf_eb6a7880-699`, PLAN_VALID_WITH_CORRECTIONS). S1/#216-H2 DONE (`20e24ff`, ABI 3→4). CI-1 `.test`-Vorlage `5e46040`. super-`test:unit` `b37d702` (Probelauf offen). B2/B7/M12/M18 erledigt. Nächster Schritt: Phase-0-Vorbedingungen (§ Sequenz 0a-0e) → dann S2 #217 ∥ P-0 #193.
 - **2026-07-03 (§0-Goal + Phase-0-Start):** §0 GOAL/MISSION als `/goal`-Referenz ergänzt (`b15904f`). super-Submodul-Bump cache-engine→`20e24ff` (`a26f52d`, B7/0a vollständig ✅). **Phase 0b/0c ✅:** alle Spur-P-Pfade am aktiven Repo (`20e24ff`) real verifiziert (AP-2 EE-Adapter+execute_engine_command+execution_result · AP-3 platform/i_platform_probe+platform_probe/cpuid_probe · AP-13 c02_pinning_engine+platform/core_layout · AP-11 8 lp_-XMLs) — die B5-Decoy-Warnung galt dem stale Mai-Klon, NICHT dem Ist. **B6-Naht bestätigt:** AP-3∥AP-13 teilen `platform/core_layout.hpp` → Single-Owner AP-3. `measurement/`-Top-Level = leerer untrackter Ordner (kein Repo-Decoy, harmlos). **S2/#217 gestartet:** Ist-Kartierung läuft (Explore a238429d) — Array-Gattung (Array256/Array65535/Vector*, native Key-Breite, KEIN uint16→uint64) — Ablauf Kartierung→Dossier→Codex→Review→Merge→Pipeline.
