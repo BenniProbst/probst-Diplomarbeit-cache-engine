@@ -9,7 +9,8 @@
 #   • Pro-Untermodul:       COMDARE_DA_<Mxx>_BUILD_SHARED         (default = globaler Wert)
 #     Untermodul-Schlüssel: M01 sample_data_generator · M02 messung_driver · M03 binary_to_csv ·
 #                           M04 csv_to_latex · M05 diagram_generator · M06 latex_to_pdf ·
-#                           M08 appendix_generator (Inc1; M07 tier_binary_report nutzt das Makro nicht)
+#                           M08 appendix_generator (Inc1; M07 tier_binary_report nutzt das Makro nicht) ·
+#                           M09 tex_formatter (#25: LaTeX-Formatierer, ersetzt format_tex.py)
 #
 # Verwendung:
 #   comdare_da_add_library(<target> MODULE <Mxx> SOURCES <src...>)

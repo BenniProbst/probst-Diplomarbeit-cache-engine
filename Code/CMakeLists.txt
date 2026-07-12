@@ -317,6 +317,7 @@ add_subdirectory(05_diagram_generator)       # CSV -> TikZ-Plot
 add_subdirectory(06_latex_to_pdf)            # final PDF-Build
 add_subdirectory(07_tier_binary_report)      # #279 Build-Sichtbarkeit + Interface-Roster
 add_subdirectory(08_appendix_generator)      # Inc1: In-Process-Appendix-Orchestrator (ersetzt .ps1)
+add_subdirectory(09_tex_formatter)           # #25: LaTeX-Formatierer C++23 (ersetzt format_tex.py)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # V41.P1 (2026-05-31) — E2E-Pipeline-Orchestrierung: treibt EINEN Datensatz GESCHLOSSEN durch die

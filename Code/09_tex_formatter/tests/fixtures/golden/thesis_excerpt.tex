@@ -1,0 +1,14 @@
+Auch der Transfer erfolgt nicht streng \enquote{blockweise am Stück}: Verfahren wie
+\emph{critical-word-first} liefern zuerst das angefragte Wort; DDR5 unterteilt den Speicherkanal in
+zwei unabhängige 32-Bit-Sub-Kanäle~\cite{micron_ddr5}; und nicht-temporale bzw.
+Write-Combining-Schreibzugriffe umgehen den normalen Write-Allocate-Pfad, statt die betroffene
+Cache-Line in die Cache-Hierarchie zu holen~\cite{intel_sdm}. Ein Zugriff, der sein Datum in einer
+Cache-Ebene findet, ist günstig; ein Fehlzugriff (Miss) wird an die nächste, langsamere Ebene
+weitergereicht, und ein Miss im Last-Level-Cache erreicht den Hauptspeicher zu Kosten von einigen
+hundert Zyklen~\cite{hennessy2019architecture,drepper2007memory}. Auf Mehr-Sockel- und
+Chiplet-Systemen macht der nicht-uniforme Speicherzugriff (NUMA) die Latenz einer Referenz
+zusätzlich davon abhängig, welcher Knoten die Seite besitzt~\cite{drepper2007memory}.
+
+\subsection{Cache-Line-Größen: statisch und dynamisch}\label{ssec:cache-line-sizes}
+Die Cache-Line-Größe ist je Mikroarchitektur fest verdrahtet, unterscheidet sich aber zwischen
+Architekturen. Auf x86-64 (AMD wie Intel) und auf gängigen ARM-Kernen (etwa Cortex-A76 oder
