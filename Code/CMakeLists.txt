@@ -316,6 +316,7 @@ add_subdirectory(04_csv_to_latex)            # CSV -> LaTeX-Tabelle
 add_subdirectory(05_diagram_generator)       # CSV -> TikZ-Plot
 add_subdirectory(06_latex_to_pdf)            # final PDF-Build
 add_subdirectory(07_tier_binary_report)      # #279 Build-Sichtbarkeit + Interface-Roster
+add_subdirectory(08_appendix_generator)      # Inc1: In-Process-Appendix-Orchestrator (ersetzt .ps1)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # V41.P1 (2026-05-31) — E2E-Pipeline-Orchestrierung: treibt EINEN Datensatz GESCHLOSSEN durch die

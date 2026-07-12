@@ -41,6 +41,9 @@ Forschungsarbeiten/code/P28-Kuehn-DAMON/bplustree_reordering/
 # `git add -- measurement/` die Mess-CSVs (das wichtigste Artefakt) still weg. NUR die CSVs werden
 # re-inkludiert; die DLL-Binaries kopiert der persist-Job gar nicht erst in den Lauf-Ordner.
 !measurement/**/*.csv
+# Test-Fixtures sind committete, deterministische golden inputs (keine Mess-Dumps) → trackbar,
+# damit ctest sie nicht in den Checkout schreiben muss (kein Source-Tree-Seiteneffekt in CI).
+!Code/**/tests/fixtures/**/*.csv
 *.binarydump
 *.aux
 *.log
