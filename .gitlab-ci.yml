@@ -396,6 +396,78 @@ thesis:pdf:
     when: always
     expire_in: 4 weeks
 
+# ── Stage measure — SMOKE-Vorlauf (#26/GO-5, User 2026-07-12 „erst Smoke, DANN Voll-Lauf"): der schnelle
+#    Voll-FEATURE-Smoke ueber das dedizierte Profil m3_smoke_coverage.profile.xml (1 Baseline + je-Achse-
+#    Enabled-Sweeps + 21 SOTA-DLLs; USE=ENABLE&&HAVE-abhaengig ~93-115 Binaries, super-Sub-Build 94;
+#    ~12-14,5k Mess-Zellen, Stunden statt Tage — Dossier GO-5 Teil B).
+#    Klon der measure:golden-320-Mechanik (gleicher Runner/Toolchain/Anhang-Regen/Artefakt-Logik), aber:
+#      * COMDARE_THESIS_PROFILE zeigt auf das Smoke-Profil (env-Hook 02_messung_driver/main.cpp) —
+#        das ist das COMDARE_MEASURE_PROFILE=smoke|full-Mapping aus dem Dossier B.4.4: smoke-only via
+#        COMDARE_MEASURE_PROFILE=="smoke" (golden-320 bleibt inert, da COMDARE_RUN_MEASURE ungesetzt);
+#        voller Ablauf via COMDARE_RUN_MEASURE=="true" (Smoke laeuft IMMER zuerst, golden-320 needs ihn).
+#      * eigenes Ausgabeverzeichnis measure_out_smoke/ (kollisionsfrei zum golden-Lauf auf demselben
+#        Runner-Workspace: kein Mischen der Anhang-Aggregation, kein Artefakt-Pfad-Clobbering).
+#      * timeout 12h statt 10 Tage (Smoke prueft Funktion, nicht Streuung).
+#    INERT-by-default wie der golden-Job: ohne COMDARE_RUN_MEASURE/COMDARE_MEASURE_PROFILE existiert er nicht.
+#    Der LAUFENDE golden-320-Lauf (#9916) ist unberuehrt: Pipeline-Definitionen sind je Pipeline eingefroren.
+measure:smoke:
+  stage: measure
+  tags: [prod, baremetal, amd]
+  timeout: 12h                      # Smoke: Stunden statt Tage (Dossier B.4.3 ~14,5k Zellen)
+  variables:
+    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
+    COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3_smoke_coverage.profile.xml"
+  needs: ["verify:submodules"]
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
+      when: never
+    - if: '$COMDARE_RUN_MEASURE == "true"'         # Voll-Ablauf: erst Smoke, dann golden-320 (needs)
+    - if: '$COMDARE_MEASURE_PROFILE == "smoke"'    # Smoke-ONLY: nur dieser Job (golden-320 bleibt inert)
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
+    - cmake --build build --target comdare-messung-driver
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      echo "== Pre-Flight (--validate, rein lesende Pruefung des SMOKE-Profils gegen die EnabledStrategies) =="
+      echo "   COMDARE_THESIS_PROFILE=$COMDARE_THESIS_PROFILE"
+      "$DRIVER" --validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
+      mkdir -p measure_out_smoke
+      echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
+      "$DRIVER" experiment_config measure_out_smoke
+      echo "== Mess-CSVs (Beleg) =="; find measure_out_smoke -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
+      test -n "$(find measure_out_smoke -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Smoke-Lauf lieferte nichts"; exit 1; }
+      # ── CI-interaktiv (#24): den Anhang aus den LIVE-Smoke-Messdaten regenerieren (gleiche Logik wie golden-320) ──
+      echo "== Anhang-Regenerierung aus Live-Smoke-Messdaten (#24) =="
+      cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+      APP=$(find build -type f -name "appendix-generator" | head -1)
+      if [ -n "$APP" ] && [ -x "$APP" ]; then
+        find measure_out_smoke -type f -name 'result.csv' | sort > measure_out_smoke/_rc_list.txt
+        WIDE=measure_out_smoke/wide_aggregate.csv; : > "$WIDE"; _hdr=0
+        while IFS= read -r rc; do
+          [ "$_hdr" = "0" ] && { head -1 "$rc" > "$WIDE"; _hdr=1; }
+          tail -n +2 "$rc" >> "$WIDE"
+        done < measure_out_smoke/_rc_list.txt
+        if [ -s "$WIDE" ] && [ "$(wc -l < "$WIDE")" -gt 1 ]; then
+          "$APP" "$WIDE" measure_out_smoke/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
+          echo "== regenerierte Anhang-.tex =="; find measure_out_smoke/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
+          rm -f "$WIDE" measure_out_smoke/_rc_list.txt   # Intermediates NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
+        else
+          echo "kein WIDE-Aggregat (keine result.csv gefunden) -> Anhang-Regenerierung honest uebersprungen"
+        fi
+      fi
+      echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
+  artifacts:
+    paths:
+      - Code/measure_out_smoke/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die 115 DLL-Binaries
+      - Code/measure_out_smoke/appendix/**/*.tex # CI-interaktiv (#24): regenerierte Darstellungs-.tex
+    when: always
+    expire_in: 12 weeks
+
 # ── Stage measure (#156/#17, User 2026-07-11 „Cluster mess infra wieder online … nochmal anstoßen"): der EINE
 #    offizielle XML-getriebene golden-320-Voll-Messlauf ueber comdare-messung-driver (der mehrtaegige Lauf #156,
 #    bisher bewusst AUS der Pipeline gehalten — hier als OPT-IN triggerbar gemacht, NICHT im Normal-Gesamtlauf).
@@ -405,13 +477,24 @@ thesis:pdf:
 #    aktiviert Measurement-ON im Sub-Build) + faehrt ihn gegen experiment_config (die 3 Messreihen A/B/C, exakt die
 #    lokal verifizierte golden-320-Invocation) -> measure_out/{A,B,C}/measurements.{csv,json}. Die CSVs sammelt der
 #    persist:measurements-Job (#22) additiv nach development; zusaetzlich 12-Wochen-Artefakt als Sicherheitsnetz.
+#    #26/GO-5 (2026-07-12): needs measure:smoke (optional) — „erst Smoke, DANN Voll-Lauf" (User-Ablauf-Doktrin);
+#    optional:true, damit historische/Sonder-Trigger ohne Smoke-Job die Pipeline nicht invalide machen. Der
+#    Job-KERN (rules/script/artifacts) ist UNVERAENDERT.
 measure:golden-320:
   stage: measure
   tags: [prod, baremetal, amd]
   timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
   variables:
     GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
-  needs: ["verify:submodules"]
+  needs:
+    - "verify:submodules"
+    # #26/GO-5 (2026-07-12): erst Smoke, DANN Voll-Lauf (User-Ablauf-Doktrin). optional:true haelt die
+    # Pipeline valide, falls der Smoke-Job (andere rules-Variante) nicht existiert; existieren beide
+    # (COMDARE_RUN_MEASURE=true), erzwingt needs die Sequenz. artifacts:false — der Voll-Lauf braucht
+    # keine Smoke-CSVs, nur die Reihenfolge.
+    - job: "measure:smoke"
+      optional: true
+      artifacts: false
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'      # (Netz) Bot-Writeback triggert NIE einen Messlauf
       when: never
@@ -493,6 +576,9 @@ persist:measurements:
     - job: measure:golden-320       # measure_out/ (golden-320-Mess-CSVs) — OPTIONAL: nur wenn COMDARE_RUN_MEASURE gesetzt war
       artifacts: true
       optional: true
+    - job: measure:smoke            # measure_out_smoke/ (#26/GO-5 Smoke-CSVs) — OPTIONAL: nur bei Smoke-/Voll-Messlauf vorhanden
+      artifacts: true
+      optional: true
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'                                           # (Netz) Bot-Writeback triggert NIE persist
       when: never
@@ -542,6 +628,16 @@ persist:measurements:
           cp -- "$f" "$DEST/measure_out/$rel"; n_csv=$((n_csv+1))
         done < <(find Code/measure_out -type f \( -name '*.csv' -o -name '*.tex' \))
         if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out/ ($n_csv Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
+      fi
+      # measure_out_smoke/ = die Smoke-/Coverage-Mess-CSVs des measure:smoke-Jobs (#26/GO-5) — gleiche
+      # additive Mechanik, eigener Zielordner (kollisionsfrei zum golden-Lauf derselben Pipeline).
+      if [ -d Code/measure_out_smoke ]; then
+        n_csv=0
+        while IFS= read -r f; do
+          rel="${f#Code/measure_out_smoke/}"; mkdir -p "$DEST/measure_out_smoke/$(dirname "$rel")"
+          cp -- "$f" "$DEST/measure_out_smoke/$rel"; n_csv=$((n_csv+1))
+        done < <(find Code/measure_out_smoke -type f \( -name '*.csv' -o -name '*.tex' \))
+        if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out_smoke/ ($n_csv Smoke-Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
       fi
       {
         echo "# persist:measurements Laufordner — Provenance (#22, Ledger §11-G)"
