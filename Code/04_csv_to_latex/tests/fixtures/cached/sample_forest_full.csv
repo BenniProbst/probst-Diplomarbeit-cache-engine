@@ -1,0 +1,14 @@
+binary_id;workload;two_phase_valid;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns
+search_algo=alpha/node_type=n4/memory_layout=aos/prefetch=off;w1;1;100;100;100;100;100;100
+search_algo=alpha/node_type=n4/memory_layout=aos/prefetch=off;w2;1;100;100;100;100;100;100
+search_algo=alpha/node_type=n4/memory_layout=aos/prefetch=off;w3;1;100;100;100;100;100;100
+search_algo=alpha/node_type=n4/memory_layout=aos/prefetch=off;w4;1;100;100;100;100;100;100
+search_algo=beta/node_type=n4/memory_layout=aos/prefetch=off;w1;1;70;70;70;70;70;70
+search_algo=beta/node_type=n4/memory_layout=aos/prefetch=off;w2;1;80;80;80;80;80;80
+search_algo=beta/node_type=n4/memory_layout=aos/prefetch=off;w3;1;90;90;90;90;90;90
+search_algo=beta/node_type=n4/memory_layout=aos/prefetch=off;w4;1;100;100;100;100;100;100
+search_algo=gamma/node_type=n4/memory_layout=aos/prefetch=off;w1;1;100;100;100;100;100;100
+search_algo=alpha/node_type=n8/memory_layout=aos/prefetch=off;w1;1;130;130;130;130;130;130
+search_algo=alpha/node_type=n8/memory_layout=aos/prefetch=off;w2;1;130;130;130;130;130;130
+search_algo=alpha/node_type=n8/memory_layout=aos/prefetch=off;w3;1;130;130;130;130;130;130
+search_algo=alpha/node_type=n8/memory_layout=aos/prefetch=off;w4;1;130;130;130;130;130;130

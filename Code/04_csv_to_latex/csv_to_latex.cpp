@@ -638,6 +638,227 @@ int write_exchange_longtables(std::filesystem::path const& out_dir, std::span<Ex
     return status_ok;
 }
 
+namespace {
+
+// P5: 4-Nachkomma-Formatierung (Dezimalpunkt, sprachneutral wie fmt_double in 05).
+[[nodiscard]] std::string fmt4(double d) {
+    char buf[64];
+    std::snprintf(buf, sizeof(buf), "%.4f", d);
+    return buf;
+}
+
+// P5: Forest-Zeile = EIN (Achse × Wertepaar v→v')-Aggregat der ns_per_op-Headline.
+struct ForestRow {
+    std::string axis;
+    std::string value_from;
+    std::string value_to;
+    double      median_rel_delta = 0.0; // Punkt-x (real, aus ExchangeAggregate)
+    double      iqr_rel_delta    = 0.0; // Whisker-Breite (p75-p25, real)
+    std::size_t n                = 0;   // pair_workload_samples
+    bool        small_n          = false;
+};
+
+} // anonymous namespace
+
+int write_exchange_forest_plot(std::filesystem::path const& out, std::span<ExchangeAggregate const> aggs,
+                               std::span<SiblingPairCount const> counts, std::string const& lang, bool body_only,
+                               std::size_t small_n_threshold) {
+    bool const de = (lang == "de");
+
+    // 1) NUR die ns_per_op-Headline; je Achse (kVariableAxes-Reihenfolge) die Wertepaare sortiert. n=0-Aggregate
+    //    (kein definiertes rel-Delta, z.B. durchweg Zero-Baseline) werden NIE als „+0"-Zeile aufgenommen (Phantom).
+    std::vector<ForestRow> rows;
+    for (auto axis_sv : kVariableAxes) {
+        std::string const      axis{axis_sv};
+        std::vector<ForestRow> per_axis;
+        for (auto const& a : aggs) {
+            if (a.axis != axis) continue;
+            if (a.interface_fn != "ns_per_op") continue;
+            if (a.pair_workload_samples == 0) continue; // kein Befund → keine Phantom-Zeile
+            per_axis.push_back({axis, a.value_from, a.value_to, a.median_rel_delta, a.iqr_rel_delta,
+                                a.pair_workload_samples, a.pair_workload_samples < small_n_threshold});
+        }
+        std::sort(per_axis.begin(), per_axis.end(), [](ForestRow const& x, ForestRow const& y) {
+            if (x.value_from != y.value_from) return x.value_from < y.value_from;
+            return x.value_to < y.value_to;
+        });
+        for (auto& r : per_axis) rows.push_back(std::move(r));
+    }
+    if (rows.empty()) return status_empty_input; // ehrlich leer, KEIN leerer Plot (Datei wird nicht angelegt)
+
+    std::size_t const N = rows.size();
+
+    // 2) x-Skala aus den VALIDEN (nicht-kleine-n) Zeilen ableiten, 0 stets einschliessen. So bestimmen die
+    //    Division-durch-~0-Ausreisser kleiner n NICHT die Skala (sie werden ausgegraut + ggf. am Rand geklemmt).
+    double lo = 0.0, hi = 0.0;
+    bool   init   = false;
+    auto   extend = [&](ForestRow const& r) {
+        double const a = r.median_rel_delta - r.iqr_rel_delta / 2.0;
+        double const b = r.median_rel_delta + r.iqr_rel_delta / 2.0;
+        if (!init) {
+            lo   = a;
+            hi   = b;
+            init = true;
+        } else {
+            lo = std::min(lo, a);
+            hi = std::max(hi, b);
+        }
+    };
+    bool any_valid = false;
+    for (auto const& r : rows)
+        if (!r.small_n) {
+            extend(r);
+            any_valid = true;
+        }
+    if (!any_valid) // nur kleine-n-Zeilen: dann deren Spanne nehmen (sonst leere Skala)
+        for (auto const& r : rows) extend(r);
+    lo          = std::min(lo, 0.0); // 0-Referenzlinie MUSS im Sichtfenster liegen (sonst geklemmt)
+    hi          = std::max(hi, 0.0);
+    double span = hi - lo;
+    if (span <= 0.0) span = 1.0;
+    double const pad  = 0.08 * span;
+    double const xmin = lo - pad;
+    double const xmax = hi + pad;
+
+    // y-Layout: erste Zeile oben (y = N-1), letzte unten (y = 0).
+    auto y_of = [N](std::size_t display_index) { return static_cast<double>(N - 1 - display_index); };
+
+    std::size_t n_small = 0;
+    for (auto const& r : rows)
+        if (r.small_n) ++n_small;
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+
+    f << "% AUTO-GENERATED durch csv_to_latex::write_exchange_forest_plot (P5 Achsen-Austauschbarkeit; "
+      << "ns_per_op-Headline; lang=" << lang << ")\n";
+    f << "% Punkt = Median rel. Delta ns/op (bzgl. v); Whisker = IQR (p75-p25) symmetrisch um den Median (das\n";
+    f << "% Aggregat traegt NUR die IQR-Breite, nicht p25/p75 → Balken konstruktionsbedingt symmetrisch). Nur\n";
+    f << "% reale Aggregat-Werte (aggregate_exchange); kleine n (< " << small_n_threshold
+      << ") ausgegraut. n=0 nicht gezeigt.\n";
+    f << "% Zeilen=" << N << "; davon kleine-n=" << n_small << ". 0-Linie = keine Aenderung.\n";
+
+    if (!body_only) { f << "\\begin{figure}[!htbp]\n\\centering\n"; }
+    // Breiten-sicher wie die 05-pgfplots-Emitter (resizebox-Decorator um das tikzpicture).
+    f << "\\resizebox{\\textwidth}{!}{%\n";
+    f << "\\begin{tikzpicture}\n";
+    // Farb-Klassen (ColorBrewer-nah, CVD-tauglich; Vorzeichen zusaetzlich durch Position rechts/links der
+    // 0-Linie kodiert → nicht farb-only). Marker-Form kodiert Validitaet redundant (voll * vs. offen o).
+    f << "\\definecolor{fpimprove}{RGB}{27,158,119}\n"; // Verbesserung (Delta<0)
+    f << "\\definecolor{fpregress}{RGB}{215,48,39}\n";  // Regression (Delta>=0)
+    f << "\\definecolor{fpsmalln}{RGB}{150,150,150}\n"; // kleine n (unzuverlaessig)
+    f << "\\definecolor{fpzero}{RGB}{120,120,120}\n";   // 0-Referenzlinie
+    f << "\\begin{axis}[\n";
+    f << "    width=0.86\\textwidth,\n";
+    f << "    height=" << fmt4(1.8 + 0.55 * static_cast<double>(N)) << "cm,\n";
+    f << "    xmin=" << fmt4(xmin) << ", xmax=" << fmt4(xmax) << ",\n";
+    f << "    ymin=-0.7, ymax=" << fmt4(static_cast<double>(N - 1) + 0.7) << ",\n";
+    f << "    ytick={";
+    for (std::size_t t = 0; t < N; ++t) {
+        if (t > 0) f << ",";
+        f << t;
+    }
+    f << "},\n";
+    // yticklabels aufsteigend (y=0..N-1): bei y=t steht die Anzeige-Zeile display_index = N-1-t.
+    f << "    yticklabels={";
+    for (std::size_t t = 0; t < N; ++t) {
+        std::size_t const di = N - 1 - t;
+        auto const&       r  = rows[di];
+        if (t > 0) f << ",";
+        f << "{" << escape_latex(r.axis) << ": " << breakable_identifier(r.value_from) << " $\\rightarrow$ "
+          << breakable_identifier(r.value_to) << "}";
+    }
+    f << "},\n";
+    f << "    y tick label style={font=\\tiny},\n";
+    f << "    x tick label style={font=\\tiny},\n";
+    f << "    xlabel={"
+      << (de ? "Median rel.\\ $\\Delta$ ns/op (bzgl.\\ $v$; $<0$ = schneller)"
+             : "median rel.\\ $\\Delta$ ns/op (w.r.t.\\ $v$; $<0$ = faster)")
+      << "},\n";
+    f << "    xlabel style={font=\\footnotesize},\n";
+    f << "    title={"
+      << (de ? "Achsen-Austauschbarkeit (Forest-Plot, ns/op-Headline)"
+             : "Axis exchangeability (forest plot, ns/op headline)")
+      << "},\n";
+    f << "    title style={font=\\footnotesize},\n";
+    f << "    xmajorgrids=true,\n";
+    f << "    major grid style={gray!25},\n";
+    f << "    tick align=outside,\n";
+    f << "    mark size=2.2pt,\n";
+    f << "    legend style={font=\\tiny, at={(0.99,0.02)}, anchor=south east, legend cell align=left},\n";
+    f << "    clip=true,\n";
+    f << "]\n";
+
+    // 0-Referenzlinie (keine Aenderung). Numerische x/y → robust; MUSS im Sichtfenster liegen (xmin<=0<=xmax).
+    f << "% P5-0-REFERENZLINIE (keine Aenderung, Delta=0)\n";
+    f << "\\draw[color=fpzero, dashed, line width=0.8pt] (axis cs:0," << fmt4(-0.7) << ") -- (axis cs:0,"
+      << fmt4(static_cast<double>(N - 1) + 0.7) << ");\n";
+
+    // Drei Vorzeichen-/Validitaets-Klassen als getrennte \addplot (klare Farbe + Marker + eigene Whisker-Stile).
+    // Reihenfolge fix: improvement, regression, small-n (Test-stabil ueber die % P5-CLASS-Marker).
+    auto emit_class = [&](char const* tag, char const* color, char const* mark, char const* extra,
+                          auto pred) -> std::size_t {
+        std::vector<ForestRow const*> sel;
+        for (std::size_t di = 0; di < N; ++di)
+            if (pred(rows[di])) sel.push_back(&rows[di]);
+        if (sel.empty()) return 0;
+        f << "% P5-CLASS " << tag << "\n";
+        f << "\\addplot[only marks, mark=" << mark << ", color=" << color << ", " << extra << ",\n";
+        f << "    error bars/.cd, x dir=both, x explicit, error bar style={line width=0.6pt, color=" << color << "}]\n";
+        f << "coordinates {\n";
+        for (auto const* rp : sel) {
+            // display_index rekonstruieren (Pointer-Distanz in rows) → korrekte y-Koordinate.
+            std::size_t const di   = static_cast<std::size_t>(rp - &rows[0]);
+            double const      yv   = y_of(di);
+            double const      half = rp->iqr_rel_delta / 2.0; // Whisker = IQR, symmetrisch um den Median
+            f << "    (" << fmt4(rp->median_rel_delta) << "," << fmt4(yv) << ") +- (" << fmt4(half) << ",0)\n";
+        }
+        f << "};\n";
+        return sel.size();
+    };
+
+    std::size_t const n_imp = emit_class("improvement", "fpimprove", "*", "fill=fpimprove",
+                                         [](ForestRow const& r) { return !r.small_n && r.median_rel_delta < 0.0; });
+    std::size_t const n_reg = emit_class("regression", "fpregress", "*", "fill=fpregress",
+                                         [](ForestRow const& r) { return !r.small_n && r.median_rel_delta >= 0.0; });
+    std::size_t const n_sml =
+        emit_class("smalln", "fpsmalln", "o", "densely dotted", [](ForestRow const& r) { return r.small_n; });
+
+    // Legende NUR fuer real vorhandene Klassen (kein Phantom-Eintrag).
+    if (n_imp > 0)
+        f << "\\addlegendentry{" << (de ? "Verbesserung ($\\Delta<0$)" : "improvement ($\\Delta<0$)") << "}\n";
+    if (n_reg > 0)
+        f << "\\addlegendentry{" << (de ? "Regression ($\\Delta\\ge 0$)" : "regression ($\\Delta\\ge 0$)") << "}\n";
+    if (n_sml > 0)
+        f << "\\addlegendentry{" << (de ? "kleine $n$ (unzuverl\\\"assig)" : "small $n$ (unreliable)") << "}\n";
+
+    f << "\\end{axis}\n\\end{tikzpicture}\n";
+    f << "}%\n"; // resizebox
+
+    if (!body_only) {
+        std::string const cap =
+            de ? ("Achsen-Austauschbarkeit als Forest-Plot (ns/op-Headline): Punkt = Median rel.\\ $\\Delta$ ns/op "
+                  "je Geschwister-Wertepaar $v\\rightarrow v'$ (bzgl.\\ $v$), Whisker = IQR (p75-p25, symmetrisch "
+                  "um den Median). Vertikale Linie = Referenz (kein Effekt, $\\Delta=0$); links = schneller "
+                  "(Verbesserung), rechts = langsamer (Regression). Ausgegraut = kleine Stichprobe "
+                  "($n<" +
+                  std::to_string(small_n_threshold) +
+                  "$ Paar-Lastprofil-Diffs, Division-durch-$\\approx$0-"
+                  "instabil). Nur reale Aggregat-Werte; visuelle Erg\\\"anzung zu den ld\\_exchange-Longtables.")
+               : ("Axis exchangeability as forest plot (ns/op headline): point = median rel.\\ $\\Delta$ ns/op "
+                  "per sibling value pair $v\\rightarrow v'$ (w.r.t.\\ $v$), whisker = IQR (p75-p25, symmetric "
+                  "about the median). Vertical line = reference (no effect, $\\Delta=0$); left = faster "
+                  "(improvement), right = slower (regression). Greyed = small sample "
+                  "($n<" +
+                  std::to_string(small_n_threshold) +
+                  "$ pair-workload diffs, division-by-$\\approx$0 "
+                  "unstable). Only real aggregate values; visual complement to the ld\\_exchange longtables.");
+        f << "\\caption{" << cap << "}\\label{fig:ld:exchange:forest}\n\\end{figure}\n";
+    }
+
+    return f.good() ? status_ok : status_io_error;
+}
+
 int write_limitations_longtable(std::filesystem::path const& out, std::string const& lang) {
     std::ofstream f{out};
     if (!f) return status_io_error;

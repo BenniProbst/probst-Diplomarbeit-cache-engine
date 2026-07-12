@@ -50,6 +50,46 @@ int main(int argc, char* argv[]) {
                 for (auto const& c : counts) std::cout << "  sibling-pairs " << c.axis << "=" << c.pairs << "\n";
                 return 0;
             }
+            // P5 (2026-07-12): Forest-/Dot-Plot der Achsen-Austauschbarkeit (ns_per_op-Headline). Reuse
+            //   parse_wide_csv_full + aggregate_exchange DIREKT (dieselben Aggregate wie die Longtables).
+            //   --exchange-forest=<csv> <out.tex> [--lang=de|en] [--body-only]
+            if (a.rfind("--exchange-forest=", 0) == 0) {
+                std::string const csv = a.substr(18);
+                std::string       out;
+                bool              body_only = false;
+                for (int j = 1; j < argc; ++j) {
+                    std::string b{argv[j]};
+                    if (b == "--body-only")
+                        body_only = true;
+                    else if (j != i && b.rfind("--", 0) != 0 && out.empty())
+                        out = b;
+                }
+                if (out.empty()) {
+                    std::cerr << "csv-to-latex --exchange-forest: <out.tex> fehlt\n";
+                    return 1;
+                }
+                std::vector<c2l::WideFullRow> rows;
+                int                           rc = c2l::parse_wide_csv_full(csv, rows);
+                if (rc != 0) {
+                    std::cerr << "csv-to-latex: parse_wide_csv_full failed " << rc << "\n";
+                    return rc;
+                }
+                std::vector<c2l::SiblingPairCount> counts;
+                auto const                         aggs = c2l::aggregate_exchange(rows, counts);
+                rc = c2l::write_exchange_forest_plot(out, aggs, counts, lang_ld, body_only);
+                if (rc == c2l::status_empty_input) {
+                    std::cerr << "csv-to-latex --exchange-forest: keine gueltige ns_per_op-Austausch-Zeile "
+                                 "-> nichts geschrieben (ehrlich leer)\n";
+                    return rc;
+                }
+                if (rc != 0) {
+                    std::cerr << "csv-to-latex: write_exchange_forest_plot failed " << rc << "\n";
+                    return rc;
+                }
+                std::cout << "csv-to-latex (exchange-forest,lang=" << lang_ld << ",body_only=" << (body_only ? 1 : 0)
+                          << "): " << rows.size() << " rows -> " << aggs.size() << " aggregates -> " << out << "\n";
+                return 0;
+            }
             if (a == "--limitierung") {
                 if (i + 1 >= argc) {
                     std::cerr << "csv-to-latex --limitierung: <out.tex> fehlt\n";
@@ -125,6 +165,8 @@ int main(int argc, char* argv[]) {
                   << "                 Bias-Bruch-Matrix (Zeilen=search_algo, Spalten=Lastprofile,\n"
                   << "                 Zelle=Median ns/op, nur two_phase_valid).\n"
                   << "  --exchange=<csv> <outdir> [--lang]: L-d Achsen-Austauschbarkeits-longtables.\n"
+                  << "  --exchange-forest=<csv> <out.tex> [--lang] [--body-only]: P5 Forest-/Dot-Plot\n"
+                  << "                 der Achsen-Austauschbarkeit (ns_per_op-Headline, pgfplots).\n"
                   << "  --limitierung <out.tex> [--lang]:   L-e ehrliche Limitierungs-longtable.\n";
         return 1;
     }

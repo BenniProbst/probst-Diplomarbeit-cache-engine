@@ -22,6 +22,9 @@ namespace comdare::da::csv_to_latex {
 inline constexpr int status_ok          = 0;
 inline constexpr int status_io_error    = 10;
 inline constexpr int status_parse_error = 11;
+// P5 (2026-07-12): honest-leer — keine gueltige Austausch-Zeile → KEIN leerer Plot (keine Datei). Eigener
+// Wert (12), da 11 hier bereits status_parse_error belegt (05 nutzt 11 fuer status_empty_input — anderes Modul).
+inline constexpr int status_empty_input = 12;
 
 struct CsvRow {
     std::string   permutation_id;
@@ -153,6 +156,28 @@ struct SiblingPairCount {
 [[nodiscard]] int write_exchange_longtables(std::filesystem::path const&       out_dir,
                                             std::span<ExchangeAggregate const> aggs,
                                             std::span<SiblingPairCount const> counts, std::string const& lang = "en");
+
+// P5 (2026-07-12): Schwelle „kleine n". Unterhalb dieser Zahl (Paar-Lastprofil-Diffs mit definiertem
+// rel-Delta) gilt eine Forest-Zeile als kleine Stichprobe und wird ausgegraut (die viz-Research nannte
+// Division-durch-~0-Instabilitaet bei kleinem n, z.B. scan n=11 → rel-Delta-Ausreisser). 30 = uebliche
+// Kleinstichproben-Faustregel; fuer die ns_per_op-Headline (Basis ns/op stets >0 → n in Hunderten) greift
+// sie real nicht — der Marker ist defensiv gegen kuenftig duenn besetzte Zellen und in Tests parametrierbar.
+inline constexpr std::size_t kExchangeForestSmallSampleThreshold = 30;
+
+// P5 (2026-07-12): Forest-/Dot-Plot der Achsen-Austauschbarkeit (pgfplots) — visuelle Ergaenzung zu den
+// ld_exchange-Longtables aus DENSELBEN Aggregaten (aggregate_exchange). EINE horizontale Zeile je (variabler
+// Achse × Geschwister-Wertepaar v→v') fuer die ns_per_op-Headline: Punkt = Median rel.\ Delta ns/op (bzgl. v),
+// Whisker = IQR (p75-p25) symmetrisch um den Median (das Aggregat traegt NUR die IQR-Breite, nicht die
+// p25/p75-Endpunkte → der Balken ist konstruktionsbedingt symmetrisch), vertikale 0-Referenzlinie (keine
+// Aenderung), Faerbung nach Vorzeichen (Verbesserung Delta<0 gruen / Regression Delta>=0 rot).
+// EHRLICH/Anti-Phantom: NUR reale Aggregat-Werte; n=0-Aggregate (kein definiertes rel-Delta) werden NICHT als
+// „+0"-Zeile gezeigt; kleine-n-Zeilen (pair_workload_samples < small_n_threshold) werden ausgegraut + offener
+// Marker. Keine gueltige ns_per_op-Zeile → status_empty_input (honest-leer, KEINE Datei). body_only: nur der
+// tikzpicture-Rumpf (ohne figure/caption) — der Aufrufer wrappt Float+Caption+Label selbst.
+[[nodiscard]] int write_exchange_forest_plot(std::filesystem::path const& out, std::span<ExchangeAggregate const> aggs,
+                                             std::span<SiblingPairCount const> counts, std::string const& lang = "en",
+                                             bool        body_only         = false,
+                                             std::size_t small_n_threshold = kExchangeForestSmallSampleThreshold);
 
 // L-e.1: schreibt die EINE ehrliche Limitierungs-longtable (anhang/<lang>/tabellen/le_limitierung.tex).
 // Zeile 1 (Spitzenplatz) = Cache-Misses/PMC = 0/nicht-erhoben (Kernmetrik). Inhalt ist statisch (die
