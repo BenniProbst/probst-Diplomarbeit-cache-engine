@@ -94,3 +94,7 @@ _workflow-raw-backups/
 thesis/.idea/
 docs/sessions/20260710-SESSION-TRANSKRIPT-VOLLTEXT.jsonl
 docs/sessions/20260710-SESSION-TRANSKRIPT-LESBAR.md
+
+# Voll-Review-Rohdaten (2026-07-12): 51MB Agent-Transkripte, enthalten Token-Muster aus CI/Secrets-Scan
+# -> LOKAL erhalten (Workflow-Backup-Doktrin), NIE pushen (wie Session-Transkripte).
+docs/sessions/backups/20260712-full-line-review/rohdaten/
