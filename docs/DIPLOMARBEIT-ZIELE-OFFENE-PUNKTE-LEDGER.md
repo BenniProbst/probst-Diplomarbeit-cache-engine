@@ -51,11 +51,27 @@ Thesis-PDF-Kette bleibt grün, und die Lösung ist am Ende **manuell bedienbar**
   Review), god-header max. 1 offen, `modules/**`/`ext/**`/golden/Registry-mp_list TABU, Push beide Remotes je
   Increment, `#188` nie halb committen. Bei NEUER echter Architektur-Entscheidung anhalten.
 
-**Aktuelle Front (nächste konkrete Schritte).** **Phase 0** (Sequenz §sequencing: 0a Push ✅ · 0b Pfad-Re-Verify
-gegen development · 0c Spiegel-Sperre · 0d `.test`-Expansion je Projekt verifizieren · 0e ABI-Freeze deklariert)
-→ dann **S2 #217** (serielle Kette) NEBENLÄUFIG zu **P-0 #193** (manuelle Bedienbarkeit, TOP-PRIO). Fortschritt
-wird in §12 datiert fortgeschrieben; dieser Ledger ist die Single-Source und schlägt bei Widerspruch alle
-Session-Docs.
+**Aktuelle Front (nächste konkrete Schritte).**
+> **HISTORISCH (2026-07-03, überholt — nur Archiv):** Phase 0 (0a Push ✅ · 0b Pfad-Re-Verify · 0c Spiegel-Sperre ·
+> 0d `.test`-Expansion · 0e ABI-Freeze) → S2 #217 nebenläufig zu P-0 #193. Diese Front ist abgearbeitet/überholt;
+> Spur-S ist vollständig (CMD-2 war das letzte Item, §12 2026-07-11), die vier Projekte bauen+testen CI-grün.
+
+**AKTUALISIERT 2026-07-12 (Ist-Front):**
+1. **DoD-4 (FF3-Mess-Kette):** der **golden-320-Voll-Messlauf läuft** (CI-Pipeline #9916, `measure:golden-320` auf
+   PMC-Node prod1, mehrtägig, #156) → liefert die realen Werte für den Thesis-Anhang. Reale Cache-Misses/PMC
+   bleiben **honest-0 bis #26** (Intel-PCM/PAPI extern-gated) — der Lauf ist wall-clock/Perzentil-echt.
+2. **DoD-6 (Mess→PDF-Persistenz):** die Mechanik ist **gebaut+scharf** — `persist:measurements` (merge-basiert,
+   per-Pipeline-aktiviert, sicherer Write-Token id=54, §11-G G-a..G-d). End-to-end mit echten Daten validiert
+   (Rohwerte→CSV→LaTeX→PDF, 5 Stufen), 2 kritische persist-Bugs beim Durchtesten gefunden+gefixt.
+3. **CI-interaktive Diplomarbeit (#24, §12 2026-07-12):** die Anhänge werden aus den Messwerten automatisiert.
+   Increment 1 (C++23 `08_appendix_generator`, ersetzt den `.ps1`-Behelfsweg) + P6 (Log-Heatmaps) + P4
+   (Segment-Attribution) **CI-grün/verifiziert**; offen: Writer P3/P2/P5, Inc-2-Pipeline-Verdrahtung +
+   Thesis-Submodul-Regeneration (Live-Daten-gekoppelt), #25 (`format_tex.py`/`codegen.sh`→C++23).
+4. **Genuin gated (autonom nicht lösbar, dokumentiert):** #3/#5/#8/#9 (extern/design/GO), #11 (#156-DATA, wird
+   durch den laufenden #9916 entsperrt), #17-Vollendung (= der mehrtägige #9916 selbst).
+
+Fortschritt wird in §12 datiert fortgeschrieben; dieser Ledger ist die Single-Source und schlägt bei Widerspruch
+alle Session-Docs.
 
 ---
 
