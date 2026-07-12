@@ -240,6 +240,28 @@ size=Cache-Regime-Key, op=std-C++23-Interface, Blatt=Pareto-Front). CoR-Filterke
 CacheEngineBuilder für die Generierungs-Kontrolle. 3-Varianten-Observer + komplementärer 4. Schritt (§D Doc 20)
 als E4-XML-Messdimension.
 
+**Nachtrag GO 3 (2026-07-12, Task #5 „Hebel-A-Rest" — Option 1 „Deklarations-Wahrheit + Mess-Kern-Reinheit"
+umgesetzt; Dossier `docs/sessions/backups/20260712-go3-hebel-a-dossier/DOSSIER.md`):**
+- **R1 (09b→Flag) GEBAUT:** `comdare_apply_simd_extension_flags(<target> <EXT>)` (ce `cmake/isa_features.cmake`,
+  je-Extension-Kaskade EINMAL zentral, MSVC+GCC/Clang) + consteval-Kohärenz-Guard
+  `topics/hardware/axis_09b_simd_extension/axis_09b_build_coherence.hpp` (Meta-driven Concept Hardening) +
+  ADDITIVES Makro `COMDARE_DEFINE_BUILD_VARIANT_INSPECTION_CHECKED` (`build_variant_inspection.hpp`; Legacy-Makro
+  + Golden-Pfad byte-unverändert, SHAPED-Präzedenz). Die real-Wrapper-Beweis-DLLs
+  (`perm_buildvariant_real_avx512/_real_avx2`) bauen jetzt MIT echten Flags + CHECKED; Beweise: (a) Configure-
+  Negativ-Probe (256-bit-Deklaration OHNE AVX2-Flag kompiliert NICHT, Positiv-Probe MIT Flag kompiliert —
+  `check_cxx_source_compiles`-Paar, FATAL bei Guard-Erosion), (b) Host-Test `test_ap5_simd_extension_coherence`
+  (POD-Etikett == Build-ISA-Kaskade je DLL, literal über die .dll-Grenze). Ausführung der real-DLL-Tests
+  host-gated (`__builtin_cpu_supports`), Build compiler-flag-gated.
+- **R2 (*_scan-Routing über isa) NICHT gebaut — by design:** die Skalarität der `*_scan`-Mess-Kerne ist
+  Mess-DESIGN (Zugriffsmuster IST das Achsen-Signal, Meta-Befund oben; Original-Audit-Rahmung Hebel A für die
+  Nicht-isa-Kerne als Fehldiagnose reklassifiziert). Als stehende Invariante kodifiziert: Interface-Freeze-Guard
+  `tests/unit/test_striktheit_scan_kernel_purity.cpp` (Striktheit-Familie Teil 4; 9 Kernel-Familien, positiv
+  kanonische Signatur + negativ keine Isa-Form, prospektiv build-brechend) + Kommentar-Anker am do_seg19-Kopf
+  (`abi_adapter.hpp`, nur Kommentar).
+- **R3 (NEON/RVV `simd_field_sum`) OFFEN, HW-/INFRA-gated** (unverändert, s.o. Z.223-224; RVV-Flag-Kopplung in
+  `comdare_apply_simd_extension_flags` bewusst FATAL mit R3-Verweis).
+- golden-320/POD-1416/ABI-4/`permutation_axes.xml`/Codegen-Kanal (#25-B) byte-unberührt; kein Mess-Signal geändert.
+
 ---
 
 ## G. Offene/gated Punkte (unverändert)
