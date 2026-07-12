@@ -433,10 +433,32 @@ measure:golden-320:
       "$DRIVER" experiment_config measure_out
       echo "== Mess-CSVs (Beleg) =="; find measure_out -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
       test -n "$(find measure_out -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Messlauf lieferte nichts"; exit 1; }
-      echo "=== measure:golden-320 OK (golden-320 gemessen, CSVs unter measure_out/) ==="
+      # ── CI-interaktiv (#24): den Anhang aus den LIVE-Messdaten regenerieren ──
+      # appendix_generator (Stufe 08) erzeugt die 16 Darstellungs-.tex aus der WIDE-Matrix ALLER Permutationen.
+      # WIDE-Aggregat = Konkatenation der per-Perm-result.csv (Header einmal + alle Datenzeilen). honest-empty-tolerant.
+      echo "== Anhang-Regenerierung aus Live-Messdaten (#24) =="
+      cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+      APP=$(find build -type f -name "appendix-generator" | head -1)
+      if [ -n "$APP" ] && [ -x "$APP" ]; then
+        find measure_out -type f -name 'result.csv' | sort > measure_out/_rc_list.txt
+        WIDE=measure_out/wide_aggregate.csv; : > "$WIDE"; _hdr=0
+        while IFS= read -r rc; do
+          [ "$_hdr" = "0" ] && { head -1 "$rc" > "$WIDE"; _hdr=1; }
+          tail -n +2 "$rc" >> "$WIDE"
+        done < measure_out/_rc_list.txt
+        if [ -s "$WIDE" ] && [ "$(wc -l < "$WIDE")" -gt 1 ]; then
+          "$APP" "$WIDE" measure_out/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
+          echo "== regenerierte Anhang-.tex =="; find measure_out/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
+          rm -f "$WIDE" measure_out/_rc_list.txt   # Intermediates (39k-Zeilen-Konkatenation) NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
+        else
+          echo "kein WIDE-Aggregat (keine result.csv gefunden) -> Anhang-Regenerierung honest uebersprungen"
+        fi
+      fi
+      echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs + regenerierter Anhang unter measure_out/) ==="
   artifacts:
     paths:
-      - Code/measure_out/**/*.csv    # NUR die Mess-CSVs (Ergebnisse) — NICHT die ~320 DLL-Binaries (Repo-/Artefakt-Bloat)
+      - Code/measure_out/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die ~320 DLL-Binaries (Repo-/Artefakt-Bloat)
+      - Code/measure_out/appendix/**/*.tex # CI-interaktiv (#24): die aus Live-Messdaten regenerierten 16 Darstellungs-.tex
     when: always
     expire_in: 12 weeks
 
@@ -518,8 +540,8 @@ persist:measurements:
         while IFS= read -r f; do
           rel="${f#Code/measure_out/}"; mkdir -p "$DEST/measure_out/$(dirname "$rel")"
           cp -- "$f" "$DEST/measure_out/$rel"; n_csv=$((n_csv+1))
-        done < <(find Code/measure_out -type f -name '*.csv')
-        if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out/ ($n_csv Mess-CSVs, NUR CSVs — keine DLL-Binaries)"; persisted=$((persisted+1)); fi
+        done < <(find Code/measure_out -type f \( -name '*.csv' -o -name '*.tex' \))
+        if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out/ ($n_csv Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
       fi
       {
         echo "# persist:measurements Laufordner — Provenance (#22, Ledger §11-G)"
