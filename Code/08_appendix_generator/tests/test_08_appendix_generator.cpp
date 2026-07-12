@@ -43,33 +43,71 @@ fs::path fixtures_dir() {
 #endif
 }
 
+// Die 20 seg_*_ns-Spaltennamen (== 05::kSegmentColumns; hier lokal, da die Konstante modul-privat ist).
+// Reihenfolge = 19 Organ-Achsen (kCompositionAxisNames) + seg_framework_ns an Index 19.
+std::string seg_header() {
+    return "seg_search_algo_ns;seg_cache_traversal_ns;seg_mapping_ns;seg_path_compression_ns;"
+           "seg_node_type_ns;seg_memory_layout_ns;seg_allocator_ns;seg_prefetch_ns;"
+           "seg_concurrency_ns;seg_serialization_ns;seg_telemetry_ns;seg_value_handle_ns;"
+           "seg_isa_ns;seg_index_organization_ns;seg_io_dispatch_ns;seg_migration_policy_ns;"
+           "seg_filter_ns;seg_queuing_q1_ns;seg_queuing_q2_ns;seg_framework_ns";
+}
+
+// 20 deterministische seg-Werte seg_mult*(i+1) → ';'-Block. Σ_{i=1}^{20} i = 210 → Σ == seg_mult*210
+// == seg_run_total_ns (seg_coverage=1.0 → kommensurabel; die Segment-Attribution stapelt gegen das 100%-Ganze).
+std::string seg_values(int seg_mult) {
+    std::string s;
+    for (int i = 0; i < 20; ++i) {
+        if (i) s += ';';
+        s += std::to_string(seg_mult * (i + 1)) + ".0";
+    }
+    return s;
+}
+
 // Selbstheilende Regeneration der WIDE-Fixture (schema-treu zu allen drei Parsern:
 // 04::parse_wide_csv [bias], 05::parse_wide_csv [surface], 04::parse_wide_csv_full
-// [exchange]). Nur schreiben, wenn die committete Datei fehlt (sonst = committed).
+// [exchange]) UND — Inc-2a — zu den 4 additiven Darstellungs-Writern: die 5 op_*_p99_ns
+// (Latenz-Range/-ECDF) + die 20 seg_*_ns + seg_run_total_ns + seg_coverage (Segment-
+// Attribution) sind additiv/header-getrieben angehängt. Werte gewählt, dass KEIN neuer
+// Writer honest-empty ist (sonst würde der Byte-Identitäts-Test die 4 neuen .tex nicht
+// prüfen). Nur schreiben, wenn die committete Datei fehlt (sonst = committed).
 void ensure_fixture(fs::path const& p) {
     if (fs::exists(p)) return;
     fs::create_directories(p.parent_path());
     std::ofstream f(p);
+    // Header: 12 Basis-Spalten (alle 3 Parser) + 5 op_*_p99_ns + 20 seg_*_ns + seg_run_total_ns + seg_coverage.
     f << "binary_id;repetition;n_ops;total_ns;ns_per_op;workload;two_phase_valid;"
-      << "op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns\n";
-    f << "search_algo=k_ary/node_type=node4/memory_layout=aos/"
-         "prefetch=off;0;1000;100000;100.0;ycsb_c;1;30.0;25.0;28.0;500.0;40.0\n";
-    f << "search_algo=k_ary/node_type=node4/memory_layout=aos/"
-         "prefetch=off;1;1000;110000;110.0;ycsb_c;1;31.0;26.0;29.0;510.0;41.0\n";
-    f << "search_algo=k_ary/node_type=node4/memory_layout=aos/"
-         "prefetch=off;2;1000;120000;120.0;ycsb_c;1;32.0;27.0;30.0;520.0;42.0\n";
-    f << "search_algo=k_ary/node_type=node4/memory_layout=aos/"
-         "prefetch=off;0;1000;200000;200.0;ycsb_a;1;60.0;50.0;55.0;900.0;70.0\n";
-    f << "search_algo=eytzinger/node_type=node4/memory_layout=aos/"
-         "prefetch=off;0;1000;150000;150.0;ycsb_c;1;35.0;20.0;31.0;600.0;45.0\n";
-    f << "search_algo=eytzinger/node_type=node4/memory_layout=aos/"
-         "prefetch=off;1;1000;9999000;9999.0;ycsb_c;0;1.0;1.0;1.0;1.0;1.0\n";
-    f << "search_algo=k_ary/node_type=node16/memory_layout=aos/"
-         "prefetch=off;0;1000;130000;130.0;ycsb_c;1;33.0;28.0;32.0;530.0;43.0\n";
-    f << "search_algo=k_ary/node_type=node4/memory_layout=soa/"
-         "prefetch=off;0;1000;90000;90.0;ycsb_c;1;28.0;22.0;25.0;480.0;38.0\n";
-    f << "search_algo=k_ary/node_type=node4/memory_layout=aos/"
-         "prefetch=on;0;1000;95000;95.0;ycsb_c;1;29.0;23.0;26.0;490.0;39.0\n";
+      << "op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns;"
+      << "op_insert_p99_ns;op_lookup_p99_ns;op_erase_p99_ns;op_scan_p99_ns;op_rmw_p99_ns;" << seg_header()
+      << ";seg_run_total_ns;seg_coverage\n";
+    // Eine Datenzeile: <binary_id>;<rep>;1000;<total_ns>;<ns_per_op>;<wl>;<two_phase>;<5 p50>;<5 p99>;<20 seg>;<run_total>;1.0
+    // p99 = 2*p50 (monoton, keine p99<p50-Inversion). p50/ns_per_op/binary_id/workload/two_phase UNVERÄNDERT
+    // gegenüber der Vor-Inc-2a-Fixture ⇒ bias/surface/exchange-Outputs bleiben byte-identisch.
+    auto row = [&](std::string const& bid, int rep, long total_ns, std::string const& ns_per_op, std::string const& wl,
+                   int two_phase, std::string const& p50_p99, int seg_mult) {
+        f << bid << ';' << rep << ";1000;" << total_ns << ';' << ns_per_op << ';' << wl << ';' << two_phase << ';'
+          << p50_p99 << ';' << seg_values(seg_mult) << ';' << (seg_mult * 210) << ".0;1.0\n";
+    };
+    // seg_mult: k_ary=10 (Σ=2100), eytzinger=15 (Σ=3150) → 2 distinkte Balken der Segment-Attribution.
+    row("search_algo=k_ary/node_type=node4/memory_layout=aos/prefetch=off", 0, 100000, "100.0", "ycsb_c", 1,
+        "30.0;25.0;28.0;500.0;40.0;60.0;50.0;56.0;1000.0;80.0", 10);
+    row("search_algo=k_ary/node_type=node4/memory_layout=aos/prefetch=off", 1, 110000, "110.0", "ycsb_c", 1,
+        "31.0;26.0;29.0;510.0;41.0;62.0;52.0;58.0;1020.0;82.0", 10);
+    row("search_algo=k_ary/node_type=node4/memory_layout=aos/prefetch=off", 2, 120000, "120.0", "ycsb_c", 1,
+        "32.0;27.0;30.0;520.0;42.0;64.0;54.0;60.0;1040.0;84.0", 10);
+    row("search_algo=k_ary/node_type=node4/memory_layout=aos/prefetch=off", 0, 200000, "200.0", "ycsb_a", 1,
+        "60.0;50.0;55.0;900.0;70.0;120.0;100.0;110.0;1800.0;140.0", 10);
+    row("search_algo=eytzinger/node_type=node4/memory_layout=aos/prefetch=off", 0, 150000, "150.0", "ycsb_c", 1,
+        "35.0;20.0;31.0;600.0;45.0;70.0;40.0;62.0;1200.0;90.0", 15);
+    // two_phase=0 → von ALLEN Aggregaten verworfen (Mess-Ungültigkeit); seg-Werte nur zur Spaltenbreiten-Treue.
+    row("search_algo=eytzinger/node_type=node4/memory_layout=aos/prefetch=off", 1, 9999000, "9999.0", "ycsb_c", 0,
+        "1.0;1.0;1.0;1.0;1.0;1.0;1.0;1.0;1.0;1.0", 10);
+    row("search_algo=k_ary/node_type=node16/memory_layout=aos/prefetch=off", 0, 130000, "130.0", "ycsb_c", 1,
+        "33.0;28.0;32.0;530.0;43.0;66.0;56.0;64.0;1060.0;86.0", 10);
+    row("search_algo=k_ary/node_type=node4/memory_layout=soa/prefetch=off", 0, 90000, "90.0", "ycsb_c", 1,
+        "28.0;22.0;25.0;480.0;38.0;56.0;44.0;50.0;960.0;76.0", 10);
+    row("search_algo=k_ary/node_type=node4/memory_layout=aos/prefetch=on", 0, 95000, "95.0", "ycsb_c", 1,
+        "29.0;23.0;26.0;490.0;39.0;58.0;46.0;52.0;980.0;78.0", 10);
 }
 
 std::string read_all(fs::path const& p) {
@@ -112,11 +150,21 @@ int run_individual_writers(fs::path const& csv, fs::path const& out_root, std::v
         if (c2l::write_exchange_longtables(out_dir, exch_aggs, counts, lang) != c2l::status_ok) return 4;
         // (4) limitierung
         if (c2l::write_limitations_longtable(out_dir / "le_limitierung.tex", lang) != c2l::status_ok) return 5;
+        // (5) ADDITIV (Inc-2a): 4 Darstellungs-Writer aus DENSELBEN geparsten Rows/Aggregaten (kein Doppel-Parsen).
+        //     honest-empty (status_empty_input: dg=11 / c2l=12) = ok — dieselbe Toleranz-Semantik wie die Facade.
+        auto const dg_ok  = [](int rc) { return rc == dg::status_ok || rc == dg::status_empty_input; };
+        auto const c2l_ok = [](int rc) { return rc == c2l::status_ok || rc == c2l::status_empty_input; };
+        if (!dg_ok(dg::write_segment_attribution_stacked_bar(out_dir / "seg_attribution.tex", surf_rows, lang)))
+            return 6;
+        if (!dg_ok(dg::write_latency_range_bar(out_dir / "latency_range.tex", surf_rows, lang))) return 7;
+        if (!dg_ok(dg::write_latency_ecdf(out_dir / "latency_ecdf.tex", surf_rows, lang))) return 8;
+        if (!c2l_ok(c2l::write_exchange_forest_plot(out_dir / "exchange_forest.tex", exch_aggs, counts, lang)))
+            return 9;
     }
     return 0;
 }
 
-// Die 12 erwarteten Dateinamen je Sprache (bias 1 + surface 6 + exchange 4 + limitierung 1).
+// Die 12 Kern-Dateinamen je Sprache (bias 1 + surface 6 + exchange 4 + limitierung 1).
 std::vector<std::string> expected_files() {
     std::vector<std::string> names;
     names.push_back("bias_matrix_table.tex");
@@ -124,6 +172,12 @@ std::vector<std::string> expected_files() {
     for (auto const ax : c2l::kVariableAxes) names.push_back("ld_exchange_" + std::string{ax} + ".tex");
     names.push_back("le_limitierung.tex");
     return names;
+}
+
+// Die 4 additiven Darstellungs-Dateinamen (Inc-2a). Die enriched Fixture ist so gewählt, dass KEINER
+// honest-empty ist → alle 4 werden geschrieben und byte-identisch geprüft (16 .tex/Sprache insgesamt).
+std::vector<std::string> expected_extra_files() {
+    return {"seg_attribution.tex", "latency_range.tex", "latency_ecdf.tex", "exchange_forest.tex"};
 }
 
 } // namespace
@@ -140,6 +194,38 @@ TEST(Stufe08Appendix, FixtureIsFullWideSchema) {
     std::vector<c2l::WideFullRow> c;
     EXPECT_EQ(c2l::parse_wide_csv_full(fixture, c), c2l::status_ok);
     EXPECT_GT(a.size(), 0u);
+}
+
+// Inc-2a-Beleg: die enriched Fixture speist die 4 neuen Writer mit ECHTEN Daten (NICHT honest-empty) —
+// sonst wäre die Byte-Identität über die 4 Darstellungs-.tex ein Nulltest. status_ok (nicht status_empty_input).
+TEST(Stufe08Appendix, EnrichedFixtureFeedsAllFourNewWriters) {
+    auto const fixture = fixtures_dir() / "tier_wide_appendix.csv";
+    ensure_fixture(fixture);
+
+    std::vector<dg::WideMeasurementRow> surf;
+    ASSERT_EQ(dg::parse_wide_csv(fixture, surf), dg::status_ok);
+    std::vector<c2l::WideFullRow> full;
+    ASSERT_EQ(c2l::parse_wide_csv_full(fixture, full), c2l::status_ok);
+    std::vector<c2l::SiblingPairCount> counts;
+    auto const                         aggs = c2l::aggregate_exchange(full, counts);
+
+    // Aggregate müssen befüllt sein (sonst honest-empty).
+    EXPECT_GT(dg::aggregate_segment_attribution(surf).groups.size(), 0u);
+    EXPECT_GT(dg::aggregate_latency_range(surf).algos.size(), 0u);
+    EXPECT_GT(dg::aggregate_latency_ecdf(surf).size(), 0u);
+
+    auto const      base = comdare_user_tmp() / "appendix_new_writers";
+    std::error_code ec;
+    fs::remove_all(base, ec);
+    fs::create_directories(base);
+    // Alle 4 liefern status_ok (schreiben real) — nicht status_empty_input.
+    EXPECT_EQ(dg::write_segment_attribution_stacked_bar(base / "seg_attribution.tex", surf, "de"), dg::status_ok);
+    EXPECT_EQ(dg::write_latency_range_bar(base / "latency_range.tex", surf, "de"), dg::status_ok);
+    EXPECT_EQ(dg::write_latency_ecdf(base / "latency_ecdf.tex", surf, "de"), dg::status_ok);
+    EXPECT_EQ(c2l::write_exchange_forest_plot(base / "exchange_forest.tex", aggs, counts, "de"), c2l::status_ok);
+    for (auto const& n : {"seg_attribution.tex", "latency_range.tex", "latency_ecdf.tex", "exchange_forest.tex"})
+        EXPECT_GT(fs::file_size(base / n), 0u) << n;
+    fs::remove_all(base, ec);
 }
 
 // Kern-Beweis: In-Process-Orchestrator ≡ Einzel-Writer (byte-identisch).
@@ -168,11 +254,14 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
     // Pfad B — die äquivalenten Einzel-Writer (= die früheren .exe-Spawns).
     ASSERT_EQ(run_individual_writers(fixture, dir_ref, langs, label), 0);
 
-    // Beweis: jede erzeugte .tex byte-identisch.
+    // Beweis: jede erzeugte .tex byte-identisch — 12 Kern-.tex + 4 Darstellungs-.tex (Inc-2a) = 16/Sprache.
+    auto all_expected = expected_files();
+    for (auto const& n : expected_extra_files()) all_expected.push_back(n);
+    ASSERT_EQ(all_expected.size(), 16u);
     for (auto const& lang : langs) {
         auto const a = dir_orch / lang / "tabellen";
         auto const b = dir_ref / lang / "tabellen";
-        for (auto const& name : expected_files()) {
+        for (auto const& name : all_expected) {
             auto const fa = a / name;
             auto const fb = b / name;
             ASSERT_TRUE(fs::exists(fa)) << "orchestrator fehlt: " << fa;

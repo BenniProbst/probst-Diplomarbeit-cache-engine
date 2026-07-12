@@ -35,7 +35,9 @@ int main(int argc, char* argv[]) {
                   << "                          [--bias-caption-de=<text>] [--bias-caption-en=<text>]\n"
                   << "  Schreibt je Sprache <out_root>/<lang>/tabellen/:\n"
                   << "    bias_matrix_table.tex, lc_surface_<z>.tex (6x),\n"
-                  << "    ld_exchange_<achse>.tex (4x), le_limitierung.tex\n"
+                  << "    ld_exchange_<achse>.tex (4x), le_limitierung.tex,\n"
+                  << "    seg_attribution.tex, latency_range.tex, latency_ecdf.tex,\n"
+                  << "    exchange_forest.tex (honest-empty ⇒ ggf. ausgelassen)\n"
                   << "  In-Process (linkt comdare::csv_to_latex + comdare::diagram_generator);\n"
                   << "  kein .exe-Spawn, cross-platform. Ersetzt generate_wide_appendix.ps1.\n";
         return 1;

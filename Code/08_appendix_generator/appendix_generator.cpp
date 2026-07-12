@@ -94,7 +94,46 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             return status_io_error;
         }
 
-        std::cout << "appendix-generator [" << lang << "]: 12 WIDE-Appendix-.tex -> " << out_dir << "\n";
+        // ── (5) ADDITIV (Inc-2a): 4 neue Darstellungs-Writer aus den BEREITS geparsten Rows/Aggregaten ──
+        // KEIN Doppel-Parsen: die 3 05er-Writer speisen sich aus surf_rows (dg::WideMeasurementRow trägt nach
+        // P4/P3 die seg_*_ns + op_*_p99_ns), der Forest-Plot aus DENSELBEN exch_aggs/exch_counts wie die Longtables.
+        // HONEST-EMPTY-SEMANTIK: liefert ein Writer status_empty_input (dg=11 / c2l=12) — z.B. seg n/a (Nicht-Mess-
+        // DLL), keine op_*_p99-Spalten, oder keine gültige Austausch-Zeile — legt der Writer bewusst KEINE Datei an.
+        // Das ist KEIN Fehler der Gesamt-Facade (die 12 Kern-.tex sind bereits vollständig geschrieben); nur ein
+        // echter status_io_error wird als status_io_error propagiert.
+        auto const dg_ok  = [](int rc) { return rc == dg::status_ok || rc == dg::status_empty_input; };
+        auto const c2l_ok = [](int rc) { return rc == c2l::status_ok || rc == c2l::status_empty_input; };
+
+        // (5a) Segment-Attribution (gestapelte Balken) — surf_rows (dg::WideMeasurementRow, trägt seg_*_ns).
+        if (int const rc = dg::write_segment_attribution_stacked_bar(out_dir / "seg_attribution.tex", surf_rows, lang);
+            !dg_ok(rc)) {
+            std::cerr << "appendix-generator: write_segment_attribution_stacked_bar (" << lang << ") failed " << rc
+                      << "\n";
+            return status_io_error;
+        }
+
+        // (5b) Latenz-Range (Punkt=p50, Whisker→p99) — surf_rows (trägt op_*_p99_ns).
+        if (int const rc = dg::write_latency_range_bar(out_dir / "latency_range.tex", surf_rows, lang); !dg_ok(rc)) {
+            std::cerr << "appendix-generator: write_latency_range_bar (" << lang << ") failed " << rc << "\n";
+            return status_io_error;
+        }
+
+        // (5c) Latenz-ECDF (Config-Streuung über die Permutationen) — surf_rows.
+        if (int const rc = dg::write_latency_ecdf(out_dir / "latency_ecdf.tex", surf_rows, lang); !dg_ok(rc)) {
+            std::cerr << "appendix-generator: write_latency_ecdf (" << lang << ") failed " << rc << "\n";
+            return status_io_error;
+        }
+
+        // (5d) Forest-Plot der Achsen-Austauschbarkeit — DIESELBEN exch_aggs/exch_counts (ns/op-Headline).
+        if (int const rc =
+                c2l::write_exchange_forest_plot(out_dir / "exchange_forest.tex", exch_aggs, exch_counts, lang);
+            !c2l_ok(rc)) {
+            std::cerr << "appendix-generator: write_exchange_forest_plot (" << lang << ") failed " << rc << "\n";
+            return status_io_error;
+        }
+
+        std::cout << "appendix-generator [" << lang
+                  << "]: 12 Kern- + 4 Darstellungs-.tex (honest-empty ⇒ ggf. ausgelassen) -> " << out_dir << "\n";
     }
     return status_ok;
 }

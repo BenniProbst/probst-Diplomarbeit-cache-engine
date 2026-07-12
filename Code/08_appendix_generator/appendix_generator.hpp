@@ -2,9 +2,10 @@
 // appendix_generator — Diplomarbeit/Code Module (Pipeline-Stufe 08)
 // =============================================================================
 // In-Process-Orchestrator ("Facade") für den kompletten WIDE-Mess-Appendix:
-// erzeugt je Sprache {de,en} die 11 kanonischen .tex (Bias-Bruch-Matrix +
-// 6× Surface-Heatmap + 4× Achsen-Austauschbarkeit + Limitierung) aus EINER
-// WIDE-Matrix — cross-platform, ohne .exe-Subprozess-Spawn.
+// erzeugt je Sprache {de,en} die 12 Kern-.tex (Bias-Bruch-Matrix + 6× Surface-
+// Heatmap + 4× Achsen-Austauschbarkeit + Limitierung) PLUS additiv (Inc-2a) 4
+// Darstellungs-.tex (Segment-Attribution + Latenz-Range + Latenz-ECDF + Forest-
+// Plot) aus EINER WIDE-Matrix — cross-platform, ohne .exe-Subprozess-Spawn.
 //
 // Ersetzt den Windows-only PowerShell-Behelfsweg
 //   thesis/diplomarbeit/generate_wide_appendix.ps1
@@ -57,12 +58,20 @@ struct AppendixConfig {
 [[nodiscard]] std::string default_bias_caption(std::string const& lang);
 
 // FACADE: parst die WIDE-Matrix EINMAL und schreibt je Sprache nach
-// <out_root>/<lang>/tabellen/ die 12 Appendix-.tex (1+6+4+1):
+// <out_root>/<lang>/tabellen/ die 12 Kern-.tex (1+6+4+1):
 //   bias_matrix_table.tex · lc_surface_<z>.tex (6×) ·
 //   ld_exchange_<achse>.tex (4×, Writer benennt selbst) · le_limitierung.tex
-// Byte-identisch zu den bisherigen .exe-Spawns des .ps1-Orchestrators (dieselben
-// Lib-Writer, dieselben Argumente). Rückgabe: status_ok | status_parse_error |
-// status_io_error.
+// PLUS additiv (Inc-2a) 4 Darstellungs-.tex aus DENSELBEN geparsten Rows/Aggregaten
+// (kein Doppel-Parsen):
+//   seg_attribution.tex (05, gestapelte Segment-Attribution, aus surf_rows) ·
+//   latency_range.tex   (05, p50→p99-Spanne, aus surf_rows) ·
+//   latency_ecdf.tex    (05, Config-Streuung-ECDF, aus surf_rows) ·
+//   exchange_forest.tex (04, Forest-Plot der Austauschbarkeit, aus exch_aggs/counts)
+// HONEST-EMPTY: liefert ein Darstellungs-Writer status_empty_input (n/a-Daten), wird
+// die betreffende Datei bewusst NICHT geschrieben — das ist KEIN Facade-Fehler (die 12
+// Kern-.tex bleiben unberührt). Die 12 Kern-.tex sind byte-identisch zu den bisherigen
+// .exe-Spawns des .ps1-Orchestrators (dieselben Lib-Writer, dieselben Argumente).
+// Rückgabe: status_ok | status_parse_error | status_io_error.
 [[nodiscard]] int generate_wide_appendix(AppendixConfig const& cfg);
 
 } // namespace comdare::da::appendix_generator
