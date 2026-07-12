@@ -1,0 +1,7 @@
+binary_id;setting;repetition;n_ops;total_ns;ns_per_op;stat_search_algo_lookup;stat_allocator_bytes_alloc;workload;two_phase_valid
+search_algo=k_ary/node_type=node4;s=1/rep=0;0;1000;100000;100.0;1000;64000;ycsb_c;1
+search_algo=k_ary/node_type=node4;s=1/rep=1;1;1000;200000;200.0;1000;64000;ycsb_c;1
+search_algo=k_ary/node_type=node4;s=1/rep=2;2;1000;300000;300.0;1000;64000;ycsb_c;1
+search_algo=k_ary/node_type=node4;s=1/rep=0;0;1000;500000;500.0;1000;64000;ih;1
+search_algo=eytzinger/node_type=node4;s=1/rep=0;0;1000;150000;150.0;1000;64000;ycsb_c;1
+search_algo=eytzinger/node_type=node4;s=1/rep=1;1;1000;90000;90.0;1000;64000;ycsb_c;0

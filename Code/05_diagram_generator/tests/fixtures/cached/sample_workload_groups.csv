@@ -1,0 +1,5 @@
+permutation_id,fingerprint,succeeded,workload_used,op_count,total_cycles,cache_misses_l1,cache_misses_l2,cache_misses_l3,dtlb_misses,coherence_invalidations,energy_micro_joules,bytes_allocated,bytes_in_use_peak,external_frag,internal_frag
+ce_art,1,1,YCSB_C,1000,500000,50,10,2,0,0,12345,4096,3072,0.0,0.0
+pa_art,2,1,YCSB_C,1500,400000,30,8,1,0,0,15000,5120,4096,0.0,0.0
+ce_hot,3,1,YCSB_A,2000,800000,150,30,5,0,0,25000,8192,6144,0.0,0.0
+pa_hot,4,1,YCSB_A,2200,750000,120,25,4,0,0,27000,8192,6144,0.0,0.0
