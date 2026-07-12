@@ -150,7 +150,34 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     std::size_t const nx = data.matrix[0].size();
     std::size_t const ny = data.matrix.size();
 
-    f << "% AUTO-GENERATED durch diagram_generator (REV 7.6, TikZ-Heatmap)\n";
+    // P6 (2026-07-12): LOGARITHMISCHE Farbskala. Die Latenz-Zellen spannen ~4 Dekaden
+    // (z.B. 33..235805 ns) → eine LINEARE point-meta-Skala saettigt am unteren Ende und
+    // verschluckt die eigentlichen Verfahrens-Unterschiede. Fix: point meta = log10(z),
+    // Colorbar-Ticks als echte ns-Dekaden (10^k) relabelt. Konsistent mit dem 3D-Pfad
+    // (write_surface3d_..., zmode=log). Farb-Domaene = tatsaechliche Log-Spanne der
+    // positiven Zellen (maximaler Kontrast). z<=0 / fehlende Zelle → point meta = nan
+    // (NICHT log10(0)=-inf): pgfplots zeichnet die Zelle, ohne sie in die Skala zu ziehen.
+    double pos_min  = 0.0;
+    double pos_max  = 0.0;
+    bool   have_pos = false;
+    for (auto const& row : data.matrix) {
+        for (double v : row) {
+            if (!(v > 0.0)) continue;
+            if (!have_pos) {
+                pos_min  = v;
+                pos_max  = v;
+                have_pos = true;
+            } else {
+                pos_min = std::min(pos_min, v);
+                pos_max = std::max(pos_max, v);
+            }
+        }
+    }
+    double log_min = have_pos ? std::log10(pos_min) : 0.0;
+    double log_max = have_pos ? std::log10(pos_max) : 0.0;
+    if (have_pos && !(log_max > log_min)) log_max = log_min + 1.0; // entartete Ein-Wert-Matrix aufweiten
+
+    f << "% AUTO-GENERATED durch diagram_generator (REV 7.6, TikZ-Heatmap, P6 log-Farbskala)\n";
     if (!cnst.body_only) {
         f << "\\begin{figure}[" << cnst.position_hint << "]\n";
         f << "\\centering\n";
@@ -162,6 +189,26 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     f << "    view={0}{90},\n";
     f << "    colorbar,\n";
     f << "    colormap/viridis,\n";
+    if (have_pos) {
+        // P6: Farb-Domaene in log10(ns). point meta min/max = tatsaechliche Log-Spanne (max. Kontrast).
+        f << "    point meta min=" << fmt_double(log_min) << ",\n";
+        f << "    point meta max=" << fmt_double(log_max) << ",\n";
+        // Colorbar-Ticks auf ganzzahlige ns-Dekaden relabeln (10^k). Randticks ausserhalb
+        // [min,max] clippt pgfplots automatisch → Achse zeigt echte ns-Werte statt log-Zahlen.
+        int const k_lo = static_cast<int>(std::floor(log_min));
+        int const k_hi = static_cast<int>(std::ceil(log_max));
+        f << "    colorbar style={ytick={";
+        for (int k = k_lo; k <= k_hi; ++k) {
+            if (k > k_lo) f << ",";
+            f << k;
+        }
+        f << "}, yticklabels={";
+        for (int k = k_lo; k <= k_hi; ++k) {
+            if (k > k_lo) f << ",";
+            f << "$10^{" << k << "}$";
+        }
+        f << "}},\n";
+    }
     f << "    mesh/cols=" << nx << ",\n"; // PFLICHT fuer matrix plot* (sonst 'matrix input=image' unsupported)
     f << "    xtick={0,1,...," << (nx - 1) << "},\n";
     f << "    ytick={0,1,...," << (ny - 1) << "},\n";
@@ -187,8 +234,13 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     f << "\\addplot3[matrix plot*, point meta=explicit] coordinates {\n";
     for (std::size_t y = 0; y < ny; ++y) {
         for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
-            f << "    (" << x << "," << y << "," << fmt_double(data.matrix[y][x]) << ") ["
-              << fmt_double(data.matrix[y][x]) << "]\n";
+            double const z = data.matrix[y][x];
+            // Koordinaten-z bleibt der Roh-ns-Wert (bei view={0}{90} flach → nur Position).
+            // FARBE (point meta) = log10(z); z<=0/fehlend → nan (nicht log10(0)=-inf).
+            // have_pos==false (unmoegliche rein-nicht-positive Matrix) → linear wie zuvor.
+            std::string const meta =
+                have_pos ? (z > 0.0 ? fmt_double(std::log10(z)) : std::string{"nan"}) : fmt_double(z);
+            f << "    (" << x << "," << y << "," << fmt_double(z) << ") [" << meta << "]\n";
         }
     }
     f << "};\n";
