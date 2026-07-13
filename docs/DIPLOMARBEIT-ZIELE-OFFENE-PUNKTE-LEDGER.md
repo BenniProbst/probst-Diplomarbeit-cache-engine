@@ -817,6 +817,29 @@ geschrieben; zusätzlich 12-Wochen-Artefakt als Sicherheitsnetz. Cross-Bezug: §
     7 mittel/1 niedrig), ohne Codefix oder globale #280+-ID-Fabrikation. Autoritative Details,
     Datei-/Zeilenbelege, Abhängigkeiten, Akzeptanzkriterien, Tests und verworfene Verdachtsmomente:
     docs/sessions/20260711-SESSION-UEBERGABE-gitlab-sync-submodule-stand-und-readonly-review.md.
+  - **SESSION-ABSCHLUSS 2026-07-13 (thesis `c2d3c51`):** letzte Rest-Punkte erledigt —
+    Acht-zu-Sechs-Beziehung der Prüflings-Bausteine in §4.2 aufgelöst (ValueHandles→T11-Slot,
+    Signaling-Bit-Serialisierung→VarLenSerialization/Anhang D); Prüf-Skripte dauerhaft persistiert
+    (`thesis/…/sessions/tools/` + README: seq_ref_scan, cite_de_en_check, cite_usage_diff);
+    Session-Doku `sessions/2026-07-13-session-phase-g-bis-frischleser-abschluss.md` (Commit-Tabelle,
+    bewusste Entscheidungen, offene Gates). Builds DE 168 S./EN 162 S., 0/0/0; Gates DE≡EN + 44/18/0.
+    **Text-Agent-Stand: ALLES geschlossen; einziges Gate = Kap.-5-Ergebnisteil (wartet auf reale
+    Messdaten, #156/Impl-Agent; Hybrid zusätzlich 14900KS-RMA ~September). Overleaf-Sync = User-Aktion.**
+    ⚠️ **GITLAB-AUSFALL festgestellt 2026-07-13:** gitlab.comdare.de liefert HTTP 404 auf /users/sign_in
+    UND /api/v4/version (Server/TLS antwortet in 0,4 s → App down oder Ingress-Routing, NICHT Netz;
+    Fehlerbild anders als der frühere 502/CNPG-WAL-Vorfall). GitLab-Pushes des Super-Repos stehen daher
+    AUS (main dort veraltet); GitHub-origin ist vollständig synchron (Merge 8ad00dd inkl. Impl-Agent-
+    Parallel-Commits, thesis-Submodule-Konflikt auf jüngsten Stand c2d3c51 gelöst). GitLab-Push nachholen,
+    sobald der Dienst wieder da ist — Infra-Prüfung = Infra-Agent/User (Text-Agent-Mandat: kein Infra).
+    ✅ **AUFGELÖST 2026-07-13 (User: „im Cred-Vault nachschlagen und pushen"):** Ursache war KEIN
+    Ausfall, sondern (a) die Realm-Split-Migration — GitLab lebt unter **https://gitlab.comdare.local**
+    (comdare.de-Host liefert 404; Vault-Rotation-Log dokumentiert die Umstellung des Cluster-Repos) —
+    und (b) die heutige keeper-root-PAT-Rotation (id=20, alter Wert transcript-geleakt→revoked).
+    Super-Repo nachgezogen: Remote-URL auf gitlab.comdare.local, CA-Pinning
+    `http.https://gitlab.comdare.local/.sslcainfo` = `Cluster/keys/gitlab-ca-ROOTCA-20260621.crt`
+    (kein sslVerify-off, HTTPS-Direktive), Credential-Helper (manager+store) auf den rotierten PAT
+    (Wert nur aus Vault-Datei in Variable — nie im Transcript). **Push nachgeholt: cc4582a..ebe6498;
+    lokal = GitHub = GitLab synchron.**
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
