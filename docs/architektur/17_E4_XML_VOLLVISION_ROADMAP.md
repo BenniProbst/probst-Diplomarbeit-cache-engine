@@ -24,7 +24,7 @@ Das ist **#229 in Vollform** — die ZIEL-Invariante ist thesis- und dossier-ver
   4. **`StaticBinaryView`** (lazy mixed-radix Odometer, `experiment_tree.hpp:235-324`, `binary_count()` = ∏ arithmetisch) → **`BuildSelection` S1/S2/S3** (`coverage_selection.hpp:37-89`: full / 1-wise / explicit-pinned).
   5. **`BuildOrchestrator::provision_all`** (`build_orchestrator.hpp:171-349`): multithreaded, RAM-Admission, resumierbar, realer `cl`-Subprozess = Thesis-„Pfad B" (`04_implementierung.tex:150-158`).
   6. **1 DLL je Permutation** `adhoc_emitter.hpp:83-108`: `COMDARE_DEFINE_ANATOMY_MODULE_ADHOC(<19 FQ-Achsen>)`.
-  7. **Eintritt läuft real** `run_lazy_150.cpp:108-284` → `run_profile` (`profile_run_entry.hpp:104-172`).
+  7. **Eintritt läuft real** `run_lazy_150.cpp:108-284` → `run_profile` (`profile_run_entry.hpp:104-172`). (run_lazy_150.cpp geloescht 2026-07-11; Eintritt heute profile_facade/profile_run_entry.hpp)
 
 **Die drei Blocker für #229:**
 1. **Kein Produktiv-App dockt an** (größte Lücke, = **#230**). `run_profile` wird nur von Test-Harness + Lib-Primitiven referenziert; `messung_driver` triggert es NICHT (obwohl `profile_run_entry.hpp:2-4` genau das behauptet).

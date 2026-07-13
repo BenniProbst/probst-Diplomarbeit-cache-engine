@@ -133,6 +133,7 @@ struct CsvRow {
 // ─────────────────────────────────────────────────────────────────────────────
 //
 // Das Mess-System (cache-engine run_lazy_150 / lazy_csv_header) emittiert das
+// (run_lazy_150 geloescht 2026-07-11; Emitter heute Code/02_messung_driver, WIDE-Schema)
 // ';'-getrennte WIDE-Schema (154 Spalten). Der Parser ist HEADER-GETRIEBEN (Spalten
 // per Name aufgelöst, Reihenfolge-/Breite-agnostisch → robust gegen additive
 // Schema-Erweiterungen); 1:1 portiert aus 04_csv_to_latex/csv_to_latex.cpp:158-201.

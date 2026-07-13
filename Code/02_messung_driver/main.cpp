@@ -272,6 +272,7 @@ struct MessreihenSpec {
 int main(int argc, char* argv[]) {
     // --validate [<profil>]: rein-lesende Pre-Flight-Pruefung des Thesis-Profils gegen die realen
     // EnabledStrategies (P5, migriert von run_lazy_150) — baut KEINE DLL, misst NICHT. Braucht KEINE
+    // (run_lazy_150 geloescht 2026-07-11)
     // <config>/<output>-Argumente; ohne Pfad gilt COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil.
     for (int i = 1; i < argc; ++i) {
         std::string const flag{argv[i]};
