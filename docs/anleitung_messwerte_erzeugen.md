@@ -1,5 +1,13 @@
 # Anleitung: Messwerte für die Diplomarbeit erzeugen (Sicht „Mess-Anhang erstellen")
 
+> **DEPRECATED/SUPERSEDED (2026-07-11):** Die in dieser Anleitung genannten `*.ps1` (z.B.
+> `build_and_measure_thesis_tiere.ps1`, Z.41; `build_node_delegation_proof.ps1`, Z.75) und die daraus gebauten
+> `thesis_sa_*`-Tier-DLLs (Z.45/57) wurden am 2026-07-11 bei der Behelfsweg-Bereinigung **entfernt** und sind
+> **nicht mehr ausfuehrbar** (keine `*.ps1` mehr im ce-Repo; `thesis_sa_*`/`thesis_nt_*`-Quellen geloescht).
+> **Offizieller Weg heute:** Mess-Erzeugung ueber ein XML-Profil (`comdare_thesis_profile`) ->
+> **`Code/02_messung_driver`** (E4-XML-getriebener Mess-Host); Appendix-Erzeugung ueber `Code/08_appendix_generator`.
+> Der folgende Text bleibt additiv als historischer Stand erhalten.
+
 **Zweck:** Schritt-für-Schritt, wie aus der `comdare-cache-engine` **echte Messwerte** für den Diplomarbeit-Mess-Anhang
 entstehen — von der Kommandozeile, selbst ausführbar. Diese Anleitung ist die Thesis-seitige Klammer um die technische
 Kurzanleitung im Repo: `Code/external/comdare-cache-engine/README.md` → Abschnitt „Messwerte erzeugen (Kommandozeile)".

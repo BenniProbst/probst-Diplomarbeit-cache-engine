@@ -9,6 +9,13 @@
 - **Optional PDF:** TeXLive/MiKTeX (`pdflatex`/`latexmk`).
 
 ## 1. Weg A (EMPFOHLEN): Profil-Flow — ein Profil, ein Kommando
+
+> **DEPRECATED (2026-07-11):** Weg A ruft `build_and_measure_150_tiere.ps1` (Z.16/19/21) auf. Dieses Skript und
+> ALLE ce-`*.ps1` wurden am 2026-07-11 bei der Behelfsweg-Bereinigung **entfernt** und sind **nicht mehr
+> ausfuehrbar**. **Offizieller Weg heute ist Weg B (`messung_driver` / E4-XML-Profil, s. Abschnitt 3):** XML-Profil
+> -> `Code/02_messung_driver`. Das "(EMPFOHLEN)" im Titel ist damit ueberholt; die Zeilen unten bleiben additiv als
+> historischer Stand erhalten.
+
 ```powershell
 cd "Code\external\comdare-cache-engine"
 cmake --preset msvc-release
