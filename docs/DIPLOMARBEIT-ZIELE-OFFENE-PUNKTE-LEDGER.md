@@ -634,6 +634,15 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     AUS (main dort veraltet); GitHub-origin ist vollständig synchron (Merge 8ad00dd inkl. Impl-Agent-
     Parallel-Commits, thesis-Submodule-Konflikt auf jüngsten Stand c2d3c51 gelöst). GitLab-Push nachholen,
     sobald der Dienst wieder da ist — Infra-Prüfung = Infra-Agent/User (Text-Agent-Mandat: kein Infra).
+    ✅ **AUFGELÖST 2026-07-13 (User: „im Cred-Vault nachschlagen und pushen"):** Ursache war KEIN
+    Ausfall, sondern (a) die Realm-Split-Migration — GitLab lebt unter **https://gitlab.comdare.local**
+    (comdare.de-Host liefert 404; Vault-Rotation-Log dokumentiert die Umstellung des Cluster-Repos) —
+    und (b) die heutige keeper-root-PAT-Rotation (id=20, alter Wert transcript-geleakt→revoked).
+    Super-Repo nachgezogen: Remote-URL auf gitlab.comdare.local, CA-Pinning
+    `http.https://gitlab.comdare.local/.sslcainfo` = `Cluster/keys/gitlab-ca-ROOTCA-20260621.crt`
+    (kein sslVerify-off, HTTPS-Direktive), Credential-Helper (manager+store) auf den rotierten PAT
+    (Wert nur aus Vault-Datei in Variable — nie im Transcript). **Push nachgeholt: cc4582a..ebe6498;
+    lokal = GitHub = GitLab synchron.**
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
