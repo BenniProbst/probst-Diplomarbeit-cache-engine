@@ -292,7 +292,14 @@ int main(int argc, char* argv[]) {
     if (int rc = comdare::messung_driver::assert_permutations_available_or_die(); rc != 0) { return rc; }
 
     // V37.C (2026-05-23): Manifest-Iteration — pro Permutation ein Eintrag.
-    {
+    // GO-V4 G2 (2026-07-13): hinter die bereits bestehende Legacy-Huerde (COMDARE_LEGACY_MESSREIHEN==1,
+    // identischer env-Check wie :595) gezogen. Dieser Kopf-Diagnose-Block war ein zweiter, ungegateter
+    // Mess-/Diagnose-Pfad NEBEN dem offiziellen E4-XML-Weg und verletzte "EIN offizieller XML-getriebener
+    // Programmweg". BEWUSST NUR gegatet, NICHT entfernt: die Voll-Entfernung ist data-gated — die
+    // golden-320-Subsumtion des Legacy-Pfads (E4-XML deckt V37.C/V38.C ab) ist noch nicht bestaetigt;
+    // eine Entfernung jetzt zerstoerte die bewusst gehaltene Vergleichsfaehigkeit. Ohne den env faellt
+    // der Treiber direkt in den regulaeren E4-XML-Pfad.
+    if (env_trimmed("COMDARE_LEGACY_MESSREIHEN") == "1") {
         auto perms = comdare::messung_driver::load_all_permutations();
         std::cout << "[V37.C] Permutations-Inventar: " << perms.size() << " Eintraege\n";
         std::size_t i{0};
@@ -305,7 +312,11 @@ int main(int argc, char* argv[]) {
     // dem perm-Baum, ruft pro Plugin perm_<id>_run(N, &micros) auf.
     // V41.B1 (2026-05-24): jeder Plugin-Aufruf wird als binary measurement-record
     // in <output_dir>/measurements/<perm_id>.bin geschrieben (Stage-03-kompatibel).
-    {
+    // GO-V4 G2 (2026-07-13): identische Legacy-Huerde wie der V37.C-Block oben
+    // (COMDARE_LEGACY_MESSREIHEN==1) — gegatet statt entfernt (data-gated, Begruendung s.o.), damit der
+    // offizielle E4-XML-Weg ohne env der Alleinweg bleibt und dieser Plugin-Mikrobench nicht als
+    // paralleler Mess-Pfad mitlaeuft.
+    if (env_trimmed("COMDARE_LEGACY_MESSREIHEN") == "1") {
         // Annahme: messung_driver-Binary liegt in build/<preset>/<config>/.
         // perm-Root liegt unter build/<preset>/perm/.
         auto exe_dir = std::filesystem::current_path();
