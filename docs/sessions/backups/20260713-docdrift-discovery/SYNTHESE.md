@@ -30,7 +30,15 @@ Teilmenge der 19). Kern-Teilmengen-Nutzung (z. B. `axis_operability_classificati
   (`Code/02_messung_driver`/ctest-Targets/`Code/08_appendix_generator`) in `tests/unit/thesis_tiere/README.md`,
   `Code/MANUAL_RUN.md` (Weg A), `docs/anleitung_messwerte_erzeugen.md`, `docs/ERWEITERUNGS-LEITFADEN.md`, `SCHEMA.md`,
   README-Abschnitte + ~21 Test-`Build:`-Kommentare (scratch_compile_*.ps1 → ctest-Target-Vermerk).
-- **Increment 3 (Attribution, BELEGT via in-repo PAPER_REFERENCES/family_name):** Wormhole ATC→**EuroSys 2019** ·
+- **Increment 3 (Attribution) — ⚠️ RECLASSIFIED 2026-07-13 (nach Increment 1+2):** teilt sich in **SICHER** (reine
+  Kommentare/Doku/ungeparste `.xml`-Felder → autonom) vs. **BYTE-RISKANT** (`paper_id`/`family_name` sind ABI-exponiert
+  via `IAnatomyBase::paper_id()`/`family_name()` UND werden per EXAKT-String-Match konsumiert — `PaperSignatureIndex`
+  `if (pid == paper_id)` in `builder/experiment_tree/inverse_signature_eval.hpp:25-39,73`; `family_name` ist Observer-
+  emittiert). Diese String-Werte zu ändern kann gepinnte Signatur-Lookups/Tests/Profile brechen → braucht Konsumenten-
+  Scan + `byte_identity`+`golden==320`+voller-ctest-Gate; bei Rot die betroffene String-Änderung isolieren/reverten.
+  Zudem: `axis_03a_search_algo_registry.hpp`/`organ_for_search_algo.hpp` = **Registry-mp_list-TABU** → nicht anfassen
+  (auch keine Kommentare). Der DOI-Teil (start.profile.xml) = UNSICHER (s. u.). **→ Als gegateter Folge-Increment, NICHT
+  im initialen autonomen Doku-Drift-Durchlauf.** Inhalt (BELEGT via in-repo PAPER_REFERENCES/family_name): Wormhole ATC→**EuroSys 2019** ·
   START „Mertens ICDE 2024"→**Fent/Jungmair/Kipf/Neumann ICDEW 2020** · lrmalloc „Cohen/Petrank PPoPP"→**Leite/Rocha
   VECPAR 2018** · snmalloc „Liedtke…"→**Liétar et al.** · 9 Allocator-`vendor_includes/*.hpp:4` `@vendor`-Venues
   (michael PLDI 2004 · scalloc OOPSLA 2015 · numalloc ISMM 2023 · starmalloc OOPSLA 2024 · lrmalloc VECPAR 2018 ·
