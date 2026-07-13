@@ -62,6 +62,27 @@ cmake --build build
 cd build && ctest --output-on-failure
 ```
 
+Die drei projektinternen Submodule verfolgen explizit den Integrationsbranch
+`development` und verwenden die nicht-destruktive Update-Strategie `merge`.
+Der Gitlink im Superprojekt bleibt der reproduzierbare Snapshot; zum bewussten
+Nachziehen auf den aktuellen Integrationsstand dienen aus der Wurzel des
+Superprojekts:
+
+```bash
+git submodule update --init --recursive
+git submodule update --remote --merge -- \
+  Code/external/comdare-cache-engine \
+  Code/external/comdare-prt-art \
+  thesis/diplomarbeit
+```
+
+Das gezielte zweite Kommando laesst transitiv gepinnte Drittanbieter-Submodule
+(beispielsweise Q01/concurrentqueue) bewusst auf dem vom jeweiligen Parent
+festgelegten Gitlink.
+
+Vor einem Gitlink-Commit muessen `main` und `development` des jeweiligen
+Submoduls synchronisiert sein (`development` enthaelt mindestens `main`).
+
 ## CMake-Presets (V37+, 11 vordefinierte)
 
 Aus `Code/CMakePresets.json` — alle aktivieren V32 + Pre-Build Permutations + 8 parallel Jobs.
