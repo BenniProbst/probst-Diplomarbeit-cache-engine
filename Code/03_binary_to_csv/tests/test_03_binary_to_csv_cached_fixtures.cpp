@@ -46,6 +46,12 @@ void write_binary_fixture(fs::path const& p, std::vector<btc::LabeledRecord> con
         out.write(reinterpret_cast<char const*>(&r.fingerprint), sizeof(r.fingerprint));
         std::uint8_t succ = r.succeeded ? 1 : 0;
         out.write(reinterpret_cast<char const*>(&succ), sizeof(succ));
+        // #6-Fix (V41.P1 v2-Layout): der Header stempelt kBinaryVersion=2 → workload_used MUSS zwischen succ und
+        // record geschrieben werden. Vorher fehlte es (v1-Layout unter v2-Stempel) → eine Fixture-Regeneration
+        // erzeugte korrupte v2-Dateien (der v2-Reader las die record-Bytes als workload_len). Faithful zu Stufe 02.
+        std::uint32_t wl_len = static_cast<std::uint32_t>(r.workload_used.size());
+        out.write(reinterpret_cast<char const*>(&wl_len), sizeof(wl_len));
+        out.write(r.workload_used.data(), wl_len);
         out.write(reinterpret_cast<char const*>(&r.record), sizeof(r.record));
     }
 }
