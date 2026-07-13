@@ -63,3 +63,9 @@ target_include_directories(test_messreihen_workload PRIVATE
     ${COMDARE_CACHE_ENGINE_DIR}/libs/test_infra/workload_generator/include
 )
 add_test(NAME test_messreihen_workload COMMAND test_messreihen_workload)
+# M-SU-07 (Muster-F, 2026-07-13): #31-Regressions-Gate lief in CI weder gebaut noch ausgefuehrt — bare add_test
+# OHNE `LABELS da_unit` (→ `ctest -L da_unit` liess es aus) und OHNE Registry-Eintrag (→ nicht im Sammel-Bau
+# comdare_da_unit_tests). Additiv nachgezogen: Label (macht es in test:unit lauffaehig) + COMDARE_DA_TEST_TARGETS
+# (root sammelt es in comdare_da_unit_tests; 02_messung_driver wird vor dem Property-Read verarbeitet).
+set_tests_properties(test_messreihen_workload PROPERTIES LABELS da_unit TIMEOUT 60)
+set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_messreihen_workload)

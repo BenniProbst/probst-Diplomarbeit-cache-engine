@@ -457,11 +457,18 @@ if(COMDARE_DA_BUILD_TESTS)
             add_dependencies(comdare_da_unit_tests ${_t})
         endif()
     endforeach()
+    # M-SU-05 (Muster-F, 2026-07-13): test_08_appendix_generator + test_09_tex_formatter werden in ihren Stufen-
+    # Subdirs via gtest_discover_tests (LABELS da_unit) definiert, NICHT ueber comdare_da_add_test → sie fehlten im
+    # Sammel-Bau comdare_da_unit_tests → test:unit baute sie nie → ihre da_unit-Suites liefen in CI nie (silent
+    # skip; tex_formatter wurde in keinem CI-Job kompiliert). Additiv in dieselbe explizite Liste wie die 03..06-
+    # Fixture-Tests aufgenommen (TARGET-Guard: greift nur bei COMDARE_DA_BUILD_TESTS).
     foreach(_t
             test_03_binary_to_csv_cached_fixtures
             test_04_csv_to_latex_cached_fixtures
             test_05_diagram_generator_cached_fixtures
-            test_06_latex_to_pdf_cached_fixtures)
+            test_06_latex_to_pdf_cached_fixtures
+            test_08_appendix_generator
+            test_09_tex_formatter)
         if(TARGET ${_t})
             add_dependencies(comdare_da_unit_tests ${_t})
         endif()
