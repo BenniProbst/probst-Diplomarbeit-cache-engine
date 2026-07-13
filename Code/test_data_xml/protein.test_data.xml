@@ -2,10 +2,10 @@
 <!-- Diplomarbeit Testdatensatz: protein (Pizza&Chili protein-Sequenzen)
      6er-Kanon (tab:datasets): biologische Sequenzen, kleines bis mittleres Alphabet.
      Quelle uebernommen aus P04 CoCo-trie (Boffa et al.). #25 (2026-07-08). -->
-<comdare_test_data id="protein" source="Pizza&Chili protein (via CoCo-trie P04)">
+<comdare_test_data id="protein" source="Pizza&amp;Chili protein (via CoCo-trie P04)">
   <metadata>
-    <name>Pizza&Chili proteins.distinct (no_suffixes_small)</name>
-    <license>research use — siehe source_url (Pizza&Chili)</license>
+    <name>Pizza&amp;Chili proteins.distinct (no_suffixes_small)</name>
+    <license>research use — siehe source_url (Pizza&amp;Chili)</license>
     <size_bytes>511956</size_bytes>
     <source_url>http://pizzachili.dcc.uchile.cl/texts/protein/</source_url>
     <referenced_in_paper>P04 CoCo-trie (Boffa/Ferragina/Vinciguerra 2022)</referenced_in_paper>

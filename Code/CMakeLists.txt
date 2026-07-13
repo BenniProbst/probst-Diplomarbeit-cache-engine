@@ -419,8 +419,10 @@ set(_comdare_ce_manifest "${CMAKE_BINARY_DIR}/generated/permutations_manifest.tx
 set(_comdare_visibility_cmd
     $<TARGET_FILE:tier_binary_report_cli> --visibility
         "${_comdare_ce_manifest}" "${CMAKE_BINARY_DIR}/perm")
-if(TARGET comdare-cache-engine-builder)
-    list(APPEND _comdare_visibility_cmd "--builder-exe=$<TARGET_FILE:comdare-cache-engine-builder>")
+# M-SU-06: echtes CMake-Target = cache_engine_builder (apps/cache_engine_builder, if COMDARE_BUILD_BUILDER);
+# „comdare-cache-engine-builder" ist NUR OUTPUT_NAME und existiert NICHT als Target — daher hier der Target-Name.
+if(TARGET cache_engine_builder)
+    list(APPEND _comdare_visibility_cmd "--builder-exe=$<TARGET_FILE:cache_engine_builder>")
 endif()
 add_custom_target(comdare_tier_binary_visibility
     COMMAND ${_comdare_visibility_cmd}

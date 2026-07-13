@@ -12,12 +12,22 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <unistd.h>
 #include <vector>
 
 namespace dg = comdare::da::diagram_generator;
 namespace fs = std::filesystem;
 
 namespace {
+
+// M-SU-04: Benutzer-eindeutige tmp-Basis (identisch zum 04-Test). /tmp ist host-weit geteilt (prod1: lokale
+// Läufe als comdare, CI als gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils
+// anderen (Incident 8081/213626). Der ::getuid()-Suffix trennt die Läufe kollisionsfrei.
+std::filesystem::path comdare_user_tmp() {
+    auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
+    std::filesystem::create_directories(p);
+    return p;
+}
 
 void write_sample_csv_with_workload(fs::path const& p) {
     fs::create_directories(p.parent_path());
@@ -80,7 +90,7 @@ TEST(Stufe05Pipeline, WriteBarChartFromCachedFixture) {
     data.labels  = {"ce_art", "pa_art", "ce_hot", "pa_hot"};
     data.values  = {1000.0, 1500.0, 2000.0, 2200.0};
 
-    auto out = fs::temp_directory_path() / "v35d3_bar.tex";
+    auto out = comdare_user_tmp() / "v35d3_bar.tex";
     ASSERT_EQ(dg::write_bar_chart(out, data), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "tikzpicture"));
     // Underscores werden im TikZ escaped, daher nur Praefix pruefen
@@ -99,7 +109,7 @@ TEST(Stufe05Pipeline, WriteScatterPlot) {
     data.xs      = {16.0, 64.0, 256.0, 1024.0};
     data.ys      = {100.0, 250.0, 800.0, 3500.0};
 
-    auto out = fs::temp_directory_path() / "v35d3_scatter.tex";
+    auto out = comdare_user_tmp() / "v35d3_scatter.tex";
     ASSERT_EQ(dg::write_scatter_plot(out, data), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "tikzpicture"));
 
@@ -113,7 +123,7 @@ TEST(Stufe05Pipeline, WriteThroughputByWorkloadFromCachedCsv) {
     auto rows = dg::load_csv_with_workload_used(dir / "sample_workload_groups.csv");
     ASSERT_EQ(rows.size(), 4u);
 
-    auto out = fs::temp_directory_path() / "v35d3_throughput.tex";
+    auto out = comdare_user_tmp() / "v35d3_throughput.tex";
     ASSERT_EQ(dg::write_throughput_by_workload(out, rows), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "tikzpicture"));
 
@@ -137,7 +147,7 @@ void write_sample_wide_csv(fs::path const& p) {
 } // namespace
 
 TEST(Stufe05Pipeline, ParseWideCsvHeaderDriven) {
-    auto p = fs::temp_directory_path() / "lc_wide_sample.csv";
+    auto p = comdare_user_tmp() / "lc_wide_sample.csv";
     write_sample_wide_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
@@ -154,17 +164,17 @@ TEST(Stufe05Pipeline, ParseWideCsvHeaderDriven) {
 }
 
 TEST(Stufe05Pipeline, WriteSurfaceHeatmapFromWide) {
-    auto p = fs::temp_directory_path() / "lc_wide_sample2.csv";
+    auto p = comdare_user_tmp() / "lc_wide_sample2.csv";
     write_sample_wide_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
-    auto out = fs::temp_directory_path() / "lc_surface_nsperop.tex";
+    auto out = comdare_user_tmp() / "lc_surface_nsperop.tex";
     ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "ns_per_op", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "addplot3"));
     EXPECT_TRUE(file_contains(out, "colormap/viridis"));
 
-    auto out3d = fs::temp_directory_path() / "lc_surface3d_nsperop.tex";
+    auto out3d = comdare_user_tmp() / "lc_surface3d_nsperop.tex";
     ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out3d, rows, "ns_per_op", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out3d, "addplot3[surf]"));
     EXPECT_TRUE(file_contains(out3d, "zmode=log"));
@@ -178,7 +188,7 @@ TEST(Stufe05Pipeline, WriteSurfaceHeatmapFromWide) {
 TEST(Stufe05Pipeline, EmptyInputReturnsEmpty) {
     dg::BarChartData empty;
     empty.title = "empty";
-    auto out    = fs::temp_directory_path() / "v35d3_empty.tex";
+    auto out    = comdare_user_tmp() / "v35d3_empty.tex";
     int  rc     = dg::write_bar_chart(out, empty);
     // Erwartung: entweder status_empty_input ODER status_ok mit leerer Datei
     EXPECT_TRUE(rc == dg::status_ok || rc == dg::status_empty_input);
@@ -264,7 +274,7 @@ std::size_t count_occurrences(fs::path const& p, std::string_view needle) {
 } // namespace
 
 TEST(Stufe05Pipeline, ParseWideCsvSegColumns) {
-    auto p = fs::temp_directory_path() / "p4_wide_seg_parse.csv";
+    auto p = comdare_user_tmp() / "p4_wide_seg_parse.csv";
     write_sample_wide_seg_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
@@ -283,7 +293,7 @@ TEST(Stufe05Pipeline, ParseWideCsvSegColumns) {
 }
 
 TEST(Stufe05Pipeline, SegAttributionAggregateSumsToRunTotalNotTotalNs) {
-    auto p = fs::temp_directory_path() / "p4_wide_seg_agg.csv";
+    auto p = comdare_user_tmp() / "p4_wide_seg_agg.csv";
     write_sample_wide_seg_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
@@ -318,12 +328,12 @@ TEST(Stufe05Pipeline, SegAttributionAggregateSumsToRunTotalNotTotalNs) {
 }
 
 TEST(Stufe05Pipeline, SegAttributionStackedBarEmitsTwentyAddplots) {
-    auto p = fs::temp_directory_path() / "p4_wide_seg_writer.csv";
+    auto p = comdare_user_tmp() / "p4_wide_seg_writer.csv";
     write_sample_wide_seg_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
-    auto out = fs::temp_directory_path() / "p4_seg_attribution.tex";
+    auto out = comdare_user_tmp() / "p4_seg_attribution.tex";
     ASSERT_EQ(dg::write_segment_attribution_stacked_bar(out, rows, "de"), dg::status_ok);
     // (c) valides pgfplots: ybar stacked, exakt 20 \addplot + 20 \addlegendentry.
     EXPECT_TRUE(file_contains(out, "ybar stacked"));
@@ -340,7 +350,7 @@ TEST(Stufe05Pipeline, SegAttributionStackedBarEmitsTwentyAddplots) {
 
 TEST(Stufe05Pipeline, SegAttributionGuardHonestEmptyOnAllNa) {
     // (d) Guard: keine gueltige Segment-Zeile (alle seg n/a bzw. two_phase=0) → status_empty_input, KEIN leerer Balken.
-    auto p = fs::temp_directory_path() / "p4_wide_seg_allna.csv";
+    auto p = comdare_user_tmp() / "p4_wide_seg_allna.csv";
     write_all_invalid_wide_seg_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
@@ -348,7 +358,7 @@ TEST(Stufe05Pipeline, SegAttributionGuardHonestEmptyOnAllNa) {
     auto const agg = dg::aggregate_segment_attribution(rows);
     EXPECT_TRUE(agg.groups.empty());
 
-    auto out = fs::temp_directory_path() / "p4_seg_attribution_empty.tex";
+    auto out = comdare_user_tmp() / "p4_seg_attribution_empty.tex";
     EXPECT_EQ(dg::write_segment_attribution_stacked_bar(out, rows, "en"), dg::status_empty_input);
     std::error_code ec;
     fs::remove(out, ec);
@@ -395,7 +405,7 @@ std::size_t p3_count(fs::path const& p, std::string_view needle) {
 
 // (a) p99-Parse: header-getrieben, n-a-tolerant. Alle 5 op_*_p99_ns numerisch → has_op_p99; EINE "n/a" → false.
 TEST(Stufe05Pipeline, ParseWideCsvOpP99Columns) {
-    auto p = fs::temp_directory_path() / "p3_p99_parse.csv";
+    auto p = comdare_user_tmp() / "p3_p99_parse.csv";
     fs::create_directories(p.parent_path());
     {
         std::ofstream f(p);
@@ -420,7 +430,7 @@ TEST(Stufe05Pipeline, ParseWideCsvOpP99Columns) {
 // (b) Range-Aggregat: Whisker-Top (Median p99) >= Punkt (Median p50) je Zelle (Monotonie); scan-No-Op- und
 // 0-Op-Ausschluss; op-Arten ohne Daten (erase/rmw) fehlen; nearest-rank-Median deterministisch.
 TEST(Stufe05Pipeline, LatencyRangeAggregateMonotoneAndExclusions) {
-    auto p = fs::temp_directory_path() / "p3_range_agg.csv";
+    auto p = comdare_user_tmp() / "p3_range_agg.csv";
     write_sample_wide_p99_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
@@ -455,12 +465,12 @@ TEST(Stufe05Pipeline, LatencyRangeAggregateMonotoneAndExclusions) {
 
 // (c) Writer: valides pgfplots (Punkt+plus-Whisker, log-y), 1 addplot je op-Art, KEIN Box/Quartil-Artefakt.
 TEST(Stufe05Pipeline, LatencyRangeBarEmitsWhiskersNoBoxplot) {
-    auto p = fs::temp_directory_path() / "p3_range_writer.csv";
+    auto p = comdare_user_tmp() / "p3_range_writer.csv";
     write_sample_wide_p99_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
-    auto out = fs::temp_directory_path() / "p3_latency_range.tex";
+    auto out = comdare_user_tmp() / "p3_latency_range.tex";
     ASSERT_EQ(dg::write_latency_range_bar(out, rows, "de"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "error bars"));
     EXPECT_TRUE(file_contains(out, "y dir=plus"));
@@ -479,7 +489,7 @@ TEST(Stufe05Pipeline, LatencyRangeBarEmitsWhiskersNoBoxplot) {
 
 // (d) ECDF: Population = ANZAHL KONFIGURATIONEN (nicht Einzel-Ops), sortiert; Treppe y∈[0,1]; Config-Streuung.
 TEST(Stufe05Pipeline, LatencyEcdfConfigPopulationMonotone) {
-    auto p = fs::temp_directory_path() / "p3_ecdf.csv";
+    auto p = comdare_user_tmp() / "p3_ecdf.csv";
     write_sample_wide_p99_csv(p);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
@@ -496,7 +506,7 @@ TEST(Stufe05Pipeline, LatencyEcdfConfigPopulationMonotone) {
     // eytzinger: nur E (F ist two_phase_valid=0 → verworfen).
     EXPECT_EQ(series[0].sorted_ns_per_op.size(), 1u);
 
-    auto out = fs::temp_directory_path() / "p3_latency_ecdf.tex";
+    auto out = comdare_user_tmp() / "p3_latency_ecdf.tex";
     ASSERT_EQ(dg::write_latency_ecdf(out, rows, "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "const plot"));
     EXPECT_TRUE(file_contains(out, "ymin=0, ymax=1"));
@@ -513,19 +523,19 @@ TEST(Stufe05Pipeline, LatencyEcdfConfigPopulationMonotone) {
 // (e) Guard: keine p99 (altes cowfix-v1-Schema ohne op_*_p99_ns) → Range honest leer. ECDF auf leerer Eingabe leer.
 TEST(Stufe05Pipeline, LatencyDistributionGuardsHonestEmpty) {
     // Range: die bestehende p50-only-Fixture (kein p99) → has_op_p99=false → keine gueltige Zeile.
-    auto p = fs::temp_directory_path() / "p3_no_p99.csv";
+    auto p = comdare_user_tmp() / "p3_no_p99.csv";
     write_sample_wide_csv(p); // p50-only-Header (L-c), KEINE op_*_p99_ns-Spalten
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
     for (auto const& r : rows) EXPECT_FALSE(r.has_op_p99);
     auto const agg = dg::aggregate_latency_range(rows);
     EXPECT_TRUE(agg.algos.empty());
-    auto out = fs::temp_directory_path() / "p3_range_empty.tex";
+    auto out = comdare_user_tmp() / "p3_range_empty.tex";
     EXPECT_EQ(dg::write_latency_range_bar(out, rows, "en"), dg::status_empty_input);
 
     // ECDF: leere Eingabe → honest leer.
     std::vector<dg::WideMeasurementRow> none;
-    auto                                out2 = fs::temp_directory_path() / "p3_ecdf_empty.tex";
+    auto                                out2 = comdare_user_tmp() / "p3_ecdf_empty.tex";
     EXPECT_EQ(dg::write_latency_ecdf(out2, none, "en"), dg::status_empty_input);
     EXPECT_TRUE(dg::aggregate_latency_ecdf(none).empty());
 

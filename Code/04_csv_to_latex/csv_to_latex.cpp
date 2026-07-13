@@ -469,10 +469,17 @@ std::vector<ExchangeAggregate> aggregate_exchange(std::span<WideFullRow const>  
                         auto const b_it = fns_to.find(fn);
                         if (a_it == fns_from.end() || b_it == fns_to.end()) return;
                         double const base = a_it->second, other = b_it->second;
-                        double const d    = other - base;
-                        auto&        slot = agg[{axis, vf, vt, fn}];
-                        slot.abs_.push_back(d);
-                        if (base > 0.0) slot.rel.push_back(d / base); // Zero-Baseline → kein rel-Delta
+                        double const d = other - base;
+                        // Anti-Phantom (M-SU-03): abs_ und rel zaehlen dieselbe (ausgeuebte) Population. Eine
+                        // nicht-ausgeuebte Interface-Fn (base = 0 = „nicht ausgeuebt", Header) darf weder einen
+                        // 0-0-Pseudo-Diff in abs_ druecken (sonst verwaessert median_abs_delta_ns gegenueber der
+                        // ausgewiesenen n = pair_workload_samples = rel-Samples) noch eine leere Aggregat-Zelle
+                        // anlegen. Zero-Baseline → kein rel-Delta, kein Eintrag.
+                        if (base > 0.0) {
+                            auto& slot = agg[{axis, vf, vt, fn}];
+                            slot.abs_.push_back(d);
+                            slot.rel.push_back(d / base);
+                        }
                     };
                     for (auto fn : kInterfaceFns) consider(std::string{fn});
                     consider("ns_per_op");
