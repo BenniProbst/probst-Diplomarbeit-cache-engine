@@ -196,6 +196,16 @@ verify:submodules:
     - 'test -e Code/external/comdare-cache-engine/CMakeLists.txt && echo "cache-engine OK"'
     - 'test -e Code/external/comdare-prt-art/CMakeLists.txt && echo "prt-art OK"'
     - 'test -d thesis/diplomarbeit && (ls thesis/diplomarbeit/*.tex >/dev/null 2>&1 && echo "thesis-LaTeX OK" || echo "thesis vorhanden")'
+    # REV-CI-04 (#22, 2026-07-13): Gitlink-Determinismus HART pruefen. `git submodule status` markiert mit
+    # Praefix `-` (nicht initialisiert), `+` (ausgecheckter Commit != Gitlink) oder `U` (Merge-Konflikt). Mit
+    # update=merge (.gitmodules) koennte CI auf einem persistenten/wiederverwendeten Worktree sonst einen
+    # lokalen Mergezustand STATT des exakten Gitlink-Commits bauen (= misst evtl. den falschen Submodul-Stand).
+    - |
+      _bad="$(git submodule status --recursive | grep -E '^[-+U]' || true)"
+      if [ -n "${_bad}" ]; then
+        echo "FEHLER (REV-CI-04): Submodul NICHT auf exaktem Gitlink-Commit (-/+/U-Praefix):"; echo "${_bad}"; exit 1
+      fi
+      echo "Submodul-Gitlink-Determinismus OK (alle exakt auf ihrem Gitlink-Commit)"
 
 # ── Stage analyse: Auswertungswerkzeuge bauen (KEIN grosses Artefakt) ──
 analyse:thesis-data:
