@@ -628,6 +628,12 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     bewusste Entscheidungen, offene Gates). Builds DE 168 S./EN 162 S., 0/0/0; Gates DE≡EN + 44/18/0.
     **Text-Agent-Stand: ALLES geschlossen; einziges Gate = Kap.-5-Ergebnisteil (wartet auf reale
     Messdaten, #156/Impl-Agent; Hybrid zusätzlich 14900KS-RMA ~September). Overleaf-Sync = User-Aktion.**
+    ⚠️ **GITLAB-AUSFALL festgestellt 2026-07-13:** gitlab.comdare.de liefert HTTP 404 auf /users/sign_in
+    UND /api/v4/version (Server/TLS antwortet in 0,4 s → App down oder Ingress-Routing, NICHT Netz;
+    Fehlerbild anders als der frühere 502/CNPG-WAL-Vorfall). GitLab-Pushes des Super-Repos stehen daher
+    AUS (main dort veraltet); GitHub-origin ist vollständig synchron (Merge 8ad00dd inkl. Impl-Agent-
+    Parallel-Commits, thesis-Submodule-Konflikt auf jüngsten Stand c2d3c51 gelöst). GitLab-Push nachholen,
+    sobald der Dienst wieder da ist — Infra-Prüfung = Infra-Agent/User (Text-Agent-Mandat: kein Infra).
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
