@@ -85,22 +85,24 @@ private:
 };
 
 // Helper: us/op + Achsen-Info -> measurement_record_v1
-inline comdare_measurement_record_v1 make_record_from_run(std::uint64_t n_ops, double micros_per_op) {
+// Anti-Phantom (Ledger §0, "honest-0 statt Schaetzung"): total_cycles und bytes_* werden NICHT aus
+// us/op oder op_count fabriziert. Ohne realen PMU-/Allocator-Zaehler bleiben sie honest-0 -- exakt wie
+// die Cache-Miss-Felder unten. Die reale Zeit-Messung (micros_per_op) wird separat in der Stats-CSV
+// (compute_stats) gefuehrt; dieser Binary-Record erfindet keinen Zyklen-/Byte-Wert aus einer fixen
+// Takt-/Bucket-Konstante (frueher: total_us*3000 @ 3 GHz bzw. n_ops*64). Phase 6+: echten PMU-Counter ablesen.
+inline comdare_measurement_record_v1 make_record_from_run(std::uint64_t n_ops, [[maybe_unused]] double micros_per_op) {
     comdare_measurement_record_v1 r{};
-    r.version  = kMeasurementVersion;
-    r.op_count = n_ops;
-    // total_cycles approximieren aus us/op (1 us ~ 3000 cycles bei 3 GHz)
-    // (Phase 6+: PerfCounter ablesen statt approximieren)
-    double total_us           = micros_per_op * static_cast<double>(n_ops);
-    r.total_cycles            = static_cast<std::uint64_t>(total_us * 3000.0);
+    r.version                 = kMeasurementVersion;
+    r.op_count                = n_ops;
+    r.total_cycles            = 0; // honest-0: kein realer Zyklen-Counter in diesem Pfad (Phase 6+: PMU)
     r.cache_misses_l1         = 0; // Phase 6+: PMU-Counter
     r.cache_misses_l2         = 0;
     r.cache_misses_l3         = 0;
     r.dtlb_misses             = 0;
     r.coherence_invalidations = 0;
     r.energy_micro_joules     = 0;
-    r.bytes_allocated         = n_ops * 64; // Schaetzung: HashSet-Bucket-Size
-    r.bytes_in_use_peak       = r.bytes_allocated;
+    r.bytes_allocated         = 0; // honest-0: kein realer Allocator-Zaehler in diesem Pfad (Phase 6+)
+    r.bytes_in_use_peak       = 0; // honest-0
     r.external_fragmentation  = 0.0;
     r.internal_fragmentation  = 0.0;
     return r;
