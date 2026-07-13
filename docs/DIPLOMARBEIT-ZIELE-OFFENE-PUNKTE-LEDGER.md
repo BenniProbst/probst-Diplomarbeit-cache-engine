@@ -620,6 +620,15 @@ Die §10-Aussage „E0-E4 = reine Architektur-Audit-Dimension, NICHT Terminierun
     DE 168 S./EN 162 S., 0 Errors/0 Overfull/0 Warnungen; DE≡EN-Cites alle 12 Dateipaare; Verweis-Scan
     44/18/0 symmetrisch regelkonform; Rohdaten `sessions/workflow-backups/20260711-wf-frischleser-review/`.
 
+  - **SESSION-ABSCHLUSS 2026-07-13 (thesis `c2d3c51`):** letzte Rest-Punkte erledigt —
+    Acht-zu-Sechs-Beziehung der Prüflings-Bausteine in §4.2 aufgelöst (ValueHandles→T11-Slot,
+    Signaling-Bit-Serialisierung→VarLenSerialization/Anhang D); Prüf-Skripte dauerhaft persistiert
+    (`thesis/…/sessions/tools/` + README: seq_ref_scan, cite_de_en_check, cite_usage_diff);
+    Session-Doku `sessions/2026-07-13-session-phase-g-bis-frischleser-abschluss.md` (Commit-Tabelle,
+    bewusste Entscheidungen, offene Gates). Builds DE 168 S./EN 162 S., 0/0/0; Gates DE≡EN + 44/18/0.
+    **Text-Agent-Stand: ALLES geschlossen; einziges Gate = Kap.-5-Ergebnisteil (wartet auf reale
+    Messdaten, #156/Impl-Agent; Hybrid zusätzlich 14900KS-RMA ~September). Overleaf-Sync = User-Aktion.**
+
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
 ### 13.1 Schaden/Nutzen-Bilanz der autonomen Nacht (03.–05.07., ce 971a0a57..e9cf4f3f = 23 Commits, super 31 Commits)
