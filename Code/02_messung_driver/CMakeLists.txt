@@ -86,3 +86,23 @@ target_compile_definitions(test_messreihe_v32_parser PRIVATE
 add_test(NAME test_messreihe_v32_parser COMMAND test_messreihe_v32_parser)
 set_tests_properties(test_messreihe_v32_parser PROPERTIES LABELS da_unit TIMEOUT 60)
 set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_messreihe_v32_parser)
+
+# INC-E (2026-07-14) — Unit-Gate des Experiment-Phase-Strategy-Pattern
+# (experiment_phase_strategy.hpp): header-only, INERT (KEIN Konsument — die
+# Orchestrator-Verdrahtung ist Stufe G). Der Test instanziiert die 3 Strategies
+# compile-time, prueft select_merge() je Phase, den Concept-Guard (positiv+negativ)
+# und kein-vtable — alles Compile-Time-/Host-Logik, gate-frei (kein Treiber-Lauf,
+# kein #156-Messdaten) und UNABHAENGIG vom COMDARE_V32_ENABLE-Gate.
+# Include-Roots: das 02-Verzeichnis (Strategy-Header) + der ce-Root libs/cache_engine
+# (fuer <anatomy/pruefling_merge.hpp>, die MergeStrategy-Single-Source). Boost::mp11
+# liefert den boost/mp11.hpp-Include-Dir (INTERFACE, kein Compile) fuer das ce-Header.
+add_executable(test_experiment_phase_strategy tests/test_experiment_phase_strategy.cpp)
+target_compile_features(test_experiment_phase_strategy PRIVATE cxx_std_23)
+target_include_directories(test_experiment_phase_strategy PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}                     # experiment_phase_strategy.hpp
+    ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine   # <anatomy/pruefling_merge.hpp> (MergeStrategy-Single-Source)
+)
+target_link_libraries(test_experiment_phase_strategy PRIVATE Boost::mp11)
+add_test(NAME test_experiment_phase_strategy COMMAND test_experiment_phase_strategy)
+set_tests_properties(test_experiment_phase_strategy PROPERTIES LABELS da_unit TIMEOUT 60)
+set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_experiment_phase_strategy)
