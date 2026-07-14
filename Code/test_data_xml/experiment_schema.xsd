@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  INC-C (2026-07-14) - comdare_experiment XSD-Schema (3-Phasen-Vorlage).
+
+  Formale Spec der experiment_*.xml Struktur. Loest das Interim-Muster
+  messreihe_v32_schema.xsd ab (das als Legacy-Fixture BEHALTEN wird).
+
+  Kern-Idee: das Experiment-XML REFERENZIERT die zwei Achsen-Registries
+  (cache_engine_axis_registry.xml, engine=cache_engine, 19 Achsen/90 Bausteine +
+  prt_art_axis_registry.xml, engine=prt_art, 5 Slots) und traegt KEINE Bausteine
+  selbst. Eine <phase> traegt NUR merge (MergeStrategy-Enum aus
+  cache_engine/anatomy/pruefling_merge.hpp) + engine(s), KEIN <baustein>.
+
+  Diese XSD ist inert bis der typisierte Parser (INC-D) sie liest. Die
+  registry-/allowed_variants-/measurement-Konsistenz gegen die Registries wird
+  vom Code-Parser gegen die generierten Registry-XML validiert (die XSD kann die
+  Registry-Namen nicht kennen); die XSD formalisiert nur die Struktur.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+  <xs:element name="comdare_experiment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="metadata"             type="MetadataType"/>
+        <xs:element name="execution_engines"    type="ExecutionEnginesType"/>
+        <xs:element name="lebewesen"            type="LebewesenType"/>
+        <xs:element name="phases"               type="PhasesType"/>
+        <xs:element name="axes_default_lookup"  type="AxesDefaultLookupType" minOccurs="0"/>
+        <xs:element name="workloads"            type="xs:string"/>
+        <xs:element name="datasets"             type="DatasetsType"/>
+        <xs:element name="measurement_categories" type="MeasurementCategoriesType"/>
+        <xs:element name="op_types"             type="OpTypeListType"/>
+        <xs:element name="output"               type="OutputType"/>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="required" fixed="1"/>
+      <xs:attribute name="id"      type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- metadata: name + mode (defined | full | full_sampled) -->
+  <xs:complexType name="MetadataType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="mode">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="defined"/>
+            <xs:enumeration value="full"/>
+            <xs:enumeration value="full_sampled"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- execution_engines: GENAU 2 (ee_ce + ee_prt), jede mit registry-Referenz -->
+  <xs:complexType name="ExecutionEnginesType">
+    <xs:sequence>
+      <xs:element name="engine" minOccurs="2" maxOccurs="2">
+        <xs:complexType>
+          <xs:attribute name="id"       type="xs:string" use="required"/>
+          <xs:attribute name="type"     type="xs:string" use="required"/>
+          <xs:attribute name="registry" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- lebewesen: die gemessenen Tiere (base_tier-ids) -->
+  <xs:complexType name="LebewesenType">
+    <xs:sequence>
+      <xs:element name="tier" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- phases: die 3 Phasen. merge = MergeStrategy-Enum (Stufe1/2/3). KEIN baustein. -->
+  <xs:complexType name="PhasesType">
+    <xs:sequence>
+      <xs:element name="phase" minOccurs="3" maxOccurs="3">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="merge" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="Stufe1_CeOnly"/>
+                <xs:enumeration value="Stufe2_PrueflingReplace"/>
+                <xs:enumeration value="Stufe3_FullJoin"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <!-- Genau eine von engine (Einzel-EE) / engines (Whitespace-Liste). -->
+          <xs:attribute name="engine"    type="xs:string" use="optional"/>
+          <xs:attribute name="engines"   type="xs:string" use="optional"/>
+          <xs:attribute name="pruefling" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- axes_default_lookup: reines LIMIT. axis ref = Registry-axis-id,
+       allowed_variants = Whitespace-Liste von Registry-baustein-name-Werten
+       (Teilmenge). Ungenannte Achsen = volle Registry-Liste. -->
+  <xs:complexType name="AxesDefaultLookupType">
+    <xs:sequence>
+      <xs:element name="axis" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="ref"              type="xs:string" use="required"/>
+          <xs:attribute name="allowed_variants" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="enabled" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <!-- datasets: Single-Source Referenzen auf die test_data-AKTEN (kein
+       test_data_sets.xml-Doppelquelle). -->
+  <xs:complexType name="DatasetsType">
+    <xs:sequence>
+      <xs:element name="dataset" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id"       type="xs:string" use="required"/>
+          <xs:attribute name="akte_ref" type="xs:string" use="required"/>
+          <xs:attribute name="loader"   type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- measurement_categories: Spalten-PROJEKTION. name = exakt der Enum-Name aus
+       kAllMeasurementCategories (measurement_category.hpp, 16 Kategorien). -->
+  <xs:complexType name="MeasurementCategoriesType">
+    <xs:sequence>
+      <xs:element name="category" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" use="required">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="CLU"/>
+                <xs:enumeration value="CACHE_MISS_L1"/>
+                <xs:enumeration value="CACHE_MISS_L2"/>
+                <xs:enumeration value="CACHE_MISS_L3"/>
+                <xs:enumeration value="DTLB_MISS"/>
+                <xs:enumeration value="MEMORY_FOOTPRINT"/>
+                <xs:enumeration value="BRANCH_MISS"/>
+                <xs:enumeration value="IPC_CPI"/>
+                <xs:enumeration value="LATENCY_MEAN"/>
+                <xs:enumeration value="LATENCY_P50"/>
+                <xs:enumeration value="LATENCY_P95"/>
+                <xs:enumeration value="LATENCY_P99"/>
+                <xs:enumeration value="LATENCY_P999"/>
+                <xs:enumeration value="THROUGHPUT"/>
+                <xs:enumeration value="ENERGY_J"/>
+                <xs:enumeration value="FILL_BUFFER_OCCUPANCY"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- op_types: Whitespace-Liste von OP-1..OP-6. -->
+  <xs:simpleType name="OpTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OP-1"/>
+      <xs:enumeration value="OP-2"/>
+      <xs:enumeration value="OP-3"/>
+      <xs:enumeration value="OP-4"/>
+      <xs:enumeration value="OP-5"/>
+      <xs:enumeration value="OP-6"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OpTypeListType">
+    <xs:list itemType="OpTypeType"/>
+  </xs:simpleType>
+
+  <!-- output: Zielpfade + comparison_metrics (boolean). -->
+  <xs:complexType name="OutputType">
+    <xs:sequence>
+      <xs:element name="binary_path"        type="xs:string"/>
+      <xs:element name="csv_path"           type="xs:string"/>
+      <xs:element name="latex_path"         type="xs:string"/>
+      <xs:element name="comparison_metrics" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
