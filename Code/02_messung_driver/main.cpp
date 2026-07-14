@@ -46,6 +46,17 @@
 #include <profile_facade/profile_run_facade.hpp>
 #endif
 
+// INC-G+H (C.2+C.3, 2026-07-14): INERT-Andock der execute_messreihe-Verdrahtung (v32_messreihe_antrieb.hpp).
+// DOPPELT gegatet — COMDARE_V32_DRIVER_ENABLE (Build-Option, Default OFF) UND COMDARE_MEASUREMENT_ON (der
+// abi_adapter-/Katalog-Treiber fordert MEASUREMENT, sonst traegt der SearchAlgorithmAbiAdapter kein
+// IObservableTier). Der messung_driver-Default-Build setzt KEINES von beiden -> der Block wird vom Praeprozessor
+// vollstaendig entfernt (main.cpp byte-identisch, golden-320 unveraendert). Der eigentliche Antriebs-/Export-
+// Beweis laeuft ueber das FRISCH gebaute Test-Target test_v32_messreihe_antrieb (beide Makros gesetzt) — der
+// volle messung_driver-Binary-Link bricht vorbestehend an ext/allocator/A07-snmalloc (unabhaengig, INERT-Andock).
+#if defined(COMDARE_V32_DRIVER_ENABLE) && defined(COMDARE_MEASUREMENT_ON)
+#include "v32_messreihe_antrieb.hpp"
+#endif
+
 // V38.C - bringt windows.h auf Win32 (LEAN_AND_MEAN + NOMINMAX gesetzt).
 // MUSS am Ende stehen, sonst clash mit STL via Windows-Makros.
 // V38.C.2 Workaround: windows.h definiert auf manchen SDK-Versionen Macros
@@ -283,6 +294,19 @@ int main(int argc, char* argv[]) {
             return comdare::cache_engine::builder::profile_facade::validate_profile_facade(prof, std::cout);
         }
     }
+
+    // INC-G+H (C.2+C.3): der OFFIZIELLE XML-getriebene execute_messreihe-Weg NUR bei explizitem Opt-in (Muster
+    // COMDARE_RUN_E4_XML). COMDARE_RUN_V32_EXPERIMENT = Pfad der comdare_experiment-XML; optional
+    // COMDARE_V32_EXPERIMENT_MODE = defined|full|full_sampled (Default defined). Doppelt gegatet (s. Include
+    // oben) -> im messung_driver-Default-Build praeprozessor-entfernt (byte-identisch, kein neuer Mess-Pfad).
+#if defined(COMDARE_V32_DRIVER_ENABLE) && defined(COMDARE_MEASUREMENT_ON)
+    if (std::string const xp = env_trimmed("COMDARE_RUN_V32_EXPERIMENT"); !xp.empty()) {
+        std::string mode = env_trimmed("COMDARE_V32_EXPERIMENT_MODE");
+        if (mode.empty()) { mode = "defined"; }
+        return comdare::diplomarbeit::messung_driver::v32::antrieb::execute_messreihe(xp, mode);
+    }
+#endif
+
     if (argc < 3) {
         print_usage();
         return 1;
