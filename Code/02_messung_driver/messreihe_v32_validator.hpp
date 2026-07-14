@@ -10,6 +10,19 @@
 //
 // Header-only, keine Dependencies. Wenn spaeter pugixml/tinyxml2 verfuegbar
 // ist, kann der Validator gegen vollstaendige XSD-Validation getauscht werden.
+//
+// INC-V32-C.parser (2026-07-14) — TYPISIERTE Validierung nachgezogen:
+//   validate_string()/validate_file() unten sind der DEPRECATED Legacy-Praesenzcheck: sie
+//   pruefen NUR das Vorhandensein von Tags (std::string_view::find), lesen aber KEINE Attribut-
+//   oder Element-WERTE. Sie bleiben erhalten (Doku/Code nie loeschen) als schneller Wohlgeformt-
+//   heits-Smoke ohne DOM-Aufbau. Die neue, wertetreue Validierung laeuft ueber den echten
+//   XML->Struct-Parser (messreihe_v32_parser.hpp): validate_parsed() prueft die GEPARSTEN
+//   Struct-Felder (genau 2 Engines, >=1 Tupel mit Workload, gueltiger op_type, comparison_metrics
+//   gelesen, gueltiger mode). validate_parsed() ist bewusst ein Template (statisches Duck-Typing
+//   ueber die MessreiheV32-Felder) STATT eines harten `#include "messreihe_v32_parser.hpp"`, damit
+//   bestehende Validator-Konsumenten OHNE serialization-Include-Pfad (z.B.
+//   tests/unit/test_messreihe_v32_validator) unveraendert kompilieren; instanziiert wird es nur
+//   dort, wo der Parser bereits inkludiert ist (der 02-Stufen-Parser-Test).
 
 #include <algorithm>
 #include <fstream>
@@ -116,7 +129,50 @@ public:
         return validate_string(ss.str());
     }
 
+    // INC-V32-C.parser (2026-07-14) — Wertetreue Validierung der vom echten DOM-Parser
+    // (messreihe_v32_parser.hpp::parse_messreihe_v32) gelieferten Struct-Felder. Additiv zum
+    // DEPRECATED string-find-Pfad oben. Template (statisches Duck-Typing) statt hartem #include —
+    // s. Header-Kommentar. `MessreiheV32Like` ist erwartungsgemaess das MessreiheV32-Struct.
+    template <class MessreiheV32Like>
+    [[nodiscard]] static ValidationReport validate_parsed(MessreiheV32Like const& m) {
+        ValidationReport report;
+
+        // Pflicht: GENAU 2 <engine> (XSD ExecutionEnginesType minOccurs=maxOccurs=2)
+        if (m.engines.size() != 2) {
+            add_error(report,
+                      "execution_engines must contain exactly 2 <engine>, parsed " + std::to_string(m.engines.size()));
+        }
+
+        // Pflicht: mode aus {defined, full, full_sampled}
+        if (m.metadata.mode != "defined" && m.metadata.mode != "full" && m.metadata.mode != "full_sampled") {
+            add_error(report,
+                      "metadata/mode must be 'defined', 'full', or 'full_sampled' (parsed: '" + m.metadata.mode + "')");
+        }
+
+        // Pflicht: mindestens 1 <tupel>, jeder mit <workload>, op_type (falls gesetzt) gueltig
+        if (m.tupel.empty()) { add_error(report, "At least one <tupel> required (parsed 0)"); }
+        for (const auto& t : m.tupel) {
+            if (!t.has_workload) { add_error(report, "tupel '" + t.id + "' missing <workload>"); }
+            if (!t.op_type.empty() && !is_valid_op_type(t.op_type)) {
+                add_error(report, "tupel '" + t.id + "' has invalid op_type '" + t.op_type + "' (expected OP-1..OP-6)");
+            }
+        }
+
+        // comparison_metrics MUSS gelesen worden sein (OutputType, xs:boolean)
+        if (!m.output.has_comparison_metrics) {
+            add_warning(report, "output/comparison_metrics not present (F15-Verdict/Ratios undefiniert)");
+        }
+
+        report.valid = !report.has_errors();
+        return report;
+    }
+
 private:
+    // XSD op_type-Enumeration (messreihe_v32_schema.xsd:76-87).
+    [[nodiscard]] static bool is_valid_op_type(std::string_view s) noexcept {
+        return s == "OP-1" || s == "OP-2" || s == "OP-3" || s == "OP-4" || s == "OP-5" || s == "OP-6";
+    }
+
     static void add_error(ValidationReport& report, const std::string& msg) {
         report.issues.push_back({ValidationIssue::Severity::Error, msg});
     }

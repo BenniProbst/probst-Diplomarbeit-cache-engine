@@ -69,3 +69,20 @@ add_test(NAME test_messreihen_workload COMMAND test_messreihen_workload)
 # (root sammelt es in comdare_da_unit_tests; 02_messung_driver wird vor dem Property-Read verarbeitet).
 set_tests_properties(test_messreihen_workload PROPERTIES LABELS da_unit TIMEOUT 60)
 set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_messreihen_workload)
+
+# INC-V32-C.parser (2026-07-14) — Unit-Gate der typisierten XML->Struct-Parse-Schicht
+# (messreihe_v32_parser.hpp): liest Attribut- UND Element-Werte der gelieferten Beispiel-Instanz
+# ueber den ce-DOM-Reader (comdare::common::xml). Gate-frei (reine Host-Logik, kein Treiber-Lauf,
+# kein #156-Messdaten) und UNABHAENGIG vom COMDARE_V32_ENABLE-Gate (kein Orchestrator/Katalog).
+add_executable(test_messreihe_v32_parser tests/test_messreihe_v32_parser.cpp)
+target_compile_features(test_messreihe_v32_parser PRIVATE cxx_std_23)
+target_include_directories(test_messreihe_v32_parser PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}                                # messreihe_v32_parser.hpp / _validator.hpp
+    ${COMDARE_CACHE_ENGINE_DIR}/libs/common/serialization      # xml_config_parser/xml_reader.hpp (ce-DOM-Reader)
+)
+# Beispiel-XML deterministisch aus dem Source-Baum (Muster COMDARE_TEST_DATA_XML_DIR_FALLBACK).
+target_compile_definitions(test_messreihe_v32_parser PRIVATE
+    "COMDARE_V32_EXAMPLE_XML=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_data_xml/messreihe_v32_schema_example.xml\"")
+add_test(NAME test_messreihe_v32_parser COMMAND test_messreihe_v32_parser)
+set_tests_properties(test_messreihe_v32_parser PROPERTIES LABELS da_unit TIMEOUT 60)
+set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_messreihe_v32_parser)
