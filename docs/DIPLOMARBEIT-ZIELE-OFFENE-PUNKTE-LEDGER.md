@@ -1105,3 +1105,42 @@ Vor dem Stopp beide potenziell veralteten Gates read-only re-verifiziert:
 - **#270b node7-Freeze:** node7 meldet weiter `online + idle + paused=false`, nahm aber den arm64-Job (1× transienter Retry, Pipeline 8311, Kadenz-konform) **erneut >8 min NICHT auf** → **ZWEITE bestätigte Freeze-Reproduktion (03:35 + 04:15)** = persistent/deterministisch, nicht transient. #270b-Grün-Beweis bleibt Montag-gated (node7-Freeze-Fix zuerst); KEINE weiteren Retries. Der zusätzliche Datenpunkt (Watchdog heilte den Freeze NICHT innerhalb des Fensters) stützt H18 weiter — beim Montags-Audit relevant (Workhorse-Long-Poll/HAProxy-Timeout, K88 §2.2). Proving-Pipeline 8311 gecancelt.
 Damit sind ALLE 6 verbleibenden Board-Punkte durch Re-Check als echt extern-gated bestätigt (kein von mir lösbarer non-gated Slice mehr).
 > **KORREKTUR 2026-07-07 ~06:00 (Hook-getrieben):** Dieser Absolutsatz war ÜBERZOGEN. Ein Stop-Hook forderte „alle sichtbaren TODOs"; die Re-Verifikation fand bei **#279** (Task #22) sehr wohl einen agent-machbaren, grün-beweisbaren non-gated Slice (Mess-Modus-Schalter + Tier-Binary-Build-Sichtbarkeit) — erledigt + CI-grün (super 8316/009ada3, s. §12). Ebenso ist **#266-P3** (memory-Konsum-Kartierung, read-only) noch nicht ausgeschöpft. Lehre: „extern-gated" je Slice belegen, nicht pauschal je Board-Punkt behaupten (Trigger = das Absolut-Wort selbst, vgl. feedback_no_success_marks / ultracode-bei-Absolutbehauptung). Der GENUIN gated Rest von #279 (scharfer mehrtägiger Release-RUN, ISA-Voll-Matrix-Scharfschaltung) bleibt bestätigt gated.
+
+
+## §15 — SESSION 2026-07-13/14: ERWEITERTE XML-EXPERIMENT-ARCHITEKTUR + OFFENE PUNKTE + VERGESSENE TODOs + ELABORIERTER PLAN
+
+> Konsolidierung der gesamten Session (Board via /goal + /model mehrfach geleert → hier + §11 wiederhergestellt). Autoritativ für den weiteren Verlauf; ergänzt §11 (offene Liste) + §12 (Increment-Log). Backups: `docs/sessions/backups/20260713-{achsen-gattungen-metaprog, familie-c-design-dossier, audit-3-schema-familien, design-zwei-registry-experiment-strategy, verify-registry-facts, xml-pdf-konsolidierung}/`. Bindende Memory: `feedback_unified_experiment_xml_plus_system_registry_xml`.
+
+### 15.1 Die erweiterte Architektur (User-Prinzip, bindend)
+- **CacheEngineBuilder (CEB) = DAS zentrale Experiment-Framework (EINE C++-Anwendung):** alle XML-Parser sind im CEB verankert; er steuert nach Anwender-Aufruf das gesamte Experiment (parst Registries+Experiment-XML → baut Tier-Binaries ZUR LAUFZEIT (C++-orchestriert, nicht CMake, Performance) → treibt durch das Prüfdock → misst über das Messsystem). Der CEB kann zusätzlich die Diplomarbeit-Code-Generatoren (Excel/PDF-Auswertungen) als Bibliothek aufnehmen.
+- **Zwei Registry-XMLs, GLEICHES Schema:** ce-Registry (SOTA, Bausteine je Achse in cache-engine) + prt-art-Registry (prt-arts Bausteine je Achse, HART dasselbe Schema, auf Basis der ce-C++23-Lib). Bausteine je Achse stehen NUR in den Registries (je Engine), NICHT in der Diplomarbeit-XML.
+- **Diplomarbeit-Experiment-XML = individuelle Config:** die 3-Phasen-Prüf-Vorlage (Phase 1 prt-art / Phase 2 cache-engine / Phase 3 kombinierte Achsen = 3-Stufen-Join Stufe1/2/3), referenziert die Registries, listet KEINE Bausteine.
+- **Parser = Modul im allgemeinen ce-Parser; v32-Modul → Strategy-Pattern** der Experimentier-Configs.
+- **prt-art bleibt SEPARATER PRÜFLING** (nur seine Registry, NICHT in den CEB gemergt); wird gegen den SOTA getestet.
+
+### 15.2 Umgesetzt + verifiziert diese Session (github ✓; gitlab DEFERRED = Modus a, PAT-Blocker)
+honest-100% je Increment (ctest + golden-Roundtrip==320 wo berührt + cf22==0 + Mojibake==0 + TABU unberührt), lokal doppelt-literal:
+- **#25** rcu-Eigentumsmodell-Inversion · **#23** RC-applied echt · **#36** V32-Bit-Bank-Tilgung · **#24** predicate_evals ECHTE Messung (Option A) + Thesis D:612 · **INC-1** latex_anhang 16-col-WIDE-Parität · **INC-4** Modus-2-Observer-Detail-Writer (honest-empty) · **INC-V32-C.parser** typisierter v32-Parser · **INC-A** ce-Registry-Generator (C++-Tool, Enabled\*-gebunden, 19 Achsen/90 Bausteine) · **INC-B** prt-art-Registry + `COMDARE_DEFINE_ORGAN_LOCATION`-Makro (R-B) · **INC-C** comdare_experiment-XML-Schema (3-Phasen) · **INC-D** Experiment-Parser-Modul in ce.
+- Rollback-Anker der A-E-Welle: ce `9f05c6db` (INC-3) → aktueller ce `3f4bff19` / super `eb42e2c`, prt-art `1d66ded8`.
+
+### 15.3 OFFENE PUNKTE (user-gated / infra-gated)
+- **G-a1 gitlab-Credential (Modus a):** das `.local`-PAT verschwand nach Netzwechsel (git-erase bei transientem 401); Vault-PATs 401. ALLE Session-Commits sind github-only; gitlab-Nachzug (ce/super/prt-art `development`) wartet auf ein frisches PAT (`! echo 'https://oauth2:<PAT>@gitlab.comdare.local' >> ~/.git-credentials`). = Task-G1.
+- **G-a2 CI infra-blockiert:** baremetal-Runner (node5-8/pve1-2/node3-4) offline, nur k8s-Runner online (ohne `baremetal`-Tag) → alle 4 Diplomarbeit-Pipelines pending. Handover geschrieben (`Cluster/docs/sessions/2026-07-13-INFRA-baremetal-runner-offline-diplomarbeit-ci-pending.md`). User-GO Modus a: lokal-doppelt-verifiziert fortfahren, CI-Grün zieht batch nach.
+- **A-E-Welle:** A-D ✅, **INC-E (Strategy-Pattern)** offen (nächster Schritt).
+- **F-H (Antriebsteil):** separater GO nötig (CEB-getrieben, W4-Katalog-Pfad-Gate).
+
+### 15.4 VERGESSENE / GEFUNDENE TODOs (aus den Design-/Verifikations-Workflows)
+- **M-CE-10** (`sota_catalog.hpp:175/159`): `Stufe2_PrueflingReplace` ignoriert das `lebewesen`-Argument → 7× identische binary_id (heute per (view_binary_id,fairness)-Dedup abgefangen). **Wird bau-relevant mit F/G** (Reihe R-C(i) semantisch) → per-Host-Stufe2-Kompositionen nötig. In §0-V4-G2 (Mess-Integrität) erfasst.
+- **M-CE-27** (golden-Gate-Lücke): `test_profile_roundtrip` (das 320-Roundtrip-Gate) ist `EXCLUDE_FROM_ALL`, hat kein `add_test`, läuft in KEINEM CI-Job → automatisiert geprüft ist nur `golden[0]`. **Fork R-E freigegeben: in CI heben.** = Task-R-E.
+- **Dataset-Doppelquelle** (`builder/example_configs/test_data_sets.xml`): disjunkte Code-Pfade, keine echte Live-Doppelquelle; nur additiver DEPRECATED-Marker + Single-Source-Konsolidierung beim `<datasets>`-Konsum.
+- **ce-Wrapper-Header-Lücke** (INC-A): die ~90 ce-Achsen-Wrapper tragen kein per-Organ `cpp_type_name`/`header_include` → INC-A emittiert `header=""`. Fix = `COMDARE_DEFINE_ORGAN_LOCATION` (existiert seit INC-B) auf die 90 Wrapper. = Task-Header-Fill; **nötig erst für den per-Organ-Codegen (F/G)**, nicht für den Katalog.
+- **M-CE-11/12/28** (Studien-Profil-`<workloads>` Legacy A..F): GRÜN — bereits gefixt (alle 10 Profile `ycsb_*`); einzige Auflage: neuer Host muss `known_workload_ids` befüllen, sonst bleibt der exit-4-Wächter für 2-arg-Pfade stumm.
+
+### 15.5 ELABORIERTER PLAN — weiteres Vorgehen (geordnet)
+1. **INC-E** Strategy-Pattern (Phase=Strategy, CRTP+Concept) → A-E-Fundament komplett.
+2. **Header-Fill** (Task-Header-Fill): `COMDARE_DEFINE_ORGAN_LOCATION` auf die 90 ce-Wrapper → `header` befüllt.
+3. **F-H Antriebsteil** (separater GO, CEB-getrieben): F Surrogat→reale CEB-Tier-Binaries (Tier→Prüfdock→Messsystem→Welch, W4-Gate: nie `PrtArtHashBackend`) · G `execute_messreihe` verdrahten (`mp_for_each<PhaseList>`→Strategy) · H INERT `COMDARE_V32_DRIVER_ENABLE`+Env+Export. **Zeitgleich M-CE-10-Fix + R-E.**
+4. **xml→pdf Last-Mile** (INC-5/6/7, Token-289/Overleaf-gated) + **INC-8** Auto-Fill via golden-320 (data-gated).
+5. **Zentralisierung** (Task): Framework-Tools + Diplomarbeit-Generatoren (Excel/PDF) → in den CEB; prt-art bleibt separater Prüfling.
+6. **E2E-Re-Audit** (Task): ALLE auf dem E2E-Prinzip aufbauenden Pläne/Doks gegen ALLE Anforderungen prüfen + erweitern.
+- **Parallel/gated:** G1 gitlab-Nachzug (PAT) · G4/#40 Dead-Code · G5-Facade #274 · G6 golden-320-Voll-Lauf (mehrtägig, nie pollen) · #35/#36/#37 Kernfeatures (je vorlegen; **#36-Scheduling = MAJOR golden/ABI-Halt**) · #188-Architektur-Rest (§11-A/B/C).
