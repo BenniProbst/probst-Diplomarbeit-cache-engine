@@ -45,6 +45,50 @@ else()
     message(STATUS "[messung_driver] V32 Orchestrator DEAKTIVIERT (V31.F Default)")
 endif()
 
+# INC-F (C.1, 2026-07-14) — INERT-Flag COMDARE_V32_DRIVER_ENABLE: die F-Verdrahtung (Surrogat -> reale
+# CEB-Katalog-Tier im EE-A/EE-B-Vergleich, W4-Gate) lebt in v32_katalog_driver.hpp und hat im Default-Build
+# KEINEN Konsumenten. Flag OFF (Muster COMDARE_V32_ENABLE oben) => messung_driver byte-identisch, golden-320
+# unveraendert. Nur bei Flag ON wird der W4-Gate-Mess-Test gebaut (frisch, mit COMDARE_MEASUREMENT_ON + dem
+# vollen ce-Anatomie-/Achsen-Include-Satz — identisch zu den ce-measured-Tests).
+option(COMDARE_V32_DRIVER_ENABLE "Enable INC-F katalog driver (real CEB tier in EE-A/EE-B, W4-gate)" OFF)
+if(COMDARE_V32_DRIVER_ENABLE)
+    target_compile_definitions(messung_driver PRIVATE COMDARE_V32_DRIVER_ENABLE=1)
+    target_include_directories(messung_driver PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+    # Die generierten axis_*_flags-Include-Dirs kommen ueber die GLOBAL-Property, die der ce-Subbuild exportiert
+    # (tests/unit/CMakeLists.txt) — single-source, kein Drift.
+    get_property(_ce_axis_gen_dirs GLOBAL PROPERTY COMDARE_CE_AXIS_GENERATED_DIRS)
+
+    add_executable(test_v32_katalog_driver tests/test_v32_katalog_driver.cpp)
+    target_compile_features(test_v32_katalog_driver PRIVATE cxx_std_23)
+    target_include_directories(test_v32_katalog_driver PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}                                    # v32_katalog_driver.hpp
+        ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine
+        ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include
+        ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/src
+        ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/profile_facade   # sota_catalog.hpp (Katalog-Typ-Identitaet)
+        ${COMDARE_CACHE_ENGINE_DIR}/libs/common
+        ${COMDARE_CACHE_ENGINE_DIR}/libs/common/serialization
+        ${CMAKE_BINARY_DIR}/_cache_engine_external/generated
+        ${_ce_axis_gen_dirs})
+    target_link_libraries(test_v32_katalog_driver PRIVATE Boost::mp11 comdare_builder_xml_config_parser)
+    target_compile_definitions(test_v32_katalog_driver PRIVATE
+        COMDARE_V32_DRIVER_ENABLE=1
+        COMDARE_MEASUREMENT_ON=1 COMDARE_CE_ENABLE_STATISTICS=1 COMDARE_EXPERIMENT_MODE_ON=1
+        "COMDARE_V32_DRIVER_HDR=\"${CMAKE_CURRENT_SOURCE_DIR}/v32_katalog_driver.hpp\""
+        "COMDARE_CE_LIB_DIR=\"${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine\""
+        "COMDARE_GOLDEN_320_IDS=\"${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt\"")
+    if(COMMAND comdare_set_platform_defines)
+        comdare_set_platform_defines(test_v32_katalog_driver)
+    endif()
+    add_test(NAME test_v32_katalog_driver COMMAND test_v32_katalog_driver)
+    set_tests_properties(test_v32_katalog_driver PROPERTIES LABELS "da_unit;inc_f;measured;w4_gate" TIMEOUT 300)
+    set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_v32_katalog_driver)
+    message(STATUS "[messung_driver] INC-F Katalog-Treiber AKTIVIERT (W4-Gate test_v32_katalog_driver)")
+else()
+    message(STATUS "[messung_driver] INC-F Katalog-Treiber DEAKTIVIERT (Surrogat-Default, INERT)")
+endif()
+
 # V36.D (2026-05-23) - Runtime-Check fuer Pre-Build-Permutationen
 # Pfade zur generierten Manifests via compile-time defines durchreichen.
 target_compile_definitions(messung_driver PRIVATE
