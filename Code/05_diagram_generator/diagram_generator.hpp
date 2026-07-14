@@ -16,6 +16,8 @@
 //   height = 0.40 * \textheight  (max 40% Seitenhoehe, damit 2 Diagramme
 //                                 + Text auf eine Seite passen)
 
+#include "csv_to_latex.hpp" // INC-4: c2l::WideFullRow (trägt den durchgereichten stat_<achse>_<feld>-Block)
+
 #include <array>
 #include <cstdint>
 #include <filesystem>
@@ -308,5 +310,26 @@ struct LatencyEcdfSeries {
 // Konfigurationen" (Config-Streuung) aus — NICHT Per-Operation. Guard: keine gültige Zeile → status_empty_input.
 [[nodiscard]] int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
                                      std::string const& lang = "en", PageConstraints const& cnst = {});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INC-4 (2026-07-13) — Modus-2 Per-Achsen-Observer-Detail-Tabelle (stat_<achse>_<feld>)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Schreibt den vollen Per-Achsen-Observer-Block als longtable: je (Tier-Binary × Achse × Observer-Feld) EINE
+// Zeile mit dem ECHT gemessenen uint64-Zählwert. Die Spaltennamen stat_<achse>_<feld> werden HEADER-GETRIEBEN
+// aus der WIDE-CSV gelesen (c2l::WideFullRow::stat, parse_wide_csv_full) — NIE hartkodiert: die DLL-seitige
+// kV3AxisSchema[19][8] ist die Single-Source und emittiert die Spaltennamen. Achse/Feld werden aus dem
+// Spaltennamen mit dem Achsen-Vokabular des binary_id-Tupels (r.axes-Keys = dieselben kCompositionAxisNames-
+// Namen, exakt die stat_<achse>_-Präfixe) per LÄNGSTEM-Präfix zerlegt — nötig, weil BEIDE (Achsen- und
+// Feldnamen) Unterstriche tragen (naives Splitten wäre falsch).
+//
+// HONEST-EMPTY (exakt das write_segment_attribution_stacked_bar-Muster): existiert KEINE Zeile mit mindestens
+// EINEM echt gemessenen stat_-Wert (alle Spalten "n/a"/leer ODER der stat_-Block fehlt) → status_empty_input
+// VOR dem ofstream (KEINE Datei, KEIN erfundener 0-Wert). Innerhalb einer Zeile werden n/a-/leere Felder
+// übersprungen (nie 0-erfunden). Breiten-sicher via longtable + \scriptsize (mehrseiten-fähig; KEIN resizebox,
+// da longtable nicht in eine \resizebox darf).
+[[nodiscard]] int write_axis_observer_detail_table(std::filesystem::path const&                            out,
+                                                   std::span<comdare::da::csv_to_latex::WideFullRow const> rows,
+                                                   std::string const&                                      lang = "en");
 
 } // namespace comdare::da::diagram_generator

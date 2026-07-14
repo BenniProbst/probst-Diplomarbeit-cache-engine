@@ -6,6 +6,10 @@ comdare_da_add_library(comdare_diagram_generator MODULE M05 SOURCES
 )
 target_compile_features(comdare_diagram_generator PUBLIC cxx_std_23)
 target_include_directories(comdare_diagram_generator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# INC-4 (2026-07-13): write_axis_observer_detail_table konsumiert c2l::WideFullRow (stat_<achse>_<feld>-Block)
+# → PUBLIC-Link auf csv_to_latex (Typ steht im öffentlichen Header diagram_generator.hpp). 04 wird vor 05 als
+# add_subdirectory eingebunden (Code/CMakeLists.txt:315-316) → das Alias-Target existiert.
+target_link_libraries(comdare_diagram_generator PUBLIC comdare::csv_to_latex)
 add_library(comdare::diagram_generator ALIAS comdare_diagram_generator)
 
 add_executable(diagram_generator_cli main_cli.cpp)

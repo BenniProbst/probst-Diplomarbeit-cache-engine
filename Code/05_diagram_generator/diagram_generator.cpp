@@ -1162,4 +1162,110 @@ int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasureme
     return f.good() ? status_ok : status_io_error;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// INC-4 (2026-07-13) — Modus-2 Per-Achsen-Observer-Detail-Tabelle (stat_<achse>_<feld>)
+// ─────────────────────────────────────────────────────────────────────────────
+int write_axis_observer_detail_table(std::filesystem::path const&                            out,
+                                     std::span<comdare::da::csv_to_latex::WideFullRow const> rows,
+                                     std::string const&                                      lang) {
+    // "echt gemessen" = Spalte vorhanden UND Wert weder leer noch "n/a" (Nicht-Mess-DLL schreibt ehrlich "n/a",
+    // NICHT 0). Der Konsument erfindet NIE einen 0-Wert für einen fehlenden Zähler.
+    auto const is_real = [](std::string const& v) { return !v.empty() && v != "n/a"; };
+
+    // ── HONEST-EMPTY (VOR dem ofstream, exakt das write_segment_attribution_stacked_bar-Muster): existiert KEINE
+    //    Zeile mit mind. EINEM echt gemessenen stat_-Wert (alle "n/a"/leer ODER der stat_-Block fehlt ganz) →
+    //    status_empty_input → KEINE Datei, KEIN erfundener Wert.
+    bool any_real = false;
+    for (auto const& r : rows) {
+        for (auto const& [name, val] : r.stat)
+            if (is_real(val)) {
+                any_real = true;
+                break;
+            }
+        if (any_real) break;
+    }
+    if (!any_real) return status_empty_input;
+
+    // ── Achsen-Vokabular DATEN-GETRIEBEN aus den binary_id-Tupeln (r.axes-Keys = kCompositionAxisNames-Namen,
+    //    exakt die stat_<achse>_-Präfixe; NIE hartkodiert). Längster Treffer trennt Achse/Feld eindeutig, weil
+    //    BEIDE Unterstriche tragen (z.B. stat_cache_traversal_resolve_hit → Achse=cache_traversal, Feld=resolve_hit).
+    std::set<std::string> axis_vocab;
+    for (auto const& r : rows)
+        for (auto const& [axis, value] : r.axes) axis_vocab.insert(axis);
+
+    auto const decompose = [&axis_vocab](std::string const& col) -> std::pair<std::string, std::string> {
+        std::string_view rest{col};
+        rest.remove_prefix(std::string_view{"stat_"}.size());
+        std::string best_axis; // längster passender Achsen-Präfix
+        for (auto const& a : axis_vocab)
+            if (rest.size() > a.size() + 1 && rest.substr(0, a.size()) == a && rest[a.size()] == '_' &&
+                a.size() > best_axis.size())
+                best_axis = a;
+        if (!best_axis.empty()) return {best_axis, std::string{rest.substr(best_axis.size() + 1)}};
+        // Defensiver Fallback (Achse nicht im binary_id-Tupel — bei vollständigem 19-Achsen-binary_id nie): am
+        // letzten '_' trennen, damit die Zeile ehrlich mit ihrem Roh-Namen erscheint statt verloren zu gehen.
+        auto const last = rest.rfind('_');
+        if (last == std::string_view::npos) return {std::string{rest}, std::string{}};
+        return {std::string{rest.substr(0, last)}, std::string{rest.substr(last + 1)}};
+    };
+
+    bool const de = (lang == "de");
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+
+    std::string const caption = de ? "Per-Achsen-Observer-Detailwerte je Tier-Binary (nur echt gemessene Zaehler)"
+                                   : "Per-axis observer detail values per tier binary (measured counters only)";
+    std::string const label   = "tab:appendix:observer-detail";
+    std::string const c_axis  = de ? "Achse" : "axis";
+    std::string const c_field = de ? "Observer-Feld" : "observer field";
+    std::string const c_value = de ? "Wert" : "value";
+    std::string const colhead =
+        escape_latex(c_axis) + " & " + escape_latex(c_field) + " & " + escape_latex(c_value) + " \\\\";
+
+    f << "% AUTO-GENERATED durch diagram_generator (INC-4, Modus-2 Per-Achsen-Observer-Detail): stat_<achse>_<feld>\n";
+    f << "% aus kV3AxisSchema[19][8] (single-source, DLL-seitig) — header-getrieben gelesen, honest-empty. lang="
+      << lang << "\n";
+    f << "\\begin{scriptsize}\n\\setlength{\\tabcolsep}{3pt}\n";
+    f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{4.6cm} "
+         ">{\\raggedright\\arraybackslash}p{4.6cm} r@{}}\n";
+    f << "\\caption{" << escape_latex(caption) << "}\\label{" << label << "}\\\\\n";
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    f << "\\multicolumn{3}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
+      << "}\\\\\n\\toprule\n"
+      << colhead << "\n\\midrule\n\\endhead\n";
+    f << "\\midrule\n\\multicolumn{3}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
+      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+
+    // Je WIDE-Zeile (= je Tier-Binary/Messung) EIN Block: Kopfzeile binary_id[+workload] + je Achse/Feld die
+    // echten Werte. Reihenfolge deterministisch: r.stat ist std::map (nach vollem Spaltennamen sortiert → nach
+    // Achse, dann Feld). Zeilen ohne EINEN echten Wert (reine n/a-DLL) werden ehrlich ganz übersprungen.
+    for (auto const& r : rows) {
+        bool row_has_real = false;
+        for (auto const& [name, val] : r.stat)
+            if (is_real(val)) {
+                row_has_real = true;
+                break;
+            }
+        if (!row_has_real) continue;
+
+        std::string being = r.binary_id;
+        if (!r.workload.empty()) being += "  [" + r.workload + "]";
+        f << "\\multicolumn{3}{@{}l}{\\textbf{" << escape_latex(being) << "}}\\\\\n";
+
+        std::string last_axis;
+        for (auto const& [name, val] : r.stat) {
+            if (!is_real(val)) continue; // n/a/leer → NIE 0-erfunden, Feld weggelassen
+            auto const [axis, field] = decompose(name);
+            // Achsen-Label nur beim Wechsel drucken (Lesbarkeit); Feld+Wert immer.
+            std::string const axis_cell = (axis == last_axis) ? std::string{} : escape_latex(axis);
+            last_axis                   = axis;
+            f << axis_cell << " & " << escape_latex(field) << " & " << escape_latex(val) << " \\\\\n";
+        }
+        f << "\\midrule\n";
+    }
+    f << "\\end{longtable}\n\\end{scriptsize}\n";
+    return f.good() ? status_ok : status_io_error;
+}
+
 } // namespace comdare::da::diagram_generator

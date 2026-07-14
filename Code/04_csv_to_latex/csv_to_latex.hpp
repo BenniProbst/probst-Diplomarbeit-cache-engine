@@ -113,6 +113,13 @@ struct WideFullRow {
     bool          has_working_set_n = false;
     double        seg_coverage      = 0.0; // Σseg_ns/run_total (Mess-Validität)
     bool          has_seg_coverage  = false;
+    // INC-4 (2026-07-13, xml→pdf-Konsolidierung): der volle Per-Achsen-Observer-Block stat_<achse>_<feld>
+    // (Schema = kV3AxisSchema[19][8] auf der DLL-Seite, single-source) — HEADER-GETRIEBEN durchgereicht (KEIN
+    // Positions-/Namens-Hartkodieren; JEDE Spalte mit "stat_"-Präfix wird mitgenommen). Key = voller Spaltenname
+    // "stat_<achse>_<feld>", Wert = Roh-Zelle: "n/a" bei Nicht-Mess-DLL (ehrlich n/a, NICHT 0) sonst der uint64-
+    // Zählwert als String. Fehlt der Block komplett (altes 154-Spalten-Schema ohne stat_-Spalten), bleibt die
+    // Map leer (n/a, KEIN Parse-Fehler). Konsument: diagram_generator::write_axis_observer_detail_table.
+    std::map<std::string, std::string> stat;
 };
 
 [[nodiscard]] int parse_wide_csv_full(std::filesystem::path const& in, std::vector<WideFullRow>& out_rows);

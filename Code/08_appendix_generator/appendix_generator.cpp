@@ -132,8 +132,19 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             return status_io_error;
         }
 
+        // (5e) INC-4 (xml→pdf-Konsolidierung): Per-Achsen-Observer-Detail-Tabelle (stat_<achse>_<feld> aus
+        // kV3AxisSchema[19][8], single-source). Speist sich aus DENSELBEN geparsten full_rows (c2l::WideFullRow
+        // trägt seit INC-4 den durchgereichten stat_-Block) — KEIN Doppel-Parsen. HONEST-EMPTY (dg_ok): fehlt der
+        // stat_-Block bzw. sind alle Zähler "n/a" (Nicht-Mess-DLL/altes Schema), liefert der Writer
+        // status_empty_input → KEINE observer_detail.tex, KEIN Facade-Fehler. Thesis-\input erst INC-7 (Overleaf).
+        if (int const rc = dg::write_axis_observer_detail_table(out_dir / "observer_detail.tex", full_rows, lang);
+            !dg_ok(rc)) {
+            std::cerr << "appendix-generator: write_axis_observer_detail_table (" << lang << ") failed " << rc << "\n";
+            return status_io_error;
+        }
+
         std::cout << "appendix-generator [" << lang
-                  << "]: 12 Kern- + 4 Darstellungs-.tex (honest-empty ⇒ ggf. ausgelassen) -> " << out_dir << "\n";
+                  << "]: 12 Kern- + 5 Darstellungs-.tex (honest-empty ⇒ ggf. ausgelassen) -> " << out_dir << "\n";
     }
     return status_ok;
 }

@@ -2,6 +2,8 @@
 
 #include "diagram_generator.hpp"
 
+#include "csv_to_latex.hpp" // INC-4: c2l::WideFullRow + parse_wide_csv_full (stat_<achse>_<feld>-Durchreichung)
+
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -15,8 +17,9 @@
 #include <unistd.h>
 #include <vector>
 
-namespace dg = comdare::da::diagram_generator;
-namespace fs = std::filesystem;
+namespace dg  = comdare::da::diagram_generator;
+namespace c2l = comdare::da::csv_to_latex;
+namespace fs  = std::filesystem;
 
 namespace {
 
@@ -542,5 +545,101 @@ TEST(Stufe05Pipeline, LatencyDistributionGuardsHonestEmpty) {
     std::error_code ec;
     fs::remove(out, ec);
     fs::remove(out2, ec);
+    fs::remove(p, ec);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INC-4 (2026-07-13) — Modus-2 Per-Achsen-Observer-Detail-Tabelle (stat_<achse>_<feld>)
+// ─────────────────────────────────────────────────────────────────────────────
+namespace {
+
+// WIDE-full-Zeilen mit den c2l::parse_wide_csv_full-Pflichtspalten PLUS ausgewählten stat_<achse>_<feld>-Spalten.
+// binary_id trägt BEIDE getesteten Achsen (search_algo + cache_traversal) → die Achse/Feld-Zerlegung des Writers
+// nutzt das binary_id-Achsen-Vokabular (der reale Pfad), nicht den Fallback. all_na=true → alle stat_ = "n/a".
+void write_observer_detail_wide_csv(fs::path const& p, bool all_na) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns;"
+      << "stat_search_algo_lookup;stat_search_algo_hit;stat_search_algo_miss;stat_cache_traversal_resolve_hit;"
+      << "workload;two_phase_valid\n";
+    // Spalten-Reihenfolge der stat_-Werte: lookup;hit;miss;resolve_hit. miss=n/a testet die honest-Auslassung
+    // (NIE 0-erfunden). resolve_hit ist ein MEHR-Wort-Feld → beweist die Längster-Präfix-Zerlegung (cache_traversal
+    // vs cache_traversal_resolve wäre falsch).
+    if (all_na)
+        f << "search_algo=k_ary/cache_traversal=direct;42.0;30;25;28;500;40;n/a;n/a;n/a;n/a;ycsb_c;1\n";
+    else
+        f << "search_algo=k_ary/cache_traversal=direct;42.0;30;25;28;500;40;12345;6789;n/a;4242;ycsb_c;1\n";
+}
+
+} // namespace
+
+// (Phase 2.2) Parser durchreicht die stat_<achse>_<feld>-Spalten HEADER-GETRIEBEN (Roh-Wert als String, "n/a"
+// unverändert) — keine Positions-Hartkodierung, kein Parse-Fehler durch die Zusatzspalten.
+TEST(Stufe05Pipeline, ObserverDetailParserCarriesStatColumns) {
+    auto p = comdare_user_tmp() / "inc4_stat_parse.csv";
+    write_observer_detail_wide_csv(p, /*all_na=*/false);
+    std::vector<c2l::WideFullRow> rows;
+    ASSERT_EQ(c2l::parse_wide_csv_full(p, rows), c2l::status_ok);
+    ASSERT_EQ(rows.size(), 1u);
+    ASSERT_EQ(rows[0].stat.size(), 4u); // alle 4 stat_-Spalten mitgenommen (inkl. der n/a-Spalte)
+    EXPECT_EQ(rows[0].stat.at("stat_search_algo_lookup"), "12345");
+    EXPECT_EQ(rows[0].stat.at("stat_search_algo_hit"), "6789");
+    EXPECT_EQ(rows[0].stat.at("stat_search_algo_miss"), "n/a"); // ehrlich n/a durchgereicht (NICHT 0)
+    EXPECT_EQ(rows[0].stat.at("stat_cache_traversal_resolve_hit"), "4242");
+    std::error_code ec;
+    fs::remove(p, ec);
+}
+
+// (Phase 2, Test b) With-Fixture: Zeilen mit echten stat_-Werten → longtable mit EXAKT diesen gemessenen Werten.
+// n/a-Feld (miss) wird ehrlich ausgelassen (kein 0), Mehr-Wort-Feld korrekt zerlegt (Achse cache_traversal).
+TEST(Stufe05Pipeline, ObserverDetailTableWithFixtureRealValues) {
+    auto p = comdare_user_tmp() / "inc4_stat_fixture.csv";
+    write_observer_detail_wide_csv(p, /*all_na=*/false);
+    std::vector<c2l::WideFullRow> rows;
+    ASSERT_EQ(c2l::parse_wide_csv_full(p, rows), c2l::status_ok);
+
+    auto            out = comdare_user_tmp() / "inc4_observer_detail.tex";
+    std::error_code ec0;
+    fs::remove(out, ec0);
+    ASSERT_EQ(dg::write_axis_observer_detail_table(out, rows, "de"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out));
+    EXPECT_TRUE(file_contains(out, "longtable"));
+    // Die drei ECHT gemessenen Werte stehen VERBATIM in der Tabelle.
+    EXPECT_TRUE(file_contains(out, "12345"));
+    EXPECT_TRUE(file_contains(out, "6789"));
+    EXPECT_TRUE(file_contains(out, "4242"));
+    // Achse/Feld-Zerlegung (escape_latex: '_' → "\\_").
+    EXPECT_TRUE(file_contains(out, "search\\_algo"));
+    EXPECT_TRUE(file_contains(out, "cache\\_traversal"));
+    EXPECT_TRUE(file_contains(out, "resolve\\_hit")); // Mehr-Wort-Feld korrekt (nicht am ersten '_' gesplittet)
+    // honest: das n/a-Feld (miss) erscheint NICHT (weder "n/a" noch der Feldname "miss") — kein 0-erfundener Wert.
+    EXPECT_FALSE(file_contains(out, "n/a"));
+    EXPECT_FALSE(file_contains(out, "miss"));
+    fs::remove(out, ec0);
+    fs::remove(p, ec0);
+}
+
+// (Phase 2, Test a) Honest-empty: (i) leere rows sowie (ii) rows mit ausschließlich n/a-stat_-Werten → der Writer
+// legt KEINE Datei an (status_empty_input VOR dem ofstream, kein erfundener 0-Wert).
+TEST(Stufe05Pipeline, ObserverDetailHonestEmptyNoFile) {
+    // (i) leere Eingabe.
+    std::vector<c2l::WideFullRow> none;
+    auto                          out_none = comdare_user_tmp() / "inc4_observer_empty_none.tex";
+    std::error_code               ec;
+    fs::remove(out_none, ec);
+    EXPECT_EQ(dg::write_axis_observer_detail_table(out_none, none, "en"), dg::status_empty_input);
+    EXPECT_FALSE(fs::exists(out_none)); // KEINE Datei angelegt
+
+    // (ii) rows vorhanden, aber ALLE stat_ = "n/a" (Nicht-Mess-DLL) → ebenfalls honest leer, keine Datei.
+    auto p = comdare_user_tmp() / "inc4_stat_allna.csv";
+    write_observer_detail_wide_csv(p, /*all_na=*/true);
+    std::vector<c2l::WideFullRow> rows;
+    ASSERT_EQ(c2l::parse_wide_csv_full(p, rows), c2l::status_ok);
+    ASSERT_EQ(rows.size(), 1u);
+    auto out_na = comdare_user_tmp() / "inc4_observer_empty_na.tex";
+    fs::remove(out_na, ec);
+    EXPECT_EQ(dg::write_axis_observer_detail_table(out_na, rows, "en"), dg::status_empty_input);
+    EXPECT_FALSE(fs::exists(out_na)); // KEINE Datei angelegt
+
     fs::remove(p, ec);
 }

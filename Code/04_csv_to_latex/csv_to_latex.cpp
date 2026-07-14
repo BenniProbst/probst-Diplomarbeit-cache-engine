@@ -336,6 +336,13 @@ int parse_wide_csv_full(std::filesystem::path const& in, std::vector<WideFullRow
     for (char const* name : required)
         if (col.find(name) == col.end()) return status_parse_error;
 
+    // INC-4: HEADER-GETRIEBEN ALLE stat_<achse>_<feld>-Spalten sammeln (Positions-agnostisch, Reihenfolge = Header).
+    // NIE hartkodiert — die Namen kommen aus der WIDE-CSV, die die DLL aus der Single-Source kV3AxisSchema[19][8]
+    // emittiert. Fehlt der Block (altes 154-Spalten-Schema), bleibt stat_cols leer → r.stat leer (honest n/a).
+    std::vector<std::pair<std::string, std::size_t>> stat_cols;
+    for (std::size_t i = 0; i < header.size(); ++i)
+        if (header[i].rfind("stat_", 0) == 0) stat_cols.emplace_back(header[i], i);
+
     std::string line;
     while (std::getline(f, line)) {
         if (line.empty() || line == "\r") continue;
@@ -372,6 +379,9 @@ int parse_wide_csv_full(std::filesystem::path const& in, std::vector<WideFullRow
                 } catch (std::exception const&) { /* n/a */
                 }
             }
+            // INC-4: die stat_<achse>_<feld>-Roh-Zellen durchreichen (Wert bleibt String — "n/a" ODER uint64; die
+            // Ehrlichkeits-/Zerlegungs-Logik liegt beim Konsumenten write_axis_observer_detail_table).
+            for (auto const& [name, idx] : stat_cols) r.stat.emplace(name, cols[idx]);
             out_rows.push_back(std::move(r));
         } catch (std::exception const&) { return status_parse_error; }
     }

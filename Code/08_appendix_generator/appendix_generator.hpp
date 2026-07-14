@@ -66,7 +66,8 @@ struct AppendixConfig {
 //   seg_attribution.tex (05, gestapelte Segment-Attribution, aus surf_rows) ·
 //   latency_range.tex   (05, p50→p99-Spanne, aus surf_rows) ·
 //   latency_ecdf.tex    (05, Config-Streuung-ECDF, aus surf_rows) ·
-//   exchange_forest.tex (04, Forest-Plot der Austauschbarkeit, aus exch_aggs/counts)
+//   exchange_forest.tex (04, Forest-Plot der Austauschbarkeit, aus exch_aggs/counts) ·
+//   observer_detail.tex (05, INC-4 Per-Achsen-Observer-Detail stat_<achse>_<feld>, aus full_rows)
 // HONEST-EMPTY: liefert ein Darstellungs-Writer status_empty_input (n/a-Daten), wird
 // die betreffende Datei bewusst NICHT geschrieben — das ist KEIN Facade-Fehler (die 12
 // Kern-.tex bleiben unberührt). Die 12 Kern-.tex sind byte-identisch zu den bisherigen
