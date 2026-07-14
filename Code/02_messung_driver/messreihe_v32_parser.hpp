@@ -23,6 +23,15 @@
 // Fehlertoleranz: fehlende OPTIONALE Felder -> Defaults (leerer String / 0 / false / nullopt).
 // Struktureller Fehler (nicht wohlgeformt, falsches Wurzelelement) -> nullopt + klare Meldung
 // (via optionalem `std::string* error`-Out-Parameter; ohne Out-Parameter still).
+//
+// ── DEPRECATED (INC-D, 2026-07-14) ──────────────────────────────────────────────────────────
+// Dieser Interim-Standalone-Parser fuer `<messreihe version="32">` ist ABGELOEST vom Experiment-
+// Parser als MODUL im allgemeinen ce-Parser: `parse_experiment_profile` (comdare_experiment,
+// ce libs/common/serialization/xml_config_parser) + `validate_experiment_profile` (cache_engine
+// profile_facade/validate_profile.hpp). Die Parse-Funktionen sind [[deprecated]]-markiert. Er wird
+// BEHALTEN (Doku/Code nie loeschen) + bleibt funktional (sein Unit-Test bleibt gruen), NUR fuer die
+// bestehende v32-Fixture messreihe_v32_schema_example.xml; NEUE Aufrufer nutzen parse_experiment_profile.
+// ────────────────────────────────────────────────────────────────────────────────────────────
 
 #include "xml_config_parser/xml_reader.hpp" // comdare::common::xml::{XmlNode, parse_document}
 
@@ -209,8 +218,9 @@ namespace detail {
 // ── Parse aus einem bereits geparsten DOM-Wurzelknoten (testbar ohne Datei) ─────────────────
 //
 // Erwartet den `<messreihe>`-Wurzelknoten. Falsches Wurzelelement -> nullopt + Meldung.
-[[nodiscard]] inline std::optional<MessreiheV32> parse_messreihe_v32_from_root(common::xml::XmlNode const& root,
-                                                                               std::string* error = nullptr) {
+[[deprecated("superseded by parse_experiment_profile / comdare_experiment — INC-D")]]
+[[nodiscard]] inline std::optional<MessreiheV32>
+parse_messreihe_v32_from_root(common::xml::XmlNode const& root, std::string* error = nullptr) {
     if (root.tag != "messreihe") {
         if (error) *error = "root element is <" + root.tag + ">, expected <messreihe>";
         return std::nullopt;
@@ -252,8 +262,9 @@ namespace detail {
 }
 
 // ── Parse aus einem XML-String ──────────────────────────────────────────────────────────────
-[[nodiscard]] inline std::optional<MessreiheV32> parse_messreihe_v32_string(std::string_view xml,
-                                                                            std::string*     error = nullptr) {
+[[deprecated("superseded by parse_experiment_profile / comdare_experiment — INC-D")]]
+[[nodiscard]] inline std::optional<MessreiheV32>
+parse_messreihe_v32_string(std::string_view xml, std::string* error = nullptr) {
     auto root = common::xml::parse_document(xml);
     if (!root) {
         if (error) *error = "XML not well-formed (parse_document failed)";
@@ -263,8 +274,9 @@ namespace detail {
 }
 
 // ── Parse aus einer Datei ───────────────────────────────────────────────────────────────────
-[[nodiscard]] inline std::optional<MessreiheV32> parse_messreihe_v32(std::filesystem::path const& xml_path,
-                                                                     std::string*                 error = nullptr) {
+[[deprecated("superseded by parse_experiment_profile / comdare_experiment — INC-D")]]
+[[nodiscard]] inline std::optional<MessreiheV32>
+parse_messreihe_v32(std::filesystem::path const& xml_path, std::string* error = nullptr) {
     std::ifstream in{xml_path};
     if (!in) {
         if (error) *error = "cannot open XML file: " + xml_path.string();
