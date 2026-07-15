@@ -133,3 +133,18 @@ T2 mapping (dünn, evtl. Sub-Aspekt T0/T11) · T1 cache_traversal (überlappt T5
 ---
 
 *Nach Freigabe wird dieses Dossier zur autoritativen Mess-Methodik-Doku; Dossier 17 Phase 2/6 werden durch Teil C+F hier präzisiert. Der M0-Befund (BEFUND.md) ist die zitierbare Grundlage.*
+
+---
+
+## Nachtraege — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unveraendert (Doku nie loeschen).
+
+- **[R9 · Anker docs/architektur/18_MESS_METHODIK_ACHSEN_OPTIMIERUNG_KONSOLIDIERT.md:104]** Die TABU-Aufzählung (Teil E, Zeile 104) additiv präzisieren, ohne den Bestand zu ändern: die Registry-`mp_list` als weiteren TABU-Eintrag aufnehmen und die golden-320-Herleitung als Klammer ergänzen — `mp_take_c<Enabled,4>` über die 4 Achsen = 4×4×5×4 = 320. Reine Doku-Präzisierung mit geringem Restrisiko, da `golden_fullpilot_320` bereits TABU ist (ein Registry-`mp_list`-Eingriff verändert den 320-Count transitiv) und der Code-Guard `test_striktheit_metaprog_guard.cpp` die volle TABU-Menge unabhängig durchsetzt.  
+  *(Bezug: TABU ohne GO — permutation_axes.xml, golden_fullpilot_320, ABI-MAJOR==4, POD-sizeof, GenusBindingTraits.)*
+- **[R8 · Anker docs/architektur/18_MESS_METHODIK_ACHSEN_OPTIMIERUNG_KONSOLIDIERT.md:105]** Additiver Querverweis zum honest-0>Phantom-Prinzip in TEIL E/F: der Mess-Pfad nutzt ausschließlich reale Katalog-DLLs (`sota_catalog` → `COMDARE_DEFINE_ANATOMY_MODULE` → DLL → `IObservableTier`), NIE das `std::unordered_map`-Surrogat (`PrtArtHashBackend`). Das W4-Gate ist als honest-100%-Invariante zu verankern, getragen vom Test `test_ap2_katalog_pfad_stubfrei.cpp` und Ledger-G2 als durchsetzenden Artefakten. (prt-art existierte im Weltbild dieses Docs vom 09.07. noch nicht — additive Ergänzung, keine Umschreibung.)  
+  *(Bezug: honest-0 > Phantom — nie einen Achsen-Effekt faken, lieber ehrlich „nicht laufzeit-variabel".)*
+- **[R6 · Anker docs/architektur/18_MESS_METHODIK_ACHSEN_OPTIMIERUNG_KONSOLIDIERT.md:114-119]** Additiv den R6-Metaprog-Grenzsatz aufnehmen und an A.4 (Last/Füllstand/Beschaffenheit als Parameter-Raum, Zeilen 44–46) verorten: Hot-Path-Achsen sind compile-time-only (CRTP+Concept, keine vtable, vgl. A.3), W/D (Workload/Dataset) dagegen bewusst runtime (E4-XML / E1-Laufzeit / E3-Permutation) — NICHT compile-time-statisch. Die 5-RC-runtime / 14-honest-0-Trennung (F.1/F.2) bleibt damit konsistent, wird aber um die korrekte compile-time/runtime-Grenze der A.4-Parameter geschärft.  
+  *(Bezug: F.1 genau 5 RC-steuerbare Achsen · F.2 14 honest-0-Achsen — ehrlich compile-time-only auf RC-Kanal, KEIN Defekt.)*
+- **[R10 · Anker docs/architektur/18_MESS_METHODIK_ACHSEN_OPTIMIERUNG_KONSOLIDIERT.md:23]** Additiv (als neue Unter-Notiz zu TEIL A, orthogonal zu den Mess-Kategorien in Zeile 23, ohne diese zu editieren) die kanonische 3-Mess-Modi-Struktur benennen: (1) Lebewesen-Wall-Clock, (2) Per-Achsen-Observer `observe_all` → `axis_stats[19][8]`, (3) Achsen-Vergleich vs. `std::map` als Güte-Entscheider — je Achse mit Makro- UND Mikro-Benchmarks. Zusätzlich die xml→pdf-Kette (Code 01–09, `InputIfFileExists`/honest-empty) als Auswertungs-Ausgabe für die Thesis-Anhänge verankern; Konzepte bereits in Ledger §12 l.503, `docs/thesis-anhang-wiring-READY.md` und Doc 24 §2/§8 — hier nur konsolidiert, nichts erfunden.  
+  *(Bezug: System-Achsen = Mess-Kategorien CLU, Cache-Miss L1/L2/L3, dTLB, Branch, IPC/CPI, Latenz, Durchsatz, Energie, Speicher-Fußabdruck.)*

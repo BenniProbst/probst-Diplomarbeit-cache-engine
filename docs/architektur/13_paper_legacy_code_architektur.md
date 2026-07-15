@@ -1970,3 +1970,12 @@ nur Type-Liste erweitern → automatisch +7 Tests pro Wrapper.
 ---
 
 **Ende Teil I (Stand 2026-05-26 spaeter — P2.D.q.s2 Pilot OriginalLockFreeMpmcConcurrentQueue, 732 Tests gruen).**
+
+---
+
+## Nachtraege — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unveraendert (Doku nie loeschen).
+
+- **[R8 · Anker docs/architektur/13_paper_legacy_code_architektur.md:27]** Additiver Verweis: Das hier verankerte SHA256-Locking (§7, `sha256_originals.txt`/`sha256_locked.txt`) plus das Linking gegen den jeweiligen Original-Compiler (Habich-Forderung §1, Validierungs-Workflow §10 mit dokumentierter Welch-Test-Konfidenz) bilden das Provenienz-Fundament der honest-100%-Anforderung (R8) — echte, verifizierte, nicht synthetisierte Mess-Grundlage, "Schummeln" per SHA-Tracking ausgeschlossen. Der so gelinkte Original-Code ist die reale Ausfuehrungsgrundlage der Katalog-DLLs. Komplementaer, nicht deckungsgleich zum W4-Gate: Doc 13 deckt die Code-Provenienz-Dimension der Ehrlichkeit ab, waehrend das W4-Gate (reale Katalog-DLLs statt `unordered_map`-Surrogat) eine separate, hier nicht auftauchende Dimension ist. Rein informativ, keine Aenderung noetig.  
+  *(Bezug: SHA256-Locking + Original-Compiler-Linking = honest-100%-Fundament, komplementaer zum W4-Gate)*

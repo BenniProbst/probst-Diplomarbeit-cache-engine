@@ -337,3 +337,12 @@ Pro K-Tab spezifische Klarstellung. Konkretisiert §4 + §5 mit Code-Beispielen.
 ---
 
 **Ende docs/architektur/11_axes_vs_strategies_disambiguation.md (Phase R.11 DONE).**
+
+---
+
+## Nachtraege — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unveraendert (Doku nie loeschen).
+
+- **[R9 · Anker docs/architektur/11_axes_vs_strategies_disambiguation.md:35]** Additiv einen Nachzieh-Banner an den Doc-Kopf setzen, der klarstellt, dass die hier gefuehrte 13-Hauptachsen-Zaehlung (§2.1, Liste 37-57) sowie die Aussage in §8 ("alle 13 Algorithmus-Achsen") inzwischen durch die kanonische 19-Achsen-Anatomie ersetzt sind (Mapping-Verweis; direkter Kanon-Beleg ist die axis_stats[19][8]-Struktur/R10, ergaenzt durch permutation_axes.xml bzw. Registry-mp_list unter R9). Der Banner verweist zusaetzlich darauf, dass die Ebene-I-Bausteine kanonisch in den 2 Registry-XMLs leben (ce-Registry als SOTA vs. prt-art-Registry, R1). Die 4-Konzept-Ebenen-Disambiguierung selbst (Ebene I-IV, C1-C12/F1-F29/S1-S30-Trennung) bleibt inhaltlich gueltig; nur die Achsen-Anzahl und das Pre-19-Achsen-Vokabular werden nachgezogen. Keine neue Architektur-Entscheidung — der Vermerk quervernetzt nur bereits kanonische Fakten (19-Achsen-Anatomie schon im Code, 2 Registry-XMLs schon durch R1 vorgeschrieben).  
+  *(Bezug: §2.1 "13 Hauptachsen (Stand 2026-05-18)" + §8 "alle 13 Algorithmus-Achsen" vs. kanonische 19 Achsen; Doc nicht als superseded markiert.)*

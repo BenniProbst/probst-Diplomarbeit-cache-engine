@@ -252,3 +252,20 @@ Die live-Verifikation korrigiert Teil D/H erheblich — der Fork war falsch gera
 - **Option B:** V32 wiederbeleben (XSD-Erweiterung + ~200 LOC neuer Parser + Orchestrator-Stub vollenden + Verdrahtung; reicher: op_type OP-1..6, XSD-validiert; bricht V31.F-Freeze).
 
 **Doppeltes Gate für Phase 4:** **(R1)** Reicht `YcsbWorkload` A–F, oder braucht die Mess-Kategorie OP-1..6 (Bulk-Insert/Range-Delete)? **(R2)** Treibt messreihe-`<workload>` die `WorkloadOptions`, oder bleibt `test_data_sets.xml` autoritativ (Doppelquelle vermeiden)? **+ main.cpp-V31.F-Freeze** (`v32_orchestrator.hpp:7`, „V31.F-Code in main.cpp bleibt unveraendert"). Beides = **User-GO nötig**; kein Blind-Bau. Volldetails: Backup-`BEFUND.md`.
+
+---
+
+## Nachtraege — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unveraendert (Doku nie loeschen).
+
+- **[R1 · Anker Teil H:206 / I.4]** Der offene V32-vs-`comdare_experiment`-Fork ist durch die spätere kanonische Entscheidung (12.–13.07., `feedback_unified_experiment_xml` / Ledger §15.1) als ÜBERFORMT zu markieren — nicht durch „2 Registry-XMLs" allein, sondern durch das GESAMTE unified-experiment-Modell: R1 (zwei Registry-XMLs gleichen Schemas — ce-Registry SOTA + prt-art-Registry, Bausteine je Achse NUR in den Registries) + R2 (eine Experiment-XML) + R3 (v32→Strategy). Anders als der Fork suggeriert wird V32 dabei NICHT verworfen, sondern als Strategy weitergeführt. Original stehen lassen, Verweis setzen; Ankerort I.4 (dort sitzt bereits die Fork-Korrektur).  
+  *(Bezug: Zeile 206 „V32-Schema aktivieren vs. `comdare_experiment` minimal um `<datasets>/<measurement_categories>` erweitern; Empfehlung V32 aktivieren".)*
+- **[R2 · Anker Zeile 72 (A.4) / I.4]** Den A.4-3-Stufen-Join explizit auf die 3-Phasen-Struktur der EINEN Experiment-XML abbilden: Stufe 1 → Phase 1 (prt-art), Stufe 2 → Phase 2 (cache-engine), Stufe 3 → Phase 3 (kombinierte Achsen). Damit werden Familie A (`comdare_thesis_profile`) und Familie C (`messreihe_v32`) in EINER XML VEREINT (Union statt Entweder-Oder); die Experiment-XML referenziert die Registries und trägt selbst KEINE Bausteine. Ergänzend den I.4-Fork als durch R2 aufgelöst kennzeichnen.  
+  *(Bezug: Zeile 72 „PRT-ART-3-Stufen-Join: Stufe 1 CE-Perms · Stufe 2 Prüfling-ersetzt · Stufe 3 A⋈B; Regel der abstrakt-leeren Achse".)*
+- **[R3 · Anker Zeile 252 (I.4-Option-B)]** Der „~200 LOC neue Parser" gehört als MODUL in den allgemeinen ce-Parser (`libs/common/serialization/xml_config_parser`), nicht als Standalone-Parser; das v32-Modul ist als STRATEGY-Pattern (`PhaseStrategyBase<Derived>`, CRTP + Concept) der Phase-/Experiment-Configs zu rahmen. Verweis auf R3 / Ledger §15.1 (`:323`, INC-D/E/G) als kanonische Umsetzung. Rein additiv — Fork-Doc erhalten, Zeiger auf die realisierte ce-Modul+Strategy-Fassung.  
+  *(Bezug: Zeile 252 „Option B: V32 wiederbeleben — XSD-Erweiterung + ~200 LOC neuer Parser + Orchestrator-Stub + Verdrahtung".)*
+- **[R9 · Anker Zeile 69]** Die Angabe „ABI-Major 3" für `kV3AxisSchema` widerspricht Doc 19:20 (dasselbe Schema als ABI-Major 4) sowie der kanonischen Vorgabe ABI-MAJOR==4 (Teil F:186 korrekt) und wirkt stale. Additiv auf ABI-Major 4 nachziehen; die Alternative „Observer-Snapshot-Major getrennt von der Tier-ABI-MAJOR==4 ausweisen" ist technisch fragwürdig, da der Code keinen separaten Observer-ABI-Major kennt — die Versionierung läuft ausschließlich über ABI-MAJOR==4. Kein Bump ohne GO.  
+  *(Bezug: Zeile 69 „Schema `kV3AxisSchema` = `axis_stats[19][8]+seg_ns[19]+Meta`, ABI-Major 3 (CE/31:44-62)".)*
+- **[R11 · Anker Zeile 72]** Der 3-Stufen-Join ist bereits ausgerichtet; zu ergänzen ist der Datei-Anker `pruefling_merge.hpp` sowie die Präzisierung der Regel: `PrueflingSlot` = compile-time-Substitution in GENAU EINE Achse (NIE hart verdrahtet). Beleg: User-Direktive 2026-05-30 + IST-Tests Doc 24 §8.9.1. Original nicht antasten.  
+  *(Bezug: Zeile 72 „Stufe 1/2/3 + Regel der abstrakt-leeren Achse — leere Prüfling-Achse reust alle CE-Algos".)*

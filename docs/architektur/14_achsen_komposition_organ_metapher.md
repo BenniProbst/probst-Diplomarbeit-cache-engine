@@ -3460,3 +3460,18 @@ braucht nur einen 1-Liner-Aufruf.
 **Ende Teil 19 §54 (Stand 2026-05-27 nacht — User-Hinweise + 3-Agent-Audit-
 Resultate dokumentiert + Priorisierung der naechsten Sprints + CMake-Robustness-
 Fix dokumentiert).**
+
+---
+
+## Nachtraege — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unveraendert (Doku nie loeschen).
+
+- **[R4 · Anker docs/architektur/14_achsen_komposition_organ_metapher.md:744]** Additiv an §17.3 + §21 ein Deprecation-/Korrektur-Banner setzen: Die Strategie `cmake -B build/perm_<hash>` (CMake-Treiber, ein .so/.dll je Permutation) ist durch die kanonische Direktive abgeloest, dass CEB den Tier-Binary-Build zur CEB-Laufzeit C++-seitig orchestriert (NICHT via CMake-per-Permutation, kein Python). Verweis auf `feedback_e4_xml_autoritative_bauanleitung_ceb_orchestriert` + `feedback_no_python_in_buildchain`. Alt-Text (auch die spaeteren CMake-SHARED-Snippets in §48.5/§51.5) bleibt unveraendert erhalten.  
+  *(Bezug: §17.3/§21 R5.D `cmake -B build/perm_<hash>` per Permutation vs. R4 CEB-Laufzeit-Orchestrierung des Binary-Builds.)*
+- **[R3 · Anker docs/architektur/14_achsen_komposition_organ_metapher.md:743]** Additiv an §17.3 einen Unterabschnitt "CEB-Konfigurationsquelle = Experiment-XML + 2 Registry-XMLs" ergaenzen: Die compile-time `TopicConfigSets` sind das Ziel, in das der XML-Parser (ce-Modul `libs/common/serialization/xml_config_parser`, v32 -> `PhaseStrategyBase<Derived>` CRTP+Concept) uebersetzt; die eine Experiment-XML (3-Phasen) referenziert die zwei Registry-XMLs (ce + prt-art). Verweis auf `feedback_unified_experiment_xml_plus_system_registry_xml`.  
+  *(Bezug: §17.3 konfiguriert CEB nur ueber compile-time TopicConfigSets ohne XML-Schicht — R1/R2/R3 fordern die XML-Schicht + Parser als ce-Modul.)*
+- **[R9 · Anker docs/architektur/14_achsen_komposition_organ_metapher.md:732]** Additiv an §17.2, §20 und §13 eine Schaerfungs-Notiz anbringen, dass `organ_count()` bzw. die Snapshot-Zahl kanonisch 19 ist (17->19 gemaess Kopf-Banner + AdHocComposition) und den Bezug zu `axis_stats[19][8]` herstellen. Die §28-Notiz (17->19) besteht bereits; §17.2 (732), §20 (891) und die §27.2-Tabelle (1156) fuehren noch "17" und erhalten die additive Notiz. Original-Tabellen/Signaturen werden nicht ueberschrieben.  
+  *(Bezug: Body durchgaengig "17 Achsen" (`organ_count(){return 17;}`, §13/§20/§27.2) vs. kanonisch 19 (`axis_stats[19][8]`, golden-320 `mp_take_c<Enabled,4>`).)*
+- **[R6 · Anker docs/architektur/14_achsen_komposition_organ_metapher.md:681]** Additiv ein kurzer Traceability-Querverweis, dass §17.1 (compile-time Anatomie, kein Runtime-Switch) zusammen mit §53 (runtime WorkloadDriver/WorkloadConfig) genau die R6-Metaprog-Grenze abbildet: Hot-Path compile-time-only (CRTP+Concepts), W/D (Workload/Dataset) bewusst runtime. Verweis auf `feedback_compile_time_only_no_runtime`. Inhaltlich bestaetigend — keine Korrektur des Bestands noetig.  
+  *(Bezug: §17.1 "kein Runtime-Switch" + §53 runtime-Workload == R6; §27.1-vtable ist Cold-Start-ABI-Grenze, nicht Hot-Path — kein Widerspruch.)*

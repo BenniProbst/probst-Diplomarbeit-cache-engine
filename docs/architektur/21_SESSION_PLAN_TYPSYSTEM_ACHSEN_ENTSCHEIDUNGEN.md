@@ -277,3 +277,11 @@ Architektur-Entscheidung). Boundary-saubere Alternativen ohne GO: die **Tag-Spre
 (Phase 1/4)** oder Prefetch-Unter-Achse (Phase 2) prüfen — ODER User-GO für die Tier-Level-Allocator-Architektur
 (0.3) bzw. die 0.2-Forks einholen. Empfehlung: nächste Phase erst Ist-verifizieren (wie 0.2/0.3 gezeigt: die
 Audit-Rahmung ist optimistisch), bevor als „punktuell" eingeplant.
+
+---
+
+## Nachträge — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unverändert (Doku nie löschen).
+
+- **[R5 · Anker docs/architektur/21_SESSION_PLAN_TYPSYSTEM_ACHSEN_ENTSCHEIDUNGEN.md:161]** Keine Korrektur der Auslagerung nötig — die Allocator-Differenzierung liegt korrekt in der PRT_ART-/extension-Schicht (prt-art als separater Prüfling, nicht in CEB gemergt) und golden-320 bleibt unberührt. Additiv einen Querverweis auf R11 setzen: der prt-art-3-Stufen-Join (Stufe 1 CE-Permutationen / Stufe 2 Prüfling-ersetzt in genau EINE Achse via `PrueflingSlot`-compile-time-Substitution / Stufe 3 A join B, Regel der abstrakt-leeren Achse; `PrueflingSlot` nie hart verdrahtet) ist die künftige extension-Schicht-Mechanik für diese Multi-Allocator-Permutation.  \n  *(Bezug: 0.3b inert; die Multi-Allocator-Permutation lebt in der PRT_ART-/extension-Schicht, golden-320 permutiert die Allocator-Achse NICHT — allocator=std_malloc ×320.)*

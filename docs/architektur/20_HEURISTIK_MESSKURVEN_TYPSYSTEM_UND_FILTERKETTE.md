@@ -142,3 +142,9 @@ binary_id-Pfad berührt und einen eigenen, golden-verifizierten Increment erford
 
 
 > **SUPERSEDIERT/PRÄZISIERT (2026-07-10):** Das „orthogonal compile/dynamic"-Bild aus §I ist durch das autoritative **Layer-/Haupt-Unter-Achsen-Modell** in `21_SESSION_PLAN_TYPSYSTEM_ACHSEN_ENTSCHEIDUNGEN.md` ersetzt (User-Klärung + Achsen-Utilization-Audit wf_73129d50). Die 7 §H-Forks sind dort ALLE entschieden; §H bleibt als Historie stehen.
+
+## Nachtraege — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unveraendert (Doku nie loeschen).
+
+- **[R9 · Anker docs/architektur/20_HEURISTIK_MESSKURVEN_TYPSYSTEM_UND_FILTERKETTE.md:94-96]** Kein Handlungsbedarf — die §G-Warnung ist bereits R9-konsistent: die Kardinalitaet ist strikt an die mp_list-Produkt-Identitaet `binary_count() == Π mp_size(Enabled_i)` gebunden und der Raum wird nie voll materialisiert (C1060), sodass die Literalzahl 137.594.142.720.000 keinen golden-320/Registry-mp_list-TABU-Bruch darstellt. Empfohlen lediglich ein kurzer Querverweis auf das R9-TABU (golden-320 = `mp_take_c<Enabled,4>`) zur Verstaerkung der Identitaets-Invariante.  \n  *(Bezug: Kardinalitaet = Produkt-Identitaet, nie Literalzahl; keine Voll-Materialisierung.)*

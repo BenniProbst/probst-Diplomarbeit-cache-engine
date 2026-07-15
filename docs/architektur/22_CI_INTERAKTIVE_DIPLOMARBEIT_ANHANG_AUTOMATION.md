@@ -158,3 +158,13 @@ Aus `wf_2c594d82` (25 Kandidaten → 4 adversarial bestätigt; **kein high-Perf-
 
 **Direktive:** keine Behelfswege, immer der sauberste Weg ([[feedback_immer_schwerer_offizieller_weg_keine_behelfswege]]);
 kein Python in der Build-Chain; die bestehenden Libs wiederverwenden statt Neucode.
+
+---
+
+## Nachträge — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unverändert (Doku nie löschen).
+
+- **[R10 · Anker docs/architektur/22_CI_INTERAKTIVE_DIPLOMARBEIT_ANHANG_AUTOMATION.md:105]** Additive REV-Notiz an TEIL C/D/E setzen: das Stufen-Mapping auf den Ist-Stand der xml→pdf-Kette 01-09 nachziehen (appendix_generator = Stufe 08, tex_formatter = Stufe 09, latex_to_pdf = Stufe 06). Die alten "Code/06_*"-Bezeichnungen als historischen Planungsstand kennzeichnen (Dossier-Datum 2026-07-11, überholt am 07-12/07-13, als 06/07 bereits vergeben waren) — nicht löschen; die kanonischen Artefakte (Code + Ledger) tragen das korrekte 08/09/06-Mapping bereits.  \n  *(Bezug: veraltete Stufen-Nummerierung — "Code/06_appendix_generator"/"Code/06_tex_formatter" kollidiert mit der real vergebenen Stufe 06 = latex_to_pdf und kann die CMake/CI-Verdrahtung fehlleiten.)*
+- **[R10 · Anker docs/architektur/22_CI_INTERAKTIVE_DIPLOMARBEIT_ANHANG_AUTOMATION.md:31]** Additive Ergänzung in TEIL B.3/C.1: die \InputIfFileExists-honest-empty-Verdrahtung für die additiven, mess-gegateten Darstellungen (P3 ECDF/Range, P4 Segment-Attribution, P5 Forest-Plot) als Pflicht festhalten, damit das PDF auch vor einem Messlauf sauber kompiliert; als Ist-Beleg auf `thesis/.../A_measurements.tex:82/92/103` verweisen (dort bereits bilingual, vorplatziert in der handgepflegten Konsum-Kapiteldatei verdrahtet).  \n  *(Bezug: die Doc beschreibt nur hartes \input der 12 als % AUTO-GENERATED markierten Tabellen; R10 verlangt \InputIfFileExists honest-empty für die kettengespeisten Anhänge — das Ist ist der Doc hier bereits voraus.)*
+- **[R8 · Anker docs/architektur/22_CI_INTERAKTIVE_DIPLOMARBEIT_ANHANG_AUTOMATION.md:97]** Die honest-empty-Direktive beibehalten (Darstellungen auf Null-/NullPmcSource-Spalten bis #26 NICHT bauen) und lediglich um den R8-Quellen-Aspekt aus dem nächsten Befund ergänzen: reale Katalog-DLL statt Surrogat (PrtArtHashBackend/std::unordered_map), W4-Gate. Rein additiv — kein Bestandstext entfällt, es wird eine bereits bindende R8-Anforderung angewandt.  \n  *(Bezug: alle pmc_*-Spalten = 0 (NullPmcSource) → jede Cache-Miss-Darstellung ist bis #26 honest-empty, NICHT bauen; stark an R8/honest-100% ausgerichtet.)*

@@ -404,3 +404,16 @@ cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 
 **Pointer-Bump Haupt-Repo:** am Ende der B-Gesamtgruppe (cache-engine-Submodul-Pointer `0556e3a`→finaler B-HEAD).
 
 **OFFENER PRÜFPUNKT A4 (Inkonsistenz):** Zeile 375 markiert `_paper_extractions/` (cluster_D/F) + `_rev5_extractions/` (cache_engine_families/state_visitor/taxonomien/rev4_delta) als OFFEN, Zeile 373 + HISTORIE als erledigt (`23c6462`). Nach B-Architektur-Block per Grep verifizieren + Häkchen konsolidieren.
+
+---
+
+## Nachtraege — E2E-Re-Audit 2026-07-15 (Ausrichtung an §0-GOAL-V5 / erweiterte A-H-Architektur)
+
+> Additive Ausrichtungs-Vermerke; der Originaltext oben bleibt unveraendert (Doku nie loeschen).
+
+- **[R11 · Anker docs/architektur/TIER-AUFLOESUNG-AUDIT-UND-MAPPING-PLAN.md:43-46,81-82]** Keine Korrektur noetig — das 3-Stufen-Join-Modell (§1: Stufe 1 = nur cache-engine, Stufe 2 = Prüfling-ersetzt-mit-Fallback, Stufe 3 = voller Join) und der Verweis auf `pruefling_merge.hpp` decken sich exakt mit R11; der frueher vermutete Konflikt „ist prt-art ein Lebewesen / in CEB gemergt" ist damit aufgeloest (beide sind getrennte Bibliotheken, die ueber die ②Subject-ABI treiben). Additiv praezisieren: die PrueflingSlot-Substitution erfolgt compile-time „in genau EINE Achse", und eine leere Prüfling-Achse reust automatisch alle cache-engine-Algorithmen dieser Achse (code-belegt, User-Direktive 2026-05-26 in `pruefling_merge.hpp`).  
+  *(Bezug: 3-Stufen-Join Stufe1 CE-Perms / Stufe2 Prüfling-ersetzt / Stufe3 A⋈B; Prüfling-Slot-Pattern `pruefling_merge.hpp`.)*
+- **[R6 · Anker docs/architektur/TIER-AUFLOESUNG-AUDIT-UND-MAPPING-PLAN.md:81-82]** Die Formulierung „`std::variant`-Bausteine" fuer den Prüfling/SOTA-Fallback liest sich wie Runtime-Dispatch und ist zu praezisieren: der Wechsel zwischen Prüfling-Stack und Stand-der-Technik-Stack erfolgt compile-time via PrueflingSlot (mp_list/CRTP + `std::conditional_t`) in genau EINE Achse; `std::variant` dient — falls verwendet — nur als Storage, die Selektion bleibt statisch (`pruefling_merge.hpp:99-124` nutzt `mp_list`/`std::conditional_t`, KEIN `std::variant`; `permutation_strategy_concept.hpp:10-11` verbietet Runtime-Tag/`std::variant`). Verweis auf die R6-Metaprogrammier-Grenze ergaenzen: nur W/D-Dispatch bewusst runtime, alle Achsen-Bausteine im Hot-Path compile-time-only (CRTP+Concepts, kein Runtime-Switch/vtable).  
+  *(Bezug: „Compile-Time-Fallback … (`std::variant`-Bausteine; `pruefling_merge.hpp`; Join Stufe 2)".)*
+- **[R1 · Anker docs/architektur/TIER-AUFLOESUNG-AUDIT-UND-MAPPING-PLAN.md:39-41,157-158]** Die Zwei-Bibliotheken-Symmetrie (cache-engine und PRT-ART beide Bibliotheken) und „je Achse einen Katalog von Organ-Varianten" sind der konzeptionelle Vorlaeufer von R1, benennen aber die formalisierte Architektur noch nicht (Doc datiert 2026-06-15, predatiert R1/Ledger §15.1, nicht deprecatet). Additiv ergaenzen: der Organ-Katalog je Achse jeder Bibliothek ist nun als Registry-XML formalisiert — ZWEI Registry-XMLs gleichen Schemas (ce-Registry SOTA + prt-art-Registry), in denen die Bausteine je Achse liegen (NICHT in der Diplomarbeit-/Experiment-XML). Querverweis auf Ledger §15.1 / `feedback_unified_experiment_xml`.  
+  *(Bezug: „cache-engine und PRT-ART sind beide Bibliotheken" + „Bibliothek — stellt je Achse einen Katalog von Organ-Varianten bereit".)*
