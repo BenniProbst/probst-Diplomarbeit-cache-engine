@@ -613,40 +613,93 @@ int main(int argc, char* argv[]) {
                 std::filesystem::create_directories(e4_dir, ec);
                 if (ec) throw std::runtime_error("create_directories(" + e4_dir.string() + "): " + ec.message());
 
-                pf::ProfileRunArgs pa;
-                pa.profile_path      = thesis_profile;
-                pa.out_csv           = e4_dir / "measurements.csv";
-                pa.src_dir           = e4_dir / "src";
-                pa.dll_dir           = e4_dir / "dll";
-                pa.build_version     = "m3v2";
-                pa.min_free_gb       = parse_min_free_gb_from_env();
-                pa.platform_override = env_trimmed("COMDARE_PLATFORM");
-                if (pa.platform_override.empty()) pa.platform_override = compile_time_platform_tag();
+                // Bruecke-I4 (2026-07-16): der E4-Run-Block deckt — wie der --validate-Zweig (S0/FORK-4) — BEIDE
+                // offiziellen Profil-Wurzeln ab. Ein Root-Tag-Sniff (rein-lesend ueber den common-DOM) entscheidet:
+                // <comdare_thesis_profile> -> run_profile_facade (UNVERAENDERT, Thesis-Weg); <comdare_experiment> ->
+                // run_experiment_profile_facade (die duenne 3-Phasen-Bruecke ueber DEMSELBEN E4-Unterbau, echte DLLs,
+                // DIE EINE offizielle CSV e4_xml/measurements.csv, E8). Beide Parser liefern nullopt bei Fremd-Tag,
+                // daher ist der reine Root-Tag-Read gefahrlos. COMDARE_RUN_V32_EXPERIMENT/COMDARE_V32_DRIVER_ENABLE
+                // werden NICHT benutzt — die Bruecke ERSETZT die untersagte Parallelstrecke (kein neuer Mess-Pfad).
+                std::string root_tag;
+                if (std::ifstream in{thesis_profile, std::ios::binary}; in) {
+                    std::ostringstream ss;
+                    ss << in.rdbuf();
+                    if (auto const root = comdare::common::xml::parse_document(ss.str())) root_tag = root->tag;
+                }
 
-                // Achse-2-Lastprofile: leer ist OK — die run_profile-Fassade defaultet auf die zum Profil
-                // co-lokalisierten Lastprofile (algorithm_profiles/load_profiles/), sodass die XML selbst-
-                // suffizient ist (G1/#229). COMDARE_LOAD_PROFILE_DIR bleibt reiner Override; findet die
-                // Fassade 0 gueltige Profile, bricht SIE mit exit 4 ab (Achse 2 nie still leer =
-                // two_phase_valid=0-Schutz bleibt gewahrt, nur in die WIE-Schicht verlagert).
-                pa.load_profile_dir = env_trimmed("COMDARE_LOAD_PROFILE_DIR");
-                if (auto cap = parse_size_env_strict("COMDARE_E4_CAP")) pa.max_binaries = *cap;
-                if (auto ws = parse_size_env_strict("COMDARE_WORKLOAD_RECORDS"))
-                    pa.working_set_override = static_cast<std::uint64_t>(*ws);
+                if (root_tag == "comdare_experiment") {
+#if defined(COMDARE_CE_AXIS_REGISTRY_PATH) && defined(COMDARE_PRT_AXIS_REGISTRY_PATH)
+                    pf::ExperimentRunArgs xa;
+                    xa.profile_path     = thesis_profile;
+                    xa.out_csv          = e4_dir / "measurements.csv"; // E8: DIE EINE offizielle CSV (wie Thesis-Weg)
+                    xa.src_dir          = e4_dir / "src";
+                    xa.dll_dir          = e4_dir / "dll";
+                    xa.ce_registry_path = COMDARE_CE_AXIS_REGISTRY_PATH; // 2-Registry-Kanon (Validat, I2)
+                    xa.prt_registry_path =
+                        COMDARE_PRT_AXIS_REGISTRY_PATH; // Host reicht beide herein (Baseline-Layering)
+                    xa.build_version     = "m3v2";
+                    xa.min_free_gb       = parse_min_free_gb_from_env();
+                    xa.platform_override = env_trimmed("COMDARE_PLATFORM");
+                    if (xa.platform_override.empty()) xa.platform_override = compile_time_platform_tag();
+                    xa.load_profile_dir = env_trimmed("COMDARE_LOAD_PROFILE_DIR");
+                    if (auto cap = parse_size_env_strict("COMDARE_E4_CAP")) xa.max_binaries = *cap;
+                    if (auto ws = parse_size_env_strict("COMDARE_WORKLOAD_RECORDS"))
+                        xa.working_set_override = static_cast<std::uint64_t>(*ws);
+                    if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
+                        xa.build_version_tag_override = build_tag;
 
-                if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
-                    pa.build_version_tag_override = build_tag;
-                if (env_trimmed("COMDARE_RUN_SOTA") == "0") pa.run_sota_series = false;
+                    std::cout << "[E4] comdare_experiment-Bruecke via run_experiment_profile-Fassade: profile="
+                              << thesis_profile << " -> " << xa.out_csv.string() << "\n";
+                    pf::ExperimentRunResult const xr = pf::run_experiment_profile_facade(xa);
+                    std::cout << "[E4] fertig (experiment): exit=" << xr.exit_code << " phasen=" << xr.phases
+                              << " sota_rows=" << xr.sota_rows << " sota_ids=" << xr.sota_binary_ids
+                              << " measured=" << xr.measured << " resumed=" << xr.resumed << "\n";
+                    if (xr.exit_code != 0) {
+                        e4_overall_rc = xr.exit_code;
+                        std::cerr << "[E4] WARN: comdare_experiment-Lauf exit=" << xr.exit_code << ".\n";
+                    }
+#else
+                    std::cerr << "[E4] '" << thesis_profile
+                              << "': comdare_experiment erkannt, aber die statischen Registry-Pfade wurden nicht "
+                                 "einkompiliert (COMDARE_CE/PRT_AXIS_REGISTRY_PATH) -- ce-Klon/CMake nicht synchron?\n";
+                    e4_overall_rc = 5;
+#endif
+                } else {
+                    pf::ProfileRunArgs pa;
+                    pa.profile_path      = thesis_profile;
+                    pa.out_csv           = e4_dir / "measurements.csv";
+                    pa.src_dir           = e4_dir / "src";
+                    pa.dll_dir           = e4_dir / "dll";
+                    pa.build_version     = "m3v2";
+                    pa.min_free_gb       = parse_min_free_gb_from_env();
+                    pa.platform_override = env_trimmed("COMDARE_PLATFORM");
+                    if (pa.platform_override.empty()) pa.platform_override = compile_time_platform_tag();
 
-                std::cout << "[E4] XML-Lauf via run_profile-Fassade: profile=" << thesis_profile << " -> "
-                          << pa.out_csv.string() << "\n";
-                pf::ProfileRunResult const rr = pf::run_profile_facade(pa);
-                std::cout << "[E4] fertig: exit=" << rr.exit_code << " basis_rows=" << rr.basis_rows
-                          << " sota_rows=" << rr.sota_rows << " basis_ids=" << rr.basis_binary_ids
-                          << " sota_ids=" << rr.sota_binary_ids << " measured=" << rr.measured
-                          << " resumed=" << rr.resumed << "\n";
-                if (rr.exit_code != 0) {
-                    e4_overall_rc = rr.exit_code;
-                    std::cerr << "[E4] WARN: E4-XML-Lauf exit=" << rr.exit_code << ".\n";
+                    // Achse-2-Lastprofile: leer ist OK — die run_profile-Fassade defaultet auf die zum Profil
+                    // co-lokalisierten Lastprofile (algorithm_profiles/load_profiles/), sodass die XML selbst-
+                    // suffizient ist (G1/#229). COMDARE_LOAD_PROFILE_DIR bleibt reiner Override; findet die
+                    // Fassade 0 gueltige Profile, bricht SIE mit exit 4 ab (Achse 2 nie still leer =
+                    // two_phase_valid=0-Schutz bleibt gewahrt, nur in die WIE-Schicht verlagert).
+                    pa.load_profile_dir = env_trimmed("COMDARE_LOAD_PROFILE_DIR");
+                    if (auto cap = parse_size_env_strict("COMDARE_E4_CAP")) pa.max_binaries = *cap;
+                    if (auto ws = parse_size_env_strict("COMDARE_WORKLOAD_RECORDS"))
+                        pa.working_set_override = static_cast<std::uint64_t>(*ws);
+
+                    if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
+                        pa.build_version_tag_override = build_tag;
+                    if (env_trimmed("COMDARE_RUN_SOTA") == "0") pa.run_sota_series = false;
+
+                    std::cout << "[E4] XML-Lauf via run_profile-Fassade: profile=" << thesis_profile << " -> "
+                              << pa.out_csv.string() << "\n";
+                    pf::ProfileRunResult const rr = pf::run_profile_facade(pa);
+                    std::cout << "[E4] fertig: exit=" << rr.exit_code << " basis_rows=" << rr.basis_rows
+                              << " sota_rows=" << rr.sota_rows << " basis_ids=" << rr.basis_binary_ids
+                              << " sota_ids=" << rr.sota_binary_ids << " measured=" << rr.measured
+                              << " resumed=" << rr.resumed << "\n";
+                    if (rr.exit_code != 0) {
+                        e4_overall_rc = rr.exit_code;
+                        std::cerr << "[E4] WARN: E4-XML-Lauf exit=" << rr.exit_code << ".\n";
+                    }
                 }
             }
         } catch (std::exception const& e) {
