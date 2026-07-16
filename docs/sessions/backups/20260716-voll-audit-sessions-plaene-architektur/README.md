@@ -20,7 +20,7 @@
 
 ## Sicherheits-Vermerk
 - **Secret-Scan vor Commit:** 0 Treffer über alle Rohdaten (Muster: `glpat-…`-Werte, `oauth2:…@`, AWS-Keys, PRIVATE-KEY-Blöcke; eindeutiger Zähl-Scan). Die Auditoren waren read-only ohne Credential-Zugriff.
-- **Mojibake-Byte-Treffer in 23 Rohdaten-Dateien = wörtliche Zitate des Prüf-Musters** (`Ã|â€`) aus den Audit-Kadenz-Belegen — KEINE echte Doppelkodierung; Rohdaten werden nicht nachbearbeitet.
+- **Doppelkodierungs-Byte-Treffer in 23 Rohdaten-Dateien = wörtliche Zitate des Prüf-Musters** (die cp1252-fehlgelesenen UTF-8-Lead-Byte-Folgen „A-Tilde" bzw. „a-Zirkumflex-Euro") aus den Audit-Kadenz-Belegen — KEINE echte Doppelkodierung; Rohdaten werden nicht nachbearbeitet.
 
 ## Verweise
 - Ledger `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md` §12 (2026-07-16) + §15.8 (Wiederaufnahme-Anker).
