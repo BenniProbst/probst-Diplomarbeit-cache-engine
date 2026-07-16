@@ -35,10 +35,11 @@
 
 #include "experiment_driver/experiment_driver.hpp"
 #include "xml_config_parser/xml_config_parser.hpp"
-#include "messreihen_workload.hpp"        // #31: E4-XML Workload-Drive (<workload> via ce-DOM, kein Submodul-Bump)
-#include "permutations_runtime_check.hpp" // V36.D
-#include "measurement_writer.hpp"         // V41.B1
-#include "stats_aggregator.hpp"           // V41.B3
+#include "xml_config_parser/xml_reader.hpp" // Bruecke-I2: Root-Tag-Sniff des --validate-Profils (common-DOM)
+#include "messreihen_workload.hpp"          // #31: E4-XML Workload-Drive (<workload> via ce-DOM, kein Submodul-Bump)
+#include "permutations_runtime_check.hpp"   // V36.D
+#include "measurement_writer.hpp"           // V41.B1
+#include "stats_aggregator.hpp"             // V41.B3
 
 #include <comdare/workload_generator/workload_generator.hpp>
 
@@ -291,7 +292,37 @@ int main(int argc, char* argv[]) {
             std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-            return comdare::cache_engine::builder::profile_facade::validate_profile_facade(prof, std::cout);
+
+            // Bruecke-I2 (2026-07-16): der --validate-Zweig deckt BEIDE offiziellen Profil-Wurzeln ab. Ein
+            // Root-Tag-Sniff (rein-lesend ueber den common-DOM) entscheidet: <comdare_thesis_profile> -> das
+            // Achsen-/Werte-Gate (validate_profile_facade, wie bisher); <comdare_experiment> -> das 3-Phasen-
+            // Gate (validate_experiment_profile_facade) mit den per CMake einkompilierten STATISCHEN ce+prt-
+            // Registry-Pfaden (2-Registry-Kanon; der Host reicht sie herein, die ce-Fassade haelt keinen prt-
+            // art-Pfad hart vor — Baseline-Layering). Beide Parser liefern nullopt bei Fremd-Tag, daher ist der
+            // reine Root-Tag-Read gefahrlos; eine unbekannte/unlesbare Wurzel -> rc 5 (kein Bau).
+            std::string root_tag;
+            if (std::ifstream in{prof, std::ios::binary}; in) {
+                std::ostringstream ss;
+                ss << in.rdbuf();
+                if (auto const root = comdare::common::xml::parse_document(ss.str())) root_tag = root->tag;
+            }
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            if (root_tag == "comdare_thesis_profile") { return pf::validate_profile_facade(prof, std::cout); }
+            if (root_tag == "comdare_experiment") {
+#if defined(COMDARE_CE_AXIS_REGISTRY_PATH) && defined(COMDARE_PRT_AXIS_REGISTRY_PATH)
+                return pf::validate_experiment_profile_facade(prof, COMDARE_CE_AXIS_REGISTRY_PATH,
+                                                              COMDARE_PRT_AXIS_REGISTRY_PATH, std::cout);
+#else
+                std::cerr << "[validate] '" << prof
+                          << "': comdare_experiment erkannt, aber die statischen Registry-Pfade wurden nicht "
+                             "einkompiliert (COMDARE_CE/PRT_AXIS_REGISTRY_PATH) -- ce-Klon/CMake nicht synchron?\n";
+                return 5;
+#endif
+            }
+            std::cerr << "[validate] '" << prof << "': unbekannte/unlesbare Wurzel"
+                      << (root_tag.empty() ? "" : " '" + root_tag + "'")
+                      << " -- weder <comdare_thesis_profile> noch <comdare_experiment>. KEIN Bau ausgefuehrt.\n";
+            return 5;
         }
     }
 

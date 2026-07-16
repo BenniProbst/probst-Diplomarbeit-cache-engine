@@ -25,6 +25,13 @@ if(TARGET comdare::profile_run_facade)
         "${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/m3v2_study.profile.xml")
     target_compile_definitions(messung_driver PRIVATE
         "COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE=\"${_comdare_default_thesis_profile}\"")
+    # Bruecke-I2 (2026-07-16): die 2 STATISCHEN Registry-Pfade (2-Registry-Kanon) als compile-defs am
+    # messung_driver-Target. main.cpp liest sie via #ifdef und reicht sie an validate_experiment_profile_facade
+    # herein — je Engine EINE Registry an ihrem dokumentierten Pfad (verschiedene Verzeichnisse!); die ce-Fassade
+    # haelt KEINEN prt-art-Pfad hart vor (ce=Framework, kennt das prt-art-Repo-Layout nicht — Baseline-Layering).
+    target_compile_definitions(messung_driver PRIVATE
+        "COMDARE_CE_AXIS_REGISTRY_PATH=\"${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/cache_engine_axis_registry.xml\""
+        "COMDARE_PRT_AXIS_REGISTRY_PATH=\"${COMDARE_PRT_ART_DIR}/prt_art/algorithm_profiles/prt_art_axis_registry.xml\"")
     message(STATUS "[messung_driver] E4-XML-Fassade angedockt (opt-in COMDARE_RUN_E4_XML=1)")
 else()
     # FATAL statt WARNING: ce und super werden atomar (Submodul-Bump) versioniert -- ein fehlendes
