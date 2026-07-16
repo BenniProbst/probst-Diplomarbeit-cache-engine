@@ -1,0 +1,61 @@
+# fixture_sync_check.cmake — WP-4/F33+F66 (Voll-Audit 2026-07-16): super-seitiges Fixture-Sync-Gate.
+#
+# PROBLEM: die ce-Test-Fixtures tests/unit/thesis_tiere/{experiment_golden.xml, prt_art_axis_registry.xml}
+# sind KOPIEN (Layering-Doktrin: ce darf prt-art nicht konsumieren; Golden-Instanz doppelt super/ce ohne
+# entschiedene Kanonizitaet, F27 user-gated) — ohne Sync-Gate testete ce nach einer Master-Aenderung still
+# gegen einen stalen Stand (Phantom-Fixture, honest-100%-Beruehrung). Das super-Repo konsumiert BEIDE
+# Submodule -> hier ist der layering-saubere Ort fuer den Byte-Vergleich (Befund-Fixes F33/F66).
+#
+# UEBERGANG bis E7-Single-Source (Bruecke I7): User-E7 will langfristig EINE Quelle statt Kopien; dieses
+# Gate ist die Uebergangs-Sicherung, bis die Single-Source-Struktur steht — danach ersatzlos abloesbar.
+#
+# MECHANIK: KOPIE == MASTER byte-genau, NACH Ausblendung des markierten FIXTURE-PROVENIENZ-Kommentar-
+# Blocks in der Kopie (der Block dokumentiert Herkunft+Sync-Pflicht IN der Kopie und existiert im Master
+# bewusst nicht). Fehlt ein Nachbar-Checkout (Submodule nicht ausgecheckt), wird sauber GESKIPPT
+# (Ausgabe-Marker FIXTURE-SYNC-SKIP + ctest-Property SKIP_REGULAR_EXPRESSION), NIE stumm-gruen.
+#
+# Erwartete -D Variablen: MASTER (Referenz-Datei), KOPIE (Fixture-Kopie mit optionalem Provenienz-Block).
+
+foreach(_req MASTER KOPIE)
+    if(NOT DEFINED ${_req})
+        message(FATAL_ERROR "fixture_sync_check: -D${_req} fehlt.")
+    endif()
+endforeach()
+
+if(NOT EXISTS "${MASTER}" OR NOT EXISTS "${KOPIE}")
+    # Sauberer SKIP (kein Fehler, kein Stumm-Gruen): Nachbar-Checkout fehlt (z.B. Submodule nicht
+    # initialisiert). Der Marker matcht die SKIP_REGULAR_EXPRESSION des add_test-Aufrufs.
+    message(STATUS "FIXTURE-SYNC-SKIP: Nachbar-Checkout fehlt (MASTER='${MASTER}' KOPIE='${KOPIE}').")
+    return()
+endif()
+
+file(READ "${MASTER}" _master)
+file(READ "${KOPIE}" _kopie)
+
+# Markierten Provenienz-Block aus der KOPIE ausblenden (genau EIN Block; inkl. Folge-Newline).
+set(_marker "<!-- FIXTURE-PROVENIENZ")
+string(FIND "${_kopie}" "${_marker}" _p)
+if(NOT _p EQUAL -1)
+    string(SUBSTRING "${_kopie}" 0 ${_p} _head)
+    string(SUBSTRING "${_kopie}" ${_p} -1 _rest)
+    string(FIND "${_rest}" "-->" _e)
+    if(_e EQUAL -1)
+        message(FATAL_ERROR "fixture_sync_check: FIXTURE-PROVENIENZ-Block in '${KOPIE}' ohne '-->' (kaputt).")
+    endif()
+    math(EXPR _after "${_e} + 3")
+    string(SUBSTRING "${_rest}" ${_after} -1 _tail)
+    if(_tail MATCHES "^\n")
+        string(SUBSTRING "${_tail}" 1 -1 _tail)
+    endif()
+    set(_kopie "${_head}${_tail}")
+endif()
+
+if(NOT _kopie STREQUAL _master)
+    message(FATAL_ERROR
+        "fixture_sync_check: DRIFT — Fixture-Kopie != Master (Byte-Vergleich nach Provenienz-Ausblendung).\n"
+        "  MASTER: ${MASTER}\n"
+        "  KOPIE:  ${KOPIE}\n"
+        "Fix: Kopie vom Master nachziehen (bzw. bei bewusster Master-Aenderung beide synchron committen); "
+        "der FIXTURE-PROVENIENZ-Block in der Kopie bleibt dabei erhalten.")
+endif()
+message(STATUS "fixture_sync_check: OK — Kopie byte-identisch zum Master (ohne Provenienz-Block).")

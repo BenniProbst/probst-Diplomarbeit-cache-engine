@@ -119,3 +119,28 @@ if(COMDARE_V32_ENABLE)
     # #265-b: s.o. — messreihe_report_exporter.hpp zieht v32_orchestrator -> Bruecke -> comdare::platform.
     target_link_libraries(test_messreihe_report_exporter PRIVATE comdare::platform)
 endif()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WP-4/F33+F66 (Voll-Audit 2026-07-16) — Fixture-Sync-Gates (Script-Tests, KEIN gtest/Build):
+# die ce-Fixture-KOPIEN tests/unit/thesis_tiere/{experiment_golden.xml, prt_art_axis_registry.xml}
+# muessen byte-identisch zu ihren Mastern bleiben (super Code/test_data_xml/experiment_golden.xml
+# bzw. prt-art prt_art/algorithm_profiles/prt_art_axis_registry.xml) — sonst testet ce still gegen
+# einen stalen Stand. Das super-Repo konsumiert BEIDE Submodule -> layering-sauberer Pruef-Ort.
+# Der markierte FIXTURE-PROVENIENZ-Kommentar-Block der Kopien wird vor dem Vergleich ausgeblendet
+# (fixture_sync_check.cmake). Fehlt ein Nachbar-Checkout, SKIP sauber (SKIP_REGULAR_EXPRESSION).
+# UEBERGANG bis E7-Single-Source (Bruecke I7) — danach durch die Single-Source-Struktur abloesbar.
+# Label da_unit: laeuft im test:unit-Gate (ctest -L da_unit); braucht kein Build-Target.
+# ─────────────────────────────────────────────────────────────────────────────
+add_test(NAME test_fixture_sync_experiment_golden
+    COMMAND "${CMAKE_COMMAND}"
+        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden.xml"
+        "-DKOPIE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden.xml"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_sync_check.cmake")
+add_test(NAME test_fixture_sync_prt_registry
+    COMMAND "${CMAKE_COMMAND}"
+        "-DMASTER=${COMDARE_PRT_ART_DIR}/prt_art/algorithm_profiles/prt_art_axis_registry.xml"
+        "-DKOPIE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/prt_art_axis_registry.xml"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_sync_check.cmake")
+set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_registry
+    PROPERTIES LABELS "da_unit;fixture_sync" TIMEOUT 60
+    SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP")
