@@ -217,6 +217,8 @@ analyse:thesis-data:
     - 'curl -sf -o ce-measure.zip "${CI_API_V4_URL}/projects/comdare%2Fresearch%2Fcomdare-cache-engine/jobs/artifacts/main/download?job=pmc:amd" -H "JOB-TOKEN: ${CI_JOB_TOKEN}" && unzip -o -q ce-measure.zip -d ce-measure && echo "-> Mess-Artefakte uebernommen" || echo "-> keine CI-Mess-Artefakte (NAS-Writeback-Modell) -> baue mit committetem Bestand"'
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
+    # (I-PMC-1 gilt NUR den 2 Mess-Jobs measure:smoke/measure:golden-320 — dieser analyse-Job baut
+    # Auswertungswerkzeuge ohne Messung und bleibt bewusst ohne COMDARE_ENABLE_PMC.)
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25)
     - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator
@@ -440,7 +442,11 @@ measure:smoke:
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
-    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    # I-PMC-1 (F9, User 2026-07-16 "PFLICHT fuer Vollstaendigkeit aller perf-Messwerte"): -DCOMDARE_ENABLE_PMC=ON
+    # aktiviert unter __linux__ die reale perf_event_open-Quelle (pmc_source_factory.hpp:19/32; prod1-Rechte
+    # seit 25.06. bewiesen, Job 189916: pmc_available=1, cache_misses_l1=4190096). Ohne das Flag schrieb der
+    # offizielle Mess-Lauf pmc_available=0/honest-0 trotz fertiger Infra.
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
     - |
@@ -516,7 +522,11 @@ measure:golden-320:
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
-    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    # I-PMC-1 (F9, User 2026-07-16 "PFLICHT fuer Vollstaendigkeit aller perf-Messwerte"): -DCOMDARE_ENABLE_PMC=ON
+    # aktiviert unter __linux__ die reale perf_event_open-Quelle (pmc_source_factory.hpp:19/32; prod1-Rechte
+    # seit 25.06. bewiesen, Job 189916: pmc_available=1, cache_misses_l1=4190096). Ohne das Flag schrieb der
+    # offizielle Mess-Lauf pmc_available=0/honest-0 trotz fertiger Infra.
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
     - |
