@@ -917,6 +917,33 @@ geschrieben; zusätzlich 12-Wochen-Artefakt als Sicherheitsnetz. Cross-Bezug: §
     (kein sslVerify-off, HTTPS-Direktive), Credential-Helper (manager+store) auf den rotierten PAT
     (Wert nur aus Vault-Datei in Variable — nie im Transcript). **Push nachgeholt: cc4582a..ebe6498;
     lokal = GitHub = GitLab synchron.**
+  - **F12i — offizieller messung_driver-Binary-Bau geschlossen (2026-07-16; ce `730831d2`, super Gitlink-Bump `1687434→730831d`):**
+    Der volle `comdare-messung-driver`-Bau im super-Sub-Build (g++-16.0.1, Release, `COMDARE_HAVE_SNMALLOC=ON`,
+    frischer `Code/build-f12i`) brach WÖRTLICH an `ext/allocator/A07-snmalloc/src/snmalloc/backend_helpers/../mem/../ds/../ds/aba.h:108:2:
+    error: #error You must compile with -mcx16 to enable 16-byte atomic compare and swap.` — zuerst am Codegen-Tool
+    `comdare_catalog_codegen_cli` (Katalog-Kette `source_catalog → topic_allocator → axis_06_allocator_snmalloc.hpp →
+    vendor_includes/snmalloc_include.hpp → <snmalloc/snmalloc.h>`), dahinter (Sub-Stack) identisch an
+    `comdare_profile_run_facade` (via `generated_source_catalog.hpp → profile_run_entry.hpp`; dessen DEFER-Adapter-Link
+    erbt der C++20-Modul-Scan `.ddi` NICHT). Ursache: `COMDARE_AXIS_06_USE_SNMALLOC=1` wird GLOBAL in
+    `axis_06_allocator_flags.hpp` gebacken → jedes Target mit `-I<build>/generated` zieht die snmalloc-Header, aber die
+    #21-INTERFACE-Belange am a07-Adapter erreichen NUR Ziele, die den Adapter explizit linken. **Cleanest Fix (DRY,
+    single-source):** directory-scope `link_libraries(comdare::vendor_snmalloc)` in ce `CMakeLists.txt` DIREKT neben dem
+    bestehenden `link_libraries(comdare::vendor_mimalloc)` (wf_1009d16f-Muster) — der Vendor-Target trägt EXAKT die
+    #21-Belange (`SNMALLOC_HEADER_ONLY_LIBRARY=1`, `SNMALLOC_USE_WAIT_ON_ADDRESS=0`, `-mcx16` NUR x86_64) string-gleich zu
+    `ext/CMakeLists.txt` INTERFACE → erben ALLE nachfolgend angelegten Targets; gegatet `COMDARE_AXIS_06_ENABLE_SNMALLOC
+    AND COMDARE_HAVE_SNMALLOC AND TARGET comdare::vendor_snmalloc` → ce-Standalone/perms-OFF byte-identisch (inert).
+    **Gate-Belege (literal):** messung_driver `[66/69] Linking CXX executable 02_messung_driver/comdare-messung-driver`,
+    0 FAILED, Binary 5,2 MB. **REALE Binary `comdare-messung-driver --validate` (I2-Vorbehalt mit ECHTER Binary
+    geschlossen):** `experiment_golden.xml` → **rc 0** (VALIDAT OK: 2 engines/3 phases/6 variants/5 categories); typo
+    `<workloads>`-id „ycsb_TYPOXYZ" → **rc 1** (`[FEHLER] UNBEKANNTE Workload-id`); Fremd-Wurzel `<some_foreign_root>` →
+    **rc 5** (`unbekannte/unlesbare Wurzel`); Thesis-Profil `m3v2_study.profile.xml` → **rc 0** (19 Achsen/32 Werte/6
+    workloads). `test_profile_roundtrip` (build-f12i): `golden binary_count == 320 (4*4*5*4) = 320`, `profile binary_count
+    = 320`, Diff `only_in_golden = 0` / `only_in_profile = 0` — golden-320 UNVERÄNDERT. clang-format-22.1.8 `--dry-run
+    --Werror`: 0 geänderte C++-Dateien (nur CMake, N/A). Mojibake-Scan (Doppelkodierungs-Sequenzen) = 0, valid UTF-8. Kein
+    POD/ABI/GenusBindingTraits/permutation_axes.xml/golden_fullpilot_320/kV3AxisSchema berührt; ext/-snmalloc read-only;
+    buildsystem.xml unangetastet; kein Python. NICHT gefixt (vorbestehend, separat): A07-snmalloc-LAUFZEIT-Segfault
+    `V31AdapterAlloc.A07_Snmalloc` (Vendor-Runtime-Bug, `--validate` triggert ihn nicht — kein Allocator-Lauf).
+    ce+super auf beide Remotes gepusht (origin=gitlab.comdare.local, github); Ref-Gleichheit literal verifiziert.
 
 ## §13 — NACHT-AUDIT 2026-07-05 (ultracode wf_b00c414e, 11 Agenten, adversarial verifiziert) + TODO-Katalog #253–#272 + GOAL-TEXT V2
 
