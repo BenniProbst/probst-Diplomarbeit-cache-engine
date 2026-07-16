@@ -1,4 +1,7 @@
 #pragma once
+// DEPRECATED-BY-DESIGN (Fork A, User 2026-07-16): Parallel-Antrieb wird durch die CEB-Bruecke ersetzt
+// (3-Phasen-XML -> offizieller E4/CEB/DLL-Pfad -> 16-col-CSV); INC-A..E bleiben gueltig; NICHT weiterentwickeln.
+//
 // V34.B.1 (2026-05-21) - MessreiheReportExporter: CSV + TikZ aus MessreiheReport
 //
 // @subsystem MessungDriver
@@ -32,11 +35,16 @@ struct ExportStatus {
  * @brief MessreiheReportExporter - persistiert MessreiheReport in CSV + TikZ
  * @subsystem MessungDriver
  *
- * Beispiel:
+ * Beispiel (HISTORISCH — Surrogat-Aufruf, DEPRECATED; nur als Alt-Referenz erhalten):
  *   auto report = orchestrator.run_default_lookup_messreihe(workload);
  *   MessreiheReportExporter ex;
  *   ex.write_csv(report, "results.csv");
  *   ex.write_tikz_summary(report, "summary.tex");
+ *
+ * OFFIZIELLER WEG (F63-Korrektur 2026-07-16): der MessreiheReport stammt aus dem XML-getriebenen
+ * W4-Antrieb v32_messreihe_antrieb.hpp (execute_messreihe: parse -> validate -> INC-F-Katalog-Treiber),
+ * der den Export selbst aufruft — den Surrogat-Orchestrator (V32Orchestrator, [[deprecated]]) NICHT
+ * mehr verwenden; Folge-Richtung = CEB-Bruecke (Fork A, s. super-Ledger §12 2026-07-16).
  */
 class MessreiheReportExporter {
 public:

@@ -29,6 +29,17 @@ namespace comdare::diplomarbeit::messung_driver::v32 {
 namespace cmd = comdare::cache_engine::builder::commands;
 namespace dl  = comdare::prt_art::default_lookup;
 
+// [F63 / Fork A 2026-07-16] W4-Guard: die beiden Surrogat-Adapter als DEPRECATED benannte Aliase.
+// Der Audit-Fix verlangte "[[deprecated]] auf die beiden Surrogat-Adapter-Aliase"; im Ist-Code existierten
+// keine Aliase (die Adapter wurden in execute_one_permutation direkt instanziiert) — sie werden hier als
+// benannte, deprecatete Aliase eingefuehrt, damit jeder NEUE Konsument compile-time gewarnt wird.
+using CacheEngineSurrogatAdapter
+    [[deprecated("W4: Surrogat — nie im Mess-Pfad; ersetzt durch CEB-Bruecke (Fork A 2026-07-16)")]] =
+        comdare::cache_engine::abi::CacheEngineExecutionEngineAdapter<>;
+using PrtArtSurrogatAdapter
+    [[deprecated("W4: Surrogat — nie im Mess-Pfad; ersetzt durch CEB-Bruecke (Fork A 2026-07-16)")]] =
+        comdare::prt_art::identity::PrtArtExecutionEngineAdapter<>;
+
 /**
  * @brief PermutationOutcome - Ergebnis einer Permutation (EE-A vs EE-B Vergleich)
  * @subsystem MessungDriver
@@ -67,7 +78,7 @@ struct MessreiheReport {
  *   via std::async, vergleicht via Welch's t-Test.
  * - Result-Aggregation in MessreiheReport.
  */
-class V32Orchestrator {
+class [[deprecated("W4: Surrogat — nie im Mess-Pfad; ersetzt durch CEB-Bruecke (Fork A 2026-07-16)")]] V32Orchestrator {
 public:
     V32Orchestrator() = default;
 

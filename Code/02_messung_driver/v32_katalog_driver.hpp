@@ -1,4 +1,7 @@
 #pragma once
+// DEPRECATED-BY-DESIGN (Fork A, User 2026-07-16): Parallel-Antrieb wird durch die CEB-Bruecke ersetzt
+// (3-Phasen-XML -> offizieller E4/CEB/DLL-Pfad -> 16-col-CSV); INC-A..E bleiben gueltig; NICHT weiterentwickeln.
+//
 // INC-F (C.1, 2026-07-14) -- v32_katalog_driver: die W4-Gate-konforme Ersatz-Verdrahtung des Surrogats im
 // EE-A/EE-B-Vergleich. Statt der beiden Surrogat-Adapter (die CE- und die Pruefling-ExecutionEngine mit ihrem
 // std-Hash-Backend, v32_orchestrator.hpp:154-155 -- die verbotenen Alt-Pfad-Marker sind bewusst NICHT literal

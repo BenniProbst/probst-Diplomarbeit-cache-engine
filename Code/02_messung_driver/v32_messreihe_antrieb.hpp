@@ -1,4 +1,7 @@
 #pragma once
+// DEPRECATED-BY-DESIGN (Fork A, User 2026-07-16): Parallel-Antrieb wird durch die CEB-Bruecke ersetzt
+// (3-Phasen-XML -> offizieller E4/CEB/DLL-Pfad -> 16-col-CSV); INC-A..E bleiben gueltig; NICHT weiterentwickeln.
+//
 // INC-G (C.2) + INC-H (C.3), 2026-07-14 -- v32_messreihe_antrieb: die W4-Gate-konforme Verdrahtung von
 // execute_messreihe. Der EINE offizielle XML-getriebene Weg fuer das comdare_experiment-Profil:
 //
