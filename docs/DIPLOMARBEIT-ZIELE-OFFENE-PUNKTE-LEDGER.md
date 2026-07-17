@@ -1724,7 +1724,7 @@ Neue Marker `COMDARE_ANATOMY_ABI_MAJOR 5`, Magic `.A5.`; Loader-Gate verwirft al
 | **F3** | (i) 4. merge-Wert erst untersuchen (→§16.3-F3i: KEINE 4. Stufe); (ii) 4 CEB-Betriebsmodi als XML-Element PFLICHT (Dossier 19) | LED:384 · DOK |
 | **F4** | Option 3 (Reparatur) — erst Revert `804aa3c2` ultracode-untersuchen → Rückfrage | LED:384 · GATED |
 | **F5** | JA (#35→#38→#37) + AUDIT der Fassaden-Kette | LED:384 · GEBAUT (#35 R1) |
-| **F6** | JA+GROSS: XML steuert CI via INTERPRETER; JEDES CE-Feature XML-unterstützt + je Schritt CI-getrackt | LED:384 · DOK |
+| **F6** *(Entscheidungsrunde 07-16 — Namens-Kollision: ≠ „F6 (#40+Kleinteile)"/„F6-Nachzieh" 07-17 aus §18.3.3/§20.A [Deprecation-Marker, ERLEDIGT ce `871f6d2e`]; DIESES F6 = der XML→CI-Interpreter-Strang = Planer-Codegen-Folgearbeit)* | JA+GROSS: XML steuert CI via INTERPRETER; JEDES CE-Feature XML-unterstützt + je Schritt CI-getrackt | LED:384 · DOK |
 | **F7** | (i) 4 .py erst nach XML-Ersatzbeweis löschen · (ii) jemalloc NICHT löschen→Allokator-Achse · (iii) ZIH-README benötigt · (iv) Behelfs-Tier nach P5 | LED:384 · teils GATED |
 | **F8** | GO je-Repo: 4 Branch-Löschungen (nur main+development behalten) | LED:384 · DOK |
 | **F9** | ENTSPERRT: perf-Messung PFLICHT für alle Ergebnisse, Infra fertig, Agent darf installieren | LED:384 · DOK |
