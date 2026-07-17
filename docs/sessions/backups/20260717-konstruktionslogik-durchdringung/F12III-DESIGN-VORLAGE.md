@@ -62,6 +62,13 @@ Der Snapshot-POD `ComdareTierObserverSnapshot` behält `axis_stats[19][8]`; entf
 Komposition, ändert sich die Achsen-Anzahl der SearchAlgorithm-Anatomie und damit `kV3AxisSchema`
 (`observable_tier.hpp:66-104`) und `sizeof==1416` (Z.128). → **POD-Layout-Bruch = ABI-Major-Bruch.**
 
+> **KORREKTUR (2026-07-17, real vollzogen in Bau-INC-2c — design-is-source):** Dieser Absatz war
+> selbst-widersprüchlich („behält `[19][8]`" vs. „POD-Layout-Bruch" im selben Satz). Real umgesetzt
+> und der **maßgebliche** Stand ist: der Snapshot-POD trägt jetzt **`axis_stats[18][8]` + `seg_ns[18]`**
+> (telemetry-Zeile entfernt, T10 = value_handle), `kV3AxisCount == 18`, `kTierObserverSnapshotVersionUnified == 6`,
+> **`sizeof` 1416 → 1344** (Δ −72). Der POD-Layout-Bruch ist damit die Achsen-**Reduktion**, nicht die Beibehaltung.
+> Die telemetry-Wahl (Active/Silent) wandert in die CEB-System-Achsen-Schicht (H-10-Sidecar), NICHT in die binary_id.
+
 ---
 
 ## 3. Der koordinierte 4→5-Bump am Experiment-Planer-Dock
