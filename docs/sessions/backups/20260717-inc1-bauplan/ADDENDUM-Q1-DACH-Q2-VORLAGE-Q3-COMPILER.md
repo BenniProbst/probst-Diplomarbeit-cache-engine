@@ -166,3 +166,39 @@ Report D beantwortet die Leitfrage explizit: „**Ist Q2 damit entschieden? NEIN
 **Reihenfolge-Hinweis:** das `-fno-gnu-unique`-Compiler-Gate aus INC-1h ist **Voraussetzung** für die clang-Leg des „5 %"-Vergleichs — landet die Vergleichs-Messung von INC-1d unter beiden Compilern, muss INC-1h (bzw. sein Gate-Sub-Schritt) davor grün sein.
 
 **Auf Q2 wartet ausschließlich INC-1d.** Alle übrigen Increments (1a/1b/1c/1e/1f/1g/1h) sind Q2-unabhängig und dürfen vor der Q2-Antwort gebaut werden (goldene/ABI-Gates je Increment bleiben Pflicht).
+
+---
+
+## (5) FOLD 2026-07-17: Q2-C-RULING + 6. ACHSE (Q2 aufgelöst — Freigabe-Gate geschlossen)
+
+**Datum:** 2026-07-17 (später als §1–§4). **Status:** Q2 ist damit **ENTSCHIEDEN** — das §4-„Q2-GATED"-Flag an INC-1d entfällt; der User hat mit demselben Ruling **VOLLES GO für Bau-INC-1** erteilt. Die §3-Vorlage (Option-C-Empfehlung) ist **bestätigt** und um eine **6. System-Achse** erweitert.
+
+### 5.1 Der User-Ruling (verbatim, LEDGER:1916)
+> „**Option C: Die CEB bekommt die Einstellungen vom Experiment-Planer, aber Permutiert etwa simd_extension selbst für die Systemachse zu seiner Laufzeit durch, um Tier-Binaries zur compile time mit diesen Eigenschaften auszustatten und durchzumessen. Daher sind die Systemachse der Erweiterungshardware (SIMD, GPU) eine weitere eigene Systemachse, die erstmal nur auf SIMD ausgedehnt wird. GO für den Bau**"
+
+Zusatz-Wortlaut (LEDGER:1916): „**Die Beantwortung der Q2 Frage gilt dann als volles GO**" — Q2-Antwort = Bau-Freigabe Bau-INC-1. Standing-Direktive dabei: „**bitte merke dir immer zuerst mit ultracode zu versuchen Fragen aus der Dokumentation aufzulösen**".
+
+### 5.2 Auflösung — Option C bestätigt + SECHSTE System-Achse „Erweiterungshardware"
+Das Ruling wählt exakt die §3(d)-Empfehlung **Option C** (Wert=System-Achse · Ort=`CompileFn`-Naht · Provenienz=H-10-Sidecar, **NIE** binary_id) und **präzisiert** sie: die `-march`/SIMD-Werte kommen aus einer **eigenen sechsten System-Achse „Erweiterungshardware" (SIMD → später GPU)**, deren Ausprägungen die **CEB zu ihrer eigenen Laufzeit SELBST durchpermutiert** (den Rahmen/Raum setzt der Planer über das Experiment-Dock), und die je Ausprägung Tier-Binaries **compile-time baut + durchmisst**. Damit sind die CEB-System-Achsen jetzt **SECHS**:
+
+**Scheduling · Hardware/ISA (reiner Host-Deskriptor+Gate) · Telemetrie · Last+Frameworks · Compiler (gcc|clang) · Erweiterungshardware (SIMD→GPU).**
+
+Konsequenz für die §3-Optionslogik: „Hardware/ISA" und „Erweiterungshardware" sind nun **zwei getrennte System-Achsen** — die alte Zweideutigkeit (treibt die Hardware-Achse den Bau, Option B, oder ist sie reiner Deskriptor, Option A?) ist damit **aufgelöst**: die Hardware/ISA-Achse bleibt **reiner Host-Deskriptor + Mess-Gate** (e18-⟂), das **Treiben** übernimmt die neue Erweiterungshardware-Achse — genau die Option-C-Rollen-Trennung, jetzt auf zwei distinkte Achsen abgebildet.
+
+### 5.3 INC-1d-Präzisierung (ExtensionHardwareSystemAxis) + INC-1h-Bestätigung
+**INC-1d wird von „Hardware-ISA + H-7 `-march`-Kopplung (Q2-GATED)" umgewidmet auf die Erweiterungshardware-System-Achse (6. Achse)** — die drei Option-C-Rollen sitzen jetzt konkret so:
+- **Flag-QUELLE = `ExtensionHardwareSystemAxis<D> : CebSystemAxis<D>`** (SIMD-Ausprägungen als static-constexpr; die CEB permutiert `simd_extension` zur eigenen Laufzeit durch, Rahmen vom Planer via Experiment-Dock; Muster `IsaStrategyBase`, `axis_09_isa_strategy_base.hpp:11`).
+- **ORT = `CompileFn`-Naht:** `-march`/`-mavx…` angewandt in `make_gpp_compile_fn` (`build_orchestrator.hpp:466/476`; Flag-Renderer analog `simd_flags()`, `permutation_codegen_tool.cpp:43-48`).
+- **Provenienz = H-10-Sidecar (INC-1: Text; INC-2: autoritative Metadaten-Version), NIE binary_id.**
+- Die **Hardware/ISA-System-Achse** bleibt als **reiner Host-Deskriptor + Mess-Gate** bestehen (e18; berührt nie binary_id) — sie treibt in INC-1d **nichts** mehr.
+
+**INC-1h (Compiler-System-Achse, 5. Achse) steht unverändert** (§2.2): `CompilerSystemAxis<D>` (gcc|clang) + `cxx_compiler()`-Anbindung + `-fno-gnu-unique`-Compiler-Gate (`build_orchestrator.hpp:479`) + Serialisierungs-Ordner (Host→OS→Compiler→ISA) + H-10-Sidecar per-Binary. Orthogonal zu `-march` (der „bis-5-%"-Vergleich lebt von der Trennung Compiler ⟂ Erweiterungshardware).
+
+### 5.4 Increments-Tabelle — Delta (nur 1d-Präzisierung + 1h; Rest §4 unverändert)
+
+| Inc | Inhalt (Delta ggü. §4) | Wartet auf Q2? |
+|---|---|---|
+| **INC-1d** *(PRÄZISIERT — Q2 ENTSCHIEDEN, Gate entfällt)* | **Erweiterungshardware-System-Achse (6. Achse, SIMD)** = `-march`-**Flag-QUELLE** (CEB-laufzeit-permutiert, Rahmen vom Planer); angewandt an **`CompileFn` (ORT)** `make_gpp_compile_fn` (`build_orchestrator.hpp:466/476`); **Provenienz** im H-10-Sidecar (NIE binary_id). **Hardware/ISA-Achse** bleibt reiner **Host-Deskriptor+Gate** (treibt nichts). = Option C, jetzt auf zwei distinkte Achsen abgebildet. | **NEIN — Q2 ENTSCHIEDEN (Option C)** |
+| **INC-1h** *(BESTÄTIGT, NEU aus §2.2)* | **Compiler-System-Achse (5. Achse)** `CompilerSystemAxis<D>` (gcc\|clang) + `cxx_compiler()`-Anbindung + `-fno-gnu-unique`-Gate (`:479`) + Serialisierungs-Ordner + H-10-Sidecar. Orthogonal zu `-march`. | nein (orthogonal) |
+
+**Damit:** ALLE INC-1-Increments (1a–1h) sind Q2-frei; die einzige verbliebene Q2-Wartekante ist **aufgelöst**. Das „bis-5-%"-Vergleichs-Regime (Compiler × Erweiterungshardware) koppelt an die **neue ABI-5-Metadaten-Version** — der Version-Bump ist **INC-2** (§2d des INC-2-Bauplans `20260717-inc2-planung/BAUPLAN-INC2-4NACH5-BUMP.md`: die Metadaten-Version trägt `-march`+Compiler-Provenienz autoritativ); INC-1d/1h liefern nur den ABI-4-neutralen Rahmen (Achse + Ordner + Sidecar-Text).
