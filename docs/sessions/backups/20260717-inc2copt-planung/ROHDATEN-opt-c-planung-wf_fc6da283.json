@@ -1,0 +1,310 @@
+{
+  "summary": "Ultracode-Planungssession Bau-INC-2c.opt-c (perm_opt_level_cflags-Übersetzer) gegen Code + Ledger + Rulings",
+  "agentCount": 5,
+  "logs": [],
+  "result": {
+    "maps": [
+      {
+        "area": "Bau-INC-2c.opt-c: Naht-Mechanik der opt_level-Einspeisung in make_gpp_compile_fn (profile_run_facade.cpp)",
+        "findings": [
+          {
+            "point": "Zwei GRUNDVERSCHIEDENE Einspeise-Kanaele: extension_hardware wird in den defines-Vektor GEMERGT, opt_flag ist ein SEPARATER Positions-Param. perm_extension_hardware_cflags() liefert vector<string> und wird in perm_mess_defines() in den defines-Vektor d gepusht; dieser Vektor fliesst als 2. positionales Argument (defines) in make_gpp_compile_fn. opt-c fliesst NICHT ueber perm_mess_defines/defines, sondern als eigenstaendiger 5. positionaler Param (opt_flag) — ein einzelner String, kein Vektor-Eintrag.",
+            "evidence": "profile_run_facade.cpp:156 (for (auto& f : perm_extension_hardware_cflags()) d.push_back(std::move(f))) innerhalb perm_mess_defines() :132-158; build_orchestrator.hpp:466-469 (Signatur-Reihenfolge: include_dirs, defines, cxx, link_libs, opt_flag)"
+          },
+          {
+            "point": "make_gpp_compile_fn HAT den 5. Param opt_flag seit opt-b (Default -O2), aber BEIDE Aufrufer setzen ihn noch NICHT — sie uebergeben nur 4 Argumente und ziehen den Signatur-Default -O2 (byte-identisch zum harten Alt-Verhalten).",
+            "evidence": "build_orchestrator.hpp:469 (std::string opt_flag = \"-O2\"); profile_run_facade.cpp:226 und :402 sind heute identisch: ex::make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs()) — 4 Args, kein 5.; build_orchestrator.hpp:483 Kommentar 'war hart -O2; Default-opt_flag==-O2 => byte-identisch'"
+          },
+          {
+            "point": "opt_flag wird im Compile-Lambda als EIGENE Response-File-Zeile emittiert, getrennt und VOR der defines-Schleife — bestaetigt, dass es KEIN Define ist, sondern eine eigene Flag-Position.",
+            "evidence": "build_orchestrator.hpp:483 (rf << opt_flag << \"\\n\") steht direkt nach -std=c++23 (:482), vor -fPIC/-shared (:484-485) und vor der defines-Schleife (:490 for (auto const& d : defines) rf << d << \"\\n\")"
+          },
+          {
+            "point": "Die neue Uebersetzer-Funktion muss ein Spiegel von perm_extension_hardware_cflags() sein, aber mit anderem Rueckgabetyp: perm_extension_hardware_cflags() -> vector<string>; perm_opt_level_cflags() -> std::string (ein einzelner Flag-String, passend zum 5. Param opt_flag vom Typ std::string). Die Flag-Quelle sind die CRTP-Achsen OptO*SubAxis::gcc_opt_flag()/clang_opt_flag()/msvc_opt_flag().",
+            "evidence": "build_orchestrator.hpp:469 opt_flag ist std::string (nicht vector); optimization_level_sub_axis.hpp:45-47 (gcc_opt_flag/clang_opt_flag/msvc_opt_flag je Dialekt); :113-116 OptOfastSubAxis::do_gcc_opt_flag()==\"-Ofast\""
+          },
+          {
+            "point": "Compiler-Dialekt-Wahl muss den bestehenden Gate-Stil spiegeln: gcc/clang teilen -O<n>, MSVC weicht ab. Der Facade-Code entscheidet Dialekt heute per cxx_compiler()-String; das build_orchestrator-Lambda nutzt cxx.find(\"clang\") als Dialekt-Gate. perm_opt_level_cflags() sollte analog anhand cxx_compiler() zwischen gcc_opt_flag()/clang_opt_flag()/msvc_opt_flag() waehlen. Default = DefaultOptLevelSubAxis (Ofast, OF-2).",
+            "evidence": "profile_run_facade.cpp:160-165 cxx_compiler() (Default GccCompilerAxis::driver_default()); build_orchestrator.hpp:488 (if (cxx.find(\"clang\") == std::string::npos) ... GNU-only Gate); optimization_level_sub_axis.hpp:121 using DefaultOptLevelSubAxis = OptOfastSubAxis; :128 static_assert Default==Ofast"
+          }
+        ],
+        "design_recommendation": "Exakte Naht: opt-c fuegt NEBEN perm_extension_hardware_cflags() (:116-130) eine Spiegel-Funktion im anonymen Namespace ein, z.B. perm_opt_level_cflags() -> std::string, gebaut nach demselben Muster wie active_simd_policy()+perm_extension_hardware_cflags(): (a) active_opt_level() liest COMDARE_PILOT_OPT_LEVEL als Smoke-Schalter (Spiegel von active_simd_policy()/COMDARE_PILOT_SIMD_POLICY :109-114), Default = DefaultOptLevelSubAxis::opt_level_id() (Ofast, OF-2); (b) perm_opt_level_cflags() waehlt anhand von cxx_compiler() den passenden Dialekt-Flag (OptO*SubAxis::gcc_opt_flag() bzw. clang_opt_flag() bzw. msvc_opt_flag()) und gibt EINEN String zurueck (kein Merge in perm_mess_defines!).\\n\\nDie Aufrufer-Aenderung ist an BEIDEN Stellen identisch — der neue 5. Positions-Arg wird angehaengt:\\n\\nprofile_run_facade.cpp:226 VORHER:\\n  a.compile = ex::make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs());\\nNACHHER:\\n  a.compile = ex::make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs(), perm_opt_level_cflags());\\n\\nprofile_run_facade.cpp:402 VORHER:\\n  a.compile = ex::make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs());\\nNACHHER:\\n  a.compile = ex::make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs(), perm_opt_level_cflags());\\n\\nKernaussage zur KERNFRAGE: JA — opt-c speist den perm_opt_level_cflags()-Wert als 5. POSITIONALES Argument an make_gpp_compile_fn an BEIDEN Aufrufstellen (:226 und :402). Das ist strukturell ANDERS als perm_extension_hardware_cflags(): letztere wird per push_back in den defines-Vektor (perm_mess_defines(), :156) gemergt und reist als 2. Positions-Arg; opt_flag bleibt ein separater, einzelner String-Param (5.), der im Lambda seine eigene rsp-Zeile bekommt (build_orchestrator.hpp:483), getrennt von den defines (:490). Achtung Typ: der 5. Param opt_flag ist std::string (nicht vector), also liefert die Spiegel-Funktion einen String, nicht — wie ihr Vorbild — einen Vektor.",
+        "open_questions": [
+          "build_version-Provenienz (+opt=): system_axes_version_suffix() (:172-174) traegt heute nur +ext= und +cxx=. Der Header optimization_level_sub_axis.hpp:11 nennt H-10-Sidecar '+opt='. opt-c/opt-g sollte system_axes_version_suffix() um +opt=<active_opt_level()> erweitern, damit unter anderem Opt-Level gebaute DLLs eigene .version-Sidecars bekommen (kein falscher dll_is_current-Skip). Nicht Teil der reinen 5-Param-Naht, aber verbindlich fuer korrekte Provenienz.",
+          "Dialekt-Erkennung: Soll perm_opt_level_cflags() den Dialekt per cxx_compiler()-Substring (cxx.find(\"clang\"), wie build_orchestrator.hpp:488) oder ueber die Compiler-System-Achse (GccCompilerAxis/ClangCompilerAxis compiler_id()) waehlen? Da gcc_opt_flag()==clang_opt_flag() fuer alle Stufen ({O0..Ofast}) ist die Dialekt-Wahl heute praktisch nur fuer MSVC (/O<n>) relevant; auf POSIX-g++/clang identisch. Trotzdem architektonisch die Achse als Single-Source bevorzugen (Metaprogrammierungs-Doktrin).",
+          "Smoke-Schalter-Name: COMDARE_PILOT_OPT_LEVEL als Spiegel von COMDARE_PILOT_SIMD_POLICY bestaetigen? Der Wert muesste eine opt_level_id (O0/O1/O2/O3/Ofast) sein, die auf die OptO*SubAxis-Familie gemappt wird (analog dem policy==...simd_extension_id()-Vergleich :120-127)."
+        ]
+      },
+      {
+        "area": "Bau-INC-2c.opt-c — WERT-QUELLE des aktiven opt_level (Ordering: opt-c VOR opt-f)",
+        "findings": [
+          {
+            "point": "Das env-Pilot-Muster ist woertlich vorhanden und ist das exakte Vorbild: active_simd_policy() liest den Achsen-Default und laesst ihn per env uebersteuern.",
+            "evidence": "profile_run_facade.cpp:109-114 — active_simd_policy(): policy = GenericExtensionHardwareAxis::simd_extension_id() (Achsen-Default, Z.111); if getenv(COMDARE_PILOT_SIMD_POLICY) gesetzt -> policy = e (Z.112). Kommentar Z.105-108: '...bis dahin ist COMDARE_PILOT_SIMD_POLICY der Smoke-Schalter', CEB-Laufzeit-Permutation erst mit dem Planer-Strang."
+          },
+          {
+            "point": "perm_extension_hardware_cflags() ist der zu spiegelnde Uebersetzer: policy-String -> Flag via if/else-Kette ueber die Achsen-IDs; unbekannt -> cerr-Warnung + generischer Fallback (leerer Flag = keine Flags).",
+            "evidence": "profile_run_facade.cpp:116-130 — if policy==Avx2..::simd_extension_id() -> Avx2..::gcc_march_flag(); elif Avx512..; elif policy!=Generic.. -> std::cerr '..unbekannt; nutze no_extension'; if flag.empty() return {}."
+          },
+          {
+            "point": "WERT-QUELLE fuer opt-c ist also ein env-Pilot COMDARE_PILOT_OPT_LEVEL (analog), dessen Default die Achse selbst liefert: DefaultOptLevelSubAxis::opt_level_id()=='Ofast' (OF-2). Die XML-opt_level-Achse existiert in opt-c NOCH NICHT; sie wird erst in opt-f zur Quelle.",
+            "evidence": "optimization_level_sub_axis.hpp:121 'using DefaultOptLevelSubAxis = OptOfastSubAxis;' + :128 static_assert(DefaultOptLevelSubAxis::opt_level_id()==\"Ofast\", \"OF-2: CEB-Default = Ofast\"). Header Z.9 'CEB-Default = Ofast (OF-2), per XML ueberschreibbar'; Z.16-18 'die Wahl je Mess-Reihe trifft die XML' -> XML greift erst spaeter (opt-f)."
+          },
+          {
+            "point": "Der Uebersetzer perm_opt_level_cflags() mappt den aktiven opt_level-id-String auf die passende OptO*SubAxis (if/else ueber opt_level_id(), Spiegel der SIMD-Kette) und liest DEREN Compiler-Dialekt-Flag.",
+            "evidence": "optimization_level_sub_axis.hpp:75-117 — je Auspraegung do_gcc_opt_flag/do_clang_opt_flag/do_msvc_opt_flag; z.B. OptOfastSubAxis: gcc/clang='-Ofast', msvc='/O2' (:112-115). Static-dispatch/CRTP, keine vtable (:33-34,:60-70)."
+          },
+          {
+            "point": "KERNFRAGE gcc vs clang vs msvc: die Auswahl erfolgt anhand des Treiber-Strings aus cxx_compiler(); das Dialekt-Detektionsmuster existiert bereits WOERTLICH im Builder und ist zu spiegeln — clang wird per Substring-Test erkannt.",
+            "evidence": "cxx_compiler() profile_run_facade.cpp:160-165 (Default GccCompilerAxis::driver_default()=='g++-16', env COMDARE_CXX-Override). Dialekt-Test build_orchestrator.hpp:488 'if (cxx.find(\"clang\") == std::string::npos) rf << \"-fno-gnu-unique\"' — d.h. clang-Substring => clang-Leg, sonst gcc-Leg. compiler_system_axis.hpp:47-56 belegt driver_default 'g++-16' (gcc) bzw. 'clang++-22' (clang)."
+          },
+          {
+            "point": "Auf der POSIX-Fassade ist die Wahl faktisch gcc_opt_flag() vs clang_opt_flag(); msvc_opt_flag() gehoert nicht hierher. make_gpp_compile_fn ist gcc/clang-only und traegt als einzige den opt_flag-Param; einen make_msvc_compile_fn mit opt_flag-Param gibt es in dieser Datei nicht.",
+            "evidence": "grep build_orchestrator.hpp: opt_flag nur in make_gpp_compile_fn (:467-469,:477,:483). Facade-Aufruf a.compile = make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs()) profile_run_facade.cpp:226 — opt_flag-Param (5.) noch NICHT gesetzt (opt-b: Aufrufer unveraendert)."
+          },
+          {
+            "point": "Semantische Note: gcc_opt_flag und clang_opt_flag sind fuer ALLE Stufen identisch ('-O0'..'-Ofast'), nur MSVC weicht ab ('/Od','/O1','/O2'). Der Dialekt-Branch in perm_opt_level_cflags() ist auf der POSIX-Fassade daher aktuell semantisch ein No-op, architektonisch (Spiegeltreue zu perm_extension_hardware_cflags) aber Pflicht.",
+            "evidence": "optimization_level_sub_axis.hpp:77-79,:85-87,:93-95,:101-103,:113-115 — gcc==clang je Stufe; msvc abweichend. static_assert :130 OptO2SubAxis::gcc_opt_flag()=='-O2'."
+          },
+          {
+            "point": "Provenienz-Andockpunkt fuer opt-c (Spiegel von active_simd_policy im Sidecar): system_axes_version_suffix() ist um '+opt=' zu erweitern; binary_id bleibt neutral (golden==320 unberuehrt).",
+            "evidence": "profile_run_facade.cpp:172-174 system_axes_version_suffix() baut '+ext='+active_simd_policy()+'+cxx='+cxx_compiler(); Header Z.11-13 fordert 'H-10-Sidecar-Provenienz (build_version \"+opt=\") ; binary_id-NEUTRAL (steht nie in kCompositionAxisNames, golden==320 unberuehrt)'."
+          }
+        ],
+        "design_recommendation": "opt-c spiegelt perm_extension_hardware_cflags() 1:1 als perm_opt_level_cflags(): (1) Neue Helper active_opt_level() analog active_simd_policy() (profile_run_facade.cpp:109-114) — Default = DefaultOptLevelSubAxis::opt_level_id() ('Ofast', OF-2), env-Pilot COMDARE_PILOT_OPT_LEVEL als Smoke-Override; die XML wird erst in opt-f Quelle, hier NICHT. (2) perm_opt_level_cflags() als Spiegel von :116-130: if/else-Kette ueber OptO{0,1,2,3,Ofast}SubAxis::opt_level_id(); unbekannter env-Wert -> std::cerr-Warnung + Fallback auf DefaultOptLevelSubAxis (Ofast), NICHT leer (opt_level darf nie still entfallen). (3) Compiler-Dialekt-Wahl per cxx_compiler() (:160) mit dem bereits etablierten Substring-Test aus build_orchestrator.hpp:488: cxx.find('clang')!=npos -> clang_opt_flag(), sonst gcc_opt_flag(); msvc_opt_flag() bleibt dem MSVC-CompileFn-Pfad vorbehalten (make_gpp_compile_fn ist gcc/clang-only). (4) Ergebnis als 5. Param opt_flag an make_gpp_compile_fn im Facade-Aufruf :226 (Param existiert seit opt-b, Default '-O2' transitional). (5) system_axes_version_suffix() :172-174 um '+opt='+active_opt_level() erweitern; binary_id unberuehrt. Ergebnis: OF-2 (Default Ofast) am Planer/Facade erzwungen, nicht auf der Builder-Signatur; Ist-Verhalten aendert sich erst, wenn env/Planer explizit setzt.",
+        "open_questions": [
+          "Fallback-Semantik bei unbekanntem COMDARE_PILOT_OPT_LEVEL: perm_extension_hardware_cflags faellt auf Generic=leer zurueck; opt_level darf aber nie leer sein (kein Flag = Compiler-Default != Ofast). Vorschlag: Warnung + Ofast-Fallback. Bestaetigen, ob das die gewuenschte Fehlerklasse ist (vs. harter exit analog Achse-2 :216)?",
+          "Namens-/Werte-Domaene der env-Pilot: erwartet COMDARE_PILOT_OPT_LEVEL die opt_level_id ('O0'..'Ofast') oder den rohen Flag-String ('-Ofast')? active_simd_policy nutzt die id — Analogie legt id nahe; final zu bestaetigen.",
+          "Ordering-Grenze zu opt-f praezisieren: soll active_opt_level() in opt-c bereits die spaetere XML-Quelle als auskommentierten Andockpunkt vorsehen, oder strikt env-only bis opt-f (Vermeidung Parallelstruktur laut Direktive)?"
+        ]
+      },
+      {
+        "area": "OF-2-Konformitaet (opt_level-Default = Ofast) vs. Determinismus-Direktive (1-Thread, IEEE-754-treu) an der Compiler-System-Unterachse — Bau-INC-2c.opt-a/b/c",
+        "findings": [
+          {
+            "point": "OF-2 verbatim fordert Default=Ofast UND 'nichts gepinnt' — die Spannung ist im Ledger selbst als Widerspruch angelegt, nicht erfunden.",
+            "evidence": "Ledger:1924 (OF-2, User-verbatim 2026-07-17): 'Die Standardeinstellung von CEB ist Ofast, kann aber ueberschrieben werden per XML. Da ist nichts gepinnt, JEDES TEIL ist beweglich.' Dagegen Ledger:1653/1745/1885 + Memory feedback_measurement_modes: 'Mess = 1 Mess-Thread ... Messung NIE als Nullen'; deterministisches Mess-Regime ist harte Direktive."
+          },
+          {
+            "point": "Der -Ofast-Determinismus-Bruch ist als Deep-Research-Faktum im Code UND im Bauplan verankert, nicht vermutet.",
+            "evidence": "optimization_level_sub_axis.hpp:15-16: '-Ofast = -O3 + -ffast-math-Familie + -fallow-store-data-races + -funsafe-math-optimizations -> bricht IEEE-754 UND Run-to-Run-Determinismus'. BAUPLAN 6 Z.55: 'Determinismus-Falle -Ofast: aktiviert -fallow-store-data-races (bricht T08-Concurrency-Achsen) + -funsafe-math-optimizations (Mess-Rauschen)'. Quelle Bauplan Z.23: gcc.gnu.org/onlinedocs Optimize-Options."
+          },
+          {
+            "point": "Der opt-a-Code ist OF-2-buchstabenkonform: Ofast IST der benannte Default, und der Trenn-Mechanismus ist bereits eingebaut.",
+            "evidence": "optimization_level_sub_axis.hpp:121 'using DefaultOptLevelSubAxis = OptOfastSubAxis;' + static_assert:128 'OF-2: CEB-Default = Ofast' + :129 '!is_ieee754_deterministic()'. O0..O3 tragen do_is_ieee754_deterministic()==true (Z.80/88/96/104), NUR Ofast==false (Z.116). Header-Kommentar Z.49-51 nennt diesen Flag den Hook, 'mit dem der Planer/die XML mess-deterministische Reihen von aggressiven Vergleichs-Reihen trennen kann (OF-2)'."
+          },
+          {
+            "point": "Der Ofast-Default ist heute NOCH NICHT als Mess-Binary-Default verdrahtet — die Spannung wird erst bei opt-c/opt-g scharf, die noch nicht gebaut sind.",
+            "evidence": "Ledger:1936 (opt-b GEBAUT, ce 3b7a83df): make_gpp_compile_fn hat opt_flag Default '-O2', 'TRANSITIONALER Signatur-Fallback, NICHT CEB-Default'; Aufrufer profile_run_facade.cpp:226/:402 unveraendert -> byte-identisch -O2. Ofast-Default 'wird am Planer opt-c/opt-g erzwungen'. BAUPLAN 6 Z.51: Byte-Identitaets-Gate wird 'bei opt-c/opt-g ZURUECKGEZOGEN, sobald der Planer den Ofast-Default verdrahtet'."
+          },
+          {
+            "point": "Der Bauplan listet OF-2 selbst explizit als GENUINE, nicht-code-ableitbare offene Frage, wortgleich zur Aufgabenstellung.",
+            "evidence": "BAUPLAN 7 (OF-2), Z.61: 'F2 sagt voll {O0..Ofast} fuer den Permutationsraum, aber Mess-Direktive (1-Thread, Determinismus) + -fallow-store-data-races/-funsafe-math sprechen gegen Ofast fuer Mess-Binaries. Ist Ofast Teil ALLER Mess-Permutationen, oder nur im Compiler-Vergleichs-/Debug-Raum, waehrend die golden-Mess-Binaries auf ein IEEE-treues Level (O2/O3) gepinnt bleiben?' 7-Kopf: 'Abwaegung vorzulegen, nicht eigenmaechtig aufloesen'."
+          },
+          {
+            "point": "Aufloesungs-Schluessel: OF-2 'nichts gepinnt' ist eine MECHANISMUS-Aussage (XML-Ueberschreibbarkeit, kein hartkodiertes Literal), keine POLICY-Aussage ueber die golden-Mess-Selektion. Beide Direktiven sind simultan erfuellbar.",
+            "evidence": "OF-2 (Ledger:1924) betont ranges/batches/einzeln + 'per XML ueberschreibbar' -> Ziel ist Beweglichkeit, nicht ein Mess-Wert. Eine golden-320-XML, die is_ieee754_deterministic()==true waehlt, ist KEIN 'Pin' im OF-2-Sinn, sondern bewegliche XML-Selektion. Header-Kommentar Z.17-18: '-Ofast fuer das permutierende Experiment (Vergleich/Debug) zulaessig; die Wahl je Mess-Reihe trifft die XML'. opt NIE in binary_id (BAUPLAN Z.45) -> Determinismus betrifft Mess-VALIDITAET, nicht Achsen-Identitaet (golden==320/kV3AxisSchema unberuehrt)."
+          },
+          {
+            "point": "Konkrete Konsequenz jeder Lesart fuer den golden-Korpus.",
+            "evidence": "Lesart A (Ofast auch golden-Mess-Default): CEB emittiert -Ofast fuer golden-320 ausser XML-Override -> -fallow-store-data-races verfaelscht die T08-Concurrency/Data-Race-Achse (falsche Semantik), -funsafe-math bringt FP-Rauschen -> Konflikt mit Mess=1-Thread-deterministisch + 'nie als Nullen/failed'. Lesart B (Ofast nur im opt-level-Vergleichsexperiment; golden auf O2/O3 via XML): golden reproduzierbar; is_ieee754_deterministic() ist der gebaute Planer-/Warn-Hook; Ofast lebt additiv als Vergleichsreihe daneben."
+          }
+        ],
+        "design_recommendation": "Zur Vorlage, NICHT eigenmaechtig aufloesen (BAUPLAN 7 markiert OF-2 explizit als genuine offene Frage). Abwaegung an den User: (1) opt-a ist OF-2-buchstabenkonform gebaut — Ofast IST der benannte DefaultOptLevelSubAxis, der Determinismus-Trenn-Hook is_ieee754_deterministic() ist bereits eingezogen; KEIN Code-Bruch, der jetzt zu beheben waere. (2) Die Spannung ist eine MESS-METHODIK-Entscheidung, die erst bei opt-c/opt-g (Planer-Default-Verdrahtung) scharf wird — noch nicht gebaut, kein akuter Zwang; opt-b haelt den Default transitional auf -O2 byte-identisch. (3) Empfohlene Aufloesung (nachdruecklich, aber user-gated): OF-2 'nichts gepinnt' als MECHANISMUS-Aussage lesen (kein hartkodiertes -O-Literal, alles XML-ueberschreibbar — erfuellt); die golden-320-Experiment-XML selektiert dann EXPLIZIT ein is_ieee754_deterministic()==true-Level (O2 oder O3; O3 zeigt den in opt-a literal bewiesenen Cache-Line-Stride-Effekt -33..-42%, Ledger:1929), waehrend -Ofast als eigene additive opt-level-Vergleichsreihe permutiert. Das erfuellt OF-2 (Ofast bleibt CEB-Code-Default + voll beweglich) UND die 1-Thread-Determinismus-Direktive (golden reproduzierbar, T08-Achse semantisch valide) gleichzeitig, weil die golden-XML-Wahl kein 'Pin' im OF-2-Sinn ist. Der User muss dennoch entscheiden, weil es die primaere Mess-Validitaet (FF0-FF4, honest-100%) beruehrt und OF-2 woertlich 'Standardeinstellung von CEB ist Ofast' sagt — ob dieser Default AUCH fuer die golden-Mess-Binaries greift oder nur den Vergleichsraum stellt, ist die eine nicht-code-ableitbare Frage.",
+        "open_questions": [
+          "OF-2-KERNENTSCHEIDUNG: Greift der Ofast-Default AUCH fuer die golden-320-Mess-Binaries (Lesart A: Ofast ueberall ausser XML-Override), oder selektiert die golden-Experiment-XML explizit ein IEEE-754-treues Level (Lesart B: Ofast nur im opt-level-Vergleichsexperiment)? Davon haengt die Reproduzierbarkeit des primaeren Mess-Korpus ab.",
+          "Falls Lesart B: Ist die golden-Mess-Selektion O2 oder O3? O3 zeigt den in opt-a bewiesenen Cache-Line-Stride-Effekt -33..-42% und ist weiter is_ieee754_deterministic()==true; O2 ist der historische Byte-Identitaets-Anker der bereits persistierten Reihen.",
+          "Soll der Planer bei opt-c/opt-g eine HARTE Guard/Warnung emittieren, wenn eine als deterministisch/1-Thread deklarierte Mess-Reihe ein is_ieee754_deterministic()==false-Level (Ofast) waehlt — analog zur 'failed'-Zelle-Sichtbarkeit — oder bleibt das rein dokumentarisch?",
+          "-fallow-store-data-races konkret: Wenn Ofast je mit T08-Concurrency-/Data-Race-Achsen kombiniert wird, ist das Ergebnis semantisch ungueltig (nicht nur verrauscht). Soll der Planer diese Kombination technisch ausschliessen oder nur als 'failed'+Log kennzeichnen?",
+          "OF-1-Kopplung (verschraenkt): Die Topologie-Reconciliation extension_hardware (eigenstaendige 6. Achse vs. Fold-in unter compiler, BAUPLAN 7 OF-1) beeinflusst, unter welcher Achse der opt_level-Default final materialisiert wird — bleibt separat user-gated."
+        ]
+      },
+      {
+        "area": "MSVC-Lücke in make_system_compile_fn (Bau-INC-2c.opt-c, Optimierungs-Flag-Emit unter cl)",
+        "findings": [
+          {
+            "point": "Bestätigt: make_system_compile_fn emittiert KEIN /O-Flag und cl defaultet damit implizit auf /Od (kein Optimierungslauf).",
+            "evidence": "build_orchestrator.hpp:453 baut cmd = \"cl /nologo \" + std_flag + \" /EHsc /LD /MP\" + cores; in :453-458 folgt nur /I, Quelle, /Fe, /Fo — an keiner Stelle ein /O<n>. Ohne /O ist cl-Default /Od (kein Opt)."
+          },
+          {
+            "point": "Bestätigt: make_system_compile_fn hat KEINEN opt-Parameter (Signatur nur include_dirs + std_flag).",
+            "evidence": "build_orchestrator.hpp:450-451: make_system_compile_fn(std::vector<std::string> include_dirs = {}, std::string std_flag = \"/std:c++latest\"). Lambda-Capture :452 fängt nur include_dirs+std_flag — kein opt_flag."
+          },
+          {
+            "point": "Die msvc-Flag-Quelle existiert bereits vollständig — die Unter-Achse liefert /Od,/O1,/O2 je Stufe.",
+            "evidence": "optimization_level_sub_axis.hpp:47 deklariert msvc_opt_flag(); Werte: O0→/Od (:79), O1→/O1 (:87), O2→/O2 (:95), O3→/O2 (:103), Ofast→/O2 (:115). Nur der cl-Emit-Ort fehlt, nicht das Vokabular."
+          },
+          {
+            "point": "ENTSCHEIDEND — make_system_compile_fn ist derzeit GAR NICHT verdrahtet: kein Aufrufer, nur eine Kommentar-Referenz. Beide Fassaden fahren ausschließlich make_gpp_compile_fn.",
+            "evidence": "grep über libs/: einzige Nennung von make_system_compile_fn außerhalb der Definition ist ein Kommentar in build_orchestrator.hpp:379. Beide Compile-Injektionspunkte profile_run_facade.cpp:226 (run_profile) und :402 (run_experiment) rufen ex::make_gpp_compile_fn(...). Der cl-/Od-Zustand kann heute keinen realen Messlauf treffen — die Lücke ist latent, nicht live."
+          },
+          {
+            "point": "opt-b-Mirror ist auf der POSIX-Seite bereits vollzogen und definiert die Konvention, die MSVC spiegeln müsste.",
+            "evidence": "make_gpp_compile_fn hat opt_flag als 5. Param mit transitionalem Default \"-O2\" (build_orchestrator.hpp:469) und emittiert ihn in die .rsp (:483). Der Kommentar :470-475 hält fest: Signatur-Default bleibt \"-O2\" (NICHT Ofast), damit unveränderte Aufrufer die opt-b/opt-c-Trennung nicht brechen; CEB-Default=Ofast wird am Planer erzwungen, nicht auf der Signatur."
+          },
+          {
+            "point": "Cluster=Linux/POSIX-first stützt die Zurückstellbarkeit des MSVC-Emits.",
+            "evidence": "Auto-Memory-Direktiven (feedback_diplomarbeit_impl_agent_cluster_readonly_no_infra, POSIX-first-Doktrin); die Mess-Pipeline läuft auf prod1/prod2 (Linux) via make_gpp_compile_fn. Ein Windows-/cl-Lauf existiert im aktiven Track nicht."
+          }
+        ],
+        "design_recommendation": "Exakte Änderung (Spiegel opt-b für cl): (1) Signatur build_orchestrator.hpp:450-451 um einen 3. Param erweitern — std::string opt_flag = \\\"/O2\\\" (transitionaler Builder-Fallback, exakt analog zum -O2-Default von make_gpp_compile_fn; NICHT Ofast, das ohnehin auf /O2 abbildet). (2) Lambda-Capture :452 um , opt_flag = std::move(opt_flag) ergänzen. (3) Emit :453 ändern zu: std::string cmd = \\\"cl /nologo \\\" + std_flag + \\\" \\\" + opt_flag + \\\" /EHsc /LD /MP\\\" + std::to_string(job.cores); — das /O<n> steht damit vor /EHsc, cl wertet es als Optimierungsstufe. Facade-Seite: perm_opt_level_cflags() (opt-c) muss je cxx_compiler() gcc_opt_flag()/clang_opt_flag()/msvc_opt_flag() wählen; da aber kein Fassaden-Aufrufer make_system_compile_fn injiziert, entsteht der MSVC-cflag-Zweig erst mit der cl-Verdrahtung (opt-k/Windows-Track). TIMING-EMPFEHLUNG: Die 3-Zeilen-MSVC-Änderung JETZT innerhalb opt-c mitnehmen (nicht zurückstellen) — Begründung: sie ist trivial, architekturkonform (Symmetrie-Prinzip make_system ↔ make_gpp), und verhindert, dass msvc_opt_flag() ein toter Accessor bleibt bzw. dass beim späteren Verdrahten von make_system_compile_fn ein stilles /Od-Regressionsrisiko entsteht. Sie ist jedoch NICHT golden-/messrelevant und NICHT blockierend: da make_system_compile_fn keinen Aufrufer hat und der Cluster Linux/POSIX-first ist, kann das aktuelle /Od keinen Messlauf verfälschen. Fazit: in opt-c mit-emittieren (sauberster, vollständiger Mirror), aber als non-blocking Tail behandeln — der Live-Wert von opt-c liegt komplett auf dem POSIX-make_gpp-Pfad.",
+        "open_questions": [
+          "Soll der MSVC-Signatur-Default /O2 (Mirror von -O2) sein — bestätigt konsistent mit opt-b — oder erwartet der Master-Bauplan hier eine andere transitionale Stufe?",
+          "Wann wird make_system_compile_fn überhaupt an einen Fassaden-Injektionspunkt verdrahtet (opt-k/Windows-Platform-Track)? Erst dann wird der msvc-Zweig von perm_opt_level_cflags() live; bis dahin bleibt er ungenutzter Code.",
+          "OF-2 (CEB-Default Ofast) bildet unter MSVC auf /O2 ab (kein Ofast-Äquivalent, /fp:fast wäre separate FP-Achse) — ist diese Semantik-Degradierung Ofast→/O2 für die Provenienz (H-10-Sidecar) explizit zu kennzeichnen, damit Mess-Reihen cl-seitig nicht fälschlich als Ofast gelten?"
+        ]
+      }
+    ],
+    "synth": {
+      "conformance_verdict": "NEEDS_USER_DECISION_FIRST",
+      "increment_scope_summary": "Bau-INC-2c.opt-c verdrahtet die opt_level-Unterachse an die POSIX-Fassade: neuer Übersetzer perm_opt_level_cflags() (Spiegel von perm_extension_hardware_cflags(), profile_run_facade.cpp:116-130) + Helper active_opt_level() (Spiegel active_simd_policy():109-114, env-Pilot COMDARE_PILOT_OPT_LEVEL, Achsen-Default Ofast), gespeist als 5. Positions-Arg opt_flag an make_gpp_compile_fn an BEIDEN Aufrufern (:226 run_profile, :402 run_experiment); Provenienz-Erweiterung system_axes_version_suffix() um +opt= (:172-174); optional non-blocking Tail: 3-Zeilen-MSVC-Mirror in make_system_compile_fn (build_orchestrator.hpp:450-461). KERN-BLOCKER: opt-c zieht damit erstmals den Ofast-Default an die golden-320-Mess-Binaries (byte-neutrale -O2-Transition wird ZURÜCKGEZOGEN) — das ist die OF-2-Kernentscheidung (Lesart A vs. B), die vor dem Bau der Default-Verdrahtung eine User-Freigabe braucht. Der Naht-Mechanik-Teil (Funktion + Include + Provenienz) ist voll code-verankert und baubar; nur der Default-Wert von active_opt_level() für den golden-Pfad ist die offene Entscheidung.",
+      "open_decisions_for_user": [
+        {
+          "id": "OF-2-KERN",
+          "question": "opt-c verdrahtet erstmals einen aktiven opt_level an die golden-320-Mess-Binaries. Greift der CEB-Default Ofast (DefaultOptLevelSubAxis) AUCH für die golden-Mess-Binaries (Lesart A: Ofast überall, ausser XML-Override), oder selektiert die golden-Experiment-XML explizit ein IEEE-754-treues Level, während -Ofast nur als additive opt-level-Vergleichsreihe permutiert (Lesart B)? OF-2 verbatim sagt 'Standardeinstellung von CEB ist Ofast'; die Mess-Direktive (1-Thread, deterministisch, -Ofast bricht via -fallow-store-data-races + -funsafe-math IEEE-754 UND Run-to-Run-Determinismus, optimization_level_sub_axis.hpp:15-16) spricht gegen Ofast für die PRIMÄREN Mess-Binaries. Davon hängt die Reproduzierbarkeit des gesamten primären Mess-Korpus (FF0-FF4, honest-100%) ab.",
+          "recommendation": "Lesart B. OF-2 'nichts gepinnt' als MECHANISMUS-Aussage lesen (kein hartkodiertes -O-Literal, alles XML-überschreibbar — durch die opt-a/b/c-Achse erfüllt), NICHT als Policy über die golden-Mess-Selektion. active_opt_level() behält Ofast als CEB-Code-Default (OF-2-buchstabenkonform + voll beweglich), aber der golden-320-Lauf wählt via env/Planer explizit ein is_ieee754_deterministic()==true-Level; -Ofast lebt additiv als eigene +opt-Sidecar-Vergleichsreihe daneben (Messdaten nie löschen). Damit sind OF-2 und die 1-Thread-Determinismus-Direktive SIMULTAN erfüllt, weil eine deterministische golden-XML-Wahl kein 'Pin' im OF-2-Sinn ist. Konkrete Bau-Konsequenz: in opt-c NICHT die 5-Param-Naht + Provenienz + Übersetzer bauen (das ist unstrittig und baubar), aber die DEFAULT-Wahl von active_opt_level() für den golden-Pfad erst nach diesem GO festschreiben."
+        },
+        {
+          "id": "OF-2-LEVEL",
+          "question": "Falls Lesart B: Ist die golden-Mess-Selektion O2 oder O3? O2 ist der historische Byte-Identitäts-Anker der bereits persistierten Reihen (opt-b-Transition-Default); O3 zeigt den in opt-a literal bewiesenen Cache-Line-Stride-Effekt (-33..-42 %, Ledger:1929) und ist weiter is_ieee754_deterministic()==true.",
+          "recommendation": "O2 als golden-Anker beibehalten (Byte-Identität zu allen bereits persistierten Reihen, keine Invalidierung des Alt-Korpus), O3 und Ofast additiv als eigene +opt=-Sidecar-Reihen permutieren. Das trennt den reproduzierbaren Primär-Korpus sauber von der aggressiven Vergleichs-Studie und hält Messdaten additiv."
+        },
+        {
+          "id": "MSVC-TIMING",
+          "question": "make_system_compile_fn (build_orchestrator.hpp:450-461) emittiert KEIN /O-Flag (cl defaultet still auf /Od) und hat keinen opt-Param; es ist aktuell GAR NICHT verdrahtet (kein Aufrufer, nur Kommentar :379). Soll der 3-Zeilen-MSVC-Mirror (Signatur +opt_flag=\"/O2\", Capture, Emit vor /EHsc) JETZT in opt-c mitgenommen oder auf den opt-k/Windows-Platform-Track zurückgestellt werden?",
+          "recommendation": "In opt-c als NON-BLOCKING Tail mit-emittieren: trivial, architekturkonform (Symmetrie make_system ↔ make_gpp), verhindert dass msvc_opt_flag() ein toter Accessor bleibt und dass beim späteren Verdrahten ein stilles /Od-Regressionsrisiko entsteht. NICHT golden-/messrelevant und NICHT blockierend (kein Aufrufer, Cluster Linux/POSIX-first) — der Live-Wert von opt-c liegt komplett auf dem make_gpp-Pfad. Falls der Master-Bauplan MSVC strikt dem opt-k-Track zuordnet: zurückstellen, dann msvc_opt_flag()-Zweig in perm_opt_level_cflags() als auskommentierten Andockpunkt vorsehen (keine Parallelstruktur)."
+        },
+        {
+          "id": "ENV-DOMAENE",
+          "question": "Erwartet der env-Pilot COMDARE_PILOT_OPT_LEVEL die opt_level_id ('O0'..'Ofast') oder den rohen Flag-String ('-Ofast')? Und ist der Name als Spiegel von COMDARE_PILOT_SIMD_POLICY bestätigt?",
+          "recommendation": "opt_level_id ('O0'/'O1'/'O2'/'O3'/'Ofast') — strikte Analogie zu active_simd_policy() (:112 nutzt die id, nicht den Flag). Name COMDARE_PILOT_OPT_LEVEL bestätigen (1:1-Spiegel des SIMD-Pilots)."
+        },
+        {
+          "id": "FALLBACK-KLASSE",
+          "question": "Bei unbekanntem COMDARE_PILOT_OPT_LEVEL: perm_extension_hardware_cflags() fällt auf Generic=LEER zurück; opt_level darf aber nie leer sein (kein Flag = Compiler-Default, nicht Ofast/kontrolliert). Warn+Ofast-Fallback oder harter exit (analog Achse-2 :216)?",
+          "recommendation": "std::cerr-Warnung + Fallback auf DefaultOptLevelSubAxis (Ofast), NICHT leer und NICHT harter exit. opt_level darf nie still entfallen, aber ein Tippfehler im Smoke-Schalter soll den Lauf nicht killen; die Fehlerklasse ist 'sichtbar degradiert, weiterlaufen' (Memory feedback_fehlerklassen_pflicht). Bei opt-g/Planer-Verdrahtung härten."
+        }
+      ],
+      "dossier_markdown": "# Bau-INC-2c.opt-c — Bauplan-Dossier\n\n**Übersetzer `perm_opt_level_cflags()` + Default-Verdrahtung des opt_level an die POSIX-Fassade**\n\nStatus: **NEEDS_USER_DECISION_FIRST** — die Naht-Mechanik (Funktion, Include, Provenienz, Aufrufer-Anhang) ist voll code-verankert und baubar; der **Default-Wert** von `active_opt_level()` für den golden-Pfad ist die OF-2-Kernentscheidung (Lesart A vs. B), die opt-c blockiert, weil opt-c genau den Punkt ist, an dem der Ofast-Default erstmals an die golden-320-Mess-Binaries greift und die byte-neutrale −O2-Transition **bewusst zurückgezogen** wird.\n\nEhrliche Benennung: **opt-c ist KEIN byte-neutraler Schritt mehr.** opt-b hielt via Signatur-Default `-O2` + unveränderte Aufrufer Byte-Identität. Sobald opt-c den 5. Param an :226/:402 setzt und `active_opt_level()` den Achsen-Default (Ofast) liefert, ändert sich das reale Compile-Verhalten der golden-Mess-Binaries. Die persistierten Alt-Reihen bleiben (Messdaten nie löschen); die neue Ofast/O3-Selektion lebt **additiv als +opt=-Sidecar-Reihe**.\n\n---\n\n## 1. `active_opt_level()` — neuer Helper (Spiegel `active_simd_policy()`)\n\n**Zweck:** Liefert die aktive `opt_level_id` (Achsen-Default, env-übersteuerbar). Wert-Quelle in opt-c ist ausschliesslich env-Pilot + Achsen-Default; die XML wird erst in **opt-f** Quelle (Ordering-Grenze: opt-c VOR opt-f, keine Parallelstruktur).\n\n**IST** `profile_run_facade.cpp:109-114` (`active_simd_policy()` — das wörtliche Vorbild):\n```\npolicy = GenericExtensionHardwareAxis::simd_extension_id();  // :111 Achsen-Default\nif (getenv(\"COMDARE_PILOT_SIMD_POLICY\")) policy = e;         // :112 env-Override\n```\n`optimization_level_sub_axis.hpp:121` `using DefaultOptLevelSubAxis = OptOfastSubAxis;` · `:128` static_assert Default==Ofast.\n\n**SOLL (Mini-Schritte):**\n1. Direkt hinter `active_simd_policy()` (nach :114) neuen anonymen-Namespace-Helper `active_opt_level() -> std::string_view` einfügen.\n2. `policy = DefaultOptLevelSubAxis::opt_level_id();` (Ofast, OF-2) — Single-Source aus der Achse, kein Literal.\n3. `if (char const* e = std::getenv(\"COMDARE_PILOT_OPT_LEVEL\"); e && *e) policy = e;` — Wert-Domäne = `opt_level_id` (nicht roher Flag), strikte SIMD-Analogie. **[open: ENV-DOMAENE]**\n4. Kommentar-Block spiegeln (:105-108): Smoke-Schalter bis Planer-Strang (opt-f/opt-g); XML hier NICHT.\n\n---\n\n## 2. `perm_opt_level_cflags()` — Übersetzer (Spiegel `perm_extension_hardware_cflags()`)\n\n**Zweck:** Mappt die aktive `opt_level_id` auf den compiler-passenden Flag-String und gibt **EINEN `std::string`** zurück (NICHT vector — der 5. Param `opt_flag` ist `std::string`, `build_orchestrator.hpp:469`). **KEIN Merge in `perm_mess_defines()`** — strukturell anders als extension_hardware (dort push_back in defines-Vektor :156). opt_flag reist als eigener Positions-Param mit eigener .rsp-Zeile (`build_orchestrator.hpp:483`), getrennt von den defines (:490).\n\n**IST** `profile_run_facade.cpp:116-130` (`perm_extension_hardware_cflags()` — if/else über Achsen-IDs, unbekannt → cerr + Fallback). Flag-Quelle: `optimization_level_sub_axis.hpp:45-47` (`gcc_opt_flag()`/`clang_opt_flag()`/`msvc_opt_flag()`); Werte :77-116.\n\n**SOLL (Mini-Schritte):**\n1. Neue Funktion `perm_opt_level_cflags() -> std::string` direkt nach `perm_extension_hardware_cflags()` (nach :130).\n2. `auto id = active_opt_level();` — Dialekt via `cxx_compiler()` (:160) mit dem etablierten Substring-Gate aus `build_orchestrator.hpp:488`: `cxx_compiler().find(\"clang\") != npos` → clang-Leg, sonst gcc-Leg. `msvc_opt_flag()` bleibt dem MSVC-CompileFn-Pfad vorbehalten (make_gpp ist gcc/clang-only). **[open: MSVC-TIMING]** Architektur-Note: Dialekt-Wahl bevorzugt über die Compiler-Achse als Single-Source (Metaprog-Doktrin); da `gcc_opt_flag()==clang_opt_flag()` für alle Stufen, ist der Branch auf POSIX heute ein semantischer No-op, aber Spiegeltreue Pflicht.\n3. if/else-Kette über `OptO{0,1,2,3,Ofast}SubAxis::opt_level_id()` → jeweiliges `gcc_opt_flag()`/`clang_opt_flag()`.\n4. Unbekannter env-Wert → `std::cerr`-Warnung + Fallback auf `DefaultOptLevelSubAxis` (Ofast), **NIE leer** (opt_level darf nie still entfallen — Unterschied zu Generic=leer bei SIMD). **[open: FALLBACK-KLASSE]**\n5. Include ergänzen: `#include <cache_engine/measurement/optimization_level_sub_axis.hpp>` (fehlt bislang; heute nur `compiler_system_axis.hpp` :12 + `extension_hardware_system_axis.hpp` :13). Neue Zeile bei :14.\n\n---\n\n## 3. Aufrufer-Anhang — 5. Positions-Arg an BEIDEN Stellen\n\n**Zweck:** Speist den Flag an make_gpp_compile_fn ein (Param existiert seit opt-b, Default `-O2` transitional). **HIER wird die Byte-Neutralität bewusst verlassen** — abhängig von [open: OF-2-KERN].\n\n**IST** identisch an zwei Stellen (4 Args, kein 5.):\n- `profile_run_facade.cpp:226` (run_profile_facade)\n- `profile_run_facade.cpp:402` (run_experiment-Delegation)\n```\na.compile = ex::make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs());\n```\n\n**SOLL (Mini-Schritte, an :226 UND :402 identisch):**\n```\na.compile = ex::make_gpp_compile_fn(perm_include_dirs(), perm_mess_defines(), cxx_compiler(), perm_link_libs(), perm_opt_level_cflags());\n```\n**GATE:** Dieser Schritt erst nach GO zu [open: OF-2-KERN]/[OF-2-LEVEL] final festschreiben. Bei Lesart B liefert `active_opt_level()` für den golden-Lauf ein deterministisches Level (O2-Anker), nicht Ofast; Ofast permutiert additiv.\n\n---\n\n## 4. Provenienz — `system_axes_version_suffix()` um `+opt=` erweitern\n\n**Zweck:** Unter anderem opt_level gebaute DLLs bekommen ein eigenes `.version`-Sidecar (kein falscher `dll_is_current`-Skip), CSV-Spalte `build_version` trägt die Provenienz. **binary_id bleibt neutral** (opt NIE in `kCompositionAxisNames`, golden==320 unberührt).\n\n**IST** `profile_run_facade.cpp:172-174`: `return \"+ext=\" + active_simd_policy() + \"+cxx=\" + cxx_compiler();` — trägt heute nur `+ext=` und `+cxx=`. Header-Forderung `optimization_level_sub_axis.hpp:11-13` nennt `+opt=`.\n\n**SOLL:** `... + \"+opt=\" + std::string{active_opt_level()}` anhängen. Verbindlich für korrekte Provenienz (Teil des sauberen Wegs, nicht der reinen 5-Param-Naht). Note MSVC: Ofast→/O2-Degradierung — falls MSVC live wird, im Sidecar kenntlich, damit cl-Reihen nicht fälschlich als Ofast gelten.\n\n---\n\n## 5. (Non-blocking Tail) MSVC-Mirror in `make_system_compile_fn`\n\n**Zweck:** Symmetrie make_system ↔ make_gpp; verhindert toten `msvc_opt_flag()`-Accessor + latentes stilles-/Od-Regressionsrisiko. **NICHT golden-/messrelevant, NICHT blockierend** (kein Aufrufer, nur Kommentar `build_orchestrator.hpp:379`; Cluster Linux/POSIX-first). **[open: MSVC-TIMING]**\n\n**IST** `build_orchestrator.hpp:450-461`: Signatur nur `include_dirs`+`std_flag`; Emit :453 `\"cl /nologo \" + std_flag + \" /EHsc /LD /MP\" + cores` — kein `/O<n>` (cl-Default still `/Od`).\n\n**SOLL (3 Zeilen, exakter opt-b-Spiegel):**\n1. Signatur :450-451: 3. Param `std::string opt_flag = \"/O2\"` (transitionaler Builder-Fallback analog `-O2`; NICHT Ofast, das auf /O2 abbildet).\n2. Capture :452: `, opt_flag = std::move(opt_flag)`.\n3. Emit :453: `\"cl /nologo \" + std_flag + \" \" + opt_flag + \" /EHsc /LD /MP\" + std::to_string(job.cores)` (/O vor /EHsc).\n\n---\n\n## Verifikation\n\n1. **.rsp-Vergleich (byte-genau):** Vor/nach Diff einer perm_*.cpp → perm_*.so-Kompilation die generierte `<output>.rsp` vergleichen.\n   - **Lesart B / O2-golden:** `.rsp`-Zeile 2 MUSS `-O2` bleiben → **byte-identisch** zum opt-b-Stand, `diff` leer. Beweist Neutralität des golden-Anker-Pfads.\n   - **Ofast/O3-Vergleichsreihe (env gesetzt):** `.rsp`-Zeile 2 = `-Ofast`/`-O3`, alle übrigen Zeilen identisch (nur die eine opt-Zeile ändert).\n2. **golden==320:** `ctest`-golden-Suite grün, Achsen-Zahl exakt 320 (kV3AxisSchema / kCompositionAxisNames unberührt — opt_level steht NIE drin). Kein neuer Achsen-Eintrag.\n3. **cf22 (clang-format):** `~/tools/cf22/usr/bin/clang-format` über die geänderten Dateien, kein Diff (offizieller Weg, keine Behelfe).\n4. **ce-standalone-Build:** Pflicht-Reihenfolge (reference_cache_engine_standalone_build_pipeline) hart grün, inkl. der neuen `static_assert`-tragenden TU.\n5. **super-Sub-Build:** Einbettung im Super-Repo (Sub-Build) grün — Interface-Include-Pfad `<cache_engine/measurement/optimization_level_sub_axis.hpp>` auflösbar.\n6. **Fehlerklasse-Sichtbarkeit:** Test mit unbekanntem `COMDARE_PILOT_OPT_LEVEL` → cerr-Warnung + Ofast-Fallback (nicht leer, kein Absturz, kein Null-Flag).\n7. **Provenienz-Roundtrip:** DLL unter env-Ofast gebaut → `.version`-Sidecar trägt `+opt=Ofast`, kein falscher `dll_is_current`-Skip gegen eine `+opt=O2`-DLL.\n\n**Dual-Verifikation (baremetal lokal + CI) gemäss Memory geparkt bis Aufgaben-Abschluss** — hier lokal-first (ce-standalone + super-Sub); CI-Strategie danach gesammelt nachziehen. Kein ✓ ohne wörtliche Ausgabe.\n\n---\n\n## TABU / Risiken\n\n- **TABU:** opt_flag NIE in `binary_id`/`kCompositionAxisNames` — sonst golden!=320. opt_level ist Provenienz (Mess-VALIDITÄT), nicht Achsen-Identität.\n- **TABU:** Kein Merge des opt-Flags in `perm_mess_defines()`/defines-Vektor — opt_flag ist separater Positions-Param (Typ `std::string`, nicht vector). Der Rückgabetyp der neuen Funktion ist `std::string`, NICHT wie beim SIMD-Vorbild `vector<string>`.\n- **TABU:** Kein Signatur-Default `Ofast` auf `make_gpp_compile_fn`/`make_system_compile_fn` — würde unveränderte Aufrufer sofort ziehen und die opt-b/opt-c-Trennung brechen (`build_orchestrator.hpp:470-475`). Default bleibt `-O2`/`/O2` transitional; Ofast wird am Planer/Fassade erzwungen.\n- **TABU:** Keine XML-Quelle in opt-c (Ordering: opt-f). Kein auskommentierter XML-Pfad, der Parallelstruktur andeutet, ausser als klar markierter opt-f-Andockpunkt.\n- **TABU:** Keine CT→RT-Degradierung — Flag-Werte kommen constexpr aus den CRTP-Achsen (static-dispatch, keine vtable), nur die env-Piloten-Auswahl ist runtime (Smoke-Schalter, wie SIMD).\n- **TABU:** Messdaten nie löschen — Ofast/O3 additiv als +opt=-Sidecar-Reihen; O2-Alt-Korpus unangetastet.\n- **RISIKO (KERN):** Ofast bricht IEEE-754 + Run-to-Run-Determinismus (`-fallow-store-data-races` + `-funsafe-math`, optimization_level_sub_axis.hpp:15-16). Bei Kombination mit T08-Concurrency/Data-Race-Achsen ist das Ergebnis **semantisch ungültig** (nicht nur verrauscht). → **[open: OF-2-KERN]** blockiert die Default-Verdrahtung; is_ieee754_deterministic() ist der bereits eingebaute Trenn-Hook (Planer/Warnung bei opt-g).\n- **RISIKO:** Dialekt-Erkennung per Substring (`find(\"clang\")`) ist heute No-op auf POSIX (gcc==clang je Stufe), aber MSVC-relevant; Single-Source über die Compiler-Achse ist die sauberere (nicht einfachste) Variante — im Übersetzer als solche umsetzen, nicht per String-Heuristik verewigen wo die Achse verfügbar ist.\n\n---\n\n## Diff-Umfang\n\n- `libs/cache_engine/profile_facade/profile_run_facade.cpp`:\n  - +1 Include (~:14).\n  - +`active_opt_level()` (~10 Zeilen nach :114).\n  - +`perm_opt_level_cflags()` (~14 Zeilen nach :130).\n  - :226 + :402: je +1 Arg (5. Positions-Param) — **GO-gated (OF-2)**.\n  - :172-174: +`+opt=`-Fragment.\n- `libs/cache_engine/builder/build_orchestrator/build_orchestrator.hpp` (non-blocking Tail, [open: MSVC-TIMING]):\n  - :450-451 Signatur +1 Param, :452 Capture, :453 Emit — 3 Zeilen.\n\nNetto ~40 Zeilen, davon der golden-verhaltensrelevante Kern = die zwei Aufrufer-Zeilen (:226/:402), die unter der offenen OF-2-Entscheidung stehen. Der Rest (Übersetzer, Helper, Provenienz, MSVC-Mirror) ist code-verankert, architekturkonform und ohne golden-Bruch baubar."
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Map"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Synth"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "map:mirror_wiring",
+      "phaseIndex": 1,
+      "phaseTitle": "Map",
+      "agentId": "ae40a247e1a097835",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784322596911,
+      "queuedAt": 1784322596903,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Bau-INC-2c.opt-c: Naht-Mechanik der opt_level-Einspeisung i…",
+      "promptPreview": "Kartiere die Naht-Mechanik für opt-c. Lies /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/profile_facade/profile_run_facade.cpp Zeilen 78-175 (perm_link_libs, COMDARE_PILOT_SIMD_POLICY-Pilot :108-130, perm_extension_hardware_cflags :116, perm_mess_defines :132-158, cxx_compiler :160, system_axes_version_suffix :173) und :220-23…",
+      "lastProgressAt": 1784322743285,
+      "tokens": 45029,
+      "toolCalls": 10,
+      "durationMs": 146374,
+      "resultPreview": "{\"area\":\"Bau-INC-2c.opt-c: Naht-Mechanik der opt_level-Einspeisung in make_gpp_compile_fn (profile_run_facade.cpp)\",\"findings\":[{\"point\":\"Zwei GRUNDVERSCHIEDENE Einspeise-Kanaele: extension_hardware wird in den defines-Vektor GEMERGT, opt_flag ist ein SEPARATER Positions-Param. perm_extension_hardware_cflags() liefert vector<string> und wird in perm_mess_defines() in den defines-Vektor d gepusht; …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "map:value_source",
+      "phaseIndex": 1,
+      "phaseTitle": "Map",
+      "agentId": "a6c7f0ccfd492bdfb",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784322596917,
+      "queuedAt": 1784322596903,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Bau-INC-2c.opt-c — WERT-QUELLE des aktiven opt_level (Order…",
+      "promptPreview": "Kartiere die WERT-QUELLE für opt-c. Lies /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/profile_facade/profile_run_facade.cpp:108-130 (das env-Pilot-Muster COMDARE_PILOT_SIMD_POLICY) und /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/mea…",
+      "lastProgressAt": 1784322755123,
+      "tokens": 42715,
+      "toolCalls": 9,
+      "durationMs": 158206,
+      "resultPreview": "{\"area\":\"Bau-INC-2c.opt-c — WERT-QUELLE des aktiven opt_level (Ordering: opt-c VOR opt-f)\",\"findings\":[{\"point\":\"Das env-Pilot-Muster ist woertlich vorhanden und ist das exakte Vorbild: active_simd_policy() liest den Achsen-Default und laesst ihn per env uebersteuern.\",\"evidence\":\"profile_run_facade.cpp:109-114 — active_simd_policy(): policy = GenericExtensionHardwareAxis::simd_extension_id() (Ach…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "map:ofast_conformance",
+      "phaseIndex": 1,
+      "phaseTitle": "Map",
+      "agentId": "aa404c2e3ca87b8f6",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784322596921,
+      "queuedAt": 1784322596903,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "OF-2-Konformitaet (opt_level-Default = Ofast) vs. Determini…",
+      "promptPreview": "Prüfe die OF-2-Konformität + die Determinismus-Spannung. Lies im Ledger /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md (grep 'OF-2','OF-3','Ofast','opt_level','Determinismus','measurement_modes','1-Thread') und /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260717-inc2copt-planung/BAUPLAN-IN…",
+      "lastProgressAt": 1784322836570,
+      "tokens": 74567,
+      "toolCalls": 11,
+      "durationMs": 239649,
+      "resultPreview": "{\"area\":\"OF-2-Konformitaet (opt_level-Default = Ofast) vs. Determinismus-Direktive (1-Thread, IEEE-754-treu) an der Compiler-System-Unterachse — Bau-INC-2c.opt-a/b/c\",\"findings\":[{\"point\":\"OF-2 verbatim fordert Default=Ofast UND 'nichts gepinnt' — die Spannung ist im Ledger selbst als Widerspruch angelegt, nicht erfunden.\",\"evidence\":\"Ledger:1924 (OF-2, User-verbatim 2026-07-17): 'Die Standardeins…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "map:msvc_gap",
+      "phaseIndex": 1,
+      "phaseTitle": "Map",
+      "agentId": "a6c56851f0a1274f0",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784322596926,
+      "queuedAt": 1784322596903,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "MSVC-Lücke in make_system_compile_fn (Bau-INC-2c.opt-c, Opt…",
+      "promptPreview": "Kartiere die MSVC-Lücke (vom opt-b-Verdikt vorgemerkt). Lies /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/build_orchestrator/build_orchestrator.hpp:450-461 (make_system_compile_fn — MSVC/cl-CompileFn). Sie emittiert KEIN Optimierungs-Flag (cl-Default implizit /Od) und hat KEINEN opt-Parameter. Die opt_level-Unter-Achs…",
+      "lastProgressAt": 1784322673121,
+      "tokens": 38395,
+      "toolCalls": 7,
+      "durationMs": 76195,
+      "resultPreview": "{\"area\":\"MSVC-Lücke in make_system_compile_fn (Bau-INC-2c.opt-c, Optimierungs-Flag-Emit unter cl)\",\"findings\":[{\"point\":\"Bestätigt: make_system_compile_fn emittiert KEIN /O-Flag und cl defaultet damit implizit auf /Od (kein Optimierungslauf).\",\"evidence\":\"build_orchestrator.hpp:453 baut cmd = \\\"cl /nologo \\\" + std_flag + \\\" /EHsc /LD /MP\\\" + cores; in :453-458 folgt nur /I, Quelle, /Fe, /Fo — an k…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "synth:opt-c-dossier",
+      "phaseIndex": 2,
+      "phaseTitle": "Synth",
+      "agentId": "ad3c0949c281b4a14",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784322836583,
+      "queuedAt": 1784322836574,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NEEDS_USER_DECISION_FIRST",
+      "promptPreview": "Du bist der Planer-Synthesizer für Bau-INC-2c.opt-c. Aus den 4 Kartierungen unten erzeuge ein PRÄZISES, code-verankertes Bauplan-Dossier (Markdown, Struktur wie opt-b: Zweck · IST datei:zeile · SOLL Mini-Schritte · Verifikation inkl. .rsp-cmp + golden==320 + cf22 + super-Sub-Build · TABU/Risiken · Diff-Umfang). REGELN: compile-time-only Hot-Path, opt_flag NIE in binary_id, byte-identitäts-Neutrali…",
+      "lastProgressAt": 1784323015997,
+      "tokens": 50684,
+      "toolCalls": 8,
+      "durationMs": 179413,
+      "resultPreview": "{\"conformance_verdict\":\"NEEDS_USER_DECISION_FIRST\",\"increment_scope_summary\":\"Bau-INC-2c.opt-c verdrahtet die opt_level-Unterachse an die POSIX-Fassade: neuer Übersetzer perm_opt_level_cflags() (Spiegel von perm_extension_hardware_cflags(), profile_run_facade.cpp:116-130) + Helper active_opt_level() (Spiegel active_simd_policy():109-114, env-Pilot COMDARE_PILOT_OPT_LEVEL, Achsen-Default Ofast), ge…"
+    }
+  ],
+  "totalTokens": 251390,
+  "totalToolCalls": 45
+}
