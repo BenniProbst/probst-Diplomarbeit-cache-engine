@@ -1,3 +1,14 @@
+> # ⚠️ KORREKTUR-KOPF (2026-07-17, User-Ruling F1/F2/F3) — DIESES DOSSIER IST TEILWEISE IRRLÄUFER
+> Die **architektonische Verortung** in §2/F1 (dedizierte `OptimizationLevelSystemAxis`-Geschwister-Achse)
+> ist **FALSCH** und der „global vs. per-Ausprägung"-Fork (F3) **kategorial ungültig**. Korrekte Verortung
+> per User-Ruling (verbatim im Ledger §20): Die Optimierungsstufe ist eine **dynamische Unterachse UNTER der
+> Compiler-System-Haupt-Achse**, die auch Flags/Commands je Compiler als permutierbare Unterachsen trägt
+> (→ verschiedene Tier-Binaries). **F2 = voll {O0..Ofast} + Hardware-Erweiterungs-Unterachsen (SIMD/AVX,
+> deep research).** **F3 = ALLES per XML konfigurierbar (Achse + Unterachsen); „global" existiert im
+> dynamischen System NICHT.** Die IST-Nähte (§3), TABUs (§6) und Verifikations-Gates (§5) dieses Dossiers
+> bleiben gültig; nur die Verortung (§2) + F1/F3 (§7) sind durch die Neuplanung ersetzt.
+> Memory: `project_compiler_systemachse_traegt_dynamische_xml_unterachsen`.
+
 # BAUPLAN-INC-2c.opt — Optimierungsstufe (Richtung -O3) als System-Achsen-Flag (Option A)
 
 Status: PLAN (ultracode-Synthese aus 4 Kartierungen). Kein Bau vor expliziter Phasen-Freigabe (§20.B V6.3-Prozessregel). ABI-neutral geplant (kein weiterer 4→5-Bump; der Major-Bump war einmalig in 2b, ce 86769bc9).
