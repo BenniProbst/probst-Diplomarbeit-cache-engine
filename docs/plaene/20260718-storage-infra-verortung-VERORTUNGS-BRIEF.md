@@ -1,137 +1,150 @@
-# Verortungs-Brief — Storage #51 Infra (ultracode wf_ee4bd609)
-> 2026-07-18, 4 Agenten. Verortung vor Infra-Arbeit (Direktive: vor Infra immer ultracode über Themen-Sessions). Secrets redigiert.
+# Verortungs-Brief — Storage #51 Infra (FRISCH, ultracode wf_64c5aeb6)
+> 2026-07-18, 4 Agenten, auf AKTUELLEM Cluster-Stand (081ebc4, nach gitlab-Pull). ERSETZT den ersten Lauf (wf_ee4bd609), der 36 Commits stale war. Secrets redigiert.
 
-# Verortungs-Brief — Storage #51 (vor Infra-Arbeit)
+# Verortungs-Brief — Storage #51 (Cache-Engine Storage-Layering, vor Infra-Aktivierung)
 
-Stand 2026-07-18 · Deadline 28.07. · Governance: **VOLLES GO** (Ledger §24.A schlägt den GATED-Doc-Kopf; §24.B lockert „Cluster read-only" ausnahmsweise für Caching+Storage-Einrichtung). Bau-Doktrin: VOR-ultracode-Planung → Bau → NACH-Konformitätsprüfung.
+Stand: 2026-07-18 · Scope: 3-Ebenen-Storage A/B/C · CE-Code byte-neutral bis Env gesetzt · Infra = Handover an Infra-Agent (Cluster read-only, Ausnahme nur Caching/Storage-Einrichtung, Ledger §24.B)
 
 ---
 
-## 1 · WO STEHE ICH (CE-Design)
+## 1 — WO STEHE ICH (CE-Design entschieden, codiert vs. pending)
 
-**Drei Speicher-Ebenen, klar getrennt:**
+**Entschieden: 3 sauber getrennte Storage-Ebenen, je eigener Endpoint**
 
-| Ebene | Ziel | Status | Kern |
+| Ebene | Inhalt | Ziel | CE-Arbeit |
 |---|---|---|---|
-| **A** Standard-Compiles + CI-ccache | dev-MinIO `buildsystem-cache` via `runners.cache` | **DONE** | Bestehende Infra, KEINE CE-Änderung (`.gitlab-ci.yml:34`) |
-| **B** CEB/Tier-Binary-Artefakte | minio dev-V90, eigener Bucket | **PENDING** | Objekt-Key `<build_version>/<stem>/perm.dll(+.version)`, an Algo-Versions-Manifest gekoppelt |
-| **C** Messergebnisse (result.csv, measurements.csv, PDF/tex) | NFS prod-longhorn-6TB (V91) | **PENDING** | POSIX-copy an `COMDARE_MEASUREMENT_NFS_ROOT`, additiv/sha256-verify |
+| **A** | Standard-Compiles + CI-Daten (CEB-Host-.o, 9 Pipeline-Executables) | GitLab-Cache dev, Bucket `buildsystem-cache` (V90) | **KEINE** — leben schon im CMake-Build-Tree außerhalb `e4_dir`, unverändert |
+| **B** | CEB/Tier-Binary-Artefakte: `perm.dll` + `perm.dll.version` + `result.csv` | MinIO **dev V90** NEU, Bucket getrennt von `buildsystem-cache`; Key = `<build_version>/<stem>/perm.dll(+.version)`, an Algo-Versions-Manifest gekoppelt (gleiche `build_version`-Signatur wie `dll_is_current` lokal), Pull re-verifiziert → stale ABI (5→6) nie reused | **pending** |
+| **C** | Messergebnisse: per-Binary `result.csv` + globale `measurements.csv` + PDF/tex | NFS **prod-longhorn-6TB** NEU (V91), POSIX `std::filesystem::copy` an `COMDARE_MEASUREMENT_NFS_ROOT`, additiv/sha256-verify | **pending** |
 
-**Bereits GELANDET (via caching-impl, byte-neutral):** das Injektions-Muster ist LIVE — `AlgoSigFn` als 4. Ctor-Arg injiziert (`cache_engine_builder_iterator.hpp:708-712`), `algo_sidecar_path()` + `dll_is_current(output,version,algo_sig)` mit Organ-Gate (`build_orchestrator.hpp:~185/~193`), per-Binary Resume-Stamp `|algos=<sig>` (`:731`). Die Ebene-B-Key-Kopplung nutzt exakt dieselbe Signatur, die `dll_is_current` lokal prüft → Pull re-verifiziert → stale ABI (5→6) nie reused.
+**Bereits codiert (im Code verifiziert vorhanden — die Einhänge-Naht existiert):**
+- `cache_engine_builder_iterator.hpp:714` — `provision_all` = Phase A (BAU, multithreaded)
+- `:734` — Mess-For-Loop (Phase B, 1-Thread)
+- `:893-897` — `result.csv`-Write (`csv_write_ok`)
+- `:904-908` — `result.csv.stamp` nach verifiziertem Write
+- `:911` — RAII-DLL-Unload-Kommentar → **die Einhänge-Stelle** liegt zwischen Stamp-Write und Unload
+- `profile_run_entry.hpp:426` — `csv.flush` = Whole-run-Sink-Punkt (plan-425)
+- `build_orchestrator.hpp:332` — `dll_is_current(job.output, build_version, algos)` = Pull-Punkt (Warm-Cache in Phase A, parallel-unbedenklich)
+- `build_orchestrator.hpp:126-127, :227` — `CompileFn`/`SourceGenFn` (`std::function`, injiziert) = **Muster-Präzedenz** für die No-Op-Injektion
 
-**Noch zu codieren (CE-Seite, alles No-Op-injiziert):**
-- Naht-Felder `CachePushFn` + `MeasurementSinkFn` (Default No-Op) auf Iterator-cfg + `RunProfileArgs`/`ExperimentRunArgs` — Muster wie `CompileFn`/`SourceGenFn`/`AlgoSigFn` (grep = 0 Treffer, existiert nicht).
-- `builder/artifact_transport/artifact_cache.hpp` — schmale synchrone C++-Klasse, mc-Shellout (grep = 0, existiert nicht).
-- `artifact_cache::from_env` in `messung_driver/main.cpp` auf xa/pa; Durchreichen in `profile_run_facade.cpp`.
-- Objekt-Key-Ableitung (aus `build_version`/`stem`); NFS-Sink.
+**Pending (grep = 0 Treffer in `Code/external/comdare-cache-engine`; nichts gebaut):**
+- `builder/artifact_transport/artifact_cache.hpp` — schmale C++-Klasse, synchron `mc cp`, Retry/Größen-Verify nach Muster `scripts/copy_results_to_nas.sh:24-40`; Vollständigkeits-Marke: `perm.dll` ZUERST, `.version` ZULETZT (halb-gepusht = kein Sidecar = kein Pull); Fehler → `InfraErrorClass::ArtefaktIo` loggen, lokale Kopie behalten, **MESSEN WEITER** (`grep artifact_cache = 0`)
+- `CachePushFn` + `MeasurementSinkFn` (Default No-Op) auf Iterator-cfg + `RunProfileArgs`/`ExperimentRunArgs`, durchgereicht über `profile_run_facade.cpp` (Spiegel `out_csv`-Passthrough) (`grep = 0`)
+- Push/Sink-Call an der Naht (`:900`) + Whole-run-Sink an `:426` — Injektion outstanding
+- Env-Wiring `COMDARE_MINIO_ENDPOINT/_BUCKET/_PREFIX` (B) + `COMDARE_MEASUREMENT_NFS_ROOT` (C), getrennt von `COMDARE_CACHE_ROOT` (A/ccache); `artifact_cache::from_env` in `messung_driver/main.cpp` auf `xa`/`pa` (`grep COMDARE_MINIO/NFS = 0`)
 
-**Naht-Punkte existieren, nur Push/Sink-Aufruf fehlt:** Phase A `provision_all` multithreaded (`cache_engine_builder_iterator.hpp:712`), Phase B 1-Thread for-loop (`:731`), `result.csv` write (`:893`), `.stamp` (`:905`), RAII-DLL-unload = Naht-Ende (`:911`); Whole-run `csv.flush` (`profile_run_entry.hpp:426`). **Push+NFS-copy SYNCHRON an der Naht, VOR RAII-Unload; async/detached VERBOTEN** (I/O-Contention-Messfehler).
-
-**Byte-Neutralität (Anti-Phantom):** alle env-Vars leer → No-Op → golden/CI unverändert.
-
-**Fehlerklassen-Träger vorhanden:** `measurement/axis_error.hpp` (`BuildError = variant<InfraError,CompilerCompilerError>`) → `InfraErrorClass::ArtefaktIo`. Doktrin: Push-/NFS-Fehler loggen, lokale Kopie behalten, **MESSEN WEITER** (nie „measured=0").
-
----
-
-## 2 · CLUSTER-IST
-
-**VLAN-Isolation:** 15 VLANs strikt isoliert; Cross-VLAN NUR über OPNsense pf + HAProxy (bindet CARP-VIP `.1` je VLAN). Subnetz `10.0.<vlan>.0/24`, VIP `.1`, OPN `.11-.14`. V20=STORAGE (GlusterFS/NFS), V80=BACKUP (Longhorn), **V90=DATABASE (MinIO)**. Split „prod = dev+1": **V90 dev-DB ↔ V91 prod-DB**.
-
-**Cross-VLAN-SNI-Muster:** DB = Service-Produzent, Heimat = OPN-HAProxy-CARP-VIP auf DB-VLAN, Backend = Calico-Self-Announce (BGP). Konsument im Fremd-VLAN via Samba-AD-DNS (Name → Konsumenten-VLAN-`.1`) + `.1`-SNI → OPN-HAProxy (mode tcp Passthrough, echtes comdare-ca-Backend-Cert).
-
-**dev-MinIO EXISTIERT (Ebene-B-Ziel):** NS `databases`, MetalLB `10.0.90.55:9000/9001`, BGP-Backend `10.0.90.224`, 4 Replicas gesund. TLS von comdare-ca, SAN `minio.comdare.de`. Storage = 500 GiB Longhorn-PVC `minio-data` (SC `longhorn-database`, R4). Bestehende Buckets: `buildsystem-artifacts` (~16-17 GiB), `buildsystem-cache`, `gitlab-*`. CI-Access-Key-Name = `bsci-artifacts` (Secret redigiert).
-
-**prod-MinIO:** `minio.prod.comdare.de → 10.0.10.1 → OPN-HAProxy-SNI → 10.32.243.80:9000` (prod-K8s-ClusterIP), LIVE als Cache-Backend (K81-61).
-
-**prod Cold-Storage 6TB LIVE (#140 DONE, Ebene-C-Ziel):** beide prod-Nodes Talos `coldstore` = 6TB SATA-HDD XFS `/var/mnt/coldstore`; Longhorn cold-Disk (Tag `cold`), SC `longhorn-cold` (R2, **Retain**). ALLE PVC = Retain (Löschung nur mit User-OK).
-
-**NFS-Ist:** Longhorn-Backup-NFS `10.0.80.223:/backup/longhorn` (V80). NFS-Ganesha-VIPs `.211-.218`; **Ganesha instabil** (GlusterFS-FSAL SIGSEGV) → VFS-FSAL bevorzugt. Der Ebene-C-Export auf prod-6TB ist **KOMPLETT NEU** — kein Repo-Vorbild (V20-NAS/V80-longhorn-backup sind NICHT prod-6TB).
-
-**OPN-HAProxy:** Config als base64 in `config.xml <haproxy_custom>` (Plugin disabled), ~29 FE/32 BE/32 SRV. Ports 80/443-SNI (~12 Hosts)/2222/6443/5901-04/8822. opn-1=CARP-MASTER, opn-2=BACKUP, beide reboot-fest, active/active (BGP+HAProxy+pf).
-
-**⚠ OFFENES OPN-Risiko #72 (V91-relevant):** beide OPN sind MASTER auf `10.0.91.1` (prod-DB-VLAN-VIP), da VLAN-91-L2 zwischen den OPN fehlt → latentes P0-Trunk-Risiko. Direkt relevant für prod-V91-Provisionierung; User-Direktive = L2-Fix planen (kein Band-Aid).
-
-**Security:** Infra-Docs enthalten Live-Secrets — hier durchweg redigiert, nur Namen/Muster.
+**Schreib-Naht-Doktrin (entschieden):** Push (B→minio) + Sink (C→NFS) beide **synchron/blockierend** zwischen zwei Messungen, NIE parallel/async/detached (I/O-Contention = Messfehler). Whole-run-CSV → NFS nach `csv.flush`. **Anti-Phantom:** ALLE Env-Vars leer → No-Op → golden/CI byte-neutral.
 
 ---
 
-## 3 · PROVISIONIERUNG (geordnet, Constraint je Schritt)
+## 2 — CLUSTER-IST (autoritativ, LIVE)
 
-**0 · Preflight.** Cluster-Ledger #202 (NAS/MinIO-Writeback) + #156 lesen; beide `config.xml` sichern (`cp -n /conf/config.xml /conf/config.xml.bak-<tag>`); Baseline festhalten (GitLab-P0 = 200, CARP-MASTER-Count je OPN, Switch-Mgmt OPEN). — *Constraint: read-only außer Storage-Ausnahme; OPN NUR vom Laptop via `~/.ssh/cluster` (node7 hat den Key nicht); csh → `sh -c "…"`.*
+> **WARNUNG:** `/docs/02_NETZWERK_VLAN_PLAN.txt` ist ein **veraltetes v5-PLAN**-Dokument (10.10.x.x, V40=STORAGE). Der LIVE-Cluster nutzt **10.0.x.x**. Für Storage-Provisionierung NICHT die `.txt` verwenden. Autoritativ: `agent-memories-infra/INFRA-AGENT-MEMORIES-KONSOLIDIERT-20260708.md`.
 
-**1 · MinIO-Bucket dev-V90** (z.B. `cache-engine-tier-binaries`) auf bestehender Instanz, getrennt von `buildsystem-cache`; Objekt-Layout versioniert je Organ-Algo. — *Constraint: MetalLB-Heimat-IP bleibt unberührt (Service-HA); KEINE dedizierte Cross-VLAN-Präsentations-VIP im Fremd-VLAN.*
+**VLANs (LIVE, strikt isoliert; Gateway = `.1` CARP-VIP auf OPN, OPN-IPs `.11–.14`):**
+- V10 MGMT `10.0.10.0/24` · V15 K8S-API · V20 STORAGE (GlusterFS/NFS) · V60 BUILD/CI (extern geteilt) · V80 BACKUP (Longhorn/Offsite) · V90 DATABASE (PostgreSQL/Redis/**MinIO**/Kafka) · **V100 SYNC — TABU** · V110/V120/V130 Calico dev · V111/V121/V131 = prod-Spiegel
+- Spiegel-Doktrin VN0↔VN1: V90↔V91 (DB), gleiche V10-Rechte je Pendant
 
-**2 · Minimal-scoped MinIO-Credential-Paar** (`MINIO_ACCESS_KEY`/`MINIO_SECRET_KEY`), Policy nur Tier-Binary-Push/Pull, kein Admin, kein Cross-Bucket. — *Constraint: NIE Klartext lesen/ausgeben; rotierbar ohne Admin-PAT (Vorbild write_repository-Token id=54).*
+**dev-MinIO (Ziel Ebene B):**
+- ns `databases`, Deployment replicas=1 (Recreate) auf Longhorn-PVC `minio-data` 500Gi, SC `longhorn-database` (Rep4/Retain)
+- MetalLB-LB **`10.0.90.224:9000`** (Console 9001), HAProxy-Backend `be-minio-v90`
+- DNS: `minio.comdare.de` → `minio.comdare.local` (Realm-Split 2026-07-12), Views V40/V60 → `.1`; :443-SNI → `be-minio-v90`
+- Runner-Cache: `minio-s3-FE` bind `10.0.60.1:9000`, Bucket `buildsystem-cache` (= Ebene A, unangetastet)
+- Buckets dev (K46-Audit): `buildsystem-artifacts` (16 GiB), `gitlab-artifacts`, `buildsystem-cache` (17 GiB/7778 Obj), Rest leer; **alle `policy=private` (S3v4-Auth Pflicht)**
 
-**3 · Samba-AD-DNS-Record** (z.B. `tier-cache.comdare.de`/`measure-drop.comdare.de`) als A-Record → `10.0.10.1`, via `samba-tool dns add` NUR von Pi5/DC; OPN-Unbound-Split-Horizon-Override name→`.1`. — *Constraint: Name löst auf Konsumenten-`.1`-CARP-VIP, NIE auf Service-Heimat-MetalLB-IP; samba-tool/kubectl NIE auf der OPN.*
+**prod-MinIO (nicht Ziel für B):** separater Stack `minio.prod.comdare.de`, Backend `be-minio-prod` via Calico-ClusterIP `10.32.243.80:9000` über V111-BGP (KEIN V91-LB), Bucket `gitlab-runner-cache`. **#141 prod-MinIO-Separation OFFEN/gated** (an PROD-Cutover Phase 6-7 gebunden).
 
-**4 · os-haproxy-Objekte für `.1`-SNI-Route** auf opn-1: sequenzielle separate-Prozess `php-model-Add()` in Reihenfolge server → backend → acl(ssl_sni) → action(use_backend) → frontend-`https-in`-Link. — *Constraint: roher ElementTree-Klon rendert NICHT (VALIDATION OK trügt); JEDES Objekt eigener php-Prozess; acl/action haben KEIN enabled-Feld.*
+**Longhorn:**
+- dev: 4 Talos-Nodes, ~1.6–1.7 TiB/Node NVMe; **Over-Provisioning gehärtet 300%→100%, `storageReserved` 350G/Node** (#234-Incident) → usable ~1394–1448 G/Node
+- prod-6TB (Ziel Ebene C): Hotstore `/var/mnt/hotstore` (NVMe p5) + **Coldstore `/var/mnt/coldstore` = 6TB-WD-HDD via vfio (diskType=sat)**, RAID1/**Replica-2 über prod1+prod2**
 
-**5 · STAGING rendern + graceful Softreload** auf opn-1: `configctl template reload OPNsense/HAProxy` → validieren `haproxy -c -f …staging` → Live-Backup → `haproxy -sf $(cat /var/run/haproxy.pid)`. — *Constraint: NIE stop+start; opn-1 syshook-gestartet (nicht rc-enabled) → `configctl haproxy reload` scheitert STILL; NIE `service haproxy start` (Legacy-Format clobbert Objekte).*
+**NFS-Landschaft:**
+- Ganesha bare-metal auf V20 (Gruppen A/B/C `10.0.20.211-.213`, Keepalived) — **instabil (GLUSTER-FSAL SEGV)** → R/O-Pods nutzen **FSAL VFS + Graceless=true**
+- Longhorn-Backup-NFS auf V80 (`10.0.80.214`, MetalLB, K8s-only)
+- NAS `backup1` (PR4100, `/Cluster_NFS`) = Haupt-Backup-Ziel, V10-CARP-VIP `10.0.10.243`; **Cluster-Backups NIE auf Knoten**
+- **Bestehender Mess-Rückschreibpfad:** V60-Runner dürfen `Cluster_NFS` NIE lesen → write-only über **Filterpod ns `measure-drop`, VIP `10.0.80.226`**, `PUT https://measure-drop.comdare.local/<ts>/<datei>`, NFS nfsvers=3
 
-**6 · Route auf opn-2 spiegeln** (eigene UUIDs). — *Constraint: opn-1 = SPOF ohne Parität; beide OPN handgepflegt (kein XMLRPC-Sync); Hand-Edits ohne config.xml-Objekt löscht ein staging→live-Promote.*
+**prod-Storage-Gate:** **prod2-Recovery (etcd 3/3 + 2-Node-Longhorn) = Universal-Gate für ALLE prod-Mutationen**, vor UND nach jedem Schritt. Off-Cluster-DR (#208/#209) ready-not-done.
 
-**7 · NFS-Export prod-longhorn-6TB** STRIKT auf Mess-Subpfad (`cache-engine-experiment/`), nie NFS-Root; V80-Filterpod (IPPool `10.0.80.224/27`) einzige Komponente mit Mount. — *Constraint: exakter Volume-/Export-Pfad aus Ledger #202/#156 (nicht raten); Subpath-only; kein V20-/prod-Storage-Vollzugriff (externe Mandanten).*
+**VLAN-Routing-Doktrin:** DB = Heimat auf DB-VLAN (dev V90/prod V91); Cross-VLAN-Konsum **ausschließlich via Samba-AD-DNS (FQDN → Konsumenten-`.1`) + `.1`-SNI-HAProxy über OPN**. KEINE dedizierten internen VIPs (einzige Ausnahme: DMZ V40). Direkt `:9000`/ClusterIP/Cross-VLAN-Direkt-IP = **blackholed**.
 
-**8 · Write-only-SNI-Drop** (`measure-drop.comdare.de`) über V80-Filterpod (nginx-dav-ext PUT-only oder MinIO-Gateway write-only), nur aus V60-Runner-Kontext via `10.0.60.1`. — *Constraint: GET/LIST/DELETE → 403/405, nur PUT → 201; direkte V20-/V80-IP aus V60 geblockt (NetworkPolicy-Nachweis).*
+**OPN-HAProxy:** beide OPN (opn-1 MASTER/opn-2 BACKUP) os-haproxy-gerendert, reboot-fest; **`config.xml` = Single Source of Truth**; ein zentrales SNI-Frontend `https-in` bind `*:443` mode tcp/SNI-Passthrough trägt gitlab/registry/kas/harbor/minio.comdare.de/minio.prod/backup1/2/monitoring. **Offener OPN-Bug #72:** CARP vhid-91 Split-Brain (beide MASTER für `10.0.91.1`, V91-L2-Trunk fehlt) — latent (V91 ungenutzt, prod-MinIO läuft via V10/`.1`-SNI), Fix P0-riskant/geplant.
 
-**9 · Pfad-Jail + Additiv-Doktrin** am Filterpod: nur unterhalb `cache-engine-experiment/`; Traversal (`..`/absolut/Symlink) → 403; existierende Datei NIE überschreiben → 409. — *Constraint: Rohdaten strikt additiv, nie rm/überschreiben; Fehlversuch sichtbar (Log neben Datei), nicht stumm.*
-
-**10 · Credentials als protected+masked CI-Var in super (288):** `MINIO_ACCESS_KEY`/`MINIO_SECRET_KEY`/`COMDARE_NFS_DROP_TOKEN`. — *Constraint: nur Namen im Log; keine embedded PATs in Remote-URLs/.gitmodules.*
-
-**11 · Consumer-Seite verdrahten, INERT bis Enable-Flag:** `persist:measurements`-Job schreibt bereits nach `measurement/<YYYYMMDD-HHMMSS>/`; Phase 2 = `curl -T` an SNI-Endpoint + Tier-Push/Pull, gated hinter `COMDARE_PERSIST_MEASUREMENTS`. — *Constraint: CI-Grün = Persist/Messung AUS; nur opt-in + Loop-Schutz; gesamte Pipeline hart grün.*
-
-**12 · Abschluss-Verify + Rollback:** nach jeder Mutation GitLab-P0 = 200, SNI-openssl = echtes Backend-CN auf beiden OPN, CARP-MASTER-Count unverändert; aus Runner PUT → 201 / GET/LIST/DELETE → 403/405 / 2. PUT → 409; Rollback = `config.xml.bak-<tag>`. — *Constraint: kein ✓ ohne wörtliche Ausgabe; V10 nie >10s ohne Rollback.*
-
----
-
-## 4 · HARTE CONSTRAINTS / FALLEN
-
-1. **OPN-HAProxy NIE `stop`+`start`** — löst SO_REUSEPORT-Straggler (#35: mehrere haproxy teilen `*:443`, SNI intermittierend leer, killall erwischt nicht alle) + stale-pidfile-Silent-Fail (Rückgabe OK, kein Prozess) → `:443`-P0 (harbor/`.1`-SNI tot). Sichere Aktivierung: `pkill -9 haproxy` (2-3× bis `pgrep` leer) + `rm -f /var/run/haproxy.pid /var/run/haproxy.socket` + `configctl template reload` + EINE Instanz + pidfile syncen.
-2. **Render ≠ Live** — `configctl template reload` rendert nur `…STAGING`; Live-Promote = graceful `haproxy -sf`. opn-1 nicht rc-enabled → `configctl haproxy reload` friert Live-Datei still ein. NIE `service haproxy start` (Legacy-Format clobbert frische Objekte).
-3. **`.1`-SNI-Pflicht Cross-VLAN** — JEDER VLAN-übergreifende Zugriff ausschließlich über Konsumenten-`.1`-CARP-VIP + Samba-Split-Horizon-DNS + OPN-HAProxy-SNI (tcp-Passthrough). KEINE Cross-VLAN-Präsentations-VIPs im Fremd-VLAN (V10-Storage-VIPs `.243/.244` sind als falsch markiert); direkte Cross-VLAN-L3-IP = blackholed/isolations-widrig; `:9000`/ClusterIP-direkt = blackhole.
-4. **opn-1 = SPOF** solange opn-2 keine Parität hat — jede SNI-Route auf BEIDEN config.xml mit eigenen UUIDs; nur als os-haproxy-Objekt (kein Hand-Edit, sonst staging→live-Promote + Reboot löscht ihn).
-5. **os-haproxy nur via php-model-`Add()`** (sequenziell, je Objekt eigener Prozess) — roher ElementTree-Klon rendert nicht (VALIDATION OK trügt); acl/action ohne enabled-Feld.
-6. **Cluster strikt read-only, EINZIGE Ausnahme** = bewilligter Storage-Writeback (PUT-only auf gejailten `cache-engine-experiment/` über V80-Filterpod). Jede andere ändernde Infra-Aktion (HAProxy/DNS/NFS-Export/Firewall) = Handover an Infra-Agenten. **WireGuard verboten.**
-7. **Write-only-Doktrin** — V60-Runner (mit externen Firmen geteilt) dürfen prod-Storage/Cluster_NFS WEDER sehen NOCH lesen; Rohdaten strikt additiv (409 statt Überschreiben).
-8. **#72 vhid-91-Split-Brain** — beide OPN MASTER auf `10.0.91.1` (V91), L2 fehlt → latentes P0; vor scharfer prod-V91-Aktivierung mitdenken.
-9. **Secrets** — nie Klartext lesen/ausgeben, nur Namen/Muster; INERT bis `COMDARE_PERSIST_MEASUREMENTS`; keine embedded PATs.
-10. **Verify-Zwang** — kein ✓ ohne wörtliche Ausgabe; config.xml-Backup ist der definierte Restore-Punkt.
+**Zugang:** OPN nur vom Laptop via `ssh -i ~/.ssh/cluster root@10.0.10.11` (opn-1) / `.12` (opn-2), csh-Wrapping. node7 (root, dev+prod-kubectl+prod-talosctl) hat den OPN-Key NICHT. P0-Gate = `gitlab.comdare.de/users/sign_in` = 200.
 
 ---
 
-## 5 · OFFENE FRAGEN / ENTSCHEIDUNGEN (vor Infra-Aktivierung)
+## 3 — PROVISIONIERUNG (geordnet, Constraint je Schritt)
 
-Unter §24.A VOLLES GO autonom im VOR-ultracode-Workflow aufzulösen, nicht mehr user-blockiert:
+**0 · Pre-flight** — `config.xml` auf BEIDEN OPN sichern (`cp -n .../config-<tag>-preprov.xml`); GitLab-P0=200 + CARP-MASTER-count als Baseline. *Constraint:* OPN-Zugang nur Laptop-cluster-Key + python3-ElementTree (idempotent, `.new` validieren, `os.replace` atomar); node7 scheidet aus.
 
-1. **minio-Transport:** mc-Shellout (empf.) vs libcurl+SigV4 vs aws-sdk-cpp.
-2. **Endpoint-Host-Bestätigung:** Binaries → DEV-V90 (`minio.comdare.de`) und Mess → prod-NFS-V91 — final bestätigen.
-3. **NFS-Sink vs Git-Writeback:** ERSETZT `persist:measurements` oder PARALLEL (Doppel-Persistenz)?
-4. **minio-Retention:** alte ABI 5→6 behalten oder evicten? („Messdaten nie löschen" gilt Ergebnisse — Bau-Binaries fraglich.)
-5. **PULL-Timing:** im 1. Increment oder push-only zuerst?
-6. **NFS-Granularität:** per-Binary+whole-run vs nur whole-run+datierter Baum; Timestamp-Besitzer.
+**A — Ebene B / MinIO dev-V90**
+- **1 · Bucket** für Tier-Binaries anlegen (analog `buildsystem-artifacts`), Versioning/immutability additiv. *Constraint:* Heimat bleibt V90; KEINE Bucket-VIP im Fremd-VLAN; Additiv-Doktrin (nie löschen/überschreiben); getrennt von `buildsystem-cache`.
+- **2 · Service-Account** minimal-scoped, Policy strikt auf diesen Bucket (kein globaler Zugriff), projekt-lokal rotierbar (Muster Write-Token id=54). *Constraint:* Secret-WERTE nie im Klartext — nur Namen (`MINIO_ACCESS_KEY`/`MINIO_SECRET_KEY`).
 
-**Infra-spezifisch zusätzlich:**
-- Exakter Volume-/Export-Pfad des prod-6TB-NFS aus Ledger #202/#156 (nicht raten).
-- **#72-L2-Fix** vor scharfer V91-Aktivierung — reihenfolge-kritisch.
-- Handover-Doku gegen veraltetes 07-12-V20-NAS-Design aktualisieren (HO-3 #202, HO-7 #209, MinIO-Key-Rotation).
+**B — Ebene C / NFS prod-longhorn-6TB (GATED: prod2-Recovery)**
+- **3 · Volume + K8s-NFS-Provisioner-Pod** (`registry.k8s.io/sig-storage/nfs-provisioner`, FSAL VFS + Graceless=true, MNT_Port 20048), Export-Service an **V80-BACKUP** (fußt auf V20). *Constraint:* Longhorn kontaktiert NIE Bare-Metal-Ganesha; kein roher V16→V20:2049-Direktpass.
+- **4 · Export auf Subpfad jailen** `cache-engine-experiment/`, append/create-only, Pfad-Jail (`..`/abs/Symlink), Consumer-Mount → `measurement/<YYYYMMDD-HHMMSS>/`. *Constraint:* MetalLB-L2-Falle — nur `mount -t nfs -o vers=4,port=2049` beweist Erreichbarkeit (ping/showmount täuschen); additiv (Konflikt → kein Overwrite).
+
+**C — SNI-Browse-Route (Cross-VLAN Sicht aus V10)**
+- **5 · os-haproxy-Objektkette** auf beiden OPN per `php-Model->Add()` (separate php-Prozesse): server → backend(linkedServers) → acl(ssl_sni) → action(use_backend) → `https-in`.linkedActions; Frontend bind `*:443` mode tcp passthrough auf `10.0.10.1`, Backend = Browse-ClusterIP (OPN routet 10.32/16 via Calico-BGP). *Constraint:* `.1`-SNI-Pflicht, keine dedizierte VIP; Objekte MÜSSEN in `config.xml` (roher ElementTree-Klon rendert nicht).
+- **6 · Split-Horizon-DNS** — Samba-AD-Record (nur Pi5/DC) + OPN-Unbound-Override FQDN → `10.0.10.1`; `checkconf` vor `configctl unbound restart`. *Constraint:* DNS nur vom Pi5/DC, nie samba-tool/kubectl auf OPN; Browse-UI nur auf V10.
+- **7 · HAProxy-Deploy** — `configctl template reload OPNsense/HAProxy` (→ `haproxy.conf.staging`, NICHT live) → `haproxy -c -f ...staging` → Live-Backup → graceful `haproxy -q -f ...conf -p /var/run/haproxy.pid -sf $(cat pid)`. *Constraint:* opn-1 `configctl haproxy reload` scheitert STILL → manueller `-sf`; NIE `service haproxy start`/`setup.sh deploy`.
+- **8 · Beide OPN separat** (eigene UUIDs, kein XMLRPC-HAProxy-Sync), name/ssl_sni-getrieben. *Constraint:* opn-1 = SPOF-nähe (fronted P0 GitLab/LDAP); beide reboot-fest.
+
+**D — Credentials**
+- **9 · protected + masked CI-Vars** in super (Projekt 288): `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `COMDARE_NFS_DROP_TOKEN`, minimal-scoped, rotierbar; Consumer-Job `persist:measurements` inert bis Feature-Flag. *Constraint:* nur Namen, nie Werte; protected → nur protected-Branches; Runner braucht `ref_protected`.
+
+**E — Verifikation**
+- **10 · E2E + Cleanup** — aus echtem V10-Host: `openssl s_client -servername <fqdn> -connect 10.0.10.1:443` zeigt echtes Backend-Cert (Fake „Kubernetes Ingress" = default_backend); MinIO-PUT/GET ok; NFS schreibt `measurement/<ts>/`; aus V60-Kontext GET/LIST/DELETE → 403/405, PUT neu → 201, PUT dup → 409. *Constraint:* kein Erfolgs-Haken ohne wörtliche Ausgabe; am Zyklusende alle Hilfs-Shells/Monitore beenden.
 
 ---
 
-## 6 · EMPFOHLENE REIHENFOLGE
+## 4 — HARTE CONSTRAINTS / FALLEN
 
-**Phase 1 — CE-Seite ZUERST (byte-neutral, kein Infra-Risiko):**
-1. VOR-ultracode-Planungssession über Ledger + ALLE Plandocs; die 6 offenen §6-Entscheidungen fällen (mind. Transport=mc, Push-only-first, Doppel-Persistenz-Frage).
-2. `CachePushFn`/`MeasurementSinkFn` als No-Op-Injektionsfelder ergänzen (Muster `AlgoSigFn`), Durchreichen bis `profile_run_facade.cpp`.
-3. `builder/artifact_transport/artifact_cache.hpp` (mc-Shellout, Retry/Größen-Verify nach Vorbild `scripts/copy_results_to_nas.sh`, `.version` ZULETZT).
-4. Objekt-Key-Ableitung + NFS-Sink; `from_env`-Konstruktion in `messung_driver/main.cpp`.
-5. Fehlerklasse `InfraErrorClass::ArtefaktIo` in `axis_error.hpp` verdrahten (MESSEN WEITER); Test gegen Naht-Overlap assert-en + Resume-Interplay abdecken.
-6. **Verify:** alle env leer → golden/CI byte-identisch; lokaler ce-standalone + super-Sub-Build grün. NACH-Konformitätsprüfung.
+1. **HAProxy NIE `stop`/`start`** — löst SO_REUSEPORT-Straggler (#35) + stale-pidfile-silent-fail → `:443`-P0 (harbor/`.1`-SNI intermittierend tot). Sichere Aktivierung: `pkill -9 haproxy` (2-3× bis `pgrep` leer) + `rm -f /var/run/haproxy.pid /var/run/haproxy.socket` + `configctl template reload` + EINE direkte Instanz + pidfile syncen.
+2. **Render ≠ Live** — `template reload` schreibt nur `haproxy.conf.staging`; Promote nur graceful `-sf`. opn-1 (syshook, nicht rc-enabled) friert Live STILL ein. NIE `service haproxy start`/`setup.sh deploy` (Legacy-Template-Clobber).
+3. **Hand-Edits an Live-`haproxy.conf`** ohne `config.xml`-Objekt werden beim nächsten Promote + Reboot gelöscht. Immer `php-Model->Add()`.
+4. **opn-1 = SPOF-nähe** (fronted P0 GitLab/LDAP), kein XMLRPC-Sync → beide OPN separat pflegen.
+5. **`.1`-SNI-Pflicht Cross-VLAN** — jede VLAN-Grenze = OPN-HAProxy-SNI auf Konsumenten-`.1` (mode tcp passthrough) + Firewall-Pass; KEINE internen Per-Service-VIPs (Ausnahme DMZ V40); kein roher Cross-VLAN-Direkt-IP-Pass; `:9000`/ClusterIP direkt = blackhole.
+6. **Storage-Service-Kette** — V70/V80 fußen auf V20 und greifen via `.1`-SNI; Backup an V80-BACKUP-NFS-Service, NICHT direkt an V20-NAS-IP `10.0.20.101`; kein V16→V20:2049-Direktpass.
+7. **Mgmt-/Browse-UIs nur auf V10**; Speicherprotokolle (SMB/NFS/iSCSI) nur V20+V80.
+8. **Cluster read-only — Ausnahme nur Caching/Storage-Einrichtung** (Ledger §24.B). Impl-Agent hat kein sudo → ALLE Infra-Mutationen (config.toml, OPN, K8s, NAS) = Handover an Infra-Agent.
+9. **Write-only-Semantik** — V60-Runner (extern geteilt) sehen/lesen `Cluster_NFS` nie; nur PUT unter `cache-engine-experiment/<ts>/`; GET/LIST/DELETE → 403/405; dup → 409; Pfad-Jail gegen Traversal.
+10. **Additiv-Doktrin** — Mess-/Rohdaten strikt additiv, nie `rm`/overwrite.
+11. **Secrets** — nie Klartext in Report/Repo/Log; nur Variablen-NAMEN; protected + masked, minimal-scoped, rotierbar (Muster id=54).
+12. **NAS nur lesend/Switch-Port-seitig** — kein NAS-UI-Eingriff (IP-Renumber = User-Sache).
+13. **MetalLB-L2-Falle** — ping/showmount täuschen auf L2-VIPs; nur `mount -t nfs -o vers=4,port=2049`.
+14. **Ganesha instabil** (GLUSTER-FSAL SEGV) → FSAL VFS + Graceless; Longhorn kontaktiert Bare-Metal-Ganesha NIEMALS (nur K8s-Pod).
+15. **OPN-Config nur Laptop-cluster-Key** + csh-Wrap + python3-ElementTree, `config.xml` zuvor sichern; DNS nur Pi5/DC.
+16. **Nach JEDER Mutation** harte Verifikation mit wörtlicher Ausgabe: GitLab-P0 → 200, CARP-MASTER-count unverändert, echtes Backend-Cert via `openssl s_client -servername`.
 
-**Phase 2 — Infra behutsam (nach Preflight §0):**
-7. Ebene B first (kleineres Risiko, bestehende MinIO): Bucket + minimal-scoped Credential → CI-Var (Schritte 1-2, 10).
-8. `.1`-SNI-Route für Browse/Drop auf **beiden** OPN (Schritte 3-6) — pro Mutation Verify (GitLab-P0=200, SNI-CN, CARP-Count), config.xml-Backup als Restore-Punkt.
-9. Ebene C (NEU, größtes Risiko): erst #72-L2 klären, dann NFS-Export prod-6TB subpath-only + V80-Filterpod + Pfad-Jail/Additiv (Schritte 7-9).
-10. Consumer-Seite verdrahten, INERT hinter `COMDARE_PERSIST_MEASUREMENTS` (Schritt 11); Abschluss-Verify + Rollback-Bereitschaft (Schritt 12).
+---
 
-**Leitprinzip:** CE-Bau ist additiv/No-Op und blockiert nichts — er kann komplett vor jeder Infra-Mutation fertig+grün sein. Die scharfe Aktivierung ist erst der letzte Schritt, gated hinter dem Enable-Flag, und jede ändernde OPN/DNS/NFS-Aktion läuft unter §24.B-Ausnahme mit Verify+Rollback je Mutation.
+## 5 — OFFENE FRAGEN / ENTSCHEIDUNGEN (vor Infra-Aktivierung)
+
+1. **Transport-Wahl B** — `mc`-Shellout (empfohlen, Template `scripts/copy_results_to_nas.sh`, kein Python) vs. libcurl+SigV4 vs. aws-sdk-cpp (plan §6). **Blockiert `artifact_cache.hpp` — zuerst entscheiden.**
+2. **Transport-Modell C — Konflikt im Design:** DESIGN sagt „POSIX `std::filesystem::copy` an `COMDARE_MEASUREMENT_NFS_ROOT` (kein Client, Mount=Infra)", die bestehende Write-back-Infra (Schritt 9, `measure-drop`) nutzt aber `curl -T` HTTPS-PUT. **Zwei unvereinbare Modelle — festlegen: POSIX-Mount-Copy (neuer Export) ODER Wiederverwendung des existierenden `measure-drop`-Write-only-Pfads (V80 Filterpod).**
+3. **Ziel-VLAN C — prod V91 gated + #72-blockiert:** DESIGN will C auf prod-longhorn-6TB/**V91**, aber (a) prod-Mutationen sind hinter dem prod2-Recovery-Universal-Gate, (b) **OPN-Bug #72 (vhid-91 Split-Brain) macht V91 latent-unbrauchbar**, (c) es existiert bereits der `measure-drop`-Pfad über V80. **Entscheiden: Neu-Export auf V91 (gated, #72-abhängig) vs. bestehender V80-`measure-drop` als C-Sink.**
+4. **Routing-Bestätigung** (plan §6): Binaries → **DEV-V90**-MinIO UND Messergebnisse → **prod-NFS-V91** explizit bestätigen — Kreuzung dev/prod ist ungewöhnlich.
+5. **Bucket-Immutability-/Versioning-Policy** exakt = Infra-Konvention, nicht raten (plan §7-GAP).
+6. **NFS-Export-Konvention + VLAN10-Browse-SNI-FQDN** = Infra-Handover, nicht raten (plan §7-GAP).
+7. **prod-MinIO #141** bleibt OFFEN — für Ebene B irrelevant (B → dev-V90), aber falls je prod-MinIO nötig: gated.
+
+---
+
+## 6 — EMPFOHLENE REIHENFOLGE
+
+**Phase I — CE-Seite zuerst, byte-neutral (keine Infra nötig, golden/CI bleiben grün):**
+1. **Transport-Entscheid** (Offene Frage 1) → `builder/artifact_transport/artifact_cache.hpp` bauen (synchron `mc cp`, Retry/Größen-Verify, `.version` ZULETZT, Fehler → `InfraErrorClass::ArtefaktIo` + weitermessen).
+2. `CachePushFn` + `MeasurementSinkFn` (Default No-Op) auf Iterator-cfg + `RunProfileArgs`/`ExperimentRunArgs` — 1:1 nach `CompileFn`/`SourceGenFn` (`build_orchestrator.hpp:126-127,227`), durchgereicht über `profile_run_facade.cpp`.
+3. Naht-Calls injizieren: Push+Sink synchron an `cache_engine_builder_iterator.hpp:~900` (nach `stamp`-Write `:904-908`, vor RAII-Unload `:911`); Whole-run-Sink an `profile_run_entry.hpp:426` (nach `csv.flush`); Pull an `build_orchestrator.hpp:332` (`dll_is_current`, Phase A).
+4. `artifact_cache::from_env` in `messung_driver/main.cpp` (`xa`/`pa`); Env-Namen `COMDARE_MINIO_ENDPOINT/_BUCKET/_PREFIX` + `COMDARE_MEASUREMENT_NFS_ROOT`, getrennt von `COMDARE_CACHE_ROOT`.
+5. **Byte-Neutralität beweisen:** ALLE Env leer → No-Op; golden-Lauf + CI unverändert grün (Anti-Phantom). Review + Backup. → Diese Phase braucht KEINEN Cluster-Zugriff.
+
+**Phase II — Infra behutsam (Handover an Infra-Agent, gated-Reihenfolge):**
+6. Offene Fragen 2–6 auflösen (Transport-Modell C, Ziel-VLAN C, Routing-Bestätigung, Policies/Konventionen) — nicht raten.
+7. Provisionierung Schritt 0 (Pre-flight/Backup/P0-Baseline) → **A/MinIO-B zuerst** (Schritt 1-2, dev-V90, ungegated) → **C/NFS** (Schritt 3-4, prod-gated: erst prod2-Recovery-Gate prüfen ODER `measure-drop`-Weg wählen) → **SNI-Browse-Route** (Schritt 5-8, beide OPN separat, php-Add, staging→graceful `-sf`) → **DNS** (Schritt 6) → **Credentials** (Schritt 9, super 288, inert) → **E2E-Verifikation + Cleanup** (Schritt 10).
+8. Nach jedem Infra-Schritt: GitLab-P0=200 + CARP-MASTER-count + echtes Backend-Cert wörtlich verifizieren.
+
+**Kern:** Phase I ist vollständig ohne Cluster-Berührung machbar und liefert einen messbaren, byte-neutralen Zustand; erst danach die gegated/`.1`-SNI-empfindliche Infra aktivieren.
