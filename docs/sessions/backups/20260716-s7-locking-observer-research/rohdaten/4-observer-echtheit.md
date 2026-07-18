@@ -199,8 +199,8 @@ Basis: `/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/ex
 - `include/cache_engine/concepts/locking_mode.hpp` (LockingMode-Enum :20-25, Upgradeable=2 ohne Organ)
 - `virus/graph_bfs.hpp` + `execution_engine/virus_execution_engine.hpp` (VirusMeasurementSnapshotV1 :19)
 - `builder/pruef_dock/pruef_dock_registry.hpp:4-5` („initial nur SearchAlgorithmDock; Set/Sequence/Adapter/View kommen mit V42")
-- `docs/sessions/goal-v6-luecken-ledger.md` (GenusBound 2/5; L-75 Container-Gattung)
-- `docs/sessions/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md` (§5 Weg-A/B; historisch, §5-Bruch durch #188 aufgelöst)
+- `docs/ledger-sections/goal-v6-luecken-ledger.md` (GenusBound 2/5; L-75 Container-Gattung)
+- `docs/plaene/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md` (§5 Weg-A/B; historisch, §5-Bruch durch #188 aufgelöst)
 
 Super-Ledger: `/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md`
 - §11-H (Z.289-311): Container-Messung „genus-eigener Form da, V42-deferred"; Graph „bewusst-deferred Interface-Stub"; Perzentile „schon da".

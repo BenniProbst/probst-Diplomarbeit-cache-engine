@@ -345,7 +345,7 @@ cache_engine_families 19/state_visitor 15/taxonomien 7/rev4_delta 6/termin5_6 2 
 > (`Phase5_UML_Detail/phase5_uml_detail_REV5/REV6/REV7.drawio` je **25** Vork., REV3/4 je 4-6) und **`.txt`**
 > (`Allokator_Matrix.txt`) wurden ÜBERSEHEN. Der **größte Block ist B = cache-engine-`docs/` mit 648
 > Vorkommen über 50+ Dateien** (Doc 24=104, Doc 30/27=41/39, abhaengigkeitskette/messarchitektur_v5 je ~33-39,
-> Doc 34=31 …). Vollständiger Scope + ALLE Pflicht-Referenzen: **`thesis/diplomarbeit/sessions/2026-06-15-tier-umstellung-fortschritt-und-vollstaendiger-rest-uebergabe.md`**.
+> Doc 34=31 …). Vollständiger Scope + ALLE Pflicht-Referenzen: **`thesis/diplomarbeit/docs/sessions/2026-06-15-tier-umstellung-fortschritt-und-vollstaendiger-rest-uebergabe.md`**.
 
 ### A. Haupt-Repo `docs/` (356 Vorkommen / 60 Dateien; Stand-Grep 2026-06-15)
 

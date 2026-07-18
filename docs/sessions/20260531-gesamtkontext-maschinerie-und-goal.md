@@ -5,7 +5,7 @@ wo das PDF mit den Messdiagrammen herauskommt — und das **/goal**, das du setz
 autonom abarbeiten zu lassen.
 
 Single-Source-of-Truth für offene/erledigte Punkte bleibt das **Ledger**:
-`Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md`.
+`Code/external/comdare-cache-engine/docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md`.
 
 ---
 

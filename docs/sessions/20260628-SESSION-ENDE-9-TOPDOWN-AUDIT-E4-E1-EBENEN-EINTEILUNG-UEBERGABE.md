@@ -1,6 +1,6 @@
 # SESSION-ENDE-9 — Top-Down-Audit E4→E1 + Ebenen-Einteilung + #214/#212 (2026-06-28)
 
-> **Elaborate Übergabe.** Diese Session hat (a) #214 fertiggestellt, (b) das **Permutations-/4-Ebenen-Modell vollständig durchdrungen** (große Architektur-Korrektur), (c) **alle offenen TODOs in E-Ebenen eingeteilt**, (d) das **komplette Top-Down-Audit E4→E1** gefahren. **Primärer Kontext-Anker bleibt das Dossier** `Code/external/comdare-cache-engine/docs/sessions/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md` (§1, §12–§15) — VOR jeder Weiterarbeit lesen.
+> **Elaborate Übergabe.** Diese Session hat (a) #214 fertiggestellt, (b) das **Permutations-/4-Ebenen-Modell vollständig durchdrungen** (große Architektur-Korrektur), (c) **alle offenen TODOs in E-Ebenen eingeteilt**, (d) das **komplette Top-Down-Audit E4→E1** gefahren. **Primärer Kontext-Anker bleibt das Dossier** `Code/external/comdare-cache-engine/docs/plaene/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md` (§1, §12–§15) — VOR jeder Weiterarbeit lesen.
 
 ## §0 Orientierung — finale HEADs + Anker
 - **cache-engine** `main` = **b2fff0e** (beide Remotes: gitlab + origin/GitHub).

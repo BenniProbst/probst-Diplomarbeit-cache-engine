@@ -134,7 +134,7 @@ git push
 
 1. Weitere Default-Lookup-Files: 3.B, 6.2, 6.3, 6.4, 8.2, 9
 2. PrtArt-IExecutingEngine-Adapter (Bridge zur SearchEngine-Klasse)
-3. PrtArt Reuse-Matrix-Doku unter `docs/PRT_ART_AXES_REUSE_MATRIX.md`
+3. PrtArt Reuse-Matrix-Doku unter `docs/architektur/PRT_ART_AXES_REUSE_MATRIX.md`
 4. Tests: U.2 erweiterte Template-Params
 
 ### §5.3 Diplomarbeit V32.1

@@ -12,7 +12,7 @@
 Dieses Dokument ist die **Single-Source der offenen Implementierungs-Aufgaben** über alle 4 Projekte hinweg. Es ist **Kontext-Ende-sicher** geschrieben: Falls der Arbeitskontext abreißt, kann ein frischer Impl-Agent allein aus diesem Dokument den vollständigen offenen Stand rekonstruieren — jede Aufgabe nennt Titel, konkrete Tätigkeit, Code-Orte (file:line), Status und Quelle (Session-Doc).
 
 > **Hinweis zur Autorität:** Die *laufend gepflegte* Single-Source-of-Truth bleibt das Ledger
-> `Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md`.
+> `Code/external/comdare-cache-engine/docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md`.
 > Dieses Dokument ist die **konsolidierte Momentaufnahme zum 2026-06-25** plus die **neuen User-Anforderungen vom 2026-06-25** (Abschnitt B). Bei Widerspruch zu konkreten Code-Stellen gilt: **vor jedem Edit Zeilennummern re-greppen** (siehe Abschnitt C).
 
 ### Leitprinzip (KRITISCH — bei jeder Aufgabe beachten)
@@ -35,7 +35,7 @@ Dieses Dokument ist die **Single-Source der offenen Implementierungs-Aufgaben** 
 - **Code-Orte:** `libs/cache_engine/include/cache_engine/abi/search_engine.hpp:19-21` **(2026-06-25 verifiziert noch im Defekt-Zustand:** `class search_engine : public execution_engine<...>`**)**; `libs/cache_engine/anatomy/abi_adapter.hpp:119` + `:124-125`; `libs/cache_engine/anatomy/search_algorithm_anatomy.hpp:32`.
 - **NICHT anfassen:** Namespace `comdare::cache_engine::search_engine::...` (das sind Achsen-Topics, kein Klassenname).
 - **Status:** offen — **zusammen mit A.1.2 umsetzen.**
-- **Quelle:** cache-engine `docs/sessions/20260625-UEBERGABE-impl-agent-ch4-grounding-codelag.md` + `…/20260620-UEBERGABE-impl-agent-EINE-ARCHITEKTUR-vereinheitlichung.md`; thesis `…/2026-06-22-UEBERGABE-kontext-thesis-konsolidierung.md`.
+- **Quelle:** cache-engine `docs/docs/sessions/20260625-UEBERGABE-impl-agent-ch4-grounding-codelag.md` + `…/20260620-UEBERGABE-impl-agent-EINE-ARCHITEKTUR-vereinheitlichung.md`; thesis `…/2026-06-22-UEBERGABE-kontext-thesis-konsolidierung.md`.
 
 #### A.1.2 — Code-Lag #2: `search_engine` → variadisches `SearchEngine` (CamelCase, `class... Ts`) · **bereits getrackt #177 (Teil von #176)**
 - **Was tun:** Der lowercase-snake-case Identifier `search_engine` (2 fixe Typ-Params) zum Thesis-Namen `SearchEngine` (CamelCase, `template<class... Ts>`) als abstrakte ABI-Laufzeit-Sicht über `SearchAlgorithmAbiAdapter` konsolidieren/umbenennen — passend zur **variadischen Hybrid-API** (1 Param ⇒ `vector`, 2 ⇒ `map`, N>2 ⇒ `map<K,tuple>`). **Vorbild bereits konform:** `prt-art/.../prt_art_search_engine.hpp` (`PrtArtSearchEngine<Ts...>`) bleibt.

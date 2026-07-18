@@ -288,7 +288,7 @@ prt_art/include/prt_art/isa/
 
 ## §4 O.4 — PRT-ART Reuse-vs-Neuartig Matrix
 
-**Neu anzulegen:** `comdare-prt-art/docs/PRT_ART_AXES_REUSE_MATRIX.md`
+**Neu anzulegen:** `comdare-prt-art/docs/architektur/PRT_ART_AXES_REUSE_MATRIX.md`
 
 Inhalt analog §2.1 oben. Pro Achse 1-13 (+ Sub-Achsen):
 - PRT-ART-Klasse

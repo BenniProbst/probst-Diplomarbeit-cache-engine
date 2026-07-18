@@ -97,7 +97,7 @@ NEU `prt_art/include/prt_art/identity/prt_art_execution_engine_adapter.hpp`:
 
 ### §2.3 FF.3 PRT_ART_AXES_REUSE_MATRIX.md
 
-NEU `comdare-prt-art/docs/PRT_ART_AXES_REUSE_MATRIX.md`:
+NEU `comdare-prt-art/docs/architektur/PRT_ART_AXES_REUSE_MATRIX.md`:
 - Achsen-Matrix mit Status pro Achse 1-13 + Sub-Achsen (20 Eintraege total)
 - Status-Bilanz:
   - **(b) Neu-Impl: 10 Achsen** (1, 2, 3.A, 3.M, 5, 6.1, 6.5, 7, 8.1, 10)

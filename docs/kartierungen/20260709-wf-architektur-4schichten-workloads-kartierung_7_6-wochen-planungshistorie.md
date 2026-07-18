@@ -77,7 +77,7 @@ Das Goal V6 vom selben Tag zementiert die Skalierungs-Trennung `static_filter()/
 
 **Workload-Achsen-Split — invariant/TABU (Gates die NIE verletzt werden dürfen):** Workload geht NICHT in `permutation_axes.xml`/`binary_id`/golden_320 (LEDGER:371); Metaprogrammierung compile-time zwingend, kein Runtime-Switch (Doc15:59); die 36 Zellen sind Mess-INPUT auf bestehenden Binaries, keine Binary-Multiplikation.
 
-**Angrenzend #29 (Workload-Zelle & Container-Typen):** `comdare-workloads`-Zellen-Schnitt kartiert, aber **A↔B-Welten-Konsolidierung** (zwei parallele Generator-Modelle `workload_driver` vs. `test_infra/workload_generator`) ist als GEPARKT-Owner-Entscheid ausgewiesen (`docs/sessions/20260707-SCHRITT7-KARTIERUNG-comdare-workloads-schnitt.md:17-21/41`). #29-Container-Typen-Realisierung (Doc37: Option A `backing_structure`-Achse vs. B eigener Genus) bleibt ABI/golden-User-Gate (LEDGER:351/:367).
+**Angrenzend #29 (Workload-Zelle & Container-Typen):** `comdare-workloads`-Zellen-Schnitt kartiert, aber **A↔B-Welten-Konsolidierung** (zwei parallele Generator-Modelle `workload_driver` vs. `test_infra/workload_generator`) ist als GEPARKT-Owner-Entscheid ausgewiesen (`docs/kartierungen/20260707-SCHRITT7-KARTIERUNG-comdare-workloads-schnitt.md:17-21/41`). #29-Container-Typen-Realisierung (Doc37: Option A `backing_structure`-Achse vs. B eigener Genus) bleibt ABI/golden-User-Gate (LEDGER:351/:367).
 
 ---
 

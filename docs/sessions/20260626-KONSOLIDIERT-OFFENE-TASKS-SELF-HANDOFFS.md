@@ -181,4 +181,4 @@
 - **GitLab-Projekt:** `comdare/cluster/ci-templates` (`base-pipeline.yml`, hermetischer Lint-Bootstrap) — id=269
 - **Memory:** `reference_cluster_ci_runner_access_topology` (MEMORY.md-Pointer noch zu setzen)
 - **Repo-IDs:** cache-engine=286, prt-art=287, super=288, thesis=289, ci-templates=269, cluster-Gruppe=340. **Runner:** prod1=16, prod2=17 (pausiert). **CI-Var:** `COMDARE_PROD2_AVAILABLE` (in 286) = false.
-- **Single-Source Cluster:** `docs/sessions/architektur-ziele-offene-punkte-ledger.md`; Sessions K81-73 / K81-60.
+- **Single-Source Cluster:** `docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md`; Sessions K81-73 / K81-60.

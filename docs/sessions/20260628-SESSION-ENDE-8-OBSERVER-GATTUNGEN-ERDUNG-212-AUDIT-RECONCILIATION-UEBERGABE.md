@@ -3,7 +3,7 @@
 > **Rolle:** Diplomarbeit-Implementierungs-Agent (cache-engine + Thesis). Autonom; User sichert per Zuschauen ab.
 > **Datum:** 2026-06-28. **Vorgänger:** `20260628-SESSION-ENDE-7-…UEBERGABE.md`.
 > **🧭 PRIMÄRER KONTEXT-ANKER (VOR jeder A2/#188-Arbeit ZUERST lesen):**
-> `Code/external/comdare-cache-engine/docs/sessions/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md`
+> `Code/external/comdare-cache-engine/docs/plaene/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md`
 > — §1–§11: Gattungen/Anatomie, Observer-Aufbau durchs Prüf-Dock, Apparat-Reinheit + Meta-Lehre #3, Audit-Verdikt,
 > §6 elaborierte #212-Spec, §10 Array-über-2-Gattungen-RESOLUTION, §11 Stale-Reconciliation, **alle Referenz-Doc-Pfade**, Invarianten.
 > Diese Übergabe DUPLIZIERT das Dossier nicht — sie ergänzt Session-Deltas + Pacing.

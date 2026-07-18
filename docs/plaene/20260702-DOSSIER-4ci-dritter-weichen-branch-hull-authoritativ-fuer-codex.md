@@ -2,7 +2,7 @@
 
 **Für: codex exec (workspace-write) im Repo `comdare-cache-engine` (HEAD `ecee6b3`).**
 **Increment-Tag:** `#188-4c-i (2026-07-02)`. Teil der #188-4c-Spiegel-Eliminierung (Masterplan
-`docs/sessions/20260702-MASTERPLAN-188-4c-spiegel-eliminierung-cmd-visitor.md` im Super-Repo, §2 Zeile 4c-i).
+`docs/plaene/20260702-MASTERPLAN-188-4c-spiegel-eliminierung-cmd-visitor.md` im Super-Repo, §2 Zeile 4c-i).
 god-header-Regel: dies ist das EINE offene abi_adapter-Increment.
 
 ## 1. Problem (verifiziert am HEAD, alle Zeilennummern frisch)

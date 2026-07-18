@@ -2,7 +2,7 @@
 
 > ⚠️ **SUPERSEDED (2026-05-31):** Dieser REV7.7/V31-Master ist vom Code überholt (axis-zentrische Restruktur
 > F.2, Plugin-Prüfling-Modell, DLL-F15-Pipeline, sezierte Organe). **IST-treue Single-Source-of-Truth:**
-> `Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md`
+> `Code/external/comdare-cache-engine/docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md`
 > + `…/20260531-e2e-abnahme-audit-und-entscheidungen.md`. Niemals löschen — nur Banner (Direktive).
 
 **Stand:** 2026-05-15 (K-C.3)

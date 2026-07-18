@@ -9,7 +9,7 @@
 
 **Zweck:** Dieses Dokument ist die **Single-Source ALLER offenen Implementierungs-TODOs seit dem 12.06.2026** — damit sie **nie wieder neu herausgesucht** werden müssen. Jeder Eintrag nennt elaborat **Was / Ziel / Wie / Abhängigkeiten-Blocker / Quelle** und ist kontext-ende-sicher (ein frischer Agent rekonstruiert den vollen Stand allein hieraus).
 
-**Geltung & Vorrang:** Diese Datei konsolidiert; die *laufend gepflegte* Live-Single-Source bleibt das cache-engine-Ledger `Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md`. **Bei Widerspruch zu konkreten Code-Stellen gilt: vor jedem Edit Zeilennummern re-greppen** (alle `file:line` sind Momentaufnahmen) und den lebenden GitLab-PAT aus dem Cluster-Vault ermitteln. **Thesis Kap. 1–4 = FESTGEZOGEN = das SOLL**; der Code wird an die Thesis nachgezogen, nie umgekehrt. **Messdaten werden NIE gelöscht** (ABI/Schema darf brechen, alte Mess-CSV bleiben). **Codex-Gegenreview (gpt-5.5/xhigh, read-only, nur Code-Repos) vor „done"** bei jeder Code-Aufgabe.
+**Geltung & Vorrang:** Diese Datei konsolidiert; die *laufend gepflegte* Live-Single-Source bleibt das cache-engine-Ledger `Code/external/comdare-cache-engine/docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md`. **Bei Widerspruch zu konkreten Code-Stellen gilt: vor jedem Edit Zeilennummern re-greppen** (alle `file:line` sind Momentaufnahmen) und den lebenden GitLab-PAT aus dem Cluster-Vault ermitteln. **Thesis Kap. 1–4 = FESTGEZOGEN = das SOLL**; der Code wird an die Thesis nachgezogen, nie umgekehrt. **Messdaten werden NIE gelöscht** (ABI/Schema darf brechen, alte Mess-CSV bleiben). **Codex-Gegenreview (gpt-5.5/xhigh, read-only, nur Code-Repos) vor „done"** bei jeder Code-Aufgabe.
 
 ---
 
@@ -485,7 +485,7 @@
 | PHASE-A | `20260627-PHASE-A-PIPELINE-WINS-PROGRESS.md` |
 | 179-LEDGER | `20260627-179-WARTBARKEITS-SWEEP-LEDGER.md` |
 | MANUAL-RUN | `20260627-MANUAL-RUN-GAP-ANALYSE-CODEX.md` |
-| ledger | cache-engine `Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md` (Live-Single-Source) |
+| ledger | cache-engine `Code/external/comdare-cache-engine/docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md` (Live-Single-Source) |
 | phase-L | thesis phase-L-Mess-Tabellen-Doc (`#154`-Kontext) |
 
 ---

@@ -2,7 +2,7 @@
 
 > **ZUERST LESEN (nächste Session):** Memory `feedback_command_pattern_achsen_mess_visitor_container_in_sa`
 > (trägt ALLE User-Direktiven + 4c-0/0b-Verlauf + 4c-i-Einstieg) + Memory `reference_188_4b_…` (4a-DONE-Block)
-> + Masterplan `docs/sessions/20260702-MASTERPLAN-188-4c-spiegel-eliminierung-cmd-visitor.md` (a0e236a).
+> + Masterplan `docs/plaene/20260702-MASTERPLAN-188-4c-spiegel-eliminierung-cmd-visitor.md` (a0e236a).
 
 ## §0 HEADs / STATUS bei Kontext-Ende
 - **cache-engine `ecee6b3`** (beide Remotes; Kette heute: 95e249e 4a → a1f6024 4a-warnfix → e70f0c4 4c-0-Test →

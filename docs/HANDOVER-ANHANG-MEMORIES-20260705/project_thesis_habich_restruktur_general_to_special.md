@@ -10,7 +10,7 @@ metadata:
 **Erstprüfer Prof. Habich** hat im Audit (2026-06-29) die Arbeit bis tief in Kap. 4 gelesen: **inhaltlich richtig**,
 aber Struktur/Hinführung mangelhaft. Großer Umbau, **NUR Struktur/Übergänge/Platzierung** (Inhalt bleibt; **DE führt,
 EN folgt**; Metapher-Kanon bleibt). Backup vor Umbau: Git-Tag `backup-2026-06-29-pre-habich-restruktur` (beide Remotes).
-Detail-Referenz: `thesis/diplomarbeit/sessions/2026-06-29-habich-audit-kritik-und-restruktur-plan.md`.
+Detail-Referenz: `thesis/diplomarbeit/docs/sessions/2026-06-29-habich-audit-kritik-und-restruktur-plan.md`.
 
 **Ziel-Struktur (5-6 Kapitel statt 8):** 1 Einleitung · 2 Suchbäume+Grundlagen [**KONZEPT→HARDWARE→SOFTWARE**, rein
 visuell, KEINE Tabellen]: 2.1 Konzept+SOTA-Überblick (je Paper-Algorithmus ein Detailbild), 2.2 historische Hardware-Einführung
@@ -38,7 +38,7 @@ sein; ihre Belange (cache-aware-Fokus) **vollständig in Kap. 3** einführen, au
 Leitidee**, um die Mess-System-Idee zu erklären. (e) **Massive grafische Erweiterung (~50 Abbildungen):** pro Achse
 (Algorithmen + Achsen-Interface-Code), alle Gattungen, **UML-Landkarten** aller Code-Interfaces, **Achsen-Nutzungs-Graph**
 (welche Achse nutzt welche), Entwurfsmuster-Bild; Kap. 4: **je PRT-ART-Algorithmus ein Bild**. Detail-Plan v2:
-`thesis/diplomarbeit/sessions/2026-06-29-restruktur-detailplan-gliederung-und-bildliste.md`.
+`thesis/diplomarbeit/docs/sessions/2026-06-29-restruktur-detailplan-gliederung-und-bildliste.md`.
 
 **Why:** Habich = Erstprüfer, DB-/Suchstruktur-Professor; seine Präferenz (general→special, Detailtiefe, Suchbaum-Fokus)
 entscheidet die Note. **How to apply:** beim Umbau IMMER gegen diese Struktur + den general→special-Bogen prüfen; vgl.

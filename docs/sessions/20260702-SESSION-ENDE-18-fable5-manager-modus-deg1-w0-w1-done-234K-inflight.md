@@ -53,7 +53,7 @@
    workload_orchestrator/pmc_source_factory) erstmals CI-compiliert + seiteneffektfreier Smoke. Codex-Draft
    diesmal KORREKTUR-FREI (Claude-Verifikation: 30+ Symbole 100% real; Review SHIP ohne Befund).
 8. **234-K vorbereitet + GESTARTET:** Doppel-Recherche (Explore+Codex-Pair, konvergent) → 5 Design-Festlegungen
-   (§2.4) → Dossier finalisiert (persistiert: `docs/sessions/20260702-DOSSIER-234K-node-shape-achsen-kopf-fuer-codex.md`)
+   (§2.4) → Dossier finalisiert (persistiert: `docs/plaene/20260702-DOSSIER-234K-node-shape-achsen-kopf-fuer-codex.md`)
    → `codex exec` workspace-write GESTARTET — **bei Kontext-Ende noch nicht fertig** (§8).
 
 ## §2 ARCHITEKTURKONSOLIDIERUNGEN dieser Session
@@ -147,7 +147,7 @@ Shape-Dimension im 320-Baum aktiviert werden soll (sonst bleiben Varianten opt-i
   Trace-/Artefakt-Endpunkte alle erprobt (diese Session: play für manuelle Jobs, artifacts-zip-Download).
 - codex-cli 0.142.2 (`codex exec`); Workflow-Script-Datei
   `…/workflows/scripts/todo-replan-fable5-wf_bc48bcdd-802.js` (gehärtet, wiederverwendbar).
-- Aktive Dossiers: **234-K** = `docs/sessions/20260702-DOSSIER-234K-node-shape-achsen-kopf-fuer-codex.md`
+- Aktive Dossiers: **234-K** = `docs/plaene/20260702-DOSSIER-234K-node-shape-achsen-kopf-fuer-codex.md`
   (persistiert; Scratchpad-Kopien können verfallen).
 
 ## §8 🔥 IN-FLIGHT bei Kontext-Ende: der 234-K-Codex-Lauf — ZUERST HIER WEITERMACHEN

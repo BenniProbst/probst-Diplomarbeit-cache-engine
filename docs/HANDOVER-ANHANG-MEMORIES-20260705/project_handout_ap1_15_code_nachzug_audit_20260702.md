@@ -7,7 +7,7 @@ metadata:
   originSessionId: 78cf67f8-571e-4fcd-a907-1556dbc5be72
 ---
 
-**Quelle (autoritativ, VOR AP-Arbeit lesen):** `thesis/diplomarbeit/sessions/2026-07-02-handout-implementierungsagent-audit-code-todos.md` + Audit `2026-07-02-audit-thesis-vs-code.md` (ultracode, 151 Claims: 99 OK / 50 divergent). Grundsatz User: „Thesis beschreibt den faktischen Sollstand — Code zieht nach." §1 des Audits (Text→Code, P4-P7) ist bereits vom Text-Agenten erledigt — NICHTS tun.
+**Quelle (autoritativ, VOR AP-Arbeit lesen):** `thesis/diplomarbeit/docs/sessions/2026-07-02-handout-implementierungsagent-audit-code-todos.md` + Audit `2026-07-02-audit-thesis-vs-code.md` (ultracode, 151 Claims: 99 OK / 50 divergent). Grundsatz User: „Thesis beschreibt den faktischen Sollstand — Code zieht nach." §1 des Audits (Text→Code, P4-P7) ist bereits vom Text-Agenten erledigt — NICHTS tun.
 
 **Tasks eingereiht 2026-07-02:** AP-1→#235 … AP-15→#249 (1:1, Details je Task-Description). P0 = AP-1..7 (#235-#241) blocken #156 (M3-Lauf); **AP-1 (#235, POD branch_misses+throughput = ABI-Bruch) und AP-7 (#241, SwissTable-S22 ändert T0-Registry/Permutations-Baum) blocken zusätzlich #215** (FREEZE/320-Neubau). AP-12 (#246) blockedBy AP-2 (#236). AP-14 (#248) blockedBy #215+#156. AP-9 (#243) MIT AP-1 in einem Zug (ein Schema-Bruch statt zwei). Wellen-Plan: neue **W4.5** zwischen W4 und W5 (in #149-Description verankert).
 

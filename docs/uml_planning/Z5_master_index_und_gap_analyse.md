@@ -2,7 +2,7 @@
 
 > ⚠️ **SUPERSEDED (2026-05-31):** Die UML-Planung Y1–Y4 / Z1–Z5 (Stand 2026-05-18, in-process
 > register_engine-Modell, prt-art-als-Submodul-Topologie) ist vom Code überholt (axis-zentrisch + Plugin
-> + DLL-F15). **IST-treue Quelle:** `Code/external/comdare-cache-engine/docs/sessions/architektur-ziele-offene-punkte-ledger.md`.
+> + DLL-F15). **IST-treue Quelle:** `Code/external/comdare-cache-engine/docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md`.
 > Niemals löschen — nur Banner.
 
 ## §0 KRITISCHE KORREKTUR AA.3 (2026-05-18 spaet)
@@ -48,7 +48,7 @@ Die §3.2 Gap-Analyse-Tabelle PRT-ART war FALSCH wo "FEHLT" markiert war. **Korr
 | `prt_art/isa/` | **DEFAULT-LOOKUP** | (CE liefert IPlatformProbe-Output) |
 | `prt_art/allocator/reclamation/numa/huge_page/` | **DEFAULT-LOOKUP** fuer Reclamation/NUMA/HugePage | (CE-Allokator-Bibliothek liefert via Auto-Permutation) |
 | `prt_art/concurrency/locking_mode.hpp` | DEFAULT-LOOKUP (CE-Bibliothek 4 Modes) | (CE liefert read-only/RW/optimistic/upgradeable) |
-| `docs/PRT_ART_AXES_REUSE_MATRIX.md` | NEU mit (a)/(b)/(c)/(default-lookup) | O.4 |
+| `docs/architektur/PRT_ART_AXES_REUSE_MATRIX.md` | NEU mit (a)/(b)/(c)/(default-lookup) | O.4 |
 
 **Bilanz prt-art KORRIGIERT:** Statt 11 V32+ Aenderungen sind es **nur ca. 4-5 echte Neuerungen** (Trie-Mapping + Search-Algo-Traversal + Reuse-Matrix-Doku + V32.1 Template). **6 Module entfallen** (sind Default-Lookup-Faelle).
 
@@ -173,7 +173,7 @@ flowchart LR
 | `prt_art/allocator/` | 3 Header (Pool-Familie) | + 3 Header (Reclamation/NUMA/HugePage) | **ERWEITERN** | O.3 |
 | `memory_layout/virtual_offset_address.hpp` | in memory_layout/ | VERSCHIEBE nach traversal/traversal_mapping.hpp | **MOVE** | O.3 |
 | `concurrency/olc_with_reserved_blocks.hpp` | + 8.1 + 8.2 zusammen | klare 8.1 + 8.2 Trennung | **DOKU + Concept-Split** | O.3 |
-| `docs/PRT_ART_AXES_REUSE_MATRIX.md` | **FEHLT** | NEU Tabelle aus O.4 | **NEU DOKU** | O.4 |
+| `docs/architektur/PRT_ART_AXES_REUSE_MATRIX.md` | **FEHLT** | NEU Tabelle aus O.4 | **NEU DOKU** | O.4 |
 | `prt_art/tests/test_prt_art_identity.cpp` | 51 Tests | + 8 Tests fuer neue Template-Params | **ERWEITERN** | U.2 |
 
 **Bilanz prt-art:** 5 NEU-Verzeichnisse, 2 ERWEITERN, 1 MOVE, 1 DOKU+Split, 1 REFACTOR, 1 NEU DOKU = **11 V32+ Aenderungen**.

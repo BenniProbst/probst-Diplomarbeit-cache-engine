@@ -2,7 +2,7 @@
 
 > **DEFINITIVE Übergabe dieser Session** — ersetzt den Mid-Session-Checkpoint SESSION-ENDE-10 (reichte nur bis E3-Beginn). Diese Session setzte die top-down-Strecke (User-Direktive: E4→E3→E2→E1→**E0 zuletzt**) fort und arbeitete **E4 + E3 vollständig (soweit jetzt machbar)** ab.
 >
-> **⚠️ PRIMÄR-ANKER = das Dossier** `Code/external/comdare-cache-engine/docs/sessions/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md`. **VOR jeder Weiterarbeit lesen:** §1 (Anatomie A1–A3) · §1.1 (STL-Hüllen: SearchAlgorithm=std::map, Container=std::vector) · §12 (Permutations-B+-Baum, 2 Knotenarten, RC) · §13 (die 4 Experiment-Ebenen E1–E4 + XML) · §14 (Top-Down-Audit B4-1…B1-1) · §15 (Ebenen-Einteilung aller TODOs) · §16 (Exekutions-Log dieser Session) · **§17 (#188-Implementierungsplan, ausführungsreif)**. Ohne diesen Kontext verrennt man sich (wie zu Session-Beginn).
+> **⚠️ PRIMÄR-ANKER = das Dossier** `Code/external/comdare-cache-engine/docs/plaene/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md`. **VOR jeder Weiterarbeit lesen:** §1 (Anatomie A1–A3) · §1.1 (STL-Hüllen: SearchAlgorithm=std::map, Container=std::vector) · §12 (Permutations-B+-Baum, 2 Knotenarten, RC) · §13 (die 4 Experiment-Ebenen E1–E4 + XML) · §14 (Top-Down-Audit B4-1…B1-1) · §15 (Ebenen-Einteilung aller TODOs) · §16 (Exekutions-Log dieser Session) · **§17 (#188-Implementierungsplan, ausführungsreif)**. Ohne diesen Kontext verrennt man sich (wie zu Session-Beginn).
 
 ## §0 Orientierung — finale HEADs + Commit-Kette
 - **cache-engine** `main` = **`c34d6cb`** · **super (Diplomarbeit)** `main` = **`a82d464`** · beide Remotes (gitlab + origin) gepusht.

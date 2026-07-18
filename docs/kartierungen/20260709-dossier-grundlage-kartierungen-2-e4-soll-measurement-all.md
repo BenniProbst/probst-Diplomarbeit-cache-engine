@@ -11,7 +11,7 @@ I have the complete picture. Here is the structured SOLL-Bild.
 
 ## 1 — Der 28.06.-E1–E4-Plan (Dossier §12–§17)
 
-Datei: `ce/docs/sessions/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md` (570 Z.)
+Datei: `ce/docs/plaene/20260628-KONTEXT-DOSSIER-mess-echtheit-gattungen-observer-pruefdock-A2welle.md` (570 Z.)
 
 **Die vier E-Ebenen** (Definition Z.32; §13-Tabelle Z.385–390, Ablauf Z.393):
 - **E4 — XML-Experiment-Definition** (oberste, „das WAS"): `comdare_thesis_profile` = `ce/libs/cache_engine/algorithm_profiles/thesis_profiles/*.profile.xml` + `SCHEMA.md`. Ist-Delta (Z.387): Profile liegen physisch in der Bibliothek, **gehören konzeptionell ins Superprojekt**.
@@ -53,7 +53,7 @@ Struktur (`mod/README.md` Z.5–11; Baum verifiziert):
 - Vokabular real: `include/comdare/workloads/workload_generator.hpp:20-27` = `enum class YcsbWorkload { A..F }` (identisch zu #31s A–F).
 - **Der gated Migrationsplan-Schritt 13** = wörtlich README Z.28–29: *„Der Monolith (CI 286) bleibt unangetastet; Research-Verdrahtung ist **Schritt 13**."* — bestätigt in `workload_generator.hpp:73-74` (`to_abi_descriptor` bewusst NICHT migriert, ABI-Naht bleibt im Monolithen bis Schritt 13). Bewusste Auslassungen auch `workload_orchestrator`, `load_profile_parser/writer` (Z.21–24).
 
-**„Option A"** = die **Doku-25-Modul-Split-Entscheidung**, nicht ein measurement-all-„Doc 15". Beleg: `ce/docs/sessions/architektur-ziele-offene-punkte-ledger.md:40` — *„User wählte nach Doku 25 **Option A** → alle 6 modules/-Repos mit kuratiertem Public-Header-Set … non-destruktiv, modules/ NICHT im Build-Graph"*; **Option B** = echte Konsumptions-Migration (Monolith baut FROM Submodulen), gated auf GitLab-/DependencyManager-Reife.
+**„Option A"** = die **Doku-25-Modul-Split-Entscheidung**, nicht ein measurement-all-„Doc 15". Beleg: `ce/docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md:40` — *„User wählte nach Doku 25 **Option A** → alle 6 modules/-Repos mit kuratiertem Public-Header-Set … non-destruktiv, modules/ NICHT im Build-Graph"*; **Option B** = echte Konsumptions-Migration (Monolith baut FROM Submodulen), gated auf GitLab-/DependencyManager-Reife.
 
 **Verortung des #31-Vokabulars (SOLL):** Das Workload-Vokabular (YCSB A–F) gehört **jetzt schon** zu `comdare-workloads` (baseline_2). Die Dataset-Achse (6 Kanon-Datensätze) + die **Mess-Kategorie** (Granularität Micro/Macro/Overall, s. §4) gehören in die **noch anzulegende Stufe `3-analysis`**. Nach Option A bleibt beides bis **Schritt 13** ein reines Modul-Public-Interface; die Research-Pipeline (Monolith) konsumiert es erst mit der Verdrahtung — bis dahin ist der Monolith unangetastet.
 
