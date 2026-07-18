@@ -1963,3 +1963,22 @@ Keine kippt Architektur/Roadmap; sie schärfen die INC-0/INC-1-Verifikationsumge
 - **S-7-Deep-Research:** NICHT durch das GO entsperrt — Tooling-/Safety-Block (Opus-Session nach Planungs-Abschluss, §12-Nachzieh 2026-07-16). Bleibt EHRLICH OFFEN.
 - **G5/#274 measurement-all-Migration:** bewusst ans Projektende terminiert (§16.4-G5) — kein Entscheidungs-Gate, korrekt aufgeschoben.
 - **Interne SHA-„Diskrepanz" I4-super: GEKLÄRT (git-Ground-Truth, 2026-07-17):** keine Diskrepanz — `c78359d` = I4-Code-Commit (feat messung_driver + Gitlink), `a92f362` = der unmittelbar folgende I4-Ledger-Commit (docs §12). Beide SHAs korrekt, dieselbe I4-Landung.
+
+## §21 — 2026-07-18: BRUCH-RULINGS + SYSTEM/MESS/ORGAN-SCHICHTUNG + E1–E5 ENTSCHIEDEN → BAU-FREIGABE (NEUESTER EINSTIEG — vor §20 lesen)
+
+> **User 2026-07-18: E1–E5 gerult + „Bitte baue los".** Anhalte-Direktive durch explizite Freigabe überschrieben. Design crash-sicher in `docs/sessions/backups/20260718-optg-systemachsen-neue-golden/DESIGN-optg-a2neben-neue-golden.md` (ultracode `wf_bd2878b3` + `wf_e7e52856`).
+
+### 21.A — BRUCH-RULINGS (User, wörtlich)
+golden_fullpilot_320 / `CatalogAxes<4,4,5,4>=320` / „additiv"-Zwang **AUFGEHOBEN** (Bruch-Freigabe): „die 320er ist überholt und darf mit allen Erweiterungen gebrochen werden, weil sich die Achsenstruktur und die Anzahl der Achsen vergrößert und geändert hat." **⇒ neuere Fakten schlagen ältere:** der §0-GOAL-V6-TABU auf golden-320 ist konditional gelöst; überholte Messwerte dürfen gelöscht/ersetzt werden (git-reversibel), neue golden-Version. Rohdaten-Backups + ABI-Historie bleiben additiv/nie-löschen.
+
+### 21.B — ACHSEN-SCHICHTUNG (code-verifiziert + User-E1-Verfeinerung)
+Drei Schichten (`axis.hpp:17-21` `AxisKind{organ, system_measurement, system_config}`): **Organ** → bildet allein `binary_id` (`serialize_composition_path`, `axis_path_serialization.hpp:44-60`), **direkt in die Tier-Binaries einkompiliert** (User). **Mess** (`SystemAxis`) + **System-Config** (`CebSystemAxis`) **gehören beide in CEB; die System-Achsen steuern die gesamte Kompilation UND die Ausprägung der Mess-Achsen** (User). `opt_level`=`system_config` unter `compiler` (`optimization_level_sub_axis.hpp:40`) → **berührt binary_id NIE**. **⇒ opt/simd wachsen NICHT die golden-Fixture, sondern die Mess-Matrix (CSV → Organ × System-Achsen).** binary_id läuft mehrfach unter versch. Sidecars, unterschieden über CSV-Spalte `build_version` (`+opt=`, heute nur SOLL `optimization_level_sub_axis.hpp:12-13`). **SIMD** = Erweiterungs-Hardware-System-Achse (`extension_hardware`, Avx2/Avx512 mit `gcc_march_flag`), **ISA-gegated** (nur wenn ISA es bietet); **Organ-SIMD ≤ System-SIMD-Zulassung** (ein Organ das SIMD nutzt ist nur zulässig, wenn die System-Achse es auf der Ziel-ISA zulässt). golden-Quelle = `FullSourceCatalog=CatalogAxes<4,4,5,4>` (`source_catalog.hpp:111`), regen via `comdare_gen_golden_fullpilot`.
+
+### 21.C — ENTSCHEIDUNGEN (gerult 2026-07-18) + BAU-FREIGABE
+- **E1** = Organ-Matrix **320 bleibt** (opt/simd wachsen sie nicht); a/b/c wie empfohlen. **SIMD mit rein** als System-Achse (ISA-gated, Organ-SIMD ≤ System-Zulassung).
+- **E1b** = **O2/O3 in Mess-golden**, O0/O1/Ofast additiv (Ofast bricht 1-Thread-Determinismus).
+- **E2** = **rm freigegeben**: `tier150_measurements.csv` (tests+build) + `adapter_measurements.csv` (git-reversibel; Manifest wird regeneriert, nicht gelöscht).
+- **E3** = **sauber** — A2-Neben Namespace `builder::`→`measurement::`, „so sauber wie möglich".
+- **E4** = **beide A2-Stufen durchziehen** (Stufe 1 `pmc_source` → Stufe 2 `perm_runner`→`harness/`).
+- **E5** = `..._abi4.txt` behalten/deprecaten (nicht überschrieben).
+- **BAU-REIHENFOLGE (freigegeben):** **opt-f** (XML-Liste/Range opt_level+simd im ExperimentProfile+XSD+validate) → **opt-g** (Planer permutiert opt×simd, ISA-gated; je Perm CompileFn(opt_flag/march)+build_version-Sidecar; sota_seen_bids je Perm-Reset; NIE binary_id) → **A2-Neben** (Stufe 1+2). Volle Kadenz je Increment (ctest + golden-Roundtrip + cf22=0 + Mojibake=0 + super-Sub-Build + beide Remotes + CI hart-grün).

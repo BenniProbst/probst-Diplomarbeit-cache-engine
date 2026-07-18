@@ -27,6 +27,7 @@
         <xs:element name="lebewesen"            type="LebewesenType"/>
         <xs:element name="phases"               type="PhasesType"/>
         <xs:element name="axes_default_lookup"  type="AxesDefaultLookupType" minOccurs="0"/>
+        <xs:element name="system_axes"          type="SystemAxesType" minOccurs="0"/>
         <xs:element name="workloads"            type="xs:string"/>
         <xs:element name="datasets"             type="DatasetsType"/>
         <xs:element name="measurement_categories" type="MeasurementCategoriesType"/>
@@ -115,6 +116,56 @@
       </xs:element>
     </xs:sequence>
     <xs:attribute name="enabled" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <!-- system_axes: CEB-System-Achsen-Permutation (opt-f/A3). binary_id-NEUTRAL — opt_level/simd sind
+       system_config (CebSystemAxis), stehen NIE in kCompositionAxisNames; die Provenienz gehoert ins
+       build_version/H-10-Sidecar. compiler/opt_level = Optimierungs-Stufen-Liste (OptO*SubAxis-ids O0..Ofast);
+       extension_hardware/simd = Erweiterungs-Hardware-Liste (simd_extension_id, ISA-gegated). Beide additiv
+       (minOccurs=0); leer = CEB-Default (O3 / no_extension). Der Planer permutiert sie SELBST (opt-g). -->
+  <xs:complexType name="SystemAxesType">
+    <xs:sequence>
+      <xs:element name="compiler" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="opt_level" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="value" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:enumeration value="O0"/>
+                      <xs:enumeration value="O1"/>
+                      <xs:enumeration value="O2"/>
+                      <xs:enumeration value="O3"/>
+                      <xs:enumeration value="Ofast"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="extension_hardware" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="simd" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="value" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:enumeration value="no_extension"/>
+                      <xs:enumeration value="avx2"/>
+                      <xs:enumeration value="avx512"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
   </xs:complexType>
 
   <!-- datasets: Single-Source Referenzen auf die test_data-AKTEN (kein
