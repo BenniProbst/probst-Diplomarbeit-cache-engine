@@ -25,6 +25,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <memory>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -45,6 +46,7 @@
 
 #ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
 #include <profile_facade/profile_run_facade.hpp>
+#include <builder/artifact_transport/artifact_cache.hpp> // Storage #51: ArtifactCache::from_env (No-Op-Default)
 #endif
 
 // INC-G+H (C.2+C.3, 2026-07-14): INERT-Andock der execute_messreihe-Verdrahtung (v32_messreihe_antrieb.hpp).
@@ -613,6 +615,27 @@ int main(int argc, char* argv[]) {
                 std::filesystem::create_directories(e4_dir, ec);
                 if (ec) throw std::runtime_error("create_directories(" + e4_dir.string() + "): " + ec.message());
 
+                // Storage #51 (No-Op-Default => byte-neutral): der EINE Transport-Client aus der Umgebung. Ist weder
+                // COMDARE_MINIO_ENDPOINT/_BUCKET (Ebene B) noch COMDARE_MEASUREMENT_NFS_ROOT (Ebene C) gesetzt, ist er
+                // INERT -> die Naht-Funktionen bleiben LEER -> der Iterator ruft sie nie -> golden/CI byte-identisch.
+                // EINE Instanz (ein datierter Lauf-Baum) fuer BEIDE Profil-Wurzeln (xa/pa). Credentials NIE hier (mc/
+                // MC_HOST_<alias>), NIE geloggt. SYNCHRON an der per-Binary-/whole-run-Naht — kein async/detached.
+                namespace at                   = comdare::cache_engine::builder::artifact_transport;
+                auto const      artifact_cache = std::make_shared<at::ArtifactCache>(at::ArtifactCache::from_env());
+                at::CachePushFn cache_push;
+                at::MeasurementSinkFn measurement_sink;
+                if (!artifact_cache->inert()) {
+                    cache_push = [artifact_cache](std::filesystem::path const& bin_dir, std::string const& bv) {
+                        artifact_cache->push_tier_binary(bin_dir, bv);
+                    };
+                    measurement_sink = [artifact_cache](std::filesystem::path const& file, std::string const& dest) {
+                        artifact_cache->sink_measurement(file, dest);
+                    };
+                    std::cout << "[E4] Storage #51 aktiv: minio=" << (artifact_cache->minio_enabled() ? "1" : "0")
+                              << " nfs=" << (artifact_cache->nfs_enabled() ? "1" : "0")
+                              << " lauf-baum=" << artifact_cache->run_stamp() << "\n";
+                }
+
                 // Bruecke-I4 (2026-07-16): der E4-Run-Block deckt — wie der --validate-Zweig (S0/FORK-4) — BEIDE
                 // offiziellen Profil-Wurzeln ab. Ein Root-Tag-Sniff (rein-lesend ueber den common-DOM) entscheidet:
                 // <comdare_thesis_profile> -> run_profile_facade (UNVERAENDERT, Thesis-Weg); <comdare_experiment> ->
@@ -647,6 +670,8 @@ int main(int argc, char* argv[]) {
                         xa.working_set_override = static_cast<std::uint64_t>(*ws);
                     if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
                         xa.build_version_tag_override = build_tag;
+                    xa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
+                    xa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
 
                     std::cout << "[E4] comdare_experiment-Bruecke via run_experiment_profile-Fassade: profile="
                               << thesis_profile << " -> " << xa.out_csv.string() << "\n";
@@ -688,6 +713,8 @@ int main(int argc, char* argv[]) {
                     if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
                         pa.build_version_tag_override = build_tag;
                     if (env_trimmed("COMDARE_RUN_SOTA") == "0") pa.run_sota_series = false;
+                    pa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
 
                     std::cout << "[E4] XML-Lauf via run_profile-Fassade: profile=" << thesis_profile << " -> "
                               << pa.out_csv.string() << "\n";
