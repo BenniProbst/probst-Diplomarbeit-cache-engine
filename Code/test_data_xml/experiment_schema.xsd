@@ -122,8 +122,9 @@
        binary_id-NEUTRAL (opt_level/simd sind system_config, stehen NIE in kCompositionAxisNames; Provenienz
        build_version/H-10-Sidecar). Haupt-Achse 'compiler' traegt die Unter-Achse 'opt_level' (EIN Container),
        deren <option>-Kinder die Stufen O0..Ofast tragen (Optionen der Unter-Achse, KEINE eigenen Achsen).
-       Haupt-Achse 'extension_hardware' (6., Q2 Option C) traegt ihre simd-Ausraegungen DIREKT als <option>
-       (Code-Wahrheit: keine simd-Unter-Achse). Alles additiv (minOccurs=0); leer = CEB-Default (O3/no_extension).
+       Haupt-Achse 'extension_hardware' (6., Q2 Option C) traegt die Unter-Achse 'simd' (EIN Container), deren
+       <option>-Kinder die Auspraegungen no_extension/avx2/avx512 tragen (symmetrisch zu compiler/opt_level).
+       Alles additiv (minOccurs=0); leer = CEB-Default (O3/no_extension).
        Der Planer permutiert die Optionen SELBST (opt-g). -->
   <xs:complexType name="SystemAxesType">
     <xs:sequence>
@@ -157,17 +158,23 @@
       <xs:element name="extension_hardware" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="option" minOccurs="0" maxOccurs="unbounded">  <!-- simd-Optionen (direkt, keine Unter-Achse) -->
+            <xs:element name="simd" minOccurs="0">              <!-- Unter-Achse (6.x): EIN Container, symmetrisch zu opt_level -->
               <xs:complexType>
-                <xs:attribute name="value" use="required">
-                  <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                      <xs:enumeration value="no_extension"/>
-                      <xs:enumeration value="avx2"/>
-                      <xs:enumeration value="avx512"/>
-                    </xs:restriction>
-                  </xs:simpleType>
-                </xs:attribute>
+                <xs:sequence>
+                  <xs:element name="option" minOccurs="0" maxOccurs="unbounded">  <!-- Optionen no_extension/avx2/avx512 -->
+                    <xs:complexType>
+                      <xs:attribute name="value" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="no_extension"/>
+                            <xs:enumeration value="avx2"/>
+                            <xs:enumeration value="avx512"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
