@@ -24,7 +24,7 @@
         "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/experiment_driver/experiment_driver.hpp:55",
         "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/concepts/cache_engine_mode.hpp:9",
         "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/builder/curve_fit/curve_fit.hpp:44",
-        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260711-e4prime-messkurven-typsystem-wurzel/BEFUND.md"
+        "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/audits/20260711-e4prime-messkurven-typsystem-wurzel-BEFUND.md"
       ]
     },
     "gap": {
@@ -111,7 +111,7 @@
       "queuedAt": 1783757323028,
       "attempt": 1,
       "lastToolName": "StructuredOutput",
-      "promptPreview": "Hook-Ask A: SKIZZIERE die TABU-respektierende Alternative fuer §B (Messkurven-Typsystem-WURZEL) + §D (Hybrid-Modus). Vorbefunde (NICHT wiederholen, darauf aufbauen): §B ist Doppelquelle zu profile_to_tree.hpp (/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260711-e4prime-messkurven-typsystem-wurzel/BEFUND.md); §D ist TABU (genus_binding_traits) + ABI-Bump-…",
+      "promptPreview": "Hook-Ask A: SKIZZIERE die TABU-respektierende Alternative fuer §B (Messkurven-Typsystem-WURZEL) + §D (Hybrid-Modus). Vorbefunde (NICHT wiederholen, darauf aufbauen): §B ist Doppelquelle zu profile_to_tree.hpp (/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/audits/20260711-e4prime-messkurven-typsystem-wurzel-BEFUND.md); §D ist TABU (genus_binding_traits) + ABI-Bump-…",
       "lastProgressAt": 1783757815908,
       "tokens": 126654,
       "toolCalls": 30,

@@ -13,7 +13,7 @@
     "non_gated": [
       {
         "titel": "Limits-Entkopplung (Dossier 17 Phase 4, #229-Kern) — XML-getriebene Katalog-Limits + Pre-Build-Codegen der binary_id→Source-Map + adhoc_emitter-Entkopplung [merged: dossier16-17-01 + dossier16-17-02, gleiches Bau-Artefakt = der eine GO-Increment 'Limits-Entkopplung']",
-        "quellen": "docs/architektur/17_E4_XML_VOLLVISION_ROADMAP.md:60 (D-Tabelle Phase 4) + :31-32 (Blocker 2+3) + :51 (C.3); Ledger §12 Eintrag 10.07. Schicht E3 (b) + STOP-Bilanz Z.422; Analyse-Vorarbeit: super docs/sessions/backups/20260710-schicht-e3-impl/LIMITS-ENTKOPPLUNG-ANALYSE.md (Konsum-Kanten + Codegen-Design-Skizze golden-320-byte-gleich)",
+        "quellen": "docs/architektur/17_E4_XML_VOLLVISION_ROADMAP.md:60 (D-Tabelle Phase 4) + :31-32 (Blocker 2+3) + :51 (C.3); Ledger §12 Eintrag 10.07. Schicht E3 (b) + STOP-Bilanz Z.422; Analyse-Vorarbeit: super docs/audits/20260710-schicht-e3-impl-LIMITS-ENTKOPPLUNG-ANALYSE.md (Konsum-Kanten + Codegen-Design-Skizze golden-320-byte-gleich)",
         "was_fehlt": "(1) CatalogAxes<4,4,5,4>=320 weiterhin hartkodiert (ce tests/unit/thesis_tiere/source_catalog.hpp:113) statt Ableitung aus ThesisProfile.permute_axes — permute_axes treibt nur den Runtime-Baum (profile_to_tree.hpp:51), nicht die compile-time Limits; (2) Pre-Build-Codegen der binary_id→Source-Map aus der XML fehlt (ce libs/cache_engine/builder/experiment_tree/pilot_source_map.hpp = Pilot-only/umbrella-schwer, unbekannte binary_id ⇒ leere Quelle; grep add_custom_command×source_map/xml = 0) — XML kann heute nur INNERHALB der hartkodierten Kataloge treiben; (3) ce apps/adhoc_emitter/main.cpp:139 PilotEngine hartkodiert statt XML-Achsenliste. Randbedingungen: compile-time-gebunden (Pre-Build-Codegen, KEIN Runtime-Fallback), golden-Roundtrip==320 bleibt Regressions-Gate, kein ABI-Bump. Wert fürs Diplomarbeits-Ziel: HOCH — öffnet den XML-Achsenraum jenseits golden-320 = Voraussetzung für Heuristik-Kurven-Breite und die Hybrid-Modus-Rekombination (virtuelles Tier-Binary braucht Source-Erzeugung jenseits der Pilot-Map). Per User-Freigabe 10.07. (alle GO-Increments) jetzt baubar."
       },
       {
@@ -141,7 +141,7 @@
       "tokens": 104389,
       "toolCalls": 11,
       "durationMs": 182890,
-      "resultPreview": "{\"claims\":[{\"id\":\"befunde-01\",\"quelle\":\"docs/sessions/backups/20260709-pareto-objectives-t6-t18-t5/BEFUND.md:63-67,129-139,292-295\",\"anspruch\":\"T6-Default-Objective `ThroughputOptimizing` als neuer GoF-Strategy-Typ im cacheline_policy_selector bauen — das im Header (:29-30) annoncierte 'durchsatz-optimierend' existiert nicht als Typ; nur ScanOptimizing/LatencyOptimizing sind implementiert.\",\"pruef…"
+      "resultPreview": "{\"claims\":[{\"id\":\"befunde-01\",\"quelle\":\"docs/audits/20260709-pareto-objectives-t6-t18-t5-BEFUND.md:63-67,129-139,292-295\",\"anspruch\":\"T6-Default-Objective `ThroughputOptimizing` als neuer GoF-Strategy-Typ im cacheline_policy_selector bauen — das im Header (:29-30) annoncierte 'durchsatz-optimierend' existiert nicht als Typ; nur ScanOptimizing/LatencyOptimizing sind implementiert.\",\"pruef…"
     },
     {
       "type": "workflow_agent",
@@ -391,7 +391,7 @@
       "tokens": 44828,
       "toolCalls": 9,
       "durationMs": 73850,
-      "resultPreview": "{\"status\":\"fehlt\",\"beleg\":\"0 Code-Treffer für GeneratedFullSourceCatalog/generated_catalog_static_levels/generated_make_catalog_source_gen im gesamten ce-Repo (einziger Treffer = das Analyse-Doc docs/sessions/backups/20260710-schicht-e3-impl/LIMITS-ENTKOPPLUNG-ANALYSE.md:66). Ist-Stand unverändert: Katalog hartkodiert in Code/external/comdare-cache-engine/tests/unit/thesis_tiere/source_catalog.hpp…"
+      "resultPreview": "{\"status\":\"fehlt\",\"beleg\":\"0 Code-Treffer für GeneratedFullSourceCatalog/generated_catalog_static_levels/generated_make_catalog_source_gen im gesamten ce-Repo (einziger Treffer = das Analyse-Doc docs/audits/20260710-schicht-e3-impl-LIMITS-ENTKOPPLUNG-ANALYSE.md:66). Ist-Stand unverändert: Katalog hartkodiert in Code/external/comdare-cache-engine/tests/unit/thesis_tiere/source_catalog.hpp…"
     },
     {
       "type": "workflow_agent",
@@ -517,7 +517,7 @@
       "tokens": 55982,
       "toolCalls": 12,
       "durationMs": 94807,
-      "resultPreview": "{\"status\":\"teilweise\",\"beleg\":\"Research-Hälfte des SOLL ist VOLLZOGEN, Code-Hälfte fehlt komplett. (1) Der in Dossier 19:68 geforderte Deep-Research-Task ist abgeschlossen — Ledger Z.410 'läuft' ist stale: docs/sessions/backups/20260709-workload-cluster-research/BEFUND.md (27 KB, 09.07. 21:49) liefert das komplette Cluster-Bildungsverfahren mit Ehrlichkeits-Markierung: Merkmalsraum = Last-Beschrei…"
+      "resultPreview": "{\"status\":\"teilweise\",\"beleg\":\"Research-Hälfte des SOLL ist VOLLZOGEN, Code-Hälfte fehlt komplett. (1) Der in Dossier 19:68 geforderte Deep-Research-Task ist abgeschlossen — Ledger Z.410 'läuft' ist stale: docs/audits/20260709-workload-cluster-research-BEFUND.md (27 KB, 09.07. 21:49) liefert das komplette Cluster-Bildungsverfahren mit Ehrlichkeits-Markierung: Merkmalsraum = Last-Beschrei…"
     },
     {
       "type": "workflow_agent",
@@ -685,7 +685,7 @@
       "tokens": 49699,
       "toolCalls": 11,
       "durationMs": 114990,
-      "resultPreview": "{\"status\":\"teilweise\",\"beleg\":\"SOLL: super docs/architektur/18_MESS_METHODIK_ACHSEN_OPTIMIERUNG_KONSOLIDIERT.md:128 (F.5). ERLEDIGT nur T18 (+T6/T5): super docs/sessions/backups/20260709-pareto-objectives-t6-t18-t5/BEFUND.md Z.175-189/318-319/334-337 zitiert Monkey SIGMOD 2017 + Dostoevsky SIGMOD 2018 substanziell. FEHLT: T10 Bolosky/Scott 1993, T13 Graefe FnT 2011, T2 mapping — grep 'bolosky|grae…"
+      "resultPreview": "{\"status\":\"teilweise\",\"beleg\":\"SOLL: super docs/architektur/18_MESS_METHODIK_ACHSEN_OPTIMIERUNG_KONSOLIDIERT.md:128 (F.5). ERLEDIGT nur T18 (+T6/T5): super docs/audits/20260709-pareto-objectives-t6-t18-t5-BEFUND.md Z.175-189/318-319/334-337 zitiert Monkey SIGMOD 2017 + Dostoevsky SIGMOD 2018 substanziell. FEHLT: T10 Bolosky/Scott 1993, T13 Graefe FnT 2011, T2 mapping — grep 'bolosky|grae…"
     },
     {
       "type": "workflow_agent",

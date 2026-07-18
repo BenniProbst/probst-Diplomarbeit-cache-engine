@@ -195,7 +195,7 @@ Diagramm als künftiges Familienmitglied vermerkt, mehr nicht.
 | **Compiler (Achse 15)** | Registry-Permutationsachse der TIER-Binaries (AutoPermutator-Tabelle) | die Compiler-SYSTEMACHSE inkl. CEB-Selbst-Wahl (F3i(1)) | REGISTRY:274-313; B §5.2 |
 | **`AxisBase::get_compiler()`** | Paper-Provenance-Metadatum je Organ (Habich-Compliance) | Build-Compiler-Steuerung | ce `topics/axis_base.hpp:58-70`; C §8 |
 
-**Abgrenzung gegen die E11-„Phasen"-Taxonomie** (Klärung `super/docs/sessions/backups/20260716-e11-phasen-e13-kontext/SYNTHESE-E11-E13.md`):
+**Abgrenzung gegen die E11-„Phasen"-Taxonomie** (Klärung `super/docs/audits/20260716-e11-phasen-e13-kontext-SYNTHESE-E11-E13.md`):
 „Phase" ist dort mindestens 5-fach überladen (XML-Prüf-Phase, CEB-Betriebs-„Phase", Treiberphasen
 1–5/7-Phasen-Pipeline, Roadmap-Phase, Zwei-Phasen-Op-Schleife; SYNTHESE L4 :38). **Systemachsen sind
 KEINE Phase in irgendeinem dieser Vokabulare:** sie sind ein E0-QUERSCHNITT über alle Phasen

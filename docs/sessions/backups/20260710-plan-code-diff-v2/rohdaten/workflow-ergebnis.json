@@ -330,7 +330,7 @@
       "tokens": 43880,
       "toolCalls": 12,
       "durationMs": 142608,
-      "resultPreview": "{\"id\":\"DOC20-G-kk-klassen\",\"status_bestaetigt\":\"TEILWEISE\",\"gate_bestaetigt\":\"user\",\"grund\":\"TEILWEISE bestaetigt (NICHT heimlich DONE): KK-1/2/3-Einteilung existiert nur als Doc-Konstrukt in docs/architektur/20_HEURISTIK_MESSKURVEN_TYPSYSTEM_UND_FILTERKETTE.md:98-107 + Deep-Research-BEFUND docs/sessions/backups/20260710-kardinalitaeten-deep-research/BEFUND-KARDINALITAETEN.md (71 Befunde). KK-1-An…"
+      "resultPreview": "{\"id\":\"DOC20-G-kk-klassen\",\"status_bestaetigt\":\"TEILWEISE\",\"gate_bestaetigt\":\"user\",\"grund\":\"TEILWEISE bestaetigt (NICHT heimlich DONE): KK-1/2/3-Einteilung existiert nur als Doc-Konstrukt in docs/architektur/20_HEURISTIK_MESSKURVEN_TYPSYSTEM_UND_FILTERKETTE.md:98-107 + Deep-Research-BEFUND docs/audits/20260710-kardinalitaeten-deep-research-BEFUND-KARDINALITAETEN.md (71 Befunde). KK-1-An…"
     },
     {
       "type": "workflow_agent",

@@ -139,7 +139,7 @@
         "cache_engine_builder_iterator.hpp:168-186 (WIDE stat_<achse>_<feld> single-source aus kV3AxisSchema; :186 'kein doppeltes Zaehlen', per-Messung warmup-frei)",
         "tests/unit/thesis_tiere/gen_golden_fullpilot.cpp:3-9 (golden_fullpilot_320 = eingefrorene binary_ids-Selektionsliste, kein Mess-CSV)",
         "libs/cache_engine/algorithm_profiles/permutation_axes.xml:1-6 (11 Permutations-Achsen)",
-        "docs/sessions/backups/20260709-axes-optimization-deep-research/BEFUND.md:49-52 (14 honest-0 = RC-Kanal, NICHT Observer) + :207-208 (S7 T6 real)",
+        "docs/audits/20260709-axes-optimization-deep-research-BEFUND.md:49-52 (14 honest-0 = RC-Kanal, NICHT Observer) + :207-208 (S7 T6 real)",
         "docs/sessions/20260705-268-CMD2-RESERVE-PRUEFUNG-BERICHT.md:8,15,19,21,23 (E2-Sidecar 0 neue Spalten; c1/c2/c3-Def; Variante-a-Reservierung; additive-CSV; 4→5-Bump unverbraucht)"
       ],
       "risks": [

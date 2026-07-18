@@ -843,7 +843,7 @@
  {
   "kind": "untracked-promise",
   "title": "Muster B 'noexcept-auf-Alloc-Haertung' ist G3 zugeordnet, wurde aber nie umgesetzt — G3 trotzdem am 07-15 fuer 'autonom erschoepft' erklaert",
-  "location": "docs/sessions/backups/20260712-full-line-review/REVIEW-BERICHT.md:277 (+ Ledger:150, §12:367)",
+  "location": "docs/audits/20260712-full-line-review-REVIEW-BERICHT.md:277 (+ Ledger:150, §12:367)",
   "detail": "REVIEW-BERICHT.md:277: 'B. noexcept-auf-allozierenden-Pfaden (bad_alloc → std::terminate). Systemisch … Pool-Stores (tree_node_pool_store:148 + 6 Geschwister, real_trie.hpp:133), Queuing (copy_on_write:113, priority_heap:117), Prefetch …, value_handle …, pmr_resource_adapter:41, path_read_counter:20. Empfehlung: noexcept auf den allozierenden Bodies entfernen … oder Allokation aus dem noexcept-Pfad heben.' Ledger:150 mappt es verbindlich: 'B noexcept-auf-Alloc-Haertung → G3' ('alle als Task erfasst'). Der G3-Verify-Pass §12 2026-07-15 prueft aber nur 'die ~20 major-correctness-Anker des Voll-Reviews' und schliesst mit 'Kein abi-/golden-beruehrender G3-Fix offen ⇒ G3 autonom erschoepft' — Muster B kommt darin nicht vor; grep 'noexcept' im Ledger trifft ausser der Mapping-Zeile 150 nichts, §11/§15 fuehren es nicht. Code-verifiziert weiterhin offen: tree_node_pool_store.hpp 'void free_node(std::size_t i) noexcept { free_.push_back(i); …' (vector::push_back kann allozieren/werfen) — dieselbe Klasse wie das im Sweep gefixte prt-art-Pendant (dort blieb density_tracker ebenfalls offen, s. Finding 1).",
   "severity": "med",
   "autonomous": true,
@@ -858,7 +858,7 @@
  {
   "kind": "untracked-promise",
   "title": "F-B-Wiedervorlage 2 (Codegen-Baeckung der alloc_hw-Varianten) nach GO-2-Abschluss entsperrt, aber nirgends getrackt",
-  "location": "docs/sessions/backups/20260712-go4-f-abc-dossier/NACHTRAG-F-B-IMPLEMENTIERUNG.md:71-74",
+  "location": "docs/plaene/20260712-go4-f-abc-dossier-NACHTRAG-F-B-IMPLEMENTIERUNG.md:71-74",
   "detail": "NACHTRAG §5 Wiedervorlage 2 woertlich: 'Codegen-Baeckung der Varianten: wie bei cacheline/node_width waehlt der (GO-2-gegatete) Codegen-Kanal spaeter die distinkte Organ-Instanz je alloc_hw-Wert (NUMAllocAllocatorBody<V, Cfg> / PoolResourceAllocatorBody<V, Cfg> + gate_alloc_hw_for<HW>); der Kanal selbst war in diesem Increment TABU.' GO-2 FINAL ist seit §12 2026-07-12 DONE (cpp-Codegen=Default) — damit ist die Wiedervorlage entsperrt, aber: der F-B-DONE-Eintrag (§12:400) listet als 'Ehrlich gated' nur 'NUMA-EFFEKT Multi-Socket (~Sep); mmap/MAP_HUGETLB = GO-pflichtig; POOL nicht in der eingefrorenen Achse' — die Codegen-Baeckung fehlt; G7 traegt nur 'NUMA-Effekt (Multi-Socket ~Sep)'; grep 'alloc_hw' im Ledger trifft ausschliesslich Zeile 400. Ohne sie liefert die vorbereitete fb_numa_page_study-Permutationsstrecke im Sep-Messfenster keine distinkt gebackenen Organ-Instanzen.",
   "severity": "low",
   "autonomous": true,

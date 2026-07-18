@@ -120,7 +120,7 @@ Fortsetzen auf grün prüfen. **GitLab-API zeigte zuletzt HTTP 500** (transient 
 | **#2** | 🔒 in_progress, **fork-blockiert** | E4′ + Arbeitsmodus-/Hybrid-Strecke — Fundament fertig (Deep-Research + Doc 20 §G/§H/§I), Bau hängt an den **7 User-Forks (§4)** + gated #156/#215 |
 | **#3** | ⏸ pending, geparkt | EXTERN_GATED-Forks — je eigenes User-GO nötig (s. §3.3) |
 
-### 3.2 BACKLOG-Klassifikation (aus `docs/sessions/backups/20260710-plan-code-diff/BACKLOG.md`)
+### 3.2 BACKLOG-Klassifikation (aus `docs/plaene/20260710-plan-code-diff-BACKLOG.md`)
 
 - **NON_GATED (baubar, diese Session ABGEARBEITET):**
   1. Limits-Entkopplung (#229-Kern) — Vorstufe ✅ + Produktivumschaltung ✅.
@@ -150,7 +150,7 @@ gated. Verbleibend gated/geparkt: #266 (config-Owner) · #269/#244-Rest (6-vs-48
 
 Diese bestimmen die `map<>`-Ebenen-Kardinalitäten des Messkurven-Typsystems und sind laut Bestand NICHT
 entschieden. **AskUserQuestion ist tabu** (crasht) — dem User als Klartext vorlegen, `entscheide nichts selbst`.
-Grundlage: Deep-Research-BEFUND `docs/sessions/backups/20260710-kardinalitaeten-deep-research/BEFUND-KARDINALITAETEN.md`.
+Grundlage: Deep-Research-BEFUND `docs/audits/20260710-kardinalitaeten-deep-research-BEFUND-KARDINALITAETEN.md`.
 
 | # | Fork | Optionen (Bestand) | Empfehlung (Bestand-gestützt, NICHT entschieden) |
 |---|---|---|---|

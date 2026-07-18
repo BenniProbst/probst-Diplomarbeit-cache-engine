@@ -35,7 +35,7 @@ Jede Organ-Achse hat eine **Optimierungs-Eigenschaft = Min ODER Max einer messba
 - *minimiere* Lookup-Latenz / Speicher-Fußabdruck / Cache-Misses / dTLB-Misses / Branch-Misses;
 - *maximiere* Durchsatz / Node-Fanout / Kompressionsverhältnis / Space-Efficiency.
 
-Diese Eigenschaft steht **teils in der Thesis, teils muss sie per deep research** ermittelt werden (was messbar, was relevant, welcher reale Parameter). **Das ersetzt die #221-„Effekt-Erfindung".** Der deep-research-Lauf (Agent, Sessionende → `docs/sessions/backups/20260709-axes-optimization-deep-research/BEFUND.md`) liefert je Achse: Min/Max-Größe · Messbarkeit · realer Laufzeit-Knopf vs. honest-0 · Abhängigkeit von Last/Füllstand/Verteilung.
+Diese Eigenschaft steht **teils in der Thesis, teils muss sie per deep research** ermittelt werden (was messbar, was relevant, welcher reale Parameter). **Das ersetzt die #221-„Effekt-Erfindung".** Der deep-research-Lauf (Agent, Sessionende → `docs/audits/20260709-axes-optimization-deep-research-BEFUND.md`) liefert je Achse: Min/Max-Größe · Messbarkeit · realer Laufzeit-Knopf vs. honest-0 · Abhängigkeit von Last/Füllstand/Verteilung.
 
 ## A.3 Wirkungsweise je Achse = Observer-Strategy-Pattern
 

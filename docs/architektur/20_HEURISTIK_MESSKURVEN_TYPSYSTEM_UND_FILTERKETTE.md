@@ -77,7 +77,7 @@ Heuristik-Systemachse) → Hybrid-Strecke (3-Varianten-Bau + Schritt 4). Gated b
 
 ## G. Kardinalitäts-Synthese (Deep-Research wf_62fe0731, 10.07. — nur Bestand, nie erfunden)
 
-Volle Synthese: `docs/sessions/backups/20260710-kardinalitaeten-deep-research/BEFUND-KARDINALITAETEN.md`
+Volle Synthese: `docs/audits/20260710-kardinalitaeten-deep-research-BEFUND-KARDINALITAETEN.md`
 (4 Quellen-Agenten über Backups/Workload-Kanon/Observer/Achsen → 71 Bestand-Befunde datei:zeile).
 Kardinalität je Typsystem-Ebene (HEUTE gefahren / PLAN-Kanon / GATED):
 

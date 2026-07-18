@@ -443,7 +443,7 @@
       "tokens": 67378,
       "toolCalls": 23,
       "durationMs": 247400,
-      "resultPreview": "{\"axis\":\"filter (T16)\",\"confirmed\":true,\"begruendung\":\"Widerlegung GESCHEITERT — die Lücke ist datei:zeile-hart belegbar; die Achse ist bzgl. ihres PRIMAER-Objectives unvollständig.\\n\\n1) Das Primaer-Objective ist autoritativ genau so deklariert wie die Lücke behauptet — NICHT vom Melder erfunden: docs/sessions/backups/20260709-axes-optimization-deep-research/BEFUND.md:99 und :353-354 = \\\"MIN Fals…"
+      "resultPreview": "{\"axis\":\"filter (T16)\",\"confirmed\":true,\"begruendung\":\"Widerlegung GESCHEITERT — die Lücke ist datei:zeile-hart belegbar; die Achse ist bzgl. ihres PRIMAER-Objectives unvollständig.\\n\\n1) Das Primaer-Objective ist autoritativ genau so deklariert wie die Lücke behauptet — NICHT vom Melder erfunden: docs/audits/20260709-axes-optimization-deep-research-BEFUND.md:99 und :353-354 = \\\"MIN Fals…"
     },
     {
       "type": "workflow_agent",

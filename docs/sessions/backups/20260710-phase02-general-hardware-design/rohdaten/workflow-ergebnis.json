@@ -199,7 +199,7 @@
       "queuedAt": 1783725676699,
       "attempt": 1,
       "lastToolName": "StructuredOutput",
-      "promptPreview": "Du bist Constraint-Forscher. Verifiziere die golden/ABI/Zirkularitäts-Randbedingungen und die Muster-Wahl präzise am Code + konsolidiere den früheren Utilization-Audit.\nLies: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260710-achsen-unterachsen-utilization/ACHSEN-UNTERACHSEN-UTILIZATION-BEFUND.md (Abschnitt zu general_hardware/#4). Verifiziere am Code /…",
+      "promptPreview": "Du bist Constraint-Forscher. Verifiziere die golden/ABI/Zirkularitäts-Randbedingungen und die Muster-Wahl präzise am Code + konsolidiere den früheren Utilization-Audit.\nLies: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/audits/20260710-achsen-unterachsen-utilization-ACHSEN-UNTERACHSEN-UTILIZATION-BEFUND.md (Abschnitt zu general_hardware/#4). Verifiziere am Code /…",
       "lastProgressAt": 1783725924238,
       "tokens": 70101,
       "toolCalls": 17,

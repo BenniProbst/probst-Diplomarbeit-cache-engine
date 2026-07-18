@@ -175,7 +175,7 @@ granulare Commits beide Remotes → CI strikt grün).
 ### §F.1 — Re-Diagnose Phase 0.2 „general_hardware (12) verdrahten" (2026-07-10, Deep-Research wf_7bba0921 + Verifikation)
 
 Die Audit-Rahmung „memory_layout/node/allocator lesen `cache_line_size` aus axis_12 **statt eigener
-cacheline-Unterachse**" ist **widerlegt** (Backup `docs/sessions/backups/20260710-phase02-general-hardware-design/BEFUND.md`;
+cacheline-Unterachse**" ist **widerlegt** (Backup `docs/audits/20260710-phase02-general-hardware-design-BEFUND.md`;
 beide adversarialen Kritiker NEEDS-REVISION inkl. golden-BLOCKER):
 
 1. **`cache_line_size()` in den Layouts ist intrinsische Layout-Semantik, kein HW-Deskriptor:**
@@ -208,7 +208,7 @@ inapplikabel. **Sauberer Weg = Tier-Level-Strategie-Besitz** (Anatomie besitzt E
 Pool-Store-Vektoren gefädelt; COW-Kopien teilen die externe Strategie → korrekte Stats) — mehrschichtiger Umbau
 nahe der Mess-Maschinerie, berührt das Zwei-Phasen-Protokoll (Thesis-Kern) = **NEUE Architektur-Entscheidung
 (Ledger §0: anhalten), GO-pflichtig.** Versuch vollständig revertiert (ce clean). Backup:
-`docs/sessions/backups/20260711-phase03-allocator-adapter/DOSSIER.md §3b`.
+`docs/plaene/20260711-phase03-allocator-adapter-DOSSIER.md §3b`.
 
 **Meta-Befund (0.2 + 0.3 + Hebel-A-Rest, verifiziert):** KEINES der verbleibenden Phase-0-Utilization-Items ist
 ein „punktuelles Refactoring":
@@ -241,7 +241,7 @@ CacheEngineBuilder für die Generierungs-Kontrolle. 3-Varianten-Observer + kompl
 als E4-XML-Messdimension.
 
 **Nachtrag GO 3 (2026-07-12, Task #5 „Hebel-A-Rest" — Option 1 „Deklarations-Wahrheit + Mess-Kern-Reinheit"
-umgesetzt; Dossier `docs/sessions/backups/20260712-go3-hebel-a-dossier/DOSSIER.md`):**
+umgesetzt; Dossier `docs/plaene/20260712-go3-hebel-a-dossier-DOSSIER.md`):**
 - **R1 (09b→Flag) GEBAUT:** `comdare_apply_simd_extension_flags(<target> <EXT>)` (ce `cmake/isa_features.cmake`,
   je-Extension-Kaskade EINMAL zentral, MSVC+GCC/Clang) + consteval-Kohärenz-Guard
   `topics/hardware/axis_09b_simd_extension/axis_09b_build_coherence.hpp` (Meta-driven Concept Hardening) +
