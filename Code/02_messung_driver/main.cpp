@@ -616,10 +616,11 @@ int main(int argc, char* argv[]) {
                 if (ec) throw std::runtime_error("create_directories(" + e4_dir.string() + "): " + ec.message());
 
                 // Storage #51 (No-Op-Default => byte-neutral): der EINE Transport-Client aus der Umgebung. Ist weder
-                // COMDARE_MINIO_ENDPOINT/_BUCKET (Ebene B) noch COMDARE_MEASUREMENT_NFS_ROOT (Ebene C) gesetzt, ist er
-                // INERT -> die Naht-Funktionen bleiben LEER -> der Iterator ruft sie nie -> golden/CI byte-identisch.
-                // EINE Instanz (ein datierter Lauf-Baum) fuer BEIDE Profil-Wurzeln (xa/pa). Credentials NIE hier (mc/
-                // MC_HOST_<alias>), NIE geloggt. SYNCHRON an der per-Binary-/whole-run-Naht — kein async/detached.
+                // COMDARE_MINIO_ENDPOINT/_BUCKET (Ebene B, mc-Push) noch COMDARE_MEASUREMENT_DROP_URL (Ebene C, measure-
+                // drop-HTTPS-PUT) gesetzt, ist er INERT -> die Naht-Funktionen bleiben LEER -> der Iterator ruft sie nie
+                // -> golden/CI byte-identisch. EINE Instanz (ein datierter Lauf-Baum) fuer BEIDE Profil-Wurzeln (xa/pa).
+                // Credentials NIE hier (mc/MC_HOST_<alias>, measure-drop-Token nur ueber 0600-curl-Config), NIE geloggt.
+                // SYNCHRON an der per-Binary-/whole-run-Naht — kein async/detached.
                 namespace at                   = comdare::cache_engine::builder::artifact_transport;
                 auto const      artifact_cache = std::make_shared<at::ArtifactCache>(at::ArtifactCache::from_env());
                 at::CachePushFn cache_push;
@@ -632,7 +633,7 @@ int main(int argc, char* argv[]) {
                         artifact_cache->sink_measurement(file, dest);
                     };
                     std::cout << "[E4] Storage #51 aktiv: minio=" << (artifact_cache->minio_enabled() ? "1" : "0")
-                              << " nfs=" << (artifact_cache->nfs_enabled() ? "1" : "0")
+                              << " measure-drop=" << (artifact_cache->drop_enabled() ? "1" : "0")
                               << " lauf-baum=" << artifact_cache->run_stamp() << "\n";
                 }
 
