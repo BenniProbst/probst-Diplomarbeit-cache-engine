@@ -118,29 +118,37 @@
     <xs:attribute name="enabled" type="xs:boolean" use="required"/>
   </xs:complexType>
 
-  <!-- system_axes: CEB-System-Achsen-Permutation (opt-f/A3). binary_id-NEUTRAL — opt_level/simd sind
-       system_config (CebSystemAxis), stehen NIE in kCompositionAxisNames; die Provenienz gehoert ins
-       build_version/H-10-Sidecar. compiler/opt_level = Optimierungs-Stufen-Liste (OptO*SubAxis-ids O0..Ofast);
-       extension_hardware/simd = Erweiterungs-Hardware-Liste (simd_extension_id, ISA-gegated). Beide additiv
-       (minOccurs=0); leer = CEB-Default (O3 / no_extension). Der Planer permutiert sie SELBST (opt-g). -->
+  <!-- system_axes: CEB-System-Achsen — konform zur V35-Tabelle §2.1: Haupt-Achse → Unter-Achse → Optionen.
+       binary_id-NEUTRAL (opt_level/simd sind system_config, stehen NIE in kCompositionAxisNames; Provenienz
+       build_version/H-10-Sidecar). Haupt-Achse 'compiler' traegt die Unter-Achse 'opt_level' (EIN Container),
+       deren <option>-Kinder die Stufen O0..Ofast tragen (Optionen der Unter-Achse, KEINE eigenen Achsen).
+       Haupt-Achse 'extension_hardware' (6., Q2 Option C) traegt ihre simd-Ausraegungen DIREKT als <option>
+       (Code-Wahrheit: keine simd-Unter-Achse). Alles additiv (minOccurs=0); leer = CEB-Default (O3/no_extension).
+       Der Planer permutiert die Optionen SELBST (opt-g). -->
   <xs:complexType name="SystemAxesType">
     <xs:sequence>
       <xs:element name="compiler" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="opt_level" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="opt_level" minOccurs="0">              <!-- Unter-Achse 15.2: EIN Container -->
               <xs:complexType>
-                <xs:attribute name="value" use="required">
-                  <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                      <xs:enumeration value="O0"/>
-                      <xs:enumeration value="O1"/>
-                      <xs:enumeration value="O2"/>
-                      <xs:enumeration value="O3"/>
-                      <xs:enumeration value="Ofast"/>
-                    </xs:restriction>
-                  </xs:simpleType>
-                </xs:attribute>
+                <xs:sequence>
+                  <xs:element name="option" minOccurs="0" maxOccurs="unbounded">  <!-- Optionen O0..Ofast -->
+                    <xs:complexType>
+                      <xs:attribute name="value" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="O0"/>
+                            <xs:enumeration value="O1"/>
+                            <xs:enumeration value="O2"/>
+                            <xs:enumeration value="O3"/>
+                            <xs:enumeration value="Ofast"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -149,7 +157,7 @@
       <xs:element name="extension_hardware" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="simd" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="option" minOccurs="0" maxOccurs="unbounded">  <!-- simd-Optionen (direkt, keine Unter-Achse) -->
               <xs:complexType>
                 <xs:attribute name="value" use="required">
                   <xs:simpleType>

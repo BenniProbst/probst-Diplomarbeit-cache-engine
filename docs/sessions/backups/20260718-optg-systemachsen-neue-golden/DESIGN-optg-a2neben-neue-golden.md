@@ -69,3 +69,19 @@ wird feldweise in den ABI-heiligen `ComdareMeasurementSnapshotV1` kopiert (`meas
 - **E3 — A2-Neben Namespace.** sauber (`builder::`→`measurement::` + ~6 Call-Sites) vs minimal (Namespace behalten). *Empf.: sauber.*
 - **E4 — `perm_runner` Stufe 2.** jetzt (im selben GO) oder Folge-Increment? *Empf.: Stufe 1 zuerst, dann Stufe 2.*
 - **E5 — `..._abi4.txt`.** löschen (Bruch) oder als deprecated ABI-Historie behalten? *Empf.: behalten/deprecaten (git ≠ Ersatz für getrackte Referenz).*
+
+## 5. KONFORMITÄTS-DIFF opt-f/opt-g (ultracode `wf_d27ad90d`, User-Einwand Haupt/Unter-Achse 2026-07-18)
+
+**Führende Tabelle (workflow-belegt):** `docs/sessions/20260522-…-compiler-axis.md:66-74` §2.1 + Memory `project_compiler_axis_v35`: **Haupt-Achse 15 `compiler`** → Unter-Achsen **15.1 Compiler-Family** {gcc,clang}, **15.2 Optimization-Level** {O0..Ofast}, 15.3 LTO, 15.4 PGO, 15.5 Target-Arch. O0..Ofast = **Optionen** der Unter-Achse 15.2. `extension_hardware` = eigene Haupt-Achse (6., Q2 Option C). Mess-Achsen = formal System (`AxisKind::system_measurement`), **getrennte Wurzel** (Mess-SystemAxis ⟂ CebSystemAxis) unter EINEM Dach `topics::Axis`.
+
+**Verdikt:** Die **C++-Achsen-Library ist SOLL-konform** (`opt_level`=Unter-Achse `parent=="compiler"`, O0..Ofast=`opt_level_id`-Ausprägungen). Der User-Einwand trifft die Kernschicht NICHT, aber die Haupt/Unter-Vertauschung lebt real an **3 Nähten**:
+
+| Ebene | SOLL | IST (Verstoß) | Fix |
+|---|---|---|---|
+| Namensfalle | O-Typen = Optionen | structs `OptO0..OfastSubAxis` (Suffix „SubAxis") legen Fehl-Lesart nahe | → `OptO0..OfastOption` |
+| XML-Flachheit | `opt_level`/`simd` = EIN Container, Optionen als Kinder | `<opt_level value>` je Option WIEDERHOLT; Parser dropt `compiler`-Parent (flach `opt_levels`) | XSD Container+`<option>`; Parser `CompilerAxisSel{family,opt_options}` |
+| Asymmetrie | extension_hardware → simd-Unter-Achse → Optionen | XSD hat `<simd>`, aber typed KEINE `SimdSubAxis` (Optionen direkt) | `SimdSubAxis` (parent=="extension_hardware") symmetrisch anlegen **[Entscheidung]** |
+| Mess=System | getrennte Wurzel, formal System | ✓ korrekt getrennt | KEIN Verstoß; optional Kinship-Kommentar im XSD |
+| opt-Default | O3 (Ruling 18.07.) | Code ✓ O3; `BAUPLAN-…-OPT-C-UEBERSETZER.md` STALE (Ofast) | Doku-Nachzug O3 |
+
+**Konforme Ziel-XML:** `<compiler><opt_level><option value="O2"/><option value="O3"/></opt_level></compiler>` + `<extension_hardware><simd><option value="no_extension"/><option value="avx2"/></simd></extension_hardware>`.
