@@ -38,7 +38,7 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
         return status_parse_error;
     }
 
-    // (3) Exchange — volle 19-Achsen-Tupel: parse_wide_csv_full → aggregate_exchange (lang-unabhängig).
+    // (3) Exchange — volle 17-Achsen-Tupel (M-4: CE kV3AxisCount): parse_wide_csv_full → aggregate_exchange (lang-unabhängig).
     std::vector<c2l::WideFullRow> full_rows;
     if (int const rc = c2l::parse_wide_csv_full(cfg.csv, full_rows); rc != c2l::status_ok) {
         std::cerr << "appendix-generator: parse_wide_csv_full (exchange) failed " << rc << "\n";
@@ -133,7 +133,8 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
         }
 
         // (5e) INC-4 (xml→pdf-Konsolidierung): Per-Achsen-Observer-Detail-Tabelle (stat_<achse>_<feld> aus
-        // kV3AxisSchema[19][8], single-source). Speist sich aus DENSELBEN geparsten full_rows (c2l::WideFullRow
+        // kV3AxisSchema[17][8] (M-4: 17 = kV3AxisCount, ABI-6/INC-2d), single-source). Speist sich aus DENSELBEN
+        // geparsten full_rows (c2l::WideFullRow
         // trägt seit INC-4 den durchgereichten stat_-Block) — KEIN Doppel-Parsen. HONEST-EMPTY (dg_ok): fehlt der
         // stat_-Block bzw. sind alle Zähler "n/a" (Nicht-Mess-DLL/altes Schema), liefert der Writer
         // status_empty_input → KEINE observer_detail.tex, KEIN Facade-Fehler. Thesis-\input erst INC-7 (Overleaf).

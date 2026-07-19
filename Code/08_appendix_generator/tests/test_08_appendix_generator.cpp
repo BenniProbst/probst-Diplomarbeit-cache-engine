@@ -43,23 +43,30 @@ fs::path fixtures_dir() {
 #endif
 }
 
-// Die 20 seg_*_ns-Spaltennamen (== 05::kSegmentColumns; hier lokal, da die Konstante modul-privat ist).
-// Reihenfolge = 19 Organ-Achsen (kCompositionAxisNames) + seg_framework_ns an Index 19.
+// M-4 (2026-07-19): die seg_*_ns-Spaltennamen kommen aus dg::kSegmentColumns (Header-Konstante, ihrerseits
+// compile-time aus der CE-Single-Source kCompositionAxisNames gepraegt) — hier KEINE Literal-Liste mehr
+// (war 20er-Drift inkl. seg_telemetry_ns/seg_isa_ns, B16). Reihenfolge = 17 Organ-Achsen + seg_framework_ns.
+constexpr std::size_t kSegN = dg::WideMeasurementRow::kSegmentCount; // 17 Organ + framework = 18
+// Summe 1+2+...+kSegN fuer die seg_run_total_ns-Bildung (kSegN=18 -> 171).
+constexpr long kSegTriangleSum = static_cast<long>(kSegN) * static_cast<long>(kSegN + 1) / 2;
+
 std::string seg_header() {
-    return "seg_search_algo_ns;seg_cache_traversal_ns;seg_mapping_ns;seg_path_compression_ns;"
-           "seg_node_type_ns;seg_memory_layout_ns;seg_allocator_ns;seg_prefetch_ns;"
-           "seg_concurrency_ns;seg_serialization_ns;seg_telemetry_ns;seg_value_handle_ns;"
-           "seg_isa_ns;seg_index_organization_ns;seg_io_dispatch_ns;seg_migration_policy_ns;"
-           "seg_filter_ns;seg_queuing_q1_ns;seg_queuing_q2_ns;seg_framework_ns";
+    std::string h;
+    for (auto const col : dg::kSegmentColumns) {
+        if (!h.empty()) h += ';';
+        h += std::string{col};
+    }
+    return h;
 }
 
-// 20 deterministische seg-Werte seg_mult*(i+1) → ';'-Block. Σ_{i=1}^{20} i = 210 → Σ == seg_mult*210
-// == seg_run_total_ns (seg_coverage=1.0 → kommensurabel; die Segment-Attribution stapelt gegen das 100%-Ganze).
+// kSegN deterministische seg-Werte seg_mult*(i+1) → ';'-Block. Σ_{i=1}^{kSegN} i = kSegTriangleSum → Σ ==
+// seg_mult*kSegTriangleSum == seg_run_total_ns (seg_coverage=1.0 → kommensurabel; die Segment-Attribution
+// stapelt gegen das 100%-Ganze).
 std::string seg_values(int seg_mult) {
     std::string s;
-    for (int i = 0; i < 20; ++i) {
+    for (std::size_t i = 0; i < kSegN; ++i) {
         if (i) s += ';';
-        s += std::to_string(seg_mult * (i + 1)) + ".0";
+        s += std::to_string(seg_mult * static_cast<long>(i + 1)) + ".0";
     }
     return s;
 }
@@ -67,28 +74,29 @@ std::string seg_values(int seg_mult) {
 // Selbstheilende Regeneration der WIDE-Fixture (schema-treu zu allen drei Parsern:
 // 04::parse_wide_csv [bias], 05::parse_wide_csv [surface], 04::parse_wide_csv_full
 // [exchange]) UND — Inc-2a — zu den 4 additiven Darstellungs-Writern: die 5 op_*_p99_ns
-// (Latenz-Range/-ECDF) + die 20 seg_*_ns + seg_run_total_ns + seg_coverage (Segment-
+// (Latenz-Range/-ECDF) + die kSegN seg_*_ns + seg_run_total_ns + seg_coverage (Segment-
 // Attribution) sind additiv/header-getrieben angehängt. Werte gewählt, dass KEIN neuer
 // Writer honest-empty ist (sonst würde der Byte-Identitäts-Test die 4 neuen .tex nicht
 // prüfen). Nur schreiben, wenn die committete Datei fehlt (sonst = committed).
+// M-4 (2026-07-19): committete Fixture auf das 17-Achsen-Schema regeneriert (seg_telemetry_ns/seg_isa_ns raus).
 void ensure_fixture(fs::path const& p) {
     if (fs::exists(p)) return;
     fs::create_directories(p.parent_path());
     std::ofstream f(p);
-    // Header: 12 Basis-Spalten (alle 3 Parser) + 5 op_*_p99_ns + 20 seg_*_ns + seg_run_total_ns + seg_coverage.
+    // Header: 12 Basis-Spalten (alle 3 Parser) + 5 op_*_p99_ns + kSegN seg_*_ns + seg_run_total_ns + seg_coverage.
     f << "binary_id;repetition;n_ops;total_ns;ns_per_op;workload;two_phase_valid;"
       << "op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;op_scan_p50_ns;op_rmw_p50_ns;"
       << "op_insert_p99_ns;op_lookup_p99_ns;op_erase_p99_ns;op_scan_p99_ns;op_rmw_p99_ns;" << seg_header()
       << ";seg_run_total_ns;seg_coverage\n";
-    // Eine Datenzeile: <binary_id>;<rep>;1000;<total_ns>;<ns_per_op>;<wl>;<two_phase>;<5 p50>;<5 p99>;<20 seg>;<run_total>;1.0
+    // Eine Datenzeile: <binary_id>;<rep>;1000;<total_ns>;<ns_per_op>;<wl>;<two_phase>;<5 p50>;<5 p99>;<kSegN seg>;<run_total>;1.0
     // p99 = 2*p50 (monoton, keine p99<p50-Inversion). p50/ns_per_op/binary_id/workload/two_phase UNVERÄNDERT
     // gegenüber der Vor-Inc-2a-Fixture ⇒ bias/surface/exchange-Outputs bleiben byte-identisch.
     auto row = [&](std::string const& bid, int rep, long total_ns, std::string const& ns_per_op, std::string const& wl,
                    int two_phase, std::string const& p50_p99, int seg_mult) {
         f << bid << ';' << rep << ";1000;" << total_ns << ';' << ns_per_op << ';' << wl << ';' << two_phase << ';'
-          << p50_p99 << ';' << seg_values(seg_mult) << ';' << (seg_mult * 210) << ".0;1.0\n";
+          << p50_p99 << ';' << seg_values(seg_mult) << ';' << (seg_mult * kSegTriangleSum) << ".0;1.0\n";
     };
-    // seg_mult: k_ary=10 (Σ=2100), eytzinger=15 (Σ=3150) → 2 distinkte Balken der Segment-Attribution.
+    // seg_mult: k_ary=10 (Σ=1710), eytzinger=15 (Σ=2565) → 2 distinkte Balken der Segment-Attribution.
     row("search_algo=k_ary/node_type=node4/memory_layout=aos/prefetch=off", 0, 100000, "100.0", "ycsb_c", 1,
         "30.0;25.0;28.0;500.0;40.0;60.0;50.0;56.0;1000.0;80.0", 10);
     row("search_algo=k_ary/node_type=node4/memory_layout=aos/prefetch=off", 1, 110000, "110.0", "ycsb_c", 1,
