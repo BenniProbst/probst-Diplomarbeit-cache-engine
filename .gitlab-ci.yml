@@ -426,6 +426,48 @@ thesis:pdf:
 #      * timeout 12h statt 10 Tage (Smoke prueft Funktion, nicht Streuung).
 #    INERT-by-default wie der golden-Job: ohne COMDARE_RUN_MEASURE/COMDARE_MEASURE_PROFILE existiert er nicht.
 #    Der LAUFENDE golden-320-Lauf (#9916) ist unberuehrt: Pipeline-Definitionen sind je Pipeline eingefroren.
+# ── Storage #51 OPT-IN-Scharfschaltung (Ebene B minio-Tier-Binary-Cache + Ebene C measure-drop), DRY via !reference ──
+#    INERT-by-default: nur bei COMDARE_STORAGE_CACHE=="true"; sonst bleibt ArtifactCache::from_env() No-Op
+#    (minio_enabled()==false && drop_enabled()==false) => golden byte-identisch (Anti-Phantom, CI-Gruen=Messung-AUS).
+#    Wird VOR dem Driver-Lauf als eigener script-Schritt in measure:golden-320 + measure:smoke referenziert; die
+#    env-Exports persistieren in den Folge-Schritt (gleiche Shell wie 'cd Code'->'cmake'). Creds bleiben im
+#    CI-Var-Store: mc zieht sie aus MC_HOST_<alias> (nie argv/Log), measure-drop-Token via 0600-curl-config im
+#    ArtifactCache. Fehler (mc fehlt / Vars unvollstaendig) => Ebene inert + [Infra-Fehler]-Log, MESSUNG LAEUFT
+#    WEITER (Fehlerklassen-Doktrin, nie Abbruch). Infra-Voraussetzungen (siehe IMPL-TO-INFRA-Handout 2026-07-19):
+#      - Runner-Image traegt 'mc'; CI-Vars MINIO_ACCESS_KEY/SECRET_KEY/COMDARE_MINIO_ENDPOINT(=S3-URL)/_BUCKET (Projekt 288).
+#      - CI-Vars COMDARE_MEASUREMENT_DROP_URL + COMDARE_NFS_DROP_TOKEN (fuer Ebene C measure-drop).
+.storage_cache_activation:
+  script:
+    - |
+      if [ "${COMDARE_STORAGE_CACHE:-}" = "true" ]; then
+        echo "== Storage #51 scharf (COMDARE_STORAGE_CACHE=true) =="
+        # Ebene B — minio: ArtifactCache erwartet in COMDARE_MINIO_ENDPOINT den mc-ALIAS-Namen (Creds via MC_HOST_<alias>).
+        # Der Infra-CI-Var COMDARE_MINIO_ENDPOINT traegt die S3-URL -> daraus Alias 'prodcache' bauen, dann Var auf Alias umsetzen.
+        if command -v mc >/dev/null 2>&1; then
+          if [ -n "${MINIO_ACCESS_KEY:-}" ] && [ -n "${MINIO_SECRET_KEY:-}" ] && [ -n "${COMDARE_MINIO_ENDPOINT:-}" ] && [ -n "${COMDARE_MINIO_BUCKET:-}" ]; then
+            _mh="${COMDARE_MINIO_ENDPOINT#https://}"; _mh="${_mh#http://}"
+            export MC_HOST_prodcache="https://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@${_mh}"
+            export COMDARE_MINIO_ENDPOINT="prodcache"   # ArtifactCache liest dies als mc-ALIAS-Namen
+            echo "  Ebene B aktiv: mc-Alias=prodcache Bucket=${COMDARE_MINIO_BUCKET} (Creds via MC_HOST env, nie argv)"
+          else
+            echo "  [Infra-Fehler: minio-CI-Vars unvollstaendig -> Ebene B inert, Messung laeuft weiter]"
+            unset COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET 2>/dev/null || true
+          fi
+        else
+          echo "  [Infra-Fehler: mc-Binary fehlt im Runner-Image -> Ebene B inert, Messung laeuft weiter]"
+          unset COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET 2>/dev/null || true
+        fi
+        # Ebene C — measure-drop HTTPS-PUT: aktiv nur wenn beide Vars da (Token nie in argv; ArtifactCache 0600-curl-config).
+        if [ -n "${COMDARE_MEASUREMENT_DROP_URL:-}" ] && [ -n "${COMDARE_NFS_DROP_TOKEN:-}" ]; then
+          echo "  Ebene C aktiv: measure-drop=${COMDARE_MEASUREMENT_DROP_URL}"
+        else
+          echo "  [Info: measure-drop-CI-Vars fehlen -> Ebene C inert; Git-Writeback bleibt Persistenz-Pfad]"
+          unset COMDARE_MEASUREMENT_DROP_URL COMDARE_NFS_DROP_TOKEN 2>/dev/null || true
+        fi
+      else
+        echo "== Storage #51 INERT (COMDARE_STORAGE_CACHE != true) -> from_env() No-Op, golden byte-neutral =="
+      fi
+
 measure:smoke:
   stage: measure
   tags: [prod, baremetal, amd]
@@ -449,6 +491,7 @@ measure:smoke:
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
+    - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
     - |
       set -euo pipefail
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
@@ -529,6 +572,7 @@ measure:golden-320:
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
+    - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
     - |
       set -euo pipefail
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
