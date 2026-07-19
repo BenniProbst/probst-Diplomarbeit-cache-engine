@@ -2292,3 +2292,14 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - Das ist die **Mess-Exklusivitäts-Doktrin auf CEB-Ebene** (die 1-Thread-Mess-Doktrin hochskaliert): eine MESSENDE CEB braucht die Maschine exklusiv; der §38-Fortschritts-Rück-Kanal liefert dem Planer genau das Fertig-Signal, mit dem er die **nächste CEB erst nach Abschluss der vorigen** startet (Sequenzierung über den Rück-Kanal — ohne ihn keine Allein-Lauf-Garantie).
 - **Abgrenzung zum §35/§36-Pool:** Der cluster-parallele **BAU** (provision-only-Matrix-Zellen, 24 Zellen, resource_group je Permutation) bleibt parallel erlaubt — er MISST nicht. Die Sequentialität gilt für **messende CEB-Läufe** (Mess-Modus; Debug-Modus bleibt per §32-F1/F7 parallel ohne Korrektheits-Garantie; Release misst am Ende einmalig).
 - **CI-Mechanik:** messende CEB-/Mess-Jobs erhalten eine GLOBALE `resource_group` (z.B. `ceb-measurement-exclusive`) — GitLab garantiert dann cluster-weit genau EINEN messenden Lauf; die Bau-Matrix behält ihre per-Permutations-Locks. (Bestehende measure:*-Jobs laufen heute ohnehin einzeln auf prod1; der Vermerk wird beim nächsten CI-Edit als resource_group nachgezogen.)
+
+---
+
+## §39 — Infra-Autonomie-Freigabe + Kalibrierungs-GO (2026-07-19 abends, User-Direktive)
+
+**User-Direktive (verbatim-treu):** „Sobald alle Voraussetzungen erfüllt sind, autonom fortfahren — auch nachts bitte. **Volles GO für alle Punkte.** Das Cluster ist **nur für dich reserviert** und du hast die **Freigabe, Infrastruktur autonom einzurichten mit den Schlüsseln aus dem Cred-Vault**. Der **einzige Blocker sei die Implementierung**, um die du dich kümmerst."
+
+**Einordnung:**
+- Hebt die frühere Impl/Infra-Trennung (Cluster read-only für den Impl-Agenten) für das Abgabe-Endspiel auf: Runner-Tags, CI-Variablen, Token-Handling, MinIO/measure-drop-Konfiguration dürfen autonom durchgeführt werden; jede Änderung wird im Cluster-Repo dokumentiert (Koordination mit Infra bleibt, das Warten entfällt).
+- **Sofort umgesetzt (gleiche Session):** (1) Capability-Tags additiv gesetzt — prod1 `+amd64,avx2,avx512`, prod2 `+amd64,avx2` (API-verifiziert). (2) **Kalibrierungslauf gestartet**: Pipeline 11453 (`COMDARE_BUILD_GOLDEN_N=true`, `COMDARE_GN_INCLUDE_AVX512=true`, `COMDARE_GN_TOTAL=64`, `COMDARE_STORAGE_CACHE=true`) = 24 Zellen à 16 Indizes als Mini-Vollprobe der §35/§36-Maschinerie (Routing+Locking+Dedup+Ebene-B-Push). (3) **Ebene-C-401 aufgeklärt**: measure-drop verlangt HTTP-Basic-Auth (`measure:<token>`, HANDOFF3), der CE-Client sendete Bearer → Client-Fix in `artifact_cache.hpp` (+`COMDARE_NFS_DROP_USER`, Default `measure`); Token+Dienst korrekt (Basic-PUT → 201 live belegt).
+- Mess-Exklusivität (§38.b) bleibt trotz reserviertem Cluster PFLICHT (Messfehler-Vermeidung, nicht Ressourcen-Höflichkeit); `ceb-measurement-exclusive` ist seit W5-A in der super-CI aktiv.
