@@ -527,7 +527,7 @@ measure:smoke:
   artifacts:
     paths:
       - Code/measure_out_smoke/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die 115 DLL-Binaries
-      - Code/measure_out_smoke/appendix/**/*.tex # CI-interaktiv (#24): regenerierte Darstellungs-.tex
+      - Code/measure_out_smoke/appendix/**/*.tex # CI-interaktiv (#24): regenerierte 12 Kern- + 5 Darstellungs-.tex je Sprache (K-12-Sweep 2026-07-19)
     when: always
     expire_in: 12 weeks
 
@@ -585,7 +585,8 @@ measure:golden-320:
       echo "== Mess-CSVs (Beleg) =="; find measure_out -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
       test -n "$(find measure_out -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Messlauf lieferte nichts"; exit 1; }
       # ── CI-interaktiv (#24): den Anhang aus den LIVE-Messdaten regenerieren ──
-      # appendix_generator (Stufe 08) erzeugt die 16 Darstellungs-.tex aus der WIDE-Matrix ALLER Permutationen.
+      # appendix_generator (Stufe 08) erzeugt je Sprache die 12 Kern- + 5 Darstellungs-.tex (K-12-Sweep 2026-07-19:
+      # vorher stale "16"; Ist laut 08_appendix_generator/appendix_generator.hpp) aus der WIDE-Matrix ALLER Permutationen.
       # WIDE-Aggregat = Konkatenation der per-Perm-result.csv (Header einmal + alle Datenzeilen). honest-empty-tolerant.
       echo "== Anhang-Regenerierung aus Live-Messdaten (#24) =="
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
@@ -609,7 +610,7 @@ measure:golden-320:
   artifacts:
     paths:
       - Code/measure_out/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die ~320 DLL-Binaries (Repo-/Artefakt-Bloat)
-      - Code/measure_out/appendix/**/*.tex # CI-interaktiv (#24): die aus Live-Messdaten regenerierten 16 Darstellungs-.tex
+      - Code/measure_out/appendix/**/*.tex # CI-interaktiv (#24): die aus Live-Messdaten regenerierten 12 Kern- + 5 Darstellungs-.tex
     when: always
     expire_in: 12 weeks
 
