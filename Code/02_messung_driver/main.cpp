@@ -352,6 +352,18 @@ int main(int argc, char* argv[]) {
                       << " -- weder <comdare_thesis_profile> noch <comdare_experiment>. KEIN Bau ausgefuehrt.\n";
             return 5;
         }
+        // --dump-plan [<profil>] (PAKET W5-B, 2026-07-19): rein-lesende Emission des deterministischen
+        // ExperimentPlanDirector-Walks (GoF Director + PlanTextBuilder) -- baut KEINE DLL, misst NICHT. Der
+        // Root-Tag-Sniff (comdare_thesis_profile vs comdare_experiment) sitzt IN der Fassade (der katalog-
+        // schwere Planer-Header gehoert dorthin, nicht in diesen Treiber). Wie --validate: ohne Pfad gilt
+        // COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil. Text -> stdout, exit 0.
+        if (flag == "--dump-plan") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::dump_experiment_plan_facade(prof, std::cout);
+        }
     }
 
     // INC-G+H (C.2+C.3): der OFFIZIELLE XML-getriebene execute_messreihe-Weg NUR bei explizitem Opt-in (Muster
@@ -701,6 +713,13 @@ int main(int argc, char* argv[]) {
                         xa.build_version_tag_override = build_tag;
                     xa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
                     xa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
+                    // W5-C+ (§36.1 Zellen-Locking): GN-Zellen-Filter — SPIEGEL zum run_profile-Zweig. Leer = kein
+                    // Filter = Ist-Verhalten (byte-neutral). Wirkt am opt×simd-Walk in run_experiment_profile.
+                    xa.gn_cell_opt  = env_trimmed("COMDARE_GN_OPT");
+                    xa.gn_cell_simd = env_trimmed("COMDARE_GN_SIMD");
+                    if (!xa.gn_cell_opt.empty() || !xa.gn_cell_simd.empty())
+                        std::cout << "[E4] W5-C+ GN-Zellen-Filter aktiv: opt='" << xa.gn_cell_opt << "' simd='"
+                                  << xa.gn_cell_simd << "' (§36.1: eine System-Perm je Cluster-Zelle)\n";
 
                     std::cout << "[E4] comdare_experiment-Bruecke via run_experiment_profile-Fassade: profile="
                               << thesis_profile << " -> " << xa.out_csv.string() << "\n";
@@ -751,6 +770,15 @@ int main(int argc, char* argv[]) {
                         pa.provision_only = true;
                         std::cout << "[E4] INC-G6 provision-only: baut DLLs, misst NICHT.\n";
                     }
+                    // W5-C+ (§36.1 Zellen-Locking): der GN-Zellen-Filter. Die CI-Matrix exportiert je Cluster-Zelle
+                    // COMDARE_GN_OPT/COMDARE_GN_SIMD (z.B. O2 + no_extension). Gesetzt => run_profile baut in dieser
+                    // Zelle NUR die matchende (opt,simd)-Perm statt aller Profil-Perms (Befund Pipeline 11453:
+                    // 4-fach-redundanter Bau). Leer/ungesetzt = kein Filter = Ist-Verhalten (byte-neutral).
+                    pa.gn_cell_opt  = env_trimmed("COMDARE_GN_OPT");
+                    pa.gn_cell_simd = env_trimmed("COMDARE_GN_SIMD");
+                    if (!pa.gn_cell_opt.empty() || !pa.gn_cell_simd.empty())
+                        std::cout << "[E4] W5-C+ GN-Zellen-Filter aktiv: opt='" << pa.gn_cell_opt << "' simd='"
+                                  << pa.gn_cell_simd << "' (§36.1: eine System-Perm je Cluster-Zelle)\n";
 
                     if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
                         pa.build_version_tag_override = build_tag;
