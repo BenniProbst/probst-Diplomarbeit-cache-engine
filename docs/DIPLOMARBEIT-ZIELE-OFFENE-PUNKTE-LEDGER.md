@@ -2317,3 +2317,15 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **User-Bestätigung:** alle Pipelines grün und erfolgreich (W5-Integration + Kalibrierung 11453).
 
 **§40.b-PRÄZISIERUNG (User, 2026-07-19 spät):** „Der **Experiment-Planer steuert die Bau-Jobs von CEBs** und die **CEBs steuern Bau-Jobs von Tier-Binaries**." — Die zweistufige dynamische CI-Steuerung liegt exakt auf der Binary-Kette (§30): Stufe 1 = Planer emittiert die CEB-Bau-Jobs (Child-Pipeline 1, je Messsystem/Maschinen-Signatur), Stufe 2 = jede CEB emittiert ihre Tier-Binary-Bau-Jobs (Child-Pipeline 2). Keine Stufe überspringt die andere; die Tier-Job-Emission ist CEB-Hoheit (§37.b-Delegation), nicht Planer-Hoheit.
+
+---
+
+## §41 — GN-11-ENTSCHEID: Bau=new-golden VOLL, Messung=320er, N-Messung ab 01.08. (2026-07-19 spaet, User-Direktive)
+
+**User-Direktive (verbatim-treu):** „Wir **bauen alles new golden** und **messen alles mit der 320er**. Wir **messen new golden ab dem 01.08.** Bis **Freitag** müssen wir nur nachweisen, dass wir **alles bauen** und **das Meiste CI und lokal messen können**."
+
+**Einordnung / Meilenstein-Aufloesung (GN-11 damit ENTSCHIEDEN):**
+- **Bis Freitag 24.07. (neuer Zwischen-Meilenstein):** (a) **Voll-Matrix-BAU new-golden** (2^17 je System-Permutation, 24-Zellen-Pool mit W6-Parallelbau + Zellen-Filter + Dedup) NACHGEWIESEN — der §33-Systembeweis auf Bau-Ebene; (b) **Messfaehigkeits-Nachweis**: Messen funktioniert in der CI (measure:smoke-Klasse) UND lokal/bare-metal (W7-B MANUAL_RUN + lokaler Mess-Smoke) — kein Voll-Messlauf, nur der Faehigkeits-Beleg „das Meiste".
+- **Bis Abgabe 28.07.:** golden-320-VOLL-MESSLAUF als Abgabe-Messdatensatz (F2-Regime → M-4-Auswertung → #47 Thesis + Anhaenge). Ein-CEB-Exklusivitaet (§38.b) aktiv.
+- **Ab 01.08. (nach Abgabe):** new-golden-VOLL-MESSUNG (mehrtaegig/mehrwoechig, 1-Thread-Doktrin) als Anschlussarbeit auf der gebauten Voll-Matrix.
+- Konsequenz fuer die Wellen: W6 (Parallelbau) und W7 (dynamische CI + Bare-Metal) sind die 24.07.-Trager; W9.1 (H-10-Sidecar) bleibt VOR dem 320er-Messlauf zwingend; Hybrid-Pflicht speist sich aus den 320er-CSVs.
