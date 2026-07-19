@@ -52,3 +52,17 @@ Child-2 (CEB-emittiert, je CEB — SYSTEM-ACHSEN-Stufe des FREIGEGEBENEN Raums):
 ## Gates / Neutralitaet
 Alle Emissionen deterministisch + GitLab-linted; statische Matrix bleibt bis zur W10-Abnahme funktional (Fallback);
 binary_id/golden unberuehrt; Hybrid-Pfad bleibt GN-11/320er-gated. Abnahme §41-Meilenstein erfolgt gegen DIESE Kette.
+
+## NACHTRAG §42.b — Unter-Achsen + Mess-Job-Ebene (User-Praezisierung, gleiche Nacht)
+
+Die Topologie oben zeigt die BAU-Kette (nur HAUPT-Achsen). §42.b ergaenzt:
+- **Unter-Achsen [d1,d2,...] = reine LAUFZEIT-Permutation im selben Compile** — sie tauchen in KEINER Bau-Stufe auf.
+  Zweischichtige Freigabe: Haupt-Achse gibt ihren Unter-Achsen-Raum frei; die CEB gibt Haupt-Raum UND Unter-Raeume frei.
+- **4. Emissions-Ebene (Mess-Jobs, gated hinter §41/320er-Regime):** je Haupt-Achsen-Permutation eines Tier-Binaries
+  emittiert die CEB EINEN Mess-Job `"measure:[a,b,c][d,e,f][g,h,i]"` — der Job laedt das EINE Binary, faehrt den
+  vollen Unter-Achsen-Sweep zur Laufzeit (1-Thread, §38.b-Exklusivitaet) und schreibt EIN CSV zurueck
+  (Fehler-Sichtbarkeit: failed-Zellen im CSV, misst weiter).
+- **Mess-Achsen-Unter-Achsen (Workload):** der PLANER permutiert sie zur Laufzeit gegen alle CEBs (Mess-Beauftragung
+  ueber den §38-Dock-Kanal, kein Neubau; Lastprofil-Mechanik existiert als Achse-2-XML).
+- W10-A-Konsequenz: das Legenden-Namensschema bekommt die Mess-Job-Form; die Contract-Tests pruefen zusaetzlich,
+  dass KEINE Unter-Achse in Bau-Job-Legenden erscheint (Bau=Haupt-only-Gate).
