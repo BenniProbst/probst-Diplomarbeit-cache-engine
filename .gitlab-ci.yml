@@ -637,19 +637,47 @@ measure:golden-320:
 #    0xF1C1F26A1232073B (source_catalog.hpp) + test_reflect_versions_all17. Sobald INC-G6 gebaut ist
 #    (gestaffelte/Storage-gated Materialisierung + provision-only-Treiber-Pfad), erweitert er DIESEN Job um den
 #    echten N-Satz-Bau; bis dahin ist der --validate-Pre-Flight der ausfuehrbare Beweis-Schritt.
-build:golden-n:
+# .golden_n_build (W4-A / Ledger §35+§36, 2026-07-19): das gemeinsame Geruest der Cluster-parallelen System-Achsen-Builds.
+#   parallel:matrix ueber msys x opt x simd x chunk (je Zelle EIN Job); 3-stufiges N-Node-Capability-Routing per
+#   Runner-Tag ($GN_RUNNER_TAG, §36.3); LOCKING via resource_group (§36.1); Cross-Runner-Dedup (Ein-Build-pro-
+#   Permutation, egal wo) via MinIO-Chunk-Marker + algo_sig-Invalidierung (#50) als 2. Schicht.
+#   Zwei konkrete Jobs erben dies (DRY: EIN script, zwei Matrizen):
+#     build:golden-n         -> no_extension (Tag amd64, ALLE amd64-Nodes) + avx2 (Tag avx2), §33-Kernsatz
+#     build:golden-n-avx512  -> avx512 (Tag avx512, heute nur prod1/Zen5), extra opt-in
+.golden_n_build:
   stage: measure
   interruptible: false              # INC-G6/Ledger-34: der N-Bau (Stufe 2) darf NIE auto-cancelt werden (Belt-and-Suspenders zu auto_cancel=disabled)
-  tags: [prod, baremetal, amd]
-  timeout: 2h                       # nur Bau von comdare-messung-driver + --validate (kein Messlauf) — Minuten..Stunden
+  # 3-STUFIGES SIMD-/N-Node-ROUTING (Ledger §36.3): $GN_RUNNER_TAG kommt je Matrix-Zelle = die CAPABILITY-Klasse
+  #   (nicht die Node-Marke). Pool-Modell ueber N amd64-Nodes: no_extension laeuft auf ALLEN amd64-Buildern (auch
+  #   kleine Nodes ohne AVX, Odroid-H4-Klasse), avx2 nur wo AVX2-Hardware, avx512 nur wo AVX512-Hardware. Deshalb
+  #   NUR der Capability-Tag (KEIN [prod,baremetal]-Praefix -> das wuerde die kleinen Nicht-prod-Nodes ausschliessen).
+  #     no_extension -> "amd64"   (alle amd64: prod1/prod2 + pve1/pve2 + node3/node4 + Odroid-H4-Klasse + amd64-k8s)
+  #     avx2         -> "avx2"    (prod1 Zen5 + prod2 RaptorLake + AVX2-faehige kleine Nodes, z.B. Odroid N97/AlderLake-N)
+  #     avx512       -> "avx512"  (heute NUR prod1 Zen5; prod2 i9-14900KS/RaptorLake hat AVX512 hardware-fused-off)
+  #   INFRA-HANDOUT (Doku Abschnitt 5): KEIN Runner traegt heute amd64/avx2/avx512 (Ist: prod1=[..amd], prod2=[..intel],
+  #   kleine Nodes=[..x86_64..]) -> Nodes nach realer CPU-Faehigkeit taggen. Bis dahin pendet der Job (opt-in +
+  #   W4-B-blockiert -> nichts laeuft verfrueht). Matrix ist tag-parametrisch fertig; nur die Runner-Tags fehlen.
+  tags: ["$GN_RUNNER_TAG"]
+  # LOCKING (Ledger §36.1): eine System-Achsen-Permutation darf nur auf genau EINEM Runner und EINER Concurrency
+  #   gleichzeitig gebaut werden -> GitLab resource_group = natives Ein-Job-Lock je Zelle ueber ALLE Pipelines/Runner
+  #   hinweg (Variablen werden expandiert). Der Schluessel enthaelt die Messsystem-Dimension ($GN_MSYS, §36.2: ein
+  #   Planer baut multiple CEBs je Messsystem). Der mc-stat-Dedup bleibt die ZWEITE Schicht (historische Builds/
+  #   Cache-Hits); resource_group verhindert den Live-Race zwischen gleichzeitigen Runnern (Ein-Runner-eine-Concurrency).
+  resource_group: "gn-$GN_MSYS-$GN_SIMD-$GN_OPT-$GN_CHUNK"
+  timeout: 2h                       # Bau von comdare-messung-driver + --validate + Chunk-Bau-Naht je Zelle (kein Messlauf)
   variables:
     GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
     COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
+    # -- Chunk-Fenster ueber den 2^17-Indexraum (Ledger §35.1). COMDARE_GN_CHUNK_COUNT MUSS == Laenge der GN_CHUNK-Liste. --
+    COMDARE_GN_TOTAL: "131072"             # 2^17 Organ-Permutations-Indexraum (all_axes_golden)
+    COMDARE_GN_CHUNK_COUNT: "4"            # Zahl der Chunk-Fenster je System-Permutation (== len(GN_CHUNK) in der Matrix)
+    # -- Dedup-Key (Ledger §35.2/§35.3): GN_PREFIX = perm_build_version = <base>+cxx=<cxx>+opt=<opt>[+ext=<simd>]. --
+    COMDARE_GN_BUILD_VERSION_BASE: "m3v2"  # experiment_run_entry.hpp:61 default; ueberschreibbar
+    COMDARE_GN_COMPILER_TAG: ""            # = a.compiler_tag des Treibers (z.B. "gcc-15.3"); leer -> Pull compiler-agnostisch (nur Marker, kein DLL-Pull)
+    # -- Messsystem-Konfiguration (Ledger §36.2/§30: ein Planer baut multiple CEBs je Messsystem). Heute 1 Default-Zelle;
+    #    weitere Messsysteme = weiterer GN_MSYS-Wert in den Matrizen (multipliziert die System-Permutations-Zellen). --
+    GN_MSYS: "default"                     # Matrix-Default; je Zelle ueberschrieben (fliesst in resource_group + Treiber-Env)
   needs: ["verify:submodules"]
-  rules:
-    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Bau-Beweis
-      when: never
-    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # INERT: nur bei explizitem Opt-in
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
@@ -657,6 +685,58 @@ build:golden-n:
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
+    - !reference [.storage_cache_activation, script]   # W4-A: mc-Alias 'prodcache' scharfschalten fuer Cross-Runner-Dedup (inert wenn COMDARE_STORAGE_CACHE!=true)
+    - |
+      set -euo pipefail
+      # ── W4-A / Ledger §35: pro Matrix-Zelle System-Permutations-PREFIX + Chunk-Fenster ableiten (exportiert -> Folge-Steps, gleiche Shell) ──
+      : "${GN_OPT:?GN_OPT (Matrix-Var) fehlt}"; : "${GN_SIMD:?GN_SIMD (Matrix-Var) fehlt}"; : "${GN_CHUNK:?GN_CHUNK (Matrix-Var) fehlt}"
+      TOTAL="${COMDARE_GN_TOTAL:-131072}"; CCOUNT="${COMDARE_GN_CHUNK_COUNT:-4}"
+      case "$GN_CHUNK" in ''|*[!0-9]*) echo "GN_CHUNK nicht numerisch: '$GN_CHUNK'"; exit 1;; esac
+      [ "$GN_CHUNK" -lt "$CCOUNT" ] || { echo "GN_CHUNK=$GN_CHUNK >= COMDARE_GN_CHUNK_COUNT=$CCOUNT (GN_CHUNK-Liste/Count-Drift -> Matrix-Fehler)"; exit 1; }
+      CHUNK_SIZE=$(( (TOTAL + CCOUNT - 1) / CCOUNT ))   # ceil(TOTAL/CCOUNT)
+      START=$(( GN_CHUNK * CHUNK_SIZE ))
+      if [ "$START" -ge "$TOTAL" ]; then
+        echo "== Chunk $GN_CHUNK jenseits Indexraum ($TOTAL) -> No-Op-Zelle (CHUNK_COUNT ueberdimensioniert) =="; export GN_RANGE=""
+      else
+        REMAIN=$(( TOTAL - START )); COUNT_C=$CHUNK_SIZE; [ "$COUNT_C" -gt "$REMAIN" ] && COUNT_C=$REMAIN   # letzter Chunk klemmt
+        export GN_RANGE="${START}:${COUNT_C}"
+      fi
+      # GN_PREFIX = perm_build_version (experiment_run_entry.hpp:263-265): <base>+cxx=<cxx>+opt=<opt>[+ext=<simd>], +ext bei no_extension WEG
+      BASE="${COMDARE_GN_BUILD_VERSION_BASE:-m3v2}"; CXX="${COMDARE_GN_COMPILER_TAG:-}"
+      SUF="+opt=${GN_OPT}"; [ "$GN_SIMD" != "no_extension" ] && SUF="${SUF}+ext=${GN_SIMD}"
+      if [ -n "$CXX" ]; then export GN_PREFIX="${BASE}+cxx=${CXX}${SUF}"; else export GN_PREFIX="${BASE}${SUF}"; fi
+      # Messsystem-Dimension (§36.2): heute default=neutral. Bei >1 Messsystem MUSS GN_MSYS in die Binary-Identitaet
+      # (GN_PREFIX/build_version) einfliessen -- in Lockstep mit W4-B, damit der Dedup-Key je CEB eindeutig bleibt.
+      export GN_MSYS="${GN_MSYS:-default}"; export COMDARE_GN_MSYS="$GN_MSYS"
+      echo "== W4-A Zelle: msys=$GN_MSYS opt=$GN_OPT simd=$GN_SIMD chunk=$GN_CHUNK -> PREFIX='$GN_PREFIX' RANGE='${GN_RANGE:-<none>}' runner_tag='$GN_RUNNER_TAG' =="
+      # ── Cross-Runner-Dedup (Ledger §35.2): Chunk-Marker im MinIO-Bucket -> HIT=skip+pull (Warm-Cache), MISS=build ──
+      #    Grobe Job-Ebene: 1 Marker je (System-Permutation x Chunk). Die FEINE Per-DLL-Invalidierung (dll_is_current /
+      #    algo_sig, #50) macht der Treiber ohnehin (§35.3) -> selbst ein grober False-Hit bleibt korrektheits-sicher.
+      export GN_DECISION="build"
+      if [ "${COMDARE_STORAGE_CACHE:-}" != "true" ]; then
+        echo "[dedup] Storage inert (COMDARE_STORAGE_CACHE!=true) -> kein Cross-Runner-Sync, Bau lokal (golden-neutral)"
+      elif ! command -v mc >/dev/null 2>&1; then
+        echo "[dedup] mc-Binary fehlt im Runner-Image -> kein Sync, Bau lokal (Infra-Fehler-Klasse, kein Abbruch)"
+      elif [ -z "${COMDARE_MINIO_BUCKET:-}" ] || [ "${COMDARE_MINIO_ENDPOINT:-}" != "prodcache" ]; then
+        echo "[dedup] mc-Alias/Bucket nicht scharf (Ebene B inert) -> Bau lokal"
+      elif [ -z "${GN_RANGE:-}" ]; then
+        echo "[dedup] No-Op-Zelle (kein Range) -> nichts zu deduplizieren"
+      else
+        MARKER="prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done"
+        if mc stat "$MARKER" >/dev/null 2>&1; then
+          echo "[dedup] HIT: $GN_PREFIX Chunk $GN_RANGE bereits im Cluster gebaut -> SKIP (bereits im Cluster gebaut) + PULL (Warm-Cache)"
+          if [ -n "$CXX" ]; then
+            mkdir -p "$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}"
+            mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/" "$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}/" 2>&1 | tail -8 \
+              || echo "[dedup] Pull-Teilfehler -> Bau-Naht faellt auf Neubau zurueck (Treiber-dll_is_current bleibt Invalidierer)"
+          else
+            echo "[dedup] COMDARE_GN_COMPILER_TAG leer -> DLL-Pull uebersprungen (PREFIX compiler-agnostisch, DLL-Key traegt +cxx=); Marker-Skip genuegt"
+          fi
+          export GN_DECISION="skip"
+        else
+          echo "[dedup] MISS: $GN_PREFIX Chunk $GN_RANGE noch nicht im Cluster -> Bau (danach Marker + Push, s. Stufe 2)"
+        fi
+      fi
     - |
       set -euo pipefail
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
@@ -670,42 +750,93 @@ build:golden-n:
       echo "== FIXME INC-G6: die VOLLE 2^17-DLL-Materialisierung ist GO-pflichtig/gestaffelt (GN-2-Guard) und NICHT Teil dieses Jobs; =="
       echo "   der Systembeweis-Anker bleibt der Compile-Time-Guard static_assert(...==131072) + CRC64 0xF1C1F26A1232073B in der ce-Test-Suite."
       echo "=== build:golden-n Stufe 1 OK (§33 Pre-Flight-Beweis erbracht; kein Messlauf, kein Drop, golden-neutral) ==="
-    # -- Stufe 2 (INC-G6, opt-in COMDARE_BUILD_GOLDEN_N_RANGE="start:count"): der gestaffelte CHUNK-BAU des N-Fensters.
-    #    INERT ohne die Var (der Gesamtlauf setzt sie NIE -> byte-neutral, golden-neutral). Solange die ce-
-    #    Materialisierungs-Naht (lazy Per-Index-Adhoc-Emitter + Chunk-Fenster + provision-only) NOCH NICHT gebaut ist
-    #    (GO-pflichtig; der GN-2-Guard sperrt die map-materialisierende Naht compile-time), meldet Stufe 2 die
-    #    fehlende Voraussetzung HART und baut NICHTS -- KEIN Fake-DLL, kein Erfolgs-Haken ohne reale Materialisierung
-    #    (Anti-Phantom, no_success_marks_without_literal_output). Bauplan + reale-Umschaltung:
-    #    docs/plaene/20260719-inc-g6-materialisierung-BAUPLAN.md (Abschnitt 1+6+7). Sobald die ce-Naht landet, ersetzt
-    #    der reale Treiber-Aufruf diesen Melde-Block: comdare-messung-driver experiment_config <out> mit
-    #    COMDARE_THESIS_PROFILE=$COMDARE_GOLDEN_N_PROFILE + COMDARE_GOLDEN_N_RANGE=$COMDARE_BUILD_GOLDEN_N_RANGE +
-    #    COMDARE_GOLDEN_N_PROVISION_ONLY=true, danach der GN-9-Groessen-Report je Chunk, dann Storage-Push (Ebene B)
-    #    nur bei COMDARE_STORAGE_CACHE=true (!reference [.storage_cache_activation, script]).
+    # -- Stufe 2 (INC-G6, W4-A Chunk-Bau je Matrix-Zelle): baut NUR die System-Permutation dieser Zelle (opt=$GN_OPT
+    #    x simd=$GN_SIMD) fuer das Chunk-Fenster $GN_RANGE. Der Cross-Runner-Dedup-Step (oben) hat GN_DECISION gesetzt:
+    #    skip (HIT: schon im Cluster + gepullt) ODER build (MISS). Solange die ce-Materialisierungs-Naht (lazy
+    #    Per-Index-Adhoc-Emitter, W4-B) NOCH NICHT gelandet ist, meldet der build-Zweig die fehlende Voraussetzung HART
+    #    (exit 3) und baut NICHTS -- KEIN Fake-DLL, kein Erfolgs-Haken ohne reale Materialisierung (Anti-Phantom,
+    #    no_success_marks_without_literal_output). Die EINZIGE Zeile, die beim Landen von W4-B ersetzt wird, ist unten
+    #    als "UMSCHALT-ZEILE" markiert. Bauplan: docs/plaene/20260719-inc-g6-materialisierung-BAUPLAN.md (Abschnitt 1+6+7)
+    #    + Matrix/Dedup: docs/plaene/20260719-cluster-parallel-build-MATRIX.md.
     - |
       set -euo pipefail
-      if [ -z "${COMDARE_BUILD_GOLDEN_N_RANGE:-}" ]; then
-        echo "== Stufe 2 (Chunk-Bau) INERT: COMDARE_BUILD_GOLDEN_N_RANGE ungesetzt -> nur Stufe-1-Pre-Flight, golden-neutral =="
+      if [ "${GN_DECISION:-build}" = "skip" ]; then
+        echo "== Stufe 2 SKIP (Cross-Runner-Dedup HIT): $GN_PREFIX Chunk $GN_RANGE bereits im Cluster -> Warm-Cache gepullt, kein Neubau =="
         exit 0
       fi
-      RANGE="$COMDARE_BUILD_GOLDEN_N_RANGE"
-      START="${RANGE%%:*}"; CNT="${RANGE##*:}"
-      case "$RANGE" in
-        *:*) : ;;
-        *) echo "COMDARE_BUILD_GOLDEN_N_RANGE ungueltig (erwartet start:count): '$RANGE'"; exit 1 ;;
-      esac
-      case "$START" in ''|*[!0-9]*) echo "COMDARE_BUILD_GOLDEN_N_RANGE start nicht numerisch: '$RANGE'"; exit 1 ;; esac
-      case "$CNT" in ''|*[!0-9]*) echo "COMDARE_BUILD_GOLDEN_N_RANGE count nicht numerisch: '$RANGE'"; exit 1 ;; esac
-      echo "== Stufe 2 (INC-G6 Chunk-Bau) angefragt: Fenster [$START:$CNT) ueber den 131072-Indexraum =="
-      echo "   INTENDIERT (nach ce-Naht): provision-only (Bau ohne Messung) je Chunk, dann GN-9-Groessen-Report:"
+      if [ -z "${GN_RANGE:-}" ]; then
+        echo "== Stufe 2 No-Op (Chunk jenseits Indexraum) -> nichts zu bauen, golden-neutral =="
+        exit 0
+      fi
+      echo "== Stufe 2 (W4-A Chunk-Bau) MISS: baue Permutation opt=$GN_OPT simd=$GN_SIMD Fenster $GN_RANGE unter PREFIX '$GN_PREFIX' =="
+      echo "   INTENDIERT (nach W4-B ce-Naht): provision-only (Bau ohne Messung) je Chunk, dann GN-9-Groessen-Report:"
       echo "     dlls=\$(find <dll_dir> -name perm.dll | wc -l); bytes=\$(find <dll_dir> -name perm.dll -printf '%s\\n' | awk '{s+=\$1} END{print s+0}')"
       echo "     extrapolation_131072 = bytes/dlls*131072  (GN-9-Bloat-Deckel je Chunk, LITERAL geloggt)"
-      echo "   Storage-Push Ebene B nur bei COMDARE_STORAGE_CACHE=true (mc-Alias, Objekt-Key an build_version gekoppelt)."
-      echo "== VORAUSSETZUNG FEHLT (GO-pflichtig): die ce-Materialisierungs-Naht (lazy Per-Index-Adhoc-Emitter +"
-      echo "   Chunk-Fenster COMDARE_GOLDEN_N_RANGE + provision-only) ist NOCH NICHT gebaut. Der GN-2-Guard"
-      echo "   (source_catalog.hpp: kMaxMaterializableCatalogCardinality=4096) sperrt die map-materialisierende Naht"
-      echo "   compile-time; der lazy Emitter (BAUPLAN Abschnitt 1) muss sie DANEBEN ersetzen. Kein Chunk-Bau ausgefuehrt."
-      echo "== Siehe docs/plaene/20260719-inc-g6-materialisierung-BAUPLAN.md (Abschnitt 1+6). =="
-      exit 3
+      # ====================================================================================================
+      # UMSCHALT-ZEILE (W4-B): der folgende Melde-/exit-3-Block wird durch DIESEN EINEN realen Treiber-Aufruf
+      #   + Marker-Push ersetzt (nur diese Naht aendert sich; Matrix/Dedup/Routing bleiben):
+      #     COMDARE_THESIS_PROFILE="$COMDARE_GOLDEN_N_PROFILE" COMDARE_GOLDEN_N_RANGE="$GN_RANGE" \
+      #       COMDARE_GN_OPT="$GN_OPT" COMDARE_GN_SIMD="$GN_SIMD" COMDARE_GOLDEN_N_PROVISION_ONLY=true \
+      #       "$DRIVER" experiment_config "$CI_PROJECT_DIR/Code/gn_out/$GN_PREFIX"
+      #     # danach GN-9-Report, dann (nur bei COMDARE_STORAGE_CACHE=true) der Chunk-Marker fuer den naechsten Runner:
+      #     [ "${COMDARE_STORAGE_CACHE:-}" = "true" ] && command -v mc >/dev/null 2>&1 && \
+      #       printf 'algo_sig=%s compiler=%s range=%s utc=%s\n' "<algo_sig>" "${COMDARE_GN_COMPILER_TAG:-na}" "$GN_RANGE" "$(date -u +%FT%TZ)" \
+      #       | mc pipe "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done"
+      #   (die Per-DLL-perm.dll/-sidecar pusht die ce-artifact_cache-Naht via COMDARE_STORAGE_CACHE bereits selbst;
+      #    dll_is_current/algo_sig bleibt der Organ-Invalidierer, #50 -> §35.3.)
+      # ====================================================================================================
+      # UMGESCHALTET (W4-B gelandet): echter Chunk-Bau via lazy Per-Index-Emitter + Chunk-Fenster + provision-only.
+      DLL_DIR="$CI_PROJECT_DIR/Code/gn_out/$GN_PREFIX/e4_xml/dll"   # Treiber schreibt DLLs unter <out>/e4_xml/dll
+      COMDARE_THESIS_PROFILE="$COMDARE_GOLDEN_N_PROFILE" COMDARE_GOLDEN_N_RANGE="$GN_RANGE" \
+        COMDARE_GN_OPT="$GN_OPT" COMDARE_GN_SIMD="$GN_SIMD" COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 \
+        "$DRIVER" experiment_config "$CI_PROJECT_DIR/Code/gn_out/$GN_PREFIX"
+      count=$(find "$DLL_DIR" -name 'perm.dll' 2>/dev/null | wc -l)
+      bytes=$(find "$DLL_DIR" -name 'perm.dll' -printf '%s\n' 2>/dev/null | awk '{s+=$1} END{print s+0}')
+      echo "GN-9 chunk[$GN_RANGE]: dlls=$count bytes=$bytes extrapolation_131072=$(( count>0 ? bytes/count*131072 : 0 )) B"
+      [ "${COMDARE_STORAGE_CACHE:-}" = "true" ] && command -v mc >/dev/null 2>&1 && \
+        printf 'compiler=%s range=%s utc=%s\n' "${COMDARE_GN_COMPILER_TAG:-na}" "$GN_RANGE" "$(date -u +%FT%TZ)" \
+        | mc pipe "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done" || true
+
+# ── build:golden-n (W4-A, Ledger §35/§36): die kanonische §33-System-Achsen-Matrix (opt O2/O3 x simd no_extension/avx2),
+#    N-Node-Pool-geroutet (§36.3): no_extension -> Tag "amd64" (ALLE amd64-Nodes inkl. kleiner Nodes ohne AVX),
+#    avx2 -> Tag "avx2". Messsystem-Dimension GN_MSYS (§36.2) heute 1 Default -> 2 SIMD x 1 msys x 2 opt x 4 chunk = 16 Zellen/Jobs.
+#    INERT-by-default (nur bei COMDARE_BUILD_GOLDEN_N=="true"). avx512 ist NICHT hier (separater opt-in-Job unten).
+build:golden-n:
+  extends: .golden_n_build
+  parallel:
+    matrix:
+      - GN_SIMD: ["no_extension"]
+        GN_RUNNER_TAG: ["amd64"]       # §36.3: ALLE amd64-Nodes (prod1/prod2 + pve1/pve2/node3/node4 + Odroid-Klasse); INFRA: Tag 'amd64' setzen
+        GN_MSYS: ["default"]
+        GN_OPT: ["O2", "O3"]
+        GN_CHUNK: ["0", "1", "2", "3"]
+      - GN_SIMD: ["avx2"]
+        GN_RUNNER_TAG: ["avx2"]        # §36.3: AVX2-faehige Nodes (prod1 Zen5 + prod2 RaptorLake + AVX2-kleine Nodes); INFRA: Tag 'avx2' setzen
+        GN_MSYS: ["default"]
+        GN_OPT: ["O2", "O3"]
+        GN_CHUNK: ["0", "1", "2", "3"]
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Bau-Beweis
+      when: never
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # INERT: nur bei explizitem Opt-in
+
+# ── build:golden-n-avx512 (W4-A, EXTRA opt-in): die avx512-Erweiterung, N-Node-geroutet auf Tag "avx512" (§36.3;
+#    heute NUR prod1/Zen5 avx512-faehig, prod2/RaptorLake fused-off). GN_MSYS default -> 1 SIMD x 1 msys x 2 opt x 4 chunk = 8 Zellen/Jobs.
+#    DOPPELT inert: nur wenn COMDARE_BUILD_GOLDEN_N=="true" UND COMDARE_GN_INCLUDE_AVX512=="true". avx512 gehoert NICHT
+#    zum §33-golden-Kernsatz (no_extension/avx2) -> bewusst separater Job + eigenes Gate (Anti-Phantom).
+build:golden-n-avx512:
+  extends: .golden_n_build
+  parallel:
+    matrix:
+      - GN_SIMD: ["avx512"]
+        GN_RUNNER_TAG: ["avx512"]      # §36.3: NUR avx512-faehige Nodes (heute prod1/Zen5); INFRA: Tag 'avx512' setzen
+        GN_MSYS: ["default"]
+        GN_OPT: ["O2", "O3"]
+        GN_CHUNK: ["0", "1", "2", "3"]
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
+      when: never
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_GN_INCLUDE_AVX512 == "true"'
 
 # ── Stage persist (#22, User 2026-07-11, Ledger §0-DoD-6/§11-G): die Auswertungs-Dokumente EINES Laufs additiv
 #    nach measurement/<YYYYMMDD-HHMMSS-p{pipeline}>/ im super-Root sammeln + per commit+MERGE+push nach
