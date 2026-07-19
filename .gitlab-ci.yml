@@ -29,6 +29,7 @@ stages:
   - analyse
   - test                 # Stufe 3 (User 2026-07-03): VOLLE super-Unit-Suite bauen+AUSFUEHREN (Korrektheitsbeweis, nicht nur kompilieren)
   - integration
+  - planer               # W7-A (§40.b): dynamische, Planer-gesteuerte Folge-CI (CiYamlBuilder -> Child-Pipeline), inert-by-default (opt-in COMDARE_DYNAMIC_PLANER_CI)
   - manifest             # Stufe 7 (#198, EPIC #186): Build-/Mess-Manifest (Provenance) + additives Prebackup
   - thesis-pdf
   - measure              # #156/#17 (User 2026-07-11): mehrtaegiger golden-320-Voll-Messlauf (inert-by-default, opt-in COMDARE_RUN_MEASURE)
@@ -970,3 +971,64 @@ persist:measurements:
         sleep $(( (RANDOM % 5) + 2 ))
       done
       echo "FEHLER: writeback nach 5 Versuchen fehlgeschlagen (development bewegt sich zu schnell?)" >&2; exit 1
+
+# ── planer:emit-ci (W7-A, Ledger §40.b): die DYNAMISCHE, Planer-gesteuerte Folge-CI (Pilot->Serie). Der
+#    Planer-Binary (comdare-messung-driver --dump-ci) liest das golden-Profil, erkennt die System-Permutationen
+#    (opt x simd des Director-Walks) und EMITTIERT SELBST die GitLab-Child-Pipeline-YAML (CiYamlBuilder:
+#    STUFE 1 = CEB-Bau-Jobs je System-Perm, STUFE 2 = Tier-Job-Emitter + Grandchild-Trigger). Die Steuerung
+#    liegt im PLANER, nicht in handgeschriebener YAML (§40.b-Direktive). Die statische 24-Zellen-Matrix
+#    (build:golden-n / build:golden-n-avx512) bleibt UNANGETASTET als Pilot-Fallback, bis die dynamische Serie
+#    dual-gruen ist.
+#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_DYNAMIC_PLANER_CI=="true" gesetzt
+#    ist -> der Gesamtlauf (Messung/Bau AUS) baut ihn NIE. --dump-ci ist rein lesend: KEIN Bau, KEINE Messung.
+#    HINWEIS (Architekt): das emittierte Child-YAML kann hier NICHT per GitLab-CI-Lint-API geprueft werden ->
+#    der Architekt lintet die generierte planer-child-ci.yml vor dem Scharfschalten der dynamischen Serie.
+planer:emit-ci:
+  stage: planer
+  tags: [baremetal]
+  variables:
+    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token (wie .golden_n_build)
+    COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
+  needs: ["verify:submodules"]
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE die dynamische Planer-CI
+      when: never
+    - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # INERT: nur bei explizitem Opt-in
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build --target comdare-messung-driver
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      test -f "$COMDARE_GOLDEN_N_PROFILE" || { echo "golden-Profil fehlt: $COMDARE_GOLDEN_N_PROFILE"; exit 1; }
+      echo "== W7-A: der Planer emittiert die dynamische Folge-CI (--dump-ci, rein lesend, KEIN Bau, KEINE Messung) =="
+      "$DRIVER" --dump-ci "$COMDARE_GOLDEN_N_PROFILE" > "$CI_PROJECT_DIR/planer-child-ci.yml"
+      echo "== emittierte Child-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
+      echo "== STUFE-1 CEB-Bau-Jobs: $(grep -c '# JOB ceb-build perm ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
+      echo "== STUFE-2 Grandchild-Trigger-Jobs: $(grep -c '# JOB tier-trigger perm ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
+  artifacts:
+    paths:
+      - planer-child-ci.yml
+    expire_in: 1 week
+
+# ── planer:trigger-ci (W7-A): triggert die vom Planer emittierte Child-Pipeline (GitLab Dynamic-Child-Pipeline,
+#    trigger: include: artifact:). Diese Child-Pipeline emittiert ihrerseits je System-Perm die Tier-Job-YAML als
+#    GRANDCHILD (parent->child->grandchild = GitLab-Nesting-Tiefe 2). strategy:depend = der Parent-Job spiegelt
+#    den Child-Status (synchron + gated). INERT-by-default (COMDARE_DYNAMIC_PLANER_CI).
+planer:trigger-ci:
+  stage: planer
+  needs:
+    - job: planer:emit-ci
+      artifacts: true
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
+      when: never
+    - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'
+  trigger:
+    include:
+      - artifact: planer-child-ci.yml
+        job: planer:emit-ci
+    strategy: depend
