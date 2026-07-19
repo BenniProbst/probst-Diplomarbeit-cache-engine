@@ -1,0 +1,348 @@
+{
+  "summary": "Welle-5-Planungssession: SOLL (Ledger/Plandocs) + IST (Code/CI) fuer das §38-Dock-Protokoll erheben",
+  "agentCount": 4,
+  "logs": [],
+  "result": {
+    "soll": {
+      "protokoll_soll": [
+        {
+          "aspekt": "(1) Nutzlast hinab — Grundform",
+          "festlegung": "Die Planer→CEB-Nutzlast ist der per SERIALISIERUNG uebergebene zusammenhaengende UNTERE TEILBAUM des Experiment-B+-Baums: System-Achsen mit den nachfolgenden freigegebenen und regulaeren Organ-Achsen. Uebergeben werden NICHT beliebige Configs, sondern direkt die RANGES jeder System- und Organ-Achse; die CEB permutiert diese Ranges lokal/lazy und delegiert die Kompilation (§37.b).",
+          "beleg": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2279"
+        },
+        {
+          "aspekt": "(1) Nutzlast hinab — exaktes Format soweit festgelegt",
+          "festlegung": "Format = Achsen-RANGES deckungsgleich mit der Fork-R5-Range-Syntax (§32-F1 Mess-Modi) und der AxisKind-Faerbung (§30). Minimale XML-Range-Syntax: `<values>` (enumerierte Werte / benannte Algorithmus-Bezeichnungen je Achse) PLUS `<range min max scale>`, wahlweise mit Gesamtexperiment-Geltungsbereich (je Achse ODER per Gesamtexperiment). Der Planer zerlegt den AxisKind-gefaerbten Gesamtbaum und reicht nur den System→Organ-Teilbaum serialisiert weiter (Organ→binary_id; System/Mess NIE in binary_id).",
+          "beleg": "docs/plaene/20260719-FINALES-DESIGN-ABSTRACT-kette-baum-registries.md:46 (D12); docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2175,2283"
+        },
+        {
+          "aspekt": "(2) Nutzlast hinauf — sparser Fortschritts-Rueckkanal",
+          "festlegung": "REVISION (frueheres 'kein Rueckkanal' ist UEBERHOLT): Die CEB liefert dem Planer einen RUECK-KANAL fuer die Fortschrittsmessung je Experiment-Permutation. Es wird SPARSE immer nur die Achse(n) der lazy Materialisierung mit der gewaehlten Konfiguration uebermittelt, die fuer die naechste Permutation / Erzeugung der naechsten Tier-Binary noetig sind = Cursor-/Delta-Protokoll. Es ist ein FORTSCHRITTS-/Cursor-Protokoll, KEIN Observer-POD.",
+          "beleg": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2280,2284"
+        },
+        {
+          "aspekt": "(2) Nutzlast hinauf — Mixed-Radix-Konformitaet + kein Mess-Rueckfluss",
+          "festlegung": "Die sparse-Uebermittlung = nur die Achsen-Konfigurations-DELTAS zur naechsten Permutation, passend zur Mixed-Radix-Iteration der lazy StaticBinaryView (pro Schritt aendern sich meist nur niederwertige Achsen → minimales Delta). Der Rueck-Kanal ist explizit KEIN Mess-Daten-Rueckfluss — Messwerte schreibt die CEB weiterhin selbst ans Ziel (measure-drop). Obere Dock-Grenze damit bidirektional mit ASYMMETRISCHER Nutzlast: hinab Teilbaum-Ranges, hinauf Fortschritts-Deltas (kein Observer-POD).",
+          "beleg": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2284,2285; docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md:253"
+        },
+        {
+          "aspekt": "(3) §38.b Ein-CEB-Mess-Exklusivitaet",
+          "festlegung": "Es kann nur EINE CEB gleichzeitig laufen; multiple CEBs eines Planers laufen SEQUENTIELL. Grund: Mess-Exklusivitaets-Doktrin auf CEB-Ebene (1-Thread-Mess-Doktrin hochskaliert) — eine MESSENDE CEB braucht die Maschine exklusiv, sonst ist ohne Feedback nicht abschaetzbar, ob eine Messung in der Gesamt-Permutation allein laeuft (sonst Messfehler). Abgrenzung: der cluster-parallele BAU (§35/§36 provision-only-Matrix, resource_group je Permutation) bleibt parallel — Sequentialitaet gilt nur fuer MESSENDE CEB-Laeufe (Mess-Modus; Debug parallel ohne Garantie; Release misst am Ende einmalig).",
+          "beleg": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2289,2292,2293"
+        },
+        {
+          "aspekt": "(3) Fertig-Signal-Semantik",
+          "festlegung": "Der §38-Fortschritts-Rueck-Kanal liefert dem Planer genau das FERTIG-SIGNAL, mit dem er die naechste CEB erst nach Abschluss der vorigen startet — Sequenzierung LAEUFT UEBER den Rueck-Kanal; ohne ihn gibt es keine Allein-Lauf-Garantie. CI-Mechanik: messende CEB-/Mess-Jobs erhalten eine GLOBALE resource_group (z.B. `ceb-measurement-exclusive`), damit GitLab cluster-weit genau EINEN messenden Lauf garantiert; die Bau-Matrix behaelt ihre per-Permutations-Locks.",
+          "beleg": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2292,2294"
+        },
+        {
+          "aspekt": "(4) Phasen/Zustaende des Docks",
+          "festlegung": "Ableitbare Ablauf-Phasen (nicht als expliziter State-Automat formalisiert): (a) Planer serialisiert den System→Organ-Teilbaum als Ranges hinab; (b) CEB permutiert die Ranges lazy (mixed-radix) und delegiert die Kompilation je Perm ueber BuildOrchestrator::provision_all/CompileFn (§37.b); (c) CEB meldet je Permutation sparse Fortschritts-Deltas/Cursor hinauf; (d) Fertig-Signal des Rueck-Kanals triggert die naechste CEB sequentiell (Mess-Exklusivitaet). Planer-seitige Template-Method je PhaseStep: resolve_selection→emit_build→emit_measure→emit_serialize→emit_copy. Getrennt davon: State-Pattern (§37) fuer die CEB-Freigabe-System-Organ-Achsen (Freischaltung ueber Pruef-Dock), NICHT das Dock-Transport-Protokoll selbst.",
+          "beleg": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2283,2292,2274; docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md:50"
+        },
+        {
+          "aspekt": "(5) Increment-Schnitt Planer (I1..I5)",
+          "festlegung": "Phase 1 intern: I1 = Interpreter (parse_experiment_profile formalisiert) + ExperimentPlanDirector::construct(IPlanBuilder&) + --dump-plan + Contract-Test → I2 = CMakeGraphBuilder + 2-Pass cmake/experiment_plan.cmake → (Fork C) I3 = CiYamlBuilder → I4 = mode(debug/mess)/failed-Zelle → I5 = Serialisierung. Aufwand gross (~5 Increments, netto-neuer Codegen). I1 ist per §34 freigegeben (golden-neutral, parallel).",
+          "beleg": "docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md:196; docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2232"
+        },
+        {
+          "aspekt": "(5) CMakeGraphBuilder — Ziel-Design",
+          "festlegung": "CMakeGraphBuilder emittiert generated/experiment_plan.cmake via add_custom_command + DEPENDS; das cmake/experiment_plan.cmake ist 2-Pass mit -DCOMDARE_EXPERIMENT_XML=, gebaut 1:1 nach der Blaupause catalog_codegen.cmake:27-37 (COMMAND $<TARGET_FILE:...codegen_cli> + DEPENDS <xml>). CMakeGraphBuilder und CiYamlBuilder entstehen aus DEMSELBEN Director-Walk (2x ConcreteBuilder, GoF Builder) → strukturelle Synchronie; Contract-Test test_experiment_planner_plan verlangt topologie-isomorphe Ausgabe (gleiche PhaseStep-Menge, gleiche build:→measure:-Kanten). NICHT das Legacy-CodegenEngine (codegen.hpp:24, 90ns-Stub) als Vehikel verwenden.",
+          "beleg": "docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md:61,62,49,77,41"
+        },
+        {
+          "aspekt": "(5) CEB-Generierung + Delegations-Naht",
+          "festlegung": "Fork A verschaerft entschieden (§30): die CEB ist eine vom Planer GENERIERTE+kompilierte Binary je Messsystem (Configure-/Pre-Build-Zeit-Codegen, kein Runtime-Konfigurieren), nicht nur .so-/Vertragsgrenze. Delegations-Naht der Kompilation ist der BESTEHENDE Pfad BuildOrchestrator::provision_all/CompileFn — die CEB liest ihre einkompilierten System-Achsen-Freigaben, waehlt/permutiert die zulaessige Organ-Rekombination (Organ ≤ System-Freigabe) und delegiert VOR der Kompilation. Andockpunkt system-achsen-seitig: acquire_ceb_system_axis_drive montiert BuildConfig.build_version + CompileFn, dockt an make_gpp_compile_fn; CEB-Host-Treiber run_lazy_static_then_dynamic (cache_engine_builder_iterator.hpp:694-696).",
+          "beleg": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2274,2244(§30 Zeile 2183); docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md:111,93,244"
+        },
+        {
+          "aspekt": "Registry-Speisung + Stufen-Zuordnung (Kontext)",
+          "festlegung": "1:1-Abbildung: Mess-Registry→Planer · System-Registry→CEB · Organ-Registry(+prt)→Tier. Stufen-Zuordnung: Planer=Mess-Achsen · CEB=System-Achsen · Tier=Organ-Achsen (+optionaler Hybrid als 4. Ketten-Glied, ABGABE-PFLICHT vor 28.07.). 3-4 sequentiell top-down GENERIERTE Binaries in EINER Kette; jede Vorstufe friert die Wahl der Folgestufe als CT-Draht ein.",
+          "beleg": "docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md:242,243,246; docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2177,2183"
+        }
+      ],
+      "offene_designluecken": [
+        "Serialisierungs-WIRE-FORMAT der Teilbaum-Ranges Planer→CEB nicht festgelegt: nur die XML-Range-SYNTAX (R5 `<values>`/`<range min max scale>`) steht fest — die konkrete serialisierte Transport-Repraesentation (in-Prozess-Struct vs. Datei vs. .so-Uebergabe) und ihr Layout sind undefiniert.",
+        "Konkrete Gestalt des Fortschritts-Rueck-Kanals ist offen: 'Cursor-/Delta-Protokoll, Mixed-Radix-konform, kein Observer-POD' ist die Semantik — aber die exakte Datenstruktur eines Deltas, die Mixed-Radix-Cursor-Kodierung und die Achsen-Radix-Gewichtung (welche Achsen-Ordnung niederwertig ist) sind nicht gepinnt.",
+        "Fertig-Signal-Handshake nur qualitativ ('Rueck-Kanal liefert das Fertig-Signal'): der praezise Mechanismus, mit dem der Planer Abschluss + garantierten Allein-Lauf einer messenden CEB erkennt (Signal-Payload, Zeitpunkt, Fehlerfall), ist nicht spezifiziert; resource_group `ceb-measurement-exclusive` ist noch NICHT in der CI (beim naechsten CI-Edit nachzuziehen).",
+        "Fork A Sequenzierung offen (Fork-C-Schnittfrage): §30 entscheidet CEB=generierte Binary je Messsystem als Ziel-Design, aber ob vor Deadline zuerst nur die Vertragsform (IExperimentDock/Director/CebSystemAxisDrive-POD, .so-Grenze deferred) oder sofort die echte dlopen-.so mit vollem 4-Symbol-Loader gebaut wird, ist als Fork C ungeschnitten.",
+        "Fork E (XML-Pfad-Vereinheitlichung) ungeloest: run_experiment_profile faehrt ueber parse_experiment_profile, der offizielle golden-Mess-Pfad ueber parse_thesis_profile/run_profile_facade — Konvergenz auf EINE Interpreter-Quelle beruehrt den golden Pfad und braucht GO; sonst Phase-1 strikt additiv am Experiment-Profil.",
+        "ADVERSARIALER BLOCKER (Befund 1): Projektstruktur-Analyse des Bauplans endet am Submodul; das offizielle Super-Repo-Einstieg Code/02_messung_driver/main.cpp:679 und die ZWEITE compile-time-Enumerations-Engine v32_messreihe_antrieb.hpp:214 (MergeStrategy-CT-Dispatch, betitelt 'OFFIZIELLER Einstieg INC-G+H', inkl. CSV+TikZ-Export) sind ungeprueft — der neue ExperimentPlanDirector-Walk droht zur DRITTEN Parallel-Engine zu werden (v32-Stopp-Grund). MUSS vor Impl kartiert/reconciled werden.",
+        "CoR-Andockpunkt existiert nicht als Naht: run_selection_filter_chain/resolve_selection (selection_filter_chain.hpp:87) hat 0 Produktions-Treffer, nur Test-Konsum — muss als NEUE Methode deklariert werden, nicht als bestehender Andockpunkt behandelt.",
+        "Kritischer-Pfad-Uebertreibung: 'Phase 2 haengt von Phase 1 (Director muss existieren)' ist sachlich nicht zwingend — CebSystemAxisDrive/acquire_ceb_system_axis_drive spiegeln SearchAlgorithmDrive unabhaengig vom Director und koennten parallel laufen; Sequenzierung praezisieren.",
+        "Hybrid-Einschub (4. Binary, ABGABE-PFLICHT): das Dock-Protokoll der rekursiven Delegation Hybrid-Tier ↔ CEB (Ketten-Position Planer→CEB→[Hybrid-Tier↔CEB]→Tier) ist nur als Phasen-Position verankert, das konkrete Transport-/Delegations-Protokoll nicht ausgearbeitet.",
+        "System-/Mess-Achsen-JOIN (Achsen-Algorithmus-Join fuer System/Mess) ist unterstuetzt aber NACH Abgabe deprioritisiert (Roadmap PL-21) — als getracktes spaeteres Increment offen, nicht designt."
+      ]
+    },
+    "istDock": {
+      "befunde": [
+        {
+          "was": "Naht Planer→CEB→Tier ist vollstaendig IN-PROCESS (keine Prozessgrenze, keine IPC, keine Serialisierung dazwischen)",
+          "wo": "libs/cache_engine/profile_facade/profile_run_facade.cpp:435 (tlz::run_profile(a) direkter Aufruf)",
+          "zustand": "vorhanden/aktiv. Kette: 02_messung_driver/main.cpp:670 → run_profile_facade → facade.cpp:374-435 fuellt RunProfileArgs POD → run_profile (profile_run_entry.hpp:171) → run_lazy_static_then_dynamic (iterator:706) → BuildOrchestrator.provision_all (iterator:744) → Laden+Messen. Alles ein Binary, ein Adressraum."
+        },
+        {
+          "was": "RunProfileArgs — Eintritts-POD der EINEN CEB-API (S7c)",
+          "wo": "libs/cache_engine/profile_facade/profile_run_entry.hpp:64-109",
+          "zustand": "vorhanden. Enthaelt golden_range_start/count (:103-104) + provision_only (:105) als Chunk-/Bau-Kanal. compile_for_perm (:75) = per-Perm-CompileFn-Fabrik (opt×simd). Reines in-process value-struct, NICHT ABI-serialisiert."
+        },
+        {
+          "was": "CEB-BAU-DELEGATIONS-NAHT-Marker (Freigabe-Kopplung System→Organ)",
+          "wo": "libs/cache_engine/profile_facade/profile_run_entry.hpp:580-601",
+          "zustand": "vorhanden/aktiv. Hier wird pro System-Zelle (opt_id×simd_id) perm_compile = a.compile_for_perm(opt_flag, march_flag) montiert (:592) und run_all_passes() gerufen. system_axis_opt_flag_of (:137) / system_axis_march_of (:146) / system_axis_host_supports_simd (:155) = geteilte Flag-Aufloesung. ISA-Gate filtert VOR Kompilation (:573)."
+        },
+        {
+          "was": "LazyRunConfig — Konfig-POD des Lazy-E2E-Laufs (Iterator-Eingang)",
+          "wo": "libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:65-151",
+          "zustand": "vorhanden. provision_only (:144) kehrt NACH provision_all VOR Mess-Phase zurueck (:758-768). cache_push/measurement_sink (:149-150) = SYNCHRONE per-Binary-Injektions-Naht (No-Op-Default). max_binaries (:66) kappt die Selektion. Kein Range-Feld hier — Fensterung passiert oberhalb in run_profile via select_explicit."
+        },
+        {
+          "was": "golden-N Chunk-Fenster-Logik (Range→Selektion)",
+          "wo": "libs/cache_engine/profile_facade/profile_run_entry.hpp:425-437",
+          "zustand": "vorhanden/aktiv. golden_range_start/count (2 std::size_t) → ids [start,stop) → ex::select_explicit; provenance-String 'golden_n_range:start:count' (:432) ist REIN Logging-Tag. KEINE Range-Serialisierungs-Schicht — Range reist als 2 Ints im POD + Env-String COMDARE_GOLDEN_N_RANGE='start:count' (driver main.cpp:284-303)."
+        },
+        {
+          "was": "axis_path_serialization.hpp — DIE zentrale Pfad-Serialisierung (aber fuer binary_id, nicht Ranges)",
+          "wo": "libs/cache_engine/builder/experiment_tree/axis_path_serialization.hpp:34-84",
+          "zustand": "vorhanden. kCompositionAxisNames[17] (:34) Single-Source; serialize_composition_path<P>() (:51) baut 'axis=value/...'-Pfad EINER 17-Achsen-Permutation = binary_id. Serialisiert EINE Komposition (ein Blatt), NICHT einen Achsen-RANGE/ein Fenster."
+        },
+        {
+          "was": "axis_variant_version_table.hpp — {axis,variant→algo_version} compile-time Tabelle → Flach-Signatur (.algos-Sidecar)",
+          "wo": "libs/cache_engine/builder/experiment_tree/axis_variant_version_table.hpp:43-49",
+          "zustand": "vorhanden. AxisVariantVersion{axis,value,version} POD; compile-time-Durchsetzung von algo_version. Fuer Mess-Resume/Signatur, NICHT fuer Dock-Nutzlast/Range."
+        },
+        {
+          "was": "IPruefDock — per-Gattung Mess-Uebergang, EXPLIZIT KEINE ABI-Grenze",
+          "wo": "libs/cache_engine/builder/pruef_dock/pruef_dock.hpp:10-13, :57-80",
+          "zustand": "vorhanden. Lebt NUR im Builder-Binary (eine vtable, nicht Hot-Path). Die einzige echte ABI-Grenze ist Builder↔gebaute DLL: gattungs-Antriebs-Sub-Interface (anatomy::IObservableTier) + POD-Snapshot. dock_status_* errno-Codes (:36-41). PruefDockMeasureOptions = AbiTierTraceConfig-Alias (:33)."
+        },
+        {
+          "was": "Dock-Nutzlast-PODs (in-process, builder-intern)",
+          "wo": "libs/cache_engine/builder/pruef_dock/search_algorithm_dock.hpp:65-70 (SearchAlgorithmDrive), pruef_dock_sequencer.hpp:29 (PruefDockResult)",
+          "zustand": "vorhanden. SearchAlgorithmDrive = {obs,ctrl,rbk,scn}-Pointer-Buendel; measure() gibt out_csv/out_json Strings (dock.hpp:78). Echte ABI-POD ueber DLL-Grenze: anatomy::ComdareTierObserverSnapshot (iterator:170, LazyMeasuredRow.unified) + measurement::PmcCounters (:206) + OpKindLatency[6] (:166)."
+        },
+        {
+          "was": "ExperimentPlanDirector — benannter Planer-Walk (GoF Director/Builder), aber INERT",
+          "wo": "libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:194-292",
+          "zustand": "vorhanden aber NICHT im Lauf-Pfad verdrahtet (:39-40 'nichts ruft den Director ausser dem opt-in Contract-Test'). Emittiert nur --dump-plan-Text (PlanTextBuilder :138). Spiegelt den opt×simd-Walk aus run_profile (:274-291), treibt aber KEINEN Bau. PODs: PlanHeader/PlanPerm/PlanStep (:83-116) = reine Beschreibung."
+        },
+        {
+          "was": "Fortschritts-Rueck-Kanal (Cursor/Achsen-Delta/Heartbeat) existiert NICHT",
+          "wo": "grep progress|cursor|delta|heartbeat|fortschritt in profile_facade/ + experiment_tree/ = leer",
+          "zustand": "FEHLT vollstaendig. Einzige Rueckmeldung: BuildStats (succeeded/built/skipped, iterator:746-749) am Ende von provision_all + terminale Zaehler RunProfileResult (:112-122) / LazyRunResult. Alles batch/terminal, kein Streaming."
+        },
+        {
+          "was": "CMakeGraphBuilder / cmake_graph",
+          "wo": "grep 'CMakeGraph|cmake_graph' in libs/ = leer",
+          "zustand": "FEHLT vollstaendig, keine Vorarbeit. Naechstliegende Bau-Bausteine: BuildOrchestrator.provision_all (iterator:742-744), ceb_generator.hpp, slurm_launcher.hpp — aber KEINE CMake-Graph-Emission."
+        }
+      ],
+      "anknuepfpunkte": [
+        "Per-Binary SYNCHRON-Naht im Iterator (cache_engine_builder_iterator.hpp:942-954, nach result.csv+stamp, vor DLL-Unload): hier feuern bereits cache_push/measurement_sink (:763-766) im gleichen Injektions-Muster wie CompileFn — EXAKT der Andockpunkt fuer einen per-Binary-Fortschritts-Callback (Cursor = view-Index innerhalb [start,start+count)).",
+        "LazyRunConfig (iterator:65-151): ein neues optionales ProgressSinkFn-Feld (No-Op-Default, byte-neutral) analog cache_push/measurement_sink waere die architekturkonforme Andock-Stelle fuer den Rueck-Kanal — durchgereicht von RunProfileArgs (profile_run_entry.hpp:64) via make_cfg.",
+        "golden_range_start/count (profile_run_entry.hpp:103-104, :425-437) definiert bereits die Cursor-Einheit (Fenster ueber 2^17-Indexraum); ein Delta-Rueckkanal wuerde 'fertig bis Index X' relativ zu diesem Fenster melden. select_explicit-Provenance-String (:432) ist der bestehende, aber nur-Logging-Traeger.",
+        "ExperimentPlanDirector (planner/experiment_plan_director.hpp:194): der benannte Walk existiert bereits als GoF Director/Builder — er ist der natuerliche Ort, um aus einem INERTEN Plan-Emitter einen AKTIVEN Plan-Treiber (mit Serialisierung des Plans zu XML/Binary) zu machen; PlanPerm/PlanStep-PODs (:91-116) sind fertige Serialisierungs-Kandidaten.",
+        "compile_for_perm-Fabrik-Naht (profile_run_entry.hpp:75, :592) + CEB-BAU-DELEGATIONS-NAHT (:580-601): der dokumentierte Andockpunkt fuer kuenftige System-Consumer-Achsen (NUMA/NPU/GPU/FPGA) + constexpr requires_simd()-Bau-Gate — hier wuerde ein State-Pattern durchs Pruef-Dock ansetzen (Kommentar :588-590).",
+        "artifact_transport CachePushFn/MeasurementSinkFn (iterator:61-62, :149-150): die etablierte No-Op-Naht-Doktrin (byte-neutral, synchron, per-Binary) ist die Vorlage fuer JEDE neue Dock-Nutzlast oder Rueck-Kanal-Injektion.",
+        "IPruefDock-Erweiterungs-Vertrag (pruef_dock.hpp:54-56): neue Gattung = neues Dock + neues Sub-Interface + neuer flacher V1-POD, IPruefDock stabil — das ist das dokumentierte Muster, falls Dock-Nutzlasten ueber eine echte Grenze serialisiert werden muessten."
+      ],
+      "fehlend": [
+        "IExperimentDock / experiment_dock existiert NICHT — es gibt nur IPruefDock (per-Gattung MESS-Dock, builder-intern, keine ABI-Grenze). Kein Bau-/Planer-Dock-Interface.",
+        "KEINE Serialisierungs-Schicht fuer Achsen-Ranges (XML/Binary/POD). Ranges reisen als 2 std::size_t (golden_range_start/count) im in-process-POD + als Env-String COMDARE_GOLDEN_N_RANGE='start:count'. Es gibt Pfad-Serialisierung fuer EINE Komposition (axis_path_serialization.hpp) und Achsen-Version-Tabelle (axis_variant_version_table.hpp), aber nichts fuer Fenster/Ranges.",
+        "KEINE Prozessgrenze / IPC / Netz-Naht zwischen Planer und CEB — alles in-process direkte C++-Aufrufe. Es gibt keinen Serialisierungs-/Deserialisierungs-Punkt, an dem ein Range-POD ueber eine Grenze ginge.",
+        "KEIN Fortschritts-Rueck-Kanal jeglicher Art (Cursor, Achsen-Delta, Heartbeat, Streaming-Progress). Nur terminale Batch-Zaehler (BuildStats, RunProfileResult, LazyRunResult).",
+        "KEIN CMakeGraphBuilder / cmake_graph und keine Vorarbeit dazu.",
+        "ExperimentPlanDirector ist vorhanden aber INERT (nur --dump-plan-Text, nicht im golden Lauf-Pfad verdrahtet) — der Planer 'kommuniziert' heute gar nicht mit dem CEB, run_profile enthaelt den opt×simd-Walk selbst dupliziert (profile_run_entry.hpp:552-604)."
+      ]
+    },
+    "istCli": {
+      "befunde": [
+        {
+          "was": "W3-B-Report / Welle-3-Output existiert NICHT als eigenstaendige Datei; einzige Erwaehnung des dump-plan-Patch-Textes",
+          "wo": "docs/sessions/2026-07-19-SESSION-UEBERGABE-wellen1-4-pool-maschinerie-komplett.md:35",
+          "zustand": "Textzeile: '--dump-plan-CLI im super-Treiber (Patch-Text liegt im W3-B-Report/Welle-3-Output)'. Der referenzierte Report ist ein NICHT-persistierter Subagent-Output (Welle 3) - grep -ril auf W3-B-Report/Welle-3-Output/Welle-3-B im gesamten docs-Baum liefert KEINE Report-Datei; der Patch-Text selbst (Diff fuer main.cpp) ist nirgends in docs/ abgelegt."
+        },
+        {
+          "was": "Paket-W3-B-Artefakt im ce-Code: der --dump-plan-Traeger PlanTextBuilder (GoF ConcreteBuilder)",
+          "wo": "Code/external/comdare-cache-engine/libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:3 (Header 'PAKET W3-B / Phase-1-I1'), :129-176 (PlanTextBuilder), :138 class, :140-168 Emitter, :194-295 ExperimentPlanDirector",
+          "zustand": "Existiert, header-only, INERT-by-default. PlanTextBuilder rendert deterministischen Zeilen-Text ('# comdare-experiment-plan v1' ...). Director.construct(ThesisProfile/ExperimentProfile, IPlanBuilder&) laeuft opt x simd Walk (walk_perms_ :262). KEIN CLI-main, KEIN --dump-Argument verdrahtet - nur der Baustein."
+        },
+        {
+          "was": "Contract-Test (byte-deterministischer dump-plan)",
+          "wo": "Code/external/comdare-cache-engine/tests/unit/thesis_tiere/test_experiment_plan_director.cpp:94,111,139,174 (ThesisDumpPlanIsByteDeterministic :174, PlanTextBuilder :179)",
+          "zustand": "Existiert, opt-in Test; nur er ruft den Director (INERT-Nachweis)."
+        },
+        {
+          "was": "KEIN dump-plan/--dump-Einstieg im super-Treiber",
+          "wo": "Code/02_messung_driver/main.cpp (879 Z.), Arg-Loop :317-355, keine apps/ mit --dump im ce",
+          "zustand": "grep 'dump' im main.cpp = 0 Treffer; kein comdare_experiment_planner-App-Target; kein --dump-plan-Flag. Der Patch (--dump-plan-Zweig) ist NICHT angewandt."
+        },
+        {
+          "was": "Heutiger Profil-/Messreihen-Ladeweg (E4-XML-Alleinweg)",
+          "wo": "Code/02_messung_driver/main.cpp:627-680",
+          "zustand": "COMDARE_THESIS_PROFILE (bzw. Default-Define :628-630) -> Existenz-Check :636 -> Root-Tag-Sniff via common-DOM parse_document :675-680 entscheidet comdare_experiment vs comdare_thesis_profile."
+        },
+        {
+          "was": "Uebergabe an CEB/Fassade (run_experiment_profile / run_profile)",
+          "wo": "Code/02_messung_driver/main.cpp:682-772",
+          "zustand": "comdare_experiment-Zweig baut ExperimentRunArgs xa (:684-703) -> pf::run_experiment_profile_facade(xa) :707. thesis-Zweig baut ProfileRunArgs pa (:722-759) -> pf::run_profile_facade(pa) :763. Die opt x simd-Permutation laeuft heute INNERHALB der Fassade (Callees), nicht im Treiber."
+        },
+        {
+          "was": "Legacy-Messreihen-Weg (nur Opt-in)",
+          "wo": "Code/02_messung_driver/main.cpp:207-220 (load_messreihen), :784 Gate COMDARE_LEGACY_MESSREIHEN!=1 return, :787-802 external_specs-Schleife",
+          "zustand": "Nur bei COMDARE_LEGACY_MESSREIHEN=1; default fertig nach E4-Block (:784 return e4_overall_rc)."
+        }
+      ],
+      "anknuepfpunkte": [
+        "Planer-I2-Einstiegsort im Treiber: zwischen Root-Tag-Sniff (main.cpp:675-680) und dem Fassaden-Aufruf run_experiment_profile_facade :707 / run_profile_facade :763 - dort wuerde der ExperimentPlanDirector die Mess-Achsen-Permutation (opt x simd) VOR dem CEB-Aufruf enumerieren/emittieren.",
+        "--dump-plan-Flag gehoert als frueh- exit CLI-Zweig in die Arg-Loop main.cpp:317-355, exakt analog zum bestehenden --validate/--check-Zweig (:319-354): Root-Tag-Sniff + Profil laden, dann Director.construct(profile, PlanTextBuilder) + text() ausgeben + return - kein Bau, keine Messung.",
+        "ce-Bausteine liegen bereit: planner::ExperimentPlanDirector + planner::PlanTextBuilder in experiment_plan_director.hpp; Namespace comdare::cache_engine::planner. Der Treiber inkludiert die Fassade bereits (profile_facade/profile_run_facade.hpp :48) - der Planer-Header haengt Katalog-schwer und gehoert laut Header-Kommentar :42-43 in die Harness-/Fassaden-.cpp, nicht direkt in den Treiber-Header.",
+        "Registry-Trio-Annotation (make_plan_registry_annotation, experiment_plan_director.hpp:184-191) + validate_profile.hpp RegistryTrio sind die Resolver-Vorstufe; die statischen Registry-Pfade sind im Treiber schon per CMake-Define vorhanden (COMDARE_CE/PRT_AXIS_REGISTRY_PATH, main.cpp:341,689-691).",
+        "Contract-Test test_experiment_plan_director.cpp:174 (ThesisDumpPlanIsByteDeterministic) ist die vorhandene Verifikationsbasis fuer den --dump-plan-Text."
+      ],
+      "fehlend": [
+        "Der konkrete --dump-plan-Patch-TEXT (Diff fuer Code/02_messung_driver/main.cpp) ist NICHT auffindbar - er lag im nicht-persistierten W3-B-Subagent-Output; nur die Existenz-Aussage steht in der wellen1-4-Session:35. Muss von Welle 5 neu geschrieben werden (oder der Subagent-Output ist nur im Live-Transkript).",
+        "Kein App-Target comdare_experiment_planner im ce (grep apps/ = 0); der BAUPLAN (docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md:59) sieht es vor, es ist aber noch nicht gebaut.",
+        "Der --dump-plan-Einstieg selbst (weder super-Treiber-CLI-Flag noch Planer-Binary-main) existiert noch nicht - nur Director+Builder-Baustein + Contract-Test.",
+        "I2-Verdrahtung (CMakeGraphBuilder / --emit-cmake) ist noch nicht implementiert - nur PlanTextBuilder (I1) existiert."
+      ]
+    },
+    "istCi": {
+      "befunde": [
+        {
+          "was": "measure:smoke — echter Mess-Job (baut comdare-messung-driver, faehrt experiment_config -> measure_out_smoke/measurements.csv, PMC via -DCOMDARE_ENABLE_PMC=ON)",
+          "wo": ".gitlab-ci.yml:471-533 (Job-Kopf 471, script 485-527, Mess-Aufruf 505)",
+          "zustand": "interruptible:false (473); tags [prod,baremetal,amd] (474) = PMC-Node prod1; timeout 12h (475). KEINE resource_group vorhanden -> nicht gegen andere Mess-Laeufe serialisiert."
+        },
+        {
+          "was": "measure:golden-320 — der EINE offizielle golden-320-Voll-Mess-Job (experiment_config -> measure_out/measurements.csv, PMC-ON, mehrtaegig)",
+          "wo": ".gitlab-ci.yml:547-617 (Job-Kopf 547, script 567-611, Mess-Aufruf 586)",
+          "zustand": "interruptible:false (549); tags [prod,baremetal,amd] (550) = prod1; timeout 10 days (551). needs measure:smoke (optional, 560-562) -> INNERHALB einer Pipeline sequenziell zu smoke. KEINE resource_group -> ueber Pipelines hinweg NICHT gegen einen parallelen measure:smoke einer anderen Pipeline serialisiert."
+        },
+        {
+          "was": ".golden_n_build — Template des Cluster-parallelen System-Achsen-BAUS (provision-only, KEIN Messlauf: Stufe 2 mit COMDARE_GOLDEN_N_PROVISION_ONLY=true, kein measurements.csv, golden-neutral)",
+          "wo": ".gitlab-ci.yml:647-798 (resource_group 666, tags 660, provision-only Chunk-Bau 788-798)",
+          "zustand": "resource_group: \"gn-$GN_MSYS-$GN_SIMD-$GN_OPT-$GN_CHUNK\" (666) = feingranulares Ein-Job-Lock JE Permutations-Zelle; tags [\"$GN_RUNNER_TAG\"] (660) = Pool ueber alle amd64/avx2/avx512-Nodes; interruptible:false (649). Bewusst PARALLEL ueber viele Zellen/Runner -> das ist der Bau-Pool, der laut §38.b NICHT unter die globale Mess-Gruppe fallen darf."
+        },
+        {
+          "was": "build:golden-n / build:golden-n-avx512 — konkrete Matrix-Instanzen von .golden_n_build (2 SIMD x 2 opt x 4 chunk = 16 bzw. 8 parallele Bau-Zellen)",
+          "wo": ".gitlab-ci.yml:804-822 (build:golden-n) und 827-839 (avx512)",
+          "zustand": "erben resource_group gn-... (feingranular, 666) via extends; parallel:matrix (806-817 / 829-835). REIN bauend (provision-only), MISST nicht -> korrekt vom globalen Mess-Lock ausgenommen."
+        },
+        {
+          "was": "Kollisions-Pruefung: baut-UND-misst-Jobs",
+          "wo": ".gitlab-ci.yml:485-527 (smoke), 567-611 (golden-320), 681-798 (.golden_n_build)",
+          "zustand": "KEINE echte Doppelrolle. Die 2 Mess-Jobs bauen nur ihr eigenes Treiber-Tool (comdare-messung-driver) und messen dann — sie sind fundamental Mess-Jobs, NICHT Teil des Bau-Pools. .golden_n_build baut den DLL-Katalog provision-only ohne jede Messung. Trennlinie ist sauber: Messen = {measure:smoke, measure:golden-320}; Bau-Pool = {build:golden-n, build:golden-n-avx512}. Kein Job faellt in beide Klassen."
+        },
+        {
+          "was": "Weitere bauende/validierende Jobs die NICHT messen (Abgrenzung)",
+          "wo": ".gitlab-ci.yml:113 build:clang, 211 analyse:thesis-data, 233 visibility:tier-binaries, 262 integration:smoke, 299 manifest:provenance",
+          "zustand": "Alle tags [baremetal] (kein amd/prod), KEIN experiment_config-Messlauf, KEIN PMC. Duerfen NICHT unter ceb-measurement-exclusive -> unveraendert lassen."
+        }
+      ],
+      "anknuepfpunkte": [
+        "measure:smoke Job-Body: neue Zeile resource_group unmittelbar bei interruptible:false (.gitlab-ci.yml:473) oder tags (474) einziehen — gleiche Einrueckung (2 Spaces).",
+        "measure:golden-320 Job-Body: neue Zeile resource_group bei interruptible:false (.gitlab-ci.yml:549) / tags (550) einziehen.",
+        ".golden_n_build:666 traegt bereits resource_group gn-$GN_MSYS-$GN_SIMD-$GN_OPT-$GN_CHUNK — UNANGETASTET lassen (Bau-Pool bleibt parallel je Zelle).",
+        "Optional (falls ein benannter Anker gewuenscht): globalen Wert als YAML-Anchor/Variable definieren, z.B. am Kopf der Stage measure (nach Zeile 534), um ceb-measurement-exclusive DRY an beiden Mess-Jobs zu referenzieren.",
+        "Kein Eingriff an build:golden-n (804), build:golden-n-avx512 (827), build:clang (113), analyse:thesis-data (211), visibility:tier-binaries (233), integration:smoke (262), manifest:provenance (299), prebackup:measurements (350), persist:measurements (851)."
+      ],
+      "fehlend": [
+        "measure:smoke (.gitlab-ci.yml:471): resource_group hinzufuegen -> resource_group: \"ceb-measurement-exclusive\" (neue Zeile im Job-Body, z.B. nach interruptible:false Zeile 473).",
+        "measure:golden-320 (.gitlab-ci.yml:547): resource_group hinzufuegen -> resource_group: \"ceb-measurement-exclusive\" (neue Zeile, z.B. nach interruptible:false Zeile 549). Damit serialisiert der native GitLab-resource_group beide Mess-Jobs ueber ALLE Pipelines/Runner hinweg auf genau EINE laufende messende CEB (§38.b).",
+        ".golden_n_build (.gitlab-ci.yml:666): resource_group KEINESFALLS auf die globale Gruppe umstellen — behaelt \"gn-$GN_MSYS-$GN_SIMD-$GN_OPT-$GN_CHUNK\" (feingranulares Ein-Bau-pro-Permutation-Lock, Bau-Pool bleibt cluster-parallel). Ebenso build:golden-n (804) und build:golden-n-avx512 (827) UNVERAENDERT.",
+        "Keine weiteren Job-Aenderungen noetig: Es existiert kein Job der gleichzeitig provision-baut UND misst, daher keine Kollisions-Aufloesung/Job-Split erforderlich; die 2 Mess-Jobs und der Bau-Pool sind bereits sauber getrennt.",
+        "HINWEIS zur Wirkung: measure:golden-320 needs measure:smoke (optional, Zeile 560) -> innerhalb einer Pipeline bereits sequenziell; die globale resource_group ergaenzt den fehlenden Cross-Pipeline-Schutz (zwei separate Pipelines koennten sonst je einen Mess-Job parallel auf prod1/amd starten)."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Erheben"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "soll:ledger+plaene",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "a85871e2020be89ab",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784471093957,
+      "queuedAt": 1784471093941,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist Rechercheur fuer eine C++/CMake-Diplomarbeits-Codebasis. Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine, ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. Antworte NUR mit dem StructuredOutput. Alle Belege als datei:zeile. Lies gezielt (Grep->Read mit offset), keine Volltext-Dumps.\nAUFGABE SOLL-EXTRAKT §38…",
+      "lastProgressAt": 1784471231887,
+      "tokens": 62995,
+      "toolCalls": 10,
+      "durationMs": 137929,
+      "resultPreview": "{\"protokoll_soll\":[{\"aspekt\":\"(1) Nutzlast hinab — Grundform\",\"festlegung\":\"Die Planer→CEB-Nutzlast ist der per SERIALISIERUNG uebergebene zusammenhaengende UNTERE TEILBAUM des Experiment-B+-Baums: System-Achsen mit den nachfolgenden freigegebenen und regulaeren Organ-Achsen. Uebergeben werden NICHT beliebige Configs, sondern direkt die RANGES jeder System- und Organ-Achse; die CEB permutiert dies…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ist:dock+baum",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "aed4d2d861e304dea",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784471093968,
+      "queuedAt": 1784471093942,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist Rechercheur fuer eine C++/CMake-Diplomarbeits-Codebasis. Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine, ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. Antworte NUR mit dem StructuredOutput. Alle Belege als datei:zeile. Lies gezielt (Grep->Read mit offset), keine Volltext-Dumps.\nAUFGABE IST-KARTIERUNG D…",
+      "lastProgressAt": 1784471269210,
+      "tokens": 77708,
+      "toolCalls": 19,
+      "durationMs": 175241,
+      "resultPreview": "{\"befunde\":[{\"was\":\"Naht Planer→CEB→Tier ist vollstaendig IN-PROCESS (keine Prozessgrenze, keine IPC, keine Serialisierung dazwischen)\",\"wo\":\"libs/cache_engine/profile_facade/profile_run_facade.cpp:435 (tlz::run_profile(a) direkter Aufruf)\",\"zustand\":\"vorhanden/aktiv. Kette: 02_messung_driver/main.cpp:670 → run_profile_facade → facade.cpp:374-435 fuellt RunProfileArgs POD → run_profile (profile_ru…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "ist:w3b+cli+treiber",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "a220188a4bcffb52f",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784471093969,
+      "queuedAt": 1784471093942,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist Rechercheur fuer eine C++/CMake-Diplomarbeits-Codebasis. Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine, ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. Antworte NUR mit dem StructuredOutput. Alle Belege als datei:zeile. Lies gezielt (Grep->Read mit offset), keine Volltext-Dumps.\nAUFGABE W3-B-REPORT + du…",
+      "lastProgressAt": 1784471243645,
+      "tokens": 73148,
+      "toolCalls": 18,
+      "durationMs": 149676,
+      "resultPreview": "{\"befunde\":[{\"was\":\"W3-B-Report / Welle-3-Output existiert NICHT als eigenstaendige Datei; einzige Erwaehnung des dump-plan-Patch-Textes\",\"wo\":\"docs/sessions/2026-07-19-SESSION-UEBERGABE-wellen1-4-pool-maschinerie-komplett.md:35\",\"zustand\":\"Textzeile: '--dump-plan-CLI im super-Treiber (Patch-Text liegt im W3-B-Report/Welle-3-Output)'. Der referenzierte Report ist ein NICHT-persistierter Subagent-O…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "ist:ci-exklusivitaet",
+      "phaseIndex": 1,
+      "phaseTitle": "Erheben",
+      "agentId": "ad364a8e3f6525856",
+      "model": "claude-opus-4-8",
+      "state": "done",
+      "startedAt": 1784471093969,
+      "queuedAt": 1784471093942,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist Rechercheur fuer eine C++/CMake-Diplomarbeits-Codebasis. Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine, ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine. Antworte NUR mit dem StructuredOutput. Alle Belege als datei:zeile. Lies gezielt (Grep->Read mit offset), keine Volltext-Dumps.\nAUFGABE CI-IST fuer §38.…",
+      "lastProgressAt": 1784471158845,
+      "tokens": 62581,
+      "toolCalls": 3,
+      "durationMs": 64876,
+      "resultPreview": "{\"befunde\":[{\"was\":\"measure:smoke — echter Mess-Job (baut comdare-messung-driver, faehrt experiment_config -> measure_out_smoke/measurements.csv, PMC via -DCOMDARE_ENABLE_PMC=ON)\",\"wo\":\".gitlab-ci.yml:471-533 (Job-Kopf 471, script 485-527, Mess-Aufruf 505)\",\"zustand\":\"interruptible:false (473); tags [prod,baremetal,amd] (474) = PMC-Node prod1; timeout 12h (475). KEINE resource_group vorhanden -> n…"
+    }
+  ],
+  "totalTokens": 276432,
+  "totalToolCalls": 50
+}
