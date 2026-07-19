@@ -2179,3 +2179,13 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 3. **multiple Tier-Binaries (wahrscheinlichste Rekombinationen über die Workload) als Array hot an multiplen Docks geladen halten** und nach einem **heuristischen Memory-Verdrängungs-Algorithmus (deep research)** hot swappen.
 
 **Ergänzung F8 — Break-Even-Mathematik:** Switch-Thresholds = **Schnittpunkte zwischen den f(x)-Spline-Funktionen** der Performance-Modellierungen zweier Algorithmen derselben Achse (Beispiel: Allokatoren für große vs kleine Dateien — Kurven übereinandergelegt ergeben den Break-Even-Punkt). Da eine **voll permutierte Baum-Matrix** aufgebaut ist, ist der **Messwert-Diff jeder Ebene** bekannt und **gegen andere Parameter isolierbar** → ein **vollständig isolierbares Modell aus jeder einzelnen gemessenen Organ-Achse**, möglicherweise mit erweiterter Interpretation unter Hinzunahme der System-Achsen.
+
+## §33 — 2026-07-19: BEWEIS-DOKTRIN — golden-320 ist KEIN legitimer Systembeweis; nur new-golden unter VOLL-Konfiguration beweist das System — NEUESTER EINSTIEG (vor §32 lesen)
+
+**User-Direktive (verbatim-treu):** „Der golden-320-Test deckt viel zu wenig ab, **nur der new-golden-Test unter Voll-Konfiguration ist laut Plan ein legitimer Beweis, dass das System funktioniert**."
+
+**Einordnung + Kadenz-Änderung:**
+- **golden-320** bleibt als Alias/Snapshot eine **notwendige Byte-Regressions-Wache** (Fixture-Identität, TABU-Schutz) — aber sie ist **NICHT hinreichend**: 13 von 17 Achsen sind dort gepinnt, sie beweist das System nicht.
+- **Der legitime Systembeweis** = der **new-golden-Test unter VOLL-Konfiguration** (F1/§32): alle 17 Achsen mit ≥2 permutierenden Algorithmen, N=2^17=131072 (compile-static_assert + CRC64-Referenz `0xF1C1F26A1232073B` + `test_reflect_versions_all17`), **Bau-Fähigkeit gegen die CI mit dem N-Satz** + **Debug-Messlauf-Fähigkeit** (parallelisiert, ohne Korrektheits-Garantie). Baseline = gesamtes System kompromisslos breit (§32-F1).
+- **Verifikations-Kadenz ab jetzt:** „golden-Roundtrip==320 grün" wird in Berichten nur noch als *Byte-Neutralitäts*-Beleg geführt, NIE als Funktions-/Systembeweis. Systembeweis-Kriterium je Increment = die N-Referenz-Guards grün + (sobald GN-3 gebaut) der N-Voll-Konfigurations-Bau/Debug-Lauf in der CI (F2: Aufbau via N-Satz, Mess-Test via 320-XML).
+- **Prioritäts-Folge:** #49/GN-3 (system_axes-Wiring + N-XML an den Lauf-Pfad + CI-Bau-Beweis) ist der **Beweis-Träger des Systems** und steht in Welle 2 gleichrangig ZUOBERST neben dem Planer-Strang.
