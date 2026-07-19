@@ -180,6 +180,19 @@ endif()
 
 # cache-engine + prt-art als EXCLUDE_FROM_ALL einbinden (wir bauen nur,
 # was wir wirklich brauchen)
+# K-4/L5 (2026-07-19, Ledger par.20.D-B2/B4): generated-Include-Root des ce-Sub-Builds.
+# ce setzt in cmake/provenance.cmake include_directories("${CMAKE_BINARY_DIR}/generated")
+# als Directory-Include fuer ALLE ce-Targets — im ce-Standalone-Build ist das der
+# ce-eigene generated-Root (axes/, topics/, generated_source_catalog.hpp), im
+# super-Embed zeigt CMAKE_BINARY_DIR aber auf den super-Build-Root. Damit blieben
+# <axes/...>-rootige Includes der exgen-Header (z.B. axis_06_allocator_exgen.hpp:18
+# -> axes/alloc/axis_06_allocator_flags.hpp) im ce-Teilbaum unaufloesbar:
+# test_experiment_projection gruen in ce build-conf, rot im super-Tree (build-i2);
+# smoke/measurement/wdk-Tests stale-rot. Fix: den ce-Embed-generated-Root VOR dem
+# add_subdirectory als Directory-Include setzen — vererbt sich in den gesamten
+# ce-Teilbaum und stellt Standalone-Paritaet her. Gleiche Pfad-Konvention wie
+# 02_messung_driver/CMakeLists.txt (COMDARE_V32-Include ..._cache_engine_external/generated).
+include_directories("${CMAKE_BINARY_DIR}/_cache_engine_external/generated")
 add_subdirectory(${COMDARE_CACHE_ENGINE_DIR}
                  ${CMAKE_BINARY_DIR}/_cache_engine_external
                  EXCLUDE_FROM_ALL)
