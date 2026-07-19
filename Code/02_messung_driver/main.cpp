@@ -329,14 +329,16 @@ int main(int argc, char* argv[]) {
     }
 
     // INC-G+H (C.2+C.3): der OFFIZIELLE XML-getriebene execute_messreihe-Weg NUR bei explizitem Opt-in (Muster
-    // COMDARE_RUN_E4_XML). COMDARE_RUN_V32_EXPERIMENT = Pfad der comdare_experiment-XML; optional
-    // COMDARE_V32_EXPERIMENT_MODE = defined|full|full_sampled (Default defined). Doppelt gegatet (s. Include
-    // oben) -> im messung_driver-Default-Build praeprozessor-entfernt (byte-identisch, kein neuer Mess-Pfad).
+    // COMDARE_RUN_E4_XML). COMDARE_RUN_V32_EXPERIMENT = Pfad der comdare_experiment-XML. PL-4 (L6, 2026-07-19):
+    // die Mode-Quelle ist die XML SELBST (<metadata><mode> = defined|full|full_sampled, single-XML-Doktrin);
+    // COMDARE_V32_EXPERIMENT_MODE ist NUR noch expliziter Debug-Override und wird beim abweichenden Greifen in
+    // der Antriebs-Schicht LAUT geloggt (vorher ersetzte der env die XML still = L6-Bruch). Doppelt gegatet (s.
+    // Include oben) -> im messung_driver-Default-Build praeprozessor-entfernt (byte-identisch, kein neuer Mess-Pfad).
 #if defined(COMDARE_V32_DRIVER_ENABLE) && defined(COMDARE_MEASUREMENT_ON)
     if (std::string const xp = env_trimmed("COMDARE_RUN_V32_EXPERIMENT"); !xp.empty()) {
-        std::string mode = env_trimmed("COMDARE_V32_EXPERIMENT_MODE");
-        if (mode.empty()) { mode = "defined"; }
-        return comdare::diplomarbeit::messung_driver::v32::antrieb::execute_messreihe(xp, mode);
+        // Leerer Override -> <metadata><mode> der XML gilt (leer/unbekannt faellt im Antrieb sicher auf Defined).
+        return comdare::diplomarbeit::messung_driver::v32::antrieb::execute_messreihe(
+            xp, env_trimmed("COMDARE_V32_EXPERIMENT_MODE"));
     }
 #endif
 
