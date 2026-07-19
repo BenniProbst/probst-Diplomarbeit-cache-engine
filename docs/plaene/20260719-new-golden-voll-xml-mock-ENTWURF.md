@@ -18,6 +18,12 @@
 > **Doktrin-Anker:** binary_id = NUR die 17 Organ-Achsen (ABI-6, kV3AxisCount=17); System-/Mess-Achsen = Sidecar,
 > NIE binary_id. golden-320 = TABU-Snapshot; golden-N = 2^17 = 131.072 all-vary. Referenz (lazy Count) ≠
 > materialisierter Bau-Katalog (bleibt 320). NUR EIN offizielles XML-Programm.
+>
+> **KONSOLIDIERUNGS-VERMERK §30 (2026-07-19):** Die ZUKUNFT-`system_axes`-Sektion adressiert die **CEB-Stufe**
+> (System-Achsen); die Mess-Sektionen (`measurement_categories`/`runtime_dynamic`/`compile_dims`-workloads/
+> `datasets`/`working_set_sweep`/`repetitions`) adressieren die **PLANER-Stufe** (Mess-Achsen-Permutation wandert
+> per §30 in den Planer). Faerbungs-Zuordnung je XML-Sektion als Tabelle: siehe
+> „## KONSOLIDIERUNG §30 (2026-07-19)" am Dokumentende.
 
 ---
 
@@ -383,3 +389,35 @@ opt-in/gestaffelt (~409× golden-320; CI-Gruen = Messung AUS).
   Bauplan-Option 1 (faithful all-vary). Zwischen 320 und 2^17 existiert keine reine All-Vary-Kartesik.
 - System-Achsen (ZUKUNFT-Block) multiplizieren NUR die Bau-Matrix (Sidecar, max 16-fach, ISA-gegated), NIE N —
   binary_id bleibt exakt die 17-Organ-Kartesik.
+
+---
+
+## KONSOLIDIERUNG §30 (2026-07-19) — Faerbungs-Zuordnung je XML-Sektion (Stufen-Adressierung)
+
+> Quelle: Ledger §30 (Planer=MESS · CEB=SYSTEM · Tier=ORGAN [+Hybrid]; EIN AxisKind-gefaerbter Gesamt-B+-Baum,
+> je Achsen-Art zerlegbar und je Stufe permutiert). ADDITIV — der Mock oben bleibt unveraendert; diese Tabelle
+> ordnet jede XML-Sektion ihrer Faerbung (Traeger `AxisKind{organ, system_measurement, system_config}`,
+> `topics/axis.hpp:17-20`) und damit ihrer Ketten-Stufe zu.
+
+| XML-Sektion (Mock) | Faerbung (AxisKind) | Stufe der Binary-Kette |
+|---|---|---|
+| `permute_axes` (17×2) · `axis_sweeps` · `modes`/active_axes · `static_axes` · `base_tiers` (Lebewesen) | **organ** | St.3 Tier-Binaries (bilden binary_id) |
+| `key_value_signature` | organ (CT-Codegen-Material) | St.3 Tier (monomorpher Typsatz) |
+| ZUKUNFT `system_axes` (compiler family/opt_level · extension_hardware/simd · target_isa · scheduling) | **system_config** | St.2 CEB (Bau-Matrix/Sidecar `build_version`; NIE binary_id, NIE N) — CEB wird vom Planer je Messsystem HART kompiliert |
+| `measurement_categories` (16) | **system_measurement** | St.1 PLANER (Spalten-Projektion des Messsystems) |
+| `runtime_dynamic` (thread_count, hw_prefetcher = DynamicDims) | **system_measurement** | St.1 PLANER |
+| `compile_dims`/workloads (YCSB) + `datasets` (Akten/Loader) | **system_measurement** (Workload-Achse/Material der Mess-Registry, §28) | St.1 PLANER |
+| `working_set_sweep` · `repetitions` | **system_measurement** (Sweep-/Wiederholungs-Dimension) | St.1 PLANER |
+| `compile_dims`/telemetry | system_measurement (Sidecar H-10) | St.1 PLANER |
+| `run_options` (cap/build_version/resume) | Steuerung (keine Achse) | St.1 PLANER-Steuerung |
+| `sota_series_set` merge= · ZUKUNFT `phases`/MergeStrategy | Organ-**JOIN-Modi** (Stufe1_CeOnly/Stufe2_PrueflingReplace/Stufe3_FullJoin — JETZT; System-/Mess-Join deprioritisiert-getrackt) | St.1 Planer ordnet an, St.3 vollzieht (Merge im Tier-Typsatz) |
+| ZUKUNFT `output` | Ketten-/Provenienz-Ziel | St.4 Auswertung (Kettenende) |
+
+Ergaenzend: (1) Der optionale **HYBRID-Einschub St.3b** (CEB-generierte Heuristik-Hybrid-Tier-Binaries, rekursive
+Delegation, nach Abgabe) hat bewusst KEINE eigene XML-Sektion — er entsteht aus der Mess-Auswertung.
+**NACHTRAG §31: „nach Abgabe" REVIDIERT — Hybrid = ABGABE-PFLICHT vor 28.07.; die Aussage „keine eigene
+XML-Sektion, entsteht aus der Mess-Auswertung" bleibt unveraendert gueltig.** (2) Die
+**§30-Mess-Modi** (Steuerbefehle je Achse ODER per Gesamtexperiment: enumerierte Range oder benannte
+Algorithmus-Listen, permutiert) sind die kuenftige R5-Syntax UEBER diesen Sektionen (Resolver-STUFE-Dokument,
+KONSOLIDIERUNG §30 dort). (3) Die DREI Achsen-Art-Registries (§28) speisen die Stufen 1:1: Mess-Registry→Planer ·
+System-Registry→CEB · Organ-Registry(+prt)→Tier.

@@ -11,6 +11,7 @@
 - Resolver laeuft Planer-/Configure-Zeit (compile-time-Doktrin, kein Runtime-Switch im Hot-Path, KEIN Python im Buildchain).
 - Nur benannte Patterns (GoF/MOF/PoEAA); musterlos verboten.
 - 2 Registry-Bibliotheken je Engine: `cache_engine_axis_registry.xml` + `prt_art_axis_registry.xml` (`feedback_unified_experiment_xml_plus_system_registry_xml`); Registry-Pfade per CMake-Interface statisch (`feedback_ceb_config_cmake_interface_static_registry_paths_prt_module`).
+  > **KONSOLIDIERUNGS-VERMERK §28/§30 (2026-07-19):** Der 2-je-Engine-Schnitt ist ÜBERHOLT — DREI Achsen-Art-Registries je Modul (Organ/System/Mess), 1:1 auf die Kettenstufen gemappt (Mess→Planer, System→CEB, Organ→Tier). Siehe „## KONSOLIDIERUNG §30 (2026-07-19)" am Dokumentende.
 - Organ-Achsen → `binary_id`; System-/Mess-Achsen NIE `binary_id` (`feedback_system_axes_measurement_own_abstract_root_blood`, Q2 Option C).
 - Unregistriertes Element = harter, klassifizierter Validierungsfehler (Fehlerklassen-Doktrin, kein stilles Verhalten; `feedback_fehlerklassen_pflicht_alle_achsen_unterachsen_algorithmen`).
 - Haupt-Achse CT-statisch, Unter-Achse runtime, stufen-relativ (`feedback_haupt_achse_static_unter_achse_runtime_chain_ct_wiring`).
@@ -77,6 +78,8 @@
 > Basis: IST (§2) + Bauplan (Phase-0-Blocker: super-Reconcile `Code/02_messung_driver/v32_messreihe_antrieb.hpp` — `execute_messreihe`-Stub WIEDERVERWENDEN, keinen dritten Enumerations-Walk daneben). Doktrin: KEINE Parallelstruktur — alle Erweiterungen docken an `validate_profile.hpp` + `xml_config_parser.hpp` + die beiden bestehenden Registry-Generatoren an. Kein Python, kein Runtime-Switch im Hot-Path, nur benannte Patterns.
 
 ### 3.A Angebots-Schema v2 — je Registry-Bibliothek
+
+> **KONSOLIDIERUNGS-VERMERK §28/§30 (2026-07-19):** Die unten als KATEGORIE 2 (system_config) und KATEGORIE 3 (system_measurement) in EINER Datei gezeigten Blöcke wandern in ZWEI eigene Registry-Dateien in ihren Modulen (System-Registry im measurement-Modul, Mess-Registry im Mess-Modul); Elemente/Schema bleiben identisch. Siehe „## KONSOLIDIERUNG §30 (2026-07-19)" am Dokumentende.
 
 #### A.1 Prinzip
 
@@ -454,6 +457,7 @@ Die drei primaeren Forks dieser Stufe:
 
 - **FORK R1 — Single-Source der Registry:** Option 1 = Code=Wahrheit, Registry GENERIERT (Generatoren ausbauen, Nebenwahrheiten in Reflektion ziehen — golden-K aus `golden_320_catalog`, prt-Slot-Tabelle, `algo_version`-Concept, per-K-Reflektion) — **EMPFEHLUNG**. Option 2 = Registry=Hand-Wahrheit + CI-Diff-Guard — dokumentiert abgelehnt (§3.A.3: XML kann CT-Typen nicht erzwingen; Hand-Pflege driftet nachweislich — die committete XML IST stale). **GO noetig.** **[KORREKTUR K6 — Sequenz-Klarstellung, damit der Fork nicht faktisch vorweg entschieden wird]:** I0/M2 und §3.E sind vollstaendig Option-1-konditioniert (Generator-Ausbau); bei R1=Option 2 entfiele I0 in dieser Form. Deshalb: R1-GO ist VOR I0-Baubeginn einzuholen — AUSNAHME ist nur der akute M1-Commit-Verbund (K1), der unter BEIDEN Optionen identisch noetig ist (Pipeline-Reparatur, kein Options-Vorgriff).
 - **FORK R5 — Range-Syntax-Umfang:** (a) MINIMAL: `<values>` (diskret, ⊆ options) + `<range min max scale="pow2|linear"/>` — deckt N-Sweep, prefetch_distance, repetitions ab — **EMPFEHLUNG** (jede Erweiterung bleibt additiv moeglich); (b) ERWEITERT: zusaetzlich `step`-Ausdruecke, arithmetische Ausdruecke, zusammengesetzte/abhaengige Ranges (Interpreter-Grammatik waechst deutlich; Naehe zum „mini-Interpreter"-Bild der Direktive, aber gegen YAGNI/Deadline). **GO noetig.**
+  > **KONSOLIDIERUNGS-VERMERK §30 (2026-07-19):** R5 = XML-Traeger der §30-Mess-Modi (Steuerbefehle je Achse ODER per Gesamtexperiment; enumerierte Range oder benannte Algorithmus-Listen, permutiert). Siehe „## KONSOLIDIERUNG §30 (2026-07-19)" am Dokumentende.
 - **FORK R6 — Schema-v2-Fenster:** (a) v1 bleibt UNBEFRISTET lesbar, wird nur als deprecated markiert; Abschaltung erst mit eigenem, spaeterem GO — **EMPFEHLUNG** (Doku/Formate-nie-loeschen-Doktrin, kein Flag-Day); (b) hartes Fenster: v1-Leser wird nach vollzogener golden-N-Migration (alle committeten Profile auf v2 gepinnt) entfernt. **GO noetig.**
 
 Weitere Design-Forks (aus §3, ebenfalls GO-pflichtig):
@@ -483,3 +487,15 @@ Harte Gegenpruefung aller Andockpunkte/Behauptungen gegen den Live-Code. Bestand
 - **K4 (§3.C.4):** `execute_messreihe` v32_messreihe_antrieb.hpp:259 ist KEIN Stub (voll implementierte INC-G+H-Kette, INERT); der return-0-Stub liegt in `v32_orchestrator.hpp:92` — Reconcile = Input-Umstellung, kein Neuschreiben.
 - **K5 (§3.B.2):** Anwender-Syntax fuer ACHSEN-Ebenen-Unter-Achsen ergaenzt (Regel 6) — ohne sie waere der §27-VOLLE Unter-Achsen-Support fuer node_width/cacheline/alloc_hw nicht anzeigbar.
 - **K6 (§5 R1):** I0/M2 sind Option-1-konditioniert; R1-GO vor I0-Baubeginn (Ausnahme: akuter M1-Verbund, options-neutral).
+
+---
+
+## KONSOLIDIERUNG §30 (2026-07-19) — DREI Registries je Achsen-Art + Stufen-Mapping + R5=Mess-Modi
+
+> Quellen: Ledger §28 (DREI Achsen-Art-Registries je Modul) + §30 (Achsen-Art-Stufen-Zuordnung der Binary-Kette) + §29.6-Fold-Auflage. ADDITIV zu §1–§6; wo §2/§3 den 2-je-Engine-Schnitt beschreiben, gilt dieser Abschnitt.
+
+1. **Schnitt korrigiert — DREI-je-Achsen-Art statt 2-je-Engine:** (1) **Organ-Registry**: `cache_engine_axis_registry.xml` (ce-Achsen-Modul) + `prt_art_axis_registry.xml` (Organ-Angebot des Prüflings); (2) **System-Registry** NEU im measurement-/System-Achsen-Modul (die 6/7 CEB-System-Achsen mit Unter-Achsen opt_level/Flags/Commands/simd/march/target); (3) **Mess-Registry** NEU im Mess-Modul (16 Kategorien, Kollektoren, DynamicDims, Workload-Achse). Das v2-ANGEBOTS-Schema (§3.A) bleibt inhaltlich unverändert; die dort als KATEGORIE 2/3 in EINER Datei gezeigten Blöcke werden eigene Registry-Dateien in ihren Modulen (Elemente identisch; Registry-Pfade weiterhin statisch per CMake-Interface — je neue Registry ein eigenes Define analog `COMDARE_CE_AXIS_REGISTRY_PATH`). `read_axis_registry`/Repository werden auf 3(+prt) Bibliotheken erweitert — weiterhin KEIN zweiter Parser; der Resolver linkt die Anwender-XML gegen ALLE drei Angebote.
+2. **Stufen-Mapping (elegante 1:1-Abbildung §28↔§30):** **Mess-Registry→PLANER** (Mess-Achsen-Permutation wandert von der CEB in den Planer; Planer bestimmt das Messsystem und kompiliert HART ein effizientes CEB je Messsystem) · **System-Registry→CEB** (kompiliert Tier-Binaries) · **Organ-Registry(+prt)→TIER-Binaries**. Jede Stufe konsumiert ihre art-eigene Angebots-Bibliothek; der Resolver linkt stufen-gerecht.
+3. **Bauplan-Fork A damit VERSCHÄRFT ENTSCHIEDEN:** die CEB ist eine vom Planer GENERIERTE+kompilierte Binary je Messsystem (Kette = 3–4 top-down generierte Binaries + optionaler Hybrid-Einschub). Die §4.1-Punkt-8-Aussage („Resolver von der CEB-.so-Grenzfrage unabhängig") bleibt sachlich wahr — der Fork selbst ist aber nicht mehr offen.
+4. **R5 = §30-Mess-Modi:** die Range-Syntax IST die XML-Repräsentation der „Mess-Modi des Systems": Steuerbefehle **je Achse ODER per Gesamtexperiment**, die eine **enumerierte Range oder bestimmte Algorithmus-Bezeichnungen je Achse** auflisten und **permutiert durchtesten**. Die R5-Empfehlung (a) MINIMAL bleibt; ZUSÄTZLICH braucht das Anwender-Schema den Gesamtexperiment-Geltungsbereich (globaler Steuerbefehl neben per-Achse/per-Phase; additiv, Zwei-Schichten-.pom-analog — Gesamtexperiment-Schicht analog `axes_default_lookup`).
+5. **Gesamtbaum-Bezug:** der `LinkedExperimentPlan` bleibt der Vertrags-Input — künftig stufen-zerlegt entlang des AxisKind-gefärbten Gesamtbaums (EIN B+-Baum, Färbung `AxisKind{organ, system_measurement, system_config}`, Zerlegung je Achsen-Art; s. Bauplan-KONSOLIDIERUNG §30 Punkt 6).

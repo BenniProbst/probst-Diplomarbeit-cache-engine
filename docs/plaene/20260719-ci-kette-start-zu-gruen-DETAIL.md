@@ -50,6 +50,8 @@ Die gesamte Pipeline ist HAND-maintained; der geplante `CiYamlBuilder` (Planer-I
 
 ## Stufe 1 — PLANER (comdare-messung-driver: XML-Parse → Validierung → Projektion → Baum) — **[TEILWEISE]**
 
+> **KONSOLIDIERUNG §30 (2026-07-19):** St.1 Planer = **MESS-Achsen** (`system_measurement`); der Planer bestimmt das Messsystem und kompiliert künftig HART ein effizientes CEB je Messsystem. Siehe „## KONSOLIDIERUNG §30 (2026-07-19)" am Dokumentende.
+
 Programm: `comdare-messung-driver` (super `Code/02_messung_driver/main.cpp`), gebaut in `measure:smoke`/`measure:golden-320` mit `-DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release` (`.gitlab-ci.yml:491-493` / `:572-574`).
 
 ### 1.1 --validate-Preflight — [FERTIG]
@@ -91,6 +93,8 @@ Es existiert KEIN Director-Typ, kein `IPlanBuilder`, kein `comdare_experiment_pl
 
 ## Stufe 2 — CEB (System-Achsen-Bestückung → provision_all → Storage-B-Push) — **[TEILWEISE]** (Kern FERTIG, Vertrag+Infra offen)
 
+> **KONSOLIDIERUNG §30 (2026-07-19):** St.2 CEB = **SYSTEM-Achsen** (`system_config`); künftig vom Planer GENERIERTE+kompilierte Binary je Messsystem (Fork A verschärft entschieden). Siehe Abschnitt am Dokumentende.
+
 ### 2.1 System-Achsen-Bestückung (WAS/WIE-Injektion) — [FERTIG als Closure]
 - `profile_run_facade.cpp:494` `run_experiment_profile_facade`: (1) `validate_experiment_profile_facade` `:500` (Preflight in-Prozess wiederholt) → (2) Experiment-XML für `<workloads>` parsen `:508-517` (0 gültige Lastprofile ⇒ Abbruch exit 4, Achse 2 nie still leer) → (4) der EINE Compile-Injektionspunkt: `compile_for_perm`-Fabrik `:560-568` (Closure über include_dirs/defines/cxx/link_libs/fno_gnu_unique → je Perm `make_gpp_compile_fn(…, opt_flag, march)`), `algo_sig` aus `compose_algo_signature` + Achsen-Versions-Tabelle `:574-576`, Fallback-Einzel-CompileFn (CEB-Default **O3**, Ruling 2026-07-18, `:254/:579`).
 - Thesis-Weg analog: `run_profile_facade` `:317` — EIN `make_gpp_compile_fn` `:365` + `system_axes_version_suffix()` `:293` (`+cxx=+opt=+ext=`) in `build_version` `:381`.
@@ -124,6 +128,8 @@ Es existiert KEIN Director-Typ, kein `IPlanBuilder`, kein `comdare_experiment_pl
 ---
 
 ## Stufe 3 — TIER (dlopen → Dock → Zwei-Phasen-Messung → result.csv+Stamp) — **[FERTIG]** (additive Reste offen)
+
+> **KONSOLIDIERUNG §30 (2026-07-19):** St.3 Tier = **ORGAN-Achsen** (17, binary_id); optionaler Einschub **St.3b HYBRID** (CEB-generierte Heuristik-Hybrid-Tier-Binaries, rekursive Delegation, nach Abgabe). Siehe Abschnitt am Dokumentende. **NACHTRAG §31: „nach Abgabe" REVIDIERT — St.3b HYBRID = ABGABE-PFLICHT vor 28.07.**
 
 Host-Treiber: `run_lazy_static_then_dynamic` (`CE/libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:694`) — verdrahtet die volle Lazy-Kette.
 
@@ -227,8 +233,26 @@ Host-Treiber: `run_lazy_static_then_dynamic` (`CE/libs/cache_engine/builder/expe
 
 **Stufe 0:** K-16 (ce allow_failure vs hart-grün) · K-4/L5 (build-i2 stale + Include-Root, läuft nicht in CI) · PL-1/I3 (CI hand-maintained, kein CiYamlBuilder) · M13/#276 (ISA-/Distro-Matrix, bewusst zuletzt).
 **Stufe 1:** PL-1 (Planer-Kopf: Director + 2 ConcreteBuilder + Executable + Vertragsgrenze — größtes Einzel-Loch der Kette) · PL-0 (v32-Skelett-Reconcile) · K-1 (Organ-only-Guard in profile_to_tree) · PL-3 (CoR unverdrahtet, resolve_selection=NEU) · PL-4 (`<metadata><mode>` nie konsumiert) · PL-5/PL-6 (XML-Kanal-Konvergenz; 4/6 System-Achsen ohne Kanal) · PL-7/PL-9 (Schema/repeats-Gate) · GN-3 (golden-N-XML nicht gedockt).
-**Stufe 2:** PL-2 (CebSystemAxisDrive statt Closure) · GN-1 (extension_hardware-Knoten) · GN-2 (Instanziierungs-Guard) · GN-5 (reflect_versions-Test) · K-9 (ToolchainFehlt-Emitter) · Fork A (CEB-.so-Grenze, GO offen) · ST-2/ST-3/ST-4 (Storage-Infra P1–P6 + Scharfschaltung + VLAN-Klärung).
+**Stufe 2:** PL-2 (CebSystemAxisDrive statt Closure) · GN-1 (extension_hardware-Knoten) · GN-2 (Instanziierungs-Guard) · GN-5 (reflect_versions-Test) · K-9 (ToolchainFehlt-Emitter) · Fork A (CEB-.so-Grenze, GO offen) · ST-2/ST-3/ST-4 (Storage-Infra P1–P6 + Scharfschaltung + VLAN-Klärung). *KORREKTUR §30: „Fork A … GO offen" ist ÜBERHOLT — Fork A ist VERSCHÄRFT ENTSCHIEDEN (CEB = vom Planer GENERIERTE+kompilierte Binary je Messsystem); offen bleibt nur die SEQUENZIERUNG (Vertragsform zuerst, echte Generierung danach) als Fork-C-Schnittfrage.*
 **Stufe 3:** PL-11 (error.log-Sidecar) · PL-14 (Multi-Gattungs-Dispatch/V42) · PL-8 (mode/threads-Kanal) · K-2 (sizeof-static_assert) · K-5 (ABI-Spiegel 5→6, Daten-korrektheitsrelevant) · K-6 (host_compatible_with nutzen) · K-10 (SampleStatus-Vollsplit) · K-17 (A07-Segfault) · M-12 (PMC branch/IPC).
 **Stufe 4:** M-3 (erster persist-Beweis) · M-4 (17-Achsen-Nachzug 04/05/08 — blockiert seg_attribution, VOR Lauf-Auswertung) · M-5 (bilinguales PDF + TeXLive-Gate) · M-6 (Kettenende: Copy-Back + thesis:pdf hinter measure) · M-7..M-11 (Haupt-Text-Einbindung, Sensitivität, Kurven-Writer, FF-Antworten) · M-15 (Welch-Stufe) · K-12 (CI-„16 .tex"-Kommentar) · ST-5 (Persistenz-Politik).
 
 *Additiv; ersetzt weder Bauplan noch Roadmap — es materialisiert deren CI-Sicht als eine Start→Grün-Kette.*
+
+---
+
+## KONSOLIDIERUNG §30 (2026-07-19) — Achsen-Art-Zuordnung der Stufen
+
+> Quelle: Ledger §30 (autoritativ, revidiert frühere Zuordnungen). Die Stufen-Beschreibungen oben sind der IST (Stufen 1–3 laufen heute in-Prozess im Driver); §30 macht daraus **3–4 top-down sequentiell GENERIERTE Binaries** in EINER Kette. Zuordnung:
+
+| CI-Stufe | Binary (§30-Ziel) | Achsen-Art (§30) | Registry (§28) |
+|---|---|---|---|
+| **St.1 PLANER** | Planer-Binary (heute `comdare-messung-driver`; künftig `comdare_experiment_planner`) | **MESS-Achsen** (`system_measurement`: 16 Kategorien, Kollektoren, DynamicDims, Workload) — Mess-Achsen-Permutation wandert von der CEB in den Planer; Planer bestimmt das Messsystem und kompiliert HART ein effizientes CEB je Messsystem | Mess-Registry (NEU, Mess-Modul) |
+| **St.2 CEB** | vom Planer GENERIERTE+kompilierte CEB-Binary je Messsystem (Fork A verschärft entschieden; heute in-Prozess `provision_all`) | **SYSTEM-Achsen** (`system_config`: compiler/opt/simd/target_isa/scheduling/load) — kompiliert Tier-Binaries | System-Registry (NEU, measurement-Modul) |
+| **St.3 TIER** | Tier-.so (AnatomyModuleLoader/IPruefDock) | **ORGAN-Achsen** (17, bilden binary_id) | Organ-Registry ce + prt |
+| **opt. St.3b HYBRID** | weitere generierte Binary: Heuristik-Hybrid-Tier aus der Mess-Auswertung; entwickelt/lädt echte Tier-Binaries delegiert durch CEB (rekursive Delegation) | Heuristik über allen 3 Arten; ~~späteres Increment NACH Abgabe~~ **NACHTRAG §31: ABGABE-PFLICHT vor 28.07. (User-Revision)** | — |
+| St.0 / St.4 | Rahmen (Start/Lint/Orchestrate bzw. Auswertung/Persist) | keine Achsen-Art; St.4 konsumiert die Mess-Matrix der Planer-Stufe | — |
+
+Ergänzend: EIN AxisKind-gefärbter Gesamt-B+-Baum wird je Achsen-Art zerlegt und je Stufe permutiert (lazy gestaffelt); Join-Modi: Organ-Join per Prüfling (Stufe1/2/3-MergeStrategy) JETZT in St.3, System-/Mess-Join deprioritisiert-getrackt (Roadmap PL-21).
+
+**NACHTRAG §31 (2026-07-19, User-Antworten):** (a) St.3b HYBRID = **ABGABE-PFLICHT vor 28.07.** (revidiert „nach Abgabe"; Roadmap PL-20 in den Vor-Deadline-Scope). (b) **Storage-Stufen-Zuordnung:** CI-Cache (dev-MinIO `minio.comdare.local`) hält NUR die Planer-Binary (statisch gebaut, Kopf); prod-MinIO (`https://minio.prod.comdare.de`, Bucket `cache-engine-tier-binaries`) hält ALLE dynamisch GENERIERTEN Folge-Stufen-Binaries (CEB je Messsystem + Tier + Hybrid) + deren Systemaufstellungen (Sidecars/Provenienz) — Ebene B erweitert von „Tier-Binaries" auf „alle generierten Folge-Stufen".
