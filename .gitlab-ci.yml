@@ -470,6 +470,7 @@ thesis:pdf:
 
 measure:smoke:
   stage: measure
+  interruptible: false              # INC-G6/Ledger-34: mehrstuendiger Mess-Lauf NIE auto-cancelbar (Belt-and-Suspenders zu auto_cancel=disabled)
   tags: [prod, baremetal, amd]
   timeout: 12h                      # Smoke: Stunden statt Tage (Dossier B.4.3 ~14,5k Zellen)
   variables:
@@ -545,6 +546,7 @@ measure:smoke:
 #    Job-KERN (rules/script/artifacts) ist UNVERAENDERT.
 measure:golden-320:
   stage: measure
+  interruptible: false              # INC-G6/Ledger-34: mehrtaegiger Mess-Lauf NIE auto-cancelbar (Belt-and-Suspenders zu auto_cancel=disabled)
   tags: [prod, baremetal, amd]
   timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
   variables:
@@ -637,6 +639,7 @@ measure:golden-320:
 #    echten N-Satz-Bau; bis dahin ist der --validate-Pre-Flight der ausfuehrbare Beweis-Schritt.
 build:golden-n:
   stage: measure
+  interruptible: false              # INC-G6/Ledger-34: der N-Bau (Stufe 2) darf NIE auto-cancelt werden (Belt-and-Suspenders zu auto_cancel=disabled)
   tags: [prod, baremetal, amd]
   timeout: 2h                       # nur Bau von comdare-messung-driver + --validate (kein Messlauf) — Minuten..Stunden
   variables:
@@ -666,7 +669,43 @@ build:golden-n:
       echo "== §33 Pre-Flight OK: das N-Voll-Konfig-Profil validiert gegen die EnabledStrategies (17x2 Organ) + System-Achsen (opt O0..O3/Ofast-REJECT, simd) =="
       echo "== FIXME INC-G6: die VOLLE 2^17-DLL-Materialisierung ist GO-pflichtig/gestaffelt (GN-2-Guard) und NICHT Teil dieses Jobs; =="
       echo "   der Systembeweis-Anker bleibt der Compile-Time-Guard static_assert(...==131072) + CRC64 0xF1C1F26A1232073B in der ce-Test-Suite."
-      echo "=== build:golden-n OK (§33 Pre-Flight-Beweis erbracht; kein Messlauf, kein Drop, golden-neutral) ==="
+      echo "=== build:golden-n Stufe 1 OK (§33 Pre-Flight-Beweis erbracht; kein Messlauf, kein Drop, golden-neutral) ==="
+    # -- Stufe 2 (INC-G6, opt-in COMDARE_BUILD_GOLDEN_N_RANGE="start:count"): der gestaffelte CHUNK-BAU des N-Fensters.
+    #    INERT ohne die Var (der Gesamtlauf setzt sie NIE -> byte-neutral, golden-neutral). Solange die ce-
+    #    Materialisierungs-Naht (lazy Per-Index-Adhoc-Emitter + Chunk-Fenster + provision-only) NOCH NICHT gebaut ist
+    #    (GO-pflichtig; der GN-2-Guard sperrt die map-materialisierende Naht compile-time), meldet Stufe 2 die
+    #    fehlende Voraussetzung HART und baut NICHTS -- KEIN Fake-DLL, kein Erfolgs-Haken ohne reale Materialisierung
+    #    (Anti-Phantom, no_success_marks_without_literal_output). Bauplan + reale-Umschaltung:
+    #    docs/plaene/20260719-inc-g6-materialisierung-BAUPLAN.md (Abschnitt 1+6+7). Sobald die ce-Naht landet, ersetzt
+    #    der reale Treiber-Aufruf diesen Melde-Block: comdare-messung-driver experiment_config <out> mit
+    #    COMDARE_THESIS_PROFILE=$COMDARE_GOLDEN_N_PROFILE + COMDARE_GOLDEN_N_RANGE=$COMDARE_BUILD_GOLDEN_N_RANGE +
+    #    COMDARE_GOLDEN_N_PROVISION_ONLY=true, danach der GN-9-Groessen-Report je Chunk, dann Storage-Push (Ebene B)
+    #    nur bei COMDARE_STORAGE_CACHE=true (!reference [.storage_cache_activation, script]).
+    - |
+      set -euo pipefail
+      if [ -z "${COMDARE_BUILD_GOLDEN_N_RANGE:-}" ]; then
+        echo "== Stufe 2 (Chunk-Bau) INERT: COMDARE_BUILD_GOLDEN_N_RANGE ungesetzt -> nur Stufe-1-Pre-Flight, golden-neutral =="
+        exit 0
+      fi
+      RANGE="$COMDARE_BUILD_GOLDEN_N_RANGE"
+      START="${RANGE%%:*}"; CNT="${RANGE##*:}"
+      case "$RANGE" in
+        *:*) : ;;
+        *) echo "COMDARE_BUILD_GOLDEN_N_RANGE ungueltig (erwartet start:count): '$RANGE'"; exit 1 ;;
+      esac
+      case "$START" in ''|*[!0-9]*) echo "COMDARE_BUILD_GOLDEN_N_RANGE start nicht numerisch: '$RANGE'"; exit 1 ;; esac
+      case "$CNT" in ''|*[!0-9]*) echo "COMDARE_BUILD_GOLDEN_N_RANGE count nicht numerisch: '$RANGE'"; exit 1 ;; esac
+      echo "== Stufe 2 (INC-G6 Chunk-Bau) angefragt: Fenster [$START:$CNT) ueber den 131072-Indexraum =="
+      echo "   INTENDIERT (nach ce-Naht): provision-only (Bau ohne Messung) je Chunk, dann GN-9-Groessen-Report:"
+      echo "     dlls=\$(find <dll_dir> -name perm.dll | wc -l); bytes=\$(find <dll_dir> -name perm.dll -printf '%s\\n' | awk '{s+=\$1} END{print s+0}')"
+      echo "     extrapolation_131072 = bytes/dlls*131072  (GN-9-Bloat-Deckel je Chunk, LITERAL geloggt)"
+      echo "   Storage-Push Ebene B nur bei COMDARE_STORAGE_CACHE=true (mc-Alias, Objekt-Key an build_version gekoppelt)."
+      echo "== VORAUSSETZUNG FEHLT (GO-pflichtig): die ce-Materialisierungs-Naht (lazy Per-Index-Adhoc-Emitter +"
+      echo "   Chunk-Fenster COMDARE_GOLDEN_N_RANGE + provision-only) ist NOCH NICHT gebaut. Der GN-2-Guard"
+      echo "   (source_catalog.hpp: kMaxMaterializableCatalogCardinality=4096) sperrt die map-materialisierende Naht"
+      echo "   compile-time; der lazy Emitter (BAUPLAN Abschnitt 1) muss sie DANEBEN ersetzen. Kein Chunk-Bau ausgefuehrt."
+      echo "== Siehe docs/plaene/20260719-inc-g6-materialisierung-BAUPLAN.md (Abschnitt 1+6). =="
+      exit 3
 
 # ── Stage persist (#22, User 2026-07-11, Ledger §0-DoD-6/§11-G): die Auswertungs-Dokumente EINES Laufs additiv
 #    nach measurement/<YYYYMMDD-HHMMSS-p{pipeline}>/ im super-Root sammeln + per commit+MERGE+push nach
