@@ -469,6 +469,32 @@ thesis:pdf:
         echo "== Storage #51 INERT (COMDARE_STORAGE_CACHE != true) -> from_env() No-Op, golden byte-neutral =="
       fi
 
+# ── P11-Lehre (W9.6): Mess-Pre-Flight — HARTER Abbruch, wenn ein FREMDER comdare-messung-driver auf dem Runner
+#    laeuft. Die 1-Thread-Mess-Doktrin verlangt Allein-Belegung (ein paralleler Driver verfaelscht die Streuung).
+#    Laeuft VOR dem eigenen Driver-Start -> jeder gefundene Driver ist fremd; zusaetzlich wird die eigene
+#    Prozessgruppe ausgeschlossen. Nur in die 2 Mess-Jobs !reference'd. (resource_group liefert das Cross-Pipeline-
+#    Lock; dieser pgrep-Schritt faengt zusaetzlich prozess-ebene Kollisionen auf demselben Node ab.)
+.measurement_preflight_no_foreign_driver:
+  script:
+    - |
+      # comm ist auf 15 Zeichen gekuerzt -> Muster 'comdare-messung' statt des vollen 22-Zeichen-Namens.
+      if command -v pgrep >/dev/null 2>&1; then
+        _mypgid=$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')
+        _foreign=""
+        for _p in $(pgrep comdare-messung 2>/dev/null || true); do
+          _ppgid=$(ps -o pgid= -p "$_p" 2>/dev/null | tr -d ' ')
+          [ "$_ppgid" = "$_mypgid" ] || _foreign="$_foreign $_p"
+        done
+        if [ -n "$_foreign" ]; then
+          echo "MESSFEHLER-VERMEIDUNG (P11): fremder comdare-messung-driver laeuft bereits (PID(s):$_foreign) -> HARTER ABBRUCH."
+          echo "  Die 1-Thread-Mess-Doktrin verlangt Allein-Belegung des Runners; erst den fremden Lauf beenden."
+          exit 1
+        fi
+        echo "== Pre-Flight P11 OK: kein fremder comdare-messung-driver aktiv (nur eigene Prozessgruppe) =="
+      else
+        echo "== Pre-Flight P11: pgrep fehlt im Runner-Image -> Prozess-Kollisionsschutz uebersprungen =="
+      fi
+
 measure:smoke:
   stage: measure
   interruptible: false              # INC-G6/Ledger-34: mehrstuendiger Mess-Lauf NIE auto-cancelbar (Belt-and-Suspenders zu auto_cancel=disabled)
@@ -495,6 +521,7 @@ measure:smoke:
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
     - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
+    - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
     - |
       set -euo pipefail
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
@@ -578,6 +605,7 @@ measure:golden-320:
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
     - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
+    - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
     - |
       set -euo pipefail
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
@@ -667,7 +695,8 @@ measure:golden-320:
   #   Planer baut multiple CEBs je Messsystem). Der mc-stat-Dedup bleibt die ZWEITE Schicht (historische Builds/
   #   Cache-Hits); resource_group verhindert den Live-Race zwischen gleichzeitigen Runnern (Ein-Runner-eine-Concurrency).
   resource_group: "gn-$GN_MSYS-$GN_SIMD-$GN_OPT-$GN_CHUNK"
-  timeout: 2h                       # Bau von comdare-messung-driver + --validate + Chunk-Bau-Naht je Zelle (kein Messlauf)
+  timeout: 30h                      # VOLL-Matrix-Zelle: ~20min Driver-Build + ~8h Chunk-Bau (32768 DLLs, W6-parallel) + Batch-Push
+                                    # + Puffer fuer O3/avx512-Zellen. (2h-Pilot-Wert killte die 11509-Zellen — Session-Fund 19.07.)
   variables:
     GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
     COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
