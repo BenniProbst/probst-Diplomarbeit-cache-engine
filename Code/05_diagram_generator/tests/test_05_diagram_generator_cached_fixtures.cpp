@@ -293,8 +293,8 @@ TEST(Stufe05Pipeline, ParseWideCsvSegColumns) {
     EXPECT_TRUE(rows[0].has_seg_run_total);
     EXPECT_TRUE(rows[0].has_seg_coverage);
     EXPECT_DOUBLE_EQ(rows[0].seg_run_total_ns, static_cast<double>(10 * kSegTriangleSum));
-    EXPECT_DOUBLE_EQ(rows[0].seg_ns[0], 10.0);                                             // seg_search_algo_ns
-    EXPECT_DOUBLE_EQ(rows[0].seg_ns[kSegN - 1], static_cast<double>(10 * kSegN));          // seg_framework_ns
+    EXPECT_DOUBLE_EQ(rows[0].seg_ns[0], 10.0);                                    // seg_search_algo_ns
+    EXPECT_DOUBLE_EQ(rows[0].seg_ns[kSegN - 1], static_cast<double>(10 * kSegN)); // seg_framework_ns
     // n/a-Zeile (letzte): seg_search_algo_ns="n/a" → has_seg_ns=false (n-a-tolerant, KEIN Parse-Fehler).
     EXPECT_FALSE(rows[4].has_seg_ns);
     std::error_code ec;

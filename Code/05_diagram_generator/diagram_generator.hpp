@@ -212,7 +212,7 @@ namespace segment_columns_detail {
 // Compile-time-Speicher fuer EINEN gejointen Spaltennamen "seg_" + kCompositionAxisNames[I] + "_ns".
 template <std::size_t I>
 struct SegColumnName {
-    static constexpr std::string_view kAxis = ::comdare::cache_engine::builder::experiment::kCompositionAxisNames[I];
+    static constexpr std::string_view kAxis   = ::comdare::cache_engine::builder::experiment::kCompositionAxisNames[I];
     static constexpr auto             kJoined = [] {
         constexpr std::string_view                                     prefix = "seg_";
         constexpr std::string_view                                     suffix = "_ns";
