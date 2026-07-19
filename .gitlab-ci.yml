@@ -614,6 +614,60 @@ measure:golden-320:
     when: always
     expire_in: 12 weeks
 
+# ── Stage measure — GN-3 / §33 (User 2026-07-19): der INERTE CI-BAU-BEWEIS-Job des NEW-GOLDEN-Systembeweises.
+#    §33-Doktrin: golden-320 ist KEIN legitimer Systembeweis (13 von 17 Achsen gepinnt); NUR der new-golden-Satz
+#    unter VOLL-Konfiguration (all_axes_golden.profile.xml: ALLE 17 Achsen je 2 Auspraegungen, N=2^17=131072, PLUS
+#    <system_axes> opt O2/O3 x simd no_extension/avx2) beweist das System. Dieser Job faehrt den auf der CI
+#    ausfuehrbaren PRE-FLIGHT-Beweis-Schritt: comdare-messung-driver --validate gegen das VOLL-Konfig-Profil ->
+#    das N-XML parst + validiert HART gegen die realen EnabledStrategies (17x2 Organ-Werte) UND die
+#    System-Achsen-Klassen (opt O0..O3 zulaessig / Ofast REJECT gemaess §32-F4, simd gegen die SimdSubAxis-Optionen).
+#    Das ist der auf der CI ausfuehrbare Teil der F2-Aufbau-Doktrin ("System gegen die CI mit dem new-golden-Satz
+#    aufbauen"). tags [prod,baremetal,amd] = PMC-Node prod1 (wie die measure-Jobs).
+#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_BUILD_GOLDEN_N=="true" gesetzt ist —
+#    der Gesamtlauf (Messung/Bau AUS) baut ihn also NIE. KEIN Messlauf, KEIN Storage-Drop -> golden-neutral.
+#
+#    FIXME (INC-G6, Materialisierungs-Increment — GO-pflichtig, NICHT golden-neutral, NICHT in diesem Job): die
+#    VOLLE Materialisierung des 2^17-DLL-Katalogs ("System aufbauen" im Wortsinn) steht noch aus. Sie ist bewusst
+#    NICHT Teil dieses Jobs, weil 131072 materialisierte Quell-TUs ein GB-Compile / g++-ICE waeren — der GN-2-Guard
+#    (source_catalog.hpp: negativer Instanziierungs-Guard an der Katalog-Naht) sperrt die materialisierende Naht
+#    compile-time. Der Systembeweis-ANKER ist heute der COMPILE-TIME-Beweis in der ce-Test-Suite:
+#    static_assert(catalog_axis_product<FullSourceCatalog>() == 131072) + CRC64 kNewGolden131072Crc64 =
+#    0xF1C1F26A1232073B (source_catalog.hpp) + test_reflect_versions_all17. Sobald INC-G6 gebaut ist
+#    (gestaffelte/Storage-gated Materialisierung + provision-only-Treiber-Pfad), erweitert er DIESEN Job um den
+#    echten N-Satz-Bau; bis dahin ist der --validate-Pre-Flight der ausfuehrbare Beweis-Schritt.
+build:golden-n:
+  stage: measure
+  tags: [prod, baremetal, amd]
+  timeout: 2h                       # nur Bau von comdare-messung-driver + --validate (kein Messlauf) — Minuten..Stunden
+  variables:
+    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
+    COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
+  needs: ["verify:submodules"]
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Bau-Beweis
+      when: never
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # INERT: nur bei explizitem Opt-in
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    # Kein -DCOMDARE_ENABLE_PMC / kein Measurement-ON noetig: dies ist ein BAU-/VALIDIER-Beweis, kein Messlauf.
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
+    - cmake --build build --target comdare-messung-driver
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      test -f "$COMDARE_GOLDEN_N_PROFILE" || { echo "NEW-GOLDEN-Voll-Konfig-Profil fehlt: $COMDARE_GOLDEN_N_PROFILE"; exit 1; }
+      echo "== §33 Systembeweis Pre-Flight (--validate, rein lesend, KEIN Bau von DLLs, KEINE Messung) =="
+      echo "   PROFIL=$COMDARE_GOLDEN_N_PROFILE"
+      echo "   (alle 17 Achsen je 2 Auspraegungen = 2^17 = 131072 + <system_axes> opt O2/O3 x simd no_extension/avx2)"
+      "$DRIVER" --validate "$COMDARE_GOLDEN_N_PROFILE" || { echo "NEW-GOLDEN-Voll-Konfig-Validierung fehlgeschlagen -> Systembeweis NICHT erbracht"; exit 1; }
+      echo "== §33 Pre-Flight OK: das N-Voll-Konfig-Profil validiert gegen die EnabledStrategies (17x2 Organ) + System-Achsen (opt O0..O3/Ofast-REJECT, simd) =="
+      echo "== FIXME INC-G6: die VOLLE 2^17-DLL-Materialisierung ist GO-pflichtig/gestaffelt (GN-2-Guard) und NICHT Teil dieses Jobs; =="
+      echo "   der Systembeweis-Anker bleibt der Compile-Time-Guard static_assert(...==131072) + CRC64 0xF1C1F26A1232073B in der ce-Test-Suite."
+      echo "=== build:golden-n OK (§33 Pre-Flight-Beweis erbracht; kein Messlauf, kein Drop, golden-neutral) ==="
+
 # ── Stage persist (#22, User 2026-07-11, Ledger §0-DoD-6/§11-G): die Auswertungs-Dokumente EINES Laufs additiv
 #    nach measurement/<YYYYMMDD-HHMMSS-p{pipeline}>/ im super-Root sammeln + per commit+MERGE+push nach
 #    development ZURUECKSCHREIBEN — sonst gehen die Mess-Ergebnisse am Pipeline-Ende verloren.
