@@ -705,7 +705,12 @@ measure:golden-320:
     COMDARE_GN_CHUNK_COUNT: "4"            # Zahl der Chunk-Fenster je System-Permutation (== len(GN_CHUNK) in der Matrix)
     # -- Dedup-Key (Ledger §35.2/§35.3): GN_PREFIX = perm_build_version = <base>+cxx=<cxx>+opt=<opt>[+ext=<simd>]. --
     COMDARE_GN_BUILD_VERSION_BASE: "m3v2"  # experiment_run_entry.hpp:61 default; ueberschreibbar
-    COMDARE_GN_COMPILER_TAG: ""            # = a.compiler_tag des Treibers (z.B. "gcc-15.3"); leer -> Pull compiler-agnostisch (nur Marker, kein DLL-Pull)
+    # W11 (Ledger §43.c): MUSS == a.compiler_tag des Treibers = cxx_compiler() = COMDARE_CXX bzw. GccCompilerAxis::
+    #   driver_default()=="g++-16" (profile_run_facade.cpp). Nur dann stimmt der Pull-PREFIX (traegt +cxx=) mit dem
+    #   Push-Objekt-Key ueberein -> der per-DLL-Pull (skip+pull / Teil-Resume) greift. Leer war die 'Pull compiler-
+    #   agnostisch'-Luecke (PREFIX ohne +cxx= != Push-Key mit +cxx=). Bei abweichendem COMDARE_CXX hier nachziehen.
+    COMDARE_GN_COMPILER_TAG: "g++-16"
+    COMDARE_GN_PART_SIZE: "1024"           # W11 (§43.c): Teil-Marker nach je N gepushten DLLs (Cluster-Resume-Granularitaet)
     # -- Messsystem-Konfiguration (Ledger §36.2/§30: ein Planer baut multiple CEBs je Messsystem). Heute 1 Default-Zelle;
     #    weitere Messsysteme = weiterer GN_MSYS-Wert in den Matrizen (multipliziert die System-Permutations-Zellen). --
     GN_MSYS: "default"                     # Matrix-Default; je Zelle ueberschrieben (fliesst in resource_group + Treiber-Env)
@@ -755,18 +760,31 @@ measure:golden-320:
         echo "[dedup] No-Op-Zelle (kein Range) -> nichts zu deduplizieren"
       else
         MARKER="prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done"
+        # W11 (§43.c): Pull-Ziel = die Treiber-dll_dir <out>/e4_xml/dll (dorthin schaut dll_is_current: output_dir/<stem>/
+        #   perm.dll). Frueher wurde nach gn_out/<PREFIX>/ gepullt -> der Treiber fand die DLLs NIE (Pfad-Mismatch,
+        #   Resume-Luecke). Der Objekt-Key <PREFIX>/<stem>/perm.dll landet so unter <out>/e4_xml/dll/<stem>/perm.dll.
+        PULL_DST="$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}/e4_xml/dll"
+        MARK_PREFIX="prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/"
         if mc stat "$MARKER" >/dev/null 2>&1; then
           echo "[dedup] HIT: $GN_PREFIX Chunk $GN_RANGE bereits im Cluster gebaut -> SKIP (bereits im Cluster gebaut) + PULL (Warm-Cache)"
           if [ -n "$CXX" ]; then
-            mkdir -p "$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}"
-            mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/" "$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}/" 2>&1 | tail -8 \
+            mkdir -p "$PULL_DST"
+            mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/" "$PULL_DST/" 2>&1 | tail -8 \
               || echo "[dedup] Pull-Teilfehler -> Bau-Naht faellt auf Neubau zurueck (Treiber-dll_is_current bleibt Invalidierer)"
           else
             echo "[dedup] COMDARE_GN_COMPILER_TAG leer -> DLL-Pull uebersprungen (PREFIX compiler-agnostisch, DLL-Key traegt +cxx=); Marker-Skip genuegt"
           fi
           export GN_DECISION="skip"
+        elif [ -n "$CXX" ] && mc ls "$MARK_PREFIX" 2>/dev/null | grep -q "${GN_RANGE//:/-}\.part"; then
+          # W11 (§43.c) TEIL-RESUME: kein Whole-Chunk-Marker, aber TEIL-Marker vorhanden (ein Vorlauf brach ab).
+          #   Die bereits gepushten DLLs dieses PREFIX in die Treiber-dll_dir hydrieren -> dll_is_current ueberspringt
+          #   sie, NUR die fehlenden werden neu gebaut (Cluster-Resume). GN_DECISION bleibt "build" (Stufe 2 baut weiter).
+          echo "[dedup] TEIL-RESUME: Teil-Marker fuer $GN_PREFIX Chunk $GN_RANGE gefunden -> pulle bereits gepushte DLLs (nur Fehlende werden gebaut)"
+          mkdir -p "$PULL_DST"
+          mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/" "$PULL_DST/" 2>&1 | tail -8 \
+            || echo "[dedup] Teil-Pull-Teilfehler -> dll_is_current baut die fehlenden neu (kein Abbruch)"
         else
-          echo "[dedup] MISS: $GN_PREFIX Chunk $GN_RANGE noch nicht im Cluster -> Bau (danach Marker + Push, s. Stufe 2)"
+          echo "[dedup] MISS: $GN_PREFIX Chunk $GN_RANGE noch nicht im Cluster (kein Whole-/Teil-Marker) -> Bau (danach Marker + Push, s. Stufe 2)"
         fi
       fi
     - |

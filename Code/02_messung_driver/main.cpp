@@ -687,6 +687,14 @@ int main(int argc, char* argv[]) {
                 auto const      artifact_cache = std::make_shared<at::ArtifactCache>(at::ArtifactCache::from_env());
                 at::CachePushFn cache_push;
                 at::MeasurementSinkFn measurement_sink;
+                // W11 (Ledger §43.c): der BAU-Modus Teil-Marker-Sink + Intervall. Nach je COMDARE_GN_PART_SIZE (Default
+                // 1024) gepushten DLLs legt der async Push-Pump einen Teil-Marker <build_version>/_gn_chunk_markers/
+                // <range>.part<k>.done in den Store (Cluster-Resume bei Job-Abbruch). Der range = COMDARE_GOLDEN_N_RANGE
+                // (byte-exakt zur YAML-Marke ${GN_RANGE//:/-}, im ArtifactCache ':' -> '-'). Leer/inert => No-Op.
+                at::PartialMarkerFn partial_marker_sink;
+                std::size_t         chunk_part_size = 1024; // Default; COMDARE_GN_PART_SIZE ueberschreibt
+                if (auto ps = parse_size_env_strict("COMDARE_GN_PART_SIZE")) chunk_part_size = *ps;
+                std::string const gn_range_raw = env_trimmed("COMDARE_GOLDEN_N_RANGE");
                 if (!artifact_cache->inert()) {
                     cache_push = [artifact_cache](std::filesystem::path const& bin_dir, std::string const& bv) {
                         artifact_cache->push_tier_binary(bin_dir, bv);
@@ -694,9 +702,17 @@ int main(int argc, char* argv[]) {
                     measurement_sink = [artifact_cache](std::filesystem::path const& file, std::string const& dest) {
                         artifact_cache->sink_measurement(file, dest);
                     };
+                    // Teil-Marker nur, wenn ein Chunk-Fenster gesetzt ist (golden-N-Bau) -- sonst waere der range-Key
+                    // sinnlos. Die range wird in der Closure gekapselt (Sink-Signatur = (build_version, part_index)).
+                    if (!gn_range_raw.empty())
+                        partial_marker_sink = [artifact_cache, gn_range_raw](std::string const& bv, std::size_t part) {
+                            artifact_cache->push_chunk_partial_marker(bv, gn_range_raw, part);
+                        };
                     std::cout << "[E4] Storage #51 aktiv: minio=" << (artifact_cache->minio_enabled() ? "1" : "0")
                               << " measure-drop=" << (artifact_cache->drop_enabled() ? "1" : "0")
-                              << " lauf-baum=" << artifact_cache->run_stamp() << "\n";
+                              << " lauf-baum=" << artifact_cache->run_stamp()
+                              << " teil-marker=" << (partial_marker_sink ? "an" : "aus")
+                              << " part_size=" << chunk_part_size << " (W11 §43.c)\n";
                 }
 
                 // Bruecke-I4 (2026-07-16): der E4-Run-Block deckt — wie der --validate-Zweig (S0/FORK-4) — BEIDE
@@ -741,8 +757,10 @@ int main(int argc, char* argv[]) {
                         std::cout << "[E4] W6 Bau-Pool: COMDARE_BUILD_PARALLEL=" << *bp
                                   << " parallele Compile-Worker (Messen bleibt 1-Thread)\n";
                     }
-                    xa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
-                    xa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
+                    xa.cache_push          = cache_push;          // Storage #51 (No-Op-Default => byte-neutral)
+                    xa.measurement_sink    = measurement_sink;    // Storage #51 (No-Op-Default => byte-neutral)
+                    xa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
+                    xa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
                     // W5-C+ (§36.1 Zellen-Locking): GN-Zellen-Filter — SPIEGEL zum run_profile-Zweig. Leer = kein
                     // Filter = Ist-Verhalten (byte-neutral). Wirkt am opt×simd-Walk in run_experiment_profile.
                     xa.gn_cell_opt  = env_trimmed("COMDARE_GN_OPT");
@@ -821,8 +839,10 @@ int main(int argc, char* argv[]) {
                         std::cout << "[E4] W6 Bau-Pool: COMDARE_BUILD_PARALLEL=" << *bp
                                   << " parallele Compile-Worker (Messen bleibt 1-Thread)\n";
                     }
-                    pa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
-                    pa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.cache_push          = cache_push;          // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.measurement_sink    = measurement_sink;    // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
+                    pa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
 
                     std::cout << "[E4] XML-Lauf via run_profile-Fassade: profile=" << thesis_profile << " -> "
                               << pa.out_csv.string() << "\n";
