@@ -6,6 +6,16 @@
 //
 // V31.F-Code in main.cpp bleibt unveraendert (Memory-Direktive).
 // V32-Orchestrator wird in main.cpp ueber COMDARE_V32_ENABLE Compile-Flag aktiviert.
+//
+// ── PL-0 PHASE-0-RECONCILE (2026-07-19) — PRAEZISIERUNG ─────────────────────────────────────────────────
+// DIESER Header ist der SURROGAT-Strang (Roadmap 20260719 PL-0; Ledger §29-Praezisierung (a) + §30-
+// Stufen-Zuordnung Planer=Mess / CEB=System / Tier=Organ). execute_messreihe HIER
+// (V32Orchestrator::execute_messreihe, unten) ist der return-0-Stub (Skelett-Kompatibilitaet fuer
+// Alt-Tests) — NICHT die reale Kette. Die VOLL implementierte INC-G+H-Kette lebt in
+// v32_messreihe_antrieb.hpp (antrieb::execute_messreihe; INERT via main.cpp-Opt-in) und WIRD als
+// Planer-Phasen-Walk-Substrat wiederverwendet. Diesen Stub NICHT fuellen, NICHT neu schreiben,
+// KEIN dritter Walk daneben (Bauplan 20260719 Phase-0-Blocker/Kritik 1). Das Fork-A-Ruling 2026-07-16
+// (Surrogat nie im Mess-Pfad; [[deprecated]]-Aliase unten) gilt fuer diese Klasse unveraendert fort.
 
 #include "cache_engine/abi/cache_engine_execution_engine_adapter.hpp"
 #include "cache_engine/builder/commands/auto_permutator.hpp"
@@ -88,7 +98,9 @@ public:
         // direkt im run_default_lookup_messreihe() konstruiert + parallel ausgefuehrt.
     }
 
-    /// V32.GG.1 Skelett-Kompatibilitaet (existierende Tests)
+    /// V32.GG.1 Skelett-Kompatibilitaet (existierende Tests) — PL-0 (2026-07-19): DER return-0-Stub
+    /// (Ledger §29 (a)); die reale INC-G+H-Kette ist antrieb::execute_messreihe (v32_messreihe_antrieb.hpp).
+    /// Bewusst leer LASSEN: Phase 0 stellt den Input der realen Kette um, sie fuellt NICHT diesen Stub.
     int execute_messreihe(std::string_view config_xml, std::string_view mode = "defined") {
         (void)config_xml;
         (void)mode;

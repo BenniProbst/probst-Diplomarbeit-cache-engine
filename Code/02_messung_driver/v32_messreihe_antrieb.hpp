@@ -1,6 +1,19 @@
 #pragma once
-// DEPRECATED-BY-DESIGN (Fork A, User 2026-07-16): Parallel-Antrieb wird durch die CEB-Bruecke ersetzt
-// (3-Phasen-XML -> offizieller E4/CEB/DLL-Pfad -> 16-col-CSV); INC-A..E bleiben gueltig; NICHT weiterentwickeln.
+// ── PL-0 PHASE-0-RECONCILE (2026-07-19) — DEPRECATION-STAND FORTGESCHRIEBEN ─────────────────────────────
+// REAKTIVIERT ALS OFFIZIELLES SKELETT des Planer-Phasen-Walks (Roadmap 20260719 PL-0; Ledger §29-
+// Praezisierung (a) + §30-Stufen-Zuordnung Planer=Mess / CEB=System / Tier=Organ): execute_messreihe
+// (unten in diesem Header) ist die VOLL implementierte INC-G+H-Kette (parse -> validate -> Phasen-
+// Strategy -> Katalog-Treiber -> CSV/TikZ) — INERT via main.cpp-Opt-in (COMDARE_RUN_V32_EXPERIMENT,
+// doppelt gegatet, s. INERT-Block unten). Der return-0-Stub liegt NICHT hier, sondern in
+// v32_orchestrator.hpp (V32Orchestrator::execute_messreihe). Phase 0 = Input-Umstellung unter
+// WIEDERVERWENDUNG dieses Skeletts (PhaseStrategyFor + execute_messreihe als Planer-Phasen-Walk-
+// Substrat) — NICHT neu schreiben, KEIN dritter Walk daneben (Bauplan 20260719 Phase-0-Blocker/
+// Kritik 1; feedback_vor_aufgaben_erst_projektstruktur_analyse).
+//
+// Historisches Ruling (Fork A, User 2026-07-16 — fortgeschrieben, nicht geloescht): Parallel-Antrieb wird
+// durch die CEB-Bruecke ersetzt (3-Phasen-XML -> offizieller E4/CEB/DLL-Pfad -> 16-col-CSV); INC-A..E
+// bleiben gueltig. Das "NICHT weiterentwickeln" gilt FORT fuer den Surrogat-Strang (v32_orchestrator.hpp);
+// fuer DIESES Skelett gilt seit PL-0: als Phase-0-Substrat andocken statt eine dritte Engine bauen.
 //
 // INC-G (C.2) + INC-H (C.3), 2026-07-14 -- v32_messreihe_antrieb: die W4-Gate-konforme Verdrahtung von
 // execute_messreihe. Der EINE offizielle XML-getriebene Weg fuer das comdare_experiment-Profil:
@@ -30,8 +43,9 @@
 // ── INERT ────────────────────────────────────────────────────────────────────────────────────────────────
 // Dieser Header hat KEINEN Konsumenten im Default-Build. Er wird NUR unter COMDARE_V32_DRIVER_ENABLE +
 // COMDARE_MEASUREMENT_ON kompiliert (der abi_adapter-Guard fordert MEASUREMENT, damit der
-// SearchAlgorithmAbiAdapter ein IObservableTier traegt). v32_orchestrator.hpp bleibt BYTE-UNBERUEHRT
-// (execute_messreihe dort ist weiterhin return-0-Stub) -> Default-Build byte-identisch, golden-320 unveraendert.
+// SearchAlgorithmAbiAdapter ein IObservableTier traegt). v32_orchestrator.hpp behaelt seinen return-0-Stub
+// (execute_messreihe dort; die PL-0-Banner-Fortschreibung 2026-07-19 dort ist KOMMENTAR-ONLY) -> Default-
+// Build verhaltensidentisch, golden-320 unveraendert.
 //
 // @pattern GoF-Strategy (INC-E PhaseStrategyFor) + Policy-Based Design (PhaseCompositions<S>, compile-time) +
 //   GoF-Object-Adapter (INC-F KatalogTierEngineCallable) + Command (ExecuteEngineCommand/CompareEngineCommand).
@@ -256,7 +270,10 @@ inline void drive_phase(MessreiheReport& report, cx::ExperimentPhase const& phas
 ///   0 = ok · 2 = parse-Fehler · 3 = validate-Fehler · 4 = leerer Report · 5 = Export-Fehler.
 /// registry_dir wird leer gelassen (rein strukturelle Validierung); der volle Registry-Abgleich (4)+(5) ist
 /// Sache der Fassade, die das Registry-Verzeichnis kennt (analog test_experiment_parser::make_registry_dir).
-[[nodiscard]] inline int execute_messreihe(std::string_view config_xml, std::string_view mode = "defined") {
+/// PL-4 (L6, 2026-07-19): <metadata><mode> der Experiment-XML ist die AUTORITATIVE Mode-Quelle (single-
+/// XML-Doktrin). mode_override ist NUR noch expliziter Debug-Override (leer = XML gilt); greift er
+/// abweichend, wird das LAUT geloggt — nie still (der L6-Bruch war: env ersetzte die XML still).
+[[nodiscard]] inline int execute_messreihe(std::string_view config_xml, std::string_view mode_override = {}) {
     cx::XmlConfigParser const parser;
     auto const                profile = parser.parse_experiment_profile(std::filesystem::path{std::string{config_xml}});
     if (!profile) {
@@ -271,7 +288,16 @@ inline void drive_phase(MessreiheReport& report, cx::ExperimentPhase const& phas
         return 3;
     }
 
-    MessreiheReport const report = run_experiment_profile(*profile, parse_enumeration_mode(mode));
+    // PL-4: Mode-Quelle = XML <metadata><mode>; leer/unbekannt faellt in parse_enumeration_mode sicher auf
+    // Defined zurueck. Ein abweichender expliziter Override wird LAUT geloggt (nie stiller XML-Bypass).
+    std::string effective_mode = profile->metadata.mode;
+    if (!mode_override.empty() && mode_override != profile->metadata.mode) {
+        std::cout << "[PL-4] mode-Override AKTIV: XML <metadata><mode>='" << profile->metadata.mode
+                  << "' -> expliziter Override '" << mode_override << "' (geloggt, nie still).\n";
+        effective_mode = std::string{mode_override};
+    }
+
+    MessreiheReport const report = run_experiment_profile(*profile, parse_enumeration_mode(effective_mode));
     if (report.outcomes.empty()) {
         std::cerr << "[INC-G] leerer MessreiheReport (keine Permutation getrieben).\n";
         return 4;
