@@ -22,15 +22,10 @@ namespace {
     return s.str();
 }
 
-// P4 (2026-07-12): die 20 Stapel-Segment-Spaltennamen in EXAKTER Stapel-/Header-Reihenfolge — 19 Organ-Achsen
-// (single-source = kCompositionAxisNames aus axis_path_serialization.hpp:30-34) + seg_framework_ns an Index 19.
-// Die Legende leitet die Anzeigenamen deterministisch durch Strippen von "seg_"/"_ns" ab (keine zweite Liste → keine Drift).
-constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount> kSegmentColumns = {
-    "seg_search_algo_ns", "seg_cache_traversal_ns",    "seg_mapping_ns",     "seg_path_compression_ns",
-    "seg_node_type_ns",   "seg_memory_layout_ns",      "seg_allocator_ns",   "seg_prefetch_ns",
-    "seg_concurrency_ns", "seg_serialization_ns",      "seg_telemetry_ns",   "seg_value_handle_ns",
-    "seg_isa_ns",         "seg_index_organization_ns", "seg_io_dispatch_ns", "seg_migration_policy_ns",
-    "seg_filter_ns",      "seg_queuing_q1_ns",         "seg_queuing_q2_ns",  "seg_framework_ns"};
+// P4 (2026-07-12) / M-4 (2026-07-19): die Stapel-Segment-Spaltennamen kommen aus dem Header
+// (kSegmentColumns, diagram_generator.hpp) — dort zur Uebersetzungszeit aus der CE-Single-Source
+// kCompositionAxisNames gepraegt. Die fruehere lokale 20er-Literal-Liste (inkl. seg_telemetry_ns/
+// seg_isa_ns) ist getilgt: sie driftete gegen die 17-Achsen-WIDE-CSV (B16, seg_attribution nie erzeugt).
 
 // Anzeigename eines Segments = Spaltenname ohne "seg_"-Präfix und "_ns"-Suffix (deterministisch, ein Ort).
 [[nodiscard]] std::string segment_label(std::string_view column) {
@@ -534,9 +529,9 @@ int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementR
                 } catch (std::exception const&) { /* n/a */
                 }
             }
-            // P4 (2026-07-12): die 20 Stapel-Segmente (19 Organ-Achsen kCompositionAxisNames + seg_framework_ns) +
-            // seg_run_total_ns. OPTIONAL/header-getrieben (NICHT in required[] → cowfix-v1 bricht nicht). n-a-tolerant:
-            // fehlt EINE der 20 Spalten ODER ist EINE Zelle leer/"n/a"/nicht-numerisch → has_seg_ns bleibt false (Zeile
+            // P4 (2026-07-12): die kSegmentCount Stapel-Segmente (17 Organ-Achsen kCompositionAxisNames +
+            // seg_framework_ns) + seg_run_total_ns. OPTIONAL/header-getrieben (NICHT in required[] → cowfix-v1 bricht
+            // nicht). n-a-tolerant: fehlt EINE Spalte ODER ist EINE Zelle leer/"n/a"/nicht-numerisch → has_seg_ns bleibt false (Zeile
             // wird bei der Attribution honest übersprungen, NICHT 0-gestapelt). Der stod-Wurf wird LOKAL geschluckt
             // (NICHT an die äußere catch weitergereicht), damit eine n/a-Zelle keinen ganzen Parse-Fehler auslöst.
             {
@@ -780,10 +775,10 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
 // P4 (2026-07-12) — Per-Achsen-Latenz-Attribution als GESTAPELTE Balken
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// KERN-SEMANTIK (erforscht+an echten Daten verifiziert): die 20 Stapel-Segmente sind kommensurabel mit
-// seg_run_total_ns (dem eigenen Wall-Clock des 19-Segment-Laufs run_workload_segmented), NICHT mit total_ns
-// (Real-Workload → 3–29× daneben). Beleg cache_engine_builder_iterator.hpp:205-214,327-329:
-// Σ(19 Organ-seg + seg_framework_ns) == seg_run_total_ns EXAKT (seg_coverage ≈ 1.0). Daher ist das
+// KERN-SEMANTIK (erforscht+an echten Daten verifiziert): die kSegmentCount Stapel-Segmente sind kommensurabel
+// mit seg_run_total_ns (dem eigenen Wall-Clock des Segment-Laufs run_workload_segmented), NICHT mit total_ns
+// (Real-Workload → 3–29× daneben). Beleg cache_engine_builder_iterator.hpp:248-257,395-401:
+// Σ(17 Organ-seg + seg_framework_ns) == seg_run_total_ns EXAKT (seg_coverage ≈ 1.0). Daher ist das
 // 100%-Ganze je Balken = seg_run_total_ns; gegen total_ns zu stapeln wäre PHANTOM (verboten).
 
 SegmentAttribution aggregate_segment_attribution(std::span<WideMeasurementRow const> rows) {
@@ -829,7 +824,7 @@ SegmentAttribution aggregate_segment_attribution(std::span<WideMeasurementRow co
             agg.means[s].push_back(m);
             total += m;
         }
-        agg.group_totals.push_back(total); // == Mittel seg_run_total_ns (Σ 20 seg je Zeile = seg_run_total)
+        agg.group_totals.push_back(total); // == Mittel seg_run_total_ns (Σ aller seg je Zeile = seg_run_total)
         agg.run_total_means.push_back(a.run_total_sum * inv);
         agg.coverage_means.push_back(a.cov_sum * inv);
     }
@@ -838,7 +833,7 @@ SegmentAttribution aggregate_segment_attribution(std::span<WideMeasurementRow co
 
 namespace {
 
-// Deterministische kategoriale Palette: 20 Farben aus dem HSV-Farbkreis (gleichmäßig verteilter Hue,
+// Deterministische kategoriale Palette: kSegmentCount Farben aus dem HSV-Farbkreis (gleichmäßig verteilter Hue,
 // S=0.62). Selbst-enthaltend (KEIN colorbrewer-/xcolor-Zusatzpaket → F-EXTRA-5-konform). Der Wert V
 // alterniert 0.90/0.70 je Index → benachbarte Stapel-Schichten trennen sich zusätzlich in der Helligkeit
 // (kleine Segmente bleiben lesbar; zusätzlich zeichnet jeder Balken einen dünnen Rand).
@@ -891,12 +886,13 @@ int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std:
                                  : "per-axis latency attribution (ns, segment run)";
 
     f << "% AUTO-GENERATED durch diagram_generator (P4, Per-Achsen-Latenz-Attribution, ybar stacked)\n";
-    f << "% Ganzes je Balken = seg_run_total_ns (Wall-Clock des 19-Segment-Laufs), NICHT total_ns (inkommensurabel,\n";
-    f << "% 3-29x daneben). Σ der 20 Segmente == seg_run_total_ns (seg_coverage~1). 19 Organ-Achsen + framework.\n";
+    f << "% Ganzes je Balken = seg_run_total_ns (Wall-Clock des Segment-Laufs), NICHT total_ns (inkommensurabel,\n";
+    f << "% 3-29x daneben). Σ der " << WideMeasurementRow::kSegmentCount
+      << " Segmente == seg_run_total_ns (seg_coverage~1). 17 Organ-Achsen + framework.\n";
     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
     open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";
-    // 20 deterministische Kategorienfarben je Segment definieren (Stapel-Reihenfolge = kSegmentColumns).
+    // kSegmentCount deterministische Kategorienfarben je Segment definieren (Stapel-Reihenfolge = kSegmentColumns).
     for (std::size_t s = 0; s < WideMeasurementRow::kSegmentCount; ++s) {
         double const hue = 360.0 * static_cast<double>(s) / static_cast<double>(WideMeasurementRow::kSegmentCount);
         double const val = (s % 2 == 0) ? 0.90 : 0.70;
@@ -918,7 +914,7 @@ int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std:
     f << "},\n";
     f << "    xtick=data,\n";
     f << "    x tick label style={font=\\small},\n";
-    // 20-Eintrags-Legende AUSSERHALB rechts (tiny), damit sie den Plot nicht ueberdeckt.
+    // Per-Segment-Legende (kSegmentCount Eintraege) AUSSERHALB rechts (tiny), damit sie den Plot nicht ueberdeckt.
     f << "    legend style={at={(1.03,1)},anchor=north west,font=\\tiny,legend cell align=left},\n";
     f << "    reverse legend,\n"; // Legende von oben (letztes Stapel-Segment) nach unten lesbar zum Balken passend
     f << "]\n";
@@ -1202,7 +1198,7 @@ int write_axis_observer_detail_table(std::filesystem::path const&               
                 a.size() > best_axis.size())
                 best_axis = a;
         if (!best_axis.empty()) return {best_axis, std::string{rest.substr(best_axis.size() + 1)}};
-        // Defensiver Fallback (Achse nicht im binary_id-Tupel — bei vollständigem 19-Achsen-binary_id nie): am
+        // Defensiver Fallback (Achse nicht im binary_id-Tupel — bei vollständigem 17-Achsen-binary_id nie): am
         // letzten '_' trennen, damit die Zeile ehrlich mit ihrem Roh-Namen erscheint statt verloren zu gehen.
         auto const last = rest.rfind('_');
         if (last == std::string_view::npos) return {std::string{rest}, std::string{}};

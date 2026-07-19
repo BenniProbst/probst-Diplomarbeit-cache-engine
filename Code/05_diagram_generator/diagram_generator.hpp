@@ -18,12 +18,21 @@
 
 #include "csv_to_latex.hpp" // INC-4: c2l::WideFullRow (trägt den durchgereichten stat_<achse>_<feld>-Block)
 
+// M-4/B16 (2026-07-19): CE-Single-Source der Achsen-Zaehlung und -Namen (17 Organ-Achsen, ABI-6/INC-2d).
+// KEINE eigenen Zaehl-Literale mehr: das fruehere kSegmentCount=20 (19 Organ + framework, inkl. der nach
+// INC-2c/INC-2d ausgezogenen seg_telemetry_ns/seg_isa_ns) liess has_seg_ns gegen die 17-Achsen-WIDE-CSV
+// dauerhaft false werden -> seg_attribution.tex wurde NIE erzeugt.
+#include "anatomy/observable_tier.hpp"                         // kV3AxisCount = 17 (die EINE Zaehl-Quelle)
+#include "builder/experiment_tree/axis_path_serialization.hpp" // kCompositionAxisNames (Namen + Reihenfolge)
+
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace comdare::da::diagram_generator {
@@ -136,14 +145,14 @@ struct CsvRow {
 //
 // Das Mess-System (cache-engine run_lazy_150 / lazy_csv_header) emittiert das
 // (run_lazy_150 geloescht 2026-07-11; Emitter heute Code/02_messung_driver, WIDE-Schema)
-// ';'-getrennte WIDE-Schema (154 Spalten). Der Parser ist HEADER-GETRIEBEN (Spalten
-// per Name aufgelöst, Reihenfolge-/Breite-agnostisch → robust gegen additive
-// Schema-Erweiterungen); 1:1 portiert aus 04_csv_to_latex/csv_to_latex.cpp:158-201.
+// ';'-getrennte WIDE-Schema (Spaltenzahl header-getrieben, nicht fixiert). Der Parser ist
+// HEADER-GETRIEBEN (Spalten per Name aufgelöst, Reihenfolge-/Breite-agnostisch → robust gegen
+// additive Schema-Erweiterungen); 1:1 portiert aus 04_csv_to_latex/csv_to_latex.cpp:158-201.
 // Extrahiert werden nur die L-c-auswertungs-relevanten Felder (ns_per_op-Gesamt +
 // die 5 Interface-Funktions-p50: insert/lookup/erase/scan/rmw).
 
 struct WideMeasurementRow {
-    std::string binary_id;              // volle statische Rekombination (19 Achsen-Belegungen)
+    std::string binary_id;              // volle statische Rekombination (17 Achsen-Belegungen)
     std::string search_algo;            // aus binary_id extrahiert (führendes "search_algo=<wert>/")
     std::string workload;               // Lastprofil-id (eigene Spalte "workload")
     double      ns_per_op        = 0.0; // Gesamt-Latenz (alle Operationen gemischt)
@@ -172,19 +181,66 @@ struct WideMeasurementRow {
     bool          has_working_set_n = false; // true ⇔ working_set_n-Spalte vorhanden und nicht-leer
     double        seg_coverage      = 0.0;   // Σseg_ns/run_total (Mess-Validität); 0 falls Spalte fehlt
     bool          has_seg_coverage  = false;
-    // P4 (2026-07-12) — die 20 Stapel-Segmente der Per-Achsen-Latenz-Attribution: 19 Organ-Achsen
-    // (Reihenfolge = kCompositionAxisNames: search_algo..queuing_q2) + seg_framework_ns an Index 19.
-    // Kommensurabel mit seg_run_total_ns (dem eigenen Wall-Clock des 19-Segment-Laufs run_workload_segmented),
-    // NICHT mit total_ns (Real-Workload → 3–29× daneben). Beleg: cache_engine_builder_iterator.hpp:205-214,327-329
-    // (Σ 19 Organ + framework = seg_run_total_ns EXAKT). OPTIONAL/header-getrieben/n-a-tolerant: fehlt EINE der
-    // 20 seg_*_ns-Spalten ODER ist EINE "n/a" (Nicht-Mess-DLL), bleibt has_seg_ns=false → die Zeile wird bei der
-    // Attribution honest ÜBERSPRUNGEN (NICHT 0-gestapelt).
-    static constexpr std::size_t      kSegmentCount = 20;
-    std::array<double, kSegmentCount> seg_ns{};                  // 19 Organ-Achsen + framework (ns)
-    bool                              has_seg_ns        = false; // true ⇔ alle 20 seg_*_ns vorhanden UND numerisch
+    // P4 (2026-07-12) — die Stapel-Segmente der Per-Achsen-Latenz-Attribution: die kV3AxisCount (=17,
+    // ABI-6/INC-2d) Organ-Achsen (Reihenfolge = kCompositionAxisNames: search_algo..queuing_q2) +
+    // seg_framework_ns als LETZTES Segment (Index kSegmentCount-1). Kommensurabel mit seg_run_total_ns
+    // (dem eigenen Wall-Clock des Segment-Laufs run_workload_segmented), NICHT mit total_ns (Real-Workload
+    // → 3–29× daneben). Beleg: cache_engine_builder_iterator.hpp:248-257,395-401 (Σ Organ-Segmente +
+    // framework = seg_run_total_ns EXAKT). OPTIONAL/header-getrieben/n-a-tolerant: fehlt EINE der
+    // seg_*_ns-Spalten ODER ist EINE "n/a" (Nicht-Mess-DLL), bleibt has_seg_ns=false → die Zeile wird bei
+    // der Attribution honest ÜBERSPRUNGEN (NICHT 0-gestapelt).
+    // M-4/B16 (2026-07-19): Zaehlung aus der CE-Single-Source kV3AxisCount statt Literal — das fruehere
+    // hartkodierte 20 (inkl. seg_telemetry_ns/seg_isa_ns) passte nicht mehr zur 17-Achsen-WIDE-CSV.
+    static constexpr std::size_t      kSegmentCount = ::comdare::cache_engine::anatomy::kV3AxisCount + 1;
+    std::array<double, kSegmentCount> seg_ns{};                  // 17 Organ-Achsen + framework (ns)
+    bool                              has_seg_ns        = false; // true ⇔ alle seg_*_ns vorhanden UND numerisch
     double                            seg_run_total_ns  = 0.0;   // äußere Wall-Clock des Segment-Laufs (100%-Ganzes)
     bool                              has_seg_run_total = false;
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// M-4 (2026-07-19) — Segment-Spaltennamen aus der CE-Single-Source abgeleitet
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// "seg_<achse>_ns" wird zur UEBERSETZUNGSZEIT aus kCompositionAxisNames gepraegt (constexpr-Join per
+// IIFE + index_sequence — Template-Metaprogramm ohne Laufzeit-Anteil, compile-time-Doktrin). Es gibt
+// KEINE zweite Namensliste mehr: Schreiber (CE lazy_csv_header, Schleife ueber kCompositionAxisNames,
+// cache_engine_builder_iterator.hpp:248-257) und Leser (parse_wide_csv) ziehen aus derselben Quelle.
+
+namespace segment_columns_detail {
+
+// Compile-time-Speicher fuer EINEN gejointen Spaltennamen "seg_" + kCompositionAxisNames[I] + "_ns".
+template <std::size_t I>
+struct SegColumnName {
+    static constexpr std::string_view kAxis = ::comdare::cache_engine::builder::experiment::kCompositionAxisNames[I];
+    static constexpr auto             kJoined = [] {
+        constexpr std::string_view                                     prefix = "seg_";
+        constexpr std::string_view                                     suffix = "_ns";
+        std::array<char, prefix.size() + kAxis.size() + suffix.size()> b{};
+        std::size_t                                                    p = 0;
+        for (char c : prefix) b[p++] = c;
+        for (char c : kAxis) b[p++] = c;
+        for (char c : suffix) b[p++] = c;
+        return b;
+    }();
+    static constexpr std::string_view value{kJoined.data(), kJoined.size()};
+};
+
+} // namespace segment_columns_detail
+
+// Entkopplungs-Wache: beide CE-Quellen (POD-Zaehlung + Namensliste) muessen dieselbe Achsen-Zahl tragen —
+// zieht CE eine Achse um (wie INC-2c telemetry / INC-2d isa), bricht der Bau hier LAUT statt still leer.
+static_assert(::comdare::cache_engine::builder::experiment::kCompositionAxisNames.size() ==
+                  ::comdare::cache_engine::anatomy::kV3AxisCount,
+              "CE-Drift: kCompositionAxisNames vs kV3AxisCount — Segment-Schema der Stufe 05 neu abgleichen");
+
+/// Die kSegmentCount Stapel-Segment-Spaltennamen in EXAKTER Header-/Stapel-Reihenfolge: die kV3AxisCount
+/// Organ-Achsen (Single-Source kCompositionAxisNames) + "seg_framework_ns" als letztes Segment.
+inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount> kSegmentColumns =
+    []<std::size_t... I>(std::index_sequence<I...>) {
+        return std::array<std::string_view, sizeof...(I) + 1>{segment_columns_detail::SegColumnName<I>::value...,
+                                                              std::string_view{"seg_framework_ns"}};
+    }(std::make_index_sequence<::comdare::cache_engine::anatomy::kV3AxisCount>{});
 
 // HEADER-GETRIEBENER ';'-Parser (Spalten per Name → Index-Map). Pflichtspalten:
 // binary_id, ns_per_op, workload, two_phase_valid + die 5 op_*_p50_ns.
@@ -227,17 +283,18 @@ struct WideMeasurementRow {
 // P4 (2026-07-12) — Per-Achsen-Latenz-Attribution als GESTAPELTE Balken
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// Der bisher unvisualisierte Kern-Beitrag: WELCHE der 19 Organ-Achsen (+ Framework-Overhead) wie viel
+// Der bisher unvisualisierte Kern-Beitrag: WELCHE der 17 Organ-Achsen (+ Framework-Overhead) wie viel
 // Latenz beiträgt. Ein Balken je search_algo; das 100%-Ganze je Balken ist seg_run_total_ns (der eigene
-// Wall-Clock des 19-Segment-Laufs), NICHT total_ns (Real-Workload → inkommensurabel). Aggregation: Mittel
+// Wall-Clock des Segment-Laufs), NICHT total_ns (Real-Workload → inkommensurabel). Aggregation: Mittel
 // je Segment über die GÜLTIGEN Segment-Zeilen (two_phase_valid ∧ has_seg_ns ∧ seg_run_total_ns>0 ∧
-// seg_coverage vorhanden). Σ der 20 Segment-Mittel == Mittel seg_run_total_ns (Coverage≈1 → kommensurabel).
+// seg_coverage vorhanden). Σ der kSegmentCount Segment-Mittel == Mittel seg_run_total_ns (Coverage≈1 →
+// kommensurabel).
 
 // Numerisch prüfbares Aggregat (deterministisch nach search_algo sortiert). means[segment][group] = Mittel ns;
 // Σ_segment means[s][g] == group_totals[g] == run_total_means[g]. groups leer ⇔ keine gültige Segment-Zeile.
 struct SegmentAttribution {
     std::vector<std::string>         groups;          // search_algo, aufsteigend sortiert (Balken-x)
-    std::vector<std::string>         segment_labels;  // 20 Segment-Namen (Legende, Stapel-Reihenfolge)
+    std::vector<std::string>         segment_labels;  // kSegmentCount Segment-Namen (Legende, Stapel-Reihenfolge)
     std::vector<std::vector<double>> means;           // means[segment][group] = Mittel des Segments (ns)
     std::vector<double>              group_totals;    // Σ_segment means je Gruppe (== Mittel seg_run_total_ns)
     std::vector<double>              run_total_means; // Mittel seg_run_total_ns je Gruppe (Kommensurabilitäts-Beleg)
@@ -249,8 +306,8 @@ struct SegmentAttribution {
 // (NICHT 0-gestapelt). Rückgabe mit leerem `groups`, wenn KEINE gültige Segment-Zeile existiert.
 [[nodiscard]] SegmentAttribution aggregate_segment_attribution(std::span<WideMeasurementRow const> rows);
 
-// Emittiert den pgfplots `ybar stacked` (ein Balken je search_algo, 20 `\addplot`-Segmente, Legende =
-// Achsennamen, lineare y-Achse in ns, deterministische HSV-Kategorienfarben). Guard: keine gültige
+// Emittiert den pgfplots `ybar stacked` (ein Balken je search_algo, kSegmentCount `\addplot`-Segmente,
+// Legende = Achsennamen, lineare y-Achse in ns, deterministische HSV-Kategorienfarben). Guard: keine gültige
 // Segment-Zeile → status_empty_input (ehrlich leer, KEIN leerer Balken). Breiten-sicher (resizebox_wrap).
 [[nodiscard]] int write_segment_attribution_stacked_bar(std::filesystem::path const&        out,
                                                         std::span<WideMeasurementRow const> rows,
@@ -318,7 +375,7 @@ struct LatencyEcdfSeries {
 // Schreibt den vollen Per-Achsen-Observer-Block als longtable: je (Tier-Binary × Achse × Observer-Feld) EINE
 // Zeile mit dem ECHT gemessenen uint64-Zählwert. Die Spaltennamen stat_<achse>_<feld> werden HEADER-GETRIEBEN
 // aus der WIDE-CSV gelesen (c2l::WideFullRow::stat, parse_wide_csv_full) — NIE hartkodiert: die DLL-seitige
-// kV3AxisSchema[19][8] ist die Single-Source und emittiert die Spaltennamen. Achse/Feld werden aus dem
+// kV3AxisSchema[17][8] ist die Single-Source und emittiert die Spaltennamen. Achse/Feld werden aus dem
 // Spaltennamen mit dem Achsen-Vokabular des binary_id-Tupels (r.axes-Keys = dieselben kCompositionAxisNames-
 // Namen, exakt die stat_<achse>_-Präfixe) per LÄNGSTEM-Präfix zerlegt — nötig, weil BEIDE (Achsen- und
 // Feldnamen) Unterstriche tragen (naives Splitten wäre falsch).
