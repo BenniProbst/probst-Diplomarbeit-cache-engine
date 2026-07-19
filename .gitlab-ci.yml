@@ -471,6 +471,7 @@ thesis:pdf:
 measure:smoke:
   stage: measure
   interruptible: false              # INC-G6/Ledger-34: mehrstuendiger Mess-Lauf NIE auto-cancelbar (Belt-and-Suspenders zu auto_cancel=disabled)
+  resource_group: "ceb-measurement-exclusive"   # §38.b: cluster-weit genau EINE messende CEB (Cross-Pipeline-Lock); Bau-Pool (gn-*) bleibt parallel
   tags: [prod, baremetal, amd]
   timeout: 12h                      # Smoke: Stunden statt Tage (Dossier B.4.3 ~14,5k Zellen)
   variables:
@@ -547,6 +548,7 @@ measure:smoke:
 measure:golden-320:
   stage: measure
   interruptible: false              # INC-G6/Ledger-34: mehrtaegiger Mess-Lauf NIE auto-cancelbar (Belt-and-Suspenders zu auto_cancel=disabled)
+  resource_group: "ceb-measurement-exclusive"   # §38.b: cluster-weit genau EINE messende CEB (Cross-Pipeline-Lock); Bau-Pool (gn-*) bleibt parallel
   tags: [prod, baremetal, amd]
   timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
   variables:
