@@ -2378,3 +2378,14 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 8. **Offene User-GO-Forks (gebuendelt, aus dem Anforderungs-Ueberblick):** O-1 (rm alter Mess-CSVs — Konflikt Messdaten-nie-loeschen), E-2 (opt-Timing), O-13 (Nummern-Kollision) u.a. §26-O — werden dem User als Sammel-Frage vorgelegt, wenn der Messlauf-Fahrplan sie beruehrt; bis dahin geparkt.
 9. **W12 VORGEZOGEN (User):** W12-A (Stempel-ERZEUGUNG + X.Y.Z-Schema: Emitter/Versions-Tabelle/Registry/Planer-Eigen-Stempel) startet JETZT parallel zu W11; W12-B (Stempel-KONSUMPTION in Cache-Key/dll_is_current) nach W11 (gleiche Naht) — W11-Agent erhaelt die §43-Key-Vorgabe (X.Y.Z-stempel-kompatibler Cache-Schluessel).
 10. **Noch offene Kern-DoDs (unveraendert getrackt):** DoD6-Endstueck (Rueckschrieb-E2E mit echten Daten), DoD7 xml->pdf-Voll-Matrix, G8 Thesis-Anhaenge A/B/E + #47, Resolver-4-Stufen (D13), Fork E, Gattungs-Docks/PL-19/PL-21 (nach Abgabe).
+
+---
+
+## §45 — Voll-Bau-GATE: erst optimierte Pipeline, dann Voll-Build (2026-07-19 nachts, User-Direktive)
+
+**User-Direktive (verbatim-treu):** „Es ergibt wenig Sinn, die **unoptimierten Builds weiter durchlaufen zu lassen** — wir sollten uns **gleich zuerst um die Restrukturierung der CI und die Optimierung** kuemmern, damit wir die optimale Grundlage haben, effizient neue Features zu implementieren, das wird sonst nie fertig. Dafuer **akzeptiere ich auch eine Zwischenperiode rot**. Dabei muessen wir aber die **Workflows abwarten, um nicht mit ihnen zu interferieren**. Ich wuerde den **Voll-Build nur unter optimierter Pipeline fahren — betrachte das als Gate.** Ich bestaetige also deine Strategie."
+
+**Einordnung/Umsetzung:**
+- **Pipeline 11519 GECANCELT** (Voll-Matrix-2; Teilstand ohne W11-Teil-Marker verloren — akzeptiert). Der 11453-Kalibrier-Cache (521 DLLs+Sidecars) bleibt.
+- **NEUE REIHENFOLGE:** laufende Agenten-Workflows ABWARTEN (W11 async-Push/Resume, W12-A Stempel) → Sammel-Kadenz W9+W11+W12-A → **W10 CI-Restrukturierung** (Legenden-Kette §42) → W12-B (Stempel-Konsumption) → **DANN Voll-Build unter optimierter Pipeline** (§45-GATE fuer Task #19 / §41-Meilenstein).
+- **Zwischenperiode ROT ausdruecklich akzeptiert** (temporaere, bewusste Ausnahme von der Hart-Gruen-Doktrin §-'gesamte Pipeline immer hart gruen' NUR fuer die Restrukturierungs-Phase; Ende der Ausnahme = W10-Abnahme, danach gilt hart-gruen wieder uneingeschraenkt).
