@@ -364,6 +364,28 @@ int main(int argc, char* argv[]) {
             namespace pf = comdare::cache_engine::builder::profile_facade;
             return pf::dump_experiment_plan_facade(prof, std::cout);
         }
+        // --dump-ci [<profil>] (PAKET W7-A, 2026-07-19, §40.b): rein-lesende Emission der deterministischen
+        // GitLab-Child-Pipeline-YAML (CiYamlBuilder am SELBEN Director-Walk wie --dump-plan). Die dynamische,
+        // Planer-gesteuerte Folge-CI (Pilot->Serie). Wie --dump-plan: baut KEINE DLL, misst NICHT; Root-Tag-Sniff
+        // in der Fassade; ohne Pfad gilt COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil. YAML -> stdout.
+        if (flag == "--dump-ci") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::dump_experiment_ci_facade(prof, std::cout);
+        }
+        // --dump-cmake [<profil>] (PAKET W7-B, 2026-07-19, §40.c): rein-lesende Emission des scharfen
+        // experiment_plan.cmake (CMakeGraphBuilder am SELBEN Director-Walk). Der Bare-Metal-Bauplan: echte
+        // provision-only-build:-Kommandos je Zelle + GN-11-gegatetes measure:-Skelett. Wie --dump-plan: baut
+        // KEINE DLL, misst NICHT. Text -> stdout (Umleitung nach out.cmake -> cmake-Aufruf = Bare-Metal-Lauf).
+        if (flag == "--dump-cmake") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::dump_experiment_cmake_facade(prof, std::cout);
+        }
     }
 
     // INC-G+H (C.2+C.3): der OFFIZIELLE XML-getriebene execute_messreihe-Weg NUR bei explizitem Opt-in (Muster
@@ -711,6 +733,14 @@ int main(int argc, char* argv[]) {
                         xa.working_set_override = static_cast<std::uint64_t>(*ws);
                     if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
                         xa.build_version_tag_override = build_tag;
+                    // W6 (Ledger §32-F7): paralleler Bau-Pool. COMDARE_BUILD_PARALLEL = harte Compile-Worker-Zahl
+                    // (KOMPILATION parallel, MESSEN bleibt 1-Thread). Ungesetzt => parallel_jobs()-Heuristik = Ist
+                    // (byte-neutral). Muster wie COMDARE_E4_CAP (parse_size_env_strict: fail-fast bei Muell).
+                    if (auto bp = parse_size_env_strict("COMDARE_BUILD_PARALLEL")) {
+                        xa.build_parallelism = *bp;
+                        std::cout << "[E4] W6 Bau-Pool: COMDARE_BUILD_PARALLEL=" << *bp
+                                  << " parallele Compile-Worker (Messen bleibt 1-Thread)\n";
+                    }
                     xa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
                     xa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
                     // W5-C+ (§36.1 Zellen-Locking): GN-Zellen-Filter — SPIEGEL zum run_profile-Zweig. Leer = kein
@@ -783,6 +813,14 @@ int main(int argc, char* argv[]) {
                     if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
                         pa.build_version_tag_override = build_tag;
                     if (env_trimmed("COMDARE_RUN_SOTA") == "0") pa.run_sota_series = false;
+                    // W6 (Ledger §32-F7): paralleler Bau-Pool. COMDARE_BUILD_PARALLEL = harte Compile-Worker-Zahl
+                    // (KOMPILATION parallel, MESSEN bleibt 1-Thread). Ungesetzt => parallel_jobs()-Heuristik = Ist
+                    // (byte-neutral). Muster wie COMDARE_E4_CAP (parse_size_env_strict: fail-fast bei Muell).
+                    if (auto bp = parse_size_env_strict("COMDARE_BUILD_PARALLEL")) {
+                        pa.build_parallelism = *bp;
+                        std::cout << "[E4] W6 Bau-Pool: COMDARE_BUILD_PARALLEL=" << *bp
+                                  << " parallele Compile-Worker (Messen bleibt 1-Thread)\n";
+                    }
                     pa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
                     pa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
 
