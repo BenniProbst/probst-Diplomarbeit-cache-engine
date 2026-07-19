@@ -50,12 +50,13 @@ struct CsvRow {
 // ── WIDE-Schema (tier×workload, 2026-06-11) ────────────────────────────────────────────────────────────
 // Das Mess-System (cache-engine run_lazy_150 / lazy_csv_header) emittiert das ';'-getrennte WIDE-Schema:
 // (run_lazy_150 geloescht 2026-07-11; Emitter heute Code/02_messung_driver, WIDE-Schema)
-// binary_id;setting;repetition;n_ops;total_ns;ns_per_op;19×seg_*_ns;13 Counter;…;119 stat_*;…;workload;
+// binary_id;setting;repetition;n_ops;total_ns;ns_per_op;18×seg_*_ns (17 Organ + framework, M-4: CE
+// kV3AxisCount);13 Counter;…;stat_*-Block (kV3AxisSchema[17][8]-getrieben, Anzahl = benannte Felder);…;workload;
 // two_phase_valid. Der Parser ist HEADER-GETRIEBEN (Spalten per Name aufgelöst, Reihenfolge/Breite-agnostisch
 // → robust gegen additive Schema-Erweiterungen); extrahiert werden nur die auswertungs-relevanten Felder.
 
 struct WideMeasurementRow {
-    std::string   binary_id;   // volle statische Rekombination (19 Achsen-Belegungen)
+    std::string   binary_id;   // volle statische Rekombination (17 Achsen-Belegungen, M-4: CE kV3AxisCount)
     std::string   search_algo; // aus binary_id extrahiert (führendes "search_algo=<wert>/")
     std::string   workload;    // Lastprofil-id (Achse 2; eigene Spalte "workload")
     std::uint64_t repetition      = 0;
@@ -87,10 +88,10 @@ struct TierWorkloadAggregate {
 
 // ── L-d / L-e (Phase L, 2026-06-18) ─────────────────────────────────────────────────────────────────────
 // L-d Achsen-Austauschbarkeit (Geschwister-Paar-Diffs) + L-e ehrliche Limitierungs-longtable.
-// Beide konsumieren das WIDE-Schema (parse_wide_csv_full → volle 19-Achsen-Tupel + op_<art>_p50-Spalten).
+// Beide konsumieren das WIDE-Schema (parse_wide_csv_full → volle 17-Achsen-Tupel + op_<art>_p50-Spalten).
 
 // Volle WIDE-Zeile inkl. der 5 Interface-Funktions-p50-Spalten (op_<art>_p50_ns) und des kompletten
-// 19-Achsen-Tupels (achse→wert), header-getrieben aufgelöst. NUR die für L-d/L-e relevanten Felder.
+// 17-Achsen-Tupels (achse→wert), header-getrieben aufgelöst. NUR die für L-d/L-e relevanten Felder.
 struct WideFullRow {
     std::string binary_id;
     std::string workload;
@@ -102,7 +103,7 @@ struct WideFullRow {
     double op_erase_p50  = 0.0;
     double op_scan_p50   = 0.0;
     double op_rmw_p50    = 0.0;
-    // 19-Achsen-Tupel als (achse→wert)-Map, aus binary_id geparst (achse=wert/achse=wert/...).
+    // 17-Achsen-Tupel als (achse→wert)-Map, aus binary_id geparst (achse=wert/achse=wert/...).
     std::map<std::string, std::string> axes;
     // ── M3v2-Tag-Spalten (Task #156, ans Schema-Ende gehängt) ──────────────────────────────────────
     // OPTIONAL/header-getrieben: fehlt die Spalte (cowfix-v1-Schema), bleibt das Feld leer/0 (n/a) —
@@ -114,7 +115,7 @@ struct WideFullRow {
     double        seg_coverage      = 0.0; // Σseg_ns/run_total (Mess-Validität)
     bool          has_seg_coverage  = false;
     // INC-4 (2026-07-13, xml→pdf-Konsolidierung): der volle Per-Achsen-Observer-Block stat_<achse>_<feld>
-    // (Schema = kV3AxisSchema[19][8] auf der DLL-Seite, single-source) — HEADER-GETRIEBEN durchgereicht (KEIN
+    // (Schema = kV3AxisSchema[17][8] auf der DLL-Seite, single-source; M-4: 17 = kV3AxisCount) — HEADER-GETRIEBEN durchgereicht (KEIN
     // Positions-/Namens-Hartkodieren; JEDE Spalte mit "stat_"-Präfix wird mitgenommen). Key = voller Spaltenname
     // "stat_<achse>_<feld>", Wert = Roh-Zelle: "n/a" bei Nicht-Mess-DLL (ehrlich n/a, NICHT 0) sonst der uint64-
     // Zählwert als String. Fehlt der Block komplett (altes 154-Spalten-Schema ohne stat_-Spalten), bleibt die
@@ -124,7 +125,7 @@ struct WideFullRow {
 
 [[nodiscard]] int parse_wide_csv_full(std::filesystem::path const& in, std::vector<WideFullRow>& out_rows);
 
-// Die 4 VARIABLEN Achsen (alle übrigen 15 sind gepinnt → 1 Wert). Reihenfolge = Ausgabe-Reihenfolge.
+// Die 4 VARIABLEN Achsen (alle übrigen 13 der 17 sind gepinnt → 1 Wert; M-4: CE kV3AxisCount). Reihenfolge = Ausgabe-Reihenfolge.
 inline constexpr std::array<std::string_view, 4> kVariableAxes = {"search_algo", "node_type", "memory_layout",
                                                                   "prefetch"};
 

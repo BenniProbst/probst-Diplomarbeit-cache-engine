@@ -337,7 +337,8 @@ int parse_wide_csv_full(std::filesystem::path const& in, std::vector<WideFullRow
         if (col.find(name) == col.end()) return status_parse_error;
 
     // INC-4: HEADER-GETRIEBEN ALLE stat_<achse>_<feld>-Spalten sammeln (Positions-agnostisch, Reihenfolge = Header).
-    // NIE hartkodiert — die Namen kommen aus der WIDE-CSV, die die DLL aus der Single-Source kV3AxisSchema[19][8]
+    // NIE hartkodiert — die Namen kommen aus der WIDE-CSV, die die DLL aus der Single-Source kV3AxisSchema[17][8]
+    // (M-4: 17 = kV3AxisCount, ABI-6/INC-2d)
     // emittiert. Fehlt der Block (altes 154-Spalten-Schema), bleibt stat_cols leer → r.stat leer (honest n/a).
     std::vector<std::pair<std::string, std::size_t>> stat_cols;
     for (std::size_t i = 0; i < header.size(); ++i)
