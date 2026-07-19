@@ -281,6 +281,32 @@ struct MessreihenSpec {
     return static_cast<std::size_t>(value);
 }
 
+// INC-G6 (Ledger 33/34, 2026-07-19): das golden-N Chunk-Fenster. COMDARE_GOLDEN_N_RANGE="start:count" ->
+// {start, count}. Leer/ungesetzt = nullopt (kein Fenster, Ist-Verhalten). Fail-loud bei Fehlform (ein Tippfehler
+// wuerde sonst still den ganzen 2^17-Bau statt eines Chunks starten) -- der Abbruch landet im try/catch des
+// E4-Blocks. count==0 ist syntaktisch gueltig (deaktiviert das Fenster). Muster wie parse_size_env_strict.
+struct GoldenRange {
+    std::size_t start = 0;
+    std::size_t count = 0;
+};
+[[nodiscard]] std::optional<GoldenRange> parse_golden_range_env() {
+    std::string const s = env_trimmed("COMDARE_GOLDEN_N_RANGE");
+    if (s.empty()) return std::nullopt;
+    std::size_t const colon = s.find(':');
+    if (colon == std::string::npos)
+        throw std::runtime_error("COMDARE_GOLDEN_N_RANGE erwartet 'start:count': '" + s + "'");
+    auto const parse_u = [&s](std::string_view part) -> std::size_t {
+        std::uint64_t v      = 0;
+        auto const [ptr, ec] = std::from_chars(part.data(), part.data() + part.size(), v, 10);
+        if (part.empty() || ec != std::errc{} || ptr != part.data() + part.size() ||
+            v > static_cast<std::uint64_t>((std::numeric_limits<std::size_t>::max)()))
+            throw std::runtime_error("COMDARE_GOLDEN_N_RANGE ungueltig: '" + s + "'");
+        return static_cast<std::size_t>(v);
+    };
+    std::string_view const sv{s};
+    return GoldenRange{parse_u(sv.substr(0, colon)), parse_u(sv.substr(colon + 1))};
+}
+
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -712,6 +738,19 @@ int main(int argc, char* argv[]) {
                     if (auto cap = parse_size_env_strict("COMDARE_E4_CAP")) pa.max_binaries = *cap;
                     if (auto ws = parse_size_env_strict("COMDARE_WORKLOAD_RECORDS"))
                         pa.working_set_override = static_cast<std::uint64_t>(*ws);
+                    // INC-G6 (33/34): golden-N Chunk-Fenster + provision-only. Inert ohne die Env-Vars
+                    // (byte-identisch zum Ist-Lauf). COMDARE_GOLDEN_N_RANGE="start:count" fenstert den 2^17-
+                    // Indexraum; COMDARE_GOLDEN_N_PROVISION_ONLY=="true" baut NUR DLLs (misst nicht).
+                    if (auto range = parse_golden_range_env()) {
+                        pa.golden_range_start = range->start;
+                        pa.golden_range_count = range->count;
+                        std::cout << "[E4] INC-G6 golden-N Chunk-Fenster: start=" << range->start
+                                  << " count=" << range->count << "\n";
+                    }
+                    if (env_trimmed("COMDARE_GOLDEN_N_PROVISION_ONLY") == "true") {
+                        pa.provision_only = true;
+                        std::cout << "[E4] INC-G6 provision-only: baut DLLs, misst NICHT.\n";
+                    }
 
                     if (std::string const build_tag = env_trimmed("COMDARE_BUILD_VERSION"); !build_tag.empty())
                         pa.build_version_tag_override = build_tag;
