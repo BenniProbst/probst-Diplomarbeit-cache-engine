@@ -72,23 +72,31 @@ VALIDAT OK: das Profil ist gegen die AxisRegistry/EnabledStrategies konsistent.
 
 ## 3. Plan ansehen (`--dump-plan`, rein lesend)
 
-Deterministischer Textplan des `ExperimentPlanDirector`-Walks (opt × simd × Sweep-Passes). Zwei Läufe
-sind byte-gleich. Rein lesend.
+Deterministischer Textplan des `ExperimentPlanDirector`-Walks. **W10/§42: der Walk ist dreistufig** —
+Mess-Achsen-Kombination → System-Permutation (opt × simd) → Chunk-Bündel. Zwei Läufe sind byte-gleich.
 
 ```bash
 "$DRIVER" --dump-plan "$PROFILE" | head
 ```
 
-Kopf: `# comdare-experiment-plan v1`, `source_kind=thesis`, `perm_count=4`
-(2 opt-Level O2/O3 × 2 SIMD no_extension/avx2 = 4 System-Permutationen).
+Kopf: `# comdare-experiment-plan v1`, `source_kind=thesis`, `measurement_combo_count=1`,
+`measurement_combo 0 legend=[all]` (die Anwender-XML deklariert alle 16 `<measurement_categories>` →
+EIN CEB-Typ `[all]`), `perm_count=4` (2 opt O2/O3 × 2 SIMD no_extension/avx2 = 4 System-Permutationen
+**je Mess-Kombination**).
 
 ---
 
-## 4. CMake-Bauplan emittieren (`--dump-cmake`)
+## 4. Die dreistufige Kette (`--dump-cmake` → CEB → `--emit-tier-cmake`)
 
-Der **scharfe** CMake-Bauplan (W7-B/§40.c): pro System-Permutation ein echtes provision-only-Treiber-
-Kommando (`build:`-Ziel) + ein GN-11-gegatetes `measure:`-Skelett. Host-unabhängig: Treiber/Profil/Range/Out
-sind CMake-Variablen mit Defaults, nur opt/simd sind Plan-Konstanten (Literale).
+Die CE erhält die XML und **steuert alles** (§42). Der Bare-Metal-Bau ist deshalb dreistufig:
+
+| Stufe | Rolle | Kommando | Was |
+|-------|-------|----------|-----|
+| 1 | Planer | `--dump-cmake` | je Mess-Kombination `[a,b,c]` ein CEB-Bau- + CEB-Emit-Target |
+| 2 | CEB | `--emit-tier-cmake` (von Stufe 1 aufgerufen) | je System-Perm `[d,e,f]` die Tier-Chunk-Bau-Targets |
+| 3 | Mess-Job | (GN-11/320er-gated) | `measure:[a,b,c][d,e,f][g,h,i]` — Skelett, **kein** Auto-Messlauf |
+
+Stufe 1 emittieren (Planer-Rolle):
 
 ```bash
 "$DRIVER" --dump-cmake "$PROFILE" > /tmp/experiment_plan.cmake
@@ -98,58 +106,73 @@ Konfigurierbare Eingaben (per `-D` überschreibbar):
 
 | Variable | Default | Bedeutung |
 |----------|---------|-----------|
-| `COMDARE_PLAN_DRIVER`  | `comdare-messung-driver` (PATH-Suche) | Pfad/Name des Treibers |
-| `COMDARE_PLAN_PROFILE` | *(leer → Treiber-Default-Profil)* | Thesis-/Experiment-Profil-XML |
-| `COMDARE_PLAN_RANGE`   | `0:4` (sicher klein) | golden-N Chunk-Fenster `start:count` |
-| `COMDARE_PLAN_OUT`     | `<bindir>/experiment_plan/out` | Ausgabe-Wurzel der provision-DLLs |
+| `COMDARE_PLAN_DRIVER`   | `comdare-messung-driver` (PATH-Suche) | Pfad/Name des Treibers / der CEB |
+| `COMDARE_PLAN_PROFILE`  | *(leer → Treiber-Default-Profil)* | Thesis-/Experiment-Profil-XML |
+| `COMDARE_PLAN_TIER_OUT` | `<bindir>/tier_plans` | Ausgabe-Wurzel für die emittierten Stufe-2-`.cmake` |
+| `COMDARE_PLAN_RANGE`    | `0:4` (sicher klein) | golden-N Chunk-Fenster `start:count` (Stufe 2) |
+| `COMDARE_PLAN_OUT`      | `<bindir>/tier/out` | Ausgabe-Wurzel der provision-DLLs (Stufe 2) |
 
 ---
 
 ## 5. Den emittierten Plan abfahren (Bare-Metal-Bau, **ohne GitLab**)
 
 Der emittierte `.cmake` ist ein Fragment (`add_custom_command`/`add_custom_target`). Ein Minimal-Wrapper
-inkludiert ihn; `cmake` konfiguriert und baut dann ein kleines Fenster einer Permutation.
+inkludiert ihn; `cmake` konfiguriert und baut. Die Kette hat **zwei cmake-Konfigurationen** (Stufe 1 → 2).
+
+### 5a. Stufe 1: CEB-Emit-Target bauen → erzeugt den Stufe-2-Plan
 
 ```bash
-WORK=/tmp/w7_baremetal
-mkdir -p "$WORK"
+WORK=/tmp/w10_baremetal
+rm -rf "$WORK"; mkdir -p "$WORK"
 cp /tmp/experiment_plan.cmake "$WORK/experiment_plan.cmake"
 cat > "$WORK/CMakeLists.txt" <<'EOF'
 cmake_minimum_required(VERSION 3.20)
-project(comdare_bare_metal_plan NONE)
+project(comdare_bare_metal_stage1 NONE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/experiment_plan.cmake)
 EOF
 
-# Konfigurieren: kleines Fenster Range 0:4, perm0 = O2/no_extension
-cmake -S "$WORK" -B "$WORK/build" \
+cmake -S "$WORK" -B "$WORK/b1" \
+  -DCOMDARE_PLAN_DRIVER="$DRIVER" \
+  -DCOMDARE_PLAN_PROFILE="$PROFILE" \
+  -DCOMDARE_PLAN_TIER_OUT="$WORK/tier_plans"
+
+# Der CEB-Emit-Schritt ruft --emit-tier-cmake -> emittiert den Stufe-2-Plan (Slug von [all] = _all_).
+cmake --build "$WORK/b1" --target comdare_ceb_emit__all_
+ls "$WORK/tier_plans/"   # -> tier_plan__all_.cmake
+```
+
+### 5b. Stufe 2: die Tier-Binaries bauen (provision-only, kleines Fenster)
+
+```bash
+S2="$WORK/stage2"; mkdir -p "$S2"
+cp "$WORK/tier_plans/tier_plan__all_.cmake" "$S2/tier_plan.cmake"
+cat > "$S2/CMakeLists.txt" <<'EOF'
+cmake_minimum_required(VERSION 3.20)
+project(comdare_bare_metal_stage2 NONE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/tier_plan.cmake)
+EOF
+
+cmake -S "$S2" -B "$S2/b" \
   -DCOMDARE_PLAN_DRIVER="$DRIVER" \
   -DCOMDARE_PLAN_PROFILE="$PROFILE" \
   -DCOMDARE_PLAN_RANGE="0:4" \
-  -DCOMDARE_PLAN_OUT="$WORK/out"
+  -DCOMDARE_PLAN_OUT="$S2/out"
 
-# Bauen: nur perm0 (O2/no_extension), provision-only (baut DLLs, misst NICHT)
-cmake --build "$WORK/build" --target comdare_experiment_plan_build_perm0
+# Bauen: perm0/chunk0 (O2/no_extension), provision-only (baut DLLs, misst NICHT)
+cmake --build "$S2/b" --target comdare_tier_build_perm0_chunk0
+find "$S2/out" -name 'perm.dll' | wc -l
 ```
 
-Andere Ziele:
+Andere Stufe-2-Ziele:
 
-- `comdare_experiment_plan_build_perm<i>` — eine einzelne Permutation `i` (0..3).
-- `comdare_experiment_plan_all` — alle Permutationen (Aggregat; via `measure:`-Kante transitiv auch
-  `build:`; der `measure:`-Schritt bleibt aber GN-11-gegatet = nur Echo, **kein** Messlauf).
+- `comdare_tier_build_perm<i>_chunk<k>` — eine Zelle: Perm `i` (0..3) × Chunk `k` (0..3).
+- `comdare_tier_measure_perm<i>` — der GN-11/320er-gegatete `measure:`-Schritt (Echo-Skelett, **kein** Messlauf).
+- `comdare_tier_plan_all` — Aggregat (alle `measure:`-Targets → transitiv alle `tier:build`-Targets).
 
 ### Wo die DLLs/Logs liegen
 
-- **Tier-DLLs** (provision-only): `"$COMDARE_PLAN_OUT"/perm<i>/e4_xml/dll/**/perm.dll`
-  (im Beispiel: `/tmp/w7_baremetal/out/perm0/e4_xml/dll/.../perm.dll`).
-- **Provision-Log/CSV-Kopf**: `"$COMDARE_PLAN_OUT"/perm<i>/e4_xml/measurements.csv`
-  (bei provision-only ohne Messzeilen — `measured=0`).
-- **Build-Stamp** (CMake-Idempotenz): `"$WORK"/build/experiment_plan/perm<i>.build.stamp`.
-
-DLLs zählen:
-
-```bash
-find "$WORK/out" -name 'perm.dll' | wc -l
-```
+- **Tier-DLLs** (provision-only): `"$COMDARE_PLAN_OUT"/_all_/perm<i>/chunk<k>/e4_xml/dll/**/perm.dll`.
+- **Build-Stamp** (CMake-Idempotenz): `"$S2"/b/tier/_all__perm<i>_chunk<k>.build.stamp`.
 
 ---
 
@@ -157,34 +180,41 @@ find "$WORK/out" -name 'perm.dll' | wc -l
 
 **Literal verifiziert (2026-07-19, dieser Handlauf):**
 
-- `--validate` → rc 0 (17 Achsen / 34 Werte / 2 opt × 2 simd).
-- `--dump-plan` / `--dump-cmake` / `--dump-ci` → je rc 0, byte-deterministisch.
-- **Bare-Metal-Bau** `comdare_experiment_plan_build_perm0` (Range 0:4, O2/no_extension):
-  **rc 0 in ~94 s**, **69 `perm.dll`** kompiliert (provision-only, `measured=0`), Build-Stamp gesetzt.
-  → Das ist der §40.c-Erfüllungs-Beweis: identischer Bau **ohne GitLab-CI**.
+- `--validate` → rc 0 (17 Achsen / 34 Werte / 2 opt × 2 simd / 16 measurement_categories).
+- `--dump-plan` / `--dump-cmake` / `--dump-ci` / `--emit-tier-ci` / `--emit-tier-cmake` → je rc 0,
+  byte-deterministisch.
+- **Bare-Metal-Kette (dreistufig)**: Stufe 1 (`--dump-cmake` + `comdare_ceb_emit__all_`) erzeugt den
+  Stufe-2-Plan; Stufe 2 (`comdare_tier_build_perm0_chunk0`, Range 0:4, O2/no_extension): **rc 0 in ~82 s**,
+  **69 `perm.dll`** kompiliert (provision-only, `measured=0`).
+  → Das ist der §42-Erfüllungs-Beweis: identischer, **CE-gesteuerter** dreistufiger Bau **ohne GitLab-CI**.
 
 **Bewusst gated (kein Auto-Lauf):**
 
-- **Messen** ist GN-11-gegatet: der `measure:`-Schritt im emittierten Plan ist ein Echo-/Skelett-Schritt.
-  Das echte Mess-Kommando (`COMDARE_GOLDEN_N_PROVISION_ONLY` entfernt) steht nur als Kommentar-Skelett und
-  wird erst nach dem GN-11-Entscheid des Users scharfgeschaltet.
-- **Voller 2^17-Satz je Permutation** ist INC-G6-gegatet (GN-2-Compile-Time-Guard). `COMDARE_PLAN_RANGE`
-  fenstert deshalb bewusst klein; ein Voll-Bau erfordert die gestaffelte/Storage-gated Materialisierung.
+- **Messen** ist GN-11/320er-gegatet: der `measure:`-Schritt (Stufe 3) im emittierten Plan ist ein
+  Echo-/Skelett-Schritt. Das echte Mess-Kommando (`COMDARE_GOLDEN_N_PROVISION_ONLY` entfernt) steht nur als
+  Kommentar-Skelett und wird erst nach dem GN-11-Entscheid des Users scharfgeschaltet.
+- **Voller 2^17-Satz je Zelle** ist INC-G6-gegatet (GN-2-Compile-Time-Guard). `COMDARE_PLAN_RANGE` fenstert
+  bewusst klein; die vier `chunk<k>`-Targets bündeln den Organ-Raum (2^17 Einzel-Jobs wären keine Legende).
 - **avx512** setzt eine avx512-fähige CPU voraus (SIMD-Flag-Signatur, §40.a); der `no_extension`-/`avx2`-
   Kernsatz läuft überall.
 
 ---
 
-## Anhang: dieselbe Kette in der CI (`--dump-ci`)
+## Anhang: dieselbe Kette in der CI (`--dump-ci` → `--emit-tier-ci`)
 
-`--dump-ci` emittiert dieselbe Perm-Menge als **GitLab-Child-Pipeline-YAML** (CiYamlBuilder, §40.b):
-STUFE 1 = CEB-Bau-Jobs je System-Permutation, STUFE 2 = Tier-Job-Emitter + Grandchild-Trigger.
+`--dump-ci` emittiert die **STUFE 1** (Planer-Rolle) als GitLab-Child-Pipeline-YAML (CiYamlBuilder, §42):
+je Mess-Kombination `[a,b,c]` die CEB-Jobs `ceb:build`/`ceb:emit`/`ceb:trigger`. Die `ceb:emit`-Jobs rufen
+`--emit-tier-ci` → die CEB emittiert **STUFE 2** (System-Perms + Tier-Chunk-Jobs + gegatete Mess-Jobs) als
+Grandchild-Pipeline (parent → child → grandchild = GitLab-Nesting-Tiefe 2).
 
 ```bash
-"$DRIVER" --dump-ci "$PROFILE" > /tmp/planer-child-ci.yml
+"$DRIVER" --dump-ci "$PROFILE" > /tmp/planer-child-ci.yml       # Stufe 1 (CEB-Jobs)
+"$DRIVER" --emit-tier-ci "$PROFILE" > /tmp/tier-child-ci.yml    # Stufe 2 (Tier-Chunk-/Mess-Jobs)
 ```
 
-In der CI fährt das der inerte Job `planer:emit-ci` (Stage `planer`, opt-in `COMDARE_DYNAMIC_PLANER_CI=true`)
-+ `planer:trigger-ci`. Die statische 24-Zellen-Matrix (`build:golden-n`) bleibt als Pilot-Fallback erhalten.
-Das emittierte Child-YAML muss vor dem Scharfschalten **per GitLab-CI-Lint** geprüft werden (nicht im
-Handlauf abgedeckt).
+In der CI fährt das der Job **`planer:delegate`** (Stage `planer`, NEUER Standard-Pfad hinter
+`COMDARE_BUILD_GOLDEN_N`) + `planer:delegate-trigger`; das Ergebnis-Holen liegt in `ergebnis:holen`
+(Skelett auf `persist:measurements`-Grundlage). Die statische 24-Zellen-Matrix (`build:golden-n`) bleibt
+als **DEPRECATED Fallback** (`COMDARE_STATIC_MATRIX_FALLBACK=true`, Default AUS) — nicht gelöscht,
+Pilot-Historie. Das emittierte Child-YAML muss vor dem Scharfschalten **per GitLab-CI-Lint** geprüft
+werden (Architekt; nicht im Handlauf abgedeckt).

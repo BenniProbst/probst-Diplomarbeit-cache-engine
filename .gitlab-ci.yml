@@ -850,7 +850,13 @@ measure:golden-320:
 # ── build:golden-n (W4-A, Ledger §35/§36): die kanonische §33-System-Achsen-Matrix (opt O2/O3 x simd no_extension/avx2),
 #    N-Node-Pool-geroutet (§36.3): no_extension -> Tag "amd64" (ALLE amd64-Nodes inkl. kleiner Nodes ohne AVX),
 #    avx2 -> Tag "avx2". Messsystem-Dimension GN_MSYS (§36.2) heute 1 Default -> 2 SIMD x 1 msys x 2 opt x 4 chunk = 16 Zellen/Jobs.
-#    INERT-by-default (nur bei COMDARE_BUILD_GOLDEN_N=="true"). avx512 ist NICHT hier (separater opt-in-Job unten).
+#
+#    DEPRECATED (W10-B, Ledger §42): diese statische, HANDGESCHRIEBENE 24-Zellen-Matrix war der erfolgreiche W4-PILOT
+#    (die Steuerung lag in der YAML statt im Planer). Die ZIEL-Steuerung ist die dynamische, CE-gesteuerte W10-Kette
+#    (planer:delegate -> die CE emittiert STUFE 1 [Mess-Achsen/CEB] und die CEB emittiert STUFE 2 [System-Achsen/
+#    Tier]). Diese Matrix bleibt als GATED FALLBACK erhalten (Pilot-Historie + 11509-Artefakt-Lieferant) -- NICHT
+#    geloescht. Sie laeuft NUR NOCH, wenn ZUSAETZLICH COMDARE_STATIC_MATRIX_FALLBACK=="true" gesetzt ist (Default
+#    AUS): so ist planer:delegate der NEUE Standard-Pfad hinter COMDARE_BUILD_GOLDEN_N. avx512 = separater Job unten.
 build:golden-n:
   extends: .golden_n_build
   parallel:
@@ -868,12 +874,14 @@ build:golden-n:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Bau-Beweis
       when: never
-    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # INERT: nur bei explizitem Opt-in
+    # DEPRECATED-Fallback: DOPPELT gegatet -> Default AUS. Der Standard ist planer:delegate (COMDARE_BUILD_GOLDEN_N).
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_STATIC_MATRIX_FALLBACK == "true"'
 
 # ── build:golden-n-avx512 (W4-A, EXTRA opt-in): die avx512-Erweiterung, N-Node-geroutet auf Tag "avx512" (§36.3;
 #    heute NUR prod1/Zen5 avx512-faehig, prod2/RaptorLake fused-off). GN_MSYS default -> 1 SIMD x 1 msys x 2 opt x 4 chunk = 8 Zellen/Jobs.
-#    DOPPELT inert: nur wenn COMDARE_BUILD_GOLDEN_N=="true" UND COMDARE_GN_INCLUDE_AVX512=="true". avx512 gehoert NICHT
-#    zum §33-golden-Kernsatz (no_extension/avx2) -> bewusst separater Job + eigenes Gate (Anti-Phantom).
+#    DEPRECATED (W10-B, §42): Teil der statischen Pilot-Matrix (s. build:golden-n) -> DREIFACH gegatet, Default AUS.
+#    Laeuft NUR, wenn COMDARE_BUILD_GOLDEN_N=="true" UND COMDARE_STATIC_MATRIX_FALLBACK=="true" UND
+#    COMDARE_GN_INCLUDE_AVX512=="true". avx512 gehoert NICHT zum §33-golden-Kernsatz -> bewusst separater Job.
 build:golden-n-avx512:
   extends: .golden_n_build
   parallel:
@@ -886,7 +894,8 @@ build:golden-n-avx512:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
-    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_GN_INCLUDE_AVX512 == "true"'
+    # DEPRECATED-Fallback (s. build:golden-n): nur mit explizitem COMDARE_STATIC_MATRIX_FALLBACK + avx512-Opt-in.
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_STATIC_MATRIX_FALLBACK == "true" && $COMDARE_GN_INCLUDE_AVX512 == "true"'
 
 # ── Stage persist (#22, User 2026-07-11, Ledger §0-DoD-6/§11-G): die Auswertungs-Dokumente EINES Laufs additiv
 #    nach measurement/<YYYYMMDD-HHMMSS-p{pipeline}>/ im super-Root sammeln + per commit+MERGE+push nach
@@ -1019,18 +1028,19 @@ persist:measurements:
       done
       echo "FEHLER: writeback nach 5 Versuchen fehlgeschlagen (development bewegt sich zu schnell?)" >&2; exit 1
 
-# ── planer:emit-ci (W7-A, Ledger §40.b): die DYNAMISCHE, Planer-gesteuerte Folge-CI (Pilot->Serie). Der
-#    Planer-Binary (comdare-messung-driver --dump-ci) liest das golden-Profil, erkennt die System-Permutationen
-#    (opt x simd des Director-Walks) und EMITTIERT SELBST die GitLab-Child-Pipeline-YAML (CiYamlBuilder:
-#    STUFE 1 = CEB-Bau-Jobs je System-Perm, STUFE 2 = Tier-Job-Emitter + Grandchild-Trigger). Die Steuerung
-#    liegt im PLANER, nicht in handgeschriebener YAML (§40.b-Direktive). Die statische 24-Zellen-Matrix
-#    (build:golden-n / build:golden-n-avx512) bleibt UNANGETASTET als Pilot-Fallback, bis die dynamische Serie
-#    dual-gruen ist.
-#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_DYNAMIC_PLANER_CI=="true" gesetzt
-#    ist -> der Gesamtlauf (Messung/Bau AUS) baut ihn NIE. --dump-ci ist rein lesend: KEIN Bau, KEINE Messung.
-#    HINWEIS (Architekt): das emittierte Child-YAML kann hier NICHT per GitLab-CI-Lint-API geprueft werden ->
-#    der Architekt lintet die generierte planer-child-ci.yml vor dem Scharfschalten der dynamischen Serie.
-planer:emit-ci:
+# ── planer:delegate (W10-B, Ledger §42): die DELEGATION der Anwender-XML an die CE — der NEUE Standard-Pfad
+#    (loest die statische Matrix als STEUERUNG ab, §42: „Eigentlich erhaelt die Cache Engine die XML und
+#    uebernimmt die gesamte Arbeit"). Der super-CI-Job baut NUR den Treiber, reicht das golden-Profil an die CE
+#    (--dump-ci) und legt die CE-emittierte STUFE-1-YAML als Artefakt ab. ALLE Steuerung/Emission liegt in der CE:
+#    STUFE 1 (diese YAML) = je Mess-Kombination [a,b,c] die CEB-Jobs (ceb:build/emit/trigger); die ceb:emit-Jobs
+#    rufen --emit-tier-ci -> die CEB emittiert STUFE 2 (System-Perms + Tier-Chunk-Jobs + gegatete Mess-Jobs) als
+#    Grandchild (parent->child->grandchild = GitLab-Nesting-Tiefe 2).
+#    GATE: der NEUE Standard laeuft hinter COMDARE_BUILD_GOLDEN_N (die statische Matrix ist auf COMDARE_STATIC_
+#    MATRIX_FALLBACK verschoben, Default AUS). Zusaetzlich bleibt COMDARE_DYNAMIC_PLANER_CI als ISOLIERTES Opt-in
+#    (nur die Delegation ohne den Rest). INERT-by-default: ohne beide Flags wird der Job NIE erzeugt (--dump-ci ist
+#    rein lesend: KEIN Bau, KEINE Messung). HINWEIS (Architekt): das emittierte Child-YAML wird vor dem
+#    Scharfschalten per GitLab-CI-Lint geprueft (nicht via API in diesem Job).
+planer:delegate:
   stage: planer
   tags: [baremetal]
   variables:
@@ -1040,7 +1050,8 @@ planer:emit-ci:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE die dynamische Planer-CI
       when: never
-    - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # INERT: nur bei explizitem Opt-in
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # NEUER STANDARD-Pfad (loest die statische Matrix ab)
+    - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # ISOLIERTES Opt-in (nur die Delegation, ohne den Rest)
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
@@ -1051,31 +1062,71 @@ planer:emit-ci:
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
       test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
       test -f "$COMDARE_GOLDEN_N_PROFILE" || { echo "golden-Profil fehlt: $COMDARE_GOLDEN_N_PROFILE"; exit 1; }
-      echo "== W7-A: der Planer emittiert die dynamische Folge-CI (--dump-ci, rein lesend, KEIN Bau, KEINE Messung) =="
+      echo "== W10-B: super delegiert die Anwender-XML an die CE (--dump-ci = STUFE 1, rein lesend, KEIN Bau/Messung) =="
       "$DRIVER" --dump-ci "$COMDARE_GOLDEN_N_PROFILE" > "$CI_PROJECT_DIR/planer-child-ci.yml"
-      echo "== emittierte Child-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
-      echo "== STUFE-1 CEB-Bau-Jobs: $(grep -c '# JOB ceb-build perm ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
-      echo "== STUFE-2 Grandchild-Trigger-Jobs: $(grep -c '# JOB tier-trigger perm ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
+      echo "== CE-emittierte STUFE-1-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
+      echo "== STUFE-1 CEB-Bau-Jobs (je Mess-Kombination): $(grep -c '# JOB ceb-build combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
+      echo "== STUFE-1 CEB-Trigger-Jobs (Grandchild -> STUFE 2): $(grep -c '# JOB ceb-trigger combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
   artifacts:
     paths:
       - planer-child-ci.yml
     expire_in: 1 week
 
-# ── planer:trigger-ci (W7-A): triggert die vom Planer emittierte Child-Pipeline (GitLab Dynamic-Child-Pipeline,
-#    trigger: include: artifact:). Diese Child-Pipeline emittiert ihrerseits je System-Perm die Tier-Job-YAML als
-#    GRANDCHILD (parent->child->grandchild = GitLab-Nesting-Tiefe 2). strategy:depend = der Parent-Job spiegelt
-#    den Child-Status (synchron + gated). INERT-by-default (COMDARE_DYNAMIC_PLANER_CI).
-planer:trigger-ci:
+# ── planer:delegate-trigger (W10-B): triggert die CE-emittierte STUFE-1-Child-Pipeline (Dynamic-Child-Pipeline,
+#    trigger: include: artifact:). Die Child-Pipeline emittiert ihrerseits je Mess-Kombination ueber die CEB die
+#    STUFE-2-YAML als GRANDCHILD (parent->child->grandchild = GitLab-Nesting-Tiefe 2). strategy:depend = der
+#    Parent-Job spiegelt den Child-Status (synchron + gated). Dieselben Gates wie planer:delegate.
+planer:delegate-trigger:
   stage: planer
   needs:
-    - job: planer:emit-ci
+    - job: planer:delegate
       artifacts: true
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'
     - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'
   trigger:
     include:
       - artifact: planer-child-ci.yml
-        job: planer:emit-ci
+        job: planer:delegate
     strategy: depend
+
+# ── ergebnis:holen (W10-B, Ledger §42, SKELETT): das ERGEBNIS-HOLEN gehoert laut §42 in die Diplomarbeit-CI
+#    („das Holen der Messergebnisse gehoert auf der Grundlage der cache-engine-lib in die Diplomarbeit-CI auf
+#    Delegation der cache-engine-Framework-lib"). Es sammelt die von den CEB-emittierten STUFE-3-Mess-Jobs
+#    zurueckgeschriebenen CSVs (measure_out/) und reicht sie an persist:measurements (der bestehende Writeback-
+#    Mechanismus, #22/§11-G) weiter. SKELETT auf der persist:measurements-Grundlage: heute dokumentiert es den
+#    Fluss + prueft die Artefakt-Naht; der scharfe Sammel-/Delegations-Aufruf ist GN-11/320er-gated (kein
+#    Auto-Messlauf). INERT-by-default (DREIFACH: COMDARE_BUILD_GOLDEN_N-Gate + when:manual + _bot_-never).
+ergebnis:holen:
+  stage: planer
+  tags: [baremetal]
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+  needs:
+    - job: planer:delegate-trigger
+      optional: true
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
+      when: never
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'
+      when: manual                                 # GN-11/320er-Gate: das scharfe Ergebnis-Holen ist opt-in
+      allow_failure: true
+  script:
+    - |
+      set -euo pipefail
+      echo "== W10-B: ergebnis:holen (SKELETT auf persist:measurements-Grundlage, §42) =="
+      echo "-- Delegation an die cache-engine-lib: die CEB-emittierten STUFE-3-Mess-Jobs schreiben je Zelle"
+      echo "   ein CSV zurueck (measure:[a,b,c][d,e,f][g,h,i], 1-Thread §38.b). ergebnis:holen sammelt sie und"
+      echo "   reicht sie an persist:measurements (#22/§11-G Writeback nach development) weiter."
+      echo "-- GATED (GN-11/320er): der scharfe Sammel-Aufruf ist erst nach dem User-Mess-Entscheid aktiv."
+      # SKELETT-Naht (GN-11/320er-gated, NICHT aktiv): sammelt die measure_out/-CSVs der Grandchild-Mess-Jobs
+      #   mkdir -p "$CI_PROJECT_DIR/measurement/ergebnis"
+      #   find "$CI_PROJECT_DIR" -path '*/measure_out/*.csv' -exec cp {} "$CI_PROJECT_DIR/measurement/ergebnis/" \;
+      #   -> Uebergabe an persist:measurements (needs: measure:*-Artefakte, bestehender Writeback-Mechanismus).
+      if [ -d "$CI_PROJECT_DIR/measure_out" ]; then
+        echo "measure_out/ gefunden: $(find "$CI_PROJECT_DIR/measure_out" -name '*.csv' 2>/dev/null | wc -l) CSV(s)"
+      else
+        echo "measure_out/ (noch) nicht vorhanden -> Skelett-Lauf, kein Sammeln (golden-neutral)."
+      fi

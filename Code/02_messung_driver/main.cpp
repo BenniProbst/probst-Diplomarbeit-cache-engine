@@ -386,6 +386,29 @@ int main(int argc, char* argv[]) {
             namespace pf = comdare::cache_engine::builder::profile_facade;
             return pf::dump_experiment_cmake_facade(prof, std::cout);
         }
+        // --emit-tier-ci [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): die CEB-ROLLEN-Emission (Stufe 2). Wie
+        // --dump-ci, aber emittiert NUR die Stufe-2-Sicht des freigegebenen CEB-Raums (System-Perms + Tier-Chunk-
+        // Jobs "tier:build:[a,b,c][d,e,f]:chunk<k>" + GN-11/320er-gegatete Mess-Jobs). CEB-Hoheit (§40.b): der
+        // Planer steuert die CEB-Jobs (--dump-ci), die CEB steuert die Tier-Jobs (--emit-tier-ci). Heute EINE
+        // Binary in zwei Rollen. Baut KEINE DLL, misst NICHT; Root-Tag-Sniff in der Fassade. YAML -> stdout.
+        if (flag == "--emit-tier-ci") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::emit_tier_ci_facade(prof, std::cout);
+        }
+        // --emit-tier-cmake [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): der Bare-Metal-Gegenpart zu
+        // --emit-tier-ci (Stufe 2, CEB-Rolle). Emittiert das tier_plan.cmake (reale provision-only-Tier-Chunk-
+        // Bau-Targets + GN-11/320er-gegatetes measure:-Skelett) -- der Ort des Tier-Baus in der dreistufigen
+        // Bare-Metal-Kette (--dump-cmake -> CEB -> --emit-tier-cmake -> Tier-Bau). Baut KEINE DLL, misst NICHT.
+        if (flag == "--emit-tier-cmake") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::emit_tier_cmake_facade(prof, std::cout);
+        }
     }
 
     // INC-G+H (C.2+C.3): der OFFIZIELLE XML-getriebene execute_messreihe-Weg NUR bei explizitem Opt-in (Muster
