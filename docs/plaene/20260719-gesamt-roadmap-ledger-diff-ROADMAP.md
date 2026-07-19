@@ -297,3 +297,24 @@ Anhang-Regen einspielen (**M-6**-Copy-Back-Minimalweg genügt zur Not manuell-do
 - **Mess-Modi (§30.3):** XML-Steuerbefehle je Achse ODER per Gesamtexperiment (enumerierte Range oder benannte Algorithmus-Listen je Achse, permutiert durchgetestet) — konkretisiert Fork R5 der PL-17-Resolver-Stufe.
 - **Registry-Stufen-Mapping (§28×§30):** Mess-Registry→Planer · System-Registry→CEB · Organ-Registry(+prt)→Tier (präzisiert PL-17/PL-18).
 - **Infra-Stand-Nachtrag (ST-Strang):** Storage Ebene B+C scharfschaltbar (P1–P3 done); Smoke-Pipeline 11365 mit `COMDARE_STORAGE_CACHE=true` gelaufen — ST-2 teilweise vollzogen; ST-3-Rest = literale E2E-Belege + Politik-Entscheide (ST-5). **NACHTRAG §31 (Storage-Stufen-Zuordnung, User-präzisiert):** CI-Cache (dev-MinIO `minio.comdare.local`) hält NUR die Planer-Binary (statisch, Kopf); prod-MinIO (`https://minio.prod.comdare.de`, Bucket `cache-engine-tier-binaries`) hält ALLE dynamisch GENERIERTEN Folge-Stufen-Binaries (CEB je Messsystem + Tier + Hybrid) + Systemaufstellungen (Sidecars/Provenienz) — Ebene B erweitert von „Tier-Binaries" auf „alle generierten Folge-Stufen".
+
+---
+
+## KONSOLIDIERUNG §35–§39 (2026-07-19 abends) — Meilenstein-Nachzug
+
+Die Abschnitte §35–§39 des Ledgers (Cluster-Parallelisierung, Pool-Modell, Freigabe-Generalisierung, §38-Dock-Protokoll, Infra-Autonomie) verschieben/ergänzen die (E)-Marschrichtung wie folgt:
+
+| Neu | Inhalt | Stand 19.07. abends | Haengt an |
+|---|---|---|---|
+| M-§35a | 24-Zellen-Bau-Matrix (resource_group-Locking + Capability-Tag-Routing + mc-Dedup) | **GELIEFERT** (W4-A, super-CI) | — |
+| M-§35b | Runner-Capability-Tags amd64/avx2/avx512 | **GELIEFERT** (IMPL selbst, §39-Freigabe; prod1/prod2 getaggt, kleine Nodes bei Online-Gang) | — |
+| M-§35c | Kalibrierungslauf (TOTAL=64, 24 Zellen a 16, Ebene B scharf) | **LAEUFT** (Pipeline 11453) | M-§35a+b |
+| M-§35d | Voll-Matrix golden-N 2^17 (4 Chunks a 32768 je System-Permutation) | offen — GO nach 11453-Auswertung (Zeit-Hochrechnung + GN-9-Bloat-Deckel) | M-§35c |
+| M-§38a | Dock-Nutzlast hinab: ExperimentSubtreePayload + R5-XML + Roundtrip-Gate | **IN BAU** (W5-C) | — |
+| M-§38b | Fortschritts-Rueck-Kanal: ProgressDelta + ProgressSinkFn-Naht + done-Signal | **IN BAU** (W5-C) | — |
+| M-§38c | --dump-plan-CLI (I1-Rest) + CMakeGraphBuilder (I2) | **IN BAU** (W5-B) | — |
+| M-§38d | ceb-measurement-exclusive resource_group (Mess-Jobs) | **GELIEFERT** (W5-A, 7cca57a) | — |
+| M-§37a | Aktive CEB-Generierung je Messsystem (Fork C .so-Schnitt) + State-Pattern-Freigabe | offen (nach W5; Fork C ungeschnitten, Ledger-Designluecke) | M-§38a-c |
+| M-§39a | Ebene-C-Basic-Auth-Fix (artifact_cache) | **IN INTEGRATION** (Fix im Tree, 201 live belegt) | — |
+
+B5 (Messlauf+PDF) bleibt der kritische Pfad: nach M-§35d folgt F2-Regime → M-4 → #47 (unveraendert).
