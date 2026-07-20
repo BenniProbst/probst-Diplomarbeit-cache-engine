@@ -124,7 +124,7 @@
 | **A4 Anhaenge A/B/E + FF0** (Thesis) | Thesis .tex Anhaenge A/B/E, FF0-Owner | B/E von 4-Zeilen-Stubs zu Voll-Anhang; FF0-Owner benannt | §0-V6.2-G8 |
 
 **Agenten-Zahl: 4** (Code + Analyse + zwei Thesis-Straenge datei-disjunkt).
-**Gate:** Hybrid ctest gruen + PDF baut (`.blg`/alphadin geprueft). **Offene User-Entscheidung noetig VOR A1:** §32-F8-3 Break-Even-Option (variant-im-Hybrid / ganze Tier-Binaries hot / Dock-Array mit Verdraengung) — bestimmt Hybrid-Architektur.
+**Gate:** Hybrid ctest gruen + PDF baut (`.blg`/alphadin geprueft). **§32-F8-3 ENTSCHIEDEN (§49):** Option 1 (std::variant DIREKT im Hybrid-Tier-Binary, eng begrenzte §23-Ausnahme) + Option 3 (Dock-Array multipler Tier-Binaries hot an multiplen Docks + Verdraengungs-Strategie, Speicher-Heuristiken WEB-recherchiert) — BEIDE gebaut; Praezisierung s. S9.
 **Blockiert-durch:** S6 (reale Messdaten).
 
 ---
@@ -209,10 +209,23 @@
 
 ## Risiken & Fallbacks
 
-**R1 — Mess-Vollzug-Komplexitaet (S4+S5, hoch):** Schema-Auffaecherung + scharfe `emit_measure_job`-Verdrahtung + 1-Thread-Sweep + EIN-CSV sind der dickste unerledigte Block und liegen direkt auf dem Pfad zur 28.07. *Fallback:* Auffaecherung auf **einen** Tooling-Pfad (Wallclock) reduzieren statt {Wallclock/Makro/Micro} voll — der 320er-Lauf ist dann schmaler, aber real und abgabefaehig; Makro/Micro als additive Spalten ab 01.08.
+**R1 — Mess-Vollzug-Komplexitaet (S4+S5, hoch):** Schema-Auffaecherung + scharfe `emit_measure_job`-Verdrahtung + 1-Thread-Sweep + EIN-CSV sind der dickste unerledigte Block und liegen direkt auf dem Pfad zur 28.07. **UMGEDEUTET (§49-User-Entscheid): KEINE Reduktion — kompromisslos ALLE Messmethoden {Wallclock/Makro/Micro} + Observer-Prüfdock-Bestandteile voll durchziehen (s. S9).** *Fallback bei Zeitnot:* NICHT die Methoden reduzieren, sondern den 320er-Umfang (weniger binary_ids), aber immer mit vollem Mess-Tooling — Vollstaendigkeit der Methoden hat Vorrang.
 
 **R2 — ABI/golden-Bruch (S1/S2, hoch):** kMeasurementAxisVersionLine reisst sizeof-Assert; P-OBS-Reklass ist golden-relevant; ein Fehlbau im Fenster kostet den 24.07.-Nachweis. *Fallback:* Version-Line-Gate strikt als **kleines** Gate isolieren (binary_id Organ-only bleibt CRC-neutral); bei golden-Bruch auf den letzten gruenen ABI-Snapshot zurueck, P-OBS additiv nachziehen — golden-Regen ist EIN kontrolliertes Fenster, nicht pro Agent.
 
 **R3 — Storage-Infra-gated (P-W12B / Ebene-B, mittel):** prod-MinIO V91 ist #56/#72-gated und NICHT vor 28.07. verfuegbar. *Fallback:* Bereits so eingeplant — **P-W12B strikt nach Abgabe** (BAND-C); der 28.07.-Pfad nutzt den vorhandenen env-gated Cache ohne Ebene-B. Kein Deadline-Impact.
 
 **R4 — Zeit / Ketten-Stau am Planer-Kern (durchgehend, hoch):** S3->S4->S5 serialisieren zwingend auf denselben Header; Slip eines Schritts schiebt alle folgenden. *Fallback:* P-RESOLVER auf einen **minimalen 3-tiefen Resolver** (Organ/System/Mess-Roundtrip ohne volle 5-Tiefe) kappen, damit S4 nicht wartet; volle 5-Tiefe als post-Abgabe. Hybrid (S7) ist ABGABE-PFLICHT -> **minimale Baseline** aus realen Daten (eine Achse, ctest-bewiesen) genuegt der Pflicht, Spline-Vollausbau ab 01.08. Nebenstraenge (P-HYBRID-Scaffold, P-KONFORM, P-INFRA-avx512) parallel vorziehen, um Kern-Owner-Leerlauf zu fuellen.
+---
+
+## S9 — Mess-Methoden VOLL + Observer-Prüfdock-Bestandteile (§49, ultracode-präzisiert; speist S4/S5/S6/S7)
+
+**Ziel (User §49, kompromisslos):** Die Mess-Tooling-HAUPT-Achse trägt ALLE Messmethoden {Wallclock · Makro-Benchmarks · Micro-Benchmarks über Observer} + die Observer-Prüfdock-Bestandteile (selektiv einkompilierte IObservableTier-Observer + Prüf-Dock-Mechanik) — KEINE Reduktion. Zusätzlich Option-3-Verdrängungs-Strategie für das Hybrid-Dock-Array (S7) web-recherchiert.
+
+**Einordnung im Plan:** S9 ist KEIN zeitlich neunter Schritt nach S8, sondern die **Design-Präzisierung, die VOR S4 geklärt sein muss** und in S4 (Schema/Auffächerung), S5 (Vollzug: welche Observer/Methoden je Lauf), S6 (320er-Umfang) und S7 (Hybrid-Dock-Verdrängung) einfließt. Wird per ultracode-Workflow präzisiert (läuft), Ergebnis als Bauplan-Dokument.
+
+**ultracode-Präzisierungs-Umfang (Workflow):**
+1. **Mess-Tooling-Voll-Katalog** — Wallclock / Makro-Bench / Micro-Bench: welche existieren im Code (IObservableTier, observe_all, tier_observe, PMC), was fehlt je Tooling-Variante; wie selektiv einkompiliert (§32-F7).
+2. **Observer-Prüfdock-Bestandteile** — welche Observer (Achsen-Observer, Segment-Timing, PMC-Counter), wie ins Prüf-Dock (PruefDock/IPruefDock, dock-Mechanik), prüfdock-kompatible Einkompilation in die Tier-Binaries.
+3. **Speicher-Verdrängungs-Heuristiken (WEB-Recherche)** für das Hybrid-Dock-Array (Option 3): LRU/LFU/ARC/CLOCK/2Q/W-TinyLFU etc. — welche für Tier-Binary-Hot-Swapping (große, wenige, workload-korrelierte Objekte) passt; Auswahl mit Begründung.
+4. **Schema-Konsequenz** — wie die vollen Mess-Methoden in `<measurement_tooling>` (S4) enumeriert werden; wie die Ablaufmethodik {Debug/Messen/Release} sie an-/abschaltet.
