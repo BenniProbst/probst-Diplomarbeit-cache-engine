@@ -66,3 +66,12 @@ Die Topologie oben zeigt die BAU-Kette (nur HAUPT-Achsen). §42.b ergaenzt:
   ueber den §38-Dock-Kanal, kein Neubau; Lastprofil-Mechanik existiert als Achse-2-XML).
 - W10-A-Konsequenz: das Legenden-Namensschema bekommt die Mess-Job-Form; die Contract-Tests pruefen zusaetzlich,
   dass KEINE Unter-Achse in Bau-Job-Legenden erscheint (Bau=Haupt-only-Gate).
+
+## NACHTRAG §47 — Mess-Achse [a,b,c] = MESS-TOOLING (Haupt), NICHT measurement_categories (2026-07-20)
+
+Die Auffaecherung `[a,b,c]` in mehrere ceb:build-Strecken kommt aus der **Mess-Tooling-HAUPT-Achse** (Ledger §47):
+- **[a,b,c] = Mess-Tooling** (statisch/CT, fest einkompiliert): {Wallclock-Time · Makro-Benchmarks · Micro-Benchmarks-ueber-Observer}, selektiv. Je Tooling-Wahl EINE eigene CEB-Strecke + kMeasurementAxisVersionLine-Stempel (§43).
+- **Ablaufmethodik {Debug · Messen · Release} = UNTER-Achse** (dynamisch, an CEB delegiert; CEB kompiliert das Tooling ein + haelt den Ablauf ein). NICHT Auffaecherungs-Achse, nie Stempel.
+- **Workloads (ycsb_a..f) + Datasets = UNTER-Achse** (Planer permutiert zur Laufzeit gegen alle CEBs, §42.b). Die 16 `<measurement_categories>` = CSV-Spalten (binary_id-neutral), NICHT Auffaecherung.
+
+**Impl-Konsequenz W10-B (Korrektur):** `measurement_combos_of()` muss ueber die Mess-Tooling-HAUPT-Achse auffaechern (N Tooling-Konfigs -> N CEB-Strecken), NICHT den `<measurement_categories>`-Block als eine Kombi nehmen. Schema-Ergaenzung Anwender-XML: `<measurement_tooling>` (Haupt, enumerierbar) + `<run_methodology>` (Unter: debug|measure|release). Registry-Angebot im Mess-Modul (§28). Die Ablaufmethodik-Unter + Workload-Unter fliessen in den (delegierten) Mess-Job-Sweep, nicht in die Bau-Auffaecherung (§42.b Bau=Haupt-only-Gate gilt: keine Unter-Achse in Bau-Legenden).
