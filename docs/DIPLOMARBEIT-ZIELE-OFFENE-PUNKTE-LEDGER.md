@@ -2413,3 +2413,177 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **F1/F7-Konflikt aufgelöst:** §32-**F1** war korrekt (Debug/Mess/Release = Unter-Achse). §32-**F7** beschrieb den Tooling-Effekt (selektiv einkompiliertes Messsystem), aber die HAUPT-Achse ist das **Tooling selbst**, NICHT der Modus. Beide §-Punkte werden additiv präzisiert (Verweis hierher).
 - **Zweite fehlende Mess-Unter (aus §42.b):** die **Mess-Framework-Workloads** (ycsb_a..f) + Datasets bleiben Unter-Achse (Planer permutiert sie zur Laufzeit gegen alle CEBs). Die 16 `<measurement_categories>` bleiben CSV-Spalten (binary_id-neutral), NICHT die Auffächerungs-Achse.
 - **Konsequenz für den Bau (measurement_combos_of):** Die CEB-Strecken-Auffächerung `[a,b,c]` kommt aus der **Mess-Tooling-Haupt-Achse** (N Tooling-Konfigurationen → N CEB-Strecken). Ablaufmethodik + Workloads = an CEB/Mess-Job delegierte Unter-Achsen. Prinzip identisch an allen 3 Vertragspunkten (§24 Ketten-Statik): Haupt=statisch/CT eingefroren, Unter=dynamisch/delegiert. Schema-Ergänzung: `<measurement_tooling>` (Haupt) + `<run_methodology>` (Unter) im Anwender-XML; Registry-Angebot im Mess-Modul (§28).
+
+## §48 — KONSOLIDIERTER GESAMTBLOCK ALLER OFFENEN ZIELE (Stand 2026-07-20, gepflegt)
+
+**Executive Summary — kritischer Pfad zur Abgabe 28.07.:**
+1. **Voll-Build 2^17 (Task #19/§41/§46) muss durchlaufen** — new-golden gebaut, dann golden-320-Mess-Datensatz vor 28.07., N-Messung ab 01.08. (`§46`, `§41`, `§26 #49`).
+2. **Realer Mess-Vollzug fehlt noch**: `emit_measure_job` ist nur when:manual-Echo-Skelett, und `measurement_combos_of` fächert nicht auf (nur `[all]`) — beide vor dem Messlauf zu verdrahten (`AKTUELL-mess-vollzug-sequentiell`, `AKTUELL-mess-achsen-auffaecherung`).
+3. **Hybrid-Binary (4. Ketten-Glied) ist ABGABE-PFLICHT vor 28.07.**, nicht danach (`§31`, `§32-F8`).
+4. **Thesis-PDF-Endspurt**: Anhänge A/B/E + CRC64 + Mess→PDF-Rückschrieb-E2E (`§0-V6.2-G8`, `§44 Kern-DoDs`, `§0-DoD6`).
+5. Größte offene Blöcke: **Experiment-Planer-Codegen/Registry-Resolver + 3 Achsen-Art-Registries** (`§27`/`§28`/`§18.1.8`), **Hybrid-Spline-Heuristik** (`§32-F8`), **Storage-Aktivierung Ebene B (prod-MinIO V91, Infra #56-gated)**.
+
+---
+
+### Bau-Kette
+
+- **[§24.G-Naechstes]** Hauptstrang-Endstrecke — #45 A2-Neben (pmc_source→measurement/ + Namespace builder::→measurement::) → Rest-Konformität #44/#43 → FF0-FF4-Messlauf #46 → Thesis-PDF #47 (OFFEN, kritisch — Endstrecke 28.07.).
+- **[§26 #49][§0-12-0718][§32-F1][§33][§34]** golden-N Voll-Konfig = einziger legitimer Systembeweis — All-17-Achsen-XML + opt×simd-Verdrahtung + Materialisierung (E-1/E-2/E-3), N=2^17, CRC64 0xF1C1F26A1232073B; CE-seitig NICHT gebaut, kein Stale-Green (OFFEN, kritisch — Bau-Nachweis 24.07.).
+- **[§46 VOLL-BUILD]** Voll-Build über die neue Kette getriggert (GN_TOTAL=131072, 4 System-Perms × 4 Chunks); avx512 = Anschluss-Increment (`AKTUELL-infra-avx512`) (TEIL/laufend, kritisch 24.07.).
+- **[§30][§18.1.1][§18.1.8][§16.1-C3][§29 Phase-0][§19.E-Roadmap Schritt5]** Experiment-Planer als 3. Framework-Anwendung — Planer-Executable existiert NICHT; rekursive Dock-Topologie (Planer↔CEB↔Tier), F5-Planer-Codegen, Input-Umstellung v32_orchestrator return-0-Stub unter Wiederverwendung von execute_messreihe (OFFEN, kritisch — Deadline).
+- **[§27][§28][§32-F6]** Registry-Resolver-Stufe + DREI Achsen-Art-Registries — Registry=ANGEBOT / Anwender-XML=ANZEIGE(.pom); Organ (existiert) + System (NEU 6/7) + Mess (NEU 16 Kat.); Generator-aus-Code je Byte-Roundtrip-Gate; validate_profile.hpp erweitern, KEIN Parallel-Validator, kein Python (OFFEN, hoch — Planer-Strang).
+- **[§30 AxisKind]** AxisKind-gefärbter Gesamtbaum zerlegbar (Organ→binary_id / System→CEB / Mess→Planer); build_all_axis_levels/ExperimentTree mit Filter-/Zerlege-Operation (OFFEN, hoch). **[§31 A1]** AxisKind-Code veraltet, für Färbung/Zerlegung ausbauen (TEIL).
+- **[§18.2.4-INC][§18.2.4-#37][§20.B-INC1-offen]** Rest 4→5-Bau — INC-3 golden additiv einfrieren+neu materialisieren; INC-4 Sequence/Container/Graph-Dock (V42); #37 Scheduling-vtable-Ersatz (CRTP); Q1-Stufe-2 AxisBase→OrganAxis-Umhängung 22 StrategyBase; Metadaten-POD-Version (TEIL, hoch).
+- **[§18.1.3]** Prüf-Dock-ABI-Vertrag 3-teilig (Befehl/Settings ComdareResourceControlV1/Rückkanal 1416) — Set/Sequence-Docks V42, Iterator-Bypass beseitigen (OFFEN, hoch).
+- **[§18.1.4]** Allokatoren = Algorithmen axis_06 (CRTP+Concept, kein vtable) — Rest nach INC-0 (OFFEN, hoch).
+- **[§20.B-optc-OF][§20.B-A1A2A3][§21.C-E1E5][§32-F4]** opt-Arc — opt-f (XML-Liste/Range opt_level+simd+XSD+validate) + opt-g (Planer permutiert opt×simd ISA-gated, build_version-Sidecar, NIE binary_id) + A2-Neben (perm_runner + pmc_source-Verzeichnis-Zyklus, ABI-nah); Default O3; codegen-Minor CI-Tripwire+Lock (TEIL, hoch).
+- **[§21.D-Ebenen]** 3 vertagte Kern-Library-Punkte (near-TABU, nur mit GO): Namensfalle OptO*SubAxis→OptO*Option, symmetrische SimdSubAxis, Doku-Nachzug Ofast→O3 (TEIL).
+- **[§26 F-SIMD]** Aktiven SIMD-System-Knoten (extension_hardware, Q2-C, E-4) bauen — heutige Klasse DEPRECATED, SimdSubAxis verwaist (OFFEN, hoch).
+- **[§26 L5]** build-i2-Tests (smoke/measurement/wdk) stale-rot durch B2/B4-generated-Include-Root-Gap (test_experiment_projection), INC-0-gebunden (OFFEN, hoch — Hart-Grün-Doktrin).
+- **[§43][§43.b][§44 W12][§45 GATE-STAND][AKTUELL-w12a3]** Versionierungs-Stempel — W12-A/A2 produktiv; offen: W12-B (Stempel in Cache-Key, dll_is_current-Konsumption; s. Storage), W12-A3 SOTA-Stempel, X.Y.Z-Migration algo_version int→X.Y.Z (TEIL, hoch — Cache-Effizienz).
+- **[§35 algo_sig]** algo_sig als Invalidierer + lazy Per-Index-Emitter (INC-G6, Welle 4) — Voraussetzung für N-Quellen (OFFEN/TEIL, hoch).
+- **[§37][§37.b]** Freigabe-Prinzip alle System→Organ-Achsen (SIMD-Pilot; Dual-Aufnahme via State-Pattern durchs Prüf-Dock); CEB wertet Freigaben zur Laufzeit aus und delegiert Organ-Kompilation (Organ ≤ System) (OFFEN, hoch).
+- **[§38]** Planer→CEB B+-Teilbaum-Serialisierung als Achsen-Ranges + sparse Fortschritts-/Cursor-Rück-Kanal (kein Mess-Daten-Rückfluss) (OFFEN, hoch).
+- **[§40.a]** SIMD-Flag-Signatur-Modell — je Maschine deklarierte Signatur EINZELNER Flags (avx512f/vl/bw/dq/vnni), Flag-genaue Freigabe-Kopplung; Web-Recherche → Referenz-Doc + System-Registry (OFFEN, hoch).
+- **[§26 Guard-2^17]** static_assert gegen versehentliche 2^17-Voll-Materialisierung des generated_source_catalog.hpp (E-3) (OFFEN, mittel).
+- **[§26 Quick-Wins][§44 r5g]** golden-neutraler Batch — static_assert(sizeof==1272), host_compatible_with, all_axes_*_count-Rename, Stale-Skip-Guard reflect_versions<17> ins Default-ctest, lokaler r5g-Codegen-Regen (TEIL/OFFEN, mittel/niedrig — Hygiene).
+- **[§10.1-E4]** #229 „Diplomarbeit ändert nur die XML" — P5/P6, Behelfsweg-Löschung, golden-Vollmesslauf offen (TEIL, hoch).
+- **[§11-E]** #179 Wartbarkeits-Sweep XL (TEIL, mittel).
+- **[§12-0716-E11]** Phasen-Kardinalität ≠3 — ultracode-Klärung der echten Phasen-Struktur, blockiert Schema/Validator (OFFEN, hoch).
+- **[§12-0717-DOCK]** Rekursive Dock-Architektur autoritativ (fließt in INC-1/2) (OFFEN, hoch).
+- **[§12-0716-FORKA][§12-0716-AUDIT]** Fork-Option-A / v32-Rückschnitt zu dünner Orchestrierung; WP-Rest-Befunde (OFFEN/TEIL, hoch).
+- **[§12-0716-F][§18.5.1-Danach]** F1-F12-Reste + Nach-4→5-Bauliste (Planer/F9✓/F10/F11/S-7/#276) (TEIL, hoch/kritisch).
+- **[§13.10-W1/W2/S7/OFFEN-S7Plan/OFFEN-234V/OFFEN-Pruning][§12-234V]** B+-Baum Shape-Materialisierung — 234-V (T22-T25/page_type/simd webt nichts in perm-Source; Option A + binary_id-Segment); S7-Serienplan S7-2..9; Pool-L-Semantik; Cross-Familie-Pruning; Zählung 9-vs-10 (OFFEN/TEIL/GEPARKT, mittel).
+- **[§13.8-F-S7-b]** L-Node-Pool-Backing Code-Vollausbau (packed vs cache_line_aligned) (OFFEN, niedrig).
+- **[§12-0708-#29 / #29-Rest][§14.1-G-AP15]** comdare::container-Kopf-Framework + AP-15 Set/Sequence-Gattungs-Folge (Genus→Typ-ABI-GO, Option A/B) (TEIL, hoch — user-gated ABI).
+- **[§15.8-g-F72]** Vendor-Allokatoren jemalloc/tcmalloc/hoard/scalloc echt linken (K78-CE-D4-gated) (OFFEN, mittel).
+- **[§15.8-g-F58]** G7-Vorlauf alloc_hw-Codegen fb_numa_page_study, golden-neutral (NUMA-Fenster-gated) (OFFEN, niedrig).
+- **[§16.1-C1]** 2/3 Registries als statische CMake-Pfade (DOKUMENTIERT+I2; §28 präzisiert auf 3) (TEIL, hoch).
+- **[§18.1.6-Golden]** Golden zerlegt+umgebaut + Serialisierungs-Doktrin (Umsetzung im Planer) (TEIL, hoch — s. Storage).
+- **[§20.D-B3]** cpuid_probe-Lücken für H-1/H-7/H-9 (Leaf 0x1A/0xB/0x1F, physical/logical_cores via sysfs) (OFFEN, mittel).
+- **[§20.D-B7]** v32-Restwarnungen F02 (<mode> nie konsumiert) / F08/F61 (kein MEASUREMENT_ON-Preset) (OFFEN, niedrig).
+- **[§30 Organ-Join]** Organ-Join-Modi Stufe1/2/3 (existiert; feinschleifen) (TEIL, mittel).
+- **[§30 System/Mess-Join]** System-/Mess-Achsen-Algorithmus-Join — nach Abgabe, getrackt (GEPARKT, niedrig).
+- **[§18.3.1-S7]** S-7 Deep-Research (Locking in Suchalgo+Container, Observer echt; OptiQL/ARTSynchronized) — Tooling-/Safety-Block, EHRLICH OFFEN, Opus-Session (GEPARKT, mittel).
+- **[§8-DEFERRED]** #125 lazy-DLL Content-Hash, #10 V42-Infra/Nicht-SA-Docks, #149/#229 Audit-Meta (GEPARKT, niedrig).
+
+*Erledigt/überholt (Bau-Kette):* §0-DoD1, §0-DoD5, §0-V5.4b-SUP, §0-V6.2-BauINC0/1/2, §2-B1/B4/B5/B6/B7, §3-S1/S2/S3/S4/S5/S6/S7/S9, §4-ABI, §5-P0/PA, §17.B/17.C/17.E, §18.1.5-F1b, §18.2.1/18.2.2/18.2.3-INC0/18.2.4-4zu5, §18.5.1-Danach(F9-Teil), §19.A/19.B/19.C, §20.A/BauGate/INC1/SYNC1/INC2/2copt/Nachschlagewerk/optc-block/mainMerge, §21.A/21.B, §16.3-E17/E18, §12-0717-GO, §12-0710-Limits/Parser/Phase6/Achsen-Ontologie/Kardinalitäten/Doc21/Phase0/CMD2/Slice1/GO-Increments, §12-0708-#26/#27/#49-50, §12-0711-#31/#12-0710-E4/E3/E2/M/E1, §12-16-F12i, §13.9-C1/C2, §13.10-7b3/AP2, §15.6(Header-Fill), §16.1-C4, §16.5, §29 ce-CI-Reparatur.
+
+### Mess-Kette
+
+- **[§14.3-HELD][§13.10-W3/CMD2/#268/m3v2Artefakt][§0-V6.2-Gated][§6-MESS][§12-#279/§14.2-#279]** DER Voll-per-Host-Messlauf (m3v2/#156/#215/#216, mehrtägig, Pipeline 286 — NIE pollen); Re-Build-Pflicht ALLER DLLs, 162-Spalten-WIDE additiv, Alt-Pilot-CSVs nie mischen; 320er zur Deadline, N ab 01.08. (GEPARKT/HELD, kritisch — vor 28.07.).
+- **[AKTUELL-mess-vollzug-sequentiell]** emit_measure_job nur when:manual-Echo-Skelett (COMDARE_RUN_MEASURE auskommentiert) — realen 1-Thread-Mess-Vollzug (§38.b, Unter-Achsen-Sweep, EIN CSV) verdrahten (OFFEN, hoch — 320er vor 28.07.).
+- **[AKTUELL-mess-achsen-auffaecherung]** Mess-HAUPT (Tooling wallclock/makro/micro, statisch, je Wahl eigene ceb:build-Strecke) NICHT von Mess-UNTER (Debug/Mess/Release + Workloads) getrennt; measurement_combos_of gibt nur `[all]` → Schema <measurement_tooling>+<run_methodology> + Registry-Angebot (TEIL — Design §47-final, CODE fehlt; kritisch vor Voll-Messlauf).
+- **[§15.7-R10][§32-F7][§16.2-M1][§16.2-M3]** 3 Mess-Modi bauen (Wall-Clock / Per-Achsen-Observer / vs-std::map-Güte) + Makro/Mikro je Achse; Debug=parallel / Mess=1-Thread; Release ohne Messsystem; selektive Messkompilation; 2-Phasen-Op-Schleife 3× (TEIL/OFFEN, hoch/kritisch).
+- **[§15.8-g-F60/F61][§15.3-F-H]** DLL-Load Fork A — INC-F ist typ-identische IN-PROCESS-Vorstufe, echter Laufzeit-DLL-Load steht aus (OFFEN, kritisch — Deadline).
+- **[§1-FF1/FF3/FF4][§11-B][§13.10-W4/OFFEN-PRTART]** FF-Gate-Kette AP-2✓→#162 (≥8 Rang-1-SOTA, HELD)→#156/M3; PRT-ART Stub-Quarantäne (90ns/unordered_map in 3 Alt-Pfaden); 3-Hauptmessmethoden-Referenz (TEIL, kritisch/hoch).
+- **[§1-FF0]** FF0-Owner explizit fehlt (nur implizit über gated #163/#189/#247) (OFFEN, hoch — Abgabe-Blocker).
+- **[§12-PMC]** I-PMC-2 (L3+branch_misses) / I-PMC-3 (#187 L2+coherence Zen-5-RAW) (TEIL, hoch).
+- **[§42.b]** 4. Mess-Emissions-Ebene — dynamische Unter-Achsen-Sweep-Jobs measure:[a,b,c][d,e,f][g,h,i], gated hinter 320er (OFFEN, hoch).
+- **[§38.b]** NUR EINE messende CEB gleichzeitig (Mess-Exklusivität, ceb-measurement-exclusive); paralleler BAU bleibt (TEIL, hoch — Mess-Korrektheit).
+- **[§32-F2/F3]** Aufbau-Reihenfolge new-golden→320er; Alt-CSVs behalten aber IMMER gegen Ledger prüfen (OFFEN, hoch/mittel).
+- **[§10.1-GOLDCOV]** Goldener Coverage-Test #18 (je Achse ≥1 Config × alle Frameworks × Lastprofile) (OFFEN, mittel).
+- **[§12-20260709-E0E4]** Phase-4/#31 E4-XML-Maschinerie (Fork R1/R2-gated) (TEIL, hoch).
+- **[§11-C][§5-PB][§12-AP10]** AP-12/#246, AP-13-Rest (3-ISA infra-gated), AP-14/#248 (nach #215/#156), AP-10-Rest user-gated (TEIL, mittel).
+- **[§15.8-g-F39]** #34 honest-100%-Audit run-gated (code-done, prod1-Messfenster) (TEIL, mittel).
+- **[§15.8-g-F79]** axis_05-IMC-Runtime-Heuristik als §8-Zeile (messgebunden) (OFFEN, niedrig).
+- **[§15.8-g-F74][§8-C2]** C2/GH200-ARM-Strategie (eigene ARM-Strategie vs §8-Punkt); Miet-Antrag läuft (OFFEN/GEPARKT, niedrig).
+- **[§12-P33]** AP-6/P33 VAMPIR Option B (NfpTierPlacedMemoryLayout, NUMA_PINNED) (TEIL, niedrig).
+- **[§13.10-OFFEN-m3v2Artefakt]** einheitlicher m3v2-Neu-Build aller 326 Basis-DLLs nicht belegbar (Resume-Mischstand) (OFFEN, mittel).
+
+*Erledigt/überholt (Mess-Kette):* §0-DoD4(Teil), §0-IST-0712, §2-B8, §11-H, §13.10-AP2/7b3, §13.3-#267/#268, §12-0708-#25/#45, §12-0710-M/E1/E2/E3/E4/HabichReste, §12-0711-CMD2/#31, §15.1-S-0, §15.4-M-CE-10/M-CE-11-12-28/M-CE-27.
+
+### Thesis/PDF
+
+- **[§0-V6.2-G8][§0-V4-G8][§44 Kern-DoDs]** Abgabe-Blocker G8 — Anhänge A/B/E (B/E nur 4-Zeilen-Stubs, Overleaf-gated) + FF0-Owner + Mess-Manifest/Provenance + #47; DoD7 xml→pdf-Voll-Matrix; Resolver-4-Stufen (D13); Fork E (OFFEN, hoch — 28.07.).
+- **[§0-DoD6][§18.3.1-F10]** Mess→PDF-Persistenz-Rückschrieb E2E mit echten Daten — LaTeX-Mess-Schnittstelle überschreibt je Messung ins Overleaf-Git; Phase 2 NAS-Parallel (TEIL, hoch — an Messlauf gebunden).
+- **[§12-20260711-CI-interaktiv][§12-20260712-#24]** CI-interaktive Diplomarbeit — eine XML→gesamte Kette→Auswertung mit dynamischen Tabellen/Diagrammen, Anhänge A-F DE+EN automatisiert; #24-Rest: Overleaf-\input-Commit + P1 (#156-gated) (OFFEN/TEIL, hoch).
+- **[§12-20260711-Kap5-Gate]** Kap.5-Ergebnisteil wartet auf reale Messdaten (#156) + Overleaf-Sync (User-Aktion); Hybrid zusätzlich 14900KS-RMA (GATED, hoch — daten-gated).
+- **[§15.6]** INC-5 (Live-Token Proj 289) + INC-6 (INERTE CI-Writeback-Stages) infra-delegiert (TEIL, mittel).
+- **[§13.10-OFFEN-LDoku]** autoritative Architektur-Doku „L gilt für Node-Pools" (Doc 30 §8.2 geliefert, per-Familie offen) (TEIL, mittel).
+- **[§8-USERGATED]** #24 Overleaf-Text, #25 Diplomarbeit-Text (User schreibt), #24 Cluster-Tasks extern (GEPARKT, niedrig).
+
+*Erledigt/überholt (Thesis/PDF):* §12-0712-#25, §12-0710-HabichR2/Qualitätsdirektive, §12-0711-Frischleser, §29 8-Docs, §12-0706-normative-Pipeline.
+
+### Hybrid (ABGABE-PFLICHT)
+
+- **[§31][§32-F8-DoD]** A2/Hybrid-Binary (4. Ketten-Glied) = ABGABE-PFLICHT vor 28.07. — minimale Baseline (Heuristik-Hybrid-Tier-Binary aus realen Messdaten, CEB-kompiliert+geladen, delegiert echte Tier-Binaries, ctest-bewiesen) + Spline-Funktion je Achse → Rückwärts-Wahl optimaler Binary/Algo-Sätze (OFFEN, kritisch — 28.07.).
+- **[§32-F8-3-Break-Even]** 3 Break-Even-Optionen — (1) heuristik-erkannte Algos als std::variant NUR im Hybrid-Kontext (eng begrenzte §23-Ausnahme), (2) ganze Tier-Binaries hot ans Dock, (3) Array multipler Docks mit Memory-Verdrängungs-Algo (deep research); Break-Even = Spline-Schnittpunkte (OFFEN, hoch).
+- **[§0-MISSION]** Übergeordnetes Ziel — top-down vollenden, FF0-FF4 mit CI-verifizierten realen Messwerten, PDF grün, #193 Hand-bedienbar (OFFEN, kritisch — laufende Mission).
+- **[§15.10-B]** DEADLINE 28.07.: SOWOHL gitlab-CI ALS AUCH STANDALONE messbar, cmake+C++23 auf EINER Maschine, synchron parallel (F12i) (OFFEN, kritisch).
+- **[§15.10-D]** Konzept-Stand (bindend): Systemachsen getrennt von Gattungs-Achsen, beide CT-Haupt+RT-Unter; Planer als 3. Anwendung (OFFEN, kritisch).
+- **[§15.10-F]** Autonom baubar: Brücke I-Reste, S-2c, F12i-Parität, F9/F10/F11, E16, #40, S-7-INC-1, #276-allerletzte (TEIL, kritisch — Deadline-Priorität).
+- **[§15.10-E]** Genuin offene User-Entscheidungen — G5/#274-Vorlage, S-7-Bau-Forks, F12iii ABI-Grenzen, F3i-Schema (OFFEN, hoch — user-gated).
+- **[§15.10-G]** HART GESPERRT ohne GO: golden/ABI-Berührung, Löschungen ohne je-Repo-GO, V32-Rückbau, Overleaf-outward-Push, Cluster-Schreibzugriff, G6-Voll-Lauf außer opt-in-CI (OFFEN, kritisch — bindende Sperre).
+- **[§12-20260710-HYBRID][§12-20260710-Doc20]** Heuristik-Optimierungs-Achse als eigene Systemachse mit Arbeits-Dock; Messkurven-Typsystem (tree<axis…tuple<property,time>>) + Chain-of-Responsibility im CEB (OFFEN, hoch — gated, Bau nach E4′).
+- **[§15.5]** Elaborierter Plan Rest — Zentralisierung + E2E-Re-Audit (TEIL, hoch).
+
+### Storage
+
+- **[§24.G-goldenN][§24.F-Ebene-B][§31 A4]** Ebene-B prod-MinIO (V91, Bucket cache-engine-tier-binaries) cacht ALLE Folge-Stufen (CEB+Tier+Hybrid+Sidecars) — CE-Seite fertig env-gated, AKTIVIERUNG gated auf Infra-Handout #56 + #72-Fix (TEIL, hoch — ab 01.08. Voll-Messung).
+- **[AKTUELL-w12b-cache-key]** W12-B — W12-Stempel in ArtifactCache::cache_key_prefix + YAML-GN_PREFIX spiegelbildlich (sonst Pull-Key≠Push-Key), Konsumption in dll_is_current (chirurgische Cache-Invalidierung) (OFFEN, hoch).
+- **[§0-DoD6][§11-G]** Mess→development-Rückschrieb (measurement/<YYYYMMDD-HHMMSS>/) — Mechanik scharf (persist:measurements, Token id=54, INERT bis Aktivierung); Phase 2 NAS-Parallel offen (TEIL, hoch).
+- **[§16.1-C2][§16.2-Q][§16.2-M2][§18.1.6-Golden]** Serialisierung — Q1 flach je Binary+Manifest+Baum-Index, Q2 statische/System-Achsen NICHT als CSV-Spalten (Baum in Planer), Q3 additiv gespiegelt Host→OS→Toolchain→ISA, Q4 On-Disk-Baum + build→ziel-Copy (Copy-Code FEHLT); Reihe C = Option C (TEIL, hoch).
+- **[§14.1-G-6v48][§13.10-AP10/OFFEN-Schichten][§13.10-W5]** Datensatz-Akten — 8er-Liste tab:datasets ∪ Bestand; 5 Akten fehlen (3/8 vorhanden); 6-vs-48-Widerspruch user-gated; ob messung_driver test_data_xml einliest ungeprüft (TEIL, hoch — user-gated).
+- **[§32-F5]** measure-drop als XML-DEFAULT, git-Writeback optional; Pull als 2. Increment (push-only zuerst); Timestamp vom Aufrufer (TEIL, hoch).
+- **[§12-0716-SER]** Serialisierungs-Konzept FIXIERT, Umsetzung offen (4 Neu-Bau-Stränge, failed statt null) (OFFEN, mittel).
+- **[§15.4-Dataset-Doppelquelle]** test_data_sets.xml DEPRECATED-Marker + Single-Source-Konsolidierung (OFFEN, niedrig).
+
+*Erledigt/überholt (Storage):* §24.F-Ebene-C/OPN, §25 WegA-Storage, §44 Storage-Transport-C.
+
+### Infra
+
+- **[§0-DoD3][§7-CI2/CI3/CI4/CI5/CI6][§2-B3][§12-264]** CI-Härtung — comdare_tests Sammel-Target Hard-Gate, cache-engine 2-Pass-Job (PFLICHT gegen Schein-Grün), prt-art 264-c 3 Header (array_256/vector_u8_u8/vector_u16_u16) + alle 12, -j/RAM-Politik, allow_failure-first je neue Stage (OFFEN/TEIL, hoch).
+- **[§20.B-hartgruen]** Gesamte Pipeline IMMER hart grün (ce+super, prod1+prod2, alle Stages), je Increment literal status=success prüfen (OFFEN, kritisch — stehende Direktive).
+- **[§15.3-G-a2]** baremetal-Runner offline → Modus a (lokal-doppelt-verifiziert, CI-Grün batch nach) (OFFEN, hoch — infra-gated).
+- **[§25 Infra-Handout][AKTUELL-infra-pat-rotation-327]** Infra-Handout 6-Punkte + PAT-Rotation #327 (Vault-PAT exponiert, Security-sofort) (TEIL/OFFEN, hoch — deadline-unabhängig).
+- **[§24.B-Infra]** Infra-Modus Caching+Storage-Einrichtung (minio-Bucket, NFS-prod-longhorn, .1-SNI/HAProxy) — Storage-Aktivierung gated auf #56 (OFFEN, hoch).
+- **[§40.b][§42][§44 W7-Child-Auth]** Dynamische Planer-CI/Child-Pipeline — Planer emittiert Folge-CI (CiYamlBuilder/I3, Fork C); super-CI nur Delegation an CE-lib + Ergebnis-Holen; Child-Submodul-Auth (REV-17-Deploy-Token) + Marker-SKIP-Livebeweis vor W10-Abnahme (OFFEN/TEIL, kritisch).
+- **[§40.c]** Bare-Metal-Pflicht — CMakeGraphBuilder scharf (experiment_plan.cmake echte Treiber-Kommandos), topologie-isomorph zu CI-YAML (Contract-Test) (OFFEN/TEIL, hoch — 24.07. lokal messbar).
+- **[§35/§36]** Cluster-parallele System-Achsen-Builds — parallel:matrix opt×simd, Tag-Routing 3-stufig, resource_group-Locking je Zelle + MinIO-Dedup als Sync-Punkt; G7-constexpr-Gate wird Bau-Gate (TEIL, hoch).
+- **[§20.B-XMLCI]** SIMD-Gate-Jobs ISA-Pinning [baremetal,amd]/[baremetal,intel] sofort vs im Rahmen #276 — Struktur-Frage an User (OFFEN, mittel).
+- **[§14.2-#21]** Runner-Cache-Vereinheitlichung (alle Nodes → dev-MinIO, k8s ohne [runners.cache], ccache-S3-Größen) (OFFEN, hoch — Montag/infra-gated).
+- **[§14.2-#273-T2T3][§13.3-#273]** gcc-15.3-Pin (HO-11) + clang-Matrix (T3 done, T2 toolchain-gated) (TEIL, hoch).
+- **[§14.2-Task23/#270b][§20.D-B6][§14.1-G-270a]** Runner-Freeze H11-H18 (node7-rpi5-arm64) → #270b arm64-Grün; prod2-Intel P/E-Core (#270a, 14900KS-RMA ~September) (OFFEN/GEPARKT, hoch/mittel — infra/hardware-gated).
+- **[AKTUELL-infra-runner-version]** prod1 Runner 18.9.0 auf hold ($CI_PROJECT_DIR-Expansions-Falle, Workaround aktiv) — Grund-Entscheid offen (OFFEN, mittel).
+- **[§14.6-#277]** ccache-S3-Archivgrößen-Messung + k8s-[runners.cache] (H15) (TEIL, mittel).
+- **[§14.2-#276][§13.3-#276]** 3-ISA-Teilmatrix als HARTE CI-PFLICHT — ausdrücklich ALLERLETZTE Aufgabe (OFFEN, niedrig — nach Abgabe).
+- **[§14.1-G-274][§13.12-Matrix-Goal][§16.4-G5][§12-0707-274]** G5/#274 measurement-all-Migration Schritte 8-15 ans Projektende (TEIL/GEPARKT, niedrig).
+- **[§12-0716-E14]** Branch-Audit statt -Löschung (wertvolle auf development mergen) + E16 Naming-Backlog (OFFEN, mittel).
+- **[§12-20260708-#46]** ~50 Repos gitlab→github (je-Repo-GO, kein Blind-Sweep) (OFFEN, niedrig — user-gated).
+- **[§12-0708-#32][§13.11-Credential]** Alt-Naming-Sweep redcomponent/bep→Comdare; WCM/Vault-Rotation (OFFEN, mittel).
+- **[§12-20260712-Infra-Contention]** Messlauf drosselt super-CI (dedizierter Mess-Runner/2. baremetal-Node) (OFFEN, mittel — Infra-Handover).
+- **[§0-V4-GINFRA]** CRC64-Platzhalter binary_blob_writer.hpp:50 (echte CRC64 oder Layout-Doku auf 4B) (OFFEN, niedrig).
+- **[§8-INFRA][§13.3-#270/#272][§12-0707-#38/#40][§15.8-g-F59]** Infra-Handover-Paket (#189/#199-210/#231, HO-Punkte, foundation/db/buildsystem-Owner, Token-Rotation, ci-test-ce-bump-Lösch-GO) (GEPARKT, mittel — Infra-Agent).
+- **[§13.3-#254]** OneDrive-Verbleib-Klärung ce/modules/ (TEIL, niedrig).
+
+*Erledigt/überholt (Infra):* §2-B2, §7-CI1, §13.3-#253/#255/#256/#257/#258/#264/#265/#266/#271/#277/#278, §12-0706-Matrix-Reuse/Tests, §12-0707-274-S5/S6/S7/#33/#34/#35/#37/#39/Branch-Doktrin/Standardprozess/F1-F14/Umbrella/#41-44, §12-0708-#11/#43/Dual-Remote/322Memory, §12-13-GitLab-Realm, §13.1-GitHub-Schaden, §13.6-Q2/§14.1-G-Q2, §13.9-A1/A5/A7, §13.11-#273-T1/Übergabe, §16.3-E17, §39, §44 timeout, §45 Voll-Bau-GATE, §46 GATE-ERFÜLLT, AKTUELL-voll-build-total.
+
+### Konformitaet
+
+- **[§33]** Beweis-Doktrin — golden-320 KEIN Systembeweis (13/17 gepinnt, nur Byte-Wache); legitimer Beweis = new-golden Voll-Konfig (alle 17 Achsen ≥2 Algo, N=2^17, CRC64, test_reflect_versions_all17) (OFFEN, kritisch — Beweis-Kadenz).
+- **[§19.F-Kadenz][§19.E-4-Checkpoint]** Kadenz je Increment — ctest + golden-Roundtrip (nach 4→5 messdaten-erhaltender Neubau) + cf22-22.1.8==0 + Mojibake Ã|â€==0 + beide Remotes ref-gleich + CI; je ABI/golden-berührenden Increment golden-Regen- + POD/ABI-Diff-Checkpoint zeigen (OFFEN, kritisch — stehend).
+- **[§9-METAPROG]** Metaprog-/Interface-Doktrin — interne Templates erlaubt, Produkt-Interfaces = pre-compiled Binary-Interfaces, äußere ABI binary-stabil; Push zu BEIDEN Remotes je Increment (OFFEN, kritisch — bindend).
+- **[§20.B-Fehlerklassen]** Fehlerklassifizierung (#29) PFLICHT alle Achsen→Unterachsen→Algorithmen — (a) HW-Fehlen→Compiler-Klasse, (b) Compile-Fehler, (c) Runtime-Algo-Fehler; Planer kennt Klassen statt hart abzubrechen; SampleStatus-Split (INC-29.3-Rest) offen (TEIL, hoch).
+- **[§21.E-Sweep][§21.D-Ebenen]** Konformitäts-Sweep-Roadmap Tasks #38-#48 (Freigabe System→Organ, kein opt-Haupt-Achse, gemeinsames Dach, EIN ABI/golden-Regen-Fenster) + XML-Haupt/Unter-Achsen-Konformität (TEIL, hoch).
+- **[§24.E]** Task #54 — verifizieren (datei:zeile), dass Organ/System/Mess-Achsen weiter durch XML-B+-Baum gesteuert werden, kein hartkodierter Bypass/Runtime-Umgehung (OFFEN, mittel — vor Voll-Messlauf).
+- **[§25 2-Audits]** 9-Dim (4/9) + Ketten (3/5) Konformitäts-Fix-Listen G1-G10/P1-P8; #1-Fix Organ-only-binary_id-Guard (profile_to_tree.hpp:82) (TEIL, mittel).
+- **[§26 07-16-AUDIT-83]** VOLL-AUDIT 83 Befunde — F57 (noexcept-auf-Alloc ~15 Bodies) + DATA-07 vor #46 gegen Register abgleichen (OFFEN, mittel).
+- **[AKTUELL-observer-reklass]** Observer/Segment-Reklass telemetry/isa (kSegmentCount 20 vs 17-WIDE; prt-art telemetry-Demo-Slot); H-10-Sidecar-Aufrufer zwingend vor telemetry-variierendem Messlauf (OFFEN, mittel — W9, H-10 Prio 1).
+- **[§15.8-g-F62]** W4-CI-Coverage-Defizit (Surrogat-Pfad hart, W4-Treiber 0 CI) — Fork B (OFFEN, mittel — user-gated).
+- **[§13.10-OFFEN-Quellen]** nicht gesichtete Quellen (Doc 29, S7-/DEG-Thesis-Seite, ch4-3.3-Historie) (OFFEN, niedrig).
+
+*Erledigt/überholt (Konformitaet):* §0-V6.5-TABU, §0-V6.7, §13.9-B1, §15.4-M-CE-27, §13.10-AP15-1.
+
+### Bookkeeping
+
+- **[§0-V6.3][§0-V6.4][§0-V6.6][§24.C-KettenStatik][§24.D-SessionRitus][§16.4-DIR]** Standing-Direktiven — ultracode-Planungssession je Aufgabe über Ledger + ALLE Plandocs; explizites User-Bau-Release-Gate je Phase; Lesereihenfolge §20→§16; compile-time-only Hot-Path (CRTP+Concept, kein vtable/Runtime-Switch); nur benannte Lehrbuch-Patterns; Ketten-Statik (statisch/dynamisch stufen-relativ); Session-Start gezielt per ultracode (nicht ganzes Memory); bei offener Entscheidung erst Ledger+Plandocs, sonst PAUSIEREN; NIE rebase/AskUserQuestion; kein Python; Doku/Messdaten nie löschen; Remote je-Repo-GO (OFFEN, kritisch — dauerhaft bindend).
+- **[§18.3.1-F7]** F7-Aufräum — 4 .py erst nach XML-Ersatzbeweis löschen; jemalloc→Allokator-Achse erhalten; ZIH-README; Behelfs-Tier nach P5 (TEIL, niedrig).
+- **[§26 USER-GO-Forks-Register-D]** User-GO-Sammelfrage — O-1 rm Mess-CSVs (KONFLIKT Messdaten-nie-löschen), E-2 opt-f/g-Timing, O-3/O-5/O-6 golden-N-Details, O-7..O-11 Storage-Policy, O-13 Nummern-Kollision (GEPARKT, mittel).
+- **[§20.E-Gated]** Ehrlicher gated-Status: durch VOLLES GO entschieden, genuin offen bleiben S-7-Deep-Research + G5/#274 (TEIL, mittel).
+
+*Erledigt/überholt (Bookkeeping):* §0-FRONT-HIST, §0-V4/V5, §13.4-V2-STOP, §13.12-V3/Arbeitsreihenfolge/Defaults/Kadenz/Tabus/Eskalation/STOP/Blocker, §12-0709-Codex-abgelöst/GO-Increments, §12-0708-USER-FREIGABE-ALLE-TODOs, §10-TAXO, §18.5.2-Gated, §20.B-DualVerif(reaktiviert §20.B-CI-online).
+
+---
+
+**PFLEGE-HINWEIS:** Dieser §48-Block ist die **Single-Source der offenen Ziele**. Bei JEDER neuen §-Direktive, jedem Increment-Abschluss oder Superseding hier in-place nachziehen: (1) neue/geänderte offene Zeile im Strang-Format `**[§-Anker]** Kurzname — Ziel (Status, Prio/Deadline)` eintragen bzw. aktualisieren; (2) fertige/überholte Ziele aus dem Detailteil in die `Erledigt/überholt`-Sammelzeile des jeweiligen Strangs verschieben (Anker nie löschen — Historie bleibt); (3) Executive Summary neu bewerten, sobald sich der kritische Pfad zur Abgabe verschiebt. Kadenz §19.F + Beweis-Doktrin §33 sind bei jeder Änderung mitzudenken.
