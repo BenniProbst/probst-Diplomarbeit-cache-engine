@@ -2980,3 +2980,24 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 
 ### Scope / „saubere Grundlage"
 Der Defekt betrifft AUSSCHLIESSLICH die Achsen-Zuweisung in der **Tier-Build-Job-Legende** und ihre Doku-/Ledger-/Plan-Spiegel; `ceb:build`- und `measure`-Legende sind vertragskonform, binary_id/golden unberuehrt. Doku-Fixes (Architektur-Doku, §54-T6, §55-Kern, Plan-v3-AP-S0-6) sind erledigt; der Code-Fix ist GO-pflichtig und vor dem naechsten „§54-T6-korrekt"-Stempel zu ziehen.
+
+---
+
+## §57 — STEMPEL-SCHICHTUNG + CHUNK-SEMANTIK + CEB-Compile/Runtime-Grenze (2026-07-20, User — praezisiert §54-T3/T6 + §56)
+
+**User-Praezisierung (massgeblich, verbatim-treu):** „tier-chunk buendelt System-Achsen-Freigabedurchfuehrungsraum-chunk UND Organ-Achsen-Chunk, weil der ceb-chunk selbst das Buendel System-Achsen-Freigabeerlaubnis-chunk UND Organ-Achsen-tobecompiled-chunk hat. Bei der CEB sind System-Achse und Organ-Achse noch runtime und die Mess-Achse fest einkompiliert (bis auf Variablen des Planers ueber dynamische Unter-Achsen); die CEB baut zu ihrer Laufzeit die compile-time Tier-Binaries auf, welche dann den System-Achse x Organ-Achse Typ+Versions-Stempel erhalten. Die CEB hat ihren eigenen Typ+Versions-Stempel ueber die Mess-Achse des Planers."
+
+**S1 — Compile/Runtime-Grenze je Stufe (verfeinert §24-Ketten-Statik):**
+- **Planer:** traegt die Mess-Achse; baut je Mess-Tooling-Wahl EINE CEB.
+- **CEB:** die **Mess-Achse ist FEST EINKOMPILIERT** (compile-time; bis auf die dynamischen Unter-Achsen = Planer-Variablen). **System-Achse und Organ-Achse sind an der CEB NOCH RUNTIME** — die CEB haelt sie als Bau-Raum. Die CEB **baut zu IHRER LAUFZEIT die COMPILE-TIME Tier-Binaries** (ihre Laufzeit = Bau-Zeit der Tier-Binaries).
+- **Tier-Binary:** compile-time-Artefakt; ein festes (System x Organ)-Kompilat.
+
+**S2 — Chunk-Semantik (Buendel aus ZWEI Teil-chunks, nicht nur Organ; praezisiert §56-Chunk-Slot):**
+- **CEB-chunk** = **System-Achsen-Freigabe-ERLAUBNIS-chunk** (was darf gebaut werden) **+ Organ-Achsen-TOBECOMPILED-chunk** (noch zu kompilierende Organe). Zustand: Erlaubnis + to-be-compiled.
+- **Tier-chunk** = **System-Achsen-Freigabe-DURCHFUEHRUNG-chunk** (die ausgefuehrte Freigabe) **+ Organ-Achsen-chunk** (kompilierte Organe). Zustand: Durchfuehrung + kompiliert.
+- Der `:chunk<k>` in `tier:build:[d,e,f][g,h,i]:chunk<k>` buendelt also das kombinierte **System-Freigabe-Durchfuehrung x Organ**-Bau-Volumen (NICHT rein den Organ-Slot); der 2^17-Organ-Raum x die System-Freigabe-Durchfuehrung wird als chunk<k> gebuendelt. (Korrigiert die zu enge §56-Formulierung „chunk buendelt den Organ-Slot" -> chunk buendelt System-Freigabe-Durchfuehrung + Organ.)
+
+**S3 — Stempel-Schichtung (praezisiert §54-T3 + §43-Stempel-System):**
+- **CEB-Stempel** (Typ + Version) = **die Mess-Achse des Planers** (die CEB IST ein bestimmtes Mess-Tooling-Kompilat).
+- **Tier-Binary-Stempel** (Typ + Version) = **System-Achse x Organ-Achse** (das (System x Organ)-Kompilat).
+- **binary_id bleibt Organ-only** (17-Organ-Kern) — der Tier-STEMPEL traegt aber System x Organ (freigegebene System-Achsen mitgestempelt, §54-T3). Zwei Stempel-Ebenen: CEB=Mess, Tier=System x Organ.
