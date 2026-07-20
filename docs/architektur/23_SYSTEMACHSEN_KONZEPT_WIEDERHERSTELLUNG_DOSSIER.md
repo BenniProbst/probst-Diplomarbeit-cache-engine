@@ -111,6 +111,16 @@ Fall einer dynamischen Unter-Achse einer SYSTEMachse). Live-Stand je Seite:
   statisch/constexpr"). Die Reparatur muss die Haupt-/Unter-Struktur der System-Seite nachziehen
   (Bauplan-Vorbild: Doc 21:21-23/235-241 — Wurzel = System-Achsen mit Visitor+Strategy).
 
+> **§47/§54-T2-NACHTRAG (2026-07-20, A10 — additiv; der Ist-Befund oben bleibt gültig):** Der obige
+> Ist-Befund („16 Mess-Kategorien = Hauptachsen in flacher Registry") beschreibt den GEBAUTEN Code-Stand
+> korrekt, benennt die Achsen-Rollen aber vor-§47. Architektur-kanonisch (§47/§54-T2) gilt: die
+> **Mess-HAUPT-Achse ist das MESS-TOOLING {nur Wallclock · Makro-Benchmarks · Micro-Benchmarks über die
+> Observer}** — statisch/CT, je Tooling-Wahl eine eigene hart kompilierte CEB = eine eigene
+> `ceb:build:[a,b,c]`-Strecke (die heute fehlende Auffächerungs-Achse). Die **16 measurement_categories
+> sind Mess-Tooling-UNTER-Achse** (Planer-gesteuert, manifestieren sich als CSV-Spalten), NICHT die
+> Hauptachse. Die hier geforderte „Haupt-/Unter-Struktur der System-Seite" ist also genau diese
+> Tooling(HAUPT)/Ablaufmethodik+Workloads+categories(UNTER)-Zweiteilung (§47/§28/§55-PFLEGE-HINWEIS).
+
 ### 1.2 Die Systemachsen-Familie im SOLL (drei Gruppen, EINE Wurzel)
 
 Alle drei Gruppen hängen an der EINEN bestehenden CRTP-Wurzel `SystemAxis<Derived>` +
@@ -194,6 +204,14 @@ Diagramm als künftiges Familienmitglied vermerkt, mehr nicht.
 | **c11_scheduler** | datenstruktur-internes Page-Type-/Deferral-Scheduling (Skelett) | OS-Thread-Scheduling — auch inhaltlich KEINE Deckung der Scheduling-Systemachse | `i_scheduler_engine.hpp:2-14`; C §5 |
 | **Compiler (Achse 15)** | Registry-Permutationsachse der TIER-Binaries (AutoPermutator-Tabelle) | die Compiler-SYSTEMACHSE inkl. CEB-Selbst-Wahl (F3i(1)) | REGISTRY:274-313; B §5.2 |
 | **`AxisBase::get_compiler()`** | Paper-Provenance-Metadatum je Organ (Habich-Compliance) | Build-Compiler-Steuerung | ce `topics/axis_base.hpp:58-70`; C §8 |
+
+> **Fußnote zur Begriffstabelle (§54-T1/§54-T2-NACHTRAG, 2026-07-20, A10 — additiv):** (a) **§54-T2:** die in
+> der Zeile „Mess-System-Achse" genannten 16 MeasurementCategory-Achsen sind architektur-kanonisch
+> **Mess-Tooling-UNTER-Achsen** (Planer-gesteuert; manifestieren sich als CSV-Spalten), NICHT die
+> Mess-HAUPT-Achse — HAUPT ist das Mess-Tooling {Wallclock/Makro/Micro} (§47). (b) **§54-T1:** kanonisch heißt
+> der Achsen-TYP **„Organ-Achse"**; „Gattung"/„Gattungs-Achse" ist reserviert für das **einheitliche
+> Tier-Binary-INTERFACE** (Hülle Search/Container/Graph), NIE eine Achse. (Die Slot-Zahl 19→17 wird NICHT
+> hier, sondern separat als §50-M-4 im Thesis-Text nachgezogen.)
 
 **Abgrenzung gegen die E11-„Phasen"-Taxonomie** (Klärung `super/docs/audits/20260716-e11-phasen-e13-kontext-SYNTHESE-E11-E13.md`):
 „Phase" ist dort mindestens 5-fach überladen (XML-Prüf-Phase, CEB-Betriebs-„Phase", Treiberphasen

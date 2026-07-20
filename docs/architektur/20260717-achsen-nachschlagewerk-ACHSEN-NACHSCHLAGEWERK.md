@@ -169,6 +169,8 @@ Autoritative Reihenfolge = `kCompositionAxisNames` `std::array<…,18>` (`axis_p
 
 ## (4) MESS-ACHSEN
 
+> **§47/§54-T2-SEKTIONS-NACHTRAG (2026-07-20, A10 — additiv; die Tabelle unten bleibt gültig):** Diese Sektion listet die Mess-Dimensionen als flache Registry-/CSV-Sicht. Architektur-kanonisch (§47/§54-T2) gilt die Haupt-/Unter-Zweiteilung: **HAUPT = Mess-TOOLING {nur Wallclock · Makro-Benchmarks · Micro-Benchmarks über die Observer}** (statisch/CT, je Wahl eine eigene CEB-Strecke `ceb:build:[a,b,c]`, Stempel §43) — die heute fehlende Auffächerungs-Achse. **UNTER (Planer-gesteuert, delegiert, manifestieren sich als CSV-Spalten) = Ablaufmethodik {Debug/Messen/Release} · Workloads/Datasets (YCSB A–F × Datasets) · die 16 measurement_categories · Rückschrieb-Methoden.** Die 16 Kategorien, W/D/K und die Granularität in den Zeilen unten sind demnach UNTER-Achsen bzw. deren CSV-Projektion, NICHT die Mess-HAUPT-Achse (§28-Mess-Registry-Angebot, §55-PFLEGE-HINWEIS).
+
 | Achse / Dimension / Kategorie | misst was | Ausprägungen | ct/rt | Quelle |
 |---|---|---|---|---|
 | **Mess-Dimensionen (3-fach)** | Grundmodell | 3: D1/D2/D3 | — | `24_messmodell_korrektur §2` |

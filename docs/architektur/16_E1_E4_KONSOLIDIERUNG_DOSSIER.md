@@ -122,6 +122,8 @@ E1  RC-Laufzeit   Algorithm_Resource_Control (POD ComdareResourceControlV1, 5 Fe
 
 `15_F7` verortet Workload/Dataset **compile-time (E2)** (`:34,48`), liest „Workload als *dynamische* Achse" fälschlich als compile-time (`:26,38`), und rahmt alles in `measurement-all`-Baselines + M/W/A-B-C **ohne E-Bezug**. **Neufassung (additiv, golden/ABI-neutral) — Kernsatz:**
 > **M (Mess-Kategorien) = compile-time (E0-Modul-Interna, Option A OK); W/Datasets = E4-XML-definiert + E1-Laufzeit / E3-Permutation (NICHT compile-time-statisch); A/B/C × Micro/Makro/Gesamt = E4-Auswertung.**
+>
+> **§47/§54-T2-NACHTRAG (2026-07-20, A10 — additiv; der Kernsatz oben bleibt für die E-Verortung gültig):** „Micro/Makro/Gesamt" ist NICHT bloß eine E4-Auswertungs-Dimension, sondern die **Mess-Tooling-HAUPT-Achse {nur Wallclock · Makro-Benchmarks · Micro-Benchmarks über die Observer}** = die Bau-Auffächerung (je Tooling-Wahl eine eigene CEB, `ceb:build:[a,b,c]`, §47). Die Mess-Kategorien sind Planer-gesteuerte **Mess-Tooling-UNTER-Achsen mit Registry-Angebot** (§28-Mess-Registry), die sich als CSV-Spalten manifestieren — nicht passive Spalten.
 
 Konkret: Achse M bleibt Option-A-tauglich als *interne* `measurement-all`-Code-Organisation (F6-Metaprogrammierung, golden-orthogonal); Achse W (Workload×Dataset) wandert in E4 (XML wählt Profil×Dataset je Messreihe) → E1 (DynamicVariableNode) / E3 (Dataset = „4. CEB-Permutations-Dimension", `test_data_sets.xml`); Kopf um E-Anker (`ce Dossier §12-15`) ergänzen; `LEDGER:371` als bindenden Beleg zitieren.
 
@@ -149,6 +151,7 @@ Konkret: Achse M bleibt Option-A-tauglich als *interne* `measurement-all`-Code-O
 - **Achse W (Workload YCSB A–F):** **E4-XML-Definition** (`<compile_dims><workloads>`) → gespeist an **E1-Laufzeit** (Lastprofil-Wertmenge, DynamicVariableNode). *Doppelnatur:* die Op-Mix-KLASSE ist per-Binary-Dim (compile_dims), die Seed/Ops-Instanz ist E1-Lastprofil (`drei_profile`: Build ⊥ Last).
 - **Achse D (6 Datasets):** **E3-Permutations-Dimension** (CEB „4. Dim", `test_data_sets.xml`) bzw. E4-Auswahl je Messreihe; Daten liegen in `super/Code/test_data_xml/*.test_data.xml`.
 - **Achse M (Mess-Kategorie):** **E0/Tooling** — compile-time-Modul-Interna von `measurement-all` (Option A OK), zusätzlich die Granularität Micro/Makro/Gesamt als **E4-Auswertungs-Dimension**. Reine Spalten-Projektion, **nie** `mp_product`-Lauffaktor.
+  - *§54-T2-Präzisierung (2026-07-20, A10, additiv):* „Reine Spalten-Projektion" gilt für die **16 measurement_categories** (binary_id-neutrale CSV-Spalten) — die Granularität **Micro/Makro/Gesamt ist hingegen die Mess-Tooling-HAUPT-Achse = Bau-Auffächerung** (je Wahl eine eigene CEB-Strecke `ceb:build:[a,b,c]`, §47), nicht bloß E4-Auswertung. Die categories bleiben Planer-**UNTER**-Achse mit Registry-Angebot (§28), nicht passive Spalten.
 
 ## D.3 Konkrete Andockpunkte (verifiziert)
 1. **`m3v2_study.profile.xml:127-131`** — `<compile_dims><workloads>A B C D E F` existiert = SOLL-Ort Achse W. **Fehlt:** `<datasets>` + Mess-Kategorie-Dim.

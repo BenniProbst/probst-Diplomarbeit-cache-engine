@@ -113,6 +113,8 @@ Genus-eigene Achsen + BUILD/SHAPE-Tabelle: GEPRÜFT-UNVERÄNDERT (nur: simd_exte
 
 Alle übrigen §4-Zeilen (Mess-Dimensionen, Pfade A/B, 3 Profile, 16 Kategorien, Perzentile, Granularität, Reihen, Workload, W/D/K, DynamicDims, PmcCounters, kMeasurementAxisRegistry, Kollektoren): GEPRÜFT-UNVERÄNDERT (`measurement_category.hpp:32` =16; `system_axis.hpp:196/242/287` =3 Kollektoren).
 
+> **§47/§54-T2-VERWEIS (2026-07-20, A10, additiv):** Die Mess-Achsen-Rollen sind architektur-kanonisch Haupt/Unter geteilt — **HAUPT = Mess-Tooling {Wallclock/Makro/Micro}**, **UNTER = Ablaufmethodik + Workloads/Datasets + 16 measurement_categories + Rückschrieb-Methoden** (manifestieren sich als CSV-Spalten). Siehe den §47/§54-T2-Sektions-Nachtrag am Kopf der Mess-Sektion in NW1 (`20260717-achsen-nachschlagewerk-ACHSEN-NACHSCHLAGEWERK.md`, „(4) MESS-ACHSEN") sowie Ledger §47/§28.
+
 ### C.5 — Sektion (5) Compile-/Registry-XML-Achsen
 
 | Original-Zeile | ALT | NEU (live-verifiziert) |

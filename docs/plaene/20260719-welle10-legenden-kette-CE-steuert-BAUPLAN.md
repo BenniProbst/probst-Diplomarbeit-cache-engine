@@ -21,6 +21,10 @@ Child-2 (CEB-emittiert, je CEB — SYSTEM-ACHSEN-Stufe des FREIGEGEBENEN Raums):
     "tier:build:[a,b,c][d,e,f]:chunk<k>" -> CEB-Raum permutiert System[d,e,f] x Organ[g,h,i] und baut die Tier-Binaries;
        Legende je BINARY = [d,e,f,g,h,i] im Artefakt-Pfad (bestehende binary_id-Pfad-Serialisierung axis=value);
        Job-Ebene buendelt als Chunk (2^17 Einzel-Jobs waeren keine Legende, sondern Rauschen)
+    # §54-T6/§56-KORREKTUR (2026-07-20, A10, additiv -- Zeile oben bewusst VERBATIM belassen als Regressions-Beleg):
+    #   KANONISCH ist "tier:build:[d,e,f][g,h,i]:chunk<k>" (System[d,e,f] x Organ[g,h,i]; chunk zieht in den ORGAN-Slot).
+    #   Das obige [a,b,c]-Praefix ist FALSCH: die Mess-Achse [a,b,c] baut NUR die CEB ("ceb:build:[a,b,c]") und
+    #   gehoert NICHT in die Tier-Build-Legende. Code seit S0.5/§56 sauber; vgl. Ledger §54-T6/§55-T6-T7/§56.
   XOR (gated, nach 320er-Messung):
     "hybrid:pick:[d,e,f,g,h,i]"          -> Hybrid-Heuristik-Tier-Binary: static pick der AUSGEMESSENEN besten, KEINE Permutation
 ```
