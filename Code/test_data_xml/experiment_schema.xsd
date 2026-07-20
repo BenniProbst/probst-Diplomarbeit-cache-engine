@@ -42,6 +42,14 @@
         <xs:element name="measurement_tooling"  type="MeasurementToolingType" minOccurs="0"/>
         <!-- KERN-A: measurement_categories jetzt OPTIONAL (minOccurs=0). Abwesenheit = alle 16 Kategorien. -->
         <xs:element name="measurement_categories" type="MeasurementCategoriesType" minOccurs="0"/>
+        <!-- A9.1 (S4-Delta B9 Mess-Schema-Kern, 2026-07-20): drei PASSIVE Mess-UNTER-Achsen (Planer-delegiert,
+             binary_id-NEUTRAL). Strukturell wie measurement_tooling: der Code-Parser validiert die ids gegen die
+             3 constexpr-Registries (run_methodology/measurement_framework/writeback_method_registry.hpp); die XSD
+             kann die Registry-Namen nicht kennen (Single-Source im Code); nur strukturell. Alle OPTIONAL;
+             Abwesenheit = Default (byte-identisch). -->
+        <xs:element name="run_methodology"      type="RunMethodologyType" minOccurs="0"/>
+        <xs:element name="measurement_framework" type="MeasurementFrameworkType" minOccurs="0"/>
+        <xs:element name="writeback_methods"    type="WritebackMethodsType" minOccurs="0"/>
         <xs:element name="op_types"             type="OpTypeListType"/>
         <xs:element name="output"               type="OutputType"/>
       </xs:sequence>
@@ -143,6 +151,38 @@
     </xs:sequence>
   </xs:complexType>
 
+  <!-- A9.1 (S4-Delta B9 Mess-Schema-Kern, 2026-07-20): run_methodology = die Run-Methodik-UNTER-Achse
+       {debug/measure/release}. Je <method value=".."/> EINE Methode. Der Code-Parser validiert die ids gegen
+       kRunMethodologyRegistry (die XSD ist nur strukturell; Single-Source im Code). Leer/abwesend = Default. -->
+  <xs:complexType name="RunMethodologyType">
+    <xs:sequence>
+      <xs:element name="method" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- A9.1: measurement_framework = die Mess-Framework-UNTER-Achse (einzeln; heute {ycsb}, honest-1). Der
+       Code-Parser validiert name gegen kMeasurementFrameworkRegistry (XSD nur strukturell). Abwesend = Default. -->
+  <xs:complexType name="MeasurementFrameworkType">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- A9.1: writeback_methods = die Rueckschrieb-Methoden-UNTER-Achse {csv/latex_table/comparison_metrics}
+       (ehrliche Formalisierung des <output>-Trios; KEIN pdf). Je <method value=".."/> EIN Kanal. Der Code-Parser
+       validiert die ids gegen kWritebackMethodRegistry (XSD nur strukturell). Leer/abwesend = Default. -->
+  <xs:complexType name="WritebackMethodsType">
+    <xs:sequence>
+      <xs:element name="method" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
   <!-- axes_default_lookup: reines LIMIT. axis ref = Registry-axis-id,
        allowed_variants = Whitespace-Liste von Registry-baustein-name-Werten
        (Teilmenge). Ungenannte Achsen = volle Registry-Liste. -->
@@ -196,6 +236,27 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <!-- A4 (S2/A2-Nachzug, 2026-07-20): atomic128 = ZWEITE Unter-Achse unter compiler (INC-0-Ruling:
+                 -mcx16/CMPXCHG16B ist ein Compiler-Codegen-Flag, KEIN optionales ISA-Feature). EIN Container,
+                 symmetrisch zu opt_level; die <option>-Werte tragen no_cx16/cx16. binary_id-NEUTRAL, additiv. -->
+            <xs:element name="atomic128" minOccurs="0">             <!-- Unter-Achse: EIN Container -->
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="option" minOccurs="0" maxOccurs="unbounded">  <!-- Optionen no_cx16/cx16 -->
+                    <xs:complexType>
+                      <xs:attribute name="value" use="required">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:enumeration value="no_cx16"/>
+                            <xs:enumeration value="cx16"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -219,6 +280,28 @@
                     </xs:complexType>
                   </xs:element>
                 </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!-- A4 (S2/A2-Nachzug, 2026-07-20): target_isa = EIGENE Haupt-System-Achse (Ziel-ISA fuer Cross-Compile,
+           INC-2d; isa verliess mit INC-2d die Komposition, 18->17). KEINE Unter-Achse -> die <option>-Werte
+           stehen DIREKT unter <target_isa> (kein Zwischen-Container, im Gegensatz zu compiler/opt_level).
+           binary_id-NEUTRAL, additiv; leer = CEB-Default x86_64 (host==target). -->
+      <xs:element name="target_isa" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="option" minOccurs="0" maxOccurs="unbounded">  <!-- Optionen x86_64/aarch64 -->
+              <xs:complexType>
+                <xs:attribute name="value" use="required">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:enumeration value="x86_64"/>
+                      <xs:enumeration value="aarch64"/>
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:attribute>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
