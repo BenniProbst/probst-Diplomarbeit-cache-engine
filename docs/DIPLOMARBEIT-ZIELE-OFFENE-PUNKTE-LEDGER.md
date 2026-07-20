@@ -2992,7 +2992,7 @@ Der Defekt betrifft AUSSCHLIESSLICH die Achsen-Zuweisung in der **Tier-Build-Job
 
 **S1 — Compile/Runtime-Grenze je Stufe (verfeinert §24-Ketten-Statik):**
 - **Planer:** traegt die Mess-Achse; baut je Mess-Tooling-Wahl EINE CEB.
-- **CEB:** die **Mess-Achse ist FEST EINKOMPILIERT** (compile-time; bis auf die dynamischen Unter-Achsen = Planer-Variablen). **System-Achse und Organ-Achse sind an der CEB NOCH RUNTIME** — die CEB haelt sie als Bau-Raum. Die CEB **baut zu IHRER LAUFZEIT die COMPILE-TIME Tier-Binaries** (ihre Laufzeit = Bau-Zeit der Tier-Binaries).
+- **CEB** (= `CacheEngineBuilder`, die Builder-Applikation des Cache-Engine-Mess-Frameworks, vom Anwender/Diplomarbeit gerufen — kanonische Bezeichnung in allen Dokumenten)**:** die **Mess-Achse ist FEST EINKOMPILIERT** (compile-time; bis auf die dynamischen Unter-Achsen = Planer-Variablen). **System-Achse und Organ-Achse sind an der CEB NOCH RUNTIME** — die CEB haelt sie als Bau-Raum. Die CEB **baut zu IHRER LAUFZEIT die COMPILE-TIME Tier-Binaries** (ihre Laufzeit = Bau-Zeit der Tier-Binaries).
 - **Tier-Binary:** compile-time-Artefakt; ein festes (System x Organ)-Kompilat.
 
 **S2 — Chunk-Semantik (Buendel aus ZWEI Teil-chunks, nicht nur Organ; praezisiert §56-Chunk-Slot):**

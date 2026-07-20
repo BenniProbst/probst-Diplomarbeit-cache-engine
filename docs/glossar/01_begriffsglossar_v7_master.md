@@ -151,7 +151,7 @@
 | **SINGLETON** (CacheEngineRuntime + ConcurrencyManager) | v4:98 |
 | **COMMAND PATTERN** (im Cache-Engine-Kontext) | v5:54 |
 
-### 4.3 Cache-Engine-Builder + Runtime
+### 4.3 CacheEngineBuilder (CEB) + Runtime
 
 | Begriff | Quelle (Z) |
 |---|---|

@@ -20,7 +20,7 @@ Planer  ─▶  CEB  ─▶  Tier-Binary   (+  Hybrid-Binary)
 ```
 
 - **Planer** — liest die XML, plant *was* gebaut und gemessen wird, und emittiert die untergeordneten Pipelines/Bauplaene (CI-YAML *und* lokaler Bare-Metal-CMake-Pfad, topologie-isomorph). Trägt die **Mess**-Eigenschaften als seine statische Achse. Existiert als Executable noch nicht — der größte offene Bau-Block.
-- **CEB** (Cache-Engine-Builder) — kompiliert die eigentlichen Tier-Binaries und bekommt die **System**-Eigenschaften fest eingebacken. Emittiert selbst die Tier-Stufe.
+- **CEB** = **`CacheEngineBuilder`** (kanonische Applikations-Bezeichnung, so in allen Dokumenten) — die **Builder-Applikation des Cache-Engine-Mess-Frameworks**, die vom **Anwender (der Diplomarbeit / PRT-ART)** gerufen wird. Sie kompiliert die eigentlichen Tier-Binaries, bekommt die **System**-Eigenschaften fest eingebacken und emittiert selbst die Tier-Stufe.
 - **Tier-Binary** — eine konkrete `.so`, ein „Lebewesen" aus **Organen** (den Organ-Achsen). Wird geladen und gemessen.
 - **Hybrid-Binary** — das 4. Glied: baut aus realen Messkurven rückwärts die optimalen Algorithmen-Sätze (Break-Even-Auswertung). **Abgabe-Pflicht**; die Break-Even-Auswertung ist und bleibt fester Planbestandteil, weil sie die Hybrid-Tier-Binaries korrekt formt.
 
