@@ -2601,3 +2601,56 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **Session-Plan S1-S8 FREIGEGEBEN** als Ausführungsrahmen (docs/plaene/20260720-SESSION-PLAN-ausfuehrung-offene-arbeit.md). Die zwei USER-GO-Gates (Bau-Release/320er-manual; ABI-golden-Fenster) + §12-E11 (vor S4) bleiben je Schritt vorzulegen. Wartestand: der Vergessene-Features-Sweep (Rückfragen zu alten Punkten) vor Implementierungsbeginn.
 
 **§49-KORREKTUR (2026-07-20, User) — std::variant-Freigabe im Hybrid ist LIMITIERT:** „Die std::variant im Hybrid-Tier ist **nur limitiert freigegeben, sofern das Einbinden der Tier-Binary-Unter-Prüf-Docks per Abstract-Factory-Methode gelesen und verarbeitet wird.** Die std::variant sind **nur dazu da, um bestimmte abweichende Prüfdock-Typen und Verträge dynamisch zu unterstützen, aber NICHT die Haupt-Kommunikation zu den Tier-Binary-Observern.**" — **Präzisierung:** (a) Die **Haupt-Kommunikation** Hybrid↔Tier-Binary-Observer läuft weiter über das **statische IObservableTier/Prüf-Dock-Interface** (KEIN variant, zero-cost, §9-Doktrin). (b) Die std::variant ist AUSSCHLIESSLICH der dynamische Träger für **abweichende Unter-Prüf-Dock-Typen/-Verträge**, die eine **Abstract-Factory-Methode** liest+verarbeitet (die Factory erzeugt den passenden Unter-Prüf-Dock je abweichendem Vertrag; das variant hält die Typ-Alternativen). Damit ist die §23-Ausnahme NOCH ENGER als in §32-F8-3 Option 1 skizziert: variant NICHT für Break-Even-Algo-Swapping der Messkommunikation, sondern NUR für die Prüfdock-Vertrags-Varianz. Fließt in S9 (Observer-Prüfdock-Bestandteile) + S7 (Hybrid-Architektur) ein.
+
+
+---
+
+## §50 — §48-NACHTRAG: vergessene Features (Vergessene-Features-Sweep 2026-07-20, 7-Batch-ultracode)
+
+> Vom Sweep ueber Ledger §0-§47 + Plandocs/Workflow-Backups der letzten 3 Tage als FEHLEND (nicht im §48-Block) und NICHT-widersprechend erhoben. Ergaenzt §48 (Single-Source) additiv; Straenge wie §48. Die zweifelhaften/widersprechenden alten Punkte sind NICHT hier, sondern in der User-Rueckfrage-Liste (B1-B15).
+
+**Bau-Kette — 4→5-Bump / ABI**
+- **[Bau]** F2 native Set-ABI — ISetTier + SetObserverSnapshotV1/V2 (extract/merge/Mengen-Ops) + SetDock, ordering/multiplicity als Achsen-Werte (LEDGER:1515,1732; niedrig; abhaengig von Set-Promotion-Entscheid in B).
+- **[Bau]** F12iii Telemetrie aus binary_id herausloesen — T10 raus aus kCompositionAxisNames, neues kV3AxisSchema, Snapshot-sizeof-Bruch, Telemetrie→CEB-System-Achse (LEDGER:1664ff; ABI-Major-Bruch, hoch).
+- **[Bau]** H-7 -march/-mavx-Kopplung der injizierten CompileFn aus System-Achsen-Belegung (build_orchestrator.hpp:474-483; heute generisch -O2; mittel).
+- **[Bau]** H-10/K-18 AVX10-Versionsfeld in BuildVariantDefinitionV1 + per-Binary-statt-global Sidecar (LEDGER:1687; ROADMAP:121; mittel).
+- **[Bau]** INC-1 CEB-System-Achsen-Schichtung mit eigener abstrakter Wurzel (build_system_axis_levels(), System ⊃ Tier statt 26 flach; LEDGER:1668; hoch).
+- **[Bau]** Geschlossene INC-Roadmap INC-0→1→2(4→5)→3→4 als getrackte Sequenz (je Schicht CI-gruen+messfaehig; LEDGER:1742,1872ff).
+- **[Bau]** Gattung View (non-owning read) + Generalisierung Kopf-Framework auf graph/set (genus_binding_traits.hpp:135-152; LEDGER:1681f; niedrig).
+- **[Bau]** Fehlerklassen-Framework #29 — INC-29.0 axis_error.hpp Enum-Kern, InfraError vs Compiler-Compiler-Fehler, ErrorDomain/CoR-Durchreichung, HandlingPolicy, isa_features.cmake FATAL→WARNING (DESIGN §3/§6; mittel).
+- **[Bau]** INC-1b genus_organ_binding.hpp (RequiredOrgans<G>) + INC-1c freigabe_contract.hpp Stub (koord-reihenfolge:11; mittel).
+- **[Bau]** CompilerAtomicSubAxis Ziel-ISA-Degradierung — Laufzeit-Ziel-ISA-Check statt nur Host-Makro COMDARE_ARCH_X86_64 (INC2D-DELTA #5; niedrig).
+- **[Bau]** K-17 A07-snmalloc Runtime-Segfault (V31AdapterAlloc) — ehrliche 'failed'-Zelle+Log bis Vendor-Untersuchung (ROADMAP:120; niedrig).
+- **[Bau]** OF-1 dyn. Beschleuniger-Hauptachsen-Array GPU/FPGA/NPU+NUMA (Zukunft; LEDGER:1961/2265; niedrig).
+- **[Bau]** §37.2/3 mehrdim. feingliedriger Cross-Compile (Freigabe physisch nicht vorhandener Eigenschaften; LEDGER:2262; niedrig).
+
+**Bau-Kette — Planer / Registry / Forks (als getrackte GO-pflichtige Zeilen)**
+- **[Bau]** Resolver-Forks R1–R8 enumeriert ins USER-GO-Register (R1 Single-Source, R5 Range-Syntax=Traeger §30-Mess-Modi, R6 Schema-v2-Fenster, R2/R3/R4/R8; STUFE:458-467; R1/R5 hoch).
+- **[Bau]** Planer-Bauplan-Forks B/C/D/E (PlanTextBuilder, Deadline-Schnitt, ceb_contract_version-Bump, XML-Kanal-Konvergenz; BAUPLAN:185-188; hoch).
+- **[Bau]** PL-18 physische Aufteilung der 3 Art-Registries in 3 Dateien/3 Module (System-Reg→measurement, Mess-Reg→Mess-Modul; mittel).
+- **[Bau]** §32-F4/GN-8-Rest — COMDARE_GOLDEN_320_IDS-Makro-Rename + axis_version.lock-Scope auf Organ-Strategie-Header + contract:axis-version-lock-CI vervollstaendigen (niedrig).
+- **[Bau]** GN-10 Fixture-Single-Source experiment_golden.xml (E7-Kanon, F27 kanonische-Kopie; niedrig).
+- **[Konformitaet]** K-5 best_binary_selector ABI-Spiegel stale (kAbiMajor=5/'.A5.' vs Host 6) — schreibt falsche Provenienz, Paritaets-static_assert nachziehen (ROADMAP:108/176; hoch, Daten-Korrektheit).
+- **[Konformitaet]** K-13 cache_engine_axis_registry.xml-Drift (18/86 mit isa-composition vs HEAD 17+system_axis) per axis_registry_gen regenerieren+committen (mittel).
+
+**Mess-Kette / Auswertung**
+- **[Mess]** M-4 19→17-Achsen-Nachzug super-Stufen 04/05/08 (kSegmentCount 20→17, has_seg_ns/seg_attribution.tex) + Thesis-Text 'neunzehn Achsen'/T-Nummern DE+EN (ROADMAP:141; hoch).
+- **[Mess]** M-8 Achsen-Sensitivitaetsanalyse-Writer (Varianz-Attribution/Ranking/Standard-Konfig = Heuristik-Grundlage; 04/05-Writer+08-Facade; hoch).
+- **[Mess]** M-9 vier Heuristik-Kurven-Writer verdrahten (sota_series/sweep_axis/seg_coverage/working_set_curve → 08-Facade + Anhang A DE+EN; mittel).
+- **[Mess]** M-15/E2 Welch-Konsument als eigene WIDE-CSV-Auswertungsstufe (je phase,engine; mittel).
+- **[Mess]** GN-9 Bloat-/Kalibrierungs-Report — 1 Zellen-Lauf (Range 0:64) t/TU+Bytes/DLL → 6-TB-Feasibility-Gate vor Voll-Matrix (ROADMAP:81/312; hoch).
+- **[Mess]** §44.4 W8-Gate-Aktivierungs-Nachlauf — organ_required-Deklarationen + active_machine_signature()-Host-Wahl (LEDGER:2374; mittel).
+- **[Mess]** §40.a Deliverables — Organ-Sinnhaftigkeits-Matrix (Flags↔Organ-Achsen), Resolver-Regeln required=all/optional, Maschinen-Signatur-XML vs Organ-Anforderungs-XML, AVX10-<isa-level>-Notation (REFERENZ §5/§6; hoch).
+- **[Mess]** PL-12 CEB schreibt SELBST ans XML-Ziel zurueck (heute <output> nur Provenienz-Log; gegen #51-out_csv reconcilen; mittel).
+- **[Mess]** W10/§37a CEB-Selbst-Emission Stufe-2/Grandchild aus einkompilierten Freigaben (--emit-tier-ci/-cmake; Fork-C .so-Schnitt/ceb_generator.hpp; §48 §40.b deckt nur Planer→Child-1; hoch).
+
+**Hybrid / Thesis / Bookkeeping**
+- **[Hybrid]** Rekursives Delegations-/Transport-Protokoll Hybrid-Tier↔CEB (4. Binary, Abgabe-Pflicht; nur Phasen-Position verankert; hoch).
+- **[Bau]** CoR-Andockpunkt run_selection_filter_chain als NEUE Methode deklarieren (selection_filter_chain.hpp:87 = Dead-Code, 0 Prod-Treffer; mittel).
+- **[Thesis]** §44.10 Gattungs-Docks PL-19/PL-21 namentlich als nachgelagerte Arbeitspakete (LEDGER:2380; niedrig).
+- **[Bau]** §23.D variant-Insel-Triade DEPRECATED-markieren (algorithm_baustein/baustein_variants/resolve_baustein) + test_abi_interface.cpp auf Achsen-Wahl umstellen (LEDGER:2085; niedrig).
+- **[Konformitaet]** 9dim-G3 ThesisProfile-<system_axes>-Feld + Baum-Verdrahtung → COMDARE_PILOT_*-ENV-Steuerung entfaellt (profile_run_facade.cpp:128/137/150; hoch).
+- **[Konformitaet]** 9dim-constexpr-Freigabe-Gate — Freigabe/Durchsetzungs-Kontrakt heute nur Kommentar (target_isa_system_axis.hpp:8), compile-time-Naht fehlt (niedrig).
+- **[Konformitaet]** 9dim-Dach-Rehang telemetry/simd_extension/general_hardware von topics::AxisBase → topics::Axis<Derived> (Struktur-Konsistenz; niedrig).
+- **[Bookkeeping]** Parallelisierungs-Modell 7 Straenge + Gates SYNC-1 (INC-2-Bau-Freigabe)/SYNC-2 (Messlauf-Start, vor 28.07.) verankern (STRATEGIE §1; niedrig).
+- **[Bookkeeping]** §0-DoD5/#193 Hand-Lauf-Artefakte EXPERIMENT_MODE + MANUAL_RUN.md als eigene DoD-Zeile (mittel).
