@@ -388,7 +388,8 @@ int main(int argc, char* argv[]) {
         }
         // --emit-tier-ci [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): die CEB-ROLLEN-Emission (Stufe 2). Wie
         // --dump-ci, aber emittiert NUR die Stufe-2-Sicht des freigegebenen CEB-Raums (System-Perms + Tier-Chunk-
-        // Jobs "tier:build:[a,b,c][d,e,f]:chunk<k>" + GN-11/320er-gegatete Mess-Jobs). CEB-Hoheit (§40.b): der
+        // Jobs "tier:build:[d,e,f][g,h,i]:chunk<k>" = System x Organ, Mess-Achse [a,b,c] baut nur die CEB, siehe
+        // §56/§57 + GN-11/320er-gegatete Mess-Jobs). CEB-Hoheit (§40.b): der
         // Planer steuert die CEB-Jobs (--dump-ci), die CEB steuert die Tier-Jobs (--emit-tier-ci). Heute EINE
         // Binary in zwei Rollen. Baut KEINE DLL, misst NICHT; Root-Tag-Sniff in der Fassade. YAML -> stdout.
         if (flag == "--emit-tier-ci") {
