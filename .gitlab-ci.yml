@@ -99,6 +99,12 @@ variables:
   # cppcheck-Pendant zur EXCLUDE_RE (Template 237b6ec): OHNE external/thesis scannt lint:static die
   # Submodule mit, die auf dem persistenten Workspace aus recursive-Jobs liegen (Job 192672).
   COMDARE_CPPCHECK_IGNORE_DIRS: "ext build _archive_code_pre_migration modules external thesis"
+  # S1/A1 P-TOTAL (Ledger 46/48): Voll-Build-Umfang 2^17 des all_axes_golden-Organraums. Selbst-enthaltene
+  # Child-/Grandchild-Pipelines erben Pipeline-Variablen NICHT -> dieser Wert wird ueber die zwei Trigger-Grenzen
+  # (planer:delegate-trigger + der CE-emittierte ceb:trigger) per expliziter forward-Allowlist durchgereicht, damit
+  # der Grandchild-Tier-Bau 131072 statt des Sicherheits-Fallbacks 16 liest. Golden-neutral (reiner CI-Umfang).
+  # Ueberschreibbar je Trigger (z.B. Kalibrierlauf COMDARE_GN_TOTAL=64); wirkt nur hinter COMDARE_BUILD_GOLDEN_N.
+  COMDARE_GN_TOTAL: "131072"
 
 # ── Stufe 1: Lint (aus ci-templates) — NUR super-eigener Code, KEINE Submodule ──
 # #273 T1 (User-E2 2026-07-05): Compiler-Inventar je Runner-Host via CI (Cluster read-only) — Grundlage
@@ -1081,6 +1087,12 @@ planer:delegate-trigger:
   needs:
     - job: planer:delegate
       artifacts: true
+  # S1/A1 P-TOTAL (Ledger 46): explizite Forward-Allowlist an der ERSTEN Trigger-Grenze. Selbst-enthaltene
+  # Child-Pipelines erben Pipeline-Variablen NICHT -> COMDARE_GN_TOTAL wird als YAML-Variable dieses Bridge-Jobs
+  # deklariert (RHS = der super-Pipeline-Wert) und via forward:yaml_variables an die STUFE-1-Child gereicht. KEIN
+  # pipeline_variables:true (Isolation: die Child erbt NICHT den gesamten Eltern-Variablenraum, Byte-Determinismus).
+  variables:
+    COMDARE_GN_TOTAL: "$COMDARE_GN_TOTAL"
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
@@ -1091,6 +1103,9 @@ planer:delegate-trigger:
       - artifact: planer-child-ci.yml
         job: planer:delegate
     strategy: depend
+    forward:
+      yaml_variables: true       # die explizite Allowlist oben (COMDARE_GN_TOTAL) durchreichen
+      pipeline_variables: false  # KEIN blindes Erben des gesamten Eltern-Variablenraums (Modul-Trigger-Isolation)
 
 # ── ergebnis:holen (W10-B, Ledger §42, SKELETT): das ERGEBNIS-HOLEN gehoert laut §42 in die Diplomarbeit-CI
 #    („das Holen der Messergebnisse gehoert auf der Grundlage der cache-engine-lib in die Diplomarbeit-CI auf
