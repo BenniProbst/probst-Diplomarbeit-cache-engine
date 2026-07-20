@@ -2449,8 +2449,8 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **[§37][§37.b]** Freigabe-Prinzip alle System→Organ-Achsen (SIMD-Pilot; Dual-Aufnahme via State-Pattern durchs Prüf-Dock); CEB wertet Freigaben zur Laufzeit aus und delegiert Organ-Kompilation (Organ ≤ System) (OFFEN, hoch).
 - **[§38]** Planer→CEB B+-Teilbaum-Serialisierung als Achsen-Ranges + sparse Fortschritts-/Cursor-Rück-Kanal (kein Mess-Daten-Rückfluss) (OFFEN, hoch).
 - **[§40.a]** SIMD-Flag-Signatur-Modell — je Maschine deklarierte Signatur EINZELNER Flags (avx512f/vl/bw/dq/vnni), Flag-genaue Freigabe-Kopplung; Web-Recherche → Referenz-Doc + System-Registry (OFFEN, hoch).
-- **[§26 Guard-2^17]** static_assert gegen versehentliche 2^17-Voll-Materialisierung des generated_source_catalog.hpp (E-3) (OFFEN, mittel).
-- **[§26 Quick-Wins][§44 r5g]** golden-neutraler Batch — static_assert(sizeof==1272), host_compatible_with, all_axes_*_count-Rename, Stale-Skip-Guard reflect_versions<17> ins Default-ctest, lokaler r5g-Codegen-Regen (TEIL/OFFEN, mittel/niedrig — Hygiene).
+- **[§26 Guard-2^17]** static_assert gegen versehentliche 2^17-Voll-Materialisierung des generated_source_catalog.hpp (E-3) (OFFEN, mittel). **→ ERLEDIGT 2026-07-20 (A11-Audit): durch GN-2-Guard gedeckt (source_catalog.hpp Cap 4096, FullSourceCatalog über Cap = ill-formed vor mp_product); kein separater TU-Guard nötig.**
+- **[§26 Quick-Wins][§44 r5g]** golden-neutraler Batch — static_assert(sizeof==1272), host_compatible_with, all_axes_*_count-Rename, Stale-Skip-Guard reflect_versions<17> ins Default-ctest, lokaler r5g-Codegen-Regen (TEIL/OFFEN, mittel/niedrig — Hygiene). **→ ERLEDIGT 2026-07-20 (A11-Audit): 4/4 gelandet — sizeof==1272 observable_tier.hpp:152, host_compatible_with anatomy_module_loader.cpp:141, all_axes_matrix_count-Rename (K-7), reflect_versions_all17 im Default-ctest.**
 - **[§10.1-E4]** #229 „Diplomarbeit ändert nur die XML" — P5/P6, Behelfsweg-Löschung, golden-Vollmesslauf offen (TEIL, hoch).
 - **[§11-E]** #179 Wartbarkeits-Sweep XL (TEIL, mittel).
 - **[§12-0716-E11]** Phasen-Kardinalität ≠3 — ultracode-Klärung der echten Phasen-Struktur, blockiert Schema/Validator (OFFEN, hoch).
@@ -2545,7 +2545,7 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **[§25 Infra-Handout][AKTUELL-infra-pat-rotation-327]** Infra-Handout 6-Punkte + PAT-Rotation #327 (Vault-PAT exponiert, Security-sofort) (TEIL/OFFEN, hoch — deadline-unabhängig).
 - **[§24.B-Infra]** Infra-Modus Caching+Storage-Einrichtung (minio-Bucket, NFS-prod-longhorn, .1-SNI/HAProxy) — Storage-Aktivierung gated auf #56 (OFFEN, hoch).
 - **[§40.b][§42][§44 W7-Child-Auth]** Dynamische Planer-CI/Child-Pipeline — Planer emittiert Folge-CI (CiYamlBuilder/I3, Fork C); super-CI nur Delegation an CE-lib + Ergebnis-Holen; Child-Submodul-Auth (REV-17-Deploy-Token) + Marker-SKIP-Livebeweis vor W10-Abnahme (OFFEN/TEIL, kritisch).
-- **[§40.c]** Bare-Metal-Pflicht — CMakeGraphBuilder scharf (experiment_plan.cmake echte Treiber-Kommandos), topologie-isomorph zu CI-YAML (Contract-Test) (OFFEN/TEIL, hoch — 24.07. lokal messbar).
+- **[§40.c]** Bare-Metal-Pflicht — CMakeGraphBuilder scharf (experiment_plan.cmake echte Treiber-Kommandos), topologie-isomorph zu CI-YAML (Contract-Test) (OFFEN/TEIL, hoch — 24.07. lokal messbar). **→ ERLEDIGT (W10-A-Refactor 19.07. + A8(c)-Re-Beweis 20.07.: MANUAL_RUN §1-§5b an HEAD, perm.dll=69, rc=0).**
 - **[§35/§36]** Cluster-parallele System-Achsen-Builds — parallel:matrix opt×simd, Tag-Routing 3-stufig, resource_group-Locking je Zelle + MinIO-Dedup als Sync-Punkt; G7-constexpr-Gate wird Bau-Gate (TEIL, hoch).
 - **[§20.B-XMLCI]** SIMD-Gate-Jobs ISA-Pinning [baremetal,amd]/[baremetal,intel] sofort vs im Rahmen #276 — Struktur-Frage an User (OFFEN, mittel).
 - **[§14.2-#21]** Runner-Cache-Vereinheitlichung (alle Nodes → dev-MinIO, k8s ohne [runners.cache], ccache-S3-Größen) (OFFEN, hoch — Montag/infra-gated).
@@ -2635,7 +2635,7 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **[Bau]** §32-F4/GN-8-Rest — COMDARE_GOLDEN_320_IDS-Makro-Rename + axis_version.lock-Scope auf Organ-Strategie-Header + contract:axis-version-lock-CI vervollstaendigen (niedrig).
 - **[Bau]** GN-10 Fixture-Single-Source experiment_golden.xml (E7-Kanon, F27 kanonische-Kopie; niedrig).
 - **[Konformitaet]** K-5 best_binary_selector ABI-Spiegel stale (kAbiMajor=5/'.A5.' vs Host 6) — schreibt falsche Provenienz, Paritaets-static_assert nachziehen (ROADMAP:108/176; hoch, Daten-Korrektheit).
-- **[Konformitaet]** K-13 cache_engine_axis_registry.xml-Drift (18/86 mit isa-composition vs HEAD 17+system_axis) per axis_registry_gen regenerieren+committen (mittel).
+- **[Konformitaet]** K-13 cache_engine_axis_registry.xml-Drift (18/86 mit isa-composition vs HEAD 17+system_axis) per axis_registry_gen regenerieren+committen (mittel). **→ ERLEDIGT-STALE 2026-07-20 (A11-Audit): Drift existiert nicht mehr — live 17 Achsen/82 Bausteine ohne isa (Fix a9c433d0, §29).**
 
 **Mess-Kette / Auswertung**
 - **[Mess]** M-4 19→17-Achsen-Nachzug super-Stufen 04/05/08 (kSegmentCount 20→17, has_seg_ns/seg_attribution.tex) + Thesis-Text 'neunzehn Achsen'/T-Nummern DE+EN (ROADMAP:141; hoch).
@@ -2787,7 +2787,7 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **[§50-Fehlerklassen-#29]** Fehlerklassen-Framework INC-29.0 — `axis_error.hpp` Enum-Kern (InfraError vs Compiler-Compiler-Fehler DISJUNKT, ErrorDomain/CoR-Durchreichung, HandlingPolicy, `isa_features.cmake` FATAL→WARNING); Durchsetzung/SampleStatus-Split → Konformitaet-Strang §20.B-Fehlerklassen (OFFEN, mittel).
 - **[§50-CoR-Andockpunkt]** `run_selection_filter_chain` als NEUE Methode deklarieren (selection_filter_chain.hpp:87 = Dead-Code, 0 Prod-Treffer) (OFFEN, mittel).
 - **[§23.D-#52][§50-§23.D]** variant-Insel-Triade DEPRECATED-markieren (algorithm_baustein/baustein_variants/resolve_baustein) + `test_abi_interface.cpp` auf Achsen-Wahl umstellen (Guard `HotPathIsVariantFree` done, Insel offen) (TEIL, niedrig).
-- **[§26 Guard-2^17][§44.3][§50-GN-10]** Golden-Hygiene — static_assert gegen versehentliche 2^17-Voll-Materialisierung des `generated_source_catalog.hpp` (E-3); lokaler r5g-Codegen-Regen (test_v41_anatomy_adhoc_autobuilt_load, 18-vs-17 stale, per -E ausgeschlossen); GN-10 Fixture-Single-Source `experiment_golden.xml` (E7-Kanon, F27 kanonische-Kopie) (OFFEN, mittel/niedrig).
+- **[§26 Guard-2^17][§44.3][§50-GN-10]** Golden-Hygiene — static_assert gegen versehentliche 2^17-Voll-Materialisierung des `generated_source_catalog.hpp` (E-3); lokaler r5g-Codegen-Regen (test_v41_anatomy_adhoc_autobuilt_load, 18-vs-17 stale, per -E ausgeschlossen); GN-10 Fixture-Single-Source `experiment_golden.xml` (E7-Kanon, F27 kanonische-Kopie) (OFFEN, mittel/niedrig). **→ Guard-2^17-Teil ERLEDIGT (GN-2, A11 2026-07-20); GN-10-Fixture-Kanonizität bleibt F27-user-gated.**
 - **[§26 L5]** build-i2-Tests (smoke/measurement/wdk) stale-rot durch B2/B4-generated-Include-Root-Gap (test_experiment_projection) — **EINZIGER INC-0-Rest** (§52-B11, KEIN Code-Regress) (OFFEN, hoch — Hart-Grün-Doktrin).
 - **[§15.8-g-F72]** Vendor-Allokatoren jemalloc/tcmalloc/hoard/scalloc echt linken (K78-CE-D4-gated) (OFFEN, mittel).
 - **[§50-K-17]** A07-snmalloc Runtime-Segfault (`V31AdapterAlloc`) — ehrliche 'failed'-Zelle+Log bis Vendor-Untersuchung (OFFEN, niedrig).
@@ -2829,7 +2829,7 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **[§50-M-15/E2]** Welch-Konsument als eigene WIDE-CSV-Auswertungsstufe (je phase,engine) (OFFEN, mittel).
 - **[§50-M-4]** 19→17-Achsen-Nachzug super-Stufen 04/05/08 (kSegmentCount 20→17, has_seg_ns/seg_attribution.tex) + Thesis-Text „neunzehn Achsen"/T-Nummern DE+EN (OFFEN, hoch).
 - **[§50-GN-9]** Bloat-/Kalibrierungs-Report 1-Zellen-Lauf (Range 0:64) t/TU + Bytes/DLL → 6-TB-Feasibility-Gate VOR Voll-Matrix (OFFEN, hoch).
-- **[§50-W10/§37a]** CEB-Selbst-Emission Stufe-2/Grandchild aus einkompilierten Freigaben (`--emit-tier-ci`/`-cmake`; §48/§40.b deckt nur Planer→Child-1) (OFFEN, hoch).
+- **[§50-W10/§37a]** CEB-Selbst-Emission Stufe-2/Grandchild aus einkompilierten Freigaben (`--emit-tier-ci`/`-cmake`; §48/§40.b deckt nur Planer→Child-1) (OFFEN, hoch). **→ KERN ERLEDIGT (A8-Befund 20.07.: --emit-tier-ci/-cmake + Combo-Selektor beidseitig); Fork-C .so-Schnitt (§37a) DEFERRED.**
 - **[§50-PL-12]** CEB schreibt SELBST ans XML-Ziel zurück (heute `<output>` nur Provenienz-Log; gegen #51-out_csv reconcilen) (OFFEN, mittel).
 - **[§44.4][§50-§44.4]** W8-Gate-Aktivierungs-Nachlauf — `organ_required`-Deklarationen + `active_machine_signature()`-Host-Wahl (OFFEN, mittel).
 - **[§50-§40.a-Deliverables]** Organ-Sinnhaftigkeits-Matrix (Flags↔Organ-Achsen), Resolver-Regeln required=all/optional, Maschinen-Signatur-XML vs Organ-Anforderungs-XML, AVX10-`<isa-level>`-Notation (OFFEN, hoch).
@@ -2887,7 +2887,7 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 
 - **[§20.B-hartgruen]** Pipeline hart-grün — die GESAMTE Pipeline (ce+super, prod1+prod2, alle Stages) ist IMMER hart grün zu halten; keine Schein-Grün-Toleranz (OFFEN, kritisch — stehende Direktive).
 - **[§40.b / §42 / §40.b]** Dynamische Planer/CEB-CI = dünne super-CI-Delegation — super-CI ruft NUR die CE-lib + holt Ergebnis; Planer emittiert CEB-Bau-Jobs (Child-1), jede CEB emittiert Tier-Jobs (Child-2); CE emittiert CI-YAML UND lokalen CMake-Pfad; Steuerung im Planer/CEB, NICHT statische YAML (TEIL — W10-Legenden-Skelett via §46 produktiv, Grandchild-Selbst-Emission der CEB offen §50-W10/§37a Mess-Kette; kritisch).
-- **[§40.c]** Bare-Metal-Pflicht — identischer Bau OHNE GitLab-CI; CMakeGraphBuilder scharf, topologie-isomorph zur CI-YAML (Contract-Test); 24.07. lokal/bare-metal messbar (TEIL, hoch).
+- **[§40.c]** Bare-Metal-Pflicht — identischer Bau OHNE GitLab-CI; CMakeGraphBuilder scharf, topologie-isomorph zur CI-YAML (Contract-Test); 24.07. lokal/bare-metal messbar (TEIL, hoch). **→ ERLEDIGT (s. §40.c-Vermerk, A8(c) 20.07.).**
 - **[§7-CI2..CI6 / §2-B3]** CI-Test-Härtung — comdare_tests-Sammel-Target als Hard-Gate, cache-engine 2-Pass-Pflicht (gegen Schein-Grün), prt-art array_256 + alle-12, -j/RAM-Politik, allow_failure-first je neue Stage (OFFEN/TEIL, hoch).
 - **[§14.2-#21]** Runner-Cache-Vereinheitlichung — alle Nodes → dev-MinIO, k8s ohne [runners.cache], ccache-S3 (OFFEN, hoch — infra-gated).
 - **[§13.3-#273 / §14.2-#273-T2]** CI-Toolchain gcc-15.3-Pin (HO-11) + neueste-clang-Matrix — T3 clang done, T2 toolchain-gated (TEIL, hoch).
@@ -2935,9 +2935,9 @@ Das neue golden **N=2^17=131.072** ([[feedback_new_golden_all_axes_xml_gt320]], 
 - **[§24.E-#54]** Nachweis Organ-/System-/Mess-Achsen weiter durch XML-B+-Baum gesteuert — kein Bypass/Runtime-Umgehung (OFFEN, mittel — vor Voll-Messlauf).
 - **[§25-2-Audits]** 9-Dim (4/9) + Ketten (3/5) Konformitäts-Fix-Listen G1-G10/P1-P8 + #1 Organ-only-binary_id-Guard — G4/G5/G8/G9/G10 + #29 + a1a2 nun 7/7 done via §52-B13, Rest = 2 Prosa-Drifts (§52-B13-Rest) (TEIL, mittel).
 - **[§26-07-16-AUDIT-83]** F57 (noexcept-auf-Alloc ~15 Bodies) + DATA-07 vor #46 gegen Register abgleichen (OFFEN, mittel).
-- **[§50-K-13]** cache_engine_axis_registry.xml-Drift — 18/86 isa-composition vs HEAD 17+system_axis per axis_registry_gen regenerieren+committen (OFFEN, mittel).
+- **[§50-K-13]** cache_engine_axis_registry.xml-Drift — 18/86 isa-composition vs HEAD 17+system_axis per axis_registry_gen regenerieren+committen (OFFEN, mittel). **→ ERLEDIGT-STALE (A11 2026-07-20, live 17/82).**
 - **[§15.8-g-F62]** W4-CI-Coverage-Defizit — Surrogat hart, W4-Treiber 0 CI (Fork B) (OFFEN, mittel — user-gated).
-- **[§26-Quick-Wins]** golden-neutraler Batch — sizeof==1272, host_compatible_with, all_axes_*_count-Rename, Stale-Skip-Guard reflect_versions⟨17⟩ (TEIL, mittel/niedrig).
+- **[§26-Quick-Wins]** golden-neutraler Batch — sizeof==1272, host_compatible_with, all_axes_*_count-Rename, Stale-Skip-Guard reflect_versions⟨17⟩ (TEIL, mittel/niedrig). **→ ERLEDIGT (A11 2026-07-20, s. §26-Quick-Wins-Audit).**
 - **[§13.10-OFFEN-Quellen]** nicht gesichtete Quellen — Doc 29 experiment_baum_generik, S7-/DEG-Thesis-Seite, ch4-3.3-Historie (OFFEN, niedrig).
 - **[§50-9dim-constexpr-Gate]** 9dim-constexpr-Freigabe-Gate — Freigabe/Durchsetzungs-Kontrakt heute nur Kommentar, compile-time-Naht fehlt (OFFEN, niedrig).
 - **[§50-9dim-Dach-Rehang]** telemetry/simd_extension/general_hardware von topics::AxisBase → topics::Axis⟨Derived⟩ umhängen (OFFEN, niedrig).
