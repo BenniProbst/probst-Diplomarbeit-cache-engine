@@ -760,24 +760,24 @@ int main(int argc, char* argv[]) {
                 // NIE in die Mess-CSV/binary_id => golden-neutral (der No-Op-Default der Fassade bleibt fuer alle
                 // Nicht-Treiber-Konsumenten byte-identisch). Die Mess-Sequenzierung leistet bereits die aktive
                 // CI-resource_group ceb-measurement-exclusive -- der Sink beobachtet den Cursor, er steuert nichts.
-                namespace ex = comdare::cache_engine::builder::experiment;
+                namespace ex                                        = comdare::cache_engine::builder::experiment;
                 std::filesystem::path const progress_cursor_path    = output_dir / "progress.cursor";
                 bool const                  progress_cursor_enabled = std::filesystem::exists(output_dir);
                 constexpr std::size_t       kProgressStride         = 10; // ruhig-Default: jede 10. Perm + immer done
-                ex::ProgressSinkFn const    progress_sink =
-                    [progress_cursor_path, progress_cursor_enabled](ex::ProgressDelta const& d) {
-                        if (!(d.done || d.cursor % kProgressStride == 0)) return; // Drossel (byte-arm auf stderr)
-                        std::ostringstream line;
-                        if (d.done) {
-                            line << "[progress] done perm=" << d.cursor << " window-complete";
-                        } else {
-                            line << "[progress] perm=" << d.cursor << " axes_changed=" << d.changed.size();
-                            for (auto const& c : d.changed) line << " " << c.axis_index << "->" << c.variant_index;
-                        }
-                        std::cerr << line.str() << "\n";
-                        if (progress_cursor_enabled)
-                            if (std::ofstream cur{progress_cursor_path, std::ios::app}; cur) cur << line.str() << "\n";
-                    };
+                ex::ProgressSinkFn const    progress_sink = [progress_cursor_path,
+                                                             progress_cursor_enabled](ex::ProgressDelta const& d) {
+                    if (!(d.done || d.cursor % kProgressStride == 0)) return; // Drossel (byte-arm auf stderr)
+                    std::ostringstream line;
+                    if (d.done) {
+                        line << "[progress] done perm=" << d.cursor << " window-complete";
+                    } else {
+                        line << "[progress] perm=" << d.cursor << " axes_changed=" << d.changed.size();
+                        for (auto const& c : d.changed) line << " " << c.axis_index << "->" << c.variant_index;
+                    }
+                    std::cerr << line.str() << "\n";
+                    if (progress_cursor_enabled)
+                        if (std::ofstream cur{progress_cursor_path, std::ios::app}; cur) cur << line.str() << "\n";
+                };
 
                 // Bruecke-I4 (2026-07-16): der E4-Run-Block deckt — wie der --validate-Zweig (S0/FORK-4) — BEIDE
                 // offiziellen Profil-Wurzeln ab. Ein Root-Tag-Sniff (rein-lesend ueber den common-DOM) entscheidet:
@@ -825,7 +825,8 @@ int main(int argc, char* argv[]) {
                     xa.measurement_sink    = measurement_sink;    // Storage #51 (No-Op-Default => byte-neutral)
                     xa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
                     xa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
-                    xa.progress_sink       = progress_sink;       // Welle 5 (E-W5-2): §38-Fortschritts-Rueck-Kanal (Treiber-Konsument)
+                    xa.progress_sink =
+                        progress_sink; // Welle 5 (E-W5-2): §38-Fortschritts-Rueck-Kanal (Treiber-Konsument)
                     // W5-C+ (§36.1 Zellen-Locking): GN-Zellen-Filter — SPIEGEL zum run_profile-Zweig. Leer = kein
                     // Filter = Ist-Verhalten (byte-neutral). Wirkt am opt×simd-Walk in run_experiment_profile.
                     xa.gn_cell_opt  = env_trimmed("COMDARE_GN_OPT");
@@ -908,7 +909,8 @@ int main(int argc, char* argv[]) {
                     pa.measurement_sink    = measurement_sink;    // Storage #51 (No-Op-Default => byte-neutral)
                     pa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
                     pa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
-                    pa.progress_sink       = progress_sink;       // Welle 5 (E-W5-2): §38-Fortschritts-Rueck-Kanal (Treiber-Konsument)
+                    pa.progress_sink =
+                        progress_sink; // Welle 5 (E-W5-2): §38-Fortschritts-Rueck-Kanal (Treiber-Konsument)
 
                     std::cout << "[E4] XML-Lauf via run_profile-Fassade: profile=" << thesis_profile << " -> "
                               << pa.out_csv.string() << "\n";
