@@ -3475,3 +3475,9 @@ Fix dokumentiert).**
   *(Bezug: Body durchgaengig "17 Achsen" (`organ_count(){return 17;}`, §13/§20/§27.2) vs. kanonisch 19 (`axis_stats[19][8]`, golden-320 `mp_take_c<Enabled,4>`).)*
 - **[R6 · Anker docs/architektur/14_achsen_komposition_organ_metapher.md:681]** Additiv ein kurzer Traceability-Querverweis, dass §17.1 (compile-time Anatomie, kein Runtime-Switch) zusammen mit §53 (runtime WorkloadDriver/WorkloadConfig) genau die R6-Metaprog-Grenze abbildet: Hot-Path compile-time-only (CRTP+Concepts), W/D (Workload/Dataset) bewusst runtime. Verweis auf `feedback_compile_time_only_no_runtime`. Inhaltlich bestaetigend — keine Korrektur des Bestands noetig.  
   *(Bezug: §17.1 "kein Runtime-Switch" + §53 runtime-Workload == R6; §27.1-vtable ist Cold-Start-ABI-Grenze, nicht Hot-Path — kein Widerspruch.)*
+
+---
+
+### → §59 KERN-Mess-Schema (2026-07-20)
+
+> Additiver Querverweis (kein Duplikat). Die Organ-Metapher/Anatomie dieses Dossiers ist zugleich die **Stempel-Vorlage** der KERN-Mess-Schema-Steuerung (Ledger §59): die Rekombination aller Achsen je Stufe (Planer/CEB/Tier), aus der gestempelt wird. Neu gegenüber §57/§58: je **Prüfling-Merge** ein eigener id-Satz (Tier-Binaries + Mess-Artefakte zusammen) und ein **dritter Tier-Binary-Stempel = die Merge-Kombination** (zusätzlich zu System-Array + Organ-Array). Die 3-Stufen-Merge-Mechanik (`pruefling_merge.hpp` `MergeAxis`) wird von EINEM hart-codierten Prüfling/Slot auf beliebige Prüflinge generalisiert (Umverdrahtung, kein Neubau). Volle Fassung: **Ledger §59**.

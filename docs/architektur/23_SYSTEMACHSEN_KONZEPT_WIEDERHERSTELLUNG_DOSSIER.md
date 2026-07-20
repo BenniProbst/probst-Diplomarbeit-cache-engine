@@ -769,3 +769,9 @@ V-2 AutoPermutator-Konsumstatus.
   `reference_tier_metaphor_system_axis_properties_verified_complete`.
 
 *Ende Dossier 23. Erstellt 2026-07-16; read-only außer dieser Datei; TABU/golden unberührt.*
+
+---
+
+### → §59 KERN-Mess-Schema (2026-07-20)
+
+> Additiver Querverweis (kein Duplikat). Die System-Achsen dieses Dossiers werden von der KERN-Mess-Schema-Steuerung getrieben (Ledger §59): der Planer parst die XML, die **Haupt-Achsen sind statisch per Metaprogrammierung in die CEB einkompiliert** (Interpreter je Haupt-Achse fix), die CEB-Laufzeit treibt den Tier-Emit. Beim Stempel kommt zu den zwei §58-Arrays der Tier-Binary (System-Array, Organ-Array) ein **dritter Tier-Binary-Stempel = die Merge-Kombination** hinzu; je **Prüfling-Merge** ein eigener id-Satz. golden ce-only `0xF1C1F26A1232073B` byte-identisch (Merges additiv). Volle Fassung: **Ledger §59**.

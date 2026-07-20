@@ -148,3 +148,9 @@ T2 mapping (dünn, evtl. Sub-Aspekt T0/T11) · T1 cache_traversal (überlappt T5
   *(Bezug: F.1 genau 5 RC-steuerbare Achsen · F.2 14 honest-0-Achsen — ehrlich compile-time-only auf RC-Kanal, KEIN Defekt.)*
 - **[R10 · Anker docs/architektur/18_MESS_METHODIK_ACHSEN_OPTIMIERUNG_KONSOLIDIERT.md:23]** Additiv (als neue Unter-Notiz zu TEIL A, orthogonal zu den Mess-Kategorien in Zeile 23, ohne diese zu editieren) die kanonische 3-Mess-Modi-Struktur benennen: (1) Lebewesen-Wall-Clock, (2) Per-Achsen-Observer `observe_all` → `axis_stats[19][8]`, (3) Achsen-Vergleich vs. `std::map` als Güte-Entscheider — je Achse mit Makro- UND Mikro-Benchmarks. Zusätzlich die xml→pdf-Kette (Code 01–09, `InputIfFileExists`/honest-empty) als Auswertungs-Ausgabe für die Thesis-Anhänge verankern; Konzepte bereits in Ledger §12 l.503, `docs/thesis-anhang-wiring-READY.md` und Doc 24 §2/§8 — hier nur konsolidiert, nichts erfunden.  
   *(Bezug: System-Achsen = Mess-Kategorien CLU, Cache-Miss L1/L2/L3, dTLB, Branch, IPC/CPI, Latenz, Durchsatz, Energie, Speicher-Fußabdruck.)*
+
+---
+
+### → §59 KERN-Mess-Schema (2026-07-20)
+
+> Additiver Querverweis (kein Duplikat). Die hier konsolidierte Mess-Methodik ordnet sich unter die KERN-Mess-Schema-Steuerung (Ledger §59): **Default = ALLES messen**, die XML wirkt als **negatives Blacklisting**. Das Mess-Tooling {Wallclock/Makro/Micro} ist die **HAUPT**-Mess-Achse (compile-time fix in CEB+Tier); die 16 `measurement_categories` sind eine **Planer-gesteuerte Unter-Achse** (manifestiert als CSV-Spalten, §54-T2), keine Auffächerungs-Haupt-Achse. Drei Mess-Stufen: ① CE allein · ② je Prüfling `replace`/`merge` · ③ kombiniert `fulljoin`. Volle Fassung: **Ledger §59**.

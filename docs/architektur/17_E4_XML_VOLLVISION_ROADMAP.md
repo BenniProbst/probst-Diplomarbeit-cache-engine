@@ -91,3 +91,9 @@ Das ist **#229 in Vollform** — die ZIEL-Invariante ist thesis- und dossier-ver
   *(Bezug: Roadmap deckt weder den 3-Stufen-Join aus pruefling_merge.hpp noch prt-art als eigenen Prüfling ab.)*
 - **[R10 · Anker docs/architektur/17_E4_XML_VOLLVISION_ROADMAP.md:42]** Additiv die drei kanonischen Mess-Modi in Phase 6 vollständig aufnehmen: (1) Lebewesen-Wall-Clock, (2) Per-Achsen-Observer (bereits erfasst), (3) Achsen-Vergleich gegen std::map (entscheidet die Achsen-Güte), dazu Makro/Mikro je Achse und die xml→pdf-Kette (Code 01–09, \InputIfFileExists honest-empty) für die Thesis-Anhänge. Es ist eine Vollständigkeitslücke der Phase 6 dieses Planungs-Dossiers (Primärquelle spezifiziert die 3 Modi vollständig, :43 referenziert sie, Modus 3 über :18 teils erreichbar) — nicht droppbar, weil xml→pdf-Kette und Makro/Mikro-Granularität doc-weit gänzlich fehlen.  
   *(Bezug: Doc erfasst nur Modus 2; Wall-Clock, std::map-Vergleich und xml→pdf-Kette fehlen.)*
+
+---
+
+### → §59 KERN-Mess-Schema (2026-07-20)
+
+> Additiver Querverweis (kein Duplikat). Die E4-XML-Vollvision dieses Roadmap-Dossiers ist die KERN-Mess-Schema-Steuerung (Ledger §59): die XML wirkt als **negatives Blacklisting** auf die Voll-Whitelist und steuert Messmodi · per-Achse `merge`/`replace` · *welcher* Prüfling (Variablenname ODER statisch `"CacheEngine"`) · per-Achse Algorithmus-Whitelist · ODER Template laden (`mode=full`; benanntes `<template>` additiv) + je Achse `restrict`/`extend`. Die hier geforderte „prt-art als eigener Prüfling"-Roadmap-Phase generalisiert sich zu beliebigen Prüflingen (Paper-als-Prüfling = post-v3). Volle Fassung: **Ledger §59**.

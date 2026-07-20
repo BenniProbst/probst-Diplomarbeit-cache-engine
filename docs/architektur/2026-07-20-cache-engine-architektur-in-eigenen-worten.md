@@ -141,6 +141,29 @@ Die gebauten Binaries und Sidecars werden inkrementell zwischengespeichert (Vora
 
 Ein Audit gegen die früher falsch-zusammengezogene Architektur zeigt: die Grundlage ist **weitgehend sauber**. Literal belegt: kein `genus`-Enumerator in `AxisKind` (T1/T4), der Organ-only-Guard für die binary_id greift (T3), die Legende trennt Tier-Build und Measurement sauber (T6). Die Meta-Meta-Command-/Zwei-Schicht-Struktur (T5/T7) ist eine **Lücke, kein Verstoß** (S10-Bauziel). Die einzige echte Residue ist die Mess-Tooling-Auffächerung (T2, `plan_legend.hpp`), die ohnehin als §47/S4-Umbau geplant ist. Der Rest ist Doku-Kommentar-Nachzug (nie löschen, nur additiv).
 
+## 17. Der KERN: die Mess-Schema-Steuerung (§59)
+
+Wenn Abschnitt 1 sagt, das eigentliche Experiment *ist die XML*, dann ist **dieser** Abschnitt der Kern davon: die **Mess-Schema-Steuerung** ist nicht ein Feature unter vielen, sondern das eigentliche Herz der Arbeit (§59; vom Autor als „schon immer Gesetz" bezeichnet, Abweichung = Regression). Sie beantwortet die Frage, *was* eine XML überhaupt in Auftrag geben kann.
+
+**Default ist: alles messen.** Die Whitelist ist der volle Raum — alle Achsen, alle Einstellungen, alle geladenen Prüflinge. Die XML wirkt darauf als **negatives Blacklisting**: sie gibt nur Teilbereiche frei bzw. schränkt ein. Man definiert ein Experiment also nicht, indem man Dinge einschaltet, sondern indem man aus dem Vollen herausschneidet.
+
+**Die drei Mess-Stufen.** Ein Experiment läuft in bis zu drei Stufen, und der Begriff „Prüfling" (ein Fremd-/SOTA-Algorithmus-Satz, z.B. PRT-ART, perspektivisch ein Paper) ist dabei zentral:
+1. **CE allein** — die reine Cache-Engine, permutativ über alle freigegebenen Achsen.
+2. **Je Prüfling, direkt danach** — Default **`replace`**: die Prüfling-Achsen ersetzen die CE-Achsen komplett (die Sicht „nur der Prüfling"); alternativ **`merge`**: ein CE+Prüfling-Hybrid je Prüfling.
+3. **Kombiniert = `fulljoin` je Achse** — der volle Kreuz-Join CE × Prüfling, der nichts verwirft.
+
+**Was die XML im Detail steuert:** die Messmodi (welche Stufen laufen); pro Achse `merge` vs. `replace` (alle oder nur bestimmte Achsen); *welcher* Prüfling (ein Variablenname oder statisch `"CacheEngine"` = der explizite Prüfling `identity="self"`); pro Achse eine Algorithmus-Whitelist; und alternativ das Laden eines **Templates** (eines Research-Gesamtalgorithmus) mit je Achse `restrict`/`extend` — heute als `mode=full`, das benannte `<template>`-Element kommt additiv (post-v3). `extend` ist erlaubt, aber die Obergrenze bleibt das Registry-**Angebot**.
+
+**Der Weg Planer → CEB.** Der Planer parst die XML; die CEB *versteht* sie dann je Achse. Der Trick ist die Ebenen-Trennung: die **Haupt-Achsen sind statisch per Metaprogrammierung in die CEB einkompiliert** — der Interpreter je Haupt-Achse ist fix —, und die **CEB-Laufzeit** (vom Planer orchestriert) treibt daraus den Tier-Emit. Die XML variiert also nicht den Interpreter, sondern nur, welche Schnitte er durch den fest einkompilierten Raum fährt.
+
+**Das ist keine neue Maschine, sondern eine Verallgemeinerung.** Der schöne Befund aus dem CoreSchema-Audit: die 3-Stufen-Merge-Mechanik existiert im Ist-Code bereits compile-time und per-Achse (`pruefling_merge.hpp` `MergeAxis`). Sie ist heute nur **katalog-verdrahtet auf genau einen hart-codierten Prüfling** (`prt_art`) und **einen Slot** (`path_compression`) via `sota_catalog.hpp`. Der KERN generalisiert das auf beliebige Prüflinge, per-Achse, XML-gesteuert — **Umverdrahtung + Schema, kein Neubau.**
+
+**id-Satz, Stempel und Storage.** Jeder Prüfling-Merge bildet einen **eigenen id-Satz**: die Tier-Binaries werden zusammen mit allen Mess-Artefakten dem Prüfling zugeführt und gespeichert; je Merge-/Join-Art entsteht eine eigene Mess-Kategorie, die mit-gecacht wird. Gespeichert wird in einem Unterordner unter root **lokal (Default)** oder per XML in `minio.comdare.de`. Beim Stempel kommt zu den zwei §58-Arrays der Tier-Binary (System-Array, Organ-Array) ein **dritter Tier-Binary-Stempel = die Merge-Kombination** hinzu (Namen + Versionen aller beteiligten Achsen-Algorithmen, Haupt-Achsen-only). Entscheidend für die Verifikation: der ce-only-golden `0xF1C1F26A1232073B` bleibt **byte-identisch** — die Merges sind ein rein additiver id-Satz, der Identitäts-Pfad bleibt byte-gleich.
+
+**Anatomie als Stempel-Vorlage.** Die Anatomie (Abschnitt 10) ist zugleich die **Stempel-Vorlage**: die Rekombination aller Achsen, aus der jede Stufe (Planer/CEB/Tier) ihren stufen-eigenen Achsen-Satz stempelt. Das Mess-Tooling {Wallclock/Makro/Micro} ist dabei eine **Unter-Achse, compile-time fix in CEB und Tier** eingebacken; das scharfe Zusammenschalten mehrerer Tooling-Wahlen (N>1) kommt erst mit dem 320er-Lauf (S6). Und der Prüfling-Begriff trägt weit: perspektivisch ist ein **Paper selbst ein Prüfling** (CE- und PRT-ART-Registry führen dann echte Template-Profile je Paper) — das ist die post-v3-Ausbaustufe der Idee, dass ein Experiment allein durch die XML definiert wird.
+
+**Bau-Weg (§59, K1-K8).** KERN-A {Schema+Parser · XSD · validate · Director/Projektion · Auto-Phasen} ist golden-neutral; KERN-B {Emitter katalog→direktiven-getrieben · Merge-Stempel-POD} liegt im golden-Fenster (POD wächst 56→72, `binary_id`/CRC bleiben unberührt); §58-Array-Umbau + Storage sind Post-Abgabe/Caching. golden-gated ist allein die Verifikation S2/A1.
+
 ---
 
 ## Auf einen Nenner

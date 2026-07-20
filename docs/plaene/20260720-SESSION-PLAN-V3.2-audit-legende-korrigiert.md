@@ -694,3 +694,31 @@ S1 (P-TOTAL Forward-Fix)  → COMDARE_GN_TOTAL-Forward + golden-Vorbereitung, je
 ```
 
 **Begründung der Vorziehung:** S1 schaltet die CE-gesteuerte Kette scharf und treibt den 2^17-Voll-Build (S2, 24.07.). Würde die Legenden-Residue erst später gefixt, emittierte jeder in S1/S2 gelandete Job zunächst die Fehlform und müsste nachträglich regeneriert werden. Deshalb liegt S0.5 als reiner, golden-neutraler Legenden-/Fan-out-Fix **vor** S1 — kein Deadline-Impact, aber die gesamte nachgelagerte Mess-Kette (S4/P-MESSTOOL, S5/P-VOLLZUG, S6/320er, `measure:`-Jobs) startet vertragskonform. S4/P-MESSTOOL baut auf dem in S0.5 gelandeten Mess-Tooling-HAUPT-Fan-out auf (Verdrahtung dort → volle Schema-Auffächerung dort). Der übrige v2-Grundlauf (S1–S9 + PLAN-V2-ERWEITERUNG A–E / S10–S23) bleibt **unverändert**; v3.2 ist rein additiv (A. Terminologie-KORR + S0-Audit + S0.5-Gate), die v2-Struktur ist exakte Kopie.
+
+---
+
+## S4-KERN-Redefinition (2026-07-20, User — KERN-Erweiterung von S4, Ledger §59)
+
+> Additiver Block. Der User hat die **Mess-Schema-Steuerung als KERN** neu/autoritativ beschrieben („schon immer Gesetz"); das erweitert S4 (P-MESSTOOL) um die Prüfling-Semantik und löst #19 in S4-KERN auf. Die bestehende S4-Definition (Z.72–86, Schema `<measurement_tooling>`/`<run_methodology>` + Mess-Tooling-HAUPT-Auffächerung) bleibt **unverändert** und wird hier ergänzt, nicht ersetzt. Autoritativ ist **Ledger §59** (dort die volle Fassung); dieser Block ist der Plan-Zeiger.
+
+### S4-Erweiterung: die Prüfling-Mess-Semantik
+
+S4 trägt jetzt neben der Mess-Tooling-HAUPT-Auffächerung die **KERN-Steuerung**: Default = ALLES messen, XML = **negatives Blacklisting**. Drei Mess-Stufen — ① **CE allein** (permutativ) · ② **je Prüfling** direkt danach, Default **`replace`** (Prüfling-Achsen ersetzen CE-Achsen), alternativ **`merge`** (CE+Prüfling-Hybrid) · ③ **kombiniert = `fulljoin`** je Achse (verwirft nichts). Die XML steuert: Messmodi · per-Achse merge/replace · welcher Prüfling (Variablenname ODER statisch `"CacheEngine"` = `identity="self"`) · per-Achse Algorithmus-Whitelist · ODER Template laden (`mode=full`; benanntes `<template>` additiv post-v3) + je Achse `restrict`/`extend`. Der Planer parst → die CEB versteht je Achse; die Haupt-Achsen sind statisch per Metaprogrammierung in die CEB einkompiliert, die CEB-Laufzeit treibt den Tier-Emit.
+
+**CoreSchema-Befund (kein Neubau):** Die 3-Stufen-Merge-Maschinerie existiert bereits compile-time + per-Achse (`pruefling_merge.hpp:137-158` `MergeAxis`), ist aber katalog-verdrahtet auf EINEN hart-codierten Prüfling (`prt_art`) + EINEN Slot (`path_compression`) via `sota_catalog.hpp`. KERN = **Generalisierung** (beliebige Prüflinge, per-Achse, XML-gesteuert) = **Umverdrahtung + Schema**.
+
+**6 Forks (entschieden):** ① Phasen derived-by-default + `<phases>`-Override · ② Träger = `comdare_experiment` · ③ `"CacheEngine"` = expliziter Prüfling `identity="self"` · ④ Merge-Default=`replace`, `merge` nur bei Override, `fulljoin` nur Phase 3 · ⑤ `extend` erlaubt (Obergrenze Registry-Angebot) · ⑥ K5-golden-Bruch → additiv (ce-only byte-gleich, neuer id-Satz für Merges).
+
+### Bau-Sequenz K1-K8
+
+| Stufe | Inhalt | golden |
+|---|---|---|
+| **KERN-A** | K1 Schema-POD+Parser → K2 XSD → K3 validate → K4 Director/Projektion (`merge_plan_from_profile`-Naht) + K6 Auto-Phasen (`<phases>` 1..unbounded, E11-A) | **golden-neutral** |
+| **KERN-B** | K5 Emitter `sota_module_for` katalog-fix → direktiven-getrieben (additiv) + K7a Merge-Stempel-POD (dritter Tier-Binary-Stempel = Merge-Kombination; POD **56→72**, layout **2→3**; `binary_id`/CRC **unberührt**) | **golden-Fenster** |
+| **Post-Abgabe** | K7b §58-Array-Umbau + K8 Storage (eigener id-Satz je Merge/Join-Art, lokal ODER `minio.comdare.de`, mit-gecacht) | Caching-Phase |
+
+**STEMPEL/id-Satz:** eigener id-Satz je Prüfling-Merge (Tier-Binaries + Mess-Artefakte zusammen); DRITTER Tier-Binary-Stempel = Merge-Kombination (zusätzlich zu §58 System-Array + Organ-Array); golden ce-only `0xF1C1F26A1232073B` byte-identisch (Merges additiv). Mess-Tooling {Wallclock/Makro/Micro} = Unter-Achse, compile-time fix in CEB+Tier; N>1 erst S6. Anatomy = Stempel-Vorlage. Paper-als-Prüfling = post-v3.
+
+### #19-Auflösung + Band-B-Einordnung
+
+**#19 (voller 5-tief-Resolver) löst sich in S4-KERN auf** — die Struktur, durch die die KERN-Semantik fließt (Registry-ANGEBOT → Anwender-XML → Resolver). #19-Rest (numerische Ranges, `algo_version`-Angebot, Flag-Angebot) → **Band-C**. Band-B-Zuschnitt: **S4-KERN → Emitter-Paket (D4 per-CEB `ceb:emit`) → S5 → S6 (320er, USER-GO) → S7 (Hybrid, §32-F8-3 ENTSCHIEDEN §49) → S8 (28.07.)**; golden-gated allein S2/A1, ganz Band-B golden-neutral. Volle Fassung + Folge-TODOs (§59-SCHEMA/-EMITTER/-MERGE-STEMPEL/-STORAGE/-TEMPLATE): **Ledger §59**.

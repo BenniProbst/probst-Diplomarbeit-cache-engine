@@ -269,3 +269,9 @@ Die live-Verifikation korrigiert Teil D/H erheblich — der Fork war falsch gera
   *(Bezug: Zeile 69 „Schema `kV3AxisSchema` = `axis_stats[19][8]+seg_ns[19]+Meta`, ABI-Major 3 (CE/31:44-62)".)*
 - **[R11 · Anker Zeile 72]** Der 3-Stufen-Join ist bereits ausgerichtet; zu ergänzen ist der Datei-Anker `pruefling_merge.hpp` sowie die Präzisierung der Regel: `PrueflingSlot` = compile-time-Substitution in GENAU EINE Achse (NIE hart verdrahtet). Beleg: User-Direktive 2026-05-30 + IST-Tests Doc 24 §8.9.1. Original nicht antasten.  
   *(Bezug: Zeile 72 „Stufe 1/2/3 + Regel der abstrakt-leeren Achse — leere Prüfling-Achse reust alle CE-Algos".)*
+
+---
+
+### → §59 KERN-Mess-Schema (2026-07-20)
+
+> Additiver Querverweis (kein Duplikat). Der hier beschriebene 3-Stufen-Join ist jetzt als KERN autoritativ gefasst (Ledger §59): ① CE allein · ② je Prüfling Default `replace` (alternativ `merge`) · ③ kombiniert `fulljoin`. Die Mechanik existiert im Ist-Code (`pruefling_merge.hpp:137-158` `MergeAxis`, `PrueflingSlot` = compile-time-Substitution in genau EINE Achse), ist aber katalog-verdrahtet auf EINEN Prüfling (`prt_art`)/EINEN Slot (`path_compression`); der KERN generalisiert das XML-gesteuert auf beliebige Prüflinge (`"CacheEngine"` = `identity="self"`). Volle Fassung: **Ledger §59**.
