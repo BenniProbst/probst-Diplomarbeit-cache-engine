@@ -396,8 +396,15 @@ int main(int argc, char* argv[]) {
             std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            // A5 (§56-T2-FANOUT D4): optionaler --measurement-combo=<cmake_slug>-Selektor. Er beginnt mit '-' und
+            // wird daher NIE als Profil-Positional verschluckt (der argv[i+1][0]!='-'-Test oben ueberspringt ihn).
+            // Ohne Flag -> leer -> emit_tier_ci_facade laeuft byte-identisch zu vor A5 (Identitaet, 1 Voll-Konfig).
+            std::string combo_sel;
+            for (int j = 1; j < argc; ++j) {
+                if (std::string const a{argv[j]}; a.rfind("--measurement-combo=", 0) == 0) combo_sel = a.substr(20);
+            }
             namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::emit_tier_ci_facade(prof, std::cout);
+            return pf::emit_tier_ci_facade(prof, std::cout, combo_sel);
         }
         // --emit-tier-cmake [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): der Bare-Metal-Gegenpart zu
         // --emit-tier-ci (Stufe 2, CEB-Rolle). Emittiert das tier_plan.cmake (reale provision-only-Tier-Chunk-
