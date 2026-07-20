@@ -3131,3 +3131,15 @@ Vollstaendiger Session-Kontext-Log dieser Konsolidierungs-Runde als Teil des §5
 - **Security-Fund (Sweep): PAT-Rotation #327** (Vault-PAT-Exposition, Status unklar) — nicht autonom rotiert (braeche API-Zugang), dem User vorgelegt.
 
 *(Pre-Kompaktierungs-Historie — §48-TODO-Ladung, Plan-v3-Ueberarbeitung, Legenden-Regression, v3.2-Erstellung, Autonomie-Grant, Impl-an-Opus-Delegation — ist in AUTONOM-01 + ZWISCHENSTAND-02 + Ledger §52-§58 verankert; autoritativ fuer diese Session sind die post-Kompaktierungs-Direktiven U-1..U-11.)*
+
+---
+
+## §60 — POST-v3-ANFORDERUNGEN (2026-07-20 spaet, User — R1 .so-ABI-Vertrag / R2 Driver-Split / R3 Planer-CLI)
+
+**User-Auftrag (woertlich sinngetreu, autoritativ):** Diese drei Anforderungen gelten als zusaetzliche Anforderungen NACH Plan v3.
+
+- **[§60-R1 .so-ABI-VERTRAG]** Der Vertrag zwischen Experiment-Planer und CEB wird derzeit durch **Textemission** aufgeloest, nicht konform mithilfe einer schnellen **C++23 `<modules>` .so ABI-stabilen Schnittstelle**, die Messergebnisse (bei ~131.000 Ergebnissen) womoeglich schneller transportieren und die Steuerung effizienter gestalten kann als Textemission. Historie: eine fruehere Anfrage meinte, das sei bewusst verworfen/deprecated — ABER die rekursive Dock<->.so-Doktrin (ABI-stabile .so-Kette Planer/CEB/Tier) war am 19.07. dekretiert (Memory/Handover), und der Fork-C-.so-Schnitt (§37a) wurde in A8 nur DEFERRED. **Auftrag: Wiedereinfuehrbarkeit + Sinnhaftigkeit pruefen (deprecated-Audit 20.07.), dann als Post-v3-Strang planen.** (OFFEN, hoch — Post-v3.)
+- **[§60-R2 DRIVER-SPLIT]** Der measurement_driver ist auf Planer und CEB **verteilt**. User-Hypothese zu den Verantwortlichkeiten: die **Mess-Achsen des Planers steuern die AUSSTATTUNG der CEB**, und die **CEB enthaelt genau genommen den eigentlichen measurement_driver** zu den Festlegungen des Planers — womit beide **zwei Module und Unter-Klassen derselben Klasseninstanz** waeren. Zu klaeren: was genau messen beide, stimmt das Modell, und ist eine Konsolidierung (zwei Module derselben Klasse) architektonisch geboten? (OFFEN, hoch — Post-v3; Antwort-Analyse s. Session-Doc deprecated-Audit 20.07.)
+- **[§60-R3 PLANER-CLI]** Fuer Bauen/emit (CEB aus Planer, Tier-Binary aus CEB) und die Ueberwachung der Tier-Builds soll der **Planer als CLI** ausgerichtet sein, auf der Shell mit umgaenglichem User-Interface steuerbar; der Planer soll **Zustand/Builds/Messungen der CEB und der Tier-Binaries LOGGEN**, damit der Nutzer den Stand kennt. Der User will das Programm spaeter **manuell mit der XML-Config fahren** koennen. (OFFEN, hoch — Post-v3; baut auf S5-ProgressSink + --dump-plan/--emit-* auf.)
+
+**Kurations-Direktive:** Opus verwirft bei Unterbrechungen schnell den ganzen Turn und filtert schlecht, welche Aussagen deprecated sind; **Fable kuratiert die deprecated Features** (Audit + Wiederverwendungs-Bewertung als eigenes Session-Doc). Es existiert ein Bestand offiziell-deprecated Features mit moeglichem Restwert.
