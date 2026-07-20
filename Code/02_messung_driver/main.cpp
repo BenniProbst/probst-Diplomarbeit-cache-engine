@@ -414,8 +414,15 @@ int main(int argc, char* argv[]) {
             std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            // A8(a)-Symmetrie (§56-T2-FANOUT D4): optionaler --measurement-combo=<cmake_slug>-Selektor, EXAKT wie im
+            // --emit-tier-ci-Zweig gespiegelt (er beginnt mit '-' und wird daher NIE als Profil-Positional
+            // verschluckt). Ohne Flag -> leer -> emit_tier_cmake_facade laeuft byte-identisch (Identitaet, 1 Voll-Konfig).
+            std::string combo_sel;
+            for (int j = 1; j < argc; ++j) {
+                if (std::string const a{argv[j]}; a.rfind("--measurement-combo=", 0) == 0) combo_sel = a.substr(20);
+            }
             namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::emit_tier_cmake_facade(prof, std::cout);
+            return pf::emit_tier_cmake_facade(prof, std::cout, combo_sel);
         }
     }
 

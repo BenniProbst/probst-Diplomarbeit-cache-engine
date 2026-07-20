@@ -893,7 +893,7 @@ build:golden-n-avx512:
   parallel:
     matrix:
       - GN_SIMD: ["avx512"]
-        GN_RUNNER_TAG: ["avx512"]      # §36.3: NUR avx512-faehige Nodes (heute prod1/Zen5); INFRA: Tag 'avx512' setzen
+        GN_RUNNER_TAG: ["avx512f"]     # §36.3 + A3 (Weg a): Tag = REALES march-Flag -mavx512f (=> "avx512f", NICHT "avx512"); NUR avx512-faehige Nodes (heute prod1/Zen5); INFRA: Tag 'avx512f' setzen
         GN_MSYS: ["default"]
         GN_OPT: ["O2", "O3"]
         GN_CHUNK: ["0", "1", "2", "3"]
