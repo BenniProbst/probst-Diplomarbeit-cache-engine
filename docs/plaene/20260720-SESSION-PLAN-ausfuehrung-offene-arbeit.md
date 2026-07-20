@@ -124,7 +124,7 @@
 | **A4 Anhaenge A/B/E + FF0** (Thesis) | Thesis .tex Anhaenge A/B/E, FF0-Owner | B/E von 4-Zeilen-Stubs zu Voll-Anhang; FF0-Owner benannt | §0-V6.2-G8 |
 
 **Agenten-Zahl: 4** (Code + Analyse + zwei Thesis-Straenge datei-disjunkt).
-**Gate:** Hybrid ctest gruen + PDF baut (`.blg`/alphadin geprueft). **§32-F8-3 ENTSCHIEDEN (§49):** Option 1 (std::variant DIREKT im Hybrid-Tier-Binary, eng begrenzte §23-Ausnahme) + Option 3 (Dock-Array multipler Tier-Binaries hot an multiplen Docks + Verdraengungs-Strategie, Speicher-Heuristiken WEB-recherchiert) — BEIDE gebaut; Praezisierung s. S9.
+**Gate:** Hybrid ctest gruen + PDF baut (`.blg`/alphadin geprueft). **§32-F8-3 ENTSCHIEDEN (§49 + Korrektur):** Option 1 (std::variant im Hybrid-Tier-Binary) ist **LIMITIERT freigegeben** — variant NUR fuer abweichende **Unter-Pruef-Dock-Typen/-Vertraege**, eingebunden per **Abstract-Factory-Methode**; NICHT fuer die Haupt-Observer-Kommunikation (die bleibt statisch IObservableTier/Pruef-Dock, kein variant). Plus Option 3 (Dock-Array multipler Tier-Binaries hot an multiplen Docks + Verdraengungs-Strategie, Speicher-Heuristiken WEB-recherchiert). Praezisierung s. S9.
 **Blockiert-durch:** S6 (reale Messdaten).
 
 ---
@@ -226,6 +226,6 @@
 
 **ultracode-Präzisierungs-Umfang (Workflow):**
 1. **Mess-Tooling-Voll-Katalog** — Wallclock / Makro-Bench / Micro-Bench: welche existieren im Code (IObservableTier, observe_all, tier_observe, PMC), was fehlt je Tooling-Variante; wie selektiv einkompiliert (§32-F7).
-2. **Observer-Prüfdock-Bestandteile** — welche Observer (Achsen-Observer, Segment-Timing, PMC-Counter), wie ins Prüf-Dock (PruefDock/IPruefDock, dock-Mechanik), prüfdock-kompatible Einkompilation in die Tier-Binaries.
+2. **Observer-Prüfdock-Bestandteile** — welche Observer (Achsen-Observer, Segment-Timing, PMC-Counter), wie ins Prüf-Dock (PruefDock/IPruefDock, dock-Mechanik), prüfdock-kompatible Einkompilation in die Tier-Binaries. **§49-Korrektur:** Haupt-Observer-Kommunikation = statisch IObservableTier (kein variant). Die **Unter-Prüf-Docks mit abweichenden Typen/Verträgen** werden per **Abstract-Factory-Methode** eingebunden; die std::variant (limitiert §23-Ausnahme) ist NUR der Typ-Träger dieser abweichenden Vertrags-Varianten — Factory-Design + variant-Scope präzisieren.
 3. **Speicher-Verdrängungs-Heuristiken (WEB-Recherche)** für das Hybrid-Dock-Array (Option 3): LRU/LFU/ARC/CLOCK/2Q/W-TinyLFU etc. — welche für Tier-Binary-Hot-Swapping (große, wenige, workload-korrelierte Objekte) passt; Auswahl mit Begründung.
 4. **Schema-Konsequenz** — wie die vollen Mess-Methoden in `<measurement_tooling>` (S4) enumeriert werden; wie die Ablaufmethodik {Debug/Messen/Release} sie an-/abschaltet.
