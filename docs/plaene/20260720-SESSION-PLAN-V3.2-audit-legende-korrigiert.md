@@ -148,7 +148,7 @@
 
 ### Post-Abgabe (BAND-C ab 01.08. / BAND-D geparkt)
 
-- **P-W12B Stempel-Cache-Key** (`artifact_cache.hpp` cache_key_prefix, YAML GN_PREFIX, `dll_is_current`) — **Infra-#56-gated** (KORREKTUR §51-B5/B6: Ebene B = dev-MinIO V90 / Ebene C = prod-NFS V91, #72-Kopplung gestrichen; s. Abschnitt C S14), NICHT auf dem 28.07.-Pfad; relevant fuer N-Messung ab 01.08. Teilt `artifact_cache.hpp`+YAML mit P-INFRA -> serialisieren.
+- **P-W12B Stempel-Cache-Key** (`artifact_cache.hpp` cache_key_prefix, YAML GN_PREFIX, `dll_is_current`) — **Infra-#56-gated** (KORREKTUR §51-B5/B6: Ebene B = dev-MinIO V90 / Ebene C = prod-NFS V91, #72-Kopplung gestrichen; s. Abschnitt C S14), NICHT auf dem 28.07.-Pfad; relevant fuer N-Messung ab 01.08. Teilt `artifact_cache.hpp`+YAML mit P-INFRA -> serialisieren. **§58-VERSIONIERUNGS-MODELL (Ledger §58, autoritativ):** Planer=EIN X.Y.Z / CEB=Array je Mess-Haupt-Algo (kein Gesamt) / Tier=ZWEI separate Arrays System+Organ (kein Gesamt, nur Haupt; Unter=dynamisch-Laufzeit ungestempelt) / CSV=voll-permutativer Stempel (Haupt+Unter, Benennung+Spalten); Caching-Replay (suchen->Replay/materialisieren, Lazy-Materialisierung+Caching); async minio.comdare.de fuer Planer-Binary+CEB+Tier+CSV. Der W12-Stempel-Cache-Key baut hierauf auf -> Array-Stempel-Umbau (§58-STEMPEL) ist Caching-Voraussetzung.
 - **new-golden VOLL-MESSUNG** (§14.3-HELD, Pipeline 286, 1-Thread, mehrtaegig, NIE pollen).
 - **avx512-Ketten-Anschluss**, **#276 3-ISA-Teilmatrix** (ausdruecklich ALLERLETZTE Aufgabe), **S-7 Deep-Research**, **AP-15 Gattungs-Docks** (user-gated ABI).
 
