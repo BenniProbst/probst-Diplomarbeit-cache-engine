@@ -872,12 +872,18 @@ measure:golden-320:
         PULL_DST="$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}/e4_xml/dll"
         MARK_PREFIX="prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/"
         if mc stat "$MARKER" >/dev/null 2>&1; then
-          # Cache-Resthygiene (S1-F1): algo_sig-Wache. Der Marker traegt algo_sig=<Organ-Fingerprint des Baus>. Weicht er
-          #   vom ERWARTETEN (COMDARE_GN_ALGO_SIG) ab, war es ein Organ-/Katalog-Bump OHNE PREFIX-Bump => Marker als STALE
-          #   IGNORIEREN = MISS (nicht pullen, GN_DECISION bleibt "build"; alter Marker bleibt additiv stehen -- nie
-          #   loeschen). Alte Marker OHNE algo_sig ODER unbelegtes COMDARE_GN_ALGO_SIG => wie bisher HIT (rueckw.-kompat.).
-          #   COMDARE_GN_ALGO_SIG-Quelle (Pre-Pull erwarteter Fingerprint) = benannter ce-Folgepunkt; bis dahin dormant,
-          #   dll_is_current/.algos bleibt der Feind-Filter (grober False-Hit ist korrektheits-sicher, s.o.).
+          # Cache-Resthygiene (S1-F1 + Resthygiene-2, SCHARF): algo_sig-Wache. Der Marker traegt algo_sig=<Organ-Fingerprint
+          #   des Baus>. Der ERWARTETE Fingerprint kommt vom frisch gebauten Treiber (--chunk-organ-fingerprint: rein aus
+          #   dem Katalog, KEIN DLL-Bau; sha256 des Pre-Image == der Marker-Berechnung, ce-seitig kreuz-validiert gegen
+          #   find|LC_ALL=C sort|xargs cat). Weichen sie ab, war es ein Organ-/Katalog-Bump OHNE PREFIX-Bump => Marker STALE
+          #   => MISS (nicht pullen, GN_DECISION bleibt "build"; alter Marker bleibt additiv -- nie loeschen). Kein Treiber/
+          #   leeres algo_sig => wie bisher HIT (rueckw.-kompat.; dll_is_current/.algos bleibt ohnehin der Feind-Filter).
+          if [ -z "${COMDARE_GN_ALGO_SIG:-}" ]; then
+            _DRV=$(find build -type f -name comdare-messung-driver 2>/dev/null | head -1)
+            if [ -n "$_DRV" ] && [ -x "$_DRV" ] && [ -f "${COMDARE_GOLDEN_N_PROFILE:-}" ]; then
+              COMDARE_GN_ALGO_SIG=$(COMDARE_GOLDEN_N_RANGE="$GN_RANGE" "$_DRV" --chunk-organ-fingerprint "$COMDARE_GOLDEN_N_PROFILE" 2>/dev/null | sha256sum | awk '{print $1}')
+            fi
+          fi
           MARK_ALGO=$(mc cat "$MARKER" 2>/dev/null | sed -n 's/^algo_sig=//p' | head -1)
           if [ -n "${COMDARE_GN_ALGO_SIG:-}" ] && [ -n "$MARK_ALGO" ] && [ "$MARK_ALGO" != "${COMDARE_GN_ALGO_SIG}" ]; then
             echo "[dedup] MARKER-STALE (algo_sig Marker='$MARK_ALGO' != erwartet='$COMDARE_GN_ALGO_SIG') -> Organ-Bump, Marker IGNORIERT = MISS (Neubau; alter Marker bleibt additiv)"

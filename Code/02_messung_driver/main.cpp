@@ -365,6 +365,22 @@ int main(int argc, char* argv[]) {
             namespace pf = comdare::cache_engine::builder::profile_facade;
             return pf::dump_experiment_plan_facade(prof, std::cout);
         }
+        // --chunk-organ-fingerprint [<profil>] (Cache-Resthygiene-2, 2026-07-21): druckt das Chunk-Organ-Fingerprint-
+        // PRE-IMAGE (perm.dll.algos-Inhalte der Range-Binaries, stem-sortiert konkateniert) nach stdout -- rein aus dem
+        // Katalog, KEIN DLL-Bau. Die CI pipet es durch `sha256sum` -> COMDARE_GN_ALGO_SIG (== S1-F1-Marker-algo_sig ->
+        // Marker-Wache scharf). Range aus COMDARE_GOLDEN_N_RANGE="start:count" (leer/ungesetzt => ganze View).
+        if (flag == "--chunk-organ-fingerprint") {
+            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
+                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
+            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+            std::size_t rstart = 0, rcount = 0;
+            if (auto const r = parse_golden_range_env()) {
+                rstart = r->start;
+                rcount = r->count;
+            }
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::chunk_organ_fingerprint_facade(prof, rstart, rcount, std::cout);
+        }
         // --dump-ci [<profil>] (PAKET W7-A, 2026-07-19, §40.b): rein-lesende Emission der deterministischen
         // GitLab-Child-Pipeline-YAML (CiYamlBuilder am SELBEN Director-Walk wie --dump-plan). Die dynamische,
         // Planer-gesteuerte Folge-CI (Pilot->Serie). Wie --dump-plan: baut KEINE DLL, misst NICHT; Root-Tag-Sniff
