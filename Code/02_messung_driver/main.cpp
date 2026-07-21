@@ -757,6 +757,7 @@ int main(int argc, char* argv[]) {
                 namespace at                   = comdare::cache_engine::builder::artifact_transport;
                 auto const      artifact_cache = std::make_shared<at::ArtifactCache>(at::ArtifactCache::from_env());
                 at::CachePushFn cache_push;
+                at::CachePullFn cache_pull; // S2 (#46a): BATCH-Warm-Cache-Hydrierung VOR dem Bau (No-Op-Default)
                 at::MeasurementSinkFn measurement_sink;
                 // W11 (Ledger §43.c): der BAU-Modus Teil-Marker-Sink + Intervall. Nach je COMDARE_GN_PART_SIZE (Default
                 // 1024) gepushten DLLs legt der async Push-Pump einen Teil-Marker <build_version>/_gn_chunk_markers/
@@ -769,6 +770,12 @@ int main(int argc, char* argv[]) {
                 if (!artifact_cache->inert()) {
                     cache_push = [artifact_cache](std::filesystem::path const& bin_dir, std::string const& bv) {
                         artifact_cache->push_tier_binary(bin_dir, bv);
+                    };
+                    // S2 (#46a): BATCH-Warm-Cache-Hydrierung VOR dem Bau. Der Iterator ruft sie EINMAL (Phase A) und
+                    // zieht den ganzen Perm-Praefix rekursiv ins output_dir -> dll_is_current ueberspringt die gepullten
+                    // (bauen nur die fehlenden). pull_tier_prefix ist selbst No-Op ohne Ebene B (minio) => byte-neutral.
+                    cache_pull = [artifact_cache](std::filesystem::path const& dest, std::string const& bv) {
+                        artifact_cache->pull_tier_prefix(bv, dest);
                     };
                     measurement_sink = [artifact_cache](std::filesystem::path const& file, std::string const& dest) {
                         artifact_cache->sink_measurement(file, dest);
@@ -854,8 +861,9 @@ int main(int argc, char* argv[]) {
                         std::cout << "[E4] W6 Bau-Pool: COMDARE_BUILD_PARALLEL=" << *bp
                                   << " parallele Compile-Worker (Messen bleibt 1-Thread)\n";
                     }
-                    xa.cache_push          = cache_push;          // Storage #51 (No-Op-Default => byte-neutral)
-                    xa.measurement_sink    = measurement_sink;    // Storage #51 (No-Op-Default => byte-neutral)
+                    xa.cache_push          = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
+                    xa.cache_pull          = cache_pull;       // S2 (#46a): BATCH-Warm-Cache-Hydrierung (No-Op-Default)
+                    xa.measurement_sink    = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
                     xa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
                     xa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
                     xa.progress_sink =
@@ -938,8 +946,9 @@ int main(int argc, char* argv[]) {
                         std::cout << "[E4] W6 Bau-Pool: COMDARE_BUILD_PARALLEL=" << *bp
                                   << " parallele Compile-Worker (Messen bleibt 1-Thread)\n";
                     }
-                    pa.cache_push          = cache_push;          // Storage #51 (No-Op-Default => byte-neutral)
-                    pa.measurement_sink    = measurement_sink;    // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.cache_push          = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.cache_pull          = cache_pull;       // S2 (#46a): BATCH-Warm-Cache-Hydrierung (No-Op-Default)
+                    pa.measurement_sink    = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
                     pa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
                     pa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
                     pa.progress_sink =
