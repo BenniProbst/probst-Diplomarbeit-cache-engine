@@ -180,6 +180,11 @@ build:clang:
 lint:secrets:
   extends: .lint-secrets
   tags: [baremetal]
+  # #53-Haertung (21.07.): explizite Immer-rules — lint:secrets ist der EINZIGE Pflicht-Job jeder Welle
+  # (Token-Risiko je Commit, auch docs-only). Befund 12012: docs-only-Welle entstand LEER-failed; diese
+  # rules stellen sicher, dass die Minimal-Welle existiert und GRUEN werden kann.
+  rules:
+    - when: on_success
   variables:
     GIT_SUBMODULE_STRATEGY: none
 lint:format:
