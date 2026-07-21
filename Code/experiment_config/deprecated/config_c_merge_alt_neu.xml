@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- DEPRECATED 2026-07-22 (#48 Scheibe 1): tote Alt-Config, 0 Konsumenten belegt (grep). Provenienz REV 7.6 (2026-05-13).
+     supersedes: das Section-59-KERN-Schema; die R-C-Semantik lebt in Stufe1+Stufe3 der 3-Phasen-golden (experiment_golden_kern).
+     BEHALTEN (Doku-nie-loeschen); nur nach deprecated/ verschoben (git mv, kein rm). -->
 <!-- Messreihe C: Merge alt/neu (PRT-ART-Bausteine in cache-engine-Stack)
      REV 7.6 (2026-05-13)
 -->
