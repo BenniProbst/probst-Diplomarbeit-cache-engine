@@ -374,12 +374,19 @@ int main(int argc, char* argv[]) {
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
             std::size_t rstart = 0, rcount = 0;
-            if (auto const r = parse_golden_range_env()) {
-                rstart = r->start;
-                rcount = r->count;
+            try {
+                if (auto const r = parse_golden_range_env()) {
+                    rstart = r->start;
+                    rcount = r->count;
+                }
+                namespace pf = comdare::cache_engine::builder::profile_facade;
+                return pf::chunk_organ_fingerprint_facade(prof, rstart, rcount, std::cout);
+            } catch (std::exception const& e) {
+                // Fehlerklassen-Doktrin: kaputtes COMDARE_GOLDEN_N_RANGE/Profil ist ein KONFIG-Fehler --
+                // klar melden statt unhandled throw (cppcheck throwInEntryPoint); nie stillschweigend Voll-View.
+                std::cerr << "[Konfig-Fehler: chunk-organ-fingerprint] " << e.what() << "\n";
+                return 2;
             }
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::chunk_organ_fingerprint_facade(prof, rstart, rcount, std::cout);
         }
         // --dump-ci [<profil>] (PAKET W7-A, 2026-07-19, §40.b): rein-lesende Emission der deterministischen
         // GitLab-Child-Pipeline-YAML (CiYamlBuilder am SELBEN Director-Walk wie --dump-plan). Die dynamische,
