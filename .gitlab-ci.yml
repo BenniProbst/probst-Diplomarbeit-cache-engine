@@ -514,8 +514,12 @@ measure:smoke:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
       when: never
-    - if: '$COMDARE_RUN_MEASURE == "true"'         # Voll-Ablauf: erst Smoke, dann golden-320 (needs)
-    - if: '$COMDARE_MEASURE_PROFILE == "smoke"'    # Smoke-ONLY: nur dieser Job (golden-320 bleibt inert)
+    # DEPRECATED-Fallback (2026-07-21, analog COMDARE_STATIC_MATRIX_FALLBACK): dieser STATISCHE Smoke-Job ist durch
+    # die dynamische Kette (planer:delegate -> ceb -> tier, Profil-Methodik m3_smoke=debug, 2c-Dual-Compile) abgeloest.
+    # Er laeuft NUR NOCH mit ZUSAETZLICHEM COMDARE_STATIC_SMOKE_FALLBACK=="true" (Default AUS) -- sonst kollidierte er
+    # per P11-Wache/resource_group mit den emittierten Mess-Jobs derselben Welle. NICHT geloescht (Pilot-Historie).
+    - if: '$COMDARE_RUN_MEASURE == "true" && $COMDARE_STATIC_SMOKE_FALLBACK == "true"'
+    - if: '$COMDARE_MEASURE_PROFILE == "smoke" && $COMDARE_STATIC_SMOKE_FALLBACK == "true"'
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
