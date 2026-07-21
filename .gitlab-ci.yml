@@ -118,7 +118,7 @@ variables:
 # Commit aendert keinen Code, der Beweis der Vorwelle bleibt gueltig (Skip != gelb, Job existiert nicht).
 .code-rules:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
@@ -159,7 +159,7 @@ build:clang:
   rules:
     - if: '$COMDARE_CLANG_MATRIX != "1"'
       when: never
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
@@ -221,7 +221,7 @@ trigger:cache-engine:
   stage: orchestrate
   needs: ["lint:secrets"]
   rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — ce-Gitlink-Bump = Pfad-Change => nie faelschlich uebersprungen
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
@@ -240,7 +240,7 @@ trigger:prt-art:
   stage: orchestrate
   needs: ["lint:secrets"]
   rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — prt-art-Gitlink-Bump = Pfad-Change
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
@@ -259,7 +259,7 @@ trigger:thesis:
   stage: orchestrate
   needs: ["lint:secrets"]
   rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — thesis-Gitlink-Bump = Pfad-Change
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
@@ -497,7 +497,7 @@ prebackup:measurements:
 thesis:pdf:
   stage: thesis-pdf
   tags: [baremetal]
-  needs: ["analyse:thesis-data"]
+  needs: [{job: "analyse:thesis-data", optional: true}]  # #53: docs-only-DAG-sicher (analyse ist code-gegated, thesis:pdf laeuft auch ohne)
   cache:
     paths: []               # #53: latexmk-PDF-Bau, kein C++-Compile -> kein ccache-Zip (docs-Konsument, NICHT code-gaten)
   # TeXLive/latexmk = Runner-Voraussetzung (Infra installiert texlive vor). Bis dahin gegatet
@@ -606,7 +606,7 @@ measure:smoke:
   variables:
     GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
     COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3_smoke_coverage.profile.xml"
-  needs: ["verify:submodules"]
+  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
       when: never
@@ -820,7 +820,7 @@ measure:golden-320:
     # -- Messsystem-Konfiguration (Ledger §36.2/§30: ein Planer baut multiple CEBs je Messsystem). Heute 1 Default-Zelle;
     #    weitere Messsysteme = weiterer GN_MSYS-Wert in den Matrizen (multipliziert die System-Permutations-Zellen). --
     GN_MSYS: "default"                     # Matrix-Default; je Zelle ueberschrieben (fliesst in resource_group + Treiber-Env)
-  needs: ["verify:submodules"]
+  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
@@ -1028,6 +1028,7 @@ persist:measurements:
       artifacts: true
       optional: true
     - job: manifest:provenance      # build_manifest.txt (Provenance)
+      optional: true                  # #53: docs-only-DAG-sicher (manifest:provenance ist code-gegated)
       artifacts: true
     # HINWEIS (Anti-Phantom, Ledger §G2): prebackup:measurements ist BEWUSST KEIN need mehr — sein
     # Artefakt ist ein reiner Mechanismus-Selbsttest (synthetische CSVs), der NICHT in den measurement-
@@ -1152,7 +1153,7 @@ planer:delegate:
   variables:
     GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token (wie .golden_n_build)
     COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
-  needs: ["verify:submodules"]
+  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher (Job kann bei docs-Wellen fehlen)
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE die dynamische Planer-CI
       when: never
