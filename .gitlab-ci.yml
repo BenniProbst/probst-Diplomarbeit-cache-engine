@@ -106,19 +106,69 @@ variables:
   # Ueberschreibbar je Trigger (z.B. Kalibrierlauf COMDARE_GN_TOTAL=64); wirkt nur hinter COMDARE_BUILD_GOLDEN_N.
   COMDARE_GN_TOTAL: "131072"
 
+# ── #53 docs-only-Durchsatz-Gate (Ledger §63-Nachtrag, Manager-Verdikt V2): Allowlist-Rules-Vorlage. ──
+# WIRKT auf development (unsere docs-/Ledger-Wellen SIND development-Pushes): ein Commit, der NUR
+# Dokumentation aendert (KEIN Pfad der changes-Allowlist), ueberspringt die schweren Code-Jobs =>
+# sofortiger Durchsatz-Gewinn. NUR main laeuft IMMER voll (Release-Beweis auf der Merge-SHA; V2). Gitlink-
+# Bumps (Code/external/*, .gitmodules) stehen in der Positivliste => ein 1-Zeilen-160000-Submodul-Bump ist
+# NIE docs-only. Allowlist (NICHT Blocklist): neue Branches/unbekannte Pfade => changes=true = volle
+# Pipeline (sichere Richtung). web/pipeline/trigger/MR werten changes ohnehin true bzw. sind Mess-Trigger
+# => nie gaten. lint:secrets bleibt UNGEGATET (Token-Risiko je Commit); thesis:pdf ist docs-Konsument.
+# Doktrin-Auslegung (V2): "gesamte Pipeline hart gruen" bezieht sich auf den CODE-Stand -- ein docs-only-
+# Commit aendert keinen Code, der Beweis der Vorwelle bleibt gueltig (Skip != gelb, Job existiert nicht).
+.code-rules:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        paths:
+          - "Code/**/*"
+          - "Code/external/*"      # Gitlink-Bumps ce/prt-art (1-Zeilen-160000-Diff) => NIE docs-only
+          - "thesis/diplomarbeit"  # thesis-Gitlink
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
+
+# ── #53 ccache-Hygiene: Konsumenten ziehen den ccache nur (policy: pull), EIN Writer (analyse:thesis-data)
+# bleibt pull-push (globale cache-Default). Nicht-kompilierende Jobs tragen KEINEN ccache-Zip-Transfer. ──
+.ccache-pull:
+  cache:
+    key: "ccache-$CI_PROJECT_NAME"
+    paths: [".ccache"]
+    policy: pull
+
 # ── Stufe 1: Lint (aus ci-templates) — NUR super-eigener Code, KEINE Submodule ──
 # #273 T1 (User-E2 2026-07-05): Compiler-Inventar je Runner-Host via CI (Cluster read-only) — Grundlage
 # fuer den gcc-15.3-Pin (T2) + die neueste-clang-Pflichtmatrix. Rollout beginnt hier (super).
 toolchain:probe:
-  extends: .toolchain-probe
+  extends: [.toolchain-probe, .code-rules]   # #53: docs-only-Gate
   tags: [baremetal]
+  cache:
+    paths: []                                # #53: Probe kompiliert nicht -> kein ccache-Zip-Transfer
 
 # #273: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang (COMDARE_CLANG_MATRIX=1 oben).
 # #258-Fix (2026-07-06, Pipeline 8048/Job 213091): Template-Default cmake -S "." fand kein CMakeLists —
 # super-Quelle liegt unter Code/. Scope = Sammel-Target comdare_da_tools (Code/CMakeLists.txt, super-eigene
 # Werkzeugflaeche analog analyse+integration; Konfiguration spiegelt analyse:thesis-data: Ninja/Release/V32).
 build:clang:
-  extends: .build-clang-latest
+  # #53: docs-only-Gate als EXPLIZITE kombinierte rules (NICHT .code-rules-extends), damit der #273-CLANG_MATRIX-
+  # Ausschalter erhalten bleibt (architekturkonform, nicht nur heute-identisch): CLANG_MATRIX!=1 => never (Bestand
+  # der neueste-clang-Pflicht), DANN die V2-Allowlist (docs-only skippt; main/Code/Gitlink laufen). .ccache-pull
+  # bleibt (Konsument, pull-only). needs UNVERAENDERT (Verdikt V4).
+  extends: [.build-clang-latest, .ccache-pull]
+  rules:
+    - if: '$COMDARE_CLANG_MATRIX != "1"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        paths:
+          - "Code/**/*"
+          - "Code/external/*"
+          - "thesis/diplomarbeit"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
   stage: analyse   # super hat keinen 'build'-Stage (Lint-API 05.07.: chosen stage build does not exist)
   tags: [baremetal]
   variables:
@@ -133,12 +183,12 @@ lint:secrets:
   variables:
     GIT_SUBMODULE_STRATEGY: none
 lint:format:
-  extends: .lint-format
+  extends: [.lint-format, .code-rules]   # #53: docs-only-Gate (Tool-Cache aus .lint-format bleibt)
   tags: [baremetal]
   variables:
     GIT_SUBMODULE_STRATEGY: none
 lint:static:
-  extends: .lint-static
+  extends: [.lint-static, .code-rules]   # #53: docs-only-Gate (Tool-Cache aus .lint-static bleibt)
   tags: [baremetal]
   variables:
     GIT_SUBMODULE_STRATEGY: none
@@ -149,7 +199,7 @@ lint:static:
 # bewusst NICHT Target "all": das zöge die komplette ce-Suite (888 Targets) doppelt, die ihr EIGENES
 # test:unit im ce-Repo hat (dort advisory bis 58er-Fix-Strecke/264-d).
 test:unit:
-  extends: .test
+  extends: [.test, .code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
   tags: [baremetal]
   variables:
     COMDARE_TEST_CMAKE_SOURCE_DIR: "Code"
@@ -165,6 +215,15 @@ test:unit:
 trigger:cache-engine:
   stage: orchestrate
   needs: ["lint:secrets"]
+  rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — ce-Gitlink-Bump = Pfad-Change => nie faelschlich uebersprungen
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        paths:
+          - "Code/external/comdare-cache-engine"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
   trigger:
     project: comdare/research/comdare-cache-engine
     branch: main
@@ -175,6 +234,15 @@ trigger:cache-engine:
 trigger:prt-art:
   stage: orchestrate
   needs: ["lint:secrets"]
+  rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — prt-art-Gitlink-Bump = Pfad-Change
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        paths:
+          - "Code/external/comdare-prt-art"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
   trigger:
     project: comdare/research/comdare-prt-art
     branch: main
@@ -185,6 +253,15 @@ trigger:prt-art:
 trigger:thesis:
   stage: orchestrate
   needs: ["lint:secrets"]
+  rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — thesis-Gitlink-Bump = Pfad-Change
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        paths:
+          - "thesis/diplomarbeit"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
   trigger:
     project: comdare/research/20260931-overleaf-diplomarbeit
     branch: main
@@ -195,9 +272,12 @@ trigger:thesis:
 
 # ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (braucht recursive) ──
 verify:submodules:
+  extends: [.code-rules]   # #53: docs-only-Gate (faellt mit allen Code-Dependents; DAG bleibt gueltig)
   stage: submodules
   tags: [baremetal]
   needs: ["lint:secrets"]   # Codex-Review 06-27: hart auf den Secrets-Gate warten
+  cache:
+    paths: []               # #53: reine Submodul-Verifikation, kein Compile -> kein ccache-Zip
   script:
     - 'echo "== Submodule =="; git submodule status'
     - 'test -e Code/external/comdare-cache-engine/CMakeLists.txt && echo "cache-engine OK"'
@@ -216,6 +296,7 @@ verify:submodules:
 
 # ── Stage analyse: Auswertungswerkzeuge bauen (KEIN grosses Artefakt) ──
 analyse:thesis-data:
+  extends: [.code-rules]   # #53: docs-only-Gate. ccache-WRITER (pull-push, globale cache-Default) -> unveraendert
   stage: analyse
   tags: [baremetal]
   needs: ["verify:submodules"]
@@ -238,6 +319,7 @@ analyse:thesis-data:
 # Tool tier-binary-report gebaut + --visibility ausgefuehrt. KEIN schwerer Perm-/Mess-Lauf
 # (mehrtaegiger Lauf #156 bleibt HELD). Hart (kein allow_failure).
 visibility:tier-binaries:
+  extends: [.code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
   stage: analyse
   tags: [baremetal]
   needs: ["verify:submodules"]
@@ -267,6 +349,7 @@ visibility:tier-binaries:
 # Mess-Lauf (messung_driver: 3x 1M Keys/5M Ops + ~43 DLLs) ist bewusst NICHT hier (= mehrtaegiger Lauf #156).
 # Submodule kommen aus dem globalen recursive-Checkout (03_binary_to_csv braucht einen cache-engine-Header).
 integration:smoke:
+  extends: [.code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
   stage: integration
   tags: [baremetal]
   needs: ["verify:submodules"]   # erst nach Submodul-Verifikation (transitiv nach lint:secrets)
@@ -304,9 +387,12 @@ integration:smoke:
 # Lastprofil-/Config-XMLs der cache-engine). Cross-cutting -> gehoert an den Super-Root (sieht alle Submodule).
 # Beleg = Manifest-Artefakt. needs:[verify:submodules] (braucht den recursive-Checkout). KEIN schwerer Bau.
 manifest:provenance:
+  extends: [.code-rules]   # #53: docs-only-Gate
   stage: manifest
   tags: [baremetal]
   needs: ["verify:submodules"]
+  cache:
+    paths: []               # #53: Manifest-Sammlung, kein Compile -> kein ccache-Zip
   script:
     - |
       set -euo pipefail
@@ -355,9 +441,12 @@ manifest:provenance:
 # „Messdaten nie loeschen"). Reales Storage-Ziel (NAS/MinIO) ist #202-gegatet -> hier CI-Selbsttest +
 # versioniertes Artefakt als Beleg, dass der Mechanismus korrekt + datenschuetzend ist.
 prebackup:measurements:
+  extends: [.code-rules]   # #53: docs-only-Gate
   stage: manifest
   tags: [baremetal]
   needs: ["verify:submodules"]
+  cache:
+    paths: []               # #53: Shell-Selbsttest, kein Compile -> kein ccache-Zip
   script:
     - |
       set -euo pipefail
@@ -404,6 +493,8 @@ thesis:pdf:
   stage: thesis-pdf
   tags: [baremetal]
   needs: ["analyse:thesis-data"]
+  cache:
+    paths: []               # #53: latexmk-PDF-Bau, kein C++-Compile -> kein ccache-Zip (docs-Konsument, NICHT code-gaten)
   # TeXLive/latexmk = Runner-Voraussetzung (Infra installiert texlive vor). Bis dahin gegatet
   # (sonst sicherer Fail an "latexmk fehlt"). Reaktivieren: CI-Variable COMDARE_TEXLIVE_AVAILABLE="true".
   rules:
@@ -1125,6 +1216,8 @@ planer:delegate-trigger:
 ergebnis:holen:
   stage: planer
   tags: [baremetal]
+  cache:
+    paths: []               # #53: reines Ergebnis-Sammeln (var-gated), kein Compile -> kein ccache-Zip
   variables:
     GIT_SUBMODULE_STRATEGY: none
   needs:
