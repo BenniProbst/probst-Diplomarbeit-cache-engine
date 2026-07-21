@@ -1088,11 +1088,15 @@ planer:delegate-trigger:
     - job: planer:delegate
       artifacts: true
   # S1/A1 P-TOTAL (Ledger 46): explizite Forward-Allowlist an der ERSTEN Trigger-Grenze. Selbst-enthaltene
-  # Child-Pipelines erben Pipeline-Variablen NICHT -> COMDARE_GN_TOTAL wird als YAML-Variable dieses Bridge-Jobs
-  # deklariert (RHS = der super-Pipeline-Wert) und via forward:yaml_variables an die STUFE-1-Child gereicht. KEIN
-  # pipeline_variables:true (Isolation: die Child erbt NICHT den gesamten Eltern-Variablenraum, Byte-Determinismus).
+  # Child-Pipelines erben Pipeline-Variablen NICHT -> COMDARE_GN_TOTAL + COMDARE_MEASURE_PROFILE werden als
+  # YAML-Variablen dieses Bridge-Jobs deklariert (RHS = der super-Pipeline-Wert) und via forward:yaml_variables an
+  # die STUFE-1-Child gereicht. KEIN pipeline_variables:true (Isolation: die Child erbt NICHT den gesamten
+  # Eltern-Variablenraum, Byte-Determinismus). COMDARE_MEASURE_PROFILE (S5-Rest): ohne diese Weiterreichung sieht
+  # das Grandchild die Smoke-Marke nicht -> die STUFE-3-Mess-Rule '$COMDARE_MEASURE_PROFILE == "smoke"' faellt aus
+  # und die emittierten Mess-Jobs bleiben when:manual statt Auto-Run (Befund CI-Smoke 11840/Grandchild 11858).
   variables:
     COMDARE_GN_TOTAL: "$COMDARE_GN_TOTAL"
+    COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
@@ -1104,7 +1108,7 @@ planer:delegate-trigger:
         job: planer:delegate
     strategy: depend
     forward:
-      yaml_variables: true       # die explizite Allowlist oben (COMDARE_GN_TOTAL) durchreichen
+      yaml_variables: true       # die explizite Allowlist oben (COMDARE_GN_TOTAL + COMDARE_MEASURE_PROFILE) durchreichen
       pipeline_variables: false  # KEIN blindes Erben des gesamten Eltern-Variablenraums (Modul-Trigger-Isolation)
 
 # ── ergebnis:holen (W10-B, Ledger §42, SKELETT): das ERGEBNIS-HOLEN gehoert laut §42 in die Diplomarbeit-CI
