@@ -196,3 +196,15 @@ target_link_libraries(test_experiment_phase_strategy PRIVATE Boost::mp11)
 add_test(NAME test_experiment_phase_strategy COMMAND test_experiment_phase_strategy)
 set_tests_properties(test_experiment_phase_strategy PROPERTIES LABELS da_unit TIMEOUT 60)
 set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_experiment_phase_strategy)
+
+# Scheibe 2a (2026-07-21, Ledger 61/62) - Unit-Gate der Lane-Fehlrouting-Wache (lane_vendor_guard.hpp):
+# reine Host-Logik (check_lane_vendor Match/Mismatch/Skip + Lane-Praefix-Parsing + Laufzeit-CPUID-Vendor).
+# Header-only, keine ce/prt-Includes, gate-frei (kein Treiber-Lauf, kein #156-Messdaten), UNABHAENGIG vom
+# COMDARE_V32_ENABLE-Gate. Include-Root: nur das 02-Verzeichnis (lane_vendor_guard.hpp).
+add_executable(test_lane_vendor_guard tests/test_lane_vendor_guard.cpp)
+target_compile_features(test_lane_vendor_guard PRIVATE cxx_std_23)
+target_include_directories(test_lane_vendor_guard PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR})                    # lane_vendor_guard.hpp
+add_test(NAME test_lane_vendor_guard COMMAND test_lane_vendor_guard)
+set_tests_properties(test_lane_vendor_guard PROPERTIES LABELS da_unit TIMEOUT 60)
+set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_lane_vendor_guard)

@@ -39,6 +39,7 @@
 #include "xml_config_parser/xml_reader.hpp" // Bruecke-I2: Root-Tag-Sniff des --validate-Profils (common-DOM)
 #include "messreihen_workload.hpp"          // #31: E4-XML Workload-Drive (<workload> via ce-DOM, kein Submodul-Bump)
 #include "permutations_runtime_check.hpp"   // V36.D
+#include "lane_vendor_guard.hpp"            // Scheibe 2a (Ledger 61/62): Lane-Fehlrouting-Wache (Runtime-CPUID)
 #include "measurement_writer.hpp"           // V41.B1
 #include "stats_aggregator.hpp"             // V41.B3
 
@@ -423,6 +424,38 @@ int main(int argc, char* argv[]) {
             }
             namespace pf = comdare::cache_engine::builder::profile_facade;
             return pf::emit_tier_cmake_facade(prof, std::cout, combo_sel);
+        }
+    }
+
+    // Scheibe 2a (Ledger 61/62): Lane-Fehlrouting-Wache. Die Pre-Flight-Zweige oben (--validate/--dump/--emit)
+    // sind bereits raus (jeder return-t); AB HIER misst der Treiber (v32/legacy/v41/E4/Thesis). Traegt
+    // COMDARE_PLATFORM die emittierte Lane-Form "amd@<host>"/"intel@<host>" (ce emit_measure_job), MUSS die reale
+    // CPU (Laufzeit-CPUID) dazu passen -- sonst HARTER Abbruch VOR der Messung, damit kein Lauf stundenlang Daten
+    // unter falscher Hardware-Provenienz schreibt (CI wird rot statt still falsch zu messen). Kein Lane-Praefix
+    // oder Vendor unbekannt (non-x86/bare-metal) => Wache inaktiv (Notausgang). Die platform-CSV-Spalte bleibt
+    // unveraendert lane@host; der detektierte Vendor geht NUR zusaetzlich ins Log. Bruecke #49/#46 (feine
+    // Identitaet + Cache-Log loesen die Lane-Form spaeter ab; Lanes = Interim, Ledger 62).
+    {
+        namespace md                     = comdare::diplomarbeit::messung_driver;
+        std::string const guard_platform = env_trimmed("COMDARE_PLATFORM");
+        std::string const cpu_vendor     = md::detect_cpu_vendor();
+        switch (md::check_lane_vendor(guard_platform, cpu_vendor)) {
+            case md::LaneVendorCheck::kMismatch:
+                std::cerr << "[Betriebs-Fehler: Lane-Fehlrouting] COMDARE_PLATFORM='" << guard_platform
+                          << "' verlangt CPU-Vendor '" << md::lane_expected_vendor(guard_platform)
+                          << "', die reale CPU meldet '" << cpu_vendor
+                          << "' (Laufzeit-CPUID). Abbruch VOR der Messung -- keine Daten unter falscher "
+                             "Hardware-Provenienz. (Ledger 61/62 Lane-Wache; feine Identitaet folgt #49/#46.)\n";
+                return 7;
+            case md::LaneVendorCheck::kMatch:
+                std::cout << "[Lane-Wache] COMDARE_PLATFORM='" << guard_platform << "' passt zu CPU-Vendor '"
+                          << cpu_vendor << "' (Laufzeit-CPUID).\n";
+                break;
+            case md::LaneVendorCheck::kSkipped:
+                if (!cpu_vendor.empty() && cpu_vendor != "unknown")
+                    std::cout << "[Lane-Wache] inaktiv (kein amd@/intel@-Lane-Praefix); CPU-Vendor='" << cpu_vendor
+                              << "' (nur informativ).\n";
+                break;
         }
     }
 
