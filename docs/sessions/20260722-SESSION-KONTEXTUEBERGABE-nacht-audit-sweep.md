@@ -44,3 +44,25 @@ merge->Stufe2-Frage (§59-Wortlaut vs Ist-Pin merge==Stufe3; S4 konservativ) · 
 
 ## 7. SICHERHEIT (unveraendert bindend)
 PAT via grep aus Vault je Aufruf, NIE printen/committen; Vault=Cluster/keys/CREDENTIALS-VAULT-DEV.md; CA=comdare-gitlab-ca.crt; NIE rebase; Remote-Loeschung nur je-Repo-GO; Doku nie loeschen (Ausnahmen nur per explizitem User-GO wie Alt-Mess-CSVs); Transkripte=Tokens nie committen; kein AskUserQuestion; kein Python in Buildchain; ASCII-Kommentare; Dual-Remote origin=gitlab+github (Token im Vault).
+
+---
+# UPDATE (22.07. ~07:05, unmittelbar vor manueller Kompaktierung) — FINALER STAND
+
+## A. NACHT-AUDIT IST FERTIG + FIXES LAUFEN
+- Verdikt (R1-R9 / A-Liste mit 3 Auflagen / K) liegt VOLLSTAENDIG in **docs/plaene/20260722-AUDIT-nacht-abweichungen-VERDIKT.md** — jede R mit datei:zeile-Fix-Auftrag + Test-Pflicht. Kern: R1+R2 = Marker-Dedup-Wache strukturell tot (sed-Parse + Write/Read-Basis-Mismatch); R3 golden-320-needs; R4 TRIES=1 bare-metal-Debug fehlt; R5 exactly-one tp-Pfad ungehaertet; R6 merge->Stufe2_Hybrid (Gesetzes-Form); R8 Key-Drift deprecated-Matrix (niedrig); R9 stale Kommentare.
+- **R7 GEFIXT** (Zen4->Zen5 beide golden_kern-Instanzen): ce 3c2bad51, super 4369d51 (+Audit-Doc), danach Uebergabe-Commit 77c9ed5-Nachfolger.
+- **Impl-Agent 'Impl-S6-P1' LAEUFT** (neu gespawnt, Opus) mit DREI Paketen: P1=R1+R2+R3 (super-YAML, Marker-Wache zuerst), P2=R4+R5+R9 (ce), P3=R6 (ce, Lockstep-Pins test_merge_plan_directive:46-48 + test_experiment_kern_seam:192-194); R8 nur benannter Folgepunkt. Er meldet mit Freeze; Manager verifiziert (diff-stat literal!) + committet.
+- A-Auflagen: (B4) Ledger-Konsolidierungszeile "§61-PARALLEL = beide Compile-Staende im selben Debug-Lauf; Vollzug sequentiell" — User-Pauschal-GO 22.07. ("Behebung aller Probleme autonom") DECKT sie: eintragen. (B6) K7b-Je-Binary-Stempel MUSS vor #46b. (C5/C6) Scheibe-6-Auflagen (Fixture-Rename/Wache; enabled-Default vor erstem Konsum).
+
+## B. ZOMBIES: prod1 TOT (belegt), Sweep-Job-Kosmetik-Fix noetig
+- prod1: **0 comdare-messung-driver-Prozesse** (ps-Beleg 07:00; Kill durch runner:sweep-zombies erfolgreich).
+- Sweep-Welle 12097 zeigt trotzdem failed: **SELBST-MATCH-ARTEFAKT** — der finale `pgrep -af comdare-messung-driver` im Job fand den comdare-eigenen MONITOR-Prozess (eval-Cmdline enthaelt den String), exit 1. SOFORT-FIX (2 Zeilen, super .gitlab-ci.yml runner:sweep-zombies): alle drei pgrep/pkill-Muster auf `'[c]omdare-messung-driver'` ([c]-Trick) — dann Job-Gruen reproduzierbar. build:clang skipped in 12097 = bekanntes Stage-Folge-Symptom, kein Bug.
+- **12098 (intel/prod2) lief noch** — Ausgang pruefen (Job-Log = prod2-ps-Beleg). Danach SMOKE-BEREIT.
+
+## C. UNMITTELBARE SCHRITTE NACH KOMPAKTIERUNG (Reihenfolge)
+1. 12098-Ausgang + Sweep-[c]-Fix committen; ggf. amd-Sweep-Re-Run fuer den Gruen-Beleg (Zombie ist eh tot).
+2. Impl-Paket 1 (R1-R3) verifizieren+committen -> Marker-Wache lebt; dann P2, P3.
+3. **Debug-Smoke**: POST /projects/288/pipeline ref=development, vars {COMDARE_BUILD_GOLDEN_N:true, COMDARE_GN_TOTAL:"4", COMDARE_MEASURE_PROFILE:smoke} — Voll-Monitor auf Pipeline-IDs (Kette Parent->3 CEB-Lanen->Grandchild; measure-Terminals+Fails melden). Erwartung: Minuten statt 6h (#45-parallel), Cache-Push befuellt Bucket (prod1-Scharflauf-Beweis), Dual-Compile sichtbar (2 Treiber-Aufrufe im Log).
+4. Smoke gruen -> 320er (m3v2-320; Interim-Lanes amd=4/intel=8; wallclock zuerst; Hochrechnung nach Lane 1) -> S7 -> S8 (28.07.).
+5. B4-Ledger-Zeile eintragen (gedeckt, s.o.). Danach §63-Endlauf laut Uebergabe Abschnitt 4.
+- User-GOs dieser Minuten: "volles GO Behebung aller Probleme autonom + autonome Weiterarbeit nach stehenden Direktiven" (deckt Sweep-Fix, R-Fixes, B4-Zeile, Smoke/320er-Start ohne Rueckfrage).
