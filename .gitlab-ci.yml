@@ -882,6 +882,20 @@ measure:golden-320:
       # (GN_PREFIX/build_version) einfliessen -- in Lockstep mit W4-B, damit der Dedup-Key je CEB eindeutig bleibt.
       export GN_MSYS="${GN_MSYS:-default}"; export COMDARE_GN_MSYS="$GN_MSYS"
       echo "== W4-A Zelle: msys=$GN_MSYS opt=$GN_OPT simd=$GN_SIMD chunk=$GN_CHUNK -> PREFIX='$GN_PREFIX' RANGE='${GN_RANGE:-<none>}' runner_tag='$GN_RUNNER_TAG' =="
+      # R8 (Nacht-Audit 2026-07-22): der OBJEKT-STORE-Cache-Key kommt LITERAL aus dem Treiber (--print-cache-key =
+      #   cache_key_prefix, inkl. der von GN_PREFIX NICHT getragenen Segmente +bt/+ceb/+mtool/+mrg) -- KEINE bash-
+      #   Nachbildung der ABI-/Combo-Segmente (kein Key-Drift; die Perm-Suffix-Reihenfolge kommt aus derselben
+      #   ce-Naht wie der Push). Der Treiber ist oben gebaut (--target comdare-messung-driver, VOR diesem Step). Env:
+      #   GN_OPT/GN_SIMD (Zelle) + COMDARE_CXX/BUILD_TYPE/MEASUREMENT_COMBO (Job). GN_PREFIX bleibt der LOKALE Bau-
+      #   Pfad-Name (Code/gn_out/<GN_PREFIX>), GN_CACHE_KEY der OBJEKT-STORE-Praefix. Fallback GN_PREFIX, falls der
+      #   Treiber (wider Erwarten) fehlt -> deprecateter Pfad bleibt lauffaehig (Warm-Pull dann evtl. leer wie bisher).
+      _CKDRV=$(find build -type f -name comdare-messung-driver 2>/dev/null | head -1)
+      if [ -n "$_CKDRV" ] && [ -x "$_CKDRV" ]; then
+        GN_CACHE_KEY=$(COMDARE_GN_OPT="$GN_OPT" COMDARE_GN_SIMD="$GN_SIMD" "$_CKDRV" --print-cache-key 2>/dev/null | head -1)
+      fi
+      [ -z "${GN_CACHE_KEY:-}" ] && GN_CACHE_KEY="$GN_PREFIX" # Treiber fehlt -> Alt-Verhalten (GN_PREFIX als Key)
+      export GN_CACHE_KEY
+      echo "== R8 Objekt-Store-Key: GN_CACHE_KEY='$GN_CACHE_KEY' (Treiber-Literal; GN_PREFIX bleibt lokaler Bau-Pfad) =="
       # ── Cross-Runner-Dedup (Ledger §35.2): Chunk-Marker im MinIO-Bucket -> HIT=skip+pull (Warm-Cache), MISS=build ──
       #    Grobe Job-Ebene: 1 Marker je (System-Permutation x Chunk). Die FEINE Per-DLL-Invalidierung (dll_is_current /
       #    algo_sig, #50) macht der Treiber ohnehin (§35.3) -> selbst ein grober False-Hit bleibt korrektheits-sicher.
@@ -895,12 +909,12 @@ measure:golden-320:
       elif [ -z "${GN_RANGE:-}" ]; then
         echo "[dedup] No-Op-Zelle (kein Range) -> nichts zu deduplizieren"
       else
-        MARKER="prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done"
+        MARKER="prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/_gn_chunk_markers/${GN_RANGE//:/-}.done" # R8: Treiber-Key
         # W11 (§43.c): Pull-Ziel = die Treiber-dll_dir <out>/e4_xml/dll (dorthin schaut dll_is_current: output_dir/<stem>/
         #   perm.dll). Frueher wurde nach gn_out/<PREFIX>/ gepullt -> der Treiber fand die DLLs NIE (Pfad-Mismatch,
         #   Resume-Luecke). Der Objekt-Key <PREFIX>/<stem>/perm.dll landet so unter <out>/e4_xml/dll/<stem>/perm.dll.
         PULL_DST="$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}/e4_xml/dll"
-        MARK_PREFIX="prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/"
+        MARK_PREFIX="prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/_gn_chunk_markers/" # R8: Treiber-Key
         if mc stat "$MARKER" >/dev/null 2>&1; then
           # Cache-Resthygiene (S1-F1 + Resthygiene-2, SCHARF): algo_sig-Wache. Der Marker traegt algo_sig=<Organ-Fingerprint
           #   des Baus>. Der ERWARTETE Fingerprint kommt vom frisch gebauten Treiber (--chunk-organ-fingerprint: rein aus
@@ -925,7 +939,7 @@ measure:golden-320:
             echo "[dedup] HIT: $GN_PREFIX Chunk $GN_RANGE bereits im Cluster gebaut -> SKIP (bereits im Cluster gebaut) + PULL (Warm-Cache)"
             if [ -n "$CXX" ]; then
               mkdir -p "$PULL_DST"
-              mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/" "$PULL_DST/" 2>&1 | tail -8 \
+              mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/" "$PULL_DST/" 2>&1 | tail -8 \
                 || echo "[dedup] Pull-Teilfehler -> Bau-Naht faellt auf Neubau zurueck (Treiber-dll_is_current bleibt Invalidierer)"
             else
               echo "[dedup] COMDARE_GN_COMPILER_TAG leer -> DLL-Pull uebersprungen (PREFIX compiler-agnostisch, DLL-Key traegt +cxx=); Marker-Skip genuegt"
@@ -938,7 +952,7 @@ measure:golden-320:
           #   sie, NUR die fehlenden werden neu gebaut (Cluster-Resume). GN_DECISION bleibt "build" (Stufe 2 baut weiter).
           echo "[dedup] TEIL-RESUME: Teil-Marker fuer $GN_PREFIX Chunk $GN_RANGE gefunden -> pulle bereits gepushte DLLs (nur Fehlende werden gebaut)"
           mkdir -p "$PULL_DST"
-          mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/" "$PULL_DST/" 2>&1 | tail -8 \
+          mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/" "$PULL_DST/" 2>&1 | tail -8 \
             || echo "[dedup] Teil-Pull-Teilfehler -> dll_is_current baut die fehlenden neu (kein Abbruch)"
         else
           echo "[dedup] MISS: $GN_PREFIX Chunk $GN_RANGE noch nicht im Cluster (kein Whole-/Teil-Marker) -> Bau (danach Marker + Push, s. Stufe 2)"
@@ -1015,7 +1029,7 @@ measure:golden-320:
       echo "[dedup] MARKER-WRITE algo_sig(driver:909-Quelle)=$ALGO_SIG algo_sig(find_dll_dir:alt)=$ALGO_SIG_FIND (driver autoritativ; Gleichheit == reines Range-DLL_DIR ohne Fremd-Hydration)"
       [ "${COMDARE_STORAGE_CACHE:-}" = "true" ] && command -v mc >/dev/null 2>&1 && \
         printf 'algo_sig=%s compiler=%s range=%s utc=%s\n' "$ALGO_SIG" "${COMDARE_GN_COMPILER_TAG:-na}" "$GN_RANGE" "$(date -u +%FT%TZ)" \
-        | mc pipe "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done" || true
+        | mc pipe "prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/_gn_chunk_markers/${GN_RANGE//:/-}.done" || true # R8: Treiber-Key
 
 # ── build:golden-n (W4-A, Ledger §35/§36): die kanonische §33-System-Achsen-Matrix (opt O2/O3 x simd no_extension/avx2),
 #    N-Node-Pool-geroutet (§36.3): no_extension -> Tag "amd64" (ALLE amd64-Nodes inkl. kleiner Nodes ohne AVX),
