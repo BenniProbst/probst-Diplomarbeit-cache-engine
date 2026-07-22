@@ -13,8 +13,10 @@
 // V38.C: STL-Header zuerst (windows.h via plugin_loader.hpp am Ende),
 // damit die STL-Header (frueher u.a. <regex>, Phase 7 entfernt) nicht durch Windows-Makros gestoert werden.
 #include <array>
+#include <atomic> // S1 (§62-B Log-Flush): zeit-gatete progress_sink-Drossel
 #include <cerrno>
 #include <charconv>
+#include <chrono> // S1 (§62-B Log-Flush): steady_clock fuer die zeit-basierte progress-Drossel
 #include <cctype>
 #include <cstdint>
 #include <cstdlib>
@@ -844,10 +846,26 @@ int main(int argc, char* argv[]) {
                 namespace ex                                        = comdare::cache_engine::builder::experiment;
                 std::filesystem::path const progress_cursor_path    = output_dir / "progress.cursor";
                 bool const                  progress_cursor_enabled = std::filesystem::exists(output_dir);
-                constexpr std::size_t       kProgressStride         = 10; // ruhig-Default: jede 10. Perm + immer done
-                ex::ProgressSinkFn const    progress_sink = [progress_cursor_path,
-                                                             progress_cursor_enabled](ex::ProgressDelta const& d) {
-                    if (!(d.done || d.cursor % kProgressStride == 0)) return; // Drossel (byte-arm auf stderr)
+                // S1 (§62-B Log-Flush, 2026-07-22, Befund 6h-stumm): die Drossel ist ZEIT- statt zaehl-basiert (frueher
+                // kProgressStride=10) und die stderr-Zeile wird GEFLUSHT -> auch in langen, sonst stillen Fenstern
+                // kommt regelmaessig ein geflushtes Lebenszeichen. Rein beobachtend (stderr + progress.cursor), NIE in
+                // Mess-CSV/binary_id -> golden-neutral (No-Op-Default der Fassade unveraendert).
+                constexpr std::int64_t kProgressIntervalS =
+                    30; // hoechstens alle 30 s eine progress-Zeile (+ immer done)
+                auto const progress_last_emit_s =
+                    std::make_shared<std::atomic<std::int64_t>>(std::chrono::duration_cast<std::chrono::seconds>(
+                                                                    std::chrono::steady_clock::now().time_since_epoch())
+                                                                    .count());
+                ex::ProgressSinkFn const progress_sink = [progress_cursor_path, progress_cursor_enabled,
+                                                          progress_last_emit_s](ex::ProgressDelta const& d) {
+                    std::int64_t const now_s = std::chrono::duration_cast<std::chrono::seconds>(
+                                                   std::chrono::steady_clock::now().time_since_epoch())
+                                                   .count();
+                    if (!d.done) { // done immer; sonst zeit-gated (thread-sicher via CAS -> genau ein Emitter je Intervall)
+                        std::int64_t last = progress_last_emit_s->load(std::memory_order_relaxed);
+                        if (now_s - last < kProgressIntervalS) return;
+                        if (!progress_last_emit_s->compare_exchange_strong(last, now_s)) return;
+                    }
                     std::ostringstream line;
                     if (d.done) {
                         line << "[progress] done perm=" << d.cursor << " window-complete";
@@ -855,7 +873,7 @@ int main(int argc, char* argv[]) {
                         line << "[progress] perm=" << d.cursor << " axes_changed=" << d.changed.size();
                         for (auto const& c : d.changed) line << " " << c.axis_index << "->" << c.variant_index;
                     }
-                    std::cerr << line.str() << "\n";
+                    std::cerr << line.str() << "\n" << std::flush;
                     if (progress_cursor_enabled)
                         if (std::ofstream cur{progress_cursor_path, std::ios::app}; cur) cur << line.str() << "\n";
                 };
