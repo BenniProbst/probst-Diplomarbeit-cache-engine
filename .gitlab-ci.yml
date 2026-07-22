@@ -156,14 +156,17 @@ runner:sweep-zombies:
   rules:
     - if: '$COMDARE_SWEEP_ZOMBIES == "true"'
   script:
+    # [c]-Trick auf ALLEN Mustern (12097-Befund 2026-07-22): das nackte Muster matcht jede fremde Shell,
+    # deren Cmdline den String traegt (Monitor-/eval-Shells) -> Verifikation exit 1 trotz erfolgreichem Kill.
+    # Die Regex [c]omdare... matcht den echten Treiber, aber nie eine Cmdline, die das Muster selbst zitiert.
     - 'echo "== Waisen-Inventar ($SWEEP_TAG / $(hostname)) =="'
-    - 'pgrep -af comdare-messung-driver || echo "keine Waisen"'
-    - 'pkill -f comdare-messung-driver 2>/dev/null || true'
+    - 'pgrep -af ''[c]omdare-messung-driver'' || echo "keine Waisen"'
+    - 'pkill -f ''[c]omdare-messung-driver'' 2>/dev/null || true'
     - 'sleep 3'
-    - 'pkill -9 -f comdare-messung-driver 2>/dev/null || true'
+    - 'pkill -9 -f ''[c]omdare-messung-driver'' 2>/dev/null || true'
     - 'sleep 2'
     - 'echo "== ps-Beleg nach Sweep =="'
-    - 'pgrep -af comdare-messung-driver && exit 1 || echo "SAUBER: keine comdare-messung-driver-Prozesse auf $(hostname)"'
+    - 'pgrep -af ''[c]omdare-messung-driver'' && exit 1 || echo "SAUBER: keine comdare-messung-driver-Prozesse auf $(hostname)"'
 
 toolchain:probe:
   extends: [.toolchain-probe, .code-rules]   # #53: docs-only-Gate
@@ -713,7 +716,9 @@ measure:golden-320:
   variables:
     GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
   needs:
-    - "verify:submodules"
+    - job: "verify:submodules"
+      optional: true               # #53/R3 (2026-07-22): docs-only-DAG-sicher (analog measure:smoke); haelt die
+                                   # Pipeline valide, wenn verify:submodules bei docs-only-Push nicht existiert (leer-failed 12012/12045)
     # #26/GO-5 (2026-07-12): erst Smoke, DANN Voll-Lauf (User-Ablauf-Doktrin). optional:true haelt die
     # Pipeline valide, falls der Smoke-Job (andere rules-Variante) nicht existiert; existieren beide
     # (COMDARE_RUN_MEASURE=true), erzwingt needs die Sequenz. artifacts:false — der Voll-Lauf braucht
@@ -909,7 +914,11 @@ measure:golden-320:
               COMDARE_GN_ALGO_SIG=$(COMDARE_GOLDEN_N_RANGE="$GN_RANGE" "$_DRV" --chunk-organ-fingerprint "$COMDARE_GOLDEN_N_PROFILE" 2>/dev/null | sha256sum | awk '{print $1}')
             fi
           fi
-          MARK_ALGO=$(mc cat "$MARKER" 2>/dev/null | sed -n 's/^algo_sig=//p' | head -1)
+          # R1 (2026-07-22): NUR das sha-Feld extrahieren. Der Marker ist EINZEILIG
+          #   ('algo_sig=<sha> compiler=<..> range=<..> utc=<..>', :1002-1003); 's/^algo_sig=//p' strippte nur das
+          #   Praefix und behielt die ganze Restzeile (sha + compiler=.. range=.. utc=..) -> Vergleich :913 gegen das
+          #   reine sha schlug IMMER fehl -> jeder Marker STALE (Dedup strukturell tot). Jetzt: erstes Whitespace-Feld.
+          MARK_ALGO=$(mc cat "$MARKER" 2>/dev/null | sed -n 's/^algo_sig=\([^[:space:]]*\).*/\1/p' | head -1)
           if [ -n "${COMDARE_GN_ALGO_SIG:-}" ] && [ -n "$MARK_ALGO" ] && [ "$MARK_ALGO" != "${COMDARE_GN_ALGO_SIG}" ]; then
             echo "[dedup] MARKER-STALE (algo_sig Marker='$MARK_ALGO' != erwartet='$COMDARE_GN_ALGO_SIG') -> Organ-Bump, Marker IGNORIERT = MISS (Neubau; alter Marker bleibt additiv)"
           else
@@ -991,13 +1000,19 @@ measure:golden-320:
       count=$(find "$DLL_DIR" -name 'perm.dll' 2>/dev/null | wc -l)
       bytes=$(find "$DLL_DIR" -name 'perm.dll' -printf '%s\n' 2>/dev/null | awk '{s+=$1} END{print s+0}')
       echo "GN-9 chunk[$GN_RANGE]: dlls=$count bytes=$bytes extrapolation_131072=$(( count>0 ? bytes/count*131072 : 0 )) B"
-      # Cache-Resthygiene (S1-F1, 2026-07-21): der Whole-Chunk-Marker traegt jetzt ein algo_sig-Feld = Organ-Fingerprint
-      # dieses Chunks (sha256 ueber die sortiert-konkatenierten perm.dll.algos-Sidecars der gebauten DLLs). Ein Organ-/
-      # Katalog-Bump OHNE PREFIX-Bump aendert die .algos-Inhalte => anderer Fingerprint => der HIT-Pfad (oben) ignoriert
-      # den Marker als stale (MISS). Fehlt .algos (Organ-Gate aus) => 'none'. Der geplante Feld-Format (:843) ist damit
-      # wieder scharf. (Die FEINE per-DLL-Invalidierung bleibt dll_is_current/.algos, #50 -> §35.3.)
-      ALGO_SIG=$(find "$DLL_DIR" -name 'perm.dll.algos' 2>/dev/null | LC_ALL=C sort | xargs -r cat 2>/dev/null \
-        | sha256sum | awk '{print $1}'); [ -z "$ALGO_SIG" ] && ALGO_SIG=none
+      # Cache-Resthygiene (S1-F1 + R2-Fix, 2026-07-22): der Whole-Chunk-Marker traegt ein algo_sig-Feld = Organ-
+      # Fingerprint dieses Chunks. R2: der Fingerprint wird aus DERSELBEN QUELLE wie die HIT-Erwartung (:912-Block,
+      # frisch gebauter Treiber --chunk-organ-fingerprint ueber GN_RANGE, rein aus dem Katalog, KEIN DLL-Bau)
+      # berechnet. Die alte find|sort|cat-Variante ueber das GANZE DLL_DIR wich davon ab (der plankonforme S2-Batch-
+      # Pull hydriert fremde Chunks ins DLL_DIR => Obermengen-Hash => Marker permanent STALE, auch nach dem R1-Fix).
+      # Sie bleibt NUR als Log-Vergleich (Kreuz-Beleg: im reinen MISS-DLL_DIR sind beide Quellen byte-identisch --
+      # ce-seitig kreuz-validiert, :902-903; Divergenz im Log zeigt Fremd-Hydration). sha256sum emittiert immer einen
+      # Hash (leere Eingabe => e3b0c442...-Leerhash, NIE Leerstring) -> ALGO_SIG ist nie leer; 'none' ist ein defensiver
+      # Rest-Guard (unerreichbar, solange der Treiber in Stufe 2 vorliegt, :941 sichert das hart).
+      ALGO_SIG=$(COMDARE_GOLDEN_N_RANGE="$GN_RANGE" "$DRIVER" --chunk-organ-fingerprint "$COMDARE_GOLDEN_N_PROFILE" 2>/dev/null | sha256sum | awk '{print $1}')
+      [ -z "$ALGO_SIG" ] && ALGO_SIG=none
+      ALGO_SIG_FIND=$(find "$DLL_DIR" -name 'perm.dll.algos' 2>/dev/null | LC_ALL=C sort | xargs -r cat 2>/dev/null | sha256sum | awk '{print $1}')
+      echo "[dedup] MARKER-WRITE algo_sig(driver:909-Quelle)=$ALGO_SIG algo_sig(find_dll_dir:alt)=$ALGO_SIG_FIND (driver autoritativ; Gleichheit == reines Range-DLL_DIR ohne Fremd-Hydration)"
       [ "${COMDARE_STORAGE_CACHE:-}" = "true" ] && command -v mc >/dev/null 2>&1 && \
         printf 'algo_sig=%s compiler=%s range=%s utc=%s\n' "$ALGO_SIG" "${COMDARE_GN_COMPILER_TAG:-na}" "$GN_RANGE" "$(date -u +%FT%TZ)" \
         | mc pipe "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done" || true
