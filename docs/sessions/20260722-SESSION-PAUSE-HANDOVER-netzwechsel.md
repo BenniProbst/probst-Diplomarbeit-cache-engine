@@ -64,3 +64,18 @@ macro/micro=CEB+Tier via Pruefdock + Fundstellen + Versionierungs-Klaerung §58-
 (contract-Label-Luecke; prt-art-Geschwister-Checkout-Race; Suffix-Reihenfolge-Single-Source;
 ~14min-Treiber-Bau je Mess-Job; xmllint '--'-Kommentare; Testing/-gitignore) · W12-Quelldaten (v1->
 echte X.Y.Z, Band-C) · #48-Scheibe-6 (gegated) · G7-User-Punkte.
+
+---
+## KORREKTUR-NACHTRAG (22.07. ~20:30) — K7b-2-Anweisung in Abschnitt 4 war FALSCH
+
+Die dortige D1-B-Anweisung "BEWUSSTER kNewGolden131072Crc64-RE-ANCHOR ... 320er-Katalog-Anker 0xF1C1F26A
+bleibt unberuehrt" ist IN SICH WIDERSPRUECHLICH und technisch falsch (Agent-STOPP 20:22, literal belegt):
+kNewGolden131072Crc64 IST der 0xF1C1F26A1232073B-Anker (EINE Konstante, source_catalog.hpp:168); die CRC
+laeuft ueber die 131072 binary_ids, NICHT ueber Source-Bytes; der measurement_stamp ist binary_id="never"
+=> der K7b-2-Mengen-Umbau ist golden-NEUTRAL, es gibt NICHTS zu re-ankern, die TABU-Konstante bleibt.
+GUELTIGE K7b-2-Definition (GO 054b1ccf): Variante A (NUR der [all]-Legenden-/from_env-LIVE-Pfad stempelt
+die Vollmenge N x {measurement_tooling=<t>@1.0.0}; No-Arg-Default bleibt "" = 2-arg = 320er-Byte-Wachen
+gruen) + ADDITIVE span-Ueberladung an measurement_stamp_line; Lockstep = die Source-Byte-Wachen
+(test_lazy (e)/(f) + Director-[all]-Tests); der literale Beleg "Wache (c) CRC gruen unveraendert" IST der
+Unberuehrtheits-Nachweis. Wer dieses Handover fuer einen Neu-Spawn nutzt: Abschnitt-4-K7b-2 durch DIESEN
+Block ersetzen.
