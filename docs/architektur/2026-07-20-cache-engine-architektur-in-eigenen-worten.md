@@ -1,6 +1,8 @@
 # Die Cache-Engine-Architektur in eigenen Worten (Stand 2026-07-20, überarbeitet)
 
 > Reiche finale Gesamtsicht des Systems, wie ich (Fable, als Architekt) es verstehe — auf Wunsch des Autors als eigenständiges Architektur-Dokument abgelegt und nach Abschluss der Konsolidierungs-Workflows **komplett überarbeitet**. Terminologie durchgängig nach den User-bestätigten Sätzen **§54-T1-T7** (Ledger); Auswertungs-Tiefe angereichert aus dem konsolidierten TODO-Block **§55** und der Erinnerungs-Sammlung wiederverwendbarer Konzepte. Bei Konflikt mit älterem Vokabular gilt dieses Dokument bzw. §54/§55. Kein Ersatz für die Primärquelle (LaTeX-Design + Ledger), sondern eine kohärente Gesamtsicht.
+>
+> **UPDATE-VERWEIS (2026-07-22):** Der Abschnitt **„UPDATE 2026-07-22"** am Ende konsolidiert dieses Dokument mit den seither vom Autor gesetzten Gesetzen **§61 (Modi/Stufen/Dual-Compile/Compile-Stempel)**, **§62 (Multi-Maschinen-Architektur A–H)** und **§63 (Arbeitsmodus)** — auf User-Anweisung in meinen exakten Worten aus der Drei-Zeitschnitte-Beschreibung. Bei Konflikt mit den Abschnitten 1–17 gilt das Update. Status-/Zeitschnitt-Anteile derselben Beschreibung liegen bewusst NICHT hier, sondern in `docs/sessions/20260722-SESSION-STATUS-drei-zeitschnitte.md`.
 
 ---
 
@@ -129,6 +131,8 @@ Aus den realen Messkurven baut das **Hybrid-Binary** (4. Ketten-Glied, Abgabe-Pf
 
 Für eine ehrliche Auswertung gilt: **Paper-/SOTA-Algorithmen müssen real gemessen werden** (nie als Spiegel geführt); eine Alt-vs-new-Referenzkurve darf nicht vorschnell getilgt werden (Vergleichsbasis für Break-Even). Ein `objective_tag` + Pareto-Front kann die Break-Even-Bildung steuern. Die Selektion, *welche* (Hybrid-)Tier-Binaries gebaut werden, läuft über eine benannte Chain-of-Responsibility-Filterkette auf dem Resolver (Registry-ANGEBOT gegen Anwender-XML).
 
+Am Ende steht das Forschungsziel aus §62-H (→ Update-Abschnitt): optimale Binaries für maximal ausgeschöpfte Hardware-Rekombinationen, um das **Cache-Line-Verhalten in allen permutativen Facetten** zu untersuchen — mit Break-Even-Splines je Achse, Hybrid-Tier-Binaries und dem Release-Wallclock-Beweis (beste Release-Binary vs. beste Debug-Overhead-Version vs. schlechteste XML-Variante) als Projekt-Schlussstein.
+
 ## 14. Die Metaprogrammierungs-Doktrin
 
 Alles auf dem Hot-Path ist **compile-time**: CRTP + Concepts, **kein vtable, kein Runtime-Switch, kein `std::variant`** — mit einer einzigen, eng begrenzten Ausnahme im Hybrid: `std::variant` dient dort *ausschließlich* als dynamischer Träger für abweichende **Unter-Prüf-Dock-Typen/-Verträge**, eingebunden per **Abstract-Factory-Methode**; die Haupt-Observer-Kommunikation bleibt statisch (`IObservableTier`). Nur benannte Lehrbuch-Patterns; statischer Dispatch; zero-cost. Interne Templates sind erlaubt, aber die äußeren Produkt-Interfaces sind binär-stabil. Fehlerklassen sind Pflicht über alle Achsen → Unter-Achsen → Algorithmen (Compiler-Compiler-Fehler vs. Infra-Fehler disjunkt); der Planer kennt Klassen, statt hart abzubrechen.
@@ -163,6 +167,40 @@ Wenn Abschnitt 1 sagt, das eigentliche Experiment *ist die XML*, dann ist **dies
 **Anatomie als Stempel-Vorlage.** Die Anatomie (Abschnitt 10) ist zugleich die **Stempel-Vorlage**: die Rekombination aller Achsen, aus der jede Stufe (Planer/CEB/Tier) ihren stufen-eigenen Achsen-Satz stempelt. Das Mess-Tooling {Wallclock/Makro/Micro} ist dabei eine **Unter-Achse, compile-time fix in CEB und Tier** eingebacken; das scharfe Zusammenschalten mehrerer Tooling-Wahlen (N>1) kommt erst mit dem 320er-Lauf (S6). Und der Prüfling-Begriff trägt weit: perspektivisch ist ein **Paper selbst ein Prüfling** (CE- und PRT-ART-Registry führen dann echte Template-Profile je Paper) — das ist die post-v3-Ausbaustufe der Idee, dass ein Experiment allein durch die XML definiert wird.
 
 **Bau-Weg (§59, K1-K8).** KERN-A {Schema+Parser · XSD · validate · Director/Projektion · Auto-Phasen} ist golden-neutral; KERN-B {Emitter katalog→direktiven-getrieben · Merge-Stempel-POD} liegt im golden-Fenster (POD wächst 56→72, `binary_id`/CRC bleiben unberührt); §58-Array-Umbau + Storage sind Post-Abgabe/Caching. golden-gated ist allein die Verifikation S2/A1.
+
+---
+
+## UPDATE 2026-07-22 — Konsolidierung mit §61/§62/§63 (in meinen exakten Worten)
+
+> Auf User-Anweisung 22.07. exakt übernommen aus meiner Drei-Zeitschnitte-Beschreibung (Architektur-Anteile; die Status-Anteile stehen im Session-Doc). Dieser Abschnitt schreibt die Abschnitte 2, 3, 6, 9, 15 und „Auf einen Nenner" fort.
+
+### U1. Das Fundament, präzisiert (schreibt Abschnitte 2/3/6/9 fort)
+
+Der Name „Cache-Engine" führt in die Irre: Das eigentliche Artefakt ist **das Experiment, und das Experiment ist die XML**. Der gesamte C++-Apparat ist die Maschinerie, die eine XML-Definition in messbare Binaries übersetzt. Der Permutationsraum (~137 Billionen Tier-Binaries) wird nie materialisiert — man fährt gezielte Schnitte.
+
+Die **dreistufige Binary-Kette** bildet die drei Achsen-**Typen** ab (Achsen sind Typen — Mess, System, Organ; „Gattung" bezeichnet dagegen ausschließlich das Tier-Binary-*Interface* wie SearchAlgorithm/Set/Sequence/Adapter/View):
+
+- Der **Planer** trägt die Mess-Achsen `[a,b,c]`. Haupt-Achse ist das **Mess-Tooling** (Wallclock/Makro/Micro — fest einkompiliert), Unter-Achse die **Ablaufmethodik** (Debug/Messung/Release, **plus künftig Compare**). Der Planer baut je Mess-Konfiguration eine CEB und delegiert — die Mess-Achse gehört *nie* in die Tier-Build-Legende.
+- Die **CEB (CacheEngineBuilder)** ist das statische Kompilat ihrer Mess-Achse (Stempel = Mess-Array). In ihrem Realm sind System- und Organ-Achse noch *Laufzeit*: Sie hält den Bau-Raum als System-Freigabe-*Erlaubnis* plus Organ-*tobecompiled* und baut zu ihrer Laufzeit die Tier-Binaries.
+- Die **Tier-Binary** trägt System `[d,e,f]` und Organ `[g,h,i]` **beide fest einkompiliert, aber als getrennte Dimensionen** mit zwei getrennten Versions-Arrays — plus dem dritten Stempel für die Merge-Kombination (KERN §59) und **seit §61 dem Compile-Einstellungs-Stempel** (`+bt=Debug` als Nicht-Default-Suffix). Legenden: `ceb:build:[a,b,c]` / `tier:build:[d,e,f][g,h,i]:chunk<k>` / `measure:[a,b,c][d,e,f][g,h,i]`.
+
+Quer dazu liegen die unveränderten Gesetze: **Haupt = compile-time, Unter = runtime** an jedem der drei Vertragspunkte; das **Freigabe-Prinzip** (System-Achsen geben Hardware frei, Organ-Achsen setzen sie durch, Organ-Nutzung ≤ System-Freigabe), inklusive **Meta-Meta-Achsen** (das Hardware-Erweiterungs-Array, dessen Existenz die Hardware-Haupt-Achse selbst per zweischichtiger Kern-Permutation an/aus permutiert, Freigabe per Command-Pattern); und der **KERN §59** (XML = negatives Blacklisting, drei Stufen CE-allein → je Prüfling replace/merge → kombiniert-fulljoin, per-Achse-Whitelist, benanntes `<template>`, eigener id-Satz je Prüfling-Merge). Der Beweis-Maßstab bleibt: **golden-320 ist nur Byte-Wache** (CRC64 `0xF1C1F26A1232073B`), der legitime Systembeweis ist die 2^17-Voll-Konfiguration.
+
+### U2. §61 — Modi, Stufen, Dual-Compile (NEU gegenüber Abschnitten 3/8)
+
+Die Ablaufmethodik ist zur vollen Modi-Maschine ausgewachsen: **Debug** = Multi-Maschine, je Maschine parallel bauen + parallel messen; **Messung** = Multi-Maschine, parallel bauen + sequentiell messen (sequentiell heißt IMMER nur das Messen, nie der Bau); **Release** = System-Achsen-korrekte Maschine, Auslieferung ohne Mess-Einrichtung (Observer per Metaprogrammierung abschaltbar) plus Wallclock-Beweis. Die Modi bauen **stufenweise** aufeinander auf (Release braucht die volle Messung samt §58-Replay), und **Debug ist Dual-Compile**: parallel cmake-Debug UND cmake-Release, getestet nur mit den Debug-Binaries — nur die Release-Binaries fließen als Reuse-Masse in Messung/Release weiter. Der Reuse-Schlüssel ist der **Compile-Einstellungs-Stempel** (`+bt` trägt den **cmake-Compile-Typ**, nie den Modus — die Namens-Dopplung „Debug" ist bewusst und bleibt). Die **Modus-Wahl geschieht per XML, genau EIN Modus je Call** (`<run_methodology>` exactly-one, Validator hart auf beiden Ausführungspfaden).
+
+### U3. §62 — Wie sie sein soll: die Multi-Maschinen-Architektur (NEU; schreibt Abschnitt 15 fort)
+
+Das Zielbild dreht die Maschinen-Logik um: **Der Planer ist anspruchslos.** Jede Maschine — lokal oder CI, Dutzende — baut denselben Planer und führt ihn gegen die **eine, für alle identische XML** aus. Es gibt keine Runner-Tag-Vorfilterung mehr (die heutigen amd/intel-Lanes sind ausdrücklich Interim); verlangt die XML physisch nicht existente System-Achsen-Algorithmen, schreibt der Planer *Warnungen* statt still zu filtern. Koordiniert wird ausschließlich über den **Cache auf minio.comdare.de**: eine lockbare Sync-Datei (Compile-Log) mit 3-Stufen-Dedup (Planer/CEB/Tier — nichts wird je doppelt gebaut), Batch-Reservierungen als *Versprechen* mit zwingender Release-Pflicht und Fortschritts-Testat je Build (Lease/Timeout für den Absturzfall), und Binary-Sync zwischen allen Maschinen. Symmetrie-Prinzip: prod1 baut und misst alles, was es kann, prod2 ebenso — der live Cache-Sync ist Betriebs-*Voraussetzung*, keine Optimierung.
+
+Die Modi laufen **je Maschine** einzeln, und nach dem Release kommt je Maschine der **vierte Modus COMPARE**, der aus dem Mess-Replay die eigene Sicht mit allen im Cache-Log registrierten Maschinen vergleicht. Die CI ist erst *fertig*, wenn die XML auf jeder vom User gewünschten Maschine exakt für diese Maschine ausgewertet wurde. Replay ist **schichtweise** gekeyt: `[a,b,c]` bestimmt das Replay einer CEB (Planer-Sicht), `[d,e,f]` allein das der Tier-Binaries (CEB-Sicht), Messwerte brauchen `[d,e,f]`×`[g,h,i]` *plus* Hardware-Identität — die eine Äquivalenzklasse modulo ungenutzter Meta-Meta-Achsen ist (GPU/NPU/FPGA zählen nicht zur Kern-Identität, aber einkompilierte Erweiterungen muss die assimilierende Maschine unterstützen). Binary-*Sharing* dagegen ist rein stempel-gekeyt — zwei verschiedene Schlüssel. Dafür kommen zwei **neue statische Haupt-System-Achsen**: RAM-Frequenz + CAS-Latenz (wahre Latenz = CL×2000/MT-Rate) und die exakte CPU-Fabrikation, erhoben per libcpuid/cpu_features/decode-dimms (#49).
+
+Bei ~130.000 Tier-Binaries gilt das **Batch-Job-Prinzip**: Job-Anzahl O(konstant), nie O(Binaries) — der Bau läuft **CEB-intern** als Runtime-Batch, jedes gebaute Tier wird direkt am Prüfdock per **GTest-Prüfstand** auf Interface-Korrektheit getestet (erst Build+Prüf-Batch, dann Messung), die CEB piped den Status an den Planer, und der Planer **instrumentiert** die CEB per XML-Anweisung — das ist der Kern der emit-Vertrags-Kette (#54), die nach der CI-Stabilisierung korrekt aufgebaut wird, flankiert vom .so-ABI-Schnitt statt Textemission (R1/#35) und dem Planer als CLI mit Zustands-Logging (#34).
+
+### U4. Auf einen Nenner (fortgeschrieben 22.07.)
+
+Der Nenner-Absatz unten gilt weiter — mit drei Fortschreibungen: (1) Die Ablaufmethodik ist eine **Vier-Modi-Stufenleiter je Maschine** (Debug-Dual-Compile → Messung → Release → Compare), deren Reuse-Schlüssel der `+bt`-Compile-Stempel ist. (2) Die Maschinen koordinieren sich **nicht über Runner-Tags, sondern über den stempel-gekeyten Cache** (Sync-Datei, Claims, Batch-Jobs, CEB-interner Prüfstand) — eine XML, viele Maschinen, jede aus eigener Sicht, CI fertig erst nach per-Maschine-Auswertung. (3) Replay und Sharing sind **zwei verschiedene Schlüssel** (Hardware-Identität vs. Stempel), und die Hardware-Identität selbst wird über die neuen RAM-/CPU-Fabrikations-Achsen zur messbaren Systemgröße.
 
 ---
 
