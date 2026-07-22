@@ -1235,6 +1235,15 @@ planer:delegate:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE die dynamische Planer-CI
       when: never
+    # S2 (§62-B Smoke-Umfang, 2026-07-22, Entscheid A): der SMOKE-Zweig delegiert ein KLEINES Umfangs-Profil
+    # (m3v2_smoke: cap=2 + 2 Achsen-Sweeps + 1 working_set) statt all_axes_golden -> --dump-ci emittiert die kleine
+    # Pipeline; der Smoke ist damit eine schnelle Regressionswache. Der GN-11-2^17-Bau-Nachweis laeuft SEPARAT (ueber
+    # die S4-Batch-Kette), NICHT ueber den Smoke. Die Smoke-METHODIK bleibt orthogonal (COMDARE_PLAN_METHODIK_PROFILE=
+    # m3_smoke_coverage im Trigger). §61: Env waehlt das Profil, nie einen Wert. MUSS VOR der generischen golden-Regel
+    # stehen (erste passende Regel gewinnt) -- golden/Nicht-Smoke bleibt bei all_axes_golden (golden/CRC-neutral).
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_MEASURE_PROFILE == "smoke"'
+      variables:
+        COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3v2_smoke.profile.xml"
     - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # NEUER STANDARD-Pfad (loest die statische Matrix ab)
     - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # ISOLIERTES Opt-in (nur die Delegation, ohne den Rest)
   script:
@@ -1280,10 +1289,12 @@ planer:delegate-trigger:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
     # smoke=>debug-Entkopplung (2026-07-22): NUR im smoke-Zweig speist das METHODIK-Profil m3_smoke_coverage (debug =>
-    # parallel messen + (j3)-Dual-Compile) die Mess-Methodik, waehrend der Bau-Katalog all_axes_golden bleibt
-    # (COMDARE_GOLDEN_N_PROFILE + COMDARE_MEASURE_PROFILE UNVERAENDERT). Nur der BASENAME (KLASSEN-Regel: KEIN
-    # $CI_PROJECT_DIR in geforwardeten Child/Grandchild-Vars -- der CEB-/Grandchild-Prolog re-derived den Voll-Pfad
-    # mit frischem ${CI_PROJECT_DIR}, s. emit_child_submodule_prolog). Voll-Lauf (measure) => nicht gesetzt => unveraendert.
+    # parallel messen + (j3)-Dual-Compile) die Mess-Methodik. Der Bau-KATALOG (Umfang) des Smoke ist seit S2 (Entscheid A,
+    # §62-B) KLEIN: planer:delegate delegiert im Smoke-Zweig COMDARE_GOLDEN_N_PROFILE=m3v2_smoke (cap=2 + 2 Sweeps) statt
+    # all_axes_golden -> schnelle Regressionswache; der GN-11-2^17-Bau-Nachweis laeuft SEPARAT (S4-Batch-Kette). Nur der
+    # BASENAME (KLASSEN-Regel: KEIN $CI_PROJECT_DIR in geforwardeten Child/Grandchild-Vars -- der CEB-/Grandchild-Prolog
+    # re-derived den Voll-Pfad mit frischem ${CI_PROJECT_DIR}, s. emit_child_submodule_prolog). Voll-Lauf (measure) =>
+    # nicht gesetzt => all_axes_golden (Voll-Umfang, unveraendert).
     - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_MEASURE_PROFILE == "smoke"'
       variables:
         COMDARE_PLAN_METHODIK_PROFILE: "m3_smoke_coverage.profile.xml"
