@@ -397,6 +397,15 @@ int main(int argc, char* argv[]) {
             namespace pf = comdare::cache_engine::builder::profile_facade;
             return pf::print_cache_key_facade("m3v2", std::cout);
         }
+        // K7b-4 (§62-B, G1/B6-Auflage 2026-07-22): --version -- druckt den Je-Binary-Selbst-Stempel DIESES
+        // Treiber-Binary (Planer- + CEB-Rolle in EINEM Binary) nach stdout: vier gelabelte non-empty Zeilen
+        // (planner-Selbst-Stempel / ceb-contract / build-type / build-version = system_axes_version_suffix). Ordnet
+        // das Binary per Versionierung dem gebauten Cache-Artefakt zu (ccache-Beschleunigung ist durch K7b gated).
+        // Rein-lesend: baut KEINE DLL, liest keinen Katalog.
+        if (flag == "--version") {
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::print_version_facade(std::cout);
+        }
         // --dump-ci [<profil>] (PAKET W7-A, 2026-07-19, §40.b): rein-lesende Emission der deterministischen
         // GitLab-Child-Pipeline-YAML (CiYamlBuilder am SELBEN Director-Walk wie --dump-plan). Die dynamische,
         // Planer-gesteuerte Folge-CI (Pilot->Serie). Wie --dump-plan: baut KEINE DLL, misst NICHT; Root-Tag-Sniff
