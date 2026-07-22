@@ -22,12 +22,18 @@
   <xs:element name="comdare_experiment">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="metadata"             type="MetadataType"/>
+        <!-- KERN #48-S5 (2026-07-22): metadata jetzt OPTIONAL (v2). Die KERN-golden traegt die Semantik ueber
+             template/axes_default_lookup; metadata/mode ist Interim-Legacy (v1). Abwesend = kein metadata. -->
+        <xs:element name="metadata"             type="MetadataType" minOccurs="0"/>
         <!-- KERN-A (S4, 2026-07-20): optionales <template ref=".." mode="full|.."> (Research-Gesamtalgorithmus-
              Load). mode="full" = Voll-Whitelist-Basis + axes_default_lookup restrict/extend; ref = benanntes
              Paper-Template (SPAETERE Feature-Erweiterung). Abwesenheit = kein Template (byte-identisch). -->
         <xs:element name="template"             type="TemplateType" minOccurs="0"/>
         <xs:element name="execution_engines"    type="ExecutionEnginesType"/>
+        <!-- KERN #48-S5 (Section 62-C): die Maschinen-MENGE (CI-Fertig-Gate-Kriterium; EINE XML fuer beide
+             Maschinen). Identitaets-Kern = cpu_fabrication + ram_pair; hostname_hint nur Hinweis. OPTIONAL;
+             Abwesenheit = keine Menge = heutiges Verhalten. Der Konsum (Fertig-Gate) gehoert dem Planer. -->
+        <xs:element name="machines"             type="MachinesType" minOccurs="0"/>
         <xs:element name="lebewesen"            type="LebewesenType"/>
         <!-- KERN-A (S4 Mess-Schema, 2026-07-20): phases jetzt OPTIONAL (minOccurs=0). Abwesenheit/leer =>
              der Planer LEITET die 3 Default-Stufen ab (Stufe1_CeOnly . je Pruefling Stufe2 . Stufe3_FullJoin);
@@ -36,7 +42,8 @@
         <xs:element name="axes_default_lookup"  type="AxesDefaultLookupType" minOccurs="0"/>
         <xs:element name="system_axes"          type="SystemAxesType" minOccurs="0"/>
         <xs:element name="workloads"            type="xs:string"/>
-        <xs:element name="datasets"             type="DatasetsType"/>
+        <!-- KERN #48-S5: datasets jetzt OPTIONAL (v2) - eine reine Achsen-KERN-golden braucht keine Mess-Inputs. -->
+        <xs:element name="datasets"             type="DatasetsType" minOccurs="0"/>
         <!-- KERN-A: measurement_tooling = die Mess-Tooling-HAUPT-Achse (auffaechernd; vor der UNTER-Achse
              measurement_categories). OPTIONAL; Abwesenheit = Default [all] (1 Voll-Konfig, byte-stabil). -->
         <xs:element name="measurement_tooling"  type="MeasurementToolingType" minOccurs="0"/>
@@ -46,14 +53,21 @@
              binary_id-NEUTRAL). Strukturell wie measurement_tooling: der Code-Parser validiert die ids gegen die
              3 constexpr-Registries (run_methodology/measurement_framework/writeback_method_registry.hpp); die XSD
              kann die Registry-Namen nicht kennen (Single-Source im Code); nur strukturell. Alle OPTIONAL;
-             Abwesenheit = Default (byte-identisch). -->
+             Abwesenheit = Default (byte-identisch).
+             KERN #48-S5 (v2): run_methodology traegt fuer v2 GENAU EINE <method> (exactly-one je Call/Profil,
+             Section 61-STUFEN). Das XSD kann "genau eine" strukturell nicht v2-selektiv erzwingen (der Ist-Parser
+             + validate_experiment_profile sind die Autoritaet: validate meldet size>1 als Fehler); hier nur die
+             Struktur. Der vierte Methoden-Wert 'compare' (Replay-Sichten-Vergleich) ist die Reserve fuer #47 -
+             in #48 KEIN Registry-Eintrag, nur diese Kommentar-Reserve. -->
         <xs:element name="run_methodology"      type="RunMethodologyType" minOccurs="0"/>
         <xs:element name="measurement_framework" type="MeasurementFrameworkType" minOccurs="0"/>
         <xs:element name="writeback_methods"    type="WritebackMethodsType" minOccurs="0"/>
         <xs:element name="op_types"             type="OpTypeListType"/>
         <xs:element name="output"               type="OutputType"/>
       </xs:sequence>
-      <xs:attribute name="version" type="xs:string" use="required" fixed="1"/>
+      <!-- KERN #48-S5: version-Attribut Pflicht, aber NICHT mehr fixed="1" - v2 = das KERN-Fundament
+           (comdare_experiment v2, experiment_golden_kern.xml). v1 = Interim-Legacy (Abgabe-Kette, Scheibe 6). -->
+      <xs:attribute name="version" type="xs:string" use="required"/>
       <xs:attribute name="id"      type="xs:string" use="required"/>
     </xs:complexType>
   </xs:element>
@@ -96,6 +110,22 @@
     </xs:sequence>
   </xs:complexType>
 
+  <!-- KERN #48-S5 (Section 62-C/D/E): machines = die Maschinen-MENGE. Der Identitaets-KERN (cpu_fabrication +
+       ram_pair) ist Pflicht (validate prueft den SCHLUESSEL, nicht den Namen); hostname_hint ist ein optionaler
+       Hinweis. Die XSD haelt die Struktur; die Nicht-Leere des Schluessels prueft validate_experiment_profile. -->
+  <xs:complexType name="MachinesType">
+    <xs:sequence>
+      <xs:element name="machine" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id"              type="xs:string" use="required"/>
+          <xs:attribute name="cpu_fabrication" type="xs:string" use="required"/>
+          <xs:attribute name="ram_pair"        type="xs:string" use="required"/>
+          <xs:attribute name="hostname_hint"   type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
   <!-- lebewesen: die gemessenen Tiere (base_tier-ids) -->
   <xs:complexType name="LebewesenType">
     <xs:sequence>
@@ -108,7 +138,7 @@
   </xs:complexType>
 
   <!-- phases: die Phasen. merge = MergeStrategy-Enum (Stufe1/2/3). KEIN baustein.
-       KERN-A (S4, 2026-07-20): <phases> ist OPTIONAL (Element minOccurs=0 in comdare_experiment) -- Abwesenheit =>
+       KERN-A (S4, 2026-07-20): <phases> ist OPTIONAL (Element minOccurs=0 in comdare_experiment) - Abwesenheit =>
        der Planer LEITET die 3 Default-Stufen ab. Ist <phases> PRAESENT, traegt es 1..unbounded <phase> (vorher genau
        3); explizite Phasen sind der Override (byte-identisch zum Ist). -->
   <xs:complexType name="PhasesType">
@@ -129,6 +159,10 @@
           <xs:attribute name="engine"    type="xs:string" use="optional"/>
           <xs:attribute name="engines"   type="xs:string" use="optional"/>
           <xs:attribute name="pruefling" type="xs:string" use="optional"/>
+          <!-- KERN #48-S5 (Section 59-C): id_namespace = der eigene id-Satz je Merge-Phase (3. Tier-Binary-Stempel;
+               auch die Merge-Kombination bekommt einen id-Namensraum). Optional; sinnvoll nur auf einer Phase mit
+               pruefling (validate warnt sonst). Konsum = K6a/#37 (Stempel-Materialisierung); hier nur Struktur. -->
+          <xs:attribute name="id_namespace" type="xs:string" use="optional"/>
           <!-- KERN-A (S4): identity = optionaler CacheEngine-self-Marker ("CacheEngine"/self). Der Code-Parser
                liest es roh; die Semantik-Pruefung ("CacheEngine"/self) macht validate_profile. -->
           <xs:attribute name="identity"  type="xs:string" use="optional"/>
@@ -183,23 +217,29 @@
     </xs:sequence>
   </xs:complexType>
 
-  <!-- axes_default_lookup: reines LIMIT. axis ref = Registry-axis-id,
-       allowed_variants = Whitespace-Liste von Registry-baustein-name-Werten
-       (Teilmenge). Ungenannte Achsen = volle Registry-Liste. -->
+  <!-- axes_default_lookup: NEGATIVES Blacklisting = reines LIMIT. Doku-Semantik: eine UNGENANNTE Achse expandiert
+       zur VOLLEN Registry-Liste ("alles messen" = Default); nur die GENANNTEN Achsen tragen einen Override. axis
+       ref = Registry-axis-id. allowed_variants = optionale Whitespace-Liste von Registry-baustein-name-Werten
+       (Teilmenge; ABWESEND = keine Einschraenkung dieser Achse ueber die Voll-Sweep-Basis hinaus).
+       KERN #48-S5 (v2): allowed_variants + enabled sind jetzt OPTIONAL (der KERN benennt nur Abweichungen). -->
   <xs:complexType name="AxesDefaultLookupType">
     <xs:sequence>
       <xs:element name="axis" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
           <xs:attribute name="ref"              type="xs:string" use="required"/>
-          <xs:attribute name="allowed_variants" type="xs:string" use="required"/>
-          <!-- KERN-A (S4, 2026-07-20): per-Achse Merge-Modus fuer die Pruefling-Komposition.
-               Abwesend/leer = replace-Default (byte-identisch); "merge" = additiver Zusammenschluss.
-               Der Code-Parser prueft {replace,merge} (validate_profile); die XSD ist nur strukturell. -->
+          <xs:attribute name="allowed_variants" type="xs:string" use="optional"/>
+          <!-- KERN-A (S4) + KERN #48-S4/S5: per-Achse Merge-Modus fuer die Pruefling-Komposition. Abwesend/leer =
+               replace-Default (byte-identisch); "merge" = additiver Zusammenschluss; "fulljoin" = die EXPLIZITE,
+               Phase-3-gebundene Union (Verdikt V-a). Der Code-Parser prueft {replace,merge,fulljoin} + die
+               fulljoin-Phase-3-Bindung (validate_profile); die XSD ist nur strukturell. -->
           <xs:attribute name="merge"            type="xs:string" use="optional"/>
+          <!-- KERN #48-S4 (Section 59-C/D): per-Achse Pruefling-Wahl (engine-id / lebewesen-id / self-Marker).
+               Optional; leer = Fallback auf die Phasen-Identitaet. -->
+          <xs:attribute name="pruefling"        type="xs:string" use="optional"/>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
-    <xs:attribute name="enabled" type="xs:boolean" use="required"/>
+    <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
   </xs:complexType>
 
   <!-- system_axes: CEB-System-Achsen — konform zur V35-Tabelle §2.1: Haupt-Achse → Unter-Achse → Optionen.
@@ -326,7 +366,7 @@
 
   <!-- measurement_categories: Spalten-PROJEKTION. name = exakt der Enum-Name aus
        kAllMeasurementCategories (measurement_category.hpp, 16 Kategorien).
-       KERN-A (S4, 2026-07-20): category minOccurs=0 (vorher 1) -- ein leeres <measurement_categories/> ODER
+       KERN-A (S4, 2026-07-20): category minOccurs=0 (vorher 1) - ein leeres <measurement_categories/> ODER
        ein fehlendes Element = alle 16 Kategorien (statt Fehler). -->
   <xs:complexType name="MeasurementCategoriesType">
     <xs:sequence>
@@ -374,13 +414,23 @@
     <xs:list itemType="OpTypeType"/>
   </xs:simpleType>
 
-  <!-- output: Zielpfade + comparison_metrics (boolean). -->
+  <!-- output: Zielpfade + comparison_metrics (boolean) + storage-Slot.
+       KERN #48-S5 (v2): comparison_metrics jetzt OPTIONAL (das writeback_methods-Trio ist die ehrliche v2-
+       Formalisierung); storage (Section 59-C-Slot) ist INERT deklariert (Konsum K7b/K8 post-Abgabe). -->
   <xs:complexType name="OutputType">
     <xs:sequence>
       <xs:element name="binary_path"        type="xs:string"/>
       <xs:element name="csv_path"           type="xs:string"/>
       <xs:element name="latex_path"         type="xs:string"/>
-      <xs:element name="comparison_metrics" type="xs:boolean"/>
+      <xs:element name="comparison_metrics" type="xs:boolean" minOccurs="0"/>
+      <!-- KERN #48-S4/S5: <storage backend="local|minio" endpoint=".."/>. backend-Enum-Pruefung + minio-endpoint-
+           Warnung leben in validate_experiment_profile; die XSD haelt die Struktur. Abwesend = kein Storage-Slot. -->
+      <xs:element name="storage" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="backend"  type="xs:string" use="required"/>
+          <xs:attribute name="endpoint" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 

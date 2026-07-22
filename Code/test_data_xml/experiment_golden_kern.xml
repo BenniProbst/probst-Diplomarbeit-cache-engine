@@ -10,25 +10,36 @@
 
      ADDITIV-DANEBEN: die alte experiment_golden.xml, die ce-Kopie und das
      Sync-Gate bleiben byte-unberuehrt (Interim-Abgabe-Kette, Interim-GO-1).
-     Diese Datei traegt (noch) KEINEN Konsumenten; die Parser-Naht folgt in
-     Scheibe 4, die XSD-Konsolidierung in Scheibe 5, die Umhaengung
-     (gegated nach dem 320er plus User-GO) in Scheibe 6.
+     Die Umhaengung (gegated nach dem 320er plus User-GO) ist Scheibe 6.
 
-     Achsen-Voll-Abdeckung ist die 1:1-Lese-Referenz aus
-     all_axes_golden.profile.xml: die 17 Kompositions-Achsen (per Voll-Sweep-
-     Default abgedeckt, siehe axes_default_lookup), der System-Achsen-Block
-     (Compiler plus extension_hardware), das Mess-Tooling-Trio und das
-     Writeback-Trio. all_axes_golden selbst bleibt unangetastet.
+     #48-S5: die Element-Namen und die Reihenfolge folgen EXAKT dem Ist-
+     Parser (parse_experiment_profile) und dem konsolidierten XSD
+     (experiment_schema.xsd, xs:sequence). Diese Instanz validiert gegen
+     experiment_schema.xsd (xmllint -schema). Achsen-Voll-Abdeckung ist die
+     1:1-Lese-Referenz aus all_axes_golden.profile.xml (17 Kompositions-
+     Achsen per Voll-Sweep-Default; System-Achsen-Block; Mess-Tooling-Trio;
+     Writeback-Trio). all_axes_golden selbst bleibt unangetastet.
      ==================================================================== -->
 <comdare_experiment version="2" id="diplomarbeit_golden_kern"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="experiment_schema.xsd">
 
+  <metadata>
+    <name>diplomarbeit_golden_kern</name>
+    <mode>full</mode>
+  </metadata>
+
   <!-- Fork 5: mode=full ist die Voll-Whitelist-Basis aus der Registry
        (ANGEBOT). Das Attribut ref benennt spaeter ein Paper-Template
-       (post-v3); die Einschraenkung laeuft ueber allowed_variants je Achse
-       (siehe axes_default_lookup). -->
+       (post-v3); die Einschraenkung laeuft ueber allowed_variants je Achse. -->
   <template mode="full"/>
+
+  <!-- Registry = ANGEBOT; die Engine-ids tragen die Wurzel-Engine-Erwartung
+       (die K7-Generisierung auf beliebige Wurzeln ist post-v3). -->
+  <execution_engines>
+    <engine id="ee_ce"  type="CacheEngineExecutionEngineAdapter" registry="cache_engine_axis_registry.xml"/>
+    <engine id="ee_prt" type="PrtArtExecutionEngineAdapter"      registry="prt_art_axis_registry.xml"/>
+  </execution_engines>
 
   <!-- Sektion 62-C/D/E: die Maschinen-MENGE ist das CI-Fertig-Gate-Kriterium,
        KEINE Zustaendigkeits-Aufteilung. EINE XML fuer beide Maschinen
@@ -40,31 +51,28 @@
     <machine id="prod2" cpu_fabrication="intel_avx2"      ram_pair="ddr4_2x32" hostname_hint="prod2"/>
   </machines>
 
-  <!-- exactly-one je CALL: der Modus ist ein Call-Parameter, NIE ein
-       Binary-Stempel. Werte: debug, measure, release. Der vierte Wert
-       compare ist die Reserve fuer Paket #47 (er liest das Mess-Replay der
-       registrierten Maschinen nach dem release-Lauf); in #48 nur als
-       Kommentar reserviert, KEIN Registry-Eintrag. -->
-  <run_methodology>
-    <method value="measure"/>
-  </run_methodology>
-
-  <!-- Registry = ANGEBOT; die Engine-ids tragen die Wurzel-Engine-Erwartung
-       (die K7-Generisierung auf beliebige Wurzeln ist post-v3). -->
-  <engines>
-    <engine id="ee_ce"  registry="cache_engine_axis_registry.xml"/>
-    <engine id="ee_prt" registry="prt_art_axis_registry.xml"/>
-  </engines>
+  <!-- Die gemessenen Lebewesen (base_tier-ids), 1:1 aus all_axes_golden. -->
+  <lebewesen>
+    <tier id="prt_art"/>
+    <tier id="art"/>
+    <tier id="hot"/>
+    <tier id="masstree"/>
+    <tier id="surf"/>
+    <tier id="start"/>
+    <tier id="wormhole"/>
+  </lebewesen>
 
   <!-- Sektion 59-A: phases sind optional; ein leerer Block bedeutet
        derive_default_experiment_phases() mit 3 Default-Stufen. Das Attribut
        pruefling benennt je Phase den einzusetzenden Pruefling; id_namespace
-       ist der eigene id-Satz (der 3. Merge-Stempel). Merges sind ADDITIV
-       (Sektion 59-C): der CRC-131072-Satz bleibt unberuehrt. -->
+       ist der eigene id-Satz (der 3. Tier-Binary-Stempel: auch die
+       Merge-Kombination bekommt einen id-Namensraum). Merges sind ADDITIV
+       (Sektion 59-C): der CRC-131072-Satz bleibt unberuehrt. Der self-Marker
+       laeuft ueber das phase-Attribut identity (kein Top-Level-Element). -->
   <phases>
-    <phase name="Stufe1_CeOnly"/>
-    <phase name="Stufe2_PrueflingReplace" pruefling="ee_prt" id_namespace="merge_prt_v1"/>
-    <phase name="Stufe3_FullJoin"         pruefling="ee_prt" id_namespace="join_prt_v1"/>
+    <phase name="Stufe1_CeOnly"           merge="Stufe1_CeOnly"           engine="ee_ce"/>
+    <phase name="Stufe2_PrueflingReplace" merge="Stufe2_PrueflingReplace" engine="ee_prt"        pruefling="prt_art" id_namespace="merge_prt_v1"/>
+    <phase name="Stufe3_FullJoin"         merge="Stufe3_FullJoin"         engines="ee_ce ee_prt" pruefling="prt_art" id_namespace="join_prt_v1"/>
   </phases>
 
   <!-- Negatives Blacklisting ist ein reines LIMIT: eine UNGENANNTE Achse
@@ -81,14 +89,12 @@
          merge    = CE plus Pruefling als Hybrid, nur Override.
          fulljoin = NUR in der Phase-3-Bindung gueltig (Stufe3_FullJoin);
                     validate erzwingt diese Bindung. Der Fork-4-Entscheid
-                    trennt so den Sektion-59-A(2)-Hybrid sauber vom
-                    A(3)-FullJoin (der User-KERN-Wortlaut unterscheidet beide).
-       pruefling je Achse benennt, von welchem Pruefling die Achse stammt;
-       der Wert self meint die CacheEngine selbst (Fork 3). -->
-  <axes_default_lookup>
-    <axis ref="search_algo"      pruefling="ee_prt" merge="replace"
-          allowed_variants="binary_search,linear_search"/>
-    <axis ref="path_compression" pruefling="ee_prt" merge="merge"/>
+                    trennt so den Sektion-59-A(2)-Hybrid vom A(3)-FullJoin.
+       pruefling je Achse benennt, von welchem Pruefling die Achse stammt
+       (engine-id / lebewesen-id / self-Marker CacheEngine). -->
+  <axes_default_lookup enabled="true">
+    <axis ref="search_algo"      pruefling="prt_art" merge="replace" allowed_variants="binary_search linear_search"/>
+    <axis ref="path_compression" pruefling="prt_art" merge="merge"/>
     <!-- Alle uebrigen Achsen bleiben absichtlich UNGENANNT = Voll-Sweep. -->
   </axes_default_lookup>
 
@@ -113,44 +119,54 @@
     </extension_hardware>
   </system_axes>
 
-  <!-- Workloads plus Datensaetze 1:1 aus all_axes_golden. Die Datensaetze
-       sind MESS-INPUTS, binary_id-NEUTRAL; die Akten in Code/test_data_xml/
-       sind die Single-Source der Datensatz-Provenienz (keine Doppelquelle).
-       Referenz per akte_ref, keine Inline-Daten. -->
+  <!-- Workloads 1:1 aus all_axes_golden. -->
   <workloads>ycsb_a ycsb_b ycsb_c ycsb_d ycsb_e ycsb_f</workloads>
+
+  <!-- Datensaetze 1:1 aus all_axes_golden (MESS-INPUTS, binary_id-NEUTRAL;
+       die Akten in Code/test_data_xml/ sind die Single-Source der Provenienz,
+       keine Doppelquelle). -->
   <datasets>
-    <dataset akte_ref="test_data_xml/url.test_data.xml"/>
-    <dataset akte_ref="test_data_xml/english_words.test_data.xml"/>
-    <dataset akte_ref="test_data_xml/sosd_books_200M.test_data.xml"/>
+    <dataset id="url"             akte_ref="test_data_xml/url.test_data.xml"             loader="string_corpus"/>
+    <dataset id="english_words"   akte_ref="test_data_xml/english_words.test_data.xml"   loader="string_corpus"/>
+    <dataset id="sosd_books_200M" akte_ref="test_data_xml/sosd_books_200M.test_data.xml" loader="sosd_uint64"/>
   </datasets>
 
-  <!-- Mess-Framework plus Mess-Tooling-Trio plus Writeback-Trio, 1:1 aus
-       all_axes_golden. measurement_tooling fuehrt die drei CEB-Typen als
-       SEPARATE Combos (wallclock, macro, micro). writeback_methods traegt
-       das volle Trio (csv, latex_table, comparison_metrics).
-       measurement_framework ist ycsb (heute das EINZIGE Framework). -->
-  <measurement_framework name="ycsb"/>
+  <!-- Mess-Tooling-Trio 1:1 aus all_axes_golden: die drei CEB-Typen als
+       SEPARATE Combos (wallclock, macro, micro). -->
   <measurement_tooling>
     <combo tools="wallclock"/>
     <combo tools="macro"/>
     <combo tools="micro"/>
   </measurement_tooling>
+
+  <!-- exactly-one je CALL: der Modus ist ein Call-Parameter, NIE ein
+       Binary-Stempel. Werte: debug, measure, release. Der vierte Wert
+       compare ist die Reserve fuer Paket #47 (er liest das Mess-Replay der
+       registrierten Maschinen nach dem release-Lauf); in #48 nur als
+       Kommentar reserviert, KEIN Registry-Eintrag. -->
+  <run_methodology>
+    <method value="measure"/>
+  </run_methodology>
+
+  <measurement_framework name="ycsb"/>
+
+  <!-- Writeback-Trio 1:1 aus all_axes_golden. -->
   <writeback_methods>
     <method value="csv"/>
     <method value="latex_table"/>
     <method value="comparison_metrics"/>
   </writeback_methods>
 
+  <op_types>OP-1 OP-3</op_types>
+
   <output>
+    <binary_path>golden_kern/measurements/all_permutations.bin</binary_path>
+    <csv_path>golden_kern/measurements.csv</csv_path>
+    <latex_path>golden_kern/golden_kern_table.tex</latex_path>
     <!-- Sektion 59-C-Slot, in #48 INERT deklariert: der Konsum (K7b/K8)
          folgt post-Abgabe. backend=local ist der Default; die minio-Variante
-         traegt zusaetzlich ein endpoint-Attribut
-         (backend=minio endpoint=minio.comdare.local). -->
+         traegt zusaetzlich ein endpoint-Attribut. -->
     <storage backend="local"/>
-    <csv_path>golden_kern/measurements.csv</csv_path>
-    <binary_path>golden_kern/measurements/all_permutations.bin</binary_path>
-    <latex_path>golden_kern/golden_kern_table.tex</latex_path>
   </output>
 
-  <identity marker="CacheEngine"/>
 </comdare_experiment>

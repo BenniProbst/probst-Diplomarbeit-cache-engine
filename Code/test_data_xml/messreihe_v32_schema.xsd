@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- DEPRECATED (#48-S5, 2026-07-22): Legacy-Fixture. BEHALTEN (Doku-nie-loeschen, INC-D), aber KEIN Ziel-Traeger.
+     Neue Schema-Felder gehoeren ausschliesslich in experiment_schema.xsd (comdare_experiment v2 = Ziel-Traeger).
+     Diese Datei bleibt am Ort (Test-Referenzen im messung_driver); nur dieser Kopf-Vermerk kommt hinzu. -->
 <!--
   V33.D.1 (2026-05-21) - Messreihe XSD-Schema V32
 
