@@ -1279,6 +1279,14 @@ planer:delegate-trigger:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
       when: never
+    # smoke=>debug-Entkopplung (2026-07-22): NUR im smoke-Zweig speist das METHODIK-Profil m3_smoke_coverage (debug =>
+    # parallel messen + (j3)-Dual-Compile) die Mess-Methodik, waehrend der Bau-Katalog all_axes_golden bleibt
+    # (COMDARE_GOLDEN_N_PROFILE + COMDARE_MEASURE_PROFILE UNVERAENDERT). Nur der BASENAME (KLASSEN-Regel: KEIN
+    # $CI_PROJECT_DIR in geforwardeten Child/Grandchild-Vars -- der CEB-/Grandchild-Prolog re-derived den Voll-Pfad
+    # mit frischem ${CI_PROJECT_DIR}, s. emit_child_submodule_prolog). Voll-Lauf (measure) => nicht gesetzt => unveraendert.
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_MEASURE_PROFILE == "smoke"'
+      variables:
+        COMDARE_PLAN_METHODIK_PROFILE: "m3_smoke_coverage.profile.xml"
     - if: '$COMDARE_BUILD_GOLDEN_N == "true"'
     - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'
   trigger:
@@ -1287,7 +1295,7 @@ planer:delegate-trigger:
         job: planer:delegate
     strategy: depend
     forward:
-      yaml_variables: true       # die explizite Allowlist oben (COMDARE_GN_TOTAL + COMDARE_MEASURE_PROFILE) durchreichen
+      yaml_variables: true       # Allowlist (COMDARE_GN_TOTAL + COMDARE_MEASURE_PROFILE [+ COMDARE_PLAN_METHODIK_PROFILE im smoke]) an STUFE-1
       pipeline_variables: false  # KEIN blindes Erben des gesamten Eltern-Variablenraums (Modul-Trigger-Isolation)
 
 # ── ergebnis:holen (W10-B, Ledger §42, SKELETT): das ERGEBNIS-HOLEN gehoert laut §42 in die Diplomarbeit-CI
