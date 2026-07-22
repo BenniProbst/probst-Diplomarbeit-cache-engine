@@ -140,6 +140,31 @@ variables:
 # ── Stufe 1: Lint (aus ci-templates) — NUR super-eigener Code, KEINE Submodule ──
 # #273 T1 (User-E2 2026-07-05): Compiler-Inventar je Runner-Host via CI (Cluster read-only) — Grundlage
 # fuer den gcc-15.3-Pin (T2) + die neueste-clang-Pflichtmatrix. Rollout beginnt hier (super).
+# [RUN-1]-Workaround selbstbedienbar (User-GO 22.07. "kill alle Zombies"): Job-Cancel laesst den
+# comdare-messung-driver als Waise zurueck (Runner killt nur den Shell-Wrapper) -> P11-Wache blockt
+# den Host. Dieser Sweep laeuft ALS gitlab-runner auf der per SWEEP_TAG gewaehlten Lane und darf die
+# eigenen Waisen killen. NUR via API-Trigger mit COMDARE_SWEEP_ZOMBIES=true + SWEEP_TAG=amd|intel.
+# Nachhaltig-Fix (Runner KillMode/Prozessgruppen) bleibt Infra-Task [RUN-1].
+runner:sweep-zombies:
+  stage: lint
+  tags: ["$SWEEP_TAG"]
+  needs: []
+  cache:
+    paths: []
+  variables:
+    GIT_STRATEGY: none
+  rules:
+    - if: '$COMDARE_SWEEP_ZOMBIES == "true"'
+  script:
+    - 'echo "== Waisen-Inventar ($SWEEP_TAG / $(hostname)) =="'
+    - 'pgrep -af comdare-messung-driver || echo "keine Waisen"'
+    - 'pkill -f comdare-messung-driver 2>/dev/null || true'
+    - 'sleep 3'
+    - 'pkill -9 -f comdare-messung-driver 2>/dev/null || true'
+    - 'sleep 2'
+    - 'echo "== ps-Beleg nach Sweep =="'
+    - 'pgrep -af comdare-messung-driver && exit 1 || echo "SAUBER: keine comdare-messung-driver-Prozesse auf $(hostname)"'
+
 toolchain:probe:
   extends: [.toolchain-probe, .code-rules]   # #53: docs-only-Gate
   tags: [baremetal]
