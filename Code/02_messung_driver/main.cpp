@@ -984,6 +984,15 @@ int main(int argc, char* argv[]) {
                         pa.provision_only = true;
                         std::cout << "[E4] INC-G6 provision-only: baut DLLs, misst NICHT.\n";
                     }
+                    // S3 (§62-B, 2026-07-22): COMDARE_PRUEF_ONLY=="true" faehrt NUR das Konformitaets-Gate je bereits
+                    // gebauter .so im dll_dir (ueber das COMDARE_GOLDEN_N_RANGE-Fenster der COMDARE_GN_OPT/SIMD-Perm) --
+                    // KEINE Messung, KEIN Neubau; exit!=0 bei Gate-Fail. Ablauf-Selektor wie provision-only (kein
+                    // Methodik-WERT). Inert ohne die Var (byte-identisch).
+                    if (env_trimmed("COMDARE_PRUEF_ONLY") == "true") {
+                        pa.pruef_only = true;
+                        std::cout << "[E4] S3 pruef-only: laedt gebaute .so + faehrt NUR das Konformitaets-Gate "
+                                     "(misst/baut NICHT).\n";
+                    }
                     // W5-C+ (§36.1 Zellen-Locking): der GN-Zellen-Filter. Die CI-Matrix exportiert je Cluster-Zelle
                     // COMDARE_GN_OPT/COMDARE_GN_SIMD (z.B. O2 + no_extension). Gesetzt => run_profile baut in dieser
                     // Zelle NUR die matchende (opt,simd)-Perm statt aller Profil-Perms (Befund Pipeline 11453:
