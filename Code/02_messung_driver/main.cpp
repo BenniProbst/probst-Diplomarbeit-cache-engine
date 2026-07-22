@@ -388,6 +388,15 @@ int main(int argc, char* argv[]) {
                 return 2;
             }
         }
+        // R8 (Nacht-Audit 2026-07-22): --print-cache-key -- druckt den VOLLEN ce-Objekt-Cache-Key-Praefix fuer die per
+        // Env (COMDARE_GN_OPT/COMDARE_GN_SIMD/COMDARE_CXX/COMDARE_BUILD_TYPE/COMDARE_MEASUREMENT_COMBO) gepinnte
+        // GN-Zelle nach stdout (EINE Zeile). Die CI (.golden_n_build) konsumiert ihn LITERAL als PULL-Quelle/
+        // MARK_PREFIX -> kein bash-Key-Drift (+bt/+ceb/+mtool/+mrg Single-Source aus dem Treiber). base = "m3v2"
+        // (dieselbe Mess-Lauf-build_version wie die run-Pfade unten). Baut KEINE DLL, liest keinen Katalog.
+        if (flag == "--print-cache-key") {
+            namespace pf = comdare::cache_engine::builder::profile_facade;
+            return pf::print_cache_key_facade("m3v2", std::cout);
+        }
         // --dump-ci [<profil>] (PAKET W7-A, 2026-07-19, §40.b): rein-lesende Emission der deterministischen
         // GitLab-Child-Pipeline-YAML (CiYamlBuilder am SELBEN Director-Walk wie --dump-plan). Die dynamische,
         // Planer-gesteuerte Folge-CI (Pilot->Serie). Wie --dump-plan: baut KEINE DLL, misst NICHT; Root-Tag-Sniff
