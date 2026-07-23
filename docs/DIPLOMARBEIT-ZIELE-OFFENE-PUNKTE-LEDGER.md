@@ -3325,3 +3325,55 @@ Vollstaendiger Session-Kontext-Log dieser Konsolidierungs-Runde als Teil des §5
 **ZUORDNUNG (Konsolidierung 23.07., loest die Einordnungs-Spannung "Heimat #46b [post-Abgabe]" vs. Vorzieh-Direktive auf):** Der MINIMAL-Teil — RAM-Sammelpuffer (256 MB) + Writer-Thread (portables Backend) + async per-Binary-Slice-Queue im BAU-Batch — wird gemaess Vorzieh-Direktive als NAECHSTES CI-/Treiber-Paket NACH dem laufenden 2^17-Voll-Bau eingeplant (nie in einen LAUFENDEN Lauf injiziert), Ziel: wirksam fuer den 320er-Messlauf bzw. spaetestens die 01.08.-Kampagne. Der VOLLAUSBAU (XML-Bestandslog-Persistenz, ETA+avg_size-Log, Gleichverteilung/Takeover, io_uring/IoRing-Beschleuniger-Backends) bleibt #46b — PFLICHT vor der 01.08.-new-golden-VOLL-MESSUNG.
 
 **PLATTFORM-AUFLAGE (User 23.07.: "io_uring wird auf Windows nicht unterstuetzt, aber wir muessen die dokumentierten OS ALLE unterstuetzen"):** Der Writer ist eine CT-Strategy mit drei Backend-FAMILIEN hinter EINER Schnittstelle (Familie b traegt zwei Windows-Varianten, ebenfalls CT-gewaehlt je Runner-Klasse): (a) **io_uring** (Linux, async buffered writes 5.19/6.x); (b) **Windows IoRing** (Win11 22H2+, Write-Support via BuildIoRingWriteFile — windows-internals.com "One Year to I/O Ring") bzw. **IOCP/Overlapped** fuer aeltere Windows inkl. Server 2022 (die win2022-Runner-Klasse hat KEIN IoRing); (c) **portabler write-Thread** (Referenz-Backend, ALLE dokumentierten OS/8er-Docker-Matrix, immer korrekt). Auswahl zur COMPILE-ZEIT je Plattform (kein Runtime-Switch); das portable Backend ist Pflicht-Basis und Korrektheits-Referenz der beiden beschleunigten Backends.
+
+## §65 — STORAGE-FORECAST-DOKTRIN + TOOLS-LAGERHALTUNG (2026-07-23 mittags, User-Klarstellung; KERN=Gesetz)
+
+**USER-KERN (a, Forecast):** Der Matrix-Forecast gehoert IMMER auf die Lager: Binaries -> ccache/minio
+(Ebene B, dev-MinIO V90 Bucket cache-engine-tier-binaries), Messergebnisse -> PR4100
+Cluster_NFS/cache-engine-experiment (Ebene C, measure-drop). **Der Forecast auf der Bau-Maschine
+selbst soll gegen NULL gehen.** (Klarstellung zur GN-9-6-TB-Rechnung: die bezog sich auf
+Cluster-Storage, nicht auf lokale Platten.)
+
+**USER-KERN (b, Tools-Lagerhaltung, NEU):** AUCH ALLE TOOLS (Toolchain/gcc-Builds, Treiber-/Planer-/
+CEB-Werkzeug-Binaries) fliessen in die minio.comdare.de-Lagerhaltung ein und werden per EINHEITLICHEM
+BENENNUNGSSCHEMA wiederverwendet statt je Maschine neu gebaut (Ist-Schmerz: z.B. ~14G tote
+comdare-gcc-build-Temps vom 12.07. auf prod1). Konsolidierung NACH der Abgabe, Heimat #46b-Familie.
+
+**IST-BEFUND (ultracode wf_2a8f2489, 23.07., datei:zeile in Synthese):**
+1. Ebene-B-Push ist in den Director-emittierten Stufe-2-Batch-Jobs INERT (Aktivierung/MINIO-Vars
+   nicht gesetzt; Naht nur in handgeschriebenen super-Jobs + comdare_storage_activation.sh) ->
+   Voll-Bau-Binaries entstehen derzeit NUR lokal; kein Pruning nirgends; Resume-Quelle = lokale
+   Sidecars (dll_is_current). Teil-A-gn_out-Persistenz = doktrin-konformes INTERIM (einzige Kopie!),
+   MUSS nach #46b-Lager+Push-Aktivierung explizit zurueckgebaut werden (lokal->0).
+2. Ehrlicher lokaler Forecast Voll-Bau-4 auf prod1 dadurch ~58-65G (131072 x ~428KB + Sidecars +
+   build + Logs) — Platz-Pflege vor dem Trigger noetig (23.07.: 24G Scratchpad-Altbau geraeumt,
+   79G frei; +33G root-Kandidaten offen; /var/mnt/coldstore auf KEINER Maschine gemountet).
+3. VERLUSTNAHT VOR MESS-PHASE: Code/measure_out ist in Batch-Mess-Jobs weder clean-excluded noch
+   CI-Artefakt (nur logs/ geht hoch) — vor dem 320er fixen (Sink-Doppelweg §51/Ebene C aktivieren
+   oder measure_out sichern).
+
+**FOLGEN:** (i) Nach #46b: Push-/Drop-Aktivierung in den Batch-Emit + lokal->0-Rueckbau (User-GO je
+Schritt); (ii) Tools-Lagerhaltung als Post-Abgabe-Paket; (iii) df-Wache auf beiden Maschinen
+waehrend des Voll-Baus (Monitore-nie-stumm).
+
+## §66 — RESEQUENZIERUNG: LAGER+STEMPEL = GATE FUER VOLL-BUILD (2026-07-23 mittags, User; KERN=Gesetz)
+
+**USER-KERN:** "Wir ziehen alle Punkte, die mit Lagerhaltung zu tun haben, nach vorn und erledigen
+sie als naechstes, VOR dem voll build (betrachte alles was die Lagerhaltung und Stempel angeht als
+gate fuer voll build)."
+
+**FOLGEN:**
+1. Das LAGER-GATE (vor Voll-Bau-4-Trigger) umfasst: (G1) B/C/D+amd24 landen (#27) · (G2)
+   STEMPEL-Finalisierung = bewusstes Cache-Bruch-Fenster JETZT (#36: K7b-Array-Form, AVX10-Feld,
+   per-Binary-Sidecar, W12 X.Y.Z — supersediert die "vor 01.08."-Parkung) · (G3) #46b-Bestandslog-
+   Kern P1-P4 + RAM-Puffer/avg_size/Writer-Backends/Slice-Queue (#10 — supersediert "vor 01.08.")
+   · (G4) P-A Push-Aktivierung + P-C measure_out (#34/#33, Design wf_87301637 liegt vor) · (G5)
+   P-B Pruning lokal->0 mit verify_remote_then_prune (#35 — vorgezogen von "vor Abgabe").
+2. 12713 (Voll-Bau-3) wurde 23.07. ~12:45 GECANCELT (User-GO lag vor; Stempel-Bruch invalidiert
+   dessen Sidecar-Bestand ohnehin; ccache-Objektwaerme bleibt in minio). Waisen beidseitig per
+   sudo-Sweep beseitigt (prod1 pgid 791677, prod2 pgid 1306754); beide Maschinen ruhig.
+3. Tools-Lagerhaltung (#32) bleibt explizit POST-ABGABE (User-Wortlaut 23.07. frueher: "nach der
+   Abgabe") — NICHT Teil des Gates.
+4. FRIST-EHRLICHKEIT: Das Gate kostet realistisch 1-2 Tage Bau (mit Delegation); Voll-Bau-Start
+   verschiebt sich auf ~Do/Fr, 320er auf ~So — S8-PDF-Endgate Mo 27.07. wird ENG. Gruendlichkeit
+   ist die User-Doktrin ("so gruendlich wie moeglich"); Kompression via paralleler Opus-Impl.
