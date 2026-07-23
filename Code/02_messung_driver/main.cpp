@@ -765,6 +765,45 @@ int main(int argc, char* argv[]) {
 
     std::filesystem::create_directories(output_dir);
 
+    // G5 (P-B, Ledger Section 65/66): COMDARE_PRUNE_ONLY=="true" -> STANDALONE-Prune-Modus (Spiegel des PRUEF_ONLY-
+    // Modus, aber NICHT ueber die run_profile-Fassade -- direkter Bibliotheks-Aufruf, der Iterator/Facade bleiben
+    // unberuehrt): iteriert die bereits gebauten Tier-Binaries unter output_dir/e4_xml/dll/<stem>/ und ruft je Stem
+    // ArtifactCache::verify_remote_then_prune -> loescht die lokale Binary + ihre 2 Sidecars NUR nach beweisbarem
+    // Remote-Spiegel (remote .version == lokale + Groesse == lokale); NIEMALS Messdaten. Baut/misst NICHT. Inert
+    // ohne minio (from_env INERT => nie loeschen). Kein throw; [PRUNE-TESTAT]-Aggregat + je-Stem-Log (perm.prune.log).
+    if (env_trimmed("COMDARE_PRUNE_ONLY") == "true") {
+        namespace atp                       = comdare::cache_engine::builder::artifact_transport;
+        std::filesystem::path const dll_dir = output_dir / "e4_xml" / "dll";
+        std::string                 bv      = env_trimmed("COMDARE_BUILD_VERSION");
+        if (bv.empty()) bv = "m3v2";
+        auto const      ac       = atp::ArtifactCache::from_env();
+        std::size_t     verified = 0, pruned = 0, behalten = 0, skipped = 0;
+        std::error_code pec;
+        std::cout << "[E4] G5 prune-only: verify-then-prune je Stem unter " << dll_dir.string()
+                  << " (build_version=" << bv << "; " << (ac.minio_enabled() ? "minio aktiv" : "INERT -> nie loeschen")
+                  << ")\n";
+        if (std::filesystem::is_directory(dll_dir, pec)) {
+            for (auto const& entry : std::filesystem::directory_iterator(dll_dir, pec)) {
+                if (!entry.is_directory()) continue;
+                atp::PruneOutcome const oc = ac.verify_remote_then_prune(entry.path(), bv);
+                switch (oc.state) {
+                    case atp::PruneState::pruned:
+                        ++pruned;
+                        ++verified;
+                        break;
+                    case atp::PruneState::kept:
+                        ++behalten;
+                        ++verified;
+                        break;
+                    case atp::PruneState::skipped: ++skipped; break;
+                }
+            }
+        }
+        std::cout << "[PRUNE-TESTAT] verified=" << verified << " pruned=" << pruned << " behalten=" << behalten
+                  << " skipped=" << skipped << " dll_dir=" << dll_dir.string() << "\n";
+        return 0;
+    }
+
     int e4_overall_rc = 0;
 
 #ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
