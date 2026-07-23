@@ -109,3 +109,20 @@ Agenten voll-build-verifiziert gemeldet; die profile_facade-Anteile sind MITTEN 
 im Zweifel: facade-Anteile zurueckstellen (git stash/Neubau nach Matrix), T1 einzeln abnehmen.
 NICHTS blind committen, NICHTS wegwerfen. Wachen bei Pause beendet (Cron-Wache b5nxgn31k
 gestoppt — bei Resume NEU armieren, §5).
+
+## 10. ADDENDUM-2 (~16:15): I2 DOCH NOCH GELANDET — Tree CLEAN, Pause final
+
+Die I2-Paketmeldung kam Sekunden nach der Sofort-Pause -> abgenommen und committet als
+**ce d8ead0a8** (super-Gitlink folgt im selben Commit wie dieses Addendum), dual gepusht.
+§9-Kaltweg damit OBSOLET: ce-Working-Tree ist CLEAN, beide Agenten FROZEN/Standby.
+I2-ERGEBNIS: .fingerprint-Sidecar-Produktion DRIFT-BEWIESEN (Makrotext-Parse == Provider-
+sha512) hinter COMDARE_BESTANDSLOG=true; ZWEI (c)-Vertagungen mit dokumentierten
+Architektur-Waenden (KEINE Zweitwahrheit gebaut):
+  (A) Bestandslog-KONSUM (transport/present) braucht: generische ArtifactCache-Objekt-
+      per-Key-API + public LagerRunState-Index-Accessor + view_index->binary_id-Aufloesung.
+  (B) variant_sig-Aktivierung braucht: per-Zelle-Variant-Key beim BUILD aus dem enabled
+      Wrapper emittiert (einzige Stelle mit dem Typ) — KEINE Runtime-String->Typ-Ableitung.
+BEIDE = eigene Folge-Scheiben NACH der Pause, VOR G4a einplanen (A entsperrt den echten
+Lager-Konsum im Voll-Bau-4; B aktiviert das ISA-Mismatch-Gate fuers Cross-Maschinen-Lager).
+Neue Reihenfolge nach Pause: Folge-A -> Folge-B -> I2b (Spool) -> G4a (§4) -> Smoke ->
+Beweise -> TRIGGER.
