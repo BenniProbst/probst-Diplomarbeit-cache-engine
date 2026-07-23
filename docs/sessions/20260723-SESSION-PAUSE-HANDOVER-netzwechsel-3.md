@@ -93,3 +93,19 @@ measure-drop UP. COMDARE_PMC_LANES="amd intel" (ce-Default); COMDARE_PROD2_AVAIL
    Smoke. 4. Resume-Skip-Beweis lokal (Doppellauf, GN_DECISION/Skip-Zaehlung) + Hydration-
    Smoke (G3-P2). 5. TRIGGER Voll-Bau-4 + df-Wachen beide Maschinen + Cron-Wache neu.
    6. Danach Phase 2-5 der Gesamtabfolge (mittag-Doc §7).
+
+## 9. ADDENDUM SOFORT-PAUSE (~16:05): I2 UNFERTIG im Tree pausiert
+
+Die Pause kam VOR der I2-Paketmeldung. IST-SNAPSHOT des ce-Working-Trees (uncommitted,
+Basis 27455b4e; 5 Dateien, 132+/3-):
+  M build_orchestrator/build_orchestrator.hpp        (I2-T1: FingerprintFn/write_fingerprint_sidecar)
+  M experiment_tree/cache_engine_builder_iterator.hpp (I2-T1: bestand_fingerprint_fn-Durchreiche)
+  M profile_facade/lazy_adhoc_source_gen.hpp          (I2-T2/T3 IN ARBEIT — vermutlich Emitter-/
+  M profile_facade/profile_run_entry.hpp               Registry-Tabellen-/Facade-Naehte, Stand
+  M tests/unit/test_lazy_adhoc_source_gen.cpp          UNVERIFIZIERT — nicht abgenommen!)
+KALTWEG bei Resume: erst Impl-S6-P1-Kurzmeldung suchen (Mailbox/Transcript); sonst Diff der 5
+Dateien gegen die §3-Abnahme-Matrix sichten. Teil-1-Anteile (orchestrator/iterator) sind vom
+Agenten voll-build-verifiziert gemeldet; die profile_facade-Anteile sind MITTEN in Teil 2/3 —
+im Zweifel: facade-Anteile zurueckstellen (git stash/Neubau nach Matrix), T1 einzeln abnehmen.
+NICHTS blind committen, NICHTS wegwerfen. Wachen bei Pause beendet (Cron-Wache b5nxgn31k
+gestoppt — bei Resume NEU armieren, §5).
