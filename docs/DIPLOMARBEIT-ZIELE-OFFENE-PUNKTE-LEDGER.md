@@ -3377,3 +3377,10 @@ gate fuer voll build)."
 4. FRIST-EHRLICHKEIT: Das Gate kostet realistisch 1-2 Tage Bau (mit Delegation); Voll-Bau-Start
    verschiebt sich auf ~Do/Fr, 320er auf ~So — S8-PDF-Endgate Mo 27.07. wird ENG. Gruendlichkeit
    ist die User-Doktrin ("so gruendlich wie moeglich"); Kompression via paralleler Opus-Impl.
+
+**§66-NACHTRAG (User 23.07., Frist-Einordnung):** "das Risiko des Scheiterns ohne Wiederaufnahme
+ist zu gross, wir sind gezwungen die Lagerhaltungs-Punkte nach vorn zu ziehen und moeglichst
+parallelisiert zu entwickeln. Dann sind Fehler bei der Messung abfangbar und ueberhaupt
+verkraftbar." Mo 27.07. = ZWISCHEN-Abgabe (nicht End-Abgabe); moeglichen Verzug begruendet der
+User. Gate-Gruendlichkeit schlaegt den Mo-Termin; Kompression via paralleler Impl-Agenten auf
+disjunkten Dateischnitten.
