@@ -3384,3 +3384,19 @@ parallelisiert zu entwickeln. Dann sind Fehler bei der Messung abfangbar und ueb
 verkraftbar." Mo 27.07. = ZWISCHEN-Abgabe (nicht End-Abgabe); moeglichen Verzug begruendet der
 User. Gate-Gruendlichkeit schlaegt den Mo-Termin; Kompression via paralleler Impl-Agenten auf
 disjunkten Dateischnitten.
+
+**§66-NACHTRAG-2 — PMC-DOKTRIN je Vendor (User 23.07. nachmittags, KERN=Gesetz):** Je Maschine ihr
+EIGENER PMC-Pflicht-Beweis: pmc:amd nur auf der AMD-Maschine (Runner-Tag amd), pmc:intel nur auf der
+Intel-Maschine (Tag intel); BEIDE hart (kein Gate/allow_failure) — "eine Lane darf den gesamten
+Strang erst abarbeiten, wenn IHR pmc-Job erfolgreich ist". Umsetzung: ce 194dee57 (Gate entfernt;
+Probe 12757 beide success; Runner-Filter verifiziert prod1=amd-only/prod2=intel-only). Messcode
+selbst vendor-portabel (generische PERF_TYPE_HW_CACHE-Events, kein Raw-Rateversuch). OFFEN als
+G4a-Auflage: per-Lane-PMC-Preflight in den emittierten Mess-Batch-Jobs (Grandchild-Strang), Task #37.
+
+**§66-NACHTRAG-2-PRAEZISIERUNG (User 23.07., Verschiffbarkeit):** Die PMC-Pflicht gilt je
+DEKLARIERTER Lane, nicht unbedingt: COMDARE_PMC_LANES (ce-Default "amd intel" = AND auf Comdare,
+beide Maschinen stets verfuegbar) deklariert die Vendor-Menge des Clusters; Fremd-Cluster
+(nur-intel/nur-amd) ueberschreiben per Variable -> nur vorhandene Lanes instanziiert+Pflicht
+(XOR-Verfuegbarkeit), Pipeline+Programm verschiffbar. Deklarierte-aber-tote Maschine blockiert
+ehrlich. ce 57dc0245 (supersediert die unbedingte Hart-Schaltung 194dee57); Beweis 12769 beide
+Jobs instanziiert. Preflight im Grandchild bleibt G4a-Auflage (#37/#34).
