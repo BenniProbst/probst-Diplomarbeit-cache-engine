@@ -1238,12 +1238,17 @@ planer:delegate:
     # S2 (§62-B Smoke-Umfang, 2026-07-22, Entscheid A): der SMOKE-Zweig delegiert ein KLEINES Umfangs-Profil
     # (m3v2_smoke: cap=2 + 2 Achsen-Sweeps + 1 working_set) statt all_axes_golden -> --dump-ci emittiert die kleine
     # Pipeline; der Smoke ist damit eine schnelle Regressionswache. Der GN-11-2^17-Bau-Nachweis laeuft SEPARAT (ueber
-    # die S4-Batch-Kette), NICHT ueber den Smoke. Die Smoke-METHODIK bleibt orthogonal (COMDARE_PLAN_METHODIK_PROFILE=
-    # m3_smoke_coverage im Trigger). §61: Env waehlt das Profil, nie einen Wert. MUSS VOR der generischen golden-Regel
-    # stehen (erste passende Regel gewinnt) -- golden/Nicht-Smoke bleibt bei all_axes_golden (golden/CRC-neutral).
+    # die S4-Batch-Kette), NICHT ueber den Smoke. Die Smoke-METHODIK (COMDARE_PLAN_METHODIK_PROFILE=m3_smoke_coverage)
+    # steht ab S2-Nacht-3 AUCH hier (Basename), damit sie zur --dump-ci-EMISSIONSZEIT gesetzt ist: die Facade loest den
+    # Basename gegen thesis_profiles/ auf (resolve_methodik_profile_path) UND der Planer brennt ihn KLASSEN-konform ans
+    # ceb:trigger (append_forward_var_literal) -> der Grandchild-Mess-Loop bekommt die injizierte Methodik. Der
+    # Trigger-Job (planer:delegate-trigger) behaelt seine Zeile (Forward an die STUFE-1-Child/ceb:emit). §61: Env waehlt
+    # das Profil, nie einen Wert. MUSS VOR der generischen golden-Regel stehen (erste passende Regel gewinnt) --
+    # golden/Nicht-Smoke bleibt bei all_axes_golden ohne METHODIK (golden/CRC-neutral).
     - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_MEASURE_PROFILE == "smoke"'
       variables:
         COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3v2_smoke.profile.xml"
+        COMDARE_PLAN_METHODIK_PROFILE: "m3_smoke_coverage.profile.xml"
     - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # NEUER STANDARD-Pfad (loest die statische Matrix ab)
     - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # ISOLIERTES Opt-in (nur die Delegation, ohne den Rest)
   script:
