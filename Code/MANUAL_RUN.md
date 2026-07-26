@@ -1,4 +1,8 @@
 # MANUAL_RUN — Lösung selbst bauen + ausführen (User-Self-Test)
+\n> **HINWEIS (2026-07-26, V-0):** Der Permutations-Codegen-Kanal (`comdare_perms_all`, V36.B) ist per
+> Owner-Entscheid (Diplom-Ledger §71/§73) RETIRED und wird in den Fassaden-/Planer-Kanal gemerged.
+> Die `comdare_perms_all`-Schritte in diesem Manual sind ÜBERGANGSWEISE noch nötig (bis Bauplan
+> TEIL V Paket V-2/V-3 den Manifest-Konsum abgelöst hat) und entfallen danach. Master-Manual = `../MANUAL_RUN.md`.
 
 > **Zweck:** den kompletten Mess-/Auswerte-Lauf **von Hand** durchführen, um die Thesis-Ergebnisse selbst zu validieren. Autoritativ über `USAGE.md` (teils stale). **v1, Codex-ermittelt 2026-06-27 — beim ersten Hand-Lauf verifizieren + Abweichungen hier korrigieren** (Memory `feedback_solution_manually_operable_for_user_self_test`; Lücken-Detail: `docs/sessions/20260627-MANUAL-RUN-GAP-ANALYSE-CODEX.md`).
 
