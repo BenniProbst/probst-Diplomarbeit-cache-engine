@@ -35,51 +35,20 @@ stages:
   - measure              # #156/#17 (User 2026-07-11): mehrtaegiger golden-320-Voll-Messlauf (inert-by-default, opt-in COMDARE_RUN_MEASURE)
   - persist              # #22 (Ledger §11-G): Auswertungs-Dokumente sammeln + commit-back nach development (inert-by-default)
 
-# ── Submodul-Auth-Fix (2026-07-11, User-GO „Diplomarbeit-CI fixen"). ──
-# Ursache (get_sources-Trace verify:submodules): der Runner injiziert das CI_JOB_TOKEN NICHT in die
-# via GIT_SUBMODULE_FORCE_HTTPS auf HTTPS umgeschriebenen Submodul-Klone → alle 3 Submodule (ce/prt-art/
-# thesis) klonen UNAUTHENTIFIZIERT → "remote: HTTP Basic: Access denied". Die inbound-job_token_scope-
-# Allowlists sind korrekt (super∈{286,287,289}); es kam nur kein Token an.
-# Befund (Job 252884): das CI_JOB_TOKEN hat genuin KEINEN Cross-Projekt-Klon-Zugriff auf die privaten
-# Submodule. Fix: ein limitiertes Group-Deploy-Token (read_repository, comdare/research, deckt ce/prt-art/
-# thesis) als maskierte CI-Variablen CE_SUBMODULE_USER/CE_SUBMODULE_TOKEN.
+# ── Submodul-Auth (REV 16, 2026-07-27, path a = nativer v8-Weg; Owner-GO Handout-1 §1 + INFRA->DIPLOM). ──
+# Native GitLab-Submodul-Verdrahtung statt manuellem Klon: GIT_STRATEGY:fetch + GIT_SUBMODULE_STRATEGY:recursive
+# (unten in variables:) -> get_sources klont die 3 Submodule (ce/prt-art/thesis) rekursiv und injiziert das
+# CI_JOB_TOKEN automatisch via `http.<host>.extraheader`. Die .gitmodules-URLs sind relativ (super 89af7ca2)
+# -> same-host gegen origin aufgeloest; GIT_SUBMODULE_FORCE_HTTPS erzwingt HTTPS (air-gap). Voraussetzung =
+# inbound-job_token_scope-Allowlist von 289/287/286 enthaelt 288 (verifiziert 2026-07-27; #399 + Recheck).
 #
-# (REV 13/14 = insteadOf-Ansaetze, SUPERSEDED: der Runner klont die Submodule mit CLEAN URLs
-# https://${CI_SERVER_HOST}/comdare/research/<repo>.git — KEINE URL-Credentials — und liefert den
-# CI_JOB_TOKEN via `http.<host>.extraheader` (AUTHORIZATION: Bearer …, hier vom Runner faelschlich als
-# 'cd-buildsystem-construct'-Token). Deshalb matcht KEINE insteadOf-Variante (weder clean- noch Token-
-# Prefix), und der Header uebertrumpft ohnehin jede URL-Credential → 403 job-token (Pipeline 9707-Trace).
-#
-# KERN-FIX (REV 15, 2026-07-11, gegen den ECHTEN Runner-Trace): GIT_SUBMODULE_STRATEGY:none (unten) schaltet
-# das failende Auto-Fetch in get_sources ab; die 3 Submodule werden hier MANUELL geklont. Zwei Dinge zusammen:
-#  (1) die Submodul-URL traegt die Deploy-Token-Credentials EXPLIZIT (umgeht insteadOf + Parent-Origin-Vererbung),
-#  (2) der Runner-extraheader wird per `-c "http.${CI_SERVER_URL}.extraheader="` (leer = Reset der Header-Liste)
-#      GELEERT — sonst uebertrumpft der Bearer-Header die URL-Basic-Auth und GitLab lehnt ab.
-# Lebt in default:before_script (laeuft NACH get_sources). Lint-Jobs haben ihr eigenes before_script (.lint-base)
-# → sie erben diesen Block NICHT und bleiben submodul-frei (STRATEGY:none). Alle submodul-brauchenden Jobs
-# (verify:submodules/build:clang/test:unit/analyse/integration/manifest/thesis-pdf) haben KEIN eigenes
-# before_script → sie erben ihn. Guard schuetzt Repo-lose Jobs (toolchain:probe = GIT_STRATEGY:none).
-# CE_SUBMODULE_TOKEN ist masked → kein Leak. ci-templates unberuehrt. Token read-only + revoke-bar.
-default:
-  before_script:
-    - |
-      if [ -f .gitmodules ] && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        # Cross-Projekt-Private-Submodul-Klon mit Group-Deploy-Token. Ursache (DIAG Pipeline 9787): der Runner
-        # setzt KEINEN Auth-extraheader (nur X-Gitaly-Correlation-ID). Die "Access denied" kam daher, dass die
-        # RELATIVEN .gitmodules-URLs (../<repo>.git) gegen origin=CI_REPOSITORY_URL zu
-        # https://gitlab-ci-token:${CI_JOB_TOKEN}@… aufloesen (Parent-Origin-Vererbung) UND `git submodule
-        # update --init` genau diese aufgeloeste Token-URL in .git/config schreibt -> ueberschreibt jedes
-        # vorher gesetzte submodule.<>.url-Override. Fix: die Deploy-Token-URLs DIREKT in .gitmodules setzen
-        # (ephemerer Job-Checkout, danach restauriert), dann liest sync+init sie. Der Deploy-Token hat
-        # read_repository auf alle 3 comdare/research-Repos -> Cross-Projekt-Fetch authentifiziert.
-        for spec in "Code/external/comdare-cache-engine:comdare-cache-engine" "Code/external/comdare-prt-art:comdare-prt-art" "thesis/diplomarbeit:20260931-overleaf-diplomarbeit"; do
-          p="${spec%%:*}"; r="${spec##*:}"
-          git config -f .gitmodules "submodule.${p}.url" "https://${CE_SUBMODULE_USER}:${CE_SUBMODULE_TOKEN}@${CI_SERVER_HOST}/comdare/research/${r}.git"
-        done
-        git submodule sync --recursive
-        git submodule update --init --recursive
-        git checkout -- .gitmodules 2>/dev/null || true
-      fi
+# SUPERSEDED (REV 13/14 insteadOf; REV 15/17 manueller Deploy-Token-Klon im default:before_script): der
+# REV-15-Behelf war noetig, solange v7.0.3-Embed-Tokens + polluted Host-gitconfigs den Runner-extraheader mit
+# einem FREMDEN Token verunreinigten (403 job-token). Seit v7.0.4 (kein Embed-Token) + Host-Store-De-Pollution
+# + GIT_CONFIG-per-Build-Isolation (#395) injiziert der Runner den KORREKTEN CI_JOB_TOKEN -> der native
+# recursive-Fetch traegt; der manuelle Deploy-Token-Klon entfaellt ersatzlos.
+# Jobs OHNE Submodul-Bedarf ueberschreiben GIT_SUBMODULE_STRATEGY:none (lint:*/persist:measurements/
+# ergebnis:holen) bzw. GIT_STRATEGY:none (toolchain:probe/runner:sweep-zombies). ci-templates unberuehrt.
 
 # #277/#21 (User 06.07.): ccache-Bestand liegt auf dev-MinIO (runners.cache -> minio.comdare.de:9000/buildsystem-cache).
 # CCACHE_DIR projektlokal, damit GitLab-cache ihn synct; MAXSIZE klein halten (Zip-Transfer je Job).
@@ -91,7 +60,8 @@ variables:
   CCACHE_DIR: "$CI_PROJECT_DIR/.ccache"
   CCACHE_MAXSIZE: "3G"
   COMDARE_CLANG_MATRIX: "1"   # #273: neueste-clang-Pflicht (User-E2), Rollout-Start super
-  GIT_SUBMODULE_STRATEGY: none            # REV 15: Auto-Fetch AUS (failt am Runner-extraheader); Submodule via default:before_script manuell mit Deploy-Token
+  GIT_STRATEGY: fetch                      # (REV 16, path a) natives Repo-Setup -> get_sources injiziert CI_JOB_TOKEN via extraheader
+  GIT_SUBMODULE_STRATEGY: recursive        # (REV 16, path a) nativer rekursiver Submodul-Fetch mit CI_JOB_TOKEN (ersetzt den manuellen Deploy-Token-Klon)
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
   CMAKE_BUILD_PARALLEL_LEVEL: "6"          # User 2026-07-06: 2x6 Kerne bei concurrent=2 (prod1 16C/60G, 17G frei, kein earlyoom; revidiert 8@concurrent=1)
   COMDARE_LINT_PATHS: "Code"
@@ -632,7 +602,7 @@ measure:smoke:
   tags: [prod, baremetal, amd]
   timeout: 12h                      # Smoke: Stunden statt Tage (Dossier B.4.3 ~14,5k Zellen)
   variables:
-    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
+    GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
     COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3_smoke_coverage.profile.xml"
   needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
   rules:
@@ -714,7 +684,7 @@ measure:golden-320:
   tags: [prod, baremetal, amd]
   timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
   variables:
-    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
+    GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
   needs:
     - job: "verify:submodules"
       optional: true               # #53/R3 (2026-07-22): docs-only-DAG-sicher (analog measure:smoke); haelt die
@@ -783,303 +753,13 @@ measure:golden-320:
     when: always
     expire_in: 12 weeks
 
-# ── Stage measure — GN-3 / §33 (User 2026-07-19): der INERTE CI-BAU-BEWEIS-Job des NEW-GOLDEN-Systembeweises.
-#    §33-Doktrin: golden-320 ist KEIN legitimer Systembeweis (13 von 17 Achsen gepinnt); NUR der new-golden-Satz
-#    unter VOLL-Konfiguration (all_axes_golden.profile.xml: ALLE 17 Achsen je 2 Auspraegungen, N=2^17=131072, PLUS
-#    <system_axes> opt O2/O3 x simd no_extension/avx2) beweist das System. Dieser Job faehrt den auf der CI
-#    ausfuehrbaren PRE-FLIGHT-Beweis-Schritt: comdare-messung-driver --validate gegen das VOLL-Konfig-Profil ->
-#    das N-XML parst + validiert HART gegen die realen EnabledStrategies (17x2 Organ-Werte) UND die
-#    System-Achsen-Klassen (opt O0..O3 zulaessig / Ofast REJECT gemaess §32-F4, simd gegen die SimdSubAxis-Optionen).
-#    Das ist der auf der CI ausfuehrbare Teil der F2-Aufbau-Doktrin ("System gegen die CI mit dem new-golden-Satz
-#    aufbauen"). tags [prod,baremetal,amd] = PMC-Node prod1 (wie die measure-Jobs).
-#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_BUILD_GOLDEN_N=="true" gesetzt ist —
-#    der Gesamtlauf (Messung/Bau AUS) baut ihn also NIE. KEIN Messlauf, KEIN Storage-Drop -> golden-neutral.
-#
-#    FIXME (INC-G6, Materialisierungs-Increment — GO-pflichtig, NICHT golden-neutral, NICHT in diesem Job): die
-#    VOLLE Materialisierung des 2^17-DLL-Katalogs ("System aufbauen" im Wortsinn) steht noch aus. Sie ist bewusst
-#    NICHT Teil dieses Jobs, weil 131072 materialisierte Quell-TUs ein GB-Compile / g++-ICE waeren — der GN-2-Guard
-#    (source_catalog.hpp: negativer Instanziierungs-Guard an der Katalog-Naht) sperrt die materialisierende Naht
-#    compile-time. Der Systembeweis-ANKER ist heute der COMPILE-TIME-Beweis in der ce-Test-Suite:
-#    static_assert(catalog_axis_product<FullSourceCatalog>() == 131072) + CRC64 kNewGolden131072Crc64 =
-#    0xF1C1F26A1232073B (source_catalog.hpp) + test_reflect_versions_all17. Sobald INC-G6 gebaut ist
-#    (gestaffelte/Storage-gated Materialisierung + provision-only-Treiber-Pfad), erweitert er DIESEN Job um den
-#    echten N-Satz-Bau; bis dahin ist der --validate-Pre-Flight der ausfuehrbare Beweis-Schritt.
-# .golden_n_build (W4-A / Ledger §35+§36, 2026-07-19): das gemeinsame Geruest der Cluster-parallelen System-Achsen-Builds.
-#   parallel:matrix ueber msys x opt x simd x chunk (je Zelle EIN Job); 3-stufiges N-Node-Capability-Routing per
-#   Runner-Tag ($GN_RUNNER_TAG, §36.3); LOCKING via resource_group (§36.1); Cross-Runner-Dedup (Ein-Build-pro-
-#   Permutation, egal wo) via MinIO-Chunk-Marker + algo_sig-Invalidierung (#50) als 2. Schicht.
-#   Zwei konkrete Jobs erben dies (DRY: EIN script, zwei Matrizen):
-#     build:golden-n         -> no_extension (Tag amd64, ALLE amd64-Nodes) + avx2 (Tag avx2), §33-Kernsatz
-#     build:golden-n-avx512  -> avx512 (Tag avx512, heute nur prod1/Zen5), extra opt-in
-.golden_n_build:
-  stage: measure
-  interruptible: false              # INC-G6/Ledger-34: der N-Bau (Stufe 2) darf NIE auto-cancelt werden (Belt-and-Suspenders zu auto_cancel=disabled)
-  # 3-STUFIGES SIMD-/N-Node-ROUTING (Ledger §36.3): $GN_RUNNER_TAG kommt je Matrix-Zelle = die CAPABILITY-Klasse
-  #   (nicht die Node-Marke). Pool-Modell ueber N amd64-Nodes: no_extension laeuft auf ALLEN amd64-Buildern (auch
-  #   kleine Nodes ohne AVX, Odroid-H4-Klasse), avx2 nur wo AVX2-Hardware, avx512 nur wo AVX512-Hardware. Deshalb
-  #   NUR der Capability-Tag (KEIN [prod,baremetal]-Praefix -> das wuerde die kleinen Nicht-prod-Nodes ausschliessen).
-  #     no_extension -> "amd64"   (alle amd64: prod1/prod2 + pve1/pve2 + node3/node4 + Odroid-H4-Klasse + amd64-k8s)
-  #     avx2         -> "avx2"    (prod1 Zen5 + prod2 RaptorLake + AVX2-faehige kleine Nodes, z.B. Odroid N97/AlderLake-N)
-  #     avx512       -> "avx512"  (heute NUR prod1 Zen5; prod2 i9-14900KS/RaptorLake hat AVX512 hardware-fused-off)
-  #   INFRA-HANDOUT (Doku Abschnitt 5): KEIN Runner traegt heute amd64/avx2/avx512 (Ist: prod1=[..amd], prod2=[..intel],
-  #   kleine Nodes=[..x86_64..]) -> Nodes nach realer CPU-Faehigkeit taggen. Bis dahin pendet der Job (opt-in +
-  #   W4-B-blockiert -> nichts laeuft verfrueht). Matrix ist tag-parametrisch fertig; nur die Runner-Tags fehlen.
-  tags: ["$GN_RUNNER_TAG"]
-  # LOCKING (Ledger §36.1): eine System-Achsen-Permutation darf nur auf genau EINEM Runner und EINER Concurrency
-  #   gleichzeitig gebaut werden -> GitLab resource_group = natives Ein-Job-Lock je Zelle ueber ALLE Pipelines/Runner
-  #   hinweg (Variablen werden expandiert). Der Schluessel enthaelt die Messsystem-Dimension ($GN_MSYS, §36.2: ein
-  #   Planer baut multiple CEBs je Messsystem). Der mc-stat-Dedup bleibt die ZWEITE Schicht (historische Builds/
-  #   Cache-Hits); resource_group verhindert den Live-Race zwischen gleichzeitigen Runnern (Ein-Runner-eine-Concurrency).
-  resource_group: "gn-$GN_MSYS-$GN_SIMD-$GN_OPT-$GN_CHUNK"
-  timeout: 30h                      # VOLL-Matrix-Zelle: ~20min Driver-Build + ~8h Chunk-Bau (32768 DLLs, W6-parallel) + Batch-Push
-                                    # + Puffer fuer O3/avx512-Zellen. (2h-Pilot-Wert killte die 11509-Zellen — Session-Fund 19.07.)
-  variables:
-    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token
-    COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
-    # -- Chunk-Fenster ueber den 2^17-Indexraum (Ledger §35.1). COMDARE_GN_CHUNK_COUNT MUSS == Laenge der GN_CHUNK-Liste. --
-    COMDARE_GN_TOTAL: "131072"             # 2^17 Organ-Permutations-Indexraum (all_axes_golden)
-    COMDARE_GN_CHUNK_COUNT: "4"            # Zahl der Chunk-Fenster je System-Permutation (== len(GN_CHUNK) in der Matrix)
-    # -- Dedup-Key (Ledger §35.2/§35.3): GN_PREFIX = perm_build_version = <base>+cxx=<cxx>+opt=<opt>[+ext=<simd>]. --
-    COMDARE_GN_BUILD_VERSION_BASE: "m3v2"  # experiment_run_entry.hpp:61 default; ueberschreibbar
-    # W11 (Ledger §43.c): MUSS == a.compiler_tag des Treibers = cxx_compiler() = COMDARE_CXX bzw. GccCompilerAxis::
-    #   driver_default()=="g++-16" (profile_run_facade.cpp). Nur dann stimmt der Pull-PREFIX (traegt +cxx=) mit dem
-    #   Push-Objekt-Key ueberein -> der per-DLL-Pull (skip+pull / Teil-Resume) greift. Leer war die 'Pull compiler-
-    #   agnostisch'-Luecke (PREFIX ohne +cxx= != Push-Key mit +cxx=). Bei abweichendem COMDARE_CXX hier nachziehen.
-    COMDARE_GN_COMPILER_TAG: "g++-16"
-    COMDARE_GN_PART_SIZE: "1024"           # W11 (§43.c): Teil-Marker nach je N gepushten DLLs (Cluster-Resume-Granularitaet)
-    # -- Messsystem-Konfiguration (Ledger §36.2/§30: ein Planer baut multiple CEBs je Messsystem). Heute 1 Default-Zelle;
-    #    weitere Messsysteme = weiterer GN_MSYS-Wert in den Matrizen (multipliziert die System-Permutations-Zellen). --
-    GN_MSYS: "default"                     # Matrix-Default; je Zelle ueberschrieben (fliesst in resource_group + Treiber-Env)
-  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
-  script:
-    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
-    - cd Code
-    # Kein -DCOMDARE_ENABLE_PMC / kein Measurement-ON noetig: dies ist ein BAU-/VALIDIER-Beweis, kein Messlauf.
-    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
-    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
-    - cmake --build build --target comdare-messung-driver
-    - !reference [.storage_cache_activation, script]   # W4-A: mc-Alias 'prodcache' scharfschalten fuer Cross-Runner-Dedup (inert wenn COMDARE_STORAGE_CACHE!=true)
-    - |
-      set -euo pipefail
-      # ── W4-A / Ledger §35: pro Matrix-Zelle System-Permutations-PREFIX + Chunk-Fenster ableiten (exportiert -> Folge-Steps, gleiche Shell) ──
-      : "${GN_OPT:?GN_OPT (Matrix-Var) fehlt}"; : "${GN_SIMD:?GN_SIMD (Matrix-Var) fehlt}"; : "${GN_CHUNK:?GN_CHUNK (Matrix-Var) fehlt}"
-      TOTAL="${COMDARE_GN_TOTAL:-131072}"; CCOUNT="${COMDARE_GN_CHUNK_COUNT:-4}"
-      case "$GN_CHUNK" in ''|*[!0-9]*) echo "GN_CHUNK nicht numerisch: '$GN_CHUNK'"; exit 1;; esac
-      [ "$GN_CHUNK" -lt "$CCOUNT" ] || { echo "GN_CHUNK=$GN_CHUNK >= COMDARE_GN_CHUNK_COUNT=$CCOUNT (GN_CHUNK-Liste/Count-Drift -> Matrix-Fehler)"; exit 1; }
-      CHUNK_SIZE=$(( (TOTAL + CCOUNT - 1) / CCOUNT ))   # ceil(TOTAL/CCOUNT)
-      START=$(( GN_CHUNK * CHUNK_SIZE ))
-      if [ "$START" -ge "$TOTAL" ]; then
-        echo "== Chunk $GN_CHUNK jenseits Indexraum ($TOTAL) -> No-Op-Zelle (CHUNK_COUNT ueberdimensioniert) =="; export GN_RANGE=""
-      else
-        REMAIN=$(( TOTAL - START )); COUNT_C=$CHUNK_SIZE; [ "$COUNT_C" -gt "$REMAIN" ] && COUNT_C=$REMAIN   # letzter Chunk klemmt
-        export GN_RANGE="${START}:${COUNT_C}"
-      fi
-      # GN_PREFIX = perm_build_version (experiment_run_entry.hpp:263-265): <base>+cxx=<cxx>+opt=<opt>[+ext=<simd>], +ext bei no_extension WEG
-      BASE="${COMDARE_GN_BUILD_VERSION_BASE:-m3v2}"; CXX="${COMDARE_GN_COMPILER_TAG:-}"
-      SUF="+opt=${GN_OPT}"; [ "$GN_SIMD" != "no_extension" ] && SUF="${SUF}+ext=${GN_SIMD}"
-      if [ -n "$CXX" ]; then export GN_PREFIX="${BASE}+cxx=${CXX}${SUF}"; else export GN_PREFIX="${BASE}${SUF}"; fi
-      # Messsystem-Dimension (§36.2): heute default=neutral. Bei >1 Messsystem MUSS GN_MSYS in die Binary-Identitaet
-      # (GN_PREFIX/build_version) einfliessen -- in Lockstep mit W4-B, damit der Dedup-Key je CEB eindeutig bleibt.
-      export GN_MSYS="${GN_MSYS:-default}"; export COMDARE_GN_MSYS="$GN_MSYS"
-      echo "== W4-A Zelle: msys=$GN_MSYS opt=$GN_OPT simd=$GN_SIMD chunk=$GN_CHUNK -> PREFIX='$GN_PREFIX' RANGE='${GN_RANGE:-<none>}' runner_tag='$GN_RUNNER_TAG' =="
-      # R8 (Nacht-Audit 2026-07-22): der OBJEKT-STORE-Cache-Key kommt LITERAL aus dem Treiber (--print-cache-key =
-      #   cache_key_prefix, inkl. der von GN_PREFIX NICHT getragenen Segmente +bt/+ceb/+mtool/+mrg) -- KEINE bash-
-      #   Nachbildung der ABI-/Combo-Segmente (kein Key-Drift; die Perm-Suffix-Reihenfolge kommt aus derselben
-      #   ce-Naht wie der Push). Der Treiber ist oben gebaut (--target comdare-messung-driver, VOR diesem Step). Env:
-      #   GN_OPT/GN_SIMD (Zelle) + COMDARE_CXX/BUILD_TYPE/MEASUREMENT_COMBO (Job). GN_PREFIX bleibt der LOKALE Bau-
-      #   Pfad-Name (Code/gn_out/<GN_PREFIX>), GN_CACHE_KEY der OBJEKT-STORE-Praefix. Fallback GN_PREFIX, falls der
-      #   Treiber (wider Erwarten) fehlt -> deprecateter Pfad bleibt lauffaehig (Warm-Pull dann evtl. leer wie bisher).
-      _CKDRV=$(find build -type f -name comdare-messung-driver 2>/dev/null | head -1)
-      if [ -n "$_CKDRV" ] && [ -x "$_CKDRV" ]; then
-        GN_CACHE_KEY=$(COMDARE_GN_OPT="$GN_OPT" COMDARE_GN_SIMD="$GN_SIMD" "$_CKDRV" --print-cache-key 2>/dev/null | head -1)
-      fi
-      [ -z "${GN_CACHE_KEY:-}" ] && GN_CACHE_KEY="$GN_PREFIX" # Treiber fehlt -> Alt-Verhalten (GN_PREFIX als Key)
-      export GN_CACHE_KEY
-      echo "== R8 Objekt-Store-Key: GN_CACHE_KEY='$GN_CACHE_KEY' (Treiber-Literal; GN_PREFIX bleibt lokaler Bau-Pfad) =="
-      # ── Cross-Runner-Dedup (Ledger §35.2): Chunk-Marker im MinIO-Bucket -> HIT=skip+pull (Warm-Cache), MISS=build ──
-      #    Grobe Job-Ebene: 1 Marker je (System-Permutation x Chunk). Die FEINE Per-DLL-Invalidierung (dll_is_current /
-      #    algo_sig, #50) macht der Treiber ohnehin (§35.3) -> selbst ein grober False-Hit bleibt korrektheits-sicher.
-      export GN_DECISION="build"
-      if [ "${COMDARE_STORAGE_CACHE:-}" != "true" ]; then
-        echo "[dedup] Storage inert (COMDARE_STORAGE_CACHE!=true) -> kein Cross-Runner-Sync, Bau lokal (golden-neutral)"
-      elif ! command -v mc >/dev/null 2>&1; then
-        echo "[dedup] mc-Binary fehlt im Runner-Image -> kein Sync, Bau lokal (Infra-Fehler-Klasse, kein Abbruch)"
-      elif [ -z "${COMDARE_MINIO_BUCKET:-}" ] || [ "${COMDARE_MINIO_ENDPOINT:-}" != "prodcache" ]; then
-        echo "[dedup] mc-Alias/Bucket nicht scharf (Ebene B inert) -> Bau lokal"
-      elif [ -z "${GN_RANGE:-}" ]; then
-        echo "[dedup] No-Op-Zelle (kein Range) -> nichts zu deduplizieren"
-      else
-        MARKER="prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/_gn_chunk_markers/${GN_RANGE//:/-}.done" # R8: Treiber-Key
-        # W11 (§43.c): Pull-Ziel = die Treiber-dll_dir <out>/e4_xml/dll (dorthin schaut dll_is_current: output_dir/<stem>/
-        #   perm.dll). Frueher wurde nach gn_out/<PREFIX>/ gepullt -> der Treiber fand die DLLs NIE (Pfad-Mismatch,
-        #   Resume-Luecke). Der Objekt-Key <PREFIX>/<stem>/perm.dll landet so unter <out>/e4_xml/dll/<stem>/perm.dll.
-        PULL_DST="$CI_PROJECT_DIR/Code/gn_out/${GN_PREFIX}/e4_xml/dll"
-        MARK_PREFIX="prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/_gn_chunk_markers/" # R8: Treiber-Key
-        if mc stat "$MARKER" >/dev/null 2>&1; then
-          # Cache-Resthygiene (S1-F1 + Resthygiene-2, SCHARF): algo_sig-Wache. Der Marker traegt algo_sig=<Organ-Fingerprint
-          #   des Baus>. Der ERWARTETE Fingerprint kommt vom frisch gebauten Treiber (--chunk-organ-fingerprint: rein aus
-          #   dem Katalog, KEIN DLL-Bau; sha256 des Pre-Image == der Marker-Berechnung, ce-seitig kreuz-validiert gegen
-          #   find|LC_ALL=C sort|xargs cat). Weichen sie ab, war es ein Organ-/Katalog-Bump OHNE PREFIX-Bump => Marker STALE
-          #   => MISS (nicht pullen, GN_DECISION bleibt "build"; alter Marker bleibt additiv -- nie loeschen). Kein Treiber/
-          #   leeres algo_sig => wie bisher HIT (rueckw.-kompat.; dll_is_current/.algos bleibt ohnehin der Feind-Filter).
-          if [ -z "${COMDARE_GN_ALGO_SIG:-}" ]; then
-            _DRV=$(find build -type f -name comdare-messung-driver 2>/dev/null | head -1)
-            if [ -n "$_DRV" ] && [ -x "$_DRV" ] && [ -f "${COMDARE_GOLDEN_N_PROFILE:-}" ]; then
-              COMDARE_GN_ALGO_SIG=$(COMDARE_GOLDEN_N_RANGE="$GN_RANGE" "$_DRV" --chunk-organ-fingerprint "$COMDARE_GOLDEN_N_PROFILE" 2>/dev/null | sha256sum | awk '{print $1}')
-            fi
-          fi
-          # R1 (2026-07-22): NUR das sha-Feld extrahieren. Der Marker ist EINZEILIG
-          #   ('algo_sig=<sha> compiler=<..> range=<..> utc=<..>', :1002-1003); 's/^algo_sig=//p' strippte nur das
-          #   Praefix und behielt die ganze Restzeile (sha + compiler=.. range=.. utc=..) -> Vergleich :913 gegen das
-          #   reine sha schlug IMMER fehl -> jeder Marker STALE (Dedup strukturell tot). Jetzt: erstes Whitespace-Feld.
-          MARK_ALGO=$(mc cat "$MARKER" 2>/dev/null | sed -n 's/^algo_sig=\([^[:space:]]*\).*/\1/p' | head -1)
-          if [ -n "${COMDARE_GN_ALGO_SIG:-}" ] && [ -n "$MARK_ALGO" ] && [ "$MARK_ALGO" != "${COMDARE_GN_ALGO_SIG}" ]; then
-            echo "[dedup] MARKER-STALE (algo_sig Marker='$MARK_ALGO' != erwartet='$COMDARE_GN_ALGO_SIG') -> Organ-Bump, Marker IGNORIERT = MISS (Neubau; alter Marker bleibt additiv)"
-          else
-            echo "[dedup] HIT: $GN_PREFIX Chunk $GN_RANGE bereits im Cluster gebaut -> SKIP (bereits im Cluster gebaut) + PULL (Warm-Cache)"
-            if [ -n "$CXX" ]; then
-              mkdir -p "$PULL_DST"
-              mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/" "$PULL_DST/" 2>&1 | tail -8 \
-                || echo "[dedup] Pull-Teilfehler -> Bau-Naht faellt auf Neubau zurueck (Treiber-dll_is_current bleibt Invalidierer)"
-            else
-              echo "[dedup] COMDARE_GN_COMPILER_TAG leer -> DLL-Pull uebersprungen (PREFIX compiler-agnostisch, DLL-Key traegt +cxx=); Marker-Skip genuegt"
-            fi
-            export GN_DECISION="skip"
-          fi
-        elif [ -n "$CXX" ] && mc ls "$MARK_PREFIX" 2>/dev/null | grep -q "${GN_RANGE//:/-}\.part"; then
-          # W11 (§43.c) TEIL-RESUME: kein Whole-Chunk-Marker, aber TEIL-Marker vorhanden (ein Vorlauf brach ab).
-          #   Die bereits gepushten DLLs dieses PREFIX in die Treiber-dll_dir hydrieren -> dll_is_current ueberspringt
-          #   sie, NUR die fehlenden werden neu gebaut (Cluster-Resume). GN_DECISION bleibt "build" (Stufe 2 baut weiter).
-          echo "[dedup] TEIL-RESUME: Teil-Marker fuer $GN_PREFIX Chunk $GN_RANGE gefunden -> pulle bereits gepushte DLLs (nur Fehlende werden gebaut)"
-          mkdir -p "$PULL_DST"
-          mc cp --recursive "prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/" "$PULL_DST/" 2>&1 | tail -8 \
-            || echo "[dedup] Teil-Pull-Teilfehler -> dll_is_current baut die fehlenden neu (kein Abbruch)"
-        else
-          echo "[dedup] MISS: $GN_PREFIX Chunk $GN_RANGE noch nicht im Cluster (kein Whole-/Teil-Marker) -> Bau (danach Marker + Push, s. Stufe 2)"
-        fi
-      fi
-    - |
-      set -euo pipefail
-      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
-      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
-      test -f "$COMDARE_GOLDEN_N_PROFILE" || { echo "NEW-GOLDEN-Voll-Konfig-Profil fehlt: $COMDARE_GOLDEN_N_PROFILE"; exit 1; }
-      echo "== §33 Systembeweis Pre-Flight (--validate, rein lesend, KEIN Bau von DLLs, KEINE Messung) =="
-      echo "   PROFIL=$COMDARE_GOLDEN_N_PROFILE"
-      echo "   (alle 17 Achsen je 2 Auspraegungen = 2^17 = 131072 + <system_axes> opt O2/O3 x simd no_extension/avx2)"
-      "$DRIVER" --validate "$COMDARE_GOLDEN_N_PROFILE" || { echo "NEW-GOLDEN-Voll-Konfig-Validierung fehlgeschlagen -> Systembeweis NICHT erbracht"; exit 1; }
-      echo "== §33 Pre-Flight OK: das N-Voll-Konfig-Profil validiert gegen die EnabledStrategies (17x2 Organ) + System-Achsen (opt O0..O3/Ofast-REJECT, simd) =="
-      echo "== FIXME INC-G6: die VOLLE 2^17-DLL-Materialisierung ist GO-pflichtig/gestaffelt (GN-2-Guard) und NICHT Teil dieses Jobs; =="
-      echo "   der Systembeweis-Anker bleibt der Compile-Time-Guard static_assert(...==131072) + CRC64 0xF1C1F26A1232073B in der ce-Test-Suite."
-      echo "=== build:golden-n Stufe 1 OK (§33 Pre-Flight-Beweis erbracht; kein Messlauf, kein Drop, golden-neutral) ==="
-    # -- Stufe 2 (INC-G6, W4-A Chunk-Bau je Matrix-Zelle): baut NUR die System-Permutation dieser Zelle (opt=$GN_OPT
-    #    x simd=$GN_SIMD) fuer das Chunk-Fenster $GN_RANGE. Der Cross-Runner-Dedup-Step (oben) hat GN_DECISION gesetzt:
-    #    skip (HIT: schon im Cluster + gepullt) ODER build (MISS). Solange die ce-Materialisierungs-Naht (lazy
-    #    Per-Index-Adhoc-Emitter, W4-B) NOCH NICHT gelandet ist, meldet der build-Zweig die fehlende Voraussetzung HART
-    #    (exit 3) und baut NICHTS -- KEIN Fake-DLL, kein Erfolgs-Haken ohne reale Materialisierung (Anti-Phantom,
-    #    no_success_marks_without_literal_output). Die EINZIGE Zeile, die beim Landen von W4-B ersetzt wird, ist unten
-    #    als "UMSCHALT-ZEILE" markiert. Bauplan: docs/plaene/20260719-inc-g6-materialisierung-BAUPLAN.md (Abschnitt 1+6+7)
-    #    + Matrix/Dedup: docs/plaene/20260719-cluster-parallel-build-MATRIX.md.
-    - |
-      set -euo pipefail
-      if [ "${GN_DECISION:-build}" = "skip" ]; then
-        echo "== Stufe 2 SKIP (Cross-Runner-Dedup HIT): $GN_PREFIX Chunk $GN_RANGE bereits im Cluster -> Warm-Cache gepullt, kein Neubau =="
-        exit 0
-      fi
-      if [ -z "${GN_RANGE:-}" ]; then
-        echo "== Stufe 2 No-Op (Chunk jenseits Indexraum) -> nichts zu bauen, golden-neutral =="
-        exit 0
-      fi
-      echo "== Stufe 2 (W4-A Chunk-Bau) MISS: baue Permutation opt=$GN_OPT simd=$GN_SIMD Fenster $GN_RANGE unter PREFIX '$GN_PREFIX' =="
-      echo "   INTENDIERT (nach W4-B ce-Naht): provision-only (Bau ohne Messung) je Chunk, dann GN-9-Groessen-Report:"
-      echo "     dlls=\$(find <dll_dir> -name perm.dll | wc -l); bytes=\$(find <dll_dir> -name perm.dll -printf '%s\\n' | awk '{s+=\$1} END{print s+0}')"
-      echo "     extrapolation_131072 = bytes/dlls*131072  (GN-9-Bloat-Deckel je Chunk, LITERAL geloggt)"
-      # ====================================================================================================
-      # UMSCHALT-ZEILE (W4-B): der folgende Melde-/exit-3-Block wird durch DIESEN EINEN realen Treiber-Aufruf
-      #   + Marker-Push ersetzt (nur diese Naht aendert sich; Matrix/Dedup/Routing bleiben):
-      #     COMDARE_THESIS_PROFILE="$COMDARE_GOLDEN_N_PROFILE" COMDARE_GOLDEN_N_RANGE="$GN_RANGE" \
-      #       COMDARE_GN_OPT="$GN_OPT" COMDARE_GN_SIMD="$GN_SIMD" COMDARE_GOLDEN_N_PROVISION_ONLY=true \
-      #       "$DRIVER" experiment_config "$CI_PROJECT_DIR/Code/gn_out/$GN_PREFIX"
-      #     # danach GN-9-Report, dann (nur bei COMDARE_STORAGE_CACHE=true) der Chunk-Marker fuer den naechsten Runner:
-      #     [ "${COMDARE_STORAGE_CACHE:-}" = "true" ] && command -v mc >/dev/null 2>&1 && \
-      #       printf 'algo_sig=%s compiler=%s range=%s utc=%s\n' "<algo_sig>" "${COMDARE_GN_COMPILER_TAG:-na}" "$GN_RANGE" "$(date -u +%FT%TZ)" \
-      #       | mc pipe "prodcache/${COMDARE_MINIO_BUCKET}/${GN_PREFIX}/_gn_chunk_markers/${GN_RANGE//:/-}.done"
-      #   (die Per-DLL-perm.dll/-sidecar pusht die ce-artifact_cache-Naht via COMDARE_STORAGE_CACHE bereits selbst;
-      #    dll_is_current/algo_sig bleibt der Organ-Invalidierer, #50 -> §35.3.)
-      # ====================================================================================================
-      # UMGESCHALTET (W4-B gelandet): echter Chunk-Bau via lazy Per-Index-Emitter + Chunk-Fenster + provision-only.
-      DLL_DIR="$CI_PROJECT_DIR/Code/gn_out/$GN_PREFIX/e4_xml/dll"   # Treiber schreibt DLLs unter <out>/e4_xml/dll
-      COMDARE_THESIS_PROFILE="$COMDARE_GOLDEN_N_PROFILE" COMDARE_GOLDEN_N_RANGE="$GN_RANGE" \
-        COMDARE_GN_OPT="$GN_OPT" COMDARE_GN_SIMD="$GN_SIMD" COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 \
-        "$DRIVER" experiment_config "$CI_PROJECT_DIR/Code/gn_out/$GN_PREFIX"
-      count=$(find "$DLL_DIR" -name 'perm.dll' 2>/dev/null | wc -l)
-      bytes=$(find "$DLL_DIR" -name 'perm.dll' -printf '%s\n' 2>/dev/null | awk '{s+=$1} END{print s+0}')
-      echo "GN-9 chunk[$GN_RANGE]: dlls=$count bytes=$bytes extrapolation_131072=$(( count>0 ? bytes/count*131072 : 0 )) B"
-      # Cache-Resthygiene (S1-F1 + R2-Fix, 2026-07-22): der Whole-Chunk-Marker traegt ein algo_sig-Feld = Organ-
-      # Fingerprint dieses Chunks. R2: der Fingerprint wird aus DERSELBEN QUELLE wie die HIT-Erwartung (:912-Block,
-      # frisch gebauter Treiber --chunk-organ-fingerprint ueber GN_RANGE, rein aus dem Katalog, KEIN DLL-Bau)
-      # berechnet. Die alte find|sort|cat-Variante ueber das GANZE DLL_DIR wich davon ab (der plankonforme S2-Batch-
-      # Pull hydriert fremde Chunks ins DLL_DIR => Obermengen-Hash => Marker permanent STALE, auch nach dem R1-Fix).
-      # Sie bleibt NUR als Log-Vergleich (Kreuz-Beleg: im reinen MISS-DLL_DIR sind beide Quellen byte-identisch --
-      # ce-seitig kreuz-validiert, :902-903; Divergenz im Log zeigt Fremd-Hydration). sha256sum emittiert immer einen
-      # Hash (leere Eingabe => e3b0c442...-Leerhash, NIE Leerstring) -> ALGO_SIG ist nie leer; 'none' ist ein defensiver
-      # Rest-Guard (unerreichbar, solange der Treiber in Stufe 2 vorliegt, :941 sichert das hart).
-      ALGO_SIG=$(COMDARE_GOLDEN_N_RANGE="$GN_RANGE" "$DRIVER" --chunk-organ-fingerprint "$COMDARE_GOLDEN_N_PROFILE" 2>/dev/null | sha256sum | awk '{print $1}')
-      [ -z "$ALGO_SIG" ] && ALGO_SIG=none
-      ALGO_SIG_FIND=$(find "$DLL_DIR" -name 'perm.dll.algos' 2>/dev/null | LC_ALL=C sort | xargs -r cat 2>/dev/null | sha256sum | awk '{print $1}')
-      echo "[dedup] MARKER-WRITE algo_sig(driver:909-Quelle)=$ALGO_SIG algo_sig(find_dll_dir:alt)=$ALGO_SIG_FIND (driver autoritativ; Gleichheit == reines Range-DLL_DIR ohne Fremd-Hydration)"
-      [ "${COMDARE_STORAGE_CACHE:-}" = "true" ] && command -v mc >/dev/null 2>&1 && \
-        printf 'algo_sig=%s compiler=%s range=%s utc=%s\n' "$ALGO_SIG" "${COMDARE_GN_COMPILER_TAG:-na}" "$GN_RANGE" "$(date -u +%FT%TZ)" \
-        | mc pipe "prodcache/${COMDARE_MINIO_BUCKET}/${GN_CACHE_KEY}/_gn_chunk_markers/${GN_RANGE//:/-}.done" || true # R8: Treiber-Key
-
-# ── build:golden-n (W4-A, Ledger §35/§36): die kanonische §33-System-Achsen-Matrix (opt O2/O3 x simd no_extension/avx2),
-#    N-Node-Pool-geroutet (§36.3): no_extension -> Tag "amd64" (ALLE amd64-Nodes inkl. kleiner Nodes ohne AVX),
-#    avx2 -> Tag "avx2". Messsystem-Dimension GN_MSYS (§36.2) heute 1 Default -> 2 SIMD x 1 msys x 2 opt x 4 chunk = 16 Zellen/Jobs.
-#
-#    DEPRECATED (W10-B, Ledger §42): diese statische, HANDGESCHRIEBENE 24-Zellen-Matrix war der erfolgreiche W4-PILOT
-#    (die Steuerung lag in der YAML statt im Planer). Die ZIEL-Steuerung ist die dynamische, CE-gesteuerte W10-Kette
-#    (planer:delegate -> die CE emittiert STUFE 1 [Mess-Achsen/CEB] und die CEB emittiert STUFE 2 [System-Achsen/
-#    Tier]). Diese Matrix bleibt als GATED FALLBACK erhalten (Pilot-Historie + 11509-Artefakt-Lieferant) -- NICHT
-#    geloescht. Sie laeuft NUR NOCH, wenn ZUSAETZLICH COMDARE_STATIC_MATRIX_FALLBACK=="true" gesetzt ist (Default
-#    AUS): so ist planer:delegate der NEUE Standard-Pfad hinter COMDARE_BUILD_GOLDEN_N. avx512 = separater Job unten.
-build:golden-n:
-  extends: .golden_n_build
-  parallel:
-    matrix:
-      - GN_SIMD: ["no_extension"]
-        GN_RUNNER_TAG: ["amd64"]       # §36.3: ALLE amd64-Nodes (prod1/prod2 + pve1/pve2/node3/node4 + Odroid-Klasse); INFRA: Tag 'amd64' setzen
-        GN_MSYS: ["default"]
-        GN_OPT: ["O2", "O3"]
-        GN_CHUNK: ["0", "1", "2", "3"]
-      - GN_SIMD: ["avx2"]
-        GN_RUNNER_TAG: ["avx2"]        # §36.3: AVX2-faehige Nodes (prod1 Zen5 + prod2 RaptorLake + AVX2-kleine Nodes); INFRA: Tag 'avx2' setzen
-        GN_MSYS: ["default"]
-        GN_OPT: ["O2", "O3"]
-        GN_CHUNK: ["0", "1", "2", "3"]
-  rules:
-    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Bau-Beweis
-      when: never
-    # DEPRECATED-Fallback: DOPPELT gegatet -> Default AUS. Der Standard ist planer:delegate (COMDARE_BUILD_GOLDEN_N).
-    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_STATIC_MATRIX_FALLBACK == "true"'
-
-# ── build:golden-n-avx512 (W4-A, EXTRA opt-in): die avx512-Erweiterung, N-Node-geroutet auf Tag "avx512" (§36.3;
-#    heute NUR prod1/Zen5 avx512-faehig, prod2/RaptorLake fused-off). GN_MSYS default -> 1 SIMD x 1 msys x 2 opt x 4 chunk = 8 Zellen/Jobs.
-#    DEPRECATED (W10-B, §42): Teil der statischen Pilot-Matrix (s. build:golden-n) -> DREIFACH gegatet, Default AUS.
-#    Laeuft NUR, wenn COMDARE_BUILD_GOLDEN_N=="true" UND COMDARE_STATIC_MATRIX_FALLBACK=="true" UND
-#    COMDARE_GN_INCLUDE_AVX512=="true". avx512 gehoert NICHT zum §33-golden-Kernsatz -> bewusst separater Job.
-build:golden-n-avx512:
-  extends: .golden_n_build
-  parallel:
-    matrix:
-      - GN_SIMD: ["avx512"]
-        GN_RUNNER_TAG: ["avx512f"]     # §36.3 + A3 (Weg a): Tag = REALES march-Flag -mavx512f (=> "avx512f", NICHT "avx512"); NUR avx512-faehige Nodes (heute prod1/Zen5); INFRA: Tag 'avx512f' setzen
-        GN_MSYS: ["default"]
-        GN_OPT: ["O2", "O3"]
-        GN_CHUNK: ["0", "1", "2", "3"]
-  rules:
-    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
-      when: never
-    # DEPRECATED-Fallback (s. build:golden-n): nur mit explizitem COMDARE_STATIC_MATRIX_FALLBACK + avx512-Opt-in.
-    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_STATIC_MATRIX_FALLBACK == "true" && $COMDARE_GN_INCLUDE_AVX512 == "true"'
+# ── DEPRECATED statische Perm-Matrix (build:golden-n / build:golden-n-avx512 + .golden_n_build-Geruest) ──
+#    ARCHIVIERT (Owner RF-4, Handout-1 §2, 2026-07-27): "Bitte ins Archiv. Aber sortiere sie aus dem Sichtfeld
+#    fuer Ordnung." Voller Inhalt VERBATIM erhalten in ci/archive/perm-matrix-fallback.yml (NICHT im super-CI
+#    `include:` -> von GitLab NIE geparst/instanziiert = inert). Abgeloest durch den dynamischen CE-gesteuerten
+#    Pfad (planer:delegate -> ceb:emit -> tier, W10-B/§42). Reaktivierung: Inhalt zurueck hierher +
+#    COMDARE_STATIC_MATRIX_FALLBACK opt-in; die genutzten Anker (.storage_cache_activation /
+#    .measurement_preflight_no_foreign_driver) leben weiter oben in dieser Datei.
 
 # ── Stage persist (#22, User 2026-07-11, Ledger §0-DoD-6/§11-G): die Auswertungs-Dokumente EINES Laufs additiv
 #    nach measurement/<YYYYMMDD-HHMMSS-p{pipeline}>/ im super-Root sammeln + per commit+MERGE+push nach
@@ -1088,7 +768,7 @@ build:golden-n-avx512:
 #    development-Branch gesetzt ist; laeuft er, pusht er NUR wenn zusaetzlich das Write-Credential
 #    (COMDARE_WRITEBACK_USER/COMDARE_WRITEBACK_TOKEN, Infra separat = Project-Access-Token write_repository,
 #    masked+protected) gesetzt ist. Kein Submodul-Klon (PDF/Manifest/Prebackup via needs-artifacts) → before_script:[]
-#    + GIT_SUBMODULE_STRATEGY:none ueberspringt den REV-17-default:before_script. Loop-Schutz DREIFACH: push -o
+#    + GIT_SUBMODULE_STRATEGY:none ist submodul-frei (REV 16 path a: kein default:before_script mehr). Loop-Schutz DREIFACH: push -o
 #    ci.skip (primaer) + [skip ci] in der Commit-Message (backup) + rules _bot_->never (Netz). Rueckschreiben per
 #    MERGE (User-Direktive 11.07.: „durch merge, kein rebase"); measurement/<RUN_TS>/ ist disjunkt → konfliktfrei.
 persist:measurements:
@@ -1229,7 +909,7 @@ planer:delegate:
   stage: planer
   tags: [baremetal]
   variables:
-    GIT_SUBMODULE_STRATEGY: none    # REV-17-default:before_script klont die Submodule mit Deploy-Token (wie .golden_n_build)
+    GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/golden-Profil)
     COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
   needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher (Job kann bei docs-Wellen fehlen)
   rules:
