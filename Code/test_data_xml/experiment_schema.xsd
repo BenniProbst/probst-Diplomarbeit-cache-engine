@@ -236,6 +236,17 @@
           <!-- KERN #48-S4 (Section 59-C/D): per-Achse Pruefling-Wahl (engine-id / lebewesen-id / self-Marker).
                Optional; leer = Fallback auf die Phasen-Identitaet. -->
           <xs:attribute name="pruefling"        type="xs:string" use="optional"/>
+          <!-- A9b (P6, 2026-07-26): EXPLIZITE Abwahl statt Abwahl-durch-Abwesenheit. Die Registry ist ein ANGEBOT
+               (§27); eine Achse wird hier ausdruecklich an- bzw. abgewaehlt, statt still zu fehlen. Das
+               unterscheidet "nicht genannt" (= volle Registry-Liste, unveraendert) von "genannt und
+               abgewaehlt". ABWESEND == "true", damit alle Bestands-Profile unveraendert gueltig bleiben.
+               Das Attribut ist heute DEKLARATIV: der Parser LIEST es, der Resolver TRAEGT es (validate_profile,
+               Ueberladung resolve_axis_refs_against_trio), aber NIEMAND wertet es aus. Grund: ein wirksames
+               active="false" entfernte einen Baustein aus der Katalog-Kardinalitaet und verschoebe damit den
+               golden-CRC; der auswertende Verbraucher (declared_count) gehoert in das Lane-F-Byte-Fenster.
+               Kein Default-Wert in der XSD (die Datei fuehrt bewusst keine Schema-Defaults; die
+               Abwesenheits-Semantik steht im Code). Lexikalisch gelten die xs:boolean-Werte true/false/1/0. -->
+          <xs:attribute name="active"           type="xs:boolean" use="optional"/>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
