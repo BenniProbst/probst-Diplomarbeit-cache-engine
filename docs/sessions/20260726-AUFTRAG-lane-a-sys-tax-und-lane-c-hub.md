@@ -1,5 +1,32 @@
 # AUFTRAG: Lane A (SYS-TAX) + Lane C (external_utils-HUB) -- EINE koordinierte Welle (26.07.2026)
 
+> ================================================================================
+> ## !!! SUPERSEDED 26.07. abends -- NICHT als Bauauftrag verwenden !!!
+> ================================================================================
+> Dieses Dokument entstand in der Opus-Phase und traegt DREI bestaetigte Fehler + 5 vom
+> adversarialen Vorlauf gefundene Blocker. Es bleibt als Historie stehen (Doku-nie-loeschen).
+> Der GUELTIGE Bauauftrag ist der konsolidierte Bauplan-v2 (ultracode wf_4d2b7439, adversarial
+> geprueft: PLAN NICHT BAUFAEHIG bis die 5 Blocker geheilt sind -> Heil-Runde laeuft).
+>
+> DIE DREI OPUS-FEHLER in diesem Doc (nicht befolgen):
+> 1. Abschnitt 1.3 "System-HAUPT-Achsen sind VIER: ... load_framework" ist FALSCH.
+>    load_framework ist eine META-META (erste Meta-Meta unter external_utils), KEINE 4. Haupt-Achse.
+>    Die Komplex-Achse hat die Glieder target_isa x operating_system x external_utils x Meta-Metas;
+>    load_framework sitzt IM Meta-Meta-Satz von external_utils.
+> 2. Abschnitt 1.7 reduziert NUMA/page auf reine "runtime-Unter-Achsen, binary_id=never". FALSCH:
+>    Owner-Dual-Natur-KERN = RT-Unter unter ISA an der CEB UND CT-Haupt am Tier (stufen-relativ).
+> 3. Paket A6 vergisst AVX512. Richtig: 4 opt x 3 simd (no_extension/avx2/avx512) = 12 System-Perms,
+>    Ausschluss maschinenseitig per Freigabe + WARNUNG (nicht stiller Profil-Filter).
+>
+> DIE 5 ADVERSARIALEN BLOCKER (in Bauplan-v2 zu heilen, Reihenfolge): B-2 Sperrmatrix auf veraltetem
+> Baum (2 "NEU"-Dateien existieren schon = A1) -> B-3 5-vs-4-Haupt-Achsen widerspricht dem A1-Header ->
+> B-1 Freigabe-Pilot NICHT durchgehend inert (C-3a byte-Neutralitaet neu belegen) -> B-4 NUMA/page ohne
+> XSD-/Parser-Schritt (Angebot unerreichbar) -> B-5 page_topology kollidiert mit existierender Achse
+> page_type (Namensfalle). Erst nach Heilung: Bau.
+> ================================================================================
+
+
+
 > AUTORITAET: Owner-KERN > dieses Dokument > Bauplaene > Ist-Code. Grundlage: Verortungs-Brief
 > (ultracode wf_8d5b32a5-c0e), Rueckfragen-Aufloesung A-F (wf_bb5d71e9-fdb), new-golden-Suche
 > (wf_2330dddf-1c2), Frage-6-Aufloesung (wf_3ed15f5c-7d7), Matrix/NUMA-Plan (wf_dc503d77-596).
