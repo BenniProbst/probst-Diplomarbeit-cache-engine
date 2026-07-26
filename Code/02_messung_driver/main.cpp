@@ -515,10 +515,13 @@ int main(int argc, char* argv[]) {
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
             namespace pf = comdare::cache_engine::builder::profile_facade;
             // G4b-2/E1: eine der beiden Strecken, die real in einen CEB-Compile muenden -> planer_block haengt hier.
-            auto const gate = make_planer_block_gate();
-            if (gate.abbruch) return 6;
-            int const rc = guarded_emission("--dump-ci",
-                                            [&]() { return pf::dump_experiment_ci_facade(prof, std::cout, gate.ctx); });
+            // Gate-Erzeugung IM Mantel: make_planer_block_gate() macht Bestandslog-IO und kann werfen -- nur im
+            // Mantel ist das Unwinding (PromiseGuard) garantiert; exit 6 bleibt dem Gate-Abbruch vorbehalten.
+            int const rc = guarded_emission("--dump-ci", [&]() -> int {
+                auto const gate = make_planer_block_gate();
+                if (gate.abbruch) return 6;
+                return pf::dump_experiment_ci_facade(prof, std::cout, gate.ctx);
+            });
             return rc; // 2.4-(2): LOKALE Variable, kein return-im-Ausdruck
         }
         // --dump-cmake [<profil>] (PAKET W7-B, 2026-07-19, §40.c): rein-lesende Emission des scharfen
@@ -531,10 +534,12 @@ int main(int argc, char* argv[]) {
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
             namespace pf = comdare::cache_engine::builder::profile_facade;
             // G4b-2/E1: die zweite CEB-Compile-Strecke -- derselbe planer_block wie bei --dump-ci.
-            auto const gate = make_planer_block_gate();
-            if (gate.abbruch) return 6;
-            int const rc = guarded_emission(
-                "--dump-cmake", [&]() { return pf::dump_experiment_cmake_facade(prof, std::cout, gate.ctx); });
+            // Gate-Erzeugung IM Mantel (siehe --dump-ci): werfende Bestandslog-IO nur mit garantiertem Unwinding.
+            int const rc = guarded_emission("--dump-cmake", [&]() -> int {
+                auto const gate = make_planer_block_gate();
+                if (gate.abbruch) return 6;
+                return pf::dump_experiment_cmake_facade(prof, std::cout, gate.ctx);
+            });
             return rc; // 2.4-(2): LOKALE Variable
         }
         // --emit-tier-ci [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): die CEB-ROLLEN-Emission (Stufe 2). Wie
