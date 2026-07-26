@@ -15,4 +15,4 @@
 	update = merge
 [submodule "Code/external/20260931-overleaf-diplomarbeit"]
 	path = Code/external/20260931-overleaf-diplomarbeit
-	url = https://gitlab.comdare.local/comdare/research/20260931-overleaf-diplomarbeit.git
+	url = ../20260931-overleaf-diplomarbeit.git
