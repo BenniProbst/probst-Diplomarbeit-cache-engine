@@ -289,6 +289,98 @@ struct MessreihenSpec {
     return static_cast<std::size_t>(value);
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// G4b-2 (d2) / #46b I1b: das GATE des planer_block fuer die beiden CEB-Compile-Strecken (--dump-ci/--dump-cmake).
+//
+// Der planer_block meldet dem Lager, dass DIESER Planer gleich eine CEB-Compile-Strecke anstoesst, damit ein
+// zweiter Planer auf einer anderen Maschine dieselbe Strecke nicht doppelt reserviert. Ausgefuehrt wird der
+// Lebenszyklus in der Fassaden-TU (profile_run_facade.cpp) -- hier entsteht nur der Kontext, denn der gelockte
+// Schreibweg zieht ueber bestandslog_document.hpp den ce-XML-DOM, und libs/common liegt nicht im Include-Satz
+// dieses Targets. Derselbe Schnitt wie bei bestand_cache in (d1).
+//
+// GATE-FORMEL identisch zu (d1): COMDARE_BESTANDSLOG=="true" UND minio_enabled() UND die drei Pflicht-Variablen.
+// minio_enabled() und NICHT !inert(), weil die vier Objekt-Verben ausnahmslos auf Ebene B gaten
+// (artifact_cache.hpp:487/507/535) -- eine Nur-measure-drop-Konfiguration wuerde sonst einen toten Transport binden.
+// Gate an + Pflicht-Var leer => harter Abbruch (der Aufrufer liefert exit 6). Gate an + kein minio => EINE
+// WARNUNG, kein Binden. Gate aus => vollstaendig stumm (Byte-Neutralitaet des Vor-Zustands).
+//
+// BUDGET (2.4-(5)): der Emissions-Cache ist knapp budgetiert -- with_object_budget(1, 10), also EIN Versuch mit
+// 10 s Deckel statt der 12 Versuche des Defaults. Ein unerreichbarer Store darf eine CI-Emission nicht minutenlang
+// aufhalten; die Buchhaltung ist nachrangig gegenueber der Emission.
+//
+// id (E2): owner_uuid + "/planer" -- EINE Sperre je Lauf, nicht je Sequenz. Die Eindeutigkeit tragt der
+// lauf-eindeutige owner, nicht ein Zaehler; ein neuer Lauf hat einen neuen owner und damit eine neue id, weshalb
+// die Merge-Monotonie kein Re-Open braucht. owner_uuid bleibt ein EIGENES Feld neben der id.
+struct PlanerBlockGate {
+    comdare::cache_engine::builder::profile_facade::PlanerBlockContext ctx;             // leer = inert
+    bool                                                               abbruch = false; // true => exit 6
+};
+
+[[nodiscard]] PlanerBlockGate make_planer_block_gate() {
+    namespace atp = comdare::cache_engine::builder::artifact_transport;
+    namespace pf  = comdare::cache_engine::builder::profile_facade;
+
+    PlanerBlockGate g;
+    if (env_trimmed("COMDARE_BESTANDSLOG") != "true") return g; // stumm inert
+
+    // Der Emissions-Cache ist eine EIGENE, benannte Instanz (Praezedenz main.cpp:784) -- die E4-Block-Instanz
+    // entsteht erst viel spaeter, und die Emissionszweige returnen lange davor.
+    auto const emit_ac = std::make_shared<atp::ArtifactCache const>(atp::ArtifactCache::from_env().with_object_budget(
+        /*tries=*/1, /*timeout_s=*/10));
+    if (!emit_ac->minio_enabled()) {
+        std::cerr << "[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt: COMDARE_BESTANDSLOG=true, aber Ebene B "
+                  << "(minio) ist nicht konfiguriert (measure-drop=" << (emit_ac->drop_enabled() ? "1" : "0")
+                  << ") -- planer_block bleibt AUS, Emission unveraendert.\n";
+        return g;
+    }
+
+    std::string const doc_key      = env_trimmed("COMDARE_BESTANDSLOG_DOC_KEY");
+    std::string const owner_uuid   = env_trimmed("COMDARE_BESTANDSLOG_OWNER_UUID");
+    std::string const maschine     = env_trimmed("COMDARE_BESTANDSLOG_MASCHINE");
+    char const*       fehlende_var = nullptr;
+    if (doc_key.empty())
+        fehlende_var = "COMDARE_BESTANDSLOG_DOC_KEY";
+    else if (owner_uuid.empty())
+        fehlende_var = "COMDARE_BESTANDSLOG_OWNER_UUID";
+    else if (maschine.empty())
+        fehlende_var = "COMDARE_BESTANDSLOG_MASCHINE";
+    if (fehlende_var != nullptr) {
+        std::cerr << "[bestandslog] FEHLER fehlerklasse=konfiguration_unvollstaendig: "
+                  << "COMDARE_BESTANDSLOG=true, aber " << fehlende_var << " ist leer -- Abbruch.\n";
+        g.abbruch = true;
+        return g;
+    }
+
+    g.ctx.cache      = emit_ac;
+    g.ctx.doc_key    = doc_key;
+    g.ctx.id         = owner_uuid + "/planer"; // E2: EINE Sperre je Lauf
+    g.ctx.owner_uuid = owner_uuid;
+    g.ctx.maschine   = maschine;
+    // Thread-Budget nur, wenn es ueberhaupt erklaert ist (0 = nicht gemeldet, keine erfundene Zahl).
+    if (auto const bp = parse_size_env_strict("COMDARE_BUILD_PARALLEL")) g.ctx.threads = static_cast<unsigned>(*bp);
+    std::cerr << "[bestandslog] planer_block aktiv: doc_key=" << g.ctx.doc_key << " id=" << g.ctx.id
+              << " maschine=" << g.ctx.maschine << "\n";
+    return g;
+}
+
+// G4b-2/2.4-(3): EIN Ausnahme-Mantel fuer ALLE VIER Emissionszweige. Sie lagen bisher in keinem try (die einzigen
+// im File sind der --validate- und der E4-Block) -- eine Ausnahme aus main haette std::terminate OHNE Unwinding
+// ausgeloest, der PromiseGuard des planer_block waere nie gefeuert und die Reservierung 30 Minuten haengen
+// geblieben. Rueckgabe 1, NICHT 6: exit 6 bleibt exklusiv fuer fehlerklasse=konfiguration_unvollstaendig.
+template <typename Thunk>
+[[nodiscard]] int guarded_emission(char const* was, Thunk&& thunk) {
+    try {
+        return thunk();
+    } catch (std::exception const& e) {
+        std::cerr << "[bestandslog] FEHLER fehlerklasse=emission_abgebrochen: " << was << " -- " << e.what() << "\n";
+        return 1;
+    } catch (...) {
+        std::cerr << "[bestandslog] FEHLER fehlerklasse=emission_abgebrochen: " << was << " -- unbekannte Ausnahme\n";
+        return 1;
+    }
+}
+// ---------------------------------------------------------------------------------------------------------------
+
 // INC-G6 (Ledger 33/34, 2026-07-19): das golden-N Chunk-Fenster. COMDARE_GOLDEN_N_RANGE="start:count" ->
 // {start, count}. Leer/ungesetzt = nullopt (kein Fenster, Ist-Verhalten). Fail-loud bei Fehlform (ein Tippfehler
 // wuerde sonst still den ganzen 2^17-Bau statt eines Chunks starten) -- der Abbruch landet im try/catch des
@@ -422,7 +514,12 @@ int main(int argc, char* argv[]) {
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
             namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::dump_experiment_ci_facade(prof, std::cout);
+            // G4b-2/E1: eine der beiden Strecken, die real in einen CEB-Compile muenden -> planer_block haengt hier.
+            auto const gate = make_planer_block_gate();
+            if (gate.abbruch) return 6;
+            int const rc = guarded_emission("--dump-ci",
+                                            [&]() { return pf::dump_experiment_ci_facade(prof, std::cout, gate.ctx); });
+            return rc; // 2.4-(2): LOKALE Variable, kein return-im-Ausdruck
         }
         // --dump-cmake [<profil>] (PAKET W7-B, 2026-07-19, §40.c): rein-lesende Emission des scharfen
         // experiment_plan.cmake (CMakeGraphBuilder am SELBEN Director-Walk). Der Bare-Metal-Bauplan: echte
@@ -433,7 +530,12 @@ int main(int argc, char* argv[]) {
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
             namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::dump_experiment_cmake_facade(prof, std::cout);
+            // G4b-2/E1: die zweite CEB-Compile-Strecke -- derselbe planer_block wie bei --dump-ci.
+            auto const gate = make_planer_block_gate();
+            if (gate.abbruch) return 6;
+            int const rc = guarded_emission(
+                "--dump-cmake", [&]() { return pf::dump_experiment_cmake_facade(prof, std::cout, gate.ctx); });
+            return rc; // 2.4-(2): LOKALE Variable
         }
         // --emit-tier-ci [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): die CEB-ROLLEN-Emission (Stufe 2). Wie
         // --dump-ci, aber emittiert NUR die Stufe-2-Sicht des freigegebenen CEB-Raums (System-Perms + Tier-Chunk-
@@ -453,7 +555,12 @@ int main(int argc, char* argv[]) {
                 if (std::string const a{argv[j]}; a.rfind("--measurement-combo=", 0) == 0) combo_sel = a.substr(20);
             }
             namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::emit_tier_ci_facade(prof, std::cout, combo_sel);
+            // G4b-2/E1: KEIN planer_block -- --emit-tier-* ist die CEB-Rolle (Tier-Jobs), nicht die
+            // CEB-Compile-Strecke; die Tier-Ebene hat ihre eigene Reservierung im Iterator. Der Ausnahme-Mantel
+            // gilt trotzdem (2.4-(3) verlangt ihn fuer ALLE vier Zweige).
+            int const rc = guarded_emission("--emit-tier-ci",
+                                            [&]() { return pf::emit_tier_ci_facade(prof, std::cout, combo_sel); });
+            return rc; // 2.4-(2): LOKALE Variable
         }
         // --emit-tier-cmake [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): der Bare-Metal-Gegenpart zu
         // --emit-tier-ci (Stufe 2, CEB-Rolle). Emittiert das tier_plan.cmake (reale provision-only-Tier-Chunk-
@@ -471,7 +578,10 @@ int main(int argc, char* argv[]) {
                 if (std::string const a{argv[j]}; a.rfind("--measurement-combo=", 0) == 0) combo_sel = a.substr(20);
             }
             namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::emit_tier_cmake_facade(prof, std::cout, combo_sel);
+            // G4b-2/E1: wie --emit-tier-ci -- kein planer_block, aber der Ausnahme-Mantel (2.4-(3)).
+            int const rc = guarded_emission("--emit-tier-cmake",
+                                            [&]() { return pf::emit_tier_cmake_facade(prof, std::cout, combo_sel); });
+            return rc; // 2.4-(2): LOKALE Variable
         }
     }
 
