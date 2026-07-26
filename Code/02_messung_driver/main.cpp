@@ -50,6 +50,11 @@
 #ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
 #include <profile_facade/profile_run_facade.hpp>
 #include <builder/artifact_transport/artifact_cache.hpp> // Storage #51: ArtifactCache::from_env (No-Op-Default)
+// G4b-1 (d1): make_fingerprint_key_fn (.fingerprint-Sidecar). LEICHT -- zieht nur fingerprint_sidecar.hpp + stdlib.
+// Bewusst NICHT artifact_cache_transport.hpp: das zoege bestandslog_document.hpp und damit den ce-XML-DOM
+// (<serialization/xml_config_parser/xml_reader.hpp>) in diese TU, und libs/common liegt nicht im Include-Satz des
+// messung_driver-Targets. Den BestandTransport bindet deshalb die Fassaden-TU aus dem hier uebergebenen Cache.
+#include <builder/bestandslog/fingerprint_key_source.hpp>
 #endif
 
 // INC-G+H (C.2+C.3, 2026-07-14): INERT-Andock der execute_messreihe-Verdrahtung (v32_messreihe_antrieb.hpp).
@@ -875,6 +880,86 @@ int main(int argc, char* argv[]) {
                               << " part_size=" << chunk_part_size << " (W11 §43.c)\n";
                 }
 
+                // ---------------------------------------------------------------------------------------------------
+                // G4b-1 (d1) / #46b I1 -- BESTANDSLOG-HOST-VERDRAHTUNG mit HARTEM DOPPEL-GATE (AUF-B3/B4/B5/B6).
+                //
+                // Bis zu dieser Scheibe existierte die Host-Seite des Bestandslogs NICHT: bestandslog_active
+                // (cache_engine_builder_iterator.hpp:927-929) war in Produktion IMMER false, weil niemand die vier
+                // Traeger belegte. Hier werden sie belegt -- aber nur unter drei gleichzeitig erfuellten Bedingungen.
+                //
+                // WARUM DREI GATES UND NICHT NUR EINES: make_bestand_transport belegt alle vier Verben
+                // BEDINGUNGSLOS, auch auf einem inerten Cache, und bestandslog_active prueft nur, DASS sie belegt
+                // sind. Ohne Doppel-Gate haengt der Umschalt von provision_all auf run_planer_driven_provision
+                // (iterator:979-982) allein an einem nicht-leeren Doc-Key -- ein anderer BAU-TREIBER, ausgeloest
+                // durch eine gesetzte Umgebungsvariable. Das Gate gehoert deshalb hierher, an die Injektionsstelle.
+                //
+                // LEBENSDAUER (AUF-B5): make_bestand_transport haelt ArtifactCache CONST& (Kopf Z.20-24 von
+                // artifact_cache_transport.hpp). Weitergereicht wird deshalb DERSELBE shared_ptr von oben (:840),
+                // den auch cache_push/cache_pull kapseln -- die Fassaden-TU bindet den Transport daraus und benutzt
+                // ihn nur innerhalb des run_profile-Aufrufs. Ein Binden an eine temporaere from_env()-Instanz
+                // (vier dangling Lambdas) ist so strukturell ausgeschlossen. Warum die Fassade bindet und nicht
+                // dieser Host: artifact_cache_transport.hpp zieht den ce-XML-DOM nach, der im Include-Satz dieses
+                // Targets fehlt -- und profile_run_facade.hpp ist ausdruecklich die umbrella-FREIE POD-Signatur.
+                //
+                // LOG-KANAL (AUF-B6): ALLE [bestandslog]-Zeilen gehen auf cerr, NIE auf cout. cout ist im
+                // Emissions-Pfad der YAML-Kanal (profile_run_facade.cpp Umleitung ueber den Director) -- eine
+                // Fremdzeile dort ist ein GitLab config_error. Die [E4]-Zeile oben schreibt auf cout und verleitet
+                // dazu; hier wird bewusst abgewichen.
+                //
+                // FEHLERKLASSE konfiguration_unvollstaendig: Gate an (COMDARE_BESTANDSLOG=true) UND eine der drei
+                // Pflicht-Variablen leer => HARTER ABBRUCH mit exit_code 6, EINE Zeile mit stabilem Etikett. Der
+                // Halb-Zustand (Log an, aber anonym oder ohne Ziel-Dokument) ist der teuerste denkbare: er
+                // produziert zwei Tage lang unbrauchbare Zeilen, und den Lauf wiederholt man nicht. Gate AUS =>
+                // stumm inert, keine einzige Zeile (Byte-Neutralitaet des Vor-Zustands).
+                // ---------------------------------------------------------------------------------------------------
+                namespace bl = comdare::cache_engine::builder::bestandslog;
+                std::shared_ptr<at::ArtifactCache const>                                bestand_cache;
+                std::function<std::optional<std::string>(std::filesystem::path const&)> bestand_key_of;
+                std::string                                                             bestand_doc_key;
+                std::string                                                             bestand_owner_uuid;
+                std::string                                                             bestand_maschine;
+                if (env_trimmed("COMDARE_BESTANDSLOG") == "true") {
+                    std::string const doc_key    = env_trimmed("COMDARE_BESTANDSLOG_DOC_KEY");
+                    std::string const owner_uuid = env_trimmed("COMDARE_BESTANDSLOG_OWNER_UUID");
+                    std::string const maschine   = env_trimmed("COMDARE_BESTANDSLOG_MASCHINE");
+                    // Fail-loud VOR der inert-Pruefung: eine unvollstaendige Konfiguration ist unabhaengig davon
+                    // falsch, ob auf DIESER Maschine gerade ein Objekt-Store konfiguriert ist. Erste fehlende
+                    // Variable in fester Reihenfolge -> genau EINE Zeile, deterministisch.
+                    char const* fehlende_var = nullptr;
+                    if (doc_key.empty())
+                        fehlende_var = "COMDARE_BESTANDSLOG_DOC_KEY";
+                    else if (owner_uuid.empty())
+                        fehlende_var = "COMDARE_BESTANDSLOG_OWNER_UUID";
+                    else if (maschine.empty())
+                        fehlende_var = "COMDARE_BESTANDSLOG_MASCHINE";
+                    if (fehlende_var != nullptr) {
+                        std::cerr << "[bestandslog] FEHLER fehlerklasse=konfiguration_unvollstaendig: "
+                                  << "COMDARE_BESTANDSLOG=true, aber " << fehlende_var << " ist leer -- Abbruch.\n";
+                        return 6;
+                    }
+                    if (artifact_cache->inert()) {
+                        // Gate an, aber kein Objekt-Store: alle vier Transport-Verben waeren tot (object_fetch/
+                        // object_store/object_remove pruefen minio_enabled, artifact_cache.hpp:487/507/535). Nicht
+                        // binden -- sonst waere bestandslog_active true, der Bau schaltete auf den Planer-Treiber
+                        // und das Lager blieb dauerhaft leer. Kein Abbruch (die Konfiguration ist vollstaendig, nur
+                        // die Ebene fehlt), aber auch nicht stumm: eine gesetzte Absicht, die wirkungslos bleibt,
+                        // muss sichtbar sein.
+                        std::cerr << "[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt: COMDARE_BESTANDSLOG=true, "
+                                  << "aber der ArtifactCache ist inert (kein minio/measure-drop) -- Bestandslog "
+                                  << "bleibt AUS, Bau unveraendert.\n";
+                    } else {
+                        bestand_cache      = artifact_cache; // derselbe Zeiger wie cache_push/cache_pull (AUF-B5)
+                        bestand_key_of     = bl::make_fingerprint_key_fn();
+                        bestand_doc_key    = doc_key;
+                        bestand_owner_uuid = owner_uuid;
+                        bestand_maschine   = maschine;
+                        std::cerr << "[bestandslog] aktiv: doc_key=" << bestand_doc_key
+                                  << " maschine=" << bestand_maschine
+                                  << " minio=" << (artifact_cache->minio_enabled() ? "1" : "0")
+                                  << " key_of=.fingerprint-Sidecar (#46b I1/I2)\n";
+                    }
+                }
+
                 // Welle 5 (E-W5-2, §38-Fortschritts-Rueck-Kanal, 2026-07-20): der EINE konkrete Progress-Konsument des
                 // Treibers. run_profile/run_experiment feuern je bereitgestellte/gemessene Binary GENAU EIN ProgressDelta
                 // (fenster-relativer Perm-Cursor + mixed-radix-Achsen-Delta) und am Fensterende GENAU EIN done=true.
@@ -1053,9 +1138,17 @@ int main(int argc, char* argv[]) {
                         std::cout << "[E4] W6 Bau-Pool: COMDARE_BUILD_PARALLEL=" << *bp
                                   << " parallele Compile-Worker (Messen bleibt 1-Thread)\n";
                     }
-                    pa.cache_push          = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
-                    pa.cache_pull          = cache_pull;       // S2 (#46a): BATCH-Warm-Cache-Hydrierung (No-Op-Default)
-                    pa.measurement_sink    = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.cache_push       = cache_push;       // Storage #51 (No-Op-Default => byte-neutral)
+                    pa.cache_pull       = cache_pull;       // S2 (#46a): BATCH-Warm-Cache-Hydrierung (No-Op-Default)
+                    pa.measurement_sink = measurement_sink; // Storage #51 (No-Op-Default => byte-neutral)
+                    // G4b-1 (d1): die fuenf Bestandslog-Traeger. Bereits GEGATET (Doppel-Gate oben) -- ist das Gate
+                    // aus, sind alle fuenf leer und bestandslog_active bleibt false => byte-neutral. NUR pa: der
+                    // xa-Pfad (:962-964, comdare_experiment) bleibt in dieser Scheibe INERT (AUF-B2).
+                    pa.bestand_cache       = bestand_cache;
+                    pa.bestand_key_of      = bestand_key_of;
+                    pa.bestand_doc_key     = bestand_doc_key;
+                    pa.bestand_owner_uuid  = bestand_owner_uuid;
+                    pa.bestand_maschine    = bestand_maschine;
                     pa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
                     pa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
                     pa.progress_sink =
