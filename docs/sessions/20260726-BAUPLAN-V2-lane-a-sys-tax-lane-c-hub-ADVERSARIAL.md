@@ -253,3 +253,60 @@ Code-Blocker; die 2 Plan-Blocker (O-1-KERN-Widerspruch, C-3a-Widerspruch) sind m
 Selbstcheck: grep -P '[^\x00-\x7F]' auf dieses Delta = 0 Treffer; alle datei:zeile aus Live-Lesung an
 abef03cee33cc27beb38433e2e9997ed1dffdcc0 (untracked P0-Dateien: Working Tree, D2.11); keine Haken-Marken;
 0 Dateien geschrieben; 100 Zeilen.
+
+---
+
+# TEIL III: OD-GO-STAND + V4-KORREKTUR load_framework=MESS-REALM (26.07. ~18:45; Owner-Quelle: docs/sessions/20260726-SESSION-od-antworten-load-framework-mess-realm-target-isa-komplex.md; Ledger §69)
+
+> STATUS: ALLE OD-1..OD-10 ENTSCHIEDEN. Bei Widerspruch gilt TEIL III > TEIL II > TEIL I.
+> Der Plan bleibt BAUFAEHIG; TEIL III aendert ZIELE, nicht die Paket-Mechanik.
+
+## E1. GO-Register (bindend)
+- OD-6 VOLLES GO: byte-neutrale Pakete DUERFEN BAUEN - P0 (gelandet ce a3644cb8) -> parallel
+  Lane C C-1/C-2(additiv)/C-5/C-3b; P5 A7'+A9a seriell; P6. Byte-Fenster (A2/A3+C-3c/A8.2-3/
+  Lane F/Golden-Strings) weiter GESPERRT bis O-8-Fenster-GO.
+- OD-4 VOLLES GO: C-3b-Kanal-Merge-Paket exakt nach D2.2. C-3a bleibt Folge-Paket (D2.3),
+  gegatet auf C-3b-Beleg + O-4.
+- OD-1 RATIFIZIERT: golden-NEUTRAL; binary_id+Stempel-PRINZIP unveraendert (Tier fuehrt
+  System-Achsen, Organ-Achsen, je-Achsen-Algo-Versionen, CT-SHA512-Fingerprint); nur die
+  Achsen-Mitglieder je Achsen-Typ aendern sich. OD-5 GO (Stufen-Lesart), OD-8 GO, OD-9 GO
+  (Bauplan-v3 deckt Alt-"V3 direkt mit rein" ab; ultracode-Auseinanderhaltung laeuft),
+  OD-10 FREIGABE (NUMA/page VOR Trigger).
+- META (69.7): die Bauplan-Gates O-1r/O-2/O-3/O-4/O-5/O-6/O-9 sind laut Owner BEREITS
+  ENTSCHIEDEN und werden per Explore-Straengen aus den Quellen belegt+gegengelesen
+  (ultracode laeuft) - NICHT neu gefragt.
+
+## E2. V4-KORREKTUR (Ziel-Aenderungen gegen TEIL II; Detail-Kartierung via ultracode)
+- K1 load_framework (R-G, Ledger §69.1): D2.5 bleibt mechanisch (RAUS aus kSystemAxisOrder/
+  kSystemAxisCodeVersions, kCount 5->3, Registry-Top-Level :114 raus, Stempel -3/+2, Generator,
+  Suffix) - aber das UMZUGS-ZIEL ist der MESS-REALM (Planer-Meta-Meta-Haupt-Achse; Planer
+  generiert Loads, delegiert ans CEB-Interface), NICHT der external_utils-Hub.
+- K2 C-1-Zuschnitt (Lane C): hardware_meta_meta_axis.hpp traegt NUR System-Meta-Metas
+  (SIMD/AVX, externe HW, GPU/FPGA/NPU-Familien). load_framework wird NICHT als Hub-Instanz
+  eingebaut. Die D2.5-Abhaengigkeit "A3 -> C-1 (Hub-Typ fuer die XML-Einhaengung von
+  load_framework)" ENTFAELLT VORAUSSICHTLICH - die load_framework-Einhaengung geht in die
+  Mess-/Planer-Registry (Kartierung bestaetigt den Ort; nicht raten).
+- K3 load_framework-Versions-Traeger (D2.5-Schlusssatz): "migriert in den Meta-Meta-Stempel-
+  Traeger" wird zu "migriert in den MESS-Stempel-Bereich" - der exakte Ort (Mess-Zeile [b]?
+  CSV-Legende? Planer-Version?) ist Teil der V4-Kartierung; Stempel-PRINZIP per OD-1 fix.
+- K4 target_isa-Komplex (Ledger §69.2): target_isa = Komplex-Achse IN SICH mit festen
+  Gliedern RAM-Frequenz + CAS + CPU-Fabrikation (statisch, Command-Pattern rekursiv eine
+  Ebene tiefer); die Unter-System-Achsen (scheduling, numa_node, page) haengen am
+  target_isa-Komplex-Wrapper. Betrifft A3 (Wrapper-Typ), A4/A5 (Eltern-Anker unveraendert
+  "target_isa"), Stempel-Identitaets-Zeile (Kartierung).
+- K5 telemetry (Ledger §69.3): ZWEIGETEILT (Mess-RT-Unter im Tooling + System-CT-Haupt,
+  pmc-Einbau); die Bauplan-B3-Empfehlung "telemetry bleibt in diesem Fenster System-Level
+  gefuehrt" ist damit OWNER-GEDECKT als Dauerzustand (Dual-Natur), nicht nur als Interim.
+- K6 OD-7 Runner (Ledger §69.6): heavy concurrency=1 (prod1 24 Worker, prod2 alle Threads),
+  normal beide concurrency=2 x 12 Threads -> Infra-HANDOUT-Kanal (§69.5), kein Bau-Paket.
+
+## E3. NAECHSTE SCHRITTE (nach diesem Nachtrag)
+1. ultracode: (a) Explore-Gegenlese der bereits getroffenen Gate-Entscheide (69.7);
+   (b) OD-9-Auseinanderhaltung; (c) V4-Kartierung K1-K5 (alle datei:zeile-Anker live).
+2. V4-Kartierungs-Ergebnis als TEIL IV bzw. praezisierte Paket-Texte anhaengen; erst dann
+   startet der A3-/Lane-C-Bau mit korrigiertem Zuschnitt (C-1 ohne load_framework SOFORT
+   baubar, da rein additiv-neutral).
+3. Infra-Handout OD-7 ins Cluster-git.
+
+Selbstcheck TEIL III: ASCII bis auf Paragraph-Zeichen; rein additiv; Owner-Wortlaute im
+Session-Doc verbatim gesichert; keine geratenen Orte (K3/K2 explizit als Kartierungs-Punkte).
