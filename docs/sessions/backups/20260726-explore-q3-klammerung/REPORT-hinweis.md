@@ -18,14 +18,36 @@ Plaintext-Sicherung. KERN-ERGEBNISSE:
    Owner-Q-A-Antwort AUFGELOEST: "Die Klammerung der Unter-Achsen zu ihrer Haupt-Achse
    ist in den Binaries NICHT praesent, nur als Meta-Info in den xlsx" -> §58-strenge Lesart.
 
-KONSOLIDIERTE STEMPEL-END-FORM (Lane A-II, ersetzt die S2-Woertlichkeit):
-- Binary-Stempel je Achsen-Typ, Array-Form, NUR die in DIESER Binary CT-einkompilierten
-  (Haupt-)Achsen mit gewaehltem Algo + X.Y.Z (stufen-relativ: was hier CT ist, ist hier Haupt;
-  §58-Transkript: "alle statischen Achsen, die compile time in Tier-Binary landen, sind im
+KONSOLIDIERTE STEMPEL-END-FORM (Lane A-II) — KORRIGIERT 26.07. (Owner: "Die Stempel-End-Form
+ist falsch, weil im Plan und den memory direktiven immer die strikte Trennung der Achsen-Typen
+verlangt ist. Da fehlen klare Klammern"):
+
+DREI-STUFIGE KLAMMER-HIERARCHIE, die TYP-Klammern sind die OBERSTE, STRIKT GETRENNTE Struktur
+(§56 drei Gruppen; §57-S3 zwei Stempel-Ebenen; §66-N3 je Achse ihre eigene Klammer; Testat-
+Grammatik LEDGER:3308-3310 Klammer-Anzahl kodiert die Ebene):
+
+  Ebene 1  TYP-KLAMMER (immer aeusserste, nie verschmolzen):
+           CEB-Stempel   = [a,b,c]-Klammer (Mess-Typ)
+           Tier-Stempel  = [d,e,f]-Klammer (System-Typ) GETRENNT VON [g,h,i]-Klammer (Organ-Typ)
+                           = zwei separate Zeilen/Arrays (§58)
+           Mess-CSV      = [a,b,c][d,e,f][g,h,i] (alle drei, einzige Voll-Form)
+  Ebene 2  KOMPLEX-KLAMMER (rekursiv, NUR INNERHALB ihrer Typ-Klammer): Klammern um die
+           Haupt-Achsen-Klammern, die sie wrappt; EIN gemeinsamer Stempel-Block mit
+           indirekter Identitaet. Beispiel System-Typ-Zeile:
+             [d,e,f] = [ complex[ [target_isa@X.Y.Z] [os@X.Y.Z]
+                                  [external_utils[ [avx512@X.Y.Z] [gpu@X.Y.Z] ... ]] ] ]
+           (external_utils klammert seine Meta-Meta-HAUPT-Achsen rekursiv; jede Haupt-Achse
+           behaelt IHRE eigene Klammer + Algo@Version.)
+  Ebene 3  HAUPT-ACHSEN-KLAMMER: je Haupt-Achse eigene Klammer mit gewaehltem Algorithmus +
+           eindeutiger X.Y.Z (Array-Form je Typ, §58; keine Gesamt-Version fuer CEB/Tier,
+           nur der Planner hat eine eigene).
+
+- Stempel-Inhalt stufen-relativ: NUR die in DIESER Binary CT-einkompilierten (Haupt-)Achsen
+  (§58-Transkript: "alle statischen Achsen, die compile time in Tier-Binary landen, sind im
   Stempel zu deklarieren").
-- KOMPLEX-Klammer IM Stempel erlaubt und gefordert (Haupt-ueber-Haupt, rekursiv):
-  complex[target_isa@X.Y.Z, os@X.Y.Z, external_utils[metameta1@..., ...]] = EIN gemeinsamer
-  Stempel der Komplex-Achse (Q-A 26.07.).
 - RT-Unter-Achsen (scheduling, OS-Werte, opt_level/atomic128 auf ihrer RT-Stufe) NIE im
-  Binary-Stempel; voll-permutative Haupt[Unter]-Klammer NUR im Mess-CSV/xlsx (Name +
-  Spalten + Spalten-Sparregel + Info-Sheet-Meta).
+  Binary-Stempel; die Haupt[Unter]-Voll-Klammer (Xa[Unter-k,...]) NUR im Mess-CSV/xlsx
+  (Name + Spalten + Spalten-Sparregel + Info-Sheet-Meta).
+- NIE typ-uebergreifend klammern: die Komplex-Klammer darf nur Haupt-Achsen DESSELBEN
+  Achsen-Typs wrappen (Q-E "in derselben Kategorie"); [d,e,f] und [g,h,i] bleiben auch im
+  Tier-Stempel zwei getrennte Zeilen, [a,b,c] gehoert dem CEB.
