@@ -1,0 +1,71 @@
+ERHEBUNGSBERICHT OS-FLOTTE (Cluster-Repo /home/comdare/Projekte/Cluster, branch development, HEAD 44a263b, read-only; alle Pfade relativ zum Repo-Root, ausser anders angegeben)
+
+PRIMAERQUELLE: docs/sessions/2026-07-26-INFRA-runner-matrix-DONE.md (= Report zu Commit 8eb830b "Runner-Matrix DONE ... Windows 1/4 + 3 owner-gated", API-verifiziert 26.07. ~19:30-21:40Z)
+
+═══ (1) MASCHINEN / VMs / CONTAINER ═══
+
+Baremetal-Hosts (Wirte der Windows-VMs):
+- prod1 = 10.0.10.211, Ryzen 9 9950X3D 32T/16C, 60Gi RAM, gitlab-runner 18.9.0 — runner-matrix-DONE.md:18
+- prod2 = 10.0.10.212, i9-12900K 24T/16C, 62Gi RAM, 5 VMs, gitlab-runner 19.1.1 — runner-matrix-DONE.md:19
+
+Windows-Flotte (4 KVM-VMs, je 12vCPU/12G, QEMU-Agent):
+- id53 `prod1-win2022` (VM CD-WIN2022-P1, prod1 Partition p6) — 10.0.60.191, RDP+WinRM offen — runner-matrix-DONE.md:26,99; VM-Bau/Aktivierung: 2026-07-15-K104b-go-prod1-PROGRESS-win2022-win11-installed-activated.md:11 ("beide installiert + AKTIVIERT", win2022=ServerStandard permanent aktiviert)
+- id54 `prod2-win2022` (VM CD-WIN2022-P2; zugleich 4. AD-DC der comdare.de-Hybrid-Domaene) — 10.0.60.192 lt. 26.07.-Report (runner-matrix-DONE.md:30,101); 17.07. dokumentiert V30 .248 / V60 .100 (2026-07-17-K108-AJ-...-konsolidierung.md:11,31) — IP-Diskrepanz V60 .100 vs .192 NICHT AUFGELOEST (vermutlich V60-Renumber, UNGEPRUEFT)
+- id55 `prod1-win11` (VM CD-WIN11-P1, prod1 p7) — 10.0.60.193, nur RDP offen — runner-matrix-DONE.md:27,100; Win11 Pro permanent aktiviert (PROGRESS...15.md:11)
+- id19 `prod2-win11` — 10.0.60.194, RDP offen — runner-matrix-DONE.md:31
+- Randbestand: id18 alt-prod2-win2022 (stale), id52 laptop-benja-windows-repro (locked) — runner-matrix-DONE.md:35
+
+Linux-Baremetal-Runner: id16 `prod-baremetal-prod1` (Ubuntu, shell; Tags prod/baremetal/amd/amd64/avx2/avx512+12 subflags/x86_64), id17 `prod-baremetal-prod2` (Ubuntu, shell; Tags prod/baremetal/intel/amd64/avx2) — runner-matrix-DONE.md:25,29; Tag-Herkunft: 2026-07-19-IMPL-TO-INFRA-runner-capability-tags-cluster-parallel-build.md:33-35
+
+k8s: dev id1/10/11/12 `k8s-runner(-2/-3/-4)` (Talos, kubernetes-exec, run_untagged) + prod id15 `prod-k8s-talos-runner` — runner-matrix-DONE.md:28,33
+
+Exotic-Nodes (Bestandsliste): node5 = Mac mini Intel 8GB (Port 5), node6 = Mac mini ARM 8GB (Port 6), node7 = Pi5, node8 = VisionFive 2 RISC-V 8GB — docs/00_README.txt:24-27; IPs node5=10.0.10.205/10.0.60.205, node6=10.0.10.206/10.0.60.206 — docs/sessions/20260204-00-00-002818-ip-allokationsplan-vollstaendig.md:289-290
+
+═══ (2) STATUS JE EINHEIT ═══
+
+- Windows 1/4 INTEGRIERT: id19 prod2-win11 ONLINE, laeuft, v19.1.1 platform=windows (Referenz, "dass die Methode traegt") — runner-matrix-DONE.md:31,97
+- Windows 3/4 OWNER-GATED: id53/id54/id55 registriert aber NIE verbunden (contacted_at=None, locked); STOP per Grenzfall-Direktive; Fertigstellung braucht (a) Auth-Token-Reset per API, (b) Windows-Admin-Creds aus Vault, (c) In-VM gitlab-runner-Install (id53/54 headless via WinRM, id55 nur RDP=interaktiv); kein SSH auf keiner Win-VM — runner-matrix-DONE.md:98-104. Deckt die bekannte Lage "id 53/54 TABU + owner-gated"; ACHTUNG: id19 ist im 26.07.-Ist NICHT tabu sondern der einzige laufende Windows-Runner (die alte 53/54/19-TABU-Notiz ist damit ueberholt, id55 kam als dritter gated hinzu).
+- Linux-BM: beide LIVE; normal-Modus prod1 concurrent=3/10 Threads, prod2 concurrent=2/12 Threads (Owner-Chat-Korrektur ueberschreibt OD-7 fuer prod1-normal); heavy = 1x24 / 1xnproc — runner-matrix-DONE.md:5,44-45,53-73; OD-7-Zieltabelle: 2026-07-26-DIPLOM-AN-INFRA-od7-runner-neukonfiguration.md:13-16
+- macOS: BEIDE Runner STALE/TOT (id2 node5-macintel, id3 node6-macarm) — runner-matrix-DONE.md:35; SSH-Audit 16.07.: node5 Port 22 ZU (aus/SSH-tot), node6 sshd kex-reset; Reaktivierung = offener Punkt #79 — 2026-07-16-K108e-SSH-ZUGANGS-MATRIX-AUDIT-node7-laptop.md:18-19,45. Toolchain aber KOMPLETT installiert (GCC 15.2.0, Apple Clang 17, CMake 4.2.1, Ninja 1.13.0; node5=macOS 15 x86_64, node6=macOS 26 arm64) — 20260221-00-00-002969-macos-build-tools-complete-node8-alive.md:11,191-192. "Bereit" heisst also: HW+Toolchain+Registrierung vorhanden, Runner-Verbindung owner-/infra-gated.
+- node8 RISC-V: Runner stale; Docker dort NICHT installiert (Install-Probe scheiterte) — 20260227-00-00-002994-docker-os-matrix-v630-rollout.md:165,180
+- pve1/pve2, node3/node4 (x86-Odroid-Klasse): Runner id6/7/8/9 offline/stale — runner-matrix-DONE.md:35; 2026-07-14-INFRA-HANDOVER-buildsystem-session.md:29-30
+
+═══ (3) DIE 7 LINUX-DOCKER-CONTAINER ═══
+
+Best belegter Treffer im Cluster-git = die "OS-Variant Docker Images (7 Distributionen)" in registry.comdare.de/comdare/buildtools (einheitliche Toolchain GCC>=14/Clang/CMake/Ninja) — 20260221-00-00-003023-node8-buildtools-gcc15-rollout.md:669-683:
+debian-sid, ubuntu-2404, fedora-42, alpine-321 (musl!), archlinux, opensuse-tw, rocky-9 (Dockerfiles "7 Stueck" auf pve1, :686).
+Bezug 8er-Doktrin: Infra-Memory sagt "8er-Docker-Distributionsliste INKL. Ubuntu (nicht 7 — die 7er-Annahme des CI-Blueprints war falsch)" — docs/agent-memories-infra/INFRA-AGENT-MEMORIES-KONSOLIDIERT-20260708.md:2151. Plausible Lesart der Owner-Aussage "7 WEITERE": 7 Container-Distros ZUSAETZLICH zum nativen Ubuntu der BM-Runner = 8 inkl. Ubuntu. Das exakte 8. Listenmitglied ist im Cluster-git NIRGENDS enumeriert — NICHT-GEFUNDEN, Lesart = Interpretation.
+Aktueller CI-Stand (_infra/buildtools/.gitlab-ci.yml, v7.0.0): Docker-x86-Pool mit 18 Varianten = 6 Familien x 3 Versionen (ubuntu 24.04/22.04/20.04, debian 12/11/10, fedora 41/40/39, alpine 3.21/3.20/3.19, opensuse tw/leap15.6/leap15.5, rocky 9/9.3/8) via `docker run` auf BM-Hosts — .gitlab-ci.yml:440-483; analog Pool 4 ARM64 (:549) + Pool 5 RISC-V (:652). Historie der Matrix: 20260227-...-002994-...:35-44 (6 Varianten v6.3.0), :119,126 (18er-Plan).
+
+═══ (4) DIE 2 MACOS-EINHEITEN ═══
+
+- node5: Mac mini Intel, 8GB, macOS 15, x86_64; 10.0.10.205/10.0.60.205; Homebrew /usr/local, GCC /usr/local/bin/gcc-15; macOS-User `benjamineliasprobst` — 00_README.txt:24; ip-allokationsplan:289; 002969.md:60,88,93,191
+- node6: Mac mini M1, 8GB, macOS 26, arm64; 10.0.10.206/10.0.60.206; Homebrew /opt/homebrew — 00_README.txt:25; ip-allokationsplan:290; 002969.md:61,92,192
+- Runner-Tags historisch: node5 `amd64-cfl, bare-metal, shell, macos, docker-capable`, node6 `arm64-m1, bare-metal, shell, macos, docker-capable` — 003023.md:661-662; Docker auf den headless Macs wurde uebersprungen ("nicht sinnvoll") — 002969.md:205
+
+═══ (5) ANGLIEDERUNG AN DIE OS-SCHNITTSTELLE (Infra-Mechanik) ═══
+
+- Grundprinzip: GitLab-Runner mit SHELL-Executor je Bare-Metal-/Exotic-Node, Plattform-Routing rein ueber Tags — docs/CICD-DEPLOYMENT-PLAN.md:21-28 (Runner-Landschaft multi-arch)
+- Linux-Docker-Distros: KEINE eigenen Runner, sondern `docker run` der buildtools-Images IM Job auf docker-capable BM-Runnern (Container erben CPU-Features des Hosts) — 003023.md:689-704; heutige v7.0.0-Pools .gitlab-ci.yml:440ff
+- Windows: gitlab-runner.exe in der VM, config.toml url=https://gitlab.comdare.local, executor `shell` (PowerShell) oder `docker-windows`, tls-ca=comdare-CA, Tags additiv (windows, win2022/win11, x86_64, host-spezifisch, RUNN-23-konform); Zugang headless via WinRM (Jump ueber node7 auf V60), id55 nur RDP; vorab Auth-Token-Reset POST /runners/{id}/reset_authentication_token — 6-Schritte-Plan runner-matrix-DONE.md:106-112 ("bereit zur Ausfuehrung nach Owner-OK")
+- macOS: Reaktivierung der stale Shell-Runner + SSH-Key-Autorisierung (node7/Laptop) als offener Punkt — K108e:45
+- Deploy-/Betriebs-Skripte: scripts/runner-mode.sh (normal|heavy, SIGHUP statt restart, auf beiden Hosts deployt md5-8 b011bc1a) — runner-matrix-DONE.md:48-50; scripts/prod-runner-toolchain-setup.sh; _infra/buildtools/bs-3049-bare-metal-bootstrap.sh + bs-3049-exotic-bootstrap.sh
+- Historische Idee "Windows Docker auf macOS" (MinGW-Cross in Linux-Container, colima kann nur Linux-Container) — 002994.md:122,217 — Stand Feb, Aktualitaet UNGEPRUEFT
+
+═══ (6) FOLGERUNGEN FUER DIE DIPLOM-SEITE ═══
+
+operating_system-Achse (A3/R-A, Unter-Achsen os_version/kernel/build, update_zustand in build gemerged, XML-erweiterbar Pflicht — Diplom-Repo /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260726-AUFTRAG-lane-a-sys-tax-und-lane-c-hub.md:145-148 und 20260726-SESSION-achsen-neuordnung-lager-baeume-xlsx-regressionen.md:18-19):
+
+a) REAL abdeckbare Auspraegungen durch die Ist-Flotte:
+- Linux nativ: Ubuntu (prod1/prod2 BM, eigener Host-Kernel) + Talos (k8s)
+- Linux-Container: os_version/userland-Varianz ueber 7 buildtools-Images bzw. 18er-CI-Matrix (glibc-Spektrum 2.34-2.41 + musl/Alpine, Paketmanager apt/dnf/apk/zypper/pacman — 003023.md:673-683). WICHTIG: Container teilen den HOST-Kernel — die Docker-Schiene liefert os_version/build-Varianz, aber KEINE kernel-Varianz; kernel-Auspraegungen kommen nur aus BM/VM/Talos/Windows/macOS.
+- Windows: Win11 Pro + WinServer2022 Standard (beide permanent aktiviert, NT-Kernel, je prod1+prod2) — heute nur id19 messfaehig, die anderen 3 owner-gated (siehe (2))
+- macOS: Darwin x86_64 (macOS 15) + Darwin arm64 (macOS 26) — Runner derzeit tot, Angliederung erfordert #79-Reaktivierung
+
+b) Fehlerklassen: Im ce-Ist existiert CompilerCompilerErrorClass {KonfigXmlParse=0(implizit), ToolchainFehlt=1, HardwareErweiterungFehlt=2, CompileKombination} (ce libs/cache_engine/include/cache_engine/measurement/axis_error.hpp:39-42); eine Klasse `BetriebssystemFeatureFehlt` existiert dort NICHT (NICHT-GEFUNDEN; grep leer) — sie waere das OS-Analogon zu HardwareErweiterungFehlt (Enum additiv nachruestbar lt. axis_error.hpp:24). Konkretes, im Cluster-git dokumentiertes Material je OS: Alpine/musl-libc-Abweichung (003023.md:676), macOS/BSD- und msys-grep-P-Portabilitaetsfalle des Buildsystems (INFRA-AGENT-MEMORIES-KONSOLIDIERT-20260708.md:11522), Windows-PowerShell-Shell-Executor-Semantik (runner-matrix-DONE.md:110) — genau die Zustaende, die je OS-Auspraegung als deklarierte Fehlerklasse statt Absturz zu behandeln sind (Pflicht lt. Diplom-Ledger 2012: Fehlerklassen fuer ALLE Achsen/Unterachsen/Algorithmen).
+
+c) Operativ: Angliederung laeuft durchgaengig ueber GitLab-Runner-Tags — die OS-Achse kann 1:1 auf Tag-Routing abgebildet werden (windows/win11/win2022, macos, linux+distro-Matrix); fuer Windows id53/54/55 und macOS node5/6 ist VOR jeder Messplanung das Owner-OK + Vault-Zugang noetig (Gates in runner-matrix-DONE.md:112,129).
+
+OFFEN/EHRLICH: (i) 8. Docker-Distro-Name nirgends enumeriert; (ii) IP-Widerspruch CD-WIN2022-P2 V60 (.100 vs .192) unaufgeloest; (iii) ob die 7 buildtools-Images (Feb-Stand, registry.comdare.de) heute noch alle in der Registry liegen, ist UNGEPRUEFT (nur git-Doku gelesen, keine Registry-Abfrage); (iv) macOS-"bereit" beruht auf Toolchain-Doku Feb + Stale-Befund Jul — kein Live-Check ausgefuehrt (read-only-Auftrag).
+
+SELBSTCHECK: read-only eingehalten (keine Writes/Commits/Pull/Push, keine Live-System-Zugriffe); ASCII-only ok; keine Secret-Werte zitiert (nur Runner-IDs, Namen, IPs, md5-8 b011bc1a); Kernaussagen mit datei:zeile belegt; UNGEPRUEFT/NICHT-GEFUNDEN explizit markiert.
