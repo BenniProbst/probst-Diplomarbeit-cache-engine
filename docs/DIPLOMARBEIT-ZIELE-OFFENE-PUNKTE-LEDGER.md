@@ -3400,3 +3400,14 @@ beide Maschinen stets verfuegbar) deklariert die Vendor-Menge des Clusters; Frem
 (XOR-Verfuegbarkeit), Pipeline+Programm verschiffbar. Deklarierte-aber-tote Maschine blockiert
 ehrlich. ce 57dc0245 (supersediert die unbedingte Hart-Schaltung 194dee57); Beweis 12769 beide
 Jobs instanziiert. Preflight im Grandchild bleibt G4a-Auflage (#37/#34).
+
+**§66-NACHTRAG-3 — MAPPING-REINHEITS-DOKTRIN (User 23.07. nachmittags, KERN=Gesetz):**
+std::variant ist in CEB und Tier-Binaries STRIKT VERBOTEN — es mappt eine RUNTIME-Variable auf ein
+COMPILE-TIME-Ziel und bloated die Binary (alle CT-Zweige materialisieren). Der Compile muss
+REIN sein: nur compile-time -> compile-time und runtime -> runtime Abbildungen akzeptiert;
+KEINE runtime->compile-time-Bruecken. ERLAUBT: verschiedene RUNTIME-Varianten der UNTER-Achsen
+auf dieselben COMPILE-TIME-HAUPT-Achsen (§59-Haupt/Unter-Prinzip). Die REGISTRY entscheidet, wie
+zu bauen ist (schlanke, effiziente Binaries) — bestaetigt die I2-Teil-3-Registry-Tabellen-Form
+(CT-Tabelle einmal typ-instanziiert; der Runtime-Flag-Lookup ist runtime->runtime ueber
+vorberechnete Werte). ALLE Achsen sind IMMER getrennt zu behandeln und zu KLAMMERN (keine
+Fusion in Signaturen/Schluesseln/Stempeln — je Achse ihr eigenes Feld/ihre eigene Klammer).
