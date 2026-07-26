@@ -893,6 +893,16 @@ int main(int argc, char* argv[]) {
                 // (iterator:979-982) allein an einem nicht-leeren Doc-Key -- ein anderer BAU-TREIBER, ausgeloest
                 // durch eine gesetzte Umgebungsvariable. Das Gate gehoert deshalb hierher, an die Injektionsstelle.
                 //
+                // WARUM minio_enabled() UND NICHT !inert() (AUF-B3, korrigiert 2026-07-26): inert() ist
+                // !minio_enabled() && !drop_enabled() -- es ist also schon dann false, wenn NUR Ebene C
+                // (COMDARE_MEASUREMENT_DROP_URL, der Mess-CSV-Kanal) konfiguriert ist. Die vier Objekt-Verben, aus
+                // denen der BestandTransport besteht, gaten aber ausnahmslos auf Ebene B: object_fetch
+                // (artifact_cache.hpp:487), object_store (:507), object_remove (:535) geben ohne minio_enabled()
+                // nullopt bzw. false zurueck. Unter !inert() wuerde bei einer Nur-drop-Konfiguration also ein
+                // vollstaendig belegter, aber TOTER Transport gebunden: bestandslog_active waere true, der Bau
+                // schaltete auf den Planer-Treiber, das Lager blieb dauerhaft leer und jeder flush scheiterte.
+                // minio_enabled() ist die praezise Bedingung und impliziert !inert().
+                //
                 // LEBENSDAUER (AUF-B5): make_bestand_transport haelt ArtifactCache CONST& (Kopf Z.20-24 von
                 // artifact_cache_transport.hpp). Weitergereicht wird deshalb DERSELBE shared_ptr von oben (:840),
                 // den auch cache_push/cache_pull kapseln -- die Fassaden-TU bindet den Transport daraus und benutzt
@@ -906,11 +916,19 @@ int main(int argc, char* argv[]) {
                 // Fremdzeile dort ist ein GitLab config_error. Die [E4]-Zeile oben schreibt auf cout und verleitet
                 // dazu; hier wird bewusst abgewichen.
                 //
-                // FEHLERKLASSE konfiguration_unvollstaendig: Gate an (COMDARE_BESTANDSLOG=true) UND eine der drei
-                // Pflicht-Variablen leer => HARTER ABBRUCH mit exit_code 6, EINE Zeile mit stabilem Etikett. Der
-                // Halb-Zustand (Log an, aber anonym oder ohne Ziel-Dokument) ist der teuerste denkbare: er
-                // produziert zwei Tage lang unbrauchbare Zeilen, und den Lauf wiederholt man nicht. Gate AUS =>
-                // stumm inert, keine einzige Zeile (Byte-Neutralitaet des Vor-Zustands).
+                // FEHLERKLASSE konfiguration_unvollstaendig (AUF-B4): die BEIDEN Gate-Bedingungen
+                // COMDARE_BESTANDSLOG=="true" UND minio_enabled() erfuellt, aber eine der drei Pflicht-Variablen
+                // leer => HARTER ABBRUCH mit exit_code 6, EINE Zeile mit stabilem Etikett. Der Halb-Zustand (Log an,
+                // aber anonym oder ohne Ziel-Dokument) ist der teuerste denkbare: er produziert zwei Tage lang
+                // unbrauchbare Zeilen, und den Lauf wiederholt man nicht.
+                //
+                // ALLE UEBRIGEN FAELLE SIND STUMM INERT -- keine einzige Zeile, keine Bindung, Bau unveraendert:
+                //   (a) COMDARE_BESTANDSLOG ungesetzt/!="true"  -> Byte-Neutralitaet des Vor-Zustands.
+                //   (b) Gate an, aber KEIN minio (auch: nur Ebene C / measure-drop) -> die Gate-Bedingung ist aus
+                //       Sicht des Lagers schlicht nicht erfuellt, und das ist kein Fehler: ein Mess-Lauf mit
+                //       Ergebnis-Drop aber ohne Objekt-Store ist eine gueltige Konfiguration. Deshalb wird hier
+                //       AUCH NICHT auf die Pflicht-Variablen geprueft -- ohne Ebene B gibt es nichts zu reservieren,
+                //       also auch nichts unvollstaendig zu konfigurieren.
                 // ---------------------------------------------------------------------------------------------------
                 namespace bl = comdare::cache_engine::builder::bestandslog;
                 std::shared_ptr<at::ArtifactCache const>                                bestand_cache;
@@ -918,13 +936,14 @@ int main(int argc, char* argv[]) {
                 std::string                                                             bestand_doc_key;
                 std::string                                                             bestand_owner_uuid;
                 std::string                                                             bestand_maschine;
-                if (env_trimmed("COMDARE_BESTANDSLOG") == "true") {
+                // Beide Gate-Bedingungen zusammen -- die zweite ist minio_enabled(), NICHT !inert() (s.o.). Ist eine
+                // von beiden nicht erfuellt, wird der Block gar nicht betreten: kein Binden, keine Pruefung, keine
+                // Zeile.
+                if (env_trimmed("COMDARE_BESTANDSLOG") == "true" && artifact_cache->minio_enabled()) {
                     std::string const doc_key    = env_trimmed("COMDARE_BESTANDSLOG_DOC_KEY");
                     std::string const owner_uuid = env_trimmed("COMDARE_BESTANDSLOG_OWNER_UUID");
                     std::string const maschine   = env_trimmed("COMDARE_BESTANDSLOG_MASCHINE");
-                    // Fail-loud VOR der inert-Pruefung: eine unvollstaendige Konfiguration ist unabhaengig davon
-                    // falsch, ob auf DIESER Maschine gerade ein Objekt-Store konfiguriert ist. Erste fehlende
-                    // Variable in fester Reihenfolge -> genau EINE Zeile, deterministisch.
+                    // Fail-loud: erste fehlende Variable in FESTER Reihenfolge -> genau EINE Zeile, deterministisch.
                     char const* fehlende_var = nullptr;
                     if (doc_key.empty())
                         fehlende_var = "COMDARE_BESTANDSLOG_DOC_KEY";
@@ -937,27 +956,13 @@ int main(int argc, char* argv[]) {
                                   << "COMDARE_BESTANDSLOG=true, aber " << fehlende_var << " ist leer -- Abbruch.\n";
                         return 6;
                     }
-                    if (artifact_cache->inert()) {
-                        // Gate an, aber kein Objekt-Store: alle vier Transport-Verben waeren tot (object_fetch/
-                        // object_store/object_remove pruefen minio_enabled, artifact_cache.hpp:487/507/535). Nicht
-                        // binden -- sonst waere bestandslog_active true, der Bau schaltete auf den Planer-Treiber
-                        // und das Lager blieb dauerhaft leer. Kein Abbruch (die Konfiguration ist vollstaendig, nur
-                        // die Ebene fehlt), aber auch nicht stumm: eine gesetzte Absicht, die wirkungslos bleibt,
-                        // muss sichtbar sein.
-                        std::cerr << "[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt: COMDARE_BESTANDSLOG=true, "
-                                  << "aber der ArtifactCache ist inert (kein minio/measure-drop) -- Bestandslog "
-                                  << "bleibt AUS, Bau unveraendert.\n";
-                    } else {
-                        bestand_cache      = artifact_cache; // derselbe Zeiger wie cache_push/cache_pull (AUF-B5)
-                        bestand_key_of     = bl::make_fingerprint_key_fn();
-                        bestand_doc_key    = doc_key;
-                        bestand_owner_uuid = owner_uuid;
-                        bestand_maschine   = maschine;
-                        std::cerr << "[bestandslog] aktiv: doc_key=" << bestand_doc_key
-                                  << " maschine=" << bestand_maschine
-                                  << " minio=" << (artifact_cache->minio_enabled() ? "1" : "0")
-                                  << " key_of=.fingerprint-Sidecar (#46b I1/I2)\n";
-                    }
+                    bestand_cache      = artifact_cache; // derselbe Zeiger wie cache_push/cache_pull (AUF-B5)
+                    bestand_key_of     = bl::make_fingerprint_key_fn();
+                    bestand_doc_key    = doc_key;
+                    bestand_owner_uuid = owner_uuid;
+                    bestand_maschine   = maschine;
+                    std::cerr << "[bestandslog] aktiv: doc_key=" << bestand_doc_key << " maschine=" << bestand_maschine
+                              << " key_of=.fingerprint-Sidecar (#46b I1/I2)\n";
                 }
 
                 // Welle 5 (E-W5-2, §38-Fortschritts-Rueck-Kanal, 2026-07-20): der EINE konkrete Progress-Konsument des
