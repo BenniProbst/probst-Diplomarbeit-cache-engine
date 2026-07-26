@@ -310,3 +310,10 @@ abef03cee33cc27beb38433e2e9997ed1dffdcc0 (untracked P0-Dateien: Working Tree, D2
 
 Selbstcheck TEIL III: ASCII bis auf Paragraph-Zeichen; rein additiv; Owner-Wortlaute im
 Session-Doc verbatim gesichert; keine geratenen Orte (K3/K2 explizit als Kartierungs-Punkte).
+
+## E4. NACHTRAG (Owner ~18:55): C-3a-FOLGE-GO VORAB ERTEILT
+Owner verbatim: "C-3a erhaelt direktes volles Folge GO sobald das gate dafuer faellt."
+=> KEINE weitere Owner-Schleife fuer die Scharfschaltung: sobald C-3b (Kanal-Merge-Beleg,
+OD-4-GO) erbracht UND O-4 (Maschinen-Identifikation) geloest ist, wird C-3a DIREKT
+ausgefuehrt - mit den D2.3/D2.11-Auflagen (DREI Stubs :185-:187 GEMEINSAM, Kill-Switch,
+rsp-Diff je Route, Organ-required-Beleg, Compile-Probe der Sub-Feature-Flags). Ledger §69.9.
