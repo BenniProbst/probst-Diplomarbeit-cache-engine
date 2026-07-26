@@ -922,13 +922,18 @@ int main(int argc, char* argv[]) {
                 // aber anonym oder ohne Ziel-Dokument) ist der teuerste denkbare: er produziert zwei Tage lang
                 // unbrauchbare Zeilen, und den Lauf wiederholt man nicht.
                 //
-                // ALLE UEBRIGEN FAELLE SIND STUMM INERT -- keine einzige Zeile, keine Bindung, Bau unveraendert:
-                //   (a) COMDARE_BESTANDSLOG ungesetzt/!="true"  -> Byte-Neutralitaet des Vor-Zustands.
-                //   (b) Gate an, aber KEIN minio (auch: nur Ebene C / measure-drop) -> die Gate-Bedingung ist aus
-                //       Sicht des Lagers schlicht nicht erfuellt, und das ist kein Fehler: ein Mess-Lauf mit
-                //       Ergebnis-Drop aber ohne Objekt-Store ist eine gueltige Konfiguration. Deshalb wird hier
-                //       AUCH NICHT auf die Pflicht-Variablen geprueft -- ohne Ebene B gibt es nichts zu reservieren,
-                //       also auch nichts unvollstaendig zu konfigurieren.
+                // FEHLERKLASSE lager_ebene_fehlt: Opt-in gesetzt, aber Ebene B (minio) fehlt -- EINE WARNUNG auf cerr,
+                // KEIN Abbruch, KEIN Binden. Das deckt beide Ausbaustufen des Falls: gar keine Ebene (voll inert) und
+                // nur Ebene C (measure-drop ohne Objekt-Store). Begruendung fuer die Sichtbarkeit: beim Voll-Bau mit
+                // COMDARE_BESTANDSLOG=true ist ein STILL leeres Lager der teuerste Fehlermodus -- er faellt erst nach
+                // Stunden auf, und den Lauf wiederholt man nicht. Kein Abbruch, weil die Konfiguration als solche
+                // gueltig ist (ein Mess-Lauf mit Ergebnis-Drop ohne Objekt-Store ist legitim) und ein exit hier einen
+                // laufenden Bau kosten wuerde. Die Pflicht-Variablen werden in diesem Zweig NICHT geprueft: ohne
+                // Ebene B gibt es nichts zu reservieren, also auch nichts unvollstaendig zu konfigurieren.
+                //
+                // STUMM INERT bleibt genau EIN Fall: COMDARE_BESTANDSLOG ungesetzt/!="true". Dann faellt keine
+                // einzige Zeile -- das ist die Byte-Neutralitaet des Vor-Zustands, und nur an ihr haengt der
+                // env-freie 0-Byte-Nachweis. Beide Zeilen oben koennen ausschliesslich bei gesetztem Opt-in feuern.
                 // ---------------------------------------------------------------------------------------------------
                 namespace bl = comdare::cache_engine::builder::bestandslog;
                 std::shared_ptr<at::ArtifactCache const>                                bestand_cache;
@@ -936,10 +941,11 @@ int main(int argc, char* argv[]) {
                 std::string                                                             bestand_doc_key;
                 std::string                                                             bestand_owner_uuid;
                 std::string                                                             bestand_maschine;
-                // Beide Gate-Bedingungen zusammen -- die zweite ist minio_enabled(), NICHT !inert() (s.o.). Ist eine
-                // von beiden nicht erfuellt, wird der Block gar nicht betreten: kein Binden, keine Pruefung, keine
-                // Zeile.
-                if (env_trimmed("COMDARE_BESTANDSLOG") == "true" && artifact_cache->minio_enabled()) {
+                // Das Opt-in EINMAL lesen -- es entscheidet ueber beide Zweige: erfuellt zusammen mit minio_enabled()
+                // das Gate, und traegt allein die Sichtbarkeits-Warnung. Die zweite Gate-Bedingung ist
+                // minio_enabled(), NICHT !inert() (s.o.).
+                bool const bestandslog_opt_in = env_trimmed("COMDARE_BESTANDSLOG") == "true";
+                if (bestandslog_opt_in && artifact_cache->minio_enabled()) {
                     std::string const doc_key    = env_trimmed("COMDARE_BESTANDSLOG_DOC_KEY");
                     std::string const owner_uuid = env_trimmed("COMDARE_BESTANDSLOG_OWNER_UUID");
                     std::string const maschine   = env_trimmed("COMDARE_BESTANDSLOG_MASCHINE");
@@ -963,6 +969,15 @@ int main(int argc, char* argv[]) {
                     bestand_maschine   = maschine;
                     std::cerr << "[bestandslog] aktiv: doc_key=" << bestand_doc_key << " maschine=" << bestand_maschine
                               << " key_of=.fingerprint-Sidecar (#46b I1/I2)\n";
+                } else if (bestandslog_opt_in) {
+                    // Opt-in gesetzt, Ebene B fehlt: die Absicht ist da, das Lager kann sie nicht erfuellen. Genau
+                    // EINE Zeile, damit ein still leeres Lager nicht erst nach Stunden auffaellt. drop_enabled wird
+                    // mitgemeldet, weil es die beiden Ausbaustufen unterscheidet (voll inert vs. nur Ebene C) --
+                    // dieselbe Information, die die [E4]-Storage-Zeile auf cout traegt, hier auf dem Bestandslog-Kanal.
+                    std::cerr << "[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt: COMDARE_BESTANDSLOG=true, aber "
+                              << "Ebene B (minio) ist nicht konfiguriert (measure-drop="
+                              << (artifact_cache->drop_enabled() ? "1" : "0")
+                              << ") -- Bestandslog bleibt AUS, Bau unveraendert.\n";
                 }
 
                 // Welle 5 (E-W5-2, §38-Fortschritts-Rueck-Kanal, 2026-07-20): der EINE konkrete Progress-Konsument des
