@@ -3411,3 +3411,14 @@ zu bauen ist (schlanke, effiziente Binaries) — bestaetigt die I2-Teil-3-Regist
 (CT-Tabelle einmal typ-instanziiert; der Runtime-Flag-Lookup ist runtime->runtime ueber
 vorberechnete Werte). ALLE Achsen sind IMMER getrennt zu behandeln und zu KLAMMERN (keine
 Fusion in Signaturen/Schluesseln/Stempeln — je Achse ihr eigenes Feld/ihre eigene Klammer).
+
+**§66-N4 — N-13-EINORDNUNG RAM-Sammelpuffer am Compile-Seam (Befund 26.07., Impl-verifiziert):**
+Der Orchestrator haelt die Binary-Bytes NIE im Prozess (externer Compiler schreibt job.output
+per -o; build_orchestrator:510/750) — ein Binary-Spool am Compile-Seam waere Voll-Read+
+Voll-Write-Pessimierung, wuerde das RAM-Budget des parallel-Gates fressen und die
+output-existiert-nach-compile-Invariante brechen (dll_is_current/W11-Pump/Sidecars). Der
+implementierbare N-13-Kern ist REALISIERT: B6-SpoolWriter-Maschinerie (Lager-Transport, wo
+Bytes real im RAM liegen) + W11-Async-Push-Pump (zweiter Thread, gebuendeltes Zurueckstreamen).
+MERKPOSTEN (Phase-4-Optimierung, nicht Gate): SIDECAR-Spool nach Variante 1b (nur im
+Nicht-Push-Bau, harte gegenseitige Ausschluss-Wache; ~500k Mini-Writes gebuendelt bei 2^17;
+Crash-Richtung konservativ: Binary ohne Attest => Neubau). I2b als Scheibe ENTFAELLT.
