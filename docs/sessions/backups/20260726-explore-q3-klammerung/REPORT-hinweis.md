@@ -26,11 +26,17 @@ DREI-STUFIGE KLAMMER-HIERARCHIE, die TYP-Klammern sind die OBERSTE, STRIKT GETRE
 (§56 drei Gruppen; §57-S3 zwei Stempel-Ebenen; §66-N3 je Achse ihre eigene Klammer; Testat-
 Grammatik LEDGER:3308-3310 Klammer-Anzahl kodiert die Ebene):
 
-  Ebene 1  TYP-KLAMMER (immer aeusserste, nie verschmolzen):
+  Ebene 0  BINARY-KLAMMER (Owner-Praezisierung 26.07., "ganz wichtig"): die Binary selbst
+           ist eine AEUSSERE Klammer ueber ihre Typ-Klammern (Komma-getrennt, nie
+           verschmolzen — die Rekursion geht bis zur Binary-Ebene durch):
+             System-Achsen [d,e,f] -> [[d,e,f],[g,h,i]]Tier-Binary
+             CEB = [[a,b,c]]CEB (eine Typ-Klammer)
+             Mess-CSV analog ueber alle drei: [[a,b,c],[d,e,f],[g,h,i]]
+  Ebene 1  TYP-KLAMMER (je Typ eigene Klammer, nie verschmolzen):
            CEB-Stempel   = [a,b,c]-Klammer (Mess-Typ)
            Tier-Stempel  = [d,e,f]-Klammer (System-Typ) GETRENNT VON [g,h,i]-Klammer (Organ-Typ)
-                           = zwei separate Zeilen/Arrays (§58)
-           Mess-CSV      = [a,b,c][d,e,f][g,h,i] (alle drei, einzige Voll-Form)
+                           = zwei separate Zeilen/Arrays (§58), gemeinsam nur durch die
+                           Ebene-0-Binary-Klammer umschlossen
   Ebene 2  KOMPLEX-KLAMMER (rekursiv, NUR INNERHALB ihrer Typ-Klammer): Klammern um die
            Haupt-Achsen-Klammern, die sie wrappt; EIN gemeinsamer Stempel-Block mit
            indirekter Identitaet. Beispiel System-Typ-Zeile:
