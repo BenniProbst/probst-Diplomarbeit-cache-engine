@@ -6,9 +6,11 @@
 
 ## 1. CODE-STAND (alle dual gepusht, main==development auf BEIDEN Remotes)
 
-ce-Kette seit Vendor-Fix: bbd5915a -> f6144859 (Folge-B Mengen-Signatur) -> bb35074d (Folge-A
-Objekt-API+LagerKey/ZellKoordinaten) -> f3a6e68d (G4a Director-Scheibe, 8 Punkte) -> **5795fae2
-(Fix A Prune-Praefix, LETZTER Commit)**. super: 6006fbab (Gitlink G4a) + Folge-Commit (Gitlink
+ce-Kette seit Vendor-Fix: bbd5915a -> f6144859 (Folge-B Mengen-Signatur) -> efa08c7a (Folge-A
+Objekt-per-Key-API+LagerKey/Zell-Koordinaten) -> bb35074d (Folge-B-VERDRAHTUNG Facade-Gate
+COMDARE_VARIANT_GATE) -> f3a6e68d (G4a Director-Scheibe, 8 Punkte) -> **5795fae2
+(Fix A Prune-Praefix, LETZTER Commit)**. (Zuordnung Folge-A=efa08c7a vom Impl-Agenten literal
+aus git log korrigiert — bb35074d war zuvor faelschlich als Folge-A referenziert.) super: 6006fbab (Gitlink G4a) + Folge-Commit (Gitlink
 5795fae2 + dieses Handover). Thesis-Submodul external/20260931-overleaf-diplomarbeit @ ef448e4b.
 
 Pipelines: 12913 (f6144859) SUCCESS terminal · 12914 (bb35074d) lief (Watcher bu8j44fbm) ·
