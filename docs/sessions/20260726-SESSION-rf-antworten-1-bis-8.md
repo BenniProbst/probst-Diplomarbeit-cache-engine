@@ -69,3 +69,16 @@ Selbstcheck: ASCII bis auf Paragraph-Zeichen; Owner-Wortlaute transliteriert-ver
 Kanal GEMERGED. Ein-Kanal-Praemisse je Achsen-Typ (Planer=Mess / CEB=System+Organ); CI==baremetal;
 leicht installierbar (Stand der Technik, Web-Recherche) + User-Manual; CMake-Umwege vermeiden,
 Arbeit an den C++23-Compiler. ultracode-Merge-Planung beauftragt.
+
+## NACHTRAG 2 (~22:30): EIN-HAUPTKANAL-DIREKTIVE + Q1-Q7-ANTWORTEN (Owner-Wortlaut, transliteriert)
+> "Hinweis: Ich wuensche, dass ALLE Nebenkanaele zu einem Hauptkanal konsolidiert werden, das ist
+> sonst Chaotisch. Es gibt eine XML als Quelle fuer den gesamten Prozess und einen Kanal der es
+> baut, Punkt. Und der sollte moeglichst weit C++23 metaprogrammierung nutzen und moeglichst wenig
+> skripte (keine skripte ausser cmake sparsam). Q1: Bitte mergen, das ist eine eigene
+> System-Meta-Meta-Hauptachse. Q4: Auf dem Windows 11 Runner und Windows Server 2022 ist das der
+> Standard Weg. Eher ein handout an den infra Agent, dass er das bitte einrichten soll, dann geht
+> es dort voran und wir debuggen MSVC. Q5: g++15.3 ist minimum und standard. mp11 wird stets
+> verwendet als Metaprogrammierungs-Erweiterung. Q6: Ja, aber optional nur als fallback fuer
+> baremetal Steuerung ohne CI und die XML mit Planer ueberschreibt stets die default Optionen um
+> die Kette zu laufen. Ja bitte nach Teil V, aber bleibt host seitig als compile Programm
+> Q7: Jetzt. Volles GO fuer alle sonstigen Punkte"

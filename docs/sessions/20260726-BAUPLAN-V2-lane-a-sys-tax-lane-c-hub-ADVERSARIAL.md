@@ -482,3 +482,20 @@ Q4: Windows/MSVC-Bauweg: make_msvc_compile_fn als Merge-Substanz bauen oder Wind
 Q5: Compiler-Doktrin fuer den gemergten Kanal: Ein-Compiler g++-16 (dann sind P2996-Reflection/template-for real nutzbar, aber experimentell und nicht Clang-portabel) oder C++23-Floor + Mp11-Muster mit Reflection als spaeterem Drop-in?
 Q6: Neben-Kanal (d): XML-Ueberfuehrung des Angebots-Zuschnitts als eigenes Band nach TEIL-V einplanen - ja/nein, und welche Schalter bleiben bewusst Host-/CMake-seitig?
 Q7: CLI-UX-Umbau (--dump/--emit-Flags -> clig.dev-Subcommands je Werkzeug): jetzt in V-6 oder nach der Frist?
+
+## TEIL V NACHTRAG (Owner ~22:30, Ledger §73): Q-ENTSCHEIDE + EIN-HAUPTKANAL-VERSCHAERFUNG
+- EIN-HAUPTKANAL (73.1): Das Neben-Kanal-Register (a)-(g) ist KONSOLIDIERUNGS-PFLICHT-Liste; je
+  Kandidat ein benanntes Merge-Paket nach V-4 (catalog_codegen erst nach GN-2-Guard-Ersatz;
+  anatomy_codegen_runner-Merge einplanen). Skript-Doktrin: keine Skripte ausser CMake (sparsam) -
+  codegen.sh/bat fallen mit V-4 als Archiv-Artefakte.
+- V-5a PRAEZISIERT (Q1): sse4.2/neon = Zellen der eigenen System-Meta-Meta-Hauptachse
+  (SIMD-Familie unter external_utils-Hub), Flag-Werte aus codegen.cmake:577-580; golden-neutral
+  solange Golden-Profil unveraendert.
+- V-5b BESTAETIGT (Q4): make_msvc_compile_fn = Merge-Substanz; Vorstufe = Infra-Handout
+  Windows-Runner id53/54/55 einrichten (Owner-OK §73.3), MSVC-Debug dort.
+- V-6iii KORRIGIERT (Q5): Toolchain-Floor = g++ >= 15.3 (Minimum UND Standard, kein 16er-Pin);
+  mp11 stets als Metaprog-Erweiterung; P2996-Reflection nur als spaeterer Drop-in.
+- V-6-BAND (Q6): Angebots-Zuschnitt-in-XML nach TEIL V; CMake-Options = optionaler
+  Baremetal-Fallback ohne CI, host-seitig; XML+Planer ueberschreibt STETS die Defaults.
+- V-6vi (Q7): CLI-Subcommand-Umbau JETZT in V-6 (nicht nach der Frist).
+- M1-M3 + Reihenfolge V-0..V-7: Volles GO (73.7).
