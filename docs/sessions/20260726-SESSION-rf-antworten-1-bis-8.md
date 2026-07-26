@@ -53,3 +53,19 @@ C-3b-Fund: Gate-Sub-Feature-Flags implizieren AVX512F; Route-Wache faengt ab; NE
 C-3a-Zusatz-Auflage = Gate-Beitraege muessen in der IDENTITAET sichtbar werden, deckt sich
 mit RF-6 build_version-als-Stempel-Variable) + 9b042e23 (Generator-Iteration).
 Selbstcheck: ASCII bis auf Paragraph-Zeichen; Owner-Wortlaute transliteriert-verbatim.
+
+## NACHTRAG (~22:05): RF-5-ANTWORT (Owner-Wortlaut, transliteriert)
+> "RF-5: Bitte retire den aelteren Kanal und merge ihn unter Haupt-Vorgabe aller Plaene in den
+> neueren Kanal. Praemisse ist, dass es EINEN sauberen Kanal je Achsen-Typ gibt, der die
+> Konfiguration im Planer fuer die Mess-Achsen und in der CEB fuer System-Achsen und
+> Organ-Achsen vornimmt. Dieser Kanal muss in der CI und lokal auf baremetal gleichermassen
+> laufen und leicht nach (web recherche) dem Stand der Technik installierbar und per user
+> manual anzuwenden sein. Bitte untersuche den Kanal, was er hat und was uns noch fehlt, aber
+> ich denke er wurde gruendlich durch die offizielle direkte C++23 Metaprogrammierung ersetzt
+> und das ist gut so, wir nehmen keine ekligen Umwege mehr ueber tools wie cmake, sofern wir
+> das verhindern koennen und die Arbeit sauber an den compiler uebergeben -> schneller und
+> typ-sicher. Bitte ultracode fuer den merge."
+=> KEIN blosses out-of-scope: der V36.B-Codegen-CMake-Kanal wird RETIRED und in den neueren
+Kanal GEMERGED. Ein-Kanal-Praemisse je Achsen-Typ (Planer=Mess / CEB=System+Organ); CI==baremetal;
+leicht installierbar (Stand der Technik, Web-Recherche) + User-Manual; CMake-Umwege vermeiden,
+Arbeit an den C++23-Compiler. ultracode-Merge-Planung beauftragt.
