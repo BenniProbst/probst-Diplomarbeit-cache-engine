@@ -1,8 +1,9 @@
 # Backup: Kontext-Neugruendungs-Workflow (ultracode, Opus xhigh) — 26.07.2026
 
-> STRUKTUR-SNAPSHOT eines LAUFENDEN Workflows (Stand ~06:34 UTC, 28 von ~38 Agenten fertig,
-> Synthese ausstehend). User-Auftrag: nach Workflow-Ende wird dieses Backup FINAL durch
-> UEBERSCHREIBEN aktualisiert (frische Neu-Extraktion aller Ergebnisse + Synthese-Dossier).
+> **FINAL** (Ueberschreibung nach Workflow-Ende, User-Auftrag): 39/39 Agenten erfolgreich,
+> 0 Fehler, ~7,47M Subagent-Tokens, 553 Tool-Calls, Dauer ~25,5 min. Kernstueck:
+> ergebnisse/00-SYNTHESE-lage-dossier-*.md (das Lage-Dossier fuer den Architekten).
+> journal-final.jsonl ersetzt den frueheren Laufend-Snapshot.
 
 ## Zweck
 
