@@ -329,6 +329,22 @@
            INC-2d; isa verliess mit INC-2d die Komposition, 18->17). KEINE Unter-Achse -> die <option>-Werte
            stehen DIREKT unter <target_isa> (kein Zwischen-Container, im Gegensatz zu compiler/opt_level).
            binary_id-NEUTRAL, additiv; leer = CEB-Default x86_64 (host==target). -->
+      <!-- O-2 ENTSCHIEDEN / Lane A (c), 26.07.2026: target_isa bekommt UNTER-ACHSEN. Bisher standen unter
+           <target_isa> ausschliesslich die <option>-Werte der Haupt-Achse; die vereinbarten Unter-Achsen
+           (D2.6: numa_node + page, parent="target_isa") hatten GAR KEINEN XML-Kanal - das Angebot war
+           unerreichbar (BLOCKER-4, mit O-2 aufgehoben).
+           STRUKTUR: die Unter-Achsen folgen dem compiler/opt_level-Muster (Container + <option value=..>),
+           NICHT dem target_isa-Muster (Werte direkt darunter) - denn genau diese Unterscheidung Haupt-vs-
+           Unter ist hier die Aussage. Alle neuen Elemente sind minOccurs="0" und stehen HINTER <option>:
+           bestehende Profile bleiben damit unveraendert valide (xs:sequence, nur Anhang).
+           ADDITIV ERWEITERBAR, ABER NICHT VORWEGGEBAUT (RF-6, Ledger 70.6): die target_isa-GLIEDER
+           (RAM-Frequenz / CAS / CPU-Fabrikation) werden JE MASCHINE deklariert und wirken NUR auf die
+           Stempel-Identitaet. Sie sind hier BEWUSST NICHT modelliert - wenn ihr Owner-Entscheid steht,
+           werden sie als weitere optionale Elemente an DIESE sequence angehaengt (Muster
+           machine_signatures), ohne ein bestehendes Dokument zu brechen. Diese sequence ist deshalb
+           absichtlich offen gelassen und nicht auf die zwei Unter-Achsen verengt.
+           binary_id-NEUTRAL: System-Achsen tragen binary_id="never"; kein Konsument liest die neuen
+           Knoten in diesem Paket (Parser fuellt nur den POD). -->
       <xs:element name="target_isa" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -342,6 +358,38 @@
                     </xs:restriction>
                   </xs:simpleType>
                 </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+            <!-- Unter-Achse numa_node (D2.6; Spiegel des Organ-Members alloc_hw.numa_node). Werte-Bereich
+                 BEWUSST als offener xs:string und NICHT als Enumeration: die zulaessige Menge haengt an der
+                 Maschine (Node-Zahl ist nicht compile-statisch erkennbar) und wird vom Resolver gegen das
+                 Registry-ANGEBOT geprueft, nicht vom Schema. Eine Enumeration hier waere eine Zusage, die
+                 das Schema nicht halten kann. -->
+            <xs:element name="numa_node" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:attribute name="value" type="xs:string" use="required"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <!-- Unter-Achse page (D2.6; Spiegel des Organ-Members alloc_hw.page). Ebenfalls offener
+                 xs:string - die Seitengroessen-Freigabe ist eine System-Capability (page_topology 4k/2m/1g),
+                 ihre Durchsetzung liegt organ-seitig im AllocPageHint-NTTP. NICHT "page_type" benennen:
+                 axis_01_page_type ist der Baum-Knoten-PageKind und eine ANDERE Achse (Namensfalle,
+                 Bauplan D2.6 / IV-BLOCKER-5). -->
+            <xs:element name="page" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:attribute name="value" type="xs:string" use="required"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
