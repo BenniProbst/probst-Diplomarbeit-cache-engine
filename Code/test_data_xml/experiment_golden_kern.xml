@@ -48,7 +48,7 @@
        (validate prueft den Schluessel, nicht den Namen). -->
   <machines>
     <machine id="prod1" cpu_fabrication="amd_zen5_avx512" ram_pair="ddr5_2x32" hostname_hint="prod1"/>
-    <machine id="prod2" cpu_fabrication="intel_avx2"      ram_pair="ddr4_2x32" hostname_hint="prod2"/>
+    <machine id="prod2" cpu_fabrication="intel_avx2"      ram_pair="ddr5_2x32" hostname_hint="prod2"/>
   </machines>
 
   <!-- Die gemessenen Lebewesen (base_tier-ids), 1:1 aus all_axes_golden. -->
