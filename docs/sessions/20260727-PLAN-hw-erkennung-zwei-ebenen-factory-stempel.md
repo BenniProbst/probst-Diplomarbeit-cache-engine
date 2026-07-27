@@ -181,3 +181,14 @@ mit fremdem Passungs-Stempel ⇒ status 9, nie stiller Lauf).
 *Erstellt aus ultracode-Planungssession (7 Workflow-Agenten + Explore-Kartierung + Recherche).
 Rohdaten: Workflow-Journal wf_edc83047-744; Extrakt im Session-Scratchpad. Nächster Schritt:
 Owner-Entscheide E-1..E-7, dann P1-Beauftragung (voraussichtlich Impl-CE-6de).*
+
+---
+## NACHTRAG ~17:45Z — OWNER-FREIGABE
+
+Owner 27.07. (~17:45Z, verbatim): "Alle Punkte korrekt und wie empfohlen freigegeben, volles GO"
+=> E-1 GO (ABI-POD Layout 5->6 append-only) · E-2 GO (ddr4->ddr5-Schluessel-Fix als eigenes
+Paket, P3-Nachbar, VOR Messbeginn) · E-3 additiv (declared+provenance; Abloesung erst §75) ·
+E-4 eigene HardwareProbe-Domaene + dokumentierte Dehnung der Drift-Klasse · E-5 CAS =
+Folge-Paket · E-6 Abstract Factory (CAS/Bestueckung = zweites Produkt) · E-7 Familien-Klasse
++ Maschinen-Tupel-Zusatzzeile. E-8 bleibt Infra-gated (nur Test-Erwartung).
+Ausfuehrung: P1 beauftragt (Impl-CE-6de) am 27.07. ~17:45Z.
