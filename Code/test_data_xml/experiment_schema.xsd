@@ -112,15 +112,33 @@
 
   <!-- KERN #48-S5 (Section 62-C/D/E): machines = die Maschinen-MENGE. Der Identitaets-KERN (cpu_fabrication +
        ram_pair) ist Pflicht (validate prueft den SCHLUESSEL, nicht den Namen); hostname_hint ist ein optionaler
-       Hinweis. Die XSD haelt die Struktur; die Nicht-Leere des Schluessels prueft validate_experiment_profile. -->
+       Hinweis. Die XSD haelt die Struktur; die Nicht-Leere des Schluessels prueft validate_experiment_profile.
+
+       O-8 Schritt 5 (Paket O-4b, Ledger 70.6 / RF-6): <machines> ist der DEKLARATIONS-KANAL der drei festen
+       Glieder der Komplex-Haupt-System-Achse target_isa (Owner: "feste Rekombination aus RAM-Frequenz und CAS
+       und CPU-Fabrikation"). Die beiden RAM-seitigen Glieder treten hier ADDITIV und OPTIONAL ein:
+         ram_frequency_mhz  = Datenrate in MT/s als ganze Zahl (Einheit im Namen; z.B. 5600 fuer DDR5-5600)
+         cas_latency_cl     = CAS-Latenz als reine CL-Zahl (z.B. 36); wahre Latenz ns = CL x 2000 / MT-Rate
+       Das DRITTE Glied (CPU-Fabrikation) bekommt hier KEIN eigenes Attribut: es ist das O-4a-Kern-Tupel
+       vendor/family/model/stepping, das compile-time in machine_identity.hpp (MachineCoreCpuId) deklariert
+       und ueber den bestehenden Schluessel cpu_fabrication + ram_pair aufgeloest wird. Das Attribut
+       cpu_fabrication bleibt damit unveraendert das SYMBOLISCHE Etikett des Identitaets-Schluessels
+       (machine_identity.hpp Herkunfts-Block); es traegt NICHT das Tupel, sonst braeche der Schluessel.
+
+       ABWESEND = NICHT DEKLARIERT (nicht 0 MHz / nicht CL0). Beide Attribute sind optional, damit eine
+       Maschine ehrlich unvollstaendig deklariert sein darf, statt erfundene Werte zu tragen; die
+       Nachdeklaration ist rein additiv. ram_pair BLEIBT (Additiv-Doktrin): es ist Teil des Schluessels und
+       traegt die Bestueckung, die aus Frequenz und CAS nicht hervorgeht. -->
   <xs:complexType name="MachinesType">
     <xs:sequence>
       <xs:element name="machine" minOccurs="1" maxOccurs="unbounded">
         <xs:complexType>
-          <xs:attribute name="id"              type="xs:string" use="required"/>
-          <xs:attribute name="cpu_fabrication" type="xs:string" use="required"/>
-          <xs:attribute name="ram_pair"        type="xs:string" use="required"/>
-          <xs:attribute name="hostname_hint"   type="xs:string" use="optional"/>
+          <xs:attribute name="id"                type="xs:string"      use="required"/>
+          <xs:attribute name="cpu_fabrication"   type="xs:string"      use="required"/>
+          <xs:attribute name="ram_pair"          type="xs:string"      use="required"/>
+          <xs:attribute name="hostname_hint"     type="xs:string"      use="optional"/>
+          <xs:attribute name="ram_frequency_mhz" type="xs:unsignedInt" use="optional"/>
+          <xs:attribute name="cas_latency_cl"    type="xs:unsignedInt" use="optional"/>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
