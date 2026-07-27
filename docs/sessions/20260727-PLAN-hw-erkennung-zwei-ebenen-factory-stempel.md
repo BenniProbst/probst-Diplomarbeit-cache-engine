@@ -203,8 +203,12 @@ dokumentierten OS)."
 BINDENDE KONSEQUENZEN (praezisiert Ebene 1 + P2/P5):
 K1. Der PLANER wird erster echter KONSUMENT von TargetIsaComplexAxis + OS-Achse (heute:
     0 Konsumenten ausser asserts/Registry-Gen — Kartierungs-Befund). Seine Laufzeit-Erkennung
-    mappt den identifizierten Host auf eine ZELLE der CT-Matrix ISA×OS und waehlt darueber
-    per Metaprogrammierung die einzukompilierende feingranulare Erkennung + OS-Handles.
+    ist bewusst GROB (Owner-Schaerfung 2. Fassung: "grob erkennen"): sie mappt den Host nur
+    auf eine ZELLE der CT-Matrix ISA×OS und waehlt darueber per Metaprogrammierung die
+    einzukompilierende feingranulare Erkennung + OS-Handles. ARBEITSTEILUNG (Owner verbatim):
+    "Die feingranulare Erkennung liegt bei der CEB" — der Planer erhebt selbst KEINE
+    Feinwerte (kein SPD, kein Boot-Cache; nur CPUID-Vendor/Familie + CT-OS-Konstante),
+    die gesamte Detail-Erhebung (Provenienz-Kette, RAM-Werte) ist CEB-Laufzeit.
 K2. Die Factory-WAHL spannt BEIDE Achsen im Typ: Spezialisierung ueber (IsaComplexTyp ×
     OsTyp) — nicht OS-only mit ISA als Methoden-Parameter (loest die Review-Auflage
     "GoF nur halb im Typ" im Owner-Sinn auf).
