@@ -937,12 +937,12 @@ persist:measurements:
 #    uebernimmt die gesamte Arbeit"). Der super-CI-Job baut NUR den Treiber, reicht das golden-Profil an die CE
 #    (Subkommando "plan ci") und legt die CE-emittierte STUFE-1-YAML als Artefakt ab. ALLE Steuerung/Emission liegt in der CE:
 #    STUFE 1 (diese YAML) = je Mess-Kombination [a,b,c] die CEB-Jobs (ceb:build/emit/trigger); die ceb:emit-Jobs
-#    rufen --emit-tier-ci -> die CEB emittiert STUFE 2 (System-Perms + Tier-Chunk-Jobs + gegatete Mess-Jobs) als
-#    Grandchild (parent->child->grandchild = GitLab-Nesting-Tiefe 2).
-#    HINWEIS P8/D3.2 (27.07.): "--emit-tier-ci" steht hier BEWUSST noch als Alt-Flag -- es ist die Form, die
-#    der PLANER SELBST ins STUFE-1-Child emittiert (ce-Seite, ausserhalb dieses Pakets; am realen
-#    Emissionstext verifiziert). Erst wenn die ce-Emission auf "tier ci" umgestellt ist, wird dieser Text
-#    nachgezogen; ein vorzeitiges Umschreiben waere eine Doku-Luege gegenueber dem realen Child-YAML.
+#    rufen das Subkommando "tier ci" -> die CEB emittiert STUFE 2 (System-Perms + Tier-Chunk-Jobs + gegatete
+#    Mess-Jobs) als Grandchild (parent->child->grandchild = GitLab-Nesting-Tiefe 2).
+#    NACHZUG P8/D3.2 (27.07., zweiter Halt): die ce-Emission ist seit ce 2acea388 auf "tier ci" umgestellt
+#    (am realen Emissionstext byte-identisch verifiziert, sha256-gleicher stdout beider Formen) -- dieser Text
+#    ist damit wie im frueheren HINWEIS angekuendigt nachgezogen. Das Alt-Flag --emit-tier-ci existiert bis zum
+#    §75-Aufraeumpass nur noch als deprecation-warnender Alias im Treiber.
 #    GATE: der NEUE Standard laeuft hinter COMDARE_BUILD_GOLDEN_N (die statische Matrix ist auf COMDARE_STATIC_
 #    MATRIX_FALLBACK verschoben, Default AUS). Zusaetzlich bleibt COMDARE_DYNAMIC_PLANER_CI als ISOLIERTES Opt-in
 #    (nur die Delegation ohne den Rest). INERT-by-default: ohne beide Flags wird der Job NIE erzeugt ("plan ci" ist
