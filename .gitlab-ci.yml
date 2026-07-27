@@ -79,7 +79,10 @@ variables:
 # ── #53 docs-only-Durchsatz-Gate (Ledger §63-Nachtrag, Manager-Verdikt V2): Allowlist-Rules-Vorlage. ──
 # WIRKT auf development (unsere docs-/Ledger-Wellen SIND development-Pushes): ein Commit, der NUR
 # Dokumentation aendert (KEIN Pfad der changes-Allowlist), ueberspringt die schweren Code-Jobs =>
-# sofortiger Durchsatz-Gewinn. NUR main laeuft IMMER voll (Release-Beweis auf der Merge-SHA; V2). Gitlink-
+# sofortiger Durchsatz-Gewinn. Fuer die CODE-Jobs laeuft main weiter IMMER voll (der main-Zweig DIESER
+# Vorlage bleibt bestehen: Release-Beweis auf der Merge-SHA; V2). P2/D3.1 (27.07.) nimmt diese main-Ausnahme
+# aber den 3 orchestrate-BRIDGES: die sind jetzt auch auf main changes-gegatet, damit eine docs-only-Welle
+# auf main keine Modul-Pipelines mehr erzeugt (Ende der 286-Echo-Kaskade). Gitlink-
 # Bumps (Code/external/*, .gitmodules) stehen in der Positivliste => ein 1-Zeilen-160000-Submodul-Bump ist
 # NIE docs-only. Allowlist (NICHT Blocklist): neue Branches/unbekannte Pfade => changes=true = volle
 # Pipeline (sichere Richtung). web/pipeline/trigger/MR werten changes ohnehin true bzw. sind Mess-Trigger
@@ -152,8 +155,18 @@ build:clang:
   # #53: docs-only-Gate als EXPLIZITE kombinierte rules (NICHT .code-rules-extends), damit der #273-CLANG_MATRIX-
   # Ausschalter erhalten bleibt (architekturkonform, nicht nur heute-identisch): CLANG_MATRIX!=1 => never (Bestand
   # der neueste-clang-Pflicht), DANN die V2-Allowlist (docs-only skippt; main/Code/Gitlink laufen). .ccache-pull
-  # bleibt (Konsument, pull-only). needs UNVERAENDERT (Verdikt V4).
+  # bleibt (Konsument, pull-only).
+  # P2/D3.1 (27.07.; INFRA-AN-DIPLOM Punkt 1 SUPERSEDET das alte "needs UNVERAENDERT (Verdikt V4)"):
+  # ohne needs war der Job stage-blockiert (stage: analyse) und wartete hinter der Stage orchestrate
+  # auf die 3 strategy:depend-Bridges -- Slot-Fresser und Mit-Ursache der 286-Echo-Kaskade. Mit
+  # needs: ["verify:submodules"] laeuft er per DAG los, sobald die Submodul-Verifikation steht.
+  # EXISTENZ-SICHER in der TRAGENDEN Richtung: die rules 2-4 unten sind eine echte Teilmenge der
+  # .code-rules (Vorlage oben), also existiert verify:submodules in JEDER Welle, in der build:clang
+  # existiert => das needs haengt nie. Die Gegenrichtung gilt bewusst NICHT: mit
+  # COMDARE_CLANG_MATRIX != "1" existiert verify:submodules OHNE build:clang -- fuer die
+  # needs-Validitaet harmlos (nur die tragende Richtung zaehlt).
   extends: [.build-clang-latest, .ccache-pull]
+  needs: ["verify:submodules"]
   rules:
     - if: '$COMDARE_CLANG_MATRIX != "1"'
       when: never
@@ -218,9 +231,8 @@ test:unit:
 trigger:cache-engine:
   stage: orchestrate
   needs: ["lint:secrets"]
-  rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — ce-Gitlink-Bump = Pfad-Change => nie faelschlich uebersprungen
+  rules:                                     # #53 + P2/D3.1 (27.07.): changes-Gate OHNE main-Ausnahme -- auch auf main entscheidet die Pfadliste (ce-Gitlink-Bump = Pfad-Change => nie faelschlich uebersprungen); NUR web/api/pipeline/trigger/MR feuern immer
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
           - "Code/external/comdare-cache-engine"
@@ -237,9 +249,8 @@ trigger:cache-engine:
 trigger:prt-art:
   stage: orchestrate
   needs: ["lint:secrets"]
-  rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — prt-art-Gitlink-Bump = Pfad-Change
+  rules:                                     # #53 + P2/D3.1 (27.07.): changes-Gate OHNE main-Ausnahme -- auch auf main entscheidet die Pfadliste (prt-art-Gitlink-Bump = Pfad-Change); NUR web/api/pipeline/trigger/MR feuern immer
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
           - "Code/external/comdare-prt-art"
@@ -256,9 +267,8 @@ trigger:prt-art:
 trigger:thesis:
   stage: orchestrate
   needs: ["lint:secrets"]
-  rules:                                     # #53: eigenes changes-Gate (V2: nur main immer voll) — thesis-Gitlink-Bump = Pfad-Change
+  rules:                                     # #53 + P2/D3.1 (27.07.): changes-Gate OHNE main-Ausnahme -- auch auf main entscheidet die Pfadliste (thesis-Gitlink-Bump = Pfad-Change); NUR web/api/pipeline/trigger/MR feuern immer
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
           - "thesis/diplomarbeit"
