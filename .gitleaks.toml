@@ -17,7 +17,8 @@ paths = [
   '''(^|/)Forschungsarbeiten/''',
   '''(^|/)_archive_code_pre_migration/''',
   '''(^|/)Code/build/''',
-  '''(^|/)build[^/]*/''',
+  '''(^|/)build/''',
+  '''(^|/)build-[^/]+/''',
   '''(^|/)cmake-build-[^/]*/''',
   '''(^|/)\.citools/''',
 ]
