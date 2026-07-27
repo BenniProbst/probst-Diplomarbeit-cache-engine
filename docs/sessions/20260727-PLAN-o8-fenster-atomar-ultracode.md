@@ -732,6 +732,60 @@ sind genau solche Abweichungen => OWNER-Entscheide, vom Manager nur EINZUHOLEN. 
 
 ---
 
+### ENTSCHEIDE-BLOCK (27.07. ~07:30 — ALLE OPs FIXIERT; Owner-GOs Ledger §76, Rest Manager)
+
+- **OP-1 ENTSCHIEDEN (OWNER-GO §76):** R1/GN_PREFIX = GEGENSTANDSLOS abgehakt. Beweis-grep in
+  Schritt 11 bleibt PFLICHT (aktives .gitlab-ci.yml 0 Treffer; Archiv-Reaktivierung wuerde die
+  Auflage wiederbeleben — als P10 bei Infra vermerkt).
+- **OP-2 ENTSCHIEDEN (Manager):** Plan-Vorschlag bestaetigt — granulare LOKALE Commits je Schritt,
+  Schritt 4 zwingend EIN Commit, EIN Push je Repo nach Schritt 13 (Gruen-Kette vor Publikation).
+- **OP-3 ENTSCHIEDEN (Manager, quellen-gestuetzt):** load_framework-Segment steht als ERSTES
+  Meta-Meta-Segment VOR measurement_tooling in der kMeasurementAxisVersionLine — Bauplan-Vorgabe
+  "load_framework = ERSTE Meta-Meta" (BP:6-7, :157) wird auf die Segment-Ordnung uebertragen.
+- **OP-4 ENTSCHIEDEN (Manager):** <machines>-Attributnamen mit Einheit im Namen:
+  `ram_frequency_mhz` (MHz, ganzzahlig), `cas_latency_cl` (CL-Zahl), `cpu_fabrication`
+  (Tupel-String im O-4a-Format: vendor/family/model/stepping, z.B.
+  "GenuineIntel/6/151/2"). `ram_pair` bleibt (Schritt-5-Entscheid, Additiv-Doktrin).
+  prod2-Deklaration: cpu_fabrication liegt vor (O-4a-VOLLZUG: GenuineIntel/6/151/2,
+  i9-12900K); ram_frequency_mhz/cas_latency_cl bei Infra angefragt — bis dahin traegt
+  prod2 diese zwei Glieder als nicht-deklariert (ehrlich, kein Raten; Nachdeklaration additiv).
+- **OP-5 ENTSCHIEDEN (OWNER-GO §76):** Die AEUSSERE System-Komplex-Haupt-Achse
+  (CompoundSystemAxis, O-1r: compiler+opt_level+atomic128 als SubAxisGroup, Rekombination der
+  DREI) wird IM FENSTER MITGEBAUT (Schritt 6(e) wird von "Umfang offen" auf VOLL gestellt).
+- **OP-6 ENTSCHIEDEN (Manager, gegengelesen):** P7-Volltext (BP:76-77) deckt Schritt 6(f) exakt:
+  C-3c = ISA-Zulassung profile_run_entry.hpp:209-216 von Host-Probe auf deklarierte
+  Klassen-Identitaet (kDeclaredMachines/O-4) ausrichten, als PATCH-AN-A3, kein separater
+  Edit-Gang an target_isa_system_axis.hpp. BESTAETIGT, keine Abweichung.
+- **OP-7 ENTSCHIEDEN (Manager):** Das `gate=[...]`-Segment wird als LETZTES Segment ans ENDE der
+  bestehenden Suffix-Ordnung gehaengt (nach +ceb bzw. +tel) — Praefix-Stabilitaet der bestehenden
+  Suffix-Parser/Vergleiche; D2.10-Neuanker erfasst die Strings ohnehin.
+- **OP-8 ENTSCHIEDEN (Manager):** Schaltername `COMDARE_PROVISION_VENDOR_ALLOCATORS` FINAL
+  (konsistent mit der COMDARE_VENDOR_*-Familie; keine Nach-Fenster-Umbenennung).
+- **OP-9 ENTSCHIEDEN (Manager):** (a) Schritt 0A = PFLICHT im Fenster (Feld nicht gelandet,
+  code-verifiziert). (b2) Verlagerung der 0A-Startbedingung ins Fenster BESTAETIGT (LED:3548
+  verbatim gegengelesen). IV.6-Doc-Vermerk-Schicht: wird mit Schritt 14 (Paketmeldung +
+  Doc-Vermerke nach Landung) erbracht.
+- **OP-10 ENTSCHIEDEN (Manager, quellen-gestuetzt RF-3-Flotte + 8er-Docker-Doktrin + §69.2-Analogie):**
+  operating_system-Auspraegungs-Katalog = DREI Klassen-Identitaeten `linux` / `windows` / `macos`
+  (Familien; deckt die reale Flotte: Win11+WinServer2022, Linux-Docker-Matrix, 2x macOS).
+  Distribution/Version (z.B. debian-13/trixie, windows-server-2022, macOS-Version) = STEMPEL-
+  VARIABLEN (analog BUILD-Version §69.2), je Maschine deklariert (<machines>), je Runner
+  ermittelt. Emitter/Registry-Block folgt dem target_isa-Muster (fixed_enum_tuple). Der
+  static_assert :93-94 wird von A3 aufgeloest (Schritt 4).
+- **OP-11 ENTSCHIEDEN (Manager, quellen-gestuetzt):** Die Organ-Stempel-Zeile traegt nach A8.2
+  ACHTZEHN Eintraege — persistence_target KOMMT REIN. Begruendung: Das 17er-Array ist ein
+  golden-neutral-bedingter Nicht-Nachzug der ORG-18-Welle (der Stempel durfte damals nicht
+  brechen); OD-1-Stempel-PRINZIP verlangt ALLE Organ-Achsen mit je-Achse-Algorithmus-Version —
+  eine fehlende 18. Achse waere eine Stempel-Blindstelle (persistence_target-Drift unsichtbar).
+  Golden-Strings ("17 Haupt-Achsen", test_m_w12:339-340) ziehen im Schritt-12-Neuanker auf 18
+  nach (D2.10-Checkliste). META-META-EINTRAEGE: KEINE in der Organ-Zeile (RF-7: je Typ EINE
+  Array-Zeile; Typ-Trennung) — load_framework stempelt in der MESS-Zeile (Schritt 9),
+  System-Meta-Metas in der System-Sphaere. Die vier Stempel-Zeilen bleiben GETRENNT (OD-1).
+
+**FENSTER-START-GATE damit reduziert auf:** (1) P1-Vollzug Infra (Template-Fix) + V-6-Kandidaten
+gruen (Retry-Rezept), (2) Manager-Kurzreview Re-Pin-Protokoll 4a am Vergabe-Tag (Pins sind seit
+Rev. 3 weitergewandert: super c0613620+, docs-only — 4a-Klassifikation greift), (3) Fenster-Vergabe.
+
 ## 11. VERWORFENE BEFUNDE (Adversarial-Pass + Verify-2-Pass 27.07.)
 
 Adversarial-Pass (Rev. 2): Keine. Alle 20 adversarialen Befunde wurden am Code-Ist (Pins
