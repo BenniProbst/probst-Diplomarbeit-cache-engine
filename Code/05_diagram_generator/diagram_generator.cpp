@@ -529,7 +529,7 @@ int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementR
                 } catch (std::exception const&) { /* n/a */
                 }
             }
-            // P4 (2026-07-12): die kSegmentCount Stapel-Segmente (17 Organ-Achsen kCompositionAxisNames +
+            // P4 (2026-07-12): die kSegmentCount Stapel-Segmente (Organ-Achsen kCompositionAxisNames +
             // seg_framework_ns) + seg_run_total_ns. OPTIONAL/header-getrieben (NICHT in required[] → cowfix-v1 bricht
             // nicht). n-a-tolerant: fehlt EINE Spalte ODER ist EINE Zelle leer/"n/a"/nicht-numerisch → has_seg_ns bleibt false (Zeile
             // wird bei der Attribution honest übersprungen, NICHT 0-gestapelt). Der stod-Wurf wird LOKAL geschluckt
@@ -778,7 +778,7 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
 // KERN-SEMANTIK (erforscht+an echten Daten verifiziert): die kSegmentCount Stapel-Segmente sind kommensurabel
 // mit seg_run_total_ns (dem eigenen Wall-Clock des Segment-Laufs run_workload_segmented), NICHT mit total_ns
 // (Real-Workload → 3–29× daneben). Beleg cache_engine_builder_iterator.hpp:248-257,395-401:
-// Σ(17 Organ-seg + seg_framework_ns) == seg_run_total_ns EXAKT (seg_coverage ≈ 1.0). Daher ist das
+// Summe(Organ-seg + seg_framework_ns) == seg_run_total_ns EXAKT (seg_coverage ~ 1.0). Daher ist das
 // 100%-Ganze je Balken = seg_run_total_ns; gegen total_ns zu stapeln wäre PHANTOM (verboten).
 
 SegmentAttribution aggregate_segment_attribution(std::span<WideMeasurementRow const> rows) {
@@ -888,7 +888,8 @@ int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std:
     f << "% AUTO-GENERATED durch diagram_generator (P4, Per-Achsen-Latenz-Attribution, ybar stacked)\n";
     f << "% Ganzes je Balken = seg_run_total_ns (Wall-Clock des Segment-Laufs), NICHT total_ns (inkommensurabel,\n";
     f << "% 3-29x daneben). Σ der " << WideMeasurementRow::kSegmentCount
-      << " Segmente == seg_run_total_ns (seg_coverage~1). 17 Organ-Achsen + framework.\n";
+      << " Segmente == seg_run_total_ns (seg_coverage~1). " << (WideMeasurementRow::kSegmentCount - 1)
+      << " Organ-Achsen + framework.\n";
     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
     open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";

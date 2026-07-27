@@ -50,8 +50,8 @@ struct CsvRow {
 // ── WIDE-Schema (tier×workload, 2026-06-11) ────────────────────────────────────────────────────────────
 // Das Mess-System (cache-engine run_lazy_150 / lazy_csv_header) emittiert das ';'-getrennte WIDE-Schema:
 // (run_lazy_150 geloescht 2026-07-11; Emitter heute Code/02_messung_driver, WIDE-Schema)
-// binary_id;setting;repetition;n_ops;total_ns;ns_per_op;18×seg_*_ns (17 Organ + framework, M-4: CE
-// kV3AxisCount);13 Counter;…;stat_*-Block (kV3AxisSchema[17][8]-getrieben, Anzahl = benannte Felder);…;workload;
+// binary_id;setting;repetition;n_ops;total_ns;ns_per_op;seg_*_ns-Block (Organ + framework, M-4: CE
+// kV3AxisCount);13 Counter;...;stat_*-Block (kV3AxisSchema[kV3AxisCount][8]-getrieben, Anzahl = benannte Felder);...;workload;
 // two_phase_valid. Der Parser ist HEADER-GETRIEBEN (Spalten per Name aufgelöst, Reihenfolge/Breite-agnostisch
 // → robust gegen additive Schema-Erweiterungen); extrahiert werden nur die auswertungs-relevanten Felder.
 

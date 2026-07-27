@@ -18,7 +18,8 @@
 
 #include "csv_to_latex.hpp" // INC-4: c2l::WideFullRow (trägt den durchgereichten stat_<achse>_<feld>-Block)
 
-// M-4/B16 (2026-07-19): CE-Single-Source der Achsen-Zaehlung und -Namen (17 Organ-Achsen, ABI-6/INC-2d).
+// M-4/B16 (2026-07-19): CE-Single-Source der Achsen-Zaehlung und -Namen (Organ-Achsen, ABI-6/INC-2d;
+// die Zahl traegt kV3AxisCount -- KEIN Zaehl-Literal, A-B2/ORG-18).
 // KEINE eigenen Zaehl-Literale mehr: das fruehere kSegmentCount=20 (19 Organ + framework, inkl. der nach
 // INC-2c/INC-2d ausgezogenen seg_telemetry_ns/seg_isa_ns) liess has_seg_ns gegen die 17-Achsen-WIDE-CSV
 // dauerhaft false werden -> seg_attribution.tex wurde NIE erzeugt.
@@ -181,8 +182,8 @@ struct WideMeasurementRow {
     bool          has_working_set_n = false; // true ⇔ working_set_n-Spalte vorhanden und nicht-leer
     double        seg_coverage      = 0.0;   // Σseg_ns/run_total (Mess-Validität); 0 falls Spalte fehlt
     bool          has_seg_coverage  = false;
-    // P4 (2026-07-12) — die Stapel-Segmente der Per-Achsen-Latenz-Attribution: die kV3AxisCount (=17,
-    // ABI-6/INC-2d) Organ-Achsen (Reihenfolge = kCompositionAxisNames: search_algo..queuing_q2) +
+    // P4 (2026-07-12): die Stapel-Segmente der Per-Achsen-Latenz-Attribution: die kV3AxisCount
+    // (ABI-6/INC-2d) Organ-Achsen (Reihenfolge = kCompositionAxisNames: search_algo..persistence_target) +
     // seg_framework_ns als LETZTES Segment (Index kSegmentCount-1). Kommensurabel mit seg_run_total_ns
     // (dem eigenen Wall-Clock des Segment-Laufs run_workload_segmented), NICHT mit total_ns (Real-Workload
     // → 3–29× daneben). Beleg: cache_engine_builder_iterator.hpp:248-257,395-401 (Σ Organ-Segmente +
@@ -192,7 +193,7 @@ struct WideMeasurementRow {
     // M-4/B16 (2026-07-19): Zaehlung aus der CE-Single-Source kV3AxisCount statt Literal — das fruehere
     // hartkodierte 20 (inkl. seg_telemetry_ns/seg_isa_ns) passte nicht mehr zur 17-Achsen-WIDE-CSV.
     static constexpr std::size_t      kSegmentCount = ::comdare::cache_engine::anatomy::kV3AxisCount + 1;
-    std::array<double, kSegmentCount> seg_ns{};                  // 17 Organ-Achsen + framework (ns)
+    std::array<double, kSegmentCount> seg_ns{};                  // Organ-Achsen + framework (ns)
     bool                              has_seg_ns        = false; // true ⇔ alle seg_*_ns vorhanden UND numerisch
     double                            seg_run_total_ns  = 0.0;   // äußere Wall-Clock des Segment-Laufs (100%-Ganzes)
     bool                              has_seg_run_total = false;
@@ -283,7 +284,7 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
 // P4 (2026-07-12) — Per-Achsen-Latenz-Attribution als GESTAPELTE Balken
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// Der bisher unvisualisierte Kern-Beitrag: WELCHE der 17 Organ-Achsen (+ Framework-Overhead) wie viel
+// Der bisher unvisualisierte Kern-Beitrag: WELCHE der Organ-Achsen (+ Framework-Overhead) wie viel
 // Latenz beiträgt. Ein Balken je search_algo; das 100%-Ganze je Balken ist seg_run_total_ns (der eigene
 // Wall-Clock des Segment-Laufs), NICHT total_ns (Real-Workload → inkommensurabel). Aggregation: Mittel
 // je Segment über die GÜLTIGEN Segment-Zeilen (two_phase_valid ∧ has_seg_ns ∧ seg_run_total_ns>0 ∧

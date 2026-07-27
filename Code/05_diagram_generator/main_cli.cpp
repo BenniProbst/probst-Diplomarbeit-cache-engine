@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     // P4 (2026-07-12) — Per-Achsen-Latenz-Attribution als GESTAPELTE Balken (Kern-Beitrag):
     //   diagram-generator --seg-attribution=<wide.csv> <out.tex> [--lang=de|en] [--body-only]
     // Ein Balken je search_algo; das 100%-Ganze je Balken = seg_run_total_ns (Segment-Lauf-Wall-Clock),
-    // NICHT total_ns (inkommensurabel). Stapel-Segmente = 17 Organ-Achsen + framework (CE-Single-Source, M-4).
+    // NICHT total_ns (inkommensurabel). Stapel-Segmente = Organ-Achsen + framework (CE-Single-Source, M-4).
     if (argc >= 3 && std::string{argv[1]}.rfind("--seg-attribution=", 0) == 0) {
         std::string const   in_csv  = std::string{argv[1]}.substr(std::string{"--seg-attribution="}.size());
         char const*         out_tex = argv[2];
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
                "ns_per_op|op_insert_p50_ns|op_lookup_p50_ns|op_erase_p50_ns|op_scan_p50_ns|op_rmw_p50_ns)\n"
             << "  oder: diagram-generator --seg-attribution=<wide.csv> <output.tex> [--lang=de|en] [--body-only]\n"
             << "       (P4: Per-Achsen-Latenz-Attribution als gestapelte Balken; ein Balken je search_algo,\n"
-            << "        Segmente = 17 Organ-Achsen + framework (CE-Single-Source), Ganzes = seg_run_total_ns)\n"
+            << "        Segmente = Organ-Achsen + framework (CE-Single-Source), Ganzes = seg_run_total_ns)\n"
             << "  oder: diagram-generator --latency-range=<wide.csv> <output.tex> [--lang=de|en] [--body-only]\n"
             << "       (P3: Latenz-Verteilung als p50--p99-Spanne; Punkt=p50, Whisker->p99 je (search_algo x op))\n"
             << "  oder: diagram-generator --latency-ecdf=<wide.csv> <output.tex> [--lang=de|en] [--body-only]\n"

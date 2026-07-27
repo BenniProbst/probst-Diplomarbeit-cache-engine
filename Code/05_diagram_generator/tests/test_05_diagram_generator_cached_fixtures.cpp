@@ -206,7 +206,7 @@ namespace {
 
 // M-4 (2026-07-19): Zaehlung + Namen aus der Produktions-Konstante (die ihrerseits CE-Single-Source ist:
 // kV3AxisCount + kCompositionAxisNames) — hier KEINE eigene Literal-Liste mehr (war 20er-Drift, B16).
-constexpr std::size_t kSegN = dg::WideMeasurementRow::kSegmentCount; // 17 Organ-Achsen + framework = 18
+constexpr std::size_t kSegN = dg::WideMeasurementRow::kSegmentCount; // Organ-Achsen + framework (ORG-18: 19)
 // Summe 1+2+...+kSegN fuer die seg_run_total_ns-Bildung der synthetischen Zeilen (kSegN=18 -> 171).
 constexpr long kSegTriangleSum = static_cast<long>(kSegN) * static_cast<long>(kSegN + 1) / 2;
 

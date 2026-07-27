@@ -45,9 +45,9 @@ fs::path fixtures_dir() {
 
 // M-4 (2026-07-19): die seg_*_ns-Spaltennamen kommen aus dg::kSegmentColumns (Header-Konstante, ihrerseits
 // compile-time aus der CE-Single-Source kCompositionAxisNames gepraegt) — hier KEINE Literal-Liste mehr
-// (war 20er-Drift inkl. seg_telemetry_ns/seg_isa_ns, B16). Reihenfolge = 17 Organ-Achsen + seg_framework_ns.
-constexpr std::size_t kSegN = dg::WideMeasurementRow::kSegmentCount; // 17 Organ + framework = 18
-// Summe 1+2+...+kSegN fuer die seg_run_total_ns-Bildung (kSegN=18 -> 171).
+// (war 20er-Drift inkl. seg_telemetry_ns/seg_isa_ns, B16). Reihenfolge = Organ-Achsen + seg_framework_ns.
+constexpr std::size_t kSegN = dg::WideMeasurementRow::kSegmentCount; // Organ-Achsen + framework (ORG-18: 19)
+// Summe 1+2+...+kSegN fuer die seg_run_total_ns-Bildung (ORG-18: kSegN=19 -> 190).
 constexpr long kSegTriangleSum = static_cast<long>(kSegN) * static_cast<long>(kSegN + 1) / 2;
 
 std::string seg_header() {
@@ -79,6 +79,8 @@ std::string seg_values(int seg_mult) {
 // Writer honest-empty ist (sonst würde der Byte-Identitäts-Test die 4 neuen .tex nicht
 // prüfen). Nur schreiben, wenn die committete Datei fehlt (sonst = committed).
 // M-4 (2026-07-19): committete Fixture auf das 17-Achsen-Schema regeneriert (seg_telemetry_ns/seg_isa_ns raus).
+// A-B2 (2026-07-27): committete Fixture auf das 18+1-Schema regeneriert (STRUKT-R ORG-18 persistence_target,
+// ce 774a5d5f) -- die 17+1-Fixture liess has_seg_ns ueberall false werden (Attribution 0 Gruppen, Status 11).
 void ensure_fixture(fs::path const& p) {
     if (fs::exists(p)) return;
     fs::create_directories(p.parent_path());
