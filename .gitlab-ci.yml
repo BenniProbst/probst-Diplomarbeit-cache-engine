@@ -341,8 +341,12 @@ analyse:thesis-data:
 #   - EIN-FORMAT-REGEL (§73.1): der Job liest NUR den ROHEN plan-dump-Text - denselben, den 2c
 #     auch fuer tier_binary_report_cli vorsieht. Kein Zwischenformat, keine eigene Datei;
 #     "Caching" ausschliesslich als Job-Artefakt der rohen Ausgabe.
-#   - Die permutations_manifest.txt-Pruefung entfaellt ERSATZLOS (der Codegen im Configure
-#     bleibt, ist fuer diesen Job aber irrelevant -> perspektivisch entkoppelbar, OP-6).
+#   - Die permutations_manifest.txt-Pruefung entfaellt ERSATZLOS. NACHTRAG 27.07. (V-3, OP-6
+#     ERLEDIGT): der Codegen laeuft in diesem Configure jetzt auch nicht mehr -- die Super-
+#     Abschaltung hat die Alt-Kanal-Schalter aus Code/CMakeLists.txt entfernt (Bauplan TEIL V
+#     Paket V-3). Der Job spart damit den kompletten V36.B-Codegen (27 CE- + 16 PRT-ART-
+#     smoke-Permutationen je Configure); die D3-Notiz "Codegen bleibt, perspektivisch
+#     entkoppelbar" ist eingeloest.
 # BILLIG-KLAUSEL ENTFAELLT: der Treiber-Bau ist SCHWERER als das alte tier_binary_report_cli
 # (voller Werkzeug-Bau statt Einzel-Tool); .ccache-pull mildert das. Weiterhin KEIN Perm-/
 # Mess-Lauf (mehrtaegiger Lauf #156 bleibt HELD). Hart (kein allow_failure).
