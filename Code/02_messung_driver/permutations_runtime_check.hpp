@@ -1,10 +1,29 @@
 // SPDX-License-Identifier: Apache-2.0
+//
+// ============================================================================
+// DEPRECATED seit V-2/2a (Bauplan TEIL V, 2026-07-27) -- NICHT MEHR DAS STARTGATE.
+// ============================================================================
+// assert_permutations_available_or_die() wird vom Mess-Treiber NICHT MEHR AUFGERUFEN. An seiner
+// Stelle steht das Planer-Plan-Gate ce profile_facade::assert_plan_nonempty_facade (main.cpp).
+//
+// GRUND (nicht blosse Umstellung, sondern Korrektur des Gegenstands): dieses Gate zaehlte die
+// PERM-DLL-Menge des V36.B-Alt-Kanals aus zwei CONFIGURE-ZEIT-Manifesten. Ob der bevorstehende
+// E4-XML-Lauf ueberhaupt etwas zu tun hat, sagte es nicht. Nach dem Manifest-Umzug waere es
+// ausserdem zwangslaeufig auf Exit 2 gelaufen -- fuer JEDEN Messlauf.
+//
+// STAND: die compile-time defines COMDARE_PERMUTATIONS_MANIFEST_CE/_PA werden nicht mehr gesetzt
+// (Code/02_messung_driver/CMakeLists.txt); die #ifndef-Fallbacks unten greifen, load_all_permutations()
+// liefert daher eine leere Liste. Der EINZIGE verbliebene Aufrufer ist der env-gegatete
+// COMDARE_LEGACY_MESSREIHEN-Diagnoseblock in main.cpp, der dann "0 Eintraege" meldet.
+// Die Datei bleibt bewusst im Baum (Doku-nie-loeschen) und faellt endgueltig im V-4-Retire-Scope.
+//
+// --- Historie (Stand vor V-2) ------------------------------------------------
 // V36.D (2026-05-23) - Runtime-Check fuer Pre-Build-Permutationen
 //
 // User-Direktive Sonderfall: "Keine Prebuilds vorhanden und bauen ist aus,
-// dann Error: Kein Experiment möglich"
+// dann Error: Kein Experiment moeglich"
 //
-// Triggert FATAL wenn beide Manifeste leer/missing — dann hat kein Experiment
+// Triggert FATAL wenn beide Manifeste leer/missing -- dann hat kein Experiment
 // einen Sinn, weil keine Permutationen zum durchlaufen verfuegbar sind.
 
 #pragma once

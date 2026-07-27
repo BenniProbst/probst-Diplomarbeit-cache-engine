@@ -641,9 +641,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // V36.D: Pre-Build-Permutationen-Check. Wenn KEINE Permutationen
-    // vorhanden sind, hat das Experiment keinen Sinn -> Fatal mit Exit 2.
-    if (int rc = comdare::messung_driver::assert_permutations_available_or_die(); rc != 0) { return rc; }
+    // V-2/2a (Bauplan TEIL V, M3-Ersatz-Gate, 2026-07-27): Start-Gate am PLANER-PLAN statt am
+    // Configure-Zeit-Manifest. Bis hierher stand hier assert_permutations_available_or_die() aus
+    // permutations_runtime_check.hpp -- das zaehlte die Perm-DLL-Menge des V36.B-Alt-Kanals aus
+    // generated/permutations_manifest.txt und sagte damit NICHTS darueber, ob DIESER Lauf etwas zu tun
+    // hat. Das Gate fragt jetzt denselben deterministischen Director-Walk, den der Lauf ohnehin nimmt.
+    // Der Exit-Code 2 bleibt (etablierte Semantik "kein Experiment moeglich"); die Fassade meldet Profil,
+    // Perm- und Schritt-Zahl. Profil-Aufloesung identisch zu --validate/--dump-plan: argv-Profil, sonst
+    // COMDARE_THESIS_PROFILE, sonst das gebackene Default-Profil.
+    {
+        std::string gate_profile = env_trimmed("COMDARE_THESIS_PROFILE");
+        if (gate_profile.empty()) gate_profile = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
+        namespace pf = comdare::cache_engine::builder::profile_facade;
+        if (int const rc = pf::assert_plan_nonempty_facade(gate_profile, std::cout); rc != 0) { return rc; }
+    }
 
     // V37.C (2026-05-23): Manifest-Iteration — pro Permutation ein Eintrag.
     // GO-V4 G2 (2026-07-13): hinter die bereits bestehende Legacy-Huerde (COMDARE_LEGACY_MESSREIHEN==1,

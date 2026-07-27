@@ -135,11 +135,15 @@ else()
     message(STATUS "[messung_driver] INC-F Katalog-Treiber DEAKTIVIERT (Surrogat-Default, INERT)")
 endif()
 
-# V36.D (2026-05-23) - Runtime-Check fuer Pre-Build-Permutationen
-# Pfade zur generierten Manifests via compile-time defines durchreichen.
-target_compile_definitions(messung_driver PRIVATE
-    "COMDARE_PERMUTATIONS_MANIFEST_CE=\"${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt\""
-    "COMDARE_PERMUTATIONS_MANIFEST_PA=\"${CMAKE_BINARY_DIR}/generated/prt_art_permutations_manifest.txt\"")
+# V-2/2a (Bauplan TEIL V, 2026-07-27): die einkompilierten Manifest-Pfade sind ENTFALLEN.
+# Hier standen bis zum Manifest-Umzug die beiden compile-time defines
+# COMDARE_PERMUTATIONS_MANIFEST_CE/_PA auf ${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt
+# (bzw. prt_art_...). Sie speisten das alte V36.D-Startgate, das die Perm-DLL-Menge des Alt-Kanals
+# zaehlte. Das Startgate fragt jetzt den Planer-Plan (ce profile_run_facade::assert_plan_nonempty_facade),
+# ein Configure-Zeit-Artefakt braucht der Treiber dafuer nicht mehr.
+# permutations_runtime_check.hpp bleibt DEPRECATED im Baum (Doku-nie-loeschen); ohne diese Defines
+# greifen dort die leeren #ifndef-Fallbacks -- der env-gegatete COMDARE_LEGACY_MESSREIHEN-Diagnoseblock
+# meldet dann 0 Eintraege. Endgueltiger Entfall im V-4-Retire-Scope.
 
 # #31 (2026-07-11) — Regressions-Gate der E4-XML-Workload-Drive (messreihen_workload.hpp): reine Host-Logik
 # ueber den ce-DOM-Reader auf synthetischem XML-String (gate-frei, kein Treiber-Lauf, kein #156-Messdaten).
