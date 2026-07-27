@@ -99,7 +99,7 @@
   </axes_default_lookup>
 
   <!-- System-Achsen 1:1 aus all_axes_golden (Compiler-opt_level plus
-       extension_hardware-simd). system_config ist binary_id-NEUTRAL: es
+       external_utils-simd). system_config ist binary_id-NEUTRAL: es
        multipliziert nur die BAU-Matrix (build_version plus opt-Suffix plus
        ext-Suffix), NIE die N=2^17-Organ-Kartesik. Ofast bleibt WEGGELASSEN
        (es bricht den IEEE-754-Determinismus und den CRC64-golden-Anker);
@@ -111,12 +111,12 @@
         <option value="O3"/>
       </opt_level>
     </compiler>
-    <extension_hardware>
+    <external_utils>
       <simd>
         <option value="no_extension"/>
         <option value="avx2"/>
       </simd>
-    </extension_hardware>
+    </external_utils>
   </system_axes>
 
   <!-- Workloads 1:1 aus all_axes_golden. -->

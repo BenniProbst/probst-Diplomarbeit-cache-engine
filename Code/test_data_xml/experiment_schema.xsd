@@ -257,7 +257,7 @@
        binary_id-NEUTRAL (opt_level/simd sind system_config, stehen NIE in kCompositionAxisNames; Provenienz
        build_version/H-10-Sidecar). Haupt-Achse 'compiler' traegt die Unter-Achse 'opt_level' (EIN Container),
        deren <option>-Kinder die Stufen O0..Ofast tragen (Optionen der Unter-Achse, KEINE eigenen Achsen).
-       Haupt-Achse 'extension_hardware' (6., Q2 Option C) traegt die Unter-Achse 'simd' (EIN Container), deren
+       Haupt-Achse 'external_utils' (6., Q2 Option C) traegt die Unter-Achse 'simd' (EIN Container), deren
        <option>-Kinder die Auspraegungen no_extension/avx2/avx512 tragen (symmetrisch zu compiler/opt_level).
        Alles additiv (minOccurs=0); leer = CEB-Default (O3/no_extension).
        Der Planer permutiert die Optionen SELBST (opt-g). -->
@@ -311,7 +311,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="extension_hardware" minOccurs="0">
+      <xs:element name="external_utils" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="simd" minOccurs="0">              <!-- Unter-Achse (6.x): EIN Container, symmetrisch zu opt_level -->
