@@ -96,6 +96,40 @@ Kein Haken ohne literale Ausgabe.
    Neu-Pin. Ohne dokumentiertes 4a-Protokoll KEIN Fenster-Start.
 5. Kein laufender CI-Mess-/Golden-Lauf wird unterbrochen (§74); Fenster-Start erst bei freiem Slot.
 
+### GATE-ENTSCHEID 27.07.: ZWEI-GATE-MODELL (Manager bestaetigt, 5 Auflagen)
+
+NACHTRAG zu Vorbedingung 4a(iii) und Schritt 0(c)/13: Die Plan-Erwartung "0 failed JE BAUM" gilt
+ab hier NUR fuer den ce-Baum. Grund (Kurz-Beleg): der super-Baum traegt am Neu-Pin eine
+VOR-FENSTER-BESTANDS-Rotmenge, die kein Fenster-Schritt verursacht und die nicht Fenster-Inhalt ist;
+ein starres 453/453-Gate waere unerfuellbar (Muster identisch zur 4a-Basiszahlen-Korrektur).
+Statt Aufweichung gilt eine NAMENTLICH eingefrorene Ausnahmemenge mit Fehlerklasse.
+
+1. **ce-standalone = SCHARFES Gate.** 316/316, 0 failed, keine Ausnahme. Der Golden-Doppellauf und
+   das CRC-Bestaetigungs-Gate (kNewGolden131072Crc64 == 0x56F1B721C72DC10E) laufen NUR hier;
+   **STOPP-Regel 5 (Abschnitt 6) ist ausschliesslich am ce-Gate definiert.**
+2. **super = Integrations-Gate.** Erwartung 450 gruen / 5 rot / 453. Die Rotmenge ist ABSCHLIESSEND
+   (jeder sechste rote Test = STOPP + Meldung, keine stille Erweiterung):
+
+   | Test | Eingefrorene Fehlerklasse |
+   |------|---------------------------|
+   | test_v31_adapters | SEGFAULT (vendor-snmalloc; Ledger:514) |
+   | test_v41_topic_allocator_axis_06 | Abort (vendor-snmalloc, dito) |
+   | test_limits_entkopplung_vorstufe | CRC-MISMATCH (konfigurationsgebunden) |
+   | test_lazy_adhoc_source_gen | CRC-MISMATCH (konfigurationsgebunden) |
+   | test_axis_registry_roundtrip | Inventar-Drift (contract; gate-gewollt) |
+
+3. **CRC-Wert vs. CRC-Klasse im super:** der super-seitige CRC-MISMATCH-WERT der beiden
+   CRC-Tests DARF sich durch die golden-veraendernden Schritte 3/4/6/7/8/9/10/12 aendern — die
+   FEHLERKLASSE muss bleiben. Ein Klassenwechsel (z.B. CRC-MISMATCH -> SEGFAULT) ist STOPP.
+   Das beruehrt das ce-seitige Bestaetigungs-Gate (Punkt 1) NICHT: dort bleibt der Wert hart.
+4. **comdare_permutation_codegen_cli** wird in super-Laeufen EXPLIZIT als Target mitgebaut
+   (sonst faellt er aus dem Bau-Scope und das Integrations-Gate wird zum Schein-Beweis).
+5. **test_system_axis_registry_roundtrip = tragendes Gate der Schritte 3/4/6** (Registry-Regen im
+   selben Commit, compare_files FATAL). Vorher-Beweis 1/1 in BEIDEN Baeumen ist Pflicht und geht
+   als Vorher/Nachher-Paar in die Paketmeldung. NICHT zu verwechseln mit dem gleichnamig
+   anmutenden `test_axis_registry_roundtrip` aus der super-Ausnahmemenge (Zeile 5 der Tabelle) —
+   verschiedene Tests, verschiedene Rollen.
+
 ---
 
 ## 2. TABU-Liste (gilt AUCH im Fenster, NACH-Pruefung 6.12)
@@ -116,8 +150,10 @@ conformance-Oracle; saemtliche Messdaten/CSV; beide .gitlab-ci.yml (Infra-Gebiet
   (getrackte Aenderungen leer, erlaubte untracked Pfade namentlich gelistet); (b) lokale Start-Tags
   `o8-fenster-start` in BEIDEN
   Baeumen setzen; (c) Baseline-Bau ce-standalone UND super mit `-DCOMDARE_V32_ENABLE=ON` nach
-  Standalone-Referenz, ctest JE BAUM 0 failed als Eintritts-Beweis (Basiszahlen am Alt-Pin:
-  ce 316/316, super 453/453 — NICHT "316 in beiden"; nach Re-Pin gelten die 4a(iii)-Neu-Zahlen);
+  Standalone-Referenz, ctest je Baum als Eintritts-Beweis GEMAESS ZWEI-GATE-MODELL (Abschnitt 1,
+  GATE-ENTSCHEID 27.07.): ce 316/316 scharf, super 450/5/453 mit eingefrorener Ausnahmemenge
+  (Basiszahlen am Alt-Pin ce 316 / super 453 — NICHT "316 in beiden"; nach Re-Pin gelten die
+  4a(iii)-Neu-Zahlen);
   (d) Baseline-Sicherungen in den Scratchpad:
   `generated/axes/alloc/axis_06_allocator_flags.hpp` aus BEIDEN Baeumen (V-1-G1-Referenz),
   golden/320-Baum-Dump, Kopien der 7 Byte-Wachen-Dateien, Literal `kNewGolden131072Crc64 =
@@ -484,7 +520,9 @@ conformance-Oracle; saemtliche Messdaten/CSV; beide .gitlab-ci.yml (Infra-Gebiet
   Wachen-Matrix (Abschnitt 4) komplett pruefen; V-1-G1-Byte-Diff final wiederholen;
   golden/320-Baum-Dump gegen Baseline: NUR die in der Delta-Liste erklaerten Abweichungen.
 - Byte-Klasse: byte-neutral (Pruef-Schritt).
-- Beweis: ctest-Summary JE BAUM literal, 0 failed; Basiszahlen am Alt-Pin: ce-standalone 316,
+- Beweis: ctest-Summary JE BAUM literal nach ZWEI-GATE-MODELL (Abschnitt 1, GATE-ENTSCHEID 27.07.):
+  ce-standalone 0 failed SCHARF, super 5 failed == die eingefrorene Ausnahmemenge NAMENTLICH
+  abgeglichen (sechster roter Test = STOPP); Basiszahlen am Alt-Pin: ce-standalone 316,
   super 453; nach Re-Pin gilt die 4a(iii)-Neu-Basis
   ("316/316 in beiden Baeumen" war falsch — im super-Baum unerreichbar und haette zur Scope-Verengung
   auf den ce-Subbuild verleitet); neue Wachen-Tests aus Schritt 11 erhoehen N additiv — Ist-N je Baum
