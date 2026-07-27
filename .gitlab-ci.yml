@@ -326,11 +326,17 @@ analyse:thesis-data:
   # KEIN Code/build/-Artefakt (Object-Storage-500 post-swap; analyse-Erfolg = Tools bauen, Beleg im Log).
 
 # ── Stage analyse: #279 dynamische Tier-Binary-Build-Sichtbarkeit ──
-# Surfacet im CI-Log, welche Tier-Binary-Rekombinationen geplant/gebaut/offen sind + ob der
-# CacheEngineBuilder-Orchestrator gebaut ist. BILLIG: der ce-Codegen schreibt das
-# permutations_manifest.txt bereits bei CONFIGURE (KEIN Lib-Compile); es wird NUR das committete
-# Tool tier-binary-report gebaut + --visibility ausgefuehrt. KEIN schwerer Perm-/Mess-Lauf
-# (mehrtaegiger Lauf #156 bleibt HELD). Hart (kein allow_failure).
+# UMBAU 2b/D3.4 (27.07., INFRA-Handout-Auftraege 1-3): der Job surfacet die Bau-Sichtbarkeit
+# jetzt aus der EINEN kanonischen Planer-Ausgabe statt aus dem Codegen-Manifest.
+#   - Quelle ist "comdare-messung-driver plan dump" (rein lesend: KEIN DLL-Bau, KEINE Messung).
+#   - EIN-FORMAT-REGEL (§73.1): der Job liest NUR den ROHEN plan-dump-Text - denselben, den 2c
+#     auch fuer tier_binary_report_cli vorsieht. Kein Zwischenformat, keine eigene Datei;
+#     "Caching" ausschliesslich als Job-Artefakt der rohen Ausgabe.
+#   - Die permutations_manifest.txt-Pruefung entfaellt ERSATZLOS (der Codegen im Configure
+#     bleibt, ist fuer diesen Job aber irrelevant -> perspektivisch entkoppelbar, OP-6).
+# BILLIG-KLAUSEL ENTFAELLT: der Treiber-Bau ist SCHWERER als das alte tier_binary_report_cli
+# (voller Werkzeug-Bau statt Einzel-Tool); .ccache-pull mildert das. Weiterhin KEIN Perm-/
+# Mess-Lauf (mehrtaegiger Lauf #156 bleibt HELD). Hart (kein allow_failure).
 visibility:tier-binaries:
   extends: [.code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
   stage: analyse
@@ -339,21 +345,35 @@ visibility:tier-binaries:
   script:
     - 'echo "== Toolchain =="; cmake --version'
     - cd Code
-    # Configure triggert den ce-Permutations-Codegen (COMDARE_BUILD_PERMUTATIONS=ON = super-Default)
-    # -> generated/permutations_manifest.txt; Tests aus fuer schnelles Configure (kein gtest-Fetch).
     - cmake -B build-visibility -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
-    - cmake --build build-visibility --target tier_binary_report_cli
+    - cmake --build build-visibility --target comdare-messung-driver
     - |
       set -euo pipefail
-      REPORT=$(find build-visibility -type f -name "tier-binary-report" 2>/dev/null | head -1)
-      test -n "$REPORT" -a -x "$REPORT" || { echo "tier-binary-report fehlt: $REPORT"; exit 1; }
-      MANIFEST=build-visibility/generated/permutations_manifest.txt
-      test -s "$MANIFEST" || { echo "Codegen-Manifest fehlt (COMDARE_BUILD_PERMUTATIONS?): $MANIFEST"; exit 1; }
-      echo "-- permutations_manifest.txt (head) --"; head -n 5 "$MANIFEST"
-      "$REPORT" --visibility "$MANIFEST" build-visibility/perm --out=build-visibility/BUILD_VISIBILITY.txt
-      echo "=== visibility:tier-binaries OK (Build-Sichtbarkeit im Log surfaced) ==="
+      DRIVER=$(find build-visibility -type f -name "comdare-messung-driver" 2>/dev/null | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      # Profil OHNE Argument: Fallback-Kette COMDARE_THESIS_PROFILE -> einkompiliertes Default
+      # (Profil-Pinning waere haerter gegen CI-Env-Drift -> OP-5, bewusst noch nicht gesetzt).
+      "$DRIVER" plan dump > build-visibility/dump_plan.txt
+      # 1. Kopf-Wache: Formatanker der v1.1-Emission (schlaegt bei Formatbruch sofort an).
+      grep -q '^# comdare-experiment-plan v1.1' build-visibility/dump_plan.txt || {
+        echo "FORMAT-BRUCH: Kopfzeile '# comdare-experiment-plan v1.1' fehlt"; head -5 build-visibility/dump_plan.txt; exit 1; }
+      # 2. Startgate/Sichtbarkeit: >=1 geplante step-Zeile MIT binary_id-FELD = sichtbarer Bau-Raum.
+      # BEWUSST Feld-Praesenz statt Wert-ungleich-'-': THESIS-Profile emittieren binary_id=- (nur
+      # EXPERIMENT-Profile tragen echte ids); ein Nicht-'-'-Filter waere beim Thesis-Default LEER
+      # und der Job dauerhaft ROT (lokal am realen plan-dump verifiziert). Strengere Pruefung: OP-4.
+      # '|| true': ohne das wuerde grep -c bei 0 Treffern via set -e sofort abbrechen - die
+      # Diagnose unten kaeme nie ins Log. Der Job wird trotzdem hart rot (test -ge 1).
+      STEPS=$(grep -Ec '^  step [0-9]+ .*binary_id=' build-visibility/dump_plan.txt || true)
+      test "$STEPS" -ge 1 || {
+        echo "STARTGATE LEER: keine 'step N ... binary_id='-Zeile im plan dump -> kein sichtbarer Bau-Raum"; exit 1; }
+      # 3. Sichtbarkeits-Zweck des Jobs: Zaehler + Rohausgabe ins Log.
+      echo "== geplante step-Zeilen mit binary_id-Feld: ${STEPS} =="
+      echo "-- plan dump (head -30) --"; head -30 build-visibility/dump_plan.txt
+      echo "=== visibility:tier-binaries OK (Bau-Sichtbarkeit aus plan dump v1.1 surfaced) ==="
   artifacts:
-    paths: []
+    when: always          # auch rote Laeufe sollen die Rohausgabe surfacen
+    expire_in: 1 week
+    paths: ["Code/build-visibility/dump_plan.txt"]
 
 # ── Stage integration (#196, EPIC #186): E2E-Auswerte-Smoke auf Linux-bare-metal ──
 # Beweist, dass der Mess-AUSWERTE-Pfad real funktioniert: baut die 4 leichten Auswerte-Tools (01/03/04/05,
