@@ -363,20 +363,69 @@ struct PlanerBlockGate {
     return g;
 }
 
-// G4b-2/2.4-(3): EIN Ausnahme-Mantel fuer ALLE VIER Emissionszweige. Sie lagen bisher in keinem try (die einzigen
+// G4b-2/2.4-(3): der Ausnahme-Mantel fuer ALLE VIER Emissionszweige. Sie lagen bisher in keinem try (die einzigen
 // im File sind der --validate- und der E4-Block) -- eine Ausnahme aus main haette std::terminate OHNE Unwinding
 // ausgeloest, der PromiseGuard des planer_block waere nie gefeuert und die Reservierung 30 Minuten haengen
 // geblieben. Rueckgabe 1, NICHT 6: exit 6 bleibt exklusiv fuer fehlerklasse=konfiguration_unvollstaendig.
-template <typename Thunk>
-[[nodiscard]] int guarded_emission(char const* was, Thunk&& thunk) {
+//
+// A-B1 (cppcheck 2.21 throwInEntryPoint, CI Job 333638): die vier Zweige leben als BENANNTE freie Handler
+// AUSSERHALB von main -- cppcheck wertet Lambda-Koerper LEXIKALISCH im Kontext der umgebenden Funktion (auch
+// in main; der fruehere In-main-Lambda-Umbau 8064f3ff blieb deshalb wirkungslos) und versteht ein try, das erst
+// im Aufgerufenen um den Thunk liegt, NICHT (das fruehere guarded_emission-Template fiel genau daran). Deshalb
+// steht der try/catch-Mantel ausgeschrieben IN jedem Handler (etabliertes Muster --chunk-organ-fingerprint);
+// nur die Fehler-Meldung ist zentral (emission_abgebrochen). noexcept ist damit wahr UND lexikalisch belegbar.
+// main ruft die Handler direkt, ohne Lambda, und ist lexikalisch frei von werfendem Code. Zugleich sind das
+// die kanonischen Handler der V-6-Subcommand-Linie (Bauplan TEIL V, V-6vi).
+[[nodiscard]] int emission_abgebrochen(char const* was, char const* detail) noexcept {
+    std::cerr << "[bestandslog] FEHLER fehlerklasse=emission_abgebrochen: " << was << " -- " << detail << "\n";
+    return 1;
+}
+
+[[nodiscard]] int run_dump_ci_guarded(std::string const& prof) noexcept {
+    namespace pf = comdare::cache_engine::builder::profile_facade;
+    // G4b-2/E1: eine der beiden CEB-Compile-Strecken -> planer_block haengt hier. Gate-Erzeugung IM Mantel:
+    // make_planer_block_gate() macht Bestandslog-IO und kann werfen -- nur im Mantel ist das Unwinding
+    // (PromiseGuard) garantiert; exit 6 bleibt dem Gate-Abbruch vorbehalten.
     try {
-        return thunk();
-    } catch (std::exception const& e) {
-        std::cerr << "[bestandslog] FEHLER fehlerklasse=emission_abgebrochen: " << was << " -- " << e.what() << "\n";
-        return 1;
-    } catch (...) {
-        std::cerr << "[bestandslog] FEHLER fehlerklasse=emission_abgebrochen: " << was << " -- unbekannte Ausnahme\n";
-        return 1;
+        auto const gate = make_planer_block_gate();
+        if (gate.abbruch) return 6;
+        return pf::dump_experiment_ci_facade(prof, std::cout, gate.ctx);
+    } catch (std::exception const& e) { return emission_abgebrochen("--dump-ci", e.what()); } catch (...) {
+        return emission_abgebrochen("--dump-ci", "unbekannte Ausnahme");
+    }
+}
+
+[[nodiscard]] int run_dump_cmake_guarded(std::string const& prof) noexcept {
+    namespace pf = comdare::cache_engine::builder::profile_facade;
+    // G4b-2/E1: die zweite CEB-Compile-Strecke -- derselbe planer_block wie bei --dump-ci.
+    try {
+        auto const gate = make_planer_block_gate();
+        if (gate.abbruch) return 6;
+        return pf::dump_experiment_cmake_facade(prof, std::cout, gate.ctx);
+    } catch (std::exception const& e) { return emission_abgebrochen("--dump-cmake", e.what()); } catch (...) {
+        return emission_abgebrochen("--dump-cmake", "unbekannte Ausnahme");
+    }
+}
+
+[[nodiscard]] int run_emit_tier_ci_guarded(std::string const& prof, std::string const& combo_sel) noexcept {
+    namespace pf = comdare::cache_engine::builder::profile_facade;
+    // G4b-2/E1: KEIN planer_block -- --emit-tier-* ist die CEB-Rolle (Tier-Jobs), nicht die CEB-Compile-
+    // Strecke; die Tier-Ebene hat ihre eigene Reservierung im Iterator. Der Ausnahme-Mantel gilt trotzdem
+    // (2.4-(3) verlangt ihn fuer ALLE vier Zweige).
+    try {
+        return pf::emit_tier_ci_facade(prof, std::cout, combo_sel);
+    } catch (std::exception const& e) { return emission_abgebrochen("--emit-tier-ci", e.what()); } catch (...) {
+        return emission_abgebrochen("--emit-tier-ci", "unbekannte Ausnahme");
+    }
+}
+
+[[nodiscard]] int run_emit_tier_cmake_guarded(std::string const& prof, std::string const& combo_sel) noexcept {
+    namespace pf = comdare::cache_engine::builder::profile_facade;
+    // G4b-2/E1: wie --emit-tier-ci -- kein planer_block, aber der Ausnahme-Mantel (2.4-(3)).
+    try {
+        return pf::emit_tier_cmake_facade(prof, std::cout, combo_sel);
+    } catch (std::exception const& e) { return emission_abgebrochen("--emit-tier-cmake", e.what()); } catch (...) {
+        return emission_abgebrochen("--emit-tier-cmake", "unbekannte Ausnahme");
     }
 }
 // ---------------------------------------------------------------------------------------------------------------
@@ -513,15 +562,8 @@ int main(int argc, char* argv[]) {
             std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            // G4b-2/E1: eine der beiden Strecken, die real in einen CEB-Compile muenden -> planer_block haengt hier.
-            // Gate-Erzeugung IM Mantel: make_planer_block_gate() macht Bestandslog-IO und kann werfen -- nur im
-            // Mantel ist das Unwinding (PromiseGuard) garantiert; exit 6 bleibt dem Gate-Abbruch vorbehalten.
-            int const rc = guarded_emission("--dump-ci", [&]() -> int {
-                auto const gate = make_planer_block_gate();
-                if (gate.abbruch) return 6;
-                return pf::dump_experiment_ci_facade(prof, std::cout, gate.ctx);
-            });
+            // A-B1: Mantel + planer_block-Gate leben im benannten Handler ausserhalb von main (throwInEntryPoint).
+            int const rc = run_dump_ci_guarded(prof);
             return rc; // 2.4-(2): LOKALE Variable, kein return-im-Ausdruck
         }
         // --dump-cmake [<profil>] (PAKET W7-B, 2026-07-19, §40.c): rein-lesende Emission des scharfen
@@ -532,14 +574,8 @@ int main(int argc, char* argv[]) {
             std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
                                                                        : env_trimmed("COMDARE_THESIS_PROFILE");
             if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            // G4b-2/E1: die zweite CEB-Compile-Strecke -- derselbe planer_block wie bei --dump-ci.
-            // Gate-Erzeugung IM Mantel (siehe --dump-ci): werfende Bestandslog-IO nur mit garantiertem Unwinding.
-            int const rc = guarded_emission("--dump-cmake", [&]() -> int {
-                auto const gate = make_planer_block_gate();
-                if (gate.abbruch) return 6;
-                return pf::dump_experiment_cmake_facade(prof, std::cout, gate.ctx);
-            });
+            // A-B1: Mantel + planer_block-Gate im benannten Handler ausserhalb von main (siehe --dump-ci).
+            int const rc = run_dump_cmake_guarded(prof);
             return rc; // 2.4-(2): LOKALE Variable
         }
         // --emit-tier-ci [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): die CEB-ROLLEN-Emission (Stufe 2). Wie
@@ -559,12 +595,8 @@ int main(int argc, char* argv[]) {
             for (int j = 1; j < argc; ++j) {
                 if (std::string const a{argv[j]}; a.rfind("--measurement-combo=", 0) == 0) combo_sel = a.substr(20);
             }
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            // G4b-2/E1: KEIN planer_block -- --emit-tier-* ist die CEB-Rolle (Tier-Jobs), nicht die
-            // CEB-Compile-Strecke; die Tier-Ebene hat ihre eigene Reservierung im Iterator. Der Ausnahme-Mantel
-            // gilt trotzdem (2.4-(3) verlangt ihn fuer ALLE vier Zweige).
-            int const rc = guarded_emission("--emit-tier-ci",
-                                            [&]() { return pf::emit_tier_ci_facade(prof, std::cout, combo_sel); });
+            // A-B1: Mantel im benannten Handler ausserhalb von main (Rollen-Kommentar dort).
+            int const rc = run_emit_tier_ci_guarded(prof, combo_sel);
             return rc; // 2.4-(2): LOKALE Variable
         }
         // --emit-tier-cmake [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): der Bare-Metal-Gegenpart zu
@@ -582,10 +614,8 @@ int main(int argc, char* argv[]) {
             for (int j = 1; j < argc; ++j) {
                 if (std::string const a{argv[j]}; a.rfind("--measurement-combo=", 0) == 0) combo_sel = a.substr(20);
             }
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            // G4b-2/E1: wie --emit-tier-ci -- kein planer_block, aber der Ausnahme-Mantel (2.4-(3)).
-            int const rc = guarded_emission("--emit-tier-cmake",
-                                            [&]() { return pf::emit_tier_cmake_facade(prof, std::cout, combo_sel); });
+            // A-B1: Mantel im benannten Handler ausserhalb von main (Rollen-Kommentar dort).
+            int const rc = run_emit_tier_cmake_guarded(prof, combo_sel);
             return rc; // 2.4-(2): LOKALE Variable
         }
     }
