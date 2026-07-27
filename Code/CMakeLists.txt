@@ -96,26 +96,26 @@ set(COMDARE_PARALLEL_JOBS "${COMDARE_PARALLEL_JOBS}" CACHE STRING
     "Parallele Builds (User-Direktive: cores/2, je 2 Threads, Pipeline voll)")
 message(STATUS "Comdare V37.G: ${_comdare_n_cores} cores detected, ${COMDARE_PARALLEL_JOBS} parallel jobs (2 threads each)")
 
-# V36.B (2026-05-23): Permutations-Pre-Build Default-ON im Diplomarbeit-Container
-# Mode: on_build_on_demand (User-Direktive 2026-05-23) — inkrementell
-set(COMDARE_BUILD_PERMUTATIONS ON CACHE BOOL
-    "Pre-Build der cache-engine Permutationen (V36.B Diplomarbeit-Default)")
+# V-3 (Bauplan TEIL V, 2026-07-27): die Alt-Kanal-Schalter des Diplomarbeit-Containers sind
+# ENTFALLEN -- der super-Configure ruft keinen Permutations-Codegen mehr auf.
+# Hier standen bis zur Super-Abschaltung sechs Setzungen: COMDARE_BUILD_PERMUTATIONS (V36.B)
+# und COMDARE_PRT_ART_BUILD_PERMUTATIONS (V36.C) je auf ON sowie die zugehoerigen
+# COMDARE_[PRT_ART_]PERMUTATION_MODE/_PROFILE (on_build_on_demand / smoke). Sie zwangen den
+# ce- und den prt-art-Sub-Build bei JEDEM Configure durch den V36.B-Codegen (27 + 16 smoke-
+# Permutationen). Der Fassaden-/Planer-Kanal hat diesen Kanal vollstaendig abgeloest: das
+# Treiber-Startgate fragt den Planer-Plan (V-2, 02_messung_driver/CMakeLists.txt), der
+# CI-Job visibility:tier-binaries liest die Planer-Rohausgabe 'plan dump' v1.1 (D3.4/2b),
+# und die perm_*-DLLs sind nicht die Tier-Binaries. Die Repo-Defaults bleiben unberuehrt
+# (ce CMakeLists.txt:41 OFF, prt-art CMakeLists.txt:41 OFF) -- wer den Alt-Kanal fuer einen
+# Vergleichslauf braucht, setzt -DCOMDARE_BUILD_PERMUTATIONS=ON explizit auf der Kommandozeile.
+# Der ce-seitige Retire (Codegen-Werkzeug, cmake/permutations.cmake) folgt als Paket V-4.
+#
 # V-1 (O-8 Schritt 1): Vendor-Provisioning EXPLIZIT, nicht als Mitnahme-Effekt der
-# Permutationen. Der ce-Default leitet sich zwar aus COMDARE_BUILD_PERMUTATIONS ab und
-# waere hier ebenfalls ON -- die explizite Setzung haelt das Provisioning aber am Leben,
-# wenn V-3 (Super-Abschaltung) COMDARE_BUILD_PERMUTATIONS im super abschaltet.
+# Permutationen. Der ce-Default leitet sich aus COMDARE_BUILD_PERMUTATIONS ab und ist mit
+# V-3 dort OFF -- diese explizite Setzung haelt das Provisioning am Leben und ist damit ab
+# jetzt die TRAGENDE Quelle der COMDARE_VENDOR_*-Defaults (nicht mehr nur die Absicherung).
 set(COMDARE_PROVISION_VENDOR_ALLOCATORS ON CACHE BOOL
     "Vendor-Allokatoren im Diplomarbeit-Container bereitstellen (V-1 Entkopplung)")
-set(COMDARE_PRT_ART_BUILD_PERMUTATIONS ON CACHE BOOL
-    "Pre-Build der PRT-ART Pruefling-Permutationen (V36.C Diplomarbeit-Default)")
-set(COMDARE_PERMUTATION_MODE "on_build_on_demand" CACHE STRING
-    "Tri-State Mode: on_rebuild | on_build_on_demand | off_pause_build")
-set(COMDARE_PRT_ART_PERMUTATION_MODE "on_build_on_demand" CACHE STRING
-    "Tri-State Mode (PRT-ART): on_rebuild | on_build_on_demand | off_pause_build")
-set(COMDARE_PERMUTATION_PROFILE "smoke" CACHE STRING
-    "Profile-Filter: smoke (~27) | medium (~108) | full (Stunden)")
-set(COMDARE_PRT_ART_PERMUTATION_PROFILE "smoke" CACHE STRING
-    "PRT-ART Profile: smoke (~16) | medium (~81) | full")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # V35.E (2026-05-22) - FetchContent-Cache im User-Home
@@ -221,86 +221,25 @@ add_subdirectory(${COMDARE_PRT_ART_DIR}
                  ${CMAKE_BINARY_DIR}/_prt_art_external
                  EXCLUDE_FROM_ALL)
 
-# V36.B (2026-05-23): Re-Export der Permutations-Targets auf Top-Level.
-# Ohne dieses Re-Export sind die ~27 Per-Permutation-Targets nur in der
-# cache-engine.sln, nicht in der Diplomarbeit-Sln.
-if(TARGET comdare_permutations_all)
-    # Aggregator-Top-Level Target: explizit baubar via
-    #   cmake --build <preset> --target comdare_perms
-    add_custom_target(comdare_perms_ce
-        DEPENDS comdare_permutations_all
-        COMMENT "V36.B Pre-Build aller cache-engine Permutationen")
-    message(STATUS "Comdare V36.B: 'comdare_perms_ce' Top-Level-Target registriert")
-endif()
+# V-3 (Bauplan TEIL V, 2026-07-27): die drei Re-Export-Targets des Alt-Kanals sind ENTFALLEN.
+# Hier standen comdare_perms_ce (V36.B, Re-Export von comdare_permutations_all aus dem
+# ce-Sub-Build), comdare_perms_pa (V36.C, Re-Export von comdare_prt_art_permutations_all) und
+# das Kombi-Target comdare_perms_all (V36.D). Ihr Zweck war, die generierten Per-Permutations-
+# Targets aus den Sub-Builds in der Diplomarbeit-Solution sichtbar zu machen; mit dem
+# abgeschalteten Codegen (s. Options-Block oben) existieren die Quell-Targets gar nicht mehr,
+# die if(TARGET ...)-Waechter waeren also ohnehin dauerhaft falsch.
 
-# V36.C (2026-05-23): PRT-ART Pruefling-Permutations Top-Level Re-Export
-if(TARGET comdare_prt_art_permutations_all)
-    add_custom_target(comdare_perms_pa
-        DEPENDS comdare_prt_art_permutations_all
-        COMMENT "V36.C Pre-Build aller PRT-ART Pruefling-Permutationen")
-    message(STATUS "Comdare V36.C: 'comdare_perms_pa' Top-Level-Target registriert")
-endif()
-
-# V36.D (2026-05-23): Kombi-Target — beide Permutations-Sets in einem Schritt
-if(TARGET comdare_perms_ce AND TARGET comdare_perms_pa)
-    add_custom_target(comdare_perms_all
-        DEPENDS comdare_perms_ce comdare_perms_pa
-        COMMENT "V36.D Pre-Build aller Permutationen (cache-engine + PRT-ART)")
-endif()
-
-# V37.G (2026-05-23): Drei-Wurzel-Filesystem-Layout fuer Permutations.
-# User-Direktive: "Cache Engine Rekombinationen vs Prueflings Rekombinationen
-# vs ALLE Rekombinationen sind jeweils die Wurzel des Baumes"
-#
-# Wurzeln:
-#   ${BINARY_DIR}/perm/cache_engine/  (27 smoke / 144 medium)
-#   ${BINARY_DIR}/perm/prt_art/       (16 smoke / 81 medium)
-#   ${BINARY_DIR}/perm/all/           (Aggregator-Manifest)
-#
-# Compiler/BuildType-Label als perm/BUILD_LABEL.txt (User-Direktive:
-# "Compiler/CMake-build-type/Version koennen als Beschriftung des
-# Permutation-Builds vereinfacht werden")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/perm/all")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/perm/cache_engine")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/perm/prt_art")
-
-# Compiler/BuildType/Version als Label
-# Bei Multi-Config-Generatoren (VS) ist CMAKE_BUILD_TYPE leer
-set(_label_build_type "${CMAKE_BUILD_TYPE}")
-if(NOT _label_build_type)
-    set(_label_build_type "multi-config")
-endif()
-set(_build_label_content "# perm/BUILD_LABEL.txt — generiert vom Diplomarbeit-Container
-# User-Direktive V37.G: Compiler/BuildType/Version als Beschriftung
-
-compiler_id=${CMAKE_CXX_COMPILER_ID}
-compiler_version=${CMAKE_CXX_COMPILER_VERSION}
-compiler_path=${CMAKE_CXX_COMPILER}
-build_type=${_label_build_type}
-generator=${CMAKE_GENERATOR}
-cmake_version=${CMAKE_VERSION}
-system_name=${CMAKE_SYSTEM_NAME}
-system_processor=${CMAKE_SYSTEM_PROCESSOR}
-parallel_jobs=${COMDARE_PARALLEL_JOBS}
-permutation_profile=${COMDARE_PERMUTATION_PROFILE}
-prt_art_profile=${COMDARE_PRT_ART_PERMUTATION_PROFILE}
-permutation_mode=${COMDARE_PERMUTATION_MODE}
-prt_art_mode=${COMDARE_PRT_ART_PERMUTATION_MODE}
-")
-file(WRITE "${CMAKE_BINARY_DIR}/perm/BUILD_LABEL.txt" "${_build_label_content}")
-
-# Aggregator-Manifest (perm/all/manifest_all.txt) wird via custom_command
-# nach jedem comdare_perms_all-Build geschrieben (POST_BUILD).
-if(TARGET comdare_perms_all)
-    add_custom_command(TARGET comdare_perms_all POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-            -DPERM_CE_MANIFEST=${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt
-            -DPERM_PA_MANIFEST=${CMAKE_BINARY_DIR}/generated/prt_art_permutations_manifest.txt
-            -DPERM_ALL_OUT=${CMAKE_BINARY_DIR}/perm/all/manifest_all.txt
-            -DPERM_ROOT=${CMAKE_BINARY_DIR}/perm
-            -P ${CMAKE_SOURCE_DIR}/cmake/write_perm_all_manifest.cmake
-        COMMENT "V37.G: schreibe perm/all/manifest_all.txt + perm/README.md")
-endif()
+# V-3 (Bauplan TEIL V, 2026-07-27): der perm/-Ausgabebaum des Alt-Kanals ist ENTFALLEN.
+# Hier stand V37.G: das Drei-Wurzel-Layout (${BINARY_DIR}/perm/{cache_engine,prt_art,all})
+# samt perm/BUILD_LABEL.txt (Compiler/BuildType/Generator/Profile/Mode als Beschriftung des
+# Permutations-Builds) und dem POST_BUILD-Aggregator auf comdare_perms_all, der die beiden
+# Codegen-Manifeste zu perm/all/manifest_all.txt zusammenzog (cmake/write_perm_all_manifest.cmake).
+# Ohne Codegen bleibt kein Inhalt fuer diesen Baum: die drei Wurzeln waeren leere Verzeichnisse,
+# das Label trueg leere permutation_profile/-mode-Felder (Doku-Luege), und der POST_BUILD-Waechter
+# if(TARGET comdare_perms_all) ist dauerhaft falsch. Lebende Konsumenten hatte weder BUILD_LABEL.txt
+# noch manifest_all.txt (Grep ueber super: nur diese CMake-Stellen selbst und Doku/Backups).
+# Das Skript cmake/write_perm_all_manifest.cmake bleibt vorerst im Baum (Aufrufer = 0) und ist als
+# Kandidat des Abschluss-Aufraeumpasses (Ledger 75) vermerkt.
 
 # prt-art baut intern wieder cache-engine ein — das aber NICHT noch einmal:
 # wir setzen COMDARE_CACHE_ENGINE_DIR explizit, sodass prt-art unsere
@@ -392,11 +331,13 @@ set(_comdare_release_dir "${CMAKE_BINARY_DIR}/pipeline_release")
 if(COMDARE_DA_PIPELINE_MODE STREQUAL "release_measure")
     set(_comdare_release_deps
         messung_driver binary_to_csv_cli csv_to_latex_cli diagram_generator_cli)
-    if(TARGET comdare_perms_all)
-        list(APPEND _comdare_release_deps comdare_perms_all)  # alle Tier-Binaries PFLICHT vor dem Lauf
-    elseif(TARGET comdare_perms_ce)
-        list(APPEND _comdare_release_deps comdare_perms_ce)
-    endif()
+    # V-3 (Bauplan TEIL V, 2026-07-27): der bedingte Anhang von comdare_perms_all bzw.
+    # comdare_perms_ce an die Release-Abhaengigkeiten ist ENTFALLEN. Sein Kommentar behauptete
+    # "alle Tier-Binaries PFLICHT vor dem Lauf" -- das war schon vor dem Retire falsch: die
+    # perm_*-DLLs des V36.B-Codegens sind NICHT die Tier-Binaries (Bauplan TEIL V, Paket V-4:
+    # "perm_*-DLLs sind nicht die Tier-Binaries; kein ce-Runtime-Konsument"). Die Tier-Binaries
+    # baut der Planer-/CEB-Kanal aus dem Profil. Mit den entfallenen Re-Export-Targets waeren
+    # beide if(TARGET ...)-Zweige ohnehin dauerhaft falsch.
     # Best-effort finale PDF (nur wenn pdflatex vorhanden) — analog comdare_pipeline_e2e.
     set(_comdare_release_pdf_cmds "")
     if(COMDARE_PDFLATEX)
