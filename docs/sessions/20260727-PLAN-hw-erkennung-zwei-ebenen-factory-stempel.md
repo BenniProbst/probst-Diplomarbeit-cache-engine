@@ -192,3 +192,31 @@ E-4 eigene HardwareProbe-Domaene + dokumentierte Dehnung der Drift-Klasse · E-5
 Folge-Paket · E-6 Abstract Factory (CAS/Bestueckung = zweites Produkt) · E-7 Familien-Klasse
 + Maschinen-Tupel-Zusatzzeile. E-8 bleibt Infra-gated (nur Test-Erwartung).
 Ausfuehrung: P1 beauftragt (Impl-CE-6de) am 27.07. ~17:45Z.
+
+## NACHTRAG 2 ~17:50Z — OWNER-ERGAENZUNG: Planer kennt die ISA×OS-KOMPLEX-HAUPTACHSE
+
+Owner (verbatim-nah): "Der Planer muss zumindest die ISA x OS Komplex-Hauptachse KENNEN, um
+per Metaprogrammierung eine passende feingranulare Hardware-Erkennung und passende OS-Handles
+dafuer mitzugeben bzw. je ISA x OS einzukompilieren (beachte ALLE vorhandenen ISA und
+dokumentierten OS)."
+
+BINDENDE KONSEQUENZEN (praezisiert Ebene 1 + P2/P5):
+K1. Der PLANER wird erster echter KONSUMENT von TargetIsaComplexAxis + OS-Achse (heute:
+    0 Konsumenten ausser asserts/Registry-Gen — Kartierungs-Befund). Seine Laufzeit-Erkennung
+    mappt den identifizierten Host auf eine ZELLE der CT-Matrix ISA×OS und waehlt darueber
+    per Metaprogrammierung die einzukompilierende feingranulare Erkennung + OS-Handles.
+K2. Die Factory-WAHL spannt BEIDE Achsen im Typ: Spezialisierung ueber (IsaComplexTyp ×
+    OsTyp) — nicht OS-only mit ISA als Methoden-Parameter (loest die Review-Auflage
+    "GoF nur halb im Typ" im Owner-Sinn auf).
+K3. TOTALITAET ueber den GANZEN deklarierten Raum: kAllTargetIsaComplexIds (alle vorhandenen
+    ISA-Komplexe) × kAllOperatingSystemIds (alle dokumentierten OS, Registry linux/windows/
+    macos). CT-Totalitaets-Wache: JEDE Zelle hat eine definierte Spezialisierung; nicht
+    implementierte Zellen (z.B. macOS) = EHRLICHE declared-only-Spezialisierung mit
+    benanntem Nicht-implementiert-Durchfallen — nie eine fehlende Spezialisierung, nie
+    stilles Verhalten (Auflage A8 wird damit zur Matrix-Pflicht).
+K4. "OS-Handles" = die OS-gebundenen Zugriffs-Bausteine (sysfs-/Datei-Pfade, kuenftig
+    WMI-Handle) als CT-Typ-Bausteine der jeweiligen Zelle — der Planer gibt sie via
+    Achsen-Zellwahl mit, die CEB erhaelt sie einkompiliert (kein Laufzeit-OS-Switch).
+K5. Wachstums-Regel: Neue ISA-Komplexe/OS-Eintraege in den Registries ziehen per
+    Totalitaets-Wache SOFORT eine bewusste Zellen-Entscheidung nach (Compile-Bruch statt
+    stiller Luecke).
