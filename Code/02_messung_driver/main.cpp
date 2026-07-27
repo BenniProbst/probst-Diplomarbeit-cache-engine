@@ -456,9 +456,246 @@ struct GoldenRange {
     return GoldenRange{parse_u(sv.substr(0, colon)), parse_u(sv.substr(colon + 1))};
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// V-6vi (Bauplan TEIL V Paket V-6, Ledger 73.6 Q7, clig.dev): Subcommand-Schnittstelle des Treibers.
+// W3 (rollen-orientiert): validate | plan dump/ci/cmake (Planer-Rolle, Stufe 1) | tier ci/cmake (CEB-Rolle,
+// Stufe 2) | cache-key | fingerprint | run | version | help -- die 40.b-Rollentrennung (Planer steuert CEB-Jobs,
+// CEB steuert Tier-Jobs) wird damit auf UX-Ebene sichtbar. W4: der Dispatcher kanonisiert die Subcommand-Form
+// VOR der etablierten Flag-Schleife auf die Alt-Flag-Routen -- EIN Code-Pfad, stdout byte-identisch zur
+// Alt-Form. Die Alt-Flags bleiben funktionale DEPRECATED-Aliase (eine stderr-Hinweis-Zeile je Lauf; sie fallen
+// erst im Abschluss-Aufraeumpass, Ledger 75). --version und --help bleiben kanonische clig.dev-Flags (KEINE
+// Aliase). W6: auch cache-key/fingerprint/run sind Subcommands; ein <config_dir>, das woertlich wie ein
+// Subcommand heisst, nimmt den run-Weg (in der Hilfe dokumentiert).
+
+// Alt-Flag -> neue Subcommand-Form (fuer den Deprecation-Hinweis; Reihenfolge = Hilfe-Tabelle).
+struct DeprecatedAlias {
+    std::string_view flag;
+    std::string_view neu;
+};
+inline constexpr DeprecatedAlias kDeprecatedAliases[] = {
+    {"--validate", "validate"},
+    {"--check", "validate"},
+    {"--dump-plan", "plan dump"},
+    {"--dump-ci", "plan ci"},
+    {"--dump-cmake", "plan cmake"},
+    {"--emit-tier-ci", "tier ci"},
+    {"--emit-tier-cmake", "tier cmake"},
+    {"--print-cache-key", "cache-key"},
+    {"--chunk-organ-fingerprint", "fingerprint"},
+};
+
+// W5: Hilfe nach stdout (clig.dev: Hilfe ist Daten), rc 0. topic leer = Uebersicht; sonst Detail je Subcommand.
+void help_for(std::string const& topic) {
+    if (topic == "validate") {
+        std::cout << "comdare-messung-driver validate [<profil>]\n"
+                  << "  Rein-lesende Pre-Flight-Pruefung des Profils -- baut KEINE DLL, misst NICHT.\n"
+                  << "  Deckt BEIDE offiziellen Wurzeln: <comdare_thesis_profile> (Achsen-/Werte-Gate) und\n"
+                  << "  <comdare_experiment> (3-Phasen-Gate gegen die einkompilierten ce+prt-Registry-Pfade).\n"
+                  << "  Profil-Aufloesung: Argument > COMDARE_THESIS_PROFILE > einkompiliertes Default-Profil.\n"
+                  << "  Exit: 0 ok; 5 unbekannte/unlesbare Profil-Wurzel. Alt-Flags: --validate/--check.\n";
+        return;
+    }
+    if (topic == "plan") {
+        std::cout << "comdare-messung-driver plan dump|ci|cmake [<profil>]\n"
+                  << "  PLANER-Rolle (Stufe 1, 40.b): der deterministische ExperimentPlanDirector-Walk in drei\n"
+                  << "  Emissions-Kanaelen -- zwei Laeufe sind byte-gleich.\n"
+                  << "    plan dump   Textplan nach stdout (Alt-Flag --dump-plan)\n"
+                  << "    plan ci     GitLab-Child-Pipeline-YAML: CEB-Jobs je Mess-Kombination (--dump-ci)\n"
+                  << "    plan cmake  experiment_plan.cmake fuer den Bare-Metal-Bau (--dump-cmake)\n"
+                  << "  plan ci/cmake tragen das Bestandslog-planer_block-Gate: COMDARE_BESTANDSLOG=true +\n"
+                  << "  COMDARE_BESTANDSLOG_DOC_KEY/_OWNER_UUID/_MASCHINE (Exit 6 bei unvollstaendiger Konfig).\n"
+                  << "  Profil-Aufloesung: Argument > COMDARE_THESIS_PROFILE > einkompiliertes Default-Profil.\n";
+        return;
+    }
+    if (topic == "tier") {
+        std::cout << "comdare-messung-driver tier ci|cmake [<profil>] [--measurement-combo=<cmake_slug>]\n"
+                  << "  CEB-Rolle (Stufe 2, 42/42.b): emittiert die Stufe-2-Sicht des freigegebenen CEB-Raums\n"
+                  << "  (System-Perms + Tier-Chunk-Jobs; Mess-Jobs GN-11/320er-gegatet).\n"
+                  << "    tier ci     Grandchild-Pipeline-YAML (Alt-Flag --emit-tier-ci)\n"
+                  << "    tier cmake  tier_plan.cmake fuer den Bare-Metal-Tier-Bau (--emit-tier-cmake)\n"
+                  << "  --measurement-combo waehlt EINE Mess-Kombination (leer = Voll-Konfig, byte-identisch).\n";
+        return;
+    }
+    if (topic == "cache-key") {
+        std::cout << "comdare-messung-driver cache-key\n"
+                  << "  Druckt den vollen ce-Objekt-Cache-Key-Praefix der env-gepinnten GN-Zelle (EINE Zeile).\n"
+                  << "  Env-Pins: COMDARE_GN_OPT, COMDARE_GN_SIMD, COMDARE_CXX, COMDARE_BUILD_TYPE,\n"
+                  << "  COMDARE_MEASUREMENT_COMBO. Alt-Flag: --print-cache-key.\n";
+        return;
+    }
+    if (topic == "fingerprint") {
+        std::cout << "comdare-messung-driver fingerprint [<profil>]\n"
+                  << "  Druckt das Chunk-Organ-Fingerprint-PRE-IMAGE des Range-Fensters nach stdout (die CI\n"
+                  << "  pipet es durch sha256sum -> COMDARE_GN_ALGO_SIG). Fenster: COMDARE_GOLDEN_N_RANGE\n"
+                  << "  \"start:count\" (leer = ganze View). Exit 2 bei kaputter Range/Profil.\n"
+                  << "  Alt-Flag: --chunk-organ-fingerprint.\n";
+        return;
+    }
+    if (topic == "run") {
+        std::cout << "comdare-messung-driver run <config_dir> <output_dir> [--comdare-root=DIR]"
+                  << " [--messreihen-xml=FILE]\n"
+                  << "  Der Mess-Lauf (Messreihen A/B/C bzw. der E4-XML-Weg via COMDARE_RUN_V32_EXPERIMENT).\n"
+                  << "  Wichtige Envs: COMDARE_PLATFORM (Lane-Wache, Exit 7 bei CPU-Vendor-Fehlrouting),\n"
+                  << "  COMDARE_GOLDEN_N_RANGE (Chunk-Fenster), COMDARE_MIN_FREE_GB (RAM-Admission),\n"
+                  << "  COMDARE_THESIS_PROFILE (Profil des Plan-Startgates).\n"
+                  << "  Die Alt-Form ohne 'run' (positional) bleibt funktional; heisst ein <config_dir>\n"
+                  << "  woertlich wie ein Subcommand, ist 'run' der eindeutige Weg.\n";
+        return;
+    }
+    if (topic == "version") {
+        std::cout << "comdare-messung-driver version   (kanonisches Flag: --version)\n"
+                  << "  Druckt den Je-Binary-Selbst-Stempel: planner-Stempel / ceb-contract / build-type /\n"
+                  << "  build-version (system_axes_version_suffix) -- vier gelabelte non-empty Zeilen.\n";
+        return;
+    }
+    std::cout
+        << "comdare-messung-driver -- Planer- + CEB-Rolle in EINEM Binary (Mess-Kette der Diplomarbeit)\n\n"
+        << "Usage:\n"
+        << "  comdare-messung-driver <subcommand> [argumente]\n"
+        << "  comdare-messung-driver run <config_dir> <output_dir> [--comdare-root=DIR] [--messreihen-xml=FILE]\n\n"
+        << "Subcommands:\n"
+        << "  validate [<profil>]     Profil rein-lesend pruefen (beide offiziellen Wurzeln)\n"
+        << "  plan dump [<profil>]    deterministischer Experiment-Plan als Text (Stufe 1, Planer-Rolle)\n"
+        << "  plan ci [<profil>]      GitLab-Child-Pipeline-YAML der CEB-Jobs (Stufe 1, Planer-Rolle)\n"
+        << "  plan cmake [<profil>]   experiment_plan.cmake fuer den Bare-Metal-Bau (Stufe 1)\n"
+        << "  tier ci [<profil>]      Tier-Jobs-YAML (Stufe 2, CEB-Rolle)\n"
+        << "  tier cmake [<profil>]   tier_plan.cmake (Stufe 2, CEB-Rolle)\n"
+        << "  cache-key               ce-Objekt-Cache-Key-Praefix der env-gepinnten GN-Zelle\n"
+        << "  fingerprint [<profil>]  Chunk-Organ-Fingerprint-Pre-Image (COMDARE_GOLDEN_N_RANGE-Fenster)\n"
+        << "  run <config> <output>   Mess-Lauf (Messreihen A/B/C bzw. E4-XML-Weg)\n"
+        << "  version                 Selbst-Stempel (planner/ceb-contract/build-type/build-version)\n"
+        << "  help [<subcommand>]     diese Uebersicht bzw. Detail-Hilfe (auch: <subcommand> --help)\n\n"
+        << "Profil-Aufloesung: explizites Argument > COMDARE_THESIS_PROFILE > einkompiliertes Default-Profil.\n"
+        << "Ausgaben: Daten/Emissionen -> stdout; Diagnose/Fehler -> stderr (clig.dev).\n\n"
+        << "Exit-Codes:\n"
+        << "  0 Erfolg | 1 Usage/Emission abgebrochen | 2 Konfig-Fehler (leerer Plan, kaputte Range)\n"
+        << "  5 validate: unbekannte Profil-Wurzel | 6 Bestandslog-Gate-Abbruch | 7 Lane-Fehlrouting\n\n"
+        << "DEPRECATED Alt-Flags (Verhalten identisch; sie fallen im Abschluss-Aufraeumpass, Ledger 75):\n"
+        << "  --validate/--check -> validate | --dump-plan -> plan dump | --dump-ci -> plan ci\n"
+        << "  --dump-cmake -> plan cmake | --emit-tier-ci -> tier ci | --emit-tier-cmake -> tier cmake\n"
+        << "  --print-cache-key -> cache-key | --chunk-organ-fingerprint -> fingerprint\n"
+        << "  (--version und --help bleiben kanonische clig.dev-Flags.)\n";
+}
+
+// Die kanonisierte argv-Sicht des Laufs. storage haelt die Argument-Strings (Lebensdauer = main), argv zeigt
+// hinein. help_rc >= 0: die Hilfe/Fehlermeldung wurde bereits gedruckt -- main beendet sofort mit diesem Code.
+struct EffectiveArgs {
+    std::vector<std::string> storage;
+    std::vector<char*>       argv;
+    int                      argc    = 0;
+    int                      help_rc = -1;
+};
+
+[[nodiscard]] EffectiveArgs canonicalize_cli(int argc, char* argv[]) {
+    EffectiveArgs ea;
+    ea.storage.reserve(static_cast<std::size_t>(argc));
+    for (int i = 0; i < argc; ++i) ea.storage.emplace_back(argv[i]);
+    std::string const a1 = ea.storage.size() > 1 ? ea.storage[1] : std::string{};
+    std::string const a2 = ea.storage.size() > 2 ? ea.storage[2] : std::string{};
+    std::string const a3 = ea.storage.size() > 3 ? ea.storage[3] : std::string{};
+
+    // (1) Hilfe: --help/-h (kanonische clig-Flags, Uebersicht) bzw. help [<topic>].
+    if (a1 == "--help" || a1 == "-h") {
+        help_for({});
+        ea.help_rc = 0;
+        return ea;
+    }
+    if (a1 == "help") {
+        help_for(a2);
+        ea.help_rc = 0;
+        return ea;
+    }
+
+    // (2) Subcommand -> kanonische Alt-Flag-Route (exakter argv[1]-Match; '-'-Argumente sind nie Subcommands).
+    bool matched  = false;
+    auto replace2 = [&ea, &matched](char const* canonical) { // '<wort> <unterwort>' -> EIN kanonisches Flag
+        ea.storage[1] = canonical;
+        ea.storage.erase(ea.storage.begin() + 2);
+        matched = true;
+    };
+    if (a1 == "validate" || a1 == "cache-key" || a1 == "fingerprint" || a1 == "version" || a1 == "run") {
+        if (a2 == "--help" || a2 == "-h") {
+            help_for(a1);
+            ea.help_rc = 0;
+            return ea;
+        }
+        if (a1 == "run") { // run: das Wort faellt weg, der etablierte Positional-Weg uebernimmt
+            ea.storage.erase(ea.storage.begin() + 1);
+            matched = true;
+        } else if (a1 == "validate") {
+            ea.storage[1] = "--validate";
+            matched       = true;
+        } else if (a1 == "cache-key") {
+            ea.storage[1] = "--print-cache-key";
+            matched       = true;
+        } else if (a1 == "fingerprint") {
+            ea.storage[1] = "--chunk-organ-fingerprint";
+            matched       = true;
+        } else {
+            ea.storage[1] = "--version";
+            matched       = true;
+        }
+    } else if (a1 == "plan" || a1 == "tier") {
+        if (a2 == "--help" || a2 == "-h" || a3 == "--help" || a3 == "-h") {
+            help_for(a1);
+            ea.help_rc = 0;
+            return ea;
+        }
+        if (a1 == "plan" && a2 == "dump") {
+            replace2("--dump-plan");
+        } else if (a1 == "plan" && a2 == "ci") {
+            replace2("--dump-ci");
+        } else if (a1 == "plan" && a2 == "cmake") {
+            replace2("--dump-cmake");
+        } else if (a1 == "tier" && a2 == "ci") {
+            replace2("--emit-tier-ci");
+        } else if (a1 == "tier" && a2 == "cmake") {
+            replace2("--emit-tier-cmake");
+        } else {
+            std::cerr << "comdare-messung-driver: unbekanntes Unterkommando '" << a1 << (a2.empty() ? "" : " ") << a2
+                      << "' -- erwartet: " << (a1 == "plan" ? "plan dump|ci|cmake" : "tier ci|cmake")
+                      << " (Detail: 'comdare-messung-driver help " << a1 << "').\n";
+            ea.help_rc = 1;
+            return ea;
+        }
+    }
+
+    // (3) W4: Deprecation-Hinweis bei Alt-Flag-Nutzung -- EINE stderr-Zeile je Lauf (stdout bleibt byte-rein).
+    if (!matched) {
+        bool gemeldet = false;
+        for (std::size_t i = 1; i < ea.storage.size() && !gemeldet; ++i) {
+            for (auto const& d : kDeprecatedAliases) {
+                if (ea.storage[i] == d.flag) {
+                    std::cerr << "[DEPRECATED] " << d.flag << " -> neue Form: 'comdare-messung-driver " << d.neu
+                              << "' (Verhalten identisch; die Alt-Flags fallen im Abschluss-Aufraeumpass, "
+                                 "Ledger 75).\n";
+                    gemeldet = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    ea.argv.reserve(ea.storage.size() + 1);
+    for (auto& s : ea.storage) ea.argv.push_back(s.data());
+    ea.argv.push_back(nullptr);
+    ea.argc = static_cast<int>(ea.storage.size());
+    return ea;
+}
+
 } // namespace
 
 int main(int argc, char* argv[]) {
+    // V-6vi (W3/W4/W6): der Subcommand-Dispatcher kanonisiert die clig.dev-Form (validate | plan dump/ci/cmake |
+    // tier ci/cmake | cache-key | fingerprint | run | version | help) VOR der Flag-Schleife auf die etablierten
+    // Flag-Routen -- EIN Code-Pfad, stdout byte-identisch; Alt-Flags = DEPRECATED-Aliase (stderr-Hinweis).
+    // argc/argv werden bewusst auf die kanonisierte Sicht umgestellt: ALLER nachfolgender Code (Flag-Schleife,
+    // Lane-Wache, E4-Block, Positional-Lauf) liest dieselbe Sicht; cli.storage traegt die Lebensdauer.
+    EffectiveArgs cli = canonicalize_cli(argc, argv);
+    if (cli.help_rc >= 0) return cli.help_rc;
+    argc = cli.argc;
+    argv = cli.argv.data();
+
     // --validate [<profil>]: rein-lesende Pre-Flight-Pruefung des Thesis-Profils gegen die realen
     // EnabledStrategies (P5, migriert von run_lazy_150) — baut KEINE DLL, misst NICHT. Braucht KEINE
     // (run_lazy_150 geloescht 2026-07-11)

@@ -27,8 +27,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 #   clang: 16.0+  (volles std::format ab 17, std::expected ab 16)
 #   MSVC:  19.34+ (VS 2022 17.4, std::format + std::expected ab MSVC 19.35)
 #   apple-clang: 15.0+ (Xcode 15)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13.0)
-    message(FATAL_ERROR "gcc >= 13.0 erforderlich fuer C++23 (gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
+#
+# V-6iii (Bauplan TEIL V, Ledger 73.4 Q5, 2026-07-27): GNU-Zweig auf den Flotten-FLOOR g++ >= 15.3
+# angehoben -- Minimum UND Standard (prod1/prod2 + CI==baremetal-Weg), bewusst KEIN Versions-Pin
+# (neuere g++ zugelassen; kein 16er-Pin, P2996 bleibt spaeterer Drop-in, mp11 = Metaprog-Weg).
+# Clang/MSVC/AppleClang behalten ihre V38.A-Floors (W2: Floor-Anhebung NUR fuer GNU).
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.3)
+    message(FATAL_ERROR "g++ >= 15.3 erforderlich (Toolchain-Floor V-6iii/Ledger 73.4; gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0)
     message(FATAL_ERROR "clang >= 16.0 erforderlich fuer C++23 (gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.0)
@@ -37,6 +42,10 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERS
     message(FATAL_ERROR "MSVC >= 19.34 (VS 2022 17.4+) erforderlich (gefunden: ${CMAKE_CXX_COMPILER_VERSION})")
 endif()
 message(STATUS "V38.A C++23-Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} OK")
+
+# V-6i (Bauplan TEIL V, W1): Standard-Installationslayout fuer die install()-Targets der
+# Mess-Auswerte-Kette (02 Treiber + 03/04/05 Auswerte-CLIs; je Modul-CMakeLists).
+include(GNUInstallDirs)
 
 # V41.E2 (2026-05-25): Vendor-Lib User-Cache via ccache/sccache.
 # Vendor-Libraries (mimalloc-static.c, jemalloc/snmalloc Headers, etc.) werden

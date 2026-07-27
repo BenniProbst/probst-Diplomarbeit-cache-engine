@@ -12,6 +12,8 @@ add_executable(csv_to_latex_cli main_cli.cpp)
 target_compile_features(csv_to_latex_cli PRIVATE cxx_std_23)
 target_link_libraries(csv_to_latex_cli PRIVATE comdare::csv_to_latex)
 set_target_properties(csv_to_latex_cli PROPERTIES OUTPUT_NAME "csv-to-latex")
+# V-6i (Bauplan TEIL V, W1): install()-Target der Mess-Auswerte-Kette (Stufe 04).
+install(TARGETS csv_to_latex_cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # V35.D.2 (2026-05-22) - Stufen-Test mit gecachten Fixtures
 if(COMDARE_DA_BUILD_TESTS)

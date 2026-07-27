@@ -17,6 +17,9 @@ target_link_libraries(messung_driver PRIVATE
 set_target_properties(messung_driver PROPERTIES
     OUTPUT_NAME "comdare-messung-driver"
 )
+# V-6i (Bauplan TEIL V, W1): install()-Target des Treibers (Planer- + CEB-Rolle in EINEM Binary) --
+# Kopf der installierbaren Mess-Auswerte-Kette (02 -> 03 -> 04 -> 05); Layout: GNUInstallDirs (Top-Level).
+install(TARGETS messung_driver RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(TARGET comdare::profile_run_facade)
     target_link_libraries(messung_driver PRIVATE comdare::profile_run_facade)

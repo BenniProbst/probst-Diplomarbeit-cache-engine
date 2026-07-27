@@ -28,6 +28,8 @@ target_link_libraries(diagram_generator_cli PRIVATE comdare::diagram_generator)
 set_target_properties(diagram_generator_cli PROPERTIES
     OUTPUT_NAME "diagram-generator"
 )
+# V-6i (Bauplan TEIL V, W1): install()-Target der Mess-Auswerte-Kette (Stufe 05).
+install(TARGETS diagram_generator_cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # V35.D.3 (2026-05-22) - Stufen-Test mit gecachten Fixtures
 if(COMDARE_DA_BUILD_TESTS)

@@ -146,6 +146,37 @@
     { "name": "ninja-mingw-debug",         "configurePreset": "ninja-mingw-debug",         "output": { "outputOnFailure": true } },
     { "name": "ninja-mingw-release",       "configurePreset": "ninja-mingw-release",       "output": { "outputOnFailure": true } },
     { "name": "gcc-release",               "configurePreset": "gcc-release",               "output": { "outputOnFailure": true } },
-    { "name": "gcc-release-measurement-on","configurePreset": "gcc-release-measurement-on","output": { "outputOnFailure": true } }
+    { "name": "gcc-release-measurement-on","configurePreset": "gcc-release-measurement-on","output": { "outputOnFailure": true } },
+    { "name": "ninja-gcc-release",         "configurePreset": "ninja-gcc-release",         "output": { "outputOnFailure": true } },
+    { "name": "clang-release",             "configurePreset": "clang-release",             "output": { "outputOnFailure": true } }
+  ],
+  "workflowPresets": [
+    {
+      "name": "gcc-release",
+      "displayName": "GCC Release: Configure -> Build -> Test (V-6ii Ein-Kommando-Weg)",
+      "steps": [
+        { "type": "configure", "name": "gcc-release" },
+        { "type": "build",     "name": "gcc-release" },
+        { "type": "test",      "name": "gcc-release" }
+      ]
+    },
+    {
+      "name": "gcc-release-measurement-on",
+      "displayName": "GCC Release MEASUREMENT_ON: Configure -> Build -> Test (V-6ii)",
+      "steps": [
+        { "type": "configure", "name": "gcc-release-measurement-on" },
+        { "type": "build",     "name": "gcc-release-measurement-on" },
+        { "type": "test",      "name": "gcc-release-measurement-on" }
+      ]
+    },
+    {
+      "name": "clang-release",
+      "displayName": "Clang Release: Configure -> Build -> Test (V-6ii)",
+      "steps": [
+        { "type": "configure", "name": "clang-release" },
+        { "type": "build",     "name": "clang-release" },
+        { "type": "test",      "name": "clang-release" }
+      ]
+    }
   ]
 }

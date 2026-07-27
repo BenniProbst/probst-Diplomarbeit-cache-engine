@@ -17,6 +17,8 @@ target_link_libraries(binary_to_csv_cli PRIVATE comdare::binary_to_csv)
 set_target_properties(binary_to_csv_cli PROPERTIES
     OUTPUT_NAME "binary-to-csv"
 )
+# V-6i (Bauplan TEIL V, W1): install()-Target der Mess-Auswerte-Kette (Stufe 03).
+install(TARGETS binary_to_csv_cli RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # V35.D.1 (2026-05-22) - Stufen-Test mit gecachten Fixtures
 if(COMDARE_DA_BUILD_TESTS)
