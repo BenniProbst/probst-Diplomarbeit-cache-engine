@@ -275,3 +275,10 @@ System-Achsen-Anbau. P5 praezisiert: Planer-Seite = Mess-Achsen-Einbau analog
 Mess-Programme (Profil waehlt Erkennungs-Geraet je Plattform) + Passungs-Stempel wie
 geplant; die measure_host_lane-Abloesung/C-3c-Aktivierung bleiben als eigene Planer-
 Verbesserungen bestehen (K1), beruehren aber die Achsen-Strukturen nicht (N4).
+
+## SPEC-SCHLUSS ~18:25Z (Owner): Der Stempel der neuen Mess-Achse auf der CEB traegt
+## ISA = VENDOR-ERKENNUNGS-KATEGORIE-FAMILIE x OS — damit die CEB eine BREITE BANDBREITE
+## verschiedener CPU-Familien per Erkennungs-Software-Einbau erkennen kann (deckt E-7).
+## SPEZIFIKATION DAMIT ABGESCHLOSSEN. Prioritaet per Owner-Wort: HAUPTSTRANG weiterbauen,
+## bis Voll-Build + Messdurchlauf gehen — P2-P6 ruhen nach P1-Abschluss bis dahin
+## (Ausnahmen: E-2 Schluessel-Fix + OP-9 Bau-Stem, beide VOR Voll-Bau/Messung noetig).
