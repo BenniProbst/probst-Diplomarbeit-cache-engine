@@ -1,0 +1,5 @@
+export const meta = { name:'b15-migration-abdeckung', description:'B15: deckt G5/#274-Schritte-8-15 die Migration A1/A5/A7 ab?', phases:[{title:'Analyse'}] }
+const SUPER='/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine'
+phase('Analyse')
+const r = await agent(`Diplomarbeit. super=${SUPER}, Ledger=${SUPER}/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md. AUFGABE (Ledger §51-B15): Der User gibt VOLLES GO fuer die Modul-Migration A1/A5/A7, SOFERN per ultracode bestaetigt ist, dass G5/#274-Schritte-8-15 die Abdeckung liefern. Lies im Ledger: §14.1-G-274 + §16.4-G5 + die A1/A5/A7-Beschreibung (~Zeile 1110-1116: A1 Modul-Matrix-Migration, A5 master-Branch je Repo loeschen [je-Repo-GO], A7 Rename 'comdare-cache-engine-all' verboten -> funktionale Kategorien) + §12-0707-274. Fragen: (1) Was umfassen G5/#274-Schritte-8-15 konkret? (2) Decken sie A1 (Matrix-Migration), A5 (master-Loeschung), A7 (Rename) ab? (3) Luecken? LIEFERE Text: Abdeckungs-Matrix A1/A5/A7 vs G5-Schritte + BESTAETIGUNG (voll abgedeckt -> GO) ODER Luecken (was zusaetzlich verankern). A5-Loeschung bleibt je-Repo-GO-gated.`, {label:'b15', model:'opus', effort:'high'})
+return { r }
