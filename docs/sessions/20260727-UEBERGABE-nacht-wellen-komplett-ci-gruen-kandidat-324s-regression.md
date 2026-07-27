@@ -159,3 +159,19 @@ feedback_abschluss_aufraeumpass + reference_lokale_vollbau_luecken (J-Kette ERWE
 - PAT-FALLE: api-PAT = rueckwaerts testen, 2. von hinten; Token nie printen, shred nach Nutzung.
 
 *Erstellt 27.07. ~04:25 als Kontext-Ende-Uebergabe. Naechste Session: 7a zuerst.*
+
+===============================================================================
+## 9. LETZT-NACHTRAG (~04:35, letzte CiCheck-Meldung vor Kontext-Ende)
+===============================================================================
+- KANDIDATEN-PIPELINES SIND DA: 13485 (dev, de786e9b) + 13486 (main, de786e9b), beide
+  pending, im Watcher als [PAKET-A-KANDIDAT] markiert (SIGNAL-CPPCHK/TESTS/GRUEN scharf).
+- SIGNAL-FIX gebaut: Watcher misst je Zyklus den Trace-Ende->finished_at-Abstand frischer
+  Jobs und meldet sofort bei <60s (= 324s-Fix greift, unabhaengig vom Infra-DONE-Report);
+  Heartbeats zeigen die Nachhangwerte live + id16/17-Online-Status.
+- Queue lief um ~04:17 noch (13464/13465 gingen auf running) -- Infra-Fix hatte zu dem
+  Zeitpunkt die Runner noch nicht angehalten.
+- KASKADE GEWACHSEN: jetzt SECHS redundante 286-main-Laeufe auf SHA be827881
+  (13475/13479/13481/13483 + NEU 13487/13489); Erzeuger produziert im ~20-35-min-Takt
+  weiter. TIMING-ARGUMENT zu 7b: Wenn der 324s-Fix greift, entlaedt sich dieser Stau
+  GENAU DANN in die freien Slots, wenn die Kapazitaet fuer den de786e9b-Kandidaten
+  gebraucht wird -> die Cancel-Entscheidung (7b) moeglichst VOR Fix-Abschluss treffen.
