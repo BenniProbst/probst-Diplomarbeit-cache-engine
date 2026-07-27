@@ -100,6 +100,12 @@ message(STATUS "Comdare V37.G: ${_comdare_n_cores} cores detected, ${COMDARE_PAR
 # Mode: on_build_on_demand (User-Direktive 2026-05-23) — inkrementell
 set(COMDARE_BUILD_PERMUTATIONS ON CACHE BOOL
     "Pre-Build der cache-engine Permutationen (V36.B Diplomarbeit-Default)")
+# V-1 (O-8 Schritt 1): Vendor-Provisioning EXPLIZIT, nicht als Mitnahme-Effekt der
+# Permutationen. Der ce-Default leitet sich zwar aus COMDARE_BUILD_PERMUTATIONS ab und
+# waere hier ebenfalls ON -- die explizite Setzung haelt das Provisioning aber am Leben,
+# wenn V-3 (Super-Abschaltung) COMDARE_BUILD_PERMUTATIONS im super abschaltet.
+set(COMDARE_PROVISION_VENDOR_ALLOCATORS ON CACHE BOOL
+    "Vendor-Allokatoren im Diplomarbeit-Container bereitstellen (V-1 Entkopplung)")
 set(COMDARE_PRT_ART_BUILD_PERMUTATIONS ON CACHE BOOL
     "Pre-Build der PRT-ART Pruefling-Permutationen (V36.C Diplomarbeit-Default)")
 set(COMDARE_PERMUTATION_MODE "on_build_on_demand" CACHE STRING
