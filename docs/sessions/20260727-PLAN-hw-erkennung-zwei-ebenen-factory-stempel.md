@@ -193,12 +193,19 @@ Folge-Paket · E-6 Abstract Factory (CAS/Bestueckung = zweites Produkt) · E-7 F
 + Maschinen-Tupel-Zusatzzeile. E-8 bleibt Infra-gated (nur Test-Erwartung).
 Ausfuehrung: P1 beauftragt (Impl-CE-6de) am 27.07. ~17:45Z.
 
-## NACHTRAG 2 ~17:50Z — OWNER-ERGAENZUNG: Planer kennt die ISA×OS-KOMPLEX-HAUPTACHSE
+## NACHTRAG 2 — OWNER-ERGAENZUNG: Planer kennt die ISA×OS-KOMPLEX-HAUPTACHSE
+## (GELTENDE FASSUNG nach Owner-Klaerung ~18:05Z)
 
-Owner (verbatim-nah): "Der Planer muss zumindest die ISA x OS Komplex-Hauptachse KENNEN, um
-per Metaprogrammierung eine passende feingranulare Hardware-Erkennung und passende OS-Handles
-dafuer mitzugeben bzw. je ISA x OS einzukompilieren (beachte ALLE vorhandenen ISA und
-dokumentierten OS)."
+Owner (verbatim, geltender Text): "Der Planer muss zumindest die ISA x OS Komplex-Hauptachse
+grob erkennen um per Metaprogrammierung eine passende feingranulare Hardware-Erkennung und
+passende OS handles dafuer mitzugeben bzw. je ISA x OS einzukompilieren (beachte alle
+vorhandenen ISA und dokumentierte OS). Die feingranulare Erkennung liegt bei der CEB."
+
+KLARSTELLUNGS-HISTORIE: Die K1-K5-Auslegung unten wurde vom Owner ~18:05Z als goldrichtig
+BESTAETIGT (Reapply 74a175d3 nach Revert-Irrtum 4f81191a). Die separate, engere
+"K1-Schaerfungs"-Deutung (45846e30: Planer nur CPUID-Vendor/Familie, Detailverbote) war die
+FALSCHE Interpretation und bleibt zurueckgerollt (1a7eb1bb) — massgeblich sind der obige
+Owner-Text und K1-K5.
 
 BINDENDE KONSEQUENZEN (praezisiert Ebene 1 + P2/P5):
 K1. Der PLANER wird erster echter KONSUMENT von TargetIsaComplexAxis + OS-Achse (heute:
