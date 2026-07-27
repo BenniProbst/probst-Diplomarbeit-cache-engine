@@ -3,6 +3,14 @@
 > Owner-Entscheid (Diplom-Ledger §71/§73) RETIRED und wird in den Fassaden-/Planer-Kanal gemerged.
 > Die `comdare_perms_all`-Schritte in diesem Manual sind ÜBERGANGSWEISE noch nötig (bis Bauplan
 > TEIL V Paket V-2/V-3 den Manifest-Konsum abgelöst hat) und entfallen danach. Master-Manual = `../MANUAL_RUN.md`.
+>
+> **NACHTRAG (2026-07-27, V-3 VOLLZOGEN):** Der Übergang ist abgeschlossen. Der super-Configure
+> schaltet den Alt-Kanal nicht mehr ein, und die Targets `comdare_perms_ce/_pa/_all` **existieren
+> nicht mehr** (`Code/CMakeLists.txt`). Der `--target comdare_perms_all`-Schritt in Abschnitt 3
+> (Zeile unten) ist damit **nicht mehr ausführbar** und auch nicht mehr nötig: das Treiber-Startgate
+> fragt seit V-2 den Planer-Plan statt der Codegen-Manifeste. Wer den Alt-Kanal für einen
+> historischen Vergleichslauf braucht, konfiguriert explizit mit `-DCOMDARE_BUILD_PERMUTATIONS=ON`.
+> Die Zeilen bleiben additiv als historischer Stand stehen (Doku-nie-löschen).
 
 > **Zweck:** den kompletten Mess-/Auswerte-Lauf **von Hand** durchführen, um die Thesis-Ergebnisse selbst zu validieren. Autoritativ über `USAGE.md` (teils stale). **v1, Codex-ermittelt 2026-06-27 — beim ersten Hand-Lauf verifizieren + Abweichungen hier korrigieren** (Memory `feedback_solution_manually_operable_for_user_self_test`; Lücken-Detail: `docs/sessions/20260627-MANUAL-RUN-GAP-ANALYSE-CODEX.md`).
 

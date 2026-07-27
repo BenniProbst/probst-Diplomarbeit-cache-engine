@@ -108,11 +108,12 @@ Aufruf: `cmake --preset msvc-release` + `cmake --build --preset msvc-release`.
 | Option | Default | Bedeutung |
 |--------|---------|-----------|
 | `COMDARE_V32_ENABLE` | ON | V32 Orchestrator + Tests |
-| `COMDARE_BUILD_PERMUTATIONS` | ON | cache-engine Permutations-Codegen |
-| `COMDARE_PRT_ART_BUILD_PERMUTATIONS` | ON | PRT-ART Pruefling-Permutationen |
-| `COMDARE_PERMUTATION_MODE` | on_build_on_demand | on_rebuild / on_build_on_demand / off_pause_build |
-| `COMDARE_PERMUTATION_PROFILE` | smoke | smoke (~27) / medium (~108) / full |
-| `COMDARE_PRT_ART_PERMUTATION_PROFILE` | smoke | smoke (~16) / medium / full |
+| `COMDARE_BUILD_PERMUTATIONS` | **OFF** (seit V-3) | Alt-Kanal cache-engine Permutations-Codegen; der Container setzt ihn nicht mehr — nur noch explizit per `-D` fuer historische Vergleichslaeufe |
+| `COMDARE_PRT_ART_BUILD_PERMUTATIONS` | **OFF** (seit V-3) | dito fuer die PRT-ART Pruefling-Permutationen |
+| `COMDARE_PERMUTATION_MODE` | on_build_on_demand | nur wirksam bei explizit eingeschaltetem Alt-Kanal |
+| `COMDARE_PERMUTATION_PROFILE` | smoke | dito: smoke (~27) / medium (~108) / full |
+| `COMDARE_PRT_ART_PERMUTATION_PROFILE` | smoke | dito: smoke (~16) / medium / full |
+| `COMDARE_PROVISION_VENDOR_ALLOCATORS` | ON | Vendor-Allokatoren bereitstellen (V-1-Entkopplung; traegt die `COMDARE_VENDOR_*`-Defaults, seit V-3 unabhaengig vom Alt-Kanal) |
 | `COMDARE_DA_BUILD_TESTS` | ON | Diplomarbeit-Tests (104) |
 | `COMDARE_FETCHCONTENT_USER_CACHE` | ON | User-Cache fuer FetchContent |
 | `COMDARE_QUIET_SUBMODULE_CHECK` | ON | Submodule-Hinweise als STATUS statt WARNING |
@@ -127,9 +128,9 @@ Aufruf: `cmake --preset msvc-release` + `cmake --build --preset msvc-release`.
 
 | Target | Was |
 |--------|-----|
-| `comdare_perms_ce` | Alle cache-engine Permutations-DLLs |
-| `comdare_perms_pa` | Alle PRT-ART Pruefling-Permutations-DLLs |
-| `comdare_perms_all` | Beide zusammen + Aggregator-Manifest |
+| ~~`comdare_perms_ce`~~ | ENTFALLEN mit V-3 (2026-07-27) — Alt-Kanal-Re-Export der cache-engine Permutations-DLLs |
+| ~~`comdare_perms_pa`~~ | ENTFALLEN mit V-3 — Alt-Kanal-Re-Export der PRT-ART Pruefling-Permutations-DLLs |
+| ~~`comdare_perms_all`~~ | ENTFALLEN mit V-3 — Kombi-Target + Aggregator-Manifest |
 | `messung_driver` | Driver-Binary (Plugins laden, binary records, Welch-Stats) |
 | Tests `test_*` | 104 GTest-Tests |
 
