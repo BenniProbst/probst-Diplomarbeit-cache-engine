@@ -440,21 +440,31 @@ endif()
 # ─────────────────────────────────────────────────────────────────────────────
 # #279 — dynamische Tier-Binary-Build-Sichtbarkeit (comdare_tier_binary_visibility):
 # rostert geplante vs. gebaute vs. offene Rekombinationen + CacheEngineBuilder-Status
-# ueber das committete Tool tier-binary-report. Liest das ce-Codegen-Manifest
-# (bei configure erzeugt, wenn COMDARE_BUILD_PERMUTATIONS=ON) + die perm/-Wurzel.
+# ueber das committete Tool tier-binary-report.
+# 2c/OP-8 (2026-07-27): die geplante Menge kommt NICHT mehr aus dem Configure-Zeit-Manifest
+# (generated/permutations_manifest.txt), sondern aus der Planer-Rohausgabe "plan dump" v1.1 --
+# derselbe Text, den der CI-Job visibility:tier-binaries liest (EIN-FORMAT-REGEL, Ledger 73.1).
+# Das Target erzeugt die Rohausgabe zuerst selbst (Schritt 1) und wertet sie dann aus (Schritt 2);
+# es ist dadurch schwerer als vorher (Treiber-Bau statt Einzel-Tool) und bleibt manuell.
+# Profil OHNE Argument: Fallback-Kette COMDARE_THESIS_PROFILE -> einkompiliertes Default
+# (identisch zum CI-Job; explizites Pinning waere OP-5).
 # ─────────────────────────────────────────────────────────────────────────────
-set(_comdare_ce_manifest "${CMAKE_BINARY_DIR}/generated/permutations_manifest.txt")
+set(_comdare_plan_dump "${CMAKE_BINARY_DIR}/generated/dump_plan.txt")
 set(_comdare_visibility_cmd
     $<TARGET_FILE:tier_binary_report_cli> --visibility
-        "${_comdare_ce_manifest}" "${CMAKE_BINARY_DIR}/perm")
+        "${_comdare_plan_dump}" "${CMAKE_BINARY_DIR}/perm")
 # M-SU-06: echtes CMake-Target = cache_engine_builder (apps/cache_engine_builder, if COMDARE_BUILD_BUILDER);
 # „comdare-cache-engine-builder" ist NUR OUTPUT_NAME und existiert NICHT als Target — daher hier der Target-Name.
 if(TARGET cache_engine_builder)
     list(APPEND _comdare_visibility_cmd "--builder-exe=$<TARGET_FILE:cache_engine_builder>")
 endif()
 add_custom_target(comdare_tier_binary_visibility
+    COMMAND ${CMAKE_COMMAND}
+        -DDUMP_PLAN_DRIVER=$<TARGET_FILE:messung_driver>
+        -DDUMP_PLAN_OUT=${_comdare_plan_dump}
+        -P ${CMAKE_SOURCE_DIR}/cmake/comdare_dump_plan.cmake
     COMMAND ${_comdare_visibility_cmd}
-    DEPENDS tier_binary_report_cli
+    DEPENDS tier_binary_report_cli messung_driver
     COMMENT "#279 Build-Sichtbarkeit: geplante/gebaute/offene Tier-Binaries + CacheEngineBuilder-Status"
     VERBATIM)
 

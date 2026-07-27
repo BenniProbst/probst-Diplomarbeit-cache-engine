@@ -2,9 +2,14 @@
 // tier_binary_report CLI (#279-a, 2026-07-07)
 //
 // Zwei Modi (nachgelagerte Ueberwachungs-Stufe der Mess-Pipeline):
-//   --visibility <manifest> <perm_root> [--builder-exe=<p>] [--out=<f>]
+//   --visibility <plan_dump> <perm_root> [--builder-exe=<p>] [--out=<f>]
 //       Dynamische Build-Sichtbarkeit: geplante vs. gebaute vs. offene
 //       Tier-Binary-Rekombinationen + CacheEngineBuilder-Status (#279(3)).
+//       <plan_dump> = Rohausgabe von "comdare-messung-driver plan dump"
+//       (Format v1.1). 2c/OP-8 (27.07.): EIN Format fuer dieses Werkzeug UND
+//       den CI-Job visibility:tier-binaries (Ledger 73.1) -- die frueher
+//       gelesene permutations_manifest.txt ist damit endgueltig abgeloest.
+//       Exit 1, wenn die Quelle keine plan-dump-Ausgabe ist (kein falsches 0/0).
 //   --interface-check <perm_root> [--out=<f>]
 //       Laedt jedes gebaute Tier-Binary und rostert den generischen
 //       Interface-Vertrag (comdare_perm_descriptor + run) je Binary
@@ -36,8 +41,11 @@ namespace {
 
 void print_usage() {
     std::cerr << "Usage:\n"
-              << "  tier-binary-report --visibility <manifest> <perm_root> [--builder-exe=<path>] [--out=<file>]\n"
-              << "  tier-binary-report --interface-check <perm_root> [--out=<file>]\n";
+              << "  tier-binary-report --visibility <plan_dump> <perm_root> [--builder-exe=<path>] [--out=<file>]\n"
+              << "  tier-binary-report --interface-check <perm_root> [--out=<file>]\n"
+              << "\n"
+              << "  <plan_dump> = Rohausgabe von \"comdare-messung-driver plan dump\" (v1.1),\n"
+              << "                z.B.: comdare-messung-driver plan dump > dump_plan.txt\n";
 }
 
 // Schreibt Text nach <out> (best-effort) und meldet den Pfad; leerer Pfad = kein Write.
@@ -64,10 +72,10 @@ int run_visibility(std::vector<std::string> const& pos, fs::path const& out_over
         print_usage();
         return 2;
     }
-    fs::path const manifest  = pos[0];
+    fs::path const plan_dump = pos[0];
     fs::path const perm_root = pos[1];
 
-    tbr::PlannedSet const       planned       = tbr::parse_manifest(manifest);
+    tbr::PlannedSet const       planned       = tbr::parse_plan_dump(plan_dump);
     tbr::BuiltSet const         built         = tbr::scan_built(perm_root);
     bool const                  builder_built = !builder_exe.empty() && fs::exists(builder_exe);
     tbr::VisibilityReport const report        = tbr::compute_visibility(planned, built, builder_built);
@@ -77,6 +85,14 @@ int run_visibility(std::vector<std::string> const& pos, fs::path const& out_over
 
     fs::path const out = out_override.empty() ? (perm_root / "BUILD_VISIBILITY.txt") : out_override;
     write_report(out, text);
+
+    // Formatwache (2c): eine fehlende/fremde Quelle wuerde sonst als gueltiges "0/0 gebaut"
+    // durchgehen -- genau das falsche Gruen. Der Report ist geschrieben, der Exit ist hart.
+    if (!planned.format_ok) {
+        std::cerr << "[#279] FEHLER: " << plan_dump.string() << " ist keine plan-dump-Ausgabe v1.1 (Kopf-Anker fehlt). "
+                  << "Erwartet wird die Rohausgabe von: comdare-messung-driver plan dump\n";
+        return 1;
+    }
     return 0;
 }
 

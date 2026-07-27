@@ -1,0 +1,19 @@
+# comdare-experiment-plan v1.1
+source_kind=thesis
+profile_id=m3v2_study
+profile axes=18 values=31
+registry_trio loaded=1 organ=cache_engine organ_axes=18 organ_offers=83 system=cache_engine_system system_axes=3 system_offers=6 measurement=cache_engine_measurement measurement_axes=3 measurement_offers=20
+measurement_combo_count=1
+perm_count=1
+resolver resolved=1 ok=1 rejects=0
+measurement_combo 0 legend=[all]
+perm 0 opt=O3 simd=no_extension opt_flag=-O3 march_flag=- build_version_suffix=+opt=O3
+  step 0 kind=thesis_sweep_pass label=<basis> merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 1 kind=thesis_sweep_pass label=search_algo merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 2 kind=thesis_sweep_pass label=node_type merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 3 kind=thesis_sweep_pass label=memory_layout merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 4 kind=thesis_sweep_pass label=prefetch merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 5 kind=thesis_sweep_pass label=path_compression merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 6 kind=thesis_sweep_pass label=migration_policy merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 7 kind=thesis_sweep_pass label=filter merge=- binary_id=- series=- pruefling_type=- lebewesen=-
+  step 8 kind=thesis_sweep_pass label=value_handle merge=- binary_id=- series=- pruefling_type=- lebewesen=-

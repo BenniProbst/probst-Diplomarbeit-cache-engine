@@ -1,0 +1,41 @@
+# comdare-experiment-plan v1.1
+source_kind=experiment
+profile_id=diplomarbeit_golden_kern_fixture
+profile axes=3 values=2
+registry_trio loaded=1 organ=cache_engine organ_axes=18 organ_offers=83 system=cache_engine_system system_axes=3 system_offers=6 measurement=cache_engine_measurement measurement_axes=3 measurement_offers=20
+measurement_combo_count=1
+perm_count=4
+resolver resolved=1 ok=1 rejects=0
+measurement_combo 0 legend=[all]
+perm 0 opt=O2 simd=no_extension opt_flag=-O2 march_flag=- build_version_suffix=+opt=O2
+  step 0 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::PrtArtComposition series=A pruefling_type=full lebewesen=prt_art
+  step 1 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::ArtComposition series=A pruefling_type=full lebewesen=art
+  step 2 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::HotComposition series=A pruefling_type=full lebewesen=hot
+  step 3 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::ArtPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=art
+  step 4 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::HotPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=hot
+  step 5 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::ArtPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=art
+  step 6 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::HotPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=hot
+perm 1 opt=O2 simd=avx2 opt_flag=-O2 march_flag=-mavx2 build_version_suffix=+opt=O2+ext=avx2
+  step 0 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::PrtArtComposition series=A pruefling_type=full lebewesen=prt_art
+  step 1 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::ArtComposition series=A pruefling_type=full lebewesen=art
+  step 2 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::HotComposition series=A pruefling_type=full lebewesen=hot
+  step 3 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::ArtPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=art
+  step 4 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::HotPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=hot
+  step 5 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::ArtPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=art
+  step 6 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::HotPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=hot
+perm 2 opt=O3 simd=no_extension opt_flag=-O3 march_flag=- build_version_suffix=+opt=O3
+  step 0 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::PrtArtComposition series=A pruefling_type=full lebewesen=prt_art
+  step 1 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::ArtComposition series=A pruefling_type=full lebewesen=art
+  step 2 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::HotComposition series=A pruefling_type=full lebewesen=hot
+  step 3 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::ArtPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=art
+  step 4 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::HotPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=hot
+  step 5 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::ArtPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=art
+  step 6 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::HotPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=hot
+perm 3 opt=O3 simd=avx2 opt_flag=-O3 march_flag=-mavx2 build_version_suffix=+opt=O3+ext=avx2
+  step 0 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::PrtArtComposition series=A pruefling_type=full lebewesen=prt_art
+  step 1 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::ArtComposition series=A pruefling_type=full lebewesen=art
+  step 2 kind=experiment_phase_pass label=Stufe1_CeOnly merge=Stufe1_CeOnly binary_id=sota_tier=sota::A::HotComposition series=A pruefling_type=full lebewesen=hot
+  step 3 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::ArtPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=art
+  step 4 kind=experiment_phase_pass label=Stufe2_PrueflingReplace merge=Stufe2_PrueflingReplace binary_id=sota_tier=sota::A::HotPrtStufe2ReplaceComposition series=A pruefling_type=abstract lebewesen=hot
+  step 5 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::ArtPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=art
+  step 6 kind=experiment_phase_pass label=Stufe3_FullJoin merge=Stufe3_FullJoin binary_id=sota_tier=sota::B::HotPrtStufe3FullJoinComposition series=B pruefling_type=abstract lebewesen=hot

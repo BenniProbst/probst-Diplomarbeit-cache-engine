@@ -1,6 +1,0 @@
-# permutations_manifest.txt (Fixture #279-a): geplante Rekombinations-Menge.
-# Format: '#'-Kommentare + Leerzeilen werden ignoriert; profile=NAME setzt das Profil.
-profile=smoke
-aaa
-bbb
-ccc
