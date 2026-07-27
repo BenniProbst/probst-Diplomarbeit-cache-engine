@@ -227,3 +227,51 @@ K4. "OS-Handles" = die OS-gebundenen Zugriffs-Bausteine (sysfs-/Datei-Pfade, kue
 K5. Wachstums-Regel: Neue ISA-Komplexe/OS-Eintraege in den Registries ziehen per
     Totalitaets-Wache SOFORT eine bewusste Zellen-Entscheidung nach (Compile-Bruch statt
     stiller Luecke).
+
+## NACHTRAG 3 ~18:15Z — OWNER-EINORDNUNG (FINAL): Die HW-Erkennung ist eine ZWEIGETEILTE
+## MESS-ACHSE; System-/Organ-Achsen bleiben UNBERUEHRT
+
+Owner (verbatim): "Option b ist richtig, der Planer baut in die CEB ja die Mess-Programme
+ein und nun auch die Hardware-Erkennungsprogramme, das ist alles. Zu seiner Laufzeit baut
+der Planer eine passende CEB fuer eine Plattform und Mess-Aufgabe. Die CEB uebernimmt dann
+mit dem compiletime Hardware-Erkennungs-Geraet und den einkompilierten Mess-Achsen die
+Orchestration des Baus von Tier-Binaries. Daher: Die System-Achsen und Organ-Achsen der CEB
+werden durch die Hardware-Erkennungs-Einrichtung nicht beruehrt. Die Hardware-Erkennung
+findet zur Laufzeit der CEB statt, um die compile-time Stempel der Tier-Binaries korrekt zu
+setzen. Die Hardware-Erkennung ist somit eine weitere zweigeteilte Haupt-Achse ueber
+Planer runtime und CEB compile time, es ist eine MESS-ACHSE ('misst' Hardware-Eigenschaften
+aus)."
+
+STRUKTURELLE KONSEQUENZEN N1-N5 (praezisieren K1-K5 und Abschnitt 2, ohne sie umzustossen):
+N1. REALM-ZUORDNUNG: Die HW-Erkennung ist eine WEITERE MESS-ACHSE unter der Mess-Realm-
+    Wurzel (MeasurementMetaMetaAxis, Blut-Doktrin: golden-neutral, binary_id-neutral) —
+    NICHT Teil des System-Realms. Zweigeteilt exakt nach dem Muster der bestehenden
+    Mess-Klammer (load_framework): Planer-RT waehlt/kompiliert ein, CEB traegt sie CT.
+N2. EINBAU-MECHANIK = DIESELBE wie bei den Mess-Programmen ("das ist alles"): Die
+    Erkennungs-Geraete reihen sich als Angebot in die Mess-Registry-Mechanik ein
+    (Registry=ANGEBOT -> Planer waehlt via Profil/Resolver -> CEB-Config/CMake-Interface
+    kompiliert ein); die CEB-Mess-Stempel-Zeile erhaelt ein weiteres Segment (z.B.
+    hardware_probe=<geraet>@version) NEBEN load_framework/tooling — der leere
+    System-Fingerprint-Slot bleibt fuer den PASSUNGS-Stempel (fruehere Praezisierung,
+    unveraendert gueltig), die ERKENNUNG selbst stempelt im Mess-Slot.
+N3. ZWECK-BINDUNG: Die CEB-Laufzeit-Erkennung dient dem korrekten Setzen der COMPILE-TIME-
+    STEMPEL der TIER-Binaries, die die CEB orchestriert (die Naht ist der W10-Anschluss:
+    perm_compile kennt die Zelle, Zellwerte via Compile-Define) — erhobene Werte fliessen
+    in Tier-Stempel-Defines + CSV/Log, NIE in System-Achsen-Strukturen.
+N4. UNBERUEHRTHEIT: System-Achsen (target_isa_complex, operating_system, external_utils,
+    CompoundSystemAxis) und Organ-Achsen werden von der Erkennungs-EINRICHTUNG nicht
+    angefasst — kein neues Mitglied, keine Struktur-Aenderung dort. (Die davon GETRENNTE
+    Abloesung der statischen ram_frequency-Deklaration + Anker-Migration A1/P3 bleibt
+    Owner-KERN-1-Auftrag, ist aber Deklarations-Pflege, kein Erkennungs-Anbau.)
+N5. OPTION B / BAU-RAUM: Der Planer baut zu SEINER Laufzeit je (Plattform x Mess-Aufgabe)
+    eine passende CEB — ueber alle vorhandenen ISA und dokumentierten OS als moeglicher
+    Bau-Raum (K3-Totalitaet lebt hier: jede baubare Zelle hat ein definiertes
+    Erkennungs-Geraet oder eine ehrliche declared-only-Auspraegung).
+
+AUSWIRKUNG AUF DIE PAKETE: P1 UNVERAENDERT (Vokabular/Fehler-Domaene/Parser sind das
+Innenleben des Erkennungs-Geraets). P2 praezisiert: Factory/CoR-Kette wird als MESS-
+ACHSEN-Baustein verankert (Mess-Realm-Wurzel, Registry-Angebots-Mechanik), nicht als
+System-Achsen-Anbau. P5 praezisiert: Planer-Seite = Mess-Achsen-Einbau analog
+Mess-Programme (Profil waehlt Erkennungs-Geraet je Plattform) + Passungs-Stempel wie
+geplant; die measure_host_lane-Abloesung/C-3c-Aktivierung bleiben als eigene Planer-
+Verbesserungen bestehen (K1), beruehren aber die Achsen-Strukturen nicht (N4).
