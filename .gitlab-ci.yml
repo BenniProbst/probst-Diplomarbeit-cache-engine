@@ -216,8 +216,12 @@ lint:static:
 # test:unit im ce-Repo hat (dort advisory bis 58er-Fix-Strecke/264-d).
 test:unit:
   extends: [.test, .code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
-  # OP-2 (D3-Plan, 27.07.): per DAG starten, sobald die Submodul-Verifikation steht -- ohne needs war
-  # der Job stage-blockiert und wartete hinter den 3 strategy:depend-Bridges der Stage orchestrate.
+  # OP-2 (D3-Plan, 27.07.; Herleitung korrigiert nach CiCheck-Messung 13570): die Vorlage .test aus
+  # den zentralen ci-templates (base-pipeline.yml) bringt needs:[] mit -- test:unit war dadurch
+  # stage-frei und startete in 4/4 gemessenen Voll-Wellen VOR verify:submodules (bis 37s Vorsprung),
+  # d.h. die Unit-Suite baute los, bevor die Submodul-Verifikation ueberhaupt lief. Das needs hier
+  # ueberschreibt das geerbte needs:[] und garantiert die Reihenfolge (Korrektheits-Fix, kein
+  # Scheduling-Fix; test:unit liegt nicht auf dem kritischen Pfad der Welle).
   # EXISTENZ-SICHER in BEIDEN Richtungen: test:unit und verify:submodules ziehen ihre rules identisch
   # aus .code-rules => beide existieren in exakt denselben Wellen, das needs haengt nie.
   needs: ["verify:submodules"]
