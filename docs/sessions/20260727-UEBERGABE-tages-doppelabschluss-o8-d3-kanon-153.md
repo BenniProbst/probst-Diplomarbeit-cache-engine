@@ -154,3 +154,21 @@ explizit, 2-Pass, N immer mitmelden, include_retried=true bei Gruen-Verifikation
 
 *Erstellt 27.07. ~15:25 als Kontext-Ende-Uebergabe. Naechste Session: 6a-Ausgaenge einsammeln,
 dann 6b ff. Der main-Push DIESES Docs ist der Negativ-Beweis-Traeger.*
+
+===============================================================================
+## 8. LETZT-NACHTRAG ~15:35 (nach Credits-Neustart)
+===============================================================================
+ALLE AGENTEN SIND TOT (Prozess-Neustart bei Credits-Aktivierung; CiCheck288e nicht mehr
+erreichbar — Korrektur zu §5). FOLGEN fuer die naechste Session:
+(a) CiCheck288f NEU SPAWNEN (Opus, read-only): Briefing-Kern = §4+§5 dieses Docs + Memory
+    reference_ci_trace_parsing (Fallen a-n) + PAT rueckwaerts (Position rotiert). ERSTE
+    Aufgaben: (i) Terminal-Ausgaenge 13561/13560/13564 einsammeln (= Beweis-2-POSITIV),
+    (ii) die docs-only-main-Welle auf a4dc6891 pruefen: <=3 Jobs UND /bridges LEER =
+    KASKADEN-STOPP-NEGATIV-BEWEIS (Bridge dort = Befund hoechster Prio!), (iii) Vormerke
+    A (comdare-web-Basis-Zweig) + B (jede main-Welle: bridges+Job-Zahl) neu armieren,
+    (iv) prod1-Toolchain-Wache (Default-Rueckfall 16.x-BAU-Ident = BEFUND).
+(b) Die Uebergabe selbst wurde als a4dc6891 auf dev+main (beide Remotes) gepusht — die
+    main-Welle ist der Negativ-Beweis-Traeger und laeuft bereits; ihr Ausgang ist beim
+    Wiedereinstieg per Not-Read ODER durch CiCheck288f einzusammeln.
+(c) Impl-D3/O8e/O8c/O8b sind ebenfalls tot; fuer Folge-Pakete (6b/6c) frische Agenten
+    spawnen — alle noetigen Plaene/Entscheide sind in den Plan-Docs + diesem Doc.
