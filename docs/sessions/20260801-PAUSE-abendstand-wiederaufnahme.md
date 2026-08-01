@@ -131,3 +131,14 @@ testen (Stufe 1 Boot-Cache live + Stufe 2 SPD — gehoert in P3/P6-Pakete), DANN
 Nachruestung als Infra-Auftrag anstossen. DAMIT SIND ALLE F-FRAGEN (F1-F13) ENTSCHIEDEN —
 bei Wiederaufnahme ist nichts owner-blockiert; W1-W5 + Paket-Strecke laufen entscheidungsfrei.
 Owner bleibt in Pause.
+
+NACHTRAG ~23:3xZ: K6+CI-FIX ABGENOMMEN+GEPUSHT (thesis dev=048f3ba; Commit a57a76c CI-Fix:
+mehlhorn edition={1} + 57 chktex->0 inkl. K2-K5-Nachzuegler; Commit 048f3ba K6: alle FF-
+Teilfragen des K1-Schnitts beantwortet, Passungs-Stempel als Entwurf, Ehrlichkeits-Bullets).
+Neue Build-Referenz: DE 188 S./EN 180 S., je 0 Fehler/0 blg/CHKTEX=0 — die 289-CI muesste
+mit dieser Welle erstmals seit 21:52Z wieder GRUEN werden (bei Wiedereinstieg verifizieren).
+THESIS-SEQUENZ-REST (W3): NUR NOCH Anhaenge-Pass (Merkposten: anhang-E-19er-Zaehlung ADR-2/
+ADR-4, Anhang-B-Stichtag 11.07., Anhang-D-ORG-18, K3:1130-Ein-Satz-Nachzug HW-Ist, Anhang-A-
+Konsistenz) + Rahmen-Pass (Danksagungs-ENTWURF nach F1 zur Owner-Freigabe, Lizenz-Matrix,
+eingeschraenkter Sperrvermerk, F10 der->das, EN-Abstract-Sync). Kapitel-Agenten-Lehre fuer
+die Paesse: W12-Idiom '.\ \emph', '% chktex 29' fuer Hex/CPU-Namen.
