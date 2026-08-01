@@ -60,3 +60,10 @@ Thesis: Studenten-Identitaet ohne Trailer + Eich-Saetze + Rueckwaerts-Verweise.
 NACHTRAG 21:59Z: 14167 hatte EINEN scheduler_failure-Erstversuch (integration:smoke, leerer
 Trace, 42min-Queue = Pausierungs-Nachlauf, KEIN Paket-Befund; GitLab-Auto-Retry laeuft —
 Praxisbeleg Falle (n), Welle zeigt mit include_retried 14 statt 13 Jobs). 14169 fertig gruen.
+
+NACHTRAG 22:15Z (trigger-relevant): scheduler_failure 2x NACH dem Entpausieren (21:56Z prod2
+integration:smoke + 22:13Z prod1 contract:durability; je 4-9s, Trace 0 Bytes, Auto-Retry
+heilt; API im Fenster zeitweise ohne JSON). VOR-TRIGGER-AUFLAGE NEU: Beruhigungs-Check —
+VOLL-BAU-4-Trigger erst, wenn ueber ein Beobachtungsfenster (>=2h CI-Betrieb) 0 weitere
+scheduler_failures auftraten (heavy c=1 hat keinen Puffer; mehrstuendiger Job + 5s-Abbruch
+= teuer). CiCheck288g zaehlt mit. Infra-Notiz angehaengt (Cluster-Handout).
