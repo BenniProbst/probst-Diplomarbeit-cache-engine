@@ -217,3 +217,13 @@ OE-F: FRIST AUF FREITAG (08.08.) VERSCHOBEN. 'Wir ziehen mit dem Bau durch und n
   => HW-Erkennung P2-P6 sind NICHT mehr ruhend, sondern PFLICHT vor dem Voll-Bau;
   ebenso die uebrigen bekannten Pakete (OD-10, E-04, E-18, Benchmarking-Schnitt-Fix,
   xlsx-Factory, 12-Perm, Bestandslog-Gap-Schluss nach OE-E-Dossier).
+
+## OWNER-ENTSCHEIDE F3-F9 (01.08. ~21:3xZ): F3 xlsx=EIGENER Writer (Orientierung/Fork an
+## libxlsxwriter erlaubt). F4 Infra-Prio-Handout geschrieben (Cluster-git). F5 Kalibrierlauf-GO
+## + Trigger AUTONOM nach gruenen Tests; ETA-Berechnung = Prinzip des Kalibrierlaufs (ultracode
+## laeuft). F6 Batch=4096er-JOB-MEILENSTEINE je Maschine am Stueck (Session-Log-Konsolidierung
+## laeuft). F7 Skip-Gate = NUR SHA512-Fingerprint (deckt alle Stempel; effizienter als 4
+## Einzelpruefungen). F8 Planer-Reservierung: aeltere Frage UEBERHOLT — 14+-Nachrichten-Revision
+## wird konsolidiert (Workflow wf_5fc6ea7b). F9 KRITISCHER PFAD NEU: Lager-BAUM-Vollausbau ist
+## VOR-Trigger-PFLICHT ('der Voll-Bau-Trigger IST der Baum-Vollausbau') — erst Lager-Baum,
+## dann Compile. Runner-Flotte pausiert (Infra-Wartung, gewollt); 10-min-Freigabe-Cron aktiv.
