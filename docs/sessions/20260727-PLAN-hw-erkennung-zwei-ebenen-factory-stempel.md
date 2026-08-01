@@ -282,3 +282,11 @@ Verbesserungen bestehen (K1), beruehren aber die Achsen-Strukturen nicht (N4).
 ## SPEZIFIKATION DAMIT ABGESCHLOSSEN. Prioritaet per Owner-Wort: HAUPTSTRANG weiterbauen,
 ## bis Voll-Build + Messdurchlauf gehen — P2-P6 ruhen nach P1-Abschluss bis dahin
 ## (Ausnahmen: E-2 Schluessel-Fix + OP-9 Bau-Stem, beide VOR Voll-Bau/Messung noetig).
+
+## P2-VOLLZUG 01.08. (~21:15Z): ce a3eb9845 (5 Commits, Gate 318->320, 35 Faelle).
+## Praezisierung aus der Umsetzung: 7 Verdikte statt 5 (zusaetzlich UnvergleichbareStufen
+## [A3-Ausweisung ungleicher Groessen] + KeineDeklaration [O-4-Analogon]); neuer Typ
+## DeclarationOrigin (A2-Notiz, keine Stufe; bis P3 'Unbekannt' und bewusst vergleichbar).
+## Live-Befund prod1: Kette produktiv, Stufe 2 liefert 4800 MT/s aus echtem SPD ->
+## P3-Material fuer die Anker-Migration. Boot-Cache-Kontrakt als Header-Doku fixiert
+## (/run/comdare/hw/dmi_ram.cache, v1-Marker, gefiltert, boot_id) -> P6/Infra-Handout.
