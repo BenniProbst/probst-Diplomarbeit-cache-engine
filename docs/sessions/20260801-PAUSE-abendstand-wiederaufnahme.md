@@ -79,3 +79,17 @@ dieselbe Wurzel). KONSEQUENZ: super main==dev==d0837429 ist GEPUSHT, aber Bump-/
 NICHT CI-belegt (frozen). Beruhigungs-Check-Auflage erweitert: Trigger erst wenn Instanz
 nachweislich stabil (Infra-Bestaetigung + >=2h sauberer CI-Betrieb). NICHT canceln (§74) —
 beobachten; Infra-Fall.
+
+KORREKTUR 22:56Z (Watcher-Widerruf, ersetzt Nachtrag 22:44Z): INSTANZ-THESE WIDERRUFEN —
+GitLab verarbeitet normal (14191/14195/14196/14197 alle success). 14190 bleibt nur als
+UEBERHOLTE pending-Welle liegen (Projekt-Setting auto_cancel_pending_pipelines=disabled;
+fachlich gegenstandslos — der Gitlink-Bump ist via main-Welle 14195 + ce-Downstream 14196
+CI-BELEGT; super main=d0837429 gruen). scheduler_failure-Zaehler jetzt 3 (289/14198 22:50)
+— Beruhigungs-Check-Auflage BLEIBT. NEUER ECHTER BEFUND Thesis-CI 289/14198 dev ROT:
+(a) thesis:pdf .blg-GATE-FAIL 'Warnings/Repeated=1' (PDF baut; vermutlich Duplikat-/Defekt-
+Eintrag in literatur.bib aus K2-Neuzugaengen ODER das strengere CI-Gate faengt den mehlhorn-
+Vorbestand); (b) lint:latex exit 123: chktex-13 (\@) anhang/en/D:889 + chktex-2 (~) anhang/
+en/E:23/34/46/57 + 13 in E:133 — FOLGE DER MERGE-RESOLUTION (Overleaf-Fassung gewann,
+die ef448e4-chktex-Fixes der gitlab-Seite in Anhang B/E gingen verloren). FIX-PAKET
+'thesis-ci-gruen' NACH K5-Abnahme (Ein-Schreiber-Regel): .blg-Repeated identifizieren+
+bereinigen, chktex-Stellen fixen (\@-Spacing, ~), lokal bibtex+chktex-Beweis, dann push.
