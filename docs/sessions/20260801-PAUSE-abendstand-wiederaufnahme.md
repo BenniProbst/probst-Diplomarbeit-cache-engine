@@ -121,3 +121,13 @@ vollzug,scheduler-failure}*.md; Owner ging danach in Pause):
    Paketmeldung bei Wiedereinstieg abnehmen (Commit-1-CI-Fix + Commit-2-K6, Pruefregeln §1).
 NEUE OWNER-PUNKTE: F12 (P5-Timing-Ebene: JEDEC vs. XMP zitieren), F13 (ee1004-Nachruestung
 prod2 ja/nein). Offen weiter: F10, F11(Empfehlung steht).
+
+OWNER-SCHLUSSENTSCHEIDE (~23:2xZ, verbatim: 'Alle wie empfohlen. Erst prod1 testen und dann
+prod2 nachruesten.'): F10 GO (der->das-Korrektur in der Zielsetzung — beim Rahmen-/Abschluss-
+Pass). F11 = Empfehlung (prod1-Deklaration BLEIBT 0; Kette liefert Stufe 1 je Lauf). F12 =
+Empfehlung (Timing-Zitate auf der GEMESSENEN configured-Ebene: prod1 XMP-5600, prod2
+JEDEC-4800 — nie ein Timing zu fremdem Takt). F13 + REIHENFOLGE: ERST die prod1-Kette real
+testen (Stufe 1 Boot-Cache live + Stufe 2 SPD — gehoert in P3/P6-Pakete), DANN prod2-ee1004-
+Nachruestung als Infra-Auftrag anstossen. DAMIT SIND ALLE F-FRAGEN (F1-F13) ENTSCHIEDEN —
+bei Wiederaufnahme ist nichts owner-blockiert; W1-W5 + Paket-Strecke laufen entscheidungsfrei.
+Owner bleibt in Pause.
