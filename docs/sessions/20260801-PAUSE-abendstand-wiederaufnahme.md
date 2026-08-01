@@ -93,3 +93,31 @@ en/E:23/34/46/57 + 13 in E:133 — FOLGE DER MERGE-RESOLUTION (Overleaf-Fassung 
 die ef448e4-chktex-Fixes der gitlab-Seite in Anhang B/E gingen verloren). FIX-PAKET
 'thesis-ci-gruen' NACH K5-Abnahme (Ein-Schreiber-Regel): .blg-Repeated identifizieren+
 bereinigen, chktex-Stellen fixen (\@-Spacing, ~), lokal bibtex+chktex-Beweis, dann push.
+
+NACHTRAG ~23:1xZ — INFRA-ANTWORTEN GELESEN (Cluster: 2026-08-02-INFRA-AN-diplom-{antwort,
+vollzug,scheduler-failure}*.md; Owner ging danach in Pause):
+1. BOOT-CACHE-KANAL v1 IST LIVE auf BEIDEN Hosts (/run/comdare/hw/dmi_ram.cache, 0444,
+   gefiltert 0 Serial-Treffer, boot_id, Kontrakt exakt verifiziert). PAUKENSCHLAG:
+   prod1 faehrt CONFIGURED 5600 MT/s (XMP AKTIV; beide Slots DDR5-5600) — die offene
+   Ist-Takt-Frage ist per Stufe 1 BEANTWORTET; prod2 configured 4800 (Deklaration korrekt).
+   FOLGEN: (a) F11 entschaerft — Empfehlung bleibt Deklaration prod1=0 (Kette liefert
+   Stufe 1 je Lauf); (b) P6/BootCacheDmiProbe jetzt real testbar (P3-Paket kann Stufe-1-
+   Fixture vom echten Kontrakt ableiten); (c) THESIS-NACHZUG im Abschluss-Pass: K3-
+   Ehrlichkeitsnote 'Ist-Takt strukturell unbeweisbar ohne Stufe 1' ist UEBERHOLT (Stufe 1
+   existiert live; prod1=5600 belegt); (d) Infra-Frage Z.235: P5-Timing-Zitat-Ebene
+   (JEDEC-4800-Timings vs. XMP-5600) = neuer Owner-Punkt F12.
+2. prod2-SPD: BIOS SPD-Write-Disable bestaetigt -> Stufe 2 dort NICHT verfuegbar
+   (Recherche-Risiko eingetreten); optionaler Nachrüstweg modprobe ee1004 (= F13-Frage,
+   auch fuer CAS/decode-dimms — der zudem KEINEN DDR5-Decoder hat); prod2-Kette: Stufe 1
+   live -> configured_measured verfuegbar.
+3. runner-mode.sh RECONCILED (#519: Repo-Fassung 4a6df9b9 auf beiden Hosts, heavy-Profil
+   war nie betroffen); heavy bleibt signal-gated auf unser Wort.
+4. scheduler_failure GEKLAERT: Longhorn-Rebuild-Schwarm nach pve1-Zug (deckt auch API-non-
+   JSON); degraded 26->9, monoton; INFRA GIBT degraded=0-SIGNAL in docs/sessions.
+   TRIGGER-AUFLAGE FINAL: degraded=0-Signal + 2h ohne scheduler_failure.
+5. #437 ccache VOLLZOGEN -> TODO: (^|/)\.ccache/-Allowlists aus base-pipeline.yml +
+   super/.gitleaks.toml droppen (kleines Paket).
+6. Runner-Pause war das #461-Drain-Fenster (geplant); K6+CI-Fix-Agent laeuft noch aus —
+   Paketmeldung bei Wiedereinstieg abnehmen (Commit-1-CI-Fix + Commit-2-K6, Pruefregeln §1).
+NEUE OWNER-PUNKTE: F12 (P5-Timing-Ebene: JEDEC vs. XMP zitieren), F13 (ee1004-Nachruestung
+prod2 ja/nein). Offen weiter: F10, F11(Empfehlung steht).
