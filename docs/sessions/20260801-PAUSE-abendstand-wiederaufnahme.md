@@ -67,3 +67,15 @@ heilt; API im Fenster zeitweise ohne JSON). VOR-TRIGGER-AUFLAGE NEU: Beruhigungs
 VOLL-BAU-4-Trigger erst, wenn ueber ein Beobachtungsfenster (>=2h CI-Betrieb) 0 weitere
 scheduler_failures auftraten (heavy c=1 hat keinen Puffer; mehrstuendiger Job + 5s-Abbruch
 = teuer). CiCheck288g zaehlt mit. Infra-Notiz angehaengt (Cluster-Handout).
+
+NACHTRAG 22:44Z (INSTANZ-VERDACHT, Watcher-Diagnose): Pipeline 288/14190 (Gitlink-Bump
+8cb51663) FRIERT nach gruener lint-Stage ein — 9 Folge-Jobs "created" (nicht pending!),
+Bridge created/ohne Downstream, Pipeline seit 22:12Z nicht mehr verarbeitet, bei LEERER
+gesunder Flotte (0 laufende Jobs, alle 15 Runner aktiv). FUENF Symptome in 90 min (Flotten-
+Pause unbekannter Herkunft, Selbst-Unpause, 2x scheduler_failure mit 0-Byte-Trace, API-ohne-
+JSON-Phasen, Pipeline-Freeze) => EIN Instanz-Problem wahrscheinlich (Sidekiq/Background-
+Worker; Cluster-Log heute enthaelt K115e-GITLAB-REDIS-READONLY-RECOVERY — vermutlich
+dieselbe Wurzel). KONSEQUENZ: super main==dev==d0837429 ist GEPUSHT, aber Bump-/main-Wellen
+NICHT CI-belegt (frozen). Beruhigungs-Check-Auflage erweitert: Trigger erst wenn Instanz
+nachweislich stabil (Infra-Bestaetigung + >=2h sauberer CI-Betrieb). NICHT canceln (§74) —
+beobachten; Infra-Fall.
