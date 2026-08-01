@@ -1,0 +1,727 @@
+{
+  "summary": "Hauptstrang: Beweis-Kommandos 1-3 aus Code-Ist ableiten + 12-Perm-Klaerung + Bestandslog-Luecken-Ist (Opus-5-Probe mit Fallback)",
+  "agentCount": 5,
+  "logs": [
+    "Worker-Modell: claude-opus-5"
+  ],
+  "result": {
+    "workerModel": "claude-opus-5",
+    "karten": [
+      {
+        "befunde": [
+          {
+            "thema": "Beweis 1 / GN_DECISION: existiert NUR im deprecateten Archiv-Fallback",
+            "ist": "Der String GN_DECISION kommt im gesamten super-Repo (ohne docs/build*) an GENAU 6 Stellen vor - alle in ci/archive/perm-matrix-fallback.yml (Kopfzeile: 'ARCHIV (deprecated statische Perm-Matrix, Owner RF-4, 2026-07-27)'). Im ce-Repo (libs/apps/tools/tests/.gitlab-ci.yml/scripts): 0 Treffer (grep exit=1). Die Datei ist NICHT included; sie laeuft nur nach Ruecktransplantation + COMDARE_STATIC_MATRIX_FALLBACK=true (:291, :311). Da GATE-SWAP §45 die dynamische planer:delegate-Kette faehrt, ist die GN_DECISION-Naht im Voll-Bau-4 STRUKTURELL TOT.",
+            "quelle": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/ci/archive/perm-matrix-fallback.yml:131,152,176,181,204,213 + :1,:12,:291,:311; Kontroll-grep siehe Kommando 1"
+          },
+          {
+            "thema": "GN_DECISION=skip ist keine Log-Zeile, sondern eine Shell-Zuweisung",
+            "ist": "Zeile 176 lautet `export GN_DECISION=\"skip\"` - ohne set -x erscheint sie NIE im Job-Log. Die tatsaechlich emittierten Literale des Dedup-Schritts sind: `[dedup] HIT: $GN_PREFIX Chunk $GN_RANGE bereits im Cluster gebaut -> SKIP (bereits im Cluster gebaut) + PULL (Warm-Cache)` (:175) und `== Stufe 2 SKIP (Cross-Runner-Dedup HIT): ...` (:214). Das Fahrplan-Gate-Kriterium 'Log-Zeile GN_DECISION=skip' ist damit in KEINER Variante erfuellbar - auch nicht in CI.",
+            "quelle": "ci/archive/perm-matrix-fallback.yml:175-176 und :213-215"
+          },
+          {
+            "thema": "Der reale Resume-Arbiter der dynamischen Kette ist dll_is_current",
+            "ist": "Der vom Planer emittierte tier:build-Chunk ruft ausschliesslich `COMDARE_THESIS_PROFILE=... COMDARE_GN_OPT=<opt> COMDARE_GN_SIMD=<simd> COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=\"${START}:${COUNT}\" \"$DRIVER\" experiment_config <dll_dir>`. Kein Dedup-Praeludium, kein GN_DECISION. Der Skip passiert per-Binary in `if (dll_is_current(job.output, cfg_.build_version, algos, cfg_.build_variant_sig)) { r.status=0; r.skipped=true; r.message=\"uebersprungen (Version aktuell)\"; }`.",
+            "quelle": "ce libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:1130-1150 (Emission) und ce libs/cache_engine/builder/build_orchestrator/build_orchestrator.hpp:471-478 (Skip-Arbiter), dll_is_current-Definition :251-276"
+          },
+          {
+            "thema": "Die Skip-Meldung wird NIRGENDS gedruckt (Anti-Beweis-Falle)",
+            "ist": "r.message ('uebersprungen (Version aktuell)') hat keinen Konsumenten; grep nach dem Literal in ce libs/apps/tools/tests: 0 Treffer. Ebenso: LazyRunResult::built_skip wird an genau EINER Stelle gesetzt (cache_engine_builder_iterator.hpp:1030) und NIRGENDS gelesen; ProfileRunResult kennt kein built_new/built_skip. Der golden-Weg druckt nur die Aggregat-Zeile `RUN_PROFILE fertig: basis_rows=.. sota_rows=.. (basis_ids=.. sota_ids=..) measured=.. resumed=.. provisioned=.. (provision-only) csv_ok=.. -> <csv>` - und `provisioned` = build_stats.succeeded = gebaut PLUS resumiert, unterscheidet also NICHT.",
+            "quelle": "ce cache_engine_builder_iterator.hpp:1028-1031; ce profile_facade/profile_run_entry.hpp:557 und :842-846"
+          },
+          {
+            "thema": "Die EINZIGE Code-Stelle, die 'neu kompiliert' vs 'resumiert' literal druckt",
+            "ist": "`std::cout << \"      [pass] selected=\" << r.selected << \" built=\" << r.built << \" built_new=\" << r.built_new << \" loaded=\" ... << \" resumed=\" << r.resumed_binaries` - sie liegt im <comdare_experiment>-Zweig (run_experiment), NICHT im <comdare_thesis_profile>-Zweig (run_profile), den Voll-Bau-4 faehrt. Damit ist built_new=0 nur ueber die E4-XML-Wurzel (z.B. Code/test_data_xml/experiment_golden_kern.xml) literal erreichbar.",
+            "quelle": "ce libs/cache_engine/profile_facade/experiment_run_entry.hpp:384-387; Wurzel-Sniff in Code/02_messung_driver/main.cpp:1424-1432"
+          },
+          {
+            "thema": "Beweis 2 / [PRUNE-TESTAT]: Emitter liegt im SUPER-Treiber, nicht in ce",
+            "ist": "`std::cout << \"[PRUNE-TESTAT] verified=\" << verified << \" pruned=\" << pruned << \" behalten=\" << behalten << \" skipped=\" << skipped << \" dll_dir=\" << dll_dir.string()` - gegated auf COMDARE_PRUNE_ONLY==\"true\". Er iteriert output_dir/e4_xml/dll/<stem>/ und ruft je Stem ArtifactCache::verify_remote_then_prune. Im ce-Repo hat verify_remote_then_prune KEINEN Aufrufer (grep in ce libs/apps/tools: nur die Definition) - der einzige Aufrufer ist dieser super-Treiber. Literal im gebauten Binary bestaetigt (strings-Treffer = 1).",
+            "quelle": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/02_messung_driver/main.cpp:1172-1202 (Emission :1200-1201); ce artifact_cache.hpp:430-471"
+          },
+          {
+            "thema": "Prune-Semantik: verified = pruned + behalten; skipped = inert/kein Artefakt",
+            "ist": "PruneState{pruned,kept,skipped}; im Treiber zaehlt pruned und kept BEIDE auch auf verified hoch, skipped NICHT. verify_remote_then_prune liefert {skipped,\"inert\"} wenn !minio_enabled(). Die Verdikt-Gruende sind literal: no_local_version | remote_version_missing | version_mismatch | remote_size_unknown | size_mismatch | verified. Je Stem wird zusaetzlich `[PRUNE] stem=<s> action=<pruned|behalten> reason=<r>` an <bin_dir>/perm.prune.log angehaengt (dieses Log ist NICHT in prunable_artifacts, ueberlebt also).",
+            "quelle": "ce artifact_cache.hpp:68-79 (prune_verdict), :117-123 (PruneState), :433 (inert), :888-895 (log_prune_testat); super main.cpp:1187-1198 (Zaehl-Logik)"
+          },
+          {
+            "thema": "Hydration = pull_tier_prefix via `mc mirror`, gehaengt an cache_pull",
+            "ist": "Der Treiber setzt cache_push/cache_pull/measurement_sink NUR wenn `!artifact_cache->inert()`, also wenn COMDARE_MINIO_ENDPOINT UND _BUCKET gesetzt sind (bzw. DROP_URL). COMDARE_STORAGE_CACHE wird vom Treiber NICHT gelesen - das ist der CI-Schalter, der im .storage_cache_activation-Anker erst MC_HOST_prodcache faltet und COMDARE_MINIO_ENDPOINT auf den ALIAS 'prodcache' umsetzt. cache_pull ruft pull_tier_prefix -> `mc mirror --exclude _gn_chunk_markers/* <alias>/<bucket>/<key_prefix>/ <dest>/`. Treiber-Literal: `[E4] Storage #51 aktiv: minio=1 measure-drop=0`.",
+            "quelle": "Code/02_messung_driver/main.cpp:1249-1270; ce artifact_cache.hpp:365-395 (pull_tier_prefix), :175-217 (from_env); super .gitlab-ci.yml:583-603"
+          },
+          {
+            "thema": "Beweis 3 / Was DAS Varianten-Gate im Code IST",
+            "ist": "Opt-in ueber `COMDARE_VARIANT_GATE==\"true\"` -> variant_gate_sig = ex::driver_build_variant_signature() -> LazyRunConfig::build_variant_sig -> BuildConfig::build_variant_sig -> (a) dll_is_current vergleicht <output>.variant byte-genau, fehlendes oder abweichendes Sidecar erzwingt Neubau GENAU dieser Binary; (b) write_variant_sidecar schreibt es nur bei r.status==0. Gelesen wird COMDARE_VARIANT_GATE AUSSCHLIESSLICH in profile_run_entry.hpp (run_profile / <comdare_thesis_profile>) - der <comdare_experiment>-Zweig kennt es nicht.",
+            "quelle": "ce profile_facade/profile_run_entry.hpp:363-376 und :505; ce cache_engine_builder_iterator.hpp:954; ce build_orchestrator.hpp:241-243, :265-275, :291-296, :542-543"
+          },
+          {
+            "thema": "Der erwartete .variant-Inhalt ist read-only aus dem Treiber extrahierbar (GEMESSEN)",
+            "ist": "`strings -a Code/build-o8/02_messung_driver/comdare-messung-driver | grep -m1 '^bvset='` liefert literal: bvset=1;bv=2;page_type[{page_dense_byte;page_kind=0}{page_extended_dense;page_kind=1}{page_sparse_patricia;page_kind=2}{page_redirect;page_kind=3}{page_custom_cache;page_kind=4}{page_bplus;page_kind=5}];simd_extension[{simd_ext_none;simd_width_bits=0;simd_avx512=0;simd_avx10_version=0}{simd_ext_sse2;simd_width_bits=128;...}{simd_ext_avx2;simd_width_bits=256;...}{simd_ext_avx512;simd_width_bits=512;simd_avx512=1;...}{simd_ext_neon;...}{simd_ext_sve2;simd_width_bits=18446744073709551615;...}{simd_ext_rvv;...}{simd_ext_cuda_gh200;...}];general_hardware[{general_hardware_generic;hw_cache_line=64;hw_numa_capable=0}{general_hardware_x86_64;hw_cache_line=64;hw_numa_capable=1}{general_hardware_aarch64;hw_cache_line=64;hw_numa_capable=1}] - das ist die SOLL-Seite des Gates und damit das literale Gate-Kriterium (Sidecar-Inhalt == dieser String, ohne Zeilenende).",
+            "quelle": "gemessen an /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver; CT-Konstante ce libs/cache_engine/builder/driver_build_variant_signature.hpp:31-49"
+          },
+          {
+            "thema": "LUECKE im Trigger-Rezept: COMDARE_VARIANT_GATE fehlt im Fahrplan-Var-Satz",
+            "ist": "Der Director forwarded COMDARE_VARIANT_GATE explizit ueber die Trigger-Grenze (append_forward_var_literal, direkt hinter den vier BESTANDSLOG-Vars). Der Fahrplan §3.2 listet COMDARE_BUILD_GOLDEN_N/_STORAGE_CACHE/_BESTANDSLOG*/_GN_TOTAL, aber NICHT COMDARE_VARIANT_GATE. Folge: Beweis 3 wuerde ein Gate absichern, das im Voll-Bau-4 mangels Trigger-Var AUS bliebe (leerer String => byte-neutral, .variant wird ignoriert und nicht geschrieben).",
+            "quelle": "ce experiment_plan_director.hpp:864-872; docs/sessions/20260801-FAHRPLAN-vollbau4-beweise-g6-trigger.md:64-69"
+          },
+          {
+            "thema": "Lokale Werkzeug-/Stand-Lage (gemessen)",
+            "ist": "mc vorhanden: /usr/local/bin/mc. GNU timeout vorhanden: /usr/bin/timeout (=> ArtifactCache aktiviert den `timeout -k 5 <s>`-Wrapper vor JEDEM mc-Aufruf; ein mc-Mock muss das vertragen - es stoert nicht, da timeout sich selbst abstreift). `mc alias list` kennt genau EINEN Alias-Namen: local (kein prodcache lokal). ce build-v6: `ctest -N` = 'Total Tests: 318'. Treiber-Binary Code/build-o8/02_messung_driver/comdare-messung-driver datiert 2026-07-27 18:17 - nach J-0 ist das Beweis-GIFT, alle Beweise brauchen einen frischen Treiber.",
+            "quelle": "command -v mc/timeout; mc alias list; ctest -N in Code/external/comdare-cache-engine/build-v6; ls -la Code/build-o8/02_messung_driver/comdare-messung-driver"
+          },
+          {
+            "thema": "Kleinste-N-Hebel im Code (fuer alle drei Beweise)",
+            "ist": "golden/pa-Weg: COMDARE_GOLDEN_N_RANGE=\"start:count\" fenstert die Basis-View (Treiber-Literal `[E4] INC-G6 golden-N Chunk-Fenster: start=0 count=2`, Facade-Literal `[INC-G6] golden-N Chunk-Fenster [0,2) = 2 Binaries (view.size=...) provision-only`); COMDARE_GOLDEN_N_PROVISION_ONLY=true => `[E4] INC-G6 provision-only: baut DLLs, misst NICHT.`; COMDARE_RUN_SOTA=0 schaltet die SOTA-Reihen ab; COMDARE_BUILD_PARALLEL setzt die Compile-Worker hart. Im provision_only-Lauf kollabiert n_sweep auf 1 Element (Tier-Binary ist N-unabhaengig). xa-Weg: COMDARE_E4_CAP kappt max_binaries.",
+            "quelle": "Code/02_messung_driver/main.cpp:1516-1527, :1546-1552, :1513; ce profile_run_entry.hpp:419, :634-639"
+          },
+          {
+            "thema": "Vorhandene Unit-Tests decken die KERNE der drei Beweise bereits ab (kleinste Alternative)",
+            "ist": "In build-v6 registriert: #181 test_kf16b_build_resilience ('(C) inkrementell-resumierbar (versions-aktuelle DLLs uebersprungen)'), #312 test_g2_variant_sidecar (3x3-Skip-Matrix variant_sig {leer,gesetzt} x .variant {fehlt,mismatch,match}, zusaetzlich mit der REALEN Treiber-Mengen-Signatur), #316 test_g3_prune (prune_verdict-Matrix + prunable_artifacts + prune_key_base), #186 test_s2_pull_tier_binary (Hydration mock-basiert ueber COMDARE_MC_BIN, inkl. mc mirror). Sie belegen die KERNE, NICHT die env-Verdrahtung (getenv-Zweige) und NICHT den E2E-Treiberlauf.",
+            "quelle": "ctest -N in build-v6; ce tests/unit/test_kf16b_build_resilience.cpp:1-4, test_g2_variant_sidecar.cpp:1-15, test_g3_prune.cpp:1-8, test_s2_pull_tier_binary.cpp:1-18"
+          },
+          {
+            "thema": "mc-Mock-Vertrag (Blaupause liegt im Repo)",
+            "ist": "ArtifactCache ruft mc ausschliesslich als: `mc stat --json <alias>/<bucket>/<key>`, `mc cp --quiet <LOCAL> <alias>/<bucket>/<key>` (Push), `mc cp --quiet <alias>/<bucket>/<key> <LOCAL>` (Pull), `mc mirror --exclude _gn_chunk_markers/* <SRC>/ <DST>/`, `mc rm --quiet <target>`. Alle ueber posix_spawnp ohne /bin/sh, optional mit `timeout -k 5 <s>`-Praefix. mc_target = endpoint + '/' + bucket + ['/' + prefix] + '/' + key. Ein fertiger Fake-mc (stat/cp/mirror) steht im Repo und ist 1:1 nachnutzbar.",
+            "quelle": "ce artifact_cache.hpp:769-812 (mc_cp/mc_remote_exists/mc_pull), :389-390 (mirror), :917-925 (mc_target), :637-655 (timeout-Wrapper); Fake-mc: ce tests/unit/test_s2_pull_tier_binary.cpp:62-96"
+          }
+        ],
+        "kommandos": [
+          {
+            "zweck": "KONTROLLTEST zum Negativ-Befund 'GN_DECISION existiert nicht in der dynamischen Kette' - beide Repos, ohne docs/build",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine && grep -rn \"GN_DECISION\" --exclude-dir=.git --exclude-dir=docs --exclude-dir=\"build*\" --exclude-dir=Forschungsarbeiten . 2>/dev/null | grep -v \"/build\" | grep -v \"\\.md:\" ; echo \"---\"; grep -rn \"GN_DECISION\" Code/external/comdare-cache-engine/libs Code/external/comdare-cache-engine/apps Code/external/comdare-cache-engine/tools Code/external/comdare-cache-engine/tests Code/external/comdare-cache-engine/.gitlab-ci.yml Code/external/comdare-cache-engine/scripts 2>/dev/null; echo \"ce-exit=$?\"",
+            "erwartete_ausgabe": "GEMESSEN 01.08.: genau 6 Zeilen, alle aus ci/archive/perm-matrix-fallback.yml (:131 export GN_DECISION=\"build\", :152 Kommentar, :176 export GN_DECISION=\"skip\", :181 Kommentar, :204 Kommentar, :213 if [ \"${GN_DECISION:-build}\" = \"skip\" ]); danach '---' und 'ce-exit=1' (KEIN Treffer im ce-Repo)."
+          },
+          {
+            "zweck": "J-0-Vorbedingung fuer ALLE drei Beweise: frischer Treiber (build-o8 ist vom 27.07. = Beweis-Gift)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && cmake -B build-beweis -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release && cmake --build build-beweis --target comdare-messung-driver && ls -la build-beweis/02_messung_driver/comdare-messung-driver && build-beweis/02_messung_driver/comdare-messung-driver version",
+            "erwartete_ausgabe": "Binary existiert mit heutigem Datum; `version` druckt VIER gelabelte non-empty Zeilen (planner-Stempel / ceb-contract / build-type / build-version) - aus dem Hilfetext main.cpp:534-537. (Erwartung aus Code abgeleitet, Ausgabe-Inhalt NICHT gemessen.)"
+          },
+          {
+            "zweck": "BEWEIS 1 - Lauf 1 (Kaltstart): kleinstes N=2 auf dem GOLDEN-Weg, exakt der Aufruf des Voll-Bau-4-tier:build-Chunks",
+            "kommando": "mkdir -p /home/comdare/beweise-20260801 && cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/resume; rm -rf \"$OUT\"; COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" 2>&1 | tee /home/comdare/beweise-20260801/lauf1.log",
+            "erwartete_ausgabe": "Literale (aus Code abgeleitet, nicht gemessen): '[E4] INC-G6 golden-N Chunk-Fenster: start=0 count=2' (main.cpp:1521-1523), '[E4] INC-G6 provision-only: baut DLLs, misst NICHT.' (main.cpp:1526), '  [INC-G6] golden-N Chunk-Fenster [0,2) = 2 Binaries (view.size=<Basis-View-Groesse>) provision-only' (profile_run_entry.hpp:634-639), Abschluss 'RUN_PROFILE fertig: ... provisioned=2 (provision-only) csv_ok=1 -> ...' (profile_run_entry.hpp:842-846), exit 0."
+          },
+          {
+            "zweck": "BEWEIS 1 - Fingerabdruck nach Lauf 1 nehmen (mtime+Groesse+sha256 aller Artefakte)",
+            "kommando": "OUT=/home/comdare/beweise-20260801/resume; find \"$OUT/e4_xml/dll\" -type f -name 'perm.dll*' -printf '%T@ %s %p\\n' | sort > /home/comdare/beweise-20260801/stat1.txt; find \"$OUT/e4_xml/dll\" -type f -name 'perm.dll' -exec sha256sum {} + | sort > /home/comdare/beweise-20260801/sha1.txt; wc -l /home/comdare/beweise-20260801/stat1.txt /home/comdare/beweise-20260801/sha1.txt",
+            "erwartete_ausgabe": "sha1.txt hat 2 Zeilen (2 Tier-Binaries); stat1.txt hat 2 * (1 perm.dll + 1 perm.dll.version [+ .algos/.fingerprint je nach Opt-ins]) Zeilen."
+          },
+          {
+            "zweck": "BEWEIS 1 - Lauf 2 (Wiederaufnahme): identischer Aufruf, MUSS ueberspringen",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/resume; COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" 2>&1 | tee /home/comdare/beweise-20260801/lauf2.log; find \"$OUT/e4_xml/dll\" -type f -name 'perm.dll*' -printf '%T@ %s %p\\n' | sort > /home/comdare/beweise-20260801/stat2.txt; diff /home/comdare/beweise-20260801/stat1.txt /home/comdare/beweise-20260801/stat2.txt; echo \"DIFF-RC=$?\"",
+            "erwartete_ausgabe": "GATE-KRITERIUM (Ersatz fuer das nicht existierende GN_DECISION=skip): 'DIFF-RC=0' bei leerem diff => KEINE einzige perm.dll/.version wurde neu geschrieben => alle 2 Permutationen resumiert. Zusaetzlich in lauf2.log wieder 'RUN_PROFILE fertig: ... provisioned=2 (provision-only) csv_ok=1' und deutlich kuerzere Laufzeit."
+          },
+          {
+            "zweck": "BEWEIS 1 - KONTROLLTEST (der Skip darf nicht Zufall sein): .version-Sidecar entfernen erzwingt Neubau",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/resume; rm -f \"$OUT\"/e4_xml/dll/*/perm.dll.version; COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" 2>&1 | tail -5; find \"$OUT/e4_xml/dll\" -type f -name 'perm.dll*' -printf '%T@ %s %p\\n' | sort > /home/comdare/beweise-20260801/stat3.txt; diff /home/comdare/beweise-20260801/stat2.txt /home/comdare/beweise-20260801/stat3.txt; echo \"DIFF-RC=$?\"",
+            "erwartete_ausgabe": "'DIFF-RC=1' mit geaenderten mtimes FUER ALLE perm.dll UND perm.dll.version (dll_is_current gibt bei fehlendem .version-Sidecar false zurueck, build_orchestrator.hpp:259-263). Damit ist bewiesen, dass Lauf 2 wirklich der Skip-Pfad war und nicht ein no-op-Bau."
+          },
+          {
+            "zweck": "BEWEIS 1 - LITERALE ZUSATZ-VARIANTE (die einzige Code-Stelle mit einer 'neu vs. resumiert'-Zahl): 2x ueber die <comdare_experiment>-Wurzel",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; OUT2=/home/comdare/beweise-20260801/resume-xa; rm -rf \"$OUT2\"; for i in 1 2; do echo \"=== LAUF $i ===\"; COMDARE_THESIS_PROFILE=$PWD/test_data_xml/experiment_golden_kern.xml COMDARE_E4_CAP=1 COMDARE_WORKLOAD_RECORDS=1024 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT2\" 2>&1 | grep -E \"^\\s+\\[pass\\]|^RUN_EXPERIMENT fertig\"; done",
+            "erwartete_ausgabe": "Lauf 1: '      [pass] selected=1 built=1 built_new=1 loaded=1 load_failed=0 dyn_settings=.. measured=.. resumed=0'. Lauf 2: '      [pass] selected=1 built=1 built_new=0 ... resumed=1'. built_new=0 IST das literale Resume-Skip-Gate-Kriterium (experiment_run_entry.hpp:384-387). ACHTUNG: dieser Weg MISST (kein provision_only auf der xa-Wurzel) - Ausgabe geht in den scratch-OUT2, nie ins Repo."
+          },
+          {
+            "zweck": "BEWEIS 2 - Vorbereitung: Fake-mc als Objekt-Store-Attrappe (Push+Pull+Mirror+Stat), 1:1 nach der Repo-Blaupause",
+            "kommando": "mkdir -p /home/comdare/beweise-20260801/store && cat > /home/comdare/beweise-20260801/fake_mc.sh <<'EOF'\n#!/bin/sh\nSTORE=\"/home/comdare/beweise-20260801/store\"\nif [ \"$1\" = \"stat\" ]; then T=\"$3\"; K=\"${T#*/}\"; K=\"${K#*/}\"; if [ -f \"$STORE/$K\" ]; then echo \"{\\\"size\\\": $(wc -c < \"$STORE/$K\")}\"; exit 0; fi; exit 1; fi\nif [ \"$1\" = \"mirror\" ]; then S=\"$4\"; D=\"$5\"; K=\"${S#*/}\"; K=\"${K#*/}\"; K=\"${K%/}\"; SD=\"$STORE/$K\"; DD=\"${D%/}\"; [ -d \"$SD\" ] || exit 1; ( cd \"$SD\" && find . -type f | while IFS= read -r rf; do case \"$rf\" in ./_gn_chunk_markers/*) continue;; esac; mkdir -p \"$DD/$(dirname \"$rf\")\"; cp \"$SD/$rf\" \"$DD/$rf\"; done ); exit 0; fi\nif [ \"$1\" = \"cp\" ]; then S=\"$3\"; D=\"$4\"; if [ -f \"$S\" ]; then K=\"${D#*/}\"; K=\"${K#*/}\"; mkdir -p \"$STORE/$(dirname \"$K\")\"; cp \"$S\" \"$STORE/$K\"; exit 0; else K=\"${S#*/}\"; K=\"${K#*/}\"; [ -f \"$STORE/$K\" ] || exit 1; mkdir -p \"$(dirname \"$D\")\"; cp \"$STORE/$K\" \"$D\"; exit 0; fi; fi\nif [ \"$1\" = \"rm\" ]; then T=\"$3\"; K=\"${T#*/}\"; K=\"${K#*/}\"; rm -f \"$STORE/$K\"; exit 0; fi\nexit 1\nEOF\nchmod +x /home/comdare/beweise-20260801/fake_mc.sh && echo OK",
+            "erwartete_ausgabe": "'OK'. Der Vertrag ist aus ce artifact_cache.hpp:769-812/:389-390/:917-925 abgeleitet und deckt sich mit dem Repo-Fake in tests/unit/test_s2_pull_tier_binary.cpp:62-96. HINWEIS: mit /usr/bin/timeout vorhanden ruft ArtifactCache 'timeout -k 5 <s> <mc> ...' - timeout streift sich selbst ab, $1 bleibt stat/cp/mirror."
+          },
+          {
+            "zweck": "BEWEIS 2 - Phase 1 (Bestand aufbauen): provision-only mit scharfer Ebene B => Bau + Push in den Fake-Store",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/hydra; rm -rf \"$OUT\"; export COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket COMDARE_MC_BIN=/home/comdare/beweise-20260801/fake_mc.sh; unset COMDARE_MINIO_PREFIX COMDARE_MEASUREMENT_DROP_URL COMDARE_MEASUREMENT_COMBO; COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" 2>&1 | tee /home/comdare/beweise-20260801/hydra1.log | grep -E \"Storage #51|RUN_PROFILE fertig\"; find /home/comdare/beweise-20260801/store -type f | sort",
+            "erwartete_ausgabe": "'[E4] Storage #51 aktiv: minio=1 measure-drop=0' (main.cpp:1269-1270, Literal im Binary bestaetigt) und 'RUN_PROFILE fertig: ... provisioned=2 (provision-only) csv_ok=1'. Im Store liegen je Stem perm.dll und perm.dll.version (+ .algos/.fingerprint/.variant je nach Opt-in) unter <cache_key_prefix>/<stem>/."
+          },
+          {
+            "zweck": "BEWEIS 2 - Objekt-Store-Praefix LITERAL vom Treiber holen (nie nachbilden; R8-Doktrin)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket build-beweis/02_messung_driver/comdare-messung-driver cache-key",
+            "erwartete_ausgabe": "EINE Zeile der Form m3v2+cxx=<tag>+opt=O3+ceb=<major>.<minor>+mtool=+mrg=none (bei simd=no_extension faellt +ext= weg). Genau dieser Praefix ist das Store-Unterverzeichnis in /home/comdare/beweise-20260801/store/. (Form aus artifact_cache.hpp:485-489 + Hilfe main.cpp:519-523 abgeleitet; Wert NICHT gemessen.)"
+          },
+          {
+            "zweck": "BEWEIS 2 - Phase 2 (HYDRATION): lokale Binaries loeschen, gleicher Lauf => mc mirror hydriert, dll_is_current skippt",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/hydra; find \"$OUT/e4_xml/dll\" -type f -name 'perm.dll' -exec sha256sum {} + | sort > /home/comdare/beweise-20260801/hydra_sha_vor.txt; rm -rf \"$OUT/e4_xml/dll\" \"$OUT/e4_xml/src\"; export COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket COMDARE_MC_BIN=/home/comdare/beweise-20260801/fake_mc.sh; COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" 2>&1 | tail -3; find \"$OUT/e4_xml/dll\" -type f -name 'perm.dll' -exec sha256sum {} + | sort > /home/comdare/beweise-20260801/hydra_sha_nach.txt; diff /home/comdare/beweise-20260801/hydra_sha_vor.txt /home/comdare/beweise-20260801/hydra_sha_nach.txt; echo \"HYDRA-DIFF-RC=$?\"; ls \"$OUT/e4_xml/src\" 2>/dev/null | wc -l",
+            "erwartete_ausgabe": "'HYDRA-DIFF-RC=0' (byte-identische perm.dll aus dem Store zurueck) UND src-Datei-Zahl 0 (kein Source-Codegen => es wurde NICHT gebaut, sondern hydriert+geskippt; build_orchestrator.hpp:473-478 schneidet vor der Source-Generierung ab). 'RUN_PROFILE fertig: ... provisioned=2 (provision-only)'."
+          },
+          {
+            "zweck": "BEWEIS 2 - Phase 3 (praeparierter Lager-Bestand): EINEN Eintrag absichtlich ungueltig machen (Remote-.version verfaelschen)",
+            "kommando": "KP=$(cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket build-beweis/02_messung_driver/comdare-messung-driver cache-key | head -1); echo \"KEY_PREFIX=$KP\"; BAD=$(ls -1 \"/home/comdare/beweise-20260801/store/$KP\" | sort | head -1); echo \"BAD_STEM=$BAD\"; printf 'KAPUTT-FREMDE-PROVENIENZ' > \"/home/comdare/beweise-20260801/store/$KP/$BAD/perm.dll.version\"; ls -la \"/home/comdare/beweise-20260801/store/$KP/$BAD/\"",
+            "erwartete_ausgabe": "KEY_PREFIX/BAD_STEM werden ausgegeben; die Remote-.version des ersten Stems traegt jetzt 'KAPUTT-FREMDE-PROVENIENZ' != lokale .version => prune_verdict liefert {false,\"version_mismatch\"} => dieser Stem wird BEHALTEN, der andere geprunt (artifact_cache.hpp:73-79)."
+          },
+          {
+            "zweck": "BEWEIS 2 - Phase 4 (das GATE): standalone Prune-Lauf => [PRUNE-TESTAT] mit verified>0 UND pruned>0",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && OUT=/home/comdare/beweise-20260801/hydra; COMDARE_PRUNE_ONLY=true COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket COMDARE_MC_BIN=/home/comdare/beweise-20260801/fake_mc.sh COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension build-beweis/02_messung_driver/comdare-messung-driver experiment_config \"$OUT\" 2>&1 | grep -E \"^\\[E4\\] G5 prune-only|^\\[PRUNE-TESTAT\\]\"; echo \"--- je-Stem-Testate:\"; cat \"$OUT\"/e4_xml/dll/*/perm.prune.log",
+            "erwartete_ausgabe": "'[E4] G5 prune-only: verify-then-prune je Stem unter <OUT>/e4_xml/dll (build_version=m3v2; minio aktiv)' und als GATE-ZEILE '[PRUNE-TESTAT] verified=2 pruned=1 behalten=1 skipped=0 dll_dir=<OUT>/e4_xml/dll' => verified>0 UND pruned>0 erfuellt, 'behalten=alles' widerlegt. Je-Stem-Log: '[PRUNE] stem=<A> action=behalten reason=version_mismatch' und '[PRUNE] stem=<B> action=pruned reason=verified' (artifact_cache.hpp:888-895)."
+          },
+          {
+            "zweck": "BEWEIS 2 - KONTROLLTEST: derselbe Prune ohne Ebene B MUSS inert sein (nie loeschen)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && OUT2=/home/comdare/beweise-20260801/resume; env -u COMDARE_MINIO_ENDPOINT -u COMDARE_MINIO_BUCKET -u COMDARE_MC_BIN COMDARE_PRUNE_ONLY=true build-beweis/02_messung_driver/comdare-messung-driver experiment_config \"$OUT2\" 2>&1 | grep -E \"^\\[E4\\] G5 prune-only|^\\[PRUNE-TESTAT\\]\"; find \"$OUT2/e4_xml/dll\" -name 'perm.dll' | wc -l",
+            "erwartete_ausgabe": "'[E4] G5 prune-only: ... (INERT -> nie loeschen)' und '[PRUNE-TESTAT] verified=0 pruned=0 behalten=0 skipped=2 dll_dir=...'; die 2 perm.dll sind unveraendert vorhanden. Das belegt, dass die pruned=1 aus Phase 4 wirklich am Remote-Verify haengt und nicht am blossen Aufruf."
+          },
+          {
+            "zweck": "BEWEIS 3 - SOLL-Signatur des Gates literal aus dem FRISCHEN Treiber ziehen (Referenzwert)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && strings -a build-beweis/02_messung_driver/comdare-messung-driver | grep -m1 '^bvset=' | tee /home/comdare/beweise-20260801/bvset_soll.txt | cut -c1-80; wc -c /home/comdare/beweise-20260801/bvset_soll.txt",
+            "erwartete_ausgabe": "Eine Zeile beginnend mit 'bvset=1;bv=2;page_type[{page_dense_byte;page_kind=0}...' - GEMESSEN am 27.07.-Binary build-o8 (voller Wert siehe Befund 10). Diese Datei ist die SOLL-Seite; bvset_soll.txt enthaelt ein zusaetzliches \\n, das beim Vergleich abgezogen wird."
+          },
+          {
+            "zweck": "BEWEIS 3 - R1/R2: ohne Gate bauen, dann MIT Gate => fehlendes .variant erzwingt Neubau + schreibt das Sidecar",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/variant; rm -rf \"$OUT\"; RUN(){ COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" >/dev/null 2>&1; }; RUN; echo \"R1 .variant-Dateien: $(find \"$OUT/e4_xml/dll\" -name 'perm.dll.variant' | wc -l)\"; find \"$OUT/e4_xml/dll\" -name 'perm.dll' -printf '%T@ %p\\n' | sort > /home/comdare/beweise-20260801/var_r1.txt; COMDARE_VARIANT_GATE=true RUN; echo \"R2 .variant-Dateien: $(find \"$OUT/e4_xml/dll\" -name 'perm.dll.variant' | wc -l)\"; find \"$OUT/e4_xml/dll\" -name 'perm.dll' -printf '%T@ %p\\n' | sort > /home/comdare/beweise-20260801/var_r2.txt; diff -q /home/comdare/beweise-20260801/var_r1.txt /home/comdare/beweise-20260801/var_r2.txt; echo \"R1-R2-DIFF-RC=$?\"; for f in $(find \"$OUT/e4_xml/dll\" -name 'perm.dll.variant'); do if [ \"$(cat $f)\" = \"$(cat /home/comdare/beweise-20260801/bvset_soll.txt)\" ] || [ \"$(cat $f)\" = \"$(head -c -1 /home/comdare/beweise-20260801/bvset_soll.txt)\" ]; then echo \"SIDECAR-MATCH $f\"; else echo \"SIDECAR-MISMATCH $f\"; fi; done",
+            "erwartete_ausgabe": "'R1 .variant-Dateien: 0' (Gate aus => write_variant_sidecar ist no-op, build_orchestrator.hpp:291-296); 'R2 .variant-Dateien: 2'; 'R1-R2-DIFF-RC=1' (alle perm.dll neu gebaut, weil das .variant fehlte, build_orchestrator.hpp:269-274); 2x 'SIDECAR-MATCH ...' - der Sidecar-Inhalt ist BYTE-GLEICH der Treiber-Mengen-Signatur."
+          },
+          {
+            "zweck": "BEWEIS 3 - R3/R4: das GATE selbst (mit Gate erneut = Skip; manipuliertes .variant = gezielter Neubau NUR dieser Binary)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/variant; RUNG(){ COMDARE_VARIANT_GATE=true COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" >/dev/null 2>&1; }; RUNG; find \"$OUT/e4_xml/dll\" -name 'perm.dll' -printf '%T@ %p\\n' | sort > /home/comdare/beweise-20260801/var_r3.txt; diff -q /home/comdare/beweise-20260801/var_r2.txt /home/comdare/beweise-20260801/var_r3.txt; echo \"R2-R3-DIFF-RC=$? (0 = Skip)\"; TAMPER=$(find \"$OUT/e4_xml/dll\" -name 'perm.dll.variant' | sort | head -1); printf 'bvset=1;bv=2;page_type[{page_dense_byte;page_kind=0}];simd_extension[{simd_ext_none;simd_width_bits=0;simd_avx512=0;simd_avx10_version=0}];general_hardware[{general_hardware_generic;hw_cache_line=64;hw_numa_capable=0}]' > \"$TAMPER\"; echo \"TAMPERED=$TAMPER\"; RUNG; find \"$OUT/e4_xml/dll\" -name 'perm.dll' -printf '%T@ %p\\n' | sort > /home/comdare/beweise-20260801/var_r4.txt; diff /home/comdare/beweise-20260801/var_r3.txt /home/comdare/beweise-20260801/var_r4.txt; echo \"R3-R4-DIFF-RC=$? (1 = Gate hat gebissen)\"; if [ \"$(cat \"$TAMPER\")\" = \"$(head -c -1 /home/comdare/beweise-20260801/bvset_soll.txt)\" ]; then echo \"GATE-OK: .variant wieder auf Treiber-Signatur\"; else echo \"GATE-FEHLER\"; fi",
+            "erwartete_ausgabe": "GATE-KRITERIUM (literal): (a) 'R2-R3-DIFF-RC=0 (0 = Skip)' - identische Signatur => vollstaendiger Skip; (b) 'R3-R4-DIFF-RC=1 (1 = Gate hat gebissen)' und der diff zeigt GENAU EINE geaenderte perm.dll (die des manipulierten Stems, nicht beide) - das ist die per-Binary-Praezision aus build_orchestrator.hpp:270-274; (c) 'GATE-OK: .variant wieder auf Treiber-Signatur'. Das ZIRKULARITAETS-VERBOT (Soll kommt aus dem Treiber, nie aus dem Sidecar) ist damit E2E belegt."
+          },
+          {
+            "zweck": "KLEINSTE FUEHRBARE ALTERNATIVE (falls kein Voll-Toolchain-Lauf moeglich): die vier Kern-Suiten einzeln",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/build-v6 && ctest -R '^(test_kf16b_build_resilience|test_g2_variant_sidecar|test_g3_prune|test_s2_pull_tier_binary)$' -V 2>&1 | tail -40",
+            "erwartete_ausgabe": "4 Tests, '100% tests passed, 0 tests failed out of 4' - deckt: Resume-Skip-Kern (dll_is_current), Variant-Gate-3x3-Matrix inkl. realer Treiber-Mengen-Signatur, prune_verdict-Matrix + prunable_artifacts + prune_key_base, Hydration via mc-Mock. NICHT gedeckt: die getenv-Verdrahtung (COMDARE_VARIANT_GATE/COMDARE_PRUNE_ONLY/COMDARE_MINIO_*) und der E2E-Treiberlauf - dafuer braucht es die Kommandos oben."
+          },
+          {
+            "zweck": "PREFLIGHT vor jedem Lauf mit ECHTEM Store (mc-Falle: unbekannter Alias schreibt LOKAL und meldet Erfolg)",
+            "kommando": "command -v mc; mc alias list 2>/dev/null | grep -E '^[A-Za-z0-9_.-]+$'",
+            "erwartete_ausgabe": "GEMESSEN 01.08.: '/usr/local/bin/mc' und genau ein Alias-Name: 'local'. KEIN prodcache-Alias lokal => ein Lauf mit COMDARE_MINIO_ENDPOINT=prodcache wuerde ins Leere greifen. Fuer Beweis 2 daher entweder der Fake-mc (oben) oder ein eigens angelegter Scratch-Alias/-Bucket - NIEMALS der Produktiv-Bucket."
+          }
+        ],
+        "offene_punkte": [
+          "BEWEIS 1 IST NICHT WIE FORMULIERT FUEHRBAR - Gate-Kriterium muss der Owner neu setzen. `GN_DECISION=skip` existiert ausschliesslich als Shell-Zuweisung in ci/archive/perm-matrix-fallback.yml (deprecated statische Matrix, COMDARE_STATIC_MATRIX_FALLBACK-gegated, nicht included). In der dynamischen Kette, die Voll-Bau-4 faehrt (GATE-SWAP §45), gibt es die Variable nicht - weder lokal noch in CI. Vorschlag fuer den Ledger-Nachtrag: Gate-Kriterium ersetzen durch 'zweiter identischer provision-only-Lauf laesst mtime+sha256 ALLER perm.dll/.version unveraendert (diff-rc=0), Kontrolltest rm .version erzwingt Neubau' bzw. zusaetzlich 'built_new=0' ueber die <comdare_experiment>-Wurzel.",
+          "Zweitbefund zu Beweis 1: selbst bei Reaktivierung der Archiv-Matrix waere `GN_DECISION=skip` KEINE Log-Zeile (kein set -x). Die dort real emittierten Literale sind '[dedup] HIT: ... -> SKIP ... + PULL (Warm-Cache)' und '== Stufe 2 SKIP (Cross-Runner-Dedup HIT): ...'. Wer das alte Kriterium behalten will, muss auf diese beiden umschreiben - und dann ist der Beweis CI-/mc-/minio-gebunden und lokal nur mit Fake-mc + gesetzten GitLab-Variablen fuehrbar.",
+          "OWNER-ENTSCHEID noetig: Beweis 2 gegen Fake-mc (Mock, hier vollstaendig spezifiziert, deterministisch, kein Netz) ODER gegen einen echten Scratch-MinIO-Bucket. Lokal existiert nur der mc-Alias 'local'; ein prodcache-Alias ist nicht konfiguriert. Fahrplan-Beweis 4 fordert ohnehin explizit 'gegen ECHTES minio' - daraus lese ich, dass Beweis 2 als Mock-Smoke gemeint und zulaessig ist, das steht aber nirgends geschrieben.",
+          "LUECKE im Trigger-Rezept: COMDARE_VARIANT_GATE steht in der Forward-Allowlist des Planers (experiment_plan_director.hpp:872), aber NICHT im Fahrplan-Trigger-Var-Satz §3.2. Ohne die Var ist das in Beweis 3 abgenommene Gate im Voll-Bau-4 AUS (leerer String => .variant wird weder geschrieben noch geprueft). Entweder die Var ins Trigger-Rezept aufnehmen oder Beweis 3 explizit als 'Faehigkeitsnachweis ohne Produktiv-Einsatz' deklarieren.",
+          "TOTE NAEHTE (Kandidaten fuer den Abschluss-Aufraeumpass, nicht fuer jetzt): LazyRunResult::built_skip und ::built_new werden gesetzt, aber auf dem golden-Weg nirgends gelesen/gedruckt; das ist die eigentliche Ursache dafuer, dass es keinen literalen Resume-Beleg gibt. Ein additiver Einzeiler in profile_run_entry.hpp (RUN_PROFILE-fertig-Zeile um built_new=/built_skip= erweitern) wuerde Beweis 1 zu einem echten Log-Gate machen - das ist eine CODE-AENDERUNG und braucht Owner-GO, ich habe nichts angefasst.",
+          "KOMMENTAR-DRIFT in experiment_plan_director.hpp:1325: der Kommentar behauptet, der Treiber gebe das PRUNE-TESTAT selbst aus 'am Bau-Ende'; tatsaechlich haengt es an COMDARE_PRUNE_ONLY=true und wird vom Planer als separater Schritt nach der Messung emittiert (:1332-1338). Inhaltlich stimmig, aber der Verweis '(02_messung_driver/main.cpp)' ist die einzige Fundstelle des Literals im ce-Baum - beim Lesen leicht als ce-Code missverstanden (mich hat es zunaechst in die Irre gefuehrt).",
+          "NICHT VERIFIZIERT (bewusst, read-only): view.size der all_axes_golden-Basis-View (erwartet 131072, aber nicht gemessen - das erste Kommando misst es); der Wert von `cache-key` fuer die Zelle O3/no_extension; die Laufzeit eines 2-Binary-provision-only-Laufs (bestimmt, ob N=2 wirklich 'klein' ist oder ob der Codegen-Vorlauf dominiert); ob build-beweis konfiguriert ohne die J-2-Re-Configure-Mechanik durchlaeuft (der Treiber-Target haengt an der Facade, nicht an den EXCLUDE_FROM_ALL-Werkzeugen - erwartet unkritisch, aber ungeprueft).",
+          "J-0-AUFLAGE gilt fuer alle drei Beweise: Code/build-o8 (Treiber vom 27.07. 18:17) und ce/build-v6 sind Alt-Stände. Alle oben gelisteten Beweis-Kommandos setzen den frisch gebauten Treiber aus Code/build-beweis voraus; die einzige Ausnahme ist die read-only-Extraktion der bvset-Referenz, die ich zur Demonstration am build-o8-Binary gemessen habe - fuer den Beweis MUSS sie aus build-beweis kommen.",
+          "SCHREIB-SCOPE der Beweise (fuer die Freigabe): alle Ausgaben liegen unter /home/comdare/beweise-20260801/ ausserhalb beider Repos. Kein measure_out/gn_out im Repo, keine Mess-CSV in getrackten Pfaden, kein Anfassen von golden/Lager/CI. Beweis 2 Phase 4 LOESCHT lokale Tier-Binaries (das ist der Zweck) - ausschliesslich im scratch-Ordner, und prunable_artifacts enthaelt per Konstruktion keine Messdaten (result.csv/measure_out/prune.log bleiben)."
+        ]
+      },
+      {
+        "befunde": [
+          {
+            "thema": "(1) A6-Profil-Ist: das committete all_axes_golden traegt HEUTE 4 System-Perms, nicht 12",
+            "ist": "Das Profil deklariert <system_axes> mit opt_level = {O2, O3} (2 Optionen) und external_utils/simd = {no_extension, avx2} (2 Optionen) => |opt x simd| = 4. LIVE gemessen mit dem lokalen Treiber: 'perm_count=4' und die vier Zeilen 'perm 0 opt=O2 simd=no_extension ... +opt=O2' / 'perm 1 opt=O2 simd=avx2 ... -mavx2 ... +opt=O2+ext=avx2' / 'perm 2 opt=O3 simd=no_extension' / 'perm 3 opt=O3 simd=avx2'. Die Fahrplan-Zahl 12 (O0-O3 x 3 simd) hat im ce-Code HEUTE keinen Beleg.",
+            "quelle": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml:187-200 (Bloecke <compiler><opt_level> und <external_utils><simd>); Live-Ausgabe: comdare-messung-driver plan dump <profil>"
+          },
+          {
+            "thema": "(1b) Das Profil begruendet die 4 EXPLIZIT — 12 waere eine bewusste Umkehr, kein Nachziehen",
+            "ist": "Der Kommentar ueber dem system_axes-Block schreibt woertlich: 'opt_level = O2 + O3 (deterministische Mess-golden-Baseline, Paragraf 32-F4; Ofast bewusst WEGGELASSEN ...). simd = no_extension + avx2 (universell auf prod1(Zen5)+prod2(i9); avx512 nicht universell).' Das ist eine dokumentierte Entwurfsentscheidung (GN-3, 2026-07-19), keine Luecke. Der Schritt auf 12 kippt beide Begruendungen (O0/O1 als Mess-Baseline; avx512 nicht universell) und ist damit ein OWNER-Entscheid, keine Nachpflege.",
+            "quelle": "all_axes_golden.profile.xml:178-186 (Kommentarblock '(sys) SYSTEM-ACHSEN')"
+          },
+          {
+            "thema": "(2) COMDARE_GN_INCLUDE_AVX512 ist TOT — im ce-Repo null Treffer, im super nur im Archiv",
+            "ist": "Kontrolltest im ce: `git grep -n \"GN_INCLUDE_AVX512\"` => Exit 1, KEINE Ausgabe (auch kein Treffer in docs). Im super existiert der Name nur in ci/archive/perm-matrix-fallback.yml:297 (Kommentar) und :311 (rules-if des Jobs build:golden-n-avx512) sowie in Alt-Doku. Diese Archiv-Datei ist NICHT included: `grep -n '^include:' .gitlab-ci.yml` liefert nur das Cluster-Template comdare/cluster/ci-templates/base-pipeline.yml; 'ci/archive' kommt in der super-YAML genau 1x vor, und zwar als Prosa-Verweis in einem Kommentar (Zeile 801), nicht als include. => Die Variable im Trigger zu setzen hat NULL Wirkung auf die dynamische Kette.",
+            "quelle": "ce: git grep GN_INCLUDE_AVX512 (rc=1, leer). super: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/ci/archive/perm-matrix-fallback.yml:297,311 · /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.gitlab-ci.yml:11-14 (include), :801 (Prosa-Verweis)"
+          },
+          {
+            "thema": "(2b) avx512 ist profil-inhaerent geworden: es steht im ANGEBOT (Registry), nicht mehr an einem Extra-Schalter",
+            "ist": "Die generierte System-Achsen-Registry bietet simd mit option_count=3 (no_extension / avx2 / avx512, avx512 -> gpp-Flag -mavx512f) und opt_level mit option_count=5 (O0,O1,O2,O3,Ofast). validate_profile laesst fuer den Thesis-Kanal O0/O1/O2/O3 zu und REJECTED nur Ofast (IEEE-754/CRC64-golden-Anker); simd wird gegen kAllSimdIds geprueft, Fehlertext nennt 'Erlaubt = no_extension, avx2, avx512'. Der Planer liest die Listen 1:1 aus dem geparsten Profil (opt_perms_of / simd_perms_of, leer => CEB-Default O3/no_extension). => Wer avx512 will, deklariert es im Profil; einen zweiten Kanal gibt es nicht mehr.",
+            "quelle": "ce libs/cache_engine/include/cache_engine/measurement/system_axis_registry.xml (sub_axis id=\"simd\" option_count=3; sub_axis id=\"opt_level\" option_count=5) · libs/cache_engine/profile_facade/validate_profile.hpp:387-413 · libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:1691-1692,1824-1830"
+          },
+          {
+            "thema": "(1c/2c) TROCKENLAUF 12 Perms: der Code kann es HEUTE, ohne jede Code-Aenderung",
+            "ist": "Scratchpad-Kopie des Profilbaums mit opt_level={O0,O1,O2,O3} und simd={no_extension,avx2,avx512} (KEINE Repo-Aenderung). `driver validate` meldet woertlich: 'geprueft: 18 Achsen, 35 Werte, 17 axis_sweeps, 21 sota_series, 6 workloads, 2 datasets, 16 measurement_categories, 4 opt_levels, 3 simd, ...' + 'VALIDAT OK'. `driver plan dump` meldet 'perm_count=12' mit perm 0..11 = O0..O3 x {no_extension, avx2, avx512}, avx512 traegt march_flag=-mavx512f und build_version_suffix=+opt=Ox+ext=avx512. => Der EINZIGE noetige Edit fuer 12 Perms ist der Profil-XML-Block; Planer, Validator und Emitter tragen es unveraendert.",
+            "quelle": "Scratchpad-Kopie /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/ap12/thesis_profiles/all_axes_golden.profile.xml + Live-Ausgaben validate/plan dump"
+          },
+          {
+            "thema": "(3) Chunk-Zerlegung: es gibt KEINE Chunks mehr — es gibt 4096er-Scheiben INNERHALB eines Batch-Jobs",
+            "ist": "Harte inline-Konstante `inline constexpr std::size_t kGnBatchSlice = 4096;` mit ausdruecklich KEINEM Env-Override (das verworfene COMDARE_GN_BATCH_SLICE waere ein Paragraf-61-Verstoss). Der emittierte Batch-Loop lautet literal: TOTAL=\"${COMDARE_GN_TOTAL:-16}\" ; SLICE=4096 ; START=0 ; while [ \"$START\" -lt \"$TOTAL\" ]; do REMAIN=$(( TOTAL - START )); COUNT=$SLICE; [ \"$COUNT\" -gt \"$REMAIN\" ] && COUNT=$REMAIN ; ... COMDARE_GOLDEN_N_RANGE=\"${START}:${COUNT}\" ... ; START=$(( START + COUNT )); done. Formel: Scheiben je Perm = ceil(TOTAL/4096); bei TOTAL=131072 exakt 32. Danach je Perm EIN unbedingter PRUEF-Aufruf ueber COMDARE_GOLDEN_N_RANGE=\"0:${TOTAL}\" (nicht gescheibt). Das frueher gueltige kTierChunkCount=4 (GN_CHUNK 0..3, O(Perms x Chunks)) ist im Code als DEPRECATED verzeichnet und ersetzt.",
+            "quelle": "ce libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:529-540 (Konstante + DEPRECATED-Doku), :1112-1141 (emit_batch_build_job Scheiben-Schleife); Live-Emission tier ci"
+          },
+          {
+            "thema": "(3b) Job-Topologie ist O(Maschinen) und perm-ZAHL-UNABHAENGIG: immer 4 Stufe-2-Jobs",
+            "ist": "Live-Emission `tier ci` bei 4 Perms: Kopfzeile 'perm_count=4 batch_slice=4096 host_lanes=amd,intel'; Jobs: tier:build-batch:amd, measure:[all]:batch:amd, tier:build-batch:intel, measure:[all]:batch:intel = 4. Live-Emission bei 12 Perms: Kopfzeile 'perm_count=12 batch_slice=4096 host_lanes=amd,intel'; DIESELBEN 4 Jobs, nur 767 statt 463 Zeilen; `grep -c 'SLICE='` = 2 (je Build-Batch einmal). => Der Fahrplan-Satz 'Produktiv-Praezedenz: Pipeline 11611 komplett gruen, 16/16 tier:build' beschreibt das ALTE O(Perms x Chunks)-Schema (4 Perms x 4 Chunks); mit dem heutigen Code entstehen 2 Build-Batches, nicht 16 Chunk-Jobs. Diese Erwartung im Fahrplan Paragraf 3.3 ist zu korrigieren, sonst liest ein gruener Lauf als 'zu wenig Jobs'.",
+            "quelle": "Live: tierci_golden.yml Z.2,25,143,245,363 · tierci_12.yml Z.2,33,307,475,645 (beide in /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad) · Fahrplan-Zeile 76"
+          },
+          {
+            "thema": "(3c) Lane-Verteilung bei 12 Perms ist 8:4 (amd:intel) — 2:1-Schieflage, HEUTE 2:2 ausgeglichen",
+            "ist": "measure_host_lane-Regel: (1) march enthaelt avx512 -> amd (Hardware-Zwang, nur prod1/Zen5); (2) simd==avx2 -> intel; (3) no_extension -> Combo entscheidet, [all] -> amd. Live 4 Perms: amd={[O2,no_extension],[O3,no_extension]}, intel={[O2,avx2],[O3,avx2]} = 2:2. Live 12 Perms: amd = alle no_extension (4) + alle avx512 (4) = 8 Perms, intel = alle avx2 (4) = 4 Perms; gezaehlt 'amd BAU zellen: 8', 'intel BAU zellen: 4'. Bei TOTAL=131072 heisst das amd 8x32=256 Scheiben, intel 4x32=128 Scheiben — prod1 traegt die doppelte Bau-Last, obwohl beide Lanes COMDARE_BUILD_PARALLEL=\"24\" bekommen.",
+            "quelle": "ce experiment_plan_director.hpp:486-503 (measure_host_lane), :514 (lane_build_parallelism, beide 24) · Live tierci_12.yml Z.20-31 (perm->lane-Kommentare), Z.85/527 (COMDARE_BUILD_PARALLEL=\"24\")"
+          },
+          {
+            "thema": "(3d) Die Stufe-2-Batch-Jobs tragen NUR Host-Lane-Tags — keine avx512f-Capability-Tags",
+            "ist": "Kontrolltest an der 12-Perm-Emission: `grep -n 'tags:.*avx' tierci_12.yml` => rc=1, KEINE Ausgabe. Die vier Jobs tragen tags: [\"amd\"] bzw. tags: [\"intel\"]. Die Funktionen simd_runner_tag()/simd_runner_tags() (no_extension->amd64, avx2->avx2, avx512->avx512f) existieren, werden in der BATCH-Emission aber nicht benutzt — das Routing traegt allein measure_host_lane. Praktische Folge: avx512 landet korrekt auf prod1, aber ueber den Lane-Tag 'amd', nicht ueber eine Faehigkeits-Zusicherung. Ein falsch getaggter amd-Runner ohne avx512 wuerde erst zur Laufzeit mit D1 HardwareErweiterungFehlt auffallen.",
+            "quelle": "Live tierci_12.yml Z.35,309,477,647 (tags) + Kontrolltest grep rc=1 · ce experiment_plan_director.hpp:453-484 (simd_runner_tag/simd_runner_tags), :496-503"
+          },
+          {
+            "thema": "(4) Forward-Allowlist: ZWEI Grenzen mit UNTERSCHIEDLICHEM Var-Satz — das ist der Kern des Rezepts",
+            "ist": "1. Grenze (super planer:delegate-trigger, variables-Block): NUR COMDARE_GN_TOTAL und COMDARE_MEASURE_PROFILE (+ COMDARE_PLAN_METHODIK_PROFILE im smoke-Zweig), forward: yaml_variables true / pipeline_variables false. 2. Grenze (ce-emittierter ceb:trigger): COMDARE_GN_TOTAL, COMDARE_MEASURE_PROFILE, COMDARE_PLAN_METHODIK_PROFILE, COMDARE_STORAGE_CACHE, COMDARE_BESTANDSLOG, COMDARE_BESTANDSLOG_DOC_KEY, COMDARE_BESTANDSLOG_OWNER_UUID, COMDARE_BESTANDSLOG_MASCHINE, COMDARE_VARIANT_GATE — jeweils via append_forward_var_literal, das den Wert zur EMISSIONSZEIT per std::getenv aus der Planer-Env LITERAL einbrennt (leer/ungesetzt => Zeile entfaellt). LIVE verifiziert: mit gesetzter Env erzeugt `plan ci` im ceb:trigger den Block COMDARE_GN_TOTAL: \"131072\" / COMDARE_STORAGE_CACHE: \"true\" / COMDARE_BESTANDSLOG: \"true\" / COMDARE_BESTANDSLOG_DOC_KEY: \"demo/key\" / COMDARE_BESTANDSLOG_OWNER_UUID: \"JOBID@host\" / COMDARE_BESTANDSLOG_MASCHINE: \"prod1\". => Weil die Pipeline-Variablen in planer:delegate ohnehin in der Job-Env stehen, reicht EIN POST; es braucht KEINE super-YAML-Aenderung fuer STORAGE/BESTANDSLOG/VARIANT_GATE.",
+            "quelle": "super .gitlab-ci.yml:1017-1019 + :1042-1046 (1. Grenze) · ce experiment_plan_director.hpp:828-832 (append_forward_var_literal), :856-880 (2. Grenze) · Live planci_golden.yml Z.122-136"
+          },
+          {
+            "thema": "(4b) LUECKE: Der planer_block (Bestandslog-Reservierung des Planers) bleibt beim Trigger INERT",
+            "ist": "Der Treiber baut den planer_block nur bei COMDARE_BESTANDSLOG==true UND emit_ac->minio_enabled(); ist minio nicht konfiguriert, faellt genau EINE Warnung ('[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt ... planer_block bleibt AUS, Emission unveraendert'). Kontrolltest im super: `grep -n 'storage_cache_activation' .gitlab-ci.yml` => Treffer nur :583 (Definition), :670 (measure:smoke), :756 (measure:golden-320), :804 (Prosa). planer:delegate (ab :955) referenziert den Anker NICHT => in diesem Job ist COMDARE_MINIO_ENDPOINT nie zum mc-Alias gefaltet => minio_enabled()==false => Reservierung findet nicht statt. Kein Abbruch, aber die im Fahrplan angenommene Planer-Reservierung passiert nicht.",
+            "quelle": "super Code/02_messung_driver/main.cpp:324-336 (Gate + Warnung), :337-352 (Pflichtvar-Abbruch) · super .gitlab-ci.yml:583,670,756 vs. :955-1004 (planer:delegate ohne !reference)"
+          },
+          {
+            "thema": "(4c) FALLE: COMDARE_BESTANDSLOG=true erzwingt DREI Pflicht-Variablen — sonst harter Abbruch (Exit 6)",
+            "ist": "Ist das Gate an und minio aktiv, aber DOC_KEY oder OWNER_UUID oder MASCHINE leer, druckt der Treiber '[bestandslog] FEHLER fehlerklasse=konfiguration_unvollstaendig: COMDARE_BESTANDSLOG=true, aber <VAR> ist leer -- Abbruch.' und der Aufrufer liefert Exit 6 (im --help als 'Exit-Codes: ... 6 Bestandslog-Gate-Abbruch' gefuehrt). Die Pruefung sitzt an ZWEI Stellen: der Emissions-Pfad (plan ci/cmake, make_planer_block_gate) und der Lauf-Pfad. Die Reihenfolge der Meldung ist DOC_KEY -> OWNER_UUID -> MASCHINE.",
+            "quelle": "super Code/02_messung_driver/main.cpp:337-352, :1340-1360, :505-506 (Hilfetext) · Live: comdare-messung-driver --help ('6 Bestandslog-Gate-Abbruch')"
+          },
+          {
+            "thema": "(4d) FALLE im Fahrplan-Rezept: COMDARE_BESTANDSLOG_OWNER_UUID=$CI_JOB_ID@$(hostname) ist als Pipeline-Variable nicht lauffaehig",
+            "ist": "GitLab expandiert in Variablenwerten nur $VAR-Referenzen, KEINE Shell-Kommandosubstitution. '$(hostname)' reist als Literal mit und landet so im owner_uuid und damit in der Bestandslog-id (owner_uuid + \"/planer\", main.cpp:357). Zusaetzlich ist CI_JOB_ID eine JOB-Variable — in einer per API gesetzten PIPELINE-Variable ist ihre Expansion nicht garantiert. Empfehlung fuer das Rezept: einen bereits aufgeloesten, lauf-eindeutigen Literalwert setzen (z.B. vollbau4-<datum>-<zufall>) oder eine Pipeline-Variable auf $CI_PIPELINE_ID-Basis, und MASCHINE getrennt literal setzen.",
+            "quelle": "super Code/02_messung_driver/main.cpp:337-360 (owner_uuid/id/maschine werden 1:1 aus der Env genommen, env_trimmed) · Fahrplan-Zeile 66"
+          },
+          {
+            "thema": "(4e) Praezisierung zur mc-Falle: COMDARE_MINIO_ENDPOINT ist als CI-VARIABLE die S3-URL, erst zur Laufzeit der Alias",
+            "ist": "Der Aktivierungs-Anker nimmt die S3-URL aus COMDARE_MINIO_ENDPOINT, baut daraus MC_HOST_prodcache=https://<key>:<secret>@<host> und setzt DANN COMDARE_MINIO_ENDPOINT=\"prodcache\" um — 'ArtifactCache liest dies als mc-ALIAS-Namen'. Identisch im bare-metal-Gegenstueck scripts/comdare_storage_activation.sh:33-62. => Der Fahrplan-Satz 'COMDARE_MINIO_ENDPOINT = mc-ALIAS (nie S3-URL)' gilt fuer das, was der TREIBER sieht; die CI-/Operator-Variable muss weiterhin die S3-URL tragen. Wer im lokalen Beweis-4 die Variable haendisch auf einen Alias setzt, ohne das Skript zu sourcen, faellt genau in die beschriebene Falle.",
+            "quelle": "super .gitlab-ci.yml:583-612 (.storage_cache_activation) · ce scripts/comdare_storage_activation.sh:14-62"
+          },
+          {
+            "thema": "(4f) COMDARE_GN_RANGE: \"0:4\" im Child-variables-Block hat KEINEN Konsumenten",
+            "ist": "Kontrolltest ce: `git grep -n 'COMDARE_GN_RANGE'` liefert ausschliesslich die drei Emissions-Stellen im Director (:699 Kommentar, :706 und :947 die emittierte Zeile) und einen Negativ-Test (:1347). Es gibt KEINE getenv-Lesestelle. Der real wirksame Fenster-Parameter heisst COMDARE_GOLDEN_N_RANGE und wird je Treiber-Aufruf inline gesetzt (\"${START}:${COUNT}\" im Bau, \"0:${TOTAL}\" im Pruef). => Die '0:4'-Zeile ist ein Rest, der beim Lesen des Trace faelschlich als Umfangs-Deckel gelesen werden kann; der Deckel ist COMDARE_GN_TOTAL.",
+            "quelle": "ce git grep COMDARE_GN_RANGE (nur experiment_plan_director.hpp:699,706,947 + Test :1347) vs. COMDARE_GOLDEN_N_RANGE (12 Treffer) · Live tierci_golden.yml Z.11 vs. Z.91/104"
+          },
+          {
+            "thema": "(5) BLAST-RADIUS des 12-Perm-Edits: das ctest-Gate zementiert die 4 an mindestens 16 Stellen",
+            "ist": "Ein Edit an all_axes_golden.profile.xml bricht die gruenen Tests, die die 4 hart einbrennen — genau das Muster 'Gruene Tests zementieren alte Ordnung'. Betroffen (alle in ce tests/unit/thesis_tiere/test_experiment_plan_director.cpp): Z.169 ASSERT opt_levels.size()==2u; Z.170 ASSERT simd_options.size()==2u; Z.177 perms.size()==4u; Z.178 header.perm_count==4u; Z.180-188 die vier Perm-Identitaeten (O2/no_extension, O2/avx2 mit -mavx2 und +opt=O2+ext=avx2, O3, O3/avx2); Z.196 total_steps()==72u (bei 12 Perms 216); Z.213/433/656/1094 die Textsuche 'perm_count=4'; Z.596/598/614 (cmake-Pfad, je 4u); Z.1130/1133 (yaml, je 4u); Z.1337/1338/1339 (Scheiben-Schleife/Range/Fortschritt, je 4u); Z.1361/1362/1364/1365 (Pruef-Schritt, je 4u). NICHT betroffen (weil O(Maschinen)): Z.1109/1111 (2u), Z.1180/1182, Z.1335 SLICE=4096 ==2u, Z.1341, Z.1386/1405/1406/1410/1425 (je 4u = 4 JOBS, nicht 4 Perms). Zusaetzlich muesste der begruendende Profil-Kommentar (all_axes_golden.profile.xml:178-186) mitgezogen werden, sonst steht die Doku gegen den Code.",
+            "quelle": "ce tests/unit/thesis_tiere/test_experiment_plan_director.cpp:165-196, 213, 408-433, 580-614, 631-656, 1066-1094, 1099-1133, 1326-1341, 1353-1365, 1373-1425 · ce tests/unit/CMakeLists.txt:2840 (COMDARE_PLANNER_THESIS_ALL_AXES-Define)"
+          },
+          {
+            "thema": "(5b) Der CRC64-golden-Anker ist vom Perm-Edit NICHT betroffen",
+            "ist": "kNewGolden131072Crc64 = 0x56F1B721C72DC10E ist eine constexpr im Header, verankert an den 131072 binary_ids der 18-Organ-Kartesik (Werkzeug-Output von comdare_gen_golden_fullpilot --crc64). system_config (opt/simd) fliesst per Doktrin NIE in die binary_id, sondern nur in BAU-Matrix und build_version-Suffix (+opt=/+ext=). => Der 12-Perm-Edit multipliziert die Bau-Matrix, nicht den Organraum; N bleibt 2^17 und der Anker bleibt reproduzierbar.",
+            "quelle": "ce libs/cache_engine/profile_facade/source_catalog.hpp:182-190 · all_axes_golden.profile.xml:180-184 (binary_id-NEUTRAL) · experiment_plan_director.hpp:35-36, :159-160"
+          },
+          {
+            "thema": "(5c) avx512-Ausschluss ist bestaetigt maschinenseitig mit Warnung, NIE stiller Profil-Filter",
+            "ist": "Der Planer annotiert nur: 'perm.host_supports_simd = tlz::system_axis_host_supports_simd(simd_id); // ANNOTATION, kein Filter'. Der reale Ausschluss sitzt erst im Lauf-Pfad und ist laut: '[Compiler-Compiler-Fehler: hardware_erweiterung_fehlt] simd=... auf dieser ISA nicht verfuegbar — Permutation uebersprungen.' host_supports_simd prueft zuerst active_machine_signature() (deklarierte Klasse gewinnt), sonst __builtin_cpu_supports. Die Registry fuehrt prod1_zen5 mit avx512f..avx512_bf16 (22 Flags) und prod2_raptor_lake ohne avx512 (9 Flags) — deckungsgleich zur Lane-Regel avx512 -> amd.",
+            "quelle": "ce experiment_plan_director.hpp:1934 · libs/cache_engine/profile_facade/profile_run_entry.hpp:226-247, :783-800 · system_axis_registry.xml <machine_signatures>"
+          },
+          {
+            "thema": "(6) Umfangs-Arithmetik, gerechnet aus den gemessenen Konstanten",
+            "ist": "HEUTE (4 Perms, COMDARE_GN_TOTAL=131072): 4 x 131072 = 524.288 Tier-Binaries SOLL; Scheiben je Perm = ceil(131072/4096) = 32; Bau-Treiberaufrufe = 4 x 32 = 128 (amd 64 / intel 64); Pruef-Aufrufe = 4 (je 1 ueber 0:131072); Stufe-2-Jobs = 4. BEI 12 Perms: 12 x 131072 = 1.572.864 Tier-Binaries (die Fahrplan-SOLL-Zahl); Bau-Treiberaufrufe = 12 x 32 = 384, davon amd 256 / intel 128; Pruef-Aufrufe = 12; Stufe-2-Jobs unveraendert 4. Die Job-Zahl waechst NICHT — die Laufzeit je Job und die 7d-timeouts tragen die Last (timeout: 7d an allen 4 Batch-Jobs).",
+            "quelle": "kGnBatchSlice=4096 (experiment_plan_director.hpp:540) · COMDARE_GN_TOTAL-Default 131072 (super .gitlab-ci.yml:77) · gemessene Lane-Verteilung tierci_12.yml (amd 8 / intel 4 BAU-Zellen) · timeout 7d: tierci_12.yml (4x)"
+          },
+          {
+            "thema": "(7) Provenienz des benutzten Treiber-Binaries (Beweis-Hygiene J-0)",
+            "ist": "In .../comdare-cache-engine/build-v6 existiert KEIN comdare-messung-driver (`find . -type f -name comdare-messung-driver` leer) — der Treiber wird im super-Baum gebaut. Benutzt wurde /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver (7.001.904 Bytes, mtime 2026-07-27 18:17:02, `version` => planner@1.0.0 isa=x86_64 os=linux / ceb-contract=7.0 / build-type=Release / build-version=+cxx=g++-16+opt=O3+ceb=7.0). Es liegt 3 Commits vor ce-HEAD 52bcbc76 (803b7d71 E-2, 813c3232 V-4, 52bcbc76 tests). KONTROLLE: `git diff --name-only 4e0a5592..HEAD -- libs/cache_engine/profile_facade libs/cache_engine/algorithm_profiles` ist LEER => am Planer-/Profil-Pfad hat sich seither nichts geaendert, die gemessenen Perm-/Lane-/Scheiben-Zahlen gelten fuer HEAD. Geaendert wurde nur machine_identity.hpp/target_isa_complex_axis.hpp (E-2-Schluessel) — betrifft active_machine_signature, also die ANNOTATION host_supports_simd, nicht perm_count/Lane-Routing/Scheiben.",
+            "quelle": "ls -la des Binaries; driver version; git log 4e0a5592..HEAD; git diff --name-only 4e0a5592..HEAD (leer fuer profile_facade+algorithm_profiles)"
+          },
+          {
+            "thema": "(8) PMC-AND-Anker bestaetigt (Fahrplan Paragraf 3.5)",
+            "ist": "ce/.gitlab-ci.yml:45 COMDARE_PMC_LANES: \"amd intel\" (Doktrin-Kommentar :42-45: 'Jede deklarierte Lane MUSS ihren pmc-Job gruen bestehen (AND ueber die Deklaration)'); :112-117 pmc:amd extends .pmc, tags [baremetal, amd], rules if $COMDARE_PMC_LANES =~ /amd/; :119-124 pmc:intel, tags [baremetal, intel]. Kein allow_failure an beiden.",
+            "quelle": "ce /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/.gitlab-ci.yml:42-45, :102-125"
+          }
+        ],
+        "kommandos": [
+          {
+            "zweck": "KONSOLIDIERTES TRIGGER-REZEPT (Voll-Bau-4, ce-Ist 4 Perms). EIN POST auf super/288, ref=development. Jede Variable mit Wirkung+Anker im Kommentar. Vorher: heavy-Mode, Platz-Pflege, PAT frisch, Bestands-Invalidierung inkl. E-2-Schluessel.",
+            "kommando": "# --- PFLICHT (Gate) ---\n# COMDARE_BUILD_GOLDEN_N=true\n#   Wirkung: erzeugt planer:delegate + planer:delegate-trigger (die dynamische Kette).\n#   Anker: super .gitlab-ci.yml:979 und :1033 (rules-if), :1064 (ergebnis:holen)\n# --- UMFANG ---\n# COMDARE_GN_TOTAL=131072   (nur setzen, wenn abweichend; 131072 ist bereits super-Default)\n#   Wirkung: TOTAL im Batch-Loop => 32 Scheiben a 4096 je Perm; auch das Mess-Fenster 0:TOTAL.\n#   Anker: super .gitlab-ci.yml:77 (Default) ; ce experiment_plan_director.hpp:1113 (TOTAL=\"${COMDARE_GN_TOTAL:-16}\")\n#   Kalibrierlauf: COMDARE_GN_TOTAL=64\n# --- PROFILWAHL ---\n# COMDARE_MEASURE_PROFILE  ==> NICHT SETZEN\n#   Wirkung wenn gesetzt auf \"smoke\": planer:delegate tauscht das Profil auf m3v2_smoke + Methodik m3_smoke_coverage.\n#   Anker: super .gitlab-ci.yml:975-977 (smoke-Zweig MUSS vor :979 stehen)\n# --- STORAGE (Dual-ccache minio=Binaries) ---\n# COMDARE_STORAGE_CACHE=true\n#   Wirkung: schaltet Push/Pull/Prune im GRANDCHILD scharf (Alias-Faltung via comdare_storage_activation.sh)\n#            + Blackhole-Deckel COMDARE_ARTEFAKT_TRIES=2.\n#   Anker: ce experiment_plan_director.hpp:863 (2. Grenze), :646-655 (emit_storage_activation in JEDEM Batch)\n#   HINWEIS: an der 1. Grenze NICHT geforwardet => Stufe-1-Jobs (ceb:build/ceb:emit) bleiben storage-inert (unschaedlich).\n# --- BESTANDSLOG (Lager-Buchhaltung) ---\n# COMDARE_BESTANDSLOG=true\n#   Anker: ce experiment_plan_director.hpp:868 ; super Code/02_messung_driver/main.cpp:324, :1340\n# COMDARE_BESTANDSLOG_DOC_KEY=<objekt-key im Store>       (PFLICHT bei =true, sonst Exit 6)\n# COMDARE_BESTANDSLOG_OWNER_UUID=<lauf-eindeutiger LITERALWERT>  (PFLICHT; KEIN $(hostname) - wird nicht expandiert)\n# COMDARE_BESTANDSLOG_MASCHINE=<hostname literal>          (PFLICHT)\n#   Anker: main.cpp:337-352 (Reihenfolge DOC_KEY -> OWNER_UUID -> MASCHINE), :357 (id = owner_uuid + \"/planer\")\n# --- OPTIONAL ---\n# COMDARE_VARIANT_GATE=true      (Build-Varianten-Gate; Anker ce experiment_plan_director.hpp:872 ; profile_run_entry.hpp:372)\n# --- AUSDRUECKLICH NICHT SETZEN ---\n# COMDARE_GN_INCLUDE_AVX512      TOT (nur ci/archive/perm-matrix-fallback.yml:311, nicht included)\n# COMDARE_STATIC_MATRIX_FALLBACK deprecated statische Matrix (archiviert)\n# COMDARE_RUN_MEASURE            haelt die Mess-Strecke inert (super :745)\n# COMDARE_PERSIST_MEASUREMENTS   nur beim spaeteren MESS-Trigger (super :846 ; exakter Name, nicht PERSIST_MEASUREMENTS)",
+            "erwartete_ausgabe": "Pipeline auf 288/development mit planer:delegate (baut nur den Treiber, `plan ci` rein lesend, Artefakt planer-child-ci.yml) -> planer:delegate-trigger (strategy: depend) -> STUFE-1-Child mit ceb:build:[all], ceb:emit:[all], ceb:trigger:[all] -> STUFE-2-Grandchild mit GENAU 4 Jobs: tier:build-batch:amd, measure:[all]:batch:amd, tier:build-batch:intel, measure:[all]:batch:intel. Mess-Jobs when:manual (allow_failure:true). Im planer:delegate-Trace: '== STUFE-1 CEB-Bau-Jobs (je Mess-Kombination): 1 ==' und '== STUFE-1 CEB-Trigger-Jobs (Grandchild -> STUFE 2): 1 =='. Bei gesetztem BESTANDSLOG zusaetzlich auf stderr: '[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt ... planer_block bleibt AUS' (weil planer:delegate den Storage-Anker nicht referenziert)."
+          },
+          {
+            "zweck": "Perm-Zahl des committeten Profils literal nachweisen (das ce-Ist zu Frage 1)",
+            "kommando": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver plan dump /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml 2>/dev/null | grep -E '^perm |^perm_count'",
+            "erwartete_ausgabe": "perm_count=4\\nperm 0 opt=O2 simd=no_extension opt_flag=-O2 march_flag=- build_version_suffix=+opt=O2\\nperm 1 opt=O2 simd=avx2 opt_flag=-O2 march_flag=-mavx2 build_version_suffix=+opt=O2+ext=avx2\\nperm 2 opt=O3 simd=no_extension opt_flag=-O3 march_flag=- build_version_suffix=+opt=O3\\nperm 3 opt=O3 simd=avx2 opt_flag=-O3 march_flag=-mavx2 build_version_suffix=+opt=O3+ext=avx2"
+          },
+          {
+            "zweck": "NEGATIV-BEFUND mit Kontrolltest: COMDARE_GN_INCLUDE_AVX512 existiert im ce-Code nicht mehr",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine && git grep -n 'GN_INCLUDE_AVX512'; echo \"rc=$?\"; git grep -ln 'AVX512' | head -3",
+            "erwartete_ausgabe": "Erste Suche: keine Ausgabe, 'rc=1'. Zweite Suche (Kontrolle, dass der Suchmechanismus greift): liefert Treffer, u.a. CMakeLists.txt, cmake/isa_features.cmake, docs/architecture/28_vollstaendigkeits-kartographie.md."
+          },
+          {
+            "zweck": "NEGATIV-BEFUND mit Kontrolltest: die archivierte statische Matrix ist nicht in die super-Pipeline eingebunden",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine && grep -n '^include:' -A4 .gitlab-ci.yml; echo '--- Archiv-Verweise ---'; grep -n 'ci/archive' .gitlab-ci.yml",
+            "erwartete_ausgabe": "include-Block enthaelt ausschliesslich 'project: comdare/cluster/ci-templates / ref: development / file: /base-pipeline.yml'. Der Archiv-Verweis erscheint genau einmal, in Zeile 801, als Kommentar-Prosa ('Voller Inhalt VERBATIM erhalten in ci/archive/perm-matrix-fallback.yml (NICHT im super-CI ...'), nicht als include."
+          },
+          {
+            "zweck": "Chunk-/Scheiben-Rezept literal am emittierten Stufe-2-YAML nachweisen (Frage 3)",
+            "kommando": "cd /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad && /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver tier ci /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml > tierci_golden.yml && sed -n '2p;20,23p' tierci_golden.yml && grep -n 'SLICE=\\|TOTAL=\"${COMDARE_GN_TOTAL\\|while \\[ \"$START\"\\|COMDARE_GOLDEN_N_RANGE=' tierci_golden.yml | head -12 && grep -c 'chunk' tierci_golden.yml",
+            "erwartete_ausgabe": "Kopfzeile '# source_kind=thesis profile_id=all_axes_golden measurement_combo_count=1 perm_count=4 batch_slice=4096 host_lanes=amd,intel'; die vier perm->lane-Kommentare (perm 0 amd, perm 1 intel, perm 2 amd, perm 3 intel); SLICE=4096 zweimal (je Build-Batch); TOTAL=\"${COMDARE_GN_TOTAL:-16}\" zweimal; while-Schleife und COMDARE_GOLDEN_N_RANGE=\"${START}:${COUNT}\" je viermal (1 je Perm); 'chunk' kommt 0 mal vor."
+          },
+          {
+            "zweck": "12-Perm-Trockenlauf reproduzieren OHNE Repo-Aenderung (Scratchpad-Kopie); belegt: kein Code-Change noetig, aber Lane-Schieflage 8:4",
+            "kommando": "S=/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad; rm -rf $S/ap12; cp -r /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles $S/ap12 && python3 -c \"p='$S/ap12/thesis_profiles/all_axes_golden.profile.xml'; s=open(p,encoding='utf-8').read(); s=s.replace('        <option value=\\\"O2\\\"/>\\n        <option value=\\\"O3\\\"/>','        <option value=\\\"O0\\\"/>\\n        <option value=\\\"O1\\\"/>\\n        <option value=\\\"O2\\\"/>\\n        <option value=\\\"O3\\\"/>'); s=s.replace('        <option value=\\\"avx2\\\"/>\\n      </simd>','        <option value=\\\"avx2\\\"/>\\n        <option value=\\\"avx512\\\"/>\\n      </simd>'); open(p,'w',encoding='utf-8').write(s)\" && D=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver; $D validate $S/ap12/thesis_profiles/all_axes_golden.profile.xml | grep -E 'opt_levels|VALIDAT'; $D plan dump $S/ap12/thesis_profiles/all_axes_golden.profile.xml 2>/dev/null | grep -c '^perm '; $D tier ci $S/ap12/thesis_profiles/all_axes_golden.profile.xml 2>/dev/null | grep -o 'lane=[a-z]*' | sort | uniq -c",
+            "erwartete_ausgabe": "validate: '... 4 opt_levels, 3 simd, ...' und 'VALIDAT OK: das Profil ist gegen die AxisRegistry/EnabledStrategies konsistent.'; plan dump zaehlt 12 perm-Zeilen; tier ci ergibt 92x 'lane=amd' und 48x 'lane=intel' (entspricht 8 amd-Perms vs. 4 intel-Perms, Verhaeltnis 2:1)."
+          },
+          {
+            "zweck": "Forward-Allowlist an der 2. Trigger-Grenze live nachweisen (welche Var reist wohin)",
+            "kommando": "cd /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad && COMDARE_GN_TOTAL=131072 COMDARE_STORAGE_CACHE=true COMDARE_BESTANDSLOG=true COMDARE_BESTANDSLOG_DOC_KEY=demo/key COMDARE_BESTANDSLOG_OWNER_UUID='JOBID@host' COMDARE_BESTANDSLOG_MASCHINE=prod1 /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver plan ci /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml 2>/dev/null | sed -n '/ceb:trigger/,$p'",
+            "erwartete_ausgabe": "Der ceb:trigger-Job mit variables-Block: COMDARE_GN_TOTAL: \"131072\" / COMDARE_STORAGE_CACHE: \"true\" / COMDARE_BESTANDSLOG: \"true\" / COMDARE_BESTANDSLOG_DOC_KEY: \"demo/key\" / COMDARE_BESTANDSLOG_OWNER_UUID: \"JOBID@host\" / COMDARE_BESTANDSLOG_MASCHINE: \"prod1\", darunter trigger: include: artifact tier-child-_all_.yml, strategy: depend, forward: yaml_variables true / pipeline_variables false. COMDARE_MEASURE_PROFILE und COMDARE_VARIANT_GATE fehlen (ungesetzt => Zeile entfaellt)."
+          },
+          {
+            "zweck": "Nachweis, dass planer:delegate den Storage-Anker NICHT referenziert (Ursache des inerten planer_block)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine && grep -n 'storage_cache_activation' .gitlab-ci.yml && echo '--- planer:delegate script ---' && sed -n '/^planer:delegate:/,/^  artifacts:/p' .gitlab-ci.yml | grep -n 'reference\\|script\\|cmake\\|plan ci'",
+            "erwartete_ausgabe": "Treffer nur in Zeile 583 (.storage_cache_activation: Definition), 670 (!reference in measure:smoke), 756 (!reference in measure:golden-320), 804 (Prosa-Kommentar). Im planer:delegate-Script erscheint KEIN '!reference [.storage_cache_activation, script]' - nur Toolchain-Echo, cd Code, cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release, cmake --build ... comdare-messung-driver und der 'plan ci'-Block."
+          },
+          {
+            "zweck": "Test-Anker gegen die 4 Perms auflisten, bevor jemand das Profil anfasst (Zementierungs-Falle)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine && grep -n 'perm_count\\|perms.size()\\|opt_levels.size()\\|simd_options.size()\\|total_steps()' tests/unit/thesis_tiere/test_experiment_plan_director.cpp && grep -n 'count_occurrences' tests/unit/thesis_tiere/test_experiment_plan_director.cpp | grep ', 4u)'",
+            "erwartete_ausgabe": "U.a. Z.169 ASSERT_EQ(tp->compiler.opt_levels.size(), 2u); Z.170 simd_options.size(), 2u; Z.177 perms.size(), 4u; Z.178 header.perm_count, 4u; Z.196 total_steps(), 72u; sowie die 4u-count_occurrences in Z.596, 598, 614, 1130, 1133, 1337, 1338, 1339, 1361, 1362, 1364, 1365 (perm-gebunden) neben Z.1386, 1405, 1406, 1410, 1425 (JOB-gebunden, bleiben 4u)."
+          },
+          {
+            "zweck": "Provenienz des benutzten Treibers pruefen (J-0: Alt-Build-Dirs sind Beweis-GIFT) und ggf. HEAD-frisch bauen (NICHT Teil dieses read-only-Pakets)",
+            "kommando": "ls -la --time-style=full-iso /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver; /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/build-o8/02_messung_driver/comdare-messung-driver version; cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine && git log -1 --format='%H %cd' && git diff --name-only 4e0a5592..HEAD -- libs/cache_engine/profile_facade libs/cache_engine/algorithm_profiles; echo \"planer-pfad-diff-leer=$?\"",
+            "erwartete_ausgabe": "Binary 7001904 Bytes, 2026-07-27 18:17:02; version => 'planner@1.0.0 isa=x86_64 os=linux / ceb-contract=7.0 / build-type=Release / build-version=+cxx=g++-16+opt=O3+ceb=7.0'; ce-HEAD 52bcbc76e29216fba324e94990c2494bee224cd4 Mon Jul 27 18:51:08 2026; der letzte Befehl gibt KEINE Datei aus (leer) - der Planer-/Profil-Pfad ist seit dem Binary-Stand unveraendert."
+          }
+        ],
+        "offene_punkte": [
+          "OWNER-ENTSCHEID noetig (blockiert 12 Perms): Das Profil begruendet die heutigen 4 Perms explizit mit 'opt_level = O2 + O3 (deterministische Mess-golden-Baseline, Paragraf 32-F4)' und 'simd = no_extension + avx2 (universell auf prod1+prod2; avx512 nicht universell)' (all_axes_golden.profile.xml:180-184). 12 Perms kippen BEIDE Begruendungen. Zwei getrennte Fragen: (a) Sollen O0 und O1 in die golden-Abgabe-Baseline? (b) Soll avx512 in den golden-Kernsatz, obwohl es nur prod1 traegt? Solange (a)/(b) offen sind, ist die Fahrplan-Zahl '2^17 x 12 = 1.572.864' nicht durch das ce-Ist gedeckt und Voll-Bau-4 faehrt real 4 Perms = 524.288.",
+          "WENN 12 beschlossen wird, ist der Edit MINIMAL und praezise benennbar (nicht gemacht): all_axes_golden.profile.xml Zeilen 188-193 <opt_level> um <option value=\"O0\"/> und <option value=\"O1\"/> ergaenzen, Zeilen 194-199 <simd> um <option value=\"avx512\"/> ergaenzen, PLUS den begruendenden Kommentarblock :180-184 nachziehen (sonst steht die Doku gegen den Code). Planer, validate_profile, Emitter, CMake und CI brauchen KEINE Zeile — am Trockenlauf belegt.",
+          "WENN 12 beschlossen wird, folgt ein Test-Nachzug im ce-Gate (kein Kollateral-Rot): mindestens 16 Assertions in tests/unit/thesis_tiere/test_experiment_plan_director.cpp muessen von 4/2/72 auf 12/4-3/216 (bzw. count 12u) gehoben werden — Liste in Befund (5). Die JOB-gebundenen 2u/4u-Assertions duerfen NICHT mitgehoben werden. Das ce-Gate steht laut Fahrplan auf N=318; nach dem Nachzug ist N neu literal zu messen.",
+          "WENN 12 beschlossen wird, ist die Lane-Schieflage 8:4 (amd:intel) zu entscheiden: measure_host_lane zwingt avx512 und (bei Combo [all]) no_extension beide auf amd, sodass prod1 die doppelte Bau-Last traegt (256 vs. 128 Scheiben bei 2^17). Optionen (nur benannt): Regel (3) so lassen und die Laufzeit-Schieflage akzeptieren; oder no_extension bei [all] auf intel routen; oder eine explizite Lane-Balancierung einziehen. Das ist eine Architektur-Entscheidung an experiment_plan_director.hpp:496-503, keine Profil-Frage.",
+          "FAHRPLAN-KORREKTUR faellig, Paragraf 3.3: 'Produktiv-Praezedenz: Pipeline 11611 komplett gruen, 16/16 tier:build' beschreibt das abgeloeste O(Perms x Chunks)-Schema. Mit dem heutigen Code entstehen 2 tier:build-batch-Jobs (+ 2 Mess-Batches) — unabhaengig von der Perm-Zahl. Wer 16 erwartet, liest einen korrekten Lauf als Fehlbau.",
+          "FAHRPLAN-KORREKTUR faellig, Paragraf 3.2: COMDARE_BESTANDSLOG_OWNER_UUID=$CI_JOB_ID@$(hostname) ist als API-Pipeline-Variable nicht lauffaehig ($(hostname) wird von GitLab nicht substituiert; CI_JOB_ID ist eine Job-Variable). Ersatzwert vor dem Trigger festlegen. UNGEPRUEFT geblieben (read-only, kein Trigger erlaubt): ob GitLab $CI_JOB_ID in einer per API gesetzten Pipeline-Variable zur Job-Zeit expandiert — das ist an einer Wegwerf-Pipeline zu klaeren, nicht zu raten.",
+          "FAHRPLAN-PRAEZISIERUNG faellig, Paragraf 1 (Beweis 4): 'COMDARE_MINIO_ENDPOINT = mc-ALIAS (nie S3-URL)' gilt fuer das, was der TREIBER liest. Die CI-/Operator-Variable traegt die S3-URL; die Faltung auf den Alias 'prodcache' macht .storage_cache_activation bzw. scripts/comdare_storage_activation.sh. Fuer den lokalen Beweis-4 heisst das: Skript SOURCEN (nicht ausfuehren), nicht die Variable haendisch auf einen Alias setzen.",
+          "OFFENE LUECKE ohne Entscheidung: Der planer_block (Planer-Reservierung im Bestandslog) bleibt beim Trigger inert, weil planer:delegate den Storage-Anker nicht referenziert => minio_enabled()==false => nur die Warnung 'lager_ebene_fehlt'. Zu entscheiden: (a) hinnehmen und die Warnung als erwartet dokumentieren, oder (b) !reference [.storage_cache_activation, script] in planer:delegate ergaenzen (dann greift bei fehlender Pflicht-Var Exit 6 SCHARF — Reihenfolge beachten). Nicht geaendert, nur benannt.",
+          "NICHT GEPRUEFT (ausserhalb read-only): ob der Grandchild bei COMDARE_STORAGE_CACHE=true real gegen minio pusht/prunt — das ist Beweis 4 aus Paragraf 1 und braucht einen echten Lauf. Ebenso ungeprueft: der Ist-Zustand des Lagers unter dem NEUEN E-2-Schluessel (ram_pair ddr5_2x32, ce-Commit 803b7d71) — die Bestands-Invalidierung aus Paragraf 3.1 ist damit weiterhin offen.",
+          "NICHT GEPRUEFT: Ob COMDARE_STORAGE_CACHE an der 1. Trigger-Grenze fehlen darf. Der ceb:emit-Job sourct comdare_storage_activation.sh und wertet ${COMDARE_STORAGE_CACHE:-} aus, sieht die Variable aber nie (super .gitlab-ci.yml:1018-1019 forwardet nur GN_TOTAL + MEASURE_PROFILE). Nach Code-Lesart ist das unschaedlich (ceb:emit emittiert nur YAML, nutzt den ArtifactCache nicht), aber es ist eine Annahme, kein Beleg — an einem Kalibrierlauf mit COMDARE_GN_TOTAL=64 verifizierbar.",
+          "BEOBACHTUNG, kein Blocker: Der Kommentar der intel-Lane in der emittierten YAML lautet 'Lane-Budget intel (... amd RAM-gedrosselt)' — Copy-Paste-Rest aus dem amd-Zweig. Der WERT ist korrekt (lane_build_parallelism liefert 24 fuer beide Lanes, experiment_plan_director.hpp:514). Kandidat fuer den Abschluss-Aufraeumpass.",
+          "BEOBACHTUNG, kein Blocker: COMDARE_GN_RANGE: \"0:4\" steht im variables-Block beider emittierter Child-YAMLs, hat aber KEINEN Konsumenten im ce-Code (Kontrolltest in Befund 4f). Der wirksame Fensterparameter ist COMDARE_GOLDEN_N_RANGE. Kandidat fuer den Abschluss-Aufraeumpass; bis dahin Fehllese-Risiko im Trace.",
+          "BEWEIS-HYGIENE: Alle Zahlen dieses Pakets stammen aus dem Treiber in Code/build-o8 (2026-07-27 18:17), 3 Commits vor ce-HEAD 52bcbc76. Der Kontrolltest zeigt: am Planer-/Profil-Pfad hat sich seither nichts geaendert, die Zahlen gelten fuer HEAD. Wer sie im G6-Protokoll zitiert, sollte sie dennoch einmal mit einem frisch aus HEAD gebauten Treiber nachziehen (J-0-Doktrin) — das war in diesem read-only-Paket nicht erlaubt."
+        ]
+      },
+      {
+        "befunde": [
+          {
+            "thema": "(1) Ebene-B-Push in Stufe-2-Batch-Jobs: VERDIKT = am Code GESCHLOSSEN (env-gated scharfschaltbar), §65-Punkt-1 'INERT' ist SUPERSEDED",
+            "ist": "Die Batch-Jobs emittieren KEINEN eigenen minio-Push-Schritt (der Push ist in-driver), aber sie emittieren die Scharfschalt-Naht. emit_storage_activation ist eine freie Funktion mit EINER Literal-Quelle (experiment_plan_director.hpp:643-656) und wird an DREI Emissionsstellen gerufen: :803 (ceb:emit), :1106 (tier:build-batch), :1235 (measure-batch). GEMESSEN in der real emittierten STUFE-2-YAML (scratchpad/tier_ci.yml, 463 Zeilen, aus 'tier ci' des lokalen Treibers): Zeilen 69/194/289/414 tragen literal '. external/comdare-cache-engine/scripts/comdare_storage_activation.sh', Zeilen 74/199/294/419 den Deckel 'if [ \"${COMDARE_STORAGE_CACHE:-}\" = \"true\" ]; then export COMDARE_ARTEFAKT_TRIES=\"${COMDARE_ARTEFAKT_TRIES:-2}\"'. Der eigentliche Push haengt in-driver: Code/02_messung_driver/main.cpp:1250-1253 bindet cache_push=push_tier_binary sobald !artifact_cache->inert(); die Bestandslog-Host-Verdrahtung main.cpp:1340-1364 unter Gate COMDARE_BESTANDSLOG==\"true\" UND minio_enabled() UND 3 Pflicht-Vars.",
+            "quelle": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:643-656,803,1106,1235 · /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/02_messung_driver/main.cpp:1250-1253,1340-1364 · /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/scripts/comdare_storage_activation.sh:33-64"
+          },
+          {
+            "thema": "(1a) Die vier Lager-Schalter ueberleben die ZWEITE Trigger-Grenze — literal gemessen",
+            "ist": "director.hpp:863-872 brennt COMDARE_STORAGE_CACHE + COMDARE_BESTANDSLOG{,_DOC_KEY,_OWNER_UUID,_MASCHINE} + COMDARE_VARIANT_GATE zur Emissionszeit als Literale in den ceb:trigger-variables:-Block (append_forward_var_literal, director.hpp:828-832; ungesetzt => Zeile entfaellt). KONTROLLTEST (beide Laeufe, lokal gebauter Treiber build-o8): OHNE die Env hat 'ceb:trigger:[all]' GAR KEINEN variables:-Block (plan_ci_baseline.yml:117-122 geht direkt von needs: auf trigger:). MIT COMDARE_STORAGE_CACHE=true + den drei BESTANDSLOG-Vars + GN_TOTAL=131072 erscheint woertlich: 'variables:\\n    COMDARE_GN_TOTAL: \"131072\"\\n    COMDARE_STORAGE_CACHE: \"true\"\\n    COMDARE_BESTANDSLOG: \"true\"\\n    COMDARE_BESTANDSLOG_DOC_KEY: \"DUMMY/doc.xml\"\\n    COMDARE_BESTANDSLOG_OWNER_UUID: \"DUMMY-owner\"\\n    COMDARE_BESTANDSLOG_MASCHINE: \"DUMMY-host\"' + 'forward: yaml_variables: true / pipeline_variables: false'.",
+            "quelle": "experiment_plan_director.hpp:828-832,855-885 · gemessen: /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/plan_ci_baseline.yml:117-129 vs. plan_ci_armed.yml (ceb:trigger-Block)"
+          },
+          {
+            "thema": "(1b) LUECKE an der ERSTEN Trigger-Grenze: super forwardet die Lager-Schalter NICHT an die STUFE-1-Child",
+            "ist": "planer:delegate-trigger deklariert im variables:-Block AUSSCHLIESSLICH COMDARE_GN_TOTAL und COMDARE_MEASURE_PROFILE (+ COMDARE_PLAN_METHODIK_PROFILE nur im smoke-Zweig) und faehrt forward: pipeline_variables: false. COMDARE_STORAGE_CACHE / COMDARE_BESTANDSLOG* sind dort NICHT gelistet => die STUFE-1-Child-Pipeline (ceb:build / ceb:emit / ceb:trigger) laeuft storage-INERT; das emit_storage_activation in ceb:emit ist dort strukturell wirkungslos. FOLGENLOS fuer die Emission selbst (das Subkommando 'tier ci' traegt KEINEN planer_block, main.cpp:412-414 'G4b-2/E1: KEIN planer_block'), ABER die Begruendung im Kommentar director.hpp:799-803 ('eine Bestandslog-Reservierung waere Fiktion') ist damit stale/falsch verortet.",
+            "quelle": "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.gitlab-ci.yml:1005,1017-1019,1035-1044 · main.cpp:410-420 · experiment_plan_director.hpp:799-803"
+          },
+          {
+            "thema": "(1c) SCHARFER REST-DEFEKT: planer:delegate ruft .storage_cache_activation NICHT — der planer_block im echten Trigger-Pfad laeuft in die mc-Falle",
+            "ist": "KONTROLLTEST 'grep -n storage_cache_activation .gitlab-ci.yml' liefert genau 4 Zeilen: 583 (Definition), 670, 756 (die beiden handgeschriebenen Mess-Jobs), 804 (Kommentar). planer:delegate (:955-1003) referenziert sie NICHT. Folge bei Trigger mit COMDARE_BESTANDSLOG=true: COMDARE_MINIO_ENDPOINT traegt weiter die S3-URL, MC_HOST_prodcache ist ungesetzt — minio_enabled() ist TROTZDEM true, weil es nur auf nicht-leer prueft (artifact_cache.hpp:221 'return !endpoint_.empty() && !bucket_.empty()'). make_planer_block_gate (main.cpp:319-364) bindet also, und mc_target (artifact_cache.hpp:917-918 't = endpoint_ + \"/\" + bucket_ + \"/\"') baut 'https://host/bucket/key' statt '<alias>/bucket/key' = exakt die im Fahrplan §1-Nr.4 benannte mc-Falle. NICHT FATAL: ein fehlgeschlagener store() gibt nur '[bestandslog] WARNUNG fehlerklasse=reservierung_nicht_gespeichert ... Emission laeuft trotzdem weiter' (profile_run_facade.cpp:784-789) und das Budget ist auf 1 Versuch/10 s gedeckelt (main.cpp:328-329) — aber der planer_block ist im Trigger-Pfad damit Fiktion. Es existiert NIRGENDS ein Alias-Preflight (Kontrolltest 'grep -rn \"alias list|mc alias\" ueber *.yml/*.sh/*.hpp/*.cpp' = 0 Treffer ausserhalb docs/sessions).",
+            "quelle": ".gitlab-ci.yml:583,670,756,955-1003 · Code/external/comdare-cache-engine/libs/cache_engine/builder/artifact_transport/artifact_cache.hpp:221,917-918 · Code/02_messung_driver/main.cpp:319-364 · Code/external/comdare-cache-engine/libs/cache_engine/profile_facade/profile_run_facade.cpp:768-815"
+          },
+          {
+            "thema": "(2) Code/measure_out-Verlustnaht: VERDIKT = GESCHLOSSEN (P-C/#33 gebaut, beide Halbe)",
+            "ist": "Naht 1 (Checkout-Clean): emit_gn_out_persistence_variables (director.hpp:1007-1016) emittiert GIT_CLEAN_FLAGS \"-ffdx -e Code/gn_out -e Code/build -e Code/measure_out\" in BEIDE Batches; gemessen in tier_ci.yml Zeilen 32/150/252/370. Naht 2 (Job-Ende): director.hpp:1347-1349 haengt 'Code/measure_out/<slug>/**/*.csv' an die artifacts:paths des Mess-Batches; gemessen tier_ci.yml:242 und :462 ('- Code/measure_out/_all_/**/*.csv'), zusaetzlich zu logs/. Mess-Jobs schreiben nach $CI_PROJECT_DIR/Code/measure_out/<slug>/perm<idx> (tier_ci.yml:217/226/437/446).",
+            "quelle": "experiment_plan_director.hpp:1007-1016,1273,1343-1350 · gemessen: scratchpad/tier_ci.yml:32,150,241-242,252,370,461-462"
+          },
+          {
+            "thema": "(2a) RESTNAHT: gn_out bleibt einzige Kopie; Ebene C haengt an nicht-geforwardeten Vars",
+            "ist": "Der Bau-Batch sichert NUR Logs (tier_ci.yml:136-141 'paths: - Code/gn_out/_all_/amd/logs/'); die 1.5e5 Tier-Binaries in Code/gn_out bleiben unversandt lokal => das §65-Interim 'Teil-A-gn_out-Persistenz = einzige Kopie' besteht unveraendert fort, solange Ebene B nicht nachweislich schreibt. Ebene C (measurement_sink) haengt an COMDARE_MEASUREMENT_DROP_URL + COMDARE_NFS_DROP_TOKEN; KONTROLLTEST 'grep -n \"DROP|MEASUREMENT_DROP|NFS_DROP\" experiment_plan_director.hpp' = 0 Treffer => diese Vars stehen NICHT in der Forward-Allowlist und muessen im Grandchild als Projekt-CI-Variablen (Projekt 288) ankommen — ungeprueft.",
+            "quelle": "scratchpad/tier_ci.yml:136-141 · experiment_plan_director.hpp (Kontrolltest 0 Treffer) · .gitlab-ci.yml:582,605-609"
+          },
+          {
+            "thema": "(3) minio_enabled-Defekt (HANDOVER-6 P.7): VERDIKT = CODE GESCHLOSSEN, LEDGER-VERBUCHUNG OFFEN",
+            "ist": "DEFEKT-INHALT: Das Bestandslog-Host-Gate lautete urspruenglich !inert() statt minio_enabled(). Da inert() == !minio_enabled() && !drop_enabled() ist, war es bereits bei einer NUR-Ebene-C-Konfiguration (measure-drop gesetzt, minio aus) false => make_bestand_transport haette alle vier Objekt-Verben BEDINGUNGSLOS belegt, bestandslog_active waere true geworden und der Bau waere von provision_all auf run_planer_driven_provision umgeschaltet — ein ANDERER Bau-Treiber auf einem vollstaendig belegten, aber TOTEN Transport (alle vier Verben geben ohne minio_enabled() false/nullopt zurueck: artifact_cache.hpp:571,591,619,627) => still leeres Lager, teuerster Fehlermodus. BEHOBEN am 26.07.: super b4e6dcd5 'fix(driver): G4b-1-Korrektur — Gate = env UND minio_enabled() UND owner; nur-Ebene-C stumm inert' + super ce82db35 (WARNUNG lager_ebene_fehlt) + ce 2224fff3 (Kommentar-Nachzug). Begruendung steht heute woertlich in main.cpp:1289-1297. VERBUCHUNG: KONTROLLTEST 'grep -n \"minio_enabled|b4e6dcd5|toten Transport|drop-only|AUF-B3|2224fff3|ce82db35\" docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md' => LEER, kein einziger Treffer. Der Ledger endet bei §77; der Defekt und seine Behebung sind dort NICHT verzeichnet — HANDOVER-6 Punkt 7 ('Ledger-Nachzug ... + minio_enabled-Defekt-Verbuchung') ist unerledigt.",
+            "quelle": "Code/02_messung_driver/main.cpp:1289-1297,1341,1365-1373 · artifact_cache.hpp:221,225,571,591,619,627 · Commits super b4e6dcd5/ce82db35 (2026-07-26), ce 2224fff3 · docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md (Kontrolltest 0 Treffer) · docs/sessions/20260726-SESSION-HANDOVER-6-lagerwelle-komplett-abnahmen-struktr.md:73"
+          },
+          {
+            "thema": "(4) Lager-Gate G4 (P-A Push-Aktivierung, #34): VERDIKT = SCHARFSCHALTBAR, inert-by-default; Rest-Luecke an Grenze 1",
+            "ist": "P-A ist gebaut und laeuft rein ueber den env-Schalter COMDARE_STORAGE_CACHE: Skript-Kopf 'bei COMDARE_STORAGE_CACHE != true vollstaendig inert' (comdare_storage_activation.sh:33/62-63, 'Storage bare-metal INERT ... from_env() No-Op, byte-neutral'). In der Grandchild-Ebene ist der Schalter durchgereicht (siehe 1a) => tier:build-batch und measure-batch sind scharf. Rest-Luecken: (i) STUFE-1-Child sieht ihn nicht (1b); (ii) planer:delegate aktiviert den mc-Alias nicht (1c); (iii) ob MINIO_ACCESS_KEY/MINIO_SECRET_KEY/COMDARE_MINIO_ENDPOINT/COMDARE_MINIO_BUCKET im GRANDCHILD-Job ueberhaupt ankommen (Projekt-288-Variablen, ggf. 'protected' und damit auf ref=development evtl. abwesend) ist am lokalen Code NICHT entscheidbar — bei Fehlen meldet das Skript nur '[Infra-Fehler: minio-Env unvollstaendig ... Ebene B inert, Betrieb laeuft weiter]' (Zeile 48) und der Voll-Bau liefe still ohne Lager.",
+            "quelle": "scripts/comdare_storage_activation.sh:33,36-54,62-64 · .gitlab-ci.yml:581-602 · experiment_plan_director.hpp:643-656"
+          },
+          {
+            "thema": "(4) Lager-Gate G5 (P-B Pruning lokal->0, #35): VERDIKT = CODE VORHANDEN, im VOLL-BAU-4 FAKTISCH INERT",
+            "ist": "Code komplett: artifact_cache.hpp:430 verify_remote_then_prune (loescht nur nach beweisbarem Remote-Bestand; NIE Messdaten, nur prunable_artifacts = perm.dll + perm.dll.version + optionale Sidecars, :108-115), Treiber-Standalone-Modus COMDARE_PRUNE_ONLY main.cpp:1166-1190, Emission director.hpp:1315-1341. ABER: der Prune-Schritt steht AUSSCHLIESSLICH im MESS-Batch, als letzter Schritt, doppelt gegatet ('if [ \"${COMDARE_STORAGE_CACHE:-}\" = \"true\" ]'). Der Mess-Batch traegt rules: smoke=>on_success, SONST 'when: manual' (gemessen tier_ci.yml:155-158). Der Voll-Bau-4-Trigger setzt COMDARE_MEASURE_PROFILE laut Fahrplan §3.2 NICHT => der Mess-Batch bleibt manual => IM VOLL-BAU-4 LAEUFT NIE EIN PRUNE. Der §65-Kern 'Forecast auf der Bau-Maschine soll gegen NULL gehen' wird damit im Bau-Lauf strukturell NICHT erreicht; der ~58-65G-Lokal-Forecast auf prod1 bleibt in voller Hoehe stehen.",
+            "quelle": "artifact_cache.hpp:108-115,423-465 · main.cpp:1166-1190 · experiment_plan_director.hpp:1315-1341 · gemessen: scratchpad/tier_ci.yml:155-158,231-235,451-455"
+          },
+          {
+            "thema": "(4) Lager-Gate G3 (#46b-Bestandslog-Kern): VERDIKT = TEIL-OFFEN — kein Claim-CHECK, kein Takeover in Produktion",
+            "ist": "KONTROLLTEST 'grep -rn \"is_reservation_takeable|is_takeable_by_eta\"' ueber das ganze ce-Repo (ohne build*) liefert GENAU 2 Definitionen (reservation_lifecycle.hpp:105 und :113) und 9 Test-Zeilen (tests/unit/test_g3_reservation_lifecycle.cpp:71-93) — NULL Produktions-Aufrufer. Die Uebernahme-Logik ist gebaut und getestet, wird aber von keinem Pfad gerufen: kein Aufrufer prueft je eine FREMDE offene Reservierung. Damit ist die §66-G3-Semantik 'Reservierung = VERSPRECHEN' einseitig (nur Setzen/Freigeben, kein Pruefen), und der Doppel-Planer-Schutz auf zwei Maschinen existiert real nicht.",
+            "quelle": "Code/external/comdare-cache-engine/libs/cache_engine/builder/bestandslog/reservation_lifecycle.hpp:105,113-119 · tests/unit/test_g3_reservation_lifecycle.cpp:71-93 (Kontrolltest: 0 Nicht-Test-Aufrufer)"
+          },
+          {
+            "thema": "(4) Ledger-Stand zum Lager-Gate G1-G5: KEIN Vollzugs-Eintrag",
+            "ist": "§66 definiert das Gate (LEDGER:3439-3444: G1 #27, G2 Stempel #36, G3 #46b-Kern #10, G4 P-A/P-C #34/#33, G5 P-B #35). Danach folgen §67..§77; KEIN Paragraph verbucht den Vollzug von G1-G5. Der letzte inhaltliche §-Eintrag ist §77 (27.07. ~15:15, D3-CI-Paket). Damit steht der V7.1-'komplett'-Anspruch gegen §65/§66 weiterhin unaufgeloest IM Ledger — die Aufloesung existiert nur im Code und in Session-Docs (HANDOVER-6, DOSSIER 26.07.).",
+            "quelle": "docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:3402-3444 (§65/§66), :3566 (§77, letzter Paragraph)"
+          },
+          {
+            "thema": "NEBENBEFUND fuer Fahrplan §5(c) — 12-Perm-Klaerung: Code-Ist sind VIER Perms, nicht zwoelf",
+            "ist": "Die real emittierte STUFE-2-YAML meldet im Kopf 'perm_count=4' und listet 'perm 0: [O2,no_extension] lane=amd / perm 1: [O2,avx2] lane=intel / perm 2: [O3,no_extension] lane=amd / perm 3: [O3,avx2] lane=intel' (tier_ci.yml:2,20-23). Quelle ist das Profil selbst: all_axes_golden.profile.xml:189-198 deklariert opt_level {O2,O3} und simd {no_extension,avx2}; der Kommentar :180-182 begruendet das ausdruecklich ('Ofast bewusst WEGGELASSEN — bricht IEEE-754-/CRC64-golden-Anker'; 'avx512 nicht universell'). KONTROLLTEST 'grep -rn GN_INCLUDE_AVX512' ueber super+ce: aktive Treffer NUR in ci/archive/perm-matrix-fallback.yml:297/311 (statische Deprecated-Matrix) — im dynamischen Planer-Pfad existiert die Variable NICHT. FOLGE: Der Fahrplan-§3.4-Umfang '12 System-Perms = 1.572.864 Tier-Binaries SOLL' ist am Code-Ist NICHT gedeckt; Ist waere 4 Perms x 131072 = 524.288 auf 2 Lanes. Entweder Profil-XML erweitern (O0/O1 + avx512) oder die Zahl im Trigger-Rezept korrigieren.",
+            "quelle": "scratchpad/tier_ci.yml:2,20-23 · Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml:179-198 · ci/archive/perm-matrix-fallback.yml:297,311"
+          },
+          {
+            "thema": "BEWEIS-HYGIENE (J-0): der lokal benutzte Treiber ist um einen Commit stale — Aussage bleibt tragfaehig",
+            "ist": "Benutzt wurde /home/comdare/.../Code/build-o8/02_messung_driver/comdare-messung-driver, mtime 2026-07-27 18:17:02. Der letzte director.hpp-beruehrende Commit ist ce 4e0a5592 vom 2026-07-27 18:20:08 ('OP-9 - plan dump weist je step den REAL gebauten Datei-Stem aus'). Der Diff dieses Commits an director.hpp trifft die Hunks @@-49 (Include), @@-209, @@-251, @@-261 — alle im PLAN-DUMP-Builder, KEINER in CiYamlBuilder/TierCiYamlBuilder. Die hier gemessenen Emissions-Aussagen sind davon nicht betroffen; beide Arbeitsbaeume sind sauber (ce 52bcbc76, super 6d8ebecc; nur thesis-Gitlink + untracked Code/measure_out_d03). VOR dem Trigger dennoch frisch bauen (J-0-Doktrin).",
+            "quelle": "ls -la build-o8/02_messung_driver/comdare-messung-driver · git log -1 -- libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp (4e0a5592) · git status --porcelain beide Repos"
+          }
+        ],
+        "kommandos": [
+          {
+            "zweck": "(1c) Beleg, dass planer:delegate die Storage-Aktivierung NICHT ruft — der Anker fuer den Fix",
+            "kommando": "grep -n 'storage_cache_activation' /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.gitlab-ci.yml",
+            "erwartete_ausgabe": "Genau 4 Zeilen: 583 (Definition .storage_cache_activation:), 670, 756 (die zwei handgeschriebenen Mess-Jobs), 804 (Kommentar). KEINE Zeile zwischen 955 und 1003 (planer:delegate)."
+          },
+          {
+            "zweck": "(1b) Beleg der Forward-Allowlist an der ERSTEN Trigger-Grenze (fehlende Lager-Schalter)",
+            "kommando": "sed -n '1005,1050p' /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.gitlab-ci.yml",
+            "erwartete_ausgabe": "planer:delegate-trigger mit variables: nur COMDARE_GN_TOTAL + COMDARE_MEASURE_PROFILE, im smoke-Zweig zusaetzlich COMDARE_PLAN_METHODIK_PROFILE; forward: yaml_variables: true / pipeline_variables: false. KEIN COMDARE_STORAGE_CACHE, KEIN COMDARE_BESTANDSLOG*."
+          },
+          {
+            "zweck": "(1a) Re-Beleg der Grandchild-Durchreiche nach frischem Bau (J-0-konform)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && COMDARE_STORAGE_CACHE=true COMDARE_BESTANDSLOG=true COMDARE_BESTANDSLOG_DOC_KEY=DUMMY/doc.xml COMDARE_BESTANDSLOG_OWNER_UUID=DUMMY-owner COMDARE_BESTANDSLOG_MASCHINE=DUMMY-host COMDARE_GN_TOTAL=131072 <FRISCHER_BUILD>/02_messung_driver/comdare-messung-driver plan ci external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml | sed -n '/^\"ceb:trigger/,$p'",
+            "erwartete_ausgabe": "variables:-Block mit COMDARE_GN_TOTAL \"131072\", COMDARE_STORAGE_CACHE \"true\", COMDARE_BESTANDSLOG \"true\", _DOC_KEY, _OWNER_UUID, _MASCHINE; danach trigger:/forward: yaml_variables: true. Auf stderr: '[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt' (lokal kein minio) — genau diese Warnung darf im CI-Job NICHT erscheinen."
+          },
+          {
+            "zweck": "(4/G5) Beleg, dass der Prune im Voll-Bau-4 nie laeuft (Mess-Batch = when:manual)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && <FRISCHER_BUILD>/02_messung_driver/comdare-messung-driver tier ci external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml | grep -n 'when: manual\\|COMDARE_PRUNE_ONLY\\|perm_count='",
+            "erwartete_ausgabe": "'perm_count=4' im Kopf; je Mess-Batch eine Zeile '- when: manual'; die COMDARE_PRUNE_ONLY-Zeilen liegen AUSSCHLIESSLICH innerhalb der measure:*-Jobs (Zeilen 231-235 / 451-455 der 463-Zeilen-Emission), nie im tier:build-batch."
+          },
+          {
+            "zweck": "(3) Beleg, dass die minio_enabled-Defekt-Verbuchung im Ledger fehlt (Negativ-Kontrolltest)",
+            "kommando": "grep -n 'minio_enabled\\|b4e6dcd5\\|ce82db35\\|2224fff3\\|drop-only\\|AUF-B3' /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md; echo \"exit=$?\"",
+            "erwartete_ausgabe": "Keine Ausgabe, exit=1 (grep ohne Treffer). Gegenprobe, dass die Datei gelesen wird: grep -c '^## §' liefert die §-Liste bis §77."
+          },
+          {
+            "zweck": "(4/G3) Beleg, dass Claim-Check/Takeover 0 Produktions-Aufrufer hat (Negativ-Kontrolltest)",
+            "kommando": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine && grep -rn 'is_reservation_takeable\\|is_takeable_by_eta' --include=*.hpp --include=*.cpp . | grep -v '^./build' | grep -v '^./tests/'",
+            "erwartete_ausgabe": "Genau 2 Zeilen: libs/cache_engine/builder/bestandslog/reservation_lifecycle.hpp:105 und :113 (die Definitionen). Kein Aufrufer ausserhalb tests/unit/test_g3_reservation_lifecycle.cpp."
+          },
+          {
+            "zweck": "VOR DEM TRIGGER (Infra-Handout, nicht von mir ausfuehrbar): mc-Alias-Preflight auf BEIDEN Hosts — die mc-Falle abfangen",
+            "kommando": "ssh root@prod1 'mc alias list | grep -w prodcache' ; ssh root@prod2 'mc alias list | grep -w prodcache'",
+            "erwartete_ausgabe": "Je Host ein prodcache-Eintrag mit der minio-URL. LEERE Ausgabe = die mc-Falle ist scharf (unbekannter Alias schreibt lokal und meldet Erfolg) -> Trigger blockieren."
+          },
+          {
+            "zweck": "VOR DEM TRIGGER: pruefen, ob die MinIO-/Drop-Creds als Projekt-288-Variablen auf ref=development ueberhaupt ankommen (protected?)",
+            "kommando": "curl -s --header \"PRIVATE-TOKEN: $PAT\" 'https://<gitlab>/api/v4/projects/288/variables?per_page=100' | grep -o '\"key\":\"[^\"]*\",\"[^}]*\"protected\":[a-z]*' | grep -E 'MINIO|DROP'",
+            "erwartete_ausgabe": "MINIO_ACCESS_KEY / MINIO_SECRET_KEY / COMDARE_MINIO_ENDPOINT / COMDARE_MINIO_BUCKET (+ COMDARE_MEASUREMENT_DROP_URL / COMDARE_NFS_DROP_TOKEN) je mit \"protected\":false — sonst muss development protected sein, sonst laeuft der Voll-Bau still ohne Lager. PAT-FALLE: Kandidaten rueckwaerts testen bis HTTP 200."
+          },
+          {
+            "zweck": "(Nebenbefund §5c) Perm-Umfang am Profil-Ist belegen statt aus dem Fahrplan uebernehmen",
+            "kommando": "sed -n '176,200p' /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml",
+            "erwartete_ausgabe": "<opt_level> mit genau zwei <option value=\"O2\"/> und <option value=\"O3\"/>; <simd> mit genau <option value=\"no_extension\"/> und <option value=\"avx2\"/> => 4 Perms. Kein O0/O1, kein avx512."
+          }
+        ],
+        "offene_punkte": [
+          "VOR TRIGGER / ENTSCHEID OWNER: G5-Prune laeuft im Voll-Bau-4 NIE (Prune sitzt nur im Mess-Batch, der when:manual ist). Entweder (a) §65 'lokal gegen NULL' fuer Voll-Bau-4 explizit aussetzen und die ~58-65G Platz-Pflege auf prod1 hart einplanen, oder (b) einen Prune-Schritt in den tier:build-batch ziehen — das widerspricht aber der dokumentierten Reihenfolge-Begruendung (director.hpp:1315-1322: Prune zwischen Bau und Messung erzwingt vollen Netz-Rueckweg), oder (c) nach dem Bau einen separaten manuellen PRUNE_ONLY-Lauf fahren. Ohne Entscheid ist §65-Kern (a) im Voll-Bau-4 nicht erfuellt.",
+          "VOR TRIGGER (Code, klein, disjunkt): planer:delegate braucht '- !reference [.storage_cache_activation, script]' vor dem 'plan ci'-Aufruf — sonst laeuft der planer_block bei COMDARE_BESTANDSLOG=true in die mc-Falle (S3-URL statt Alias). Nicht fatal (nur WARNUNG + 10s-Budget), aber die Reservierung ist dann Fiktion. Alternativ: COMDARE_BESTANDSLOG beim Trigger weglassen und den planer_block bewusst aus dem Lauf nehmen (dann aber Fahrplan §3.2-Var-Satz anpassen).",
+          "VOR TRIGGER (Entscheid): COMDARE_STORAGE_CACHE ist an der ERSTEN Trigger-Grenze nicht geforwardet (.gitlab-ci.yml:1017-1019). Heute folgenlos (tier ci hat keinen planer_block), aber die Begruendung in director.hpp:799-803 ist damit falsch — entweder Var in die Allowlist von planer:delegate-trigger aufnehmen (byte-Auswirkung auf die STUFE-1-YAML pruefen) oder den Kommentar richtigstellen. Nicht blockierend.",
+          "VOR TRIGGER (Infra, nicht lokal entscheidbar): (i) mc-Alias-Preflight 'mc alias list | grep -w prodcache' auf prod1+prod2 — es gibt NIRGENDS im Code einen Alias-Check (Kontrolltest 0 Treffer); (ii) Nachweis, dass MINIO_ACCESS_KEY/_SECRET_KEY/COMDARE_MINIO_ENDPOINT/_BUCKET im GRANDCHILD-Job auf ref=development ankommen (protected-Flag). Ohne beides laeuft der komplette Voll-Bau-4 still ohne Lager und meldet nur '[Infra-Fehler: minio-Env unvollstaendig ... Betrieb laeuft weiter]'.",
+          "LEDGER-NACHZUG (HANDOVER-6 P.7, unerledigt): minio_enabled-Defekt (Gate war !inert() statt minio_enabled(); nur-Ebene-C haette einen toten Transport gebunden und den Bau auf run_planer_driven_provision umgeschaltet) samt Behebung super b4e6dcd5 + ce82db35 + ce 2224fff3 vom 26.07. ist im Ledger NICHT verbucht (Negativ-Kontrolltest: 0 Treffer). Ebenso fehlt jeder Vollzugs-Eintrag zu G1-G5 nach §66 — der §65/V7.1-Widerspruch ist damit im Ledger weiterhin offen, obwohl er am Code aufgeloest ist.",
+          "G3-REST (nicht blockierend, aber ehrlich zu benennen): is_reservation_takeable/is_takeable_by_eta haben 0 Produktions-Aufrufer. Ein zweiter Planer auf der anderen Maschine wuerde eine fremde offene planer_block-Reservierung NICHT sehen. Fuer den Ein-Planer-Voll-Bau-4 unschaedlich; als §66-G3-Restpunkt in den Ledger.",
+          "FAHRPLAN-KORREKTUR §3.4 (vacuum-green): '12 System-Perms = 1.572.864 Tier-Binaries SOLL' ist am Code-Ist nicht gedeckt. Emission liefert perm_count=4 (O2/O3 x no_extension/avx2), COMDARE_GN_INCLUDE_AVX512 existiert nur noch in ci/archive/. Entweder all_axes_golden.profile.xml erweitern (beruehrt den CRC64-golden-Anker! Kommentar :180-182 warnt ausdruecklich vor Ofast/avx512) oder die Zahl im Trigger-Rezept auf 4 x 131072 = 524.288 korrigieren. Das gehoert zu Fahrplan-Punkt (c) und braucht einen Owner-Entscheid, weil eine Profil-Erweiterung den golden-Anker beruehrt.",
+          "BEWEIS-HYGIENE: alle Emissions-Messungen dieses Pakets stammen aus dem Treiber in Code/build-o8 (mtime 27.07. 18:17), der um einen director.hpp-Commit (4e0a5592, 18:20, reiner Plan-DUMP-Bereich) stale ist. Vor dem Trigger im Rahmen der J-Kette frisch bauen und die drei Emissions-Belege (ceb:trigger-variables, tier_ci when:manual, perm_count) einmal gegen den frischen Treiber wiederholen."
+        ]
+      }
+    ],
+    "syn": {
+      "beweis_rezepte": [
+        "BEWEIS 1 — RESUME-SKIP (Gate-Kriterium ERSETZT). VORBEREITUNG (J-0, gilt fuer alle 3 Beweise; build-o8 vom 27.07. 18:17 ist Beweis-GIFT): cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && cmake -B build-beweis -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release && cmake --build build-beweis --target comdare-messung-driver && build-beweis/02_messung_driver/comdare-messung-driver version (vier gelabelte non-empty Zeilen planner/ceb-contract/build-type/build-version). Alle Ausgaben NUR nach /home/comdare/beweise-20260801/ (ausserhalb beider Repos; golden/Lager/CI unberuehrt). GATE-KRITERIUM NEU (das Fahrplan-Kriterium 'Log-Zeile GN_DECISION=skip' ist unerfuellbar: GN_DECISION existiert ausschliesslich als Shell-Zuweisung export GN_DECISION=\"skip\" in ci/archive/perm-matrix-fallback.yml:176 — Archiv, nicht included, ohne set -x nie im Log; Kontroll-grep 01.08. selbst wiederholt: genau 6 Treffer alle im Archiv, ce-Repo ce-exit=1; Ledger-Nachtrag des Ersatz-Kriteriums noetig): (a) Doppellauf-Idempotenz, (b) Kontrolltest, (c) literales built_new=0. SCHRITT 1 (Kaltstart, N=2, exakt der Voll-Bau-4-Batch-Aufruf aus experiment_plan_director.hpp:1130-1141): mkdir -p /home/comdare/beweise-20260801 && cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && DRV=$PWD/build-beweis/02_messung_driver/comdare-messung-driver; PROF=$PWD/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml; OUT=/home/comdare/beweise-20260801/resume; rm -rf \"$OUT\"; COMDARE_THESIS_PROFILE=\"$PROF\" COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_GOLDEN_N_PROVISION_ONLY=true COMDARE_RUN_SOTA=0 COMDARE_GOLDEN_N_RANGE=0:2 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT\" 2>&1 | tee /home/comdare/beweise-20260801/lauf1.log — erwartete Literale (Code-verifiziert 01.08.): '[E4] INC-G6 golden-N Chunk-Fenster: start=0 count=2' (main.cpp:1521-1523), '[E4] INC-G6 provision-only: baut DLLs, misst NICHT.' (main.cpp:1526), '  [INC-G6] golden-N Chunk-Fenster [0,2) = 2 Binaries (view.size=...) provision-only' (profile_run_entry.hpp:636-639), Abschluss 'RUN_PROFILE fertig: ... provisioned=2 (provision-only) csv_ok=1 → <csv>' (profile_run_entry.hpp:842-846; ACHTUNG: UTF-8-Pfeil '→', NICHT '->' — grep auf das Praefix 'RUN_PROFILE fertig'), exit 0. SCHRITT 2 (Fingerabdruck): find \"$OUT/e4_xml/dll\" -type f -name 'perm.dll*' -printf '%T@ %s %p\\n' | sort > stat1.txt; find ... -name 'perm.dll' -exec sha256sum {} + | sort > sha1.txt (sha1.txt = 2 Zeilen). SCHRITT 3 (GATE a): identischen Lauf wiederholen, stat2.txt nehmen, diff stat1.txt stat2.txt; echo \"DIFF-RC=$?\" — GATE: 'DIFF-RC=0' bei leerem diff = keine perm.dll/.version neu geschrieben = beide Permutationen resumiert (Arbiter dll_is_current, build_orchestrator.hpp:471-478: r.skipped=true, r.message=\"übersprungen (Version aktuell)\" mit UMLAUT — wird nirgends gedruckt, einziger Treffer ist die Definition :476, deshalb der diff-Beweis). SCHRITT 4 (GATE b, Kontrolltest gegen Zufalls-Gruen): rm -f \"$OUT\"/e4_xml/dll/*/perm.dll.version; identischer Lauf; diff stat2 stat3 — MUSS 'DIFF-RC=1' mit neuen mtimes ALLER perm.dll+.version liefern (fehlendes .version-Sidecar => dll_is_current false => Neubau). SCHRITT 5 (GATE c, einzige literale neu-vs-resumiert-Zahl im Code, experiment_run_entry.hpp:384-387, nur <comdare_experiment>-Wurzel): OUT2=/home/comdare/beweise-20260801/resume-xa; rm -rf \"$OUT2\"; for i in 1 2; do COMDARE_THESIS_PROFILE=$PWD/test_data_xml/experiment_golden_kern.xml COMDARE_E4_CAP=1 COMDARE_WORKLOAD_RECORDS=1024 COMDARE_BUILD_PARALLEL=2 \"$DRV\" experiment_config \"$OUT2\" 2>&1 | grep -E '^\\s+\\[pass\\]|^RUN_EXPERIMENT fertig'; done — Lauf 1: '[pass] selected=1 built=1 built_new=1 ... resumed=0'; Lauf 2: '[pass] selected=1 built=1 built_new=0 ... resumed=1'. ACHTUNG: dieser Weg MISST (kein provision-only auf der xa-Wurzel) — Ausgabe bleibt im Scratch-OUT2. KLEINSTE ALTERNATIVE (Kern ohne env-Verdrahtung; Quote-Fehler der Kartierung korrigiert): cd .../Code/external/comdare-cache-engine/build-v6 && ctest -R '^(test_kf16b_build_resilience)$' -V",
+        "BEWEIS 2 — HYDRATION-SMOKE + PRUNE (Gate: [PRUNE-TESTAT] verified>0 UND pruned>0; 'behalten=alles' = Befund, kein Gruen). Emitter verifiziert im SUPER-Treiber Code/02_messung_driver/main.cpp:1172-1202 (gegated COMDARE_PRUNE_ONLY==\"true\"; verified zaehlt pruned+behalten, skipped nicht; verify_remote_then_prune hat im ce-Repo keinen anderen Aufrufer). OWNER-VORBEHALT: dieses Rezept faehrt gegen einen Fake-mc (deterministisch, kein Netz) — Fahrplan-Beweis 4 fordert das ECHTE minio separat; lokal existiert NUR mc-Alias 'local' (gemessen 01.08.), NIEMALS gegen den Produktiv-Bucket fahren. VORBEREITUNG: J-0-Treiber aus Beweis 1; fake_mc.sh + Store exakt nach Kartierungs-Blaupause anlegen (Vertrag verifiziert: mc stat --json / mc cp --quiet / mc mirror --exclude _gn_chunk_markers/* / mc rm --quiet, artifact_cache.hpp:390,777,795,808,865; COMDARE_MC_BIN-Override :184; /usr/bin/timeout vorhanden => 'timeout -k 5 <s>'-Praefix, streift sich selbst ab, $1 bleibt stat/cp/mirror). PHASE 1 (Bestand+Push): wie Beweis-1-Lauf, aber OUT=/home/comdare/beweise-20260801/hydra und export COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket COMDARE_MC_BIN=/home/comdare/beweise-20260801/fake_mc.sh (unset COMDARE_MINIO_PREFIX COMDARE_MEASUREMENT_DROP_URL) — erwartet als PRAEFIX-Match: '[E4] Storage #51 aktiv: minio=1 measure-drop=0 lauf-baum=<stamp> teil-marker=an' (main.cpp:1269-1272; KORREKTUR zur Kartierung: die Zeile traegt zusaetzlich lauf-baum= und teil-marker=; teil-marker=an weil COMDARE_GOLDEN_N_RANGE gesetzt) und 'RUN_PROFILE fertig: ... provisioned=2 (provision-only) csv_ok=1'; im Store je Stem perm.dll + perm.dll.version (+ _gn_chunk_markers-Teil-Marker). KEY-PRAEFIX literal vom Treiber (nie nachbilden): COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket \"$DRV\" cache-key (Subkommando existiert, Hilfe Z.14: 'ce-Objekt-Cache-Key-Praefix der env-gepinnten GN-Zelle'). PHASE 2 (HYDRATION): sha256 der perm.dll sichern, rm -rf \"$OUT/e4_xml/dll\" \"$OUT/e4_xml/src\", identischer Lauf — GATE: HYDRA-DIFF-RC=0 (byte-identische perm.dll aus dem Store zurueck, pull_tier_prefix via mc mirror) UND src-Dateizahl 0 (kein Source-Codegen => hydriert+geskippt, nicht gebaut). PHASE 3 (Praeparation): KP=$(\"$DRV\" cache-key ...); BAD=$(ls -1 store/$KP | sort | head -1); printf 'KAPUTT-FREMDE-PROVENIENZ' > store/$KP/$BAD/perm.dll.version — Remote-.version != lokale .version => prune_verdict {false,\"version_mismatch\"} (Reihenfolge verifiziert artifact_cache.hpp:68-79: no_local_version -> remote_version_missing -> version_mismatch -> remote_size_unknown -> size_mismatch -> verified). PHASE 4 (GATE): COMDARE_PRUNE_ONLY=true COMDARE_MINIO_ENDPOINT=fakealias COMDARE_MINIO_BUCKET=fakebucket COMDARE_MC_BIN=.../fake_mc.sh COMDARE_GN_OPT=O3 COMDARE_GN_SIMD=no_extension \"$DRV\" experiment_config \"$OUT\" — erwartet: '[E4] G5 prune-only: verify-then-prune je Stem unter <OUT>/e4_xml/dll (build_version=m3v2; minio aktiv)' und GATE-ZEILE '[PRUNE-TESTAT] verified=2 pruned=1 behalten=1 skipped=0 dll_dir=<OUT>/e4_xml/dll'; je Stem in perm.prune.log: '[PRUNE] stem=<A> action=behalten reason=version_mismatch' und '[PRUNE] stem=<B> action=pruned reason=verified'. SCHLUESSEL-SUBTILITAET (von mir eigens verifiziert, traegt das Rezept): der Remote-Praefix stammt aus der GELESENEN lokalen .version (prune_key_base FIX A, artifact_cache.hpp:450-452), der bv-Parameter 'm3v2' ist nur Fallback — Push- und Prune-Schluessel treffen dieselbe Zelle. prunable_artifacts enthaelt keine Messdaten (result.csv/measure_out/prune.log ueberleben). KONTROLLTEST (Pflicht, Negativ-Beweis): env -u COMDARE_MINIO_ENDPOINT -u COMDARE_MINIO_BUCKET -u COMDARE_MC_BIN COMDARE_PRUNE_ONLY=true \"$DRV\" experiment_config /home/comdare/beweise-20260801/resume — MUSS '(INERT -> nie loeschen)' und '[PRUNE-TESTAT] verified=0 pruned=0 behalten=0 skipped=2' liefern (artifact_cache.hpp:432-434), 2 perm.dll unversehrt. KLEINSTE ALTERNATIVE: ctest -R '^(test_g3_prune|test_s2_pull_tier_binary)$' -V in build-v6.",
+        "BEWEIS 3 — VARIANT-GATE-E2E (Gate-Kriterium jetzt definiert). MECHANIK (verifiziert): COMDARE_VARIANT_GATE==\"true\" wird AUSSCHLIESSLICH in profile_run_entry.hpp:372 gelesen (<comdare_thesis_profile>-Zweig; run_experiment kennt es nicht) -> variant_gate_sig = driver_build_variant_signature() -> dll_is_current vergleicht <output>.variant byte-genau (fehlend/abweichend => Neubau GENAU dieser Binary), write_variant_sidecar nur bei r.status==0, leere Signatur = no-op/byte-neutral (build_orchestrator.hpp:265-296 sinngemaess, Kommentar+Code verifiziert). ZIRKULARITAETS-VERBOT: die SOLL-Signatur IMMER aus dem FRISCHEN Treiber ziehen, nie aus einem Sidecar: cd .../Code && strings -a build-beweis/02_messung_driver/comdare-messung-driver | grep -m1 '^bvset=' | tee /home/comdare/beweise-20260801/bvset_soll.txt (beginnt 'bvset=1;bv=2;page_type[{page_dense_byte;page_kind=0}...'; die in der Kartierung am build-o8-Binary gemessene Vollform ist nur Demo — fuer den Beweis MUSS build-beweis die Quelle sein; beim Vergleich das \\n von tee abziehen). R1 (ohne Gate): provision-only-Lauf 0:2 nach OUT=/home/comdare/beweise-20260801/variant — erwartet 'R1 .variant-Dateien: 0' (Gate aus => write_variant_sidecar no-op). R2 (mit COMDARE_VARIANT_GATE=true, identischer Lauf): 'R2 .variant-Dateien: 2', R1-R2-DIFF-RC=1 (alle perm.dll neu gebaut, weil das Sidecar fehlte) und je Datei 'SIDECAR-MATCH' (Inhalt byte-gleich bvset_soll ohne Zeilenende). R3 (mit Gate erneut): R2-R3-DIFF-RC=0 — identische Signatur => vollstaendiger Skip. R4 (Praezisions-Kontrolltest): EIN .variant mit einer verkuerzten, wohlgeformten bvset-Zeile ueberschreiben, Lauf mit Gate — GATE: R3-R4-DIFF-RC=1 und der diff zeigt GENAU EINE geaenderte perm.dll (nur der manipulierte Stem; per-Binary-Praezision), danach 'GATE-OK: .variant wieder auf Treiber-Signatur'. Kommandos R1-R4 aus Kartierung 1 sind 1:1 uebernehmbar (von mir gegen die Code-Anker geprueft). KLEINSTE ALTERNATIVE: ctest -R '^(test_g2_variant_sidecar)$' -V in build-v6 (3x3-Skip-Matrix inkl. realer Treiber-Mengen-Signatur; deckt NICHT die getenv-Verdrahtung). PRODUKTIV-KOPPLUNG (Kern-Befund): Ohne COMDARE_VARIANT_GATE=true im Trigger-Var-Satz bleibt genau dieses abgenommene Gate im Voll-Bau-4 AUS (leerer String = byte-neutral) — die Var steht in der Forward-Allowlist (experiment_plan_director.hpp:872), fehlt aber im Fahrplan Abschnitt 3.2; Owner-Entscheid siehe vor_trigger_todos."
+      ],
+      "trigger_rezept_final": "KONSOLIDIERTES TRIGGER-REZEPT VOLL-BAU-4 (alle Anker 01.08. am Code-Ist verifiziert; super dev 6d8ebecc, ce 52bcbc76). DER TRIGGER = EIN POST auf /projects/288/pipeline, ref=development. Eine super-YAML-Aenderung ist fuer die Var-Durchreiche NICHT noetig (Pipeline-Variablen stehen in der planer:delegate-Job-Env; die 2. Grenze brennt sie via append_forward_var_literal zur Emissionszeit literal ein). VARIABLEN: (1) COMDARE_BUILD_GOLDEN_N=true — PFLICHT-Gate, aktiviert planer:delegate + planer:delegate-trigger (dynamische Kette, GATE-SWAP Paragraf 45; Anker super .gitlab-ci.yml rules-if generisch nach dem smoke-Zweig, ca. :975-981 und :1033ff). (2) COMDARE_GN_TOTAL — fuer den Voll-Bau NICHT setzen (super-Default \"131072\", .gitlab-ci.yml:77); Kalibrierlauf: 64. Wirkung: TOTAL=\"${COMDARE_GN_TOTAL:-16}\" im emittierten Batch-Loop (director.hpp:1113); bei 131072 => 32 Scheiben a 4096 je Perm (kGnBatchSlice=4096 harte Konstante :540, bewusst KEIN Env-Override). Forward ueber BEIDE Grenzen (1. Grenze: planer:delegate-trigger variables-Block, nur GN_TOTAL+MEASURE_PROFILE[+METHODIK im smoke], yaml_variables:true/pipeline_variables:false; 2. Grenze: director.hpp:856ff). (3) COMDARE_MEASURE_PROFILE — NICHT setzen (sonst smoke-Zweig: m3v2_smoke + m3_smoke_coverage; die smoke-Regel steht VOR der generischen). (4) COMDARE_STORAGE_CACHE=true — Dual-ccache Ebene B: Push/Pull/Prune im Grandchild scharf (2. Grenze director.hpp:863; Alias-Faltung via emit_storage_activation in jedem Batch-Job). 1. Grenze forwarded sie NICHT => Stufe-1 (ceb:build/emit) bleibt storage-inert — unschaedlich. (5) COMDARE_BESTANDSLOG=true — erzwingt das Pflicht-Trio, sonst Exit 6 ('6 Bestandslog-Gate-Abbruch' in der Treiber-Hilfe verifiziert; Pruef-Reihenfolge DOC_KEY -> OWNER_UUID -> MASCHINE, main.cpp:337-352). (6) COMDARE_BESTANDSLOG_DOC_KEY=<Objekt-Schluessel, z.B. bestandslog/vollbau4-20260801>. (7) COMDARE_BESTANDSLOG_OWNER_UUID=<LITERALER lauf-eindeutiger Wert, z.B. vollbau4-20260801-<zufall>> — NICHT das Fahrplan-Muster $CI_JOB_ID@$(hostname): GitLab expandiert in Variablenwerten keine Kommandosubstitution, '$(hostname)' reist als Literal in die Bestandslog-id (owner_uuid+\"/planer\"). (8) COMDARE_BESTANDSLOG_MASCHINE=<Hostname literal, z.B. prod1>. (9) COMDARE_VARIANT_GATE=true — OFFENER OWNER-ENTSCHEID: fehlt im Fahrplan 3.2, steht aber in der Forward-Allowlist (director.hpp:872) und ist exakt das in Beweis 3 abgenommene Gate; ohne die Var ist es im Voll-Bau-4 AUS. NICHT SETZEN (tote/gefaehrliche Vars, alle verifiziert): COMDARE_GN_INCLUDE_AVX512 (0 Treffer im ce; nur Archiv-Fallback), COMDARE_STATIC_MATRIX_FALLBACK (deprecated Archiv-Matrix), COMDARE_GN_RANGE (KEIN getenv-Konsument — wirksam ist nur das inline emittierte COMDARE_GOLDEN_N_RANGE; der \"0:4\"-Block im Child-YAML ist ein Rest), COMDARE_PERSIST_MEASUREMENTS (erst beim getrennten Mess-Trigger mit USER-GO). ERWARTETE KASKADE/TOPOLOGIE: planer:delegate baut NUR den Treiber, 'plan ci' (rein lesend) -> planer-child-ci.yml -> Stufe-1-Child (ceb:build/emit/trigger je [a,b,c]) -> Stufe-2-Grandchild mit KONSTANT 4 Jobs unabhaengig von der Perm-Zahl: tier:build-batch:amd, measure:[all]:batch:amd, tier:build-batch:intel, measure:[all]:batch:intel (O(Maschinen); Scheiben laufen INTERN, SLICE=4096; timeout 7d; Mess-Jobs when:manual — Messung getrennt). Die Fahrplan-Praezedenz 'Pipeline 11611, 16/16 tier:build' beschreibt das ALTE O(Perms x Chunks)-Schema (kTierChunkCount=4 DEPRECATED, director.hpp:536-539) — NICHT als Soll-Jobzahl lesen, sonst liest ein korrekter Lauf als 'zu wenig Jobs'. 12-PERM-STATUS (WAS FEHLT): ce-Ist = 4 Perms (O2,O3 x no_extension,avx2; all_axes_golden.profile.xml:187-200, von mir gelesen) mit DOKUMENTIERTER Begruendung (GN-3 :178-186: Ofast bricht IEEE-754/CRC64; avx512 nicht universell). Fuer die Fahrplan-SOLL-Zahl 12 (O0-O3 x {no_extension,avx2,avx512} = 1.572.864 Tier-Binaries) fehlt: (i) OWNER-ENTSCHEID (kippt die dokumentierte GN-3-Begruendung — bewusste Umkehr, kein Nachziehen), (ii) der Profil-XML-Edit als EINZIGER noetiger Edit (Trockenlauf-Beleg im Scratchpad verifiziert: tierci_12.yml Kopfzeile 'perm_count=12 batch_slice=4096 host_lanes=amd,intel', weiterhin 4 Jobs, SLICE-Count=2), (iii) Test-Nachzug: >=16 Anker in tests/unit/thesis_tiere/test_experiment_plan_director.cpp zementieren die 4 (von mir stichprobiert: :169/:170 size==2u, :177/:178 4u, :180-189 Perm-Identitaeten, :196 total_steps==72u -> 216u; ferner :213/:433/:656/:1094 'perm_count=4'-Strings u.a.) — Muster 'gruene Tests zementieren alte Ordnung', (iv) Profil-Kommentar :178-186 mitziehen (dort zusaetzlich stale: '17-Organ-Kartesik' — seit ORG-18 sind es 18 Segmente, source_catalog.hpp:182-190). Lane-Folge bei 12: 8:4 amd:intel (avx512+no_extension->amd, avx2->intel; nur Host-Lane-Tags, KEINE avx512f-Capability-Tags — Fehlrouting faellt erst zur Laufzeit als HardwareErweiterungFehlt auf, mit Warnung, nie stiller Filter). CRC64-Anker 0x56F1B721C72DC10E bleibt unberuehrt (system_config ist binary_id-neutral, N bleibt 2^17). avx512 braucht KEINEN Extra-Schalter (Registry bietet es, validate erlaubt es; GN_INCLUDE_AVX512 ist tot). VORHER (Fahrplan 3.1): heavy-Mode ERST-Schaltung (nie live geschaltet — Infra-Handout + 0d7c577-Deploy-Verify beide Hosts, SIGHUP-only) + Platz-Pflege prod1 (~58-65G) + github-PAT frisch (Vault-Position rotiert, rueckwaerts gegen API testen) + Bestands-Invalidierung ZWINGEND inkl. E-2-Schluesselwechsel (ram_pair ddr4_2x32 -> ddr5_2x32: Alt-Eintraege unterm alten Schluessel treffen nie wieder). AUFLAGEN IM LAUF: PMC-AND je deklarierter Lane hart (ce/.gitlab-ci.yml:45 COMDARE_PMC_LANES \"amd intel\", pmc:amd/pmc:intel ohne allow_failure — verifiziert), mc-Alias-Doktrin (CI-Variable COMDARE_MINIO_ENDPOINT = S3-URL, erst .storage_cache_activation faltet sie zum Alias 'prodcache'), NAS-df-Wache beide Hosts, main-Nachzug je Welle, Paragraf 74: laufender Lauf wird NIE unterbrochen. BEKANNTE INERTE NAHT (dokumentiert, kein Abbruch): planer:delegate referenziert .storage_cache_activation NICHT (Treffer nur :670/:756 — von mir verifiziert) => im Planer-Job minio_enabled()==false => planer_block-Reservierung bleibt AUS mit Warnung 'lager_ebene_fehlt' (main.cpp:330-336).",
+      "bestandslog_verdikt": "BEDINGT TRAGFAEHIG — NICHT ABNAHMEREIF VOR DEM TRIGGER. Verifiziert und solide: (1) das Treiber-Gate ist hart und ehrlich — COMDARE_BESTANDSLOG=true ohne DOC_KEY/OWNER_UUID/MASCHINE bricht mit '[bestandslog] FEHLER fehlerklasse=konfiguration_unvollstaendig ... Abbruch.' und Exit 6 (Hilfe-Text verifiziert; Pruef-Reihenfolge DOC_KEY -> OWNER_UUID -> MASCHINE, main.cpp:337-352); ohne minio nur Warnung 'lager_ebene_fehlt', planer_block bleibt AUS, Emission unveraendert (main.cpp:330-336). (2) Die Forward-Kette ueber die 2. Trigger-Grenze ist vollstaendig (BESTANDSLOG+DOC_KEY+OWNER_UUID+MASCHINE in der Allowlist, director.hpp:868-871, literal eingebrannt zur Emissionszeit). (3) Die Grandchild-Batch-Jobs erhalten die Storage-Aktivierung je Job (emit_storage_activation), dort ist die Verbuchung scharf. ABER vier offene Naehte: (a) die Planer-seitige Reservierung ist im planer:delegate STRUKTURELL INERT (kein .storage_cache_activation-Anker => minio_enabled()==false => nur Warnung) — die im Fahrplan angenommene Planer-Reservierung findet nicht statt; (b) das Fahrplan-Rezept fuer OWNER_UUID ($CI_JOB_ID@$(hostname)) ist als Pipeline-Variable nicht lauffaehig (keine Kommandosubstitution in GitLab-Variablenwerten) und wuerde die Bestandslog-id verschmutzen; (c) Beweis 4 (Bestandslog-E2E gegen ECHTES minio: 2 Prozesse gleichzeitig, Sektion < Budget, Log lesbar, mc-Alias-Preflight) ist OFFEN und durch nichts Vorhandenes gedeckt; (d) das Fahrplan-Delta (d) (Paragraf-65-Luecken-Ist: Ebene-B-Push inert? measure_out-Verlustnaht? V7.1-'komplett' vs. Paragraf 65) ist ungeklaert — dazu lag mir KEINE Kartierung vor (die dritte Kartierung fehlt im Input). Zusaetzlich Pflicht VOR dem Trigger: Bestands-Invalidierung inkl. E-2-Schluesselwechsel (ram_pair ddr4_2x32 -> ddr5_2x32), sonst treffen Alt-Eintraege unterm alten Schluessel nie wieder und der Lager-Skip 'gruen-inventarisiert' (Paragraf 68b) laeuft gegen einen toten Bestand.",
+      "vor_trigger_todos": [
+        {
+          "todo": "Beweis 1 (Resume-Skip) mit ERSETZTEM Gate-Kriterium fahren (Doppellauf-DIFF-RC=0 + rm-.version-Kontrolltest + built_new=0 ueber die xa-Wurzel) UND das neue Kriterium im Ledger nachtragen — das Fahrplan-Kriterium 'Log-Zeile GN_DECISION=skip' ist Code-belegt unerfuellbar; Owner muss den Ersatz abnicken",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Beweis 2 (Hydration+Prune) gegen Fake-mc fahren; vorab Owner-Bestaetigung einholen, dass der Mock-Weg zulaessig ist (Fahrplan-Beweis 4 deckt das echte minio separat) — Rezept liegt final vor, nie gegen den Produktiv-Bucket",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Beweis 3 (Variant-Gate-E2E) nach finalem Rezept fahren (R1-R4 inkl. per-Binary-Praezisions-Kontrolltest; SOLL-Signatur nur aus dem frischen build-beweis-Treiber)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "OWNER-ENTSCHEID COMDARE_VARIANT_GATE: in den Trigger-Var-Satz aufnehmen (Var=true im POST; Forward-Allowlist traegt sie bereits) ODER Beweis 3 explizit als Faehigkeitsnachweis ohne Produktiv-Einsatz deklarieren — sonst sichert Beweis 3 ein Gate ab, das im Voll-Bau-4 AUS ist",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Beweis 4: Bestandslog-E2E gegen ECHTES minio (2 Prozesse, Sektion < Budget, Log lesbar; Preflight mc alias list; COMDARE_MINIO_ENDPOINT-Doktrin: CI-Variable=S3-URL, Treiber-Sicht=Alias erst nach Aktivierungs-Skript)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Beweis 5 (B+-Baum-Steuerung E-07): erst ultracode-Pruefung OB die Steuerung nach Lane A/C/F + ORG-18 wirksam ist, dann Gate-Kriterium definieren, dann fahren (2-stufig laut Fahrplan)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "OWNER-ENTSCHEID 12 vs. 4 System-Perms: ce-Ist ist 4 (dokumentierte GN-3-Begruendung im Profil); fuer 12 noetig: Profil-XML-Edit (einziger Code-Edit, Trockenlauf-belegt) + >=16 Test-Anker-Nachzug in test_experiment_plan_director.cpp + Profil-Kommentar mitziehen; ohne Entscheid baut der Trigger 524.288 statt der Fahrplan-SOLL 1.572.864 Tier-Binaries",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "J-0 + G6/J-Kette: frischen Treiber bauen (build-o8 vom 27.07. = Beweis-Gift) und den J-Ketten-Voll-Lauf (J-1 Werkzeuge comdare_-Praefix, J-2 Re-Configure, J-3 Katalog, J-4 Voll-Bau+Voll-ctest) mit literalem N=318 melden; super-Referenz-N nach V-4 neu messen (Namensliste stabil)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "heavy-Mode ERST-Schaltung live (nie geschaltet, nur offline/fixture): Infra-HANDOUT + Deploy-Stand-Verifikation 0d7c577 beide Hosts; SIGHUP-only, kein systemctl restart",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Platz-Pflege prod1 (~58-65G Forecast) vor dem Lauf",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "github-PAT frisch ziehen (Vault-Position ROTIERT — Kandidaten rueckwaerts gegen die API testen bis HTTP 200) fuer den main-Nachzug je Welle",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Bestands-Invalidierung inkl. E-2-Schluesselwechsel ram_pair ddr4_2x32 -> ddr5_2x32 (803b7d71): Alt-Lager-/Bestandslog-Eintraege unterm alten Schluessel treffen nie wieder",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Trigger-POST korrigieren: COMDARE_BESTANDSLOG_OWNER_UUID als LITERALER lauf-eindeutiger Wert (z.B. vollbau4-<datum>-<zufall>) statt $CI_JOB_ID@$(hostname); MASCHINE getrennt literal setzen",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "HW-Erkennung Owner-Wort (Fahrplan (g)): blockiert die 5dea1258-Statik-Abloesung den Voll-Bau oder faehrt Voll-Bau-4 mit deklarierter Provenienz? (Frist 'VOR 01.08.' kollidiert mit dem Ruhen-Beschluss P2-P6)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "OD-10 NUMA/page-RT-Unter-Achsen (Bauplan TEIL IV.4: NACH Fenster, VOR Voll-Bau-4)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "E-Board-Rest: die 15 vor-Trigger-Deltas aus E-01..E-26 abarbeiten (u.a. E-02 Ledger-Audit, E-19 Runner-Fleet) + Ledger-Nachtrag Bau-Tag 27.07. abend (gebuendelt faellig)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Lane A/C/F + W-13-Komplett-Beleg einmalig VERIFIZIEREN statt annehmen (vermutlich durch O-8-Vollzug gedeckt)",
+          "blockierend": "ja"
+        },
+        {
+          "todo": "Fahrplan Abschnitt 3.3 korrigieren: Stufe-2-Erwartung ist KONSTANT 4 Batch-Jobs (O(Maschinen), Scheiben intern), nicht '16/16 tier:build' — sonst Fehllese-Gefahr bei der Gruen-Bewertung des Laufs",
+          "blockierend": "nein"
+        },
+        {
+          "todo": "Entscheid zur inerten Planer-Reservierung: !reference .storage_cache_activation in planer:delegate nachruesten (super-YAML-Einzeiler) ODER die Luecke dokumentiert akzeptieren (Warnung lager_ebene_fehlt, kein Abbruch)",
+          "blockierend": "nein"
+        },
+        {
+          "todo": "Aufraeumpass-Kandidatenliste fortschreiben (NICHT jetzt aendern): LazyRunResult::built_new/built_skip ohne Leser auf dem golden-Weg (Ursache des fehlenden literalen Resume-Belegs; additiver RUN_PROFILE-Einzeiler braucht Owner-GO), Kommentar-Drift experiment_plan_director.hpp:1325 (PRUNE-TESTAT-Verweis), stale Profil-Kommentar '17-Organ-Kartesik' (ORG-18)",
+          "blockierend": "nein"
+        },
+        {
+          "todo": "NAS-df-Wache beide Hosts einrichten/pruefen und Monitoring fuer die Lauf-Auflagen vorbereiten (main-Nachzug je Welle, keine schweren Parallel-Jobs) — Lauf-Auflage, muss beim Start stehen",
+          "blockierend": "nein"
+        }
+      ],
+      "widersprueche": [
+        "FAHRPLAN vs CODE-IST (Beweis 1): Gate-Kriterium 'Log-Zeile GN_DECISION=skip' ist doppelt unerfuellbar — GN_DECISION existiert NUR im nicht-inkludierten ci/archive/perm-matrix-fallback.yml (6 Treffer, Kontroll-grep 01.08. von mir wiederholt: ce-Repo exit=1), und selbst dort ist :176 eine Shell-Zuweisung (export), die ohne set -x nie im Log erscheint. Ersatz-Kriterium noetig (in beweis_rezepte definiert), Ledger-Nachtrag faellig.",
+        "FAHRPLAN 3.4 vs ce-IST (Perm-Zahl): Fahrplan fuehrt '12 System-Perms / 1.572.864 SOLL' als Umfangs-Fakt; das committete all_axes_golden traegt 4 Perms (O2,O3 x no_extension,avx2 — Profil :187-200 von mir gelesen) mit DOKUMENTIERTER GN-3-Entwurfsbegruendung (:178-186). Der Fahrplan markiert zwar die Rezept-Luecke (3.4 LUECKE), stellt die 12 aber als gesetzt dar — tatsaechlich ist es ein offener Owner-Entscheid, der die dokumentierte Begruendung umkehrt.",
+        "FAHRPLAN 3.3 vs heutige Emission (Topologie): 'Produktiv-Praezedenz Pipeline 11611, 16/16 tier:build' beschreibt das ALTE O(Perms x Chunks)-Schema (kTierChunkCount=4, im Code als DEPRECATED verzeichnet, director.hpp:536-539). Heute: konstant 4 Stufe-2-Batch-Jobs (O(Maschinen)), Scheiben SLICE=4096 INTERN — im Scratchpad-Trockenlauf tierci_12.yml selbst verifiziert (Kopfzeile perm_count=12, trotzdem 4 Jobs).",
+        "FAHRPLAN 3.2 vs Forward-Allowlist: COMDARE_VARIANT_GATE steht in der 2.-Grenze-Allowlist (director.hpp:872, von mir verifiziert) und ist exakt das Gate von Beweis 3, fehlt aber im Fahrplan-Trigger-Var-Satz — Beweis 3 wuerde ein im Produktivlauf abgeschaltetes Gate zertifizieren.",
+        "FAHRPLAN 3.2 (OWNER_UUID): $CI_JOB_ID@$(hostname) ist als Pipeline-Variable nicht lauffaehig — GitLab expandiert in Variablenwerten keine Kommandosubstitution; das Literal reist in die Bestandslog-id (owner_uuid+'/planer', main.cpp:357).",
+        "FAHRPLAN-Annahme vs super-YAML (Planer-Reservierung): Der Fahrplan setzt eine Bestandslog-Reservierung durch den Planer voraus; planer:delegate referenziert .storage_cache_activation NICHT (Treffer nur :670/:756, von mir verifiziert) => minio_enabled()==false => planer_block bleibt mit Warnung 'lager_ebene_fehlt' INERT. Kein Abbruch, aber die Annahme ist falsch.",
+        "KARTIERUNG-1-METHODIK (Befund haelt, Literal war falsch): grep-Literal 'uebersprungen (Version aktuell)' ist die ASCII-Transliteration — das Code-Literal traegt einen Umlaut: \"übersprungen (Version aktuell)\" (build_orchestrator.hpp:476). Mein Kontrolltest mit dem korrekten Literal: weiterhin einziger Treffer = die Definition, KEIN Konsument — der Negativ-Befund steht. Gleiches Muster: die RUN_PROFILE-fertig-Zeile endet mit UTF-8-Pfeil '→' (nicht '->'), und die Storage-#51-Zeile traegt zusaetzlich 'lauf-baum=' und 'teil-marker=' — Rezepte muessen Praefix-greps nutzen (in beweis_rezepte korrigiert).",
+        "KARTIERUNG-1-KOMMANDO-DEFEKT: das ctest-Alternativ-Kommando hat ein unbalanciertes Quote (-R '^(...|test_s2_pull_tier_binary) -V ohne schliessendes )$' ) — wuerde die Shell haengen lassen; in den finalen Rezepten korrigiert.",
+        "INPUT-LUECKE: Der Auftrag nennt DREI Kartierungen, angekommen sind ZWEI, und die zweite bricht mitten im Trigger-Rezept ab (endet bei 'COMDARE_BESTANDSLOG_DOC_KEY='). Die mutmassliche dritte Kartierung (vermutlich Bestandslog-/Beweis-4-Tiefe, Fahrplan-Delta (d)) fehlt — das Bestandslog-Verdikt stuetzt sich daher auf eigene Stichproben und ist dort mit 'keine Kartierung vorhanden' markiert. Das fertige Trigger-Rezept habe ich aus Fahrplan + verifizierten Code-Ankern selbst vervollstaendigt.",
+        "KLEIN (Zaehl-Sprachregelung, nicht trigger-relevant): Kartierung 2 nennt die '18-Organ-Kartesik' — korrekt seit ORG-18 (source_catalog.hpp:182-190, 18. Segment persistence_target, von mir gelesen); der Profil-Kommentar in all_axes_golden sagt noch '17-Organ-Kartesik' (stale, Aufraeumpass-Kandidat). N=2^17=131072 ist in beiden Lesarten konsistent (18. Achse mit K=1)."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Probe"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Kartierung"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Synthese"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "probe:opus5",
+      "phaseIndex": 1,
+      "phaseTitle": "Probe",
+      "agentId": "a67d4f0b515c87058",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785613177130,
+      "queuedAt": 1785613177129,
+      "attempt": 1,
+      "promptPreview": "Antworte mit exakt einem Wort: OK",
+      "lastProgressAt": 1785613180919,
+      "tokens": 21112,
+      "toolCalls": 0,
+      "durationMs": 3789,
+      "resultPreview": "OK"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "karte:beweis-kommandos",
+      "phaseIndex": 2,
+      "phaseTitle": "Kartierung",
+      "agentId": "a4014846bb4e59200",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785613180927,
+      "queuedAt": 1785613180920,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Diplomarbeit-Hauptstrang, Fahrplan /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260801-FAHRPLAN-vollbau4-beweise-g6-trigger.md (LIES IHN ZUERST — dein Paket ist ein Vorbedingungs-Punkt daraus). Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine (dev 6d8ebecc), ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine…",
+      "lastProgressAt": 1785614068152,
+      "tokens": 206054,
+      "toolCalls": 98,
+      "durationMs": 887225,
+      "resultPreview": "{\"befunde\":[{\"thema\":\"Beweis 1 / GN_DECISION: existiert NUR im deprecateten Archiv-Fallback\",\"ist\":\"Der String GN_DECISION kommt im gesamten super-Repo (ohne docs/build*) an GENAU 6 Stellen vor - alle in ci/archive/perm-matrix-fallback.yml (Kopfzeile: 'ARCHIV (deprecated statische Perm-Matrix, Owner RF-4, 2026-07-27)'). Im ce-Repo (libs/apps/tools/tests/.gitlab-ci.yml/scripts): 0 Treffer (grep exi…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "karte:zwoelf-perm",
+      "phaseIndex": 2,
+      "phaseTitle": "Kartierung",
+      "agentId": "a8b7e85dbbd1ec87e",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785613180927,
+      "queuedAt": 1785613180920,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Diplomarbeit-Hauptstrang, Fahrplan /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260801-FAHRPLAN-vollbau4-beweise-g6-trigger.md (LIES IHN ZUERST — dein Paket ist ein Vorbedingungs-Punkt daraus). Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine (dev 6d8ebecc), ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine…",
+      "lastProgressAt": 1785613980619,
+      "tokens": 187364,
+      "toolCalls": 67,
+      "durationMs": 799692,
+      "resultPreview": "{\"befunde\":[{\"thema\":\"(1) A6-Profil-Ist: das committete all_axes_golden traegt HEUTE 4 System-Perms, nicht 12\",\"ist\":\"Das Profil deklariert <system_axes> mit opt_level = {O2, O3} (2 Optionen) und external_utils/simd = {no_extension, avx2} (2 Optionen) => |opt x simd| = 4. LIVE gemessen mit dem lokalen Treiber: 'perm_count=4' und die vier Zeilen 'perm 0 opt=O2 simd=no_extension ... +opt=O2' / 'perm…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "karte:bestandslog-ist",
+      "phaseIndex": 2,
+      "phaseTitle": "Kartierung",
+      "agentId": "a8c0e3d6e9d909a9d",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785613180928,
+      "queuedAt": 1785613180920,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Diplomarbeit-Hauptstrang, Fahrplan /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260801-FAHRPLAN-vollbau4-beweise-g6-trigger.md (LIES IHN ZUERST — dein Paket ist ein Vorbedingungs-Punkt daraus). Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine (dev 6d8ebecc), ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine…",
+      "lastProgressAt": 1785613789591,
+      "tokens": 167110,
+      "toolCalls": 51,
+      "durationMs": 608663,
+      "resultPreview": "{\"befunde\":[{\"thema\":\"(1) Ebene-B-Push in Stufe-2-Batch-Jobs: VERDIKT = am Code GESCHLOSSEN (env-gated scharfschaltbar), §65-Punkt-1 'INERT' ist SUPERSEDED\",\"ist\":\"Die Batch-Jobs emittieren KEINEN eigenen minio-Push-Schritt (der Push ist in-driver), aber sie emittieren die Scharfschalt-Naht. emit_storage_activation ist eine freie Funktion mit EINER Literal-Quelle (experiment_plan_director.hpp:643-…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "synthese",
+      "phaseIndex": 3,
+      "phaseTitle": "Synthese",
+      "agentId": "a9f512a3d742fa702",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785614068162,
+      "queuedAt": 1785614068153,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "KONSOLIDIERTES TRIGGER-REZEPT VOLL-BAU-4 (alle Anker 01.08.…",
+      "promptPreview": "KONTEXT: Diplomarbeit-Hauptstrang, Fahrplan /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260801-FAHRPLAN-vollbau4-beweise-g6-trigger.md (LIES IHN ZUERST — dein Paket ist ein Vorbedingungs-Punkt daraus). Repos: super=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine (dev 6d8ebecc), ce=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine…",
+      "lastProgressAt": 1785614698025,
+      "tokens": 135000,
+      "toolCalls": 19,
+      "durationMs": 629863,
+      "resultPreview": "{\"beweis_rezepte\":[\"BEWEIS 1 — RESUME-SKIP (Gate-Kriterium ERSETZT). VORBEREITUNG (J-0, gilt fuer alle 3 Beweise; build-o8 vom 27.07. 18:17 ist Beweis-GIFT): cd /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code && cmake -B build-beweis -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release && cmake --build build-beweis --target comdare-messung-driver && build-beweis/02_mes…"
+    }
+  ],
+  "totalTokens": 716640,
+  "totalToolCalls": 235
+}

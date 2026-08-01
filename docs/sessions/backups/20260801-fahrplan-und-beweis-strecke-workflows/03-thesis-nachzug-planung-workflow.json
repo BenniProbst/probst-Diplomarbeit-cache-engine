@@ -1,0 +1,432 @@
+{
+  "summary": "Schritt 1: Design-Planung Thesis-Nachzug (Owner-Kommentare, 4-Tage-Diff, Kapitel-Plan, K2-Research-Bedarf) + Diff-Stimmigkeitspruefung",
+  "agentCount": 2,
+  "logs": [],
+  "result": {
+    "plan": {
+      "entscheidungen_rueckfragen": [
+        {
+          "nr": "E-1",
+          "frage": "Achsen-Zählung global nachziehen? Die Thesis trägt durchgehend 'neunzehn Kompositions-Achsen (T0–T18)' (K1:150, K3:140/703/756, K4:127-133, K6:16); die bindende Achsen-Neuordnung O-8 (Ledger §68a/§69) definiert: Organ-Achsen T00–T17 (18er-Organ-Zeile) + DREI System-Haupt-Achsen (target_isa/operating_system/external_utils) + Mess-Realm (measurement_meta_meta, load_framework, HW-Erkennung). Memory-Doktrin: T-ids ≠ axis_NN.",
+          "optionen": "(a) Voll-Nachzug auf die neue Ordnung in allen Kapiteln (18 Organ + 3 System + Mess-Realm), alte 19er-Zählung nur als historische Vorstufe erwähnt; (b) 19er-Zählung beibehalten und neue Ordnung nur in K3/K4 ergänzend beschreiben; (c) Owner definiert die kanonische Thesis-Zählweise explizit.",
+          "empfehlung": "(a) — LaTeX ist Primärquelle der Implementierung; eine zementierte Alt-Ordnung wäre Regression ('Grüne Tests zementieren alte Ordnung' gilt analog für Text). Vor dem Umbau aber Owner-Bestätigung der exakten Zähl-Formel (18 Organ T00–T17? zählt telemetry doppelt wegen Zweiteilung §69.3?), da dies JEDES Kapitel berührt."
+        },
+        {
+          "nr": "E-2",
+          "frage": "FF-Umbau-Tiefe (K1-Kommentar Z.74): Forschungsfragen 'in Richtung der Trennung der Mess-, System- und Organ-Achsen erweitert überarbeitet und aufgetrennt'. Neue FF-Nummerierung oder Erhalt von FF0–FF4?",
+          "optionen": "(a) FF0–FF4 als Nummern erhalten, je FF nach Achsen-Kategorien (Mess/System/Organ) auftrennen bzw. Teilfragen ergänzen; (b) komplett neuer FF-Schnitt je Achsen-Realm (z.B. FF-M/FF-S/FF-O) mit Neunummerierung.",
+          "empfehlung": "(a) — K6 (Beantwortung), Aufgabenstellung und alle Rückwärts-Verweise hängen an FF0–FF4; Auftrennung in benannte Teilfragen je Achsen-Kategorie erfüllt den Kommentar ohne Verweis-Kaskade. Bei (b) müsste K6 vollständig neu geschnitten werden."
+        },
+        {
+          "nr": "E-3",
+          "frage": "Abgebrochener Owner-Kommentar K1 Z.100: '% Wie sieht es unter diesem Punkt auch neben der ' (Satz endet mitten im Wort, unter FF2-Teilfrage). Intention nicht rekonstruierbar.",
+          "optionen": "(a) Owner vervollständigt den Satz vor Schritt 3; (b) Kommentar ersatzlos streichen; (c) Agent rät die Intention (verboten: nur User-Ideen persistieren).",
+          "empfehlung": "(a) — Owner um den fehlenden Halbsatz bitten; bis dahin bleibt der Kommentar stehen und FF2 wird nur nach E-2-Schema erweitert."
+        },
+        {
+          "nr": "E-4",
+          "frage": "Aufgabenstellungs-Kommentar Z.72 (Kette XML→Planer→CEB→Binary-Permutationen→beste System-Binary→CSV/xlsx→LaTeX/Diagramme) vs. Doktrin 'Aufgabenstellung nimmt die Lösung nicht vorweg' (Kopf-Kommentar der Datei verbietet ausdrücklich Achsen-Liste und Lösungs-Metaphern).",
+          "optionen": "(a) anforderungssprachlich einarbeiten ohne Klassennamen ('eine XML-getriebene, automatisierte Bau-, Mess- und Auswerte-Kette bis zu CSV/xlsx-Auswertungen und LaTeX-Diagrammen'), Begriffe Planer/CacheEngineBuilder erst ab K3; (b) Owner-Wortlaut nahezu wörtlich als neuer Teilaufgaben-Punkt inkl. Planer/CEB.",
+          "empfehlung": "(a) — wahrt die Linearitäts-Doktrin und den eigenen Kopf-Kommentar der Datei; der volle Ketten-Wortlaut landet stattdessen in K3 (Konzept) und K4 (Umsetzung). Owner-GO nötig, weil sein Kommentar wörtlich die Klassennamen nennt."
+        },
+        {
+          "nr": "E-5",
+          "frage": "Tiefe des Implementierungs-Nachzugs in K4/K5: Zwei-Gate 318 + CRC-Doppellauf, built_stem/plan-dump v1.1, Bestandslog/Lagerhaltung, Dual-ccache, J-Kette — wissenschaftlicher Text oder Anhang?",
+          "optionen": "(a) K4/K5 knapp als Reproduzierbarkeits-/QS-Argumente (Zwei-Gate-Modell, Lager-Skip nur grün-inventarisiert), technische Details in Anhang B; (b) ausführliche Aufnahme in K4; (c) Impl-Details ganz weglassen.",
+          "empfehlung": "(a) — die Thesis argumentiert Methodik, nicht CI-Betrieb; Anhang B trägt die Code-/Betriebsstruktur bereits heute."
+        },
+        {
+          "nr": "E-6",
+          "frage": "HW-Erkennung (Task-#7-Spec): Implementierungs-Ist ist nur P1 (Provenienz-Vokabular + SPD-DDR5-Parser); P2–P6 ruhen per Owner-Wort. Wie in der Thesis darstellen?",
+          "optionen": "(a) Konzept vollständig in K3 (zweigeteilte MESS-Achse: Planer-RT wählt CT-Plattform ISA-Familie×OS, CEB trägt einkompilierte Familien-Erkennung + Passungs-Stempel; Abstract Factory + CoR-Kette Stufe 1/2/3 mit Provenienz), K4 nur P1-Ist, Rest im Futur; (b) nur P1 beschreiben, Konzept in den Ausblick.",
+          "empfehlung": "(a) — Design→Impl-Richtung der Arbeit erlaubt vollständige Konzepte mit Umsetzungs-Stand-Vermerk. PFLICHT dabei die Thesis-Ehrlichkeitsnote aus der Recherche: die statische 4800 IST ein eingefrorenes dmidecode-Stufe-1-Ergebnis; der Gewinn ist 'einmalig von Hand → automatisiert je Lauf mit Provenienz und Erhebungszeitpunkt', NICHT 'statisch → gemessen'."
+        },
+        {
+          "nr": "E-7",
+          "frage": "EN-Sync-Strategie: alle Owner-Edits seit 30.07. (Aufgabenstellung, DE-Abstract, K1) fehlen in EN; kommende DE-Nachzüge vergrößern die Lücke.",
+          "optionen": "(a) EN-Sync je Kapitel unmittelbar nach DE-Abnahme (ein Agent, beide Dateien im selben Paket); (b) ein EN-Sammelpass nach Abschluss aller DE-Kapitel.",
+          "empfehlung": "(a) — Doktrin 'DE+EN bilingual synchron'; verhindert Drift und hält jedes Kapitel-Paket in sich abgeschlossen (Frisch-Leser-Review lief historisch auch DE+EN gemeinsam)."
+        },
+        {
+          "nr": "E-8",
+          "frage": "Owner-gegatete Rahmen-TODOs: Danksagung (diplomarbeit.tex:174/177), Sperrvermerk-Wortlaut+Platzierung (:181), offizielles Aufgabenblatt-PDF statt Platzhalter (:182).",
+          "optionen": "(a) TODOs bleiben stehen, Owner liefert Wortlaute/PDF nach; (b) Agent formuliert Platzhalter-Prosa.",
+          "empfehlung": "(a) — Nur-User-Ideen-Doktrin; im Rückfragen-Schritt terminieren (Sperrvermerk hat TU-Formalia-Wirkung)."
+        },
+        {
+          "nr": "E-9",
+          "frage": "K2-Research-Umfang (Habich): Seitenbudget und Einbau-Form der additiven Cacheline-Awareness-Grundlagen.",
+          "optionen": "(a) 4–5 kompakte Unterabschnitte (~5–8 Seiten) IN die bestehende Sektion 2.2 'Hardware' + neuer kurzer Begriffs-Unterabschnitt in 2.1; (b) eigene neue Top-Level-Sektion 'Grundlagen der Cache-Bewusstheit' zwischen 2.2 und 2.3; (c) Minimal-Variante ~3 Seiten.",
+          "empfehlung": "(a) — wahrt allgemein→speziell und die bestehende Kapitel-Balance; nur die Datenstruktur-Übersicht (cache-conscious/oblivious) als eigener Unterabschnitt, da sie die Brücke zu 2.4 schlägt."
+        },
+        {
+          "nr": "E-10",
+          "frage": "SOLL-Zahlen des laufenden Voll-Bau-4 in die Thesis: 2^17 Organ-Permutationen × 12 System-Perms (O0–O3 × {no_extension,avx2,avx512}) = 1.572.864 Tier-Binaries SOLL; ce-Gate N=318. Aufnehmen, obwohl der Lauf noch nicht abgeschlossen ist?",
+          "optionen": "(a) als geplanten Voll-Umfang mit expliziter SOLL-Kennzeichnung aufnehmen, Ist-Zahlen nach Lauf nachtragen; (b) Zahlen erst nach abgeschlossenem Voll-Bau-4 eintragen.",
+          "empfehlung": "(a) für K5-Methodik (der Umfang ist Design, nicht Ergebnis), (b) für Ergebnis-Abschnitte — deckt sich mit der bestehenden Futur-Formulierungs-Praxis in 5.1/5.2."
+        }
+      ],
+      "k2_research_plan": [
+        {
+          "sektion": "K2-R1: Begrifflichkeiten der Cache-Bewusstheit (neuer Unterabschnitt am Ende von 2.1 oder Beginn 2.2)",
+          "inhalt": "Saubere Taxonomie: cache-aware/cache-conscious (Parameter der Hierarchie explizit im Entwurf), cache-oblivious (asymptotisch gut ohne Parameterkenntnis, vEB-Layout), cache-sensitive (CSS/CSB+-Tradition), Cacheline Awareness als Spezialfall (Layout-Entscheidungen an der Line-Granularität); Abgrenzung aktiv/adaptiv vs. passiv/statisch (Anschluss an FF0); externes-Speicher-Modell (I/O-Modell) vs. ideal-cache-Modell als theoretischer Rahmen.",
+          "quellen_typ": "Paper + Lehrbuch: Frigo/Leiserson/Prokop/Ramachandran 1999 (frigo1999cache, VORHANDEN), Bender et al. (bender2000cobtree/bender2005coboblivious, VORHANDEN), Rao/Ross (rao1999css/rao2000csb, VORHANDEN), Hennessy/Patterson (VORHANDEN); NEU zu beschaffen: Aggarwal/Vitter 1988 (I/O-Modell, CACM) und Chilimbi/Hill/Larus 1999 (Cache-Conscious Structure Layout, PLDI)."
+        },
+        {
+          "sektion": "K2-R2: Cache-Parameter-Katalog inkl. Assoziativität (Erweiterung in 2.2 nach fig:cache-line)",
+          "inhalt": "Die bekannten Parameter systematisch: Line-Größe (vorhanden), Kapazität je Ebene, ASSOZIATIVITÄT (Sets/Ways, direkt-abgebildet bis voll-assoziativ, Konflikt-Misses; fehlt bisher komplett), 3-C-Miss-Klassifikation (compulsory/capacity/conflict), Latenz-Staffel, MSHR/Line-Fill-Buffer als Parallelitätsgrenze, Alignment und False Sharing an der Line-Grenze; je Parameter: statisch (Mikroarchitektur) vs. auslesbar (CPUID/CTR_EL0, vorhanden) — speist die Achsen-Sicht 'Line-Größe als Eingabeparameter der Übersetzung'.",
+          "quellen_typ": "Lehrbuch + Hersteller-Doku: Hennessy/Patterson 2019 (VORHANDEN, 3-C-Modell), Intel SDM + Intel Optimization Manual (intel_sdm/intel_optimization, VORHANDEN), AMD Software Optimization Guide (amd_sog, VORHANDEN), ARM ARM (arm_arm, VORHANDEN), Drepper 2007 (VORHANDEN)."
+        },
+        {
+          "sektion": "K2-R3: Hardware- und Software-Prefetching-Grundlagen (Erweiterung des Prefetch-Absatzes in 2.2)",
+          "inhalt": "Prefetcher-Klassen: adjacent-line, Stream-, Stride-/IP-basiert, DCU-Prefetcher; Trigger-Bedingungen und Grenzen (Seitengrenzen, Streams-Anzahl); Software-Prefetch-Instruktionen (prefetcht0..nta) und der Parameter Prefetch-Distanz; Interaktion mit Pointer-Chasing in Bäumen (warum Tries Prefetcher-feindlich sind) — motiviert die Prefetch-Organ-Achse rückwärtsgerichtet.",
+          "quellen_typ": "Hersteller-Doku + Survey-Paper: Intel Optimization Manual / AMD SOG (VORHANDEN); NEU zu beschaffen: Mittal 2016 'A Survey of Recent Prefetching Techniques for Processor Caches' (ACM CSUR); vorhandene Instanz-Paper chen2001prefetch (pB+-Trees) und zhang2025hierarchical als Brücke zum SOTA."
+        },
+        {
+          "sektion": "K2-R4: Speicherhierarchie-Parameter jenseits des Caches: DRAM, NUMA, TLB-Reach (Erweiterung in 2.2 beim DDR5-/NUMA-Absatz)",
+          "inhalt": "DRAM-Grundparameter: Takt (MT/s) vs. CAS-Latenz und Timings, Kanäle/Sub-Kanäle (DDR5 vorhanden), Bank-Groups; JEDEC-Nennwert vs. XMP/EXPO-Profil (Anschluss an die target_isa-Komplex-Glieder RAM-Frequenz/CAS und die HW-Erkennungs-Achse in K3/K4 — nur Grundlagen, keine Lösungs-Vorwegnahme); NUMA-Topologie, Distanzen, first-touch-Policy; TLB-Reach und Huge Pages als quantitativer Parameter (Reach = Einträge × Seitengröße).",
+          "quellen_typ": "Hersteller-/Standard-Doku + Paper: Micron DDR5 (micron_ddr5, VORHANDEN), Drepper 2007 (VORHANDEN), Intel SDM (VORHANDEN); NEU zu beschaffen: JEDEC JESD79-5 (DDR5) bzw. SPD-Annex-Referenz, Lameter 2013 'NUMA: An Overview' (ACM Queue)."
+        },
+        {
+          "sektion": "K2-R5: Cache-conscious und cache-oblivious Datenstrukturen im Überblick (eigener kurzer Unterabschnitt vor 2.3)",
+          "inhalt": "Verdichtete Linie der Datenstruktur-Antworten auf die Parameter aus R2–R4: CSS/CSB+ (line-genaue Knoten), Knotengrößen-Studien (Hankins/Patel), prefetching B+-Trees (Chen), fractal prefetching (chen2002fractal), Graefe/Larson-B-Baum-Techniken, vEB-Layout/cache-oblivious B-Baum (Bender), SIMD-freundliche Layouts (FAST als Bindeglied zur ISA-Achse); Tabelle: Struktur × adressierter Parameter (mit Legende UNTER dem Float).",
+          "quellen_typ": "Paper: rao1999css, rao2000csb, hankins2003nodesize, chen2001prefetch, chen2002fractal, graefe2001btree, bender2000cobtree/2005 (alle VORHANDEN); NEU zu beschaffen: Kim et al. 2010 'FAST: Fast Architecture Sensitive Tree Search' (SIGMOD), ggf. Ailamaki et al. 1999 'DBMSs on a Modern Processor' (VLDB) als Motivations-Klassiker."
+        },
+        {
+          "sektion": "K2-R6: Mess-Parameter der Cache-Bewusstheit (kurzer Anschluss-Absatz in 2.3 Workloads/Benchmark-Konventionen)",
+          "inhalt": "Die bekannten Beobachtungs-Größen als Grundlagen-Vokabular: Miss-Raten je Ebene, MPKI, IPC/CPI, Stall-Zyklen, Cache-Line-Auslastungs-Ratio (genutzte Bytes je geladener Line); PMC-Grundprinzip und Grenzen (Multiplexing, Domänen bei Hybrid-CPUs) — bereitet die 16 Mess-Kategorien in K3 vor, ohne sie vorwegzunehmen.",
+          "quellen_typ": "Paper + Hersteller-Doku: Hoefler/Belli 2015 (hoefler2015benchmarking, VORHANDEN), Intel SDM Kap. Performance Monitoring (VORHANDEN); NEU optional: perf-Events-Dokumentation (kernel.org) als Werkzeug-Referenz."
+        }
+      ],
+      "kapitel_plan": [
+        {
+          "kapitel": "Aufgabenstellung",
+          "dateien": "aufgabenstellung/de.tex (führend) + aufgabenstellung/en.tex (Sync)",
+          "aenderungen": [
+            "Kommentar Z.72 einarbeiten: die erweiterte Kette (XML-Beginn → automatisierter System-Bau → alle Binary-Permutationen → Auswertung beste System-Binary/-Rekombination → finale Messung → CSV/xlsx → LaTeX/Diagramme) als Erweiterung der Teilaufgaben 3/4 — anforderungssprachlich gemäß E-4 (keine Klassennamen, Linearitäts-Doktrin), danach Kommentar löschen (Schritt 3)",
+            "Die Owner-Präzisierung der Benchmarking-Stufen (7b2dbc9, Z.79-83) sprachlich glätten: die neuen Schachtelsätze ('innerhalb jeder gemeinsamen Interface-Funktion innerhalb seiner Kategorie', 'Algorithmus Kategorie' ohne Bindestrich) in den Ton der Arbeit bringen OHNE inhaltliche Abweichung vom Owner-KERN (Micro = Bestandteil je Interface-Funktion je Kategorie-Hülle + Kategorie-interner Auswertungsvergleich + Latenz-best-practices; Makro = Interface-Operationen als Ganzes)",
+            "Bestands-Tippfehler beheben: 'Entwufsbestandteile' (Z.64), fehlender Satzpunkt Z.65",
+            "Konsistenz-Check der Verweise Kapitel~\\ref{ch:foundations}/\\ref{ch:measurement} (Z.56-57) mit dem finalen Kapitel-Schnitt",
+            "EN-Voll-Sync: en.tex trägt noch die alte Micro-/Makro-Formulierung (en.tex:68) und keinen Ketten-Punkt"
+          ],
+          "abhaengig_von": "Owner-Antworten E-4 (Formulierungsform der Kette)",
+          "aufwand": "M"
+        },
+        {
+          "kapitel": "K1 Einleitung",
+          "dateien": "kapitel/de/01_einleitung.tex + kapitel/en/01_einleitung.tex",
+          "aenderungen": [
+            "Kommentar Z.51: fig:separability hinter das Absatz-Ende verschieben (Figur trennt derzeit den Trennbarkeits-Problem-Satz); gleiche Prüfung für fig:cache-wall in der Motivation",
+            "Kommentar Z.74: Forschungsfragen-Sektion nach Achsen-Kategorien auftrennen (Mess-/System-/Organ-Achsen als explizite Gliederung der FFs bzw. Teilfragen, je Kategorie eigener Belang nach Code-Kenntnisstand) — Schnitt gemäß Owner-Antwort E-2",
+            "Kommentar Z.115: in der FF3-Teilfrage Haupt-/Unterachsen indirekt andeuten: Latenz-kritische Messungen erzwingen die Lösung von Laufzeit-Wahlen durch Compile-Time-Anforderungen (Brücke zu FF4)",
+            "Kommentar Z.100 gemäß Owner-Antwort E-3 auflösen",
+            "Beiträge-Liste (sec:contributions) Fakten-Nachzug gemäß E-1: Achsen-Zählung, drei System-Haupt-Achsen, Planer+CacheEngineBuilder in der Beitragsformulierung (Abstract nennt sie seit 7fef45c — K1 muss nachziehen), HW-Erkennung als zweigeteilte Mess-Achse im Beitrags- oder Ausblicks-Punkt",
+            "Aufbau-der-Arbeit-Absatz an neue K2-Unterabschnitte (K2-R1..R6) und ggf. neuen FF-Schnitt anpassen",
+            "EN-Sync aller Punkte; die 4 Owner-Kommentare existieren nur in DE"
+          ],
+          "abhaengig_von": "Aufgabenstellung (Ketten-Wortlaut), Owner-Antworten E-1/E-2/E-3",
+          "aufwand": "L"
+        },
+        {
+          "kapitel": "K2 Suchbäume und Grundlagen",
+          "dateien": "kapitel/de/02_suchbaeume_grundlagen.tex + kapitel/en/02_suchbaeume_grundlagen.tex + literatur.bib",
+          "aenderungen": [
+            "Habich-Auftrag: additive Grundlagen-Sektionen K2-R1..K2-R6 gemäß K2-Research-Plan einziehen (Begrifflichkeiten, Parameter-Katalog inkl. Assoziativität, Prefetching, DRAM/NUMA/TLB-Parameter, cache-conscious/oblivious Datenstrukturen, Mess-Parameter) — Deep-Web-Research + Bib-Erweiterung in Schritt 3",
+            "Rückwärts-Verweis-Regel wahren: neue Unterabschnitte referenzieren nur K1 und frühere K2-Teile; KEINE Vorwärts-Vorwegnahme der Achsen-Lösung (nur 'Parameter existieren und sind auslesbar')",
+            "Tabellen-Legenden unter dem Float (Doktrin) für die neue Struktur-×-Parameter-Tabelle",
+            "EN-Sync der neuen Sektionen im selben Paket"
+          ],
+          "abhaengig_von": "Owner-Antwort E-9 (Umfang); unabhängig von K1-Inhalt, aber sequenziell nach K1",
+          "aufwand": "L"
+        },
+        {
+          "kapitel": "K3 Konzepte eines cache-aware Mess-Systems",
+          "dateien": "kapitel/de/03_messsystem_prtart.tex + kapitel/en/03_messsystem_prtart.tex",
+          "aenderungen": [
+            "Achsen-Neuordnung konzeptionell nachziehen (größter Einzelposten, gemäß E-1): kanonische Ordnung Mess-Tooling → target_isa → operating_system → external_utils → Organ T00–T17; ZWEI Realm-Wurzeln (Mess-Realm am Planer / System-Realm an der CEB) statt der bisherigen einen Blut-Metapher-Darstellung; external_utils als Hub der System-Meta-Metas (SIMD/AVX-Familie, externe HW)",
+            "target_isa als KOMPLEX-Achse in sich: feste Glieder RAM-Frequenz+CAS+CPU-Fabrikation als statische Komplex-Identität, Unter-System-Achsen (scheduling, numa_node, page) am Komplex-Wrapper (Ledger §69.2)",
+            "load_framework-Umzug: vom System- in den Mess-Realm (Meta-Meta-Hauptachse der Mess-Achsen; Planer generiert Loads, delegiert ans CEB-Interface — §69.1); telemetry-Zweiteilung (Mess-Unter-Achse UND Haupt-System-Achse, §69.3)",
+            "Kette präzisieren: XML als EINE Quelle → Planer (baut zur Laufzeit je Plattform×Mess-Aufgabe eine CEB) → CacheEngineBuilder (orchestriert mit einkompilierten Mess-Achsen den Bau der Tier-Binaries) → Tier-Binary — Ein-Hauptkanal-Doktrin §73; deckt den Aufgabenstellungs-Ketten-Kommentar konzeptseitig ab",
+            "NEU: HW-Erkennung als weitere ZWEIGETEILTE MESS-Achse (Owner-Spec 27.07. final): Planer-RT erkennt ISA-Vendor-Familie×OS grob und kompiliert per Metaprogrammierung passende feingranulare Erkennung + OS-Handles in die CEB ein; CEB-RT erhebt (CoR-Kette Boot-Cache-DMI → SPD → declared, mit Provenienz) und setzt die CT-Stempel der Tier-Binaries; System-/Organ-Achsen bleiben unberührt; Passungs-Stempel ISA-Familie×OS (gemäß E-6)",
+            "Stempel-/Identitäts-Modell aktualisieren: je Achsen-Typ eine Array-Stempel-Zeile, Komplex-Achse = EIN Feld (§70.7), System-Achsen tragen build_version (§70.6); 18er-Organ-Stempel-Zeile",
+            "Zahlen prüfen: '16 Mess-Kategorien' und Permutationsraum-Angaben (Z.1122) gegen Code-Ist; Abbildungen fig:design-space/fig:three-levels/fig:genera auf neue Achsen-Zählung anpassen",
+            "EN-Sync im selben Paket"
+          ],
+          "abhaengig_von": "K1 (FF-Schnitt), Owner-Antworten E-1/E-6",
+          "aufwand": "L"
+        },
+        {
+          "kapitel": "K4 Implementierung",
+          "dateien": "kapitel/de/04_implementierung.tex + kapitel/en/04_implementierung.tex",
+          "aenderungen": [
+            "sec:impl-system-axes umbauen: kSystemAxisOrder mit DREI System-Haupt-Gliedern als Ordnungs-Single-Source, measurement_meta_meta als eigene AxisKind-Kategorie, Mess-Registry-Zweiteilung — Prüfung, ob die 16-Kategorien/2-Regime-Darstellung nach O-8 noch exakt stimmt (gegen ce-Code-Ist verifizieren, nie raten)",
+            "Achsen-Galerie fig:axes-gallery + UML-Landkarte auf neue Zählung/Ordnung anpassen (E-1); 'neunzehn/siebzehn'-Stellen (Z.127-133, 268)",
+            "Bau-Kette nachziehen: built_stem/plan-dump v1.1, CLI-Subcommands (validate/plan ci/tier ci) statt Alt-Flags, V-3/V-4-Retire des Permutations-Alt-Kanals (comdare_permutation_codegen_cli gestrichen; Ein-Hauptkanal C++23-Metaprogrammierung, CMake sparsam — §71/§73)",
+            "QS-Abschnitt: Zwei-Gate-Modell knapp aufnehmen (ce-standalone scharf, N=318, CRC64-Doppellauf-Anker; super-Integrations-Gate mit eingefrorener 5er-Namensmenge) gemäß E-5",
+            "HW-Erkennung P1-Ist: Provenienz-Vokabular, RamFrequencyReading, HardwareProbe-Fehlerdomäne, SPD-DDR5-Parser (<200 Zeilen, span-Funktion, kein Vendoring) + THESIS-EHRLICHKEITSNOTE (4800 = eingefrorenes dmidecode-Ergebnis; Gewinn = automatisierte Wiedervorlage mit Provenienz) — E-6",
+            "E-2-Schlüsselwechsel ddr4_2x32→ddr5_2x32 nur falls Maschinen-Deklarationen im Text vorkommen (prüfen)",
+            "EN-Sync im selben Paket"
+          ],
+          "abhaengig_von": "K3 (Konzept-Begriffe müssen vorher eingeführt sein — Rückwärts-Verweise), Owner-Antworten E-1/E-5/E-6",
+          "aufwand": "L"
+        },
+        {
+          "kapitel": "K5 Evaluation",
+          "dateien": "kapitel/de/05_evaluation.tex + kapitel/en/05_evaluation.tex",
+          "aenderungen": [
+            "Methodik-Nachzug: Voll-Bau-Umfang als SOLL kennzeichnen (2^17 = 131.072 Organ-Permutationen × 12 System-Perms O0–O3 × {no_extension,avx2,avx512} = 1.572.864 Tier-Binaries; avx512-Ausschluss nur maschinenseitig mit Warnung, nie stiller Filter) gemäß E-10",
+            "KERN-Mess-Schema des Prüflings (replace/merge/fulljoin) in der Reihen-Beschreibung verankern (Reihe B nennt Full Join bereits — konsistent machen)",
+            "Mess-Betrieb: Messung getrennt vom Bau (measure-Jobs manuell/inert), 1-Thread-Mess-Doktrin vs. paralleler Debug-Bau — knapp als Fairness-Argument (E-5)",
+            "xlsx-Doktrin: CSV/xlsx als Auswerte-Default in der Pipeline-Beschreibung ergänzen (Owner-Ketten-Kommentar nennt CSV/xlsx ausdrücklich)",
+            "Kommentar Z.165-169 (input-Platzhalter nach erstem messung_driver-Lauf) bleibt bis zur Messdaten-Einspeisung stehen — NICHT löschen, ist Arbeits-Anker für die Ergebnis-Sektion",
+            "Plattform-Absatz gegen Ist prüfen (prod1 Ryzen 9950X3D/prod2-Zwei-Maschinen-Betrieb, zwei OS-Regimes) — nur belegbare Fakten",
+            "EN-Sync im selben Paket"
+          ],
+          "abhaengig_von": "K3/K4 (Begriffe Planer/CEB/Stempel), Owner-Antworten E-5/E-10",
+          "aufwand": "M"
+        },
+        {
+          "kapitel": "K6 Fazit und Ausblick",
+          "dateien": "kapitel/de/06_fazit.tex + kapitel/en/06_fazit.tex",
+          "aenderungen": [
+            "FF-Antworten an den neuen FF-Schnitt aus K1 anpassen (E-2); FF1-Antwort: Achsen-Aufzählung und Konfigurationsraum-Zahl auf neue Ordnung (E-1); 'siebzehn Vertragsoperationen'-Stellen prüfen",
+            "FF4-Antwort: Compile-Time-Antwort um die zweigeteilten Haupt-Achsen (Planer-RT/CEB-CT) und den Passungs-Stempel ergänzen — die Frage 'ISA+OS-optimierte Binaries' hat jetzt eine konkrete Architektur-Antwort",
+            "Limitierungen/Ausblick: HW-Erkennung P2–P6 (ruhend), 320er-Abgabemessung nach Voll-Bau-4, best_binary_selector-Stand konsistent mit K1-Beiträgen",
+            "EN-Sync im selben Paket"
+          ],
+          "abhaengig_von": "K1 (FF-Schnitt) + K5 (Ergebnis-Stand); letztes Text-Kapitel",
+          "aufwand": "M"
+        },
+        {
+          "kapitel": "Anhänge A–F",
+          "dateien": "anhang/de/*.tex + anhang/en/*.tex",
+          "aenderungen": [
+            "B_code_structure: Repo-/Modul-Struktur nach O-8 prüfen (System-Achsen-Dateien, Registry-Gen-Werkzeuge mit comdare_-Präfix); Zwei-Gate-Details hier statt in K4 (E-5)",
+            "D_building_block_matrix: Matrix gegen die bindende Achsen-Sortierung und 18er-Organ-Zeile prüfen (E-1); T-Nummern-Mapping dokumentieren falls Umbenennung",
+            "C_glossary: neue Begriffe ergänzen (Mess-Realm, Komplex-Achse, Passungs-Stempel, Provenienz-Stufe, built_stem, Zwei-Gate, Planer, CacheEngineBuilder als Glossar-Einträge sofern nicht vorhanden)",
+            "A_measurements: bleibt bis echte neue Messdaten (Alt-Mess-CSV = Archiv-Doktrin); nur Verweis-Konsistenz",
+            "E/F: Verweis- und Begriffskonsistenz-Pass nach Kapitel-Umbau",
+            "EN-Sync je Anhang"
+          ],
+          "abhaengig_von": "K3/K4 (Begriffe + finale Achsen-Ordnung)",
+          "aufwand": "M"
+        },
+        {
+          "kapitel": "Rahmen (diplomarbeit.tex)",
+          "dateien": "diplomarbeit.tex",
+          "aenderungen": [
+            "EN-Abstract-Sync der Owner-Korrekturen 7fef45c: 'three-layer abstraction WITHIN the produced Tier binary', 'by means of a Planner and a CacheEngineBuilder', 'compile-time permutation' — DE-Abstract ist führend korrigiert, EN trägt noch die alte Fassung",
+            "Abstract-Konsistenz-Pass NACH K1/K3-Umbau (Achsen-Zählung im Abstract prüfen — E-1)",
+            "TODOs Danksagung/Sperrvermerk/Aufgabenblatt-PDF gemäß Owner-Antwort E-8 (bleiben bzw. Owner liefert)",
+            "Skelett-Platzhalter-Makros (\\bildPH/\\inhaltPH) auf Rest-Nutzung prüfen; falls 0 Verwendungen: Kandidat für Abschluss-Aufräumpass (nur mit Beleg)"
+          ],
+          "abhaengig_von": "K1/K3 (finale Zählung), Owner-Antwort E-8",
+          "aufwand": "S"
+        }
+      ],
+      "kommentar_inventar": [
+        {
+          "datei": "aufgabenstellung/de.tex",
+          "zeile": 72,
+          "wortlaut": "% Wir haben in einer Erweiterung definiert, dass die Kette nun per XML beginnt und daraus mithilfe eines Planers eine CacheEngineBuilder für das betreffende System baut, die dann ihrerseits alle erdenklichen Binary Permutationen baut, die dann auf die beste gemessene System-Binary und System-Binary-Rekombination auswerten, die dann per finaler Messung der einen Binary oder hybrid-Binary-Rekombinationen eine Auswertung über CSV/xlsx Dateien generieren, die dann in Latex und Diagramme übersetzt werden.",
+          "deutung": "Owner-Auftrag (Commit ba0eb57 'Vollständige Kette der Implementierung einpflegen'): die erweiterte End-zu-End-Kette XML → Planer → CacheEngineBuilder → alle Binary-Permutationen → Auswertung beste System-Binary/-Rekombination → finale Messung → CSV/xlsx → LaTeX/Diagramme soll in die Aufgabenstellung (Teilaufgaben) eingepflegt werden. Spannungsfeld: Doktrin 'Aufgabenstellung nimmt die Lösung nicht vorweg' + Datei-Kopf verbietet Lösungs-Vokabular → Rückfrage E-4 (anforderungssprachliche Fassung empfohlen). Konzept-/Impl-Seite der Kette gehört zusätzlich nach K3/K4.",
+          "betroffene_stellen": "aufgabenstellung/de.tex Teilaufgaben 3/4 (Z.70-75) + aufgabenstellung/en.tex (Sync); nachgelagert K1 sec:contributions, K3 sec:measurement-system (Vier-Subsysteme-Absatz), K4 sec:impl-pipeline, K5 sec:eval-results (CSV/xlsx)"
+        },
+        {
+          "datei": "kapitel/de/01_einleitung.tex",
+          "zeile": 51,
+          "wortlaut": "% Beim Gegenlesen trennt diese Figur einen Satz ungünstig in der Mitte. Die Figur sollte nach einem ganzen Satz eingeblendet werden.",
+          "deutung": "Layout-Befund des Owners: fig:separability (Z.52-63) unterbricht den Trennbarkeits-Problem-Absatz mitten im Satzfluss. Figur-Environment hinter das Absatz-Ende (nach Z.72 bzw. an die nächste Satzgrenze) verschieben; da [htbp] float, genügt das Verschieben des Quelltext-Blocks. Analog fig:cache-wall in sec:motivation prüfen (gleiche Bauform, Z.11-21).",
+          "betroffene_stellen": "kapitel/de/01_einleitung.tex sec:problem (Z.47-72) + kapitel/en/01_einleitung.tex (gleiche Figur-Position)"
+        },
+        {
+          "datei": "kapitel/de/01_einleitung.tex",
+          "zeile": 74,
+          "wortlaut": "% Die Forschungsfragen müssen in Richtung der Trennung ser Mess-, System- und Organ-Achsen erweitert überarbeitet und aufgetrennt werden. Die Belange jeder Achsen-Kategorie müssen einzeln nach dem neuen Kenntnisstand des Codes berücksichtigt werden.",
+          "deutung": "Kern-Auftrag (Commit 683476a 'Anforderungen Haupt- vs. Unterachsen'; 'ser' = Tippfehler für 'der'): Die FF-Sektion soll die DREI Achsen-Kategorien (Mess-Achsen am Planer / System-Achsen an der CEB / Organ-Achsen T00–T17) explizit trennen und je Kategorie eigene Fragen/Teilfragen nach dem neuen Code-Kenntnisstand (O-8-Neuordnung, Ledger §68-§70) formulieren. Schnitt-Tiefe = Rückfrage E-2.",
+          "betroffene_stellen": "kapitel/de/01_einleitung.tex sec:rqs komplett (Z.75-123); Folge-Anpassung K6 sec:answers (FF-Antworten), Aufgabenstellung (FF-Bezug), K3 (Achsen-Kategorien-Begriffe müssen dazu rückwärts-referenzierbar aus K1 heraus eingeführt sein — Reihenfolge beachten: K1 darf nur andeuten, K3 definiert)"
+        },
+        {
+          "datei": "kapitel/de/01_einleitung.tex",
+          "zeile": 100,
+          "wortlaut": "% Wie sieht es unter diesem Punkt auch neben der ",
+          "deutung": "ABGEBROCHENER Owner-Kommentar unter der FF2-Teilfrage (Knoten-/Cache-Line-Größe) — Satz endet mitten im Ausdruck, Intention nicht rekonstruierbar (vermutlich eine zusätzliche Teilfrage-Dimension neben der Cache-Line-Größe). Darf NICHT erraten werden (Nur-User-Ideen-Doktrin) → Rückfrage E-3.",
+          "betroffene_stellen": "kapitel/de/01_einleitung.tex FF2-Teilfrage (Z.96-99); Auflösung erst nach Owner-Vervollständigung"
+        },
+        {
+          "datei": "kapitel/de/01_einleitung.tex",
+          "zeile": 115,
+          "wortlaut": "% Die Hauptachsen und Unterachsen müssen hier in der Frage schon indirekt angedeutet werden, dass für Latenz-kritische Messungen Laufzeitmessungen durch Compile-time Anforderungen gelöst werden müssen.",
+          "deutung": "Owner-Auftrag zur FF3-Teilfrage (lokale Seitendarstellung/Umschaltregeln): Die Frage soll das Haupt-/Unterachsen-Prinzip andeuten — Latenz-kritische Messungen erzwingen, dass Laufzeit-Wahlen durch Compile-Time-Anforderungen (Haupt-Achse = CT, Unter-Achse = RT-Draht) gelöst werden. Schlägt die Brücke zu FF4 (CT vs. RT), ohne die Lösung explizit vorwegzunehmen ('indirekt angedeutet').",
+          "betroffene_stellen": "kapitel/de/01_einleitung.tex FF3-Teilfrage (Z.110-114) + Übergang zu FF4 (Z.116-122); EN-Pendant"
+        },
+        {
+          "datei": "kapitel/de/05_evaluation.tex",
+          "zeile": 165,
+          "wortlaut": "% Nach dem ersten messung_driver-Lauf hier einfuegen:\\n%   \\\\input{tikz/A_full/cycles_per_permutation.tikz}\\n%   \\\\input{tabellen/A_full_summary.tex}\\n%   \\\\input{tikz/B_cache_engine_perms/heatmap.tikz}\\n%   \\\\input{tikz/C_merge/comparison.tikz}",
+          "deutung": "Älterer Arbeits-Anker (kein neuer Owner-Kommentar): Einspeise-Stellen für die realen Messdaten der Reihen A/B/C nach dem ersten vollständigen Mess-Lauf. BLEIBT bis zur Messdaten-Einspeisung stehen (nicht Teil der Lösch-Checkliste von Schritt 3, sondern des späteren Messdaten-Nachzugs nach Voll-Bau-4/320er-Messung).",
+          "betroffene_stellen": "kapitel/de/05_evaluation.tex sec:eval-results + anhang A_measurements; EN-Pendant"
+        },
+        {
+          "datei": "diplomarbeit.tex",
+          "zeile": 174,
+          "wortlaut": "\\acknowledgments{% TODO: Danksagung ausformulieren.\\n  Platzhalter -- Danksagung folgt.} (EN-Zwilling Z.177: % TODO: write the acknowledgments.)",
+          "deutung": "Owner-gegateter Alt-TODO: Danksagung fehlt in beiden Sprachen. Nicht vom Agenten formulierbar (persönlicher Text) → Rückfrage E-8, Owner liefert Wortlaut.",
+          "betroffene_stellen": "diplomarbeit.tex Z.173-179 (beide Sprachzweige)"
+        },
+        {
+          "datei": "diplomarbeit.tex",
+          "zeile": 181,
+          "wortlaut": "% TODO(Sperrvermerk): confidentiality notice requested -- provide wording + placement.",
+          "deutung": "Owner-gegateter Alt-TODO: Ein Sperrvermerk (Vertraulichkeitsvermerk) wurde angefordert; Wortlaut und Platzierung fehlen. Formalia-relevant für die Abgabe → Rückfrage E-8.",
+          "betroffene_stellen": "diplomarbeit.tex Präambel/Titelei; ggf. zihpub.cls-Mechanik prüfen"
+        },
+        {
+          "datei": "diplomarbeit.tex",
+          "zeile": 182,
+          "wortlaut": "% TODO(Aufgabenstellung): bind official task sheet (PDF) instead of the placeholder.",
+          "deutung": "Owner-gegateter Alt-TODO: Das offizielle Aufgabenblatt (PDF der Professur) soll den konsolidierten Platzhalter aufgabenstellung/de|en.tex ersetzen bzw. eingebunden werden. Bis dahin bleibt der Platzhalter die zu pflegende Fassung (daher Kommentar Z.72 dort einarbeiten) → Rückfrage E-8.",
+          "betroffene_stellen": "diplomarbeit.tex Z.104-110 (\\aufgabenstellung-Block) + aufgabenstellung/*"
+        }
+      ],
+      "struktur": "REPO-IST (HEAD 06ac320, development): Rahmen diplomarbeit.tex mit Sprachschalter \\thesislang (config/language.tex, Default 'en'; build.ps1 -Lang de|en) — EINE Quelle, zwei Builds (diplomarbeit-de.pdf/-en.pdf). Include-Reihenfolge ist für BEIDE Sprachen identisch (kapitel/<lang>/...): 01_einleitung → 02_suchbaeume_grundlagen → 03_messsystem_prtart → 04_implementierung → 05_evaluation → 06_fazit; danach \\appendix + anhang/<lang>/A_measurements..F_comparison_interfaces. Aufgabenstellung via \\aufgabenstellung{\\input{aufgabenstellung/de|en}}; Abstract DE+EN direkt im Rahmen. WICHTIGE KORREKTUR zur Auftrags-Annahme: Der EN-Kapitelschnitt weicht NICHT ab — kapitel/en/ enthält englischsprachige 1:1-Zwillinge mit denselben 6er-Basenamen und identischen Labels (ch:intro, ch:foundations, ch:measurement, ch:impl, ch:eval, ch:conclusion); z.B. ist kapitel/en/01_einleitung.tex das englische 'Introduction'. Die 8er-Dateien (01_introduction, 02_fundamentals, 03_state_of_the_art, 04_concept_architecture, 05_implementation, 06_evaluation_methodology, 07_results_evaluation, 08_conclusion) liegen in BEIDEN Sprachordnern als UN-INCLUDETE Alt-Inhaltsquellen der Habich-Restruktur 2026-06-29 (8→6; Kommentar diplomarbeit.tex:213-214). Mapping alt→neu: 01_introduction→01_einleitung · 02_fundamentals→02_suchbaeume_grundlagen · 03_state_of_the_art→03_messsystem_prtart §3.2 (sec:sota-instances) · 04_concept_architecture→03_messsystem_prtart §3.3-3.6 · 05_implementation→04_implementierung · 06_evaluation_methodology+07_results_evaluation→05_evaluation §5.1/§5.2 · 08_conclusion→06_fazit. DE↔EN-Sync-Einheit = gleicher Basename in beiden Ordnern; EN zuletzt am 13.07. angefasst — ALLE Owner-Änderungen seit 28.07. existieren nur in DE. 4-TAGE-DIFF (ef448e4..development --since=2026-07-28): genau 4 Owner-Commits + 1 Merge: (1) ba0eb57 30.07. 'Vollständige Kette der Implementierung einpflegen' = Ketten-Kommentar in aufgabenstellung/de.tex:72 (XML→Planer→CEB→Permutationen→beste Binary→CSV/xlsx→LaTeX); (2) 7b2dbc9 30.07. 'Präzisierung der Benchmarking Stufen' = TEXT-Änderung der Micro-/Makro-Definitionen in aufgabenstellung/de.tex:79-83 (Micro: je Entwurfsbestandteil innerhalb Suchalgorithmus- UND Algorithmus-Kategorie-Hülle je gemeinsamer Interface-Funktion, plus kategorie-interner Auswertungsvergleich unter Latenz-best-practices; Makro: Interface-Operationen des Algorithmus ALS GANZES über die Interface-Funktionen der Kategorie); (3) 7fef45c 30.07. 'Abstract corrections' = DE-Abstract präzisiert (Drei-Schichten-Abstraktion INNERHALB der erzeugten Tier-Binary; Zerlegung MITHILFE eines Planers und einer CacheEngineBuilder; compile-Permutation statt Permutation) — EN-Abstract NICHT nachgezogen; (4) 683476a 31.07. 'Anforderungen Haupt- vs. Unterachsen' = 4 Kommentare in kapitel/de/01_einleitung.tex (Z.51 Figur-Platzierung, Z.74 FF-Auftrennung nach Mess-/System-/Organ-Achsen, Z.100 abgebrochener Satz, Z.115 Haupt-/Unterachsen+CT-Andeutung in FF3). INHALTLICHE FOLGE: Der Owner zieht die Arbeit auf den neuen Achsen-Kenntnisstand (Planer/CEB-Kette, Haupt- vs. Unterachsen, Achsen-Kategorien-Trennung) — exakt die O-8-/§68-§70-Neuordnung der Implementierung; der Nachzug muss Aufgabenstellung→K1(FFs)→K3(Achsen-Modell)→K4(Code)→K6(Antworten) in dieser Reihenfolge durchziehen, DE führend, EN je Kapitel synchron.",
+      "ton_referenz": "Ziel-Ton = wissenschaftlich-präzise, bildhaft aber ehrlich, mit Gedankenstrich-Einschüben und em-dash-Struktur; Ehrlichkeits-Ausweis von Lücken gehört zum Stil. Wörtliche Eich-Sätze: (1) \"Cache-Bewusstheit ist in heutigen Suchstrukturen entweder fest verdrahtet oder ganz ignoriert; vor allem aber lässt sich nicht \\emph{trennen}, welche einzelne Entwurfsentscheidung welchem Lastmuster nützt --- das \\emph{Trennbarkeits-Problem}, der rote Faden dieser Arbeit.\" (kapitel/de/01_einleitung.tex:48-50). (2) \"Für ein cache-line-bewusstes Layout ist die je Zielplattform ermittelte Line-Größe daher ein \\emph{Eingabeparameter der Übersetzung}, keine feste Annahme.\" (kapitel/de/02_suchbaeume_grundlagen.tex:135-136). (3) \"System-Achsen sind nicht permutierbar (sie sind nicht austauschbare, zentrale Systembestandteile); sie stehen nicht im Permutationsbaum; und sie berühren niemals die Binary-Identität --- kein Mess-Instrument darf verändern, \\emph{was} gebaut wird.\" (kapitel/de/03_messsystem_prtart.tex:938-940). (4) \"Lieber eine als ungültig markierte Messung als ein erfundener Effekt: Ein Phantomwert würde die Heuristik-Ableitung (Abschnitt~\\ref{sec:heuristics}) systematisch vergiften, während eine ehrliche Lücke sichtbar bleibt und gezielt geschlossen werden kann.\" (kapitel/de/03_messsystem_prtart.tex:959-961). (5) \"Fehlende Fähigkeiten einer Baseline --- etwa Bereichs-Scans einer Hash-Tabelle --- werden als N/A ausgewiesen statt verdeckt emuliert; für jede Fremdbibliothek werden Compiler, Flags, ISA-Pfad, Allokator und Commit-Hash mitgeloggt [...]\" (kapitel/de/05_evaluation.tex:90-93)."
+    },
+    "diffpruef": {
+      "owner_aenderungen": [
+        {
+          "commit": "ba0eb57",
+          "datei": "aufgabenstellung/de.tex",
+          "was": "Neue Ketten-Definition als LaTeX-Kommentarzeile: XML -> Planer -> CacheEngineBuilder je System -> alle Binary-Permutationen -> Auswertung auf beste System-Binary und System-Binary-Rekombination -> finale Messung (eine Binary oder hybrid-Binary-Rekombinationen) -> CSV/xlsx -> LaTeX/Diagramme. Faktentragend trotz Kommentar-Form (Commit-Titel: Vollstaendige Kette der Implementierung einpflegen)."
+        },
+        {
+          "commit": "7b2dbc9",
+          "datei": "aufgabenstellung/de.tex",
+          "was": "Praezisierung Micro-/Makro-Benchmarking: Micro neu je Entwurfsbestandteil innerhalb Suchalgorithmus- UND Algorithmus-Kategorie-Huelle, innerhalb JEDER gemeinsamen Interface-Funktion, plus Auswertungsvergleich der Kategorie-Algorithmen untereinander und Latenz-best-practices; Makro neu ueber die Interface-Funktionen der Algorithmus-Kategorie (Einfuegen, Punktsuche, Loeschen)."
+        },
+        {
+          "commit": "7fef45c",
+          "datei": "diplomarbeit.tex",
+          "was": "Abstract-Korrekturen: (a) dreischichtige Abstraktion jetzt 'innerhalb der erzeugten Tier-Binary' verortet, (b) Zerlegung 'mithilfe eines Planers und einer CacheEngineBuilder', (c) 'compile-Permutation (keine Laufzeit-Adaption)' statt nur 'Permutation'."
+        },
+        {
+          "commit": "683476a",
+          "datei": "kapitel/de/01_einleitung.tex",
+          "was": "Vier LaTeX-Kommentar-TODOs: Figur-Platzierung; Forschungsfragen nach Mess-/System-/Organ-Achsen auftrennen; Haupt-/Unterachsen in FF andeuten (Latenz-kritische Messungen via Compile-time loesen); ein abgebrochenes Satz-Fragment unter FF2."
+        },
+        {
+          "commit": "06ac320",
+          "datei": "anhang/*, kapitel/* (DE+EN)",
+          "was": "Merge github/main (Overleaf-Linie 31.07.) in die gitlab-Linie; Konflikt-Resolution Anhang B/E zugunsten der neueren Overleaf-Fassung. Kein neuer Owner-Text seit 28.07. jenseits der vier Commits; unterlegene Fassung bleibt unter ef448e4 rueckholbar."
+        }
+      ],
+      "stimmigkeits_befunde": [
+        {
+          "stelle": "diplomarbeit.tex Abstract (7fef45c)",
+          "thesis_aussage": "dahinter liegt eine dreischichtige Abstraktion innerhalb der erzeugten Tier-Binary (CacheEngine -> ExecutionEngine -> SearchEngine), die die Such-API bereitstellt",
+          "impl_ist": "Schichtung liegt tier-binary-seitig: libs/cache_engine/anatomy/idriveable_tier.hpp:8 (IMMER in jeder Tier-Binary einkompiliert), anatomy/abi_adapter.hpp (SearchAlgorithmAbiAdapter ueber der Anatomie, ABI-Such-Sicht), execution_engine/execution_engine_base.hpp:2-15 (ExecutionEngine als Wurzel, IAnatomyBase : IExecutionEngine), abi/cache_engine_execution_engine_adapter.hpp:2-9 (CacheEngine selbst ExecutionEngine). Nuance: api::ICacheEngine (api/i_cache_engine.hpp:96ff) ist explizit host-/builder-seitige Fassade NICHT im Hot-Path — dokumentiert als anderer Typ (R3-Abgrenzung), kein Konflikt.",
+          "verdikt": "stimmig"
+        },
+        {
+          "stelle": "diplomarbeit.tex Abstract (7fef45c)",
+          "thesis_aussage": "zerlegt ... mithilfe eines Planers und einer CacheEngineBuilder in austauschbare ... Entwurfsentscheidungen",
+          "impl_ist": "Beide Instanzen existieren namensgleich: libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:3 (der EINE benannte Planer-Walk, planner_version.hpp) und builder/ceb_version_stamp.hpp:3 ('(CacheEngineBuilder) ... der Planer schon: planner_version.hpp'); Kette Planer->CEB->Tier gemaess Ledger §38-Kanon.",
+          "verdikt": "stimmig"
+        },
+        {
+          "stelle": "diplomarbeit.tex Abstract (7fef45c)",
+          "thesis_aussage": "durch dynamische Zusammensetzung mittels compile-Permutation (keine Laufzeit-Adaption)",
+          "impl_ist": "CT-Doktrin durchgesetzt: abi/algorithm_baustein.hpp:2-4 (§23-Quarantaene: Runtime-Tag-Variante VERBOTEN, Live-Weg monomorphe CRTP+Concept-Achsen), measurement_tooling_registry.hpp:13 (KEIN Runtime-Switch), anatomy/search_algorithm_permutation_engine.hpp. HW-Erkennung zur Planer-/CEB-Laufzeit (PLAN 27.07. Zwei-Ebenen, Nachtrag 3: zweigeteilte MESS-Achse) betrifft die Bau-Zeit-Wahl der CT-Plattform, nicht Laufzeit-Adaption der Tier-Binary — kein Widerspruch.",
+          "verdikt": "stimmig"
+        },
+        {
+          "stelle": "aufgabenstellung/de.tex Micro-Benchmarking (7b2dbc9)",
+          "thesis_aussage": "jeder einzelne Entwurfsbestandteil ... innerhalb der Algorithmus-Kategorie-Huelle wird innerhalb jeder gemeinsamen Interface-Funktion ... isoliert gegen Lastprofile gemessen, Auswertungsvergleich der Algorithmen der Kategorie der Interface-Funktion untereinander wird durchgefuehrt",
+          "impl_ist": "Micro-Tooling (PMC) und Bestandteil-Aufloesung existieren (measurement_tooling_registry.hpp:28; measurement_category.hpp:34-58 AlgoDetail; Latenz-P50/P95/P99/P999 Zeilen 20-23), ABER MeasurementRecord (measurement/measurement_record.hpp:11-21) traegt KEIN Interface-Funktions-/Op-Feld — Bestandteil x Interface-Funktion ist im 32-Byte-Record nicht darstellbar; per-Op-Metriken (insert/lookup/erase/scan/rmw) existieren nur binary-weit im WIDE-CSV (builder/best_binary_selector/best_binary_selector.hpp:8,143), nicht je Entwurfsbestandteil. Owner-Text ist Gesetz: Mess-Schema/Auswertung muss die (Bestandteil x Interface-Funktion)-Aufloesung plus Kategorie-internen Vergleich nachziehen.",
+          "verdikt": "impl_muss_nachziehen"
+        },
+        {
+          "stelle": "aufgabenstellung/de.tex Makro-Benchmarking (7b2dbc9)",
+          "thesis_aussage": "die einzelnen Interface-Operationen des Suchalgorithmus als Ganzes werden gegen Beispiellasten ... ueber die Interface-Funktionen der Algorithmus Kategorie, z.B. Einfuegen, Punktsuche, Loeschen gemessen",
+          "impl_ist": "Gedeckt: measurement_tooling_registry.hpp:27 (Macro = Ende-zu-Ende ueber Observer), best_binary_selector.hpp:143 (enum Metric {ns_per_op, insert, lookup, erase, scan, rmw} als Vergleichs-Strategy), anatomy/observable_tier.hpp:176 (CEB treibt Gattungs-API tier_insert/lookup des Tier-Moduls).",
+          "verdikt": "stimmig"
+        },
+        {
+          "stelle": "aufgabenstellung/de.tex Ketten-Kommentar (ba0eb57)",
+          "thesis_aussage": "Kette beginnt per XML, Planer baut daraus eine CacheEngineBuilder fuer das betreffende System, die alle erdenklichen Binary-Permutationen baut, Auswertung auf die beste gemessene System-Binary und System-Binary-Rekombination, finale Messung ... Auswertung ... die dann in Latex und Diagramme uebersetzt werden",
+          "impl_ist": "Kette vorhanden: xml_config_parser (cx::ExperimentProfile/ThesisProfile) -> experiment_plan_director.hpp (Director-Walk, RegistryTrio-Annotation Zeile 30) -> builder/build_orchestrator/ + Permutations-Engines -> builder/best_binary_selector/best_binary_selector.hpp (Ranking/Selektion, two_phase_valid) -> CSV-Rueckschrieb (measurement/, WRITE-Token) -> tools/latex_toolchain + tools/latex_anhang. ExecutionEngineKind::Hybrid (execution_engine_base.hpp:39ff) traegt die Hybrid-Rekombination.",
+          "verdikt": "stimmig"
+        },
+        {
+          "stelle": "aufgabenstellung/de.tex Ketten-Kommentar, Teil CSV/xlsx (ba0eb57)",
+          "thesis_aussage": "eine Auswertung ueber CSV/xlsx Dateien generieren",
+          "impl_ist": "CSV ist implementiert (WIDE-CSV best_binary_selector.hpp:8; Mess-CSV-Pipeline); 'xlsx' kommt im GESAMTEN Code-Tree nicht vor (rekursiver grep ueber Code/ leer) — xlsx existiert nur als Doktrin in docs (Ledger §-Verweise, Session-Docs 26.07. lager-baeume-xlsx). xlsx=Default ist Owner-Gesetz (Lager-Baeume+xlsx-Doktrin), die Ausgabe-Seite muss xlsx-Erzeugung nachziehen.",
+          "verdikt": "impl_muss_nachziehen"
+        },
+        {
+          "stelle": "kapitel/de/01_einleitung.tex Kommentar-TODOs (683476a)",
+          "thesis_aussage": "Die Forschungsfragen muessen in Richtung der Trennung der Mess-, System- und Organ-Achsen ... aufgetrennt werden; Haupt-/Unterachsen andeuten, dass fuer Latenz-kritische Messungen Laufzeitmessungen durch Compile-time Anforderungen geloest werden muessen",
+          "impl_ist": "Deckungsgleich mit dem Impl-Ist: RegistryTrio Organ/System/Mess (experiment_plan_director.hpp:30), abi/system_axis_order.hpp:40-48 (GENAU DREI System-Haupt-Achsen target_isa/operating_system/external_utils, Mess-Realm separat), measurement_tooling_registry.hpp:3-5 (Mess-Tooling fest in CEB+Tier-Binaries einkompiliert, F7-Selektivitaet). Der geforderte Umbau betrifft den THESIS-Text (Forschungsfragen-Kapitel), nicht die Impl — bereits als THESIS-NACHZUG (Task #3) eingeplant.",
+          "verdikt": "stimmig"
+        }
+      ],
+      "unbedenklich": [
+        "683476a: Kommentar zur Figur-Platzierung in 01_einleitung.tex (Figur trennt Satz ungluecklich; reines Layout, keine Faktenaussage)",
+        "683476a: abgebrochenes Kommentar-Fragment unter FF2 ('Wie sieht es unter diesem Punkt auch neben der') — ohne Aussagegehalt; sollte vom Owner bei Gelegenheit vervollstaendigt werden",
+        "7b2dbc9: orthographische Nebenaenderungen im selben Hunk (Beispiel-Lasten -> Beispiellasten) — reine Schreibweise",
+        "06ac320: Merge-Konflikt-Resolution Anhang B/E (DE+EN) zugunsten der neueren Overleaf-Fassung (Habich-Runde-2) — Content-Hoheit des Owners, kein neuer Fakten-Text seit 28.07.; unterlegene Kartierungs-Fassung bleibt unter ef448e4 in der History",
+        "ba0eb57 ist formal eine LaTeX-Kommentarzeile (im PDF nicht gerendert) — wegen des faktentragenden Commit-Titels dennoch inhaltlich gegen die Impl geprueft (siehe Befunde 6+7)"
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Planung"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "design-planer",
+      "phaseIndex": 1,
+      "phaseTitle": "Planung",
+      "agentId": "a79c17fa26b73b503",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785613122236,
+      "queuedAt": 1785613122224,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "REPO-IST (HEAD 06ac320, development): Rahmen diplomarbeit.t…",
+      "promptPreview": "Du bist der DESIGN-PLANER fuer den Thesis-Nachzug (Schritt 1 von 3; NUR PLANEN, KEINE Edits — read-only!). Repo: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/thesis/diplomarbeit (Branch development, HEAD = Merge 06ac320 der Overleaf-Linie).\nTHESIS-DOKTRIN (bindend, aus Owner-Memories): Struktur allgemein->speziell; DE+EN BILINGUAL synchron (DE fuehrend, EN-Kapitelschnitt weicht…",
+      "lastProgressAt": 1785613639803,
+      "tokens": 161777,
+      "toolCalls": 32,
+      "durationMs": 517567,
+      "resultPreview": "{\"entscheidungen_rueckfragen\":[{\"nr\":\"E-1\",\"frage\":\"Achsen-Zählung global nachziehen? Die Thesis trägt durchgehend 'neunzehn Kompositions-Achsen (T0–T18)' (K1:150, K3:140/703/756, K4:127-133, K6:16); die bindende Achsen-Neuordnung O-8 (Ledger §68a/§69) definiert: Organ-Achsen T00–T17 (18er-Organ-Zeile) + DREI System-Haupt-Achsen (target_isa/operating_system/external_utils) + Mess-Realm (measuremen…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "diff-pruefer",
+      "phaseIndex": 1,
+      "phaseTitle": "Planung",
+      "agentId": "ad5a9921768d536a0",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785613122245,
+      "queuedAt": 1785613122225,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Du bist der DIFF-STIMMIGKEITS-PRUEFER (zweitrangige Owner-Aufgabe; read-only). Repo: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/thesis/diplomarbeit (Branch development).\nAUFGABE: Der Owner hat in den letzten 4 Tagen (Commits seit 2026-07-28, git log ef448e4..development --since=2026-07-28 + git show je Commit) nicht nur Kommentare, sondern auch TEXT und FAKTEN angepasst — in …",
+      "lastProgressAt": 1785613597571,
+      "tokens": 94222,
+      "toolCalls": 36,
+      "durationMs": 475326,
+      "resultPreview": "{\"owner_aenderungen\":[{\"commit\":\"ba0eb57\",\"datei\":\"aufgabenstellung/de.tex\",\"was\":\"Neue Ketten-Definition als LaTeX-Kommentarzeile: XML -> Planer -> CacheEngineBuilder je System -> alle Binary-Permutationen -> Auswertung auf beste System-Binary und System-Binary-Rekombination -> finale Messung (eine Binary oder hybrid-Binary-Rekombinationen) -> CSV/xlsx -> LaTeX/Diagramme. Faktentragend trotz Komm…"
+    }
+  ],
+  "totalTokens": 255999,
+  "totalToolCalls": 68
+}

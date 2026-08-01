@@ -140,3 +140,50 @@ Stale permutation_codegen_cli-Anweisung -> hiermit widerrufen · Ledger-Nachtrag
 
 *Nachster Schritt: Beweis-Strecke (a)-(j) priorisieren; (g) braucht Owner-Wort. Erstellt
 aus 6-Agenten-Workflow, Verify tragfaehig-mit-auflagen, Korrekturen eingearbeitet.*
+
+---
+## ADDENDUM ~20:05Z — BEWEIS-STRECKEN-KARTIERUNG (Opus-5-Workflow wf_0cbea88d, Rohdaten
+## in backups/20260801-fahrplan-und-beweis-strecke-workflows/) — KORRIGIERT DIESEN FAHRPLAN
+
+K1. BEWEIS 1 GATE-KRITERIUM ERSETZT: 'Log-Zeile GN_DECISION=skip' ist DOPPELT unerfuellbar
+    (GN_DECISION nur im nicht-inkludierten ci/archive/perm-matrix-fallback.yml; dort :176
+    eine export-Zuweisung, nie im Log). Realer Resume-Arbiter der dynamischen Kette =
+    dll_is_current per-Binary (build_orchestrator.hpp:471-478); dessen Skip-Meldung hat
+    KEINEN Konsumenten (Anti-Beweis-Falle). ERSATZ-GATE (finales Rezept liegt im Backup):
+    (a) Doppellauf-Idempotenz (DIFF-RC=0 ueber die perm.dll-Menge), (b) rm-.version-
+    Kontrolltest (genau EINE Binary neu), (c) literales built_new=0 ueber die
+    <comdare_experiment>-Wurzel (einzige Stelle mit built_new/resumed-Ausgabe:
+    experiment_run_entry.hpp:384-387). Owner-Abnahme des Ersatz-Kriteriums noetig.
+K2. BEWEIS 2/3 REZEPTE FINAL (Backup): Prune-Testat-Emitter im SUPER-Treiber
+    (main.cpp:1172-1202, COMDARE_PRUNE_ONLY); Hydration via Fake-mc (Owner-Vorbehalt:
+    Mock-Weg abnicken; NIE gegen Produktiv-Bucket; Beweis 4 = echtes minio separat).
+    Variant-Gate: COMDARE_VARIANT_GATE nur im thesis_profile-Zweig; R1-R4 inkl.
+    per-Binary-Praezisions-Kontrolltest; SOLL-Signatur NUR aus frischem Treiber (bvset=).
+K3. TRIGGER-REZEPT-KORREKTUREN: (i) OWNER_UUID als LITERAL (GitLab expandiert keine
+    Kommandosubstitution — '$CI_JOB_ID@$(hostname)' reiste als Text in die Bestandslog-id);
+    (ii) TOTE VARS nicht setzen: COMDARE_GN_INCLUDE_AVX512 (0 Treffer im ce),
+    COMDARE_GN_RANGE (kein getenv-Konsument; wirksam nur emittiertes COMDARE_GOLDEN_N_RANGE);
+    (iii) COMDARE_VARIANT_GATE steht in der Forward-Allowlist (director.hpp:872) aber
+    fehlte im Var-Satz — Owner-Entscheid: aufnehmen (sonst zertifiziert Beweis 3 ein im
+    Produktivlauf abgeschaltetes Gate); (iv) §3.3-TOPOLOGIE KORRIGIERT: Stufe-2 =
+    KONSTANT 4 Batch-Jobs (tier:build-batch + measure je amd/intel; Scheiben SLICE=4096
+    INTERN, kGnBatchSlice hart :540) — die 11611-Praezedenz '16/16' war das ALTE
+    O(Perms x Chunks)-Schema (kTierChunkCount DEPRECATED :536-539). 4 Jobs = korrekt,
+    NICHT 'zu wenig'.
+K4. 12-PERM-KLAERUNG: ce-Ist = 4 Perms (O2,O3 x no_extension,avx2; all_axes_golden
+    :187-200) MIT dokumentierter GN-3-Begruendung (:178-186: Ofast bricht IEEE-754/CRC64,
+    avx512 nicht universell). 12 waere bewusste UMKEHR (Owner-Entscheid), technisch klein:
+    Profil-XML-Edit (Trockenlauf belegt: perm_count=12, weiterhin 4 Jobs) + >=16
+    Test-Anker-Nachzug (test_experiment_plan_director.cpp zementiert die 4) + Kommentar-
+    Nachzug (dort auch stale '17-Organ-Kartesik' — ORG-18 ist Ist). Ohne Entscheid baut
+    der Trigger 4 x 131072 = 524.288 Tier-Binaries.
+K5. BESTANDSLOG: BEDINGT TRAGFAEHIG, nicht abnahmereif — Treiber-Gate hart+ehrlich
+    (Exit 6, Pflicht-Trio), Forward vollstaendig, Grandchild scharf; ABER (a) Planer-
+    Reservierung STRUKTURELL INERT (planer:delegate ohne .storage_cache_activation-Anker
+    => Warnung lager_ebene_fehlt) — nachruesten (YAML-Einzeiler) oder dokumentiert
+    akzeptieren; (b) Beweis 4 offen; (c) §65-Delta weiter ungeklaert (Input-Luecke der
+    Kartierung — Nachpruefung noetig); (d) Bestands-Invalidierung MUSS E-2-Schluessel-
+    wechsel einschliessen.
+K6. VOR-TRIGGER-TODO-LISTE (blockierend ja/nein) + vollstaendige Widerspruchs-Liste im
+    Backup-JSON §syn. Aufraeumpass-Kandidaten fortgeschrieben (built_new/built_skip ohne
+    Leser auf dem golden-Weg; Kommentar-Drift director:1325; '17-Organ'-Profil-Kommentar).
