@@ -187,3 +187,33 @@ K5. BESTANDSLOG: BEDINGT TRAGFAEHIG, nicht abnahmereif — Treiber-Gate hart+ehr
 K6. VOR-TRIGGER-TODO-LISTE (blockierend ja/nein) + vollstaendige Widerspruchs-Liste im
     Backup-JSON §syn. Aufraeumpass-Kandidaten fortgeschrieben (built_new/built_skip ohne
     Leser auf dem golden-Weg; Kommentar-Drift director:1325; '17-Organ'-Profil-Kommentar).
+
+---
+## OWNER-ENTSCHEIDE OE-A..OE-F (01.08. ~20:4xZ, verbatim-nah) — AENDERN DIE STRECKE
+
+OE-A: Beweis 1 wird NICHT als Ersatz-Minimalkriterium gefahren — Owner: Buildprozess+
+  Lagerhaltung sind exzessiv dokumentiert, Lagerhaltung beinhaltet die KOMPLETTE
+  Versionierung, jedes Binary traegt das Stempelsystem; lueckenlose BATCH-Wiederaufnahme
+  (2 Layer) + Nachbau fehlender Binaries EINER VERSION ist bekannte Loesung und PFLICHT
+  zu konstruieren. => ultracode-Rekonstruktion laeuft (wf_62640a90), Dossier OE-A liefert
+  den Konstruktions- und Beweis-Zuschnitt.
+OE-B: GO in Owner-Form: Dummy-Lager im temp-Verzeichnis, Binaries als TEXTDATEIEN mit
+  Stempel-String, Test als GOOGLE-TEST (nicht Shell-Skript).
+OE-C: Korrektur der Praemisse: CEB UND Planer tragen ihr EIGENES Stempelsystem; JEDE
+  Haupt-Achse (auch Compiler) traegt Versions-/Beschreibungs-Tag; Version-Bump EINER
+  Haupt-Achse => Update ALLER Binaries, die sie beinhalten (selektive Invalidierung).
+  'Es ist alles vorhanden' => ultracode kartiert (Dossier OE-C). VARIANT_GATE=true in
+  den Trigger-Var-Satz: GO ('Ja wie empfohlen').
+OE-D: 'AVX-512 wird mit aufgenommen, wo es gemessen werden kann; die System-Achse soll
+  das Verhalten freigeben. Groesste Gruendlichkeit: wir bauen ALLES WAS GEHT.' =>
+  12-Perm-Umbau ist beschlossen (Profil-XML + Test-Anker-Nachzug als ce-Paket; avx512-
+  Freigabe maschinenseitig ueber die System-Achse, HardwareErweiterungFehlt-Mechanik).
+  GN-3-Begruendung wird owner-gedeckt umgekehrt; Kommentar mitziehen.
+OE-E: Bestandslog ist ein VERTEILTES System, viel weiter geplant als 'eine Datei';
+  YAML-Einzeiler-Framing war falsch => ultracode rekonstruiert Soll aus Plaenen+Session-
+  Log (Dossier OE-E), erst danach Gap-Schluss-Pakete.
+OE-F: FRIST AUF FREITAG (08.08.) VERSCHOBEN. 'Wir ziehen mit dem Bau durch und nehmen
+  ALLE bekannten Pakete als Pflicht mit rein. Die Erkennungspakete bitte alle mit bauen.'
+  => HW-Erkennung P2-P6 sind NICHT mehr ruhend, sondern PFLICHT vor dem Voll-Bau;
+  ebenso die uebrigen bekannten Pakete (OD-10, E-04, E-18, Benchmarking-Schnitt-Fix,
+  xlsx-Factory, 12-Perm, Bestandslog-Gap-Schluss nach OE-E-Dossier).
