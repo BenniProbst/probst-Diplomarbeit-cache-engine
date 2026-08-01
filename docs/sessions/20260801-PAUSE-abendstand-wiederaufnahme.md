@@ -142,3 +142,8 @@ ADR-4, Anhang-B-Stichtag 11.07., Anhang-D-ORG-18, K3:1130-Ein-Satz-Nachzug HW-Is
 Konsistenz) + Rahmen-Pass (Danksagungs-ENTWURF nach F1 zur Owner-Freigabe, Lizenz-Matrix,
 eingeschraenkter Sperrvermerk, F10 der->das, EN-Abstract-Sync). Kapitel-Agenten-Lehre fuer
 die Paesse: W12-Idiom '.\ \emph', '% chktex 29' fuer Hex/CPU-Namen.
+
+ERLEDIGT 23:30Z: 289-CI-GRUEN-VERIFIKATION VORAB ABGESCHLOSSEN (Watcher-Beleg): 289/14203
+(048f3ba) success, Gate UNVERAENDERT und erfuellt (.blg Warnings/Repeated=0, LaTeX-Warnings=0,
+188 pages; lint:latex gruen). Job-Zahl-Differenz 4 vs 3 = include_retried-Effekt, keine
+entfernte Pruefung. Punkt ist bei Wiedereinstieg NICHT mehr nachzuholen.
