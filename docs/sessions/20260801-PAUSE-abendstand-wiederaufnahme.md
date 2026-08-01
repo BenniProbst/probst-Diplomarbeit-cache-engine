@@ -147,3 +147,16 @@ ERLEDIGT 23:30Z: 289-CI-GRUEN-VERIFIKATION VORAB ABGESCHLOSSEN (Watcher-Beleg): 
 (048f3ba) success, Gate UNVERAENDERT und erfuellt (.blg Warnings/Repeated=0, LaTeX-Warnings=0,
 188 pages; lint:latex gruen). Job-Zahl-Differenz 4 vs 3 = include_retried-Effekt, keine
 entfernte Pruefung. Punkt ist bei Wiedereinstieg NICHT mehr nachzuholen.
+
+FINAL ~23:4xZ — MASCHINEN-ABSCHALTUNG (Owner-Wort): Alles remote gesichert. Finale Spitzen:
+super main==dev==61b41bef · thesis main==dev==048f3ba (Overleaf/github erhaelt damit die
+komplette Kapitel-Kette K0-K6+CI-Fix) · ce main==dev==a3eb9845 · Cluster 2a62642+.
+Workflow-Rohdaten 00-06 committet (tmp darf sterben). ALLE Agenten (CiCheck288g, entlassene
+Kapitel-Agenten, Impl-CE-P2 wartend) STERBEN mit der Maschine — bei Wiedereinstieg:
+(1) dieses Doc lesen, (2) Watcher CiCheck288h NEU spawnen (Briefing: dieses Doc + Fallen
+a-q + Pro-Bridge + Referenzen: ce prod2=274/prod1-Erwartung 278, super=144, Gate 320;
+scheduler_failure-Zaehler neu ab 0 zaehlen, degraded=0-Signal von Infra abwarten),
+(3) Impl-Agenten frisch spawnen je Paket (P3-Auftrag zuerst — Spez: PLAN-Doc P3 + F11=prod1
+bleibt 0 + Boot-Cache-Kontrakt LIVE als Fixture-Quelle + B-3-Notiz EingefrorenesSpd vs Dmi),
+(4) W2-W5 der Wiederaufnahme-Reihenfolge. Die ueberholte pending-Welle 288/14190 einfach
+liegen lassen. NICHTS ist owner-blockiert (F1-F13 komplett entschieden).
