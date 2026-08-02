@@ -299,4 +299,10 @@ Version und System-ID reichen als Ist-Beleg.
 
 ---
 
-**Ende `docs/infra/I112-fleet-matrix.md` (Stufe 1). Nachtrags-Stufe: Abschnitt 8, nicht gate-relevant.**
+**Ende `docs/infra/I112_RUNNER_FLEET_IST_SOLL_ALLE_ARCHITEKTUREN.md` (Stufe 1).
+Nachtrags-Stufe: Abschnitt 8, nicht gate-relevant.**
+
+*Dateiname-Historie: bis 02.08. lag dieses Dokument unter `docs/infra/I112-fleet-matrix.md`; per `git mv` auf den
+Design-Dossier-Namen und die gelebte I-Serien-Konvention (`I77_`, `I109_`, `I111_`) gezogen. Der alte Pfad wird in
+aelteren Session-/Backup-Dokumenten weiter zitiert und dort bewusst NICHT nachgeschrieben (Doku wird nicht
+umgeschrieben, nur fortgeschrieben).*
