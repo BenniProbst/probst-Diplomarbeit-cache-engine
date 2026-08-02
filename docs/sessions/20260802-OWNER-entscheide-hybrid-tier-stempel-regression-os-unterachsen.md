@@ -130,3 +130,9 @@ NUR ZUR KENNTNIS (Q8): A-08 sagte fuer die OS-Unter-Achsen „statisch, RT vorbe
 „Bitte fahre doch direkt mit offener Arbeit fort"
 
 **Auslegung (bindend):** Nach der Integritaets-Korrektur (voreilige #17/#18) und abgeschlossener OS-U3-Landung direkt weiter mit der hoechsten offenen Prioritaet = Welle 2d (Codex-Wellen-Befunde CX-W1..W8, 2 BLOCK trigger-blockierend, Task #20). Codex-bwrap ist auf prod1 defekt -> Bau durch Opus-Worker (schwere Logik-Fallback), Fable-Review + Manager-Ist-Verifikation je Befund; wo Codex verfuegbar, Zweitreview. CX-W2 kann einen Wire-syntax_version-Bump verlangen (Stempel-/Wire-Fenster = Owner-Entscheid) -> Worker implementiert die konservativ-korrekte Variante (nie faelschlich Claim freigeben), Wire-Bump nur als Owner-Vorlage falls unumgaenglich. CX-W7 (B8-Hybrid-Doc) + CX-W13 (v0-Kurzform) = Lead/Owner-Vorlage.
+
+## NACHTRAG ~21:2x UTC — M3-Reihenfolge + Q-M3-GATE entschieden (VERBATIM)
+
+„Bitte wie empfohlen weiter. Wir warten die Welle 2d ab und machen das ordentlich"
+
+**Auslegung (bindend):** (1) A13-M3 startet NICHT vor der gelandeten Welle 2d (harte Vorbedingung: CX-W5/W6 sind die Migrations-Naht-Flaeche; CX-W6 = AllStrategies-Deckung ist logische Vorbedingung fuer ENFORCE=1). (2) Q-M3-GATE = wie empfohlen: primaer (a) Codex-Zweitreview auf einer FUNKTIONIERENDEN Codex-Umgebung (nicht prod1, bwrap-Defekt) VOR M3; falls nicht erreichbar (b) Fable-xhigh-Adversarial-Review als Ersatz-Lens MIT ausdruecklichem Ledger-Vermerk. Reine Verschiebung (c) ist ausgeschlossen (Trigger-Frist Do 07.08.). Das M3-Ausfuehrungs-Dossier wird jetzt vorbereitet (reine Planung). Reihenfolge zwingend: 2d landen -> M3 (mit Review-Gate) -> M4 -> OD-10-RT. „ordentlich" = alle M3-Auflagen K-1/K-3/K-4/K-6 + B3-Frozen-Neuanker + TP1-Lager-Neu-Inventarisierung eingehalten, nichts abgekuerzt.
