@@ -52,9 +52,19 @@ fuehren waere das gefaehrlichste Muster (leeres Ergebnis als Befund fehlgedeutet
 - `2026-07-27-INFRA-P4-windows-runner-git-online-VOLLZUG.md` -- Windows-Runner-Status 27.07.
 - `2026-07-27-INFRA-win-runner-untagged-fix-DONE.md` -- Tag-Disjunktheit Windows vs. Linux-baremetal (27.07.).
 - `2026-07-27-INFRA-node7-diskgc-runner-contention-B1-VOLLZUG.md` -- node7-Rolle + `concurrent=1` (27.07.).
-- `2026-08-02-K118d-SWEEP-6-DIAGNOSEN-node7-AUSFALL-V10-POLICY-KORREKTUREN.md` -- node7-Ausfall (02.08.).
+- `2026-08-02-K118d-SWEEP-6-DIAGNOSEN-node7-AUSFALL-V10-POLICY-KORREKTUREN.md` -- node7-Ausfall (02.08., ~14:05).
+- `2026-08-02-K118f-node7-ROOT-CAUSE-sysvol-sync-backups-abgeschaltet.md` -- **node7-Root-Cause-Kandidat +
+  Backup-Abschaltung auf Owner-Anweisung** (02.08.). Loest K118d als node7-Ist ab.
+- `2026-08-02-K118g-KOORDINATION-offene-straenge-priorisiert.md` `:9` -- **node7-Live-Stand ~16:25**
+  ("ueberlebt seit Backup-Abschaltung 23+ min", Beobachtung laeuft, #536). **Juengste node7-Quelle.**
+- `2026-07-27-INFRA-AN-DIPLOM-o4a-prod2-cpu-VOLLZUG.md` `:13-15` -- prod2-CPU-Kern-Kennung, Live-`lscpu`
+  auf dem prod2-Blech (Antwort auf unsere eigene Rueckfrage O-4a).
 - `2026-08-02-K118c-node5-RECOVERY-RUNBOOK-drei-wege.md` und
   `2026-08-02-K118b-NACHMITTAG-BEFUNDE-node5-V10EGRESS-OFFENE-ARBEIT.md` -- node5/node6/node8-Lage (02.08.).
+
+**Quellen-Vorrang innerhalb `[INFRA]`:** bei mehreren Berichten zum selben Host gilt der **juengste**. Fuer node7
+ist das K118g `:9` (~16:25), nicht K118d (~14:05) -- die Erst-Fassung dieses Dokuments hatte genau diese Staffelung
+uebersehen und node7 als hart ausgefallen gefuehrt (Korrektur unten in 3.1 und 8).
 
 Konsequenz: **Runner-IDs, Tag-Listen, `concurrent`-Werte und Online-Status sind Uebernahmen aus diesen Quellen,
 keine von uns verifizierten Ist-Werte.** Bestaetigt oder korrigiert werden sie im Ruecklauf des Handouts; erst
@@ -70,7 +80,7 @@ der Ruecklauf fuellt die Nachtrags-Stufe (Abschnitt 8).
 |---|---|---|---|---|
 | `x86_64` (AMD) x linux | prod1, id16 `prod-baremetal-prod1`, shell/Ubuntu | Ist `prod, baremetal, amd, amd64, avx2, avx512 (+12 Sub-Flags), x86_64` | `[CI-TRACE]` 02.08. 13:20:08Z (gitlab-runner 19.1.1) + `[INFRA]` 26.07. | **online, nimmt Jobs an.** `concurrent=3` / 10 Threads (Modus `normal`) `[INFRA]` 26.07. -> Ist heute bestaetigen |
 | `x86_64` (Intel) x linux | prod2, id17 `prod-baremetal-prod2`, shell/Ubuntu | Ist `prod, baremetal, intel, amd64, avx2` | `[CI-TRACE]` 02.08. 13:23:24Z + 08:06:27Z (19.1.1) + `[INFRA]` 26.07. | **online, nimmt Jobs an.** `concurrent=2` / 12 Threads (`normal`) `[INFRA]` 26.07. -> Ist heute bestaetigen. **HW-Diskrepanz offen:** `[INFRA]` 26.07. sagt i9-12900K (24T/16C), `[DOC]` #276 `:14` sagt i9-14900KS -- Infra entscheidet |
-| `aarch64` x linux | node7 (Pi5), id4 `node7-rpi5-arm64` | Ist `arm64, linux`; unser Bedarf: `arm64` (ce `.gitlab-ci.yml:134`) | `[INFRA]` 27.07.: **einziger online arm64-Linux-Runner**, `concurrent=1`; `[INFRA]` 02.08.: **AUSGEFALLEN** | **AUSGEFALLEN seit 02.08. 13:00:03 CEST** (Blocker #536: TCP tot, ICMP intermittierend). Kein CI-Trace, weil `build:arm64-smoke` opt-in-gegated ist (`COMDARE_ISA_MATRIX`, `allow_failure`) -- die Trace-Leere ist also **kein** Runner-Beweis in beide Richtungen |
+| `aarch64` x linux | node7 (Pi5), id4 `node7-rpi5-arm64` | Ist `arm64, linux` `[DOC]` #276 `:18` (Stand 06.07. -- **keine** Infra-Bestaetigung, in 8 zur Bestaetigung gefuehrt); unser Bedarf: `arm64` (ce `.gitlab-ci.yml:134`) | `[INFRA]` 27.07.: **einziger online arm64-Linux-Runner**, `concurrent=1`; `[INFRA]` K118f/K118g `:9` 02.08. ~16:25 | **In Erholung, Beobachtung laeuft (#536).** Ausfall 02.08. 13:00:03 CEST; **Root-Cause-Kandidat `samba-sysvol-sync`** (kubectl-exec-Tar-Stream alle 15 min aus der node7-User-crontab, ~9-12 min Lebensdauer je Boot). Infra hat **auf Owner-Anweisung alle 14 Backup-Jobs abgeschaltet** (reversibel, PRE gesichert); seither ist der **Node wieder zugreifbar und ueberlebt** (K118g `:9`: "23+ min", vorher 9-12). Infra deklariert den Kandidaten selbst als **stark indiziert, nicht bewiesen** (kein OOM-Kill im Journal des Crash-Boots). Kein CI-Trace, weil `build:arm64-smoke` opt-in-gegated ist (`COMDARE_ISA_MATRIX`, `allow_failure`) -- die Trace-Leere ist also **kein** Runner-Beweis in beide Richtungen |
 | `riscv64` x linux (**Owner-E4 NEU**) | node8 (VisionFive2), id5 `node8-visionfive-riscv64` | Soll-Vorschlag **`riscv64`** (+ `linux`) | `[INFRA]` 26.07.: id5 unter "Online-Instanz-Runner ausserhalb prod1/2"; `[INFRA]` 02.08.: Host **online** (10.0.60.208, :22 offen) "entgegen Doku/Board" | **Infra-Vollzug ausstehend.** Runner-Registrierung existiert offenbar, aber **kein `riscv64`-Tag und keine CI-Anbindung** -> naeher am Ziel als die Alt-Doku annimmt; Tag + Nachaktivierung bestaetigen |
 | `aarch64` x macos (**Owner-E4 NEU**, M1) | node6 (Mac mini M1 2020), id3 `node6-macarm-arm64` | Soll-Vorschlag **`macos-arm64`** | `[INFRA]` 26.07.: **stale**; `[INFRA]` 02.08.: Diagnose laufend (abweichend von node5) | **Infra-Vollzug ausstehend** (Registrierung + Tag + Toolchain) |
 | `x86_64` x macos (**Owner-E4 NEU**) | node5 (Mac mini 2018 Intel), id2 `node5-macintel-x86_64` | Soll-Vorschlag **`macos-x86-64`** | `[INFRA]` 26.07.: **stale**; `[INFRA]` 02.08.: Recovery-Runbook offen (V10-Egress/Portlage) | **Infra-Vollzug ausstehend** (erst Host-Recovery, dann Registrierung + Tag) |
@@ -207,8 +217,13 @@ Diese Sektion wird nach der Infra-Rueckmeldung befuellt und ist **kein Trigger-G
       Tag-Listen) -- Quelle: Infra-Antwort, nicht unsere Uebernahme.
 - [ ] prod2-HW-Diskrepanz entschieden (i9-12900K vs. i9-14900KS) -- betrifft Mess-Doku und die
       AVX-512-Aussage der W4-A-Matrix.
-- [ ] node7 (arm64): Ausfall #536 vom 02.08. behoben oder Ersatz benannt (Infra flaggte bereits einen zweiten
-      arm64-Linux-Runner als Bedarf, #394/#78).
+- [ ] node7 (arm64), #536 -- **teil-beantwortet, Beobachtung laeuft:** Root-Cause-Kandidat `samba-sysvol-sync`
+      identifiziert, Backups abgeschaltet, Node wieder zugreifbar (K118f, K118g `:9`). Offen bleibt: (a) haelt die
+      Stabilitaet ueber Stunden (Infras eigener Gegenbeweis-Test), (b) bleibt die arm64-Lane damit dauerhaft
+      tragfaehig oder braucht sie den zweiten arm64-Linux-Runner, den Infra selbst als Bedarf flaggte (#394/#78).
+      **Abschreibung der Lane steht nach heutigem Stand nicht mehr im Raum.**
+- [ ] node7-Tag-Ist `arm64, linux` bestaetigen -- bislang nur `[DOC]` #276 `:18` (Stand 06.07.), keine
+      Infra-Erhebung; die Voll-Erhebung 26.07. fuehrt id4 nur als "online", ohne Tag-Liste.
 - [ ] riscv64 (node8, id5): Tag `riscv64` gesetzt, Runner CI-seitig ansprechbar.
 - [ ] macos-arm64 (node6, id3) und macos-x86-64 (node5, id2): Runner registriert/reaktiviert, Tags gesetzt.
 - [ ] Tag-Schema bestaetigt (oder Infra-Schreibweise uebernommen) -> danach CI-Template-Nachzug als eigenes
@@ -233,8 +248,10 @@ Diese Sektion wird nach der Infra-Rueckmeldung befuellt und ist **kein Trigger-G
 3. **Poll-Verhalten:** Verifikation + literaler Config-Beleg (Abschnitt 7).
 4. **Nachaktivierung:** Welche der geplanten Runner sind heute nicht registriert/aktiv, und was blockiert sie
    (Hardware, Netz, Toolchain)? Der Owner-Auftrag lautet ausdruecklich "Ansonsten aktiviere das bitte
-   nachtraeglich". Konkret offen: node5, node6, node8-Tag, node7-Ausfall, id14 (tot seit 06-22),
-   id6-id9 (stale).
+   nachtraeglich". Konkret offen: node5, node6, node8-Tag, id14 (tot seit 06-22), id6-id9 (stale).
+   **node7 ist hier bewusst herausgenommen** -- der Strang ist durch K118f/K118g teil-beantwortet (siehe 3.1);
+   offen ist dort nur noch die Stabilitaets-Bestaetigung ueber Stunden und die Frage nach dem zweiten
+   arm64-Linux-Runner (#394/#78).
 
 ---
 
@@ -266,9 +283,29 @@ Diese Sektion wird nach der Infra-Rueckmeldung befuellt und ist **kein Trigger-G
   "node7 als einzigem online arm64-Linux-Runner bei concurrent=1 strikt seriell"
   "echter zweiter arm64-Linux-Runner noetig (#394/#78)"
 
-[INFRA] Cluster 2026-08-02-K118d-SWEEP-6-DIAGNOSEN-node7-AUSFALL-...md:
+[INFRA] Cluster 2026-08-02-K118d-SWEEP-6-DIAGNOSEN-node7-AUSFALL-...md (~14:05, SUPERSEDED
+        als node7-Ist durch K118f/K118g):
   "NEUER TOP-BLOCKER: node7/Pi5 ist AUSGEFALLEN ... Ausfallzeitpunkt exakt belegt:
    2026-08-02 13:00:03 CEST" (#536; TCP 0/10 auf :22, ICMP intermittierend)
+
+[INFRA] Cluster 2026-08-02-K118f-node7-ROOT-CAUSE-sysvol-sync-backups-abgeschaltet.md:
+:28   "*/15 * * * * /usr/bin/flock -n /tmp/sysvol-sync.lock
+       /usr/local/bin/samba-sysvol-sync.sh >/dev/null 2>&1"   (node7-User-crontab, uid 1000)
+:32   "Die 15-Minuten-Kadenz deckt sich exakt mit dem beobachteten Muster und mit der
+       ~9-12-Minuten-Lebensdauer je Boot."
+:62   node7-crontab: 3 Jobs deaktiviert - "samba-sysvol-sync (der Crash-Kandidat)",
+       backup-freshness-check, cluster-dr-bundle; root-crontab: 11 Jobs deaktiviert
+:57   "Zeilen mit '#K118-DISABLED ' praefixiert => zeilenweise reversibel, nichts geloescht."
+:68   "Zustand nach der Abschaltung: uptime 290 s, Mem: 7937 total / 747 used / 5716 free"
+:81-84 "Der Zusammenhang 'SYSVOL-Sync -> Absturz' ist stark indiziert ..., aber nicht bewiesen."
+       "Der Gegenbeweis steht aus: Bleibt node7 jetzt, mit abgeschalteten Backups, ueber
+        Stunden stabil?"
+
+[INFRA] Cluster 2026-08-02-K118g-KOORDINATION-offene-straenge-priorisiert.md:
+:9    "node7: ueberlebt seit Backup-Abschaltung 23+ min (vorher ~9-12) -> Owner-OOM-These
+       bestaetigt. Ursache-Kandidat = samba-sysvol-sync ... Backups alle aus (14 Jobs,
+       reversibel). Persistentes Journal aktiv. Beobachtung laeuft. (#536)"
+:19   Board #536: "Ursache gefunden, Backups aus | Stabilitaet ueber Stunden bestaetigen"
 
 [INFRA] Cluster 2026-08-02-K118c-node5-RECOVERY-RUNBOOK-drei-wege.md:
   "#243-Korrektur: node8 ist online (10.0.60.208, :22 offen) - entgegen Doku/Board;
