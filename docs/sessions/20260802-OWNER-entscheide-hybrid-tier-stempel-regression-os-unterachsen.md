@@ -70,3 +70,7 @@ Rückfrage 9: Nein, ALLES genannte wird voll gebaut, wir haben die Ressourcen da
 
 ## Neue Paket-Wahrheit (Katalog-Deltas)
 A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final drei (E3) · A15=Fehlerklassen-Framework #29 (E6) · A16=E-Pflicht-Bündel jetzt (E-24 als LETZTER ABI-Schritt in die Gate-Reihenfolge, E-19 Runner-Fleet-Soll+Poll-Jitter, E-02 Vier-Ledger-Struktur herstellen, E-23 API-Suchlauf, E-21 STACK/Verbose) · Hybrid-Tier: Design JETZT (ultracode), Bau=Auswertungsphase · D: PAT-Rotation nach Messfenster (Handout raus) · Plattform-Querschnitt: RISC-V + macOS M1 + macOS x86.
+
+## NACHTRAG ~17:4x CEST — Owner-GO (verbatim): "Ok, volles Go fuer ALLE geplante offene Arbeit wie vorgegeben"
+
+**Auslegung (bindend):** Die gesamte Bauplan-/Katalog-Strecke laeuft autonom weiter wie dokumentiert. Die noch offenen Bauplan-Fragen Q4-Q9 gelten mit ihren dokumentierten EMPFEHLUNGS-Defaults als freigegeben (Q4 CSV-Token nicht_gebaut; Q5 E-24 im EINEN ABI-Fenster, Graph-Gattung nach Abgabe; Q6 Ein-Gattung-Hybrid + MaxN=8 + LEDGER:187(e) superseded; Q7 PRUEF-TESTAT je Fenster; Q8 RT-Erhebung nach 27.07.-KERN; Q9 thesis-Ledger im Abgabe-Repo). Einspruch jederzeit moeglich; Abweichungen von Empfehlungen wuerden erneut vorgelegt. Messung selbst bleibt USER-GO-gated.
