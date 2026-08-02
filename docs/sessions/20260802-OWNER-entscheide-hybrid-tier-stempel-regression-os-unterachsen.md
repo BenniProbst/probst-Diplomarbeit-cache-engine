@@ -112,3 +112,9 @@ A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final d
 ## NACHTRAG ~19:2x UTC — Q8-Pflicht-Meldung VOR OS-U3 (NUR ZUR KENNTNIS, Bauplan Paragraph 3)
 
 NUR ZUR KENNTNIS (Q8): A-08 sagte fuer die OS-Unter-Achsen „statisch, RT vorbereitet"; wir bauen JETZT die sofortige Laufzeit-Erhebung nach deinem 27.07.-KERN (HW-Werte nie statisch, declared -> Cross-Check): prozess-frei (linux uname(2)+/etc/os-release-Read, macos sysctl/SystemVersion.plist, windows RtlGetVersion), versioniertes probe_id je Familie (K5), Fehler in die Fehlerklassen-Framework-Welt (K4), Bump-Verbot kSystemAxisCodeVersions[operating_system] bleibt hart (B6-Asserts). Einspruch nur noetig, wenn du die Statik-Lesart willst — sonst laeuft OS-U3 ab jetzt.
+
+## NACHTRAG ~19:3x UTC — Codex-Doppel-Review-GO (VERBATIM)
+
+„Du kannst gerne paralle mit codex noch einen code review gegen die Anforderungen von Welle 1,2a,2c und dann einen großen codex lauf gegen die Erfüllung des Gesamtcodes und seiner Anforderungen starten"
+
+**Auslegung (bindend):** Zwei parallele Codex-Laeufe (v2.1: Codex = zweite Dual-Review-Haelfte), beide auf DETACHED-Worktrees des gelandeten Standes 897e887b (eingefroren — die spaetere 2b-Landung bewegt den Review-Stand nicht): (1) Wellen-Review W1+2a+2c gegen ihre ANFORDERUNGEN (Bauplan-Auflagen K-Serien, Q3-Flag-Grammatik, FK-Auflagen, B1-B13-Schliessungen inkl. Zweitpruefung der 2c-Fixes); (2) GESAMT-Audit Code vs. Gesamt-Anforderungen/Kanon (CT-Doktrin, Achsen-Architektur, Flag-Grammatik, A-15, Fehlerklassen, Ehrlichkeit, Aufraeumpass-Kandidaten; bekannte offene Punkte aus Dossier Abschn. 5 als bekannt deklarieren). Treiber-Agenten verifizieren Codex-Befunde am Ist (Befunde nie ungeprueft uebernehmen).
