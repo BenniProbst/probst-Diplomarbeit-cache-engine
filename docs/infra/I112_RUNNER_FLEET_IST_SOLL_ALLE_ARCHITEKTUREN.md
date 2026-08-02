@@ -79,7 +79,7 @@ der Ruecklauf fuellt die Nachtrags-Stufe (Abschnitt 8).
 | Zelle (ISA x OS) | Host / Runner | Tags (Ist bzw. Soll-Vorschlag) | Beleg | Ist-Status (von Infra zu bestaetigen) |
 |---|---|---|---|---|
 | `x86_64` (AMD) x linux | prod1, id16 `prod-baremetal-prod1`, shell/Ubuntu | Ist `prod, baremetal, amd, amd64, avx2, avx512 (+12 Sub-Flags), x86_64` | `[CI-TRACE]` 02.08. 13:20:08Z (gitlab-runner 19.1.1) + `[INFRA]` 26.07. | **online, nimmt Jobs an.** `concurrent=3` / 10 Threads (Modus `normal`) `[INFRA]` 26.07. -> Ist heute bestaetigen |
-| `x86_64` (Intel) x linux | prod2, id17 `prod-baremetal-prod2`, shell/Ubuntu | Ist `prod, baremetal, intel, amd64, avx2` | `[CI-TRACE]` 02.08. 13:23:24Z + 08:06:27Z (19.1.1) + `[INFRA]` 26.07. | **online, nimmt Jobs an.** `concurrent=2` / 12 Threads (`normal`) `[INFRA]` 26.07. -> Ist heute bestaetigen. **HW-Diskrepanz offen:** `[INFRA]` 26.07. sagt i9-12900K (24T/16C), `[DOC]` #276 `:14` sagt i9-14900KS -- Infra entscheidet |
+| `x86_64` (Intel) x linux | prod2, id17 `prod-baremetal-prod2`, shell/Ubuntu | Ist `prod, baremetal, intel, amd64, avx2` | `[CI-TRACE]` 02.08. 13:23:24Z + 08:06:27Z (19.1.1) + `[INFRA]` 26.07. | **online, nimmt Jobs an.** `concurrent=2` / 12 Threads (`normal`) `[INFRA]` 26.07. -> Ist heute bestaetigen. **HW GEKLAERT (keine offene Frage):** CPU ist ein **Intel Core i9-12900K** (Alder Lake, family 6 / model 151 / stepping 2) -- Live-`lscpu` auf dem prod2-Blech, `[INFRA]` `2026-07-27-INFRA-AN-DIPLOM-o4a-prod2-cpu-VOLLZUG.md:13-15`. Der `[DOC]` #276 `:14`-Wert i9-14900KS ist **pre-RMA-stale** (dokumentierter CPU-Tausch 14900KS -> 12900K), keine echte Diskrepanz; diplomseitig bereits nachgezogen (Thesis-Commit `b224628`, KATALOG `:55` "F15-12900K-Nachzug") |
 | `aarch64` x linux | node7 (Pi5), id4 `node7-rpi5-arm64` | Ist `arm64, linux` `[DOC]` #276 `:18` (Stand 06.07. -- **keine** Infra-Bestaetigung, in 8 zur Bestaetigung gefuehrt); unser Bedarf: `arm64` (ce `.gitlab-ci.yml:134`) | `[INFRA]` 27.07.: **einziger online arm64-Linux-Runner**, `concurrent=1`; `[INFRA]` K118f/K118g `:9` 02.08. ~16:25 | **In Erholung, Beobachtung laeuft (#536).** Ausfall 02.08. 13:00:03 CEST; **Root-Cause-Kandidat `samba-sysvol-sync`** (kubectl-exec-Tar-Stream alle 15 min aus der node7-User-crontab, ~9-12 min Lebensdauer je Boot). Infra hat **auf Owner-Anweisung alle 14 Backup-Jobs abgeschaltet** (reversibel, PRE gesichert); seither ist der **Node wieder zugreifbar und ueberlebt** (K118g `:9`: "23+ min", vorher 9-12). Infra deklariert den Kandidaten selbst als **stark indiziert, nicht bewiesen** (kein OOM-Kill im Journal des Crash-Boots). Kein CI-Trace, weil `build:arm64-smoke` opt-in-gegated ist (`COMDARE_ISA_MATRIX`, `allow_failure`) -- die Trace-Leere ist also **kein** Runner-Beweis in beide Richtungen |
 | `riscv64` x linux (**Owner-E4 NEU**) | node8 (VisionFive2), id5 `node8-visionfive-riscv64` | Soll-Vorschlag **`riscv64`** (+ `linux`) | `[INFRA]` 26.07.: id5 unter "Online-Instanz-Runner ausserhalb prod1/2"; `[INFRA]` 02.08.: Host **online** (10.0.60.208, :22 offen) "entgegen Doku/Board" | **Infra-Vollzug ausstehend.** Runner-Registrierung existiert offenbar, aber **kein `riscv64`-Tag und keine CI-Anbindung** -> naeher am Ziel als die Alt-Doku annimmt; Tag + Nachaktivierung bestaetigen |
 | `aarch64` x macos (**Owner-E4 NEU**, M1) | node6 (Mac mini M1 2020), id3 `node6-macarm-arm64` | Soll-Vorschlag **`macos-arm64`** | `[INFRA]` 26.07.: **stale**; `[INFRA]` 02.08.: Diagnose laufend (abweichend von node5) | **Infra-Vollzug ausstehend** (Registrierung + Tag + Toolchain) |
@@ -215,8 +215,13 @@ Diese Sektion wird nach der Infra-Rueckmeldung befuellt und ist **kein Trigger-G
 
 - [ ] Ist-Spalte aus 3.1/3.2 durch Infra bestaetigt oder korrigiert (Runner-Namen, IDs, Status, `concurrent`,
       Tag-Listen) -- Quelle: Infra-Antwort, nicht unsere Uebernahme.
-- [ ] prod2-HW-Diskrepanz entschieden (i9-12900K vs. i9-14900KS) -- betrifft Mess-Doku und die
-      AVX-512-Aussage der W4-A-Matrix.
+- [x] **prod2-HW: ERLEDIGT, keine Infra-Frage.** i9-12900K (Alder Lake) belegt per Live-`lscpu`
+      (`[INFRA]` `2026-07-27-INFRA-AN-DIPLOM-o4a-prod2-cpu-VOLLZUG.md:13-15`, Antwort auf unsere Rueckfrage
+      O-4a); `[DOC]` #276 `:14` ist pre-RMA-stale. Thesis-seitig nachgezogen (`b224628`, KATALOG `:55`).
+      **Folge-Notiz (offen, fremdes Paket):** die W4-A-Matrix begruendet "prod2 ohne AVX-512" ueber
+      Raptor-Lake-R. Die Ist-Tag-Liste von id17 (`avx2`, **kein** `avx512`) traegt die Aussage weiterhin,
+      die Modell-Begruendung ist aber nachzuziehen. Nicht hier entschieden -- Supersede-Vermerk in
+      `docs/plaene/20260719-cluster-parallel-build-MATRIX.md` empfohlen.
 - [ ] node7 (arm64), #536 -- **teil-beantwortet, Beobachtung laeuft:** Root-Cause-Kandidat `samba-sysvol-sync`
       identifiziert, Backups abgeschaltet, Node wieder zugreifbar (K118f, K118g `:9`). Offen bleibt: (a) haelt die
       Stabilitaet ueber Stunden (Infras eigener Gegenbeweis-Test), (b) bleibt die arm64-Lane damit dauerhaft
@@ -306,6 +311,13 @@ Diese Sektion wird nach der Infra-Rueckmeldung befuellt und ist **kein Trigger-G
        bestaetigt. Ursache-Kandidat = samba-sysvol-sync ... Backups alle aus (14 Jobs,
        reversibel). Persistentes Journal aktiv. Beobachtung laeuft. (#536)"
 :19   Board #536: "Ursache gefunden, Backups aus | Stabilitaet ueber Stunden bestaetigen"
+
+[INFRA] Cluster 2026-07-27-INFRA-AN-DIPLOM-o4a-prod2-cpu-VOLLZUG.md (Live-lscpu auf dem
+        prod2-Bare-Metal-Host 10.0.10.212; Antwort auf unsere Rueckfrage O-4a):
+:10-12 cpu family 6 | model 151 | stepping 2
+:13    model name  "12th Gen Intel(R) Core(TM) i9-12900K"
+:15    "(= Alder Lake; deckt sich mit dem dokumentierten CPU-Tausch i9-14900KS -> i9-12900K.)"
+-> #276 :14 (i9-14900KS) ist pre-RMA-stale; Thesis nachgezogen in b224628 (KATALOG :55).
 
 [INFRA] Cluster 2026-08-02-K118c-node5-RECOVERY-RUNBOOK-drei-wege.md:
   "#243-Korrektur: node8 ist online (10.0.60.208, :22 offen) - entgegen Doku/Board;
