@@ -128,17 +128,38 @@
        ABWESEND = NICHT DEKLARIERT (nicht 0 MHz / nicht CL0). Beide Attribute sind optional, damit eine
        Maschine ehrlich unvollstaendig deklariert sein darf, statt erfundene Werte zu tragen; die
        Nachdeklaration ist rein additiv. ram_pair BLEIBT (Additiv-Doktrin): es ist Teil des Schluessels und
-       traegt die Bestueckung, die aus Frequenz und CAS nicht hervorgeht. -->
+       traegt die Bestueckung, die aus Frequenz und CAS nicht hervorgeht.
+
+       A14/OS-U2 (Owner-Entscheid E3 vom 02.08.2026): <machines> ist zusaetzlich der ERWARTUNGS-Kanal der
+       drei operating_system-UNTER-Achsen (ce measurement/operating_system_sub_axes.hpp). Sie treten hier
+       ADDITIV und OPTIONAL ein:
+         os_version = Distributions-/Release-Identitaet der OS-INSTANZ innerhalb ihrer Familie
+                      (z.B. "debian-13", "windows-server-2022", "macos-15.5")
+         kernel     = Kernel-Release der Instanz (z.B. "6.17.0-35-generic")
+         build      = OS-Build-/Patch-Stand INKLUSIVE Update-Zustand (Owner E-12: "Wir mergen den Update
+                      Zustand in Build"); es gibt AUSDRUECKLICH kein viertes update_status-Attribut
+         os_declaration_source = Herkunfts-Notiz der drei Werte (Muster ram_frequency_source; sie reist
+                      nur mit deklarierten Werten mit)
+       ERWARTUNG, NICHT WERTE-QUELLE: die Werte werden je Lauf auf der Maschine ERHOBEN (Owner-KERN 27.07.,
+       "HW-Werte nie statisch"); was hier steht, ist der Soll-Wert fuer den Cross-Check. ABWESEND = NICHT
+       DEKLARIERT (nicht "leeres OS"). Die OS-FAMILIE (linux/windows/macos) steht NICHT hier: sie ist die
+       Haupt-Achse und wird einkompiliert und gestempelt.
+       ABGRENZUNG build: das ist der OS-Patch-Stand, NICHT die build_version (Ledger 70.6) und NICHT der
+       build_type des Suffix-Segments "+bt=". -->
   <xs:complexType name="MachinesType">
     <xs:sequence>
       <xs:element name="machine" minOccurs="1" maxOccurs="unbounded">
         <xs:complexType>
-          <xs:attribute name="id"                type="xs:string"      use="required"/>
-          <xs:attribute name="cpu_fabrication"   type="xs:string"      use="required"/>
-          <xs:attribute name="ram_pair"          type="xs:string"      use="required"/>
-          <xs:attribute name="hostname_hint"     type="xs:string"      use="optional"/>
-          <xs:attribute name="ram_frequency_mhz" type="xs:unsignedInt" use="optional"/>
-          <xs:attribute name="cas_latency_cl"    type="xs:unsignedInt" use="optional"/>
+          <xs:attribute name="id"                    type="xs:string"      use="required"/>
+          <xs:attribute name="cpu_fabrication"       type="xs:string"      use="required"/>
+          <xs:attribute name="ram_pair"              type="xs:string"      use="required"/>
+          <xs:attribute name="hostname_hint"         type="xs:string"      use="optional"/>
+          <xs:attribute name="ram_frequency_mhz"     type="xs:unsignedInt" use="optional"/>
+          <xs:attribute name="cas_latency_cl"        type="xs:unsignedInt" use="optional"/>
+          <xs:attribute name="os_version"            type="xs:string"      use="optional"/>
+          <xs:attribute name="kernel"                type="xs:string"      use="optional"/>
+          <xs:attribute name="build"                 type="xs:string"      use="optional"/>
+          <xs:attribute name="os_declaration_source" type="xs:string"      use="optional"/>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
