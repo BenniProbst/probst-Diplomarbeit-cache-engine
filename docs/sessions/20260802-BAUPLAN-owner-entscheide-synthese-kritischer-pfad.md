@@ -46,7 +46,7 @@ Nicht auf dem kritischen Pfad, aber Pflicht vor Trigger: A8 Benchmarking-Schnitt
 
 - **Q1 BEANTWORTET (Owner ~12:1x): KLAMMER-FORM** — Q-A-Auflage gilt (Klammer-Anzahl kodiert die Ebene); Punkt-Pfad-Empfehlung verworfen; A13-M2 baut die Klammer-Erweiterung des consteval-Parsers als Pflichtteil. **M2 ist entsperrt.**
 - **Q2 BEANTWORTET (Owner ~12:1x):** Strategie wird durchgeführt, lebt im Stempel NUR über das 'e'-Suffix; Differenzierung über erweiterte hierarchische Algorithmus-Namen (`prt-art.memory.abc@1.0.0`, ce nach gleichem Muster). Lager-Key-Eindeutigkeit über Namens-Erweiterung + CT-Wache (byte-verschiedene Merge-Binaries nie namensgleich). **M3 ist entsperrt.** Wortlaut: Owner-Doc Nachtrag.
-- **Q3:** 'e'-Suffix-Form: klein-e direkt angehängt, auch an Kurzform (`2.3.4e`, `v1e`) — ok? (Empfehlung: ja.)
+- **Q3 BEANTWORTET (Owner ~17:0x, ERSETZT die Empfehlung): FLAG-GRAMMATIK.** Kurzform VERBOTEN; Versionen immer `vX.Y.Z` + Hardware-Flag (`c`=CPU/`g`=GPU/`f`=FPGA/`n`=NPU) + optional `e`; CPU-only ⇒ alle Versionen enden `c`/`ce` (`v1.0.0c`, `v2.3.4ce`). → Paket **A13-M1b** (Welle 2): v1e-Kurzform-Rückbau, Flag-Parser, „genau-ein-HW-Flag"-Wache; Bestands-Migration `v1.0.0`→`v1.0.0c` ins EINE M2/M3-Neuanker-Fenster gebündelt. Wortlaut: Owner-Doc Nachtrag.
 - **Q4:** CSV-Zell-Token für bau-gescheiterte Permutationen = `nicht_gebaut` (auswerte-sichtbar, analog `gesperrt`) — ok?
 - **Q5:** E-24-Bündelung ins EINE 4→5-ABI-Fenster (F1b+F2+#37+E-24) bestätigen; Graph-Gattung: eigener Entscheid jetzt oder nach Abgabe?
 - **Q6:** Hybrid: Ein-Gattung-Lesart (ein Hybrid-Binary je Gattung) bestätigen; Dock-Array-MaxN Default 8; LEDGER:187(e) „Heuristik-Optimierung als eigene Systemachse" durch E1-Stufen-Modell superseded?
