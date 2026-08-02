@@ -49,5 +49,13 @@ Rückfrage 9: Nein, ALLES genannte wird voll gebaut, wir haben die Ressourcen da
 ### R8 → Thesis-Rahmen-Pass: volles GO. Danksagung Habich: **bescheiden + diszipliniert würdigen, NICHT überschwänglich**.
 ### R9 → E-04 **VOLLAUSBAU** vor Trigger (keine Minimalform). „ALLES genannte wird voll gebaut."
 
+## NACHTRAG ~12:1x CEST — Owner-Antworten Q1/Q2 der Bauplan-Fragen (verbatim)
+
+„Q1 - Wie empfohlen nach Klammern (derzeit auch so geplant, bitte nachlesen). Q2 - Die Merge strategie wird durchgeführt aber lebt in den Stempeln nur durch das bezifferte 'e' für experimentell und kann erweiterte Muster wie prt-art.memory.abc@1.0.0 nach sich ziehen, die cache engine macht das nach dem gleichen muster."
+
+**Auslegung (bindend für A13):**
+- **Q1 = KLAMMER-FORM.** Die Meta-Meta-Ebenen-Kodierung im Stempel folgt der bereits im Code kodifizierten Q-A-Auflage (Klammer-ANZAHL kodiert die Ebene; hardware_meta_meta_axis.hpp Kopf + :222-223/:281-283). Die Punkt-Pfad-Empfehlung des Designs ist VERWORFEN; A13-M2 baut die Klammer-Erweiterung des consteval-Zeilen-Parsers (anatomy_stamp_entries.hpp) als Pflichtteil. (Wichtig: Punkt-Pfade bleiben das Muster im ALGORITHMUS-NAMENSRAUM, s. Q2 — zwei verschiedene Namensräume, keine Kollision.)
+- **Q2 = Strategie ohne eigenes Stempel-Feld.** Die Merge-Strategie wird DURCHGEFÜHRT, erscheint im Stempel aber NUR über das 'e'-Suffix der Versionsbezifferung; Differenzierung, wo nötig, über ERWEITERTE hierarchische Algorithmus-Namen nach dem Muster `prt-art.memory.abc@1.0.0` — die cache-engine nutzt dasselbe Namens-Muster. Damit ist die A13-Review-K-2-Frage (Lager-Key-Kollision zweier Strategien) über die Namens-Erweiterung zu lösen: unterschiedliche Merge-Konstellationen ⇒ unterschiedliche zusammengesetzte Algorithmus-Namen ⇒ unterschiedliche Stempel/SHA512. A13-M3 hat das als Design-Invariante durchzusetzen (CT-Wache: byte-verschiedene Merge-Binaries dürfen nie namensgleiche Organ-Segmente tragen).
+
 ## Neue Paket-Wahrheit (Katalog-Deltas)
 A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final drei (E3) · A15=Fehlerklassen-Framework #29 (E6) · A16=E-Pflicht-Bündel jetzt (E-24 als LETZTER ABI-Schritt in die Gate-Reihenfolge, E-19 Runner-Fleet-Soll+Poll-Jitter, E-02 Vier-Ledger-Struktur herstellen, E-23 API-Suchlauf, E-21 STACK/Verbose) · Hybrid-Tier: Design JETZT (ultracode), Bau=Auswertungsphase · D: PAT-Rotation nach Messfenster (Handout raus) · Plattform-Querschnitt: RISC-V + macOS M1 + macOS x86.

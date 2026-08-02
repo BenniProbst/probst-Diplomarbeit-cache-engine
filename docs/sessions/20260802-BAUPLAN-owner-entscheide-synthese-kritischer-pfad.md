@@ -44,8 +44,8 @@ Nicht auf dem kritischen Pfad, aber Pflicht vor Trigger: A8 Benchmarking-Schnitt
 
 ## 3. Owner-Fragen aus der Designplanung (gesammelt; Q1/Q2 sind SEQUENZ-KRITISCH)
 
-- **Q1 (blockiert A13-M2):** Meta-Meta-Ebenen-Kodierung im Stempel-Segment — Punkt-Pfad `external_utils.simd=code@1.0.0` (Empfehlung: bestehende Serialisierungs-Konvention, consteval-Parser-fähig) ODER Klammer-Form nach deiner Q-A-Auflage (Code kodifiziert „Klammer-ANZAHL kodiert die Ebene", hardware_meta_meta_axis.hpp:222-223/:281-283)?
-- **Q2 (blockiert A13-M3-Abschluss):** Merge-Strategie-Provenienz nach Wegfall der merge-Zeile — Einfaltung ins Organ-Segment `path_compression=prt_algo+stufe2_hybrid@2.3.4e` (Empfehlung) ODER Strategie ist nicht stempel-relevant (dann bräuchte es den Beweis, dass zwei Strategien nie byte-verschiedene Binaries mit gleichen Zeilen erzeugen — heute widerlegt)?
+- **Q1 BEANTWORTET (Owner ~12:1x): KLAMMER-FORM** — Q-A-Auflage gilt (Klammer-Anzahl kodiert die Ebene); Punkt-Pfad-Empfehlung verworfen; A13-M2 baut die Klammer-Erweiterung des consteval-Parsers als Pflichtteil. **M2 ist entsperrt.**
+- **Q2 BEANTWORTET (Owner ~12:1x):** Strategie wird durchgeführt, lebt im Stempel NUR über das 'e'-Suffix; Differenzierung über erweiterte hierarchische Algorithmus-Namen (`prt-art.memory.abc@1.0.0`, ce nach gleichem Muster). Lager-Key-Eindeutigkeit über Namens-Erweiterung + CT-Wache (byte-verschiedene Merge-Binaries nie namensgleich). **M3 ist entsperrt.** Wortlaut: Owner-Doc Nachtrag.
 - **Q3:** 'e'-Suffix-Form: klein-e direkt angehängt, auch an Kurzform (`2.3.4e`, `v1e`) — ok? (Empfehlung: ja.)
 - **Q4:** CSV-Zell-Token für bau-gescheiterte Permutationen = `nicht_gebaut` (auswerte-sichtbar, analog `gesperrt`) — ok?
 - **Q5:** E-24-Bündelung ins EINE 4→5-ABI-Fenster (F1b+F2+#37+E-24) bestätigen; Graph-Gattung: eigener Entscheid jetzt oder nach Abgabe?
