@@ -38,3 +38,7 @@ Der Design-Workflow (Run wf_a6dc0828-593) lief 12/13 Agenten fertig (6 Designs +
 ## 6. Offene Punkte unverändert (Kurzliste)
 
 A-Strecke nach Bauplan-Zeitachse (Trigger-Ziel Do 07.08.); W10-Zellwert-Paket; SHA512-Gate NACH A13; E.0 KERN-Schema vor Messung; Infra: heavy auf unser Signal, degraded=0-Komfort-Doc, ee1004→spd5118-Posten ruht; Messung nur mit USER-GO.
+
+## NACHTRAG ~12:35 CEST — Impl-CE-P3 unterbrochen, Zwischenstand gesichert
+
+Der Nachbesserungs-Agent wurde unterbrochen (interrupted, ohne Paketmeldung). Read-only-Befund: **ce-Worktree CLEAN**, dev lokal auf **1e6d8965** — beide BLOCKIERENDEN Befunde sind bereits committet (880bc9ba = B-1 Registrierung nach Push-Drain + Push-Fehler ausgeschlossen + Pfad store-relativ; 9015e9f1 = B-2/B-3 builds-Buchung + volle done-Menge + Lager-Skips differenzierbar, Gate 322->323; 1e6d8965 = ASCII-Nachzug). AUSSTEHEND bei Wiederaufnahme: A-1/A-2/A-3-Mitnahmen + FakeStore-Fehlerpfad + Doppellauf-Beweis 323 + Paketmeldung, DANN Manager-Abnahme (cf22/gitleaks/Truth-Check-Verifikation der Fixes) und Push-Sequenz. NICHTS gepusht.
