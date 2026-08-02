@@ -115,3 +115,16 @@ dev+main + thesis-origin). thesis-Sprachpass-Commits sind auf github gesichert
 (048f3ba..9ddb658, unabgenommen). LETZTER offener Owner-Punkt: F14-GO (Ersatz-Trigger-
 Bedingung: Auth-200 + 2h ohne scheduler_failure + Infra-'Baremetal-unbeeintraechtigt'
 statt degraded=0).
+
+NACHTRAG ~08:5xZ — FINALE OWNER-ENTSCHEIDE (alle Fragen geschlossen):
+F14 = GO in Entkopplungs-Form (Infra-Doc 2026-08-02-INFRA-AN-diplom-F14-GO.md, Owner
+verbatim 'F14 wie empfohlen passt'): Trigger-Gate BINDEND = (a) Auth-200 [erfuellt] +
+(b) 2h ohne scheduler_failure [laeuft ab 07:57Z] + (c) Baremetal-Bestaetigung [erteilt];
+degraded=0 nur noch Komfort-Zusage (Messkette ohnehin seit node7-Ausfall tot, K115t).
+F15 = prod2 ist ein i9-12900K (Alder Lake; 'die Ersatz-CPU ist noch drin') — Deklaration
+GenuineIntel/6/151/2 KORREKT; Thesis: K5-Intel-Halbsatz darf 12900K nennen, die Rang-3-
+14900KS-Nennung ist zu pruefen (vermutlich urspruenglich geplante CPU, nicht die Mess-
+Plattform). NEU PFLICHT: SPD-Freischaltung prod2 via Infra-Handout (geschrieben:
+2026-08-02-DIPLOM-AN-infra-PFLICHT-spd-freischaltung-prod2.md). ES GIBT KEINE OFFENEN
+OWNER-FRAGEN MEHR — die komplette Strecke bis Trigger+Messung ist entscheidungsfrei
+(einzig Mess-START braucht spaeter USER-GO).
