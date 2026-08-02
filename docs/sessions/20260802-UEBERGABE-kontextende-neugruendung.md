@@ -91,3 +91,19 @@ Infra (Handout 2026-08-01-DIPLOM-AN-infra-PRIO-* + Nachträge): degraded=0-Signa
 Cluster docs/sessions), heavy-Schaltung auf unser Signal, ee1004-prod2 NACH prod1-Test (F13),
 Marathon-Ursache (nice-to-have). Owner: Danksagungs-/Sperrvermerk-Freigabe nach Entwurf;
 Aufgabenblatt-PDF; Voll-Messung-GO nach Voll-Bau.
+
+## NACHTRAG ~07:50Z — GITLAB AUTH-500 (CiCheck288h-Erstbefund) + TRIGGER-AUFLAGEN-PROBLEM
+1. gitlab.comdare.local: ALLE authentifizierten Pfade 500 (API+Web-Login+Git-HTTPS; readiness
+   taeuscht gruen; 401/500-Split beweist gueltige Tokens; Redis-read-only-Signatur = Wieder-
+   holung K115e). x-request-ids fuer Infra: 01KZ0PZ0HW9BXFK0TBB8AD1GF5, 01KZ0Q14JNJPSG2FKB9Y8MT5RC.
+   FOLGE: origin-Pushes scheitern (Uebergabe e8ecc496 ist NUR auf github: dev+main); Cluster-
+   Handout unten ist lokal committet, Push nach Entstoerung. Lokal-only-Arbeit laeuft weiter
+   (Sprachpass, P3).
+2. TRIGGER-AUFLAGE STRUKTURELL BLOCKIERT: degraded=0 ist laut K115l UNERREICHBAR bis Infra-#472
+   (DB-Decommission schafft Einplanungsraum; 'Warten bis degraded=0 wuerde nie enden').
+   => OWNER-ENTSCHEID F14 VORLEGEN: Ersatz-Freigabebedingung fuer den Voll-Bau-4-Trigger —
+   Vorschlag: (a) GitLab-Auth wieder 200 + (b) 2h CI-Betrieb ohne scheduler_failure +
+   (c) Infra-Kurzbestaetigung 'Baremetal-Pfad unbeeintraechtigt' (die Rebuild-Volumes liegen
+   auf dev-K8s, prod1/prod2-Runner sind nicht betroffen) — STATT degraded=0.
+3. WIEDERAUFNAHME-ZUSATZ: origin-Nachschub super (dev+main auf e8ecc496+) + Cluster-Push
+   sobald 200; CiCheck288h haelt Rueckkehr-Wache und liefert das Erst-Delta nach.
