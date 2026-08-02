@@ -1,0 +1,445 @@
+{
+  "summary": "Welle 1 der A-Strecke: OS-U1/U2, A13-M1, FK-0, HY-D2 als Opus-Worker (Patches) + Fable-Reviews",
+  "agentCount": 8,
+  "logs": [],
+  "result": {
+    "welle1": [
+      {
+        "key": "A14-OSU12",
+        "bau": {
+          "key": "A14-OSU12",
+          "patch_dir": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/A14-OSU12",
+          "commits": [
+            "CE (Basis 6b8eee0f, Worktree /home/comdare/wt-w1-A14-OSU12, Branch w1-A14-OSU12) 73c8ab18d866df34a11b8d9cdd2aaf9a727486d5 feat(measurement): A14/OS-U1 -- FINALE DREI operating_system-Unter-Achsen (os_version/kernel/build)",
+            "CE 21367f39407592c54d2a926720176e48e6144912 feat(registry): A14/OS-U2 -- 3 sub_axis-Emissionen operating_system + Registry-XML ATOMAR regeneriert",
+            "CE f1aa1a7cb7c58b1c93255fecd91d485b61b49bab feat(parser): A14/OS-U2 -- <machine>-ERWARTUNGS-Attribute os_version/kernel/build (additiv, passiv)",
+            "SUPER (Basis f8e2863d, Worktree /home/comdare/wt-w1-A14-OSU12-super, Branch w1-A14-OSU12-xsd) 0a31bbff9ac9486cc7b8e39e3106a3853ad6ca42 feat(schema): A14/OS-U2 -- <machine> bekommt die OS-ERWARTUNGS-Attribute os_version/kernel/build"
+          ],
+          "dateien": [
+            "/home/comdare/wt-w1-A14-OSU12/libs/cache_engine/include/cache_engine/measurement/operating_system_sub_axes.hpp (NEU, 197 Z.)",
+            "/home/comdare/wt-w1-A14-OSU12/libs/cache_engine/include/cache_engine/measurement/operating_system_axis.hpp (Kommentar-Neufassung Kopf + Katalog-Anker; Typen/Strings/Asserts unveraendert)",
+            "/home/comdare/wt-w1-A14-OSU12/libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp (Auflage K5: Kommentar-Wache am operating_system-Eintrag; KEIN static_assert, damit ein spaeterer gewollter Bump nicht blockiert)",
+            "/home/comdare/wt-w1-A14-OSU12/tools/system_axis_registry_gen/main.cpp (emit_operating_system_open_sub_axes + Aufruf + Include + NETZ-4-Kommentar)",
+            "/home/comdare/wt-w1-A14-OSU12/libs/cache_engine/include/cache_engine/measurement/system_axis_registry.xml (REGENERIERT, exakt 3 additive <sub_axis>-Zeilen)",
+            "/home/comdare/wt-w1-A14-OSU12/libs/common/serialization/xml_config_parser/xml_config_parser.hpp (ExperimentMachine +4 Felder am ENDE, mit ausgeschriebenem Default {})",
+            "/home/comdare/wt-w1-A14-OSU12/libs/common/serialization/xml_config_parser/xml_config_parser.cpp (4 attr()-Lesungen, passiv)",
+            "/home/comdare/wt-w1-A14-OSU12/libs/cache_engine/include/cache_engine/measurement/machine_identity.hpp (stale Zeilenverweis auf die Parser-Naht mitgezogen)",
+            "/home/comdare/wt-w1-A14-OSU12/tests/unit/test_a14_os_sub_axes_guard.cpp (NEU, 122 Z., 4 Faelle)",
+            "/home/comdare/wt-w1-A14-OSU12/tests/unit/CMakeLists.txt (Registrierung test_a14_os_sub_axes_guard)",
+            "/home/comdare/wt-w1-A14-OSU12/tests/unit/thesis_tiere/test_experiment_kern_seam.cpp (+2 Faelle fuer die OS-Erwartungs-Attribute)",
+            "/home/comdare/wt-w1-A14-OSU12-super/Code/test_data_xml/experiment_schema.xsd (4 optionale <machine>-Attribute + Kommentar-Block)"
+          ],
+          "beweise_literal": [
+            "OS-U1 ctest-Binary: '[==========] Running 4 tests from 1 test suite.' ... '[       OK ] A14OsSubAxes.FinalDreiLabelsUndOptionsHerkunft (0 ms)' / '[       OK ] A14OsSubAxes.ElternBezugKommtAusDemTypNichtAusEinemLiteral (0 ms)' / '[       OK ] A14OsSubAxes.NamensfallenBuildUndOsSindAusgeschlossen (0 ms)' / '[       OK ] A14OsSubAxes.UnterAchsenStehenNichtImSystemStempel (0 ms)' ... '[  PASSED  ] 4 tests.'",
+            "K6-GATE (benannter Beweis, ctest -V): '303: -- Generator-Ausgabe:' / '303: system_axis_registry_gen: 3 System-Achsen-Elemente (opt_level/atomic128/simd als sub_axis), 8 Bausteine, simd_feature_catalog=23 Flags, machine_signatures=3 -> .../registry_roundtrip_system/regenerated_registry.xml' / '303: -- registry_roundtrip: Byte-Diff == 0 - committete XML == Code-Reflektion.' / '1/1 Test #303: test_system_axis_registry_roundtrip ...   Passed    0.01 sec'",
+            "Registry-XML-Delta (git diff, exakt 3 additive Zeilen nach dem macos-Baustein): '+    <sub_axis id=\"os_version\" parent=\"operating_system\" stage=\"runtime\" value_type=\"token\" option_source=\"machine_resolved\"/>' / '+    <sub_axis id=\"kernel\" parent=\"operating_system\" stage=\"runtime\" value_type=\"token\" option_source=\"machine_resolved\"/>' / '+    <sub_axis id=\"build\" parent=\"operating_system\" stage=\"runtime\" value_type=\"token\" option_source=\"machine_resolved\"/>'",
+            "Parser-Naht: '[       OK ] ExperimentKernSeam.ParsesDeclaredOsExpectationValues (0 ms)' / '[       OK ] ExperimentKernSeam.MachinesWithoutOsExpectationStayEmpty (0 ms)' ; Gesamtdatei '[==========] 15 tests from 1 test suite ran. (0 ms total)' / '[  PASSED  ] 15 tests.'",
+            "XSD (xmllint, super-Worktree): 'XSD_WOHLGEFORMT_OK' / 'experiment_golden_kern.xml validates' / 'experiment_golden.xml validates' / 'GOLDEN_INSTANZEN_VALIDE'",
+            "XSD Positiv-Probe (Instanz MIT allen vier neuen Attributen): '/tmp/.../os_probe_instance.xml validates' + 'NEUE_ATTRIBUTE_VALIDE'",
+            "XSD Negativ-Gegenprobe (FINAL DREI auch XML-seitig scharf): \"element machine: Schemas validity error : Element 'machine', attribute 'update_status': The attribute 'update_status' is not allowed.\" / '.../os_probe_negativ.xml fails to validate' / 'NEGATIV_EXIT=3'",
+            "Betroffene Test-Targets, ctest-Gesamtlauf (19 Stueck): 'Test #198: test_kf1_thesis_profile_parser ... Passed', '#211 test_striktheit_axis_dach_guard ... Passed', '#212 test_a14_os_sub_axes_guard ... Passed', '#247 test_profile_coverage ... Passed', '#254 test_experiment_parser ... Passed', '#255 test_experiment_kern_seam ... Passed', '#256 test_experiment_projection ... Passed', '#257 test_merge_plan_directive ... Passed', '#258 test_experiment_plan_director ... Passed', '#260 test_validate_profile ... Passed', '#272 test_ff2_node_width_subaxis ... Passed', '#273 test_fb_alloc_hw_subaxis ... Passed', '#276 test_e4_contract_xml_to_axislevels ... Passed', '#283 test_p2_ram_probe_chain ... Passed', '#285 test_p3_boot_cache_dmi ... Passed', '#288 test_m_w12_stamp_bausteine ... Passed', '#293 test_parser_konsolidierung ... Passed', '#301 test_profile_roundtrip ... Passed', '#303 test_system_axis_registry_roundtrip ... Passed' -> '100% tests passed, 0 tests failed out of 19'",
+            "cf22-SELBSTCHECK (Liste aus dem Diff abgeleitet, alle geaenderten .hpp/.cpp): '~/tools/cf22/usr/bin/clang-format-22 --dry-run -Werror' -> leere Ausgabe, 'CF22_EXIT=0'",
+            "ASCII-SELBSTCHECK (Diff-Plus-Zeilen, sed 's/paragraph//g'): 'NICHT_ASCII_ZEILEN_CE=0' und 'NICHT_ASCII_ZEILEN_SUPER=0'",
+            "TABU-WACHE ueber den gesamten Commit-Bereich: 'TABU_TREFFER=0' (kein golden_fullpilot_320*/permutation_axes.xml/m3v2_study.profile.xml im Diff); Secret-Schnellprobe ueber die Patch-Dateien: 'SECRET_TREFFER=0'",
+            "Basis-Beweis VOR dem Bau (Ausgangslage gruen): '1/1 Test #302: test_system_axis_registry_roundtrip ...   Passed    0.01 sec' auf dem unveraenderten Stand 6b8eee0f",
+            "Konsumenten-Beleg statt Vermutung: read_axis_registry (libs/cache_engine/profile_facade/validate_profile.hpp:674-676) liest ausschliesslich <axis>/<baustein>; grep ueber cpp/hpp/cmake/txt findet KEINEN weiteren Ableitungsweg fuer den XML-String 'sub_axis' -> system_axis_count bleibt 3, baustein_count(target_isa) bleibt 2"
+          ],
+          "ledger_texte": [
+            "LEDGER-NACHTRAG (Entwurf, A14/OS-U1): Die System-Haupt-Achse operating_system traegt ab sofort GENAU DREI Unter-Achsen -- os_version, kernel, build (measurement/operating_system_sub_axes.hpp). Sie sind stage=runtime mit option_source=machine_resolved (Muster numa_node/page am target_isa-Komplex) und haengen ueber den TYP OperatingSystemAxisTag, nicht ueber einen String. Der Update-Zustand ist in 'build' GEMERGT (Owner E-12) und ist ausdruecklich KEINE vierte Achse; eine vierte bricht compile-time (FINAL-DREI-Wache). Quelle: Owner-Entscheid E3 vom 02.08.2026, A-08/K-04.",
+            "LEDGER-NACHTRAG (Entwurf, A14/K5 Stempel-Neutralitaet): kSystemAxisCodeVersions[operating_system] bleibt bei v1.0.0. Die Einhaengung der drei Unter-Achsen aendert den einkompilierten Achsen-CODE nicht; ein Bump ginge in system_stamp_line ein, verschoebe den SHA512 ALLER Neubauten gegen den Bestand und liesse das Lager-Skip-Gate an den Alt-Binaries vorbeilaufen -- exakt die von Owner-E3 ausgeschlossene Folge. Verankert als Kommentar-Wache an der Tabelle (bewusst kein static_assert, damit ein spaeterer, andersbegruendeter Bump nicht an dieser Datei haengenbleibt). A-15 gilt unveraendert: RT-Unter-Achsen stehen NIE im Binary-Stempel.",
+            "LEDGER-NACHTRAG (Entwurf, A14/OS-U2 Suffix): Der build_version-Suffix bekommt WEITERHIN kein operating_system-Segment (kSuffixSegmentBindings). Neu begruendet und im Generator-Kommentar verankert: (1) A-15 -- RT-Unter-Achsen stehen nie im Stempel und damit nie im Suffix (Ledger 70.6); (2) ein neues Segment waere ein Byte-Ereignis auf JEDER bestehenden build_version, jedem .version-Sidecar und jedem Cache-Key. Die Instanz-Zuordnung einer Messung laeuft ueber Mess-Spalten/Dateinamen (OS-U4), nicht ueber den Suffix.",
+            "LEDGER-NACHTRAG (Entwurf, A14/OS-U2 Deklarations-Kanal): <machines> ist zusaetzlich der ERWARTUNGS-Kanal der drei OS-Unter-Achsen. Neue optionale <machine>-Attribute: os_version, kernel, build, os_declaration_source (experiment_schema.xsd, super). Ausdruecklich ERWARTUNG, nicht Werte-Quelle -- die Werte werden je Lauf erhoben (OS-U3, Owner-KERN 27.07.); abwesend = nicht deklariert. Das Schema kennt KEIN update_status-Attribut (xmllint weist es zurueck) -- FINAL DREI gilt auch XML-seitig.",
+            "LEDGER-NACHTRAG (Entwurf, OP-10-TEIL-SUPERSEDE, gehoert eigentlich zu OS-U5): Die exklusive OP-10-Lesart 'Distribution/Version sind NUR Stempel-Variablen, keine Unter-Achsen' ist durch Owner-E3 (02.08.) teil-superseded. UNVERAENDERT gilt: die Haupt-Achse traegt GENAU DREI FAMILIEN (linux/windows/macos), Distro/Version sind keine Auspraegungen DIESER Achse. NEU: sie sind die Unter-Achsen os_version/kernel/build. Der Code-Kommentar in operating_system_axis.hpp ist neu gefasst; das Doku-Archiv (PLAN-o8:806-812) bleibt unangetastet (Doku nur deprecaten, nie loeschen). OS-U5 (Session-Doc + Ledger-Vollzug A-08) ist NICHT Teil dieses Pakets."
+          ],
+          "offene_punkte": [
+            "ZWEI PATCH-SERIEN, zwei Repos: Der XSD liegt NICHT im ce-Submodul, sondern im super-Repo (Code/test_data_xml/experiment_schema.xsd). CE-Serie (3 Patches, Basis 6b8eee0f) liegt in patches/A14-OSU12/, die SUPER-Serie (1 Patch, Basis f8e2863d) in patches/A14-OSU12/super/. Dafuer wurde ein ZWEITER Worktree /home/comdare/wt-w1-A14-OSU12-super (Branch w1-A14-OSU12-xsd) angelegt -- beide Worktrees stehen und wurden NICHT entfernt.",
+            "WORKTREE-ABWEICHUNG: 'git worktree add <pfad> development' schlug fehl ('development is already used by worktree ...'). Stattdessen 'git worktree add -b w1-A14-OSU12 <pfad> development' -- Basis-Commit ist unveraendert 6b8eee0f, nur der Branch-Name weicht ab. Analog im super-Repo.",
+            "SCOPE-ERWEITERUNG (bewusst, isoliert entfernbar): Der DRITTE CE-Commit (f1aa1a7c) baut die LESENDE Parser-Naht fuer die vier neuen <machine>-Attribute. Ohne sie waeren die XSD-Attribute ein Phantom (deklariert, von niemandem gelesen) -- die Repo-Doktrin verlangt Konsument+Contract-Test im selben Increment. Wenn der Manager das strikt nach OS-U3/U4 verschieben will, ist genau dieser eine Commit herausnehmbar; der XSD-Commit sollte dann mit ihm zusammen warten.",
+            "NAMENS-PRAEZISIERUNG gegenueber dem Design-Wortlaut '(+declaration_source)': das Attribut heisst os_declaration_source. Ein nacktes declaration_source am <machine> waere mehrdeutig -- die RAM-Deklaration fuehrt ihre Herkunfts-Notiz bereits als ram_frequency_source (machine_identity.hpp) und die Registry-XML nutzt declaration_source am <sub_dim> einer anderen Ebene. Bitte quittieren oder umbenennen lassen.",
+            "REVIEW-BEFUND B1/K1 BLEIBT OFFEN und ist NICHT Teil dieses Pakets: system_stamp_line traegt weiterhin nur Code-Versionen, keine System-Zellwerte (W10-Anschluss). Bis dahin gilt die Uebergangsregel des Bauplans: SHA512-Skip nur INNERHALB der gleichen OS-Familie. Owner-E3s Wiederverwendbarkeits-/Zuordbarkeits-Versprechen ist damit erst nach W10 voll eingeloest.",
+            "OS-U3 bis OS-U5 auftragsgemaess NICHT gebaut (RT-Erhebung via Codex; Doku/Ledger-Vollzug + OP-10-Supersede-Session-Doc offen). Die Owner-NUR-KENNTNIS-Meldung zur A-08-Abweichung (Q8) ist Pflicht VOR OS-U3 und steht noch aus.",
+            "VOLLES GATE (Doppellauf) ausstehend -- auftragsgemaess nur die betroffenen Targets lokal gebaut und ausgefuehrt (19 ctest gruen). build-w1 wurde per Initial-Cache aus build-v6/CMakeCache.txt abgeleitet (alle COMDARE_*-BOOL/STRING + CMAKE_BUILD_TYPE=Release, Ninja); die PATH/FILEPATH-Eintraege wurden BEWUSST weggelassen, weil sie auf build-v6- bzw. Haupt-Worktree-Pfade zeigen (COMDARE_COMPILER_CACHE_DIR/TOOLS_CACHE_DIR -- Haupt-Worktree nicht anfassen). Helfer-Datei /home/comdare/wt-w1-A14-OSU12/initial-cache-w1.cmake ist untracked+gitignored und NICHT im Patch.",
+            "WARNUNGS-DISZIPLIN: Die neuen ExperimentMachine-Felder haetten in test_experiment_kern_seam.cpp:249 eine neue -Wmissing-field-initializers-Warnung erzeugt; sie ist durch ausgeschriebene Defaults {} vermieden (0 Treffer im Build-Log). Die verbleibenden Warnungen aus libs/cache_engine/builder/experiment_tree/profile_to_tree.hpp sind Bestand und nicht von diesem Paket.",
+            "SEQUENZ-HINWEIS an den Manager: Dieses Paket ist stempel-neutral und damit A13-unabhaengig, ABER der Registry-Regen ist konfigurations-gebunden. Landet A13 vor der Uebernahme, ist der roundtrip nur zu wiederholen, nicht neu zu eichen -- die System-Registry haengt nicht am Stempel-Layout."
+          ]
+        },
+        "review": {
+          "verdict": "NACHBESSERN",
+          "befunde": [
+            "BLOCKIEREND-LEICHT (komment-only, vor Landung fixen + Patches regenerieren): K5-FEHLZUORDNUNG. Das bindende Dossier definiert K5 als probe_id-Versionierung der OsIdentityProbe fuer OS-U3 (designs/A14-os-unterachsen.md:18); die Bump-Verbots-Wache stammt aus RISIKEN 'Review-Wache noetig' (ebd.:29) und Design (3) OHNE K-Nummer. Die Patches etikettieren die Bump-Wache 7x als 'Auflage K5'/'Bauplan A14': /home/comdare/wt-w1-A14-OSU12/libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp:39+:51, .../measurement/operating_system_sub_axes.hpp:27+:30, .../measurement/operating_system_axis.hpp:26, /home/comdare/wt-w1-A14-OSU12/tests/unit/test_a14_os_sub_axes_guard.cpp:17+:105+:115, dazu Commit-Message 0001. Wirkung: sobald OS-U3 die ECHTE K5 (versioniertes probe_id, Muster hardware_probe_factory.hpp:97 'linux_dmi_spd_v1') einloest, existieren zwei widersprechende K5-Anker -- exakt die Drift-Klasse, die die Namensfallen-Wachen dieses Pakets selbst bekaempfen. Kein Bauplan-A14-Dokument mit eigener K-Nummerierung auffindbar (scratchpad: nur designs/A14-os-unterachsen.md; bauplan-v2.md hat kein A14). Fix: Etikett auf 'Design (3)/RISIKEN Bump-Verbot' o.ae. umschreiben, K5 fuer OS-U3 freihalten.",
+            "DEKLARIERTE ABWEICHUNG, AKZEPTIERT (Design-Doc nachziehen): Attribut heisst os_declaration_source statt Design 'declaration_source' (Dossier:112). Begruendung des Workers verifiziert WAHR: machine_identity.hpp:177 fuehrt ram_frequency_source als Muster, und system_axis_registry.xml:24 nutzt declaration_source bereits am <sub_dim> einer ANDEREN Ebene -- ein nacktes declaration_source am <machine> waere mehrdeutig. Sauber im Commit deklariert. Auflage: Dossier/OS-U5-Doku um die Namens-Praezisierung ergaenzen, damit Design=Quelle bleibt (LaTeX/Design-ist-Quelle-Doktrin).",
+            "SCOPE-TREUE BESTANDEN: exakt OS-U1+OS-U2 (Paket A14-OSU12); ce-Commits 73c8ab18/21367f39/f1aa1a7c + super-XSD-Patch decken PAKETE-Zeilen 22-23 des Dossiers; Parser+XSD sind dort explizit OS-U2-Bestandteil. Die Bump-Kommentar-Wache in system_axis_code_versions.hpp ist komment-only und vom Dossier gefordert (RISIKEN:29). OS-U3/U4/U5 korrekt NICHT angefasst (kein sw_vers, keine Probe, keine Fehlerklassen, keine Lager-Spalten). Kein Kriecher. Worktree /home/comdare/wt-w1-A14-OSU12 clean (status 0 Zeilen) -- Freeze eingehalten.",
+            "DESIGN-/OWNER-TREUE BESTANDEN: FINAL DREI os_version/kernel/build exakt A-08/K-04; E-12-Merge durchgesetzt (Namensfallen-Wache verbietet update_zustand/update_status, operating_system_sub_axes.hpp:256-258 + static_assert:302); Eltern-Bezug als TYP via OperatingSystemAxisTag (Muster TargetIsaAxisTag), Label aus Single-Source LinuxOperatingSystem::axis_label(); option_source=machine_resolved exakt nach numa_node/page (Generator-Lambda main.cpp:410 deckungsgleich zu :370); 3-Familien-Katalog von OP-10 bleibt; Kommentar-Neufassung operating_system_axis.hpp kippt die Suffix-/OP-10-Semantik NICHT ('bewusst KEIN Segment' bleibt, main.cpp:551). Auflage K6 erfuellt: Generator+XML atomar in 21367f39, Gate benannt. K2-konform: kein sw_vers/system_profiler im gesamten Diff (grep 0 Treffer).",
+            "GOLDEN-/BYTE-NEUTRALITAET BEWIESEN (selbst nachgemessen, nicht nur gemeldet): test_m_w12_stamp_bausteine Passed (Stempel-Zeilen-Pins unveraendert); test_system_axis_registry_roundtrip Passed (Byte-Diff==0 nach Regen); Registry-XML-Delta = exakt 3 additive sub_axis-Zeilen :45-47; kSuffixSegmentBindings-WERTE unveraendert (nur Kommentar); kSystemAxisCodeVersions unveraendert v1.0.0 (kein Bump); XSD nur optionale Attribute -- experiment_golden_kern.xml und experiment_golden.xml validieren weiter (xmllint literal: 'validates'); Parser-Felder additiv am Struct-Ende mit {}-Default, Golden-Kern-Fixture-Verhalten per neuem Test MachinesWithoutOsExpectationStayEmpty belegt.",
+            "BEWEIS-ECHTHEIT BESTANDEN -- alle Behauptungen literal reproduziert: test_a14_os_sub_axes_guard '4 tests PASSED' (behauptet 4, stimmt); test_experiment_kern_seam '15 tests PASSED' (behauptet 15/15, stimmt); test_experiment_plan_director + test_validate_profile Passed (behauptet unveraendert gruen, stimmt); xmllint-Kette komplett reproduziert auf Scratch-Kopie mit angewandtem super-Patch: XSD wohlgeformt, beide Bestands-Instanzen validieren, Positiv-Probe mit allen 4 Attributen validiert, Negativ-Probe liefert woertlich \"The attribute 'update_status' is not allowed\" (behauptet, stimmt).",
+            "TABU/ASCII/FORMAT BESTANDEN: kein TABU-Pfad im Diff (permutation_axes.xml, m3v2_study.profile.xml, golden-Dateien unberuehrt; Diff-Dateiliste 11 ce-Dateien + 1 super-XSD); Non-ASCII im ce-Diff: 0, im super-Patch: 0; Co-Authored-By-Trailer in allen 4 Commits vorhanden.",
+            "DRITTE ABLEITUNGSWEGE GEPRUEFT, KEINE OFFEN: read_axis_registry liest nur <axis>/<baustein>, sub_axis unsichtbar (validate_profile.hpp:673-676, Code gelesen); die 0u/1u-Pins in test_experiment_plan_director.cpp:125-130 halten (Lauf gruen); sub_axis_valueset_segment (axis_variant_version_table.hpp:113-117) ist hartkodierte Organ-Welt (cacheline/node_width/alloc_hw) -- kein Byte-Ereignis durch neue System-sub_axis; xml_config_parser ist der EINZIGE <machine>-Parser (grep: kDeclaredMachines ist Code-seitig, getrennte Welt); keine XSD-Kopie im ce-Repo, kein CI-xmllint-Gate im super (manuelle Beweise daher der einzige und erbrachte Weg); measurement_sub_axis-Funktionen konsumieren In-Code-Registries, nicht die System-XML; SCHEMA.md ist Traeger-Landkarte ohne Attribut-Liste, und die kanonische super-Referenz-Instanz traegt auch die O-4b-RAM-Attribute nicht (Praezedenz: optionale Erwartungs-Attribute erzwingen dort keinen Nachzug).",
+            "HINWEIS AN NACHFOLGE-PAKETE (kein Befund gegen OSU12): Dossier-Auflagen K1 (W10-Uebergangsregel Skip-Gate nur familien-gleich), K3 (Owner-NUR-KENNTNIS-Meldung als PFLICHT VOR OS-U3-Bau, A-08-Abweichung explizit benennen), K4 (Fehlerklassen-Ort + Count-Wache) und die ECHTE K5 (probe_id je Familie) sind hier korrekt NICHT umgesetzt, weil OS-U3-/Gate-Scope -- sie muessen im OS-U3-Paket nachweisbar auftauchen; K3 gate-t den OS-U3-Start."
+          ]
+        }
+      },
+      {
+        "key": "A13-M1",
+        "bau": {
+          "key": "A13-M1",
+          "patch_dir": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/A13-M1",
+          "commits": [
+            "e7d7e25d223da2f0f41604e12aa7fdff36da0e75 feat(A13-M1): 'e'-Versions-Suffix als Experimental-Markierung im AlgoSemVer-Parser",
+            "d19e364600e0fa517a994fce719688f8aa69c46e feat(A13-M1): Experimental-Bit 0 im reserved-Feld des Stempel-Entry-PODs",
+            "686d3b3a8257bac748de965a9a92f4cc2d257b52 feat(A13-M1): CT-Wache \"ce-Registry traegt nie ein 'e'\" + K-5-Sentinel-Praedikat",
+            "26c8b55759ec6967daded08bfacd11b6379dde2a test(A13-M1): 'e'-Suffix, K-5-Sentinel-Wache und Q2-Namens-Toleranz im W12-Querschnitt"
+          ],
+          "dateien": [
+            "/home/comdare/wt-w1-A13-M1/libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "/home/comdare/wt-w1-A13-M1/libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp",
+            "/home/comdare/wt-w1-A13-M1/libs/cache_engine/builder/experiment_tree/axis_variant_version_table.hpp",
+            "/home/comdare/wt-w1-A13-M1/tests/unit/test_m_w12_stamp_bausteine.cpp"
+          ],
+          "beweise_literal": [
+            "WORKTREE (Basis 6b8eee0f, Branch w1-A13-M1):\n$ git -C <ce> worktree add -b w1-A13-M1 /home/comdare/wt-w1-A13-M1 development\nPreparing worktree (new branch 'w1-A13-M1')\nHEAD is now at 6b8eee0f chore(license): Umstellung auf Comdare-Dual-Lizenz ...",
+            "KONFIGURATION (Optionen 1:1 aus build-v6/CMakeCache.txt uebernommen: 221 COMDARE_*-Eintraege + CMAKE_BUILD_TYPE=Release, Generator Ninja):\n$ cmake -S . -B build-w1 -G Ninja -DCMAKE_BUILD_TYPE=Release <221 -DCOMDARE_...>\nEXIT=0\n-- Gesamt: 16 Topics . 27 Achsen . 172 Wrapper\n-- Configuring done (0.7s)\n-- Generating done (0.2s)\n-- Build files have been written to: /home/comdare/wt-w1-A13-M1/build-w1",
+            "BAU der betroffenen Test-Targets:\n$ cmake --build build-w1 --target test_m_w12_stamp_bausteine test_reflect_versions_all17 test_lazy_adhoc_source_gen -j 12\n[43/46] Linking CXX executable tests/unit/test_reflect_versions_all17\n[45/46] Linking CXX executable tests/unit/test_lazy_adhoc_source_gen\n[43/46] Linking CXX executable tests/unit/test_m_w12_stamp_bausteine\nBUILD_EXIT=0",
+            "TESTLAUF test_m_w12_stamp_bausteine (19 Tests, davon 3 NEU):\n[ RUN      ] MW12StampBausteine.A13M1ExperimentalSuffixParsesInRawAndDottedForm\n[       OK ] MW12StampBausteine.A13M1ExperimentalSuffixParsesInRawAndDottedForm (0 ms)\n[ RUN      ] MW12StampBausteine.A13M1ExperimentalSuffixRendersAndStaysGoldenNeutral\n[       OK ] MW12StampBausteine.A13M1ExperimentalSuffixRendersAndStaysGoldenNeutral (0 ms)\n[ RUN      ] MW12StampBausteine.A13M1StampEntryCarriesExperimentalFlagAndTolerantNames\n[       OK ] MW12StampBausteine.A13M1StampEntryCarriesExperimentalFlagAndTolerantNames (0 ms)\n[----------] 19 tests from MW12StampBausteine (0 ms total)\n[==========] 19 tests from 1 test suite ran. (0 ms total)\n[  PASSED  ] 19 tests.",
+            "GOLDEN-/FROZEN-ANKER UNBEWEGT (im selben Lauf gruen, kein Anker angefasst):\n[ RUN      ] MW12StampBausteine.FrozenFingerprintTestVectorForLagerGateB3\n[       OK ] MW12StampBausteine.FrozenFingerprintTestVectorForLagerGateB3 (0 ms)\n[ RUN      ] MW12StampBausteine.AnatomyVersionLinesPodLayoutIsStableAt136\n[       OK ] MW12StampBausteine.AnatomyVersionLinesPodLayoutIsStableAt136 (0 ms)\n[ RUN      ] MW12StampBausteine.A4AnatomyStampArraysRoundtripThroughPod\n[       OK ] MW12StampBausteine.A4AnatomyStampArraysRoundtripThroughPod (0 ms)",
+            "ZWILLING test_g3_sha512_index (B3-Frozen-Vektor):\n[----------] 6 tests from G3Sha512Index (0 ms total)\n[==========] 6 tests from 1 test suite ran. (0 ms total)\n[  PASSED  ] 6 tests.",
+            "REGISTRY-PFAD test_reflect_versions_all17 (durchlaeuft die neuen CT-Wachen ueber ALLE 18 Kompositions-Achsen / 172 Wrapper):\n[==========] 6 tests from 1 test suite ran. (0 ms total)\n[  PASSED  ] 6 tests.",
+            "320-ROUND-TRIP-WACHE test_lazy_adhoc_source_gen (lazy == Katalog):\n  [OK]  (d) gerenderte Quelle traegt den SIMD-Organ-Typ\n==== INC-G6 lazy Gate: ALLE OK ====",
+            "ABI-/CODEGEN-QUERSCHNITT (alle Konsumenten von anatomy_stamp_entries.hpp / anatomy_module_abi_v1.hpp):\n=== test_v41_anatomy_module_abi ===\n[==========] 10 tests from 3 test suites ran. (0 ms total)\n[  PASSED  ] 10 tests.\n=== test_v41_anatomy_adhoc_codegen_macro ===\n[  PASSED  ] 1 test.\n=== test_v41_anatomy_codegen ===\n[  PASSED  ] 5 tests.\n=== test_v41_anatomy_module_loader ===\n[  PASSED  ] 11 tests.",
+            "NEGATIV-PROBE 1 (IM ECHTEN PFAD, temporaer \"v1.0.0e\" an filter_axis/axis_filter_xor.hpp:103, danach revertiert): die Wache bricht MIT DEM TYP-NAMEN:\naxis_variant_version_table.hpp: In instantiation of 'reflect_versions<mp_list<BloomFilter, CuckooFilter, RangeSurfFilter, XorFilter> >(...)::<lambda(auto:76)> [with auto:76 = mp_identity<comdare::cache_engine::filter_axis::XorFilter>]':\naxis_variant_version_table.hpp:72:23: error: static assertion failed: algo_version experimentell ('e'-Suffix): das 'e' ist AUSSCHLIESSLICH die Pruefling-Markierung (Owner-E2 02.08.2026) -- ce-eigene Registry-Varianten tragen es NIE\n$ git status --short libs/cache_engine/axes/filter_axis/axis_filter_xor.hpp\nREVERTED (leerer status = sauber)",
+            "NEGATIV-PROBE 2 (K-5-Sentinel-Wache, isolierte TU mit algo_version=\"v0e\"):\nneg_sent.cpp:12:15: error: static assertion failed: algo_version unparsbar (Sentinel): erlaubt ist NUR \"vN\" oder \"vN.N.N\" (optional mit Experimental-Suffix 'e') -- A10-X.Y.Z-Disziplin\nPOSITIV-Gegenprobe (Bestands-\"v1\"): POSITIV OK (Bestands-v1 passiert beide Wachen)",
+            "cf22-SELBSTCHECK (alle 4 geaenderten Dateien, --dry-run -Werror):\n=== cf22 final (leer == sauber) ===\nCF22_LEER",
+            "ASCII-SELBSTCHECK (Liste AUS DEM DIFF abgeleitet, nicht handgepflegt; sed 's/§//g' vorgeschaltet):\n$ git diff 6b8eee0f..HEAD | grep '^+' | grep -v '^+++' | sed 's/^+//' | sed 's/<paragraph>//g' | LC_ALL=C grep -c '[^ -~\\t]'\nNICHT_ASCII_ZEILEN=0",
+            "TABU-BEWEIS (keine der Tabu-Dateien beruehrt):\n$ git diff --stat 6b8eee0f..HEAD\n .../experiment_tree/axis_variant_version_table.hpp |  22 ++--\n .../cache_engine/abi/anatomy_stamp_entries.hpp     |  43 +++++++\n .../cache_engine/measurement/algo_semver.hpp       | 125 ++++++++++++++++++---\n tests/unit/test_m_w12_stamp_bausteine.cpp          | 119 ++++++++++++++++++++\n 4 files changed, 287 insertions(+), 22 deletions(-)\nTABU_TREFFER=0  (grep -cE 'golden_fullpilot_320|permutation_axes.xml|m3v2_study.profile.xml')\nWorking Tree sauber (git status --short == leer).",
+            "K-5-KERNSEMANTIK (aus dem Code, algo_semver.hpp detail::make_semver):\n    if (x == 0u && y == 0u && z == 0u) return AlgoSemVer{};\n    return AlgoSemVer{x, y, z, experimental};\n-> 'v0e' / 'v0.0.0e' / '0.0.0e' parsen exakt auf den REINEN Sentinel (experimental FALSE); zusaetzlich prueft is_sentinel() nur das x/y/z-Tripel, und beide Registry-Wachen haengen an is_sentinel() bzw. .experimental.",
+            "OWNER-Q2-NAMENS-TOLERANZ (CT-bewiesen, Header-Probe + Test):\nstatic_assert(std::string_view(kStampEntryProbe[0].axis, kStampEntryProbe[0].axis_len) == \"prt-art.memory.abc\");\nTest-Fixture: \"prt-art.memory.abc=prt_patricia.simd@2.3.4e;filter=bloom@1.0.0\"\n-> Achse == \"prt-art.memory.abc\", Algorithmus == \"prt_patricia.simd\", Version == 2.3.4 + Experimental-Bit; Punkte NUR im Namens-Anteil vor dem '@', im Versions-Anteil bleiben sie reine Zahlen-Trenner (\"@1.0e\" -> Sentinel, reserved == 0)."
+          ],
+          "ledger_texte": [
+            "LEDGER-Nachtrag (A13-M1, 02.08.2026): 'e'-VERSIONS-FUNDAMENT GEBAUT (golden-neutral, rein additiv). Owner-Entscheid E2 vom 02.08. ('Die Markierung experimenteller Achsen-Algorithmen aus einem Pruefling wird in der Versionsbezifferung eines jeden Achsen-Algorithmus mit einem angehaengten e fuer experimental markiert') ist im Parser-Fundament umgesetzt: AlgoSemVer traegt das Feld experimental und vergleicht es in operator==; parse_algo_semver akzeptiert 'vNe'/'vN.N.Ne', parse_dotted_semver 'X.Y.Ze'; algo_semver_string rendert das Suffix. Zeichen-Grammatik: NUR klein-'e', genau eines, ganz am Ende; die verbotene Kurzform 'vN.N' bleibt auch mit 'e' Sentinel. Vier Commits im Worktree /home/comdare/wt-w1-A13-M1 (Basis 6b8eee0f): e7d7e25d, d19e3646, 686d3b3a, 26c8b557.",
+            "LEDGER-Nachtrag (A13-M1, Auflage K-5 ERFUELLT): Das NULL-TRIPEL ist und bleibt der Sentinel -- 'v0e', 'v0.0.0e' und '0.0.0e' falten per detail::make_semver auf das reine AlgoSemVer{} zurueck (experimental FALSE). Zusaetzlich prueft das neue Praedikat AlgoSemVer::is_sentinel() NUR x/y/z statt des ganzen Structs; die Registry-Wache in axis_variant_version_table.hpp:reflect_versions ist darauf umgestellt. Damit kann die im Review beschriebene Luecke ('v0e' parst zu {0,0,0,exp=true} != Default-Sentinel und ginge als parsbar durch) nicht mehr entstehen -- weder ueber den Wert noch ueber den Vergleichs-Operator. Beide Faelle sind in der static_assert-Batterie UND im Unit-Test verankert.",
+            "LEDGER-Nachtrag (A13-M1, ce-GOLDEN-SCHUTZ): Neue CT-Wache in reflect_versions -- eine ce-EIGENE Registry-Variante darf NIE ein 'e' tragen ('e' ist ausschliesslich die Pruefling-Markierung). Beweis im echten Pfad gefuehrt: ein temporaeres algo_version=\"v1.0.0e\" an XorFilter bricht die Kompilation mit dem vollen Instanziierungs-Pfad und dem Typ-Namen; danach revertiert (Working Tree sauber). Damit bleiben ce-Stempel, -Fingerprints und -Lager-Keys beweisbar golden-neutral.",
+            "LEDGER-Nachtrag (A13-M1, STEMPEL-POD): Das 'e' reist in der Array-Form der Stempel-Zeilen als BIT 0 des reserved-Feldes von AnatomyStampEntryV1 (kStampEntryFlagExperimental + Praedikat stamp_entry_is_experimental). Das reserved-Feld war genau dafuer vorgesehen ('0 (Ausrichtung / kuenftige Flags)') -- KEIN sizeof-/Layout-Bruch am 48-Byte-Entry-POD, keine Entry-Layout-Versions-Folge, kein Bump von kAnatomyVersionLinesLayout (bleibt 5, sizeof 136 -- das Relayout ist und bleibt A13-M3). Ohne 'e' bleibt reserved == 0, der gesamte Bestand ist byte-identisch.",
+            "LEDGER-Nachtrag (A13-M1, Owner-Q2-NAMENS-TOLERANZ FESTGESCHRIEBEN): Der consteval-Zeilen-Parser (anatomy_stamp_entries.hpp) toleriert erweiterte hierarchische Algorithmus-/Achsen-Namen nach dem Owner-Muster 'prt-art.memory.abc@1.0.0'. Grammatik-Regel jetzt im Kopf-Kommentar kodifiziert und CT-bewiesen: der Tokenizer teilt strikt an '=' und dem ERSTEN '@' danach -- ein '.' VOR dem '@' ist transparenter Namens-Bestandteil (Achse UND Algorithmus), ein '.' NACH dem '@' bleibt reiner Zahlen-Trenner (drei Zahlen, sonst Sentinel). Zwei Namensraeume, keine Kollision mit der Q1-Klammer-Form der Meta-Meta-Ebenen (A13-M2).",
+            "LEDGER-Nachtrag (A13-M1, Q3-VORGRIFF, Owner-Bestaetigung erbeten): Die Bauplan-Frage Q3 ('e'-Suffix auch an der Kurzform, also 'v1e') ist gemaess der dort notierten Empfehlung mit JA implementiert. Falls der Owner die Kurzform-Variante NICHT will, ist der Rueckbau lokal und klein: der 'vNe'-Zweig in parse_algo_semver plus drei static_asserts und zwei EXPECTs."
+          ],
+          "offene_punkte": [
+            "ceb_version_stamp.hpp (consteval Renderer, :43-126) rendert nur X.Y.Z und WUERDE ein 'e' STILL fallen lassen -- dort existiert noch KEINE CT-Wache analog reflect_versions. Heute harmlos (kMeasurementToolingRegistry/kMeasurementFrameworkRegistry sind ce-eigen), aber genau das Trap-Muster 'stiller Verlust ohne Compile-Fehler' aus BEFUND-1. EMPFEHLUNG: in M2/M3 ein static_assert(!parse_algo_semver(...).experimental) je Registry-Eintrag ergaenzen. Bewusst NICHT in M1 gebaut (ausserhalb des zugewiesenen Scopes).",
+            "PRODUZENTEN-Seite bewusst NICHT in M1: compose_organ_stamp_line/build_axis_version_stamp_line reichen den rohen algo_version durch -- sobald ein Pruefling-Slot-Typ 'v2.3.4e' traegt, erscheint das 'e' AUTOMATISCH im Segment (end-to-end im Test bewiesen). Es gibt heute aber noch keinen Slot, der es setzt; das kommt mit M3 (sota-/Direktiven-Pfad, Organ-Zeile).",
+            "anatomy_module_abi_v1_decl.hpp:139 (Kommentar am reserved-Feld: '0 (Ausrichtung / kuenftige Flags)') wurde bewusst NICHT angefasst, um die Konfliktflaeche mit A13-M3 (POD v6, sizeof 136->120, Layout 5->6) minimal zu halten. Die Flag-Belegung ist stattdessen vollstaendig in anatomy_stamp_entries.hpp dokumentiert (Einzige Wahrheit). Nachzug des decl-Kommentars empfohlen, wenn M3 den Header ohnehin editiert.",
+            "Q3 (Bauplan Paragraph 3) noch unbeantwortet: 'e' auch an der Kurzform ('v1e') -- M1 hat die Empfehlung (ja) implementiert. Bei Owner-Nein: Rueckbau des 'vNe'-Zweigs in parse_algo_semver + 3 static_asserts + 2 EXPECTs.",
+            "Der neue Header-CT-Probe detail::kStampEntryProbe in anatomy_stamp_entries.hpp wird in jeder TU ausgewertet, die den Header zieht (16 Dateien im Baum). Kosten: zwei kurze consteval-Aufrufe, in den gebauten Targets nicht messbar. A13-M2 MUSS den Probe beim Klammer-Umbau des Parsers mitziehen (sonst zementiert er die Alt-Grammatik -- Lehre 'Gruene Tests zementieren alte Ordnung').",
+            "VOLLES GATE STEHT AUS (auftragsgemaess beim Manager): Doppellauf, komplette ctest-Suite, CI beide Repos. Hier gebaut+gruen: test_m_w12_stamp_bausteine (19), test_g3_sha512_index (6), test_reflect_versions_all17 (6), test_lazy_adhoc_source_gen, test_v41_anatomy_module_abi (10), test_v41_anatomy_adhoc_codegen_macro (1), test_v41_anatomy_codegen (5), test_v41_anatomy_module_loader (11).",
+            "Doku-/Ledger-Dateien wurden von mir NICHT editiert (Lead-only) -- Entwuerfe stehen in ledger_texte. Ebenfalls offen und NICHT Teil von M1: die KATALOG-E.0-Korrektur ('merge-Stempel-Zeile real schreiben' -> superseded) gehoert laut Design zu M4.",
+            "Worktree /home/comdare/wt-w1-A13-M1 (Branch w1-A13-M1) bleibt bestehen, inkl. Build-Verzeichnis build-w1 (ignoriert, nicht committet). Basis-Commit 6b8eee0f. Aufraeumen nach der Landung durch den Manager."
+          ]
+        },
+        "review": {
+          "verdict": "LANDEBEREIT",
+          "befunde": [
+            "BEFUND-M1-1 (minor, Namensraum-Praezision Q1/Q2): libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp:116 (kStampEntryProbeLine) und tests/unit/test_m_w12_stamp_bausteine.cpp:145-153 zementieren das hierarchische Punkt-Muster 'prt-art.memory.abc' per static_assert im ACHSEN-Slot ('...=prt_patricia@2.3.4e') und der Kopf-Kommentar (:48-51) erklaert es fuer 'Achsen-Namen zulaessig'. Die bindende Owner-Auslegung (super docs/sessions/20260802-OWNER-...md:57-58) verortet das Punkt-Muster aber im ALGORITHMUS-Namensraum und verwirft Punkt-Pfad als Achsen-Ebenen-Kodierung (Q1=Klammer-Form fuer M2). Tokenizer-Wahrheit, kein Code-Fehler -- aber Verwechslungsrisiko genau gegen die Q1-Doktrin 'zwei verschiedene Namensraeume'. Empfehlung: Probe/Kommentar in M2 auf den Algorithmus-Slot praezisieren.",
+            "BEFUND-M1-2 (minor, dritter Ableitungsweg, PLAUSIBLE): libs/cache_engine/builder/ceb_version_stamp.hpp:86-125 rendert X.Y.Z per put_num/ceb_digits OHNE das neue 'e' -- truege eine Mess-Framework-/Tooling-Version kuenftig ein 'e', driftet die CEB-Zeile still gegen abi::measurement_stamp_line (algo_semver_string rendert 'e'). Heute unmoeglich (Bestand 'v1', repo-weit kein 'vNe'-Literal, grep-bewiesen) und der Laufzeit-Drift-Guard tests/unit/test_m_w12_stamp_bausteine.cpp:568 wuerde es fangen; die Mess-Registries (measurement_framework_registry.hpp:49-52, measurement_tooling_registry.hpp:53-54) haben aber anders als die Organ-Registry KEINE !experimental-CT-Wache. Design-M1-scope-konform (Design verlangte nur axis_variant_version_table) -- als Auflage fuer M2 (Mess-Realm-Verdrahtung) notieren.",
+            "BEFUND-M1-3 (minor, Beweis-Disziplin): die 4 Commit-Botschaften tragen keine literale Beweis-Zeile (Repo-Kanon der Vorgaenger-Commits 408242f3/35ffb511: 'ALLE OK, cf22 leer, ASCII 0'); Patch 3 behauptet den Negativ-Beweis ('temporaeres v1.0.0e an XorFilter') ohne beigelegte Ausgabe. Reviewer hat ALLE Beweise selbst reproduziert und ECHT befunden: ASCII-grep exit 1; cf22 (clang-format-22.1.8 --dry-run -Werror) exit 0 auf allen 4 Dateien; voller Testlauf '100% tests passed, 0 tests failed out of 319' (nach offiziellem 2-Pass-Bau der Generator-Tools; die 4 initialen Roundtrip-Fails waren Build-Luecken, nicht patch-verursacht); Negativ-TU 'v1.0.0e' bricht literal an axis_variant_version_table.hpp:72, 'v0e' an :65. Keine Fabrikation -- Beweis-Zeilen in der Paketmeldung/M4-Quittung nachreichen.",
+            "POSITIV-BILANZ: Scope exakt = M1-Dateiliste (4 Dateien, 287+/22-, Patches zeilenidentisch zu Worktree-Commits e7d7e25d..26c8b557, Worktree clean/Freeze eingehalten, keine TABU-Dateien); Owner-E2-Zitat verbatim verifiziert (OWNER-doc:9), Q2-Nachtrag real (:54/:58); Auflage K-5 DOPPELT umgesetzt (make_semver-Null-Tripel-Faltung + is_sentinel-Praedikat + static_assert-Batterie (a)-(g) + Wachen-Umstellung in Patch 3); golden-/byte-neutral bewiesen (kein 'vNe' im Bestand, Frozen-B3-Anker unberuehrt und gruen, algo_semver_string fuer Bestand byte-identisch); rein additiv (kein Alt-Anker/Fixture-String veraendert)."
+          ]
+        }
+      },
+      {
+        "key": "FK-0",
+        "bau": {
+          "key": "FK-0",
+          "patch_dir": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/FK-0",
+          "commits": [
+            "e558260e7599a30dd9e8232942418d24e0c7765a test(fk-0): RF-3-Guard-Helfer auf interne Bindung (static) - Vorbereitung der Registrierung unter dem Projekt-Warnsatz",
+            "f2767d58a44c1e18daf1dbbeac8d079d36f0ec93 test(fk-0): RF-3-Guard test_rf3_betriebssystem_feature_fehlt in tests/unit/CMakeLists.txt registrieren (A15/FK-0, Owner-E6 02.08.)"
+          ],
+          "dateien": [
+            "/home/comdare/wt-w1-FK-0/tests/unit/CMakeLists.txt (+14 Zeilen, Registrier-Block direkt hinter test_axis_error_taxonomy :2016-2019)",
+            "/home/comdare/wt-w1-FK-0/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp (Kopf-Kommentar auf Ist-Stand gehoben, Alt-Wortlaut zitiert erhalten; check_eq/check_true auf static)",
+            "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/FK-0/0001-test-fk-0-RF-3-Guard-Helfer-auf-interne-Bindung-stat.patch",
+            "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/FK-0/0002-test-fk-0-RF-3-Guard-test_rf3_betriebssystem_feature.patch",
+            "Worktree /home/comdare/wt-w1-FK-0 (Branch w1-FK-0, Basis 6b8eee0f4061e42b7f07e63529f768b43305c769) NICHT entfernt; Build-Dir /home/comdare/wt-w1-FK-0/build-w1"
+          ],
+          "beweise_literal": [
+            "CONFIGURE (cmake -S . -B build-w1 mit den build-v6-Optionen: CMAKE_BUILD_TYPE=Release, COMDARE_BUILD_TESTS/BUILDER/BENCHMARKS=ON, COMDARE_MEASUREMENT_MODE=ON, COMDARE_V32_ENABLE=ON, COMDARE_CE_ENABLE_STATISTICS=ON, COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION=ON, COMDARE_DETECTION_MODE=COMPILE_TIME, COMDARE_WRITER_BACKEND=portable, COMDARE_BUILD_PERMUTATIONS=OFF):\n--  Gesamt: 16 Topics . 27 Achsen . 172 Wrapper\n-- Configuring done (0.7s)\n-- Generating done (0.3s)\n-- Build files have been written to: /home/comdare/wt-w1-FK-0/build-w1\nCONFIGURE_EXIT=0",
+            "BAU aus dem committeten Stand (cmake --build build-w1 --target test_rf3_betriebssystem_feature_fehlt test_axis_error_taxonomy -j 8), gefiltert auf warning|error|Building CXX object tests|Linking|Built target test_ -- KEINE warning-Zeile:\n[100%] Building CXX object tests/unit/CMakeFiles/test_rf3_betriebssystem_feature_fehlt.dir/test_rf3_betriebssystem_feature_fehlt.cpp.o\n[100%] Linking CXX executable test_rf3_betriebssystem_feature_fehlt\n[100%] Built target test_rf3_betriebssystem_feature_fehlt\n[100%] Built target test_axis_error_taxonomy\nBUILD_EXIT=0",
+            "BEFUND VOR DEM FIX (erster Bau nach der Registrierung, deshalb Commit 1): der Guard uebersetzte bis heute nur per Hand-Bau (g++ -Wall) und warnte unter dem Projekt-Warnsatz:\n/home/comdare/wt-w1-FK-0/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp:69:6: warning: no previous declaration for 'void check_true(const char*, bool)' [-Wmissing-declarations]\n   69 | void check_true(char const* what, bool cond) {\n      |      ^~~~~~~~~~",
+            "LAUF (ctest -V -R 'test_rf3_betriebssystem_feature_fehlt|test_axis_error_taxonomy'), volle Test-Ausgabe:\n213: == Teil 1: die Nummer haengt hinten an, die Bestands-Nummern stehen still ==\n213:   [OK]  BetriebssystemFeatureFehlt = 4\n213:   [OK]  Klassen-Zahl (Single-Source) = 5\n213:   [OK]  die vier Bestands-Nummern 0..3 sind unveraendert\n213: == Teil 2: Etikett-Roundtrip, alle fuenf paarweise verschieden ==\n213:   [OK]  Etikett der neuen Klasse = betriebssystem_feature_fehlt\n213:   [OK]  das OS-Analogon steht neben seinem HW-Vorbild = hardware_erweiterung_fehlt\n213:   [OK]  alle fuenf Etiketten sind belegt und keines faellt in den unbekannt-Default\n213:   [OK]  alle fuenf Etiketten sind PAARWEISE verschieden\n213: == Teil 3: die Drift-Wachen sind scharf ==\n213:   [OK]  Count == letzter Enum-Wert + 1\n213:   [OK]  out-of-range-Cast faellt sichtbar in den Default = unbekannt\n213: == Teil 4: D2 bleibt disjunkt und unberuehrt ==\n213:   [OK]  SampleStatus-Zahl = 4\n213:   [OK]  das failed-Token ist unveraendert = failed\n213: ==== RF-3 BetriebssystemFeatureFehlt: ALLE OK ====\n1/2 Test #212: test_axis_error_taxonomy ................   Passed    0.00 sec\n2/2 Test #213: test_rf3_betriebssystem_feature_fehlt ...   Passed    0.00 sec\n100% tests passed, 0 tests failed out of 2",
+            "DOPPELLAUF (Paket-Scope, das volle Gate faehrt der Manager):\n=== LAUF 1 ===\n2/2 Test #213: test_rf3_betriebssystem_feature_fehlt ...   Passed    0.00 sec\n100% tests passed, 0 tests failed out of 2\n=== LAUF 2 ===\n2/2 Test #213: test_rf3_betriebssystem_feature_fehlt ...   Passed    0.00 sec\n100% tests passed, 0 tests failed out of 2",
+            "ctest-ENUMERATION (Namens-Diff build-v6 -> build-w1, `ctest -N`):\nbuild-w1: Total Tests: 320\nbuild-v6: Total Tests: 323\ndiff v6-tests.txt w1-tests.txt:\n< f15_compare_cli_smoke\n> test_rf3_betriebssystem_feature_fehlt\n< test_v41_anatomy_adhoc_autobuilt_load\n< test_v41_anatomy_f15_measurement\n< test_v41_anatomy_r5i_configure_codegen\nLESART: genau EIN Zugang = test_rf3_betriebssystem_feature_fehlt (die FK-0-Registrierung). Die vier Abgaenge sind die configure-bedingt registrierten Post-Pass-2-Tests (tests/unit/CMakeLists.txt:1033 _r5i_status, :1506 adhoc-autobuilt) -- sie fehlen in JEDEM frischen Build-Verzeichnis und sind kein Effekt dieser Aenderung. Erwartung fuer den Manager-Gesamtlauf im eingelaufenen Baum: 323 -> 324.",
+            "cf22-SELBSTCHECK (~/tools/cf22/usr/bin/clang-format-22 --dry-run -Werror ueber die einzige geaenderte C++-Datei tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp):\n<keine Ausgabe>\nCF22_EXIT=0 (leer==sauber)",
+            "ASCII-SELBSTCHECK (Diff-Plus-Zeilen 6b8eee0f..HEAD, aus dem Diff abgeleitet -- nicht handgepflegt; sed 's/§//g', dann LC_ALL=C grep -c '[^\\x00-\\x7F]'):\n0",
+            "ARBEITSBAUM + TABU: git status --short == leer; git diff --name-only 6b8eee0f..HEAD == tests/unit/CMakeLists.txt + tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp. Kein TABU-Artefakt beruehrt (kein golden_fullpilot_320*, kein permutation_axes.xml, kein m3v2_study.profile.xml, kein CRC-Anker).",
+            "GEGENPROBE zur L1-Aussage (Stand heute im Worktree, Basis fuer den Ledger-Text): grep -rl 'axis_error|ErrorDomain|ErrorClass' ueber include/cache_engine/measurement/*axis*.hpp topics/ axes/ anatomy/ liefert GENAU EINEN Treffer: include/cache_engine/measurement/axis_error.hpp (die Taxonomie selbst). system_axis.hpp:0, ceb_system_axis.hpp:0 -- die Achsen-Ebene ist unveraendert unverdrahtet."
+          ],
+          "ledger_texte": [
+            "NACHTRAG-TEXT 1 (Praezisierung zum Schlusssatz von LEDGER-Zeile 2022 'Fehlerklassen-Framework (#29) end-to-end verdrahtet (D1 Bau-Naht + D2 Mess-Zelle)'; additiv anhaengen, Alt-Satz stehen lassen):\n\n- **PRAEZISIERUNG zu 20.B/Zeile 2022 (A15/FK-0, 2026-08-02):** Der Schlusssatz „Fehlerklassen-Framework (#29) end-to-end verdrahtet (D1 Bau-Naht + D2 Mess-Zelle)\" gilt **ausschliesslich fuer die NAHT-Ebene** — er ist dort korrekt (D1 an der Bau-Naht: `build_orchestrator.hpp:144`/:526-538, Iterator-Log `cache_engine_builder_iterator.hpp:1238-1248`; D2 an der Mess-Zelle: `perm_runner.hpp:130-133`/:160-169/:328-342, CSV-Renderer `iterator:471-524`; Leser-Seite `measurement_curve_loader.hpp:57`). Er gilt **NICHT** fuer die vom Owner am 17.07. verlangte **ACHSEN-Ebene** („Fehlerklassen und Behandlung sind fuer **alle Achsen → Unterachsen → Algorithmen** Pflicht\", §20.B/Zeile 2013, verbatim in `axis_error.hpp:4-5` zitiert). **Ist-Stand 02.08. grep-belegt:** ueber `include/cache_engine/measurement/*axis*.hpp`, `topics/`, `axes/`, `anatomy/` liefert `axis_error|ErrorDomain|ErrorClass` **genau einen** Treffer — `axis_error.hpp` selbst; `system_axis.hpp` und `ceb_system_axis.hpp` je **0**. Kein `error_domain()`/Traits-Haken in `CebSystemAxisConcept` (`ceb_system_axis.hpp:33-37`), `SystemAxisConcept` (`system_axis.hpp:187-196`) oder `topics::AxisConcept` (`topics/axis.hpp:54`). ⇒ **Achsen-/Unterachsen-/Algorithmen-Ebene = 0 % umgesetzt**; sie ist der Gegenstand von A15 FK-3 (System/Mess/Meta-Meta-Traits), FK-4 (ORG-18) und FK-5 (Algorithmen-Ebene, im A13-Fenster). Die Formulierung „end-to-end\" bitte kuenftig nur mit dem Zusatz „auf Naht-Ebene\" verwenden — sonst liest sie sich als erfuellte Owner-Direktive.",
+            "NACHTRAG-TEXT 2 (Vollzugs-Eintrag A15/FK-0; im aktuellen Abschnitt zur A15-Strecke anhaengen):\n\n- **✅ A15/FK-0 (Hygiene+Wahrheit) VOLLZOGEN (Owner-Entscheid E6 vom 02.08. „Fehlerklassen bitte jetzt mit bauen\"; ce `e558260e` + `f2767d58`):** Die A15-Luecke **L7** ist geschlossen — der RF-3-Guard `tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp` (§70.3, seit 26.07. im Baum) lag **unregistriert** und lief nur per Hand-Bau, also ausserhalb jeder Gate-Wirkung. Registrierung nach dem Muster des direkten Nachbarn `test_axis_error_taxonomy` (`tests/unit/CMakeLists.txt:2016-2019`): `comdare_add_test` + identische Include-Menge (nur `libs/cache_engine/include`; der Guard zieht ausschliesslich `measurement/axis_error.hpp` — kein boost, keine lib, damit **keine** Hermetik-Falle im Sinne von Zeile 2014/2015). Der Guard beweist **zwei** Dinge, die `test_axis_error_taxonomy` nicht prueft: die **paarweise** Distinktheit aller fuenf D1-Etiketten und die **Anhaenge-Wache** (hinter `kCompilerCompilerErrorClassCount` darf kein etikettierter Enum-Wert liegen). **Nebenbefund + Fix (eigener Commit):** unter dem Projekt-Warnsatz (`cmake/compiler_flags.cmake:20-33`, u. a. `-Wmissing-declarations`) warnte der bis dahin nur per `g++ -Wall` gebaute Guard (`warning: no previous declaration for 'void check_true(const char*, bool)'`); beide Helfer sind auf **interne Bindung (static)** gestellt — sachlich richtig (Ein-TU-Helfer), keine Warn-Unterdrueckung. **LITERAL:** Bau ohne jede warning-Zeile; `100% tests passed, 0 tests failed out of 2` (Doppellauf); Guard-Ausgabe `==== RF-3 BetriebssystemFeatureFehlt: ALLE OK ====`; cf22-dry-run leer; ASCII-Selbstcheck 0. **ctest-Enumeration:** Namens-Diff `build-v6 → build-w1` zeigt **genau einen Zugang** (`test_rf3_betriebssystem_feature_fehlt`); die vier Abgaenge sind die configure-bedingten Post-Pass-2-Tests (`tests/unit/CMakeLists.txt:1033`, `:1506`), die in jedem **frischen** Build-Verzeichnis fehlen ⇒ im eingelaufenen Baum erwartet **323 → 324**. Golden-neutral (reine Test-Registrierung, kein Codegen-Pfad, Binary-Menge unberuehrt). **Bleibt offen (nicht FK-0):** `BetriebssystemFeatureFehlt` hat weiterhin **keinen Producer** (L6) — der kommt mit den A14-OS-Unter-Achsen.",
+            "NACHTRAG-TEXT 3 (K8-Supersede-Vermerk aus der A15-Review; gehoert in den Ledger, weil das 20260717-Dossier NUR als Rohdaten-JSON existiert):\n\n- **📌 SUPERSEDE-VERMERK zum Fehlerklassen-Design vom 17.07. (A15-Review-Auflage K8, 2026-08-02; additiv, nichts geloescht):** Das Design-Dossier zu Task #29 (Zeile 2020, Rohdaten `docs/sessions/backups/20260717-fehlerklassen-framework/ROHDATEN-planung-wf_86316a90.json`) nannte als **Alt-Andockpunkt 3** den `error_domain()`-Trait **IM `CebSystemAxis`-Concept** und als **TABU** wortwoertlich: „**KEINE Parallelstruktur** — an vorhandene Traeger (BuildResult, SystemAxisSample, status_*-Enums, CebSystemAxis-Concept) andocken, nicht daneben\". **Der A15-Kanon vom 02.08. weicht hiervon bewusst ab:** die Achsen-Bindung entsteht als **externer Bindungs-Header** `measurement/axis_error_traits.hpp` mit einer **externen Vollstaendigkeits-Wache** (primaeres Template deklariert-nicht-definiert, K5-Factory-Muster) statt als Requirement im Concept. **Begruendung:** ein Concept-Requirement braeche **alle** Achsen atomar und zwaenge jede Achsen-Header-Datei zur Aenderung; der externe Traits-Header haelt die Achsen-Header **byte-stabil** und haelt die Boost/mp11-Hermetik (Meta-Meta-Wache im Separat-Header) ein. **Das TABU bleibt sinngemaess gewahrt:** der Traits-Header bindet **bestehende** Achsen-Typen an die **bestehende** Taxonomie (`axis_error.hpp`) — er baut keine zweite Fehler-Welt daneben. Der Alt-Text bleibt unveraendert stehen (Doku nie loeschen). **Verortung dieses Vermerks:** das 17.07.-Dossier existiert **ausschliesslich** als Rohdaten-JSON im Workflow-Backup; Rohdaten-Backups sind additiv-unantastbar (Memory `feedback_raw_data_backups_additive_never_delete`) ⇒ der Vermerk gehoert hierher (Ledger) bzw. in ein Session-Doc, **nicht** in die Backup-Datei. Owner-Autoritaets-Beleg fuer die Fehlerklassen-Pflicht bleibt die Direktive vom 17.07. „fuer **alle Achsen → Unterachsen → Algorithmen** Pflicht\" (Zeile 2013, zitiert in `axis_error.hpp:4-5`) — **nicht** Owner-E2 vom 02.08. (dort verbatim Stempel-Kontext; A15-Review K9)."
+          ],
+          "offene_punkte": [
+            "Review-Auflage K8 ist NICHT als Datei-Edit ausfuehrbar: das 20260717-Fehlerklassen-Dossier existiert nur als Rohdaten-JSON (docs/sessions/backups/20260717-fehlerklassen-framework/ROHDATEN-planung-wf_86316a90.json, 60 KB, keine .md). Das Alt-TABU steht dort im JSON-Text ('KEINE Parallelstruktur -- an vorhandene Traeger (BuildResult, SystemAxisSample, status_*-Enums, CebSystemAxis-Concept) andocken, nicht daneben'). Rohdaten-Backups sind additiv-unantastbar => Supersede-Vermerk als ledger_texte Nr. 3 entworfen; Lead entscheidet Verortung (Ledger vs. Session-Doc).",
+            "ctest-Gesamtzaehler steigt um genau 1 (erwartet 323 -> 324 im eingelaufenen Baum). Meine build-w1-Zahl (320) ist NICHT direkt vergleichbar, weil ein frisches Build-Verzeichnis die vier configure-bedingten Post-Pass-2-Tests (f15_compare_cli_smoke, test_v41_anatomy_adhoc_autobuilt_load/_f15_measurement/_r5i_configure_codegen; tests/unit/CMakeLists.txt:1033, :1506) noch nicht registriert. Der Manager sollte den Zaehler im vollen Gate literal gegen 324 pruefen.",
+            "Commit 1 (static-Bindung) ist fuer sich genommen golden- und verhaltensneutral, aber die Reihenfolge ist bindend: wird nur Commit 2 gelandet, warnt der Bau mit -Wmissing-declarations. Beide Patches als Serie anwenden.",
+            "FK-0 aendert NICHTS an der Sache: BetriebssystemFeatureFehlt hat weiterhin keinen Producer (A15-L6) -- Detektions-Naht liegt bei A14 (OS-Unter-Achsen). Ebenso bleibt AdmissionStatus::Gesperrt producer-los (L5, C-3a-gated).",
+            "Nicht in meinem Scope, aber fuer die Sequenz relevant: der Ledger-Satz 'end-to-end verdrahtet' (Zeile 2022) ist bis zur Landung von ledger_texte Nr. 1 die einzige Stelle, die den A15-Restumfang (FK-3/FK-4/FK-5) als erledigt lesen laesst -- Lead-only, deshalb nur entworfen.",
+            "Worktree /home/comdare/wt-w1-FK-0 (Branch w1-FK-0) bleibt inkl. build-w1 stehen; drei Geschwister-Worktrees (wt-w1-A13-M1, wt-w1-A14-OSU12, wt-w1-HY-D2) stehen noch auf der Basis 6b8eee0f. Bei serieller Landung: FK-0 beruehrt tests/unit/CMakeLists.txt im Block :2016-2033 -- Kollisionsflaeche mit jedem anderen Paket, das dort Tests registriert (A14 OS-U2, A13-M1)."
+          ]
+        },
+        "review": {
+          "verdict": "NACHBESSERN",
+          "befunde": [
+            "F1 (SCHWER, Paket-Unvollstaendigkeit): FK-0-Teil 2 fehlt komplett. Die Paketdefinition (designs/A15-fehlerklassen.md:29) verlangt die LEDGER-Praezisierung zu Zeile 2022 ('#29 end-to-end verdrahtet' gilt fuer die NAHT-Ebene, Achsen-Ebene offen, additiv). Ist: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2022 endet weiterhin unqualifiziert mit 'Fehlerklassen-Framework (#29) end-to-end verdrahtet (D1 Bau-Naht + D2 Mess-Zelle).'; super-Repo hat weder Commit noch Working-Tree-Aenderung dazu (git log/status geprueft), und patches/FK-0 enthaelt nur die 2 ce-Patches.",
+            "F2 (SCHWER, bindende Review-Auflage K8 nicht erfuellt): Der additive Supersede-Vermerk im 20260717-Dossier (Alt-Andockpunkt 3 'error_domain()-Trait im CebSystemAxis-Concept' + TABU 'KEINE Parallelstruktur ... an CebSystemAxis-Concept andocken' -> ersetzt durch externen Traits-Header per OF-3) fehlt. Ist: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260717-fehlerklassen-framework-DESIGN-FEHLERKLASSEN-FRAMEWORK.md:98 und :137 stehen unveraendert ohne Vermerk; letzter Commit auf der Datei ist die alte Konsolidierung c9536bb0. K8 (designs/A15-fehlerklassen.md:24) weist diesen Vermerk explizit FK-0 zu.",
+            "F3 (MITTEL, ASCII-Disziplin): Zwei NEU eingebrachte Diff-Zeilen tragen non-ASCII '§': /home/comdare/wt-w1-FK-0/tests/unit/CMakeLists.txt:2022 ('(§70.3)' in neuem Kommentar) und tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp:1 (modifizierte Kopfzeile, § mitgeschleppt) — Patch 0002 traegt deswegen den UTF-8-MIME-Header. Zudem fehlt beiden Commit-Botschaften die Selbstcheck-Zeile ('ASCII 0'), die die Nachbar-Commits derselben Linie fuehren (408242f3, 35ffb511, 1e6d8965 'ASCII-Nachzug der neuen Zeilen'). Fix: '§70.3' in neuen Zeilen als 'Abschnitt 70.3' schreiben, Selbstcheck-Zeile aus dem Diff ableiten.",
+            "F4 (MITTEL, Verifikations-Kadenz): Das Design (designs/A15-fehlerklassen.md:100, 'je Increment ce-standalone + super-Sub-Build dual gruen') ist nicht belegt: /home/comdare/wt-w1-FK-0/build-w1/Testing LastTest.log deckt exakt die 2 gefilterten Tests 212/320+213/320 (Start=End 14:16 UTC); kein Voll-ctest-Lauf, kein super-Sub-Build-Beleg in den Commit-Botschaften. Gerade weil die Registrierung den Voll-Zaehler hebt (Standard-Konfig 323 -> 324), ist der Voll-Lauf der Beleg, dass nichts Drittes bricht.",
+            "F5 (HINWEIS, Koordination dritte Ableitungswege): Im ce-Repo pinnt kein Skript/CI-Job die Testanzahl (verifiziert: scripts/, tools/, .gitlab-ci.yml ohne hartes 323; einzig Alt-Kommentar .gitlab-ci.yml:440 'out of 164' inert). Die parallel laufende Lager-/TP1-Strecke dokumentiert aber Voll-Laeufe 'out of 323' und 'Gate 322 -> 323' (Commits 35ffb511/9015e9f1) — nach FK-0-Landung sind es 324; der parallelen Welle als Schnittstellen-Notiz mitgeben (Working-Tree-Freeze-/Koordinations-Doktrin), kein Code-Defekt.",
+            "POSITIV (verifiziert): Scope der gelieferten Patches sauber (exakt 2 Dateien, kein Kriecher; static-Bindung ist notwendige Vorstufe, -Wmissing-declarations belegt cmake/compiler_flags.cmake:30 via COMDARE_add_test cmake/gtest_setup.cmake:46); Registrierung exakt nach Muster :2016ff (Nachbar test_axis_error_taxonomy, identische Include-Menge; neu tests/unit/CMakeLists.txt:2030-2033); golden-/byte-neutral (reine Test-/Kommentar-Schicht); Beweis LITERAL echt (build-w1 im Worktree, LastTest.log 02.08. 14:16 UTC: Tests 212+213 Passed, 'ALLE OK'-Zeile vorhanden); Doku-nie-loeschen vorbildlich (Alt-Wortlaut verbatim als 'STAND 26.07. (ueberholt, Wortlaut erhalten)'); alle technischen Behauptungen einzeln nachgeprueft korrekt (gtest_main-Archiv-Member-Mechanik gtest_setup.cmake:49-52, seen-Array-Luecke des Nachbartests test_axis_error_taxonomy.cpp:55-59, 4 configure-bedingte Test-Abgaenge :1033/:1506)."
+          ]
+        }
+      },
+      {
+        "key": "HY-D2",
+        "bau": {
+          "key": "HY-D2",
+          "patch_dir": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/HY-D2",
+          "commits": [
+            "0e79a7a1062243f82d56433d2a3efc7b3c266974 docs(A17/HY-D2): Architektur-Doc Hybrid-Tier-Stufe (Owner-E1 02.08.) - SOLL-Design additiv nach docs/architecture/",
+            "f794f3ed342c4a280d1d7a3e9634ccc252268e35 chore(A17/HY-D2): Verzeichnis-Stub libs/cache_engine/hybrid/ reserviert (README-Header, KEIN Code, kein Build-Anschluss)"
+          ],
+          "dateien": [
+            "/home/comdare/wt-w1-HY-D2/docs/architecture/20260802-hybrid_tier_stufe_soll_design.md (NEU, 480 Zeilen)",
+            "/home/comdare/wt-w1-HY-D2/libs/cache_engine/hybrid/README.md (NEU, 58 Zeilen; einziger Inhalt des Stub-Verzeichnisses)",
+            "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/HY-D2/0001-docs-A17-HY-D2-Architektur-Doc-Hybrid-Tier-Stufe-Own.patch",
+            "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/HY-D2/0002-chore-A17-HY-D2-Verzeichnis-Stub-libs-cache_engine-h.patch",
+            "Worktree (NICHT entfernt, Manager raeumt auf): /home/comdare/wt-w1-HY-D2 (Branch w1-HY-D2, Basis 6b8eee0f); Build-Verzeichnis /home/comdare/wt-w1-HY-D2/build-w1 (gitignoriert)"
+          ],
+          "beweise_literal": [
+            "Worktree-Anlage: 'Preparing worktree (new branch 'w1-HY-D2')' / 'HEAD is now at 6b8eee0f chore(license): Umstellung auf Comdare-Dual-Lizenz ...' / Basis-SHA literal: 6b8eee0f4061e42b7f07e63529f768b43305c769",
+            "cmake -S . -B build-w1 (Optionen aus build-v6/CMakeCache.txt: CMAKE_BUILD_TYPE=Release, COMDARE_BUILD_TESTS=ON, COMDARE_BUILD_BUILDER=ON, COMDARE_BUILD_BENCHMARKS=ON, COMDARE_V32_ENABLE=ON, COMDARE_MEASUREMENT_MODE=ON, COMDARE_BUILD_PERMUTATIONS=OFF, COMDARE_AUTO_RUN_BUILDER=OFF) -> literal: '-- Configuring done (0.7s)' / '-- Generating done (0.2s)' / '-- Build files have been written to: /home/comdare/wt-w1-HY-D2/build-w1'",
+            "cmake --build build-w1 --target test_hybrid_spline_selector_scaffold test_v41_pruef_dock_search_algorithm test_v41_anatomy_module_loader -j 12 -> literal Abschluss: '[100%] Linking CXX executable test_v41_anatomy_module_loader' / '[100%] Built target test_v41_anatomy_module_loader' (nur bekannte -Wshadow-Bestandswarnungen aus abi_adapter.hpp, keine Fehler)",
+            "ctest -R \"hybrid_spline_selector_scaffold|v41_pruef_dock_search_algorithm|v41_anatomy_module_loader\" --output-on-failure -> literal: '1/3 Test  #60: test_v41_anatomy_module_loader .........   Passed    0.00 sec' / '2/3 Test  #88: test_v41_pruef_dock_search_algorithm ...   Passed    0.00 sec' / '3/3 Test #274: test_hybrid_spline_selector_scaffold ...   Passed    0.00 sec' / '100% tests passed, 0 tests failed out of 3'",
+            "ASCII-Selbstcheck (git diff -U0 | grep '^+' | grep -v '^+++' | sed 's/§//g' | grep -c -P '[^\\x00-\\x7F]') -> literal Ausgabe: '0'; identischer Check ueber den Commit-Range 6b8eee0f..HEAD -> literal: '0'",
+            "cf22-Selbstcheck: Menge der geaenderten C++-Dateien (git diff --name-only | grep -E '\\.(hpp|cpp|h|cc|cxx|inl)$') -> literal '[Anzahl: 0]' / '(leere Menge - keine C++-Datei im Paket; cf22 ohne Befund)'; Tool literal: 'Ubuntu clang-format version 22.1.8 (++20260613092238+e80beda6e255-1~exp1~20260613092253.78)'",
+            "git diff --stat 6b8eee0f..HEAD -> literal: ' .../20260802-hybrid_tier_stufe_soll_design.md      | 480 +++++++++++++++++++++' / ' libs/cache_engine/hybrid/README.md                 |  58 +++' / ' 2 files changed, 538 insertions(+)'",
+            "Trailer-Check: git log --format=%b 6b8eee0f..HEAD | grep -c 'Co-Authored-By: Claude Fable 5' -> literal: '2'; git status --short nach den Commits -> literal leer (sauberer Baum)",
+            "Anker-Verifikation (Auszug, alle gegen 6b8eee0f): 'grep -n \"enum class AnatomyGenus\" libs/cache_engine/anatomy/anatomy_base.hpp' -> '78:enum class AnatomyGenus : std::uint8_t {' ... '84:};' (Review-K7 nannte :80-86 - im development-Stand NICHT zutreffend, im Doc korrigiert); '62:#define COMDARE_ANATOMY_ABI_MAJOR 7'; '185:class IObservableTier : public IDriveableTier'; '193:    virtual void tier_observe(ComdareTierObserverSnapshot* out) const noexcept = 0;'; pruef_dock.hpp '78:    [[nodiscard]] virtual int measure(...'; anatomy_module_loader.hpp '152: load(...)' / '156: load_all(...)' / '159: platform_suffix()'",
+            "Build-Neutralitaets-Beleg des Stubs: 'grep -n \"GLOB|add_subdirectory\" libs/cache_engine/CMakeLists.txt' -> nur '4:add_subdirectory(builder)' / '5:add_subdirectory(profile_facade)' / '6:add_subdirectory(concurrency_manager)' / '7:add_subdirectory(subsystems)' / '8:add_subdirectory(reclamation)'; 'grep -rn \"file(GLOB\" CMakeLists.txt libs/CMakeLists.txt' -> keine Treffer. Der neue Ordner ist nirgends eingetragen und traegt keine CMakeLists.",
+            "Hybrid-Neuland-Beleg (Ist): 'grep -rn hybrid --include=CMakeLists.txt .' -> nur libs/common/platform/hybrid_core_pinning (unverwandtes CPU-Kern-Pinning) und tests/unit/CMakeLists.txt:3393 test_hybrid_spline_selector_scaffold (synthetischer Vorbau); KEINE Hybrid-Tier-Stufe im Bestand.",
+            "XSD-Reserve-Muster verifiziert (super-Repo, NICHT editiert): Code/test_data_xml/experiment_schema.xsd Zeile 62 '<xs:element name=\"run_methodology\"      type=\"RunMethodologyType\" minOccurs=\"0\"/>' und Zeile 63 '<xs:element name=\"measurement_framework\" type=\"MeasurementFrameworkType\" minOccurs=\"0\"/>' = der reservierte Platz; run_methodology_registry.hpp:7-8 literal: 'COMPARE ist der 4. Registry-Modus ...; zuvor lebte er NUR als XSD-Kommentar-Reserve (experiment_schema.xsd:60-61), nicht als Typ.'"
+          ],
+          "ledger_texte": [
+            "=== (3) XSD-KOMMENTAR-RESERVE <hybrid_tier> -- ENTWURF fuer super-Repo Code/test_data_xml/experiment_schema.xsd, EINZUFUEGEN als Kommentar-Block ZWISCHEN Zeile 62 (<xs:element name=\"run_methodology\" .../>) und Zeile 63 (<xs:element name=\"measurement_framework\" .../>). NICHT von mir editiert (Lead-only). XML-Kommentar-Falle beachtet: der Text enthaelt KEINEN doppelten Bindestrich. ===\n\n        <!-- HY-D2 KOMMENTAR-RESERVE (Owner-E1, 2026-08-02): <hybrid_tier> ist der reservierte Platz der\n             HYBRID-TIER-STUFE (eigene Stufe hinter der CEB; N ABI-stabile Pruef-Docks; Factory-Pattern-Proxy\n             auf die plain Tier-Binaries; std::variant NUR als Traeger der Dock-Typ- und Vertrags-Varianz in\n             einem wahlweise statischen oder Runtime-Dock-Array, Dock-Anzahl dynamisch). Der Platz lebt HEUTE\n             ausschliesslich als diese Kommentar-Reserve, exakt nach dem COMPARE-Muster (der Modus 'compare'\n             lebte erst als XSD-Kommentar-Reserve, dann als Registry-Typ; run_methodology_registry.hpp:7\n             dokumentiert den Weg). KEIN Typ, KEIN Parser, KEIN Registry-Eintrag, KEIN Byte-Effekt: alle\n             Bestands-XMLs bleiben unveraendert valide.\n             SOLL-Form (kommt mit Paket HY-B3 als optionales Element vom Typ HybridTierType, minOccurs=0,\n             GENAU HIER in der Root-Sequenz zwischen run_methodology und measurement_framework):\n               hybrid_tier@enabled@genus\n                 dock_array@storage=static|runtime  (storage=static setzt NUR die Compile_Time_Kapazitaet\n                                                     max_docks; die Belegung bleibt in beiden Formen dynamisch)\n                 eviction@strategy@ram_budget_mb\n                 docks/dock@id@contract  mit  tier_binary@select=binary_id|heuristic\n                 router/break_even@source@curves\n             Die 'Zwischenloesung' des Owners bildet sich exakt ab: dock@contract ist die STATISCHE Seite\n             (Dock-Typ je Slot steht nach Konfiguration fest), tier_binary@select die AUSTAUSCHBARE Seite\n             (plain Binary je Pruefdock swappbar unter Verdraengung). contract- und strategy-Token kommen NUR\n             aus constexpr-Registries im Code (Registry ist ANGEBOT, kein Runtime-Switch); die Validierung ist\n             der C++-Validator validate_profile.hpp, nicht das XSD.\n             Autoritaet: docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:7;\n             Design: ce docs/architecture/20260802-hybrid_tier_stufe_soll_design.md Abschnitt 4. -->",
+            "=== (4) HY-D1 V7.2-PRAEZISIERUNGS-VERMERK -- ENTWURF fuer super-Repo docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md, ADDITIV direkt unter Zeile 89 (dem V7.2-variant-Satz). Lead-only, von mir NICHT editiert. ===\n\n> **[Stand 02.08. -> Owner-E1, docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:7]:** Der V7.2-Satz \"`std::variant` nur in der CEB geduldet, in ALLEN Tier-Binary-Typen verboten\" ist **PRAEZISIERT, nicht aufgeweicht**: Verbots-Scope = alle **PLAIN** Tier-Binaries (dort uneingeschraenkt, keine Ausnahme). Die **HYBRID**-Tier-Binary ist eine eigene **STUFE HINTER der CEB** und die EINE definierte Ausnahme: `std::variant` dort AUSSCHLIESSLICH als Traeger der Dock-Typ- und Vertrags-Varianz ihrer N ABI-stabilen Pruef-Docks, in einem **wahlweise statischen oder Runtime-Dock-Array** (Dock-Anzahl dynamisch einstellbar), gelesen und verarbeitet durch die **Abstract-Factory-Methode** (die §49-KORREKTUR LEDGER:2663 bleibt uneingeschraenkt bindend). NICHT freigegeben bleibt variant fuer die **Haupt-Kommunikation zu den Tier-Binary-Observern** (statisches `IObservableTier`, zero-cost) und fuer jeden plain-Tier- und Planer-Code; die CEB-Duldung (LEDGER:3489) ist unveraendert. Damit ist der **E-11-Regelkonflikt** (LEDGER:89 gegen LEDGER:2656/2659, Katalog G.2a) **AUFGELOEST**: kein Konflikt, zwei Geltungsbereiche.\n> **Einordnung LEDGER:187(e) (Review-Auflage K4):** Owner-E1 definiert die Hybrid-Natur als **STUFE** hinter der CEB. Das aeltere Framing \"Hybrid = Heuristik-Optimierungs-Achse als eigene **Systemachse**\" (LEDGER:187(e)) ist damit in das Stufen-Modell einzuordnen und gilt insoweit als **superseded** (V7.2 kennt genau drei System-Glieder). Rest-Klaerung als **Owner-Frage Q6** ausdruecklich OFFEN gefuehrt, nicht stillschweigend uebergangen.\n> **Design-Autoritaet:** `ce docs/architecture/20260802-hybrid_tier_stufe_soll_design.md` (Abschnitte 1, 3.2, 7-K4). Bau der Stufe: Auswertungsphase (HY-B1a..HY-B4), nach E-24.",
+            "=== (4b) SPIEGEL-VERMERK -- ENTWURF fuer denselben LEDGER, ADDITIV unter Zeile 3489 (dem V7.2-Spiegel-Satz). Lead-only. ===\n\n> **[Nachtrag 02.08., Owner-E1]:** Der hier gespiegelte V7.2-Satz gilt fuer **plain** Tier-Binaries uneingeschraenkt weiter. Die **Hybrid-Tier-Stufe** (eigene Stufe hinter der CEB) ist die EINE definierte Ausnahme, eng begrenzt auf die Dock-Typ-/Vertrags-Varianz per Abstract Factory in einem statischen ODER Runtime-Dock-Array. Vollstaendiger Wortlaut der Praezisierung: Nachtrag unter LEDGER:89 (HY-D1); Design: `ce docs/architecture/20260802-hybrid_tier_stufe_soll_design.md`.",
+            "=== (ZUSATZ A) FREEZE-VERMERK fuer die §75-Abschluss-Aufraeum-Kandidatenliste -- ENTWURF, Lead-only (Ort: LEDGER §75-Abschnitt bzw. die gefuehrte Kandidatenliste). ===\n\n**§75-NICHT-KANDIDATEN (Hybrid-Stufen-Freihaltung, HY-D2 02.08.):** Die folgenden Flaechen duerfen im Abschluss-Aufraeumpass **weder entfernt noch umbenannt** werden, weil die Hybrid-Tier-Stufe (Bau in der Auswertungsphase) unmittelbar auf ihnen aufsetzt: (1) `ce libs/cache_engine/heuristik/axis_spline.hpp`, `heuristik/break_even.hpp`, `heuristik/measurement_curve_loader.hpp` (Speisung des Break-Even-Routers HY-B2); (2) der Vertrag `IPruefDock::measure` (`builder/pruef_dock/pruef_dock.hpp:78`) samt Konformitaets-Gate-Klausel (die Hybrid-Binary haengt als normales Tier-Modul daran); (3) die Loader-Flaeche `AnatomyModuleHandle` + `AnatomyModuleLoader::load/load_all/platform_suffix` (`builder/anatomy_module_loader/anatomy_module_loader.hpp:76/:152/:156/:159`) inkl. der destroy-vor-dlclose-Ordnung (`:70-75`). Aenderungen an (3) beruehren zusaetzlich den offenen Schichten-Entscheid K2 (stufen-neutrale Lib gegen bewusstes Linken der Builder-Loader-Lib) und sind daher entscheid-gebunden, nicht aufraeum-frei.",
+            "=== (ZUSATZ B) E-24-SEQUENZ-MERKSATZ fuer den Gate-Reihenfolge-Eintrag von A16 -- ENTWURF, Lead-only. ===\n\n**Gate-Reihenfolge, harte Kante (Quelle: Hybrid-Design HY-D2, Risiko ABI-Major-Drift):** **E-24 (Container-Gattung) ist der LETZTE ABI-Schritt und MUSS VOR dem Voll-Bau-4-Trigger liegen.** Begruendung: die Hybrid-Tier-Stufe fordert selbst KEINEN eigenen ABI-Schritt (beide ihrer Grenzen sind die bestehende Anatomy-ABI, heute Major 7, `anatomy_module_abi_v1_decl.hpp:62`). Bumpt E-24 den Major aber NACH dem Voll-Bau-4, laedt eine spaeter auf dem neuen Major gebaute Hybrid-Stufe die eingelagerten plain Binaries nicht mehr (Major-Check in `AnatomyModuleLoader::load`, Schritt 5) -> Neubau ALLER Binaries, also exakt der Zustand, den Owner-E3 (Wiederverwendbarkeit/Zuordbarkeit) ausschliesst. Umgekehrt erbt die Hybrid-Stufe bei E-24-vor-Trigger den finalen Major und laedt die Voll-Bau-Binaries ohne Neubau."
+          ],
+          "offene_punkte": [
+            "Lead-Vollzug ausstehend (bewusst NICHT von mir editiert): XSD-Kommentar-Reserve in super-Repo Code/test_data_xml/experiment_schema.xsd (Text ledger_texte #1, Einfuegeort zwischen :62 und :63) sowie die drei LEDGER-Nachtraege (LEDGER:89-Praezisierung + :3489-Spiegel + §75-NICHT-Kandidaten) und der A16-Gate-Merksatz.",
+            "K1 OFFEN (blockiert Lager-/A13-Freeze): Lager-Identitaet der Hybrid-.so selbst ist ungeklaert - entweder eigene Einlagerungsform im Binaries-Realm (Vorschlag: Stempel-SHA512 statt Organ-binary_id + Sidecar der Dock-Bestueckung) ODER explizit 'nicht eingelagert, reines Auswertungs-Artefakt der CEB'. Solange offen, darf kein Lager-Schema Hybrid-Knoten annehmen. Owner-/A13-Entscheid noetig.",
+            "K2 OFFEN (vor HY-B1): Schichten-Entscheid Loader/Drive. HybridBinaryProxy braucht AnatomyModuleHandle + SearchAlgorithmDrive; AnatomyModuleLoader::load/load_all (anatomy_module_loader.hpp:152/:156) leben in der Builder-Lib, was gegen die Doktrin-Zeile pruef_dock.hpp:10-14 ('lebt nur im Builder-Binary') steht. Wahl: stufen-neutrale Lib extrahieren (Vorzug) ODER bewusstes Linken mit additiver Doktrin-Praezisierung.",
+            "K4 OFFEN als Owner-Frage Q6: Ist LEDGER:187(e) ('Heuristik-Optimierung als eigene Systemachse') durch das E1-Stufen-Modell superseded? Design-Lesart (jetzt dokumentiert): ja, Hybrid ist STUFE, keine Systemachse - Owner-Bestaetigung erbeten.",
+            "K5 OFFEN (benannter Entscheid in HY-B4): Snapshot-Aggregations-Semantik - Summe ueber alle Docks (Provenienz-Verlust je Sub-Tier) gegen Passthrough der aktiven Binary (Verlust der uebrigen Docks); Konformitaets-Test vorgesehen, keine Variante gilt als implizit gesetzt.",
+            "K6 EINGEARBEITET, aber bau-relevant: F8-Minimal-DoD (1 Standard-Dock, ctest-bewiesen) ist als HY-B1a VOR dem Vollausbau in die Paketreihenfolge geschnitten - der Manager muss das bei der Auswertungsphasen-Planung so uebernehmen, sonst faellt die Abgabe-Pflicht §32-F8 bei Zeitdruck aus.",
+            "Weitere offene Owner-Fragen aus dem Design (Abschnitt 10 des Docs): Gattungs-Kardinalitaet (ein Hybrid je Gattung?), Default-MaxN der statischen Dock-Array-Policy (Vorschlag 8), Stempel-Kennzeichen der Hybrid-Binary (haengt an K1), Zeitpunkt der §49-Web-Recherche der Verdraengungs-Heuristiken, Aufnahme der Hybrid-Stufe in die neue Plattform-Matrix (RISC-V, macOS M1/x86, E-19-Soll).",
+            "Anker-Abweichung zur Design-Review: Review-Notiz K7 verortete AnatomyGenus bei anatomy_base.hpp:80-86; im development-Stand 6b8eee0f liegt das Enum grep-belegt bei :78-84. Das Doc fuehrt die verifizierte Zeile und weist die Abweichung aus - falls die Review gegen einen anderen Stand geprueft hat, sollte der Manager das gegenpruefen.",
+            "Sidecar-Manifest-Format der Dock-Bestueckung darf erst NACH gelandetem A13 fixiert werden (sonst traegt es die defekte 5-Zeilen-Stempel-Identitaet weiter) - im Doc als Abschnitt-6.4-Auflage verankert, aber A13 laeuft parallel.",
+            "Kompilier-Beweis ist bewusst bounded: das Paket aendert NUR Markdown (0 C++-Dateien), daher ist der cf22-Scope leer und es gibt keine 'betroffenen' Test-Targets im engeren Sinn. Belegt wurden stattdessen Konfigurations- und Build-Neutralitaet (configure ok, 3 sachnahe Test-Targets gebaut und gruen). Das VOLLE Gate (Doppellauf ueber die Gesamt-Suite) faehrt der Manager bei der seriellen Landung.",
+            "Worktree /home/comdare/wt-w1-HY-D2 (Branch w1-HY-D2) bleibt wie beauftragt stehen; darin liegt zusaetzlich das gitignorierte Build-Verzeichnis build-w1 (Konfiguration + 3 Test-Binaries) - beim Aufraeumen mit entfernen."
+          ]
+        },
+        "review": {
+          "verdict": "NACHBESSERN",
+          "befunde": [
+            "MITTEL (Scope-Vollzug/Uebergabe-Luecke): Zwei beauftragte HY-D2-Teile sind weder vollzogen noch explizit delegiert: (1) Freeze-Vermerk heuristik/-API + IPruefDock::measure in der Paragraph-75-Kandidatenliste (liegt im super-Repo, LEDGER:3560 'Kandidaten-Startliste (fortzuschreiben)') und (2) E-24-Merksatz im A16-Gate-Reihenfolge-Eintrag (super docs/sessions/20260802-KATALOG-offene-strecke-gesamtplan.md:32). docs/architecture/20260802-hybrid_tier_stufe_soll_design.md:298 und :281 nennen keinen Vollzieher, waehrend :390 (Sektion-8-Tabelle) beide als 'dieses Paket' = geliefert ausweist -- im Gegensatz zur XSD-Reserve, die in :284 sauber als '(Lead, super-Repo)' markiert ist. Genau der Verlust-Typ der Chunk-Delta-/Freeze-Nachrichten-Doktrin. Fix: :298/:281 analog :284 explizit als Lead-Nachtrag markieren + :390 korrigieren ('Text entworfen, Lead vollzieht'), plus Uebergabe in der Paket-Rueckgabe.",
+            "KLEIN (Beweis-Echtheit): docs/architecture/20260802-hybrid_tier_stufe_soll_design.md:463 -- Anker-Zeile 'Kein Hybrid-Code' behauptet, `grep -rn \"hybrid\" libs/` liefere NUR hybrid_core_pinning + Scaffold-Test. Literal falsch: der Befehl trifft dutzende weitere Kommentar-Stellen ('hybride Laufzeit-Permutation' in topics/axes-Headern, rollbackable_tier.hpp:11/:25 'hybrider Visitor', pruef_dock.hpp:35 '[[hybrid-search-engine-interface]]', axis_library_registry.hpp:329 'V3 hybrid'). Die Schlussfolgerung (keine Hybrid-Tier-Stufe, Name frei) haelt, aber der literale Beweis-Anker muss korrigiert werden (Befehl auf hybrid_tier/HybridTier verengen oder 'identifier-/verzeichnis-ebene' praezisieren).",
+            "KLEIN (ASCII-Disziplin): Beide Patches tragen das Nicht-ASCII-Zeichen Paragraph (U+00A7) in Diff-Plus-Zeilen (0001 mehrfach, 0002 README.md:75); der Selbstcheck meldet '0 Nicht-ASCII' nur mit offengelegtem sed-Carve-out. Kein CI-Gate vorhanden und Repo-Praezedenz existiert (run_methodology_registry.hpp:7), aber Abweichung vom bisherigen literalen 'ASCII 0'-Standard der Commit-Historie (z.B. 408242f3 = echt 0). Carve-out vom Lead/Owner abnicken lassen oder Paragraph-Zeichen durch 'Sec.'/'Section' ersetzen.",
+            "NITS (Format): libs/cache_engine/hybrid/README.md:7 -- Doppel-Bindestrich '--' INNERHALB des HTML/XML-Kommentars <!-- ... --> ist formal unzulaessige Kommentar-Sequenz; pikant, weil das Design-Doc selbst die XSD-Kommentar-Doppelbindestrich-Falle zitiert (Doc:301). In '-' aendern oder Satz umstellen.",
+            "POSITIV-VERMERKE (kein Handlungsbedarf): (a) K7-Widerspruch des Workers ist grep-belegt KORREKT -- AnatomyGenus liegt im Stand 6b8eee0f bei anatomy_base.hpp:78-84, nicht :80-86; (b) Owner-E1-Transliteration wortlaut-treu gegen super docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:7 verifiziert; (c) alle weiteren stichprobengeprueften datei:zeile-Anker korrekt (abi_decl :62/:66, pruef_dock :10-14/:57/:78-79, observable_tier :185/:193, loader :70-75/:76/:139-159, run_methodology_registry :7-10, break_even :3, super-XSD :60-63); (d) golden-/byte-neutral bestaetigt (nur 2 neue .md, hybrid/ ohne CMake-Anschluss, keine TABUs); (e) Testbeweis literal im Worktree (build-w1 LastTest.log 02.08. 14:17 UTC, 3x Test Passed, 0 Failed); (f) K1-K6 auflagengerecht als offene bindende Abschnitte gefuehrt, HY-B1a-Minimal-DoD (K6) verankert."
+          ]
+        }
+      }
+    ]
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "bau:A14-OSU12",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "a60bf43fd1d65a38d",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785679809585,
+      "queuedAt": 1785679809576,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "A14-OSU12",
+      "promptPreview": "Du bist Struktur-Worker (Arbeitsweise v2.1) fuer das Paket A14-OSU12. PFLICHT-Lektuere VOR dem Bau: (1) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md (Owner-Wortlaut=Gesetz, inkl. Nachtrag Q1/Q2), (2) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-BAU…",
+      "lastProgressAt": 1785681050065,
+      "tokens": 260438,
+      "toolCalls": 141,
+      "durationMs": 1240480,
+      "resultPreview": "{\"key\":\"A14-OSU12\",\"patch_dir\":\"/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/A14-OSU12\",\"commits\":[\"CE (Basis 6b8eee0f, Worktree /home/comdare/wt-w1-A14-OSU12, Branch w1-A14-OSU12) 73c8ab18d866df34a11b8d9cdd2aaf9a727486d5 feat(measurement): A14/OS-U1 -- FINALE DREI operating_system-Unter-Achsen (os_version/kernel/build)\",\"CE 21367f39407592c54d2a926720176e4…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "bau:A13-M1",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "ad526485587ebd194",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785679809585,
+      "queuedAt": 1785679809576,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "A13-M1",
+      "promptPreview": "Du bist Struktur-Worker (Arbeitsweise v2.1) fuer das Paket A13-M1. PFLICHT-Lektuere VOR dem Bau: (1) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md (Owner-Wortlaut=Gesetz, inkl. Nachtrag Q1/Q2), (2) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-BAUPLA…",
+      "lastProgressAt": 1785680658379,
+      "tokens": 162385,
+      "toolCalls": 71,
+      "durationMs": 848794,
+      "resultPreview": "{\"key\":\"A13-M1\",\"patch_dir\":\"/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/A13-M1\",\"commits\":[\"e7d7e25d223da2f0f41604e12aa7fdff36da0e75 feat(A13-M1): 'e'-Versions-Suffix als Experimental-Markierung im AlgoSemVer-Parser\",\"d19e364600e0fa517a994fce719688f8aa69c46e feat(A13-M1): Experimental-Bit 0 im reserved-Feld des Stempel-Entry-PODs\",\"686d3b3a8257bac748de96…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "bau:FK-0",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "ad5165614fcd35356",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785679809585,
+      "queuedAt": 1785679809576,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FK-0",
+      "promptPreview": "Du bist Struktur-Worker (Arbeitsweise v2.1) fuer das Paket FK-0. PFLICHT-Lektuere VOR dem Bau: (1) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md (Owner-Wortlaut=Gesetz, inkl. Nachtrag Q1/Q2), (2) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-BAUPLAN-…",
+      "lastProgressAt": 1785680352762,
+      "tokens": 139577,
+      "toolCalls": 59,
+      "durationMs": 543177,
+      "resultPreview": "{\"key\":\"FK-0\",\"patch_dir\":\"/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/FK-0\",\"commits\":[\"e558260e7599a30dd9e8232942418d24e0c7765a test(fk-0): RF-3-Guard-Helfer auf interne Bindung (static) - Vorbereitung der Registrierung unter dem Projekt-Warnsatz\",\"f2767d58a44c1e18daf1dbbeac8d079d36f0ec93 test(fk-0): RF-3-Guard test_rf3_betriebssystem_feature_fehlt in t…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "bau:HY-D2",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "af1fb7c8aed24e4cb",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785679809586,
+      "queuedAt": 1785679809577,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "HY-D2",
+      "promptPreview": "Du bist Struktur-Worker (Arbeitsweise v2.1) fuer das Paket HY-D2. PFLICHT-Lektuere VOR dem Bau: (1) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md (Owner-Wortlaut=Gesetz, inkl. Nachtrag Q1/Q2), (2) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-BAUPLAN…",
+      "lastProgressAt": 1785680458461,
+      "tokens": 122430,
+      "toolCalls": 42,
+      "durationMs": 648875,
+      "resultPreview": "{\"key\":\"HY-D2\",\"patch_dir\":\"/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/HY-D2\",\"commits\":[\"0e79a7a1062243f82d56433d2a3efc7b3c266974 docs(A17/HY-D2): Architektur-Doc Hybrid-Tier-Stufe (Owner-E1 02.08.) - SOLL-Design additiv nach docs/architecture/\",\"f794f3ed342c4a280d1d7a3e9634ccc252268e35 chore(A17/HY-D2): Verzeichnis-Stub libs/cache_engine/hybrid/ reserv…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "review:FK-0",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "a12c2fd3fba29e7a0",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785680352773,
+      "queuedAt": 1785680352765,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NACHBESSERN",
+      "promptPreview": "Du bist Patch-Reviewer (Fable xhigh, eine Haelfte des Dual-Reviews). Paket FK-0. Lies das Design-Dossier /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/designs/A15-fehlerklassen.md (Review-Auflagen bindend) und die Patches unter /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/FK-0 (git format-patch-Dateien; zusaetzlich ist der …",
+      "lastProgressAt": 1785680744751,
+      "tokens": 99253,
+      "toolCalls": 34,
+      "durationMs": 391978,
+      "resultPreview": "{\"verdict\":\"NACHBESSERN\",\"befunde\":[\"F1 (SCHWER, Paket-Unvollstaendigkeit): FK-0-Teil 2 fehlt komplett. Die Paketdefinition (designs/A15-fehlerklassen.md:29) verlangt die LEDGER-Praezisierung zu Zeile 2022 ('#29 end-to-end verdrahtet' gilt fuer die NAHT-Ebene, Achsen-Ebene offen, additiv). Ist: /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-L…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "review:HY-D2",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "a729b033b6a2ee7bd",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785680458462,
+      "queuedAt": 1785680458461,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NACHBESSERN",
+      "promptPreview": "Du bist Patch-Reviewer (Fable xhigh, eine Haelfte des Dual-Reviews). Paket HY-D2. Lies das Design-Dossier /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/designs/A17-hybrid-tier.md (Review-Auflagen bindend) und die Patches unter /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/HY-D2 (git format-patch-Dateien; zusaetzlich ist der …",
+      "lastProgressAt": 1785680899010,
+      "tokens": 115286,
+      "toolCalls": 29,
+      "durationMs": 440548,
+      "resultPreview": "{\"verdict\":\"NACHBESSERN\",\"befunde\":[\"MITTEL (Scope-Vollzug/Uebergabe-Luecke): Zwei beauftragte HY-D2-Teile sind weder vollzogen noch explizit delegiert: (1) Freeze-Vermerk heuristik/-API + IPruefDock::measure in der Paragraph-75-Kandidatenliste (liegt im super-Repo, LEDGER:3560 'Kandidaten-Startliste (fortzuschreiben)') und (2) E-24-Merksatz im A16-Gate-Reihenfolge-Eintrag (super docs/sessions/202…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "review:A13-M1",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "a8ced6e41d5e27b7c",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785680658380,
+      "queuedAt": 1785680658380,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDEBEREIT",
+      "promptPreview": "Du bist Patch-Reviewer (Fable xhigh, eine Haelfte des Dual-Reviews). Paket A13-M1. Lies das Design-Dossier /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/designs/A13-stempel-regression.md (Review-Auflagen bindend) und die Patches unter /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/A13-M1 (git format-patch-Dateien; zusaetzlich…",
+      "lastProgressAt": 1785681408492,
+      "tokens": 109230,
+      "toolCalls": 49,
+      "durationMs": 750112,
+      "resultPreview": "{\"verdict\":\"LANDEBEREIT\",\"befunde\":[\"BEFUND-M1-1 (minor, Namensraum-Praezision Q1/Q2): libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp:116 (kStampEntryProbeLine) und tests/unit/test_m_w12_stamp_bausteine.cpp:145-153 zementieren das hierarchische Punkt-Muster 'prt-art.memory.abc' per static_assert im ACHSEN-Slot ('...=prt_patricia@2.3.4e') und der Kopf-Kommentar (:48-51) erklae…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "review:A14-OSU12",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "a9eea37bb971907a4",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785681050066,
+      "queuedAt": 1785681050066,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NACHBESSERN",
+      "promptPreview": "Du bist Patch-Reviewer (Fable xhigh, eine Haelfte des Dual-Reviews). Paket A14-OSU12. Lies das Design-Dossier /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/designs/A14-os-unterachsen.md (Review-Auflagen bindend) und die Patches unter /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/patches/A14-OSU12 (git format-patch-Dateien; zusaetzli…",
+      "lastProgressAt": 1785681704955,
+      "tokens": 127121,
+      "toolCalls": 45,
+      "durationMs": 654889,
+      "resultPreview": "{\"verdict\":\"NACHBESSERN\",\"befunde\":[\"BLOCKIEREND-LEICHT (komment-only, vor Landung fixen + Patches regenerieren): K5-FEHLZUORDNUNG. Das bindende Dossier definiert K5 als probe_id-Versionierung der OsIdentityProbe fuer OS-U3 (designs/A14-os-unterachsen.md:18); die Bump-Verbots-Wache stammt aus RISIKEN 'Review-Wache noetig' (ebd.:29) und Design (3) OHNE K-Nummer. Die Patches etikettieren die Bump-Wa…"
+    }
+  ],
+  "totalTokens": 1135720,
+  "totalToolCalls": 470
+}

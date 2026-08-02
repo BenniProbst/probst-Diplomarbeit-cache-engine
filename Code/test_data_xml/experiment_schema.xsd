@@ -60,6 +60,29 @@
              Struktur. Der vierte Methoden-Wert 'compare' (Replay-Sichten-Vergleich) ist die Reserve fuer #47 -
              in #48 KEIN Registry-Eintrag, nur diese Kommentar-Reserve. -->
         <xs:element name="run_methodology"      type="RunMethodologyType" minOccurs="0"/>
+        <!-- HY-D2 KOMMENTAR-RESERVE (Owner-E1, 2026-08-02): <hybrid_tier> ist der reservierte Platz der
+             HYBRID-TIER-STUFE (eigene Stufe hinter der CEB; N ABI-stabile Pruef-Docks; Factory-Pattern-Proxy
+             auf die plain Tier-Binaries; std::variant NUR als Traeger der Dock-Typ- und Vertrags-Varianz in
+             einem wahlweise statischen oder Runtime-Dock-Array, Dock-Anzahl dynamisch). Der Platz lebt HEUTE
+             ausschliesslich als diese Kommentar-Reserve, exakt nach dem COMPARE-Muster (der Modus 'compare'
+             lebte erst als XSD-Kommentar-Reserve, dann als Registry-Typ; run_methodology_registry.hpp:7
+             dokumentiert den Weg). KEIN Typ, KEIN Parser, KEIN Registry-Eintrag, KEIN Byte-Effekt: alle
+             Bestands-XMLs bleiben unveraendert valide.
+             SOLL-Form (kommt mit Paket HY-B3 als optionales Element vom Typ HybridTierType, minOccurs=0,
+             GENAU HIER in der Root-Sequenz zwischen run_methodology und measurement_framework):
+               hybrid_tier@enabled@genus
+                 dock_array@storage=static|runtime  (storage=static setzt NUR die Compile_Time_Kapazitaet
+                                                     max_docks; die Belegung bleibt in beiden Formen dynamisch)
+                 eviction@strategy@ram_budget_mb
+                 docks/dock@id@contract  mit  tier_binary@select=binary_id|heuristic
+                 router/break_even@source@curves
+             Die 'Zwischenloesung' des Owners bildet sich exakt ab: dock@contract ist die STATISCHE Seite
+             (Dock-Typ je Slot steht nach Konfiguration fest), tier_binary@select die AUSTAUSCHBARE Seite
+             (plain Binary je Pruefdock swappbar unter Verdraengung). contract- und strategy-Token kommen NUR
+             aus constexpr-Registries im Code (Registry ist ANGEBOT, kein Runtime-Switch); die Validierung ist
+             der C++-Validator validate_profile.hpp, nicht das XSD.
+             Autoritaet: docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:7;
+             Design: ce docs/architecture/20260802-hybrid_tier_stufe_soll_design.md Abschnitt 4. -->
         <xs:element name="measurement_framework" type="MeasurementFrameworkType" minOccurs="0"/>
         <xs:element name="writeback_methods"    type="WritebackMethodsType" minOccurs="0"/>
         <xs:element name="op_types"             type="OpTypeListType"/>
