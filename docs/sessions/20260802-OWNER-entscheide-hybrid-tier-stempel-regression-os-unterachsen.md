@@ -124,3 +124,9 @@ NUR ZUR KENNTNIS (Q8): A-08 sagte fuer die OS-Unter-Achsen „statisch, RT vorbe
 „Bitte suche über die letzten 10 Kontexte mit einem Explore Agenten nach vergessener Arbeit, insbesondere hatte ich angefordert, dass nicht nur die Kapitel der Diplomarbeit angepasst werden sollten, sondern auch die Anhänge, ist das vollumfassend auch in bezug auf die einzel-Gliederung aller Achsen-Kategorien erfolgt?"
 
 **Auslegung:** Explore-Agent (very thorough) ueber die 38 redigierten Transkript-Chunks + 48 Leser-Extrakte + Session-Docs rueckwaerts + Thesis-Ist (anhang/, generate_wide_appendix.ps1, generate_measurement_appendix.ps1, beide Sprachzellen). Kernfrage: Anhaenge-Einzel-Gliederung ALLER Achsen-Kategorien (Ist: 18 Organ-Achsen + 3 System-Haupt-Achsen mit Unter-Achsen) — vollzogen oder Luecke? Ergebnis wird als Befund gemeldet; Luecken werden als Auftrag in die Thesis-Strecke eingeplant.
+
+## NACHTRAG ~21:1x UTC — GO offene Arbeit fortsetzen (VERBATIM)
+
+„Bitte fahre doch direkt mit offener Arbeit fort"
+
+**Auslegung (bindend):** Nach der Integritaets-Korrektur (voreilige #17/#18) und abgeschlossener OS-U3-Landung direkt weiter mit der hoechsten offenen Prioritaet = Welle 2d (Codex-Wellen-Befunde CX-W1..W8, 2 BLOCK trigger-blockierend, Task #20). Codex-bwrap ist auf prod1 defekt -> Bau durch Opus-Worker (schwere Logik-Fallback), Fable-Review + Manager-Ist-Verifikation je Befund; wo Codex verfuegbar, Zweitreview. CX-W2 kann einen Wire-syntax_version-Bump verlangen (Stempel-/Wire-Fenster = Owner-Entscheid) -> Worker implementiert die konservativ-korrekte Variante (nie faelschlich Claim freigeben), Wire-Bump nur als Owner-Vorlage falls unumgaenglich. CX-W7 (B8-Hybrid-Doc) + CX-W13 (v0-Kurzform) = Lead/Owner-Vorlage.
