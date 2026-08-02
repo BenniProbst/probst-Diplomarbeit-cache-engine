@@ -10,9 +10,14 @@
 
 ## 0. INTEGRITAETS-KORREKTUR (zuerst, weil Anlass)
 
-- Ich markierte `#17` (Parallel-Welle 3a) als „VOLLZOGEN" — FALSCH: OS-U3-CI unbestaetigt, ce main-FF
-  nicht gemacht, ce- und thesis-Gitlink nicht gebumpt, OS-U3-Ledger offen, Design-Dossiers NACHBESSERN
-  (4 Nachtraege undone, nicht committet), Welle-3-Backup uncommittet.
+- Ich markierte `#17` (Parallel-Welle 3a) als „VOLLZOGEN" — FALSCH war zu dem Zeitpunkt: OS-U3-CI
+  unbestaetigt, ce main-FF nicht gemacht, ce- und thesis-Gitlink nicht gebumpt, OS-U3-Ledger offen,
+  Design-Dossiers NACHBESSERN (4 Nachtraege undone), Welle-3-Backup uncommittet.
+- NACH der Korrektur (bis ~21:1x) nachgeholt und damit ECHT erledigt: ce-CI 14321 gruen (test:unit
+  prod=283), ce main-FF `6e34e754→7150cc51` (beide Remotes), super ce-Gitlink→`7150cc51` +
+  thesis-Gitlink→`b1ec837` committet+gepusht (super dev `d7e7e39d`, main-FF laeuft auf CI-Gruen per
+  Watcher), OS-U3-Ledger-Nachtrag, beide Backups (welle3 + codex) committet. NOCH offen bleibt allein
+  die Design-Nachbesserung (`#22`, eigene Task) — NICHT Teil der OS-U3-Code-Landung.
 - Ich markierte `#18` (Codex-Doppel-Review) als „VOLLZOGEN" — FALSCH: Wellen-Review fand 8 BESTAETIGTE
   Befunde (2 BLOCK) die NICHT gefixt sind; der Gesamt-Audit lief GAR NICHT (Codex-bwrap-Ausfall).
 - Beide auf in_progress zurueckgesetzt; die echten offenen Stuecke sind als Tasks #20/#21/#22 + #17
@@ -23,11 +28,11 @@
 
 | Linie | dev (remote) | main (remote) | Anmerkung |
 |---|---|---|---|
-| ce (286) | **`7150cc51`** (OS-U3 gepusht) | `6e34e754` (Welle 2b) | **main-FF 6e34e754→7150cc51 OFFEN**; CI 14321 LAEUFT (unbestaetigt) |
-| super (288) | `5b763179` | `5b763179` | Working-Tree: uncommittete Submodul-Pointer-Diffs (s. §5) + 2 untracked Backup-Dirs |
-| thesis (289) | `b1ec8379` | `b1ec8379` | **CI 14322(main)+14323(dev) GRUEN**; super-Gitlink steht noch auf `13b1b5ab` → Bump faellig |
+| ce (286) | **`7150cc51`** (OS-U3) | **`7150cc51`** (main-FF vollzogen) | CI 14321 GRUEN (test:unit prod=283) |
+| super (288) | **`d7e7e39d`** (gepusht) | `5b763179` → FF auf CI-Gruen (Watcher 14325) | Working-Tree jetzt CLEAN (Gitlinks committet) |
+| thesis (289) | `b1ec8379` | `b1ec8379` | CI 14322/14323 GRUEN; super-Gitlink JETZT `b1ec837` (gebumpt) |
 | prtart (287) | `c4735d2` | `c4735d2` | unveraendert; super-Gitlink `32e8ffa` (Owner-Vorlage V5, offen) |
-| ce-Gitlink in super | zeigt auf `6e34e754` | | Bump auf `7150cc51` faellig NACH ce-main-FF |
+| ce-Gitlink in super | JETZT `7150cc51` (gebumpt) | | committet in `d7e7e39d` |
 
 rescue-Refs (beide Remotes): ce `refs/rescue/{w2b-A13-M2-fix,w2b-E04-P1-fix,w2b-B10stale,w2c-*,w3-os-u3}`,
 super `refs/rescue/{w2b-E19-fix,w2b-E19}`, thesis `refs/rescue/w3-thesis-c`, super `refs/backup/pre-secret-scrub-20260802`.
