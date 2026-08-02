@@ -1,0 +1,100 @@
+From f794f3ed342c4a280d1d7a3e9634ccc252268e35 Mon Sep 17 00:00:00 2001
+From: Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+Date: Sun, 2 Aug 2026 14:18:23 +0000
+Subject: [PATCH 2/2] chore(A17/HY-D2): Verzeichnis-Stub
+ libs/cache_engine/hybrid/ reserviert (README-Header, KEIN Code, kein
+ Build-Anschluss)
+
+Namens- und Schnittstellen-Reservierung fuer die Hybrid-Tier-Stufe (Owner-E1 02.08.), damit kein
+anderes Paket den Namen 'hybrid' unter libs/cache_engine/ belegt und die Stufe spaeter ohne
+Umbenennung landen kann.
+
+Build-Neutralitaet belegt: libs/cache_engine/CMakeLists.txt listet seine Unterverzeichnisse
+einzeln per add_subdirectory (kein file(GLOB) im Repo-Wurzel-/libs-Pfad); der neue Ordner ist dort
+NICHT eingetragen und traegt keine CMakeLists - er kann also weder ein Target noch ein Byte
+erzeugen.
+
+Die README traegt: Zweck-Kommentar-Header, Stufen-Einordnung (Rekursions-Ebene 3), reservierter
+Namespace comdare::cache_engine::hybrid, Verweis auf das bindende Design-Doc
+docs/architecture/20260802-hybrid_tier_stufe_soll_design.md, Tabelle der spaeter geplanten
+Dateien und die harten Randbedingungen (variant nur als HybridDockVariant/visit nur an
+Umschaltpunkten, kein neuer ABI-Schritt, Sidecar statt binary_id, offene Auflagen K1/K2/K4/K5,
+F8-Minimal-DoD zuerst).
+
+Beweis: ASCII-Selbstcheck Diff-Plus-Zeilen == 0 Nicht-ASCII; cf22-Scope leer (keine C++-Datei);
+Konfigurations- und Testbeweis im Paket-Bericht (build-w1 configure ok, 3 nahe Test-Targets
+gebaut und gruen).
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+---
+ libs/cache_engine/hybrid/README.md | 58 ++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+ create mode 100644 libs/cache_engine/hybrid/README.md
+
+diff --git a/libs/cache_engine/hybrid/README.md b/libs/cache_engine/hybrid/README.md
+new file mode 100644
+index 00000000..9b02ed17
+--- /dev/null
++++ b/libs/cache_engine/hybrid/README.md
+@@ -0,0 +1,58 @@
++# hybrid/ -- RESERVIERTER STUB der Hybrid-Tier-Stufe (KEIN CODE)
++
++<!--
++  ZWECK DIESES ORDNERS (Paket HY-D2, 02.08.2026)
++  Dieser Ordner ist eine reine NAMENS- UND SCHNITTSTELLEN-RESERVIERUNG fuer die Hybrid-Tier-Stufe
++  nach Owner-Entscheid E1 vom 02.08.2026. Er enthaelt bewusst NUR diese README.
++  KEIN Header, KEINE Quelle, KEINE CMakeLists, KEIN Build-Anschluss -- libs/cache_engine/CMakeLists.txt
++  listet seine Unterverzeichnisse einzeln per add_subdirectory (kein GLOB), dieser Ordner ist dort
++  NICHT eingetragen und damit build- und byte-neutral.
++  ANFASSEN ERST in der Auswertungsphase (Pakete HY-B1..HY-B4), nach Voll-Bau-4 und nach E-24.
++-->
++
++**Stufe:** Rekursions-Ebene 3 der Dock-Kette (Planer-Dock -> CEB-Pruef-Dock -> **Hybrid-Pruef-Docks**).
++**Namespace (reserviert):** `comdare::cache_engine::hybrid`.
++**Design (bindend):** `docs/architecture/20260802-hybrid_tier_stufe_soll_design.md`.
++**Owner-Autoritaet:** Entscheid E1, super-Repo
++`docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:7`.
++**Bau-Zeitpunkt:** Auswertungsphase. Vorher entsteht hier KEIN Code.
++
++## Warum der Ordner jetzt schon existiert
++
++Owner-E1 definiert die Hybrid-Tier-Binary als eigene Stufe HINTER der CEB, mit mehreren
++ABI-stabilen Pruef-Docks, Factory-Pattern-Proxy auf ihre Tier-Binaries und `std::variant` als
++begrenzte Ausnahme in einem wahlweise statischen oder Runtime-Dock-Array. Der Bau faellt in die
++Auswertungsphase; die SCHNITTSTELLEN muessen aber JETZT freigehalten werden, damit die
++Voll-Bau-4-Binaries spaeter nicht neu gebaut werden muessen (kein eigener ABI-Schritt fuer die
++Hybrid-Stufe, siehe Design Abschnitt 6). Die Reservierung verhindert zusaetzlich, dass ein anderes
++Paket den Namen `hybrid` in `libs/cache_engine/` belegt.
++
++## Geplante Dateien (Auswertungsphase, Design Abschnitt 3)
++
++| Datei | Inhalt |
++|---|---|
++| `hybrid_dock_contract.hpp` | `DockContractDescriptor` (POD) + Contract-Concept + constexpr contract-Registry |
++| `hybrid_pruef_dock.hpp` | Standard-Dock + Alternativ-Dock-Typen je abweichendem Vertrag |
++| `hybrid_dock_factory.hpp` | Abstract Factory (§49-KORREKTUR): einziger Konstruktions-Ort der variant-Alternativen |
++| `hybrid_dock_array.hpp` | `DockArray<Policy>`: statische ODER Runtime-Policy, Belegung immer dynamisch |
++| `hybrid_binary_proxy.hpp` | Proxy je Dock auf seine plain Tier-Binary (besitzt `AnatomyModuleHandle`) |
++| `hybrid_eviction.hpp` | Verdraengungs-Strategie (Compile-Time-Strategy) |
++| `hybrid_router.hpp` | Break-Even-Router (Compile-Time-Chain-of-Responsibility) |
++| `hybrid_config_xml.hpp` | Parser der `<hybrid_tier>`-XML-Sektion (common-DOM, Doktrin NUR EIN XML-Programm) |
++| `hybrid_tier_module.cpp` | Export der Hybrid-Binary als normales Tier-Modul (4 ABI-Pflicht-Symbole) |
++
++## Harte Randbedingungen fuer den spaeteren Bau
++
++- `std::variant` ausschliesslich als `HybridDockVariant` im `DockSlot`; `std::visit` NUR an
++  Konfigurations-/Umschaltpunkten. Der Op-Hot-Path bleibt variant-frei und cast-frei
++  (Haupt-Kommunikation = statisches `IObservableTier`). In plain Tier-Binaries bleibt `std::variant`
++  verboten.
++- Kein neuer ABI-Schritt: beide Grenzen der Stufe sind die bestehende Anatomy-ABI (Major 7,
++  `anatomy_module_abi_v1_decl.hpp:62`).
++- Die Dock-Bestueckung ist Runtime-Konfiguration und gehoert in ein Sidecar-Manifest, NIE in die
++  binary_id. Das Sidecar-Format wird erst NACH der A13-Stempel-Regression fixiert.
++- Offene Auflagen K1 (Lager-Identitaet der Hybrid-.so), K2 (Schichten-Entscheid Loader/Drive),
++  K4 (Verhaeltnis zu LEDGER:187(e)) und K5 (Snapshot-Aggregations-Semantik) sind VOR dem jeweiligen
++  Bauschritt zu klaeren -- Details im Design-Dokument Abschnitt 7.
++- Erster Meilenstein der Auswertungsphase ist der F8-Minimal-DoD (genau 1 Standard-Dock,
++  ctest-bewiesen), nicht der Vollausbau.
+-- 
+2.43.0
+

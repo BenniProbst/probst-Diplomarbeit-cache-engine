@@ -1,0 +1,56 @@
+From e558260e7599a30dd9e8232942418d24e0c7765a Mon Sep 17 00:00:00 2001
+From: Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+Date: Sun, 2 Aug 2026 14:15:44 +0000
+Subject: [PATCH 1/2] test(fk-0): RF-3-Guard-Helfer auf interne Bindung
+ (static) - Vorbereitung der Registrierung unter dem Projekt-Warnsatz
+
+A15/FK-0, Vorstufe zur ctest-Registrierung: der Guard lief bisher nur per Hand-Bau
+(g++ -Wall, Kopf-Zeile 9). Unter dem Projekt-Warnsatz COMDARE_set_default_warnings
+(cmake/compiler_flags.cmake:20-33, u.a. -Wmissing-declarations) warnt ein Helfer mit
+externer Bindung ohne vorherige Deklaration:
+
+  test_rf3_betriebssystem_feature_fehlt.cpp:69:6: warning: no previous declaration
+  for 'void check_true(const char*, bool)' [-Wmissing-declarations]
+
+check_eq/check_true leben ausschliesslich in dieser Uebersetzungseinheit -- interne
+Bindung ist die sachlich richtige Loesung (keine Unterdrueckung, keine Deklaration
+auf Vorrat). Verhalten unveraendert (reine Bindungs-Aenderung), golden-neutral.
+
+Beweis nach der Aenderung: Bau des Targets ohne jede warning-Zeile (Ausgabe siehe
+Folge-Commit, dort laeuft der Test auch literal).
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+---
+ tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp b/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp
+index 9a843ec4..157a2ea6 100644
+--- a/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp
++++ b/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp
+@@ -49,8 +49,12 @@ using Klasse  = cem::CompilerCompilerErrorClass;
+ 
+ static int g_fail = 0;
+ 
++// Interne Bindung (static) fuer beide Helfer: seit der FK-0-Registrierung uebersetzt der Test unter dem
++// Projekt-Warnsatz (COMDARE_set_default_warnings, u.a. -Wmissing-declarations). Ein Helfer mit externer
++// Bindung und ohne vorherige Deklaration warnt dort -- der Hand-Bau (-Wall) sah das nicht. static ist
++// hier die sachlich richtige Bindung: beide Helfer leben nur in dieser einen Uebersetzungseinheit.
+ template <typename A, typename B>
+-void check_eq(char const* what, A const& got, B const& want) {
++static void check_eq(char const* what, A const& got, B const& want) {
+     bool const ok = (got == want);
+     std::cout << (ok ? "  [OK]  " : "  [ERR] ") << what << " = " << got;
+     if (!ok) {
+@@ -60,7 +64,7 @@ void check_eq(char const* what, A const& got, B const& want) {
+     std::cout << "\n";
+ }
+ 
+-void check_true(char const* what, bool cond) {
++static void check_true(char const* what, bool cond) {
+     std::cout << (cond ? "  [OK]  " : "  [ERR] ") << what << "\n";
+     if (!cond) ++g_fail;
+ }
+-- 
+2.43.0
+

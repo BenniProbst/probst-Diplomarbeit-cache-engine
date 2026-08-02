@@ -1,0 +1,116 @@
+From f2767d58a44c1e18daf1dbbeac8d079d36f0ec93 Mon Sep 17 00:00:00 2001
+From: Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+Date: Sun, 2 Aug 2026 14:16:14 +0000
+Subject: [PATCH 2/2] test(fk-0): RF-3-Guard
+ test_rf3_betriebssystem_feature_fehlt in tests/unit/CMakeLists.txt
+ registrieren (A15/FK-0, Owner-E6 02.08.)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Owner-Entscheid 02.08. E6: "Fehlerklassen bitte jetzt mit bauen". FK-0 (Hygiene+
+Wahrheit) schliesst die Luecke L7 des A15-Ist-Befunds: der RF-3-Guard (§70.3) lag
+seit 26.07. unregistriert im Baum und lief nur per Hand-Bau -- also ausserhalb
+jeder Gate-Wirkung.
+
+Registrierung nach dem Muster des direkten Nachbarn test_axis_error_taxonomy
+(tests/unit/CMakeLists.txt:2016-2019): comdare_add_test + identische Include-Menge
+(nur libs/cache_engine/include; der Test zieht ausschliesslich
+measurement/axis_error.hpp, kein boost, keine lib). comdare_add_test linkt gtest/
+gtest_main als Archive; der main-tragende Archiv-Member wird nicht gezogen, weil
+dieser Guard sein eigenes main hat (Exit 0/1) -- die bewusste gtest-Freiheit des
+Guards bleibt damit erhalten.
+
+Der Guard beweist zwei Dinge, die test_axis_error_taxonomy NICHT prueft: die
+PAARWEISE Distinktheit aller fuenf D1-Etiketten und die Anhaenge-Wache (hinter
+kCompilerCompilerErrorClassCount darf kein etikettierter Enum-Wert liegen).
+
+Kopf-Kommentar des Tests auf den Ist-Stand gehoben, Alt-Wortlaut erhalten (Doku
+nie loeschen, nur vermerken): "STAND 26.07. (ueberholt, Wortlaut erhalten)" +
+"STAND 02.08.".
+
+BEWEIS (build-w1, Optionen aus build-v6/CMakeCache.txt: Release,
+COMDARE_BUILD_TESTS/BUILDER/BENCHMARKS=ON, MEASUREMENT_MODE=ON, V32_ENABLE=ON,
+CE_ENABLE_STATISTICS/ORIGINAL_CODE_VALIDATION=ON, DETECTION_MODE=COMPILE_TIME,
+WRITER_BACKEND=portable, BUILD_PERMUTATIONS=OFF), Bau ohne warning-Zeile:
+
+  [100%] Building CXX object tests/unit/CMakeFiles/test_rf3_betriebssystem_feature_fehlt.dir/test_rf3_betriebssystem_feature_fehlt.cpp.o
+  [100%] Linking CXX executable test_rf3_betriebssystem_feature_fehlt
+  [100%] Built target test_rf3_betriebssystem_feature_fehlt
+
+  1/2 Test #212: test_axis_error_taxonomy ................   Passed    0.00 sec
+  2/2 Test #213: test_rf3_betriebssystem_feature_fehlt ...   Passed    0.00 sec
+  100% tests passed, 0 tests failed out of 2
+
+  ==== RF-3 BetriebssystemFeatureFehlt: ALLE OK ====
+
+ctest-Enumeration: der Name test_rf3_betriebssystem_feature_fehlt ist der EINZIGE
+Zugang gegenueber build-v6 (Namens-Diff v6 -> w1). Die vier Abgaenge im Diff
+(f15_compare_cli_smoke, test_v41_anatomy_adhoc_autobuilt_load / _f15_measurement /
+_r5i_configure_codegen) sind die configure-bedingt registrierten Post-Pass-2-Tests
+(tests/unit/CMakeLists.txt:1033, :1506) und fehlen in JEDEM frischen Build-Verzeichnis
+-- kein Effekt dieser Aenderung.
+
+Golden-neutral (reine Test-Registrierung, kein Codegen-Pfad, keine Binary-Menge).
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+---
+ tests/unit/CMakeLists.txt                      | 14 ++++++++++++++
+ .../test_rf3_betriebssystem_feature_fehlt.cpp  | 18 ++++++++++++------
+ 2 files changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/tests/unit/CMakeLists.txt b/tests/unit/CMakeLists.txt
+index 4f62c4ac..0be96bfe 100644
+--- a/tests/unit/CMakeLists.txt
++++ b/tests/unit/CMakeLists.txt
+@@ -2018,6 +2018,20 @@ comdare_add_test(test_axis_error_taxonomy
+ target_include_directories(test_axis_error_taxonomy PRIVATE
+     "${PROJECT_SOURCE_DIR}/libs/cache_engine/include")
+ 
++# Fehlerklassen-Framework A15/FK-0 (Task #29, Owner-Entscheid E6 vom 02.08.: "Fehlerklassen bitte jetzt
++# mit bauen"): der RF-3-Guard (§70.3) zur fuenften D1-Klasse BetriebssystemFeatureFehlt wird hier am Join
++# nachregistriert (bis 02.08. lag er unregistriert im Baum, Sammel-Registrierung war so vorgesehen).
++# Er beweist ZWEI Dinge, die der Nachbar test_axis_error_taxonomy NICHT prueft: die PAARWEISE
++# Distinktheit aller fuenf D1-Etiketten und die Anhaenge-Wache (hinter dem Count darf kein etikettierter
++# Enum-Wert liegen). Include-Menge deshalb identisch zum Nachbarn: der Test zieht ausschliesslich
++# measurement/axis_error.hpp (header-only Enums, kein boost, keine lib).
++# Bewusst OHNE gtest geschrieben (eigenes main, Exit 0/1) -- comdare_add_test linkt gtest/gtest_main nur
++# als Archive; der main-tragende Archiv-Member wird nicht gezogen, weil main hier schon definiert ist.
++comdare_add_test(test_rf3_betriebssystem_feature_fehlt
++    SOURCES test_rf3_betriebssystem_feature_fehlt.cpp)
++target_include_directories(test_rf3_betriebssystem_feature_fehlt PRIVATE
++    "${PROJECT_SOURCE_DIR}/libs/cache_engine/include")
++
+ # Goal-V3 Striktheit (Metaprogrammierung): prospektiver compile-time-Guard. Beweist POSITIV, dass die 11
+ # Referenz-Anatomien nicht-polymorph (keine vtable im Hot-Path) + AnatomyConcept-erfuellt sind, und dass die
+ # ABI-Grenze (IAnatomyBase/IDriveableTier/IMeasurableWorkload) bewusst polymorph bleibt -- faengt jede
+diff --git a/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp b/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp
+index 157a2ea6..c1251039 100644
+--- a/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp
++++ b/tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp
+@@ -1,10 +1,16 @@
+-// tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp -- RF-3 (§70.3), 26.07.2026. UNREGISTRIERT.
++// tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp -- RF-3 (§70.3), 26.07.2026.
++// REGISTRIERT seit A15/FK-0 (02.08.2026, Owner-Entscheid E6 "Fehlerklassen bitte jetzt mit bauen").
+ //
+-// Absichtlich NICHT in tests/unit/CMakeLists.txt eingetragen (Sammel-Registrierung am Join, wie die
+-// Lane-C-Guards und der A9b-Guard): der Voll-ctest-Zaehler bleibt dadurch unveraendert. Bewusst OHNE
+-// gtest geschrieben, damit der Hand-Bau eine einzige Zeile ohne Link-Satz ist. Literal gelaufen (26.07.),
+-// hier ohne Zeilenfortsetzung notiert, weil ein Backslash am Zeilenende einen //-Kommentar fortsetzt
+-// (-Wcomment):
++// STAND 26.07. (ueberholt, Wortlaut erhalten): "Absichtlich NICHT in tests/unit/CMakeLists.txt
++// eingetragen (Sammel-Registrierung am Join, wie die Lane-C-Guards und der A9b-Guard): der
++// Voll-ctest-Zaehler bleibt dadurch unveraendert."
++// STAND 02.08.: der Join ist erfolgt -- der Guard ist per comdare_add_test neben seinem Nachbarn
++// test_axis_error_taxonomy registriert und laeuft als regulaerer ctest-Eintrag mit; der Voll-Zaehler
++// waechst um genau diesen einen Eintrag. Bewusst OHNE gtest geschrieben, damit der Hand-Bau eine
++// einzige Zeile ohne Link-Satz ist -- das bleibt so (eigenes main, Exit 0/1; der von comdare_add_test
++// mitgelinkte gtest_main-Archiv-Member wird nicht gezogen). Hand-Bau weiterhin moeglich, literal
++// gelaufen (26.07.), hier ohne Zeilenfortsetzung notiert, weil ein Backslash am Zeilenende einen
++// //-Kommentar fortsetzt (-Wcomment):
+ //
+ //   g++ -std=c++23 -O0 -Wall -I libs/cache_engine/include tests/unit/test_rf3_betriebssystem_feature_fehlt.cpp -o <build>/test_rf3_guard
+ //
+-- 
+2.43.0
+

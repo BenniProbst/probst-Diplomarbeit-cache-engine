@@ -1,0 +1,480 @@
+From 73c8ab18d866df34a11b8d9cdd2aaf9a727486d5 Mon Sep 17 00:00:00 2001
+From: Benjamin-Elias Probst <benjamineliasprobst@gmail.com>
+Date: Sun, 2 Aug 2026 14:19:38 +0000
+Subject: [PATCH 1/3] feat(measurement): A14/OS-U1 -- FINALE DREI
+ operating_system-Unter-Achsen (os_version/kernel/build)
+
+Owner-Entscheid E3 vom 02.08.2026 ("Das Paket ist JETZT Pflicht, ansonsten muessen alle
+Binaries bei Einfuehrung neu gebaut werden"): die Haupt-Achse operating_system bekommt ihre
+drei Unter-Achsen als TYPEN. Namen und Zahl stehen seit A-08/K-04 und Owner E-12 fest
+("Wir mergen den Update Zustand in Build") -- os_version, kernel, build; update_zustand ist
+KEINE vierte Achse.
+
+NEU operating_system_sub_axes.hpp:
+  * OperatingSystemAxisTag = Familien-Repraesentant der ACHSE (Muster TargetIsaAxisTag);
+    Label aus LinuxOperatingSystem::axis_label() gezogen, nie als Literal wiederholt.
+  * OperatingSystemSubAxis<Derived> ueber CebSubAxis<Derived, OperatingSystemAxisTag> --
+    Eltern-Bezug ist ein TYP, parent_axis_label() ist ABGELEITET (keine String-Konvention).
+  * OsVersionSubAxis/KernelSubAxis/BuildSubAxis, je option_source="machine_resolved"
+    (kein CT-Options-Katalog: die Werte haengen an der Maschine, Muster numa_node/page).
+  * FINAL-DREI-Wache (size()==3 mit E-12-Begruendung) + Distinktheits-Wache +
+    NAMENSFALLEN-Wache gegen die 'build'/'build_version'-Kollision (Verbots-Katalog:
+    update_zustand/update_status, build_version/build_type/build_target_complex,
+    os/distribution/operating_system/os_family) + Einhaengungs-/Tiefen-Wachen.
+
+Kommentar-Neufassung operating_system_axis.hpp (Kopf + Katalog-Anker): der 3-Familien-Schnitt
+von OP-10 BLEIBT; die exklusive Nur-Stempel-Variablen-Lesart wird auf die Unter-Achsen
+umgestellt (Familie = Klasse, os_version = Instanz). Typen, Strings und static_asserts sind
+UNVERAENDERT -- kein emittierter String aendert sich.
+
+AUFLAGE K5 (Kommentar-Wache) an kSystemAxisCodeVersions: der Eintrag "operating_system" darf
+wegen der Unter-Achsen NICHT gebumpt werden; ein Bump verschoebe system_stamp_line und damit
+den SHA512 aller Neubauten gegen den Bestand und erzwaenge exakt den von Owner-E3
+ausgeschlossenen Neubau.
+
+Beweis: neuer ctest test_a14_os_sub_axes_guard (4 Faelle, gruen) -- er ist zugleich die TU,
+in der der neue Header im Default-Sweep uebersetzt wird, und prueft die A-15-Stempel-
+Neutralitaet gegen system_stamp_line() gegen.
+
+Stempel-/golden-/ABI-neutral: keine Aenderung an kCompositionAxisNames, POD-Layout,
+Stempel-Zeilen oder build_version-Suffix. TABU unberuehrt.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+---
+ .../abi/system_axis_code_versions.hpp         |  13 +-
+ .../measurement/operating_system_axis.hpp     |  24 ++-
+ .../measurement/operating_system_sub_axes.hpp | 197 ++++++++++++++++++
+ tests/unit/CMakeLists.txt                     |  15 ++
+ tests/unit/test_a14_os_sub_axes_guard.cpp     | 122 +++++++++++
+ 5 files changed, 365 insertions(+), 6 deletions(-)
+ create mode 100644 libs/cache_engine/include/cache_engine/measurement/operating_system_sub_axes.hpp
+ create mode 100644 tests/unit/test_a14_os_sub_axes_guard.cpp
+
+diff --git a/libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp b/libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp
+index ec54fae3..67c3d4f2 100644
+--- a/libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp
++++ b/libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp
+@@ -35,9 +35,20 @@ inline constexpr std::size_t kSystemAxisCodeCount = 3;
+ 
+ /// Die EINE Tabelle der System-Achsen-Code-Versionen -- Reihenfolge == kanonische System-Stempel-Ordnung (Section 43,
+ /// W12-A-1). Init "v1.0.0" (render-neutral zum frueheren "v1"); je Eintrag ab jetzt einzeln bump-bar.
++///
++/// BUMP-WACHE operating_system (A14 / Auflage K5, Owner-Entscheid E3 vom 02.08.2026) -- KOMMENTAR-WACHE,
++/// bewusst kein static_assert, damit ein spaeterer, GEWOLLTER Bump nicht an dieser Datei haengenbleibt:
++/// Die Einfuehrung der drei operating_system-UNTER-Achsen (os_version/kernel/build,
++/// measurement/operating_system_sub_axes.hpp) darf den Eintrag "operating_system" NICHT bumpen. Die
++/// Unter-Achsen sind RT-Unter-Achsen (A-15: nie im Binary-Stempel); der in die Binary kompilierte
++/// Achsen-CODE aendert sich durch sie nicht. Ein Bump ginge in system_stamp_line ein, verschoebe den
++/// SHA512 ALLER Neubauten gegen den Bestand und liesse das Lager-Skip-Gate an den Alt-Binaries
++/// vorbeilaufen -- exakt die Folge, die Owner-E3 ausschliesst ("ansonsten muessen alle Binaries bei
++/// Einfuehrung neu gebaut werden"). Wer hier dennoch bumpt, tut das aus einem ANDEREN Grund und muss
++/// ihn benennen.
+ inline constexpr std::array<SystemAxisCodeVersion, kSystemAxisCodeCount> kSystemAxisCodeVersions{{
+     {"target_isa", "v1.0.0"},
+-    {"operating_system", "v1.0.0"},
++    {"operating_system", "v1.0.0"}, // A14/K5: NICHT wegen der Unter-Achsen bumpen (Wache oben)
+     {"external_utils", "v1.0.0"},
+ }};
+ 
+diff --git a/libs/cache_engine/include/cache_engine/measurement/operating_system_axis.hpp b/libs/cache_engine/include/cache_engine/measurement/operating_system_axis.hpp
+index c5e33797..50b3598f 100644
+--- a/libs/cache_engine/include/cache_engine/measurement/operating_system_axis.hpp
++++ b/libs/cache_engine/include/cache_engine/measurement/operating_system_axis.hpp
+@@ -11,10 +11,22 @@
+ // Identitaeten -- linux / windows / macos. Das sind FAMILIEN, keine Distributionen: die reale Flotte
+ // (Windows 11 + Windows Server 2022, die Linux-Docker-Matrix, 2x macOS) faellt vollstaendig in diese
+ // drei. Distribution und Version (debian-13/trixie, windows-server-2022, macOS-Version) sind
+-// AUSDRUECKLICH KEINE Auspraegungen dieser Achse, sondern STEMPEL-VARIABLEN (analog der BUILD-Version
+-// nach Ledger 69.2/70.6): je Maschine in <machines> deklariert (O-4b, Schritt 5), je Runner ermittelt.
+-// Wer eine Distribution als vierte Auspraegung einfuegen will, hat den Schnitt missverstanden --
+-// die Achse traegt die Klassen-Identitaet, die Stempel-Variable die Instanz.
++// AUSDRUECKLICH KEINE Auspraegungen dieser Achse: die Achse traegt die KLASSEN-Identitaet.
++//
++// WO DIE INSTANZ WOHNT (A14/OS-U1, Owner-Entscheid E3 vom 02.08.2026): in den DREI Unter-Achsen
++// os_version / kernel / build (operating_system_sub_axes.hpp; "build" traegt den Update-Zustand
++// mit -- Owner E-12: "Wir mergen den Update Zustand in Build"). Sie sind stage="runtime" mit
++// option_source="machine_resolved": die Werte werden je Maschine erhoben, die <machines>-Deklaration
++// (O-4b, Schritt 5) ist die ERWARTUNG dafuer, nicht die Quelle. Das ist die systematische Form dessen,
++// was OP-10 als "STEMPEL-VARIABLE" (analog der BUILD-Version nach Ledger 69.2/70.6) beschrieben hat --
++// kein Widerspruch zu OP-10, sondern seine Typ-Fassung.
++// Wer eine Distribution als vierte Auspraegung DIESER Achse einfuegen will, hat den Schnitt weiterhin
++// missverstanden: die Familie ist die Klasse, os_version die Instanz.
++//
++// STEMPEL-NEUTRAL (A-15 + Auflage K5): die drei Unter-Achsen sind RT-Unter-Achsen und stehen deshalb
++// NIE im Binary-Stempel. Weder ihre Einfuehrung noch ihre Werte duerfen
++// abi::kSystemAxisCodeVersions["operating_system"] bumpen -- ein Bump verschoebe den SHA512 aller
++// Neubauten gegen den Bestand und erzwaenge exakt den Neubau, den Owner-E3 ausschliesst.
+ //
+ // WIRKUNG: NUR Stempel-Identitaet (RF-6-Linie, wie target_isa): gleiche Kombination => gleicher
+ // Stempel. KEINE Laufzeit-/Dispatch-Wirkung, KEIN Eintrag in der binary_id (binary_id="never" --
+@@ -91,7 +103,9 @@ static_assert(OperatingSystemAxisConcept<WindowsOperatingSystem>);
+ static_assert(OperatingSystemAxisConcept<MacosOperatingSystem>);
+ static_assert(LinuxOperatingSystem::axis_label() == std::string_view{"operating_system"});
+ // Katalog-Anker (OP-10): GENAU DREI Familien. Eine vierte Auspraegung bricht hier compile-time -- das
+-// ist der Ort, an dem die Distro-als-Achse-Verwechslung auffaellt (Distro = Stempel-Variable).
++// ist der Ort, an dem die Distro-als-Achse-Verwechslung auffaellt. Die Distribution ist seit A14/OS-U1
++// die Unter-Achse os_version (operating_system_sub_axes.hpp), NIE eine vierte Familie hier. Erst eine
++// echte vierte FAMILIE (z.B. bsd) waere ein bewusstes CT-Ereignis an dieser Zeile.
+ static_assert(kAllOperatingSystemIds.size() == 3);
+ static_assert(DefaultOperatingSystem::os_family_id() == std::string_view{"linux"});
+ static_assert(LinuxOperatingSystem::is_posix_family() && MacosOperatingSystem::is_posix_family() &&
+diff --git a/libs/cache_engine/include/cache_engine/measurement/operating_system_sub_axes.hpp b/libs/cache_engine/include/cache_engine/measurement/operating_system_sub_axes.hpp
+new file mode 100644
+index 00000000..d5a3713b
+--- /dev/null
++++ b/libs/cache_engine/include/cache_engine/measurement/operating_system_sub_axes.hpp
+@@ -0,0 +1,197 @@
++// measurement/operating_system_sub_axes.hpp -- die FINALEN DREI Unter-System-Achsen der Haupt-Achse
++// operating_system (Paket A14 / OS-U1; Owner-Entscheid E3 vom 02.08.2026).
++//
++// OWNER-DECKUNG (E3, verbatim): "Das Paket ist JETZT Pflicht, ansonsten muessen alle Binaries bei
++// Einfuehrung neu gebaut werden. Es ist die Basis des Systems, um mit den heute von infra installierten
++// anderen OS die Bandbreite an binaries und Messungen zu erhoehen." Die drei Namen stehen fest seit
++// A-08 (Konsolidierungs-Anker K-04, Konflikt "4 vs 3" aufgeloest) und E-12 (Owner verbatim: "Wir mergen
++// den Update Zustand in Build") -- os_version, kernel, build. update_zustand ist damit KEINE vierte
++// Unter-Achse, sondern Bestandteil von build.
++//
++// -- WAS DIE DREI SIND ---------------------------------------------------------------------------
++//   os_version -- die Distributions-/Release-Identitaet der OS-INSTANZ innerhalb ihrer Familie
++//                 (linux: ID+VERSION_ID aus /etc/os-release; windows: Produktlinie; macos: Produktversion).
++//   kernel     -- das Kernel-Release der Instanz (linux/macos: uname-Release; windows: NT-Kernel-Tripel).
++//   build      -- der Build-/Patch-Stand INKLUSIVE Update-Zustand (E-12-Merge).
++// Die HAUPT-Achse traegt weiterhin ausschliesslich die KLASSEN-Identitaet (drei Familien, OP-10); diese
++// drei Unter-Achsen tragen die INSTANZ. Das ist die systematische Form dessen, was OP-10 als
++// "Stempel-Variablen" beschrieben hat -- keine Gegenrede zu OP-10, sondern seine Typ-Fassung.
++//
++// -- CT/RT-SCHNITT (Kanon Haupt=CT / Unter=RT-Draht, stufen-relativ) -----------------------------
++// Wie numa_node/page am target_isa-Komplex haben diese drei KEINEN compile-statischen Options-Katalog:
++// die zulaessigen Werte haengen an der konkreten Maschine und sind zur Bauzeit nicht erkennbar. Sie
++// deklarieren deshalb eine option_source ("machine_resolved") statt einer Options-Liste.
++// Die LAUFZEIT-ERHEBUNG der Werte ist AUSDRUECKLICH nicht Teil dieses Headers (Paket OS-U3): hier
++// entsteht nur die statische Einhaengung, also das ANGEBOT.
++//
++// -- STEMPEL-NEUTRALITAET (A-15 + Auflage K5) ----------------------------------------------------
++// A-15 gilt hart: RT-Unter-Achsen stehen NIE im Binary-Stempel. Dieser Header aendert deshalb WEDER
++// die Stempel-Zeilen NOCH den SHA512 NOCH den build_version-Suffix -- er ist rein additiv.
++// AUFLAGE K5 (bindende Wache, Bauplan A14): abi::kSystemAxisCodeVersions["operating_system"] darf durch
++// die Einhaengung dieser Unter-Achsen NICHT gebumpt werden. Der in die Binary kompilierte Achsen-CODE
++// aendert sich nicht; ein Bump wuerde system_stamp_line und damit den SHA512 ALLER Neubauten gegen den
++// Bestand verschieben -- das Skip-Gate verfehlte die Alt-Binaries, also genau die Folge, die Owner-E3
++// ausschliesst ("ansonsten muessen alle Binaries ... neu gebaut werden").
++//
++// -- NAMENSFALLE "build" vs "build_version" ------------------------------------------------------
++// Die Unter-Achse heisst "build" (OS-Patch-/Update-Stand der INSTANZ). Sie ist NICHT der
++// build_version-Suffix (Ledger 70.6: die Stempel-Variable-Version der System-Achsen), NICHT der
++// build_type ("+bt="-Suffix-Segment) und NICHT die build_target_complex-Klammer. Die static_asserts am
++// Dateiende halten das fest -- ohne sie entstuende hier die naechste Drift-Klasse.
++//
++// Metaprog: CRTP + Concept, static-dispatch, keine vtable (Muster TargetIsaSubAxis).
++
++#pragma once
++
++#include <cache_engine/measurement/ceb_sub_axis.hpp>
++#include <cache_engine/measurement/operating_system_axis.hpp>
++
++#include <array>
++#include <concepts>
++#include <cstddef>
++#include <string_view>
++#include <type_traits>
++
++namespace comdare::cache_engine::measurement {
++
++/// Familien-Repraesentant der ACHSE operating_system fuer Typ-Eltern-Bezuege
++/// (CebSubAxis<..., OperatingSystemAxisTag>). KEINE Auspraegung und kein Baustein: er traegt
++/// ausschliesslich das Achsen-Label, damit sich die Unter-Achsen auf die ACHSE beziehen koennen statt
++/// auf eine willkuerlich herausgegriffene Familie. Das Label wird NICHT wiederholt, sondern aus der
++/// bestehenden Single-Source gezogen (Muster TargetIsaAxisTag).
++struct OperatingSystemAxisTag final : CebSystemAxis<OperatingSystemAxisTag> {
++    [[nodiscard]] static constexpr std::string_view do_axis_label() noexcept {
++        return LinuxOperatingSystem::axis_label();
++    }
++};
++
++/// Gemeinsame Schicht der operating_system-Unter-Achsen: Eltern-Typ fest, Options-Herkunft deklariert.
++template <class Derived>
++struct OperatingSystemSubAxis : CebSubAxis<Derived, OperatingSystemAxisTag> {
++    /// Woher die zulaessigen Werte kommen (statt einer CT-Options-Liste). Reines Deklarations-Merkmal.
++    [[nodiscard]] static constexpr std::string_view option_source() noexcept { return Derived::do_option_source(); }
++
++protected:
++    constexpr OperatingSystemSubAxis() noexcept = default;
++};
++
++template <class A>
++concept OperatingSystemSubAxisConcept =
++    CebSubAxisConcept<A> && std::derived_from<A, OperatingSystemSubAxis<A>> && requires {
++        { A::option_source() } -> std::same_as<std::string_view>;
++    };
++
++/// os_version -- Distributions-/Release-Identitaet der OS-Instanz INNERHALB ihrer Familie.
++/// Die Familie selbst bleibt die Haupt-Achse; diese Achse unterscheidet debian-13 von ubuntu-24.04.
++struct OsVersionSubAxis final : OperatingSystemSubAxis<OsVersionSubAxis> {
++    [[nodiscard]] static constexpr std::string_view do_axis_label() noexcept { return "os_version"; }
++    [[nodiscard]] static constexpr std::string_view do_option_source() noexcept { return "machine_resolved"; }
++};
++
++/// kernel -- das Kernel-Release der Instanz. Eigene Achse, weil dieselbe os_version mehrere Kernel
++/// fahren kann (und der Kernel die Mess-Relevanz traegt, nicht die Distributions-Marke).
++struct KernelSubAxis final : OperatingSystemSubAxis<KernelSubAxis> {
++    [[nodiscard]] static constexpr std::string_view do_axis_label() noexcept { return "kernel"; }
++    [[nodiscard]] static constexpr std::string_view do_option_source() noexcept { return "machine_resolved"; }
++};
++
++/// build -- Build-/Patch-Stand INKLUSIVE Update-Zustand (Owner E-12: "Wir mergen den Update Zustand in
++/// Build"). Siehe Namensfallen-Block im Kopf: das ist NICHT der build_version-Suffix.
++struct BuildSubAxis final : OperatingSystemSubAxis<BuildSubAxis> {
++    [[nodiscard]] static constexpr std::string_view do_axis_label() noexcept { return "build"; }
++    [[nodiscard]] static constexpr std::string_view do_option_source() noexcept { return "machine_resolved"; }
++};
++
++/// Single-Source der Unter-Achsen-Labels an der Haupt-Achse operating_system. Der Registry-Generator
++/// und jeder Spalten-/Dateinamen-Erzeuger ziehen ihre Liste HIER, nie aus Literalen.
++inline constexpr std::array<std::string_view, 3> kOperatingSystemSubAxisLabels = {
++    OsVersionSubAxis::axis_label(), KernelSubAxis::axis_label(), BuildSubAxis::axis_label()};
++
++namespace detail {
++
++/// FINAL-DREI-Hilfe: die Labels muessen paarweise verschieden sein -- zwei gleiche Labels waeren zwei
++/// XML-Zeilen mit derselben id und damit eine still ueberschriebene Unter-Achse.
++[[nodiscard]] consteval bool operating_system_sub_axis_labels_are_distinct() {
++    for (std::size_t i = 0; i < kOperatingSystemSubAxisLabels.size(); ++i) {
++        if (kOperatingSystemSubAxisLabels[i].empty()) return false;
++        for (std::size_t j = i + 1; j < kOperatingSystemSubAxisLabels.size(); ++j)
++            if (kOperatingSystemSubAxisLabels[i] == kOperatingSystemSubAxisLabels[j]) return false;
++    }
++    return true;
++}
++
++/// NAMENSFALLEN-Katalog: Etiketten, die hier NIE als Unter-Achsen-Label auftauchen duerfen. Jeder
++/// Eintrag steht fuer eine reale Verwechslung, nicht fuer eine hypothetische:
++///   update_zustand/update_status -- die vierte Achse, die E-12 in "build" gemergt hat;
++///   build_version/build_type/build_target_complex -- die drei Bau-Begriffe, mit denen sich "build"
++///       kreuzen wuerde (Ledger 70.6-Stempel-Variable, "+bt="-Suffix-Segment, aeussere Komplex-Klammer);
++///   os/operating_system/distribution -- die Familie bzw. die Achse selbst; eine Unter-Achse, die so
++///       heisst, macht die Instanz zur Klasse und bricht den OP-10-Schnitt.
++inline constexpr std::array<std::string_view, 9> kOperatingSystemSubAxisForbiddenLabels = {
++    "update_zustand", "update_status",    "build_version", "build_type", "build_target_complex", "os",
++    "distribution",   "operating_system", "os_family"};
++
++[[nodiscard]] consteval bool operating_system_sub_axis_labels_avoid_traps() {
++    for (auto const& label : kOperatingSystemSubAxisLabels)
++        for (auto const& forbidden : kOperatingSystemSubAxisForbiddenLabels)
++            if (label == forbidden) return false;
++    return true;
++}
++
++} // namespace detail
++
++static_assert(OperatingSystemSubAxisConcept<OsVersionSubAxis>);
++static_assert(OperatingSystemSubAxisConcept<KernelSubAxis>);
++static_assert(OperatingSystemSubAxisConcept<BuildSubAxis>);
++
++// EINHAENGUNGS-WACHE: alle drei haengen wirklich an operating_system, und zwar ueber den TYP. Das Label
++// ist ABGELEITET (CebSubAxis), nicht wiederholt -- ein Rename der Haupt-Achse zieht hier automatisch mit.
++static_assert(OsVersionSubAxis::parent_axis_label() == std::string_view{"operating_system"});
++static_assert(KernelSubAxis::parent_axis_label() == std::string_view{"operating_system"});
++static_assert(BuildSubAxis::parent_axis_label() == std::string_view{"operating_system"});
++static_assert(std::same_as<OsVersionSubAxis::parent_axis, OperatingSystemAxisTag>);
++static_assert(std::same_as<KernelSubAxis::parent_axis, OperatingSystemAxisTag>);
++static_assert(std::same_as<BuildSubAxis::parent_axis, OperatingSystemAxisTag>);
++// Der Tag traegt exakt das Label der Haupt-Achse (er ist ihr Repraesentant, keine zweite Achse).
++static_assert(OperatingSystemAxisTag::axis_label() == LinuxOperatingSystem::axis_label());
++static_assert(OperatingSystemAxisTag::axis_label() == std::string_view{"operating_system"});
++// Tiefe 1 = direkte Unter-Achse (offene Rekursion aus ceb_sub_axis.hpp, hier als Gegenprobe).
++static_assert(axis_depth_v<OsVersionSubAxis> == 1 && axis_depth_v<KernelSubAxis> == 1 &&
++              axis_depth_v<BuildSubAxis> == 1);
++
++// FINAL-DREI-WACHE (A-08 / K-04 / Owner E-12). Eine VIERTE Unter-Achse bricht hier compile-time -- das
++// ist der Ort, an dem die zurueckgekehrte update_zustand-Achse auffaellt.
++static_assert(kOperatingSystemSubAxisLabels.size() == 3,
++              "A-08/K-04 + Owner E-12: operating_system hat GENAU DREI Unter-Achsen (os_version, kernel, "
++              "build). Der Update-Zustand ist in 'build' GEMERGT ('Wir mergen den Update Zustand in "
++              "Build') und ist AUSDRUECKLICH keine vierte Achse. Wer hier eine vierte eintraegt, hebt "
++              "einen Owner-Entscheid auf und muss das quittieren, statt die Zahl nachzuziehen.");
++static_assert(detail::operating_system_sub_axis_labels_are_distinct(),
++              "Zwei operating_system-Unter-Achsen tragen dasselbe Label -- in der Registry-XML waeren das "
++              "zwei <sub_axis>-Zeilen mit derselben id, von denen jeder Leser eine still verliert.");
++
++// NAMENSFALLEN-WACHE (Kopf-Block): "build" ist der OS-Patch-Stand, NICHT der build_version-Suffix
++// (Ledger 70.6), NICHT der build_type ("+bt=") und NICHT die build_target_complex-Klammer; "os_version"
++// ist die Instanz, NICHT die Familie.
++static_assert(detail::operating_system_sub_axis_labels_avoid_traps(),
++              "Ein operating_system-Unter-Achsen-Label kollidiert mit einem Begriff aus dem Verbots-"
++              "Katalog (kOperatingSystemSubAxisForbiddenLabels): update_zustand/update_status sind in "
++              "'build' gemergt (E-12), build_version/build_type/build_target_complex sind BAU-Begriffe "
++              "und os/distribution/operating_system/os_family sind die Familie, nicht die Instanz.");
++static_assert(BuildSubAxis::axis_label() != std::string_view{"build_version"});
++static_assert(BuildSubAxis::axis_label() != std::string_view{"build_type"});
++static_assert(OsVersionSubAxis::axis_label() != LinuxOperatingSystem::axis_label());
++static_assert(OsVersionSubAxis::axis_label() != std::string_view{"os"});
++
++// ABGRENZUNGS-WACHE zu den target_isa-Unter-Achsen: dieselbe Mechanik, ANDERE Eltern-Achse. Die Wache
++// steht hier und nicht drueben, weil dieser Header der neue ist.
++static_assert(OperatingSystemAxisTag::axis_label() != std::string_view{"target_isa"});
++static_assert(OperatingSystemAxisTag::axis_label() != std::string_view{"external_utils"});
++
++// OPTIONS-HERKUNFT: alle drei sind maschinen-aufgeloest (kein CT-Options-Katalog). Der Wert ist das
++// Etikett, das die Registry-XML traegt -- er ist an DIESE Konstante gekoppelt, nicht an ein XML-Literal.
++static_assert(OsVersionSubAxis::option_source() == std::string_view{"machine_resolved"});
++static_assert(KernelSubAxis::option_source() == std::string_view{"machine_resolved"});
++static_assert(BuildSubAxis::option_source() == std::string_view{"machine_resolved"});
++
++} // namespace comdare::cache_engine::measurement
+diff --git a/tests/unit/CMakeLists.txt b/tests/unit/CMakeLists.txt
+index 4f62c4ac..badff5b9 100644
+--- a/tests/unit/CMakeLists.txt
++++ b/tests/unit/CMakeLists.txt
+@@ -2011,6 +2011,21 @@ target_include_directories(test_striktheit_axis_dach_guard PRIVATE
+ target_compile_definitions(test_striktheit_axis_dach_guard PRIVATE
+     COMDARE_MEASUREMENT_ON=1 COMDARE_CE_ENABLE_STATISTICS=1 COMDARE_EXPERIMENT_MODE_ON=1)
+ 
++# Paket A14 / OS-U1 (Owner-Entscheid E3, 02.08.2026): Wachen-Test der DREI operating_system-Unter-Achsen
++# (os_version/kernel/build). Er ist zugleich die TU, in der operating_system_sub_axes.hpp im Default-Sweep
++# tatsaechlich uebersetzt wird -- ein nie inkludierter Header haette nur dekorative Wachen. Additiv,
++# golden/ABI-neutral; die Stempel-Neutralitaet (A-15/K5) wird als Gegenprobe mitgeprueft.
++comdare_add_test(test_a14_os_sub_axes_guard
++    SOURCES test_a14_os_sub_axes_guard.cpp)
++target_include_directories(test_a14_os_sub_axes_guard PRIVATE
++    "${PROJECT_SOURCE_DIR}/libs/cache_engine"
++    "${PROJECT_SOURCE_DIR}/libs/cache_engine/include"
++    "${PROJECT_SOURCE_DIR}/libs/cache_engine/builder"
++    "${PROJECT_SOURCE_DIR}/libs/common")
++target_link_libraries(test_a14_os_sub_axes_guard PRIVATE Boost::mp11)
++target_compile_definitions(test_a14_os_sub_axes_guard PRIVATE
++    COMDARE_MEASUREMENT_ON=1 COMDARE_CE_ENABLE_STATISTICS=1 COMDARE_EXPERIMENT_MODE_ON=1)
++
+ # Fehlerklassifizierungs-Framework INC-29.0 (Task #29): reiner static_assert-Taxonomie-Guard (axis_error.hpp,
+ # header-only Enums; kein boost, keine lib). Beweist D1/D2-Taxonomie + Count-Drift-Guards + CSV-Token-Vokabeln.
+ comdare_add_test(test_axis_error_taxonomy
+diff --git a/tests/unit/test_a14_os_sub_axes_guard.cpp b/tests/unit/test_a14_os_sub_axes_guard.cpp
+new file mode 100644
+index 00000000..c168c841
+--- /dev/null
++++ b/tests/unit/test_a14_os_sub_axes_guard.cpp
+@@ -0,0 +1,122 @@
++// Paket A14 / OS-U1 -- Wachen-Test der DREI operating_system-Unter-Achsen (Owner-Entscheid E3, 02.08.2026).
++//
++// **Zweck:** Er beweist POSITIV, dass die FINALEN DREI Unter-Achsen os_version/kernel/build an der
++// Haupt-Achse operating_system haengen (Eltern-Bezug ueber den TYP, nicht ueber einen String), dass die
++// FINAL-DREI-Wache und die Namensfallen-Wachen wirklich scharf sind, und dass die Einhaengung
++// STEMPEL-NEUTRAL bleibt (A-15: RT-Unter-Achsen stehen nie im Binary-Stempel).
++//
++// **Warum ein eigener Test und nicht nur die static_asserts im Header:** ein Header, den niemand
++// inkludiert, wird nie uebersetzt -- seine Wachen sind dann Dekoration. Diese TU ist der Ort, an dem
++// operating_system_sub_axes.hpp im Default-ctest-Sweep tatsaechlich durch den Compiler laeuft. Die
++// Registry-Seite (XML-Emission) deckt separat das Byte-Gate test_system_axis_registry_roundtrip.
++//
++// **ADDITIV & golden/ABI-NEUTRAL:** reiner Wachen-Test; keine Aenderung an kCompositionAxisNames,
++// golden_fullpilot_320, POD-Layout oder Stempel-Zeilen.
++
++#include <cache_engine/abi/anatomy_version_stamp.hpp>     // A-15-Gegenprobe: system_stamp_line()
++#include <cache_engine/abi/system_axis_code_versions.hpp> // K5: kSystemAxisCodeVersions (Single-Source)
++#include <cache_engine/measurement/ceb_sub_axis.hpp>
++#include <cache_engine/measurement/operating_system_axis.hpp>
++#include <cache_engine/measurement/operating_system_sub_axes.hpp>
++#include <cache_engine/measurement/target_isa_sub_axes.hpp> // Abgrenzung: gleiche Mechanik, andere Eltern
++
++#include <gtest/gtest.h>
++
++#include <string>
++#include <string_view>
++#include <type_traits>
++
++namespace cem  = ::comdare::cache_engine::measurement;
++namespace cabi = ::comdare::cache_engine::abi;
++
++// -- Block A (compile-time): Concept, Eltern-TYP und Tiefe ------------------------------------------
++static_assert(cem::OperatingSystemSubAxisConcept<cem::OsVersionSubAxis>);
++static_assert(cem::OperatingSystemSubAxisConcept<cem::KernelSubAxis>);
++static_assert(cem::OperatingSystemSubAxisConcept<cem::BuildSubAxis>);
++// Eine Unter-Achse IST eine Voll-Achse (Layer-Modell D4) -- die Gegenprobe gehoert hierher, weil sie
++// sonst nur im Header behauptet waere.
++static_assert(cem::CebSystemAxisConcept<cem::OsVersionSubAxis>);
++static_assert(cem::CebSubAxisConcept<cem::KernelSubAxis>);
++static_assert(std::same_as<cem::BuildSubAxis::parent_axis, cem::OperatingSystemAxisTag>);
++static_assert(cem::axis_depth_v<cem::OsVersionSubAxis> == 1);
++static_assert(cem::axis_depth_v<cem::OperatingSystemAxisTag> == 0);
++// Der Tag ist zustandslos und vtable-frei (Anti-Runtime-Switch-Doktrin haelt auch am Repraesentanten).
++static_assert(std::is_empty_v<cem::OperatingSystemAxisTag>);
++static_assert(!std::is_polymorphic_v<cem::OperatingSystemAxisTag>);
++static_assert(std::is_empty_v<cem::BuildSubAxis>);
++
++// -- Block B (compile-time): ABGRENZUNG zu den target_isa-Unter-Achsen ------------------------------
++// Dieselbe Mechanik (CebSubAxis + option_source), ANDERE Eltern-Achse. Wer beim Kopieren die Eltern
++// vergisst, haengt eine OS-Unter-Achse an target_isa -- das faellt hier auf.
++static_assert(cem::NumaNodeSubAxis::parent_axis_label() != cem::OsVersionSubAxis::parent_axis_label());
++static_assert(!std::same_as<cem::PageSubAxis::parent_axis, cem::OperatingSystemAxisTag>);
++
++namespace {
++
++// -- Block C (Laufzeit): die FINALEN DREI, ihre Labels und ihre Options-Herkunft ---------------------
++TEST(A14OsSubAxes, FinalDreiLabelsUndOptionsHerkunft) {
++    ASSERT_EQ(cem::kOperatingSystemSubAxisLabels.size(), 3u)
++        << "A-08/K-04 + Owner E-12: GENAU DREI Unter-Achsen; update_zustand ist in 'build' gemergt.";
++    EXPECT_EQ(cem::kOperatingSystemSubAxisLabels[0], std::string_view{"os_version"});
++    EXPECT_EQ(cem::kOperatingSystemSubAxisLabels[1], std::string_view{"kernel"});
++    EXPECT_EQ(cem::kOperatingSystemSubAxisLabels[2], std::string_view{"build"});
++    // option_source statt CT-Options-Katalog: die zulaessigen Werte haengen an der Maschine.
++    for (auto const& label : cem::kOperatingSystemSubAxisLabels) EXPECT_FALSE(label.empty());
++    EXPECT_EQ(cem::OsVersionSubAxis::option_source(), std::string_view{"machine_resolved"});
++    EXPECT_EQ(cem::KernelSubAxis::option_source(), std::string_view{"machine_resolved"});
++    EXPECT_EQ(cem::BuildSubAxis::option_source(), std::string_view{"machine_resolved"});
++}
++
++// -- Block D (Laufzeit): der Eltern-Bezug ist ABGELEITET, nicht wiederholt ---------------------------
++TEST(A14OsSubAxes, ElternBezugKommtAusDemTypNichtAusEinemLiteral) {
++    // Das Eltern-Label wird aus der Haupt-Achse gezogen -- ein Rename dort zoege hier automatisch mit.
++    EXPECT_EQ(cem::OperatingSystemAxisTag::axis_label(), cem::LinuxOperatingSystem::axis_label());
++    EXPECT_EQ(cem::OsVersionSubAxis::parent_axis_label(), cem::LinuxOperatingSystem::axis_label());
++    EXPECT_EQ(cem::KernelSubAxis::parent_axis_label(), cem::LinuxOperatingSystem::axis_label());
++    EXPECT_EQ(cem::BuildSubAxis::parent_axis_label(), cem::LinuxOperatingSystem::axis_label());
++    // Die Haupt-Achse bleibt bei GENAU DREI Familien -- die Instanz wohnt in den Unter-Achsen (OP-10-Schnitt).
++    EXPECT_EQ(cem::kAllOperatingSystemIds.size(), 3u);
++}
++
++// -- Block E (Laufzeit): NAMENSFALLEN ---------------------------------------------------------------
++TEST(A14OsSubAxes, NamensfallenBuildUndOsSindAusgeschlossen) {
++    // "build" ist der OS-Patch-/Update-Stand, NICHT der build_version-Suffix (Ledger 70.6), NICHT der
++    // build_type ("+bt=") und NICHT die build_target_complex-Klammer.
++    EXPECT_NE(cem::BuildSubAxis::axis_label(), std::string_view{"build_version"});
++    EXPECT_NE(cem::BuildSubAxis::axis_label(), std::string_view{"build_type"});
++    EXPECT_NE(cem::BuildSubAxis::axis_label(), std::string_view{"build_target_complex"});
++    // "os_version" ist die INSTANZ, nicht die Familie.
++    EXPECT_NE(cem::OsVersionSubAxis::axis_label(), cem::LinuxOperatingSystem::axis_label());
++    EXPECT_NE(cem::OsVersionSubAxis::axis_label(), std::string_view{"os"});
++    // Der Verbots-Katalog ist wirklich gefuellt und enthaelt die gemergte vierte Achse (E-12).
++    bool update_zustand_verboten = false;
++    bool update_status_verboten  = false;
++    for (auto const& forbidden : cem::detail::kOperatingSystemSubAxisForbiddenLabels) {
++        if (forbidden == std::string_view{"update_zustand"}) update_zustand_verboten = true;
++        if (forbidden == std::string_view{"update_status"}) update_status_verboten = true;
++    }
++    EXPECT_TRUE(update_zustand_verboten) << "Owner E-12: 'Wir mergen den Update Zustand in Build'.";
++    EXPECT_TRUE(update_status_verboten);
++    // Und kein gueltiges Label steht im Verbots-Katalog (die consteval-Wache noch einmal zur Laufzeit).
++    for (auto const& label : cem::kOperatingSystemSubAxisLabels)
++        for (auto const& forbidden : cem::detail::kOperatingSystemSubAxisForbiddenLabels) EXPECT_NE(label, forbidden);
++}
++
++// -- Block F (Laufzeit): STEMPEL-NEUTRALITAET (A-15 + Auflage K5) ------------------------------------
++TEST(A14OsSubAxes, UnterAchsenStehenNichtImSystemStempel) {
++    std::string const line = cabi::system_stamp_line();
++    // A-15: RT-Unter-Achsen stehen NIE im Binary-Stempel. Taucht hier ein Unter-Achsen-Label auf, ist
++    // der SHA512 aller Neubauten gegen den Bestand verschoben -- exakt die Owner-E3-verbotene Folge.
++    for (auto const& label : cem::kOperatingSystemSubAxisLabels)
++        EXPECT_EQ(line.find(std::string{label}), std::string::npos)
++            << "A-15-Bruch: '" << label << "' steht in der System-Stempel-Zeile: " << line;
++    // Die Haupt-Achse selbst steht dort weiterhin -- die Zeile ist nicht etwa leer geworden.
++    EXPECT_NE(line.find(std::string{cem::LinuxOperatingSystem::axis_label()}), std::string::npos) << line;
++    // K5-Gegenprobe: die Tabelle traegt weiterhin GENAU DREI System-Haupt-Achsen; die Unter-Achsen
++    // haben KEINEN Eintrag bekommen (ein Eintrag hier waere ein Stempel-Byte-Ereignis).
++    EXPECT_EQ(cabi::kSystemAxisCodeCount, 3u);
++    for (auto const& entry : cabi::kSystemAxisCodeVersions)
++        for (auto const& label : cem::kOperatingSystemSubAxisLabels) EXPECT_NE(entry.axis, label);
++}
++
++} // namespace
+-- 
+2.43.0
+
