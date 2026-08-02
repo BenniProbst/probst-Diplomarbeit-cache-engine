@@ -159,9 +159,37 @@ Der Owner-Querschnitt (OWNER-Doc `:44`) nennt die Achsen ausdruecklich. Ist-Stan
 
 | Achse | Ist | Folge fuer die neuen Zellen |
 |---|---|---|
-| `target_isa` | `baustein_count="2"`: `x86_64`, `aarch64` (Registry `:10-12`); `kAllTargetIsaIds` = 2 Eintraege (`target_isa_system_axis.hpp:85`) | **`riscv64` fehlt in der Achse.** Der Header haelt `:61` fest: "Weitere ISAs (riscv64/power) folgen mit der Runner-/Toolchain-Matrix". Ein riscv64-Runner erzeugt also noch keine riscv64-Binaries -- die Achsen-Erweiterung ist ein **eigenes, design-/owner-gegatetes Paket** (System-Achsen-Wert-Zuwachs; jede Beruehrung von `kSystemAxisCodeVersions` unterliegt der A14-Bump-Verbots-Wache). **Hier NICHT entschieden.** |
+| `target_isa` | `baustein_count="2"`: `x86_64`, `aarch64` (Registry `:10-12`); `kAllTargetIsaIds` = 2 Eintraege (`target_isa_system_axis.hpp:85`) | **`riscv64` fehlt in DIESER Achse** -- der Header haelt `:61` fest: "Weitere ISAs (riscv64/power) folgen mit der Runner-/Toolchain-Matrix". Die Achsen-Erweiterung ist ein **eigenes, design-/owner-gegatetes Paket** (System-Achsen-Wert-Zuwachs; jede Beruehrung von `kSystemAxisCodeVersions` unterliegt der A14-Bump-Verbots-Wache). **Hier NICHT entschieden.** **Aber Vorsicht -- das ist nicht der einzige Weg zu einer riscv64-Binary, s. 5.1.** |
 | `operating_system` | 3 Familien `linux` / `windows` / `macos` (Registry `:41-44`), Unter-Achsen `os_version` / `kernel` / `build` (`:45-47`, `option_source="machine_resolved"`) | **macOS ist achsen-seitig bereits modelliert** (Familie + drei Unter-Achsen aus OS-U1/U2). Es fehlt die **Laufzeit-Erhebung** je Familie = Paket OS-U3 (macos prozess-frei ueber `sysctl`/`SystemVersion.plist`, nicht `sw_vers`). |
 | Skip-/Lager-Identitaet | `system_stamp_line` traegt heute nur Code-Versionen, keine Zellwerte (W10-Paket offen) | **Uebergangsregel bis W10 gilt hier direkt:** Binary-Skip nur innerhalb derselben OS-Familie. Solange W10 nicht steht, duerfen macOS-/RISC-V-Zellen **nicht** in den gemeinsamen Lager-Skip mit den Linux-Zellen -- sonst wuerde ein Linux-Binary fuer macOS "wiederverwendet". Das ist die Fleet-seitige Sicht auf denselben Befund. |
+
+### 5.1 Drei Ableitungswege zu einer riscv64-Binary -- die Mess-Achse ist nur einer davon
+
+Die Erst-Fassung dieses Dokuments schloss kategorisch: "ein riscv64-Runner erzeugt noch keine
+riscv64-Binaries". Das ist **zu eng** und war der gefaehrlichere Fehler, weil es Sicherheit vorspiegelt.
+Die `target_isa`-**Mess**-Achse ist nur der erste von **drei** Wegen; die anderen beiden existieren am
+ce-Ist bereits und stehen nicht unter der Achsen-Gatterung:
+
+| # | Weg | Ist am ce-Stand | Was er erzeugt |
+|---|---|---|---|
+| 1 | **Mess-Achse `target_isa`** (Cross-Permutation ueber `-target ...`) | nur `x86_64` + `aarch64` (Registry `:10-12`) | Heute **keine** riscv64-Binary. Gegattert (A14/Bump-Wache). |
+| 2 | **Nativer Bau auf einem riscv64-Host** | `cmake/platform_detection.cmake:31-33` erkennt `CMAKE_SYSTEM_PROCESSOR MATCHES "^riscv64$"` -> `COMDARE_ARCH="riscv64"`, `COMDARE_ARCH_RISCV64 ON` | **Sobald node8 CI-Jobs annimmt**, baut ein Job nach dem Muster von `build:arm64-smoke` (ce `.gitlab-ci.yml:134`) **nativ riscv64-Binaries** -- ganz ohne die Mess-Achse. |
+| 3 | **SIMD-Organ-Achse 09 (ISA)** | `libs/cache_engine/axes/simd/axis_09_isa_riscv.hpp` (`class RiscVIsa`, RV64GC) + `axis_09_isa_flags.hpp.in:6` `#cmakedefine01 COMDARE_AXIS_09_USE_RISCV` | Der RISC-V-Zweig ist **im Organ-Achsen-Code vorhanden** und wird per CMake-Flag scharf geschaltet; er haengt nicht an `kAllTargetIsaIds`. |
+
+**Konsequenz fuer die A14-Naht (der eigentliche Punkt):** Weg 2 und 3 koennen riscv64-Artefakte erzeugen,
+**bevor** `target_isa` die ISA kennt. Solche Binaries waeren **stempel-/lagerseitig nicht zuordbar**: die
+`system_stamp_line` traegt keinen ISA-Zellwert (W10 offen), und `kAllTargetIsaIds` kennt `riscv64` nicht --
+ein nativ gebautes riscv64-Artefakt landete damit ununterscheidbar neben den x86_64-Artefakten im Lager und
+faellt im Skip-Vergleich potentiell mit ihnen zusammen.
+
+**Daraus zwei Auflagen, hier nur festgehalten, NICHT entschieden:**
+
+1. **Reihenfolge-Auflage:** Ein riscv64-CI-Job (Weg 2) darf erst scharf geschaltet werden, wenn entweder
+   `target_isa` die ISA fuehrt **oder** der Lager-Pfad des Jobs von den gemessenen Zellen getrennt ist --
+   analog zur `build:arm64-smoke`-Praxis (`allow_failure`, opt-in per `COMDARE_ISA_MATRIX`, kein
+   Lager-Rueckschrieb).
+2. **Bump-Auflage:** Die `target_isa`-Erweiterung um `riscv64` beruehrt `kSystemAxisCodeVersions` und
+   unterliegt der A14-Bump-Verbots-Wache -- eigenes, owner-gegatetes Paket, s. Abschnitt 8.
 
 ---
 
@@ -236,7 +264,10 @@ Diese Sektion wird nach der Infra-Rueckmeldung befuellt und ist **kein Trigger-G
 - [ ] Tag-Disjunktheit der neuen Tags geprueft (kein Ueberlappen mit `baremetal`/`arm64`/`prod`).
 - [ ] Poll-Verhalten: Antwort + literaler Config-Beleg (Abschnitt 7).
 - [ ] Danach erst: A14-Folgefrage `target_isa`-Erweiterung um `riscv64` als eigenes Paket vorlegen
-      (Abschnitt 5) -- sinnvoll erst, wenn ein riscv64-Runner real Jobs annimmt.
+      (Abschnitt 5/5.1) -- sinnvoll erst, wenn ein riscv64-Runner real Jobs annimmt. **Mit der
+      Reihenfolge-Auflage aus 5.1:** ein nativer riscv64-Bau (Weg 2, `platform_detection.cmake:31-33`) ist
+      auch ohne die Mess-Achse moeglich; solche Artefakte sind stempel-/lagerseitig nicht zuordbar und
+      duerfen bis dahin nicht in den gemeinsamen Lager-Skip.
 
 ---
 
@@ -341,6 +372,16 @@ Diese Sektion wird nach der Infra-Rueckmeldung befuellt und ist **kein Trigger-G
 :41    <axis id="operating_system" ... baustein_count="3">
 :42-44 <baustein name="linux"/> <baustein name="windows"/> <baustein name="macos"/>
 :45-47 <sub_axis id="os_version"/> <sub_axis id="kernel"/> <sub_axis id="build"/>
+
+[CODE] ce cmake/platform_detection.cmake (Ableitungsweg 2, nativer Bau -- Abschnitt 5.1):
+:31    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^riscv64$")
+:32        set(COMDARE_ARCH "riscv64")
+:33        set(COMDARE_ARCH_RISCV64 ON)
+
+[CODE] ce libs/cache_engine/axes/simd/ (Ableitungsweg 3, Organ-Achse 09 -- Abschnitt 5.1):
+axis_09_isa_flags.hpp.in:6   #cmakedefine01 COMDARE_AXIS_09_USE_RISCV
+axis_09_isa_riscv.hpp        class RiscVIsa : public IsaStrategyBase<RiscVIsa>   (RV64GC)
+                             static constexpr bool enabled = flags::riscv_enabled;
 ```
 
 Die Runner-Kurz-ID aus der Trace-Kopfzeile ist redigiert (Token-Praefix-Charakter); Runner-Name, Zeitstempel,
