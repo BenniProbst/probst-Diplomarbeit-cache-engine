@@ -84,3 +84,9 @@ A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final d
 „Hinweis: die Workflows von weniger als 8 gelten nur für das Programmieren aber nicht für die Planung."
 
 **Auslegung:** Die A1-Grenze „bis zu 8 Agenten parallel" bindet NUR Programmier-/Bau-Worker (RAM-Begruendung); Planungs-/Design-/Review-Breiten (Fable-xhigh) sind davon ausgenommen. Der 13-Agenten-Design-Workflow und die Review-Staffeln waren damit konform; Bau-Wellen halten weiterhin <=8 gleichzeitige Worker.
+
+## NACHTRAG ~19:5x CEST — Owner-Antwort Q10 (verbatim)
+
+„Q10: Bitte ohne 'v' , lass es jetzt so, also Option A"
+
+**Auslegung (bindend):** Das 'v'-Praefix gilt NUR fuer die Roh-Literale im Code (algo_version="vX.Y.Zc"); die GERENDERTE Stempel-Form bleibt praefixfrei (@X.Y.Zc nach der M3-Migration). Codex-Befund B9 ist damit GELOEST (kein Code-Aenderungsbedarf — die M1b-Implementierung ist korrekt); der M3-Neuanker rendert @1.0.0c.

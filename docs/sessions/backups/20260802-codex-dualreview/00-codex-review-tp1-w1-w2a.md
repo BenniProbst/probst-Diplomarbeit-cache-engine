@@ -14,3 +14,4 @@ B11 (W2a, MITTEL): take_uint ohne Ueberlauf-/Leading-Zero-Wache -> Alias-Identit
 B12 (W2a, MITTEL): Nicht-Organ-Registry-Wachen pruefen nicht 'parsbar' und nicht '!experimental' -> junk faellt still auf @0.0.0; v1.0.0ce passiert ENFORCE (ce-nie-e fehlt dort).
 B13 (W2a, KLEIN): FK-1-Reader-Negativtest beweist nur Listen-Mitgliedschaft (strikter Nichtnumerik-Pfad verwirft ohnehin).
 POSITIV: Flag-Parser-Kanten sauber (cc/ec/e/Gross/@/WS/Leer verworfen), Bit-Kodierung kollisionsfrei, Q2-Punktnamen ok, F1/F2-Fixes korrekt, FK-2 vollstaendig, kein ungeplanter Byte-Shift heute.
+B9-AUFLOESUNG (Owner-Q10, ~19:5x): Option A — v nur im Roh-Literal, Render bleibt praefixfrei (@X.Y.Zc). KEIN Fix noetig; M1b-Stand korrekt.
