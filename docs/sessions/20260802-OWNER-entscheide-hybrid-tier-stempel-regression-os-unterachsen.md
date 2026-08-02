@@ -74,3 +74,7 @@ A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final d
 ## NACHTRAG ~17:4x CEST — Owner-GO (verbatim): "Ok, volles Go fuer ALLE geplante offene Arbeit wie vorgegeben"
 
 **Auslegung (bindend):** Die gesamte Bauplan-/Katalog-Strecke laeuft autonom weiter wie dokumentiert. Die noch offenen Bauplan-Fragen Q4-Q9 gelten mit ihren dokumentierten EMPFEHLUNGS-Defaults als freigegeben (Q4 CSV-Token nicht_gebaut; Q5 E-24 im EINEN ABI-Fenster, Graph-Gattung nach Abgabe; Q6 Ein-Gattung-Hybrid + MaxN=8 + LEDGER:187(e) superseded; Q7 PRUEF-TESTAT je Fenster; Q8 RT-Erhebung nach 27.07.-KERN; Q9 thesis-Ledger im Abgabe-Repo). Einspruch jederzeit moeglich; Abweichungen von Empfehlungen wuerden erneut vorgelegt. Messung selbst bleibt USER-GO-gated.
+
+## NACHTRAG ~18:4x CEST — Owner-GO (verbatim): "Alles klar, volles GO für das pausenlose Durchziehen aller Wellen"
+
+**Auslegung:** Alle Bauplan-Wellen laufen ohne Zwischen-Meldepausen durch (Welle 2b: A13-M2 Klammer-Parser + E04-P1 Marker v2 + A16-P2/P4; Welle 3: OS-U3 + A13-M3 + OD-10-RT, Codex-Klasse; danach W10, SHA512-Gate, Beweise, 12-Perm, E-04-Rest, J-Kette, Kalibrierlauf, Trigger). Gates bleiben unverändert scharf (Reviews, Doppellauf, gitleaks, R4); Messung bleibt USER-GO-gated.
