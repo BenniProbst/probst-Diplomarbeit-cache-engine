@@ -118,3 +118,9 @@ NUR ZUR KENNTNIS (Q8): A-08 sagte fuer die OS-Unter-Achsen „statisch, RT vorbe
 „Du kannst gerne paralle mit codex noch einen code review gegen die Anforderungen von Welle 1,2a,2c und dann einen großen codex lauf gegen die Erfüllung des Gesamtcodes und seiner Anforderungen starten"
 
 **Auslegung (bindend):** Zwei parallele Codex-Laeufe (v2.1: Codex = zweite Dual-Review-Haelfte), beide auf DETACHED-Worktrees des gelandeten Standes 897e887b (eingefroren — die spaetere 2b-Landung bewegt den Review-Stand nicht): (1) Wellen-Review W1+2a+2c gegen ihre ANFORDERUNGEN (Bauplan-Auflagen K-Serien, Q3-Flag-Grammatik, FK-Auflagen, B1-B13-Schliessungen inkl. Zweitpruefung der 2c-Fixes); (2) GESAMT-Audit Code vs. Gesamt-Anforderungen/Kanon (CT-Doktrin, Achsen-Architektur, Flag-Grammatik, A-15, Fehlerklassen, Ehrlichkeit, Aufraeumpass-Kandidaten; bekannte offene Punkte aus Dossier Abschn. 5 als bekannt deklarieren). Treiber-Agenten verifizieren Codex-Befunde am Ist (Befunde nie ungeprueft uebernehmen).
+
+## NACHTRAG ~19:4x UTC — Suchauftrag vergessene Arbeit + Anhaenge-Frage (VERBATIM)
+
+„Bitte suche über die letzten 10 Kontexte mit einem Explore Agenten nach vergessener Arbeit, insbesondere hatte ich angefordert, dass nicht nur die Kapitel der Diplomarbeit angepasst werden sollten, sondern auch die Anhänge, ist das vollumfassend auch in bezug auf die einzel-Gliederung aller Achsen-Kategorien erfolgt?"
+
+**Auslegung:** Explore-Agent (very thorough) ueber die 38 redigierten Transkript-Chunks + 48 Leser-Extrakte + Session-Docs rueckwaerts + Thesis-Ist (anhang/, generate_wide_appendix.ps1, generate_measurement_appendix.ps1, beide Sprachzellen). Kernfrage: Anhaenge-Einzel-Gliederung ALLER Achsen-Kategorien (Ist: 18 Organ-Achsen + 3 System-Haupt-Achsen mit Unter-Achsen) — vollzogen oder Luecke? Ergebnis wird als Befund gemeldet; Luecken werden als Auftrag in die Thesis-Strecke eingeplant.
