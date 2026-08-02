@@ -102,3 +102,9 @@ A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final d
 „Hm, Zeit für eine weitere Welle habe ich doch noch, leg los"
 
 **Auslegung (bindend):** Die Pausen-Order von ~19:0x ist aufgehoben; das PAUSE-Doc bleibt als korrekte Zeitpunkt-Doku stehen. Naechste Welle = Welle-2b-Nachbesserung + Landung (Task #15) gemaess UEBERGABE-Doc Abschn. 4 + PAUSE-Doc Abschn. 3/4: A13-M2-Befund-Fixes (inkl. F-WAISEN-Default (b): halbordnung-TU fixen+registrieren), E04-P1 (Falte/ASCII/Beweis/heartbeat-Test), F-B10-Default (b) (result.csv.stale), E19-stale-Fixes, E23-Text-Fixes als Lead. Owner-Vorlagen V1-V6 laufen weiter mit Default.
+
+## NACHTRAG ~19:2x UTC — Parallel-Orchestrierungs-GO (VERBATIM)
+
+„Bitte zieh die anderen neuen Wellen auch gleich parallel durch, sofern sie sich nicht überschneiden. Orchestriere den Fortschritt."
+
+**Auslegung (bindend):** Parallel zur laufenden Welle-2b-Nachbesserung (wf_871929a5) starten NUR ueberschneidungsfreie Pakete: (a) OS-U3 (Welle-3-Teil, eigener ce-Worktree, disjunkte Dateien; Codex-Klasse nach v2.1); (b) Design-Dossiers A16-P1/E-24, F2/A8-Schnitt, A9-xlsx, E-07-Gate-Definition (reine Fable-Design-Arbeit, keine Code-Ueberschneidung; Planung frei von der 8er-Grenze); (c) Thesis-Strecke C1-Rest/C3/C7 (eigenes Repo, disjunkt; Commits OHNE Trailer). NICHT parallel (Ueberschneidung): A13-M3 (braucht M2 gelandet + Codex-Zweitreview), W10 (Stempel-Kollision mit M2), OD-10-RT (SubAxisMembership-Kollision mit OS-U3 — folgt danach), 12-Perm (Profil-Naehe TABU-Datei). Bau-Worker gesamt: 4 (2b) + 1 (OS-U3) + 1 (Thesis) = 6 <= 8.
