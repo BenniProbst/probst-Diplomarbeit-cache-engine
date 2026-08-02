@@ -26,6 +26,11 @@ Linien-Ist (alle CI-belegt grün): ce main==dev==2b0a9bd8 (Gate 321, prod2=275) 
 | A10 | **HW-Erkennung P4–P6** | P4 CSV-Spalten/Provenienz-Rückschrieb, P5 Passungs-Stempel (Vendor-Familie×OS), P6 Rest-Verdrahtung/Roundtrip (Plan 20260727; P1–P3 gebaut); **+ prod2-Stufe-2-Live-Beweis** (SpdEeprom-Kette auf prod2, seit SPD-Freischaltung #525 entblockt; prod2 liest Bytes 0–127, Kern-Offsets <128 verifiziert) | offen |
 | A11 | **Klein-Sammel** | ccache-Allowlist-Drop; gebündelter Ledger-Nachtrag (inkl. 5 veraltete Zeilen + 4 Erledigt-Befunde aus G.0) | offen |
 | A12 | **NAS-Creds backup1/backup2 (E-14)** | Zugangs-/Mount-Strecke für die Mess-CSV-Ablage — trigger-nah, stand bis zur Inventur in KEINER Paketliste; neben A1/G-E7 einplanen | offen |
+| A13 | **Stempel-REGRESSION (Owner-E2, 02.08.)** | merge-Zeile ENTFERNEN (darf nicht existieren; PRT-ART merge't gegen Organ-Achsen); Meta-Meta-Einträge dynamisch per Metaprogrammierung ans ENDE der jeweiligen Realm-Zeile; 'e'-Versions-Suffix für experimentelle Prüfling-Algorithmen; OP-11-Rückbau; G-E6/SHA512-Gate setzt darauf auf — VOR Voll-Bau (Stempel=Lager-Identität) | offen, Design via ultracode |
+| A14 | **OS-Unter-Achsen FINAL DREI (Owner-E3)** | Basis Wiederverwendbarkeit/Zuordbarkeit; ohne sie Neubau aller Binaries bei OS-Erweiterung (RISC-V/macOS kommen heute); A-08/K-04-Definition umsetzen | offen, Design via ultracode |
+| A15 | **Fehlerklassen-Framework #29 (Owner-E6)** | Design-Doc 20260717 wiederaufnehmen, auf heutigen Kanon heben, bauen | offen |
+| A16 | **E-Pflicht-Bündel (Owner-R7)** | E-24 (Container-Gattung als LETZTER ABI-Schritt → in Gate-Reihenfolge einordnen) · E-19 (Runner-Fleet-Ist-Soll alle Architekturen + Poll-Jitter 2+rand(0..1)s) · E-02 (Vier-Ledger-Struktur herstellen: prt-art+thesis-Ledger anlegen + Audit-Pflicht) · E-23 (GitLab-API-Suchlauf vor Modul-Migration, G5-Forks F0-F5=A) · E-21 (STACK-Form/LIFO + Verbose-Regel verankern) | offen |
+| A17 | **Hybrid-Tier-Stufe: DESIGN (Owner-E1)** | Exakte Designplanung Fable 5 xhigh + ultracode JETZT (Stufe hinter CEB, N ABI-stabile Prüf-Docks dynamisch, Factory-Proxy, std::variant-Ausnahme statisch/runtime-Array, XML-Auswertungsphasen-Konfig); BAU in Auswertungsphase (E) | offen |
 
 ## B. Trigger-Sequenz (nach A, autonom bis inkl. Trigger)
 
@@ -95,11 +100,14 @@ Bereits entfernt: permutations_runtime_check.hpp, COMDARE_apply_simd_flags, cmak
 ### G.5 Unverbuchte Offen-Posten §59–§77 (Einordnung)
 Trigger-/abgabe-relevant → verbucht: **E-14 NAS-Creds → A12** · **§61-Dual-Weg-Beleg → A3** · **#48-Scheibe-6 → E** (XML-Sync-Gate-Umhängung, gated „nach 320er + USER-GO"; fixture_sync_check.cmake:3 zeigt aufs Alt-Paar) · **§61-Modi Release-Wallclock-Beweis → E** (Naht da, Deliverable fehlt) · **#51 tier150-Ersatz → E** (bis 320er-Umstellung blockiert). Detail zu A1/G-E6 (OE-C-Versionierung): W12-Quelldaten-Migration ist erst KOSMETISCH („v1"→„v1.0.0" 122× uniform, keine per-Algo-Differenzierung; XML-Registries ohne Versionsfelder) — der G-E6-Bau muss das real einlösen (G-C5-bestätigt). Ehrlich nach-Trigger/post-Abgabe: §65 Tools-Lagerhaltung #32 (POST-ABGABE; ~14G tote gcc-Temps prod1) · §73.1 Ein-Hauptkanal-Konsolidierung (catalog_codegen+anatomy_codegen_runner = Merge-Kandidaten, Dauerzustand) · §73.5 Q6 Angebots-Zuschnitt-Band · §69.9 C-3a-Scharfschaltung (Vorab-GO liegt; Gate=C-3b-Beleg+O-4; 3 Stubs gemeinsam, Kill-Switch, rsp-Diff) · §70.4 RF-4 + §73.3 Q4 (Infra-Kanal) · SECURITY #327 PAT-Rotation (seit 20.07. „dem User vorgelegt", kein Vollzug — Owner-Sicht nötig).
 
-## H. Offene OWNER-Entscheide (gesammelt; keine Bau-Pakete)
+## H. OWNER-Entscheide 02.08. — ALLE BEANTWORTET (Wortlaut: docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md)
 
-1. **E-11/V7.2-Ausnahme** (G.2a): std::variant-Verbot vs. Hybrid-Tier-Freigabe — Ausnahme-Vermerk in V7.2 ja/nein?
-2. **E-10 Meta-Meta-Stempelzeile** (G.2b): OP-11-Ausschluss beibehalten oder Owner-Forderung nr798-B3org wiederherstellen?
-3. **E-12b OS-Unter-Achsen** (G.2c): A-08 „FINAL DREI" superseded-vermerken oder Bau-Paket nachziehen?
-4. **C3 Rang-3-Framing K5:70** (Owner-Prosa): Umformulierung auf „eigene Produktions-Zielmaschinen + HBM-Plattform (P32)" gewünscht?
-5. **SECURITY #327 PAT-Rotation**: Vollzug/Verzicht entscheiden (liegt seit 20.07. vor).
-6. **Fehlerklassen-Framework Task #29** (eigene OD-1..6-Liste): weiterhin PAUSIERT lassen oder in die Restwoche einplanen?
+1. **E-11 = kein Konflikt:** Hybrid-Tier-Binaries sind eine eigene Stufe HINTER der CEB (mehrere ABI-stabile Prüf-Docks, Factory-Proxy auf Tier-Binaries, std::variant als definierte Ausnahme in wahlweise statischem/Runtime-Array, XML-Konfiguration in der Auswertungsphase). In plain Tier-Binaries bleibt std::variant VERBOTEN. → Design JETZT (Fable xhigh + ultracode, Owner-Auflage), Bau in Auswertungsphase.
+2. **E-10 = REGRESSION:** Meta-Meta-Stempeleinträge PFLICHT wie alle Hauptachsen; dynamisch per Metaprogrammierung ANS ENDE der jeweiligen Realm-Zeile; **merge-Zeile darf nicht existieren** (PRT-ART läuft merge gegen Organ-Achsen); experimentelle Prüfling-Algorithmen per **'e'-Versions-Suffix**. Realm-Trennung derzeit defekt → wirkt auf Lagerhaltung. → **A13, trigger-blockierend.**
+3. **E-12b = Paket JETZT PFLICHT:** OS-Unter-Achsen (final drei) sind die Basis der Wiederverwendbarkeit/Zuordbarkeit — ohne sie Neubau aller Binaries bei Einführung; heute installiert Infra weitere OS. → **A14, trigger-blockierend.**
+4. **C3 = schärfen (GO)**; zusätzlich kommen heute **RISC-V, macOS M1, macOS x86** als Plattformen dazu (Querschnitt: target_isa/OS-Achsen, Runner, E-19).
+5. **#327 = nach Messfenster rotieren**; Handout an Infra sofort.
+6. **#29 Fehlerklassen-Framework = JETZT mitbauen** → **A15**.
+7. **E-24, E-19, E-02, E-23, E-21 = JETZT PFLICHT** → **A16**; Rest (inkl. E-25) nach Abgabe ebenfalls PFLICHT.
+8. **Rahmen-Pass = volles GO**; Danksagung Habich bescheiden+diszipliniert, nicht überschwänglich.
+9. **E-04 = VOLLAUSBAU vor Trigger** (A7); „ALLES genannte wird voll gebaut."
