@@ -107,3 +107,11 @@ Aufgabenblatt-PDF; Voll-Messung-GO nach Voll-Bau.
    auf dev-K8s, prod1/prod2-Runner sind nicht betroffen) — STATT degraded=0.
 3. WIEDERAUFNAHME-ZUSATZ: origin-Nachschub super (dev+main auf e8ecc496+) + Cluster-Push
    sobald 200; CiCheck288h haelt Rueckkehr-Wache und liefert das Erst-Delta nach.
+
+NACHTRAG ~08:0xZ: Owner hat Infra DIREKT informiert (zirkulaere Blockade durchbrochen —
+auth-500 + request-ids sind bei Infra). Erwartung: Entstoerung durch Infra; CiCheck288h
+meldet den 200-Wechsel, dann gesammelter Nachschub (Cluster-Handout e10607f + super-origin
+dev+main + thesis-origin). thesis-Sprachpass-Commits sind auf github gesichert
+(048f3ba..9ddb658, unabgenommen). LETZTER offener Owner-Punkt: F14-GO (Ersatz-Trigger-
+Bedingung: Auth-200 + 2h ohne scheduler_failure + Infra-'Baremetal-unbeeintraechtigt'
+statt degraded=0).
