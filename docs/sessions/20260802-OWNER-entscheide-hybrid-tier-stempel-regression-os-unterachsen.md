@@ -78,3 +78,9 @@ A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final d
 ## NACHTRAG ~18:4x CEST — Owner-GO (verbatim): "Alles klar, volles GO für das pausenlose Durchziehen aller Wellen"
 
 **Auslegung:** Alle Bauplan-Wellen laufen ohne Zwischen-Meldepausen durch (Welle 2b: A13-M2 Klammer-Parser + E04-P1 Marker v2 + A16-P2/P4; Welle 3: OS-U3 + A13-M3 + OD-10-RT, Codex-Klasse; danach W10, SHA512-Gate, Beweise, 12-Perm, E-04-Rest, J-Kette, Kalibrierlauf, Trigger). Gates bleiben unverändert scharf (Reviews, Doppellauf, gitleaks, R4); Messung bleibt USER-GO-gated.
+
+## NACHTRAG ~19:1x CEST — Owner-Klarstellung Agenten-Grenze (verbatim)
+
+„Hinweis: die Workflows von weniger als 8 gelten nur für das Programmieren aber nicht für die Planung."
+
+**Auslegung:** Die A1-Grenze „bis zu 8 Agenten parallel" bindet NUR Programmier-/Bau-Worker (RAM-Begruendung); Planungs-/Design-/Review-Breiten (Fable-xhigh) sind davon ausgenommen. Der 13-Agenten-Design-Workflow und die Review-Staffeln waren damit konform; Bau-Wellen halten weiterhin <=8 gleichzeitige Worker.
