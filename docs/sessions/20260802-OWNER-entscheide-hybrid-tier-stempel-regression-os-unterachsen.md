@@ -96,3 +96,9 @@ A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final d
 „Bitte fange keine neue Arbeit mehr an, aber führe den workflow noch zuende. Danach bitte abbruchsichere Pause"
 
 **Auslegung (bindend):** (1) KEINE neue Arbeit — die Welle-2b-Landung (Task #15) wird NICHT begonnen und bleibt mit vollstaendiger Befund-Fixliste auf dem Stack (Uebergabe-Doc Abschn. 4). (2) Der laufende Neugruendungs-Workflow `wf_c8a24118` laeuft zu Ende; sein Ergebnis wird gelesen und das Backup nach der 233-Regel-Doktrin committet (Workflow-Backup-SOFORT-Pflicht = Teil des Zuendefuehrens). (3) Die bereits ANGESTOSSENE Welle-2c-Landung wird nur noch ABGESCHLOSSEN (laufende Pipelines 14307/14308 begleiten, super main-FF, Ledger-Nachtrag-Push) — das ist Abschluss laufender Arbeit im Sinne der Push-zu-Gruen-Doktrin, keine neue. (4) Danach abbruchsichere Pause: Pause-Doc, alles committet+gepusht, Shells/Monitore beendet (Zyklusende-Doktrin), Task-Stack aktuell.
+
+## NACHTRAG ~19:1x UTC — Pause aufgehoben, GO naechste Welle (VERBATIM)
+
+„Hm, Zeit für eine weitere Welle habe ich doch noch, leg los"
+
+**Auslegung (bindend):** Die Pausen-Order von ~19:0x ist aufgehoben; das PAUSE-Doc bleibt als korrekte Zeitpunkt-Doku stehen. Naechste Welle = Welle-2b-Nachbesserung + Landung (Task #15) gemaess UEBERGABE-Doc Abschn. 4 + PAUSE-Doc Abschn. 3/4: A13-M2-Befund-Fixes (inkl. F-WAISEN-Default (b): halbordnung-TU fixen+registrieren), E04-P1 (Falte/ASCII/Beweis/heartbeat-Test), F-B10-Default (b) (result.csv.stale), E19-stale-Fixes, E23-Text-Fixes als Lead. Owner-Vorlagen V1-V6 laufen weiter mit Default.
