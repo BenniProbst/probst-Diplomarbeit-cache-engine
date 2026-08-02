@@ -90,3 +90,9 @@ A7=E-04-Vollausbau · A13=Stempel-Regression (E2) · A14=OS-Unter-Achsen final d
 „Q10: Bitte ohne 'v' , lass es jetzt so, also Option A"
 
 **Auslegung (bindend):** Das 'v'-Praefix gilt NUR fuer die Roh-Literale im Code (algo_version="vX.Y.Zc"); die GERENDERTE Stempel-Form bleibt praefixfrei (@X.Y.Zc nach der M3-Migration). Codex-Befund B9 ist damit GELOEST (kein Code-Aenderungsbedarf — die M1b-Implementierung ist korrekt); der M3-Neuanker rendert @1.0.0c.
+
+## NACHTRAG ~19:0x UTC — Pausen-Order (VERBATIM)
+
+„Bitte fange keine neue Arbeit mehr an, aber führe den workflow noch zuende. Danach bitte abbruchsichere Pause"
+
+**Auslegung (bindend):** (1) KEINE neue Arbeit — die Welle-2b-Landung (Task #15) wird NICHT begonnen und bleibt mit vollstaendiger Befund-Fixliste auf dem Stack (Uebergabe-Doc Abschn. 4). (2) Der laufende Neugruendungs-Workflow `wf_c8a24118` laeuft zu Ende; sein Ergebnis wird gelesen und das Backup nach der 233-Regel-Doktrin committet (Workflow-Backup-SOFORT-Pflicht = Teil des Zuendefuehrens). (3) Die bereits ANGESTOSSENE Welle-2c-Landung wird nur noch ABGESCHLOSSEN (laufende Pipelines 14307/14308 begleiten, super main-FF, Ledger-Nachtrag-Push) — das ist Abschluss laufender Arbeit im Sinne der Push-zu-Gruen-Doktrin, keine neue. (4) Danach abbruchsichere Pause: Pause-Doc, alles committet+gepusht, Shells/Monitore beendet (Zyklusende-Doktrin), Task-Stack aktuell.
