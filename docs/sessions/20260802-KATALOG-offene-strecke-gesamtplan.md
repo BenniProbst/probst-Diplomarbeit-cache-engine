@@ -34,7 +34,7 @@ Linien-Ist (alle CI-belegt grün): ce main==dev==2b0a9bd8 (Gate 321, prod2=275) 
 
 ## B. Trigger-Sequenz (nach A, autonom bis inkl. Trigger)
 
-1. **J-Ketten-Voll-Lauf** (N=316; nur mit V32_ENABLE=ON) →
+1. **J-Ketten-Voll-Lauf** (N=316; nur mit V32_ENABLE=ON) → *[KORREKTUR 03.08., Gegenlese D-01: N ist KEINE eigene Zaehlung, sondern das lebende ctest-Gate — live via ctest -N erheben, Stand 331; V32=ON ist nur CI-Kanon und gated KEINEN Test (Verify-Befund 01.08., FAHRPLAN:42-53)]* →
 2. **heavy-Signal an Infra** (runner-mode.sh heavy, SIGHUP-only, beide Hosts) →
 3. **Kalibrierlauf** GN_TOTAL=64 (F5-GO liegt vor) → ETA-Ableitung →
 4. **Voll-Bau-4-Trigger AUTONOM** (F14-Gate: (a) Auth 200 ✓, (b) 2h ohne scheduler_failure — läuft, Ziel ~09:57Z, ✓-Meldung durch Dauerwache, (c) Baremetal-Bestätigung ✓; degraded=0 nur Komfort). Trigger-Form: POST /projects/288/pipeline, GN_TOTAL=131072, 4096er-JOB-MEILENSTEINE je Maschine (F6), VARIANT_GATE=true, keine toten Vars.
@@ -45,7 +45,7 @@ Linien-Ist (alle CI-belegt grün): ce main==dev==2b0a9bd8 (Gate 321, prod2=275) 
 | # | Punkt | Stand |
 |---|---|---|
 | C1 | Rahmen-Pass: Danksagungs- + Sperrvermerk-ENTWÜRFE zur Owner-Freigabe (F1-Richtung liegt), Lizenz-Matrix (DA+PRT-ART=Apache, ce=GPL+Comdare, Overleaf-Text privat), EN-Abstract-Sync, F10-Wortfix | offen |
-| C2 | K4 „320 Tests"→321 + Anhang-B-Stichtagszeile — **beim Einfrieren der ce-Linie** (Sprachpass-Befund) | terminiert |
+| C2 | K4 „320 Tests"→321 + Anhang-B-Stichtagszeile — **beim Einfrieren der ce-Linie** (Sprachpass-Befund) *[NACHTRAG 03.08., D-07: dazu K5 05_evaluation DE:98+EN 'deklariert es vier' nach A4/12-Perm nachziehen; + D-02: 4. Stempel-Zeile in 03/05/06 DE+EN per Owner-E2 abgeschafft -> eigener Thesis-Nachzug-Task]* | terminiert |
 | C3 | Rang-3-Framing K5:70 („Plattformen der Rang-3-Hardware-Arbeiten" → Produktions-Zielmaschinen + HBM) — **Owner-Prosa, braucht Owner-Wunsch** | Owner-Frage |
 | C4 | Aufgabenblatt-PDF | beim Owner |
 | C5 | Ergebnis-/Auswertungs-Einspeisung nach Voll-Messung (E-1: breit nachziehen) | gated auf Messung |
@@ -65,7 +65,7 @@ Erledigt seit 01.08.: K0–K6-Nachzug, Sprachpass alle Kapitel, Anhänge A–F-K
 
 ## E. Nach dem Voll-Bau (gated)
 
-0. **KERN-Mess-Schema-Anschluss (§59) — PFLICHT VOR der Messung:** K4-Naht in den Director (per-Achse-Direktiven statt Kreuzprodukt), K5-Renderer produktiv + generische Typauflösung (statt hartcodiertem Einzel-if), merge-Stempel-Zeile real schreiben (statt hart {}), Abgabeprofil um per-Achse-Modi ergänzen (G.3-Befund: Naht greift in der Abgabekette faktisch nicht) · 1. 320er-Abgabemessung (USER-GO) · 2. Voll-Messung 2^17×System-Perms (USER-GO) · 3. Mess-Rückschreibung: erste CSV auf NAS, minio=Binaries/NAS=CSV-Kaskade · 4. Auswertung (xlsx-Lager-Baum, Heuristik-Kurven, LaTeX-Kanal) · 5. Thesis-Ergebnis-Kapitel (C5) · 6. §62-COMPARE-Vollzug (Nach-Trigger-Paket D2, Replay-Vergleich je Maschine) · 7. #48-Scheibe-6 XML-Sync-Gate-Umhängung (gated „nach 320er + USER-GO") · 8. §61-Modi Release-Wallclock-Beweis · 9. #51 tier150-Ersatz (bis 320er-Umstellung blockiert).
+0. **KERN-Mess-Schema-Anschluss (§59) — PFLICHT VOR der Messung:** K4-Naht in den Director (per-Achse-Direktiven statt Kreuzprodukt), K5-Renderer produktiv + generische Typauflösung (statt hartcodiertem Einzel-if), merge-Stempel-Zeile real schreiben (statt hart {}) *[SUPERSEDED 03.08., Gegenlese D-03: Owner-E2/Q2 (09:25, NACH diesem Doc) — es gibt KEINE merge-Stempel-Zeile; Merge lebt im Stempel NUR ueber e-Flag + erweiterte Namen; A13-M3/C3 ENTFERNT den merge-Stempel-Code]*, Abgabeprofil um per-Achse-Modi ergänzen (G.3-Befund: Naht greift in der Abgabekette faktisch nicht) · 1. 320er-Abgabemessung (USER-GO) · 2. Voll-Messung 2^17×System-Perms (USER-GO) · 3. Mess-Rückschreibung: erste CSV auf NAS, minio=Binaries/NAS=CSV-Kaskade · 4. Auswertung (xlsx-Lager-Baum, Heuristik-Kurven, LaTeX-Kanal) · 5. Thesis-Ergebnis-Kapitel (C5) · 6. §62-COMPARE-Vollzug (Nach-Trigger-Paket D2, Replay-Vergleich je Maschine) · 7. #48-Scheibe-6 XML-Sync-Gate-Umhängung (gated „nach 320er + USER-GO") · 8. §61-Modi Release-Wallclock-Beweis · 9. #51 tier150-Ersatz (bis 320er-Umstellung blockiert).
 
 ## F. Zuletzt: Abschluss-Aufräumpass (§75)
 

@@ -24,7 +24,7 @@
 | A13 Stempel-REGRESSION | M1+M1b+M2 FERTIG; M3 STARTKLAR | Dossier v4 (8edda5eb) audit-geprueft; Gate: 2d-Landung + Q-M3-GATE; 3 Owner-Defaults OF-M3-1/OF-M3-2/DV-3; M4 danach |
 | A14 OS-Unter-Achsen | U1/U2/U3 FERTIG; U4 OFFEN | GA-10: OS-U3 gebaut+getestet, produktiv erst mit OS-U4 |
 | A15 FK-Framework #29 | FK-0/1/2 FERTIG | FK-5 faehrt im M3-Fenster mit (Audit-F1, Dossier R14); Rest-FK-Stufen offen |
-| A16 E-Buendel | E-23 OK, E-21 OK; E-02/E-19/E-24 OFFEN | E-02 VERIFIZIERT NICHT hergestellt (kein prtart-/thesis-Ledger); E-19: i112-Fleet-Handout an Infra liegt (02.08.); E-24 = KRITISCHE ABI-KANTE VOR Trigger (HY-D2) |
+| A16 E-Buendel | E-23 OK, E-21 OK; E-02/E-19/E-24 OFFEN | E-02 VERIFIZIERT NICHT hergestellt (kein prtart-/thesis-Ledger) [KORRIGIERT 03.08. nachmittags, D-08: BEIDE existierten bereits (Glob-Fehler); E-02 HERGESTELLT — 4 Ledger, Nachzuege prtart c6f0754 + thesis 626b9db]; E-19: i112-Fleet-Handout an Infra liegt (02.08.); E-24 = KRITISCHE ABI-KANTE VOR Trigger (HY-D2) |
 | A17 Hybrid-Design | DESIGN FERTIG | hybrid_tier_stufe_soll_design.md + CX-W7 (fc47c5d9, in 2d-Landung enthalten); BAU planmaessig Auswertungsphase |
 
 ## B/C/D/E/F — Kurzstatus

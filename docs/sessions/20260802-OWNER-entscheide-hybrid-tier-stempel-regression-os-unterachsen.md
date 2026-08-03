@@ -197,3 +197,16 @@ WF Thesis-Anhaenge-Realm-Welle (#6, thesis-Worktree, EIN Bau-Worker, Commits Ben
 Trailer) + WF Nachzug/Triage/E-02 (#5/#8, Fable, Scratchpad-Output; Ledger bleibt Lead-only) parallel
 SOFORT; M3-Welle (A13-M3 + FK-5) startet NACH ce-CI-Gruen der 2d-Landung + Q-M3-GATE-b-Formalisierung.
 Programmier-Worker-Deckel 8 eingehalten (Design-/Review-Breiten ausgenommen per Owner-Klarstellung 02.08.).
+
+## Nachtrag 03.08. — vier zuvor unpersistierte Owner-Worte (Gegenlese-Deltas D-05/D-12/D-13/D-14)
+
+Owner (03.08. ~06:45): "Ich sehe jetzt viele doppelte Agenten. Ich hebe die Pause auf und moechte doch
+nicht mehr kompaktieren" — Umsetzung: Duplikate gestoppt, Vollbetrieb ohne Kompaktierung.
+Owner (03.08. ~07:00): "Bitte lies unter den letzten 10 workflows bitte die Ergebnisse ein und den Wellen
+Plan, dann laesst sich die Gruendlichkeit des M3Dossier abschaetzen" — vollzogen; Verdikt GRUENDLICH-MIT-
+LUECKEN -> v4; Rohdaten backups/20260803-m3-dossier-gruendlichkeitsaudit/.
+Owner (03.08. ~14:59, nach /login): "Bitte gruende dich neu, resume alle Agenten und Workflows und fahre
+mit offener Arbeit fort" — vollzogen (Neugruendung + Resumes + lint-Fix).
+Owner (03.08. ~15:05): "Bitte lies den gesamten Kontextinhalt auf das backend als cache ein, es ist ein
+zusammenhaengender Strang, bitte kipp es rein und lies den session log gegen" — vollzogen; Ergebnis:
+docs/sessions/20260803-SESSION-kontext-gegenlese-abschluss.md (15 Deltas, alle verarbeitet).

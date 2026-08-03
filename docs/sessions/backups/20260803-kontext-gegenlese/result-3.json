@@ -1,0 +1,28 @@
+{
+ "chunk": 2,
+ "owner_nachrichten_gefunden": 13,
+ "deltas": [
+  {
+   "klasse": "VERGESSENE-ARBEIT",
+   "schwere": "MITTEL",
+   "was": "Thesis-Kapiteltext traegt weiterhin die per Owner-E2 (02.08.) abgeschaffte 'vierte Stempel-Zeile' (Merge-Strategie samt Pruefling): kapitel/de/03_messsystem_prtart.tex:1146 (sec:stamp-model), de/05_evaluation.tex:207 (+ en/05:203), de/06_fazit.tex:83 (+ en/06:81). KEIN Paket/Task beauftragt den Kapitel-Nachzug: KATALOG-C fuehrt nur C2 (Gate-Zahl 320->331 + Anhang-B-Stichtag), das A13-M3-Dossier grept nur Code/Kommentare (K-6-Sweep), und der 8-Stueck-Plan der Thesis-Anhaenge-Welle markiert die Stelle ausdruecklich als 'fremder Scope, nicht mitfixen' (nennt zudem nur 03:1133 — die K5/K6-Stellen gar nicht). Die Korrektur haengt damit in der Luft, obwohl die Thesis das Abgabe-Artefakt ist.",
+   "transkript_beleg": "Z90875 K5-Paketmeldung (b): 'vierte Stempel-Zeile (Misch-Strategie samt Pruefling, sec:stamp-model) macht Hybrid/Full-Join am Kompilat unterscheidbar' (verankert 2a9404f, K6 analog Z91549); Owner-E2 Z91849: 'Merge Zeile kann daher nicht existieren'",
+   "persistenz_pruefung": "Gesucht in: 20260802-KATALOG (C/H), 20260803-ABGLEICH (C), 20260803-DOSSIER-a13-m3 (Fundstellen-Tabelle + K-6), ledger-nachtraege.md, owner-vorlagen-konsolidiert.md, 20260802-BEFUND-thesis-anhaenge (0 'Stempel'-Treffer), backups/20260803-design-nachtraege-teilstand/thesis-analyse-8-stueck-plan.json (nur 'fremder Scope'-Vermerk); Thesis-Ist per grep verifiziert (4 Fundstellen DE+EN unveraendert)."
+  },
+  {
+   "klasse": "WIDERSPRUCH",
+   "schwere": "MITTEL",
+   "was": "Der persistierte E.0-Auftrag 'merge-Stempel-Zeile real schreiben (statt hart {})' (KATALOG Zeile 68; Lage-Dossier Zeile 242 'merge-Stempel real schreiben') widerspricht Owner-E2/Q2 und dem laufenden DV-1-Default: merge-Stempel-CODE wird in A13-M3/C3 ENTFERNT (POD 136->120, Layout 5->6), die Merge-Strategie lebt im Stempel NUR ueber 'e'-Flag + erweiterte Namen (ledger-nachtraege:137, DOSSIER:30/:36). KATALOG-E.0 wurde ~09:00 VOR dem 09:25-Owner-Entscheid geschrieben und nie korrigiert; ABGLEICH 03.08. fuehrt E.0 'unveraendert' fort. Risiko: der E.0-Ausfuehrende (Pflicht vor jeder Messung) koennte die abgeschaffte merge-Zeile wieder einfuehren.",
+   "transkript_beleg": "Z91763-Z91816 (KATALOG inkl. E.0 committet ee33a3b5, ~09:00) vs. Z91849 Owner-Entscheid 2 (09:25) + Q2-Nachtrag (OWNER-Doc ~12:1x)",
+   "persistenz_pruefung": "KATALOG:68 unveraendert ('merge-Stempel-Zeile real schreiben'); Lage-Dossier 00-SYNTHESE:242 gleichlautend; ABGLEICH:37 traegt E.0 unkorrigiert fort; die Verdraengungs-Tabelle im Lage-Dossier (§1, Zeile 98) legitimiert nur OP-3/OP-11->E2, NICHT diesen E.0-Teilpunkt — kein Doc loest den Widerspruch auf."
+  },
+  {
+   "klasse": "VERGESSENE-ARBEIT",
+   "schwere": "KLEIN",
+   "was": "K5-Passus 'Wie viele solcher Bau-Varianten anstehen, entscheidet allein das Profil; im Stand dieser Arbeit deklariert es vier' (verankert 2a9404f, 01.08.) wird mit dem offenen Pflicht-Paket A4/12-Perm (OE-D: 12 System-Perms O0-O3 x {no_extension,avx2,avx512}) sachlich falsch. Fuer die parallele Stale-Klasse existiert ein Nachzugs-Vermerk (C2: Gate-Zahl 'beim Einfrieren der ce-Linie' nachziehen), fuer die Vier-Zahl NICHT — kein Katalog-/Abgleich-/Dossier-Punkt nennt den K5-Zahlen-Nachzug nach A4.",
+   "transkript_beleg": "Z90875 K5-Paketmeldung (a) + woertlicher Kern-Absatz 1 ('im Stand dieser Arbeit deklariert es vier (zwei Opt...')",
+   "persistenz_pruefung": "grep 'deklariert es vier' und '12-Perm.*Thesis' ueber docs/sessions: 0 Nachzugs-Notizen; KATALOG C2 + ABGLEICH C2 nennen nur Gate-Zahl + Anhang-B-Stichtagszeile; A4-Paket (KATALOG A4, ABGLEICH) ist rein code-seitig formuliert."
+  }
+ ],
+ "gedeckt_bilanz": "Alle 13 echten Owner-Nachrichten des Chunks (Z90903, Z90938, Z91009, Z91033, Z91041, Z91133, Z91226, Z91238, Z91343, Z91833, Z91849, Z91925, Z92063) sind verifiziert gedeckt: der grosse 09:25-Entscheide-Block (E1-E6, R7-R9) steht VERBATIM im OWNER-Entscheide-Doc samt spaeteren Nachtraegen (Q1/Q2/Q3/Q10, Pausen-/Resume-Orders) und ist in KATALOG A13-A17/H, Memory-KERNs und Lage-Dossier §1.16/18 ausgelegt; F10-F13 verbatim im PAUSE-Doc 01.08.; der 07:39-Sprachpass-Auftrag verbatim im BEFUND-thesis-anhaenge-Doc + sinngemaess in der UEBERGABE; 'Volles GO/12900K/Ersatz-CPU/SPD-Pflicht' im UEBERGABE-Nachtrag ~08:5xZ; die Arbeitsweise-Ruege 09:32 als datierter B.3-Nachtrag im Arbeitsweise-Memory (gitleaks/R4/Truth-Check). Auch die Folge-Straenge sind getrackt: Truth-Check-FAIL-Fragen 1-3 owner-entschieden und persistiert (Mittags-PAUSE: Dual-Lizenz/Krause zweiter Betreuer/Marke eingetragen, thesis 2139047), EN-CI-REV3, spd5118-Korrektur, C2/C7, A11 ccache-Drop, A12 NAS-Creds, E-07/PAT-#327 in owner-vorlagen-konsolidiert. Nur die drei gemeldeten Deltas (Thesis-merge-Zeile-Kapitelnachzug, staler E.0-merge-Stempel-Teilpunkt, K5-Vier-Zahl) fehlen im heutigen Persistenz-Stand."
+}

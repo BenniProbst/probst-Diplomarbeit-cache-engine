@@ -1,0 +1,96 @@
+{
+ "deltas_konsolidiert": [
+  {
+   "id": "D-01",
+   "schwere": "MITTEL",
+   "was": "J-Kette/V32 stale (Chunk 1, WIDERSPRUCH, BESTÄTIGT): KATALOG B1 (Trigger-Sequenz-Schritt 1, docs/sessions/20260802-KATALOG-offene-strecke-gesamtplan.md:37) sagt weiter 'N=316; nur mit V32_ENABLE=ON'; memory/reference_ce_jkette_n316_braucht_v32_enable_on.md endet 27.07. mit der widerlegten V32-Test-Gate-Kausalität; MEMORY-Index-Zeile unverändert. Der Verify-Befund (Gate = lebendes ctest-N, 312→…→318, heute 331 lt. ABGLEICH C2; V32 gated KEINEN Test, bleibt nur CI-Kanon ON) steht nur im FAHRPLAN:41-49. Risiko: J-Ketten-Lauf der Trigger-Sequenz gegen falsches Soll-N.",
+   "empfohlene_aktion": "persistieren: KATALOG-B1-Zeile korrigieren ('N = aktuelles ctest-Gate, live via ctest -N ermitteln, Stand 331; V32=ON nur CI-Kanon, gated keine Tests') + datierter Nachtrag in reference_ce_jkette_n316_braucht_v32_enable_on.md + MEMORY-Index-Zeile anpassen. VOR Trigger-Sequenz B."
+  },
+  {
+   "id": "D-02",
+   "schwere": "MITTEL",
+   "was": "Thesis trägt die per Owner-E2 (02.08., 'Merge Zeile kann daher nicht existieren') abgeschaffte vierte Stempel-Zeile (Chunk 2, VERGESSENE-ARBEIT, BESTÄTIGT am maßgeblichen Baum super/thesis/diplomarbeit/): kapitel/de/03_messsystem_prtart.tex:1145-1148, de/05_evaluation.tex:207 (+en), de/06_fazit.tex:83 (+en). Kein Task/Paket beauftragt den Kapitel-Nachzug (KATALOG C2 nur Gate-Zahl; A13-M3-Dossier nur Code; Anhänge-Welle-Plan markiert die Stelle als 'fremder Scope'). Thesis = Abgabe-Artefakt.",
+   "empfohlene_aktion": "Task anlegen: eigenes Thesis-Kapitel-Nachzug-Paket (DE+EN, 03/05/06, sec:stamp-model auf 3-Zeilen-Modell + 'e'-Suffix/Namens-Muster umschreiben) + KATALOG-C um den Punkt ergänzen; NICHT in die laufende Anhänge-Welle mischen (deren Scope-Abgrenzung respektieren)."
+  },
+  {
+   "id": "D-03",
+   "schwere": "MITTEL",
+   "was": "KATALOG-E.0-Teilpunkt 'merge-Stempel-Zeile real schreiben (statt hart {})' (KATALOG:68, vor dem 09:25-Owner-Entscheid geschrieben) widerspricht Owner-E2/Q2 und dem A13-M3/C3-Kurs (merge-Stempel-Code wird ENTFERNT, Merge lebt nur als 'e'-Flag + erweiterte Namen) — Chunk 2, WIDERSPRUCH, BESTÄTIGT: KATALOG:68 unverändert, ABGLEICH-E-Zeile führt E.0 'unveraendert' fort. E.0 ist Pflicht vor jeder Messung → Ausführender könnte die abgeschaffte Zeile wieder einführen.",
+   "empfohlene_aktion": "persistieren: E.0-Teilpunkt in KATALOG (und ABGLEICH-E-Zeile) korrigieren auf 'merge-Semantik gemäß Owner-E2/Q2: KEINE vierte Stempel-Zeile; Merge nur via e-Flag + Namens-Muster' mit Verweis auf OWNER-Doc E2/Q2."
+  },
+  {
+   "id": "D-04",
+   "schwere": "MITTEL",
+   "was": "F3-Testschuld aus dem TP1-Zweit-Truth-Check (Iterator-Test für discard_fresh_with_pfad_prefix mit echtem bestand_key_of + werfendem Push; Zusage 'vor dem nächsten Lager-Increment', war Task #10) ist aus der aktiven Steuerung gefallen — Chunk 3, VERGESSENE-ARBEIT, BESTÄTIGT: aktueller Task-Stack #1-#7 ohne Eintrag, super-LEDGER und ce-Ledger 0 Treffer, ce tests/unit ohne discard_fresh-Test. Träger nur 02.08.-welle2d-PAUSE + Backup-Extrakt. A1-Lager-Rest steht in Task #7 an → Auflage droht überfahren zu werden.",
+   "empfohlene_aktion": "Task anlegen: '[S1] (Folgeschuld) F3-Testschuld: discard_fresh-Iterator-Test' wieder in den Stack + Ledger-Folgeschuld-Zeile; als Vorbedingung an den A1-Lager-Rest in Task #7 koppeln."
+  },
+  {
+   "id": "D-05",
+   "schwere": "MITTEL",
+   "was": "Owner-Entscheid 03.08. 06:45 'Ich sehe jetzt viele doppelte Agenten. Ich hebe die Pause auf und möchte doch nicht mehr kompaktieren' nirgends persistiert — Chunk 4, UNPERSISTIERTES-OWNER-WORT, BESTÄTIGT: 0 Treffer in docs/ (inkl. sessions/backups); OWNER-Doc endet mit 'Parallelisierungs-Freigabe (2)', der Rüge-Nachtrag nennt nur die Folge. Operativ bindend (Vollbetrieb statt /compact) — Verstoß gegen E-21-Voll-Persistenz.",
+   "empfohlene_aktion": "persistieren: verbatim-Nachtrag im OWNER-Entscheide-Doc (Datum/Uhrzeit, Wortlaut, Umsetzung 'keine Kompaktierung mehr, Pause aufgehoben')."
+  },
+  {
+   "id": "D-06",
+   "schwere": "KLEIN",
+   "was": "Dediziertes Codex-Setup-Memory feedback_codex_mcp_always_newest_model_xhigh.md endet mit KORREKTUR 10.07. 'zurück auf gpt-5.5 + xhigh', obwohl Owner-Order 01.08. (gpt-5.6-sol + ultra) vollzogen, Smoke-belegt und im Arbeitsweise-Memory ('Codex gpt-5.6-sol auf ultra') + UEBERGABE-Doc persistiert ist — Chunk 1, WIDERSPRUCH, BESTÄTIGT per tail beider Memory-Dateien. Die stale Datei ist die How-to-apply-Quelle für Codex-Setups auf neuen Maschinen.",
+   "empfohlene_aktion": "persistieren: datierter Nachtrag 01.08. in feedback_codex_mcp_always_newest_model_xhigh.md (gpt-5.6-sol + ultra verifiziert, Fallback-Kette sol+max→niedriger; Verweis auf Arbeitsweise-v2.1-Memory)."
+  },
+  {
+   "id": "D-07",
+   "schwere": "KLEIN",
+   "was": "K5-Passus 'im Stand dieser Arbeit deklariert es vier' (BESTÄTIGT: thesis kapitel/de/05_evaluation.tex:98) wird mit dem offenen Pflicht-Paket A4/12-Perm sachlich falsch; anders als für die Gate-Zahl (C2-Nachzugs-Vermerk 'bei Einfrieren: jetzt 331') existiert KEIN Nachzugs-Vermerk für die Vier-Zahl — Chunk 2, VERGESSENE-ARBEIT, BESTÄTIGT (grep docs/ 'deklariert es vier' = 0).",
+   "empfohlene_aktion": "persistieren: Nachzugs-Vermerk an KATALOG C2 (oder A4) anhängen: 'nach A4/12-Perm die Varianten-Zahl in 05_evaluation DE:98 + EN-Pendant nachziehen'; sauber zusammen mit D-02 im Thesis-Nachzug-Task erledigen."
+  },
+  {
+   "id": "D-08",
+   "schwere": "KLEIN",
+   "was": "E-02-Statusaussagen in zwei aktiven Wiederaufnahme-Ankern falsch (Merge aus Chunk-3-Δ1 + Chunk-4-Δ5; HERABGESTUFT von MITTEL): ABGLEICH:27 'E-02 VERIFIZIERT NICHT hergestellt (kein prtart-/thesis-Ledger)' und PAUSE §7 'prtart hat wirklich keins' sind am Objekt widerlegt (prtart-Ledger seit 456b511/c4735d2 auf beiden Remotes, thesis-Ledger a0ba339/13b1b5a). Herabstufung, weil das operative Risiko (Neuanlage statt Merge) inzwischen GEHEILT ist: E-02-Nachzug additiv vollzogen — prtart c6f0754 ('Bestandstext unveraendert'), thesis 626b9db, Task #6 completed. Rest = reine Doc-Angleichung.",
+   "empfohlene_aktion": "persistieren: ABGLEICH-A16-Zeile auf Ist korrigieren ('E-02 HERGESTELLT: 4 Ledger, prtart c6f0754 / thesis 626b9db') + Korrektur-Nachtrag in PAUSE §7; keine weitere Arbeit nötig."
+  },
+  {
+   "id": "D-09",
+   "schwere": "KLEIN",
+   "was": "TP1-Folgebefunde leben nur im Backup-Extrakt (Chunk 3, VERGESSENE-ARBEIT, BESTÄTIGT): (a) '(void)-ohne-try' an der Takeover-Aufrufstelle weiterhin im Code (cache_engine_builder_iterator.hpp:1162, trotz Zusage 'wird nachgezogen'); (b) B-N3 FreeRamFn-Härtung. Beide fehlen in der §75-Aufräumpass-Kandidatenliste, im Ledger und in allen Tasks (greps 0 Treffer).",
+   "empfohlene_aktion": "persistieren: beide als Kandidaten in die fortgeschriebene §75-Aufräumpass-Kandidatenliste aufnehmen (Fundstellen iterator:1162 + system_ram/FreeRamFn); kein eigener Task nötig, §75 läuft als Sammelpass."
+  },
+  {
+   "id": "D-10",
+   "schwere": "KLEIN",
+   "was": "CiWatch2-Zusage ohne Nachtrag (Chunk 3, VERGESSENE-ARBEIT, BESTÄTIGT): Die 46er-Differenz lokale 326 ctest-Fälle vs. CI test:unit 280 (Vermutung: contract:*-Jobs als Träger) wurde nie belegt/nachgetragen — 0 Treffer in 20260803-Docs, LEDGER und den CI-Referenz-Memories.",
+   "empfohlene_aktion": "Task anlegen (Folgeschuld, klein): Differenz einmal belegen (ctest -N Labels contract|pmc vs. test:unit -LE-Filter zählen) und Ergebnis als Nachtrag in reference_ci_trace_parsing_commit_titel_falle.md persistieren — wichtig als Referenz-Eichung vor Mess-CI-Auswertungen."
+  },
+  {
+   "id": "D-11",
+   "schwere": "KLEIN",
+   "was": "Fehlattribution im committeten Backup-Extrakt (Chunk 3, WIDERSPRUCH, BESTÄTIGT): backups/20260802-kontext-neugruendung-abend-workflows/ergebnisse/47-1ed96c98.md:90 schreibt der Welle 1 'CI: prod2 280 (+3 ...)' zu; laut Transkript war Welle 1 (ce/14286) '0 tests failed out of 279', die 280 gehört zu Welle 2a (ce/14296) — Zeile 96 desselben Files ordnet 280 korrekt 14296 zu. Maßgebliche Memory-Referenz (280@7603453b) ist korrekt.",
+   "empfohlene_aktion": "persistieren (additiv, Backup-Kanon: nie editieren): kleine Korrektur-Notiz als NEUE Datei im Backup-Ordner bzw. Einzeiler im nächsten Session-Doc ('Extrakt 47 Z.90: 280 gehört zu 14296/Welle 2a, Welle 1 = 279'); Priorität niedrig, da Memory-Referenz korrekt."
+  },
+  {
+   "id": "D-12",
+   "schwere": "KLEIN",
+   "was": "Owner-Prüfauftrag ~07:00 (M3-Dossier-Gründlichkeit, 'Bitte lies unter den letzten 10 workflows die Ergebnisse ein und den Wellen-Plan...') nur im flüchtigen Task #9 zitiert — Chunk 4, UNPERSISTIERTES-OWNER-WORT, BESTÄTIGT (0 Treffer in docs/ inkl. audit-Backup; audit-verdikt.md trägt nur das Verdikt). Auftrag ist VOLLZOGEN; zusätzlich Kondensat-Lücke (kein USER-Kopf zwischen Z95786 und Z95854).",
+   "empfohlene_aktion": "persistieren: Wortlaut (aus TaskCreate-#9-Zitat) als Nachtrag im OWNER-Doc + Vermerk 'vollzogen, Verdikt in backups/20260803-m3-dossier-gruendlichkeitsaudit/audit-verdikt.md'; Kondensat-Lücke im Gegenlese-Abschluss-Doc notieren."
+  },
+  {
+   "id": "D-13",
+   "schwere": "KLEIN",
+   "was": "Resume-Order 03.08. 14:59 ('Bitte gründe dich neu, resume alle Agenten und Workflows und fahre mit offener Arbeit fort') ohne OWNER-Doc-Nachtrag — Chunk 4, UNPERSISTIERTES-OWNER-WORT, BESTÄTIGT: OWNER-Doc endet mit Parallelisierungs-Freigabe (2); grep-Treffer nur 26.07.-Altbestand. Bricht das etablierte Verbatim-Nachtrag-Muster der früheren Resume-Orders.",
+   "empfohlene_aktion": "persistieren: verbatim-Nachtrag im OWNER-Doc (zusammen mit D-05 und D-12 in einem Nachtrags-Block erledigbar)."
+  },
+  {
+   "id": "D-14",
+   "schwere": "KLEIN",
+   "was": "Kontext-Cache/Gegenlese-Auftrag 03.08. 15:05 ('gesamten Kontextinhalt auf das backend als cache einlesen ... session log gegenlesen') in keinem Session-Doc — Chunk 4, UNPERSISTIERTES-OWNER-WORT, BESTÄTIGT (0 Treffer). Es ist der JETZT laufende Auftrag; Persistenz wird mit Abschluss fällig.",
+   "empfohlene_aktion": "persistieren bei Abschluss (= jetzt): Gegenlese-Abschluss-Session-Doc mit Owner-Wortlaut, Vorgehen (4-Chunk-Kondensat + Synthese) und dieser Delta-Liste anlegen; deckt zugleich D-14 selbst."
+  },
+  {
+   "id": "D-15",
+   "schwere": "KLEIN",
+   "was": "Vortrags-Zusage nur halb eingelöst (Chunk 4, VERGESSENE-ARBEIT, BESTÄTIGT): Memory + BEFUND-Doc:73 existieren, aber im DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER (Stand nach cb805f8c/a0247348) 0 Treffer 'vortrag' — der zugesagte Ledger-Merkposten fehlt.",
+   "empfohlene_aktion": "persistieren: eine Merkposten-Zeile im Ledger ('Vortrag NACH Abgabe, technischer Hintergrund zuerst — Owner 01.08.', Verweis auf Memory)."
+  }
+ ],
+ "verdikt": "NICHT vollständig gedeckt — aber knapp davor. Die Deckungsquote ist hoch: alle 86 im Strang 01.–03.08. gefundenen Owner-Nachrichten sind bis auf 4 Wortlaut-Lücken (D-05, D-12, D-13, D-14) verbatim oder sinngetreu persistiert, alle wellensteuernden Entscheide (E1–E6, R7–R9, Q1–Q3/Q10, Flag-Grammatik, GOs, Pausen-/Resume-Orders, Arbeitsweise-Rügen) verbatim im OWNER-Doc + Memory-KERNs. Es verbleiben 15 konsolidierte Deltas (5 MITTEL, 10 KLEIN, 0 GROSS): 3 stale Persistenz-Spitzen, die einem korrigierten Verify-Befund nie nachgezogen wurden (D-01 J-Kette/V32, D-03 E.0-merge-Stempel, D-06 Codex-Memory), 2 vergessene Arbeits-Fäden mit Objekt-Beleg (D-02 Thesis-Stempel-Zeile, D-04 F3-Testschuld), 4 unpersistierte Owner-Wortlaute sowie 6 Klein-Deltas. Trigger-/mess-relevant und darum VOR der Trigger-Sequenz B bzw. vor E.0-Ausführung zu schließen: D-01 und D-03; abgabe-relevant: D-02. Ein Chunk-Delta wurde nach eigener Objektprüfung herabgestuft (E-02: operativ bereits geheilt durch prtart c6f0754 + thesis 626b9db, nur noch Doc-Angleichung). Kein Delta musste ganz verworfen werden, keines war falsch-positiv.",
+ "statistik": "4 Chunks, 86 Owner-Nachrichten geprüft (28+13+26+19); 16 Roh-Deltas → 15 konsolidiert (1 Dedup-Merge: Chunk-3-Δ1 + Chunk-4-Δ5 → D-08). Eigene Stichproben-Verifikation aller 15 am Objekt (Kondensat Z-Marker, KATALOG/ABGLEICH/PAUSE/OWNER/FAHRPLAN-Zeilen, Memory-tails, Thesis-Kapitel im maßgeblichen Baum super/thesis/diplomarbeit, ce-Code iterator:1162, git-Historien prtart/thesis-Ledger, LEDGER-greps, Backup-Extrakt 47): 14 bestätigt, 1 herabgestuft (D-08: MITTEL→KLEIN, Objekt-Heilung c6f4/626b9db + Task #6), 0 verworfen. Schwere-Verteilung: 5 MITTEL (D-01..D-05), 10 KLEIN (D-06..D-15). Empfohlene Aktionen: 10× persistieren/Doc-Korrektur, 3× Task anlegen (D-02, D-04, D-10), 1× persistieren-bei-Abschluss (D-14), 1× additiv-niedrigprio (D-11); 0× ignorieren. Nebenbefund: Standalone-Klon Research/20260931-overleaf-diplomarbeit steht auf einem anderen, kürzeren Kapitel-Stand (591 vs. 1517 Zeilen) als der maßgebliche Baum im super-Repo — Klon-Sync-Doktrin prüfen. Keine Token-Werte im Kondensat angetroffen."
+}
