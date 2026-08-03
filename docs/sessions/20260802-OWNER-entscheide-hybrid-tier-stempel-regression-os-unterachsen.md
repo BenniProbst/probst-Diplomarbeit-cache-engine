@@ -223,3 +223,12 @@ Auslegung (Manager): Phase = UMSETZUNG. Scheinbar fehlende Entscheidungen werden
 in den Bestands-Quellen gefunden (Praezedenz-Doktrinen decken neue Instanzen); Owner-Vorlagen nur nach
 belegtem NICHT-GEFUNDEN ueber alle Quellen. Reviews/Truth-Checks = Umsetzungs-Drift-Abfang, nie verduennen.
 Als Memory fixiert: feedback_fehlende_entscheidung_erst_explore_alles_ist_entschieden.
+
+## Nachtrag 03.08. nachts — Pause-Order (verbatim)
+
+> "Bitte lasse alle aktuellen Workflows und Agenten auslaufen und beginne keine neue Arbeit mehr, dann
+> abbruchsichere aber harte Pause"
+
+Umsetzung: OD-10-RT-Welle (wf_a34d53e2) + ExpPhasenCheck (Explore, Fahrplan-Vollstaendigkeit) laufen aus;
+Ergebnisse werden bei Eintreffen NUR gesichert-committet, NICHT verarbeitet. Keine neue Arbeit. Pause-Doc:
+20260803-PAUSE-abbruchsicher-a13-komplett-od10-laeuft.md.
