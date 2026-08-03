@@ -185,3 +185,13 @@ Kontext: `ceb_legende` trägt die `[a,b,c]`-Mess-Kombinatorik der emittierenden 
 > 9. **V5** super-prtart-Gitlink: auf `c4735d2` nachziehen (Empfehlung) oder bewusst auf `32e8ffa8` gepinnt lassen?
 > 10. **V6** `Code/measure_out_d03/`: bleibt untracked liegen (Default) — ok?
 > 11. **#327** NUR-KENNTNIS: PAT-Rotation nach Messfenster ist bei Infra beauftragt (Handout liegt); Vollzug folgt nach Messfenster-Ende.
+
+---
+## NACHTRAG 03.08. nachmittags — Explore-Konsolidierung: dieses Doc ist WEITGEHEND GEGENSTANDSLOS
+
+Owner-KERN 03.08. + 4 Explore-Berichte (backups/20260803-entscheide-explore/): Fast alle 11 Punkte waren
+bereits entschieden/gedeckt — Voll-Verdikte im Ledger-NACHTRAG (Explore-Konsolidierung). REST-OFFEN:
+NUR A.7-f2 (Tombstone-Koepfe, je-Repo-GO, nach Abgabe), A.7-f3 (comdare-analysis-Anlage-GO + Name,
+nach Abgabe) und die 3 Overlay-Festlegungen (nicht-blockierend). Punkt 6 (V3) war ein Manager-Entscheid
+und ist GEFAELLT (getrennte Fenster + A8-Kopplung); Punkt 8-f1-Empfehlung ZURUECKGEZOGEN (lief gegen
+die Gitflow-Doktrin 07.07. — Default bleibt main, Aufloesung per merge).
