@@ -9,6 +9,12 @@
 > je Increment Pipeline-belegt). **Spur P** = dateidisjunkte Parallel-Wellen (Worktrees). **gated** = SCHEDULING-
 > Sperre (nicht Priorität). **E0-E4** = reine Architektur-Audit-Dimension, NICHT Terminierung. Direktiven: Verify
 > NUR Pipeline; keine Erfolgsmarke ohne literale Ausgabe; Push zu BEIDEN Remotes je Increment; #188 nie halb committen.
+> **AUDIT-KLAUSEL (Nachtrag 03.08., E-02/A16 + L20):** Vollstaendigkeits-Audits laufen ueber ALLE VIER Ledger —
+> DIESES super-Ledger + ce `Code/external/comdare-cache-engine/docs/ledger-sections/*.md` (inkl.
+> `goal-v6-luecken-ledger.md`; dort SUPERSEDED-Banner beachten) + prt-art `Code/external/comdare-prt-art/docs/
+> ledger-sections/architektur-ziele-offene-punkte-ledger.md` + thesis `thesis/diplomarbeit/docs/ledger-sections/
+> architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
+> gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
 ---
 
