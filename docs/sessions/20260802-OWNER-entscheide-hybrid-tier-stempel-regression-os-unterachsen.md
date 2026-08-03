@@ -142,3 +142,30 @@ NUR ZUR KENNTNIS (Q8): A-08 sagte fuer die OS-Unter-Achsen „statisch, RT vorbe
 „Bitte resume alle abgebrochenen und pausierten Workflows und Agenten, bitte starte auch die beiden codex reviews und Welle 2d und Welle 3 neu wenn notwendig. Dann moechte ich weiterhin kompaktieren"
 
 **Auslegung (bindend):** Welle 2d brach am MONATS-SPEND-LIMIT ab (Transport-BAU + Flag-Review). Ist-Zustand VERIFIZIERT (nicht angenommen): Flag-Grammatik-Cluster (CX-W5/W6) fertig gebaut+committet (3dfb65ad, Doppellauf 331/331) -- nur Review offen. Transport-Cluster TEIL-fertig: CX-W3 (e073897b) + CX-W8 (d0b6f40a) committet+negativ-getestet; CX-W1/W2 (2 BLOCK) + CX-W4 waren dirty-WIP (4 Dateien), unreviewt -> WIP als Referenz gesichert, Worktree auf e073897b sauber, BLOCK-Fixes bekommen sauberen Redo. Model jetzt 'draws from usage credits' (Limit navigierbar). Neustart: (1) Welle-2d-Abschluss (Transport-Rest CX-W1/W2/W4 + Reviews beider Cluster), (2) beide Codex-Reviews NEU -- Codex prod1-bwrap bleibt defekt, daher Fable-xhigh-Adversarial-Lens als Ersatz mit ausdruecklichem Vermerk (Owner-Gate-Option b), (3) Welle 3 = M3-Dossier neu (Planung; M3-CODE erst nach 2d gelandet + Q-M3-GATE). Danach kompaktieren (Workflows laufen im Hintergrund weiter).
+
+## Nachtrag 03.08. — Resume-Bekraeftigung nach Kompaktierung + Model-Switch
+
+Owner (03.08., nach /compact + /model):
+> „Bitte gründe dich neu, prüfe die Arbeit von Opus 4.8 und die resumed workflows und Agenten und fahre mit offener Arbeit fort"
+
+Owner (mid-turn, Bekraeftigung des Resume-Auftrags vom 02.08.):
+> „Bitte resume alle abgebrochenen und pausierten Workflows und Agenten, bitte starte auch die beiden codex reviews und Welle 2d und Welle 3 neu wenn notwendig. Dann möchte ich weiterhin kompaktieren"
+
+BEFUND der Pruefung: Die drei am 02.08. spaetabends gestarteten Restart-Tracks (wf_60e0a56c Welle-2d,
+wf_df52a10b Review-Neulauf, M3Dossier2) sind beim Model-Switch ALLE gestorben — Journale enthalten nur
+'started'-Eintraege, KEIN agent()-Call lieferte ein Result. Die Opus-Worker hinterliessen aber verwertbare
+Arbeit im Transport-Worktree (wt-w2d-Transport-Bestandslog, 4 dirty Dateien, +382/-68): CX-W1
+mess_pfad_synchron_push definiert UND am Mess-Pfad verdrahtet (iterator :1768), CX-W2 slice_window_bounds
+Spannen-Form (min, max-min+1) ohne Wire-Bump, CX-W4 gepruefte stamp-Entfernung fail-closed, +187
+Test-Zeilen UNVOLLSTAENDIG (Abbruch beim Test-Schreiben). Manager-Verdikt nach eigener Diff-Pruefung:
+tragfaehig, unfertig, ungetestet -> verifiziert-FERTIGSTELLEN statt verwerfen. Flag-Cluster (bf6fc810 +
+3dfb65ad) war fertig, nur das Review stand aus. Die zwei Review-Agenten legten Audit-Worktrees an
+(wt-zweitpass-w1w2a2c + scratchpad/ce-audit-7150cc51), lieferten aber keine Befunde.
+
+NEUSTART 03.08.: (1) wf_0c5c3d92 welle2d-fertigstellung — Opus-Bau-Worker verifiziert+vervollstaendigt
+die WIP (Tests, Doppellauf gegen Basis 329, cf22, granulare Commits, KEIN Push), danach Fable-Adversarial-
+Reviews beider Cluster (Transport + Flag; Flag-Review parallel sofort). (2) wf_1ff366b1 review-neulauf —
+Wellen-Zweitpass W1/2a/2c + Gesamt-Audit (8 Achsen) auf 7150cc51, existierende Audit-Worktrees werden
+wiederverwendet; Codex-Versuch mit hartem Zugriffstest, sonst Fable-Adversarial. (3) M3Dossier3 — Fable,
+read-only, M3-Ausfuehrungs-Dossier-Neubau (Fundstellen-Inventur, Literal-Neuzaehlung, M3a/M3b-Commit-Plan).
+Reihenfolge unveraendert bindend: 2d landen -> Q-M3-GATE -> A13-M3 -> M4 -> OD-10-RT.
