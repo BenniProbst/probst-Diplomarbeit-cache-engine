@@ -187,3 +187,13 @@ explizit (Fable fuer Planung/Design/Review/Synthese, claude-opus-5 fuer Struktur
 fuer leicht/Infra); Neustarts nur nach positivem Todes-Beweis; laufende Rest-Agenten
 (W2dNachbesserung=Runbook-Fall A1-konform Opus 4.8, M3DossierAudit=Fable) laufen aus,
 ihre Ergebnisse erhalten den Truth-Check.
+## Nachtrag 03.08. vormittags (2) — Parallelisierungs-Freigabe (bindend)
+
+Owner (03.08., auf Manager-Vorschlag im Gesamtplan-Abgleich 743078fa):
+> „Vorschlag angenommen, Parallelisierung nach strikter Claude Code Arbeitsweise mit bis zu 8 Aufgaben parallel freigegeben (keine Beschränkung der Agenten der workflows und Subagenten)"
+
+Umsetzung: WF Design-Nachtraege (#4, Fable-Breite, Scratchpad-Output, Lead-Commit nach 2d-Landung) +
+WF Thesis-Anhaenge-Realm-Welle (#6, thesis-Worktree, EIN Bau-Worker, Commits Benjamin-Elias Probst OHNE
+Trailer) + WF Nachzug/Triage/E-02 (#5/#8, Fable, Scratchpad-Output; Ledger bleibt Lead-only) parallel
+SOFORT; M3-Welle (A13-M3 + FK-5) startet NACH ce-CI-Gruen der 2d-Landung + Q-M3-GATE-b-Formalisierung.
+Programmier-Worker-Deckel 8 eingehalten (Design-/Review-Breiten ausgenommen per Owner-Klarstellung 02.08.).
