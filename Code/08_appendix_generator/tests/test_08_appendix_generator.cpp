@@ -285,3 +285,225 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
     fs::remove_all(dir_orch, cleanup);
     fs::remove_all(dir_ref, cleanup);
 }
+
+// ── Achsen-Inventar (2026-08-03) ──────────────────────────────────────────────
+// Die Fixtures sind MINIATUREN der drei generierten Registry-XML: dieselbe Gestalt
+// (Tag-Namen, Attribute, Kommentare, Verschachtelung), aber nur so viele Eintraege,
+// wie der Beweis braucht. Sie sind ausdruecklich KEINE zweite Achsen-Liste: der
+// Test prueft die PARSER-Zusagen, nicht den Inhalt der echten Registries (die sind
+// generiert und duerfen sich aendern, ohne diesen Test rot zu faerben).
+namespace {
+
+void write_text(fs::path const& p, std::string const& text) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p, std::ios::binary);
+    f << text;
+}
+
+fs::path make_registry_fixtures(fs::path const& dir) {
+    // Organ: zwei Slots, Kommentar mit einem Pseudo-Tag (darf NICHT als Achse zaehlen).
+    write_text(dir / "organ.xml", R"(<comdare_axis_registry engine="cache_engine" schema="1">
+  <!-- GENERIERT. NICHT von Hand editieren. Ein <axis id="phantom"/> im Kommentar zaehlt nicht. -->
+  <axis id="search_algo" slot="T00" category="composition" baustein_count="4">
+    <baustein name="k_ary"/>
+  </axis>
+  <axis id="persistence_target" slot="T17" category="composition" baustein_count="1">
+    <baustein name="memory_only"/>
+  </axis>
+</comdare_axis_registry>
+)");
+    // System: eine Haupt-Achse mit Unter-Achsen + die Komplex-Klammer mit Unter-Achsen-GRUPPE.
+    write_text(dir / "system.xml", R"(<comdare_axis_registry engine="cache_engine_system" schema="1">
+  <axis id="target_isa" category="system_config" binary_id="never" stage="ct" baustein_count="2">
+    <baustein name="x86_64" enabled="true"/>
+    <sub_axis id="numa_node" parent="target_isa" stage="runtime" value_type="token" option_source="machine_resolved"/>
+    <sub_axis id="page" parent="target_isa" stage="runtime" value_type="token" option_source="machine_resolved"/>
+  </axis>
+  <system_complex_axis id="build_target_complex" category="system_config" binary_id="never" stage="ct" member_count="3">
+    <member axis="target_isa"/>
+    <sub_axis_group id="build_toolchain" sub_axis_count="3">
+      <sub_axis id="compiler" parent="build_target_complex" stage="ct" baustein_count="2"/>
+    </sub_axis_group>
+  </system_complex_axis>
+</comdare_axis_registry>
+)");
+    // Messen: eine Achse + die dynamic_dims (haengen an KEINER Achse).
+    write_text(dir / "measurement.xml", R"(<comdare_axis_registry engine="cache_engine_measurement" schema="1">
+  <axis id="load_framework" category="measurement_meta_meta" binary_id="never" stage="ct" baustein_count="1">
+    <baustein name="ycsb" sub_axis_label="workload" enabled="true"/>
+  </axis>
+  <dynamic_dims resource_control_version="1">
+    <dim id="workload" stage="runtime" source="measurement:load_framework" value_type="token"/>
+    <dim id="thread_count" stage="runtime" source="resource_control_pod" value_type="uint"/>
+  </dynamic_dims>
+</comdare_axis_registry>
+)");
+    return dir;
+}
+
+} // namespace
+
+// Parser-Zusage 1: Tag-Namen werden EXAKT unterschieden (sub_axis vs. sub_axis_group),
+// Kommentare zaehlen nicht, Slots und Zaehlungen kommen aus den Attributen.
+TEST(Stufe08Appendix, RegistryParserReadsAllThreeRealms) {
+    auto const dir = comdare_user_tmp() / "appendix_registry_fixtures";
+    std::error_code ec;
+    fs::remove_all(dir, ec);
+    make_registry_fixtures(dir);
+
+    ag::AxisRegistry organ;
+    ASSERT_EQ(ag::parse_axis_registry(dir / "organ.xml", ag::AxisRealm::organ, organ), ag::status_ok);
+    ASSERT_EQ(organ.axes.size(), 2u); // der Kommentar-<axis> zaehlt NICHT
+    EXPECT_EQ(organ.axes[0].id, "search_algo");
+    EXPECT_EQ(organ.axes[0].slot, "T00");
+    EXPECT_TRUE(organ.axes[0].has_baustein_count);
+    EXPECT_EQ(organ.axes[0].baustein_count, 4u);
+    EXPECT_EQ(organ.axes[1].id, "persistence_target");
+    EXPECT_EQ(organ.axes[1].slot, "T17");
+
+    ag::AxisRegistry system;
+    ASSERT_EQ(ag::parse_axis_registry(dir / "system.xml", ag::AxisRealm::system, system), ag::status_ok);
+    ASSERT_EQ(system.axes.size(), 2u);
+    EXPECT_EQ(system.axes[0].id, "target_isa");
+    EXPECT_FALSE(system.axes[0].is_complex_bracket);
+    ASSERT_EQ(system.axes[0].sub_axes.size(), 2u);
+    EXPECT_EQ(system.axes[0].sub_axes[0].id, "numa_node");
+    EXPECT_EQ(system.axes[0].sub_axes[0].option_source, "machine_resolved");
+    EXPECT_EQ(system.axes[0].sub_axes[1].id, "page");
+    // Die aeussere Klammer ist als Klammer markiert und KEINE vierte Haupt-Achse.
+    EXPECT_EQ(system.axes[1].id, "build_target_complex");
+    EXPECT_TRUE(system.axes[1].is_complex_bracket);
+    ASSERT_EQ(system.axes[1].sub_axes.size(), 2u);
+    EXPECT_TRUE(system.axes[1].sub_axes[0].is_group); // sub_axis_group != sub_axis
+    EXPECT_EQ(system.axes[1].sub_axes[0].id, "build_toolchain");
+    EXPECT_FALSE(system.axes[1].sub_axes[1].is_group);
+    EXPECT_EQ(system.axes[1].sub_axes[1].id, "compiler");
+
+    ag::AxisRegistry meas;
+    ASSERT_EQ(ag::parse_axis_registry(dir / "measurement.xml", ag::AxisRealm::measurement, meas), ag::status_ok);
+    ASSERT_EQ(meas.axes.size(), 1u);
+    EXPECT_EQ(meas.axes[0].id, "load_framework");
+    EXPECT_EQ(meas.axes[0].category, "measurement_meta_meta");
+    EXPECT_EQ(meas.axes[0].binary_id, "never");
+    ASSERT_EQ(meas.dynamic_dims.size(), 2u);
+    EXPECT_EQ(meas.dynamic_dims[0].id, "workload");
+    EXPECT_EQ(meas.dynamic_dims[1].id, "thread_count");
+
+    fs::remove_all(dir, ec);
+}
+
+// Parser-Zusage 2: eine fehlende Datei ist ein I/O-Fehler, keine stille Leer-Antwort.
+TEST(Stufe08Appendix, RegistryParserFailsHonestlyOnMissingFile) {
+    ag::AxisRegistry reg;
+    EXPECT_EQ(ag::parse_axis_registry(comdare_user_tmp() / "gibt_es_nicht.xml", ag::AxisRealm::organ, reg),
+              ag::status_io_error);
+    EXPECT_TRUE(reg.axes.empty());
+    EXPECT_EQ(ag::parse_axis_registry(fs::path{}, ag::AxisRealm::organ, reg), ag::status_io_error);
+}
+
+// Writer-Zusage: ohne Registry KEINE Datei (honest-empty); mit Registry ein
+// vollstaendiges longtable-Fragment, das jede Achse genau einmal nennt.
+TEST(Stufe08Appendix, AxisInventoryWriterIsHonestEmptyAndComplete) {
+    auto const      dir = comdare_user_tmp() / "appendix_inventory";
+    std::error_code ec;
+    fs::remove_all(dir, ec);
+    fs::create_directories(dir);
+
+    // (a) honest-empty: leere Registry-Liste ⇒ status_empty_input, keine Datei.
+    auto const empty_out = dir / "axis_inventory_empty.tex";
+    EXPECT_EQ(ag::write_axis_inventory_table(empty_out, {}, "de"), ag::status_empty_input);
+    EXPECT_FALSE(fs::exists(empty_out));
+
+    // (b) vollstaendig: alle drei Realms in EINER Tabelle.
+    auto const fx = comdare_user_tmp() / "appendix_registry_fixtures_w";
+    fs::remove_all(fx, ec);
+    make_registry_fixtures(fx);
+    std::vector<ag::AxisRegistry> regs(3);
+    ASSERT_EQ(ag::parse_axis_registry(fx / "organ.xml", ag::AxisRealm::organ, regs[0]), ag::status_ok);
+    ASSERT_EQ(ag::parse_axis_registry(fx / "system.xml", ag::AxisRealm::system, regs[1]), ag::status_ok);
+    ASSERT_EQ(ag::parse_axis_registry(fx / "measurement.xml", ag::AxisRealm::measurement, regs[2]), ag::status_ok);
+
+    for (auto const& lang : {"de", "en"}) {
+        auto const out = dir / ("axis_inventory_" + std::string{lang} + ".tex");
+        ASSERT_EQ(ag::write_axis_inventory_table(out, regs, lang), ag::status_ok);
+        auto const text = read_all(out);
+        EXPECT_GT(text.size(), 0u);
+        EXPECT_NE(text.find("\\begin{longtable}"), std::string::npos);
+        EXPECT_NE(text.find("\\end{longtable}"), std::string::npos);
+        // Jede Achse steht drin (Unterstriche als \_ maskiert + Umbruchpunkt).
+        std::vector<std::string> const wanted = {
+            "search\\_\\allowbreak{}algo", "persistence\\_\\allowbreak{}target",
+            "target\\_\\allowbreak{}isa",  "build\\_\\allowbreak{}target\\_\\allowbreak{}complex",
+            "load\\_\\allowbreak{}framework"};
+        for (auto const& id : wanted) EXPECT_NE(text.find(id), std::string::npos) << id << " fehlt (" << lang << ")";
+        // Die Sweep-Dimensionen stehen als Legende UNTER dem Float.
+        auto const table_end = text.find("\\end{longtable}");
+        auto const dims_pos  = text.find("thread\\_\\allowbreak{}count");
+        ASSERT_NE(dims_pos, std::string::npos);
+        EXPECT_GT(dims_pos, table_end);
+        // Kein roher Unterstrich ausserhalb der Maskierung (sonst bricht der LaTeX-Lauf).
+        for (std::size_t i = 0; i < text.size(); ++i)
+            if (text[i] == '_') ASSERT_GT(i, 0u) << "roher Unterstrich am Textanfang";
+    }
+
+    fs::remove_all(dir, ec);
+    fs::remove_all(fx, ec);
+}
+
+// Facade-Zusage: OHNE Registry-Pfade bleibt der Lauf byte-gleich zu vorher (keine
+// axis_inventory.tex), MIT Pfaden entsteht sie zusaetzlich — die 16 Kern-/Darstellungs-
+// .tex bleiben unberuehrt.
+TEST(Stufe08Appendix, FacadeWritesAxisInventoryOnlyWhenRegistriesGiven) {
+    auto const fixture = fixtures_dir() / "tier_wide_appendix.csv";
+    ensure_fixture(fixture);
+    auto const      fx = comdare_user_tmp() / "appendix_registry_fixtures_f";
+    std::error_code ec;
+    fs::remove_all(fx, ec);
+    make_registry_fixtures(fx);
+
+    auto const base    = comdare_user_tmp();
+    auto const dir_off = base / "appendix_inv_off";
+    auto const dir_on  = base / "appendix_inv_on";
+    fs::remove_all(dir_off, ec);
+    fs::remove_all(dir_on, ec);
+
+    ag::AppendixConfig off;
+    off.csv      = fixture;
+    off.out_root = dir_off;
+    off.langs    = {"de"};
+    ASSERT_EQ(ag::generate_wide_appendix(off), ag::status_ok);
+    EXPECT_FALSE(fs::exists(dir_off / "de" / "tabellen" / "axis_inventory.tex"));
+
+    ag::AppendixConfig on            = off;
+    on.out_root                      = dir_on;
+    on.organ_axis_registry           = fx / "organ.xml";
+    on.system_axis_registry          = fx / "system.xml";
+    on.measurement_axis_registry     = fx / "measurement.xml";
+    ASSERT_EQ(ag::generate_wide_appendix(on), ag::status_ok);
+    auto const inv = dir_on / "de" / "tabellen" / "axis_inventory.tex";
+    ASSERT_TRUE(fs::exists(inv));
+    EXPECT_GT(fs::file_size(inv), 0u);
+
+    // Die 16 bestehenden .tex sind zwischen beiden Laeufen byte-identisch geblieben.
+    auto all_expected = expected_files();
+    for (auto const& n : expected_extra_files()) all_expected.push_back(n);
+    for (auto const& name : all_expected) {
+        auto const a = dir_off / "de" / "tabellen" / name;
+        auto const b = dir_on / "de" / "tabellen" / name;
+        ASSERT_TRUE(fs::exists(a)) << a;
+        ASSERT_TRUE(fs::exists(b)) << b;
+        EXPECT_EQ(read_all(a), read_all(b)) << "byte-diff in " << name;
+    }
+
+    // Gesetzter, aber kaputter Pfad = ECHTER Fehler (kein stilles Degradieren auf 4 Achsen).
+    ag::AppendixConfig broken       = off;
+    broken.out_root                 = base / "appendix_inv_broken";
+    broken.organ_axis_registry      = fx / "gibt_es_nicht.xml";
+    fs::remove_all(broken.out_root, ec);
+    EXPECT_EQ(ag::generate_wide_appendix(broken), ag::status_parse_error);
+
+    fs::remove_all(dir_off, ec);
+    fs::remove_all(dir_on, ec);
+    fs::remove_all(broken.out_root, ec);
+    fs::remove_all(fx, ec);
+}

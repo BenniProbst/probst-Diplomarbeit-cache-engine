@@ -24,8 +24,11 @@
 // bleiben — wie im .ps1 — PARAMETRISCH übersprungen (cowfix-v1 ohne die Spalten).
 
 #include <array>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <map>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -35,12 +38,78 @@ namespace comdare::da::appendix_generator {
 inline constexpr int status_ok          = 0;
 inline constexpr int status_io_error    = 10;
 inline constexpr int status_parse_error = 11;
+// HONEST-EMPTY (wie dg=11 / c2l=12 in den Subsystem-Bibliotheken): der Aufrufer hat nichts
+// zu schreiben gegeben bzw. die Quelle traegt keine Eintraege — KEINE Datei, KEIN Fehler.
+inline constexpr int status_empty_input = 12;
 
 // Die 6 Surface-z-Felder → Datei lc_surface_<z>.tex (Heatmap, full figure; die
 // Generator-Funktion schreibt figure+caption selbst). Reihenfolge = Ausgabe-
 // Reihenfolge, EXAKT wie generate_wide_appendix.ps1:69-72.
 inline constexpr std::array<std::string_view, 6> kSurfaceFields = {
     "ns_per_op", "op_insert_p50_ns", "op_lookup_p50_ns", "op_erase_p50_ns", "op_scan_p50_ns", "op_rmw_p50_ns"};
+
+// ── ACHSEN-INVENTAR (2026-08-03) ──────────────────────────────────────────────
+// DIE LUECKE: bis hierher kannte diese Stufe NUR die VIER variablen Mess-Achsen
+// (c2l::kVariableAxes: search_algo, node_type, memory_layout, prefetch) — exakt
+// dieselbe Achsen-Luecke, die auch die abgeloesten .ps1-Orchestratoren hatten
+// (thesis/diplomarbeit/generate_{measurement,wide}_appendix.ps1, beide DEPRECATED).
+// Der Anhang braucht aber das VOLLE Inventar: 18 Organ-Slots T00-T17, die drei
+// System-Haupt-Achsen samt aeusserer Komplex-Klammer und die Mess-Achsen.
+//
+// QUELL-WAHRHEIT sind die DREI GENERIERTEN Registry-XML des Codes:
+//   cache_engine_axis_registry.xml   (Organ-Realm, 18 axis-Eintraege T00-T17)
+//   system_axis_registry.xml         (System-Realm, 3 Haupt-Achsen + Komplex-Klammer)
+//   measurement_axis_registry.xml    (Mess-Realm, 3 Achsen + dynamic_dims)
+// Sie entstehen per compile-time-Reflektion der realen Achsen-Typen und sind
+// ausdruecklich NICHT von Hand zu pflegen. Deshalb steht hier KEINE Achsen-Liste
+// im Quelltext: eine zweite, handgepflegte Liste waere die naechste Drift-Klasse
+// (genau die Klasse, aus der die 4-Achsen-Luecke entstanden ist).
+enum class AxisRealm : std::uint8_t { organ = 0, system = 1, measurement = 2 };
+
+// Eine Unter-Achse (bzw. Unter-Achsen-GRUPPE) so, wie die Registry sie fuehrt.
+struct RegistrySubAxis {
+    std::string id;
+    std::string parent;         // Eltern-Achse laut Registry-Attribut; leer = nicht deklariert
+    std::string stage;          // "ct" | "runtime"; leer = nicht deklariert
+    std::string value_type;     // "token" | "uint"; leer = nicht deklariert
+    std::string option_source;  // z.B. "machine_resolved"; leer = nicht deklariert
+    bool        is_group = false; // <sub_axis_group> statt <sub_axis>
+};
+
+// Ein Achsen-Eintrag der Registry (Haupt-Achse oder aeussere Komplex-Klammer).
+struct RegistryAxis {
+    AxisRealm   realm = AxisRealm::organ;
+    std::string id;
+    std::string slot;      // "T00".."T17" (Organ-Realm); leer bei System-/Mess-Achsen
+    std::string category;
+    std::string stage;     // "ct" | "runtime"; leer = nicht deklariert
+    std::string binary_id; // "never"; leer = nicht deklariert
+    std::size_t baustein_count     = 0;
+    bool        has_baustein_count = false;
+    // <system_complex_axis>: die aeussere Klammer ist AUSDRUECKLICH KEINE vierte
+    // Haupt-Achse — die kanonische System-Achsen-Ordnung bleibt bei dreien.
+    bool                         is_complex_bracket = false;
+    std::vector<RegistrySubAxis> sub_axes;
+};
+
+// Das Ergebnis EINER Registry-Datei. dynamic_dims ist nur im Mess-Realm belegt
+// (<dynamic_dims>): Sweep-Dimensionen, die an keiner Achse haengen.
+struct AxisRegistry {
+    AxisRealm                    realm = AxisRealm::organ;
+    std::vector<RegistryAxis>    axes;
+    std::vector<RegistrySubAxis> dynamic_dims;
+};
+
+// Liest EINE Registry-XML. Hermetisch (kein XML-Fremdcode): die Dateien sind
+// generiert und tragen eine feste, attribut-getriebene Gestalt; der Scanner liest
+// Tag-Namen + Attribute und ueberspringt Kommentare/Deklarationen.
+// status_ok | status_io_error (Datei fehlt/unlesbar) | status_parse_error.
+[[nodiscard]] int parse_axis_registry(std::filesystem::path const& xml, AxisRealm realm, AxisRegistry& out);
+
+// Schreibt das Achsen-Inventar als longtable-Fragment (Sprache de|en). Leeres
+// Inventar ⇒ status_empty_input und KEINE Datei (honest-empty, kein Phantom).
+[[nodiscard]] int write_axis_inventory_table(std::filesystem::path const& out, std::span<AxisRegistry const> registries,
+                                             std::string const& lang);
 
 // Konfiguration eines Appendix-Laufs. csv wird NUR gelesen; geschrieben wird je
 // Sprache nach <out_root>/<lang>/tabellen/ (Verzeichnisse werden angelegt).
@@ -52,6 +121,13 @@ struct AppendixConfig {
     std::string bias_label = "tab:bias:search-algo-workload";
     // Caption je Sprache; fehlt ein lang-Key → eingebauter de/en-Default (= .ps1).
     std::map<std::string, std::string> bias_caption_by_lang = {};
+    // ── Achsen-Inventar (additiv) ──────────────────────────────────────────────
+    // Die drei generierten Registry-XML. LEER ODER FEHLEND = der Inventar-Block wird
+    // ausgelassen (honest-empty): die 12 Kern- und 5 Darstellungs-.tex bleiben davon
+    // vollstaendig unberuehrt und byte-identisch.
+    std::filesystem::path organ_axis_registry;
+    std::filesystem::path system_axis_registry;
+    std::filesystem::path measurement_axis_registry;
 };
 
 // Eingebaute Default-Bias-Caption je Sprache (= generate_wide_appendix.ps1:61-64).
@@ -68,6 +144,9 @@ struct AppendixConfig {
 //   latency_ecdf.tex    (05, Config-Streuung-ECDF, aus surf_rows) ·
 //   exchange_forest.tex (04, Forest-Plot der Austauschbarkeit, aus exch_aggs/counts) ·
 //   observer_detail.tex (05, INC-4 Per-Achsen-Observer-Detail stat_<achse>_<feld>, aus full_rows)
+// PLUS additiv (2026-08-03) das VOLLE Achsen-Inventar aus den drei generierten
+// Registry-XML, sofern die Pfade gesetzt sind:
+//   axis_inventory.tex  (Organ-Slots T00-T17 + System-Realm + Mess-Realm)
 // HONEST-EMPTY: liefert ein Darstellungs-Writer status_empty_input (n/a-Daten), wird
 // die betreffende Datei bewusst NICHT geschrieben — das ist KEIN Facade-Fehler (die 12
 // Kern-.tex bleiben unberührt). Die 12 Kern-.tex sind byte-identisch zu den bisherigen

@@ -4,13 +4,258 @@
 #include "csv_to_latex.hpp"
 #include "diagram_generator.hpp"
 
+#include <algorithm>
+#include <fstream>
 #include <iostream>
+#include <iterator>
 #include <system_error>
 
 namespace comdare::da::appendix_generator {
 
 namespace c2l = comdare::da::csv_to_latex;
 namespace dg  = comdare::da::diagram_generator;
+
+namespace {
+
+// ── Minimaler, hermetischer XML-Attribut-Scanner ──────────────────────────────
+// Die drei Registry-XML sind GENERIERT (compile-time-Reflektion) und tragen eine
+// feste, attribut-getriebene Gestalt. Statt einer Fremdbibliothek liest dieser
+// Scanner Tag-Namen und Attribute und ueberspringt Kommentare/Deklarationen. Er
+// rekonstruiert bewusst KEINEN Baum: die Eltern-Bezuege stehen als Attribute in
+// den Dateien selbst (parent=...), sind also nicht aus der Verschachtelung zu raten.
+struct XmlTag {
+    std::string                                      name;
+    std::vector<std::pair<std::string, std::string>> attrs;
+};
+
+[[nodiscard]] bool is_name_char(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-' ||
+           c == ':';
+}
+
+[[nodiscard]] std::string attr_of(XmlTag const& t, std::string_view key) {
+    auto const it = std::find_if(t.attrs.begin(), t.attrs.end(), [key](auto const& kv) { return kv.first == key; });
+    return it == t.attrs.end() ? std::string{} : it->second;
+}
+
+// Zerlegt den gesamten Text in die Folge der OEFFNENDEN (bzw. leeren) Tags.
+// Schliessende Tags, Kommentare, Prolog und Doctype werden uebersprungen.
+[[nodiscard]] std::vector<XmlTag> scan_xml_tags(std::string const& text) {
+    std::vector<XmlTag> tags;
+    std::size_t         i = 0;
+    while (i < text.size()) {
+        auto const lt = text.find('<', i);
+        if (lt == std::string::npos) break;
+        i = lt + 1;
+        if (i >= text.size()) break;
+        if (text.compare(i, 3, "!--") == 0) { // Kommentar: bis "-->" ueberspringen
+            auto const end = text.find("-->", i + 3);
+            i              = (end == std::string::npos) ? text.size() : end + 3;
+            continue;
+        }
+        if (text[i] == '/' || text[i] == '?' || text[i] == '!') { // schliessend / Prolog / Doctype
+            auto const end = text.find('>', i);
+            i              = (end == std::string::npos) ? text.size() : end + 1;
+            continue;
+        }
+        XmlTag tag;
+        while (i < text.size() && is_name_char(text[i])) tag.name += text[i++];
+        if (tag.name.empty()) continue;
+        // Attribute bis '>' bzw. '/>'.
+        while (i < text.size() && text[i] != '>') {
+            if (static_cast<unsigned char>(text[i]) <= ' ' || text[i] == '/') {
+                ++i;
+                continue;
+            }
+            std::string key;
+            while (i < text.size() && is_name_char(text[i])) key += text[i++];
+            if (key.empty()) { // unerwartetes Zeichen: nicht raten, weiterschieben
+                ++i;
+                continue;
+            }
+            while (i < text.size() && static_cast<unsigned char>(text[i]) <= ' ') ++i;
+            if (i >= text.size() || text[i] != '=') continue; // Attribut ohne Wert: ignorieren
+            ++i;
+            while (i < text.size() && static_cast<unsigned char>(text[i]) <= ' ') ++i;
+            if (i >= text.size() || (text[i] != '"' && text[i] != '\'')) continue;
+            char const   quote = text[i++];
+            std::string  value;
+            while (i < text.size() && text[i] != quote) value += text[i++];
+            if (i < text.size()) ++i; // schliessendes Anfuehrungszeichen
+            tag.attrs.emplace_back(std::move(key), std::move(value));
+        }
+        if (i < text.size()) ++i; // '>'
+        tags.push_back(std::move(tag));
+    }
+    return tags;
+}
+
+[[nodiscard]] RegistrySubAxis sub_axis_from(XmlTag const& t, bool is_group) {
+    RegistrySubAxis s;
+    s.id            = attr_of(t, "id");
+    s.parent        = attr_of(t, "parent");
+    s.stage         = attr_of(t, "stage");
+    s.value_type    = attr_of(t, "value_type");
+    s.option_source = attr_of(t, "option_source");
+    s.is_group      = is_group;
+    return s;
+}
+
+// LaTeX-Maskierung der Registry-Bezeichner. Sie bestehen aus [a-z0-9_]; der
+// Unterstrich ist das einzige Sonderzeichen, das real vorkommt — er wird mit einem
+// Umbruchpunkt versehen, damit lange Kennungen die Tabellenspalte nicht sprengen.
+[[nodiscard]] std::string tex_id(std::string_view s) {
+    std::string out;
+    out.reserve(s.size() + 16);
+    for (char const c : s) {
+        switch (c) {
+            case '_': out += "\\_\\allowbreak{}"; break;
+            case '&': out += "\\&"; break;
+            case '%': out += "\\%"; break;
+            case '#': out += "\\#"; break;
+            case '$': out += "\\$"; break;
+            case '{': out += "\\{"; break;
+            case '}': out += "\\}"; break;
+            case '\\': out += "\\textbackslash{}"; break;
+            default: out += c; break;
+        }
+    }
+    return out;
+}
+
+[[nodiscard]] std::string realm_label(AxisRealm r, bool de) {
+    switch (r) {
+        case AxisRealm::organ: return de ? "Organ" : "organ";
+        case AxisRealm::system: return de ? "System" : "system";
+        case AxisRealm::measurement: return de ? "Messen" : "measurement";
+    }
+    return de ? "unbekannt" : "unknown";
+}
+
+} // namespace
+
+int parse_axis_registry(std::filesystem::path const& xml, AxisRealm realm, AxisRegistry& out) {
+    out = AxisRegistry{};
+    out.realm = realm;
+    if (xml.empty()) return status_io_error;
+    std::ifstream in(xml, std::ios::binary);
+    if (!in) return status_io_error;
+    std::string const text((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    if (text.empty()) return status_parse_error;
+
+    bool in_dynamic_dims = false;
+    for (auto const& tag : scan_xml_tags(text)) {
+        if (tag.name == "axis" || tag.name == "system_complex_axis") {
+            RegistryAxis a;
+            a.realm              = realm;
+            a.id                 = attr_of(tag, "id");
+            a.slot               = attr_of(tag, "slot");
+            a.category           = attr_of(tag, "category");
+            a.stage              = attr_of(tag, "stage");
+            a.binary_id          = attr_of(tag, "binary_id");
+            a.is_complex_bracket = (tag.name == "system_complex_axis");
+            if (auto const bc = attr_of(tag, "baustein_count"); !bc.empty()) {
+                a.baustein_count     = static_cast<std::size_t>(std::stoul(bc));
+                a.has_baustein_count = true;
+            }
+            if (a.id.empty()) return status_parse_error; // generierte Registry ohne id => kaputt
+            out.axes.push_back(std::move(a));
+            in_dynamic_dims = false;
+        } else if (tag.name == "sub_axis" || tag.name == "sub_axis_group") {
+            if (out.axes.empty()) return status_parse_error; // Unter-Achse ohne Achse
+            out.axes.back().sub_axes.push_back(sub_axis_from(tag, tag.name == "sub_axis_group"));
+        } else if (tag.name == "dynamic_dims") {
+            in_dynamic_dims = true;
+        } else if (tag.name == "dim" && in_dynamic_dims) {
+            RegistrySubAxis d;
+            d.id         = attr_of(tag, "id");
+            d.parent     = attr_of(tag, "source");
+            d.stage      = attr_of(tag, "stage");
+            d.value_type = attr_of(tag, "value_type");
+            out.dynamic_dims.push_back(std::move(d));
+        }
+    }
+    return out.axes.empty() ? status_parse_error : status_ok;
+}
+
+int write_axis_inventory_table(std::filesystem::path const& out, std::span<AxisRegistry const> registries,
+                               std::string const& lang) {
+    std::size_t axis_total = 0;
+    for (auto const& r : registries) axis_total += r.axes.size();
+    if (axis_total == 0) return status_empty_input; // honest-empty: KEINE Datei, kein Phantom
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    bool const de = (lang == "de");
+
+    f << "% AUTO-GENERATED durch appendix_generator::write_axis_inventory_table (lang=" << lang << ")\n";
+    f << "% Quelle: die drei GENERIERTEN Achsen-Registries des Codes (Organ/System/Messen).\n";
+    f << "% Keine handgepflegte Achsen-Liste: die Registries entstehen per compile-time-Reflektion.\n";
+
+    std::string const cap = de ? "Achsen-Inventar aus den drei generierten Registries "
+                                 "(Organ-, System- und Mess-Realm)"
+                               : "Axis inventory from the three generated registries "
+                                 "(organ, system and measurement realm)";
+    std::string const colhead = de ? "Realm \\& Slot & Achse & Stufe / \\texttt{binary\\_id} & Bausteine & "
+                                     "Unter-Achsen \\\\"
+                                   : "Realm \\& slot & Axis & Stage / \\texttt{binary\\_id} & Blocks & Sub-axes \\\\";
+
+    f << "\\begin{scriptsize}\n";
+    f << "\\begin{longtable}{@{}>{\\raggedright\\arraybackslash}p{1.8cm} >{\\raggedright\\arraybackslash}p{3.0cm} "
+      << ">{\\raggedright\\arraybackslash}p{2.6cm} r >{\\raggedright\\arraybackslash}p{5.0cm}@{}}\n";
+    f << "\\caption{" << cap << "}\\label{tab:axis-inventory}\\\\\n";
+    f << "\\toprule\n" << colhead << "\n\\midrule\n\\endfirsthead\n";
+    f << "\\multicolumn{5}{c}{\\tablename\\ \\thetable{} -- " << (de ? "Fortsetzung" : "continued")
+      << "}\\\\\n\\toprule\n"
+      << colhead << "\n\\midrule\n\\endhead\n";
+    f << "\\midrule\n\\multicolumn{5}{r}{" << (de ? "Fortsetzung n\\\"achste Seite" : "continued on next page")
+      << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
+
+    for (auto const& reg : registries) {
+        for (auto const& a : reg.axes) {
+            f << realm_label(a.realm, de);
+            if (!a.slot.empty()) f << " " << tex_id(a.slot);
+            f << " & \\texttt{" << tex_id(a.id) << "}";
+            if (a.is_complex_bracket) f << " " << (de ? "(Klammer)" : "(bracket)");
+            f << " & ";
+            if (!a.stage.empty()) f << "\\texttt{" << tex_id(a.stage) << "}";
+            if (!a.stage.empty() && !a.binary_id.empty()) f << " / ";
+            if (!a.binary_id.empty()) f << "\\texttt{" << tex_id(a.binary_id) << "}";
+            f << " & ";
+            if (a.has_baustein_count) f << a.baustein_count;
+            else
+                f << "--";
+            f << " & ";
+            bool first = true;
+            for (auto const& s : a.sub_axes) {
+                if (s.id.empty()) continue;
+                if (!first) f << ", ";
+                first = false;
+                f << "\\texttt{" << tex_id(s.id) << "}";
+                if (s.is_group) f << (de ? " (Gruppe)" : " (group)");
+            }
+            if (first) f << "--";
+            f << " \\\\\n";
+        }
+    }
+    f << "\\end{longtable}\n\\end{scriptsize}\n";
+
+    // Sweep-Dimensionen des Mess-Realms als Legende UNTER dem Float (Legende-unter-Float-Regel).
+    std::vector<std::string> dims;
+    for (auto const& reg : registries)
+        for (auto const& d : reg.dynamic_dims)
+            if (!d.id.empty()) dims.push_back(d.id);
+    if (!dims.empty()) {
+        f << "\n\\emph{" << (de ? "Sweep-Dimensionen des Mess-Realms" : "Sweep dimensions of the measurement realm")
+          << ":} ";
+        for (std::size_t i = 0; i < dims.size(); ++i) {
+            if (i) f << ", ";
+            f << "\\texttt{" << tex_id(dims[i]) << "}";
+        }
+        f << ".\n";
+    }
+    return status_ok;
+}
 
 std::string default_bias_caption(std::string const& lang) {
     // Wortgleich zu generate_wide_appendix.ps1:61-64 (die Caption wird ROH übergeben;
@@ -46,6 +291,34 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
     }
     std::vector<c2l::SiblingPairCount> exch_counts;
     auto const                         exch_aggs = c2l::aggregate_exchange(full_rows, exch_counts);
+
+    // (4) ADDITIV (2026-08-03): das VOLLE Achsen-Inventar aus den drei generierten Registries.
+    // EINMAL geparst und ueber alle Sprachen wiederverwendet (dieselbe Disziplin wie oben).
+    // Ein NICHT gesetzter Pfad wird still ausgelassen; eine gesetzte, aber unlesbare oder
+    // kaputte Datei ist ein ECHTER Parse-Fehler (kein stilles Degradieren auf 4 Achsen —
+    // genau dieses stille Degradieren war die Achsen-Luecke).
+    std::vector<AxisRegistry> registries;
+    {
+        auto const load = [&registries](std::filesystem::path const& p, AxisRealm realm) -> int {
+            if (p.empty()) return status_ok; // nicht angefordert
+            AxisRegistry reg;
+            if (int const rc = parse_axis_registry(p, realm, reg); rc != status_ok) return rc;
+            registries.push_back(std::move(reg));
+            return status_ok;
+        };
+        if (int const rc = load(cfg.organ_axis_registry, AxisRealm::organ); rc != status_ok) {
+            std::cerr << "appendix-generator: parse_axis_registry (organ) failed " << rc << "\n";
+            return status_parse_error;
+        }
+        if (int const rc = load(cfg.system_axis_registry, AxisRealm::system); rc != status_ok) {
+            std::cerr << "appendix-generator: parse_axis_registry (system) failed " << rc << "\n";
+            return status_parse_error;
+        }
+        if (int const rc = load(cfg.measurement_axis_registry, AxisRealm::measurement); rc != status_ok) {
+            std::cerr << "appendix-generator: parse_axis_registry (measurement) failed " << rc << "\n";
+            return status_parse_error;
+        }
+    }
 
     // ── Je Sprache: 12 .tex nach <out_root>/<lang>/tabellen/ (bias 1 + surface 6 + exchange 4 + limitierung 1) ──
     for (auto const& lang : cfg.langs) {
@@ -144,8 +417,17 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             return status_io_error;
         }
 
+        // (5f) ADDITIV (2026-08-03): Achsen-Inventar aus den DENSELBEN geparsten Registries.
+        // HONEST-EMPTY: keine Registry angefordert ⇒ status_empty_input ⇒ KEINE Datei, kein Fehler.
+        if (int const rc = write_axis_inventory_table(out_dir / "axis_inventory.tex", registries, lang);
+            rc != status_ok && rc != status_empty_input) {
+            std::cerr << "appendix-generator: write_axis_inventory_table (" << lang << ") failed " << rc << "\n";
+            return status_io_error;
+        }
+
         std::cout << "appendix-generator [" << lang
-                  << "]: 12 Kern- + 5 Darstellungs-.tex (honest-empty ⇒ ggf. ausgelassen) -> " << out_dir << "\n";
+                  << "]: 12 Kern- + 5 Darstellungs-.tex + Achsen-Inventar (honest-empty ⇒ ggf. ausgelassen) -> "
+                  << out_dir << "\n";
     }
     return status_ok;
 }

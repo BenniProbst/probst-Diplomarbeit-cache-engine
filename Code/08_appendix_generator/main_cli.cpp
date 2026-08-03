@@ -33,11 +33,15 @@ int main(int argc, char* argv[]) {
         std::cerr << "Usage: appendix-generator <wide.csv> <out_root> [--langs=de,en]\n"
                   << "                          [--bias-label=<label>]\n"
                   << "                          [--bias-caption-de=<text>] [--bias-caption-en=<text>]\n"
+                  << "                          [--organ-registry=<xml>] [--system-registry=<xml>]\n"
+                  << "                          [--measurement-registry=<xml>]\n"
                   << "  Schreibt je Sprache <out_root>/<lang>/tabellen/:\n"
                   << "    bias_matrix_table.tex, lc_surface_<z>.tex (6x),\n"
                   << "    ld_exchange_<achse>.tex (4x), le_limitierung.tex,\n"
                   << "    seg_attribution.tex, latency_range.tex, latency_ecdf.tex,\n"
-                  << "    exchange_forest.tex (honest-empty ⇒ ggf. ausgelassen)\n"
+                  << "    exchange_forest.tex (honest-empty ⇒ ggf. ausgelassen),\n"
+                  << "    axis_inventory.tex (nur mit mindestens einer --*-registry;\n"
+                  << "      Quelle sind die GENERIERTEN Achsen-Registries des Codes)\n"
                   << "  In-Process (linkt comdare::csv_to_latex + comdare::diagram_generator);\n"
                   << "  kein .exe-Spawn, cross-platform. Ersetzt generate_wide_appendix.ps1.\n";
         return 1;
@@ -56,6 +60,12 @@ int main(int argc, char* argv[]) {
             cfg.bias_caption_by_lang["de"] = a.substr(18);
         else if (a.rfind("--bias-caption-en=", 0) == 0)
             cfg.bias_caption_by_lang["en"] = a.substr(18);
+        else if (a.rfind("--organ-registry=", 0) == 0)
+            cfg.organ_axis_registry = a.substr(17);
+        else if (a.rfind("--system-registry=", 0) == 0)
+            cfg.system_axis_registry = a.substr(18);
+        else if (a.rfind("--measurement-registry=", 0) == 0)
+            cfg.measurement_axis_registry = a.substr(23);
         else {
             std::cerr << "appendix-generator: unbekanntes Argument '" << a << "'\n";
             return 1;
