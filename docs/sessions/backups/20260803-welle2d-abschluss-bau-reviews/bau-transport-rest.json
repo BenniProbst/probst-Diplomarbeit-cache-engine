@@ -1,0 +1,81 @@
+{
+ "key": "w2d-transport-bestandslog-rest",
+ "commits": [
+  "3612521e fix(bestandslog): CX-W2 -- Slice-Fenster als Spanne statt verlustbehafteter (front,size)",
+  "220a8f8b fix(bestandslog): CX-W1 -- Mess-Pfad-Faenger schliesst unbestaetigten Bestand aus",
+  "07dde230 fix(bestandslog): CX-W4 -- Entfern-Fehler von result.csv.stamp nicht mehr verschluckt",
+  "(unveraendert uebernommen, NICHT angefasst) e073897b CX-W3 / d0b6f40a CX-W8"
+ ],
+ "dateien": [
+  "/home/comdare/wt-w2d-Transport-Bestandslog/libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/libs/cache_engine/builder/bestandslog/planer_driven_build.hpp",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/libs/cache_engine/builder/bestandslog/builder_registration.hpp",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/tests/unit/test_tp1_planer_filter_iterator.cpp",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/libs/cache_engine/builder/artifact_transport/artifact_cache.hpp (aus e073897b, unveraendert)",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/libs/cache_engine/builder/build_orchestrator/build_orchestrator.hpp (aus e073897b, unveraendert)",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/libs/cache_engine/builder/bestandslog/reservation_lifecycle.hpp (aus d0b6f40a, unveraendert)",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/tests/unit/test_g3_artifact_cache_transport.cpp (aus e073897b, unveraendert)",
+  "/home/comdare/wt-w2d-Transport-Bestandslog/tests/unit/test_g3_reservation_lifecycle.cpp (aus d0b6f40a, unveraendert)"
+ ],
+ "befund_status": [
+  {
+   "id": "CX-W1",
+   "status": "GEFIXT",
+   "wie": "Commit 220a8f8b. Neue Naht mess_pfad_synchron_push (cache_engine_builder_iterator.hpp:908) ersetzt den nur-loggenden try/catch an der Mess-Pfad-Push-Stelle (jetzt :1763-1770). Wirft cache_push, wird nach der klassifizierten MISST-WEITER-Zeile lager->discard_fresh_with_pfad_prefix({store-relativer bin_dir-Praefix}) gerufen und die Zahl der verworfenen Eintraege beziffert -- exakt das Gegenstueck zum Pump-Zweig (failed_dirs). Ohne aktives Bestandslog wird nullptr uebergeben (reines Loggen, Ist-Verhalten). Zusaetzlich EINE Form-Quelle des Eintragspfades: bestand_eintragspfad(p, output_dir) (:890) wird jetzt von observe-Hook, Pump-Ausschluss UND Mess-Pfad-Ausschluss benutzt (vorher drei Kopien; discard vergleicht MIT Trenner, jede Byte-Abweichung haette einen unbestaetigten Eintrag stehen lassen).",
+   "negativprobe": "Fall (8) in test_tp1_planer_filter_iterator.cpp: zwei per observe() vorgemerkte Binaries (sX werfende CachePushFn, sY gelingende), danach flush. VOR Fix (ausschliessen()-Aufrufe entfernt) literal rot: '[ERR] (8) der Ausschluss ist beziffert (Nie-stumm)' / '[ERR] (8) genau EIN Eintrag bleibt vorgemerkt = 2  (erwartet: 1)' / '[ERR] (8) der flush hat geschrieben' / '[ERR] (8) CX-W1: die Binary mit geworfenem Push steht NICHT im geteilten Dokument' / 'TP1_ANKER_FAIL'. NACH Fix gruen: '[OK] (8) CX-W1: die Binary mit geworfenem Push steht NICHT im geteilten Dokument' + '[OK] (8) die Binary mit gelungenem Push steht sehr wohl drin (kein Fehl-Ausschluss)' / 'TP1_ANKER_OK'."
+  },
+  {
+   "id": "CX-W2",
+   "status": "GEFIXT",
+   "wie": "Commit 3612521e. Neue reine Funktion bestandslog::slice_window_bounds(view_indices) in planer_driven_build.hpp: begin=min, count=SPANNE (max-min+1) statt .front()/.size(). Aufrufstelle cache_engine_builder_iterator.hpp:983-997. Das gespeicherte Intervall UMFASST damit immer die reale (evtl. gappy) Menge -> scope_covers_slice bejaht Deckung nur, wenn die uebernehmende Selektion jeden realen Index baut: NIE faelschlich released. Fuer zusammenhaengende 4096er-Slices byte-identisch zu (front,size) (bestehender Test (3) slice_count==8 bleibt gruen). Weicht die Spanne von der Kardinalitaet ab, sagt es eine geflushte [bestandslog] warn-Zeile (Nie-stumm; im Betrieb feuert sie nie). KEIN Wire-/syntax_version-Bump: Felder und Syntax unveraendert. Der falsche Kopfkommentar in builder_registration.hpp:318 ('STRENGER, nie laxer' -- galt fuer den alten Schreibweg NICHT) ist korrigiert und benennt den Verlust.",
+   "negativprobe": "Fall (7) in test_tp1_planer_filter_iterator.cpp. (7b) belegt den Verlust literal am Ist: '[OK] (7b) Beleg des Schreib-Verlusts: (0, size=2) HAETTE {0,1} faelschlich freigegeben' gegenueber '[OK] (7b) fremde Selektion {0,1} released das gappy Fenster {0,2} NICHT'. (7c) prueft den REALEN Schreibweg (run_planer_driven_provision mit gappy {0,2}); VOR Fix (alte front()/size()-Argumente wiederhergestellt) literal rot: '[ERR] (7c) slice_count == SPANNE 3 (nicht size 2) -- kein Schreib-Verlust = 2  (erwartet: 3)' / 'TP1_ANKER_FAIL'. NACH Fix: '[OK] (7c) slice_count == SPANNE 3 (nicht size 2) -- kein Schreib-Verlust = 3' / 'TP1_ANKER_OK'."
+  },
+  {
+   "id": "CX-W3",
+   "status": "SCHON-ERLEDIGT",
+   "wie": "Vorlauf-Commit e073897b (fix(artifact-transport): CX-W3 -- fehlende lokale perm.dll.version sichtbar machen), artifact_cache.hpp + build_orchestrator.hpp. Von mir NICHT angefasst; Inhalt und Test laufen im Vollbau + Doppellauf mitgruen.",
+   "negativprobe": "Im Commit dokumentiert: TEST(G3ArtifactCacheTransport, PushWirftWennLokaleVersionMarkeFehlt) in tests/unit/test_g3_artifact_cache_transport.cpp (+42 Zeilen)."
+  },
+  {
+   "id": "CX-W4",
+   "status": "GEFIXT",
+   "wie": "Commit 07dde230, cache_engine_builder_iterator.hpp:1559-1618. remove(result.csv.stamp) laeuft jetzt mit EIGENEM error_code, und stamp_bleibt = (stamp_ec gesetzt) || exists(stamp) urteilt ueber ec UND Ist (remove setzt bei blosser Nicht-Existenz keinen Fehler; scheitert exists selbst, entscheidet der remove-Fehler). Bleibt der Stamp liegen, ist die Invalidierung gescheitert -> die per-Binary-Ablage wird NICHT ersetzt (kein rename nach .stale, keine neue result.csv), damit ein Alt-Stamp keine nicht_gebaut-Marker-Zeile als Messstand zertifizieren kann; stattdessen eine klassifizierte Zeile 'binary_id=... result.csv.stamp NICHT entfernt (<ec.message()>) in <dir> -- die per-Binary-Ablage bleibt daher UNVERAENDERT ... MUSS von Hand geraeumt werden'. Die Aussage 'der Stamp ist entfernt ...' faellt nur noch im belegten Fall. Der Befund bleibt sichtbar: die nicht_gebaut-Zeile reist unveraendert in die globale CSV (r9.csv_rows == 1, BuildCellStatus::NichtGebaut geprueft).",
+   "negativprobe": "Fall (9) in test_tp1_planer_filter_iterator.cpp: result.csv.stamp als NICHT-LEERES Verzeichnis -> remove scheitert deterministisch (ENOTEMPTY, auch als root, kein chmod/ro-Mount noetig). VOR Fix (stamp_bleibt hart false) literal rot: '[ERR] (9) CX-W4: der Entfern-Fehler ist klassifiziert sichtbar' / '[ERR] (9) die Marker-Zeile wurde NICHT unter den Alt-Stamp geschrieben' / '[ERR] (9) der Alt-Stand blieb unangetastet (Messdaten nie loeschen)' / '[ERR] (9) kein result.csv.stale -- die Ablage wurde gar nicht erst angefasst' / 'TP1_ANKER_FAIL'. NACH Fix alle vier '[OK]' + 'TP1_ANKER_OK'."
+  },
+  {
+   "id": "CX-W8",
+   "status": "SCHON-ERLEDIGT",
+   "wie": "Vorlauf-Commit d0b6f40a (fix(bestandslog): CX-W8 -- inf/infinity ist keine brauchbare ETA (isfinite-Wache)), reservation_lifecycle.hpp. Von mir NICHT angefasst; im Vollbau + Doppellauf mitgruen.",
+   "negativprobe": "Im Commit dokumentiert: TEST(G3ReservationLifecycle, B3InfIstKeineBrauchbareEta) in tests/unit/test_g3_reservation_lifecycle.cpp (+24 Zeilen); 'nan' faellt weiterhin korrekt auf den pro-forma-Fallback."
+  }
+ ],
+ "beweise_literal": [
+  "NEGATIV-PROBE CX-W1 (Ausschluss entfernt) -> EXIT=1 / '  [ERR] (8) der Ausschluss ist beziffert (Nie-stumm)' / '  [ERR] (8) genau EIN Eintrag bleibt vorgemerkt = 2  (erwartet: 1)' / '  [ERR] (8) der flush hat geschrieben' / '  [ERR] (8) CX-W1: die Binary mit geworfenem Push steht NICHT im geteilten Dokument' / 'TP1_ANKER_FAIL'",
+  "NEGATIV-PROBE CX-W2 (front()/size() zurueck) -> EXIT=1 / '  [ERR] (7c) slice_count == SPANNE 3 (nicht size 2) -- kein Schreib-Verlust = 2  (erwartet: 3)' / 'TP1_ANKER_FAIL'",
+  "NEGATIV-PROBE CX-W4 (remove ungeprueft) -> EXIT=1 / '  [ERR] (9) CX-W4: der Entfern-Fehler ist klassifiziert sichtbar' / '  [ERR] (9) die Marker-Zeile wurde NICHT unter den Alt-Stamp geschrieben' / '  [ERR] (9) der Alt-Stand blieb unangetastet (Messdaten nie loeschen)' / '  [ERR] (9) kein result.csv.stale -- die Ablage wurde gar nicht erst angefasst' / 'TP1_ANKER_FAIL'",
+  "FIX ZURUECK: Kontroll-Lauf -> EXIT=0 / 'TP1_ANKER_OK'",
+  "Anker-Test nach allen drei Fixes (Auszug): '[OK] (7c) slice_count == SPANNE 3 (nicht size 2) -- kein Schreib-Verlust = 3' / '[OK] (8) CX-W1: die Binary mit geworfenem Push steht NICHT im geteilten Dokument' / '[OK] (8) die Binary mit gelungenem Push steht sehr wohl drin (kein Fehl-Ausschluss)' / '[OK] (9) CX-W4: der Entfern-Fehler ist klassifiziert sichtbar' / '[OK] (9) die Marker-Zeile wurde NICHT unter den Alt-Stamp geschrieben' / 'TP1_ANKER_OK'",
+  "BAU-UMGEBUNG (frisches build-Dir /home/comdare/wt-w2d-Transport-Bestandslog/build-w2d, 2-Phasen-Configure, Optionen aus build-v6 + COMDARE_V32_ENABLE=ON): 'CFG1_RC=0' / 'GEN1_RC=0' (Ziel comdare_limits_generated_source_catalog) / 'ALL1_RC=0' / 'CFG2_RC=0' / 2. Pass literal: '163:-- R5.G: Auto-Permutations-Skalierung ACTIVE (48 auto-gebaute DLLs).' / 'ALL2_RC=0' / EXCLUDE_FROM_ALL-Ziele 'EXCL_RC=0'",
+  "Vollbau NACH allen Commits: 'ALL_RC=0' (ninja all, letzte Zeile '[88/89] Linking CXX executable tests/unit/test_lazy_adhoc_source_gen') und 'EXCL_RC=0' (comdare_axis_registry_gen comdare_system_axis_registry_gen comdare_measurement_axis_registry_gen test_profile_roundtrip -> 'ninja: no work to do.')",
+  "ctest -N: 'Total Tests: 329' == Basis-Referenz ce dev 7150cc51 (329). Namens-Diff LEER by construction: 'git diff --name-only 7150cc51..HEAD -- *CMakeLists.txt' liefert 0 Dateien (keine Test-Registrierung hinzugefuegt/entfernt; die Faelle (7)/(8)/(9) haengen an der BESTEHENDEN TU test_tp1_planer_filter_iterator).",
+  "DOPPELLAUF (2x ctest -j 8 nach dem finalen Vollbau): Lauf 1 '100% tests passed, 0 tests failed out of 329'; Lauf 2 '100% tests passed, 0 tests failed out of 329'",
+  "cf22 ueber ALLE im Branch geaenderten C++-Dateien (9 Stueck, /home/comdare/tools/cf22/usr/bin/clang-format-22 --dry-run -Werror): 'CF22_ZEILEN=0' (Ausgabe leer)",
+  "ASCII-Selbstcheck: git diff 7150cc51..HEAD | grep -P '^\\+' | LC_ALL=C grep -cP '[^\\x00-\\x7F]' -> '0'",
+  "TABU-Diff-Check: 'git diff --name-only 7150cc51..HEAD | grep -E \"golden|permutation|\\.xml$|m3v2_study\" | wc -l' -> 0; 'git diff 7150cc51..HEAD | grep -c 56F1B721C72DC10E' -> 0. Der Branch-Diff beruehrt ausschliesslich 6 .hpp + 3 Test-.cpp.",
+  "FREEZE: 'git -C /home/comdare/wt-w2d-Transport-Bestandslog status --short' -> leer. HEAD=07dde230 auf branch w2d-Transport-Bestandslog; e073897b und d0b6f40a unveraendert als Vorfahren im Log ('git log --oneline -6' zeigt 07dde230 / 220a8f8b / 3612521e / e073897b / d0b6f40a / 7150cc51). NICHT gepusht.",
+  "diff --stat 7150cc51..HEAD: '9 files changed, 498 insertions(+), 72 deletions(-)' -- davon meine 3 Commits: cache_engine_builder_iterator.hpp 210, planer_driven_build.hpp 34, builder_registration.hpp 20, test_tp1_planer_filter_iterator.cpp 187"
+ ],
+ "ledger_texte": [
+  "TP1FK1-B2-REST / CX-W1 (BLOCK, 220a8f8b): Der Bestandslog-Ausschluss bei Push-Fehler existierte NUR im Pump-Zweig; der synchrone Mess-Pfad-Faenger loggte 'MISST WEITER' und das unbedingte bestandslog_flush() registrierte den unbestaetigten Bestand doch. Neu ist mess_pfad_synchron_push das fehlende Gegenstueck: wirft cache_push, wird der store-relative Praefix dieser Binary aus fresh_ verworfen und beziffert -- MESSEN WEITER bleibt, der Skip-Anspruch des Folgelaufs entsteht nicht. Der Eintragspfad hat jetzt EINE Form-Quelle (bestand_eintragspfad), die observe, Pump-Ausschluss und Mess-Ausschluss teilen; die drei Kopien waren das Divergenz-Risiko, an dem der Praefix-Vergleich (MIT Trenner) haengt.",
+  "TP1FK1-B1-REST / CX-W2 (BLOCK, 3612521e): Die Slice-Identitaet wurde als (front(), size()) geschrieben und war fuer luecken-behaftete Fenster verlustbehaftet -- {0,2} landete als Intervall {0,1}, eine fremde Selektion {0,1} enteignete den Claim und Index 2 baute niemand. Jetzt legt slice_window_bounds die SPANNE (min, max-min+1) ab: das Intervall umfasst die reale Menge, freigegeben wird erst bei voller Deckung, nie faelschlich released. Fuer die zusammenhaengenden 4096er-Slices byte-identisch; eine Abweichung meldet eine geflushte Zeile. KEIN syntax_version-Bump. OFFEN als Owner-Vorlage: eine mengen-genaue Reservierung (auch der eigene gappy Claim wieder reapbar) braucht ein weiteres Draht-Feld.",
+  "TP1FK1-B10-REST / CX-W4 (MITTEL, 07dde230): Das Entfernen von result.csv.stamp im Bau-Fehler-Zweig lief ungeprueft (wiederverwendeter error_code, Rueckgabewert verworfen), waehrend die Diagnose die Entfernung behauptete. Geurteilt wird jetzt ueber eigenen error_code UND Ist; bleibt der Stamp liegen, ist die Invalidierung gescheitert und die per-Binary-Ablage wird gar nicht erst ersetzt -- ein Alt-Stamp darf keine nicht_gebaut-Marker-Zeile als Messstand zertifizieren. Der Fehlschlag ist klassifiziert beziffert und verlangt Hand-Bereinigung; der Befund selbst reist unveraendert als Marker-Zeile in die globale CSV."
+ ],
+ "offene_punkte": [
+  "OWNER-VORLAGE (CX-W2, gemeldet statt genommen): Eine MENGEN-genaue Slice-Identitaet braucht ein zusaetzliches Draht-Feld im Bestandslog-Dokument und damit einen syntax_version-Bump -- Stempel-/Wire-Fenster ist Owner-Entscheid. Implementiert ist die konservativ-korrekte Spannen-Form ohne jede Draht-Aenderung.",
+  "Bewusst offen gelassene Gegenrichtung von CX-W2: ein Lauf mit der IDENTISCHEN luecken-behafteten Selektion kann sein eigenes Fenster weiterhin nicht reapen (die Spanne deckt er nicht), der Claim laeuft dann in seine pro-forma-Frist. Das ist die geforderte konservative Verneinung ('nie faelschlich released') und betrifft nur gappy Selektionen -- der Betrieb schneidet dichte 4096er-Slices, dort ist das Verhalten byte-identisch zum Ist.",
+  "Entscheidung in CX-W4, die ein Reviewer sehen soll: schlaegt das Entfernen des Stamps fehl, wird die per-Binary-Ablage NICHT mehr ersetzt (kein rename nach result.csv.stale, keine neue result.csv). Das ist strenger als 'nur die Meldung korrigieren' und folgt der write-ZULETZT-Disziplin (keine Daten unter eine Marke schreiben, die man nicht invalidieren konnte). Der Bau-Fehler bleibt in der globalen CSV sichtbar; der Ordner braucht Hand-Bereinigung.",
+  "NICHT gepusht (Kanon): 3 Commits liegen im Worktree /home/comdare/wt-w2d-Transport-Bestandslog auf branch w2d-Transport-Bestandslog, HEAD 07dde230, working tree SAUBER (Freeze).",
+  "Bau-Verzeichnis /home/comdare/wt-w2d-Transport-Bestandslog/build-w2d liegt IM Worktree, ist aber durch .gitignore ('build-*/') gedeckt -- git status bleibt leer. Das getrackte build/ (thesis_tiere) wurde nicht angefasst.",
+  "Der WIP-Patch /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/w2d-transport-wip-cx-w1-w2.patch wurde nur als Ideen-Referenz gelesen; das ausgelieferte Ergebnis ist neu geschrieben (LagerRunState*-Naht statt std::function, EINE Pfad-Form-Quelle fuer alle drei Leser, Fall (8) mit Gegenprobe 'gelungener Push wird NICHT enteignet', CX-W4 zusaetzlich mit Ablage-Schutz statt nur Meldungs-Korrektur)."
+ ]
+}
