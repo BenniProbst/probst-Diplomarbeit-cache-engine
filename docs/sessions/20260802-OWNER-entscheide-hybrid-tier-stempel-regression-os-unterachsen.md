@@ -169,3 +169,21 @@ Wellen-Zweitpass W1/2a/2c + Gesamt-Audit (8 Achsen) auf 7150cc51, existierende A
 wiederverwendet; Codex-Versuch mit hartem Zugriffstest, sonst Fable-Adversarial. (3) M3Dossier3 — Fable,
 read-only, M3-Ausfuehrungs-Dossier-Neubau (Fundstellen-Inventur, Literal-Neuzaehlung, M3a/M3b-Commit-Plan).
 Reihenfolge unveraendert bindend: 2d landen -> Q-M3-GATE -> A13-M3 -> M4 -> OD-10-RT.
+
+## Nachtrag 03.08. vormittags — Owner-Ruege Arbeitsweise (bindend)
+
+Owner (03.08., nach Duplikat-Vorfall und Einzel-Agent-Starts):
+> „Bitte halte dich in Zukunft strikt an die vereinbarte Claude code Arbeitsweise"
+
+Selbst-Audit des Managers (Verstoesse benannt, Memory B.3-Nachtrag 03.08. fixiert):
+(1) Duplikat-Ursache = Zustand nicht am Objekt rekonstruiert (A4) — laufende Workflows
+wegen fehlender Task-IDs als tot eingestuft, obwohl agent-Transkript-mtimes Aktivitaet
+zeigten. (2) A1-Kanal: Einzel-Agenten via Agent-Tool unter ultracode statt Workflow-Tool
+(M3Dossier3, W2dNachbesserung, M3DossierAudit); model:'opus' im Agent-Tool = Opus 4.8
+statt Opus 5; Review-Treiber im wiederverwendeten review-neulauf-Skript liefen als Opus
+statt Fable. (3) Ein-Agent-Regel ce-Worktree kurz verletzt (Schaden null, verifiziert).
+DURCHSETZUNG AB SOFORT: Workflow-Tool fuer jede substanzielle Aufgabe; Modell je Phase
+explizit (Fable fuer Planung/Design/Review/Synthese, claude-opus-5 fuer Struktur, opus
+fuer leicht/Infra); Neustarts nur nach positivem Todes-Beweis; laufende Rest-Agenten
+(W2dNachbesserung=Runbook-Fall A1-konform Opus 4.8, M3DossierAudit=Fable) laufen aus,
+ihre Ergebnisse erhalten den Truth-Check.
