@@ -53,3 +53,22 @@ AGENT-HINWEIS fuer Wiederaufnahme: moeglicher Transpositionsfehler im ABGLEICH-D
 dort 'A2 -> E-24', bindend laut Lage-Dossier GATE 5 + M3-Dossier §3 ist 'W10 -> E-24 -> A2-Eichung
 EINMALIG ZULETZT'; bei Wiederaufnahme korrigieren. Ausserdem: DV-3-Fundstellen nach 2d verschoben
 (axis_variant_version_table.hpp :236-240/:270 — im M3-Fenster neu greppen).
+
+## 7. NACHTRAG 2 (Owner: "Bitte pausiere die workflows") — beide Rest-Workflows GESTOPPT
+
+- **wf_66ac7530 (Design-Nachtraege) gestoppt.** Fertig: Kartierung + E07-Neufassung (Results im Journal);
+  A9-Neufassung als Datei vorhanden aber OHNE Result (evtl. unvollstaendig — pruefen); E24/A8-Neufassungen
+  NICHT erstellt. ALLE Scratchpad-Dateien (7, inkl. der vom Kartierungs-Agenten aus den Welle-3a-Backups
+  extrahierten Bestands-Dossiers) + Journal-Results gesichert in backups/20260803-design-nachtraege-teilstand/.
+  RESUME: Workflow({scriptPath: <session-workflows>/design-nachtraege-e24-a8-a9-e07-wf_66ac7530-01f.js,
+  resumeFromRunId: 'wf_66ac7530-01f'}) — Kartierung+E07 kommen aus dem Cache, E24/A8/A9 laufen neu.
+- **wf_dd7ac071 (Thesis-Anhaenge) gestoppt.** Fertig: Analyse (8-Stueck-Plan, gesichert als
+  thesis-analyse-8-stueck-plan.json) + Opus-5-Probe. Bau-Agent hatte NOCH NICHTS committet
+  (wt-thesis-anhaenge clean, kein Anhaenge-Commit). RESUME analog mit resumeFromRunId 'wf_dd7ac071-8b0'
+  (Analyse+Probe cached, Bau startet frisch).
+- **KORREKTUR E-02/thesis:** Das thesis-Ledger EXISTIERT bereits — thesis dev LOKAL = 13b1b5a (2 ungepushte
+  Commits vor origin b1ec837, vom 02.08. 16:28Z: a0ba339 legt architektur-ziele-offene-punkte-ledger.md an,
+  13b1b5a Audit-Kopfsatz). Mein Abgleich-Befund "kein thesis-Ledger" war ein Glob-Fehler (*LEDGER* vs.
+  kleingeschrieben). Bei Wiederaufnahme: e02-thesis-LEDGER.md-Entwurf gegen die EXISTIERENDE Datei MERGEN,
+  nicht neu anlegen; die 2 thesis-Commits mit der naechsten thesis-Landung pushen. e02-prtart-Entwurf bleibt
+  gueltig (prtart hat wirklich keins).
