@@ -1,0 +1,1 @@
+Ich reiche den Bericht nach — im geforderten Format, mit Zitat, Quelle, Entscheidung und Verdikt je Teilpunkt.

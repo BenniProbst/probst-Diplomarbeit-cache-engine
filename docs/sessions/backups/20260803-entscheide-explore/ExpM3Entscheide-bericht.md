@@ -1,0 +1,1 @@
+Zur Absicherung prüfe ich das Roh-Transkript direkt — hat das Kondensat Owner-Nachrichten ausgelassen?

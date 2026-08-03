@@ -1,0 +1,7 @@
+Auftrag abgeschlossen. Der Q-3-Report ist zugestellt und laut Manager unter `fb77fccd` persistiert.
+
+Zusammenfassung dessen, was die Suche erbracht hat:
+
+Die Klammerungs-Definition liegt an zwei Stellen im Ledger, getrennt nach Notations-Ebene. Die Typ-Klammern `[a,b,c]`/`[d,e,f]`/`[g,h,i]` entstehen in `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2339` (§42, Label "2026-07-19 nachts") und werden am Montag 20.07. in `:2970` (§56) als "drei Gruppen: [a,b,c]=Mess · [d,e,f]=System · [g,h,i]=Organ" kanonisiert, flankiert von `:2715` (§54-T1, "es gibt Achsen-TYPEN (Organ / System / Mess)"). Die geschachtelte Haupt[Unter]-Form entsteht in `:2347` (§42.b) als `d[d1,d2,d3]` und wird am Montag in `:3022` (§58) als Stempel-Form `Xa[Unter-k, Unter-l, Unter-m]` festgeschrieben, mit dem Owner-Wortlaut im Transkript `docs/sessions/backups/20260726-kontext-neugruendung-workflow/ergebnisse/37-transkript-24-a0020951.md:89`.
+
+Der für die Entscheidung nutzbare Befund war die Spannung, die dabei sichtbar wurde: §58 weist die Unter-Klammer dem Mess-CSV zu und hält die Binary-Stempel ausdrücklich Haupt-only, während S2 sie in den Binary-Stempel setzen will und §66-Nachtrag-3 (`:3412`) genau das fordert. Dass diese Spannung zusammen mit der Owner-Antwort die Stempel-End-Form entschieden hat, ist die Rückmeldung des Managers.
