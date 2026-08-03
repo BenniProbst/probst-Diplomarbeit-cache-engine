@@ -232,3 +232,14 @@ Als Memory fixiert: feedback_fehlende_entscheidung_erst_explore_alles_ist_entsch
 Umsetzung: OD-10-RT-Welle (wf_a34d53e2) + ExpPhasenCheck (Explore, Fahrplan-Vollstaendigkeit) laufen aus;
 Ergebnisse werden bei Eintreffen NUR gesichert-committet, NICHT verarbeitet. Keine neue Arbeit. Pause-Doc:
 20260803-PAUSE-abbruchsicher-a13-komplett-od10-laeuft.md.
+
+## Nachtrag 03.08. nachts (2) — Pause BEENDET, Durchzieh-Order (verbatim)
+
+> "Bitte gruende dich neu und fahre mit offener Arbeit fort, resume alle Agenten und Workflows, die Pause
+> ist beendet. Arbeite ALLE Phasen in einem Zug ab, ohne zu stoppen. Lies nach jedem Compact IMMER zuerst
+> die Claude Code Arbeitsweise, alle Plan- und Referenzdokumente ein. Zieh durch, viel Erfolg"
+
+Auslegung: Autonome Durchzieh-Strecke Phasen 1-5 inkl. Trigger (FAHRPLAN dc2d9cc6 + PhasenCheck-Nachtrag);
+Messung (Phase 6) bleibt per stehender Doktrin USER-GO-gated — dort wird gestoppt und das GO erbeten.
+COMPACT-REGEL (stehend): nach jedem Compact ZUERST Arbeitsweise-Memory + FAHRPLAN + Pause-/Lage-Anker +
+Ledger-Nachtraege einlesen, dann weiterarbeiten.
