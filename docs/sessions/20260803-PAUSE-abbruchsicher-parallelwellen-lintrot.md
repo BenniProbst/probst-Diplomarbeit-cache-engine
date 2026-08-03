@@ -71,4 +71,4 @@ EINMALIG ZULETZT'; bei Wiederaufnahme korrigieren. Ausserdem: DV-3-Fundstellen n
   13b1b5a Audit-Kopfsatz). Mein Abgleich-Befund "kein thesis-Ledger" war ein Glob-Fehler (*LEDGER* vs.
   kleingeschrieben). Bei Wiederaufnahme: e02-thesis-LEDGER.md-Entwurf gegen die EXISTIERENDE Datei MERGEN,
   nicht neu anlegen; die 2 thesis-Commits mit der naechsten thesis-Landung pushen. e02-prtart-Entwurf bleibt
-  gueltig (prtart hat wirklich keins).
+  gueltig (prtart hat wirklich keins). [KORREKTUR 04.08., D-08-Rest: FALSCH — auch prtart HATTE bereits ein Ledger (02.08., Welle 2b); der Entwurf war die additive Fortschreibung, gelandet als c6f0754.]
