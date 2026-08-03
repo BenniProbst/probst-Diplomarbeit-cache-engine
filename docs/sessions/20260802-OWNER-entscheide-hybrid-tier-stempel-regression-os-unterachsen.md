@@ -210,3 +210,16 @@ mit offener Arbeit fort" — vollzogen (Neugruendung + Resumes + lint-Fix).
 Owner (03.08. ~15:05): "Bitte lies den gesamten Kontextinhalt auf das backend als cache ein, es ist ein
 zusammenhaengender Strang, bitte kipp es rein und lies den session log gegen" — vollzogen; Ergebnis:
 docs/sessions/20260803-SESSION-kontext-gegenlese-abschluss.md (15 Deltas, alle verarbeitet).
+
+## Nachtrag 03.08. — Owner-KERN: Entscheidungs-Vollstaendigkeit + Explore-Pflicht (verbatim)
+
+> "Bitte merke dir, dass du immer wenn eine Entscheidung fehlt, neue Explore Agenten startest, weil ich
+> in den letzten 3 Tagen ueber 500 praezise Fragen beantwortet habe und der gesamte Plan ueber die
+> letzten 10 Tage steht und jetzt nur noch imgesetzt werden muss. Daher auch die strikte Arbeitsweise
+> ueber die Code reviews, um den drift abzufangen aufgrund der Projektgroesse und weil doch schon alles
+> entschieden ist, die frage ist nur, ob es richtig umgesetzt wird"
+
+Auslegung (Manager): Phase = UMSETZUNG. Scheinbar fehlende Entscheidungen werden per Explore-Recherche
+in den Bestands-Quellen gefunden (Praezedenz-Doktrinen decken neue Instanzen); Owner-Vorlagen nur nach
+belegtem NICHT-GEFUNDEN ueber alle Quellen. Reviews/Truth-Checks = Umsetzungs-Drift-Abfang, nie verduennen.
+Als Memory fixiert: feedback_fehlende_entscheidung_erst_explore_alles_ist_entschieden.
