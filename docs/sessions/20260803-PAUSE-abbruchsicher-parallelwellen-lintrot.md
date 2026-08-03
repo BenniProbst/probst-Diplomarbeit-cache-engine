@@ -43,3 +43,13 @@ Commit auf dev, Push, CI hart gruen. DANACH main-FF mit dem NEUEN gruenen SHA (P
 ## 5. OFFENE OWNER-ENTSCHEIDE (Defaults laufen)
 
 OF-M3-1 (Preimage-Trenner, Default A) · OF-M3-2 (Overlay/GATE-9, Default A konditioniert bis M3-Start) · DV-3 (v0-Sentinel, Default unangetastet) · V3 (E-24-Fenster) · V4 (Q&A-Reste+CX-W13) · V5 (prtart-Gitlink) · V6 (measure_out_d03) · CX-W2-Wire-Bump · Fundstelle-B-Umsortierung · #327 PAT-Rotation (nach Messfenster). Konsolidiertes Vorlagen-Doc entsteht in wf_a87f9cfd.
+
+## 6. NACHTRAG (waehrend Pause-Herstellung): wf_a87f9cfd FERTIG — nur gesichert
+
+Alle 4 Ergebnisse liegen redigiert in backups/20260803-nachzug-paket-workflows/ (ledger-nachtraege.md
+mit Einfuege-Reihenfolge-Anleitung, owner-vorlagen-konsolidiert.md mit 11 offenen Vorlagen + versand-
+fertiger Kurzfassung §D, triage-rest, e02-Ledger-Entwuerfe). NICHT verarbeitet (Pause). WICHTIGER
+AGENT-HINWEIS fuer Wiederaufnahme: moeglicher Transpositionsfehler im ABGLEICH-Doc — kritischer Pfad
+dort 'A2 -> E-24', bindend laut Lage-Dossier GATE 5 + M3-Dossier §3 ist 'W10 -> E-24 -> A2-Eichung
+EINMALIG ZULETZT'; bei Wiederaufnahme korrigieren. Ausserdem: DV-3-Fundstellen nach 2d verschoben
+(axis_variant_version_table.hpp :236-240/:270 — im M3-Fenster neu greppen).
