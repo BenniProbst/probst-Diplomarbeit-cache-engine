@@ -69,10 +69,10 @@ enum class AxisRealm : std::uint8_t { organ = 0, system = 1, measurement = 2 };
 // Eine Unter-Achse (bzw. Unter-Achsen-GRUPPE) so, wie die Registry sie fuehrt.
 struct RegistrySubAxis {
     std::string id;
-    std::string parent;         // Eltern-Achse laut Registry-Attribut; leer = nicht deklariert
-    std::string stage;          // "ct" | "runtime"; leer = nicht deklariert
-    std::string value_type;     // "token" | "uint"; leer = nicht deklariert
-    std::string option_source;  // z.B. "machine_resolved"; leer = nicht deklariert
+    std::string parent;           // Eltern-Achse laut Registry-Attribut; leer = nicht deklariert
+    std::string stage;            // "ct" | "runtime"; leer = nicht deklariert
+    std::string value_type;       // "token" | "uint"; leer = nicht deklariert
+    std::string option_source;    // z.B. "machine_resolved"; leer = nicht deklariert
     bool        is_group = false; // <sub_axis_group> statt <sub_axis>
 };
 
@@ -80,7 +80,7 @@ struct RegistrySubAxis {
 struct RegistryAxis {
     AxisRealm   realm = AxisRealm::organ;
     std::string id;
-    std::string slot;      // "T00".."T17" (Organ-Realm); leer bei System-/Mess-Achsen
+    std::string slot; // "T00".."T17" (Organ-Realm); leer bei System-/Mess-Achsen
     std::string category;
     std::string stage;     // "ct" | "runtime"; leer = nicht deklariert
     std::string binary_id; // "never"; leer = nicht deklariert

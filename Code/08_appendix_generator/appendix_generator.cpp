@@ -78,8 +78,8 @@ struct XmlTag {
             ++i;
             while (i < text.size() && static_cast<unsigned char>(text[i]) <= ' ') ++i;
             if (i >= text.size() || (text[i] != '"' && text[i] != '\'')) continue;
-            char const   quote = text[i++];
-            std::string  value;
+            char const  quote = text[i++];
+            std::string value;
             while (i < text.size() && text[i] != quote) value += text[i++];
             if (i < text.size()) ++i; // schliessendes Anfuehrungszeichen
             tag.attrs.emplace_back(std::move(key), std::move(value));
@@ -135,7 +135,7 @@ struct XmlTag {
 } // namespace
 
 int parse_axis_registry(std::filesystem::path const& xml, AxisRealm realm, AxisRegistry& out) {
-    out = AxisRegistry{};
+    out       = AxisRegistry{};
     out.realm = realm;
     if (xml.empty()) return status_io_error;
     std::ifstream in(xml, std::ios::binary);
@@ -192,10 +192,10 @@ int write_axis_inventory_table(std::filesystem::path const& out, std::span<AxisR
     f << "% Quelle: die drei GENERIERTEN Achsen-Registries des Codes (Organ/System/Messen).\n";
     f << "% Keine handgepflegte Achsen-Liste: die Registries entstehen per compile-time-Reflektion.\n";
 
-    std::string const cap = de ? "Achsen-Inventar aus den drei generierten Registries "
-                                 "(Organ-, System- und Mess-Realm)"
-                               : "Axis inventory from the three generated registries "
-                                 "(organ, system and measurement realm)";
+    std::string const cap     = de ? "Achsen-Inventar aus den drei generierten Registries "
+                                     "(Organ-, System- und Mess-Realm)"
+                                   : "Axis inventory from the three generated registries "
+                                     "(organ, system and measurement realm)";
     std::string const colhead = de ? "Realm \\& Slot & Achse & Stufe / \\texttt{binary\\_id} & Bausteine & "
                                      "Unter-Achsen \\\\"
                                    : "Realm \\& slot & Axis & Stage / \\texttt{binary\\_id} & Blocks & Sub-axes \\\\";
@@ -222,7 +222,8 @@ int write_axis_inventory_table(std::filesystem::path const& out, std::span<AxisR
             if (!a.stage.empty() && !a.binary_id.empty()) f << " / ";
             if (!a.binary_id.empty()) f << "\\texttt{" << tex_id(a.binary_id) << "}";
             f << " & ";
-            if (a.has_baustein_count) f << a.baustein_count;
+            if (a.has_baustein_count)
+                f << a.baustein_count;
             else
                 f << "--";
             f << " & ";
