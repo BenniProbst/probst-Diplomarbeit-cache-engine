@@ -346,7 +346,7 @@ fs::path make_registry_fixtures(fs::path const& dir) {
 // Parser-Zusage 1: Tag-Namen werden EXAKT unterschieden (sub_axis vs. sub_axis_group),
 // Kommentare zaehlen nicht, Slots und Zaehlungen kommen aus den Attributen.
 TEST(Stufe08Appendix, RegistryParserReadsAllThreeRealms) {
-    auto const dir = comdare_user_tmp() / "appendix_registry_fixtures";
+    auto const      dir = comdare_user_tmp() / "appendix_registry_fixtures";
     std::error_code ec;
     fs::remove_all(dir, ec);
     make_registry_fixtures(dir);
@@ -432,9 +432,8 @@ TEST(Stufe08Appendix, AxisInventoryWriterIsHonestEmptyAndComplete) {
         EXPECT_NE(text.find("\\end{longtable}"), std::string::npos);
         // Jede Achse steht drin (Unterstriche als \_ maskiert + Umbruchpunkt).
         std::vector<std::string> const wanted = {
-            "search\\_\\allowbreak{}algo", "persistence\\_\\allowbreak{}target",
-            "target\\_\\allowbreak{}isa",  "build\\_\\allowbreak{}target\\_\\allowbreak{}complex",
-            "load\\_\\allowbreak{}framework"};
+            "search\\_\\allowbreak{}algo", "persistence\\_\\allowbreak{}target", "target\\_\\allowbreak{}isa",
+            "build\\_\\allowbreak{}target\\_\\allowbreak{}complex", "load\\_\\allowbreak{}framework"};
         for (auto const& id : wanted) EXPECT_NE(text.find(id), std::string::npos) << id << " fehlt (" << lang << ")";
         // Die Sweep-Dimensionen stehen als Legende UNTER dem Float.
         auto const table_end = text.find("\\end{longtable}");
@@ -474,11 +473,11 @@ TEST(Stufe08Appendix, FacadeWritesAxisInventoryOnlyWhenRegistriesGiven) {
     ASSERT_EQ(ag::generate_wide_appendix(off), ag::status_ok);
     EXPECT_FALSE(fs::exists(dir_off / "de" / "tabellen" / "axis_inventory.tex"));
 
-    ag::AppendixConfig on            = off;
-    on.out_root                      = dir_on;
-    on.organ_axis_registry           = fx / "organ.xml";
-    on.system_axis_registry          = fx / "system.xml";
-    on.measurement_axis_registry     = fx / "measurement.xml";
+    ag::AppendixConfig on        = off;
+    on.out_root                  = dir_on;
+    on.organ_axis_registry       = fx / "organ.xml";
+    on.system_axis_registry      = fx / "system.xml";
+    on.measurement_axis_registry = fx / "measurement.xml";
     ASSERT_EQ(ag::generate_wide_appendix(on), ag::status_ok);
     auto const inv = dir_on / "de" / "tabellen" / "axis_inventory.tex";
     ASSERT_TRUE(fs::exists(inv));
@@ -496,9 +495,9 @@ TEST(Stufe08Appendix, FacadeWritesAxisInventoryOnlyWhenRegistriesGiven) {
     }
 
     // Gesetzter, aber kaputter Pfad = ECHTER Fehler (kein stilles Degradieren auf 4 Achsen).
-    ag::AppendixConfig broken       = off;
-    broken.out_root                 = base / "appendix_inv_broken";
-    broken.organ_axis_registry      = fx / "gibt_es_nicht.xml";
+    ag::AppendixConfig broken  = off;
+    broken.out_root            = base / "appendix_inv_broken";
+    broken.organ_axis_registry = fx / "gibt_es_nicht.xml";
     fs::remove_all(broken.out_root, ec);
     EXPECT_EQ(ag::generate_wide_appendix(broken), ag::status_parse_error);
 
