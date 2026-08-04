@@ -1,0 +1,904 @@
+{
+  "summary": "Owner-KERN abend-6: Fremd-Achsen-Eigenschaften kartieren (ALLE Achsen-Themen, read-only) — 6 Fable-Lenses + Synthese",
+  "agentCount": 7,
+  "logs": [],
+  "result": {
+    "lenses": [
+      {
+        "key": "L1-prefetch-concurrency-telemetry",
+        "r": {
+          "befunde": [
+            {
+              "achse": "prefetch (A07)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:112",
+              "auszug": "#include <xmmintrin.h> // (X) _mm_prefetch für das T7-Prefetch-Segment (MSVC/x86_64-Mess-Build)",
+              "klasse": "mechanisch-vor-anker",
+              "begruendung": "Toter Prefetch-Intrinsic-Header im Genus-Adapter: abi_adapter.hpp enthaelt 12 '_mm_'-Zeilen, davon 11 Kommentare und 1 Include, aber NULL direkte _mm_prefetch-Aufrufe (case-insensitive gegengeprueft, auch _MM_HINT/_mm_pause: 0). Alle realen T7-Prefetches laufen korrekt ueber die Achse: pf_organ_.observe_prefetch_descent(...) bzw. pf_seg_organ.observe_prefetch_descent(...) (Zeilen ~818, ~1700) -> axes/prefetch_axis/axis_07_prefetch_real_descent.hpp, das seinen xmmintrin.h selbst inkludiert (dessen Zeile 42). Der Include samt irrefuehrendem Kommentar ('für das T7-Prefetch-Segment') ist Rest aus der Zeit VOR der K9-/#188-Delegation und mechanisch entfernbar; die Eigenschaft selbst ist bereits achsen-konform verdrahtet."
+            },
+            {
+              "achse": "cacheline-Unterachse (KF-3/KF-5; Abgrenzung zu prefetch A07)",
+              "fundstelle": "libs/cache_engine/axes/cacheline/cacheline_config.hpp:57-79 (Code: :67 _mm_prefetch, :73 __builtin_prefetch)",
+              "auszug": "template <SwPrefetchHint Hint> inline void prefetch(void const* p) noexcept { ... _mm_prefetch(static_cast<char const*>(p), h); ... __builtin_prefetch(p, 0, locality); }",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall ausgewiesen: Prefetch-Intrinsics ausserhalb axes/prefetch_axis, ABER sw_hint (None/T0/T1/T2/NTA) ist laut Datei-Kopf eine dokumentierte eigene Sub-Dimension der per-Organ-Cache-Line-Unterachse (User-Direktive 2026-06-02, KF-5, thesis-verankert anhang/de/D_building_block_matrix.tex; 4x3x5=60 Configs) und liegt im eigenen Themen-Verzeichnis axes/cacheline/ -> LEGITIM (a). Design-Space-Disjunktion: prefetch_axis A07 = Descent-STRATEGIE (none/hardware/distance/path, family_id 0-3), cacheline sw_hint = per-Organ Locality-Hint, per if constexpr gebacken, konsumiert nur ueber die Achsen-API CacheLineAware<Cfg>::cacheline_prefetch."
+            },
+            {
+              "achse": "alloc (A06); beruehrt Thema concurrency",
+              "fundstelle": "libs/cache_engine/axes/alloc/axis_06_allocator_rpmalloc.hpp:56-58 (Include :36)",
+              "auszug": "static std::atomic_flag process_inited = ATOMIC_FLAG_INIT; if (!process_inited.test_and_set(std::memory_order_acquire)) { ::rpmalloc_initialize(); } thread_local bool thread_inited = false;",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall ausgewiesen (einziges ECHTES std::atomic im Suchraum ausserhalb concurrency_axis + Framework): Der Init-Guard implementiert den Vendor-Lifecycle-Kontrakt von rpmalloc (rpmalloc_initialize einmal je Prozess, rpmalloc_thread_initialize je Thread) — eine Eigenschaft der alloc-Achse in ihrem eigenen Themen-Verzeichnis (LEGITIM a), nicht die modellierte Concurrency-STRATEGIE. Delegation an die concurrency_axis waere semantisch falsch: der Guard muss auch bei Concurrency=None thread-sicher sein (if constexpr auf flags::rpmalloc_enabled, kein Hot-Path). Strengere Lesart koennte semantisch-nach-abgabe stufen; Empfehlung: als Achsen-eigene Vendor-Integrationsmechanik belassen."
+            },
+            {
+              "achse": "concurrency (Thema); Traeger = Mess-Framework",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/parallel_measure_pool.hpp:20,22,44-46,58",
+              "auszug": "#include <atomic> / #include <thread> ... std::atomic<std::size_t> next{0}; active{0}; max_active{0}; std::vector<std::thread> pool;",
+              "klasse": "legitim-framework",
+              "begruendung": "Debug-Mess-Pool des Experiment-Baums: parallelisiert unabhaengige Mess-Zellen gemaess Kanon Debug=parallel/Messung=1-Thread. Modelliert KEINE Engine-Concurrency-Eigenschaft (die laeuft ueber axes/concurrency_axis), sondern orchestriert den Mess-Lauf — Mess-Framework-Flaeche im Sinne der Owner-Ausnahme (c). Kein mutex, nur atomics fuer Work-Stealing-Index/Zaehler."
+            },
+            {
+              "achse": "concurrency + telemetry (Thema); Traeger = Mess-Framework",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/progress_heartbeat.hpp:10,12,51,63-97",
+              "auszug": "#include <atomic> / #include <chrono> ... last_emit_s_.store(now, std::memory_order_relaxed); std::atomic<std::size_t> done_{0}; std::atomic<std::int64_t> last_emit_s_; ... steady_clock::now().time_since_epoch()",
+              "klasse": "legitim-framework",
+              "begruendung": "Fortschritts-Heartbeat des Mess-Laufs (Doktrin 'Monitore duerfen nie stumm haengen'): atomarer done-Zaehler + Zeitstempel fuer Intervall-Emission. Weder Engine-Concurrency- noch Telemetrie-ACHSEN-Eigenschaft (telemetry_axis = modellierte Engine-Observables), sondern Orchestrierungs-Werkzeug des Experiment-Baums -> Framework-Flaeche."
+            },
+            {
+              "achse": "concurrency (Thema); Traeger = Mess-Framework",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/measure_parallelism.hpp:16,39",
+              "auszug": "#include <thread> // std::thread::hardware_concurrency() (nproc-Default) ... unsigned const hw = std::thread::hardware_concurrency();",
+              "klasse": "legitim-framework",
+              "begruendung": "Reine Kapazitaetsabfrage (nproc-Default) fuer den Debug-Mess-Pool; kein Sync-Primitiv, kein Thread-Start in dieser Datei. Mess-Orchestrierung, keine Achsen-Eigenschaft."
+            },
+            {
+              "achse": "telemetry (Thema); Traeger = deklarierte Mess-Treiber-Flaeche",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:477-479,567-569,724-726,1589-1591 (Include :109)",
+              "auszug": "using clock = std::chrono::steady_clock; ... return std::chrono::duration_cast<std::chrono::nanoseconds>(b - a).count();",
+              "klasse": "legitim-framework",
+              "begruendung": "Per-Segment-steady_clock-Timer liegen exakt in den Mess-Treibern: run_workload (:434, do_batch :475), run_workload_segmented (:537, do_seg_batch :573), run_workload_segmented_v2 (:637), fill_segment_timing_v3 (:1584, do_batch :1623); Snapshots via fill_observer_v3 (:1229) / fill_observer_pathb_driven_v3 (:1537) / tier_observe (:1874). Das ist die vom Owner explizit deklarierte Flaeche 'Mess-Treiber fill_*_v3' (Ausnahme c) — das Messinstrument, nicht die telemetry-Achse. T8-Concurrency-Segment delegiert zudem via if constexpr an Concurrency::acquire()/release (:827) — kein Primitiv im Adapter."
+            },
+            {
+              "achse": "telemetry (Thema); Traeger = CEB-Orchestrierung",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:57,1134-1142",
+              "auszug": "#include <chrono> // #46b I1b: Slice-Wall-Clock fuer die ETA-Kalibrierung ... auto const t0 = std::chrono::steady_clock::now(); ... double const wall_s = std::chrono::duration<double>(t1 - t0).count();",
+              "klasse": "legitim-framework",
+              "begruendung": "Slice-Wall-Clock ausschliesslich fuer ETA-Kalibrierung des Builder-Laufs (#46b I1b) — Werkzeug-Telemetrie des Orchestrators, fliesst nicht in Mess-Spalten der Engine und ist keine Achsen-Eigenschaft."
+            },
+            {
+              "achse": "concurrency (Thema); Traeger = Bestandslog/Transport/Orchestrator — AUSSERHALB des deklarierten Suchraums, via Kommentar-Spur entdeckt",
+              "fundstelle": "libs/cache_engine/builder/bestandslog/builder_registration.hpp:49,602,624,656,674,681,685,689,700,714 (+7 weitere builder/-Dateien)",
+              "auszug": "#include <mutex> ... std::lock_guard<std::mutex> lk(mtx_); ... mutable std::mutex mtx_;",
+              "klasse": "legitim-framework",
+              "begruendung": "GEGENCHECK-Ergebnis zum 'Plan-Ist 0 mutex': Im DEKLARIERTEN Suchraum (axes/+anatomy/+builder/experiment_tree/+src/ ohne concurrency_axis) ist 0 bestaetigt (nur Kommentare). Die Kommentar-Spur cache_engine_builder_iterator.hpp:1011 ('eigener Mutex in LagerRunState') fuehrt aber zu ECHTEM std::mutex in 8 builder/-Dateien ausserhalb experiment_tree: bestandslog/{builder_registration,messwert_registrierung,planer_driven_build,slice_queue}.hpp, artifact_transport/{async_push_pump,spool_writer}.hpp, build_orchestrator/build_orchestrator.hpp, commands/axis_library_registry.hpp. Alles Werkzeug-Ebene (Bestandslog-Persistenz/Spool/Registry), keine Engine-Achsen-Eigenschaft -> legitim-framework; eine pauschale Aussage '0 mutex im Repo' waere jedoch FALSCH und ist hiermit korrigiert."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD  # -> a801a7e3c5b9054d130b4006e513f50a5e0c4ae7 (Branch: development)",
+            "B=/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine; grep -rnE '__builtin_prefetch|_mm_prefetch|_m_prefetch|prefetcht[012]|prefetchnta|__pld|svprf|_MM_HINT' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | grep -v 'axes/prefetch_axis/'  # PREFETCH-Hauptlauf",
+            "grep -rnE 'std::atomic|std::mutex|std::shared_mutex|std::recursive_mutex|std::timed_mutex|std::lock_guard|std::unique_lock|std::scoped_lock|std::shared_lock|std::condition_variable|std::(j)?thread\\b|atomic_thread_fence|atomic_signal_fence|std::memory_order|#include *<atomic>|#include *<mutex>|#include *<thread>|#include *<shared_mutex>|#include *<condition_variable>' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | grep -v 'axes/concurrency_axis/' | wc -l  # -> 19 Treffer (4x alloc/rpmalloc, 2x measure_parallelism, 6x progress_heartbeat, 6x parallel_measure_pool, 1x value_handle-Kommentar)",
+            "grep -rniE 'mutex|lock_guard|condition_variable|scoped_lock|unique_lock|shared_lock' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | grep -v 'axes/concurrency_axis/'  # Mutex-Gegencheck: 12 Zeilen, ALLE Kommentare/Typ-Tag-Doku, 0 Code",
+            "grep -rnE '__rdtsc|_rdtsc|rdtscp?\\b|clock_gettime|QueryPerformanceCounter|std::chrono|#include *<chrono>|steady_clock|high_resolution_clock|system_clock' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | grep -v 'axes/telemetry_axis/' | wc -l  # -> 22 Treffer in genau 4 Dateien (abi_adapter, measurable_workload, cache_engine_builder_iterator, progress_heartbeat)",
+            "grep -rnEi 'rdtsc|clock_gettime|QueryPerformanceCounter' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | wc -l  # -> 0",
+            "grep -rnE '__builtin_prefetch|_mm_prefetch|std::atomic|std::mutex|std::thread|std::memory_order|atomic_thread_fence|std::chrono|rdtsc|clock_gettime' \"$B/axes/node\" \"$B/axes/layout\" | wc -l  # Store-Kette -> 0",
+            "grep -rnE '__builtin_prefetch|_mm_prefetch|std::atomic|std::mutex|std::thread|std::memory_order|atomic_thread_fence|std::chrono|rdtsc|clock_gettime' \"$B/src\" | wc -l  # src/ -> 0",
+            "grep -rn 'thread_local' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | grep -v 'axes/concurrency_axis/'  # nur alloc-eigene AA3-thread_locality-Traits + rpmalloc-Guard",
+            "grep -rnE 'pthread_|#pragma omp' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | wc -l  # -> 0",
+            "grep -rnE '__asm|asm volatile|asm\\(' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | grep -v 'axes/prefetch_axis/'  # -> 0 Zeilen",
+            "grep -rn '#include <xmmintrin.h>\\|#include <immintrin.h>\\|#include <x86intrin.h>\\|#include <intrin.h>' \"$B/axes\" \"$B/anatomy\" \"$B/builder/experiment_tree\" \"$B/src\" | grep -vE 'axes/(prefetch_axis|cacheline|simd)/'  # -> genau 1: anatomy/abi_adapter.hpp:112 (= Befund 1)",
+            "grep -niE '_mm|xmm' \"$B/anatomy/abi_adapter.hpp\" | grep -viE ':\\s*//' | grep -vE '// [A-Za-z]'  # -> nur der Include :112; 0 direkte Intrinsic-Aufrufe",
+            "grep -n 'std::mutex\\|std::lock_guard\\|#include <mutex>\\|std::scoped_lock' \"$B/builder/bestandslog/builder_registration.hpp\" ; grep -rln 'std::mutex\\|std::lock_guard\\|std::scoped_lock\\|std::unique_lock' \"$B/builder\"  # Gegencheck ausserhalb Suchraum -> 8 Dateien mit echtem Mutex",
+            "awk 'NR>=500 && NR<=730 && /^    (\\[\\[nodiscard\\]\\] )?(std::uint64_t|void|auto|double|int)/ {print NR\": \"$0}' \"$B/anatomy/abi_adapter.hpp\"  # Funktionsgrenzen der Timer-Sites: run_workload_segmented :537, _v2 :637; ferner run_workload :434, fill_segment_timing_v3 :1584 (via grep -nE '(do_batch|fill_[a-z_]*_v3|tier_observe)')"
+          ],
+          "negativ_belege": [
+            "OBJEKT-STAND: HEAD = a801a7e3c5b9054d130b4006e513f50a5e0c4ae7, Branch development (git -C <objekt> rev-parse HEAD / branch --show-current); READ-ONLY eingehalten, keine Worktrees betreten.",
+            "PREFETCH / Store-Kette + src/ + builder/experiment_tree: 0 Prefetch-Intrinsics (Kommando 2: einzige Nicht-prefetch_axis-Treffer sind axes/cacheline [= Befund 2, eigene Unterachse], anatomy/abi_adapter [11 Kommentare + 1 toter Include = Befund 1] und 1 Negativ-Kommentar axes/filter_axis/composable/surf_louds_bitvector.hpp:8 'KEIN __builtin_prefetch').",
+            "PREFETCH / Inline-Assembly: 0 Treffer im gesamten Suchraum (Kommando 11) — kein prfm/asm-Schleichweg an den Intrinsics vorbei.",
+            "PREFETCH / Intrinsic-Header: ausserhalb axes/{prefetch_axis,cacheline,simd} exakt 1 Include im Suchraum (abi_adapter.hpp:112 = Befund 1); axes/prefetch_axis/axis_07_prefetch_real_descent.hpp:42 inkludiert xmmintrin.h selbst — die Achse ist autark.",
+            "CONCURRENCY / MUTEX im deklarierten Suchraum: 0 Code-Treffer (Kommando 4: 12 Zeilen, saemtlich Kommentare bzw. Typ-Tag-Doku wie src/permutations/permutation_strategy_concept.hpp:122-124 'Permutation<StdMalloc, Mutex, AoS>') — Plan-Ist '0 mutex' FUER DEN SUCHRAUM BESTAETIGT; ausserhalb (builder/bestandslog u.a.) jedoch 8 Dateien mit echtem std::mutex (= Befund 9, legitim-framework).",
+            "CONCURRENCY / anatomy/: 0 Concurrency-Primitive — alle 19 Treffer aus Kommando 3 liegen in axes/alloc/rpmalloc (4), builder/experiment_tree (14) und 1 Kommentar axes/value_handle_axis/axis_14_value_handle_immutable_shared_ref.hpp:49 ('kein echtes std::atomic'). Das T8-Concurrency-Segment im abi_adapter delegiert via if constexpr an Concurrency::acquire()/release (:827ff) — kein eigenes Primitiv.",
+            "CONCURRENCY / Store-Kette axes/node/ + axes/layout/: 0 Treffer aller Muster (Kommando 7).",
+            "CONCURRENCY / pthread_/OpenMP: 0 Treffer (Kommando 10). thread_local ausserhalb concurrency_axis nur als alloc-eigene AA3-thread_locality-Sub-Achsen-Traits (constexpr supports_thread_local_cache(), reine Modell-Eigenschaft der alloc-Achse) + rpmalloc-Guard (= Befund 3).",
+            "TELEMETRY / rdtsc, clock_gettime, QueryPerformanceCounter: 0 Treffer im gesamten Suchraum (Kommando 6) — einzige Zeitquelle ist std::chrono::steady_clock.",
+            "TELEMETRY / src/ + Store-Kette: 0 chrono/Timer-Treffer (Kommandos 7+8). Die 22 chrono-Treffer (Kommando 5) verteilen sich vollstaendig auf die 4 Dateien der Befunde 5, 7, 8 sowie anatomy/measurable_workload.hpp, das NUR Kommentar-Erwaehnungen enthaelt (Zeilen 66, 105, 125 — kein Timer-Code, kein <chrono>-Include).",
+            "TELEMETRY / eigene Zaehler-Mechanik ausserhalb der deklarierten Flaechen: keine gefunden — Segment-Akkumulation (acc[]/SegmentAccumulator) liegt vollstaendig in den Mess-Treibern run_workload*/fill_*_v3/do_batch (Owner-Ausnahme c); Achsen-Observables zaehlen nur eigene Achsen-Ereignisse in ihren eigenen *_observable-Headern."
+          ]
+        }
+      },
+      {
+        "key": "L2-mapping-indexorg-node",
+        "r": {
+          "befunde": [
+            {
+              "achse": "search_algo (03a) / cache_traversal (03b) Descent-Geometrie + index_organization (01) Sortierungs-Annahme",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:2192-2206 (Kern :2200)",
+              "auszug": "std::size_t lo = 0, hi = n; while (lo < hi) { std::size_t const m = lo + (hi - lo) / 2; if (st.key_at(m) < key) lo = m + 1; else hi = m; }",
+              "klasse": "semantisch-nach-abgabe",
+              "begruendung": "descent_slot_for_ dupliziert die Lower-Bound-Descent-Geometrie im Genus-Adapter (selbst dokumentiert :2180 'gleiche Descent-Geometrie wie SortedBinaryTraversal::lower_bound_index') statt an das Achsen-Organ zu delegieren; die Sortiert/Unsortiert-Annahme (Eigenschaft der index_organization/Traversal-Achsen) wird implizit getroffen (dokumentierte Schaetzung fuer unsortierte Stores) statt ueber eine Achsen-Eigenschaft bezogen. Mildernd: alle 4 Aufrufe (:1033/:1096/:1101/:1707) liegen in #if COMDARE_MEASUREMENT_ON-Observer-Kopplungen (K9-Fix T7-Prefetch), Zugriff ausschliesslich ueber Store-Interface (slot_count/key_at) — kein Node-Interna-Bypass. Umbau = Delegation an das Traversal-Organ, verhaltenssemantisch nicht rein mechanisch (Schaetzpfad unsortiert) -> nach Abgabe."
+            },
+            {
+              "achse": "node_type (04) — Slot-Storage-Substrat (designiertes Organ: NodeTypeSlotStore)",
+              "fundstelle": "libs/cache_engine/axes/lookup/composable/composable_search.hpp:54 (Verdrahtung: axes/lookup/composable/tier_to_organ_mapping.hpp:41-43)",
+              "auszug": "std::vector<std::pair<key_type, value_type>> slots_;  // RawSlotStore — 'LinearScanOrgan = ComposedSearch<LinearScanTraversal, RawSlotStore>'",
+              "klasse": "semantisch-nach-abgabe",
+              "begruendung": "Die node-Achse stellt fuer genau diese Rolle das designierte Brueckenorgan NodeTypeSlotStore bereit ('node_type ALS Storage-Organ ... Drop-in-Substrat fuer ComposedSearch', axes/node/axis_04_node_type_slot_store.hpp:2-11, Korrektur Doku 24 §5.4); konsumiert wird es aber nirgends (grep: nur axes/node selbst + storage_organ_concept-Selbstbeweis), waehrend die lookup-Achse das parallele RawSlotStore haelt und in den flachen Organ-Aliases verdrahtet. Kein Bypass fremder Interna (eigenes Substrat), aber Doppel-Abbildung der Slot-Storage-Eigenschaft. Im Suchraum 0 Live-Konsumenten der RawSlotStore-Organe (Mess-Pfad nutzt LayoutAwareChunkedStore der node-Achse via abi_adapter:2224-2228) -> schlafender Duplikat-Pfad; Zusammenfuehrung ist Design-Entscheid (bounded array vs vector, Kapazitaets-/Wurf-Semantik) -> nach Abgabe."
+            },
+            {
+              "achse": "node_type (04) Namens-/Themen-Ueberlappung; Eigentum: search_algo (03a) S04-ART-Anatomie",
+              "fundstelle": "libs/cache_engine/axes/lookup/composable/art_trie_node_pool_store.hpp:45-72",
+              "auszug": "struct ArtTrieNode4 { ArtTriePrefix prefix{}; int n = 0; std::array<std::uint8_t, 4> keys{}; std::array<std::size_t, 4> kids{}; }; // + Node16/48/256, GROWTH N4->16->48->256",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall ausgewiesen: adaptive Node4/16/48/256 ueberlappen namentlich/thematisch die axis_04-Familien (family_id 4/16/48/256, capacity_class_tag). ABER: dokumentiert originalgetreue Paper-Substrat-Re-Impl (Leis ICDE 2013 / unodb, is_original=false, [[pseudocode-papers-fallback]], Kopf :6-16) als konstitutive Anatomie der S04-ART-Organ-Familie im eigenen Achsen-Themen-Verzeichnis; das Mehr-Achsen-Modell ist als bewusster Entscheid dokumentiert (tier_to_organ_mapping.hpp:70-75), und die fremde Achsen-Eigenschaft path_compression wird korrekt an das axis_02-Organ delegiert (ByteWiseKeyPrefix-Include :19-20). axis_04-Varianten sind Verhaltens-Charakterisierungs-Strategien (node_find_scan), kein wiederverwendbares Trie-Knoten-Substrat — nichts zum Wiederverwenden vorhanden. Analog: start_trie/masstree/skip_list/btree/wormhole-Pools."
+            },
+            {
+              "achse": "mapping (03m)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:753",
+              "auszug": "auto o = mapping.resolve_offset(static_cast<typename Mapping::slot_index_type>(rng() % kSlots));",
+              "klasse": "legitim-framework",
+              "begruendung": "Grenzfall ausgewiesen (% kSlots ausserhalb axes/mapping): liegt im Segment-Mess-Treiber run_workload_segmented_v2 (IMeasurableWorkloadV2-Override, Definition :637); der Modulo erzeugt nur den Zufalls-Query-Strom, die eigentliche Slot-Zuordnung laeuft vollstaendig durch das Achsen-Interface (register_slot :679, resolve_offset :753). Gleiches Muster :745 (rng() % kTrav fuer cache_traversal). Mess-Treiber-Flaeche = deklarierte Framework-Ausnahme (c)."
+            },
+            {
+              "achse": "mapping (03m) beruehrt; Eigentum: Mess-Framework / node-Store-Kette",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:715-719",
+              "auszug": "using PfStore = ::comdare::cache_engine::node::LayoutAwareChunkedStore<NodeType, MemLayout, Allocator>; ... pf_store.append_slot(static_cast<typename PfStore::key_type>(i * 2654435761ull + 1u), ...)",
+              "klasse": "legitim-framework",
+              "begruendung": "Grenzfall ausgewiesen: zweite Store-Ketten-Instanziierung AUSSERHALB des deklarierten Genus-Verdrahtungspunkts (:2224-2228) plus Knuth-multiplikative Key-Spreizung (2654435761). Liegt aber im Mess-Treiber run_workload_segmented_v2 (T7-Segment, GAP#2-Re-Grounding: reale Slot-Adressen fuer die Prefetch-Messung, Kommentar :707-714); Befuellung ausschliesslich via Store-API append_slot; die Konstante ist Testdaten-Generierung, keine Slot-Zuordnungs-Logik."
+            },
+            {
+              "achse": "mapping (03m) beruehrt; Eigentum: search_algo (03a) HashSearch-Familie S14",
+              "fundstelle": "libs/cache_engine/axes/lookup/composable/hash_probe_traversal_organ.hpp:45",
+              "auszug": "return static_cast<std::size_t>(static_cast<std::uint64_t>(k) * kFibonacciMul) & (cap - 1);",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall ausgewiesen (Fibonacci-Hash->Bucket ausserhalb axes/mapping): Hash-Bucket-Disziplin ist konstitutive Eigenschaft der HashSearch-/SwissTable-Organ-Familien im eigenen Achsen-Themen-Verzeichnis; die mapping-Achse besitzt laut ihrem Concept die slot_index->offset-Platzierung (register_slot/resolve_offset/reverse_lookup, axis_03m_mapping_base.hpp:43-45), nicht die Schluessel-Hash-Funktion von Suchalgorithmen. Analog axes/cache_traversal hash_lookup (cap-Power-of-2-Check :235) in der eigenen Achse."
+            },
+            {
+              "achse": "mapping (03m) beruehrt; Eigentum: filter_axis",
+              "fundstelle": "libs/cache_engine/axes/filter_axis/axis_filter_bloom.hpp:116-117",
+              "auszug": "// double-hashing (Kirsch/Mitzenmacher 2006): h1 = FNV-artig, h2 = Rotation\\nstd::uint32_t h1 = key * 2654435761u + 0x9E3779B9u;",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Eigene Hash-Familien sind konstitutiv fuer die Filter-Algorithmen (Bloom double-hashing, Cuckoo :52/:177, Xor :52-61, SuRF :55) und liegen im eigenen Achsen-Themen-Verzeichnis; kein Slot-Mapping des Datenpfads, keine Beruehrung der 03m-Eigenschaft."
+            },
+            {
+              "achse": "index_organization (01)",
+              "fundstelle": "libs/cache_engine/axes/index_organization/axis_01_index_organization_non_clustered.hpp:56",
+              "auszug": "std::uint64_t idx = 0x9E3779B97F4A7C15ull; // Startzustand (Fibonacci-Hash), LCG-getrieben",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Fibonacci-Hash/LCG modelliert die random Storage-Hops (Pointer-Indirektion) der NonClustered-Strategie — Ordnungs-/Zugriffsmuster-Logik in der eigenen Achse (auch :81); genau dort gehoert sie hin."
+            },
+            {
+              "achse": "index_organization (01)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:1427-1431",
+              "auszug": "// predicate_evals/indirect_lookups folgen den static-deklarierten Strategie-Eigenschaften (is_clustered/has_secondary_indexes). reset()+scan. ... (void)container_algorithm_.store_observe_index_org(idx_organ_);",
+              "klasse": "legitim-framework",
+              "begruendung": "T11-Kopplung in fill_observer_v3: der Scan laeuft durch die ObservableIndexOrg-Huelle (Achsen-Organ) und die Store-API (store_observe_index_org -> NodeChunkedStore::organ_observe_index_org, chunked_store :163-175); abi_adapter liest nur die statistics() in den C6-POD. Keine Ordnungs-/Reorg-Logik im Adapter — deklarierte Mess-Flaeche."
+            },
+            {
+              "achse": "mapping (03m) beruehrt; Eigentum: migration_policy",
+              "fundstelle": "libs/cache_engine/axes/migration_policy/axis_migration_tier_based.hpp:57",
+              "auszug": "tier_index_sum += (v % kTiers); // Ziel-Tier per Modulo (0=RAM,1=SSD,2=HDD)",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall ausgewiesen (Modulo-Zuordnung): Ziel-Tier-Entscheidung ist die eigene Eigenschaft der Migrations-Achse (decide-Scan im eigenen Achsen-Verzeichnis), kein Schluessel->Slot-Mapping der 03m-Achse."
+            },
+            {
+              "achse": "mapping (03m) beruehrt; Eigentum: Build-/Permutations-Framework",
+              "fundstelle": "libs/cache_engine/src/permutations/permutation_engine.hpp:61",
+              "auszug": "std::uint64_t h = 0xcbf29ce484222325ULL; // FNV-1a offset basis (Compile-Time-Hash ueber V::name())",
+              "klasse": "legitim-framework",
+              "begruendung": "FNV-1a-Fingerprint ueber Variant-Namen fuer stabile Permutations-IDs der Bau-/Registry-Maschinerie (auch permutation_strategy_concept.hpp:107); Typ-Identitaets-Hash, keine Schluessel->Slot-Zuordnung des Datenpfads. Gleiche Klasse: src/sha256/ctsha.hpp (consteval SHA-256 fuer Paper-Original-Code-Validierung, Kopf :2-11) und builder/experiment_tree/organ_fingerprint.hpp:29 (Sortierung nur fuer Fingerprint-Stabilitaet)."
+            },
+            {
+              "achse": "mapping (03m) beruehrt; Eigentum: Coverage-/Bau-Framework",
+              "fundstelle": "libs/cache_engine/anatomy/combinatorial_coverage.hpp:91",
+              "auszug": "for (std::size_t i = 0; i < counts.size(); ++i) tuple[i] = r % counts[i];",
+              "klasse": "legitim-framework",
+              "begruendung": "Mixed-Radix-Dekodierung eines Zufallswerts in Abdeckungs-Tupel fuer die kombinatorische Coverage-Auswahl (Bau-Maschinerie); kein Bucket-/Slot-Mapping einer Datenstruktur."
+            },
+            {
+              "achse": "index_organization (01) beruehrt; Eigentum: serialization (10)",
+              "fundstelle": "libs/cache_engine/axes/serialization_axis/axis_10_serialization_var_len.hpp:50-55",
+              "auszug": "std::uint64_t mix = 1469598103934665603ULL; // FNV-1a offset basis ... mix = (mix ^ byte) * 1099511628211ULL;",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Order-sensitiver FNV-Mix als Pruefsumme der emittierten Bytes im eigenen Achsen-Verzeichnis; Checksummen-Eigenschaft der Serialisierungs-Variante, weder Mapping- noch Ordnungs-Logik fremder Achsen."
+            },
+            {
+              "achse": "node_type (04) + memory_layout (05) + allocator (06) — Store-Kette",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:2224-2228",
+              "auszug": "using flat_container_algorithm_t = ...ObservableComposedSearch<container_algorithm_traversal_t, ::comdare::cache_engine::node::LayoutAwareChunkedStore<typename Composition::node_type, typename Composition::memory_layout, typename Composition::allocator>>;",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "Der in der Owner-Regel explizit deklarierte Kompositions-/Verdrahtungs-Punkt (Store-Ketten-Konstruktion abi_adapter :2224-2228): Genus-Erst-Instanziierung der node x layout x alloc-Kette; die Layout-Geometrie kommt dabei aus der Achse selbst (LayoutAwareChunkedStore: kRep = L::representation_kind(), axis_04_node_type_layout_aware_store.hpp:60). Als Positiv-Anker dokumentiert."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD  # -> a801a7e3c5b9054d130b4006e513f50a5e0c4ae7 (branch development; git branch --show-current)",
+            "cd .../libs/cache_engine && grep -rn \"std::hash\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp --include=*.h | grep -v \"axes/mapping\"  # 0 Treffer",
+            "grep -rnE \"0x9[eE]3779|fnv|FNV|murmur|Murmur|xxhash|splitmix|SplitMix|0xff51afd7|0x2545F491\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/mapping\"  # 17 Zeilen: filter/index_org/serialization (eigene Achse), permutations (Framework)",
+            "grep -rnE \"%[[:space:]]*(bucket|capacity|num_|slot|size|count|mask|kBucket|kSlot|table|pool)\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/mapping\" | grep -vE \"%[[:space:]]*size_t|// |/\\*\"  # 2 Treffer: abi_adapter:753, combinatorial_coverage:91",
+            "grep -rnE \"%[[:space:]]*k[A-Z]\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/mapping\"  # 10 Treffer, alle eigene Achse bzw. Mess-Treiber",
+            "grep -rnE \"&[[:space:]]*\\((.*- 1|.*mask)|_mask\\b.*&|&[[:space:]]*(bucket_mask|slot_mask|index_mask|kMask)\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/mapping\"  # Treffer nur in axes/lookup + axes/filter_axis (eigene Achse)",
+            "grep -rnE \"resolve_offset|register_slot|reverse_lookup\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/mapping\" | grep -vE \"^\\s*//\"  # 16 Zeilen, alle Aufrufe INS Achsen-Interface (abi_adapter Mapping/map_organ_), keine Re-Implementation",
+            "grep -rnE \"is_clustered|has_secondary_indexes|data_embedded_in_leaf\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/index_organization\"  # 1 Treffer, nur Kommentar abi_adapter:1427",
+            "grep -rnE \"is_clustered|std::sort|std::stable_sort|std::partial_sort|insertion_sort|reorganiz\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/index_organization\"  # Treffer nur eigene Achsen (filter Build-Sort, lookup Range-Scan) + organ_fingerprint (Framework)",
+            "grep -rnE \"chunks_|slots_\\b|slot_backing|\\.data\\(\\).*slot|node16|node48|node256|Node4\\b|Node16|Node48|Node256\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"axes/node\"  # chunks_ ausserhalb axes/node NUR in abi_adapter-Kommentaren; Node4/16/48/256 in axes/lookup/composable (ART-Substrat)",
+            "grep -rnE \"append_slot|insert_slot_at|erase_slot_at|set_value_at|key_at\\(|value_at\\(\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -vE \"^axes/node/|^axes/lookup/\"  # 6 Treffer: filter-eigener Store, abi_adapter:719/:2200 (Mess-Pfad via Store-API)",
+            "grep -rn \"LayoutAwareChunkedStore\\|NodeChunkedStore\\|ComposedStore\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp | grep -v \"^axes/node/\" | grep -vE \"//|\\*\"  # 2 Treffer: abi_adapter:715 (Mess-Treiber), :2227 (deklarierter Genus-Punkt)",
+            "grep -rln \"NodeTypeSlotStore\" . --include=*.hpp --include=*.cpp  # 3 Dateien: axes/node (2) + axes/lookup/composable/storage_organ_concept.hpp — KEIN Live-Konsument in anatomy/compositions/builder",
+            "grep -rn \"observe_prefetch_descent\" axes/prefetch_axis/*.hpp && sed -n 150,200p axes/prefetch_axis/axis_07_prefetch_observable.hpp; grep -rn \"struct PrefetchDescentPolicy|slot_address|drive(\" axes/prefetch_axis/*.hpp  # Zugriff nur via Duck-Typing-Store-API slot_count()+slot_address(i)",
+            "grep -n \"descent_slot_for_\\|lower_bound_index\" anatomy/abi_adapter.hpp  # Aufrufe :1033/:1096/:1101/:1707, Definition :2192; alle in #if COMDARE_MEASUREMENT_ON-Bloecken (sed -n 1010,1110p / 2150,2260p verifiziert)",
+            "sed -n 640,680p anatomy/abi_adapter.hpp; grep -n \"run_workload_segmented_v2\" anatomy/abi_adapter.hpp anatomy/measurable_workload.hpp  # Zeilen 637 ff. = IMeasurableWorkloadV2-Mess-Treiber (measurable_workload.hpp:135)"
+          ],
+          "negativ_belege": [
+            "MAPPING/std::hash: 0 Treffer ausserhalb axes/mapping im gesamten Suchraum (axes, anatomy, builder/experiment_tree, src). Kommando: grep -rn \"std::hash\" axes anatomy builder/experiment_tree src --include=*.hpp --include=*.cpp --include=*.h | grep -v \"axes/mapping\"",
+            "MAPPING/Interface-Reimplementation: keine eigene register_slot/resolve_offset/reverse_lookup-Nachbildung ausserhalb axes/mapping — alle 16 Treffer-Zeilen sind Aufrufe IN das Achsen-Interface (anatomy/abi_adapter.hpp via Mapping-Typ bzw. map_organ_-Observer-Organ) oder Doku-Strings (search_algorithm_anatomy.hpp:182, observable_tier.hpp:75). Kommando: grep -rnE \"resolve_offset|register_slot|reverse_lookup\" ... | grep -v axes/mapping",
+            "MAPPING/Modulo-Bucket im Datenpfad: 0 Treffer — die 2 Fundstellen des %-Bucket-Grep (abi_adapter.hpp:753, combinatorial_coverage.hpp:91) sind Mess-/Coverage-Framework, keine Datenpfad-Slot-Zuordnung. Kommando: grep -rnE \"%[[:space:]]*(bucket|capacity|num_|slot|size|count|mask|kBucket|kSlot|table|pool)\" ... | grep -v axes/mapping",
+            "INDEX_ORGANIZATION/Eigenschafts-Konsum ausserhalb Achse: is_clustered/has_secondary_indexes/data_embedded_in_leaf ausserhalb axes/index_organization = 1 Treffer, reiner Kommentar (abi_adapter.hpp:1427); die T11-Kopplung laeuft durch ObservableIndexOrg-Organ + Store-API. Kommando: grep -rnE \"is_clustered|has_secondary_indexes|data_embedded_in_leaf\" ... | grep -v axes/index_organization",
+            "INDEX_ORGANIZATION/Reorg-Logik ausserhalb Achse: 0 fremde Index-Reorg-Fundstellen — std::sort/partial_sort-Treffer liegen in eigenen Achsen (filter Build-Sortierung exact_prefix/louds_sparse; lookup Range-Scan composable_search.hpp:120) bzw. im Fingerprint-Framework (organ_fingerprint.hpp:29). Kommando: grep -rnE \"is_clustered|std::sort|std::stable_sort|std::partial_sort|insertion_sort|reorganiz\" ... | grep -v axes/index_organization",
+            "NODE_TYPE/Interna-Bypass: 0 direkte Member-Zugriffe auf Node-/Chunk-Interna fremder Achsen — chunks_ ausserhalb axes/node existiert nur in abi_adapter-KOMMENTAREN (:1581/:1665 ff.), der Code geht durch store_observe_*/organ_observe_*-Store-APIs; die Prefetch-Achse bezieht Slot-Adressen ausschliesslich ueber die Duck-Typing-Store-API slot_count()+slot_address(i) (axis_07_prefetch_real_descent.hpp:89/:111). Kommandos: grep -rnE \"chunks_|slots_\\b|...\" ... | grep -v axes/node; grep slot_address axes/prefetch_axis/*.hpp",
+            "NODE_TYPE/Store-Ketten-Konstruktion: ausserhalb axes/node nur 2 Instanziierungen — abi_adapter.hpp:2227 (deklarierter Genus-Erstinstanz-Punkt 2224-2228) und abi_adapter.hpp:715 (Mess-Treiber run_workload_segmented_v2, als legitim-framework ausgewiesen). Kommando: grep -rn \"LayoutAwareChunkedStore|NodeChunkedStore|ComposedStore\" ... | grep -v ^axes/node/",
+            "NODE_TYPE/Scan-Organ-Kontrakt: die buf + i*record_size-Zugriffe der Observe-Organe (index_organization, io_dispatch, migration, value_handle, serialization, path_compression) erhalten Puffer+record_size VOM Store ueber dessen organ_observe_*-API und liegen jeweils im eigenen Achsen-Verzeichnis — kein Bypass. Kommando: grep -rnE \"\\* record_size|record_size \\*\" ... | grep -vE ^axes/node/|^axes/layout/|abi_adapter",
+            "Stand-Dokumentation: OBJEKT read-only inspiziert bei HEAD a801a7e3c5b9054d130b4006e513f50a5e0c4ae7 (development); kein Edit/Commit/Build; Worktrees wt-e24/wt-w10/wt-m3/wt-a8s1 nicht betreten (alle Kommandos gegen den OBJEKT-Pfad /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine)."
+          ]
+        }
+      },
+      {
+        "key": "L3-serialization-pathcomp-valuehandle",
+        "r": {
+          "befunde": [
+            {
+              "achse": "path_compression (axis_02)",
+              "fundstelle": "libs/cache_engine/axes/lookup/composable/hot_patricia_traversal_organ.hpp:43-49 (genutzt :70, :85-88, :105, :129-136; Skip-Position als nackter uint8: hot_patricia_node_pool_store.hpp:34+:96)",
+              "auszug": "first_diff_bit(a,b)=countl_zero(a^b); dir(key,crit_bit)=(key >> (63U - crit_bit)) & 1ULL — Kopf Z.9: 'nicht-diskriminative Bits werden uebersprungen (Single-Bit-Split Path-Compression)'",
+              "klasse": "mechanisch-vor-anker",
+              "begruendung": "Bit-identische Re-Implementierung von PatriciaPathCompression::key_split_bit (axes/path_compression/axis_02_path_compression_patricia.hpp:59-61: '(key >> (63U - (depth & 63U))) & 1U'), die laut Achsen-Doku explizit 'Verwendet von HOT' ist. Das Organ inkludiert die PC-Achse NICHT (<bit> + Pool-Header only); key_split_bit hat 0 operative Nutzer ausserhalb der Achse (grep-belegt). Kontrast beweist das konforme Muster: ART-/START-Organe konsumieren den PC-Achsen-Typ ByteWiseKeyPrefix (art_trie_traversal_organ.hpp:39, start_trie_traversal_organ.hpp:47; definiert axes/path_compression/axis_02_path_compression_byte_wise.hpp:54), und der ART-Pool speichert den Achsen-Typ, waehrend der HOT-Pool crit_bit als nackten uint8 haelt. Datei entstanden 2026-05-30 (3d7409fd), letzte Aenderung 2026-07-06 (9af28e7e) — lange vor dem Regel-Anker 04.08. abend-6, daher mechanisch-vor-anker (Bestandsverstoss, kein Nach-Abgabe-Drift)."
+            },
+            {
+              "achse": "serialization (axis_10) — ABI-Grenz-Kopie",
+              "fundstelle": "libs/cache_engine/anatomy/observable_tier.hpp:126-153 (analog genus_observer_aggregate.hpp:24-27, measurable_workload.hpp:43-120, adapter_tier.hpp:13+:44, sequence_tier_v2.hpp:50-53, set_tier_v2.hpp:55-58)",
+              "auszug": "'ABI-Pflicht: konsolidierter Observer-POD muss standard_layout sein (memcpy ueber DLL-Grenze)' — flacher POD sizeof==1344, trivially_copyable-Pins",
+              "klasse": "legitim-framework",
+              "begruendung": "Deklarierte Mess-/Framework-Flaeche (LEGITIM c: observable_tier/GenusObserverAggregate/Statistics-PODs). Die Wire-PROJEKTION der Observer-Snapshots ueber die Modul-Binary-Grenze ist das ABI-Framework selbst, kein Achsen-Fremdgang; keine encode/decode-Logik, nur trivially_copyable-Pins + memcpy-Faehigkeit."
+            },
+            {
+              "achse": "serialization (axis_10) vs. memory_layout (axis_05)",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:439-471 (Dispatch-Quelle :59-60)",
+              "auszug": "store_record_/load_key_: if constexpr (kRep == RK::succinct_hot_cold_split) { hot=k&0xFFFF; cold=k>>16; memcpy(...) } — kRep = L::representation_kind()",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall Byte-Packing ausserhalb der Serialization-Achse: es ist KEIN Wire-Format, sondern die physische In-Memory-Repraesentation, deren ENTSCHEIDUNG vollstaendig bei der Layout-Achse liegt (compile-time-Dispatch ueber deren deklariertes RepresentationKind, Header deklariert die Datei als composable-bridge node_type⊕layout⊕allocator, Z.4). Die Serialization-Eigenschaft bleibt via organ_observe_serialization (:303-308, org.observe_serialize) ans Achsen-Organ delegiert. Genau diese Store-Ketten-Konstruktion ist zudem der per Owner-KERN legitimierte Verdrahtungspunkt (abi_adapter.hpp:2224-2228 baut LayoutAwareChunkedStore<node_type,memory_layout,allocator>)."
+            },
+            {
+              "achse": "serialization (axis_10) — Record-Marshaling",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:364-371",
+              "auszug": "unsigned char rec[16]; memcpy(rec,&s.first,8); memcpy(rec+8,&s.second,8); org.should_migrate_record(rec, sizeof(rec), prev_recency)",
+              "klasse": "legitim-framework",
+              "begruendung": "Grenzfall: (k,v) wird in einen Byte-Record gepackt — aber ausschliesslich um den Organ-API-Kontrakt der Migrations-Achse (should_migrate_record(bytes)) zu bedienen; prozess-lokal, native-endian, kein persistentes/ABI-Wire-Format, keine Format-Entscheidung. Mess-/Organ-Framework-Flaeche analog den _scan(buf,n,record_size)-Treibe-Ops."
+            },
+            {
+              "achse": "serialization (axis_10)",
+              "fundstelle": "libs/cache_engine/axes/filter_axis/composable/louds_sparse_filter_store.hpp:36-41 (Deklaration Kopf Z.6-11)",
+              "auszug": "to_bytes: std::uint64_t const be = std::byteswap(k); // config.hpp uint64ToString — 'Keys = uint64 -> 8-Byte-BIG-ENDIAN'",
+              "klasse": "legitim-framework",
+              "begruendung": "Grenzfall Byte-Order-Encoding ausserhalb der Serialization-Achse: Datei ist deklarierter 'Original-getreuer' faithful Port aus ext/traversal/P10-SuRF (Apache-2.0, is_original=false) — EV-4-Flaeche (LEGITIM d). Die BE-Konvertierung ist Algorithmus-Erfordernis des SuRF-Trie (numerische==lexikografische Ordnung), kein Cache-Record-Wire-Format."
+            },
+            {
+              "achse": "path_compression (axis_02)",
+              "fundstelle": "libs/cache_engine/axes/filter_axis/composable/louds_sparse_filter_store.hpp:200 + :224-227",
+              "auszug": "is_char_common_prefix(c, level) / skip_common_prefix(key): while (level < 8 && is_char_common_prefix(key[level], level)) ...",
+              "klasse": "legitim-framework",
+              "begruendung": "Grenzfall Prefix-Skip-Logik ausserhalb der PC-Achse: Teil desselben deklarierten faithful SuRF-Ports (surf_builder.hpp/louds_sparse.hpp, EV-4) — die Prefix-Behandlung ist Bestandteil des portierten Builder-Algorithmus, nicht der Store-Ketten-Trie-Kompression; ein Umbiegen auf die PC-Achse wuerde die Original-Treue (vendoring-Doktrin vendor→faithful→self) brechen."
+            },
+            {
+              "achse": "path_compression (axis_02)",
+              "fundstelle": "libs/cache_engine/axes/filter_axis/axis_filter_range_surf.hpp:41-81",
+              "auszug": "common_prefix_depth(key): Byte-weiser Prefix-Abstieg ueber gehashte Knoten-Bitmap ('vereinfachte LOUDS-Idee nach Zhang SIGMOD 2018')",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall: die common-prefix-Semantik IST die Substanz des Range-Filters (SuRF-Definition: Range-Filterung = gemeinsame Prefix-Laenge) und damit Eigen-Eigenschaft der Filter-Achse in ihrem eigenen Achsen-Verzeichnis; es wird keine Store-Trie-Pfad-Kompression nachgebaut (eigene gehashte 8-KiB-Knoten-Bitmap, kein Bezug zu ByteWiseKeyPrefix/Patricia-Skip der Store-Kette)."
+            },
+            {
+              "achse": "serialization (axis_10) — Namens-Grenzfall",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/axis_path_serialization.hpp:1-50",
+              "auszug": "'DIE EINE zentrale Pfad-Serialisierungs-Konvention' — serialize_axis_segment: s = axis + '=' + value; '/'-join zu binary_id",
+              "klasse": "legitim-framework",
+              "begruendung": "Trotz des Namens keine Byte-/Wire-Formung, sondern die BR-2-String-Pfad-Konvention des Experiment-Baums (binary_id-Round-Trip, Doc 27 §3+§5-R3) — reine Framework-Meta-Ebene ueber Achsen-NAMEN; die 18 kCompositionAxisNames referenzieren die Achsen nur als Registry-Strings."
+            },
+            {
+              "achse": "serialization (axis_10) — Hash-Primitiv",
+              "fundstelle": "libs/cache_engine/src/sha512/ctsha512.hpp:132-140 (analog src/sha256/ctsha.hpp)",
+              "auszug": "block[127-i] = (bit_length >> (8*i)) & 0xff; digest[8*i+j] = (h[i] >> (56-8*j)) & 0xff — 128-Bit-Laenge/Digest big-endian",
+              "klasse": "legitim-framework",
+              "begruendung": "Grenzfall Byte-Kodierung ausserhalb der Serialization-Achse: FIPS-180-4/RFC-6234-definierte Laengenfeld-/Digest-Kodierung des eigenen consteval-Hash-Primitivs (Stempel-/Fingerprint-Infrastruktur, K7b-1) — die Byte-Ordnung ist Bestandteil der Hash-Definition selbst, kein Achsen-Record-Wire."
+            },
+            {
+              "achse": "value_handle (axis_14)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:288 + :332-336",
+              "auszug": "out_caps->inline_threshold_bytes = 256; // value_handle (axis_14) ... vh_organ_.set_runtime_inline_threshold(applied_rc_.inline_threshold_bytes)",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "Genus-Verdrahtungspunkt (Anatomie/abi_adapter, LEGITIM b): der Adapter deklariert die Capability und reicht den Schwellwert unveraendert ans VH-Organ durch; die INTERPRETATION der Schwelle (inline vs. external, Chain-Tiefe) lebt ausschliesslich in der Achse (axis_14_value_handle_observable.hpp:95-176, set_runtime_inline_threshold/runtime-Zweige). Auch der Mess-Treiber (:850-852) ruft nur ValueHandle::value_access_scan — Delegation, keine Re-Implementierung."
+            },
+            {
+              "achse": "value_handle (axis_14)",
+              "fundstelle": "libs/cache_engine/anatomy/resource_controllable_tier.hpp:39 + libs/cache_engine/builder/experiment_tree/runtime_variable_loop.hpp:61-62",
+              "auszug": "std::uint64_t inline_threshold_bytes = 0; // Achse value_handle(axis_14) ... else if (var == \"inline_threshold_bytes\") pod.inline_threshold_bytes = v;",
+              "klasse": "legitim-framework",
+              "begruendung": "Ressourcen-POD und Runtime-Variablen-Routing des Mess-Frameworks: der Wert wird nur transportiert und explizit der Achse zugeschrieben ('Achse value_handle(axis_14)'), nirgends interpretiert — deklarierte Framework-Flaeche (C6-/Resource-PODs, LEGITIM c)."
+            },
+            {
+              "achse": "value_handle (axis_14)",
+              "fundstelle": "libs/cache_engine/axes/lookup/composable/masstree_layer_traversal_organ.hpp:11-14",
+              "auszug": "'Leaf-Slot bei layer < MaxLayers-1 ist ein LAYER-Zeiger (keylenx=128 ...); bei layer == MaxLayers-1 haelt er den INLINE-Wert (keylenx=8)'",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall 'Inline-Wert vs. Zeiger': das ist die keylenx-Diskrimination des Masstree-Modells (B+Baum-of-Tries, Paper-Definition) — strukturelle Leaf/Sub-Layer-Unterscheidung der Lookup-Achse in ihrem eigenen Verzeichnis, KEINE Threshold-/Deref-STRATEGIE (kein Schwellwert, keine Wahlfreiheit); die VH-Achse bleibt unberuehrt und wird separat als Organ getrieben."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD && git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine branch --show-current  # -> a801a7e3c5b9054d130b4006e513f50a5e0c4ae7 / development",
+            "cd .../libs/cache_engine && grep -rn \"memcpy\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp --include=*.hpp.in -l | sort  # 78 Dateien, KEINE in builder/experiment_tree/ und src/",
+            "grep -rniE \"serialize|deserialize|to_bytes|from_bytes|wire_|encode|decode\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp --include=*.hpp.in -l | grep -v \"axes/serialization_axis\" | sort",
+            "grep -rniE \"prefix_len|common_prefix|skip_count|longest common|lcp|path_compress|compress_path|patricia|prefix compression\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp --include=*.hpp.in -l | grep -v \"axes/path_compression\" | sort",
+            "grep -rniE \"inline_threshold|value_handle|deref|value_ptr|inline_value|inlined value|out.of.line|indirect value|value slot\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp --include=*.hpp.in -l | grep -v \"axes/value_handle_axis\" | sort",
+            "grep -rn \"byteswap\\|htole\\|htobe\\|endian\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp | grep -v \"axes/serialization_axis\"  # 5 Treffer: SuRF-Port(2), sha512(1), masstree-Kommentar 'KEIN byteswap noetig'(1), louds_organ-Kommentar(1)",
+            "grep -rn \"is_inline\\|value_access_scan\\|inline_threshold\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp --include=*.hpp.in | grep -v \"axes/value_handle_axis\"",
+            "grep -rn \"external_pool\\|chain_ref\\|versioned_pointer\\|immutable_shared_ref\\|real_slot\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp | grep -v \"axes/value_handle_axis\" | grep -vi \"registry\\|factory\\|known_algorithms\\|axis_levels\\|classification\\|version_table\\|binding_traits\"  # 3 Treffer, alle Kommentar-Querverweise INNERHALB der PC-Achse",
+            "grep -rniE \"varint|var_len|leb128|zigzag|succinct\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp --include=*.cpp | grep -v \"axes/serialization_axis\" | grep -vi \"registry\\|axis_levels\\|classification\\|version_table\\|known_algorithms\"  # nur 'succinct' als Layout-/SuRF-Wort, kein varint/leb128/zigzag",
+            "grep -rn \"key_split_bit\\|PatriciaPathCompression\" axes/ anatomy/ builder/experiment_tree/ topics/ compositions/ --include=*.hpp | grep -v \"axes/path_compression\\|topics/nodes/axis_02\"  # 4 Treffer: 1 Kommentar abi_adapter.hpp:78, 3 Wiring/Doku compositions/prt_art_reference.hpp -> 0 operative Nutzer",
+            "grep -rn \"reinterpret_cast<unsigned char\" axes/ anatomy/ builder/experiment_tree/ src/ --include=*.hpp | grep -v \"axes/serialization_axis\" | awk -F: '{print $1}' | sort | uniq -c  # 7 chunked_store, 3 composed_store, 2 swiss_group_pool_store, 1 abi_adapter — alle Organ-Delegation",
+            "grep -rniE \"memcpy|serializ|encode|decode|prefix|compress|inline_threshold|deref\" src/ --include=*.hpp --include=*.cpp  # nur CMake-Flag-'prefix'-Strings in permutation_build_command.hpp",
+            "grep -rniE \"encode|decode|serializ\" builder/experiment_tree/ --include=*.hpp | grep -viE \"path_serialization|axis=value|serialize_path|serialize_axis_segment\"  # alle Treffer = Achsen-Namen-Strings/Registry-Meta",
+            "grep -nE \"countl_zero|countr_zero|>> \\(|& 1U|<bit>\" axes/lookup/composable/wormhole_jump_traversal_organ.hpp axes/lookup/composable/btree_traversal_organ.hpp axes/lookup/composable/skip_list_traversal_organ.hpp  # 0 Treffer",
+            "git -C .../comdare-cache-engine log --follow --format=\"%h %ad %s\" --date=short -- libs/cache_engine/axes/lookup/composable/hot_patricia_traversal_organ.hpp  # entstanden 2026-05-30 (3d7409fd), letzte Aenderung 2026-07-06 (9af28e7e)",
+            "git -C .../comdare-cache-engine log --since=2026-08-01 --format=\"%h %ad %s\" --date=short --name-only -- libs/cache_engine/axes libs/cache_engine/anatomy libs/cache_engine/builder/experiment_tree libs/cache_engine/src && git show 91c1b19f --stat  # Post-Abgabe-Sichtung"
+          ],
+          "negativ_belege": [
+            "SERIALIZATION in builder/experiment_tree/: 0 Byte-Wire-Treffer — alle encode/decode/serialize-Vorkommen sind Achsen-Namen-Strings bzw. die BR-2-String-Pfad-Konvention (Kommando 13); memcpy-Dateiliste (Kommando 2) enthaelt KEINE builder/experiment_tree/-Datei.",
+            "SERIALIZATION Byte-Order ausserhalb der Achse: 5 Treffer gesamt (Kommando 6), alle legitim erklaert (SuRF-faithful-Port, SHA-512-Primitiv, 2 Kommentare) — 0 achsen-fremde Wire-Formung.",
+            "SERIALIZATION varint/leb128/zigzag ausserhalb der Achse: 0 Treffer (Kommando 9).",
+            "SERIALIZATION Store-Kette: chunked_store:137, composed_store:104, layout_aware_store:306 delegieren via org.observe_serialize an das Serialization-Achsen-Organ; abi_adapter treibt nur Serializer::serialize_scan (:509,:595,:846) — Muster achsen-konform, 0 Eigen-Encodings.",
+            "PATH_COMPRESSION operative Fremdnutzung von key_split_bit/PatriciaPathCompression: 0 (Kommando 10; nur Kommentar abi_adapter.hpp:78 + Genus-Wiring compositions/prt_art_reference.hpp:57).",
+            "PATH_COMPRESSION in wormhole/btree/skip_list-Traversal-Organen: 0 Treffer countl_zero/Bit-Split (Kommando 14); axes/cache_traversal/, axes/mapping/, axes/telemetry_axis/, axes/concurrency_axis/ erscheinen NICHT in der Prefix-Vokabular-Dateiliste (Kommando 4).",
+            "PATH_COMPRESSION konformes Gegenmuster belegt: ART-/START-Organe konsumieren den PC-Achsen-Typ ByteWiseKeyPrefix (art_trie_traversal_organ.hpp:39, start_trie_traversal_organ.hpp:47; Definition axes/path_compression/axis_02_path_compression_byte_wise.hpp:54; topics/nodes/axis_02_path_compression/* sind reine Re-Export-Shims auf die Achse) — nur das HOT-Patricia-Organ weicht ab (Befund 1).",
+            "VALUE_HANDLE Re-Implementierungen von is_inline/value_access_scan/Threshold-Interpretation ausserhalb der Achse: 0 (Kommandos 5+7); alle Treffer sind Transport/Delegation (abi_adapter-Verdrahtung, Resource-POD, Runtime-Var-Routing, organ_observe_value_handle-Delegation der Stores).",
+            "VALUE_HANDLE Varianten-Typen (external_pool/chain_ref/versioned_pointer/immutable_shared_ref/real_slot) ausserhalb der Achse: nur 3 Kommentar-Querverweise innerhalb der PC-Achse (Kommando 8) — 0 Fremd-Implementierungen. NodeRef-Tag-Kodierung im ART-Pool (art_trie_node_pool_store.hpp:93) betrifft KIND-Referenzen, nicht Wert-Handles.",
+            "src/ gesamt: 0 Themen-Lecks (Kommando 12) — 'prefix'-Treffer sind CMake-Flag-Praefix-Strings (permutation_build_command.hpp:46-118), SHA-256/512 = eigenes RFC-Primitiv (als Grenzfall legitim ausgewiesen).",
+            "Klasse semantisch-nach-abgabe: 0 Befunde — alle Commits seit 01.08. im Suchraum gesichtet (Kommando 16): a8-s3/a8-s4/e24/fk-5 = Anatomie-/Basen-/Doku-Haertung (Genus-Verdrahtung bzw. Achsen-Basen selbst), s5-04 (91c1b19f) = inline-Array statt Heap in der EIGENEN Prefetch-Achse (Allokator-Familienschnitt, kein VH-/Serialization-/PC-Bezug).",
+            "memcpy in alloc/simd/index_organization/io_dispatch/migration_policy/persistence_target-Achsen: eigene Mess-Ops (unaligned scalar loads bzw. Staging-Kopie), kontext-verifiziert (axis_io_direct.hpp:59-63, axis_io_buffered.hpp:56-62, axis_io_in_memory_only.hpp:51-56, axis_migration_hot_cold.hpp:57, axis_01_index_organization_clustered.hpp:54, disk_writeback:75-93) — kein Wire-Format, Eigen-Eigenschaft der jeweiligen Achse."
+          ]
+        }
+      },
+      {
+        "key": "L4-traversal-search",
+        "r": {
+          "befunde": [
+            {
+              "achse": "SEARCH_ALGO (T0, Traversal-Organ SortedBinaryTraversal, Heimat axes/lookup/composable/)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:2192-2206 (Aufrufer :1033, :1096, :1101, :1707)",
+              "auszug": "descent_slot_for_(std::uint64_t key): \"std::size_t lo = 0, hi = n; while (lo < hi) { std::size_t const m = lo + (hi - lo) / 2; if (st.key_at(m) < key) lo = m + 1; else hi = m; } return (lo < n) ? lo : (n - 1);\" — Doc-Kommentar :2180: \"(gleiche Descent-Geometrie wie SortedBinaryTraversal::lower_bound_index)\"",
+              "klasse": "mechanisch-vor-anker",
+              "begruendung": "Handgerollte Binaer-Lower-Bound-Suche ueber die realen Store-Keys IM Genus-ABI-Adapter. Die Eigenschaft (Lower-Bound-Descent) gehoert der SEARCH_ALGO-/Traversal-Achse, deren API existiert nachweislich: SortedBinaryTraversal::lower_bound_index (axes/lookup/composable/composable_search.hpp:130) — der eigene Kommentar bestaetigt die Duplikation woertlich. Kein Achsen-Aufruf, sondern Re-Implementierung; die Mess-Flaechen-Ausnahme (c) deckt das Rufen von Achsen-APIs, nicht deren Nachbau. Grenzfall-Aspekt: dient nur der Prefetch-Observer-Speisung (Aufrufer COMDARE_MEASUREMENT_ON-gated), die Funktion selbst ist ungegated definiert. Eingefuehrt 0941a1ca 2026-06-18 (K9/P5d, lange vor Owner-KERN 04.08.) — Fix ist mechanisch (Aufruf der vorhandenen Achsen-API statt eigener Schleife), daher mechanisch-vor-anker."
+            },
+            {
+              "achse": "SEARCH_ALGO (T0; Aequivalent zu axes/lookup-Strategien vector_*/SortedBinary sorted-array)",
+              "fundstelle": "libs/cache_engine/anatomy/set_default_organ.hpp:18-38 (eingebunden via anatomy/cross_genus_organ.hpp:38, SetSubOrgan<KeySet = SortedArrayKeySet> :77-78)",
+              "auszug": "\"SortedArrayKeySet: ein leichtgewichtiges, ECHTES search_algo-API-Organ (sorted-array Mengen-Algorithmus mit Binary-Search) als Default-Kern der Set-Gattung\" — insert/lookup/erase je: \"auto it = std::lower_bound(keys_.begin(), keys_.end(), k);\" ueber privaten std::vector keys_",
+              "klasse": "semantisch-nach-abgabe",
+              "begruendung": "Vollstaendiger Suchalgorithmus (sortiertes Array + Binaersuche) als eigenstaendige Implementierung im anatomy/-Segment statt ueber die ~30 echten search_algo-Achsen-Wrapper. Die Datei deklariert selbst den Interims-Charakter: \"Der Vollausbau mit den ~30 echten search_algo-Wrappern (Array256/Patricia/...) als Set-Kern ist die R5.B-Operativitaets-Erweiterung (separat, #74-artig)\" — Zweck: Set-DLL ohne schweres Achsen-Umbrella baubar. Genus-Erstinstanz-Ausnahme (b) deckt das ERSTE AUFRUFEN fremder Achsen, nicht deren Nachbau; SetAnatomy selbst treibt korrekt Composition::search_algo (set_anatomy.hpp:144/154/164 — der Fremdgang ist NUR dieses Default-Organ). Eingefuehrt 54289d1a 2026-06-02. Fix ist kein mechanisches Umverdrahten, sondern die geplante R5.B-Architektur-Erweiterung — daher semantisch-nach-abgabe."
+            },
+            {
+              "achse": "CACHE_TRAVERSAL (T1) + SEARCH_ALGO (T0) — Store-Ketten-/Traversal-Verdrahtung",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:2219-2228",
+              "auszug": "container_algorithm_traversal_t = std::conditional_t<StoreTraversableSearchAlgo<SearchAlgo>, traversal_for_search_algo_t<SearchAlgo>, SortedBinaryTraversal>; flat_container_algorithm_t = ObservableComposedSearch<container_algorithm_traversal_t, node::LayoutAwareChunkedStore<node_type, memory_layout, allocator>>",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "Exakt der im Auftrag als EINZIGE Ausnahme benannte Kompositions-/Verdrahtungspunkt (Store-Ketten-Konstruktion abi_adapter ~:2224-2228; Zeilen am HEAD a801a7e3 verifiziert als 2219-2228). Traversal-Auswahl laeuft ueber den achsen-eigenen Trait traversal_for_search_algo_t (Heimat axes/lookup/composable/) — keine Traversal-Logik im Adapter."
+            },
+            {
+              "achse": "CACHE_TRAVERSAL (T1)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:988-994 (register_entry in tier_insert), :1074-1076 (resolve in tier_lookup), Organ-Member :2206ff (mutable ct_organ_)",
+              "auszug": "\"ct_organ_.register_entry(static_cast<...cache_traversal::key_type>(key), ...)\" / \"(void)ct_organ_.resolve(...)\" — unter \"#if COMDARE_MEASUREMENT_ON ... ALLE Observer-feeding Auto-Kopplungen NUR im Mess-Build ... speisen AUSSCHLIESSLICH den Observer (fill_observer_v3)\" (K10-PMAJOR-04, :977-987)",
+              "klasse": "legitim-framework",
+              "begruendung": "Traversal-Registrierung/-Aufloesung findet zwar ausserhalb axes/cache_traversal statt, ist aber (1) reiner Aufruf der Achsen-eigenen API (Eigenschaft bleibt in der Achse implementiert) und (2) vollstaendig COMDARE_MEASUREMENT_ON-gegatete Observer-Speisung der deklarierten Mess-Flaeche fill_observer_v3 — Ausnahme (c). Grenzfall bewusst ausgewiesen."
+            },
+            {
+              "achse": "CACHE_TRAVERSAL (T1)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:669-674 (Setup traversal.register_entry) + :745 (traversal.resolve) in run_workload_segmented_v2",
+              "auszug": "\"CacheTraversal traversal; // T1: register K Eintraege -> resolve N-fach ... traversal.register_entry(...)\" / \"auto v = traversal.resolve(static_cast<typename CacheTraversal::key_type>(rng() % kTrav));\"",
+              "klasse": "legitim-framework",
+              "begruendung": "Segment-Mess-Treiber (per-Achsen-ns T0..T17, COMDARE_MEASUREMENT_ON-gegated): treibt jede Achse ueber IHRE eigene API mit realen Ops — deklarierte Mess-Flaeche, Ausnahme (c). Keine Traversal-Logik im Treiber."
+            },
+            {
+              "achse": "CACHE_TRAVERSAL (T1) — Reflexions-/Klassifikations-Flaeche",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/axis_observer_classification.hpp:58 (stellvertretend fuer registry_to_axis_levels.hpp:52/99/128/192, axis_variant_version_table.hpp:136/204, axis_path_serialization.hpp:41, composition_registry.hpp:32, genus_binding_traits.hpp:87/115)",
+              "auszug": "{\"cache_traversal\", AxisObserverKind::SearchAlgorithmObserver}, bzw. \"using R01_cache_traversal = ce::traversal::axis_03b_cache_traversal::AllStrategies;\" + \"push_static_axis<axes26::T01_cache_traversal>(lv, \\\"cache_traversal\\\")\"",
+              "klasse": "legitim-framework",
+              "begruendung": "Experiment-Tree-Framework enumeriert/klassifiziert ALLE 18+ Achsen uniform (Namens-, Versions-, Observer-Kind-Tabellen) — Registry ist ANGEBOT, Reflexion konsumiert die achsen-eigenen Registries (AllStrategies aus axes/cache_traversal). Keine achsen-fremde Traversal-Logik."
+            },
+            {
+              "achse": "SEARCH_ALGO (T0, Traversal-Organe als Concept-Referenz)",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_slot_store.hpp:77-80 (analog chunked_store.hpp:239-240, composed_store.hpp:152-153, layout_aware_store.hpp:571-572)",
+              "auszug": "static_assert(ce_cmp::TraversalOrgan<ce_cmp::LinearScanTraversal, NodeTypeSlotStore<Node4NodeType>>); static_assert(ce_cmp::TraversalOrgan<ce_cmp::SortedBinaryTraversal, ...>); — Store selbst traegt NUR Slot-Mechanik (append_slot/insert_slot_at(i,...)/erase_slot_at(i)); Position i kommt von aussen",
+              "klasse": "legitim-framework",
+              "begruendung": "Compile-Time-Selbstbeweis (CRTP+Concept-Doktrin): der node_type-Store beweist StorageOrgan-Konformitaet gegenueber BEIDEN Traversal-Organen, implementiert aber keinerlei Suche/Descent — Suchposition wird vom Traversal-Organ geliefert (\"Suchalgorithmus = Traversal-Organ + NodeTypeSlotStore\"). Grenzfall (Namensbezug auf fremde Achse), kein Eigenschafts-Fremdgang."
+            },
+            {
+              "achse": "MAPPING (T2, axis_03m — eigene Achse)",
+              "fundstelle": "libs/cache_engine/axes/mapping/axis_03m_mapping_direct_placement.hpp:75/89/104 (analog pool_relative.hpp:85/100/118)",
+              "auszug": "\"auto it = std::find_if(mappings_.begin(), mappings_.end(), [s](auto const& m) { return m.first == s; });\" — Header :13: \"std::find_if linear-scan\" als deklarierte Strategie-Semantik",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall SEARCH_ALGO: lineare Suche, aber ueber die EIGENEN mappings_ der Mapping-Achse in ihrem Themen-Verzeichnis; der Linear-Scan ist die dokumentierte Strategie-Eigenschaft von DirectPlacement selbst (interne Hilfs-Iteration eines Organs ueber SEINE Daten = eigene Achse)."
+            },
+            {
+              "achse": "FILTER (T14 — eigene Achse)",
+              "fundstelle": "libs/cache_engine/axes/filter_axis/composable/exact_prefix_filter_store.hpp:36-38 (+ Organ exact_prefix_filter_organ.hpp:24/30)",
+              "auszug": "\"[[nodiscard]] std::size_t lower_bound(key_type k) const noexcept { return ... std::lower_bound(keys_.begin(), keys_.end(), k) - keys_.begin(); }\" — Header: \"Reines Substrat OHNE Query-Logik — die EXAKTE Filter-Correctness-Base (S1) ... GROUND-TRUTH-ANKER\"",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Grenzfall SEARCH_ALGO: Binaersuche, aber ueber die EIGENEN sortierten Keys des Filter-Achsen-Substrats in dessen Themen-Verzeichnis; Zweck ist die Filter-Korrektheits-Referenz S1 (Kreuzbeleg gegen S2-LOUDS-FST), nicht die T0-Suchrolle. Eigene Achsen-Eigenschaft in eigener Heimat."
+            },
+            {
+              "achse": "SEARCH_ALGO (T0) — Traversal-Organ-Auswahl",
+              "fundstelle": "libs/cache_engine/builder/anatomy_commands/anatomy_execution_context.hpp:51 (AUSSERHALB des zugewiesenen Suchraums, beim Namens-Sweep gefunden — der Vollstaendigkeit halber ausgewiesen)",
+              "auszug": "\"lk_comp::traversal_for_search_algo_t<search_algo_t>, comp::SortedBinaryTraversal>;\" (std::conditional-Auswahl wie abi_adapter :2219-2222)",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "Spiegel der abi_adapter-Store-Ketten-Verdrahtung (abi_adapter :2210-Kommentar: \"spiegelt builder/AnatomyExecutionContext\"): Traversal-Auswahl ueber den achsen-eigenen Trait, reine Kompositions-/Erstinstanziierungs-Stelle. Liegt in builder/anatomy_commands/, nicht im beauftragten Suchraum builder/experiment_tree/."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD  # -> a801a7e3c5b9054d130b4006e513f50a5e0c4ae7",
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine branch --show-current  # -> development",
+            "grep -rn --include='*.hpp' --include='*.cpp' --include='*.h' -E 'cache_traversal|CacheTraversal|CACHE_TRAVERSAL' libs/cache_engine/anatomy/ libs/cache_engine/builder/experiment_tree/ libs/cache_engine/src/ libs/cache_engine/axes/node/ libs/cache_engine/axes/layout/",
+            "grep -rn --include='*.hpp' --include='*.cpp' --include='*.h' -E 'std::lower_bound|std::upper_bound|std::binary_search|std::equal_range' libs/cache_engine/axes/ libs/cache_engine/anatomy/ libs/cache_engine/builder/experiment_tree/ libs/cache_engine/src/ | grep -v 'axes/cache_traversal'",
+            "grep -rn --include='*.hpp' --include='*.cpp' -E 'std::find|std::find_if|std::search\\b' libs/cache_engine/axes/ libs/cache_engine/anatomy/ libs/cache_engine/builder/experiment_tree/ libs/cache_engine/src/ | grep -v 'axes/lookup' | grep -v 'axes/cache_traversal'",
+            "grep -rn --include='*.hpp' --include='*.cpp' -E 'descend|traverse|Traversal' libs/cache_engine/axes/node/ libs/cache_engine/axes/layout/ libs/cache_engine/src/ libs/cache_engine/builder/experiment_tree/",
+            "grep -rn --include='*.hpp' --include='*.cpp' -E 'register_entry|register_slot|\\.resolve\\(|->resolve\\(' libs/cache_engine/axes/ libs/cache_engine/anatomy/ libs/cache_engine/builder/experiment_tree/ libs/cache_engine/src/ | grep -v 'axes/cache_traversal' | grep -v 'axes/mapping'",
+            "grep -n 'descent_slot_for_' libs/cache_engine/anatomy/abi_adapter.hpp libs/cache_engine/anatomy/*.hpp",
+            "grep -rn 'lower_bound_index' libs/cache_engine/  # Achsen-API-Nachweis: composable_search.hpp:130 + abi_adapter-Kommentar :2180",
+            "grep -rn --include='*.hpp' --include='*.cpp' -E 'while \\(lo < hi\\)|while \\(low|/ 2;|>> 1' libs/cache_engine/anatomy/ libs/cache_engine/builder/experiment_tree/ libs/cache_engine/src/ libs/cache_engine/axes/node/ libs/cache_engine/axes/layout/ | grep -viE 'kRecords|stride|half|/ 2;.*(size|count|cap|byte|len)'",
+            "grep -rn --include='*.hpp' -E '\\.find\\(|find_if|lower_bound|linear|scan' libs/cache_engine/src/",
+            "grep -rnl --include='*.hpp' -E 'for \\(.*key|while \\(.*key|key_at\\(' libs/cache_engine/anatomy/",
+            "grep -rn --include='*.hpp' -E 'std::lower_bound|std::find\\b|std::find_if' libs/cache_engine/builder/experiment_tree/",
+            "grep -rn --include='*.hpp' --include='*.cpp' -E 'LinearFanout|BinarySearchFanout|HashLookup' libs/cache_engine/ | grep -v 'axes/cache_traversal' | grep -v 'topics/traversal'",
+            "grep -rn --include='*.hpp' -E 'LinearScanTraversal|SortedBinaryTraversal|EytzingerTraversal' libs/cache_engine/ | grep -v 'axes/lookup' | grep -v 'topics/traversal'",
+            "grep -rn --include='*.hpp' -E 'memchr|bsearch\\(|std::search|std::ranges::(find|lower_bound|binary_search)' libs/cache_engine/axes/ libs/cache_engine/anatomy/ libs/cache_engine/builder/experiment_tree/ libs/cache_engine/src/ | grep -v 'axes/lookup'",
+            "grep -n -E 'for \\(|while \\(|scan_range|lower_bound|find' libs/cache_engine/anatomy/scannable_tier.hpp libs/cache_engine/anatomy/set_tier_algebra.hpp libs/cache_engine/anatomy/set_tier.hpp libs/cache_engine/anatomy/sequence_tier.hpp libs/cache_engine/anatomy/view_tier.hpp libs/cache_engine/anatomy/pruefling_merge.hpp",
+            "grep -n -E 'tier_scan|scan_range' libs/cache_engine/anatomy/abi_adapter.hpp",
+            "grep -rn --include='*.hpp' -E 'key_at\\(|slot_count\\(\\)' libs/cache_engine/axes/ | grep -vE 'axes/(lookup|cache_traversal|node|mapping)/'",
+            "grep -rn --include='*.hpp' -E 'bool contains|std::count|== *key|!= *key' libs/cache_engine/anatomy/ | grep -v abi_adapter | grep -v set_default_organ",
+            "grep -rn 'set_default_organ' libs/ --include='*.hpp' --include='*.cpp' | grep -v 'set_default_organ.hpp:'  # -> nur cross_genus_organ.hpp:38",
+            "git log --format='%h %ad %s' --date=short -S 'descent_slot_for_' -- libs/cache_engine/anatomy/abi_adapter.hpp | tail -2  # aelteste: 0941a1ca 2026-06-18",
+            "git log --format='%h %ad %s' --date=short --follow -- libs/cache_engine/anatomy/set_default_organ.hpp | tail -2  # aelteste: 54289d1a 2026-06-02",
+            "Read-Kontrollen (Datei:Bereich): anatomy/set_default_organ.hpp (voll), anatomy/abi_adapter.hpp:560-690/780-830/940-1090/2160-2280, axes/node/axis_04_node_type_slot_store.hpp:30-83, axes/filter_axis/composable/exact_prefix_filter_store.hpp (voll), anatomy/set_abi_adapter.hpp:105-150, builder/experiment_tree/cache_engine_builder_iterator.hpp:800-834, builder/experiment_tree/experiment_tree.hpp:418-432"
+          ],
+          "negativ_belege": [
+            "THEMA 1 KERN-NEGATIV: Keine Traversal-/Descent-LOGIK (Registrierung/Aufloesung als Implementierung) ausserhalb axes/cache_traversal + topics/traversal/axis_03b im gesamten Suchraum — alle 80+ cache_traversal-Treffer in anatomy/ + builder/experiment_tree/ sind (i) Kompositions-Typ-Aliase/Organ-Member (Verdrahtung), (ii) COMDARE_MEASUREMENT_ON-gegatete Observer-Kopplungen ueber die Achsen-API oder (iii) uniforme Framework-Reflexion. Kommando: grep -rn -E 'cache_traversal|CacheTraversal|CACHE_TRAVERSAL' ueber anatomy/, builder/experiment_tree/, src/, axes/node/, axes/layout/ (jeder Treffer klassifiziert).",
+            "Traversal-Strategie-Namen (LinearFanout/BinarySearchFanout/HashLookup) ausserhalb der Achsen-Heimat: NUR in libs/cache_engine/compositions/*.hpp (Kompositions-Deklarationen, ausserhalb Suchraum, Verdrahtungs-Charakter) + 1 Doc-Kommentar abi_adapter:2162. 0 Logik-Treffer. Kommando: grep -rnE 'LinearFanout|BinarySearchFanout|HashLookup' libs/cache_engine/ | grep -v axes/cache_traversal | grep -v topics/traversal",
+            "src/ (concepts/measurement/permutations/sha256/sha512): 0 Treffer fuer '\\.find\\(|find_if|lower_bound|linear|scan' UND 0 fuer cache_traversal-Vokabular. Kommandos: grep -rn --include='*.hpp' -E '\\.find\\(|find_if|lower_bound|linear|scan' libs/cache_engine/src/ (leer); Thema-1-grep oben (leer fuer src/).",
+            "builder/experiment_tree/: 0 Treffer fuer std::lower_bound/std::find/std::find_if/binary_search. Einziger Midpoint-Treffer cache_engine_builder_iterator.hpp:818 ist nth_element-MEDIAN ueber eigene Mess-Zeilen (Ausreisser-Flagging, Framework-eigene Daten — kein Store-Search). binary_count_traversed (experiment_tree.hpp:423) zaehlt nur via for_each_binary ueber den EIGENEN Experiment-Baum.",
+            "Handgerollte Binaersuch-Muster (while (lo < hi) / Midpoint) im Suchraum: EXAKT 1 Fundstelle = abi_adapter.hpp:2198-2199 (Befund 1); uebrige Treffer sind SHA256-Rotationen (src/sha256/ctsha.hpp) und Bit-/Stride-Arithmetik. Kommando siehe kommandos-Liste.",
+            "Alternative Such-Primitive (memchr, bsearch, std::search, std::ranges::find/lower_bound/binary_search) im gesamten Suchraum ausserhalb axes/lookup: 0 Treffer (EXIT_OK).",
+            "Anatomy-Tier-Schicht (scannable_tier, set_tier_algebra, set_tier, sequence_tier, view_tier, pruefling_merge): 0 Schleifen/Such-Aufrufe (grep for/while/scan_range/lower_bound/find = leer) — reine Interfaces.",
+            "tier_scan (YCSB-E Range-Scan) laeuft korrekt ueber container_algorithm_.scan_range, d.h. das Traversal-Organ der T0-Achse (abi_adapter.hpp:2057-2081; Familien ohne scan_range = honest-0) — KEIN eigener Range-Walk im Adapter.",
+            "set_abi_adapter.hpp:111-144 (merge/intersection/difference): Schleifen laufen NUR ueber das INPUT-Array des Aufrufers und delegieren Membership an anatomy_.contains/insert -> SetAnatomy -> Composition::search_algo (set_anatomy.hpp:144/154/164) — kein eigener Store-Scan.",
+            "Store-Kette axes/node/ + axes/layout/: node_type-Stores tragen ausschliesslich Slot-Mechanik (insert_slot_at/erase_slot_at-Shifts, child_index-Aufbau node48:48); Suchposition kommt vom Traversal-Organ. axes/layout/: 0 Treffer fuer lower_bound/find (globaler Binaersuch-grep). Prefetch-Achse (axis_07_prefetch_real_descent.hpp:99) ERHAELT den Descent-Slot von aussen, berechnet ihn nicht.",
+            "Anatomy-weite Key-Iterations-Suche ('for (.*key|while (.*key|key_at('): einzige Datei = abi_adapter.hpp (= Befund 1); 'bool contains'-Definitionen nur set_anatomy.hpp:152 (delegiert an axis_search_algo_.lookup) + organ_concept.hpp:389 (Concept-Archetyp-Stub return false).",
+            "SortedArrayKeySet-Verbreitung: einzige Einbindung cross_genus_organ.hpp:38 (SetSubOrgan-Default) — der Fremdgang ist auf das eine Default-Organ begrenzt, SetAnatomy selbst ist achsenrein."
+          ]
+        }
+      },
+      {
+        "key": "L5-layout-alloc-migration-queuing",
+        "r": {
+          "befunde": [
+            {
+              "achse": "memory_layout (axis_05)",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:398-427 (dazu :69-77 record_bytes_/round_up_, :113-122 kStoreBlock=10/kBlockW, :127-138 chunk_bytes, :66-67 kHotBytes=2/kColdBytes=6)",
+              "auszug": "if constexpr (kRep == RK::aos_interleaved_packed) return base + j * kKvBytes; // [k|v] @ 16 ... else if constexpr (kRep == RK::aosoa_blocked_columns) { std::size_t const b = j / kBlockW, w = j % kBlockW; return base + b * (kBlockW * kKvBytes) + w * kKeyBytes; } else { return base + j * kHotBytes; }",
+              "klasse": "semantisch-nach-abgabe",
+              "begruendung": "Die KOMPLETTE Stride-/Feld-Offset-Rechnung aller 5 Repraesentationen (AoS 16/64-B-Stride via round_up, SoA-Spalten-Offsets, AoSoA-Tile B=10, succinct 2/6-B-Hot/Cold-Split) liegt in der node-Achse; die layout-Achse publiziert NUR das RepresentationKind-Enum. axes/layout/axis_05_memory_layout_strategy_base.hpp:18 dokumentiert dieses Design ausdruecklich ('der Store leitet daraus store_record/load_key/load_value ... ab', P-MD1-ERDUNG #167) — unter Owner-KERN 04.08. ist das dennoch memory_layout-Eigenschaft ausserhalb der Achse. Verlagerung erfordert Redesign der composable-bridge (Layout-Strategien muessten ptr-/stride-Rechner exportieren), kein mechanischer Fix; keine der 4 Legitim-Ausnahmen greift (kein Genus-Erstaufruf, keine deklarierte Mess-Flaeche, kein vendored)."
+            },
+            {
+              "achse": "cacheline (Unterachse der memory_layout-Achse)",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:65 (Nutzung :77, :105-107, :500, :504) und :387 kChunkAlign (Nutzung :222, :532, :541)",
+              "auszug": "static constexpr std::size_t kLineBytes = 64; // Cache-Line (CLU-Bezugsgroesse) ... static constexpr std::size_t kChunkAlign = 64;",
+              "klasse": "mechanisch-vor-anker",
+              "begruendung": "Die permutierbare Cache-Line-Groesse ist Eigentum der cacheline-Unterachse (MemoryLayoutStrategyBase erbt CacheLineAware; L::cacheline_subaxis_line_bytes() existiert, Default B64=64 — strategy_base.hpp:50-55). Der Store rechnet CLU-Zaehlung, Node-Breite (node_width_lines_*kLineBytes), AoS-Padding round_up(16,kLineBytes) und Chunk-Alignment stattdessen mit der Literal-64 — die cacheline-Permutation wuerde stumm ignoriert. Mechanische Substitution durch L::cacheline_subaxis_line_bytes() ist beim Default byte-neutral. ACHTUNG: NICHT durch L::cache_line_size() ersetzen — das ist der intrinsische Design-Deskriptor (aos_strict=1, packed_bitmap=8), Duplikat-Bug-Falle laut axis_05_memory_layout_cache_line_aligned.hpp:54."
+            },
+            {
+              "achse": "memory_layout (axis_05)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:454-464 (Spiegel :560, :691)",
+              "auszug": "// (NICHT 64) — sonst fiele cache_line_aligned (aligned_stride=round_up(48,64)=64) mit aos_strict ... constexpr std::size_t kRecordSize = 48; constexpr std::size_t kLbufBytes = kRecords * 64; // OOB-Schutz: groesstmoeglicher Layout-Stride (64)",
+              "klasse": "legitim-framework",
+              "begruendung": "IMeasurableWorkload::run_workload (F15 Stufe B) ist deklarierte Mess-Treiber-Flaeche; das Scan-Muster selbst wird an die Achse delegiert (MemLayout::scan_field_sum :505). Grenzfall ausgewiesen: die Konstante 'groesstmoeglicher Layout-Stride 64' dupliziert Achsen-Wissen (round_up(48,64)) im Treiber, statt sie als max ueber die Layout-Registry abzufragen."
+            },
+            {
+              "achse": "allocator (axis_06)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:463 (weitere: :495, :502, :527, :562, :584, :591, :605, :693, :790, :797, :912)",
+              "auszug": "unsigned char* lbuf = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, 64));",
+              "klasse": "legitim-framework",
+              "begruendung": "Alle Mess-Treiber-Allokationen in anatomy/ laufen UEBER die allocator-Achse der Komposition (alloc.allocate/deallocate) — achsen-vermitteltes Muster, kein Fremdgang. Als geprueft ausgewiesen, weil dies die einzigen Nicht-std-Container-Allokationsstellen im anatomy-Segment sind."
+            },
+            {
+              "achse": "allocator (axis_06) — Host-Framework, keine Achsen-Eigenschaft",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/experiment_tree.hpp:172 (dazu :176, :344)",
+              "auszug": "return std::make_unique<StaticAxisNode>(std::move(axis), std::move(value), pinned, std::move(block_id));",
+              "klasse": "legitim-framework",
+              "begruendung": "make_unique-Besitz fuer Experimentbaum-Knoten in der GoF-AbstractNodeFactory des Planers — host-seitige CEB-/Mess-Orchestrierung, nicht der Engine-Datenpfad, den die allocator-Achse regiert. Grenzfall der Themen-Klasse ALLOCATOR-REST, als Framework-Flaeche ausgewiesen."
+            },
+            {
+              "achse": "allocator (axis_06) — Host-Framework, keine Achsen-Eigenschaft",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:1319-1322",
+              "auszug": "std::unique_ptr<AsyncPushPump> push_pump; if (cfg.provision_only && cfg.cache_push && cfg.per_binary_subdirs) push_pump = std::make_unique<AsyncPushPump>(cfg.cache_push, cfg.build_version, cfg.partial_marker_sink, cfg.chunk_part_size);",
+              "klasse": "legitim-framework",
+              "begruendung": "W11-Bau-Modus-Push-Pump (Artefakt-Transport, Typ aus builder/artifact_transport/) — Host-Tooling ausserhalb des Engine-Datenpfads. Die Queue darin ist Build-Artefakt-Transport, KEINE Q1/Q2-Queuing-Achsen-Eigenschaft (Q1/Q2 = Insert-Puffer/Flush-Policy des Cache-Datenpfads). std-Container-Klasse laeuft parallel im S5-Scrub und wird hier nicht doppelt gemeldet."
+            },
+            {
+              "achse": "migration_policy",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:358-381",
+              "auszug": "bool const migrate = (max_moves == 0 || moved < max_moves) && org.should_migrate_record(rec, sizeof(rec), prev_recency); if (migrate) { tier1.append_slot(s.first, s.second); ++moved; }",
+              "klasse": "legitim-framework",
+              "begruendung": "P4 echter 2-Ebenen-Migrations-Schritt: die POLICY-Entscheidung kommt vollstaendig aus dem migration-Achsen-Organ (should_migrate_record); der Store fuehrt nur mechanisch aus (append/rebuild). max_moves ist Treiber-Limit des Mess-Pfads, keine Policy-Rechnung. Achsen-vermittelt und damit konform; als Grenzfall ausgewiesen, weil Move-MECHANIK im node-Store liegt."
+            },
+            {
+              "achse": "queuing_q2 (Flush-Policy)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:1010-1020 (dazu :889-891, :1793-1796)",
+              "auszug": "(void)queuing_q2_organ_.should_flush(static_cast<std::size_t>(container_algorithm_.occupied_count()), std::size_t{1024}); queuing_q2_organ_.on_flush_complete();",
+              "klasse": "legitim-framework",
+              "begruendung": "Deklarierte Auto-Kopplung der Mess-Flaeche (T15 Q1 put/get, T16 Q2 should_flush) in tier_insert/lookup — die Flush-ENTSCHEIDUNG stammt aus der Q2-Achse, der Adapter exerziert sie nur (decide-only, Ergebnis verworfen, ehrlich dokumentiert). Grenzfall ausgewiesen: die synthetische Kapazitaet 1024 ist Treiber-Konstante statt Achsen-/Registry-Parameter und wiederholt sich an 3 Stellen."
+            },
+            {
+              "achse": "queuing_q1 (fifo/lifo/priority_heap) vs Adapter-Genus",
+              "fundstelle": "libs/cache_engine/anatomy/adapter_anatomy.hpp:47-115 (Entnahme :278-309)",
+              "auszug": "// FIFO (queue) nutzt front+pop_front; LIFO (stack) nutzt back+pop_back — die Disziplin ist die API-Nutzung. ... DequeInner / VectorInner / HeapInner (std::push_heap/std::pop_heap)",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "Das Adapter-Genus (stack/queue/priority_queue, Wirbelloses) implementiert FIFO/LIFO/Priority-Disziplin selbst statt axis_q1_queuing_fifo/lifo/priority_heap zu rufen. Die Disziplin ist jedoch KONSTITUTIV fuer das Genus (ein stack IST lifo; §26.4 std-Praezedenz stack/queue→deque, priority_queue→vector+Compare) — Gattungs-Konstitution, nicht Achsen-Fremdgang. Als Grenzfall ausgewiesen (Abgrenzung gehoert in die A8-S4-Konstitutiv-Matrix), da nominale Ueberlappung mit Q1-Strategienamen besteht."
+            },
+            {
+              "achse": "Komposition node_type ⊕ memory_layout ⊕ allocator (Verdrahtungspunkt)",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:2224-2228",
+              "auszug": "using flat_container_algorithm_t = ...ObservableComposedSearch<container_algorithm_traversal_t, ::comdare::cache_engine::node::LayoutAwareChunkedStore<typename Composition::node_type, typename Composition::memory_layout, typename Composition::allocator>>;",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "Exakt der im Owner-KERN 04.08. deklarierte Ausnahme-Punkt (Store-Ketten-Konstruktion abi_adapter :2224-2228). Verifiziert: hier findet reine Typ-Verdrahtung der Achsen statt, keine Eigenschafts-Rechnung."
+            },
+            {
+              "achse": "lookup/search_algo (B-Baum) — Grenzfall zu memory_layout/cacheline",
+              "fundstelle": "libs/cache_engine/axes/lookup/axis_03a_search_algo_btree.hpp:197 (dazu axes/lookup/composable/btree_node_pool_store.hpp:38)",
+              "auszug": "struct alignas(64) Node { // alignas(64): block-orientierter Knoten ⇒ has_cache_line_alignment()==true (B-Baum-Merkmal)",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "64-B-Block-Knoten ist konstitutives, dokumentiertes Design-Merkmal des cache-bewussten B-Baums in dessen eigenem Achsen-Verzeichnis (btree_node_pool_store.hpp:11: 'alignas(64) BLEIBT erhalten — messbares B-Baum-Merkmal'). Kein memory_layout-Fremdgang; Grenzfall wegen der Cache-Line-Konstante ausgewiesen."
+            },
+            {
+              "achse": "io_dispatch",
+              "fundstelle": "libs/cache_engine/axes/io_dispatch/axis_io_direct.hpp:59",
+              "auszug": "std::size_t const aligned = offset & ~(kSector - 1u);",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Sektor-Alignment-Arithmetik des O_DIRECT-Pfads — Eigenschaft der io_dispatch-Achse selbst, in deren eigenem Themen-Verzeichnis (Ausnahme a). Ausgewiesen, weil es beim Alignment-Grep als Treffer erscheint, aber kein memory_layout-Fremdgang ist."
+            },
+            {
+              "achse": "Mess-Framework C6/GenusObserverAggregate",
+              "fundstelle": "libs/cache_engine/anatomy/genus_observer_aggregate.hpp:162-165",
+              "auszug": "return (N * kGenusAxisFieldCount * sizeof(std::uint64_t)) // axis_stats + (N * sizeof(std::int64_t)) // seg_ns + (kGenusStatFieldCount * sizeof(std::uint64_t)) + (5 * sizeof(std::uint64_t));",
+              "klasse": "legitim-framework",
+              "begruendung": "Groessenrechnung des Statistik-POD-Blobs der deklarierten GenusObserverAggregate-Flaeche (Ausnahme c) — Mess-Serialisierung, kein Nutzdaten-Stride und keine Layout-Achsen-Eigenschaft."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD  # → a801a7e3c5b9054d130b4006e513f50a5e0c4ae7; branch --show-current → development",
+            "cd .../libs/cache_engine && grep -rn \"stride\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' -l | grep -v \"axes/layout/\" | sort  # → 8 Dateien (anatomy/abi_adapter.hpp, anatomy/view_composition.hpp, 5× axes/migration_policy/, axes/node/axis_04_node_type_layout_aware_store.hpp)",
+            "grep -rn \"offsetof\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -v \"axes/layout/\"  # → 0 Treffer",
+            "grep -rnE \"round_up|align_up|& ~\\(|~\\(a - 1|\\+ a - 1\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -v \"axes/layout/\" | grep -v \"axes/alloc/\"  # → 6 Zeilen: io_direct.hpp:59 (Sektor), masstree_layer_pool_store.hpp:67 (Key-Slicing), layout_aware_store.hpp:69/70/77, abi_adapter.hpp:454 (Kommentar)",
+            "grep -rnE \"= new |\\bnew [A-Za-z_:]+[\\(\\[<{]|delete \\[|delete [a-z_]+;|std::malloc|::malloc\\(|\\bmalloc\\(|aligned_alloc\\(|posix_memalign|std::calloc|std::realloc|std::free\\(|::free\\(\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -v \"axes/alloc/\"  # → 3 Zeilen, alle Kommentar/Doku (surf_louds_bitvector.hpp:65, comdare_is_original_macro.hpp:37, abi_adapter.hpp:216)",
+            "grep -rn \"return new \\|= new \\|new (\\|::pmr::\\|unique_ptr<.*>(new\\|shared_ptr<.*>(new\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -v \"axes/alloc/\"  # → 1 Treffer, Doku-Beispiel abi_adapter.hpp:216",
+            "grep -rn \"make_unique\\|make_shared\" axes/ anatomy/ src/ --include='*.hpp' --include='*.cpp' | grep -v \"axes/alloc/\"  # → 0 Treffer",
+            "grep -rnE \"\\bnew\\b|\\bdelete\\b|malloc|calloc|realloc|\\bfree\\(|aligned_alloc|posix_memalign|::pmr\" builder/experiment_tree/ --include='*.hpp' --include='*.cpp' | grep -vE \":[0-9]+: *(//|///|\\*|\\* )\" | grep -vE \"= delete|delete\\]\"  # → 0 Treffer",
+            "grep -rn \"\\.allocate(\\|->allocate(\\|\\.deallocate(\\|->deallocate(\" anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp'  # → 12 Zeilen, ALLE anatomy/abi_adapter.hpp via Kompositions-Allocator-Achse",
+            "grep -rln \"migrat\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -v \"axes/migration_policy/\"  # → 30 Dateien, alle als Observer-/Verdrahtungs-/Doku-Flaechen geprueft",
+            "grep -rn \"should_migrate\\|migration_decide\\|should_flush\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -vE \"axes/migration_policy/|topics/\" | grep -vE \":[0-9]+: *(//|///)\"  # → 8 Code-Zeilen, ALLE delegieren an Achsen-Strategien/-Organe (layout_aware_store.hpp:371; abi_adapter.hpp:704/869/889/1014/1017/1790/1795)",
+            "grep -rn \"recency\\|hot_threshold\\|is_hot\\|cold_threshold\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -v \"axes/migration_policy/\"  # → 3 Zeilen, alle layout_aware_store organ_migrate_step (Entscheidung delegiert)",
+            "grep -rln \"enqueue\\|dequeue\\|\\bqueue\\|Queue\\|ring_buffer\\|RingBuffer\\|tombstone\\|epoch_buffer\\|insert_buffer\\|flush_threshold\\|batch_buffer\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp'  # → 23 Dateien, einzeln klassifiziert (Adapter-Genus, prefetch-eigene Queue, SwissTable-Tombstones, Mess-Zeilen, Host-Tooling)",
+            "grep -rn \"alignas(\" axes/ anatomy/ builder/experiment_tree/ src/ --include='*.hpp' --include='*.cpp' | grep -vE \"axes/layout/|axes/alloc/|axes/cacheline/\"  # → btree (konstitutiv) + simd-Lanes (eigene Achse)",
+            "grep -rn \"cache_line_size()\" axes/layout/*.hpp  # → intrinsischer Deskriptor je Strategie (aos_strict=1, packed_bitmap=8, sonst 64); kLineBytes=64 im Store ist davon unabhaengig hartkodiert"
+          ],
+          "negativ_belege": [
+            "MEMORY_LAYOUT/offsetof: 0 Treffer im gesamten Suchraum (axes/ anatomy/ builder/experiment_tree/ src/) — Kommando: grep -rn \"offsetof\" ... | grep -v \"axes/layout/\" → leer.",
+            "MEMORY_LAYOUT/Alignment-Rechnung ausserhalb layout+alloc: nur 3 Nicht-Layout-Code-Stellen — io_direct.hpp:59 (Sektor, eigene io-Achse), masstree_layer_pool_store.hpp:67 (Key-Bit-Slicing der Suchstruktur, kein Byte-Layout), layout_aware_store.hpp:69-77 (als Befund 1/2 gemeldet). Kommando: grep -rnE \"round_up|align_up|& ~\\(...\" → 6 Zeilen gesamt.",
+            "ALLOCATOR-REST/rohe Primitive (new/delete/malloc/calloc/realloc/free/aligned_alloc/posix_memalign) ausserhalb axes/alloc/: 0 Code-Treffer — die 3 Grep-Treffer (surf_louds_bitvector.hpp:65, comdare_is_original_macro.hpp:37, abi_adapter.hpp:216) sind saemtlich Kommentar/Doku, per sed-Kontextlesung verifiziert.",
+            "ALLOCATOR-REST/::pmr, unique_ptr(new...), shared_ptr(new...), 'return new' im Suchraum: 0 Code-Treffer (einziger Treffer abi_adapter.hpp:216 ist ein Doku-Codebeispiel; das reale Factory-new liegt in builder/codegen/codegen.cpp:33/157/172 AUSSERHALB des Suchraums, nur zur Ortung dokumentiert).",
+            "ALLOCATOR-REST/make_unique+make_shared in axes/, anatomy/, src/: 0 Treffer — Besitz-Allokationen existieren ausschliesslich in builder/experiment_tree (Befunde 5/6, legitim-framework).",
+            "ALLOCATOR-REST/builder/experiment_tree rohe Primitive (non-comment): 0 Treffer — Kommando mit Kommentar-Filter dokumentiert.",
+            "MIGRATION_POLICY/eigenstaendige Move-Entscheidungslogik ausserhalb der Achse: 0 Treffer — alle 8 Code-Aufrufe von should_migrate_record/migration_decide_scan/should_flush delegieren an Achsen-Strategien bzw. -Organe; die organ_observe_migration/organ_migrate_step-Stellen in beiden Stores reichen Backing+record_size nur durch (chunked_store.hpp:186-194, layout_aware_store.hpp:336-381).",
+            "MIGRATION_POLICY/Hot-Cold-Recency-Heuristik ausserhalb der Achse: 0 Treffer eigenstaendiger Logik — grep recency|hot_threshold|is_hot|cold_threshold ausserhalb axes/migration_policy/ liefert nur die 3 delegierenden Zeilen in organ_migrate_step.",
+            "QUEUING_Q1/Q2/fremde Puffer-/Flush-Logik im Engine-Pfad: 0 Treffer — abi_adapter treibt Q1/Q2 ausschliesslich ueber deren Strategie-API (put/get/should_flush/on_flush_complete, Zeilen 877-892, 1010-1020, 1086, 1488-1500); prefetch-Adress-Queue = eigene prefetch-Achse (axis_07_prefetch_path_oriented.hpp:67-70, eigenes Verzeichnis); SwissTable-Tombstones = konstitutives Merkmal der lookup-Achse (swiss_group_pool_store.hpp:7,55-85), NICHT Q1-tombstone_buffer.",
+            "src/ (concepts/measurement/permutations/sha256/sha512): Themen-Begriffe (queuing/migrat/layout/stride/flush) nur in 3 Doku-Kommentarzeilen (legacy_original_code_strategy_concept.hpp:11, measurable_concept.hpp:43,57), 0 Logik-Treffer.",
+            "Es existiert KEIN axes/queuing/-Verzeichnis — Q1/Q2 leben ausschliesslich in topics/queuing/axis_q1_queuing + axis_q2_queuing (per ls -R verifiziert); axes/-Liste enthaelt 20 Eintraege ohne queuing.",
+            "Objekt-Stand READ-ONLY eingehalten: ausschliesslich git rev-parse, ls, grep, sed auf /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine (HEAD a801a7e3c5b9054d130b4006e513f50a5e0c4ae7, Branch development); keine Worktrees betreten, keine Schreib-/Build-/Git-Mutationen."
+          ]
+        }
+      },
+      {
+        "key": "L6-filter-io-persistence-isa",
+        "r": {
+          "befunde": [
+            {
+              "achse": "isa (axes/simd) — ISA-Artefakt im Genus",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:112",
+              "auszug": "#include <xmmintrin.h> // (X) _mm_prefetch für das T7-Prefetch-Segment (MSVC/x86_64-Mess-Build) [unter #if defined(_M_X64) || defined(__x86_64__), Z.111]",
+              "klasse": "mechanisch-vor-anker",
+              "begruendung": "Der Genus-Code enthaelt keinen einzigen echten _mm_-/_MM_-Aufruf mehr: grep -n '_mm_\\|_MM_' anatomy/abi_adapter.hpp (ohne Kommentarzeilen) liefert NUR Z.112 (der Include) und Z.818 (reiner Kommentar 'REALES _mm_prefetch (strat-distinkt)' an einem Aufruf der Achsen-Policy). Der reale T7-Prefetch laeuft seit K9-Fix vollstaendig ueber die prefetch-Achse; axes/prefetch_axis/axis_07_prefetch_real_descent.hpp:41-42 bringt <xmmintrin.h> unter eigenem Guard selbst mit. Der Include ist ein totes ISA-Artefakt ausserhalb jeder Achse — mechanisch entfernbar, kein Semantik-Effekt."
+            },
+            {
+              "achse": "cacheline (sw_hint-Unterachse); Grenzfall zur isa-Achse",
+              "fundstelle": "libs/cache_engine/axes/cacheline/cacheline_config.hpp:67",
+              "auszug": "_mm_prefetch(static_cast<char const*>(p), h);  [MSVC-Zweig; Z.73 __builtin_prefetch(p, 0, locality) fuer GCC/Clang-x86; #else (void)p]",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "sw_hint (SwPrefetchHint None/T0/T1/T2/NTA) ist deklarierte Dimension der cacheline-Unterachse selbst (Wertraum 4x3x5, Thesis-Anker KF-5, Kopf-Kommentar der Datei); das Intrinsic ist der Mechanismus dieser eigenen Eigenschaft, sauber plattform-geguarded (Z.62-78: MSVC / GCC-Clang-x86 / No-op-Fallback). Die isa-Achse bietet keine Prefetch-Flaeche an (grep -rn 'prefetch' axes/simd/ --include='*.hpp' → 0 Treffer) — kein Fremdgang auf eine existierende Achsen-API. Grenzfall ausgewiesen: bei INC-2d-Homing (isa → hardware_isa-System) waere eine Delegation der ISA-Mechanik an axis_09 denkbar."
+            },
+            {
+              "achse": "prefetch_axis; Grenzfall zur isa-Achse",
+              "fundstelle": "libs/cache_engine/axes/prefetch_axis/axis_07_prefetch_real_descent.hpp:72",
+              "auszug": "inline void issue_prefetch_t0(unsigned char const* addr) noexcept { #if COMDARE_PREFETCH_HAVE_MM  _mm_prefetch(reinterpret_cast<char const*>(addr), _MM_HINT_T0); #elif __GNUC__/__clang__  __builtin_prefetch(addr, 0, 3); #else volatile-Touch #endif }",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Prefetch ist die Eigenschaft der prefetch-Achse selbst, implementiert im eigenen Achsen-Verzeichnis (legitim (a)); die ISA-Mechanik ist in EINEM Kapsel-Helper (issue_prefetch_t0) mit 3-stufigem portablen Fallback gebuendelt (Z.41-46 Guard-Definition COMDARE_PREFETCH_HAVE_MM, Z.70-79 Dispatch). Die isa-Achse (axes/simd, axis_09) exportiert keine Prefetch-Primitive — ihr Remit sind ISA-Familien + SIMD-Gruppen-Match (group_match_mask); kein Fremdgang."
+            },
+            {
+              "achse": "filter (axes/filter_axis) — T14-Mess-Segment im Genus",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:874",
+              "auszug": "// T14 filter: filter_probe_scan (Bloom/Cuckoo/SuRF/Xor-Probe; buf,n,queries,q).\nsink += Filter::filter_probe_scan(lbuf, kRecords, qbuf.data(), kQueries);",
+              "klasse": "legitim-framework",
+              "begruendung": "18-Segment-Batch-Treiber des Mess-Frameworks (T0-T17, Segment-Timing acc[14]): reine Delegation an die statische Achsen-API filter_axis; keinerlei Membership-/Hash-/Bitmap-Logik im Genus. Das Mess-Framework ist per Owner-KERN deklarierte legitime Flaeche."
+            },
+            {
+              "achse": "filter (axes/filter_axis) — Genus-Treiber Build-/Clear-Phase",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:1042",
+              "auszug": "if constexpr (requires { flt_organ_.insert_key(key); }) flt_organ_.insert_key(key);  [analog Z.1152: if constexpr (requires { flt_organ_.clear_filter(); }) flt_organ_.clear_filter();]",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "tier_insert/tier_clear = Genus als erste Instanz treibt das Filter-Organ (P5/#124 Build-Phase bzw. R1 symmetrischer Clear); if-constexpr prueft nur die Achsen-API, die Filterstruktur (Bloom-Bitmap/Cuckoo-Buckets/Xor/SuRF-Trie) lebt vollstaendig in filter_axis. Kompositions-/Verdrahtungspunkt gemaess Ausnahme-Definition."
+            },
+            {
+              "achse": "filter (axes/filter_axis) — Memento im Genus",
+              "fundstelle": "libs/cache_engine/anatomy/abi_adapter.hpp:2369",
+              "auszug": "using flt_organ_t = ::comdare::cache_engine::filter_axis::ObservableFilter<typename Composition::filter>;\nstd::optional<flt_organ_t> saved_flt_{};  [Z.1942 saved_flt_.emplace(flt_organ_); Z.1985/2007 flt_organ_ = *saved_flt_;]",
+              "klasse": "legitim-genus-erstinstanz",
+              "begruendung": "P5-Memento sichert/restauriert das Achsen-Organ ALS GANZES (Kopie + operator==) fuer rollback_all — kein Zugriff auf Filter-Interna, kein Nachbau von Membership-Semantik; ObservableFilter ist zudem deklarierte Mess-Flaeche (Observable-Huelle)."
+            },
+            {
+              "achse": "filter (axes/filter_axis) — T16-Auto-Kopplung im Node-Store",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_chunked_store.hpp:197",
+              "auszug": "template <class FltOrgan> std::uint64_t organ_observe_filter(FltOrgan& org) const { ... return org.observe_probe_keys(ks.data(), ks.size()); } else { ... return org.observe_probe(kb.data(), kb.size(), kb.data(), kb.size()); }",
+              "klasse": "legitim-framework",
+              "begruendung": "T16-Observer-Auto-Kopplung (Phase B): der Node-Store extrahiert NUR seinen eigenen gespeicherten Key-Strom und uebergibt ihn der Filter-Observer-Huelle; Probe-/Membership-Logik bleibt komplett in der Achse (observe_probe_keys → strat_.probe_key). Grenzfall ausgewiesen: filter-benannte Methode im node-Store, aber reines Daten-Feeding an die Achsen-API — Bestandteil des Mess-Frameworks (Observer-Aggregat)."
+            },
+            {
+              "achse": "filter (axes/filter_axis) — T16-Auto-Kopplung im Layout-Aware-Store",
+              "fundstelle": "libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:342",
+              "auszug": "template <class FltOrgan> std::uint64_t organ_observe_filter(FltOrgan& org) const {",
+              "klasse": "legitim-framework",
+              "begruendung": "Identisches T16-Feeding-Muster wie im chunked_store (Signatur per grep belegt): Store liefert Key-Strom an die Observer-Huelle, keine eigene Membership-Logik."
+            },
+            {
+              "achse": "lookup (axes/lookup) — Abgrenzung: Sondierung ist KEINE Filter-Membership",
+              "fundstelle": "libs/cache_engine/axes/lookup/axis_03a_search_algo_swisstable.hpp:91",
+              "auszug": "for (std::size_t probe = 0; probe < groups; ++probe) { std::size_t const group_start = group_start_for(hash, probe); ...  [Z.65: supports_simd() { return false; } // AP-7-Follow: SIMD-Gruppen-Probe]",
+              "klasse": "legitim-eigene-achse",
+              "begruendung": "Open-Addressing-/SwissTable-Gruppen-Sondierung ist die Eigenschaft der lookup-Achse selbst (S22) und semantisch KEINE Filter-Membership; die SIMD-Gruppen-Probe wird explizit NICHT inline implementiert (supports_simd()=false, group_match_mask liegt in axis_09_isa_amd64) — sogar Positiv-Beleg fuer korrekte Achsen-Trennung. Repraesentativ fuer alle 'Probe'-Treffer in axes/lookup/ + axes/cache_traversal/ (Sondierketten/Tombstones, per Kommando 7 erhoben)."
+            },
+            {
+              "achse": "io_dispatch + persistence_target — CEB-Codegen (kein Datenpfad-I/O)",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/ceb_generator.hpp:104",
+              "auszug": "std::ofstream manifest{out_dir / \"perm_manifest.txt\"};  [Z.108 std::ofstream f{out_dir / (\"perm_\" + id + \".cpp\")}; Z.124 anatomy_manifest.txt]",
+              "klasse": "legitim-framework",
+              "begruendung": "CEB-Generator schreibt generierte Permutations-Quellen + Manifeste = Build-Orchestrierung des Mess-Frameworks (E4-XML/CEB-Doktrin); die Achsen-Eigenschaft von io_dispatch/persistence_target ist die DATEN-Pfad-I/O-Strategie des Caches (buffered/direct/mmap/in-memory bzw. memory_only/disk_writeback) — Codegen-Dateischreiben bildet diese Eigenschaft nicht nach."
+            },
+            {
+              "achse": "io_dispatch + persistence_target — Mess-Ergebnis-Persistenz (kein Datenpfad-I/O)",
+              "fundstelle": "libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:1932",
+              "auszug": "std::ofstream pf{bin_dir / \"result.csv\", std::ios::trunc};  [Z.942 std::ifstream sf{stamp_p}; Z.955 std::ifstream cf{csv_p}; Z.1785 std::ofstream mf{alt_csv, std::ios::trunc}; Z.1940 result.csv.stamp]",
+              "klasse": "legitim-framework",
+              "begruendung": "Per-Binary-Ergebnis-CSV + Stamp-Dateien = Mess-Ergebnis-Persistenz des CEB (deklarierte Mess-Framework-Flaeche; Include Z.64 kommentiert '(E) per-Binary-Ergebnis-CSV schreiben'). Keine Cache-Daten-Writeback-Semantik, damit kein Nachbau der persistence_target-Eigenschaft."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD  →  a801a7e3c5b9054d130b4006e513f50a5e0c4ae7 (Branch: development; Objekt read-only belassen, keine Worktrees betreten). Alle folgenden Kommandos mit cwd = <repo>/libs/cache_engine; Fundstellen relativ zur Repo-Wurzel /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine",
+            "ISA-Haupt: grep -rnE 'immintrin|arm_neon|xmmintrin|emmintrin|_mm_|_mm256|_mm512|__builtin_ia32|vld1q|vst1q|__ARM_NEON|__AVX|__SSE' axes anatomy builder/experiment_tree src --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -v '^axes/simd/'  →  ausserhalb axes/simd NUR der Prefetch-Komplex (cacheline_config.hpp, prefetch_axis, abi_adapter.hpp:112) + reine Kommentare (axes/lookup/composable/art_trie_node_pool_store.hpp:14, wormhole_*)",
+            "ISA-Guards: grep -rnE '__x86_64__|__aarch64__|__riscv|__powerpc|__AVX2__|__SSE4|_mm_crc32|__builtin_prefetch|__builtin_bswap' axes anatomy builder/experiment_tree src --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -v '^axes/simd/' | grep -vE '^\\S+:[0-9]+:\\s*(//|\\*)'  →  6 Zeilen, alle im Prefetch-Komplex (cacheline_config.hpp:28/68/73, axis_07_prefetch_real_descent.hpp:41/74, abi_adapter.hpp:111)",
+            "ISA-Negativ: grep -rnE 'uint8x16|vaddvq|vceqq|__crc32|asm volatile|__asm__|experimental::simd|__m128|__m256|__m512' axes anatomy builder/experiment_tree src --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -v '^axes/simd/' | grep -vE '^\\S+:[0-9]+:\\s*(//|\\*)'  →  0 Treffer",
+            "ISA-Detail: grep -n '_mm_prefetch(\\|__builtin_prefetch(' anatomy/abi_adapter.hpp axes/prefetch_axis/axis_07_prefetch_real_descent.hpp axes/prefetch_axis/axis_07_prefetch_observable.hpp  →  echte Aufrufe NUR in axis_07_prefetch_real_descent.hpp:72/74; grep -n '_mm_\\|_MM_' anatomy/abi_adapter.hpp | grep -vE ':\\s*//'  →  nur Z.112 (Include) + Z.818 (Kommentar)",
+            "ISA-Remit-Check: grep -rn 'prefetch' axes/simd/ --include='*.hpp'  →  0 Treffer (isa-Achse bietet keine Prefetch-Flaeche); head axes/simd/axis_09_isa_amd64.hpp  →  immintrin/emmintrin-Includes + group_match_mask liegen IN der Achse",
+            "FILTER-Haupt: grep -rniE 'bloom|cuckoo|false_positive|xor_filter|may_contain|might_contain|membership' axes anatomy builder/experiment_tree src --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -v '^axes/filter_axis/'  →  8 Zeilen: 3 reine Kommentare in axes/lookup/composable/wormhole_* ('Cuckoo = andere Achsen/Folge-Increments') + 5 in anatomy/abi_adapter.hpp (Delegationen/Memento, klassifiziert)",
+            "FILTER-Anatomy-Rest: grep -rniE 'bloom|cuckoo|membership|insert_key|filter_probe|clear_filter' anatomy/ --include='*.hpp' | grep -v 'abi_adapter.hpp' | grep -vE '^\\S+:[0-9]+:\\s*(//|\\*)'  →  0 Treffer",
+            "FILTER-Probe: grep -rniE '\\bprobe' axes anatomy builder/experiment_tree src --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -v '^axes/filter_axis/' | grep -vE '^\\S+:[0-9]+:\\s*(//|\\*)' | grep -viE 'platform_probe|probe_scan|hw_probe'  →  ausschliesslich Open-Addressing-Sondierung in axes/lookup/ + axes/cache_traversal/ (lookup-eigene Eigenschaft, keine Membership)",
+            "FILTER-Storekette: grep -rn 'filter' axes/node/ axes/layout/ --include='*.hpp' | grep -vE ':\\s*//'  →  4 Zeilen: 2x organ_observe_filter (T16-Feeding, klassifiziert) + 2x mp::mp_filter (Metaprogrammierung-Typlistenfilter, kein Bezug)",
+            "IO-Haupt (axes/anatomy/experiment_tree): grep -rnE '\\b(std::)?(o|i)?fstream\\b|fopen\\(|fwrite\\(|fread\\(|pwrite\\(|pread\\(|O_DIRECT|fsync\\(|fdatasync\\(|::mmap\\(|msync\\(' axes anatomy builder/experiment_tree --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -vE '^axes/(io_dispatch|persistence_target)/' | grep -vE '^\\S+:[0-9]+:\\s*(//|\\*)'  →  10 Zeilen, ALLE in builder/experiment_tree (ceb_generator.hpp, cache_engine_builder_iterator.hpp); axes ausserhalb IO-Achsen: 0, anatomy: 0",
+            "IO-src: gleiches Muster auf src --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -vE Kommentar | awk -F: '{print $1}' | sort | uniq -c  →  0 Treffer (src/ = concepts/measurement/permutations/sha256/sha512)",
+            "IO-Header: grep -rnE '#include\\s*<(unistd\\.h|fcntl\\.h|sys/mman\\.h|sys/uio\\.h|cstdio|stdio\\.h)>' axes anatomy builder/experiment_tree src --include='*.hpp' --include='*.cpp' --include='*.h' --include='*.in' | grep -vE '^axes/(io_dispatch|persistence_target)/'  →  nur 3x <cstdio>; Nutzung geprueft via grep -nE 'snprintf|fopen|popen|fprintf|fputs|fwrite|FILE' builder/experiment_tree/repetition_plan.hpp src/permutations/permutation_build_command.hpp  →  ausschliesslich std::snprintf (Formatierung, kein Datei-I/O); cache_engine_builder_iterator.hpp:61 laut Include-Kommentar ebenfalls snprintf"
+          ],
+          "negativ_belege": [
+            "ISA / SIMD-Vektor-Typen + Inline-Assembly (uint8x16|vaddvq|vceqq|__crc32|asm volatile|__asm__|experimental::simd|__m128|__m256|__m512) ausserhalb axes/simd im gesamten Suchraum: 0 Treffer — Kommando 4",
+            "ISA / NEON- und ia32-Builtin-Familie (arm_neon|vld1q|vst1q|__ARM_NEON|__builtin_ia32|immintrin|emmintrin ausserhalb axes/simd): 0 Code-Treffer ausser dem klassifizierten Prefetch-Komplex; art_trie_node_pool_store.hpp:14 und wormhole_* nur Kommentare, die SIMD/Cuckoo explizit ANDEREN Achsen zuweisen — Kommando 2",
+            "ISA / _mm_crc32 + __builtin_bswap ausserhalb axes/simd: 0 Treffer — Kommando 3 (die 6 Treffer dieses Kommandos sind saemtlich __x86_64__-Guards/__builtin_prefetch des Prefetch-Komplexes)",
+            "FILTER / Membership-Logik (bloom|cuckoo|false_positive|xor_filter|may_contain|might_contain|membership) in builder/experiment_tree + src: 0 Treffer; in axes ausserhalb filter_axis: nur 3 Kommentarzeilen (wormhole) — Kommando 7",
+            "FILTER / anatomy ohne abi_adapter (alle 56 uebrigen Anatomy-Header): 0 Treffer auf bloom|cuckoo|membership|insert_key|filter_probe|clear_filter — Kommando 8",
+            "FILTER / abi_adapter selbst: alle 5 Code-Treffer sind reine Delegationen an die filter_axis-API (filter_probe_scan/insert_key/clear_filter/ObservableFilter-Memento) — keine einzige Hash-/Bitmap-/Fingerprint-Berechnung im Genus — Kommandos 5+7, Regionen 860-885/1035-1060/1145-1160/2355-2380 gelesen",
+            "IO_DISPATCH+PERSISTENCE_TARGET / Plan-Ist 0 BESTAETIGT fuer axes (ausserhalb der beiden IO-Achsen), anatomy und src: 0 Code-Treffer auf fstream/fopen/fwrite/fread/pwrite/pread/O_DIRECT/fsync/fdatasync/mmap/msync — Kommandos 11+12. Einzige Code-Treffer im gesamten Suchraum: 10 Zeilen Mess-Framework-Persistenz in builder/experiment_tree (als legitim-framework klassifiziert, Befunde 10+11)",
+            "IO / Syscall-Header (unistd.h/fcntl.h/sys/mman.h/sys/uio.h/stdio.h) ausserhalb der IO-Achsen: 0; die 3 <cstdio>-Includes nutzen ausschliesslich std::snprintf (Formatierung) — Kommando 13",
+            "Suchraum-Abdeckung: axes/ (inkl. Store-Kette axes/node/ + axes/layout/ + axes/lookup/composable/), anatomy/ (57 Header), builder/experiment_tree/, src/ (concepts/measurement/permutations/sha256/sha512) vollstaendig gegrept; src/ enthaelt KEINE der builder-Unterverzeichnisse (disk_serializer etc. liegen unter builder/, nicht im beauftragten Suchraum builder/experiment_tree) — per ls -la src/ belegt"
+          ]
+        }
+      }
+    ],
+    "synthese": {
+      "verdikt": "TRAGFAEHIG mit GENAU EINEM Pflicht-Posten. Die 6 Lenses sind nach Dedupe konsistent: ~60 Befunde reduzieren sich auf 4 mechanische Bestandsverstoesse (davon 1 mess-verfaelschend = Pflicht, 3 = Aufraeumpass-Kandidaten), 4-5 semantische Register-Posten und eine breite, sauber belegte Legitim-Flaeche. 11 Befunde wurden selbst am Objekt nachgelesen; alle Lens-Klassen bestaetigt, mit einer Klassen-Aufspaltung (descent_slot_for_, siehe Widerspruch W1). STAND-KLARSTELLUNG: Alle Lenses melden rev-parse a801a7e3, die abi_adapter-Zeilennummern gelten aber nachweislich am HEAD 28261b5a (Inhalts-Proben :1033/:1096/:1101/:1707/:2192/:2224 treffen nur dort; a801a7e3=2331 Zeilen, HEAD=2433, Diff=+102 nur anatomy/abi_adapter.hpp, A8-S4-Merge-Doku/CT-Haertung) — kein Befund invalidiert, ausserhalb abi_adapter sind beide Staende identisch; alle datei:zeile-Angaben dieser Synthese sind am HEAD 28261b5a verifiziert. Kalender-Einschaetzung: Der Pflichtteil ist 1 Datei / 2 constexpr-Konstanten, am Default byte-/golden-neutral, mit ctest-Gate vor Do 07.08. realistisch — der Trigger ist nicht gefaehrdet.",
+      "vor_anker_pflichtteil": [
+        "P-CACHELINE-LITERAL (einziger Pflicht-Posten; erfuellt a+b+c): Im LayoutAwareChunkedStore die hartkodierte Cache-Line-64 durch die permutierbare Unterachsen-Groesse ersetzen — axes/node/axis_04_node_type_layout_aware_store.hpp:65 (kLineBytes=64; Nutzer :77 AoS-Padding round_up(16,kLineBytes), :105-107 FF2-Knotenbreite W*kLineBytes, :500+:504 CLU-Line-Zaehlung) und :387 (kChunkAlign=64; Nutzer :222, :532, :541) → L::cacheline_subaxis_line_bytes() (API existiert: axes/layout/axis_05_memory_layout_strategy_base.hpp:51-53, Default B64=64 → Substitution am Default byte-neutral; robust via if-constexpr-requires mit Fallback 64, falls ein L die Basis nicht traegt). KRITERIEN-BELEG: (a) binary-beruehrend — Record-Stride/Chunk-Alignment/chunk_bytes aendern sich bei Nicht-Default-Konfig; (b) mechanisch — reine constexpr-Quellen-Substitution, kein Semantik-Umbau; (c) mess-verfaelschend — cacheline ist aktivierbare STATISCHE Mess-Achse (builder/experiment_tree/profile_to_tree.hpp:82-86 erzeugt cacheline.line_size/alignment/sw_hint-Ebenen) und das Thesis-Profil algorithm_profiles/thesis_profiles/cacheline_study.profile.xml:74-86 permutiert line_size per_organ inkl. node_type — mit Literal-64 wuerden line_size-Varianten in CLU-Zaehlung/Padding/Alignment stumm identisch gemessen (Kernthema-Unterachse laut cacheline_config.hpp:2). FALLE (aus L5 uebernommen, am Objekt bestaetigt): NICHT durch L::cache_line_size() ersetzen — das ist der INTRINSISCHE Design-Deskriptor (aos_strict=1, packed_bitmap=8; Koexistenz-Doku strategy_base.hpp:37-43) und wuerde record_bytes_/CLU brechen. Gate: ctest + golden-Byte-Vergleich (Default-Neutralitaet beweisen).",
+        "KEINE WEITEREN PFLICHT-POSTEN — Ausschluss-Begruendungen: (1) toter xmmintrin-Include abi_adapter.hpp:112 = binary-neutral (0 echte _mm_-Aufrufe, grep-verifiziert; nur Kommentare :711-:1695), keine Mess-Verfaelschung → Aufraeumpass; (2) HOT-Patricia dir() hot_patricia_traversal_organ.hpp:47-48 = bit-identisch zu axis_02_path_compression_patricia.hpp:59-61 key_split_bit (selbst nachgelesen), Messwerte unveraendert → Aufraeumpass; (3) descent_slot_for_ abi_adapter.hpp:2192-2206 = Geometrie bit-identisch zu SortedBinaryTraversal::lower_bound_index (composable_search.hpp:130-140, selbst verglichen), speist nur COMDARE_MEASUREMENT_ON-Observer → keine Verfaelschung → Aufraeumpass (mechanischer Teil) + Register (semantischer Teil, s. W1)."
+      ],
+      "nach_abgabe_register": [
+        "POSTEN 'Descent-Slot-Organ-Delegation' (Anschluss Par.75): Die Prefetch-Observer-Slot-Bestimmung ans KONFIGURIERTE Traversal-Organ delegieren statt pauschal Lower-Bound — anatomy/abi_adapter.hpp:2192-2206 (Aufrufer :1033/:1096/:1101/:1707, alle Mess-gegated); die dokumentierte Schaetzpfad-Semantik fuer UNSORTIERTE Stores (:2182-2191) ist Verhaltens-Entscheid, kein Umverdrahten. Eigentum: search_algo/Traversal-Achse; die Sortiert-Annahme (index_organization-Beruehrung, L2) im selben Posten mitbehandeln.",
+        "POSTEN 'Slot-Storage-Vereinheitlichung' (Anschluss Par.75): Doppel-Abbildung des Slot-Storage-Substrats aufloesen — designiertes Brueckenorgan NodeTypeSlotStore (axes/node/axis_04_node_type_slot_store.hpp:2-11) hat 0 Live-Konsumenten (repo-grep: nur axes/node + storage_organ_concept-Selbstbeweis), waehrend die lookup-Achse parallel RawSlotStore haelt und verdrahtet (axes/lookup/composable/composable_search.hpp:54, tier_to_organ_mapping.hpp:41-47). Design-Entscheid: bounded-array- vs. vector-Semantik.",
+        "POSTEN 'R5.B Set-Kern-Vollausbau' (Anschluss Par.75): SortedArrayKeySet als anatomy-eigener Suchalgorithmus (anatomy/set_default_organ.hpp:18-38, eingebunden via cross_genus_organ.hpp:38) durch die ~30 echten search_algo-Achsen-Wrapper ersetzen — Interims-Charakter in der Datei selbst deklariert (Kopf :6-8, 'R5.B-Operativitaets-Erweiterung, #74-artig'); SetAnatomy selbst ist achsenrein (set_anatomy.hpp:144/154/164).",
+        "POSTEN 'Layout-Offset-Rechner in die Achse' (Anschluss Par.75; buendelt W2): Die komplette Stride-/Feld-Offset-Mathematik aller 5 Repraesentationen liegt in der node-Achse (axes/node/axis_04_node_type_layout_aware_store.hpp:398-427 + Dispatch-Quellen :59-60, :69-77, :113-122, :127-137), waehrend axes/layout nur das RepresentationKind-Enum publiziert — dokumentiertes P-MD1-Design (#167; axis_05_memory_layout_strategy_base.hpp:18-19 und :55-60 beschreiben es ausdruecklich), unter Owner-KERN 04.08. dennoch memory_layout-Eigenschaft ausserhalb der Achse. Redesign der composable-bridge: Layout-Strategien exportieren ptr-/stride-Rechner. Serialization-Achse ist dabei NICHT verletzt (Delegation via organ_observe_serialization :303-308) — ein Posten, nicht zwei.",
+        "POSTEN 'KF-6 Cacheline-NTTP-Codegen-Verdrahtung' (Anschluss Par.75; VORZIEH-KANDIDAT falls cacheline_study VOR Abgabe gemessen wird): Die per-Organ-CacheLineConfig aus dem Profil in die Typen bringen — strategy_base.hpp:42-43 ('Run-Body-Nutzung folgt mit KF-6'); heute instanziieren ALLE Strategie-Basen nur CacheLineConfig{} (repo-grep: axis_06_allocator_strategy_base.hpp:67, axis_04_node_type_strategy_base.hpp:22, axis_03a_search_algo_base.hpp:28, axis_05_memory_layout_strategy_base.hpp:45 u.a.), kein Codegen-Emit vorhanden — ohne KF-6 sind cacheline.line_size-Baum-Ebenen (profile_to_tree.hpp:82-86) Namens-Ebenen ohne Binary-Wirkung. WARNUNG dazu: bei KF-6-Landung die Mess-Treiber-Pufferkonstante abi_adapter.hpp:454-464 ('groesstmoeglicher Layout-Stride 64', kLbufBytes=kRecords*64) mitziehen, sonst OOB bei line_size>64 (L5-Caveat, uebernommen).",
+        "AUFRAEUMPASS-KANDIDAT (mechanisch, nicht trigger-blockierend, Kandidaten-Liste fortschreiben): toter Include + irrefuehrender Kommentar anatomy/abi_adapter.hpp:111-112 (#include <xmmintrin.h> unter x86-Guard; 0 echte _mm_-Aufrufe im Genus, Achse bringt xmmintrin selbst mit: axes/prefetch_axis/axis_07_prefetch_real_descent.hpp:41-42). Dedupe L1+L6.",
+        "AUFRAEUMPASS-KANDIDAT (mechanisch): HOT-Patricia-Organ konsumiert PC-Achsen-Primitiv statt Eigenbau — axes/lookup/composable/hot_patricia_traversal_organ.hpp:43-49 (dir/first_diff_bit) → axes/path_compression/axis_02_path_compression_patricia.hpp:59-61 (key_split_bit, bit-identisch verifiziert); konformes Gegenmuster existiert (ART/START konsumieren ByteWiseKeyPrefix: art_trie_traversal_organ.hpp:39, start_trie_traversal_organ.hpp:47).",
+        "AUFRAEUMPASS-KANDIDAT (mechanisch; Teil A der W1-Aufloesung): descent_slot_for_-Schleife durch Aufruf von SortedBinaryTraversal::lower_bound_index ersetzen (statischer Drop-in ueber Store-API, composable_search.hpp:130-140) + Leer-/Klemm-Wrapper behalten (return lo<n?lo:n-1; 0 bei leer) — beseitigt die Duplikation ohne Semantik-Aenderung.",
+        "KATALOG-NOTIZ (klein): synthetische Q2-Treiberkapazitaet 1024 an 3 Stellen (anatomy/abi_adapter.hpp:1010-1020, :889-891, :1793-1796) als benannten Registry-/Treiber-Parameter heben statt Wiederholungs-Literal (L5-Caveat; Klasse legitim-framework unveraendert)."
+      ],
+      "legitim_quittiert": "QUITTIERT in 4 Ausnahme-Klassen. (b) GENUS-ERSTINSTANZ — real an: anatomy/abi_adapter.hpp:2219-2228 (Store-Ketten-Konstruktion LayoutAwareChunkedStore<node_type,memory_layout,allocator> + Traversal-Auswahl ueber achsen-eigenen Trait traversal_for_search_algo_t; von L2/L4/L5 konkordant, am HEAD selbst nachgelesen — der Owner-deklarierte Punkt :2224-2228 beginnt faktisch :2219 mit der conditional-Traversal-Wahl), abi_adapter.hpp:334-335 (+Capability ~:288: value_handle-Schwellwert wird unveraendert ans VH-Organ durchgereicht, Interpretation lebt in axis_14), abi_adapter.hpp:1042/:1152 (Filter-Organ-Antrieb Build/Clear via if-constexpr auf Achsen-API), abi_adapter.hpp:2369 (Filter-Memento sichert Achsen-Organ als Ganzes), anatomy/adapter_anatomy.hpp:46-115 (FIFO/LIFO/Heap-Disziplin KONSTITUTIV fuers Adapter-Genus, kein Q1-Fremdgang — Abgrenzung seit A8-S4-Konstitutiv-Matrix im HEAD-Merge 28261b5a formal gedeckt); Spiegel AUSSERHALB des Suchraums: builder/anatomy_commands/anatomy_execution_context.hpp:51. (a) EIGENE ACHSE — bestaetigt u.a.: cacheline sw_hint-Prefetch (cacheline_config.hpp:56-78, selbst nachgelesen: dokumentierte eigene Unterachsen-Dimension, plattform-geguarded; isa-Achse bietet keine Prefetch-Flaeche), prefetch issue_prefetch_t0 (axis_07_prefetch_real_descent.hpp:72), rpmalloc-Init-Guard (axis_06_allocator_rpmalloc.hpp:56-58, Vendor-Lifecycle statt Concurrency-Strategie), ART-Node-Substrat Node4/16/48/256 (art_trie_node_pool_store.hpp:45-72, faithful Paper-Re-Impl mit korrekter PC-Delegation), Fibonacci-Hash der HashSearch-Familie (hash_probe_traversal_organ.hpp:45), Filter-eigene Hash-Familien (axis_filter_bloom.hpp:116-117 u.a.), index_org-LCG (axis_01_index_organization_non_clustered.hpp:56), migration-Modulo (axis_migration_tier_based.hpp:57), serialization-FNV-Pruefsumme (axis_10_serialization_var_len.hpp:50-55), mapping find_if ueber EIGENE mappings_ (axis_03m_mapping_direct_placement.hpp:75/89/104), exact_prefix-Ground-Truth-lower_bound (exact_prefix_filter_store.hpp:36-38), btree alignas(64) konstitutiv (axis_03a_search_algo_btree.hpp:197), io_direct-Sektor-Alignment (axis_io_direct.hpp:59), masstree keylenx-Diskrimination (masstree_layer_traversal_organ.hpp:11-14), surf common_prefix als Filter-Substanz (axis_filter_range_surf.hpp:41-81). (c) FRAMEWORK/MESS-FLAECHE — Mess-Treiber run_workload*/fill_*_v3 (chrono-Timer, rng%kSlots-Querystrom, PfStore-Testdaten :715-719, alles ueber Achsen-/Store-APIs), decide-only-Auto-Kopplungen T1/T11/T15/T16/Q2 (abi_adapter :988-994, :1010-1020, :1074-1076, :1427-1431 + Store-organ_observe_*-Feeding chunked_store:197/layout_aware_store:342 und organ_migrate_step :358-381 mit Achsen-Entscheid), Experimentbaum-Werkzeuge (parallel_measure_pool, progress_heartbeat, measure_parallelism, ETA-Wall-Clock cache_engine_builder_iterator :1134-1142, axis_path_serialization=String-Konvention, Reflexions-/Klassifikations-Tabellen), CEB-Ergebnis-/Codegen-Persistenz (ceb_generator :104-124, iterator :1932ff), 8 builder/-Dateien mit echtem std::mutex AUSSERHALB des Suchraums (bestandslog/artifact_transport/build_orchestrator/commands — Werkzeug-Ebene), Permutations-/Stempel-Hash-Primitive (permutation_engine FNV, ctsha256/512), ABI-Grenz-PODs (observable_tier :126-153, GenusObserverAggregate-Groessenrechnung :162-165), Migration-Record-Marshaling fuer Organ-API (:364-371). (d) VENDORED/FAITHFUL — SuRF-Port BE-Encoding + Prefix-Skip (louds_sparse_filter_store.hpp:36-41, :200, :224-227; EV-4, Original-Treue vor Achsen-Umbiegung).",
+      "widersprueche": [
+        "W1 AUFGELOEST (descent_slot_for_: L2 'semantisch-nach-abgabe' vs. L4 'mechanisch-vor-anker') → SPLIT-Entscheid nach Objekt-Lektuere (abi_adapter.hpp:2178-2206 + composable_search.hpp:128-140): Teil A, die reine Duplikat-Beseitigung, IST mechanisch (lower_bound_index ist statischer Drop-in ueber dieselbe Store-API slot_count/key_at; nur Leer-/Klemm-Wrapper noetig) — L4 hat fuer die Mechanik recht; Teil B, die Delegation ans KONFIGURIERTE Traversal-Organ inkl. Schaetzpfad-Semantik fuer unsortierte Stores (Eigen-Doku :2182-2191), ist semantisch — L2 hat fuer die Tiefe recht. KEIN Pflichtteil, da keine Mess-Verfaelschung (Geometrie bit-identisch, Eigen-Doku :2180; Aufrufer ausschliesslich Mess-gegatete Observer-Speisung). Teil A → Aufraeumpass-Kandidat, Teil B → Register-Posten.",
+        "W2 AUFGELOEST (layout_aware_store-Repraesentationsmechanik: L3 'legitim-eigene-achse' :439-471 vs. L5 'semantisch-nach-abgabe' :398-427) → KEIN echter Konflikt, verschiedene Achsen-Brillen auf denselben Code: Aus SERIALIZATION-Sicht legitim (kein Wire-Format, Delegation via organ_observe_serialization :303-308 — L3 bestaetigt); aus MEMORY_LAYOUT-Sicht liegt die Offset-/Stride-Eigenschaft dokumentiert (P-MD1 #167, strategy_base.hpp:18-19) ausserhalb der Achse — L5s Register-Einstufung uebernommen. Konsequenz: EIN Register-Posten ('Layout-Offset-Rechner in die Achse'), keine Doppelzaehlung.",
+        "W3 AUFGEKLAERT (Stand-Diskrepanz): Alle 6 Lenses melden rev-parse a801a7e3, aber die abi_adapter-Zeilennummern passen nachweislich NUR auf HEAD 28261b5a — per Inhalts-Probe verifiziert (git show a801a7e3 hat an :1033/:1096/:1101/:1707/:2192/:2224 ANDERE Inhalte; HEAD trifft exakt; a801a7e3=2331 vs. HEAD=2433 Zeilen; Diff=+102 ausschliesslich anatomy/abi_adapter.hpp, A8-S4-Merge-Doku/CT-Haertung ohne Byte-Aenderung laut Commit). Der A8-S4-Stand lag beim Lens-Lauf offenbar schon im Working Tree. Folge: Lens-datei:zeile gelten am HEAD; ausserhalb abi_adapter sind beide Staende identisch; kein Befund invalidiert.",
+        "W4 PRAEZISIERT ('0 mutex'-Plan-Ist, L1-Gegencheck uebernommen): Im DEKLARIERTEN Suchraum (axes/anatomy/builder/experiment_tree/src ohne concurrency_axis) sind 0 Code-Mutexe bestaetigt (12 Grep-Zeilen = saemtlich Kommentare/Typ-Tag-Doku); AUSSERHALB tragen 8 builder/-Dateien echten std::mutex (bestandslog/builder_registration.hpp:49/602ff u.a.) — die Pauschalaussage '0 mutex im Repo' ist FALSCH und darf so nicht in Doku/Thesis; Klasse legitim-framework.",
+        "W5 DEDUPE (xmmintrin-Include doppelt gemeldet): L1-Befund 1 und L6-Befund 1 betreffen dieselbe Fundstelle abi_adapter.hpp:112 mit identischer Klasse mechanisch-vor-anker → als EIN Aufraeumpass-Kandidat gefuehrt (nicht Pflicht: binary-neutral, 0 echte Intrinsic-Aufrufe, am Objekt gegengeprueft).",
+        "W6 GEKLAERT (Achsen-Eigentum von descent_slot_for_: L2 nennt zusaetzlich index_organization-Annahme, L4 search_algo/Traversal): Eigentum liegt bei search_algo/Traversal (lower_bound_index ist deren API, composable_search.hpp:130); die implizite Sortiert-Annahme ist eine index_organization-BERUEHRUNG, die im Register-Posten 'Descent-Slot-Organ-Delegation' mitbehandelt wird — keine getrennten Posten."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Lenses"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Synthese"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "L1-prefetch-concurrency-telemetry",
+      "phaseIndex": 1,
+      "phaseTitle": "Lenses",
+      "agentId": "ac939396ee1885558",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785856529914,
+      "queuedAt": 1785856529906,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "OBJEKT (READ-ONLY, KEIN Edit/Commit/Build): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine (development, Stand beim Start per 'git rev-parse HEAD' selbst dokumentieren). Aktive Worktrees wt-e24/wt-w10/wt-m3/wt-a8s1 NICHT betreten.\nREGEL (Owner-KERN 04.08. abend-6, Ledger verbatim): ALLE Achsen-Eigenschaften in allen Code-Segmenten ueber ALLE Ach…",
+      "lastProgressAt": 1785856973248,
+      "tokens": 74797,
+      "toolCalls": 28,
+      "durationMs": 443334,
+      "resultPreview": "{\"befunde\":[{\"achse\":\"prefetch (A07)\",\"fundstelle\":\"libs/cache_engine/anatomy/abi_adapter.hpp:112\",\"auszug\":\"#include <xmmintrin.h> // (X) _mm_prefetch für das T7-Prefetch-Segment (MSVC/x86_64-Mess-Build)\",\"klasse\":\"mechanisch-vor-anker\",\"begruendung\":\"Toter Prefetch-Intrinsic-Header im Genus-Adapter: abi_adapter.hpp enthaelt 12 '_mm_'-Zeilen, davon 11 Kommentare und 1 Include, aber NULL direkte _…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "L2-mapping-indexorg-node",
+      "phaseIndex": 1,
+      "phaseTitle": "Lenses",
+      "agentId": "a33ab13e3004de47c",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785856529914,
+      "queuedAt": 1785856529906,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "OBJEKT (READ-ONLY, KEIN Edit/Commit/Build): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine (development, Stand beim Start per 'git rev-parse HEAD' selbst dokumentieren). Aktive Worktrees wt-e24/wt-w10/wt-m3/wt-a8s1 NICHT betreten.\nREGEL (Owner-KERN 04.08. abend-6, Ledger verbatim): ALLE Achsen-Eigenschaften in allen Code-Segmenten ueber ALLE Ach…",
+      "lastProgressAt": 1785857290631,
+      "tokens": 129916,
+      "toolCalls": 61,
+      "durationMs": 760717,
+      "resultPreview": "{\"befunde\":[{\"achse\":\"search_algo (03a) / cache_traversal (03b) Descent-Geometrie + index_organization (01) Sortierungs-Annahme\",\"fundstelle\":\"libs/cache_engine/anatomy/abi_adapter.hpp:2192-2206 (Kern :2200)\",\"auszug\":\"std::size_t lo = 0, hi = n; while (lo < hi) { std::size_t const m = lo + (hi - lo) / 2; if (st.key_at(m) < key) lo = m + 1; else hi = m; }\",\"klasse\":\"semantisch-nach-abgabe\",\"begrue…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "L3-serialization-pathcomp-valuehandle",
+      "phaseIndex": 1,
+      "phaseTitle": "Lenses",
+      "agentId": "a6d2c771d839d4410",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785856529914,
+      "queuedAt": 1785856529906,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "OBJEKT (READ-ONLY, KEIN Edit/Commit/Build): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine (development, Stand beim Start per 'git rev-parse HEAD' selbst dokumentieren). Aktive Worktrees wt-e24/wt-w10/wt-m3/wt-a8s1 NICHT betreten.\nREGEL (Owner-KERN 04.08. abend-6, Ledger verbatim): ALLE Achsen-Eigenschaften in allen Code-Segmenten ueber ALLE Ach…",
+      "lastProgressAt": 1785857331999,
+      "tokens": 131368,
+      "toolCalls": 53,
+      "durationMs": 802085,
+      "resultPreview": "{\"befunde\":[{\"achse\":\"path_compression (axis_02)\",\"fundstelle\":\"libs/cache_engine/axes/lookup/composable/hot_patricia_traversal_organ.hpp:43-49 (genutzt :70, :85-88, :105, :129-136; Skip-Position als nackter uint8: hot_patricia_node_pool_store.hpp:34+:96)\",\"auszug\":\"first_diff_bit(a,b)=countl_zero(a^b); dir(key,crit_bit)=(key >> (63U - crit_bit)) & 1ULL — Kopf Z.9: 'nicht-diskriminative Bits werde…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "L4-traversal-search",
+      "phaseIndex": 1,
+      "phaseTitle": "Lenses",
+      "agentId": "a7c24b4deabd12620",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785856529914,
+      "queuedAt": 1785856529906,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "OBJEKT (READ-ONLY, KEIN Edit/Commit/Build): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine (development, Stand beim Start per 'git rev-parse HEAD' selbst dokumentieren). Aktive Worktrees wt-e24/wt-w10/wt-m3/wt-a8s1 NICHT betreten.\nREGEL (Owner-KERN 04.08. abend-6, Ledger verbatim): ALLE Achsen-Eigenschaften in allen Code-Segmenten ueber ALLE Ach…",
+      "lastProgressAt": 1785857060377,
+      "tokens": 102003,
+      "toolCalls": 38,
+      "durationMs": 530462,
+      "resultPreview": "{\"befunde\":[{\"achse\":\"SEARCH_ALGO (T0, Traversal-Organ SortedBinaryTraversal, Heimat axes/lookup/composable/)\",\"fundstelle\":\"libs/cache_engine/anatomy/abi_adapter.hpp:2192-2206 (Aufrufer :1033, :1096, :1101, :1707)\",\"auszug\":\"descent_slot_for_(std::uint64_t key): \\\"std::size_t lo = 0, hi = n; while (lo < hi) { std::size_t const m = lo + (hi - lo) / 2; if (st.key_at(m) < key) lo = m + 1; else hi = …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "L5-layout-alloc-migration-queuing",
+      "phaseIndex": 1,
+      "phaseTitle": "Lenses",
+      "agentId": "afc3761a9c755361f",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785856529915,
+      "queuedAt": 1785856529906,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "OBJEKT (READ-ONLY, KEIN Edit/Commit/Build): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine (development, Stand beim Start per 'git rev-parse HEAD' selbst dokumentieren). Aktive Worktrees wt-e24/wt-w10/wt-m3/wt-a8s1 NICHT betreten.\nREGEL (Owner-KERN 04.08. abend-6, Ledger verbatim): ALLE Achsen-Eigenschaften in allen Code-Segmenten ueber ALLE Ach…",
+      "lastProgressAt": 1785857260977,
+      "tokens": 119935,
+      "toolCalls": 62,
+      "durationMs": 731062,
+      "resultPreview": "{\"befunde\":[{\"achse\":\"memory_layout (axis_05)\",\"fundstelle\":\"libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:398-427 (dazu :69-77 record_bytes_/round_up_, :113-122 kStoreBlock=10/kBlockW, :127-138 chunk_bytes, :66-67 kHotBytes=2/kColdBytes=6)\",\"auszug\":\"if constexpr (kRep == RK::aos_interleaved_packed) return base + j * kKvBytes; // [k|v] @ 16 ... else if constexpr (kRep == RK…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "L6-filter-io-persistence-isa",
+      "phaseIndex": 1,
+      "phaseTitle": "Lenses",
+      "agentId": "ae5127bd55b2b22e4",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785856529915,
+      "queuedAt": 1785856529906,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "OBJEKT (READ-ONLY, KEIN Edit/Commit/Build): /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine (development, Stand beim Start per 'git rev-parse HEAD' selbst dokumentieren). Aktive Worktrees wt-e24/wt-w10/wt-m3/wt-a8s1 NICHT betreten.\nREGEL (Owner-KERN 04.08. abend-6, Ledger verbatim): ALLE Achsen-Eigenschaften in allen Code-Segmenten ueber ALLE Ach…",
+      "lastProgressAt": 1785857009384,
+      "tokens": 72264,
+      "toolCalls": 26,
+      "durationMs": 479469,
+      "resultPreview": "{\"befunde\":[{\"achse\":\"isa (axes/simd) — ISA-Artefakt im Genus\",\"fundstelle\":\"libs/cache_engine/anatomy/abi_adapter.hpp:112\",\"auszug\":\"#include <xmmintrin.h> // (X) _mm_prefetch für das T7-Prefetch-Segment (MSVC/x86_64-Mess-Build) [unter #if defined(_M_X64) || defined(__x86_64__), Z.111]\",\"klasse\":\"mechanisch-vor-anker\",\"begruendung\":\"Der Genus-Code enthaelt keinen einzigen echten _mm_-/_MM_-Aufruf…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "synthese",
+      "phaseIndex": 2,
+      "phaseTitle": "Synthese",
+      "agentId": "a7c9e51e216a8daf6",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785857332009,
+      "queuedAt": 1785857332000,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "TRAGFAEHIG mit GENAU EINEM Pflicht-Posten. Die 6 Lenses sin…",
+      "promptPreview": "SYNTHESE der generalisierten Schnitt-Regel-Kartierung (Owner-KERN abend-6). Lens-Ergebnisse: [{\"key\":\"L1-prefetch-concurrency-telemetry\",\"r\":{\"befunde\":[{\"achse\":\"prefetch (A07)\",\"fundstelle\":\"libs/cache_engine/anatomy/abi_adapter.hpp:112\",\"auszug\":\"#include <xmmintrin.h> // (X) _mm_prefetch für das T7-Prefetch-Segment (MSVC/x86_64-Mess-Build)\",\"klasse\":\"mechanisch-vor-anker\",\"begruendung\":\"Toter …",
+      "lastProgressAt": 1785857885608,
+      "tokens": 129477,
+      "toolCalls": 23,
+      "durationMs": 553597,
+      "resultPreview": "{\"verdikt\":\"TRAGFAEHIG mit GENAU EINEM Pflicht-Posten. Die 6 Lenses sind nach Dedupe konsistent: ~60 Befunde reduzieren sich auf 4 mechanische Bestandsverstoesse (davon 1 mess-verfaelschend = Pflicht, 3 = Aufraeumpass-Kandidaten), 4-5 semantische Register-Posten und eine breite, sauber belegte Legitim-Flaeche. 11 Befunde wurden selbst am Objekt nachgelesen; alle Lens-Klassen bestaetigt, mit einer …"
+    }
+  ],
+  "totalTokens": 759760,
+  "totalToolCalls": 291
+}
