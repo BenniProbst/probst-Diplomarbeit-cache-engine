@@ -1,0 +1,133 @@
+{
+  "summary": "A8-S3 (Vor-Anker-Pflicht, G8 3.2): axis_stats[17]-strukturell-0-Fix + SA-Member-Nachruestung (Katalog Sektion 4) + Klasse-C-CSV-Ereignisse — abi_adapter-Ein-Schreiber, Opus-5 + Fable-Review, wt-a8s1",
+  "agentCount": 3,
+  "logs": [],
+  "result": {
+    "bauModell": "claude-opus-5",
+    "bau": {
+      "status": "FERTIG",
+      "beleg_vor_fix": "BELEG axis_stats[17]-strukturell-0, erhoben VOR dem Fix am Basis-Stand 19f27223 (Branch a8-s3, Build /home/comdare/wt-a8s1/build-a8s1-final, Kommando: `cmake --build . -j 8 --target test_a8s3_t17_stats_lesezeitpunkt && ./tests/unit/test_a8s3_t17_stats_lesezeitpunkt`) -- Ausgabe literal:\n\n==== A8-S3: T17-Observer-Lesezeitpunkt (kV3AxisCount = 18) ====\n    letzte Achse T17 = 'persistence_target'  -> Observer-Spalten stat_persistence_target_*\n  [OK]  W0 Struktur: letzte Achse ist benannt und in beiden Single-Sources deckungsgleich (static_assert)\n  -- DiskWritebackTarget --\n  [OK]  unified observer real (Mess-Build aktiv, DiskWritebackTarget)\n    seg_ns[T17] = 450\n    axis_stats[T17] = rounds=0 bytes_staged=0 records_staged=0 device_flushes=0 checksum=0\n  [OK]  W1 DiskWritebackTarget: seg_ns[T17] > 0 (Achse wird real getrieben)\n  [ERR] W2 DiskWritebackTarget: axis_stats[T17][0] 'rounds' > 0 (Lese-Zeitpunkt NACH dem Treiben)\n  [ERR] W3 DiskWritebackTarget: axis_stats[T17][2] 'records_staged' > 0 (gestagte Records gezaehlt)\n  [ERR] W4 DiskWritebackTarget: axis_stats[T17][1] 'bytes_staged' > 0 (echter Rueckschreib-Pfad stagt Bytes)\n  [OK]  W5 DiskWritebackTarget: axis_stats[T17][3] 'device_flushes' == 0 (kein Geraete-Flush behauptet)\n  -- MemoryOnlyTarget --\n    seg_ns[T17] = 150\n    axis_stats[T17] = rounds=0 bytes_staged=0 records_staged=0 device_flushes=0 checksum=0\n  [ERR] W2 MemoryOnlyTarget: axis_stats[T17][0] 'rounds' > 0 (Lese-Zeitpunkt NACH dem Treiben)\n  [ERR] W3 MemoryOnlyTarget: axis_stats[T17][2] 'records_staged' > 0 (gestagte Records gezaehlt)\n  [OK]  W4 MemoryOnlyTarget: axis_stats[T17][1] 'bytes_staged' == 0 (kein Rueckschreib-Pfad -> EHRLICHE 0)\n  [OK]  W6a CSV-Header traegt die Spalte 'stat_persistence_target_rounds'\n    CSV-Zelle [148] 'stat_persistence_target_rounds' = '0'\n  [ERR] W6b CSV-Zelle 'stat_persistence_target_rounds' ist ein Messwert (nicht \"0\")\n==== A8-S3 T17-Lesezeitpunkt-Wache: 6 FEHLER ====\nEXIT=1\n\nDEUTUNG: seg_ns[T17] > 0 belegt, dass T17 REAL getrieben wird (A8-S1-Stand), waehrend die gesamte Observer-Zeile 0 bleibt. Ursache am Objekt: pt_organ_ ist die EINZIGE Achse, deren Mess-Organ ausschliesslich in fill_segment_timing_v3 getrieben wird; tier_observe las die Zeile per fill_observer_v3 VOR dem Timing, und fill_segment_timing_v3 nullte das Organ an seinem Ende selbst (pt_organ_.reset() im Reset-Block). Sequenz: Lesen(0) -> Treiben(n) -> Reset(0) -> Lesen(0).",
+      "commits": [
+        "843fe06c3fd6b2782f2167d9be94b195ab2045e1 fix(a8-s3): T17-Observer strukturell-0 behoben -- Lese-Zeitpunkt NACH dem Treiben (Reihenfolge, kein Byte)",
+        "51d37cd385ccc9b8b1d30c660f6705e544acccfb feat(a8-s3): SearchAlgorithmAnatomy haelt ALLE 18 Achsen als Organ-Member (Katalog-P1, in-process)",
+        "3ef9649021a61a7b3581c32ec5b093a7c308894c feat(a8-s3): CSV-Klasse C -- pmc_branch_misses, Tail-Perzentile p999, T6-Ehrlichkeit, Achsen-Legende"
+      ],
+      "doppellauf": "Basis-N live erhoben auf 19f27223: '100% tests passed, 0 tests failed out of 377' (Total Test time 17.52 sec, ctest -j 1). Je Commit Voll-Bau (cmake --build . -j 8, nice) + Doppellauf 2x voll-ctest SERIELL:\n- 843fe06c: Voll-Bau BUILD_EXIT=0 · 2x '100% tests passed, 0 tests failed out of 378' (377 + neue Wache test_a8s3_t17_stats_lesezeitpunkt) · golden-320 '100% tests passed, 0 tests failed out of 3'\n- 51d37cd3: Voll-Bau BUILD_EXIT=0 · 2x '100% tests passed, 0 tests failed out of 379' (+ test_a8s3_sa_organ_member_vollstaendigkeit) · golden-320 3/3\n- 3ef96490: Voll-Bau BUILD_EXIT=0 · 2x '100% tests passed, 0 tests failed out of 380' (+ test_a8s3_csv_klasse_c) · golden-320 3/3\nFINALE VERIFIKATION auf HEAD 3ef96490 (eigener Nachlauf): 2x '100% tests passed, 0 tests failed out of 380' + golden-320 '100% tests passed, 0 tests failed out of 3'. N-Kette 377 -> 378 -> 379 -> 380, monoton +1 je neuer TU, arithmetisch geschlossen. Working-Tree-Freeze: `git status --short` == 0 Zeilen.",
+      "orakel_belege": [
+        "NACH-FIX-PROBE (identische Wache, HEAD): 'seg_ns[T17] = 480 / axis_stats[T17] = rounds=9 bytes_staged=18432 records_staged=2304 device_flushes=0 checksum=32640' (DiskWritebackTarget) und 'axis_stats[T17] = rounds=9 bytes_staged=0 records_staged=2304 device_flushes=0 checksum=0' (MemoryOnlyTarget); CSV-Zelle [148] 'stat_persistence_target_rounds' = '9'; '==== A8-S3 T17-Lesezeitpunkt-Wache: ALLE OK (Zaehler und Zeit derselben Op-Schleife) ====' EXIT=0. Das ORAKEL der Ehrlichkeit ist der Strategie-Kontrast am SELBEN Slot: strukturell-0 traf beide Strategien gleich; nach dem Fix trennt sich MemoryOnly (bytes_staged ehrlich 0, weil writes_back_to_disk()==false) von DiskWriteback (18432) -- eine erfundene Zahl haette diesen Kontrast zerstoert.",
+        "SA-MEMBER-ORAKEL (test_a8s3_sa_organ_member_vollstaendigkeit, HEAD): 'gehaltene Organ-Member der SearchAlgorithmAnatomy = 18' gegen anatomy::kV3AxisCount==18 gezaehlt (nie Literal); 'ART observable_axis_count = 9' -- die Bestands-Registry-Strategien bleiben ehrlich EmptyAxisSnapshot; 'Cross-Genus index_organization<-Set: insert_count = 3' -- derselbe Slot mit observablem Sub-Organ traegt ECHTE Werte. '==== A8-S3 SA-Member-Wache: ALLE OK (18/18 gehalten, ehrlich leer wo leer) ====' EXIT=0.",
+        "FIXTURE-ORAKEL (Lehre 'gruene Tests zementieren alte Ordnung', 3x real in dieser Scheibe): (a) test_e24_c3_cross_genus.cpp brach am Bau literal mit 'error: static assertion failed: IST 04.08.: SA haelt 9 von 18 Achsen als Organ-Member -- index_organization nicht' -- der Pin trug selbst den Vorsatz 'Waechst die SA-Anatomie spaeter um diesen Member, bricht diese Zeile -- und genau dann gehoert die SA-Variante der Verdrahtung nachgezogen'; umgedreht UND um den real getriebenen Abschnitt (4c) ergaenzt. (b)+(c) test_wdk_datasets_fairness und test_h2_score_akte pinnten per substr(size()-N) die LETZTE-Spalte-Position; beide auf Spalte-NACH-NAMEN umgestellt (Existenz + relative Nachbarschaft + Zellwert + Header==Row).",
+        "CSV-KLASSE-C-ORAKEL (test_a8s3_csv_klasse_c, HEAD): 'Spalten im Header = 183  Zellen in der Zeile = 183' (Struktur-Orakel gegen halb nachgezogenen END-Append); 'pmc_branch_misses = 4711' (realer PmcCounters-Wert, vorher nicht emittierbar); p999 >= p99 je Op-Art; 'alloc_bytes_in_use_peak = n/a', 'alloc_external_frag_milli = n/a', 'alloc_internal_frag_milli = n/a'; failed-Zeile -> op_<art>_p999_ns == 'failed'. '==== A8-S3 CSV-Klasse-C-Wache: ALLE OK ====' EXIT=0.",
+        "WIRE-NEUTRALITAETS-BELEG (G8): `git diff 19f27223..HEAD -- anatomy/observable_tier.hpp` enthaelt AUSSCHLIESSLICH Kommentar-Zeilen (Filter auf Nicht-Kommentar-Zeilen liefert leer). Im abi_adapter-Diff trifft der Filter auf 'struct |sizeof|static_assert(sizeof|kV3AxisCount = |ABI_MAJOR|public I' genau EINE Zeile -- und die ist ein Kommentar ('das Wire-Layout ist unberuehrt (sizeof 1344, Version 8)'). TABU-grep ueber golden_fullpilot_320*, permutation_axes.xml, m3v2_study.profile.xml, system_axis_registry.xml, anatomy_fingerprint.hpp, subaxis_valueset_segment.hpp, system_cell_values.hpp, source_catalog.hpp, ctsha512.hpp, system_axis_order.hpp, anatomy_module_abi_v1_decl.hpp, observer_aggregate.hpp, thesis_tiere/: 0 Treffer je Commit.",
+        "FORMAT-/ASCII-GATE je Commit: /home/comdare/tools/cf22/usr/bin/clang-format-22 --dry-run --Werror ueber alle geaenderten .hpp/.cpp -> CF_EXIT=0; ASCII-Selbstcheck (Liste AUS DEM DIFF abgeleitet, nie handgepflegt): `git diff --cached -U0 | grep '^+' | grep -P '[^\\x00-\\x7F]' | wc -l` == 0 (bei Commit 1 und 2 zunaechst 7 bzw. 1 Treffer -- Pfeile/Umlaute aus kopiertem Bestands-Stil --, beide vor dem Commit geheilt)."
+      ],
+      "abweichungen": [
+        "PEAK-END-APPEND liefert bewusst KEINEN Wert, sondern die ehrliche Nicht-erhoben-Markierung. Grund am Objekt: run_observable_perm/run_workload_perm/workload_orchestrator ziehen GENAU EINEN tier_observe je Zeile -- aus einer einzigen Beobachtung ist kein Peak ableitbar. Die Alternativen waeren (a) der Momentanwert unter Peak-Etikett (= genau der Befund B7, den die Scheibe heilen soll) oder (b) ein Wire-Slot (Klasse B, ABI-Major -> G8 gesperrt). Gewaehlt: Spalte alloc_bytes_in_use_peak existiert und traegt 'n/a' ueber die EINE D2-Taxonomie sample_status_token(SourceUnavailable) -- die Luecke ist damit maschinenlesbar statt unsichtbar, eine echte Quelle fuellt spaeter genau dort ohne Schema-Bruch.",
+        "B7-HEILUNG OHNE UMBENENNUNG: das Feld ComdareMeasurementSnapshotV1::bytes_in_use_peak behaelt seinen Namen. Begruendung: A8-Dossier Auflage 3 (CSV-Spalten-NAMEN stabil, Alt-Mess-CSV = Archiv) und tools/latex_anhang liest die Spalte per col.at('bytes_in_use_peak') und parst sie als Zahl -- ein Rename oder ein Token statt der Zahl braeche den Bestands-Leser. Geheilt ist die STILLE: die Fehl-Etikettierung ist jetzt am Feld UND an der Zuweisung deklariert, die ehrliche Aussage steht als 'n/a' im WIDE-Schema. Es wird bewusst nichts umgerechnet.",
+        "frag_milli (E9): Heilung ebenfalls als ehrliche Markierung im WIDE-Schema (alloc_external_frag_milli/alloc_internal_frag_milli == 'n/a'), NICHT als Befuellung -- das SA-T6-Wire-Schema hat gar keine Fragmentierungs-Felder (die gibt es nur in den GATTUNGS-Wire-Formen Set/Sequence, axis_stats[5][5]/[5][6]). Eine Befuellung waere Klasse A2/B, also ein Wire-/Schema-Ereignis, das der Auftrag ausschliesst. In measurement_snapshot.hpp bleibt das Zahlenformat (Reader-Bruch waere die schlechtere Ehrlichkeit), die Nicht-Erhebung ist dort am Feld deklariert.",
+        "Neue Klasse-C-Spalten haengen HINTER h2_code_quality_score, nicht im 7er-pmc-Block: pmc_branch_misses steht bewusst am Zeilen-Ende statt bei seinen sechs Geschwistern, damit deren Positionen fuer Bestands-Leser stabil bleiben (END-Append-Muster wie series/fairness_mode).",
+        "Katalog-P1 zweite Haelfte ('fill_observer_v3 auf Anatomie-Quellen umziehen') NICHT ausgefuehrt. Ist-Befund: SearchAlgorithmAbiAdapter haelt KEINE Anatomie-Instanz (abi_adapter.hpp:136-141 'Die Organe werden INTERN konstruiert ... es gibt KEINEN injizierten Adaptee-Instanz-Member'); ein Umzug der Quellen waere die volle Delegations-Vereinheitlichung, wuerde die gemessenen WERTE aendern und ist kein Reihenfolge-Schritt. Ausgefuehrt wurde die Member-/Einsammlungs-Nachruestung (die im Auftrag genannte Haelfte); der Umzug ist als offener Punkt gemeldet."
+      ],
+      "offene_punkte": [
+        "KLASSE-A-SCHEMA-EREIGNISSE NICHT AUSGEFUEHRT (bewusst, ausserhalb des Klasse-C-Auftrags): Katalog P2 (T7-Schema-Benennung der drei real geschriebenen aber unbenannten Felder real_prefetches_issued/last_prefetch_distance/last_real_address, observable_tier.hpp:83-85 names[5..7]==nullptr vs. abi_adapter.hpp Schreiber) und P3-P8 (Slot-Benennungen der freien axis_stats-Slots gemaess bindender Slot-Vergabe). Beides ist layout-neutral, aber es sind CSV-SCHEMA-Ereignisse MITTEN im stat_*-Block (Spalten-Positionen verschieben sich) und beruehren observable_tier.hpp = G8-Negativ-Liste 1.2. Fenster-Zuordnung = Manager/Owner (Katalog-Entscheid E3), nie still.",
+        "Von den neun nachgeruesteten SA-Slots hat am Ist nur index_organization eine produktive observable Belegung (SaCompositionWithIndexOrganizationOrgan<IndexOrganizationFromSet>). Die uebrigen acht (value_handle, filter, allocator, path_compression, prefetch, concurrency, io_dispatch, migration_policy) bleiben mit den Bestands-Registry-Varianten ehrlich EmptyAxisSnapshot -- der Halter ist da, eine observable Belegung fehlt. Ob weitere Cross-Genus-/Huellen-Belegungen produktiv werden sollen, ist eine Bau-Entscheidung ausserhalb dieser Scheibe.",
+        "S6-KOMMENTAR-KANDIDATEN (Liste fortgeschrieben, NICHT gefixt -- S6 ist eigene Scheibe): observable_tier.hpp:15 'axis_stats[17][8] + seg_ns[17]', :33 'seg_ns[17]', :58 'ALLE 17 Achsen befuellt'; abi_adapter.hpp:47 Zeilen-Verweise 'fill_observer_v3 (~:907) · fill_segment_timing_v3 (~:1136) · tier_observe (~:1312)' (real jetzt :1137/:1447/:1786) sowie :187 und :2072 'ALLER 17 Achsen'; search_algorithm_anatomy.hpp:25 '17 Achsen-Auspraegungen', :48 '17-Achsen-Anatomie', :52 '17-Achsen-Snapshot'; cache_engine_builder_iterator.hpp:287 'axis_stats[17][8]', :348 'ALLE 17 Achsen', :438 'Diagnose 17 Achsen befuellt'; perm_runner.hpp:17 und :221 'ALLE 17 Achsen'. Alle compile-/golden-/ABI-neutral (K1-Klasse nach G8 Paragraf 4).",
+        "Peak-Quelle: eine ECHTE bytes_in_use_peak-Erhebung braucht entweder einen Wire-Slot (Klasse B, ABI-Major -- nach G8 nur per Owner-Entscheid) ODER periodische tier_observe-Zuege im Mess-Pfad (die vom Katalog benannte ZEITREIHEN-LUECKE; Mechanismus observable_tier.hpp:176-180 vorhanden, der Mess-Pfad faehrt ihn nicht). Entscheid steht aus; die Spalte ist vorbereitet.",
+        "A8-S4 und A8-S5 sind weiterhin vor-Anker-Pflicht (G8 Paragraf 3.2). Diese Scheibe hat KEINEN axes/-Header angefasst (S5-Flaeche unberuehrt) und die Konstitutiv-Matrix (S4) nicht hergestellt.",
+        "Kein Push, kein Merge: Branch a8-s3 liegt lokal in /home/comdare/wt-a8s1 auf 3ef96490 (Basis 19f27223), Working-Tree eingefroren (git status --short == 0 Zeilen). CI-Gegenlauf (Dual-Weg) steht aus."
+      ]
+    },
+    "review": {
+      "befunde": [
+        "BELEG-PRAEZISION (kein Substanz-Verstoss): Die Report-Behauptung 'TABU-grep ueber ... thesis_tiere/: 0 Treffer je Commit' ist fuer Commit 3ef96490 literal FALSCH -- der Commit aendert tests/unit/thesis_tiere/test_h2_score_akte.cpp und test_wdk_datasets_fairness.cpp (git show --name-only, selbst erhoben). Die Substanz ist gedeckt: G8 par. 1.5 sperrt in thesis_tiere/ nur die Byte-Wache golden_fullpilot_320_binary_ids.txt(+_abi4/5/6) -- die ist in allen drei Commits unberuehrt (0 Treffer, selbst geprueft) -- und G8 par. 4 erlaubt Fixture-Nachzuege ausdruecklich; derselbe Report deklariert beide Edits offen als FIXTURE-ORAKEL (b)+(c). NACHBESSERUNG NUR IM LEDGER/REPORT: TABU-Muster kuenftig als 'golden_fullpilot_320*' fuehren, nie als Verzeichnis-Pauschale -- sonst erbt das naechste Review eine falsche Beleg-Schablone.",
+        "MINOR: Die im offene-Punkte-Block genannten 'realen' Zeilenreferenzen fuer abi_adapter.hpp (':1137/:1447/:1786') weichen vom Ist am HEAD ab (selbst erhoben: fill_observer_v3 :1138, fill_observer_pathb_driven_v3 :1446, tier_observe-Sequenz :1788). Harmlos, da die S6-Doktrin die Liste ohnehin aus live-grep ableitet -- aber nicht als Fixpunkte uebernehmen.",
+        "EINORDNUNG (kein Mangel, fuer den Anker-Plan): Commit 51d37cd3 vergroessert SearchAlgorithmAnatomy um 9 Member -- wie von G8 par. 3.2 fuer A8-S3 ausdruecklich vorgesehen binary-beruehrend (in Tier-Binaries einkompiliert), aber wire-/fingerprint-/binary_id-neutral. Die Scheibe MUSS wie geplant VOR dem Anker-Vollzug liegen; A8-S4/S5 bleiben vor-Anker-Pflicht (vom Report korrekt als offen gefuehrt). CI-Gegenlauf (Dual-Weg) steht aus -- Branch a8-s3 existiert auf keinem Remote (selbst geprueft), kein Push erfolgt, konform zum Auftrag."
+      ],
+      "selbst_verifiziert": [
+        "(a) BELEG-VOR-FIX unabhaengig REPRODUZIERT: Include-Overlay im Scratchpad mit AUSSCHLIESSLICH abi_adapter.hpp auf Basis 19f27223 (alle anderen Header/Test = HEAD via Symlink; Original-Compile-Flags aus ninja -t commands; Worktree unberuehrt). Ergebnis literal: 'seg_ns[T17] = 510' (Disk) / '130' (MemoryOnly) bei 'axis_stats[T17] = rounds=0 bytes_staged=0 records_staged=0 device_flushes=0 checksum=0', [ERR] W2/W3/W4-Disk + W2/W3-Memory + W6b, '==== A8-S3 T17-Lesezeitpunkt-Wache: 6 FEHLER ====' EXIT=1 -- exakt die 6 gemeldeten Fehler. Der Defekt liegt damit kausal in der Befuellungs-Reihenfolge genau dieser einen Datei. Historie: HEAD=3ef96490 auf Basis 19f27223, Reihenfolge fix->feat->feat linear, alle 3 Commits mit Trailer 'Claude Fable 5'.",
+        "(b) WIRE-NEUTRALITAET: observable_tier.hpp-Diff mit EIGENEM Filter = 0 Nicht-Kommentar-Zeilen; static_assert(sizeof(ComdareTierObserverSnapshot) == 1344) am HEAD vorhanden (observable_tier.hpp:160), Schema-Version 8 (:167) unbewegt; Wire-Grep ueber den GESAMT-Diff (ABI_MAJOR/MAGIC/sizeof(Comdare/struct Comdare/kV3AxisCount =) trifft NUR zwei Testausgabe-Zeilen; G8-Negativ-Listen-Dateien im name-only-Diff: 0 Treffer JE COMMIT (observer_aggregate.hpp, anatomy_fingerprint, source_catalog, ctsha512, system_axis_order, anatomy_module_abi*, alle XML/golden-Dateien, axes/-Header); abi_adapter.hpp nur in Commit 1 (= die von G8 par. 3.2 vor-autorisierte S3-Flaeche, reine Reihenfolge), Commit 3 beruehrt abi_adapter 0x. Einziger Orchestrator der 4-Schritt-Sequenz ist tier_observe (:1788-1798) -- kein anderer Aufrufer von fill_segment_timing_v3/fill_observer_v3 im Repo, der am alten Reset-Ort oder filled-Zaehler hinge.",
+        "(c) NACH-FIX-PROBE Eigenlauf am HEAD: 'axis_stats[T17] = rounds=9 bytes_staged=18432 records_staged=2304 device_flushes=0 checksum=32640' (Disk) vs 'rounds=9 bytes_staged=0 records_staged=2304 checksum=0' (MemoryOnly -- ehrliche 0 bei writes_back_to_disk()==false), CSV-Zelle [148] 'stat_persistence_target_rounds' = '9', 'ALLE OK' EXIT=0. Strategie-Kontrast-Orakel intakt, Zaehler identisch mit dem Report.",
+        "(d) SA-MEMBER: Grep-Zaehlung am Objekt Basis=9 gehaltene Organ-Member (search_algo{}, memory_layout, serialization, node_type, cache_traversal, mapping, queuing_q1, queuing_q2, persistence_target) -> HEAD=18 (+index_organization, value_handle, filter, allocator, path_compression, prefetch, concurrency, io_dispatch, migration_policy; search_algorithm_anatomy.hpp:304-312). Einsammlung flach-imperativ per if constexpr (ObservableAxis<...>) -- CT-Guard, kein Runtime-Dispatch, kein variant. Wache prueft per static_assert gegen anatomy::kV3AxisCount (nie Literal), pinnt EmptyAxisSnapshot-Ehrlichkeit auf TYP-Ebene fuer die nackten ART-Slots und sizeof 1344 mit. Eigenlauf: '18/18 gehalten', 'ART observable_axis_count = 9', 'insert_count = 3', EXIT=0. Fixture-Flip test_e24_c3 loest den Original-Vorsatz ein (umgedrehter Pin + real getriebener Abschnitt 4c, insert(511)/insert(512)).",
+        "(e) CSV-KLASSE-C = HOST-EREIGNIS: Spalten-Appends am ENDE von lazy_csv_header (';pmc_branch_misses', ';op_*_p999_ns', ';alloc_bytes_in_use_peak;alloc_external_frag_milli;alloc_internal_frag_milli') + Legenden-Block in cache_engine_builder_iterator.hpp; p999_ns ist Host-Struct-Feld in perm_runner.hpp (nearest_rank_p(v, 0.999) aus denselben Ist-Vektoren), KEIN Wire-POD-Feld; B7 in measurement_snapshot.hpp am FELD und an der ZUWEISUNG deklariert, Name unveraendert (latex_anhang-Leser geschuetzt); Fixtures von substr(size()-N)-End-Pinning auf Spalte-NACH-NAMEN + Nachbarschaft umgestellt. Eigenlauf: 'Spalten im Header = 183  Zellen in der Zeile = 183', 'pmc_branch_misses = 4711', n/a-Trio, failed-Kaskade, 'ALLE OK' EXIT=0.",
+        "(f) VOLL-CTEST SERIELL Eigenlauf 2x: '100% tests passed, 0 tests failed out of 380' (Total Test time ~17.4 sec, ctest -j 1, warmer Build BUILD_EXIT=0 'ninja: no work to do'). golden-320 Eigenlauf (= die drei Konsumenten von COMDARE_GOLDEN_320_BYTE_GUARD_IDS: test_smoke_coverage_profile, test_wdk_datasets_fairness, test_measurement_categories): '100% tests passed, 0 tests failed out of 3'. N-Kette 377->378->379->380 arithmetisch geschlossen: ctest -N = 380 mit genau den drei neuen a8s3-Wachen (#160/#190/#379).",
+        "(g) GATES Eigenlauf: /home/comdare/tools/cf22/usr/bin/clang-format-22 --dry-run --Werror ueber alle 14 geaenderten Dateien CF_EXIT=0; ASCII: git diff 19f27223..HEAD, +Zeilen mit non-ASCII = 0; TABU-Dateien je Commit 0 Treffer (s. Befund 1 zur thesis_tiere-FORMULIERUNG); Working-Tree-Freeze vor UND nach meinen Eigenlaeufen: git status --short = 0 Zeilen; kein Remote-Branch a8-s3 (kein Push, kein Merge)."
+      ],
+      "verdikt": "LANDEBEREIT"
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "probe:opus5",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "a7f55fae1b6a3081b",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785848830170,
+      "queuedAt": 1785848830169,
+      "attempt": 1,
+      "promptPreview": "Antworte NUR mit OK.",
+      "lastProgressAt": 1785848832752,
+      "tokens": 22721,
+      "toolCalls": 0,
+      "durationMs": 2582,
+      "resultPreview": "OK"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "bau:A8-S3",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "a72f337505ba0a2d5",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785848832761,
+      "queuedAt": 1785848832753,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FERTIG",
+      "promptPreview": "ARBEITSAUFTRAG A8-S3 (Observer-Scheibe, Vor-Anker-Pflicht):\nPFLICHT-VORLAUF: Lies (1) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/docs/architecture/20260803-a8_f2_benchmarking_schnitt_soll_design.md — die S3-Scheibe; (2) /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260804-DOSSIER-achsen-qualitaets-parameter…",
+      "lastProgressAt": 1785851373164,
+      "tokens": 390085,
+      "toolCalls": 177,
+      "durationMs": 2540403,
+      "resultPreview": "{\"status\":\"FERTIG\",\"beleg_vor_fix\":\"BELEG axis_stats[17]-strukturell-0, erhoben VOR dem Fix am Basis-Stand 19f27223 (Branch a8-s3, Build /home/comdare/wt-a8s1/build-a8s1-final, Kommando: `cmake --build . -j 8 --target test_a8s3_t17_stats_lesezeitpunkt && ./tests/unit/test_a8s3_t17_stats_lesezeitpunkt`) -- Ausgabe literal:\\n\\n==== A8-S3: T17-Observer-Lesezeitpunkt (kV3AxisCount = 18) ====\\n    letz…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "rev:A8-S3",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "ae0ea66166c144c05",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785851373172,
+      "queuedAt": 1785851373164,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDEBEREIT",
+      "promptPreview": "ARBEITSAUFTRAG Fable-Review A8-S3 (READ-ONLY /home/comdare/wt-a8s1): Report: {\"status\":\"FERTIG\",\"beleg_vor_fix\":\"BELEG axis_stats[17]-strukturell-0, erhoben VOR dem Fix am Basis-Stand 19f27223 (Branch a8-s3, Build /home/comdare/wt-a8s1/build-a8s1-final, Kommando: `cmake --build . -j 8 --target test_a8s3_t17_stats_lesezeitpunkt && ./tests/unit/test_a8s3_t17_stats_lesezeitpunkt`) -- Ausgabe literal:…",
+      "lastProgressAt": 1785852078447,
+      "tokens": 124930,
+      "toolCalls": 57,
+      "durationMs": 705275,
+      "resultPreview": "{\"befunde\":[\"BELEG-PRAEZISION (kein Substanz-Verstoss): Die Report-Behauptung 'TABU-grep ueber ... thesis_tiere/: 0 Treffer je Commit' ist fuer Commit 3ef96490 literal FALSCH -- der Commit aendert tests/unit/thesis_tiere/test_h2_score_akte.cpp und test_wdk_datasets_fairness.cpp (git show --name-only, selbst erhoben). Die Substanz ist gedeckt: G8 par. 1.5 sperrt in thesis_tiere/ nur die Byte-Wache …"
+    }
+  ],
+  "totalTokens": 537736,
+  "totalToolCalls": 234
+}

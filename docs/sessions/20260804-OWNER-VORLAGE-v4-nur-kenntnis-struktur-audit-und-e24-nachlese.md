@@ -73,6 +73,15 @@ Job-Sperre (Startklar-9) aktiv bis zum Anker-Vollzug. Wir liegen VOR dem Bauplan
 A2-SHA512-Eichung) -> Phase 3 Parallel-Spuren -> Phase 4 Beweise -> Phase 5 Trigger (Ziel
 Do 07.08.). Messung Phase 6 stoppt am USER-GO.
 
+## 7b. ZUR KENNTNIS: EV-4/OF-A8-3 (S5-Scope-Abgrenzung, Default angewandt)
+
+Die A8-Dossier-Vorlage EV-4 war formal nie versendet; ihr Default gilt per deiner Pauschal-GO-
+Kette und wird in S5 SO angewandt: ext/-vendored Paper-Originalcode bleibt faithful und ist vom
+Scrub AUSGENOMMEN; die Adapter-/Portierungs-Schichten in axes/ (die 4 original_*-Adapter, die
+SuRF-Portierungen) sind IN Scope — Papertreue wird je Scheibe per bestehender Verhaltens-Tests
+literal belegt. Steht dein Entscheid anders, waechst der Scope auf die ext/-Uebersetzungs-
+schichten; Einspruch jederzeit, kein Gate.
+
 ## 8. GO-FRAGE Platte (aus V3b Par.8, weiter offen)
 
 `wt-w10/build-lc.stale-pfad` (2,4 GB, Vor-W10-Referenz-Build, Vergleichszweck erfuellt und im
