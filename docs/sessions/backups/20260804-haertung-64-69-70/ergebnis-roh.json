@@ -1,0 +1,142 @@
+{
+  "summary": "Haertungs-Mini-Scheibe (Owner-GO): throw-on-null im StdAllocatorAdapter (64) + per-Worktree-Tempdir (69) + Kommentar-Wahrheit (70) — Opus-5 + Fable-Review in wt-a8s1",
+  "agentCount": 3,
+  "logs": [
+    "Bau-Modell: claude-opus-5"
+  ],
+  "result": {
+    "bauModell": "claude-opus-5",
+    "bau": {
+      "status": "FERTIG -- alle drei Teile (Posten 64 / 69 / 70) gebaut, je eigener Commit, je eigenes volles Gate bestanden. Branch haertung-64-69-70 @ 9c08940b (Basis 1246ccd8), kein Push, kein Merge, Working-Tree sauber, Build eingefroren ('ninja: no work to do.'). N-Kette der Linie: 388 (Basis, live erhoben) -> 389 (+1 = die neue Negativ-TU aus Teil A) und ab da konstant ueber B und C.",
+      "commits": [
+        "436be899  fix(haertung-64): StdAllocatorAdapter uebersetzt den Strategie-nullptr in std::bad_alloc (UB-Pfad geschlossen) -- libs/cache_engine/axes/alloc/axis_06_allocator_strategy_base.hpp (+26/-1: Wurf im Fehlerpfad + Vertrags-Doku am Adapter + <new>), tests/unit/test_h64_allocator_adapter_failure_contract.cpp (NEU, 227 Z.), tests/unit/CMakeLists.txt (+8, Registrierung in COMDARE_PHASE_E_BOOST_TESTS)",
+        "43f3dcd5  fix(haertung-69): Test-Temp-Wurzel zusaetzlich je BUILD-VERZEICHNIS suffixiert -- tests/unit/CMakeLists.txt (+29: string(MD5) ueber CMAKE_BINARY_DIR -> add_compile_definitions(COMDARE_TEST_TMP_BUILD_TAG) + STATUS-Meldung), tests/unit/comdare_test_tmp.hpp (+38/-3: tmp_build_tag() + Fallback)",
+        "9c08940b  docs(haertung-70): Kommentar-Wahrheit nach dem Adapter-Wurf -- 12 Dateien, NUR Kommentare (mechanisch belegt): btree_node_pool_store, hash_bucket_pool_store, tree_node_pool_store, surf_fst_map_pool_store, axis_03b_cache_traversal_{linear_fanout,hash_lookup,binary_search_fanout}, concepts/axis_03b_cache_traversal_iterable_aspect_strategy_concept, axis_03m_mapping_{direct_placement,pool_relative}, axis_14_value_handle_real_slot, test_s5_03_placement_alloc_conformance"
+      ],
+      "doppellauf": "BASIS VOR DEM ERSTEN EDIT (build-a8s1-final nach Reconfigure auf 1246ccd8): 'Total Tests: 388' + 'ctest -j1: 100% tests passed, 0 tests failed out of 388' (17,57 s). -- COMMIT A (436be899): Voll-Bau EXIT=0 (167 s), Freeze 'ninja: no work to do.', N live 'Total Tests: 389'; LAUF 1 '100% tests passed, 0 tests failed out of 389'; LAUF 2 '100% tests passed, 0 tests failed out of 389'; golden-320 '100% tests passed, 0 tests failed out of 3'; Registry-Roundtrip '100% tests passed, 0 tests failed out of 2'. -- COMMIT B (43f3dcd5): Voll-Bau EXIT=0 (184 s, 1881 Kanten), Freeze 'ninja: no work to do.', N live 389; Mess-Doppellauf (mit Wurzel-Diff) LAUF 1/LAUF 2 je '100% tests passed, 0 tests failed out of 389'; Gate-Doppellauf LAUF 1/LAUF 2 je '100% tests passed, 0 tests failed out of 389'; golden-320 3/3; Roundtrip 2/2. -- COMMIT C (9c08940b): Voll-Bau EXIT=0 (127 s, 692 Kanten), Freeze 'ninja: no work to do.', N live 389; LAUF 1 '100% tests passed, 0 tests failed out of 389'; LAUF 2 '100% tests passed, 0 tests failed out of 389'; golden-320 3/3; Roundtrip 2/2. -- FLAKE-KLAUSEL NICHT AUSGELOEST: test_s5_artifact_cache_bounded und test_cache_mc_timeout waren in KEINEM der insgesamt 7 vollen seriellen Laeufe rot; keine Wiederholung noetig, kein Ausschluss zu erklaeren.",
+      "orakel_belege": [
+        "(A) NEGATIV-TEST MIT WURF (build-a8s1-final/tests/unit/test_h64_allocator_adapter_failure_contract, EXIT=0): '== (1) KONFORMITAET ... == / [OK] ErschoepfteStubStrategie erfuellt AllocatorStrategy / [OK] ... CacheEnginePermutationStrategy / [OK] ... AxisBaseConcept / [OK] ... OrganAxisConcept' | '== (2) NEGATIV-FALL ... == / [INFO] gefangen: std::bad_alloc -- what()=\\'std::bad_alloc\\' / [OK] push_back auf erschoepfter Strategie wirft std::bad_alloc / [OK] der Container blieb leer (nichts in Nullspeicher konstruiert)' | '== (3) EHRLICHKEIT ... == / [INFO] failure_count=1 allocation_count=0 / [OK] failure_count >= 1 NACH dem Wurf (Zaehlung vor dem Wurf) / [OK] allocation_count == 0' | '== (4) ZERO-SIZE ... == / [INFO] allocate(0) lieferte nullptr / [OK] allocate(0) wirft nicht' | '== (5) POSITIV-KONTROLLE ... == / [OK] 64x push_back ueber ExgenAllocator wirft NICHT / [OK] Groesse korrekt (64) / [OK] Inhalt korrekt (v[63] == 190) / [INFO] Exgen: allocation_count=7 failure_count=0 / [OK] Exgen failure_count == 0 / [OK] Exgen allocation_count >= 1' | 'POSTEN-64 FEHLSCHLAG-VERTRAG: ALLE OK'",
+        "(A) GEGENPROBE -- DAS ORAKEL BEISST (Adapter temporaer auf den VORZUSTAND ohne Wurf gesetzt, nur dieses eine Ziel neu gebaut, danach zurueckgesetzt und voll neu gebaut): '[INFO] push_back kehrte OHNE Wurf zurueck (size=1)' + '[ERR] push_back auf erschoepfter Strategie wirft std::bad_alloc' + '[ERR] der Container blieb leer (nichts in Nullspeicher konstruiert)' + 'POSTEN-64 FEHLSCHLAG-VERTRAG: 2 FEHLER' + EXIT=1. Der Container meldet also size()==1 auf einem nullptr-data() -- genau das UB, das Teil A schliesst. Ohne diese Gegenprobe waere die TU eine Tautologie.",
+        "(B) PFAD-DIFFERENZ, Kennungs-Bildung wie in CMake (cmake -P mit string(MD5)+string(SUBSTRING 0 12)): '/home/comdare/wt-a8s1/build-a8s1-final -> 8957ed3e2bce' | '/home/comdare/wt-m3/build-m3 -> 8f082a000730' | '/home/comdare/wt-a8s1/build-a8s1 -> aa2912f60141'.",
+        "(B) PFAD-DIFFERENZ AM KOMPILAT (derselbe Header, nur -D verschieden; g++ -std=c++23 -I tests/unit): 'TAG=8957ed3e2bce -> /tmp/comdare_test_1001_8957ed3e2bce' | 'TAG=8f082a000730 -> /tmp/comdare_test_1001_8f082a000730' | 'TAG=aa2912f60141 -> /tmp/comdare_test_1001_aa2912f60141' | 'OHNE -D -> /tmp/comdare_test_1001' (Fallback == exakt der Alt-Stand). Determinismus: zweiter Lauf desselben Kompilats liefert denselben Pfad.",
+        "(B) DER REALE CONFIGURE MELDET DIESELBE KENNUNG: '-- Test-Temp-Wurzel (Posten 69): comdare_test_<uid>_8957ed3e2bce (stabil aus CMAKE_BINARY_DIR=/home/comdare/wt-a8s1/build-a8s1-final)'. Und die Definition steht real am Ziel: ninja -t commands fuer test_s5_artifact_cache_bounded.cpp.o enthaelt 'COMDARE_TEST_TMP_BUILD_TAG=\\\"8957ed3e2bce\\\"'.",
+        "(B) WIRKUNG AM OBJEKT: Ist der Alt-Wurzel /tmp/comdare_test_1001 = 16119 Eintraege (Ledger nannte 15683 -- seitdem gewachsen). Nach einem vollen ctest-Doppellauf: 'ALT-Wurzel neue Eintraege: 0' (comm-Diff der Eintragslisten leer, 16119 -> 16119), waehrend die neue Wurzel /tmp/comdare_test_1001_8957ed3e2bce 115 Eintraege traegt. Isolierter Gegen-Test: nach rm -rf /tmp/comdare_test_1001/comdare_s5_bounded legt test_s5_artifact_cache_bounded das Verzeichnis dort NICHT wieder an.",
+        "(C) KOMMENTAR-ONLY MECHANISCH BELEGT (nicht behauptet): je Datei HEAD-Fassung und Arbeitsstand durch 'g++ -fpreprocessed -E -P -x c++' (Kommentare entfernt, Code-Token erhalten) und die Ergebnisse diff'ed -> 12x 'KOMMENTAR-ONLY OK', 'FAIL=0'. Betrifft auch die eine Zeile, an der ein Trailing-Kommentar vom Code getrennt wurde (iterable_aspect-Concept).",
+        "G8-NACHWEIS (selbst gegriffen ueber docs/architecture/20260804-e24_g8_negativliste_gesperrte_abi_flaechen.md): grep -c 'axis_06' = 0, 'allocator_strategy_base' = 0, 'StdAllocatorAdapter' = 0, 'alloc/' = 0, 'comdare_test_tmp' = 0, 'btree_node_pool_store' = 0, 'hash_bucket_pool_store' = 0. Keine der beruehrten Dateien steht auf einer BENANNTEN Flaeche (Abschn. 1.1-1.5, 1.7). Ergaenzend ehrlich: Abschn. 1.6 sperrt axes/-Header PAUSCHAL, traegt aber die ausdrueckliche Ausnahme der A8-Vor-Anker-Scheiben (Abschn. 3.2) -- diese Haertung ist genau diese Klasse (binary-beruehrend, MUSS vor den Anker) und ist Owner-/Manager-GO-gedeckt.",
+        "TABU/ABI-GREPS: ueber die Dateiliste je Commit UND ueber die gesamte Scheibe (git diff --name-only 1246ccd8..HEAD): 'golden_fullpilot_320|permutation_axes.xml|m3v2_study.profile.xml|system_axis_registry.xml|anatomy_fingerprint.hpp|subaxis_valueset_segment.hpp|system_cell_values.hpp|source_catalog.hpp|ctsha512.hpp|system_axis_order.hpp|tests/unit/thesis_tiere/' = 0 Treffer. Zusatz-Grep ueber die G8-benannten ABI-/Wire-/Stempel-Dateien = 0 Treffer.",
+        "cf22 (/home/comdare/tools/cf22/usr/bin/clang-format-22, 'Ubuntu clang-format version 22.1.8') --dry-run --Werror: je Commit ueber alle beruehrten C++-Dateien EXIT=0. ASCII-Selbstcheck aus dem Diff (git diff -U0 | grep '^+' | grep -P '[^\\x00-\\x7F]'): je Commit 0 Treffer.",
+        "GESAMT-DIFFSTAT 1246ccd8..HEAD: 16 Dateien, 423 insertions(+), 54 deletions(-) -- davon 227 Zeilen die neue Negativ-TU. Working-Tree nach dem letzten Commit: 'git status --porcelain' leer; Build: 'ninja: no work to do.'"
+      ],
+      "abweichungen": [
+        "TEIL B, Verankerung der Kennung: die Compile-Definition ist VERZEICHNIS-WEIT gesetzt (add_compile_definitions in tests/unit/CMakeLists.txt), nicht je Ziel. Grund: die Konsumenten von comdare_test_tmp.hpp verteilen sich ueber DREI Registrier-Wege (comdare_add_test, die Phase-E-/G3-Listen-Schleifen, direkte add_executable-Bloecke) -- eine handgepflegte Ziel-Liste driftet bei der naechsten TU sofort ab. FOLGE, ehrlich benannt: das Makro landet auch auf Zielen in tests/unit, die den Header nicht ziehen, darunter die SHARED-Anatomie-/Permutations-Module. Dort ist es ein UNBENUTZTES Makro (kein emittiertes Byte aendert sich); belegt durch golden-320 3/3 + Registry-Roundtrip 2/2 + 2x389/389 in demselben Commit.",
+        "TEIL C, Umfang groesser als die drei namentlich genannten Stellen: zusaetzlich geheilt wurden (a) die restlichen ZWEI der vier Pool-Stores (tree_node_pool_store, surf_fst_map_pool_store) -- der Auftrag verlangt die Praezisierung der [[allocation-failure-exception]]-Aussagen ALLER vier; (b) die Kopf-Doku-Bloecke der drei cache_traversal-Organe (dort stand 'wirft kein std::bad_alloc mehr'); (c) die driftenden Zeilennummern-Verweise 'axis_06_allocator_strategy_base.hpp:162-164' -> NAMENS-Verweise, inkl. des letzten solchen Verweises im Repo (test_s5_03_placement_alloc_conformance.cpp:36, war :152 und waere durch Teil A auf :151 verrutscht).",
+        "TEIL C, bewusst NICHT angefasst: axis_07_prefetch_path_oriented_impl.hpp. Dessen Aussage 'der bad_alloc-Pfad EXISTIERT NICHT MEHR' gehoert zu Schnitt-Form (A) (heap-frei, Compile-Zeit-Kappe) und bleibt wahr -- sie haengt nicht am Adapter. Eine 'Heilung' waere hier eine Verschlechterung gewesen.",
+        "TEIL A, Orakel-Bauform: die Stub-Strategie ist als VOLLWERTIGE Achsen-Variante gebaut (haengt an AllocatorStrategyBase, erfuellt AllocatorStrategy + CacheEnginePermutationStrategy + AxisBaseConcept + OrganAxisConcept, static_assert-belegt) statt als schlanker Attrappentyp. Sie traegt family_id = 0 ('keine Vendor-Familie') und lebt in einem anonymen Namespace der Test-TU -- sie steht in KEINER Registry und beruehrt weder binary_id noch Fingerprint.",
+        "TEIL A, Zwischenschritt am Objekt: fuer die Gegenprobe wurde der Adapter kurzzeitig auf den Vorzustand gesetzt und NUR das eine Test-Ziel gebaut; danach wurde die Datei aus der Sicherung zurueckgespielt und der VOLLE Bau erneut gefahren (EXIT=0), bevor das Gate lief. Der committete Stand ist der Wurf-Stand (grep 'throw std::bad_alloc' = axis_06_allocator_strategy_base.hpp:186).",
+        "MESS-ANOMALIE, unreproduziert und deshalb nicht weginterpretiert: bei der ERSTEN Wirkungs-Messung zu Teil B wuchs die Alt-Wurzel /tmp/comdare_test_1001 waehrend des Doppellaufs um 16 Eintraege (16087 -> 16103). In drei nachfolgenden Messungen mit Eintrags-LISTEN-Diff (comm) statt blosser Zaehlung war der Zuwachs jeweils 0 -- einmal nach einem vollen Einzel-Lauf, zweimal nach vollen Doppellaeufen. Ich halte die erste Zahl fuer ein Mess-Artefakt (Zaehlung waehrend des Auslaufens des letzten Tests), kann das aber nicht beweisen; die belastbare Aussage ist die reproduzierte: 0 neue Eintraege in der Alt-Wurzel, 115 in der neuen.",
+        "cf22 wurde NICHT auf tests/unit/CMakeLists.txt angewandt -- clang-format ist fuer CMake-Sprache nicht zustaendig (ein Probelauf produziert nur Rauschen). Fuer die C++-Dateien je Commit: EXIT=0."
+      ],
+      "offene_punkte": [
+        "KEIN PUSH, KEIN MERGE (auftragskonform). Branch haertung-64-69-70 @ 9c08940b, ohne Upstream, Basis 1246ccd8. Landung + CI-Wache + main-FF + super-Gitlink + Ledger-Nachtrag stehen aus und liegen beim Lead.",
+        "PmrResourceAdapter (die zweite, pmr-seitige Adapter-Klasse in derselben Datei, geliefert von as_pmr_resource()) reicht den Strategie-nullptr WEITERHIN ungeprueft durch -- std::pmr::memory_resource::allocate hat denselben Wurf-Vertrag wie std::allocator. Der Auftrag benannte ausdruecklich nur den StdAllocatorAdapter, deshalb bewusst nicht mitgezogen. RISIKO HEUTE KLEIN, belegt: grep ueber libs/+tests/+apps/+tools/ findet NULL Konsumenten dieser genesteten Klasse (die Treffer auf 'PmrResourceAdapter' gehoeren zur unabhaengigen Familie allocators/families/a22_pmr_resource/). Empfehlung: als eigener Registrier-Kandidat aufnehmen und im selben Zug erledigen wie Posten 64.",
+        "Die geerbte Alt-Wurzel /tmp/comdare_test_1001 mit 16119 Eintraegen wurde NICHT geloescht (keine Loesch-Freigabe, und die Doktrin 'Messdaten nie loeschen' laesst sich hier nicht ohne Pruefung ausschliessen). Sie wird ab jetzt von diesem Build nicht mehr befuellt. Aufraeumen = Owner-/Lead-Entscheid; die anderen Worktrees fuellen sie weiter, bis sie diese Commits haben.",
+        "Posten 66 des Registers (Perf-Sanity-Feld-Index-Literale namens-ableiten, 01d-Review B2) bleibt offen -- war nicht Teil dieses Auftrags. Posten 65 (stale iterable_aspect-Concept-Kommentar) ist mit Teil C erledigt.",
+        "Die noexcept-Vertraeglichkeit des neuen Wurfs habe ich an den bekannten Konsumenten geprueft (mapping register_slot, value_handle store_value, traversal register_entry, die vier Pool-Stores: alle NICHT noexcept, F57/Muster B sagt dort woertlich 'werfen statt terminate') -- also kein neuer std::terminate-Pfad. Diese Pruefung war GEZIELT per grep, nicht erschoepfend ueber alle 340 axes/-Header. Eine erschoepfende Wache (z.B. static_assert-Sweep 'kein noexcept-Member allokiert ueber den Adapter') waere Stoff fuer den Aufraeumpass.",
+        "Die neue TU laeuft im Phase-E-Standalone-Muster (plain int main, Label 'phase_e;standalone'); sie ist damit im comdare_tests-Sammel-Target und in ctest, aber sie ist NICHT im CI-Kanon-Leg V32_ENABLE=ON gelaufen -- das haengt an der Landung (kein Push).",
+        "Fuer das Ledger: N-Kette der Linie 388 -> 389 (genau +1, die neue TU); die beiden Folge-Commits sind N-neutral. Ich habe den Ledger NICHT geschrieben (Lead-Sache)."
+      ]
+    },
+    "review": {
+      "befunde": [
+        "BEFUND 1 (Report-Genauigkeit, kein Code-Fehler): Die offene-Punkte-Behauptung 'grep findet NULL Konsumenten der genesteten PmrResourceAdapter-Klasse' ist FALSCH. tests/unit/test_v41_topic_allocator_axis_06.cpp:1048 (TEST AsPmrResourceBacksPmrVector) holt a.as_pmr_resource() und schiebt 500 Elemente durch einen std::pmr::vector ueber genau diese genestete Klasse; nur die test_allocator_full_matrix-Treffer gehoeren zur unabhaengigen a22-Familie. Praktisches Risiko bleibt klein (StdMalloc scheitert unter Testlast nicht), aber die pmr-Luecke liegt auf einer GETESTETEN Flaeche -- der empfohlene Folge-Posten (PmrResourceAdapter::do_allocate nullptr -> bad_alloc) ist dringlicher als im Report dargestellt. Kein Landeblocker: der committete Code aendert dort nichts.",
+        "BEFUND 2 (Vollstaendigkeit der Konsumenten-Liste): Der Report nennt als Wurf-Konsumenten mapping/value_handle/cache_traversal + vier Pool-Stores, uebergeht aber libs/cache_engine/axes/node/axis_04_node_type_composed_store.hpp (slots_ = std::vector<Slot, A::StdAllocatorAdapter<Slot>> via as_std_allocator, Z. 57/133). Selbst geprueft: dessen allokierende Mutatoren (append_slot Z. 81, insert_slot_at Z. 83) sind NICHT noexcept -- musterkonform, kein neuer terminate-Pfad. Nur Listen-Luecke, keine Code-Folge.",
+        "BEFUND 3 (Beobachtung, vorbestehend, ausserhalb Posten-Scope): StdAllocatorAdapter::allocate wacht n*sizeof(T)-Ueberlauf nicht (streng nach C++23 waere bad_array_new_length die Vertragsantwort auf n > max_size); vorbestehend, nicht Teil von Posten 64 -- Kandidat fuer die Aufraeumpass-Kandidaten-Liste. Nebenbeobachtung ohne Korrektheitsfolge: die verzeichnisweite, je Build-Verzeichnis verschiedene Compile-Definition (Teil B) verhindert Cross-Worktree-ccache-Treffer fuer alle tests/unit-TUs (nur Compile-Kosten, konsistent mit den 1881 Kanten in Commit B)."
+      ],
+      "selbst_verifiziert": [
+        "OBJEKT-IDENTITAET: /home/comdare/wt-a8s1 Branch haertung-64-69-70 @ 9c08940b, linear auf Basis 1246ccd8 (merge-base = 1246ccd8), git status --porcelain leer, kein Upstream ('fatal: no upstream configured'), kein Remote-Branch enthaelt 9c08940b; Diffstat 16 Dateien +423/-54 exakt wie gemeldet.",
+        "(A) SUBSTANZ AM CODE: Wurf sitzt in axis_06_allocator_strategy_base.hpp:186 ('if (p == nullptr && n != 0) throw std::bad_alloc{}'); der Adapter hat genau EINE allocate-Ueberladung -- allocate(n,hint) und allocate_at_least synthetisiert std::allocator_traits ueber genau diese, Deckung vollstaendig; failure_count wird in axis_06_allocator_exgen.hpp:89 im else-Zweig VOR 'return p' gezaehlt (Stub ebenso, Z. 105 vor return); Zero-Size (n==0) ausgenommen. Negativ-TU selbst ausgefuehrt: EXIT=0, alle Abschnitte (1)-(5) OK, failure_count=1/allocation_count=0 literal gesehen. Registrierung in COMDARE_PHASE_E_BOOST_TESTS am Diff belegt.",
+        "(B) MECHANIK: string(MD5) ueber CMAKE_BINARY_DIR + SUBSTRING 0 12 selbst per cmake -P nachgerechnet -- zweimal identisch 8957ed3e2bce (deterministisch, kein Zeitstempel, keine Zufallszahl, offizieller CMake-Weg); Definition steht real am Kompilat (ninja -t commands fuer test_s5_artifact_cache_bounded.cpp.o enthaelt COMDARE_TEST_TMP_BUILD_TAG=\"8957ed3e2bce\"); Fallback ohne Definition = exakter Alt-Pfad (Header-Diff gelesen); ALLE 36 Konsumenten von comdare_test_tmp.hpp liegen in tests/unit -- kein Ziel ausserhalb faellt still auf die Alt-Wurzel zurueck.",
+        "(C) KOMMENTAR-ONLY EIGENSTAENDIG: alle 12 Dateien des Commits 9c08940b je in HEAD- und Vorgaenger-Fassung durch g++ -fpreprocessed -dD -E -P -x c++ tokenisiert und diff'ed (mit -dD, faengt auch Makro-Aenderungen) -> 12x identisch, FAIL=0, 0 Logik-Zeilen.",
+        "G8/TABU/ASCII SELBST GEGRIFFEN: docs/architecture/20260804-e24_g8_negativliste_gesperrte_abi_flaechen.md -- 13 Muster (axis_06, allocator_strategy_base, StdAllocatorAdapter, alloc/, comdare_test_tmp, alle vier Pool-Stores, axis_03b, axis_03m, axis_14, value_handle) je 0 Treffer; Abschn. 1.6 sperrt axes/ pauschal MIT expliziter Ausnahme Abschn. 3.2 (A8-S5 = axes/-Header, 'PFLICHT VOR DEM ANKER') -- die Haertung faellt in diese gedeckte Klasse, Task #1 nennt 'Haertung 64+69+70 bauen' ausdruecklich. TABU-Grep ueber den Gesamt-Diff 1246ccd8..HEAD (golden_fullpilot_320, permutation_axes.xml, m3v2_study.profile.xml, system_axis_registry.xml, anatomy_fingerprint, subaxis_valueset_segment, system_cell_values, source_catalog, ctsha512, system_axis_order, thesis_tiere/) = 0; Nicht-ASCII in addierten Diff-Zeilen = 0.",
+        "EIGENER DOPPELLAUF: Build eingefroren ('ninja: no work to do.' selbst gesehen); N live = 'Total Tests: 389'; drei volle serielle ctest-Laeufe gefahren, die zwei gezaehlten literal je '100% tests passed, 0 tests failed out of 389'; golden-320-Trio (test_smoke_coverage_profile, test_wdk_datasets_fairness, test_measurement_categories -- Konsumenten der COMDARE_GOLDEN_320_BYTE_GUARD_IDS-Datei, selbst hergeleitet) 3/3; Registry-Roundtrips sogar 3/3 (axis/system/measurement -- Obermenge der gemeldeten 2/2). FLAKE-KLAUSEL: test_s5_artifact_cache_bounded und test_cache_mc_timeout in keinem meiner Laeufe rot.",
+        "(7) VERHALTENS-RISIKO ABGESUCHT: kein bestehender Test faehrt eine erschoepfte/scheiternde Strategie durch den Adapter mit nullptr-Erwartung (alle 'fail'-Treffer in den s5-Konformanz-TUs sind g_fail-Zaehler; einzige Erschoepfungs-TU ist die neue h64); allokierende Mutatoren aller Adapter-Konsumenten (mapping emplace_back Z. 132, value_handle push_back Z. 165f mit explizitem 'NICHT noexcept'-F57/Muster-B-Vermerk, traversal register_entry/Rehash lt. Kopf-Doku nicht noexcept, btree free_node/alloc_node nicht noexcept, node-ComposedStore append_slot/insert_slot_at nicht noexcept) -- kein neuer std::terminate-Pfad; die noexcept-Member (clear/reset/set_*) allokieren nicht."
+      ],
+      "verdikt": "LANDEBEREIT"
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "probe:opus5",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "a68d4c9b311f303f1",
+      "model": "claude-opus-5",
+      "state": "done",
+      "startedAt": 1785864128540,
+      "queuedAt": 1785864128539,
+      "attempt": 1,
+      "promptPreview": "Antworte NUR mit OK.",
+      "lastProgressAt": 1785864131287,
+      "tokens": 21034,
+      "toolCalls": 0,
+      "durationMs": 2747,
+      "resultPreview": "OK"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "bau:HAERTUNG",
+      "phaseIndex": 1,
+      "phaseTitle": "Bau",
+      "agentId": "a1b043c6bc77dad98",
+      "model": "claude-opus-5",
+      "state": "done",
+      "startedAt": 1785864131299,
+      "queuedAt": 1785864131288,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FERTIG -- alle drei Teile (Posten 64 / 69 / 70) gebaut, je …",
+      "promptPreview": "ARBEITSAUFTRAG HAERTUNGS-MINI-SCHEIBE 64+69+70 (Owner-GO 04.08. abends; Ledger abend-9/abend-10 Register):\n\nPFLICHT-VORLAUF: (1) super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md grep '04.08.2026' — Nachtraege abend-9 (Posten 64-66) + abend-10 (Posten 67-70, Kontext); (2) ce docs/architecture/20260804-e24_g8_negativliste_gesperrte_abi_flaechen.md; (3) die betroffenen Dateien VOLL lesen.\n\nORT: …",
+      "lastProgressAt": 1785866240235,
+      "tokens": 259160,
+      "toolCalls": 164,
+      "durationMs": 2108936,
+      "resultPreview": "{\"status\":\"FERTIG -- alle drei Teile (Posten 64 / 69 / 70) gebaut, je eigener Commit, je eigenes volles Gate bestanden. Branch haertung-64-69-70 @ 9c08940b (Basis 1246ccd8), kein Push, kein Merge, Working-Tree sauber, Build eingefroren ('ninja: no work to do.'). N-Kette der Linie: 388 (Basis, live erhoben) -> 389 (+1 = die neue Negativ-TU aus Teil A) und ab da konstant ueber B und C.\",\"commits\":[\"…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "rev:HAERTUNG",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "aa366fa78e96a1165",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785866240249,
+      "queuedAt": 1785866240240,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDEBEREIT",
+      "promptPreview": "ARBEITSAUFTRAG Fable-Review Haertung 64+69+70 (READ-ONLY /home/comdare/wt-a8s1, Branch haertung-64-69-70, Basis 1246ccd8): Adversarial. Report: {\"status\":\"FERTIG -- alle drei Teile (Posten 64 / 69 / 70) gebaut, je eigener Commit, je eigenes volles Gate bestanden. Branch haertung-64-69-70 @ 9c08940b (Basis 1246ccd8), kein Push, kein Merge, Working-Tree sauber, Build eingefroren ('ninja: no work to …",
+      "lastProgressAt": 1785866619280,
+      "tokens": 90971,
+      "toolCalls": 36,
+      "durationMs": 379031,
+      "resultPreview": "{\"befunde\":[\"BEFUND 1 (Report-Genauigkeit, kein Code-Fehler): Die offene-Punkte-Behauptung 'grep findet NULL Konsumenten der genesteten PmrResourceAdapter-Klasse' ist FALSCH. tests/unit/test_v41_topic_allocator_axis_06.cpp:1048 (TEST AsPmrResourceBacksPmrVector) holt a.as_pmr_resource() und schiebt 500 Elemente durch einen std::pmr::vector ueber genau diese genestete Klasse; nur die test_allocator…"
+    }
+  ],
+  "totalTokens": 371165,
+  "totalToolCalls": 200
+}
