@@ -1,0 +1,5 @@
+== GATE-BASIS ctest -N (frisches Configure, Zwei-Phasen: Codegen-Tools + comdare_adhoc_emitter_cli, dann re-configure) ==
+Objekt: b4110cd021dc1838dde2571d8fe786751f3f626f  Branch: b2-neuanker-format3
+2026-08-05T18:39:29+00:00
+
+Total Tests: 405

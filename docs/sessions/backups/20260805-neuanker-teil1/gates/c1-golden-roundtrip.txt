@@ -1,0 +1,23 @@
+== C-1 TABU-/GOLDEN-BEWEISE (nach C-1-Aenderung, vor Commit) ==
+2026-08-05T18:52:17+00:00
+-- golden-320 3/3 + Roundtrip + CRC-Anker --
+
+100% tests passed, 0 tests failed out of 8
+
+Label Time Summary:
+contract        =   0.05 sec*proc (5 tests)
+coverage        =   0.03 sec*proc (1 test)
+e4              =   1.37 sec*proc (3 tests)
+go5             =   0.00 sec*proc (1 test)
+golden          =   0.01 sec*proc (1 test)
+inc3            =   0.00 sec*proc (1 test)
+limits          =   1.37 sec*proc (1 test)
+measurement     =   0.01 sec*proc (1 test)
+profiles        =   0.03 sec*proc (3 tests)
+registry        =   0.02 sec*proc (3 tests)
+roundtrip       =   0.03 sec*proc (4 tests)
+smoke           =   0.03 sec*proc (1 test)
+system          =   0.01 sec*proc (1 test)
+thesis_tiere    =   0.01 sec*proc (1 test)
+
+Total Test time (real) =   1.43 sec

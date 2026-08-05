@@ -1,0 +1,45 @@
+Running main() from /home/comdare/wt-b2-neuanker/build/gate/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = *NeubauRaeumtStaleSidecarsBeidseitig*
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from A2SkipGate
+[ RUN      ] A2SkipGate.NeubauRaeumtStaleSidecarsBeidseitig
+[heartbeat] tier-build 1/1 t+0s
+[heartbeat] tier-build fertig 1/1 t+0s
+[heartbeat] tier-build 1/1 t+0s
+[heartbeat] tier-build fertig 1/1 t+0s
+/home/comdare/wt-b2-neuanker/tests/unit/test_a2_sha512_skip_gate.cpp:403: Failure
+Value of: fs::exists(fp_pfad)
+  Actual: true
+Expected: false
+C5: der 128-hex des Vorgaenger-Baus haette einen spaeteren Lauf falsch skippen lassen koennen
+
+/home/comdare/wt-b2-neuanker/tests/unit/test_a2_sha512_skip_gate.cpp:405: Failure
+Value of: fs::exists(ex::algo_sidecar_path(dll_pfad))
+  Actual: true
+Expected: false
+
+/home/comdare/wt-b2-neuanker/tests/unit/test_a2_sha512_skip_gate.cpp:406: Failure
+Value of: fs::exists(ex::variant_sidecar_path(dll_pfad))
+  Actual: true
+Expected: false
+
+[heartbeat] tier-build 1/1 t+0s
+[heartbeat] tier-build fertig 1/1 t+0s
+/home/comdare/wt-b2-neuanker/tests/unit/test_a2_sha512_skip_gate.cpp:429: Failure
+Value of: fs::exists(ex::algo_sidecar_path(dll_pfad))
+  Actual: true
+Expected: false
+
+[heartbeat] tier-build 1/1 t+0s
+[heartbeat] tier-build fertig 1/1 t+0s
+[  FAILED  ] A2SkipGate.NeubauRaeumtStaleSidecarsBeidseitig (0 ms)
+[----------] 1 test from A2SkipGate (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] A2SkipGate.NeubauRaeumtStaleSidecarsBeidseitig
+
+ 1 FAILED TEST
