@@ -124,3 +124,7 @@ dieses Doc sind die Wahrheit, Stack bei Wiederaufnahme neu.
   (-E) — damit gefahrene Compile-Biss-Tests sind FALSCH GRUEN; echten Compile-Befehl nehmen.
 - CRTP-Weiterleiter-Klasse (h81): derived().X() findet ohne eigenen Member den Basis-Member
   wieder = stille Endlos-Rekursion; Heilung = self-proving static_asserts an JEDEM Weiterleiter.
+
+## VOLLZUGS-VERMERK 05.08.2026 vormittag (additiv)
+
+- §2 (01c-3-Landung) VOLLZOGEN: ce 98eea2e7 (Gate 400, Pipeline 14607). §3-Vorstufe: Abschnitts-Truth-Check gefahren (ABSCHLUSS-MIT-AUFLAGEN) -> Q-Welle S5-05q GELANDET: ce b09ebb8a (Gate 402, Pipeline 14615), Familie 05 = 4/4 inkl. topics/-Doppelwurzel. Details: Ledger Nachtraege nacht-6 + vormittag-1. Reststrecke unveraendert: Phase B (§3) -> ANKER (§4).
