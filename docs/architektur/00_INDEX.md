@@ -17,6 +17,7 @@
 | `03_konzepte_saeule_a.md` | Such-Algorithmen-Konzepte (Saeule A) | Doks 11, 12 | ~1.500 |
 | `04_konzepte_saeule_b.md` | Plattform-Modell (Saeule B) | Doc 13 | 631 |
 | `05_uml_klassen.md` | Konsolidierte UML-Klassen-Doku (Search Engine, Cache Engine, Measurement, Hardware/ISA, Engine-Choice/Builder, Persistence) | Doks 01-06 | ~1.700 |
+| `05b_uml_klassenatlas_20260805.md` + `.html` | IST-treuer UML-Klassenatlas am Objekt (1918 Typ-Definitionen aus 1211 Headern, alle Methodensignaturen, CRTP/Concept/Facade-Stereotypen, 92 Beziehungsdiagramme; Stand ce `98eea2e7`, Erhebung 34-Shard-Workflow + Census) | libs/cache_engine | Atlas |
 | `06_er_modell.md` | Entity-Relationship-Modell (ER) | Doc 07 | 281 |
 | `07_cross_reference.md` | Cross-References zwischen Saeulen + Bausteine_Matrix-Achsen ↔ UML-Klassen ↔ ER-Entitaeten | Doc 08 | 129 |
 | `08_drawio_export.md` | Drawio-Export-Strategie + Verweis "REV7-drawio noch zu erstellen, Phase K-H" | Doc 09 | 162 |
