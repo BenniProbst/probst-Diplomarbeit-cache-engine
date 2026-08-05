@@ -1,0 +1,413 @@
+{
+  "summary": "ADVERSARIALER Abschnitts-Truth-Check des S5-Scrub-ABSCHLUSSES (A2-Pflicht, nachgeholt): 4 Refuter-Lenses + Synthese — alle Fable, read-only",
+  "agentCount": 5,
+  "logs": [],
+  "result": {
+    "lenses": [
+      {
+        "key": "R1-vollstaendigkeit",
+        "r": {
+          "widerlegungs_versuche": [
+            {
+              "behauptung": "Der S5-B-5-Scrub ist VOLLSTAENDIG (alle Achsen-Familien erfasst, Familie 05 per Nachweis-grep=0 abgeschlossen)",
+              "angriff": "Bindende Familien-Definition (kOrganGruppen-Drift-Wache) gegen das tatsaechlich gegreppte Nachweis-Universum gestellt; frische Container-greps ueber ALLE Wurzeln inkl. topics/-Doppelwurzeln, .in-Templates, compositions/; Allokator-Achsen-Konsum im Fundort gezaehlt; Treiber-Verdrahtung und enabled-Status der uebersehenen Organe geprueft; Ledger abend-4..nacht-5, beide Pause-Anker und S5-Dossier auf eine Ausnahme-Deklaration abgesucht",
+              "ergebnis": "WIDERLEGT",
+              "beleg": "Familie 05_write_path_io = {queuing_q1, queuing_q2, io_dispatch, persistence_target} per drift-bewachter Einzigquelle (libs/cache_engine/builder/bestandslog/lager_baum_writer.hpp:135-141, Kommentar :126 'KEINE ZWEITE ACHSEN-QUELLE'). Der 05-Nachweis greppte NUR axes/io_dispatch/ + axes/persistence_target/ (tests/unit/test_s5_04_execution_alloc_conformance.cpp:21-25, Lauf-Ausweis :132) — queuing hat KEINEN axes/-Ordner und lebt ausschliesslich in der Doppelwurzel libs/cache_engine/topics/queuing/. Dort: 13 von 18 Q1-Organ-Headern halten Organ-ZUSTAND am Default-Allokator (axis_q1_queuing_append_only.hpp:161 std::vector data_, fifo.hpp:121 std::deque, lifo.hpp:120, priority_heap.hpp:151 std::priority_queue, skiplist_buffer.hpp:141 std::set, delta_chain.hpp:139, epoch_buffer.hpp:191-192, lockfree_spsc.hpp:220, bounded_ring.hpp:176, batched_insert_buffer.hpp:199-200, copy_on_write.hpp:168-169); grep as_std_allocator|StdAllocatorAdapter|allocator_type|AllocAxis ueber den GESAMTEN topics/queuing/-Baum = 0 Treffer. Materiell: Q1 ist Kompositions-Achse T15, live im abi_adapter verdrahtet (anatomy/abi_adapter.hpp:1010 put in tier_insert unter #if COMDARE_MEASUREMENT_ON — exakt die Klasse, fuer die die 04-Familie [PathOrientedImpl, ebenfalls Mess-only] GESCRUBBT wurde; :1086 get, :1165 clear) und laut Ledger-INC-A voll-ON (queuing_q1=15 enabled — anders als die grossteils OFF-Paper-Wrapper der 03a). Keine Deklaration: 'queuing' kommt im Ledger-S5-Strang (super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md Z.3874-3987), in beiden Pause-Ankern (20260804/20260805-PAUSE-*.md) und im Dossier-S5-Scope (docs/architecture/20260803-a8_f2_benchmarking_schnitt_soll_design.md:334-339) nicht als Ausnahme vor; der 70-Dateien-Planungs-Bestand war axes/-verankert und hat die Doppelwurzel strukturell nie gesehen. Die topics/-Doppel-Wurzel-Kontrolle des 04-Piloten prueften nur die eigene Familie."
+            },
+            {
+              "behauptung": "Die 8 benannten Familien-Schnitte (04/03/01d/01a/02a/01b/02b/01c) laufen ueber das Allokator-Achsen-Interface",
+              "angriff": "Frische Voll-greps in beiden Formklassen (1-Argument-Sequenz-Container UND 2-Argument-map/unordered_map/string-Defaults) ueber axes/, compositions/, topics/, anatomy/, builder/, include/ inkl. *.in; jeden Resttreffer am Objekt gelesen und auf Organ-Zustand vs. deklarierte Ausnahme klassifiziert",
+              "ergebnis": "HAELT",
+              "beleg": "Einziger 2-Argument-map-Treffer in axes/ traegt den Achsen-Allokator (axes/lookup/composable/wormhole_leaf_list_pool_store.hpp:195 map_allocator_type). Saemtliche verbleibenden Default-Alloc-Zeilen in axes/ liegen in 02a-Familien-Dateien (node/axis_04_node_type_{chunked,composed,layout_aware}_store.hpp) und sind TRANSIENTE observe-/flatten_/rebuild_-Streupuffer, KEIN Organ-Zustand, mit schriftlicher SCOPE-DEKLARATION am Objekt (chunked_store.hpp:293-301: bewusst stehen gelassen, Verweis Mess-Schnitt-Fenster + Doppelzaehlungs-Regel Owner-KERN 04.08.; composed_store.hpp:113 als benannter Praezedenzfall). compositions/ = 0 Treffer. topics/traversal/axis_03a_search_algo/composable/* sind 5-Zeilen-Forwarding-Header auf die gescrubbten axes/lookup/composable/-Dateien (verifiziert an composed_art_trie_search.hpp). Familien-Gates existieren als Registry-abgeleitete Typ-Wachen (tests/unit/test_s5_0{1a,1b,1c,1d,2a,2b,3,4}_*.cpp)."
+            },
+            {
+              "behauptung": "Die Achse 03a ist 22/22 lueckenlos [Fassaden-Schnitt] — die Registry zaehlt ALLE Organ-Klassen der Achse",
+              "angriff": "AllStrategies eigenhaendig aus dem Quelltext gezaehlt; Pin-Mechanik auf Handlisten-Schwaeche geprueft; Vollsuche nach SearchAlgoBase-Ableitungen ueber axes/ UND topics/ nach Organ-Klassen ausserhalb der Registry; die 03a-Doppelwurzel und die Kompositions-search_algo-Slots (ObservableArtTrieOrgan) als Gegenbeispiel-Kandidaten verfolgt",
+              "ergebnis": "HAELT",
+              "beleg": "Eigene Zaehlung von axes/lookup/axis_03a_search_algo_registry.hpp:54ff = exakt 22 (18 Organ-Dateien; k_ary traegt 5 Fassaden inkl. der 4 per-K-Leaf-Klassen KArySearchAlgoK2/4/8/16). Der Pin ist ABLEITUNG, keine Handliste: MigrierteOrgane = mp_filter<traegt_migrations_ausweis, AllStrategies> mit static_assert mp_size<Migriert>==mp_size<AllStrategies> (tests/unit/test_s5_01c_fassaden_conformance.cpp:173, :252) — jedes neue Registry-Organ ohne Ausweis bricht compile-hart. Vollsuche 'SearchAlgoBase<' ueber axes/+topics/ findet ausschliesslich die Cores/Fassaden/Rebounds der 18 lookup-Dateien, keine Klasse ausserhalb. Die einzigen 03a-Organe ausserhalb der 22 (ComposedSearch-Wrapper, z.B. compositions/art_reference.hpp:66 ObservableArtTrieOrgan) liegen exakt im [Fassaden-Schnitt]-Scope-Vorbehalt der Behauptung und unter dem EIGENEN 01b-Gate (test_s5_01b_composable_alloc_conformance.cpp, 8 Composed-Anker); ihre topics/-Wurzel ist Forwarding-only. Der Zwei-Ebenen-Schnitt ist an allen 18 Dateien sichtbar (Core+Rebound-Paare, z.B. skip_list.hpp:95/:414 inkl. innerer Turm-Ebene level_alloc :144)."
+            },
+            {
+              "behauptung": "Die 2 containerfreien Organe (array256, original_art) tragen eine ehrliche MINIMAL-Form",
+              "angriff": "Beide Dateien vollstaendig auf Container/new/malloc/unique_ptr/shared_ptr gegreppt; die Selbstbeweis-Pins auf Umgehbarkeit geprueft (gilt der Pin fuer BEIDE Ebenen Fassade+Rebound?)",
+              "ergebnis": "HAELT",
+              "beleg": "axes/lookup/axis_03a_search_algo_array256.hpp und axis_03a_search_algo_original_art.hpp: 0 Container-/Heap-Treffer (nur constexpr std::string_view name()/flag_suffix()). Begruendeter KLASSEN-ENTSCHEID im Datei-Kopf (array256:24-40, original_art:19-35: 'MINIMAL-FORM, NICHT das Voll-Rezept', jedes Weglassen als Aussage begruendet; Achsen-AUSWEIS ausdruecklich NICHT Speicher-Bindung :114/:126). Self-proving Pins auf BEIDEN Ebenen: static_asserts brechen, sobald Fassade ODER Rebound-Leaf nicht mehr heap-frei ist, plus Groessen-Gleichheits-Pin der Ebenen (array256:295-319, original_art:329-354)."
+            },
+            {
+              "behauptung": "golden/XML/Wire sind ueber die GESAMTE Strecke byte-neutral",
+              "angriff": "Endpoint-diff UND per-commit-Beruehrungsliste ueber die volle S5-Strecke 65a61fcf..98eea2e7 fuer Registry-XML, permutation_axes.xml, golden-320-IDs und die ABI-Wire-Header; Landungs-Beleg-Kette des Schluss-Merges gegen das Ledger gestellt",
+              "ergebnis": "TEILWEISE",
+              "beleg": "ARTEFAKT-EBENE HAELT (eigenes Kommando): git diff 65a61fcf..98eea2e7 auf libs/cache_engine/algorithm_profiles/cache_engine_axis_registry.xml, permutation_axes.xml, tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt, include/cache_engine/abi/ = LEER, und git log ueber die Strecke zeigt KEINEN Commit, der diese Pfade beruehrt (kein touch-and-revert). ABER LAUF-EBENE DES SCHLUSS-MERGES NUR ATTESTIERT: der letzte Ledger-Eintrag (nacht-5) und der super-HEAD 0675a591 kennen 01c-3 nur als UNGELANDET @fbb351d9 (super-gitlink noch auf 40e8bf27); Merge-Doppellauf 2x400 / golden 3/3 / Pipeline-Gruen fuer die Landung 98eea2e7 stehen ausschliesslich im Commit-Text von 98eea2e7 und sind read-only hier nicht unabhaengig nachvollziehbar (immerhin: origin/main==98eea2e7 belegt das vollzogene main-FF-Ritual auf beiden... zumindest origin)."
+            },
+            {
+              "behauptung": "Alle Mess-Semantik-Aenderungen sind deklariert",
+              "angriff": "Deklarations-Pflichtstellen der gescrubbten Familien am Objekt nachgelesen (Scope-Ausnahmen, Zaehler-Trennungen, EV-4-Grenzen, Duplikat-Logik-Entfall) und nach einer undeklarierten Semantik-Drehung gesucht; die Mess-Konsequenz der Vollstaendigkeits-Luecke aus Befund 1 gegen die Behauptung gestellt",
+              "ergebnis": "TEILWEISE",
+              "beleg": "Fuer die GESCRUBBTEN Familien gefunden und deklariert: 02a-Scope-Deklaration transiente Puffer mit Mess-Schnitt-Fenster-Verweis (chunked_store.hpp:293-301), Statistik-Trennung ohne Doppelzaehlung (chunked_store.hpp:181-190 node_store_allocator_statistics), 01b walk_allocator_statistics BEWUSST getrennt (Ledger nacht-1), EV-4-Grenzen im Header der original_*-Wrapper (Commit b2e21a92), G8-Befund fill_segment_timing_v3 deklariert statt still (Ledger abend-7), Befunde 77/78 gepinnt (nacht-1) — keine undeklarierte Drehung gefunden. ABER: die aus Befund 1 folgende T6-BLINDSTELLE ist NIRGENDS deklariert — 15 enabled Q1-Puffer-Organe allozieren im Messbetrieb am Allokator-Achsen-Zaehler vorbei (0 Achsen-Referenzen in topics/queuing/), d.h. das T6-Mess-Bild ist unvollstaendig, ohne dass Ledger, Anker oder Code-Kommentar dies ausweisen."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD  # -> 98eea2e780b4e8d8244d4916816b4aeda24057ee, Branch development, status --porcelain leer",
+            "grep -rnE 'std::(vector|deque|list|map|set|...)\\s*<' libs/cache_engine/axes --include='*.hpp' --include='*.cpp' --include='*.in'  # 111 Treffer, Detailliste je Zeile klassifiziert",
+            "for d in axes topics compositions anatomy builder include; do grep -rnE 'std::(vector|deque|list|set|stack|queue|priority_queue)\\s*<[^,<>]+>' libs/cache_engine/$d ...; done  # 1-Argument-Default-Formen ueber alle Wurzeln",
+            "grep -rnE 'std::(map|unordered_map|multimap|string)\\s*<' libs/cache_engine/{axes,topics,compositions}  # einziger Treffer: wormhole_leaf_list_pool_store.hpp:195 MIT map_allocator_type",
+            "sed -n '110,150p' libs/cache_engine/builder/bestandslog/lager_baum_writer.hpp  # kOrganGruppe05 = {queuing_q1, queuing_q2, io_dispatch, persistence_target}; 'KEINE ZWEITE ACHSEN-QUELLE'",
+            "sed -n '1,60p' tests/unit/test_s5_04_execution_alloc_conformance.cpp  # 05-Nachweis :21-25 greppt NUR axes/io_dispatch/ + axes/persistence_target/",
+            "grep -rn 'as_std_allocator\\|StdAllocatorAdapter\\|allocator_type\\|AllocAxis' libs/cache_engine/topics/queuing/ | wc -l  # -> 0",
+            "grep -rlE 'std::(vector|deque|set|map|priority_queue|unordered)' libs/cache_engine/topics/queuing/axis_q1_queuing/*.hpp | wc -l  # -> 13 von 18 Organ-Headern",
+            "awk 'NR>=955 && NR<=1012' libs/cache_engine/anatomy/abi_adapter.hpp  # queuing_q1_organ_.put :1010 unter #if COMDARE_MEASUREMENT_ON; get :1086; clear :1165",
+            "sed -n '/using AllStrategies/,/>;/p' libs/cache_engine/axes/lookup/axis_03a_search_algo_registry.hpp  # eigenhaendig gezaehlt: exakt 22",
+            "grep -rn 'SearchAlgoBase<\\|public.*SearchAlgo' libs/cache_engine/{axes,topics} --include='*.hpp'  # alle Ableitungen; keine Organ-Klasse ausserhalb der 18 lookup-Dateien",
+            "grep -n 'mp_size\\|Migriert' tests/unit/test_s5_01c_fassaden_conformance.cpp  # Pin :173 mp_filter-Ableitung, :252 mp_size<Migriert>==mp_size<AllStrategies>",
+            "grep -nE 'std::(vector|map|set|...)|new |malloc|unique_ptr|shared_ptr' axes/lookup/axis_03a_search_algo_{array256,original_art}.hpp  # 0 Container/Heap; MINIMAL-FORM-Pins :295-319 / :329-354",
+            "head -30 libs/cache_engine/topics/traversal/axis_03a_search_algo/composable/composed_art_trie_search.hpp  # 5-Zeilen-Forwarding auf axes/lookup/composable/",
+            "git -C <ce> diff --stat 65a61fcf..98eea2e7 -- libs/cache_engine/algorithm_profiles/cache_engine_axis_registry.xml libs/cache_engine/algorithm_profiles/permutation_axes.xml tests/unit/thesis_tiere/golden_fullpilot_320_binary_ids.txt include/cache_engine/abi/  # LEER",
+            "git -C <ce> log --oneline 65a61fcf..98eea2e7 -- <dieselben Pfade>  # LEER: kein Commit der Strecke beruehrt die Artefakte",
+            "sed -n '3874,3987p' /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md  # abend-4..nacht-5 vollstaendig gelesen; Familien-Scope + Landungs-Belege",
+            "grep -n -i 'queuing' <Ledger> <beide Pause-Anker> <S5-Dossier>  # keine Ausnahme-Deklaration fuer queuing im S5-Kontext",
+            "git -C <ce> rev-parse main origin/main  # origin/main == 98eea2e7 (main-FF vollzogen); lokales main stale (2b0a9bd8, unerheblich)"
+          ]
+        }
+      },
+      {
+        "key": "R2-substanz",
+        "r": {
+          "widerlegungs_versuche": [
+            {
+              "behauptung": "Alle Achsen-Familien (04/03/01d/01a/02a/01b/02b/01c) laufen ueber das Allokator-Achsen-Interface -- Form B real verdrahtet, nicht nur deklariert.",
+              "angriff": "Stichproben an 12+ Organen quer durch alle Wellen (02a chunked/layout_aware, 01a btree/skip_list-Pool-Stores, 01b AxisBoundBuffer, 02b SurfBitVector/SurfRank/SurfSelect/SurfSuffixBits, 01c skip_list-Core/hash_search/swisstable/original_art/original_surf, 01d hash_lookup, 03 value_handle real_slot, 04 execution-Gate); Ctor-/Copy-/Rehash-/Wachstums-Pfade am Code nachvollzogen; Konstruktion einer stillen Default-Allokator-Kopie versucht (Move-Luecken, select_on_container_copy_construction, verschachtelte Turm-/LOUDS-Ebenen); zeilen-genauer Sweep ueber axes/ nach Default-Container-Zeilen ohne Adapter.",
+              "ergebnis": "HAELT",
+              "beleg": "StdAllocatorAdapter hat KEINEN Default-Ctor (axis_06_allocator_strategy_base.hpp:216) -> stiller Default-Rueckfall ist compile-hart unmoeglich; POCCA/POCMA=false gedeckt; Copy-Ctors rebinden auf das EIGENE allocator_ + Memento-restore (btree_node_pool_store.hpp:90, swisstable:150, hash_lookup:129, real_slot:122, skip_list-Core:173 inkl. Turm-Ebene:180); Moves unterdrueckt (user-declared Copy) oder geloescht (composed_store:134-137, SurfBitVector:95-97 mit allokator-erweiterter Kopie); Rehash-Zwischenpuffer laufen ueber DIESELBE Strategie-Instanz (hash_search:292-297, hash_lookup:321); verschachtelte Ebenen per static_assert gepinnt (chunked_store chunk_t/chunk_vec_t, skip_list Node::next). Einzige Default-Alloc-Zeilen in axes/ sind die DEKLARIERTEN transienten Puffer (chunked_store:289-297 SCOPE-DEKLARATION flatten_/rebuild_, layout_aware_store:551-558 inkl. kb/ks/survivors) mit Mess-Semantik-Begruendung. Sweep-Rest ausserhalb node/: 1 Treffer = Doku-Kommentar (axis_03a_search_algo_concept.hpp:31). std::allocator<-Literal in axes/: 0."
+            },
+            {
+              "behauptung": "Die Achse 03a ist 22/22 lueckenlos geschnitten (Fassaden-Schnitt).",
+              "angriff": "Eigener Compile-Beweis statt Glauben an den Gate-Lauf: Scratchpad-TU gegen den Ist-Stand 98eea2e7 gebaut, die AllStrategies-Groesse und den Migrations-Filter (AllocatorRebindableSearchAlgo gegen die REALE Kompositions-T6-Wahl) selbst gezogen; Biss-Gegenproben gefahren (Pin auf 21 gedreht; Fake-Organ ohne rebind_allocator angehaengt); zusaetzlich die B3-Methodik-Falle (Modul-Scan -E = falsches Gruen) vermieden durch echten g++ -fsyntax-only-Lauf.",
+              "ergebnis": "HAELT",
+              "beleg": "probe_22_pin.cpp kompiliert: mp_size<AllStrategies>==22 UND Migrations-Filter==22 UND KompositionsAllokator!=ExgenAllocator (Kontrast nicht vakuoos) UND Fake-Organ faellt aus dem Filter; Negativ-Probe (Pin==21) bricht compile-hart mit 'static assertion failed'. Haendische Zaehlung der Registry-Liste (axis_03a_search_algo_registry.hpp:54-92) ergibt ebenfalls 22. EINSCHRAENKUNG (im Gate selbst deklariert, test_s5_01c_fassaden_conformance.cpp:69-77): real GETRIEBEN werden 17/22 (10 Kontrast + 3 Bau-Allozierer + 4 EV-4-Staging); array256, vector_u8u8, btree, swisstable, original_art tragen nur den compile-harten Typ-Vertrag -- fuer btree/swisstable/original_art habe ich die reale Verdrahtung ersatzweise am Code verifiziert (original_art ist ehrliche Form A ohne Heap; swisstable/btree Adapter-gebunden inkl. Rehash/Copy)."
+            },
+            {
+              "behauptung": "golden/XML/Wire sind ueber die GESAMTE S5-Strecke byte-neutral.",
+              "angriff": "Strecken-Basis selbst gepinnt (91c1b19f^ = 65a61fcf, A8-S3-Merge vor dem S5-Pilot) und den vollen Diff 65a61fcf..98eea2e7 auf XML-, golden-, CSV- und Wire-Artefakte durchsucht; die einzige serialisierungs-nahe Aenderung inhaltlich geprueft.",
+              "ergebnis": "HAELT",
+              "beleg": "git diff 65a61fcf..98eea2e7: 153 Dateien, davon 0x *.xml, 0x golden*, 0x *.csv; kein anatomy/abi_adapter/Wire-Header im Diff. Einzige Fundstelle axis_10_serialization_primitives.hpp aendert NUR die Puffer-QUELLE (byte_alloc-Adapter, Copy-Rebind) -- kein geschriebenes Format-Byte. CAVEAT ehrlich: Laufzeit-golden-Laeufe habe ich nicht selbst nachgefahren (kein Bau im read-only-Auftrag); die Aussage traegt auf Repo-Artefakt-Ebene plus den name()-Invarianz-/XML-Literal-Pins der Gate-TUs."
+            },
+            {
+              "behauptung": "Der S5-B-5-Scrub ist VOLLSTAENDIG.",
+              "angriff": "Die B-5-Bestands-Definition (Dossier 20260803-a8_f2 :152-155: grep-Wurzel axes/) gegen die Familien-Zuordnung gehalten, auf die sich die S5-Planung selbst beruft (kOrganGruppe01..05, lager_baum_writer.hpp:136-142); den 05-Nachweis-grep am Ist reproduziert und auf die NICHT gegrepten Familien-05-Achsen ausgeweitet.",
+              "ergebnis": "TEILWEISE",
+              "beleg": "VOLLSTAENDIG gilt NUR relativ zur axes/-grep-Wurzel der B-5-Definition (dort bestaetigt: Rest = deklarierte transiente Puffer + Kommentare). ABER: kOrganGruppe05 = {queuing_q1, queuing_q2, io_dispatch, persistence_target}; der 05-Nachweis (test_s5_04_execution_alloc_conformance.cpp:21-25) grept nur axes/io_dispatch + axes/persistence_target und definiert die Familie dort still auf 2 von 4 Achsen um. topics/queuing/axis_q1_queuing traegt 11 Header mit Default-Allokator-ORGAN-STATE (tombstone_buffer.hpp:165 'std::vector<std::optional<element_type>> slots_', lockfree_spsc.hpp:220 'std::vector<element_type> buffer_', copy_on_write.hpp:81/:91 make_shared<vector>), 0x StdAllocatorAdapter im ganzen queuing-Baum; queuing_q1 ist mandatorische Kompositions-Achse T15 (composition_factory.hpp:41) und realer Organ-Member der Anatomie (search_algorithm_anatomy.hpp:192) -- exakt die B-5-Klasse ('Default-Allokator-Container am Achsen-Interface vorbei'), nur ausserhalb der grep-Wurzel, weil queuing unter topics/ statt axes/ liegt. Die Behauptung 'alle Achsen-Familien' ist damit in der Familien-05-Lesart nicht gedeckt; die 8 enumerierten Scheiben selbst sind sauber."
+            },
+            {
+              "behauptung": "Alle Mess-Semantik-Aenderungen sind deklariert.",
+              "angriff": "Jede in den Stichproben gefundene T6-/Statistik-beruehrende Aenderung auf eine explizite Deklaration (Header-Kommentar, Gate-TU oder Ledger) rueckverfolgt; gezielt nach undeklarierten Doppelzaehlungs-/Semantik-Drifts gesucht (observe-Puffer, Walk-Stacks, Rehash-Zwischenpuffer, EV-4-Staging, HERZ-Index-Sichtbarkeit).",
+              "ergebnis": "HAELT",
+              "beleg": "Alle gefundenen Semantik-Punkte tragen Deklarationen am Objekt: chunked/layout_aware SCOPE-DEKLARATIONEN mit Doppelzaehlungs-Begruendung (:289ff/:551ff); node_store_allocator_statistics als getrennter Verdrahtungs-Beleg OHNE T6-Umdeutung (chunked_store:181-189); walk_allocator_statistics BEWUSST getrennt vom Store-Zaehler (Ledger nacht-1); search_allocator_statistics als vierter Name gegen Doppelzaehlung (nacht-3); EV-4-Grenze doppelt deklariert (Gate-TU (6c) + b2e21a92-Header); HERZ-Sichtbarmachung des Chunk-Index als Kontrast-Beleg deklariert (12135da4); vorbestehende Befunde kReal16/XorFilter-FN beidseitig gepinnt statt verschwiegen (336382a4). Keine undeklarierte Semantik-Aenderung in den Stichproben gefunden. Rest-Risiko: Pruefung ist stichproben-, nicht flaechendeckend."
+            },
+            {
+              "behauptung": "Die Form-B-Grenze des Gate-Headers ist durch reale Wachen gedeckt (keine Familie besteht nur per using-Zeile).",
+              "angriff": "Die deklarierte Form-B-Grenze (AxisAllocatorBoundOrgan prueft NUR die Deklaration) gegen die je-Familie-Zusatzbelege gehalten; versucht, ein Organ zu finden, das Form B nur ausweist, waehrend eine reale Allokation am Adapter vorbeilaeuft.",
+              "ergebnis": "HAELT",
+              "beleg": "Die Grenze ist im Gate-Header SELBST deklariert (s5_family_alloc_conformance.hpp:31-37 inkl. Auflage 'Folge-Familie MUSS real belegen') und je Familie unterlegt: 01c Kontrast-/Bau-/Staging-Laufzeitproben mit beidseitig beissendem kWaechstUnterLast; 02a TYP-BEWEISE (static_assert Index- UND Slot-Ebene an derselben Achse A, chunked_store Ende / layout_aware:657) + HERZ-Kontrast; 02b geloeschte gewoehnliche Kopien + allokator-erweiterte Kopien; Selbstbeweis der Wache (Negativ-Probe DefaultAllocHeapProbe:105). Die einzige gefundene nur-deklarierte Form-B-Stelle ist original_art -- dort aber KORREKT: Form A heap-frei, der allocator_type ist als reiner Achsen-Ausweis fuer die Naht-Totalitaet kommentiert (original_art.hpp:127-131). Posten 82 (original_surf-Gate) ist am HEAD real geheilt (if constexpr (enabled) um den insert-Datenpfad, Statistik bewusst ungegated)."
+            }
+          ],
+          "kommandos": [
+            "git -C .../comdare-cache-engine rev-parse HEAD && git branch --show-current && git status --porcelain  # -> 98eea2e780b4e8d8244d4916816b4aeda24057ee, development, clean",
+            "git -C .../comdare-cache-engine log --oneline -30  # S5-Kette 91c1b19f..98eea2e7 inkl. 01c-3-Merge",
+            "grep -n -E '0[45]\\.08\\.2026' docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md + sed abend-4..nacht-5  # Referenz-Wissen",
+            "grep -rn --include='*.hpp' -E 'std::(vector|deque|list|map|set|unordered_map|string)\\s*<' libs/cache_engine/axes | grep -v -iE 'alloc' | grep -vE '//'  # zeilen-genauer Default-Container-Sweep",
+            "grep -rn 'std::allocator<' libs/cache_engine/axes --include='*.hpp' | grep -v '//'  # 0 Treffer",
+            "sed/Read auf: axis_06_allocator_strategy_base.hpp, s5_family_alloc_conformance.hpp, test_s5_01c_fassaden_conformance.cpp, btree/skip_list/hash_search/swisstable/original_art/original_surf, chunked/layout_aware/composed_store, surf_louds_bitvector/surf_suffix_bits/surf_axis_allocator, axis_bound_scratch, hash_lookup, real_slot, search_algo_rebind.hpp  # Ctor/Copy/Move/Rehash-Pfade",
+            "git rev-parse 91c1b19f^  # Strecken-Basis 65a61fcf selbst gepinnt",
+            "git diff --stat 65a61fcf..HEAD -- '*.xml' '*golden*'  # leer; git diff --name-only | grep -iE 'wire|serial|xml|csv|golden'  # nur axis_10_serialization_primitives.hpp (Puffer-Quelle, kein Format-Byte)",
+            "g++ -std=c++23 -fsyntax-only -DCOMDARE_CE_ENABLE_STATISTICS -I libs/cache_engine{,/src,/include} -I libs/common -I build/generated/** -I cmake/third_party/boost_mp11/include scratchpad/probe_22_pin.cpp  # EXIT=0: 22/22 + Biss-Proben",
+            "sed 's/== 22/== 21/' probe_22_pin.cpp -> probe_neg.cpp; g++ ... probe_neg.cpp  # static assertion failed = Pin beisst real",
+            "sed -n '120,150p' libs/cache_engine/builder/bestandslog/lager_baum_writer.hpp  # kOrganGruppe05 = {queuing_q1, queuing_q2, io_dispatch, persistence_target}",
+            "sed -n '1,66p' tests/unit/test_s5_04_execution_alloc_conformance.cpp  # 05-Nachweis grept NUR axes/io_dispatch + axes/persistence_target",
+            "grep -rlE 'std::(vector|map|unordered_map)' libs/cache_engine/topics/ --include='*.hpp'  # 13 Dateien: 11x topics/queuing/axis_q1_queuing + 2x topics/sequence/axis_growth (growth: nur alloc-gebundene/Kommentar-Zeilen)",
+            "grep -rn 'StdAllocatorAdapter|as_std_allocator' libs/cache_engine/topics/queuing  # 0 Treffer im ganzen queuing-Baum",
+            "sed -n '160,170p' axis_q1_queuing_tombstone_buffer.hpp; sed -n '215,225p' axis_q1_queuing_lockfree_spsc.hpp  # Default-Allokator-ORGAN-Member belegt",
+            "grep composition_factory.hpp:41 'T15 = queuing_q1' + search_algorithm_anatomy.hpp:192 queuing_q1_organ()  # q1 = mandatorische Kompositions-Achse, real instanziiert",
+            "grep -n -B3 -A10 'B-5' docs/architecture/20260803-a8_f2_benchmarking_schnitt_soll_design.md  # B-5-Definition: grep-Wurzel axes/, 70 Dateien"
+          ]
+        }
+      },
+      {
+        "key": "R3-neutralitaet",
+        "r": {
+          "widerlegungs_versuche": [
+            {
+              "behauptung": "golden/XML/Wire sind ueber die GESAMTE Strecke byte-neutral (Strecken-Anfang selbst ermittelt: 65a61fcf = Merge-Basis der ersten S5-Landung a801a7e3, direkt nach 19f27223+a8c2da91; Ende = 98eea2e7 = HEAD = development = origin/main = origin/development, selbst gepinnt)",
+              "angriff": "Voll-Strecken-Diff 65a61fcf..98eea2e7 ueber ALLE Angriffs-Flaechen: (a) jede *.xml-Datei; (b) golden_fullpilot_320_binary_ids{,_abi4,_abi5,_abi6}.txt + experiment_golden*.xml + tools/gen_golden_fullpilot + tools/axis_registry_gen; (c) alle Wire-Pin-Header (observable_tier.hpp mit sizeof==1344-static_assert :160, adapter/sequence/set/view_tier_v2.hpp, measurement_record.hpp, anatomy_module_abi_v1_decl.hpp); (d) abi_adapter.hpp-Diff VOLLSTAENDIG gelesen; (e) INDIREKT: Registry-Listen-Ordnung, enabled-/name()-Flips im Strecken-Diff, 01c-3-Delta 40e8bf27..98eea2e7 isoliert gegen XML/golden/wire gegrept",
+              "ergebnis": "HAELT",
+              "beleg": "XML: 0 Dateien bewegt (git diff --name-only -- '*.xml' = leer, wc -l = 0) — permutation_axes.xml und cache_engine_axis_registry.xml byte-unberuehrt. golden-Wachen+Generatoren: 0 Diff (leerer --stat; binary_ids-Diff 0 Zeilen). Wire-Pins: 0 Diff auf allen 7 Headern; sizeof(ComdareTierObserverSnapshot)==1344-Pin unveraendert (observable_tier.hpp:160). abi_adapter.hpp einzige anatomy-Aenderung: +102/-0 = ausschliesslich Kommentare (A8-S4-Rollen-Deklarationen) + Concept A8S4GattungsKernAntrieb + inline constexpr bool + 2 static_asserts — kein Member, kein POD-Feld, kein vtable-Slot. Registry-Header: 3 Zeilen Kommentar-Diff, Ordnung aller 22 Eintraege unveraendert, per-K am ENDE + Default-OFF (golden-320-First-4 k_ary/interpolation/eytzinger/linear_scan unberuehrt, XML fuehrt exakt diese 4 mit golden_wired=true). Kein enabled-/name()-Flip im Strecken-Diff (grep leer bis auf original_surf-if-constexpr). 01c-3-Delta: 15 Dateien, grep auf xml/golden/wire-Pfade RC=1 (kein Treffer). RESTRISIKO ehrlich: golden-LAUF fuer 98eea2e7 nicht selbst gefahren; Ledger dokumentiert golden 3/3 + Pipeline HART GRUEN nur bis 40e8bf27 (14596) — siehe Widerlegung 5."
+            },
+            {
+              "behauptung": "Alle Achsen-Familien (04/03/01d/01a/02a/01b/02b/01c) laufen ueber das Allokator-Achsen-Interface",
+              "angriff": "Eigener Scrub-Grep am Pin 98eea2e7 ueber ganz libs/cache_engine/axes nach std::vector/map/unordered_map/string/deque-Instanzen OHNE Allokator-Parameter (Kommentare und Alloc-parametrisierte Treffer ausgefiltert), plus Gegenlesen der Trefferkontexte am Objekt",
+              "ergebnis": "TEILWEISE",
+              "beleg": "axes/lookup (Familien 01a-01d, komplette 03a): 0 echte Default-Alloc-Treffer — die Schluss-Bilanz '39 Zeilen -> 0' haelt meinem Grep stand. ABER axes/node (Familie 02a): 15 Default-Alloc-std::vector-Treffer live (axis_04_node_type_chunked_store.hpp:195,278,284,302-309; layout_aware_store.hpp:326,396-412,559-565; composed_store.hpp:113). Kontext gelesen: transiente, messungs-gebundene Lokal-/Staging-Puffer (organ_observe_node_type-kb, flatten_/rebuild_-Scratch), KEINE persistenten Store-Zustaende — persistenter Zustand laeuft nachweislich ueber die Achse (node_store_allocator_statistics an alloc_.statistics() verdrahtet, HERZ-Beleg alloc_cnt 1035>1024 deklariert). Diese 15 Stellen sind der DEKLARIERTE Posten 76 (Ledger abend-13: 'transiente Streu-/Umbau-Puffer der node-Stores, 14 Stellen, Klasse D' — Entscheid im T6-Einsammel-Fenster). Zusaetzlich deklariert offen: die 3 abi_adapter-Treiberstellen ('SearchAlgo algo;') = Phase B, im nacht-5-Eintrag explizit als Reststrecke VOR dem Anker ausgewiesen; fill_segment_timing_v3-Default-Alloc-vector (G8-Flaeche, abend-7 deklariert). FAZIT: Im deklarierten Scope (persistente Familien-Zustaende, B-5-Klasse der Planung abend-4) haelt die Behauptung; als ABSOLUTE Aussage ist sie falsch — es existieren 15 Default-Alloc-Container in axes/ plus die Phase-B-Treiber, alle deklariert, keiner versteckt."
+            },
+            {
+              "behauptung": "Die Achse 03a ist 22/22 lueckenlos [Fassaden-Schnitt]",
+              "angriff": "Zahl 22 aus EIGENEM Kommando: AllStrategies-Liste in axes/lookup/axis_03a_search_algo_registry.hpp:53-96 vollstaendig angezeigt und selbst gezaehlt; Pin-Mechanik auf Vakuositaet geprueft (haendische Liste? Selbst-erfuellend?); XML-Gegenzaehlung enabled/abwesend; original_surf-Luecke (Review-Befund nacht-5, Posten 82) am Objekt nachgeprueft; Branch-Historie der Landung geprueft",
+              "ergebnis": "HAELT",
+              "beleg": "Eigene Zaehlung: exakt 22 Typen S01-S22 (3 Pilot + 5 original_* + Array65535 + 8 Methoden + 4 per-K-Leaves + SwissTable). Pin ist ABLEITUNG, nicht Liste: tests/unit/test_s5_01c_fassaden_conformance.cpp:252 static_assert(mp_size<MigrierteOrgane>==mp_size<AllStrategies>) mit MigrierteOrgane=mp_filter<AllocatorRebindableSearchAlgo gegen den Kompositions-Allokator> (:169-175), Anti-Vakuum-Wache :160 erzwingt Kompositions-Alloc != Achsen-Default; zweiter Pin :260 fuer enabled. XML-Gegenprobe: cache_engine_axis_registry.xml fuehrt fuer search_algo baustein_count=4 (genau die golden-First-4, alle enabled=true), die 18 OFF-Organe sind ABWESEND (eigene Zaehlung 4 Zeilen; 22-4=18 konsistent zum Abwesenheits-Beweis). original_surf-Heilung am Objekt verifiziert: axis_03a_search_algo_original_surf.hpp:181-189 insert-Rumpf unter if constexpr (enabled), Statistik-Block bewusst ungegated mit Begruendungs-Kommentar (Posten 82 geheilt) — als 5. Commit 27ef28ea auf dem Branch (fbb351d9 + Heilung), gemerged als 98eea2e7^2. RESTRISIKO: der Pin ist compile-hart — ich habe die TU nicht selbst kompiliert (kein eigener Build-Lauf; Quell-Verifikation vollstaendig)."
+            },
+            {
+              "behauptung": "Alle Mess-Semantik-Aenderungen sind deklariert",
+              "angriff": "Strecken-Diff nach semantik-tragenden Aenderungen durchsucht (Statistik-Pfade, Zaehler, Observer, CSV-Flaechen) und jede gefundene gegen Ledger-Deklarationen abgeglichen; CSV-Schema-Flaeche measurement_record.hpp separat gediffed",
+              "ergebnis": "HAELT",
+              "beleg": "Gefundene semantik-tragende Aenderungen der Strecke, ALLE deklariert: (1) store_allocator_statistics = echte Strategie-Statistik statt Capacity-Schaetzer (Ledger abend-13 'Alt-CSV=Archiv' + Objekt-Kommentar chunked_store:181-189 'VERDRAHTUNGS-BELEG... keine Doppelzaehlung im T6-Pfad'); (2) h81-Fix restore_statistics in 25/26 Strategien (nacht-3, Belege literal via objdump deklariert); (3) P-CACHELINE CLU-Zaehlung ALT 4/4/4 blind -> NEU 8/4/2/1 diskriminierend (abend-12, am Default 64 byte-genau neutral bewiesen); (4) eytzinger EIN Versorger/Duplikat-Logik entfallen (nacht-4); (5) vorbestehende Befunde XorFilter 30/256-FN + kReal16-Kollaps beidseitig gepinnt statt still (nacht-1, 'VOR Messbeginn entscheiden'). Neue Statistik-NAEHTE (walk_/traversal_/mapping_/search_allocator_statistics) bewusst namens-getrennt vom T6-Store-Zaehler, KEINE CSV-Spalte — measurement_record.hpp 0 Diff ueber die Strecke = CSV-Schema unbewegt. Kein undeklarierter Semantik-Treffer gefunden (Suchraum: voller Strecken-Diff, 153 Dateien)."
+            },
+            {
+              "behauptung": "Der S5-Abschnitts-ABSCHLUSS ist vollzogen und verankert (implizite Prozess-Behauptung des Abschluss-Status)",
+              "angriff": "Ledger-Fortschreibung nach nacht-5 geprueft (wc -l + Tail), super-Gitlink des ce-Submoduls gelesen, Remote-Staende beider Remotes gepinnt, Landungs-Zeitpunkt aus Commit-Daten",
+              "ergebnis": "WIDERLEGT",
+              "beleg": "Die Landung IST am ce-Objekt vollzogen (98eea2e7 = Merge s5-01c-3, 05.08. 06:21 UTC; development==main==origin==github, alle selbst per rev-parse gepinnt) — ABER die Verankerungs-Kette ist NICHT vollstaendig: (a) der super-Ledger endet bei Zeile 3987 = nacht-5 mit '01c-3 FERTIG/LANDEBEREIT/UNGELANDET @ fbb351d9' — KEIN Nachtrag dokumentiert die Landung, den Merge-Doppellauf oder eine gruene Pipeline fuer 98eea2e7 (letzter dokumentierter Gruen-Nachweis: 40e8bf27/Pipeline 14596); (b) der super-Gitlink zeigt noch auf 40e8bf27 (git -C super ls-tree HEAD Code/external/comdare-cache-engine = 160000 commit 40e8bf27) — das Submodul ist im super NICHT nachgezogen; (c) der Erst-Anker 20260805-PAUSE-abbruchsicher-01c-komplett-vor-phase-b-anker.md beschreibt den VOR-Landungs-Stand. Der MEMORY-Lage-Anker ('ce=40e8bf27 Gate 400; 01c-3 LANDEBEREIT @fbb351d9') ist gegenueber dem Objekt-Ist STALE. Konsequenz: Die technische Abschluss-Behauptung haelt am Objekt, der dokumentierte Abschluss-STATUS (Ledger-Nachtrag + super-Bump + Pipeline-Nachweis 98eea2e7) fehlt — vor Phase B/ANKER nachzuziehen."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD development origin/main origin/development  # alle = 98eea2e780b4e8d8244d4916816b4aeda24057ee",
+            "git merge-base a801a7e3^1 a801a7e3^2  # Strecken-Anfang selbst ermittelt = 65a61fcf (A8-S3-Landung, nach 19f27223)",
+            "git log --oneline --first-parent -30 98eea2e7  # 98eea2e7 = Merge s5-01c-3-off-familien; alle 8 S5-Familien-Merges enthalten",
+            "git diff --name-only 65a61fcf..98eea2e7 -- '*.xml' | wc -l  # = 0",
+            "git diff --stat 65a61fcf..98eea2e7 -- tests/unit/thesis_tiere/ tools/gen_golden_fullpilot/ tools/axis_registry_gen/  # leer; binary_ids-Diff 0 Zeilen",
+            "git diff --stat 65a61fcf..98eea2e7 -- libs/cache_engine/anatomy/observable_tier.hpp .../adapter_tier_v2.hpp .../sequence_tier_v2.hpp .../set_tier_v2.hpp .../view_tier_v2.hpp .../measurement_record.hpp .../anatomy_module_abi_v1_decl.hpp  # leer (0 Diff)",
+            "git diff 65a61fcf..98eea2e7 -- libs/cache_engine/anatomy/abi_adapter.hpp  # +102/-0 vollstaendig gelesen: nur Kommentare + CT-Wachen (Concept + constexpr bool + 2 static_asserts)",
+            "git diff 65a61fcf..98eea2e7 -- libs/cache_engine/axes/lookup/axis_03a_search_algo_registry.hpp  # 3 Zeilen (Kommentar), Listen-Ordnung unveraendert",
+            "git diff --name-only 40e8bf27..98eea2e7 | grep -E '\\.xml$|golden|observable_tier|_tier_v2|measurement_record|abi_v1|permutation_axes'  # RC=1, kein Treffer im 01c-3-Delta",
+            "git show 98eea2e7:libs/cache_engine/axes/lookup/axis_03a_search_algo_registry.hpp | sed -n '53,96p'  # AllStrategies selbst gezaehlt = 22 (S01-S22)",
+            "git grep -n 'mp_size' 98eea2e7 -- tests/unit/test_s5_01c_fassaden_conformance.cpp  # Pin :252 mp_size<Migriert>==mp_size<AllStrategies>, :260 enabled-Pin, Ableitung :169-175, Anti-Vakuum :160",
+            "git show 98eea2e7:libs/cache_engine/axes/lookup/axis_03a_search_algo_original_surf.hpp | sed -n '170,210p'  # Posten-82-Heilung: if constexpr (enabled) am insert-Rumpf verifiziert",
+            "git log --oneline 40e8bf27..98eea2e7^2  # Branch = fbb351d9 + Heilungs-Commit 27ef28ea (original_surf)",
+            "git grep -nE 'std::(vector|unordered_map|unordered_set|map|set|deque|list|string)\\s*<' 98eea2e7 -- libs/cache_engine/axes | <Filter Kommentare+Alloc-parametrisiert>  # lookup=0; node=15 transiente Treffer (deklarierter Posten 76)",
+            "git show 98eea2e7:libs/cache_engine/algorithm_profiles/cache_engine_axis_registry.xml | grep -A5 'axis id=\"search_algo\"'  # baustein_count=4, genau die golden-First-4 enabled/golden_wired; 18 OFF-Organe abwesend",
+            "grep -nE '0[45]\\.08\\.2026' /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md && wc -l <Ledger>  # endet Zeile 3987 = nacht-5 'UNGELANDET'; kein Landungs-Nachtrag",
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine ls-tree HEAD Code/external/comdare-cache-engine  # super-Gitlink = 40e8bf27 (STALE gegenueber 98eea2e7)",
+            "git log -1 --format='%ci %an' 98eea2e7  # 2026-08-05 06:21:36 +0000 (Landung nach der nacht-5-Pause)"
+          ]
+        }
+      },
+      {
+        "key": "R4-regression",
+        "r": {
+          "widerlegungs_versuche": [
+            {
+              "behauptung": "Alle Achsen-Familien (04/03/01d/01a/02a/01b/02b/01c) laufen ueber das Allokator-Achsen-Interface",
+              "angriff": "Eigener Frisch-grep am HEAD 98eea2e7 ueber ganz libs/cache_engine/axes/: (1) std::allocator-Literal ohne Adapter-Naht, (2) Ein-Argument-std-Container (vector/deque/map/unordered_map/unordered_set/list), (3) erweiterter Sweep string/set/priority_queue/stack/queue.",
+              "ergebnis": "TEILWEISE",
+              "beleg": "std::allocator-Literal = 0 und erweiterter Sweep = 0 — ABER 14 Default-Allokator-Container-Zeilen bestehen fort, alle in den drei axis_04-Node-Stores (layout_aware 7, chunked 6, composed 1), z.B. axis_04_node_type_chunked_store.hpp:195 'std::vector<std::uint8_t> kb;' im MESS-Pfad organ_observe_node_type. Das sind exakt die im Ledger abend-13 als Posten 76 registrierten 'transienten Streu-/Umbau-Puffer (14 Stellen, Klasse D)' — bewusst aufs T6-Einsammel-/Doppelzaehlungs-Fenster verschoben. Die Abschluss-Behauptung nennt diese Ausnahme-Klasse nicht: organ-EIGENE persistente Container laufen ueber die Achse (belegt), 14 transiente Puffer laufen am Interface vorbei (registriert, aber in der Behauptung unerwaehnt)."
+            },
+            {
+              "behauptung": "Die Achse 03a ist 22/22 lueckenlos [Fassaden-Schnitt]",
+              "angriff": "Zahl 22 nicht glauben, sondern selbst zaehlen (AllStrategies-Liste axis_03a_search_algo_registry.hpp:54ff) + Pin-Mechanik lesen (Ableitung, kein Literal) + Gate-TU am Merge-Objekt SELBST bauen und fahren; zusaetzlich die 5-vs-4-original_*-Diskrepanz verfolgt (5 Dateien, Behauptung '4 Paper-Wrapper').",
+              "ergebnis": "HAELT",
+              "beleg": "AllStrategies live = exakt 22 Eintraege (selbst gezaehlt S01-S22 inkl. K2..K16+SwissTable); Pin test_s5_01c_fassaden_conformance.cpp:252 static_assert(mp_size<MigrierteOrgane>==mp_size<AllStrategies>) — eigener Bau (BUILD_EXIT=0) + Lauf am Merge-Objekt: '01c-FASSADEN-GATE: BESTANDEN' inkl. XML-Abwesenheits-Proben aller OFF-Organe. Diskrepanz aufgeloest: original_art ist eines der '2 containerfreien' Minimal-Form-Organe (fbb351d9: art+array256), die '4 Paper-Wrapper' (hot/start/wormhole/surf) sind die mit Staging-Vektoren — konsistent."
+            },
+            {
+              "behauptung": "golden/XML/Wire sind ueber die GESAMTE Strecke byte-neutral",
+              "angriff": "Git-Historie der Byte-Traeger ueber die volle Strecke 65a61fcf..98eea2e7 selbst geprueft (Registry-XML, golden-320-id-Dateien, experiment_golden.xml, CRC-Anker-Datei source_catalog.hpp, builder/, measurement/) + die golden/CRC-TUs am Merge-Objekt selbst gebaut und gefahren.",
+              "ergebnis": "HAELT",
+              "beleg": "git log 65a61fcf..98eea2e7 auf '*cache_engine_axis_registry.xml' = 0 Commits; tests/unit/thesis_tiere/ = 0 Commits; profile_facade/ diff leer; builder/+measurement/ diff leer. LIVE-Beweis eigener Lauf: ctest -R 'limits_entkopplung|e24_c10_g6|lazy_adhoc' = 100% passed 3/3, darin CRC64 der 131072 regenerierten ids == kNewGolden131072Crc64 (6264989912352538894) und 320-golden positionsgleich/Mismatch=0. (Mein anfaenglicher '1 FEHLER' bei Direktaufruf war ein CWD-Artefakt — via ctest mit korrektem Arbeitsverzeichnis gruen.) Einschraenkung ehrlich: Lauf in der Conformance-Probe-Konfiguration (396 Tests registriert), nicht der vollen dev-Konfiguration; CI-Gruen des Merges nicht selbst abgefragt — origin/main==98eea2e7 belegt den vollzogenen main-FF."
+            },
+            {
+              "behauptung": "Alle Mess-Semantik-Aenderungen sind deklariert (nur store_allocator_statistics [01a] + seg-Werte/Allokator-Pfad [Archiv-Doktrin])",
+              "angriff": "Systematische Suche nach WEITEREN undeklarierten Aenderungen: Diff der Mess-Flaechen (measurement/, builder/, Statistics-Structs, abi_adapter, SearchAlgoStatistics) ueber die Gesamtstrecke; Copy-Ctor-Vergleich Alt (implizit) vs. Neu (explizit) der migrierten Organe; MeasurableObserver-Definition + PUSH-Flag-Verdrahtung; Deklarations-Gegenprobe in allen S5-Wellen-Backups.",
+              "ergebnis": "TEILWEISE",
+              "beleg": "Mess-Flaechen unberuehrt (alle Diffs leer; SearchAlgoStatistics-Concept 0 Commits); walk_/search_allocator_statistics-Naehte, h81, OFF-surf-Stub im Ledger/Commit deklariert. GEFUNDEN, NIRGENDS DEKLARIERT: die neuen expliziten Copy-Ctors/Assignments der migrierten Organe konstruieren observer_ frisch bzw. lassen ihn stehen — die Alt-Organe (verifiziert an hot/wormhole/surf @ b2e21a92^: nur '= default', impliziter Copy) kopierten den Observer MIT. Backup-Gegenprobe: einzige observer-Erwaehnung aller S5-Backups betrifft die h81-Mechanik, nicht die Copy-Semantik. ABER messwirksam inert: COMDARE_CE_ENABLE_OBSERVER_PUSH ist CMake-Default OFF (CMakeLists.txt:168, nur Observer-Mechanik-Test-Targets schalten ihn an); im Mess-Build ist MeasurableObserver ein zustandsloses NullObject. Fazit: keine undeklarierte Aenderung mit Mess-WIRKUNG gefunden; die Absolutheit 'alle deklariert' traegt eine undeklarierte Push-Build-Nuance (Callback-Verlust bei Kopie/Zuweisung)."
+            },
+            {
+              "behauptung": "surf-Heilung 27ef28ea ist muster-konform gegen ALLE drei Geschwister (hot/start/wormhole)",
+              "angriff": "Volllektuere aller vier Wrapper-Dateien am HEAD (nicht nur wormhole): insert-Rumpf, Gate-Form, Statistik-Block, Copy/Assign, Fassade/Rebound, static_assert-Bloecke zeilenweise verglichen; zusaetzlich das fuenfte Geschwister original_art und Nicht-Paper-OFF-Organe (SwissTable) als Kontrast.",
+              "ergebnis": "HAELT",
+              "beleg": "hot (:204-223) und start (:199-218) tragen EXAKT das geheilte Muster inkl. else{(void)k;(void)v;}; wormhole (:177-193) identisch bis auf den fehlenden (verhaltensneutralen) else-Zweig; Statistik-/Observer-Block bei allen dreien ungegated NACH dem Gate. surf matcht textuell hot/start und semantisch alle drei. Kosmetische Fussnote: der Commit nennt es 'wormhole-Muster', textuell exakt ist es das hot/start-Muster. Kontrast bestaetigt Familien-Logik: Nicht-Paper-OFF-Organe (SwissTable, insert :356 ungegated) stubben NICHT — das Gate ist die Paper-Wrapper-Familiennorm (art traegt es an allen Methoden :138/:167/:192), surf war der einzige Ausreisser."
+            },
+            {
+              "behauptung": "surf-Heilung ist auf dem ON-Pfad verhaltens-neutral",
+              "angriff": "Diff 27ef28ea token-genau gelesen: was aendert sich bei enabled==true?",
+              "ergebnis": "HAELT",
+              "beleg": "Der Diff (16+/7-, eine Datei) verschiebt die identischen Statements (lower_bound/idx/update-or-insert) unveraendert unter if constexpr (enabled) und ergaenzt nur den else-void-Zweig; Statistik-Block unberuehrt. Bei enabled==true ist if constexpr tokengleich zum Alt-Rumpf — Neutralitaet per Konstruktion. Grenze deklariert: eine ON-Konfiguration (V32-ENABLE-ON-Kanon) habe ich nicht separat gebaut; original_surf ist in Default- und Probe-Konfiguration OFF."
+            },
+            {
+              "behauptung": "Der ungegatete Observer-/Statistik-Block bei OFF ist GEWOLLTES Bestandsverhalten (Test-Erwartung == Design-Absicht)",
+              "angriff": "Die zementierende Test-Erwartung selbst gesucht, gelesen und am Merge-Objekt SELBST gefahren; Design-Absicht gegen #42-Stub-Doktrin und Geschwister-Bestand geprueft; Gegenprobe: bricht irgendein Test am neuen OFF-Daten-Stub (occupied_count bleibt 0)?",
+              "ergebnis": "HAELT",
+              "beleg": "test_v41_topic_traversal.cpp:171 ObserverNotifiedOnInsert laeuft BEWUSST ungeskippt ueber alle Strategien (im Kontrast zu InsertLookupRoundtrip/EraseRemovesEntry, die Stubs explizit skippen mit #42-Begruendung 'No-op-Stubs per Design' — Stub-Design gilt den DATEN, nicht den Zaehlern); eigener Lauf am Merge-Objekt: 22/22 ObserverNotifiedOnInsert PASSED inkl. disabled surf; volle TU 363 Tests, 309 passed / 0 failed / Rest Stub-Skips. Alle drei Geschwister zaehlen bei OFF seit jeher ungegated (Volllektuere) — die Erst-Fassung mit voll-gegatetem Rumpf MUSSTE genau daran brechen (events==0 vs EXPECT_GE 1), konsistent zur Commit-Aussage '2x reproduzierbar'. Der neue OFF-Daten-Stub (peak_occupancy/occupied_count bleiben 0) ist im Commit deklariert und bricht keinen Test."
+            },
+            {
+              "behauptung": "Die neue h81-static_assert-Wache kann keine LEGITIME Ableitung faelschlich brechen",
+              "angriff": "Wachen-Mechanik gelesen (axis_06_allocator_strategy_base.hpp:148-180: is_same auf Member-Pointer-Typ mit BASIS-Klassenanteil) und systematisch legitime Ableitungsformen durchgespielt: eigener Member, abweichende Signatur/noexcept, Vererbung von anderer Strategie, Mixin-Herkunft, static Member, Overload-Saetze; Flaechen-TU am Objekt selbst gefahren; 25/26-Behauptung nachgezaehlt.",
+              "ergebnis": "TEILWEISE",
+              "beleg": "Fuer jeden SELBST deklarierten Member ist der Klassenanteil des Member-Pointers Derived (nie die Basis) — die is_same-Wache kann dort nicht anschlagen; Vererbung von Zwischen-Strategie (z.B. struct X : ExgenAllocator) liefert den Zwischenklassen-Typ und passiert korrekt. ABER konstruierbarer False-Break existiert: deklariert eine legitime Strategie einen OVERLOAD-Satz (z.B. eigenes reset() plus reset(arg) — vom Concept nicht verboten), wird &Derived::reset ohne Zieltyp ambig und decltype an der Wache hart ill-formed, obwohl KEINE Selbstrekursion vorlaege; der Fehler waere zudem nicht die erklaerende static_assert-Meldung. Kein In-Tree-Fall: test_h81 ueber die Registry (26 Strategien) eigener Lauf 'H81: BESTANDEN'; restore_statistics-Zaehlung 27 Dateien in axes/alloc = 25 nachgezogene + Exgen + Basis, konsistent zur 25/26-Behauptung."
+            },
+            {
+              "behauptung": "Der Landungs-Zustand selbst: 01c-3 inkl. Heilung ist sauber auf development/main gelandet (Gate-Zustand des Merges)",
+              "angriff": "Merge-Flaeche 40e8bf27..98eea2e7 auf Fremd-Dateien und name()-Drift gegriffen; Branch-Positionen geprueft; die drei kritischsten TUs (Fassaden-Gate, h81, Traversal inkl. Observer) am Merge-Objekt selbst gebaut+gefahren, da der Ledger bei nacht-5 endet (01c-3 dort noch UNGELANDET) und kein Landungs-Nachtrag existiert.",
+              "ergebnis": "HAELT",
+              "beleg": "Merge-Flaeche = 15 Dateien, ausnahmslos axes/lookup + tests/unit (2791+/185-), 0 name()-Zeilen im Diff (binary_id-Schluessel unberuehrt); origin/main == 98eea2e7 (main-FF vollzogen), lokaler main-Ref des Checkouts stale (2b0a9bd8, nur Ref-Kosmetik); eigene Laeufe am Merge-Objekt: Fassaden-Gate BESTANDEN, H81 BESTANDEN, Traversal-TU 0 failed, golden-ctests 3/3. Nicht selbst verifiziert: CI-Pipeline-Status des Merges und die volle 400er-Kadenz der dev-Konfiguration (Probe-Konfiguration registriert 396)."
+            }
+          ],
+          "kommandos": [
+            "git -C /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine rev-parse HEAD  # 98eea2e780b4e8d8244d4916816b4aeda24057ee, branch development",
+            "git -C .../comdare-cache-engine worktree list  # wt-e24 @ 27ef28ea (s5-01c-3) u.a. — nicht betreten",
+            "git -C .../comdare-cache-engine show 27ef28ea  # surf-Heilung: 1 Datei, 16+/7-, Daten-Pfad gegated, Stats-Block ungegated",
+            "git -C .../comdare-cache-engine show b2e21a92 --stat && git show fbb351d9 --stat  # 4 Paper-Wrapper vs. 2 containerfreie (art+array256) aufgeloest",
+            "git -C .../comdare-cache-engine show b2e21a92^:libs/.../axis_03a_search_algo_original_hot.hpp | grep -n 'OriginalHotSearchAlgo(\\|operator='  # Alt-Stand: nur '= default', KEIN expliziter Copy-Ctor",
+            "Read (Volllektuere): axis_03a_search_algo_original_{surf,wormhole,hot,start}.hpp am HEAD (366/359/398/390 Zeilen)",
+            "git -C .../comdare-cache-engine log --oneline 65a61fcf..98eea2e7 -- '*cache_engine_axis_registry.xml'  # LEER = XML ueber Gesamtstrecke unberuehrt",
+            "git -C .../comdare-cache-engine log --oneline 65a61fcf..98eea2e7 -- tests/unit/thesis_tiere/  # LEER = golden-Artefakte unberuehrt",
+            "git -C .../comdare-cache-engine diff 65a61fcf..98eea2e7 --stat -- libs/cache_engine/builder/ libs/cache_engine/src/measurement/ libs/cache_engine/profile_facade/  # alle LEER",
+            "git -C .../comdare-cache-engine diff 40e8bf27..98eea2e7 --stat + --name-only | grep -v 'axes/lookup\\|tests/unit'  # 15 Dateien, 0 Fremdflaechen, 0 name()-Drift",
+            "grep -rn 'std::allocator<' libs/cache_engine/axes/ | grep -v 'StdAllocatorAdapter\\|as_std_allocator' | wc -l  # 0",
+            "grep -rEn 'std::(vector|deque|map|unordered_map|unordered_set|list)<[A-Za-z_:0-9 ]+>' libs/cache_engine/axes/ --include='*.hpp' | grep -vE '//|alloc|Alloc'  # 14 Treffer, alle in 3 axis_04-Node-Stores = Ledger-Posten 76 Klasse D",
+            "sed -n 40,110p libs/cache_engine/axes/lookup/axis_03a_search_algo_registry.hpp  # AllStrategies selbst gezaehlt = 22",
+            "cmake --build /tmp/.../scratchpad/build-conf-probe --target test_v41_topic_traversal test_s5_01c_fassaden_conformance test_h81_allocator_statistics_forwarder_recursion -j8  # BUILD_EXIT=0 am Merge-Objekt (Quelle = Haupt-Checkout @ 98eea2e7)",
+            "./tests/unit/test_s5_01c_fassaden_conformance  # '01c-FASSADEN-GATE: BESTANDEN' (inkl. 22/22-Pin Zeile 252 + XML-Abwesenheits-Proben)",
+            "./tests/unit/test_h81_allocator_statistics_forwarder_recursion  # 'H81: BESTANDEN'",
+            "./tests/unit/test_v41_topic_traversal --gtest_filter='*ObserverNotifiedOnInsert*'  # 22/22 PASSED inkl. disabled-surf-Stub",
+            "./tests/unit/test_v41_topic_traversal  # 363 Tests, 309 passed, 0 failed, Rest Stub-Skips",
+            "ctest -R 'limits_entkopplung_vorstufe|e24_c10_g6|lazy_adhoc'  # 100% passed 3/3: CRC64==kNewGolden131072Crc64 + 320-golden Mismatch=0 (Direktaufruf ohne ctest-CWD war falsch-rot)",
+            "git -C .../comdare-cache-engine rev-parse main origin/main  # origin/main == 98eea2e7 (FF vollzogen), lokaler main-Ref stale",
+            "sed -n 130,185p libs/cache_engine/axes/alloc/axis_06_allocator_strategy_base.hpp + grep -rl 'void restore_statistics' libs/cache_engine/axes/alloc/ | wc -l  # Wachen-Mechanik + 27 Dateien (25+Exgen+Basis)",
+            "sed -n 166,173p CMakeLists.txt  # OBSERVER_PUSH option Default OFF; tests/unit/CMakeLists.txt:372/384/399 nur Test-Targets AN",
+            "grep -oF 'bserver' docs/sessions/backups/2026080[45]-*/ergebnis-roh.json  # einzige Erwaehnung = h81-Mechanik, Copy-Semantik nirgends deklariert",
+            "grep -nE '0[45]\\.08\\.2026' docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md + sed abend-4..nacht-5  # Referenzwissen; Ledger endet bei nacht-5 (01c-3 dort UNGELANDET)"
+          ]
+        }
+      }
+    ],
+    "synthese": {
+      "verdikt": "ABSCHLUSS-MIT-AUFLAGEN",
+      "begruendung": "Die SUBSTANZ der 8 enumerierten S5-Familien-Scheiben haelt allen vier Lenses und meiner Nachpruefung stand: 03a ist 22/22 mit ABGELEITETEM (nicht handgelistetem) compile-hartem Pin (zweifach unabhaengig selbst kompiliert/gefahren, R2+R4), die Form-B-Verdrahtung ist an 12+ Organen real (kein Default-Ctor am StdAllocatorAdapter, Copy/Rehash/Turm-Ebenen gedeckt), und golden/XML/Wire sind ueber die volle Strecke 65a61fcf..98eea2e7 byte-neutral (0 XML-/golden-/Wire-Commits, eigener golden-ctest 3/3 inkl. CRC64-Match). ZWEI substanzielle Widerlegungen halten jedoch und wurden von mir mit eigenen Belegen bestaetigt: (1) VOLLSTAENDIGKEITS-LUECKE FAMILIE 05: Die drift-bewachte Einzigquelle (lager_baum_writer.hpp:141-142) definiert Familie 05 als {queuing_q1, queuing_q2, io_dispatch, persistence_target}; der 05-Nachweis (test_s5_04_execution_alloc_conformance.cpp:21-25) engt die Familie still auf 2 von 4 Achsen ein, weil queuing keinen axes/-Ordner hat. topics/queuing/ traegt 0 Allokator-Achsen-Referenzen bei 14/18 Q1-Organ-Headern mit Default-Container-ORGAN-ZUSTAND (z.B. lockfree_spsc.hpp:220 buffer_); queuing_q1 ist mandatorischer Kompositions-Slot T15 (composition_factory.hpp:41), als Mess-Organ unter COMDARE_MEASUREMENT_ON verdrahtet (abi_adapter.hpp:948-951/:1010) und mit 15 enabled Bausteinen in der Registry-XML — im Messbetrieb allozieren diese Organe am T6-Achsen-Zaehler vorbei, und diese Blindstelle ist NIRGENDS deklariert (der einzige queuing-Treffer im S5-Ledger-Strang ist die Owner-Generalregel vom 04.08., die Queuing ausdruecklich als achsen-pflichtig AUFZAEHLT — sie verschaerft die Luecke, statt sie zu decken; Dossier-Treffer sind nur T15/T16-Tabellenzeilen). (2) VERANKERUNGS-LUECKE: Die Landung ist am Objekt vollzogen (HEAD==development==origin/main==origin/development==98eea2e7, selbst gepinnt), aber der super-Gitlink steht auf 40e8bf27 (eigenes ls-tree), der Ledger endet bei Zeile 3987 mit '01c-3 UNGELANDET' und enthaelt 0 Erwaehnungen von 98eea2e7; Merge-Doppellauf/golden/Pipeline-Gruen der Landung stehen nur im Commit-Text. Die TEILWEISE-Befunde zur Absolut-Formulierung 'alle Familien ueber das Interface' betreffen DEKLARIERTE Ausnahmen (Posten 76 SCOPE-DEKLARATION am Objekt chunked_store.hpp:293-301 selbst nachgelesen; Phase-B-Treiber im nacht-5-Eintrag ausgewiesen) und tragen kein WIDERLEGT. VERDIKT-ABWAEGUNG: Kein WIDERLEGT, weil die geleistete Scrub-Arbeit, die Gates und die Byte-Neutralitaet real und mehrfach unabhaengig belegt sind — die Defekte sind die UEBERSCHIESSENDE Vollstaendigkeits-Behauptung (eine Familie zur Haelfte ausserhalb des grep-Universums) und die fehlende Abschluss-Verankerung; beides ist klar umrissen und vor Phase B/ANKER heilbar. ABSCHLUSS-BESTAETIGT ist ausgeschlossen, solange die queuing-T6-Blindstelle undeklariert und der Abschluss unverankert ist.",
+      "auflagen": [
+        "AUFLAGE 1 (vor Phase-B-Anker): Abschluss-Behauptung im Ledger-Nachtrag praezisieren — 'S5-B-5-Scrub vollstaendig' gilt nur relativ zur axes/-grep-Wurzel; Familie 05 ist 2/4 Achsen nachgewiesen; queuing_q1/q2 als offene Familie-05-Reststrecke mit T6-Mess-Konsequenz ausweisen.",
+        "AUFLAGE 2 (vor Messbeginn, Entscheid im Mess-Schnitt-Fenster): topics/queuing/axis_q1+q2 ENTWEDER nach B-5-Muster auf das Allokator-Achsen-Interface schneiden (eigenes Familien-Gate mit topics/-Wurzel, Registry-abgeleitet) ODER begruendete SCOPE-DEKLARATION am Objekt plus T6-Blindstellen-Deklaration in Ledger und Mess-Doku (analog Posten-76-Muster chunked_store.hpp:293-301) — 15 enabled Q1-Organe allozieren sonst undeklariert am T6-Zaehler vorbei.",
+        "AUFLAGE 3 (vor Phase-B-Anker): Nachweis-Universum der Familien-Gates an die kOrganGruppen-Einzigquelle koppeln — der Familie-05-Nachweis (test_s5_04 bzw. neue test_s5_05-TU) muss alle 4 Achsen der Gruppe inkl. der topics/-Doppelwurzeln abdecken; keine stille Pfad-Annahme axes/ mehr.",
+        "AUFLAGE 4 (vor Phase B): Verankerungs-Kette nachziehen — Ledger-Landungs-Nachtrag fuer 98eea2e7 (Merge-Doppellauf, golden 3/3, Pipeline-Nachweis), super-Gitlink-Bump 40e8bf27 auf 98eea2e7 mit gruener super-Pipeline, Erst-Anker-/MEMORY-Aktualisierung (dort steht noch '01c-3 LANDEBEREIT @fbb351d9').",
+        "AUFLAGE 5: CI-Pipeline-Gruen fuer 98eea2e7 unabhaengig nachweisen (Pipelines-API mit VOLL-SHA), nicht nur per Commit-Text attestieren."
+      ],
+      "neue_posten": [
+        "Familie-05-queuing-Scrub oder deklarierte Ausnahme: topics/queuing/axis_q1_queuing (14/18 Organ-Header mit Default-Container-Organ-Zustand, 0 Achsen-Referenzen im Baum) + axis_q2_queuing; T15/T16 mandatorisch, Mess-Organ unter COMDARE_MEASUREMENT_ON, 15 enabled Bausteine — undeklarierte T6-Blindstelle im Messbetrieb.",
+        "Familien-Gate-Universum an kOrganGruppen-Quelle koppeln: Nachweis-greps und Registry-Typ-Wachen muessen topics/-Doppelwurzeln erfassen (lager_baum_writer.hpp kOrganGruppe05 = 4 Achsen, Nachweis deckte 2).",
+        "Landungs-Verankerung 98eea2e7: Ledger-Nachtrag + super-Gitlink-Bump (aktuell 40e8bf27) + Anker-/MEMORY-Aktualisierung + unabhaengiger Pipeline-Nachweis.",
+        "Observer-Copy-Semantik der migrierten 03a-Organe deklarieren: explizite Copy-Ctors konstruieren observer_ frisch statt mitzukopieren (Alt-Verhalten impliziter Copy); messwirksam inert, da COMDARE_CE_ENABLE_OBSERVER_PUSH Default OFF (CMakeLists.txt:168-172), aber im Push-Build Callback-Verlust bei Kopie/Zuweisung — nirgends deklariert.",
+        "h81-Wachen-Haertung (niedrige Prioritaet, kein In-Tree-Fall): legitimer Overload-Satz einer Strategie (z.B. reset() + reset(arg)) macht den Member-Pointer an der Wache ambig und bricht hart ill-formed statt mit erklaerender static_assert-Meldung (axis_06_allocator_strategy_base.hpp:148-180).",
+        "Kosmetik/Report-Praezision: Commit 27ef28ea nennt die surf-Heilung 'wormhole-Muster', textuell exakt ist es das hot/start-Muster (verhaltensgleich; nur Doku-Korrektur)."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Refute"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Synthese"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "R1-vollstaendigkeit",
+      "phaseIndex": 1,
+      "phaseTitle": "Refute",
+      "agentId": "ae8585de3df0f8ee3",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785911069975,
+      "queuedAt": 1785911069964,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "ADVERSARIALER TRUTH-CHECK des S5-ABSCHNITTS-ABSCHLUSSES. Dein Job ist WIDERLEGEN, nicht bestaetigen — jede Kernbehauptung angreifen; im Zweifel WIDERLEGT.\nOBJEKT (READ-ONLY): ce-Submodul /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, development @ 98eea2e7 (Stand selbst per rev-parse pinnen). Aktive Worktrees NICHT betreten. Referenz-Wissen: su…",
+      "lastProgressAt": 1785911848816,
+      "tokens": 155748,
+      "toolCalls": 52,
+      "durationMs": 778841,
+      "resultPreview": "{\"widerlegungs_versuche\":[{\"behauptung\":\"Der S5-B-5-Scrub ist VOLLSTAENDIG (alle Achsen-Familien erfasst, Familie 05 per Nachweis-grep=0 abgeschlossen)\",\"angriff\":\"Bindende Familien-Definition (kOrganGruppen-Drift-Wache) gegen das tatsaechlich gegreppte Nachweis-Universum gestellt; frische Container-greps ueber ALLE Wurzeln inkl. topics/-Doppelwurzeln, .in-Templates, compositions/; Allokator-Achse…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "R2-substanz",
+      "phaseIndex": 1,
+      "phaseTitle": "Refute",
+      "agentId": "aecf07e5a01d1b27b",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785911069976,
+      "queuedAt": 1785911069964,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "ADVERSARIALER TRUTH-CHECK des S5-ABSCHNITTS-ABSCHLUSSES. Dein Job ist WIDERLEGEN, nicht bestaetigen — jede Kernbehauptung angreifen; im Zweifel WIDERLEGT.\nOBJEKT (READ-ONLY): ce-Submodul /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, development @ 98eea2e7 (Stand selbst per rev-parse pinnen). Aktive Worktrees NICHT betreten. Referenz-Wissen: su…",
+      "lastProgressAt": 1785912036129,
+      "tokens": 196740,
+      "toolCalls": 95,
+      "durationMs": 966153,
+      "resultPreview": "{\"widerlegungs_versuche\":[{\"behauptung\":\"Alle Achsen-Familien (04/03/01d/01a/02a/01b/02b/01c) laufen ueber das Allokator-Achsen-Interface -- Form B real verdrahtet, nicht nur deklariert.\",\"angriff\":\"Stichproben an 12+ Organen quer durch alle Wellen (02a chunked/layout_aware, 01a btree/skip_list-Pool-Stores, 01b AxisBoundBuffer, 02b SurfBitVector/SurfRank/SurfSelect/SurfSuffixBits, 01c skip_list-Co…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "R3-neutralitaet",
+      "phaseIndex": 1,
+      "phaseTitle": "Refute",
+      "agentId": "afc7212ded35e46a2",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785911069976,
+      "queuedAt": 1785911069964,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "ADVERSARIALER TRUTH-CHECK des S5-ABSCHNITTS-ABSCHLUSSES. Dein Job ist WIDERLEGEN, nicht bestaetigen — jede Kernbehauptung angreifen; im Zweifel WIDERLEGT.\nOBJEKT (READ-ONLY): ce-Submodul /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, development @ 98eea2e7 (Stand selbst per rev-parse pinnen). Aktive Worktrees NICHT betreten. Referenz-Wissen: su…",
+      "lastProgressAt": 1785911692325,
+      "tokens": 126544,
+      "toolCalls": 41,
+      "durationMs": 622349,
+      "resultPreview": "{\"widerlegungs_versuche\":[{\"behauptung\":\"golden/XML/Wire sind ueber die GESAMTE Strecke byte-neutral (Strecken-Anfang selbst ermittelt: 65a61fcf = Merge-Basis der ersten S5-Landung a801a7e3, direkt nach 19f27223+a8c2da91; Ende = 98eea2e7 = HEAD = development = origin/main = origin/development, selbst gepinnt)\",\"angriff\":\"Voll-Strecken-Diff 65a61fcf..98eea2e7 ueber ALLE Angriffs-Flaechen: (a) jede …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "R4-regression",
+      "phaseIndex": 1,
+      "phaseTitle": "Refute",
+      "agentId": "a22046716a993ed56",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785911069976,
+      "queuedAt": 1785911069964,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "ADVERSARIALER TRUTH-CHECK des S5-ABSCHNITTS-ABSCHLUSSES. Dein Job ist WIDERLEGEN, nicht bestaetigen — jede Kernbehauptung angreifen; im Zweifel WIDERLEGT.\nOBJEKT (READ-ONLY): ce-Submodul /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine, development @ 98eea2e7 (Stand selbst per rev-parse pinnen). Aktive Worktrees NICHT betreten. Referenz-Wissen: su…",
+      "lastProgressAt": 1785912300707,
+      "tokens": 203351,
+      "toolCalls": 72,
+      "durationMs": 1230731,
+      "resultPreview": "{\"widerlegungs_versuche\":[{\"behauptung\":\"Alle Achsen-Familien (04/03/01d/01a/02a/01b/02b/01c) laufen ueber das Allokator-Achsen-Interface\",\"angriff\":\"Eigener Frisch-grep am HEAD 98eea2e7 ueber ganz libs/cache_engine/axes/: (1) std::allocator-Literal ohne Adapter-Naht, (2) Ein-Argument-std-Container (vector/deque/map/unordered_map/unordered_set/list), (3) erweiterter Sweep string/set/priority_queue…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "synthese",
+      "phaseIndex": 2,
+      "phaseTitle": "Synthese",
+      "agentId": "a3aa6245cadf8e6df",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785912300723,
+      "queuedAt": 1785912300709,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "ABSCHLUSS-MIT-AUFLAGEN",
+      "promptPreview": "SYNTHESE des adversarialen S5-Abschnitts-Truth-Checks. Lens-Ergebnisse: [{\"key\":\"R1-vollstaendigkeit\",\"r\":{\"widerlegungs_versuche\":[{\"behauptung\":\"Der S5-B-5-Scrub ist VOLLSTAENDIG (alle Achsen-Familien erfasst, Familie 05 per Nachweis-grep=0 abgeschlossen)\",\"angriff\":\"Bindende Familien-Definition (kOrganGruppen-Drift-Wache) gegen das tatsaechlich gegreppte Nachweis-Universum gestellt; frische Con…",
+      "lastProgressAt": 1785912491698,
+      "tokens": 63593,
+      "toolCalls": 10,
+      "durationMs": 190975,
+      "resultPreview": "{\"verdikt\":\"ABSCHLUSS-MIT-AUFLAGEN\",\"begruendung\":\"Die SUBSTANZ der 8 enumerierten S5-Familien-Scheiben haelt allen vier Lenses und meiner Nachpruefung stand: 03a ist 22/22 mit ABGELEITETEM (nicht handgelistetem) compile-hartem Pin (zweifach unabhaengig selbst kompiliert/gefahren, R2+R4), die Form-B-Verdrahtung ist an 12+ Organen real (kein Default-Ctor am StdAllocatorAdapter, Copy/Rehash/Turm-Ebe…"
+    }
+  ],
+  "totalTokens": 745976,
+  "totalToolCalls": 270
+}
