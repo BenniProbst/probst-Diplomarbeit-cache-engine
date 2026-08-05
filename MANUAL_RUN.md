@@ -88,10 +88,15 @@ Alt-Flags `--validate`/`--check`/`--dump-plan`/`--dump-ci`/`--dump-cmake`/`--pri
 `diagram-generator`) trägt `install()`-Targets (GNUInstallDirs):
 
 ```bash
-cmake --build build-test --target messung_driver binary_to_csv_cli csv_to_latex_cli diagram_generator_cli
-cmake --install build-test --prefix "$HOME/.local"    # -> <prefix>/bin/comdare-messung-driver usw.
+cmake --build build-test --target messung_driver comdare_experiment_planner binary_to_csv_cli csv_to_latex_cli diagram_generator_cli
+cmake --install build-test --prefix "$HOME/.local"    # -> <prefix>/bin/comdare-messung-driver + comdare-experiment-planner usw.
 "$HOME/.local/bin/comdare-messung-driver" version     # rc 0 = Installationspfad funktioniert
+"$HOME/.local/bin/comdare-experiment-planner" version # rc 0 = Planer-Binary installiert (W1)
 ```
+
+> Codex-Zweitblick 05.08.2026: `cmake --install` baut nichts nach — die Planer-Binary MUSS im
+> Partial-Build-Target-Satz stehen (Zeile oben), sonst scheitert die `install(PROGRAMS)`-Naht im
+> frischen Tree an der fehlenden Datei. Der volle `--target all`-Bau deckt sie ohnehin.
 
 **Hinweis CMake-Options vs. XML (Ledger §73.5):** alle `COMDARE_*`-CMake-Options sind der **optionale
 Baremetal-Fallback ohne CI**; die Experiment-XML mit dem Planer **überschreibt STETS** die
