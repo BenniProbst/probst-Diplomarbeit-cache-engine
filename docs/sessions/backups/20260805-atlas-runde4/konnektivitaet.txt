@@ -1,0 +1,24 @@
+Konnektivitaet L4-Fragmente (Knoten ohne Kante, Summe ueber alle Mermaid-Bloecke je Fragment)
+Shard | vorher | nachher | Bloecke | max Knoten/Block
+frag-01: vorher=53 nachher=0 bloecke=3 max_knoten=45
+frag-02: vorher=117 nachher=0 bloecke=3 max_knoten=41
+frag-03: vorher=15 nachher=0 bloecke=2 max_knoten=44
+frag-04: vorher=1 nachher=0 bloecke=1 max_knoten=11
+frag-05: vorher=17 nachher=0 bloecke=2 max_knoten=28
+frag-06: vorher=3 nachher=0 bloecke=2 max_knoten=32
+frag-07: vorher=0 nachher=0 bloecke=2 max_knoten=37
+frag-08: vorher=37 nachher=0 bloecke=1 max_knoten=44
+frag-09: vorher=8 nachher=0 bloecke=1 max_knoten=45
+frag-10: vorher=21 nachher=0 bloecke=1 max_knoten=38
+frag-11: vorher=0 nachher=0 bloecke=0 max_knoten=0
+frag-12: vorher=1 nachher=0 bloecke=1 max_knoten=4
+frag-13: vorher=7 nachher=0 bloecke=1 max_knoten=22
+frag-14: vorher=0 nachher=0 bloecke=1 max_knoten=40
+frag-15: vorher=0 nachher=0 bloecke=2 max_knoten=36
+frag-16: vorher=3 nachher=0 bloecke=1 max_knoten=5
+frag-17: vorher=15 nachher=0 bloecke=1 max_knoten=34
+frag-18: vorher=6 nachher=0 bloecke=1 max_knoten=8
+frag-19: vorher=9 nachher=0 bloecke=1 max_knoten=12
+frag-20: vorher=9 nachher=0 bloecke=1 max_knoten=12
+frag-21: vorher=13 nachher=0 bloecke=1 max_knoten=17
+ERGEBNIS: ALLE NACHHER=0
