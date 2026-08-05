@@ -1,0 +1,223 @@
+{
+  "summary": "PHASE B (letzte Bau-Scheibe vor dem ANKER, G8-Flaeche): abi_adapter EffectiveSearchAlgo an 3 Treiber-Stellen + Organ-Pfad-Faden + Traversal-Mapping ALLER Rebound-Leaves — Fable-Planung, Opus-5-Bau, Fable-Review in wt-e24 ab b09ebb8a",
+  "agentCount": 4,
+  "logs": [
+    "Bau-Modell: claude-opus-5"
+  ],
+  "result": {
+    "plan": {
+      "status": "PLAN FERTIG (read-only eingehalten; einzige Schreibung = phase-b-plan.md im Scratchpad). Pflicht-Vorlauf 1-7 vollstaendig am Objekt b09ebb8a gefahren: Ledger 04./05.08.-Nachtraege (h81 nacht-3, Rezept nacht-4/-5, 05q vormittag-1), Pause-Doc Par.3+Par.6, Design-Backup designs[0].r.t6_durchbindung, abi_adapter :400-:700 + :2195-:2284 (alle 3 Treiber-Stellen liegen KOMPLETT unter #if COMDARE_MEASUREMENT_ON :433..:935 = Mess-only), search_algo_rebind.hpp, traversal_for/organ_for/organ_for_shaped, beide tier_to_organ_mapping-Wurzeln, 02a-HERZ-Vorbild inkl. Kontrast-TU test_s5_02a_layout_alloc_conformance.cpp:306-330. Basis-grep reproduziert (EffectiveSearchAlgo/search_algo_for_composition im abi_adapter = 0). wt-e24 clean, tree-identisch zu b09ebb8a.",
+      "plan_pfad": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/phase-b-plan.md",
+      "rebound_inventar": [
+        "S01 Array256: Rebound JA (array256.hpp:247/:254); Fassade->DirectAddressTraversal (trav:62); Rebound-Mapping FEHLT",
+        "S02 VectorU8U8: Rebound JA (vector_u8u8.hpp:319/:326); ->SortedVectorTraversal (trav:70); FEHLT",
+        "S03 VectorU16U16: Rebound JA (vector_u16u16.hpp:304/:314); ->SortedVectorTraversal (trav:74); FEHLT",
+        "S04 OriginalArt: Rebound JA (original_art.hpp:272/:279); Fassade void (Pool, organ_for:70); void-korrekt",
+        "S05 OriginalHot: Rebound JA (original_hot.hpp:325/:332); void (organ_for:74); void-korrekt",
+        "S06 OriginalStart: Rebound JA (original_start.hpp:316/:324); void (organ_for:78); void-korrekt",
+        "S07 OriginalWormhole: Rebound JA (original_wormhole.hpp:288/:296); void (organ_for:82); void-korrekt",
+        "S08 OriginalSurf: Rebound JA (original_surf.hpp:298/:306); void (organ_for:86); void-korrekt",
+        "S09 Array65535: Rebound JA (array65535.hpp:286/:293); ->DirectAddressTraversal (trav:66); FEHLT",
+        "S10 KAry-HAUPT: Rebound JA (k_ary.hpp:369/:376); ->KAryTraversal<4u> (trav:86); FEHLT",
+        "S11 Interpolation: Rebound JA (interpolation.hpp:338/:348); ->InterpolationTraversalOrgan (trav:82); FEHLT",
+        "S12 Eytzinger: Rebound JA (eytzinger.hpp:312/:319); void (organ-backed, organ_for:112); void-korrekt",
+        "S13 SkipList: Rebound JA (skip_list.hpp:407/:414); void (organ_for:90); void-korrekt",
+        "S14 Hash: Rebound JA (hash_search.hpp:352/:359); void (organ_for:94); void-korrekt",
+        "S15 LinearScan: Rebound JA (linear_scan.hpp:323/:334); ->LinearScanTraversal (trav:78); FEHLT",
+        "S16 BST: Rebound JA (bst.hpp:364/:372); void (organ_for:102); void-korrekt",
+        "S17 BTree: Rebound JA (btree.hpp:579/:586); void (organ_for:106); void-korrekt",
+        "S18 KAryK2: Rebound JA KArySearchAlgoKRebound<2,A2> (k_ary.hpp:795); ->KAryTraversal<2u> (trav:94); VORHANDEN (trav:112-115)",
+        "S19 KAryK4: Rebound JA (k_ary.hpp:806); ->KAryTraversal<4u> (trav:98); VORHANDEN",
+        "S20 KAryK8: Rebound JA (k_ary.hpp:817); ->KAryTraversal<8u> (trav:102); VORHANDEN",
+        "S21 KAryK16: Rebound JA (k_ary.hpp:828); ->KAryTraversal<16u> (trav:107); VORHANDEN",
+        "S22 SwissTable: Rebound JA (swisstable.hpp:390/:397); void (organ_for:98); void-korrekt || BILANZ: 22/22 Rebound; 11 non-void-Fassaden, 4 gemappt (per-K), GENAU 7 Spezialisierungen fehlen (Array256/Array65535/VecU8U8/VecU16U16/LinearScan/Interpolation/KAry-Haupt); 11 void-Fassaden sind auch fuer Rebounds void-korrekt (Primaer trav:57-60) — dort NICHTS ergaenzen; Symmetrie-Pin abgeleitet ueber AllStrategies in test_s5_01c_fassaden_conformance.cpp (der in trav:157-163 angekuendigte Ort)"
+      ],
+      "wurzel_entscheid": "SUBSTANZ = libs/cache_engine/axes/lookup/composable/tier_to_organ_mapping.hpp (128 Zeilen, alle Organ-Alias-Definitionen :41-117 + TierOrganPair :122-126). WEITERLEITUNG = libs/cache_engine/topics/traversal/axis_03a_search_algo/composable/tier_to_organ_mapping.hpp = GENAU 5 Zeilen (nur '#include <axes/lookup/composable/tier_to_organ_mapping.hpp>' + using-namespace-Re-Export; selbst gelesen). Zusatz-Beleg: UML-Atlas-Census (Ledger vormittag-2) 'topics/traversal-1 = reine Weiterleitungsheader, 0 Typ-Definitionen'. Konsumenten (z.B. compositions/art_paper_binding_reference.hpp:19) inkludieren topics/ und bleiben ueber den Re-Export versorgt. ENTSCHEID: NUR die axes/-Wurzel aendern, topics/-Header byte-unangetastet. Hinweis: die Pause-Doc-Referenz ':46-64' ist Zeilen-Drift eines Alt-Stands; am Ist ist der Alias-Block :41-117.",
+      "risiken": [
+        "G8/ABI: abi_adapter ist ABI-Flaeche — erlaubt NUR 1 Include, 1 Klassen-using + 1 static_assert (kein Member/Byte), 6 Body-Zeilen (:443/:444, :548/:549, :663/:666), 2 Trait-Argumente (:2235/:2243-2244); virtuelle Signaturen/Reihenfolge (:406ff/:434ff/:537ff/:637ff), SegmentAccumulator und ComdareSegmentLatencyV1/V2-PODs/Wire TABU",
+        "golden: Treiber-Stellen sind Mess-only (#if COMDARE_MEASUREMENT_ON :433..:935; CI-Gruen = Messung AUS); Level-0-is_same-Vorrang haelt den golden-Pfad auf der Fassade (kein neuer Symbolname); PB-2 (konstitutiver Organ-Faden) ist der riskanteste Schnitt — Typ-Identitaet fuer Alloc=Exgen per Konstruktion + compile-harte Pins, Beweis = golden-320 3/3 + CRC + Roundtrip je Commit; KEINE XML-Regeneration, Rebounds/Alloc-Formen bekommen KEIN ORGAN_LOCATION",
+        "Ehrliche Grenzen als Posten deklarieren statt still bauen: organ_hull_-Kompositionen (Observable*Organ als search_algo, z.B. art_paper_binding_reference MimallocAllocator) bleiben Level-2 (ObservableComposedContainer traegt kein rebind_allocator, :67 nur allocator_type); anatomy_execution_context.hpp:50-63 bleibt einarmig; original_*-CODEGEN bleibt T6-blind (EV-4)",
+        "Fallen-Kanon: ninja -t commands-Modul-Scan (-E) macht Compile-Biss-Tests falsch gruen — echten Compile-Befehl nehmen; ctest-N NUR am Commit-Objekt (warme-Bau-Falle real, 401-statt-400-Praezedenz); Boost-Link bei JEDEM Include-Wachstum (Kontrast-TU zieht mp11 -> Boost::mp11 explizit; CI-Job-Form mit frischem Configure als Beweis; search_algo_rebind.hpp ist bewusst boost-frei); cf22 nur echtes Binary mit Datei-Argumenten; 3-Marker-grep in Zeilenanfangs-Form; ASCII-only in ADDED-Zeilen",
+        "Kontrast-Beweis-Arithmetik: Alt-Stand-FALL-Pflicht via Exakt-Gleichheit (Treiber-Eigenanteil deterministisch 4097 Allokationen bei batches=1: lbuf + 2x kChurn=2048), Delta == Direkt-Materialisierungs-Zaehler des EffectiveSearchAlgo, Fassade bewegt Fremd-Zaehler um 0; Zaehl-Strategie-Probe zuerst in S7-/01c-TUs am Objekt suchen statt neu erfinden (h81-Klasse bei neuen CRTP-Weiterleitern)",
+        "Betrieb: KEIN Push/Merge (Landung = Lead nach Review); Job-Sperre aktiv; Messung Phase 6 = USER-GO-STOPP; nach Phase B folgt EIN ANKER-Vollzug"
+      ],
+      "commit_plan": [
+        "PB-1 (Branch phase-b-treiber NEU ab b09ebb8a in /home/comdare/wt-e24): Traversal-Mapping-Symmetrie — 7 Rebound-Fwd-Decls + 7 partielle Spezialisierungen in traversal_for_search_algo.hpp (nach per-K-Muster :51-52/:112-115) + abgeleiteter AllStrategies-Symmetrie-Pin in test_s5_01c_fassaden_conformance.cpp (Anti-Zementierungs-Biss am Vor-Stand fahren) + Kommentar-Reste flags.hpp.in:33 und CMakeLists.txt:278/:280-283 (option-NAMEN unangetastet). ctest-N unveraendert (live erheben, Ausgangs-Erwartung 402). Voll-Gate.",
+        "PB-2: Organ-Pfad-Faden — tier_to_organ_mapping.hpp (NUR axes/-Substanz-Wurzel): Alloc-parametrisierte Organ-Formen, bestehende Namen als Default-Instanziierungen typ-identisch; organ_for_search_algo_shaped.hpp: 3. Parameter CompAlloc=ExgenAllocator (Primaer inert, alle 11 organ-backed Familien binden CompAlloc in die Store-Position; einarmige organ_for UNANGETASTET); abi_adapter :2235 + :2243-2244: ShapeCarrier-Aufrufe um typename Composition::allocator ergaenzen; Level-0/Level-1-Pins. ctest-N unveraendert (402). Voll-Gate (golden 3/3 hier der Substanz-Beweis; 02a-Praezedenz).",
+        "PB-3: EffectiveSearchAlgo-Durchbindung (G8-Flaeche, kleinster Diff) — abi_adapter: Include search_algo_rebind.hpp (:72-74), Klassen-Alias EffectiveSearchAlgo + !IsReboundSearchAlgoLeaf-Wache nach :2209, 3x2 Body-Zeilen (:443/:444, :548/:549, :663/:666); + NEUE Kontrast-TU test_phase_b_effective_search_algo_contrast.cpp (MEASURED-Flags nach CMakeLists:2312-2328-Muster, Boost::mp11-Link, HERZ-Kontrast K-1/K-2/K-3 mit Exakt-Arithmetik 4097+Delta, name()-Invarianz-Pin). ctest-N +1 (erwartet 403, am Commit-Objekt erheben). Voll-Gate.",
+        "GATE JE COMMIT (alle 3): Voll-Bau build-e24 (-j MAX 8, nice) + 2x voll-ctest SERIELL + golden-320 3/3 + Roundtrip + TABU-diff LEER (golden_fullpilot_320*, permutation_axes.xml, cache_engine_axis_registry.xml, system_axis_registry.xml, CRC-Anker, binary_id, fingerprint_format=2) + Freeze + diff-stat + cf22-Binary mit Datei-Argumenten + 3-Marker-grep + ASCII-Selbstcheck + .d-Boost-Detektor. KEIN Push/Merge."
+      ]
+    },
+    "bauModell": "claude-opus-5",
+    "bau": {
+      "status": "PHASE B FERTIG (3/3 Commits, jeder mit vollem Gate; Branch phase-b-treiber @ c2bc0e2b ab b09ebb8a, Freeze 0, KEIN Push/Merge). Alle fuenf Auftragsteile geliefert: (1) EffectiveSearchAlgo EINMAL am Genus-Erst-Instanziierungs-Punkt + Konsum an allen 3 Treiber-Stellen; (2) Organ-Pfad-Faden NUR ueber die Substanz-Wurzel axes/ (topics/-Weiterleitung byte-unangetastet, 0 Diff-Zeilen); (3) Traversal-Mapping fuer ALLE 7 fehlenden Rebound-Leaves + abgeleitete 22/22-Wache; (4) Kontrast-Beweis nach 02a-HERZ-Vorbild, beidseitig beissend, mit EXAKTER Arithmetik statt '>0'; (5) Kommentar-Reste 01c-2-B2. Gate-Basis LIVE am Commit-Objekt erhoben: 402 (b09ebb8a, frisches Configure, Freeze 0) -> 402 (PB-1) -> 402 (PB-2) -> 403 (PB-3, +1 durch die Kontrast-TU). G8-Auflage eingehalten: am abi_adapter NUR 1 Include, 1 Klassen-Alias, 1 static_assert, 6 Body-Zeilen, 2 Trait-Argument-Stellen -- 0 Treffer fuer override/virtual/POD/Interface-Reihenfolge im gesamten Adapter-Diff. TABU-Diff LEER ueber die gesamte Strecke, XML nach Voll-Bau byte-stabil.",
+      "commits": [
+        "40ae3ebf  PB-1  feat(a8-s5-phase-b): die sieben Rebound-Leaves, die je nach Allokator-Strategie ueber einen ANDEREN Such-Pfad gesucht haetten -- 7 Fwd-Decls + 7 partielle Spezialisierungen in traversal_for_search_algo.hpp, 8 In-Header-Symmetrie-Pins ueber einen unvollstaendigen Sonden-Typ (0 Include-Wachstum), abgeleitete Ebene (10) im FassadenVertrag ueber lk::AllStrategies, Kommentar-Reste flags.hpp.in + CMakeLists (option-NAMEN byte-gleich). Diff 4 Dateien +147/-14. Gate: 2x402, golden 3/3, Roundtrip 11/11, TABU 0, cf22 0/2, ASCII 0.",
+        "6eb47486  PB-2  feat(a8-s5-phase-b): der Organ-Pfad-Faden -- der tote Alloc-Parameter der elf Pool-Organe wird lebendig, und die Schale hoert auf, heimlich anders zu allozieren -- tier_to_organ_mapping.hpp (NUR axes/-Substanz-Wurzel): 11 ...Bound<Alloc>-Formen + defaultierter 2. Parameter an den 4 Shaped-Formen + store_shape_of_t (Shape-Vorgabe aus dem Store statt zweites Literal) + 12 Level-0-static_asserts; organ_for_search_algo_shaped.hpp: 3. Parameter CompAlloc mit Default, alle 11 organ-backed Familien gebunden (4 Shape-Familien in BEIDEN Armen), 11 Level-0-Pins per Makro; abi_adapter: die 2 Trait-Konsum-Stellen fuehren typename Composition::allocator; axis_bound_scratch.hpp: composition_allocator_t gedreht (s. Abweichung A2) mit Form-A-Fallunterscheidung + 3 Sonden-Pins; Level-1-Gegenprobe in test_234_vb (0 Include-Wachstum). Diff 5 Dateien +350/-45. Gate: 2x402, golden 3/3, Roundtrip 11/11, TABU 0, cf22 0/5, .d-Detektor 0/510.",
+        "c2bc0e2b  PB-3  feat(a8-s5-phase-b): EffectiveSearchAlgo an den drei Treiber-Stellen -- 1 Include (search_algo_rebind.hpp, bewusst boost-frei), 1 Klassen-Alias EffectiveSearchAlgo nach :2210, 1 Ebenen-Wache (!IsReboundSearchAlgoLeaf<SearchAlgo>), 6 Body-Zeilen (:444/:445, :549/:550, :664/:667) + NEUE Kontrast-TU test_phase_b_effective_search_algo_contrast.cpp (375 Z.) + CMake-Target (MEASUREMENT_ON=1/STATISTICS=1/EXPERIMENT_MODE_ON=1, Boost::mp11 explizit). Diff 3 Dateien +432/-8. Gate: 2x403 (N am Commit-Objekt), golden 3/3, Roundtrip 11/11, TABU 0, cf22 0/2, .d-Detektor 0/511."
+      ],
+      "doppellauf": "SCHLUSS-DOPPELLAUF am FINALEN Commit-Objekt c2bc0e2b (Freeze 0, ctest -j1 seriell):\n  ctest -N  ->  \"Total Tests: 403\"\n  LAUF1 EXIT=0 -> \"100% tests passed, 0 tests failed out of 403\"\n  LAUF2 EXIT=0 -> \"100% tests passed, 0 tests failed out of 403\"\nJE COMMIT (alle seriell, je nach dem finalen -- also cf22-formatierten -- Inhalt gefahren):\n  BASIS b09ebb8a (frisches cmake-Configure, Freeze 0): ctest -N -> \"Total Tests: 402\"   [NICHT am warmen Bau abgelesen; die 05q-Falle 401-statt-400 war der Anlass]\n  PB-1 40ae3ebf: \"100% tests passed, 0 tests failed out of 402\" (x2) | golden 3x \"100% tests passed, 0 tests failed out of 1\" | roundtrip \"100% tests passed, 0 tests failed out of 11\"\n  PB-2 6eb47486: \"100% tests passed, 0 tests failed out of 402\" (x2) | golden 3x \"100% tests passed, 0 tests failed out of 1\" | roundtrip \"100% tests passed, 0 tests failed out of 11\"\n  PB-3 c2bc0e2b: \"100% tests passed, 0 tests failed out of 403\" (x2) | golden 3x \"100% tests passed, 0 tests failed out of 1\" | roundtrip \"100% tests passed, 0 tests failed out of 11\"\nFLAKE-KLAUSEL: kein Test in einem der Laeufe rot, keine Wiederholung noetig, keine Flake beobachtet.\nN-HERKUNFT: 402 -> 402 -> 402 -> 403; das +1 ist GENAU die neue Kontrast-TU (ein add_test im Diff).",
+      "kontrast_beweis": "test_phase_b_effective_search_algo_contrast (EXIT=0 am Commit-Objekt), literal:\n\n   Fassade   : linear_scan (gebunden an den Achsen-Default)\n   Effektiv  : derselbe Name (linear_scan), gebunden an test_phase_b_zaehlend\n== (K-2) HERZ-KONTRAST am Mess-Pfad: run_workload ==\n   Organ-Anteil (256 Inserts auf EffectiveSearchAlgo) : 9 Allokationen\n   Fassaden-Anteil (dieselbe Folge auf der Fassade)   : 0 Allokationen\n  [ ok ] das effektive Organ alloziert REAL ueber die Kompositions-Strategie (Organ-Anteil > 0)\n  [ ok ] DER KONTRAST: dieselbe Folge auf der FASSADE bewegt den Zaehler der Kompositions-Strategie um EXAKT 0 (sie alloziert nicht weniger -- sie alloziert WOANDERS)\n   run_workload lieferte 1 Probe(n); Zaehler-Delta = 4106\n   Erwartung  = Treiber-Eigenanteil 4097 + Organ-Anteil 9 = 4106\n  [ ok ] EXAKTE GLEICHUNG: Delta == Treiber-Eigenanteil + Organ-Anteil\n== (K-3) SEGMENT-KOHAERENZ ==\n   run_workload_segmented    : n=1, Delta=4106 (Erwartung 4106)\n  [ ok ] run_workload_segmented: Delta == Treiber-Eigenanteil + Organ-Anteil\n   run_workload_segmented_v2 : Organ A (linear_scan) Delta=4127 | Organ B (vector_u16u16) Delta=4136\n   Organ-Anteile direkt gemessen: A=9, B=18 -> erwartete Delta-Differenz -9\n  [ ok ] DIFFERENZ-BEWEIS an der dritten Treiber-Stelle: die Delta-Differenz der beiden Kompositionen ist EXAKT die Differenz ihrer Organ-Anteile\nALLES GRUEN -- 0 Fehler\n\nANTI-ZEMENTIERUNGS-BISS AM ALT-STAND (nur die 6 Body-Zeilen zurueckgedreht, Alias+Wache stehengelassen; echter Compile-Befehl, KEIN -E-Modul-Scan) -> EXIT=1, literal:\n   run_workload lieferte 1 Probe(n); Zaehler-Delta = 4097\n  [FAIL] der Treiber-Eigenanteil allein reicht NICHT aus (Delta ECHT groesser)\n  [FAIL] EXAKTE GLEICHUNG: Delta == Treiber-Eigenanteil + Organ-Anteil\n   run_workload_segmented    : n=1, Delta=4097 (Erwartung 4106)\n  [FAIL] run_workload_segmented: Delta == Treiber-Eigenanteil + Organ-Anteil\n  [FAIL] run_workload_segmented: Treiber-Eigenanteil allein reicht NICHT (Alt-Stand-Falle)\n   run_workload_segmented_v2 : Organ A (linear_scan) Delta=4118 | Organ B (vector_u16u16) Delta=4118\n  [FAIL] DIFFERENZ-BEWEIS an der dritten Treiber-Stelle\nROT -- 5 Fehler\n\nARITHMETIK-HERKUNFT (abgeleitet, nicht geraten): Treiber-Eigenanteil = 1 Layout-Puffer + 2 Churn-Runden a kChurn=2048 (Warmup + 1 Mess-Batch bei batches=1) = 4097; Organ-Anteil GEMESSEN durch Direkt-Materialisierung desselben effektiven Typs mit derselben 256-Insert-Folge. Die Zaehl-Strategie ist eine ECHTE Achsen-Variante (AllocatorStrategy + CacheEnginePermutationStrategy + OrganAxisConcept compile-hart) nach dem test_h64-Muster inkl. der drei EIGENEN Statistik-Member (h81-Lehre); ihr einziger Unterschied ist der TYP-GLOBALE Zaehler -- Treiber und Organ halten getrennte Strategie-Instanzen, und genau ihre Summe ist die Aussage.",
+      "orakel_belege": [
+        "ABSCHLUSS-ORAKEL 1 -- grep 'EffectiveSearchAlgo' libs/cache_engine/anatomy/abi_adapter.hpp, literal: 444: 'using K          = typename EffectiveSearchAlgo::key_type;' | 445: 'EffectiveSearchAlgo algo;' | 549: 'using K          = typename EffectiveSearchAlgo::key_type;' | 550: 'EffectiveSearchAlgo algo;' | 664: 'using K                 = typename EffectiveSearchAlgo::key_type;' | 667: 'EffectiveSearchAlgo algo;' | 2222: 'using EffectiveSearchAlgo =' (der EINE Alias, Klassen-Ebene, neben :2209 Composition / :2210 SearchAlgo)",
+        "ABSCHLUSS-ORAKEL 2 -- Fassaden-Materialisierung = 0: grep -cE '(^|[^[:alnum:]_])SearchAlgo algo;' abi_adapter.hpp -> 0. ACHTUNG Falle: der NAIVE 'grep -c \"SearchAlgo algo;\"' liefert 3, weil 'EffectiveSearchAlgo algo;' das Muster als Teilzeichenkette enthaelt -- die Wortgrenzen-Form ist das gueltige Orakel (Klasse des 3-Marker-grep-Befunds aus vormittag-1).",
+        "REBOUND-MAPPING-VOLLSTAENDIGKEIT, dreifach: (a) 8 partielle Spezialisierungen fuer Rebound-Leaves im Mapping-Header (7 neu + die per-K-Bestandszeile); (b) 8 In-Header-Symmetrie-Pins traversal_symmetrisch_v<Fassade, Rebound<Sonde>> -- compile-hart OHNE Allokator-Wissen ueber einen unvollstaendigen Sonden-Typ, also 0 Include-Wachstum; (c) DER eigentliche Beweis: Ebene (10) des FassadenVertrags laeuft ueber die REGISTRY-abgeleitete Population, und die Familien-Wache meldet literal 'AllStrategies=22 | migriert=22 | davon enabled=4 | EnabledStrategies=4' + 'mp_size<Migriert> == mp_size<AllStrategies> == 22 -- die Achse 03a ist LUECKENLOS'. Damit ist die Symmetrie fuer 22/22 compile-hart, ohne dass eine Namensliste gepflegt werden muss.",
+        "ANTI-ZEMENTIERUNGS-BISS PB-1 (echter Compile-Befehl aus 'ninja -t commands', ZWEITER Eintrag mit -c; der ERSTE ist der C++20-Modul-Scan mit -E und waere FALSCH GRUEN -- Falle 01c-3-B3 am Objekt reproduziert): am VOR-Stand 7 static-assertion-Fehler mit der erklaerenden Meldung '01c/PHASE B TRAVERSAL-ASYMMETRIE ...', Compiler-Note literal: 'std::is_same_v<void, comdare::cache_engine::lookup::composable::DirectAddressTraversal> evaluates to false'. Die gebissenen Typen sind EXAKT die 7 des Inventars: Array256SearchAlgo, Array65535SearchAlgo, InterpolationSearchAlgo, KArySearchAlgo, LinearScanSearchAlgo, VectorU16U16SearchAlgo, VectorU8U8SearchAlgo. Am NEU-Stand: derselbe Befehl EXIT=0, 0 Zeilen Ausgabe.",
+        "G8/ABI-WACHE: git diff b09ebb8a -- abi_adapter.hpp | grep -cE 'override|virtual|struct Comdare|SegmentAccumulator|public I' ueber die reinen +/- Zeilen -> 0. Der gesamte Adapter-Diff besteht aus 1 Include, 1 Klassen-Alias, 1 static_assert, 6 Body-Zeilen, 2 Trait-Argument-Stellen und Kommentar.",
+        "TABU-DIFF LEER ueber die gesamte Strecke b09ebb8a..c2bc0e2b: algorithm_profiles/ (cache_engine_axis_registry.xml, permutation_axes.xml) 0 | tests/unit/thesis_tiere/golden_fullpilot_320* 0 | include/cache_engine/abi/ 0 | measurement/system_axis_registry.xml 0. Zusaetzlich 'git status --porcelain -- *.xml' NACH jedem Voll-Bau = 0 Zeilen (die XML ist auch generatorseitig byte-stabil, keine Regeneration ausgeloest).",
+        "DOPPELWURZEL-ENTSCHEID belegt: git diff --name-only b09ebb8a -- libs/cache_engine/topics/ = 0 Dateien. Die Weiterleitungs-Wurzel topics/traversal/axis_03a_search_algo/composable/tier_to_organ_mapping.hpp hat unveraendert 5 Zeilen. Ebenso UNANGETASTET (0 Diff-Zeilen): die einarmige Naht axes/lookup/composable/organ_for_search_algo.hpp -- der golden-Anker.",
+        "BOOST-LINK-SATZ / Falsches-Gruen-Detektor: Include-Wachstum fand an zwei Stellen statt (abi_adapter -> search_algo_rebind.hpp; neue TU -> Umbrella/Registry). Die neue TU linkt Boost::mp11 EXPLIZIT (tests/unit/CMakeLists.txt:2351). Flaechen-Probe ueber den Bau-Baum: 511 .d-Dateien, davon 0 mit /usr/include/boost. search_algo_rebind.hpp ist bewusst boost-frei (nur <type_traits>).",
+        "cf22 mit dem ECHTEN Binary /home/comdare/tools/cf22/usr/bin/clang-format-22 (Version 22.1.8) und Datei-Argumenten, je Commit ueber den vollen Diff: PB-1 0/2, PB-2 0/5, PB-3 0/2 C++-Dateien. Messung in-place gegen den Basis-Stand gefahren (nicht via --assume-filename aus dem Scratchpad -- dort loest clang-format die .clang-format anders auf und meldete falsche 156 statt 0).",
+        "3-MARKER-GREP in Zeilenanfangs-Form ueber alle beruehrten Dateien: 0 Treffer. ASCII-Selbstcheck ueber ALLE ADDED-Zeilen von b09ebb8a..HEAD: 1 Treffer, und der ist deklariert -- eine BESTANDS-Zeile (abi_adapter-Include organ_for_search_algo.hpp mit dem Kommentar '(Pool->Organ)' als U+2192), die cf22 beim Einfuegen der Nachbarzeile um EIN Leerzeichen neu ausgerichtet hat. Kein neuer Nicht-ASCII-Inhalt.",
+        "FREEZE: git status --porcelain = 0 Zeilen nach jedem der drei Commits und am Ende. HEAD = c2bc0e2b89ca4d905f53f944295f20131f9af21d auf Branch phase-b-treiber, angelegt mit 'git checkout -b phase-b-treiber b09ebb8a'. KEIN Push, KEIN Merge, kein Remote-Touch.",
+        "GESAMT-DIFF-STAT PHASE B (b09ebb8a..c2bc0e2b): 11 Dateien, +929/-67. Davon Substanz-Header 5 (traversal_for_search_algo 117, tier_to_organ_mapping 105, organ_for_search_algo_shaped 153, axis_bound_scratch 59, abi_adapter 54), Tests 3 (neue Kontrast-TU 375, test_234_vb 63, test_s5_01c 24), Bau 2 (CMakeLists 12, tests/unit/CMakeLists 26), Kommentar-Rest 1 (flags.hpp.in 8)."
+      ],
+      "abweichungen": [
+        "A1 (Verschaerfung, PB-1) -- Der Plan sagte 'KEINE In-Header-static_asserts mit Allokator-Typen' (Include-Disziplin, Hotfix-Klasse cda964e0). Ich habe die Symmetrie trotzdem IM Header gepinnt, aber OHNE Allokator: das Mapping reicht den Strategie-Parameter der Rebound-Leaves nur durch und benutzt ihn nie, also genuegt ein unvollstaendiger Sonden-Typ (detail::TraversalSymmetrieSonde, nie definiert) als Argument. BEGRUENDUNG: das kostet 0 Include-Zeilen und macht die Datei selbst-beweisend, waehrend der eigentliche Grund des Verbots (neue Link-Kante) unberuehrt bleibt. Der volle Beweis ueber die reale Registry-Population mit echter fremder Strategie steht zusaetzlich weiterhin in der Familien-Wache, wie geplant.",
+        "A2 (ECHTE ZUSATZ-SUBSTANZ, PB-2 -- der wichtigste Abweichungs-Posten) -- axis_bound_scratch.hpp:84 'composition_allocator_t<Store>' lieferte HARTKODIERT den Achsen-Default und ignorierte den Store. Der Plan sah diese Datei nicht vor. Sie wurde faellig, weil der geplante Kontrast-Beweis (b) fuer BTree/BST ROT fiel: das Composed*-Organ meldet seine allocator_type ueber genau diesen Alias, haette also nach dem Organ-Faden eine Strategie GEMELDET, die sein Knoten-Pool gar nicht mehr benutzt -- und seine Schale (memento_t, Scan-Zwischenablage des Traversal-Organs) haette weiter am Achsen-Default alloziert. Ein Organ mit zwei internen Strategien ist exakt die Regression, die diese Strecke abstellt. 01c-1 hatte die Zeile SCHRIFTLICH als Restarbeit fuer genau diese Folgescheibe hinterlegt (axis_bound_scratch.hpp:73-75). Sie ist gedreht, mit Level-0-Pin + Level-1-Gegenprobe + Form-A-Sonde.",
+        "A3 (ehrliche Grenze, am Objekt aufgedeckt, PB-2) -- Beim Drehen von A2 fiel auf: nicht jeder Store, ueber dem eine Schale gebildet wird, TRAEGT eine Achsen-Bindung. Die heap-freien Form-A-Stores (NodeTypeSlotStore) haben bewusst keinen allocator_type. Statt das per Compile-Fehler zu erzwingen (was Form A kaputtmachen wuerde), gibt es eine CT-Fallunterscheidung ueber ein Concept: Form B erbt die Store-Bindung, Form A bleibt beim benannten Achsen-Default. Kein variant, kein Runtime-Switch. Drei Sonden pinnen alle drei Faelle (Default / fremd / Form A).",
+        "A4 (Ort, PB-2) -- Die Level-1-Gegenprobe des Shaped-Traits liegt in tests/unit/test_234_vb_rest_families_shaped.cpp statt in test_s5_01c_fassaden_conformance.cpp. BEGRUENDUNG: die 234-V-TU fuehrt den Shaped-Header UND eine ausgelieferte Referenz-Komposition mit fremder Strategie bereits im Include-Satz -- Include-Wachstum exakt 0. Die 01c-TU haette den Shaped-Header (und damit alle Pool-Stores) neu hereinziehen muessen. Der Allokator wird auch dort ABGELEITET (comp::ArtComposition::allocator), kein Mimalloc-Literal.",
+        "A5 (Verschaerfung nach eigenem Biss-Befund, PB-3) -- Die erste Fassung der v2-Aussage war 'Delta >= Treiber-Eigenanteil + Organ-Anteil' (run_workload_segmented_v2 treibt alle 18 Achsen, dort liegt Fremd-Allokation im selben Zaehler). Der Biss-Lauf am Alt-Stand zeigte, dass genau diese Zeile GRUEN blieb (4118 >= 4106) -- sie war zahnlos. Ersetzt durch einen DIFFERENZ-BEWEIS ueber zwei Kompositionen, die sich NUR im Such-Organ unterscheiden (linear_scan 9 vs vector_u16u16 18): der Fremd-Anteil kuerzt sich exakt heraus, und am Alt-Stand ist die Differenz zwangslaeufig 0 (4118 vs 4118). Jetzt beissen alle drei Treiber-Stellen.",
+        "A6 (Detail, PB-2) -- Der geplante Shaped-Neutralitaets-Pin sollte BtreeOrderKt8 nennen; dieser Name ist im Mapping-Header nicht sichtbar (er kennt bewusst keine Shape-Registry). Ersetzt durch die Vorgabe-Shape des Stores selbst via store_shape_of_t -- shape-unabhaengig gleichwertig und ohne Include-Wachstum. Ebenfalls Plan-konform NICHT angefasst: MasstreeOrgan und SwissTableOrganSimd (beide keine organ_for-Konsumenten -- der Plan erlaubte 'nur wenn trivial').",
+        "A7 (Kommentar-Umschrift, PB-1) -- Beim Umschreiben des Kommentarblocks am Ende von traversal_for_search_algo.hpp fielen 6 BESTANDS-Kommentarzeilen ('... wird BEWUSST NICHT hier gepinnt ...'), weil A1 die Aussage inhaltlich umkehrt. Substanz-neutral, im Diff sichtbar, hier deklariert statt still.",
+        "A8 (Bestand, deklariert statt geheilt) -- axis_03a_search_algo_flags.hpp.in hat 20 cf22-Befunde. Sie sind BESTAND: derselbe Aufruf am Basis-Stand b09ebb8a liefert dieselben 20, und b09ebb8a war CI-hart gruen (Pipeline 14615). .hpp.in ist eine cmake-Template-Datei (#cmakedefine01) und damit nicht in der CI-Format-Flaeche. Auf MEINEN Zeilen (33-38) liegen 0 Befunde. Nicht angefasst -- eine Formatierung der Datei waere eine substanzfremde Flaechen-Aenderung kurz vor dem Anker."
+      ],
+      "offene_punkte": [
+        "LANDUNG: Branch phase-b-treiber @ c2bc0e2b liegt landebereit in /home/comdare/wt-e24, Freeze 0, KEIN Push/Merge (auftragsgemaess Lead-Sache nach Review). Basis b09ebb8a, 3 Commits, tree sauber. Gate-Kadenz je Commit vollzogen; fuer die Landung fehlen noch die Lead-Schritte: rescue-Ref beide Remotes, Merge --no-ff in ce-development, Merge-Doppellauf, Lead-cf22-Abnahme ueber den Wellen-Diff, gitleaks, Push, CI-Wache am VOLL-SHA, main-FF, super-Gitlink + Ledger-Nachtrag.",
+        "POSTEN (neu, EHRLICHE GRENZE, war so geplant und ist NICHT gebaut): organ_hull_-Kompositionen bleiben Level-2-Identitaet. Reference-/PaperBinding-Kompositionen fuehren als search_algo bereits eine Organ-HUELLE (ObservableComposedContainer<XOrgan>, z.B. art_paper_binding_reference mit MimallocAllocator); ObservableComposedContainer traegt kein rebind_allocator (observable_composed_container.hpp:67 nur allocator_type). Fuer sie liefert die Naht weiter die Identitaet. Klasse EV-4/Level-2, ausserhalb der 320-Registry. Fuer den Owner-Block.",
+        "POSTEN (neu, Faden-Rest im selben Komplex): builder/anatomy_commands/anatomy_execution_context.hpp:50-63 ist der ZWEITE Trait-Konsument und bleibt einarmig (ohne CompAlloc). Er ist nicht der Genus-Erst-Instanziierungs-Punkt, deshalb in Phase B bewusst unangetastet -- aber der Faden ist dort noch nicht durchgezogen.",
+        "POSTEN (Bestand, unveraendert): die original_*-CODEGEN-Pfade bleiben T6-blind (EV-4, faithful-Doktrin) -- Vendor-Interna werden nicht achsen-gebunden.",
+        "MESS-SCHNITT-FENSTER (Posten 68, VOR Messbeginn): durch A2 alloziert jetzt auch die SCHALE eines Organs (memento_t, Scan-Zwischenablage) ueber die Kompositions-Strategie statt ueber den Achsen-Default. Die T6-EINSAMMEL-Regel muss das beruecksichtigen: Store-Snapshot (konstitutiv) + Organ-Snapshots + SCHALEN-Anteil sind jetzt drei disjunkte Instanz-Gruppen an derselben Strategie -- additiv, aber die Doppelzaehlungs-Regel und die CSV-Spalten-Zuordnung sind explizit zu entscheiden. Das war schon vorher der deklarierte Schritt des Mess-Schnitt-Fensters; Phase B hat die Naht nur real gemacht.",
+        "MESSTECHNISCH RELEVANT (Kenntnis fuer die Messung, keine Aktion jetzt): fuer Kompositionen mit fremder T6-Wahl materialisiert der Mess-Treiber ab jetzt den Rebound-Leaf statt der Fassade. name(), family_id, algo_version und der serialize-/binary_id-Schluessel sind compile-hart als invariant gepinnt; die GEMESSENEN Allokationszahlen dieser Kompositionen aendern sich aber -- und zwar genau um den bisher unsichtbaren Organ-Anteil (im Beleg: 9 von 4106 bei linear_scan, 18 bei vector_u16u16). Das ist der beabsichtigte Effekt, sollte aber beim ersten Vergleich gegen alte Mess-CSV bekannt sein.",
+        "NACH PHASE B: es folgt EIN ANKER-Vollzug (Pause-Doc Par.3 Punkt 2; GATE 5 = TP1-Neu-Inventur + A2-SHA512-Eichung GENAU EINMAL) -- er beendet die Job-Sperre. Messung Phase 6 bleibt USER-GO-STOPP.",
+        "FALLEN-KANON-ZUWACHS aus dieser Phase (fuer den Ledger): (a) der naive 'grep -c \"SearchAlgo algo;\"' liefert 3 statt 0, weil EffectiveSearchAlgo das Muster enthaelt -- Abschluss-Orakel brauchen Wortgrenzen; (b) cf22-Messung eines Basis-Stands NICHT ueber --assume-filename aus dem Scratchpad fahren (andere .clang-format-Aufloesung -> 156 statt 0 Befunde); in-place am echten Pfad messen; (c) eine '>='-Behauptung in einem Kontrast-Test ist so lange wertlos, bis der Biss-Lauf am Alt-Stand sie widerlegt hat -- hier blieb genau eine solche Zeile gruen und musste durch einen Differenz-Beweis ersetzt werden."
+      ]
+    },
+    "review": {
+      "befunde": [
+        "KEIN blockierender Befund. Alle Bau-Report-Claims halten der unabhaengigen adversarialen Pruefung am Objekt stand; G8-Flaeche exakt eingehalten (1 Include, 1 Klassen-Alias :2222, 1 static_assert, 6 Body-Zeilen :444/:445/:549/:550/:664/:667, 2 Trait-Argument-Stellen :2261-2263/:2275-2276, Rest Kommentar; 0 Treffer override/virtual/POD/Interface im gesamten Adapter-Diff).",
+        "B-1 (NUR-KENNTNIS, Aufraeumpass-Kandidat Posten-54-Klasse): die lokalen 'using SearchAlgo = typename A::composition_t::search_algo;'-Aliase in den drei Treiber-Bodies (libs/cache_engine/anatomy/abi_adapter.hpp:440/:545/:658-Umfeld) sind nach der EffectiveSearchAlgo-Ersetzung referenzlos -- plan-konform stehengelassen ('SONST NICHTS in dieser Datei'), harmlos, aber toter Alias fuer den Abschluss-Aufraeumpass.",
+        "B-2 (Fallen-Kanon-Zuwachs, kein Repo-Bezug): das Bauer-Scratchpad enthaelt Alt-Artefakte frueherer Biss-Laeufe (u.a. scratchpad/axes/), die Include-Overlay-Compiles kontaminieren -- mein erster Shadow-Header-Versuch fing sich exakt daran (Duplikat-Concept-Definitionen ueber gemischte Pfade). Rezept fuer kuenftige Biss-Nachvollzuege: Hardlink-VOLLKOPIE von libs/cache_engine (cp -al) + Pfad-Ersetzung im echten -c-Befehl statt Einzeldatei-Override.",
+        "B-3 (bestaetigt korrekt deklariert statt still gebaut): die vier offenen Posten des Reports stimmen am Objekt -- (i) organ_hull_-Kompositionen bleiben Level-2 (observable_composed_container.hpp traegt kein rebind_allocator), (ii) builder/anatomy_commands/anatomy_execution_context.hpp:50-63 bleibt einarmig (0 Diff), (iii) original_*-CODEGEN T6-blind, (iv) Mess-Schnitt-Folge der A2-Schalen-Drehung (drei disjunkte Instanz-Gruppen an derselben Strategie) ist echt und gehoert VOR Messbeginn entschieden.",
+        "B-4 (A8-Bestand bestaetigt): axis_03a_search_algo_flags.hpp.in traegt 20 cf22-Befunde IDENTISCH am Basis-Stand b09ebb8a (in gueltiger Messform: Basis-Inhalt mit Projekt-.clang-format daneben = 20; die --assume-filename-Scratchpad-Form liefert falsch 84 -- die vom Bauer gemeldete Falle reproduziert); auf den beruehrten Zeilen 30-40 liegen 0 Befunde.",
+        "B-5 (Messtechnik-Kenntnis, wie im Report): fuer Kompositionen mit fremder T6-Wahl steigen die gemessenen Allokationszahlen ab jetzt exakt um den Organ-Anteil (Beleg 9 bei linear_scan, 18 bei vector_u16u16) -- beim ersten Vergleich gegen Alt-Mess-CSV einzupreisen (Alt-CSV=Archiv-Doktrin)."
+      ],
+      "selbst_verifiziert": [
+        "OBJEKT-IDENTITAET + FREEZE: HEAD=c2bc0e2b89ca4d905f53f944295f20131f9af21d auf Branch phase-b-treiber, b09ebb8a ist Vorfahr (merge-base-Beweis), git status --porcelain = 0 Zeilen (vor UND nach allen Laeufen), Diff-Stat 11 Dateien +929/-67 exakt wie gemeldet; KEIN Remote-Ref phase-b (0 Treffer git branch -r), origin/development steht auf b09ebb8a -- kein Push/Merge/Remote-Touch.",
+        "GATE-BASIS + N-HERKUNFT am Commit-Objekt: warmer build-e24 ist ninja-no-op am HEAD ('ninja: no work to do', tree clean => Bau==Commit-Objekt); ctest -N = 'Total Tests: 403' live; add_test-Registrierungs-Arithmetik tests/unit/CMakeLists.txt 265(Basis)->266(HEAD), Root-CMakeLists 0 Test-Zeilen => Basis-N=402 (kommissions-attestiert Gate 402 + Pipeline 14615 gruen am b09ebb8a).",
+        "G8-/ABI-NEUTRALITAET BYTE-GENAU: kompletten Diff libs/cache_engine/anatomy/abi_adapter.hpp gelesen -- ausschliesslich die 5 erlaubten Flaechen + Kommentar + 1 cf22-Neuausrichtung zweier Bestands-Include-Kommentare; grep ueber alle +/- Zeilen auf override|virtual|struct Comdare|SegmentAccumulator|public I = 0; include/cache_engine/abi/ Diff = 0 Zeilen; anatomy/ ausser abi_adapter 0 Dateien; profile_facade/, src/sha512/, builder/ Diff = 0 (CRC64-Anker, Fingerprint, Loader unberuehrt).",
+        "TABU/XML/WIRE: git diff b09ebb8a..HEAD auf algorithm_profiles/, tests/unit/thesis_tiere/, measurement/system_axis_registry.xml = 0 Zeilen; 0 XML-Dateien im Gesamt-Diff; git status nach Voll-Bau+allen Test-Laeufen = 0 (XML generatorseitig byte-stabil); ComdareSegmentLatencyV1/V2-traegende Dateien nicht im Diff.",
+        "DOPPELWURZEL-ENTSCHEID: libs/cache_engine/topics/ = 0 Diff-Dateien; Weiterleitungs-Header topics/traversal/axis_03a_search_algo/composable/tier_to_organ_mapping.hpp unveraendert exakt 5 Zeilen (selbst gelesen); golden-Anker axes/lookup/composable/organ_for_search_algo.hpp = 0 Diff-Zeilen.",
+        "EFFECTIVESEARCHALGO-SEMANTIK SELBST NACHVOLLZOGEN: Treiber-Arithmetik am Quelltext abgeleitet (run_workload :463 1x lbuf-allocate + do_batch Warmup + 1 Mess-Batch a kChurn=2048 => 4097); Kontrast-TU am Commit-Objekt EXIT=0 mit literal Organ-Anteil 9 / Fassaden-Anteil 0 / Delta 4106==4097+9 / segmented 4106 / v2 4127 vs 4136 mit Differenz -9 == Organ-Anteil-Differenz; Abschluss-Orakel selbst gefahren: EffectiveSearchAlgo an :444/:445/:549/:550/:664/:667 + EIN Alias :2222; Wortgrenzen-grep 'SearchAlgo algo;' = 0 (naive Form = 3, Falle reproduziert).",
+        "EIGENER ANTI-ZEMENTIERUNGS-BISS PB-3 OHNE REPO-TOUCH: Hardlink-Vollkopie von libs/cache_engine ins Scratchpad, NUR die 6 Body-Zeilen zurueckgedreht (Alias+Wache stehen), echter -c-Compile-Befehl aus ninja -t commands (nicht der -E-Modul-Scan), Pfade ersetzt: Lauf ROT EXIT=1 mit 5 FAILs, Delta=4097 (run_workload+segmented), v2 beide 4118/4118 => Differenz-Beweis beisst an der dritten Stelle real (A5-Verschaerfung bestaetigt notwendig und wirksam).",
+        "UNABHAENGIGE REBOUND-INVENTUR (eigene Compile-Probe ueber lk::AllStrategies + fremde Strategie aus ArtPaperBindingComposition, echter Compile-Befehl der Conformance-TU): AllStrategies=22 | non-void-Fassaden=11 | Luecken (non-void-Fassade mit void-Rebound)=0 | migriert=22 | umgekehrte Drift=0, EXIT=0. GEGENPROBE am BASIS-Stand (b09ebb8a-Traversal-Header in der Kopie): Symmetrie- und Luecken-Assert brechen, und die Zaehl-Variante 'Luecken==7' kompiliert GRUEN => am Basis-Stand waren es GENAU die 7 gemeldeten Luecken. Zusaetzlich Ebene (10) gelesen: laeuft ueber MigrierteOrgane==AllStrategies (22/22-Pin test_s5_01c:254), beisst beidseitig.",
+        "EIGENER DOPPELLAUF am finalen Commit-Objekt (build-e24, seriell -j1, nice): 3 Voll-Laeufe, davon 2 literal '100% tests passed, 0 tests failed out of 403', alle EXIT=0, keine Flake; golden 3x literal '100% tests passed, 0 tests failed out of 1' (Label golden = test_profile_roundtrip); Roundtrip literal 7 (dll_roundtrip) + 4 (registry/profile) = 11/11 gruen.",
+        "CF22 MIT ECHTEM BINARY: /home/comdare/tools/cf22/usr/bin/clang-format-22 (22.1.8) mit Datei-Argumenten in-place ueber alle 8 C++-Dateien des Gesamt-Diffs = 0 Befunde je Datei; flags.hpp.in 20 Befunde an Basis UND HEAD identisch (Bestand; beruehrte Zeilen 0 Befunde); --assume-filename-Falle reproduziert (84 statt 20).",
+        "MARKER/ASCII/BOOST: 3-Marker-grep in Zeilenanfangs-Form ueber alle 11 beruehrten Dateien = 0; ASCII-Check ueber ALLE ADDED-Zeilen des Gesamt-Diffs = exakt 1 Treffer (die deklarierte U+2192-Bestands-Include-Kommentar-Neuausrichtung im abi_adapter); .d-Detektor: 511 .d-Dateien im Bau-Baum, 0 mit /usr/include/boost; search_algo_rebind.hpp selbst gelesen: nur <type_traits>, boost-frei; neue TU linkt Boost::mp11 explizit (tests/unit/CMakeLists.txt-Diff gelesen).",
+        "SUBSTANZ-HEADER VOLLGELESEN: traversal_for_search_algo.hpp (7 Fwd-Decls + 7 partielle Spezialisierungen + 8 Symmetrie-Pins ueber unvollstaendigen Sonden-Typ, 0 Include-Wachstum), tier_to_organ_mapping.hpp (11 Bound-Formen + 4 defaultierte Shaped-Formen + store_shape_of_t + 12 Level-0-Pins), organ_for_search_algo_shaped.hpp (11 Familien, 4 Shape-Familien beidarmig, 11 Level-0-Pins per Makro, Primaerfall CompAlloc-inert), axis_bound_scratch.hpp (CT-Fallunterscheidung Form A/B per Concept, kein variant/Runtime-Switch, 3 Sonden-Pins), test_234_vb-Level-1-Gegenprobe (abgeleiteter Fremd-Allokator, kein Literal) -- alle Abweichungen A1-A8 am Objekt geprueft und plausibel begruendet; Ledger-/Plan-Vorlauf gelesen (phase-b-plan.md, Pause-Doc, Ledger-Nachtraege nacht-3..vormittag-1, G8-Negativliste)."
+      ],
+      "verdikt": "LANDEBEREIT"
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Planung"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "plan:phase-b",
+      "phaseIndex": 1,
+      "phaseTitle": "Planung",
+      "agentId": "a7c2a109dcf6e4fa7",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785921321116,
+      "queuedAt": 1785921321107,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "PLAN FERTIG (read-only eingehalten; einzige Schreibung = ph…",
+      "promptPreview": "PLANUNGS-AUFTRAG PHASE B (READ-ONLY; Plan-Datei nach /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/phase-b-plan.md schreiben — einzige Schreib-Erlaubnis):\n\nKONTEXT PHASE B (Pause-Doc /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260805-PAUSE-abbruchsicher-01c-komplett-vor-phase-b-anker.md §3 Punkt 1 — LESEN):\nAm Objekt verifiziert…",
+      "lastProgressAt": 1785922147287,
+      "tokens": 175394,
+      "toolCalls": 47,
+      "durationMs": 826171,
+      "resultPreview": "{\"status\":\"PLAN FERTIG (read-only eingehalten; einzige Schreibung = phase-b-plan.md im Scratchpad). Pflicht-Vorlauf 1-7 vollstaendig am Objekt b09ebb8a gefahren: Ledger 04./05.08.-Nachtraege (h81 nacht-3, Rezept nacht-4/-5, 05q vormittag-1), Pause-Doc Par.3+Par.6, Design-Backup designs[0].r.t6_durchbindung, abi_adapter :400-:700 + :2195-:2284 (alle 3 Treiber-Stellen liegen KOMPLETT unter #if COMDA…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "probe:opus5",
+      "phaseIndex": 2,
+      "phaseTitle": "Bau",
+      "agentId": "a83de8eac47d70042",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785922147288,
+      "queuedAt": 1785922147287,
+      "attempt": 1,
+      "promptPreview": "Antworte NUR mit OK.",
+      "lastProgressAt": 1785922149379,
+      "tokens": 21128,
+      "toolCalls": 0,
+      "durationMs": 2091,
+      "resultPreview": "OK"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "bau:phase-b",
+      "phaseIndex": 2,
+      "phaseTitle": "Bau",
+      "agentId": "aabc1df15b89f76e9",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785922149388,
+      "queuedAt": 1785922149379,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "PHASE B FERTIG (3/3 Commits, jeder mit vollem Gate; Branch …",
+      "promptPreview": "ARBEITSAUFTRAG PHASE B — BAU (nach freigegebenem Plan; G8-Flaeche = hoechste Sorgfalt):\n\nKONTEXT PHASE B (Pause-Doc /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260805-PAUSE-abbruchsicher-01c-komplett-vor-phase-b-anker.md §3 Punkt 1 — LESEN):\nAm Objekt verifiziert (Basis b09ebb8a, Gate 402): grep 'search_algo_for_composition|EffectiveSearchAlgo' in libs/cache_en…",
+      "lastProgressAt": 1785925075135,
+      "tokens": 335896,
+      "toolCalls": 159,
+      "durationMs": 2925746,
+      "resultPreview": "{\"status\":\"PHASE B FERTIG (3/3 Commits, jeder mit vollem Gate; Branch phase-b-treiber @ c2bc0e2b ab b09ebb8a, Freeze 0, KEIN Push/Merge). Alle fuenf Auftragsteile geliefert: (1) EffectiveSearchAlgo EINMAL am Genus-Erst-Instanziierungs-Punkt + Konsum an allen 3 Treiber-Stellen; (2) Organ-Pfad-Faden NUR ueber die Substanz-Wurzel axes/ (topics/-Weiterleitung byte-unangetastet, 0 Diff-Zeilen); (3) Tra…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "rev:phase-b",
+      "phaseIndex": 3,
+      "phaseTitle": "Review",
+      "agentId": "a07eef7c81aa9c52d",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785925075142,
+      "queuedAt": 1785925075135,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDEBEREIT",
+      "promptPreview": "REVIEW-AUFTRAG Fable PHASE B (READ-ONLY /home/comdare/wt-e24, Branch phase-b-treiber, Basis b09ebb8a): Adversarial — G8-Flaeche, hoechste Latte. Bau-Report: {\"status\":\"PHASE B FERTIG (3/3 Commits, jeder mit vollem Gate; Branch phase-b-treiber @ c2bc0e2b ab b09ebb8a, Freeze 0, KEIN Push/Merge). Alle fuenf Auftragsteile geliefert: (1) EffectiveSearchAlgo EINMAL am Genus-Erst-Instanziierungs-Punkt + …",
+      "lastProgressAt": 1785925925898,
+      "tokens": 201836,
+      "toolCalls": 76,
+      "durationMs": 850756,
+      "resultPreview": "{\"befunde\":[\"KEIN blockierender Befund. Alle Bau-Report-Claims halten der unabhaengigen adversarialen Pruefung am Objekt stand; G8-Flaeche exakt eingehalten (1 Include, 1 Klassen-Alias :2222, 1 static_assert, 6 Body-Zeilen :444/:445/:549/:550/:664/:667, 2 Trait-Argument-Stellen :2261-2263/:2275-2276, Rest Kommentar; 0 Treffer override/virtual/POD/Interface im gesamten Adapter-Diff).\",\"B-1 (NUR-KEN…"
+    }
+  ],
+  "totalTokens": 734254,
+  "totalToolCalls": 282
+}
