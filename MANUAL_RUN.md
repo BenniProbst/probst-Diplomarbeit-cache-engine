@@ -215,7 +215,9 @@ die `ceb:emit`-Jobs rufen `tier ci` → Grandchild-Pipeline (Nesting parent→ch
 Emittierte YAML vor dem Scharfschalten per **GitLab-CI-Lint** prüfen. W1 (05.08.2026): die
 super-`.gitlab-ci.yml` ruft die vier Planer-Stellen (`visibility:tier-binaries` `plan dump`, die
 beiden Mess-Pre-Flights `validate`, `planer:delegate` `plan ci`) über
-`comdare-experiment-planner`; die Jobs bauen das ce-Target zusätzlich. Historisch standen dort die
+`comdare-experiment-planner`; die drei erstgenannten Jobs bauen das ce-Target **zusätzlich** zum
+Treiber, `planer:delegate` baut seit W1 **nur noch** das Planner-Target (der Treiber-Bau entfällt
+dort — die emittierten `ceb:build`-Jobs bauen ihn selbst). Historisch standen dort die
 Alt-Flags am Treiber — funktional identisch, aber seit W1 beantwortet der Treiber sie mit einer
 Verweis-Zeile.
 
