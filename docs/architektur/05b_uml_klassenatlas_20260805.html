@@ -68,6 +68,7 @@ article.k.aus,section.subsys.aus{display:none}
   <h1>UML-Klassenatlas</h1>
   <p class="sub">comdare-cache-engine<br>libs/cache_engine</p>
   <a class="e" href="#uebersicht"><span>Architektur-Übersicht (Layer)</span></a>
+  <a class="e" href="#kette"><span>Vertragskette Planer→CEB→Tier</span></a>
   <div class="grp">L0 · Planer (E4/E3-Plan)</div>
   <a class="e" href="#sh-27"><span>Builder: experiment_tree (E3-Permutationsmaschine)</span><span class="c">71</span></a>
   <a class="e" href="#sh-33"><span>profile_facade + compositions + subsystems</span><span class="c">115</span></a>
@@ -254,6 +255,148 @@ article.k.aus,section.subsys.aus{display:none}
 <p class="hinweis">Zahlen-Kanon: <b>3</b> Gattungen (Ebene 1), <b>5</b> Genera (Ebene 2), <b>18</b> Organ-Haupt-Achsen (<code>abi::kOrganAxisCount</code>, <code>anatomy_version_stamp.hpp:39</code>), <b>5</b> Organ-Kategorien (kOrganGruppen). Nur GoF-Muster als Laufzeit-Idiome (Command, Observer, Strategy, Chain of Responsibility, Builder/Director im Planer); Haupt-Achsen strikt compile-time, keine <code>std::variant</code>-Achsen. Tests sind nicht Teil des Atlas.</p>
 </div>
 </section>
+<section class="subsys" id="kette">
+<h2>Die Vertragskette: Planer → CEB → Tier-Binary (SOLL/IST nach Audit 05.08.)</h2>
+<p class="meta">Quelle: adversarialer Ketten-Audit 05.08.2026 (Synthese + Lens ist-planer/ist-ceb), Objekt <code>ce=b09ebb8a</code> (READ-ONLY) + <code>super/02_messung_driver</code>; alle Aussagen mit Fundstelle am Objekt verifiziert. Regressionen (JETZT-Pflicht verletzt) sind <b class="reg">rot</b> markiert, bewusst-Deferred (markiert, kein stiller Verlust) <span class="grau">ausgegraut</span>.</p>
+<style>
+#kette b.reg{color:#c43b2f}
+:root[data-theme="dark"] #kette b.reg{color:#e8756a}
+@media (prefers-color-scheme: dark){#kette b.reg{color:#e8756a}}
+:root[data-theme="light"] #kette b.reg{color:#c43b2f}
+#kette .grau{color:var(--ink2);opacity:.75}
+#kette table.verdikt{border-collapse:collapse;font-size:13px;min-width:680px}
+#kette table.verdikt th{text-align:left;border-bottom:2px solid var(--acc);padding:4px 12px 4px 0}
+#kette table.verdikt td{border-bottom:1px solid var(--line);padding:4px 12px 4px 0;vertical-align:top}
+</style>
+
+<h3>1 · Die eine Kette (L0) — SOLL-Glieder mit IST-Markierung</h3>
+<div class="dia"><pre class="mermaid">flowchart LR
+ U["User + Anwender-XML<br>comdare_thesis_profile / comdare_experiment<br>Profil: Argument &gt; COMDARE_THESIS_PROFILE &gt; Default"] --> P
+ P["PLANER<br>SOLL: eigene Binary mit User-CLI (Owner-KERN 05.08.)<br>IST: Planer-Rolle im comdare-messung-driver<br>REGRESSION R-G1"] --> RES
+ RES["XML/Registry-Resolve<br>3-Registry-Trio = ANGEBOT<br>autoritative XML = ANZEIGE<br>validate-Pre-Flight-Gate vor jedem Bau"] --> EM
+ EM["CEB-Emission<br>Director-Walk: ceb:build / ceb:emit / ceb:trigger<br>je Mess-Combo [a,b,c]<br>IST: generischer Treiber statt harter Kompilation<br>REGRESSION R-G3"] --> DOCK
+ DOCK["Experiment-Dock-Vertrag<br>LIVE: emittierter CMake-/YAML-Text + Env"] --> CMD
+ DEP["DEPRECATED: Teilbaum-Payload S5-P4<br>+ R1 .so-ABI, Band-C DEFERRED #19"] -.-> DOCK
+ CMD["CEB-Befehle<br>SlicePlanner 4096er-Scheiben<br>lazy Iterator-Kette · ram_spool 256MB"] --> GATE
+ GATE["Prüf-Dock<br>Oracle-Gate VOR der Messung<br>import → GATE → nur bei pass messen"] --> TIER
+ TIER["Tier Bau + Messen<br>BuildOrchestrator g++-16 → perm_&lt;id&gt;.so<br>1-Thread-Messung"] --> WB
+ WB["Rückschrieb<br>EIN CSV je Zelle + Bestandslog-XML<br>NICHT übers Dock"]
+ WB -. "§38-Cursor: messdatenfrei; kein Rück-Leser (offen)" .-> P
+ classDef reg stroke:#c43b2f,stroke-width:2.5px
+ classDef dep stroke-dasharray:6 4,opacity:0.65
+ class P,EM reg
+ class DEP dep
+</pre></div>
+<p class="hinweis">Der Rück-Pfeil ist der §38-Fortschritts-Cursor (ProgressDelta, mixed-radix, ausdrücklich ohne Mess-Daten-Rückfluss) — er wird heute nur von CI-Log/Mensch gelesen; einen Planer-Rück-Leser für <code>progress.cursor</code> gibt es nicht (§52-B14-Restpunkt&nbsp;1, offen). Die Sequenzierung der Mess-CEBs leistet stattdessen die CI-<code>resource_group</code> (§38.b).</p>
+
+<h3>2 · Die Glieder im Detail (L1)</h3>
+
+<div class="legende">
+<h3>Planer-CLI-Grammatik (Glied 1)</h3>
+<ul>
+<li>Shell-CLI VOLL vorhanden (clig.dev-Konvention): Subkommandos <code>validate | plan dump/ci/cmake | tier ci/cmake | cache-key | fingerprint | run | version | help</code>; Exit-Code-Grammatik <code>0/1/2/5/6/7</code> (<code>super/02_messung_driver/main.cpp:551-577</code>); Alt-Flags als DEPRECATED-Aliase kanonisch migriert.</li>
+<li>Planer-Eigen-Version vorhanden: <code>planner_version.hpp</code> (profile_facade/planner/, 1.5); Mess-Achsen-Trägerschaft erfüllt (<code>PlanMeasurementCombo</code> = äußerste Walk-Ebene); manuelles Fahren mit XML-Config erfüllt.</li>
+<li>Rollen-Split nur über CLI-Modi: <code>plan ci|cmake</code> = Planer-Rolle (trägt das planer_block-Gate), <code>tier ci|cmake</code> = CEB-Rolle (explizit KEIN planer_block).</li>
+<li><b class="reg">Offene Bau-Kante (Owner-KERN 05.08.)</b>: „Der Planer ist ZWINGEND eine eigene Binary“ — der physische Binary-Split (R2-Kopplung) hat nicht stattgefunden; <code>main.cpp:552</code> deklariert selbst „Planer- + CEB-Rolle in EINEM Binary“, im ce-Repo existiert kein Planer-Target (Vollabsuche <code>add_executable</code>). Das ist die Kopf-Regression der Kette (R-G1).</li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>Resolve-DOPPELPFAD (Glied 2) — zwei getrennte Pfade, die Divergenz ist ein Befund</h3>
+<ul>
+<li><b>(a) Plan-Pfad</b>: <code>read_axis_registry_trio</code> liest die 3 art-spezifischen Registries (Organ/System/Mess) über CMake-Interface-Defines mit EINEM Parser; der S3-P-RESOLVER schreibt einen <code>ResolverReport</code> als reine <b>ANNOTATION</b> in den Plan-Kopf — „Resolver annotiert, entscheidet nicht“ (<code>director:37</code>), fehlende Registry ⇒ graceful INERT, „KEIN Exit!=0 im run/build-Pfad“ (<code>facade:852-857</code>).</li>
+<li><b>(b) validate-Gate</b>: HARTER Validierungsfehler für Unregistriertes — „UNBEKANNTE Achse … r.ok=false“ (<code>validate_profile.hpp:1218-1220</code>), als Pre-Flight VOR jedem Bau gegated (<code>facade:996-999</code>); arbeitet aber mit dem 2-Registry-Kanon (ce+prt).</li>
+<li><b class="reg">Befund (klein)</b>: Registry-Kanon-Divergenz je Pfad (validate = 2er, plan = 3er-Trio); im Plan-Emissions-Pfad ist Unregistriertes nur Annotation/INERT — der Kern des Vertrags (harter Fehler vor jedem Bau) ist gewahrt.</li>
+<li><span class="grau">Voller .pom-Link (<code>LinkedExperimentPlan</code>, 5-tiefer #19-Resolver): Band-C DEFERRED #19, im Code markiert; Design-Frage D3 offen.</span></li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>CEB-Emission (Glied 3) — Director + 6 Builder, Fan-out, §38.b</h3>
+<ul>
+<li>GoF Director+Builder REAL: <code>ExperimentPlanDirector::construct</code> + <code>IPlanBuilder</code> mit 6 ConcreteBuildern (PlanText / PlanSize / CMakeGraph / CiYaml / TierCiYaml / TierCmakeGraph); EIN deterministischer Walk: Mess-Combo → System-Perm (opt×simd) → Steps.</li>
+<li>Fan-out multipler CEBs je <code>&lt;measurement_tooling&gt;</code>-Combo real (<code>measurement_combos_of</code>); leeres Tooling ⇒ <code>[all]</code> = vereinter Tooling-Default (§64 konform); Kollisionsschutz per <code>--measurement-combo</code>-Selektor.</li>
+<li>§38.b-Sequentialisierung: <code>resource_group "ceb-&lt;slug&gt;"</code> bzw. <code>"ceb-measure-&lt;host&gt;"</code> am Build-Batch UND am Mess-Batch (<code>director:1104, :1239</code> — §52-B14-Restpunkt&nbsp;3 am Objekt GESCHLOSSEN) + 1-Thread-Messpolitik.</li>
+<li>CEB-Stempel: <code>ceb_version_stamp.hpp</code> = Mess-ANGEBOT [a,b,c] + SHA-512-Provenienz, bewusst zellwertfrei (W10-C3: „die CEB ist KEIN Tier-Binary“).</li>
+<li><b class="reg">REGRESSION R-G3</b>: Der Planer kompiliert NICHTS hart je Messsystem — der emittierte ceb:build-Job baut per <code>cmake --build build --target comdare-messung-driver</code> stets DENSELBEN generischen Treiber (<code>director:769-770</code>) und testiert ihn als CEB; die Messsystem-Differenzierung [a,b,c] kommt zur Laufzeit per Env <code>COMDARE_MEASUREMENT_COMBO</code> in dieselbe Binary — exakt die von §30.6 ausgeschlossene Runtime-Konfiguration, durch keinen markierten Deferred-Posten gedeckt.</li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>Dock-Vertrag: der LIVE-Draht (Glied 4)</h3>
+<ul>
+<li><code>COMDARE_GOLDEN_N_PROFILE</code> — Profil-Pin: die CEB liest die autoritative Anwender-XML <b>SELBST erneut</b> (XML-Re-Read durch denselben Parser); der Plan reist NICHT als aufgeschlüsselte Datenstruktur.</li>
+<li><code>COMDARE_GN_OPT</code> / <code>COMDARE_GN_SIMD</code> — System-Achsen je Perm als Env-EINZELWERTE.</li>
+<li><code>COMDARE_GOLDEN_N_RANGE="start:count"</code> — Organ-Raum als LINEARES Index-Fenster in 4096er-Scheiben; keine per-Achse-Ranges im Draht (durch #19-Deferral gedeckt).</li>
+<li><code>COMDARE_MEASUREMENT_COMBO</code> — Mess-Kombination [a,b,c] als CEB-Identität; dazu Modus-Schalter (PROVISION_ONLY, PRUEF_ONLY, BUILD_PARALLEL, LANE, HEARTBEAT_EVERY).</li>
+<li><span class="grau">Ausgegraut daneben: <code>ExperimentSubtreePayload</code>/<code>AxisRangeEntry</code> (Ranges je Achse, exakt der SOLL-Teilbaum, getestet mit Byte-Roundtrip) — per S5-P4-Ruling 20.07. DEPRECATED/inert, never-delete, Referenz-Serialisierung für den #19-Resolver; und das .so-ABI (R1): nicht vorhanden, Textemission im Code als bewusster Entscheid markiert („Band-C DEFERRED (Task #19)“, <code>experiment_dock_payload.hpp:57-64</code>), §60-R1-Prüf-Auftrag offen → Owner.</span></li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>Rück-Kanal (§38)</h3>
+<ul>
+<li><code>ProgressDelta</code>: erste Meldung eines Fensters = Voll-Konfiguration, danach mixed-radix-minimale Deltas, <code>done=true</code> GENAU EINMAL am Fensterende — „KEIN Mess-Daten-Rückfluss“ (SOLL-konform sparse).</li>
+<li>Emission: zeit-gedrosselte <code>[progress]</code>-Zeilen nach stderr + additiv in <code>progress.cursor</code>; dazu Testat-Grammatik <code>[heartbeat]</code> / <code>[CEB-TESTAT]</code> / <code>[PRUEF-TESTAT]</code> / <code>[BATCH-BAU]</code> mit <code>fenster=START:COUNT</code>.</li>
+<li><b class="reg">Konsument heute = CI-Log/Mensch</b>: der Sink ist „REINER BEOBACHTER … er steuert nichts“ (<code>main.cpp:1391-1394</code>); <code>progress.cursor</code> hat keinen Rück-Leser — das §38.b-Fertig-Signal trägt damit NICHT die Planer-Sequenzierung (Restpunkt offen; künftiger Planer-Rück-Leser = gestrichelter Pfeil im Diagramm).</li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>CEB-intern (Glied 5, Maschinerie)</h3>
+<ul>
+<li>Batch 4096 zweifach verankert: <code>kGnBatchSlice</code> (director:542) == <code>kBuildSliceGrain</code> (planer_driven_build.hpp:46) == 4096; async Producer/Consumer <code>SlicePlanner</code>/<code>SlicePlanQueue</code> mit per-Binary-Miss-Erkennung; Fenster-Schleife INNERHALB EINES Batch-Jobs je Host (O(Maschinen)-Emission — der frühere Einzel-Job-je-Perm×Chunk-Verstoß ist behoben).</li>
+<li>RAM-Puffer: <code>ram_spool</code> 256&nbsp;MB / 12-Trigger + SpoolWriter-Thread (io_uring/portables Backend) für BAU-Artefakte; <span class="grau"><code>in_memory_measurement_buffer/</code> ist leerer Platzhalter (unmarkierte Kleinst-Lücke; Messwerte laufen über result.csv/MeasurementSinkFn)</span>.</li>
+<li>Lazy Kette ohne ∏-Voll-Materialisierung: <code>StaticBinaryView</code> O(K) → <code>AnatomyModuleLoader</code> → <code>RuntimeVariableLoop</code> ohne Neu-Bauen (<code>run_lazy_static_then_dynamic</code>); die eager Legacy-<code>PermutationLoop</code> ist sauber als Demo-Strecke getrennt.</li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>Prüf-Dock (Pruefstand VOR der Messung)</h3>
+<ul>
+<li>Je Anatomie-Gattung EIN Prüf-Dock; <code>IPruefDock</code> ist KEINE ABI-Grenze (lebt im Builder-Binary) — die ABI-Grenze ist das gattungs-eigene Antriebs-Sub-Interface.</li>
+<li>Reihenfolge bindend: „import → GATE → (nur bei pass) messen“ (<code>conformance_gate.hpp:1-9</code>); Oracle = <code>std::map&lt;uint64,uint64&gt;</code>-Hüllen-Konformität über ALLE Randfälle; <code>pruef_dock_sequencer</code> gattungs-sequentiell; <code>COMDARE_PRUEF_ONLY</code>-Standalone je Perm nach der Fenster-Schleife (<code>[PRUEF-TESTAT]</code>).</li>
+<li><b class="reg">Regression (Wortlaut)</b>: kein GTest im Prüfstand (grep gtest in pruef_dock/ = 0) — §62-B fordert verbatim „GOOGLE-TESTS als PRUEFSTAND“; das std::map-Oracle-Gate ist funktional äquivalent, die Werkzeug-Abweichung aber unmarkiert → Owner-Rückfrage. Ebenso <b class="reg">#54</b>: Instrumentierung per Env/Job-Text (XML-abgeleitet, Profil-Pin) statt „per XML-ANWEISUNG“ — semantisch nah, Wortlaut nicht erfüllt.</li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>Rückschrieb-Pfad</h3>
+<ul>
+<li>Durch die CEB SELBST, ausdrücklich NICHT über den Dock-Rück-Kanal (der ist messdatenfrei): <code>result.csv</code> + <code>result.csv.stamp</code> je Binary mit Resume/stale-Sichtbarkeit („Mess-Fehler ⇒ CSV 'failed' + Log“).</li>
+<li>EIN CSV je Zelle nach <code>measure_out/&lt;slug&gt;/perm&lt;idx&gt;</code> (SOLL §42.b wörtlich erfüllt) → <code>MeasurementSinkFn</code>/measure-drop → <code>messwert_registrierung</code> → Bestandslog-measurement-XML (MinIO, doc_revision monoton, Byte-Roundtrip).</li>
+<li>Präzisierung: SOLL 5.5 fordert Rückschrieb „ans in der XML GENANNTE Ziel“, nicht in die Anwender-XML — die CSV-/measurement-Ziele sind die richtige Leserichtung; kein Verstoß.</li>
+</ul>
+</div>
+
+<div class="legende">
+<h3>Querschnitts-Legende an den Kanten</h3>
+<ul>
+<li><code>[a,b,c]</code> (Mess-Kombination) → bestimmt die <b>CEB</b> (CEB-TYP/Identität, Stempel-Legende).</li>
+<li><code>[d,e,f]</code> (System-Achsen) ALLEIN → versionieren das <b>Tier</b>-Artefakt (<code>+opt=..+ext=..</code>-Suffix).</li>
+<li><code>[d,e,f]+[g,h,i]+HW</code> → identifizieren den <b>Messwert</b> — die Schichten werden nie fusioniert (Testat-/Replay-Schichtung).</li>
+</ul>
+</div>
+
+<h3>3 · SOLL/IST-Verdikt je Kettenglied (Audit 05.08.)</h3>
+<div class="legende" style="overflow-x:auto">
+<table class="verdikt">
+<thead><tr><th>Glied</th><th>Verdikt</th><th>Begründung (1 Satz)</th></tr></thead>
+<tbody>
+<tr><td>1 · Planer = eigene Binary mit User-CLI</td><td><b class="reg">REGRESSION</b> (CLI-Anteil konform)</td><td>Das Shell-CLI ist voll da, aber der Planer ist nur eine Rolle im comdare-messung-driver („EINE Binary in zwei Rollen“) — der Owner-KERN 05.08. hebt die eigene Binary zur harten Struktur-Pflicht, damit ist der Ist-Stand formal Regression mit Umbau-Auftrag (R2-Split).</td></tr>
+<tr><td>2 · XML-Interpretation (3 Registries + Anwender-XML, .pom)</td><td>TEIL-KONFORM</td><td>Parse beider Wurzeln, Trio-Lesen und harter Validierungsfehler als Pre-Flight vor jedem Bau stehen; der Rest ist die Pfad-Divergenz (Plan-Annotation INERT vs validate-Gate hart, 2er- vs 3er-Kanon) plus der bewusst deferred #19-Voll-Link.</td></tr>
+<tr><td>3 · Planer BAUT die CEB (hart kompiliert je Messsystem)</td><td>TEIL-KONFORM, <b class="reg">Kernsatz-Verstoss = REGRESSION</b></td><td>Director+Builder, Fan-out und §38.b-Sequenzierung sind real — aber ceb:build rekompiliert stets den generischen Treiber und differenziert das Messsystem zur Laufzeit per Env, exakt die von §30.6 ausgeschlossene Runtime-Konfiguration ohne deckenden Deferred-Posten.</td></tr>
+<tr><td>4 · Experiment-Dock-Vertrag (Teilbaum, Ranges je Achse; R1)</td><td><span class="grau">BEWUSST-DEFERRED</span> (Vertragsform) / TEIL-KONFORM (Rück-Kanal)</td><td>Das volle Wire-Format existiert getestet, ist aber per S5-P4-Ruling DEPRECATED/inert und die Live-Übergabe läuft als Text+Env — im Code selbst als bewusster Entscheid markiert (Band-C #19), also kein stiller Doktrin-Verlust; die R1-.so-Frage liegt beim Owner.</td></tr>
+<tr><td>5 · CEB führt aus (lazy, 4096, Prüfstand, Rückschrieb)</td><td>TEIL-KONFORM</td><td>Die Kern-Maschinerie (lazy O(K), 4096er-Slices, Oracle-Gate vor Messung, Rückschrieb EIN CSV je Zelle + Bestandslog) ist konform; benannte Abweichungen: <b class="reg">kein GTest</b>, <b class="reg">#54-Instrumentierung per Env statt XML-Anweisung</b>, <b class="reg">kein Planer-Rück-Leser am §38.b-Signal</b> (Command-Pattern-Ablösung durch compile-time AxisCommand ist CT-Kanon-konform dokumentiert, keine Regression).</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>4 · Korrektur zur Architektur-Übersicht</h3>
+<p class="z"><b>CEB == CacheEngineBuilder (Owner 05.08.)</b>: die Binary <code>apps/cache_engine_builder</code> (<code>add_executable cache_engine_builder</code>, Library-Wrapper um <code>comdare::builder::ExperimentDriver</code>, REV 7.6) — die frühere Fußnote („Die CEB ist keine einzelne Klasse“) war irreführend gerahmt. <b>ACHTUNG</b>: dieser Legacy-Orchestrator ist NICHT die Soll-CEB der Kette; die heutige CEB-Rolle trägt der <code>comdare-messung-driver</code> (Audit Glied 1/3).</p>
+</section>
+
+
 <section class="subsys" id="sh-27">
 <h2>Builder: experiment_tree (E3-Permutationsmaschine)</h2>
 <p class="meta">75 Klassen/Structs/Enums/Concepts | 36 Header | libs/cache_engine/builder/experiment_tree/*.hpp</p>

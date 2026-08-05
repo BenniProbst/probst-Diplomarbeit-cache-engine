@@ -37,3 +37,7 @@ Der Owner-Review der Erstausgabe ergab drei berechtigte Befunde; die HTML-Fassun
 ## Aktualisierung
 
 Neuerhebung nach groesseren Struktur-Wellen: Extraktions-Workflow erneut ueber `libs/cache_engine` fahren (Shard-Plan und Karten-jq siehe Session 05.08.2026, Ledger-Nachtrag vormittag-2), neue HTML als `05c_…<datum>.html` daneben ablegen — dieses Dokument nie loeschen, nur Banner (Doku-Doktrin).
+
+## REV-3-Vermerk (05.08.2026, Kette-Sektion nach Vertragsketten-Audit)
+
+Neue Sektion **"Die Vertragskette: Planer -> CEB -> Tier-Binary (SOLL/IST nach Audit 05.08.)"** direkt nach der Architektur-Uebersicht: EIN Kette-Flussdiagramm (SOLL/IST-Doppelmarkierung an Planer [R-G1] und CEB-Emission [R-G3], DEPRECATED-Straenge gestrichelt), 9 Detail-Bloecke (Planer-CLI-Grammatik, Resolve-Doppelpfad, CEB-Emission, Dock-LIVE-Draht COMDARE_GOLDEN_N_*, Rueck-Kanal, CEB-intern 4096/ram_spool, Pruef-Dock, Rueckschrieb, Replay-Schluessel-Schichtung), SOLL/IST-Verdikts-Tabelle aller 5 Kettenglieder (Regressionen rot, bewusst-deferred grau) und die CEB==CacheEngineBuilder-Korrektur (Owner 05.08.; apps/cache_engine_builder existiert als Binary, ist aber der Legacy-REV-7.6-Orchestrator, nicht die Soll-CEB — heutige CEB-Rolle traegt der comdare-messung-driver). Quellen: Audit-Backup docs/sessions/backups/20260805-planer-ceb-kette-audit/ (4 Berichte); Ledger-Nachtrag vormittag-4.
