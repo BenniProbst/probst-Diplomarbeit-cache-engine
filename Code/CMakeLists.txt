@@ -212,6 +212,29 @@ add_subdirectory(${COMDARE_CACHE_ENGINE_DIR}
                  ${CMAKE_BINARY_DIR}/_cache_engine_external
                  EXCLUDE_FROM_ALL)
 
+# V-6i-NACHTRAG / F-B3 super-Naht (Codex-Nachreview W1/W2, 05.08.2026 abend): install()-Naht der
+# PLANER-Binary. Der W1-Rollen-Schnitt (F1-HART) hat die Planer-Kommandos (validate | plan
+# dump/ci/cmake | cache-key | fingerprint) aus dem installierten comdare-messung-driver entfernt;
+# die ce-eigene Regel (ce apps/experiment_planner/CMakeLists.txt) ist HIER INERT, weil das
+# add_subdirectory(... EXCLUDE_FROM_ALL) direkt oben einer Unterverzeichnis-Ebene dokumentiert auch
+# ihre install()-Regeln aus dem Install-Ziel des Elternprojekts nimmt. Ohne super-eigene Naht
+# verloere jedes super-Deployment die Planer-Kommandos ersatzlos (Funktionsverlust statt Teilung).
+# FORM: install(PROGRAMS $<TARGET_FILE:...>) statt install(TARGETS ...), weil die Install-Regel im
+# NICHT-excludeten Eltern-Scope leben muss und die PROGRAMS-Form die fertige Datei (OUTPUT_NAME
+# comdare-experiment-planner) explizit ins selbe GNUInstallDirs-bin-Layout legt wie der Treiber
+# (02_messung_driver/CMakeLists.txt:27, install(TARGETS messung_driver RUNTIME DESTINATION
+# ${CMAKE_INSTALL_BINDIR})) -- Muster-Reuse, kein zweites Layout.
+# BAU-VOR-INSTALL-NAHT: install() baut nicht. Damit `cmake --build` (ALL) + `cmake --install` die
+# Datei sicher vorfinden, holt die Target-Property EXCLUDE_FROM_ALL=FALSE das ce-Target ins ALL des
+# super-Builds zurueck (live gegen cmake 4.3.4 geprueft: der Property-Override aus dem Eltern-Scope
+# wirkt, das Target baut im nackten ALL-Lauf mit; Mehrkosten = die eine App, denn die tragende
+# Fassaden-lib comdare::profile_run_facade haengt ohnehin am Treiber). Ebenfalls live geprueft:
+# die Property-Ruecknahme aktiviert NICHT die inerte ce-install()-Regel (die DIRECTORY-Ebene
+# entscheidet ueber die Aufnahme der install()-Regeln) -- es bleibt bei genau EINER Install-Zeile.
+set_property(TARGET comdare_experiment_planner PROPERTY EXCLUDE_FROM_ALL FALSE)
+install(PROGRAMS "$<TARGET_FILE:comdare_experiment_planner>"
+        DESTINATION "${CMAKE_INSTALL_BINDIR}")
+
 # V36.C (2026-05-23): prt-art als add_subdirectory einbinden — nur fuer
 # Pruefling-Permutations, NICHT die internen prt-art-Tests (vermeidet
 # doppelten gtest-FetchContent + Test-Konflikte).
