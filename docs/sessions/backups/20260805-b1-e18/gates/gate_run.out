@@ -1,0 +1,9 @@
+== COMMIT-OBJEKT ==
+08ec8e7d docs(e18): B1-Abgrenzung im ce-Ledger -- E-18-Kern liegt super-seitig (anhang:forward), ce-Beitrag = 0 Code
+git status --porcelain Zeilen: 0
+== CONFIGURE PASS 1 (frisch, Build-Dir NEU) ==
+configure_pass1_rc=0
+Total Tests: 401
+== VOLL-BAU ==
+build_rc=1
+GATE_BAU_FEHLGESCHLAGEN_RC1

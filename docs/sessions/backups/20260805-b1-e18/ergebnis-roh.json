@@ -1,0 +1,236 @@
+{
+  "summary": "W-B / B1 (Owner: HAUPT-ZIEL, GO): E-18 LaTeX-Anhang-VORWAERTS-Kanal je CI — ultracode-Planung (Korpus-SOLL + IST-Andockpunkte) -> Opus-5-Bau in wt-b1-e18 ab b4110cd0 -> Dual-Review Fable+Codex",
+  "agentCount": 5,
+  "logs": [],
+  "result": {
+    "plan": {
+      "status": "PLAN FERTIG (READ-ONLY eingehalten; kein Edit am Objekt, kein Push/Merge). E-18-SOLL aus dem Korpus belegt (LEDGER:3554/§68c + LEDGER:4212/B1 + Owner-verbatim nr529/nr541 aus 982er-Anker + 02.08.-Katalog:91 + D-03-Kopplung). KERN-BEFUND: E-18 ist ein super+289-Paket -- der ce-Anteil am E-18-KERN ist NULL Code (ce-Worktree wt-b1-e18 bleibt Default auf b4110cd0; Dauer-Auflagen werden trotzdem literal am Commit-Objekt erbracht, Basis-N erwartet 405). super-Anteil braucht EIGENEN Lead-Worktree (wt-super-w1/wt-e24 TABU). Beweis-Design kommt OHNE echte Messung aus (Fixture = bereits committete D-03-Erstbeleg-CSV in measurement/). Infra-Gate: eigenes 289-Write-Token (Handout an Infra, E-20-Kanal) blockiert nur den Lebend-Check, nicht die inerte Landung.",
+      "plan_pfad": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/b1-e18/plan.md",
+      "e18_soll_kern": [
+        "E-18 = LaTeX-Anhang-VORWAERTS-Kanal je CI = HAUPT-ZIEL des Gesamt-Systems (Owner-Dekret LEDGER:3554/§68c, 26.07.; benanntes Bau-Paket VOR dem Voll-Bau-4-Trigger, LEDGER:4212 B1).",
+        "Owner verbatim nr529 (jsonl:38737): 'Das Generieren der Latex-Anhaenge im Diplomarbeit-Code ist HAUPT-ZIEL des Gesamt-Systems und kombiniert das automatische Erstellen der Ergebnisse in die Diplomarbeit-PDF mit Auswertungsautomatisierung aus der xml-Kette bis zu den fertigen Ergebnissen (Voll-Matrix mit Tabellen, Formeln und Diagrammen der echten Messwerte) ... konsolidiere die xml-bis-pdf-Kette gegen die im cache-engine-Tool gemessenen Messwerte' + 'A wird eingebaut, das schliesst aber B nicht logisch aus (beides umsetzen mit Prioritaet auf A)'; nr541: 'Ja B1/B2 auto befuellen bzw. bei jedem CI neu setzen'.",
+        "Operativ (982er-Synthese E-18 + 02.08.-Katalog:91): bei JEDEM CI die aus echten Messwerten regenerierten anhang/{de,en}/tabellen/*.tex automatisch VORWAERTS ins Overleaf-gekoppelte thesis-Submodul (Projekt 289) pushen (EIGENER Write-Token), super-Gitlink nachziehen, Thesis-PDF-Rebuild anstossen -- E4-Kette CSV->LaTeX->PDF vorwaerts geschlossen, PDF-Tabellen nie stale. Heute regeneriert die CI die .tex NUR als Artefakt (measure:smoke/golden-320 -> measure_out*/appendix/); Push/Token/Rebuild fehlen.",
+        "'Bei jedem CI neu setzen' = idempotentes Neu-Setzen auch OHNE frische Messung (Quelle-Kaskade: Pipeline-Artefakte -> neuester measurement/<RUN_TS>-Korpus [replace-Semantik] -> honest-empty-NO-OP); Commit nur bei Byte-Delta. Weg A (InputIfFileExists-Wiring in A_measurements.tex) ist seit GO-1 12.07./INC-7 14.07. KOMPLETT gebaut -- offener E-18-Kern = Weg B.",
+        "ABGRENZUNG: NICHT E-18 sind E-04 (CI-Live-Fortschritt+Interface-Nachtests, B2-Welle), B12-xlsx (anderes Fenster), B5 T6-Einsammel-Naht (Grandchild-CSV-Sammlung; E-18 dockt an der persistierten Ebene an), G8 Anhang-B/E-Prosa (Owner-gegatet) und die M-CE-18-Deprecation von ce tools/latex_anhang (je-GO, nur Aufraeumpass-Kandidatenliste)."
+      ],
+      "aenderungs_liste": [
+        "SUPER S1 (.gitlab-ci.yml, Anker Job-Name: NACH persist:measurements :834-972, VOR planer:delegate :974): NEU Job anhang:forward, Stage persist -- Quellen-Kaskade (needs measure:smoke+measure:golden-320 optional/artifacts:true; sonst Korpus-Regeneration via appendix_generator_cli aus neuestem measurement/<RUN_TS>; sonst NO-OP), 289-Klon auf development via COMDARE_THESIS_WRITEBACK_USER/TOKEN, Whitelist-Kopie NUR anhang/<lang>/tabellen/*.tex (nie loeschen), Idempotenz git diff --quiet, 289-Push OHNE ci.skip (289-Pipeline = Post-measure-Rebuild), danach Gitlink-Bump 288 mit ci.skip+[skip ci]+_bot_-rule+Merge-Retry (Literal-Spiegel persist:measurements :934-956); INERT hinter COMDARE_ANHANG_FORWARD=='true' + development-only. ~95-110 Zeilen.",
+        "SUPER S2 (.gitlab-ci.yml:36 stages-Kommentar + persist-Block-Kopf :826-833): additive Doku-Fortschreibung um den Schwester-Vorwaerts-Kanal (sonst Doku-Luege; D3-Edit-C-Lehre).",
+        "SUPER S3: NEU ci/anhang_forward_core.sh -- Kern-Logik (Kaskade, WIDE-Aggregat, Whitelist-Kopie, Idempotenz) env-parametrisiert + DRY_RUN-faehig; YAML umhuellt nur Creds+Push (Fixture-Beweisbarkeit ohne CI/Messung, eine Quelle).",
+        "SUPER S4: NEU docs/sessions/20260805-PLAN-b1-e18-vorwaerts-kanal.md (Plan-Dossier) + additiver Ledger-Eintrag bei Landung.",
+        "SUPER S5 (Infra-Handout, E-20-Kanal, GATE nur fuer Lebend-Check): Cluster/docs/sessions/2026-08-05-DIPLOM-AN-INFRA-e18-289-thesis-writeback-token.md -- PAT auf 289 'writeback-thesis-anhang' write_repository-only/Developer/~90d (Spiegel PAT id=54/288); CI-Vars auf 288 COMDARE_THESIS_WRITEBACK_USER (protected) + COMDARE_THESIS_WRITEBACK_TOKEN (masked+hidden+protected); 289-Branch-Protection-Check (development erlaubt Developer-Bot-Push).",
+        "LEAD-HINWEIS: super-Anteil in EIGENEM Worktree bauen (z.B. wt-super-b1-e18, Branch b1-e18-vorwaerts-kanal-super ab development); wt-super-w1/wt-e24 TABU; Kollisionsregel Substanz gewinnt (W1-Welle parallel an derselben .gitlab-ci.yml -> Job-Namen-Anker, obenauf mergen).",
+        "CE C0 (wt-b1-e18): KEINE Code-Aenderung -- kein kuenstlicher Commit, Branch bleibt Default auf b4110cd0; Dauer-Auflagen trotzdem literal erbringen (Doppellauf 2x seriell frisches Configure Basis-N live erwartet 405, golden-CRC+golden-320 3/3, abi/=libs/cache_engine/include/cache_engine/abi/ Diff 0, Frozen-Vektor 0fe275bd in genau 3 TUs test_m_w12_stamp_bausteine/test_w10_system_cell_values/test_g3_sha512_index, XML byte-stabil, cf22-Binary mit Datei-Argumenten falls doch C++ beruehrt, ASCII-grep leer, 3-Marker-grep Zeilenanfangs-Form 0; Literale ins Backup).",
+        "CE C1 OPTIONAL (docs-only, Lead-Entscheid): additive Abgrenzungs-Notiz im ce-Ledger docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md (E-02-Vier-Ledger-Audit-Findbarkeit).",
+        "CE C2 EXPLIZIT NICHT B1: tools/latex_anhang-Deprecation (M-CE-18, je-GO) nur als Aufraeumpass-Kandidat fortschreiben. CE C3 FOLGE-PAKET hinter B5: Grandchild-Anhang-Hook in experiment_plan_director.hpp erst nach T6-Einsammel-Naht.",
+        "THESIS 289: KEINE Aenderung (InputIfFileExists-Wiring + tabellen/-Ziel komplett; Kanal befuellt nur).",
+        "COMMIT-SCHNITT: super Commit 1 ci(e18) [S1+S2+S3] + super Commit 2 docs(e18) [S4]; Cluster-Handout eigener Commit; ce 0 Commits (Default) oder 1 docs-only (C1). KEIN Push/Merge aus dieser Session -- Lead nach Dual-Review, Landung nur nach Lebend-Check.",
+        "BEWEIS-DESIGN ohne Messung: B-1 ctest test_08_appendix_generator (fixtures/cached); B-2 Fixture-Harness mit committeten D-03-Erstbeleg-CSV (measurement/20260726-164259-d03-strukt-r-erstbeleg/per_binary/*.result.csv) gegen lokales git-init-Fixture-Repo via file://-Remote: 4 Laeufe (Commit N .tex / byte-identische Idempotenz '0 Aenderungen -> kein Commit' / leere-Quelle-NO-OP / Fremd-Datei unberuehrt); B-3 YAML-parse + Inertness-Beleg (Muster persist, Praezedenz Pipeline #10015); B-5 Lebend-Check NACH Landung (1 Trigger-Pipeline, 289-Commit+gruene 289-Pipeline+Gitlink-Bump, keine Echo-Pipeline) -> erst danach 'jeder CI'-Scharfschaltung per Projekt-Var-Flip."
+      ],
+      "risiken": [
+        "R1 289-Write-Token fehlt (Infra-Gate): blockiert nur den Lebend-Check, nicht die inerte Landung; Fail-loud-Guard im Job verhindert stilles Gruen.",
+        "R2 Branch-/Overleaf-Naht: Push-Ziel development (Submodul-Branch .gitmodules) != trigger:thesis-Bridge (main) != Overleaf-Sync (GitHub main); Live-Overleaf-Sichtbarkeit erst nach main-FF+GitHub-Sync -- falls Owner Direkt-Sichtbarkeit je CI will, Ziel-Branch-Entscheid VERBOSE eskalieren.",
+        "R3 Overleaf-Divergenz/Owner-Prosa: strukturell entschaerft (tabellen/ disjunkt zu kapitel/, Whitelist, nie loeschen, Merge-statt-Rebase-Retry); Restrisiko dokumentiert.",
+        "R4 Commit-Rauschen/Loop bei nicht-deterministischem Generator-Output: durch B-2-Lauf2 byte-beweisen; sonst NO-GO fuer die Projekt-Var-Scharfschaltung (Job bleibt Trigger-gebunden).",
+        "R5 Race anhang:forward vs persist:measurements auf development: disjunkte Pfade (Gitlink vs measurement/) + beidseitige Merge-Retry-Schleifen; Retry-Erschoepfung bricht laut ab.",
+        "R6 Gitlink-Bump mit ci.skip feuert trigger:thesis nicht -- gewollt (Rebuild via direkter 289-Pipeline); im YAML-Kommentar festschreiben.",
+        "R7 Zeilen-Drift + W1-Parallel-Welle an .gitlab-ci.yml: Job-Namen-Anker statt Zeilennummern; Substanz gewinnt, obenauf mergen.",
+        "R8 Scope-Creep Richtung E-04/B12/B5/G8/M-CE-18: per Abgrenzung §1.3 ausgegrenzt; jede Ausweitung = neues Paket.",
+        "R9 Korpus-Schema-Drift (result.csv-Header vs Generator): Generator honest-empty-tolerant; B-2 bindet den Beweis an echte committete Daten.",
+        "R10 289-Branch-Protection falsch (Bot-403): Job bricht laut; Protection-Check ist expliziter Handout-Punkt."
+      ]
+    },
+    "bauModell": "claude-opus-5",
+    "bau": {
+      "status": "FERTIG / LANDEBEREIT (kein Push, kein Merge, kein Edit im super-Baum -- super status --porcelain byte-identisch zum Sessionstart). PLANBEFUND BESTAETIGT: E-18 ist ein super+289-Paket, der ce-Anteil am KERN ist NULL Code; ce traegt genau 1 docs-only Commit (C1-Abgrenzung fuer das Vier-Ledger-Audit). Der super-Anteil (S1-S5) liegt vollstaendig als anwendbarer PATCH-Vorschlag im Scratch (git apply --check RC=0 gegen den AKTUELLEN super-HEAD 626aee36 -- .gitlab-ci.yml hat sich seit d08f5dde nicht bewegt). ABWEICHUNG VOM PLAN, load-bearing: der geforderte beidseitig beissende E2E-Beweis hat einen echten Defekt gefunden -- die aus dem committeten D-03-Korpus regenerierte Heatmap lc_surface_op_erase_p50_ns.tex (z-Matrix komplett 0.0000, weil D-03 keine Erase-Messwerte hat) laesst den Thesis-Bau FATAL abbrechen (pgfplots 'I got too few coordinates', latexmk rc=12, GAR KEINE PDF), waehrend derselbe Klon vor dem Kanal-Lauf sauber baut (rc=0). Ohne Gegenmassnahme haette E-18 die PDF-Strecke GERISSEN statt sie zu schliessen. Der Kanal hat daher ein PDF-GATE bekommen (alles-oder-nichts, fail-loud, praeziser Rollback) -- beide Richtungen literal bewiesen. Doppellauf am finalen Commit-Objekt 07fc470d: 2x 405/405 seriell, Basis-N live 405 getroffen.",
+      "commits": [
+        "ce 07fc470d docs(e18): B1-Abgrenzung im ce-Ledger -- E-18-Kern liegt super-seitig (anhang:forward), ce-Beitrag = 0 Code | Ort /home/comdare/wt-b1-e18, Branch b1-e18-vorwaerts-kanal ab b4110cd0 | 1 Datei, +17/-0 (docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md, additiver NACHTRAG-Block in einer als 'nur Banner/Nachtraege' markierten SUPERSEDED-Doku) | Inhalt: E-18 ist super+289; Kanal = super-Job anhang:forward + ci/anhang_forward_core.sh; ce-Mess-Kette ist QUELLE, keine Baustelle; zwei benannte NICHT-B1-Folgepunkte festgehalten (M-CE-18 tools/latex_anhang je-GO-Deprecate; Grandchild-Vorwaerts-Verlaengerung hinter B5)",
+        "ce: KEIN zweiter Commit -- C0 des Plans ('KEINE ce-Code-Aenderung, kein kuenstlicher Commit') eingehalten; C2 (tools/latex_anhang deprecaten) und C3 (Grandchild-Hook) bewusst NICHT angefasst",
+        "super: 0 Commits in dieser Session (auftragsgemaess). Der super-Anteil liegt als Patch-Vorschlag unter /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/b1-e18/super-anteil/ mit ANWENDUNG.md; vorgeschlagener Schnitt: Commit 1 ci(e18) [gitlab-ci.yml.patch + ci/anhang_forward_core.sh], Commit 2 docs(e18) [Plan-/Beweis-Dossier], Cluster-Repo eigener Commit [Infra-Handout]"
+      ],
+      "doppellauf": "DOPPELLAUF AM FINALEN COMMIT-OBJEKT 07fc470d (git status --porcelain = 0 Zeilen), Build-Dir /home/comdare/wt-b1-e18/build-b1e18-gate FRISCH angelegt, Configure literal `cmake -B build-b1e18-gate -S /home/comdare/wt-b1-e18 -G Ninja -DCOMDARE_V32_ENABLE=ON`:\n\n  ctest -N nach dem 1. Configure:  \"Total Tests: 401\"\n  ctest -N nach 2. Configure + Nachbau der 2-Pass-Werkzeuge:  \"Total Tests: 405\"   (Basis-N LIVE erhoben, erwartet 405 -- GETROFFEN)\n\n  LAUF 1 (ctest -j1): \"100% tests passed, 0 tests failed out of 405\"   LAUF1-RC=0\n  LAUF 2 (ctest -j1): \"100% tests passed, 0 tests failed out of 405\"   LAUF2-RC=0\n  GATE_FINAL_AM_AMEND_KOMPLETT\n\nREIHENFOLGE-BEFUND (Fallen-Kandidat, ueber die dokumentierte N-Erhebungs-Falle hinaus): 405 entsteht NICHT durch ein blosses zweites Configure. Die vier Zusatz-Tests 375-378 (test_profile_roundtrip, test_axis_registry_roundtrip, test_system_axis_registry_roundtrip, test_measurement_axis_registry_roundtrip) erscheinen zwar nach dem 2. Configure, sind aber ROT, weil das all-Ziel ihre Werkzeuge nicht baut. registry_roundtrip.cmake:30 sagt es literal: \"Generator-Tool nicht gebaut: .../comdare_system_axis_registry_gen -- Vorher bauen (2-Pass, wie #25-B): cmake --build <build> --target <generator-target>\". Erster Doppellauf-Versuch daher literal \"99% tests passed, 4 tests failed out of 405\" (LAUF1-RC=8/LAUF2-RC=8). Nach `cmake --build ... --target comdare_axis_registry_gen comdare_system_axis_registry_gen comdare_measurement_axis_registry_gen test_profile_roundtrip` (nachbau_rc=0) sind beide Laeufe 405/405 gruen. Wer \"frisches Configure + 2-Pass\" meldet, ohne diese vier Ziele zu bauen, meldet ein falsches Gate.\n\nGOLDEN-320 + ROUNDTRIP in BEIDEN Laeufen Passed: test_smoke_coverage_profile 1/1, test_wdk_datasets_fairness 1/1, test_measurement_categories 1/1, test_profile_roundtrip 1/1, test_axis_registry_roundtrip 1/1, test_system_axis_registry_roundtrip 1/1, test_measurement_axis_registry_roundtrip 1/1.\n\nFINGERPRINT-NEUTRALITAET (Diff b4110cd0..07fc470d):\n  abi/-Diff (libs/cache_engine/include/cache_engine/abi/) = 0 Zeilen\n  Frozen-Vektor 0fe275bddc7af1af9474cea655ff28280b93cfb3acc299c00d76d3489822993b in GENAU 3 TUs (test_g3_sha512_index.cpp, test_m_w12_stamp_bausteine.cpp, test_w10_system_cell_values.cpp); Diff dieser 3 TUs = 0 Zeilen\n  golden-CRC-Traeger source_catalog.hpp Diff = 0 Zeilen\n  geaenderte .xml = 0\n  C++-Dateien im Diff = 0 -> cf22 hat keine Datei-Argumente; Binary-Beleg trotzdem erbracht: /home/comdare/tools/cf22/usr/bin/clang-format-22 --version = \"Ubuntu clang-format version 22.1.8 (++20260613092238+e80beda6e255-1~exp1~20260613092253.78)\"\n  ASCII-Selbstcheck ueber die hinzugefuegten Zeilen = 0 nicht-ASCII (erste Fassung hatte 2 Geviertstriche -- gefunden, ersetzt, Commit amended, Doppellauf DANACH erneut gefahren)\n  3-Marker in ZEILENANFANGS-Form in den hinzugefuegten Zeilen = 0\n\nLITERALE (Volltext): /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/b1-e18/gates/99-DOPPELLAUF-LITERALE.txt (+ 09-doppellauf-final.log, 09-lauf1.log, 09-lauf2.log, 04-ctest-N-final.log, 40-ce-dauerauflagen.log).",
+      "beweise": [
+        "B-1 GENERATOR (bestehend, Regressionsnetz): super Code out-of-source in den Scratch konfiguriert+gebaut (Ziel appendix_generator_cli + test_08_appendix_generator; superbuild_rc=0), dann ctest im Stufe-08-Unterbaum: '100% tests passed, 0 tests failed out of 7' (ctest_rc=0), Binary direkt: '[  PASSED  ] 7 tests.' -> gates/20-B1-ctest-appendix.log. Der super-Baum blieb dabei unberuehrt (out-of-source Build-Dir im Scratch).",
+        "B-2 KANAL-KERN AM FIXTURE, 8 Laeufe gegen ein lokales Steh-Ersatz-289 (bare remote + Arbeitsklon, file://-Remote, Ausgangsbestand = die ECHTEN 18 committeten anhang/{de,en}/tabellen/*.tex + eine Owner-Prosa-Datei in kapitel/). Quelle = die BEREITS COMMITTETEN echten D-03-Erstbeleg-CSV (measurement/20260726-164259-d03-strukt-r-erstbeleg/per_binary/, 8 result.csv) -- KEINE neue Messung. L1 Korpus-Zweig: 'WIDE-Aggregat: 17 Zeilen', '[1b] regeneriert: 34 .tex', 34 committet + 'OK: gepusht (Versuch 1) nach development'. L2 identische Wiederholung: 'gestagte Aenderungen: 0 Datei(en)' -> 'IDEMPOTENT: 0 Aenderungen -> kein Commit' (Generator-Byte-Determinismus + Rausch-Wache). L3 leere Quelle: 'NO-OP: keine Anhang-Quelle', RC 0. L4 Negativ: 6 Fremd-Dateien in tabellen/ sha256-identisch (identisch: 6 / abweichend: 0), 0 Dateien ausserhalb anhang/<lang>/tabellen/*.tex im Kanal-Commit, 0 Loeschungen, kapitel/ unberuehrt, 18 -> 23 Dateien (nur die 5 bisher fehlenden Darstellungs-.tex kamen HINZU). L5 Artefakt-Zweig mit 1-Byte-Delta: 'kind=artefakt', 'gestagte Aenderungen: 1 Datei(en)' -> genau 1 Datei committet. L6 Korpus da, Generator fehlt: RC 1, 'FEHLER: ... KEIN honest-empty-Fall, sondern eine kaputte Job-Konfiguration -> Abbruch (kein stilles Gruen)'. L7 Namens-Wache: '..evil.tex' und 'a b;rm -rf .tex' UEBERSPRUNGEN, 0 boese Namen im Ziel. L8 Race/R5: Fremd-Push auf den Remote -> 'push abgelehnt (non-ff-Race) -> fetch + MERGE (kein rebase) + retry (1)' -> 'Merge made by the ort strategy' -> 'OK: gepusht (Versuch 2)'; die parallele Owner-Prosa ist im Endstand erhalten (Soll 1 = 1). -> gates/21..27, 50-51.",
+        "B-3 YAML + INERTNESS: yaml.safe_load (mit GitLab-!reference-Konstruktor) parst ALT-Stand (32 Keys) und NEU-Stand (33 Keys) gruen; 'anhang:forward' vorhanden; stage=persist; stages-Liste unveraendert; needs = measure:golden-320 (optional, artifacts) + measure:smoke (optional, artifacts). INERTNESS-MATRIX (rules-Auswertung, Muster-Spiegel persist:measurements): Gesamtlauf ohne Flag -> NICHT ERZEUGT; development ohne Flag -> NICHT ERZEUGT; Flag aber main -> NICHT ERZEUGT; Flag + development -> ERZEUGT; Flag + development aber _bot_ -> NICHT ERZEUGT (when=never). Diff-Umfang gegen den IST-Stand: 0 ENTFERNTE / 162 hinzugefuegte Zeilen (rein additiv). bash -n auf den extrahierten Job-Script-Block: RC=0. -> gates/28, 28b.",
+        "B-4 E2E CSV -> LaTeX -> PDF am ECHTEN Thesis-Klon (Kopie von 289, Owner-Baum unberuehrt), beidseitig beissend. BISS/STALE-BEWEIS VOR dem Kanal: von den 17 aus D-03 regenerierten .tex sind gegenueber dem committeten 289-Stand 12 byte-verschieden und 5 fehlen ganz -- 'stale/fehlend: 17  identisch: 0'. Das ist die literale Belegung der E-18-Luecke ('PDF-Tabellen bleiben stale'). BASELINE: latexmk auf diplomarbeit.tex vor dem Kanal = rc 0. ROT-PFAD (D-03): PDF-Gate schlaegt an, 'FEHLER: PDF-Gate ROT (rc=12)' mit den literalen LaTeX-Zeilen, Rollback, RC 1, danach 0 Commits, git status -- anhang = 0 Zeilen bzw. nur die absichtlich danebengelegte fremde unversionierte Datei (sha256-identisch erhalten), 'Rollback: 10 neu angelegte Datei(en) wieder entfernt'. GRUEN-PFAD (bau-faehige Quelle, 1-Byte-Delta): 'PDF-Gate GRUEN: diplomarbeit.tex gebaut' in 14,4 s, genau 1 Datei committet, diplomarbeit.pdf 736.708 Bytes erzeugt, 0 Dateien ausserhalb anhang/ im Commit, 0 getrackte Reste im Arbeitsbaum; unmittelbare Wiederholung -> 'IDEMPOTENT: 0 Aenderungen'. -> gates/30-34, 42, 43.",
+        "HYGIENE/SICHERHEIT am Neu-Stand: core 0x 'set -x', 0 Token-Echos, 0 nicht-ASCII Zeilen, 0 3-Marker in Zeilenanfangsform, bash -n RC=0; die 3 Treffer auf destruktive Muster liegen ausnahmslos in KOMMENTAREN ('kein rm, kein git rm, kein --force'); der einzige 'set -x'-Treffer im Job ist ebenfalls ein Kommentar ('Creds nur als Var-Referenz (kein set -x)'). Reale Schreiboperationen des Kerns auf das Ziel-Repo: nur mkdir -p / cp -- / git add|diff|commit|push|fetch|merge -- kein push -f, kein --force, kein rebase. -> gates/41, 41b.",
+        "ANWENDBARKEIT DES SUPER-PATCHES: git apply --check -p1 gegen den echten super-Baum RC=0 -- zweimal erhoben, zuletzt gegen den waehrend der Session weitergelaufenen HEAD 626aee36 (die .gitlab-ci.yml hat sich seit d08f5dde nicht bewegt: git diff --stat d08f5dde..HEAD -- .gitlab-ci.yml ist leer). Anker sind Job-Namen, keine Zeilennummern."
+      ],
+      "abweichungen": [
+        "PDF-GATE ZUSAETZLICH ZUM PLAN (groesste Abweichung, load-bearing, aus dem geforderten Biss entstanden). Der Plan sah keine Bau-Wache vor. Der E2E-Beweis hat gezeigt: aus dem echten D-03-Korpus schreibt der Generator fuer eine Metrik OHNE Messwerte trotzdem eine Heatmap mit komplett 0.0000-z-Matrix (lc_surface_op_erase_p50_ns.tex, mesh/cols=2); pgfplots bricht daran FATAL ab ('! Package pgfplots Error: Error using plot graphics: I got too few coordinates!' ... 'Fatal error occurred, no output PDF file produced!', latexmk rc=12) und es entsteht GAR KEINE Thesis-PDF -- waehrend derselbe Klon vor dem Kanal-Lauf mit rc 0 baut. Weglassen einzelner Dateien rettet nichts, weil die 12 Kern-Tabellen in A_measurements.tex an blankem \\input haengen (nur die 5 Darstellungs-.tex an \\InputIfFileExists). Ohne Wache haette E-18 die PDF-Strecke GERISSEN statt sie zu schliessen. Der Kern baut die Thesis daher im 289-Klon VOR dem Commit und verweigert im Fehlerfall ALLES (Rollback + exit 1). Steuerung AF_PDF_GATE=on|auto|off, im Job an die bestehende Runner-Voraussetzung COMDARE_TEXLIVE_AVAILABLE gekoppelt.",
+        "FOLGE DARAUS FUER DEN LEBEND-CHECK: mit einem TEIL-Korpus wie D-03 landet der Kanal bewusst NICHTS (Gate rot). Der Lebend-Check B-5 braucht entweder einen vollstaendigen Mess-Korpus ODER das Folge-Paket 'honest-empty im Flaechen-Writer der Stufe 05'. Das war im Plan so nicht absehbar und ist der wichtigste neue Gate-Punkt.",
+        "ROLLBACK PRAEZISIERT (Selbst-Nachbesserung nach der ersten Fassung): der erste Entwurf raeumte mit `git clean -qfd -- anhang/<lang>/tabellen` auf und haette damit auch FREMDE unversionierte Dateien im selben Verzeichnis mitgerissen. Ersetzt durch Buchfuehrung ueber genau die in diesem Lauf kopierten Pfade; nur davon werden die unversionierten wieder entfernt. Am Fixture gegengeprueft: 'Rollback: 10 neu angelegte Datei(en) wieder entfernt' UND eine danebengelegte fremde unversionierte Owner-Datei sha256-identisch erhalten.",
+        "GIT_SUBMODULE_STRATEGY: recursive statt none (Plan spiegelte persist:measurements). Grund am Objekt verifiziert: Code/CMakeLists.txt:211 zieht die ce UNBEDINGT per add_subdirectory ein -- ohne Submodul-Checkout ist appendix_generator_cli nicht konfigurierbar, also waere Quelle 2 der Kaskade (Korpus-Regeneration = der 'bei jedem CI'-Fall) tot gewesen. Kommentar im Job nennt die Load-Bearing-Begruendung.",
+        "289-KLON-URL aus ${CI_PROJECT_PATH%/*} statt ${CI_PROJECT_NAMESPACE} -- spiegelt exakt die relative .gitmodules-URL '../20260931-overleaf-diplomarbeit.git'. Geschwister-Lage live belegt: beide Projekte liegen unter gitlab.comdare.local/comdare/research/.",
+        "C1 (docs-only ce-Commit) WURDE gemacht, obwohl der Plan ihn als 'Lead-Entscheid, optional' fuehrte. Begruendung: der Auftrag lautete 'Setze den Plan um (NUR ce-Anteile)'; ohne C1 waere der ce-Anteil leer und die Abgrenzung fuer das Vier-Ledger-Audit (E-02) nirgends auffindbar. Die Ziel-Datei ist als SUPERSEDED mit 'Niemals loeschen -- nur Banner/Nachtraege' markiert; der Eintrag ist genau so additiv gehalten.",
+        "DISK-ZWISCHENFALL WAEHREND DES GATES (transparent): der erste Voll-Bau brach mit 'No space left on device' ab (39 MB frei auf /). Ich habe AUSSCHLIESSLICH im gemeinsamen Session-Scratchpad aufgeraeumt -- 10 Bau-Verzeichnisse frueherer Auftraege dieser Session, alle seit >6 h unberuehrt (v3-fullbuild, build-w2d, d-a9b-fresh, lanec, rf2-fresh, rf3-fresh, v2-fresh, b16, b17-fresh, ce-abnahme-b17-build) -> 21 GB frei. KEINE Repo-, Worktree- oder Messdaten angefasst. Parallel hat eine andere Session die Repo-Seite geloest (super-Ledger abend-9: '60G frei ... Messdaten-Rettung all19_pilot.csv VOR Abbau'). Mein Worktree wt-b1-e18 hat den parallelen Worktree-Abbau nachweislich ueberlebt (git worktree list + HEAD + status geprueft).",
+        "ZWEITER BAU-VERSUCH NOETIG (kein Ergebnis-Einfluss): nach dem Platz-Abbruch scheiterte ein Bau-Durchgang an 'generated_source_catalog.hpp: No such file or directory'; der inkrementelle Wiederholungslauf war RC 0 (build_rc(try=1)=1, build_rc(try=2)=0). Riecht nach einer fehlenden Codegen-Abhaengigkeitskante bei voller Parallelitaet -- nicht weiter verfolgt, weil ausserhalb des Auftrags; als Beobachtung hier vermerkt.",
+        "COMMIT AMENDED: die erste Fassung des ce-Commits (08ec8e7d) enthielt 2 Geviertstriche und verletzte damit die ASCII-Auflage. Gefunden ueber den Selbstcheck aus dem Diff, ersetzt, --amend -> 07fc470d, und der Doppellauf DANACH vollstaendig neu gefahren, damit die Literale wirklich am finalen Objekt haengen."
+      ],
+      "offene_punkte": [
+        "FOLGE-PAKET (neu, aus dem Fixture-Fund, HOCH): honest-empty im Flaechen-Writer der super-Stufe 05 (diagram_generator) -- keine Heatmap fuer eine Metrik ohne Datenpunkte, analog zum bereits vorhandenen honest-empty der Darstellungs-Writer. Solange das offen ist, faellt das PDF-Gate bei Teil-Korpora rot aus und der Kanal landet bewusst nichts. Betrifft NICHT nur E-18: dieselbe .tex wuerde auch jede manuelle Anhang-Regeneration aus einem Teil-Korpus unbrauchbar machen.",
+        "B-5 LEBEND-CHECK STEHT AUS (Lead + Infra): eine getriggerte development-Pipeline mit COMDARE_ANHANG_FORWARD=true -> 289-Commit sichtbar, 289-Pipeline gruen (thesis-pdf de+en = Post-measure-Rebuild-Beleg), Gitlink-Bump [skip ci] gelandet, KEINE Echo-Pipeline auf 288. Erst danach der Projekt-Var-Flip auf 'jeder CI'.",
+        "INFRA-GATE (Handout liegt fertig im Scratch, muss vom Lead ins Cluster-Repo gepusht werden): Project-Access-Token AUF 289 'writeback-thesis-anhang' (write_repository-only, Developer, ~90 d) + CI-Vars COMDARE_THESIS_WRITEBACK_USER (protected) und COMDARE_THESIS_WRITEBACK_TOKEN (masked+hidden+protected) auf 288 + Rueckmeldung zum Ist-Zustand der 289-Branch-Protection fuer development.",
+        "BRANCH-NAHT / OWNER-ENTSCHEID (R2 des Plans, unveraendert offen): Push-Ziel ist der Submodul-Branch development, die trigger:thesis-Bridge zielt auf 289/main, Overleaf synct GitHub/main. Sichtbarkeit im Live-Overleaf entsteht erst ueber den bestehenden main-FF-/Watcher-Weg. Falls der Owner Direkt-Sichtbarkeit je CI will, ist das ein bewusster Ziel-Branch-Entscheid -- VERBOSE eskalieren, nicht stillschweigend umstellen.",
+        "DUAL-REVIEW VOR LANDUNG (A3-Pflicht) steht aus; danach landet der Lead den super-Patch in einem EIGENEN Worktree (wt-super-w1 und wt-e24 sind TABU). Kollisionsregel: Substanz gewinnt, am Job-Namen ankern, obenauf mergen.",
+        "LEDGER-NACHTRAG bei der Landung (super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md): B1 als gebaut+bewiesen+ungelandet eintragen, inklusive des PDF-Gate-Funds und des neuen Stufe-05-Folge-Postens.",
+        "FALLEN-KANDIDATEN fuer den Kanon (beide in dieser Session live erhoben): (a) 405 entsteht erst nach 'Configure -> Bau -> 2. Configure -> EXPLIZITER Bau der Ziele comdare_axis_registry_gen / comdare_system_axis_registry_gen / comdare_measurement_axis_registry_gen / test_profile_roundtrip'; ohne diesen Nachbau meldet ctest 4 rote Tests bei korrektem N. (b) Das all-Ziel des ce baut diese vier Werkzeuge NICHT -- registry_roundtrip.cmake:30 sagt es selbst.",
+        "AUFRAEUMPASS-KANDIDATENLISTE fortgeschrieben (nicht ausgefuehrt, je-GO): M-CE-18 ce tools/latex_anhang/{CMakeLists.txt,main.cpp} + tests/unit/test_latex_anhang.cpp + der tools/CMakeLists.txt-Eintrag -- toter Alt-Parser, aktive Strecke ist super Code/08_appendix_generator.",
+        "NICHT ANGEFASST, wie im Plan abgegrenzt: E-04/B2, B12-xlsx, B5 T6-Einsammel-Naht (samt der davon abhaengigen Grandchild-Vorwaerts-Verlaengerung im experiment_plan_director), G8 Anhang-B/E-Prosa. Jede Ausweitung waere ein neues Paket.",
+        "WORKFLOW-BACKUP: die Beweis-/Doppellauf-Literale liegen vollstaendig unter /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/b1-e18/gates/ (99-DOPPELLAUF-LITERALE.txt als Sammelfassung). Das Kopieren nach super docs/sessions/backups/ ist Lead-/Orchestrator-Sache -- diese Session hat den super-Baum auftragsgemaess nicht angefasst."
+      ]
+    },
+    "reviews": [
+      {
+        "befunde": [
+          "B-1 (MITTEL, Deklarations-Luecke): 18 der real 163 hinzugefuegten .gitlab-ci.yml-Zeilen tragen nach Paragraph-Abzug verbotene Nicht-ASCII (em-dash Zeilen 7,41,48,52,64,68,71,83,93,97,100; box-drawing 29,110,123,124,131,140; beide 156). Hausstil der Datei (93 Bestands-Zeilen nicht-ASCII, jeder Job-Kopf nutzt box-drawing) spricht fuer Konsistenz, aber die ASCII-Doktrin (feedback_ascii_only, V-6-Scope: Code-Kommentare -> 0, sonst Zahl EHRLICH ausweisen) verlangt die Ausweisung -- der Bau-Report weist nur core.sh (0) und ce-Diff (0) aus und schweigt zum YAML-Patch. Lead-Entscheid bei Landung: transliterieren ODER als Hausstil-Erbe deklarieren; ce-Commit und core.sh sind sauber.",
+          "B-2 (NIEDRIG, Zaehl-Diskrepanz): Patch-Umfang real +163/-0 (selbst gezaehlt); Report sagt 162, ANWENDUNG.md sagt 160. Rein additiv stimmt; die Zahlen im Report sind untereinander und gegen das Objekt inkonsistent.",
+          "B-3 (NIEDRIG, Geltungsbereich PDF-Gate): run_pdf_gate baut nur das ERSTE Haupt-.tex (grep -l | head -1) -- aktuell deckungsgleich, da 289 genau ein Top-Level-Hauptdokument traegt (diplomarbeit.tex, selbst verifiziert); kommt je ein EN-Hauptdokument hinzu, prueft das Gate nur eines. Zudem prueft AF_PDF_GATE=auto ohne TeX-Toolchain nichts (ehrlich geloggt) -- die Zusage 'landet NIE einen kaputten Stand' gilt nur auf TeX-faehigen Runnern; Restnetz ist die 289-Pipeline NACH dem Push.",
+          "B-4 (NIEDRIG, Wortlaut): core.sh-Header verspricht 'LOESCHT NIE etwas im Ziel-Repo (kein rm...)', der Rollback nutzt aber rm -f auf die in DIESEM Lauf selbst angelegten unversionierten Pfade (Buchfuehrungs-Liste). Sachlich korrekt begrenzt (selbst bewiesen: fremde unversionierte Datei sha-identisch erhalten), Wortlaut minimal uebertrieben.",
+          "B-5 (NIEDRIG, prozessual): C1 war im Plan 'OPTIONAL, Lead-Entscheid'; der Builder hat ihn selbst entschieden und ausgefuehrt. Begruendung (Auftrag 'NUR ce-Anteile' waere sonst leer; E-02-Auffindbarkeit) ist tragfaehig und transparent deklariert -- bei Landung durch den Lead ratifizieren.",
+          "B-6 (NIEDRIG, Semantik Gitlink-Bump): der Bump zieht bei jedem Lauf auf den aktuellen 289-development-HEAD nach, auch wenn die Bewegung NICHT vom Kanal stammt (z.B. reine Owner-Prosa-Commits); der Commit-Titel nennt dann trotzdem 'Anhang-Vorwaerts-Kanal'. Mechanisch gewollt (Submodul branch=development, update=merge), semantisch leicht unscharf -- Kommentar-Klarstellung bei Landung genuegt.",
+          "B-7 (FALLEN-KANDIDAT, positiv geprueft): Werkstatt-Reste als Schein-Quelle-1 (stale Code/measure_out*/ im wiederverwendeten Runner-Workspace koennten den Korpus-Zweig shadowen) sind NUR durch den Runner-Default GIT_CLEAN_FLAGS=-ffdx neutralisiert (super-CI setzt die Var nirgends, selbst geprueft). Wird GIT_CLEAN_FLAGS je ueberschrieben, kippt die Kaskaden-Prioritaet -- als Kanon-Falle notieren.",
+          "POSITIV-BILANZ (alle PFLICHT-Punkte selbst erhoben): (1) SOLL-Treue gegen plan.md Zitate: S1-S5 vollstaendig im Patch-Vorschlag, C0/C1 eingehalten, Abgrenzungen 1.3 nicht angefasst, alle 4 deklarierten Abweichungen am Objekt als load-bearing verifiziert (PDF-Gate-Defekt: erase-Heatmap alle 8 z=0.0000 an blankem \\input A_measurements.tex:62; recursive wegen add_subdirectory(ce) Code/CMakeLists.txt ~:211; Geschwister-URL == relative .gitmodules-URL). (2) Kanal-Beweis am EIGENEN frischen Fixture nachgefahren: L1 34 .tex Commit+Push, L2 idempotent 0, L3 NO-OP, L5 RC=1 fail-loud, L7 beide boese Namen uebersprungen, L8 non-ff -> ort-Merge -> Push Versuch 2 mit erhaltener Owner-Prosa; 0 Loeschungen, 0 Dateien ausserhalb tabellen/, Fremd-Dateien sha256-identisch. (3) PDF-Gate beidseitig am echten 289-Klon: Baseline rc=0 -> Rot rc=12 ('I got too few coordinates', keine PDF) -> Rollback vollstaendig (0 Commits, anhang-porcelain 0) -> Gruen mit echtem 1-Zeilen-Delta: genau 1 Datei committet, 0 Reste. (4) Fingerprint-Neutralitaet selbst: abi/ 0, Frozen-Vektor exakt 3 TUs mit Diff 0, source_catalog.hpp 0, XML 0, C++ 0. (5) Eigener serieller Doppellauf am Commit-Objekt 07fc470d: ctest -N=405, 2x 405/405 RC 0/0, golden-320 3/3 + Roundtrip 4/4. (6) cf22-Binary 22.1.8 bestaetigt (keine C++-Dateien im Diff -> keine Datei-Argumente); ce-Diff ASCII 0, Marker 0. (7) super-Tree NICHT angewandt: porcelain nur vorbestehendes '?? Code/measure_out_d03/' (vor/nach byte-identisch), kein anhang:forward, kein ci/anhang_forward_core.sh im Tree; apply --check RC=0 gegen HEAD 626aee36; orig==Tree und Patch-Ergebnis==work/.gitlab-ci.yml jeweils byte-identisch; YAML 32->33 Keys, Rules/needs/stages wie gemeldet. Literale: /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/review-b1e18/ (fixA_out.log, fixB_out.log, rev-lauf1/2.log, rev-ctest-N.log)."
+        ],
+        "lens": "fable",
+        "verdikt": "LANDEBEREIT"
+      },
+      {
+        "befunde": [
+          "MAJOR (ce docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md, Nachtrag-Zeile 'Der Kanal liegt super-seitig als CI-Job anhang:forward (Stage persist, inert-by-default hinter COMDARE_ANHANG_FORWARD) plus ci/anhang_forward_core.sh'): Der Nachtrag beschreibt den Kanal im Praesens als EXISTENT, obwohl er nirgends existiert. Von mir unabhaengig verifiziert: (a) `find /home/comdare -name anhang_forward_core.sh -not -path '*/.git/*'` -> LEER; (b) `grep -rl 'anhang:forward' /home/comdare/Projekte /home/comdare/wt-*` (ohne .git) findet AUSSCHLIESSLICH die neue Nachtrag-Zeile selbst; (c) im super-Repo /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine (development@61548676, Stand 05.08., NEUER als der ce-Commit) existiert weder ci/anhang_forward_core.sh noch ein Job anhang:forward -- auch auf KEINEM Branch (git grep ueber alle refs/heads+refs/remotes: leer). Fehlerszenario: das Vier-Ledger-Audit (E-02) liest den Nachtrag als Ist-Beschreibung, hakt E-18 als 'Kanal steht, nur inert' ab und ueberspringt Implementierung sowie die gesamte Randfall-Pruefung (CSV-Quoting, TeX-Escaping, Pfad-Injection). Verstoss gegen den Kanon 'Kein ✓ ohne Ausgabe' / 'Nie raten; Doku+Ist'. Fix: Formulierung von Ist auf SOLL/PLAN umstellen oder mit 'noch nicht implementiert (Stand 05.08.)' stempeln.",
+          "MAJOR (selbe Datei, Nachtrag-Schlusssatz 'bis dahin traegt der measurement/-Korpus-Zweig des Kanals auch den dynamischen Pfad'): Diese Zusicherung ist durch den Ist-Zustand nicht gedeckt. Verifiziert in /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/.gitlab-ci.yml ab Zeile 1066: `ergebnis:holen` ist per Kommentar ausdruecklich SKELETT und 'INERT-by-default (DREIFACH: COMDARE_BUILD_GOLDEN_N-Gate + when:manual + _bot_-never)'; der scharfe Sammel-/Delegations-Aufruf ist GN-11/320er-gated. Damit erreichen die Stufe-2/3-CSVs des dynamischen planer:delegate-Pfades den measurement/<RUN_TS>-Korpus faktisch NICHT. Fehlerszenario: ein spaeterer Korpus-Scanner (bzw. der geplante Forward-Kanal) laesst genau die dynamischen Messwerte still aus und erzeugt einen Anhang, der vollstaendig aussieht, aber den delegierten Pfad nicht enthaelt -- stiller Datenverlust ohne Fehlermeldung.",
+          "MINOR (selbe Datei, Punkt (1) M-CE-18: 'tools/latex_anhang/ ist toter Alt-Parser (nie aufgerufen)'): sachlich falsch und zu absolut. Verifiziert im ce-Worktree /home/comdare/wt-b1-e18: tools/CMakeLists.txt:4 `add_subdirectory(latex_anhang)` (Default-Build) und tests/unit/CMakeLists.txt:278-280 `comdare_add_test(test_latex_anhang SOURCES test_latex_anhang.cpp LIBRARIES comdare::latex_anhang_lib)` -- das Tool wird gebaut UND von einem aktiven Unit-Test aufgerufen. Belegbar ist nur: nicht Teil des Produktions-/Forward-Pfades (aktive Strecke super Code/08_appendix_generator). Fehlerszenario: der Abschluss-Aufraeumpass entfernt es auf Basis dieses Ledger-Satzes als folgenlos und bricht Default-Build und Unit-CI. Fix: 'nie aufgerufen' -> 'nicht im Produktions-/Forward-Pfad; Default-Build + Unit-Test haengen daran'.",
+          "MINOR (selbe Datei, Pfadangabe 'profile_facade/planner/experiment_plan_director.hpp'): loest vom ce-Repo-Root nicht auf; korrekter Pfad ist libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp. Fehlerszenario: automatischer Existenz-Check bzw. Auditor bekommt ENOENT und kann die als QUELLE benannte Emissionsnaht nicht reproduzierbar verifizieren. Die fachliche Einordnung (ce = Quelle, keine Baustelle) wird dadurch allein nicht widerlegt.",
+          "INFO (Scope-Claim '0 Code'): BESTAETIGT fuer den Range b4110cd0..HEAD -- genau ein Commit 07fc470d, genau eine geaenderte Datei, 17 Einfuegungen, reines Markdown. Keine Header/TU/XML/CI-Datei/Test/Fixture beruehrt. Folge: durch DIESEN Diff entsteht unmittelbar KEINE neue Regression bei CSV-Parsing (Quoting, leere Felder, Trennzeichen in Werten, 'failed'-Marker, Zeilenenden), TeX-Escaping/-Injection (_ % & # $ ^ ~ { } \\), Pfad-/Shell-Injection oder CI-Exit-Codes. Golden-neutral. Umgekehrt gilt: fuer den behaupteten Forward-Kanal existiert weder Implementierung noch irgendein Fixture-Nachweis fuer diese Randfaelle -- die Fixture-Beweiskraft fuer E-18 ist derzeit NULL.",
+          "PROZESS-HINWEIS zum Reviewkanal: Codex war erreichbar (kein Ausfall), konnte aber im eigenen Sandbox keine Kommandos ausfuehren ('bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted') und sah remote nur den Basisstand b4110cd0. Ich habe daraufhin Diff + Ist-Kontext verbatim nachgereicht; Codex hat das Review darauf abgeschlossen. Alle vier Sachbefunde oben habe ich anschliessend selbst am Dateisystem gegengeprueft (Kommandos und Ausgaben oben genannt), keine Uebernahme unverifizierter Codex-Behauptungen. READ-ONLY eingehalten: keine Schreibzugriffe, keine Fixes."
+        ],
+        "lens": "codex",
+        "verdikt": "NACHBESSERN"
+      }
+    ]
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Planung"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "plan:e18",
+      "phaseIndex": 1,
+      "phaseTitle": "Planung",
+      "agentId": "a0a9dca59409defec",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785953386455,
+      "queuedAt": 1785953386447,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "PLAN FERTIG (READ-ONLY eingehalten; kein Edit am Objekt, ke…",
+      "promptPreview": "PLANUNGS-AUFTRAG B1/E-18 (READ-ONLY; Plan nach /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/b1-e18/plan.md, mkdir -p erlaubt). B1/E-18 (Owner-GO abend-5; Sweep-Fund B1): Der LaTeX-Anhang-VORWAERTS-Kanal je CI — vom Owner als 'HAUPT-ZIEL des Gesamt-Systems' und benanntes Bau-Paket VOR dem Voll-Bau-4-Trigger dekretiert (LEDGER:3554, Sec-68c-Umfeld; Zweck: Messergebn…",
+      "lastProgressAt": 1785954257289,
+      "tokens": 182711,
+      "toolCalls": 51,
+      "durationMs": 870834,
+      "resultPreview": "{\"status\":\"PLAN FERTIG (READ-ONLY eingehalten; kein Edit am Objekt, kein Push/Merge). E-18-SOLL aus dem Korpus belegt (LEDGER:3554/§68c + LEDGER:4212/B1 + Owner-verbatim nr529/nr541 aus 982er-Anker + 02.08.-Katalog:91 + D-03-Kopplung). KERN-BEFUND: E-18 ist ein super+289-Paket -- der ce-Anteil am E-18-KERN ist NULL Code (ce-Worktree wt-b1-e18 bleibt Default auf b4110cd0; Dauer-Auflagen werden trot…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "probe:opus5",
+      "phaseIndex": 2,
+      "phaseTitle": "Bau",
+      "agentId": "aec41f7b664b97827",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785954257291,
+      "queuedAt": 1785954257289,
+      "attempt": 1,
+      "promptPreview": "Antworte NUR mit OK.",
+      "lastProgressAt": 1785954259122,
+      "tokens": 21182,
+      "toolCalls": 0,
+      "durationMs": 1831,
+      "resultPreview": "OK"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "bau:e18",
+      "phaseIndex": 2,
+      "phaseTitle": "Bau",
+      "agentId": "ac282a9d9a7bd4b92",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785954259129,
+      "queuedAt": 1785954259122,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FERTIG / LANDEBEREIT (kein Push, kein Merge, kein Edit im s…",
+      "promptPreview": "BAU-AUFTRAG B1/E-18 (Plan BINDEND: /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/b1-e18/plan.md ZUERST KOMPLETT lesen; Planer-Report: {\"status\":\"PLAN FERTIG (READ-ONLY eingehalten; kein Edit am Objekt, kein Push/Merge). E-18-SOLL aus dem Korpus belegt (LEDGER:3554/§68c + LEDGER:4212/B1 + Owner-verbatim nr529/nr541 aus 982er-Anker + 02.08.-Katalog:91 + D-03-Kopplung…",
+      "lastProgressAt": 1785956173915,
+      "tokens": 272354,
+      "toolCalls": 131,
+      "durationMs": 1914786,
+      "resultPreview": "{\"status\":\"FERTIG / LANDEBEREIT (kein Push, kein Merge, kein Edit im super-Baum -- super status --porcelain byte-identisch zum Sessionstart). PLANBEFUND BESTAETIGT: E-18 ist ein super+289-Paket, der ce-Anteil am KERN ist NULL Code; ce traegt genau 1 docs-only Commit (C1-Abgrenzung fuer das Vier-Ledger-Audit). Der super-Anteil (S1-S5) liegt vollstaendig als anwendbarer PATCH-Vorschlag im Scratch (g…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "rev:fable",
+      "phaseIndex": 3,
+      "phaseTitle": "Review",
+      "agentId": "a84f91359eac2980a",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785956173926,
+      "queuedAt": 1785956173917,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "fable",
+      "promptPreview": "FABLE-REVIEW B1/E-18 (READ-ONLY /home/comdare/wt-b1-e18): adversarial gegen Plan+Bau. Bau-Report: {\"status\":\"FERTIG / LANDEBEREIT (kein Push, kein Merge, kein Edit im super-Baum -- super status --porcelain byte-identisch zum Sessionstart). PLANBEFUND BESTAETIGT: E-18 ist ein super+289-Paket, der ce-Anteil am KERN ist NULL Code; ce traegt genau 1 docs-only Commit (C1-Abgrenzung fuer das Vier-Ledger…",
+      "lastProgressAt": 1785956848966,
+      "tokens": 130404,
+      "toolCalls": 40,
+      "durationMs": 675040,
+      "resultPreview": "{\"befunde\":[\"B-1 (MITTEL, Deklarations-Luecke): 18 der real 163 hinzugefuegten .gitlab-ci.yml-Zeilen tragen nach Paragraph-Abzug verbotene Nicht-ASCII (em-dash Zeilen 7,41,48,52,64,68,71,83,93,97,100; box-drawing 29,110,123,124,131,140; beide 156). Hausstil der Datei (93 Bestands-Zeilen nicht-ASCII, jeder Job-Kopf nutzt box-drawing) spricht fuer Konsistenz, aber die ASCII-Doktrin (feedback_ascii_o…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "rev:codex",
+      "phaseIndex": 3,
+      "phaseTitle": "Review",
+      "agentId": "a508ab9afc38d7d0a",
+      "model": "claude-fable-5",
+      "fallbackModel": "claude-opus-5",
+      "state": "done",
+      "startedAt": 1785956173927,
+      "queuedAt": 1785956173917,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "codex",
+      "promptPreview": "CODEX-REVIEW B1/E-18 (READ-ONLY): Lade via ToolSearch mcp__codex__codex und beauftrage Codex mit adversarialem Regressions-Review des Diffs b4110cd0..HEAD in /home/comdare/wt-b1-e18 (Fokus: CSV-Parsing-Randfaelle, TeX-Escaping [Sonderzeichen in Messwerten/Namen!], Pfad-/Injection-Sicherheit des Kanals, CI-Naht-Robustheit, Fixture-Beweiskraft). Bei Codex-Ausfall: ehrlich als AUSFALL melden, NICHT e…",
+      "lastProgressAt": 1785958189290,
+      "tokens": 39340,
+      "toolCalls": 17,
+      "durationMs": 2015363,
+      "resultPreview": "{\"befunde\":[\"MAJOR (ce docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md, Nachtrag-Zeile 'Der Kanal liegt super-seitig als CI-Job anhang:forward (Stage persist, inert-by-default hinter COMDARE_ANHANG_FORWARD) plus ci/anhang_forward_core.sh'): Der Nachtrag beschreibt den Kanal im Praesens als EXISTENT, obwohl er nirgends existiert. Von mir unabhaengig verifiziert: (a) `find /home/comda…"
+    }
+  ],
+  "totalTokens": 645991,
+  "totalToolCalls": 239
+}

@@ -1,0 +1,40 @@
+==========================================================================
+ B1/E-18 -- DOPPELLAUF-LITERALE + DAUER-AUFLAGEN (Backup-Fassung)
+ Erhoben: 2026-08-05T18:52:52Z UTC
+==========================================================================
+
+COMMIT-OBJEKT (ce, Worktree /home/comdare/wt-b1-e18, Branch b1-e18-vorwaerts-kanal):
+   07fc470d docs(e18): B1-Abgrenzung im ce-Ledger -- E-18-Kern liegt super-seitig (anhang:forward), ce-Beitrag = 0 Code
+   Basis: b4110cd0 (Gate 405) -- Vorfahr: JA
+   git status --porcelain: 0 Zeilen (FREEZE)
+
+DOPPELLAUF (seriell -j1, Build-Dir /home/comdare/wt-b1-e18/build-b1e18-gate, FRISCH angelegt):
+   Reihenfolge: frisches Configure -> VOLL-BAU -> 2. Configure -> Nachbau der 2-Pass-Werkzeuge -> 2x ctest
+   ctest -N nach dem 2-Pass:  "Total Tests: 405"   (Basis-N LIVE erhoben, erwartet 405 -- getroffen)
+   ctest -N nach 1. Configure: "Total Tests: 401"  (N-Erhebungs-Falle, dokumentiert)
+   LAUF 1: "100% tests passed, 0 tests failed out of 405"   LAUF1-RC=0
+   LAUF 2: "100% tests passed, 0 tests failed out of 405"   LAUF2-RC=0
+
+FINGERPRINT-NEUTRALITAET (Diff b4110cd0..HEAD):
+   geaenderte Dateien: docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md 
+   abi/-Diff (libs/cache_engine/include/cache_engine/abi/): 0 Zeilen
+   Frozen-Vektor 0fe275bd...93b in GENAU 3 TUs; Diff dieser 3 TUs: 0 Zeilen
+   golden-CRC-Traeger source_catalog.hpp: 0 Zeilen Diff
+   geaenderte .xml: 0
+   C++-Dateien im Diff: 0  -> cf22 hat keine Datei-Argumente
+   cf22-Binary-Beleg: Ubuntu clang-format version 22.1.8 (++20260613092238+e80beda6e255-1~exp1~20260613092253.78)
+   ASCII-Selbstcheck (hinzugefuegte Zeilen): 0 nicht-ASCII
+   3-Marker (Zeilenanfangsform, hinzugefuegte Zeilen): 0
+
+GOLDEN-320 / ROUNDTRIP in BEIDEN Laeufen:
+   test_smoke_coverage_profile                Lauf1=1 Lauf2=1
+   test_wdk_datasets_fairness                 Lauf1=1 Lauf2=1
+   test_measurement_categories                Lauf1=1 Lauf2=1
+   test_profile_roundtrip                     Lauf1=1 Lauf2=1
+   test_axis_registry_roundtrip               Lauf1=1 Lauf2=1
+   test_system_axis_registry_roundtrip        Lauf1=1 Lauf2=1
+   test_measurement_axis_registry_roundtrip   Lauf1=1 Lauf2=1
+
+SUPER-BAUM UNVERAENDERT (READ-ONLY eingehalten):
+   git -C <super> status --porcelain: 1 Zeilen (identisch zum Sessionstart)
+   git -C <thesis-289> status --porcelain: 0 Zeilen

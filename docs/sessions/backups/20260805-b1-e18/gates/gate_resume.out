@@ -1,0 +1,16 @@
+== VOLL-BAU Versuch 1 ==
+build_rc(try=1)=1
+== VOLL-BAU Versuch 2 ==
+build_rc(try=2)=0
+GATE_BAU_KOMPLETT_RC0
+== CONFIGURE PASS 2 (kanonischer 2-Pass NACH dem Bau) ==
+configure_pass2_rc=0
+build_pass2_rc=0
+Total Tests: 405
+== DOPPELLAUF LAUF 1 (seriell, -j1) ==
+LAUF1-RC=8
+99% tests passed, 4 tests failed out of 405
+== DOPPELLAUF LAUF 2 (seriell, -j1) ==
+LAUF2-RC=8
+99% tests passed, 4 tests failed out of 405
+GATE_DOPPELLAUF_KOMPLETT

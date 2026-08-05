@@ -1,0 +1,1268 @@
+# probst-Diplomarbeit-cache-engine (Super) — GitLab CI/CD (REV 13, 2026-06-27): Haupt-Pipeline orchestriert die 3 Modul-Pipelines (#186 §5.4); ci-templates-Lint + Mess→PDF
+# ─────────────────────────────────────────────────────────────────────────────
+# REV 10 (Debug-Befunde 6951 + User-Entscheidungen):
+#  - Lint scannt NUR super-eigenen Code (GIT_SUBMODULE_STRATEGY:none je Lint-Job) — die Submodule
+#    cache-engine/prt-art/thesis werden in IHREN Pipelines gelintet, nicht hier doppelt (schnell + keine Cross-FPs).
+#  - analyse: KEIN Code/build/-Artefakt (Object-Storage-500 post-swap; Beleg = Build-Log). Mess-Daten via NAS-Writeback.
+#  - thesis:pdf bis TeXLive-via-Infra (User-Wahl P1c) per Variable gegatet (sonst sicherer Fail an "latexmk fehlt").
+#  - cache-engine-Mess-Artefakt-Fetch: job=pmc:amd (REV-10-Name), bleibt optionaler Fallback.
+# Bewahrt den Mess→PDF-Flow (Submodule ziehen → Auswertungswerkzeuge bauen → Diplomarbeit-PDF mit REALEN Cache-Misses).
+
+include:
+  - project: 'comdare/cluster/ci-templates'
+    ref: development
+    file: '/base-pipeline.yml'
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "pipeline"'
+    - if: '$CI_COMMIT_BRANCH'
+
+stages:
+  - lint
+  - orchestrate          # REV13 (#186 §5.4): Haupt-Pipeline triggert die 3 Modul-Pipelines (strategy:depend = synchron + gated)
+  - submodules
+  - analyse
+  - test                 # Stufe 3 (User 2026-07-03): VOLLE super-Unit-Suite bauen+AUSFUEHREN (Korrektheitsbeweis, nicht nur kompilieren)
+  - integration
+  - planer               # W7-A (§40.b): dynamische, Planer-gesteuerte Folge-CI (CiYamlBuilder -> Child-Pipeline), inert-by-default (opt-in COMDARE_DYNAMIC_PLANER_CI)
+  - manifest             # Stufe 7 (#198, EPIC #186): Build-/Mess-Manifest (Provenance) + additives Prebackup
+  - thesis-pdf
+  - measure              # #156/#17 (User 2026-07-11): mehrtaegiger golden-320-Voll-Messlauf (inert-by-default, opt-in COMDARE_RUN_MEASURE)
+  - persist              # #22 (Ledger §11-G): Auswertungs-Dokumente sammeln + commit-back nach development (inert-by-default)
+                         # + anhang:forward (E-18, Ledger §68c): der VORWAERTS-Kanal derselben Stage — regenerierte
+                         #   anhang/{de,en}/tabellen/*.tex nach Projekt 289 + Gitlink-Bump (inert-by-default)
+
+# ── Submodul-Auth (REV 16, 2026-07-27, path a = nativer v8-Weg; Owner-GO Handout-1 §1 + INFRA->DIPLOM). ──
+# Native GitLab-Submodul-Verdrahtung statt manuellem Klon: GIT_STRATEGY:fetch + GIT_SUBMODULE_STRATEGY:recursive
+# (unten in variables:) -> get_sources klont die 3 Submodule (ce/prt-art/thesis) rekursiv und injiziert das
+# CI_JOB_TOKEN automatisch via `http.<host>.extraheader`. Die .gitmodules-URLs sind relativ (super 89af7ca2)
+# -> same-host gegen origin aufgeloest; GIT_SUBMODULE_FORCE_HTTPS erzwingt HTTPS (air-gap). Voraussetzung =
+# inbound-job_token_scope-Allowlist von 289/287/286 enthaelt 288 (verifiziert 2026-07-27; #399 + Recheck).
+#
+# SUPERSEDED (REV 13/14 insteadOf; REV 15/17 manueller Deploy-Token-Klon im default:before_script): der
+# REV-15-Behelf war noetig, solange v7.0.3-Embed-Tokens + polluted Host-gitconfigs den Runner-extraheader mit
+# einem FREMDEN Token verunreinigten (403 job-token). Seit v7.0.4 (kein Embed-Token) + Host-Store-De-Pollution
+# + GIT_CONFIG-per-Build-Isolation (#395) injiziert der Runner den KORREKTEN CI_JOB_TOKEN -> der native
+# recursive-Fetch traegt; der manuelle Deploy-Token-Klon entfaellt ersatzlos.
+# Jobs OHNE Submodul-Bedarf ueberschreiben GIT_SUBMODULE_STRATEGY:none (lint:*/persist:measurements/
+# ergebnis:holen) bzw. GIT_STRATEGY:none (toolchain:probe/runner:sweep-zombies). ci-templates unberuehrt.
+
+# #277/#21 (User 06.07.): ccache-Bestand liegt auf dev-MinIO (runners.cache -> minio.comdare.de:9000/buildsystem-cache).
+# CCACHE_DIR projektlokal, damit GitLab-cache ihn synct; MAXSIZE klein halten (Zip-Transfer je Job).
+cache:
+  key: "ccache-$CI_PROJECT_NAME"
+  paths: [".ccache"]
+
+variables:
+  CCACHE_DIR: "$CI_PROJECT_DIR/.ccache"
+  CCACHE_MAXSIZE: "3G"
+  COMDARE_CLANG_MATRIX: "1"   # #273: neueste-clang-Pflicht (User-E2), Rollout-Start super
+  GIT_STRATEGY: fetch                      # (REV 16, path a) natives Repo-Setup -> get_sources injiziert CI_JOB_TOKEN via extraheader
+  GIT_SUBMODULE_STRATEGY: recursive        # (REV 16, path a) nativer rekursiver Submodul-Fetch mit CI_JOB_TOKEN (ersetzt den manuellen Deploy-Token-Klon)
+  GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
+  CMAKE_BUILD_PARALLEL_LEVEL: "6"          # User 2026-07-06: 2x6 Kerne bei concurrent=2 (prod1 16C/60G, 17G frei, kein earlyoom; revidiert 8@concurrent=1)
+  COMDARE_LINT_PATHS: "Code"
+  COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
+  # cppcheck-Pendant zur EXCLUDE_RE (Template 237b6ec): OHNE external/thesis scannt lint:static die
+  # Submodule mit, die auf dem persistenten Workspace aus recursive-Jobs liegen (Job 192672).
+  COMDARE_CPPCHECK_IGNORE_DIRS: "ext build _archive_code_pre_migration modules external thesis"
+  # S1/A1 P-TOTAL (Ledger 46/48): Voll-Build-Umfang 2^17 des all_axes_golden-Organraums. Selbst-enthaltene
+  # Child-/Grandchild-Pipelines erben Pipeline-Variablen NICHT -> dieser Wert wird ueber die zwei Trigger-Grenzen
+  # (planer:delegate-trigger + der CE-emittierte ceb:trigger) per expliziter forward-Allowlist durchgereicht, damit
+  # der Grandchild-Tier-Bau 131072 statt des Sicherheits-Fallbacks 16 liest. Golden-neutral (reiner CI-Umfang).
+  # Ueberschreibbar je Trigger (z.B. Kalibrierlauf COMDARE_GN_TOTAL=64); wirkt nur hinter COMDARE_BUILD_GOLDEN_N.
+  COMDARE_GN_TOTAL: "131072"
+
+# ── #53 docs-only-Durchsatz-Gate (Ledger §63-Nachtrag, Manager-Verdikt V2): Allowlist-Rules-Vorlage. ──
+# WIRKT auf development (unsere docs-/Ledger-Wellen SIND development-Pushes): ein Commit, der NUR
+# Dokumentation aendert (KEIN Pfad der changes-Allowlist), ueberspringt die schweren Code-Jobs =>
+# sofortiger Durchsatz-Gewinn. Fuer die CODE-Jobs laeuft main weiter IMMER voll (der main-Zweig DIESER
+# Vorlage bleibt bestehen: Release-Beweis auf der Merge-SHA; V2). P2/D3.1 (27.07.) nimmt diese main-Ausnahme
+# aber den 3 orchestrate-BRIDGES: die sind jetzt auch auf main changes-gegatet, damit eine docs-only-Welle
+# auf main keine Modul-Pipelines mehr erzeugt (Ende der 286-Echo-Kaskade). Gitlink-
+# Bumps (Code/external/*, .gitmodules) stehen in der Positivliste => ein 1-Zeilen-160000-Submodul-Bump ist
+# NIE docs-only. Allowlist (NICHT Blocklist): neue Branches/unbekannte Pfade => changes=true = volle
+# Pipeline (sichere Richtung). web/pipeline/trigger/MR werten changes ohnehin true bzw. sind Mess-Trigger
+# => nie gaten. lint:secrets bleibt UNGEGATET (Token-Risiko je Commit); thesis:pdf ist docs-Konsument.
+# Doktrin-Auslegung (V2): "gesamte Pipeline hart gruen" bezieht sich auf den CODE-Stand -- ein docs-only-
+# Commit aendert keinen Code, der Beweis der Vorwelle bleibt gueltig (Skip != gelb, Job existiert nicht).
+.code-rules:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        paths:
+          - "Code/**/*"
+          - "Code/external/*"      # Gitlink-Bumps ce/prt-art (1-Zeilen-160000-Diff) => NIE docs-only
+          - "thesis/diplomarbeit"  # thesis-Gitlink
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
+
+# ── #53 ccache-Hygiene: Konsumenten ziehen den ccache nur (policy: pull), EIN Writer (analyse:thesis-data)
+# bleibt pull-push (globale cache-Default). Nicht-kompilierende Jobs tragen KEINEN ccache-Zip-Transfer. ──
+.ccache-pull:
+  cache:
+    key: "ccache-$CI_PROJECT_NAME"
+    paths: [".ccache"]
+    policy: pull
+
+# ── Stufe 1: Lint (aus ci-templates) — NUR super-eigener Code, KEINE Submodule ──
+# #273 T1 (User-E2 2026-07-05): Compiler-Inventar je Runner-Host via CI (Cluster read-only) — Grundlage
+# fuer den gcc-15.3-Pin (T2) + die neueste-clang-Pflichtmatrix. Rollout beginnt hier (super).
+# [RUN-1]-Workaround selbstbedienbar (User-GO 22.07. "kill alle Zombies"): Job-Cancel laesst den
+# comdare-messung-driver als Waise zurueck (Runner killt nur den Shell-Wrapper) -> P11-Wache blockt
+# den Host. Dieser Sweep laeuft ALS gitlab-runner auf der per SWEEP_TAG gewaehlten Lane und darf die
+# eigenen Waisen killen. NUR via API-Trigger mit COMDARE_SWEEP_ZOMBIES=true + SWEEP_TAG=amd|intel.
+# Nachhaltig-Fix (Runner KillMode/Prozessgruppen) bleibt Infra-Task [RUN-1].
+runner:sweep-zombies:
+  stage: lint
+  tags: ["$SWEEP_TAG"]
+  needs: []
+  cache:
+    paths: []
+  variables:
+    GIT_STRATEGY: none
+  rules:
+    - if: '$COMDARE_SWEEP_ZOMBIES == "true"'
+  script:
+    # [c]-Trick auf ALLEN Mustern (12097-Befund 2026-07-22): das nackte Muster matcht jede fremde Shell,
+    # deren Cmdline den String traegt (Monitor-/eval-Shells) -> Verifikation exit 1 trotz erfolgreichem Kill.
+    # Die Regex [c]omdare... matcht den echten Treiber, aber nie eine Cmdline, die das Muster selbst zitiert.
+    - 'echo "== Waisen-Inventar ($SWEEP_TAG / $(hostname)) =="'
+    - 'pgrep -af ''[c]omdare-messung-driver'' || echo "keine Waisen"'
+    - 'pkill -f ''[c]omdare-messung-driver'' 2>/dev/null || true'
+    - 'sleep 3'
+    - 'pkill -9 -f ''[c]omdare-messung-driver'' 2>/dev/null || true'
+    - 'sleep 2'
+    - 'echo "== ps-Beleg nach Sweep =="'
+    - 'pgrep -af ''[c]omdare-messung-driver'' && exit 1 || echo "SAUBER: keine comdare-messung-driver-Prozesse auf $(hostname)"'
+
+toolchain:probe:
+  extends: [.toolchain-probe, .code-rules]   # #53: docs-only-Gate
+  tags: [baremetal]
+  cache:
+    paths: []                                # #53: Probe kompiliert nicht -> kein ccache-Zip-Transfer
+
+# #273: Pflicht-Build mit dem neuesten auf dem Host verfuegbaren clang (COMDARE_CLANG_MATRIX=1 oben).
+# #258-Fix (2026-07-06, Pipeline 8048/Job 213091): Template-Default cmake -S "." fand kein CMakeLists —
+# super-Quelle liegt unter Code/. Scope = Sammel-Target comdare_da_tools (Code/CMakeLists.txt, super-eigene
+# Werkzeugflaeche analog analyse+integration; Konfiguration spiegelt analyse:thesis-data: Ninja/Release/V32).
+build:clang:
+  # #53: docs-only-Gate als EXPLIZITE kombinierte rules (NICHT .code-rules-extends), damit der #273-CLANG_MATRIX-
+  # Ausschalter erhalten bleibt (architekturkonform, nicht nur heute-identisch): CLANG_MATRIX!=1 => never (Bestand
+  # der neueste-clang-Pflicht), DANN die V2-Allowlist (docs-only skippt; main/Code/Gitlink laufen). .ccache-pull
+  # bleibt (Konsument, pull-only).
+  # P2/D3.1 (27.07.; INFRA-AN-DIPLOM Punkt 1 SUPERSEDET das alte "needs UNVERAENDERT (Verdikt V4)"):
+  # ohne needs war der Job stage-blockiert (stage: analyse) und wartete hinter der Stage orchestrate
+  # auf die 3 strategy:depend-Bridges -- Slot-Fresser und Mit-Ursache der 286-Echo-Kaskade. Mit
+  # needs: ["verify:submodules"] laeuft er per DAG los, sobald die Submodul-Verifikation steht.
+  # EXISTENZ-SICHER in der TRAGENDEN Richtung: die rules 2-4 unten sind eine echte Teilmenge der
+  # .code-rules (Vorlage oben), also existiert verify:submodules in JEDER Welle, in der build:clang
+  # existiert => das needs haengt nie. Die Gegenrichtung gilt bewusst NICHT: mit
+  # COMDARE_CLANG_MATRIX != "1" existiert verify:submodules OHNE build:clang -- fuer die
+  # needs-Validitaet harmlos (nur die tragende Richtung zaehlt).
+  extends: [.build-clang-latest, .ccache-pull]
+  needs: ["verify:submodules"]
+  rules:
+    - if: '$COMDARE_CLANG_MATRIX != "1"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - changes:
+        paths:
+          - "Code/**/*"
+          - "Code/external/*"
+          - "thesis/diplomarbeit"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
+  stage: analyse   # super hat keinen 'build'-Stage (Lint-API 05.07.: chosen stage build does not exist)
+  tags: [baremetal]
+  variables:
+    COMDARE_CMAKE_SOURCE_DIR: "Code"
+    COMDARE_AUDIT_BUILD_TYPE: "Release"
+    COMDARE_CMAKE_CONFIGURE_FLAGS: "-G Ninja -DCOMDARE_V32_ENABLE=ON"
+    COMDARE_CMAKE_BUILD_TARGET: "comdare_da_tools"
+
+lint:secrets:
+  extends: .lint-secrets
+  tags: [baremetal]
+  # #53-Haertung (21.07.): explizite Immer-rules — lint:secrets ist der EINZIGE Pflicht-Job jeder Welle
+  # (Token-Risiko je Commit, auch docs-only). Befund 12012: docs-only-Welle entstand LEER-failed; diese
+  # rules stellen sicher, dass die Minimal-Welle existiert und GRUEN werden kann.
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+lint:format:
+  extends: [.lint-format, .code-rules]   # #53: docs-only-Gate (Tool-Cache aus .lint-format bleibt)
+  tags: [baremetal]
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+lint:static:
+  extends: [.lint-static, .code-rules]   # #53: docs-only-Gate (Tool-Cache aus .lint-static bleibt)
+  tags: [baremetal]
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+
+# ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
+# User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
+# lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
+# bewusst NICHT Target "all": das zöge die komplette ce-Suite (888 Targets) doppelt, die ihr EIGENES
+# test:unit im ce-Repo hat (dort advisory bis 58er-Fix-Strecke/264-d).
+test:unit:
+  extends: [.test, .code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
+  # OP-2 (D3-Plan, 27.07.; Herleitung korrigiert nach CiCheck-Messung 13570): die Vorlage .test aus
+  # den zentralen ci-templates (base-pipeline.yml) bringt needs:[] mit -- test:unit war dadurch
+  # stage-frei und startete in 4/4 gemessenen Voll-Wellen VOR verify:submodules (bis 37s Vorsprung),
+  # d.h. die Unit-Suite baute los, bevor die Submodul-Verifikation ueberhaupt lief. Das needs hier
+  # ueberschreibt das geerbte needs:[] und garantiert die Reihenfolge (Korrektheits-Fix, kein
+  # Scheduling-Fix; test:unit liegt nicht auf dem kritischen Pfad der Welle).
+  # EXISTENZ-SICHER in BEIDEN Richtungen: test:unit und verify:submodules ziehen ihre rules identisch
+  # aus .code-rules => beide existieren in exakt denselben Wellen, das needs haengt nie.
+  needs: ["verify:submodules"]
+  tags: [baremetal]
+  variables:
+    COMDARE_TEST_CMAKE_SOURCE_DIR: "Code"
+    COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test"
+    COMDARE_TEST_CONFIGURE_FLAGS: "-DCOMDARE_DA_BUILD_TESTS=ON -DCOMDARE_V32_ENABLE=ON"
+    COMDARE_TEST_BUILD_TARGET: "comdare_da_unit_tests"
+    COMDARE_TEST_CTEST_ARGS: "-L da_unit"
+
+# ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
+# Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.
+# strategy: depend = dieser Bridge-Job spiegelt den Kind-Pipeline-Status -> Super wird ROT, wenn ein Modul rot ist (= echtes Gate).
+# needs: [lint:secrets] = erst nach Supers hartem Secrets-Gate triggern. Projektpfade aus .gitmodules (relative URLs -> comdare/research/<repo>).
+trigger:cache-engine:
+  stage: orchestrate
+  needs: ["lint:secrets"]
+  rules:                                     # #53 + P2/D3.1 (27.07.): changes-Gate OHNE main-Ausnahme -- auch auf main entscheidet die Pfadliste (ce-Gitlink-Bump = Pfad-Change => nie faelschlich uebersprungen); NUR web/api/pipeline/trigger/MR feuern immer
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - changes:
+        paths:
+          - "Code/external/comdare-cache-engine"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
+  trigger:
+    project: comdare/research/comdare-cache-engine
+    branch: main
+    strategy: depend
+    forward:                       # FIX 2026-06-27: super-Variablen (GIT_SUBMODULE_STRATEGY:recursive, COMDARE_CITOOLS_DIR) NICHT in die Modul-Pipeline forwarden — sie sollen ihren EIGENEN Kontext nutzen (sonst /.citools-mkdir + Submodul-Checkout -> lint:secrets failt)
+      yaml_variables: false
+      pipeline_variables: false
+trigger:prt-art:
+  stage: orchestrate
+  needs: ["lint:secrets"]
+  rules:                                     # #53 + P2/D3.1 (27.07.): changes-Gate OHNE main-Ausnahme -- auch auf main entscheidet die Pfadliste (prt-art-Gitlink-Bump = Pfad-Change); NUR web/api/pipeline/trigger/MR feuern immer
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - changes:
+        paths:
+          - "Code/external/comdare-prt-art"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
+  trigger:
+    project: comdare/research/comdare-prt-art
+    branch: main
+    strategy: depend
+    forward:
+      yaml_variables: false
+      pipeline_variables: false
+trigger:thesis:
+  stage: orchestrate
+  needs: ["lint:secrets"]
+  rules:                                     # #53 + P2/D3.1 (27.07.): changes-Gate OHNE main-Ausnahme -- auch auf main entscheidet die Pfadliste (thesis-Gitlink-Bump = Pfad-Change); NUR web/api/pipeline/trigger/MR feuern immer
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api" || $CI_PIPELINE_SOURCE == "pipeline" || $CI_PIPELINE_SOURCE == "trigger" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - changes:
+        paths:
+          - "thesis/diplomarbeit"
+          - ".gitmodules"
+          - ".gitlab-ci.yml"
+    - when: never
+  trigger:
+    project: comdare/research/20260931-overleaf-diplomarbeit
+    branch: main
+    strategy: depend
+    forward:
+      yaml_variables: false
+      pipeline_variables: false
+
+# ── Stage submodules: air-gap-taugliche Submodul-Verdrahtung verifizieren (braucht recursive) ──
+verify:submodules:
+  extends: [.code-rules]   # #53: docs-only-Gate (faellt mit allen Code-Dependents; DAG bleibt gueltig)
+  stage: submodules
+  tags: [baremetal]
+  needs: ["lint:secrets"]   # Codex-Review 06-27: hart auf den Secrets-Gate warten
+  cache:
+    paths: []               # #53: reine Submodul-Verifikation, kein Compile -> kein ccache-Zip
+  script:
+    - 'echo "== Submodule =="; git submodule status'
+    - 'test -e Code/external/comdare-cache-engine/CMakeLists.txt && echo "cache-engine OK"'
+    - 'test -e Code/external/comdare-prt-art/CMakeLists.txt && echo "prt-art OK"'
+    - 'test -d thesis/diplomarbeit && (ls thesis/diplomarbeit/*.tex >/dev/null 2>&1 && echo "thesis-LaTeX OK" || echo "thesis vorhanden")'
+    # REV-CI-04 (#22, 2026-07-13): Gitlink-Determinismus HART pruefen. `git submodule status` markiert mit
+    # Praefix `-` (nicht initialisiert), `+` (ausgecheckter Commit != Gitlink) oder `U` (Merge-Konflikt). Mit
+    # update=merge (.gitmodules) koennte CI auf einem persistenten/wiederverwendeten Worktree sonst einen
+    # lokalen Mergezustand STATT des exakten Gitlink-Commits bauen (= misst evtl. den falschen Submodul-Stand).
+    - |
+      _bad="$(git submodule status --recursive | grep -E '^[-+U]' || true)"
+      if [ -n "${_bad}" ]; then
+        echo "FEHLER (REV-CI-04): Submodul NICHT auf exaktem Gitlink-Commit (-/+/U-Praefix):"; echo "${_bad}"; exit 1
+      fi
+      echo "Submodul-Gitlink-Determinismus OK (alle exakt auf ihrem Gitlink-Commit)"
+
+# ── Stage analyse: Auswertungswerkzeuge bauen (KEIN grosses Artefakt) ──
+analyse:thesis-data:
+  extends: [.code-rules]   # #53: docs-only-Gate. ccache-WRITER (pull-push, globale cache-Default) -> unveraendert
+  stage: analyse
+  tags: [baremetal]
+  needs: ["verify:submodules"]
+  script:
+    - 'echo "== cache-engine-Mess-Artefakte (LOSE, optional) holen =="'
+    - 'curl -sf -o ce-measure.zip "${CI_API_V4_URL}/projects/comdare%2Fresearch%2Fcomdare-cache-engine/jobs/artifacts/main/download?job=pmc:amd" -H "JOB-TOKEN: ${CI_JOB_TOKEN}" && unzip -o -q ce-measure.zip -d ce-measure && echo "-> Mess-Artefakte uebernommen" || echo "-> keine CI-Mess-Artefakte (NAS-Writeback-Modell) -> baue mit committetem Bestand"'
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    # (I-PMC-1 gilt NUR den 2 Mess-Jobs measure:smoke/measure:golden-320 — dieser analyse-Job baut
+    # Auswertungswerkzeuge ohne Messung und bleibt bewusst ohne COMDARE_ENABLE_PMC.)
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    # Build-Parallelitaet via CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25)
+    - cmake --build build --target comdare-messung-driver comdare_binary_to_csv comdare_csv_to_latex comdare_diagram_generator
+  # KEIN Code/build/-Artefakt (Object-Storage-500 post-swap; analyse-Erfolg = Tools bauen, Beleg im Log).
+
+# ── Stage analyse: #279 dynamische Tier-Binary-Build-Sichtbarkeit ──
+# UMBAU 2b/D3.4 (27.07., INFRA-Handout-Auftraege 1-3): der Job surfacet die Bau-Sichtbarkeit
+# jetzt aus der EINEN kanonischen Planer-Ausgabe statt aus dem Codegen-Manifest.
+#   - Quelle ist "comdare-experiment-planner plan dump" (rein lesend: KEIN DLL-Bau, KEINE Messung).
+#     W1 (05.08.2026): bis zum Rollen-Schnitt war das der Treiber; die Planer-Rolle hat seither eine
+#     eigene Binary. Der Treiber wird hier weiterhin gebaut (Bau-Sichtbarkeit der CEB-Stufe).
+#   - EIN-FORMAT-REGEL (§73.1): der Job liest NUR den ROHEN plan-dump-Text - denselben, den 2c
+#     auch fuer tier_binary_report_cli vorsieht. Kein Zwischenformat, keine eigene Datei;
+#     "Caching" ausschliesslich als Job-Artefakt der rohen Ausgabe.
+#   - Die permutations_manifest.txt-Pruefung entfaellt ERSATZLOS. NACHTRAG 27.07. (V-3, OP-6
+#     ERLEDIGT): der Codegen laeuft in diesem Configure jetzt auch nicht mehr -- die Super-
+#     Abschaltung hat die Alt-Kanal-Schalter aus Code/CMakeLists.txt entfernt (Bauplan TEIL V
+#     Paket V-3). Der Job spart damit den kompletten V36.B-Codegen (27 CE- + 16 PRT-ART-
+#     smoke-Permutationen je Configure); die D3-Notiz "Codegen bleibt, perspektivisch
+#     entkoppelbar" ist eingeloest.
+# BILLIG-KLAUSEL ENTFAELLT: der Treiber-Bau ist SCHWERER als das alte tier_binary_report_cli
+# (voller Werkzeug-Bau statt Einzel-Tool); .ccache-pull mildert das. Weiterhin KEIN Perm-/
+# Mess-Lauf (mehrtaegiger Lauf #156 bleibt HELD). Hart (kein allow_failure).
+visibility:tier-binaries:
+  extends: [.code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
+  stage: analyse
+  tags: [baremetal]
+  needs: ["verify:submodules"]
+  script:
+    - 'echo "== Toolchain =="; cmake --version'
+    - cd Code
+    - cmake -B build-visibility -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
+    # W1 (05.08.2026, F1-HART): 'plan dump' ist die PLANER-Rolle und lebt in der eigenen ce-Binary
+    # comdare-experiment-planner. Der Treiber-Bau bleibt daneben stehen -- dieser Job beweist die
+    # Bau-Sichtbarkeit BEIDER Stufen-Traeger (CEB + Planer).
+    - cmake --build build-visibility --target comdare-messung-driver
+    - cmake --build build-visibility --target comdare_experiment_planner
+    - |
+      set -euo pipefail
+      DRIVER=$(find build-visibility -type f -name "comdare-messung-driver" 2>/dev/null | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      PLANNER=$(find build-visibility -type f -name "comdare-experiment-planner" 2>/dev/null | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
+      # Profil OHNE Argument: Fallback-Kette COMDARE_THESIS_PROFILE -> einkompiliertes Default
+      # (Profil-Pinning waere haerter gegen CI-Env-Drift -> OP-5, bewusst noch nicht gesetzt).
+      "$PLANNER" plan dump > build-visibility/dump_plan.txt
+      # 1. Kopf-Wache: Formatanker der v1.1-Emission (schlaegt bei Formatbruch sofort an).
+      grep -q '^# comdare-experiment-plan v1.1' build-visibility/dump_plan.txt || {
+        echo "FORMAT-BRUCH: Kopfzeile '# comdare-experiment-plan v1.1' fehlt"; head -5 build-visibility/dump_plan.txt; exit 1; }
+      # 2. Startgate/Sichtbarkeit: >=1 geplante step-Zeile MIT binary_id-FELD = sichtbarer Bau-Raum.
+      # BEWUSST Feld-Praesenz statt Wert-ungleich-'-': THESIS-Profile emittieren binary_id=- (nur
+      # EXPERIMENT-Profile tragen echte ids); ein Nicht-'-'-Filter waere beim Thesis-Default LEER
+      # und der Job dauerhaft ROT (lokal am realen plan-dump verifiziert). Strengere Pruefung: OP-4.
+      # '|| true': ohne das wuerde grep -c bei 0 Treffern via set -e sofort abbrechen - die
+      # Diagnose unten kaeme nie ins Log. Der Job wird trotzdem hart rot (test -ge 1).
+      STEPS=$(grep -Ec '^  step [0-9]+ .*binary_id=' build-visibility/dump_plan.txt || true)
+      test "$STEPS" -ge 1 || {
+        echo "STARTGATE LEER: keine 'step N ... binary_id='-Zeile im plan dump -> kein sichtbarer Bau-Raum"; exit 1; }
+      # 3. Sichtbarkeits-Zweck des Jobs: Zaehler + Rohausgabe ins Log.
+      echo "== geplante step-Zeilen mit binary_id-Feld: ${STEPS} =="
+      echo "-- plan dump (head -30) --"; head -30 build-visibility/dump_plan.txt
+      echo "=== visibility:tier-binaries OK (Bau-Sichtbarkeit aus plan dump v1.1 surfaced) ==="
+  artifacts:
+    when: always          # auch rote Laeufe sollen die Rohausgabe surfacen
+    expire_in: 1 week
+    paths: ["Code/build-visibility/dump_plan.txt"]
+
+# ── Stage integration (#196, EPIC #186): E2E-Auswerte-Smoke auf Linux-bare-metal ──
+# Beweist, dass der Mess-AUSWERTE-Pfad real funktioniert: baut die 4 leichten Auswerte-Tools (01/03/04/05,
+# keine cache-engine-Lib/DLLs nötig) + fährt die reale Kette record.bin -> CSV -> LaTeX-Tabelle + CSV -> TikZ
+# auf committeten Fixtures. KEIN perms-DLL-Bau, KEIN PMC, KEINE Infra (K8s/MinIO/NAS) — der schwere reale
+# Mess-Lauf (messung_driver: 3x 1M Keys/5M Ops + ~43 DLLs) ist bewusst NICHT hier (= mehrtaegiger Lauf #156).
+# Submodule kommen aus dem globalen recursive-Checkout (03_binary_to_csv braucht einen cache-engine-Header).
+integration:smoke:
+  extends: [.code-rules, .ccache-pull]   # #53: docs-only-Gate + ccache pull-only (Konsument)
+  stage: integration
+  tags: [baremetal]
+  needs: ["verify:submodules"]   # erst nach Submodul-Verifikation (transitiv nach lint:secrets)
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    - cmake -B build-integration -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
+    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc.
+    - cmake --build build-integration --target sample_data_generator binary_to_csv_cli csv_to_latex_cli diagram_generator_cli
+    - |
+      set -euo pipefail
+      find_exe() { find build-integration -type f -name "$1" 2>/dev/null | head -1; }
+      B2C=$(find_exe binary-to-csv); SDG=$(find_exe sample_data_generator)
+      C2L=$(find_exe csv-to-latex); DG=$(find_exe diagram-generator)
+      echo "exes: b2c=$B2C sdg=$SDG c2l=$C2L dg=$DG"
+      for e in "$B2C" "$SDG" "$C2L" "$DG"; do test -n "$e" -a -x "$e" || { echo "Auswerte-Exe fehlt/nicht-ausfuehrbar: $e"; exit 1; }; done
+      OUT=integration_out; mkdir -p "$OUT"
+      FIX=03_binary_to_csv/tests/fixtures/cached/sample_3_records.bin
+      test -s "$FIX" || { echo "Fixture fehlt: $FIX"; exit 1; }
+      "$B2C" "$FIX" "$OUT/measurements_from_records.csv"           # reales Stufe-2-Binaerformat -> CSV
+      "$SDG" "$OUT/measurements_sample.csv"                        # synthetische kanonische CSV (workload_used-Spalte)
+      "$C2L" "$OUT/measurements_from_records.csv" "$OUT/table_records.tex" --caption="Integration Smoke" --label=tab:smoke --lang=de
+      "$DG" --by-workload "$OUT/measurements_sample.csv" "$OUT/diagram_sample.tex"
+      for f in "$OUT/measurements_from_records.csv" "$OUT/table_records.tex" "$OUT/diagram_sample.tex"; do
+        test -s "$f" || { echo "LEER/FEHLT: $f"; exit 1; }
+      done
+      echo "=== integration:smoke OK (E2E-Auswerte-Kette real durchlaufen) ==="
+      echo "-- table_records.tex (head) --"; head -n 6 "$OUT/table_records.tex"
+  artifacts:
+    paths: []
+
+# ── Stage manifest (#198, EPIC #186 Stufe 7): Build-/Mess-Manifest (Provenance) + additives Prebackup ──
+# manifest:provenance sammelt die Reproduzierbarkeits-Provenance EINES Laufs in EINE Datei: super-SHA +
+# Commit-SHAs ALLER Submodule (recursive) + Toolchain (cmake/Compiler/ninja) + OS/ISA + Profil-Hash (alle
+# Lastprofil-/Config-XMLs der cache-engine). Cross-cutting -> gehoert an den Super-Root (sieht alle Submodule).
+# Beleg = Manifest-Artefakt. needs:[verify:submodules] (braucht den recursive-Checkout). KEIN schwerer Bau.
+manifest:provenance:
+  extends: [.code-rules]   # #53: docs-only-Gate
+  stage: manifest
+  tags: [baremetal]
+  needs: ["verify:submodules"]
+  cache:
+    paths: []               # #53: Manifest-Sammlung, kein Compile -> kein ccache-Zip
+  script:
+    - |
+      set -euo pipefail
+      OUT=manifest_out; mkdir -p "$OUT"; MF="$OUT/build_manifest.txt"
+      {
+        echo "# comdare Build-/Mess-Manifest (#198, EPIC #186 Stufe 7) — Reproduzierbarkeits-Provenance"
+        echo "generated_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        echo "ci_pipeline_id=${CI_PIPELINE_ID:-NA}"
+        echo "ci_pipeline_url=${CI_PIPELINE_URL:-NA}"
+        echo "## --- super (Diplomarbeit) ---"
+        echo "super_commit_sha=${CI_COMMIT_SHA:-$(git rev-parse HEAD 2>/dev/null || echo NA)}"
+        echo "super_commit_ref=${CI_COMMIT_REF_NAME:-NA}"
+        echo "## --- Submodul-SHAs (ALLER Submodule, recursive) ---"
+        git submodule status --recursive 2>/dev/null | awk '{sha=$1; sub(/^[-+U]/,"",sha); print "submodule "$2" "sha}' || echo "submodule NA"
+        echo "## --- Toolchain ---"
+        echo "cmake=$(cmake --version 2>/dev/null | head -1)"
+        echo "compiler=$( (g++ --version 2>/dev/null || c++ --version 2>/dev/null || echo NA) | head -1)"
+        echo "ninja=$(ninja --version 2>/dev/null || echo NA)"
+        echo "## --- OS / ISA ---"
+        echo "uname=$(uname -srvmo 2>/dev/null || uname -a)"
+        echo "os_release=$( (. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME") || echo NA)"
+        echo "cpu_model=$( (lscpu 2>/dev/null | grep -m1 'Model name' | cut -d: -f2- | sed 's/^ *//') || echo NA)"
+        flags_line=$(lscpu 2>/dev/null | grep -m1 -iE '^Flags:' || true)
+        if [ -n "$flags_line" ]; then echo "cpu_flags_sha256=$(printf '%s' "$flags_line" | sha256sum | cut -d' ' -f1)"; else echo "cpu_flags_sha256=NA"; fi
+        echo "## --- Profil-Hash (alle Lastprofil-/Config-XMLs der cache-engine) ---"
+        CE=Code/external/comdare-cache-engine
+        if [ -d "$CE" ]; then
+          n=$(find "$CE" -type f -name '*.xml' 2>/dev/null | wc -l)
+          h=$(find "$CE" -type f -name '*.xml' -print0 2>/dev/null | sort -z | xargs -0r sha256sum 2>/dev/null | sha256sum | cut -d' ' -f1)
+          echo "profile_xml_count=$n"
+          echo "profile_xml_combined_sha256=${h:-NA}"
+        else
+          echo "profile_xml_count=0"; echo "profile_xml_combined_sha256=NA"
+        fi
+      } | tee "$MF"
+      test -s "$MF" || { echo "Manifest LEER"; exit 1; }
+      echo "=== manifest:provenance OK ($(wc -l < "$MF") Zeilen) ==="
+  artifacts:
+    paths:
+      - manifest_out/build_manifest.txt
+    when: always
+    expire_in: 12 weeks
+
+# prebackup:measurements beweist den Prebackup-MECHANISMUS: bestehende Mess-Artefakte werden VOR dem
+# Ueberschreiben additiv + sha256-verifiziert je build_version gesichert und NIE ueberschrieben (Direktive
+# „Messdaten nie loeschen"). Reales Storage-Ziel (NAS/MinIO) ist #202-gegatet -> hier CI-Selbsttest +
+# versioniertes Artefakt als Beleg, dass der Mechanismus korrekt + datenschuetzend ist.
+prebackup:measurements:
+  extends: [.code-rules]   # #53: docs-only-Gate
+  stage: manifest
+  tags: [baremetal]
+  needs: ["verify:submodules"]
+  cache:
+    paths: []               # #53: Shell-Selbsttest, kein Compile -> kein ccache-Zip
+  script:
+    - |
+      set -euo pipefail
+      # Anti-Phantom (Ledger §G2 / §0-DoD-6): dieser Job ist ein reiner MECHANISMUS-SELBSTTEST. Sein
+      # Ausgabe-/Artefakt-Verzeichnis heisst DESHALB prebackup_selftest_store/ (NICHT prebackup_store/) —
+      # so kann persist:measurements die synthetischen "messung v1/v2"-CSVs NICHT in den autoritativen
+      # measurement/-Baum ziehen (Selbsttest von der Mess-Persistierung getrennt).
+      BK=prebackup_selftest_store
+      sha() { sha256sum < "$1" | cut -d' ' -f1; }
+      prebackup() {   # $1=src  $2=build_version ; additiv, sha-verifiziert, nie ueberschreiben
+        local src="$1" ver="$2" dir base dst
+        dir="$BK/$ver"; mkdir -p "$dir"; base=$(basename "$src"); dst="$dir/$base"
+        if [ -e "$dst" ]; then
+          if [ "$(sha "$src")" = "$(sha "$dst")" ]; then
+            echo "  idempotent: $base@$ver bereits gesichert (gleicher sha256) -> KEIN Overwrite"; return 0
+          fi
+          echo "  SCHUTZ: $base@$ver existiert mit ABWEICHENDEM sha256 -> Overwrite VERBOTEN"; return 3
+        fi
+        cp -- "$src" "$dst"
+        [ "$(sha "$src")" = "$(sha "$dst")" ] || { echo "  FEHLER: sha-Mismatch nach Kopie $base@$ver"; return 1; }
+        echo "  gesichert: $base@$ver (sha256=$(sha "$dst"))"
+      }
+      # Selbsttest: zwei Mess-Versionen additiv, Re-Backup idempotent, Overwrite-Schutz greift.
+      echo "messung v1" > sample_measurement.csv; prebackup sample_measurement.csv run-001
+      echo "messung v2" > sample_measurement.csv; prebackup sample_measurement.csv run-002
+      echo "messung v1" > sample_measurement.csv; prebackup sample_measurement.csv run-001
+      echo "ABWEICHEND" > sample_measurement.csv
+      set +e; prebackup sample_measurement.csv run-001; rc=$?; set -e
+      if [ "$rc" -eq 3 ]; then echo "  OK: Overwrite-Schutz (rc=3) hat abweichenden Inhalt korrekt abgelehnt";
+      elif [ "$rc" -eq 0 ]; then echo "FEHLER: Overwrite-Schutz griff NICHT (rc=0)"; exit 1;
+      else echo "FEHLER: prebackup unerwarteter Fehler (rc=$rc)"; exit 1; fi
+      test "$(cat "$BK/run-001/sample_measurement.csv")" = "messung v1" || { echo "run-001 korrumpiert"; exit 1; }
+      test "$(cat "$BK/run-002/sample_measurement.csv")" = "messung v2" || { echo "run-002 korrumpiert"; exit 1; }
+      echo "=== prebackup:measurements OK (additiv + sha256-verifiziert + nie-ueberschreiben bewiesen) ==="
+      find "$BK" -type f | sort
+  artifacts:
+    paths:
+      - prebackup_selftest_store/
+    when: always
+    expire_in: 12 weeks
+
+# ── Stage thesis-pdf: Diplomarbeit-PDF (TeXLive = Infra-Voraussetzung, User-Wahl P1c) ──
+thesis:pdf:
+  stage: thesis-pdf
+  tags: [baremetal]
+  needs: [{job: "analyse:thesis-data", optional: true}]  # #53: docs-only-DAG-sicher (analyse ist code-gegated, thesis:pdf laeuft auch ohne)
+  cache:
+    paths: []               # #53: latexmk-PDF-Bau, kein C++-Compile -> kein ccache-Zip (docs-Konsument, NICHT code-gaten)
+  # TeXLive/latexmk = Runner-Voraussetzung (Infra installiert texlive vor). Bis dahin gegatet
+  # (sonst sicherer Fail an "latexmk fehlt"). Reaktivieren: CI-Variable COMDARE_TEXLIVE_AVAILABLE="true".
+  rules:
+    - if: '$COMDARE_TEXLIVE_AVAILABLE == "true"'
+  script:
+    - 'command -v latexmk >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1 || { echo "TeX-Toolchain (texlive/latexmk) fehlt auf dem Runner — Infra-Voraussetzung (P1c)"; exit 1; }'
+    - cd thesis/diplomarbeit
+    - 'echo "thesis-Quellen:"; ls *.tex build.* 2>/dev/null | head'
+    - 'main=$(grep -lE "\\\\documentclass" *.tex 2>/dev/null | head -1); echo "main-tex=$main"; test -n "$main" && latexmk -pdf -interaction=nonstopmode -halt-on-error "$main"'
+  artifacts:
+    paths:
+      - thesis/diplomarbeit/*.pdf
+    when: always
+    expire_in: 4 weeks
+
+# ── Stage measure — SMOKE-Vorlauf (#26/GO-5, User 2026-07-12 „erst Smoke, DANN Voll-Lauf"): der schnelle
+#    Voll-FEATURE-Smoke ueber das dedizierte Profil m3_smoke_coverage.profile.xml (1 Baseline + je-Achse-
+#    Enabled-Sweeps + 21 SOTA-DLLs; USE=ENABLE&&HAVE-abhaengig ~93-115 Binaries, super-Sub-Build 94;
+#    ~12-14,5k Mess-Zellen, Stunden statt Tage — Dossier GO-5 Teil B).
+#    Klon der measure:golden-320-Mechanik (gleicher Runner/Toolchain/Anhang-Regen/Artefakt-Logik), aber:
+#      * COMDARE_THESIS_PROFILE zeigt auf das Smoke-Profil (env-Hook 02_messung_driver/main.cpp) —
+#        das ist das COMDARE_MEASURE_PROFILE=smoke|full-Mapping aus dem Dossier B.4.4: smoke-only via
+#        COMDARE_MEASURE_PROFILE=="smoke" (golden-320 bleibt inert, da COMDARE_RUN_MEASURE ungesetzt);
+#        voller Ablauf via COMDARE_RUN_MEASURE=="true" (Smoke laeuft IMMER zuerst, golden-320 needs ihn).
+#      * eigenes Ausgabeverzeichnis measure_out_smoke/ (kollisionsfrei zum golden-Lauf auf demselben
+#        Runner-Workspace: kein Mischen der Anhang-Aggregation, kein Artefakt-Pfad-Clobbering).
+#      * timeout 12h statt 10 Tage (Smoke prueft Funktion, nicht Streuung).
+#    INERT-by-default wie der golden-Job: ohne COMDARE_RUN_MEASURE/COMDARE_MEASURE_PROFILE existiert er nicht.
+#    Der LAUFENDE golden-320-Lauf (#9916) ist unberuehrt: Pipeline-Definitionen sind je Pipeline eingefroren.
+# ── Storage #51 OPT-IN-Scharfschaltung (Ebene B minio-Tier-Binary-Cache + Ebene C measure-drop), DRY via !reference ──
+#    INERT-by-default: nur bei COMDARE_STORAGE_CACHE=="true"; sonst bleibt ArtifactCache::from_env() No-Op
+#    (minio_enabled()==false && drop_enabled()==false) => golden byte-identisch (Anti-Phantom, CI-Gruen=Messung-AUS).
+#    Wird VOR dem Driver-Lauf als eigener script-Schritt in measure:golden-320 + measure:smoke referenziert; die
+#    env-Exports persistieren in den Folge-Schritt (gleiche Shell wie 'cd Code'->'cmake'). Creds bleiben im
+#    CI-Var-Store: mc zieht sie aus MC_HOST_<alias> (nie argv/Log), measure-drop-Token via 0600-curl-config im
+#    ArtifactCache. Fehler (mc fehlt / Vars unvollstaendig) => Ebene inert + [Infra-Fehler]-Log, MESSUNG LAEUFT
+#    WEITER (Fehlerklassen-Doktrin, nie Abbruch). Infra-Voraussetzungen (siehe IMPL-TO-INFRA-Handout 2026-07-19):
+#      - Runner-Image traegt 'mc'; CI-Vars MINIO_ACCESS_KEY/SECRET_KEY/COMDARE_MINIO_ENDPOINT(=S3-URL)/_BUCKET (Projekt 288).
+#      - CI-Vars COMDARE_MEASUREMENT_DROP_URL + COMDARE_NFS_DROP_TOKEN (fuer Ebene C measure-drop).
+.storage_cache_activation:
+  script:
+    - |
+      if [ "${COMDARE_STORAGE_CACHE:-}" = "true" ]; then
+        echo "== Storage #51 scharf (COMDARE_STORAGE_CACHE=true) =="
+        # Ebene B — minio: ArtifactCache erwartet in COMDARE_MINIO_ENDPOINT den mc-ALIAS-Namen (Creds via MC_HOST_<alias>).
+        # Der Infra-CI-Var COMDARE_MINIO_ENDPOINT traegt die S3-URL -> daraus Alias 'prodcache' bauen, dann Var auf Alias umsetzen.
+        if command -v mc >/dev/null 2>&1; then
+          if [ -n "${MINIO_ACCESS_KEY:-}" ] && [ -n "${MINIO_SECRET_KEY:-}" ] && [ -n "${COMDARE_MINIO_ENDPOINT:-}" ] && [ -n "${COMDARE_MINIO_BUCKET:-}" ]; then
+            _mh="${COMDARE_MINIO_ENDPOINT#https://}"; _mh="${_mh#http://}"
+            export MC_HOST_prodcache="https://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@${_mh}"
+            export COMDARE_MINIO_ENDPOINT="prodcache"   # ArtifactCache liest dies als mc-ALIAS-Namen
+            echo "  Ebene B aktiv: mc-Alias=prodcache Bucket=${COMDARE_MINIO_BUCKET} (Creds via MC_HOST env, nie argv)"
+          else
+            echo "  [Infra-Fehler: minio-CI-Vars unvollstaendig -> Ebene B inert, Messung laeuft weiter]"
+            unset COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET 2>/dev/null || true
+          fi
+        else
+          echo "  [Infra-Fehler: mc-Binary fehlt im Runner-Image -> Ebene B inert, Messung laeuft weiter]"
+          unset COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET 2>/dev/null || true
+        fi
+        # Ebene C — measure-drop HTTPS-PUT: aktiv nur wenn beide Vars da (Token nie in argv; ArtifactCache 0600-curl-config).
+        if [ -n "${COMDARE_MEASUREMENT_DROP_URL:-}" ] && [ -n "${COMDARE_NFS_DROP_TOKEN:-}" ]; then
+          echo "  Ebene C aktiv: measure-drop=${COMDARE_MEASUREMENT_DROP_URL}"
+        else
+          echo "  [Info: measure-drop-CI-Vars fehlen -> Ebene C inert; Git-Writeback bleibt Persistenz-Pfad]"
+          unset COMDARE_MEASUREMENT_DROP_URL COMDARE_NFS_DROP_TOKEN 2>/dev/null || true
+        fi
+      else
+        echo "== Storage #51 INERT (COMDARE_STORAGE_CACHE != true) -> from_env() No-Op, golden byte-neutral =="
+      fi
+
+# ── P11-Lehre (W9.6): Mess-Pre-Flight — HARTER Abbruch, wenn ein FREMDER comdare-messung-driver auf dem Runner
+#    laeuft. Die 1-Thread-Mess-Doktrin verlangt Allein-Belegung (ein paralleler Driver verfaelscht die Streuung).
+#    Laeuft VOR dem eigenen Driver-Start -> jeder gefundene Driver ist fremd; zusaetzlich wird die eigene
+#    Prozessgruppe ausgeschlossen. Nur in die 2 Mess-Jobs !reference'd. (resource_group liefert das Cross-Pipeline-
+#    Lock; dieser pgrep-Schritt faengt zusaetzlich prozess-ebene Kollisionen auf demselben Node ab.)
+.measurement_preflight_no_foreign_driver:
+  script:
+    - |
+      # comm ist auf 15 Zeichen gekuerzt -> Muster 'comdare-messung' statt des vollen 22-Zeichen-Namens.
+      if command -v pgrep >/dev/null 2>&1; then
+        _mypgid=$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')
+        _foreign=""
+        for _p in $(pgrep comdare-messung 2>/dev/null || true); do
+          _ppgid=$(ps -o pgid= -p "$_p" 2>/dev/null | tr -d ' ')
+          [ "$_ppgid" = "$_mypgid" ] || _foreign="$_foreign $_p"
+        done
+        if [ -n "$_foreign" ]; then
+          echo "MESSFEHLER-VERMEIDUNG (P11): fremder comdare-messung-driver laeuft bereits (PID(s):$_foreign) -> HARTER ABBRUCH."
+          echo "  Die 1-Thread-Mess-Doktrin verlangt Allein-Belegung des Runners; erst den fremden Lauf beenden."
+          exit 1
+        fi
+        echo "== Pre-Flight P11 OK: kein fremder comdare-messung-driver aktiv (nur eigene Prozessgruppe) =="
+      else
+        echo "== Pre-Flight P11: pgrep fehlt im Runner-Image -> Prozess-Kollisionsschutz uebersprungen =="
+      fi
+
+measure:smoke:
+  stage: measure
+  interruptible: false              # INC-G6/Ledger-34: mehrstuendiger Mess-Lauf NIE auto-cancelbar (Belt-and-Suspenders zu auto_cancel=disabled)
+  resource_group: "ceb-measurement-exclusive"   # §38.b: cluster-weit genau EINE messende CEB (Cross-Pipeline-Lock); Bau-Pool (gn-*) bleibt parallel
+  tags: [prod, baremetal, amd]
+  timeout: 12h                      # Smoke: Stunden statt Tage (Dossier B.4.3 ~14,5k Zellen)
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
+    COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3_smoke_coverage.profile.xml"
+  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
+      when: never
+    # DEPRECATED-Fallback (2026-07-21, analog COMDARE_STATIC_MATRIX_FALLBACK): dieser STATISCHE Smoke-Job ist durch
+    # die dynamische Kette (planer:delegate -> ceb -> tier, Profil-Methodik m3_smoke=debug, 2c-Dual-Compile) abgeloest.
+    # Er laeuft NUR NOCH mit ZUSAETZLICHEM COMDARE_STATIC_SMOKE_FALLBACK=="true" (Default AUS) -- sonst kollidierte er
+    # per P11-Wache/resource_group mit den emittierten Mess-Jobs derselben Welle. NICHT geloescht (Pilot-Historie).
+    - if: '$COMDARE_RUN_MEASURE == "true" && $COMDARE_STATIC_SMOKE_FALLBACK == "true"'
+    - if: '$COMDARE_MEASURE_PROFILE == "smoke" && $COMDARE_STATIC_SMOKE_FALLBACK == "true"'
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    # I-PMC-1 (F9, User 2026-07-16 "PFLICHT fuer Vollstaendigkeit aller perf-Messwerte"): -DCOMDARE_ENABLE_PMC=ON
+    # aktiviert unter __linux__ die reale perf_event_open-Quelle (pmc_source_factory.hpp:19/32; prod1-Rechte
+    # seit 25.06. bewiesen, Job 189916: pmc_available=1, cache_misses_l1=4190096). Ohne das Flag schrieb der
+    # offizielle Mess-Lauf pmc_available=0/honest-0 trotz fertiger Infra.
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
+    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
+    - cmake --build build --target comdare-messung-driver
+    # W1 (05.08.2026): 'validate' ist die PLANER-Rolle -> eigenes ce-Target (der Treiber-Bau bleibt daneben,
+    # er faehrt gleich den Mess-Lauf). Beide Binaries kommen aus DEMSELBEN Configure/ce-Stand.
+    - cmake --build build --target comdare_experiment_planner
+    - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
+    - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      PLANNER=$(find build -type f -name "comdare-experiment-planner" | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
+      echo "== Pre-Flight (Subkommando 'validate', rein lesende Pruefung des SMOKE-Profils gegen die EnabledStrategies) =="
+      echo "   COMDARE_THESIS_PROFILE=$COMDARE_THESIS_PROFILE"
+      "$PLANNER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
+      mkdir -p measure_out_smoke
+      echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
+      "$DRIVER" experiment_config measure_out_smoke
+      echo "== Mess-CSVs (Beleg) =="; find measure_out_smoke -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
+      test -n "$(find measure_out_smoke -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Smoke-Lauf lieferte nichts"; exit 1; }
+      # ── CI-interaktiv (#24): den Anhang aus den LIVE-Smoke-Messdaten regenerieren (gleiche Logik wie golden-320) ──
+      echo "== Anhang-Regenerierung aus Live-Smoke-Messdaten (#24) =="
+      cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+      APP=$(find build -type f -name "appendix-generator" | head -1)
+      if [ -n "$APP" ] && [ -x "$APP" ]; then
+        find measure_out_smoke -type f -name 'result.csv' | sort > measure_out_smoke/_rc_list.txt
+        WIDE=measure_out_smoke/wide_aggregate.csv; : > "$WIDE"; _hdr=0
+        while IFS= read -r rc; do
+          [ "$_hdr" = "0" ] && { head -1 "$rc" > "$WIDE"; _hdr=1; }
+          tail -n +2 "$rc" >> "$WIDE"
+        done < measure_out_smoke/_rc_list.txt
+        if [ -s "$WIDE" ] && [ "$(wc -l < "$WIDE")" -gt 1 ]; then
+          "$APP" "$WIDE" measure_out_smoke/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
+          echo "== regenerierte Anhang-.tex =="; find measure_out_smoke/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
+          rm -f "$WIDE" measure_out_smoke/_rc_list.txt   # Intermediates NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
+        else
+          echo "kein WIDE-Aggregat (keine result.csv gefunden) -> Anhang-Regenerierung honest uebersprungen"
+        fi
+      fi
+      echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
+  artifacts:
+    paths:
+      - Code/measure_out_smoke/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die 115 DLL-Binaries
+      - Code/measure_out_smoke/appendix/**/*.tex # CI-interaktiv (#24): regenerierte 12 Kern- + 5 Darstellungs-.tex je Sprache (K-12-Sweep 2026-07-19)
+    when: always
+    expire_in: 12 weeks
+
+# ── Stage measure (#156/#17, User 2026-07-11 „Cluster mess infra wieder online … nochmal anstoßen"): der EINE
+#    offizielle XML-getriebene golden-320-Voll-Messlauf ueber comdare-messung-driver (der mehrtaegige Lauf #156,
+#    bisher bewusst AUS der Pipeline gehalten — hier als OPT-IN triggerbar gemacht, NICHT im Normal-Gesamtlauf).
+#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_RUN_MEASURE=="true" gesetzt ist — der
+#    „Gesamtlauf" (Messung ABGESCHALTET, sonst alles) baut ihn also nie. tags [prod,baremetal,amd] = PMC-Node prod1
+#    (Runner id=16, perf_event_open/MSR). timeout:0 = mehrtaegig. Baut comdare-messung-driver (EXPERIMENT_MODE
+#    aktiviert Measurement-ON im Sub-Build) + faehrt ihn gegen experiment_config (die 3 Messreihen A/B/C, exakt die
+#    lokal verifizierte golden-320-Invocation) -> measure_out/{A,B,C}/measurements.{csv,json}. Die CSVs sammelt der
+#    persist:measurements-Job (#22) additiv nach development; zusaetzlich 12-Wochen-Artefakt als Sicherheitsnetz.
+#    #26/GO-5 (2026-07-12): needs measure:smoke (optional) — „erst Smoke, DANN Voll-Lauf" (User-Ablauf-Doktrin);
+#    optional:true, damit historische/Sonder-Trigger ohne Smoke-Job die Pipeline nicht invalide machen. Der
+#    Job-KERN (rules/script/artifacts) ist UNVERAENDERT.
+measure:golden-320:
+  stage: measure
+  interruptible: false              # INC-G6/Ledger-34: mehrtaegiger Mess-Lauf NIE auto-cancelbar (Belt-and-Suspenders zu auto_cancel=disabled)
+  resource_group: "ceb-measurement-exclusive"   # §38.b: cluster-weit genau EINE messende CEB (Cross-Pipeline-Lock); Bau-Pool (gn-*) bleibt parallel
+  tags: [prod, baremetal, amd]
+  timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
+  needs:
+    - job: "verify:submodules"
+      optional: true               # #53/R3 (2026-07-22): docs-only-DAG-sicher (analog measure:smoke); haelt die
+                                   # Pipeline valide, wenn verify:submodules bei docs-only-Push nicht existiert (leer-failed 12012/12045)
+    # #26/GO-5 (2026-07-12): erst Smoke, DANN Voll-Lauf (User-Ablauf-Doktrin). optional:true haelt die
+    # Pipeline valide, falls der Smoke-Job (andere rules-Variante) nicht existiert; existieren beide
+    # (COMDARE_RUN_MEASURE=true), erzwingt needs die Sequenz. artifacts:false — der Voll-Lauf braucht
+    # keine Smoke-CSVs, nur die Reihenfolge.
+    - job: "measure:smoke"
+      optional: true
+      artifacts: false
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'      # (Netz) Bot-Writeback triggert NIE einen Messlauf
+      when: never
+    - if: '$COMDARE_RUN_MEASURE == "true"'     # INERT: nur bei explizitem Opt-in
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    # I-PMC-1 (F9, User 2026-07-16 "PFLICHT fuer Vollstaendigkeit aller perf-Messwerte"): -DCOMDARE_ENABLE_PMC=ON
+    # aktiviert unter __linux__ die reale perf_event_open-Quelle (pmc_source_factory.hpp:19/32; prod1-Rechte
+    # seit 25.06. bewiesen, Job 189916: pmc_available=1, cache_misses_l1=4190096). Ohne das Flag schrieb der
+    # offizielle Mess-Lauf pmc_available=0/honest-0 trotz fertiger Infra.
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
+    # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
+    - cmake --build build --target comdare-messung-driver
+    # W1 (05.08.2026): 'validate' ist die PLANER-Rolle -> eigenes ce-Target (Spiegel des Smoke-Jobs oben).
+    - cmake --build build --target comdare_experiment_planner
+    - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
+    - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
+    - |
+      set -euo pipefail
+      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
+      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      PLANNER=$(find build -type f -name "comdare-experiment-planner" | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
+      echo "== Pre-Flight (Subkommando 'validate', rein lesende Profil-Pruefung gegen die realen config/output-Argumente) =="
+      "$PLANNER" validate || { echo "Profil-Validierung fehlgeschlagen -> Abbruch vor mehrtaegigem Lauf"; exit 1; }
+      mkdir -p measure_out
+      echo "== golden-320 Voll-Messlauf (mehrtaegig, Measurement-ON, PMC auf prod1) =="
+      "$DRIVER" experiment_config measure_out
+      echo "== Mess-CSVs (Beleg) =="; find measure_out -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
+      test -n "$(find measure_out -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Messlauf lieferte nichts"; exit 1; }
+      # ── CI-interaktiv (#24): den Anhang aus den LIVE-Messdaten regenerieren ──
+      # appendix_generator (Stufe 08) erzeugt je Sprache die 12 Kern- + 5 Darstellungs-.tex (K-12-Sweep 2026-07-19:
+      # vorher stale "16"; Ist laut 08_appendix_generator/appendix_generator.hpp) aus der WIDE-Matrix ALLER Permutationen.
+      # WIDE-Aggregat = Konkatenation der per-Perm-result.csv (Header einmal + alle Datenzeilen). honest-empty-tolerant.
+      echo "== Anhang-Regenerierung aus Live-Messdaten (#24) =="
+      cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
+      APP=$(find build -type f -name "appendix-generator" | head -1)
+      if [ -n "$APP" ] && [ -x "$APP" ]; then
+        find measure_out -type f -name 'result.csv' | sort > measure_out/_rc_list.txt
+        WIDE=measure_out/wide_aggregate.csv; : > "$WIDE"; _hdr=0
+        while IFS= read -r rc; do
+          [ "$_hdr" = "0" ] && { head -1 "$rc" > "$WIDE"; _hdr=1; }
+          tail -n +2 "$rc" >> "$WIDE"
+        done < measure_out/_rc_list.txt
+        if [ -s "$WIDE" ] && [ "$(wc -l < "$WIDE")" -gt 1 ]; then
+          "$APP" "$WIDE" measure_out/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
+          echo "== regenerierte Anhang-.tex =="; find measure_out/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
+          rm -f "$WIDE" measure_out/_rc_list.txt   # Intermediates (39k-Zeilen-Konkatenation) NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
+        else
+          echo "kein WIDE-Aggregat (keine result.csv gefunden) -> Anhang-Regenerierung honest uebersprungen"
+        fi
+      fi
+      echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs + regenerierter Anhang unter measure_out/) ==="
+  artifacts:
+    paths:
+      - Code/measure_out/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die ~320 DLL-Binaries (Repo-/Artefakt-Bloat)
+      - Code/measure_out/appendix/**/*.tex # CI-interaktiv (#24): die aus Live-Messdaten regenerierten 12 Kern- + 5 Darstellungs-.tex
+    when: always
+    expire_in: 12 weeks
+
+# ── DEPRECATED statische Perm-Matrix (build:golden-n / build:golden-n-avx512 + .golden_n_build-Geruest) ──
+#    ARCHIVIERT (Owner RF-4, Handout-1 §2, 2026-07-27): "Bitte ins Archiv. Aber sortiere sie aus dem Sichtfeld
+#    fuer Ordnung." Voller Inhalt VERBATIM erhalten in ci/archive/perm-matrix-fallback.yml (NICHT im super-CI
+#    `include:` -> von GitLab NIE geparst/instanziiert = inert). Abgeloest durch den dynamischen CE-gesteuerten
+#    Pfad (planer:delegate -> ceb:emit -> tier, W10-B/§42). Reaktivierung: Inhalt zurueck hierher +
+#    COMDARE_STATIC_MATRIX_FALLBACK opt-in; die genutzten Anker (.storage_cache_activation /
+#    .measurement_preflight_no_foreign_driver) leben weiter oben in dieser Datei.
+
+# ── Stage persist (#22, User 2026-07-11, Ledger §0-DoD-6/§11-G): die Auswertungs-Dokumente EINES Laufs additiv
+#    nach measurement/<YYYYMMDD-HHMMSS-p{pipeline}>/ im super-Root sammeln + per commit+MERGE+push nach
+#    development ZURUECKSCHREIBEN — sonst gehen die Mess-Ergebnisse am Pipeline-Ende verloren.
+#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_PERSIST_MEASUREMENTS=="true" auf der
+#    development-Branch gesetzt ist; laeuft er, pusht er NUR wenn zusaetzlich das Write-Credential
+#    (COMDARE_WRITEBACK_USER/COMDARE_WRITEBACK_TOKEN, Infra separat = Project-Access-Token write_repository,
+#    masked+protected) gesetzt ist. Kein Submodul-Klon (PDF/Manifest/Prebackup via needs-artifacts) → before_script:[]
+#    + GIT_SUBMODULE_STRATEGY:none ist submodul-frei (REV 16 path a: kein default:before_script mehr). Loop-Schutz DREIFACH: push -o
+#    ci.skip (primaer) + [skip ci] in der Commit-Message (backup) + rules _bot_->never (Netz). Rueckschreiben per
+#    MERGE (User-Direktive 11.07.: „durch merge, kein rebase"); measurement/<RUN_TS>/ ist disjunkt → konfliktfrei.
+#    SCHWESTER-KANAL (E-18, Job anhang:forward weiter unten in DERSELBEN Stage): der persist-Block traegt
+#    beide Richtungen. persist:measurements holt die Mess-Ergebnisse IN das super-Repo; anhang:forward
+#    schiebt die daraus regenerierten LaTeX-Anhang-Tabellen VORWAERTS in das Thesis-Submodul (Projekt 289)
+#    und zieht den super-Gitlink nach. Beide sind unabhaengig inert-schaltbar (COMDARE_PERSIST_MEASUREMENTS
+#    bzw. COMDARE_ANHANG_FORWARD) und schreiben auf DISJUNKTE Pfade (measurement/ vs. Gitlink) -> die
+#    beidseitigen MERGE-Retry-Schleifen koennen sich mechanisch nicht in die Quere kommen.
+persist:measurements:
+  stage: persist
+  tags: [baremetal]
+  before_script: []                 # ueberschreibt default:before_script -> KEIN Cross-Projekt-Submodul-Klon
+  cache:
+    paths: []                       # dieser Job kompiliert nicht -> kein ccache-Zip-Sync
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "0"                  # VOLLER Klon load-bearing: shallow bricht Merge/Push (fehlende merge-base)
+    GIT_SUBMODULE_STRATEGY: none
+  needs:
+    - job: thesis:pdf               # PDF — OPTIONAL: thesis:pdf ist COMDARE_TEXLIVE_AVAILABLE-gegatet
+      artifacts: true
+      optional: true
+    - job: manifest:provenance      # build_manifest.txt (Provenance)
+      optional: true                  # #53: docs-only-DAG-sicher (manifest:provenance ist code-gegated)
+      artifacts: true
+    # HINWEIS (Anti-Phantom, Ledger §G2): prebackup:measurements ist BEWUSST KEIN need mehr — sein
+    # Artefakt ist ein reiner Mechanismus-Selbsttest (synthetische CSVs), der NICHT in den measurement-
+    # Baum gehoert. Siehe Block (3) unten. Reale versionierte Backups sind #202-gegatet.
+    - job: measure:golden-320       # measure_out/ (golden-320-Mess-CSVs) — OPTIONAL: nur wenn COMDARE_RUN_MEASURE gesetzt war
+      artifacts: true
+      optional: true
+    - job: measure:smoke            # measure_out_smoke/ (#26/GO-5 Smoke-CSVs) — OPTIONAL: nur bei Smoke-/Voll-Messlauf vorhanden
+      artifacts: true
+      optional: true
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'                                           # (Netz) Bot-Writeback triggert NIE persist
+      when: never
+    - if: '$COMDARE_PERSIST_MEASUREMENTS == "true" && $CI_COMMIT_BRANCH == "development"'  # INERT: nur bei Opt-in auf development
+  script:
+    - |
+      set -euo pipefail
+      # ── (0) INERT-Guards (defense-in-depth; die rules gaten bereits) ──
+      if [ "${COMDARE_PERSIST_MEASUREMENTS:-}" != "true" ]; then
+        echo "INERT: COMDARE_PERSIST_MEASUREMENTS != true -> kein Sammeln/Push"; exit 0
+      fi
+      if [ -z "${COMDARE_WRITEBACK_USER:-}" ] || [ -z "${COMDARE_WRITEBACK_TOKEN:-}" ]; then
+        echo "FEHLER: COMDARE_PERSIST_MEASUREMENTS=true, aber COMDARE_WRITEBACK_USER/COMDARE_WRITEBACK_TOKEN fehlt -> Infra: maskiertes+protected write_repository-Token setzen"; exit 1
+      fi
+      # ── (1) FS-sicherer, kollisionsfreier, sortierbarer UTC-Laufordner (KEIN ':' -> Windows/NTFS-sicher) ──
+      RUN_TS="$(date -u +%Y%m%d-%H%M%S)-p${CI_PIPELINE_ID:-0}"
+      BK=measurement; DEST="$BK/$RUN_TS"; mkdir -p "$DEST"
+      echo "== persist -> $DEST =="
+      # ── (2) prebackup(): additiv, sha256-verifiziert, NIE ueberschreiben (Muster aus prebackup:measurements) ──
+      sha() { sha256sum < "$1" | cut -d' ' -f1; }
+      prebackup() {
+        local src="$1" ver="$2" dir base dst
+        dir="$BK/$ver"; mkdir -p "$dir"; base=$(basename "$src"); dst="$dir/$base"
+        if [ -e "$dst" ]; then
+          if [ "$(sha "$src")" = "$(sha "$dst")" ]; then echo "  idempotent: $base@$ver (gleicher sha256)"; return 0; fi
+          echo "  SCHUTZ: $base@$ver ABWEICHENDER sha256 -> Overwrite VERBOTEN"; return 3
+        fi
+        cp -- "$src" "$dst"
+        [ "$(sha "$src")" = "$(sha "$dst")" ] || { echo "  FEHLER: sha-Mismatch $base@$ver"; return 1; }
+        echo "  gesichert: $base@$ver (sha256=$(sha "$dst"))"
+      }
+      # ── (3) Auswertungs-Dokumente einsammeln (fehlende tolerieren) ──
+      persisted=0
+      for pdf in thesis/diplomarbeit/*.pdf; do [ -e "$pdf" ] || continue; prebackup "$pdf" "$RUN_TS"; persisted=$((persisted+1)); done
+      if [ -f manifest_out/build_manifest.txt ]; then prebackup manifest_out/build_manifest.txt "$RUN_TS"; persisted=$((persisted+1)); fi
+      # Anti-Phantom (Review 2026-07-12, Ledger §G2 / §0-DoD-6 Mess-Integritaet): der prebackup:measurements-
+      # Job ist ein reiner MECHANISMUS-SELBSTTEST (synthetische "messung v1/v2"-CSVs in prebackup_selftest_store/).
+      # Er wird via seinem EIGENEN 12-Wochen-Artefakt belegt und bewusst NICHT in den autoritativen
+      # measurement/<RUN_TS>/-Baum kopiert — sonst akkumuliert Fake-Material unter der Nie-loeschen-Doktrin.
+      # REAL versionierte Mess-CSV-Sicherungen (NAS/MinIO) sind #202-gegatet; sobald ein echter Backup-
+      # Produzent existiert, bekommt er hier einen EIGENEN Sammler, der ausschliesslich echte Daten aufnimmt.
+      # measure_out/ = die golden-320-Mess-CSVs des measure:golden-320-Jobs (nur bei COMDARE_RUN_MEASURE-Lauf vorhanden).
+      # NUR *.csv strukturerhaltend kopieren — NIE die ~320 DLL-Binaries (Repo-Bloat). Die .gitignore-Negation
+      # !measurement/**/*.csv macht die kopierten CSVs trackbar (sonst droppt `git add` sie via *.csv-Regel).
+      if [ -d Code/measure_out ]; then
+        n_csv=0
+        while IFS= read -r f; do
+          rel="${f#Code/measure_out/}"; mkdir -p "$DEST/measure_out/$(dirname "$rel")"
+          cp -- "$f" "$DEST/measure_out/$rel"; n_csv=$((n_csv+1))
+        done < <(find Code/measure_out -type f \( -name '*.csv' -o -name '*.tex' \))
+        if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out/ ($n_csv Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
+      fi
+      # measure_out_smoke/ = die Smoke-/Coverage-Mess-CSVs des measure:smoke-Jobs (#26/GO-5) — gleiche
+      # additive Mechanik, eigener Zielordner (kollisionsfrei zum golden-Lauf derselben Pipeline).
+      if [ -d Code/measure_out_smoke ]; then
+        n_csv=0
+        while IFS= read -r f; do
+          rel="${f#Code/measure_out_smoke/}"; mkdir -p "$DEST/measure_out_smoke/$(dirname "$rel")"
+          cp -- "$f" "$DEST/measure_out_smoke/$rel"; n_csv=$((n_csv+1))
+        done < <(find Code/measure_out_smoke -type f \( -name '*.csv' -o -name '*.tex' \))
+        if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out_smoke/ ($n_csv Smoke-Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
+      fi
+      {
+        echo "# persist:measurements Laufordner — Provenance (#22, Ledger §11-G)"
+        echo "run_ts=$RUN_TS"
+        echo "generated_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        echo "ci_pipeline_id=${CI_PIPELINE_ID:-NA}"; echo "ci_pipeline_url=${CI_PIPELINE_URL:-NA}"
+        echo "super_commit_sha=${CI_COMMIT_SHA:-$(git rev-parse HEAD 2>/dev/null || echo NA)}"
+        echo "super_commit_ref=${CI_COMMIT_REF_NAME:-NA}"; echo "persisted_artifact_count=$persisted"
+      } > "$DEST/PROVENANCE.txt"
+      echo "-- Laufordner --"; find "$DEST" -type f | sort
+      [ "$persisted" -eq 0 ] && echo "WARNUNG: keine Auswertungs-Dokumente gefunden (nur PROVENANCE.txt)"
+      # ── (4) Writeback: commit -> bei non-ff MERGE origin-Tip (User-Direktive: MERGE, KEIN rebase) -> push ──
+      git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
+      # Write-Credential NUR als Var-Referenz (maskiert+protected; KEIN set -x / kein `git remote -v`-Echo -> kein Leak).
+      git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      git fetch origin "$CI_COMMIT_BRANCH"
+      git checkout -B "$CI_COMMIT_BRANCH" "origin/$CI_COMMIT_BRANCH"   # detached HEAD -> benannter Branch am origin-Tip (measurement/ bleibt untracked erhalten)
+      git add -- measurement/
+      if git diff --cached --quiet; then echo "nichts einzuchecken (leerer Commit vermieden)"; exit 0; fi
+      git commit -m "measurement(#22): Lauf ${CI_PIPELINE_ID:-NA} ${RUN_TS} [skip ci]"
+      for attempt in 1 2 3 4 5; do
+        if git push -o ci.skip origin "HEAD:$CI_COMMIT_BRANCH"; then
+          echo "=== persist:measurements OK: gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
+        fi
+        echo "push abgelehnt (non-ff-Race) -> fetch + MERGE origin-Tip (kein rebase) + retry ($attempt)" >&2
+        git fetch origin "$CI_COMMIT_BRANCH"
+        # measurement/<RUN_TS>/ ist disjunkt -> Merge mechanisch konfliktfrei; [skip ci] auch im Merge-Commit.
+        if ! git merge --no-edit -m "Merge origin/$CI_COMMIT_BRANCH in measurement-writeback ${RUN_TS} [skip ci]" "origin/$CI_COMMIT_BRANCH"; then
+          git merge --abort || true
+          echo "UNerwarteter Merge-Konflikt (Versuch $attempt) -> echter Bug, Abbruch (kein --force)" >&2; exit 1
+        fi
+        sleep $(( (RANDOM % 5) + 2 ))
+      done
+      echo "FEHLER: writeback nach 5 Versuchen fehlgeschlagen (development bewegt sich zu schnell?)" >&2; exit 1
+
+# ── anhang:forward (E-18, Bau-Paket B1; Owner-Dekret Ledger §68c "HAUPT-ZIEL des Gesamt-Systems"): der
+#    VORWAERTS-Kanal der E4-Kette CSV -> LaTeX -> PDF. persist:measurements oben ist der RUECKWAERTS-Kanal
+#    (Mess-Ergebnisse nach measurement/<RUN_TS>/); DIESER Job ist sein Schwester-Kanal in die andere
+#    Richtung: die aus den ECHTEN Messwerten regenerierten anhang/{de,en}/tabellen/*.tex wandern in das
+#    Overleaf-gekoppelte Thesis-Submodul (GitLab-Projekt 289) und der super-Gitlink wird nachgezogen.
+#    Damit sind die PDF-Tabellen nie mehr stale (Owner nr529: "Das Generieren der Latex-Anhaenge ... ist
+#    HAUPT-ZIEL des Gesamt-Systems und kombiniert das automatische Erstellen der Ergebnisse in die
+#    Diplomarbeit-PDF mit Auswertungsautomatisierung aus der xml-Kette"; nr541: "Ja B1/B2 auto befuellen
+#    bzw. bei jedem CI neu setzen").
+#
+#    KERN-LOGIK LIEGT IN ci/anhang_forward_core.sh (env-parametrisiert, DRY-RUN-faehig). Dieser Job
+#    umhuellt sie NUR mit Credentials, 289-Klon und Gitlink-Bump. Grund: der Kanal MUSS ohne CI und ohne
+#    echte Messung an einem Fixture beweisbar sein (Idempotenz / Whitelist / NO-OP / Nichts-Loeschen) —
+#    EINE Quelle statt zwei, was das Fixture beweist ist genau das, was hier laeuft.
+#
+#    QUELLEN-KASKADE (im Kern, deterministisch): (1) frische Pipeline-Artefakte
+#    Code/measure_out*/appendix/<lang>/tabellen/*.tex (needs measure:golden-320 + measure:smoke, beide
+#    optional + artifacts:true), (2) sonst Regeneration aus dem NEUESTEN measurement/<RUN_TS>/-Korpus
+#    (replace-Semantik: neuester Lauf gewinnt; merge/fulljoin ist Planer-KERN-Folgearbeit) via
+#    appendix_generator_cli, (3) sonst honest-empty NO-OP (exit 0, kein Commit — A_measurements.tex
+#    bindet die Tabellen per \InputIfFileExists ein, Weg A traegt). "Bei jedem CI neu setzen" heisst
+#    darum: auch OHNE frische Messung; ein Commit entsteht NUR bei Byte-Delta (Idempotenz-Wache gegen
+#    Commit-Rauschen). Liegt Korpus-Material vor, ohne dass der Generator baubar ist, bricht der Job
+#    LAUT ab — das ist kein honest-empty-Fall, sondern eine kaputte Job-Konfiguration.
+#
+#    PDF-GATE (Fixture-Fund 2026-08-05, load-bearing): der Kern baut die Thesis-PDF im 289-Klon, BEVOR er
+#    committet, und verweigert im Fehlerfall ALLES (alles-oder-nichts). Anlass ist ein reproduzierter
+#    Realfall: aus dem echten D-03-Korpus schreibt der Generator fuer eine Metrik OHNE Messwerte eine
+#    Heatmap mit komplett 0.0000-z-Matrix; pgfplots bricht daran FATAL ab und es entsteht GAR KEINE PDF.
+#    Da die 12 Kern-Tabellen in A_measurements.tex an blankem \input haengen (nur die 5 Darstellungs-.tex
+#    an \InputIfFileExists), rettet Weglassen einzelner Dateien nichts. OHNE diese Wache wuerde E-18 die
+#    PDF-Strecke reissen statt sie zu schliessen. Gesteuert ueber AF_PDF_GATE (on|auto|off), hier an die
+#    bestehende Runner-Voraussetzung COMDARE_TEXLIVE_AVAILABLE gekoppelt.
+#
+#    WARUM DER 289-PUSH BEWUSST OHNE ci.skip LAEUFT: die 289-Pipeline (lint + thesis-pdf de/en) IST der
+#    Post-measure-Rebuild — sie SOLL feuern. 289 triggert 288 nicht zurueck => kein Loop. Der GITLINK-Bump
+#    auf 288 dagegen traegt den vollen Dreifach-Loop-Schutz des Schwester-Jobs (push -o ci.skip +
+#    [skip ci] + rules _bot_->never). FOLGE, gewollt und hier festgeschrieben: der Gitlink-Bump feuert die
+#    trigger:thesis-Bridge NICHT (sie ist changes-gegatet auf den Gitlink, aber ci.skip unterdrueckt die
+#    Pipeline) — der Rebuild laeuft ueber die direkte 289-Pipeline, nicht ueber die Bridge.
+#
+#    BRANCH-NAHT: Ziel ist der SUBMODUL-Branch development (.gitmodules: thesis/diplomarbeit -> branch
+#    development). Die trigger:thesis-Bridge zielt auf 289/main, Overleaf synct GitHub/main — die
+#    Sichtbarkeit im Live-Overleaf entsteht also erst ueber den bestehenden main-FF-/Watcher-Weg, NICHT
+#    in derselben Pipeline. Wer Direkt-Sichtbarkeit je CI will, muss den Ziel-Branch bewusst umstellen.
+#
+#    INERT-by-default: der Job wird GAR NICHT erzeugt, solange nicht COMDARE_ANHANG_FORWARD=="true" auf
+#    development gesetzt ist. Die Scharfschaltung auf "jeder CI" ist ein spaeterer Projekt-Var-Flip NACH
+#    dem Lebend-Check (eine getriggerte Pipeline: 289-Commit sichtbar + 289-Pipeline gruen + Gitlink-Bump
+#    gelandet + KEINE Echo-Pipeline auf 288).
+#
+#    INFRA-VORAUSSETZUNG (Handout 2026-08-05, E-20-Kanal): EIGENES Write-Token AUF PROJEKT 289
+#    (COMDARE_THESIS_WRITEBACK_USER / COMDARE_THESIS_WRITEBACK_TOKEN; write_repository-only, Rolle
+#    Developer, masked+hidden+protected). BEWUSST NICHT das 288-Token (COMDARE_WRITEBACK_USER/TOKEN,
+#    PAT id=54): das ist auf 288 ausgestellt und hat auf 289 kein Schreibrecht — Least-Privilege je Projekt.
+anhang:forward:
+  stage: persist
+  tags: [baremetal]
+  before_script: []                 # ueberschreibt default:before_script -> kein manueller Cross-Projekt-Klon
+  cache:
+    paths: []                       # dieser Job kompiliert hoechstens den Generator -> kein ccache-Zip-Sync
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "0"                  # VOLLER Klon load-bearing: shallow bricht Merge/Push (fehlende merge-base)
+    # recursive load-bearing: Code/CMakeLists.txt zieht die ce unbedingt per add_subdirectory ein — ohne
+    # Submodul-Checkout ist appendix_generator_cli nicht konfigurierbar (Quelle 2 der Kaskade).
+    GIT_SUBMODULE_STRATEGY: recursive
+  needs:
+    - job: measure:golden-320       # Code/measure_out/appendix/**/*.tex — OPTIONAL (nur bei COMDARE_RUN_MEASURE)
+      artifacts: true
+      optional: true
+    - job: measure:smoke            # Code/measure_out_smoke/appendix/**/*.tex — OPTIONAL (nur bei Smoke-Lauf)
+      artifacts: true
+      optional: true
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'                                       # (Netz) Bot-Writeback triggert NIE den Kanal
+      when: never
+    - if: '$COMDARE_ANHANG_FORWARD == "true" && $CI_COMMIT_BRANCH == "development"'  # INERT: nur bei Opt-in auf development
+  script:
+    - |
+      set -euo pipefail
+      # ── (0) INERT-Guards + fail-loud auf fehlende Credentials (Muster persist:measurements) ──
+      if [ "${COMDARE_ANHANG_FORWARD:-}" != "true" ]; then
+        echo "INERT: COMDARE_ANHANG_FORWARD != true -> kein Vorwaerts-Schreiben"; exit 0
+      fi
+      if [ -z "${COMDARE_THESIS_WRITEBACK_USER:-}" ] || [ -z "${COMDARE_THESIS_WRITEBACK_TOKEN:-}" ]; then
+        echo "FEHLER: COMDARE_ANHANG_FORWARD=true, aber COMDARE_THESIS_WRITEBACK_USER/COMDARE_THESIS_WRITEBACK_TOKEN fehlt"
+        echo "       -> Infra: Project-Access-Token AUF PROJEKT 289 (write_repository, Developer, masked+protected) setzen"
+        exit 1
+      fi
+      if [ -z "${COMDARE_WRITEBACK_USER:-}" ] || [ -z "${COMDARE_WRITEBACK_TOKEN:-}" ]; then
+        echo "FEHLER: 288-Write-Credential fehlt -> der Gitlink-Bump koennte nicht landen"; exit 1
+      fi
+      test -x ci/anhang_forward_core.sh || { echo "FEHLER: ci/anhang_forward_core.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      # ── (1) Generator bereitstellen (nur noetig fuer den Korpus-Zweig; Fehlschlag ist NICHT fatal:
+      #        liegen frische Artefakte an, laeuft der Kanal ohne Generator) ──
+      GEN=""
+      ( cd Code && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release >/dev/null \
+          && cmake --build build --target appendix_generator_cli ) \
+        || echo "HINWEIS: appendix_generator_cli-Bau fehlgeschlagen -> nur der Artefakt-Zweig ist nutzbar"
+      GEN=$(find Code/build -type f -name "appendix-generator" | head -1)
+      echo "appendix-generator: ${GEN:-<nicht gebaut>}"
+      # ── (2) Ziel-Klon (Projekt 289) mit EIGENEM Write-Token; Creds nur als Var-Referenz (kein set -x) ──
+      THESIS_CLONE="$CI_PROJECT_DIR/.anhang_forward_thesis"
+      rm -rf "$THESIS_CLONE"
+      # Geschwister-Pfad exakt wie die relative .gitmodules-URL "../20260931-overleaf-diplomarbeit.git":
+      # ${CI_PROJECT_PATH%/*} schneidet das letzte Segment ab (comdare/research/<super> -> comdare/research).
+      git clone --branch development \
+        "https://${COMDARE_THESIS_WRITEBACK_USER}:${COMDARE_THESIS_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH%/*}/20260931-overleaf-diplomarbeit.git" \
+        "$THESIS_CLONE"
+      echo "289-Klon auf development: $(git -C "$THESIS_CLONE" rev-parse --short HEAD)"
+      # ── (3) KERN: Quellen-Kaskade + Whitelist-Kopie + Idempotenz + Commit + Push (ci/anhang_forward_core.sh) ──
+      AF_DEST_REPO="$THESIS_CLONE" \
+      AF_BRANCH="development" \
+      AF_LANGS="de,en" \
+      AF_WORK_ROOT="$CI_PROJECT_DIR" \
+      AF_ARTIFACT_ROOTS="Code/measure_out/appendix Code/measure_out_smoke/appendix" \
+      AF_CORPUS_ROOT="measurement" \
+      AF_GENERATOR="${GEN:-}" \
+      AF_PDF_GATE="$([ "${COMDARE_TEXLIVE_AVAILABLE:-}" = "true" ] && echo on || echo auto)" \
+      AF_PROV_PIPELINE_ID="${CI_PIPELINE_ID:-NA}" \
+      AF_PROV_PIPELINE_URL="${CI_PIPELINE_URL:-NA}" \
+      AF_PROV_SUPER_SHA="${CI_COMMIT_SHA:-NA}" \
+      AF_PROV_SUPER_REF="${CI_COMMIT_REF_NAME:-NA}" \
+        ci/anhang_forward_core.sh
+      NEW_THESIS_SHA=$(git -C "$THESIS_CLONE" rev-parse HEAD)
+      echo "289-HEAD nach dem Kanal: $NEW_THESIS_SHA"
+      # ── (4) Gitlink-Bump auf 288 — NUR wenn sich 289 wirklich bewegt hat (sonst kein Leer-Commit) ──
+      OLD_LINK=$(git ls-tree HEAD thesis/diplomarbeit | awk '{print $3}')
+      echo "Gitlink alt=$OLD_LINK neu=$NEW_THESIS_SHA"
+      if [ "$OLD_LINK" = "$NEW_THESIS_SHA" ]; then
+        echo "=== anhang:forward OK: Gitlink bereits aktuell -> kein Bump-Commit ==="; exit 0
+      fi
+      git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
+      git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      git fetch origin "$CI_COMMIT_BRANCH"
+      git checkout -B "$CI_COMMIT_BRANCH" "origin/$CI_COMMIT_BRANCH"
+      git update-index --cacheinfo 160000 "$NEW_THESIS_SHA" thesis/diplomarbeit
+      if git diff --cached --quiet; then echo "Gitlink unveraendert (Race) -> kein Commit"; exit 0; fi
+      git commit -m "thesis(E-18): Gitlink auf ${NEW_THESIS_SHA} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
+      for attempt in 1 2 3 4 5; do
+        if git push -o ci.skip origin "HEAD:$CI_COMMIT_BRANCH"; then
+          echo "=== anhang:forward OK: Gitlink gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
+        fi
+        echo "push abgelehnt (non-ff-Race gegen persist:measurements) -> fetch + MERGE (kein rebase) + retry ($attempt)" >&2
+        git fetch origin "$CI_COMMIT_BRANCH"
+        # Pfade disjunkt (Gitlink vs measurement/) -> Merge mechanisch konfliktfrei; [skip ci] auch im Merge-Commit.
+        if ! git merge --no-edit -m "Merge origin/$CI_COMMIT_BRANCH in anhang-forward-gitlink [skip ci]" "origin/$CI_COMMIT_BRANCH"; then
+          git merge --abort || true
+          echo "UNerwarteter Merge-Konflikt (Versuch $attempt) -> echter Bug, Abbruch (kein --force)" >&2; exit 1
+        fi
+        sleep $(( (RANDOM % 5) + 2 ))
+      done
+      echo "FEHLER: Gitlink-Bump nach 5 Versuchen fehlgeschlagen" >&2; exit 1
+
+# ── planer:delegate (W10-B, Ledger §42): die DELEGATION der Anwender-XML an die CE — der NEUE Standard-Pfad
+#    (loest die statische Matrix als STEUERUNG ab, §42: „Eigentlich erhaelt die Cache Engine die XML und
+#    uebernimmt die gesamte Arbeit"). Der super-CI-Job baut NUR die PLANER-Binary (W1, 05.08.2026: die
+#    Planer-Rolle ist eine eigene ce-Binary comdare-experiment-planner; bis dahin trug der Treiber beide
+#    Rollen), reicht das golden-Profil an die CE (Subkommando "plan ci") und legt die CE-emittierte
+#    STUFE-1-YAML als Artefakt ab. ALLE Steuerung/Emission liegt in der CE:
+#    STUFE 1 (diese YAML) = je Mess-Kombination [a,b,c] die CEB-Jobs (ceb:build/emit/trigger); die ceb:emit-Jobs
+#    rufen das Subkommando "tier ci" -> die CEB emittiert STUFE 2 (System-Perms + Tier-Chunk-Jobs + gegatete
+#    Mess-Jobs) als Grandchild (parent->child->grandchild = GitLab-Nesting-Tiefe 2).
+#    NACHZUG P8/D3.2 (27.07., zweiter Halt): die ce-Emission ist seit ce 2acea388 auf "tier ci" umgestellt
+#    (am realen Emissionstext byte-identisch verifiziert, sha256-gleicher stdout beider Formen) -- dieser Text
+#    ist damit wie im frueheren HINWEIS angekuendigt nachgezogen. Das Alt-Flag --emit-tier-ci existiert bis zum
+#    §75-Aufraeumpass nur noch als deprecation-warnender Alias im Treiber.
+#    GATE: der NEUE Standard laeuft hinter COMDARE_BUILD_GOLDEN_N (die statische Matrix ist auf COMDARE_STATIC_
+#    MATRIX_FALLBACK verschoben, Default AUS). Zusaetzlich bleibt COMDARE_DYNAMIC_PLANER_CI als ISOLIERTES Opt-in
+#    (nur die Delegation ohne den Rest). INERT-by-default: ohne beide Flags wird der Job NIE erzeugt ("plan ci" ist
+#    rein lesend: KEIN Bau, KEINE Messung). HINWEIS (Architekt): das emittierte Child-YAML wird vor dem
+#    Scharfschalten per GitLab-CI-Lint geprueft (nicht via API in diesem Job).
+planer:delegate:
+  stage: planer
+  tags: [baremetal]
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/golden-Profil)
+    COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
+  needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher (Job kann bei docs-Wellen fehlen)
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE die dynamische Planer-CI
+      when: never
+    # S2 (§62-B Smoke-Umfang, 2026-07-22, Entscheid A): der SMOKE-Zweig delegiert ein KLEINES Umfangs-Profil
+    # (m3v2_smoke: cap=2 + 2 Achsen-Sweeps + 1 working_set) statt all_axes_golden -> "plan ci" emittiert die kleine
+    # Pipeline; der Smoke ist damit eine schnelle Regressionswache. Der GN-11-2^17-Bau-Nachweis laeuft SEPARAT (ueber
+    # die S4-Batch-Kette), NICHT ueber den Smoke. Die Smoke-METHODIK (COMDARE_PLAN_METHODIK_PROFILE=m3_smoke_coverage)
+    # steht ab S2-Nacht-3 AUCH hier (Basename), damit sie zur "plan ci"-EMISSIONSZEIT gesetzt ist: die Facade loest den
+    # Basename gegen thesis_profiles/ auf (resolve_methodik_profile_path) UND der Planer brennt ihn KLASSEN-konform ans
+    # ceb:trigger (append_forward_var_literal) -> der Grandchild-Mess-Loop bekommt die injizierte Methodik. Der
+    # Trigger-Job (planer:delegate-trigger) behaelt seine Zeile (Forward an die STUFE-1-Child/ceb:emit). §61: Env waehlt
+    # das Profil, nie einen Wert. MUSS VOR der generischen golden-Regel stehen (erste passende Regel gewinnt) --
+    # golden/Nicht-Smoke bleibt bei all_axes_golden ohne METHODIK (golden/CRC-neutral).
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_MEASURE_PROFILE == "smoke"'
+      variables:
+        COMDARE_GOLDEN_N_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3v2_smoke.profile.xml"
+        COMDARE_PLAN_METHODIK_PROFILE: "m3_smoke_coverage.profile.xml"
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'      # NEUER STANDARD-Pfad (loest die statische Matrix ab)
+    - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # ISOLIERTES Opt-in (nur die Delegation, ohne den Rest)
+  script:
+    - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    - cd Code
+    - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
+    # W1 (05.08.2026, F1-HART): die DELEGATION ist die PLANER-Rolle -- sie laeuft ab hier ueber die eigene
+    # ce-Binary comdare-experiment-planner. Der Job baut NUR noch dieses Target: der Treiber (CEB) wird in
+    # diesem Job gar nicht gebraucht, er wird von den EMITTIERTEN ceb:build-Jobs selbst gebaut (Section 40.b).
+    - cmake --build build --target comdare_experiment_planner
+    - |
+      set -euo pipefail
+      PLANNER=$(find build -type f -name "comdare-experiment-planner" | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
+      test -f "$COMDARE_GOLDEN_N_PROFILE" || { echo "golden-Profil fehlt: $COMDARE_GOLDEN_N_PROFILE"; exit 1; }
+      echo "== W10-B: super delegiert die Anwender-XML an die CE (Subkommando 'plan ci' = STUFE 1, rein lesend, KEIN Bau/Messung) =="
+      "$PLANNER" plan ci "$COMDARE_GOLDEN_N_PROFILE" > "$CI_PROJECT_DIR/planer-child-ci.yml"
+      echo "== CE-emittierte STUFE-1-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
+      echo "== STUFE-1 CEB-Bau-Jobs (je Mess-Kombination): $(grep -c '# JOB ceb-build combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
+      echo "== STUFE-1 CEB-Trigger-Jobs (Grandchild -> STUFE 2): $(grep -c '# JOB ceb-trigger combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
+  artifacts:
+    paths:
+      - planer-child-ci.yml
+    expire_in: 1 week
+
+# ── planer:delegate-trigger (W10-B): triggert die CE-emittierte STUFE-1-Child-Pipeline (Dynamic-Child-Pipeline,
+#    trigger: include: artifact:). Die Child-Pipeline emittiert ihrerseits je Mess-Kombination ueber die CEB die
+#    STUFE-2-YAML als GRANDCHILD (parent->child->grandchild = GitLab-Nesting-Tiefe 2). strategy:depend = der
+#    Parent-Job spiegelt den Child-Status (synchron + gated). Dieselben Gates wie planer:delegate.
+planer:delegate-trigger:
+  stage: planer
+  needs:
+    - job: planer:delegate
+      artifacts: true
+  # S1/A1 P-TOTAL (Ledger 46): explizite Forward-Allowlist an der ERSTEN Trigger-Grenze. Selbst-enthaltene
+  # Child-Pipelines erben Pipeline-Variablen NICHT -> COMDARE_GN_TOTAL + COMDARE_MEASURE_PROFILE werden als
+  # YAML-Variablen dieses Bridge-Jobs deklariert (RHS = der super-Pipeline-Wert) und via forward:yaml_variables an
+  # die STUFE-1-Child gereicht. KEIN pipeline_variables:true (Isolation: die Child erbt NICHT den gesamten
+  # Eltern-Variablenraum, Byte-Determinismus). COMDARE_MEASURE_PROFILE (S5-Rest): ohne diese Weiterreichung sieht
+  # das Grandchild die Smoke-Marke nicht -> die STUFE-3-Mess-Rule '$COMDARE_MEASURE_PROFILE == "smoke"' faellt aus
+  # und die emittierten Mess-Jobs bleiben when:manual statt Auto-Run (Befund CI-Smoke 11840/Grandchild 11858).
+  variables:
+    COMDARE_GN_TOTAL: "$COMDARE_GN_TOTAL"
+    COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
+      when: never
+    # smoke=>debug-Entkopplung (2026-07-22): NUR im smoke-Zweig speist das METHODIK-Profil m3_smoke_coverage (debug =>
+    # parallel messen + (j3)-Dual-Compile) die Mess-Methodik. Der Bau-KATALOG (Umfang) des Smoke ist seit S2 (Entscheid A,
+    # §62-B) KLEIN: planer:delegate delegiert im Smoke-Zweig COMDARE_GOLDEN_N_PROFILE=m3v2_smoke (cap=2 + 2 Sweeps) statt
+    # all_axes_golden -> schnelle Regressionswache; der GN-11-2^17-Bau-Nachweis laeuft SEPARAT (S4-Batch-Kette). Nur der
+    # BASENAME (KLASSEN-Regel: KEIN $CI_PROJECT_DIR in geforwardeten Child/Grandchild-Vars -- der CEB-/Grandchild-Prolog
+    # re-derived den Voll-Pfad mit frischem ${CI_PROJECT_DIR}, s. emit_child_submodule_prolog). Voll-Lauf (measure) =>
+    # nicht gesetzt => all_axes_golden (Voll-Umfang, unveraendert).
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true" && $COMDARE_MEASURE_PROFILE == "smoke"'
+      variables:
+        COMDARE_PLAN_METHODIK_PROFILE: "m3_smoke_coverage.profile.xml"
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'
+    - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'
+  trigger:
+    include:
+      - artifact: planer-child-ci.yml
+        job: planer:delegate
+    strategy: depend
+    forward:
+      yaml_variables: true       # Allowlist (COMDARE_GN_TOTAL + COMDARE_MEASURE_PROFILE [+ COMDARE_PLAN_METHODIK_PROFILE im smoke]) an STUFE-1
+      pipeline_variables: false  # KEIN blindes Erben des gesamten Eltern-Variablenraums (Modul-Trigger-Isolation)
+
+# ── ergebnis:holen (W10-B, Ledger §42, SKELETT): das ERGEBNIS-HOLEN gehoert laut §42 in die Diplomarbeit-CI
+#    („das Holen der Messergebnisse gehoert auf der Grundlage der cache-engine-lib in die Diplomarbeit-CI auf
+#    Delegation der cache-engine-Framework-lib"). Es sammelt die von den CEB-emittierten STUFE-3-Mess-Jobs
+#    zurueckgeschriebenen CSVs (measure_out/) und reicht sie an persist:measurements (der bestehende Writeback-
+#    Mechanismus, #22/§11-G) weiter. SKELETT auf der persist:measurements-Grundlage: heute dokumentiert es den
+#    Fluss + prueft die Artefakt-Naht; der scharfe Sammel-/Delegations-Aufruf ist GN-11/320er-gated (kein
+#    Auto-Messlauf). INERT-by-default (DREIFACH: COMDARE_BUILD_GOLDEN_N-Gate + when:manual + _bot_-never).
+ergebnis:holen:
+  stage: planer
+  tags: [baremetal]
+  cache:
+    paths: []               # #53: reines Ergebnis-Sammeln (var-gated), kein Compile -> kein ccache-Zip
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+  needs:
+    - job: planer:delegate-trigger
+      optional: true
+  rules:
+    - if: '$GITLAB_USER_LOGIN =~ /_bot_/'
+      when: never
+    - if: '$COMDARE_BUILD_GOLDEN_N == "true"'
+      when: manual                                 # GN-11/320er-Gate: das scharfe Ergebnis-Holen ist opt-in
+      allow_failure: true
+  script:
+    - |
+      set -euo pipefail
+      echo "== W10-B: ergebnis:holen (SKELETT auf persist:measurements-Grundlage, §42) =="
+      echo "-- Delegation an die cache-engine-lib: die CEB-emittierten STUFE-3-Mess-Jobs schreiben je Zelle"
+      echo "   ein CSV zurueck (measure:[a,b,c][d,e,f][g,h,i], 1-Thread §38.b). ergebnis:holen sammelt sie und"
+      echo "   reicht sie an persist:measurements (#22/§11-G Writeback nach development) weiter."
+      echo "-- GATED (GN-11/320er): der scharfe Sammel-Aufruf ist erst nach dem User-Mess-Entscheid aktiv."
+      # SKELETT-Naht (GN-11/320er-gated, NICHT aktiv): sammelt die measure_out/-CSVs der Grandchild-Mess-Jobs
+      #   mkdir -p "$CI_PROJECT_DIR/measurement/ergebnis"
+      #   find "$CI_PROJECT_DIR" -path '*/measure_out/*.csv' -exec cp {} "$CI_PROJECT_DIR/measurement/ergebnis/" \;
+      #   -> Uebergabe an persist:measurements (needs: measure:*-Artefakte, bestehender Writeback-Mechanismus).
+      if [ -d "$CI_PROJECT_DIR/measure_out" ]; then
+        echo "measure_out/ gefunden: $(find "$CI_PROJECT_DIR/measure_out" -name '*.csv' 2>/dev/null | wc -l) CSV(s)"
+      else
+        echo "measure_out/ (noch) nicht vorhanden -> Skelett-Lauf, kein Sammeln (golden-neutral)."
+      fi
