@@ -70,6 +70,7 @@ article.k.aus,section.subsys.aus{display:none}
   <a class="e" href="#uebersicht"><span>Architektur-Übersicht (Binary-Topologie)</span></a>
   <a class="e" href="#kette"><span>Vertragskette Planer→CEB→Tier</span></a>
   <a class="e" href="#klammer"><span>Achsen-Arten-Klammer Mess/System/Organ</span></a>
+  <a class="e" href="#zukunft"><span>Zukunfts-Phasen (SOLL)</span></a>
   <div class="grp">L0 · Planer (E4/E3-Plan)</div>
   <a class="e" href="#sh-27"><span>Builder: experiment_tree (E3-Permutationsmaschine)</span><span class="c">71</span></a>
   <a class="e" href="#sh-33"><span>profile_facade + compositions + subsystems</span><span class="c">115</span></a>
@@ -644,6 +645,172 @@ article.k.aus,section.subsys.aus{display:none}
 <blockquote class="ow"><span class="q">„Die System-Achse ist exakt wie die Messachse dehnbar stufig gegen die eingeschobenen Hybriden und die Hybriden geben sich selbst und ihren Tier-Binaries die System-Achsen-config per compile time mit. Die Organ-Achsen sind eigentlich nur in den Tier-binaries verbaut und beruehren die Hybriden nicht direkt, da die Hybriden ein factory pattern - facade - Adapter sind“</span><span class="src">Owner verbatim, mittag-10 (Hybrid-Präzisierung) — LEDGER:4083-4087, Gesamt-Form :4086, Stempel-Konsequenz :4087c</span></blockquote>
 <p class="z"><b>Haupt=CT / Unter=RT ist stufen-relativ:</b> „die dynamischen (Runtime-)Einstellungen der VORHERGEHENDEN Stufe sind oft die zu übernehmenden compile-time-Drähte der gebauten NACHFOLGENDEN Stufe“ (User-Direktive 18.07., §24) — jede Stufe friert die dynamischen Entscheidungen der Vorstufe zu eigenen Compile-Konstanten ein, kein <code>std::variant</code> in der erzeugten Binary; OD-5 (LEDGER:3562): „Unter-Achsen-Freigabe der Vorstufe = Haupt-Achsen-Annahme der Folgestufe, Planer→CEB→Tier“. Dual-Natur-Register (LEDGER:92): Mess-Tooling/<code>load_framework</code> (Planer→CEB) · <code>compiler</code>-Gruppe (CEB→Tier) · NUMA/locking + page_type (CEB unter ISA → Tier) · SIMD/AVX (external_utils gibt frei → Tier) · telemetry (§69.3) — CT-Haupt am Tier = einkompiliert+gestempelt (System-Array), NICHT binary_id, golden-neutral. Bindende Achsen-SORTIERUNG jeder Darstellung (LEDGER:3546, §68a): Mess-Tooling → <code>target_isa</code> → <code>operating_system</code> → <code>external_utils</code> → Organ T00–T17; Ordnungs-Single-Source <code>kSystemAxisOrder</code> (<code>abi/system_axis_order.hpp</code>).</p>
 <p class="hinweis">Anbindungs-Regel gegen lose UML-Knoten (Owner-Hinweis B): jede Organ-Klasse ist mindestens über ihre ACHSEN-Zugehörigkeit anzubinden (Subgraph je Haupt-Achse, Kante Klasse→Achsen-Anker); Mess-/System-Träger analog — mechanisch aus den drei Registry-XMLs ableitbar (axis id → Baustein-wrapper/type).</p>
+</div>
+</section>
+
+<section class="subsys" id="zukunft">
+<h2>Zukunfts-Phasen (SOLL nach Plan) + Rückschreibe-Kette bis xlsx</h2>
+<p class="meta">Quelle: LENS rueckschreibe-zukunft 05.08.2026 (READ-ONLY-Erhebung <code>korpus.md</code> Runde 5, inkl. 2. unabhängigem Gegenprüfungs-Durchgang) + Owner-Review Runde 5 verbatim (LEDGER:4114-4118, nachmittag-1) + P3-Format-Kanon (LEDGER:4103-4106, nachmittag-3). Manager-Entscheid: SOLL-Sektion JETZT (nachlesbar) + Live-Nachzug bei Landungen. Status-Legende je Knoten: <b>IST</b> = existiert im Code (datei:zeile, Rahmen durchgezogen) · <b>TEIL</b> = Naht existiert, Vollzug offen (fein gepunktet) · <b>PLAN</b> = nur Doku/Design (gestrichelt) — SOLL wird hier NIE als IST verkauft; Details ohne Korpus-Fundstelle tragen sichtbar die Marke <span class="ung">UNGEDECKT — Gegenprüfung offen</span> (P4-Dauer-Regel: der Atlas ist IMMER erneut gegenzuprüfen, Details sind nicht vollständig über die 6-Wochen-Planung gedeckt). Ledger-Zeilen nach den Nachträgen nachmittag-1/-3: Owner-R5-Wortlaut = LEDGER:4116, P3-Kanon = LEDGER:4106.</p>
+<style>
+#zukunft b.reg{color:#c43b2f}
+:root[data-theme="dark"] #zukunft b.reg{color:#e8756a}
+@media (prefers-color-scheme: dark){#zukunft b.reg{color:#e8756a}}
+:root[data-theme="light"] #zukunft b.reg{color:#c43b2f}
+#zukunft .pl{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--st);border:1px solid var(--st);border-radius:4px;padding:0 4px;white-space:nowrap}
+#zukunft .ung{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:#c43b2f;border:1px solid #c43b2f;border-radius:4px;padding:0 4px;white-space:nowrap}
+:root[data-theme="dark"] #zukunft .ung{color:#e8756a;border-color:#e8756a}
+@media (prefers-color-scheme: dark){#zukunft .ung{color:#e8756a;border-color:#e8756a}}
+:root[data-theme="light"] #zukunft .ung{color:#c43b2f;border-color:#c43b2f}
+#zukunft table.phasen{border-collapse:collapse;font-size:13px;min-width:920px}
+#zukunft table.phasen th{text-align:left;border-bottom:2px solid var(--acc);padding:4px 12px 4px 0;vertical-align:bottom}
+#zukunft table.phasen td{border-bottom:1px solid var(--line);padding:4px 12px 4px 0;vertical-align:top}
+#zukunft blockquote.ow{margin:8px 0;padding:6px 12px;border-left:3px solid var(--st);background:var(--code-bg);border-radius:0 8px 8px 0;font-size:13px}
+#zukunft blockquote.ow .q{font-style:italic}
+#zukunft blockquote.ow .src{display:block;color:var(--ink2);font-size:11.5px;font-style:normal;margin-top:3px;font-variant-numeric:tabular-nums}
+</style>
+
+<h3>1 · Rückschreibe-Kette XML → … → CSV/xlsx — je Knoten IST (durchgezogen) vs PLAN (gestrichelt)</h3>
+<blockquote class="ow"><span class="q">„es soll doch entweder CSV xor xlsx schreiben und xlsx ist default? Alles andere ist unnoetiger overhead. Das ist ein strategy pattern, keine chain of responsabilities“</span><span class="src">Owner verbatim, nachmittag-3 (P3) — LEDGER:4105; Kanon (LEDGER:4106): GoF-STRATEGY mit GENAU EINER aktiven Strategie je Lauf, CSV XOR xlsx, xlsx = DEFAULT; Doppel-Schreibung = Regression; KEINE Chain of Responsibility am Format-Knoten</span></blockquote>
+<div class="dia"><pre class="mermaid">flowchart LR
+ XML["Anwender-XML<br>comdare_thesis_profile / comdare_experiment<br>Aufruf: Driver experiment_config measure_out<br>(super/.gitlab-ci.yml:681) · IST"] --> DRV
+ DRV["comdare-messung-driver<br>Planer- + CEB-Rolle in EINEM Binary (main.cpp:552)<br>IST · R-G1: eigene Planer-Binary = REGRESSION<br>(Audit LEDGER:4028)"] --> LAUF
+ LAUF["Mess-Lauf measure:smoke / measure:golden-320<br>1-Thread · §38.b resource_group<br>ceb-measurement-exclusive (yml:501/579) · IST"] --> RES
+ RES["result.csv + result.csv.stamp je Binary<br>ITER:938-943 · Resume lazy_try_resume_binary (:935)<br>Sinks SYNCHRON an der per-Binary-Naht (ITER:184-186)<br>IST"] --> ZELLE
+ ZELLE["EIN CSV je Zelle (§42.b, LEDGER:2433/2435)<br>measure_out/&lt;slug&gt;/perm&lt;idx&gt; (yml:679-694 / 770-786)<br>IST Struktur · TEIL: dynamische 4. Mess-Emissions-Ebene<br>gated (LEDGER:2568/2577/2909)"] --> SINK
+ SINK["MeasurementSinkFn → measure-drop (Ebene C)<br>curl-PUT Basic-Auth an measure-drop.comdare.local/&lt;ts&gt;/<br>ITER:80/191, Feuerung :1989-1993 · F5: measure-drop = DEFAULT,<br>git-Writeback = Option (LEDGER:2290) · IST<br>XML-Schalter TEIL (LEDGER:2623)"] --> REGN
+ REGN["messwert_registrierung — 2. Bestandslog-Genus<br>MesswertRunState load/observe/flush · MesswertKeyPolicy<br>Anti-Phantom-Naht ITER:1995-1999 (G-E3) · IST"] --> BLOG
+ BLOG["Bestandslog-measurement-XML<br>doc_revision monoton → B2-Record-Union-Merge<br>(bestandslog_document.hpp:35/49) · Ziel-Routing CT-Default:<br>measurement→NAS measure-drop, binary→MinIO<br>(lager_ziel_strategie.hpp:160-171) · IST"]
+ ZELLE --> TEX
+ TEX["CSV→LaTeX: appendix-generator im Messlauf<br>WIDE-Matrix aller Perms → 12 Kern- + 5 Darstellungs-.tex je de,en<br>(yml:686-697 / 770-795) · IST<br>PLAN: Ausdehnung auf ALLE 4 Phasen (E4-Kanon 10.07.)"] --> GIT
+ ZELLE --> GIT
+ GIT["measurement/&lt;YYYYMMDD-HHMMSS-p…&gt;/-Git-Rückschrieb<br>persist:measurements (yml:807-903) · Write-Token id=54<br>merge kein rebase · Loop-Schutz dreifach inkl. skip ci<br>selektiv NUR csv + Anhang-.tex · IST<br>Aktivierung nur beim Mess-Trigger"]
+ ZELLE -. "Lager-Strecke: Vollausbau Paket 46b" .-> LBW
+ LBW["lager_baum_writer (LB-2/LB-3)<br>beide Realm-Kaskaden Ebenen 1-11 + Blatt via blatt_dateiname<br>Code IST · Verdrahtung im Mess-Lauf offen → TEIL"] -.-> FMT
+ FMT["FORMAT-STRATEGY-WEICHE (GoF STRATEGY, P3)<br>genau EINE Strategie je Lauf: xlsx = DEFAULT XOR csv = Fallback<br>Doppel-Schreibung = REGRESSION · KEINE CoR<br>PLAN · Wahl-Ort im XML: UNGEDECKT"] -.-> BLATT
+ BLATT["Blatt-Datei der Messdaten-Kaskade<br>Namens-Grammatik IST: lager_pfad_grammatik.hpp:525-538<br>…_workload=ycsb_a+working_set_n=sweep.xlsx<br>xlsx-SERIALISIERER FEHLT → PLAN (Paket 46b)<br>heutige Läufe schreiben real NUR CSV"]
+ classDef plan stroke-dasharray:6 4,opacity:0.85
+ classDef teil stroke-dasharray:2 3
+ classDef reg stroke:#c43b2f,stroke-width:2.5px
+ class FMT,BLATT plan
+ class ZELLE,LBW teil
+ class DRV reg
+</pre></div>
+<p class="hinweis">Lesehilfe: nach dem Zell-CSV (§42.b) fächert die Kette in drei parallele Abnehmer — (a) Ebene-C-Sink → Bestandslog-Genus measurement (A.4–A.6), (b) Anhang-Generator + Git-Persist (A.7/A.8; die .tex landen ZUSÄTZLICH via <code>persist:measurements</code> in <code>measurement/&lt;ts&gt;/</code>, LEDGER:263 G6), (c) die Lager-Strecke zur xlsx-Blatt-Datei (PLAN, Paket 46b) — das ist Korpus-Befund, nicht sequentielle Kette. Die Format-Weiche ist per P3 EIN Strategy-Knoten (XOR, xlsx als Default markiert), ausdrücklich NICHT zwei parallele Schreib-Zweige. <b class="reg">R-G1/R-G3-Kontext</b> siehe Vertragskette (<a href="#kette">Sektion Vertragskette</a>, Audit 05.08.).</p>
+
+<div class="legende">
+<h3>Format-Strategie IST vs SOLL (Lens-Prüfpunkte P3, am Objekt erhoben)</h3>
+<ul>
+<li><b>CSV-Writer (IST):</b> real und im Lauf verdrahtet — <code>result.csv</code>/<code>result.csv.stamp</code> je Binary (<code>ITER:938-943</code>), <code>measurements.csv</code>/WIDE-Aggregat im CI-Beleg (<code>super/.gitlab-ci.yml:679-694</code>). CSV = Factory-Fallback bleibt laut Doktrin gültig (CSV je Sheet einzeln im FACTORY PATTERN).</li>
+<li><b>xlsx-Writer (PLAN):</b> <code>grep xlsx</code> über <code>ce/libs</code>+<code>ce/apps</code> trifft genau <b>3 Dateien</b> — <code>lager_pfad_grammatik.hpp</code> (Namens-Doktrin implementiert, Selbsttests <code>blatt_dateiname()</code> :525-538; Ownership-Entscheid L5: Datei gehört der A1-Lager-Welle, A9 KONSUMIERT), <code>lager_ziel_strategie.hpp:166</code> (NAS-Default-Kommentar), <code>axis_error.hpp:535</code> (Vokabel-Verweis). Ein tatsächlicher xlsx-SERIALISIERER (SpreadsheetML/zip-Container, EIN Sheet je gewählter Unter-Achsen-Permutation + INFO-Sheet mit Sysinfo + Haupt-Achsen) existiert <b>nirgends</b> im ce (grep worksheet/zip/xl-: 0 fachliche Treffer) — Vollausbau = Paket 46b, Werkzeug = hauseigener A9-Writer (kein Python, Buildchain-Doktrin).</li>
+<li><b>Format-Strategy-WAHL (PLAN + <span class="ung">UNGEDECKT — Gegenprüfung offen</span>):</b> ein <code>&lt;format&gt;</code>-/Writer-Wahl-Element ist weder in <code>experiment_schema.xsd</code> noch im Parser belegt (0 Treffer) — die XOR-Weiche steht im Diagramm darum als PLAN-Knoten ohne XML-Fundstelle.</li>
+<li><b>Alt-Doku-Check (P3):</b> im Korpus ist KEIN Alt-Doku-Beleg erhoben, der fürs Rückschreibe-FORMAT CoR oder Doppel-Schreibung fordert; die einzige CoR-Fundstelle (LEDGER:829, Doc-20-Vision) betrifft die AUSWERTUNGS-Filterkette (<code>selection_filter_chain.hpp</code>) und bleibt dort gültig. Weitergehender Alt-Doku-Sweep = Live-Nachzug.</li>
+<li><b>Quellen-Lage der xlsx-Doktrin (ehrlich):</b> die Default-xlsx-Schreibung hat im Ledger-HAUPTTEXT keinen eigenen Paragraphen — Quellen sind der Owner-KERN 26.07. (MEM/project_lager_baeume_xlsx_doktrin.md inkl. P3-Nachtrag 05.08.) + Session-Doc 26.07. Paragraphen 4/6 (Namens-Doktrin, Zwei Realm-Bäume, Dual-ccache minio=Binaries/NAS=Mess-Ergebnisse, „Design fix, Vollausbau im 46b-Paket“) sowie der P3-Nachtrag LEDGER:4103-4106.</li>
+</ul>
+</div>
+
+<h3>2 · Zukunfts-Phasen (SOLL nach Plan) — alle PLAN-Knoten gestrichelt, existierende Mathematik durchgezogen</h3>
+<blockquote class="ow"><span class="q">„[Messwerte werden im Voll-Lauf ausgewertet,] zu Messkurven synthetisiert, die Messkurven je Eingangslast verglichen, um die beste binary zu finden, die man dann nochmal im release Modus ohne Mess-Einrichtungen neu kompiliert und nochmal wallclock time misst. An dieser stelle koennen dann auch ueber multiple Lasten multiple beste Binaries bestimmt werden, die ueber eine Erkennungsheuristik der Last ein Hybrid-Tier-binary zur aktiven runtime Auswahl der optimalen Tier-Binaries erzeugt.“</span><span class="src">Owner verbatim, Atlas-Review Runde 5 (nachmittag-1) — LEDGER:4116; Kanon-Wurzel: Dossier 19 Teil G (Messmodus → Auswertungsmodus → Arbeitsmodus → HYBRID = ZIEL der Diplomarbeit, LEDGER:215/V7.2-e)</span></blockquote>
+<div class="dia"><pre class="mermaid">flowchart TB
+ P1["PHASE 1 · MESS-MODUS — Voll-Lauf-Messwerte<br>IST: gesamte Rückschreibe-Kette oben (A.1–A.8)<br>Master COMDARE_MEASUREMENT_MODE (ce/CMakeLists.txt:135)<br>Prüfstand BINDEND vor Messung (LEDGER:4028 Glied 5)<br>TEIL: Voll-Lauf selbst offen — Trigger-Ziel Do 07.08."] --> MATH
+ MATH["PHASE 2a · Messkurven-SYNTHESE — Mathematik IST (W3-C/F8)<br>axis_spline.hpp: monotone kubische Hermite, Fritsch-Carlson,<br>Anti-Overshoot, HONEST-EMPTY · break_even.hpp: d(x)=f(x)-g(x),<br>Vorzeichenwechsel + deterministische Bisektion<br>measurement_curve_loader.hpp: Reihen je (achse, variante, workload)<br>§75-Schutzliste LEDGER:3602"] --> VGL
+ VGL["PHASE 2b · Kurven-Vergleich JE EINGANGSLAST (workload)<br>Switch-Thresholds = Schnittpunkte der f(x)-Splines zweier<br>Algorithmen derselben Achse (F8 LEDGER:2296/2301)<br>PLAN: Auswertungs-Orchestrator nicht verdrahtet ·<br>Brücke hybrid_router.hpp = SOLL HY-B2, existiert nicht<br>UNGEDECKT: kein EIN benannter Codepfad"] --> BEST
+ BBS["IST-Anker daneben: best_binary_selector (Task 172)<br>rankt Roh-Mediane je Interface-Funktion/Metrik,<br>konsumiert die Splines NICHT · löst perm.dll auf,<br>versendet ABI-stabiles Artefakt + Manifest<br>+ apps/f15_compare (Welch + Holm-FWER)"] -.-> BEST
+ BEST["BESTE Binary je Eingangslast<br>rückwärts aus dem isolierbaren Modell je Organ-Achse<br>(voll permutierte Baum-Matrix, F8 LEDGER:2301) · PLAN"] --> REL
+ CT["IST-Anker: CT-Schalter COMDARE_RELEASE_MODE<br>erzwingt MEASUREMENT_MODE OFF (FORCE)<br>ce/CMakeLists.txt:137-138 · Invariante :448-452"] -.-> REL
+ REL["PHASE 3 · Release-Rekompilation OHNE Mess-Einrichtungen<br>F7 Modus 3 (LEDGER:2294) · §61: Auslieferung ohne Overhead,<br>Mess-Observer per Metaprogrammierung abschaltbar<br>(LEDGER:3283-3284) · RELEASE benötigt die VOLLE MESSUNG,<br>Replay §58, Stempel = Reuse-Schlüssel (LEDGER:3287-3290)<br>PLAN als Lauf"] --> WALL
+ WALL["Wallclock-NACHMESSUNG (Beweis-Lauf)<br>best-Release vs beste Debug-Overhead-Version<br>vs schlechteste XML-Variante (LEDGER:3283/3285)<br>PLAN: weder CI-Job noch Driver-Subkommando —<br>eigener Deliverable-Schritt S7/Post an Posten 17/G3"] --> MULTI
+ WALL -.-> CMP
+ CMP["COMPARE — 4. Ablauf-Modus, je Maschine (§62 Punkt 3)<br>Vergleich der Mess-REPLAY-Sicht (§58) mit allen per<br>Cache-Log registrierten Maschinen · Release gilt nur je Maschine<br>IST-Anker: CompareEngineCommand + welch_t_test<br>(compare_engine_command.hpp, v32_orchestrator.hpp:13)<br>TEIL: Modus-Vollzug = Nach-Trigger-Paket D2<br>(run_methodology_registry.hpp:7-14)"]
+ MULTI["Multi-Last-Zweig: multiple Lasten →<br>multiple beste Binaries (Owner-R5 LEDGER:4116) · PLAN"] --> ERK
+ ERK["LAST-ERKENNUNGSHEURISTIK der stochastisch<br>häufigen Workload-Last · PLAN — 0 Code-Treffer,<br>auch im HY-D2-Design-Doc NICHT ausgearbeitet<br>UNGEDECKT — Gegenprüfung offen"] --> HYB
+ HYB["PHASE 4 · HYBRID-Tier-Binary — aktive RUNTIME-Auswahl<br>der optimalen Tier-Binaries am ABI-stabilen Prüf-Dock<br>eigene Stufe HINTER der CEB · Rekursions-Ebene 3 der Dock-Kette<br>variant-DockArray = einzige erlaubte Ausnahme (LEDGER:4076)<br>CT-CoR-Break-Even-Router an STATISCH zugewiesene echte Tiers<br>Tier-Neubau IMMER delegiert durch CEB · Hot-Switch nur an der<br>bewussten ABI-Grenze E2 · PLAN: Bau in der AUSWERTUNGSPHASE<br>(Owner-Entscheid E1, HY-D2)"]
+ STUB["IST-Anker: hybrid/README.md — Stub,<br>Status DESIGN FESTGESCHRIEBEN · IPruefDock::measure<br>(pruef_dock.hpp:78, §75-Schutz) · heuristik-Trio als Router-Speisung"] -.-> HYB
+ classDef plan stroke-dasharray:6 4,opacity:0.85
+ classDef teil stroke-dasharray:2 3
+ class VGL,BEST,REL,WALL,MULTI,ERK,HYB plan
+ class P1,CMP teil
+</pre></div>
+<p class="hinweis">Orthogonal zu den 4 Modus-Phasen (Dossier 19 Teil G) läuft die Ablaufmethodik Debug/Messung/Release + COMPARE als 4. Modus (F7 LEDGER:2294 · §47 LEDGER:2496 · §61 LEDGER:3281-3290 · §62 Punkt 3): DEBUG = je Maschine parallel bauen+messen, MESSUNG = parallel bauen, sequentiell 1-Thread messen, RELEASE = ZIEL DES GESAMTPROJEKTS (LEDGER:3284). Kanon dazu: CI-Grün = Messung AUS (Gesamtlauf commit-frei; nur der echte Mess-Trigger persistiert). Offene Phase-2-Posten zusätzlich: Workload-Cluster-Bildung per deep research (Dossier-19 Punkt 3) und die Messkurven-Typsystem-WURZEL Posten 11/G6 — DATEN-gated hinter dem Voll-Lauf (LEDGER:263). Für Phase 4 sind F8-Option 1 (variant in derselben Hybrid-Binary, limitiert auf Unter-Prüfdock-Typen via Abstract-Factory) UND Option 3 (Array multipler Docks + Memory-Verdrängungs-Strategie) freigegeben (LEDGER:2296-2298/2692/2696); Hot-RAM-Array-Verwaltung + Verdrängungs-Algorithmus haben 0 Code-Treffer. Die XML-Zwischenlösung statisch↔austauschbar kommt als <code>&lt;hybrid_tier&gt;</code>-Konfiguration auf Anwender-Wunsch in der Auswertungsphase (HY-D2 §4: XSD-Kommentar-Reserve JETZT, <code>HybridTierType</code> erst HY-B3; Zielentwurf <code>&lt;dock_array storage="static|runtime"&gt;</code>, <code>&lt;eviction strategy="lru|lfu|arc|cost_aware"&gt;</code>, <code>&lt;router&gt;&lt;break_even source="measurement_store" curves="axis_splines"/&gt;&lt;/router&gt;</code>).</p>
+
+<h3>3 · Phasen-Tabelle: SOLL-Kern · IST-Anker · Status</h3>
+<div class="legende" style="overflow-x:auto">
+<table class="phasen">
+<thead><tr><th>Phase</th><th>SOLL-Kern (1 Satz + Fundstelle)</th><th>IST-Anker (Code oder —)</th><th>Status</th></tr></thead>
+<tbody>
+<tr>
+<td>1 · MESS-Modus</td>
+<td>Observer + Messeinrichtungen werden IN die Binary einkompiliert (Mess-Tooling = Haupt-Achse, Ablaufmethodik + Workloads = Unter), gemessen wird sequentiell 1-Thread unter §38.b-Exklusivität (F7 LEDGER:2294 · §47 LEDGER:2496/2231 · §61 LEDGER:3281-3283 · §38.b LEDGER:2375).</td>
+<td>Gesamte Kette A.1–A.8 (Abschnitt 1) · <code>ce/CMakeLists.txt:135</code> (COMDARE_MEASUREMENT_MODE) · CI-Jobs <code>measure:smoke</code>/<code>measure:golden-320</code> + <code>persist:measurements</code></td>
+<td><b>IST/TEIL</b> — Voll-Lauf offen (Trigger-Ziel Do 07.08.)</td>
+</tr>
+<tr>
+<td>2 · AUSWERTUNGS-Modus</td>
+<td>Spline-Funktion auf JEDER Achse als Heuristik-Abschätzung, Switch-Thresholds = Schnittpunkte der f(x)-Splines, rückwärts wird je (klassifizierte Operationen × Workload) die optimale Binary geladen (F8 = ABGABE-PFLICHT, LEDGER:2296/2301 · Dossier-19 Punkt 3 · LEDGER:215 · Hybrid aus realen Messdaten ctest-bewiesen LEDGER:2605/2952).</td>
+<td><code>heuristik/axis_spline.hpp</code> · <code>heuristik/break_even.hpp</code> · <code>heuristik/measurement_curve_loader.hpp</code> · <code>builder/curve_fit/curve_fit.hpp</code> · <code>selection_filter_chain.hpp</code> (CoR der Auswertung) · <code>best_binary_selector.hpp</code> (Task 172, Roh-Mediane)</td>
+<td><b>TEIL</b> — Mathematik IST, Orchestrator + Workload-Cluster + Typsystem-Wurzel (Posten 11, DATEN-gated LEDGER:263) offen</td>
+</tr>
+<tr>
+<td>3 · RELEASE-Nachmessung</td>
+<td>Die beste Binary wird im Release-Modus OHNE Mess-Einrichtungen neu kompiliert und der Beweis per Release-Wallclock-Messung gegen die beste Debug-Overhead-Version und die schlechteste XML-Variante geführt (F7 Modus 3 LEDGER:2294 · §61 LEDGER:3283-3285 · Stufen/Replay LEDGER:3287-3290).</td>
+<td><code>ce/CMakeLists.txt:137-138</code> — COMDARE_RELEASE_MODE erzwingt MEASUREMENT_MODE OFF (FORCE) · Invariante <code>:448-452</code></td>
+<td><b>TEIL</b> — CT-Schalter IST, Beweis-LAUF <b>PLAN</b> (weder CI-Job noch Subkommando · S7/Post, Posten 17/G3)</td>
+</tr>
+<tr>
+<td>4 · ARBEITS-/HYBRID-Modus</td>
+<td>Über multiple Lasten werden multiple beste Binaries bestimmt, die über eine ERKENNUNGSHEURISTIK DER LAST ein Hybrid-Tier-Binary zur aktiven RUNTIME-Auswahl der optimalen Tier-Binaries erzeugen — als eigene Stufe HINTER der CEB am ABI-stabilen Prüf-Dock (Owner-R5 LEDGER:4116 · Dossier 19 Teil G · HY-D2 <code>20260802-hybrid_tier_stufe_soll_design.md</code> · Ruf-Kette LEDGER:4076 · F8-Optionen LEDGER:2296-2298/2692/2696).</td>
+<td><code>IPruefDock::measure</code> (<code>pruef_dock.hpp:78</code>, §75-Schutz) · heuristik-Trio (Router-Speisung HY-B2) · <code>hybrid/README.md</code> (Stub)</td>
+<td><b>PLAN</b> — Design festgeschrieben, Bau in der Auswertungsphase; Last-Erkennung 0 Code-Treffer</td>
+</tr>
+<tr>
+<td>Q · COMPARE (4. Ablauf-Modus, orthogonal)</td>
+<td>Nach Release vergleicht COMPARE je Maschine die Mess-REPLAY-Sicht (§58) der messenden Maschine mit allen per Cache-Log registrierten Maschinen — die optimale Binary gilt nur hardware-spezifisch je Maschine (§62 Punkt 3, MEM/project_62 · Kette LEDGER:2261 Punkt 6).</td>
+<td><code>commands/compare_engine_command.hpp</code> (V32 + welch_t_test, konsumiert von <code>v32_orchestrator.hpp:13</code>) · MODE-COMPARE-Planer-Baustein (LEDGER:100) · <code>apps/f15_compare/</code></td>
+<td><b>TEIL</b> — Command IST, Modus-Vollzug = Nach-Trigger-Paket D2 (<code>run_methodology_registry.hpp:7-14</code>)</td>
+</tr>
+<tr>
+<td>Q · Rückschreibe-FORMAT (P3, Querschnitt)</td>
+<td>Das Format ist ein GoF-STRATEGY-PATTERN mit genau EINER aktiven Strategie je Lauf — CSV XOR xlsx, xlsx = DEFAULT, Doppel-Schreibung = Regression, keine CoR (P3 LEDGER:4106 · Owner-KERN 26.07. MEM/project_lager_baeume_xlsx_doktrin).</td>
+<td>CSV-Writer real (<code>ITER:938-943</code>, CI-Belege) · Namens-Grammatik <code>lager_pfad_grammatik.hpp:525-538</code> · Baum-Writer <code>lager_baum_writer.hpp</code> · xlsx-Serialisierer: —</td>
+<td><b>TEIL/PLAN</b> — xlsx-Writer + XML-Format-Wahl = Paket 46b; Wahl-Ort <span class="ung">UNGEDECKT</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3>4 · UNGEDECKT-Register dieser Sektion (P4-Dauer-Regel — Gegenprüfung offen)</h3>
+<div class="legende">
+<ul>
+<li><span class="ung">UNGEDECKT 1</span> Ort der Format-Strategy-WAHL in der XML: P3 fordert „genau EINE aktive Strategie je Lauf (XML-gesteuert)“ — ein <code>&lt;format&gt;</code>-/Writer-Wahl-Element ist weder in <code>experiment_schema.xsd</code> noch im Parser belegt (0 Treffer); die XOR-Weiche steht als PLAN-Knoten ohne XML-Fundstelle.</li>
+<li><span class="ung">UNGEDECKT 2</span> „Messkurven je Eingangslast VERGLEICHEN → beste Binary“ als EIN benannter Codepfad: heute verteilt auf <code>break_even.hpp</code> (Schnittpunkte) + <code>best_binary_selector.hpp</code> (Roh-Mediane direkt aus CSV, konsumiert die Splines NICHT); die Synthese-Brücke <code>hybrid_router.hpp</code> (SOLL HY-B2) existiert nicht.</li>
+<li><span class="ung">UNGEDECKT 3</span> Release-Wallclock-NACHMESSUNG: der CT-Schalter ist IST, der Beweis-Lauf (best-Release vs beste-Debug-Overhead vs schlechteste XML-Variante) hat weder CI-Job noch Driver-Subkommando — Deckung nur LEDGER:3283-3285.</li>
+<li><span class="ung">UNGEDECKT 4</span> LAST-ERKENNUNGSHEURISTIK: auch im HY-D2-Design-Doc nicht ausgearbeitet (grep Erkennungsheuristik/Last-Erkennung/Workload-Erkennung/stochastisch im Doc = 0); Deckung ausschließlich Dossier-19 Punkt 4 („stochastisch häufige Workload-Last“, Workload-Erkennung = E4-Funktion auf Basis des Heuristik-Schätzers) + Owner-R5 verbatim LEDGER:4116.</li>
+<li><span class="ung">UNGEDECKT 5</span> Werkzeug-Detail des xlsx-Writers (SpreadsheetML-Container, Sheet-Layout): nur Doktrin-Memory (EIN Sheet je Unter-Achsen-Permutation + INFO-Sheet), kein Design-Dokument mit Serialisierer-Spezifikation gefunden.</li>
+</ul>
+</div>
+
+<h3>5 · Hinweis-Regeln: „Wann hat ein UML-Element wahrscheinlich Nachholbedarf?“ <span class="pl">Entwurf · Posten 91</span></h3>
+<div class="legende">
+<p class="z">Regel-Katalog aus dem Atlas-Erfahrungswissen der Runden 1–5 — persistiert als Posten 91 im Ledger-Nachtrag nachmittag-1 (Owner-Vermerk verbatim LEDGER:4116, Posten-Definition LEDGER:4119), <b>ENTWURF, Owner-Abnahme offen</b>. Jede Regel: 1 Zeile + Beispiel aus dem Atlas/Korpus.</p>
+<h3>Nachholbedarf WAHRSCHEINLICH</h3>
+<ul>
+<li><b>R1 · 0-Methoden-Karte ohne concept-/enum-Stereotyp</b> → Verdacht auf leere Hülle/Platzhalter. Beispiel: <code>in_memory_measurement_buffer/</code> = leerer Platzhalter, unmarkierte Kleinst-Lücke (Vertragskette, Glied 5); Gegenprobe: 0-Methoden-Karten MIT concept-Stereotyp sind Kanon (CRTP+Concept), kein Treffer.</li>
+<li><b>R2 · Stub-/README-only-Träger</b> → Nachholbedarf, außer der Stub benennt Status + Bau-Fenster selbst. Beispiel: <code>hybrid/</code> = nur README („DESIGN FESTGESCHRIEBEN, BAU IN DER AUSWERTUNGSPHASE“) — durch Owner-Entscheid E1 gedeckt, damit N5-Fall.</li>
+<li><b>R3 · PLAN-markiertes Element ohne Code-Anker</b> → sicherer Nachholbedarf oder bewusster SOLL-Posten (dann sichtbar als PLAN führen). Beispiele: <code>telemetry</code> als Haupt-System-Achse (<span class="pl">Planungs-Stand</span>, Klammer 2) · Last-Erkennungsheuristik (0 Code-Treffer).</li>
+<li><b>R4 · Dock/Interface/Naht ohne gefundenen Konsument</b> — besonders das No-Op-Default-Naht-Muster (<code>CachePushFn</code>/<code>MeasurementSinkFn</code>/<code>ProgressSinkFn</code>) → Konsument wahrscheinlich noch offen. Beispiel: <code>progress.cursor</code> ohne Planer-Rück-Leser (§52-B14-Restpunkt 1, Vertragskette).</li>
+<li><b>R5 · DEPRECATED ohne benannten Nachfolger/Zweck</b> → Doku-Nachholbedarf oder Löschkandidat (Aufräumpass-Kanon: Kandidaten-Liste fortschreiben). Gegenprobe im Atlas: <code>extension_hardware_system_axis.hpp</code> (DEPRECATED-Insel) besteht die Prüfung, weil der Nachfolger <code>external_utils</code> benannt ist (Rename, Klammer 2).</li>
+<li><b>R6 · Registry-Anteile nicht registriert/nicht typisiert (W2-B-Klasse)</b> → Nachholbedarf sicher (Registry = ANGEBOT-Doktrin). Beispiele: Ablaufmethodik {Debug/Messen/Release} <span class="pl">nicht typisiert · W2-B-TODO</span> · <code>measurement_tooling</code> als eigene Achse nicht registriert (Klammer 1).</li>
+<li><b>R7 · Kommentar-Kopf/Alt-Doku widerspricht jüngerem Kanon-Datum</b> (stale-Lesart-Klasse) → Doku-Nachholbedarf. Prüfmuster P3: Doku, die fürs Rückschreibe-FORMAT CoR/Doppel-Schreibung sagt, widerspräche dem Kanon 05.08. (Strategy XOR, LEDGER:4106) — im Korpus kein Treffer erhoben; die CoR-Fundstelle LEDGER:829 betrifft die AUSWERTUNGS-Filterkette und bleibt gültig.</li>
+<li><b>R8 · Ein-Fundstellen-Makros/-Defines/-Vokabeln ohne Gegenstück</b> → Signal für eine abgerissene oder noch nicht gebaute Strecke. Beispiel: die xlsx-Vokabel in <code>axis_error.hpp:535</code> verweist als Einzel-Fundstelle auf den noch fehlenden A9-Writer.</li>
+</ul>
+<h3>Nachholbedarf NICHT wahrscheinlich (Gegenseite)</h3>
+<ul>
+<li><b>N1 · Minimal-Form-Organe</b>: bewusst kleine Träger sind Kanon, kein Defizit. Beispiel: T17 <code>persistence_target</code> mit 1 Baustein (Klammer 3).</li>
+<li><b>N2 · Bewusste Architektur-Grenzen</b>: dokumentierte Nicht-Features. Beispiel: <code>IPruefDock</code> ist ausdrücklich KEINE ABI-Grenze — die ABI-Grenze ist das gattungs-eigene Antriebs-Sub-Interface (Vertragskette, Prüf-Dock-Kasten).</li>
+<li><b>N3 · §75-schutzgelisteter Vorbau</b>: Speisung künftiger Stufen, NICHT entfernen/umbenennen. Beispiel: <code>axis_spline</code>/<code>break_even</code>/<code>measurement_curve_loader</code> + <code>IPruefDock::measure</code> + AnatomyModuleLoader-Fläche (LEDGER:3602, Router-Speisung HY-B2).</li>
+<li><b>N4 · faithful-Vendor-Code</b>: die faithful-Stufe der vendor→faithful→self-Doktrin ist absichtlich unmodernisiert — kein Nachholbedarf.</li>
+<li><b>N5 · Markierte Deferrals/historische Snapshots</b>: DEPRECATED-never-delete mit benanntem Zweck ist kein stiller Fehler. Beispiel: <code>ExperimentSubtreePayload</code> (S5-P4-Ruling, Referenz-Serialisierung für den Posten-19-Resolver, Band-C; Vertragskette Glied 4).</li>
+<li><b>N6 · Dokumentierte Kommentar-Reserve mit benanntem Vollzugs-Fenster</b>. Beispiel: <code>run_methodology_registry.hpp:7-14</code> („WÄHLBARKEIT, NICHT VOLLZUG … Nach-Trigger-Paket D2“) — dasselbe Muster schreibt HY-D2 §4 für <code>&lt;hybrid_tier&gt;</code> vor (XSD-Kommentar-Reserve jetzt, Typ erst HY-B3).</li>
+</ul>
 </div>
 </section>
 
