@@ -67,9 +67,22 @@ Für den Treiber-Fokus (CI-identische test:unit-Konfiguration) bleibt der expliz
 ```bash
 cmake -S . -B build-test -DCOMDARE_DA_BUILD_TESTS=ON -DCOMDARE_V32_ENABLE=ON
 cmake --build build-test --target messung_driver
+cmake --build build-test --target comdare_experiment_planner   # W1: die PLANER-Binary (ce-Target)
 DRIVER=$(readlink -f build-test/02_messung_driver/comdare-messung-driver)
+PLANNER=$(readlink -f build-test/_cache_engine_external/apps/experiment_planner/comdare-experiment-planner)
 PROFILE=$(readlink -f external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml)
 ```
+
+**ZWEI BINARIES seit W1 (05.08.2026, Owner-KERN):** die **PLANER**-Rolle (Stufe 1: `validate`,
+`plan dump/ci/cmake`, `cache-key`, `fingerprint`) lebt in `comdare-experiment-planner` (ce-Target
+`comdare_experiment_planner`); die **CEB**-Rolle (Stufe 2: `tier ci/cmake`) und der Mess-Vollzug
+(`run`) bleiben im `comdare-messung-driver`. Zwei Module über *dieselbe* Fassaden-Bibliothek —
+keine Vererbung, kein doppelter Code. Der Treiber beantwortet die gewanderten Wörter mit einer
+Verweis-Zeile und `rc 1` (fail-loud, kein stilles Durchfallen in den `run`-Pfad).
+
+*Historie (nie gelöscht):* bis W1 trug `comdare-messung-driver` beide Rollen samt der DEPRECATED
+Alt-Flags `--validate`/`--check`/`--dump-plan`/`--dump-ci`/`--dump-cmake`/`--print-cache-key`/
+`--chunk-organ-fingerprint`. Die neue Planer-Binary erbt diese Aliase bewusst **nicht**.
 
 **Installieren (V-6i):** die Mess-Auswerte-Kette (Treiber + `binary-to-csv` + `csv-to-latex` +
 `diagram-generator`) trägt `install()`-Targets (GNUInstallDirs):
@@ -87,7 +100,7 @@ Default-Optionen (XML gewinnt immer).
 ## 4. Validieren (`validate`, rein lesend)
 
 ```bash
-"$DRIVER" validate "$PROFILE"      # Alt-Flag: --validate
+"$PLANNER" validate "$PROFILE"     # W1: Planer-Binary (bis W1: "$DRIVER" validate / --validate)
 ```
 
 Prüft beide offiziellen Profil-Wurzeln (`<comdare_thesis_profile>` → Achsen-/Werte-Gate;
@@ -100,9 +113,9 @@ Default-Profil (`m3v2_study.profile.xml`). Exit 0 = konsistent; Exit 5 = unbekan
 Der deterministische `ExperimentPlanDirector`-Walk (zwei Läufe sind byte-gleich) in drei Kanälen:
 
 ```bash
-"$DRIVER" plan dump  "$PROFILE" | head             # Textplan (Alt: --dump-plan)
-"$DRIVER" plan cmake "$PROFILE" > /tmp/experiment_plan.cmake   # Bare-Metal-Bauplan (Alt: --dump-cmake)
-"$DRIVER" plan ci    "$PROFILE" > /tmp/planer-child-ci.yml     # GitLab-Child-YAML (Alt: --dump-ci)
+"$PLANNER" plan dump  "$PROFILE" | head            # Textplan (bis W1: "$DRIVER" / --dump-plan)
+"$PLANNER" plan cmake "$PROFILE" > /tmp/experiment_plan.cmake  # Bare-Metal-Bauplan (bis W1: --dump-cmake)
+"$PLANNER" plan ci    "$PROFILE" > /tmp/planer-child-ci.yml    # GitLab-Child-YAML (bis W1: --dump-ci)
 ```
 
 Plan-Kopf heute: `# comdare-experiment-plan v1.1`, `profile axes=18 values=31` (golden-Profil).
@@ -195,13 +208,16 @@ Die CI fährt exakt dieselbe Kette: der Job **`planer:delegate`** (Stage `planer
 die `ceb:emit`-Jobs rufen `tier ci` → Grandchild-Pipeline (Nesting parent→child→grandchild).
 
 ```bash
-"$DRIVER" plan ci "$PROFILE" > planer-child-ci.yml    # Stufe 1 (CEB-Jobs)
-"$DRIVER" tier ci "$PROFILE" > tier-child-ci.yml      # Stufe 2 (Tier-Chunk-/Mess-Jobs)
+"$PLANNER" plan ci "$PROFILE" > planer-child-ci.yml   # Stufe 1 (CEB-Jobs)   -- PLANER-Rolle
+"$DRIVER"  tier ci "$PROFILE" > tier-child-ci.yml     # Stufe 2 (Tier-/Mess-Jobs) -- CEB-Rolle
 ```
 
-Emittierte YAML vor dem Scharfschalten per **GitLab-CI-Lint** prüfen. Die CI-YAML nutzt historisch
-noch die Alt-Flags (`--validate`, `--dump-ci`) — funktional identisch; die Migration auf die
-Subcommand-Form ist Infra-Sache (Handout-Liste liegt beim Manager).
+Emittierte YAML vor dem Scharfschalten per **GitLab-CI-Lint** prüfen. W1 (05.08.2026): die
+super-`.gitlab-ci.yml` ruft die vier Planer-Stellen (`visibility:tier-binaries` `plan dump`, die
+beiden Mess-Pre-Flights `validate`, `planer:delegate` `plan ci`) über
+`comdare-experiment-planner`; die Jobs bauen das ce-Target zusätzlich. Historisch standen dort die
+Alt-Flags am Treiber — funktional identisch, aber seit W1 beantwortet der Treiber sie mit einer
+Verweis-Zeile.
 
 ## 9. Exit-Codes + Troubleshooting
 
@@ -210,9 +226,9 @@ Subcommand-Form ist Infra-Sache (Handout-Liste liegt beim Manager).
 | 0 | Erfolg |
 | 1 | Usage-Fehler bzw. Emission abgebrochen (`fehlerklasse=emission_abgebrochen`, stderr) |
 | 2 | Konfig-Fehler: leerer Planer-Plan (V-2-Startgate) oder kaputte `COMDARE_GOLDEN_N_RANGE` |
-| 5 | `validate`: unbekannte/unlesbare Profil-Wurzel |
+| 5 | `validate`: unbekannte/unlesbare Profil-Wurzel (Planer-Binary) |
 | 6 | Bestandslog-`planer_block`: Pflicht-Variable fehlt (`konfiguration_unvollstaendig`) |
-| 7 | Lane-Wache: `COMDARE_PLATFORM`-Lane passt nicht zum realen CPU-Vendor |
+| 7 | Lane-Wache: `COMDARE_PLATFORM`-Lane passt nicht zum realen CPU-Vendor (nur `run`, Treiber) |
 
 Typische Stolpersteine:
 - **Configure stirbt mit „g++ >= 15.3 erforderlich"** → richtiger Compiler? Floor ist gewollt (§1).

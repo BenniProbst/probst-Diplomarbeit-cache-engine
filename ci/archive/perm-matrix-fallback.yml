@@ -1,4 +1,10 @@
 # ci/archive/perm-matrix-fallback.yml - ARCHIV (deprecated statische Perm-Matrix, Owner RF-4, 2026-07-27)
+# ARCHIV-NACHTRAG W1 (05.08.2026, F1-HART): die unten VERBATIM erhaltenen Aufrufe --validate /
+# --print-cache-key / --chunk-organ-fingerprint gingen an den comdare-messung-driver, der bis W1 BEIDE
+# Rollen trug. Seit dem Rollen-Schnitt leben sie in comdare-experiment-planner (validate | cache-key |
+# fingerprint); der Treiber beantwortet die Alt-Flags mit einer Verweis-Zeile und rc 1. Dieses Archiv ist
+# NICHT in die super-Pipeline eingebunden (s. .gitlab-ci.yml) und bleibt inhaltlich unangetastet --
+# Doku wird deprecatet, nie geloescht. Wer den Fallback je reaktiviert, muss die Aufrufe umstellen.
 # ==========================================================================================================
 # Herkunft: super/.gitlab-ci.yml (probst-diplomarbeit-cache-engine, Projekt 288), vormals Zeilen ~786-1082.
 # Owner-Entscheid (Handout DIPLOM->INFRA 2026-07-26 §2, Diplom-Ledger §70.4/RF-4): "Bitte ins Archiv. Aber
