@@ -337,7 +337,9 @@ analyse:thesis-data:
 # ── Stage analyse: #279 dynamische Tier-Binary-Build-Sichtbarkeit ──
 # UMBAU 2b/D3.4 (27.07., INFRA-Handout-Auftraege 1-3): der Job surfacet die Bau-Sichtbarkeit
 # jetzt aus der EINEN kanonischen Planer-Ausgabe statt aus dem Codegen-Manifest.
-#   - Quelle ist "comdare-messung-driver plan dump" (rein lesend: KEIN DLL-Bau, KEINE Messung).
+#   - Quelle ist "comdare-experiment-planner plan dump" (rein lesend: KEIN DLL-Bau, KEINE Messung).
+#     W1 (05.08.2026): bis zum Rollen-Schnitt war das der Treiber; die Planer-Rolle hat seither eine
+#     eigene Binary. Der Treiber wird hier weiterhin gebaut (Bau-Sichtbarkeit der CEB-Stufe).
 #   - EIN-FORMAT-REGEL (§73.1): der Job liest NUR den ROHEN plan-dump-Text - denselben, den 2c
 #     auch fuer tier_binary_report_cli vorsieht. Kein Zwischenformat, keine eigene Datei;
 #     "Caching" ausschliesslich als Job-Artefakt der rohen Ausgabe.
@@ -359,14 +361,20 @@ visibility:tier-binaries:
     - 'echo "== Toolchain =="; cmake --version'
     - cd Code
     - cmake -B build-visibility -G Ninja -DCOMDARE_DA_BUILD_TESTS=OFF
+    # W1 (05.08.2026, F1-HART): 'plan dump' ist die PLANER-Rolle und lebt in der eigenen ce-Binary
+    # comdare-experiment-planner. Der Treiber-Bau bleibt daneben stehen -- dieser Job beweist die
+    # Bau-Sichtbarkeit BEIDER Stufen-Traeger (CEB + Planer).
     - cmake --build build-visibility --target comdare-messung-driver
+    - cmake --build build-visibility --target comdare_experiment_planner
     - |
       set -euo pipefail
       DRIVER=$(find build-visibility -type f -name "comdare-messung-driver" 2>/dev/null | head -1)
       test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      PLANNER=$(find build-visibility -type f -name "comdare-experiment-planner" 2>/dev/null | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
       # Profil OHNE Argument: Fallback-Kette COMDARE_THESIS_PROFILE -> einkompiliertes Default
       # (Profil-Pinning waere haerter gegen CI-Env-Drift -> OP-5, bewusst noch nicht gesetzt).
-      "$DRIVER" plan dump > build-visibility/dump_plan.txt
+      "$PLANNER" plan dump > build-visibility/dump_plan.txt
       # 1. Kopf-Wache: Formatanker der v1.1-Emission (schlaegt bei Formatbruch sofort an).
       grep -q '^# comdare-experiment-plan v1.1' build-visibility/dump_plan.txt || {
         echo "FORMAT-BRUCH: Kopfzeile '# comdare-experiment-plan v1.1' fehlt"; head -5 build-visibility/dump_plan.txt; exit 1; }
@@ -667,15 +675,20 @@ measure:smoke:
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
+    # W1 (05.08.2026): 'validate' ist die PLANER-Rolle -> eigenes ce-Target (der Treiber-Bau bleibt daneben,
+    # er faehrt gleich den Mess-Lauf). Beide Binaries kommen aus DEMSELBEN Configure/ce-Stand.
+    - cmake --build build --target comdare_experiment_planner
     - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
     - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
     - |
       set -euo pipefail
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
       test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      PLANNER=$(find build -type f -name "comdare-experiment-planner" | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
       echo "== Pre-Flight (Subkommando 'validate', rein lesende Pruefung des SMOKE-Profils gegen die EnabledStrategies) =="
       echo "   COMDARE_THESIS_PROFILE=$COMDARE_THESIS_PROFILE"
-      "$DRIVER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
+      "$PLANNER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
       mkdir -p measure_out_smoke
       echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
       "$DRIVER" experiment_config measure_out_smoke
@@ -753,14 +766,18 @@ measure:golden-320:
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCOMDARE_ENABLE_PMC=ON -DCMAKE_BUILD_TYPE=Release
     # Build-Parallelitaet via globalem CMAKE_BUILD_PARALLEL_LEVEL (Runner-Core-Budget), NICHT -j nproc (User 2026-06-25).
     - cmake --build build --target comdare-messung-driver
+    # W1 (05.08.2026): 'validate' ist die PLANER-Rolle -> eigenes ce-Target (Spiegel des Smoke-Jobs oben).
+    - cmake --build build --target comdare_experiment_planner
     - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
     - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
     - |
       set -euo pipefail
       DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
       test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      PLANNER=$(find build -type f -name "comdare-experiment-planner" | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
       echo "== Pre-Flight (Subkommando 'validate', rein lesende Profil-Pruefung gegen die realen config/output-Argumente) =="
-      "$DRIVER" validate || { echo "Profil-Validierung fehlgeschlagen -> Abbruch vor mehrtaegigem Lauf"; exit 1; }
+      "$PLANNER" validate || { echo "Profil-Validierung fehlgeschlagen -> Abbruch vor mehrtaegigem Lauf"; exit 1; }
       mkdir -p measure_out
       echo "== golden-320 Voll-Messlauf (mehrtaegig, Measurement-ON, PMC auf prod1) =="
       "$DRIVER" experiment_config measure_out
@@ -938,8 +955,10 @@ persist:measurements:
 
 # ── planer:delegate (W10-B, Ledger §42): die DELEGATION der Anwender-XML an die CE — der NEUE Standard-Pfad
 #    (loest die statische Matrix als STEUERUNG ab, §42: „Eigentlich erhaelt die Cache Engine die XML und
-#    uebernimmt die gesamte Arbeit"). Der super-CI-Job baut NUR den Treiber, reicht das golden-Profil an die CE
-#    (Subkommando "plan ci") und legt die CE-emittierte STUFE-1-YAML als Artefakt ab. ALLE Steuerung/Emission liegt in der CE:
+#    uebernimmt die gesamte Arbeit"). Der super-CI-Job baut NUR die PLANER-Binary (W1, 05.08.2026: die
+#    Planer-Rolle ist eine eigene ce-Binary comdare-experiment-planner; bis dahin trug der Treiber beide
+#    Rollen), reicht das golden-Profil an die CE (Subkommando "plan ci") und legt die CE-emittierte
+#    STUFE-1-YAML als Artefakt ab. ALLE Steuerung/Emission liegt in der CE:
 #    STUFE 1 (diese YAML) = je Mess-Kombination [a,b,c] die CEB-Jobs (ceb:build/emit/trigger); die ceb:emit-Jobs
 #    rufen das Subkommando "tier ci" -> die CEB emittiert STUFE 2 (System-Perms + Tier-Chunk-Jobs + gegatete
 #    Mess-Jobs) als Grandchild (parent->child->grandchild = GitLab-Nesting-Tiefe 2).
@@ -982,14 +1001,17 @@ planer:delegate:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
     - cd Code
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
-    - cmake --build build --target comdare-messung-driver
+    # W1 (05.08.2026, F1-HART): die DELEGATION ist die PLANER-Rolle -- sie laeuft ab hier ueber die eigene
+    # ce-Binary comdare-experiment-planner. Der Job baut NUR noch dieses Target: der Treiber (CEB) wird in
+    # diesem Job gar nicht gebraucht, er wird von den EMITTIERTEN ceb:build-Jobs selbst gebaut (Section 40.b).
+    - cmake --build build --target comdare_experiment_planner
     - |
       set -euo pipefail
-      DRIVER=$(find build -type f -name "comdare-messung-driver" | head -1)
-      test -n "$DRIVER" -a -x "$DRIVER" || { echo "comdare-messung-driver fehlt: $DRIVER"; exit 1; }
+      PLANNER=$(find build -type f -name "comdare-experiment-planner" | head -1)
+      test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
       test -f "$COMDARE_GOLDEN_N_PROFILE" || { echo "golden-Profil fehlt: $COMDARE_GOLDEN_N_PROFILE"; exit 1; }
       echo "== W10-B: super delegiert die Anwender-XML an die CE (Subkommando 'plan ci' = STUFE 1, rein lesend, KEIN Bau/Messung) =="
-      "$DRIVER" plan ci "$COMDARE_GOLDEN_N_PROFILE" > "$CI_PROJECT_DIR/planer-child-ci.yml"
+      "$PLANNER" plan ci "$COMDARE_GOLDEN_N_PROFILE" > "$CI_PROJECT_DIR/planer-child-ci.yml"
       echo "== CE-emittierte STUFE-1-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
       echo "== STUFE-1 CEB-Bau-Jobs (je Mess-Kombination): $(grep -c '# JOB ceb-build combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
       echo "== STUFE-1 CEB-Trigger-Jobs (Grandchild -> STUFE 2): $(grep -c '# JOB ceb-trigger combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="

@@ -17,7 +17,12 @@ target_link_libraries(messung_driver PRIVATE
 set_target_properties(messung_driver PROPERTIES
     OUTPUT_NAME "comdare-messung-driver"
 )
-# V-6i (Bauplan TEIL V, W1): install()-Target des Treibers (Planer- + CEB-Rolle in EINEM Binary) --
+# V-6i (Bauplan TEIL V, W1): install()-Target des Treibers -- seit dem W1-Rollen-Schnitt (05.08.2026,
+# F1-HART) traegt dieses Binary NUR NOCH die CEB-Rolle (tier ci|cmake + run). Die PLANER-Rolle (Stufe 1:
+# validate | plan dump/ci/cmake | cache-key | fingerprint) hat eine eigene Binary in der ce-Welt:
+# comdare_experiment_planner (ce apps/experiment_planner). Hier entsteht BEWUSST kein zweites
+# super-Target (Section 42: die Cache Engine erhaelt die XML) -- der Sub-Build baut das ce-Target
+# per `cmake --build <build> --target comdare_experiment_planner`. --
 # Kopf der installierbaren Mess-Auswerte-Kette (02 -> 03 -> 04 -> 05); Layout: GNUInstallDirs (Top-Level).
 install(TARGETS messung_driver RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 

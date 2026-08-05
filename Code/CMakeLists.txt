@@ -387,6 +387,13 @@ endif()
 # derselbe Text, den der CI-Job visibility:tier-binaries liest (EIN-FORMAT-REGEL, Ledger 73.1).
 # Das Target erzeugt die Rohausgabe zuerst selbst (Schritt 1) und wertet sie dann aus (Schritt 2);
 # es ist dadurch schwerer als vorher (Treiber-Bau statt Einzel-Tool) und bleibt manuell.
+# W1/S3 (2026-08-05, F1-HART): 'plan dump' ist die PLANER-Rolle und lebt seit dem Rollen-Schnitt
+# in der eigenen ce-Binary comdare-experiment-planner (ce-Target comdare_experiment_planner,
+# apps/experiment_planner). Der ce-Sub-Build ist EXCLUDE_FROM_ALL -> die Bau-Sicherung laeuft
+# ueber die Target-DEPENDS unten (Gegenstueck zum expliziten
+# `cmake --build ... --target comdare_experiment_planner` der S2-CI-Jobs). Der Treiber bleibt
+# in DEPENDS stehen: das Target beweist die Bau-Sichtbarkeit BEIDER Stufen-Traeger
+# (CEB + Planer), identisch zum CI-Job visibility:tier-binaries.
 # Profil OHNE Argument: Fallback-Kette COMDARE_THESIS_PROFILE -> einkompiliertes Default
 # (identisch zum CI-Job; explizites Pinning waere OP-5).
 # ─────────────────────────────────────────────────────────────────────────────
@@ -401,11 +408,11 @@ if(TARGET cache_engine_builder)
 endif()
 add_custom_target(comdare_tier_binary_visibility
     COMMAND ${CMAKE_COMMAND}
-        -DDUMP_PLAN_DRIVER=$<TARGET_FILE:messung_driver>
+        -DDUMP_PLAN_PLANNER=$<TARGET_FILE:comdare_experiment_planner>
         -DDUMP_PLAN_OUT=${_comdare_plan_dump}
         -P ${CMAKE_SOURCE_DIR}/cmake/comdare_dump_plan.cmake
     COMMAND ${_comdare_visibility_cmd}
-    DEPENDS tier_binary_report_cli messung_driver
+    DEPENDS tier_binary_report_cli messung_driver comdare_experiment_planner
     COMMENT "#279 Build-Sichtbarkeit: geplante/gebaute/offene Tier-Binaries + CacheEngineBuilder-Status"
     VERBATIM)
 
