@@ -6,6 +6,14 @@
 
 ---
 
+## Korrektur-Vermerk (05.08.2026, Owner-Review — REV 2)
+
+Der Owner-Review der Erstausgabe ergab drei berechtigte Befunde; die HTML-Fassung wurde in Revision 2 (gleiche Datei, git-Historie traegt die Erstausgabe) korrigiert:
+
+1. **Gattung/Genus-Hierarchie war unterschlagen:** Die Erstausgabe praesentierte die CRTP-Basis `SearchAlgoBase` prominent, ohne die Ebene-1-Gattung. Korrekt (E-24 C7-1, `anatomy_base.hpp:49-58,86-97`): **Map** ist die abstrakte Gattung (K→V-Interface) mit den geforderten Interfaces; **SearchAlgorithm ist das Genus IN Map** und ERBT den Gattungs-Kern; Set/Sequence/Adapter/View sind Genera der Gattung Container (mit ITier-/ITierV2-ABI-Interfaces); Graph ist Stub. Das Hierarchie-Diagramm traegt jetzt diese Wurzel.
+2. **SearchAlgoCores korrekt verortet:** Die `*SearchAlgoCore`-Klassen sind die **Organ-Implementierungen der Achse `search_algo`** — der ersten der **18** Organ-Haupt-Achsen (`kOrganAxisCount = 18`, `abi/anatomy_version_stamp.hpp:39`; die Erstausgabe sagte faelschlich 19 — `telemetry`/`isa` sind System-Achsen, keine Organ-Haupt-Achsen). `SearchAlgoBase` ist die CRTP-Basis der Organe **dieser einen Achse**, nicht die Systemwurzel.
+3. **Layer-Gliederung Planer/CEB/Tier-Binary ergaenzt:** Navigation und Sektions-Reihenfolge folgen jetzt dem Schichten-Modell **L0 Planer** (`profile_facade/planner`, `experiment_tree`) → **L1 CEB** (`builder/`: Prüf-Docks je Genus, bestandslog, commands, transport; Hinweis: `CacheEngineBuilder` existiert nicht als benannte C++-Klasse, CEB ist die builder/-Schicht samt App) → **L2 Tier-Binary-ABI-Grenze** (`include/cache_engine/abi/`, `SearchAlgorithmAbiAdapter`, DLL-Naht) → **L3 Anatomie** (Gattung/Genus/Komposition) → **L4 Achsen-Organe** (18 Achsen je Organ-Kategorie = die 5 kOrganGruppen, Doppelwurzel axes/ + topics/ je Achse ausgewiesen) → **L5 Kern/Basis**. Neue 18-Achsen-Tabelle mit Organ-Kategorie, Wurzeln und Sektions-Links.
+
 ## Umfang
 
 - **1918 Typ-Definitionen** (class/struct/enum/concept, inkl. nested Typen und Template-Spezialisierungen) aus **1211 Headern** unter `libs/cache_engine` — Tests ausgenommen.
