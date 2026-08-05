@@ -47,6 +47,13 @@
 
 #include <comdare/workload_generator/workload_generator.hpp>
 
+// W1 (05.08.2026): die geteilten Env-/Range-Primitiven der Mess-Kette -- EINE Quelle fuer den Treiber und die
+// neue comdare-experiment-planner-Binary (Hoist aus diesem File, s. die using-Deklarationen unten). Der
+// Include-Pfad kommt ueber die PUBLIC-Wurzel von comdare::profile_run_facade; die CMakeLists brechen mit
+// FATAL_ERROR, wenn das Fassaden-Target fehlt -- der Include ist deshalb bewusst UNGEGATET (er traegt die
+// Helfer des run-Pfads, der nicht unter COMDARE_MESSUNG_HAVE_E4_FACADE steht).
+#include <profile_facade/planner/planner_cli_env.hpp>
+
 #ifdef COMDARE_MESSUNG_HAVE_E4_FACADE
 #include <profile_facade/profile_run_facade.hpp>
 #include <builder/artifact_transport/artifact_cache.hpp> // Storage #51: ArtifactCache::from_env (No-Op-Default)
@@ -230,16 +237,17 @@ struct MessreihenSpec {
     return result;
 }
 
-[[nodiscard]] std::string trim_copy(std::string_view s) {
-    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.front())) != 0) s.remove_prefix(1);
-    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.back())) != 0) s.remove_suffix(1);
-    return std::string{s};
-}
-
-[[nodiscard]] std::string env_trimmed(char const* name) {
-    if (char const* e = std::getenv(name); e != nullptr) return trim_copy(e);
-    return {};
-}
+// W1 (05.08.2026, Planer-Binary-Split): trim_copy/env_trimmed/parse_size_env_strict/GoldenRange/
+// parse_golden_range_env standen hier bis W1 TREIBER-LOKAL. Sie werden von BEIDEN Hosts gebraucht -- vom
+// Treiber (run-Pfad) und von der neuen comdare-experiment-planner-Binary -- und sind deshalb in die ce-Planer-
+// Welt gehoben (profile_facade/planner/planner_cli_env.hpp): EINE Quelle statt zweier Kopien, die auseinander
+// laufen koennen. Die using-Deklarationen halten ALLE bestehenden Aufrufstellen wortidentisch; Semantik und
+// Meldungstexte sind byte-identisch uebernommen.
+using ::comdare::cache_engine::planner::env_trimmed;
+using ::comdare::cache_engine::planner::GoldenRange;
+using ::comdare::cache_engine::planner::parse_golden_range_env;
+using ::comdare::cache_engine::planner::parse_size_env_strict;
+using ::comdare::cache_engine::planner::trim_copy;
 
 [[nodiscard]] std::string compile_time_platform_tag() {
 #if defined(__linux__) && (defined(__x86_64__) || defined(_M_X64))
@@ -276,135 +284,39 @@ struct MessreihenSpec {
     return v;
 }
 
-[[nodiscard]] std::optional<std::size_t> parse_size_env_strict(char const* name) {
-    std::string const s = env_trimmed(name);
-    if (s.empty()) return std::nullopt;
-
-    std::uint64_t value  = 0;
-    auto const [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), value, 10);
-    if (ec != std::errc{} || ptr != s.data() + s.size() ||
-        value > static_cast<std::uint64_t>((std::numeric_limits<std::size_t>::max)())) {
-        throw std::runtime_error(std::string{name} + " ungueltig: '" + s + "'");
-    }
-    return static_cast<std::size_t>(value);
-}
+// W1: parse_size_env_strict ist mit nach planner_cli_env.hpp gewandert (s. die using-Deklaration oben) --
+// derselbe Rumpf, derselbe Meldungstext, jetzt EINE Quelle fuer Treiber und Planer-Binary.
 
 // ---------------------------------------------------------------------------------------------------------------
-// G4b-2 (d2) / #46b I1b: das GATE des planer_block fuer die beiden CEB-Compile-Strecken (--dump-ci/--dump-cmake).
+// W1 (05.08.2026, F1-HART, Owner-KERN "Der Planer ist ZWINGEND eine eigene Binary"): HIER stand bis W1 das GATE
+// des planer_block (PlanerBlockGate + make_planer_block_gate) sowie die beiden guarded Emissionszweige
+// run_dump_ci_guarded / run_dump_cmake_guarded. Sie gehoerten zur PLANER-Rolle (Stufe 1) und sind mit ihr in die
+// eigene Binary gewandert: ce apps/experiment_planner/main.cpp. Gate-Formel, Budget (with_object_budget(1,10))
+// und die id-Semantik (owner_uuid + "/planer", E2) sind dort VERBATIM uebernommen -- der Merge-Schluessel
+// aendert sich durch den Umzug NICHT, weil die id den owner_uuid traegt und nicht argv[0].
 //
-// Der planer_block meldet dem Lager, dass DIESER Planer gleich eine CEB-Compile-Strecke anstoesst, damit ein
-// zweiter Planer auf einer anderen Maschine dieselbe Strecke nicht doppelt reserviert. Ausgefuehrt wird der
-// Lebenszyklus in der Fassaden-TU (profile_run_facade.cpp) -- hier entsteht nur der Kontext, denn der gelockte
-// Schreibweg zieht ueber bestandslog_document.hpp den ce-XML-DOM, und libs/common liegt nicht im Include-Satz
-// dieses Targets. Derselbe Schnitt wie bei bestand_cache in (d1).
+// Dieser Treiber ist ab W1 die CEB-ROLLE (Section 40.b): tier ci|cmake (Stufe-2-Emission) + run (Mess-Vollzug).
+// Die Tier-Emission traegt AUSDRUECKLICH KEINEN planer_block -- die Tier-Ebene hat ihre eigene Reservierung im
+// Iterator (das war schon vor W1 so und bleibt unveraendert).
+
+// G4b-2/2.4-(3): der Ausnahme-Mantel fuer die Emissionszweige. Sie lagen bisher in keinem try -- eine Ausnahme
+// aus main haette std::terminate OHNE Unwinding ausgeloest. Rueckgabe 1, NICHT 6: exit 6 blieb exklusiv fuer
+// fehlerklasse=konfiguration_unvollstaendig (die Klasse lebt seit W1 in der Planer-Binary, wo sie hingehoert).
 //
-// GATE-FORMEL identisch zu (d1): COMDARE_BESTANDSLOG=="true" UND minio_enabled() UND die drei Pflicht-Variablen.
-// minio_enabled() und NICHT !inert(), weil die vier Objekt-Verben ausnahmslos auf Ebene B gaten
-// (artifact_cache.hpp:487/507/535) -- eine Nur-measure-drop-Konfiguration wuerde sonst einen toten Transport binden.
-// Gate an + Pflicht-Var leer => harter Abbruch (der Aufrufer liefert exit 6). Gate an + kein minio => EINE
-// WARNUNG, kein Binden. Gate aus => vollstaendig stumm (Byte-Neutralitaet des Vor-Zustands).
+// A-B1 (cppcheck 2.21 throwInEntryPoint, CI Job 333638): die Zweige leben als BENANNTE freie Handler AUSSERHALB
+// von main -- cppcheck wertet Lambda-Koerper LEXIKALISCH im Kontext der umgebenden Funktion (auch in main; der
+// fruehere In-main-Lambda-Umbau 8064f3ff blieb deshalb wirkungslos) und versteht ein try, das erst im
+// Aufgerufenen um den Thunk liegt, NICHT (das fruehere guarded_emission-Template fiel genau daran). Deshalb
+// steht der try/catch-Mantel ausgeschrieben IN jedem Handler; nur die Fehler-Meldung ist zentral
+// (emission_abgebrochen). noexcept ist damit wahr UND lexikalisch belegbar.
 //
-// BUDGET (2.4-(5)): der Emissions-Cache ist knapp budgetiert -- with_object_budget(1, 10), also EIN Versuch mit
-// 10 s Deckel statt der 12 Versuche des Defaults. Ein unerreichbarer Store darf eine CI-Emission nicht minutenlang
-// aufhalten; die Buchhaltung ist nachrangig gegenueber der Emission.
-//
-// id (E2): owner_uuid + "/planer" -- EINE Sperre je Lauf, nicht je Sequenz. Die Eindeutigkeit tragt der
-// lauf-eindeutige owner, nicht ein Zaehler; ein neuer Lauf hat einen neuen owner und damit eine neue id, weshalb
-// die Merge-Monotonie kein Re-Open braucht. owner_uuid bleibt ein EIGENES Feld neben der id.
-struct PlanerBlockGate {
-    comdare::cache_engine::builder::profile_facade::PlanerBlockContext ctx;             // leer = inert
-    bool                                                               abbruch = false; // true => exit 6
-};
-
-[[nodiscard]] PlanerBlockGate make_planer_block_gate() {
-    namespace atp = comdare::cache_engine::builder::artifact_transport;
-    namespace pf  = comdare::cache_engine::builder::profile_facade;
-
-    PlanerBlockGate g;
-    if (env_trimmed("COMDARE_BESTANDSLOG") != "true") return g; // stumm inert
-
-    // Der Emissions-Cache ist eine EIGENE, benannte Instanz (Praezedenz main.cpp:784) -- die E4-Block-Instanz
-    // entsteht erst viel spaeter, und die Emissionszweige returnen lange davor.
-    auto const emit_ac = std::make_shared<atp::ArtifactCache const>(atp::ArtifactCache::from_env().with_object_budget(
-        /*tries=*/1, /*timeout_s=*/10));
-    if (!emit_ac->minio_enabled()) {
-        std::cerr << "[bestandslog] WARNUNG fehlerklasse=lager_ebene_fehlt: COMDARE_BESTANDSLOG=true, aber Ebene B "
-                  << "(minio) ist nicht konfiguriert (measure-drop=" << (emit_ac->drop_enabled() ? "1" : "0")
-                  << ") -- planer_block bleibt AUS, Emission unveraendert.\n";
-        return g;
-    }
-
-    std::string const doc_key      = env_trimmed("COMDARE_BESTANDSLOG_DOC_KEY");
-    std::string const owner_uuid   = env_trimmed("COMDARE_BESTANDSLOG_OWNER_UUID");
-    std::string const maschine     = env_trimmed("COMDARE_BESTANDSLOG_MASCHINE");
-    char const*       fehlende_var = nullptr;
-    if (doc_key.empty())
-        fehlende_var = "COMDARE_BESTANDSLOG_DOC_KEY";
-    else if (owner_uuid.empty())
-        fehlende_var = "COMDARE_BESTANDSLOG_OWNER_UUID";
-    else if (maschine.empty())
-        fehlende_var = "COMDARE_BESTANDSLOG_MASCHINE";
-    if (fehlende_var != nullptr) {
-        std::cerr << "[bestandslog] FEHLER fehlerklasse=konfiguration_unvollstaendig: "
-                  << "COMDARE_BESTANDSLOG=true, aber " << fehlende_var << " ist leer -- Abbruch.\n";
-        g.abbruch = true;
-        return g;
-    }
-
-    g.ctx.cache      = emit_ac;
-    g.ctx.doc_key    = doc_key;
-    g.ctx.id         = owner_uuid + "/planer"; // E2: EINE Sperre je Lauf
-    g.ctx.owner_uuid = owner_uuid;
-    g.ctx.maschine   = maschine;
-    // Thread-Budget nur, wenn es ueberhaupt erklaert ist (0 = nicht gemeldet, keine erfundene Zahl).
-    if (auto const bp = parse_size_env_strict("COMDARE_BUILD_PARALLEL")) g.ctx.threads = static_cast<unsigned>(*bp);
-    std::cerr << "[bestandslog] planer_block aktiv: doc_key=" << g.ctx.doc_key << " id=" << g.ctx.id
-              << " maschine=" << g.ctx.maschine << "\n";
-    return g;
-}
-
-// G4b-2/2.4-(3): der Ausnahme-Mantel fuer ALLE VIER Emissionszweige. Sie lagen bisher in keinem try (die einzigen
-// im File sind der --validate- und der E4-Block) -- eine Ausnahme aus main haette std::terminate OHNE Unwinding
-// ausgeloest, der PromiseGuard des planer_block waere nie gefeuert und die Reservierung 30 Minuten haengen
-// geblieben. Rueckgabe 1, NICHT 6: exit 6 bleibt exklusiv fuer fehlerklasse=konfiguration_unvollstaendig.
-//
-// A-B1 (cppcheck 2.21 throwInEntryPoint, CI Job 333638): die vier Zweige leben als BENANNTE freie Handler
-// AUSSERHALB von main -- cppcheck wertet Lambda-Koerper LEXIKALISCH im Kontext der umgebenden Funktion (auch
-// in main; der fruehere In-main-Lambda-Umbau 8064f3ff blieb deshalb wirkungslos) und versteht ein try, das erst
-// im Aufgerufenen um den Thunk liegt, NICHT (das fruehere guarded_emission-Template fiel genau daran). Deshalb
-// steht der try/catch-Mantel ausgeschrieben IN jedem Handler (etabliertes Muster --chunk-organ-fingerprint);
-// nur die Fehler-Meldung ist zentral (emission_abgebrochen). noexcept ist damit wahr UND lexikalisch belegbar.
-// main ruft die Handler direkt, ohne Lambda, und ist lexikalisch frei von werfendem Code. Zugleich sind das
-// die kanonischen Handler der V-6-Subcommand-Linie (Bauplan TEIL V, V-6vi).
+// W1: von den frueheren VIER Zweigen sind die beiden PLANER-Zweige (--dump-ci/--dump-cmake, heute
+// `plan ci|cmake`) in die comdare-experiment-planner-Binary gewandert. Hier bleiben die ZWEI CEB-Zweige
+// (tier ci|cmake). emission_abgebrochen bleibt in BEIDEN Binaries -- 4 Zeilen Fehler-Renderer, bewusst
+// deklarierter Kopie-Split statt eines geteilten Headers fuer eine einzige Meldungszeile.
 [[nodiscard]] int emission_abgebrochen(char const* was, char const* detail) noexcept {
     std::cerr << "[bestandslog] FEHLER fehlerklasse=emission_abgebrochen: " << was << " -- " << detail << "\n";
     return 1;
-}
-
-[[nodiscard]] int run_dump_ci_guarded(std::string const& prof) noexcept {
-    namespace pf = comdare::cache_engine::builder::profile_facade;
-    // G4b-2/E1: eine der beiden CEB-Compile-Strecken -> planer_block haengt hier. Gate-Erzeugung IM Mantel:
-    // make_planer_block_gate() macht Bestandslog-IO und kann werfen -- nur im Mantel ist das Unwinding
-    // (PromiseGuard) garantiert; exit 6 bleibt dem Gate-Abbruch vorbehalten.
-    try {
-        auto const gate = make_planer_block_gate();
-        if (gate.abbruch) return 6;
-        return pf::dump_experiment_ci_facade(prof, std::cout, gate.ctx);
-    } catch (std::exception const& e) { return emission_abgebrochen("--dump-ci", e.what()); } catch (...) {
-        return emission_abgebrochen("--dump-ci", "unbekannte Ausnahme");
-    }
-}
-
-[[nodiscard]] int run_dump_cmake_guarded(std::string const& prof) noexcept {
-    namespace pf = comdare::cache_engine::builder::profile_facade;
-    // G4b-2/E1: die zweite CEB-Compile-Strecke -- derselbe planer_block wie bei --dump-ci.
-    try {
-        auto const gate = make_planer_block_gate();
-        if (gate.abbruch) return 6;
-        return pf::dump_experiment_cmake_facade(prof, std::cout, gate.ctx);
-    } catch (std::exception const& e) { return emission_abgebrochen("--dump-cmake", e.what()); } catch (...) {
-        return emission_abgebrochen("--dump-cmake", "unbekannte Ausnahme");
-    }
 }
 
 [[nodiscard]] int run_emit_tier_ci_guarded(std::string const& prof, std::string const& combo_sel) noexcept {
@@ -430,83 +342,40 @@ struct PlanerBlockGate {
 }
 // ---------------------------------------------------------------------------------------------------------------
 
-// INC-G6 (Ledger 33/34, 2026-07-19): das golden-N Chunk-Fenster. COMDARE_GOLDEN_N_RANGE="start:count" ->
-// {start, count}. Leer/ungesetzt = nullopt (kein Fenster, Ist-Verhalten). Fail-loud bei Fehlform (ein Tippfehler
-// wuerde sonst still den ganzen 2^17-Bau statt eines Chunks starten) -- der Abbruch landet im try/catch des
-// E4-Blocks. count==0 ist syntaktisch gueltig (deaktiviert das Fenster). Muster wie parse_size_env_strict.
-struct GoldenRange {
-    std::size_t start = 0;
-    std::size_t count = 0;
-};
-[[nodiscard]] std::optional<GoldenRange> parse_golden_range_env() {
-    std::string const s = env_trimmed("COMDARE_GOLDEN_N_RANGE");
-    if (s.empty()) return std::nullopt;
-    std::size_t const colon = s.find(':');
-    if (colon == std::string::npos)
-        throw std::runtime_error("COMDARE_GOLDEN_N_RANGE erwartet 'start:count': '" + s + "'");
-    auto const parse_u = [&s](std::string_view part) -> std::size_t {
-        std::uint64_t v      = 0;
-        auto const [ptr, ec] = std::from_chars(part.data(), part.data() + part.size(), v, 10);
-        if (part.empty() || ec != std::errc{} || ptr != part.data() + part.size() ||
-            v > static_cast<std::uint64_t>((std::numeric_limits<std::size_t>::max)()))
-            throw std::runtime_error("COMDARE_GOLDEN_N_RANGE ungueltig: '" + s + "'");
-        return static_cast<std::size_t>(v);
-    };
-    std::string_view const sv{s};
-    return GoldenRange{parse_u(sv.substr(0, colon)), parse_u(sv.substr(colon + 1))};
-}
+// INC-G6 (Ledger 33/34, 2026-07-19): das golden-N Chunk-Fenster (COMDARE_GOLDEN_N_RANGE="start:count") ist mit
+// W1 nach ce profile_facade/planner/planner_cli_env.hpp gewandert -- BEIDE Hosts brauchen es (der run-Pfad hier
+// unten, das fingerprint-Subkommando in der Planer-Binary). Semantik unveraendert: leer/ungesetzt = kein
+// Fenster; Fehlform = Wurf (ein Tippfehler wuerde sonst still den ganzen 2^17-Bau statt eines Chunks starten).
+// Die using-Deklarationen oben halten die Aufrufstellen wortidentisch.
 
 // ---------------------------------------------------------------------------------------------------------------
 // V-6vi (Bauplan TEIL V Paket V-6, Ledger 73.6 Q7, clig.dev): Subcommand-Schnittstelle des Treibers.
-// W3 (rollen-orientiert): validate | plan dump/ci/cmake (Planer-Rolle, Stufe 1) | tier ci/cmake (CEB-Rolle,
-// Stufe 2) | cache-key | fingerprint | run | version | help -- die 40.b-Rollentrennung (Planer steuert CEB-Jobs,
-// CEB steuert Tier-Jobs) wird damit auf UX-Ebene sichtbar. W4: der Dispatcher kanonisiert die Subcommand-Form
-// VOR der etablierten Flag-Schleife auf die Alt-Flag-Routen -- EIN Code-Pfad, stdout byte-identisch zur
-// Alt-Form. Die Alt-Flags bleiben funktionale DEPRECATED-Aliase (eine stderr-Hinweis-Zeile je Lauf; sie fallen
-// erst im Abschluss-Aufraeumpass, Ledger 75). --version und --help bleiben kanonische clig.dev-Flags (KEINE
-// Aliase). W6: auch cache-key/fingerprint/run sind Subcommands; ein <config_dir>, das woertlich wie ein
-// Subcommand heisst, nimmt den run-Weg (in der Hilfe dokumentiert).
+// W1 (05.08.2026, F1-HART): der Treiber ist ab hier die CEB-ROLLE -- tier ci/cmake (Stufe 2) | run | version |
+// help. Die PLANER-Rolle (validate | plan dump/ci/cmake | cache-key | fingerprint) hat eine EIGENE Binary
+// bekommen: comdare-experiment-planner (ce apps/experiment_planner). Die 40.b-Rollentrennung (der Planer
+// steuert die CEB-Jobs, die CEB steuert die Tier-Jobs) ist damit nicht mehr nur UX, sondern zwei Module.
+// W4: der Dispatcher kanonisiert die Subcommand-Form VOR der etablierten Flag-Schleife auf die Alt-Flag-Routen
+// -- EIN Code-Pfad, stdout byte-identisch zur Alt-Form. Die verbliebenen Alt-Flags bleiben funktionale
+// DEPRECATED-Aliase (eine stderr-Hinweis-Zeile je Lauf; sie fallen im Abschluss-Aufraeumpass, Ledger 75).
+// --version und --help bleiben kanonische clig.dev-Flags (KEINE Aliase). W6: auch run ist ein Subcommand; ein
+// <config_dir>, das woertlich wie ein Subcommand heisst, nimmt den run-Weg (in der Hilfe dokumentiert).
 
 // Alt-Flag -> neue Subcommand-Form (fuer den Deprecation-Hinweis; Reihenfolge = Hilfe-Tabelle).
+// W1: die PLANER-Aliase (--validate/--check/--dump-plan/--dump-ci/--dump-cmake/--print-cache-key/
+// --chunk-organ-fingerprint) sind aus dieser Tabelle ENTFALLEN -- sie werden vom Dispatcher jetzt mit einer
+// VERWEIS-Zeile auf comdare-experiment-planner beantwortet (fail-loud, rc 1), nicht mehr kanonisiert. Die NEUE
+// Planer-Binary traegt bewusst KEINE Alt-Flags (eine neue Oberflaeche erbt keine deprecated Aliase).
 struct DeprecatedAlias {
     std::string_view flag;
     std::string_view neu;
 };
 inline constexpr DeprecatedAlias kDeprecatedAliases[] = {
-    {"--validate", "validate"},
-    {"--check", "validate"},
-    {"--dump-plan", "plan dump"},
-    {"--dump-ci", "plan ci"},
-    {"--dump-cmake", "plan cmake"},
     {"--emit-tier-ci", "tier ci"},
     {"--emit-tier-cmake", "tier cmake"},
-    {"--print-cache-key", "cache-key"},
-    {"--chunk-organ-fingerprint", "fingerprint"},
 };
 
 // W5: Hilfe nach stdout (clig.dev: Hilfe ist Daten), rc 0. topic leer = Uebersicht; sonst Detail je Subcommand.
 void help_for(std::string const& topic) {
-    if (topic == "validate") {
-        std::cout << "comdare-messung-driver validate [<profil>]\n"
-                  << "  Rein-lesende Pre-Flight-Pruefung des Profils -- baut KEINE DLL, misst NICHT.\n"
-                  << "  Deckt BEIDE offiziellen Wurzeln: <comdare_thesis_profile> (Achsen-/Werte-Gate) und\n"
-                  << "  <comdare_experiment> (3-Phasen-Gate gegen die einkompilierten ce+prt-Registry-Pfade).\n"
-                  << "  Profil-Aufloesung: Argument > COMDARE_THESIS_PROFILE > einkompiliertes Default-Profil.\n"
-                  << "  Exit: 0 ok; 5 unbekannte/unlesbare Profil-Wurzel. Alt-Flags: --validate/--check.\n";
-        return;
-    }
-    if (topic == "plan") {
-        std::cout << "comdare-messung-driver plan dump|ci|cmake [<profil>]\n"
-                  << "  PLANER-Rolle (Stufe 1, 40.b): der deterministische ExperimentPlanDirector-Walk in drei\n"
-                  << "  Emissions-Kanaelen -- zwei Laeufe sind byte-gleich.\n"
-                  << "    plan dump   Textplan nach stdout (Alt-Flag --dump-plan)\n"
-                  << "    plan ci     GitLab-Child-Pipeline-YAML: CEB-Jobs je Mess-Kombination (--dump-ci)\n"
-                  << "    plan cmake  experiment_plan.cmake fuer den Bare-Metal-Bau (--dump-cmake)\n"
-                  << "  plan ci/cmake tragen das Bestandslog-planer_block-Gate: COMDARE_BESTANDSLOG=true +\n"
-                  << "  COMDARE_BESTANDSLOG_DOC_KEY/_OWNER_UUID/_MASCHINE (Exit 6 bei unvollstaendiger Konfig).\n"
-                  << "  Profil-Aufloesung: Argument > COMDARE_THESIS_PROFILE > einkompiliertes Default-Profil.\n";
-        return;
-    }
     if (topic == "tier") {
         std::cout << "comdare-messung-driver tier ci|cmake [<profil>] [--measurement-combo=<cmake_slug>]\n"
                   << "  CEB-Rolle (Stufe 2, 42/42.b): emittiert die Stufe-2-Sicht des freigegebenen CEB-Raums\n"
@@ -514,21 +383,6 @@ void help_for(std::string const& topic) {
                   << "    tier ci     Grandchild-Pipeline-YAML (Alt-Flag --emit-tier-ci)\n"
                   << "    tier cmake  tier_plan.cmake fuer den Bare-Metal-Tier-Bau (--emit-tier-cmake)\n"
                   << "  --measurement-combo waehlt EINE Mess-Kombination (leer = Voll-Konfig, byte-identisch).\n";
-        return;
-    }
-    if (topic == "cache-key") {
-        std::cout << "comdare-messung-driver cache-key\n"
-                  << "  Druckt den vollen ce-Objekt-Cache-Key-Praefix der env-gepinnten GN-Zelle (EINE Zeile).\n"
-                  << "  Env-Pins: COMDARE_GN_OPT, COMDARE_GN_SIMD, COMDARE_CXX, COMDARE_BUILD_TYPE,\n"
-                  << "  COMDARE_MEASUREMENT_COMBO. Alt-Flag: --print-cache-key.\n";
-        return;
-    }
-    if (topic == "fingerprint") {
-        std::cout << "comdare-messung-driver fingerprint [<profil>]\n"
-                  << "  Druckt das Chunk-Organ-Fingerprint-PRE-IMAGE des Range-Fensters nach stdout (die CI\n"
-                  << "  pipet es durch sha256sum -> COMDARE_GN_ALGO_SIG). Fenster: COMDARE_GOLDEN_N_RANGE\n"
-                  << "  \"start:count\" (leer = ganze View). Exit 2 bei kaputter Range/Profil.\n"
-                  << "  Alt-Flag: --chunk-organ-fingerprint.\n";
         return;
     }
     if (topic == "run") {
@@ -548,32 +402,35 @@ void help_for(std::string const& topic) {
                   << "  build-version (system_axes_version_suffix) -- vier gelabelte non-empty Zeilen.\n";
         return;
     }
+    if (topic == "validate" || topic == "plan" || topic == "cache-key" || topic == "fingerprint") {
+        // W1: die Planer-Topics sind mit ihrer Rolle in die eigene Binary gewandert -- die Hilfe verweist
+        // ehrlich weiter, statt eine Grammatik zu dokumentieren, die dieses Binary nicht mehr hat.
+        std::cout << "comdare-messung-driver: '" << topic << "' gehoert zur PLANER-Rolle und lebt seit W1 in\n"
+                  << "  einer eigenen Binary: 'comdare-experiment-planner " << topic << " ...'\n"
+                  << "  (Detail-Hilfe dort: 'comdare-experiment-planner help " << topic << "').\n";
+        return;
+    }
     std::cout
-        << "comdare-messung-driver -- Planer- + CEB-Rolle in EINEM Binary (Mess-Kette der Diplomarbeit)\n\n"
+        << "comdare-messung-driver -- die CEB-Rolle der Mess-Kette (Stufe 2 + Mess-Vollzug)\n"
+        << "  Die PLANER-Rolle (Stufe 1) hat eine eigene Binary: comdare-experiment-planner.\n\n"
         << "Usage:\n"
         << "  comdare-messung-driver <subcommand> [argumente]\n"
         << "  comdare-messung-driver run <config_dir> <output_dir> [--comdare-root=DIR] [--messreihen-xml=FILE]\n\n"
         << "Subcommands:\n"
-        << "  validate [<profil>]     Profil rein-lesend pruefen (beide offiziellen Wurzeln)\n"
-        << "  plan dump [<profil>]    deterministischer Experiment-Plan als Text (Stufe 1, Planer-Rolle)\n"
-        << "  plan ci [<profil>]      GitLab-Child-Pipeline-YAML der CEB-Jobs (Stufe 1, Planer-Rolle)\n"
-        << "  plan cmake [<profil>]   experiment_plan.cmake fuer den Bare-Metal-Bau (Stufe 1)\n"
         << "  tier ci [<profil>]      Tier-Jobs-YAML (Stufe 2, CEB-Rolle)\n"
         << "  tier cmake [<profil>]   tier_plan.cmake (Stufe 2, CEB-Rolle)\n"
-        << "  cache-key               ce-Objekt-Cache-Key-Praefix der env-gepinnten GN-Zelle\n"
-        << "  fingerprint [<profil>]  Chunk-Organ-Fingerprint-Pre-Image (COMDARE_GOLDEN_N_RANGE-Fenster)\n"
         << "  run <config> <output>   Mess-Lauf (Messreihen A/B/C bzw. E4-XML-Weg)\n"
         << "  version                 Selbst-Stempel (planner/ceb-contract/build-type/build-version)\n"
         << "  help [<subcommand>]     diese Uebersicht bzw. Detail-Hilfe (auch: <subcommand> --help)\n\n"
+        << "In der PLANER-Binary (comdare-experiment-planner, Stufe 1, Section 40.b):\n"
+        << "  validate [<profil>] | plan dump|ci|cmake [<profil>] | cache-key | fingerprint [<profil>]\n\n"
         << "Profil-Aufloesung: explizites Argument > COMDARE_THESIS_PROFILE > einkompiliertes Default-Profil.\n"
         << "Ausgaben: Daten/Emissionen -> stdout; Diagnose/Fehler -> stderr (clig.dev).\n\n"
         << "Exit-Codes:\n"
-        << "  0 Erfolg | 1 Usage/Emission abgebrochen | 2 Konfig-Fehler (leerer Plan, kaputte Range)\n"
-        << "  5 validate: unbekannte Profil-Wurzel | 6 Bestandslog-Gate-Abbruch | 7 Lane-Fehlrouting\n\n"
+        << "  0 Erfolg | 1 Usage/Emission abgebrochen/gewandertes Subkommando | 2 Konfig-Fehler (leerer Plan)\n"
+        << "  7 Lane-Fehlrouting\n\n"
         << "DEPRECATED Alt-Flags (Verhalten identisch; sie fallen im Abschluss-Aufraeumpass, Ledger 75):\n"
-        << "  --validate/--check -> validate | --dump-plan -> plan dump | --dump-ci -> plan ci\n"
-        << "  --dump-cmake -> plan cmake | --emit-tier-ci -> tier ci | --emit-tier-cmake -> tier cmake\n"
-        << "  --print-cache-key -> cache-key | --chunk-organ-fingerprint -> fingerprint\n"
+        << "  --emit-tier-ci -> tier ci | --emit-tier-cmake -> tier cmake\n"
         << "  (--version und --help bleiben kanonische clig.dev-Flags.)\n";
 }
 
@@ -606,6 +463,31 @@ struct EffectiveArgs {
         return ea;
     }
 
+    // (1b) W1 (F1-HART): die PLANER-Rolle ist in comdare-experiment-planner gewandert. Der Treiber beantwortet
+    // ihre Woerter UND ihre Alt-Flags mit EINER VERWEIS-Zeile auf stderr und rc 1 -- FAIL-LOUD.
+    //
+    // WARUM fail-loud und nicht "unbekannt, ignorieren": ein unbekanntes argv[1] faellt hier in den
+    // POSITIONAL-Weg und wird als <config_dir> des Mess-Laufs gelesen. Ein Nachzuegler-Skript mit
+    // `"$DRIVER" plan ci ...` wuerde also nicht scheitern, sondern still einen Mess-Lauf mit dem config_dir
+    // "plan" starten. Genau diese stille Fehlleitung verhindert der Verweis.
+    {
+        auto const gewandert = [](std::string const& w) {
+            return w == "validate" || w == "plan" || w == "cache-key" || w == "fingerprint" || w == "--validate" ||
+                   w == "--check" || w == "--dump-plan" || w == "--dump-ci" || w == "--dump-cmake" ||
+                   w == "--print-cache-key" || w == "--chunk-organ-fingerprint";
+        };
+        for (std::size_t i = 1; i < ea.storage.size(); ++i) {
+            if (!gewandert(ea.storage[i])) continue;
+            std::cerr << "comdare-messung-driver: '" << ea.storage[i]
+                      << "' ist in die Planer-Binary gewandert (W1, 05.08.2026): "
+                      << "'comdare-experiment-planner <subkommando> ...' -- dieser Treiber traegt seit dem "
+                      << "Rollen-Schnitt nur noch die CEB-Rolle (tier ci|cmake) und den Mess-Lauf (run). "
+                      << "Uebersicht: 'comdare-experiment-planner help'.\n";
+            ea.help_rc = 1;
+            return ea;
+        }
+    }
+
     // (2) Subcommand -> kanonische Alt-Flag-Route (exakter argv[1]-Match; '-'-Argumente sind nie Subcommands).
     bool matched  = false;
     auto replace2 = [&ea, &matched](char const* canonical) { // '<wort> <unterwort>' -> EIN kanonisches Flag
@@ -613,7 +495,7 @@ struct EffectiveArgs {
         ea.storage.erase(ea.storage.begin() + 2);
         matched = true;
     };
-    if (a1 == "validate" || a1 == "cache-key" || a1 == "fingerprint" || a1 == "version" || a1 == "run") {
+    if (a1 == "version" || a1 == "run") {
         if (a2 == "--help" || a2 == "-h") {
             help_for(a1);
             ea.help_rc = 0;
@@ -622,38 +504,23 @@ struct EffectiveArgs {
         if (a1 == "run") { // run: das Wort faellt weg, der etablierte Positional-Weg uebernimmt
             ea.storage.erase(ea.storage.begin() + 1);
             matched = true;
-        } else if (a1 == "validate") {
-            ea.storage[1] = "--validate";
-            matched       = true;
-        } else if (a1 == "cache-key") {
-            ea.storage[1] = "--print-cache-key";
-            matched       = true;
-        } else if (a1 == "fingerprint") {
-            ea.storage[1] = "--chunk-organ-fingerprint";
-            matched       = true;
         } else {
             ea.storage[1] = "--version";
             matched       = true;
         }
-    } else if (a1 == "plan" || a1 == "tier") {
+    } else if (a1 == "tier") {
         if (a2 == "--help" || a2 == "-h" || a3 == "--help" || a3 == "-h") {
             help_for(a1);
             ea.help_rc = 0;
             return ea;
         }
-        if (a1 == "plan" && a2 == "dump") {
-            replace2("--dump-plan");
-        } else if (a1 == "plan" && a2 == "ci") {
-            replace2("--dump-ci");
-        } else if (a1 == "plan" && a2 == "cmake") {
-            replace2("--dump-cmake");
-        } else if (a1 == "tier" && a2 == "ci") {
+        if (a2 == "ci") {
             replace2("--emit-tier-ci");
-        } else if (a1 == "tier" && a2 == "cmake") {
+        } else if (a2 == "cmake") {
             replace2("--emit-tier-cmake");
         } else {
             std::cerr << "comdare-messung-driver: unbekanntes Unterkommando '" << a1 << (a2.empty() ? "" : " ") << a2
-                      << "' -- erwartet: " << (a1 == "plan" ? "plan dump|ci|cmake" : "tier ci|cmake")
+                      << "' -- erwartet: tier ci|cmake"
                       << " (Detail: 'comdare-messung-driver help " << a1 << "').\n";
             ea.help_rc = 1;
             return ea;
@@ -696,124 +563,24 @@ int main(int argc, char* argv[]) {
     argc = cli.argc;
     argv = cli.argv.data();
 
-    // --validate [<profil>]: rein-lesende Pre-Flight-Pruefung des Thesis-Profils gegen die realen
-    // EnabledStrategies (P5, migriert von run_lazy_150) — baut KEINE DLL, misst NICHT. Braucht KEINE
-    // (run_lazy_150 geloescht 2026-07-11)
-    // <config>/<output>-Argumente; ohne Pfad gilt COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil.
+    // W1 (05.08.2026, F1-HART): die Flag-Zweige der PLANER-Rolle (--validate/--check, --dump-plan,
+    // --chunk-organ-fingerprint, --print-cache-key, --dump-ci, --dump-cmake) sind mit ihrer Rolle in die eigene
+    // Binary comdare-experiment-planner gewandert (ce apps/experiment_planner/main.cpp) -- inklusive des
+    // Root-Tag-Sniffs beider offizieller Profil-Wurzeln (2-Registry-Kanon) und des planer_block-Gates.
+    // Der Dispatcher oben faengt die alten Woerter/Flags mit einer VERWEIS-Zeile und rc 1 ab, damit kein
+    // Nachzuegler still in den run-Positional-Pfad faellt. Hier bleiben die CEB-Zweige (--emit-tier-*) und
+    // --version.
     for (int i = 1; i < argc; ++i) {
         std::string const flag{argv[i]};
-        if (flag == "--validate" || flag == "--check") {
-            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
-                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
-            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-
-            // Bruecke-I2 (2026-07-16): der --validate-Zweig deckt BEIDE offiziellen Profil-Wurzeln ab. Ein
-            // Root-Tag-Sniff (rein-lesend ueber den common-DOM) entscheidet: <comdare_thesis_profile> -> das
-            // Achsen-/Werte-Gate (validate_profile_facade, wie bisher); <comdare_experiment> -> das 3-Phasen-
-            // Gate (validate_experiment_profile_facade) mit den per CMake einkompilierten STATISCHEN ce+prt-
-            // Registry-Pfaden (2-Registry-Kanon; der Host reicht sie herein, die ce-Fassade haelt keinen prt-
-            // art-Pfad hart vor — Baseline-Layering). Beide Parser liefern nullopt bei Fremd-Tag, daher ist der
-            // reine Root-Tag-Read gefahrlos; eine unbekannte/unlesbare Wurzel -> rc 5 (kein Bau).
-            std::string root_tag;
-            if (std::ifstream in{prof, std::ios::binary}; in) {
-                std::ostringstream ss;
-                ss << in.rdbuf();
-                if (auto const root = comdare::common::xml::parse_document(ss.str())) root_tag = root->tag;
-            }
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            if (root_tag == "comdare_thesis_profile") { return pf::validate_profile_facade(prof, std::cout); }
-            if (root_tag == "comdare_experiment") {
-#if defined(COMDARE_CE_AXIS_REGISTRY_PATH) && defined(COMDARE_PRT_AXIS_REGISTRY_PATH)
-                return pf::validate_experiment_profile_facade(prof, COMDARE_CE_AXIS_REGISTRY_PATH,
-                                                              COMDARE_PRT_AXIS_REGISTRY_PATH, std::cout);
-#else
-                std::cerr << "[validate] '" << prof
-                          << "': comdare_experiment erkannt, aber die statischen Registry-Pfade wurden nicht "
-                             "einkompiliert (COMDARE_CE/PRT_AXIS_REGISTRY_PATH) -- ce-Klon/CMake nicht synchron?\n";
-                return 5;
-#endif
-            }
-            std::cerr << "[validate] '" << prof << "': unbekannte/unlesbare Wurzel"
-                      << (root_tag.empty() ? "" : " '" + root_tag + "'")
-                      << " -- weder <comdare_thesis_profile> noch <comdare_experiment>. KEIN Bau ausgefuehrt.\n";
-            return 5;
-        }
-        // --dump-plan [<profil>] (PAKET W5-B, 2026-07-19): rein-lesende Emission des deterministischen
-        // ExperimentPlanDirector-Walks (GoF Director + PlanTextBuilder) -- baut KEINE DLL, misst NICHT. Der
-        // Root-Tag-Sniff (comdare_thesis_profile vs comdare_experiment) sitzt IN der Fassade (der katalog-
-        // schwere Planer-Header gehoert dorthin, nicht in diesen Treiber). Wie --validate: ohne Pfad gilt
-        // COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil. Text -> stdout, exit 0.
-        if (flag == "--dump-plan") {
-            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
-                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
-            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::dump_experiment_plan_facade(prof, std::cout);
-        }
-        // --chunk-organ-fingerprint [<profil>] (Cache-Resthygiene-2, 2026-07-21): druckt das Chunk-Organ-Fingerprint-
-        // PRE-IMAGE (perm.dll.algos-Inhalte der Range-Binaries, stem-sortiert konkateniert) nach stdout -- rein aus dem
-        // Katalog, KEIN DLL-Bau. Die CI pipet es durch `sha256sum` -> COMDARE_GN_ALGO_SIG (== S1-F1-Marker-algo_sig ->
-        // Marker-Wache scharf). Range aus COMDARE_GOLDEN_N_RANGE="start:count" (leer/ungesetzt => ganze View).
-        if (flag == "--chunk-organ-fingerprint") {
-            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
-                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
-            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-            std::size_t rstart = 0, rcount = 0;
-            try {
-                if (auto const r = parse_golden_range_env()) {
-                    rstart = r->start;
-                    rcount = r->count;
-                }
-                namespace pf = comdare::cache_engine::builder::profile_facade;
-                return pf::chunk_organ_fingerprint_facade(prof, rstart, rcount, std::cout);
-            } catch (std::exception const& e) {
-                // Fehlerklassen-Doktrin: kaputtes COMDARE_GOLDEN_N_RANGE/Profil ist ein KONFIG-Fehler --
-                // klar melden statt unhandled throw (cppcheck throwInEntryPoint); nie stillschweigend Voll-View.
-                std::cerr << "[Konfig-Fehler: chunk-organ-fingerprint] " << e.what() << "\n";
-                return 2;
-            }
-        }
-        // R8 (Nacht-Audit 2026-07-22): --print-cache-key -- druckt den VOLLEN ce-Objekt-Cache-Key-Praefix fuer die per
-        // Env (COMDARE_GN_OPT/COMDARE_GN_SIMD/COMDARE_CXX/COMDARE_BUILD_TYPE/COMDARE_MEASUREMENT_COMBO) gepinnte
-        // GN-Zelle nach stdout (EINE Zeile). Die CI (.golden_n_build) konsumiert ihn LITERAL als PULL-Quelle/
-        // MARK_PREFIX -> kein bash-Key-Drift (+bt/+ceb/+mtool/+mrg Single-Source aus dem Treiber). base = "m3v2"
-        // (dieselbe Mess-Lauf-build_version wie die run-Pfade unten). Baut KEINE DLL, liest keinen Katalog.
-        if (flag == "--print-cache-key") {
-            namespace pf = comdare::cache_engine::builder::profile_facade;
-            return pf::print_cache_key_facade("m3v2", std::cout);
-        }
         // K7b-4 (§62-B, G1/B6-Auflage 2026-07-22): --version -- druckt den Je-Binary-Selbst-Stempel DIESES
-        // Treiber-Binary (Planer- + CEB-Rolle in EINEM Binary) nach stdout: vier gelabelte non-empty Zeilen
+        // Treiber-Binary (CEB-Rolle; die Planer-Binary traegt ihren eigenen, zweizeiligen Stempel -- deklarierte
+        // Abweichung W1/Section 64) nach stdout: vier gelabelte non-empty Zeilen
         // (planner-Selbst-Stempel / ceb-contract / build-type / build-version = system_axes_version_suffix). Ordnet
         // das Binary per Versionierung dem gebauten Cache-Artefakt zu (ccache-Beschleunigung ist durch K7b gated).
         // Rein-lesend: baut KEINE DLL, liest keinen Katalog.
         if (flag == "--version") {
             namespace pf = comdare::cache_engine::builder::profile_facade;
             return pf::print_version_facade(std::cout);
-        }
-        // --dump-ci [<profil>] (PAKET W7-A, 2026-07-19, §40.b): rein-lesende Emission der deterministischen
-        // GitLab-Child-Pipeline-YAML (CiYamlBuilder am SELBEN Director-Walk wie --dump-plan). Die dynamische,
-        // Planer-gesteuerte Folge-CI (Pilot->Serie). Wie --dump-plan: baut KEINE DLL, misst NICHT; Root-Tag-Sniff
-        // in der Fassade; ohne Pfad gilt COMDARE_THESIS_PROFILE bzw. das gebackene Default-Profil. YAML -> stdout.
-        if (flag == "--dump-ci") {
-            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
-                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
-            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-            // A-B1: Mantel + planer_block-Gate leben im benannten Handler ausserhalb von main (throwInEntryPoint).
-            int const rc = run_dump_ci_guarded(prof);
-            return rc; // 2.4-(2): LOKALE Variable, kein return-im-Ausdruck
-        }
-        // --dump-cmake [<profil>] (PAKET W7-B, 2026-07-19, §40.c): rein-lesende Emission des scharfen
-        // experiment_plan.cmake (CMakeGraphBuilder am SELBEN Director-Walk). Der Bare-Metal-Bauplan: echte
-        // provision-only-build:-Kommandos je Zelle + GN-11-gegatetes measure:-Skelett. Wie --dump-plan: baut
-        // KEINE DLL, misst NICHT. Text -> stdout (Umleitung nach out.cmake -> cmake-Aufruf = Bare-Metal-Lauf).
-        if (flag == "--dump-cmake") {
-            std::string prof = (i + 1 < argc && argv[i + 1][0] != '-') ? std::string{argv[i + 1]}
-                                                                       : env_trimmed("COMDARE_THESIS_PROFILE");
-            if (prof.empty()) prof = COMDARE_MESSUNG_DEFAULT_THESIS_PROFILE;
-            // A-B1: Mantel + planer_block-Gate im benannten Handler ausserhalb von main (siehe --dump-ci).
-            int const rc = run_dump_cmake_guarded(prof);
-            return rc; // 2.4-(2): LOKALE Variable
         }
         // --emit-tier-ci [<profil>] (PAKET W10-A, 2026-07-19, §42/§42.b): die CEB-ROLLEN-Emission (Stufe 2). Wie
         // --dump-ci, aber emittiert NUR die Stufe-2-Sicht des freigegebenen CEB-Raums (System-Perms + Tier-Chunk-
