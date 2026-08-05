@@ -1,0 +1,244 @@
+{
+  "summary": "P2 W5-Kern (status-Subkommando in der Planer-Binary: on-demand-Rueck-Leser ueber progress.cursor/CSV-Stamps/Bestandslog = Vorstufe der Planer-Takt-Hoheit F7) + W3-Kern (Post-Compile-Testate der Mess-Interfaces am Pruef-Dock nach S5-Familien-Muster) — Fable-Plan, Opus-5-Bau, Fable-Review; Fingerprint-Neutralitaet",
+  "agentCount": 4,
+  "logs": [
+    "Bau-Modell: claude-opus-5"
+  ],
+  "result": {
+    "plan": {
+      "status": "PLAN FERTIG (read-only erstellt). Pflicht-Vorlauf vollzogen: Ledger 05.08. komplett gegrept (mittag-4/-6/-7, nachmittag-2/-5, Posten-92-Deklaration :4102), synthese.md + rufkette.md + f5/f7-Lenses gelesen, IST am Objekt wt-e24 (Basis 60c7c56a, Branch aktuell hotfix-cppcheck -- w5-w3-kern muss vor C1 neu ab 60c7c56a gesetzt werden) verifiziert: W5-Andockpunkt apps/experiment_planner/main.cpp:352-354; progress.cursor-Schreiber super Code/02_messung_driver/main.cpp:1155-1195 (zwei Literal-Formen, kein existierender Leser); result.csv-Stamp-Format cache_engine_builder_iterator.hpp:871-977; bestandslog-Leser parse_bestandslog + make_bestand_transport vorhanden; read_fingerprint_sidecar = die eine Lese-Wahrheit; abi_adapter:229-251 gelesen; Mess-Interface-Deckung am geladenen Modul erhoben (nur d13/f15 decken IObservable/RC/V1 -- V2/V3/Rollback/Migrate/AllocProxy-Assertion fehlen post-compile).",
+      "plan_pfad": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/w5w3/plan.md",
+      "w5_design": [
+        "Grammatik: comdare-experiment-planner status [<profil>] [--root=<dir>] -- additiver if-Zweig am reservierten Andockpunkt (main.cpp:352-354); on-demand, KEIN watch; Exit 0 auch bei fehlenden Quellen (ehrliche 'keine Daten'-Zeile je Quelle), 1 Usage, 2 Konfig; KEIN planer_block (rein lesend, kein Exit 6)",
+        "Pfad-Aufloesung: Profil wie ueberall (arg > COMDARE_THESIS_PROFILE > Default); --root Default Code/measure_out = Emissions-Kanon (director:1331/1342), Fallback measure_out; aufgeloester Root immer in der Kopfzeile -- die Binary kennt heute keinen measure_out-Root, --root ist die eine deklarierte neue Zutat (Flag statt neuer Env)",
+        "Quellen-Wiederverwendung ohne Format-Duplikate: (1) progress.cursor -> NEUER erster Parser progress_cursor_reader.hpp (Schreiber-Formen literal gepinnt, cross-repo-Kopplung deklariert); (2) result.csv/stamp/stale -> lazy_csv_header() direkt + Hebung des '|rows='-Literals zu kLazyResumeRowsKey im Iterator-Header (string-identisch, beide Nutzer teilen die Konstante); kein Config-Prefix-Nachbau -- gemessen = csv+stamp+Header-Identitaet+Zeilen==rows; (3) Bestandslog -> ArtifactCache::from_env().with_object_budget(1,10) + make_bestand_transport().fetch + parse_bestandslog (alles bestehend), Gate wie planer_block NUR LESEND; (4) .fingerprint -> read_fingerprint_sidecar, ungueltige Sidecars als eigener Zaehler; SOLL via PlanSizeBuilder + measurement_combos_of (kein neuer Walk, R-G2 unberuehrt)",
+        "Ausgabe: Marker-v2-Gesetz -- Schluessel = TUPEL (zelle,fenster), ceb= eigenes Feld, Sentinel 'unbelegt'; Zeilen [status] / [status-zelle] geplant/gebaut/gemessen/stale/offen je Zelle / [status-cursor] letzte_perm+done / [status-bestand] doc_revision+Reservierungen / [status-gesamt]; stdout=Daten, stderr=Diagnose",
+        "Substanz-Ort: neuer Header profile_facade/planner/planner_status_reader.hpp (+progress_cursor_reader.hpp) nach W1-Blaupause planner_cli_env-Hoist; main.cpp bleibt duenner noexcept-Host; abi_adapter/PODs/Wire nur LESEN",
+        "Takt-Ausbau-Andockpunkte (F6-Vorstufe): CursorStand.done_seen = kuenftiges 38.b-Fertig-Signal; ZellStand-Keying (zelle,fenster) = kuenftige Takt-Schluessel-Welt; Bestandslog-Reservierungs-Sicht als eigene Funktion = Ressourcen-Freigabe-Input; Schichtung Leser->Aggregator->Renderer, Takt ersetzt spaeter nur den Renderer; resource_group bleibt Ist-Traeger (Owner-R6)",
+        "TU test_w5_status_reader.cpp mit Fixtures aus den ECHTEN Schreib-Formen + honest-empty; Rauchtest literal am gebauten Binary je Gate"
+      ],
+      "w3_testate": [
+        "IObservableTier: am geladenen Modul teilgedeckt (test_d13, f15) -- NEU: kV3AxisSchema-getriebene Feld-Wache (nichts hartkodiert), Vorher/Nachher-Snapshot-Anti-Leerlauf, tier_reset_statistics am geladenen Modul (216h2 nur suite-seitig)",
+        "IMeasurableWorkload V1: am geladenen Modul GEDECKT (f15 Stufe B) -- KEIN Neu-Testat (Doppelung vermeiden), nur Quer-Konsistenz im Ketten-Lauf",
+        "IMeasurableWorkloadV2: nur suite-seitig -- NEU am geladenen Modul: batches_measured>0 + Segment-ns der getriebenen Achsen>0",
+        "IMeasurableWorkloadV3: nur suite-seitig -- KERN-Testat am geladenen Modul: Sum(seg_ns)+seg_framework_ns == seg_run_total_ns EXAKT (Identitaet aus test_seg_coverage.cpp:88 / LEDGER:855 uebernommen, nicht neu erfunden)",
+        "IRollbackableTier: nur suite-seitig -- NEU: save->mutierende Ops->rollback->Lookup-Gleichheit gegen mitgefuehrtes Oracle + Gegenprobe ohne rollback differiert (nicht-vakuos)",
+        "IMigratableTier: nur suite-seitig -- NEU: tier_migrate_step mit tier_moves REAL>0 (P4-#123) + funktionale Aequivalenz nach Migration",
+        "IResourceControllableTier: teilgedeckt (d13 thread_count) -- NEU: Restfelder-Konsum (prefetch/pool_budget/batch/inline_threshold) + POD-Roundtrip + Anti-Leerlauf",
+        "IAllocatorProxyTier: nur REPORT-Probe ohne Assertion (conformance_gate.hpp:42-60) -- NEU: interface_present+identity ASSERTIERT + stats_route-Zaehler bewegen sich unter Last (Probe-Funktion wiederverwendet)",
+        "Struktur: additiver Header pruef_dock/mess_interface_testate.hpp (Sibling von conformance_gate, das byte-unberuehrt bleibt) mit noexcept-Quoten-Funktionen je Interface -> Nach-Abgabe-Dock-Integration rein additiv; TU test_w3_mess_interface_testate_dock.cpp (Loader-Pfad AnatomyModuleLoader, import->GATE->Testate, Traeger = bestehende SHARED-Targets anatomy_codegen_pilot_wormhole_shared + perm_adhoc_buildvariant via $<TARGET_FILE>, beide MEASUREMENT-ON per Root-Define) + Einzigquellen-Kopplung (static_assert is_base_of je Interface am Host-Adapter UND dynamic_cast!=nullptr am Modul, cases_total>0-Pin); TU test_w3_mess_interface_testate_biss.cpp = beidseitiger Biss via Broken-Fakes je Testat (Muster 6-Broken-Huellen); SCOPE-GRENZE: kein Deep-Research-Katalog, kein per-Binary-Vollbeleg, kein GTest-Harness-Umbau (Nach-Abgabe)"
+      ],
+      "risiken": [
+        "Cursor-Format-Kopplung cross-repo (Schreiber super main.cpp:1185-1194, Leser neu in ce) -- Literal-Pins in TU + deklarierte Kopplung; Single-Source erst mit #35-.so nach Abgabe",
+        "ctest-N lebendes Gate (Basis 405, +3 TUs) -- je Commit frisches Configure + 2x voll-ctest seriell mit literalem N; V32=ON-Kanon",
+        "cppcheck-Adjazenz-Falle: COMDARE_*-Makros (Pfad-Defines der TUs) NIE in String-Literal-Adjazenz (Fallen-Kanon 60c7c56a)",
+        "Fingerprint-Neutralitaet: einzige Bestands-Beruehrung = kLazyResumeRowsKey-Hebung (string-identisch); Beweise je Commit abi/ 0, Frozen-Vektor 3 TUs, golden-CRC, golden-320 3/3, Roundtrip",
+        "Bestandslog on-demand darf nicht haengen/nicht binden: with_object_budget(1,10), keine Reservierung, 'keine Daten' statt Abbruch; TU ohne Netz",
+        "W3-TUs nur in der messungs-gated CMake-Sektion (sonst nullptr-Fehlalarm in Release-only-Baeumen)",
+        "planer_block-Reaper wird durch W5 NICHT akut (rein lesend, kein Block gebunden) -- bleibt benannter Nach-Abgabe-Posten",
+        "R-G2/Posten 92 tabu: status nutzt den 3er-Resolve wie plan, validate bleibt 2er -- keine Nebenbei-Heilung",
+        "Frist/Scope-Creep W3: je Testat EIN Biss-Fake; alles jenseits der Liste als Nach-Abgabe-TODO (Dauer-Regel mittag-6)",
+        "wt-e24 steht auf hotfix-cppcheck -- vor C1 Branch w5-w3-kern exakt ab 60c7c56a; -j max 8 nice; KEIN Push/Merge"
+      ],
+      "commit_plan": [
+        "C1 W3-Kern: pruef_dock/mess_interface_testate.hpp (additiv) + test_w3_mess_interface_testate_dock.cpp + test_w3_mess_interface_testate_biss.cpp + CMake-Wiring (messungs-gated, $<TARGET_FILE>-Traeger-DLLs); kein Produktiv-Pfad beruehrt; volles Gate",
+        "C2 W5-Lese-Substanz: planner/planner_status_reader.hpp + planner/progress_cursor_reader.hpp + kLazyResumeRowsKey-Hebung (string-identisch) + test_w5_status_reader.cpp (Fixtures aus echten Schreib-Formen, honest-empty); volles Gate",
+        "C3 W5-CLI-Andockung: main.cpp status-Zweig am reservierten Andockpunkt + help_for('status') + Uebersicht + MANUAL_RUN-Notiz + literaler status-Rauchtest (Fixture-Root, leerer Root, --help); volles Gate; bei Zeitdruck C2+C3 zu einem Commit faltbar (Schnittgrenze: Substanz vor CLI)"
+      ]
+    },
+    "bauModell": "claude-opus-5",
+    "bau": {
+      "status": "FERTIG -- W5-KERN + W3-KERN gebaut, 3 Commits auf /home/comdare/wt-e24 Branch w5-w3-kern (NEU ab 60c7c56a), HEAD=ac033634. Gate je Commit voll gefahren (frisches Configure am Commit-Objekt + Voll-Bau + 2x voll-ctest SERIELL + golden 3/3 + Roundtrip 6/6 + Neutralitaets-Beweise + cf22 + ASCII + 3-Marker + Wortgrenzen-Orakel + Freeze 0 Zeilen). ctest-N 405 -> 407 (C1) -> 408 (C2) -> 408 (C3). KEIN Push, KEIN Merge, Working-Tree-Freeze steht (git status --porcelain = 0 Zeilen).",
+      "commits": [
+        "e0479626 feat(w3): Post-Compile-Testate der MESS-Interfaces am Pruef-Dock (W3-KERN, Owner-GO R3) -- NEU additiv libs/cache_engine/builder/pruef_dock/mess_interface_testate.hpp (Sibling; conformance_gate.hpp Diff 0 Zeilen) + tests/unit/test_w3_mess_interface_testate_dock.cpp + tests/unit/test_w3_mess_interface_testate_biss.cpp + messungs-gegatetes CMake-Wiring (if COMDARE_MEASUREMENT_MODE). Kein Produktiv-Pfad beruehrt. Gate 405 -> 407.",
+        "064ee164 feat(w5): status-Lese-Substanz -- NEU libs/cache_engine/profile_facade/planner/progress_cursor_reader.hpp (der ERSTE Leser der progress.cursor) + planner/planner_status_types.hpp (flache PODs der Fassaden-Naht, std-only) + planner/planner_status_reader.hpp (Leser->Aggregator->Renderer) + 2 schmale Fassaden-Naehte (mess_format_fakten_facade / collect_plan_soll_facade) + kLazyResumeRowsKey-Hebung im Iterator (string-identisch, EINZIGE Beruehrung bestehender Substanz) + tests/unit/test_w5_status_reader.cpp. Gate 407 -> 408.",
+        "ac033634 feat(w5): status-Subkommando am reservierten Andockpunkt -- apps/experiment_planner/main.cpp status-Zweig (EIN additiver if-Zweig am Bauer-Reservierungs-Kommentar) + help_for('status') + Uebersicht-Zeile + CLI-Kopf-Doku + libs/common-Include-Wurzel im App-CMake + MANUAL_RUN.md Abschnitt 6. Gate 408 unveraendert (reine App-/Doku-Flaeche)."
+      ],
+      "doppellauf": "Je Commit frisches Configure am Commit-Objekt (cmake . rc 0) + Voll-Bau + 2x voll-ctest SERIELL (-j1), literal:\nC1 (e0479626): \"100% tests passed, 0 tests failed out of 407\" / \"100% tests passed, 0 tests failed out of 407\"\nC2 (064ee164): \"100% tests passed, 0 tests failed out of 408\" / \"100% tests passed, 0 tests failed out of 408\"\nC3 (ac033634): \"100% tests passed, 0 tests failed out of 408\" / \"100% tests passed, 0 tests failed out of 408\"\nBasis-Beleg VOR der Welle am selben Build-Verzeichnis: \"100% tests passed, 0 tests failed out of 405\".\nN-Kette arithmetisch geschlossen: 405 + 2 (W3-dock + W3-biss) = 407; + 1 (W5-status-reader) = 408; C3 fuegt keine TU hinzu.\ngolden 3/3 je Commit: \"100% tests passed, 0 tests failed out of 3\" (test_smoke_coverage_profile | test_wdk_datasets_fairness | test_measurement_categories).\nRoundtrip: \"100% tests passed, 0 tests failed out of 6\" (ctest -R roundtrip; darin die 4 Registry-/Profil-Roundtrips).\nResume-Nachbarn nach der kLazyResumeRowsKey-Hebung: \"100% tests passed, 0 tests failed out of 3\" (test_lazy_resume_binary | test_tp1_planer_filter_iterator | test_f3_lager_key_provider_iterator).",
+      "status_rauchtest": "LITERAL am gebauten Binary /home/comdare/wt-e24/build-e24/apps/experiment_planner/comdare-experiment-planner:\n\n(a) LEERER STAND -> ehrlich \"keine Daten\", rc 0:\n$ comdare-experiment-planner status --root=/tmp/w5smoke/gibt_es_nicht\n[status] planer=planner@1.0.0c isa=x86_64 os=linux profil=.../m3v2_study.profile.xml root=/tmp/w5smoke/gibt_es_nicht root_vorhanden=nein fenster=unbelegt plan=erhoben source_kind=thesis profil_id=m3v2_study perms=1 mess_combos=1\n[status] quelle=messbaum keine Daten (root /tmp/w5smoke/gibt_es_nicht existiert nicht)\n[status-zelle] ceb=[all] zelle=[O3,no_extension][search_algo,cache_traversal,mapping] fenster=unbelegt perm=0 plan_schritte=9 perm_dir=fehlt gebaut=0 gemessen=0 teilweise=0 stale=0 csv_gesehen=0 sidecar_ungueltig=0 ohne_stempel=0 kopf_drift=0 zeilen_abweichung=0 offen=unbelegt\n[status-cursor] ceb=[all] zelle=[O3,no_extension][search_algo,cache_traversal,mapping] fenster=unbelegt perm=0 cursor_datei=fehlt letzte_perm=unbelegt done=unbelegt zeilen=0 zeilen_perm=0 zeilen_done=0 zeilen_fremd=0\n[status] quelle=progress_cursor keine Daten (keine der 1 Zellen hat eine progress.cursor)\n[status] quelle=result_csv keine Daten (kein result.csv unter den Perm-Verzeichnissen)\n[status] quelle=bestandslog keine Daten (COMDARE_BESTANDSLOG nicht aktiv / Ebene B fehlt)\n[status-gesamt] zellen=1 fenster=unbelegt plan_schritte=9 perm_dirs_fehlen=1 gebaut=0 gemessen=0 teilweise=0 stale=0 csv_gesehen=0 sidecar_ungueltig=0 offen=unbelegt\nRC=0\n\n(b) PRAEPARIERTER MINI-STAND (Fixture aus den ECHTEN Schreib-Formen: CSV-Kopf literal aus lazy_csv_header(), Stempel-Schwanz |rows=N, 2 gueltige 128-hex-.fingerprint + 1 kaputter, 1 result.csv.stale, progress.cursor in beiden Schreiber-Formen) -> KORREKTE Bilanz, rc 0:\n$ COMDARE_GOLDEN_N_RANGE=\"0:16\" comdare-experiment-planner status --root=/tmp/w5smoke/mini\n[status] planer=planner@1.0.0c isa=x86_64 os=linux profil=.../m3v2_study.profile.xml root=/tmp/w5smoke/mini root_vorhanden=ja fenster=0:16 plan=erhoben source_kind=thesis profil_id=m3v2_study perms=1 mess_combos=1\n[status-zelle] ceb=[all] zelle=[O3,no_extension][search_algo,cache_traversal,mapping] fenster=0:16 perm=0 plan_schritte=9 perm_dir=vorhanden gebaut=2 gemessen=1 teilweise=1 stale=1 csv_gesehen=2 sidecar_ungueltig=1 ohne_stempel=0 kopf_drift=1 zeilen_abweichung=0 offen=15\n[status-cursor] ceb=[all] zelle=[O3,no_extension][search_algo,cache_traversal,mapping] fenster=0:16 perm=0 cursor_datei=vorhanden letzte_perm=9 done=ja zeilen=3 zeilen_perm=2 zeilen_done=1 zeilen_fremd=0\n[status] quelle=bestandslog keine Daten (COMDARE_BESTANDSLOG nicht aktiv / Ebene B fehlt)\n[status-gesamt] zellen=1 fenster=0:16 plan_schritte=9 perm_dirs_fehlen=0 gebaut=2 gemessen=1 teilweise=1 stale=1 csv_gesehen=2 sidecar_ungueltig=1 offen=15\nRC=0\n(Erwartung Punkt fuer Punkt getroffen: 2 gueltige Sidecars = gebaut=2, 1 kaputter = sidecar_ungueltig=1, 1 vollstaendige CSV = gemessen=1, 1 CSV mit falschem Kopf = teilweise=1/kopf_drift=1, 1 .stale = stale=1, done-Zeile = done=ja/letzte_perm=9, offen = 16-1 = 15.)\n\n(c) HILFE: \"comdare-experiment-planner status --help\" -> 12 Zeilen Detail-Hilfe nach stdout, RC=0; \"help\" (Uebersicht) traegt Zeile 13 \"  status [<profil>] [--root=<dir>]\".\n(d) USAGE: \"status --unsinn\" -> stderr \"comdare-experiment-planner: unbekanntes Flag '--unsinn' fuer status -- erwartet: --root=<dir> (Detail: 'help status').\" RC=1.\n(e) KONFIG: \"COMDARE_GOLDEN_N_RANGE=kaputt status --root=...\" -> stderr \"[Konfig-Fehler: status] COMDARE_GOLDEN_N_RANGE erwartet 'start:count': 'kaputt'\" RC=2.\n(f) KEIN exit 6 moeglich: status bindet keinen planer_block (rein lesend).",
+      "testat_belege": [
+        "W3-DOCK (test_w3_mess_interface_testate_dock, ctest-Test #339, Passed) -- ZWEI ECHTE dlopen-Module, Reihenfolge import -> GATE -> Testate. Traeger (a) anatomy_codegen_pilot_wormhole_shared: GATE cases 1104/1104 first_fail=0; Traeger (b) perm_adhoc_buildvariant: GATE cases 1144/1144 first_fail=0. Je Traeger identische Quoten: IObservableTier 28/28, IMeasurableWorkloadV2 12/12, IMeasurableWorkloadV3 10/10, IRollbackableTier 6/6, IMigratableTier 5/5, IResourceControllableTier 13/13, IAllocatorProxyTier 5/5 -- alle first_fail=0, alle cases_total > 0 (Anti-Leerlauf-Pin literal geprueft).",
+        "ANTI-LEERLAUF je Interface, literal aus dem ctest-Protokoll: IObservableTier -- benannte Feld-Summe Fenster 1 (400 Ops) = 65967 vs Fenster 2 (1200 Ops) = 155008 [Pilot] bzw. 4893869 vs 8058272 [adhoc] => 'Zaehler bewegen sich REAL mit der Op-Zahl: OK'; Pfad-B seg_ns-Summe 209151 bzw. 124921 > 0; T0-Summe nach tier_reset_statistics ohne neue Ops = 0 bei unveraendertem Fuellstand.",
+        "ANTI-LEERLAUF IMeasurableWorkloadV2: batches_measured 8, alle vier instrumentierten Segmente > 0 ns, Summe der 4 Segmente = 434392 == total_ns [Pilot] bzw. 352632 == total_ns [adhoc]; doppelte Batch-Zahl -> doppelt gezaehlte Batches.",
+        "KERN-TESTAT IMeasurableWorkloadV3 (die erforschte P-MD3-Invariante, uebernommen aus test_seg_coverage.cpp:88, NICHT neu erfunden; Summe ueber kV3AxisCount, nie ueber ein Literal): Pilot seg_sum=732374 + seg_framework_ns=2850 == seg_run_total_ns=735224 EXAKT; adhoc 708633 + 2840 == 711473 EXAKT. 18 von 18 Achsen-Segmenten tragen reale ns.",
+        "IRollbackableTier: 248 belegte Schluessel [Pilot] bzw. 126 [adhoc] vor save; Mutation REAL wirksam; rollback stellt JEDEN Schluessel/Wert und die Groesse exakt wieder her; zweiter rollback idempotent; GEGENPROBE ohne rollback weicht ab (Vergleich nicht-vakuos).",
+        "IResourceControllableTier: Caps-Meta konsistent (5 Felder != 0 == controllable_axis_count=5); per-Feld-Konsum GEMESSEN statt behauptet -- Pilot thread=0/prefetch=0/pool=0/batch=1/inline=1, applied(voll)=2; adhoc applied(voll)=3; ADDITIVITAET Summe(Einzel-Felder) == applied(voll) OK auf BEIDEN Traegern; T8-Phantom-Guard (thread_count label-only, nie applied) OK; ueber-Cap-Werte werden geklammert, nicht abgewiesen; unter angewandter Steuerung bewegen sich die Observer-Zaehler weiter (benannte Feld-Summe 151295).",
+        "IAllocatorProxyTier -- aus der bisherigen REPORT-Probe ohne Assertion wird eine ASSERTION (probe_allocator_proxy WIEDERVERWENDET, nicht dupliziert): interface_present + identity_present + format_version ASSERTIERT; stats_route deklariert (flags=7) und Zaehler bewegen sich unter Last -- Pilot allocation_count 490 -> 617, total_bytes_allocated 67944 -> 74040; adhoc 425 -> 659 bzw. 6946840 -> 10780696.",
+        "SCHEMA-WACHE (kV3AxisSchema-getrieben, nichts hartkodiert): je Achse ein Fall 'unbenannter Schema-Slot bleibt 0' -- 18/18 OK auf beiden Traegern. Ein Wert in einem Slot ohne Schema-Namen waere eine Zahl ohne CSV-Spalte (Fehlerklasse des A8-S1-Befunds seg_ns[17]).",
+        "EINZIGQUELLEN-KOPPLUNG dreifach: (i) 9 static_assert std::is_base_of_v<Interface, SearchAlgorithmAbiAdapter<SearchAlgorithmAnatomy<WormholeComposition>>> -- compile-hart gegen den REALEN Adapter; (ii) dieselbe 9er-Liste als dynamic_cast != nullptr AM MODUL, nullptr ist FEHLER statt Skip -- 9/9 auf beiden Traegern; (iii) cases_total > 0 je Quote.",
+        "W3-BISS (test_w3_mess_interface_testate_biss, ALLE OK): 8 Broken-Huellen beissen alle literal -- IObservableTier/Zaehler eingefroren (kaputt 26/28 first_fail=24), IObservableTier/unbenannter Schema-Slot belegt (27/28 first_fail=3), V2/total_ns-Bruch (11/12 first_fail=11), V3/Identitaets-Bruch (9/10 first_fail=9), Rollback-No-Op (3/6 first_fail=3), Migration verliert Records (3/6 first_fail=3), RC-Phantom-applied (12/13 first_fail=8), Allocator-Zaehler eingefroren (4/5 first_fail=5); die korrekte Referenz-Huelle besteht jeweils voll (28/28, 12/12, 10/10, 6/6, 13/13, 5/5).",
+        "tier_moves REAL > 0 BEWIESEN in der Biss-TU an einer AKTIVEN Migrations-Strategie: 'aktive Migrations-Strategie: tier_migrate_step(32) bewegte 32 Records' + moved <= max_moves + tier_size unveraendert (64) -- der Beweis, den das geladene Modul nicht fuehren kann (s. Abweichung 1).",
+        "W5 (test_w5_status_reader, ALLE OK): Schreiber-Formen des progress.cursor VIERFACH literal gepinnt; Drift-Gegenprobe (3 nahe, falsche Formen zaehlen als fremd, bewegen letzte_perm nicht, setzen done nicht); Mini-Stand gebaut=3/sidecar_ungueltig=1/csv_gesehen=5/gemessen=2/teilweise=3/kopf_drift=1/zeilen_abweichung=1/ohne_stempel=1/stale=1; Bestandslog-Roundtrip doc_revision=17, res offen/done/released 1/1/1, res_ohne_eta=2; leerer Stand liefert vier ehrliche 'keine Daten'-Zeilen; Determinismus: zwei Laeufe ueber denselben Stand byte-gleich."
+      ],
+      "neutralitaet": [
+        "abi/ -- git diff --numstat 60c7c56a -- libs/cache_engine/include/cache_engine/abi/ => 0 Zeilen.",
+        "Frozen-Vektor -- 'grep -cE 0fe275bd|kFrozenFingerprintV1' ueber den GESAMTEN Diff 60c7c56a..HEAD => 0 Treffer; die 3 TUs tragen ihn unveraendert: tests/unit/test_g3_sha512_index.cpp:1, tests/unit/test_w10_system_cell_values.cpp:1, tests/unit/test_m_w12_stamp_bausteine.cpp:1.",
+        "golden-CRC -- 'grep -c F1C1F26A1232073B' ueber den Diff => 0 Treffer (Anker unberuehrt).",
+        "golden-320 -- 3/3 je Commit gruen ('100% tests passed, 0 tests failed out of 3'); 'git diff --name-only | grep -c golden_fullpilot_320' => 0.",
+        "Roundtrip -- 6/6 gruen ('100% tests passed, 0 tests failed out of 6'), darin die 4 Registry-/Profil-Roundtrips.",
+        "XML byte-stabil -- 'git diff --name-only 60c7c56a | grep -c \\.xml$' => 0 Dateien.",
+        "conformance_gate.hpp BYTE-UNBERUEHRT -- git diff --numstat => 0 Zeilen (das neue mess_interface_testate.hpp ist ein SIBLING, keine Erweiterung).",
+        "EINZIGE Beruehrung bestehender Mess-Substanz: cache_engine_builder_iterator.hpp, 11 Zeilen -- 6 Kommentar + 1 neue Konstante 'inline constexpr char kLazyResumeRowsKey[] = \"|rows=\";' + 2 string-identische Ersetzungen des nackten Literals (Leser :949, Schreiber :1947). Der emittierte Stempel ist per Konstruktion byte-identisch; belegt zusaetzlich durch test_lazy_resume_binary + test_tp1_planer_filter_iterator + test_f3_lager_key_provider_iterator (3/3 gruen).",
+        "cf22 -- /home/comdare/tools/clang-format-22.1.8 (Ubuntu clang-format version 22.1.8) --dry-run --Werror mit DATEI-ARGUMENTEN ueber ALLE 11 beruehrten .cpp/.hpp => 0 Befunde.",
+        "ASCII -- 'git diff 60c7c56a | grep ^+ | grep -cP [^\\x00-\\x7F]' => 0 (alle neuen Dateien, alle Diff-Zusaetze inkl. CMake-Bloecke und MANUAL_RUN-Abschnitt sind ASCII-only).",
+        "3-Marker (Zeilenanfangs-Form) -- 'git diff 60c7c56a | grep -cE ^\\+(<<<<<<<|=======|>>>>>>>)' => 0.",
+        "Wortgrenzen-Orakel ueber die neuen Bezeichner -- \\bmess_interface_testate\\b: genau 3 Fundstellen (Header + 2 TUs) plus die Test-Namen im CMake; \\btestat_*\\b je 3-6 Fundstellen ausschliesslich in Header/Dock-TU/Biss-TU; \\bmess_testat_detail\\b nur im Header. Keine verirrten Konsumenten.",
+        "cppcheck-Adjazenz-Falle strukturell umgangen -- die W3-Dock-TU nimmt die DLL-Pfade als $<TARGET_FILE>-ARGUMENTE statt als -D-Pfad-Makros; praezise Probe 'Makro-Token neben String-Literal' ueber alle Diff-Zusaetze => 0 Treffer (die 2 Roh-grep-Treffer sind Env-Variablen-NAMEN INNERHALB von Literalen, keine Makros).",
+        "Freeze -- git status --porcelain nach jedem Commit und am Ende: 0 Zeilen.",
+        "KEIN Push / KEIN Merge -- 'git branch -r --contains HEAD' => 0; Branch w5-w3-kern NEU ab 60c7c56a, HEAD ac033634 rein lokal."
+      ],
+      "abweichungen": [
+        "(1) SUBSTANZ-ABWEICHUNG, IST-belegt: der Plan forderte fuer IMigratableTier 'tier_moves REAL > 0 (P4-#123)' AM GELADENEN MODUL. Das ist am Objekt NICHT beweisbar: 'grep -n migration_policy libs/cache_engine/compositions/*.hpp' zeigt AUSNAHMSLOS NoMigration (13/13 Dateien), ebenso die AdHoc-Buildvariante (genus_adhoc_buildvariant.cpp:38). Beide vom Plan benannten Traeger-DLLs koennen also nur 0 bewegen -- eine >0-Forderung waere ein Testat, das die Wirklichkeit nicht kennt (und ein neuer DLL-Bau ist per Plan-Scope ausgeschlossen). GELOEST statt umgangen: das Modul-Testat prueft den Vertrag, der fuer BEIDE Strategien gilt (moved <= max_moves, funktionale AEQUIVALENZ ueber alle 512 Schluessel, Nullpunkt als exakter No-Op benannt); der aktive Ast wird in der Biss-TU an einer aktiven Fixture-Strategie scharf geprueft (literal 32 bewegte Records, verlustfrei). Die Ableitung ist im Header (b.5-Kopfkommentar) und in der Commit-Notiz deklariert.",
+        "(2) LAYERING-ABWEICHUNG: der Plan sah die W5-SOLL-PODs im planner_status_reader.hpp und dessen Include im Fassaden-Header. Das haette JEDEM Konsumenten von profile_run_facade.hpp -- auch dem CEB-Treiber im super-Repo -- die Include-Anforderungen von bestandslog_document.hpp (serialization/xml_config_parser/xml_reader.hpp) aufgezwungen und den im Header selbst festgeschriebenen 'umbrella-frei fuer den Treiber'-Anspruch gebrochen (real aufgetreten: fatal error beim Bau der Planer-App). LOESUNG: dritter, std-only Header planner/planner_status_types.hpp traegt die flachen Naht-PODs, den Fassaden-Header inkludiert nur DIESER; der Leser mit Bestandslog-/Sidecar-Headern wird nur von App und TU inkludiert. PODs an der Naht, Substanz dahinter.",
+        "(3) Der Plan wollte den SOLL-Sammler im Planer-Header. construct_plan_into ist file-lokal (anonymer Namespace) in profile_run_facade.cpp, und experiment_plan_director.hpp ist laut Header-Doktrin 'NUR in der Fassaden-.cpp'. Deshalb: der sammelnde ConcreteBuilder (StatusSollBuilder) lebt in der Fassaden-.cpp und die App bekommt die flache PlanSollSicht ueber die neue Naht collect_plan_soll_facade(). Zwei neue Fassaden-Funktionen statt einer (zusaetzlich mess_format_fakten_facade fuer csv_header/rows_key) -- beide rein additiv, keine bestehende Signatur beruehrt.",
+        "(4) AUSGABE-PRAEZISIERUNG statt Plan-Feld 'geplant': das Plan-Format sah EIN Feld 'geplant=N'. Am Objekt sind das ZWEI verschiedene Groessen -- die Schritt-Zahl des Stufe-1-Director-Walks (immer bekannt) und das Binary-SOLL des Organ-Fensters (nur bei gepinntem COMDARE_GOLDEN_N_RANGE bekannt; der Plan traegt es nicht, die Emission reicht es als Shell-Variable durch). Beide unter einem Schluessel zu fuehren waere genau die Sorte stiller Vermischung, die der Auftrag verbietet. Jetzt: plan_schritte=<n> UND offen=<n|unbelegt>; ohne Fenster steht der Sentinel, nie eine abgeleitete Zahl.",
+        "(5) Der Platten-Scan laeuft REKURSIV (tiefen-gekappt auf 8) unter dem Perm-Verzeichnis statt entlang des fest verdrahteten Unterpfades e4_xml/dll/<stem>. Begruendung im Header: die Zwischen-Segmente sind Wissen der SCHREIBER-Seite; nachgebaut waeren sie eine zweite Wahrheit, und bei Layout-Drift meldete der Bericht still '0 gemessen' statt 'nicht gefunden'. Der Rauchtest laeuft trotzdem gegen die ECHTE Struktur (_all_/perm0/e4_xml/dll/<stem>) und findet sie.",
+        "(6) Zusatz-Zaehler ueber den Plan hinaus, weil sonst Befunde verschwinden: teilweise wird nach ohne_stempel / kopf_drift / zeilen_abweichung aufgeschluesselt; der Cursor meldet zeilen_perm / zeilen_done / zeilen_fremd (zeilen_fremd ist der Drift-Anzeiger der cross-repo-Format-Kopplung).",
+        "(7) Zwei Biss-Fakes fuer IObservableTier statt einem (Plan: 'je Testat EIN Fake'), weil dieses Testat zwei getrennte Kern-Aussagen traegt: die Schema-Wache und der Anti-Leerlauf. Ein Fake haette nur eine davon bebissen.",
+        "(8) EINE Diagnose-Zeile in test_w5_status_reader gibt lazy_csv_header() literal ins ctest-Protokoll aus. Grund: der geforderte Rauchtest am ECHTEN Binary braucht eine Fixture mit dem ECHTEN CSV-Kopf; ohne diese Zeile haette die Fixture den Kopf nachbauen muessen (= Format-Duplikat). Die Zeile ist zugleich Doku dessen, wogegen der Leser die Kopf-Identitaet prueft.",
+        "(9) MANUAL_RUN.md hatte GAR KEINEN Planer-Abschnitt (W1 hat keinen angelegt). Neuer Abschnitt 6 (Root-Default, Fenster-Semantik, Bestandslog-Gate, Exit-Codes, kein watch); der bisherige Abschnitt 6 'Plattform-Hinweise' wird zu 7. Rein additiv, nichts geloescht.",
+        "(10) apps/experiment_planner/CMakeLists.txt bekommt zusaetzlich die libs/common-WURZEL im Include-Pfad (bestandslog_document.hpp inkludiert <serialization/xml_config_parser/xml_reader.hpp>, also die Wurzel, nicht deren serialization/-Unterverzeichnis). Die bestehende serialization/-Zeile bleibt (W1-Form ohne Praefix)."
+      ],
+      "offene_punkte": [
+        "CROSS-REPO-FORMAT-KOPPLUNG progress.cursor bleibt bestehen: Schreiber in super Code/02_messung_driver/main.cpp:1185-1194, Leser neu in ce. Abgesichert durch benannte Konstanten + vier literale TU-Pins + zeilen_fremd-Drift-Zaehler, aber die ECHTE Single-Source ist erst mit #35-.so erreichbar -- Nach-Abgabe-Posten, im Header deklariert.",
+        "planer_block-Reaper (f7-Lens 7) wurde durch W5 bewusst NICHT akut: status bindet keinen Block. Bleibt benannter Nach-Abgabe-Posten.",
+        "R-G2 / Posten 92 (Registry-Kanon-Divergenz validate=2er vs plan=3er) NICHT beruehrt -- status geht ueber denselben 3er-Resolve wie plan, nichts nebenbei geheilt.",
+        "NACH-ABGABE-STRECKE (Owner-Schnitt, bewusst NICHT gebaut): Deep-Research-Katalog je Achse, per-Binary-Vollbeleg aller Achsen-Algorithmen, GTest-Harness am Dock, 64-Misch-Abnahme.",
+        "DOCK-INTEGRATION der Testat-Funktionen in den CEB-Pruefstand-Batch (measure()/pruef_only) ist vorbereitet, aber nicht vollzogen -- die Funktionen nehmen Interface-Referenzen und sind noexcept-Quoten, die Integration ist damit rein additiv (Nach-Abgabe).",
+        "Fuer ein tier_moves>0-Testat AM GELADENEN MODUL braeuchte es einen Traeger mit aktiver migration_policy (HotColdMigration). Das waere ein NEUER DLL-Bau (per Plan-Scope ausgeschlossen) -- als Nach-Abgabe-Kandidat notiert; die Aussage selbst ist heute in der Biss-TU belegt.",
+        "Der Bestandslog-WEG des status ist offline gedeckt (Gate-Logik + parse-Roundtrip), aber NICHT gegen ein echtes minio gefahren -- die TU ist bewusst netzfrei. Ein erster Lauf mit COMDARE_BESTANDSLOG=true + erreichbarer Ebene B steht aus.",
+        "SUPER-SUB-BAU NICHT GEFAHREN (nur ce-standalone in build-e24, Auftrag: kein Push/Merge). Der super-Treiber inkludiert profile_run_facade.hpp und bekommt damit den neuen transitiven Include <profile_facade/planner/planner_status_types.hpp> -- std-only und unter der bereits vorhandenen PUBLIC-Wurzel libs/cache_engine, also erwartungsgemaess neutral; VOR der Landung im super-Sub-Build gegenpruefen (Falle 'lokale Voll-Bau-Luecken = falsches Gruen').",
+        "CI/lint:static (cppcheck) nicht gefahren -- die Adjazenz-Falle ist strukturell umgangen ($<TARGET_FILE>-Argumente statt -D-Pfad-Makros, praezise Probe 0 Treffer), aber der Job selbst laeuft erst nach dem Push.",
+        "KEIN Push, KEIN Merge (Auftrag). Branch w5-w3-kern, HEAD ac033634, Working-Tree-Freeze steht (0 Zeilen). Der Landungs-Vollzug (rescue-Refs, gitleaks, Merge --no-ff, Pipeline-Wache, main-FF, super-Gitlink) liegt beim Lead."
+      ]
+    },
+    "review": {
+      "befunde": [
+        "KEINE blockierenden Befunde. Alle Kern-Behauptungen des Bau-Reports am Objekt bestaetigt.",
+        "Minor (nicht blockierend): resolve_status_root nutzt CWD-relative Defaults (Code/measure_out, measure_out) -- korrekt in help und Kopfzeile deklariert, aber Aufrufe aus fremdem CWD ohne --root melden dann ehrlich root_vorhanden=nein statt den Repo-Baum zu finden.",
+        "Minor (nicht blockierend): stempel_zeilenzahl nutzt rfind(rows_key) -- robust auch falls '|rows=' im Config-Praefix auftauchte; kein Handlungsbedarf.",
+        "Minor (nicht blockierend): der Platten-Scan zaehlt Dateien unterhalb kMaxScanTiefe=8 nicht (bounded by design, Abweichung 5 deklariert); bei der echten Struktur _all_/perm0/e4_xml/dll/<stem> (Tiefe 3) irrelevant -- im Eigenlauf-Rauchtest gefunden.",
+        "Deklarierte Abweichungen 1-10 IST-geprueft: (1) NoMigration 13/13 compositions + genus_adhoc_buildvariant bestaetigt, tier_moves>0 in Biss-TU an aktiver Fixture bewiesen (32 Records, verlustfrei); (2)+(3) Layering-Schnitt planner_status_types.hpp std-only, Fassaden-Header inkludiert nur die PODs -- korrekt; (7) zwei Obs-Fakes decken Schema-Wache UND Anti-Leerlauf getrennt; (9) MANUAL_RUN.md rein additiv (einzige Minus-Zeile = Umnummerierung 6->7).",
+        "Offene Punkte des Reports sind ehrlich und vollstaendig: super-Sub-Bau nicht gefahren (transitiver Include planner_status_types.hpp ist std-only unter vorhandener PUBLIC-Wurzel -- erwartungsgemaess neutral, VOR Landung im super-Sub-Build gegenpruefen), cppcheck-CI-Job laeuft erst nach Push (Adjazenz-Probe eigen: 0 Treffer), Bestandslog-Weg nie gegen echtes minio gefahren."
+      ],
+      "selbst_verifiziert": [
+        "W5-Rauchtest (a) leer SELBST am gebauten Binary: status --root=/tmp/.../gibt_es_nicht -> vier ehrliche 'keine Daten'-Zeilen (messbaum/progress_cursor/result_csv/bestandslog), offen=unbelegt, RC=0 -- literal identisch mit dem Report",
+        "W5-Rauchtest (b) SELBST praeparierter Mini-Stand aus den ECHTEN Schreib-Formen (CSV-Kopf literal aus dem ctest-Protokoll der W5-TU, Stempel-Schwanz |rows=N, 2 gueltige 128-hex-Sidecars + 1 kaputter, .stale, progress.cursor beide Schreiber-Formen): COMDARE_GOLDEN_N_RANGE=0:16 -> gebaut=2 gemessen=1 teilweise=1 kopf_drift=1 stale=1 csv_gesehen=2 sidecar_ungueltig=1 offen=15, Cursor letzte_perm=9 done=ja, RC=0 -- Punkt fuer Punkt korrekt",
+        "W5-CLI-Kanten SELBST: 'status --help' 12 Zeilen RC 0; Uebersicht Zeile 13 status; '--unsinn' -> exakte stderr-Meldung RC 1; COMDARE_GOLDEN_N_RANGE=kaputt -> '[Konfig-Fehler: status] ... erwartet start:count' RC 2",
+        "W5 KEINE Format-Duplikate (grep): read_fingerprint_sidecar (5 Konsumenten inkl. Skip-Gate), parse_bestandslog (6), lazy_csv_header/kLazyResumeRowsKey via mess_format_fakten_facade aus der Iterator-Substanz; progress.cursor-Leser ist der ERSTE Leser, Konstanten byte-identisch gegen super Code/02_messung_driver/main.cpp:1187+1189 verifiziert ('[progress] done perm=...' + ' window-complete' / '[progress] perm=...' + ' axes_changed=')",
+        "Iterator-Hebung verifiziert: git diff zeigt exakt 11 Zeilen -- 6 Kommentar + kLazyResumeRowsKey=\"|rows=\" + 2 string-identische Ersetzungen (Leser :949, Schreiber :1947); Emission per Konstruktion byte-identisch",
+        "W3 am Objekt: abi_adapter.hpp:238-245 messungs-gegatete Vererbung bestaetigt; Dock-TU dlopen't 2 BESTEHENDE SHARED-Targets (add_dependencies, $<TARGET_FILE>-ARGUMENTE statt -D-Makros), Reihenfolge import->GATE->Testate im Code verifiziert; Eigenlauf: GATE 1104/1104 [Pilot] + 1144/1144 [adhoc] first_fail=0, Quoten 28/28+12/12+10/10+6/6+5/5+13/13+5/5 auf BEIDEN Traegern",
+        "W3 Anti-Leerlauf im Eigenlauf literal: benannte Feld-Summe 65967->155008 [Pilot] bzw. 4893869->8058272 [adhoc] (3x Ops -> groessere Summe); KERN-Invariante Sum(seg_ns)+seg_framework_ns==seg_run_total_ns OK auf beiden Traegern (Summe ueber kV3AxisCount); Ursprung test_seg_coverage.cpp:88 verifiziert (uebernommen, nicht neu erfunden)",
+        "W3-Biss im Eigenlauf: alle 8 Broken-Huellen beissen literal (26/28 ff=24, 27/28 ff=3, 11/12 ff=11, 9/10 ff=9, 3/6 ff=3, 3/6 ff=3, 12/13 ff=8, 4/5 ff=5), korrekte Referenz besteht voll; aktive Migrations-Fixture: tier_migrate_step(32) bewegte 32 Records, tier_size=64 unveraendert; kV3AxisSchema[2].names[7]==nullptr (Defekt-2-Slot) am Schema verifiziert",
+        "W3 Doppelungs-Check: test_d13_dll_runtime_measure deckt nur IMeasurableWorkload V1 (0 grep-Treffer segmented_v2/seg_run_total), Dock-TU macht V1 explizit nur als Quer-Konsistenz; Wortgrenzen-Orakel: testat_*-Funktionen NUR in Header + 2 TUs + CMake; Scope-Grenze eingehalten (kein neuer DLL-Bau, COMDARE_MEASUREMENT_MODE-Gate im CMake, Vollausbau als Nach-Abgabe deklariert)",
+        "Neutralitaet SELBST: abi/-Diff 0 Zeilen; Frozen-Vektor 0fe275bd/kFrozenFingerprintV1 0 Treffer im Diff + 3 Traeger-TUs tragen ihn unveraendert; golden-CRC F1C1F26A1232073B 0 Treffer; XML 0 Dateien; conformance_gate.hpp 0 Zeilen (Sibling bestaetigt)",
+        "golden 3/3 EIGENLAUF: Tests #320-322 Passed, '100% tests passed, 0 tests failed out of 3'; Roundtrip EIGENLAUF: 6/6 Passed inkl. der 4 Registry-/Profil-Roundtrips",
+        "EIGENER DOPPELLAUF am Commit-Objekt ac033634: frisches Configure (cmake . rc 0) + Voll-Bau (rc 0, 1321 Targets) + 2x voll-ctest -j1: BEIDE literal '100% tests passed, 0 tests failed out of 408'; N-Kette per-Commit-Diff verifiziert: C1 +2 add_test, C2 +1, C3 +0 -> 405+2+1=408 arithmetisch geschlossen",
+        "cf22 SELBST: /home/comdare/tools/clang-format-22.1.8 --dry-run --Werror ueber ALLE 11 beruehrten .cpp/.hpp mit Datei-Argumenten -> 0 Befunde, rc 0; 3-Marker 0; ASCII-Zusaetze 0 Nicht-ASCII im gesamten Diff; praezise cppcheck-Adjazenz-Probe (Makro-Token neben String-Literal in Code-Zusaetzen) 0 Treffer",
+        "Freeze + Topologie: git status --porcelain 0 Zeilen VOR und NACH allen Review-Laeufen; git branch -r --contains HEAD leer (kein Push); exakt 3 Commits 60c7c56a..ac033634; Basis-Commit-Message traegt 'Gate 405' konsistent"
+      ],
+      "verdikt": "LANDEBEREIT"
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Planung"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Bau"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "plan:w5w3",
+      "phaseIndex": 1,
+      "phaseTitle": "Planung",
+      "agentId": "a810a26737019319f",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785939918823,
+      "queuedAt": 1785939918815,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "PLAN FERTIG (read-only erstellt). Pflicht-Vorlauf vollzogen…",
+      "promptPreview": "PLANUNGS-AUFTRAG W5+W3-Kern (READ-ONLY; Plan nach /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/w5w3/plan.md, mkdir -p erlaubt):\nW5-KERN + W3-KERN (Owner-Entscheide mittag-6; nach W1-Landung ce dev==main==60c7c56a Gate 405):\n**W5-KERN (F7/R5):** NEUES Subkommando **status** in der Planer-Binary comdare-experiment-planner (apps/experiment_planner/main.cpp — der Baue…",
+      "lastProgressAt": 1785940724233,
+      "tokens": 204943,
+      "toolCalls": 66,
+      "durationMs": 805410,
+      "resultPreview": "{\"status\":\"PLAN FERTIG (read-only erstellt). Pflicht-Vorlauf vollzogen: Ledger 05.08. komplett gegrept (mittag-4/-6/-7, nachmittag-2/-5, Posten-92-Deklaration :4102), synthese.md + rufkette.md + f5/f7-Lenses gelesen, IST am Objekt wt-e24 (Basis 60c7c56a, Branch aktuell hotfix-cppcheck -- w5-w3-kern muss vor C1 neu ab 60c7c56a gesetzt werden) verifiziert: W5-Andockpunkt apps/experiment_planner/main…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "probe:opus5",
+      "phaseIndex": 2,
+      "phaseTitle": "Bau",
+      "agentId": "a570ae256a47f6cb5",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785940724234,
+      "queuedAt": 1785940724233,
+      "attempt": 1,
+      "promptPreview": "Antworte NUR mit OK.",
+      "lastProgressAt": 1785940726623,
+      "tokens": 22227,
+      "toolCalls": 0,
+      "durationMs": 2389,
+      "resultPreview": "OK"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "bau:w5w3",
+      "phaseIndex": 2,
+      "phaseTitle": "Bau",
+      "agentId": "a29d25ae99bfb2774",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785940726632,
+      "queuedAt": 1785940726624,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FERTIG -- W5-KERN + W3-KERN gebaut, 3 Commits auf /home/com…",
+      "promptPreview": "BAU-AUFTRAG W5+W3-Kern (Plan BINDEND — /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/w5w3/plan.md KOMPLETT lesen; Planer-Report: {\"status\":\"PLAN FERTIG (read-only erstellt). Pflicht-Vorlauf vollzogen: Ledger 05.08. komplett gegrept (mittag-4/-6/-7, nachmittag-2/-5, Posten-92-Deklaration :4102), synthese.md + rufkette.md + f5/f7-Lenses gelesen, IST am Objekt wt-e24 …",
+      "lastProgressAt": 1785944671732,
+      "tokens": 434710,
+      "toolCalls": 188,
+      "durationMs": 3945100,
+      "resultPreview": "{\"status\":\"FERTIG -- W5-KERN + W3-KERN gebaut, 3 Commits auf /home/comdare/wt-e24 Branch w5-w3-kern (NEU ab 60c7c56a), HEAD=ac033634. Gate je Commit voll gefahren (frisches Configure am Commit-Objekt + Voll-Bau + 2x voll-ctest SERIELL + golden 3/3 + Roundtrip 6/6 + Neutralitaets-Beweise + cf22 + ASCII + 3-Marker + Wortgrenzen-Orakel + Freeze 0 Zeilen). ctest-N 405 -> 407 (C1) -> 408 (C2) -> 408 (C…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "rev:w5w3",
+      "phaseIndex": 3,
+      "phaseTitle": "Review",
+      "agentId": "ab8fc320457d08b29",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785944671748,
+      "queuedAt": 1785944671733,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDEBEREIT",
+      "promptPreview": "REVIEW Fable W5+W3 (READ-ONLY /home/comdare/wt-e24 Branch w5-w3-kern, Basis 60c7c56a). Bau-Report: {\"status\":\"FERTIG -- W5-KERN + W3-KERN gebaut, 3 Commits auf /home/comdare/wt-e24 Branch w5-w3-kern (NEU ab 60c7c56a), HEAD=ac033634. Gate je Commit voll gefahren (frisches Configure am Commit-Objekt + Voll-Bau + 2x voll-ctest SERIELL + golden 3/3 + Roundtrip 6/6 + Neutralitaets-Beweise + cf22 + ASCI…",
+      "lastProgressAt": 1785945224431,
+      "tokens": 149997,
+      "toolCalls": 56,
+      "durationMs": 552683,
+      "resultPreview": "{\"befunde\":[\"KEINE blockierenden Befunde. Alle Kern-Behauptungen des Bau-Reports am Objekt bestaetigt.\",\"Minor (nicht blockierend): resolve_status_root nutzt CWD-relative Defaults (Code/measure_out, measure_out) -- korrekt in help und Kopfzeile deklariert, aber Aufrufe aus fremdem CWD ohne --root melden dann ehrlich root_vorhanden=nein statt den Repo-Baum zu finden.\",\"Minor (nicht blockierend): st…"
+    }
+  ],
+  "totalTokens": 811877,
+  "totalToolCalls": 310
+}
