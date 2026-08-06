@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comdare_experiment [<!ENTITY ax "&#60;axis ref='phantom_axis' allowed_variants='m n'/>">]>
 <!-- ====================================================================
      experiment_golden_kern.xml
      KANONISCH AB #48. Jede Schema-Evolution zuerst HIER (STETS gepflegt).
@@ -232,6 +233,7 @@
     <axis ref="queuing_q1"                                              allowed_variants="no_buffer fifo_queue"/>
     <axis ref="queuing_q2"                                              allowed_variants="eager_flush watermark_flush"/>
     <axis ref="persistence_target"                                      allowed_variants="persistence_memory_only"/>
+  &ax;
   </axes_default_lookup>
 
   <!-- N MASCHINENLESBAR (B14-NB2-Heilung H1, zweites Bein). cap = max_binaries-

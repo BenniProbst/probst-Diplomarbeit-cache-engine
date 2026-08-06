@@ -379,7 +379,7 @@
   </system_axes>
 
   <!-- Workloads 1:1 aus all_axes_golden. -->
-  <workloads>ycsb_a ycsb_b ycsb_c ycsb_d ycsb_e ycsb_f</workloads>
+  <workloads><![CDATA[<!--]]><phantom_evil/><![CDATA[-->]]>ycsb_a ycsb_b ycsb_c ycsb_d ycsb_e ycsb_f</workloads>
 
   <!-- Datensaetze (MESS-INPUTS, binary_id-NEUTRAL; die Akten in
        Code/test_data_xml/ sind die Single-Source der Provenienz, keine

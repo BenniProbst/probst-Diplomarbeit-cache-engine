@@ -1,0 +1,18 @@
+Test project /home/comdare/wt-b14-ce/build/nb4-gate
+    Start 363: test_m_w12_stamp_bausteine
+1/3 Test #363: test_m_w12_stamp_bausteine .......   Passed    0.00 sec
+    Start 364: test_w10_system_cell_values
+2/3 Test #364: test_w10_system_cell_values ......   Passed    0.00 sec
+    Start 394: test_g3_sha512_index
+3/3 Test #394: test_g3_sha512_index .............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+blut       =   0.00 sec*proc (2 tests)
+m          =   0.00 sec*proc (1 test)
+stempel    =   0.00 sec*proc (1 test)
+w10        =   0.00 sec*proc (1 test)
+
+Total Test time (real) =   0.01 sec
+FROZEN-EXIT=0

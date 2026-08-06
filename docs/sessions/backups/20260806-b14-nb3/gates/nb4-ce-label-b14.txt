@@ -1,0 +1,19 @@
+Test project /home/comdare/wt-b14-ce/build/nb4-gate
+    Start 409: test_b14_layout_scan_line_subaxis
+1/2 Test #409: test_b14_layout_scan_line_subaxis .........   Passed    0.01 sec
+    Start 410: test_b14_abi_adapter_line_subaxis_paths
+2/2 Test #410: test_b14_abi_adapter_line_subaxis_paths ...   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+abi              =   0.04 sec*proc (1 test)
+anatomy          =   0.04 sec*proc (1 test)
+axes             =   0.01 sec*proc (1 test)
+b14              =   0.05 sec*proc (2 tests)
+cacheline        =   0.05 sec*proc (2 tests)
+memory_layout    =   0.05 sec*proc (2 tests)
+standalone       =   0.01 sec*proc (1 test)
+
+Total Test time (real) =   0.05 sec
+LABEL-B14-EXIT=0

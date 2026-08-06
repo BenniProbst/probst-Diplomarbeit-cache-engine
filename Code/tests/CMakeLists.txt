@@ -142,6 +142,9 @@ endif()
 # (fixture_sync_check.cmake). Fehlt ein Nachbar-Checkout, SKIP sauber (SKIP_REGULAR_EXPRESSION).
 # UEBERGANG bis E7-Single-Source (Bruecke I7) — danach durch die Single-Source-Struktur abloesbar.
 # Label da_unit: laeuft im test:unit-Gate (ctest -L da_unit); braucht kein Build-Target.
+# STAND-NACHZUG 2026-08-06 (B14/Scheibe 6): die KANONISCHE golden ist seit dem 27.07. NICHT mehr
+# experiment_golden.xml, sondern experiment_golden_kern.xml. Deren Wache steht weiter unten
+# (fixture_schema_subset_check.cmake); dieser Block hier bewacht das WEITER PRODUKTIVE Alt-Paar.
 # ─────────────────────────────────────────────────────────────────────────────
 add_test(NAME test_fixture_sync_experiment_golden
     COMMAND "${CMAKE_COMMAND}"
@@ -153,6 +156,83 @@ add_test(NAME test_fixture_sync_prt_registry
         "-DMASTER=${COMDARE_PRT_ART_DIR}/prt_art/algorithm_profiles/prt_art_axis_registry.xml"
         "-DKOPIE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/prt_art_axis_registry.xml"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_sync_check.cmake")
+
+# #48-SCHEIBE-6 (B14, 2026-08-06) -- die Wache des NEU-PAARES experiment_golden_kern.xml.
+# Die zwei add_test oben bleiben UNVERAENDERT: das Alt-Paar experiment_golden.xml ist zwar seit dem
+# 27.07. inhaltlich deprecated, treibt aber weiterhin real den Antriebs-Test (02_messung_driver/
+# CMakeLists.txt setzt COMDARE_V32_EXPERIMENT_GOLDEN_XML darauf). Seine Wache abzuschalten waere ein
+# Wach-Verlust ohne Gegenwert -- Scheibe 6 ist deshalb ein HINZUFUEGEN, kein Umbiegen.
+# Das Neu-Paar ist KEIN Byte-Paar (die ce-Datei ist eine eigenstaendige Naht-Fixture mit absichtlich
+# abweichenden Werten, literal verdrahtet in test_experiment_kern_seam.cpp) -- die Begruendung und die
+# offene ce-Umbenennungs-Auflage stehen im Kopf von fixture_schema_subset_check.cmake.
+# Geprueft wird deshalb das gemeinsame VOKABULAR gegen die EINE Single-Source experiment_schema.xsd:
+# beide Seiten duerfen nur Element-/Attribut-Namen benutzen, die das Ziel-Schema deklariert.
+add_test(NAME test_fixture_schema_experiment_golden_kern
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSCHEMA=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_schema.xsd"
+        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
+        "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden_kern.xml"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_schema_subset_check.cmake")
+# Zweites Bein derselben Wache auf dem ALT-Paar: es kostet nichts und haelt die v1-Instanz + ihre
+# ce-Kopie ebenfalls am EINEN Schema-Vokabular (das Byte-Gate oben sagt nur "gleich", nicht "gueltig").
+add_test(NAME test_fixture_schema_experiment_golden
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSCHEMA=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_schema.xsd"
+        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden.xml"
+        "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden.xml"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_schema_subset_check.cmake")
+# B14-NB2 (2026-08-06) -- die Wache der KETTE der zwei golden-Traeger.
+# Die zwei Wachen oben pruefen je EINE Datei gegen EIN Schema (Byte bzw. Vokabular). Keine von ihnen
+# haette gemerkt, dass die kanonische experiment_golden_kern.xml das Owner-N (2^17 = 131072) ueberhaupt
+# nicht maschinenlesbar trug und rechnerisch einen voellig anderen Raum deklarierte als ihr ce-Schwester-
+# Traeger all_axes_golden.profile.xml (Codex-Befund HOCH). Diese Wache vergleicht die beiden Traeger
+# SEMANTISCH ueber die Dialekt-Grenze hinweg: gleiche Achsen-Menge, je Achse gleiche Auspraegungen,
+# gleiches Produkt, und dieses Produkt == run_options cap BEIDER Seiten.
+# all_axes_golden.profile.xml wird ausschliesslich GELESEN (sie bleibt unangetastet, s. ihr Kopf-Block).
+# B14-NB3 (2026-08-06): PROFILE_ALLOW_COMMENT_TEXT_DEFECT -- die EINE, benannte Ausnahme.
+# all_axes_golden.profile.xml ist derzeit kein wohlgeformtes XML: in drei Kommentaren steht ein '--',
+# was XML verbietet (libxml2 lehnt die Datei komplett ab; Fundstellen bei Feststellung: Zeilen 62/64/207).
+# Der Defekt liegt AUSSCHLIESSLICH im Kommentar-TEXT -- kommentarfrei parst die Datei einwandfrei. Die
+# Datei gehoert dem ce-Submodul und steht in diesem Fenster unter der Ein-Schreiber-Regel, wird hier also
+# NICHT repariert; die Wache darf sie stattdessen kommentarfrei lesen. Die Freischaltung ist in BEIDE
+# Richtungen verriegelt: sie greift nur, wenn die Datei roh WIRKLICH scheitert und kommentarfrei WIRKLICH
+# durchlaeuft -- und sie wird FATAL, sobald die ce-Datei roh wohlgeformt ist. Sie zieht sich damit selbst
+# zurueck. ce-AUFLAGE: '--' in den drei Kommentaren beseitigen, danach diese Zeile ENTFERNEN.
+# SCRATCH_DIR: Ablage der kommentarfreien Arbeitskopie -- Build-Verzeichnis, nie der Quellbaum.
+# >120-Spalten-Wache (scripts/ci_diff_ascii_width_guard.sh): der PROFILE-Pfad unten wuerde als eine
+# einzelne "-DPROFILE=..."-Zeile 128 Byte tragen. In eine Zwischenvariable gezogen, damit CMakes
+# eigene Zeilenumbruch-Regeln (Backslash-Fortsetzung wuerde fuehrende Leerzeichen der Folgezeile IN
+# den Wert einbacken, empirisch geprueft) nicht angetastet werden muessen -- der resultierende
+# Kommandozeilen-Wert ist byte-identisch zur vorherigen einzeiligen Fassung.
+set(_golden_profile_path
+    "${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml")
+add_test(NAME test_golden_n_consistency
+    COMMAND "${CMAKE_COMMAND}"
+        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
+        "-DPROFILE=${_golden_profile_path}"
+        "-DPROFILE_ALLOW_COMMENT_TEXT_DEFECT=ON"
+        "-DSCRATCH_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+        # B14-NB4 / Befund B7: der ABSOLUTE golden-Kanon. Die Wache prueft bis dahin nur RELATIV
+        # (Produkt == cap == cap) und BEHAUPTETE in der Erfolgsmeldung trotzdem "golden N = 2^17".
+        # Driften beide Traeger GEMEINSAM (dieselbe Achse in beiden herausgenommen), bleiben alle
+        # relativen Pruefungen gruen und die Meldung wird zur Unwahrheit. Der Kanon steht deshalb
+        # HIER -- das super-Repo ist sein Eigentuemer, das Skript nur sein Pruefer. 2^17 = 131072.
+        # Wer N bewusst aendert, aendert diese Zeile: ein sichtbarer Edit statt eines stillen Drifts.
+        "-DEXPECTED_N=131072"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/golden_n_consistency_check.cmake")
+# B14-NB4 / Befund B4: DER SKIP-MARKER IST VERANKERT.
+# Vorher: SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP" -- ein UNVERANKERTES Teilwort, geprueft gegen die
+# GESAMTE Testausgabe, und das fuer alle fuenf Tests. Jeder Nonzero-/FATAL-Ausgang, dessen Text die
+# Zeichenfolge irgendwo mitfuehrt, waere damit als SKIP statt als FAIL klassifiziert worden -- und die
+# Wachen echoen Dateiinhalte und xmllint-Ausgaben in ihre FATAL-Meldungen. Ein struktureller
+# Fehlklassifikations-Pfad quer durch alle fuenf Tests.
+# JETZT: die Skripte drucken den Marker als EIGENE, interpolationsfreie Zeile, und der Ausdruck bindet
+# ihn an Zeilenanfang UND Zeilenende samt CMake-STATUS-Praefix. Ein Vorkommen mitten in einer Zeile --
+# der einzige Weg, auf dem fremder Text ihn einschleusen kann -- matcht nicht mehr.
+# Die Property bleibt auf allen fuenf Tests: bei jedem von ihnen ist der Skip legitim moeglich (alle
+# fuenf haengen an einem Nachbar-Checkout, COMDARE_CACHE_ENGINE_DIR bzw. COMDARE_PRT_ART_DIR).
 set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_registry
+                     test_fixture_schema_experiment_golden_kern test_fixture_schema_experiment_golden
+                     test_golden_n_consistency
     PROPERTIES LABELS "da_unit;fixture_sync" TIMEOUT 60
-    SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP")
+    SKIP_REGULAR_EXPRESSION "(^|\n)-- COMDARE-XML-WACHE-SKIP\r?(\n|$)")

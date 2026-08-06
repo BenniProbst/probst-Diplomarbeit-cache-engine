@@ -82,6 +82,9 @@
     <name>diplomarbeit_golden_kern</name>
     <mode>full</mode>
   </metadata>
+  <?comdare-doku ein Kommentar faengt so an: <!-- ?>
+  <phantom_evil/>
+  <?comdare-doku und so hoert er auf: --> ?>
 
   <!-- Fork 5: mode=full ist die Voll-Whitelist-Basis aus der Registry
        (ANGEBOT). Das Attribut ref benennt spaeter ein Paper-Template

@@ -1,0 +1,37 @@
+==== GATE TABU (B14-NB3, TEIL SUPER) -- Objekt: Working Tree vor Commit ====
+erzeugt 2026-08-06T12:56:59+00:00
+Worktree /home/comdare/wt-b14-golden, Branch b14-golden-kf6, Eintritts-Stand 953ce412
+
+-- Geaenderte Pfade (git status) --
+    M Code/tests/CMakeLists.txt
+    M Code/tests/fixture_schema_subset_check.cmake
+    M Code/tests/golden_n_consistency_check.cmake
+   ?? Code/tests/xml_canonical_utils.cmake
+   ?? docs/sessions/backups/20260806-b14-nb3/
+
+-- TABU-Klassen im Diff? (SOLL je 0) --
+   \.xml$                   : 0
+   golden                   : 1  -- AUFGELOEST: Treffer ist Code/tests/golden_n_consistency_check.cmake,
+                              also die WACHE selbst, KEINE golden-Datendatei (siehe Pfadliste unten).
+   registry                 : 0
+   ^Code/external/          : 0
+   ^thesis/                 : 0
+   measurement/             : 0
+   Messdaten                : 0
+
+-- Submodul-Gitlinks unbewegt? (SOLL: keine Ausgabe) --
+   (leer = unbewegt)
+
+-- Beruehrte Dateien: ausschliesslich ctest-Wachen unter Code/tests/ --
+   Code/tests/CMakeLists.txt
+   Code/tests/fixture_schema_subset_check.cmake
+   Code/tests/golden_n_consistency_check.cmake
+   Code/tests/xml_canonical_utils.cmake
+   docs/sessions/backups/20260806-b14-nb3/
+
+-- Diffstat --
+    Code/tests/CMakeLists.txt                    |  12 +
+    Code/tests/fixture_schema_subset_check.cmake | 342 ++++++---------------------
+    Code/tests/golden_n_consistency_check.cmake  | 254 ++++++++++----------
+    3 files changed, 208 insertions(+), 400 deletions(-)
+==== ENDE ====

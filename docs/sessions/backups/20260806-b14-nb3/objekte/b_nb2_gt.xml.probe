@@ -101,7 +101,7 @@
        CPU-Fabrikation plus RAM-Paar; hostname_hint ist NUR ein Hinweis
        (validate prueft den Schluessel, nicht den Namen). -->
   <machines>
-    <machine id="prod1" cpu_fabrication="amd_zen5_avx512" ram_pair="ddr5_2x32" hostname_hint="prod1"/>
+    <machine id="prod1" cpu_fabrication="amd_zen5_avx512" ram_pair="ddr5_2x32" hostname_hint="a>b" phantom_attr="1"/>
     <machine id="prod2" cpu_fabrication="intel_avx2"      ram_pair="ddr5_2x32" hostname_hint="prod2"/>
   </machines>
 

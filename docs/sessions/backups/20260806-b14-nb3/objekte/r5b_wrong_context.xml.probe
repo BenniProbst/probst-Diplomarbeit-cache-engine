@@ -78,7 +78,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="experiment_schema.xsd">
 
-  <metadata>
+  <metadata cpu_fabrication="fremd_aber_deklariert">
     <name>diplomarbeit_golden_kern</name>
     <mode>full</mode>
   </metadata>

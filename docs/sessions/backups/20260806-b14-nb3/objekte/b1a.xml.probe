@@ -82,6 +82,9 @@
     <name>diplomarbeit_golden_kern</name>
     <mode>full</mode>
   </metadata>
+  <!-- doku: ein CDATA faengt so an: <![CDATA[ -->
+  <phantom_evil/>
+  <!-- und so hoert es auf: ]]> -->
 
   <!-- Fork 5: mode=full ist die Voll-Whitelist-Basis aus der Registry
        (ANGEBOT). Das Attribut ref benennt spaeter ein Paper-Template

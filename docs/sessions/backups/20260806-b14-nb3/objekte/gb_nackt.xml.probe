@@ -232,6 +232,7 @@
     <axis ref="queuing_q1"                                              allowed_variants="no_buffer fifo_queue"/>
     <axis ref="queuing_q2"                                              allowed_variants="eager_flush watermark_flush"/>
     <axis ref="persistence_target"                                      allowed_variants="persistence_memory_only"/>
+  <axis ref="phantom_axis" allowed_variants="m n"/>
   </axes_default_lookup>
 
   <!-- N MASCHINENLESBAR (B14-NB2-Heilung H1, zweites Bein). cap = max_binaries-

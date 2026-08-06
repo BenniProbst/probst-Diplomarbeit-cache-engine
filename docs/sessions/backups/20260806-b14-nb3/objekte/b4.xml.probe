@@ -78,10 +78,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="experiment_schema.xsd">
 
-  <metadata>
+  <metadata id="a" id="b">
     <name>diplomarbeit_golden_kern</name>
     <mode>full</mode>
-  </metadata>
+  
 
   <!-- Fork 5: mode=full ist die Voll-Whitelist-Basis aus der Registry
        (ANGEBOT). Das Attribut ref benennt spaeter ein Paper-Template

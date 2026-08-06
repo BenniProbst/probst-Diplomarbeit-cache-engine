@@ -82,6 +82,7 @@
     <name>diplomarbeit_golden_kern</name>
     <mode>full</mode>
   </metadata>
+  <phantom_evil/>
 
   <!-- Fork 5: mode=full ist die Voll-Whitelist-Basis aus der Registry
        (ANGEBOT). Das Attribut ref benennt spaeter ein Paper-Template

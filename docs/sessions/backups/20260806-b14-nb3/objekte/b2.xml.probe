@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE comdare_experiment [<!ENTITY ph "<phantom_evil/>">]>
 <!-- ====================================================================
      experiment_golden_kern.xml
      KANONISCH AB #48. Jede Schema-Evolution zuerst HIER (STETS gepflegt).
@@ -82,6 +83,7 @@
     <name>diplomarbeit_golden_kern</name>
     <mode>full</mode>
   </metadata>
+  &ph;
 
   <!-- Fork 5: mode=full ist die Voll-Whitelist-Basis aus der Registry
        (ANGEBOT). Das Attribut ref benennt spaeter ein Paper-Template
