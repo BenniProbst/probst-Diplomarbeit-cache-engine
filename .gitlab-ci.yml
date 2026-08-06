@@ -211,6 +211,58 @@ lint:static:
   variables:
     GIT_SUBMODULE_STRATEGY: none
 
+# --- Stufe 1e: Diff-Hygiene (ASCII + Spaltenbreite) -- super-eigene Wache, 2026-08-06 ---
+# WARUM DIESER JOB EXISTIERT: der super hatte KEINE eigene ASCII-/Breiten-Wache. Nachgemessen:
+#   git ls-files | grep -vE '^Code/external/' | grep -iE 'ascii|width|guard|wache'
+# lieferte kein einziges Pruefwerkzeug (nur C++-Quellen mit "guard" im Namen und archivierte Logs);
+# ein Verzeichnis scripts/ gab es im super gar nicht. Die super-Pakete dieser Session wurden mit dem
+# Skript des FREMDEN ce-Repos geprueft. Zweiter Beleg im super-eigenen Code: Code/tests/CMakeLists.txt
+# verweist woertlich auf "(scripts/ci_diff_ascii_width_guard.sh)" -- ein Pfad, den es hier nicht gab.
+#
+# WAS DIE BESTEHENDEN LINT-JOBS NICHT ABDECKEN (gemessen, nicht vermutet -- clang-format 22.1.8
+# gegen die super-eigene .clang-format):
+#   * eine 140 Spalten lange, REIN ASCII-Kommentarzeile  -> clang-format Exit 0 (durch),
+#     weil die .clang-format ReflowComments: false setzt. Im Bestand: 15 solche Zeilen in
+#     .cpp/.hpp, die lint:format heute scannt und passieren laesst.
+#   * ein String-Literal mit echten Umlauten             -> clang-format Exit 0 (durch).
+#     ASCII prueft ueberhaupt kein bestehender Job.
+#   * Datei-Scope: lint:format/lint:static sehen nur \.(c|cc|cxx|cpp|h|hh|hxx|hpp)$ -- weder
+#     .cmake noch CMakeLists.txt noch .sh. Der ins Leere zeigende Verweis oben steht in einer
+#     CMakeLists.txt, also genau ausserhalb dieses Scopes.
+#
+# WARUM GIT_DEPTH: 0 -- die Wache bestimmt ihren Bereich per `git merge-base` SELBST und nimmt
+# bewusst KEINEN uebergebenen Zwischen-SHA entgegen (CI_COMMIT_BEFORE_SHA & Co. sind aktiv
+# verboten, Exit 2): ein zu eng geschnittener Bereich hat in dieser Session 61 Prozent einer
+# Aenderung verborgen. merge-base braucht echte Historie; ein flacher Klon laesst sie scheitern --
+# und die Wache bricht dann FATAL ab statt still gruen zu werden.
+#
+# WARUM rules: when: on_success (wie lint:secrets) -- die Wache soll bei JEDEM Lauf greifen, auch
+# in einer docs-only-Welle. Sie wird dort nicht "still gruen": sie druckt ihren NENNER
+# ("N Zeilen geprueft, davon 0 Nicht-ASCII") und benennt die uebersprungenen Dateien.
+#
+# WARUM KEIN allow_failure -- eine advisory Wache ist die naechste stille Null. Der Bereich ist
+# in der Praxis klein (nur noch nicht gelandete Commits gegen origin/$CI_DEFAULT_BRANCH), der
+# Alt-Bestand wird bewusst NICHT geprueft: `--bestand` meldet heute 845 Nicht-ASCII- und
+# 174 Breiten-Zeilen aus 18714: eine Bestands-Wache waere am Tag ihrer Einfuehrung rot geboren.
+# Diese Wache stoppt NEUE Verstoesse, sie saniert keine alten.
+#
+# KEIN extends: .lint-base -- der Job braucht nur git und awk, keine .citools-Werkzeuge und
+# damit auch keinen Tool-Cache.
+lint:diff-hygiene:
+  stage: lint
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigener Diff; das ce lintet in SEINER Pipeline
+    GIT_DEPTH: 0                   # merge-base braucht Historie -- flacher Klon => FATAL, nie still gruen
+    COMDARE_GUARD_BASIS_REF: "origin/$CI_DEFAULT_BRANCH"
+  script:
+    - sh scripts/ci_diff_ascii_width_guard.sh --seit-basis
+
 # ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
 # User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
 # lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
