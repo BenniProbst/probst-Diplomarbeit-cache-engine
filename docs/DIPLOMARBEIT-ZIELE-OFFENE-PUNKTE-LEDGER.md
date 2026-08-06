@@ -4230,9 +4230,20 @@ Die ausgeloesten Laeufe `ce 15029`, `ce 15031` und `super 15030` sind **alle dre
 keine Formalie: die letzte super-`main`-Pipeline davor (`14823` auf `030d2c62`, 09:07) war
 **`failed`** -- `main` trug also bis heute Abend einen roten Kopf, und erst dieser FF hat ihn geheilt.
 
+**KORREKTUR AN DER EIGENEN ZAEHLUNG (Regel 6, diesmal gegen mich selbst).** "13 von 13 Jobs" ist
+wahr und trotzdem unvollstaendig: `/pipelines/<id>/jobs` **zeigt keine Bridges**. Nachgeholt ueber
+`/bridges`, und es aendert die Lesart zweier Laeufe:
+`super 15026` traegt **13 Jobs + 1 Bridge** (`trigger:cache-engine`, `success`, downstream
+**`ce 15027`**), `super 15030` ebenso (downstream **`ce 15031`**). Damit loest sich auch die
+Merkwuerdigkeit "zwei ce-Pipelines auf demselben SHA": **`15029` ist der ce-`main`-Push,
+`15031` ist die vom super getriggerte Downstream-Pipeline** -- kein Doppellauf, sondern zwei Wege
+auf dasselbe Ziel. `ce 15025/15029/15031` haben je 0 Bridges, `super 15034` ebenfalls 0 (der
+Thesis-Zeiger loest den ce-Trigger nicht aus, der Gitlink der Engine blieb unberuehrt).
+
 **BILANZ DES ABENDS ueber beide Repos und beide Zweige:** `ce/development` 15025, `ce/main` 15029 und
-15031, `super/development` 15026 und 15034, `super/main` 15030 -- **sechs gruene Pipelines, kein roter
-Job.** Der Owner-Auftrag lautete, die Pipeline solle "irgendwann auch mal laufen und gruen
+15031, `super/development` 15026 und 15034, `super/main` 15030, dazu die getriggerte `ce 15027` --
+**sieben gruene Pipeline-Laeufe, zwei gruene Bridges, kein roter Job.** Der Owner-Auftrag lautete,
+die Pipeline solle "irgendwann auch mal laufen und gruen
 durchlaufen"; das ist jetzt fuer jeden Zweig beider Repos am Objekt belegt.
 
 ### B) DIE ZWEI LINT-FIXES -- und ihre gemeinsame Ursache
@@ -4384,7 +4395,23 @@ und energy auf 0 (Ledger: I-PMC-2 = L3-Mapping + branch_misses, I-PMC-3/#187 = L
 Zen-5-RAW). **Der Anhang kann also selbst im besten Fall nur L1D + dTLB zeigen** -- das gehoert vor
 Phase 6 entschieden, nicht nach der Messung entdeckt.
 
-### F) OFFEN / NICHT VON DIESER LINIE ZU ENTSCHEIDEN
+### F) DIESER NACHTRAG SELBST -- und was seine Pipeline NICHT sagt
+
+Der Push dieses Eintrags (`1b2124e6`, nur diese Ledger-Datei, expliziter Pathspec) loeste
+**Pipeline 15037** aus: `success` -- aber mit **2 Jobs**, nicht 13: `thesis:pdf` und `lint:secrets`,
+0 Bridges. Das ist korrektes Verhalten (`rules:changes` laesst bei einer reinen Markdown-Aenderung
+nur die betroffenen Jobs fahren), **aber es ist ausdruecklich KEIN Beleg fuer die anderen elf.**
+Steht hier, weil es die Musterfalle dieses Tages am eigenen Commit vorfuehrt: eine gruene Pipeline
+ist eine Aussage ueber die Jobs, die **gelaufen** sind. Der Bestand von 15026/15034 bleibt der
+Beleg fuer die volle Kette; 15037 belegt nur, dass dieser Text den Geheimnis-Scan besteht und das
+Thesis-PDF weiter baut.
+
+Vorlauf zum Push, vollstaendig: gitleaks v8.30.1 **mit** `.gitleaks.toml` zweimal --
+ueber den Push-Inhalt (`85b74237..HEAD`, 205 Zeilen, 15.77 KB) und ueber den Baum
+(201.69 MB), beide Male `no leaks found`; Backup-Ref-Kontrolle danach: `origin` traegt genau
+`5ba3d03f refs/backup/pre-secret-scrub-20260802` und nichts Neues, `github` leer.
+
+### G) OFFEN / NICHT VON DIESER LINIE ZU ENTSCHEIDEN
 
 - **PMC (Abschnitt E)**: Owner-Entscheid vor Phase 6. Zu entscheiden sind DREI Dinge, nicht eins:
   (1) das Flag in die dynamische Kette **als Invariante**, nicht als Job-Name; (2) die Wache so
