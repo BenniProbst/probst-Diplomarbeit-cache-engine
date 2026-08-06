@@ -7,7 +7,7 @@
 - **EIN-INSTANZ-REGIME** (Owner vormittag-11): alle Hoheiten bei DIESER Linie; Zwei-Sessions-Register geschlossen; Alt-Worktrees (wt-e24/wt-b1-e18/wt-super-w1/wt-b13-eta) abgebaut, ~70G frei. PID 546552 = inertes UI-Relikt (kein Monitor).
 - **super**: dev == `a61c9db3` (nach vormittag-22-Push), beide Remotes; main-FF-Ziel = IMMER der Paket-Merge-SHA, NIE die Ledger-Spitze (Owner-Ruege vormittag-15, Regel verschaerft).
 - **ce**: dev == main == `be4f0a16` (UML-Atlas nach ce kopiert; CI war Infra-Flake-ROT -> Retry GRUEN -> main-FF gepinnt). Vor dem UML: 7969b399 (Gate 408, W5/W3+E-18).
-- honest-empty GELANDET (Merge `40bf8a66`, super main-FF gezogen).
+- honest-empty GELANDET (Merge `40bf8a66`, super main-FF gezogen). Posten-77/78-Doku GELANDET (ce Merge `c837d830`, comment-only, CI-Wache+main-FF laeuft).
 
 ## 2. LAUFENDE WELLEN (bei Uebergabe; NIE blind resumen -- Journal + Objekt pruefen)
 
