@@ -1,0 +1,38 @@
+==== DOPPELLAUF-LITERALE -- NEUANKER TEIL 2, PAKET [T2-A/K2] (Resume-Stamp traegt den vollen Fingerprint) ====
+erzeugt 2026-08-06 (Fortsetzungs-Welle, Uebernahme des WIP-Standes des am Spend-Limit gestorbenen Vorgaengers)
+Vor-Stand 61a95bae (T2-A/F1). Uebernommene WIP-Dateien: 5 (SCHEMA.md, cache_engine_builder_iterator.hpp,
+test_tp1_planer_filter_iterator.cpp, test_h2_score_akte.cpp, test_wdk_datasets_fairness.cpp).
+
+-- 2-PASS-CONFIGURE (PFLICHT; kaltes Configure = 404-Falle) --
+  CONF1_RC=0
+  CONF2_RC=0
+
+-- VOLL-BAU --
+  make -j 6 (all) : 0 Zeilen "error:" / MAKE_ALL_RC=0
+  Zusatz-Target comdare_tests : 0 Zeilen "error:" / MAKE_ZUSATZ_RC=0
+
+-- ZWEI SERIELLE ctest-LAEUFE --
+  LAUF 1: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+  LAUF 2: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+
+-- golden 3/3 + CRC-Anker + Roundtrip --
+  1/5 Test #320: test_smoke_coverage_profile ........   Passed
+  2/5 Test #321: test_wdk_datasets_fairness .........   Passed
+  3/5 Test #322: test_measurement_categories ........   Passed
+  4/5 Test #367: test_limits_entkopplung_vorstufe ...   Passed
+  5/5 Test #378: test_profile_roundtrip .............   Passed
+  100% tests passed, 0 tests failed out of 5
+
+-- FROZEN-VEKTOR: NICHT GEFALLEN --
+  Frozen-Preimage Laenge : 560 Bytes
+  Frozen-Digest (RT-Weg) : 17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9b7fd37fbba76414be4718ad2180deecbb14387293935a8eff1469cef8ce89374
+  Frozen-Fixtures blob-identisch zu faa525d7:
+    tests/unit/test_g3_sha512_index.cpp        27cfbecb61f8c2276d4e01f6f4d6b7437d02923b
+    tests/unit/test_w10_system_cell_values.cpp 9555a696cb1ae34fac6377c0fcb9b505c4a0e57d
+    tests/unit/test_m_w12_stamp_bausteine.cpp  60e18132dabd90520a85ad40d552462ad8df6c93
+
+-- TABU / ASCII --
+  TABU-Treffer im Diff (golden_fullpilot_320*, permutation_axes.xml, m3v2_study.profile.xml,
+  system_axis_registry.xml, cache_engine_axis_registry.xml, PODs/Wire) : 0
+  Nicht-ASCII-Zeilen in den Diff-Zusaetzen : 0
+==== ENDE ====

@@ -1,0 +1,38 @@
+==== GESAMT-DOPPELLAUF -- DER KOMPLETTE T2-A-STAND (faa525d7..HEAD im Verbund) ====
+erzeugt 2026-08-06 (Fortsetzungs-Welle, Abschluss-Gate)
+
+ANLASS: die beiden Vorgaenger-Commits (H1+H2, F1) waren zwar je einzeln gegated, liefen aber NIE im
+Verbund mit K2 und F4. Dieses Gate laeuft ueber den vereinigten Stand.
+
+-- DER STAND --
+  3a42bf90 T2-A/F4: der Batch-Plan liegt VOR dem Lauf -- und der Zaehler je Phase steht gegen ihn
+  b4c343b9 T2-A/K2: der Mess-Resume haengt am VOLLEN Fingerprint
+  61a95bae T2-A/F1: der Zell-Pfad (Vorgaenger)
+  faa525d7 T2-A/H1+H2: per-Zelle-Identitaet + Fallback-Stempel (Vorgaenger)
+  Bilanz faa525d7^..HEAD: 12 Dateien, 1247 insertions(+), 62 deletions(-)
+  Working Tree: leer (git status -s ohne Ausgabe)
+
+-- 2-PASS-CONFIGURE --
+  CONF1_RC=0
+  CONF2_RC=0
+
+-- VOLL-BAU --
+  make -j 6 (all) : 0 Zeilen "error:" / MAKE_ALL_RC=0
+  Zusatz-Target comdare_tests : 0 Zeilen "error:" / MAKE_ZUSATZ_RC=0
+
+-- ZWEI SERIELLE ctest-LAEUFE --
+  LAUF 1: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+  LAUF 2: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+
+-- golden 3/3 + CRC-Anker + Roundtrip --
+  100% tests passed, 0 tests failed out of 5
+
+-- FROZEN-VEKTOR: NICHT GEFALLEN --
+  Frozen-Preimage Laenge : 560 Bytes
+  Frozen-Digest (RT-Weg) : 17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9b7fd37fbba76414be4718ad2180deecbb14387293935a8eff1469cef8ce89374
+
+-- TABU / FROZEN-FIXTURES / ASCII ueber den GESAMT-Bereich faa525d7^..HEAD --
+  TABU-Treffer                      : 0
+  Frozen-Fixtures im Diff           : 0
+  Nicht-ASCII-Zeilen in Additions   : 0
+==== ENDE ====

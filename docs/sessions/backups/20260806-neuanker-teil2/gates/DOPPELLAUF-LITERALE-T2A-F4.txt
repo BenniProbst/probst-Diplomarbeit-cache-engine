@@ -1,0 +1,48 @@
+==== DOPPELLAUF-LITERALE -- NEUANKER TEIL 2, PAKET [T2-A/F4] (Batch-Plan PERSISTENT VOR dem Lauf) ====
+erzeugt 2026-08-06 (Fortsetzungs-Welle)
+Vor-Stand b4c343b9 (T2-A/K2).
+
+-- 2-PASS-CONFIGURE (PFLICHT; kaltes Configure = 404-Falle) --
+  CONF1_RC=0
+  CONF2_RC=0
+
+-- VOLL-BAU --
+  make -j 6 (all) : 0 Zeilen "error:" / MAKE_ALL_RC=0
+  Zusatz-Target comdare_tests : 0 Zeilen "error:" / MAKE_ZUSATZ_RC=0
+
+-- ZWEI SERIELLE ctest-LAEUFE --
+  LAUF 1: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+  LAUF 2: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+  (Gate-Basis 408 UNVERAENDERT: die neuen Wachen sind Abschnitte in bestehenden TUs --
+   5 gtest-Faelle in test_g3_batch_planner, 17 Pruefungen in test_tp1_planer_filter_iterator.)
+
+-- golden 3/3 + CRC-Anker + Roundtrip --
+  1/5 Test #320: test_smoke_coverage_profile ........   Passed
+  2/5 Test #321: test_wdk_datasets_fairness .........   Passed
+  3/5 Test #322: test_measurement_categories ........   Passed
+  4/5 Test #367: test_limits_entkopplung_vorstufe ...   Passed
+  5/5 Test #378: test_profile_roundtrip .............   Passed
+  100% tests passed, 0 tests failed out of 5
+
+-- FROZEN-VEKTOR: NICHT GEFALLEN --
+  Frozen-Preimage Laenge : 560 Bytes
+  Frozen-Digest (RT-Weg) : 17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9b7fd37fbba76414be4718ad2180deecbb14387293935a8eff1469cef8ce89374
+  Frozen-Fixtures NICHT im Diff (0 Treffer).
+
+-- DIE PLAN-ABLAGE AM OBJEKT (literale Dokument-Zeilen aus dem Testlauf) --
+  Plan   : batchplan-v1|art=bau-slice|start=0|indizes=8|korn=4096|rows=1  +  Fach-Zeile "0;8;8"
+  Zaehler: batchplan-v1|art=bau-slice|start=0|indizes=8|korn=4096|kompiliert=8|gemessen=0|rows=1
+  Lauf 2 gegen dieselbe Ablage: 0 gebaut, "plan-resume: 1 von 1 Faechern bereits kompiliert"
+  Fremde Selektion (4 statt 8 Indizes): kein Anspruch, voller Bau
+  Fenster mit Bau-Fehlern: Plan liegt, ZAEHLER FEHLT (keine behauptete Arbeit)
+  Mess-Lauf gegen denselben Plan: kompiliert=1|gemessen=1 (Bau-Feld unangetastet)
+
+-- clang-format 22.1.8 --
+  alle 5 beruehrten Dateien: format-diff-Zeilen=0
+  (heilt zugleich die 47 Zeilen Format-Drift, die der uebernommene K2-WIP in
+   test_tp1_planer_filter_iterator.cpp hinterlassen hatte)
+
+-- TABU / ASCII --
+  TABU-Treffer im Diff : 0
+  Nicht-ASCII-Zeilen in den Diff-Zusaetzen : 0
+==== ENDE ====
