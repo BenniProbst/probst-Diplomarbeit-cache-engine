@@ -1,0 +1,28 @@
+
+-- (A) plan_bau_digest: Bindung und Kollisions-Eimer --
+  [OK ] zwei verschiedene Bau-Staende -> verschiedene Stempel
+  [OK ] EIN einziger abweichender Fingerprint reicht
+  [OK ] derselbe Bau-Stand -> gleicher Stempel
+  [OK ] MIT Anker != OHNE Anker (die zwei Welten trennen)
+  OHNE-ANKER-Stempel: batchplan-v3|art=bau-slice|start=0|indizes=8|korn=4|idx=844510dcfc8b4c84300d875ae16e3e7f4736f559aefa4afda8db4d9dcb9784906b32224cf88b76088432eb309af4681b404d7fc5e6bbede2312ed402145fe10f|bau=ohne-anker
+  [OK ] !! OHNE Anker sind ZWEI VERSCHIEDENE Bau-Staende stempel-GLEICH (Kollisions-Eimer)
+  [OK ] Glied |bau=ohne-anker literal im Stempel
+  [OK ] !! und der Zaehler-Leser NIMMT ihn an (Resume ueber fremden Bau-Stand)
+  -> kompiliert=8, plan_resume_faecher=2 von 2
+  [OK ] Gegenprobe MIT Anker: Zaehler aus Bau-Stand A gilt fuer B NICHT
+
+-- (B) Glied-Grenze des Plan-Stempels --
+  [OK ] Zaehler mit korn=40 gilt NICHT fuer korn=4 (Feld-Ordnung faengt es)
+
+-- (C) AsyncPushPump::drain -- Barriere, Doppel-drain, drain nach close --
+  [OK ] waehrend der Push laeuft ist NICHTS gebucht
+  [OK ] nach drain() ist der Fehl-Push gebucht
+  [OK ] Doppel-drain kehrt zurueck (kein Haenger)
+  [OK ] der Pump lebt nach der Barriere weiter (zweiter Eintrag)
+  [OK ] drain() NACH close() haengt nicht
+  [OK ] close() ist idempotent
+  [OK ] drain aus FREMDEM Thread haengt auch bei paralleler Schliessung nicht
+  [OK ] beide Eintraege sind abgearbeitet
+  [OK ] 200 Runden x 8 Pushes: nach jedem drain ist alles gebucht
+
+== FEHLER: 0 ==
