@@ -197,14 +197,65 @@ kleiner als 156, moeglicherweise 1. Die drei Multiplikatoren sind
   `COMDARE_GN_SIMD`, main.cpp:1315-1320; `gn_cell_opt_allowed`/`gn_cell_simd_allowed`) -- die
   CI-Matrix exportiert je Cluster-Zelle genau eine Kombination.
 - **SOTA** entfaellt bei `COMDARE_RUN_SOTA=0` (main.cpp; `pa.run_sota_series=false`).
-Bleiben die **Selektions-Paesse** (`:817`). **UNBELEGT von mir:** wie viele es im
-provision_only-Lauf des Trigger-Profils real sind -- das haengt am Profil-XML und ist ohne einen
-echten Lauf nicht ehrlich zu beziffern. **AUFLAGE:** vor dem Scharfstellen EINEN
-Trockenlauf-Beleg erheben (die `[PERM]`- und Pass-Zeilen des Job-Logs zaehlen). Ist die Zahl 1,
-traegt Option 1 vollstaendig und die Ebene wirkt sofort. Ist sie > 1, wirkt sie nur fuer den
-letzten Pass -- dann ist die Belegung zwar korrekt, aber der Nutzen bleibt bis zur Option-2-Form
-(Praefix statt Pfad) begrenzt. **Diese Zahl entscheidet ueber den Wert der ganzen Welle** und
-gehoert deshalb VOR den Bau.
+Bleiben die **Selektions-Paesse** (`:817`).
+
+#### 3.3.1 DIE ZAHL IST GEMESSEN: **18**, nicht 1 -- und Option 1 traegt damit NICHT
+
+**NACHGETRAGEN 06.08. nachmittags. Kein Trockenlauf noetig: die Zahl ist STATISCH bestimmbar,
+also ohne Bau und ohne jede Beruehrung des Mess-GO-Stopps.** Die Pass-Liste ist eine reine
+Funktion ueber das Profil:
+
+    profile_runner.hpp:283-291 -- profile_sweep_passes(tp, requested_axis)
+      requested_axis nicht leer -> genau {requested_axis}
+      requested_axis leer       -> {""} (Basis-Pass, immer zuerst) + JE <axis_sweep> ein Pass
+
+Der E4-Treiber setzt `sweep_axis` **nie** (im Header ausdruecklich vermerkt: "der E4-Treiber
+setzt sweep_axis nie"), also gilt immer der zweite Zweig. Die Zahl ist damit
+`1 + Zahl der <axis_sweep>-Elemente im Profil`. Ausgezaehlt an den realen Profilen
+(`grep -c "<axis_sweep "`):
+
+| Profil | `<axis_sweep>` | Selektions-Paesse | `<sota_series>` |
+|---|---|---|---|
+| `all_axes_golden.profile.xml` | 17 | **18** | 21 |
+| `m3_golden_coverage.profile.xml` | 17 | **18** | 21 |
+| `m3_smoke_coverage.profile.xml` | 17 | **18** | 21 |
+| `m3v2_study.profile.xml` | 8 | **9** | 21 |
+| `m3v2_sota_pilot.profile.xml` | 8 | **9** | 3 |
+| `m3v2_smoke.profile.xml` | 2 | **3** | 3 |
+
+Das deckt sich exakt mit der Ledger-Rechnung aus mittag-9 ("2 opt x 2 simd = 4 Perms mal
+(1 Basis + 17 `<axis_sweep>` + 21 `<sota_series>`)") -- die 156 sind damit unabhaengig
+bestaetigt, und der verbleibende Faktor ist beziffert.
+
+**DER VERSCHAERFENDE BEFUND (nicht im Auftrag, am Objekt gefunden): der teure Pass ist der
+ERSTE, und genau sein Plan wird ueberschrieben.** Zwei Fundstellen zusammen:
+- `profile_run_entry.hpp:762` (im `run_selection_pass`): das Chunk-Fenster gilt **nur** fuer den
+  Basis-Pass -- `if (a.golden_range_count > 0 && pass_axis.empty())`. Die 2^17-Arbeit, fuer die
+  die ganze Ebene gebaut wurde, haengt also am Pass mit leerer Achse.
+- `profile_sweep_passes` stellt den Basis-Pass **immer zuerst** ("" wird als erstes eingefuegt).
+Folge: im Chunk-Bau schreibt Pass 1 den Plan ueber das 2^17-Fenster -- und die 17 folgenden
+Sweep-Paesse ueberschreiben dieselbe Datei mit ihren eigenen Stempeln. Beim Folgelauf findet der
+Basis-Pass seinen Plan **garantiert nicht mehr**. Option 1 ist damit nicht bloss "begrenzt
+wirksam", sondern **fuer genau den Teil wirkungslos, fuer den die Ebene existiert.**
+
+**LAESST SICH DIE ZAHL LEGITIM AUF 1 BRINGEN? NEIN.** Mechanisch ginge es (`a.sweep_axis`
+setzen -> genau ein Pass), fachlich nicht: jeder Sweep-Pass baut in `run_selection_pass` einen
+EIGENEN Baum mit eigener `sweep_view` (`profile_run_entry.hpp:721-730`) und damit **andere
+binary_ids** als der Basis-Pass. Die Paesse sind keine Wiederholung derselben Arbeit, sondern
+verschiedene Mess-Substanz; sie wegzuschalten hiesse, die deklarierten `<axis_sweep>`-Reihen
+nicht zu bauen. Genau dieser Zustand war schon einmal ein Befund (GO-5 B.1: "die im Profil
+deklarierten `<axis_sweeps>` blieben im offiziellen XML-Weg UNGEFAHREN") und wurde absichtlich
+geheilt -- ihn rueckgaengig zu machen, um eine Cache-Ebene wirksam zu bekommen, waere die
+Umkehrung von Zweck und Mittel.
+
+**KONSEQUENZ FUER DEN TERMIN-ENTSCHEID (Abschnitt 5.1):** Die Bedingung, unter der ich das
+Scharfstellen vor der Abgabe empfohlen hatte ("nur wenn die Pass-Zahl 1 ergibt"), ist **NICHT
+erfuellt**. Sie ist 18. **REVIDIERTE EMPFEHLUNG: die Host-Belegung NICHT vor der Abgabe scharf
+stellen.** Sie waere korrekt gebaut und trotzdem wirkungslos -- eine neue scharfe Naht im
+Trigger-Lauf ohne Gegenwert. Der Nutzen entsteht erst mit der Option-2-Form (`batch_plan_datei`
+als PRAEFIX statt Pfad, je Pass eine eigene Datei), und die haengt laut Owner-Entscheid am
+gesonderten Versionierungs-Interface -- also nach der Abgabe. **Die Belegung und Option 2
+gehoeren damit in DIESELBE Welle**, nicht nacheinander.
 
 ### 3.4 Was NICHT passiert (Entwarnungen, am Objekt geprueft)
 
@@ -263,10 +314,14 @@ nicht abgenommen.
    mittag-16 fuehrt die Host-Belegung als Delta-Punkt 3, vormittag-41 nennt sie "VOR Trigger
    noetig" -- mittag-10 sagt dagegen ueber das Versionierungs-Interface "NICHTS davon ist vor
    der Abgabe realistisch". **Das ist kein Widerspruch** (2.1 vs. Namensform), aber die
-   Terminfrage bleibt offen. **MEINE EMPFEHLUNG: JA, aber nur mit dem Biss aus Schritt 3 und
-   nur, wenn der Pass-Zahl-Beleg 1 ergibt.** Ergibt er > 1, ist der Nutzen vor der Abgabe
-   gering und das Risiko (eine neue scharfe Naht im Trigger-Lauf) nicht gerechtfertigt -- dann
-   nach der Abgabe zusammen mit Option 2.
+   Terminfrage bleibt offen. **MEINE EMPFEHLUNG, REVIDIERT NACH DER MESSUNG IN 3.3.1: NEIN --
+   nicht vor der Abgabe.** Die Bedingung meiner urspruenglichen Ja-Empfehlung war "nur wenn die
+   Pass-Zahl 1 ergibt"; sie ist **18**. Die Belegung waere korrekt gebaut und trotzdem
+   wirkungslos, weil der Basis-Pass (der die 2^17-Arbeit traegt) als erster laeuft und seinen
+   Plan von 17 folgenden Sweep-Paessen ueberschrieben bekommt. Eine neue scharfe Naht im
+   Trigger-Lauf ohne Gegenwert ist Risiko ohne Nutzen. **Belegung und Option 2 gehoeren in
+   DIESELBE Welle, nach der Abgabe.** (Die urspruengliche Fassung dieser Empfehlung bleibt oben
+   stehen, damit nachvollziehbar ist, woran sie sich entschieden hat.)
 2. **Wo liegt die Plan-Datei?** Vorschlag: neben dem Bestandslog-Ausgabebaum, PRO
    Cluster-Zelle getrennt (der GN-Zellen-Filter macht jede Zelle zu einem eigenen Bau-Strom;
    eine gemeinsame Datei ueber Zellen hinweg waere die 156-Ueberschreibungs-Falle in klein).
@@ -297,5 +352,13 @@ Alles read-only am Objekt erhoben, Stand ce `a9a352bb` / super `d938c577`:
 - Die zwei Leerwert-Ursachen literal: `lazy_adhoc_macro_args_for:178` und `:186`.
 - GN-Zellen-Filter und `run_sota_series` als Pass-Reduzierer: `main.cpp:1315-1320` bzw.
   `profile_run_entry.hpp:826`.
-- **UNBELEGT und als solches gekennzeichnet:** die reale Pass-Zahl im provision_only-Lauf des
-  Trigger-Profils (3.3) und die Formwachen-Lage ueber die volle 2^17-Selektion (3.1).
+- **NACHGETRAGEN 06.08. nachmittags, damit nicht mehr unbelegt (3.3.1):** die Selektions-Pass-Zahl
+  ist **18** (`1 + 17 <axis_sweep>` am `all_axes_golden.profile.xml`), statisch bestimmt aus
+  `profile_sweep_passes` (profile_runner.hpp:283-291) plus `grep -c "<axis_sweep "` ueber die
+  sechs realen Thesis-Profile -- **ohne Bau, ohne Lauf, ohne Beruehrung des Mess-GO-Stopps.**
+  Dazu der verschaerfende Fund, dass der Basis-Pass (Traeger der 2^17-Arbeit, gegated per
+  `golden_range_count > 0 && pass_axis.empty()`) IMMER ZUERST laeuft und seinen Plan garantiert
+  ueberschrieben bekommt.
+- **UNBELEGT und als solches gekennzeichnet:** die Formwachen-Lage ueber die volle
+  2^17-Selektion (3.1) -- die id-Liste existiert im Repo nicht; gemessen ist die 320er-Fixture
+  mit Gegenprobe.
