@@ -99,7 +99,10 @@ variables:
         paths:
           - "Code/**/*"
           - "Code/external/*"      # Gitlink-Bumps ce/prt-art (1-Zeilen-160000-Diff) => NIE docs-only
-          - "thesis/diplomarbeit"  # thesis-Gitlink
+                                   # deckt AUCH Code/external/20260931-overleaf-diplomarbeit ab (2. Thesis-
+                                   # Gitlink, .gitmodules Z. 51-56) -> ein Bump NUR dort weckt verify:submodules
+                                   # und damit die Paritaets-Pruefung; die Praevention hat hier keine Luecke.
+          - "thesis/diplomarbeit"  # thesis-Gitlink (der LEBENDE der beiden)
           - ".gitmodules"
           - ".gitlab-ci.yml"
     - when: never
@@ -369,6 +372,15 @@ verify:submodules:
         echo "FEHLER (REV-CI-04): Submodul NICHT auf exaktem Gitlink-Commit (-/+/U-Praefix):"; echo "${_bad}"; exit 1
       fi
       echo "Submodul-Gitlink-Determinismus OK (alle exakt auf ihrem Gitlink-Commit)"
+    # PRAEVENTION Thesis-Doppelbindung (Paket b-ci-rueckschrieb-beide-zeiger, 2026-08-06). Das Thesis-Repo
+    # ../20260931-overleaf-diplomarbeit.git ist in .gitmodules ZWEIMAL eingebunden (thesis/diplomarbeit Z. 45-50
+    # LEBEND, Code/external/20260931-overleaf-diplomarbeit Z. 51-56 TOT). Die REV-CI-04-Wache darueber prueft nur
+    # WORKTREE gegen GITLINK -- sie sieht nicht, ob die beiden GITLINKS untereinander auseinanderlaufen. Genau
+    # das tat die CI bis zu diesem Paket selbst: anhang:forward bumpte nur den lebenden Zeiger. Diese Pruefung
+    # faellt bei Divergenz ROT, BEVOR etwas darauf baut. Fail-closed: ein fehlender Pfad ist FEHLER, kein
+    # Freifahrtschein -- die Begruendung steht im Kopf von ci/thesis_gitlink_parity.sh.
+    - 'test -x ci/thesis_gitlink_parity.sh || { echo "FEHLER: ci/thesis_gitlink_parity.sh fehlt/nicht ausfuehrbar"; exit 1; }'
+    - ci/thesis_gitlink_parity.sh --quelle head
 
 # ── Stage analyse: Auswertungswerkzeuge bauen (KEIN grosses Artefakt) ──
 analyse:thesis-data:
@@ -1151,18 +1163,37 @@ anhang:forward:
       NEW_THESIS_SHA=$(git -C "$THESIS_CLONE" rev-parse HEAD)
       echo "289-HEAD nach dem Kanal: $NEW_THESIS_SHA"
       # -- (4) Gitlink-Bump auf 288 -- NUR wenn sich 289 wirklich bewegt hat (sonst kein Leer-Commit) --
-      OLD_LINK=$(git ls-tree HEAD thesis/diplomarbeit | awk '{print $3}')
-      echo "Gitlink alt=$OLD_LINK neu=$NEW_THESIS_SHA"
-      if [ "$OLD_LINK" = "$NEW_THESIS_SHA" ]; then
-        echo "=== anhang:forward OK: Gitlink bereits aktuell -> kein Bump-Commit ==="; exit 0
+      # BEIDE Thesis-Gitlinks (Paket b-ci-rueckschrieb-beide-zeiger, 2026-08-06): .gitmodules bindet DASSELBE
+      # Repo zweimal ein. Bis zu diesem Paket bumpte der Job nur thesis/diplomarbeit -- die CI ERZEUGTE die
+      # Divergenz damit bei jedem Rueckschrieb selbst und still. Der zweite Bump ist bewusst GENAUSO fehlerhart
+      # wie der erste: kein `|| true`, kein stiller Zweig, kein zweiter Exit-Pfad. set -euo pipefail ist aktiv.
+      THESIS_GITLINKS="thesis/diplomarbeit Code/external/20260931-overleaf-diplomarbeit"
+      _need_bump=0
+      for _p in $THESIS_GITLINKS; do
+        _old=$(git ls-tree HEAD -- "$_p" | awk '$1 == "160000" { print $3 }')
+        if [ -z "$_old" ]; then
+          echo "FEHLER: Gitlink '$_p' fehlt im HEAD-Tree -> .gitmodules und CI stehen auseinander"; exit 1
+        fi
+        echo "Gitlink $_p: alt=$_old neu=$NEW_THESIS_SHA"
+        [ "$_old" = "$NEW_THESIS_SHA" ] || _need_bump=1
+      done
+      if [ "$_need_bump" -eq 0 ]; then
+        echo "=== anhang:forward OK: BEIDE Thesis-Gitlinks bereits aktuell -> kein Bump-Commit ==="; exit 0
       fi
       git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
       git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
       git fetch origin "$CI_COMMIT_BRANCH"
       git checkout -B "$CI_COMMIT_BRANCH" "origin/$CI_COMMIT_BRANCH"
-      git update-index --cacheinfo 160000 "$NEW_THESIS_SHA" thesis/diplomarbeit
-      if git diff --cached --quiet; then echo "Gitlink unveraendert (Race) -> kein Commit"; exit 0; fi
-      git commit -m "thesis(E-18): Gitlink auf ${NEW_THESIS_SHA} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
+      for _p in $THESIS_GITLINKS; do
+        git update-index --cacheinfo 160000 "$NEW_THESIS_SHA" "$_p"
+      done
+      # NACHBEDINGUNG am Objekt statt Vertrauen in die Schleife: derselbe Pruefkoerper, den auch
+      # verify:submodules ruft -- hier gegen den INDEX und mit --erwartet. Schlaegt er an, bricht der Job ab,
+      # BEVOR ein halb gebumpter Commit entsteht (fail-closed; ein fehlender Pfad ist dort ebenfalls FEHLER).
+      test -x ci/thesis_gitlink_parity.sh || { echo "FEHLER: ci/thesis_gitlink_parity.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      ci/thesis_gitlink_parity.sh --quelle index --erwartet "$NEW_THESIS_SHA"
+      if git diff --cached --quiet; then echo "Gitlinks unveraendert (Race) -> kein Commit"; exit 0; fi
+      git commit -m "thesis(E-18): BEIDE Gitlinks auf ${NEW_THESIS_SHA} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
       for attempt in 1 2 3 4 5; do
         if git push -o ci.skip origin "HEAD:$CI_COMMIT_BRANCH"; then
           echo "=== anhang:forward OK: Gitlink gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
