@@ -102,9 +102,23 @@ struct HeatmapData {
     std::string                      y_label;
     std::vector<std::string>         x_labels;
     std::vector<std::string>         y_labels;
-    std::vector<std::vector<double>> matrix; // matrix[y][x]
+    // matrix[y][x]. NaN (quiet_NaN) = Zelle OHNE Messwert ("nicht ausgefuehrt"), ausdruecklich NICHT 0.0
+    // -- write_heatmap laesst solche Zellen ueber point meta = nan aus und schreibt als dritte Koordinate
+    // nur den blanken Mesh-Traeger 0 (kein "0.0000"), damit die .tex keine 0-ns-Messung behauptet.
+    // Details + die drei pgfplots-Proben, die diese Auslass-Strategie erzwingen: siehe write_heatmap.
+    std::vector<std::vector<double>> matrix;
+    // E-2a/HONEST-EMPTY (2026-08-06): Vermerk-Text, den write_heatmap ANSTELLE einer datenlosen Heatmap
+    // emittiert (reiner Text, wird escape_latex-durchgereicht). Leer -> neutraler ASCII-Default. Der
+    // Aufrufer (write_surface_search_algo_x_workload) fuellt ihn sprach-lokalisiert.
+    std::string empty_note;
 };
 
+// Emittiert die 2D-Heatmap (matrix plot*, view={0}{90}, viridis, log-Farbskala).
+// HONEST-EMPTY (E-2a): traegt KEINE Zelle einen darstellbaren Messwert (kein endlicher Wert > 0), wird
+// KEINE entartete Heatmap geschrieben (pgfplots-Fatal "too few coordinates" bei [0.0:0.0]-Farbdomaene),
+// sondern ein ehrlicher, kompilierfaehiger LaTeX-Platzhalter-Vermerk -- Rueckgabe status_ok, weil die
+// Datei existieren MUSS (die 6 lc_surface_<z>.tex haengen an blankem \input, kein \InputIfFileExists).
+// Strukturell leere Matrix (0 Zeilen/Spalten) bleibt status_empty_input OHNE Datei (Bestandsverhalten).
 [[nodiscard]] int write_heatmap(std::filesystem::path const& out, HeatmapData const& data,
                                 PageConstraints const& cnst = {});
 
@@ -173,6 +187,20 @@ struct WideMeasurementRow {
     double op_scan_p99_ns   = 0.0;
     double op_rmw_p99_ns    = 0.0;
     bool   has_op_p99       = false; // true ⇔ alle 5 op_*_p99_ns-Spalten vorhanden UND numerisch
+    // E-2a/HONEST-EMPTY (2026-08-06) -- die 5 AUSFUEHRUNGS-ZAEHLER op_<art>_n (Stueckzahl der in diesem Lauf
+    // tatsaechlich ausgefuehrten Operationen dieser Art). Sie sind das EINZIGE direkte Signal fuer
+    // "Operation nicht ausgefuehrt" (op_<art>_n == 0) und trennen es von "echt 0 ns gemessen"; ohne sie
+    // muss die Auswertung auf die p50>0-Heuristik zurueckfallen (Phantom-Falle, siehe
+    // aggregate_latency_range im .cpp). Beleg fuer die Spalten-Existenz im realen WIDE-Schema:
+    // measurement/20260726-164259-d03-strukt-r-erstbeleg/measurements.csv (Spalten 7/10/13/19/22).
+    // OPTIONAL/header-getrieben (NICHT Pflichtspalte, NICHT in required[]): fehlt EINE der 5 Spalten ODER
+    // ist EINE Zelle leer/"n/a"/nicht-numerisch, bleibt has_op_n=false -> BESTANDSVERHALTEN (p50>0-Heuristik).
+    std::uint64_t op_insert_n = 0;
+    std::uint64_t op_lookup_n = 0;
+    std::uint64_t op_erase_n  = 0;
+    std::uint64_t op_scan_n   = 0;
+    std::uint64_t op_rmw_n    = 0;
+    bool          has_op_n    = false; // true <=> alle 5 op_<art>_n-Spalten vorhanden UND numerisch
     bool   two_phase_valid  = false; // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
     // M3v2-Tag-Spalten (Task #156, ans Schema-Ende gehängt). OPTIONAL/header-getrieben aufgelöst:
     // fehlt die Spalte (cowfix-v1-Schema), bleibt das Feld leer/0 — KEIN Parse-Fehler (n/a).

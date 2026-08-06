@@ -649,3 +649,187 @@ TEST(Stufe05Pipeline, ObserverDetailHonestEmptyNoFile) {
 
     fs::remove(p, ec);
 }
+
+// -----------------------------------------------------------------------------
+// E-2a (2026-08-06) -- HONEST-EMPTY im Flaechen-Writer: op_<art>_n-Zaehler, Teil-/Voll-Datenlosigkeit
+// -----------------------------------------------------------------------------
+namespace {
+
+// WIDE-Fixture MIT den Ausfuehrungs-Zaehlern op_<art>_n (Schema-treu zum realen Korpus, Beleg
+// measurement/20260726-164259-d03-strukt-r-erstbeleg/measurements.csv). Aufbau bewusst wie D-03:
+//   ns_per_op     -> VOLL-DATEN   (alle 4 Zellen ausgefuehrt)
+//   op_lookup_*   -> VOLL-DATEN   (lookup laeuft in beiden Workloads)
+//   op_insert_*   -> TEIL-DATENLOS(insert nur in ycsb_a; ycsb_c-Spalte nie ausgefuehrt)
+//   op_erase_*    -> VOLL-DATENLOS(erase nie ausgefuehrt -> honest-empty-Platzhalter)
+//   op_rmw_*      -> WIDERSPRUCH  (n==0, aber p50>0): der Zaehler gewinnt -> voll-datenlos.
+void write_wide_csv_with_op_counts(fs::path const& p) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_n;op_insert_p50_ns;op_lookup_n;op_lookup_p50_ns;"
+      << "op_erase_n;op_erase_p50_ns;op_scan_n;op_scan_p50_ns;op_rmw_n;op_rmw_p50_ns;"
+      << "workload;two_phase_valid\n";
+    f << "search_algo=k_ary/mapping=direct;1000;1000;100;2000;50;0;0;0;0;0;777;ycsb_a;1\n";
+    f << "search_algo=k_ary/mapping=direct;1100;0;0;2000;60;0;0;0;0;0;777;ycsb_c;1\n";
+    f << "search_algo=eytzinger/mapping=direct;1200;1500;120;2000;70;0;0;0;0;0;777;ycsb_a;1\n";
+    f << "search_algo=eytzinger/mapping=direct;1300;0;0;2000;80;0;0;0;0;0;777;ycsb_c;1\n";
+}
+
+// Zaehlt die Koordinaten-Zeilen einer Heatmap, die ehrlich ausgelassen sind: Mesh-Traeger ",0)" + [nan].
+std::size_t count_omitted_cells(fs::path const& p) { return count_occurrences(p, ",0) [nan]"); }
+
+} // namespace
+
+// (a) Parser: die 5 op_<art>_n werden HEADER-GETRIEBEN mitgelesen; fehlt die Spaltengruppe (p50-only-
+//     Bestandsschema), bleibt has_op_n=false -> BESTANDSVERHALTEN (p50>0-Heuristik).
+TEST(Stufe05Pipeline, ParseWideCsvOpExecutionCounts) {
+    auto p = comdare_user_tmp() / "e2a_op_counts_parse.csv";
+    write_wide_csv_with_op_counts(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_EQ(rows.size(), 4u);
+    EXPECT_TRUE(rows[0].has_op_n);
+    EXPECT_EQ(rows[0].op_insert_n, 1000u);
+    EXPECT_EQ(rows[0].op_lookup_n, 2000u);
+    EXPECT_EQ(rows[0].op_erase_n, 0u);   // erase nie ausgefuehrt -> das Signal, das frueher verworfen wurde
+    EXPECT_EQ(rows[1].op_insert_n, 0u);  // ycsb_c ohne insert
+    EXPECT_EQ(rows[0].op_rmw_n, 0u);     // Widerspruchs-Zeile: Zaehler 0 trotz p50=777
+    EXPECT_DOUBLE_EQ(rows[0].op_rmw_p50_ns, 777.0);
+
+    // Bestandsschema OHNE op_<art>_n-Spalten -> has_op_n=false, KEIN Parse-Fehler.
+    auto p_old = comdare_user_tmp() / "e2a_op_counts_absent.csv";
+    write_sample_wide_csv(p_old);
+    std::vector<dg::WideMeasurementRow> old_rows;
+    ASSERT_EQ(dg::parse_wide_csv(p_old, old_rows), dg::status_ok);
+    ASSERT_FALSE(old_rows.empty());
+    for (auto const& r : old_rows) EXPECT_FALSE(r.has_op_n);
+
+    std::error_code ec;
+    fs::remove(p, ec);
+    fs::remove(p_old, ec);
+}
+
+// (b) VOLL-DATEN: jede Zelle ist ausgefuehrt -> echte Heatmap, KEINE ausgelassene Zelle, alle Messwerte
+//     stehen verbatim in der .tex (Regressions-Wache: der honest-empty-Umbau darf echte Daten nicht fressen).
+TEST(Stufe05Pipeline, SurfaceHeatmapFullDataHasNoOmittedCells) {
+    auto p = comdare_user_tmp() / "e2a_surface_full.csv";
+    write_wide_csv_with_op_counts(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto out = comdare_user_tmp() / "e2a_surface_lookup.tex";
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "op_lookup_p50_ns", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "addplot3"));
+    EXPECT_TRUE(file_contains(out, "colormap/viridis"));
+    EXPECT_EQ(count_occurrences(out, "[nan]"), 0u); // 2x2 voll besetzt
+    EXPECT_EQ(count_omitted_cells(out), 0u);
+    // Die 4 nearest-rank-Mediane (je 1 Stichprobe) stehen als echte Koordinaten in der Datei.
+    EXPECT_TRUE(file_contains(out, "50.0000"));
+    EXPECT_TRUE(file_contains(out, "60.0000"));
+    EXPECT_TRUE(file_contains(out, "70.0000"));
+    EXPECT_TRUE(file_contains(out, "80.0000"));
+
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (c) TEIL-DATENLOS: insert laeuft nur in ycsb_a. Die ycsb_c-Zellen sind NICHT gemessen und duerfen NICHT
+//     als "0.0000" (erfundene 0-ns-Messung) erscheinen; sie werden ueber point meta = nan ausgelassen.
+//     Die Achsen bleiben vollstaendig (2 Spalten) -- eine 1-spaltige matrix plot* waere pgfplots-fatal.
+TEST(Stufe05Pipeline, SurfaceHeatmapPartialDataOmitsUnexecutedCells) {
+    auto p = comdare_user_tmp() / "e2a_surface_partial.csv";
+    write_wide_csv_with_op_counts(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto out = comdare_user_tmp() / "e2a_surface_insert.tex";
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "op_insert_p50_ns", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "addplot3")); // echte Heatmap (Teil-Daten sind Daten)
+    // Die 2 gemessenen Zellen (ycsb_a) stehen echt drin ...
+    EXPECT_TRUE(file_contains(out, "100.0000"));
+    EXPECT_TRUE(file_contains(out, "120.0000"));
+    // ... die 2 nicht ausgefuehrten (ycsb_c) sind ehrlich ausgelassen, NICHT 0.0000-erfunden.
+    EXPECT_EQ(count_omitted_cells(out), 2u);
+    EXPECT_EQ(count_occurrences(out, "[nan]"), 2u);
+    EXPECT_FALSE(file_contains(out, ",0.0000)"));
+    // Beide Workload-Spalten bleiben erhalten (Achsen schrumpfen NICHT auf die Daten-Teilmenge).
+    EXPECT_TRUE(file_contains(out, "ycsb\\_a"));
+    EXPECT_TRUE(file_contains(out, "ycsb\\_c"));
+    EXPECT_TRUE(file_contains(out, "mesh/cols=2"));
+
+    std::error_code ec;
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (d) VOLL-DATENLOS: erase wurde nie ausgefuehrt. Statt einer entarteten 0.0000-Heatmap (pgfplots-Fatal
+//     "I got too few coordinates", Fixture-Beleg D-03) schreibt der Writer einen ehrlichen, kompilier-
+//     faehigen Platzhalter-Vermerk -- Datei EXISTIERT (blankes \input in A_measurements.tex), status_ok.
+TEST(Stufe05Pipeline, SurfaceHonestEmptyPlaceholderOnMetricWithoutData) {
+    auto p = comdare_user_tmp() / "e2a_surface_empty.csv";
+    write_wide_csv_with_op_counts(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "e2a_surface_erase.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "op_erase_p50_ns", "de"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out)); // Datei MUSS existieren (Kern-.tex haengt an blankem \input)
+    // KEINE Figur, KEINE Koordinaten, KEINE erfundene Null.
+    EXPECT_FALSE(file_contains(out, "addplot3"));
+    EXPECT_FALSE(file_contains(out, "tikzpicture"));
+    EXPECT_FALSE(file_contains(out, "colorbar"));
+    EXPECT_FALSE(file_contains(out, "0.0000)"));
+    // Ehrlicher Vermerk + Float-Mantel (kompilierfaehig).
+    EXPECT_TRUE(file_contains(out, "HONEST-EMPTY"));
+    EXPECT_TRUE(file_contains(out, "Keine Messwerte"));
+    EXPECT_TRUE(file_contains(out, "\\begin{figure}"));
+    EXPECT_TRUE(file_contains(out, "\\caption{"));
+
+    // Der 3D-Pfad teilt dieselbe Aggregation und denselben Platzhalter (kein erfundener 1e-3-Boden).
+    auto out3d = comdare_user_tmp() / "e2a_surface3d_erase.tex";
+    fs::remove(out3d, ec);
+    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out3d, rows, "op_erase_p50_ns", "en"), dg::status_ok);
+    ASSERT_TRUE(fs::exists(out3d));
+    EXPECT_FALSE(file_contains(out3d, "addplot3[surf]"));
+    EXPECT_FALSE(file_contains(out3d, "0.0010")); // der 1.0e-3-Darstellungsboden taucht NICHT auf
+    EXPECT_TRUE(file_contains(out3d, "No measured values"));
+
+    fs::remove(out, ec);
+    fs::remove(out3d, ec);
+    fs::remove(p, ec);
+}
+
+// (e) Der ZAEHLER ist die Primaerquelle: op_rmw_n==0 bei op_rmw_p50_ns==777 (widerspruechliche Zeile) gilt
+//     als NICHT ausgefuehrt -> voll-datenlos. Ohne den Zaehler (Bestandsschema) greift weiter p50>0.
+TEST(Stufe05Pipeline, SurfaceExecutionCounterOverridesP50Heuristic) {
+    auto p = comdare_user_tmp() / "e2a_counter_wins.csv";
+    write_wide_csv_with_op_counts(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "e2a_surface_rmw.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "op_rmw_p50_ns", "en"), dg::status_ok);
+    EXPECT_FALSE(file_contains(out, "addplot3"));  // Zaehler gewinnt -> Platzhalter statt Heatmap
+    EXPECT_FALSE(file_contains(out, "777.0000")); // die widerspruechliche p50 wird NICHT geplottet
+    EXPECT_TRUE(file_contains(out, "HONEST-EMPTY"));
+
+    // Bestandsverhalten: dieselbe Metrik-Klasse OHNE op_<art>_n-Spalten -> p50>0-Heuristik -> echte Heatmap.
+    auto p_old = comdare_user_tmp() / "e2a_counter_absent.csv";
+    write_sample_wide_csv(p_old); // p50-only-Schema, op_scan_p50_ns = 500/600 > 0
+    std::vector<dg::WideMeasurementRow> old_rows;
+    ASSERT_EQ(dg::parse_wide_csv(p_old, old_rows), dg::status_ok);
+    auto out_old = comdare_user_tmp() / "e2a_surface_scan_legacy.tex";
+    fs::remove(out_old, ec);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_old, old_rows, "op_scan_p50_ns", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_old, "addplot3"));
+    EXPECT_TRUE(file_contains(out_old, "500.0000"));
+
+    fs::remove(out, ec);
+    fs::remove(out_old, ec);
+    fs::remove(p, ec);
+    fs::remove(p_old, ec);
+}
