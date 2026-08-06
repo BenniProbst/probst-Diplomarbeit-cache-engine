@@ -129,10 +129,20 @@
        ungenannt und laeuft damit korrekt als Voll-Sweep ueber ihren einen
        Baustein.
        NICHT VERWECHSELN: das Registry-Attribut golden_wired="true|false" gehoert
-       zum ALTEN golden-320-Katalog (tools/axis_registry_gen/main.cpp,
-       CatalogAxes<4,1,1,1,4,5,1,4,1,1,1,1,1,1,1,1,1> = 17 Faktoren, Produkt
+       zum golden-320-Katalog (lebende Quelle: profile_facade/source_catalog.hpp
+       Zeile 144, golden_320_catalog =
+       CatalogAxes<4,1,1,1,4,5,1,4,1,1,1,1,1,1,1,1,1,1> = 18 Faktoren, Produkt
        4*4*5*4 = 320) und sagt NICHTS darueber aus, ob eine Achse in DIESER
-       golden-XML steht. persistence_target kommt in jenem Katalog gar nicht vor.
+       golden-XML steht. persistence_target IST in jenem Katalog enthalten, und
+       zwar als 18. Faktor mit K=1 (source_catalog.hpp Zeile 143, "Q-10b: GoldenK
+       der neuen Achse = 1"); folgerichtig traegt der Baustein
+       persistence_memory_only in der Registry golden_wired="true"
+       (cache_engine_axis_registry.xml). Das Produkt bleibt dennoch 320, weil ein
+       Faktor K=1 kardinalitaets-neutral ist.
+       STALE ZWEITQUELLE, NICHT MASSGEBLICH: der Kopf-Kommentar in
+       tools/axis_registry_gen/main.cpp Zeilen 45 bis 49 fuehrt den Katalog noch
+       in der alten 17-Faktor-Schreibweise ohne persistence_target. Massgeblich
+       ist der lebende Katalog in source_catalog.hpp, nicht jener Kommentar.
 
        merge-Token je Achse:
          replace  = der Default wird durch den Pruefling ersetzt.
@@ -194,7 +204,25 @@
        ist der Block wirkungslos und die Bau-Matrix unveraendert.
        node_width und alloc_hw bleiben hier undeklariert: sie haben eigene
        Studien-Profile im thesis-Dialekt (ff2_node_width_study,
-       fb_numa_page_study) und keinen Owner-Auftrag im B14/KF-6-Fenster. -->
+       fb_numa_page_study) und keinen Owner-Auftrag im B14/KF-6-Fenster.
+
+       ce-AUFLAGE (D), VON DIESER DEKLARATION SCHARF GESTELLT: solange line_size
+       faktisch 64 war, war der Layout-Scan-Puffer in anatomy/abi_adapter.hpp
+       gross genug. Mit line_size=256 wird ein heute schlafender Ueberlauf
+       scharf: kRecords=16384, kRecordSize=48, Puffer = kRecords * 64 = 1048576
+       Byte, gelesen wird aber bis (kRecords-1)*256+4 = 4194052 Byte, also
+       Faktor 4 zu klein. Vor dem ce-Konsum muss kLbufBytes ABGELEITET werden
+       (kRecords * round_up(kRecordSize, line_bytes_of<Self>()), plus
+       static_assert-Gate kLbufBytes >= (kRecords-1)*kMaxStride +
+       sizeof(std::uint32_t)).
+       AM IST NACHGEZAEHLT (2026-08-06): betroffen sind DREI Pfade, nicht zwei,
+       und je Pfad stecken DREI 64-Literale (Dimensionierung, allocate-
+       Alignment, deallocate-Alignment):
+         run_workload              Zeilen 462, 464, 528
+         run_workload_segmented    Zeilen 562, 563, 606
+         run_workload_segmented_v2 Zeilen 693, 694, 913
+       Wer nur die Dimensionierung ableitet, laesst die Alignment-Literale
+       stehen; alle drei Pfade tragen dieselbe Formel und dieselbe Falle. -->
   <organ_subaxes>
     <cacheline per_organ="page_type node_type cache_traversal allocator">
       <line_size>32</line_size>
