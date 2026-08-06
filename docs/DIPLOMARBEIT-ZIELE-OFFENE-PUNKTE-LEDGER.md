@@ -4311,7 +4311,17 @@ in KEINEM Zweig.** Am Objekt: die Ref existiert als `refs/remotes/origin/...` **
 `anhang/en/A_measurements.tex`, "die 23 Abbildungen des Graph-Umbaus eingebunden (DE+EN)". **Das ist
 der TEXT-Teil genau des Graph-Pakets, dessen CODE-Teil heute im super gelandet ist** (`b35aea1b`,
 Abschnitt B). Die Arbeit war fertig, gesichert, auf zwei Remotes -- und haette gefehlt, weil
-"gesichert" mit "gelandet" verwechselt wurde. Das ist dieselbe Fehlerklasse wie R4 und wie Regel 6:
+"gesichert" mit "gelandet" verwechselt wurde.
+
+**REGEL 9 IST SOGAR NOCH SCHAERFER, als der Befund zunaechst hergab** (nachtraeglich in der
+Pipeline-Verifikation gefunden): die rescue-Ref hatte einen **eigenen gruenen CI-Lauf** --
+`thesis 14964`, `ref=rescue/gate8-graph-abbildungen-8970465d`, 12:39, `success`. Die Arbeit war also
+nicht nur gesichert, sondern **CI-geprueft** -- und lag trotzdem in keinem Zweig. **Nicht einmal
+"gruen getestet" impliziert "gelandet".** Das erklaert die Verwechslung und entschuldigt sie nicht:
+genau weil alle sichtbaren Signale auf "fertig" standen, ist `merge-base --is-ancestor` der einzige,
+der die Frage tatsaechlich beantwortet.
+
+Das ist dieselbe Fehlerklasse wie R4 und wie Regel 6:
 **eine Zusage, die eine andere Frage beantwortet als die gestellte.**
 
 **VOLLZUG (Reihenfolge eingehalten, Besitzfrage zuerst).** `git status --porcelain`, `git stash list`
@@ -4489,6 +4499,38 @@ Vorlauf zum Push, vollstaendig: gitleaks v8.30.1 **mit** `.gitleaks.toml` zweima
 ueber den Push-Inhalt (`85b74237..HEAD`, 205 Zeilen, 15.77 KB) und ueber den Baum
 (201.69 MB), beide Male `no leaks found`; Backup-Ref-Kontrolle danach: `origin` traegt genau
 `5ba3d03f refs/backup/pre-secret-scrub-20260802` und nichts Neues, `github` leer.
+
+**NACHGEHOLTE VERIFIKATION DER VIER OWNER-FREIGEGEBENEN PUSHES** (je ein gezielter Abruf ueber den
+VOLL-SHA, kein Polling; `/jobs` UND `/bridges`, weil ersteres letztere nicht zeigt):
+
+    Push                          Projekt  Lauf(e)              Ergebnis
+    ce main-FF   -> e7aa1244        286    15029 + 15031        beide success, je 19+1 manual, 0 failed
+    super main-FF-> 5534c23c        288    15030                success, 13/13 + Bridge -> ce 15031
+    thesis Gate 8-> 8970465d        289    15032 (dev)+15033    beide success, je 4 Jobs
+    super dev    -> 85b74237        288    15034                success, 13/13, verify:submodules gruen
+
+**Alle vier Pushes haben einen Lauf ausgeloest, alle Laeufe sind gruen -- kein "kein Lauf"-Fall.**
+`verify:submodules` ist auch nach dem ZWEITEN Zeiger-Wechsel (Thesis auf `8970465d`) gruen; der Bump
+ist damit zweimal unabhaengig CI-bestaetigt.
+
+**DIE THESIS BAUT -- und der dokumentierte `.blg`-Beleg steht woertlich im Trace.** Das Thesis-Skript
+faehrt drei Gates, alle drei passiert, keines ausgeloest:
+`test -s diplomarbeit-<lang>.log` (Build vollstaendig), `LaTeX-Warnings <= KNOWN_WARNINGS` und
+`grep -ciE "Repeated entry|Warning--" auf der .blg == 0`. Ausgabe je Sprache woertlich:
+**`LaTeX-Warnings=0 (erlaubt <=1)`** und **`BibTeX .blg Warnings/Repeated=0`**.
+Ergebnis: `diplomarbeit-de.pdf` **202 Seiten / 919275 Bytes** (Stil `alphadin.bst`),
+`diplomarbeit-en.pdf` **192 Seiten / 885362 Bytes** (Stil `alpha.bst`). `lint:latex` gruen mit einer
+chktex-WARNING auf einen `\thesislang`-Pfad, die den Job nicht bricht.
+**METHODEN-HINWEIS fuer kuenftige Trace-Lesungen:** ein roher Zaehler ueber den Trace meldet hier
+**1476** "LaTeX Warning" -- das sind die ZWISCHENLAEUFE von latexmk (erster Durchlauf kennt keine
+Referenzen). Im FINALEN Durchlauf sind es **0**. Und `GATE-FAIL` steht zweimal im Trace, ist aber der
+SKRIPT-TEXT der Gates, kein ausgeloestes Gate. Wer beides roh zaehlt, meldet ein rotes Dokument, das
+gruen ist -- dieselbe Familie wie Regel 6, nur mit umgekehrtem Vorzeichen.
+
+**KORREKTUR EINER ANNAHME:** das Thesis-Projekt 289 hatte NICHT "zum ersten Mal seit Tagen" einen
+Lauf -- allein heute **zwoelf**, von 05:30 bis 18:32, **alle `success`**, fast alle auf `main` (das
+Repo wird laufend aus Overleaf bedient). Der Gate-8-Push ist also kein Wiederbelebungs-, sondern ein
+Regelfall-Lauf.
 
 ### H) OFFEN / NICHT VON DIESER LINIE ZU ENTSCHEIDEN
 
