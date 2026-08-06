@@ -1,0 +1,30 @@
+==== FORMWACHEN-MESSUNG: macht sie die Plan-Ablage dauerhaft inert? ====
+erzeugt 2026-08-06T16:30:52+00:00, Objekt ce a9a352bb
+Frage: liefert der PRODUKTIVE Fingerprint-Provider fuer echte binary_ids Leerwerte?
+(lazy_adhoc_source_gen.hpp:367 gibt {} zurueck, wenn eine binary_id nicht materialisierbar ist)
+
+-- AKTUELLE Form (golden_fullpilot_320_binary_ids.txt) --
+  binary_ids gepruefte Menge : 320
+  gueltige 128-hex           : 320
+  LEER (nicht materialisierbar): 0
+  formwidrig (weder leer noch 128-hex): 0
+  => Formwache wuerde die Plan-Ablage DURCHLASSEN (Ebene wirksam)
+
+-- GEGENPROBE, damit die Null nicht blind ist: dieselbe Fixture in ALT-ABI-Formen --
+   [abi4]
+     gueltige 128-hex           : 0
+     LEER (nicht materialisierbar): 320
+     formwidrig (weder leer noch 128-hex): 0
+   [abi5]
+     gueltige 128-hex           : 0
+     LEER (nicht materialisierbar): 320
+     formwidrig (weder leer noch 128-hex): 0
+   [abi6]
+     gueltige 128-hex           : 0
+     LEER (nicht materialisierbar): 320
+     formwidrig (weder leer noch 128-hex): 0
+
+ERGEBNIS: die Formwache laesst die reale Selektion DURCH und greift bei Alt-Formen scharf.
+GRENZE: gemessen ist die golden-320-Fixture, NICHT die produktive 2^17-Selektion
+(golden_fullpilot_131072_binary_ids.txt existiert im Repo nicht -- golden-gegated).
+==== ENDE ====
