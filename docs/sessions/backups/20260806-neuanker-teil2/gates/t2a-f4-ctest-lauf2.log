@@ -1,0 +1,934 @@
+Test project /home/comdare/wt-b2-neuanker/build/gate
+        Start   1: test_pressure_state
+  1/408 Test   #1: test_pressure_state .................................   Passed    0.00 sec
+        Start   2: test_cache_recommendation
+  2/408 Test   #2: test_cache_recommendation ...........................   Passed    0.00 sec
+        Start   3: test_cpuid_probe
+  3/408 Test   #3: test_cpuid_probe ....................................   Passed    0.00 sec
+        Start   4: test_permutation_flags
+  4/408 Test   #4: test_permutation_flags ..............................   Passed    0.00 sec
+        Start   5: test_event_hierarchy
+  5/408 Test   #5: test_event_hierarchy ................................   Passed    0.00 sec
+        Start   6: test_observer_registry
+  6/408 Test   #6: test_observer_registry ..............................   Passed    0.00 sec
+        Start   7: test_decision_trees
+  7/408 Test   #7: test_decision_trees .................................   Passed    0.00 sec
+        Start   8: test_decision_lambda_registry
+  8/408 Test   #8: test_decision_lambda_registry .......................   Passed    0.00 sec
+        Start   9: test_concurrency_disciplines
+  9/408 Test   #9: test_concurrency_disciplines ........................   Passed    0.00 sec
+        Start  10: test_telemetry_strategies
+ 10/408 Test  #10: test_telemetry_strategies ...........................   Passed    0.00 sec
+        Start  11: test_platform_concepts
+ 11/408 Test  #11: test_platform_concepts ..............................   Passed    0.00 sec
+        Start  12: test_cache_hierarchy_and_mode
+ 12/408 Test  #12: test_cache_hierarchy_and_mode .......................   Passed    0.00 sec
+        Start  13: test_measurement_buffer
+ 13/408 Test  #13: test_measurement_buffer .............................   Passed    0.00 sec
+        Start  14: test_sub_engines
+ 14/408 Test  #14: test_sub_engines ....................................   Passed    0.00 sec
+        Start  15: test_allocator_concepts
+ 15/408 Test  #15: test_allocator_concepts .............................   Passed    0.00 sec
+        Start  16: test_abi_interface
+ 16/408 Test  #16: test_abi_interface ..................................   Passed    0.00 sec
+        Start  17: test_config_durability
+ 17/408 Test  #17: test_config_durability ..............................   Passed    0.00 sec
+        Start  18: test_chaos_drift_gate
+ 18/408 Test  #18: test_chaos_drift_gate ...............................   Passed    0.00 sec
+        Start  19: test_test_data_accumulation
+ 19/408 Test  #19: test_test_data_accumulation .........................   Passed    0.00 sec
+        Start  20: test_benchmark_suite
+ 20/408 Test  #20: test_benchmark_suite ................................   Passed    0.00 sec
+        Start  21: test_allocator_full_matrix
+ 21/408 Test  #21: test_allocator_full_matrix ..........................   Passed    0.04 sec
+        Start  22: test_workload_and_experiment
+ 22/408 Test  #22: test_workload_and_experiment ........................   Passed    0.00 sec
+        Start  23: test_ycsb_cli
+ 23/408 Test  #23: test_ycsb_cli .......................................   Passed    0.00 sec
+        Start  24: test_builder_codegen
+ 24/408 Test  #24: test_builder_codegen ................................   Passed    0.00 sec
+        Start  25: test_codegen_from_profile
+ 25/408 Test  #25: test_codegen_from_profile ...........................   Passed    0.00 sec
+        Start  26: test_experiment_driver_v13
+ 26/408 Test  #26: test_experiment_driver_v13 ..........................   Passed    0.00 sec
+        Start  27: test_permutation_sampling
+ 27/408 Test  #27: test_permutation_sampling ...........................   Passed    0.10 sec
+        Start  28: test_latex_anhang
+ 28/408 Test  #28: test_latex_anhang ...................................   Passed    0.00 sec
+        Start  29: test_rcu
+ 29/408 Test  #29: test_rcu ............................................   Passed    0.07 sec
+        Start  30: test_rcu_concurrency
+ 30/408 Test  #30: test_rcu_concurrency ................................   Passed    0.00 sec
+        Start  31: test_succinct
+ 31/408 Test  #31: test_succinct .......................................   Passed    0.00 sec
+        Start  32: test_hbm_hierarchy
+ 32/408 Test  #32: test_hbm_hierarchy ..................................   Passed    0.00 sec
+        Start  33: test_module_loader
+ 33/408 Test  #33: test_module_loader ..................................   Passed    0.00 sec
+        Start  34: test_v31_adapters
+ 34/408 Test  #34: test_v31_adapters ...................................   Passed    0.00 sec
+        Start  35: test_v41_indexes
+ 35/408 Test  #35: test_v41_indexes ....................................   Passed    0.00 sec
+        Start  36: test_v41_topic_allocator_axis_06
+ 36/408 Test  #36: test_v41_topic_allocator_axis_06 ....................   Passed    0.01 sec
+        Start  37: test_v41_topic_queuing
+ 37/408 Test  #37: test_v41_topic_queuing ..............................   Passed    0.00 sec
+        Start  38: test_v41_topic_traversal
+ 38/408 Test  #38: test_v41_topic_traversal ............................   Passed    0.04 sec
+        Start  39: test_v41_paper_legacy_code
+ 39/408 Test  #39: test_v41_paper_legacy_code ..........................   Passed    0.00 sec
+        Start  40: test_ctsha512
+ 40/408 Test  #40: test_ctsha512 .......................................   Passed    0.00 sec
+        Start  41: test_v41_compositions
+ 41/408 Test  #41: test_v41_compositions ...............................   Passed    0.00 sec
+        Start  42: test_v41_topics_fundament
+ 42/408 Test  #42: test_v41_topics_fundament ...........................   Passed    0.00 sec
+        Start  43: test_v41_anatomy
+ 43/408 Test  #43: test_v41_anatomy ....................................   Passed    0.00 sec
+        Start  44: test_v41_anatomy_r4_driver
+ 44/408 Test  #44: test_v41_anatomy_r4_driver ..........................   Passed    0.00 sec
+        Start  45: test_v41_anatomy_observer
+ 45/408 Test  #45: test_v41_anatomy_observer ...........................   Passed    0.00 sec
+        Start  46: test_v41_tier_observe_trace
+ 46/408 Test  #46: test_v41_tier_observe_trace .........................   Passed    0.01 sec
+        Start  47: test_v41_axis_03a_cross_variant_equivalence
+ 47/408 Test  #47: test_v41_axis_03a_cross_variant_equivalence .........   Passed    0.06 sec
+        Start  48: test_ap7_swisstable
+ 48/408 Test  #48: test_ap7_swisstable .................................   Passed    0.00 sec
+        Start  49: test_ap7b_swiss_organ
+ 49/408 Test  #49: test_ap7b_swiss_organ ...............................   Passed    0.00 sec
+        Start  50: test_ap7b3_swiss_isa_group_match
+ 50/408 Test  #50: test_ap7b3_swiss_isa_group_match ....................   Passed    0.00 sec
+        Start  51: test_ap8_hdr_histogram
+ 51/408 Test  #51: test_ap8_hdr_histogram ..............................   Passed    0.00 sec
+        Start  52: test_vampir_nfp_allocator
+ 52/408 Test  #52: test_vampir_nfp_allocator ...........................   Passed    0.00 sec
+        Start  53: test_v41_axis_03a_tier_organ_equivalence
+ 53/408 Test  #53: test_v41_axis_03a_tier_organ_equivalence ............   Passed    0.19 sec
+        Start  54: test_v41_anatomy_pruefling_merge
+ 54/408 Test  #54: test_v41_anatomy_pruefling_merge ....................   Passed    0.00 sec
+        Start  55: test_v41_anatomy_base
+ 55/408 Test  #55: test_v41_anatomy_base ...............................   Passed    0.00 sec
+        Start  56: test_v41_execution_engine
+ 56/408 Test  #56: test_v41_execution_engine ...........................   Passed    0.00 sec
+        Start  57: test_v41_search_algorithm_permutation_engine
+ 57/408 Test  #57: test_v41_search_algorithm_permutation_engine ........   Passed    0.00 sec
+        Start  58: test_v41_anatomy_module_abi
+ 58/408 Test  #58: test_v41_anatomy_module_abi .........................   Passed    0.00 sec
+        Start  59: test_v41_anatomy_codegen
+ 59/408 Test  #59: test_v41_anatomy_codegen ............................   Passed    0.00 sec
+        Start  60: test_v41_anatomy_module_loader
+ 60/408 Test  #60: test_v41_anatomy_module_loader ......................   Passed    0.00 sec
+        Start  61: test_v41_anatomy_multi_codegen
+ 61/408 Test  #61: test_v41_anatomy_multi_codegen ......................   Passed    0.00 sec
+        Start  62: test_v41_anatomy_codegen_tool
+ 62/408 Test  #62: test_v41_anatomy_codegen_tool .......................   Passed    0.00 sec
+        Start  63: test_v41_anatomy_codegen_tool_traits
+ 63/408 Test  #63: test_v41_anatomy_codegen_tool_traits ................   Passed    0.00 sec
+        Start  64: test_v41_anatomy_codegen_tool_mp_list
+ 64/408 Test  #64: test_v41_anatomy_codegen_tool_mp_list ...............   Passed    0.00 sec
+        Start  65: test_v41_workload_generator
+ 65/408 Test  #65: test_v41_workload_generator .........................   Passed    0.00 sec
+        Start  66: test_v41_axis_12_general_hardware
+ 66/408 Test  #66: test_v41_axis_12_general_hardware ...................   Passed    0.00 sec
+        Start  67: test_v41_axis_05_memory_layout
+ 67/408 Test  #67: test_v41_axis_05_memory_layout ......................   Passed    0.00 sec
+        Start  68: test_v41_axis_02_axis_04_nodes
+ 68/408 Test  #68: test_v41_axis_02_axis_04_nodes ......................   Passed    0.00 sec
+        Start  69: test_v41_axis_07_prefetch
+ 69/408 Test  #69: test_v41_axis_07_prefetch ...........................   Passed    0.00 sec
+        Start  70: test_v41_axis_11_telemetry
+ 70/408 Test  #70: test_v41_axis_11_telemetry ..........................   Passed    0.00 sec
+        Start  71: test_v41_axis_10_serialization
+ 71/408 Test  #71: test_v41_axis_10_serialization ......................   Passed    0.00 sec
+        Start  72: test_v41_axis_14_value_handle
+ 72/408 Test  #72: test_v41_axis_14_value_handle .......................   Passed    0.00 sec
+        Start  73: test_v41_axis_08_concurrency
+ 73/408 Test  #73: test_v41_axis_08_concurrency ........................   Passed    0.00 sec
+        Start  74: test_v41_status_code
+ 74/408 Test  #74: test_v41_status_code ................................   Passed    0.00 sec
+        Start  75: test_v41_serialization_primitives
+ 75/408 Test  #75: test_v41_serialization_primitives ...................   Passed    0.00 sec
+        Start  76: test_v41_axis_01_page_type
+ 76/408 Test  #76: test_v41_axis_01_page_type ..........................   Passed    0.00 sec
+        Start  77: test_v41_pruefling_registry
+ 77/408 Test  #77: test_v41_pruefling_registry .........................   Passed    0.00 sec
+        Start  78: test_v41_axis_filter
+ 78/408 Test  #78: test_v41_axis_filter ................................   Passed    0.00 sec
+        Start  79: test_v41_axis_filter_surf_organ
+ 79/408 Test  #79: test_v41_axis_filter_surf_organ .....................   Passed    0.01 sec
+        Start  80: test_v41_axis_filter_surf_louds_organ
+ 80/408 Test  #80: test_v41_axis_filter_surf_louds_organ ...............   Passed    2.16 sec
+        Start  81: test_v41_axis_io
+ 81/408 Test  #81: test_v41_axis_io ....................................   Passed    0.00 sec
+        Start  82: test_v41_axis_migration
+ 82/408 Test  #82: test_v41_axis_migration .............................   Passed    0.00 sec
+        Start  83: test_v41_axis_01_index_organization
+ 83/408 Test  #83: test_v41_axis_01_index_organization .................   Passed    0.00 sec
+        Start  84: test_v41_axis_09_isa
+ 84/408 Test  #84: test_v41_axis_09_isa ................................   Passed    0.00 sec
+        Start  85: test_v41_axis_09b_simd_extension
+ 85/408 Test  #85: test_v41_axis_09b_simd_extension ....................   Passed    0.00 sec
+        Start  86: test_v41_r5c3_isa_simd_cross_constraint
+ 86/408 Test  #86: test_v41_r5c3_isa_simd_cross_constraint .............   Passed    0.00 sec
+        Start  87: test_v41_anatomy_r5i_configure_codegen
+ 87/408 Test  #87: test_v41_anatomy_r5i_configure_codegen ..............   Passed    0.00 sec
+        Start  88: test_v41_anatomy_f15_measurement
+ 88/408 Test  #88: test_v41_anatomy_f15_measurement ....................   Passed    0.58 sec
+        Start  89: test_v41_anatomy_adhoc_codegen_macro
+ 89/408 Test  #89: test_v41_anatomy_adhoc_codegen_macro ................   Passed    0.00 sec
+        Start  90: test_v41_pruef_dock_search_algorithm
+ 90/408 Test  #90: test_v41_pruef_dock_search_algorithm ................   Passed    0.01 sec
+        Start  91: test_v5_conformance_gate
+ 91/408 Test  #91: test_v5_conformance_gate ............................   Passed    0.01 sec
+        Start  92: test_v5_memento_axis
+ 92/408 Test  #92: test_v5_memento_axis ................................   Passed    0.00 sec
+        Start  93: test_v5_two_phase_driver
+ 93/408 Test  #93: test_v5_two_phase_driver ............................   Passed    0.00 sec
+        Start  94: test_v5_workload_orchestrator
+ 94/408 Test  #94: test_v5_workload_orchestrator .......................   Passed    0.03 sec
+        Start  95: test_v5_measurement_snapshot
+ 95/408 Test  #95: test_v5_measurement_snapshot ........................   Passed    0.00 sec
+        Start  96: test_heuristik_spline_break_even
+ 96/408 Test  #96: test_heuristik_spline_break_even ....................   Passed    0.00 sec
+        Start  97: test_ap9_provenance_manifest
+ 97/408 Test  #97: test_ap9_provenance_manifest ........................   Passed    0.00 sec
+        Start  98: test_ap13_thread_pinning
+ 98/408 Test  #98: test_ap13_thread_pinning ............................   Passed    0.00 sec
+        Start  99: test_ap10_dataset_akte
+ 99/408 Test  #99: test_ap10_dataset_akte ..............................   Passed    0.00 sec
+        Start 100: test_184_dataset_loader_wiring
+100/408 Test #100: test_184_dataset_loader_wiring ......................   Passed    0.00 sec
+        Start 101: test_25_kanon_dataset_akten
+101/408 Test #101: test_25_kanon_dataset_akten .........................   Passed    0.11 sec
+        Start 102: test_45_sosd_uint64_loader
+102/408 Test #102: test_45_sosd_uint64_loader ..........................   Passed    0.00 sec
+        Start 103: test_v5_disk_memento
+103/408 Test #103: test_v5_disk_memento ................................   Passed    0.00 sec
+        Start 104: test_v5_ycsb_distribution
+104/408 Test #104: test_v5_ycsb_distribution ...........................   Passed    0.03 sec
+        Start 105: test_v5_ycsb_op_set
+105/408 Test #105: test_v5_ycsb_op_set .................................   Passed    0.02 sec
+        Start 106: test_v41_scan_range_organ
+106/408 Test #106: test_v41_scan_range_organ ...........................   Passed    0.01 sec
+        Start 107: test_v5_organ_memento
+107/408 Test #107: test_v5_organ_memento ...............................   Passed    0.00 sec
+        Start 108: test_v41_codegen_type_name
+108/408 Test #108: test_v41_codegen_type_name ..........................   Passed    0.00 sec
+        Start 109: test_v41_cache_engine_tools_facade
+109/408 Test #109: test_v41_cache_engine_tools_facade ..................   Passed    0.00 sec
+        Start 110: test_v41_cache_engine_facade
+110/408 Test #110: test_v41_cache_engine_facade ........................   Passed    0.00 sec
+        Start 111: test_v41_codegen_all_axes_umbrella
+111/408 Test #111: test_v41_codegen_all_axes_umbrella ..................   Passed    0.00 sec
+        Start 112: test_v41_anatomy_adhoc_dll_load
+112/408 Test #112: test_v41_anatomy_adhoc_dll_load .....................   Passed    0.02 sec
+        Start 113: test_pruef_only_gate
+113/408 Test #113: test_pruef_only_gate ................................   Passed    0.01 sec
+        Start 114: test_v41_anatomy_adhoc_autobuilt_load
+114/408 Test #114: test_v41_anatomy_adhoc_autobuilt_load ...............   Passed    0.99 sec
+        Start 115: f15_compare_cli_smoke
+115/408 Test #115: f15_compare_cli_smoke ...............................   Passed    0.46 sec
+        Start 116: test_d1_d2_selection
+116/408 Test #116: test_d1_d2_selection ................................   Passed    0.00 sec
+        Start 117: test_d3_ceb_generator
+117/408 Test #117: test_d3_ceb_generator ...............................   Passed    0.00 sec
+        Start 118: test_d7_build_variant
+118/408 Test #118: test_d7_build_variant ...............................   Passed    0.00 sec
+        Start 119: test_d7a_build_inspection
+119/408 Test #119: test_d7a_build_inspection ...........................   Passed    0.00 sec
+        Start 120: test_d7b_definition_per_node
+120/408 Test #120: test_d7b_definition_per_node ........................   Passed    0.00 sec
+        Start 121: test_d8_operability
+121/408 Test #121: test_d8_operability .................................   Passed    0.00 sec
+        Start 122: test_d9_set
+122/408 Test #122: test_d9_set .........................................   Passed    0.00 sec
+        Start 123: test_d9_set_adapter
+123/408 Test #123: test_d9_set_adapter .................................   Passed    0.00 sec
+        Start 124: test_d10_sequence
+124/408 Test #124: test_d10_sequence ...................................   Passed    0.00 sec
+        Start 125: test_d11_view
+125/408 Test #125: test_d11_view .......................................   Passed    0.00 sec
+        Start 126: test_genus_docks
+126/408 Test #126: test_genus_docks ....................................   Passed    0.00 sec
+        Start 127: test_d12_virus
+127/408 Test #127: test_d12_virus ......................................   Passed    0.00 sec
+        Start 128: test_d13_runtime_measure
+128/408 Test #128: test_d13_runtime_measure ............................   Passed    0.00 sec
+        Start 129: test_d14_result_ingest
+129/408 Test #129: test_d14_result_ingest ..............................   Passed    0.00 sec
+        Start 130: test_d14b_perm_runner
+130/408 Test #130: test_d14b_perm_runner ...............................   Passed    0.00 sec
+        Start 131: test_a1_load_profile_opmix
+131/408 Test #131: test_a1_load_profile_opmix ..........................   Passed    0.00 sec
+        Start 132: test_d14c_e2e_pipeline
+132/408 Test #132: test_d14c_e2e_pipeline ..............................   Passed    0.00 sec
+        Start 133: test_d15_selection_filter_chain
+133/408 Test #133: test_d15_selection_filter_chain .....................   Passed    0.00 sec
+        Start 134: test_cmd2_container_attribution
+134/408 Test #134: test_cmd2_container_attribution .....................   Passed    0.00 sec
+        Start 135: test_container_genus
+135/408 Test #135: test_container_genus ................................   Passed    0.00 sec
+        Start 136: test_container_dock
+136/408 Test #136: test_container_dock .................................   Passed    0.00 sec
+        Start 137: test_d_v42_probe
+137/408 Test #137: test_d_v42_probe ....................................   Passed    0.00 sec
+        Start 138: test_d_v42_probe2
+138/408 Test #138: test_d_v42_probe2 ...................................   Passed    0.00 sec
+        Start 139: test_d_v42_telemetry_observable
+139/408 Test #139: test_d_v42_telemetry_observable .....................   Passed    0.00 sec
+        Start 140: test_d_v42_memory_layout_observable
+140/408 Test #140: test_d_v42_memory_layout_observable .................   Passed    0.00 sec
+        Start 141: test_d_v42_serialization_observable
+141/408 Test #141: test_d_v42_serialization_observable .................   Passed    0.00 sec
+        Start 142: test_d_v42_node_type_observable
+142/408 Test #142: test_d_v42_node_type_observable .....................   Passed    0.00 sec
+        Start 143: test_d_v42_telemetry_registry_observable
+143/408 Test #143: test_d_v42_telemetry_registry_observable ............   Passed    0.00 sec
+        Start 144: test_genus_permutation_engines
+144/408 Test #144: test_genus_permutation_engines ......................   Passed    0.00 sec
+        Start 145: test_axis_growth_policies
+145/408 Test #145: test_axis_growth_policies ...........................   Passed    0.00 sec
+        Start 146: test_axis_view_policies
+146/408 Test #146: test_axis_view_policies .............................   Passed    0.00 sec
+        Start 147: test_e24_c0_organ_concept
+147/408 Test #147: test_e24_c0_organ_concept ...........................   Passed    0.00 sec
+        Start 148: test_e24_c1_organ_concept
+148/408 Test #148: test_e24_c1_organ_concept ...........................   Passed    0.00 sec
+        Start 149: test_e24_c2_set_permutation_engine
+149/408 Test #149: test_e24_c2_set_permutation_engine ..................   Passed    0.00 sec
+        Start 150: test_e24_c2_sequence_permutation_engine
+150/408 Test #150: test_e24_c2_sequence_permutation_engine .............   Passed    0.00 sec
+        Start 151: test_e24_c2_view_permutation_engine
+151/408 Test #151: test_e24_c2_view_permutation_engine .................   Passed    0.00 sec
+        Start 152: test_e24_c2_adapter_permutation_engine
+152/408 Test #152: test_e24_c2_adapter_permutation_engine ..............   Passed    0.00 sec
+        Start 153: test_e24_c3_set_anatomy
+153/408 Test #153: test_e24_c3_set_anatomy .............................   Passed    0.00 sec
+        Start 154: test_e24_c3_sequence_anatomy
+154/408 Test #154: test_e24_c3_sequence_anatomy ........................   Passed    0.00 sec
+        Start 155: test_e24_c3_view_anatomy
+155/408 Test #155: test_e24_c3_view_anatomy ............................   Passed    0.00 sec
+        Start 156: test_e24_c3_adapter_anatomy
+156/408 Test #156: test_e24_c3_adapter_anatomy .........................   Passed    0.00 sec
+        Start 157: test_e24_c3_cross_genus
+157/408 Test #157: test_e24_c3_cross_genus .............................   Passed    0.00 sec
+        Start 158: test_e24_c4_genus_conformance_gates
+158/408 Test #158: test_e24_c4_genus_conformance_gates .................   Passed    0.00 sec
+        Start 159: test_e24_c5_fk8_genus_baupfad_d1
+159/408 Test #159: test_e24_c5_fk8_genus_baupfad_d1 ....................   Passed    0.00 sec
+        Start 160: test_a8s3_sa_organ_member_vollstaendigkeit
+160/408 Test #160: test_a8s3_sa_organ_member_vollstaendigkeit ..........   Passed    0.00 sec
+        Start 161: test_e24_c6v_growth_statistics
+161/408 Test #161: test_e24_c6v_growth_statistics ......................   Passed    0.00 sec
+        Start 162: test_e24_c6v_view_statistics
+162/408 Test #162: test_e24_c6v_view_statistics ........................   Passed    0.00 sec
+        Start 163: test_e24_c6v_inner_container_statistics
+163/408 Test #163: test_e24_c6v_inner_container_statistics .............   Passed    0.00 sec
+        Start 164: test_e24_c6v_set_ehrlichkeit
+164/408 Test #164: test_e24_c6v_set_ehrlichkeit ........................   Passed    0.00 sec
+        Start 165: test_e24_c6_genus_observer_aggregate
+165/408 Test #165: test_e24_c6_genus_observer_aggregate ................   Passed    0.00 sec
+        Start 166: test_e24_c6_axis_row_writer
+166/408 Test #166: test_e24_c6_axis_row_writer .........................   Passed    0.00 sec
+        Start 167: test_e24_c6_set_wire_aggregate
+167/408 Test #167: test_e24_c6_set_wire_aggregate ......................   Passed    0.00 sec
+        Start 168: test_e24_c6_sequence_wire_aggregate
+168/408 Test #168: test_e24_c6_sequence_wire_aggregate .................   Passed    0.00 sec
+        Start 169: test_e24_c6_adapter_wire_aggregate
+169/408 Test #169: test_e24_c6_adapter_wire_aggregate ..................   Passed    0.00 sec
+        Start 170: test_e24_c6_view_wire_aggregate
+170/408 Test #170: test_e24_c6_view_wire_aggregate .....................   Passed    0.00 sec
+        Start 171: test_e24_c6_set_algebra_abi
+171/408 Test #171: test_e24_c6_set_algebra_abi .........................   Passed    0.00 sec
+        Start 172: test_e24_c7_gattung_map_umbenennung
+172/408 Test #172: test_e24_c7_gattung_map_umbenennung .................   Passed    0.00 sec
+        Start 173: test_e24_c7_container_gattungs_kern
+173/408 Test #173: test_e24_c7_container_gattungs_kern .................   Passed    0.00 sec
+        Start 174: test_e24_c7_element_type_vertrag
+174/408 Test #174: test_e24_c7_element_type_vertrag ....................   Passed    0.00 sec
+        Start 175: test_e24_c7_gattung_abi_sichtbar
+175/408 Test #175: test_e24_c7_gattung_abi_sichtbar ....................   Passed    0.00 sec
+        Start 176: test_e24_c7_symmetrie_und_benennung
+176/408 Test #176: test_e24_c7_symmetrie_und_benennung .................   Passed    0.00 sec
+        Start 177: test_e24_c1_organ_concept_negativ
+177/408 Test #177: test_e24_c1_organ_concept_negativ ...................   Passed    0.15 sec
+        Start 178: test_e24_c4_dock_version_negativ
+178/408 Test #178: test_e24_c4_dock_version_negativ ....................   Passed    0.23 sec
+        Start 179: test_e24_c4_genus_pruef_docks
+179/408 Test #179: test_e24_c4_genus_pruef_docks .......................   Passed    0.00 sec
+        Start 180: test_e24_c5_fk7_dock_fehlerklassen
+180/408 Test #180: test_e24_c5_fk7_dock_fehlerklassen ..................   Passed    0.00 sec
+        Start 181: test_migration_two_tier
+181/408 Test #181: test_migration_two_tier .............................   Passed    2.49 sec
+        Start 182: test_seg_coverage
+182/408 Test #182: test_seg_coverage ...................................   Passed    0.79 sec
+        Start 183: test_filter_real_from_keys
+183/408 Test #183: test_filter_real_from_keys ..........................   Passed    0.01 sec
+        Start 184: test_patricia_real
+184/408 Test #184: test_patricia_real ..................................   Passed    0.03 sec
+        Start 185: test_value_handle_real
+185/408 Test #185: test_value_handle_real ..............................   Passed    0.01 sec
+        Start 186: test_prefetch_real
+186/408 Test #186: test_prefetch_real ..................................   Passed    0.65 sec
+        Start 187: test_prefetch_adversarial_verify
+187/408 Test #187: test_prefetch_adversarial_verify ....................   Passed    2.12 sec
+        Start 188: test_prefetch_patha_t7
+188/408 Test #188: test_prefetch_patha_t7 ..............................   Passed    0.06 sec
+        Start 189: test_a8s1_t17_vollzaehligkeit
+189/408 Test #189: test_a8s1_t17_vollzaehligkeit .......................   Passed    0.03 sec
+        Start 190: test_a8s3_t17_stats_lesezeitpunkt
+190/408 Test #190: test_a8s3_t17_stats_lesezeitpunkt ...................   Passed    0.03 sec
+        Start 191: test_s5_04_execution_alloc_conformance
+191/408 Test #191: test_s5_04_execution_alloc_conformance ..............   Passed    0.00 sec
+        Start 192: test_s5_04_execution_perf_sanity
+192/408 Test #192: test_s5_04_execution_perf_sanity ....................   Passed    0.02 sec
+        Start 193: test_s5_03_placement_alloc_conformance
+193/408 Test #193: test_s5_03_placement_alloc_conformance ..............   Passed    0.00 sec
+        Start 194: test_s5_03_placement_perf_sanity
+194/408 Test #194: test_s5_03_placement_perf_sanity ....................   Passed    0.02 sec
+        Start 195: test_s5_01d_traversal_alloc_conformance
+195/408 Test #195: test_s5_01d_traversal_alloc_conformance .............   Passed    0.00 sec
+        Start 196: test_s5_01d_traversal_perf_sanity
+196/408 Test #196: test_s5_01d_traversal_perf_sanity ...................   Passed    0.03 sec
+        Start 197: test_s5_02a_layout_alloc_conformance
+197/408 Test #197: test_s5_02a_layout_alloc_conformance ................   Passed    0.00 sec
+        Start 198: test_s5_02a_layout_perf_sanity
+198/408 Test #198: test_s5_02a_layout_perf_sanity ......................   Passed    0.03 sec
+        Start 199: test_s5_01a_pool_stores_alloc_conformance
+199/408 Test #199: test_s5_01a_pool_stores_alloc_conformance ...........   Passed    0.00 sec
+        Start 200: test_s5_01a_pool_stores_perf_sanity
+200/408 Test #200: test_s5_01a_pool_stores_perf_sanity .................   Passed    0.15 sec
+        Start 201: test_s5_02b_filter_alloc_conformance
+201/408 Test #201: test_s5_02b_filter_alloc_conformance ................   Passed    0.07 sec
+        Start 202: test_s5_02b_filter_perf_sanity
+202/408 Test #202: test_s5_02b_filter_perf_sanity ......................   Passed    0.06 sec
+        Start 203: test_s5_01b_composable_alloc_conformance
+203/408 Test #203: test_s5_01b_composable_alloc_conformance ............   Passed    0.00 sec
+        Start 204: test_s5_01b_composable_perf_sanity
+204/408 Test #204: test_s5_01b_composable_perf_sanity ..................   Passed    0.01 sec
+        Start 205: test_s5_01c_fassaden_conformance
+205/408 Test #205: test_s5_01c_fassaden_conformance ....................   Passed    0.01 sec
+        Start 206: test_s5_05q_queuing_alloc_conformance
+206/408 Test #206: test_s5_05q_queuing_alloc_conformance ...............   Passed    0.11 sec
+        Start 207: test_s5_05q_queuing_perf_sanity
+207/408 Test #207: test_s5_05q_queuing_perf_sanity .....................   Passed    0.01 sec
+        Start 208: test_h64_allocator_adapter_failure_contract
+208/408 Test #208: test_h64_allocator_adapter_failure_contract .........   Passed    0.00 sec
+        Start 209: test_h81_allocator_statistics_forwarder_recursion
+209/408 Test #209: test_h81_allocator_statistics_forwarder_recursion ...   Passed    0.00 sec
+        Start 210: test_cow_memento
+210/408 Test #210: test_cow_memento ....................................   Passed    0.01 sec
+        Start 211: test_cuckoo_eviction_correctness
+211/408 Test #211: test_cuckoo_eviction_correctness ....................   Passed    0.00 sec
+        Start 212: test_hash_lookup_backward_shift
+212/408 Test #212: test_hash_lookup_backward_shift .....................   Passed    0.00 sec
+        Start 213: test_scalloc_realloc_alignment
+213/408 Test #213: test_scalloc_realloc_alignment ......................   Passed    0.00 sec
+        Start 214: test_br1_full22_count
+214/408 Test #214: test_br1_full22_count ...............................   Passed    0.00 sec
+        Start 215: test_br1_subset
+215/408 Test #215: test_br1_subset .....................................   Passed    0.00 sec
+        Start 216: test_br2_descriptor_foundation
+216/408 Test #216: test_br2_descriptor_foundation ......................   Passed    0.00 sec
+        Start 217: test_br2_roundtrip
+217/408 Test #217: test_br2_roundtrip ..................................   Passed    0.00 sec
+        Start 218: test_br3_obs22
+218/408 Test #218: test_br3_obs22 ......................................   Passed    0.00 sec
+        Start 219: test_br_kf15_real
+219/408 Test #219: test_br_kf15_real ...................................   Passed    0.00 sec
+        Start 220: test_clu_per_layout
+220/408 Test #220: test_clu_per_layout .................................   Passed    0.01 sec
+        Start 221: test_cow_capable_wrappers
+221/408 Test #221: test_cow_capable_wrappers ...........................   Passed    0.00 sec
+        Start 222: test_d4b_container_adapter
+222/408 Test #222: test_d4b_container_adapter ..........................   Passed    0.00 sec
+        Start 223: test_genus_binding
+223/408 Test #223: test_genus_binding ..................................   Passed    0.00 sec
+        Start 224: test_genus_organ_binding
+224/408 Test #224: test_genus_organ_binding ............................   Passed    0.00 sec
+        Start 225: test_kf4_resource_control
+225/408 Test #225: test_kf4_resource_control ...........................   Passed    0.00 sec
+        Start 226: test_kf5_cacheline_weave
+226/408 Test #226: test_kf5_cacheline_weave ............................   Passed    0.00 sec
+        Start 227: test_kf6_node_run_body
+227/408 Test #227: test_kf6_node_run_body ..............................   Passed    0.00 sec
+        Start 228: test_kf7_runtime_loop
+228/408 Test #228: test_kf7_runtime_loop ...............................   Passed    0.00 sec
+        Start 229: test_kf8_ceb_generator
+229/408 Test #229: test_kf8_ceb_generator ..............................   Passed    0.00 sec
+        Start 230: test_kf9_experiment_tree
+230/408 Test #230: test_kf9_experiment_tree ............................   Passed    0.00 sec
+        Start 231: test_kf10_repetition_plan
+231/408 Test #231: test_kf10_repetition_plan ...........................   Passed    0.00 sec
+        Start 232: test_kf11_telemetry_silent
+232/408 Test #232: test_kf11_telemetry_silent ..........................   Passed    0.00 sec
+        Start 233: test_kf12_kf13_slurm_prepare
+233/408 Test #233: test_kf12_kf13_slurm_prepare ........................   Passed    0.00 sec
+        Start 234: test_kf15_inverse_signature
+234/408 Test #234: test_kf15_inverse_signature .........................   Passed    0.00 sec
+        Start 235: test_kf16_build_orchestrator
+235/408 Test #235: test_kf16_build_orchestrator ........................   Passed    0.11 sec
+        Start 236: test_kf16b_build_resilience
+236/408 Test #236: test_kf16b_build_resilience .........................   Passed    0.08 sec
+        Start 237: test_w6_parallel_provision
+237/408 Test #237: test_w6_parallel_provision ..........................   Passed    0.22 sec
+        Start 238: test_w11_async_push_pump
+238/408 Test #238: test_w11_async_push_pump ............................   Passed    0.14 sec
+        Start 239: test_s5_artifact_cache_bounded
+239/408 Test #239: test_s5_artifact_cache_bounded ......................   Passed    6.05 sec
+        Start 240: test_s1_cache_key_prefix
+240/408 Test #240: test_s1_cache_key_prefix ............................   Passed    0.00 sec
+        Start 241: test_e24_c10_g6_identitaets_bilanz
+241/408 Test #241: test_e24_c10_g6_identitaets_bilanz ..................   Passed    0.00 sec
+        Start 242: test_s2_pull_tier_binary
+242/408 Test #242: test_s2_pull_tier_binary ............................   Passed    1.04 sec
+        Start 243: test_45_parallel_measure_loop
+243/408 Test #243: test_45_parallel_measure_loop .......................   Passed    0.12 sec
+        Start 244: test_cache_mc_timeout
+244/408 Test #244: test_cache_mc_timeout ...............................   Passed    2.00 sec
+        Start 245: test_r2_suffix_wachen
+245/408 Test #245: test_r2_suffix_wachen ...............................   Passed    0.00 sec
+        Start 246: test_w10_c4_zellwert_naht
+246/408 Test #246: test_w10_c4_zellwert_naht ...........................   Passed    0.00 sec
+        Start 247: test_e24_c9_fk5_fehlerraum
+247/408 Test #247: test_e24_c9_fk5_fehlerraum ..........................   Passed    0.00 sec
+        Start 248: test_resthygiene2_organ_fingerprint
+248/408 Test #248: test_resthygiene2_organ_fingerprint .................   Passed    0.01 sec
+        Start 249: test_all19_segment_timer
+249/408 Test #249: test_all19_segment_timer ............................   Passed    0.40 sec
+        Start 250: test_m8_storetrav_segment
+250/408 Test #250: test_m8_storetrav_segment ...........................   Passed    1.03 sec
+        Start 251: test_br3_observer
+251/408 Test #251: test_br3_observer ...................................   Passed    0.01 sec
+        Start 252: test_obs_phaseB_t11_t12_iso
+252/408 Test #252: test_obs_phaseB_t11_t12_iso .........................   Passed    0.04 sec
+        Start 253: test_obs_phaseB_t14_t16
+253/408 Test #253: test_obs_phaseB_t14_t16 .............................   Passed    0.00 sec
+        Start 254: test_pathb_segment_timer
+254/408 Test #254: test_pathb_segment_timer ............................   Passed   45.26 sec
+        Start 255: test_segment_timer_differentiation
+255/408 Test #255: test_segment_timer_differentiation ..................   Passed    0.19 sec
+        Start 256: test_obs_phaseA
+256/408 Test #256: test_obs_phaseA .....................................   Passed    0.09 sec
+        Start 257: test_obs_phaseB_pilot
+257/408 Test #257: test_obs_phaseB_pilot ...............................   Passed    0.11 sec
+        Start 258: test_obs_phaseB_t11_t12
+258/408 Test #258: test_obs_phaseB_t11_t12 .............................   Passed    0.11 sec
+        Start 259: test_d_v42_abi_telemetry_coupling
+259/408 Test #259: test_d_v42_abi_telemetry_coupling ...................   Passed    0.00 sec
+        Start 260: test_a8s4_konstitutiv_kette
+260/408 Test #260: test_a8s4_konstitutiv_kette .........................   Passed    0.57 sec
+        Start 261: test_a8s4_release_pfad_neutralitaet
+261/408 Test #261: test_a8s4_release_pfad_neutralitaet .................   Passed    0.26 sec
+        Start 262: test_kf1_thesis_profile_parser
+262/408 Test #262: test_kf1_thesis_profile_parser ......................   Passed    0.00 sec
+        Start 263: test_q1_lockfree_concurrency
+263/408 Test #263: test_q1_lockfree_concurrency ........................   Passed    0.01 sec
+        Start 264: test_v5_io_real_fixture
+264/408 Test #264: test_v5_io_real_fixture .............................   Passed    0.00 sec
+        Start 265: test_winsorized_mean
+265/408 Test #265: test_winsorized_mean ................................   Passed    0.00 sec
+        Start 266: test_conformance_gate
+266/408 Test #266: test_conformance_gate ...............................   Passed    0.01 sec
+        Start 267: test_188_4bb0_pool_organ_wide_key_conformance
+267/408 Test #267: test_188_4bb0_pool_organ_wide_key_conformance .......   Passed    0.00 sec
+        Start 268: test_188_4bbV_pool_adapter_flip_compile
+268/408 Test #268: test_188_4bbV_pool_adapter_flip_compile .............   Passed    0.01 sec
+        Start 269: test_phase_b_effective_search_algo_contrast
+269/408 Test #269: test_phase_b_effective_search_algo_contrast .........   Passed    0.01 sec
+        Start 270: test_s7_1_bst_pool_allocator_deg
+270/408 Test #270: test_s7_1_bst_pool_allocator_deg ....................   Passed    0.01 sec
+        Start 271: test_ap15_2_get_allocator_proxy
+271/408 Test #271: test_ap15_2_get_allocator_proxy .....................   Passed    0.00 sec
+        Start 272: test_ap15_3_driveable_map_contract
+272/408 Test #272: test_ap15_3_driveable_map_contract ..................   Passed    0.00 sec
+        Start 273: test_s7_2_btree_pool_allocator_deg
+273/408 Test #273: test_s7_2_btree_pool_allocator_deg ..................   Passed    0.00 sec
+        Start 274: test_234_va_shaped_adapter
+274/408 Test #274: test_234_va_shaped_adapter ..........................   Passed    0.01 sec
+        Start 275: test_29_container_framework
+275/408 Test #275: test_29_container_framework .........................   Passed    0.00 sec
+        Start 276: test_striktheit_axis_dach_guard
+276/408 Test #276: test_striktheit_axis_dach_guard .....................   Passed    0.00 sec
+        Start 277: test_a14_os_sub_axes_guard
+277/408 Test #277: test_a14_os_sub_axes_guard ..........................   Passed    0.00 sec
+        Start 278: test_meta_meta_halbordnung
+278/408 Test #278: test_meta_meta_halbordnung ..........................   Passed    0.00 sec
+        Start 279: test_axis_error_taxonomy
+279/408 Test #279: test_axis_error_taxonomy ............................   Passed    0.00 sec
+        Start 280: test_rf3_betriebssystem_feature_fehlt
+280/408 Test #280: test_rf3_betriebssystem_feature_fehlt ...............   Passed    0.00 sec
+        Start 281: test_striktheit_metaprog_guard
+281/408 Test #281: test_striktheit_metaprog_guard ......................   Passed    0.00 sec
+        Start 282: test_striktheit_axes_guard
+282/408 Test #282: test_striktheit_axes_guard ..........................   Passed    0.00 sec
+        Start 283: test_striktheit_abi_pod_guard
+283/408 Test #283: test_striktheit_abi_pod_guard .......................   Passed    0.00 sec
+        Start 284: test_striktheit_scan_kernel_purity
+284/408 Test #284: test_striktheit_scan_kernel_purity ..................   Passed    0.00 sec
+        Start 285: test_234_vb_rest_families_shaped
+285/408 Test #285: test_234_vb_rest_families_shaped ....................   Passed    0.00 sec
+        Start 286: test_cmd1_a_axis_command_base
+286/408 Test #286: test_cmd1_a_axis_command_base .......................   Passed    0.00 sec
+        Start 287: test_s7_3_skip_list_pool_allocator_deg
+287/408 Test #287: test_s7_3_skip_list_pool_allocator_deg ..............   Passed    0.00 sec
+        Start 288: test_s7_4_hash_pool_allocator_deg
+288/408 Test #288: test_s7_4_hash_pool_allocator_deg ...................   Passed    0.00 sec
+        Start 289: test_s7_5_art_pool_allocator_deg
+289/408 Test #289: test_s7_5_art_pool_allocator_deg ....................   Passed    0.00 sec
+        Start 290: test_s7_6_hot_pool_allocator_deg
+290/408 Test #290: test_s7_6_hot_pool_allocator_deg ....................   Passed    0.00 sec
+        Start 291: test_s7_7_start_pool_allocator_deg
+291/408 Test #291: test_s7_7_start_pool_allocator_deg ..................   Passed    0.00 sec
+        Start 292: test_s7_8_wormhole_pool_allocator_deg
+292/408 Test #292: test_s7_8_wormhole_pool_allocator_deg ...............   Passed    0.00 sec
+        Start 293: test_s7_9_surf_pool_allocator_deg
+293/408 Test #293: test_s7_9_surf_pool_allocator_deg ...................   Passed    0.00 sec
+        Start 294: test_s7_10_swiss_pool_allocator_deg
+294/408 Test #294: test_s7_10_swiss_pool_allocator_deg .................   Passed    0.00 sec
+        Start 295: test_234_f1_btree_order_shape
+295/408 Test #295: test_234_f1_btree_order_shape .......................   Passed    0.11 sec
+        Start 296: test_234_f2_skip_list_shape
+296/408 Test #296: test_234_f2_skip_list_shape .........................   Passed    0.09 sec
+        Start 297: test_234_f3_bst_shape
+297/408 Test #297: test_234_f3_bst_shape ...............................   Passed    0.12 sec
+        Start 298: test_234_f4_hash_probe_shape
+298/408 Test #298: test_234_f4_hash_probe_shape ........................   Passed    0.04 sec
+        Start 299: test_188_4a_eytzinger_organ
+299/408 Test #299: test_188_4a_eytzinger_organ .........................   Passed    0.00 sec
+        Start 300: test_188_4c0_known_compositions_conformance
+300/408 Test #300: test_188_4c0_known_compositions_conformance .........   Passed    0.02 sec
+        Start 301: test_216h2_stat_reset_after_load
+301/408 Test #301: test_216h2_stat_reset_after_load ....................   Passed    0.00 sec
+        Start 302: test_abi_adapter_g3_batch2
+302/408 Test #302: test_abi_adapter_g3_batch2 ..........................   Passed    0.01 sec
+        Start 303: test_221_rc_prefetch_distance
+303/408 Test #303: test_221_rc_prefetch_distance .......................   Passed    0.01 sec
+        Start 304: test_e1_contract_rc_konsum
+304/408 Test #304: test_e1_contract_rc_konsum ..........................   Passed    0.03 sec
+        Start 305: test_188_4cii_flat_wrapper_traversal
+305/408 Test #305: test_188_4cii_flat_wrapper_traversal ................   Passed    0.02 sec
+        Start 306: test_217_2a_capacity_guard
+306/408 Test #306: test_217_2a_capacity_guard ..........................   Passed    0.00 sec
+        Start 307: m3v2_pmc_smoke
+307/408 Test #307: m3v2_pmc_smoke ......................................   Passed    0.00 sec
+        Start 308: test_harness_compile
+308/408 Test #308: test_harness_compile ................................   Passed    0.00 sec
+        Start 309: test_tp1_planer_filter_iterator
+309/408 Test #309: test_tp1_planer_filter_iterator .....................   Passed    0.01 sec
+        Start 310: test_f3_lager_key_provider_iterator
+310/408 Test #310: test_f3_lager_key_provider_iterator .................   Passed    0.00 sec
+        Start 311: test_lazy_resume_binary
+311/408 Test #311: test_lazy_resume_binary .............................   Passed    0.00 sec
+        Start 312: test_w5_status_reader
+312/408 Test #312: test_w5_status_reader ...............................   Passed    0.00 sec
+        Start 313: test_experiment_dock_payload
+313/408 Test #313: test_experiment_dock_payload ........................   Passed    0.00 sec
+        Start 314: test_progress_delta
+314/408 Test #314: test_progress_delta .................................   Passed    0.00 sec
+        Start 315: test_gn_cell_filter
+315/408 Test #315: test_gn_cell_filter .................................   Passed    0.00 sec
+        Start 316: test_profile_coverage
+316/408 Test #316: test_profile_coverage ...............................   Passed    0.00 sec
+        Start 317: test_ap2_katalog_pfad_stubfrei
+317/408 Test #317: test_ap2_katalog_pfad_stubfrei ......................   Passed    0.00 sec
+        Start 318: test_axis_sweep_coverage
+318/408 Test #318: test_axis_sweep_coverage ............................   Passed    0.04 sec
+        Start 319: test_org18_persistence_target
+319/408 Test #319: test_org18_persistence_target .......................   Passed    0.00 sec
+        Start 320: test_smoke_coverage_profile
+320/408 Test #320: test_smoke_coverage_profile .........................   Passed    0.03 sec
+        Start 321: test_wdk_datasets_fairness
+321/408 Test #321: test_wdk_datasets_fairness ..........................   Passed    0.00 sec
+        Start 322: test_measurement_categories
+322/408 Test #322: test_measurement_categories .........................   Passed    0.00 sec
+        Start 323: test_experiment_parser
+323/408 Test #323: test_experiment_parser ..............................   Passed    0.02 sec
+        Start 324: test_experiment_kern_seam
+324/408 Test #324: test_experiment_kern_seam ...........................   Passed    0.00 sec
+        Start 325: test_experiment_projection
+325/408 Test #325: test_experiment_projection ..........................   Passed    0.00 sec
+        Start 326: test_merge_plan_directive
+326/408 Test #326: test_merge_plan_directive ...........................   Passed    0.00 sec
+        Start 327: test_experiment_plan_director
+327/408 Test #327: test_experiment_plan_director .......................   Passed    0.05 sec
+        Start 328: test_sota_st2_dedup
+328/408 Test #328: test_sota_st2_dedup .................................   Passed    0.00 sec
+        Start 329: test_validate_profile
+329/408 Test #329: test_validate_profile ...............................   Passed    0.01 sec
+        Start 330: test_h2_score_akte
+330/408 Test #330: test_h2_score_akte ..................................   Passed    0.00 sec
+        Start 331: linux_perf_pmc_smoke
+331/408 Test #331: linux_perf_pmc_smoke ................................   Passed    0.24 sec
+        Start 332: test_dgenus_dll
+332/408 Test #332: test_dgenus_dll .....................................   Passed    0.00 sec
+        Start 333: test_e24_c10_genus_dll_roundtrip
+333/408 Test #333: test_e24_c10_genus_dll_roundtrip ....................   Passed    0.00 sec
+        Start 334: test_e24_c10_g5_lade_wache
+334/408 Test #334: test_e24_c10_g5_lade_wache ..........................   Passed    0.00 sec
+        Start 335: test_buildvariant_dll
+335/408 Test #335: test_buildvariant_dll ...............................   Passed    0.00 sec
+        Start 336: test_buildvariant_dll_real
+336/408 Test #336: test_buildvariant_dll_real ..........................   Passed    0.00 sec
+        Start 337: test_ap5_simd_extension_coherence
+337/408 Test #337: test_ap5_simd_extension_coherence ...................   Passed    0.00 sec
+        Start 338: test_adhoc_buildvariant_dll
+338/408 Test #338: test_adhoc_buildvariant_dll .........................   Passed    0.00 sec
+        Start 339: test_d13_dll_runtime_measure
+339/408 Test #339: test_d13_dll_runtime_measure ........................   Passed    0.01 sec
+        Start 340: test_w3_mess_interface_testate_dock
+340/408 Test #340: test_w3_mess_interface_testate_dock .................   Passed    0.12 sec
+        Start 341: test_w3_mess_interface_testate_biss
+341/408 Test #341: test_w3_mess_interface_testate_biss .................   Passed    0.01 sec
+        Start 342: test_cacheline_policy_selector
+342/408 Test #342: test_cacheline_policy_selector ......................   Passed    0.00 sec
+        Start 343: test_load_profile_writer
+343/408 Test #343: test_load_profile_writer ............................   Passed    0.00 sec
+        Start 344: test_kf3_cacheline_subaxis
+344/408 Test #344: test_kf3_cacheline_subaxis ..........................   Passed    0.00 sec
+        Start 345: test_ff2_node_width_subaxis
+345/408 Test #345: test_ff2_node_width_subaxis .........................   Passed    0.00 sec
+        Start 346: test_fb_alloc_hw_subaxis
+346/408 Test #346: test_fb_alloc_hw_subaxis ............................   Passed    0.00 sec
+        Start 347: test_best_binary_selector_parse_rank
+347/408 Test #347: test_best_binary_selector_parse_rank ................   Passed    0.00 sec
+        Start 348: test_hybrid_spline_selector_scaffold
+348/408 Test #348: test_hybrid_spline_selector_scaffold ................   Passed    0.00 sec
+        Start 349: test_e4_contract_xml_to_axislevels
+349/408 Test #349: test_e4_contract_xml_to_axislevels ..................   Passed    0.00 sec
+        Start 350: test_e3_contract_conformance_gate_wirksam
+350/408 Test #350: test_e3_contract_conformance_gate_wirksam ...........   Passed    0.00 sec
+        Start 351: test_e3_contract_binary_id_bijektion
+351/408 Test #351: test_e3_contract_binary_id_bijektion ................   Passed    0.00 sec
+        Start 352: test_e2_contract_abi_vertrag
+352/408 Test #352: test_e2_contract_abi_vertrag ........................   Passed    0.00 sec
+        Start 353: test_m_contract_system_axis_wurzel
+353/408 Test #353: test_m_contract_system_axis_wurzel ..................   Passed    0.00 sec
+        Start 354: test_m_simd_feature_flag_catalog
+354/408 Test #354: test_m_simd_feature_flag_catalog ....................   Passed    0.00 sec
+        Start 355: test_p1_spd_ddr5_parser
+355/408 Test #355: test_p1_spd_ddr5_parser .............................   Passed    0.00 sec
+        Start 356: test_p2_ram_probe_chain
+356/408 Test #356: test_p2_ram_probe_chain .............................   Passed    0.00 sec
+        Start 357: test_p2_ram_identity_verdict
+357/408 Test #357: test_p2_ram_identity_verdict ........................   Passed    0.00 sec
+        Start 358: test_os_u3_probe
+358/408 Test #358: test_os_u3_probe ....................................   Passed    0.00 sec
+        Start 359: test_od10_numa_page_probe
+359/408 Test #359: test_od10_numa_page_probe ...........................   Passed    0.00 sec
+        Start 360: test_p3_boot_cache_dmi
+360/408 Test #360: test_p3_boot_cache_dmi ..............................   Passed    0.00 sec
+        Start 361: test_o4_machine_identity
+361/408 Test #361: test_o4_machine_identity ............................   Passed    0.00 sec
+        Start 362: test_c3a_gate_scharfschaltung
+362/408 Test #362: test_c3a_gate_scharfschaltung .......................   Passed    0.00 sec
+        Start 363: test_m_w12_stamp_bausteine
+363/408 Test #363: test_m_w12_stamp_bausteine ..........................   Passed    0.01 sec
+        Start 364: test_w10_system_cell_values
+364/408 Test #364: test_w10_system_cell_values .........................   Passed    0.00 sec
+        Start 365: test_g1_binary_version_stamp
+365/408 Test #365: test_g1_binary_version_stamp ........................   Passed    0.00 sec
+        Start 366: test_progress_heartbeat
+366/408 Test #366: test_progress_heartbeat .............................   Passed    0.00 sec
+        Start 367: test_limits_entkopplung_vorstufe
+367/408 Test #367: test_limits_entkopplung_vorstufe ....................   Passed    1.38 sec
+        Start 368: test_lazy_adhoc_source_gen
+368/408 Test #368: test_lazy_adhoc_source_gen ..........................   Passed    1.44 sec
+        Start 369: test_w2_combo_ct_stamp
+369/408 Test #369: test_w2_combo_ct_stamp ..............................   Passed    0.00 sec
+        Start 370: test_parser_konsolidierung
+370/408 Test #370: test_parser_konsolidierung ..........................   Passed    0.00 sec
+        Start 371: test_phase6_vorbau
+371/408 Test #371: test_phase6_vorbau ..................................   Passed    0.00 sec
+        Start 372: test_simd_field_sum_dispatch
+372/408 Test #372: test_simd_field_sum_dispatch ........................   Passed    0.00 sec
+        Start 373: test_simd_field_sum_dispatch_avx2
+373/408 Test #373: test_simd_field_sum_dispatch_avx2 ...................   Passed    0.00 sec
+        Start 374: test_simd_field_sum_dispatch_avx512
+374/408 Test #374: test_simd_field_sum_dispatch_avx512 .................   Passed    0.00 sec
+        Start 375: test_simd_add_u64_carry
+375/408 Test #375: test_simd_add_u64_carry .............................   Passed    0.00 sec
+        Start 376: test_simd_add_u64_carry_avx2
+376/408 Test #376: test_simd_add_u64_carry_avx2 ........................   Passed    0.00 sec
+        Start 377: test_simd_add_u64_carry_avx512
+377/408 Test #377: test_simd_add_u64_carry_avx512 ......................   Passed    0.00 sec
+        Start 378: test_profile_roundtrip
+378/408 Test #378: test_profile_roundtrip ..............................   Passed    0.01 sec
+        Start 379: test_axis_registry_roundtrip
+379/408 Test #379: test_axis_registry_roundtrip ........................   Passed    0.01 sec
+        Start 380: test_system_axis_registry_roundtrip
+380/408 Test #380: test_system_axis_registry_roundtrip .................   Passed    0.01 sec
+        Start 381: test_measurement_axis_registry_roundtrip
+381/408 Test #381: test_measurement_axis_registry_roundtrip ............   Passed    0.01 sec
+        Start 382: test_reflect_versions_all17
+382/408 Test #382: test_reflect_versions_all17 .........................   Passed    0.00 sec
+        Start 383: test_reflect_versions_all_registered
+383/408 Test #383: test_reflect_versions_all_registered ................   Passed    0.00 sec
+        Start 384: test_planner_version_flag_grammatik
+384/408 Test #384: test_planner_version_flag_grammatik .................   Passed    0.00 sec
+        Start 385: test_g3_bestandslog_document
+385/408 Test #385: test_g3_bestandslog_document ........................   Passed    0.00 sec
+        Start 386: test_g3_bestandslog_lock
+386/408 Test #386: test_g3_bestandslog_lock ............................   Passed    0.10 sec
+        Start 387: test_g3_eta_estimator
+387/408 Test #387: test_g3_eta_estimator ...............................   Passed    0.00 sec
+        Start 388: test_g3_reservation_lifecycle
+388/408 Test #388: test_g3_reservation_lifecycle .......................   Passed    0.00 sec
+        Start 389: test_g3_batch_planner
+389/408 Test #389: test_g3_batch_planner ...............................   Passed    0.00 sec
+        Start 390: test_g3_ram_spool_writer
+390/408 Test #390: test_g3_ram_spool_writer ............................   Passed    0.00 sec
+        Start 391: test_g3_writer_backend_io_uring
+391/408 Test #391: test_g3_writer_backend_io_uring .....................   Passed    0.04 sec
+        Start 392: test_g2_variant_sidecar
+392/408 Test #392: test_g2_variant_sidecar .............................   Passed    0.00 sec
+        Start 393: test_a2_sha512_skip_gate
+393/408 Test #393: test_a2_sha512_skip_gate ............................   Passed    0.02 sec
+        Start 394: test_g3_sha512_index
+394/408 Test #394: test_g3_sha512_index ................................   Passed    0.00 sec
+        Start 395: test_g3_builder_registration
+395/408 Test #395: test_g3_builder_registration ........................   Passed    1.31 sec
+        Start 396: test_g3_takeover_sweep
+396/408 Test #396: test_g3_takeover_sweep ..............................   Passed    0.01 sec
+        Start 397: test_lb0_lager_pfad_grammatik
+397/408 Test #397: test_lb0_lager_pfad_grammatik .......................   Passed    0.00 sec
+        Start 398: test_lb1_knoten_heuristik_log
+398/408 Test #398: test_lb1_knoten_heuristik_log .......................   Passed    0.00 sec
+        Start 399: test_ge3_messwert_genus_und_ziel
+399/408 Test #399: test_ge3_messwert_genus_und_ziel ....................   Passed    0.16 sec
+        Start 400: test_ge1_claim_check_und_sidecar
+400/408 Test #400: test_ge1_claim_check_und_sidecar ....................   Passed    0.00 sec
+        Start 401: test_g3_planer_driven
+401/408 Test #401: test_g3_planer_driven ...............................   Passed    0.00 sec
+        Start 402: test_g3_prune
+402/408 Test #402: test_g3_prune .......................................   Passed    0.00 sec
+        Start 403: test_g3_artifact_cache_transport
+403/408 Test #403: test_g3_artifact_cache_transport ....................   Passed    0.54 sec
+        Start 404: test_g3_lager_presence
+404/408 Test #404: test_g3_lager_presence ..............................   Passed    0.00 sec
+        Start 405: test_fk1_nicht_gebaut_marker
+405/408 Test #405: test_fk1_nicht_gebaut_marker ........................   Passed    0.00 sec
+        Start 406: test_a8s3_csv_klasse_c
+406/408 Test #406: test_a8s3_csv_klasse_c ..............................   Passed    0.00 sec
+        Start 407: test_e04_slice_marker
+407/408 Test #407: test_e04_slice_marker ...............................   Passed    0.00 sec
+        Start 408: test_p_cacheline_store_line_source
+408/408 Test #408: test_p_cacheline_store_line_source ..................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 408
+
+Label Time Summary:
+a2                 =   0.02 sec*proc (1 test)
+a8                 =   0.01 sec*proc (2 tests)
+abi                =   0.00 sec*proc (1 test)
+algo_version       =   0.00 sec*proc (3 tests)
+alloc              =   0.01 sec*proc (2 tests)
+alloc_hw           =   0.00 sec*proc (1 test)
+allocator          =   0.02 sec*proc (11 tests)
+anti-phantom       =   0.00 sec*proc (1 test)
+axes               =   0.01 sec*proc (12 tests)
+bau_filter         =   0.01 sec*proc (2 tests)
+best_binary        =   0.00 sec*proc (2 tests)
+bestandslog        =   0.01 sec*proc (2 tests)
+biss               =   0.01 sec*proc (1 test)
+blut               =   0.03 sec*proc (8 tests)
+c6                 =   0.01 sec*proc (12 tests)
+c6v                =   0.00 sec*proc (4 tests)
+c7                 =   0.01 sec*proc (12 tests)
+cacheline          =   0.00 sec*proc (4 tests)
+cli                =   0.46 sec*proc (1 test)
+concurrency        =   0.01 sec*proc (1 test)
+container          =   0.00 sec*proc (1 test)
+contract           =   0.22 sec*proc (39 tests)
+correctness        =   0.00 sec*proc (3 tests)
+coverage           =   0.03 sec*proc (2 tests)
+csv                =   0.00 sec*proc (1 test)
+curve_fit          =   0.00 sec*proc (1 test)
+dll_roundtrip      =   0.14 sec*proc (8 tests)
+dock               =   0.00 sec*proc (2 tests)
+e04                =   0.00 sec*proc (1 test)
+e1                 =   0.03 sec*proc (1 test)
+e2                 =   0.00 sec*proc (1 test)
+e24                =   0.01 sec*proc (18 tests)
+e3                 =   0.01 sec*proc (2 tests)
+e4                 =   2.93 sec*proc (13 tests)
+f15                =   0.46 sec*proc (1 test)
+fb                 =   0.00 sec*proc (1 test)
+fehlerklassen      =   0.00 sec*proc (2 tests)
+ff2                =   0.00 sec*proc (1 test)
+g2                 =   0.00 sec*proc (1 test)
+g3                 =   0.00 sec*proc (3 tests)
+g4                 =  57.90 sec*proc (50 tests)
+gate               =   0.02 sec*proc (3 tests)
+gattung            =   0.00 sec*proc (1 test)
+gn-cell            =   0.00 sec*proc (1 test)
+go5                =   0.01 sec*proc (2 tests)
+goal_v6            =   0.45 sec*proc (73 tests)
+golden             =   0.01 sec*proc (1 test)
+harness            =   0.00 sec*proc (4 tests)
+hwprobe            =   0.01 sec*proc (4 tests)
+hybrid             =   0.00 sec*proc (1 test)
+identitaet         =   0.00 sec*proc (2 tests)
+inc-g6             =   1.44 sec*proc (1 test)
+inc3               =   0.00 sec*proc (1 test)
+incd               =   0.03 sec*proc (3 tests)
+io                 =   0.00 sec*proc (1 test)
+kernb              =   0.00 sec*proc (1 test)
+kf3                =   0.00 sec*proc (1 test)
+limits             =   2.83 sec*proc (2 tests)
+linux              =   0.24 sec*proc (1 test)
+m                  =   0.01 sec*proc (6 tests)
+measured           =  47.94 sec*proc (16 tests)
+measurement        =   0.02 sec*proc (9 tests)
+merge              =   0.00 sec*proc (1 test)
+muster_f           =  57.90 sec*proc (50 tests)
+negativ_compile    =   0.38 sec*proc (2 tests)
+node_width         =   0.00 sec*proc (1 test)
+numapageprobe      =   0.00 sec*proc (1 test)
+org18              =   0.00 sec*proc (1 test)
+osprobe            =   0.00 sec*proc (1 test)
+p_cacheline        =   0.00 sec*proc (1 test)
+parser             =   0.00 sec*proc (1 test)
+phase6             =   0.00 sec*proc (1 test)
+phase_d            =   0.45 sec*proc (72 tests)
+phase_e            =   7.02 sec*proc (34 tests)
+planner            =   0.06 sec*proc (2 tests)
+pmc                =   0.25 sec*proc (2 tests)
+pool_flip          =   0.04 sec*proc (13 tests)
+profiles           =   0.13 sec*proc (13 tests)
+pruef_dock         =   0.13 sec*proc (2 tests)
+queuing            =   0.01 sec*proc (1 test)
+r5d                =   0.46 sec*proc (1 test)
+rc                 =   0.03 sec*proc (1 test)
+registry           =   0.02 sec*proc (4 tests)
+release_mode       =   0.26 sec*proc (1 test)
+resume             =   0.00 sec*proc (1 test)
+roundtrip          =   0.03 sec*proc (4 tests)
+shaped             =   0.01 sec*proc (2 tests)
+simd               =   0.01 sec*proc (7 tests)
+slice_kanal        =   0.00 sec*proc (1 test)
+smoke              =   0.03 sec*proc (1 test)
+spd                =   0.00 sec*proc (1 test)
+stale_skip         =   0.00 sec*proc (2 tests)
+standalone         =  64.97 sec*proc (102 tests)
+stats              =   0.00 sec*proc (1 test)
+status             =   0.00 sec*proc (1 test)
+stempel            =   0.00 sec*proc (2 tests)
+strategy           =   0.00 sec*proc (1 test)
+striktheit         =   0.01 sec*proc (4 tests)
+system             =   0.01 sec*proc (1 test)
+thesis_tiere       =   0.01 sec*proc (1 test)
+tools              =   0.01 sec*proc (4 tests)
+tree               =   0.00 sec*proc (1 test)
+validate           =   0.01 sec*proc (1 test)
+w10                =   0.00 sec*proc (1 test)
+w2                 =   0.00 sec*proc (1 test)
+w3                 =   0.13 sec*proc (2 tests)
+w5                 =   0.00 sec*proc (1 test)
+welle5             =   0.00 sec*proc (3 tests)
+workload_driver    =   0.00 sec*proc (1 test)
+xml_export         =   0.00 sec*proc (1 test)
+
+Total Test time (real) =  76.46 sec
+CTEST_RC=0
