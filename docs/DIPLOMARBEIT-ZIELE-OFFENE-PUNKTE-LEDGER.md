@@ -4199,6 +4199,184 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 nachmittag-7 (LANDESTRECKE: die Trockenprobe findet, was keine Konfliktrechnung zeigt -- die mitreisende Wache stellt zwei Pakete des EIGENEN Buendels rot; Frozen/TABU ueber das Buendel geprueft; zwei Lead-Meldungen korrigiert)
+
+**DIE LEHRE DIESES DURCHGANGS (gehoert NEBEN die Nenner-Regel in die Fehlerklassen-Pruefliste):**
+
+> **ZU JEDER GATE-ZAHL GEHOERT DER PRUEFBEREICH.** "0 Verstoesse" ohne Angabe, WOGEGEN gemessen
+> wurde, ist so wenig belastbar wie eine Null ohne Nenner. Zwei Messungen koennen dasselbe Wort
+> fuer zwei verschiedene Bereiche benutzen und BEIDE korrekt sein -- und genau dann entsteht ein
+> falsches Gruen, das niemandem zurechenbar ist.
+
+DER FALL, an dem es sich zeigte: nach dem clang-format-Nachzug `034e0068` meldete der Bau-Agent
+"0 Nicht-ASCII, 0 ueber 120" -- gemessen ueber SEINEN Commit. Der Gegenpruefer fuhr dieselbe
+Wache ueber die GESAMTSERIE `7969b399..034e0068` und bekam **9 Verstoesse, exakt dieselben wie
+vor dem Format-Commit**. Beide Zahlen sind richtig. Die Ursache: der Format-Commit fasste die
+DREI Dateien an, die der NB3-Patch geaendert hatte -- die 9 Verstoesse liegen in FUENF anderen
+Dateien aus frueheren Commits der Serie (`faa525d7`, `aa46c524`). **Die Schnittmenge beider
+Dateimengen ist LEER.** Ohne die Bereichsangabe haette "0" die Landung freigegeben und die
+Pipeline waere an der eigenen neuen Wache rot geworden.
+
+ZWEITE HAELFTE DERSELBEN LEHRE: **eine Fundstelle muss auffindbar sein.** Eine Gate-Meldung, die
+`datei:zeile (N Byte)` sagt, ist nur dann verwertbar, wenn dort wirklich diese Zeile steht --
+sonst sucht der, der sie kuerzen soll, an der falschen Stelle.
+
+### A) DIE TROCKENPROBE -- der Kernbefund
+
+Verfahren: `git merge-tree --write-tree` (rein rechnerisch) + `git commit-tree` fuer die
+Kaskaden. **Kein Zweig, kein Index, kein Working Tree wurde bewegt** -- kein Probe-Merge, kein
+`merge --abort`.
+
+- **KONFLIKTE: NULL, in JEDER Kombination.** ce: alle vier Pakete einzeln sauber gegen
+  `origin/development`; ALLE SECHS Reihenfolgen von T2-A/A1/B14 kaskadiert sauber (R4CI ist zu
+  allen dateidisjunkt). super: die drei Pakete untereinander dateidisjunkt, kaskadiert sauber --
+  auch gegen den LOKALEN `development` mit den sechs ungepushten Beleg-Commits (kein Paket fasst
+  den Ledger an).
+- **Die Ueberschneidungen sind rein additiv** -- `tests/unit/CMakeLists.txt` (alle drei Paare),
+  `axis_04_node_type_layout_aware_store.hpp` (A1<->B14), `test_e24_c10_g6_identitaets_bilanz.cpp`
+  (B14<->T2-A). **Der additive Fallstrick ist GEPRUEFT, nicht angenommen:** im vereinigten Baum
+  0 doppelte `add_executable`-Targets, 0 doppelte `add_test`-Namen (75 -> 77 Targets, 5100 ->
+  5227 Zeilen).
+- **UND TROTZDEM IST DIE REIHENFOLGE NICHT FREI.** Das Gate-Werkzeug `3133f226`
+  (`scripts/ci_diff_ascii_width_guard.sh` + CI-Job) reist im selben Buendel mit. Die ECHTE Wache
+  ueber die ECHTEN Paket-Diffs gefahren (`--stdin`), nicht geschaetzt:
+
+      [BESTANDEN] b-r4-ci-abdeckung   (rc=0)
+      [VERSTOSS ] b2-neuanker-format3 (rc=1)  -- 9 Zeilen > 120 Spalten, 0 Nicht-ASCII
+      [BESTANDEN] b-a1-wurf-vertrag   (rc=0)
+      [VERSTOSS ] b14-ce-anteil       (rc=1)  -- 2 Zeilen > 120 Spalten
+
+  **Landet die Wache zuerst, gehen zwei Pakete des eigenen Buendels im CI rot.** Das ist die
+  Wechselwirkung, die eine reine Konfliktrechnung nicht zeigt -- und der Grund, warum diese
+  Trockenprobe die nuetzlichste Einzelarbeit der Landestrecke war.
+
+**EMPFOHLENE REIHENFOLGE (uebernommen):** ce: T2-A [+ Format] -> A1-NB2 -> B14-ce -> **R4CI/Wache
+ZULETZT**; super: frei (dateidisjunkt); danach der Submodul-Bump. Begruendung: R4CI zuletzt ist
+der einzige echte Zwang -- die Wache darf nicht scharf sein, waehrend Pakete landen, die sie
+beanstandet; nach der Landung ist der Bestand nicht mehr ihr Gegenstand, sie prueft kuenftige
+Diffs.
+
+**DIE 9 T2-A-VERSTOESSE, zeilen-genau zerlegt (welche heilt ein Format-Lauf?):** 8 von 9 heilt
+clang-format (`build_variant_set_signature.hpp` 4x, `lazy_adhoc_source_gen.hpp:75`,
+`profile_run_entry.hpp:989` [131 Byte] und `:1080`, `test_m_w12_stamp_bausteine.cpp:1751`).
+**EINE bleibt:** `toolchain_stamp_glied.hpp:521` -- ein Doxygen-Kommentar mit dem
+Beispiel-Stempel, 121 Byte, genau eines zu viel; clang-format bricht ihn nicht um. **Kein Code,
+kein Preimage, keine Wirkung auf den Frozen-Vektor** -- die Zeile beschreibt nur die Form
+(Herkunft `aa46c524`/C-7-NB2, nicht der NB3-Patch). OWNER-/LEAD-ENTSCHEID GEFALLEN: **Weg 1
+(heilen statt stehenlassen)**, Umbruch statt Kuerzung, damit die Doku vollstaendig bleibt.
+
+**DRITTE MESSUNG NACH DEM FIX (`b6d87c08`, 5 Dateien): GRUEN.** Der Fix traf genau die fuenf
+benannten Verstoss-Dateien. Wache ueber die GESAMTSERIE `7969b399..b6d87c08`, literal:
+`7333 Zusatzzeilen in selbst verfasstem Code geprueft, davon 0 Nicht-ASCII, davon 0 ueber 120
+Spalten` / `DIFF-HYGIENE-WACHE: GRUEN` (exit 0). Gegengeprueft am Fix-Stand: Bau 0 error, ZWEI
+serielle ctest-Laeufe je `100% tests passed, 0 tests failed out of 409`, Label golden|roundtrip
+12/12, Frozen-Vektor ueber den RT-Weg NEU uebersetzt `560 Bytes` / `17148e5a...ce89374`
+unbewegt. Der Fix ist ausserhalb der einen Doku-Zeile **whitespace-only** (Token-Folge je Datei
+per Hash verglichen); der Handumbruch in `toolchain_stamp_glied.hpp` benennt ausdruecklich, dass
+der Stempel EINE Zeile bleibt und die Haelften ohne Trenner zusammengehoeren.
+
+**PRAEZISIERUNG EINER GATE-FORMULIERUNG (sonst behauptet der naechste Bericht etwas Falsches):**
+die Zusage "die DREI Frozen-Fixtures blob-identisch ueber die Serie" gilt seit `b6d87c08` NICHT
+mehr -- `test_m_w12_stamp_bausteine.cpp` wurde mitformatiert. Der **Frozen-BLOCK Zeilen 596-663
+ist byte-identisch** (Diff leer, 0 Treffer auf den Frozen-Wert im Commit-Diff), und genau so
+gehoert es kuenftig formuliert. Der praezise Massstab existiert im Haus bereits: der NB2-Gate-
+Beleg sagte schon "Frozen-BLOCK Zeilen 596-663 byte-unbewegt", nicht "Datei unbewegt".
+
+**DIE WACHE SELBST IST VERIFIZIERT** (zwei synthetische Proben des Gegenpruefers): eine
+Quellzeile mit exakt 120 Byte passiert, eine mit 121 wird mit "121 Byte" beanstandet -- sie ist
+also NICHT um eins zu streng und zaehlt das `+`-Praefix nicht mit; und sie zaehlt auch bei
+Hunks mit Loeschungen die Ziel-Zeilennummer korrekt. **BEOBACHTUNG OHNE ISOLIERTE URSACHE
+(ehrlich als solche vermerkt):** bei `b14-ce-anteil` stimmten die gemeldeten Koordinaten
+NICHT mit dem Branch-Stand ueberein (`abi_adapter.hpp:78 (138 Byte)`, real dort 84 Byte -- die
+138er ist Z.69). Bei T2-A stimmten dieselben Angaben exakt (`profile_run_entry.hpp:989 = 131`
+nachgemessen). Wahrscheinlichste Erklaerung: bewegter Branch waehrend der Messung (der Bauer
+arbeitete parallel daran), kein Wachen-Defekt. **ARBEITSREGEL bis zur Klaerung: die zu
+kuerzenden Zeilen mit `awk 'length($0)>120'` in der Datei suchen, nicht der Wachen-Koordinate
+blind folgen.**
+
+### B) FROZEN / TABU UEBER DAS BUENDEL -- die Pruefung, die vorher niemand gemacht hatte
+
+Jedes Paket war einzeln geprueft; zwei Pakete, die je fuer sich nichts brechen, koennen es
+gemeinsam. Am vereinigten Baum gemessen:
+
+- **Buendel und `development` tragen VERSCHIEDENE Frozen-Vektoren** -- dev `0fe275bd...`
+  (Format 2), Buendel `17148e5a...` (Format 3). Das ist der Neuanker und gewollt.
+- **ENTSCHEIDEND SIND DIE 0 RESTE:** der Alt-Vektor `0fe275bd...` kommt im vereinigten Baum in
+  **keiner einzigen Datei** mehr vor (`git grep` ueber `tests/` + `libs/`). Es entsteht also
+  **kein Mischzustand**, in dem ein Paket gegen den alten und ein anderes gegen den neuen Anker
+  prueft. Die drei Frozen-Fundstellen im Buendel sind genau die drei bekannten Fixtures.
+- **TABU unbewegt:** `golden_fullpilot_320_binary_ids.txt`, `all_axes_golden.profile.xml`,
+  `m3v2_study.profile.xml`, `permutation_axes.xml` je blob-identisch zu `development`;
+  CRC64-Anker `0x56F1B721C72DC10E` unveraendert (2 Vorkommen in beiden).
+- **URTEIL: Frozen und TABU halten auch nach dem Zusammenfuehren.**
+
+### C) ZWEI KORREKTUREN MEINER EIGENEN MELDUNGEN AN DEN OWNER
+
+**(a) DIE `main`-DIVERGENZ EXISTIERT NICHT.** Gemeldet war "origin/main `9d0f1bad` vs.
+github/main `030d2c62`". Am Objekt: **beide Remotes zeigen auf `030d2c62`** und sind
+wechselseitig Vorfahr, also identisch (im ce ebenso, `c837d830`). **`9d0f1bad` ist der LOKALE
+Branch `refs/heads/main` dieses Klons** -- vom 27.07., zehn Tage alt und Vorfahr des richtigen
+Stands. Die Doktrin haelt sauber: `origin/main` ist Vorfahr von `origin/development`, das 66
+Commits voraus ist. RICHTIGER STAND: `030d2c62`; sauberer Weg zurueck ist ein Fast-Forward des
+LOKALEN Branches, nichts an den Remotes. **DIE ECHTE FALLE bleibt und ist eine andere als
+gemeldet:** wer im Hauptklon `git checkout main` macht, landet auf dem Zehn-Tage-Stand -- und
+ein Commit dort erzeugt die Divergenz, die es heute noch nicht gibt.
+
+**(b) DER SUBMODUL-ZEIGER WIRD NICHT STILLSCHWEIGEND ZURUECKGEDREHT.** Gemeldet war, ein Commit
+im super wuerde ihn zurueckdrehen. Am Objekt: der committete Zeiger ist `7969b399` (alt), der
+**Working-Tree-Zeiger ist `3bbcb8ed`** (korrekt, == ce `origin/development`) und als ` M`
+markiert; **kein einziges super-Paket fasst ihn an**. Ein Commit OHNE Pathspec wuerde ihn also
+im Gegenteil RICHTIG setzen. Zurueckgedreht wird er nur, wenn jemand den Working-Tree-Zeiger
+verwirft (`git checkout --` auf das Submodul oder ein Submodul-Reset). Die sechs Beleg-Commits
+haben ihn korrekt in Ruhe gelassen (expliziter Pathspec).
+
+**VERFAHREN FUER DEN BUMP (uebernommen, in dieser Reihenfolge):** (1) ce-Pakete landen -> ce
+`development` bekommt einen NEUEN Kopf; (2) im super das Submodul auf genau diesen Kopf setzen;
+(3) **als EIGENEN Commit mit explizitem Pathspec** (`git commit -- Code/external/comdare-cache-engine`),
+der ce-SHA gehoert in die Nachricht -- nie im selben Commit wie Doku, sonst ist der Bump im Log
+nicht auffindbar; (4) erst danach die super-Pakete (sie sind zeiger-frei).
+
+### D) B14 IST KEIN BLOCKER MEHR (Stand aus der Bau-Meldung, SHAs am Objekt geprueft)
+
+`cb4b15e9` (super, "B14-NB5 -- XXE an der Wurzel geschlossen, B6-eigener foreach-Defekt
+geheilt") und `2a58e2ed` (ce, "style(b14-nb4): clang-format-22 auf die vier abweichenden
+Dateien der Welle") -- beide SHAs existieren und tragen die genannten Titel.
+- **XXE strukturell geheilt:** `--noent` faellt weg, DOCTYPE wird komplett abgelehnt,
+  parser-basiert per Serialisierungs-Diff erkannt (Kanarienvogel vorher/nachher).
+- **`RANGE 1 0`** mit expliziter Null-Pruefung, semantisch als "kein Modus = keine
+  Einschraenkung".
+- **DREI PUNKTE BEWUSST NICHT GEHEILT**, mit Begruendung -- der tragende ist die
+  Namensraum-Frage: **eine namensraum-tolerante Wache waere PERMISSIVER als der Parser, den sie
+  absichert.** Eine Wache, die mehr durchlaesst als das Werkzeug dahinter, ist keine Wache.
+- **NEBENBEFUND, DERSELBE FEHLERTYP WIE OBEN:** auch bei B14 hat der Format-Commit `2a58e2ed`
+  die Verstoss-Dateien NICHT getroffen (er formatierte vier andere); die Wache bleibt ueber
+  `b14-ce-anteil` rot. Zweiter Beleg fuer die Bereichs-Lehre im Kopf dieses Nachtrags.
+  `abi_adapter.hpp` heilt clang-format nachweislich.
+
+### E) STAND UND OFFEN
+
+**LANDEREIF NACH DEM FIX:** ce T2-A (nach Format-Lauf ueber die FUENF Verstoss-Dateien + dem
+einen Handumbruch, danach dritte Wachen-Messung) -- A1-NB2 (an beiden Wachen sauber) -- B14-ce
+(nach dem Kuerzen seiner zwei Zeilen) -- R4CI/Wache zuletzt. super: B14-super, Graph, E18-SNAP
+dateidisjunkt und frei. Alle Pakete rescue-gesichert.
+
+**OFFEN (aus der Gegenpruefung des Fail-closed-Patches, unveraendert gueltig):**
+1. **Befund 2 / die `offen > 0`-Praefix-Abschneidung** -- bewusst NICHT gebaut, weil sie bei
+   ungebundener `PresenceFn` (`filter_window_for_build:137-140` setzt dann `zu_bauen = window`)
+   das Praefix immer auf 0 schnitte und zwei richtige Zusagen braeche. **Der saubere Weg ist ein
+   `present_`-Gate**; die Begruendung ist dieselbe wie bei der Formwache: *eine Wache, die auf
+   fehlende Praesenz-Information reagiert, verwechselt "nicht gefragt" mit "nicht da".* Nach der
+   Abgabe, zusammen mit Option 2 und der Host-Belegung. Die Autoritaets-Frage daneben als
+   Owner-Entscheid: **der Plan-Zaehler ist eine HISTORISCHE Aussage, der Praesenz-Scan eine
+   GEGENWAERTIGE -- wo beide vorliegen, muss die gegenwaertige gewinnen.**
+2. **Formwache verfeinern** (Atom aus dem Plan nehmen statt plan-global inert) -- Folgeposten,
+   niedrige Prioritaet; fail-closed plan-global ist die richtige erste Form.
+3. **Wachen-Koordinaten bei geaenderten Dateien** -- Beobachtung ohne isolierte Ursache (s. A),
+   Arbeitsregel bis dahin: Fundstellen per `awk` suchen.
+4. Unveraendert aus nachmittag-6: clang-format-Gate ist ab jetzt fahrbar (cf22 22.1.8 unter
+   `/home/comdare/tools/cf22-extract/...`), die Host-Belegung der Plan-Ablage bleibt nach der
+   Messung von nachmittag-6 ein NACH-Abgabe-Posten (Selektions-Pass-Zahl 18, nicht 1).
+
 ## NACHTRAG 06.08.2026 nachmittag-6 (OWNER-DOKTRIN GEGEN KOSTENKLAMMERN + VIER BEFUNDE DES OPUS-ZWEIT-REVIEWS an der T2-A-Serie; eine Heilung liess die Tuer daneben offen; die Mess-Falle, die ASCII-Gates still gruen faerbt)
 
 **OWNER-DOKTRIN, VERBATIM (Kopf dieses Nachtrags, weil sie alles Folgende ordnet):**
