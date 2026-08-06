@@ -1,0 +1,38 @@
+{
+  "summary": "Codex-Zweitlens fuer das landebereit gemeldete honest-empty-Paket (ba5e48eb, wt-b-honest-empty)",
+  "agentCount": 1,
+  "logs": [],
+  "result": {
+    "codex": "lens='codex' — Review Commit ba5e48eb (super-Worktree /home/comdare/wt-b-honest-empty), PROBE OK.\n\nCodex-Befunde (wörtlich):\n\n## Befunde\n\n- **HOCH — Echte Nullmessungen werden dennoch ausgelassen.** In [diagram_generator.cpp:558](/home/comdare/wt-b-honest-empty/Code/05_diagram_generator/diagram_generator.cpp:558) gilt nur ein Median `>0` als Daten. Obwohl `op_n>0, p50==0` zuvor korrekt als ausgeführt aggregiert wird, klassifiziert `write_heatmap` die Null ebenfalls als nicht darstellbar ([diagram_generator.cpp:234](/home/comdare/wt-b-honest-empty/Code/05_diagram_generator/diagram_generator.cpp:234)). Gemischt erscheint sie als `(…,0) [nan]`; bei ausschließlich echten Nullen erzeugen 2D und 3D fälschlich den „never executed\"-Platzhalter. Dieser Grenzfall fehlt in der neuen Fixture ab [test_05_diagram_generator_cached_fixtures.cpp:671](/home/comdare/wt-b-honest-empty/Code/05_diagram_generator/tests/test_05_diagram_generator_cached_fixtures.cpp:671).\n\n- **MITTEL — Partielle NaN-Zellen werden im 3D-Pfad zu Phantomwerten.** Sobald irgendeine Zelle positiv ist, ersetzt [diagram_generator.cpp:840](/home/comdare/wt-b-honest-empty/Code/05_diagram_generator/diagram_generator.cpp:840) jede nicht ausgeführte NaN-Zelle durch `0.0010` und emittiert sie als echten Surface-Vertex. Das beeinflusst Höhe, Farbe und Interpolation, während 2D dieselbe Zelle auslässt. Der neue 3D-Test ab [test_05_diagram_generator_cached_fixtures.cpp:790](/home/comdare/wt-b-honest-empty/Code/05_diagram_generator/tests/test_05_diagram_generator_cached_fixtures.cpp:790) prüft nur vollständige Datenlosigkeit.\n\nDie Zähler-/Fallback-Logik unterscheidet gemäß dokumentierter All-five-Politik korrekt zwischen vorhandener `0` und fehlender Zählergruppe. Exakt eine fehlende beziehungsweise `n/a`-Zählerspalte ist allerdings nicht getestet.\n\nVollständig datenlose Matrizen erreichen ansonsten in 2D, 3D und Appendix konsistent den ASCII-LaTeX-Platzhalter. Der dokumentierte 1×N-Bestandsfehler wurde nicht bewertet. Strikt statischer Review; keine Tests oder Schreiboperationen, Worktree unverändert.\n\nFokus-Abdeckung: (1) JA — Befund HOCH (p50==0 bei op_n>0 wird ausgelassen); (2) konsistent, aber Grenzfall einzelne fehlende/n-a-Spalte ungetestet; (3) NEIN — 3D-Pfad inkonsistent (Befund MITTEL, Phantomwert 0.0010); (4) Lücken bei echt-0- und partiellen-NaN-Grenzfällen; (5) keine weiteren neuen Defekte."
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "review:codex",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "afa97bdae60cb556f",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786004766073,
+      "queuedAt": 1786004766072,
+      "attempt": 1,
+      "lastToolName": "mcp__codex__codex",
+      "lastToolSummary": "NUR-LESE-REVIEW von Commit ba5e48eb (git show ba5e48eb; Bas…",
+      "promptPreview": "CODEX-Orchestrierungs-Lens. Lade via ToolSearch mcp__codex__codex. PROBE ('Antworte NUR mit OK'); bei Fehler: lens='codex-AUSFALL' mit woertlicher Meldung. Dann Review-Session cwd='/home/comdare/wt-b-honest-empty', approval-policy='never', sandbox='danger-full-access', STRIKTER Nur-Lese-Auftrag: 'NUR-LESE-REVIEW von Commit ba5e48eb (git show ba5e48eb; Basis HEAD~1) im super-Repo-Worktree: HONEST-E…",
+      "lastProgressAt": 1786005215076,
+      "tokens": 25874,
+      "toolCalls": 3,
+      "durationMs": 449003,
+      "resultPreview": "lens='codex' — Review Commit ba5e48eb (super-Worktree /home/comdare/wt-b-honest-empty), PROBE OK.\n\nCodex-Befunde (wörtlich):\n\n## Befunde\n\n- **HOCH — Echte Nullmessungen werden dennoch ausgelassen.** In [diagram_generator.cpp:558](/home/comdare/wt-b-honest-empty/Code/05_diagram_generator/diagram_generator.cpp:558) gilt nur ein Median `>0` als Daten. Obwohl `op_n>0, p50==0` zuvor korrekt als ausgefü…"
+    }
+  ],
+  "totalTokens": 25874,
+  "totalToolCalls": 3
+}

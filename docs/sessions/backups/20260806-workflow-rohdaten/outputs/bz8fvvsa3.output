@@ -1,0 +1,16 @@
+[stderr] /bin/bash: line 15: [: 0
+0: integer expression expected
+HEARTBEAT nb3-vollbau: [  7%], Ziele=52, error=0
+0
+[stderr] /bin/bash: line 15: [: 0
+0: integer expression expected
+HEARTBEAT nb3-vollbau: [ 98%], Ziele=466, error=0
+0
+[stderr] /bin/bash: line 15: [: 0
+0: integer expression expected
+HEARTBEAT nb3-vollbau: [100%], Ziele=470, error=0
+0
+[stderr] /bin/bash: line 15: [: 0
+0: integer expression expected
+HEARTBEAT nb3-vollbau: [100%], Ziele=470, error=0
+0

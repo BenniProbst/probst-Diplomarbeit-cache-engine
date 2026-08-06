@@ -1,0 +1,196 @@
+# SOTA-Visualisierungskatalog für die Cache-Engine-Auswertung — Heatmap-Alternativen (2D/3D) nach Paper-Vorbild
+
+## Kurzfassung
+
+- Der Auftrag deckt sich **wortgleich** mit einem bereits im Ledger geführten Owner-Entscheid: `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:4205` (NACHTRAG 06.08. früh-6, E-2) zitiert den Owner-Kern *"eine Heatmap ist vielleicht nicht die geeignete Form, wie machen das die anderen Paper? Orientiere dich daran und verwende 2D und 3D Graphen."* und verweist auf offene Task **E-2a** ("SOTA-Visualisierungs-Recherche + Umbau Stufe-05-Auswertung auf 2D/3D-Graphen"). Dieser Bericht ist die dafür angeforderte Grundlage.
+- Stufe 05 (`Code/05_diagram_generator/`) ist **nicht bei null**: Bar/Scatter/Heatmap, echte 3D-Surface (`view={45}{30}`, log-z), Working-Set-Sweep-Linienkurven, ECDF, Range/Whisker-Punktplot, Forest-/Dot-Plot und gestapelte Segment-Attribution existieren bereits produktiv (Details §1.2). Die vom Owner hinterfragte Heatmap ist **eine von acht** bereits gebauten Formen — der Auftrag ist eine gezielte Ablösung/Ergänzung, kein Neubau ab Null.
+- Es gibt einen konkreten **technischen Zusatzgrund**, jetzt zu handeln, nicht nur einen stilistischen: `docs/sessions/20260805-PLAN-b1-e18-vorwaerts-kanal.md:70-82` dokumentiert einen live gefundenen Fehler, bei dem eine Metrik ohne echte Messwerte trotzdem eine All-Null-Heatmap erzeugt und `pdflatex` daran **fatal** abbricht (kein PDF mehr). Ursache: `aggregate_surface_matrix` (`diagram_generator.cpp:431-458`) hält nicht die im selben Modul sonst überall geltende *honest-empty*-Disziplin ein (die ECDF-/Range-/Forest-/Segment-Writer tun das bereits korrekt).
+- Externe Recherche (Web, wo erreichbar; sonst Wissen, markiert) bestätigt: **keines** der einschlägigen SOTA-Paper aus dem eigenen Korpus (ART, HOT, Wormhole, SuRF, Masstree) oder der Idreos-Schule (Data Calculator, Design Continuum, RUM-Konjektur, Monkey/Dostoevsky) nutzt eine 2D-Matrix-Heatmap als Hauptform für Leistungsvergleiche. Dominant sind: Liniendiagramme über eine Sweep-Größe, gruppierte/normalisierte Balken, Scatter-/Pareto-Tradeoff-Plots, CDF/Perzentil-Kurven — und für echte 2-Parameter-Sweeps **Scatter-Tradeoff-Flächen bzw. Kontur-/Gradientenplots**, nicht Farbkachel-Matrizen über zwei **nominalen** Kategorien.
+- Der Katalog (§3) und die Top-3-Empfehlungen je Mess-Dimension (§4) liefern eine belegte, nach 2D/3D sortierte Auswahl inkl. pgfplots-Machbarkeit — auf Basis der bereits im Code bewiesenen pgfplots-Bausteine.
+
+## Methodische Einschränkung dieser Session (Transparenz, "nie raten")
+
+`pdftoppm`/`poppler-utils` sind in dieser Sandbox **nicht installiert** (`Read`-Tool-Fehler bei allen PDF-Seitenaufrufen), ebenso keine Python-PDF-Bibliothek. Als Read-Only-Lens habe ich keine Systempakete nachinstalliert. Konsequenz:
+- Die vendorten Paper-PDFs unter `Forschungsarbeiten/` (ART, HOT, Wormhole, SuRF, Masstree/"Cache Craftiness…", CoCo-trie, "B-Trees Are Back" u.a.) wurden **in dieser Session nur als Datei/Pfad verifiziert**, ihr Abbildungs-Inhalt wurde **nicht** gerendert.
+- Wo Web-Fetch von PDF-Binärdaten ebenfalls scheiterte (ART, YCSB, Monkey-Journal direkt als PDF), wird das explizit vermerkt.
+- Wo **ar5iv-HTML** (arXiv-Volltext-Rendering) erreichbar war, konnte ich echte Abbildungslisten samt Achsen-Beschreibung extrahieren (Kraska Learned-Index-Paper, Idreos "Learning Key-Value Store Design"/Design-Continuum-Familie) — diese Befunde sind mit **[Web]** markiert.
+- Alles andere ist mit **[Wissen]** markiert = Trainingswissen über diese (sehr bekannten, kanonischen) Paper, in dieser Session nicht zusätzlich gegengelesen.
+
+Legende im Katalog: **[Repo]** = im Korpus vendort/Pfad geprüft · **[Web]** = diese Session inhaltlich abgerufen · **[Web-Snippet]** = nur Suchergebnis-Auszug, nicht Volltext · **[Wissen]** = Trainingswissen, nicht diese Session verifiziert.
+
+---
+
+## §1 Repo-interner Befund
+
+### 1.1 Wo der Auftrag im Projekt verankert ist
+
+- `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:4205` — Owner-Zitat + Task-Titel (s.o.).
+- Task-Board dieser Session, Punkt #4: *"E-2a: honest-empty im Flächen-Writer + SOTA-2D/3D-Graph-Umbau Stufe 05 → dann B-5-Lebend-Check VOR Trigger"* — bestätigt, dass der Redesign-Auftrag und der Robustheits-Fix **ein gemeinsames Paket** sind, nicht zwei getrennte Anliegen.
+- `docs/architektur/15_F7_mess_frameworks_workloads_2d_matrix_plan.md` — definiert die Mess-Achsen M (Kategorien) × W (Workload/Dataset) als **compile-time-Parametrisierung**, nicht als Zell-Explosion; relevant, weil jede neue Visualisierungsform dieselbe (search_algo × workload)-Datenquelle (`WideMeasurementRow`) konsumiert, die Stufe 05 heute schon parst.
+- `docs/architektur/20_HEURISTIK_MESSKURVEN_TYPSYSTEM_UND_FILTERKETTE.md` — das SOLL-Messkurven-Typsystem (`tree<axis, map<workload-framework, map<workload-type, map<workload-size, map<operation_type, map<axis_observer_type, tuple<property,time>>>>>>>`) beschreibt exakt die Dimensionalität, die eine reine 2D-Matrix strukturell nicht abbilden kann — ein zusätzliches, unabhängiges Argument gegen "eine Heatmap für alles".
+
+### 1.2 Ist-Repertoire Stufe 05 (`Code/05_diagram_generator/diagram_generator.{hpp,cpp}`) — bereits acht Formen
+
+| Funktion | Form | Technischer Kern (pgfplots) |
+|---|---|---|
+| `write_bar_chart` | Balken (diskrete Labels) | `ybar` |
+| `write_scatter_plot` | Scatter (XY) | `only marks` |
+| `write_heatmap` | **2D-Matrix-Heatmap** (search_algo × workload) | `view={0}{90}`, `matrix plot*`, `colormap/viridis`, log10-Farbskala (`diagram_generator.cpp:179-260`) |
+| `write_surface3d_search_algo_x_workload` | echte 3D-Fläche über denselben zwei Achsen | `view={45}{30}`, `\addplot3[surf]`, `zmode=log` (`:616-681`) |
+| `write_working_set_sweep_curve` | 2D-Linie: Metrik über `working_set_n`, eine Kurve je Config | Standard-`axis`+`addplot` |
+| `write_segment_attribution_stacked_bar` | gestapelter Balken: Latenz-Anteil je der 19 Organ-Achsen + Framework | `ybar stacked` |
+| `write_latency_range_bar` | Punkt (p50) + Plus-Whisker (bis p99) je (search_algo × Op-Art) | `only marks` + `error bars/y dir=plus` |
+| `write_latency_ecdf` | ECDF der Konfigurations-Streuung | `const plot` (Treppenfunktion) |
+| `write_exchange_forest_plot` (`04_csv_to_latex`) | Forest-/Dot-Plot: rel. Delta-Median + IQR-Whisker, vorzeichen-gefärbt | analog Range-Bar |
+
+Das bedeutet: **Linienkurven, Balken, gestapelte Balken, Whisker-Punktplots, ECDF und Forest-Plots existieren bereits.** Die Heatmap (§1.2, `write_heatmap`) und ihre 3D-Schwester (`write_surface3d_…`) sind die einzigen Formen, die zwei **nominale** Kategorie-Achsen (search_algo, workload) in ein Farb-/Höhenfeld pressen — genau der Punkt, den der Owner moniert.
+
+### 1.3 Der konkrete Zusatz-Treiber: 0.0000-Heatmap-Fehler
+
+`docs/sessions/20260805-PLAN-b1-e18-vorwaerts-kanal.md:70-82` (wörtlich zitiert): für eine Metrik **ohne** reale Messwerte schreibt der Generator trotzdem eine Heatmap, deren z-Matrix komplett `0.0000` ist (`lc_surface_op_erase_p50_ns.tex`, `mesh/cols=2`); `pdflatex` bricht daran **fatal** ab (*"I got too few coordinates!"*, `rc=12`, **keine Thesis-PDF**). Code-Ursache: `aggregate_surface_matrix` (`diagram_generator.cpp:431-458`) liefert `true`, sobald *irgendeine* (algo, workload)-Zelle existiert — auch wenn der spezifische `z_field` dort nie real gemessen wurde — während `write_latency_ecdf`/`write_latency_range_bar`/`write_exchange_forest_plot`/`write_segment_attribution_stacked_bar` im selben Verzeichnis alle sauber `status_empty_input` zurückgeben, wenn keine gültige Zeile existiert. Der Heatmap-/Flächen-Pfad ist damit der **einzige Ausreißer** von einer im übrigen Modul konsequent durchgehaltenen Disziplin — ein zusätzliches, vom Stil unabhängiges Argument für einen Umbau.
+
+### 1.4 Die drei Mess-Dimensionen im Code/Thesis-Kontext
+
+1. **Latenz über Füllstand** — bereits als **2D-Liniendiagramm** über `working_set_n ∈ {2^14,2^17,2^20,2^23}` implementiert (`write_working_set_sweep_curve`, sweep_axis-getrieben, eine Kurve je Config). Die Aufgabentext-Formulierung *"read/write/delete-Zyklen"* deckt zusätzlich eine **feinere, kontinuierliche** Lesart ab: Latenz über die Operations-/Zeitachse **innerhalb eines Laufs**, während der Bestand durch Insert/Update/Delete wächst/schrumpft — dafür existiert aktuell **keine** Stufe-05-Funktion (Lücke, s. Katalog #2).
+2. **Per-Achsen-Observer-Statistiken** — der `WideMeasurementRow::seg_ns`-Block (19 Organ-Achsen + Framework, `kV3AxisSchema[19][8]`) ist strukturell eine **19×8-Matrix je Binary**. `write_segment_attribution_stacked_bar` deckt bereits eine der 8 Statistik-Spalten (Zeit-Anteil) als gestapelten Balken ab; die übrigen 7 Slots sind heute nur als Longtable (`write_axis_observer_detail_table`) ausgegeben, nicht visualisiert.
+3. **Achsen-Vergleich gegen `std::map`** — `06_evaluation_methodology.tex:132-134` benennt exakt diesen Vergleich als *"gemeinsamen Minimalmodus (Common-Denominator)"*. `write_exchange_forest_plot` (relative Delta-Median vs. Referenzwert, grün/rot nach Vorzeichen) ist strukturell **direkt wiederverwendbar**, wenn `std::map` als Referenz `v` gesetzt wird — keine neue Form nötig, nur ein neuer Aufrufkontext.
+
+### 1.5 xlsx als Erstformat (Owner-Doktrin)
+
+`docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:4165-4166,4207` (NACHTRÄGE 05./06.08.): Rückschreibe-Format ist **Strategy-Pattern, xlsx XOR CSV, xlsx = DEFAULT**; „B12 xlsx-Default-Writer" ist offener Bauposten. Das bedeutet: jede hier empfohlene Form muss auch als **Excel-natives Chart** (oder mit vertretbarem manuellem Aufwand) im xlsx-Erstformat entstehen können, bevor sie im LaTeX/pgfplots-Endformat der Thesis landet — beide Spalten im Katalog sind daher kein Nice-to-have, sondern Owner-bindend.
+
+### 1.6 SOTA-Design-Input, der schon im Korpus liegt
+
+`docs/sessions/backups/20260805-deep-research-a4-a5/synthese.md` (A5, Zeile 173) nennt bereits **Idreos Data Calculator / Periodic Table** als Beleg dafür, dass *"Filter"* eine von fünf generischen, layoutunabhängigen Design-Primitiven ist — dieselbe Idreos-Denkschule (Design-Space-Modellierung statt Einzelvergleich) ist der stärkste externe Bezugspunkt für die hier gefragte Visualisierungsfrage (§2.2).
+
+---
+
+## §2 Externe Recherche: Wie visualisieren die einschlägigen Paper?
+
+### 2.1 Index-Struktur-Paper — die direkten Reihe-A/C-Vergleichspartner (`06_evaluation_methodology.tex`: Reihe A = PRT-ART vs. SOTA)
+
+Alle vendort unter `Forschungsarbeiten/traversal/`, gegen die die Thesis in Messreihe A/C explizit antritt.
+
+- **ART** (Leis/Kemper/Neumann, ICDE 2013) **[Repo]** + **[Web-Snippet]**: Kern-Evaluation ist Single-Thread-Lookup-**Durchsatz gruppiert nach Datensatzgröße** (65K/16M/256M Schlüssel) — ein gruppiertes Balkendiagramm bzw. eine Kurvenschar über Datensatzgröße, keine Matrix zweier nominaler Kategorien.
+- **Wormhole** (Wu et al., USENIX ATC 2019) **[Repo]** + **[Web-Snippet]**: Kernaussagen ("bis 8,4× ggü. Skip-List, 4,3× ggü. ART" bzw. "16 Threads → 19,5 MOPS, 15,4× ggü. 1 Thread") sind **Skalierungs-Liniendiagramme über Thread-Anzahl** plus **relative-Speedup-Balken** gegenüber Baselines — strukturell identisch zur hier geforderten Dimension 3 (vs. Baseline).
+- **HOT, SuRF, Masstree** ("Cache Craftiness for Fast Multicore Key-Value Storage" = der EuroSys-2012-Originaltitel des Masstree-Papers) **[Repo]**, **CoCo-trie**, **"B-Trees Are Back"/LeanStore** **[Repo]**: alle im Korpus vendort, Inhalt in dieser Session nicht gerendert (§Methodik-Einschränkung); nach **[Wissen]** folgen diese Paper derselben Familien-Konvention wie ART/Wormhole (Durchsatz-über-Kerne/-Threads als Linie, gruppierte Balken über Workload-Mix, Speicher-Fußabdruck als separater Balken) — keines davon ist mir als "2D-Matrix-Heatmap-first" bekannt.
+
+### 2.2 Idreos-Schule — Design-Space- statt Einzelvergleichs-Visualisierung
+
+- **"The Case for Learned Index Structures"** (Kraska et al., SIGMOD 2018) **[Web, ar5iv-Volltext geprüft]**: von 11 Abbildungen sind die *daten*tragenden fast ausschließlich **gruppierte Balkendiagramme** (Fig. 4/5/6/8/11: Größe/Lookup-Zeit/Speedup je Datensatz-Konfiguration) und **eine Linienkurve** (Fig. 10: Speichergröße über False-Positive-Rate, mehrere Modellkonfigurationen als Serien). Fig. 2 ("Indexes as CDFs") ist konzeptionell bemerkenswert: sie deutet den Index selbst als **CDF-Kurve** (Schlüssel → kumulative Position) — dieselbe CDF-Form, die Stufe 05 bereits für Konfigurations-Streuung nutzt (`write_latency_ecdf`), hier auf die Datenstruktur selbst angewandt.
+- **"Design Continuums and the Path Toward Self-Designing Key-Value Stores"** / **"Learning Key-Value Store Design"** (Idreos, Dayan et al., CIDR 2019 / arXiv:1907.05443) **[Web, ar5iv-Volltext geprüft]**: die evaluativ wichtigen Abbildungen sind (a) ein **Scatter-/Pareto-Tradeoff-Plot** Punkt-Lesekosten vs. Schreibkosten, mehrere Strukturen als Punktwolken/Kurven über einen variierenden Parameter (Fig. 8), (b) ein **Kontur-/Gradientenplot** für eine 3-Wege-Speicherbudget-Optimierung (Cache/Puffer/Bloom-Filter) mit farbigen Höhenlinien und Gradientenpfeilen (Fig. 11) — **das** ist die genuine 3D-artige Form für einen echten 2-Parameter-Sweep in dieser Paper-Familie, und explizit **kein** Farbkachel-Raster über zwei nominale Kategorien, (c) eine **Liniendarstellung über die Zeit-/Query-Sequenz** für adaptive Übergänge zwischen Strukturen (Fig. 10).
+- **RUM-Konjektur** (Athanassoulis, Kester, Maas, Stoica, Idreos, Ailamaki, Callaghan, EDBT 2016) **[Web, Tutorial-Foliensatz geprüft]**: Kern-Visualisierung ist ein **Dreiecks-/Ternär-Diagramm** (Read/Update/Memory als drei Ecken), in dem existierende Datenstrukturen als Punkte positioniert werden — eine eigenständige, im Korpus (`docs/audits/20260709-pareto-objectives-t6-t18-t5-BEFUND.md:40,175-179,331-336`) bereits zitierte Denkschule.
+- **Monkey** (Dayan/Athanassoulis/Idreos, SIGMOD 2017) und **Dostoevsky** (Dayan/Idreos, SIGMOD 2018) **[Web-Snippet]** + **[Wissen]**: beide bereits ausführlich im eigenen Korpus rezipiert (`docs/audits/20260709-pareto-objectives-t6-t18-t5-BEFUND.md`). Kern-Visualisierung nach Wissensstand: **Pareto-Front-Scatter/Linien** (Lookup-Kosten vs. Bits-pro-Element-Budget je LSM-Level), keine Matrix-Heatmap.
+
+### 2.3 Benchmark-Suiten (YCSB/TPC/mimalloc-bench) — bereits im eigenen 13-Framework-Katalog
+
+- **YCSB** (Cooper et al., SoCC 2010) **[Web-Snippet, methodisch eindeutig]**: die Kernform ist die **Durchsatz-vs-Latenz-"Knee"-Kurve** — Latenz wird gemessen, während die angebotene Last (Durchsatz) bis zur Sättigung erhöht wird; jedes System eine eigene Kurve. Industriepraxis (Aerospike-/ScyllaDB-Benchmarkberichte, web-bestätigt) reproduziert exakt dieses Muster bis heute.
+- **TPC-C/TPC-DS** **[Wissen]**: Executive-Summary-Konvention ist der **Balken** (tpmC bzw. Preis/Leistung), kein Flächenplot.
+- **mimalloc-bench** (Teil des eigenen 13-Framework-Katalogs, `tab:wl-frameworks`) **[Wissen]**: normalisiert **relativ zum System-Allocator** als Balken (baseline = 1.0) — strukturell die gleiche Form wie das hier für Dimension 3 empfohlene normalisierte Balkendiagramm.
+
+### 2.4 Cache-Ersetzungs-Literatur (nächstliegende Nachbardisziplin zur "Cache-Engine")
+
+**[Web-Snippet, mehrfach konsistent]**: ARC (Megiddo/Modha), LIRS (Jiang/Zhang), Multi-Step-LRU u.a. zeigen durchgängig **Trefferquote (%) über Cache-Größe** als 2D-Liniendiagramm, eine Linie je Algorithmus — die klassische Form für *"Leistung über Füllstand/Skalierung"*, strukturell identisch zur bereits implementierten Working-Set-Sweep-Kurve (§1.2).
+
+### 2.5 Methodik-Standardwerke und Systems-Praxis
+
+- **Hoefler & Belli, "Scientific Benchmarking of Parallel Computing Systems"** (SC 2015) **[Web-Snippet teilweise + Wissen]**: kanonische HPC-Methodikarbeit; Kernempfehlung (Wissensstand, Suchtreffer bestätigt nur die Existenz/Kernthese) ist, **Verteilungen statt Einzelwerte** zu zeigen (Box-/Violin-artige Darstellung statt nackter Balken-Mittelwerte), ausreichende Wiederholungen für Konfidenzintervalle, und Log-Skalen bei großer Dynamik — deckt sich mit der bereits im Code gelebten Doktrin *"Perzentile über HDR-Histogramme statt Mittelwert"* (`06_evaluation_methodology.tex:141`).
+- **Brendan Gregg, "Visualizing System Latency"** (ACM Queue/CACM 2010) **[Web bestätigt]**: das ist die bekannteste *legitime* Heatmap-Nutzung in der Systems-Literatur — aber über **zwei geordneten/kontinuierlichen** Achsen (Zeit × Latenz-Bucket, Farbe = Dichte), nicht über zwei **nominalen** Kategorien wie search_algo × workload. Das ist der methodisch entscheidende Unterschied und erklärt, warum "Heatmap" per se nicht falsch ist, die *aktuelle* Instanz aber schon (s. Anti-Patterns, §5).
+- Tail-Latenz-Konvention **[Web-Snippet]**: CDF-Plots (x = Latenz, y = kumulative Wahrscheinlichkeit) sind Standard für Latenzverteilungen; Median + p95/p99 gelten als Mindestangabe — deckt sich mit der bereits vorhandenen `write_latency_ecdf`/`write_latency_range_bar`-Praxis im Code.
+
+---
+
+## §3 KATALOG der Darstellungsformen
+
+Bewertung: **◎** = Kernform/sehr geeignet · **○** = geeignet/gute Ergänzung · **△** = bedingt/Nische · **✗** = ungeeignet/abzuraten.
+D1 = Latenz über Füllstand · D2 = Per-Achsen-Observer 19×8 · D3 = Achsen vs. `std::map`-Baseline.
+
+| # | Form | Kern-Beleg | D1 | D2 | D3 | xlsx-Erstformat | LaTeX/pgfplots-Endformat |
+|---|---|---|---|---|---|---|---|
+| 1 | **2D-Linie über Füllstand/Skalierung** (log-x optional), eine Kurve je Config | Cache-Ersetzung ARC/LIRS **[Web]**; ART/Masstree-Familie **[Wissen]**; **im Code bereits `write_working_set_sweep_curve`** | ◎ Kernform | ○ je Statistik-Slot als eigene Kurie | △ als "eine Kurve = std::map" nutzbar | ◎ nativ (Liniendiagramm) | ◎ bereits bewiesen, 0 Zusatzaufwand |
+| 2 | **Latenz-über-Operationsindex/Zeit** mit Phasen-Schattierung (read/write/delete-Zyklen kontinuierlich) | LSM-Compaction-Stall-/Resize-Sägezahn-Plots **[Wissen]**, Analogie zu RocksDB/LevelDB-Engineering-Blogs | ◎ deckt die *"Zyklen"*-Lesart direkt ab | ✗ | △ | ○ mit Hilfsspalte (Rang/Zeitstempel) | ○ neuer Writer nötig, aber gleiche `axis`+`addplot`-Bausteine wie #1 |
+| 3 | **Gruppiertes Balkendiagramm** über diskrete Kategorien, optional Fehlerbalken | ART **[Web-Snippet]**, Kraska Fig.4/5/6 **[Web]** | ○ | ◎ 8 Slots als Balkengruppen je Achse | ○ | ◎ nativ | ◎ bereits bewiesen (`write_bar_chart`) |
+| 4 | **Gestapeltes Balkendiagramm** (Komposition/Attribution) | — | ✗ | ◎ **bereits implementiert** (`write_segment_attribution_stacked_bar`) für 1 von 8 Slots | △ | ◎ nativ | ◎ bereits bewiesen |
+| 5 | **Normalisiertes Balkendiagramm vs. Baseline** (Referenzlinie bei 1.0, log-y, divergierende Farbe) | mimalloc-bench **[Wissen]**, Compiler-/SPEC-Speedup-Balken **[Wissen]** | △ | △ | ◎ Kernform für D3 | ◎ nativ | ○ leichte Erweiterung von #3 |
+| 6 | **Forest-/Dot-Plot** mit Whisker (rel. Delta-Median vs. Referenz, Vorzeichen-Farbe) | Forest-Plots (Meta-Analyse-Konvention, **[Wissen]**); **im Code bereits `write_exchange_forest_plot`** | △ | ○ | ◎ direkt wiederverwendbar (Referenz = `std::map`) | ○ mit Fehlerbalken-Konstrukt | ◎ bereits bewiesen |
+| 7 | **Scatter-/Pareto-Tradeoff-Plot** (2 konkurrierende Kostenachsen, Kurve über Parameter) | Idreos "Learning KV Store Design" Fig.8 **[Web]**, Monkey/Dostoevsky **[Web-Snippet]** | ○ | ○ (z.B. Slot i vs Slot j) | ◎ (Δns/op vs Δmemory je Achse) | ◎ nativ (XY-Chart) | ○ Standard-`addplot`, kein neuer Mechanismus |
+| 8 | **Durchsatz-Latenz-"Knee"-Kurve** | YCSB **[Web-Snippet]**, ScyllaDB/Aerospike-Praxis **[Web]** | ○ (Füllstand als Lastparameter) | ✗ | ○ | ◎ nativ | ○ neu, aber trivial (2D-Linie) |
+| 9 | **CDF/ECDF-Perzentilkurve** | Tail-Latenz-Konvention **[Web-Snippet]**; **im Code bereits `write_latency_ecdf`** | ○ | ✗ | ○ | △ Hilfsspalte nötig | ◎ bereits bewiesen |
+| 10 | **Bereichs-/Whisker-Punktplot** (p50→p99, kein echter Quartil-Boxplot) | Tail-Latenz p50/p99-Konvention **[Web-Snippet]**; **im Code bereits `write_latency_range_bar`** | ○ | ○ | ○ | ○ Fehlerbalken manuell | ◎ bereits bewiesen |
+| 11 | **Echter Box-/Violin-Plot** (Quartile) | Hoefler/Belli-Empfehlung **[Wissen]** | ○ *nur falls Rohdaten-Quartile verfügbar werden* | ○ | ○ | ◎ nativ seit Excel 2016 (Box&Whisker) | △ *nur* `contour`-frei via Rohdaten; **Datenvoraussetzung fehlt heute** (WIDE-Schema trägt nur p50/p99 — Owner-Kern "kein Phantom" verbietet erfundene Quartile) |
+| 12 | **Kleine-Multiples-Gitter** (Small Multiples/Trellis), N kleine Subplots derselben Form | Tufte/Cleveland-Prinzip **[Wissen]**; im Korpus **noch nicht genutzt** (grep negativ, §vor Bericht) | ○ | ◎ Kernform für 8 Slots × 19 Achsen | ○ | △ manuell (kein natives Facet) | ○ `groupplots`-Bibliothek, im Repo noch **nicht** eingebunden — reiner Zusatzaufwand, keine neue Grundtechnik |
+| 13 | **Radar-/Spinnendiagramm** | — | ✗ | △ *(verbreitet, aber…)* | ✗ | ◎ nativ (deshalb verlockend) | ✗ **Anti-Pattern**, s. §5 |
+| 14 | **Ternär-/Dreiecksdiagramm** (RUM-Stil, 3-Wege-Tradeoff) | RUM-Konjektur Athanassoulis et al. **[Web]** | △ | △ (z.B. 3 ausgewählte Slots) | △ (Zeit/Speicher/Cache-Misses als 3 Ecken) | △ kein nativer Typ, XY-Konstruktion nötig | △ pgfplots kann Ternärkoordinaten simulieren, Zusatzaufwand |
+| 15 | **3D-Surface/Wireframe** über 2 Sweep-Parametern | Idreos Fig.11-Analogon **[Web]** *(dort Kontur, nicht Surface)*; **im Code bereits `write_surface3d_search_algo_x_workload`** | ◎ *wenn beide Achsen echte Sweep-Parameter sind* (z.B. N × Op-Mix-Anteil) | △ *nur wenn Achsen-Reihenfolge fix/kanonisch bleibt* | △ | △ Excel "3D-Surface"/"Wireframe" nativ, aber grobe Optik | ◎ bereits bewiesen — **Achtung:** methodisch nur sauber bei **geordneten** Achsen, nicht bei zwei freien Nominal-Kategorien |
+| 16 | **Top-Down-Konturplot** (Höhenlinien statt Farbfläche) | Idreos SGD-Speicherbudget-Figur (Fig.11) **[Web]** | △ | △ | △ | ✗ nur Näherung über "Contour"-Variante des Surface-Charts | △ **Build-Abhängigkeit**: `contour gnuplot` braucht externes `gnuplot` + `--shell-escape` (verletzt "kein Behelfsweg"/Sandbox-Doktrin); `contour lua` braucht `lualatex` statt `pdflatex` (Engine-Wechsel) **[Web bestätigt, pgfplots-Doku/Community]** |
+| 17 | **Matrix-/Heatmap-Plot**, sequentielle Farbskala, 2 nominale Achsen | — | △ | △ | ✗ | △ Conditional-Formatting-Farbskala (billig, aber kein "Chart") | ◎ bereits bewiesen, **aber genau die vom Owner hinterfragte Form** — als *QA-Diagnose-Ansicht* vertretbar, nicht als Haupt-Ergebnis-Figur |
+| 18 | **Baseline-relative Matrix, divergierende Farbskala** (Ratio statt Absolutwert, zentriert bei 1.0) | Regression-Dashboards/A-B-Test-Heatmaps **[Wissen]** | △ | △ | ○ *leichter Umbau von #17, kein Neubau* | △ Conditional-Formatting mit Mittelpunkt-Skala nativ | ○ minimaler Diff zu `write_heatmap` (Farbskala + Datenquelle tauschen) |
+| 19 | **3D-Balken (ybar3d)** | — | ✗ | ✗ | ✗ | △ nativ ("3D-Column"), aber irreführend | ✗ **Anti-Pattern**, s. §5 |
+
+---
+
+## §4 Empfehlung: Top-3 je Mess-Dimension (2D **und** 3D, wie vom Owner verlangt)
+
+### 4.1 Dimension 1 — Latenz über Füllstand (read/write/delete-Zyklen)
+
+1. **2D (Kernform):** Liniendiagramm Metrik über `working_set_n`, eine Kurve je Achsen-Konfiguration — **bereits gebaut** (`write_working_set_sweep_curve`). *Begründung:* deckt sich 1:1 mit der Cache-Ersetzungs-Literatur (ARC/LIRS: Trefferquote über Cache-Größe) und mit YCSB-artiger Lastskalierung; pgfplots-Aufwand = 0.
+2. **2D (Ergänzung, neu):** Latenz-über-Operationsindex mit Zyklus-Schattierung — deckt die *"read/write/delete-Zyklen"*-Formulierung wörtlich (kontinuierlicher Verlauf **innerhalb eines** Laufs, nicht nur N diskrete Stützstellen). *pgfplots-Machbarkeit:* identischer `axis`/`addplot`-Baustein wie #1, nur andere x-Semantik (Operationsindex statt N) plus optionale `\draw[fill,opacity=…]`-Rechtecke für Phasenhintergrund — geringer Zusatzaufwand, keine neue Grundtechnik.
+3. **3D (2-Parameter-Sweep):** Surface/Wireframe **nur wenn eine zweite Achse eine echte Sweep-Größe ist** (z.B. N × Anteil Schreib-/Löschoperationen, nicht N × Algorithmus-Name) — technisch identisch zu `write_surface3d_search_algo_x_workload`, aber mit zwei **geordneten** statt nominalen Achsen, wodurch die Höhenfläche erstmals eine reale Interpolationsaussage trägt. *Begründung für 3D hier statt bei D2/D3:* dies ist die einzige der drei Dimensionen, die von Natur aus zwei kontinuierliche/ordinale Größen (Füllstand, Op-Mix-Anteil) besitzt — exakt die Voraussetzung, unter der Idreos' eigene 3D-artige Darstellung (Kontur/Gradientenfeld, Fig. 11) methodisch Sinn ergibt.
+
+### 4.2 Dimension 2 — Per-Achsen-Observer-Statistiken (19 × 8)
+
+1. **2D (Kernform, neu):** Kleine-Multiples-Gitter — 8 Subplots (je Statistik-Slot), jeder ein Balkendiagramm über die 19 Achsen in kanonischer `kCompositionAxisNames`-Reihenfolge. *Begründung:* löst exakt das Problem, das die aktuelle Heatmap hat (19×8 ist eine nominal×nominal-Matrix), ohne Information zu verlieren — jede Einzelzelle bleibt als echter Balkenwert ablesbar statt als Farbnuance geschätzt; im Korpus bislang **nicht genutzt** (`groupplots` ist neu einzubinden), aber baut auf demselben `write_bar_chart`-Baustein auf, der schon existiert.
+2. **2D (Ergänzung):** gestapeltes Balkendiagramm — **bereits gebaut** für den Zeit-Slot (`write_segment_attribution_stacked_bar`); als Muster für die übrigen 7 Slots wiederverwendbar, wo eine Kompositions-/Anteils-Aussage (Σ=100%) sinnvoll ist.
+3. **3D/Matrix (bewusst zurückhaltend):** Für D2 rate ich **von einer echten 3D-Fläche ab** — beide Achsen (Achsen-Index, Statistik-Slot) sind kategorial ohne Interpolationssinn, eine Höhenfläche würde zwischen benachbarten Balken eine nicht existente Kontinuität suggerieren (dieselbe Kritik, die die heutige Heatmap trifft). Falls der Owner-Auftrag *"UND 3D"* hier zwingend eine dritte Form verlangt, ist die **einzig vertretbare** Variante die bestehende Matrix/Heatmap **unverändert als Diagnose-/QA-Ansicht** (nicht als Ergebnis-Abbildung) beizubehalten — mit dem Hinweis, dass sie dann explizit als "Rohdaten-Übersicht", nicht als Analyse-Aussage, beschriftet gehört.
+
+### 4.3 Dimension 3 — Achsen-Vergleich gegen `std::map`
+
+1. **2D (Kernform):** Forest-/Dot-Plot mit Whisker, Referenz = `std::map` — **bereits gebaut** (`write_exchange_forest_plot`), nur neue Aufrufsemantik (Referenzwert fixieren statt Geschwisterpaar). *Begründung:* exakt die Form, die Wormhole/mimalloc-bench-artige "Speedup-vs-Baseline"-Aussagen macht (§2.1, §2.3), inkl. bereits vorhandener Anti-Phantom-Vorkehrung (kleine-n ausgegraut, keine erfundenen Nullzeilen).
+2. **2D (Ergänzung):** normalisiertes Balkendiagramm, y = Faktor relativ zu `std::map` (1.0-Referenzlinie, log-y, divergierende Farbe unter/über 1.0). *Begründung:* geringster Umbau-Aufwand (Variante von `write_bar_chart`), deckt sich mit der im eigenen 13-Framework-Katalog bereits geführten mimalloc-bench-Konvention.
+3. **3D/Matrix (gezielte Wiederverwendung statt Neubau):** Baseline-relative Matrix mit **divergierender** statt sequentieller Farbskala (zentriert bei Faktor 1.0) — technisch der kleinste Diff im gesamten Katalog (Datenquelle von Absolutwert auf Ratio umstellen, `colormap/viridis` durch eine divergierende Skala ersetzen). *Begründung, warum dies die 3D/Matrix-Antwort für D3 und nicht für D2 ist:* hier gibt es eine echte, sinnvolle dritte Information (Vorzeichen/Abstand zur Baseline), die eine Farbcodierung rechtfertigt — bei D2 fehlt dieses Referenzkonzept. Das ist zugleich der Punkt im gesamten Katalog, an dem "Heatmap reparieren" der "Heatmap ersetzen" methodisch überlegen ist.
+
+---
+
+## §5 Anti-Patterns / Fallstricke (aus der Recherche, damit sie nicht unbeobachtet reproduziert werden)
+
+- **Radar-/Spinnendiagramm** (Katalog #13): trotz nativer Excel-Verfügbarkeit und verbreiteter Nutzung methodisch angreifbar — die Fläche wächst nichtlinear mit dem Wert, Achsenreihenfolge verzerrt den optischen Flächen-Eindruck beliebig; in keinem der recherchierten Kern-Paper (ART/HOT/Wormhole/SuRF/Masstree, Idreos-Familie) als Hauptform gefunden.
+- **3D-Balken (ybar3d)** (#19): Verdeckungsprobleme (hintere Balken durch vordere verdeckt) sind ein seit Jahrzehnten dokumentiertes Kritikmuster an 3D-Balkendiagrammen generell; in der recherchierten Literatur nirgends als bevorzugte Form aufgetaucht.
+- **Kontur-/Gnuplot-Pfad in pgfplots** (#16): technisch attraktiv (folgt dem Idreos-Vorbild), aber `contour gnuplot` verlangt einen externen `gnuplot`-Binärprozess **mit `--shell-escape`** — das kollidiert mit der im Memory-Kanon dokumentierten Doktrin *"kein Behelfsweg / offizieller Weg"* und mit einer reproduzierbaren Sandbox-Buildkette; `contour lua` vermeidet den externen Prozess, verlangt aber `lualatex` statt des im Repo verankerten `pdflatex` (`docs/audits/…/README.md:30`: *"pdflatex (TeX Live 2026, booktabs+pgfplots)"*) — ein Engine-Wechsel, der über den Scope einer reinen Stufe-05-Änderung hinausgeht und eine eigene Entscheidung bräuchte.
+- **Echter Box-/Violin-Plot** (#11): laut Hoefler/Belli methodisch wünschenswert, aber das WIDE-Schema trägt nur p50/p99 (`diagram_generator.hpp:322-329`, wörtlich: *"NUR 2 Perzentile existieren → KEIN Box-Plot mit erfundenen Quartilen (das wäre Phantom)"*) — die vom eigenen Korpus schon vollzogene Anti-Phantom-Entscheidung sollte nicht durch eine neue Chartform unterlaufen werden, ohne vorher die Datengrundlage (mehr Perzentile im WIDE-Schema) zu erweitern.
+- **Heatmap ist nicht per se falsch** (Gregg-Gegenbeispiel, §2.5): der methodische Fehler liegt nicht in "Farbe kodiert Wert", sondern darin, **zwei nominale Kategorien ohne Referenzpunkt** in eine sequentielle Farbskala zu pressen. Zeit×Latenz-Heatmaps (geordnete Achsen) oder baseline-relative divergierende Matrizen (mit Referenzpunkt, #18) sind davon nicht betroffen — diese Unterscheidung sollte in der Umsetzungsentscheidung nicht verloren gehen.
+
+---
+
+## §6 Anschlussfähigkeit an Stufe 05 (rein beobachtend, keine Bauentscheidung)
+
+Nur als Einordnungshilfe, welche Katalog-Positionen an welchem bestehenden Baustein andocken würden (keine Empfehlung, *wie* zu bauen ist — das ist Sache der Bau-Session):
+
+| Aufwandsklasse | Katalog-Positionen | Bestehender Andockpunkt |
+|---|---|---|
+| **0 – sofort nutzbar, nur neuer Aufrufkontext** | #6 (Forest-Plot vs. `std::map`) | `write_exchange_forest_plot` (`csv_to_latex.hpp:176`) |
+| **1 – kleiner Diff an bestehender Funktion** | #18 (Ratio-Matrix, divergierend) | `write_heatmap`/`aggregate_surface_matrix` (`diagram_generator.cpp:431-458`) |
+| **2 – neue Funktion, bekannter Baustein** | #2 (Zeitreihe/Zyklus), #5 (normalisierter Balken), #7 (Pareto-Scatter) | `write_working_set_sweep_curve` bzw. `write_bar_chart` als Vorlage |
+| **3 – neue Bibliothek/Technik nötig** | #12 (Small Multiples/`groupplots`) | im Repo bislang **nicht** eingebunden (grep negativ) |
+| **4 – Build-System-Frage vor Bau klären** | #16 (Kontur) | `gnuplot`+`--shell-escape` vs. `lualatex`-Wechsel — beides über Stufe-05-Scope hinaus |
+
+Der `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:4205`-Task E-2a verlangt außerdem *honest-empty* im Flächen-Writer (§1.3) — das ist unabhängig von der Formwahl und beträfe `aggregate_surface_matrix` unabhängig davon, ob Position #17/#18 (Matrix-Familie) überhaupt erhalten bleibt.
+
+---
+
+## Quellenverzeichnis
+
+**Repo-intern** (alle Pfade relativ zu `/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/`):
+`docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:4205,4163-4166,4207` · `docs/sessions/20260805-PLAN-b1-e18-vorwaerts-kanal.md:49-82` · `docs/sessions/backups/20260805-deep-research-a4-a5/synthese.md` · `docs/architektur/15_F7_mess_frameworks_workloads_2d_matrix_plan.md` · `docs/architektur/20_HEURISTIK_MESSKURVEN_TYPSYSTEM_UND_FILTERKETTE.md` · `docs/audits/20260709-pareto-objectives-t6-t18-t5-BEFUND.md:40,175-179,331-336` · `thesis/diplomarbeit/kapitel/de/06_evaluation_methodology.tex` (Zeilen 8-39, 130-142) · `Code/05_diagram_generator/diagram_generator.{hpp,cpp}` (vollständig gesichtet) · `Code/04_csv_to_latex/csv_to_latex.hpp:169-186` · `Forschungsarbeiten/traversal/` + `Forschungsarbeiten/code/P01…P22` (Verzeichnis-/Titel-Sichtung).
+
+**Web** (in dieser Session abgerufen):
+- [The Adaptive Radix Tree (ART), Leis/Kemper/Neumann, ICDE 2013](https://www.db.in.tum.de/~leis/papers/ART.pdf)
+- [Wormhole: A Fast Ordered Index, Wu et al., USENIX ATC 2019](https://ranger.uta.edu/~sjiang/pubs/papers/wu19-wormhole.pdf)
+- [The Case for Learned Index Structures, Kraska et al., SIGMOD 2018 (ar5iv)](https://ar5iv.labs.arxiv.org/html/1712.01208)
+- [Learning Key-Value Store Design / Design Continuums, Idreos/Dayan et al., CIDR 2019 (arXiv, ar5iv)](https://ar5iv.labs.arxiv.org/html/1907.05443)
+- [Designing Access Methods: The RUM Conjecture — Tutorial-Folien, Athanassoulis et al.](https://cs-people.bu.edu/mathan/publications/sigmod16-athanassoulis-tutorial.pdf)
+- [Monkey: Optimal Navigable Key-Value Store, Dayan/Athanassoulis/Idreos, SIGMOD 2017 (Journal-PDF)](https://nivdayan.github.io/monkey-journal.pdf)
+- [Benchmarking Cloud Serving Systems with YCSB, Cooper et al., SoCC 2010](https://courses.cs.duke.edu/fall13/compsci590.4/838-CloudPapers/ycsb.pdf)
+- [Scientific Benchmarking of Parallel Computing Systems, Hoefler & Belli, SC 2015](https://spcl.inf.ethz.ch/Teaching/2018-dphpc/hoefler-scientific-benchmarking.pdf)
+- [Visualizing System Latency, Brendan Gregg, ACM Queue 2010](https://queue.acm.org/detail.cfm?id=1809426)
+- [PGFplots Manual — Three Dimensional Plot Types / Contour](https://tikz.dev/pgfplots/reference-3dplots)
+- [pgfplots Issue #464 — contour gnuplot/lua Verhalten](https://github.com/pgf-tikz/pgfplots/issues/464)

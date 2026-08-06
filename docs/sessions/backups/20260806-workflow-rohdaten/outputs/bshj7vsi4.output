@@ -1,0 +1,2221 @@
+diff --git a/ci/anhang_forward_core.sh b/ci/anhang_forward_core.sh
+index d74f01ca..e954d09e 100755
+--- a/ci/anhang_forward_core.sh
++++ b/ci/anhang_forward_core.sh
+@@ -23,12 +23,14 @@
+ # HARTE ZUSAGEN (am Fixture bewiesen, s. Plan-Dossier Abschnitt B-2):
+ #   * schreibt AUSSCHLIESSLICH nach anhang/<lang>/tabellen/<name>.tex  (Whitelist)
+ #   * loescht NIEMALS Bestand im Ziel-Repo: kein `git rm`, kein `git clean`, kein --force.
+-#     Der EINZIGE rm-Pfad im ganzen Script ist der Rollback bei ROTEM PDF-Gate, und der
++#     Der EINZIGE rm-Pfad im Ziel-Repo ist der Rollback bei ROTEM PDF-Gate, und der
+ #     entfernt AUSSCHLIESSLICH Pfade, die DIESER Lauf selbst neu angelegt hat: Grundlage
+ #     ist die Buchfuehrungs-Liste $COPIED_LIST, jeder Eintrag wird zusaetzlich gegen
+ #     `git ls-files --error-unmatch` geprueft. Getrackte Dateien werden per `git checkout`
+ #     zurueckgeholt (nie geloescht); fremde unversionierte Dateien im selben Verzeichnis
+ #     bleiben unangetastet (am Fixture sha256-identisch nachgewiesen).
++#     (Der zweite rm-Pfad liegt AUSSERHALB des Ziel-Repos und beruehrt keinen Bestand:
++#      das trap-Cleanup der EIGENEN, unveroeffentlichten .tmp-Ordner, s. E-18-SNAP unten.)
+ #   * ohne Byte-Delta entsteht KEIN Commit  (Loop-/Rausch-Wache)
+ #   * ohne Quelle entsteht KEIN Commit und KEIN Fehler (honest-empty)
+ #   * landet AUF EINEM TeX-FAEHIGEN RUNNER nie einen Stand, mit dem die Thesis-PDF nicht
+@@ -70,7 +72,7 @@
+ #    nachvollziehen."
+ #   UMSETZUNG: das PDF-Gate baut die Thesis-PDF ohnehin schon (s.o.) -- E-18-SNAP ERNTET dieses
+ #   Bau-Produkt, statt ein zweites Mal zu kompilieren. Es landet zusaetzlich unter
+-#   <AF_SNAPSHOT_ROOT>/<JJJJMMTT-HHMMSS>/ :
++#   <AF_SNAPSHOT_ROOT>/<JJJJMMTT-HHMMSS>-<LAUF-KENNUNG>/ :
+ #     <haupt>.pdf         die kompilierte Diplomarbeit (Kopie, sha256-verifiziert)
+ #     compile-export.txt  der vollstaendige latexmk/pdflatex-Lauf (der "latex compile-export")
+ #     QUELLSTAND.txt      289-SHA + 288-SHA + Kanal-Lauf-ID -> der Compile ist nachvollziehbar
+@@ -82,18 +84,36 @@
+ #   Die .txt-Endung haelt den Schnappschuss ohne .gitignore-Aenderung trackbar; Alternative waere
+ #   ein `!measurement/**/*.log` analog zur CSV-Zeile (Entscheid Lead, s. Backup-ANWENDUNG.md).
+ #
+-#   ADDITIV, NIE UEBERSCHREIBEN (Messdaten-Doktrin): existiert der Zeitstempel-Ordner bereits, wird
+-#   ein Kollisions-Suffix -2, -3, ... angehaengt. Ein bestehender Ordner wird NIE angefasst, nie
+-#   ueberschrieben, nie geloescht -- auch nicht teilweise. Die Suffix-Wahl prueft dabei DREI Staende,
+-#   weil zwei Laeufe in derselben Sekunde auf VERSCHIEDENEN Runnern liegen koennen (Codex HOCH-2):
+-#     (i)   lokal      -- `[ -e ]` gegen den Arbeitsbaum
+-#     (ii)  REMOTE     -- `git cat-file -e <fetch>:<pfad>` gegen den Ziel-Branch des 288-Repos; ein
+-#                         bereits GELANDETER Ordner desselben Zeitstempels ist damit sichtbar, bevor
+-#                         der Writeback in einen add/add-Merge-Konflikt laeuft (= Beleg-Verlust)
+-#     (iii) EXKLUSIV   -- `mkdir` OHNE -p ist der atomare Lock: gewinnt nur EIN Lauf; wer verliert,
+-#                         geht in derselben Schleife auf das naechste Suffix (Retry statt Abbruch)
+-#   Ist der REMOTE-Stand nicht abfragbar (kein git-Arbeitsbaum, kein Remote, fetch rot), sagt der
+-#   Kanal das LITERAL und faellt auf (i)+(iii) zurueck -- kein stiller Teil-Schutz.
++#   (NB2-1) RUNNERUEBERGREIFEND EINDEUTIGER NAME statt verteilter Reservierung (Codex HOCH-2):
++#   der Zeitstempel allein kollidiert, sobald zwei Laeufe in derselben Sekunde auf VERSCHIEDENEN
++#   Runnern liegen -- und dagegen hilft KEIN lokaler Lock: getrennte Dateisysteme, beide sehen den
++#   Remote-Stand frei. Der Ordnername traegt darum die LAUF-KENNUNG:
++#       r<CI_RUNNER_ID>-j<CI_JOB_ID>        in der CI (job-global eindeutig, von GitLab vergeben)
++#       h<hostname>-p<PID>                  lokal/Fixture (Rueckfall, wenn die CI-Variablen fehlen)
++#   Damit ist der Name OHNE jede Reservierung disjunkt. Die drei Kollisions-Wachen (lokal ->
++#   REMOTE -> mkdir-Lock) bleiben als GURT bestehen, aber der mkdir-Fehler wird jetzt nach ART
++#   unterschieden: nur ein bereits existierender Pfad ist eine Kollision (-> naechstes Suffix);
++#   EACCES/ENOSPC/fehlender Parent sind FATAL und brechen SOFORT ab, statt 99 sinnlose Retries zu
++#   drehen (Codex: Liveness).
++#
++#   (NB2-5) TRANSAKTIONALES SCHREIBEN: der Schnappschuss entsteht in einem VERSTECKTEN Ordner
++#   ".<name>.tmp" und wird erst nach der vollstaendigen Beleg-Pruefung ATOMAR per `mv` auf seinen
++#   Endnamen gezogen. Ein abgerissener Lauf hinterlaesst darum NIE einen halben Ordner unter dem
++#   Endnamen; sein eigener .tmp-Rest wird per trap aufgeraeumt (nur EIGENE, nie fremde). Der
++#   Endname existiert erst, wenn der Beleg vollstaendig und geprueft ist.
++#
++#   ADDITIV, NIE UEBERSCHREIBEN (Messdaten-Doktrin): existiert der Endname wider Erwarten schon,
++#   waechst ein Kollisions-Suffix -2, -3, ... an. Ein bestehender Ordner wird NIE angefasst, nie
++#   ueberschrieben, nie geloescht -- auch nicht teilweise.
++#
++#   (NB2-3) EIN GEMEINSAMER BELEG-VALIDATOR: ob ein Schnappschuss "existiert", entscheidet AN
++#   JEDER STELLE dieselbe Funktion -- lokal wie im Remote-Stand. Sie verlangt ALLE Pflichtstuecke
++#   (<haupt>.pdf nicht leer + compile-export.txt nicht leer + QUELLSTAND.txt), die VOLLSTAENDIGE
++#   Zeile `thesis_commit_sha=<40-hex>` (nicht irgendein Teiltreffer), eine nicht-leere 288-SHA und
++#   Lauf-ID sowie sha256-Konsistenz zwischen `pdf_sha256=` und der danebenliegenden PDF. Ein
++#   HALBER Ordner gilt damit NIE als Beleg -- weder als Grund, den Compile zu ueberspringen, noch
++#   als belegter Kollisionsname. Die REMOTE-Suche laeuft ausschliesslich ueber QUELLSTAND.txt-
++#   Pfade UNTERHALB der Schnappschuss-Wurzel (Pfadvergleich literal, kein Glob, kein Pathspec).
+ #
+ #   ENTKOPPELT VOM ANHANG-BYTE-DELTA (Codex HOCH-1, load-bearing): frueher entschied ALLEIN das
+ #   Byte-Delta im Anhang, ob ueberhaupt ein Compile und damit ein Schnappschuss entsteht. Ein Lauf,
+@@ -101,19 +121,40 @@
+ #   Compile-Beleg damit DAUERHAFT: der Retry findet einen idempotenten Anhang (0 Delta) und stieg vor
+ #   dem PDF-Gate aus. Ein Marker im Workspace hilft nicht -- der Workspace stirbt mit dem Job.
+ #   WAHRE QUELLE ist darum der VERGLEICH 289 gegen 288: existiert unter <AF_SNAPSHOT_ROOT> (lokal
+-#   ODER im Remote-Stand) ein QUELLSTAND.txt mit `thesis_commit_sha=<289-HEAD>`? Wenn nein, holt der
+-#   Kanal den Beleg NACH (Modus "nachholen": Gate bauen, ernten, ablegen) -- OHNE 289-Commit und
+-#   OHNE Push, denn es gibt kein Delta. Der QUELLSTAND nennt diesen Modus, und die Commit-Botschaft
+-#   behauptet in keinem Modus etwas anderes als das, was passiert ist.
++#   ODER im Remote-Stand) ein gueltiger Beleg mit `thesis_commit_sha=<289-SHA>`? Wenn nein, holt der
++#   Kanal den Beleg NACH (Modus "nachholen"/"recovery": Gate bauen, ernten, ablegen) -- OHNE
++#   289-Commit und OHNE Push, denn es gibt kein Delta.
++#
++#   (NB2-2) RECOVERY-IDENTITAET -- gegen WELCHE SHA der Retry prueft (Codex HOCH-1-Rest): der
++#   aktuelle 289-HEAD ist die FALSCHE Frage, sobald zwischen Absturz und Retry ein FREMDER Commit
++#   gelandet ist. Der Kanal fuehrt darum zwei vom aktuellen HEAD unabhaengige Quellen:
++#     (i)  MARKER im 288-Baum: VOR jedem Push-Versuch schreibt der Kanal
++#          <AF_SNAPSHOT_ROOT>/PENDING-<LAUF-KENNUNG>.txt mit der SHA, die gleich gepusht wird.
++#          Der 288-Writeback stagt diese Datei mit; ein spaeterer Lauf liest sie (lokal ODER aus
++#          dem Remote-Stand) und weiss, welcher 289-Stand einen Beleg schuldet. Erfuellte Marker
++#          werden NICHT geloescht, sondern um `erfuellt_durch=<snapshot_id>` ERGAENZT (additiv).
++#          GRENZE (deklariert): erreicht ein Lauf den 288-Writeback ueberhaupt nicht mehr, stirbt
++#          auch sein Marker mit dem Workspace -- dafuer gibt es (ii).
++#     (ii) BOT-HISTORIE in 289: die Commits des Kanal-Bots auf dem Ziel-Branch sind selbst die
++#          dauerhafte Spur. Der Kanal sucht die juengsten AF_RECOVER_TIEFE Bot-Commits ab und
++#          nimmt den juengsten OHNE gueltigen Beleg. Diese Quelle ueberlebt jeden Runner-Tod.
++#   Der Beleg wird dann fuer GENAU DIESE SHA gebaut: der 289-Klon wird auf sie detached, das Gate
++#   laeuft ERZWUNGEN neu (s.u.), danach wird der Klon nachweislich auf seinen Ausgangs-HEAD
++#   zurueckgesetzt -- ein zurueckgelassener alter HEAD wuerde den Gitlink des Writebacks RUECKWAERTS
++#   setzen. Pro Lauf wird hoechstens AF_RECOVER_MAX Beleg nachgeholt; der naechste Lauf holt den
++#   naechsten (monotoner Fortschritt statt langer Nachhol-Ketten in einem Job).
+ #
+ #   RE-FIXIERUNG NACH NON-FF-PUSH (Codex HOCH-3): der Push-Retry (5) kann einen MERGE-Commit
+ #   erzeugen. Dann ist der tatsaechlich gelandete HEAD ein anderer als der, aus dessen Baum die PDF
+ #   gebaut wurde -- ein Schnappschuss mit der alten SHA waere eine DIVERGENTE Dokumentation ("diese
+ #   PDF gehoert zu Commit X", obwohl X nie so auf dem Branch stand). Phase 2 laeuft darum NACH dem
+ #   Push und vergleicht den gepushten BAUM mit dem gebauten: gleich => das Bau-Produkt gilt
+-#   unveraendert; ungleich => RE-ERNTE (Gate erneut, aus dem gemergten Baum). Scheitert die
+-#   Re-Ernte, wird KEIN Schnappschuss abgelegt und der Kanal bricht LAUT ab -- lieber kein Beleg als
+-#   ein falscher.
++#   unveraendert; ungleich => RE-ERNTE aus dem gemergten Baum.
++#   (NB2-4) DIE RE-ERNTE IST ERZWUNGEN FRISCH: `latexmk -gg` (bzw. beim pdflatex-Rueckfall das
++#   Loeschen der Zwischenprodukte) PLUS Loeschen der alten PDF PLUS Neuheits-Wache (die PDF MUSS
++#   juenger sein als der Bau-Beginn). Ohne das koennte latexmk "Nothing to do" melden und die ALTE
++#   PDF wuerde mit der NEUEN SHA beschriftet -- genau die Luege, die HOCH-3 verhindern soll.
++#   Scheitert die Re-Ernte, wird KEIN Schnappschuss abgelegt und der Kanal bricht LAUT ab.
+ #
+ #   DEKLARIERTE GRENZE (bewusst, kein Versehen): OHNE Compile gibt es KEINEN Schnappschuss. Wird
+ #   AF_PDF_GATE uebersprungen (auto ohne TeX-Toolchain) oder ist es off, entsteht gar kein
+@@ -130,6 +171,7 @@
+ #   AF_DEST_REPO      (Pflicht) Arbeitsklon des Thesis-Repos (Projekt 289)
+ #   AF_BRANCH         Ziel-Branch im Ziel-Repo                      (Default: development)
+ #   AF_LANGS          Komma-Liste der Sprachen                      (Default: de,en)
++#                     KONTRAKT: je Eintrag nur [A-Za-z0-9_-]; Duplikate werden entfernt.
+ #   AF_WORK_ROOT      Basis fuer Artefakt-/Korpus-Pfade             (Default: .)
+ #   AF_ARTIFACT_ROOTS Leerzeichen-Liste der Artefakt-Wurzeln
+ #                     (Default: Code/measure_out/appendix Code/measure_out_smoke/appendix)
+@@ -147,13 +189,20 @@
+ #   AF_COMPILE_SNAPSHOT true (Default) | false -- E-18-SNAP-Compile-Schnappschuss an/aus
+ #   AF_SNAPSHOT_ROOT  Wurzel der Schnappschuss-Ordner ("Wurzel der Messwerte")
+ #                     (Default: <AF_WORK_ROOT>/<AF_CORPUS_ROOT>/thesis_compiles)
+-#                     KONTRAKT: der Pfad MUSS im Arbeitsbaum des 288-Repos liegen, sonst kann ihn der
+-#                     288-Writeback nicht committen. Der Kanal sagt es literal, wenn das nicht gilt.
+-#                     Der Job-Block reicht denselben Pfad an beide Seiten (EINE Quelle, kein Literal
+-#                     zweimal) -- s. gitlab-ci-delta.patch, Variable SNAP_DIR.
++#                     KONTRAKT (durchgesetzt, s. AF_SNAP_ROOT_STRICT): der Pfad MUSS im
++#                     Arbeitsbaum des 288-Repos liegen, DARF NICHT dessen Toplevel selbst sein
++#                     und DARF NICHT von .gitignore ignoriert werden -- sonst kann ihn der
++#                     288-Writeback nicht committen und der Job waere gruen ohne Beleg.
++#   AF_SNAP_ROOT_STRICT true (Default) | false -- Vertrags-Durchsetzung fuer AF_SNAPSHOT_ROOT.
++#                     false loggt den Verstoss literal und laeuft ohne REMOTE-Wache weiter
++#                     (nur fuer Fixture-/Laborlaeufe; die CI setzt es NIE).
+ #   AF_SNAP_REMOTE    Remote fuer die REMOTE-Wache der Suffix-/Nachhol-Entscheidung (Default: origin)
+ #   AF_SNAP_REMOTE_BRANCH  Branch dort (Default: $AF_PROV_SUPER_REF; "NA"/leer => REMOTE-Wache aus,
+ #                     literal gemeldet, Rueckfall auf lokale Pruefung + mkdir-Lock)
++#   AF_SNAP_LAUF_KENNUNG  Ordner-Kennung ueberschreiben (Default: r<RUNNER>-j<JOB> bzw. h<host>-p<pid>).
++#                     Nur fuer Proben, die eine Kollision ERZWINGEN muessen; die CI setzt es nie.
++#   AF_RECOVER_MAX    max. nachgeholte Fremd-Belege je Lauf         (Default: 1)
++#   AF_RECOVER_TIEFE  wie viele Bot-Commits die Historien-Recovery absucht (Default: 20)
+ #
+ # EXIT: 0 = Commit gelandet ODER bewusst nichts zu tun. 1 = fail-loud (nie stilles Gruen).
+ # =====================================================================================
+@@ -181,20 +230,36 @@ AF_COMPILE_SNAPSHOT="${AF_COMPILE_SNAPSHOT:-true}"
+ # ausschliesslich .pdf/.txt ab und kann daher nie als Mess-Laufordner missgedeutet werden.
+ # (Wer hier je eine *.result.csv ablegt, bricht genau diese Zusage.)
+ AF_SNAPSHOT_ROOT="${AF_SNAPSHOT_ROOT:-$AF_WORK_ROOT/$AF_CORPUS_ROOT/thesis_compiles}"
++AF_SNAP_ROOT_STRICT="${AF_SNAP_ROOT_STRICT:-true}"
+ AF_SNAP_REMOTE="${AF_SNAP_REMOTE:-origin}"
+ AF_SNAP_REMOTE_BRANCH="${AF_SNAP_REMOTE_BRANCH:-$AF_PROV_SUPER_REF}"
++AF_RECOVER_MAX="${AF_RECOVER_MAX:-1}"
++AF_RECOVER_TIEFE="${AF_RECOVER_TIEFE:-20}"
++# Beide steuern Schleifen bzw. `git log -n` -- ein nicht-numerischer Wert waere ein spaeterer,
++# schwer lesbarer Fehler mitten im Lauf. Lieber sofort und literal.
++case "$AF_RECOVER_MAX"   in *[!0-9]* | "") echo "FEHLER: AF_RECOVER_MAX='$AF_RECOVER_MAX' ist keine Zahl" >&2; exit 1 ;; esac
++case "$AF_RECOVER_TIEFE" in *[!0-9]* | "") echo "FEHLER: AF_RECOVER_TIEFE='$AF_RECOVER_TIEFE' ist keine Zahl" >&2; exit 1 ;; esac
+ # Bau-Produkt-Buchfuehrung des PDF-Gates (von run_pdf_gate gesetzt; leer = es wurde NICHT gebaut).
+ AF_GATE_MAIN=""
+ AF_GATE_TOOL=""
+ AF_GATE_PDF=""
+ # Betriebsmodus: "vorwaerts" = es gibt ein Anhang-Byte-Delta (Commit+Push);
+-#                "nachholen" = 0 Delta, aber der Compile-Beleg zum 289-HEAD fehlt (kein Commit).
++#                "nachholen" = 0 Delta, aber der Compile-Beleg zum 289-HEAD fehlt (kein Commit);
++#                "recovery"  = 0 Delta, und der Beleg fehlt einem FRUEHEREN 289-Stand (Marker/Bot-
++#                              Historie) -- fuer den wird der Klon eigens detached und neu gebaut.
+ AF_MODE="vorwaerts"
+ # REMOTE-Wache (Kollisions- + Nachhol-Entscheidung); von af_snap_remote_init einmalig gesetzt.
+ AF_SNAP_GIT_TOP=""
+ AF_SNAP_REL=""
+ AF_SNAP_REMOTE_REF=""
++AF_SNAP_REMOTE_LISTE=""
+ AF_SNAP_REMOTE_INIT=0
++# Lauf-Kennung + transaktionale Buchfuehrung
++AF_SNAP_KENNUNG=""
++AF_SNAP_TMP_EIGEN=""     # newline-getrennte Liste EIGENER, noch unveroeffentlichter .tmp-Ordner
++AF_SNAP_MARKER=""        # Pfad des PENDING-Markers dieses Laufs (leer = noch keiner)
++AF_RECOVER_QUELLE=""     # "marker" | "bot-historie" (nur im Modus recovery gesetzt)
++AF_DEST_ZURUECK=""       # Ausgangs-HEAD/Branch des 289-Klons (Recovery MUSS ihn wiederherstellen)
+ 
+ echo "== anhang:forward KERN (E-18 Vorwaerts-Kanal) =="
+ 
+@@ -210,10 +275,81 @@ mkdir -p "$AF_TMP"
+ # EINE Quelle fuer den Gate-Log-Pfad: run_pdf_gate schreibt ihn, E-18-SNAP erntet ihn als
+ # "compile-export". Zwei Literale wuerden hier stumm auseinanderlaufen.
+ AF_GATE_LOG="$AF_TMP/pdf_gate.log"
+-LANGS="$(printf '%s' "$AF_LANGS" | tr ',' ' ')"
++
++# SPRACH-KONTRAKT (Codex MITTEL-3-Rest): AF_LANGS speist (a) Pfade und (b) die Rollback-
++# Buchfuehrung, deren Feldtrenner '|' ist. Ein '|' in einer Sprachmarke wuerde das Protokoll
++# zerschneiden und der Rollback liefe auf den falschen Pfad; Duplikate wuerden denselben Pfad
++# zweimal buchen und die Restore-Reihenfolge verderben. Beides wird hier ABGEWIESEN bzw. entfernt,
++# statt es spaeter zu "reparieren". Das Array ersetzt zugleich jedes `for lang in $LANGS`
++# (Wort-Splitting UND Pfad-Globbing waeren dort wirksam).
++AF_LANG_LIST=()
++_langs_roh="$(printf '%s' "$AF_LANGS" | tr ',' '\n')"
++while IFS= read -r _l; do
++  [ -n "$_l" ] || continue
++  case "$_l" in
++    *[!A-Za-z0-9_-]*)
++      echo "FEHLER: AF_LANGS-Eintrag '$_l' enthaelt unerlaubte Zeichen (erlaubt: A-Z a-z 0-9 _ -)." >&2
++      echo "       Insbesondere '|' ist verboten: es ist der Feldtrenner der Rollback-Buchfuehrung." >&2
++      exit 1 ;;
++  esac
++  _dup=0
++  for _v in ${AF_LANG_LIST[@]+"${AF_LANG_LIST[@]}"}; do
++    if [ "$_v" = "$_l" ]; then _dup=1; break; fi
++  done
++  if [ "$_dup" = "1" ]; then echo "   HINWEIS: AF_LANGS-Duplikat '$_l' entfernt (Rollback-Reihenfolge)"; continue; fi
++  AF_LANG_LIST+=("$_l")
++done <<EOF
++$_langs_roh
++EOF
++if [ "${#AF_LANG_LIST[@]}" -eq 0 ]; then
++  echo "FEHLER: AF_LANGS='$AF_LANGS' ergibt 0 gueltige Sprachen -> nichts zu tun waere stilles Gruen" >&2; exit 1
++fi
++LANGS="${AF_LANG_LIST[*]}"
+ echo "   ziel_repo=$AF_DEST_REPO  branch=$AF_BRANCH  sprachen=[$LANGS]"
+ echo "   work_root=$AF_WORK_ROOT  dry_run=$AF_DRY_RUN  no_push=$AF_NO_PUSH"
+ 
++# ---- (0b) Lauf-Kennung + trap-Cleanup der EIGENEN .tmp-Reste (NB2-1 / NB2-5) ---------
++# Die Kennung macht den Ordnernamen runneruebergreifend eindeutig, OHNE verteilte Reservierung.
++# CI_RUNNER_ID+CI_JOB_ID sind von GitLab vergeben und global disjunkt; lokal treten hostname+PID an
++# ihre Stelle (auf einer Maschine disjunkt, und mehr braucht ein lokaler Lauf nicht).
++af_kennung_saeubern() { printf '%s' "$1" | tr -c 'A-Za-z0-9' '_' | cut -c1-24; }
++af_lauf_kennung() {
++  local r j h
++  r="${CI_RUNNER_ID:-}"; j="${CI_JOB_ID:-}"
++  if [ -n "$r" ] && [ -n "$j" ]; then
++    printf 'r%s-j%s' "$(af_kennung_saeubern "$r")" "$(af_kennung_saeubern "$j")"; return 0
++  fi
++  h="$(hostname 2>/dev/null || echo unbekannt)"
++  printf 'h%s-p%s' "$(af_kennung_saeubern "$h")" "$$"
++}
++AF_SNAP_KENNUNG="${AF_SNAP_LAUF_KENNUNG:-$(af_lauf_kennung)}"
++case "$AF_SNAP_KENNUNG" in
++  *[!A-Za-z0-9_-]* | "" )
++    echo "FEHLER: Lauf-Kennung '$AF_SNAP_KENNUNG' ist kein schlichter Ordner-Namensteil" >&2; exit 1 ;;
++esac
++echo "   E-18-SNAP: Lauf-Kennung=$AF_SNAP_KENNUNG (runneruebergreifend eindeutiger Ordnername)"
++
++# Raeumt AUSSCHLIESSLICH die .tmp-Ordner weg, die DIESER Lauf angelegt und nicht veroeffentlicht
++# hat. Fremde Reste bleiben unangetastet (Messdaten-Doktrin: nie fremden Bestand anfassen).
++af_snap_trap_cleanup() {
++  local rest
++  [ -n "$AF_SNAP_TMP_EIGEN" ] || return 0
++  while IFS= read -r rest; do
++    [ -n "$rest" ] || continue
++    if [ -d "$rest" ]; then
++      if rm -rf -- "$rest" 2>/dev/null; then
++        echo "   E-18-SNAP: eigener unveroeffentlichter Rest aufgeraeumt -> $rest" >&2
++      else
++        echo "   E-18-SNAP: eigener Rest '$rest' liess sich NICHT aufraeumen (literal gemeldet)" >&2
++      fi
++    fi
++  done <<EOF
++$AF_SNAP_TMP_EIGEN
++EOF
++  AF_SNAP_TMP_EIGEN=""
++}
++trap af_snap_trap_cleanup EXIT INT TERM
++
+ # ---- (1) Quellen-Kaskade -------------------------------------------------------------
+ echo "-- (1) Quellen-Kaskade --"
+ SRC_ROOT=""
+@@ -225,7 +361,7 @@ for root in $AF_ARTIFACT_ROOTS; do
+   cand="$AF_WORK_ROOT/$root"
+   [ -d "$cand" ] || { echo "   [1a] $root: nicht vorhanden"; continue; }
+   n=0
+-  for lang in $LANGS; do
++  for lang in "${AF_LANG_LIST[@]}"; do
+     [ -d "$cand/$lang/tabellen" ] || continue
+     c=$(find "$cand/$lang/tabellen" -maxdepth 1 -type f -name '*.tex' | wc -l)
+     n=$((n + c))
+@@ -270,7 +406,7 @@ if [ -z "$SRC_ROOT" ]; then
+       "$AF_GENERATOR" "$WIDE" "$GEN_OUT" "--langs=$AF_LANGS" \
+         || echo "   [1b] appendix-generator: honest-empty/Teil-Output (n/a-Spalten) -- kein Fehler"
+       n=0
+-      for lang in $LANGS; do
++      for lang in "${AF_LANG_LIST[@]}"; do
+         [ -d "$GEN_OUT/$lang/tabellen" ] || continue
+         c=$(find "$GEN_OUT/$lang/tabellen" -maxdepth 1 -type f -name '*.tex' | wc -l)
+         n=$((n + c))
+@@ -301,9 +437,10 @@ copied=0
+ # (PDF-Gate rot) darf ausschliesslich diese wieder wegnehmen -- kein `git clean` ueber ein
+ # ganzes Verzeichnis, damit fremde unversionierte Dateien im Ziel niemals mitgerissen werden.
+ #
+-# JE ZEILE: "<zustand_vorher>|<relativer pfad>" -- der Zustand VOR dem cp entscheidet den Rollback
+-# (Codex MITTEL-3). Ohne ihn loeschte der Rollback auch Dateien, die es vorher schon gab, wenn sie
+-# nur unversioniert waren -- also FREMDE Dateien, die dieser Lauf lediglich ueberschrieben hat:
++# JE ZEILE: "<zustand_vorher>|<sicherung>|<relativer pfad>" -- der Zustand VOR dem cp entscheidet
++# den Rollback (Codex MITTEL-3). Ohne ihn loeschte der Rollback auch Dateien, die es vorher schon
++# gab, wenn sie nur unversioniert waren -- also FREMDE Dateien, die dieser Lauf lediglich
++# ueberschrieben hat:
+ #   neu       -- existierte vorher NICHT  -> Rollback loescht sie (sie ist selbst erzeugt)
+ #   getrackt  -- existierte, ist getrackt -> `git checkout` holt sie zurueck, NIE loeschen
+ #   fremd     -- existierte, unversioniert-> vor dem cp nach $PREEXIST_DIR gesichert, Rollback
+@@ -311,7 +448,48 @@ copied=0
+ COPIED_LIST="$AF_TMP/kopierte_pfade.txt"; : > "$COPIED_LIST"
+ PREEXIST_DIR="$AF_TMP/vorbestand"; mkdir -p "$PREEXIST_DIR"
+ preexist_n=0
+-for lang in $LANGS; do
++
++# ZENTRALER Rollback (Codex MITTEL-3-Rest: "frueher exit 1 ohne zentralen Rollback"). Jeder
++# Abbruch NACH der ersten Kopie laeuft hier durch -- nicht nur der PDF-Gate-Pfad.
++anhang_rollback() {
++  local anlass="$1" zustand sicherung rel zurueck=0 erhalten=0 wieder=0
++  [ -s "$COPIED_LIST" ] || { echo "   Rollback ($anlass): nichts kopiert -> nichts zurueckzunehmen" >&2; return 0; }
++  git -C "$AF_DEST_REPO" reset -q HEAD -- anhang || true
++  git -C "$AF_DEST_REPO" checkout -q -- anhang || true
++  # Entscheidend ist der Zustand VOR dem cp (Codex MITTEL-3), nicht der jetzige: eine fremde
++  # unversionierte Datei, die dieser Lauf nur UEBERSCHRIEBEN hat, ist heute genauso
++  # "unversioniert" wie eine selbst angelegte -- die alte Pruefung haette sie geloescht.
++  #   neu      -> loeschen (selbst erzeugt)
++  #   getrackt -> nichts tun (das `git checkout` oben hat sie schon zurueckgeholt)
++  #   fremd    -> Original-Inhalt aus der Sicherung WIEDERHERSTELLEN, niemals loeschen
++  while IFS='|' read -r zustand sicherung rel; do
++    [ -n "$rel" ] || continue
++    case "$zustand" in
++      neu)
++        if git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$rel" >/dev/null 2>&1; then
++          erhalten=$((erhalten + 1))   # wider Erwarten getrackt -> checkout hat entschieden
++        else
++          rm -f -- "$AF_DEST_REPO/$rel"; zurueck=$((zurueck + 1))
++        fi
++        ;;
++      fremd)
++        if cp -- "$PREEXIST_DIR/$sicherung" "$AF_DEST_REPO/$rel"; then
++          wieder=$((wieder + 1))
++        else
++          echo "FEHLER: Rollback konnte den Vorbestand '$rel' nicht wiederherstellen" >&2
++        fi
++        ;;
++      *)
++        erhalten=$((erhalten + 1))
++        ;;
++    esac
++  done < "$COPIED_LIST"
++  echo "   Rollback ($anlass): $zurueck selbst angelegte Datei(en) entfernt, $wieder fremde Datei(en) im" >&2
++  echo "   Original-Inhalt wiederhergestellt, $erhalten getrackte per checkout zurueckgeholt" >&2
++  return 0
++}
++
++for lang in "${AF_LANG_LIST[@]}"; do
+   src="$SRC_ROOT/$lang/tabellen"
+   if [ ! -d "$src" ]; then echo "   [$lang] Quelle fehlt -> 0 kopiert"; continue; fi
+   dst="$AF_DEST_REPO/anhang/$lang/tabellen"
+@@ -325,20 +503,40 @@ for lang in $LANGS; do
+     esac
+     rel="anhang/$lang/tabellen/$base"
+     # Zustand VOR dem cp feststellen -- danach ist er nicht mehr rekonstruierbar.
++    # TOCTOU-MINIMIERUNG (Codex MITTEL-3-Rest): der "neu"-Fall wird nicht nur GEPRUEFT, sondern
++    # mit `set -o noclobber` ATOMAR BELEGT (O_EXCL). Erscheint die Datei zwischen Pruefung und
++    # Anlage doch noch, schlaegt das Belegen fehl und der Zustand wird NEU bestimmt -- damit kann
++    # der Rollback keine fremde Datei mehr als "selbst erzeugt" einstufen.
+     sicherung=""
++    zustand=""
+     if [ ! -e "$dst/$base" ]; then
+-      zustand="neu"
+-    elif git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$rel" >/dev/null 2>&1; then
+-      zustand="getrackt"
+-    else
+-      zustand="fremd"
+-      preexist_n=$((preexist_n + 1))
+-      sicherung="$preexist_n.bin"
+-      cp -- "$dst/$base" "$PREEXIST_DIR/$sicherung" \
+-        || { echo "FEHLER: Vorbestand '$rel' liess sich nicht sichern -> kein Ueberschreiben" >&2; exit 1; }
+-      echo "   [$lang] Vorbestand gesichert (unversioniert, fremd): $rel -> $sicherung"
++      if ( set -o noclobber; : > "$dst/$base" ) 2>/dev/null; then
++        zustand="neu"
++      else
++        echo "   [$lang] HINWEIS: '$rel' ist zwischen Pruefung und Anlage entstanden -> Zustand neu bestimmt"
++      fi
++    fi
++    if [ -z "$zustand" ]; then
++      if git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$rel" >/dev/null 2>&1; then
++        zustand="getrackt"
++      else
++        zustand="fremd"
++        preexist_n=$((preexist_n + 1))
++        sicherung="$preexist_n.bin"
++        if ! cp -- "$dst/$base" "$PREEXIST_DIR/$sicherung"; then
++          echo "FEHLER: Vorbestand '$rel' liess sich nicht sichern -> kein Ueberschreiben" >&2
++          anhang_rollback "Vorbestand-Sicherung fehlgeschlagen"
++          exit 1
++        fi
++        echo "   [$lang] Vorbestand gesichert (unversioniert, fremd): $rel -> $sicherung"
++      fi
++    fi
++    if ! cp -- "$f" "$dst/$base"; then
++      echo "FEHLER: cp '$f' -> '$dst/$base' fehlgeschlagen" >&2
++      printf '%s|%s|%s\n' "$zustand" "$sicherung" "$rel" >> "$COPIED_LIST"
++      anhang_rollback "cp fehlgeschlagen"
++      exit 1
+     fi
+-    cp -- "$f" "$dst/$base" || { echo "FEHLER: cp '$f' -> '$dst/$base' fehlgeschlagen" >&2; exit 1; }
+     printf '%s|%s|%s\n' "$zustand" "$sicherung" "$rel" >> "$COPIED_LIST"
+     n=$((n + 1))
+   done < <(find "$src" -maxdepth 1 -type f -name '*.tex' | sort)
+@@ -347,41 +545,125 @@ for lang in $LANGS; do
+ done
+ echo "   kopiert gesamt: $copied .tex"
+ if [ "$copied" -eq 0 ]; then
+-  echo "=== anhang:forward NO-OP: Quelle vorhanden, aber 0 uebernommene .tex ==="
+-  exit 0
++  # KEIN Abbruch mehr (Codex HOCH-1-Rest): 0 uebernommene .tex sind ein 0-Byte-Delta wie jedes
++  # andere. Frueher stieg der Kanal hier aus -- VOR der Nachhol-/Recovery-Wache -- und ein
++  # fehlender Compile-Beleg blieb dauerhaft unbemerkt. Die Entscheidung faellt jetzt einheitlich
++  # in (3): gibt es fuer den relevanten 289-Stand einen gueltigen Beleg?
++  echo "   HINWEIS: 0 uebernommene .tex -> 0 Byte-Delta. Die Beleg-Wache in (3) entscheidet weiter"
++  echo "   (kein Frueh-Ausstieg vor der Nachhol-/Recovery-Pruefung)."
+ fi
+ 
+-# ---- (2b) E-18-SNAP-Wachen: REMOTE-Stand + "gibt es den Beleg schon?" -----------------
+-# Beide Wachen brauchen DENSELBEN Remote-Blick, darum EINE Initialisierung, einmal ausgefuehrt.
+-# Sie laeuft VOR der Idempotenz-Pruefung, weil genau diese Pruefung ihre Antwort braucht (HOCH-1).
+-af_snap_remote_init() {
+-  [ "$AF_SNAP_REMOTE_INIT" = "0" ] || return 0
+-  AF_SNAP_REMOTE_INIT=1
+-  # Legt NUR das (leere) Wurzelverzeichnis an -- fuer git ist ein leerer Ordner unsichtbar, es
+-  # entsteht also nichts Commitbares. Es ist der Bezugspunkt fuer rev-parse --show-toplevel.
+-  mkdir -p "$AF_SNAPSHOT_ROOT" || { echo "FEHLER: Schnappschuss-Wurzel '$AF_SNAPSHOT_ROOT' nicht anlegbar" >&2; return 1; }
++# ---- (2b) E-18-SNAP-Wachen: REMOTE-Stand, Beleg-Validator, Recovery-Identitaet --------
++# Alle Wachen brauchen DENSELBEN Remote-Blick, darum EINE Initialisierung, einmal ausgefuehrt.
++# Sie laeuft VOR der Idempotenz-Entscheidung, weil genau diese Entscheidung ihre Antwort braucht.
++
++# Vertrags-Pruefung fuer AF_SNAPSHOT_ROOT (Codex MITTEL-2-Randbefund): der Pfad muss vom
++# 288-Writeback committet werden KOENNEN. Drei Arten, wie das still scheitert -- alle werden hier
++# benannt statt spaeter zu gruenem Nichts zu fuehren.
++af_snap_root_vertrag() {   # setzt AF_SNAP_GIT_TOP/AF_SNAP_REL; echoed Befund; rc 1 = Vertragsbruch
++  local top_abs snap_abs work_top=""
+   AF_SNAP_GIT_TOP="$(git -C "$AF_SNAPSHOT_ROOT" rev-parse --show-toplevel 2>/dev/null || true)"
+   if [ -z "$AF_SNAP_GIT_TOP" ]; then
+-    echo "   E-18-SNAP-WACHE: '$AF_SNAPSHOT_ROOT' liegt in KEINEM git-Arbeitsbaum -> REMOTE-Stand nicht"
+-    echo "   abfragbar; Suffix-/Nachhol-Entscheidung nur lokal + mkdir-Lock. (Kontrakt: die Wurzel"
+-    echo "   gehoert in den 288-Arbeitsbaum, sonst kann der Writeback sie nicht committen.)"
+-    return 0
++    echo "   E-18-SNAP-VERTRAG: '$AF_SNAPSHOT_ROOT' liegt in KEINEM git-Arbeitsbaum -- der"
++    echo "   288-Writeback kann den Schnappschuss dort NIE committen."
++    return 1
++  fi
++  top_abs="$(cd "$AF_SNAP_GIT_TOP" && pwd -P)" || return 1
++  snap_abs="$(cd "$AF_SNAPSHOT_ROOT" && pwd -P)" || return 1
++  if [ "$snap_abs" = "$top_abs" ]; then
++    echo "   E-18-SNAP-VERTRAG: '$AF_SNAPSHOT_ROOT' IST das Toplevel des Arbeitsbaums. Der"
++    echo "   Schnappschuss braucht einen eigenen Unterpfad (sonst stagt der Writeback das ganze Repo)."
++    return 1
+   fi
+-  local top_abs snap_abs
+-  top_abs="$(cd "$AF_SNAP_GIT_TOP" && pwd -P)"
+-  snap_abs="$(cd "$AF_SNAPSHOT_ROOT" && pwd -P)"
+   case "$snap_abs" in
+     "$top_abs"/*) AF_SNAP_REL="${snap_abs#"$top_abs"/}" ;;
+-    *)            AF_SNAP_REL="" ;;
++    *)            AF_SNAP_REL=""; echo "   E-18-SNAP-VERTRAG: '$snap_abs' liegt nicht unter '$top_abs'"; return 1 ;;
+   esac
+-  if [ -z "$AF_SNAP_REL" ] || [ -z "$AF_SNAP_REMOTE_BRANCH" ] || [ "$AF_SNAP_REMOTE_BRANCH" = "NA" ]; then
+-    echo "   E-18-SNAP-WACHE: REMOTE-Stand AUS (rel='$AF_SNAP_REL' branch='$AF_SNAP_REMOTE_BRANCH')"
++  # Liegt der Pfad im SELBEN Arbeitsbaum wie die Mess-Wurzel (= das 288-Repo)? Ein fremdes Repo
++  # waere gruen, aber der Writeback des Jobs sieht es nie.
++  work_top="$(git -C "$AF_WORK_ROOT" rev-parse --show-toplevel 2>/dev/null || true)"
++  if [ -n "$work_top" ]; then
++    work_top="$(cd "$work_top" && pwd -P)"
++    if [ "$work_top" != "$top_abs" ]; then
++      echo "   E-18-SNAP-VERTRAG: '$snap_abs' liegt im Arbeitsbaum '$top_abs', die Mess-Wurzel"
++      echo "   '$AF_WORK_ROOT' aber in '$work_top' -- das ist NICHT der 288-Baum des Writebacks."
++      return 1
++    fi
++  else
++    echo "   E-18-SNAP-VERTRAG: AF_WORK_ROOT='$AF_WORK_ROOT' ist kein git-Arbeitsbaum -> die"
++    echo "   288-Identitaet der Schnappschuss-Wurzel konnte NICHT gegengeprueft werden (literal)."
++  fi
++  if git -C "$AF_SNAP_GIT_TOP" check-ignore -q -- "$AF_SNAP_REL" 2>/dev/null; then
++    echo "   E-18-SNAP-VERTRAG: '$AF_SNAP_REL' wird von .gitignore IGNORIERT -- ein git add wuerde den"
++    echo "   Beleg still wegwerfen (genau die Falle, die compile-export.txt statt compile.log erzwang)."
++    return 1
++  fi
++  echo "   E-18-SNAP-VERTRAG: erfuellt (Arbeitsbaum '$top_abs', repo-relativ '$AF_SNAP_REL', nicht ignoriert)"
++  return 0
++}
++
++# Remote-Pfadliste EINMAL ziehen und literal auswerten (Codex: git-grep-PATHSPEC-Glob).
++# Es wird BEWUSST kein Pathspec uebergeben: Glob-Zeichen in AF_SNAP_REL koennten sonst als Muster
++# wirken. Gefiltert wird per String-Praefix in der Shell -- literal, ohne jede Musterdeutung.
++af_snap_remote_liste_bauen() {
++  local out="$AF_TMP/remote_pfade.txt" err="$AF_TMP/remote_pfade.err" rc=0
++  [ -n "$AF_SNAP_REMOTE_REF" ] || { AF_SNAP_REMOTE_LISTE=""; return 0; }
++  # -z: NUL-getrennt und UNGEQUOTET. Das super-Repo traegt Pfade mit Leerzeichen; eine gequotete
++  # oder falsch gesplittete Zeile wuerde die Praefix-Pruefung stumm daneben greifen lassen.
++  git -C "$AF_SNAP_GIT_TOP" ls-tree -r -z --name-only "$AF_SNAP_REMOTE_REF" > "$out" 2>"$err" || rc=$?
++  if [ "$rc" -ne 0 ]; then
++    echo "FEHLER: REMOTE-Stand '$AF_SNAP_REMOTE_REF' nicht auflistbar (git ls-tree rc=$rc)." >&2
++    sed 's/^/       /' "$err" >&2
++    echo "       FAIL-CLOSED: ein Remote-Fehler gilt NICHT mehr als 'Pfad frei' (Codex)." >&2
++    return 1
++  fi
++  AF_SNAP_REMOTE_LISTE="$out"
++  echo "   E-18-SNAP-WACHE: REMOTE-Pfadliste geholt ($(tr -cd '\0' < "$out" | wc -c) Eintraege)"
++  return 0
++}
++
++# Gibt alle Remote-Pfade aus, die literal unter "$1/" liegen (Praefix-Vergleich als STRING,
++# kein Glob, kein Pathspec -- Glob-Zeichen in der Wurzel koennen darum nichts anrichten).
++af_snap_remote_pfade_unter() {
++  local praefix="$1" p rest
++  [ -n "$AF_SNAP_REMOTE_LISTE" ] || return 0
++  while IFS= read -r -d '' p; do
++    rest="${p#"$praefix"/}"
++    [ "$rest" != "$p" ] || continue
++    printf '%s\n' "$p"
++  done < "$AF_SNAP_REMOTE_LISTE"
++  return 0
++}
++
++af_snap_remote_init_impl() {
++  # Legt NUR das (leere) Wurzelverzeichnis an -- fuer git ist ein leerer Ordner unsichtbar, es
++  # entsteht also nichts Commitbares. Es ist der Bezugspunkt fuer rev-parse --show-toplevel.
++  mkdir -p "$AF_SNAPSHOT_ROOT" || { echo "FEHLER: Schnappschuss-Wurzel '$AF_SNAPSHOT_ROOT' nicht anlegbar" >&2; return 1; }
++  if ! af_snap_root_vertrag; then
++    if [ "$AF_SNAP_ROOT_STRICT" != "false" ]; then
++      echo "FEHLER: AF_SNAPSHOT_ROOT-Vertrag VERLETZT (s.o.) -> Abbruch statt gruenem Job ohne Beleg." >&2
++      echo "       Wer das bewusst will (Fixture/Labor), setzt AF_SNAP_ROOT_STRICT=false." >&2
++      return 1
++    fi
++    echo "   E-18-SNAP-VERTRAG: AF_SNAP_ROOT_STRICT=false -> Verstoss BEWUSST hingenommen;"
++    echo "   REMOTE-Wache bleibt AUS, Suffix-Entscheidung nur lokal + mkdir-Lock."
++    AF_SNAP_REMOTE_REF=""; AF_SNAP_REMOTE_LISTE=""
++    return 0
++  fi
++  if [ -z "$AF_SNAP_REMOTE_BRANCH" ] || [ "$AF_SNAP_REMOTE_BRANCH" = "NA" ]; then
++    echo "   E-18-SNAP-WACHE: REMOTE-Stand AUS (branch='$AF_SNAP_REMOTE_BRANCH')"
+     echo "   -> Suffix-/Nachhol-Entscheidung nur lokal + mkdir-Lock (kein Haken ohne Ausgabe)"
+     return 0
+   fi
+   if git -C "$AF_SNAP_GIT_TOP" fetch -q "$AF_SNAP_REMOTE" "$AF_SNAP_REMOTE_BRANCH" 2>/dev/null; then
+-    AF_SNAP_REMOTE_REF="FETCH_HEAD"
+-    echo "   E-18-SNAP-WACHE: REMOTE-Stand geholt ($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH -> $(git -C "$AF_SNAP_GIT_TOP" rev-parse --short FETCH_HEAD)), Pfad '$AF_SNAP_REL'"
++    # FETCH_HEAD ist eine DATEI, die jede parallele git-Operation im selben Repo ueberschreibt
++    # (Codex: "FETCH_HEAD als Referent austauschbar"). Sofort auf die unveraenderliche SHA aufloesen.
++    AF_SNAP_REMOTE_REF="$(git -C "$AF_SNAP_GIT_TOP" rev-parse FETCH_HEAD 2>/dev/null || true)"
++    if [ -z "$AF_SNAP_REMOTE_REF" ]; then
++      echo "FEHLER: fetch war gruen, aber FETCH_HEAD nicht aufloesbar -> FAIL-CLOSED" >&2; return 1
++    fi
++    echo "   E-18-SNAP-WACHE: REMOTE-Stand geholt ($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH -> $AF_SNAP_REMOTE_REF), Pfad '$AF_SNAP_REL'"
++    af_snap_remote_liste_bauen || return 1
+   else
+     echo "   E-18-SNAP-WACHE: fetch '$AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH' fehlgeschlagen -> REMOTE-Stand"
+     echo "   NICHT geprueft; Rueckfall auf lokale Pruefung + mkdir-Lock (literal, kein stiller Teil-Schutz)"
+@@ -389,39 +671,241 @@ af_snap_remote_init() {
+   return 0
+ }
+ 
+-# Existiert fuer diesen 289-Stand bereits ein Compile-Beleg -- lokal ODER im 288-Remote-Stand?
++# INIT-Flag erst NACH Erfolg setzen (Codex: sonst ist ein Fehlschlag "sticky gruen" -- der zweite
++# Aufruf kaeme sofort mit rc 0 zurueck, obwohl nie etwas initialisiert wurde).
++af_snap_remote_init() {
++  [ "$AF_SNAP_REMOTE_INIT" = "0" ] || return 0
++  af_snap_remote_init_impl || return 1
++  AF_SNAP_REMOTE_INIT=1
++  return 0
++}
++
++# Frischer Remote-Blick unmittelbar VOR dem Schreiben (Codex: "kein Re-Fetch zwischen Belegtest und
++# Schreiben"). Zwischen Beleg-Pruefung und Ablage liegt ein kompletter LaTeX-Bau -- Minuten, in
++# denen ein fremder Lauf landen kann.
++af_snap_remote_refresh() {
++  [ -n "$AF_SNAP_GIT_TOP" ] || return 0
++  [ -n "$AF_SNAP_REMOTE_BRANCH" ] && [ "$AF_SNAP_REMOTE_BRANCH" != "NA" ] || return 0
++  [ -n "$AF_SNAP_REMOTE_REF" ] || return 0    # Remote-Wache war schon aus -> bleibt aus (literal gemeldet)
++  if ! git -C "$AF_SNAP_GIT_TOP" fetch -q "$AF_SNAP_REMOTE" "$AF_SNAP_REMOTE_BRANCH" 2>/dev/null; then
++    echo "FEHLER: Re-Fetch vor dem Ablegen fehlgeschlagen -- der Remote-Stand ist unbekannt." >&2
++    echo "       FAIL-CLOSED: lieber kein Beleg als ein Beleg auf einem blind gewaehlten Namen." >&2
++    return 1
++  fi
++  AF_SNAP_REMOTE_REF="$(git -C "$AF_SNAP_GIT_TOP" rev-parse FETCH_HEAD 2>/dev/null || true)"
++  [ -n "$AF_SNAP_REMOTE_REF" ] || { echo "FEHLER: Re-Fetch gruen, FETCH_HEAD nicht aufloesbar" >&2; return 1; }
++  af_snap_remote_liste_bauen || return 1
++  return 0
++}
++
++# ---- (2c) GEMEINSAMER BELEG-VALIDATOR (Codex NB2-3) ----------------------------------
++# EINE Wahrheit fuer "ist das ein Beleg?" -- benutzt von der Nachhol-Wache, der Kollisions-Wache
++# und der Schluss-Pruefung des eigenen Schnappschusses. Ein halber Ordner faellt hier IMMER durch.
++af_feld() {  # $1 = Datei, $2 = Schluessel -> Wert der ERSTEN passenden Zeile (ganze Zeile verankert)
++  sed -n "s/^$2=//p" "$1" 2>/dev/null | head -1
++}
++
++af_sha256() {  # fail-loud: leerer/ungueltiger Hash ist ein FEHLER, nie ein Vergleichswert
++  local h=""
++  h="$(sha256sum < "$1" 2>/dev/null | cut -d' ' -f1)" || return 1
++  case "$h" in
++    [0-9a-f]*) [ "${#h}" -eq 64 ] || return 1 ;;
++    *) return 1 ;;
++  esac
++  printf '%s' "$h"
++  return 0
++}
++
++# Feld-Pruefung des QUELLSTAND-Inhalts. $1 = Datei mit dem Inhalt, $2 = erwartete 289-SHA.
++# Gibt bei Erfolg "pdf_datei|pdf_sha256" aus.
++af_quellstand_pruefen() {
++  local q="$1" sha="$2" fehlend="" pdf_datei pdf_sha super_sha lauf_id comp
++  # VOLLSTAENDIGE Zeile, literal (Codex: "Treffer als VOLLSTAENDIGE Zeile verankert" -- ein
++  # Praefix-Treffer wuerde eine abgeschnittene oder laengere SHA als Beleg durchgehen lassen).
++  grep -qxF "thesis_commit_sha=$sha" "$q" || fehlend="$fehlend thesis_commit_sha=$sha"
++  pdf_datei="$(af_feld "$q" pdf_datei)"
++  pdf_sha="$(af_feld "$q" pdf_sha256)"
++  super_sha="$(af_feld "$q" super_commit_sha)"
++  lauf_id="$(af_feld "$q" kanal_lauf_id)"
++  comp="$(af_feld "$q" compile_export)"
++  [ -n "$pdf_datei" ] || fehlend="$fehlend pdf_datei"
++  case "$pdf_sha" in
++    [0-9a-f]*) [ "${#pdf_sha}" -eq 64 ] || fehlend="$fehlend pdf_sha256(Format)" ;;
++    *) fehlend="$fehlend pdf_sha256" ;;
++  esac
++  # 288-SHA und Lauf-ID sind Pflichtfelder des OWNER-KERNs ("289-SHA + 288-SHA + Lauf-ID").
++  # "NA" ist der EINZIGE zugelassene Platzhalter (lokaler Lauf ohne CI-Provenance) -- leer nicht.
++  [ -n "$super_sha" ] || fehlend="$fehlend super_commit_sha"
++  [ -n "$lauf_id" ]   || fehlend="$fehlend kanal_lauf_id"
++  [ "$comp" = "compile-export.txt" ] || fehlend="$fehlend compile_export"
++  if [ -n "$fehlend" ]; then
++    printf 'FELDER_FEHLEN:%s' "$fehlend"; return 1
++  fi
++  printf '%s|%s' "$pdf_datei" "$pdf_sha"
++  return 0
++}
++
++# LOKALER Vollbeleg: Ordner + alle Pflichtstuecke + sha256-Konsistenz.
++af_beleg_lokal_gueltig() {   # $1 = Ordner, $2 = erwartete 289-SHA
++  local dir="$1" sha="$2" felder pdf_datei pdf_sha ist_sha
++  [ -d "$dir" ] || { echo "      Beleg-Validator: '$dir' ist kein Ordner"; return 1; }
++  [ -s "$dir/QUELLSTAND.txt" ] || { echo "      Beleg-Validator: '$dir/QUELLSTAND.txt' fehlt/leer"; return 1; }
++  [ -s "$dir/compile-export.txt" ] || { echo "      Beleg-Validator: '$dir/compile-export.txt' fehlt/leer"; return 1; }
++  if ! felder="$(af_quellstand_pruefen "$dir/QUELLSTAND.txt" "$sha")"; then
++    echo "      Beleg-Validator: '$dir' -- $felder"; return 1
++  fi
++  pdf_datei="${felder%%|*}"; pdf_sha="${felder##*|}"
++  [ -s "$dir/$pdf_datei" ] || { echo "      Beleg-Validator: '$dir/$pdf_datei' fehlt/leer"; return 1; }
++  if ! ist_sha="$(af_sha256 "$dir/$pdf_datei")"; then
++    echo "      Beleg-Validator: sha256 von '$dir/$pdf_datei' nicht berechenbar"; return 1
++  fi
++  if [ "$ist_sha" != "$pdf_sha" ]; then
++    echo "      Beleg-Validator: sha256-Bruch in '$dir' ($ist_sha != $pdf_sha)"; return 1
++  fi
++  return 0
++}
++
++# REMOTE-Vollbeleg: dieselben Pflichtstuecke, aber gegen den Baum des Remote-Standes.
++af_beleg_remote_gueltig() {  # $1 = Remote-Pfad der QUELLSTAND.txt, $2 = erwartete 289-SHA
++  local qpfad="$1" sha="$2" dir="${1%/QUELLSTAND.txt}" tmp="$AF_TMP/remote_quellstand.txt"
++  local felder pdf_datei pdf_sha ist_sha rc=0
++  git -C "$AF_SNAP_GIT_TOP" show "$AF_SNAP_REMOTE_REF:$qpfad" > "$tmp" 2>/dev/null || rc=$?
++  if [ "$rc" -ne 0 ]; then echo "      Beleg-Validator(remote): '$qpfad' nicht lesbar (rc=$rc)"; return 1; fi
++  if ! felder="$(af_quellstand_pruefen "$tmp" "$sha")"; then
++    echo "      Beleg-Validator(remote): '$qpfad' -- $felder"; return 1
++  fi
++  pdf_datei="${felder%%|*}"; pdf_sha="${felder##*|}"
++  if ! git -C "$AF_SNAP_GIT_TOP" cat-file -e "$AF_SNAP_REMOTE_REF:$dir/compile-export.txt" 2>/dev/null; then
++    echo "      Beleg-Validator(remote): '$dir/compile-export.txt' fehlt im Remote-Stand"; return 1
++  fi
++  ist_sha="$(git -C "$AF_SNAP_GIT_TOP" cat-file blob "$AF_SNAP_REMOTE_REF:$dir/$pdf_datei" 2>/dev/null | sha256sum | cut -d' ' -f1)"
++  if [ "$ist_sha" != "$pdf_sha" ]; then
++    echo "      Beleg-Validator(remote): sha256-Bruch in '$dir' ($ist_sha != $pdf_sha)"; return 1
++  fi
++  return 0
++}
++
++# Existiert fuer diesen 289-Stand bereits ein GUELTIGER Compile-Beleg -- lokal ODER im Remote-Stand?
+ # DAS ist die vom Workspace UNABHAENGIGE Wahrheit (ein Marker im Workspace stirbt mit dem Job).
+ af_snapshot_beleg_vorhanden() {
+-  local sha="$1" treffer=""
++  local sha="$1" d p
+   if [ -d "$AF_SNAPSHOT_ROOT" ]; then
+-    treffer="$(grep -rlF "thesis_commit_sha=$sha" "$AF_SNAPSHOT_ROOT" --include='QUELLSTAND.txt' 2>/dev/null | head -1 || true)"
+-    if [ -n "$treffer" ]; then
+-      echo "   E-18-SNAP-WACHE: Beleg LOKAL vorhanden -> $treffer"
+-      return 0
+-    fi
++    while IFS= read -r d; do
++      [ -n "$d" ] || continue
++      if af_beleg_lokal_gueltig "$d" "$sha" >/dev/null 2>&1; then
++        echo "   E-18-SNAP-WACHE: gueltiger Beleg LOKAL vorhanden -> $d"
++        return 0
++      fi
++      # Halb-Ordner literal benennen statt schweigend zu ignorieren (er sieht sonst wie ein Beleg aus).
++      if grep -qxF "thesis_commit_sha=$sha" "$d/QUELLSTAND.txt" 2>/dev/null; then
++        echo "   E-18-SNAP-WACHE: '$d' nennt die SHA, ist aber KEIN gueltiger Beleg:"
++        af_beleg_lokal_gueltig "$d" "$sha" || true
++      fi
++    done < <(find "$AF_SNAPSHOT_ROOT" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+   fi
+-  if [ -n "$AF_SNAP_REMOTE_REF" ]; then
+-    if git -C "$AF_SNAP_GIT_TOP" grep -q -F "thesis_commit_sha=$sha" "$AF_SNAP_REMOTE_REF" -- "$AF_SNAP_REL" 2>/dev/null; then
+-      echo "   E-18-SNAP-WACHE: Beleg im REMOTE-Stand vorhanden ($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH)"
+-      return 0
+-    fi
++  if [ -n "$AF_SNAP_REMOTE_REF" ] && [ -n "$AF_SNAP_REMOTE_LISTE" ]; then
++    while IFS= read -r p; do
++      [ -n "$p" ] || continue
++      [ "${p##*/}" = "QUELLSTAND.txt" ] || continue
++      if af_beleg_remote_gueltig "$p" "$sha" >/dev/null 2>&1; then
++        echo "   E-18-SNAP-WACHE: gueltiger Beleg im REMOTE-Stand vorhanden -> $p"
++        return 0
++      fi
++    done < <(af_snap_remote_pfade_unter "$AF_SNAP_REL")
+   fi
+   return 1
+ }
+ 
++# Ist der Kandidat-Ordner im REMOTE-Stand des 288-Repos schon belegt? (RC 0 = belegt)
++# Zwei Laeufe derselben Sekunde liegen auf VERSCHIEDENEN Runnern -- ein lokales `[ -e ]` sieht den
++# fremden Ordner nie. Seit NB2 traegt der Name zwar Runner-/Job-Kennung und kann praktisch nicht
++# mehr kollidieren; die Wache bleibt als GURT (und faengt manuell angelegte Namen).
++af_snapshot_remote_belegt() {
++  local rel_cand="$1" treffer
++  [ -n "$AF_SNAP_REMOTE_LISTE" ] || return 1
++  treffer="$(af_snap_remote_pfade_unter "$rel_cand" | head -1)"
++  [ -n "$treffer" ]
++}
++
++# ---- (2d) RECOVERY-IDENTITAET (Codex NB2-2) ------------------------------------------
++# PENDING-Marker: die SHA, die ein Lauf gepusht hat (oder pushen wollte), dauerhaft im 288-Baum.
++af_marker_schreiben() {   # $1 = SHA, die gleich gepusht wird
++  local sha="$1"
++  [ "$AF_COMPILE_SNAPSHOT" = "true" ] || return 0
++  case "$sha" in [0-9a-f]*) [ "${#sha}" -eq 40 ] || return 1 ;; *) return 1 ;; esac
++  AF_SNAP_MARKER="$AF_SNAPSHOT_ROOT/PENDING-$AF_SNAP_KENNUNG.txt"
++  {
++    echo "# E-18-SNAP RECOVERY-IDENTITAET (PENDING)"
++    echo "# Diese Datei nennt den 289-Stand, den DIESER Lauf gepusht hat. Stirbt der Lauf danach,"
++    echo "# weiss ein spaeterer Lauf trotzdem, welchem Stand der Compile-Beleg fehlt -- unabhaengig"
++    echo "# davon, wohin der 289-HEAD inzwischen gewandert ist (Codex NB2-2)."
++    echo "pending_lauf_kennung=$AF_SNAP_KENNUNG"
++    echo "pending_erzeugt_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
++    echo "pending_thesis_branch=$AF_BRANCH"
++    echo "pending_thesis_commit_sha=$sha"
++    echo "pending_super_commit_sha=$AF_PROV_SUPER_SHA"
++    echo "pending_kanal_lauf_id=$AF_PROV_PIPELINE_ID"
++  } > "$AF_SNAP_MARKER" || { echo "FEHLER: PENDING-Marker '$AF_SNAP_MARKER' nicht schreibbar" >&2; return 1; }
++  echo "   E-18-SNAP: Recovery-Identitaet abgelegt -> $AF_SNAP_MARKER (pending_thesis_commit_sha=$sha)"
++  return 0
++}
++
++# Erfuellte Marker werden NICHT geloescht (Messdaten-/Beleg-Doktrin), sondern additiv ergaenzt.
++af_marker_erfuellen() {   # $1 = snapshot_id
++  [ -n "$AF_SNAP_MARKER" ] && [ -f "$AF_SNAP_MARKER" ] || return 0
++  {
++    echo "erfuellt_durch=$1"
++    echo "erfuellt_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
++  } >> "$AF_SNAP_MARKER" || return 1
++  echo "   E-18-SNAP: Marker als erfuellt vermerkt (erfuellt_durch=$1)"
++  return 0
++}
++
++# Kandidaten-SHAs aus MARKERN (lokal + Remote-Stand), aelteste zuerst. Erfuellte Marker fallen raus.
++af_recover_kandidaten_marker() {
++  local f p tmp="$AF_TMP/marker_remote.txt" sha
++  if [ -d "$AF_SNAPSHOT_ROOT" ]; then
++    while IFS= read -r f; do
++      [ -n "$f" ] || continue
++      if grep -q '^erfuellt_durch=' "$f" 2>/dev/null; then continue; fi
++      sha="$(af_feld "$f" pending_thesis_commit_sha)"
++      if [ -n "$sha" ]; then printf '%s\n' "$sha"; fi
++    done < <(find "$AF_SNAPSHOT_ROOT" -mindepth 1 -maxdepth 1 -type f -name 'PENDING-*.txt' 2>/dev/null | sort)
++  fi
++  if [ -n "$AF_SNAP_REMOTE_REF" ] && [ -n "$AF_SNAP_REMOTE_LISTE" ]; then
++    while IFS= read -r p; do
++      [ -n "$p" ] || continue
++      case "${p##*/}" in PENDING-*.txt) ;; *) continue ;; esac
++      git -C "$AF_SNAP_GIT_TOP" show "$AF_SNAP_REMOTE_REF:$p" > "$tmp" 2>/dev/null || continue
++      if grep -q '^erfuellt_durch=' "$tmp"; then continue; fi
++      sha="$(af_feld "$tmp" pending_thesis_commit_sha)"
++      if [ -n "$sha" ]; then printf '%s\n' "$sha"; fi
++    done < <(af_snap_remote_pfade_unter "$AF_SNAP_REL")
++  fi
++  return 0
++}
++
++# Kandidaten-SHAs aus der BOT-HISTORIE des Ziel-Branches, juengste zuerst. Diese Quelle ueberlebt
++# jeden Runner-Tod, weil sie im 289-Repo selbst liegt.
++af_recover_kandidaten_historie() {
++  git -C "$AF_DEST_REPO" log "$1" --author='anhang-forward-bot' --format='%H' -n "$AF_RECOVER_TIEFE" 2>/dev/null || true
++}
++
+ # ---- (3) Idempotenz: Commit NUR bei Byte-Delta ---------------------------------------
+ echo "-- (3) Idempotenz-Pruefung im Ziel-Repo --"
+-for lang in $LANGS; do
++for lang in "${AF_LANG_LIST[@]}"; do
+   git -C "$AF_DEST_REPO" add -- "anhang/$lang/tabellen" 2>/dev/null || true
+ done
+ changed=$(git -C "$AF_DEST_REPO" diff --cached --name-only | wc -l)
+ echo "   gestagte Aenderungen: $changed Datei(en)"
+ if [ "$changed" -gt 0 ]; then git -C "$AF_DEST_REPO" diff --cached --name-only | sed 's/^/     /'; fi
+ DEST_HEAD="$(git -C "$AF_DEST_REPO" rev-parse HEAD)"
++AF_DEST_ZURUECK="$(git -C "$AF_DEST_REPO" symbolic-ref -q --short HEAD 2>/dev/null || echo "$DEST_HEAD")"
++AF_BELEG_SHA="$DEST_HEAD"
+ if git -C "$AF_DEST_REPO" diff --cached --quiet; then
+   # KEIN Byte-Delta. Frueher endete der Kanal hier -- und ein Lauf, der 289 gepusht hat und danach
+   # starb, verlor seinen Compile-Beleg damit fuer immer (Codex HOCH-1). Die Frage ist NICHT "gibt es
+-  # ein Delta?", sondern "gibt es fuer den 289-HEAD schon einen Beleg?".
++  # ein Delta?", sondern "gibt es fuer den SCHULDIGEN 289-Stand schon einen gueltigen Beleg?".
+   echo "   IDEMPOTENT: 0 Byte-Delta im Anhang (289-HEAD=$DEST_HEAD)"
+   if [ "$AF_COMPILE_SNAPSHOT" != "true" ]; then
+     echo "=== anhang:forward IDEMPOTENT: 0 Aenderungen, Schnappschuss abgeschaltet -> kein Commit ==="
+@@ -431,18 +915,67 @@ if git -C "$AF_DEST_REPO" diff --cached --quiet; then
+     echo "FEHLER: E-18-SNAP-Wache liess sich nicht initialisieren -> Abbruch (kein stilles Gruen)" >&2
+     exit 1
+   fi
+-  if af_snapshot_beleg_vorhanden "$DEST_HEAD"; then
+-    echo "=== anhang:forward IDEMPOTENT: 0 Aenderungen UND Compile-Beleg zu $DEST_HEAD liegt vor -> nichts zu tun ==="
+-    exit 0
++  # --- Recovery-Identitaet BESTIMMEN, bevor gebaut wird (sonst baut der Lauf den falschen Baum) ---
++  AF_RECOVER_SHA=""
++  if [ "$AF_RECOVER_MAX" -lt 1 ]; then
++    echo "   -- Recovery ABGESCHALTET (AF_RECOVER_MAX=$AF_RECOVER_MAX) -> es zaehlt nur der 289-HEAD --"
++  else
++  echo "   -- Recovery-Identitaet (Marker im 288-Baum, dann Bot-Historie, dann 289-HEAD) --"
++  REF_BRANCH=""
++  if git -C "$AF_DEST_REPO" fetch -q origin "$AF_BRANCH" 2>/dev/null; then
++    REF_BRANCH="$(git -C "$AF_DEST_REPO" rev-parse FETCH_HEAD 2>/dev/null || true)"
++    echo "   289-Ziel-Branch geholt: $AF_BRANCH -> ${REF_BRANCH:-<nicht aufloesbar>}"
++  else
++    echo "   289-Ziel-Branch NICHT holbar (kein Remote/offline) -> Recovery nur aus lokalen Markern"
++  fi
++  KAND="$AF_TMP/recover_kandidaten.txt"; : > "$KAND"
++  af_recover_kandidaten_marker >> "$KAND"
++  if [ -n "$REF_BRANCH" ]; then af_recover_kandidaten_historie "$REF_BRANCH" >> "$KAND"; fi
++  gesehen=""
++  while IFS= read -r ksha; do
++    [ -n "$ksha" ] || continue
++    case "$ksha" in [0-9a-f]*) [ "${#ksha}" -eq 40 ] || continue ;; *) continue ;; esac
++    case "$gesehen" in *"$ksha"*) continue ;; esac
++    gesehen="$gesehen $ksha"
++    [ "$ksha" != "$DEST_HEAD" ] || continue          # der HEAD ist der Rueckfall, nicht die Recovery
++    if [ -n "$REF_BRANCH" ] && ! git -C "$AF_DEST_REPO" merge-base --is-ancestor "$ksha" "$REF_BRANCH" 2>/dev/null; then
++      echo "   Recovery-Kandidat $ksha ist NICHT auf $AF_BRANCH erreichbar -> uebersprungen"
++      echo "   (ein Beleg fuer einen nie gelandeten Commit waere eine Luege)"
++      continue
++    fi
++    if af_snapshot_beleg_vorhanden "$ksha" >/dev/null 2>&1; then
++      echo "   Recovery-Kandidat $ksha hat bereits einen gueltigen Beleg -> uebersprungen"
++      continue
++    fi
++    AF_RECOVER_SHA="$ksha"
++    echo "   RECOVERY-ZIEL: $ksha (Beleg fehlt, Commit ist auf $AF_BRANCH erreichbar)"
++    break
++  done < "$KAND"
++  fi
++  if [ -n "$AF_RECOVER_SHA" ]; then
++    AF_MODE="recovery"
++    AF_BELEG_SHA="$AF_RECOVER_SHA"
++    AF_RECOVER_QUELLE="marker-oder-historie"
++    echo "   E-18-SNAP RECOVERY: der 289-Klon wird auf $AF_RECOVER_SHA detached, damit der Beleg aus"
++    echo "   GENAU DIESEM Baum entsteht (nicht aus dem inzwischen weitergewanderten HEAD)."
++    if ! git -C "$AF_DEST_REPO" checkout -q --detach "$AF_RECOVER_SHA" 2>/dev/null; then
++      echo "FEHLER: Recovery-Checkout auf $AF_RECOVER_SHA fehlgeschlagen -> Abbruch" >&2; exit 1
++    fi
++  else
++    if af_snapshot_beleg_vorhanden "$DEST_HEAD"; then
++      echo "=== anhang:forward IDEMPOTENT: 0 Aenderungen UND gueltiger Compile-Beleg zu $DEST_HEAD -> nichts zu tun ==="
++      exit 0
++    fi
++    echo "   E-18-SNAP NACHHOLUNG: zu 289-HEAD $DEST_HEAD existiert KEIN gueltiger Compile-Beleg (weder"
++    echo "   lokal noch im REMOTE-Stand). Typischer Hergang: ein Vorlauf hat 289 gepusht und ist vor dem"
++    echo "   288-Writeback gestorben. Es wird JETZT nur der Beleg nachgeholt -- KEIN Commit, KEIN Push."
++    AF_MODE="nachholen"
+   fi
+-  echo "   E-18-SNAP NACHHOLUNG: zu 289-HEAD $DEST_HEAD existiert KEIN Compile-Beleg (weder lokal noch"
+-  echo "   im REMOTE-Stand). Typischer Hergang: ein Vorlauf hat 289 gepusht und ist vor dem"
+-  echo "   288-Writeback gestorben. Es wird JETZT nur der Beleg nachgeholt -- KEIN Commit, KEIN Push."
+-  AF_MODE="nachholen"
+ fi
+ if [ "$AF_DRY_RUN" = "true" ]; then
+-  if [ "$AF_MODE" = "nachholen" ]; then
+-    echo "=== anhang:forward DRY-RUN: Nachholung waere faellig (0 Delta, Beleg fehlt), aber KEIN Compile, KEIN Schreiben ==="
++  if [ "$AF_MODE" != "vorwaerts" ]; then
++    echo "=== anhang:forward DRY-RUN: $AF_MODE waere faellig (0 Delta, Beleg fehlt zu $AF_BELEG_SHA), aber KEIN Compile, KEIN Schreiben ==="
++    if [ "$AF_MODE" = "recovery" ]; then git -C "$AF_DEST_REPO" checkout -q --force "$AF_DEST_ZURUECK" || true; fi
+   else
+     echo "=== anhang:forward DRY-RUN: $changed Aenderung(en) gestaged, KEIN Commit, KEIN Push ==="
+   fi
+@@ -454,7 +987,8 @@ fi
+ # Kanal bricht LAUT ab -- lieber gar kein Vorwaerts-Schritt als eine kaputte Thesis-PDF.
+ echo "-- (3b) PDF-Gate (AF_PDF_GATE=$AF_PDF_GATE) --"
+ run_pdf_gate() {
+-  local main tex_tool
++  local erzwingen="${1:-nein}"
++  local main tex_tool marke ext
+   main="$(cd "$AF_DEST_REPO" && grep -lE '^[^%]*\\documentclass' -- *.tex 2>/dev/null | head -1)"
+   if command -v latexmk >/dev/null 2>&1; then tex_tool=latexmk
+   elif command -v pdflatex >/dev/null 2>&1; then tex_tool=pdflatex
+@@ -468,10 +1002,27 @@ run_pdf_gate() {
+     echo "   (kein Haken ohne Ausgabe: hier wurde NICHT geprueft, ob die PDF noch baut)"
+     return 0
+   fi
+-  echo "   baue $main mit $tex_tool ..."
+-  local log="$AF_GATE_LOG" rc=0
++  local log="$AF_GATE_LOG" rc=0 pdf="$AF_DEST_REPO/${main%.tex}.pdf"
++  marke="$AF_TMP/gate_marke"
++  # ERZWUNGENE RE-KOMPILATION (Codex NB2-4): ohne sie kann latexmk "Nothing to do" melden und die
++  # ALTE PDF bliebe liegen -- die dann mit der NEUEN SHA beschriftet wuerde. Drei Riegel:
++  #   (i) alte PDF + Zwischenprodukte weg, (ii) latexmk -gg (volle Neuerzeugung),
++  #   (iii) Neuheits-Wache: die PDF MUSS juenger sein als die Marke von JETZT.
++  if [ "$erzwingen" = "erzwingen" ]; then
++    echo "   ERZWUNGENE Re-Kompilation: alte Bau-Produkte werden entfernt (kein 'Nothing to do')"
++    rm -f -- "$pdf"
++    for ext in aux fls fdb_latexmk out toc lof lot bbl blg; do
++      rm -f -- "$AF_DEST_REPO/${main%.tex}.$ext"
++    done
++  fi
++  : > "$marke"
++  echo "   baue $main mit $tex_tool (erzwungen=$erzwingen) ..."
+   if [ "$tex_tool" = "latexmk" ]; then
+-    ( cd "$AF_DEST_REPO" && latexmk -pdf -interaction=nonstopmode -halt-on-error "$main" ) > "$log" 2>&1 || rc=$?
++    if [ "$erzwingen" = "erzwingen" ]; then
++      ( cd "$AF_DEST_REPO" && latexmk -gg -pdf -interaction=nonstopmode -halt-on-error "$main" ) > "$log" 2>&1 || rc=$?
++    else
++      ( cd "$AF_DEST_REPO" && latexmk -pdf -interaction=nonstopmode -halt-on-error "$main" ) > "$log" 2>&1 || rc=$?
++    fi
+   else
+     ( cd "$AF_DEST_REPO" && pdflatex -interaction=nonstopmode -halt-on-error "$main" ) > "$log" 2>&1 || rc=$?
+   fi
+@@ -482,13 +1033,25 @@ run_pdf_gate() {
+     echo "------------------------------------" >&2
+     return 1
+   fi
++  if [ "$erzwingen" = "erzwingen" ]; then
++    if [ ! -f "$pdf" ]; then
++      echo "FEHLER: erzwungener Bau meldete Erfolg, aber '$pdf' existiert nicht" >&2; return 1
++    fi
++    if [ ! "$pdf" -nt "$marke" ]; then
++      echo "FEHLER: erzwungener Bau hat die PDF NICHT neu erzeugt ('$pdf' ist nicht juenger als der" >&2
++      echo "       Bau-Beginn) -- genau der 'Nothing to do'-Fall, der eine ALTE PDF mit einer NEUEN" >&2
++      echo "       SHA beschriften wuerde. KEIN Beleg." >&2
++      return 1
++    fi
++    echo "   Neuheits-Wache: '$pdf' ist juenger als der Bau-Beginn -> echte Re-Kompilation"
++  fi
+   echo "   PDF-Gate GRUEN: $main gebaut"
+   # Bau-Produkt fuer E-18-SNAP buchen. Die Auswahl des Hauptdokuments wird BEWUSST nicht ein
+   # zweites Mal berechnet ("EINE Quelle statt zwei", s. Datei-Kopf) -- der Schnappschuss erntet
+   # exakt das Dokument, das dieses Gate gerade gebaut hat.
+   AF_GATE_MAIN="$main"
+   AF_GATE_TOOL="$tex_tool"
+-  AF_GATE_PDF="$AF_DEST_REPO/${main%.tex}.pdf"
++  AF_GATE_PDF="$pdf"
+   return 0
+ }
+ # Der PDF-Bau fasst getrackte Dateien AUSSERHALB von anhang/ an (z.B. die eingecheckte
+@@ -515,7 +1078,6 @@ pdf_gate_aufraeumen() {
+ #     RE-GEERNTET (s. compile_snapshot_refixieren) statt umdeklariert.
+ #     AUSNAHME AF_NO_PUSH=true: dann gibt es keinen Push, der lokale Commit IST der Endstand.
+ AF_SNAP_STAGE="$AF_TMP/compile_snapshot"
+-af_sha256() { sha256sum < "$1" | cut -d' ' -f1; }
+ 
+ compile_snapshot_einsammeln() {
+   if [ "$AF_COMPILE_SNAPSHOT" != "true" ]; then
+@@ -542,6 +1104,9 @@ compile_snapshot_einsammeln() {
+   # ERREXIT-LUECKE (Codex MITTEL-1): diese Funktion laeuft unter `if ! ...`, dort ist `set -e`
+   # ABGESCHALTET. Jeder schreibende Schritt wird darum EINZELN geprueft -- sonst kaeme ein halber
+   # Schnappschuss durch (z.B. Platte voll) und der Kanal meldete trotzdem Erfolg.
++  # Die Ernte-Ablage wird VORHER GELEERT: sonst koennte eine Datei aus einem frueheren Bau in den
++  # neuen Beleg einwandern (Codex: "Stage nicht geleert").
++  rm -rf -- "$AF_SNAP_STAGE" || { echo "FEHLER: E-18-SNAP: Ernte-Ablage '$AF_SNAP_STAGE' nicht raeumbar" >&2; return 1; }
+   mkdir -p "$AF_SNAP_STAGE" || { echo "FEHLER: E-18-SNAP: Ernte-Ablage '$AF_SNAP_STAGE' nicht anlegbar" >&2; return 1; }
+   local pdf_base sha_src sha_dst
+   pdf_base="$(basename "$AF_GATE_PDF")"
+@@ -549,6 +1114,11 @@ compile_snapshot_einsammeln() {
+     || { echo "FEHLER: E-18-SNAP: PDF '$AF_GATE_PDF' liess sich nicht ernten" >&2; return 1; }
+   sha_src="$(af_sha256 "$AF_GATE_PDF")" || { echo "FEHLER: E-18-SNAP: sha256 der Quell-PDF fehlgeschlagen" >&2; return 1; }
+   sha_dst="$(af_sha256 "$AF_SNAP_STAGE/$pdf_base")" || { echo "FEHLER: E-18-SNAP: sha256 der geernteten PDF fehlgeschlagen" >&2; return 1; }
++  # af_sha256 kann nicht mehr leer zurueckkommen (fail-loud) -- der frueher moegliche
++  # Doppelfehler-Vergleich ""=="" ist damit ausgeschlossen (Codex MITTEL-1).
++  if [ -z "$sha_src" ] || [ -z "$sha_dst" ]; then
++    echo "FEHLER: E-18-SNAP: leerer sha256 trotz Erfolgs-RC -- FAIL-CLOSED" >&2; return 1
++  fi
+   if [ "$sha_src" != "$sha_dst" ]; then
+     echo "FEHLER: E-18-SNAP sha256-Mismatch beim Ernten der PDF ($sha_src != $sha_dst)" >&2
+     return 1
+@@ -563,47 +1133,68 @@ compile_snapshot_einsammeln() {
+   return 0
+ }
+ 
+-# Ist der Kandidat-Ordner im REMOTE-Stand des 288-Repos schon belegt? (RC 0 = belegt)
+-# Zwei Laeufe derselben Sekunde liegen auf VERSCHIEDENEN Runnern -- ein lokales `[ -e ]` sieht den
+-# fremden Ordner nie. Wer trotzdem denselben Namen waehlt, produziert beim 288-Writeback einen
+-# add/add-Merge-Konflikt: der Retry bricht ab, der Compile-Beleg ist weg (Codex HOCH-2).
+-af_snapshot_remote_belegt() {
+-  local rel_cand="$1"
+-  [ -n "$AF_SNAP_REMOTE_REF" ] || return 1
+-  git -C "$AF_SNAP_GIT_TOP" cat-file -e "$AF_SNAP_REMOTE_REF:$rel_cand" 2>/dev/null
+-}
+-
+ compile_snapshot_schreiben() {
+   local thesis_sha="$1"
+   [ "$AF_COMPILE_SNAPSHOT" = "true" ] || return 0
+   # Phase 1 hat mit Begruendung nichts geerntet (kein Compile) -> hier ist ehrlich nichts zu tun.
+   [ -d "$AF_SNAP_STAGE" ] || return 0
++  # LEERER/UNGUELTIGER SHA IST FATAL (Codex MITTEL-1): frueher konnte ein fehlgeschlagenes
++  # `git rev-parse HEAD` im AF_NO_PUSH-Pfad eine Zeile `thesis_commit_sha=` erzeugen -- und die
++  # damalige Wache akzeptierte sie. Ein Beleg ohne Quellstand ist wertlos.
++  case "$thesis_sha" in
++    [0-9a-f]*) if [ "${#thesis_sha}" -ne 40 ]; then
++                 echo "FEHLER: E-18-SNAP: '$thesis_sha' ist keine 40-stellige 289-SHA -> KEIN Beleg" >&2; return 1
++               fi ;;
++    *) echo "FEHLER: E-18-SNAP: leere/ungueltige 289-SHA ('$thesis_sha') -> KEIN Beleg" >&2; return 1 ;;
++  esac
+   af_snap_remote_init || return 1
+-  local ts basis dir k cand rel_cand f b n
++  # Frischer Remote-Blick DIREKT vor der Namenswahl (zwischen Beleg-Test und Schreiben lag ein
++  # kompletter LaTeX-Bau).
++  af_snap_remote_refresh || return 1
++  local ts basis dir tmpdir k cand rel_cand f b n mkerr pdf_name
+   ts="$(date -u +%Y%m%d-%H%M%S)"     # "Benennung nach Datum und Uhrzeit" (OWNER-KERN), UTC, FS-sicher
+-  basis="$AF_SNAPSHOT_ROOT/$ts"
++  # (NB2-1) Der Name traegt die LAUF-KENNUNG -> runneruebergreifend eindeutig OHNE Reservierung.
++  basis="$AF_SNAPSHOT_ROOT/$ts-$AF_SNAP_KENNUNG"
+   mkdir -p "$AF_SNAPSHOT_ROOT" || { echo "FEHLER: E-18-SNAP: '$AF_SNAPSHOT_ROOT' nicht anlegbar" >&2; return 1; }
++  if [ ! -w "$AF_SNAPSHOT_ROOT" ]; then
++    echo "FEHLER: E-18-SNAP: '$AF_SNAPSHOT_ROOT' ist nicht beschreibbar -> FATAL (keine Kollision)" >&2; return 1
++  fi
+   # MESSDATEN-DOKTRIN: NUR ADDITIV. Ein bestehender Ordner wird NIE angefasst, nie ueberschrieben,
+-  # nie geloescht -- bei gleichem Zeitstempel waechst ein Kollisions-Suffix -2, -3, ... an.
+-  # DREI Wachen je Kandidat, in dieser Reihenfolge (s. Datei-Kopf):
+-  #   lokal ([ -e ])  ->  REMOTE (cat-file gegen den Ziel-Branch)  ->  mkdir OHNE -p (atomarer Lock).
+-  # Der Lock ist der einzige, der auch gegen einen Lauf im SELBEN Workspace zwischen Pruefung und
+-  # Anlage gewinnt; verliert man ihn, geht dieselbe Schleife weiter (Retry statt Abbruch).
+-  dir=""; k=1
++  # nie geloescht -- bei gleichem Namen waechst ein Kollisions-Suffix -2, -3, ... an.
++  # DREI Wachen je Kandidat (Gurt zur eindeutigen Kennung):
++  #   lokal ([ -e ]/[ -L ])  ->  REMOTE (Pfadliste)  ->  mkdir des .tmp OHNE -p (atomarer Lock).
++  # (NB2-1) Der mkdir-Fehler wird nach ART unterschieden: nur ein bereits existierender Pfad ist
++  # eine Kollision. EACCES/ENOSPC/fehlender Parent brechen SOFORT ab -- 99 Retries darauf waeren
++  # eine Liveness-Falle mit irrefuehrender Meldung.
++  dir=""; tmpdir=""; k=1
+   while [ "$k" -le 99 ]; do
+     if [ "$k" -eq 1 ]; then cand="$basis"; else cand="$basis-$k"; fi
+     rel_cand="$AF_SNAP_REL/$(basename "$cand")"
+-    if [ -e "$cand" ]; then
++    if [ -e "$cand" ] || [ -L "$cand" ]; then
+       echo "   E-18-SNAP: '$cand' existiert LOKAL -> naechstes Suffix"
+       k=$((k + 1)); continue
+     fi
+-    if af_snapshot_remote_belegt "$rel_cand"; then
++    if [ -n "$AF_SNAP_REL" ] && af_snapshot_remote_belegt "$rel_cand"; then
+       echo "   E-18-SNAP: '$rel_cand' existiert bereits im REMOTE-Stand ($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH) -> naechstes Suffix"
+       k=$((k + 1)); continue
+     fi
+-    if mkdir "$cand" 2>/dev/null; then dir="$cand"; break; fi
+-    echo "   E-18-SNAP: '$cand' wurde parallel belegt (mkdir-Lock verloren) -> naechstes Suffix"
+-    k=$((k + 1))
++    # (NB2-5) Gearbeitet wird im VERSTECKTEN .tmp -- der Endname entsteht erst beim atomaren mv.
++    tmpdir="$AF_SNAPSHOT_ROOT/.$(basename "$cand").tmp"
++    if mkerr="$(mkdir "$tmpdir" 2>&1)"; then
++      dir="$cand"
++      AF_SNAP_TMP_EIGEN="$AF_SNAP_TMP_EIGEN
++$tmpdir"
++      break
++    fi
++    if [ -e "$tmpdir" ] || [ -L "$tmpdir" ]; then
++      echo "   E-18-SNAP: '$tmpdir' wurde parallel belegt (mkdir-Lock verloren) -> naechstes Suffix"
++      k=$((k + 1)); continue
++    fi
++    echo "FEHLER: E-18-SNAP: '$tmpdir' liess sich anlegen -- KEINE Kollision, sondern ein echter" >&2
++    echo "       Dateisystem-Fehler (Rechte/Platte/fehlender Parent). SOFORTIGER Abbruch statt 99" >&2
++    echo "       irrefuehrender Kollisions-Retries:" >&2
++    printf '       %s\n' "$mkerr" >&2
++    return 1
+   done
+   if [ -z "$dir" ]; then
+     echo "FEHLER: E-18-SNAP: '$basis' und 98 Kollisions-Suffixe sind belegt (lokal/remote/Lock) -> Abbruch" >&2
+@@ -614,13 +1205,15 @@ compile_snapshot_schreiben() {
+   for f in "$AF_SNAP_STAGE"/*; do
+     [ -f "$f" ] || continue
+     b="$(basename "$f")"
+-    cp -- "$f" "$dir/$b" || { echo "FEHLER: E-18-SNAP: '$b' liess sich nicht nach '$dir' schreiben" >&2; return 1; }
+-    if [ "$(af_sha256 "$f")" != "$(af_sha256 "$dir/$b")" ]; then
+-      echo "FEHLER: E-18-SNAP sha256-Mismatch beim Ablegen von '$b' in '$dir'" >&2; return 1
++    cp -- "$f" "$tmpdir/$b" || { echo "FEHLER: E-18-SNAP: '$b' liess sich nicht nach '$tmpdir' schreiben" >&2; return 1; }
++    local sha_a sha_b
++    sha_a="$(af_sha256 "$f")"        || { echo "FEHLER: E-18-SNAP: sha256 von '$f' fehlgeschlagen" >&2; return 1; }
++    sha_b="$(af_sha256 "$tmpdir/$b")" || { echo "FEHLER: E-18-SNAP: sha256 von '$tmpdir/$b' fehlgeschlagen" >&2; return 1; }
++    if [ -z "$sha_a" ] || [ "$sha_a" != "$sha_b" ]; then
++      echo "FEHLER: E-18-SNAP sha256-Mismatch beim Ablegen von '$b' ('$sha_a' != '$sha_b')" >&2; return 1
+     fi
+     n=$((n + 1))
+   done
+-  local pdf_name
+   pdf_name="$(basename "$AF_GATE_PDF")"
+   {
+     echo "# E-18-SNAP Compile-Schnappschuss -- QUELLSTAND"
+@@ -629,6 +1222,7 @@ compile_snapshot_schreiben() {
+     echo "# thesis_commit_sha ist der Quellstand der Diplomarbeit (Projekt 289), super_commit_sha"
+     echo "# der Stand des Mess-/Bau-Repos (Projekt 288), der den Kanal-Lauf ausgeloest hat."
+     echo "snapshot_id=$(basename "$dir")"
++    echo "lauf_kennung=$AF_SNAP_KENNUNG"
+     echo "generiert_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+     echo "thesis_commit_sha=$thesis_sha"
+     echo "thesis_branch=$AF_BRANCH"
+@@ -641,74 +1235,56 @@ compile_snapshot_schreiben() {
+     echo "haupt_dokument=$AF_GATE_MAIN"
+     echo "tex_werkzeug=$AF_GATE_TOOL"
+     echo "pdf_datei=$pdf_name"
+-    echo "pdf_bytes=$(wc -c < "$dir/$pdf_name")"
+-    echo "pdf_sha256=$(af_sha256 "$dir/$pdf_name")"
++    echo "pdf_bytes=$(wc -c < "$tmpdir/$pdf_name")"
++    echo "pdf_sha256=$(af_sha256 "$tmpdir/$pdf_name")"
+     echo "compile_export=compile-export.txt"
+     echo "anhang_dateien_uebernommen=$changed"
+     # Modus: "vorwaerts" = dieser Lauf hat den 289-Commit erzeugt; "nachholen" = der 289-Stand lag
+-    # schon auf dem Branch, nur sein Compile-Beleg fehlte. Der Beleg behauptet nie, mehr getan zu
+-    # haben, als getan wurde.
++    # schon auf dem Branch, nur sein Compile-Beleg fehlte; "recovery" = der Beleg wurde fuer einen
++    # FRUEHEREN Stand nachgeholt, den ein abgerissener Lauf schuldig geblieben ist.
++    # Der Beleg behauptet nie, mehr getan zu haben, als getan wurde.
+     echo "modus=$AF_MODE"
++    echo "recovery_quelle=${AF_RECOVER_QUELLE:-NA}"
+     echo "thesis_commit_aus_diesem_lauf=$([ "$AF_MODE" = "vorwaerts" ] && echo ja || echo nein)"
+-  } > "$dir/QUELLSTAND.txt" || { echo "FEHLER: E-18-SNAP: QUELLSTAND.txt in '$dir' nicht schreibbar" >&2; return 1; }
+-  # VOLLSTAENDIGKEITS-WACHE (Codex MITTEL-1): unter `if ! ...` ist `set -e` aus -- ein halb
+-  # geschriebener Ordner darf NIE als Erfolg durchgehen, sonst stagt ihn der 288-Writeback.
+-  local fehlend=""
+-  [ -s "$dir/$pdf_name" ]           || fehlend="$fehlend $pdf_name"
+-  [ -s "$dir/compile-export.txt" ]  || fehlend="$fehlend compile-export.txt"
+-  [ -s "$dir/QUELLSTAND.txt" ]      || fehlend="$fehlend QUELLSTAND.txt"
+-  grep -q "^thesis_commit_sha=$thesis_sha$" "$dir/QUELLSTAND.txt" 2>/dev/null || fehlend="$fehlend QUELLSTAND.txt:thesis_commit_sha"
+-  grep -q '^pdf_sha256=[0-9a-f]\{64\}$' "$dir/QUELLSTAND.txt" 2>/dev/null   || fehlend="$fehlend QUELLSTAND.txt:pdf_sha256"
+-  if [ -n "$fehlend" ]; then
+-    echo "FEHLER: E-18-SNAP: unvollstaendiger Schnappschuss in '$dir' -- fehlt/leer:$fehlend" >&2
++    # AF_NO_PUSH-Faelle duerfen nicht so aussehen, als sei der Stand gelandet (Codex).
++    echo "gepusht=$([ "$AF_MODE" = "vorwaerts" ] && { [ "$AF_NO_PUSH" = "true" ] && echo nein || echo ja; } || echo "nein-nicht-noetig")"
++  } > "$tmpdir/QUELLSTAND.txt" || { echo "FEHLER: E-18-SNAP: QUELLSTAND.txt in '$tmpdir' nicht schreibbar" >&2; return 1; }
++  # VOLLSTAENDIGKEITS-WACHE ueber den GEMEINSAMEN VALIDATOR (Codex NB2-3): dieselbe Funktion, die
++  # auch entscheidet, ob ein FREMDER Ordner als Beleg gilt. Ein halb geschriebener Ordner darf NIE
++  # als Erfolg durchgehen -- und da hier noch der .tmp-Name steht, entsteht der Endname gar nicht.
++  if ! af_beleg_lokal_gueltig "$tmpdir" "$thesis_sha"; then
++    echo "FEHLER: E-18-SNAP: unvollstaendiger/ungueltiger Schnappschuss in '$tmpdir' (s.o.)" >&2
+     echo "       Ein halber Compile-Beleg ist schlimmer als keiner (er sieht vollstaendig aus)." >&2
+-    echo "       Der Ordner wird BEWUSST NICHT geloescht (Messdaten-Doktrin); der 288-Writeback" >&2
+-    echo "       stagt ihn nicht, weil dessen Vollstaendigkeits-Wache dieselben 3 Pflichtstuecke prueft." >&2
++    echo "       Der Endname '$dir' entsteht darum GAR NICHT; das .tmp raeumt der trap weg." >&2
+     return 1
+   fi
++  # ATOMARE VEROEFFENTLICHUNG (NB2-5): erst jetzt bekommt der Beleg seinen Endnamen. Bis hierher
++  # konnte kein Writeback und kein paralleler Lauf einen Halbstand sehen.
++  if [ -e "$dir" ] || [ -L "$dir" ]; then
++    echo "FEHLER: E-18-SNAP: '$dir' ist zwischen Reservierung und Veroeffentlichung entstanden ->" >&2
++    echo "       KEIN Ueberschreiben (Messdaten-Doktrin). Der naechste Lauf waehlt ein neues Suffix." >&2
++    return 1
++  fi
++  mv -T -- "$tmpdir" "$dir" || { echo "FEHLER: E-18-SNAP: '$tmpdir' -> '$dir' (mv) fehlgeschlagen" >&2; return 1; }
++  AF_SNAP_TMP_EIGEN="$(printf '%s\n' "$AF_SNAP_TMP_EIGEN" | grep -vxF "$tmpdir" || true)"
++  af_marker_erfuellen "$(basename "$dir")" || true
+   echo "   E-18-SNAP: Schnappschuss abgelegt ($n Bau-Datei(en) + QUELLSTAND.txt, modus=$AF_MODE) -> $dir"
+   find "$dir" -type f | sort | sed 's/^/     /'
+   return 0
+ }
+ 
+ if [ "$AF_PDF_GATE" != "off" ]; then
+-  if ! run_pdf_gate; then
+-    echo "   Rollback: gestagte Anhang-Aenderungen werden verworfen (nichts wird gelandet)" >&2
+-    git -C "$AF_DEST_REPO" reset -q HEAD -- anhang || true
+-    git -C "$AF_DEST_REPO" checkout -q -- anhang || true
+-    # Entscheidend ist der Zustand VOR dem cp (Codex MITTEL-3), nicht der jetzige: eine fremde
+-    # unversionierte Datei, die dieser Lauf nur UEBERSCHRIEBEN hat, ist heute genauso
+-    # "unversioniert" wie eine selbst angelegte -- die alte Pruefung haette sie geloescht.
+-    #   neu      -> loeschen (selbst erzeugt)
+-    #   getrackt -> nichts tun (das `git checkout` oben hat sie schon zurueckgeholt)
+-    #   fremd    -> Original-Inhalt aus der Sicherung WIEDERHERSTELLEN, niemals loeschen
+-    zurueck=0; erhalten=0; wieder=0
+-    while IFS='|' read -r zustand sicherung rel; do
+-      [ -n "$rel" ] || continue
+-      case "$zustand" in
+-        neu)
+-          if git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$rel" >/dev/null 2>&1; then
+-            erhalten=$((erhalten + 1))   # wider Erwarten getrackt -> checkout hat entschieden
+-          else
+-            rm -f -- "$AF_DEST_REPO/$rel"; zurueck=$((zurueck + 1))
+-          fi
+-          ;;
+-        fremd)
+-          if cp -- "$PREEXIST_DIR/$sicherung" "$AF_DEST_REPO/$rel"; then
+-            wieder=$((wieder + 1))
+-          else
+-            echo "FEHLER: Rollback konnte den Vorbestand '$rel' nicht wiederherstellen" >&2
+-          fi
+-          ;;
+-        *)
+-          erhalten=$((erhalten + 1))
+-          ;;
+-      esac
+-    done < "$COPIED_LIST"
+-    echo "   Rollback: $zurueck selbst angelegte Datei(en) entfernt, $wieder fremde Datei(en) im" >&2
+-    echo "   Original-Inhalt wiederhergestellt, $erhalten getrackte per checkout zurueckgeholt" >&2
++  # In den Modi nachholen/recovery ist der Bau der EINZIGE Zweck des Laufs -- er muss frisch sein.
++  GATE_ZWANG="nein"
++  if [ "$AF_MODE" = "recovery" ]; then GATE_ZWANG="erzwingen"; fi
++  if ! run_pdf_gate "$GATE_ZWANG"; then
++    anhang_rollback "PDF-Gate rot"
+     pdf_gate_aufraeumen
+-    if [ "$AF_MODE" = "nachholen" ]; then
++    if [ "$AF_MODE" = "recovery" ]; then
++      git -C "$AF_DEST_REPO" checkout -q --force "$AF_DEST_ZURUECK" || true
++      echo "=== anhang:forward ABGEBROCHEN: PDF-Gate rot bei der RECOVERY von $AF_BELEG_SHA ===" >&2
++      echo "    Der Klon wurde auf den Ausgangsstand zurueckgesetzt; KEIN Beleg, KEIN Commit." >&2
++    elif [ "$AF_MODE" = "nachholen" ]; then
+       echo "=== anhang:forward ABGEBROCHEN: PDF-Gate rot bei der Beleg-NACHHOLUNG ===" >&2
+       echo "    Es gab 0 Anhang-Delta -- der bereits gelandete 289-HEAD $DEST_HEAD baut NICHT." >&2
+       echo "    KEIN Commit, KEIN Push, KEIN Schnappschuss (ein Beleg fuer einen kaputten Bau" >&2
+@@ -722,6 +1298,9 @@ if [ "$AF_PDF_GATE" != "off" ]; then
+   if ! compile_snapshot_einsammeln; then
+     echo "=== anhang:forward ABGEBROCHEN: E-18-SNAP konnte den Compile nicht sichern ===" >&2
+     echo "    (KEIN Commit, KEIN Push -- der 289-Klon ist ephemer und wird je Lauf neu geholt)" >&2
++    if [ "$AF_MODE" = "recovery" ]; then
++      git -C "$AF_DEST_REPO" checkout -q --force "$AF_DEST_ZURUECK" || true
++    fi
+     exit 1
+   fi
+   pdf_gate_aufraeumen
+@@ -734,22 +1313,36 @@ else
+   fi
+ fi
+ 
+-# ---- (3d) NACHHOLUNG: 0 Byte-Delta, aber der Compile-Beleg zum 289-HEAD fehlte --------
++# ---- (3d) NACHHOLUNG / RECOVERY: 0 Byte-Delta, aber ein Compile-Beleg fehlte ----------
+ # Hier gibt es NICHTS zu committen und NICHTS zu pushen -- der 289-Stand liegt bereits auf dem
+-# Branch. Der Schnappschuss wird gegen genau diesen HEAD fixiert; das ist derselbe Baum, aus dem
+-# das Gate soeben gebaut hat (0 Delta), also KEINE divergente Dokumentation.
+-if [ "$AF_MODE" = "nachholen" ]; then
+-  echo "-- (3d) E-18-SNAP NACHHOLUNG (kein Commit, kein Push) --"
++# Branch. Der Schnappschuss wird gegen GENAU DEN Stand fixiert, aus dessen Baum das Gate gebaut hat
++# (nachholen: der 289-HEAD; recovery: die detachte Recovery-SHA) -- also nie divergent.
++if [ "$AF_MODE" = "nachholen" ] || [ "$AF_MODE" = "recovery" ]; then
++  echo "-- (3d) E-18-SNAP $AF_MODE (kein Commit, kein Push) -- Beleg-SHA=$AF_BELEG_SHA"
++  SNAP_RC=0
+   if [ ! -d "$AF_SNAP_STAGE" ]; then
+-    echo "=== anhang:forward OK: 0 Byte-Delta; Nachholung NICHT moeglich (kein Compile, s.o.) -> nichts abgelegt ==="
+-    exit 0
++    echo "=== anhang:forward OK: 0 Byte-Delta; $AF_MODE NICHT moeglich (kein Compile, s.o.) -> nichts abgelegt ==="
++  elif ! compile_snapshot_schreiben "$AF_BELEG_SHA"; then
++    SNAP_RC=1
+   fi
+-  if ! compile_snapshot_schreiben "$DEST_HEAD"; then
+-    echo "=== anhang:forward ABGEBROCHEN: E-18-SNAP-Nachholung fehlgeschlagen ===" >&2
++  # Der Klon MUSS zurueck auf seinen Ausgangsstand: der Job-Block liest danach `rev-parse HEAD` als
++  # NEW_THESIS_SHA und wuerde den Gitlink sonst RUECKWAERTS auf die Recovery-SHA setzen.
++  if [ "$AF_MODE" = "recovery" ]; then
++    git -C "$AF_DEST_REPO" checkout -q --force "$AF_DEST_ZURUECK" || true
++    IST="$(git -C "$AF_DEST_REPO" rev-parse HEAD)"
++    if [ "$IST" != "$DEST_HEAD" ]; then
++      echo "FEHLER: der 289-Klon steht nach der Recovery auf $IST statt $DEST_HEAD -- der Writeback" >&2
++      echo "       wuerde den Gitlink RUECKWAERTS setzen. Abbruch (kein stilles Gruen)." >&2
++      exit 1
++    fi
++    echo "   RECOVERY: 289-Klon nachweislich zurueck auf $IST (== Ausgangs-HEAD)"
++  fi
++  if [ "$SNAP_RC" -ne 0 ]; then
++    echo "=== anhang:forward ABGEBROCHEN: E-18-SNAP-$AF_MODE fehlgeschlagen ===" >&2
+     echo "    (nichts committet, nichts gepusht -- der 289-Stand $DEST_HEAD bleibt unveraendert)" >&2
+     exit 1
+   fi
+-  echo "=== anhang:forward OK: KEIN Commit (0 Byte-Delta), Compile-Beleg zu $DEST_HEAD NACHGEHOLT ==="
++  echo "=== anhang:forward OK: KEIN Commit (0 Byte-Delta), Compile-Beleg zu $AF_BELEG_SHA nachgeholt (modus=$AF_MODE) ==="
+   exit 0
+ fi
+ 
+@@ -775,7 +1368,12 @@ echo "   gebauter Baum: $BUILD_TREE"
+ if [ "$AF_NO_PUSH" = "true" ]; then
+   # Kein Push => der lokale Commit IST der Endstand; nichts kann noch divergieren.
+   echo "-- (4b) E-18-SNAP Compile-Schnappschuss (AF_NO_PUSH=true: lokaler Commit ist der Endstand) --"
+-  if ! compile_snapshot_schreiben "$(git -C "$AF_DEST_REPO" rev-parse HEAD)"; then
++  LOKAL_SHA="$(git -C "$AF_DEST_REPO" rev-parse HEAD 2>/dev/null || true)"
++  if [ -z "$LOKAL_SHA" ]; then
++    echo "FEHLER: HEAD des 289-Klons nicht aufloesbar -> KEIN Beleg mit leerer SHA (Codex MITTEL-1)" >&2
++    exit 1
++  fi
++  if ! compile_snapshot_schreiben "$LOKAL_SHA"; then
+     echo "=== anhang:forward ABGEBROCHEN: E-18-SNAP-Schnappschuss fehlgeschlagen ===" >&2
+     echo "    (der 289-Commit ist lokal entstanden, aber NICHT gepusht -- nichts ist gelandet)" >&2
+     exit 1
+@@ -794,12 +1392,26 @@ fi
+ # und X traegt einen anderen Inhalt als der Branch. Genau das ist die divergente Dokumentation, die
+ # der Ordner verhindern soll. Also: erst landen, dann belegen -- und wenn der gelandete Baum ein
+ # anderer ist, ERNEUT ernten statt umdeklarieren.
++#
++# (NB2-2) VOR JEDEM Push-Versuch wird die RECOVERY-IDENTITAET in den 288-Baum geschrieben: die SHA,
++# die gleich gepusht wird. Stirbt der Lauf danach, weiss ein spaeterer Lauf trotzdem, welchem Stand
++# der Beleg fehlt -- auch wenn der 289-HEAD inzwischen weitergewandert ist.
+ echo "-- (5) Push nach $AF_BRANCH (ohne ci.skip: die 289-Pipeline ist der Rebuild) --"
++if [ "$AF_COMPILE_SNAPSHOT" = "true" ]; then
++  if ! af_snap_remote_init; then
++    echo "FEHLER: E-18-SNAP-Wache liess sich vor dem Push nicht initialisieren -> Abbruch" >&2; exit 1
++  fi
++fi
+ PUSH_MERGES=0
+ PUSH_OK=false
+ PUSH_ATTEMPT=0
+ for attempt in $(seq 1 "$AF_PUSH_RETRIES"); do
+   PUSH_ATTEMPT="$attempt"
++  if ! af_marker_schreiben "$(git -C "$AF_DEST_REPO" rev-parse HEAD)"; then
++    echo "FEHLER: Recovery-Identitaet liess sich nicht ablegen -> Abbruch VOR dem Push" >&2
++    echo "       (ohne sie waere ein Absturz nach dem Push wieder unrekonstruierbar)" >&2
++    exit 1
++  fi
+   if git -C "$AF_DEST_REPO" push origin "HEAD:$AF_BRANCH"; then
+     PUSH_OK=true
+     break
+@@ -844,8 +1456,11 @@ compile_snapshot_refixieren() {
+   # verworfen, damit keine Datei aus dem ALTEN Bau in den neuen Beleg rutscht.
+   rm -rf -- "$AF_SNAP_STAGE" || { echo "FEHLER: Ernte-Ablage '$AF_SNAP_STAGE' nicht raeumbar" >&2; return 1; }
+   AF_GATE_PDF=""; AF_GATE_MAIN=""; AF_GATE_TOOL=""
+-  if ! run_pdf_gate; then
+-    echo "FEHLER: Re-Ernte: der GEMERGTE Stand $PUSHED_SHA baut nicht -> KEIN Schnappschuss." >&2
++  # (NB2-4) ERZWUNGEN: ohne -gg/Loeschen koennte latexmk "Nothing to do" melden und die ALTE PDF
++  # bekaeme die NEUE SHA aufgedruckt. Die Neuheits-Wache in run_pdf_gate belegt die Re-Kompilation.
++  if ! run_pdf_gate erzwingen; then
++    echo "FEHLER: Re-Ernte: der GEMERGTE Stand $PUSHED_SHA baut nicht (oder wurde nicht neu gebaut)" >&2
++    echo "       -> KEIN Schnappschuss." >&2
+     return 1
+   fi
+   if [ -z "$AF_GATE_PDF" ]; then
+@@ -861,12 +1476,13 @@ compile_snapshot_refixieren() {
+ if ! compile_snapshot_refixieren; then
+   echo "=== anhang:forward ABGEBROCHEN: 289-Commit IST GEPUSHT ($PUSHED_SHA), aber der Compile-Beleg ===" >&2
+   echo "    liess sich nicht wahrheitsgemaess auf diesen Stand fixieren -> KEIN Schnappschuss abgelegt." >&2
+-  echo "    (Der naechste Lauf holt ihn ueber die Nachhol-Wache nach, sobald der Bau wieder gruen ist.)" >&2
++  echo "    (Die Recovery-Identitaet steht in '${AF_SNAP_MARKER:-<keine>}'; der naechste Lauf holt den" >&2
++  echo "     Beleg darueber nach, sobald der Bau wieder gruen ist.)" >&2
+   exit 1
+ fi
+ if ! compile_snapshot_schreiben "$PUSHED_SHA"; then
+   echo "=== anhang:forward ABGEBROCHEN: 289-Commit IST GEPUSHT ($PUSHED_SHA), aber der Compile-Beleg ===" >&2
+-  echo "    liess sich nicht ablegen -> KEIN Schnappschuss. Der naechste Lauf holt ihn nach." >&2
++  echo "    liess sich nicht ablegen -> KEIN Schnappschuss. Recovery-Identitaet: '${AF_SNAP_MARKER:-<keine>}'." >&2
+   exit 1
+ fi
+ echo "=== anhang:forward OK: gepusht (Versuch $PUSH_ATTEMPT) nach $AF_BRANCH ==="
+diff --git a/docs/sessions/backups/20260806-e18-snap/ANWENDUNG.md b/docs/sessions/backups/20260806-e18-snap/ANWENDUNG.md
+index cb6948a4..7daea4f2 100644
+--- a/docs/sessions/backups/20260806-e18-snap/ANWENDUNG.md
++++ b/docs/sessions/backups/20260806-e18-snap/ANWENDUNG.md
+@@ -225,3 +225,105 @@ eine `*.result.csv` ablegt, bricht diese Zusage** (im Code als Kommentar festgeh
+ 6. **Re-Ernte kostet einen zweiten Compile.** Nur im non-FF-Fall (Merge-Commit) und nur, wenn der
+    gelandete Baum vom gebauten abweicht. Der Alternativweg waere Abbruch ohne Beleg -- die Re-Ernte
+    liefert stattdessen einen wahren Beleg.
++
++---
++
++# NB2 -- die fuenf Codex-Mindestanforderungen (06.08., nach dem Verdikt NICHT-LANDEN zu 1ae02cdf)
++
++Grundlage: `docs/sessions/backups/20260806-e18-snap-welle/CODEX-VERDIKT-NB-1ae02cdf-NICHT-LANDEN.md`.
++Codex hatte dem NB-Stand bescheinigt, dass von sechs Altbefunden nur MITTEL-2 vollstaendig behoben
++war. Die folgenden fuenf Punkte sind seine woertlichen Mindestanforderungen; darunter steht, WAS
++gebaut wurde und WELCHE Probe es literal belegt. Alle Proben:
++`bash docs/sessions/backups/20260806-e18-snap/fixture/proben-nb2.sh` (91 Zusicherungen, 0 Abweichungen)
++sowie die weiterhin gruene 6-Befund-Regression `.../fixture/proben.sh` (56 Zusicherungen).
++
++## (1) Runneruebergreifend eindeutige Namen -- statt verteilter Reservierung
++Der Ordnername traegt jetzt die **Lauf-Kennung**: `<TS>-r<CI_RUNNER_ID>-j<CI_JOB_ID>` in der CI,
++`<TS>-h<hostname>-p<PID>` lokal. Damit sind zwei Laeufe derselben Sekunde auf verschiedenen Runnern
++disjunkt, ohne dass irgendwo eine verteilte Sperre noetig waere. Die drei Kollisions-Wachen (lokal ->
++REMOTE -> `mkdir`-Lock) bleiben als **Gurt**; neu ist, dass der `mkdir`-Fehler nach **Art**
++unterschieden wird: nur ein bereits existierender Pfad ist eine Kollision, alles andere
++(EACCES/ENOSPC/fehlender Parent) bricht **sofort** ab statt 99 irrefuehrende Retries zu drehen.
++Proben NB2-1a/1b/1c -- inkl. Gegenprobe: der alte Stand waehlt bei getrennten Runnern **denselben**
++Namen (add/add-Konflikt beim 288-Merge) und dreht beim echten mkdir-Fehler literal **99** Runden.
++
++## (2) Recovery-Identitaet statt "aktueller HEAD"
++Zwei vom aktuellen 289-HEAD unabhaengige Quellen:
++* **Marker im 288-Baum:** vor JEDEM Push-Versuch schreibt der Kern
++  `<AF_SNAPSHOT_ROOT>/PENDING-<LAUF-KENNUNG>.txt` mit der SHA, die gleich gepusht wird. Der
++  288-Writeback stagt sie mit; erfuellte Marker werden **nicht geloescht**, sondern um
++  `erfuellt_durch=<snapshot_id>` ergaenzt (additiv).
++* **Bot-Historie in 289:** die Commits des Kanal-Bots auf dem Ziel-Branch sind selbst die dauerhafte
++  Spur -- diese Quelle ueberlebt auch den Fall, in dem der Marker mit dem Workspace stirbt.
++Der Beleg wird fuer GENAU diese SHA gebaut (Klon wird darauf detached, Gate erzwungen neu) und der
++Klon danach **nachweislich** auf seinen Ausgangs-HEAD zurueckgesetzt -- sonst setzte der Writeback
++den Gitlink rueckwaerts. Pro Lauf hoechstens `AF_RECOVER_MAX` (Default 1) Nachholung.
++Proben NB2-2a (Marker), 2b (nur Bot-Historie), 2c (Marker auf nie gelandete SHA -> literal
++uebersprungen) -- Gegenprobe: der alte Stand belegt den **neuen** HEAD und laesst die schuldige SHA
++dauerhaft unbelegt.
++
++## (3) Ein gemeinsamer Beleg-Validator
++`af_beleg_lokal_gueltig` / `af_beleg_remote_gueltig` sind die EINE Wahrheit fuer "ist das ein
++Beleg?" -- benutzt von der Nachhol-Wache, der Kollisions-Wache und der Schlusspruefung des eigenen
++Schnappschusses. Verlangt werden: `<haupt>.pdf` (nicht leer) + `compile-export.txt` (nicht leer) +
++`QUELLSTAND.txt` mit der **vollstaendigen Zeile** `thesis_commit_sha=<40-hex>`, nicht-leerer
++288-SHA, nicht-leerer Lauf-ID, `pdf_sha256=<64-hex>` und **sha256-Konsistenz** gegen die
++danebenliegende PDF. Die REMOTE-Suche laeuft ausschliesslich ueber QUELLSTAND.txt-Pfade unterhalb
++der Wurzel; verglichen wird per String-Praefix (kein Pathspec, kein Glob).
++Proben NB2-3a (halber Ordner), 3b (Teiltreffer/zu lange SHA), 3c (sha256-Bruch), 3d (Fremddatei mit
++derselben Zeile) -- in allen vier Faellen nimmt der alte Stand das Praeparat als Beleg.
++
++## (4) Erzwungene Re-Kompilation bei der Re-Fixierung
++`run_pdf_gate erzwingen` loescht die alte PDF und die Zwischenprodukte, ruft `latexmk -gg` und
++prueft danach eine **Neuheits-Wache** (die PDF MUSS juenger sein als der Bau-Beginn). Damit kann
++"Nothing to do" nie mehr eine alte PDF mit einer neuen SHA beschriften.
++Proben NB2-4a (echte Re-Ernte aus dem gemergten Baum) und 4b (praeparierter "Nothing to do":
++NEU bricht ab und legt KEINEN Beleg, ALT beschriftet die alte PDF mit der neuen SHA).
++
++## (5) Transaktionales Schreiben + Cleanup, fail-closed
++Der Schnappschuss entsteht in `.<name>.tmp`, wird vollstaendig geprueft und erst dann **atomar** per
++`mv` auf den Endnamen gezogen; ein `trap` raeumt ausschliesslich **eigene** unveroeffentlichte
++.tmp-Reste weg. `AF_SNAP_REMOTE_INIT` wird erst NACH Erfolg gesetzt (kein sticky-Gruen). Die
++frueheren Fail-open-Stellen (Fehler bei der Remote-Abfrage galt als "Pfad frei") sind auf
++**fail-closed** gedreht und melden literal. Vor der Namenswahl steht ein **Re-Fetch** (zwischen
++Beleg-Test und Ablage liegt ein kompletter LaTeX-Bau).
++Proben NB2-5a (Schreibfehler mitten im Ordner: kein Endname, kein Rest -- ALT hinterlaesst einen
++halben Ordner unter dem ENDNAMEN), 5b (kaputter Remote-Blick -> lauter Abbruch), 5c (vier
++Vertragsverstoesse der Wurzel, vier laute Abbrueche).
++
++## MITTEL-Restbefunde (mitgeheilt)
++* `af_sha256` ist fail-loud: der frueher moegliche Doppelfehler-Vergleich `""==""` ist ausgeschlossen.
++* Leerer/ungueltiger 289-SHA im `AF_NO_PUSH`-Pfad ist FATAL (ALT schrieb `thesis_commit_sha=`).
++* `AF_SNAPSHOT_ROOT`-Vertrag wird **durchgesetzt** (`AF_SNAP_ROOT_STRICT`, Default true): kein
++  Arbeitsbaum / Toplevel selbst / fremdes Repo / von .gitignore ignoriert -> lauter Abbruch statt
++  gruenem Job ohne Beleg. `AF_SNAP_ROOT_STRICT=false` ist die bewusste Labor-Abschaltung; **die CI
++  setzt sie nie**.
++* Rollback: zentral (greift auch beim Abbruch mitten in der Kopie), TOCTOU minimiert (der "neu"-Fall
++  wird per `noclobber` atomar belegt statt nur geprueft).
++* `AF_LANGS`: Duplikate werden entfernt, `|` (und jedes andere Sonderzeichen) ist verboten -- es ist
++  der Feldtrenner der Rollback-Buchfuehrung. Alle `for lang in $LANGS` sind durch ein Array ersetzt.
++* `git ls-tree -r -z` statt Pathspec: Glob-Zeichen in der Wurzel und Leerzeichen in Repo-Pfaden
++  koennen die Praefix-Pruefung nicht mehr daneben greifen lassen.
++* Ernte-Ablage wird vor jedem Einsammeln geleert (keine Datei aus einem alten Bau im neuen Beleg);
++  `FETCH_HEAD` wird sofort auf die unveraenderliche SHA aufgeloest.
++* `copied=0` beendet den Lauf NICHT mehr vor der Nachhol-/Recovery-Wache.
++
++## Writeback-Delta (LEAD-ONLY, in `gitlab-ci-delta.patch` mitgezogen)
++Der 288-Writeback bekommt zwei Zeilen mehr Wahrheit: die Vollstaendigkeits-Wache verlangt
++zusaetzlich `thesis_commit_sha=<40-hex>`, und ein ueberlebender `.tmp`-Halbstand (SIGKILL) wird
++gemeldet und entfernt statt still mitgestagt. Belegt in `proben.sh`, Abschnitt "patch NB2".
++`git apply --check` gegen die echte `.gitlab-ci.yml` ist gruen; die Datei selbst bleibt unberuehrt.
++
++## Bewusste Grenzen (NB2)
++1. **Marker-Reichweite:** erreicht ein Lauf den 288-Writeback ueberhaupt nicht mehr, stirbt sein
++   Marker mit dem Workspace. Dafuer gibt es die Bot-Historie als zweite Quelle -- deren Reichweite
++   ist `AF_RECOVER_TIEFE` (Default 20 Bot-Commits).
++2. **Eine Nachholung je Lauf** (`AF_RECOVER_MAX=1`): bewusst, damit ein Job nicht in eine lange
++   Nachhol-Kette laeuft. Der naechste Lauf holt den naechsten Beleg -- monotoner Fortschritt.
++3. **Marker-Ansammlung:** je Pipeline-Lauf entsteht eine kleine `PENDING-*.txt`. Sie wird nie
++   geloescht (nur um `erfuellt_durch=` ergaenzt). Ein Aufraeum-Entscheid ist Lead-Sache.
++4. **`quelle_kind`/`quelle_ref` im Recovery-Beleg** beschreiben die Quelle DIESES Laufs, nicht die
++   des nachgeholten Standes; `modus=recovery` sagt das literal.
++5. Die atomare Veroeffentlichung per `mv` ist gegen ein gleichzeitiges Anlegen des Endnamens durch
++   einen Fremdprozess nicht formal geschuetzt -- durch die eindeutige Lauf-Kennung ist der Name aber
++   je Lauf disjunkt, und vor dem `mv` steht eine erneute Existenzpruefung.
+diff --git a/docs/sessions/backups/20260806-e18-snap/fixture/proben-nb2.sh b/docs/sessions/backups/20260806-e18-snap/fixture/proben-nb2.sh
+new file mode 100644
+index 00000000..2ae3e5d4
+--- /dev/null
++++ b/docs/sessions/backups/20260806-e18-snap/fixture/proben-nb2.sh
+@@ -0,0 +1,565 @@
++#!/usr/bin/env bash
++# =====================================================================================
++# NB2-PROBEN fuer ci/anhang_forward_core.sh -- die FUENF Codex-Mindestanforderungen aus
++# CODEX-VERDIKT-NB-1ae02cdf-NICHT-LANDEN.md plus die dort benannten MITTEL-Restbefunde.
++# Je Anforderung ein praeparierter Fehlerfall + das erwartete Verhalten, und wo es
++# bezahlbar ist die GEGENPROBE gegen den von Codex verworfenen Stand 1ae02cdf.
++#
++# AUFRUF (aus dem super-Arbeitsbaum):
++#   PATH=/usr/local/texlive/2026/bin/x86_64-linux:$PATH \
++#     bash docs/sessions/backups/20260806-e18-snap/fixture/proben-nb2.sh
++#
++# OFFENGELEGTE HILFSMITTEL (damit nichts "zufaellig" gruen aussieht) -- kein Shim
++# beruehrt die zu pruefende Logik selbst, alle sitzen ausschliesslich in $PATH:
++#   date-Shim     friert NUR `date -u +%Y%m%d-%H%M%S` ein (Kollisionen erzwingbar)
++#   mkdir-Shim    laesst NUR das Anlegen des .tmp-Ordners scheitern, OHNE dass der Pfad
++#                 entsteht -> das ist der ECHTE Dateisystem-Fehler (EACCES/ENOSPC-Klasse),
++#                 den der alte Stand 99x als "Kollision" fehldeutete
++#   cp-Shim       laesst NUR das Schreiben INNERHALB des .tmp-Ordners scheitern
++#                 (Transaktions-Bruch mitten im Schreiben)
++#   latexmk-Shim  meldet Erfolg, legt aber eine ALTE PDF mit ALTER mtime hin
++#                 (= exakt der "Nothing to do"-Fall aus Codex NB2-4)
++#   git-Shim      (a) laesst `ls-tree` scheitern (Remote-Fehler -> fail-closed?)
++#                 (b) liefert ab dem N-ten `rev-parse HEAD` einen LEEREN String
++# =====================================================================================
++set -uo pipefail
++REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
++CORE="$REPO/ci/anhang_forward_core.sh"
++R=/tmp/e18snap-fixture
++H=/tmp/e18snap-nb2
++FEHLER=0
++TEX=/usr/local/texlive/2026/bin/x86_64-linux
++
++ok()   { echo "   OK   : $*"; }
++nok()  { echo "   FEHL : $*"; FEHLER=$((FEHLER + 1)); }
++pruef(){ if [ "$2" = "$3" ]; then ok "$1 ($2)"; else nok "$1 -- erwartet '$3', ist '$2'"; fi; }
++hat()  { if grep -qF "$2" "$1"; then ok "$3"; else nok "$3 -- '$2' fehlt in $1"; fi; }
++hatnicht() { if grep -qF "$2" "$1"; then nok "$3 -- '$2' steht doch in $1"; else ok "$3"; fi; }
++kopf() { echo; echo "=== $* ==="; }
++
++rm -rf "$H"; mkdir -p "$H/bin" "$H/bin_mkdirfail" "$H/bin_cptmpfail" "$H/bin_nothingtodo" \
++                     "$H/bin_lstreefail" "$H/bin_leerhead"
++cat > "$H/bin/date" <<'EOF'
++#!/bin/sh
++if [ "$1" = "-u" ] && [ "$2" = "+%Y%m%d-%H%M%S" ] && [ -n "$E18_FIXED_TS" ]; then echo "$E18_FIXED_TS"; exit 0; fi
++exec /usr/bin/date "$@"
++EOF
++cat > "$H/bin_mkdirfail/mkdir" <<'EOF'
++#!/bin/sh
++# Faellt NUR fuer den versteckten .tmp-Ordner um -- und legt ihn NICHT an. Genau so sieht
++# EACCES/ENOSPC aus: der Pfad existiert hinterher nicht, es ist KEINE Kollision.
++for a in "$@"; do last="$a"; done
++case "$last" in *.tmp) echo "mkdir: cannot create directory '$last': Permission denied (PROBEN-SHIM)" >&2; exit 1 ;; esac
++exec /bin/mkdir "$@"
++EOF
++cat > "$H/bin_cptmpfail/cp" <<'EOF'
++#!/bin/sh
++# Bricht das Schreiben MITTEN im .tmp-Ordner ab (Transaktion halb) -- die Ernte nach
++# $AF_TMP/compile_snapshot laeuft bewusst durch.
++for a in "$@"; do last="$a"; done
++case "$last" in */.*.tmp/*) echo "cp: PROBEN-SHIM erzwingt Fehlschlag fuer '$last'" >&2; exit 1 ;; esac
++exec /bin/cp "$@"
++EOF
++cat > "$H/bin_nothingtodo/latexmk" <<'EOF'
++#!/bin/sh
++# "Nothing to do": meldet Erfolg, baut aber NICHT. Legt stattdessen eine ALTE PDF mit ALTER
++# mtime hin -- der Fall, in dem der Vorgaengerstand eine alte PDF mit neuer SHA beschriftete.
++echo "Latexmk: Nothing to do for '$*'."
++for a in "$@"; do last="$a"; done
++out="${last%.tex}.pdf"
++printf 'ALTE-PDF-AUS-EINEM-FRUEHEREN-BAU\n' > "$out"
++touch -d '2020-01-01 00:00:00' "$out"
++exit 0
++EOF
++cat > "$H/bin_lstreefail/git" <<'EOF'
++#!/bin/sh
++if [ "$1" = "-C" ]; then sub="$3"; else sub="$1"; fi
++if [ "$sub" = "ls-tree" ]; then echo "fatal: PROBEN-SHIM: ls-tree kaputt" >&2; exit 128; fi
++exec /usr/bin/git "$@"
++EOF
++cat > "$H/bin_leerhead/git" <<'EOF'
++#!/bin/sh
++# Ab dem N-ten `rev-parse HEAD` (exakt dieses Argumentpaar) kommt ein LEERER String mit RC 0
++# zurueck -- die Klasse Fehler, die frueher `thesis_commit_sha=` in den Beleg schrieb.
++N="${E18_LEER_REVPARSE_AB:-0}"
++C="${E18_LEER_ZAEHLER:-/tmp/e18snap-nb2/revparse.cnt}"
++if [ "$1" = "-C" ]; then a2="$3"; a3="$4"; else a2="$1"; a3="$2"; fi
++if [ "$a2" = "rev-parse" ] && [ "$a3" = "HEAD" ] && [ "$N" != "0" ]; then
++  n=$(cat "$C" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "$C"
++  if [ "$n" -ge "$N" ]; then echo ""; exit 0; fi
++fi
++exec /usr/bin/git "$@"
++EOF
++chmod +x "$H/bin/date" "$H/bin_mkdirfail/mkdir" "$H/bin_cptmpfail/cp" \
++         "$H/bin_nothingtodo/latexmk" "$H/bin_lstreefail/git" "$H/bin_leerhead/git"
++export PATH="$H/bin:$TEX:$PATH"
++export E18_FIXED_TS=""
++
++# ALT-Vergleichsstand = der von Codex VERWORFENE NB-Stand. Gegen ihn wird geprueft, was NB2
++# wirklich heilt (nicht gegen den Erstwurf -- der ist zwei Stufen alt).
++ALT_REF="${E18_ALT_REF:-1ae02cdfca04f399e34abe826f14636652fc0256}"
++if ! git -C "$REPO" rev-parse --verify -q "$ALT_REF^{commit}" > /dev/null; then
++  echo "FEHLER: ALT-Referenz '$ALT_REF' nicht im Repo -- Gegenproben nicht fahrbar" >&2; exit 1
++fi
++echo "ALT-Vergleichsstand (von Codex verworfen): $ALT_REF"
++git -C "$REPO" show "$ALT_REF:ci/anhang_forward_core.sh" > "$H/core_alt.sh" && chmod +x "$H/core_alt.sh"
++
++neue_tabellen() { # $1 = work-root, $2 = Marke
++  mkdir -p "$1/Code/measure_out/appendix/de/tabellen" "$1/Code/measure_out/appendix/en/tabellen"
++  printf '%s\n' "\\textbf{DE $2}\\par" > "$1/Code/measure_out/appendix/de/tabellen/T1.tex"
++  printf '%s\n' "\\textbf{EN $2}\\par" > "$1/Code/measure_out/appendix/en/tabellen/T1.tex"
++}
++# Erzeugt Artefakt-Tabellen, die BYTE-GLEICH zum Ziel-Repo sind -> garantiert 0 Anhang-Delta.
++# Ohne das entstuende ein Delta und der Lauf ginge in den Vorwaerts-Zweig, statt die Beleg-Frage
++# zu stellen -- die Probe pruefte dann etwas anderes als sie behauptet.
++tabellen_wie_branch() { # $1 = work-root, $2 = dest-Klon
++  local l
++  for l in de en; do
++    mkdir -p "$1/Code/measure_out/appendix/$l/tabellen"
++    cp "$2/anhang/$l/tabellen/"*.tex "$1/Code/measure_out/appendix/$l/tabellen/" 2>/dev/null || true
++  done
++}
++lauf()     { env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development "$@" "$CORE" 2>&1; }
++lauf_alt() { env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development "$@" "$H/core_alt.sh" 2>&1; }
++snapdirs() { find "$1" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort; }
++
++bash "$(dirname "${BASH_SOURCE[0]}")/setup.sh" > /dev/null
++echo "Fixture aufgebaut unter $R"
++
++# ============================================================ (1) EINDEUTIGE NAMEN
++kopf "NB2-1a  Zwei PARALLELE Laeufe, GLEICHE Sekunde, GLEICHE Wurzel -> disjunkte Namen OHNE Reservierung"
++TS=20260807-100000
++git clone -q -b development "$R/super.git" "$R/n1_work"; neue_tabellen "$R/n1_work" "NB2-1a"
++git clone -q -b development "$R/dest.git" "$R/n1_dA"; git clone -q -b development "$R/dest.git" "$R/n1_dB"
++SNAP="$R/n1_work/measurement/thesis_compiles"
++for w in A B; do
++  ( E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/n1_d$w" AF_WORK_ROOT="$R/n1_work" AF_SNAPSHOT_ROOT="$SNAP" \
++      AF_SNAP_LAUF_KENNUNG="r9-j100$w" AF_TMP="$(mktemp -d)" AF_NO_PUSH=true > "$H/n1_$w.log" ) &
++done
++wait
++pruef "beide Belege entstanden (2 Ordner)" "$(snapdirs "$SNAP" | wc -l)" "2"
++pruef "Name traegt Runner/Job-Kennung A" "$([ -d "$SNAP/$TS-r9-j100A" ] && echo ja || echo nein)" "ja"
++pruef "Name traegt Runner/Job-Kennung B" "$([ -d "$SNAP/$TS-r9-j100B" ] && echo ja || echo nein)" "ja"
++hatnicht "$H/n1_A.log" "naechstes Suffix" "A brauchte KEIN Kollisions-Suffix (Namen sind schon disjunkt)"
++hatnicht "$H/n1_B.log" "naechstes Suffix" "B brauchte KEIN Kollisions-Suffix"
++# GEGENPROBE ALT: gleiche Sekunde, getrennte Dateisysteme -> ALT waehlt ZWEIMAL denselben Namen.
++git clone -q -b development "$R/super.git" "$R/n1_altA"; git clone -q -b development "$R/super.git" "$R/n1_altB"
++neue_tabellen "$R/n1_altA" "NB2-1a alt"; neue_tabellen "$R/n1_altB" "NB2-1a alt"
++git clone -q -b development "$R/dest.git" "$R/n1_dAltA"; git clone -q -b development "$R/dest.git" "$R/n1_dAltB"
++for w in A B; do
++  E18_FIXED_TS=$TS lauf_alt AF_DEST_REPO="$R/n1_dAlt$w" AF_WORK_ROOT="$R/n1_alt$w" AF_NO_PUSH=true > "$H/n1_alt$w.log"
++done
++pruef "ALT: getrennte Runner waehlen denselben Ordnernamen" \
++  "$( { [ -d "$R/n1_altA/measurement/thesis_compiles/$TS" ] && [ -d "$R/n1_altB/measurement/thesis_compiles/$TS" ]; } && echo ja || echo nein)" "ja"
++echo "   (genau daraus wurde beim 288-Merge ein add/add-Konflikt = verlorener Beleg -- Codex HOCH-2)"
++
++kopf "NB2-1b  Gurt bleibt: bei ERZWUNGEN gleicher Kennung waechst weiterhin ein Suffix"
++git clone -q -b development "$R/super.git" "$R/n1b_work"; neue_tabellen "$R/n1b_work" "NB2-1b"
++git clone -q -b development "$R/dest.git" "$R/n1b_d1"; git clone -q -b development "$R/dest.git" "$R/n1b_d2"
++E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/n1b_d1" AF_WORK_ROOT="$R/n1b_work" AF_SNAP_LAUF_KENNUNG="r1-j1" AF_NO_PUSH=true > "$H/n1b_1.log"
++E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/n1b_d2" AF_WORK_ROOT="$R/n1b_work" AF_SNAP_LAUF_KENNUNG="r1-j1" AF_NO_PUSH=true > "$H/n1b_2.log"
++pruef "erster Ordner" "$([ -d "$R/n1b_work/measurement/thesis_compiles/$TS-r1-j1" ] && echo ja || echo nein)" "ja"
++pruef "zweiter Ordner mit Suffix -2" "$([ -d "$R/n1b_work/measurement/thesis_compiles/$TS-r1-j1-2" ] && echo ja || echo nein)" "ja"
++hat "$H/n1b_2.log" "existiert LOKAL -> naechstes Suffix" "Kollisions-Gurt greift literal"
++
++kopf "NB2-1c  mkdir-FEHLERART: echter Dateisystem-Fehler ist FATAL, nicht 99 Kollisions-Retries"
++git clone -q -b development "$R/super.git" "$R/n1c_work"; neue_tabellen "$R/n1c_work" "NB2-1c"
++git clone -q -b development "$R/dest.git" "$R/n1c_d"; git clone -q -b development "$R/dest.git" "$R/n1c_d_alt"
++env PATH="$H/bin_mkdirfail:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_NO_PUSH=true AF_DEST_REPO="$R/n1c_d" AF_WORK_ROOT="$R/n1c_work" \
++    "$CORE" > "$H/n1c_neu.log" 2>&1
++pruef "NEU: RC bei echtem mkdir-Fehler" "$?" "1"
++hat "$H/n1c_neu.log" "KEINE Kollision, sondern ein echter" "NEU nennt die Fehlerart literal"
++hat "$H/n1c_neu.log" "Permission denied (PROBEN-SHIM)" "NEU druckt die ORIGINAL-mkdir-Meldung"
++pruef "NEU dreht KEINE 99 Runden" "$(grep -c 'naechstes Suffix' "$H/n1c_neu.log")" "0"
++# ALT legt den ENDordner direkt an (kein .tmp) -- der Gegen-Shim trifft darum genau diesen Namen.
++mkdir -p "$H/bin_mkdirfail_alt"
++cat > "$H/bin_mkdirfail_alt/mkdir" <<'EOF'
++#!/bin/sh
++for a in "$@"; do last="$a"; done
++case "$last" in */thesis_compiles/2*) echo "mkdir: cannot create directory '$last': Permission denied (PROBEN-SHIM)" >&2; exit 1 ;; esac
++exec /bin/mkdir "$@"
++EOF
++chmod +x "$H/bin_mkdirfail_alt/mkdir"
++env PATH="$H/bin_mkdirfail_alt:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_NO_PUSH=true AF_DEST_REPO="$R/n1c_d_alt" AF_WORK_ROOT="$R/n1c_work" \
++    "$H/core_alt.sh" > "$H/n1c_alt.log" 2>&1
++pruef "ALT deutet denselben Fehler als Kollision (99 Runden)" "$(grep -c 'mkdir-Lock verloren' "$H/n1c_alt.log")" "99"
++hat "$H/n1c_alt.log" "98 Kollisions-Suffixe sind belegt" "ALT meldet am Ende eine FALSCHE Ursache"
++
++# ============================================================ (2) RECOVERY-IDENTITAET
++kopf "NB2-2a  Marker im 288-Baum: Beleg fuer die URSPRUENGLICH gepushte SHA, nicht fuer den neuen HEAD"
++# Hergang (praeparierter Fehlerfall): Lauf A pusht 289 (SHA_A) und stirbt, NACHDEM sein
++# 288-Writeback die Recovery-Identitaet gelandet hat, aber BEVOR der Beleg entstanden ist.
++# Danach landet ein FREMDER 289-Commit (HEAD wandert auf SHA_B). Der Retry darf jetzt NICHT
++# einfach den neuen HEAD belegen -- SHA_A bliebe sonst fuer immer unbelegt.
++git clone -q -b development "$R/super.git" "$R/n2_wA"; neue_tabellen "$R/n2_wA" "NB2-2a"
++git clone -q -b development "$R/dest.git" "$R/n2_dA"
++lauf AF_DEST_REPO="$R/n2_dA" AF_WORK_ROOT="$R/n2_wA" AF_SNAP_LAUF_KENNUNG="r5-j500" > "$H/n2_laufA.log"
++SHA_A="$(git -C "$R/dest.git" rev-parse development)"
++hat "$H/n2_laufA.log" "Recovery-Identitaet abgelegt" "Lauf A legt die Recovery-Identitaet VOR dem Push ab"
++pruef "Marker nennt die gepushte SHA" \
++  "$(sed -n 's/^pending_thesis_commit_sha=//p' "$R/n2_wA/measurement/thesis_compiles/PENDING-r5-j500.txt")" "$SHA_A"
++# Der Writeback landet NUR den Marker (der Beleg existierte in diesem Moment noch nicht).
++rm -rf "$R/n2_wA/measurement/thesis_compiles/"2*    # Beleg-Ordner: mit dem Workspace gestorben
++sed -i '/^erfuellt_durch=/d;/^erfuellt_utc=/d' "$R/n2_wA/measurement/thesis_compiles/PENDING-r5-j500.txt"
++git -C "$R/n2_wA" add -A -- measurement >/dev/null
++git -C "$R/n2_wA" -c user.name=f -c user.email=f@l commit -q -m "288-Writeback: nur die Recovery-Identitaet"
++git -C "$R/n2_wA" push -q origin development
++# FREMDER 289-Commit -> der HEAD ist nicht mehr SHA_A
++git clone -q -b development "$R/dest.git" "$R/n2_fremd"
++printf '%% fremde Zeile\n' >> "$R/n2_fremd/diplomarbeit.tex"
++git -C "$R/n2_fremd" -c user.name=f -c user.email=f@l commit -q -am "Y: fremder 289-Commit"
++git -C "$R/n2_fremd" push -q origin development
++SHA_B="$(git -C "$R/dest.git" rev-parse development)"
++echo "   SHA_A (Lauf A, unbelegt) = $SHA_A"
++echo "   SHA_B (fremder HEAD)     = $SHA_B"
++git clone -q -b development "$R/super.git" "$R/n2_wRetry"; neue_tabellen "$R/n2_wRetry" "NB2-2a"
++git clone -q -b development "$R/dest.git" "$R/n2_dRetry"
++lauf AF_DEST_REPO="$R/n2_dRetry" AF_WORK_ROOT="$R/n2_wRetry" AF_SNAP_LAUF_KENNUNG="r5-j501" > "$H/n2_retry.log"
++Q="$(find "$R/n2_wRetry/measurement/thesis_compiles" -name QUELLSTAND.txt | head -1)"
++pruef "NEU: genau EIN Beleg nachgeholt" "$(find "$R/n2_wRetry/measurement/thesis_compiles" -name QUELLSTAND.txt | wc -l)" "1"
++pruef "NEU: Beleg zeigt auf SHA_A (Recovery-Identitaet)" "$(sed -n 's/^thesis_commit_sha=//p' "$Q")" "$SHA_A"
++pruef "NEU: Modus ehrlich" "$(sed -n 's/^modus=//p' "$Q")" "recovery"
++hat "$H/n2_retry.log" "RECOVERY-ZIEL: $SHA_A" "Recovery-Ziel literal benannt"
++hat "$H/n2_retry.log" "289-Klon nachweislich zurueck auf $SHA_B" "289-Klon steht wieder auf dem BRANCH-HEAD (Gitlink-Schutz)"
++pruef "NEU: 289 hat KEINEN neuen Commit bekommen" "$(git -C "$R/dest.git" rev-parse development)" "$SHA_B"
++# GEGENPROBE ALT auf EXAKT demselben Zustand
++git clone -q -b development "$R/super.git" "$R/n2_wAlt"; neue_tabellen "$R/n2_wAlt" "NB2-2a"
++git clone -q -b development "$R/dest.git" "$R/n2_dAlt"
++lauf_alt AF_DEST_REPO="$R/n2_dAlt" AF_WORK_ROOT="$R/n2_wAlt" > "$H/n2_alt.log"
++QA="$(find "$R/n2_wAlt/measurement/thesis_compiles" -name QUELLSTAND.txt | head -1)"
++pruef "ALT belegt den NEUEN HEAD statt der schuldigen SHA" "$(sed -n 's/^thesis_commit_sha=//p' "$QA")" "$SHA_B"
++echo "   -> ALT laesst $SHA_A dauerhaft unbelegt (genau der Codex-Rest von HOCH-1)"
++
++kopf "NB2-2b  Ohne Marker: die BOT-HISTORIE in 289 traegt die Recovery-Identitaet"
++# Reiner Runner-Tod: nicht einmal der Marker hat es in das 288-Repo geschafft. Dafuer bekommt der
++# Lauf eine JUNGFRAEULICHE Schnappschuss-Wurzel -- weder lokal noch remote liegt dort irgendetwas.
++git clone -q -b development "$R/super.git" "$R/n2b_w"
++git clone -q -b development "$R/dest.git" "$R/n2b_d"
++tabellen_wie_branch "$R/n2b_w" "$R/n2b_d"       # 0 Anhang-Delta -> es zaehlt allein die Beleg-Frage
++N2B_ROOT="$R/n2b_w/measurement/beleg_wurzel_2b"
++pruef "Wurzel ohne jeden Marker" "$(find "$N2B_ROOT" -name 'PENDING-*.txt' 2>/dev/null | wc -l)" "0"
++pruef "Wurzel ohne jeden Beleg"  "$(find "$N2B_ROOT" -name QUELLSTAND.txt 2>/dev/null | wc -l)" "0"
++lauf AF_DEST_REPO="$R/n2b_d" AF_WORK_ROOT="$R/n2b_w" AF_SNAPSHOT_ROOT="$N2B_ROOT" \
++     AF_SNAP_LAUF_KENNUNG="r5-j502" > "$H/n2b.log"
++QB="$(find "$N2B_ROOT" -name QUELLSTAND.txt | head -1)"
++pruef "NEU: Beleg fuer SHA_A (aus der Bot-Historie, ohne jeden Marker)" "$(sed -n 's/^thesis_commit_sha=//p' "$QB")" "$SHA_A"
++hat "$H/n2b.log" "RECOVERY-ZIEL: $SHA_A" "Bot-Historie liefert dieselbe Identitaet ohne jeden Marker"
++
++kopf "NB2-2c  Marker auf eine NIE gelandete SHA -> literal uebersprungen, kein Luegen-Beleg"
++git clone -q -b development "$R/super.git" "$R/n2c_w"
++git clone -q -b development "$R/dest.git" "$R/n2c_d"
++tabellen_wie_branch "$R/n2c_w" "$R/n2c_d"
++N2C_ROOT="$R/n2c_w/measurement/beleg_wurzel_2c"; mkdir -p "$N2C_ROOT"
++printf 'pending_thesis_commit_sha=%s\n' "0000000000000000000000000000000000000000" \
++  > "$N2C_ROOT/PENDING-r0-j0.txt"
++lauf AF_DEST_REPO="$R/n2c_d" AF_WORK_ROOT="$R/n2c_w" AF_SNAPSHOT_ROOT="$N2C_ROOT" \
++     AF_SNAP_LAUF_KENNUNG="r5-j503" > "$H/n2c.log"
++hat "$H/n2c.log" "ist NICHT auf development erreichbar -> uebersprungen" "nie gelandete SHA wird literal verworfen"
++pruef "kein Beleg auf die Phantom-SHA" \
++  "$(grep -rl '^thesis_commit_sha=0000000000000000000000000000000000000000$' "$N2C_ROOT" 2>/dev/null | wc -l)" "0"
++
++# ============================================================ (3) BELEG-VALIDATOR
++# Alle Validator-Proben laufen mit AF_RECOVER_MAX=0: gefragt ist hier AUSSCHLIESSLICH, ob der
++# Beleg zum 289-HEAD als gueltig gilt -- die Recovery-Kandidaten (2) sind eine andere Frage und
++# wuerden das Bild verwischen (der Fixture-289 traegt aus frueheren Proben unbelegte Bot-Commits).
++val_lauf() { lauf AF_RECOVER_MAX=0 "$@"; }
++
++halber_beleg() { # $1 = Ordner, $2 = SHA, $3 = "ohne-export" | "sha-bruch" | "zu-lange-sha"
++  mkdir -p "$1"; printf 'PDF-INHALT\n' > "$1/diplomarbeit.pdf"
++  local sha256; sha256="$(sha256sum < "$1/diplomarbeit.pdf" | cut -d' ' -f1)"
++  [ "$3" = "ohne-export" ] || printf 'log\n' > "$1/compile-export.txt"
++  [ "$3" = "sha-bruch" ] && sha256="0000000000000000000000000000000000000000000000000000000000000000"
++  local shazeile="thesis_commit_sha=$2"
++  [ "$3" = "zu-lange-sha" ] && shazeile="thesis_commit_sha=${2}deadbeef"
++  { echo "$shazeile"; echo "super_commit_sha=NA"; echo "kanal_lauf_id=NA"
++    echo "pdf_datei=diplomarbeit.pdf"; echo "pdf_sha256=$sha256"
++    echo "compile_export=compile-export.txt"; } > "$1/QUELLSTAND.txt"
++}
++# Baut den Praeparat-Stand: 288-Klon + 289-Klon + 0 Delta + eine jungfraeuliche Beleg-Wurzel.
++val_stand() { # $1 = Marke -> setzt VW/VD/VROOT/VSHA
++  git clone -q -b development "$R/super.git" "$R/v_${1}_w"
++  git clone -q -b development "$R/dest.git"  "$R/v_${1}_d"
++  tabellen_wie_branch "$R/v_${1}_w" "$R/v_${1}_d"
++  VW="$R/v_${1}_w"; VD="$R/v_${1}_d"; VROOT="$VW/measurement/beleg_wurzel_$1"
++  VSHA="$(git -C "$VD" rev-parse HEAD)"
++  mkdir -p "$VROOT"
++}
++
++kopf "NB2-3a  HALBER Ordner gilt NIE als Beleg (fehlender compile-export)"
++val_stand 3a
++halber_beleg "$VROOT/20260807-110000-rX-jX" "$VSHA" ohne-export
++cp -r "$VW" "$R/v_3a_w_alt"
++val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j600" > "$H/n3_neu.log"
++hat "$H/n3_neu.log" "ist aber KEIN gueltiger Beleg" "NEU benennt den Halb-Ordner literal"
++hat "$H/n3_neu.log" "compile-export.txt' fehlt/leer" "NEU nennt das fehlende Pflichtstueck"
++pruef "NEU holt den echten Beleg nach" "$(find "$VROOT" -name QUELLSTAND.txt | wc -l)" "2"
++git clone -q -b development "$R/dest.git" "$R/v_3a_d_alt"
++lauf_alt AF_DEST_REPO="$R/v_3a_d_alt" AF_WORK_ROOT="$R/v_3a_w_alt" \
++         AF_SNAPSHOT_ROOT="$R/v_3a_w_alt/measurement/beleg_wurzel_3a" > "$H/n3_alt.log"
++hat "$H/n3_alt.log" "Beleg LOKAL vorhanden" "ALT nimmt den HALBEN Ordner als Beleg"
++pruef "ALT holt NICHTS nach" "$(find "$R/v_3a_w_alt/measurement/beleg_wurzel_3a" -name QUELLSTAND.txt | wc -l)" "1"
++
++kopf "NB2-3b  Teiltreffer statt ganzer Zeile: laengere SHA im QUELLSTAND ist KEIN Beleg"
++val_stand 3b
++halber_beleg "$VROOT/20260807-120000-rY-jY" "$VSHA" zu-lange-sha
++cp -r "$VW" "$R/v_3b_w_alt"
++val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j601" > "$H/n3b_neu.log"
++pruef "NEU laesst sich vom Teiltreffer NICHT taeuschen (Beleg wird gebaut)" \
++  "$(find "$VROOT" -name QUELLSTAND.txt | wc -l)" "2"
++git clone -q -b development "$R/dest.git" "$R/v_3b_d_alt"
++lauf_alt AF_DEST_REPO="$R/v_3b_d_alt" AF_WORK_ROOT="$R/v_3b_w_alt" \
++         AF_SNAPSHOT_ROOT="$R/v_3b_w_alt/measurement/beleg_wurzel_3b" > "$H/n3b_alt.log"
++hat "$H/n3b_alt.log" "Beleg LOKAL vorhanden" "ALT nimmt den TEILTREFFER als Beleg (grep -F ohne Zeilenanker)"
++
++kopf "NB2-3c  sha256-Bruch: PDF passt nicht zum QUELLSTAND -> KEIN Beleg"
++val_stand 3c
++halber_beleg "$VROOT/20260807-130000-rZ-jZ" "$VSHA" sha-bruch
++cp -r "$VW" "$R/v_3c_w_alt"
++val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j602" > "$H/n3c.log"
++hat "$H/n3c.log" "sha256-Bruch in" "NEU erkennt den sha256-Bruch und verwirft den Ordner als Beleg"
++pruef "NEU legt einen zweiten, gueltigen Beleg an" "$(find "$VROOT" -name QUELLSTAND.txt | wc -l)" "2"
++git clone -q -b development "$R/dest.git" "$R/v_3c_d_alt"
++lauf_alt AF_DEST_REPO="$R/v_3c_d_alt" AF_WORK_ROOT="$R/v_3c_w_alt" \
++         AF_SNAPSHOT_ROOT="$R/v_3c_w_alt/measurement/beleg_wurzel_3c" > "$H/n3c_alt.log"
++hat "$H/n3c_alt.log" "Beleg LOKAL vorhanden" "ALT prueft den Hash gar nicht erst"
++
++kopf "NB2-3d  REMOTE-Suche NUR in QUELLSTAND.txt-Pfaden (Fremddatei mit derselben Zeile taeuscht nicht)"
++val_stand 3d
++# Der Beleg liegt REMOTE -- und zwar in einer Datei, die KEIN QUELLSTAND ist.
++git clone -q -b development "$R/super.git" "$R/n3d_seed"
++mkdir -p "$R/n3d_seed/measurement/beleg_wurzel_3d"
++printf 'thesis_commit_sha=%s\n' "$VSHA" > "$R/n3d_seed/measurement/beleg_wurzel_3d/NOTIZ.txt"
++git -C "$R/n3d_seed" add -A -- measurement >/dev/null
++git -C "$R/n3d_seed" -c user.name=f -c user.email=f@l commit -q -m "fremde Notiz mit derselben Zeile"
++git -C "$R/n3d_seed" push -q origin development
++cp -r "$VW" "$R/v_3d_w_alt"
++val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j604" > "$H/n3d_neu.log"
++hatnicht "$H/n3d_neu.log" "Beleg im REMOTE-Stand vorhanden" "NEU liest die Fremddatei NICHT als Beleg"
++pruef "NEU holt den echten Beleg nach" "$(find "$VROOT" -name QUELLSTAND.txt | wc -l)" "1"
++git clone -q -b development "$R/dest.git" "$R/v_3d_d_alt"
++lauf_alt AF_DEST_REPO="$R/v_3d_d_alt" AF_WORK_ROOT="$R/v_3d_w_alt" \
++         AF_SNAPSHOT_ROOT="$R/v_3d_w_alt/measurement/beleg_wurzel_3d" > "$H/n3d_alt.log"
++hat "$H/n3d_alt.log" "Beleg im REMOTE-Stand vorhanden" "ALT nimmt die Fremddatei als Beleg (git grep ueber ALLE Dateien)"
++
++# ============================================================ (4) ERZWUNGENE RE-KOMPILATION
++kopf "NB2-4a  Re-Fixierung nach non-FF: Bau ist erzwungen frisch und wird belegt"
++git clone -q -b development "$R/dest.git" "$R/n4_d"
++git clone -q -b development "$R/dest.git" "$R/n4_fremd"
++perl -0pi -e 's|\\end\{document\}|\\typeout{FREMDZUSATZ-NB2}\n\\end{document}|' "$R/n4_fremd/diplomarbeit.tex"
++git -C "$R/n4_fremd" -c user.name=f -c user.email=f@l commit -q -am "Y: fremder Thesis-Commit"
++git -C "$R/n4_fremd" push -q origin development
++git clone -q -b development "$R/super.git" "$R/n4_w"; neue_tabellen "$R/n4_w" "NB2-4a"
++rm -rf "$R/n4_w/measurement/thesis_compiles/2"*
++lauf AF_DEST_REPO="$R/n4_d" AF_WORK_ROOT="$R/n4_w" AF_SNAP_LAUF_KENNUNG="r7-j700" AF_PUSH_RETRIES=3 > "$H/n4_neu.log"
++hat "$H/n4_neu.log" "RE-ERNTE" "Divergenz erkannt"
++hat "$H/n4_neu.log" "ERZWUNGENE Re-Kompilation" "Re-Ernte laeuft mit -gg und geloeschten Bau-Produkten"
++hat "$H/n4_neu.log" "Neuheits-Wache" "die neu gebaute PDF ist nachweislich juenger als der Bau-Beginn"
++QN="$(find "$R/n4_w/measurement/thesis_compiles" -name QUELLSTAND.txt | head -1)"
++pruef "Beleg zeigt auf die BRANCH-SPITZE" "$(sed -n 's/^thesis_commit_sha=//p' "$QN")" "$(git -C "$R/dest.git" rev-parse development)"
++pruef "compile-export stammt aus dem GEMERGTEN Baum" "$(grep -c 'FREMDZUSATZ-NB2' "$(dirname "$QN")/compile-export.txt")" "1"
++
++kopf "NB2-4b  'Nothing to do' darf NIE eine alte PDF mit neuer SHA beschriften"
++git clone -q -b development "$R/dest.git" "$R/n4b_d"
++git clone -q -b development "$R/dest.git" "$R/n4b_fremd"
++perl -0pi -e 's|\\end\{document\}|\\typeout{FREMDZUSATZ-NB2B}\n\\end{document}|' "$R/n4b_fremd/diplomarbeit.tex"
++git -C "$R/n4b_fremd" -c user.name=f -c user.email=f@l commit -q -am "Y2"
++git -C "$R/n4b_fremd" push -q origin development
++git clone -q -b development "$R/super.git" "$R/n4b_w"; neue_tabellen "$R/n4b_w" "NB2-4b"
++rm -rf "$R/n4b_w/measurement/thesis_compiles/2"*
++# Der Shim greift ERST bei der Re-Ernte, weil der erste Bau (vor dem Push) mit echtem latexmk
++# laeuft: dazu wird der Shim ueber eine Datei scharf geschaltet, die der erste Bau erzeugt.
++cat > "$H/bin_nothingtodo/latexmk" <<'EOF'
++#!/bin/sh
++if [ -e /tmp/e18snap-nb2/scharf ]; then
++  echo "Latexmk: Nothing to do for '$*'."
++  for a in "$@"; do last="$a"; done
++  out="${last%.tex}.pdf"
++  printf 'ALTE-PDF-AUS-EINEM-FRUEHEREN-BAU\n' > "$out"
++  touch -d '2020-01-01 00:00:00' "$out"
++  exit 0
++fi
++: > /tmp/e18snap-nb2/scharf
++exec /usr/local/texlive/2026/bin/x86_64-linux/latexmk "$@"
++EOF
++chmod +x "$H/bin_nothingtodo/latexmk"; rm -f "$H/scharf"
++env PATH="$H/bin_nothingtodo:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_PUSH_RETRIES=3 AF_SNAP_LAUF_KENNUNG="r7-j701" \
++    AF_DEST_REPO="$R/n4b_d" AF_WORK_ROOT="$R/n4b_w" "$CORE" > "$H/n4b_neu.log" 2>&1
++pruef "NEU: RC bei 'Nothing to do' in der Re-Ernte" "$?" "1"
++hat "$H/n4b_neu.log" "NICHT neu erzeugt" "NEU faengt den 'Nothing to do'-Fall literal"
++pruef "NEU legt KEINEN Beleg ab" "$(find "$R/n4b_w/measurement/thesis_compiles" -name QUELLSTAND.txt | wc -l)" "0"
++hat "$H/n4b_neu.log" "Recovery-Identitaet steht in" "NEU verweist auf die Recovery-Identitaet fuer den naechsten Lauf"
++# GEGENPROBE ALT auf demselben Praeparat
++git clone -q -b development "$R/dest.git" "$R/n4b_d_alt"
++git clone -q -b development "$R/dest.git" "$R/n4b_fremd2"
++perl -0pi -e 's|\\end\{document\}|\\typeout{FREMDZUSATZ-NB2C}\n\\end{document}|' "$R/n4b_fremd2/diplomarbeit.tex"
++git -C "$R/n4b_fremd2" -c user.name=f -c user.email=f@l commit -q -am "Y3"
++git -C "$R/n4b_fremd2" push -q origin development
++git clone -q -b development "$R/super.git" "$R/n4b_w_alt"; neue_tabellen "$R/n4b_w_alt" "NB2-4b alt"
++rm -rf "$R/n4b_w_alt/measurement/thesis_compiles/2"* ; rm -f "$H/scharf"
++env PATH="$H/bin_nothingtodo:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_PUSH_RETRIES=3 \
++    AF_DEST_REPO="$R/n4b_d_alt" AF_WORK_ROOT="$R/n4b_w_alt" "$H/core_alt.sh" > "$H/n4b_alt.log" 2>&1
++QAB="$(find "$R/n4b_w_alt/measurement/thesis_compiles" -name QUELLSTAND.txt | head -1)"
++if [ -n "$QAB" ] && grep -q 'ALTE-PDF-AUS-EINEM-FRUEHEREN-BAU' "$(dirname "$QAB")/diplomarbeit.pdf" 2>/dev/null; then
++  ok "ALT beschriftet die ALTE PDF mit der NEUEN SHA (genau der Codex-HOCH-3-Rest)"
++else
++  nok "ALT-Gegenprobe: erwartet war ein Beleg mit der alten PDF"
++fi
++
++# ============================================================ (5) TRANSAKTIONALES CLEANUP
++kopf "NB2-5a  Schreibfehler MITTEN im Ordner: kein Endname, kein .tmp-Rest"
++git clone -q -b development "$R/super.git" "$R/n5_w"; neue_tabellen "$R/n5_w" "NB2-5a"
++git clone -q -b development "$R/dest.git" "$R/n5_d"
++env PATH="$H/bin_cptmpfail:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_NO_PUSH=true AF_SNAP_LAUF_KENNUNG="r8-j800" \
++    AF_DEST_REPO="$R/n5_d" AF_WORK_ROOT="$R/n5_w" "$CORE" > "$H/n5_neu.log" 2>&1
++pruef "NEU: RC bei Transaktions-Bruch" "$?" "1"
++pruef "NEU: KEIN Ordner unter dem Endnamen" "$(snapdirs "$R/n5_w/measurement/thesis_compiles" | wc -l)" "0"
++pruef "NEU: KEIN .tmp-Rest" "$(find "$R/n5_w/measurement/thesis_compiles" -maxdepth 1 -name '.*.tmp' | wc -l)" "0"
++hat "$H/n5_neu.log" "eigener unveroeffentlichter Rest aufgeraeumt" "trap-Cleanup meldet sich literal"
++# GEGENPROBE ALT: derselbe Fehler laesst einen HALBEN Ordner unter dem ENDNAMEN stehen
++git clone -q -b development "$R/super.git" "$R/n5_w_alt"; neue_tabellen "$R/n5_w_alt" "NB2-5a alt"
++git clone -q -b development "$R/dest.git" "$R/n5_d_alt"
++cat > "$H/bin_cptmpfail/cp2" <<'EOF'
++placeholder
++EOF
++env PATH="$H/bin_cpaltfail:$PATH" true 2>/dev/null || true
++mkdir -p "$H/bin_cpaltfail"
++cat > "$H/bin_cpaltfail/cp" <<'EOF'
++#!/bin/sh
++# ALT schreibt direkt in den ENDordner (kein .tmp) -- der Shim bricht dort ab.
++for a in "$@"; do last="$a"; done
++case "$last" in */thesis_compiles/2*/compile-export.txt) echo "cp: PROBEN-SHIM erzwingt Fehlschlag" >&2; exit 1 ;; esac
++exec /bin/cp "$@"
++EOF
++chmod +x "$H/bin_cpaltfail/cp"
++env PATH="$H/bin_cpaltfail:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_NO_PUSH=true \
++    AF_DEST_REPO="$R/n5_d_alt" AF_WORK_ROOT="$R/n5_w_alt" "$H/core_alt.sh" > "$H/n5_alt.log" 2>&1
++pruef "ALT hinterlaesst einen halben Ordner unter dem ENDNAMEN" \
++  "$(snapdirs "$R/n5_w_alt/measurement/thesis_compiles" | wc -l)" "1"
++
++kopf "NB2-5b  Remote-Fehler ist FAIL-CLOSED (frueher galt er als 'Pfad frei')"
++git clone -q -b development "$R/super.git" "$R/n5b_w"; neue_tabellen "$R/n5b_w" "NB2-5b"
++git clone -q -b development "$R/dest.git" "$R/n5b_d"
++env PATH="$H/bin_lstreefail:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_NO_PUSH=true AF_SNAP_LAUF_KENNUNG="r8-j801" \
++    AF_DEST_REPO="$R/n5b_d" AF_WORK_ROOT="$R/n5b_w" "$CORE" > "$H/n5b.log" 2>&1
++pruef "NEU: RC bei kaputtem Remote-Blick" "$?" "1"
++hat "$H/n5b.log" "FAIL-CLOSED" "Remote-Fehler bricht LAUT ab statt 'frei' anzunehmen"
++pruef "NEU legt nichts ab" "$(find "$R/n5b_w/measurement/thesis_compiles" -name QUELLSTAND.txt 2>/dev/null | wc -l)" "0"
++
++kopf "NB2-5c  AF_SNAPSHOT_ROOT-Vertrag: vier Verstoesse, vier laute Abbrueche"
++git clone -q -b development "$R/super.git" "$R/n5c_w"; neue_tabellen "$R/n5c_w" "NB2-5c"
++vertrag() { # $1 = Marke, $2 = Wurzel, $3 = erwarteter Textbaustein
++  git clone -q -b development "$R/dest.git" "$R/n5c_d_$1"
++  lauf AF_DEST_REPO="$R/n5c_d_$1" AF_WORK_ROOT="$R/n5c_w" AF_SNAPSHOT_ROOT="$2" AF_NO_PUSH=true \
++       AF_SNAP_LAUF_KENNUNG="r8-j81$1" > "$H/n5c_$1.log" 2>&1
++  local rc=$?
++  pruef "Vertrag '$1': RC" "$rc" "1"
++  hat "$H/n5c_$1.log" "$3" "Vertrag '$1' literal benannt"
++}
++vertrag 1 "/tmp/e18snap-nb2-ausserhalb/beleg" "liegt in KEINEM git-Arbeitsbaum"
++vertrag 2 "$R/n5c_w"                          "IST das Toplevel des Arbeitsbaums"
++vertrag 3 "$R/dest/measurement_fremd"         "NICHT der 288-Baum des Writebacks"
++vertrag 4 "$R/n5c_w/build/beleg"              "wird von .gitignore IGNORIERT"
++rm -rf /tmp/e18snap-nb2-labor        # Labor-Wurzel liegt ausserhalb des Fixtures -> selbst raeumen
++git clone -q -b development "$R/dest.git" "$R/n5c_d_off"
++lauf AF_DEST_REPO="$R/n5c_d_off" AF_WORK_ROOT="$R/n5c_w" AF_SNAPSHOT_ROOT="/tmp/e18snap-nb2-labor/beleg" \
++     AF_SNAP_ROOT_STRICT=false AF_NO_PUSH=true AF_SNAP_LAUF_KENNUNG="r8-j819" > "$H/n5c_off.log" 2>&1
++pruef "STRICT=false: RC" "$?" "0"
++hat "$H/n5c_off.log" "Verstoss BEWUSST hingenommen" "Labor-Abschaltung sagt es literal"
++pruef "STRICT=false: Beleg entsteht trotzdem" "$(find /tmp/e18snap-nb2-labor/beleg -name QUELLSTAND.txt | wc -l)" "1"
++
++# ============================================================ MITTEL-RESTBEFUNDE
++kopf "MITTEL  AF_LANGS: '|' verboten, Duplikate entfernt"
++git clone -q -b development "$R/super.git" "$R/m_w"; neue_tabellen "$R/m_w" "MITTEL"
++git clone -q -b development "$R/dest.git" "$R/m_d1"
++lauf AF_DEST_REPO="$R/m_d1" AF_WORK_ROOT="$R/m_w" AF_LANGS='de|x,en' AF_NO_PUSH=true > "$H/m_pipe.log" 2>&1
++pruef "'|' in AF_LANGS: RC" "$?" "1"
++hat "$H/m_pipe.log" "Feldtrenner der Rollback-Buchfuehrung" "Grund literal benannt"
++git clone -q -b development "$R/dest.git" "$R/m_d2"
++lauf AF_DEST_REPO="$R/m_d2" AF_WORK_ROOT="$R/m_w" AF_LANGS='de,de,en,en' AF_NO_PUSH=true \
++     AF_SNAP_LAUF_KENNUNG="r9-j900" > "$H/m_dup.log" 2>&1
++pruef "Duplikate: RC" "$?" "0"
++hat "$H/m_dup.log" "AF_LANGS-Duplikat 'de' entfernt" "Duplikat literal entfernt"
++pruef "Duplikate aendern die Buchfuehrung nicht" "$(grep -c '^   kopiert gesamt: 2 .tex' "$H/m_dup.log")" "1"
++
++kopf "MITTEL  Leerer 289-SHA im AF_NO_PUSH-Pfad ist FATAL (frueher: 'thesis_commit_sha=')"
++git clone -q -b development "$R/super.git" "$R/m2_w"; neue_tabellen "$R/m2_w" "MITTEL-2"
++git clone -q -b development "$R/dest.git" "$R/m2_d"; git clone -q -b development "$R/dest.git" "$R/m2_d_alt"
++rm -f "$H/revparse.cnt"
++env PATH="$H/bin_leerhead:$PATH" E18_LEER_REVPARSE_AB=2 AF_ARTIFACT_ROOTS="Code/measure_out/appendix" \
++    AF_PDF_GATE=on AF_PROV_SUPER_REF=development AF_NO_PUSH=true AF_SNAP_LAUF_KENNUNG="r9-j901" \
++    AF_DEST_REPO="$R/m2_d" AF_WORK_ROOT="$R/m2_w" "$CORE" > "$H/m2_neu.log" 2>&1
++pruef "NEU: RC bei leerem HEAD" "$?" "1"
++hat "$H/m2_neu.log" "nicht aufloesbar" "NEU bricht mit literalem Grund ab"
++pruef "NEU legt keinen Beleg ab" "$(find "$R/m2_w/measurement/thesis_compiles" -name QUELLSTAND.txt 2>/dev/null | wc -l)" "0"
++rm -f "$H/revparse.cnt"
++env PATH="$H/bin_leerhead:$PATH" E18_LEER_REVPARSE_AB=2 AF_ARTIFACT_ROOTS="Code/measure_out/appendix" \
++    AF_PDF_GATE=on AF_PROV_SUPER_REF=development AF_NO_PUSH=true \
++    AF_DEST_REPO="$R/m2_d_alt" AF_WORK_ROOT="$R/m2_w" AF_SNAPSHOT_ROOT="$R/m2_w/snap_alt" \
++    "$H/core_alt.sh" > "$H/m2_alt.log" 2>&1
++if grep -rq '^thesis_commit_sha=$' "$R/m2_w/snap_alt" 2>/dev/null; then
++  ok "ALT schreibt einen Beleg mit LEERER thesis_commit_sha"
++else
++  nok "ALT-Gegenprobe: erwartet war 'thesis_commit_sha=' ohne Wert"
++fi
++
++kopf "MITTEL  Glob-Zeichen in der Schnappschuss-Wurzel (Pathspec-Falle)"
++git clone -q -b development "$R/super.git" "$R/m3_w"; neue_tabellen "$R/m3_w" "MITTEL-3"
++GLOBROOT="$R/m3_w/measurement/th[e]sis*compiles"
++git clone -q -b development "$R/dest.git" "$R/m3_d"
++lauf AF_DEST_REPO="$R/m3_d" AF_WORK_ROOT="$R/m3_w" AF_SNAPSHOT_ROOT="$GLOBROOT" AF_NO_PUSH=true \
++     AF_SNAP_LAUF_KENNUNG="r9-j902" > "$H/m3.log" 2>&1
++pruef "Glob-Wurzel: RC" "$?" "0"
++pruef "Glob-Wurzel: Beleg entsteht" "$(find "$GLOBROOT" -name QUELLSTAND.txt | wc -l)" "1"
++hat "$H/m3.log" "E-18-SNAP-VERTRAG: erfuellt" "Vertrag auch bei Glob-Zeichen sauber aufgeloest"
++
++kopf "MITTEL  Zentraler Rollback auch bei Abbruch WAEHREND der Kopie"
++git clone -q -b development "$R/super.git" "$R/m4_w"
++mkdir -p "$R/m4_w/Code/measure_out/appendix/de/tabellen" "$R/m4_w/Code/measure_out/appendix/en/tabellen"
++printf '%s\n' '\textbf{DE-A}\par' > "$R/m4_w/Code/measure_out/appendix/de/tabellen/A1.tex"
++printf '%s\n' '\textbf{DE-B}\par' > "$R/m4_w/Code/measure_out/appendix/de/tabellen/B1.tex"
++printf '%s\n' '\textbf{EN-A}\par' > "$R/m4_w/Code/measure_out/appendix/en/tabellen/A1.tex"
++git clone -q -b development "$R/dest.git" "$R/m4_d"
++mkdir -p "$H/bin_cpb1fail"
++cat > "$H/bin_cpb1fail/cp" <<'EOF'
++#!/bin/sh
++for a in "$@"; do last="$a"; done
++case "$last" in */anhang/de/tabellen/B1.tex) echo "cp: PROBEN-SHIM erzwingt Fehlschlag fuer B1.tex" >&2; exit 1 ;; esac
++exec /bin/cp "$@"
++EOF
++chmod +x "$H/bin_cpb1fail/cp"
++env PATH="$H/bin_cpb1fail:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_NO_PUSH=true \
++    AF_DEST_REPO="$R/m4_d" AF_WORK_ROOT="$R/m4_w" "$CORE" > "$H/m4_neu.log" 2>&1
++pruef "NEU: RC bei cp-Abbruch mitten in der Kopie" "$?" "1"
++hat "$H/m4_neu.log" "Rollback (cp fehlgeschlagen)" "zentraler Rollback greift auch hier"
++pruef "NEU: die vorher kopierte A1.tex ist zurueckgenommen" \
++  "$([ -e "$R/m4_d/anhang/de/tabellen/A1.tex" ] && echo da || echo weg)" "weg"
++env PATH="$H/bin_cpb1fail:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on \
++    AF_PROV_SUPER_REF=development AF_NO_PUSH=true \
++    AF_DEST_REPO="$R/m4_d" AF_WORK_ROOT="$R/m4_w" "$H/core_alt.sh" > "$H/m4_alt.log" 2>&1
++pruef "ALT laesst die halbe Kopie im Ziel-Repo stehen" \
++  "$([ -e "$R/m4_d/anhang/de/tabellen/A1.tex" ] && echo da || echo weg)" "da"
++rm -f "$R/m4_d/anhang/de/tabellen/A1.tex"
++
++kopf "REGRESSION  Grenzen unveraendert"
++git clone -q -b development "$R/super.git" "$R/g_off"; neue_tabellen "$R/g_off" "gate-off"
++git clone -q -b development "$R/dest.git" "$R/g_off_d"
++rm -rf "$R/g_off/measurement/thesis_compiles/2"*
++env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=off AF_NO_PUSH=true \
++    AF_PROV_SUPER_REF=development AF_DEST_REPO="$R/g_off_d" AF_WORK_ROOT="$R/g_off" "$CORE" > "$H/g_off.log" 2>&1
++hat "$H/g_off.log" "KEIN Schnappschuss -- das PDF-Gate hat nicht gebaut" "ohne Compile kein Beleg, literal begruendet"
++git clone -q -b development "$R/super.git" "$R/g_leer"; git clone -q -b development "$R/dest.git" "$R/g_leer_d"
++lauf AF_DEST_REPO="$R/g_leer_d" AF_WORK_ROOT="$R/g_leer" AF_SNAPSHOT_ROOT=/tmp/e18snap-nb2-nie AF_NO_PUSH=true > "$H/g_leer.log" 2>&1
++hat "$H/g_leer.log" "NO-OP: keine Anhang-Quelle" "honest-empty unveraendert"
++pruef "honest-empty legt keine Wurzel an" "$([ -e /tmp/e18snap-nb2-nie ] && echo ja || echo nein)" "nein"
++
++echo
++if [ "$FEHLER" -eq 0 ]; then echo "=== NB2-PROBEN GRUEN: alle Pfade belegt (0 Abweichungen) ==="; exit 0; fi
++echo "=== NB2-PROBEN ROT: $FEHLER Abweichung(en) ==="; exit 1
+diff --git a/docs/sessions/backups/20260806-e18-snap/fixture/proben.sh b/docs/sessions/backups/20260806-e18-snap/fixture/proben.sh
+index c4354bd8..3ea1882b 100644
+--- a/docs/sessions/backups/20260806-e18-snap/fixture/proben.sh
++++ b/docs/sessions/backups/20260806-e18-snap/fixture/proben.sh
+@@ -131,11 +131,20 @@ grep -q "Beleg im REMOTE-Stand vorhanden" "$H/h1_remote.log" && ok "Beleg im REM
+ 
+ # ------------------------------------------------------------------ HOCH-2: Kollision
+ kopf "HOCH-2  Kollisions-Wahl gegen lokal + REMOTE + mkdir-Lock"
++# SEIT NB2 traegt der Ordnername die LAUF-KENNUNG (runneruebergreifend eindeutig, Codex NB2-1).
++# Damit kollidieren zwei Laeufe praktisch nicht mehr -- die drei Wachen bleiben aber als GURT
++# bestehen, und genau den pruefen diese Proben. Sie ERZWINGEN die Kollision darum ueber
++# AF_SNAP_LAUF_KENNUNG (die CI setzt diese Variable nie).
++KENN=r42-j4242
+ TS=20260806-130000
+ git clone -q -b development "$R/super.git" "$R/w_push"
++mkdir -p "$R/w_push/measurement/thesis_compiles/$TS-$KENN"
++printf 'thesis_commit_sha=cafebabecafebabecafebabecafebabecafebabe\n' > "$R/w_push/measurement/thesis_compiles/$TS-$KENN/QUELLSTAND.txt"
++printf 'PDF eines FREMDEN Runners\n' > "$R/w_push/measurement/thesis_compiles/$TS-$KENN/diplomarbeit.pdf"
++# Derselbe Fremd-Beleg zusaetzlich unter dem ALTEN Namensschema (nur Zeitstempel) -- die
++# ALT-Gegenprobe unten waehlt genau diesen Namen und laeuft damit in den add/add-Konflikt.
+ mkdir -p "$R/w_push/measurement/thesis_compiles/$TS"
+-printf 'thesis_commit_sha=cafebabecafebabecafebabecafebabecafebabe\n' > "$R/w_push/measurement/thesis_compiles/$TS/QUELLSTAND.txt"
+-printf 'PDF eines FREMDEN Runners\n' > "$R/w_push/measurement/thesis_compiles/$TS/diplomarbeit.pdf"
++cp "$R/w_push/measurement/thesis_compiles/$TS-$KENN/"* "$R/w_push/measurement/thesis_compiles/$TS/"
+ git -C "$R/w_push" add -A -- measurement >/dev/null
+ git -C "$R/w_push" -c user.name=f -c user.email=f@l commit -q -m "fremder Runner landet $TS"
+ git -C "$R/w_push" push -q origin development
+@@ -143,9 +152,9 @@ git clone -q -b development "$R/super.git" "$R/w_koll"
+ git -C "$R/w_koll" checkout -q "$(git -C "$R/w_koll" rev-parse HEAD~1)"   # kennt den fremden Ordner NICHT
+ neue_tabellen "$R/w_koll" "Lauf Kollision"
+ git clone -q -b development "$R/dest.git" "$R/d_koll"
+-E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/d_koll" AF_WORK_ROOT="$R/w_koll" AF_NO_PUSH=true > "$H/h2_remote.log"
++E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/d_koll" AF_WORK_ROOT="$R/w_koll" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true > "$H/h2_remote.log"
+ grep -q "existiert bereits im REMOTE-Stand" "$H/h2_remote.log" && ok "REMOTE-Belegung erkannt"
+-pruef "Suffix gewachsen" "$([ -d "$R/w_koll/measurement/thesis_compiles/$TS-2" ] && echo ja || echo nein)" "ja"
++pruef "Suffix gewachsen" "$([ -d "$R/w_koll/measurement/thesis_compiles/$TS-$KENN-2" ] && echo ja || echo nein)" "ja"
+ # Gegenprobe ALT: waehlt den belegten Namen -> add/add-Konflikt beim 288-Merge
+ git clone -q -b development "$R/super.git" "$R/w_koll_alt"
+ git -C "$R/w_koll_alt" checkout -q "$(git -C "$R/w_koll_alt" rev-parse HEAD~1)"
+@@ -161,26 +170,30 @@ git -C "$R/w_koll_alt" -c user.name=f -c user.email=f@l merge --no-edit origin/d
+ pruef "ALT: 288-Merge des Writebacks" "$?" "1"
+ grep -q "CONFLICT (add/add)" "$H/h2_merge.log" && ok "add/add-Konflikt literal -> der Writeback-Retry haette abgebrochen (Beleg weg)"
+ git -C "$R/w_koll_alt" merge --abort 2>/dev/null
+-# mkdir-Lock: haengender Symlink -> [ -e ] ist FALSE, mkdir scheitert trotzdem (wie beim verlorenen Rennen)
++# mkdir-Lock: haengender Symlink auf dem .tmp-Namen -> [ -e ] ist FALSE, mkdir scheitert trotzdem
++# (wie beim verlorenen Rennen). Seit NB2 wird im versteckten ".<name>.tmp" gearbeitet -- der Lock
++# sitzt darum dort, nicht mehr auf dem Endnamen.
+ TS2=20260806-140000
+ git clone -q -b development "$R/super.git" "$R/w_lock"; neue_tabellen "$R/w_lock" "Lauf Lock"
+ git clone -q -b development "$R/dest.git" "$R/d_lock"
+-mkdir -p "$R/w_lock/measurement/thesis_compiles"; ln -s /nicht/vorhanden "$R/w_lock/measurement/thesis_compiles/$TS2"
+-E18_FIXED_TS=$TS2 lauf AF_DEST_REPO="$R/d_lock" AF_WORK_ROOT="$R/w_lock" AF_NO_PUSH=true > "$H/h2_lock.log"
++mkdir -p "$R/w_lock/measurement/thesis_compiles"
++ln -s /nicht/vorhanden "$R/w_lock/measurement/thesis_compiles/.$TS2-$KENN.tmp"
++E18_FIXED_TS=$TS2 lauf AF_DEST_REPO="$R/d_lock" AF_WORK_ROOT="$R/w_lock" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true > "$H/h2_lock.log"
+ grep -q "mkdir-Lock verloren" "$H/h2_lock.log" && ok "mkdir-Lock-Zweig genommen"
+-pruef "Lock-Fall weicht auf Suffix aus" "$([ -d "$R/w_lock/measurement/thesis_compiles/$TS2-2" ] && echo ja || echo nein)" "ja"
+-# zwei ECHT parallele Laeufe, fixer Zeitstempel, gemeinsame Wurzel
++pruef "Lock-Fall weicht auf Suffix aus" "$([ -d "$R/w_lock/measurement/thesis_compiles/$TS2-$KENN-2" ] && echo ja || echo nein)" "ja"
++# zwei ECHT parallele Laeufe, fixer Zeitstempel, ERZWUNGEN gleiche Kennung, gemeinsame Wurzel:
++# so entscheidet allein der atomare Lock -- genau der Gurt, der auch nach NB2 bestehen bleibt.
+ TS3=20260806-150000
+ git clone -q -b development "$R/super.git" "$R/w_par"; neue_tabellen "$R/w_par" "Lauf Parallel"
+ git clone -q -b development "$R/dest.git" "$R/d_parA"; git clone -q -b development "$R/dest.git" "$R/d_parB"
+ SNAPPAR="$R/w_par/measurement/thesis_compiles"
+ for w in A B; do
+   ( E18_FIXED_TS=$TS3 lauf AF_DEST_REPO="$R/d_par$w" AF_WORK_ROOT="$R/w_par" AF_SNAPSHOT_ROOT="$SNAPPAR" \
+-      AF_TMP="$(mktemp -d)" AF_NO_PUSH=true > "$H/h2_par_$w.log" ) &
++      AF_SNAP_LAUF_KENNUNG="$KENN" AF_TMP="$(mktemp -d)" AF_NO_PUSH=true > "$H/h2_par_$w.log" ) &
+ done
+ wait
+ pruef "2 parallele Laeufe -> 2 verschiedene Belege" \
+-  "$( { [ -d "$SNAPPAR/$TS3" ] && [ -d "$SNAPPAR/$TS3-2" ]; } && echo ja || echo nein)" "ja"
++  "$( { [ -d "$SNAPPAR/$TS3-$KENN" ] && [ -d "$SNAPPAR/$TS3-$KENN-2" ]; } && echo ja || echo nein)" "ja"
+ 
+ # ------------------------------------------------------------------ HOCH-3: non-FF
+ kopf "HOCH-3  Re-Fixierung nach non-FF-Push (Merge-Commit)"
+@@ -271,6 +284,33 @@ pruef "NEU stagt nichts" "$(git -C "$R/w_halb" diff --cached --name-only | wc -l
+ wb "$H/wb_alt.sh" "$R/w_halb" > "$H/p76_alt.log"
+ grep -q 'create mode .*20260806-170000' "$H/p76_alt.log" && ok "ALT committet den halben Beleg klaglos"
+ 
++kopf "patch NB2  Writeback: 40-hex-Wache + .tmp-Halbstand wird NIE gestagt"
++git clone -q -b development "$R/super.git" "$R/w_hex"
++git -C "$R/w_hex" config user.name f; git -C "$R/w_hex" config user.email f@l
++export NEW_THESIS_SHA=$(git -C "$R/w_hex" ls-tree HEAD thesis/diplomarbeit | awk '{print $3}')
++DH="$R/w_hex/measurement/thesis_compiles/20260806-190000-r1-j1"; mkdir -p "$DH"
++printf 'PDF\n' > "$DH/diplomarbeit.pdf"; printf 'log\n' > "$DH/compile-export.txt"
++printf 'thesis_commit_sha=nicht-hex\n' > "$DH/QUELLSTAND.txt"
++wb "$H/wb_neu.sh" "$R/w_hex" > "$H/pnb2_hex.log"
++pruef "NEU: RC bei nicht-hex thesis_commit_sha" "$?" "1"
++grep -q 'thesis_commit_sha=<40-hex>' "$H/pnb2_hex.log" && ok "Writeback nennt die verletzte Formregel literal"
++pruef "NEU stagt nichts" "$(git -C "$R/w_hex" diff --cached --name-only | wc -l)" "0"
++git clone -q -b development "$R/super.git" "$R/w_tmp"
++git -C "$R/w_tmp" config user.name f; git -C "$R/w_tmp" config user.email f@l
++export NEW_THESIS_SHA=$(git -C "$R/w_tmp" ls-tree HEAD thesis/diplomarbeit | awk '{print $3}')
++DT="$R/w_tmp/measurement/thesis_compiles/.20260806-191000-r1-j1.tmp"; mkdir -p "$DT"
++printf 'HALBE-PDF\n' > "$DT/diplomarbeit.pdf"
++DG="$R/w_tmp/measurement/thesis_compiles/20260806-191000-r1-j2"; mkdir -p "$DG"
++printf 'PDF\n' > "$DG/diplomarbeit.pdf"; printf 'log\n' > "$DG/compile-export.txt"
++printf 'thesis_commit_sha=%s\n' "$NEW_THESIS_SHA" > "$DG/QUELLSTAND.txt"
++wb "$H/wb_neu.sh" "$R/w_tmp" > "$H/pnb2_tmp.log"
++grep -q 'abgebrochener Schnappschuss-Halbstand' "$H/pnb2_tmp.log" && ok ".tmp-Halbstand literal gemeldet"
++pruef ".tmp-Halbstand entfernt" "$([ -e "$DT" ] && echo da || echo weg)" "weg"
++pruef "kein .tmp-Pfad im 288-Remote" \
++  "$(git -C "$R/super.git" ls-tree -r --name-only development | grep -c '\.tmp/')" "0"
++pruef "der VOLLSTAENDIGE Beleg daneben landet trotzdem" \
++  "$(git -C "$R/super.git" ls-tree -r --name-only development | grep -c '20260806-191000-r1-j2/')" "3"
++
+ kopf "Commit-Text  dritter Fall: nur Beleg, Gitlink unbewegt"
+ git clone -q -b development "$R/super.git" "$R/w_txt"
+ git -C "$R/w_txt" config user.name f; git -C "$R/w_txt" config user.email f@l
+@@ -323,8 +363,14 @@ grep -q "NO-OP: keine Anhang-Quelle" "$H/g_leer.log" && ok "honest-empty unverae
+ pruef "honest-empty legt keine Wurzel an" "$([ -e /tmp/e18snap-nie ] && echo ja || echo nein)" "nein"
+ git clone -q -b development "$R/super.git" "$R/w_aus"; neue_tabellen "$R/w_aus" "Lauf ausserhalb"
+ git clone -q -b development "$R/dest.git" "$R/d_aus"
++rm -rf /tmp/e18snap-ausserhalb
+ lauf AF_DEST_REPO="$R/d_aus" AF_WORK_ROOT="$R/w_aus" AF_SNAPSHOT_ROOT=/tmp/e18snap-ausserhalb/beleg AF_NO_PUSH=true > "$H/g_aus.log"
++# SEIT NB2 ist das kein blosser Hinweis mehr, sondern ein VERTRAGSBRUCH mit lautem Abbruch: eine
++# Wurzel, die der 288-Writeback nie committen kann, darf keinen gruenen Job erzeugen (Codex MITTEL-2).
++pruef "Wurzel ausserhalb eines Arbeitsbaums: RC" "$?" "1"
+ grep -q "liegt in KEINEM git-Arbeitsbaum" "$H/g_aus.log" && ok "Wurzel ausserhalb eines Arbeitsbaums: literal gemeldet, kein stiller Teil-Schutz"
++grep -q "AF_SNAPSHOT_ROOT-Vertrag VERLETZT" "$H/g_aus.log" && ok "Vertragsbruch fuehrt zum Abbruch statt zu stillem Gruen"
++pruef "kein Beleg ausserhalb des 288-Baums" "$([ -e /tmp/e18snap-ausserhalb/beleg/QUELLSTAND.txt ] && echo ja || echo nein)" "nein"
+ 
+ echo
+ if [ "$FEHLER" -eq 0 ]; then echo "=== PROBEN GRUEN: alle Pfade belegt (0 Abweichungen) ==="; exit 0; fi
+diff --git a/docs/sessions/backups/20260806-e18-snap/gitlab-ci-delta.patch b/docs/sessions/backups/20260806-e18-snap/gitlab-ci-delta.patch
+index 295f327d..7be561ed 100644
+--- a/docs/sessions/backups/20260806-e18-snap/gitlab-ci-delta.patch
++++ b/docs/sessions/backups/20260806-e18-snap/gitlab-ci-delta.patch
+@@ -1,3 +1,5 @@
++diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
++index 3e0f720..f0fd28f 100644
+ --- a/.gitlab-ci.yml
+ +++ b/.gitlab-ci.yml
+ @@ -837,8 +837,9 @@ measure:golden-320:
+@@ -56,7 +58,7 @@
+        AF_DEST_REPO="$THESIS_CLONE" \
+        AF_BRANCH="development" \
+        AF_LANGS="de,en" \
+-@@ -1095,29 +1126,80 @@ anhang:forward:
++@@ -1095,29 +1126,97 @@ anhang:forward:
+        AF_PROV_PIPELINE_URL="${CI_PIPELINE_URL:-NA}" \
+        AF_PROV_SUPER_SHA="${CI_COMMIT_SHA:-NA}" \
+        AF_PROV_SUPER_REF="${CI_COMMIT_REF_NAME:-NA}" \
+@@ -86,19 +88,36 @@
+ +        echo "=== anhang:forward OK: Gitlink aktuell + kein neuer Schnappschuss -> kein Bump-Commit ==="; exit 0
+        fi
+ +      # VOLLSTAENDIGKEITS-WACHE: ein Compile-Beleg ist nur mit ALLEN DREI Pflichtstuecken wahr
+-+      # (<haupt>.pdf + compile-export.txt + QUELLSTAND.txt). Ein halber Ordner wird NICHT gestagt,
+-+      # sondern bricht LAUT ab: im Repo saehe er vollstaendig aus und belegte einen Compile, den es
+-+      # so nie gab. Geprueft werden nur Ordner mit ausstehender Aenderung -- bereits committete
+-+      # Belege bleiben unangetastet (Messdaten-Doktrin).
+++      # (<haupt>.pdf + compile-export.txt + QUELLSTAND.txt) UND einer 40-stelligen thesis_commit_sha.
+++      # Ein halber Ordner wird NICHT gestagt, sondern bricht LAUT ab: im Repo saehe er vollstaendig
+++      # aus und belegte einen Compile, den es so nie gab. Geprueft werden nur Ordner mit
+++      # ausstehender Aenderung -- bereits committete Belege bleiben unangetastet (Messdaten-Doktrin).
+++      # Dieselben Pflichtstuecke prueft der Kern in seinem gemeinsamen Beleg-Validator; hier steht
+++      # die zweite, unabhaengige Instanz derselben Regel (der Writeback ist die letzte Wache vor dem Repo).
+ +      for snap in "$SNAP_DIR"/*/; do
+ +        [ -d "$snap" ] || continue
+ +        [ -n "$(git status --porcelain -uall -- "$snap")" ] || continue
+-+        if [ "$(find "$snap" -maxdepth 1 -type f -name '*.pdf' | wc -l)" -lt 1 ] || [ ! -s "$snap/compile-export.txt" ] || [ ! -s "$snap/QUELLSTAND.txt" ]; then
+-+          echo "FEHLER: unvollstaendiger Compile-Schnappschuss '$snap' -- erwartet <haupt>.pdf + compile-export.txt + QUELLSTAND.txt:" >&2
+++        if [ "$(find "$snap" -maxdepth 1 -type f -name '*.pdf' | wc -l)" -lt 1 ] || [ ! -s "$snap/compile-export.txt" ] || [ ! -s "$snap/QUELLSTAND.txt" ] || ! grep -qE '^thesis_commit_sha=[0-9a-f]{40}$' "$snap/QUELLSTAND.txt"; then
+++          echo "FEHLER: unvollstaendiger Compile-Schnappschuss '$snap' -- erwartet <haupt>.pdf + compile-export.txt + QUELLSTAND.txt mit thesis_commit_sha=<40-hex>:" >&2
+ +          find "$snap" -maxdepth 1 -type f | sed 's/^/  /' >&2
+ +          echo "       NICHTS wird gestagt (kein halber Beleg im Repo)." >&2; exit 1
+ +        fi
+ +      done
+++      # .tmp-RESTE: der Kern baut jeden Schnappschuss transaktional in ".<name>.tmp" auf und zieht ihn
+++      # erst nach bestandener Pruefung ATOMAR auf den Endnamen; sein trap raeumt eigene Reste weg.
+++      # Ueberlebt ein Rest trotzdem (SIGKILL des Runners), ist er ein HALBSTAND -- er darf niemals
+++      # per `git add` in das Repo geraten. Die Schleife oben sieht ihn nicht (Punkt-Praefix), darum
+++      # hier explizit: melden und ENTFERNEN (der Rest gehoert keinem lebenden Lauf mehr, es ist kein
+++      # Messdatum und kein Beleg, sondern ein abgebrochener Schreibvorgang).
+++      for rest in "$SNAP_DIR"/.*.tmp; do
+++        [ -d "$rest" ] || continue
+++        echo "WARNUNG: abgebrochener Schnappschuss-Halbstand gefunden -> wird NICHT gestagt: $rest" >&2
+++        find "$rest" -maxdepth 1 -type f | sed 's/^/  /' >&2
+++        rm -rf -- "$rest"
+++      done
+++      # PENDING-<LAUF-KENNUNG>.txt (Recovery-Identitaet des Kerns) liegt als DATEI direkt in
+++      # $SNAP_DIR und wird vom `git add` unten mitgenommen -- genau so ist es gewollt: nur wenn diese
+++      # Datei im 288-Repo landet, weiss ein spaeterer Lauf, welchem 289-Stand ein Beleg fehlt.
+        git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
+        git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+        git fetch origin "$CI_COMMIT_BRANCH"

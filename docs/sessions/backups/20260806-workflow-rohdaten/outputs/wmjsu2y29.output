@@ -1,0 +1,38 @@
+{
+  "summary": "Codex-Zweitlens fuer die A1-Scheibe (0b5ed557, wt-b-a1)",
+  "agentCount": 1,
+  "logs": [],
+  "result": {
+    "codex": "lens='codex'\nSession: threadId 019fd65d-9317-7f82-a229-b8373bf9d249 · cwd /home/comdare/wt-b-a1 · Probe OK\n\nBefunde (wörtlich):\n\n- **HOCH** – [axis_06_allocator_strategy_base.hpp:153](/home/comdare/wt-b-a1/libs/cache_engine/axes/alloc/axis_06_allocator_strategy_base.hpp:153), [axis_06_allocator_pool_resource.hpp:97](/home/comdare/wt-b-a1/libs/cache_engine/axes/alloc/axis_06_allocator_pool_resource.hpp:97): Die Tier-DLL-Semantik ändert sich, aber kein produktives `algo_version`-/Fingerprint-Glied wird invalidiert. Da der Source-Hash derzeit leer ist, kann ein vor diesem Commit gebautes Binary mit identischem Fingerprint wiederverwendet werden und behält die alten nullptr-UB-, Leck- und Pool-Wurfpfade. Es fehlt ein cachewirksamer Versions-Bump für alle betroffenen Allokatorvarianten bzw. ein gemeinsamer Vertragsstempel.\n\n- **MITTEL** – [axis_06_allocator_strategy_base.hpp:298](/home/comdare/wt-b-a1/libs/cache_engine/axes/alloc/axis_06_allocator_strategy_base.hpp:298): Der PMR-Adapter darf `nullptr` auch für `bytes == 0` nicht zurückgeben. `memory_resource::do_allocate` verlangt einen Zeiger auf allozierten Speicher oder einen Wurf; anders als `StdAllocatorAdapter::allocate(0)` besitzt PMR keine Nullgrößen-Ausnahme. Der neue Test zementiert das falsche Oracle und ruft anschließend sogar `deallocate(nullptr, 0, ...)` auf. PMR muss bei jedem `nullptr` werfen; raw/Std dürfen ihre Zero-Size-Ausnahme behalten.\n\n- **MITTEL** – [axis_04_node_type_layout_aware_store.hpp:276](/home/comdare/wt-b-a1/libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:276), [axis_04_node_type_layout_aware_store.hpp:665](/home/comdare/wt-b-a1/libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp:665): Neuer Compile-Regress für strukturell konforme Allokatoren. Der Store verlangt nur `AllocatorStrategy<A>`, das Concept fordert aber weder CRTP-Ableitung noch `allocate_or_throw`. Ein zuvor funktionierendes, das Concept erfüllendes `A` mit den bereits benötigten Std-Adapter-Methoden scheitert nun mit „no member named allocate_or_throw\". Die registrierten CRTP-Varianten sind nicht betroffen.\n\n`copy_from_`: **OHNE BEFUND**. Bereits eingetragene Chunks werden genau einmal freigegeben; Konstruktor-Unwinding verursacht keinen Double-free. Nach fehlgeschlagener Zuweisung bleibt ein gültiger leerer Store zurück – Basic, nicht Strong Guarantee. Pool-`allocate`/`reallocate`, Überlaufwache und erfolgreiche Nicht-Null-Pfade zeigen keinen weiteren semantischen Befund. Literal instruktions-/timingneutral sind die Erfolgspfade wegen zusätzlicher Prüfungen und EH-Code allerdings nicht."
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "review:codex",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a91d371382ef6b828",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786007868070,
+      "queuedAt": 1786007868069,
+      "attempt": 1,
+      "lastToolName": "mcp__codex__codex",
+      "lastToolSummary": "Review Commit 0b5ed557 (ce): A1-Wurf-Vertrag -- PmrResource…",
+      "promptPreview": "CODEX-Orchestrierungs-Lens. ToolSearch mcp__codex__codex; PROBE ('Antworte NUR mit OK'), bei Fehler lens='codex-AUSFALL' woertlich. Review-Session cwd='/home/comdare/wt-b-a1' (bwrap-Fallback: git show 0b5ed557 INLINE), approval-policy='never', sandbox='danger-full-access', NUR-LESE: 'Review Commit 0b5ed557 (ce): A1-Wurf-Vertrag -- PmrResourceAdapter nullptr->bad_alloc, StdAllocatorAdapter n*sizeof…",
+      "lastProgressAt": 1786008703722,
+      "tokens": 26122,
+      "toolCalls": 3,
+      "durationMs": 835652,
+      "resultPreview": "lens='codex'\nSession: threadId 019fd65d-9317-7f82-a229-b8373bf9d249 · cwd /home/comdare/wt-b-a1 · Probe OK\n\nBefunde (wörtlich):\n\n- **HOCH** – [axis_06_allocator_strategy_base.hpp:153](/home/comdare/wt-b-a1/libs/cache_engine/axes/alloc/axis_06_allocator_strategy_base.hpp:153), [axis_06_allocator_pool_resource.hpp:97](/home/comdare/wt-b-a1/libs/cache_engine/axes/alloc/axis_06_allocator_pool_resource…"
+    }
+  ],
+  "totalTokens": 26122,
+  "totalToolCalls": 3
+}

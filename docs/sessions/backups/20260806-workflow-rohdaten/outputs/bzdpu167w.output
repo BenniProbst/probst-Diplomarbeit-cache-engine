@@ -1,0 +1,6 @@
+BUILD_RC=0
+[16/21] Linking CXX static library 04_csv_to_latex/libcomdare_csv_to_latex.a
+[17/21] Linking CXX static library 05_diagram_generator/libcomdare_diagram_generator.a
+[18/21] Linking CXX executable 05_diagram_generator/diagram-generator
+[19/21] Building CXX object 05_diagram_generator/CMakeFiles/test_05_diagram_generator_cached_fixtures.dir/tests/test_05_diagram_generator_cached_fixtures.cpp.o
+[20/21] Linking CXX executable 05_diagram_generator/test_05_diagram_generator_cached_fixtures

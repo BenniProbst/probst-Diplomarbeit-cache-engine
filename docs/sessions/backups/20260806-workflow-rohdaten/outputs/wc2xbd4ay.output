@@ -1,0 +1,38 @@
+{
+  "summary": "Codex-Zweitlens B14/KF-6 (b14-golden-kf6: 71617a1b+6558c4ae+d8073913, wt-b14-golden)",
+  "agentCount": 1,
+  "logs": [],
+  "result": {
+    "codex": "lens='codex' — Codex-Review der 3 Commits eb3d285a..HEAD auf b14-golden-kf6 abgeschlossen (NUR-LESE, kein Bau, Arbeitsbaum sauber). Ergebnis: NICHT OHNE BEFUND. Befunde wörtlich:\n\n- **HOCH — /home/comdare/wt-b14-golden/Code/test_data_xml/experiment_golden_kern.xml:185:** `N=2^17` ist in dieser XML nicht kodiert. `template mode=\"full\"` besitzt keinen Verweis auf `all_axes_golden`; zugleich bedeutet „ungenannt\" volle Registry und nur zwei Achsen werden genannt. Die Registry-Fächer sind vielfach größer als 2. Der reale CI-Trigger zeigt weiterhin direkt auf `all_axes_golden.profile.xml` (/home/comdare/wt-b14-golden/.gitlab-ci.yml:1152). Damit ist `524288` aus dieser Trigger-XML weder deklarativ noch operativ herleitbar. Zusätzlich sind die vorbestehenden Werte `binary_search linear_search` an Zeile 156 keine Namen der gepinnten CE-Registry; der Code-Validator würde sie ablehnen.\n\n- **HOCH — /home/comdare/wt-b14-golden/Code/tests/fixture_schema_subset_check.cmake:138:** Für Instanzen fehlt eine Nichtleer-/Wohlgeformtheitsprüfung. Eine leere oder passend abgeschnittene vorhandene XML ergibt keine unbekannten Namen und wird an Zeile 163 als `OK` gemeldet — stumm-grüner Wachverlust.\n\n- **MITTEL — /home/comdare/wt-b14-golden/Code/test_data_xml/experiment_golden_kern.xml:185:** Selbst unter Annahme der externen `2^17`-Basis sind `4 × 2^17 = 524288` nur eindeutige Organ-/Cacheline-`binary_id`s. Der Systemblock multipliziert die Bau-Matrix zusätzlich mit `2 × 2 × 1 = 4` (Zeile 241). Nach zukünftigem Konsum wären es daher `4 × 4 × 2^17 = 2.097.152` System-Bauvarianten. F-3 trägt danach korrekt nur Faktor 1 bei.\n\n- **MITTEL — /home/comdare/wt-b14-golden/Code/tests/fixture_schema_subset_check.cmake:58:** Der Kommentar-Strip ist umgehbar: Ein gültiges `<!--` innerhalb von CDATA wird fälschlich als Kommentarstart behandelt und kann aktives unbekanntes Markup ausblenden. Zusätzlich endet der Tag-Regex an Zeile 105 am ersten `>`, obwohl `>` in einem quotierten Attributwert zulässig ist; nachfolgende unbekannte Attribute werden nicht gesehen.\n\n- **MITTEL — /home/comdare/wt-b14-golden/Code/tests/fixture_schema_subset_check.cmake:44:** Fehlendes `SCHEMA`, `MASTER` oder `FIXTURE` wird als CTest-Skip behandelt. Insbesondere Rename/Löschung der repo-eigenen XSD oder Master-Datei deaktiviert die Wache, statt hart fehlzuschlagen.\n\nEinordnung der vier Fokusfragen (wörtlich):\n- XSD-Additivität: **OHNE BEFUND.** `organ_subaxes` ist optional und separat typisiert. Alle vier vorhandenen v1/v2-Instanzen validieren weiterhin gegen die XSD.\n- Subset-Richtung: korrekt `MASTER ⊆ XSD` und `FIXTURE ⊆ XSD`; keine Beziehung `FIXTURE ⊆ MASTER` und keine Rückrichtung.\n- 17→18: korrekt sind 17 zweifache Achsen plus `persistence_target ×1 = 2^17`.\n- F-3: **OHNE BEFUND.** Eine Vollmengen-Combo ergibt eine CEB-Lane.\n- Hinweis: Der neue `organ_subaxes`-Block ist aktuell wirkungslos, weil `parse_experiment_profile` ihn nicht liest.\n\nCodex-threadId: 019fd661-4766-7883-89cf-6d1f5a52dda9"
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "review:codex",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a6d9fa79682e8cf14",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1786008108775,
+      "queuedAt": 1786008108775,
+      "attempt": 1,
+      "lastToolName": "mcp__codex__codex",
+      "lastToolSummary": "NUR-LESE-Review, keinerlei Schreiboperationen, kein Build a…",
+      "promptPreview": "CODEX-Orchestrierungs-Lens. ToolSearch mcp__codex__codex; PROBE ('Antworte NUR mit OK'), bei Fehler lens='codex-AUSFALL' woertlich. Review-Session cwd='/home/comdare/wt-b14-golden' (bwrap-Fallback: Diffs INLINE), approval-policy='never', sandbox='danger-full-access', NUR-LESE: 'Review der 3 Commits auf b14-golden-kf6 (git log/diff eb3d285a..HEAD, super-Repo): B14 GOLDEN-XML-Pflege (17->18), KF-6 l…",
+      "lastProgressAt": 1786008825877,
+      "tokens": 26837,
+      "toolCalls": 3,
+      "durationMs": 717102,
+      "resultPreview": "lens='codex' — Codex-Review der 3 Commits eb3d285a..HEAD auf b14-golden-kf6 abgeschlossen (NUR-LESE, kein Bau, Arbeitsbaum sauber). Ergebnis: NICHT OHNE BEFUND. Befunde wörtlich:\n\n- **HOCH — /home/comdare/wt-b14-golden/Code/test_data_xml/experiment_golden_kern.xml:185:** `N=2^17` ist in dieser XML nicht kodiert. `template mode=\"full\"` besitzt keinen Verweis auf `all_axes_golden`; zugleich bedeutet…"
+    }
+  ],
+  "totalTokens": 26837,
+  "totalToolCalls": 3
+}

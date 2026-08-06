@@ -1,0 +1,549 @@
+diff --git a/libs/cache_engine/builder/bestandslog/batch_planner.hpp b/libs/cache_engine/builder/bestandslog/batch_planner.hpp
+index 8667bfba..decbc3a9 100644
+--- a/libs/cache_engine/builder/bestandslog/batch_planner.hpp
++++ b/libs/cache_engine/builder/bestandslog/batch_planner.hpp
+@@ -16,15 +16,26 @@
+ //
+ // DOKTRIN: header-only C++23, ASCII-Kommentare (§ erlaubt), nur stdlib + slice_queue.hpp. Der
+ // Planer-Thread ist I/O-/Koordinations-Ebene (kein Hot-Path) -> std::function-Praedikat zulaessig.
++//
++// T2-A/F4 (2026-08-06, Owner-KERN Zaehler-Resume): dazu kommt die PLAN-ABLAGE -- <filesystem>/<fstream>
++// stehen ab hier in der Include-Liste. Das bleibt innerhalb der Doktrin (reine stdlib) und innerhalb der
++// Ebene (der Planer ist die I/O-/Koordinations-Ebene); ein Hot-Path wird nicht beruehrt.
+ 
+ #include "bestandslog_document.hpp" // BatchTyp
+ #include "slice_queue.hpp"
+ 
+ #include <algorithm>
++#include <cstddef>
+ #include <cstdint>
++#include <filesystem> // T2-A/F4: die Plan-/Zaehler-Ablage (Koordinations-Ebene, kein Hot-Path)
++#include <fstream>    // T2-A/F4: dito -- Plan schreiben, Zaehler lesen/schreiben
+ #include <functional>
++#include <iterator> // T2-A/F4: istreambuf_iterator (Datei am Stueck lesen)
++#include <optional> // T2-A/F4: fail-closed Rueckgaben der Plan-/Zaehler-Leser
+ #include <span>
+ #include <string>
++#include <string_view>
++#include <system_error>
+ #include <thread>
+ #include <unordered_set>
+ #include <utility>
+@@ -83,10 +94,298 @@ using PresencePredicate = std::function<bool(std::uint64_t index)>;
+     return true;
+ }
+ 
++// ===========================================================================
++// T2-A/F4 -- DER PLAN IST EIN DOKUMENT, KEIN STROM (Owner-KERN Zaehler-Resume, Ledger abend-10:
++// "Batch-Plan (Reihenfolge+Faecher) PERSISTENT VOR dem Lauf, Resume = Zaehler je Phase
++// [kompiliert/separat gemessen] gegen den Plan").
++//
++// WARUM. Bis hierher ENTSTAND der Plan waehrend er verbraucht wurde: der Producer erkannte ein Fenster
++// und schob es sofort weiter (Codex-Befund K1: "batch_planner.hpp:87 streamt sofort"). Damit gab es zu
++// keinem Zeitpunkt ein Objekt, gegen das ein zweiter Lauf sich haette ausrichten koennen -- die einzige
++// Ordnungs-Zahl war ein laufender Zaehler, der VOR Bau und Messung hochlief und Fehlversuche mitzaehlte.
++// Ein Abbruch hinterliess deshalb keine beantwortbare Frage "wo stand ich": weder die Reihenfolge noch
++// die Faecher waren nach dem Prozess-Ende noch irgendwo hinterlegt.
++//
++// WAS SICH AENDERT. Der Plan wird VOLLSTAENDIG konsolidiert, BEVOR das erste Fach die Queue erreicht,
++// und (wo eine Ablage benannt ist) VOR dem Lauf geschrieben. Der Strom bleibt ein Strom -- der Consumer
++// zieht weiter Fach fuer Fach und beginnt, bevor der Producer fertig ist (B22 bleibt gueltig; es ist die
++// PUSH-Phase, die ueberlappt). Was faellt, ist allein die Vorstellung, der Plan sei erst am Ende bekannt.
++//
++// DIE FORM ist die des Resume-Stempels und nicht eine zweite: ein Kopf aus "|feld=wert"-Gliedern, dann
++// DER Schwanz-Schluessel mit der Zahl der folgenden Zeilen. Dieser Schluessel wird HEREINGEREICHT
++// (kLazyResumeRowsKey, cache_engine_builder_iterator.hpp) -- exakt wie MessFormatFakten::rows_key ihn
++// dem Status-Leser hereinreicht. Ein zweites Literal "|rows=" entstuende sonst genau dort, wo die
++// W5-Hebung es gerade beseitigt hat, und die Abhaengigkeits-Richtung (Iterator -> Bestandslog) verbietet
++// den Zugriff von hier aus.
++//
++// FAIL-CLOSED: jede Abweichung -- fremder Stempel, andere Zeilenzahl, unparsbare Zahl, Zaehler groesser
++// als der Plan -- ergibt "kein Resume-Anspruch" (nullopt) und damit einen ehrlichen Voll-Lauf. Dieselbe
++// Doktrin wie lazy_try_resume_binary: es gibt keine stillen Teil-Uebernahmen.
++// ===========================================================================
++
++// Die Format-Marke der Plan-Ablage. v1 = Erst-Einfuehrung (T2-A/F4). Ein Bump invalidiert Alt-Plaene
++// ueber den Praefix-Vergleich -- wie beim Resume-Stempel, aus demselben Grund.
++inline constexpr char kBatchPlanFormat[] = "batchplan-v1";
++
++// EIN FACH des Plans: das Fenster [begin, begin+count) im Index-Raum des Planers + die Zahl der darin
++// beim Planen als FEHLEND erkannten Atome. `offen` ist bewusst nur eine Zahl: das Dokument haelt die
++// ORDNUNG und die FAECHER fest (Owner-Wortlaut), nicht die Miss-Liste -- die ist Lauf-Zustand und wird
++// beim naechsten Lauf ohnehin frisch erhoben (das Lager kann sich zwischen zwei Laeufen bewegt haben).
++struct PlanFach {
++    std::uint64_t begin = 0;
++    std::uint64_t count = 0; ///< Zahl der Plan-Atome (Binaries) dieses Fachs -- die Zaehl-Einheit
++    std::uint64_t offen = 0; ///< davon beim Planen fehlend (Momentaufnahme, kein Anspruch)
++
++    friend bool operator==(PlanFach const&, PlanFach const&) = default;
++};
++
++// DIE ZAEHLER JE PHASE. Beide zaehlen ATOME (Binaries), nicht Faecher -- ein Fach ist die Resume-KOERNUNG,
++// das Atom ist die Zaehl-EINHEIT; zwei Groessen, die man nicht vermischen darf.
++//   kompiliert : Atome, deren Bau in einem frueheren Lauf VOLLSTAENDIG und FEHLERFREI abgeschlossen ist.
++//   gemessen   : Atome, deren Messung abgeschlossen ist. Sie wird SEPARAT hochgezaehlt, weil Bau und
++//                Messung in dieser Maschinerie getrennte Laeufe sind (Owner: "kompiliert/separat
++//                gemessen"); ein Bau-Lauf beruehrt `gemessen` nie und umgekehrt.
++// BEIDE werden erst NACH dem Vollzug fortgeschrieben und NIE fuer einen Fehlversuch -- das ist der Kern
++// des Befunds K1 ("IDs vor Bau/Messung gezaehlt inkl. Fehlversuche"). Ein Zaehler, der vor der Arbeit
++// hochlaeuft, behauptet Arbeit, die es nicht gibt.
++struct PhasenZaehler {
++    std::uint64_t kompiliert = 0;
++    std::uint64_t gemessen   = 0;
++
++    friend bool operator==(PhasenZaehler const&, PhasenZaehler const&) = default;
++};
++
++// Summe der Plan-Atome (die Bezugsgroesse beider Zaehler).
++[[nodiscard]] inline std::uint64_t plan_atome(std::vector<PlanFach> const& faecher) noexcept {
++    std::uint64_t n = 0;
++    for (auto const& f : faecher) n += f.count;
++    return n;
++}
++
++// DER RESUME-PUNKT: wie viele FUEHRENDE Faecher deckt der Zaehler vollstaendig ab? Ein nur TEILWEISE
++// abgedecktes Fach wird bewusst NICHT uebersprungen -- der Plan ist ein Praefix-Resume, und ein halbes
++// Fach zur Haelfte zu ueberspringen hiesse raten, welche Haelfte. Der Nachbau eines schon gebauten Atoms
++// ist billig (dll_is_current/das .fingerprint-Sidecar fangen ihn als Skip ab); eine uebersprungene, aber
++// nie gebaute Binary waere ein Loch in der Matrix.
++[[nodiscard]] inline std::size_t plan_resume_faecher(std::vector<PlanFach> const& faecher,
++                                                     std::uint64_t                zaehler) noexcept {
++    std::uint64_t kumuliert = 0;
++    std::size_t   n         = 0;
++    for (auto const& f : faecher) {
++        if (kumuliert + f.count > zaehler) break;
++        kumuliert += f.count;
++        ++n;
++    }
++    return n;
++}
++
+ // ---------------------------------------------------------------------------
+-// BatchPlanner -- EIN Producer-Thread. Laeuft ueber alle Fenster, filtert per Paritaet die eigenen,
+-// erkennt darin die fehlenden Binaries und schiebt nicht-leere Slices in die Queue; schliesst die
+-// Queue am Ende. Der Consumer konsumiert ab der ersten Slice (Start-vor-Fertig). Der dtor joined.
++// Die Grammatik: rendern und lesen. Der rows_key kommt von aussen (s. Kopf-Abschnitt).
++// ---------------------------------------------------------------------------
++
++[[nodiscard]] inline std::string render_batch_plan(std::string const& stamp, std::vector<PlanFach> const& faecher,
++                                                   std::string const& rows_key) {
++    std::string aus = stamp + rows_key + std::to_string(faecher.size()) + "\n";
++    for (auto const& f : faecher) {
++        aus += std::to_string(f.begin);
++        aus += ';';
++        aus += std::to_string(f.count);
++        aus += ';';
++        aus += std::to_string(f.offen);
++        aus += '\n';
++    }
++    return aus;
++}
++
++// Der Zaehler-Stand steht in DERSELBEN Ordnung: Kopf-Glieder, dann der Schwanz-Schluessel mit der Zahl
++// der Faecher, GEGEN die gezaehlt wurde. Genau diese Zahl bindet die Zaehler an den Plan -- ein Plan
++// anderer Groesse macht einen Alt-Zaehler wertlos, und das faellt beim Lesen auf statt im Betrieb.
++[[nodiscard]] inline std::string render_phasen_zaehler(std::string const& stamp, PhasenZaehler const& z,
++                                                       std::size_t fach_zahl, std::string const& rows_key) {
++    return stamp + "|kompiliert=" + std::to_string(z.kompiliert) + "|gemessen=" + std::to_string(z.gemessen) +
++           rows_key + std::to_string(fach_zahl) + "\n";
++}
++
++namespace detail {
++// std::stoull ohne Wurf-Pfad: eine Zahl, die nicht VOLLSTAENDIG aus Ziffern besteht, ist keine.
++[[nodiscard]] inline std::optional<std::uint64_t> nur_ziffern_zu_u64(std::string_view s) noexcept {
++    if (s.empty() || s.size() > 20) return std::nullopt;
++    std::uint64_t w = 0;
++    for (char const c : s) {
++        if (c < '0' || c > '9') return std::nullopt;
++        std::uint64_t const ziffer = static_cast<std::uint64_t>(c - '0');
++        if (w > (~std::uint64_t{0} - ziffer) / 10) return std::nullopt; // Ueberlauf ist keine Zahl
++        w = w * 10 + ziffer;
++    }
++    return w;
++}
++} // namespace detail
++
++// Liest die Faecher aus dem Dokument-Text. Erwarteter Stempel + rows_key muessen exakt passen.
++[[nodiscard]] inline std::optional<std::vector<PlanFach>>
++parse_batch_plan(std::string const& text, std::string const& stamp, std::string const& rows_key) {
++    std::size_t const nl = text.find('\n');
++    if (nl == std::string::npos) return std::nullopt;
++    std::string kopf = text.substr(0, nl);
++    while (!kopf.empty() && kopf.back() == '\r') kopf.pop_back();
++    if (kopf.size() <= stamp.size() + rows_key.size()) return std::nullopt;
++    if (kopf.compare(0, stamp.size(), stamp) != 0) return std::nullopt;                  // fremder Plan
++    if (kopf.compare(stamp.size(), rows_key.size(), rows_key) != 0) return std::nullopt; // fremdes Format
++    auto const soll = detail::nur_ziffern_zu_u64(std::string_view{kopf}.substr(stamp.size() + rows_key.size()));
++    if (!soll.has_value()) return std::nullopt;
++
++    std::vector<PlanFach> faecher;
++    std::size_t           pos = nl + 1;
++    while (pos < text.size()) {
++        std::size_t const ende  = text.find('\n', pos);
++        std::string       zeile = text.substr(pos, ende == std::string::npos ? std::string::npos : ende - pos);
++        pos                     = (ende == std::string::npos) ? text.size() : ende + 1;
++        while (!zeile.empty() && zeile.back() == '\r') zeile.pop_back();
++        if (zeile.empty()) continue;
++        std::size_t const t1 = zeile.find(';');
++        if (t1 == std::string::npos) return std::nullopt;
++        std::size_t const t2 = zeile.find(';', t1 + 1);
++        if (t2 == std::string::npos) return std::nullopt;
++        auto const b = detail::nur_ziffern_zu_u64(std::string_view{zeile}.substr(0, t1));
++        auto const c = detail::nur_ziffern_zu_u64(std::string_view{zeile}.substr(t1 + 1, t2 - t1 - 1));
++        auto const o = detail::nur_ziffern_zu_u64(std::string_view{zeile}.substr(t2 + 1));
++        if (!b.has_value() || !c.has_value() || !o.has_value()) return std::nullopt;
++        if (*o > *c) return std::nullopt; // mehr offen als gross: das Dokument widerspricht sich
++        faecher.push_back(PlanFach{*b, *c, *o});
++    }
++    if (faecher.size() != static_cast<std::size_t>(*soll)) return std::nullopt; // abgeschnitten/angehaengt
++    return faecher;
++}
++
++// Liest den Zaehler-Stand. `faecher` ist der GERADE geplante Stand -- der Zaehler gilt nur gegen ihn.
++[[nodiscard]] inline std::optional<PhasenZaehler> parse_phasen_zaehler(std::string const&           text,
++                                                                       std::string const&           stamp,
++                                                                       std::vector<PlanFach> const& faecher,
++                                                                       std::string const&           rows_key) {
++    std::size_t const nl    = text.find('\n');
++    std::string       zeile = text.substr(0, nl == std::string::npos ? text.size() : nl);
++    while (!zeile.empty() && zeile.back() == '\r') zeile.pop_back();
++    if (zeile.compare(0, stamp.size(), stamp) != 0) return std::nullopt;
++    std::string const kompiliert_schluessel = "|kompiliert=";
++    std::string const gemessen_schluessel   = "|gemessen=";
++    std::size_t const p_k                   = zeile.find(kompiliert_schluessel, stamp.size());
++    if (p_k != stamp.size()) return std::nullopt; // Feld-Ordnung ist Teil des Formats
++    std::size_t const p_g = zeile.find(gemessen_schluessel, p_k + kompiliert_schluessel.size());
++    if (p_g == std::string::npos) return std::nullopt;
++    std::size_t const p_r = zeile.find(rows_key, p_g + gemessen_schluessel.size());
++    if (p_r == std::string::npos) return std::nullopt;
++
++    auto const k = detail::nur_ziffern_zu_u64(
++        std::string_view{zeile}.substr(p_k + kompiliert_schluessel.size(), p_g - (p_k + kompiliert_schluessel.size())));
++    auto const g = detail::nur_ziffern_zu_u64(
++        std::string_view{zeile}.substr(p_g + gemessen_schluessel.size(), p_r - (p_g + gemessen_schluessel.size())));
++    auto const fach_zahl = detail::nur_ziffern_zu_u64(std::string_view{zeile}.substr(p_r + rows_key.size()));
++    if (!k.has_value() || !g.has_value() || !fach_zahl.has_value()) return std::nullopt;
++    if (*fach_zahl != faecher.size()) return std::nullopt; // gegen einen ANDEREN Plan gezaehlt
++    std::uint64_t const atome = plan_atome(faecher);
++    if (*k > atome || *g > atome) return std::nullopt; // mehr getan als geplant: unglaubwuerdig
++    if (*g > *k) return std::nullopt;                  // gemessen ohne gebaut gibt es nicht
++    return PhasenZaehler{*k, *g};
++}
++
++// ---------------------------------------------------------------------------
++// Die Ablage. ATOMAR (schreiben nach .tmp, dann rename): ein abgebrochener Schreibvorgang darf keinen
++// halben Plan hinterlassen, den der Folgelauf fuer einen ganzen haelt. rename ist auf einem Dateisystem
++// die einzige Operation, die diese Zusage gibt.
++// ---------------------------------------------------------------------------
++[[nodiscard]] inline bool schreibe_atomar(std::filesystem::path const& ziel, std::string const& inhalt) {
++    std::error_code ec;
++    if (ziel.has_parent_path()) std::filesystem::create_directories(ziel.parent_path(), ec);
++    std::filesystem::path const tmp = std::filesystem::path{ziel.string() + ".tmp"};
++    {
++        std::ofstream os{tmp, std::ios::trunc | std::ios::binary};
++        if (!os) return false;
++        os << inhalt;
++        if (!os) return false;
++    }
++    std::filesystem::rename(tmp, ziel, ec);
++    if (ec) {
++        std::error_code weg;
++        std::filesystem::remove(tmp, weg);
++        return false;
++    }
++    return true;
++}
++
++[[nodiscard]] inline std::optional<std::string> lies_datei(std::filesystem::path const& p) {
++    std::error_code ec;
++    if (!std::filesystem::exists(p, ec)) return std::nullopt;
++    std::ifstream is{p, std::ios::binary};
++    if (!is) return std::nullopt;
++    return std::string{std::istreambuf_iterator<char>{is}, std::istreambuf_iterator<char>{}};
++}
++
++[[nodiscard]] inline bool write_batch_plan(std::filesystem::path const& p, std::string const& stamp,
++                                           std::vector<PlanFach> const& faecher, std::string const& rows_key) {
++    return schreibe_atomar(p, render_batch_plan(stamp, faecher, rows_key));
++}
++
++[[nodiscard]] inline std::optional<std::vector<PlanFach>>
++read_batch_plan(std::filesystem::path const& p, std::string const& stamp, std::string const& rows_key) {
++    auto const text = lies_datei(p);
++    if (!text.has_value()) return std::nullopt;
++    return parse_batch_plan(*text, stamp, rows_key);
++}
++
++[[nodiscard]] inline bool write_phasen_zaehler(std::filesystem::path const& p, std::string const& stamp,
++                                               PhasenZaehler const& z, std::size_t fach_zahl,
++                                               std::string const& rows_key) {
++    return schreibe_atomar(p, render_phasen_zaehler(stamp, z, fach_zahl, rows_key));
++}
++
++[[nodiscard]] inline std::optional<PhasenZaehler> read_phasen_zaehler(std::filesystem::path const& p,
++                                                                      std::string const&           stamp,
++                                                                      std::vector<PlanFach> const& faecher,
++                                                                      std::string const&           rows_key) {
++    auto const text = lies_datei(p);
++    if (!text.has_value()) return std::nullopt;
++    return parse_phasen_zaehler(*text, stamp, faecher, rows_key);
++}
++
++// ---------------------------------------------------------------------------
++// Die PURE Konsolidierung des B5-Plans: alle eigenen Fenster, in Reihenfolge, mit ihren Misses. Sie ist
++// aus BatchPlanner::run herausgeloest, damit "planen" und "streamen" zwei benennbare Schritte sind --
++// und damit der Plan ohne Thread und ohne Queue testbar ist.
++// ---------------------------------------------------------------------------
++[[nodiscard]] inline std::vector<BatchSlice> plan_batch_slices(std::uint64_t total, BatchTyp typ, unsigned rank,
++                                                               unsigned n_machines, PresencePredicate const& is_present,
++                                                               std::uint64_t grain = kGnBatchSlice) {
++    std::vector<BatchSlice> plan;
++    if (grain == 0) grain = kGnBatchSlice;
++    std::uint64_t const num_windows = (total + grain - 1) / grain;
++    for (std::uint64_t w = 0; w < num_windows; ++w) {
++        if (!window_belongs_to(w, rank, n_machines)) continue;
++        std::uint64_t const begin   = w * grain;
++        std::uint64_t const count   = std::min(grain, total - begin);
++        auto                missing = detect_missing_in_window(begin, count, is_present);
++        if (!missing.empty()) plan.push_back(BatchSlice{begin, count, typ, std::move(missing)});
++    }
++    return plan;
++}
++
++// Die Plan-SICHT eines B5-Slice-Plans (Dokument-Form): Fenster + Miss-Zahl, ohne die Miss-Liste.
++[[nodiscard]] inline std::vector<PlanFach> plan_faecher_sicht(std::vector<BatchSlice> const& plan) {
++    std::vector<PlanFach> aus;
++    aus.reserve(plan.size());
++    for (auto const& s : plan) aus.push_back(PlanFach{s.begin, s.count, static_cast<std::uint64_t>(s.missing.size())});
++    return aus;
++}
++
++// ---------------------------------------------------------------------------
++// BatchPlanner -- EIN Producer-Thread. Er KONSOLIDIERT ZUERST den vollen Plan (plan_batch_slices) und
++// schiebt ihn danach Fach fuer Fach in die Queue; am Ende schliesst er sie. Der Consumer konsumiert ab
++// dem ersten Fach, waehrend der Producer noch schiebt (B22 Start-vor-Fertig -- das gilt fuer die
++// PUSH-Phase; die Planungs-Phase ist ein reiner Praedikat-Durchlauf ohne Bau und ohne Messung). Der
++// dtor joined.
++//
++// T2-A/F4: das "erst planen, dann streamen" ist die Verhaltens-Aenderung dieses Pakets. Sie kostet einen
++// vollen Praedikat-Durchlauf vor dem ersten Push und liefert dafuer einen Plan, der als GANZES existiert
++// -- die Voraussetzung dafuer, dass ein Zaehler ueberhaupt "gegen den Plan" stehen kann.
+ // ---------------------------------------------------------------------------
+ class BatchPlanner {
+ public:
+@@ -108,14 +407,10 @@ public:
+ 
+ private:
+     void run() {
+-        std::uint64_t const num_windows = (grain_ == 0) ? 0 : (total_ + grain_ - 1) / grain_;
+-        for (std::uint64_t w = 0; w < num_windows; ++w) {
+-            if (!window_belongs_to(w, rank_, n_machines_)) continue;
+-            std::uint64_t const begin   = w * grain_;
+-            std::uint64_t const count   = std::min(grain_, total_ - begin);
+-            auto                missing = detect_missing_in_window(begin, count, is_present_);
+-            if (!missing.empty()) q_.push(BatchSlice{begin, count, typ_, std::move(missing)});
+-        }
++        // T2-A/F4: ERST DER PLAN. Die Fenster-Ordnung und die Faecher stehen vollstaendig fest, bevor
++        // das erste Fach die Queue erreicht -- der Strom bildet den Plan ab, statt ihn zu ERSETZEN.
++        auto plan = plan_batch_slices(total_, typ_, rank_, n_machines_, is_present_, grain_);
++        for (auto& s : plan) q_.push(std::move(s));
+         q_.close();
+     }
+ 
+diff --git a/libs/cache_engine/builder/bestandslog/planer_driven_build.hpp b/libs/cache_engine/builder/bestandslog/planer_driven_build.hpp
+index d14d525f..1cbc0ff8 100644
+--- a/libs/cache_engine/builder/bestandslog/planer_driven_build.hpp
++++ b/libs/cache_engine/builder/bestandslog/planer_driven_build.hpp
+@@ -18,18 +18,28 @@
+ // slict den GLOBALEN [0,total)-Indexraum mit Paritaet; I1b slict die SELEKTIERTE indices-Liste --
+ // beide erkennen Misses ueber DIESELBE Funktion (detect_missing_in_window, batch_planner.hpp).
+ //
++// T2-A/F4 (2026-08-06, Owner-KERN Zaehler-Resume): der Producer STREAMT NICHT MEHR WAEHREND ER PLANT. Er
++// konsolidiert den vollen Fenster-Plan, legt ihn (opt-in, PlanPersistenz) VOR dem Lauf ab und setzt beim
++// Wiederanlauf hinter den Faechern auf, die der Bau-Zaehler bereits vollstaendig deckt. Ohne benannte
++// Ablage aendert sich nur der ZEITPUNKT der Miss-Erkennung (alles vor dem ersten Push statt fensterweise)
++// -- Reihenfolge, Fenster-Schnitt und gebaute Menge bleiben identisch.
++//
+ // DOKTRIN: header-only C++23, ASCII-Kommentare (Section erlaubt), stdlib. pop()/push() thread-sicher.
+ 
+ #include "batch_planner.hpp" // detect_missing_in_window (die EINE per-Binary-Miss-Erkennung, B5)
+ 
+ #include <algorithm>
++#include <atomic> // T2-A/F4: die zwei Berichts-Werte des Planers (Plan-Groesse, Resume-Front)
+ #include <condition_variable>
+ #include <cstddef>
+ #include <cstdint>
+ #include <deque>
++#include <filesystem> // T2-A/F4: der Ablage-Pfad des Bau-Plans
+ #include <functional>
++#include <iostream> // T2-A/F4: die Nie-stumm-Zeilen der Plan-Ablage (nur std::cerr, golden-/CSV-neutral)
+ #include <mutex>
+ #include <optional>
++#include <string>
+ #include <thread>
+ #include <utility>
+ #include <vector>
+@@ -173,13 +183,80 @@ private:
+     bool                       closed_ = false;
+ };
+ 
+-// Async Producer: slict indices, scannt je Fenster die Miss-Zahl (PresenceFn), schiebt die Plaene IN
+-// REIHENFOLGE in die Queue, schliesst am Ende. RAII: der Thread joined im dtor (auch im Fehlerfall).
++// ---------------------------------------------------------------------------------------------------
++// T2-A/F4 -- DIE PLAN-KONSOLIDIERUNG DES PRODUKTIVEN ZWILLINGS.
++//
++// plan_alle_faecher ist der PURE Plan: alle Fenster der Selektion, in Index-Reihenfolge, je mit der
++// Miss-Zahl, die filter_window_for_build spaeter zum Bau freigibt (DIESELBE Erkennung -- EINE Wahrheit).
++// Sie ist aus SlicePlanner::run herausgeloest, damit der Plan als GANZES existiert, bevor irgendetwas
++// gebaut wird, und ohne Thread und Queue testbar ist.
++// ---------------------------------------------------------------------------------------------------
++[[nodiscard]] inline std::vector<BuildSlicePlan> plan_alle_faecher(std::vector<std::size_t> const& indices,
++                                                                   std::size_t grain, PresenceFn const& present) {
++    std::vector<BuildSlicePlan> plan;
++    for (auto& window : slice_view_indices(indices, grain)) {
++        std::size_t const missing = filter_window_for_build(window, present).zu_bauen.size();
++        plan.push_back(BuildSlicePlan{std::move(window), missing});
++    }
++    return plan;
++}
++
++// Die Dokument-Sicht des Bau-Plans: Fenster-Anfang + Fenster-Groesse + Miss-Zahl. begin ist der ERSTE
++// Index des Fensters (nicht slice_window_bounds::begin -- das ist die Reservierungs-SPANNE einer evtl.
++// luecken-behafteten Menge und beantwortet eine andere Frage). Der Plan haelt die Ordnung fest, in der
++// die Fenster gebaut werden; die Reservierung haelt fest, was ein Fenster beansprucht.
++[[nodiscard]] inline std::vector<PlanFach> slice_plan_faecher(std::vector<BuildSlicePlan> const& plan) {
++    std::vector<PlanFach> aus;
++    aus.reserve(plan.size());
++    for (auto const& p : plan)
++        aus.push_back(PlanFach{p.view_indices.empty() ? 0 : static_cast<std::uint64_t>(p.view_indices.front()),
++                               static_cast<std::uint64_t>(p.view_indices.size()),
++                               static_cast<std::uint64_t>(p.missing_count)});
++    return aus;
++}
++
++// Der Stempel des Bau-Plans: GENAU die Groessen, die den Plan bestimmen. Die PresenceFn steht bewusst
++// NICHT darin -- sie ist Lager-ZUSTAND, kein Plan-Parameter; ein zwischenzeitlich gefuelltes Lager darf
++// einen Zaehler nicht entwerten, es aendert nur die Miss-Zahlen innerhalb derselben Faecher.
++[[nodiscard]] inline std::string slice_plan_stamp(std::vector<std::size_t> const& indices, std::size_t grain) {
++    return std::string{kBatchPlanFormat} +
++           "|art=bau-slice|start=" + std::to_string(indices.empty() ? std::size_t{0} : indices.front()) +
++           "|indizes=" + std::to_string(indices.size()) +
++           "|korn=" + std::to_string(grain == 0 ? kBuildSliceGrain : grain);
++}
++
++// DIE PLAN-ABLAGE-NAHT (opt-in, Muster der uebrigen bestandslog-Injektionen): leerer Pfad => inert =>
++// der Bau bleibt byte-/verhaltensidentisch zum Ist. rows_key wird vom Iterator hereingereicht
++// (kLazyResumeRowsKey) -- die Abhaengigkeits-Richtung erlaubt hier keinen Zugriff darauf, und ein
++// zweites Literal waere genau die Format-Drift, gegen die die W5-Hebung gebaut wurde.
++struct PlanPersistenz {
++    std::filesystem::path plan_datei; ///< leer => keine Ablage, kein Resume
++    std::string           stamp;      ///< slice_plan_stamp(...) dieses Laufs
++    std::string           rows_key;   ///< == ex::kLazyResumeRowsKey
++
++    [[nodiscard]] bool aktiv() const noexcept { return !plan_datei.empty() && !stamp.empty() && !rows_key.empty(); }
++    /// Der Zaehler-Stand liegt NEBEN dem Plan (abgeleiteter Name, eine Quelle): <plan>.zaehler
++    [[nodiscard]] std::filesystem::path zaehler_datei() const {
++        return std::filesystem::path{plan_datei.string() + ".zaehler"};
++    }
++};
++
++// Async Producer: KONSOLIDIERT ZUERST den vollen Plan (plan_alle_faecher), legt ihn -- wo eine Ablage
++// benannt ist -- VOR dem ersten Push auf die Platte, ueberspringt die vom Bau-Zaehler bereits
++// vollstaendig gedeckten FUEHRENDEN Faecher und schiebt den Rest IN REIHENFOLGE in die Queue; schliesst
++// am Ende. RAII: der Thread joined im dtor (auch im Fehlerfall).
++//
++// WARUM DER ZAEHLER `kompiliert` UND NICHT `gemessen` DIE RESUME-FRONT DIESES PLANERS IST: dieser Pfad
++// ist per planer_driven_active an provision_only gebunden -- er ist der BAU-Lauf. Seine eigene Front ist
++// die Bau-Front. `gemessen` fuehrt der SEPARATE Mess-Lauf fort (Owner: "kompiliert/separat gemessen");
++// er liest denselben Plan, aber sein feinkoerniger Resume-Arbiter ist und bleibt die per-Binary
++// result.csv+stamp-Naht (T2-A/K2) -- der Plan-Zaehler ist dort die Bilanz, nicht die zweite Autoritaet.
+ class SlicePlanner {
+ public:
+-    SlicePlanner(SlicePlanQueue& q, std::vector<std::size_t> indices, std::size_t grain, PresenceFn present)
++    SlicePlanner(SlicePlanQueue& q, std::vector<std::size_t> indices, std::size_t grain, PresenceFn present,
++                 PlanPersistenz persistenz = {})
+         : q_{q}, indices_{std::move(indices)}, grain_{grain == 0 ? kBuildSliceGrain : grain},
+-          present_{std::move(present)} {
++          present_{std::move(present)}, persistenz_{std::move(persistenz)} {
+         worker_ = std::thread([this] { run(); });
+     }
+ 
+@@ -192,22 +269,68 @@ public:
+         if (worker_.joinable()) worker_.join();
+     }
+ 
++    /// Die Zahl der Faecher des GESAMTEN Plans (inkl. der uebersprungenen). Beide Werte werden gesetzt,
++    /// BEVOR das erste Fach in die Queue geht -- ein Konsument, der bereits ein Fach gezogen hat (oder die
++    /// geschlossene Queue gesehen hat), liest sie deshalb fertig. atomar, damit diese Zusage nicht an einer
++    /// Speicher-Ordnungs-Ueberlegung haengt, sondern am Typ.
++    [[nodiscard]] std::size_t plan_faecher_zahl() const noexcept { return plan_faecher_.load(); }
++    /// Die Atome der uebersprungenen FUEHRENDEN Faecher == der Bau-Zaehlerstand, auf dem dieser Lauf aufsetzt.
++    [[nodiscard]] std::uint64_t resume_atome() const noexcept { return resume_atome_.load(); }
++    /// Die vorgefundene MESS-Front. Der Bau-Lauf schreibt sie unveraendert zurueck, statt sie auf 0 zu setzen:
++    /// er baut ausschliesslich HINTER seiner eigenen Bau-Front, ruehrt also keine bereits gemessene Binary an.
++    [[nodiscard]] std::uint64_t resume_gemessen() const noexcept { return resume_gemessen_.load(); }
++
+ private:
+     void run() {
+-        for (auto& window : slice_view_indices(indices_, grain_)) {
+-            // DIESELBE Miss-Erkennung wie der Consumer-Bau-Filter (EINE Wahrheit): missing_count ist
+-            // exakt die Zahl der Indizes, die filter_window_for_build spaeter zum Bau freigibt.
+-            std::size_t const missing = filter_window_for_build(window, present_).zu_bauen.size();
+-            q_.push(BuildSlicePlan{std::move(window), missing});
++        // (1) ERST DER PLAN -- vollstaendig, bevor ein Fach die Queue erreicht.
++        auto plan = plan_alle_faecher(indices_, grain_, present_);
++
++        // (2) DANN DIE ABLAGE + DER RESUME-PUNKT (nur mit benannter Ablage; sonst byte-identisch zum Ist).
++        std::size_t ab = 0;
++        if (persistenz_.aktiv()) {
++            auto const faecher = slice_plan_faecher(plan);
++            // Der Zaehler-Stand wird gelesen, BEVOR der Plan geschrieben wird: ein Alt-Zaehler gilt gegen
++            // den GERADE geplanten Stand (Faecher-Zahl + Atom-Summe), und die Pruefung dafuer steckt in
++            // read_phasen_zaehler. Nach dem Schreiben waere die Reihenfolge dieselbe -- die Trennung haelt
++            // aber sichtbar, dass der Zaehler den Plan NICHT mitbringt, sondern sich an ihm ausweist.
++            if (auto const z = read_phasen_zaehler(persistenz_.zaehler_datei(), persistenz_.stamp, faecher,
++                                                   persistenz_.rows_key)) {
++                ab = plan_resume_faecher(faecher, z->kompiliert);
++                resume_gemessen_.store(z->gemessen);
++            }
++            if (!write_batch_plan(persistenz_.plan_datei, persistenz_.stamp, faecher, persistenz_.rows_key))
++                // Nie-stumm: eine nicht geschriebene Plan-Ablage ist KEIN Bau-Fehler (der Bau laeuft mit
++                // dem Plan im Speicher weiter), aber sie ist auch keine Nebensache -- der naechste Lauf
++                // haette sonst still keinen Resume-Anspruch und niemand wuesste warum.
++                std::cerr << "[bestandslog] warn: Batch-Plan nicht persistiert (" << persistenz_.plan_datei.string()
++                          << ") -- der Lauf baut weiter, ein Folgelauf hat aber keinen Plan-Resume-Anspruch\n"
++                          << std::flush;
++            if (ab > 0)
++                std::cerr << "[bestandslog] plan-resume: " << ab << " von " << faecher.size()
++                          << " Faechern bereits kompiliert (Zaehler gegen den Plan) -- uebersprungen\n"
++                          << std::flush;
+         }
++
++        // (3) DIE BERICHTS-WERTE VOR DEM ERSTEN PUSH -- s. plan_faecher_zahl()/resume_atome().
++        plan_faecher_.store(plan.size());
++        std::uint64_t atome = 0;
++        for (std::size_t i = 0; i < ab; ++i) atome += static_cast<std::uint64_t>(plan[i].view_indices.size());
++        resume_atome_.store(atome);
++
++        // (4) DANN DER STROM.
++        for (std::size_t i = ab; i < plan.size(); ++i) q_.push(std::move(plan[i]));
+         q_.close();
+     }
+ 
+-    SlicePlanQueue&          q_;
+-    std::vector<std::size_t> indices_;
+-    std::size_t              grain_;
+-    PresenceFn               present_;
+-    std::thread              worker_;
++    SlicePlanQueue&            q_;
++    std::vector<std::size_t>   indices_;
++    std::size_t                grain_;
++    PresenceFn                 present_;
++    PlanPersistenz             persistenz_;
++    std::atomic<std::size_t>   plan_faecher_{0};
++    std::atomic<std::uint64_t> resume_atome_{0};
++    std::atomic<std::uint64_t> resume_gemessen_{0};
++    std::thread                worker_;
+ };
+ 
+ } // namespace comdare::cache_engine::builder::bestandslog

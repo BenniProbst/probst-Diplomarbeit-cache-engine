@@ -1,0 +1,1229 @@
+# B14-Gesamtwelle: Adversariale Pruefung zweier Diffs (super-Repo + ce-Repo)
+
+Du bist Codex-Adversar fuer eine Diplomarbeits-Codebasis (C++/CMake, XML-getriebene
+Experiment-Konfiguration fuer eine Cache-Engine-Forschung). Zwei Commits sind zu pruefen,
+in zwei separaten Git-Repos, thematisch verzahnt (super = golden-XML als autoritative
+Bauanleitung; ce = C++-Implementierung, konsumiert dieselbe golden-Semantik).
+
+## KONTEXT super-Teil (Repo "super", Commit d8073913..953ce412)
+
+golden-XML als autoritative Bauanleitung. Vorher: der Owner-Kanon "golden N = 2^17 = 131072"
+stand im kanonischen Traeger `experiment_golden_kern.xml` NUR als Fliesstext-Kommentar; die
+alte deklarierte Form (2 Achsen mit Override, 16 Achsen ungenannt = "Voll-Sweep") widersprach
+rechnerisch dem Kanon (expandierte gegen die Registry-Kardinalitaeten zu ~6e10 Binaries statt
+2^17). Der Commit heilt das:
+
+1. Neues XSD-Element `<run_options cap="131072" ...>` (RunOptionsType), Attribut-Satz
+   zeichengleich zum Schwester-Dialekt `comdare_thesis_profile` (cap Pflicht, n_ops/platform/
+   build_version/resume optional).
+2. Alle 18 Kompositions-Achsen in `experiment_golden_kern.xml` tragen jetzt explizite
+   `allowed_variants` (2 Werte je Achse, persistence_target 1) -- Produkt = 2^17 = 131072,
+   deckungsgleich zum Schwester-Traeger `all_axes_golden.profile.xml`. Registry-gepinnte
+   Variantennamen (u.a. search_algo: `k_ary interpolation` statt der alten nicht-existenten
+   Token `binary_search`/`linear_search`).
+3. Neue ctest-Kettenwache `golden_n_consistency_check.cmake`
+   (`add_test(NAME test_golden_n_consistency ...)`): vergleicht die zwei golden-Traeger
+   (comdare_experiment-Dialekt vs. comdare_thesis_profile-Dialekt) SEMANTISCH ueber die
+   Dialekt-Grenze: (1) gleiche Achsen-Menge, (2) je Achse gleiche Auspraegungs-Menge,
+   (3) gleiches Produkt, (4) Produkt == cap auf BEIDEN Seiten.
+4. `fixture_schema_subset_check.cmake` gehaertet gegen mehrere Wach-Loecher (frueherer
+   Codex-Befund, B14-Erstrunde): leere/0-Byte-XML, CDATA-Sektionen, die per `<!--` im
+   CDATA-Text den Kommentar-Strip in echtes Markup hineinlaufen liessen, `>` in
+   Attributwerten (brach den alten Tag-Regex `<[A-Za-z_][^>]*>`), truncierte/abgeschnittene
+   XML (Wurzel-Tag nie geschlossen), sowie fehlende SCHEMA-/MASTER-Datei (frueher SKIP,
+   jetzt FATAL -- SKIP ist nur noch fuer den fehlenden ce-Nachbar-Checkout reserviert).
+
+Vollstaendiger Diff (893 Zeilen) folgt unten unter DIFF-SUPER.
+
+## KONTEXT ce-Teil (Repo "ce" / cache_engine, Commit c837d830..6a40071f)
+
+`kLbufBytes`-Literal 64 an drei Mess-Pfaden in `abi_adapter.hpp` (`run_workload`,
+`run_workload_segmented`, `run_workload_segmented_v2`) durch `line_bytes_of<MemLayout>()`
+ersetzt (Konsum-Bruecke `axes/cacheline/cacheline_line_bytes.hpp`), weil KF-6 die
+Cache-Line-Unterachse jetzt vollausbaut ({32,64,128,256} statt nur Default 64) und der alte
+Puffer (16384 * 64 = 1 048 576 Byte, hartkodiertes Alignment 64) bei line_size=256 einen
+Heap-OOB haette (Faktor 4 zu klein: (16384-1)*256+4 = 4 194 052 Byte Zugriff auf einen
+1 048 576-Byte-Puffer). Aenderung je Pfad: `kLineBytes`/`kMaxStride`/`kLbufBytes` jetzt aus
+`line_bytes_of<MemLayout>()` abgeleitet (Stride = round_up(kRecordSize, kLineBytes)),
+`alloc.allocate`/`alloc.deallocate` nutzen jetzt `kLineBytes` statt Literal 64 als
+Alignment-Parameter, und je Pfad ein neuer `static_assert`, der die Puffer-Untergrenze gegen
+den groesstmoeglichen Einzel-Zugriff (kRecords-1)*kMaxStride + sizeof(uint64_t) prueft.
+Zusaetzlich: `axis_05_memory_layout_observable.hpp` bekommt eine neue
+`cacheline_subaxis_line_bytes()`-Weiterleitung (Observable-Wrapper-Huelle reichte den
+Konzept-Member der Strategie vorher NICHT durch -- `line_bytes_of<>` sah dadurch nie die
+Strategie, fiel auf den Achsen-Default 64 zurueck; bei KF-6-Belegung waere das ein STILLER
+Fehler geworden: die Ableitung haette weiter 64 gerechnet, waehrend real bei 256 gescannt
+wird -- also genau der OOB, den die Aenderung eigentlich verhindern soll, nur unsichtbar).
+
+WICHTIG, vom Owner-Agenten explizit mitgegeben: Die Commit-Message dieses ce-Commits nennt
+sich selbst "**Haelfte 1 von 2**" der KF-6-Auflage (D). Ob und wo eine "Haelfte 2" noch
+aussteht, ist NICHT Teil dieses Diffs -- das ist eine offene Frage, die du explizit
+mitbewerten sollst (siehe Frage c).
+
+### Bereits selbst verifiziert (zur Einordnung, nicht blind uebernehmen -- bitte trotzdem
+gegenpruefen, wo es dir moeglich ist):
+- `cache_engine_axis_registry.xml`: search_algo fuehrt genau `k_ary`, `interpolation`,
+  `eytzinger`, `linear_scan` (alle enabled="true", in dieser Reihenfolge) -- die ersten 2
+  sind tatsaechlich `k_ary interpolation`, wie super jetzt in `experiment_golden_kern.xml`
+  gepinnt hat.
+- `all_axes_golden.profile.xml` (`<permute_axes>`, `<run_options cap="131072" .../>`):
+  alle 18 Achsen inkl. `persistence_target` vorhanden, Werte je Achse decken sich Zeichen
+  fuer Zeichen mit den neuen `allowed_variants` in `experiment_golden_kern.xml`.
+- `xml_config_parser.hpp`/`.cpp`: `ThesisRunOptions.cap` (int, 0 = ungesetzt) wird in
+  `parse_thesis_profile` gelesen; `parse_experiment_profile` (comdare_experiment-Dialekt)
+  liest `<run_options>` NICHT (unbekannte Wurzel-Kinder werden still ignoriert) -- deckt
+  sich mit der Behauptung im super-Diff ("heute deklarativ, Leseanschluss noch offen").
+- Grep ueber das gesamte ce-Repo (ausserhalb `build/`) nach weiteren `kRecords * 64`- bzw.
+  `alloc.allocate(..., 64)`-artigen Mustern ausserhalb von `abi_adapter.hpp`: keine echten
+  Treffer im Produktionscode gefunden. ZWEI Nebenfunde, die dir zur Bewertung vorliegen
+  sollen:
+  (i) `tests/unit/test_phase_b_effective_search_algo_contrast.cpp:259` ist ein reiner
+      Doku-Kommentar, der `alloc.allocate(kLbufBytes, 64)` als Text zitiert (Erklaerung der
+      Treiber-Arithmetik) -- jetzt STALE, weil der echte Code in abi_adapter.hpp nicht mehr
+      64 uebergibt, sondern kLineBytes;
+  (ii) `tests/unit/test_obs_phaseB_t14_t16.cpp:56` hat einen EIGENEN, unabhaengigen
+      `std::array<unsigned char, kRecords * 64> buf{}` -- sieht strukturell aehnlich aus,
+      betrifft aber T14/T15/T16 (io_dispatch/migration/filter), die mit fixem
+      kRecordSize=48 lesen und NICHT ueber MemLayout/line_bytes_of skalieren; ob das
+      wirklich unbetroffen ist, bitte gegenpruefen.
+
+Vollstaendiger Diff (195 Zeilen) folgt unten unter DIFF-CE.
+
+## FRAGEN (bitte je einzeln, mit Schwere und Datei:Zeile wo anwendbar)
+
+(a) Sind die neuen/gehaerteten cmake-Wachen (fixture_schema_subset_check.cmake,
+    golden_n_consistency_check.cmake) weiterhin umgehbar -- weitere Encoding-/Parser-Tricks
+    (z.B. Entities, Multi-Byte/UTF-BOM-Kanten, verschachtelte/aufeinanderfolgende CDATA,
+    Kommentare INNERHALB von Attributwerten, Groß/Kleinschreibung von Tag-Namen, `xs:element`
+    vs. `element` Namespace-Praefixe, Attribut-Reihenfolge/Duplikate) die eine Vokabular-
+    Drift wieder unsichtbar machen koennten?
+
+(b) Ist die cap=131072-Kette (XSD RunOptionsType, experiment_golden_kern.xml run_options,
+    die 18 allowed_variants-Listen, all_axes_golden.profile.xml, xml_config_parser.hpp cap-
+    Semantik, golden_n_consistency_check.cmake) widerspruchsfrei? Insbesondere: kann die neue
+    Wache falsch-positiv oder falsch-negativ ausfallen (z.B. bei CMake-Listen-Kollisionen
+    durch `;` in Werten, bei doppelt genannten Achsen, bei Gross-/Kleinschreibungs-
+    Abweichungen zwischen den zwei Dialekten, bei der SORT-basierten Mengen-Gleichheit die
+    Duplikate uebersieht)? Ist die CI-Trigger-Wirkung (welche Aenderung diesen neuen Test
+    ausloest bzw. ob er im golden-Gesamtlauf tatsaechlich eingebunden ist) plausibel aus dem
+    Diff ersichtlich?
+
+(c) ce: ist `line_bytes_of<MemLayout>()` an ALLEN Konsumstellen konsistent abgeleitet, oder
+    gibt es eine "vierte Stelle" (oder mehr), die diese Runde verpasst hat -- eingeschlossen
+    die offene Frage, was "Haelfte 2" der KF-6-Auflage (D) noch abdecken muesste? Ist die
+    Byte-/ABI-Neutralitaet am Achsen-Default (line_bytes_of == 64) wirklich exakt gewahrt
+    (Puffergroesse, Alignment, static_assert-Grenzen)? Ist das Observable-Forwarding
+    (`cacheline_subaxis_line_bytes()` in axis_05_memory_layout_observable.hpp) vollstaendig,
+    oder gibt es weitere Observable-/Wrapper-Huellen im Konsumpfad, die denselben
+    Concept-Member noch nicht durchreichen und dieselbe Falle (stiller Fallback auf 64)
+    tragen?
+
+(d) Beliebige weitere Regressionen, Logikfehler, Off-by-One, Race-/UB-Risiken oder
+    Architektur-Widersprueche, die dir in den zwei Diffs auffallen -- unabhaengig von (a)-(c).
+
+## RUECKGABEFORMAT
+Bitte roh und auf Deutsch: fuer jeden Befund Schwere (HOCH/MITTEL/NIEDRIG), Datei:Zeile
+(super- oder ce-Repo benennen), 1-Satz-Extrakt der Begruendung, und am Ende einen
+Verdikt-Vorschlag pro Diff (z.B. "GRUEN", "NACHBESSERN", "BLOCKER").
+
+---
+
+## DIFF-SUPER (super-Repo, d8073913..953ce412)
+
+```diff
+diff --git a/Code/test_data_xml/SCHEMA.md b/Code/test_data_xml/SCHEMA.md
+index a984a8e4..d15a2673 100644
+--- a/Code/test_data_xml/SCHEMA.md
++++ b/Code/test_data_xml/SCHEMA.md
+@@ -46,6 +46,7 @@ bleiben". Daraus folgt eine feste Reihenfolge bei jeder Achsen-/Schema-Aenderung
+ 3. `experiment_golden_kern.xml` deklariert ihn und beziffert die Kardinalitaets-Folge.
+ 4. Die Wachen laufen: `xmllint --schema` (Struktur), ctest
+    `test_fixture_schema_experiment_golden_kern` (Vokabular gegen die eine XSD),
++   ctest `test_golden_n_consistency` (Deckung mit dem ce-Schwester-Traeger),
+    `validate_experiment_profile` (Registry-/Wert-Ebene, Code).
+ 
+ Eine Aenderung an dieser Datei ist ein **deklariertes Trigger-Input-Ereignis**
+@@ -72,7 +73,46 @@ diesem Paket einen eigenen Wurzel-Block mit **zeichengleichem Vokabular** zum
+ - **KF-6-Belegung der golden:** `cacheline/line_size` = alle vier CT-Werte
+   {32, 64, 128, 256}; `alignment` und `sw_prefetch_hint` bleiben am Achsen-Default.
+   Kardinalitaet: Faktor 4, also 4 x 2^17 = 524288 Tier-Binaries (mit alignment und
+-  sw_hint waeren es 60 x 2^17 = 7864320).
++  sw_hint waeren es 60 x 2^17 = 7864320). Das ist das **line_size-Teilprodukt**;
++  die **Gesamt-Bau-Matrix** der golden ist `4 (line_size) x 4 (Systemblock:
++  opt_level 2 x simd 2 x target_isa 1) x 2^17 = 2097152` (NB2-Korrektur 06.08.:
++  die frueher als Gesamtzahl gefuehrten 524288 liessen den Systemblock aus).
+ - **HW-Freigabe ist keine XML-Aussage:** gebaut wird die volle Menge; welche
+   Permutation auf einer Maschine *gemessen* wird, entscheidet die CEB-/Planungs-
+   Grenze einmalig anhand der zur Laufzeit erkannten Line-Groesse.
++
++### Das golden-N (`<run_options>`, ab 2026-08-06 / B14-NB2)
++
++Der Owner-Kanon **golden N = 2^17 = 131072** war bis heute im kanonischen Traeger
++`experiment_golden_kern.xml` **nur Fliesstext**; maschinenlesbar existierte er
++allein im ce-Schwester-Traeger `all_axes_golden.profile.xml`
++(`<run_options cap="131072"/>`). Ein Kommentar ist keine Bauanleitung -- die
++frueher deklarierte Form (2 Achsen mit Override, 16 ungenannt = Voll-Sweep)
++expandierte gegen die Registry-Kardinalitaeten sogar zu rund `6e10` Binaries und
++widersprach damit dem Kanon, den sie tragen soll.
++
++Geheilt auf **drei** Ebenen:
++
++1. **XSD:** neues optionales Wurzel-Element `<run_options>` (`RunOptionsType`),
++   Attribut-Satz zeichengleich zum `comdare_thesis_profile`-Dialekt
++   (`cap` Pflicht, `n_ops`/`platform`/`build_version`/`resume` optional). `cap` =
++   `max_binaries`-Obergrenze (`xml_config_parser.hpp:193`).
++2. **Instanz:** alle 18 Kompositions-Achsen tragen ihre `allowed_variants`
++   explizit -- exakt die Werte des Schwester-Traegers (2 je Achse,
++   `persistence_target` 1). Produkt = `2^17` = 131072, gegen die Registry
++   nachgerechnet. Dazu `<run_options cap="131072" build_version="golden_kern"/>`.
++3. **Wache:** `test_golden_n_consistency`
++   (`Code/tests/golden_n_consistency_check.cmake`) vergleicht beide Traeger ueber
++   die Dialekt-Grenze hinweg: gleiche Achsen-Menge, je Achse gleiche
++   Auspraegungen, gleiches Produkt, und `Produkt == cap` auf beiden Seiten. Ein
++   `cap`, den die Achsen nicht hergeben, ist eine willkuerliche Kappung und wird
++   abgelehnt.
++
++**Registry-Namen sind Pflicht:** `allowed_variants` muss `baustein name`-Werte der
++`cache_engine_axis_registry.xml` nennen (`validate_experiment_profile` Pruefung
++(5)). Die frueher hier stehenden Token `binary_search` / `linear_search` gibt es
++dort nicht -- `search_algo` fuehrt `k_ary`, `interpolation`, `eytzinger`,
++`linear_scan`. Gepinnt ist `k_ary interpolation`, weil der golden-Raum als "die
++ersten 2 Enabled-Werte je Achse" definiert ist (`mp_take_c<...,2>`); ein anderes
++Paar waere ein zweiter, widersprechender golden-Raum und muesste **beide** Traeger
++zugleich bewegen (offener Owner-Punkt, kein Blocker).
+diff --git a/Code/test_data_xml/experiment_golden_kern.xml b/Code/test_data_xml/experiment_golden_kern.xml
+index 09774bb2..fa915229 100644
+--- a/Code/test_data_xml/experiment_golden_kern.xml
++++ b/Code/test_data_xml/experiment_golden_kern.xml
+@@ -39,8 +39,10 @@
+      (experiment_schema.xsd, xs:sequence). Diese Instanz validiert gegen
+      experiment_schema.xsd (xmllint -schema). Achsen-Voll-Abdeckung ist die
+      Lese-Referenz aus all_axes_golden.profile.xml (18 Kompositions-Achsen
+-     per Voll-Sweep-Default; System-Achsen-Block; Mess-Tooling; Writeback-
+-     Trio). all_axes_golden selbst bleibt unangetastet.
++     mit je 2 gepinnten Auspraegungen, persistence_target mit 1; System-
++     Achsen-Block; Mess-Tooling; Writeback-Trio). all_axes_golden selbst
++     bleibt unangetastet; seit NB2 ist die Deckung nicht mehr nur behauptet,
++     sondern von test_golden_n_consistency Achse fuer Achse bewacht.
+ 
+      PFLEGE-STAND 2026-08-06 (B14, gegen den Ist-Korpus nachgezogen):
+        (1) 17 -> 18 Kompositions-Achsen: persistence_target (Slot T17) kam
+@@ -55,6 +57,22 @@
+            20.07. im XSD und in parse_system_axes) war hier ungenutzt.
+        (4) KF-6: die Organ-Sub-Achsen hatten in diesem Dialekt gar keinen
+            Kanal (Schema-Luecke) -> neuer <organ_subaxes>-Block.
++
++     NB2-STAND 2026-08-06 (Codex-Verdikt NACHBESSERN, 2xHOCH + 3xMITTEL; die
++     Begruendungen stehen jeweils am Ort):
++       (5) [HOCH] N = 2^17 war NICHT maschinenlesbar kodiert (nur Fliesstext),
++           und die damalige Voll-Sweep-Form behauptete rechnerisch ein voellig
++           anderes N -> alle 18 Achsen tragen jetzt ihre allowed_variants
++           (Produkt exakt 131072) PLUS neuer <run_options cap="131072"/>.
++       (6) [HOCH] allowed_variants "binary_search linear_search" sind keine
++           Registry-Namen (search_algo fuehrt k_ary/interpolation/eytzinger/
++           linear_scan) -> gepinnt auf k_ary interpolation; der Validator haette
++           die Datei sonst abgelehnt.
++       (7) [MITTEL] die Gesamtzahl der Bau-Matrix liess den Systemblock aus
++           -> 4 x 4 x 2^17 = 2097152 ausgewiesen.
++       Die drei uebrigen MITTEL-Befunde betreffen die Wachen, nicht diese Datei:
++       fixture_schema_subset_check.cmake (leere/abgeschnittene XML, CDATA-Strip,
++       '>' im Attributwert, fehlende SCHEMA-/MASTER-Datei); dort geheilt.
+      ==================================================================== -->
+ <comdare_experiment version="2" id="diplomarbeit_golden_kern"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+@@ -117,17 +135,60 @@
+        search_algo, cache_traversal, mapping, path_compression, node_type,
+        memory_layout, allocator, prefetch, concurrency, serialization,
+        value_handle, index_organization, io_dispatch, migration_policy,
+-       filter, queuing_q1, queuing_q2, persistence_target) sind damit voll
+-       abgedeckt: die 2 unten benannten tragen einen Override, die uebrigen 16
+-       laufen als Voll-Sweep.
++       filter, queuing_q1, queuing_q2, persistence_target) stehen deshalb ALLE
++       ausdruecklich unten.
++
++       NB2-HEILUNG 2026-08-06 (Codex 2xHOCH, B14-Verdikt NACHBESSERN): zwei
++       zusammenhaengende Befunde an dieser Stelle:
++
++       (H1) N = 2^17 WAR NICHT KODIERT. Der Owner-Kanon "golden N = 2^17 =
++       131072" stand in dieser Datei ausschliesslich als Fliesstext (unten im
++       KF-6-Block). Maschinenlesbar existierte er nur im Schwester-Traeger
++       all_axes_golden.profile.xml (<run_options cap="131072"/>, Zeile 163).
++       Ein Kommentar ist keine Bauanleitung. Schlimmer: die frueher hier
++       deklarierte Form (2 Achsen mit Override, 16 ungenannt = Voll-Sweep)
++       BEHAUPTETE gar nicht 2^17: die Voll-Sweep-Semantik expandiert gegen
++       die ce-Registry-Kardinalitaeten (4,3,2,3,4,5,3,4,9,4,5,4,4,4,4,15,5,1)
++       zu rund 6*10^10 Tier-Binaries. Die Datei widersprach also dem Kanon,
++       den sie tragen soll. GEHEILT auf zwei Beinen: (a) jede der 18 Achsen
++       traegt jetzt ihre allowed_variants explizit, exakt die Werte des
++       Schwester-Traegers (2 je Achse, persistence_target 1) -> das Produkt ist
++       2*2*2*2*2*2*2*2*2*2*2*2*2*2*2*2*2*1 = 2^17 = 131072, nachgerechnet gegen
++       die Registry; (b) zusaetzlich beziffert der neue <run_options cap="131072"/>
++       dasselbe N als harte max_binaries-Obergrenze (xml_config_parser.hpp:193).
++       Beide Beine sind maschinenlesbar; die Wache test_golden_n_consistency
++       haelt sie und den Schwester-Traeger dauerhaft deckungsgleich.
++
++       (H2) binary_search / linear_search WAREN KEINE REGISTRY-NAMEN. Die
++       search_algo-Achse fuehrt in cache_engine_axis_registry.xml GENAU VIER
++       Bausteine: k_ary, interpolation, eytzinger, linear_scan. Die frueheren
++       Token "binary_search" und "linear_search" existieren dort nicht (es gibt
++       nur binary_search_fanout, und das ist ein Baustein der ANDEREN Achse
++       cache_traversal). validate_experiment_profile Pruefung (5) haette diese
++       XML damit hart abgelehnt ("UNGUELTIGE allowed_variant"). GEPINNT auf die
++       Registry-Namen k_ary und interpolation.
++       WARUM GENAU DIESES PAAR und nicht das semantisch naheliegende
++       {k_ary, linear_scan}: der golden-Raum ist NICHT frei waehlbar, er ist
++       definiert als "die ersten 2 Enabled-name()-Werte je Achse"
++       (mp_take_c<EnabledStrategies,2>, all_axes_golden.profile.xml Zeile 12/34).
++       Fuer search_algo sind das k_ary und interpolation. Ein abweichendes Paar
++       hier waere ein zweiter, widersprechender golden-Raum. Die semantische
++       Absicht hinter den alten Platzhaltern bleibt trotzdem festgehalten:
++       "binary search" ist in dieser Registry k_ary (k-aere Suche, k=2), "linear
++       search" ist linear_scan. Beide sind gueltige Registry-Namen; sie an die
++       Stelle von interpolation zu setzen, waere eine ENTSCHEIDUNG UEBER DEN
++       GOLDEN-RAUM und muesste BEIDE Traeger zugleich bewegen (offener
++       Owner-Punkt, kein Blocker fuer die Abgabe-Kette).
++
+        ACHSEN-STAND 2026-08-06: persistence_target ist die 18. Achse (Slot T17,
+        ANHANG hinter queuing_q2, axis_path_serialization.hpp; Registry-Eintrag
+        cache_engine_axis_registry.xml). Sie traegt unter Owner-Entscheid Q-1
+        Fall B genau EINEN registrierten Baustein (persistence_memory_only), ist
+        also kardinalitaets-neutral (Faktor 1) und deshalb in all_axes_golden
+-       bewusst NICHT sweepbar gefuehrt. Hier braucht sie keinen Eintrag: sie ist
+-       ungenannt und laeuft damit korrekt als Voll-Sweep ueber ihren einen
+-       Baustein.
++       bewusst NICHT sweepbar gefuehrt. Sie steht unten trotzdem MIT ihrem einen
++       Wert, statt ungenannt zu bleiben: Faktor 1 ist rechnerisch dasselbe, aber
++       nur die ausdrueckliche Nennung macht das N maschinenlesbar vollstaendig
++       (und die Konsistenz-Wache kann Achse gegen Achse pruefen).
+        NICHT VERWECHSELN: das Registry-Attribut golden_wired="true|false" gehoert
+        zum golden-320-Katalog (lebende Quelle: profile_facade/source_catalog.hpp
+        Zeile 144, golden_320_catalog =
+@@ -153,11 +214,37 @@
+        pruefling je Achse benennt, von welchem Pruefling die Achse stammt
+        (engine-id / lebewesen-id / self-Marker CacheEngine). -->
+   <axes_default_lookup enabled="true">
+-    <axis ref="search_algo"      pruefling="prt_art" merge="replace" allowed_variants="binary_search linear_search"/>
+-    <axis ref="path_compression" pruefling="prt_art" merge="merge"/>
+-    <!-- Alle uebrigen Achsen bleiben absichtlich UNGENANNT = Voll-Sweep. -->
++    <axis ref="search_algo"         pruefling="prt_art" merge="replace" allowed_variants="k_ary interpolation"/>
++    <axis ref="cache_traversal"                                         allowed_variants="linear_fanout hash_lookup"/>
++    <axis ref="mapping"                                                 allowed_variants="direct_placement pool_relative"/>
++    <axis ref="path_compression"    pruefling="prt_art" merge="merge"   allowed_variants="path_compression_none path_compression_patricia"/>
++    <axis ref="node_type"                                               allowed_variants="node4 node16"/>
++    <axis ref="memory_layout"                                           allowed_variants="memory_layout_cache_line_aligned memory_layout_aos_strict"/>
++    <axis ref="allocator"                                               allowed_variants="std_malloc pmr_resource"/>
++    <axis ref="prefetch"                                                allowed_variants="prefetch_none prefetch_distance_estimator"/>
++    <axis ref="concurrency"                                             allowed_variants="concurrency_none concurrency_blocking"/>
++    <axis ref="serialization"                                           allowed_variants="serialization_raw_binary serialization_var_len"/>
++    <axis ref="value_handle"                                            allowed_variants="value_handle_inline value_handle_external_pool"/>
++    <axis ref="index_organization"                                      allowed_variants="index_org_heap index_org_clustered"/>
++    <axis ref="io_dispatch"                                             allowed_variants="io_in_memory_only io_direct"/>
++    <axis ref="migration_policy"                                        allowed_variants="migration_none migration_hot_cold"/>
++    <axis ref="filter"                                                  allowed_variants="filter_bloom filter_cuckoo"/>
++    <axis ref="queuing_q1"                                              allowed_variants="no_buffer fifo_queue"/>
++    <axis ref="queuing_q2"                                              allowed_variants="eager_flush watermark_flush"/>
++    <axis ref="persistence_target"                                      allowed_variants="persistence_memory_only"/>
+   </axes_default_lookup>
+ 
++  <!-- N MASCHINENLESBAR (B14-NB2-Heilung H1, zweites Bein). cap = max_binaries-
++       Obergrenze (xml_config_parser.hpp Zeile 193); 131072 = 2^17 = der
++       Owner-Kanon-Organraum und exakt das Produkt der 18 allowed_variants-Listen
++       oben. build_version benennt den Traeger, damit ein Sidecar-Stempel die
++       Herkunft nennen kann; platform/n_ops/resume bleiben ungesetzt (der
++       Maschinen-Satz steht in <machines>, die Lauf-Steuerung gehoert dem Planer).
++       DECKUNGSGLEICH zu all_axes_golden.profile.xml Zeile 163 (cap="131072"),
++       bewacht von test_golden_n_consistency (Code/tests/golden_n_consistency_check.cmake),
++       die beide Traeger Achse fuer Achse UND cap gegen cap prueft. -->
++  <run_options cap="131072" build_version="golden_kern"/>
++
+   <!-- KF-6 (Owner-A4 verbatim, 2026-08-05: "es muessen dennoch alle unterstuetzt
+        sein, sofern von der Hardware freigegeben") - VOLLAUSBAU der line_sizes.
+        Die per-Organ Cache-Line-Unterachse ist KEINE der 18 Kompositions-Achsen,
+@@ -185,9 +272,21 @@
+        KARDINALITAETS-FOLGE (Bau-Matrix, kein Byte-Anker): line_size erzeugt beim
+        Konsum EINE statische Ebene (profile_to_tree.hpp, is_static=true) und geht
+        in die binary_id ein. Faktor 4. Bezogen auf den golden-Organraum
+-       N = 2^17 = 131072 sind das 4 * 131072 = 524288 Tier-Binaries. Mit
+-       alignment (3) und sw_hint (5) waeren es 60 * 131072 = 7864320 - genau
+-       deshalb bleiben diese zwei Dimensionen am Default.
++       N = 2^17 = 131072 (<run_options cap="131072"/> oben) sind das
++       4 * 131072 = 524288 Tier-Binaries. Mit alignment (3) und sw_hint (5)
++       waeren es 60 * 131072 = 7864320 - genau deshalb bleiben diese zwei
++       Dimensionen am Default.
++
++       GESAMTZAHL DER BAU-MATRIX (NB2-Korrektur MITTEL, Codex): die 524288 oben
++       sind NUR das line_size-Bein. Der System-Achsen-Block unten multipliziert
++       ebenfalls (opt_level 2 x simd 2 x target_isa 1 = Faktor 4), und zwar
++       zusaetzlich - er ist binary_id-neutral, aber NICHT bau-neutral. Die
++       vollstaendige Bau-Matrix dieser Datei ist damit
++         line_size 4  x  system 4  x  N 131072  =  2097152 Tier-Binaries.
++       Die frueher hier stehende Zahl 524288 war als GESAMTZAHL stale (sie liess
++       den Systemblock aus); als Zwischenergebnis des line_size-Beins bleibt sie
++       richtig und ist deshalb oben erhalten, aber jetzt ausdruecklich als
++       Teilprodukt benannt.
+ 
+        ERWARTETE NICHT-DIFFERENZIERUNG (A4 4.5 Punkt 5, hier vermerkt damit sie
+        spaeter nicht als Regression fehlgedeutet wird): an einer Scan-Stelle mit
+@@ -239,6 +338,8 @@
+        bleibt WEGGELASSEN (es bricht den IEEE-754-Determinismus und den
+        CRC64-golden-Anker); avx512 ist nicht universell und bleibt draussen.
+        Bau-Matrix-Faktor dieses Blocks: opt_level 2 x simd 2 x target_isa 1 = 4.
++       Dieser Faktor 4 geht in die Gesamtzahl 4 x 4 x 2^17 = 2097152 ein
++       (Rechnung vollstaendig im KF-6-Block oben).
+ 
+        PFLEGE 2026-08-06 (A7): der Ist-Parser kennt seit A4 (20.07.) und O-2
+        (26.07.) DREI weitere System-Kanaele, die diese Datei bisher nicht
+diff --git a/Code/test_data_xml/experiment_schema.xsd b/Code/test_data_xml/experiment_schema.xsd
+index cb373f8f..e637d33e 100644
+--- a/Code/test_data_xml/experiment_schema.xsd
++++ b/Code/test_data_xml/experiment_schema.xsd
+@@ -40,6 +40,23 @@
+              explizite <phases> = Override (byte-identisch zum Ist). -->
+         <xs:element name="phases"               type="PhasesType" minOccurs="0"/>
+         <xs:element name="axes_default_lookup"  type="AxesDefaultLookupType" minOccurs="0"/>
++        <!-- B14-NB2 (2026-08-06): run_options = der bis heute FEHLENDE MASCHINENLESBARE Kanal fuer das
++             golden-N. Vor diesem Paket stand N = 2^17 = 131072 in dieser Traeger-Familie NUR als
++             Fliesstext-Kommentar; die einzige maschinenlesbare Quelle war das Schwester-Profil
++             all_axes_golden.profile.xml (comdare_thesis_profile, <run_options cap="131072"/>). Ein
++             Kommentar ist keine Bauanleitung: der Owner-Kanon "golden N = 2^17" war damit im
++             KANONISCHEN Traeger nicht kodiert (Codex-Befund HOCH, B14-Verdikt).
++             VOKABULAR ZEICHENGLEICH zum thesis-Dialekt (cap, n_ops, platform, build_version, resume;
++             xml_config_parser.cpp Zeile 424 bis 432, ThesisRunOptions): die spaetere Parser-Naht bleibt
++             EINE Lese-Funktion, es entsteht kein zweites Namens-System. Semantik von cap laut
++             xml_config_parser.hpp Zeile 193: max_binaries-Obergrenze, 0/abwesend = ungesetzt =
++             Treiber-Default. Damit ist der Block rueckwaerts-neutral (minOccurs=0).
++             HEUTE DEKLARATIV: parse_experiment_profile liest ihn im comdare_experiment-Dialekt noch
++             nicht (unbekannte Wurzel-Kinder werden still ignoriert), identisches Muster wie
++             organ_subaxes; die Lese-Naht ist dieselbe dokumentierte ce-Auflage. Die Widerspruchs-
++             freiheit zwischen den beiden golden-Traegern bewacht bis dahin die ctest-Wache
++             test_golden_n_consistency (Code/tests/golden_n_consistency_check.cmake). -->
++        <xs:element name="run_options"          type="RunOptionsType" minOccurs="0"/>
+         <!-- KF-6 / Owner-A4 (B14, 2026-08-06): organ_subaxes = der bis heute FEHLENDE XML-Kanal der
+              ORGAN-SUB-Achsen (cacheline / node_width / alloc_hw) im comdare_experiment-Dialekt.
+              WARUM NICHT in axes_default_lookup: dessen ref wird gegen die ce-Registry aufgeloest
+@@ -337,6 +354,21 @@
+     <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+   </xs:complexType>
+ 
++  <!-- run_options (B14-NB2, 2026-08-06): die Lauf-/Bau-Steuerung. Attribut-Satz ZEICHENGLEICH zum
++       comdare_thesis_profile-Dialekt (all_axes_golden.profile.xml Zeile 163).
++       cap ist der einzige PFLICHT-Wert: er kodiert die Ziel-Kardinalitaet des Organraums
++       maschinenlesbar (golden: 131072 = 2^17). Wer den Block schreibt, muss N beziffern, genau
++       das war der Befund. Die uebrigen vier bleiben optional (ungesetzt = Treiber-Default).
++       KEIN xs:enumeration auf cap: der Wertraum ist eine Zahl, nicht ein Vokabular; die
++       Gleichheit mit dem Schwester-Traeger prueft die ctest-Wache, nicht das Schema. -->
++  <xs:complexType name="RunOptionsType">
++    <xs:attribute name="cap"           type="xs:unsignedInt" use="required"/>
++    <xs:attribute name="n_ops"         type="xs:unsignedLong" use="optional"/>
++    <xs:attribute name="platform"      type="xs:string"      use="optional"/>
++    <xs:attribute name="build_version" type="xs:string"      use="optional"/>
++    <xs:attribute name="resume"        type="xs:boolean"     use="optional"/>
++  </xs:complexType>
++
+   <!-- organ_subaxes: die drei ORGAN-SUB-Achsen des Sonderzweigs (KF-3 cacheline, C2/FF2 node_width,
+        F-B alloc_hw). Alle Elemente minOccurs=0; Abwesenheit = Achsen-Default (cacheline:
+        CacheLineConfig{} = B64/none/none, cacheline_line_bytes.hpp kDefaultLineBytes == 64).
+diff --git a/Code/tests/CMakeLists.txt b/Code/tests/CMakeLists.txt
+index f098ec43..5905dbeb 100644
+--- a/Code/tests/CMakeLists.txt
++++ b/Code/tests/CMakeLists.txt
+@@ -181,7 +181,21 @@ add_test(NAME test_fixture_schema_experiment_golden
+         "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden.xml"
+         "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden.xml"
+         -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_schema_subset_check.cmake")
++# B14-NB2 (2026-08-06) -- die Wache der KETTE der zwei golden-Traeger.
++# Die zwei Wachen oben pruefen je EINE Datei gegen EIN Schema (Byte bzw. Vokabular). Keine von ihnen
++# haette gemerkt, dass die kanonische experiment_golden_kern.xml das Owner-N (2^17 = 131072) ueberhaupt
++# nicht maschinenlesbar trug und rechnerisch einen voellig anderen Raum deklarierte als ihr ce-Schwester-
++# Traeger all_axes_golden.profile.xml (Codex-Befund HOCH). Diese Wache vergleicht die beiden Traeger
++# SEMANTISCH ueber die Dialekt-Grenze hinweg: gleiche Achsen-Menge, je Achse gleiche Auspraegungen,
++# gleiches Produkt, und dieses Produkt == run_options cap BEIDER Seiten.
++# all_axes_golden.profile.xml wird ausschliesslich GELESEN (sie bleibt unangetastet, s. ihr Kopf-Block).
++add_test(NAME test_golden_n_consistency
++    COMMAND "${CMAKE_COMMAND}"
++        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
++        "-DPROFILE=${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
++        -P "${CMAKE_CURRENT_SOURCE_DIR}/golden_n_consistency_check.cmake")
+ set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_registry
+                      test_fixture_schema_experiment_golden_kern test_fixture_schema_experiment_golden
++                     test_golden_n_consistency
+     PROPERTIES LABELS "da_unit;fixture_sync" TIMEOUT 60
+     SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP")
+diff --git a/Code/tests/fixture_schema_subset_check.cmake b/Code/tests/fixture_schema_subset_check.cmake
+index c5362195..ba8b0454 100644
+--- a/Code/tests/fixture_schema_subset_check.cmake
++++ b/Code/tests/fixture_schema_subset_check.cmake
+@@ -32,8 +32,14 @@
+ # dependency-freie ctest-Schicht dazwischen (reines CMake, kein xmllint-Zwang auf den Runnern).
+ #
+ # Erwartete -D Variablen: SCHEMA (die XSD), FIXTURE (die ce-Fixture), MASTER (optional, die super-golden).
+-# Fehlt ein Nachbar-Checkout, wird sauber GESKIPPT (Marker FIXTURE-SYNC-SKIP, identisch zu
+-# fixture_sync_check.cmake, damit dieselbe SKIP_REGULAR_EXPRESSION greift) -- NIE stumm-gruen.
++#
++# SKIP-DISZIPLIN (B14-NB2, Codex-MITTEL "fehlende SCHEMA-/MASTER-Datei = Skip statt Fail"): ein SKIP ist
++# NUR fuer den EINEN Fall zulaessig, fuer den er gedacht war -- der ce-NACHBAR-CHECKOUT fehlt (Submodul
++# nicht ausgecheckt). SCHEMA und MASTER liegen dagegen im super-Repo SELBST (Code/test_data_xml/); fehlen
++# sie, ist das kein fehlender Nachbar, sondern ein kaputtes eigenes Repo bzw. eine falsch verdrahtete
++# add_test-Zeile. Ein SKIP haette das stumm verdeckt und die Wache faktisch abgeschaltet -> beides ist
++# jetzt FATAL. Nur FIXTURE skippt (Marker FIXTURE-SYNC-SKIP, identisch zu fixture_sync_check.cmake, damit
++# dieselbe SKIP_REGULAR_EXPRESSION greift).
+ 
+ foreach(_req SCHEMA FIXTURE)
+     if(NOT DEFINED ${_req})
+@@ -41,15 +47,54 @@ foreach(_req SCHEMA FIXTURE)
+     endif()
+ endforeach()
+ 
+-if(NOT EXISTS "${SCHEMA}" OR NOT EXISTS "${FIXTURE}")
+-    message(STATUS "FIXTURE-SYNC-SKIP: Nachbar-Checkout fehlt (SCHEMA='${SCHEMA}' FIXTURE='${FIXTURE}').")
+-    return()
++if(NOT EXISTS "${SCHEMA}")
++    message(FATAL_ERROR
++        "fixture_schema_subset_check: SCHEMA '${SCHEMA}' EXISTIERT NICHT. Das ist KEIN fehlender "
++        "Nachbar-Checkout (die XSD liegt im super-Repo selbst) -- entweder ist der Pfad in der "
++        "add_test-Zeile falsch oder die Single-Source ist verschwunden. Kein SKIP.")
+ endif()
+ if(DEFINED MASTER AND NOT EXISTS "${MASTER}")
+-    message(STATUS "FIXTURE-SYNC-SKIP: Nachbar-Checkout fehlt (MASTER='${MASTER}').")
++    message(FATAL_ERROR
++        "fixture_schema_subset_check: MASTER '${MASTER}' EXISTIERT NICHT. Auch der MASTER liegt im "
++        "super-Repo selbst (Code/test_data_xml/) -- kein Nachbar-Checkout, also kein SKIP.")
++endif()
++if(NOT EXISTS "${FIXTURE}")
++    message(STATUS "FIXTURE-SYNC-SKIP: Nachbar-Checkout fehlt (FIXTURE='${FIXTURE}').")
+     return()
+ endif()
+ 
++# -- Hilfsfunktion: CDATA-Sektionen entfernen. MUSS VOR dem Kommentar-Strip laufen (B14-NB2,
++#    Codex-MITTEL "Kommentar-Strip via CDATA umgehbar"): der Inhalt einer CDATA-Sektion ist per
++#    XML-Definition TEXT, kein Markup. Ohne diesen Schritt sind beide Richtungen kaputt:
++#      (a) FALSCH-POSITIV: <![CDATA[ <phantom_element/> ]]> haette einen Element-Namen geliefert,
++#          den die XSD zu Recht nicht kennt -> die Wache meldet Drift, wo keine ist;
++#      (b) FALSCH-NEGATIV (der gefaehrliche Fall): ein '<!--' INNERHALB einer CDATA-Sektion haette
++#          den Kommentar-Strip losgetreten und alles bis zum naechsten '-->' WEGGESCHNITTEN --
++#          inklusive echter, dazwischen liegender Tags. Vokabular-Drift waere unsichtbar geworden.
++#    Nach dem Entfernen bleibt die Sektion als LEERE Stelle stehen (kein Ersatztext), damit keine
++#    kuenstlichen Namen entstehen.
++function(comdare_strip_cdata _in _out_var)
++    set(_s "${_in}")
++    while(TRUE)
++        string(FIND "${_s}" "<![CDATA[" _p)
++        if(_p EQUAL -1)
++            break()
++        endif()
++        string(SUBSTRING "${_s}" 0 ${_p} _head)
++        string(SUBSTRING "${_s}" ${_p} -1 _rest)
++        string(FIND "${_rest}" "]]>" _e)
++        if(_e EQUAL -1)
++            message(FATAL_ERROR
++                "fixture_schema_subset_check: unbeendete CDATA-Sektion (kein ']]>') -- die Datei ist "
++                "nicht wohlgeformt oder abgeschnitten. Kein stilles Gruen.")
++        endif()
++        math(EXPR _after "${_e} + 3")
++        string(SUBSTRING "${_rest}" ${_after} -1 _tail)
++        set(_s "${_head}${_tail}")
++    endwhile()
++    set(${_out_var} "${_s}" PARENT_SCOPE)
++endfunction()
++
+ # -- Hilfsfunktion: XML-/XSD-Kommentare entfernen. Ohne das wuerden Tag-Namen AUS Kommentaren
+ #    (die Dateien zitieren reichlich Elemente im Fliesstext) als "benutzt" gezaehlt werden.
+ function(comdare_strip_xml_comments _in _out_var)
+@@ -72,10 +117,128 @@ function(comdare_strip_xml_comments _in _out_var)
+     set(${_out_var} "${_s}" PARENT_SCOPE)
+ endfunction()
+ 
++# -- Hilfsfunktion: Datei einlesen + CDATA + Kommentare entfernen; LEERE/UNLESBARE Datei ist FATAL.
++#    (B14-NB2, Codex-HOCH ":138 leere/abgeschnittene XML = stumm-gruen"): eine leere oder auf 0 Bytes
++#    truncierte Datei lieferte frueher eine LEERE Namensmenge, und eine leere Menge ist trivial
++#    Teilmenge von allem -> die Wache meldete OK fuer eine Datei ohne jeden Inhalt. Genau der Fall,
++#    den eine Wache fangen muss.
++function(comdare_read_markup _file _out_var)
++    file(SIZE "${_file}" _bytes)
++    if(_bytes EQUAL 0)
++        message(FATAL_ERROR
++            "fixture_schema_subset_check: '${_file}' ist LEER (0 Byte). Eine leere Datei ist trivial "
++            "'schema-konform' und waere stumm gruen durchgelaufen. Kein Gruen ohne Inhalt.")
++    endif()
++    file(READ "${_file}" _raw)
++    string(STRIP "${_raw}" _stripped)
++    if(_stripped STREQUAL "")
++        message(FATAL_ERROR
++            "fixture_schema_subset_check: '${_file}' enthaelt nur Leerraum (${_bytes} Byte). "
++            "Kein Gruen ohne Inhalt.")
++    endif()
++    comdare_strip_cdata("${_raw}" _nocdata)
++    comdare_strip_xml_comments("${_nocdata}" _txt)
++    set(${_out_var} "${_txt}" PARENT_SCOPE)
++endfunction()
++
++# -- Hilfsfunktion: die Tags einer Markup-Datei QUOTE-BEWUSST einsammeln.
++#    (B14-NB2, Codex-MITTEL "Tag-Regex bricht an '>' im Attributwert"): '>' ist im Attributwert
++#    LEGALES XML (nur '<' und '&' muessen maskiert werden; xmllint akzeptiert <a b="x>y"/> anstandslos).
++#    Das alte MATCHALL "<[A-Za-z_][^>]*>" schnitt genau dort ab: aus <axis ref="a>b" phantom="1"/>
++#    wurde der Tag-Rest ' phantom="1"/>' zu freiem Text und das Attribut phantom verschwand aus der
++#    Pruefung -- Vokabular-Drift blieb unsichtbar. Diese Funktion sucht das Tag-Ende deshalb, indem sie
++#    ueber die Attributwerte HINWEGSPRINGT: sie merkt sich, ob sie gerade in "..." bzw. '...' steht,
++#    und akzeptiert nur ein '>' AUSSERHALB der Quotes.
++#    Rueckgabe: zwei Listen (Element-Namen, Attribut-Namen). Die Tag-Rohtexte werden bewusst NICHT
++#    zurueckgereicht -- sie koennen ';' enthalten und wuerden CMake-Listen zerreissen.
++function(comdare_scan_tags _txt _label _file _elems_var _attrs_var)
++    set(_elems "")
++    set(_attrs "")
++    set(_rest "${_txt}")
++    while(TRUE)
++        string(FIND "${_rest}" "<" _lt)
++        if(_lt EQUAL -1)
++            break()
++        endif()
++        string(SUBSTRING "${_rest}" ${_lt} -1 _from)
++        # Tag-Ende quote-bewusst suchen (Offsets relativ zu _from).
++        set(_scan "${_from}")
++        set(_consumed 0)
++        set(_end -1)
++        while(TRUE)
++            string(FIND "${_scan}" ">" _gt)
++            string(FIND "${_scan}" "\"" _dq)
++            string(FIND "${_scan}" "'" _sq)
++            # Der naechste "interessante" Punkt: das erste Quote-Zeichen vor dem '>' gewinnt.
++            set(_q -1)
++            if(NOT _dq EQUAL -1)
++                set(_q ${_dq})
++            endif()
++            if(NOT _sq EQUAL -1 AND (_q EQUAL -1 OR _sq LESS _q))
++                set(_q ${_sq})
++            endif()
++            if(_gt EQUAL -1)
++                break()   # kein '>' mehr -> abgeschnitten, unten behandelt
++            endif()
++            if(_q EQUAL -1 OR _gt LESS _q)
++                math(EXPR _end "${_consumed} + ${_gt}")
++                break()
++            endif()
++            # In einen Attributwert eintreten und ihn ueberspringen.
++            string(SUBSTRING "${_scan}" ${_q} 1 _qc)
++            math(EXPR _vstart "${_q} + 1")
++            string(SUBSTRING "${_scan}" ${_vstart} -1 _afterq)
++            string(FIND "${_afterq}" "${_qc}" _vend)
++            if(_vend EQUAL -1)
++                message(FATAL_ERROR
++                    "fixture_schema_subset_check: unbeendeter Attributwert (${_label}) in '${_file}' -- "
++                    "oeffnendes ${_qc} ohne schliessendes Gegenstueck. Die Datei ist nicht wohlgeformt "
++                    "oder abgeschnitten. Kein stilles Gruen.")
++            endif()
++            math(EXPR _skip "${_vstart} + ${_vend} + 1")
++            math(EXPR _consumed "${_consumed} + ${_skip}")
++            string(SUBSTRING "${_scan}" ${_skip} -1 _scan)
++        endwhile()
++        if(_end EQUAL -1)
++            message(FATAL_ERROR
++                "fixture_schema_subset_check: ABGESCHNITTENE Datei (${_label}) '${_file}' -- ein '<' "
++                "ohne zugehoeriges '>' am Dateiende. Eine truncierte XML darf nicht gruen sein.")
++        endif()
++        math(EXPR _body_len "${_end} - 1")
++        math(EXPR _next "${_end} + 1")
++        string(SUBSTRING "${_from}" 1 ${_body_len} _body)
++        string(SUBSTRING "${_from}" ${_next} -1 _rest)
++        # Nur oeffnende/leere Element-Tags tragen Vokabular: '/' = schliessend, '?' = XML-Deklaration,
++        # '!' = DOCTYPE (CDATA/Kommentare sind bereits entfernt).
++        if(_body MATCHES "^[A-Za-z_]")
++            # Attributwerte leeren, DANN Namen ziehen: ein 'wort=' INNERHALB eines Wertes ist kein
++            # Attribut-Name. Beide Quote-Formen.
++            string(REGEX REPLACE "\"[^\"]*\"" "\"\"" _nov "${_body}")
++            string(REGEX REPLACE "'[^']*'" "''" _nov "${_nov}")
++            string(REGEX REPLACE "^([A-Za-z_][A-Za-z0-9_.:-]*).*$" "\\1" _name "${_nov}")
++            list(APPEND _elems "${_name}")
++            string(REGEX MATCHALL "[A-Za-z_][A-Za-z0-9_.:-]*[ \t\r\n]*=" _am "${_nov}")
++            foreach(_ahit IN LISTS _am)
++                string(REGEX REPLACE "[ \t\r\n]*=$" "" _aname "${_ahit}")
++                # Namensraum-Deklarationen sind XML-Infrastruktur, kein Schema-Vokabular.
++                if(NOT _aname MATCHES "^xmlns" AND NOT _aname MATCHES "^xsi:")
++                    list(APPEND _attrs "${_aname}")
++                endif()
++            endforeach()
++        endif()
++    endwhile()
++    list(REMOVE_DUPLICATES _elems)
++    list(REMOVE_DUPLICATES _attrs)
++    set(${_elems_var} "${_elems}" PARENT_SCOPE)
++    set(${_attrs_var} "${_attrs}" PARENT_SCOPE)
++endfunction()
++
+ # -- Deklariertes Vokabular der XSD einsammeln: <xs:element name=".."> + <xs:attribute name="..">.
++#    Liest ueber comdare_read_markup, damit auch die XSD gegen leere Datei / CDATA-Trick / unbeendeten
++#    Kommentar abgesichert ist (eine leere XSD lieferte sonst ein leeres Vokabular -- unten ohnehin FATAL,
++#    aber die Fehlermeldung soll die WAHRE Ursache nennen).
+ function(comdare_collect_schema_names _file _elems_var _attrs_var)
+-    file(READ "${_file}" _raw)
+-    comdare_strip_xml_comments("${_raw}" _txt)
++    comdare_read_markup("${_file}" _txt)
+     set(_elems "")
+     set(_attrs "")
+     string(REGEX MATCHALL "<xs:element[ \t\r\n]+name=\"[A-Za-z_][A-Za-z0-9_.:-]*\"" _m "${_txt}")
+@@ -94,30 +257,32 @@ function(comdare_collect_schema_names _file _elems_var _attrs_var)
+     set(${_attrs_var} "${_attrs}" PARENT_SCOPE)
+ endfunction()
+ 
+-# -- Benutztes Vokabular einer XML-Instanz einsammeln. Attribut-WERTE werden vorher geleert, damit ein
+-#    'wort=' INNERHALB eines Wertes nicht faelschlich als Attribut-Name gilt.
+-function(comdare_collect_instance_names _file _elems_var _attrs_var)
+-    file(READ "${_file}" _raw)
+-    comdare_strip_xml_comments("${_raw}" _txt)
+-    set(_elems "")
+-    set(_attrs "")
+-    # Oeffnende und leere Tags (schliessende beginnen mit '/', die XML-Deklaration mit '?').
+-    string(REGEX MATCHALL "<[A-Za-z_][^>]*>" _tags "${_txt}")
+-    foreach(_tag IN LISTS _tags)
+-        string(REGEX REPLACE "\"[^\"]*\"" "\"\"" _tag_novals "${_tag}")
+-        string(REGEX REPLACE "^<([A-Za-z_][A-Za-z0-9_.:-]*).*$" "\\1" _name "${_tag_novals}")
+-        list(APPEND _elems "${_name}")
+-        string(REGEX MATCHALL "[A-Za-z_][A-Za-z0-9_.:-]*[ \t\r\n]*=" _am "${_tag_novals}")
+-        foreach(_ahit IN LISTS _am)
+-            string(REGEX REPLACE "[ \t\r\n]*=$" "" _aname "${_ahit}")
+-            # Namensraum-Deklarationen sind XML-Infrastruktur, kein Schema-Vokabular.
+-            if(NOT _aname MATCHES "^xmlns" AND NOT _aname MATCHES "^xsi:")
+-                list(APPEND _attrs "${_aname}")
+-            endif()
+-        endforeach()
+-    endforeach()
+-    list(REMOVE_DUPLICATES _elems)
+-    list(REMOVE_DUPLICATES _attrs)
++# -- Benutztes Vokabular einer XML-Instanz einsammeln (quote-bewusst, s. comdare_scan_tags).
++#    Zusaetzlich die beiden STUMM-GRUEN-Riegel (B14-NB2): 0 Element-Namen ist FATAL, und der Wurzel-Tag
++#    muss auch wieder geschlossen werden -- eine mitten im Dokument abgeschnittene Datei kann sonst eine
++#    Handvoll gueltiger Tags liefern und "OK" melden, obwohl der Rest fehlt.
++function(comdare_collect_instance_names _label _file _elems_var _attrs_var)
++    comdare_read_markup("${_file}" _txt)
++    comdare_scan_tags("${_txt}" "${_label}" "${_file}" _elems _attrs)
++    list(LENGTH _elems _n)
++    if(_n EQUAL 0)
++        message(FATAL_ERROR
++            "fixture_schema_subset_check: '${_file}' (${_label}) enthaelt KEIN einziges Element-Tag. "
++            "Eine Namensmenge der Groesse 0 ist trivial Teilmenge des Schemas und waere stumm gruen "
++            "durchgelaufen. Kein Gruen ohne Vokabular.")
++    endif()
++    # Wurzel-Abschluss-Riegel gegen Truncation MITTEN im Dokument.
++    list(GET _elems 0 _root)
++    string(FIND "${_txt}" "</${_root}>" _close)
++    if(_close EQUAL -1)
++        # Zulaessige Ausnahme: eine leere Wurzel <root/>. Alles andere ist abgeschnitten.
++        if(NOT _txt MATCHES "<${_root}[^>]*/>")
++            message(FATAL_ERROR
++                "fixture_schema_subset_check: ABGESCHNITTENE Datei (${_label}) '${_file}' -- der "
++                "Wurzel-Tag <${_root}> wird nie geschlossen (kein '</${_root}>' und keine Leer-Form "
++                "'<${_root}/>'). Eine truncierte XML darf nicht gruen sein.")
++        endif()
++    endif()
+     set(${_elems_var} "${_elems}" PARENT_SCOPE)
+     set(${_attrs_var} "${_attrs}" PARENT_SCOPE)
+ endfunction()
+@@ -135,7 +300,7 @@ message(STATUS "fixture_schema_subset_check: Schema-Vokabular ${_n_se} Elemente
+                "aus '${SCHEMA}'.")
+ 
+ function(comdare_check_instance _label _file _schema_elems _schema_attrs)
+-    comdare_collect_instance_names("${_file}" _ielems _iattrs)
++    comdare_collect_instance_names("${_label}" "${_file}" _ielems _iattrs)
+     set(_bad "")
+     foreach(_e IN LISTS _ielems)
+         if(NOT "${_e}" IN_LIST _schema_elems)
+diff --git a/Code/tests/golden_n_consistency_check.cmake b/Code/tests/golden_n_consistency_check.cmake
+new file mode 100644
+index 00000000..53be62bb
+--- /dev/null
++++ b/Code/tests/golden_n_consistency_check.cmake
+@@ -0,0 +1,292 @@
++# golden_n_consistency_check.cmake -- B14-NB2 (2026-08-06): die Wache der KETTE
++# {super Code/test_data_xml/experiment_golden_kern.xml, ce .../thesis_profiles/all_axes_golden.profile.xml}.
++#
++# WARUM ES SIE GIBT (Codex-Befund HOCH, B14-Verdikt NACHBESSERN): der Owner-Kanon "golden N = 2^17 = 131072"
++# lebte maschinenlesbar NUR im ce-Traeger all_axes_golden.profile.xml (<run_options cap="131072"/> + je Achse
++# genau 2 <value>). Im KANONISCHEN Traeger experiment_golden_kern.xml stand N ausschliesslich als
++# Fliesstext-Kommentar -- und die dort deklarierte Voll-Sweep-Form behauptete rechnerisch ein voellig
++# anderes N. Die NB2-Heilung kodiert N in beiden Traegern maschinenlesbar; DIESE Wache haelt sie
++# deckungsgleich. Ohne sie waere die Konsistenz eine Momentaufnahme, kein Zustand.
++#
++# ZWEI DIALEKTE, EINE AUSSAGE. Die Traeger sind bewusst NICHT byte-gleich (verschiedene Wurzeln,
++# verschiedene Aufgaben) -- verglichen wird deshalb die SEMANTIK:
++#   comdare_experiment  : <axes_default_lookup><axis ref=".." allowed_variants="v1 v2"/>  + <run_options cap=..>
++#   comdare_thesis_profile: <permute_axes><axis ref=".."><value>v1</value><value>v2</value></axis> + <run_options cap=..>
++#
++# GEPRUEFT WIRD (alles FATAL):
++#   (1) beide Traeger nennen dieselbe Achsen-MENGE (keine Achse fehlt, keine ist zuviel);
++#   (2) je Achse dieselbe Auspraegungs-MENGE (Reihenfolge egal, Namen identisch);
++#   (3) das PRODUKT der Auspraegungs-Zahlen ist in beiden Traegern gleich;
++#   (4) dieses Produkt ist gleich dem cap BEIDER Traeger. Damit ist "N ist kodiert" nicht nur eine
++#       Behauptung, sondern nachgerechnet: cap == prod(|Achse|) == 131072 == 2^17.
++# NICHT-ZIEL (ehrlich benannt): die Wache prueft die Namen NICHT gegen die ce-Registry. Das ist Aufgabe
++# von validate_experiment_profile Pruefung (5) (Code-Ebene, Single-Source Registry). Diese Wache prueft
++# die DECKUNG der beiden golden-Traeger untereinander.
++#
++# SKIP-DISZIPLIN (identisch zu fixture_schema_subset_check.cmake): MASTER liegt im super-Repo selbst ->
++# fehlt er, ist das FATAL. PROFILE liegt im ce-Submodul -> fehlt der Nachbar-Checkout, wird sauber
++# GESKIPPT (Marker FIXTURE-SYNC-SKIP, damit dieselbe SKIP_REGULAR_EXPRESSION greift).
++#
++# DUPLIZIERTE TEXT-HELFER (bewusst, mit Preis): die zwei Strip-Funktionen unten stehen so aehnlich auch in
++# fixture_schema_subset_check.cmake. Beide Dateien sind eigenstaendige `cmake -P`-Skripte mit EIGENEM
++# FATAL-Vokabular; ein gemeinsames include haette entweder die Fehlertexte verwaschen oder eine
++# Include-Pfad-Kopplung zwischen zwei sonst unabhaengigen ctest-Skripten eingefuehrt. Die Zusammenlegung
++# in ein xml_text_utils.cmake ist als Kandidat fuer den Sektion-75-Aufraeumpass notiert.
++
++foreach(_req MASTER PROFILE)
++    if(NOT DEFINED ${_req})
++        message(FATAL_ERROR "golden_n_consistency_check: -D${_req} fehlt.")
++    endif()
++endforeach()
++
++if(NOT EXISTS "${MASTER}")
++    message(FATAL_ERROR
++        "golden_n_consistency_check: MASTER '${MASTER}' EXISTIERT NICHT. Der kanonische Traeger liegt im "
++        "super-Repo selbst (Code/test_data_xml/) -- kein Nachbar-Checkout, also kein SKIP.")
++endif()
++if(NOT EXISTS "${PROFILE}")
++    message(STATUS "FIXTURE-SYNC-SKIP: Nachbar-Checkout fehlt (PROFILE='${PROFILE}').")
++    return()
++endif()
++
++# -- CDATA-Sektionen entfernen. VOR dem Kommentar-Strip, sonst kann ein '<!--' im CDATA-Text echtes
++#    Markup wegschneiden (dieselbe Falle wie in fixture_schema_subset_check.cmake).
++function(comdare_n_strip_cdata _in _out_var)
++    set(_s "${_in}")
++    while(TRUE)
++        string(FIND "${_s}" "<![CDATA[" _p)
++        if(_p EQUAL -1)
++            break()
++        endif()
++        string(SUBSTRING "${_s}" 0 ${_p} _head)
++        string(SUBSTRING "${_s}" ${_p} -1 _rest)
++        string(FIND "${_rest}" "]]>" _e)
++        if(_e EQUAL -1)
++            message(FATAL_ERROR "golden_n_consistency_check: unbeendete CDATA-Sektion (kein ']]>').")
++        endif()
++        math(EXPR _after "${_e} + 3")
++        string(SUBSTRING "${_rest}" ${_after} -1 _tail)
++        set(_s "${_head}${_tail}")
++    endwhile()
++    set(${_out_var} "${_s}" PARENT_SCOPE)
++endfunction()
++
++# -- Kommentare entfernen. BEIDE Dateien zitieren im Fliesstext reichlich <axis .../>- und
++#    <run_options .../>-Beispiele; ohne diesen Schritt wuerde die Wache Doku als Deklaration lesen.
++function(comdare_n_strip_comments _in _out_var)
++    set(_s "${_in}")
++    while(TRUE)
++        string(FIND "${_s}" "<!--" _p)
++        if(_p EQUAL -1)
++            break()
++        endif()
++        string(SUBSTRING "${_s}" 0 ${_p} _head)
++        string(SUBSTRING "${_s}" ${_p} -1 _rest)
++        string(FIND "${_rest}" "-->" _e)
++        if(_e EQUAL -1)
++            message(FATAL_ERROR "golden_n_consistency_check: unbeendeter XML-Kommentar (kein '-->').")
++        endif()
++        math(EXPR _after "${_e} + 3")
++        string(SUBSTRING "${_rest}" ${_after} -1 _tail)
++        set(_s "${_head}${_tail}")
++    endwhile()
++    set(${_out_var} "${_s}" PARENT_SCOPE)
++endfunction()
++
++function(comdare_n_read _label _file _out_var)
++    file(SIZE "${_file}" _bytes)
++    if(_bytes EQUAL 0)
++        message(FATAL_ERROR
++            "golden_n_consistency_check: '${_file}' (${_label}) ist LEER (0 Byte). Eine leere Datei "
++            "liefert 0 Achsen und waere trivial 'konsistent'. Kein Gruen ohne Inhalt.")
++    endif()
++    file(READ "${_file}" _raw)
++    comdare_n_strip_cdata("${_raw}" _nocdata)
++    comdare_n_strip_comments("${_nocdata}" _txt)
++    set(${_out_var} "${_txt}" PARENT_SCOPE)
++endfunction()
++
++# -- cap aus <run_options cap=".."/> ziehen. Fehlt der Block oder das Attribut, ist das FATAL: genau
++#    dieses Fehlen war der Befund.
++function(comdare_n_cap _label _file _txt _out_var)
++    if(NOT _txt MATCHES "<run_options[^>]*cap=\"([0-9]+)\"")
++        message(FATAL_ERROR
++            "golden_n_consistency_check: ${_label} '${_file}' traegt KEIN maschinenlesbares N "
++            "(<run_options cap=\"..\"/> fehlt oder hat keinen numerischen cap). Genau das war der "
++            "Codex-Befund HOCH -- ein Kommentar ist keine Bauanleitung.")
++    endif()
++    set(${_out_var} "${CMAKE_MATCH_1}" PARENT_SCOPE)
++endfunction()
++
++# -- Achsen des comdare_experiment-Dialekts: <axis ref=".." ... allowed_variants=".."/>.
++#    Jede genannte Achse MUSS allowed_variants tragen; eine ungepinnte Achse expandiert zur vollen
++#    Registry-Liste und zerstoert damit das deklarierte N.
++function(comdare_n_axes_experiment _file _txt _names_var _vals_prefix)
++    string(REGEX MATCHALL "<axis [^>]*>" _tags "${_txt}")
++    string(REGEX MATCHALL "<axis " _raw_starts "${_txt}")
++    list(LENGTH _tags _n_tags)
++    list(LENGTH _raw_starts _n_starts)
++    if(NOT _n_tags EQUAL _n_starts)
++        message(FATAL_ERROR
++            "golden_n_consistency_check: MASTER '${_file}': ${_n_starts} <axis-Anfaenge, aber nur "
++            "${_n_tags} vollstaendige Tags erkannt -- vermutlich ein '>' in einem Attributwert oder "
++            "eine abgeschnittene Datei. Kein stilles Gruen.")
++    endif()
++    set(_names "")
++    foreach(_tag IN LISTS _tags)
++        if(NOT _tag MATCHES "ref=\"([^\"]+)\"")
++            message(FATAL_ERROR "golden_n_consistency_check: MASTER '${_file}': <axis> ohne ref-Attribut.")
++        endif()
++        set(_ref "${CMAKE_MATCH_1}")
++        if(NOT _tag MATCHES "allowed_variants=\"([^\"]*)\"")
++            message(FATAL_ERROR
++                "golden_n_consistency_check: MASTER '${_file}': Achse '${_ref}' traegt KEINE "
++                "allowed_variants. Eine ungenannte/ungepinnte Achse expandiert zur VOLLEN "
++                "Registry-Liste und hebt das deklarierte N auf.")
++        endif()
++        string(REGEX REPLACE "[ \t\r\n]+" ";" _vals "${CMAKE_MATCH_1}")
++        list(REMOVE_ITEM _vals "")
++        list(SORT _vals)
++        list(APPEND _names "${_ref}")
++        set(${_vals_prefix}_${_ref} "${_vals}" PARENT_SCOPE)
++    endforeach()
++    list(SORT _names)
++    set(${_names_var} "${_names}" PARENT_SCOPE)
++endfunction()
++
++# -- Achsen des comdare_thesis_profile-Dialekts: <axis ref=".."><value>..</value>..</axis> in permute_axes.
++function(comdare_n_axes_thesis _file _txt _names_var _vals_prefix)
++    if(NOT _txt MATCHES "<permute_axes>(.*)</permute_axes>")
++        message(FATAL_ERROR
++            "golden_n_consistency_check: PROFILE '${_file}': kein <permute_axes>-Block gefunden "
++            "(fehlend oder abgeschnitten).")
++    endif()
++    set(_block "${CMAKE_MATCH_1}")
++    set(_names "")
++    # Zeichenweise ueber die </axis>-Grenzen laufen statt zeilenweise: ein <axis>-Element darf sich
++    # ueber mehrere Zeilen erstrecken, und der Chunk-Inhalt darf ';' enthalten (das eine CMake-Liste
++    # zerrissen haette).
++    set(_rest "${_block}")
++    while(TRUE)
++        string(FIND "${_rest}" "</axis>" _end)
++        if(_end EQUAL -1)
++            break()
++        endif()
++        string(SUBSTRING "${_rest}" 0 ${_end} _chunk)
++        math(EXPR _next "${_end} + 7")
++        string(SUBSTRING "${_rest}" ${_next} -1 _rest)
++        if(NOT _chunk MATCHES "<axis ref=\"([^\"]+)\">")
++            continue()
++        endif()
++        set(_cur "${CMAKE_MATCH_1}")
++        set(_curvals "")
++        string(REGEX MATCHALL "<value>[^<]*</value>" _vm "${_chunk}")
++        foreach(_v IN LISTS _vm)
++            string(REGEX REPLACE "^<value>(.*)</value>$" "\\1" _vv "${_v}")
++            string(STRIP "${_vv}" _vv)
++            list(APPEND _curvals "${_vv}")
++        endforeach()
++        if(NOT _curvals)
++            message(FATAL_ERROR
++                "golden_n_consistency_check: PROFILE '${_file}': Achse '${_cur}' hat KEINEN <value> "
++                "(leere Liste expandierte zur vollen Registry).")
++        endif()
++        list(SORT _curvals)
++        list(APPEND _names "${_cur}")
++        set(${_vals_prefix}_${_cur} "${_curvals}" PARENT_SCOPE)
++    endwhile()
++    list(SORT _names)
++    set(${_names_var} "${_names}" PARENT_SCOPE)
++endfunction()
++
++comdare_n_read("MASTER"  "${MASTER}"  _m_txt)
++comdare_n_read("PROFILE" "${PROFILE}" _p_txt)
++
++comdare_n_cap("MASTER"  "${MASTER}"  "${_m_txt}" _m_cap)
++comdare_n_cap("PROFILE" "${PROFILE}" "${_p_txt}" _p_cap)
++
++comdare_n_axes_experiment("${MASTER}"  "${_m_txt}" _m_names M)
++comdare_n_axes_thesis("${PROFILE}" "${_p_txt}" _p_names P)
++
++list(LENGTH _m_names _m_n)
++list(LENGTH _p_names _p_n)
++if(_m_n EQUAL 0 OR _p_n EQUAL 0)
++    message(FATAL_ERROR
++        "golden_n_consistency_check: Achsen-Extraktion leer (MASTER=${_m_n}, PROFILE=${_p_n}) -- "
++        "eine leere Menge waere trivial deckungsgleich. Extraktion kaputt, NICHT still gruen.")
++endif()
++
++# (1) Achsen-Mengen deckungsgleich.
++set(_only_master "")
++foreach(_a IN LISTS _m_names)
++    if(NOT "${_a}" IN_LIST _p_names)
++        list(APPEND _only_master "${_a}")
++    endif()
++endforeach()
++set(_only_profile "")
++foreach(_a IN LISTS _p_names)
++    if(NOT "${_a}" IN_LIST _m_names)
++        list(APPEND _only_profile "${_a}")
++    endif()
++endforeach()
++if(_only_master OR _only_profile)
++    message(FATAL_ERROR
++        "golden_n_consistency_check: ACHSEN-DRIFT zwischen den zwei golden-Traegern.\n"
++        "  MASTER : ${MASTER}\n"
++        "  PROFILE: ${PROFILE}\n"
++        "  nur im MASTER : ${_only_master}\n"
++        "  nur im PROFILE: ${_only_profile}\n"
++        "Beide Traeger muessen denselben Achsen-Satz nennen, sonst beschreiben sie zwei "
++        "verschiedene golden-Raeume.")
++endif()
++
++# (2)+(3) je Achse dieselbe Auspraegungs-Menge; Produkte mitrechnen.
++set(_m_prod 1)
++set(_p_prod 1)
++set(_val_drift "")
++foreach(_a IN LISTS _m_names)
++    set(_mv "${M_${_a}}")
++    set(_pv "${P_${_a}}")
++    if(NOT "${_mv}" STREQUAL "${_pv}")
++        list(APPEND _val_drift "${_a}: MASTER={${_mv}} PROFILE={${_pv}}")
++    endif()
++    list(LENGTH _mv _mc)
++    list(LENGTH _pv _pc)
++    if(_mc EQUAL 0 OR _pc EQUAL 0)
++        message(FATAL_ERROR
++            "golden_n_consistency_check: Achse '${_a}' hat auf einer Seite NULL Auspraegungen "
++            "(MASTER=${_mc}, PROFILE=${_pc}). Eine leere Liste expandiert zur vollen Registry.")
++    endif()
++    math(EXPR _m_prod "${_m_prod} * ${_mc}")
++    math(EXPR _p_prod "${_p_prod} * ${_pc}")
++endforeach()
++if(_val_drift)
++    string(REPLACE ";" "\n    " _drifttxt "${_val_drift}")
++    message(FATAL_ERROR
++        "golden_n_consistency_check: AUSPRAEGUNGS-DRIFT zwischen den zwei golden-Traegern.\n"
++        "  MASTER : ${MASTER}\n"
++        "  PROFILE: ${PROFILE}\n"
++        "  ABWEICHEND:\n    ${_drifttxt}\n"
++        "Die zwei Traeger muessen je Achse dieselben Bausteine nennen -- sonst ist das gemeinsame "
++        "N eine Behauptung ohne Deckung.")
++endif()
++
++# (4) Produkte und caps gegeneinander.
++if(NOT _m_prod EQUAL _p_prod)
++    message(FATAL_ERROR
++        "golden_n_consistency_check: N-PRODUKT ungleich (MASTER=${_m_prod}, PROFILE=${_p_prod}).")
++endif()
++if(NOT _m_cap EQUAL _p_cap)
++    message(FATAL_ERROR
++        "golden_n_consistency_check: cap ungleich (MASTER run_options cap=${_m_cap}, "
++        "PROFILE run_options cap=${_p_cap}). Beide Traeger muessen dasselbe N beziffern.")
++endif()
++if(NOT _m_cap EQUAL _m_prod)
++    message(FATAL_ERROR
++        "golden_n_consistency_check: das bezifferte N deckt sich NICHT mit den Achsen. "
++        "run_options cap=${_m_cap}, aber das Produkt der ${_m_n} Achsen-Auspraegungen ist ${_m_prod}. "
++        "Ein cap, den die Achsen nicht hergeben, ist eine willkuerliche Kappung, keine Kartesik.")
++endif()
++
++message(STATUS "golden_n_consistency_check: OK -- ${_m_n} Achsen deckungsgleich, "
++               "Produkt = ${_m_prod} = run_options cap beider Traeger (golden N = 2^17).")
+
+```
+
+## DIFF-CE (ce-Repo, c837d830..6a40071f)
+
+```diff
+diff --git a/libs/cache_engine/anatomy/abi_adapter.hpp b/libs/cache_engine/anatomy/abi_adapter.hpp
+index 021af44d..82c366c4 100644
+--- a/libs/cache_engine/anatomy/abi_adapter.hpp
++++ b/libs/cache_engine/anatomy/abi_adapter.hpp
+@@ -75,6 +75,7 @@
+ #include <axes/lookup/composable/search_algo_rebind.hpp> // A8-S5 PHASE B: search_algo_for_composition_t (bewusst boost-frei)
+ #include <axes/lookup/composable/observable_composed_container.hpp> // #188-4b-b1b: ObservableComposedContainer<Organ>
+ #include "../axes/node/axis_04_node_type_layout_aware_store.hpp" // Plan v2 S1: layout-honorierender Store (CLA-Stride echt, OOB behoben)
++#include "../axes/cacheline/cacheline_line_bytes.hpp" // B14-NB2 / KF-6-Auflage (D): Line-Groesse NUR ueber die Achse (line_bytes_of<L>())
+ // (X): ByteWiseKeyPrefix als kanonisches T3-Mess-Organ — IMMER deklariert (auch wenn die Composition
+ // PatriciaPathCompression/PathCompressionNone trägt; der `else`-Zweig der T3-Treibe-Op qualifiziert den Namen).
+ #include "../axes/path_compression/axis_02_path_compression_byte_wise.hpp"
+@@ -124,6 +125,51 @@
+ 
+ namespace comdare::cache_engine::anatomy {
+ 
++// -----------------------------------------------------------------------------
++// B14-NB2 / KF-6-AUFLAGE (D) (2026-08-06) -- Layout-Scan-Puffer: STRIDE ABLEITEN statt Literal pflegen.
++//
++// BEFUND: die drei Mess-Pfade (run_workload, run_workload_segmented, run_workload_segmented_v2)
++// dimensionierten ihren Layout-Scan-Puffer mit dem LITERAL 64 -- je Pfad an drei Stellen
++// (Dimensionierung, allocate-Alignment, deallocate-Alignment), also neun Literale insgesamt. Das war
++// korrekt, SOLANGE die Cache-Line-Unterachse faktisch auf ihrem Default B64 stand. Mit dem KF-6-
++// Vollausbau (experiment_golden_kern.xml deklariert line_size {32,64,128,256}) wird ein heute
++// schlafender Ueberlauf scharf: CacheLineAlignedMemoryLayout::scan_field_sum liest bei
++// aligned_stride = round_up(kRecordSize, line) und Index (kRecords-1) bis
++//   (16384-1) * 256 + 4 = 4194052 Byte,
++// waehrend der Puffer 16384 * 64 = 1048576 Byte gross war -- Faktor 4 zu klein, Heap-OOB.
++//
++// GEGENMITTEL (Owner-KERN "ALLE Achsen-Eigenschaften NUR ueber die Achsen", generalisierte
++// Schnitt-Regel 04.08.): die Line-Groesse ist Eigentum der cacheline-Unterachse. Sie wird deshalb nicht
++// mehr hier hartkodiert, sondern ueber die Konsum-Bruecke line_bytes_of<Layout>() bezogen
++// (axes/cacheline/cacheline_line_bytes.hpp) und der Stride daraus abgeleitet. Zusaetzlich pinnt je Pfad
++// ein static_assert die Puffer-Untergrenze gegen den groessten moeglichen Zugriff -- die Wache bricht den
++// BUILD, nicht die Messung, falls die Formel je wieder auseinanderlaeuft.
++//
++// DEFAULT-NEUTRALITAET (Byte-Beweis): heute liefert line_bytes_of<Layout>() den Achsen-Default 64
++// (kDefaultLineBytes), also kMaxStride = round_up(48,64) = 64 und kLbufBytes = 16384*64 = 1048576 --
++// exakt der bisherige Wert, und auch das Alignment bleibt 64. Kein Byte, keine Messung, kein
++// Fingerprint bewegt sich; die Ableitung wird erst mit der KF-6-NTTP-Belegung wirksam.
++//
++// UNTERGRENZE, WARUM sizeof(std::uint64_t) UND NICHT uint32_t: die Layout-/Serialisierungs-Scans lesen
++// 4 Byte je Record, der path_descend_scan des dritten Pfades aber 8 Byte. Die Wache nimmt deshalb
++// einheitlich den GROESSTEN Einzel-Read; sie ist damit strikter als noetig und fuer alle drei Pfade
++// dieselbe Aussage.
++// -----------------------------------------------------------------------------
++namespace detail {
++
++/// Der groesstmoegliche Scan-Stride des Layout-Puffers fuer Layout `L` in Bytes.
++/// = round_up(record_size, line_bytes_of<L>()); deckt damit JEDE Layout-Strategie ab, die auf diesem
++/// Puffer scannt: aos_strict (record_size), cache_line_aligned (round_up auf die Line), soa (4),
++/// packed_bitmap (2), aosoa (Block-Stride <= n*record_size) und alle Serializer (record_size).
++template <class L>
++[[nodiscard]] constexpr std::size_t layout_scan_stride_bytes(std::size_t record_size) noexcept {
++    constexpr std::size_t line = ::comdare::cache_engine::cacheline::line_bytes_of<L>();
++    static_assert(line > 0, "line_bytes_of<L>() == 0 -- die cacheline-Unterachse liefert keine Groesse");
++    return ((record_size + line - 1u) / line) * line;
++}
++
++} // namespace detail
++
+ // -----------------------------------------------------------------------------
+ // A8-S4 KONSTITUTIV-VERTRAG (Dossier docs/architecture/20260803-a8_f2_benchmarking_schnitt_soll_design.md
+ // Abschn. 3.3 "Gattungs-Vertrag"): je (Gattungs-Funktion x Achse) eine DEKLARIERTE Rolle --
+@@ -455,13 +501,20 @@ public:
+             // (NICHT 64) — sonst fiele cache_line_aligned (aligned_stride=round_up(48,64)=64) mit aos_strict
+             // (Stride 48) zusammen und die Layout-Achse differenzierte nicht. Damit liest aos_strict bei Stride 48,
+             // cache_line_aligned bei Stride 64. PFLICHT-OOB-SCHUTZ: der Puffer wird nach dem GRÖSSTMÖGLICHEN Stride
+-            // (64) dimensioniert (kLbufBytes = kRecords*64 >= jeder Layout-Stride), sonst läse der CLA-Scan bei
+-            // (kRecords-1)*64+4 über das Ende hinaus. EINMAL via Komposition-Allocator alloziert (Setup, NICHT gemessen).
++            // dimensioniert, sonst laese der CLA-Scan bei (kRecords-1)*Stride+4 ueber das Ende hinaus.
++            // B14-NB2 / KF-6-Auflage (D): der Stride wird ABGELEITET (line_bytes_of<MemLayout>()), nicht mehr als
++            // Literal 64 gepflegt -- s. den Block bei detail::layout_scan_stride_bytes. Am Achsen-Default ergibt
++            // das unveraendert 64 bzw. 16384*64 = 1048576 Byte (Byte-Neutralitaet).
++            // EINMAL via Komposition-Allocator alloziert (Setup, NICHT gemessen).
+             constexpr std::size_t kRecords    = 16384;
+             constexpr std::size_t kRecordSize = 48;
+-            constexpr std::size_t kLbufBytes =
+-                kRecords * 64; // OOB-Schutz: größtmöglicher Layout-Stride (64), nicht kRecordSize
+-            unsigned char* lbuf = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, 64));
++            constexpr std::size_t kLineBytes  = ::comdare::cache_engine::cacheline::line_bytes_of<MemLayout>();
++            constexpr std::size_t kMaxStride  = detail::layout_scan_stride_bytes<MemLayout>(kRecordSize);
++            constexpr std::size_t kLbufBytes  = kRecords * kMaxStride;
++            static_assert(kLbufBytes >= (kRecords - 1u) * kMaxStride + sizeof(std::uint64_t),
++                          "run_workload: Layout-Scan-Puffer zu klein fuer den groesstmoeglichen Zugriff "
++                          "(kRecords-1)*kMaxStride + 8 -- KF-6-Line-Groesse und Puffer-Formel laufen auseinander");
++            unsigned char* lbuf = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, kLineBytes));
+             // G3 Batch-2: Alloc-Achsen (z.B. numalloc) liefern bei OOM nullptr OHNE throw — der folgende Fill-Write
+             // wäre UB/SIGSEGV und würde vom catch(...) NICHT gefangen (bräche den noexcept-Vertrag). Ehrlicher
+             // 0-Return (= 0 Samples) statt Write ins Nichts.
+@@ -525,7 +578,7 @@ public:
+             do_batch(nullptr); // Warmup (verworfen)
+             std::uint64_t const n = (batches < out_capacity) ? batches : out_capacity;
+             for (std::uint64_t b = 0; b < n; ++b) out_latencies_ns[b] = do_batch(nullptr);
+-            alloc.deallocate(lbuf, kLbufBytes, 64); // Layout-Puffer freigeben
++            alloc.deallocate(lbuf, kLbufBytes, kLineBytes); // Layout-Puffer freigeben (Alignment == Alloc-Alignment)
+             return n;
+         } catch (...) {
+             return 0; // noexcept-Vertrag: interne Exception (z.B. OOM) → 0 Samples
+@@ -554,13 +607,20 @@ public:
+             constexpr std::size_t     kAlign = 16;
+             std::array<void*, kChurn> blocks{};
+             auto const churn_size = [](std::size_t j) noexcept { return std::size_t{16} + ((j * 16u) & 0xF0u); };
+-            // LAYOUT-FIX (X-§4): kRecordSize=48 + kLbufBytes nach größtmöglichem Layout-Stride (64) dimensioniert
++            // LAYOUT-FIX (X-Abschn.4): kRecordSize=48 + kLbufBytes nach groesstmoeglichem Layout-Stride dimensioniert
+             // (OOB-Schutz), identisch zu run_workload. So differenziert die memory_layout-Achse aos_strict(48) vs
+-            // cache_line_aligned(64).
++            // cache_line_aligned(Line-Groesse).
++            // B14-NB2 / KF-6-Auflage (D): Stride ABGELEITET statt Literal 64 -- dieser Pfad trug dieselbe Formel
++            // und dieselbe Falle wie run_workload; er wird deshalb identisch geheilt (Byte-neutral am Default).
+             constexpr std::size_t kRecords    = 16384;
+             constexpr std::size_t kRecordSize = 48;
+-            constexpr std::size_t kLbufBytes  = kRecords * 64; // OOB-Schutz: größtmöglicher Layout-Stride (64)
+-            unsigned char*        lbuf        = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, 64));
++            constexpr std::size_t kLineBytes  = ::comdare::cache_engine::cacheline::line_bytes_of<MemLayout>();
++            constexpr std::size_t kMaxStride  = detail::layout_scan_stride_bytes<MemLayout>(kRecordSize);
++            constexpr std::size_t kLbufBytes  = kRecords * kMaxStride;
++            static_assert(kLbufBytes >= (kRecords - 1u) * kMaxStride + sizeof(std::uint64_t),
++                          "run_workload_segmented: Layout-Scan-Puffer zu klein fuer den groesstmoeglichen "
++                          "Zugriff (kRecords-1)*kMaxStride + 8");
++            unsigned char* lbuf = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, kLineBytes));
+             // G3 Batch-2: OOM-nullptr der Alloc-Achse ehrlich abweisen (0 Samples) statt UB-Fill (s. run_workload).
+             if (lbuf == nullptr) return 0;
+             for (std::size_t i = 0; i < kLbufBytes; ++i) lbuf[i] = static_cast<unsigned char>(i * 31u + 7u);
+@@ -603,7 +663,7 @@ public:
+             do_seg_batch(); // Warmup (verworfen) — acc zurücksetzen
+             acc = SegmentAccumulator{};
+             for (std::uint64_t b = 0; b < batches; ++b) do_seg_batch();
+-            alloc.deallocate(lbuf, kLbufBytes, 64);
++            alloc.deallocate(lbuf, kLbufBytes, kLineBytes); // Alignment == Alloc-Alignment (B14-NB2)
+             out->seg_search_algo_ns   = (sink == ~0ull) ? (acc.s1 ^ 1) : acc.s1; // sink-Nutzung gegen Wegoptimierung
+             out->seg_allocator_ns     = acc.s2;
+             out->seg_memory_layout_ns = acc.s3;
+@@ -686,12 +746,21 @@ public:
+             std::array<void*, kChurn> blocks{};
+             auto const churn_size = [](std::size_t j) noexcept { return std::size_t{16} + ((j * 16u) & 0xF0u); };
+ 
+-            // LAYOUT-FIX (X-§4): kRecordSize=48; Lbuf nach größtmöglichem Stride (64) dimensioniert (OOB-Schutz).
++            // LAYOUT-FIX (X-Abschn.4): kRecordSize=48; Lbuf nach groesstmoeglichem Stride dimensioniert (OOB-Schutz).
+             // path_descend_scan (T3 Patricia) liest 8 B/Record → record_size>=8 sicher (letzter Read (kRecords-1)*48+8).
++            // B14-NB2 / KF-6-Auflage (D): Stride ABGELEITET statt Literal 64. DIESER Pfad war in der urspruenglichen
++            // Auflage gar nicht aufgefuehrt (erst beim Nachzaehlen am Ist gefunden) -- er traegt dieselbe Formel,
++            // also dieselbe Falle, und wird identisch geheilt. Die 8-Byte-Untergrenze der Wache ist genau der
++            // path_descend_scan-Read oben.
+             constexpr std::size_t kRecords    = 16384;
+             constexpr std::size_t kRecordSize = 48;
+-            constexpr std::size_t kLbufBytes  = kRecords * 64;
+-            unsigned char*        lbuf        = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, 64));
++            constexpr std::size_t kLineBytes  = ::comdare::cache_engine::cacheline::line_bytes_of<MemLayout>();
++            constexpr std::size_t kMaxStride  = detail::layout_scan_stride_bytes<MemLayout>(kRecordSize);
++            constexpr std::size_t kLbufBytes  = kRecords * kMaxStride;
++            static_assert(kLbufBytes >= (kRecords - 1u) * kMaxStride + sizeof(std::uint64_t),
++                          "run_workload_segmented_v2: Layout-Scan-Puffer zu klein fuer den groesstmoeglichen "
++                          "Zugriff (kRecords-1)*kMaxStride + 8");
++            unsigned char* lbuf = static_cast<unsigned char*>(alloc.allocate(kLbufBytes, kLineBytes));
+             // G3 Batch-2: OOM-nullptr der Alloc-Achse ehrlich abweisen (0 Samples) statt UB-Fill (s. run_workload).
+             if (lbuf == nullptr) return 0;
+             for (std::size_t i = 0; i < kLbufBytes; ++i) lbuf[i] = static_cast<unsigned char>(i * 31u + 7u);
+@@ -910,7 +979,7 @@ public:
+             clock::time_point const run_t0 = clock::now();
+             for (std::uint64_t b = 0; b < batches; ++b) do_seg19();
+             clock::time_point const run_t1 = clock::now();
+-            alloc.deallocate(lbuf, kLbufBytes, 64);
++            alloc.deallocate(lbuf, kLbufBytes, kLineBytes); // Alignment == Alloc-Alignment (B14-NB2)
+ 
+             // A8-S1 (2026-08-04, Befund B-6): Grenze ist kV3AxisCount, NIE ein Literal. Bis hierher stand `< 17`
+             // bei acc[18]/seg_ns[18] -> acc[17] (T17 persistence_target, oben gemessen) wurde weder kopiert noch
+diff --git a/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp b/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp
+index aa7df555..c76d6b3e 100644
+--- a/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp
++++ b/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp
+@@ -51,6 +51,23 @@ public:
+     // statische Forwarding-/Instrumentierungs-Hülle (KEIN GoF-Decorator: hält keine Komponenten-Instanz, kein Voll-Interface): Strategie-Inspektion durchgereicht (composition_registry/axis_path_serialization
+     // rufen C::memory_layout::name()).
+     [[nodiscard]] static constexpr std::size_t      cache_line_size() noexcept { return Strategy::cache_line_size(); }
++    // B14-NB2 (2026-08-06) -- FEHLENDE WEITERLEITUNG, gefunden beim Heilen der KF-6-Auflage (D):
++    // MemoryLayoutStrategyBase bietet cacheline_subaxis_line_bytes() (die PERMUTIERBARE Line-Groesse der
++    // cacheline-Unterachse), diese Huelle reichte sie aber NICHT durch. Der Registry-Eintrag der Achse ist
++    // ObservableMemoryLayout<Strategy> -- line_bytes_of<> sah also nie die Strategie, sondern fiel auf den
++    // Achsen-Default kDefaultLineBytes (64) zurueck. Heute ist das folgenlos (die Strategien tragen den
++    // Default), mit der KF-6-NTTP-Belegung waere es ein STILLER Fehler gewesen: die abgeleitete Puffer-
++    // Dimensionierung in abi_adapter.hpp haette weiter 64 gerechnet, waehrend der Scan bei 256 laeuft --
++    // also genau der OOB, den die Ableitung verhindern soll, nur unsichtbar. Muster + Begruendung:
++    // reference_observable_wrapper_must_forward_concept_members (Observable-Wrapper muessen Concept-Member
++    // forwarden). Byte-neutral: Strategy liefert heute denselben Wert wie der Fallback.
++    // NICHT VERWECHSELN mit cache_line_size() darueber -- das ist der INTRINSISCHE Design-Deskriptor der
++    // Layout-Strategie (aos_strict=1, cache_line_aligned=64), nicht die permutierbare Hardware-Line.
++    [[nodiscard]] static constexpr std::size_t cacheline_subaxis_line_bytes() noexcept
++        requires requires { Strategy::cacheline_subaxis_line_bytes(); }
++    {
++        return Strategy::cacheline_subaxis_line_bytes();
++    }
+     [[nodiscard]] static constexpr std::string_view name() noexcept { return Strategy::name(); }
+     static constexpr std::string_view               algo_version =
+         Strategy::algo_version; // #50 Caching: algo_version-Weiterleitung (Organ-Provenienz, reflect_versions)
+
+```

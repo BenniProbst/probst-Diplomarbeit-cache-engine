@@ -1,0 +1,38 @@
+{
+  "summary": "F3-Planungssession: Scheibe-6 Weg a (ce-Fixture sauber nachziehen) -- bindender Plan, kein Bau",
+  "agentCount": 1,
+  "logs": [],
+  "result": {
+    "plan": "PFAD: `/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260806-PLAN-scheibe6-weg-a-fixture-entflechtung.md` (689 Zeilen, ASCII-only literal 0 Nicht-ASCII, kein Bau, kein Commit)\n\n**ZIELBILD:** MASTER `Code/test_data_xml/experiment_golden_kern.xml` bleibt komplett unveraendert (Name/Ort/Inhalt) und bekommt nur einen additiven ABGRENZUNG-Absatz im Kopf. Die ce-Fixture wird per `git mv` zu `Code/external/comdare-cache-engine/tests/unit/thesis_tiere/experiment_kern_seam_fixture.xml` (Name aus AUDIT-C5-Vorschlag, Verzeichnis bleibt), Compile-Define `COMDARE_EXPERIMENT_GOLDEN_KERN` -> `COMDARE_EXPERIMENT_KERN_SEAM_FIXTURE`. Werte bleiben byte-identisch; der Kopf bekommt die 6-zeilige Divergenz-Tabelle mit Test-Zeilen-Belegen IN die Datei (Owner-Auflage \"Divergenz dokumentiert lassen\" wird damit verstaerkt, nicht nur erhalten). `fixture_sync_check.cmake` bleibt unveraendert scharf aufs Alt-Paar (3 produktive Suiten haengen daran), `fixture_schema_subset_check.cmake` bleibt der Gurt -- genau EINE Zeile wandert.\n\n**SCHRITTFOLGE:** [0] Vorbedingung B14 gelandet (heute NICHT erfuellt) -> [1] ce-Commit: Move + 4 Nachzuege (CMakeLists:3333, test cpp:3/:29-41, machine_identity.hpp:30/:211, target_isa_complex_axis.hpp:124) -> [2] super-Commit: `-DFIXTURE=`-Pfad + R1/R2-Haertung + **Gitlink-Bump im SELBEN Commit** -> [3] ce-Commit CI-Heimat (additiv, vorziehbar) -> [4] Ledger/Doku. Je Schritt Rename-Reinheits-Beweis (`git show --name-status` = 1 R / 0 A / 0 D) und 6 Biss-Praeparate mit ALT/NEU-Kontrast.\n\n**GROESSTES RISIKO (R1):** Nach der Umbenennung zeigt `-DFIXTURE=` (wt-b14-golden/Code/tests/CMakeLists.txt:174) auf einen nicht mehr existierenden Pfad -> `fixture_schema_subset_check.cmake:61-64` feuert den Skip-Zweig -> `SKIP_REGULAR_EXPRESSION \"FIXTURE-SYNC-SKIP\"` (CMakeLists:197-198) macht daraus ctest-**SKIPPED**, was **nicht als Fehler zaehlt**. Die einzige Wache des Neu-Paares waere lautlos abgeschaltet und `-L da_unit` bliebe gruen. Weil super/ce getrennte Repos mit Gitlink sind, ist dieser Zustand nicht durch Sorgfalt vermeidbar (Bisect, alter Submodul-Stand, Rescue-Branch). Gegenmassnahme: Skip-Zweig praezisieren -- existiert das Fixture-VERZEICHNIS, ist eine fehlende Datei FATAL statt SKIP (dieselbe Disziplin, die der Dateikopf `:36-42` fuer SCHEMA/MASTER schon fuehrt), Haertung VOR dem Rename landen, Gitlink-Bump im selben super-Commit, Beleg via Biss-Beweis ALT=SKIPPED/RC=0 vs NEU=FATAL/RC=1.\n\n**DREI BEFUNDE, DIE VON DER VORLAGE ABWEICHEN:**\n1. \"12 hartverdrahtete Tests\" ist falsch: `test_experiment_kern_seam.cpp` hat **15 TEST-Bloecke, davon lesen 6 die Fixture** (via `parse_kern()` :39-42); 9 bauen ihr Profil in C++ oder per Temp-XML und sind rename-neutral.\n2. \"GEBAUT wurde Weg b\" -- gebaut ja, **gelandet nein**: `fixture_schema_subset_check.cmake` existiert nur in `/home/comdare/wt-b14-golden` (b14-golden-kf6 @ 953ce412, Ledger: NB3 noetig). Im `development` (e75db8f9) gibt es die Datei nicht. Das ist die harte Vorbedingung fuer Weg a.\n3. NEU (R4, in keiner Vorlage): `test_experiment_kern_seam` traegt Label `contract` (tests/unit/CMakeLists.txt:3334), wird von `test:unit` per `-LE contract|pmc` (ce/.gitlab-ci.yml:479) ausgeschlossen und steht in **keinem** `-R`-Regex der ce-CI -> die gesamte machines/pruefling/fulljoin/storage-Naht laeuft heute in **keinem CI-Job**. Solange das gilt, ist \"Pipeline gruen\" fuer dieses Paket wertlos.\n\n**ABGRENZUNG/REIHENFOLGE:** Trennlinie = NAMEN (hier) vs WERTE (F5). Empfehlung **B14/NB3 -> Weg a -> F5**: beide brauchen B14; Weg a ist wert-neutral und nur solange in einer Zeile beweisbar, wie kein Inhalt mitwandert; der eindeutige Name macht F5 sicherer (F5 ist genau die Welle, in der ein Angleich-Reflex die D3-D6-Beweise loeschen wuerde, waehrend alle Werte legitim in Bewegung sind); Doppelarbeit an `Code/tests/CMakeLists.txt` entfaellt. Reissleine: startet F5 zuerst, wird Weg a **Schritt 1 innerhalb** F5 -- nie parallel.\n\n**EINORDNUNG:** ~2,5 h netto / halber Tag Kalenderzeit, Risikoklasse niedrig, golden-neutral. Empfehlung: Schritt 3 (CI-Heimat, R4) SOFORT vorziehen (15 min, keine B14-Abhaengigkeit, schliesst ein reales Loch vor dem F5-Fenster); Rename selbst **nach Abgabe Fr 08.08.** -- oder frueher nur, wenn B14/NB3 landet, ein super-Slot frei ist und F5 unmittelbar folgt."
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Plan"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "f3-plan",
+      "phaseIndex": 1,
+      "phaseTitle": "Plan",
+      "agentId": "acdb3bb7f63d1a5b4",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786019526329,
+      "queuedAt": 1786019526329,
+      "attempt": 1,
+      "lastToolName": "Bash",
+      "lastToolSummary": "cd /home/comdare/Projekte/Research/probst-diplomarbeit-cach…",
+      "promptPreview": "ROLLE: Planungs-Agent (read-only + EIN Plandoc) fuer SCHEIBE-6 WEG A. Owner-Entscheid F3 verbatim: \"Bitte sauber die fixture nachziehen und am besten nochmal gruendlich planen.\"\n\nKONTEXT (aus dem Ledger vormittag-25, am Objekt gegenpruefen): MASTER = super Code/test_data_xml/experiment_golden_kern.xml (kanonisch seit 27.07.). Die ce-Datei tests/unit/thesis_tiere/experiment_golden_kern.xml ist laut…",
+      "lastProgressAt": 1786020177341,
+      "tokens": 160731,
+      "toolCalls": 44,
+      "durationMs": 651012,
+      "resultPreview": "PFAD: `/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260806-PLAN-scheibe6-weg-a-fixture-entflechtung.md` (689 Zeilen, ASCII-only literal 0 Nicht-ASCII, kein Bau, kein Commit)\n\n**ZIELBILD:** MASTER `Code/test_data_xml/experiment_golden_kern.xml` bleibt komplett unveraendert (Name/Ort/Inhalt) und bekommt nur einen additiven ABGRENZUNG-Absatz im Kopf. Die ce-Fixture w…"
+    }
+  ],
+  "totalTokens": 160731,
+  "totalToolCalls": 44
+}

@@ -1,0 +1,5 @@
+rc=0
+0
+[100%] Linking CXX executable test_g3_artifact_cache_transport
+[100%] Built target comdare_experiment_planner
+[100%] Built target test_g3_artifact_cache_transport

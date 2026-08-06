@@ -1,0 +1,32 @@
+=== gitleaks detect ueber das gesamte Repo (repo-eigene Config) ===
+
+Finding:     ...&l3=3&CFID=544994&CFTOKEN=[1;3;me98b412c1925b047-D40E0583-FBA5-9D20-3106E5AF7890476C[0m
+http://www.europa.e...
+Secret:      [1;3;me98b412c1925b047-D40E0583-FBA5-9D20-3106E5AF7890476C[0m
+RuleID:      generic-api-key
+Entropy:     4.151799
+File:        ext/traversal/P05-START/START/tests/resources/datasets/eu-2005.urls
+Line:        763571
+Fingerprint: ext/traversal/P05-START/START/tests/resources/datasets/eu-2005.urls:generic-api-key:763571
+
+Finding:     ...?l1=2&CFID=544994&CFTOKEN=[1;3;me98b412c1925b047-D40E0583-FBA5-9D20-3106E5AF7890476C[0m
+http://www.europa.e...
+Secret:      [1;3;me98b412c1925b047-D40E0583-FBA5-9D20-3106E5AF7890476C[0m
+RuleID:      generic-api-key
+Entropy:     4.151799
+File:        ext/traversal/P05-START/START/tests/resources/datasets/eu-2005.urls
+Line:        763573
+Fingerprint: ext/traversal/P05-START/START/tests/resources/datasets/eu-2005.urls:generic-api-key:763573
+
+Finding:     ...?l1=4&CFID=544994&CFTOKEN=[1;3;me98b412c1925b047-D40E0583-FBA5-9D20-3106E5AF7890476C[0m
+http://www.europa.e...
+Secret:      [1;3;me98b412c1925b047-D40E0583-FBA5-9D20-3106E5AF7890476C[0m
+RuleID:      generic-api-key
+Entropy:     4.151799
+File:        ext/traversal/P05-START/START/tests/resources/datasets/eu-2005.urls
+Line:        763574
+Fingerprint: ext/traversal/P05-START/START/tests/resources/datasets/eu-2005.urls:generic-api-key:763574
+
+[90m7:17PM[0m [32mINF[0m scan completed in 3m23s
+[90m7:17PM[0m [31mWRN[0m leaks found: 89
+EXIT: 0
