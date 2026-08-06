@@ -199,6 +199,15 @@ int run_individual_writers(fs::path const& csv, fs::path const& out_root, std::v
                                                             defaults.reference_value, lang)))
                 return 13;
         }
+        // (9) P3a: baseline-normalisierte Balken je z-Feld.
+        for (auto const z_sv : ag::kSurfaceFields) {
+            std::string const z{z_sv};
+            if (!dg_ok(dg::write_normalized_bar_vs_reference(out_dir / ("lc_normbar_" + z + ".tex"), surf_rows, z,
+                                                             defaults.reference_value, lang)))
+                return 14;
+        }
+        // (10) P3b: Pareto-/Tradeoff-Streuung p50 gegen p99.
+        if (!dg_ok(dg::write_latency_tradeoff_scatter(out_dir / "latency_tradeoff.tex", surf_rows, lang))) return 15;
     }
     return 0;
 }
@@ -228,6 +237,12 @@ std::vector<std::string> expected_extra_files() {
     // ehrlicher Platzhalter -- die Fixture kennt kein linear_scan, also genau dieser Fall). Auch der
     // Platzhalter ist eine Datei und muss byte-identisch zwischen Facade und Einzel-Writern sein.
     for (auto const z : ag::kSurfaceFields) names.push_back("lc_surface_ratio_" + std::string{z} + ".tex");
+    // GRAPH-UMBAU P3b: die Pareto-Streuung entsteht, sobald p99-Spalten da sind -- die Fixture traegt
+    // sie (Inc-2a hat sie fuer den Latenz-Range angehaengt). AUSDRUECKLICH NICHT hier: lc_normbar_<z>
+    // (P3a) -- die Fixture kennt die Default-Referenz linear_scan nicht, der Writer ist also
+    // honest-empty und legt keine Datei an (geprueft in
+    // Stufe08Appendix.ReferenceForestIsHonestEmptyForAbsentReferenceAndAppearsForPresentOne-Nachbarschaft).
+    names.push_back("latency_tradeoff.tex");
     return names;
 }
 
@@ -306,10 +321,10 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
     ASSERT_EQ(run_individual_writers(fixture, dir_ref, langs, label), 0);
 
     // Beweis: jede erzeugte .tex byte-identisch -- 12 Kern-.tex + 4 Darstellungs-.tex (Inc-2a)
-    // + 6 3D-Flaechen (P1a) + 6 Verhaeltnis-Matrizen (P2) = 28/Sprache.
+    // + 6 3D-Flaechen (P1a) + 6 Verhaeltnis-Matrizen (P2) + Pareto-Streuung (P3b) = 29/Sprache.
     auto all_expected = expected_files();
     for (auto const& n : expected_extra_files()) all_expected.push_back(n);
-    ASSERT_EQ(all_expected.size(), 28u);
+    ASSERT_EQ(all_expected.size(), 29u);
     for (auto const& lang : langs) {
         auto const a = dir_orch / lang / "tabellen";
         auto const b = dir_ref / lang / "tabellen";

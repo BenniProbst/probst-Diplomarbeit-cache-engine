@@ -497,6 +497,32 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             }
         }
 
+        // -- (5k) GRAPH-UMBAU 2D/3D, P3a (2026-08-06): baseline-normalisierte Balken -------------------
+        // Verdichtet die Verhaeltnis-Matrix ueber die Lastprofile zu EINEM Balken je search_algo. Die
+        // Matrix zeigt, WO ein Unterschied herkommt; der Balken, OB er ueber die Lastprofile traegt.
+        // honest-empty: ohne gueltiges Verhaeltnis KEINE Datei (dg_ok-Toleranz).
+        for (auto const z_sv : kSurfaceFields) {
+            std::string const z{z_sv};
+            if (int const rc = dg::write_normalized_bar_vs_reference(out_dir / ("lc_normbar_" + z + ".tex"), surf_rows,
+                                                                      z, cfg.reference_value, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_normalized_bar_vs_reference (" << z << "," << lang
+                          << ") failed " << rc << "\n";
+                return status_io_error;
+            }
+        }
+
+        // -- (5l) GRAPH-UMBAU 2D/3D, P3b (2026-08-06): Pareto-/Tradeoff-Streuung p50 gegen p99 ---------
+        // Die einzige Form hier, die ZWEI KONKURRIERENDE Kostenachsen gegeneinander auftraegt (Idreos/
+        // Dayan-Familie). Ein echter Lese-vs-Speicher-Pareto ist NICHT moeglich: das WIDE-Schema traegt
+        // keine Speicher-/Byte-Spalte -- p50 gegen p99 (typischer Fall gegen Dienstguete-Fall) ist das
+        // Kostenpaar, das die Daten wirklich hergeben. honest-empty ohne p99 (dg_ok-Toleranz).
+        if (int const rc = dg::write_latency_tradeoff_scatter(out_dir / "latency_tradeoff.tex", surf_rows, lang);
+            !dg_ok(rc)) {
+            std::cerr << "appendix-generator: write_latency_tradeoff_scatter (" << lang << ") failed " << rc << "\n";
+            return status_io_error;
+        }
+
         std::cout << "appendix-generator [" << lang
                   << "]: 12 Kern- + 5 Darstellungs-.tex + 3D-Flaechen + Sweep-Kurven + Achsen-Inventar "
                      "(honest-empty ausgelassen wo ohne Daten) -> "

@@ -1040,6 +1040,261 @@ int write_surface_ratio_vs_reference(std::filesystem::path const& out, std::span
     return write_heatmap(out, data, cnst);
 }
 
+namespace {
+// Vorwaerts-Deklaration: die Kategorienfarben-Hilfe steht weiter unten in DERSELBEN anonymen
+// Namensraum-Gruppe (bei der Segment-Attribution, die sie zuerst gebraucht hat). Der Tradeoff-Plot
+// nutzt sie fuer seine Serienfarben -- eine zweite Farbfunktion waere die naechste Drift-Klasse.
+void hsv_to_rgb(double h, double s, double v, int& r_out, int& g_out, int& b_out);
+} // namespace
+
+std::vector<LatencyTradeoffPoint> aggregate_latency_tradeoff(std::span<WideMeasurementRow const> rows) {
+    std::vector<LatencyTradeoffPoint> out;
+    for (auto const& r : rows) {
+        if (!r.two_phase_valid) continue;
+        if (r.search_algo.empty()) continue;
+        // Ohne p99 gibt es kein Kostenpaar -> Zeile HONEST ausgelassen. Ausdruecklich NICHT p99:=p50
+        // setzen: das behauptete "kein Tail-Aufschlag", also einen Befund, den die Daten nicht tragen.
+        if (!r.has_op_p99) continue;
+        for (auto const& spec : kRangeOps) {
+            // scan-No-Op-Profile wie im Flaechen-/Range-Pfad ausschliessen (fuer Scan invalide).
+            if (spec.display == "scan" && (r.workload == "ycsb_e" || r.workload == "lp_range_scan"))
+                continue;
+            // AUSGEFUEHRT? Zaehler zuerst, sonst die p50>0-Heuristik -- wortgleich zu z_field_executed.
+            bool const executed = r.has_op_n ? (r.*(spec.n_mem) > 0U) : (r.*(spec.p50_mem) > 0.0);
+            if (!executed) continue;
+            double const p50 = r.*(spec.p50_mem);
+            double const p99 = r.*(spec.p99_mem);
+            // Negative/nicht-endliche Werte sind keine Latenzen (reine Abwehr). Eine ECHT GEMESSENE 0
+            // ist dagegen ein gueltiger Punkt (E-2b-Doktrin), KEIN Ausschlussgrund.
+            if (!std::isfinite(p50) || !std::isfinite(p99) || p50 < 0.0 || p99 < 0.0) continue;
+            out.push_back({r.search_algo, std::string{spec.display}, r.workload, p50, p99});
+        }
+    }
+    // Deterministische Ordnung (Serie, dann Op, dann Lastprofil) -- reproduzierbare .tex.
+    std::sort(out.begin(), out.end(), [](LatencyTradeoffPoint const& a, LatencyTradeoffPoint const& b) {
+        if (a.algo != b.algo) return a.algo < b.algo;
+        if (a.op != b.op) return a.op < b.op;
+        if (a.workload != b.workload) return a.workload < b.workload;
+        if (a.p50_ns != b.p50_ns) return a.p50_ns < b.p50_ns;
+        return a.p99_ns < b.p99_ns;
+    });
+    return out;
+}
+
+int write_latency_tradeoff_scatter(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                                   std::string const& lang, PageConstraints const& cnst) {
+    auto const points = aggregate_latency_tradeoff(rows);
+    if (points.empty()) return status_empty_input; // honest leer, KEINE Datei
+
+    bool const de = (lang == "de");
+
+    // Serien = search_algo (deterministisch sortiert, weil aggregate_latency_tradeoff sortiert liefert).
+    std::vector<std::string> algos;
+    for (auto const& p : points)
+        if (algos.empty() || algos.back() != p.algo) algos.push_back(p.algo);
+
+    // E-2b-Praezedenz (wortgleich zum 3D-Pfad): beide Achsen LOG, weil die Latenz Dekaden spannt --
+    // faellt aber EIN darzustellender Wert auf exakt 0 (echt gemessene 0), fallen BEIDE Achsen auf
+    // LINEAR zurueck. Eine log-Achse verschluckt die 0 lautlos als unbounded coordinate; das waere ein
+    // verschwiegener Messwert.
+    bool have_zero = false;
+    double lo = 0.0, hi = 0.0;
+    bool   have_val = false;
+    for (auto const& p : points) {
+        if (p.p50_ns == 0.0 || p.p99_ns == 0.0) have_zero = true;
+        for (double const v : {p.p50_ns, p.p99_ns}) {
+            if (!have_val) {
+                lo       = v;
+                hi       = v;
+                have_val = true;
+            } else {
+                lo = std::min(lo, v);
+                hi = std::max(hi, v);
+            }
+        }
+    }
+    bool const log_axes = !have_zero;
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    f << "% AUTO-GENERATED durch diagram_generator (E-2c, Pareto-/Tradeoff-Streuung p50 vs p99; lang=" << lang
+      << ")\n";
+    f << "% Ein Punkt je (Konfiguration x Op-Art): x = Median-Latenz, y = Tail-Latenz (p99). Beide Groessen\n";
+    f << "% stehen SO im WIDE-Schema -- nichts ist erfunden, nichts aggregiert. Diagonale y=x = kein\n";
+    f << "% Tail-Aufschlag; je weiter ein Punkt darueber liegt, desto teurer sein Ausreisser-Verhalten.\n";
+    f << "% Achsen " << (log_axes ? "LOG" : "LINEAR -- echte 0 gemessen, log kann 0 nicht tragen") << ".\n";
+    if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
+    open_resizebox(f, cnst);
+    f << "\\begin{tikzpicture}\n";
+    for (std::size_t i = 0; i < algos.size(); ++i) {
+        double const hue = (algos.size() <= 1) ? 0.0 : (360.0 * static_cast<double>(i) / static_cast<double>(algos.size()));
+        int          r = 0, g = 0, b = 0;
+        hsv_to_rgb(hue, 0.65, 0.85, r, g, b);
+        f << "\\definecolor{tradeoff" << i << "}{RGB}{" << r << "," << g << "," << b << "}\n";
+    }
+    f << "\\definecolor{tradeoffdiag}{RGB}{120,120,120}\n";
+    f << "\\begin{axis}[\n";
+    write_pgfplots_axis_options(f, cnst,
+                                de ? "Pareto-Streuung: Median- gegen Tail-Latenz"
+                                   : "Pareto scatter: median vs tail latency",
+                                de ? "Median-Latenz p50 (ns/op)" : "median latency p50 (ns/op)",
+                                de ? "Tail-Latenz p99 (ns/op)" : "tail latency p99 (ns/op)");
+    if (log_axes) f << "    xmode=log,\n    ymode=log,\n";
+    f << "    legend style={at={(1.03,1)},anchor=north west,font=\\tiny,legend cell align=left},\n";
+    f << "    mark size=1.6pt,\n";
+    f << "]\n";
+    // Diagonale y=x ZUERST (liegt damit unter den Punkten). Sie spannt die tatsaechliche Wertespanne;
+    // bei entarteter Spanne (ein einziger Wert) wird sie eine Dekade bzw. eine Einheit geweitet -- das
+    // weitet NUR die Linie, kein Datenpunkt aendert sich.
+    {
+        double d_lo = lo;
+        double d_hi = hi;
+        if (!(d_hi > d_lo)) {
+            if (log_axes && d_lo > 0.0) {
+                d_hi = d_lo * 10.0;
+            } else {
+                d_hi = d_lo + 1.0;
+            }
+        }
+        f << "% E-2c-DIAGONALE y=x: Referenz \"kein Tail-Aufschlag\". Punkte darueber zahlen Aufschlag.\n";
+        f << "\\addplot[sharp plot,no marks,dashed,tradeoffdiag,forget plot] coordinates {(" << fmt_double(d_lo) << ","
+          << fmt_double(d_lo) << ") (" << fmt_double(d_hi) << "," << fmt_double(d_hi) << ")};\n";
+    }
+    for (std::size_t i = 0; i < algos.size(); ++i) {
+        f << "\\addplot[only marks,mark=*,color=tradeoff" << i << "] coordinates {";
+        for (auto const& p : points) {
+            if (p.algo != algos[i]) continue;
+            f << "(" << fmt_double(p.p50_ns) << "," << fmt_double(p.p99_ns) << ")";
+        }
+        f << "};\n";
+        f << "\\addlegendentry{" << escape_latex(algos[i]) << "}\n";
+    }
+    f << "\\end{axis}\n\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
+    if (!cnst.body_only) {
+        f << "\\caption{"
+          << escape_latex(de ? "Pareto-Streuung: Median- gegen Tail-Latenz (ein Punkt je Konfiguration und "
+                               "Op-Art; Diagonale = kein Tail-Aufschlag)"
+                             : "Pareto scatter: median vs tail latency (one point per configuration and "
+                               "operation kind; diagonal = no tail surcharge)")
+          << "}\n\\end{figure}\n";
+    }
+    return f.good() ? status_ok : status_io_error;
+}
+
+int write_normalized_bar_vs_reference(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                                      std::string const& z_field, std::string const& reference_algo,
+                                      std::string const& lang, PageConstraints const& cnst) {
+    if (rows.empty()) return status_empty_input;
+    HeatmapData data;
+    // WIEDERVERWENDUNG der P2-Aggregation: dieselbe Zwei-Operanden-Regel, dieselbe Ausfuehrungs-Wahrheit.
+    // Es gibt bewusst KEINEN zweiten Rechenweg zum Verhaeltnis.
+    if (!aggregate_surface_ratio_matrix(rows, z_field, reference_algo, data).axes_present) return status_empty_input;
+
+    bool const have_mask = heatmap_mask_matches(data);
+    // Je Zeile (search_algo) der Median ueber die GUELTIGEN lastprofil-weisen Verhaeltnisse. Eine Zeile
+    // ohne einen einzigen gueltigen Wert wird AUSGELASSEN -- nicht auf 1.0 gesetzt (das behauptete
+    // "genauso schnell wie die Referenz", also einen Befund, den es nicht gibt).
+    std::vector<std::string> labels;
+    std::vector<double>      values;
+    for (std::size_t y = 0; y < data.matrix.size(); ++y) {
+        std::vector<double> samples;
+        for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
+            if (!cell_displayable(data, have_mask, y, x)) continue;
+            samples.push_back(data.matrix[y][x]);
+        }
+        if (samples.empty()) continue; // honest ausgelassen
+        labels.push_back(data.y_labels[y]);
+        values.push_back(nearest_rank_median(std::move(samples)));
+    }
+    if (labels.empty()) return status_empty_input; // ehrlich leer, KEINE Datei
+
+    bool const        de     = (lang == "de");
+    std::string const metric = z_field_human(z_field, lang);
+    std::string const title  = (de ? "Normalisiert zur Referenz " : "Normalised to reference ") + reference_algo +
+                              ": " + metric + (de ? " (1 = wie die Referenz)" : " (1 = same as reference)");
+
+    // E-2b-Praezedenz: ein Balken auf exakt 0 (Zaehler echt 0 gemessen) kann auf einer log-Achse weder
+    // gezeigt noch ehrlich ersetzt werden -> dann LINEAR. Sonst log (Verhaeltnisse spannen Dekaden).
+    bool have_zero_bar = false;
+    for (double const v : values)
+        if (v == 0.0) have_zero_bar = true;
+    bool const y_log = !have_zero_bar;
+
+    std::ofstream f{out};
+    if (!f) return status_io_error;
+    f << "% AUTO-GENERATED durch diagram_generator (P3a, baseline-normalisierte Balken; z=" << z_field
+      << "; Referenz=" << reference_algo << "; lang=" << lang << ")\n";
+    f << "% Balken = nearest-rank-Median der lastprofil-weisen Verhaeltnisse zur Referenz (NICHT das\n";
+    f << "% Verhaeltnis zweier Roh-Mediane -- so zaehlt jedes Lastprofil gleich). Gruppen ohne ein\n";
+    f << "% einziges gueltiges Verhaeltnis sind AUSGELASSEN, nicht auf 1.0 gesetzt.\n";
+    if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
+    open_resizebox(f, cnst);
+    f << "\\begin{tikzpicture}\n";
+    f << "\\definecolor{nbfaster}{RGB}{27,158,119}\n"; // unter 1 = schneller als die Referenz
+    f << "\\definecolor{nbslower}{RGB}{215,48,39}\n";  // ueber 1 = langsamer als die Referenz
+    f << "\\definecolor{nbref}{RGB}{120,120,120}\n";   // die Referenzlinie bei 1
+    f << "\\begin{axis}[\n";
+    f << "    ybar,\n";
+    f << "    bar width=18pt,\n";
+    write_pgfplots_axis_options(f, cnst, title, (de ? "Suchalgorithmus" : "search algorithm"),
+                                (de ? "Verhaeltnis zur Referenz" : "ratio to reference"));
+    if (y_log) f << "    ymode=log,\n";
+    // RELATIVE Form zwingend: die abs-Form bricht auf symbolischen Achsen fatal ab (siehe die
+    // ausfuehrliche Begruendung bei write_segment_attribution_stacked_bar).
+    f << "    enlarge x limits=0.25,\n";
+    f << "    symbolic x coords={";
+    for (std::size_t i = 0; i < labels.size(); ++i) {
+        if (i > 0) f << ",";
+        f << escape_latex(labels[i]);
+    }
+    f << "},\n";
+    f << "    xtick=data,\n";
+    f << "    x tick label style={font=\\small},\n";
+    f << "    legend style={at={(1.03,1)},anchor=north west,font=\\tiny,legend cell align=left},\n";
+    f << "]\n";
+    // ZWEI Serien (schneller / langsamer) auf DENSELBEN x-Positionen: bar shift=0pt verhindert das
+    // sonst uebliche Nebeneinanderstellen. Jede Gruppe erscheint dadurch genau EINMAL, in der Farbe
+    // ihrer Seite. Balken exakt auf 1 zaehlen zur "nicht langsamer"-Seite (Gleichheit ist keine
+    // Regression) -- die Referenzlinie darunter macht den Fall ohnehin ablesbar.
+    for (int side = 0; side < 2; ++side) {
+        bool const slower = (side == 1);
+        // Eine Seite OHNE Balken wird gar nicht erst emittiert. Ein leerer \addplot erzeugt sonst die
+        // pgfplots-Warnung "the current plot has no coordinates" (pdflatex-Probe 2026-08-06) und die
+        // Legende behauptete eine Klasse, die die Daten nicht tragen. Die Farbzuordnung leidet nicht
+        // darunter, weil beide Serien ihre Farbe EXPLIZIT setzen (fill=nbfaster/nbslower).
+        bool any = false;
+        for (std::size_t i = 0; i < labels.size(); ++i)
+            if ((values[i] > 1.0) == slower) any = true;
+        if (!any) continue;
+        f << "\\addplot[ybar, bar shift=0pt, fill=" << (slower ? "nbslower" : "nbfaster")
+          << ", draw=black!45, very thin] coordinates {";
+        for (std::size_t i = 0; i < labels.size(); ++i) {
+            if ((values[i] > 1.0) != slower) continue;
+            f << "(" << escape_latex(labels[i]) << "," << fmt_double(values[i]) << ")";
+        }
+        f << "};\n";
+        f << "\\addlegendentry{"
+          << (slower ? (de ? "langsamer als die Referenz" : "slower than reference")
+                     : (de ? "schneller/gleich" : "faster or equal"))
+          << "}\n";
+    }
+    // Referenzlinie bei 1 ueber die volle Breite der symbolischen Achse.
+    // MECHANIK (pdflatex-Probe 2026-08-06): ein \draw mit dem |--Operator ist hier NICHT moeglich --
+    // pgfplots bricht auf einer symbolischen Achse fatal ab ("coord trafo unsupported" +
+    // "the input coordinate \pgfmathresult has not been defined with symbolic x coords"), weil |- eine
+    // Koordinaten-Transformation erzwingt, die symbolische Achsen nicht anbieten. Der tragfaehige Weg
+    // ist ein \addplot mit den beiden aeusseren SYMBOLISCHEN x-Werten. sharp plot hebt das
+    // axis-weite ybar fuer genau diese Linie auf, forget plot haelt sie aus der Legende.
+    f << "% P3a-REFERENZLINIE: y=1 ist die Referenz selbst (Verhaeltnis 1 = gleich schnell).\n";
+    f << "\\addplot[sharp plot,no marks,dashed,nbref,thick,forget plot] coordinates {("
+      << escape_latex(labels.front()) << ",1) (" << escape_latex(labels.back()) << ",1)};\n";
+    f << "\\end{axis}\n\\end{tikzpicture}\n";
+    close_resizebox(f, cnst);
+    if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
+    return f.good() ? status_ok : status_io_error;
+}
+
 int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
                                            std::string const& z_field, std::string const& lang,
                                            PageConstraints const& cnst) {
@@ -1443,7 +1698,15 @@ int write_segment_attribution_stacked_bar(std::filesystem::path const& out, std:
     f << "    bar width=22pt,\n";
     write_pgfplots_axis_options(f, cnst, title, xlab, ylab);
     f << "    ymin=0,\n";
-    f << "    enlarge x limits={abs=0.75},\n"; // symbolische x-Achse: Rand fuer wenige breite Balken
+    // P3a-BEIFANG (2026-08-06) -- BESTANDSFEHLER, gefunden durch die pdflatex-Probe des neuen
+    // Balken-Writers: `enlarge x limits={abs=0.75}` bricht auf einer SYMBOLISCHEN x-Achse FATAL ab
+    // ("Sorry, the input coordinate \pgfmathresult has not been defined with 'symbolic x coords'",
+    // kein PDF -- reproduziert mit texlive 2026/pgfplots unter compat 1.16, 1.18 UND newest). Die
+    // abs-Form verlangt eine numerische Achse; symbolische Achsen kennen nur die relative Form.
+    // Diese Figur war damit seit ihrer Landung nicht kompilierbar -- unbemerkt, weil sie am
+    // \InputIfFileExists haengt und der d03-Korpus sie erst jetzt mit Daten fuellt.
+    // Die relative Form leistet dasselbe (Rand fuer wenige breite Balken) und ist symbolisch gueltig.
+    f << "    enlarge x limits=0.25,\n"; // symbolische x-Achse: Rand fuer wenige breite Balken
     f << "    symbolic x coords={";
     for (std::size_t i = 0; i < agg.groups.size(); ++i) {
         if (i > 0) f << ",";

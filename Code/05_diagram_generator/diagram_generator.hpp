@@ -370,6 +370,29 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
                                                    std::string const& z_field, std::string const& reference_algo,
                                                    std::string const& lang = "en", PageConstraints const& cnst = {});
 
+// GRAPH-UMBAU 2D/3D, P3a (2026-08-06) -- BASELINE-NORMALISIERTES BALKENDIAGRAMM
+// -----------------------------------------------------------------------------
+// Dieselbe Aussage wie die Verhaeltnis-Matrix (P2), aber ueber die Lastprofile ZUSAMMENGEFASST: EIN
+// Balken je search_algo, Hoehe = nearest-rank-Median der lastprofil-weisen Verhaeltnisse zur Referenz.
+// Waagerechte Referenzlinie bei 1. Faerbung nach Seite (unter 1 = schneller, ueber 1 = langsamer).
+// Die Matrix zeigt, WO ein Unterschied herkommt; der Balken zeigt, OB er ueber die Lastprofile traegt.
+//
+// AGGREGATION UEBER VERHAELTNISSE, NICHT UEBER ROHWERTEN: der Median wird ueber die je Lastprofil
+// gebildeten Verhaeltnisse genommen, nicht als Verhaeltnis zweier Roh-Mediane. Nur so zaehlt jedes
+// Lastprofil gleich; sonst dominierte das langsamste Lastprofil die Aussage allein durch seine
+// absolute Groesse.
+//
+// HONEST-EMPTY: Gruppen ohne ein einziges gueltiges Verhaeltnis (keine Referenz in ihren Lastprofilen)
+// werden AUSGELASSEN -- niemals auf 1.0 ("wie die Referenz") oder 0 gesetzt. Traegt KEINE Gruppe ein
+// gueltiges Verhaeltnis -> status_empty_input, KEINE Datei (Muster der Darstellungs-Writer 5a-5e).
+// y-ACHSEN-MODUS (E-2b-Praezedenz): LOG, weil Verhaeltnisse Dekaden spannen -- faellt aber ein Balken
+// auf exakt 0 (Zaehler echt 0 gemessen), fallen alle auf LINEAR zurueck: eine log-Achse kann die 0
+// weder zeigen noch ehrlich ersetzen.
+[[nodiscard]] int write_normalized_bar_vs_reference(std::filesystem::path const&        out,
+                                                    std::span<WideMeasurementRow const> rows,
+                                                    std::string const& z_field, std::string const& reference_algo,
+                                                    std::string const& lang = "en", PageConstraints const& cnst = {});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // A2 / m3v2 (2026-06-20) — Working-Set-Sweep-Kurve (Metrik über working_set_n)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -469,6 +492,50 @@ struct LatencyEcdfSeries {
 // Konfigurationen" (Config-Streuung) aus — NICHT Per-Operation. Guard: keine gültige Zeile → status_empty_input.
 [[nodiscard]] int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
                                      std::string const& lang = "en", PageConstraints const& cnst = {});
+
+// -----------------------------------------------------------------------------
+// E-2c (2026-08-06) -- Pareto-/Tradeoff-Streuung Median-Latenz vs. Tail-Latenz
+// -----------------------------------------------------------------------------
+//
+// OWNER-KERN E-2 ("eine Heatmap ist vielleicht nicht die geeignete Form, wie machen das die anderen Paper?
+// Orientiere dich daran und verwende 2D und 3D Graphen."). Der SOTA-Katalog der Planungs-Welle
+// (docs/sessions/backups/20260806-e2a-planungs-welle/, Katalog-Position #7) benennt den Scatter-/Pareto-
+// Tradeoff-Plot als eine der Kernformen der einschlaegigen Paper-Familie (Idreos/Dayan "Learning Key-Value
+// Store Design" Fig. 8; Monkey/Dostoevsky Pareto-Fronten) -- zwei KONKURRIERENDE Kostenachsen, je
+// Konfiguration ein Punkt, statt zweier nominaler Kategorien in einer Farbskala.
+//
+// EHRLICHKEITS-GRUNDLAGE (dieselbe wie P3): das WIDE-Schema traegt je Permutation NUR p50/p99, NICHT die
+// rohen Einzel-Op-Latenzen. Genau diese zwei Perzentile SIND aber ein echtes Kostenpaar: Median-Latenz
+// (typischer Fall) gegen Tail-Latenz (p99, Dienstguete-Fall). Der Plot erfindet also nichts, sondern traegt
+// exakt die beiden vorhandenen Groessen gegeneinander auf. KEINE Aggregation ueber Konfigurationen: jede
+// gueltige (Zeile x Op-Art) ist EIN Punkt -- die Punktwolke IST die Aussage (Streuung der Konfigurationen).
+struct LatencyTradeoffPoint {
+    std::string algo;     // search_algo (Serie/Farbe)
+    std::string op;       // Op-Art (insert/lookup/erase/scan/rmw)
+    std::string workload; // Lastprofil der Zeile (Diagnose; nicht plot-tragend)
+    double      p50_ns = 0.0;
+    double      p99_ns = 0.0;
+};
+
+// Sammelt die Tradeoff-Punkte. AUFNAHME-REGELN (alle bereits im Modul etabliert, hier nur wiederverwendet):
+// two_phase_valid UND search_algo nicht leer UND has_op_p99 (ohne p99 gibt es kein Kostenpaar -> Zeile honest
+// ausgelassen, NICHT p99:=p50 gesetzt) UND Op AUSGEFUEHRT (Zaehler op_<art>_n zuerst, sonst p50>0-Heuristik --
+// wortgleich zu z_field_executed) UND scan-No-Op-Profile "ycsb_e"/"lp_range_scan" ausgeschlossen. Eine ECHT
+// GEMESSENE 0 ist ein gueltiger Punkt (E-2b-Doktrin), KEIN Ausschlussgrund. Leer <=> keine gueltige Zeile.
+[[nodiscard]] std::vector<LatencyTradeoffPoint> aggregate_latency_tradeoff(std::span<WideMeasurementRow const> rows);
+
+// Emittiert die Pareto-/Tradeoff-Streuung (x = p50, y = p99, `only marks`, 1 Serie je search_algo mit eigener
+// Farbe+Marke, plus die Diagonale y=x als Referenz "kein Tail-Aufschlag"; Punkte oberhalb der Diagonale
+// zahlen Tail-Aufschlag, das ist die Lese-Anweisung im Titel).
+// ACHSEN-MODUS (E-2b-Praezedenz des 3D-Pfades, wortgleich uebernommen): beide Achsen LOG, weil die Latenz
+// Dekaden spannt -- ABER faellt EIN darzustellender Wert auf exakt 0 (echt gemessene 0), fallen BEIDE Achsen
+// auf LINEAR zurueck: eine log-Achse kann die 0 weder zeigen noch ehrlich ersetzen (sie verschluckt sie
+// lautlos als unbounded coordinate = verschwiegener Messwert).
+// HONEST-EMPTY: kein einziger gueltiger Punkt -> status_empty_input (KEINE Datei, kein leerer Plot) -- exakt
+// das write_latency_range_bar/write_segment_attribution_stacked_bar-Muster. Breiten-sicher (resizebox_wrap).
+[[nodiscard]] int write_latency_tradeoff_scatter(std::filesystem::path const&        out,
+                                                 std::span<WideMeasurementRow const> rows,
+                                                 std::string const& lang = "en", PageConstraints const& cnst = {});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INC-4 (2026-07-13) — Modus-2 Per-Achsen-Observer-Detail-Tabelle (stat_<achse>_<feld>)

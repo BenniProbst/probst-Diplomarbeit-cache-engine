@@ -1441,3 +1441,227 @@ TEST(Stufe05Pipeline, RatioModeDoesNotLeakIntoThePlainLatencyHeatmap) {
     fs::remove(out, ec);
     fs::remove(p, ec);
 }
+
+// -----------------------------------------------------------------------------
+// GRAPH-UMBAU 2D/3D, P3a (2026-08-06) -- baseline-normalisierte Balken.
+// Verdichtet die Verhaeltnis-Matrix ueber die Lastprofile zu EINEM Balken je search_algo.
+// -----------------------------------------------------------------------------
+
+// (P3a-t1) Der Balken ist der Median der lastprofil-weisen VERHAELTNISSE, nicht das Verhaeltnis der
+// Roh-Mediane. Prueffall: Referenz 100/1000 in zwei Lastprofilen, k_ary 50/2000. Lastprofil-weise
+// Verhaeltnisse sind 0.5 und 2.0; nearest-rank-Median davon = 2.0. Das Verhaeltnis der Roh-Mediane waere
+// dagegen 1000/100 bzw. 2000/1000 -- eine ganz andere Zahl. So zaehlt jedes Lastprofil gleich, statt dass
+// das langsamste allein durch seine absolute Groesse dominiert.
+TEST(Stufe05Pipeline, NormalizedBarAggregatesRatiosNotRawMedians) {
+    auto p = comdare_user_tmp() / "p3a_ratio_of_ratios.csv";
+    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
+                                 {"linear_scan", "ycsb_c", 1000.0},
+                                 {"k_ary", "ycsb_a", 50.0},
+                                 {"k_ary", "ycsb_c", 2000.0}});
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "p3a_bar.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_normalized_bar_vs_reference(out, rows, "ns_per_op", "linear_scan", "en"), dg::status_ok);
+    // k_ary: Median{0.5, 2.0} (nearest-rank) = 2.0 ; linear_scan gegen sich selbst = 1.0.
+    EXPECT_TRUE(file_contains(out, "(k\\_ary,2.0000)"));
+    EXPECT_TRUE(file_contains(out, "(linear\\_scan,1.0000)"));
+    // Referenzlinie bei 1 vorhanden -- und als \addplot, NICHT als \draw mit |- (das bricht auf
+    // symbolischen Achsen fatal ab, pdflatex-Probe 2026-08-06).
+    EXPECT_TRUE(file_contains(out, "P3a-REFERENZLINIE"));
+    EXPECT_TRUE(file_contains(out, "sharp plot,no marks,dashed,nbref"));
+    EXPECT_FALSE(file_contains(out, "|-"));
+    // Die abs-Form von enlarge x limits ist auf symbolischen Achsen fatal -> relative Form.
+    EXPECT_TRUE(file_contains(out, "enlarge x limits=0.25"));
+    EXPECT_FALSE(file_contains(out, "enlarge x limits={abs="));
+    // Verhaeltnisse spannen Dekaden -> log-y (keine echte 0 im Spiel).
+    EXPECT_TRUE(file_contains(out, "ymode=log"));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (P3a-t2) Eine Gruppe ohne ein einziges gueltiges Verhaeltnis wird AUSGELASSEN -- niemals auf 1.0
+// gesetzt. 1.0 hiesse "genauso schnell wie die Referenz", also ein Befund, den es nicht gibt.
+TEST(Stufe05Pipeline, NormalizedBarOmitsGroupsWithoutAnyValidRatio) {
+    auto p = comdare_user_tmp() / "p3a_group_without_ref.csv";
+    // Referenz laeuft NUR in ycsb_a. eytzinger laeuft NUR in ycsb_c -> hat nie einen Nenner.
+    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
+                                 {"k_ary", "ycsb_a", 50.0},
+                                 {"eytzinger", "ycsb_c", 35.0}});
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "p3a_omit.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_normalized_bar_vs_reference(out, rows, "ns_per_op", "linear_scan", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "(k\\_ary,0.5000)"));
+    EXPECT_TRUE(file_contains(out, "(linear\\_scan,1.0000)"));
+    // eytzinger taucht NIRGENDS auf -- weder als Balken noch als Achsen-Kategorie.
+    EXPECT_FALSE(file_contains(out, "eytzinger"));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (P3a-t3) HONEST-EMPTY: fehlt die Referenz im ganzen Korpus, traegt keine Gruppe ein Verhaeltnis ->
+// status_empty_input und KEINE Datei (Muster der Darstellungs-Writer, nicht der Platzhalter-Weg der
+// Flaechen-Writer -- diese Datei haengt am \InputIfFileExists).
+TEST(Stufe05Pipeline, NormalizedBarHonestEmptyWhenReferenceAbsent) {
+    auto p = comdare_user_tmp() / "p3a_no_ref.csv";
+    write_wide_csv_for_ratio(p, {{"k_ary", "ycsb_a", 50.0}, {"eytzinger", "ycsb_a", 35.0}});
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "p3a_empty.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    EXPECT_EQ(dg::write_normalized_bar_vs_reference(out, rows, "ns_per_op", "linear_scan", "en"),
+              dg::status_empty_input);
+    EXPECT_FALSE(fs::exists(out)); // KEINE Datei
+
+    fs::remove(p, ec);
+}
+
+// (P3a-t4) E-2b-Praezedenz: faellt ein Balken auf exakt 0 (Zaehler echt 0 gemessen), faellt die y-Achse
+// auf LINEAR zurueck -- eine log-Achse koennte die 0 weder zeigen noch ehrlich ersetzen (sie verschluckt
+// sie lautlos als unbounded coordinate = verschwiegener Messwert).
+TEST(Stufe05Pipeline, NormalizedBarFallsBackToLinearWhenABarIsTrueZero) {
+    auto p = comdare_user_tmp() / "p3a_zero_bar.csv";
+    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0}, {"k_ary", "ycsb_a", 0.0}});
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "p3a_zero.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    // op_insert_p50_ns, weil nur dort der Zaehler op_insert_n die 0 als GEMESSEN ausweisen kann.
+    ASSERT_EQ(dg::write_normalized_bar_vs_reference(out, rows, "op_insert_p50_ns", "linear_scan", "en"),
+              dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "(k\\_ary,0.0000)")); // die 0 ist ein echter Balken
+    EXPECT_FALSE(file_contains(out, "ymode=log"));       // ... und die Achse ist linear
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// -----------------------------------------------------------------------------
+// GRAPH-UMBAU 2D/3D, P3b / E-2c (2026-08-06) -- Pareto-/Tradeoff-Streuung p50 gegen p99.
+// Die einzige Form mit ZWEI KONKURRIERENDEN Kostenachsen. Ein echter Idreos-Pareto (Lese- gegen
+// Speicherkosten) ist NICHT moeglich -- das WIDE-Schema traegt keine Speicher-/Byte-Spalte. p50 gegen
+// p99 (typischer Fall gegen Dienstguete-Fall) ist das Kostenpaar, das die Daten wirklich hergeben.
+// -----------------------------------------------------------------------------
+namespace {
+
+// p99-Spalten optional: has_p99=false spiegelt den cowfix-v1-Korpus OHNE p99 (dann honest-empty).
+// insert_p50/p99 je Zeile frei setzbar; die uebrigen Op-Arten sind nie ausgefuehrt (n=0).
+struct TradeoffRow {
+    char const* algo;
+    char const* workload;
+    double      p50;
+    double      p99;
+};
+
+void write_wide_csv_for_tradeoff(fs::path const& p, std::vector<TradeoffRow> const& rows, bool has_p99) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_n;op_insert_p50_ns;op_lookup_n;op_lookup_p50_ns;op_erase_n;"
+      << "op_erase_p50_ns;op_scan_n;op_scan_p50_ns;op_rmw_n;op_rmw_p50_ns;";
+    if (has_p99) f << "op_insert_p99_ns;op_lookup_p99_ns;op_erase_p99_ns;op_scan_p99_ns;op_rmw_p99_ns;";
+    f << "workload;two_phase_valid\n";
+    for (auto const& r : rows) {
+        f << "search_algo=" << r.algo << "/mapping=direct;" << r.p50 << ";"
+          << "1000;" << r.p50 << ";" // insert AUSGEFUEHRT
+          << "0;0;0;0;0;0;0;0;";     // lookup/erase/scan/rmw: nie ausgefuehrt
+        if (has_p99) f << r.p99 << ";0;0;0;0;";
+        f << r.workload << ";1\n";
+    }
+}
+
+} // namespace
+
+// (P3b-t1) Je gueltiger (Zeile x ausgefuehrter Op-Art) genau EIN Punkt -- keine Aggregation. Die
+// Punktwolke IST die Aussage. Serien = search_algo, plus die Diagonale y=x als Referenz.
+TEST(Stufe05Pipeline, LatencyTradeoffEmitsOnePointPerExecutedOpAndTheDiagonal) {
+    auto p = comdare_user_tmp() / "p3b_points.csv";
+    write_wide_csv_for_tradeoff(p,
+                                {{"k_ary", "ycsb_a", 100.0, 400.0},
+                                 {"k_ary", "ycsb_c", 120.0, 500.0},
+                                 {"eytzinger", "ycsb_a", 80.0, 90.0}},
+                                /*has_p99=*/true);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_TRUE(rows[0].has_op_p99);
+
+    // Nur insert ist ausgefuehrt -> genau 3 Punkte (nicht 15).
+    auto const pts = dg::aggregate_latency_tradeoff(rows);
+    ASSERT_EQ(pts.size(), 3u);
+    for (auto const& q : pts) EXPECT_EQ(q.op, "insert");
+
+    auto            out = comdare_user_tmp() / "p3b_scatter.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_latency_tradeoff_scatter(out, rows, "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "only marks"));
+    EXPECT_TRUE(file_contains(out, "(100.0000,400.0000)"));
+    EXPECT_TRUE(file_contains(out, "(120.0000,500.0000)"));
+    EXPECT_TRUE(file_contains(out, "(80.0000,90.0000)"));
+    // 2 Serien (eytzinger, k_ary) + Diagonale.
+    EXPECT_EQ(count_occurrences(out, "\\addlegendentry"), 2u);
+    EXPECT_TRUE(file_contains(out, "E-2c-DIAGONALE"));
+    // Latenz spannt Dekaden -> log-Achsen (keine echte 0 im Spiel).
+    EXPECT_TRUE(file_contains(out, "xmode=log"));
+    EXPECT_TRUE(file_contains(out, "ymode=log"));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (P3b-t2) HONEST-EMPTY ohne p99: ohne die zweite Kostenachse gibt es kein Kostenpaar. Die Zeile wird
+// AUSGELASSEN -- ausdruecklich NICHT p99:=p50 gesetzt (das behauptete "kein Tail-Aufschlag").
+TEST(Stufe05Pipeline, LatencyTradeoffHonestEmptyWithoutP99Columns) {
+    auto p = comdare_user_tmp() / "p3b_no_p99.csv";
+    write_wide_csv_for_tradeoff(p, {{"k_ary", "ycsb_a", 100.0, 0.0}}, /*has_p99=*/false);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    for (auto const& r : rows) EXPECT_FALSE(r.has_op_p99);
+
+    EXPECT_TRUE(dg::aggregate_latency_tradeoff(rows).empty());
+
+    auto            out = comdare_user_tmp() / "p3b_empty.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    EXPECT_EQ(dg::write_latency_tradeoff_scatter(out, rows, "en"), dg::status_empty_input);
+    EXPECT_FALSE(fs::exists(out)); // KEINE Datei
+
+    fs::remove(p, ec);
+}
+
+// (P3b-t3) E-2b-Praezedenz: eine ECHT GEMESSENE 0 ist ein gueltiger Punkt -- und zwingt BEIDE Achsen auf
+// LINEAR, weil eine log-Achse die 0 lautlos als unbounded coordinate verschlucken wuerde (verschwiegener
+// Messwert).
+TEST(Stufe05Pipeline, LatencyTradeoffTrueZeroKeepsThePointAndForcesLinearAxes) {
+    auto p = comdare_user_tmp() / "p3b_zero.csv";
+    write_wide_csv_for_tradeoff(p, {{"k_ary", "ycsb_a", 0.0, 0.0}, {"eytzinger", "ycsb_a", 50.0, 70.0}},
+                                /*has_p99=*/true);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    // Der Zaehler op_insert_n=1000 weist die 0 als GEMESSEN aus -> der Punkt bleibt.
+    auto const pts = dg::aggregate_latency_tradeoff(rows);
+    ASSERT_EQ(pts.size(), 2u);
+
+    auto            out = comdare_user_tmp() / "p3b_zero.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_latency_tradeoff_scatter(out, rows, "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out, "(0.0000,0.0000)")); // die 0 ist ein echter Punkt
+    EXPECT_FALSE(file_contains(out, "xmode=log"));      // ... und die Achsen sind linear
+    EXPECT_FALSE(file_contains(out, "ymode=log"));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
