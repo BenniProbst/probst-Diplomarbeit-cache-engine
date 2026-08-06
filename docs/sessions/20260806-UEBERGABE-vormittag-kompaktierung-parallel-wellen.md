@@ -1,6 +1,6 @@
 # KONTEXT-UEBERGABE 06.08.2026 ~09:40 Berlin — Vormittags-Strecke (Lead-Session 5a19728e), Kompaktierung
 
-> **ERST-ANKER bei Wiederaufnahme:** super-Ledger `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md` Nachtraege **frueh-3..vormittag-22** (rueckwaerts). Dann dieses Doc. Dann `docs/sessions/20260806-REGISTER-todo-konsolidierung-14-tage.md` (konsolidiertes TODO-Register). Erdungs-Doktrin: Ledger + Objekt-Ist + Lebend-Check VOR jedem Handeln; nach Compact ZUSAETZLICH den Session-Log nachvollziehen (Memory `feedback_wiederanlauf_doktrin_nach_session_abriss`).
+> **ERST-ANKER bei Wiederaufnahme:** super-Ledger `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md` Nachtraege **frueh-3..vormittag-27** (rueckwaerts). Dann dieses Doc. Dann `docs/sessions/20260806-REGISTER-todo-konsolidierung-14-tage.md` (konsolidiertes TODO-Register). Erdungs-Doktrin: Ledger + Objekt-Ist + Lebend-Check VOR jedem Handeln; nach Compact ZUSAETZLICH den Session-Log nachvollziehen (Memory `feedback_wiederanlauf_doktrin_nach_session_abriss`).
 
 ## 1. REGIME + LINIEN-IST (verifiziert ~09:40)
 
@@ -13,7 +13,7 @@
 
 | Welle | wf | Worktree/Stand | Naechster Schritt |
 |---|---|---|---|
-| **Teil-2-Uebernahme** (P0) | wf_c72fb788 | wt-b2-neuanker @b1d33cbe; baute zuletzt T2-F | Dual-Review -> L1-Buendel-Landung |
+| **Teil-2** (P0) FERTIG 5/6 | wf_c72fb788 | wt-b2 @a6a6875b (rescue gesichert); Gates-Spiegel VOLL | Dual-Review SPLIT: Fable LANDEBEREIT / **Codex NICHT-LANDEN** (Resume-Fingerprint-Entkopplung=Kern-Bug). T2-A-Welle (F1/F4+K2/H1/H2) -> Review -> L1 |
 | **E18-SNAP-NB** | wf_058d646c | wt-b-e18snap @bda34e79; heilt 6 Codex-Befunde (3xHOCH Retry-Verlust/Kollision/Non-FF) | Fable-Re-Review -> Landung (core.sh + Patch auf .gitlab-ci.yml durch Lead) |
 | **A1-NB** | wf_c76d0070 | wt-b-a1 @0b5ed557; heilt Codex 1xHOCH Fingerprint-Bump + 2xMITTEL (PMR bytes==0, Concept-Regress) | Fable-Re-Review -> Landung |
 | **doku-77-78** | Agent | Branch b-doku-77-78; kReal16+XorFilter-FN-Doku | Commit lesen -> Landung |
