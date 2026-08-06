@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================
+     experiment_golden_kern.xml
+     KANONISCH AB #48. Jede Schema-Evolution zuerst HIER (STETS gepflegt).
+
+     Fundament: Sektion 59-KERN (Mess-Schema-Steuerung) plus Sektion 62
+     (Maschinen-Menge, compare-Reserve). Die Wurzel comdare_experiment
+     version=2 gibt einen sauberen Schema-Schnitt gegen INC-C-v1 und die
+     Alt-REV7.6-Wurzel.
+
+     ADDITIV-DANEBEN: die alte experiment_golden.xml und ihre ce-Kopie
+     bleiben byte-unberuehrt (Interim-Abgabe-Kette, Interim-GO-1); ihr
+     Sync-Gate test_fixture_sync_experiment_golden bleibt in Kraft, weil
+     der Antriebs-Test 02_messung_driver noch auf diesem Alt-Paar faehrt
+     (02_messung_driver/CMakeLists.txt COMDARE_V32_EXPERIMENT_GOLDEN_XML).
+     SCHEIBE 6 (B14, 2026-08-06) ist damit KEINE Verschiebung der alten
+     Wache, sondern die Bewachung DIESES Paares: das Neu-Paar bekommt eine
+     eigene ctest-Wache (test_fixture_schema_experiment_golden_kern,
+     Code/tests/fixture_schema_subset_check.cmake). Ein Byte-Sync auf das
+     Neu-Paar ist NICHT moeglich und war nie gemeint: die ce-Datei gleichen
+     Namens ist laut ihrem eigenen Kopf eine eigenstaendige Parser-Naht-
+     Fixture mit absichtlich abweichenden Werten (fulljoin, storage=minio,
+     dritter mapping-Override) und ist in test_experiment_kern_seam.cpp
+     literal verdrahtet. Die Wache setzt deshalb die Auflage aus
+     docs/plaene/20260722-AUDIT-nacht-abweichungen-VERDIKT.md Zeile 58 um
+     ("umbenennen ODER ctest-Wache Fixture-Teilmenge-Master-Schema").
+
+     A7-KERN (Owner 2026-08-05, Ledger NACHTRAG abend-10): DIESE Datei ist
+     die TRIGGER-INPUT-BASIS des Baus und muss "bezueglich der vorhandenen
+     Achsen und Einstellungen staendig geupdated werden, um auch gegen
+     syntaktische Aenderungen konsistent zu bleiben". Jede Aenderung hier
+     ist ein DEKLARIERTES Trigger-Input-Ereignis (Bau-Matrix-Definition),
+     KEIN Bruch der Pilot-Byte-Wachen: golden_fullpilot_320*,
+     permutation_axes.xml, m3v2_study.profile.xml und die CRC-Anker haengen
+     an anderen Traegern und bleiben unberuehrt.
+
+     #48-S5: die Element-Namen und die Reihenfolge folgen EXAKT dem Ist-
+     Parser (parse_experiment_profile) und dem konsolidierten XSD
+     (experiment_schema.xsd, xs:sequence). Diese Instanz validiert gegen
+     experiment_schema.xsd (xmllint -schema). Achsen-Voll-Abdeckung ist die
+     Lese-Referenz aus all_axes_golden.profile.xml (18 Kompositions-Achsen
+     mit je 2 gepinnten Auspraegungen, persistence_target mit 1; System-
+     Achsen-Block; Mess-Tooling; Writeback-Trio). all_axes_golden selbst
+     bleibt unangetastet; seit NB2 ist die Deckung nicht mehr nur behauptet,
+     sondern von test_golden_n_consistency Achse fuer Achse bewacht.
+
+     PFLEGE-STAND 2026-08-06 (B14, gegen den Ist-Korpus nachgezogen):
+       (1) 17 -> 18 Kompositions-Achsen: persistence_target (Slot T17) kam
+           am 26.07. dazu (kCompositionAxisNames hat 18 Eintraege,
+           cache_engine_axis_registry.xml fuehrt T17); die Kommentare hier
+           behaupteten weiter 17 und listeten den Namen nicht.
+       (2) Mess-Tooling: die drei Ein-Tool-Combos waren die F-3-Regression
+           (3 CEB-Lanen). Sektion 64 / Owner 22.07.: Default ist die
+           VOLLMENGE in EINER CEB; all_axes_golden ist seitdem korrigiert,
+           diese Datei war es nicht.
+       (3) System-Achsen: der target_isa-Kanal (Haupt-Achse, seit A4
+           20.07. im XSD und in parse_system_axes) war hier ungenutzt.
+       (4) KF-6: die Organ-Sub-Achsen hatten in diesem Dialekt gar keinen
+           Kanal (Schema-Luecke) -> neuer <organ_subaxes>-Block.
+
+     NB2-STAND 2026-08-06 (Codex-Verdikt NACHBESSERN, 2xHOCH + 3xMITTEL; die
+     Begruendungen stehen jeweils am Ort):
+       (5) [HOCH] N = 2^17 war NICHT maschinenlesbar kodiert (nur Fliesstext),
+           und die damalige Voll-Sweep-Form behauptete rechnerisch ein voellig
+           anderes N -> alle 18 Achsen tragen jetzt ihre allowed_variants
+           (Produkt exakt 131072) PLUS neuer <run_options cap="131072"/>.
+       (6) [HOCH] allowed_variants "binary_search linear_search" sind keine
+           Registry-Namen (search_algo fuehrt k_ary/interpolation/eytzinger/
+           linear_scan) -> gepinnt auf k_ary interpolation; der Validator haette
+           die Datei sonst abgelehnt.
+       (7) [MITTEL] die Gesamtzahl der Bau-Matrix liess den Systemblock aus
+           -> 4 x 4 x 2^17 = 2097152 ausgewiesen.
+       Die drei uebrigen MITTEL-Befunde betreffen die Wachen, nicht diese Datei:
+       fixture_schema_subset_check.cmake (leere/abgeschnittene XML, CDATA-Strip,
+       '>' im Attributwert, fehlende SCHEMA-/MASTER-Datei); dort geheilt.
+     ==================================================================== -->
+<comdare_experiment version="2" id="diplomarbeit_golden_kern"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="experiment_schema.xsd">
+
+  <metadata>
+    <name>diplomarbeit_golden_kern</name>
+    <mode>full</mode>
+  </metadata>
+
+  <!-- Fork 5: mode=full ist die Voll-Whitelist-Basis aus der Registry
+       (ANGEBOT). Das Attribut ref benennt spaeter ein Paper-Template
+       (post-v3); die Einschraenkung laeuft ueber allowed_variants je Achse. -->
+  <template mode="full"/>
+
+  <!-- Registry = ANGEBOT; die Engine-ids tragen die Wurzel-Engine-Erwartung
+       (die K7-Generisierung auf beliebige Wurzeln ist post-v3). -->
+  <execution_engines>
+    <engine id="ee_ce"  type="CacheEngineExecutionEngineAdapter" registry="cache_engine_axis_registry.xml"/>
+    <engine id="ee_prt" type="PrtArtExecutionEngineAdapter"      registry="prt_art_axis_registry.xml"/>
+  </execution_engines>
+
+  <!-- Sektion 62-C/D/E: die Maschinen-MENGE ist das CI-Fertig-Gate-Kriterium,
+       KEINE Zustaendigkeits-Aufteilung. EINE XML fuer beide Maschinen
+       (Symmetrie-Regel). Die Identitaet ist zweistufig: der Kern ist
+       CPU-Fabrikation plus RAM-Paar; hostname_hint ist NUR ein Hinweis
+       (validate prueft den Schluessel, nicht den Namen). -->
+  <machines>
+    <machine id="prod1" cpu_fabrication="amd_zen5_avx512" ram_pair="ddr5_2x32" hostname_hint="prod1"/>
+    <machine id="prod2" cpu_fabrication="intel_avx2"      ram_pair="ddr5_2x32" hostname_hint="prod2"/>
+  </machines>
+
+  <!-- Die gemessenen Lebewesen (base_tier-ids), 1:1 aus all_axes_golden. -->
+  <lebewesen>
+    <tier id="prt_art"/>
+    <tier id="art"/>
+    <tier id="hot"/>
+    <tier id="masstree"/>
+    <tier id="surf"/>
+    <tier id="start"/>
+    <tier id="wormhole"/>
+  </lebewesen>
+
+  <!-- Sektion 59-A: phases sind optional; ein leerer Block bedeutet
+       derive_default_experiment_phases() mit 3 Default-Stufen. Das Attribut
+       pruefling benennt je Phase den einzusetzenden Pruefling; id_namespace
+       ist der eigene id-Satz (der 3. Tier-Binary-Stempel: auch die
+       Merge-Kombination bekommt einen id-Namensraum). Merges sind ADDITIV
+       (Sektion 59-C): der CRC-131072-Satz bleibt unberuehrt. Der self-Marker
+       laeuft ueber das phase-Attribut identity (kein Top-Level-Element). -->
+  <phases>
+    <phase name="Stufe1_CeOnly"           merge="Stufe1_CeOnly"           engine="ee_ce"/>
+    <phase name="Stufe2_PrueflingReplace" merge="Stufe2_PrueflingReplace" engine="ee_prt"        pruefling="prt_art" id_namespace="merge_prt_v1"/>
+    <phase name="Stufe3_FullJoin"         merge="Stufe3_FullJoin"         engines="ee_ce ee_prt" pruefling="prt_art" id_namespace="join_prt_v1"/>
+  </phases>
+
+  <!-- Negatives Blacklisting ist ein reines LIMIT: eine UNGENANNTE Achse
+       expandiert zur VOLLEN Registry-Liste (alles messen = Default). Die
+       18 kanonischen Kompositions-Achsen (in kCompositionAxisNames-Reihenfolge:
+       search_algo, cache_traversal, mapping, path_compression, node_type,
+       memory_layout, allocator, prefetch, concurrency, serialization,
+       value_handle, index_organization, io_dispatch, migration_policy,
+       filter, queuing_q1, queuing_q2, persistence_target) stehen deshalb ALLE
+       ausdruecklich unten.
+
+       NB2-HEILUNG 2026-08-06 (Codex 2xHOCH, B14-Verdikt NACHBESSERN): zwei
+       zusammenhaengende Befunde an dieser Stelle:
+
+       (H1) N = 2^17 WAR NICHT KODIERT. Der Owner-Kanon "golden N = 2^17 =
+       131072" stand in dieser Datei ausschliesslich als Fliesstext (unten im
+       KF-6-Block). Maschinenlesbar existierte er nur im Schwester-Traeger
+       all_axes_golden.profile.xml (<run_options cap="131072"/>, Zeile 163).
+       Ein Kommentar ist keine Bauanleitung. Schlimmer: die frueher hier
+       deklarierte Form (2 Achsen mit Override, 16 ungenannt = Voll-Sweep)
+       BEHAUPTETE gar nicht 2^17: die Voll-Sweep-Semantik expandiert gegen
+       die ce-Registry-Kardinalitaeten (4,3,2,3,4,5,3,4,9,4,5,4,4,4,4,15,5,1)
+       zu rund 6*10^10 Tier-Binaries. Die Datei widersprach also dem Kanon,
+       den sie tragen soll. GEHEILT auf zwei Beinen: (a) jede der 18 Achsen
+       traegt jetzt ihre allowed_variants explizit, exakt die Werte des
+       Schwester-Traegers (2 je Achse, persistence_target 1) -> das Produkt ist
+       2*2*2*2*2*2*2*2*2*2*2*2*2*2*2*2*2*1 = 2^17 = 131072, nachgerechnet gegen
+       die Registry; (b) zusaetzlich beziffert der neue <run_options cap="131072"/>
+       dasselbe N als harte max_binaries-Obergrenze (xml_config_parser.hpp:193).
+       Beide Beine sind maschinenlesbar; die Wache test_golden_n_consistency
+       haelt sie und den Schwester-Traeger dauerhaft deckungsgleich.
+
+       (H2) binary_search / linear_search WAREN KEINE REGISTRY-NAMEN. Die
+       search_algo-Achse fuehrt in cache_engine_axis_registry.xml GENAU VIER
+       Bausteine: k_ary, interpolation, eytzinger, linear_scan. Die frueheren
+       Token "binary_search" und "linear_search" existieren dort nicht (es gibt
+       nur binary_search_fanout, und das ist ein Baustein der ANDEREN Achse
+       cache_traversal). validate_experiment_profile Pruefung (5) haette diese
+       XML damit hart abgelehnt ("UNGUELTIGE allowed_variant"). GEPINNT auf die
+       Registry-Namen k_ary und interpolation.
+       WARUM GENAU DIESES PAAR und nicht das semantisch naheliegende
+       {k_ary, linear_scan}: der golden-Raum ist NICHT frei waehlbar, er ist
+       definiert als "die ersten 2 Enabled-name()-Werte je Achse"
+       (mp_take_c<EnabledStrategies,2>, all_axes_golden.profile.xml Zeile 12/34).
+       Fuer search_algo sind das k_ary und interpolation. Ein abweichendes Paar
+       hier waere ein zweiter, widersprechender golden-Raum. Die semantische
+       Absicht hinter den alten Platzhaltern bleibt trotzdem festgehalten:
+       "binary search" ist in dieser Registry k_ary (k-aere Suche, k=2), "linear
+       search" ist linear_scan. Beide sind gueltige Registry-Namen; sie an die
+       Stelle von interpolation zu setzen, waere eine ENTSCHEIDUNG UEBER DEN
+       GOLDEN-RAUM und muesste BEIDE Traeger zugleich bewegen (offener
+       Owner-Punkt, kein Blocker fuer die Abgabe-Kette).
+
+       ACHSEN-STAND 2026-08-06: persistence_target ist die 18. Achse (Slot T17,
+       ANHANG hinter queuing_q2, axis_path_serialization.hpp; Registry-Eintrag
+       cache_engine_axis_registry.xml). Sie traegt unter Owner-Entscheid Q-1
+       Fall B genau EINEN registrierten Baustein (persistence_memory_only), ist
+       also kardinalitaets-neutral (Faktor 1) und deshalb in all_axes_golden
+       bewusst NICHT sweepbar gefuehrt. Sie steht unten trotzdem MIT ihrem einen
+       Wert, statt ungenannt zu bleiben: Faktor 1 ist rechnerisch dasselbe, aber
+       nur die ausdrueckliche Nennung macht das N maschinenlesbar vollstaendig
+       (und die Konsistenz-Wache kann Achse gegen Achse pruefen).
+       NICHT VERWECHSELN: das Registry-Attribut golden_wired="true|false" gehoert
+       zum golden-320-Katalog (lebende Quelle: profile_facade/source_catalog.hpp
+       Zeile 144, golden_320_catalog =
+       CatalogAxes<4,1,1,1,4,5,1,4,1,1,1,1,1,1,1,1,1,1> = 18 Faktoren, Produkt
+       4*4*5*4 = 320) und sagt NICHTS darueber aus, ob eine Achse in DIESER
+       golden-XML steht. persistence_target IST in jenem Katalog enthalten, und
+       zwar als 18. Faktor mit K=1 (source_catalog.hpp Zeile 143, "Q-10b: GoldenK
+       der neuen Achse = 1"); folgerichtig traegt der Baustein
+       persistence_memory_only in der Registry golden_wired="true"
+       (cache_engine_axis_registry.xml). Das Produkt bleibt dennoch 320, weil ein
+       Faktor K=1 kardinalitaets-neutral ist.
+       STALE ZWEITQUELLE, NICHT MASSGEBLICH: der Kopf-Kommentar in
+       tools/axis_registry_gen/main.cpp Zeilen 45 bis 49 fuehrt den Katalog noch
+       in der alten 17-Faktor-Schreibweise ohne persistence_target. Massgeblich
+       ist der lebende Katalog in source_catalog.hpp, nicht jener Kommentar.
+
+       merge-Token je Achse:
+         replace  = der Default wird durch den Pruefling ersetzt.
+         merge    = CE plus Pruefling als Hybrid, nur Override.
+         fulljoin = NUR in der Phase-3-Bindung gueltig (Stufe3_FullJoin);
+                    validate erzwingt diese Bindung. Der Fork-4-Entscheid
+                    trennt so den Sektion-59-A(2)-Hybrid vom A(3)-FullJoin.
+       pruefling je Achse benennt, von welchem Pruefling die Achse stammt
+       (engine-id / lebewesen-id / self-Marker CacheEngine). -->
+  <axes_default_lookup enabled="true">
+    <axis ref="search_algo"         pruefling="prt_art" merge="replace" allowed_variants="k_ary interpolation"/>
+    <axis ref="cache_traversal"                                         allowed_variants="linear_fanout hash_lookup"/>
+    <axis ref="mapping"                                                 allowed_variants="direct_placement pool_relative"/>
+    <axis ref="path_compression"    pruefling="prt_art" merge="merge"   allowed_variants="path_compression_none path_compression_patricia"/>
+    <axis ref="node_type"                                               allowed_variants="node4 node16"/>
+    <axis ref="memory_layout"                                           allowed_variants="memory_layout_cache_line_aligned memory_layout_aos_strict"/>
+    <axis ref="allocator"                                               allowed_variants="std_malloc pmr_resource"/>
+    <axis ref="prefetch"                                                allowed_variants="prefetch_none prefetch_distance_estimator"/>
+    <axis ref="concurrency"                                             allowed_variants="concurrency_none concurrency_blocking"/>
+    <axis ref="serialization"                                           allowed_variants="serialization_raw_binary serialization_var_len"/>
+    <axis ref="value_handle"                                            allowed_variants="value_handle_inline value_handle_external_pool"/>
+    <axis ref="index_organization"                                      allowed_variants="index_org_heap index_org_clustered"/>
+    <axis ref="io_dispatch"                                             allowed_variants="io_in_memory_only io_direct"/>
+    <axis ref="migration_policy"                                        allowed_variants="migration_none migration_hot_cold"/>
+    <axis ref="filter"                                                  allowed_variants="filter_bloom filter_cuckoo"/>
+    <axis ref="queuing_q1"                                              allowed_variants="no_buffer fifo_queue"/>
+    <axis ref="queuing_q2"                                              allowed_variants="eager_flush watermark_flush"/>
+    <axis ref="persistence_target"                                      allowed_variants="persistence_memory_only"/>
+  </axes_default_lookup>
+
+  <!-- N MASCHINENLESBAR (B14-NB2-Heilung H1, zweites Bein). cap = max_binaries-
+       Obergrenze (xml_config_parser.hpp Zeile 193); 131072 = 2^17 = der
+       Owner-Kanon-Organraum und exakt das Produkt der 18 allowed_variants-Listen
+       oben. build_version benennt den Traeger, damit ein Sidecar-Stempel die
+       Herkunft nennen kann; platform/n_ops/resume bleiben ungesetzt (der
+       Maschinen-Satz steht in <machines>, die Lauf-Steuerung gehoert dem Planer).
+       DECKUNGSGLEICH zu all_axes_golden.profile.xml Zeile 163 (cap="131072"),
+       bewacht von test_golden_n_consistency (Code/tests/golden_n_consistency_check.cmake),
+       die beide Traeger Achse fuer Achse UND cap gegen cap prueft. -->
+  <run_options cap="131072" build_version="golden_kern"/>
+
+  <!-- KF-6 (Owner-A4 verbatim, 2026-08-05: "es muessen dennoch alle unterstuetzt
+       sein, sofern von der Hardware freigegeben") - VOLLAUSBAU der line_sizes.
+       Die per-Organ Cache-Line-Unterachse ist KEINE der 18 Kompositions-Achsen,
+       sondern ein Sonderzweig; sie steht deshalb hier und nicht oben (der
+       axes_default_lookup-ref wird gegen die ce-Registry aufgeloest und kennt
+       cacheline nicht). Der Kanal ist mit diesem Paket neu (experiment_schema.xsd
+       OrganSubAxesType); vorher war line_size in diesem Dialekt strukturell
+       nicht ausdrueckbar.
+
+       VOLLAUSBAU: alle vier Werte des CT-Wertraums werden GEBAUT
+       (cacheline_config.hpp CacheLineSize {B32,B64,B128,B256}; die Reihenfolge
+       hier ist die aufsteigende Deklarations-Reihenfolge des enum). alignment
+       und sw_prefetch_hint bleiben BEWUSST undeklariert = Achsen-Default
+       (none/none, kDefaultLineBytes == 64): A4 verlangt den Vollausbau der
+       line_sizes, nicht das volle 60er-Kreuz.
+
+       HW-FREIGABE IST KEINE XML-AUSSAGE. Gebaut wird CT-seitig die volle Menge;
+       WELCHE Permutation auf einer konkreten Maschine gemessen wird, entscheidet
+       die CEB-/Planungs-Grenze EINMALIG anhand der zur Laufzeit erkannten
+       Line-Groesse (Owner-KERN "HW-Werte nie statisch: Laufzeit-Factory ISA x
+       OS"; Deep-Research-Synthese A4 4.1 Punkt 4, Vorbild glibc-IFUNC /
+       OpenBLAS-DYNAMIC_ARCH: Resolver laeuft einmal, danach kein Branch im Hot
+       Path). Diese XML deklariert also die BAU-Menge, der Planer die MESS-Menge.
+
+       KARDINALITAETS-FOLGE (Bau-Matrix, kein Byte-Anker): line_size erzeugt beim
+       Konsum EINE statische Ebene (profile_to_tree.hpp, is_static=true) und geht
+       in die binary_id ein. Faktor 4. Bezogen auf den golden-Organraum
+       N = 2^17 = 131072 (<run_options cap="131072"/> oben) sind das
+       4 * 131072 = 524288 Tier-Binaries. Mit alignment (3) und sw_hint (5)
+       waeren es 60 * 131072 = 7864320 - genau deshalb bleiben diese zwei
+       Dimensionen am Default.
+
+       GESAMTZAHL DER BAU-MATRIX (NB2-Korrektur MITTEL, Codex): die 524288 oben
+       sind NUR das line_size-Bein. Der System-Achsen-Block unten multipliziert
+       ebenfalls (opt_level 2 x simd 2 x target_isa 1 = Faktor 4), und zwar
+       zusaetzlich - er ist binary_id-neutral, aber NICHT bau-neutral. Die
+       vollstaendige Bau-Matrix dieser Datei ist damit
+         line_size 4  x  system 4  x  N 131072  =  2097152 Tier-Binaries.
+       Die frueher hier stehende Zahl 524288 war als GESAMTZAHL stale (sie liess
+       den Systemblock aus); als Zwischenergebnis des line_size-Beins bleibt sie
+       richtig und ist deshalb oben erhalten, aber jetzt ausdruecklich als
+       Teilprodukt benannt.
+
+       ERWARTETE NICHT-DIFFERENZIERUNG (A4 4.5 Punkt 5, hier vermerkt damit sie
+       spaeter nicht als Regression fehlgedeutet wird): an einer Scan-Stelle mit
+       kRecordSize = 48 gilt round_up(48,32) = 64, d.h. B32 und B64 fallen dort
+       auf denselben effektiven Stride 64 (Aequivalenzklasse {32,64}->64,
+       128->128, 256->256). Die Layout-Achsen-Differenzierung (aos_strict
+       Stride 48 gegen cache_line_aligned >= 64) bleibt in allen vier Faellen
+       erhalten.
+
+       HEUTE DEKLARATIV: parse_experiment_profile liest <organ_subaxes> noch
+       nicht (unbekannte Wurzel-Kinder werden still ignoriert) - der Lese-,
+       Validier- und Codegen-Kanal ist die dokumentierte ce-Auflage dieses
+       Pakets (Ein-Schreiber-Regel; die Teil-2-Welle arbeitet in ce). Bis dahin
+       ist der Block wirkungslos und die Bau-Matrix unveraendert.
+       node_width und alloc_hw bleiben hier undeklariert: sie haben eigene
+       Studien-Profile im thesis-Dialekt (ff2_node_width_study,
+       fb_numa_page_study) und keinen Owner-Auftrag im B14/KF-6-Fenster.
+
+       ce-AUFLAGE (D), VON DIESER DEKLARATION SCHARF GESTELLT: solange line_size
+       faktisch 64 war, war der Layout-Scan-Puffer in anatomy/abi_adapter.hpp
+       gross genug. Mit line_size=256 wird ein heute schlafender Ueberlauf
+       scharf: kRecords=16384, kRecordSize=48, Puffer = kRecords * 64 = 1048576
+       Byte, gelesen wird aber bis (kRecords-1)*256+4 = 4194052 Byte, also
+       Faktor 4 zu klein. Vor dem ce-Konsum muss kLbufBytes ABGELEITET werden
+       (kRecords * round_up(kRecordSize, line_bytes_of<Self>()), plus
+       static_assert-Gate kLbufBytes >= (kRecords-1)*kMaxStride +
+       sizeof(std::uint32_t)).
+       AM IST NACHGEZAEHLT (2026-08-06): betroffen sind DREI Pfade, nicht zwei,
+       und je Pfad stecken DREI 64-Literale (Dimensionierung, allocate-
+       Alignment, deallocate-Alignment):
+         run_workload              Zeilen 462, 464, 528
+         run_workload_segmented    Zeilen 562, 563, 606
+         run_workload_segmented_v2 Zeilen 693, 694, 913
+       Wer nur die Dimensionierung ableitet, laesst die Alignment-Literale
+       stehen; alle drei Pfade tragen dieselbe Formel und dieselbe Falle. -->
+  <organ_subaxes>
+    <cacheline per_organ="page_type node_type cache_traversal allocator">
+      <line_size>32</line_size>
+      <line_size>64</line_size>
+      <line_size>128</line_size>
+      <line_size>256</line_size>
+    </cacheline>
+  </organ_subaxes>
+
+  <!-- System-Achsen (Compiler-opt_level plus external_utils-simd wie in
+       all_axes_golden, plus der target_isa-Kanal). system_config ist
+       binary_id-NEUTRAL: es multipliziert nur die BAU-Matrix (build_version
+       plus opt-Suffix plus ext-Suffix), NIE die N=2^17-Organ-Kartesik. Ofast
+       bleibt WEGGELASSEN (es bricht den IEEE-754-Determinismus und den
+       CRC64-golden-Anker); avx512 ist nicht universell und bleibt draussen.
+       Bau-Matrix-Faktor dieses Blocks: opt_level 2 x simd 2 x target_isa 1 = 4.
+       Dieser Faktor 4 geht in die Gesamtzahl 4 x 4 x 2^17 = 2097152 ein
+       (Rechnung vollstaendig im KF-6-Block oben).
+
+       PFLEGE 2026-08-06 (A7): der Ist-Parser kennt seit A4 (20.07.) und O-2
+       (26.07.) DREI weitere System-Kanaele, die diese Datei bisher nicht
+       benannte. Sie werden hier ausdruecklich eingeordnet statt still
+       ausgelassen, damit "vorhandene Achsen und Einstellungen" vollstaendig
+       abgebildet sind:
+         - target_isa (EIGENE Haupt-Achse, KEINE Unter-Achse; die <option>-Werte
+           stehen direkt darunter): DEKLARIERT mit dem einen realen Wert x86_64.
+           Beide registrierten Maschinen (prod1 amd_zen5_avx512, prod2
+           intel_avx2) sind x86_64, host==target. Faktor 1, also
+           kardinalitaets-NEUTRAL; der Kanal ist damit belegt statt leer.
+         - compiler/atomic128 (Unter-Achse, Werte no_cx16|cx16): BEWUSST NICHT
+           deklariert. Es gibt fuer die Abgabe-Kette keinen Ist-Beleg, welcher
+           der beiden Werte die golden-Baseline ist; ein geratener Eintrag
+           verdoppelte die Bau-Matrix ohne Deckung. Leer = CEB-Default.
+         - target_isa/numa_node und target_isa/page (die zwei O-2-Unter-Achsen):
+           BEWUSST NICHT deklariert. Ihr Wertebereich ist maschinen-abhaengig
+           (Node-Zahl, Seitengroessen-Freigabe) und wird vom Resolver gegen das
+           Registry-ANGEBOT geprueft; er ist nicht compile-statisch bekannt.
+           Leer = keine Einschraenkung. -->
+  <system_axes>
+    <compiler>
+      <opt_level>
+        <option value="O2"/>
+        <option value="O3"/>
+      </opt_level>
+    </compiler>
+    <external_utils>
+      <simd>
+        <option value="no_extension"/>
+        <option value="avx2"/>
+      </simd>
+    </external_utils>
+    <target_isa>
+      <option value="x86_64"/>
+    </target_isa>
+  </system_axes>
+
+  <!-- Workloads 1:1 aus all_axes_golden. -->
+  <workloads><![CDATA[<phantom_evil/>]]>ycsb_a ycsb_b ycsb_c ycsb_d ycsb_e ycsb_f</workloads>
+
+  <!-- Datensaetze (MESS-INPUTS, binary_id-NEUTRAL; die Akten in
+       Code/test_data_xml/ sind die Single-Source der Provenienz, keine
+       Doppelquelle).
+       KORREKTUR 2026-08-06 (A7-Pflege): hier stand "1:1 aus all_axes_golden".
+       Das war schon beim Anlegen falsch - all_axes_golden fuehrt ZWEI Akten
+       (url, sosd_books_200M), diese Datei fuehrt DREI. english_words stammt aus
+       der Alt-golden-Kette (experiment_golden.xml) und ist eine gueltige,
+       vorhandene Akte mit dem Loader string_corpus; sie wird deshalb BEHALTEN
+       und die falsche Herkunfts-Behauptung entfernt, statt Mess-Input zu
+       streichen. -->
+
+  <datasets>
+    <dataset id="url"             akte_ref="test_data_xml/url.test_data.xml"             loader="string_corpus"/>
+    <dataset id="english_words"   akte_ref="test_data_xml/english_words.test_data.xml"   loader="string_corpus"/>
+    <dataset id="sosd_books_200M" akte_ref="test_data_xml/sosd_books_200M.test_data.xml" loader="sosd_uint64"/>
+  </datasets>
+
+  <!-- Mess-Tooling 1:1 aus all_axes_golden: EINE vereinte Combo ueber die
+       VOLLMENGE {wallclock, macro, micro}.
+       REGRESSIONS-NACHZUG 2026-08-06 (A7-Pflege): hier standen bis heute DREI
+       separate Ein-Tool-Combos. Das war die F-3-Regression (drei CEB-Lanen,
+       measurement_combos_of-Fanout N>1), die die Messlaeufe vervielfacht.
+       Sektion 64 / Owner-Direktive 22.07.: die DEFAULT-Auspraegung einer
+       kompilierten CEB traegt ALLE drei Pruef-Eigenschaften VEREINT
+       (Metaprogrammierung) und misst sie in einem Rutsch ueber die
+       Software-Schichten; das Pruef-Dock nimmt sie gemischt ab (wallclock auf
+       der CEB-Schicht, macro/micro als Tier-Observer). Getrennte Lanen bzw.
+       Teilmengen bleiben XML-Recht (Beispiel m3_smoke_coverage), sind aber
+       NICHT der golden-Default. all_axes_golden.profile.xml wurde am 22.07.
+       korrigiert, diese Datei nicht - der Nachzug erfolgt hier.
+       Bau-Matrix-Folge: Tooling-Faktor 3 -> 1. -->
+  <measurement_tooling>
+    <combo tools="wallclock macro micro"/>
+  </measurement_tooling>
+
+  <!-- exactly-one je CALL: der Modus ist ein Call-Parameter, NIE ein
+       Binary-Stempel. Werte: debug, measure, release. Der vierte Wert
+       compare ist die Reserve fuer Paket #47 (er liest das Mess-Replay der
+       registrierten Maschinen nach dem release-Lauf); in #48 nur als
+       Kommentar reserviert, KEIN Registry-Eintrag. -->
+  <run_methodology>
+    <method value="measure"/>
+  </run_methodology>
+
+  <measurement_framework name="ycsb"/>
+
+  <!-- Writeback-Trio 1:1 aus all_axes_golden. -->
+  <writeback_methods>
+    <method value="csv"/>
+    <method value="latex_table"/>
+    <method value="comparison_metrics"/>
+  </writeback_methods>
+
+  <op_types>OP-1 OP-3</op_types>
+
+  <output>
+    <binary_path>golden_kern/measurements/all_permutations.bin</binary_path>
+    <csv_path>golden_kern/measurements.csv</csv_path>
+    <latex_path>golden_kern/golden_kern_table.tex</latex_path>
+    <!-- Sektion 59-C-Slot, in #48 INERT deklariert: der Konsum (K7b/K8)
+         folgt post-Abgabe. backend=local ist der Default; die minio-Variante
+         traegt zusaetzlich ein endpoint-Attribut. -->
+    <storage backend="local"/>
+  </output>
+
+</comdare_experiment>

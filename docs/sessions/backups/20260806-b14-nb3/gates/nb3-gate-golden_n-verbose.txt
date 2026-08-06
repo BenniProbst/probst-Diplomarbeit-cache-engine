@@ -1,0 +1,37 @@
+UpdateCTestConfiguration  from :/home/comdare/wt-b14-golden/Code/build-test/DartConfiguration.tcl
+Test project /home/comdare/wt-b14-golden/Code/build-test
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 555
+    Start 555: test_golden_n_consistency
+
+555: Test command: /usr/bin/cmake "-DMASTER=/home/comdare/wt-b14-golden/Code/test_data_xml/experiment_golden_kern.xml" "-DPROFILE=/home/comdare/wt-b14-golden/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml" "-DPROFILE_ALLOW_COMMENT_TEXT_DEFECT=ON" "-DSCRATCH_DIR=/home/comdare/wt-b14-golden/Code/build-test/tests" "-P" "/home/comdare/wt-b14-golden/Code/tests/golden_n_consistency_check.cmake"
+555: Working Directory: /home/comdare/wt-b14-golden/Code/build-test/tests
+555: Test timeout computed to be: 60
+555: -- golden_n_consistency_check: XML-KOMMENTAR-TEXT-DEFEKT in PROFILE '/home/comdare/wt-b14-golden/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml' -- die Datei ist roh NICHT wohlgeformt, kommentarfrei aber einwandfrei. Die Wache liest sie deshalb kommentarfrei weiter. OFFENE AUFLAGE an den Eigentuemer der Datei: den Kommentar-Text reparieren (XML verbietet '--' im Kommentar), danach die Freischaltung in tests/CMakeLists.txt entfernen. Befund von xmllint:
+555: /home/comdare/wt-b14-golden/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml:62: parser error : Double hyphen within comment: <!-- (b') PER-ACHSEN-SWEEP: hier die 17 SWEEPBAREN Ach
+555:        Binary -- ein No-op-Pass, den der Coverage-Guard (>=2 Auspraegungen je Sw
+555:               ^
+555: /home/comdare/wt-b14-golden/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml:64: parser error : Double hyphen within comment: <!-- (b') PER-ACHSEN-SWEEP: hier die 17 SWEEPBAREN Ach
+555:        disk_writeback aufgeschaltet wird, kommt hier EINE Sweep-Zeile dazu -- sy
+555:                                                                            ^
+555: /home/comdare/wt-b14-golden/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml:207: parser error : Comment must not contain '--' (double-hyphen)
+555:        Profil -- die golden-Abgabe IST der Mess-Modus, Release-Build + 1-Thread-
+555:                 ^
+555: -- golden_n_consistency_check: OK -- 18 Achsen deckungsgleich, Produkt = 131072 = run_options cap beider Traeger (golden N = 2^17).
+1/1 Test #555: test_golden_n_consistency ........   Passed    0.19 sec
+
+The following tests passed:
+	test_golden_n_consistency
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+da_unit         =   0.19 sec*proc (1 test)
+fixture_sync    =   0.19 sec*proc (1 test)
+
+Total Test time (real) =   0.20 sec

@@ -189,10 +189,22 @@ add_test(NAME test_fixture_schema_experiment_golden
 # SEMANTISCH ueber die Dialekt-Grenze hinweg: gleiche Achsen-Menge, je Achse gleiche Auspraegungen,
 # gleiches Produkt, und dieses Produkt == run_options cap BEIDER Seiten.
 # all_axes_golden.profile.xml wird ausschliesslich GELESEN (sie bleibt unangetastet, s. ihr Kopf-Block).
+# B14-NB3 (2026-08-06): PROFILE_ALLOW_COMMENT_TEXT_DEFECT -- die EINE, benannte Ausnahme.
+# all_axes_golden.profile.xml ist derzeit kein wohlgeformtes XML: in drei Kommentaren steht ein '--',
+# was XML verbietet (libxml2 lehnt die Datei komplett ab; Fundstellen bei Feststellung: Zeilen 62/64/207).
+# Der Defekt liegt AUSSCHLIESSLICH im Kommentar-TEXT -- kommentarfrei parst die Datei einwandfrei. Die
+# Datei gehoert dem ce-Submodul und steht in diesem Fenster unter der Ein-Schreiber-Regel, wird hier also
+# NICHT repariert; die Wache darf sie stattdessen kommentarfrei lesen. Die Freischaltung ist in BEIDE
+# Richtungen verriegelt: sie greift nur, wenn die Datei roh WIRKLICH scheitert und kommentarfrei WIRKLICH
+# durchlaeuft -- und sie wird FATAL, sobald die ce-Datei roh wohlgeformt ist. Sie zieht sich damit selbst
+# zurueck. ce-AUFLAGE: '--' in den drei Kommentaren beseitigen, danach diese Zeile ENTFERNEN.
+# SCRATCH_DIR: Ablage der kommentarfreien Arbeitskopie -- Build-Verzeichnis, nie der Quellbaum.
 add_test(NAME test_golden_n_consistency
     COMMAND "${CMAKE_COMMAND}"
         "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
         "-DPROFILE=${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
+        "-DPROFILE_ALLOW_COMMENT_TEXT_DEFECT=ON"
+        "-DSCRATCH_DIR=${CMAKE_CURRENT_BINARY_DIR}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/golden_n_consistency_check.cmake")
 set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_registry
                      test_fixture_schema_experiment_golden_kern test_fixture_schema_experiment_golden
