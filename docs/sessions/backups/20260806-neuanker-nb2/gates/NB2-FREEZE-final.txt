@@ -1,0 +1,65 @@
+==== FREEZE + WORTGRENZEN-ORAKEL (finales Objekt aa46c524) ====
+2026-08-06T06:36:18+00:00
+
+-- git status --porcelain --
+   (0 Zeilen)
+
+-- HEAD --
+   aa46c524526a6cc59420c25c05b24c434e008e96
+   C-7/NB2: Codex-Zweitreview geheilt -- eine Preimage-Quelle, gekapselte Traeger, fail-closed cxx-Feld
+
+-- 3 MARKER im Commit-Text --
+      'GATE' : 4 Treffer
+      'Selbstcheck aus dem Diff' : 1 Treffer
+      'STOP-GATE' : 3 Treffer
+      'TABU' : 2 Treffer
+
+-- WORTGRENZEN-ORAKEL --
+   [a] Frozen-Digest 17148e5a... im Baum (SOLL: die drei Fundstellen):
+      tests/unit/test_m_w12_stamp_bausteine.cpp:653:        "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+      tests/unit/test_w10_system_cell_values.cpp:432:        "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+      tests/unit/test_g3_sha512_index.cpp:68:constexpr std::string_view kFrozenFingerprintV1 = "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+   [b] Alt-Digest f8f811a9... im Baum (SOLL 0 ausser Historie-Kommentaren):
+      (Ende)
+   [c] cxx_driver -- alle Stellen:
+      libs/cache_engine/profile_facade/system_version_suffix.hpp:122:    t.cxx_driver        = p.cxx;               // NB2-1: VERBATIM -- dieselbe Quelle wie das "+cxx="-Segment
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:259:/// NB2-1: cxx_driver ist das DRITTE Feld und die eigentliche IDENTITAET des Tier-Treibers -- s. die
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:266:    std::string_view cxx_driver{};        ///< NB2-1: der TIER-Treiber-Tag ("g++-16"), Pflicht wenn Dialekt gesetzt
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:350:    if (!toolchain_treiber_tag_ist_wohlgeformt(p.cxx_driver)) return "cxx_driver";
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:386:    if (!p.cxx_driver.empty() && p.cxx_dialect.empty()) return "cxx_driver";
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:387:    if (!p.cxx_dialect.empty() && p.cxx_driver.empty()) return "cxx_dialect";
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:493:            "' ist belegt, aber sein Bezugsfeld fehlt (cxx_realversion/cxx_driver brauchen cxx_dialect und "
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:500:        // NB2-1 (R1)/(R2): <dialekt>[-<realversion>]:<treiber-tag>. cxx_driver ist an dieser Stelle
+      libs/cache_engine/include/cache_engine/abi/toolchain_stamp_glied.hpp:508:        cxx += p.cxx_driver;
+      tests/unit/test_m_w12_stamp_bausteine.cpp:681:    p.cxx_driver        = "g++-16"; // NB2-1 (R1): der Tier-Treiber-Tag, Pflicht neben dem Dialekt
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1135:    p.cxx_driver        = "hausgemachter-treiber";
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1175:    e.cxx_driver  = "g++-13";
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1179:    f.cxx_driver      = "g++-13";
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1209:        p.cxx_driver      = treiber;
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1233:    k.cxx_driver  = "weird:tag";
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1234:    EXPECT_EQ(abi::toolchain_stamp_parts_diagnose(k), std::string_view{"cxx_driver"});
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1240:        b.cxx_driver  = boese;
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1241:        EXPECT_EQ(abi::toolchain_stamp_parts_diagnose(b), std::string_view{"cxx_driver"}) << boese;
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1284:    e.cxx_driver = "g++-16";
+      tests/unit/test_m_w12_stamp_bausteine.cpp:1285:    EXPECT_EQ(abi::toolchain_stamp_parts_abhaengigkeits_diagnose(e), std::string_view{"cxx_driver"});
+   [d] anatomy_fingerprint_preimage_emit -- die EINE Preimage-Konstruktion, alle Nutzer:
+      libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:466:/// anatomy_fingerprint_preimage_emit(glieder, senke) -- DIE EINE Preimage-Konstruktion.
+      libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:474:constexpr void anatomy_fingerprint_preimage_emit(std::span<std::string_view const> glieder, Senke& senke) {
+      libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:487:    anatomy_fingerprint_preimage_emit(glieder, senke);
+      libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp:507:    anatomy_fingerprint_preimage_emit(std::span<std::string_view const>{glieder.data(), glieder.size()}, senke);
+   [e] make_lazy_adhoc_fingerprint_fn_from_env -- alle Aufrufer (SOLL: 0-/1-argig):
+      libs/cache_engine/profile_facade/profile_run_entry.hpp:384:                   ? make_lazy_adhoc_fingerprint_fn_from_env()
+      libs/cache_engine/profile_facade/profile_run_entry.hpp:899:                    perm_fingerprint = make_lazy_adhoc_fingerprint_fn_from_env(perm_cell_values);
+      libs/cache_engine/profile_facade/lazy_adhoc_source_gen.hpp:381:/// make_lazy_adhoc_fingerprint_fn_from_env() -- die LIVE-Naht: ein FingerprintFn (binary_id -> 128-hex), der dieselbe
+      libs/cache_engine/profile_facade/lazy_adhoc_source_gen.hpp:417:make_lazy_adhoc_fingerprint_fn_from_env(std::string system_cell_values = {},
+
+-- Diffstat 77095354..HEAD --
+    .../builder/build_variant_set_signature.hpp        |  44 ++++
+    .../cache_engine/abi/anatomy_fingerprint.hpp       | 161 ++++++++++----
+    .../cache_engine/abi/toolchain_stamp_glied.hpp     | 135 +++++++++++-
+    .../profile_facade/lazy_adhoc_source_gen.hpp       |  37 +++-
+    .../profile_facade/system_version_suffix.hpp       |  16 +-
+    .../profile_facade/toolchain_stamp_naht.hpp        |  76 +++++--
+    tests/unit/test_m_w12_stamp_bausteine.cpp          | 245 +++++++++++++++++++--
+    7 files changed, 606 insertions(+), 108 deletions(-)
+==== ENDE ====

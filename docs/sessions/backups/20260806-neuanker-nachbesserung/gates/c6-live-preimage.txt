@@ -1,0 +1,19 @@
+CEB-TU-Toolchain (CT erhoben) : gcc 15.3.0
+Tier-Treiber (active_cxx_driver_tag) : g++-16
+Realversion DECKT den Treiber?       : NEIN (fail-closed: nur Dialekt)
+GLIED[5] LIVE (27 B) : tc=1;cxx=gcc@1.0.0c;ceb=8.0
+GLIED[6] LIVE (1036 B) : bvset=1;bv=2;page_type[{page_dense_byte;page_kind=0}{page_extended_dense;page_kind=1}{page_sparse_patricia;page_kind=2}{page_redirect;page_kind=3}{page_custom_cache;page_kind=4}{page_bplus;page_kind=5}];simd_extension[{simd_ext_none;simd_width_bits=0;simd_avx512=0;simd_avx10_version=0}{simd_ext_sse2;simd_width_bits=128;simd_avx512=0;simd_avx10_version=0}{simd_ext_avx2;simd_width_bits=256;simd_avx512=0;simd_avx10_version=0}{simd_ext_avx512;simd_width_bits=512;simd_avx512=1;simd_avx10_version=0}{simd_ext_neon;simd_width_bits=128;simd_avx512=0;simd_avx10_version=0}{simd_ext_sve2;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}{simd_ext_rvv;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}{simd_ext_cuda_gh200;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}];general_hardware[{general_hardware_generic;hw_cache_line=64;hw_numa_capable=0}{general_hardware_x86_64;hw_cache_line=64;hw_numa_capable=1}{general_hardware_aarch64;hw_cache_line=64;hw_numa_capable=1}]
+DEFINE-ARG [5] : -DCOMDARE_TOOLCHAIN_STAMP_GLIED=\"tc=1;cxx=gcc@1.0.0c;ceb=8.0\"
+DEFINE-ARG [6] : -DCOMDARE_BUILD_VARIANT_SET_SIGNATURE=\"bvset=1;bv=2;page_type[{page_dense_byte;page_kind=0}{page_extended_dense;page_kind=1}{page_sparse_patricia;page_kind=2}{page_redirect;page_kind=3}{page_custom_cache;page_kind=4}{page_bplus;page_kind=5}];simd_extension[{simd_ext_none;simd_width_bits=0;simd_avx512=0;simd_avx10_version=0}{simd_ext_sse2;simd_width_bits=128;simd_avx512=0;simd_avx10_version=0}{simd_ext_avx2;simd_width_bits=256;simd_avx512=0;simd_avx10_version=0}{simd_ext_avx512;simd_width_bits=512;simd_avx512=1;simd_avx10_version=0}{simd_ext_neon;simd_width_bits=128;simd_avx512=0;simd_avx10_version=0}{simd_ext_sve2;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}{simd_ext_rvv;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}{simd_ext_cuda_gh200;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}];general_hardware[{general_hardware_generic;hw_cache_line=64;hw_numa_capable=0}{general_hardware_x86_64;hw_cache_line=64;hw_numa_capable=1}{general_hardware_aarch64;hw_cache_line=64;hw_numa_capable=1}]\"
+---- LIVE-PREIMAGE (1174 Byte) ----
+fingerprint_format=3
+ORGAN-BEISPIEL
+SYSTEM-BEISPIEL
+MESS-BEISPIEL
+sub=cacheline@v2,node_width@v1,alloc_hw@v1
+tc=1;cxx=gcc@1.0.0c;ceb=8.0
+bvset=1;bv=2;page_type[{page_dense_byte;page_kind=0}{page_extended_dense;page_kind=1}{page_sparse_patricia;page_kind=2}{page_redirect;page_kind=3}{page_custom_cache;page_kind=4}{page_bplus;page_kind=5}];simd_extension[{simd_ext_none;simd_width_bits=0;simd_avx512=0;simd_avx10_version=0}{simd_ext_sse2;simd_width_bits=128;simd_avx512=0;simd_avx10_version=0}{simd_ext_avx2;simd_width_bits=256;simd_avx512=0;simd_avx10_version=0}{simd_ext_avx512;simd_width_bits=512;simd_avx512=1;simd_avx10_version=0}{simd_ext_neon;simd_width_bits=128;simd_avx512=0;simd_avx10_version=0}{simd_ext_sve2;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}{simd_ext_rvv;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}{simd_ext_cuda_gh200;simd_width_bits=18446744073709551615;simd_avx512=0;simd_avx10_version=0}];general_hardware[{general_hardware_generic;hw_cache_line=64;hw_numa_capable=0}{general_hardware_x86_64;hw_cache_line=64;hw_numa_capable=1}{general_hardware_aarch64;hw_cache_line=64;hw_numa_capable=1}]
+
+---- ENDE LIVE-PREIMAGE ----
+enthaelt 'cxx='  : JA
+enthaelt 'bvset=': JA

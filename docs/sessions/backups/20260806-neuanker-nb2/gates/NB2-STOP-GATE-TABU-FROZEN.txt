@@ -1,0 +1,41 @@
+==== NB2 STOP-GATE + TABU + FROZEN -- Beweise (Objekt: Working Tree vor Commit) ====
+erzeugt 2026-08-06T06:34:09+00:00
+Worktree /home/comdare/wt-b2-neuanker, Branch b2-neuanker-format3, Vor-Stand 77095354
+
+-- STOP-GATE: die drei Dateien BLOB-identisch zu 77095354 --
+   IDENTISCH  8524453902550f68a0de4e2e2f1f4423b5c242a8  libs/cache_engine/profile_facade/profile_run_entry.hpp
+   IDENTISCH  7ff382bc84a131bc9e663ba0d9cbdd6772ca7a13  libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp
+   IDENTISCH  6d6d4535c4f176f5398e3e8d89a2a31f0640a501  libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp
+
+-- FROZEN-VEKTOR: die drei Fundstellen, Zeile UND Inhalt unbewegt --
+   tests/unit/test_w10_system_cell_values.cpp:432:        "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+   tests/unit/test_g3_sha512_index.cpp:68:constexpr std::string_view kFrozenFingerprintV1 = "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+   tests/unit/test_m_w12_stamp_bausteine.cpp:653:        "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+
+-- Die beiden UNBERUEHRTEN Frozen-TUs, Blob-identisch zu 77095354 --
+   IDENTISCH  27cfbecb61f8c2276d4e01f6f4d6b7437d02923b  tests/unit/test_g3_sha512_index.cpp
+   IDENTISCH  9555a696cb1ae34fac6377c0fcb9b505c4a0e57d  tests/unit/test_w10_system_cell_values.cpp
+
+-- test_m_w12_stamp_bausteine.cpp: Frozen-BLOCK Zeilen 596-663 byte-unbewegt --
+   DIFF LEER -- identische Zeilennummern 596-663, identischer Inhalt
+
+-- TABU/STOP-GATE-Dateien im Diff? (SOLL 0) --
+   Treffer: 0
+
+-- ASCII-only in den Diff-ZUSAETZEN (SOLL 0) --
+   Nicht-ASCII-Zeilen: 0
+
+-- Restbestaende umbenannter/entfernter Symbole (SOLL je 0) --
+   cxx_driver_major        : 0
+   Traeger-Feld '.value'   : 0
+
+-- Diffstat gegen 77095354 --
+    .../builder/build_variant_set_signature.hpp        |  44 ++++
+    .../cache_engine/abi/anatomy_fingerprint.hpp       | 161 ++++++++++----
+    .../cache_engine/abi/toolchain_stamp_glied.hpp     | 135 +++++++++++-
+    .../profile_facade/lazy_adhoc_source_gen.hpp       |  37 +++-
+    .../profile_facade/system_version_suffix.hpp       |  16 +-
+    .../profile_facade/toolchain_stamp_naht.hpp        |  76 +++++--
+    tests/unit/test_m_w12_stamp_bausteine.cpp          | 245 +++++++++++++++++++--
+    7 files changed, 606 insertions(+), 108 deletions(-)
+==== ENDE ====
