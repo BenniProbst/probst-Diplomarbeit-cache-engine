@@ -648,7 +648,7 @@ index 2ece12f0..e646288d 100644
          if (chunks_.empty() || chunks_.back().count == cap_) {
              Chunk c;
 diff --git a/tests/unit/test_a1_wurf_vertrag_allokator_store.cpp b/tests/unit/test_a1_wurf_vertrag_allokator_store.cpp
-index f10cf7f9..1d2c8dd8 100644
+index f10cf7f9..2d9933d7 100644
 --- a/tests/unit/test_a1_wurf_vertrag_allokator_store.cpp
 +++ b/tests/unit/test_a1_wurf_vertrag_allokator_store.cpp
 @@ -28,11 +28,31 @@
@@ -708,7 +708,7 @@ index f10cf7f9..1d2c8dd8 100644
  // Die Stores der Wache: Node4 (Kapazitaet 4 -> mehrere Chunks bei kleiner Slot-Zahl) x CacheLineAligned.
  using ErschoepfterStore =
      nd::LayoutAwareChunkedStore<nd::Node4NodeType, ml::CacheLineAlignedMemoryLayout, ErschoepfteStubStrategie>;
-@@ -310,6 +347,28 @@ int main() {
+@@ -310,6 +347,27 @@ int main() {
          check("BudgetStubStrategie erfuellt AllocatorStrategy", acpts::AllocatorStrategy<BudgetStubStrategie>);
          check("beide erfuellen OrganAxisConcept",
                topics::OrganAxisConcept<ErschoepfteStubStrategie> && topics::OrganAxisConcept<BudgetStubStrategie>);
@@ -732,12 +732,11 @@ index f10cf7f9..1d2c8dd8 100644
 +              acpts::ThrowTranslatingStrategy<alloc::ExgenAllocator> &&
 +                  acpts::ThrowTranslatingStrategy<alloc::PoolResourceAllocator>);
 +        check("GEGENPROBE: ohne allocate_or_throw NICHT erfuellt, AllocatorStrategy aber schon",
-+              !acpts::ThrowTranslatingStrategy<OhneWurfUebersetzung> &&
-+                  acpts::AllocatorStrategy<OhneWurfUebersetzung>);
++              !acpts::ThrowTranslatingStrategy<OhneWurfUebersetzung> && acpts::AllocatorStrategy<OhneWurfUebersetzung>);
      }
  
      std::printf("== (2) F1/Posten 71: PmrResourceAdapter uebersetzt nullptr -> std::bad_alloc ==\n");
-@@ -329,14 +388,42 @@ int main() {
+@@ -329,14 +387,42 @@ int main() {
          }
          check("pmr::vector::push_back auf erschoepfter Strategie wirft std::bad_alloc", geworfen);
  
@@ -786,7 +785,7 @@ index f10cf7f9..1d2c8dd8 100644
  
          // POSITIV-KONTROLLE: sonst waere ein Adapter, der IMMER wirft, ebenfalls gruen.
          alloc::ExgenAllocator echt{};
-@@ -351,6 +438,20 @@ int main() {
+@@ -351,6 +437,19 @@ int main() {
          } catch (std::bad_alloc const&) { geworfen_echt = true; }
          check("64x push_back ueber die reale Strategie wirft NICHT", !geworfen_echt);
          check("Groesse korrekt (64)", groesse == 64u);
@@ -801,9 +800,23 @@ index f10cf7f9..1d2c8dd8 100644
 +        } catch (std::bad_alloc const&) { geworfen_echt0 = true; }
 +        std::printf("  [INFO] reale Strategie, do_allocate(0): %s\n",
 +                    geworfen_echt0 ? "Wurf" : (p_echt0 == nullptr ? "nullptr" : "Zeiger"));
-+        check("reale Strategie an der PMR-Naht: bytes == 0 liefert NIE nullptr",
-+              geworfen_echt0 || p_echt0 != nullptr);
++        check("reale Strategie an der PMR-Naht: bytes == 0 liefert NIE nullptr", geworfen_echt0 || p_echt0 != nullptr);
 +        check("und zwar per Zeiger, nicht per Wurf (die Naht wirft nicht pauschal)", !geworfen_echt0);
      }
  
      std::printf("== (3) F2/Posten 72: n*sizeof(T)-Ueberlauf -> std::bad_array_new_length ==\n");
+diff --git a/tests/unit/test_e24_c3_cross_genus.cpp b/tests/unit/test_e24_c3_cross_genus.cpp
+index 5d23c726..ad5a03c5 100644
+--- a/tests/unit/test_e24_c3_cross_genus.cpp
++++ b/tests/unit/test_e24_c3_cross_genus.cpp
+@@ -321,7 +321,9 @@ int main() {
+     // Fuer die SET-Gattung laeuft die Cross-Genus-Belegung bis an die ABI-Flaeche durch (unten belegt).
+     // Fuer die SEARCHALGORITHM-Gattung NICHT: SearchAlgorithmAbiAdapter baut als Member-Typ
+     // LayoutAwareChunkedStore<node_type, memory_layout, allocator> (abi_adapter.hpp:2064-2068), und dieses
+-    // Klassen-Template traegt `requires NodeTypeStrategy<N> && MemoryLayoutStrategy<L> && AllocatorStrategy<A>`.
++    // Klassen-Template traegt `requires NodeTypeStrategy<N> && MemoryLayoutStrategy<L> && AllocatorStrategy<A>
++    // && ThrowTranslatingStrategy<A>` (der vierte Term seit der A1-Nachbesserung 06.08.2026; er aendert an
++    // DIESEM Befund nichts -- die Grenze faellt schon am ersten Term, s.u.).
+     // NodeTypeStrategy verlangt NodesComponent, also `typename T::topic_tag == NodesTopicTag`
+     // (axes/node/concepts/axis_04_node_type_concept.hpp:17). Weder CarriedAxis noch ein Cross-Genus-Organ
+     // traegt ein topic_tag -- der SA-ABI-Adapter lehnt beide compile-hart ab. Literaler Bau-Fehler:
