@@ -4199,6 +4199,117 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 nachmittag-9 (DER ERSTE ECHTE PIPELINE-LAUF: 15022 ROT -> 15025 GRUEN; zwei Lint-Fixes; Regel-Zeilen 6+7; PMC-Sperrposten am Objekt gegengeprueft und VERSCHAERFT)
+
+### A) DER OWNER-AUFTRAG IST FUER ce ERFUELLT -- und der Weg dahin ist der Ertrag
+
+Der Owner hatte verlangt, dass die Pipeline "irgendwann auch mal laeuft und gruen durchlaeuft".
+Der Push des L1-Buendels loeste **Pipeline 15022** aus: **ROT**, 289 s, 17 gruen, 2 rot -- beide
+im Lint-Stage. **Nach zwei Fixes: Pipeline 15025 SUCCESS**, 279 s, **19 von 19 fahrenden Jobs**
+(1 bewusst `manual`: `is_original:relock`), 0 failed.
+
+**DER EIGENTLICHE ERTRAG STEHT IN DER JOB-LISTE:** `contract:axis-version-lock` faehrt wieder --
+der Tripwire, der drei Wochen doppelt definiert und damit faktisch AUS war. Und
+`test:coverage-guard` bestaetigt in der CI, was lokal gemessen war (407 von 407 Tests von einem
+fahrenden Job ausgefuehrt). **Beide an diesem Tag gelandeten Wachen laufen und sind gruen.**
+Dazu `test:unit`, beide Sanitizer, alle Contract-Jobs, `lint:secrets`.
+
+**DIE ZWEI FIXES (ce, beide gepusht, beide Remotes synchron auf `e7aa1244`):**
+
+- **`98952e02` -- Format-Nachzug.** `lint:format` meldete 94 Verstoesse in 13 Dateien. **Der Job
+  wurde REPRODUZIERT statt die Liste geraten:** aus der CI-Vorlage (`COMDARE_LINT_PATHS` +
+  `EXCLUDE_RE`) ergeben sich **1731 Dateien**; `--dry-run -Werror` darueber VOR dem Eingriff fand
+  exakt die 94/13 des CI-Trace -- damit war die Liste verifiziert, nicht geschaetzt. Dann
+  `clang-format -i` (cf22 22.1.8) ueber **genau diese 13**, danach derselbe Voll-Lauf: RC 0,
+  Ausgabe leer. **WICHTIGE ABGRENZUNG zur Format-Rausch-Lehre (nachmittag-8, D):** dort war
+  `--lines=` punktgenau richtig, weil die Breiten-Wache **Diff-Zeilen** prueft; hier ist das
+  flaechige `-i` richtig, weil `lint:format` die **ganze Datei** prueft. **Der Unterschied ist
+  der Gegenstand des Gates, nicht die Groesse des Eingriffs.**
+- **`e7aa1244` -- cppcheck-Unterdrueckung, erst verstanden, dann gehandelt.** `lint:static`
+  meldete `syntaxError` auf gueltigem C++23. **Am Objekt ISOLIERT statt behauptet:** lokal mit
+  der CI-Version (cppcheck 2.21.0, CI-Flags) reproduziert, dann drei Minimalproben --
+  (A) Lambda MIT `for`-Schleife im `static_assert` -> Fehler -- (B) Lambda OHNE Schleife -> still
+  -- (C) dieselbe Schleife in einer BENANNTEN `constexpr`-Funktion -> still. **Weder die Schleife
+  noch das Lambda fuer sich, sondern genau ihre Kombination.** `g++-15 -std=c++23 -fsyntax-only`
+  ueber die Datei: RC 0. Also **Werkzeug-Limit, kein Defekt** -> eng begrenzte Inline-
+  Unterdrueckung (`--inline-suppr` ist im Job aktiv) mit gemessener Begruendung im Kommentar.
+  **Die Wache selbst bleibt unveraendert** -- sie ist der O-2/C-2-Doppelwahrheits-Schutz;
+  Code umzubauen, um einen Parser zufriedenzustellen, waere die Umkehrung von Zweck und Mittel.
+  Im Haus vorbekannt: die CI-Vorlage fuehrt aus demselben Grund `--library=googletest`.
+
+**GATES beider Fixes:** Diff-Hygiene-Wache ueber den Format-Diff GRUEN (89 Zusatzzeilen, 0
+Nicht-ASCII, 0 ueber 120 -- ein Format-Lauf kann Zeilen verlaengern, deshalb geprueft) -- Bau 0
+error -- je ZWEI serielle ctest-Laeufe 407/407 -- gitleaks **mit** `.gitleaks.toml` UND ueber den
+**Push-Inhalt**: `no leaks found`.
+
+**BETRIEBS-DOKTRIN, aus einem eigenen Fehlalarm gelernt:** der erste gitleaks-Zusatzlauf ohne
+die Repo-`.gitleaks.toml` meldete einen `generic-api-key` -- deutscher Fliesstext aus einer
+Commit-Message, die Default-Regel schlug auf den Testnamen `test_f3_lager_key_provider_iterator`
+an. **Kuenftig: gitleaks IMMER mit der Repo-Konfiguration UND immer auch ueber den Push-Inhalt**
+(`git log -p <remote>..HEAD`), weil `--no-git` nur den aktuellen Baum sieht, gepusht aber
+Commits werden.
+
+### B) ZWEI WEITERE REGEL-ZEILEN DERSELBEN FAMILIE (jetzt sieben)
+
+> **(6) EIN GRUENES GATE DECKT NUR SEINEN EIGENEN GEGENSTAND.** Diff-Hygiene (ASCII/Breite) und
+> clang-format-Konformitaet sind verschiedene Pruefungen; "die Wache ist gruen" ist keine Aussage
+> ueber das Format. Vor jeder Freigabe die Liste der Gates nennen, die gelaufen sind -- **und
+> die, die nicht gelaufen sind.** ENTSTEHUNG: die Diff-Hygiene-Wache war dreimal gruen, ueber die
+> richtige merge-base -- und `lint:format` fand trotzdem 94 Verstoesse. Die Messung war korrekt
+> und beantwortete die falsche Frage.
+
+> **(7) EIN GATE-UMFANG IST REPO-SPEZIFISCH.** Derselbe Job prueft im ce **1731** und im super
+> **59** Dateien. Wer eine Dateiliste oder Zahl von einem Repo ins andere uebertraegt, misst am
+> falschen Umfang -- die Job-Definition lesen, die Variablen einsetzen, **lokal reproduzieren**.
+
+**DIE STAERKSTE BESTAETIGUNG VON (6) kam am selben Tag aus zwei Repos unabhaengig:** ce
+`lint:format` 94 Verstoesse in 13 Dateien, super `lint:format` 160 in 8 Dateien des
+graph-Pakets, das nie durch cf22 lief (super `b35aea1b`). Zwei Wellen, zwei Teams, dieselbe
+Fehlerklasse -- niemand hatte das Format-Gate als eigenen Gegenstand gefuehrt.
+
+### C) SUBMODUL-BUMP: committet, WARTET auf die gruene super-Pipeline
+
+**`9a2ef3b2`** hebt den ce-Gitlink von `7969b399` auf **`e7aa1244`** -- eigener Commit,
+expliziter Pathspec, ce-SHA in der Nachricht, genau ein Eintrag im Diff. **Bewusst NICHT
+gepusht:** ein Push in einen roten super-Stand liesse den Bump in der Fehlersuche verschwinden.
+Er geht raus, sobald die super-Pipeline gruen ist.
+**NEBENBEFUND, herrenlos:** das zweite Submodul `Code/external/20260931-overleaf-diplomarbeit`
+traegt einen eigenen Drift (`29a1700d` -> `ef448e4b`) und steht unversioniert im Baum. Er
+gehoert **nicht** zu dieser Landung und braucht einen Besitzer.
+
+**`main` IST UNANGETASTET** (ce und super). Der Fast-Forward ist eine VEROEFFENTLICHUNG, keine
+technische Notwendigkeit -- er liegt beim Owner. Fuer ce waere der richtige Stand **`e7aa1244`**,
+nicht `b5e0e4e7`: nur er traegt die zwei Lint-Fixes und ist gruen gemessen. **`main` darf nie
+auf einen Stand zeigen, dessen Pipeline rot war.**
+
+### D) PMC-SPERRPOSTEN: am Objekt gegengeprueft -- er traegt, und er ist SCHAERFER als gemeldet
+
+Der Befund aus der Kostenklammer-Jagd (Task 11) wurde hier unabhaengig nachgemessen. **Alle drei
+Teile bestaetigt:**
+- `experiment_plan_director.hpp` emittiert an **vier** Stellen (`:841`, `:877`, `:1194`,
+  `:1342`) `cmake ... -DCOMDARE_V32_ENABLE=ON` -- **`grep -c COMDARE_ENABLE_PMC` auf der Datei
+  = 0.**
+- `CMakeLists.txt:67`: `option(COMDARE_ENABLE_PMC ... OFF)` -- Default AUS.
+
+**VERSCHAERFUNG (neu, aus dieser Gegenpruefung):** die Option heisst *"Intel PCM **Windows**
+cache-miss source (WindowsPcmPmcSource, BSD-3)"* -- wer sie liest, haelt sie fuer eine
+Windows-Sache. **Sie gated aber auch den LINUX-Pfad:** der Zweig `if(COMDARE_ENABLE_PMC) ->
+if(UNIX AND NOT APPLE)` (CMakeLists:69-77) baut `LinuxPerfPmcSource` via `perf_event_open`, und
+der Header ist selbst geguardet mit `#if defined(COMDARE_ENABLE_PMC) && defined(__linux__)`.
+**Ohne das Flag gibt es auf Linux GAR KEINE PMC-Quelle** -- der Code kompiliert sich weg. Die
+irrefuehrende Option-Beschreibung ist damit ein eigener Risikofaktor: sie laedt dazu ein, das
+Flag auf Linux fuer entbehrlich zu halten.
+
+**WARUM ES KEINE WACHE FAENGT:** `m3v2_pmc_smoke.cpp:71` wertet
+`pmc_seam_ok = delta.available || counters_all_zero` -- **lauter Nullzaehler gelten als
+bestanden**; auf demselben Batch liegt `allow_failure: true`. Drei Wachen, keine loest aus.
+
+**BEZUG ZU REGEL (6), und das ist der Grund, warum es hier steht:** in der gruenen Job-Liste von
+Pipeline 15025 stehen `pmc:amd` und `pmc:intel` auf `success`. **Sie belegen, dass die
+PMC-Faehigkeit BAUT -- nicht, dass der Mess-Lauf sie EINSCHALTET.** Genau die Verwechslung, vor
+der Regel (6) warnt, an der teuersten Stelle des Projekts: die 131.072er-Matrix wuerde ohne
+Hardware-Zaehler durchlaufen und gruen melden. **Sperrposten vor Phase 6, Owner-Entscheid.**
+
 ## NACHTRAG 06.08.2026 nachmittag-8 (L1-BUENDEL GELANDET -- drei ce-Merges, die neue Wache besteht ihren eigenen Bestand; VIER Regel-Zeilen zur Pruefbereichs-Familie; K-01 widerlegt)
 
 ### A) VOLLZUG: das L1-Buendel ist in ce `development` (lokal, ungepusht)
