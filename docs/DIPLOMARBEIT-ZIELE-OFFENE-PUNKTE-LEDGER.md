@@ -4199,6 +4199,496 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 abend-4 (ARCHITEKTUR-KONSOLIDIERUNG: die Mess-Auswertungs-Kette vollstaendig -- ZWOELF Owner-Praezisierungen in einem Zug, von der PMU-Domaene bis zur Binary-Wahl. Die dichteste Klaerung dieses Strangs seit seinem Bestehen; drei davon KORRIGIEREN Lead-Lesarten, die falsch waren)
+
+> **WARUM DIESER NACHTRAG EXISTIERT** -- Owner-Auftrag verbatim:
+> *"Bitte schreibe eine exzessive reiche Zwischenstandsdoku mit ALLEN in diesem Kontext
+> geklaerten Architektur-Praezisierungen und schreibe diese detailliert in das Ledger als
+> Konsolidierung. Wir haben bestimmt die letzten 10 Turns nicht ausreichend dokumentiert und
+> muessen das im Ledger nachholen, weil wir hier alles kurz im Zusammenhang erklaeren
+> konnten - in der Dichte einmalig."*
+>
+> Der Anlass war ein roter CI-Job. Was daraus wurde, ist die vollstaendige Kette von der
+> Hardware-Zaehler-Domaene bis zur Frage, **welche Binary ein Anwender bekommt**. Sie stand
+> bisher nur verstreut in Termin-Dokumenten, Memory-Dateien und Antworten -- **nirgends im
+> Ledger im Zusammenhang.**
+
+---
+
+### 0. DIE KETTE IN EINEM BILD -- alles Folgende ist ihre Ausfaltung
+
+```
+  [PLANER]          laeuft (RT)   prueft Faehigkeiten, gibt frei, bewegt Unter-Achsen
+      |                              baut ->
+  [CEB]             laeuft (RT)   traegt CT die freigegebenen Routinen einkompiliert
+      |                              baut ->
+  [HYBRID]          laeuft (RT)   Schaltungs-Adapter: waehlt je Last-Kanal
+      |                              baut ->
+  [TIER-BINARY]     laeuft (RT)   das gemessene Objekt
+
+  MESSUNG -> FUNKTIONS-SYNTHESE -> SCHNITT-KURVEN (break even) -> optimale Konfiguration
+          == die zu WAEHLENDE Binary -> zurueck in den HYBRID als Schaltlogik
+```
+
+**Der Kopf der Schlange ist immer Laufzeit.** Jedes Glied laeuft, baut das naechste zur
+Compile-Zeit, und gibt dessen Laufzeit-Eigenschaften frei. Owner verbatim:
+
+> *"Die CEB baut die Compile time der Tier-Binaries und fuehrt dann deren Laufzeit aus. Also
+> der **Kopf der Schlange ist Laufzeit** und kontrolliert **durch den Bau immer die compile
+> time des naechsten Gliedes** und dann die **freigegebenen Laufzeit-Eigenschaften dieses
+> Gliedes**."*
+
+---
+
+### 1. DIE DREI TYPEN -- und warum die Mess-Achse eine Stufe mehr hat
+
+Der Owner fragte: *"Bitte Schau nochmal nach ZWEIPHASIG und DREIPHASIG per Explore Agent,
+denn **es gibt 3 Typen in diesem System**."* Die Erhebung (super `ec865db6`,
+`docs/plaene/20260806-KLAERUNG-zweiphasig-dreiphasig-drei-typen.md`, 632 Z.) loest es auf.
+
+**Die drei Typen sind die drei ACHSEN-ARTEN** -- vom Owner selbst am 01.08. definiert:
+
+> *"E-1: Thesis ist veraltet und kennt noch nicht mal **die 3 Typen der Mess-Achsen,
+> System-Achsen und Organ-Achsen**."*
+
+**Und die Paar-Formel erklaert sich Ziffer fuer Ziffer aus der Kette:**
+
+| Achsen-Art | Stufen | Warum |
+|---|---|---|
+| **MESS** | **DREI** | startet **ein Glied frueher** -- im PLANER (Stufe 1 = RT-Freigabe), dann CEB (CT), dann Tier (CT) |
+| **SYSTEM** | **ZWEI** | startet erst **in der CEB** (Stufe 1 = RT-Freigabe), dann Tier (CT) |
+| **ORGAN** | **ZWEI** | dito, und **hybrid-unberuehrt** -- Organ-Achsen leben nur in Tier-Binaries |
+
+**Das ist der Grund fuer die Fortpflanzungs-Asymmetrie** (Owner-KERN F2 vom selben Tag):
+eine **Mess**-Achsen-Aenderung baut **CEB UND alle Binaries** neu; eine System-/Organ-Aenderung
+nur die Tiers. Nicht weil Mess wichtiger waere, sondern weil sie **ein Glied weiter oben
+ansetzt**.
+
+**BELEG-KORREKTUR, die im Register bleiben muss:** Eine fruehere Erhebung stuetzte dieselbe
+(richtige) Schlussfolgerung auf ein **falsches Argument** -- sie meldete *"null
+`dreiphasig`-Treffer im gesamten docs-Baum"*. Real sind es **8**. Der Owner schreibt
+`DREIPHASIG` in **VERSALIEN**, die Suche lief case-sensitiv. Der Bericht war blind gegen
+seinen eigenen Text: er zitierte den Satz und meldete im selben Dokument, es gebe ihn nicht.
+**Die Schlussfolgerung traegt (unabhaengig durch LEDGER:4082/4095), das Argument nicht --
+es darf nicht weiterzitiert werden.**
+
+---
+
+### 2. PMC IST EINE MENGE, KEINE EINRICHTUNG
+
+Owner-KERN, verbatim:
+
+> *"**ALLE per deep research belegbaren Architekturen von AMD und Intel** muessen **mit PMC
+> unterstuetzt** werden. Dazu gehoeren **Performance Core und E-Core PMC Einrichtungen, die
+> getrennt gemessen und ausgewertet werden**. Damit hat die Intel Maschine **effektiv 2 PMC
+> und nicht nur eins**. Dieses muss **je Konfiguration compile time nach der Freigabe durch
+> den Planer in die CEB eingearbeitet werden**."*
+
+**Vier Festlegungen daraus:**
+
+1. **Die Frage lautet nie "ist PMC verfuegbar", sondern "welche PMU-Domaenen hat diese
+   Maschine und welche Zaehler traegt jede".** prod2 (i9-12900K, Alder Lake) hat **zwei**
+   (`cpu_core` / `cpu_atom`), prod1 (Ryzen 9 9950X3D) **eine**.
+2. **P-Core und E-Core werden GETRENNT gemessen UND GETRENNT ausgewertet.** Nicht gemittelt,
+   nicht zusammengefasst, nicht "die erste, die antwortet".
+3. **Die Abdeckung ist eine DEEP-RESEARCH-PFLICHT**, kein Best-Effort. honest-0 nur, wo die
+   Hardware es wirklich nicht hergibt -- und dann mit Begruendung.
+4. **Einbau je Konfiguration CT in die CEB, nach Planer-Freigabe.**
+
+**Das war seit dem 09.04.2026 Pflicht** -- Termin 3, "Hybrid-Regel lokal", verbatim:
+
+> *"P- und E-Cores werden nicht zusammenaggregiert. perf dokumentiert dafuer getrennte PMUs
+> **cpu_core** und **cpu_atom**; gruppierte Events ueber beide PMUs werden vermieden."*
+
+Mit Risiko-Zeile (*"Hybrid-CPU-Zaehler werden falsch aggregiert"* / Gegenmassnahme *"strikte
+Trennung cpu_core/cpu_atom"*) und fertigem Baustein-Entwurf im Domaenenmodell:
+`HybridCorePinning` mit `pin_thread(thread_id, core_class:{Performance|Efficient})` und
+`measure_per_class() -> {p_core, e_core}`.
+
+**Die Hybrid-CPU ist ein TERM DER FORSCHUNGSFRAGE** (Termin 4, Scope-Freeze 12.04.):
+*"...gegenueber passiven, statischen Layouts **auf Hybrid-CPUs und Sapphire-Rapids-Systemen**?"*
+
+**Der Plan hat die Fehlerklasse benannt und den Baustein gezeichnet -- gebaut wurde er nicht.**
+
+---
+
+### 3. DIE MECHANIK -- eine CEB, eine Binary, zwei Pinnings (LEAD-KORREKTUR 1)
+
+**Der Lead hatte gelesen: "eine CEB je PMU-Domaenen-Satz". Das war FALSCH.** Owner-Korrektur,
+verbatim:
+
+> *"Die CEB **kann beide Messfuehler tragen**, aber legt die Ergebnisse **je PMC getrennt** ab.
+> Die Tier-Binary wird ueber die Permutation aller Achsen insbesondere ueber die **Permutation
+> der NUMA Achse und deren Core-Unterachse** zur Laufzeit der CEB und zur Runtime der
+> Tier-Binary gemessen. Kurz und knapp: Die CEB kann alles messen, aber startet **einmal die
+> Tier-Binary gepinnt auf einen E-Core und einmal gepinnt auf einen P-Core** und misst die
+> Tier-Binary dann mit dem entsprechenden PMC. Das ist eine **reine Wiederverwendung durch
+> Achsen-Permutation durch die CEB auf einer dafuer zustaendigen SYSTEM-Achse**."*
+
+**Daraus hart:**
+- **EINE CEB**, die beide Messfuehler traegt. Die Trennung liegt in der **ABLAGE**, nicht in
+  der Binary.
+- **KEINE zweite Tier-Binary.** Dieselbe wird **zweimal GESTARTET**, je gepinnt.
+- **Die Flotte verdoppelt sich NICHT.** Was sich verdoppelt, ist die **Mess-ZEIT** auf prod2.
+- **Merksatz: die Hybrid-Trennung ist eine PERMUTATION, kein zweiter Bau.**
+
+**OBJEKT-BELEG, der das traegt** (`system_axis_registry.xml:10`): `target_isa` traegt
+**`binary_id="never"`** -- **die Achse kann die Tier-Binary-Identitaet strukturell nicht
+anfassen.** Kein Fingerprint-Eingriff, kein Neubau. Das ist nicht Absicht, sondern
+Registry-Vertrag.
+
+`numa_node` ist eine **Unter-Achse von `target_isa`** (`:38`), `stage="runtime"`,
+`option_source="machine_resolved"`. Registry-Kopf `:5-7`: *"Haupt-Achse=CT-statisch;
+**Unter-Achse=dynamisch (stage=runtime, vom Planer permutiert)**."*
+
+---
+
+### 4. WO DIE FAEHIGKEIT GEPRUEFT WIRD -- der Planer, nicht die CEB (LEAD-KORREKTUR 2)
+
+**Der Lead hatte gelesen: "das Pinning IST die RT-Freigabe IN DER CEB". Auch das war FALSCH.**
+Owner-Korrektur, verbatim:
+
+> *"Die **Pinning Faehigkeit prueft der Planer zur Laufzeit**, sodass die **CEB zur compile
+> Zeit die korrekten Binary-Code-Routinen traegt** (Interfaces zur Pinning Abfrage an das
+> korrekte OS Interface -> **je OS anders hard compiled** - oder **keine Pin Interfaces da
+> nicht vorhanden**) und der **Planer bewegt die System-Unterachsen unter den
+> System-Haupt-Achsen**, sodass **CEB ein bestimmtes Verhalten der Tier-Binaries faehrt**."*
+
+| Stufe | Wer | Wann | Was |
+|---|---|---|---|
+| 1 | **PLANER** | **Laufzeit** | prueft die Pinning-Faehigkeit -> Freigabe |
+| 2 | **CEB** | **Compile-Zeit** | traegt die OS-spezifischen Routinen **einkompiliert** -- **oder GAR KEINE** |
+| 3 | **Tier** | Laufzeit der CEB | die CEB faehrt ueber die bewegten Unter-Achsen ein **Verhalten** |
+
+**Vier Folgerungen:**
+- **Die CEB ist je OS anders kompiliert.** Das Pinning-Interface ist OS-spezifisch und wird
+  **hart einkompiliert**, nicht zur Laufzeit gewaehlt.
+- **"Keine Pin-Interfaces" ist ein GUELTIGER Bauzustand**, kein Fehler.
+- **Der Planer BEWEGT die System-Unter-Achsen unter den Haupt-Achsen** -- nicht die CEB
+  entscheidet die Kern-Klasse, sie faehrt die gestellte Auspraegung ab.
+- **Die CEB steuert ein VERHALTEN**, nicht den Inhalt der Tier-Binary.
+
+**Merksatz: der Planer FRAGT (RT), die CEB TRAEGT (CT), die Tier-Binary LAEUFT (unveraendert).**
+
+---
+
+### 5. WENN NICHT GEPINNT WERDEN KANN -- der Kompromiss
+
+Owner-KERN, verbatim:
+
+> *"hat eine CPU nicht das pinning Feature (zusammen mit einem OS Kernel der das auch
+> unterstuetzen und durchreichen muss), kann eine Maschine nicht pinnen und **muss die PMC
+> Werte tatsaechlich mit der Warnung ausgeben, dass die Werte nicht tragen, weil der Ort der
+> Ausfuehrung nicht bekannt ist**."*
+
+Und die Schwere-Entscheidung, verbatim:
+
+> *"bei diesem fehlenden Pinning Feature gibt es ja **ehrliche Messwerte**, aber ob man sie
+> **gebrauchen** kann ist fraglich. Ich wuerde nur hier einen **Kompromiss** eingehen und
+> **kein 'fatal' ausgeben aber `warn: no pinned locality on hybrid architecture`**"*
+
+**Der Warntext ist WOERTLICH vorgegeben:** `warn: no pinned locality on hybrid architecture`
+
+**Merksatz: ehrlich erhoben, fraglich verwendbar -> WARN.** Die Werte werden **ausgegeben**,
+nicht unterdrueckt -- fehlendes Pinning macht die Messung nicht wertlos, nur **unbestimmt**.
+Und sie werden **nicht stillschweigend als gueltig gefuehrt** -- der Ort der Ausfuehrung ist
+unbekannt, und auf einer Hybrid-CPU haben P- und E-Core andere Zaehler-Semantik.
+
+Die Faehigkeit haengt an **ZWEI** Bedingungen: die **CPU** muss pinnen koennen UND der
+**OS-Kernel** muss es **durchreichen**. Beide zur Laufzeit pruefen.
+
+Ausdruecklich als **Einzelfall** markiert (*"nur hier"*) -- **keine allgemeine Absenkung**.
+
+---
+
+### 6. DIE VOLLSTAENDIGE SCHWERE-LEITER
+
+Owner-KERN, verbatim:
+
+> *"**Error** waere etwa, wenn der Kunde in der XML eine **GPU Variante der Binary bauen will,
+> aber gar keine GPU im System registriert ist**. Also etwas, das mit **fehlenden
+> grundlegenden Systemeigenschaften** zu tun hat. **Fatal** waere: **Abbruch des Compile oder
+> Messung durch Kappen von Kabeln, Verbindungsabbrueche, unerwarteter Speicherverlust,
+> Lager-Inkonsistenz**."*
+
+**Die drei Stufen haben verschiedene NATUREN, nicht bloss verschiedene Lautstaerken:**
+
+| Stufe | Natur | Owner-Beispiel | Der Lauf |
+|---|---|---|---|
+| **WARN** | der Wert **EXISTIERT**, seine **VERWENDBARKEIT** ist fraglich | kein Pinning -> Ort unbestimmt | laeuft weiter, Wert wird ausgegeben, Vorbehalt reist mit |
+| **ERROR** | die **ANFORDERUNG** trifft auf eine **fehlende grundlegende Systemeigenschaft** | XML verlangt GPU-Variante, keine GPU registriert | Anforderung nicht erfuellbar -- kein Ersatzwert |
+| **FATAL** | die **INTEGRITAET** ist zerstoert | gekappte Kabel, Verbindungsabbruch, unerwarteter Speicherverlust, **Lager-Inkonsistenz** | Abbruch von Compile oder Messung |
+
+**Die zwei Trennlinien:**
+- **WARN gegen ERROR: gibt es einen Wert?** Bei WARN ja (nur unbestimmt verortet), bei ERROR
+  nein -- das System kann die verlangte Konfiguration gar nicht herstellen.
+- **ERROR gegen FATAL: war der Zustand vorher konsistent?** ERROR ist eine erkannte
+  Unmoeglichkeit VOR oder BEIM Versuch; FATAL ein Zusammenbruch WAEHREND des Laufs.
+- **Lager-Inkonsistenz ist FATAL**, nicht ERROR -- sie betrifft die Integritaet des Bestands,
+  nicht die Erfuellbarkeit einer Anforderung.
+
+**BESTANDS-BELEG:** `axis_error.hpp` (655 Z.) fuehrt die Zell-Zustaende **bereits kanonisch** --
+`SampleStatus{Ok, NotApplicable, SourceUnavailable, Failed}` mit den Token `ok`/`n/a`/`failed`,
+dazu `AdmissionStatus`, `BuildCellStatus`, `CompilerCompilerErrorClass` (mit
+**`HardwareErweiterungFehlt`** = *"ISA-/Beschleuniger-Erweiterung auf dem Host nicht verfuegbar
+(AVX512, **GPU**, FPGA)"* und **`BetriebssystemFeatureFehlt`** = *"das OS-ANALOGON"*), alle
+compile-time gegeneinander verwacht.
+**Das GPU-Beispiel des Owners steht seit dem 26.07. woertlich im Code.**
+Die tragende Drei-Wege-Definition (`:115-117`):
+`failed` = gemessen und gescheitert · `gesperrt` = baubar, aber nicht zugelassen ·
+`nicht_gebaut` = es gibt gar keine Binary.
+
+**LUECKE, die daraus folgt:** die **Zell**-Zustaende sind kanonisch, die **Doktrin**-Vokabeln
+(`honest-0`, `honest-empty`, `honest-100%`) sind ueber Ledger, Thesis und Session-Dokumente
+**verstreut** -- **kein Dokument fuehrt beide gemeinsam auf.** Genau deshalb konnte an diesem
+Abend eine Zustands-Leiter "neu erarbeitet" werden, die es laengst gibt.
+
+---
+
+### 7. STILLER RUECKFALL IST VERBOTEN
+
+Owner-KERN, verbatim:
+
+> *"**Stiller Rueckfall geht fuer uns nicht**: Regressionen oder Fehler **gehoeren angezeigt**,
+> das ist ein **weiterer Fall fuer das Anzeigen von error**."*
+
+**Eine ALLGEMEINE Regel, nicht der Einzelfall.** Ein stiller Rueckfall ist jede Stelle, an der
+der Code bei einem Fehlschlag **auf einen Ersatzwert ausweicht, ohne es anzuzeigen** -- der
+Aufrufer sieht einen plausiblen Wert und kann nicht unterscheiden, ob er gemessen oder geraten
+ist.
+
+**Die Erkennungsmuster:**
+- Fehlschlag endet in `return 0;` / `return {};` / `return default;` **ohne Log**
+- `catch (...) { /* weiter */ }` ohne Anzeige
+- `|| true`, `2>/dev/null`, ignorierter Exit-Code
+- Default-Parameter, der einspringt, wenn die echte Quelle fehlt
+- Eine Zelle mit `0`, weil die Quelle nicht existiert
+- **Eine Wache, die bei leerem Gegenstand GRUEN meldet**
+
+**Das ist die BAUFORM hinter der These des Regressions-Dossiers.** Dort steht: *"eine Messung
+war fuer sich korrekt und beantwortete die falsche Frage"* -- das beschreibt das **Symptom**.
+**Der stille Rueckfall ist die Konstruktion, die es erzeugt.**
+
+**Drei Praezedenzfaelle desselben Tages, alle geheilt:**
+- Das Literal `64` als Cacheline-Groesse bei fehlendem `line_bytes` -> `c1c76c87` zieht den
+  Nenner jetzt aus derselben Quelle wie den Zaehler, **fail-closed** bei 0.
+- `PerfCounter::open()` schwieg bei jedem Fehlschlag -> errno-Kanal (ce `22e17f57`).
+- gitleaks meldete `no leaks found` bei `0 commits scanned` -> Elternrepo-Mount.
+
+**OFFENER FALL, vor der Messung faellig:** `pmc_cache_misses_l3` faellt auf AMD mit
+`errno=2 (No such file or directory)` still auf `0`. Durchgaengig asymmetrisch: Intel
+populiert 4M+, AMD liefert 0 -- **nicht als Messwert, sondern als stillen Rueckfall.**
+Startet der Voll-Lauf so, tragen alle AMD-Zeilen eine Null, die eine Messung behauptet;
+repariert man es danach, tragen frueh und spaet erhobene Zeilen **verschiedene Semantik unter
+derselben Ueberschrift** -- ein **Datenbruch ohne Neubau**, schlimmer als ein Neubau, weil
+unsichtbar.
+
+---
+
+### 8. DIE FEHLENDE UNTER-ACHSE: `numa_cpu_pin_process_probe`
+
+Owner-KERN, verbatim:
+
+> *"**numa page ist eine Cache-Seiten Koordination von Cache-Seiten lokalitaet**. Jetzt
+> brauchen wir ein pendant [...], welche sich damit beschaeftigt, **wo Programme ausgefuehrt
+> werden, nicht welche Speicherseiten wo liegen**, sie sind aber beide **strukturell aehnliche
+> Unterachsen**. Das ist also eine **fehlende neue Unterachse, sie existiert nur im Plan,
+> nicht gebaut**."*
+
+Und die Namens-Vorgabe: *"Ich moechte numa_process_probe besser
+**numa_cpu_pin_process_probe** nennen"* -- der Name benennt **das Pinning** als Gegenstand,
+nicht bloss den Prozess.
+
+| Unter-Achse | Gegenstand | Zustand |
+|---|---|---|
+| `numa_page_probe` | **Speicher**-Lokalitaet -- wo liegen die Seiten | GEBAUT (OD-10-RT), **nicht angeschlossen** (deklarierte Paket-Grenze: Konsument = OD-10-RT-K) |
+| **`numa_cpu_pin_process_probe`** | **Ausfuehrungs**-Lokalitaet -- wo laeuft der Code | **FEHLT**, nur im Plan |
+
+Ableitungen: `NumaCpuPinProcessSubAxis`, Achsen-Id `numa_cpu_pin_process`.
+**Beide sind strukturgleich** -- das neue Paket **spiegelt** das bestehende Muster, es erfindet
+keins.
+
+Gegenprobe mit Nenner: **11 `sub_axis`-IDs in der Registry, keine enthaelt "core"**.
+Die Registry wird **GENERIERT** (`tools/system_axis_registry_gen/main.cpp:368-377`) --
+**den Generator aendern, nie die XML von Hand.**
+
+---
+
+### 9. WOZU DIE HYBRID-BINARY DA IST -- ihre Funktions-Definition
+
+Owner-KERN, verbatim:
+
+> *"Die **erste Stufe der Rangbildung** ist, dass die **Tier-binaries einfach direkt
+> drangehaengt werden**. Aber was passiert bei **gemischten Lasten des Suchalgorithmus**? Dann
+> muss dieser **jede Linie an Last-Kanaelen einwandfrei unterstuetzen** und das braucht dann
+> **nicht nur eine, sondern multiple optimale binaries je Last-Kanal**, daher der
+> **Hybrid-Schaltungs-Adapter dazwischen, der die richtige Tier-Binary waehlt**."*
+
+```
+  STUFE 1 (homogene Last):    EINE beste Binary je Schnitt, direkt drangehaengt
+  STUFE 2 (gemischte Lasten): jede Linie an Last-Kanaelen muss getragen werden
+                              -> MULTIPLE optimale Binaries, je eine pro Kanal
+                              -> HYBRID-SCHALTUNGS-ADAPTER waehlt
+```
+
+**Damit ist erklaert, warum die Auswertung eine FUNKTIONALITAETS-Voraussetzung ist:** ohne die
+Synthese weiss der Adapter nicht, **welche** Binary fuer **welchen** Kanal optimal ist.
+**Er ist kein Zwischen-Layer, sondern der Schalter zwischen mehreren gemessenen Optima.**
+
+Das erklaert die Owner-Beschreibung *"factory pattern - facade - Adapter"* (LEDGER:4090) als
+Bauanleitung statt als Muster-Aufzaehlung: **Factory** (haelt die passende Binary) · **Facade**
+(der Aufrufer sieht EINE Schnittstelle) · **Adapter** (dahinter mehrere Tier-Binaries).
+Und die Vererbung (LEDGER:4082, *"erben sie ALLE Eigenschaften vorausgegangener Stufen"*):
+er **muss** deren Ausstattung kennen, um zwischen ihnen schalten zu koennen.
+
+**IST-Stand:** `libs/cache_engine/hybrid/` enthaelt laut Ledger **nur eine README** -- die
+vierte Stufe ist ungebaut. **Das ist kein Versaeumnis, sondern die richtige Reihenfolge:**
+sie kann ohne Messdaten nicht wissen, was sie auswaehlen soll.
+
+---
+
+### 10. DIE AUSWERTUNGS-KETTE UND DER MATHEMATISCHE KERN
+
+Owner-KERN, verbatim:
+
+> *"die Auswertung braucht wiederum **die Messwerte**, aus der sie **Funktions-Synthese** und
+> **optimale Verarbeitung durch Schnitt-Kurven zwischen den Parametern verschiedener Achsen
+> und Gattungs/Genus-Funktionsinterfaces** ableiten kann. Die **Messung fuehrt zur
+> Funktions-Synthese** und diese zum **Erkennen der optimalen Konfiguration der Tier-Binaries**,
+> was **aequivalent mit der zu waehlenden Binary** ist."*
+
+```
+  Messwerte -> FUNKTIONS-SYNTHESE -> SCHNITT-KURVEN -> optimale Konfiguration
+            == die zu WAEHLENDE Binary
+```
+
+**Der mathematische Kern sind die SCHNITTE.** Nicht ein globales Optimum wird gesucht, sondern
+die Stellen, an denen sich die Kurven zweier Konfigurationen **kreuzen** -- dort kippt, welche
+Binary die bessere ist. **Ein Schnittpunkt ist ein Kipppunkt.**
+
+**Geschnitten wird ueber ZWEI Dimensionen**, beide ausdruecklich genannt:
+(a) Parameter **verschiedener Achsen** (Organ / System / Mess)
+(b) Parameter der **Gattungs-/Genus-Funktionsinterfaces** -- die leicht zu uebersehende:
+    auch die Interface-Ebene traegt Parameter, ueber die geschnitten wird.
+
+**Der letzte Halbsatz ist die Bruecke:** *"aequivalent mit der zu waehlenden Binary"* -- der
+Hybrid-Adapter braucht **keine Empfehlung**, sondern **die Schnittpunkte**. Sie sagen ihm, bei
+welchem Last-Kanal er umschaltet. **Die Auswertung produziert eine Schaltlogik, keinen Rat.**
+
+---
+
+### 11. BREAK EVEN UND DIE DREI BENCHMARK-EBENEN
+
+Owner-KERN, verbatim:
+
+> *"das ist als **'break even'** geplant. Es gibt **Schnittpunkte zwischen
+> Parameter-Funktionskurven, die anzeigen, wann ein Algorithmus in einem Parameter ueber eine
+> Achse als Organ effektiver wird.** Wenn wir das mit **gemischten Micro-Benchmarks ueber alle
+> Achsen** (siehe Parameter Benchmarks der Achsen) und **Macro-Benchmarks** (siehe alle Achsen
+> Parameter bei Aufruf einer beliebigen Funktion der verwendeten Achsen einer Gattung+Genus ->
+> **Gesamt-Messprofile timed einer Funktion ueber die Schritte und checkpoints ihrer
+> Ausfuehrung zur Detail-Analyse ueber alle Achsen die sie verwendet hat**) und
+> **Macro-Benchmarking large scope ueber die Gesamtheit der Macro-Benchmark charts ALLER fuer
+> ein Lastprofil aufgerufenen Gattung+Genus Funktionen auf dem Tier-Binary interface**."*
+
+| Ebene | Gegenstand | Was gemessen wird |
+|---|---|---|
+| **MICRO** | einzelne Achsen-Parameter | gemischte Micro-Benchmarks **ueber alle Achsen** -- die Parameter-Benchmarks der Achsen selbst |
+| **MACRO (timed)** | **eine** Gattungs+Genus-Funktion | alle Achsen-Parameter beim Aufruf; Gesamt-Messprofil **TIMED ueber die Schritte und CHECKPOINTS** ihrer Ausfuehrung, zur Detail-Analyse ueber **alle Achsen, die sie verwendet hat** |
+| **MACRO large scope** | **ein Lastprofil** | die **Gesamtheit der Macro-Benchmark-Charts ALLER** fuer dieses Lastprofil aufgerufenen Gattung+Genus-Funktionen **auf dem Tier-Binary-Interface** |
+
+**Die mittlere Ebene ist die anspruchsvollste und die aufschlussreichste:** Checkpoints
+**innerhalb** einer Funktion. Damit misst man nicht mehr "die Funktion war X ns schnell",
+sondern **wo innerhalb ihrer Ausfuehrung welche Achse Zeit gekostet hat**. Erst das macht
+Break-Even auf **Achsen**-Ebene bestimmbar -- sonst wuesste man nur, **dass** eine
+Konfiguration besser ist, nicht **warum**.
+
+**BREAK EVEN IST DIE OPERATIVE FORM VON HYPOTHESE H2** (Termin 1, 30.03.2026, verbatim):
+
+> *"**Es gibt keine universell beste lokale Seitendarstellung**; die beste Wahl haengt von
+> lokaler Dichte, Praefixstruktur, Zugriffsmix, Anwendungsdatensatz und Zielarchitektur ab."*
+
+Wenn es keine universell beste gibt, lautet die Frage nicht *"welche ist die beste"*, sondern
+**"ab wo ist welche besser"** -- und das liefern die Schnitt-Kurven. **H2 wird dadurch von
+einer plausiblen Behauptung zu einer messbaren.**
+Dieselbe Frage stellt schon das Expose (26.03.): *"und **wann sollte zwischen ihnen
+umgeschaltet werden**?"*
+
+**THESIS-ZUSAGE, die daran haengt** (`01_einleitung.tex:212-214`, eingebunden, beide Sprachen):
+*"Ein Mess-Treiber mit Defined-/Full-Modus-Unterscheidung, profilbewusstem Workload-Routing und
+**drei Granularitaeten --- Micro-, Makro- und Gesamt-Benchmarking (einzelne Bestandteile,
+Interface-Operationen, ganze Algorithmen)**."*
+**OFFENE ABGRENZUNGSFRAGE:** sind das dieselben drei Ebenen wie `wallclock`/`macro`/`micro`
+der Mess-Tooling-Achse? Ein Befund desselben Tages sagt, diese Achse habe **0 funktionale
+Konsumenten** -- dann waere die Zusage heute nicht gedeckt. **In Klaerung.**
+
+---
+
+### 12. WAS DARAUS AN BAU-POSTEN FOLGT
+
+| # | Posten | Klasse | Wann |
+|---|---|---|---|
+| **B-1** | `numa_cpu_pin_process_probe` -- die fehlende Unter-Achse (Erhebung, nicht Konsument) | CEB-ONLY, kein Tier-Neubau (`binary_id="never"`) | **Welle laeuft** |
+| **B-2** | Der Konsument: Planer-Freigabe -> CEB-CT-Einbau -> Pinning im Mess-Loop | CEB-ONLY | vor der Voll-Messung |
+| **B-3** | Getrennte Ablage je PMU-Domaene im CSV-/Lager-Schema | Schema | **vor** der Messung (sonst Datenbruch) |
+| **B-4** | `warn: no pinned locality on hybrid architecture` als Zustand + Ausgabe | CEB-ONLY | mit B-2 |
+| **B-5** | `pmc_cache_misses_l3` (+L2, coherence): ehrlicher Status-Token statt stiller `0` | CEB-ONLY | **vor** der Messung |
+| **B-6** | RAW-Events je Mikroarchitektur (Zen 3/4/5, Alder/Raptor Lake) -- Deep-Research-Pflicht | CEB-ONLY | vor der Voll-Messung |
+| **B-7** | Micro-Benchmarks je Achsen-Parameter | offen | nach Abgabe |
+| **B-8** | Checkpoint-Instrumentierung fuer Macro-timed | offen | nach Abgabe |
+| **B-9** | Funktions-Synthese + Break-Even-Rechnung | offen | nach Abgabe |
+| **B-10** | Hybrid-Schaltungs-Adapter (`libs/cache_engine/hybrid/`) | TIER-beruehrend | nach B-9 |
+
+**Die Reihenfolge ist nicht Geschmack, sondern Abhaengigkeit:** B-10 braucht B-9 braucht
+B-7/B-8 braucht die Messung braucht B-3/B-5 (sonst tragen die Daten falsche Semantik).
+
+---
+
+### 13. DIE ZWEI PRIMAERQUELLEN, DIE DIESE SESSION NICHT GELESEN HATTE
+
+**Das ist der Grund, warum zwoelf Praezisierungen an einem Abend noetig waren.** Owner-Ruege,
+verbatim: *"Ich sag es dir ja: **Gedaechtnisluecken, es ist alles geplant** und du musst bitte
+mit explore lesen"*.
+
+1. **`docs/termine/`** -- 11 Betreuer-Termine, **309 Dateien** (117 .md, 80 .txt, 27 .docx,
+   11 .pptx, 8 .drawio, 61 .jpg, 5 .py). **Die Primaerquelle.** Dort stehen Forschungsfrage,
+   eingefrorene Hypothesen H1-H4, Pflichtplattformen, Messregeln, Risiko-Tabellen mit
+   Gegenmassnahmen und fertige Baustein-Entwuerfe. **Eine ganze Session lang ungeoeffnet.**
+   Konsolidiert in `docs/plaene/20260806-KANON-termine-plan-soll-gegen-ist.md` (894 Z.).
+2. **Die Thesis als SPEZIFIKATION** -- 80 `.tex`, 18.694 Zeilen. Sie ist **nicht** die
+   Dokumentation des Codes, sondern die **Anforderung an ihn**. Konsolidiert in
+   `docs/plaene/20260806-DIFF-thesis-soll-gegen-ledger-und-code.md` (863 Z.).
+   **Struktur-Befund, der jede kuenftige Pruefung traegt:** nur **SECHS** Kapitel sind
+   eingebunden; die englisch benannten Dateien kompilieren **nicht** und sind **keine Zusage**
+   (belegt ueber die `.fls` eines echten Laufs, nicht aus dem Quelltext geschlossen).
+   **Falle:** `kapitel/en/01_einleitung.tex` **ist** der englische Text -- die Verzeichnisse
+   tragen die Sprache, die Dateinamen sind durchgaengig deutsch.
+
+**REGEL-ZEILE 18 (NEU):** **Vor jeder Ursachensuche und jedem Bauauftrag zuerst
+`docs/termine/` lesen** -- gezielt mit Explore, nicht punktuell greppen. Und: **die Thesis ist
+Spezifikation, nicht Nachbereitung.** Was dort im Praesens steht, ist eine pruefbare Zusage.
+
+---
+
+### 14. WAS AUS DIESER KONSOLIDIERUNG FUER DIE ABGABE FOLGT
+
+**Zwei Falschaussagen in der Abgabe, beide brauchen eine Owner-Entscheidung** (Details in
+`docs/plaene/20260806-DIFF-thesis-soll-gegen-ledger-und-code.md`, Abschnitt 1):
+
+- **F-01 Talos** -- die Arbeit sagt *"**jede Messung** unter zwei Betriebssystem-Regimes
+  (Talos und root-Linux)"* (ADR-12, verstaerkt in zwei eingebundenen Kapiteln). **Null Treffer
+  im Code**, OS-Achse kennt drei Auspraegungen ohne Talos, alle 16 Messzeilen tragen
+  `platform=linux-x86_64`, **kein** Limitierungs-Punkt entlastet. Empfehlung: **Aussage
+  zuruecknehmen** (unter 1 h) statt bauen (mehrere Tage Infra, Cluster read-only).
+- **F-02 `flat_hash_map`** -- namentlich in der **gesetzten Aufgabenstellung**, im Code nur
+  eine eigene SwissTable-Reimplementierung (S22), deren Mess-Pfad-Organ laut eigenem Kommentar
+  offen ist.
+
+**Und die P/E-Core-Trennung ist P1 aus dem Scope-Freeze** -- Forschungs-Kern, nicht Nacharbeit.
+Sie steht seit dem 09.04. in den Betreuer-Dokumenten, mit Risiko-Zeile und Baustein-Entwurf.
+**Gebaut wurde sie nie.**
+
+
 ## NACHTRAG 06.08.2026 abend-3 (SECHS LANDUNGEN in drei Repos; die 121 gesicherten Wellen-Ergebnisse als Checkheft verdichtet; EINE laufende Bau-Welle wegen ueberholter Annahmen GESTOPPT und korrigiert neu gestartet)
 
 > **REGEL-ZEILE 16 (NEU, aus dem Anlassfall dieses Abschnitts):**
