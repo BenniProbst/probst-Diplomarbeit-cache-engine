@@ -1,0 +1,50 @@
+==== TABU / ASCII / SPALTEN -- B14-NB4 (ce), Gesamtdiff 16a173f2..Arbeitsstand ====
+erzeugt 2026-08-06T15:47:29+00:00
+
+-- Geaenderte Pfade --
+   libs/cache_engine/anatomy/abi_adapter.hpp
+   libs/cache_engine/anatomy/observable_tier.hpp
+   libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp
+   libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp
+   libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp
+   libs/cache_engine/include/cache_engine/measurement/system_axis.hpp
+   tests/unit/CMakeLists.txt
+   tests/unit/test_b14_layout_scan_line_subaxis.cpp
+   tests/unit/test_clu_per_layout.cpp
+   tests/unit/test_e24_c10_g5_lade_wache.cpp
+   tests/unit/test_e24_c10_g6_identitaets_bilanz.cpp
+   tests/unit/test_m_contract_system_axis_wurzel.cpp
+   tests/unit/test_p_cacheline_store_line_source.cpp
+   tests/unit/test_v41_anatomy_module_abi.cpp
+   (offen)  M libs/cache_engine/include/cache_engine/abi/anatomy_module_abi_v1_decl.hpp
+   (offen)  M tests/unit/test_e24_c10_g5_lade_wache.cpp
+   (offen)  M tests/unit/test_e24_c10_g6_identitaets_bilanz.cpp
+
+-- TABU-Klassen im Diff (SOLL je 0, Ausnahme kV3AxisSchema s.u.) --
+   \.xml$ : 0
+   golden : 0
+   registry : 0
+   permutation_axes : 0
+   measurement/ : 1
+   Messdaten : 0
+
+-- kV3AxisSchema: AUSGEWIESENE, additive Beruehrung (kein stilles Gruen) --
+   geaendert: observable_tier.hpp kV3AxisSchema[5].names[5]  nullptr -> "line_bytes"
+   Praezedenz IM BAUM: kV3AxisSchema[2].names[6] nullptr -> "indirect_steps" (layout-neutral, sizeof-neutral)
+   sizeof-Pin unveraendert? 1
+   -> axis_stats bleibt [18][8], seg_ns[18], sizeof 1344; KEIN ABI-Major-Bump (Major bleibt 8).
+   -> ADDITIV ist genau eine CSV-Spalte: stat_memory_layout_line_bytes.
+
+-- ASCII-only in ALLEN Diff-ZUSAETZEN (SOLL 0) --
+   Nicht-ASCII-Zeilen: 0
+   Zeilen > 120 Spalten: 0
+
+-- clang-format --
+   NICHT VORHANDEN -> Gate STEHT AUS (ehrlich, nicht gruen gemeldet)
+==== ENDE ====
+
+-- NACHTRAG: Aufloesung des einen 'measurement/'-Treffers --
+   Treffer = libs/cache_engine/include/cache_engine/measurement/system_axis.hpp
+   Das ist ein QUELL-Pfad (die Mess-Achsen-Wurzel), NICHT das Mess-DATEN-Verzeichnis measurement/<ts>/.
+   Kein Messdaten-Pfad im Diff -> TABU-Klasse 'Messdaten' bleibt 0. (Gleiche Auflosung wie beim
+   'golden'-Treffer des NB3-super-Gates: das Muster trifft den Wach-/Quellcode, nicht die Datei.)

@@ -1,0 +1,31 @@
+MANIFEST -- sha256 der gesicherten Dateien
+Erzeugt: 2026-08-06 (Provenienz-Sicherung B14-NB4-WIP)
+Quelle Gate-Logs: /home/comdare/wt-b14-golden/docs/sessions/backups/20260806-b14-nb3/gates/
+Diese Logs liegen zusaetzlich committed im Branch b14-golden-kf6, Commit 9934a7e5.
+
+== Patch ==
+a0862e7fee12692911f39a3829c706e11af0677f2afa1f4626ba3ecad7adf2da  wt-b14-golden-nb4-wip.patch
+
+== Gate-Logs (Kopien) ==
+ae987062a02d796d0cc22225ff9e6fd4c863d7994fb2c9ccb4613b27ff554e7c  nb4-ce-configure1.txt
+f53fc9dc2946f2d446b1d987d58294b36b015a9c95f28ac4ac9aaad198ef8a3d  nb4-ce-configure2.txt
+6bdea8f51b561e53280a2bf0ec6fb4b17a4a8879e980e286bd0223f53f965335  nb4-ce-configure3.txt
+b668676729e44ff303f3321f1f80c522c65eaff6b81b9f464acd3fd8dda2db8e  nb4-ce-ctest-lauf1.txt
+f372ba83bbc52a3d7c96cef99f9ab122f569562479ec6912e7707a6585f82505  nb4-ce-ctest-lauf2.txt
+1ec2a343be8157062a5e1d6abbaff54c83a55538ddb68889e0cf08267f597ca9  nb4-ce-frozen-beweis.txt
+a873fe7a8bac62bfe7fae9c5fb5923fb875bcc831a42d33f4bd2af07f0b3e888  nb4-ce-frozen.txt
+862483d8309b3b2f36db506f8d608288b66a174a5d182cfc05463cdf0debee3f  nb4-ce-golden.txt
+e793fce54756e9985f8e015ede5e3fbde13af3663eca0df7b8ff0c13bf71ad36  nb4-ce-label-b14.txt
+79046ec1707903db605a9f82b06a42732e1400a7723da8009d3736ef07e95df7  nb4-ce-tabu-ascii.txt
+043b26c3431996f5a8df04a8dcf7a25aafd67d3a758f260c57362da38cb897a7  nb4-ce-vollbau1.txt
+c476e25b5c5f2e1b64506f94400ec8e982d55ea36f082bca98542bf7c2bc8488  nb4-ce-vollbau2.txt
+1c21038f9e94aa7199198f055388f95e4718337f715669fff0e7fd9cd5640cd7  nb4-ce-vollbau2-zusatz.txt
+1b0fc2e326ab2e448ff00d610e47e334b4df83288fb111f7e427ac90d6cd4f53  nb4-ce-vollbau3.txt
+2aa73df9ae5cda4b0db51d50b425e643b3ab7675ad20d002419fb883ed363c93  nb4-ce-vollbau3-zusatz.txt
+6a1de5027b061b2894143d15561be6aef7479ae5460b6b31d62b8de98911f75d  nb4-super-biss-beweise.txt
+24005942431aa9ffb3e6ff7f496a86acaa62483e749db8aab4ba1a367baf4369  nb4-super-configure.txt
+5b8cd02f02bcaebe3502f8bba0ee466de58abfdd3bf2972c718d542e915a5be2  nb4-super-gate-da_unit-j1.txt
+a0552c151820de4c2b135a973976abc4717fdff7672d749935f9b411a2e64ef4  nb4-super-gate-da_unit-j3.txt
+a09bc9c4a1989e09aeaad244e09ab3fbb8e28a341c2460c9b81f91641c578e74  nb4-super-gate-fixture_sync.txt
+0278c2b68322f7d64398c4dfedb88f92b3d29dc39b2c696b8ff56f071c166ec7  nb4-super-gate-tabu-ascii.txt
+58b1d55fe43d0f38725f0bea95c4a76aaff7dc6e50c35a0b4799eeb713926a58  nb4-super-gate-xmllint.txt
