@@ -1,0 +1,22 @@
+==== FROZEN-BEWEIS B14-NB4 (ce) ====
+erzeugt 2026-08-06T15:47:11+00:00, Worktree /home/comdare/wt-b14-ce, Branch b14-ce-anteil
+
+-- kFrozenFingerprintV1 im Baum (literal) --
+       constexpr std::string_view kFrozenFingerprintV1 =
+           "0fe275bddc7af1af9474cea655ff28280b93cfb3acc299c00d76d3489822993b"
+           "f043b4cee58b97d7ed2e42b0fc5bb0e3e300d15b1c50c31dd1aba7a23cc9fe36";
+
+-- SOLL laut Auftragslage: 0fe275bd...cc9fe36 (NICHT 17148e5a) --
+   Treffer 0fe275bd im Baum: tests/unit/test_m_w12_stamp_bausteine.cpp:1
+   Treffer 17148e5a im Baum (SOLL 0): 0
+
+-- die drei FROZEN-TUs: blob-identisch zum Eintritts-Stand 16a173f2? --
+   IDENTISCH  2914eb0e57fb268c3496622761138f4fbcfa6f3c  tests/unit/test_m_w12_stamp_bausteine.cpp
+   IDENTISCH  2383e4618933156afb04ae0df568f5e390934a5a  tests/unit/test_w10_system_cell_values.cpp
+   IDENTISCH  e374b371995679d7e5688a1b92f7c4c5da519ffe  tests/unit/test_g3_sha512_index.cpp
+
+-- ihre Tests im 410er-Lauf --
+   363/410 Test #363: test_m_w12_stamp_bausteine ..........................   Passed    0.00 sec
+   364/410 Test #364: test_w10_system_cell_values .........................   Passed    0.00 sec
+   394/410 Test #394: test_g3_sha512_index ................................   Passed    0.00 sec
+==== ENDE ====

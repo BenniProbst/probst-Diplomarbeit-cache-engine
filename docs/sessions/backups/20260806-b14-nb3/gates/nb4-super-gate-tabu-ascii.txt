@@ -1,0 +1,64 @@
+==== GATE TABU / ASCII -- B14-NB4 (super), Objekt: Working Tree vor Commit ====
+erzeugt 2026-08-06T15:56:57+00:00, Branch b14-golden-kf6, Eintritt 1ba29b63
+
+-- Geaenderte Pfade --
+    M Code/tests/CMakeLists.txt
+    M Code/tests/fixture_schema_subset_check.cmake
+    M Code/tests/fixture_sync_check.cmake
+    M Code/tests/golden_n_consistency_check.cmake
+    M Code/tests/xml_canonical_utils.cmake
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-configure1.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-configure2.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-configure3.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-ctest-lauf1.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-ctest-lauf2.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-frozen-beweis.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-frozen.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-golden.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-label-b14.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-tabu-ascii.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-vollbau1.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-vollbau2-zusatz.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-vollbau2.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-vollbau3-zusatz.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-ce-vollbau3.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-super-biss-beweise.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-super-configure.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-super-gate-da_unit-j1.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-super-gate-da_unit-j3.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-super-gate-fixture_sync.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-super-gate-tabu-ascii.txt
+   ?? docs/sessions/backups/20260806-b14-nb3/gates/nb4-super-gate-xmllint.txt
+
+-- TABU-Klassen im Diff (SOLL je 0) --
+   \.xml$ : 0
+   golden : 2
+   registry : 0
+   ^Code/external/ : 0
+   ^thesis/ : 0
+   measurement/ : 0
+   Messdaten : 0
+   permutation_axes : 0
+   AUFLOESUNG 'golden': Treffer sind golden_n_consistency_check.cmake = die WACHE, keine golden-DATEI.
+
+-- Submodul-Gitlinks unbewegt? --
+   KORREKTUR des ersten Pruefausdrucks (eigener Fehler, ehrlich vermerkt): 'submodule status | grep ^-'
+   trifft NICHT bewegte Gitlinks, sondern NICHT-INITIALISIERTE Submodule -- die zwei Zeilen unten sind
+   der Bestandszustand dieses Worktrees, keine Bewegung durch dieses Paket:
+       -29a1700d... Code/external/20260931-overleaf-diplomarbeit   (nicht ausgecheckt)
+       -29a1700d... thesis/diplomarbeit                            (nicht ausgecheckt)
+   DIE RICHTIGE PRUEFUNG ist der Diff selbst: bewegt sich ein Gitlink, steht sein Pfad im Diff.
+   Gitlink-Pfade im Diff (SOLL 0): 0  -- der Diff enthaelt ausschliesslich Code/tests/*.
+   (Gegenprobe: 'git diff --name-only' unten im Diffstat.)
+
+-- ASCII-only in ALLEN Diff-ZUSAETZEN (SOLL 0) --
+   Nicht-ASCII-Zeilen: 0
+
+-- Diffstat --
+    Code/tests/CMakeLists.txt                    |  20 ++-
+    Code/tests/fixture_schema_subset_check.cmake |  44 ++++--
+    Code/tests/fixture_sync_check.cmake          |  10 +-
+    Code/tests/golden_n_consistency_check.cmake  | 202 ++++++++++++++++++++++++---
+    Code/tests/xml_canonical_utils.cmake         | 180 ++++++++++++++++++------
+    5 files changed, 381 insertions(+), 75 deletions(-)
+==== ENDE ====
