@@ -181,7 +181,21 @@ add_test(NAME test_fixture_schema_experiment_golden
         "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden.xml"
         "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden.xml"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_schema_subset_check.cmake")
+# B14-NB2 (2026-08-06) -- die Wache der KETTE der zwei golden-Traeger.
+# Die zwei Wachen oben pruefen je EINE Datei gegen EIN Schema (Byte bzw. Vokabular). Keine von ihnen
+# haette gemerkt, dass die kanonische experiment_golden_kern.xml das Owner-N (2^17 = 131072) ueberhaupt
+# nicht maschinenlesbar trug und rechnerisch einen voellig anderen Raum deklarierte als ihr ce-Schwester-
+# Traeger all_axes_golden.profile.xml (Codex-Befund HOCH). Diese Wache vergleicht die beiden Traeger
+# SEMANTISCH ueber die Dialekt-Grenze hinweg: gleiche Achsen-Menge, je Achse gleiche Auspraegungen,
+# gleiches Produkt, und dieses Produkt == run_options cap BEIDER Seiten.
+# all_axes_golden.profile.xml wird ausschliesslich GELESEN (sie bleibt unangetastet, s. ihr Kopf-Block).
+add_test(NAME test_golden_n_consistency
+    COMMAND "${CMAKE_COMMAND}"
+        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
+        "-DPROFILE=${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/golden_n_consistency_check.cmake")
 set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_registry
                      test_fixture_schema_experiment_golden_kern test_fixture_schema_experiment_golden
+                     test_golden_n_consistency
     PROPERTIES LABELS "da_unit;fixture_sync" TIMEOUT 60
     SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP")

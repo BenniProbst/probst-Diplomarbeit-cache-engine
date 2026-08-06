@@ -40,6 +40,23 @@
              explizite <phases> = Override (byte-identisch zum Ist). -->
         <xs:element name="phases"               type="PhasesType" minOccurs="0"/>
         <xs:element name="axes_default_lookup"  type="AxesDefaultLookupType" minOccurs="0"/>
+        <!-- B14-NB2 (2026-08-06): run_options = der bis heute FEHLENDE MASCHINENLESBARE Kanal fuer das
+             golden-N. Vor diesem Paket stand N = 2^17 = 131072 in dieser Traeger-Familie NUR als
+             Fliesstext-Kommentar; die einzige maschinenlesbare Quelle war das Schwester-Profil
+             all_axes_golden.profile.xml (comdare_thesis_profile, <run_options cap="131072"/>). Ein
+             Kommentar ist keine Bauanleitung: der Owner-Kanon "golden N = 2^17" war damit im
+             KANONISCHEN Traeger nicht kodiert (Codex-Befund HOCH, B14-Verdikt).
+             VOKABULAR ZEICHENGLEICH zum thesis-Dialekt (cap, n_ops, platform, build_version, resume;
+             xml_config_parser.cpp Zeile 424 bis 432, ThesisRunOptions): die spaetere Parser-Naht bleibt
+             EINE Lese-Funktion, es entsteht kein zweites Namens-System. Semantik von cap laut
+             xml_config_parser.hpp Zeile 193: max_binaries-Obergrenze, 0/abwesend = ungesetzt =
+             Treiber-Default. Damit ist der Block rueckwaerts-neutral (minOccurs=0).
+             HEUTE DEKLARATIV: parse_experiment_profile liest ihn im comdare_experiment-Dialekt noch
+             nicht (unbekannte Wurzel-Kinder werden still ignoriert), identisches Muster wie
+             organ_subaxes; die Lese-Naht ist dieselbe dokumentierte ce-Auflage. Die Widerspruchs-
+             freiheit zwischen den beiden golden-Traegern bewacht bis dahin die ctest-Wache
+             test_golden_n_consistency (Code/tests/golden_n_consistency_check.cmake). -->
+        <xs:element name="run_options"          type="RunOptionsType" minOccurs="0"/>
         <!-- KF-6 / Owner-A4 (B14, 2026-08-06): organ_subaxes = der bis heute FEHLENDE XML-Kanal der
              ORGAN-SUB-Achsen (cacheline / node_width / alloc_hw) im comdare_experiment-Dialekt.
              WARUM NICHT in axes_default_lookup: dessen ref wird gegen die ce-Registry aufgeloest
@@ -335,6 +352,21 @@
       </xs:element>
     </xs:sequence>
     <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+
+  <!-- run_options (B14-NB2, 2026-08-06): die Lauf-/Bau-Steuerung. Attribut-Satz ZEICHENGLEICH zum
+       comdare_thesis_profile-Dialekt (all_axes_golden.profile.xml Zeile 163).
+       cap ist der einzige PFLICHT-Wert: er kodiert die Ziel-Kardinalitaet des Organraums
+       maschinenlesbar (golden: 131072 = 2^17). Wer den Block schreibt, muss N beziffern, genau
+       das war der Befund. Die uebrigen vier bleiben optional (ungesetzt = Treiber-Default).
+       KEIN xs:enumeration auf cap: der Wertraum ist eine Zahl, nicht ein Vokabular; die
+       Gleichheit mit dem Schwester-Traeger prueft die ctest-Wache, nicht das Schema. -->
+  <xs:complexType name="RunOptionsType">
+    <xs:attribute name="cap"           type="xs:unsignedInt" use="required"/>
+    <xs:attribute name="n_ops"         type="xs:unsignedLong" use="optional"/>
+    <xs:attribute name="platform"      type="xs:string"      use="optional"/>
+    <xs:attribute name="build_version" type="xs:string"      use="optional"/>
+    <xs:attribute name="resume"        type="xs:boolean"     use="optional"/>
   </xs:complexType>
 
   <!-- organ_subaxes: die drei ORGAN-SUB-Achsen des Sonderzweigs (KF-3 cacheline, C2/FF2 node_width,

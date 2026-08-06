@@ -46,6 +46,7 @@ bleiben". Daraus folgt eine feste Reihenfolge bei jeder Achsen-/Schema-Aenderung
 3. `experiment_golden_kern.xml` deklariert ihn und beziffert die Kardinalitaets-Folge.
 4. Die Wachen laufen: `xmllint --schema` (Struktur), ctest
    `test_fixture_schema_experiment_golden_kern` (Vokabular gegen die eine XSD),
+   ctest `test_golden_n_consistency` (Deckung mit dem ce-Schwester-Traeger),
    `validate_experiment_profile` (Registry-/Wert-Ebene, Code).
 
 Eine Aenderung an dieser Datei ist ein **deklariertes Trigger-Input-Ereignis**
@@ -72,7 +73,46 @@ diesem Paket einen eigenen Wurzel-Block mit **zeichengleichem Vokabular** zum
 - **KF-6-Belegung der golden:** `cacheline/line_size` = alle vier CT-Werte
   {32, 64, 128, 256}; `alignment` und `sw_prefetch_hint` bleiben am Achsen-Default.
   Kardinalitaet: Faktor 4, also 4 x 2^17 = 524288 Tier-Binaries (mit alignment und
-  sw_hint waeren es 60 x 2^17 = 7864320).
+  sw_hint waeren es 60 x 2^17 = 7864320). Das ist das **line_size-Teilprodukt**;
+  die **Gesamt-Bau-Matrix** der golden ist `4 (line_size) x 4 (Systemblock:
+  opt_level 2 x simd 2 x target_isa 1) x 2^17 = 2097152` (NB2-Korrektur 06.08.:
+  die frueher als Gesamtzahl gefuehrten 524288 liessen den Systemblock aus).
 - **HW-Freigabe ist keine XML-Aussage:** gebaut wird die volle Menge; welche
   Permutation auf einer Maschine *gemessen* wird, entscheidet die CEB-/Planungs-
   Grenze einmalig anhand der zur Laufzeit erkannten Line-Groesse.
+
+### Das golden-N (`<run_options>`, ab 2026-08-06 / B14-NB2)
+
+Der Owner-Kanon **golden N = 2^17 = 131072** war bis heute im kanonischen Traeger
+`experiment_golden_kern.xml` **nur Fliesstext**; maschinenlesbar existierte er
+allein im ce-Schwester-Traeger `all_axes_golden.profile.xml`
+(`<run_options cap="131072"/>`). Ein Kommentar ist keine Bauanleitung -- die
+frueher deklarierte Form (2 Achsen mit Override, 16 ungenannt = Voll-Sweep)
+expandierte gegen die Registry-Kardinalitaeten sogar zu rund `6e10` Binaries und
+widersprach damit dem Kanon, den sie tragen soll.
+
+Geheilt auf **drei** Ebenen:
+
+1. **XSD:** neues optionales Wurzel-Element `<run_options>` (`RunOptionsType`),
+   Attribut-Satz zeichengleich zum `comdare_thesis_profile`-Dialekt
+   (`cap` Pflicht, `n_ops`/`platform`/`build_version`/`resume` optional). `cap` =
+   `max_binaries`-Obergrenze (`xml_config_parser.hpp:193`).
+2. **Instanz:** alle 18 Kompositions-Achsen tragen ihre `allowed_variants`
+   explizit -- exakt die Werte des Schwester-Traegers (2 je Achse,
+   `persistence_target` 1). Produkt = `2^17` = 131072, gegen die Registry
+   nachgerechnet. Dazu `<run_options cap="131072" build_version="golden_kern"/>`.
+3. **Wache:** `test_golden_n_consistency`
+   (`Code/tests/golden_n_consistency_check.cmake`) vergleicht beide Traeger ueber
+   die Dialekt-Grenze hinweg: gleiche Achsen-Menge, je Achse gleiche
+   Auspraegungen, gleiches Produkt, und `Produkt == cap` auf beiden Seiten. Ein
+   `cap`, den die Achsen nicht hergeben, ist eine willkuerliche Kappung und wird
+   abgelehnt.
+
+**Registry-Namen sind Pflicht:** `allowed_variants` muss `baustein name`-Werte der
+`cache_engine_axis_registry.xml` nennen (`validate_experiment_profile` Pruefung
+(5)). Die frueher hier stehenden Token `binary_search` / `linear_search` gibt es
+dort nicht -- `search_algo` fuehrt `k_ary`, `interpolation`, `eytzinger`,
+`linear_scan`. Gepinnt ist `k_ary interpolation`, weil der golden-Raum als "die
+ersten 2 Enabled-Werte je Achse" definiert ist (`mp_take_c<...,2>`); ein anderes
+Paar waere ein zweiter, widersprechender golden-Raum und muesste **beide** Traeger
+zugleich bewegen (offener Owner-Punkt, kein Blocker).
