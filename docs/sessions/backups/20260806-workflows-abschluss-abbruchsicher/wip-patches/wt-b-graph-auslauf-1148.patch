@@ -1,0 +1,527 @@
+diff --git a/Code/05_diagram_generator/diagram_generator.cpp b/Code/05_diagram_generator/diagram_generator.cpp
+index 792bde65..7351434a 100644
+--- a/Code/05_diagram_generator/diagram_generator.cpp
++++ b/Code/05_diagram_generator/diagram_generator.cpp
+@@ -658,6 +658,19 @@ struct SurfaceAggregate {
+     return de ? "Gesamt-Latenz (ns/op)" : "overall latency (ns/op)";
+ }
+ 
++// P1a (2026-08-06) -- ROLLEN-BENENNUNG der 3D-Flaeche, EIN Ort fuer Achsen-Titel UND Caption.
++// Beide Flaechen-Achsen (search_algo x workload) sind NOMINAL: zwischen zwei Suchalgorithmen liegt
++// nichts, was man interpolieren koennte. Die von "surf" aufgespannte Flaeche ist daher eine
++// Ablese-Hilfe ueber den gemessenen Stuetzstellen, KEIN Modell und keine Trendaussage. Die Figur heisst
++// deshalb ausdruecklich "Rohdaten-Ansicht" (Diagnose/QA-Rolle); die analysierenden Aussagen tragen die
++// referenz-bezogenen Formen. Zweiter, ebenso wichtiger Zweck dieser Funktion: data.title wird jetzt
++// ueberhaupt gesetzt -- aggregate_surface_matrix fuellt nur Labels/Matrix/Maske, sodass die Caption des
++// (bis P1a nirgends verdrahteten) 3D-Writers bisher LEER blieb.
++[[nodiscard]] std::string surface3d_title(std::string const& metric, bool de) {
++    return (de ? "3D-Rohdaten-Ansicht: " : "3D raw-data view: ") + metric +
++           (de ? " (Suchalgorithmus x Workload)" : " (search algorithm x workload)");
++}
++
+ } // anonymous namespace
+ 
+ int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementRow>& out_rows) {
+@@ -851,16 +864,18 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
+ 
+     bool const        de     = (lang == "de");
+     std::string const metric = z_field_human(z_field, lang);
++    // P1a: EIN Titel fuer Achsen-Beschriftung, Platzhalter und Caption (vorher blieb data.title leer ->
++    // leere \caption{}; fiel nicht auf, weil der Writer bis P1a nicht in der Facade verdrahtet war).
++    data.title = surface3d_title(metric, de);
+ 
+     // E-2a/HONEST-EMPTY: dieselbe Wache wie im 2D-Pfad -- keine einzige ausgefuehrte Zelle -> ehrlicher
+     // Platzhalter statt Figur. E-2b: any_data zaehlt jetzt AUCH ausgefuehrte Nullen als Daten, der
+     // Platzhalter greift also nur noch bei wirklich nie ausgefuehrter Metrik (ein Ort, ein Muster wie 2D).
+     if (!agg.any_data) {
+-        std::string const title3d = (de ? "3D-Surface: " : "3D surface: ") + metric;
+         std::cerr << "diagram-generator: HONEST-EMPTY -- keine ausgefuehrte Messung fuer z=" << z_field
+                   << " -> Platzhalter-Vermerk statt 3D-Surface: " << out.string() << "\n";
+         return write_honest_empty_placeholder(
+-            out, title3d,
++            out, data.title,
+             de ? ("(Keine Messwerte: " + metric +
+                   " wurde im vorliegenden Korpus nie ausgefuehrt. Diese Flaeche wird ehrlich ausgelassen.)")
+                : ("(No measured values: " + metric +
+@@ -914,8 +929,8 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
+     open_resizebox(f, cnst);
+     f << "\\begin{tikzpicture}\n";
+     f << "\\begin{axis}[\n";
+-    write_pgfplots_axis_options(f, cnst, (de ? "3D-Surface: " : "3D surface: ") + metric,
+-                                (de ? "Workload" : "workload"), (de ? "Suchalgorithmus" : "search algorithm"));
++    write_pgfplots_axis_options(f, cnst, data.title, (de ? "Workload" : "workload"),
++                                (de ? "Suchalgorithmus" : "search algorithm"));
+     // Echte 3D-Projektion + surf-Plot. z LOG-skaliert: Workload-Spanne ~14000×,
+     // sonst dominiert eine Zelle die Höhen-Achse vollständig.
+     f << "    view={45}{30},\n";
+@@ -1047,6 +1062,21 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
+ 
+     std::string const metric = z_field_human(z_field, lang);
+ 
++    // P1b (2026-08-06) -- ENTARTUNGS-WACHE der x-Achse, aufgedeckt erst durch die Verdrahtung in die
++    // Facade. Der d03-Korpus sweept working_set_n gar nicht: ALLE Zeilen tragen denselben Wert (4096),
++    // die Kurve ist also ehrlich EIN Punkt je Reihe. pgfplots-Probe 2026-08-06 an genau dieser .tex:
++    // "Package pgfplots Warning: Axis range for axis x is approximately empty; enlargi[ng]" -- die
++    // Log-Achse bekommt xmin==xmax und weitet selbst auf einen willkuerlichen Bereich auf.
++    // Kleinste ehrliche Gegenmassnahme (Praezedenz: die z-/Farb-Domaenen-Aufweitung im 3D-Pfad, E-2b):
++    // NUR die ACHSE explizit auf eine Oktave um den einen Wert setzen -- log basis 2, also [v/2 : 2v].
++    // Es wird KEIN Punkt erfunden und kein Wert veraendert; die Kurve bleibt sichtbar der eine
++    // gemessene Stuetzpunkt. Erst ein echter Sweep-Korpus (mehrere working_set_n) fuellt sie.
++    std::set<std::uint64_t> distinct_x;
++    for (auto const& [key, points] : series)
++        for (auto const& [wsn, samples] : points) distinct_x.insert(wsn);
++    bool const          degenerate_x = (distinct_x.size() == 1 && *distinct_x.begin() > 0);
++    std::uint64_t const only_x       = degenerate_x ? *distinct_x.begin() : 0;
++
+     std::ofstream f{out};
+     if (!f) return status_io_error;
+     f << "% AUTO-GENERATED durch diagram_generator (A2/m3v2, Working-Set-Sweep-Kurve; z=" << z_field
+@@ -1056,9 +1086,22 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
+     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
+     open_resizebox(f, cnst);
+     f << "\\begin{tikzpicture}\n\\begin{axis}[\n";
++    // P1b (2026-08-06)/BESCHRIFTUNGS-FIX, ebenfalls erst durch die Verdrahtung sichtbar geworden:
++    // write_pgfplots_axis_options schickt JEDE Beschriftung durch escape_latex. Die bisherigen Labels
++    // enthielten Mathe-Modus und eine LaTeX-Umlaut-Sequenz und wurden dadurch buchstaeblich zerlegt --
++    // pdflatex-Probe an der erzeugten .tex: "xlabel={Arbeitsmenge \$n\$ (Schl\textbackslash{}"ussel)}",
++    // also literal sichtbare Dollarzeichen und ein sichtbares \"ussel statt eines Umlauts. Beschriftungen
++    // muessen hier deshalb REINER ASCII-TEXT ohne LaTeX-Syntax sein (Doktrin ASCII-only); die
++    // Escape-Verantwortung liegt allein bei write_pgfplots_axis_options.
+     write_pgfplots_axis_options(f, cnst, (de ? "Working-Set-Sweep: " : "working-set sweep: ") + metric,
+-                                (de ? "Arbeitsmenge $n$ (Schl\\\"ussel)" : "working set $n$ (keys)"), metric);
++                                (de ? "Arbeitsmenge n (Schluessel)" : "working set n (keys)"), metric);
+     f << "    xmode=log,\n    log basis x=2,\n";
++    if (degenerate_x) {
++        f << "    % P1b: nur EIN gemessener working_set_n -> Achse explizit auf eine Oktave geweitet\n";
++        f << "    % (sonst xmin==xmax -> \"Axis range for axis x is approximately empty\"). Nur die ACHSE.\n";
++        f << "    xmin=" << fmt_double(static_cast<double>(only_x) / 2.0) << ", xmax="
++          << fmt_double(static_cast<double>(only_x) * 2.0) << ",\n";
++    }
+     f << "    legend pos=north west,\n    legend style={font=\\tiny},\n";
+     f << "    mark size=2pt,\n";
+     f << "]\n";
+diff --git a/Code/05_diagram_generator/diagram_generator.hpp b/Code/05_diagram_generator/diagram_generator.hpp
+index b3ad1004..29685833 100644
+--- a/Code/05_diagram_generator/diagram_generator.hpp
++++ b/Code/05_diagram_generator/diagram_generator.hpp
+@@ -310,6 +310,10 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
+ // E-2b: nicht ausgefuehrte Zellen sind Loecher (z=nan + unbounded coords=jump), NIE ein Ersatzwert.
+ // Traegt die Flaeche eine ECHT GEMESSENE 0, faellt die z-Achse auf LINEAR zurueck -- eine log-Achse
+ // kann die 0 weder zeigen noch ehrlich ersetzen (Begruendung + Proben im .cpp).
++// P1a (2026-08-06): ROLLE = "3D-Rohdaten-Ansicht" (Diagnose/QA), NICHT Ergebnis-Abbildung. Beide
++// Flaechen-Achsen sind NOMINAL -- die aufgespannte Flaeche traegt keine Interpolations-/Trendaussage.
++// Titel UND Caption kommen ab P1a aus EINER Quelle (surface3d_title im .cpp); vorher blieb die Caption
++// leer, weil aggregate_surface_matrix nur Labels/Matrix/Maske fuellt und niemand data.title setzte.
+ [[nodiscard]] int write_surface3d_search_algo_x_workload(std::filesystem::path const&        out,
+                                                          std::span<WideMeasurementRow const> rows,
+                                                          std::string const& z_field, std::string const& lang = "en",
+diff --git a/Code/05_diagram_generator/tests/test_05_diagram_generator_cached_fixtures.cpp b/Code/05_diagram_generator/tests/test_05_diagram_generator_cached_fixtures.cpp
+index 15e7ef8d..6860ea19 100644
+--- a/Code/05_diagram_generator/tests/test_05_diagram_generator_cached_fixtures.cpp
++++ b/Code/05_diagram_generator/tests/test_05_diagram_generator_cached_fixtures.cpp
+@@ -188,6 +188,43 @@ TEST(Stufe05Pipeline, WriteSurfaceHeatmapFromWide) {
+     fs::remove(p, ec);
+ }
+ 
++// GRAPH-UMBAU 2D/3D, P1a (2026-08-06): der 3D-Writer traegt Titel UND Caption aus EINER Quelle.
++// Bis P1a fuellte niemand data.title (aggregate_surface_matrix setzt nur Labels/Matrix/Maske), sodass
++// die Figur ein leeres "\caption{}" bekam -- unbemerkt, weil der Writer nirgends verdrahtet war.
++// Zusaetzlich haelt der Test die ROLLEN-Benennung fest: "Rohdaten-Ansicht"/"raw-data view", NICHT
++// "Ergebnis" -- beide Flaechen-Achsen sind nominal und tragen keine Interpolationsaussage.
++TEST(Stufe05Pipeline, Surface3dCarriesRawDataViewTitleAndNonEmptyCaption) {
++    auto p = comdare_user_tmp() / "p1a_wide_sample.csv";
++    write_sample_wide_csv(p);
++    std::vector<dg::WideMeasurementRow> rows;
++    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
++
++    std::error_code ec;
++
++    // -- en --
++    auto out_en = comdare_user_tmp() / "p1a_surface3d_en.tex";
++    fs::remove(out_en, ec);
++    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out_en, rows, "ns_per_op", "en"), dg::status_ok);
++    EXPECT_TRUE(file_contains(out_en, "3D raw-data view: overall latency (ns/op)"));
++    EXPECT_FALSE(file_contains(out_en, "\\caption{}")); // Caption ist NICHT mehr leer
++    // Titel steht an BEIDEN Orten -- Achsen-title UND caption speisen sich aus derselben Quelle.
++    EXPECT_TRUE(file_contains(out_en, "title={3D raw-data view"));
++    EXPECT_TRUE(file_contains(out_en, "\\caption{3D raw-data view"));
++
++    // -- de --
++    auto out_de = comdare_user_tmp() / "p1a_surface3d_de.tex";
++    fs::remove(out_de, ec);
++    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out_de, rows, "ns_per_op", "de"), dg::status_ok);
++    EXPECT_TRUE(file_contains(out_de, "3D-Rohdaten-Ansicht"));
++    EXPECT_FALSE(file_contains(out_de, "\\caption{}"));
++    // KEINE "Ergebnis"-Behauptung und kein Rest der alten Benennung.
++    EXPECT_FALSE(file_contains(out_de, "3D-Surface:"));
++
++    fs::remove(out_en, ec);
++    fs::remove(out_de, ec);
++    fs::remove(p, ec);
++}
++
+ TEST(Stufe05Pipeline, EmptyInputReturnsEmpty) {
+     dg::BarChartData empty;
+     empty.title = "empty";
+@@ -1044,3 +1081,138 @@ TEST(Stufe05Pipeline, SurfaceOneMissingCounterColumnFallsBackToP50Heuristic) {
+     fs::remove(p_missing, ec);
+     fs::remove(p_na, ec);
+ }
++
++// -----------------------------------------------------------------------------
++// GRAPH-UMBAU 2D/3D, P1b (2026-08-06) -- Working-Set-Sweep-Kurve.
++// Die Form war seit A2 gebaut, aber NIRGENDS verdrahtet; erst die Verdrahtung in die Anhang-Facade hat
++// zwei Fehler sichtbar gemacht, die diese Tests festhalten:
++//   (a) Beschriftungs-Zerlegung: write_pgfplots_axis_options escaped JEDE Beschriftung -- die frueheren
++//       Labels trugen Mathe-Modus und eine LaTeX-Umlaut-Sequenz und erschienen literal als "\$n\$" und
++//       "Schl\textbackslash{}"ussel" im PDF.
++//   (b) entartete x-Achse: traegt der Korpus nur EINEN working_set_n (d03: durchgaengig 4096), gilt
++//       xmin==xmax -> pgfplots-Warnung "Axis range for axis x is approximately empty".
++// -----------------------------------------------------------------------------
++namespace {
++
++// working_set_n-Spalte optional (has_ws=false spiegelt den cowfix-v1-Korpus OHNE die Spalte).
++// single_ws=true -> ALLE Zeilen tragen denselben working_set_n (der d03-Fall, entartete Achse).
++void write_wide_csv_with_working_set(fs::path const& p, bool has_ws, bool single_ws) {
++    fs::create_directories(p.parent_path());
++    std::ofstream f(p);
++    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;"
++      << "op_scan_p50_ns;op_rmw_p50_ns;";
++    if (has_ws) f << "working_set_n;";
++    f << "workload;two_phase_valid\n";
++
++    struct RowSpec {
++        char const*   algo;
++        std::uint64_t ws;
++        double        ns;
++    };
++    // 2 Reihen (k_ary, eytzinger) x 2 Arbeitsmengen -- bei single_ws kollabieren beide auf 4096.
++    RowSpec const specs[] = {
++        {"k_ary", 4096, 100.0}, {"k_ary", 8192, 180.0}, {"eytzinger", 4096, 90.0}, {"eytzinger", 8192, 150.0}};
++    for (auto const& s : specs) {
++        f << "search_algo=" << s.algo << "/mapping=direct;" << s.ns << ";10.0;20.0;30.0;40.0;50.0;";
++        if (has_ws) f << (single_ws ? 4096U : s.ws) << ";";
++        f << "ycsb_c;1\n";
++    }
++}
++
++} // namespace
++
++// (P1b-t1) BESTANDSVERHALTEN: ohne working_set_n-Spalte gibt es keine Punkte -> honest-empty.
++// KEINE Datei, KEIN Crash -- das ist der Grund, warum das Wiring auf cowfix-v1-Korpora risikofrei ist.
++TEST(Stufe05Pipeline, SweepCurveHonestEmptyWithoutWorkingSetColumn) {
++    auto p = comdare_user_tmp() / "p1b_no_ws.csv";
++    write_wide_csv_with_working_set(p, /*has_ws=*/false, /*single_ws=*/false);
++    std::vector<dg::WideMeasurementRow> rows;
++    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
++    ASSERT_EQ(rows.size(), 4u);
++    for (auto const& r : rows) EXPECT_FALSE(r.has_working_set_n);
++
++    auto            out = comdare_user_tmp() / "p1b_sweep_empty.tex";
++    std::error_code ec;
++    fs::remove(out, ec);
++    EXPECT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_empty_input);
++    EXPECT_FALSE(fs::exists(out)); // honest-empty: KEINE Datei
++
++    fs::remove(p, ec);
++}
++
++// (P1b-t2) Mit echtem Sweep: eine Kurve je Reihe, die Punkte sind die gemessenen Stuetzstellen.
++// Die Achse wird NICHT aufgeweitet (zwei verschiedene working_set_n -> Spanne ist echt).
++TEST(Stufe05Pipeline, SweepCurveEmitsOneCurvePerSeriesAndKeepsRealAxisRange) {
++    auto p = comdare_user_tmp() / "p1b_real_sweep.csv";
++    write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/false);
++    std::vector<dg::WideMeasurementRow> rows;
++    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
++    for (auto const& r : rows) EXPECT_TRUE(r.has_working_set_n);
++
++    auto            out = comdare_user_tmp() / "p1b_sweep_real.tex";
++    std::error_code ec;
++    fs::remove(out, ec);
++    ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
++    // 2 Reihen -> 2 Kurven + 2 Legenden-Eintraege.
++    EXPECT_EQ(count_occurrences(out, "\\addplot+[mark=*]"), 2u);
++    EXPECT_EQ(count_occurrences(out, "\\addlegendentry"), 2u);
++    // Die gemessenen Stuetzstellen stehen literal drin.
++    EXPECT_TRUE(file_contains(out, "(4096,"));
++    EXPECT_TRUE(file_contains(out, "(8192,"));
++    // ECHTE Spanne -> KEINE Achsen-Aufweitung (die greift nur im entarteten Fall).
++    EXPECT_FALSE(file_contains(out, "xmin="));
++
++    fs::remove(out, ec);
++    fs::remove(p, ec);
++}
++
++// (P1b-t3) Der d03-Fall: nur EIN working_set_n. Die Kurve ist ehrlich ein Punkt je Reihe; NUR die ACHSE
++// wird auf eine Oktave geweitet, damit pgfplots nicht "approximately empty" warnt und selbst willkuerlich
++// aufweitet. Es entsteht KEIN zusaetzlicher Datenpunkt.
++TEST(Stufe05Pipeline, SweepCurveSingleWorkingSetWidensOnlyTheAxisNotTheData) {
++    auto p = comdare_user_tmp() / "p1b_single_ws.csv";
++    write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/true);
++    std::vector<dg::WideMeasurementRow> rows;
++    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
++
++    auto            out = comdare_user_tmp() / "p1b_sweep_single.tex";
++    std::error_code ec;
++    fs::remove(out, ec);
++    ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
++    // Achse explizit eine Oktave um den einen Wert (4096) -> [2048 : 8192], log basis 2.
++    EXPECT_TRUE(file_contains(out, "xmin=2048.0000, xmax=8192.0000"));
++    // ... aber NUR die Achse: es gibt weiterhin genau EINEN Punkt je Reihe (2 Reihen -> 2 Koordinaten).
++    EXPECT_EQ(count_occurrences(out, "(4096,"), 2u);
++    EXPECT_EQ(count_occurrences(out, "(8192,"), 0u); // kein erfundener zweiter Stuetzpunkt
++    EXPECT_EQ(count_occurrences(out, "\\addplot+[mark=*]"), 2u);
++
++    fs::remove(out, ec);
++    fs::remove(p, ec);
++}
++
++// (P1b-t4) Die Achsen-Beschriftungen sind REINER ASCII-TEXT ohne LaTeX-Syntax: write_pgfplots_axis_options
++// escaped sie, also wuerde jedes $ / \ literal im PDF erscheinen. Genau das war der Fehler vor P1b.
++TEST(Stufe05Pipeline, SweepCurveLabelsSurviveTheLatexEscape) {
++    auto p = comdare_user_tmp() / "p1b_labels.csv";
++    write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/false);
++    std::vector<dg::WideMeasurementRow> rows;
++    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
++
++    std::error_code ec;
++    auto            out_en = comdare_user_tmp() / "p1b_labels_en.tex";
++    fs::remove(out_en, ec);
++    ASSERT_EQ(dg::write_working_set_sweep_curve(out_en, rows, "ns_per_op", "en"), dg::status_ok);
++    EXPECT_TRUE(file_contains(out_en, "xlabel={working set n (keys)}"));
++    EXPECT_FALSE(file_contains(out_en, "\\$")); // KEIN literal sichtbares Dollarzeichen
++
++    auto out_de = comdare_user_tmp() / "p1b_labels_de.tex";
++    fs::remove(out_de, ec);
++    ASSERT_EQ(dg::write_working_set_sweep_curve(out_de, rows, "ns_per_op", "de"), dg::status_ok);
++    EXPECT_TRUE(file_contains(out_de, "xlabel={Arbeitsmenge n (Schluessel)}"));
++    EXPECT_FALSE(file_contains(out_de, "\\$"));
++    EXPECT_FALSE(file_contains(out_de, "textbackslash")); // KEIN zerlegter Umlaut-Befehl mehr
++
++    fs::remove(out_en, ec);
++    fs::remove(out_de, ec);
++    fs::remove(p, ec);
++}
+diff --git a/Code/08_appendix_generator/appendix_generator.cpp b/Code/08_appendix_generator/appendix_generator.cpp
+index 1ff92d6d..b6dd2505 100644
+--- a/Code/08_appendix_generator/appendix_generator.cpp
++++ b/Code/08_appendix_generator/appendix_generator.cpp
+@@ -426,8 +426,43 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
+             return status_io_error;
+         }
+ 
++        // -- (5g) GRAPH-UMBAU 2D/3D, P1a (2026-08-06): die echte 3D-Flaeche je z-Feld ---------------------
++        // Die Funktion war seit L-c gebaut und honest-empty-hart (E-2b), aber NIRGENDS verdrahtet -- im
++        // Anhang stand je Metrik ausschliesslich die 2D-Heatmap. Owner-KERN E-2 verlangt 2D UND 3D.
++        // ROLLEN-SCHNITT: lc_surface_<z> (2D) und lc_surface3d_<z> (3D) sind beide Rohdaten-/QA-Ansichten
++        // derselben (search_algo x workload)-Matrix -- zwei NOMINALE Achsen tragen keine Trendaussage.
++        // KEIN Ersatz: die 6 lc_surface_<z> oben bleiben unveraendert (blankes \input in A_measurements).
++        // dg_ok-Toleranz wie (5a)-(5e): ohne gueltige Achsen gibt es keine Datei, das ist kein Fehler.
++        for (auto const z_sv : kSurfaceFields) {
++            std::string const z{z_sv};
++            if (int const rc = dg::write_surface3d_search_algo_x_workload(out_dir / ("lc_surface3d_" + z + ".tex"),
++                                                                          surf_rows, z, lang);
++                !dg_ok(rc)) {
++                std::cerr << "appendix-generator: write_surface3d (" << z << "," << lang << ") failed " << rc << "\n";
++                return status_io_error;
++            }
++        }
++
++        // -- (5h) GRAPH-UMBAU 2D/3D, P1b (2026-08-06): Working-Set-Sweep-Kurve je z-Feld ------------------
++        // Die klassische 2D-Paper-Form: Metrik ueber die Arbeitsmengen-Groesse, eine Kurve je gesweepter
++        // Achsen-Auspraegung. Anders als die Flaeche traegt hier die x-Achse eine ECHTE Ordnung
++        // (working_set_n), die Kurve zwischen den Stuetzstellen ist also lesbar. Ebenfalls seit A2 gebaut
++        // und bis hier unverdrahtet. Auf cowfix-v1-Korpora ohne working_set_n-Spalte ist der Aufruf ein
++        // reines No-Op (status_empty_input, keine Datei) -- deshalb ist das Wiring risikofrei.
++        for (auto const z_sv : kSweepFields) {
++            std::string const z{z_sv};
++            if (int const rc =
++                    dg::write_working_set_sweep_curve(out_dir / ("ld_sweep_" + z + ".tex"), surf_rows, z, lang);
++                !dg_ok(rc)) {
++                std::cerr << "appendix-generator: write_working_set_sweep_curve (" << z << "," << lang << ") failed "
++                          << rc << "\n";
++                return status_io_error;
++            }
++        }
++
+         std::cout << "appendix-generator [" << lang
+-                  << "]: 12 Kern- + 5 Darstellungs-.tex + Achsen-Inventar (honest-empty ⇒ ggf. ausgelassen) -> "
++                  << "]: 12 Kern- + 5 Darstellungs-.tex + 3D-Flaechen + Sweep-Kurven + Achsen-Inventar "
++                     "(honest-empty ausgelassen wo ohne Daten) -> "
+                   << out_dir << "\n";
+     }
+     return status_ok;
+diff --git a/Code/08_appendix_generator/appendix_generator.hpp b/Code/08_appendix_generator/appendix_generator.hpp
+index 9bbb92bf..2db00d26 100644
+--- a/Code/08_appendix_generator/appendix_generator.hpp
++++ b/Code/08_appendix_generator/appendix_generator.hpp
+@@ -48,6 +48,14 @@ inline constexpr int status_empty_input = 12;
+ inline constexpr std::array<std::string_view, 6> kSurfaceFields = {
+     "ns_per_op", "op_insert_p50_ns", "op_lookup_p50_ns", "op_erase_p50_ns", "op_scan_p50_ns", "op_rmw_p50_ns"};
+ 
++// P1b (2026-08-06): die z-Felder der Working-Set-Sweep-Kurve -> ld_sweep_<z>.tex. Bewusst eine
++// MINIMALAUSWAHL statt aller 6: die Kurve traegt die Metrik ueber die Arbeitsmengen-Groesse
++// (working_set_n), und nur diese drei sind im Sweep-Korpus durchgaengig besetzt. Die Auswahl ist rein
++// additiv erweiterbar. HEADER-GETRIEBEN/n-a-tolerant: fehlt die working_set_n-Spalte (cowfix-v1-Korpus),
++// liefert write_working_set_sweep_curve status_empty_input -> KEINE Datei, KEIN Fehler.
++inline constexpr std::array<std::string_view, 3> kSweepFields = {"ns_per_op", "op_insert_p50_ns",
++                                                                 "op_lookup_p50_ns"};
++
+ // ── ACHSEN-INVENTAR (2026-08-03) ──────────────────────────────────────────────
+ // DIE LUECKE: bis hierher kannte diese Stufe NUR die VIER variablen Mess-Achsen
+ // (c2l::kVariableAxes: search_algo, node_type, memory_layout, prefetch) — exakt
+@@ -147,6 +155,12 @@ struct AppendixConfig {
+ // PLUS additiv (2026-08-03) das VOLLE Achsen-Inventar aus den drei generierten
+ // Registry-XML, sofern die Pfade gesetzt sind:
+ //   axis_inventory.tex  (Organ-Slots T00-T17 + System-Realm + Mess-Realm)
++// PLUS additiv (GRAPH-UMBAU 2D/3D, 2026-08-06) die 2D-/3D-Graph-Formen aus DENSELBEN
++// surf_rows (kein Doppel-Parsen); beide Writer existierten laengst, waren aber nie
++// verdrahtet:
++//   lc_surface3d_<z>.tex (6x, P1a: echte 3D-Flaeche je z-Feld, Rohdaten-/QA-Rolle)
++//   ld_sweep_<z>.tex     (3x, P1b: Metrik ueber working_set_n, eine Kurve je
++//                         gesweepter Achsen-Auspraegung; ohne die Spalte honest-empty)
+ // HONEST-EMPTY: liefert ein Darstellungs-Writer status_empty_input (n/a-Daten), wird
+ // die betreffende Datei bewusst NICHT geschrieben — das ist KEIN Facade-Fehler (die 12
+ // Kern-.tex bleiben unberührt). Die 12 Kern-.tex sind byte-identisch zu den bisherigen
+diff --git a/Code/08_appendix_generator/tests/test_08_appendix_generator.cpp b/Code/08_appendix_generator/tests/test_08_appendix_generator.cpp
+index a8139d50..1eacd05e 100644
+--- a/Code/08_appendix_generator/tests/test_08_appendix_generator.cpp
++++ b/Code/08_appendix_generator/tests/test_08_appendix_generator.cpp
+@@ -170,6 +170,20 @@ int run_individual_writers(fs::path const& csv, fs::path const& out_root, std::v
+         if (!dg_ok(dg::write_latency_ecdf(out_dir / "latency_ecdf.tex", surf_rows, lang))) return 8;
+         if (!c2l_ok(c2l::write_exchange_forest_plot(out_dir / "exchange_forest.tex", exch_aggs, counts, lang)))
+             return 9;
++        // (6) GRAPH-UMBAU 2D/3D (2026-08-06): dieselbe Writer-Sequenz wie die Facade -- P1a 3D-Flaechen,
++        //     P1b Sweep-Kurven. Ohne diese Spiegelung deckt der Byte-Identitaets-Beweis die neuen
++        //     Dateien NICHT ab (stiller Luecken-Test).
++        for (auto const z_sv : ag::kSurfaceFields) {
++            std::string const z{z_sv};
++            if (!dg_ok(dg::write_surface3d_search_algo_x_workload(out_dir / ("lc_surface3d_" + z + ".tex"), surf_rows,
++                                                                  z, lang)))
++                return 10;
++        }
++        for (auto const z_sv : ag::kSweepFields) {
++            std::string const z{z_sv};
++            if (!dg_ok(dg::write_working_set_sweep_curve(out_dir / ("ld_sweep_" + z + ".tex"), surf_rows, z, lang)))
++                return 11;
++        }
+     }
+     return 0;
+ }
+@@ -184,10 +198,18 @@ std::vector<std::string> expected_files() {
+     return names;
+ }
+ 
+-// Die 4 additiven Darstellungs-Dateinamen (Inc-2a). Die enriched Fixture ist so gewählt, dass KEINER
+-// honest-empty ist → alle 4 werden geschrieben und byte-identisch geprüft (16 .tex/Sprache insgesamt).
++// Die additiven Darstellungs-Dateinamen. Inc-2a: die 4 urspruenglichen (die enriched Fixture ist so
++// gewaehlt, dass KEINER honest-empty ist). GRAPH-UMBAU P1a (2026-08-06): + die 6 3D-Flaechen -- sie
++// entstehen IMMER, sobald die (search_algo x workload)-Achsen besetzt sind (bei datenloser Metrik als
++// ehrlicher Platzhalter, ebenfalls eine Datei), also gehoeren sie in den Byte-Identitaets-Beweis.
++// AUSDRUECKLICH NICHT hier: ld_sweep_<z>.tex (P1b) -- die Fixture traegt KEINE working_set_n-Spalte,
++// der Writer ist also honest-empty und legt keine Datei an. Genau das prueft
++// Stufe08Appendix.SweepCurvesAreHonestEmptyOnFixtureWithoutWorkingSetColumn.
+ std::vector<std::string> expected_extra_files() {
+-    return {"seg_attribution.tex", "latency_range.tex", "latency_ecdf.tex", "exchange_forest.tex"};
++    std::vector<std::string> names = {"seg_attribution.tex", "latency_range.tex", "latency_ecdf.tex",
++                                      "exchange_forest.tex"};
++    for (auto const z : ag::kSurfaceFields) names.push_back("lc_surface3d_" + std::string{z} + ".tex");
++    return names;
+ }
+ 
+ } // namespace
+@@ -264,10 +286,11 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
+     // Pfad B — die äquivalenten Einzel-Writer (= die früheren .exe-Spawns).
+     ASSERT_EQ(run_individual_writers(fixture, dir_ref, langs, label), 0);
+ 
+-    // Beweis: jede erzeugte .tex byte-identisch — 12 Kern-.tex + 4 Darstellungs-.tex (Inc-2a) = 16/Sprache.
++    // Beweis: jede erzeugte .tex byte-identisch -- 12 Kern-.tex + 4 Darstellungs-.tex (Inc-2a)
++    // + 6 3D-Flaechen (GRAPH-UMBAU P1a) = 22/Sprache.
+     auto all_expected = expected_files();
+     for (auto const& n : expected_extra_files()) all_expected.push_back(n);
+-    ASSERT_EQ(all_expected.size(), 16u);
++    ASSERT_EQ(all_expected.size(), 22u);
+     for (auto const& lang : langs) {
+         auto const a = dir_orch / lang / "tabellen";
+         auto const b = dir_ref / lang / "tabellen";
+@@ -286,6 +309,80 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
+     fs::remove_all(dir_ref, cleanup);
+ }
+ 
++// GRAPH-UMBAU 2D/3D, P1a (2026-08-06): die 3D-Flaeche ist ab jetzt VERDRAHTET -- je z-Feld entsteht
++// neben der 2D-Heatmap eine lc_surface3d_<z>.tex. Der Test haelt beide Zusagen fest: (a) die Datei
++// existiert und traegt die echte 3D-Mechanik (addplot3[surf] + view), (b) die 2D-Datei bleibt
++// unveraendert daneben stehen (KEIN Ersatz -- Plan §4 "nichts faellt weg").
++TEST(Stufe08Appendix, Surface3dIsWiredNextToTheExistingHeatmap) {
++    auto const fixture = fixtures_dir() / "tier_wide_appendix.csv";
++    ensure_fixture(fixture);
++
++    auto const      dir = comdare_user_tmp() / "appendix_3d_wiring";
++    std::error_code ec;
++    fs::remove_all(dir, ec);
++
++    ag::AppendixConfig cfg;
++    cfg.csv      = fixture;
++    cfg.out_root = dir;
++    cfg.langs    = {"de"};
++    ASSERT_EQ(ag::generate_wide_appendix(cfg), ag::status_ok);
++
++    auto const tab = dir / "de" / "tabellen";
++    for (auto const z_sv : ag::kSurfaceFields) {
++        std::string const z{z_sv};
++        auto const        f2d = tab / ("lc_surface_" + z + ".tex");
++        auto const        f3d = tab / ("lc_surface3d_" + z + ".tex");
++        ASSERT_TRUE(fs::exists(f2d)) << f2d; // Bestand bleibt
++        ASSERT_TRUE(fs::exists(f3d)) << f3d; // neu
++        EXPECT_GT(fs::file_size(f3d), 0u) << f3d;
++    }
++    // ns_per_op ist in der Fixture durchgaengig besetzt -> echte Figur, kein Platzhalter.
++    auto const body = read_all(tab / "lc_surface3d_ns_per_op.tex");
++    EXPECT_NE(body.find("addplot3[surf]"), std::string::npos);
++    EXPECT_NE(body.find("view={45}{30}"), std::string::npos);
++    // P1a-Rollen-Benennung: "Rohdaten-Ansicht", NICHT Ergebnis-Abbildung (zwei nominale Achsen).
++    EXPECT_NE(body.find("3D-Rohdaten-Ansicht"), std::string::npos);
++    // Die Caption ist NICHT leer (vor P1a blieb data.title ungesetzt -> "\caption{}").
++    EXPECT_EQ(body.find("\\caption{}"), std::string::npos);
++
++    fs::remove_all(dir, ec);
++}
++
++// GRAPH-UMBAU 2D/3D, P1b (2026-08-06): das Sweep-Wiring ist auf einem Korpus OHNE working_set_n-Spalte
++// ein reines No-Op. Der Writer ist header-getrieben und liefert status_empty_input -> KEINE Datei, und
++// die Facade bleibt gruen. Das ist der Risikofreiheits-Beleg fuer das Wiring (Plan §3/P1b).
++TEST(Stufe08Appendix, SweepCurvesAreHonestEmptyOnFixtureWithoutWorkingSetColumn) {
++    auto const fixture = fixtures_dir() / "tier_wide_appendix.csv";
++    ensure_fixture(fixture);
++
++    // Vorbedingung literal: die Fixture traegt KEINE working_set_n-Spalte.
++    std::vector<dg::WideMeasurementRow> rows;
++    ASSERT_EQ(dg::parse_wide_csv(fixture, rows), dg::status_ok);
++    ASSERT_GT(rows.size(), 0u);
++    for (auto const& r : rows) EXPECT_FALSE(r.has_working_set_n);
++
++    auto const      dir = comdare_user_tmp() / "appendix_sweep_empty";
++    std::error_code ec;
++    fs::remove_all(dir, ec);
++
++    ag::AppendixConfig cfg;
++    cfg.csv      = fixture;
++    cfg.out_root = dir;
++    cfg.langs    = {"en"};
++    ASSERT_EQ(ag::generate_wide_appendix(cfg), ag::status_ok); // Facade bleibt gruen
++
++    auto const tab = dir / "en" / "tabellen";
++    for (auto const z_sv : ag::kSweepFields) {
++        std::string const z{z_sv};
++        EXPECT_FALSE(fs::exists(tab / ("ld_sweep_" + z + ".tex"))) // honest-empty: KEINE Datei
++            << "ld_sweep_" << z << ".tex haette nicht entstehen duerfen";
++    }
++    // Gegenprobe: die Kern-Dateien sind trotzdem da (honest-empty ist kein Facade-Fehler).
++    EXPECT_TRUE(fs::exists(tab / "bias_matrix_table.tex"));
++
++    fs::remove_all(dir, ec);
++}
++
+ // ── Achsen-Inventar (2026-08-03) ──────────────────────────────────────────────
+ // Die Fixtures sind MINIATUREN der drei generierten Registry-XML: dieselbe Gestalt
+ // (Tag-Namen, Attribute, Kommentare, Verschachtelung), aber nur so viele Eintraege,
