@@ -4275,6 +4275,14 @@ fuer sich korrekt und beantwortete die falsche Frage.**
 > EINGECHECKT oder EMITTIERT ist. Praezisere Form von (3) und der dritte Fall dieser Familie
 > heute.
 
+> **(5) ZUR TESTZAHL GEHOERT DER BAU-ZUSTAND, NICHT NUR DER COMMIT.** Vier Tests haengen an
+> Configure-Zeit-Bedingungen ueber vorgebaute Artefakte (`if(TARGET ...)`,
+> `if(_r5g_autobuilt_count GREATER 0)`); im frischen Baum werden sie nicht registriert. **Eine
+> gesunkene Testzahl ist erst dann ein Befund, wenn die Mengendifferenz in BEIDE Richtungen
+> geprueft ist** -- fehlt die Gegenrichtung, kann ebenso gut die Konfiguration abweichen wie ein
+> Test verlorengegangen sein. Aufgetreten bei der L1-Landung (409 im Wellen-Baum, 405 im
+> frischen; kein Test verloren, s. Abschnitt A).
+
 ### C) K-01 WIDERLEGT: `COMDARE_BESTANDSLOG` wird gesetzt -- ueber den Emissions-Weg
 
 BEHAUPTUNG der Kostenklammer-Jagd: das Wurzel-Gate sei nicht `batch_plan_datei`, sondern
