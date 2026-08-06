@@ -4199,7 +4199,7 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
-## NACHTRAG 06.08.2026 nachmittag-10 (VOLLZUG: beide Repos gruen, `main`-FF in beiden vollzogen, Thesis Gate 8 gelandet; Regel-Zeilen 8+9 -- ein Zeiger kann RUECKWAERTS zeigen, und eine rescue-Ref ist KEINE Landung; A1 = LANDEN mit Auflage; der PMC-Sperrposten ist SCHWERER als nachmittag-9 sagt)
+## NACHTRAG 06.08.2026 nachmittag-10 (VOLLZUG: beide Repos gruen, `main`-FF in beiden vollzogen, Thesis Gate 8 gelandet; REGEL-ZEILEN 8+9+10 -- ein Zeiger kann RUECKWAERTS zeigen, eine rescue-Ref ist KEINE Landung, und ein Paketschnitt nur im Session-Doc existiert fuer die Ausfuehrung nicht; A1 = LANDEN mit Auflage; der PMC-Sperrposten ist SCHWERER als nachmittag-9 sagt; der F9/LB-Paketschnitt fehlt in Ledger UND Register -- INNERHALB des 14-Tage-Fensters)
 
 ### A) DER STAND, jede Zahl am Objekt erhoben
 
@@ -4395,7 +4395,86 @@ und energy auf 0 (Ledger: I-PMC-2 = L3-Mapping + branch_misses, I-PMC-3/#187 = L
 Zen-5-RAW). **Der Anhang kann also selbst im besten Fall nur L1D + dTLB zeigen** -- das gehoert vor
 Phase 6 entschieden, nicht nach der Messung entdeckt.
 
-### F) DIESER NACHTRAG SELBST -- und was seine Pipeline NICHT sagt
+### F) DER LB-PAKETSCHNITT -- die Verlustklasse von heute Mittag, zum zweiten Mal, und diesmal INNERHALB des Fensters
+
+**DIE KORREKTUR ZUERST, weil sie dem Owner recht gibt.** Der Lager-Scope hatte gemeldet, die
+Owner-Formel "Ich erwarte laut Plan" verweise auf kein existierendes Dokument. **Das war falsch, und
+der Grund ist lehrreich:** gesucht wurde mit der Vokabel von HEUTE (`Binary-Stub`, `Dummy-Strategie`),
+die Planung vom 01.08. fuehrt andere Woerter. Eine Suche, die die Sprache des Suchenden statt die des
+Dokuments benutzt, findet Abwesenheit, wo Anwesenheit ist. **Die Deckung ist woertlich, beide Stellen
+am Objekt nachgelesen:**
+
+- `docs/sessions/20260801-FAHRPLAN-vollbau4-beweise-g6-trigger.md:200-201` (Owner-Entscheid 01.08.):
+  "**OE-B: GO in Owner-Form: Dummy-Lager im temp-Verzeichnis, Binaries als TEXTDATEIEN mit
+  Stempel-String, Test als GOOGLE-TEST (nicht Shell-Skript).**"
+- `docs/sessions/20260801-KONSOLIDIERT-gesamtarchitektur-lager-batch-eta-sha512.md:76`, **LB-6**:
+  "OE-B-GTest-Dummy-Lager (Textdateien mit Stempel-String) **auf Baum-Form erweitert**; Beweis 1
+  (Batch-Wiederaufnahme-Konstruktion, OE-A), Beweis 2 (Hydration verified>0 UND pruned>0), Beweis 4
+  (Bestandslog-E2E gegen echtes minio + Takeover-Zweig); Truncate-/Spin-Lock-Konkurrenz-Test."
+
+**DER BEFUND: der F9/LB-Paketschnitt (LB-0..LB-6) ist buchhalterisch verlorengegangen.** Selbst
+gezaehlt, mit Gegenprobe des Musters an der Quelle (dort 3 Treffer, das Muster funktioniert):
+
+    Muster              LEDGER   TODO-REGISTER 06.08. (474 Zeilen)
+    LB-[0-9]              0             0
+    OE-B                  0             0
+    F9-Paketschnitt       0             0
+    Dummy-Lager           -             0
+
+Die Kette steht **ausschliesslich** im Session-Dokument vom 01.08. und wurde nie in den Ledger oder
+die VOR-TRIGGER-CHECKLISTE uebernommen -- **obwohl sie dort ausdruecklich Vor-Trigger-Rang hat**,
+woertlich: "Vor-Trigger-Pflicht-Paketschnitt Lager-Baum-Vollausbau (F9: erst Baum fertig, dann
+Voll-Bau-Trigger; **'der Voll-Bau-Trigger IST der Baum-Vollausbau'**)".
+
+**DAS VERSCHAERFT mittag-19 ("die Bruecke in die Vor-Zeit") -- und korrigiert ihn.** Dieser Fall liegt
+**INNERHALB** des 14-Tage-Fensters (01.08. > 23.07.). **Die dortige Zusage, das Fenster habe alles
+Aktive getragen, ist fuer diese Kette widerlegt.** Das ist eine Korrektur an einem eigenen frueheren
+Nachtrag, keine neue Klage.
+
+**UND DIE URSACHE IST PRAEZISER ALS "verloren":** das Register nennt seine Quellen selbst --
+"Zusammenfuehrung dreier Lens-Ergebnisse (**Ledger 23.-31.07.**, **Ledger 01.-06.08.** inkl.
+Live-Repo-Checks, **Dossier/Doku-Register**) plus **Live-Lesung des Fahrplans**". Der 01.08. lag also
+voll im erhobenen Zeitraum. Gefehlt hat nicht das Fenster, sondern die **QUELLENKLASSE**:
+`docs/sessions/*` ist in dieser Aufzaehlung nicht enthalten. Eine Erhebung findet nichts in einer
+Klasse, die sie nicht liest -- wieder dieselbe Familie wie Regel 6 und Regel 9.
+
+**ENTWARNUNG -- verloren ist die BUCHFUEHRUNG, nicht die Arbeit.** Am Objekt geprueft, mit einer
+Praezisierung gegenueber der Meldung:
+
+- **Gebaut sind alle vier Kopf-Bausteine:** `libs/cache_engine/builder/bestandslog/`
+  `lager_pfad_grammatik.hpp` (LB-0), `knoten_heuristik_log.hpp` (LB-1), `lager_baum_writer.hpp`
+  (LB-2/LB-3).
+- **Getestet und im Build verdrahtet sind namentlich LB-0 und LB-1:** `test_lb0_lager_pfad_grammatik`
+  mit **33** TEST-Makros und `test_lb1_knoten_heuristik_log` mit **23**, letzterer inklusive
+  `Lb1KnotenLock.GenauEinSchreiberBekommtDenKnoten`,
+  `TruncateZustandsmaschine.ZweiSchreiberKonkurrenzGenauEinerTruncatetDieZaehlungBleibtKonsistent`
+  und `...EinNachweisFuerEinenFREMDENKnotenIstKeinNachweis`; eingebunden ueber
+  `tests/unit/CMakeLists.txt:4970`.
+- **Kein eigener `test_lb2`/`test_lb3`.** Der Writer wird von `test_lb0` und zwei
+  `s5_*_alloc_conformance`-Tests mitberuehrt, hat aber **keine eigene Beweiswelle**. "LB-0..LB-3 sind
+  gebaut" gilt also fuer die Header; fuer die Beweise gilt es bis LB-1.
+
+**REGEL-ZEILE 10, und sie erklaert die Owner-Ruege von heute Mittag ("wurde nicht gelesen??"):**
+> **Ein Paketschnitt, der nur in einem Session-Dokument steht, existiert fuer die Ausfuehrung nicht.**
+> Jede Kette mit Vor-Trigger-Anspruch gehoert in den Ledger UND in die Checkliste -- ein Session-Doc
+> ist ein BELEG, kein REGISTER. Und jede Konsolidierung, die eine Quellenklasse auslaesst, muss das
+> in ihrer Methodik ausweisen, sonst liest man ihr Schweigen als Abwesenheit.
+
+**ZWEI FOLGEPOSTEN, beide mit Datum:**
+
+1. **Stufe 1 der Lager-Basis-Tests ist Vor-Trigger-PFLICHT, nicht "kann"** -- LB-6 deklariert sie so.
+   Die Restarbeit ist klein und golden-neutral (die Bausteine sind gebaut, sie wurden nur nie
+   zusammengefuehrt), sie beruehrt keine Produktivdatei. **Empfehlung: VOR dem Trigger Do 07.08.** Sie
+   belegt genau die Zusage, deren Fehlen der Owner heute geruegt hat.
+2. **Das Versionierungs-Interface ist AELTER als F7.** `LEDGER:3339`, im Block
+   "PRAEZISIERUNG-2: ZWEI BESTANDSSYSTEME ALS FACTORY PATTERN + SHA512-FINGERPRINT-STEMPEL
+   (User **22.07.**)", woertlich: "jede CEB und jedes Tier-Binary erhaelt ein **SEPARATES
+   Versionierungsinterface als CONSTEXPR-Funktion**, das einen SHA512 **UEBER DIE STRING-ARRAYS DER
+   BISHER EXISTIERENDEN STEMPEL-ZEILEN** bildet -- ZUR COMPILE TIME berechnet, nicht mehr staendig zur
+   Laufzeit." **F7 = Option b ist damit keine Neuforderung, sondern die Wiederaufnahme einer zwei
+   Wochen alten Festlegung** -- was den Rang aendert: nicht "neuer Wunsch", sondern "liegengeblieben".
+
+### G) DIESER NACHTRAG SELBST -- und was seine Pipeline NICHT sagt
 
 Der Push dieses Eintrags (`1b2124e6`, nur diese Ledger-Datei, expliziter Pathspec) loeste
 **Pipeline 15037** aus: `success` -- aber mit **2 Jobs**, nicht 13: `thesis:pdf` und `lint:secrets`,
@@ -4411,7 +4490,7 @@ ueber den Push-Inhalt (`85b74237..HEAD`, 205 Zeilen, 15.77 KB) und ueber den Bau
 (201.69 MB), beide Male `no leaks found`; Backup-Ref-Kontrolle danach: `origin` traegt genau
 `5ba3d03f refs/backup/pre-secret-scrub-20260802` und nichts Neues, `github` leer.
 
-### G) OFFEN / NICHT VON DIESER LINIE ZU ENTSCHEIDEN
+### H) OFFEN / NICHT VON DIESER LINIE ZU ENTSCHEIDEN
 
 - **PMC (Abschnitt E)**: Owner-Entscheid vor Phase 6. Zu entscheiden sind DREI Dinge, nicht eins:
   (1) das Flag in die dynamische Kette **als Invariante**, nicht als Job-Name; (2) die Wache so
