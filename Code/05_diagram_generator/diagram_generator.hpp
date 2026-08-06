@@ -123,6 +123,32 @@ struct HeatmapData {
     // emittiert (reiner Text, wird escape_latex-durchgereicht). Leer -> neutraler ASCII-Default. Der
     // Aufrufer (write_surface_search_algo_x_workload) fuellt ihn sprach-lokalisiert.
     std::string empty_note;
+    // P2/DIVERGENTE FARBSKALA (2026-08-06) -- additiv, Default false = exakt das Bestandsverhalten
+    // (log10-viridis). Die Matrix traegt dann keine Latenzen in ns, sondern VERHAELTNISSE zu einer
+    // Referenz; deren aussagekraeftiger Punkt ist nicht das Minimum, sondern die Gleichheit
+    // (divergent_center, Default 1.0 = "so schnell wie die Referenz"). Eine sequentielle Skala kann das
+    // nicht zeigen: sie faerbt "20% schneller" und "20% langsamer" verschieden weit vom Rand, aber nie
+    // erkennbar als die zwei Seiten derselben Mitte.
+    //   divergent == true  -> point meta = log10(z / divergent_center), Farb-Domaene SYMMETRISCH um 0,
+    //                         3-Stuetzstellen-Colormap blau/weiss/rot (weiss sitzt damit exakt auf der
+    //                         Mitte, also auf der Gleichheit). KEIN externes Paket noetig.
+    //                         WARUM logarithmisch und nicht z-center: ein Verhaeltnis ist MULTIPLIKATIV --
+    //                         "doppelt so schnell" (0.5) und "doppelt so langsam" (2.0) muessen gleich
+    //                         weit von der Mitte liegen. Linear waeren sie es nicht (Abstand 0.5 gegen
+    //                         1.0), die schnellere Haelfte wuerde also systematisch zusammengedrueckt.
+    //                         Beleg am d03-Korpus: Verhaeltnisse 0.44..9.22 -> auf einer linearen, um 1
+    //                         zentrierten Domaene [-7.2:9.2] laegen ALLE Zellen unter 1 zwischen 46.6%
+    //                         und 50% der Skala, ein 2.3-fach schnellerer Algorithmus waere von "gleich
+    //                         schnell" farblich nicht zu unterscheiden.
+    //                         Ein Verhaeltnis 0 (Zaehler echt 0 gemessen) hat keinen Logarithmus und
+    //                         bekommt -- wortgleich zum log-Modus -- eine eigene Klasse eine Dekade
+    //                         unterhalb; die Domaene waechst dafuer SYMMETRISCH, damit die Mitte die
+    //                         Mitte bleibt.
+    //   divergent == false -> Bestand: point meta = log10(z), viridis, eigene 0-Farbklasse.
+    // Die drei Zell-Klassen (Wert > 0 / echte 0 / nicht ausgefuehrt) bleiben in BEIDEN Modi unveraendert;
+    // nur die Meta-Berechnung und die Colorbar-Beschriftung wechseln.
+    bool   divergent        = false;
+    double divergent_center = 1.0;
 };
 
 // Emittiert die 2D-Heatmap (matrix plot*, view={0}{90}, viridis, log-Farbskala).
@@ -318,6 +344,31 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
                                                          std::span<WideMeasurementRow const> rows,
                                                          std::string const& z_field, std::string const& lang = "en",
                                                          PageConstraints const& cnst = {});
+
+// GRAPH-UMBAU 2D/3D, P2 (2026-08-06) -- BASELINE-RELATIVE VERHAELTNIS-MATRIX
+// -----------------------------------------------------------------------------
+// Die Abloesung der Heatmap als ANALYSE-Figur (die rohe Latenz-Heatmap bleibt als Rohdaten-/QA-Ansicht
+// bestehen). Zellwert ist nicht mehr der Rohmedian, sondern
+//     median(algo, workload) / median(reference_algo, workload)
+// also "wie viel langsamer/schneller als die Referenz in genau diesem Lastprofil". Erst dadurch traegt
+// die Flaeche einen Bezugspunkt (1.0) und damit ueberhaupt eine Aussage; zwei nominale Achsen ohne
+// Referenz sind methodisch schwach. reference_algo ist eine ACHSENAUSPRAEGUNG (z.B. "linear_scan"),
+// KEINE externe Bibliothek -- eine gemessene std::map-Serie existiert im Korpus nicht.
+//
+// AUSFUEHRUNGS-REGEL (die honest-empty-Kernwache dieser Form): eine Verhaeltnis-Zelle ist NUR dann
+// executed, wenn ZAEHLER UND NENNER EINZELN ausgefuehrt und darstellbar sind. Fehlt die Referenz fuer
+// eine Workload-Spalte (kein Referenz-Lauf in diesem Lastprofil), bleibt die GANZE Spalte
+// nicht-ausgefuehrt -- NIEMALS eine Ratio gegen eine fehlende Baseline. Zusaetzlich gilt: ein Nenner von
+// ECHT GEMESSENEN 0 ns macht das Verhaeltnis mathematisch undefiniert (nicht unendlich) -> die Zelle
+// wird ausgelassen. Ein ZAEHLER von echt 0 ist dagegen ein gueltiges Verhaeltnis 0 und wird DARGESTELLT
+// (E-2b-Doktrin: die gemessene 0 ist ein Messwert).
+//
+// Fehlt die Referenz-Zeile im gesamten Korpus, traegt KEINE Zelle Daten -> write_heatmap schreibt seinen
+// ehrlichen Platzhalter-Vermerk (kein pgfplots-Fatal, kompilierfaehige Datei).
+[[nodiscard]] int write_surface_ratio_vs_reference(std::filesystem::path const&        out,
+                                                   std::span<WideMeasurementRow const> rows,
+                                                   std::string const& z_field, std::string const& reference_algo,
+                                                   std::string const& lang = "en", PageConstraints const& cnst = {});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // A2 / m3v2 (2026-06-20) — Working-Set-Sweep-Kurve (Metrik über working_set_n)

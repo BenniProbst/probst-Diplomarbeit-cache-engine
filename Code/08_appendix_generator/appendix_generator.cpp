@@ -481,6 +481,22 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             }
         }
 
+        // -- (5j) GRAPH-UMBAU 2D/3D, P2 (2026-08-06): baseline-relative Verhaeltnis-Matrix -------------
+        // Die vom SOTA-Katalog empfohlene Abloesung der Heatmap als ANALYSE-Figur. Die rohe Latenz-
+        // Heatmap (lc_surface_<z>) bleibt daneben bestehen und wechselt nur die Rolle zur Rohdaten-/QA-
+        // Ansicht. Zellwert = Median / Referenz-Median DERSELBEN Workload-Spalte, divergente Farbskala
+        // um 1.0. Referenz = cfg.reference_value (Achsenauspraegung, KEINE externe Bibliothek).
+        for (auto const z_sv : kSurfaceFields) {
+            std::string const z{z_sv};
+            if (int const rc = dg::write_surface_ratio_vs_reference(out_dir / ("lc_surface_ratio_" + z + ".tex"),
+                                                                     surf_rows, z, cfg.reference_value, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_surface_ratio_vs_reference (" << z << "," << lang
+                          << ") failed " << rc << "\n";
+                return status_io_error;
+            }
+        }
+
         std::cout << "appendix-generator [" << lang
                   << "]: 12 Kern- + 5 Darstellungs-.tex + 3D-Flaechen + Sweep-Kurven + Achsen-Inventar "
                      "(honest-empty ausgelassen wo ohne Daten) -> "

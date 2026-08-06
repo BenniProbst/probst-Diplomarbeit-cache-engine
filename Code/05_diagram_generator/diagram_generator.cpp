@@ -305,8 +305,11 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     // pdflatex-Proben 2026-08-06 (texlive 2026, pgfplots compat=1.18): (a) RC=0 / 0 Warnungen;
     // (b) RC=0 erst MIT explizitem zmin/zmax -- der blanke Mesh-Traeger waere sonst eine entartete
     // z-Domaene ("Axis range for axis z is approximately empty"); (b) ohne point meta min/max: Fatal.
-    bool const log_scale = have_pos;
-    double     log_min   = 0.0;
+    // P2: point meta der Verhaeltnis-0-Klasse (divergenter Modus). Wird im Achsen-Options-Block gesetzt
+    // und im Koordinaten-Block gelesen -- deshalb hier deklariert.
+    double     div_zero_meta = 0.0;
+    bool const log_scale     = have_pos;
+    double     log_min       = 0.0;
     double     log_max   = 1.0;
     double     zero_meta = 0.0; // point meta einer ECHT GEMESSENEN 0
     int        k_lo      = 0;
@@ -335,10 +338,99 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     write_pgfplots_axis_options(f, cnst, data.title, data.x_label, data.y_label);
     f << "    view={0}{90},\n";
     f << "    colorbar,\n";
-    f << "    colormap/viridis,\n";
+    if (data.divergent) {
+        // P2: 3-Stuetzstellen-Colormap blau -> weiss -> rot. pgfplots verteilt die Stuetzstellen
+        // GLEICHMAESSIG ueber die Farb-Domaene; weil die Domaene unten symmetrisch um divergent_center
+        // gelegt wird, sitzt Weiss damit exakt auf der Mitte (Gleichheit mit der Referenz). Keine
+        // Fremd-Colormap, kein zusaetzliches LaTeX-Paket.
+        f << "    colormap={comdarediv}{rgb=(0,0,1) rgb=(1,1,1) rgb=(1,0,0)},\n";
+    } else {
+        f << "    colormap/viridis,\n";
+    }
     // P6: Farb-Domaene in log10(ns). point meta min/max = tatsaechliche Log-Spanne (max. Kontrast).
     // E-2a: ab hier IMMER gesetzt -- die datenlose Matrix ist oben schon als Platzhalter abgegangen,
     // die frueher moegliche entartete [0.0:0.0]-Domaene kann hier nicht mehr entstehen.
+    if (data.divergent) {
+        // P2/SYMMETRISCHE DOMAENE IM LOG-VERHAELTNIS. Zwei Zusagen zugleich:
+        //  (a) Die Mitte MUSS die Mitte bleiben, sonst luegt die Farbe: waere die Domaene einfach
+        //      [min:max], laege Weiss irgendwo und "gleich schnell wie die Referenz" saehe je nach
+        //      Datenlage mal blau, mal rot aus.
+        //  (b) Die Farb-Groesse ist log10(z/center), NICHT z-center. Ein Verhaeltnis ist multiplikativ:
+        //      "doppelt so schnell" (0.5) und "doppelt so langsam" (2.0) sind gleich weit von der Mitte
+        //      entfernt -- linear waeren sie es NICHT (0.5 Abstand gegen 1.0 Abstand). Beleg am realen
+        //      d03-Korpus: die Verhaeltnisse spannen 0.44 bis 9.22; auf einer linearen, um 1 zentrierten
+        //      Domaene [-7.2:9.2] laegen ALLE Zellen unter 1 zwischen 46.6% und 50% der Skala -- ein
+        //      2.3-fach schnellerer Algorithmus waere von "gleich schnell" farblich nicht zu
+        //      unterscheiden. Das waere eine systematische Untertreibung genau der Unterschiede, die
+        //      diese Figur zeigen soll.
+        double half      = 0.0;
+        bool   have_ratio_zero = false;
+        for (std::size_t y = 0; y < ny; ++y)
+            for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
+                if (!cell_displayable(data, have_mask, y, x)) continue;
+                double const v = data.matrix[y][x];
+                if (v == 0.0) { // Verhaeltnis 0: Zaehler echt 0 gemessen -> hat keinen Logarithmus
+                    have_ratio_zero = true;
+                    continue;
+                }
+                half = std::max(half, std::abs(std::log10(v / data.divergent_center)));
+            }
+        // Entartungs-Wache (Praezedenz 3D-Pfad): traegt die Flaeche nur EINEN Wert -- insbesondere lauter
+        // exakte 1.0, wenn ausser der Referenz-Zeile nichts vergleichbar ist --, waere die Farb-Domaene
+        // [0:0] und pgfplots braeche fatal ab. Dann wird ausschliesslich die ACHSE geweitet (eine Dekade).
+        if (!(half > 0.0)) half = 1.0;
+        // Ein Verhaeltnis 0 bekommt -- wortgleich zum log-Modus der Roh-Heatmap -- eine EIGENE Farbklasse
+        // eine Dekade unterhalb. Damit die Mitte die Mitte bleibt, waechst die Domaene SYMMETRISCH um
+        // diese Dekade; die dadurch oben ungenutzte Dekade ist folgenlos.
+        div_zero_meta = -(half + 1.0);
+        if (have_ratio_zero) half += 1.0;
+        f << "    point meta min=" << fmt_double(-half) << ",\n";
+        f << "    point meta max=" << fmt_double(half) << ",\n";
+        // Colorbar-Ticks auf ganzzahlige log-Dekaden, beschriftet als VERHAELTNIS (1 = wie die Referenz).
+        // Der Leser sieht damit Faktoren, nicht Logarithmen.
+        {
+            int const k_lo_r = static_cast<int>(std::ceil(-half));
+            int const k_hi_r = static_cast<int>(std::floor(half));
+            f << "    colorbar style={ytick={";
+            bool first = true;
+            if (have_ratio_zero) {
+                f << fmt_double(div_zero_meta);
+                first = false;
+            }
+            for (int k = k_lo_r; k <= k_hi_r; ++k) {
+                if (!first) f << ",";
+                f << k;
+                first = false;
+            }
+            f << "}, yticklabels={";
+            first = true;
+            if (have_ratio_zero) {
+                f << "$0$";
+                first = false;
+            }
+            for (int k = k_lo_r; k <= k_hi_r; ++k) {
+                if (!first) f << ",";
+                if (k == 0) {
+                    f << "$1$"; // Gleichheit mit der Referenz
+                } else {
+                    f << "$10^{" << k << "}$";
+                }
+                first = false;
+            }
+            f << "}},\n";
+        }
+        // z ist bei view={0}{90} nur der Mesh-Traeger; traegt er (nach dem Auslass-0-Traeger) nur einen
+        // einzigen Wert, ist auch seine Domaene entartet -> ebenfalls explizit weiten.
+        double zc_min = 0.0;
+        double zc_max = 0.0;
+        for (std::size_t y = 0; y < ny; ++y)
+            for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
+                double const carrier = cell_displayable(data, have_mask, y, x) ? data.matrix[y][x] : 0.0;
+                zc_min               = (y == 0 && x == 0) ? carrier : std::min(zc_min, carrier);
+                zc_max               = (y == 0 && x == 0) ? carrier : std::max(zc_max, carrier);
+            }
+        if (!(zc_max > zc_min)) f << "    zmin=" << fmt_double(zc_min) << ", zmax=" << fmt_double(zc_min + 1.0) << ",\n";
+    } else {
     f << "    point meta min=" << fmt_double(log_min) << ",\n";
     f << "    point meta max=" << fmt_double(log_max) << ",\n";
     if (log_scale) {
@@ -368,6 +460,7 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
         f << "    colorbar style={ytick={0}, yticklabels={$0$}},\n";
         f << "    zmin=0, zmax=1,\n";
     }
+    } // Ende des NICHT-divergenten Zweiges (P2)
     f << "    mesh/cols=" << nx << ",\n"; // PFLICHT fuer matrix plot* (sonst 'matrix input=image' unsupported)
     f << "    xtick={0,1,...," << (nx - 1) << "},\n";
     f << "    ytick={0,1,...," << (ny - 1) << "},\n";
@@ -417,8 +510,15 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
         for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
             double const      z    = data.matrix[y][x];
             bool const        has  = cell_displayable(data, have_mask, y, x);
-            std::string const zs   = has ? fmt_double(z) : std::string{"0"};
-            std::string const meta = has ? fmt_double(z > 0.0 ? std::log10(z) : zero_meta) : std::string{"nan"};
+            std::string const zs = has ? fmt_double(z) : std::string{"0"};
+            // P2: im divergenten Modus ist die Farb-Groesse log10(z/center) -- ein Verhaeltnis ist
+            // multiplikativ, "halb so lang" und "doppelt so lang" muessen gleich weit von der Mitte
+            // liegen. Ein Verhaeltnis 0 (Zaehler echt 0 gemessen) hat keinen Logarithmus und traegt
+            // deshalb -- wortgleich zum log-Modus -- seine eigene Klasse eine Dekade unterhalb.
+            std::string const meta =
+                has ? (data.divergent ? fmt_double(z > 0.0 ? std::log10(z / data.divergent_center) : div_zero_meta)
+                                      : fmt_double(z > 0.0 ? std::log10(z) : zero_meta))
+                    : std::string{"nan"};
             f << "    (" << x << "," << y << "," << zs << ") [" << meta << "]\n";
         }
     }
@@ -658,6 +758,61 @@ struct SurfaceAggregate {
     return de ? "Gesamt-Latenz (ns/op)" : "overall latency (ns/op)";
 }
 
+// P2 (2026-08-06) -- BASELINE-RELATIVE VERHAELTNIS-MATRIX.
+// Baut AUF aggregate_surface_matrix auf (kein zweiter Aggregations-Pfad, keine zweite Ausfuehrungs-
+// Wahrheit): erst die gewohnte Roh-Median-Matrix samt AUSGEFUEHRT-Maske, dann zellweise die Division
+// durch die Referenz-Zeile DERSELBEN Spalte. Damit gilt die Ausfuehrungs-Regel der Verhaeltnis-Zelle
+// zwangslaeufig ueber BEIDE Operanden -- genau das ist die honest-empty-Kernwache dieser Form.
+[[nodiscard]] SurfaceAggregate aggregate_surface_ratio_matrix(std::span<WideMeasurementRow const> rows,
+                                                              std::string const&                  z_field,
+                                                              std::string const& reference_algo, HeatmapData& data) {
+    SurfaceAggregate agg = aggregate_surface_matrix(rows, z_field, data);
+    if (!agg.axes_present) return agg; // keine Achsen -> Bestandsverhalten (Aufrufer: status_empty_input)
+
+    // Referenz-ZEILE suchen. Fehlt sie, bleibt jede Zelle ohne Nenner -> any_data faellt auf false und der
+    // Writer schreibt den ehrlichen Platzhalter. KEINE Ersatz-Baseline (z.B. Spalten-Minimum): das waere
+    // eine erfundene Referenz und genau die Phantom-Klasse, die E-2a/E-2b ausgeraeumt haben.
+    bool        have_ref = false;
+    std::size_t ref_y    = 0;
+    for (std::size_t y = 0; y < data.y_labels.size(); ++y) {
+        if (data.y_labels[y] == reference_algo) {
+            ref_y    = y;
+            have_ref = true;
+            break;
+        }
+    }
+
+    bool const have_mask = heatmap_mask_matches(data);
+    // NEUE Puffer: die Quell-Matrix darf waehrend der Division nicht veraendert werden (die Referenz-Zeile
+    // wird von JEDER Zeile gelesen, auch von sich selbst).
+    std::vector<std::vector<double>> ratio(data.matrix.size());
+    std::vector<std::vector<bool>>   exec(data.matrix.size());
+    agg.any_data = false;
+    for (std::size_t y = 0; y < data.matrix.size(); ++y) {
+        ratio[y].assign(data.matrix[y].size(), std::numeric_limits<double>::quiet_NaN());
+        exec[y].assign(data.matrix[y].size(), false);
+        for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
+            if (!have_ref) continue;
+            // (a) Zaehler-Zelle muss ausgefuehrt und darstellbar sein.
+            if (!cell_displayable(data, have_mask, y, x)) continue;
+            // (b) Nenner-Zelle DERSELBEN Spalte ebenso -- fehlt der Referenz-Lauf fuer dieses Lastprofil,
+            //     bleibt die ganze Spalte leer. NIE gegen eine fehlende Baseline rechnen.
+            if (x >= data.matrix[ref_y].size()) continue;
+            if (!cell_displayable(data, have_mask, ref_y, x)) continue;
+            double const den = data.matrix[ref_y][x];
+            // (c) Ein Nenner von ECHT GEMESSENEN 0 ns macht das Verhaeltnis undefiniert (nicht unendlich).
+            //     Ehrlich ausgelassen statt als Unendlich/Ersatzwert behauptet.
+            if (!(den > 0.0)) continue;
+            ratio[y][x] = data.matrix[y][x] / den; // Zaehler darf 0 sein -> Verhaeltnis 0 ist gueltig
+            exec[y][x]  = true;
+            agg.any_data = true;
+        }
+    }
+    data.matrix   = std::move(ratio);
+    data.executed = std::move(exec);
+    return agg;
+}
+
 // P1a (2026-08-06) -- ROLLEN-BENENNUNG der 3D-Flaeche, EIN Ort fuer Achsen-Titel UND Caption.
 // Beide Flaechen-Achsen (search_algo x workload) sind NOMINAL: zwischen zwei Suchalgorithmen liegt
 // nichts, was man interpolieren koennte. Die von "surf" aufgespannte Flaeche ist daher eine
@@ -851,6 +1006,37 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
               " was never executed in the present corpus. This surface is honestly omitted instead of "
               "claiming a 0 ns measurement.)");
     // write_heatmap WIEDERVERWENDEN (view={0}{90} matrix plot + colormap/viridis).
+    return write_heatmap(out, data, cnst);
+}
+
+int write_surface_ratio_vs_reference(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
+                                     std::string const& z_field, std::string const& reference_algo,
+                                     std::string const& lang, PageConstraints const& cnst) {
+    if (rows.empty()) return status_empty_input;
+    HeatmapData data;
+    if (!aggregate_surface_ratio_matrix(rows, z_field, reference_algo, data).axes_present) return status_empty_input;
+
+    bool const        de     = (lang == "de");
+    std::string const metric = z_field_human(z_field, lang);
+    // P2: die divergente Skala ist der ganze Punkt dieser Form -- ohne sie waere das Verhaeltnis nur eine
+    // weitere sequentielle Flaeche und die Gleichheit mit der Referenz optisch nicht auffindbar.
+    data.divergent        = true;
+    data.divergent_center = 1.0;
+    data.title = (de ? "Verhaeltnis zur Referenz " : "Ratio to reference ") + reference_algo + ": " + metric +
+                 (de ? " (1 = wie die Referenz)" : " (1 = same as reference)");
+    data.x_label = de ? "Workload" : "workload";
+    data.y_label = de ? "Suchalgorithmus" : "search algorithm";
+    // HONEST-EMPTY-Vermerk. Er nennt die Referenz beim Namen: "keine Daten" hat hier zwei ganz
+    // verschiedene Ursachen (Metrik nie ausgefuehrt ODER Referenz nicht gemessen), und der Leser muss
+    // beide unterscheiden koennen.
+    data.empty_note = de ? ("(Keine vergleichbaren Messwerte: " + metric + " liegt im vorliegenden Korpus fuer " +
+                            reference_algo +
+                            " nicht als Referenz vor (oder wurde nie ausgefuehrt). Diese Flaeche wird ehrlich "
+                            "ausgelassen, statt ein Verhaeltnis gegen eine fehlende Referenz zu behaupten.)")
+                         : ("(No comparable measurements: " + metric + " has no reference series for " +
+                            reference_algo +
+                            " in the present corpus (or was never executed). This surface is honestly omitted "
+                            "instead of claiming a ratio against a missing reference.)");
     return write_heatmap(out, data, cnst);
 }
 

@@ -192,6 +192,13 @@ int run_individual_writers(fs::path const& csv, fs::path const& out_root, std::v
                                                     lang, false, c2l::kExchangeForestSmallSampleThreshold,
                                                     defaults.reference_value)))
             return 12;
+        // (8) P2: baseline-relative Verhaeltnis-Matrix je z-Feld.
+        for (auto const z_sv : ag::kSurfaceFields) {
+            std::string const z{z_sv};
+            if (!dg_ok(dg::write_surface_ratio_vs_reference(out_dir / ("lc_surface_ratio_" + z + ".tex"), surf_rows, z,
+                                                            defaults.reference_value, lang)))
+                return 13;
+        }
     }
     return 0;
 }
@@ -217,6 +224,10 @@ std::vector<std::string> expected_extra_files() {
     std::vector<std::string> names = {"seg_attribution.tex", "latency_range.tex", "latency_ecdf.tex",
                                       "exchange_forest.tex"};
     for (auto const z : ag::kSurfaceFields) names.push_back("lc_surface3d_" + std::string{z} + ".tex");
+    // GRAPH-UMBAU P2: die 6 Verhaeltnis-Matrizen entstehen ebenfalls IMMER (bei fehlender Referenz als
+    // ehrlicher Platzhalter -- die Fixture kennt kein linear_scan, also genau dieser Fall). Auch der
+    // Platzhalter ist eine Datei und muss byte-identisch zwischen Facade und Einzel-Writern sein.
+    for (auto const z : ag::kSurfaceFields) names.push_back("lc_surface_ratio_" + std::string{z} + ".tex");
     return names;
 }
 
@@ -295,10 +306,10 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
     ASSERT_EQ(run_individual_writers(fixture, dir_ref, langs, label), 0);
 
     // Beweis: jede erzeugte .tex byte-identisch -- 12 Kern-.tex + 4 Darstellungs-.tex (Inc-2a)
-    // + 6 3D-Flaechen (GRAPH-UMBAU P1a) = 22/Sprache.
+    // + 6 3D-Flaechen (P1a) + 6 Verhaeltnis-Matrizen (P2) = 28/Sprache.
     auto all_expected = expected_files();
     for (auto const& n : expected_extra_files()) all_expected.push_back(n);
-    ASSERT_EQ(all_expected.size(), 22u);
+    ASSERT_EQ(all_expected.size(), 28u);
     for (auto const& lang : langs) {
         auto const a = dir_orch / lang / "tabellen";
         auto const b = dir_ref / lang / "tabellen";
