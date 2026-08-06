@@ -4199,6 +4199,154 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 nachmittag-8 (L1-BUENDEL GELANDET -- drei ce-Merges, die neue Wache besteht ihren eigenen Bestand; VIER Regel-Zeilen zur Pruefbereichs-Familie; K-01 widerlegt)
+
+### A) VOLLZUG: das L1-Buendel ist in ce `development` (lokal, ungepusht)
+
+Gelandet vom Gegenpruefer, der auch die Trockenprobe gemacht und die Reihenfolge begruendet
+hatte. Alle `--no-ff`, kein rebase, kein Push, `main` unberuehrt (`c837d830`).
+
+    86be2420  Merge b2-neuanker-format3  -- T2-A, der Neuanker Format 3 (27 Commits ab 7969b399)
+    f577f886  Merge b14-ce-anteil        -- B14, CLU-Kette + XXE (11 Commits ab c837d830)
+    b5e0e4e7  Merge b-r4-ci-abdeckung    -- CI-Invariante + Diff-Hygiene-Wache, ZULETZT (5 ab 3bbcb8ed)
+
+Working Tree sauber, 46 Commits ungepusht. **A1-NB2 bewusst DRAUSSEN** -- kein Lens-Verdikt
+auffindbar, und die Landebahn verlangt es ausdruecklich (dieser Ledger, vormittag-Eintrag:
+"A1 (nach NB2+Lens-Bestaetigung)"). Seine Wache waere gruen gewesen (2114 Zusatzzeilen, 0/0);
+es fehlt allein die Freigabe.
+
+**GATES JE MERGE** (frischer Baum `build/land`, je Bau + ZWEI serielle ctest-Laeufe):
+nach T2-A `2x 405/405` -- nach B14 `2x 407/407` -- nach der Wache `2x 407/407`; Configure und
+Bau je RC 0, 0 `error:`-Zeilen.
+
+**DIE TESTZAHL IST 407, NICHT 409 -- und die Differenz ist geklaert, nicht hingenommen.** Sie
+war gegenueber den Worktree-Messungen zunaechst GESUNKEN. Ursache: **vier Tests haengen an
+Configure-Zeit-Bedingungen ueber den BAU-Zustand**, nicht am Code -- `if(TARGET
+comdare_f15_compare_cli)` und `if(_r5g_autobuilt_count GREATER 0)`. Betroffen sind
+`f15_compare_cli_smoke`, `test_v41_anatomy_adhoc_autobuilt_load`,
+`test_v41_anatomy_f15_measurement`, `test_v41_anatomy_r5i_configure_codegen`; im frischen Baum
+fehlen die vorgebauten Artefakte, also registriert CMake sie nicht. Gegenprobe: **kein Test ist
+verloren** (Mengendifferenz in die andere Richtung leer), die COMDARE-Optionen beider Baeume
+sind identisch. 405 (frisch) + 2 neue B14-Tests = 407. **MERKE: zur Testzahl gehoert der
+BAU-ZUSTAND, nicht nur der Commit.**
+
+**DIE PROBE AUFS EXEMPEL -- besteht die neue Wache den Bestand, den sie ab jetzt bewacht?**
+JA. Die **gelandete** Wache (Skript aus `development`, nicht mehr aus dem Wellen-Worktree) ueber
+den **gelandeten** Stand `3bbcb8ed..HEAD`: `8792 Zusatzzeilen in selbst verfasstem Code
+geprueft, davon 0 Nicht-ASCII, davon 0 ueber 120 Spalten` -- GRUEN; 1388 der 10180 Zeilen
+ausserhalb des Scopes, alle acht Dateien namentlich ausgewiesen. **Genau dafuer stand sie
+zuletzt in der Reihenfolge.**
+**Dazu die mitgelandete Abdeckungs-Invariante gegen den neuen Bestand:** `BILANZ: 407 von 407
+registrierten Tests werden von einem fahrenden Job ausgefuehrt` (405 ohne Label `pmc`, 2 mit,
+Summe == Inventur) -- **kein blinder Fleck**, und strukturell belegt (`-L`/`-LE` komplementaer)
+statt per Audit.
+
+**FROZEN/TABU ueber den gelandeten Stand, in der neuen Formulierung:** Frozen-BLOCK
+`test_m_w12_stamp_bausteine.cpp:596-663` byte-unbewegt (68 Zeilen, Diff leer) -- Frozen-Digest
+`17148e5a...ce89374` an den drei bekannten Fundstellen -- **Alt-Vektor `0fe275bd...` (Format 2):
+0 Treffer** -- der Neuanker ist rein, kein Mischzustand -- TABU-Artefakte
+(`golden_fullpilot_320_binary_ids.txt`, `permutation_axes.xml`, `all_axes_golden.profile.xml`,
+`m3v2_study.profile.xml`) gegen `3bbcb8ed` unbewegt.
+
+### B) DIE PRUEFBEREICHS-FAMILIE -- VIER Regel-Zeilen fuer die Fehlerklassen-Pruefliste
+
+Alle vier sind am selben Tag aufgetreten, alle vier haben dieselbe Gestalt: **eine Messung war
+fuer sich korrekt und beantwortete die falsche Frage.**
+
+> **(1) ZU JEDER GATE-ZAHL GEHOERT DER PRUEFBEREICH.** "0 Verstoesse" ohne Angabe, wogegen
+> gemessen wurde, ist so wenig belastbar wie eine Null ohne Nenner. (Kopf von nachmittag-7.)
+
+> **(2) DER PRUEFBEREICH IST DATEIMENGE **UND** COMMIT-BEREICH -- und der Bereich ist die
+> MERGE-BASE, nicht der letzte bequeme SHA.** Verschaerfung von (1); die Bereichs-Haelfte fehlte
+> dort noch. ZWEI Belege am selben Tag: (a) der T2-A-Format-Commit `034e0068` traf die falsche
+> DATEIMENGE -- er formatierte die drei Dateien seines Patches, die neun Verstoesse lagen in
+> fuenf anderen; (b) bei B14 war der zuerst genannte COMMIT-BEREICH zu eng: ueber `16a173f2..HEAD`
+> waren es 558 Zusatzzeilen und 0 Verstoesse (die Zeilen erscheinen dort gar nicht als
+> hinzugefuegt), ueber die echte merge-base `c837d830..HEAD` 1448 Zeilen und die zwei echten
+> Verstoesse. **Haette man den engen Bereich genommen, waere B14 gruen gemeldet und in der
+> Pipeline rot geworden.**
+
+> **(3) "X LIEST/BRAUCHT NIEMAND" IST EINE VOLLSTAENDIGKEITSAUSSAGE** -- sie verlangt Code UND
+> Tests UND Planung; ein grep ueber `libs/` genuegt nie. (Fehlerklasse 11, nachmittag-5.)
+
+> **(4) BEI GENERIERTEN ARTEFAKTEN BEWEIST DIE ABWESENHEIT IM QUELL-REPO NICHTS.** Wer im
+> eingecheckten `.gitlab-ci.yml` sucht, sieht die Mess-Jobs nicht -- sie entstehen erst durch den
+> Plan-Director. Vor jeder "X wird nirgends gesetzt"-Aussage klaeren, ob das Artefakt
+> EINGECHECKT oder EMITTIERT ist. Praezisere Form von (3) und der dritte Fall dieser Familie
+> heute.
+
+### C) K-01 WIDERLEGT: `COMDARE_BESTANDSLOG` wird gesetzt -- ueber den Emissions-Weg
+
+BEHAUPTUNG der Kostenklammer-Jagd: das Wurzel-Gate sei nicht `batch_plan_datei`, sondern
+`COMDARE_BESTANDSLOG`, und die werde **nirgends gesetzt** -- Folge waere, dass die gesamte
+T2-A-Arbeit in keinem produktiven Pfad liefe.
+
+**GEMESSEN (Gegenpruefer, mit Bezugsgroesse):** im Repo wird sie tatsaechlich nirgends HART
+gesetzt -- ce **11 Dateien** mit Treffern, super **2** (ohne Doku/Sessions), beide
+`.gitlab-ci.yml` **0**, `ci/`+`scripts/`+`deploy/` **0**; jedes Vorkommen ist ein Lesen
+(`getenv`/`env_trimmed`), eine Fehlermeldung oder Doku. **ABER die Variable wird DURCHGEREICHT:**
+
+    experiment_plan_director.hpp:952-955
+        append_forward_var_literal(vars, "COMDARE_BESTANDSLOG");
+        append_forward_var_literal(vars, "COMDARE_BESTANDSLOG_DOC_KEY");
+        append_forward_var_literal(vars, "COMDARE_BESTANDSLOG_OWNER_UUID");
+        append_forward_var_literal(vars, "COMDARE_BESTANDSLOG_MASCHINE");
+
+Der Plan-Director schreibt sie aus seiner eigenen Umgebung in das **generierte** CI-YAML.
+Belegt durch einen bestehenden Test (`test_experiment_plan_director.cpp:845-860`): dort per
+`::setenv` gesetzt, danach literal im Emissions-Ergebnis erwartet --
+`EXPECT_EQ(count_occurrences(yaml, "    COMDARE_BESTANDSLOG: \"true\"\n"), 1u)`, samt Wache
+gegen Selbst-Referenzen (`kG4aForwardedOptIns`). **K-01 hat einen Repo-Grep als Laufzeit-Aussage
+gelesen** -- Regel-Zeile (4).
+
+**DER SCHEINBARE WIDERSPRUCH ZUM ZWEIT-REVIEW LOEST SICH AUF: beide Befunde sind richtig.**
+Gemeinsames Wurzel-Gate, VERSCHIEDENE zweite Bedingungen:
+
+    lazy_fingerprint (profile_run_entry.hpp:436-450): COMDARE_BESTANDSLOG=="true"
+                                                      UND tier_realversion_ist_bekannt()
+    bestand_key_of   (super main.cpp:1119-1142)     : COMDARE_BESTANDSLOG=="true"
+                                                      UND minio_enabled()
+
+Damit bleibt der Zweit-Review-Befund gueltig ("`bestandslog_active` true UND Provider leer" ist
+real -- bei gesetzter Variable, laufendem minio, aber nicht sondierbarer Tier-Realversion oder
+`na`-Zellwerten), und K-01s Beobachtung ueber das gemeinsame Wurzel-Gate ist ebenfalls richtig.
+**FOLGE FUER DIE LANDEFAEHIGKEIT: keine -- und mit einem staerkeren Grund als "korrekt gebaut
+ist korrekt gebaut": die Ebene ist ERREICHBAR, nicht theoretisch.** K-01 haette sie
+faelschlich als totes Holz eingeordnet.
+
+**OFFEN als OWNER-/INFRA-FRAGE (nicht als Code-Aussage entscheidbar):** *Faehrt der
+Trigger-Lauf mit gesetztem `COMDARE_BESTANDSLOG`?* Das haengt an der Umgebung, in der
+`experiment_planner` laeuft (Runner-Env, GitLab-Projekt-Variablen, Aufrufskript ausserhalb des
+Repos) -- vom Repo aus nicht entscheidbar. Der Code-Teil ist beantwortet: die Kette existiert
+und ist getestet.
+
+### D) B14: `cc20b63d`, und die Format-Rausch-Lehre daneben
+
+**KORREKTUR eines Zwischenstands:** der Zweit-Review meldete `b14-ce-anteil` als ROT (zwei
+Zeilen ueber 120). Das galt dem Stand `2a58e2ed`, dessen Format-Commit die beiden
+Verstoss-Dateien NICHT getroffen hatte -- derselbe Fehlertyp wie bei T2-A, Regel-Zeile (2a).
+**`cc20b63d`** kuerzt genau diese zwei Zeilen; die Neumessung gegen die selbst bestimmte
+merge-base `c837d830..cc20b63d` ist **GRUEN** (1450 Zusatzzeilen, 0 Nicht-ASCII, 0 ueber 120).
+Damit erledigt sich auch die Koordinaten-Beobachtung aus nachmittag-7 (gemeldete Fundstellen
+passten nicht zum Branch-Stand): der Branch bewegte sich waehrend der Messung -- **kein
+Wachen-Defekt**, der Posten ist geschlossen, nicht vertagt.
+
+**FORMAT-RAUSCH-LEHRE (Selbstkorrektur des B14-Bauers, ausdruecklich verbucht):** sein erster
+Versuch war `clang-format -i` ueber die GANZE Testdatei -- das reformatierte drei unbeteiligte
+Stellen. Er hat es zurueckgenommen und stattdessen mit `--lines=<start>:<end>` punktgenau
+gearbeitet. **REGEL: Format-Rauschen in fremden Paketen ist teurer als der Verstoss, den es
+heilt** -- es macht Diffs unlesbar, verwischt die Verantwortlichkeit und erzeugt genau die
+Bereichs-Verwirrung, die Regel-Zeile (2) beschreibt. Punktgenau formatieren, nicht flaechig.
+
+### E) OFFEN NACH DER LANDUNG
+
+Push + `main`-FF (Lead) -- super-Pakete nach ihrer Breiten-Heilung (`graph`, `b14-super`, je 2
+Verstoesse) -- Submodul-Bump auf ce `b5e0e4e7` als EIGENER Commit mit Pathspec und ce-SHA in der
+Nachricht -- A1-NB2 nach der Lens-Bestaetigung (Wache bereits gruen gemessen) -- der erste echte
+Pipeline-Lauf -- der gelandete Stand hat beide neuen Wachen scharf und besteht sie lokal.
+Unveraendert aus der Gegenpruefung: `present_`-Gate fuer die `offen > 0`-Abschneidung (nach der
+Abgabe, mit Option 2), Formwache verfeinern.
+
 ## NACHTRAG 06.08.2026 nachmittag-7 (LANDESTRECKE: die Trockenprobe findet, was keine Konfliktrechnung zeigt -- die mitreisende Wache stellt zwei Pakete des EIGENEN Buendels rot; Frozen/TABU ueber das Buendel geprueft; zwei Lead-Meldungen korrigiert)
 
 **DIE LEHRE DIESES DURCHGANGS (gehoert NEBEN die Nenner-Regel in die Fehlerklassen-Pruefliste):**
