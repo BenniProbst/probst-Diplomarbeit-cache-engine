@@ -35,8 +35,14 @@ endforeach()
 
 if(NOT EXISTS "${MASTER}" OR NOT EXISTS "${KOPIE}")
     # Sauberer SKIP (kein Fehler, kein Stumm-Gruen): Nachbar-Checkout fehlt (z.B. Submodule nicht
-    # initialisiert). Der Marker matcht die SKIP_REGULAR_EXPRESSION des add_test-Aufrufs.
-    message(STATUS "FIXTURE-SYNC-SKIP: Nachbar-Checkout fehlt (MASTER='${MASTER}' KOPIE='${KOPIE}').")
+    # initialisiert). Nur die zweite Zeile matcht die SKIP_REGULAR_EXPRESSION des add_test-Aufrufs.
+    # B14-NB4 / Befund B4: der Marker steht allein auf seiner Zeile und enthaelt KEINE Interpolation.
+    # Vorher standen Marker und Pfade in EINER Zeile und die ctest-Property matchte das Teilwort
+    # "FIXTURE-SYNC-SKIP" irgendwo in der Ausgabe -- jeder FATAL, der diese Zeichenfolge mitfuehrt
+    # (etwa weil sie im Dateiinhalt oder in einem Pfad steht), waere als SKIP statt als FAIL
+    # klassifiziert worden.
+    message(STATUS "Nachbar-Checkout fehlt (MASTER='${MASTER}' KOPIE='${KOPIE}') -- keine Aussage moeglich.")
+    message(STATUS "COMDARE-XML-WACHE-SKIP")
     return()
 endif()
 

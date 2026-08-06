@@ -47,6 +47,36 @@
 
 find_program(COMDARE_XMLLINT_EXE NAMES xmllint)
 
+# -- B14-NB4 (2026-08-06): DER STDERR-RIEGEL. -----------------------------------------------------------
+#
+# BEFUND B3 (HOCH, am Objekt reproduziert): xmllint meldet einen durch --nonet BLOCKIERTEN externen
+# Entity-Load AUSSCHLIESSLICH ueber stderr und beendet sich trotzdem mit RC 0. Literal gefahren:
+#   Datei : <!DOCTYPE r [<!ENTITY x SYSTEM "http://example.invalid/gibt.es.nicht">]> <r>&x;</r>
+#   Lauf  : xmllint --noout --nonet --noent  ->  RC=0
+#   stderr: "I/O error : Attempt to load network entity http://example.invalid/gibt.es.nicht"
+#           "warning: failed to load external entity ..."
+# Der Baum wird dann OHNE den Entity-Inhalt weitergereicht. Die NB3-Fassung sah nur den RC und haette
+# das gruen durchgelaufen -- damit lebte genau die Entity-Omissionsklasse wieder, die der Wegfall des
+# Selbstbau-Parsers strukturell erledigt haben sollte (der Defekt eine Ebene weiter).
+#
+# WARUM KEINE MUSTERLISTE: die naheliegende Fassung waere "stderr gegen 'entity|I/O error' pruefen".
+# Das waere dieselbe Klasse, gegen die diese ganze Datei gebaut wurde -- eine Textheuristik ueber der
+# Ausgabe eines Werkzeugs, die jede Meldungsvariante uebersieht, die nicht in der Liste steht. Die
+# Regel ist deshalb absolut: bei RC 0 MUSS stderr LEER sein. Am Objekt geprueft: eine wohlgeformte
+# Datei erzeugt 0 Byte stderr. Alles andere ist eine Aussage von libxml2 ueber das Dokument, und eine
+# Wache, die eine Aussage des Parsers wegwirft, ist keine Wache.
+function(comdare_xml_assert_clean_stderr _ctx _label _what _file _err)
+    if(NOT "${_err}" STREQUAL "")
+        message(FATAL_ERROR
+            "${_ctx}: ${_what} auf ${_label} '${_file}' meldete RC=0, hat aber auf stderr "
+            "geschrieben. Ein Lauf, der sich beschwert und trotzdem 0 zurueckgibt, ist der klassische "
+            "FALSE-GREEN dieser Naht: ein per --nonet blockierter externer Entity-Load meldet sich NUR "
+            "hier, und der Baum kaeme ohne den Entity-Inhalt weiter. Fail-closed -- kein Gruen auf "
+            "einem Dokument, ueber das der Parser etwas zu sagen hatte.\n"
+            "  xmllint (stderr):\n${_err}")
+    endif()
+endfunction()
+
 # -- xmllint-Pflicht. Kein Skip, kein Fallback, keine zweite Code-Bahn.
 function(comdare_xml_require_tool _ctx)
     if(NOT COMDARE_XMLLINT_EXE)
@@ -92,6 +122,68 @@ macro(comdare_xml_lex_take _endtok _endlen _what)
     math(EXPR _lex_n "${_lex_e} + ${_endlen}")
     string(SUBSTRING "${_rest}" 0 ${_lex_n} _piece)
     string(SUBSTRING "${_rest}" ${_lex_n} -1 _rest)
+endmacro()
+
+# -- B14-NB4: DIE EINE quote-bewusste Tag-Ende-Suche. Erwartet _rest/_ctx/_file, setzt _piece/_rest.
+#    _with_bracket_depth=TRUE zusaetzlich fuer das interne DOCTYPE-Subset '[...]'.
+#
+# BEFUND B1 (HOCH, am Objekt reproduziert). Bis B14-NB4 endete der Element-Zweig am ERSTEN '>'
+# (string(FIND)) -- ohne Quote-Zustand. Begruendet war das mit dem Satz "ein Kommentar kann hier nicht
+# beginnen, '<' ist im Attributwert kein legales Zeichen". Der Satz ist fuer WOHLGEFORMTES XML richtig
+# und fuer die Eingabe dieser Funktion FALSCH: comdare_xml_lex_strip_comments laeuft ausschliesslich auf
+# Dateien, die xmllint bereits ABGELEHNT hat. Genau dort darf alles stehen.
+#
+# DAS PRAEPARAT, mit dem der Fehler literal gefallen ist (Gate-Log nb4-super-biss-beweise.txt):
+#     <?xml version="1.0"?>
+#     <r>
+#       <a v="x> <!-- ">
+#       <ORPHAN>
+#       <b v=" --> "/>
+#     </r>
+#   roh      : RC=1, "Unescaped '<' not allowed in attributes values"  <- NICHT der '--'-Defekt
+#   gestrippt: RC=0 -- und <ORPHAN> sowie <b/> sind SPURLOS VERSCHWUNDEN.
+# Der Ablauf: das erste '>' liegt IM Attributwert, der Lauf schnitt dort, landete mitten im Wert, fand
+# dort ein '<!--' und verwarf alles bis zum '-->' im naechsten Attributwert. Der Flag-Pfad haette danach
+# "XML-KOMMENTAR-TEXT-DEFEKT" gemeldet (eine Unwahrheit) und auf einem AMPUTIERTEN Baum weitergefragt.
+# Das ist derselbe zustandslose Schnitt, den die xmllint-Migration ueberall sonst beseitigt hat -- der
+# Ausnahme-Weg hatte ihn behalten.
+#
+# WARUM SO UND NICHT ANDERS: es entsteht KEINE neue Regex-Insel. Der DOCTYPE-Zweig lief bereits
+# quote-bewusst; diese Fassung macht daraus die EINE Funktion, die BEIDE Zweige benutzen. Damit ist die
+# Quote-Behandlung nicht mehr an einer Stelle vorhanden und an der anderen vergessen, sondern es gibt
+# nur noch einen Ort, an dem sie richtig oder falsch sein kann.
+macro(comdare_xml_lex_take_quoted _with_bracket_depth _what)
+    string(LENGTH "${_rest}" _q_len)
+    set(_q_i 0)
+    set(_q_depth 0)
+    set(_q_quote "")
+    set(_q_end -1)
+    while(_q_i LESS _q_len)
+        string(SUBSTRING "${_rest}" ${_q_i} 1 _q_c)
+        if(NOT _q_quote STREQUAL "")
+            if(_q_c STREQUAL "${_q_quote}")
+                set(_q_quote "")
+            endif()
+        elseif(_q_c STREQUAL "\"" OR _q_c STREQUAL "'")
+            set(_q_quote "${_q_c}")
+        elseif(${_with_bracket_depth} AND _q_c STREQUAL "[")
+            math(EXPR _q_depth "${_q_depth} + 1")
+        elseif(${_with_bracket_depth} AND _q_c STREQUAL "]")
+            math(EXPR _q_depth "${_q_depth} - 1")
+        elseif(_q_c STREQUAL ">" AND _q_depth EQUAL 0)
+            set(_q_end ${_q_i})
+            break()
+        endif()
+        math(EXPR _q_i "${_q_i} + 1")
+    endwhile()
+    if(_q_end EQUAL -1)
+        message(FATAL_ERROR
+            "${_ctx}: unbeendete(s) ${_what} in '${_file}' (kein schliessendes '>' ausserhalb von "
+            "Anfuehrungszeichen). Die Datei ist nicht wohlgeformt oder abgeschnitten. Kein stilles Gruen.")
+    endif()
+    math(EXPR _q_n "${_q_end} + 1")
+    string(SUBSTRING "${_rest}" 0 ${_q_n} _piece)
+    string(SUBSTRING "${_rest}" ${_q_n} -1 _rest)
 endmacro()
 
 # -- comdare_xml_lex_strip_comments: entfernt AUSSCHLIESSLICH Kommentare, alles andere bleibt
@@ -145,51 +237,13 @@ function(comdare_xml_lex_strip_comments _ctx _file _in _out_var)
             string(APPEND _acc "${_piece}")
         elseif(_pfx MATCHES "^<!DOCTYPE")
             # Ende quote- und klammerbewusst suchen: das interne Subset '[...]' darf '>' enthalten.
-            string(LENGTH "${_rest}" _dlen)
-            set(_i 0)
-            set(_depth 0)
-            set(_quote "")
-            set(_end -1)
-            while(_i LESS _dlen)
-                string(SUBSTRING "${_rest}" ${_i} 1 _c)
-                if(NOT _quote STREQUAL "")
-                    if(_c STREQUAL "${_quote}")
-                        set(_quote "")
-                    endif()
-                elseif(_c STREQUAL "\"" OR _c STREQUAL "'")
-                    set(_quote "${_c}")
-                elseif(_c STREQUAL "[")
-                    math(EXPR _depth "${_depth} + 1")
-                elseif(_c STREQUAL "]")
-                    math(EXPR _depth "${_depth} - 1")
-                elseif(_c STREQUAL ">" AND _depth EQUAL 0)
-                    set(_end ${_i})
-                    break()
-                endif()
-                math(EXPR _i "${_i} + 1")
-            endwhile()
-            if(_end EQUAL -1)
-                message(FATAL_ERROR
-                    "${_ctx}: unbeendete DOCTYPE-Deklaration in '${_file}'. Kein stilles Gruen.")
-            endif()
-            math(EXPR _n "${_end} + 1")
-            string(SUBSTRING "${_rest}" 0 ${_n} _piece)
-            string(SUBSTRING "${_rest}" ${_n} -1 _rest)
+            comdare_xml_lex_take_quoted(TRUE "DOCTYPE-Deklaration")
             string(APPEND _acc "${_piece}")
         else()
-            # Element-Tag oder Streu-'<': bis einschliesslich '>' verbatim uebernehmen. Ein
-            # Kommentar kann hier nicht beginnen ('<' ist im Attributwert kein legales Zeichen),
-            # und uebernommen wird ohnehin nur -- verworfen wird ausschliesslich oben.
-            string(FIND "${_rest}" ">" _e)
-            if(_e EQUAL -1)
-                string(APPEND _acc "${_rest}")
-                set(_rest "")
-            else()
-                math(EXPR _n "${_e} + 1")
-                string(SUBSTRING "${_rest}" 0 ${_n} _piece)
-                string(APPEND _acc "${_piece}")
-                string(SUBSTRING "${_rest}" ${_n} -1 _rest)
-            endif()
+            # Element-Tag oder Streu-'<': bis einschliesslich des Tag-schliessenden '>' verbatim
+            # uebernehmen -- QUOTE-BEWUSST (B14-NB4, Befund B1).
+            comdare_xml_lex_take_quoted(FALSE "Element-Tag")
+            string(APPEND _acc "${_piece}")
         endif()
     endwhile()
     set(${_out_var} "${_acc}" PARENT_SCOPE)
@@ -227,6 +281,9 @@ function(comdare_xml_open _ctx _label _file _tolerate_comment_text_defect _out_v
         COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet --noent "${_file}"
         RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_VARIABLE _err ERROR_STRIP_TRAILING_WHITESPACE)
     if(_rc EQUAL 0)
+        # B14-NB4 / Befund B3: RC 0 ist NICHT gleich "sauber gelesen". Der blockierte Entity-Load
+        # meldet sich nur hier.
+        comdare_xml_assert_clean_stderr("${_ctx}" "${_label}" "Wohlgeformtheits-Lauf" "${_file}" "${_err}")
         if(_tolerate_comment_text_defect)
             message(FATAL_ERROR
                 "${_ctx}: fuer ${_label} '${_file}' ist die Kommentar-Text-Ausnahme freigeschaltet, "
@@ -243,6 +300,23 @@ function(comdare_xml_open _ctx _label _file _tolerate_comment_text_defect _out_v
             "Datei, die kein Parser lesen kann, darf keine gruene Wache erzeugen.\n"
             "  xmllint (RC=${_rc}):\n${_err}")
     endif()
+    # B14-NB4 / Befund B11 (Opus-Review): bis hierher pruefte die Verriegelung NUR "roh scheitert" und
+    # "kommentarfrei laeuft" -- NICHT, ob der rohe Fehler ueberhaupt der Doppelbindestrich ist. Ein
+    # BELIEBIGER anderer Defekt, der durch das Comment-Stripping zufaellig verschwindet, lief damit
+    # ebenfalls durch, wurde als "XML-KOMMENTAR-TEXT-DEFEKT" etikettiert -- und die Ausnahme zoege sich
+    # NIE zurueck, weil die Datei roh nie wohlgeformt wuerde. Zusammen mit Befund B1 (der Lexer konnte
+    # ECHTE Elemente wegschneiden) war das der vollstaendige False-Green-Pfad: ein amputierter Baum mit
+    # einer falschen Diagnose daneben. Der Riegel prueft deshalb die MELDUNG des Parsers.
+    # libxml2-Wortlaut, am Objekt erhoben: "parser error : Double hyphen within comment".
+    if(NOT _err MATCHES "Double hyphen within comment")
+        message(FATAL_ERROR
+            "${_ctx}: fuer ${_label} '${_file}' ist die Kommentar-Text-Ausnahme freigeschaltet, der "
+            "rohe Fehler ist aber NICHT der Doppelbindestrich im Kommentar-Text. Die Ausnahme deckt "
+            "GENAU diesen einen Defekt -- fuer jeden anderen waere sie eine Umgehung: das "
+            "Comment-Stripping koennte ihn zufaellig mit entfernen, die Datei liefe gruen durch, und "
+            "die Freischaltung zoege sich nie zurueck (roh wird die Datei ja nie wohlgeformt).\n"
+            "  xmllint roh (RC=${_rc}):\n${_err}")
+    endif()
     comdare_xml_lex_strip_comments("${_ctx}" "${_file}" "${_raw}" _nocmt)
     comdare_xml_scratch_dir("${_ctx}" _scratch)
     string(MD5 _tag "${_file}")
@@ -252,6 +326,11 @@ function(comdare_xml_open _ctx _label _file _tolerate_comment_text_defect _out_v
     execute_process(
         COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet --noent "${_tmp}"
         RESULT_VARIABLE _rc2 OUTPUT_QUIET ERROR_VARIABLE _err2 ERROR_STRIP_TRAILING_WHITESPACE)
+    if(_rc2 EQUAL 0 AND NOT "${_err2}" STREQUAL "")
+        file(REMOVE "${_tmp}")
+        comdare_xml_assert_clean_stderr("${_ctx}" "${_label}" "Wohlgeformtheits-Lauf (kommentarfrei)"
+                                        "${_file}" "${_err2}")
+    endif()
     if(NOT _rc2 EQUAL 0)
         file(REMOVE "${_tmp}")
         message(FATAL_ERROR
@@ -278,16 +357,29 @@ endfunction()
 
 # -- Eine XPath-Frage an den echten Parser stellen.
 function(comdare_xml_query _ctx _label _file _expr _out_var)
+    # B14-NB4 / Befund B10: KEIN OUTPUT_STRIP_TRAILING_WHITESPACE mehr. Es sollte die eine Newline
+    # entfernen, die xmllint an --xpath anhaengt -- es entfernte aber JEDEN abschliessenden Leerraum
+    # und damit auch den, der zum WERT gehoert. Am Objekt: fuer <v>wert   </v> liefert
+    # `xmllint --xpath 'string(/r/v)'` die Bytes "w e r t <sp> <sp> <sp> \n"; nach dem Strip stand
+    # "wert" da. Ein Wert MIT und einer OHNE abschliessende Leerzeichen waren fuer jeden Vergleich
+    # dieser Wachen identisch -- eine Achsen-Auspraegung "node4 " haette als "node4" gegolten.
+    # Entfernt wird deshalb GENAU EIN abschliessender Zeilenumbruch (das Werkzeug-Artefakt), sonst
+    # nichts. Wo eine Normalisierung fachlich gewollt ist (der Textinhalt eines <value>-Elements traegt
+    # die Einrueckung des Dokuments), macht sie der AUFRUFER sichtbar per string(STRIP).
     execute_process(
         COMMAND "${COMDARE_XMLLINT_EXE}" --noent --nonet --xpath "${_expr}" "${_file}"
         OUTPUT_VARIABLE _out ERROR_VARIABLE _err RESULT_VARIABLE _rc
-        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_STRIP_TRAILING_WHITESPACE)
+        ERROR_STRIP_TRAILING_WHITESPACE)
     if(NOT _rc EQUAL 0)
         message(FATAL_ERROR
             "${_ctx}: XPath-Abfrage auf ${_label} '${_file}' fehlgeschlagen (RC=${_rc}).\n"
             "  AUSDRUCK: ${_expr}\n"
             "  xmllint:\n${_err}")
     endif()
+    # B14-NB4 / Befund B3: auch die XPath-Abfrage laedt das Dokument -- ein blockierter externer
+    # Entity-Load meldet sich hier genauso nur ueber stderr, bei RC 0. Selbst gefahren.
+    comdare_xml_assert_clean_stderr("${_ctx}" "${_label}" "XPath-Abfrage '${_expr}'" "${_file}" "${_err}")
+    string(REGEX REPLACE "\r?\n$" "" _out "${_out}")
     set(${_out_var} "${_out}" PARENT_SCOPE)
 endfunction()
 

@@ -205,9 +205,27 @@ add_test(NAME test_golden_n_consistency
         "-DPROFILE=${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
         "-DPROFILE_ALLOW_COMMENT_TEXT_DEFECT=ON"
         "-DSCRATCH_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+        # B14-NB4 / Befund B7: der ABSOLUTE golden-Kanon. Die Wache prueft bis dahin nur RELATIV
+        # (Produkt == cap == cap) und BEHAUPTETE in der Erfolgsmeldung trotzdem "golden N = 2^17".
+        # Driften beide Traeger GEMEINSAM (dieselbe Achse in beiden herausgenommen), bleiben alle
+        # relativen Pruefungen gruen und die Meldung wird zur Unwahrheit. Der Kanon steht deshalb
+        # HIER -- das super-Repo ist sein Eigentuemer, das Skript nur sein Pruefer. 2^17 = 131072.
+        # Wer N bewusst aendert, aendert diese Zeile: ein sichtbarer Edit statt eines stillen Drifts.
+        "-DEXPECTED_N=131072"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/golden_n_consistency_check.cmake")
+# B14-NB4 / Befund B4: DER SKIP-MARKER IST VERANKERT.
+# Vorher: SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP" -- ein UNVERANKERTES Teilwort, geprueft gegen die
+# GESAMTE Testausgabe, und das fuer alle fuenf Tests. Jeder Nonzero-/FATAL-Ausgang, dessen Text die
+# Zeichenfolge irgendwo mitfuehrt, waere damit als SKIP statt als FAIL klassifiziert worden -- und die
+# Wachen echoen Dateiinhalte und xmllint-Ausgaben in ihre FATAL-Meldungen. Ein struktureller
+# Fehlklassifikations-Pfad quer durch alle fuenf Tests.
+# JETZT: die Skripte drucken den Marker als EIGENE, interpolationsfreie Zeile, und der Ausdruck bindet
+# ihn an Zeilenanfang UND Zeilenende samt CMake-STATUS-Praefix. Ein Vorkommen mitten in einer Zeile --
+# der einzige Weg, auf dem fremder Text ihn einschleusen kann -- matcht nicht mehr.
+# Die Property bleibt auf allen fuenf Tests: bei jedem von ihnen ist der Skip legitim moeglich (alle
+# fuenf haengen an einem Nachbar-Checkout, COMDARE_CACHE_ENGINE_DIR bzw. COMDARE_PRT_ART_DIR).
 set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_registry
                      test_fixture_schema_experiment_golden_kern test_fixture_schema_experiment_golden
                      test_golden_n_consistency
     PROPERTIES LABELS "da_unit;fixture_sync" TIMEOUT 60
-    SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP")
+    SKIP_REGULAR_EXPRESSION "(^|\n)-- COMDARE-XML-WACHE-SKIP\r?(\n|$)")

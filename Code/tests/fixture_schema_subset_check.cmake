@@ -49,7 +49,9 @@
 #     die sechs Befunde bezahlt. Fehlt xmllint, ist das FATAL und KEIN Skip (Begruendung und
 #     Paketnamen in xml_canonical_utils.cmake).
 #
-# Erwartete -D Variablen: SCHEMA (die XSD), FIXTURE (die ce-Fixture), MASTER (optional, die super-golden).
+# Erwartete -D Variablen: SCHEMA (die XSD), MASTER (die super-golden), FIXTURE (die ce-Fixture).
+# ALLE DREI SIND PFLICHT (B14-NB4/B9): MASTER war "optional", und ein weggelassenes -DMASTER schaltete
+# damit ein ganzes Bein der Wache lautlos ab.
 #
 # SKIP-DISZIPLIN (B14-NB2, Codex-MITTEL "fehlende SCHEMA-/MASTER-Datei = Skip statt Fail"): ein SKIP ist
 # NUR fuer den EINEN Fall zulaessig, fuer den er gedacht war -- der ce-NACHBAR-CHECKOUT fehlt (Submodul
@@ -63,9 +65,22 @@ include("${CMAKE_CURRENT_LIST_DIR}/xml_canonical_utils.cmake")
 
 set(_ctx "fixture_schema_subset_check")
 
-foreach(_req SCHEMA FIXTURE)
+# B14-NB4 / Befund B8: Werkzeug-Pruefung VOR jedem Skip (Begruendung wortgleich in
+# golden_n_consistency_check.cmake). Vorher stand der Nachbar-Skip davor -- fehlten Submoduldatei UND
+# xmllint gleichzeitig, schaltete sich die Wache trotz "absoluter FATAL-Pflicht" still ab.
+comdare_xml_require_tool("${_ctx}")
+
+# B14-NB4 / Befund B9: MASTER ist PFLICHT. Vorher verlangte diese Schleife nur SCHEMA und FIXTURE, und
+# das MASTER-Bein haengte an "if(DEFINED MASTER)". Ein KOMPLETT WEGGELASSENES -DMASTER schaltete das
+# Bein damit LAUTLOS ab -- die Wache lief gruen mit der halben Aussage. Der bestehende Biss deckte nur
+# den anderen Fall (definiert, aber Datei fehlt). Beide add_test-Zeilen uebergeben MASTER; ein
+# Weglassen waere also immer ein Verdrahtungsfehler, nie eine Absicht.
+foreach(_req SCHEMA FIXTURE MASTER)
     if(NOT DEFINED ${_req})
-        message(FATAL_ERROR "${_ctx}: -D${_req} fehlt.")
+        message(FATAL_ERROR
+            "${_ctx}: -D${_req} fehlt. Alle drei Wege sind Pflicht: SCHEMA ist die Single-Source, "
+            "MASTER und FIXTURE sind die zwei Beine der Aussage. Ein fehlendes -D ist ein Fehler in "
+            "der add_test-Zeile -- und wuerde, wenn er toleriert wuerde, ein Bein still abschalten.")
     endif()
 endforeach()
 
@@ -75,13 +90,15 @@ if(NOT EXISTS "${SCHEMA}")
         "Nachbar-Checkout (die XSD liegt im super-Repo selbst) -- entweder ist der Pfad in der "
         "add_test-Zeile falsch oder die Single-Source ist verschwunden. Kein SKIP.")
 endif()
-if(DEFINED MASTER AND NOT EXISTS "${MASTER}")
+if(NOT EXISTS "${MASTER}")
     message(FATAL_ERROR
         "${_ctx}: MASTER '${MASTER}' EXISTIERT NICHT. Auch der MASTER liegt im "
         "super-Repo selbst (Code/test_data_xml/) -- kein Nachbar-Checkout, also kein SKIP.")
 endif()
 if(NOT EXISTS "${FIXTURE}")
-    message(STATUS "FIXTURE-SYNC-SKIP: Nachbar-Checkout fehlt (FIXTURE='${FIXTURE}').")
+    # B14-NB4 / Befund B4: Grund und MARKER auf getrennten Zeilen, der Marker ohne jede Interpolation.
+    message(STATUS "Nachbar-Checkout fehlt (FIXTURE='${FIXTURE}') -- diese Wache kann nichts aussagen.")
+    message(STATUS "COMDARE-XML-WACHE-SKIP")
     return()
 endif()
 
@@ -113,6 +130,18 @@ function(comdare_check_instance _ctx _label _file _schema)
     execute_process(
         COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet --noent --schema "${_schema}" "${_doc}"
         RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_VARIABLE _err ERROR_STRIP_TRAILING_WHITESPACE)
+    # B14-NB4 / Befund B3: auch der Schema-Lauf laedt das Dokument -- und meldet einen durch --nonet
+    # blockierten externen Entity-Load NUR ueber stderr, bei RC 0. Die Validierung liefe dann gegen
+    # einen Baum OHNE den Entity-Inhalt und meldete "gueltig". Der Riegel steht deshalb VOR der
+    # RC-Auswertung, damit er auch den Erfolgsfall trifft.
+    # SONDERFALL, ehrlich benannt: xmllint gibt bei ERFOLGREICHER Validierung "<datei> validates" auf
+    # stderr aus. Genau diese eine Zeile ist erlaubt und wird vorher entfernt -- alles andere bleibt
+    # ein Grund, NICHT gruen zu sein.
+    if(_rc EQUAL 0)
+        string(REGEX REPLACE "^[^\n]* validates\r?\n?" "" _err_rest "${_err}")
+        string(STRIP "${_err_rest}" _err_rest)
+        comdare_xml_assert_clean_stderr("${_ctx}" "${_label}" "Schema-Validierung" "${_file}" "${_err_rest}")
+    endif()
     if(NOT _rc EQUAL 0)
         comdare_xml_close("${_doc}" "${_file}")
         message(FATAL_ERROR
@@ -131,7 +160,6 @@ function(comdare_check_instance _ctx _label _file _schema)
                    "das Schema.")
 endfunction()
 
-if(DEFINED MASTER)
-    comdare_check_instance("${_ctx}" "MASTER" "${MASTER}" "${SCHEMA}")
-endif()
+# B14-NB4 / Befund B9: kein "if(DEFINED MASTER)" mehr -- MASTER ist oben Pflicht, das Bein laeuft IMMER.
+comdare_check_instance("${_ctx}" "MASTER" "${MASTER}" "${SCHEMA}")
 comdare_check_instance("${_ctx}" "FIXTURE" "${FIXTURE}" "${SCHEMA}")
