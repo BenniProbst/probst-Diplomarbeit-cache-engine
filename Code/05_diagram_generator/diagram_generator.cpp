@@ -658,6 +658,19 @@ struct SurfaceAggregate {
     return de ? "Gesamt-Latenz (ns/op)" : "overall latency (ns/op)";
 }
 
+// P1a (2026-08-06) -- ROLLEN-BENENNUNG der 3D-Flaeche, EIN Ort fuer Achsen-Titel UND Caption.
+// Beide Flaechen-Achsen (search_algo x workload) sind NOMINAL: zwischen zwei Suchalgorithmen liegt
+// nichts, was man interpolieren koennte. Die von "surf" aufgespannte Flaeche ist daher eine
+// Ablese-Hilfe ueber den gemessenen Stuetzstellen, KEIN Modell und keine Trendaussage. Die Figur heisst
+// deshalb ausdruecklich "Rohdaten-Ansicht" (Diagnose/QA-Rolle); die analysierenden Aussagen tragen die
+// referenz-bezogenen Formen. Zweiter, ebenso wichtiger Zweck dieser Funktion: data.title wird jetzt
+// ueberhaupt gesetzt -- aggregate_surface_matrix fuellt nur Labels/Matrix/Maske, sodass die Caption des
+// (bis P1a nirgends verdrahteten) 3D-Writers bisher LEER blieb.
+[[nodiscard]] std::string surface3d_title(std::string const& metric, bool de) {
+    return (de ? "3D-Rohdaten-Ansicht: " : "3D raw-data view: ") + metric +
+           (de ? " (Suchalgorithmus x Workload)" : " (search algorithm x workload)");
+}
+
 } // anonymous namespace
 
 int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementRow>& out_rows) {
@@ -851,16 +864,18 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
 
     bool const        de     = (lang == "de");
     std::string const metric = z_field_human(z_field, lang);
+    // P1a: EIN Titel fuer Achsen-Beschriftung, Platzhalter und Caption (vorher blieb data.title leer ->
+    // leere \caption{}; fiel nicht auf, weil der Writer bis P1a nicht in der Facade verdrahtet war).
+    data.title = surface3d_title(metric, de);
 
     // E-2a/HONEST-EMPTY: dieselbe Wache wie im 2D-Pfad -- keine einzige ausgefuehrte Zelle -> ehrlicher
     // Platzhalter statt Figur. E-2b: any_data zaehlt jetzt AUCH ausgefuehrte Nullen als Daten, der
     // Platzhalter greift also nur noch bei wirklich nie ausgefuehrter Metrik (ein Ort, ein Muster wie 2D).
     if (!agg.any_data) {
-        std::string const title3d = (de ? "3D-Surface: " : "3D surface: ") + metric;
         std::cerr << "diagram-generator: HONEST-EMPTY -- keine ausgefuehrte Messung fuer z=" << z_field
                   << " -> Platzhalter-Vermerk statt 3D-Surface: " << out.string() << "\n";
         return write_honest_empty_placeholder(
-            out, title3d,
+            out, data.title,
             de ? ("(Keine Messwerte: " + metric +
                   " wurde im vorliegenden Korpus nie ausgefuehrt. Diese Flaeche wird ehrlich ausgelassen.)")
                : ("(No measured values: " + metric +
@@ -914,8 +929,8 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
     open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";
     f << "\\begin{axis}[\n";
-    write_pgfplots_axis_options(f, cnst, (de ? "3D-Surface: " : "3D surface: ") + metric,
-                                (de ? "Workload" : "workload"), (de ? "Suchalgorithmus" : "search algorithm"));
+    write_pgfplots_axis_options(f, cnst, data.title, (de ? "Workload" : "workload"),
+                                (de ? "Suchalgorithmus" : "search algorithm"));
     // Echte 3D-Projektion + surf-Plot. z LOG-skaliert: Workload-Spanne ~14000×,
     // sonst dominiert eine Zelle die Höhen-Achse vollständig.
     f << "    view={45}{30},\n";
@@ -1047,6 +1062,21 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
 
     std::string const metric = z_field_human(z_field, lang);
 
+    // P1b (2026-08-06) -- ENTARTUNGS-WACHE der x-Achse, aufgedeckt erst durch die Verdrahtung in die
+    // Facade. Der d03-Korpus sweept working_set_n gar nicht: ALLE Zeilen tragen denselben Wert (4096),
+    // die Kurve ist also ehrlich EIN Punkt je Reihe. pgfplots-Probe 2026-08-06 an genau dieser .tex:
+    // "Package pgfplots Warning: Axis range for axis x is approximately empty; enlargi[ng]" -- die
+    // Log-Achse bekommt xmin==xmax und weitet selbst auf einen willkuerlichen Bereich auf.
+    // Kleinste ehrliche Gegenmassnahme (Praezedenz: die z-/Farb-Domaenen-Aufweitung im 3D-Pfad, E-2b):
+    // NUR die ACHSE explizit auf eine Oktave um den einen Wert setzen -- log basis 2, also [v/2 : 2v].
+    // Es wird KEIN Punkt erfunden und kein Wert veraendert; die Kurve bleibt sichtbar der eine
+    // gemessene Stuetzpunkt. Erst ein echter Sweep-Korpus (mehrere working_set_n) fuellt sie.
+    std::set<std::uint64_t> distinct_x;
+    for (auto const& [key, points] : series)
+        for (auto const& [wsn, samples] : points) distinct_x.insert(wsn);
+    bool const          degenerate_x = (distinct_x.size() == 1 && *distinct_x.begin() > 0);
+    std::uint64_t const only_x       = degenerate_x ? *distinct_x.begin() : 0;
+
     std::ofstream f{out};
     if (!f) return status_io_error;
     f << "% AUTO-GENERATED durch diagram_generator (A2/m3v2, Working-Set-Sweep-Kurve; z=" << z_field
@@ -1056,9 +1086,22 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
     if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
     open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n\\begin{axis}[\n";
+    // P1b (2026-08-06)/BESCHRIFTUNGS-FIX, ebenfalls erst durch die Verdrahtung sichtbar geworden:
+    // write_pgfplots_axis_options schickt JEDE Beschriftung durch escape_latex. Die bisherigen Labels
+    // enthielten Mathe-Modus und eine LaTeX-Umlaut-Sequenz und wurden dadurch buchstaeblich zerlegt --
+    // pdflatex-Probe an der erzeugten .tex: "xlabel={Arbeitsmenge \$n\$ (Schl\textbackslash{}"ussel)}",
+    // also literal sichtbare Dollarzeichen und ein sichtbares \"ussel statt eines Umlauts. Beschriftungen
+    // muessen hier deshalb REINER ASCII-TEXT ohne LaTeX-Syntax sein (Doktrin ASCII-only); die
+    // Escape-Verantwortung liegt allein bei write_pgfplots_axis_options.
     write_pgfplots_axis_options(f, cnst, (de ? "Working-Set-Sweep: " : "working-set sweep: ") + metric,
-                                (de ? "Arbeitsmenge $n$ (Schl\\\"ussel)" : "working set $n$ (keys)"), metric);
+                                (de ? "Arbeitsmenge n (Schluessel)" : "working set n (keys)"), metric);
     f << "    xmode=log,\n    log basis x=2,\n";
+    if (degenerate_x) {
+        f << "    % P1b: nur EIN gemessener working_set_n -> Achse explizit auf eine Oktave geweitet\n";
+        f << "    % (sonst xmin==xmax -> \"Axis range for axis x is approximately empty\"). Nur die ACHSE.\n";
+        f << "    xmin=" << fmt_double(static_cast<double>(only_x) / 2.0) << ", xmax="
+          << fmt_double(static_cast<double>(only_x) * 2.0) << ",\n";
+    }
     f << "    legend pos=north west,\n    legend style={font=\\tiny},\n";
     f << "    mark size=2pt,\n";
     f << "]\n";

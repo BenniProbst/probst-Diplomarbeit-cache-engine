@@ -170,6 +170,20 @@ int run_individual_writers(fs::path const& csv, fs::path const& out_root, std::v
         if (!dg_ok(dg::write_latency_ecdf(out_dir / "latency_ecdf.tex", surf_rows, lang))) return 8;
         if (!c2l_ok(c2l::write_exchange_forest_plot(out_dir / "exchange_forest.tex", exch_aggs, counts, lang)))
             return 9;
+        // (6) GRAPH-UMBAU 2D/3D (2026-08-06): dieselbe Writer-Sequenz wie die Facade -- P1a 3D-Flaechen,
+        //     P1b Sweep-Kurven. Ohne diese Spiegelung deckt der Byte-Identitaets-Beweis die neuen
+        //     Dateien NICHT ab (stiller Luecken-Test).
+        for (auto const z_sv : ag::kSurfaceFields) {
+            std::string const z{z_sv};
+            if (!dg_ok(dg::write_surface3d_search_algo_x_workload(out_dir / ("lc_surface3d_" + z + ".tex"), surf_rows,
+                                                                  z, lang)))
+                return 10;
+        }
+        for (auto const z_sv : ag::kSweepFields) {
+            std::string const z{z_sv};
+            if (!dg_ok(dg::write_working_set_sweep_curve(out_dir / ("ld_sweep_" + z + ".tex"), surf_rows, z, lang)))
+                return 11;
+        }
     }
     return 0;
 }
@@ -184,10 +198,18 @@ std::vector<std::string> expected_files() {
     return names;
 }
 
-// Die 4 additiven Darstellungs-Dateinamen (Inc-2a). Die enriched Fixture ist so gewählt, dass KEINER
-// honest-empty ist → alle 4 werden geschrieben und byte-identisch geprüft (16 .tex/Sprache insgesamt).
+// Die additiven Darstellungs-Dateinamen. Inc-2a: die 4 urspruenglichen (die enriched Fixture ist so
+// gewaehlt, dass KEINER honest-empty ist). GRAPH-UMBAU P1a (2026-08-06): + die 6 3D-Flaechen -- sie
+// entstehen IMMER, sobald die (search_algo x workload)-Achsen besetzt sind (bei datenloser Metrik als
+// ehrlicher Platzhalter, ebenfalls eine Datei), also gehoeren sie in den Byte-Identitaets-Beweis.
+// AUSDRUECKLICH NICHT hier: ld_sweep_<z>.tex (P1b) -- die Fixture traegt KEINE working_set_n-Spalte,
+// der Writer ist also honest-empty und legt keine Datei an. Genau das prueft
+// Stufe08Appendix.SweepCurvesAreHonestEmptyOnFixtureWithoutWorkingSetColumn.
 std::vector<std::string> expected_extra_files() {
-    return {"seg_attribution.tex", "latency_range.tex", "latency_ecdf.tex", "exchange_forest.tex"};
+    std::vector<std::string> names = {"seg_attribution.tex", "latency_range.tex", "latency_ecdf.tex",
+                                      "exchange_forest.tex"};
+    for (auto const z : ag::kSurfaceFields) names.push_back("lc_surface3d_" + std::string{z} + ".tex");
+    return names;
 }
 
 } // namespace
@@ -264,10 +286,11 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
     // Pfad B — die äquivalenten Einzel-Writer (= die früheren .exe-Spawns).
     ASSERT_EQ(run_individual_writers(fixture, dir_ref, langs, label), 0);
 
-    // Beweis: jede erzeugte .tex byte-identisch — 12 Kern-.tex + 4 Darstellungs-.tex (Inc-2a) = 16/Sprache.
+    // Beweis: jede erzeugte .tex byte-identisch -- 12 Kern-.tex + 4 Darstellungs-.tex (Inc-2a)
+    // + 6 3D-Flaechen (GRAPH-UMBAU P1a) = 22/Sprache.
     auto all_expected = expected_files();
     for (auto const& n : expected_extra_files()) all_expected.push_back(n);
-    ASSERT_EQ(all_expected.size(), 16u);
+    ASSERT_EQ(all_expected.size(), 22u);
     for (auto const& lang : langs) {
         auto const a = dir_orch / lang / "tabellen";
         auto const b = dir_ref / lang / "tabellen";
@@ -284,6 +307,80 @@ TEST(Stufe08Appendix, InProcessOrchestratorByteIdenticalToIndividualWriters) {
     std::error_code cleanup;
     fs::remove_all(dir_orch, cleanup);
     fs::remove_all(dir_ref, cleanup);
+}
+
+// GRAPH-UMBAU 2D/3D, P1a (2026-08-06): die 3D-Flaeche ist ab jetzt VERDRAHTET -- je z-Feld entsteht
+// neben der 2D-Heatmap eine lc_surface3d_<z>.tex. Der Test haelt beide Zusagen fest: (a) die Datei
+// existiert und traegt die echte 3D-Mechanik (addplot3[surf] + view), (b) die 2D-Datei bleibt
+// unveraendert daneben stehen (KEIN Ersatz -- Plan §4 "nichts faellt weg").
+TEST(Stufe08Appendix, Surface3dIsWiredNextToTheExistingHeatmap) {
+    auto const fixture = fixtures_dir() / "tier_wide_appendix.csv";
+    ensure_fixture(fixture);
+
+    auto const      dir = comdare_user_tmp() / "appendix_3d_wiring";
+    std::error_code ec;
+    fs::remove_all(dir, ec);
+
+    ag::AppendixConfig cfg;
+    cfg.csv      = fixture;
+    cfg.out_root = dir;
+    cfg.langs    = {"de"};
+    ASSERT_EQ(ag::generate_wide_appendix(cfg), ag::status_ok);
+
+    auto const tab = dir / "de" / "tabellen";
+    for (auto const z_sv : ag::kSurfaceFields) {
+        std::string const z{z_sv};
+        auto const        f2d = tab / ("lc_surface_" + z + ".tex");
+        auto const        f3d = tab / ("lc_surface3d_" + z + ".tex");
+        ASSERT_TRUE(fs::exists(f2d)) << f2d; // Bestand bleibt
+        ASSERT_TRUE(fs::exists(f3d)) << f3d; // neu
+        EXPECT_GT(fs::file_size(f3d), 0u) << f3d;
+    }
+    // ns_per_op ist in der Fixture durchgaengig besetzt -> echte Figur, kein Platzhalter.
+    auto const body = read_all(tab / "lc_surface3d_ns_per_op.tex");
+    EXPECT_NE(body.find("addplot3[surf]"), std::string::npos);
+    EXPECT_NE(body.find("view={45}{30}"), std::string::npos);
+    // P1a-Rollen-Benennung: "Rohdaten-Ansicht", NICHT Ergebnis-Abbildung (zwei nominale Achsen).
+    EXPECT_NE(body.find("3D-Rohdaten-Ansicht"), std::string::npos);
+    // Die Caption ist NICHT leer (vor P1a blieb data.title ungesetzt -> "\caption{}").
+    EXPECT_EQ(body.find("\\caption{}"), std::string::npos);
+
+    fs::remove_all(dir, ec);
+}
+
+// GRAPH-UMBAU 2D/3D, P1b (2026-08-06): das Sweep-Wiring ist auf einem Korpus OHNE working_set_n-Spalte
+// ein reines No-Op. Der Writer ist header-getrieben und liefert status_empty_input -> KEINE Datei, und
+// die Facade bleibt gruen. Das ist der Risikofreiheits-Beleg fuer das Wiring (Plan §3/P1b).
+TEST(Stufe08Appendix, SweepCurvesAreHonestEmptyOnFixtureWithoutWorkingSetColumn) {
+    auto const fixture = fixtures_dir() / "tier_wide_appendix.csv";
+    ensure_fixture(fixture);
+
+    // Vorbedingung literal: die Fixture traegt KEINE working_set_n-Spalte.
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(fixture, rows), dg::status_ok);
+    ASSERT_GT(rows.size(), 0u);
+    for (auto const& r : rows) EXPECT_FALSE(r.has_working_set_n);
+
+    auto const      dir = comdare_user_tmp() / "appendix_sweep_empty";
+    std::error_code ec;
+    fs::remove_all(dir, ec);
+
+    ag::AppendixConfig cfg;
+    cfg.csv      = fixture;
+    cfg.out_root = dir;
+    cfg.langs    = {"en"};
+    ASSERT_EQ(ag::generate_wide_appendix(cfg), ag::status_ok); // Facade bleibt gruen
+
+    auto const tab = dir / "en" / "tabellen";
+    for (auto const z_sv : ag::kSweepFields) {
+        std::string const z{z_sv};
+        EXPECT_FALSE(fs::exists(tab / ("ld_sweep_" + z + ".tex"))) // honest-empty: KEINE Datei
+            << "ld_sweep_" << z << ".tex haette nicht entstehen duerfen";
+    }
+    // Gegenprobe: die Kern-Dateien sind trotzdem da (honest-empty ist kein Facade-Fehler).
+    EXPECT_TRUE(fs::exists(tab / "bias_matrix_table.tex"));
+
+    fs::remove_all(dir, ec);
 }
 
 // ── Achsen-Inventar (2026-08-03) ──────────────────────────────────────────────

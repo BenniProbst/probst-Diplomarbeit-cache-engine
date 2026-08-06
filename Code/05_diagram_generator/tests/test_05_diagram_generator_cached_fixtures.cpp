@@ -188,6 +188,43 @@ TEST(Stufe05Pipeline, WriteSurfaceHeatmapFromWide) {
     fs::remove(p, ec);
 }
 
+// GRAPH-UMBAU 2D/3D, P1a (2026-08-06): der 3D-Writer traegt Titel UND Caption aus EINER Quelle.
+// Bis P1a fuellte niemand data.title (aggregate_surface_matrix setzt nur Labels/Matrix/Maske), sodass
+// die Figur ein leeres "\caption{}" bekam -- unbemerkt, weil der Writer nirgends verdrahtet war.
+// Zusaetzlich haelt der Test die ROLLEN-Benennung fest: "Rohdaten-Ansicht"/"raw-data view", NICHT
+// "Ergebnis" -- beide Flaechen-Achsen sind nominal und tragen keine Interpolationsaussage.
+TEST(Stufe05Pipeline, Surface3dCarriesRawDataViewTitleAndNonEmptyCaption) {
+    auto p = comdare_user_tmp() / "p1a_wide_sample.csv";
+    write_sample_wide_csv(p);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    std::error_code ec;
+
+    // -- en --
+    auto out_en = comdare_user_tmp() / "p1a_surface3d_en.tex";
+    fs::remove(out_en, ec);
+    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out_en, rows, "ns_per_op", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_en, "3D raw-data view: overall latency (ns/op)"));
+    EXPECT_FALSE(file_contains(out_en, "\\caption{}")); // Caption ist NICHT mehr leer
+    // Titel steht an BEIDEN Orten -- Achsen-title UND caption speisen sich aus derselben Quelle.
+    EXPECT_TRUE(file_contains(out_en, "title={3D raw-data view"));
+    EXPECT_TRUE(file_contains(out_en, "\\caption{3D raw-data view"));
+
+    // -- de --
+    auto out_de = comdare_user_tmp() / "p1a_surface3d_de.tex";
+    fs::remove(out_de, ec);
+    ASSERT_EQ(dg::write_surface3d_search_algo_x_workload(out_de, rows, "ns_per_op", "de"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_de, "3D-Rohdaten-Ansicht"));
+    EXPECT_FALSE(file_contains(out_de, "\\caption{}"));
+    // KEINE "Ergebnis"-Behauptung und kein Rest der alten Benennung.
+    EXPECT_FALSE(file_contains(out_de, "3D-Surface:"));
+
+    fs::remove(out_en, ec);
+    fs::remove(out_de, ec);
+    fs::remove(p, ec);
+}
+
 TEST(Stufe05Pipeline, EmptyInputReturnsEmpty) {
     dg::BarChartData empty;
     empty.title = "empty";
@@ -1043,4 +1080,139 @@ TEST(Stufe05Pipeline, SurfaceOneMissingCounterColumnFallsBackToP50Heuristic) {
     fs::remove(out_na, ec);
     fs::remove(p_missing, ec);
     fs::remove(p_na, ec);
+}
+
+// -----------------------------------------------------------------------------
+// GRAPH-UMBAU 2D/3D, P1b (2026-08-06) -- Working-Set-Sweep-Kurve.
+// Die Form war seit A2 gebaut, aber NIRGENDS verdrahtet; erst die Verdrahtung in die Anhang-Facade hat
+// zwei Fehler sichtbar gemacht, die diese Tests festhalten:
+//   (a) Beschriftungs-Zerlegung: write_pgfplots_axis_options escaped JEDE Beschriftung -- die frueheren
+//       Labels trugen Mathe-Modus und eine LaTeX-Umlaut-Sequenz und erschienen literal als "\$n\$" und
+//       "Schl\textbackslash{}"ussel" im PDF.
+//   (b) entartete x-Achse: traegt der Korpus nur EINEN working_set_n (d03: durchgaengig 4096), gilt
+//       xmin==xmax -> pgfplots-Warnung "Axis range for axis x is approximately empty".
+// -----------------------------------------------------------------------------
+namespace {
+
+// working_set_n-Spalte optional (has_ws=false spiegelt den cowfix-v1-Korpus OHNE die Spalte).
+// single_ws=true -> ALLE Zeilen tragen denselben working_set_n (der d03-Fall, entartete Achse).
+void write_wide_csv_with_working_set(fs::path const& p, bool has_ws, bool single_ws) {
+    fs::create_directories(p.parent_path());
+    std::ofstream f(p);
+    f << "binary_id;ns_per_op;op_insert_p50_ns;op_lookup_p50_ns;op_erase_p50_ns;"
+      << "op_scan_p50_ns;op_rmw_p50_ns;";
+    if (has_ws) f << "working_set_n;";
+    f << "workload;two_phase_valid\n";
+
+    struct RowSpec {
+        char const*   algo;
+        std::uint64_t ws;
+        double        ns;
+    };
+    // 2 Reihen (k_ary, eytzinger) x 2 Arbeitsmengen -- bei single_ws kollabieren beide auf 4096.
+    RowSpec const specs[] = {
+        {"k_ary", 4096, 100.0}, {"k_ary", 8192, 180.0}, {"eytzinger", 4096, 90.0}, {"eytzinger", 8192, 150.0}};
+    for (auto const& s : specs) {
+        f << "search_algo=" << s.algo << "/mapping=direct;" << s.ns << ";10.0;20.0;30.0;40.0;50.0;";
+        if (has_ws) f << (single_ws ? 4096U : s.ws) << ";";
+        f << "ycsb_c;1\n";
+    }
+}
+
+} // namespace
+
+// (P1b-t1) BESTANDSVERHALTEN: ohne working_set_n-Spalte gibt es keine Punkte -> honest-empty.
+// KEINE Datei, KEIN Crash -- das ist der Grund, warum das Wiring auf cowfix-v1-Korpora risikofrei ist.
+TEST(Stufe05Pipeline, SweepCurveHonestEmptyWithoutWorkingSetColumn) {
+    auto p = comdare_user_tmp() / "p1b_no_ws.csv";
+    write_wide_csv_with_working_set(p, /*has_ws=*/false, /*single_ws=*/false);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    ASSERT_EQ(rows.size(), 4u);
+    for (auto const& r : rows) EXPECT_FALSE(r.has_working_set_n);
+
+    auto            out = comdare_user_tmp() / "p1b_sweep_empty.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    EXPECT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_empty_input);
+    EXPECT_FALSE(fs::exists(out)); // honest-empty: KEINE Datei
+
+    fs::remove(p, ec);
+}
+
+// (P1b-t2) Mit echtem Sweep: eine Kurve je Reihe, die Punkte sind die gemessenen Stuetzstellen.
+// Die Achse wird NICHT aufgeweitet (zwei verschiedene working_set_n -> Spanne ist echt).
+TEST(Stufe05Pipeline, SweepCurveEmitsOneCurvePerSeriesAndKeepsRealAxisRange) {
+    auto p = comdare_user_tmp() / "p1b_real_sweep.csv";
+    write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/false);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+    for (auto const& r : rows) EXPECT_TRUE(r.has_working_set_n);
+
+    auto            out = comdare_user_tmp() / "p1b_sweep_real.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
+    // 2 Reihen -> 2 Kurven + 2 Legenden-Eintraege.
+    EXPECT_EQ(count_occurrences(out, "\\addplot+[mark=*]"), 2u);
+    EXPECT_EQ(count_occurrences(out, "\\addlegendentry"), 2u);
+    // Die gemessenen Stuetzstellen stehen literal drin.
+    EXPECT_TRUE(file_contains(out, "(4096,"));
+    EXPECT_TRUE(file_contains(out, "(8192,"));
+    // ECHTE Spanne -> KEINE Achsen-Aufweitung (die greift nur im entarteten Fall).
+    EXPECT_FALSE(file_contains(out, "xmin="));
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (P1b-t3) Der d03-Fall: nur EIN working_set_n. Die Kurve ist ehrlich ein Punkt je Reihe; NUR die ACHSE
+// wird auf eine Oktave geweitet, damit pgfplots nicht "approximately empty" warnt und selbst willkuerlich
+// aufweitet. Es entsteht KEIN zusaetzlicher Datenpunkt.
+TEST(Stufe05Pipeline, SweepCurveSingleWorkingSetWidensOnlyTheAxisNotTheData) {
+    auto p = comdare_user_tmp() / "p1b_single_ws.csv";
+    write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/true);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    auto            out = comdare_user_tmp() / "p1b_sweep_single.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out, rows, "ns_per_op", "en"), dg::status_ok);
+    // Achse explizit eine Oktave um den einen Wert (4096) -> [2048 : 8192], log basis 2.
+    EXPECT_TRUE(file_contains(out, "xmin=2048.0000, xmax=8192.0000"));
+    // ... aber NUR die Achse: es gibt weiterhin genau EINEN Punkt je Reihe (2 Reihen -> 2 Koordinaten).
+    EXPECT_EQ(count_occurrences(out, "(4096,"), 2u);
+    EXPECT_EQ(count_occurrences(out, "(8192,"), 0u); // kein erfundener zweiter Stuetzpunkt
+    EXPECT_EQ(count_occurrences(out, "\\addplot+[mark=*]"), 2u);
+
+    fs::remove(out, ec);
+    fs::remove(p, ec);
+}
+
+// (P1b-t4) Die Achsen-Beschriftungen sind REINER ASCII-TEXT ohne LaTeX-Syntax: write_pgfplots_axis_options
+// escaped sie, also wuerde jedes $ / \ literal im PDF erscheinen. Genau das war der Fehler vor P1b.
+TEST(Stufe05Pipeline, SweepCurveLabelsSurviveTheLatexEscape) {
+    auto p = comdare_user_tmp() / "p1b_labels.csv";
+    write_wide_csv_with_working_set(p, /*has_ws=*/true, /*single_ws=*/false);
+    std::vector<dg::WideMeasurementRow> rows;
+    ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
+
+    std::error_code ec;
+    auto            out_en = comdare_user_tmp() / "p1b_labels_en.tex";
+    fs::remove(out_en, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out_en, rows, "ns_per_op", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_en, "xlabel={working set n (keys)}"));
+    EXPECT_FALSE(file_contains(out_en, "\\$")); // KEIN literal sichtbares Dollarzeichen
+
+    auto out_de = comdare_user_tmp() / "p1b_labels_de.tex";
+    fs::remove(out_de, ec);
+    ASSERT_EQ(dg::write_working_set_sweep_curve(out_de, rows, "ns_per_op", "de"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out_de, "xlabel={Arbeitsmenge n (Schluessel)}"));
+    EXPECT_FALSE(file_contains(out_de, "\\$"));
+    EXPECT_FALSE(file_contains(out_de, "textbackslash")); // KEIN zerlegter Umlaut-Befehl mehr
+
+    fs::remove(out_en, ec);
+    fs::remove(out_de, ec);
+    fs::remove(p, ec);
 }

@@ -426,8 +426,43 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             return status_io_error;
         }
 
+        // -- (5g) GRAPH-UMBAU 2D/3D, P1a (2026-08-06): die echte 3D-Flaeche je z-Feld ---------------------
+        // Die Funktion war seit L-c gebaut und honest-empty-hart (E-2b), aber NIRGENDS verdrahtet -- im
+        // Anhang stand je Metrik ausschliesslich die 2D-Heatmap. Owner-KERN E-2 verlangt 2D UND 3D.
+        // ROLLEN-SCHNITT: lc_surface_<z> (2D) und lc_surface3d_<z> (3D) sind beide Rohdaten-/QA-Ansichten
+        // derselben (search_algo x workload)-Matrix -- zwei NOMINALE Achsen tragen keine Trendaussage.
+        // KEIN Ersatz: die 6 lc_surface_<z> oben bleiben unveraendert (blankes \input in A_measurements).
+        // dg_ok-Toleranz wie (5a)-(5e): ohne gueltige Achsen gibt es keine Datei, das ist kein Fehler.
+        for (auto const z_sv : kSurfaceFields) {
+            std::string const z{z_sv};
+            if (int const rc = dg::write_surface3d_search_algo_x_workload(out_dir / ("lc_surface3d_" + z + ".tex"),
+                                                                          surf_rows, z, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_surface3d (" << z << "," << lang << ") failed " << rc << "\n";
+                return status_io_error;
+            }
+        }
+
+        // -- (5h) GRAPH-UMBAU 2D/3D, P1b (2026-08-06): Working-Set-Sweep-Kurve je z-Feld ------------------
+        // Die klassische 2D-Paper-Form: Metrik ueber die Arbeitsmengen-Groesse, eine Kurve je gesweepter
+        // Achsen-Auspraegung. Anders als die Flaeche traegt hier die x-Achse eine ECHTE Ordnung
+        // (working_set_n), die Kurve zwischen den Stuetzstellen ist also lesbar. Ebenfalls seit A2 gebaut
+        // und bis hier unverdrahtet. Auf cowfix-v1-Korpora ohne working_set_n-Spalte ist der Aufruf ein
+        // reines No-Op (status_empty_input, keine Datei) -- deshalb ist das Wiring risikofrei.
+        for (auto const z_sv : kSweepFields) {
+            std::string const z{z_sv};
+            if (int const rc =
+                    dg::write_working_set_sweep_curve(out_dir / ("ld_sweep_" + z + ".tex"), surf_rows, z, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_working_set_sweep_curve (" << z << "," << lang << ") failed "
+                          << rc << "\n";
+                return status_io_error;
+            }
+        }
+
         std::cout << "appendix-generator [" << lang
-                  << "]: 12 Kern- + 5 Darstellungs-.tex + Achsen-Inventar (honest-empty ⇒ ggf. ausgelassen) -> "
+                  << "]: 12 Kern- + 5 Darstellungs-.tex + 3D-Flaechen + Sweep-Kurven + Achsen-Inventar "
+                     "(honest-empty ausgelassen wo ohne Daten) -> "
                   << out_dir << "\n";
     }
     return status_ok;

@@ -48,6 +48,14 @@ inline constexpr int status_empty_input = 12;
 inline constexpr std::array<std::string_view, 6> kSurfaceFields = {
     "ns_per_op", "op_insert_p50_ns", "op_lookup_p50_ns", "op_erase_p50_ns", "op_scan_p50_ns", "op_rmw_p50_ns"};
 
+// P1b (2026-08-06): die z-Felder der Working-Set-Sweep-Kurve -> ld_sweep_<z>.tex. Bewusst eine
+// MINIMALAUSWAHL statt aller 6: die Kurve traegt die Metrik ueber die Arbeitsmengen-Groesse
+// (working_set_n), und nur diese drei sind im Sweep-Korpus durchgaengig besetzt. Die Auswahl ist rein
+// additiv erweiterbar. HEADER-GETRIEBEN/n-a-tolerant: fehlt die working_set_n-Spalte (cowfix-v1-Korpus),
+// liefert write_working_set_sweep_curve status_empty_input -> KEINE Datei, KEIN Fehler.
+inline constexpr std::array<std::string_view, 3> kSweepFields = {"ns_per_op", "op_insert_p50_ns",
+                                                                 "op_lookup_p50_ns"};
+
 // ── ACHSEN-INVENTAR (2026-08-03) ──────────────────────────────────────────────
 // DIE LUECKE: bis hierher kannte diese Stufe NUR die VIER variablen Mess-Achsen
 // (c2l::kVariableAxes: search_algo, node_type, memory_layout, prefetch) — exakt
@@ -147,6 +155,12 @@ struct AppendixConfig {
 // PLUS additiv (2026-08-03) das VOLLE Achsen-Inventar aus den drei generierten
 // Registry-XML, sofern die Pfade gesetzt sind:
 //   axis_inventory.tex  (Organ-Slots T00-T17 + System-Realm + Mess-Realm)
+// PLUS additiv (GRAPH-UMBAU 2D/3D, 2026-08-06) die 2D-/3D-Graph-Formen aus DENSELBEN
+// surf_rows (kein Doppel-Parsen); beide Writer existierten laengst, waren aber nie
+// verdrahtet:
+//   lc_surface3d_<z>.tex (6x, P1a: echte 3D-Flaeche je z-Feld, Rohdaten-/QA-Rolle)
+//   ld_sweep_<z>.tex     (3x, P1b: Metrik ueber working_set_n, eine Kurve je
+//                         gesweepter Achsen-Auspraegung; ohne die Spalte honest-empty)
 // HONEST-EMPTY: liefert ein Darstellungs-Writer status_empty_input (n/a-Daten), wird
 // die betreffende Datei bewusst NICHT geschrieben — das ist KEIN Facade-Fehler (die 12
 // Kern-.tex bleiben unberührt). Die 12 Kern-.tex sind byte-identisch zu den bisherigen

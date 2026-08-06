@@ -310,6 +310,10 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
 // E-2b: nicht ausgefuehrte Zellen sind Loecher (z=nan + unbounded coords=jump), NIE ein Ersatzwert.
 // Traegt die Flaeche eine ECHT GEMESSENE 0, faellt die z-Achse auf LINEAR zurueck -- eine log-Achse
 // kann die 0 weder zeigen noch ehrlich ersetzen (Begruendung + Proben im .cpp).
+// P1a (2026-08-06): ROLLE = "3D-Rohdaten-Ansicht" (Diagnose/QA), NICHT Ergebnis-Abbildung. Beide
+// Flaechen-Achsen sind NOMINAL -- die aufgespannte Flaeche traegt keine Interpolations-/Trendaussage.
+// Titel UND Caption kommen ab P1a aus EINER Quelle (surface3d_title im .cpp); vorher blieb die Caption
+// leer, weil aggregate_surface_matrix nur Labels/Matrix/Maske fuellt und niemand data.title setzte.
 [[nodiscard]] int write_surface3d_search_algo_x_workload(std::filesystem::path const&        out,
                                                          std::span<WideMeasurementRow const> rows,
                                                          std::string const& z_field, std::string const& lang = "en",
