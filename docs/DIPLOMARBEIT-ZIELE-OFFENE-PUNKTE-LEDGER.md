@@ -4199,6 +4199,335 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 nachmittag-11 (BUCHFUEHRUNGS-NACHTRAG nach dem F9/LB-Fall: vier Erhebungen konsolidiert -- 18 Positionen waren WIRKLICH verloren, 15 waren NUR ANDERS BENANNT; VIERTER Verlustmechanismus gemessen [NAMENSKOLLISION]; 15 Streichungen; GENAU ZWEI neue Vor-Trigger-Posten)
+
+> **REGEL-ZEILE 10, hier als Kopf, weil sie diesen ganzen Nachtrag ordnet:**
+> **Ein Paketschnitt, der nur in einem Session-Dokument steht, existiert fuer die Ausfuehrung nicht.**
+> Jede Kette mit Vor-Trigger- oder Abgabe-Anspruch gehoert in den Ledger UND in die
+> VOR-TRIGGER-CHECKLISTE -- ein Session-Doc ist ein BELEG, kein REGISTER.
+
+### A) DER ANLASS UND WAS DIESER NACHTRAG DEM nachmittag-10 HINZUFUEGT
+
+nachmittag-10 hat den F9/LB-Fall am Objekt belegt und die Regel formuliert. Der Owner hat daraufhin
+angeordnet, mit Codex "alle verlorengegangene Buchfuehrung neu als Analyse und code review"
+anzufragen. Vier Erhebungen (Scope A August-Sessions / B Juli+Backups / C Plaene+Architektur /
+D Code-ohne-Buchung) haben Kandidaten gemeldet. **Dieser Nachtrag konsolidiert sie, misst jede
+Zahl neu und trennt die echten Verluste von den Scheinverlusten.** Er ist ausdruecklich AUCH ein
+Entlastungs-Dokument: 15 der 33 gemeldeten Positionen waren nicht verloren, sondern nur unter
+einem anderen Namen gebucht.
+
+**Bezugsgroessen dieser Erhebung (alles mit `/usr/bin/grep` absolut gemessen, nie mit der
+ugrep-Shell-Funktion):** Ledger 5840 Zeilen; TODO-Register (`docs/sessions/20260806-REGISTER-todo-
+konsolidierung-14-tage.md`) 474 Zeilen; rund 60 Kennungen einzeln gezaehlt, davon 10 zusaetzlich
+wortgrenz-scharf gegengeprueft; rund 20 Code-Behauptungen der vier Erhebungen am Objekt
+nachgelesen. **Der Ledger wuchs waehrend der vier Erhebungen live von 5692 auf 5840 Zeilen** --
+alle Zahlen unten sind auf 5840 bezogen.
+
+### B) DIE VIER VERLUSTMECHANISMEN -- zwei davon sind neu
+
+mittag-19 hatte EINEN Mechanismus benannt, nachmittag-10 einen zweiten. Diese Erhebung findet
+zwei weitere. **Erst alle vier zusammen erklaeren die Fundlage:**
+
+- **(M1) ZEITFENSTER** (mittag-19): das Register ist per Konstruktion ein 14-Tage-Fenster ab
+  23.07.; der letzte Voll-Block davor (Par. 55, LEDGER:2829-3060, 20.07.) wurde nie ueberfuehrt.
+- **(M2) QUELLENKLASSE** (nachmittag-10): die Register-Erhebung las Ledger + Dossiers, aber NICHT
+  `docs/sessions/*`. Eine Erhebung findet nichts in einer Klasse, die sie nicht liest.
+- **(M3) NAMENSKOLLISION -- NEU, in dieser Erhebung gemessen.** Kurze Kennungen liefern Treffer
+  unter FREMDER Bedeutung. Wer die Trefferzahl als Buchungsnachweis liest, haelt eine Position
+  faelschlich fuer gebucht. **Sieben Faelle am Objekt, jeder einzeln nachgelesen:**
+
+        Kennung    Roh-Treffer   was die Treffer WIRKLICH sind                gemeinte
+                   im Ledger                                                 Position
+        A10             7        Par.-54-T2-Terminologie 20.07.                  0
+        A11             8        "A11-Audit" 20.07. + "A11-Buendel" 03.08.       0
+        A12            18        17x SUBSTRING im CRC-Hex 0xF1C1F26A1232073B
+                                 + 1x Allokator-XML "A12-19"                     0
+        O-A             5        SUBSTRING in "REPO-AUFLOESUNG", "HO-A"          0
+        KK-1..KK-9      1        "Kardinalitaets-Klassen KK-1/KK-2/KK-3"         0
+        D-8             1        SUBSTRING in "OD-8"                             0
+        L19             1        SUBSTRING in "ALL19"                            0
+
+  **Der A12-Fall ist der lehrreichste:** der golden-CRC-Anker `0xF1C1F26A1232073B` enthaelt die
+  Zeichenfolge "A12". Eine Kennung kollidiert hier nicht mit einer anderen Kennung, sondern mit
+  einer Pruefsumme. **Regel-Zeile 11 daraus:** *Eine Trefferzahl ist erst dann ein Buchungsnachweis,
+  wenn die Treffer GELESEN sind. Bei zwei- und dreistelligen Kennungen ist wortgrenz-scharf zu
+  suchen und jeder Treffer am Text zu pruefen -- sonst misst man Substrings von Pruefsummen.*
+- **(M4) STELLVERTRETERBUCHUNG -- NEU, aus dem Codex-Gegenlauf.** Gebucht wird die OBERPOSITION
+  oder die EXISTENZ eines Dokuments, nicht sein normativer Inhalt. Der Beleg steht in diesem
+  Nachtrag unter E-07: der Ledger bucht am 03.08. "E-07-Luecke ('Gate-Definition FEHLT')
+  GESCHLOSSEN" -- gemeint ist aber nur, dass das DOSSIER gelandet ist. Die Abnahmekriterien
+  K1-K5/N1-N3 stehen **0x im Ledger und 0x im Code**. **Regel-Zeile 12:** *"Definition liegt vor"
+  ist nicht "Gate ist erfuellt". Wer eine Gate-Definition bucht, bucht ihr Kriterium mit -- sonst
+  ist die Buchung ein Platzhalter.*
+
+### C) DIE NACHGEBUCHTEN POSITIONEN -- 18, die WIRKLICH verloren waren
+
+Alle folgenden sind in Ledger UND Register mit **0/0** gemessen (wortgrenz-scharf, wo die Kennung
+kurz ist) und unter keinem anderen Namen sachlich auffindbar.
+
+**(a-1) KK-5 / P-1 -- `allow_failure: true` am generierten Voll-Mess-Batch. VOR-TRIGGER.**
+QUELLE: `docs/sessions/20260806-ANKLAGE-kostenklammern-plan-diff.md:216`; Disposition in
+`docs/plaene/20260806-PLAN-kostenklammer-restposten.md` (Tabelle Abschn. 2: Schaerfe
+MESSVALIDITAET, Termin **VOR Trigger**, gebuendelt mit KK-1/PMC wegen gleicher Zeilenregion).
+ANSPRUCH: Messvaliditaet. `experiment_plan_director.hpp:1332-1333` setzt `allow_failure` auf
+**JOB-Ebene ausserhalb `rules:`** -- es deckt damit den ganzen Job, nicht nur die Mess-Zellen.
+CODE-STAND: unveraendert. **VERSCHAERFEND: das disponierende Plandokument ist UNVERSIONIERT**
+(`git status`: `?? docs/plaene/20260806-PLAN-kostenklammer-restposten.md`). Die einzige
+Disposition des schaerfsten Mess-Postens liegt damit in einer Datei, die kein Commit kennt --
+**der F9/LB-Mechanismus in Echtzeit, eine Stufe schlimmer als beim Anlassfall.**
+
+**(a-2) O-A + Kalibrier-Stichprobe -- die Bau-Matrix des golden. VOR-TRIGGER.**
+QUELLE: `docs/sessions/20260806-FAHRPLAN-hauptstrang-landung.md:428-435` und `:498-505`.
+Das Dokument sagt es selbst: *"Daraus folgt ein Vor-Trigger-Posten, der bisher in keiner Liste
+steht"*. ANSPRUCH: deklariert sind 2.097.152 Tier-Binaries, gekappt auf 131.072; ob die
+Abgabe-Messung den vollen KF-6-Vollausbau oder eine deklariert reduzierte Teilmenge faehrt, ist
+**nirgends entschieden** und entscheidet, ob der Trigger ins Zeitfenster passt. Die
+Kalibrier-Stichprobe (200 Binaries bauen, Zeit stoppen, hochrechnen; Kosten: Minuten) ist die
+Voraussetzung dafuer, dass der Owner O-A ueberhaupt entscheiden KANN. Ohne sie ist der Trigger
+laut Fahrplan *"ein Sprung ins Dunkle"*. CODE-STAND: nichts gebaut, nichts gemessen.
+
+**(a-3) A10 / HW-Erkennung P4-P6.** QUELLE:
+`docs/sessions/20260802-KATALOG-offene-strecke-gesamtplan.md:26` ("P4 CSV-Spalten/Provenienz-
+Rueckschrieb, P5 Passungs-Stempel, P6 Rest-Verdrahtung/Roundtrip"), fortgeschrieben als
+"Pflicht vor Trigger" bis `20260804-UEBERGABE-e24-vollzogen-vor-anker-strecke.md:67`, danach nie
+wieder. CODE-STAND: **nicht gebaut, und der Code sagt das selbst** --
+`hardware_probe_factory.hpp:118` "Etikett fuer Log und (spaeter, P5) das Mess-Stempel-Segment",
+`:331-333` "Heute stehen hier die Defaults ... In P5 setzt der PLANER die Zelle."
+
+**(a-4) A11 / ccache-Allowlist-Drop.** QUELLE: `KATALOG:27`, praezisiert
+`20260802-UEBERGABE-kontextende-neugruendung.md:60-61`. CODE-STAND: **nicht vollzogen, und der
+Code WIDERSPRICHT dem Plan** -- `.gitleaks.toml:25/29` traegt den `.ccache/`-Eintrag weiter, mit
+eigener Begruendung (Marathon-Scan-Falle 27.07.). **Braucht einen Owner-Entscheid, ob A11 noch
+gilt**, statt stillschweigend zu verschwinden.
+
+**(a-5) A12 / E-14 -- NAS-Creds backup1/backup2.** QUELLE: `KATALOG:28` ("Zugangs-/Mount-Strecke
+fuer die Mess-CSV-Ablage -- trigger-nah, stand bis zur Inventur in KEINER Paketliste").
+EINORDNUNG (Codex-Gegenlauf, uebernommen): **KEIN echter Vor-Trigger-Anspruch** -- Ablage und
+Transport, nicht Binary-Identitaet und nicht Messinhalt; CSV kann nachtraeglich uebertragen
+werden. Nur ein ausschliesslich direktes NAS-Schreiben ohne lokales Staging waere ein Blocker,
+dafuer gibt es keinen Beleg. **-> vor der Abgabe klaeren, nicht vor dem Trigger.**
+
+**(a-6) E-07 -- die ABNAHMEKRITERIEN K1-K5 / N1-N3.** Der Musterfall fuer M4, deshalb ausfuehrlich.
+QUELLE: `docs/sessions/backups/20260803-design-nachtraege-final/E07-gate-definition-dossier.md:48-64`
+-- normative Kriterien mit literalen Gate-Zeilen (K1 `E07_TREE_COUNT==E07_PLAN_PERMS==
+E07_BUILT_COUNT`, K2 `E07_ID_ROUNDTRIP_MISMATCH=0`, K3a/b/c XML-Differenz-Proben je Achsen-Familie,
+K4 Fenster-Treue, K5 Determinismus; N1 `E07_BYPASS_FINDINGS=0`, N2 `E07_STALE_ID_MEASURED=0`,
+N3 `E07_WINDOW_SUBSET=1`), Zeile 64: *"GO-Kriterium E-07: K1-K5 UND N1-N3 saemtlich mit literalen
+Zeilen erfuellt."* Zeile 134: B5 ist das *"'+1' der 4+1 lokalen Beweise (V7.4), vor G6/J-Kette,
+**trigger-blockierend** im A3-Paket"*.
+GEMESSEN: `K1-K5` / `N1-N3` = **0 Treffer im Ledger**; die fuenf E07_-Gate-Literale = **0 Treffer
+im gesamten Code**; `trigger-blockierend` = 0 Treffer im Ledger.
+**EINORDNUNG -- und hier korrigiere ich die Meldung von Scope B:** dies ist **KEIN neuer verlorener
+Vor-Trigger-Posten.** Die POSITION steht laengst in der VOR-TRIGGER-CHECKLISTE als **B10**
+(LEDGER:5817: "V7.4-4+1-Beweise + G6(J-0..J-5) auf GEEICHTEM Stand NEU erbringen"). Verloren ist
+nur ihr ABNAHMEKRITERIUM. **NACHBUCHUNG (hiermit vollzogen, damit der Zeiger auch dann traegt,
+wenn Session-Quellen erneut nicht ausgewertet werden):**
+> **B10 traegt E-07/B5 (B+-Baum-Steuerungs-Nachweis), trigger-blockierend. GO genau dann, wenn
+> K1-K5 UND N1-N3 saemtlich mit literalen Zeilen erfuellt sind. Definitionsquelle:
+> `docs/sessions/backups/20260803-design-nachtraege-final/E07-gate-definition-dossier.md:36-64`.
+> Der Ledger-Vermerk 03.08. "E-07-Luecke GESCHLOSSEN" bezeichnet die LANDUNG DES DOSSIERS,
+> NICHT die Erfuellung des Gates.**
+
+**(a-7) DEG-3 -- Masstree-Reference bleibt bei `keys={0}`.** QUELLE:
+`docs/sessions/20260702-SESSION-ENDE-18-fable5-manager-modus-deg1-w0-w1-done-234K-inflight.md:87`,
+mit ausdruecklicher Nachzieh-Bedingung "Nachziehen bei Masstree-Registrierung". Die Bedingung ist
+EINGETRETEN (Masstree lebt real in `tier_to_organ_mapping.hpp` und `sota_catalog.hpp`).
+CODE-STAND: `composed_masstree_search.hpp` hat **0x `for_each_record`** -- der Walk fehlt weiter.
+
+**(a-8) B2 / #180 -- reproduzierbarer IDE-Einstieg.** QUELLE:
+`docs/sessions/20260625-IMPL-AGENT-KONSOLIDIERTE-TODOS-HANDOVERS-WARTBARKEIT.md:251/284`, dort
+selbst als "neu und nicht in der bestehenden Task-DB" markiert. CODE-STAND: **0 `launch.json`
+unter `Code/`**; `docs/ENTWICKLER-IDE-EINSTIEG.md:225` bestaetigt es selbst.
+
+**(a-9) L19 -- vier Doku-Defekte + FS4-Nummerierung.** QUELLE:
+`docs/sessions/backups/20260803-od10-rt-welle/phasencheck-bericht.md:49` (Achsen-Zahl-Banner,
+Alt-CRC-Anker `0xF1C1F26A1232073B` in 6 Kommentaren, `cmake/axis_hierarchy_summary.cmake` globt
+nur `topics/`, 7 Doku-Stellen "drei Modi" trotz COMPARE). CODE-STAND: der Alt-CRC-Anker lebt
+weiter (`sota_catalog.hpp:183`, `source_catalog.hpp:183`); `axis_hierarchy_summary.cmake:19`
+durchsucht weiter nur `topics/`. FS4 hat 1 Ledger-Treffer (:3721, TOCTOU-Ecke), ist aber der
+Par. 75-Kandidatenliste nur zugesagt, nie nummeriert worden.
+
+**(a-10) bis (a-15) -- sechs Code-Anker ohne jede Buchung (Scope D, alle nachgemessen 0/0):**
+- **D-12 / L-76d GraphBfs (Viren-Pfad):** `libs/cache_engine/virus/graph_bfs.hpp` +
+  `tests/unit/test_d12_virus.cpp`, im Build registriert. Ledger 0.
+- **V41.F.2/F.3 axis-zentrische Namespace-Fassade:** `axis_centric_namespaces.hpp` beansprucht im
+  Kopf "ALLE Achsen", Zeile 24 deckt aber weiter nur **17** ab, waehrend 18 kanonisch sind --
+  eine **aktiv driftende** Zusage ohne Buchung, kein harmloser Altbestand.
+- **#175 / `load_profile_writer` ("Versprechen 3"):** real gebaut
+  (`builder/workload_driver/load_profile_writer.hpp`), sogar mit Produktions-Konsumenten
+  (`bestandslog_document.hpp`, `experiment_dock_payload.hpp`). Die 2 Ledger-Treffer fuer "#175"
+  sind **PMC-Infra, nicht dieses Deliverable** -- wieder M3.
+- **D-8 / L-74c Operabilitaets-Klassifikation:** Test pinnt eine bereits als stale erklaerte
+  Achsen-Zaehlung. Gebaut, driftend, ungebucht.
+- **KF-8 CebGenerator (Diagnose-Pfad):** deckt nur den String-Stub-Pfad (`ceb_generator.hpp:62`,
+  bewusst nicht-messender `0.0`-Stub). Ledger 0.
+- **D14b / D14c `result_ingest` / `e2e_pipeline`:** der Elternbegriff D14/`perm_runner` ist breit
+  gebucht, diese beiden Anker mit 0/0 nicht; beide Tests laufen nur gegen Mocks.
+
+**(a-16) #276 / W10-00 -- das Gate der vollen Plattform-Matrix.** `#276` ist im Ledger 33x gebucht,
+das GATE `W10-00` **0x -- und 0x in `.gitlab-ci.yml` (1278 Zeilen)**. Der gebuchte Posten hat also
+seine Abnahmebedingung verloren (dieselbe Klasse wie E-07, eine Stufe kleiner).
+
+**(a-17) Chaos-Gate / User-Direktive #459.** QUELLE:
+`docs/sessions/20260626-KONSOLIDIERT-OFFENE-TASKS-SELF-HANDOFFS.md:99-100` (Schwelle >5%,
+3x-Rerun, Warn-Log), dort selbst als "NUR in 06-25-Docs verankert -- nicht verlieren" markiert und
+als "GERETTET" verbucht -- **und trotzdem wieder aus Ledger und Register herausgefallen (0/0).**
+CODE-STAND: sauber gebaut (`builder/commands/drift_detector.hpp`: `threshold = 0.05`,
+`max_reruns`, `run_with_drift_gate`), aber **ohne Produktions-Aufrufer**.
+**KORREKTUR AN EINER CODEX-BEHAUPTUNG (Scope B hat sie selbst gefangen, ich habe sie nachgemessen):**
+ein behaupteter CI-Chaos-Job in `.gitlab-ci.yml:549` existiert **nicht** -- `grep -ci chaos` ueber
+die ganze Datei = **0**; Zeile 549 ist `thesis:pdf`.
+
+**(a-18) A9b / XML-DEAKT (`active="true|false"`-Kanal).** Abschlussmeldung liegt nur in
+`docs/sessions/backups/20260802-kontext-neugruendung-abend-workflows/ergebnisse/42-e069af42.md:114`
+("Welle KOMPLETT"); `A9b` = 0/0 wortgrenz-scharf. Klasse (c): gebaut, Buchung fehlt.
+
+### D) KLASSE (b) -- gebucht, aber Anspruch verloren (drei, die keine Neu-Nummer brauchen)
+
+- **#184 Loader-Verdrahtung.** Ledger 8x gebucht (u.a. :1235 "der eigentliche #184-Rest und
+  **Voraussetzung fuer die Messwirksamkeit** der #269-Akten"), Register **0**. CODE-STAND am
+  Objekt: `load_or_generate_ycsb` ist in `dataset_loader.hpp:106` definiert; **saemtliche
+  Nicht-Test-Fundstellen sind Kommentare oder Meldungstexte** (`profile_run_entry.hpp:542`,
+  `profile_runner.hpp:188`, `validate_profile.hpp:33/:344`, `xml_config_parser.hpp:180`), echte
+  Aufrufe nur in `test_184_dataset_loader_wiring.cpp`. **Der Code dokumentiert seine eigene Luecke**
+  ("der dokumentierte offene [Punkt]"). Damit ist die heutige Delta-Pruefung praezisiert: sie hatte
+  #184 unter den erledigten Datensatz-Akten subsumiert -- das war eine ANDERE Position.
+- **AP-12 / #246 Fairness-Harness.** Ledger 4x ("offen"), Register 0, `FairnessHarness` = **0
+  Dateien**. Nicht gebaut, Anspruch nie ins Register ueberfuehrt.
+- **REV-CXX / REV-DATA / REV-CI / REV-TEX -- 30 Review-TODOs.** Der Range steht im Ledger
+  (:1050: "REV-CXX-01..05, REV-DATA-01..14, REV-CI-01..06, REV-TEX-01..05; 3 kritisch/19 hoch/..."),
+  im Register **0**. Relevant, weil die P0-Teilmenge ausdruecklich "vor jeder wissenschaftlichen
+  Vollmessung" bedingt ist. Die Einzelansprueche sind nicht nachgehalten.
+- **AP-7b-3 / #27 -- der Ledger widerspricht sich selbst.** :768 (08.07.) "#27 7b-3 Option B
+  VOLLZOGEN", :2876/:2937 (20.07., juenger und damit geltend) "DEFERRED/gated (in
+  Par. 48-Erledigt-Zeilen faelschlich als erledigt gefuehrt; hiermit als OFFEN korrigiert)". AM OBJEKT
+  ENTSCHIEDEN: **beide haben teilweise recht.** Die Primitive IST gebaut (`group_match_mask` in
+  allen vier ISA-Headern), aber es gibt eine ECHTE Integrationsluecke: `SwissTableOrganSimd` wird in
+  `tier_to_organ_mapping.hpp:86` definiert und **nirgends konsumiert**. Der 20.07.-Widerruf haelt
+  im Ergebnis, seine Begruendung ist falsch. Nach der Abgabe.
+
+### E) DIE STREICHUNGEN -- 15 Positionen, die NICHT verloren waren, je mit dem ueberholenden Entscheid
+
+**Eine Streichung ist so wertvoll wie ein Fund.** Diese Positionen wurden gemeldet und sind am
+Objekt entlastet:
+
+1. **LB-0..LB-6 / OE-B / F9-Paketschnitt** -- ueberholt durch **nachmittag-10** (LEDGER:4418-4475).
+   Zum Zeitpunkt der Owner-Ruege war `LB-[0-9]` = 0/0; **heute 8 Ledger-Treffer**, `OE-B` = 3.
+   Der BUCHUNGS-Fall ist geschlossen. Die ARBEIT lebt weiter als Task #9 (LB-6 Stufe 1) und als
+   `docs/plaene/20260806-PLAN-lb6-stufe1-oeb-baumform.md`.
+2. **KK-1 / PMC** -- bereits gebucht: **nachmittag-10 Abschnitt D** (unabhaengig nachgemessen:
+   `grep -c COMDARE_ENABLE_PMC` auf `experiment_plan_director.hpp` = 0; `option(...OFF)`;
+   `m3v2_pmc_smoke.cpp:71` wertet `pmc_seam_ok = delta.available || counters_all_zero`) **und**
+   Task #11. Kein Verlust, sondern der bestgebuchte Posten des Tages.
+3. **KK-2 / K-01 (`COMDARE_BESTANDSLOG` "wird nirgends gesetzt")** -- **WIDERLEGT**, zweifach:
+   Ledger **nachmittag-8 Abschnitt C** und `PLAN-kostenklammer-restposten.md` Abschn. 1.1.
+   `experiment_plan_director.hpp:952-955` reicht die Variable per `append_forward_var_literal` real
+   in das GENERIERTE CI-YAML durch, belegt durch `test_experiment_plan_director.cpp:845-860`.
+   Fehlerklasse: ein Repo-Grep wurde als Laufzeit-Aussage gelesen. Rest = Infra-/Owner-Frage.
+4. **KK-3 / K-05 (doppelter Job-Schluessel `contract:axis-version-lock`)** -- **GEHEILT**:
+   genau eine, unbedingte Definition (`.gitlab-ci.yml:447`) plus neue Rueckfall-Wache
+   `scripts/ci_yaml_key_guard.sh`.
+5. **KK-9 Hauptteil (`bytes_in_use_peak`)** -- **selbst-entlastet**: `f15_compare/main.cpp:493`
+   weist die Spalte ausdruecklich als honest-0 aus. Nur der Doku-Rest (P-5) bleibt.
+6. **KK-4 / KK-6 / KK-8 (Bestandslog-Scope)** -- **protokollierte Vertagung nach der Abgabe**
+   (nachmittag-8 Abschn. E + nachmittag-10 Abschn. H). Eine getroffene und protokollierte Vertagung
+   ist keine Kostenklammer.
+7. **K-04 / K-07 / K-08 / K-09** -- entlastet in `PLAN-kostenklammer-restposten.md` Abschn. 1.3-1.6;
+   K-04 sogar **umklassifiziert zu geschuetzter bezahlter Vollstaendigkeit** (fail-closed-Wache,
+   die eine unvollstaendige Identitaet nicht raet).
+8. **E-07 als NEUER Vor-Trigger-Posten** -- gestrichen, weil die Position als **B10** in der
+   VOR-TRIGGER-CHECKLISTE steht (LEDGER:5817). Nachgebucht wird nur das Kriterium (s. C/a-6).
+9. **Der behauptete CI-Chaos-Job** -- gestrichen: `grep -ci chaos .gitlab-ci.yml` = **0**.
+   *Das entlastet die Aufgabe nicht -- es beweist, dass der Job fehlt* (Codex-Praezisierung,
+   uebernommen).
+10. **R1-R9 / Nacht-Audit 22.07.** -- der Inhalt wurde befolgt und spaeter sauber archiviert:
+    `ci/archive/perm-matrix-fallback.yml` traegt literal "R8 (Nacht-Audit 2026-07-22)" (:120) und
+    "R2-Fix, 2026-07-22" (:252/:266); der Mechanismus ist unter Owner-Entscheid **RF-4** archiviert
+    (LEDGER:3580). Offen bleibt nur, ob R3-R7/R9 ebenso vollzogen sind -- **UNBELEGT**, keine
+    Codespur gefunden, weder bestaetigt noch widerlegt.
+11. **KF-4 / KF-7 / KF-10 / KF-11 und D-7a / D-7b** -- Scope D hat den eigenen Erstbefund nach
+    Codex-Beleg selbst zurueckgezogen: sachlich gebucht unter #221/H-9 (LEDGER:591/845),
+    "Wiederholungen" (:381/1545) und `BuildVariantDefinitionV1`/H-10 (:1761).
+12. **A8-S3 / A8-S4** -- Scope D hat einen eigenen Regex-Fehler gefunden ("a8s3" statt "A8-S3");
+    nach Korrektur klar gebucht (LEDGER:3802-3804, 3876).
+13. **#188-4c-Strang, #51-Storage, W12, GO3/GO5, GN-11, #46a/#48** (Scope C) -- durchgehend sauber
+    im Ledger verbucht; `#188` 20 Treffer, `#51` 15, `W12` 28, `GN-11` 11. **Scope C fand in
+    `docs/plaene/` und `docs/architektur/` KEINEN einzigen Fall der Klasse (a)** -- der
+    LB-Mechanismus ist eine Eigenheit von `docs/sessions/`, nicht der Plandokumente.
+14. **#171 / #172** (sota_catalog / best_binary_selector) -- gebucht (LEDGER:587/841).
+15. **AP-13 / AP-5 / AP-9, D-15, KF-12 / KF-5 / KF-9, OD-2 / OD-10, RF-1/2/3/6/7** -- alle mit
+    korrekter Bindestrich-Schreibweise gebucht.
+
+### F) PRIORITAETEN NACH FRIST (Trigger Do 07.08.; Abgabe Fr 08.08.; Phase 6 = Owner-GO-Stopp)
+
+**(i) VOR-TRIGGER-PFLICHT mit echtem Anspruch -- GENAU ZWEI SIND NEU:**
+
+| # | Posten | warum nach dem Trigger nicht nachholbar | Status |
+|---|---|---|---|
+| 1 | **O-A + Kalibrier-Stichprobe** | bestimmt, WELCHE Matrix ueberhaupt gebaut/gemessen wird; spaetere Aenderung = neuer Bau- und Messlauf | **NEU, stand in keiner Liste** |
+| 2 | **KK-5 / P-1 `allow_failure`** | jobweites `allow_failure` laesst einen unvollstaendigen Voll-Mess-Batch formal gruen erscheinen -- Messvaliditaet | **NEU im Ledger; Disposition nur in UNVERSIONIERTER Datei** |
+| 3 | **E-07 / B10** (Kriterium K1-K5 + N1-N3) | Dossier: "trigger-blockierend"; prueft Kardinalitaet, id-Roundtrip, XML-Kausalitaet, Bypass, Stale-Artefakte | Position gebucht (B10), **Kriterium hiermit nachgebucht** |
+| 4 | **LB-6 Stufe 1** (Lager-Basis-Tests) | Owner-Entscheid 01.08. "der Voll-Bau-Trigger IST der Baum-Vollausbau" | bereits Task #9 + nachmittag-10 |
+| 5 | **KK-1 / PMC** | Compile-Option beruehrt Binary-Identitaet + Messvaliditaet | bereits Task #11; **eigener Workflow, kein Blocker des golden-Haupttriggers** |
+
+**AUSDRUECKLICH KEIN Vor-Trigger-Anspruch** (gegen die Meldung von Scope A, nach Codex-Gegenlauf
+und eigener Pruefung): **A12/NAS-Creds** (Ablage/Transport, nicht Binary-Identitaet; CSV ist
+nachtraeglich uebertragbar) und **A10/P4-P6** (Provenienz-Spalten sind vor dem MESSLAUF faellig,
+nicht vor einem reinen Vorbau -> (ii)).
+
+**(ii) VOR DER ABGABE:** A10/P4-P6 (CSV-Provenienz, sonst fehlt der Mess-Zeile ihre
+Hardware-Herkunft); A12/NAS-Creds klaeren (Ablage der Mess-CSV); A11/ccache-Drop **als
+OWNER-ENTSCHEID** (der Code widerspricht dem Plan -- eines von beiden muss weichen) ;
+#184-Loader-Rest (Ledger nennt ihn "Voraussetzung fuer die Messwirksamkeit"); REV-*-P0-Teilmenge
+(3 kritisch, ausdruecklich "vor jeder wissenschaftlichen Vollmessung").
+
+**(iii) NACH DER ABGABE:** DEG-3; B2/#180; AP-12/#246; #276/W10-00; AP-7b-3-Integrationsluecke ;
+Chaos-Gate-Produktionsanschluss; KK-4/6/8 (bereits so vertagt); P-2/P-3 aus dem
+Kostenklammer-Plan; R3-R7/R9-Klaerung.
+
+**(iv) NUR NACHBUCHEN, KEINE ARBEIT:** D-12/GraphBfs; KF-8; #175/load_profile_writer ;
+D-8/L-74c; D14b/D14c; A9b; L19/FS4-Nummerierung. **Mit einer Ausnahme, die KEINE reine
+Nachbuchung ist: V41.F.2/F.3** (`axis_centric_namespaces.hpp:24` sagt "ALLER 17 Achsen" bei 18
+kanonischen Achsen) -- das driftet aktiv und gehoert in den Aufraeumpass, nicht ins Archiv.
+
+### G) DIE BILANZ, weil der Owner sie ausdruecklich verlangt hat
+
+- **18 Positionen waren WIRKLICH verloren** (0/0 in Ledger UND Register, unter keinem anderen Namen
+  auffindbar): KK-5; O-A+Kalibrier; A10; A11; A12; E-07-Kriterien; DEG-3; B2/#180; L19+FS4 ;
+  D-12; V41.F.2/F.3; #175; D-8; KF-8; D14b/D14c; W10-00; Chaos-Gate/#459; A9b.
+- **15 Positionen waren NUR ANDERS BENANNT oder laengst gebucht** (Abschnitt E) -- fast die Haelfte
+  der Meldungen. Bei **sieben** davon haette eine naive Trefferzaehlung sogar das Gegenteil
+  behauptet ("gebucht", obwohl fremde Bedeutung) -- das ist M3.
+- **Nur ZWEI der 18 tragen einen echten Vor-Trigger-Anspruch** (KK-5/P-1 und O-A+Kalibrier-
+  Stichprobe). Drei weitere Vor-Trigger-Posten waren bereits gebucht. **Der Trigger ist also
+  nicht durch einen Berg unbekannter Arbeit blockiert, sondern durch zwei benannte Posten.**
+- **DER SCHAERFSTE STRUKTURBEFUND ist nicht eine Position, sondern ein Ort:** die Disposition des
+  einzigen neuen Messvaliditaets-Postens (KK-5) liegt in einer **unversionierten** Datei. Der
+  F9/LB-Fall wiederholt sich gerade -- eine Stufe schlimmer, weil ein untracked File nicht einmal
+  ein Beleg ist.
+
+### H) WAS DIESE ERHEBUNG NICHT LEISTET (ehrlich ausgewiesen)
+
+- **Codex-Lage:** der vorgeschriebene Sandbox-Modus faellt in dieser Umgebung reproduzierbar mit
+  `bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted` aus -- ueber alle vier Scopes und
+  meinen eigenen Lauf hinweg, mit frischen Threads. Ich habe **nicht** die Rechte erweitert,
+  sondern Codex den gesamten Beweisstoff im Prompt mitgeliefert; es hat rein am Text gearbeitet.
+  Ertrag: **M4 (Stellvertreterbuchung) stammt von Codex**, ebenso die Entlastung von A12 als
+  Nicht-Vor-Trigger und die Praezisierung zum Chaos-Job. **Eine Codex-Aussage habe ich korrigiert:**
+  es hat bei #276/W10-00 die Chaos-Gate-Mechanik ("Schwelle und Wiederholungslogik existieren") mit
+  #276 verwechselt -- das sind zwei verschiedene Posten.
+- **UNBELEGT und daher nicht als Fund gefuehrt:** R3-R7/R9 des Nacht-Audits 22.07. (keine
+  Codespur, weder bestaetigt noch widerlegt); ein von Scope A gemeldeter Posten
+  "GATE-7-Supersede-Pflicht" (`GATE-7` = 0 Treffer in `docs/sessions/`, die Meldung war
+  abgeschnitten und ist nicht nachpruefbar); ein von Scope C angekuendigter "Fund 7", der im
+  Bericht fehlt; die Reichweite von #276 jenseits des W10-00-Gates.
+- **Methodische Groesstluecke (von Scope C selbst ausgewiesen, hier uebernommen):** rund 113 der
+  133 Dateien in `docs/plaene/` + `docs/architektur/` wurden per Keyword-Grep gesiebt, nicht
+  volltextlich gelesen. Ein LB-artiger Fall, der keines der Siebwoerter fuehrt, waere durchgefallen.
+- **Diese Erhebung ist selbst M2-anfaellig:** `docs/audits/`, die vier repo-lokalen Ledger
+  (ce/prt-art/thesis) und das Cluster-Ledger waren **nicht** im Scope. Wer diesen Nachtrag als
+  vollstaendig liest, macht genau den Fehler, den er beschreibt.
+
 ## NACHTRAG 06.08.2026 nachmittag-10 (VOLLZUG: beide Repos gruen, `main`-FF in beiden vollzogen, Thesis Gate 8 gelandet; REGEL-ZEILEN 8+9+10 -- ein Zeiger kann RUECKWAERTS zeigen, eine rescue-Ref ist KEINE Landung, und ein Paketschnitt nur im Session-Doc existiert fuer die Ausfuehrung nicht; A1 = LANDEN mit Auflage; der PMC-Sperrposten ist SCHWERER als nachmittag-9 sagt; der F9/LB-Paketschnitt fehlt in Ledger UND Register -- INNERHALB des 14-Tage-Fensters)
 
 ### A) DER STAND, jede Zahl am Objekt erhoben
