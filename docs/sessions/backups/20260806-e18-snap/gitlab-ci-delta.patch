@@ -1,3 +1,5 @@
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 3e0f720..f0fd28f 100644
 --- a/.gitlab-ci.yml
 +++ b/.gitlab-ci.yml
 @@ -837,8 +837,9 @@ measure:golden-320:
@@ -56,7 +58,7 @@
        AF_DEST_REPO="$THESIS_CLONE" \
        AF_BRANCH="development" \
        AF_LANGS="de,en" \
-@@ -1095,29 +1126,80 @@ anhang:forward:
+@@ -1095,29 +1126,97 @@ anhang:forward:
        AF_PROV_PIPELINE_URL="${CI_PIPELINE_URL:-NA}" \
        AF_PROV_SUPER_SHA="${CI_COMMIT_SHA:-NA}" \
        AF_PROV_SUPER_REF="${CI_COMMIT_REF_NAME:-NA}" \
@@ -86,19 +88,36 @@
 +        echo "=== anhang:forward OK: Gitlink aktuell + kein neuer Schnappschuss -> kein Bump-Commit ==="; exit 0
        fi
 +      # VOLLSTAENDIGKEITS-WACHE: ein Compile-Beleg ist nur mit ALLEN DREI Pflichtstuecken wahr
-+      # (<haupt>.pdf + compile-export.txt + QUELLSTAND.txt). Ein halber Ordner wird NICHT gestagt,
-+      # sondern bricht LAUT ab: im Repo saehe er vollstaendig aus und belegte einen Compile, den es
-+      # so nie gab. Geprueft werden nur Ordner mit ausstehender Aenderung -- bereits committete
-+      # Belege bleiben unangetastet (Messdaten-Doktrin).
++      # (<haupt>.pdf + compile-export.txt + QUELLSTAND.txt) UND einer 40-stelligen thesis_commit_sha.
++      # Ein halber Ordner wird NICHT gestagt, sondern bricht LAUT ab: im Repo saehe er vollstaendig
++      # aus und belegte einen Compile, den es so nie gab. Geprueft werden nur Ordner mit
++      # ausstehender Aenderung -- bereits committete Belege bleiben unangetastet (Messdaten-Doktrin).
++      # Dieselben Pflichtstuecke prueft der Kern in seinem gemeinsamen Beleg-Validator; hier steht
++      # die zweite, unabhaengige Instanz derselben Regel (der Writeback ist die letzte Wache vor dem Repo).
 +      for snap in "$SNAP_DIR"/*/; do
 +        [ -d "$snap" ] || continue
 +        [ -n "$(git status --porcelain -uall -- "$snap")" ] || continue
-+        if [ "$(find "$snap" -maxdepth 1 -type f -name '*.pdf' | wc -l)" -lt 1 ] || [ ! -s "$snap/compile-export.txt" ] || [ ! -s "$snap/QUELLSTAND.txt" ]; then
-+          echo "FEHLER: unvollstaendiger Compile-Schnappschuss '$snap' -- erwartet <haupt>.pdf + compile-export.txt + QUELLSTAND.txt:" >&2
++        if [ "$(find "$snap" -maxdepth 1 -type f -name '*.pdf' | wc -l)" -lt 1 ] || [ ! -s "$snap/compile-export.txt" ] || [ ! -s "$snap/QUELLSTAND.txt" ] || ! grep -qE '^thesis_commit_sha=[0-9a-f]{40}$' "$snap/QUELLSTAND.txt"; then
++          echo "FEHLER: unvollstaendiger Compile-Schnappschuss '$snap' -- erwartet <haupt>.pdf + compile-export.txt + QUELLSTAND.txt mit thesis_commit_sha=<40-hex>:" >&2
 +          find "$snap" -maxdepth 1 -type f | sed 's/^/  /' >&2
 +          echo "       NICHTS wird gestagt (kein halber Beleg im Repo)." >&2; exit 1
 +        fi
 +      done
++      # .tmp-RESTE: der Kern baut jeden Schnappschuss transaktional in ".<name>.tmp" auf und zieht ihn
++      # erst nach bestandener Pruefung ATOMAR auf den Endnamen; sein trap raeumt eigene Reste weg.
++      # Ueberlebt ein Rest trotzdem (SIGKILL des Runners), ist er ein HALBSTAND -- er darf niemals
++      # per `git add` in das Repo geraten. Die Schleife oben sieht ihn nicht (Punkt-Praefix), darum
++      # hier explizit: melden und ENTFERNEN (der Rest gehoert keinem lebenden Lauf mehr, es ist kein
++      # Messdatum und kein Beleg, sondern ein abgebrochener Schreibvorgang).
++      for rest in "$SNAP_DIR"/.*.tmp; do
++        [ -d "$rest" ] || continue
++        echo "WARNUNG: abgebrochener Schnappschuss-Halbstand gefunden -> wird NICHT gestagt: $rest" >&2
++        find "$rest" -maxdepth 1 -type f | sed 's/^/  /' >&2
++        rm -rf -- "$rest"
++      done
++      # PENDING-<LAUF-KENNUNG>.txt (Recovery-Identitaet des Kerns) liegt als DATEI direkt in
++      # $SNAP_DIR und wird vom `git add` unten mitgenommen -- genau so ist es gewollt: nur wenn diese
++      # Datei im 288-Repo landet, weiss ein spaeterer Lauf, welchem 289-Stand ein Beleg fehlt.
        git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
        git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
        git fetch origin "$CI_COMMIT_BRANCH"

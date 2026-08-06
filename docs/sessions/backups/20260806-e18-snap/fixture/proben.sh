@@ -131,11 +131,20 @@ grep -q "Beleg im REMOTE-Stand vorhanden" "$H/h1_remote.log" && ok "Beleg im REM
 
 # ------------------------------------------------------------------ HOCH-2: Kollision
 kopf "HOCH-2  Kollisions-Wahl gegen lokal + REMOTE + mkdir-Lock"
+# SEIT NB2 traegt der Ordnername die LAUF-KENNUNG (runneruebergreifend eindeutig, Codex NB2-1).
+# Damit kollidieren zwei Laeufe praktisch nicht mehr -- die drei Wachen bleiben aber als GURT
+# bestehen, und genau den pruefen diese Proben. Sie ERZWINGEN die Kollision darum ueber
+# AF_SNAP_LAUF_KENNUNG (die CI setzt diese Variable nie).
+KENN=r42-j4242
 TS=20260806-130000
 git clone -q -b development "$R/super.git" "$R/w_push"
+mkdir -p "$R/w_push/measurement/thesis_compiles/$TS-$KENN"
+printf 'thesis_commit_sha=cafebabecafebabecafebabecafebabecafebabe\n' > "$R/w_push/measurement/thesis_compiles/$TS-$KENN/QUELLSTAND.txt"
+printf 'PDF eines FREMDEN Runners\n' > "$R/w_push/measurement/thesis_compiles/$TS-$KENN/diplomarbeit.pdf"
+# Derselbe Fremd-Beleg zusaetzlich unter dem ALTEN Namensschema (nur Zeitstempel) -- die
+# ALT-Gegenprobe unten waehlt genau diesen Namen und laeuft damit in den add/add-Konflikt.
 mkdir -p "$R/w_push/measurement/thesis_compiles/$TS"
-printf 'thesis_commit_sha=cafebabecafebabecafebabecafebabecafebabe\n' > "$R/w_push/measurement/thesis_compiles/$TS/QUELLSTAND.txt"
-printf 'PDF eines FREMDEN Runners\n' > "$R/w_push/measurement/thesis_compiles/$TS/diplomarbeit.pdf"
+cp "$R/w_push/measurement/thesis_compiles/$TS-$KENN/"* "$R/w_push/measurement/thesis_compiles/$TS/"
 git -C "$R/w_push" add -A -- measurement >/dev/null
 git -C "$R/w_push" -c user.name=f -c user.email=f@l commit -q -m "fremder Runner landet $TS"
 git -C "$R/w_push" push -q origin development
@@ -143,9 +152,9 @@ git clone -q -b development "$R/super.git" "$R/w_koll"
 git -C "$R/w_koll" checkout -q "$(git -C "$R/w_koll" rev-parse HEAD~1)"   # kennt den fremden Ordner NICHT
 neue_tabellen "$R/w_koll" "Lauf Kollision"
 git clone -q -b development "$R/dest.git" "$R/d_koll"
-E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/d_koll" AF_WORK_ROOT="$R/w_koll" AF_NO_PUSH=true > "$H/h2_remote.log"
+E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/d_koll" AF_WORK_ROOT="$R/w_koll" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true > "$H/h2_remote.log"
 grep -q "existiert bereits im REMOTE-Stand" "$H/h2_remote.log" && ok "REMOTE-Belegung erkannt"
-pruef "Suffix gewachsen" "$([ -d "$R/w_koll/measurement/thesis_compiles/$TS-2" ] && echo ja || echo nein)" "ja"
+pruef "Suffix gewachsen" "$([ -d "$R/w_koll/measurement/thesis_compiles/$TS-$KENN-2" ] && echo ja || echo nein)" "ja"
 # Gegenprobe ALT: waehlt den belegten Namen -> add/add-Konflikt beim 288-Merge
 git clone -q -b development "$R/super.git" "$R/w_koll_alt"
 git -C "$R/w_koll_alt" checkout -q "$(git -C "$R/w_koll_alt" rev-parse HEAD~1)"
@@ -161,26 +170,30 @@ git -C "$R/w_koll_alt" -c user.name=f -c user.email=f@l merge --no-edit origin/d
 pruef "ALT: 288-Merge des Writebacks" "$?" "1"
 grep -q "CONFLICT (add/add)" "$H/h2_merge.log" && ok "add/add-Konflikt literal -> der Writeback-Retry haette abgebrochen (Beleg weg)"
 git -C "$R/w_koll_alt" merge --abort 2>/dev/null
-# mkdir-Lock: haengender Symlink -> [ -e ] ist FALSE, mkdir scheitert trotzdem (wie beim verlorenen Rennen)
+# mkdir-Lock: haengender Symlink auf dem .tmp-Namen -> [ -e ] ist FALSE, mkdir scheitert trotzdem
+# (wie beim verlorenen Rennen). Seit NB2 wird im versteckten ".<name>.tmp" gearbeitet -- der Lock
+# sitzt darum dort, nicht mehr auf dem Endnamen.
 TS2=20260806-140000
 git clone -q -b development "$R/super.git" "$R/w_lock"; neue_tabellen "$R/w_lock" "Lauf Lock"
 git clone -q -b development "$R/dest.git" "$R/d_lock"
-mkdir -p "$R/w_lock/measurement/thesis_compiles"; ln -s /nicht/vorhanden "$R/w_lock/measurement/thesis_compiles/$TS2"
-E18_FIXED_TS=$TS2 lauf AF_DEST_REPO="$R/d_lock" AF_WORK_ROOT="$R/w_lock" AF_NO_PUSH=true > "$H/h2_lock.log"
+mkdir -p "$R/w_lock/measurement/thesis_compiles"
+ln -s /nicht/vorhanden "$R/w_lock/measurement/thesis_compiles/.$TS2-$KENN.tmp"
+E18_FIXED_TS=$TS2 lauf AF_DEST_REPO="$R/d_lock" AF_WORK_ROOT="$R/w_lock" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true > "$H/h2_lock.log"
 grep -q "mkdir-Lock verloren" "$H/h2_lock.log" && ok "mkdir-Lock-Zweig genommen"
-pruef "Lock-Fall weicht auf Suffix aus" "$([ -d "$R/w_lock/measurement/thesis_compiles/$TS2-2" ] && echo ja || echo nein)" "ja"
-# zwei ECHT parallele Laeufe, fixer Zeitstempel, gemeinsame Wurzel
+pruef "Lock-Fall weicht auf Suffix aus" "$([ -d "$R/w_lock/measurement/thesis_compiles/$TS2-$KENN-2" ] && echo ja || echo nein)" "ja"
+# zwei ECHT parallele Laeufe, fixer Zeitstempel, ERZWUNGEN gleiche Kennung, gemeinsame Wurzel:
+# so entscheidet allein der atomare Lock -- genau der Gurt, der auch nach NB2 bestehen bleibt.
 TS3=20260806-150000
 git clone -q -b development "$R/super.git" "$R/w_par"; neue_tabellen "$R/w_par" "Lauf Parallel"
 git clone -q -b development "$R/dest.git" "$R/d_parA"; git clone -q -b development "$R/dest.git" "$R/d_parB"
 SNAPPAR="$R/w_par/measurement/thesis_compiles"
 for w in A B; do
   ( E18_FIXED_TS=$TS3 lauf AF_DEST_REPO="$R/d_par$w" AF_WORK_ROOT="$R/w_par" AF_SNAPSHOT_ROOT="$SNAPPAR" \
-      AF_TMP="$(mktemp -d)" AF_NO_PUSH=true > "$H/h2_par_$w.log" ) &
+      AF_SNAP_LAUF_KENNUNG="$KENN" AF_TMP="$(mktemp -d)" AF_NO_PUSH=true > "$H/h2_par_$w.log" ) &
 done
 wait
 pruef "2 parallele Laeufe -> 2 verschiedene Belege" \
-  "$( { [ -d "$SNAPPAR/$TS3" ] && [ -d "$SNAPPAR/$TS3-2" ]; } && echo ja || echo nein)" "ja"
+  "$( { [ -d "$SNAPPAR/$TS3-$KENN" ] && [ -d "$SNAPPAR/$TS3-$KENN-2" ]; } && echo ja || echo nein)" "ja"
 
 # ------------------------------------------------------------------ HOCH-3: non-FF
 kopf "HOCH-3  Re-Fixierung nach non-FF-Push (Merge-Commit)"
@@ -271,6 +284,33 @@ pruef "NEU stagt nichts" "$(git -C "$R/w_halb" diff --cached --name-only | wc -l
 wb "$H/wb_alt.sh" "$R/w_halb" > "$H/p76_alt.log"
 grep -q 'create mode .*20260806-170000' "$H/p76_alt.log" && ok "ALT committet den halben Beleg klaglos"
 
+kopf "patch NB2  Writeback: 40-hex-Wache + .tmp-Halbstand wird NIE gestagt"
+git clone -q -b development "$R/super.git" "$R/w_hex"
+git -C "$R/w_hex" config user.name f; git -C "$R/w_hex" config user.email f@l
+export NEW_THESIS_SHA=$(git -C "$R/w_hex" ls-tree HEAD thesis/diplomarbeit | awk '{print $3}')
+DH="$R/w_hex/measurement/thesis_compiles/20260806-190000-r1-j1"; mkdir -p "$DH"
+printf 'PDF\n' > "$DH/diplomarbeit.pdf"; printf 'log\n' > "$DH/compile-export.txt"
+printf 'thesis_commit_sha=nicht-hex\n' > "$DH/QUELLSTAND.txt"
+wb "$H/wb_neu.sh" "$R/w_hex" > "$H/pnb2_hex.log"
+pruef "NEU: RC bei nicht-hex thesis_commit_sha" "$?" "1"
+grep -q 'thesis_commit_sha=<40-hex>' "$H/pnb2_hex.log" && ok "Writeback nennt die verletzte Formregel literal"
+pruef "NEU stagt nichts" "$(git -C "$R/w_hex" diff --cached --name-only | wc -l)" "0"
+git clone -q -b development "$R/super.git" "$R/w_tmp"
+git -C "$R/w_tmp" config user.name f; git -C "$R/w_tmp" config user.email f@l
+export NEW_THESIS_SHA=$(git -C "$R/w_tmp" ls-tree HEAD thesis/diplomarbeit | awk '{print $3}')
+DT="$R/w_tmp/measurement/thesis_compiles/.20260806-191000-r1-j1.tmp"; mkdir -p "$DT"
+printf 'HALBE-PDF\n' > "$DT/diplomarbeit.pdf"
+DG="$R/w_tmp/measurement/thesis_compiles/20260806-191000-r1-j2"; mkdir -p "$DG"
+printf 'PDF\n' > "$DG/diplomarbeit.pdf"; printf 'log\n' > "$DG/compile-export.txt"
+printf 'thesis_commit_sha=%s\n' "$NEW_THESIS_SHA" > "$DG/QUELLSTAND.txt"
+wb "$H/wb_neu.sh" "$R/w_tmp" > "$H/pnb2_tmp.log"
+grep -q 'abgebrochener Schnappschuss-Halbstand' "$H/pnb2_tmp.log" && ok ".tmp-Halbstand literal gemeldet"
+pruef ".tmp-Halbstand entfernt" "$([ -e "$DT" ] && echo da || echo weg)" "weg"
+pruef "kein .tmp-Pfad im 288-Remote" \
+  "$(git -C "$R/super.git" ls-tree -r --name-only development | grep -c '\.tmp/')" "0"
+pruef "der VOLLSTAENDIGE Beleg daneben landet trotzdem" \
+  "$(git -C "$R/super.git" ls-tree -r --name-only development | grep -c '20260806-191000-r1-j2/')" "3"
+
 kopf "Commit-Text  dritter Fall: nur Beleg, Gitlink unbewegt"
 git clone -q -b development "$R/super.git" "$R/w_txt"
 git -C "$R/w_txt" config user.name f; git -C "$R/w_txt" config user.email f@l
@@ -323,8 +363,14 @@ grep -q "NO-OP: keine Anhang-Quelle" "$H/g_leer.log" && ok "honest-empty unverae
 pruef "honest-empty legt keine Wurzel an" "$([ -e /tmp/e18snap-nie ] && echo ja || echo nein)" "nein"
 git clone -q -b development "$R/super.git" "$R/w_aus"; neue_tabellen "$R/w_aus" "Lauf ausserhalb"
 git clone -q -b development "$R/dest.git" "$R/d_aus"
+rm -rf /tmp/e18snap-ausserhalb
 lauf AF_DEST_REPO="$R/d_aus" AF_WORK_ROOT="$R/w_aus" AF_SNAPSHOT_ROOT=/tmp/e18snap-ausserhalb/beleg AF_NO_PUSH=true > "$H/g_aus.log"
+# SEIT NB2 ist das kein blosser Hinweis mehr, sondern ein VERTRAGSBRUCH mit lautem Abbruch: eine
+# Wurzel, die der 288-Writeback nie committen kann, darf keinen gruenen Job erzeugen (Codex MITTEL-2).
+pruef "Wurzel ausserhalb eines Arbeitsbaums: RC" "$?" "1"
 grep -q "liegt in KEINEM git-Arbeitsbaum" "$H/g_aus.log" && ok "Wurzel ausserhalb eines Arbeitsbaums: literal gemeldet, kein stiller Teil-Schutz"
+grep -q "AF_SNAPSHOT_ROOT-Vertrag VERLETZT" "$H/g_aus.log" && ok "Vertragsbruch fuehrt zum Abbruch statt zu stillem Gruen"
+pruef "kein Beleg ausserhalb des 288-Baums" "$([ -e /tmp/e18snap-ausserhalb/beleg/QUELLSTAND.txt ] && echo ja || echo nein)" "nein"
 
 echo
 if [ "$FEHLER" -eq 0 ]; then echo "=== PROBEN GRUEN: alle Pfade belegt (0 Abweichungen) ==="; exit 0; fi

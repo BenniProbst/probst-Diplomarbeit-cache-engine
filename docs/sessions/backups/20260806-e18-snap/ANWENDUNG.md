@@ -225,3 +225,105 @@ eine `*.result.csv` ablegt, bricht diese Zusage** (im Code als Kommentar festgeh
 6. **Re-Ernte kostet einen zweiten Compile.** Nur im non-FF-Fall (Merge-Commit) und nur, wenn der
    gelandete Baum vom gebauten abweicht. Der Alternativweg waere Abbruch ohne Beleg -- die Re-Ernte
    liefert stattdessen einen wahren Beleg.
+
+---
+
+# NB2 -- die fuenf Codex-Mindestanforderungen (06.08., nach dem Verdikt NICHT-LANDEN zu 1ae02cdf)
+
+Grundlage: `docs/sessions/backups/20260806-e18-snap-welle/CODEX-VERDIKT-NB-1ae02cdf-NICHT-LANDEN.md`.
+Codex hatte dem NB-Stand bescheinigt, dass von sechs Altbefunden nur MITTEL-2 vollstaendig behoben
+war. Die folgenden fuenf Punkte sind seine woertlichen Mindestanforderungen; darunter steht, WAS
+gebaut wurde und WELCHE Probe es literal belegt. Alle Proben:
+`bash docs/sessions/backups/20260806-e18-snap/fixture/proben-nb2.sh` (91 Zusicherungen, 0 Abweichungen)
+sowie die weiterhin gruene 6-Befund-Regression `.../fixture/proben.sh` (56 Zusicherungen).
+
+## (1) Runneruebergreifend eindeutige Namen -- statt verteilter Reservierung
+Der Ordnername traegt jetzt die **Lauf-Kennung**: `<TS>-r<CI_RUNNER_ID>-j<CI_JOB_ID>` in der CI,
+`<TS>-h<hostname>-p<PID>` lokal. Damit sind zwei Laeufe derselben Sekunde auf verschiedenen Runnern
+disjunkt, ohne dass irgendwo eine verteilte Sperre noetig waere. Die drei Kollisions-Wachen (lokal ->
+REMOTE -> `mkdir`-Lock) bleiben als **Gurt**; neu ist, dass der `mkdir`-Fehler nach **Art**
+unterschieden wird: nur ein bereits existierender Pfad ist eine Kollision, alles andere
+(EACCES/ENOSPC/fehlender Parent) bricht **sofort** ab statt 99 irrefuehrende Retries zu drehen.
+Proben NB2-1a/1b/1c -- inkl. Gegenprobe: der alte Stand waehlt bei getrennten Runnern **denselben**
+Namen (add/add-Konflikt beim 288-Merge) und dreht beim echten mkdir-Fehler literal **99** Runden.
+
+## (2) Recovery-Identitaet statt "aktueller HEAD"
+Zwei vom aktuellen 289-HEAD unabhaengige Quellen:
+* **Marker im 288-Baum:** vor JEDEM Push-Versuch schreibt der Kern
+  `<AF_SNAPSHOT_ROOT>/PENDING-<LAUF-KENNUNG>.txt` mit der SHA, die gleich gepusht wird. Der
+  288-Writeback stagt sie mit; erfuellte Marker werden **nicht geloescht**, sondern um
+  `erfuellt_durch=<snapshot_id>` ergaenzt (additiv).
+* **Bot-Historie in 289:** die Commits des Kanal-Bots auf dem Ziel-Branch sind selbst die dauerhafte
+  Spur -- diese Quelle ueberlebt auch den Fall, in dem der Marker mit dem Workspace stirbt.
+Der Beleg wird fuer GENAU diese SHA gebaut (Klon wird darauf detached, Gate erzwungen neu) und der
+Klon danach **nachweislich** auf seinen Ausgangs-HEAD zurueckgesetzt -- sonst setzte der Writeback
+den Gitlink rueckwaerts. Pro Lauf hoechstens `AF_RECOVER_MAX` (Default 1) Nachholung.
+Proben NB2-2a (Marker), 2b (nur Bot-Historie), 2c (Marker auf nie gelandete SHA -> literal
+uebersprungen) -- Gegenprobe: der alte Stand belegt den **neuen** HEAD und laesst die schuldige SHA
+dauerhaft unbelegt.
+
+## (3) Ein gemeinsamer Beleg-Validator
+`af_beleg_lokal_gueltig` / `af_beleg_remote_gueltig` sind die EINE Wahrheit fuer "ist das ein
+Beleg?" -- benutzt von der Nachhol-Wache, der Kollisions-Wache und der Schlusspruefung des eigenen
+Schnappschusses. Verlangt werden: `<haupt>.pdf` (nicht leer) + `compile-export.txt` (nicht leer) +
+`QUELLSTAND.txt` mit der **vollstaendigen Zeile** `thesis_commit_sha=<40-hex>`, nicht-leerer
+288-SHA, nicht-leerer Lauf-ID, `pdf_sha256=<64-hex>` und **sha256-Konsistenz** gegen die
+danebenliegende PDF. Die REMOTE-Suche laeuft ausschliesslich ueber QUELLSTAND.txt-Pfade unterhalb
+der Wurzel; verglichen wird per String-Praefix (kein Pathspec, kein Glob).
+Proben NB2-3a (halber Ordner), 3b (Teiltreffer/zu lange SHA), 3c (sha256-Bruch), 3d (Fremddatei mit
+derselben Zeile) -- in allen vier Faellen nimmt der alte Stand das Praeparat als Beleg.
+
+## (4) Erzwungene Re-Kompilation bei der Re-Fixierung
+`run_pdf_gate erzwingen` loescht die alte PDF und die Zwischenprodukte, ruft `latexmk -gg` und
+prueft danach eine **Neuheits-Wache** (die PDF MUSS juenger sein als der Bau-Beginn). Damit kann
+"Nothing to do" nie mehr eine alte PDF mit einer neuen SHA beschriften.
+Proben NB2-4a (echte Re-Ernte aus dem gemergten Baum) und 4b (praeparierter "Nothing to do":
+NEU bricht ab und legt KEINEN Beleg, ALT beschriftet die alte PDF mit der neuen SHA).
+
+## (5) Transaktionales Schreiben + Cleanup, fail-closed
+Der Schnappschuss entsteht in `.<name>.tmp`, wird vollstaendig geprueft und erst dann **atomar** per
+`mv` auf den Endnamen gezogen; ein `trap` raeumt ausschliesslich **eigene** unveroeffentlichte
+.tmp-Reste weg. `AF_SNAP_REMOTE_INIT` wird erst NACH Erfolg gesetzt (kein sticky-Gruen). Die
+frueheren Fail-open-Stellen (Fehler bei der Remote-Abfrage galt als "Pfad frei") sind auf
+**fail-closed** gedreht und melden literal. Vor der Namenswahl steht ein **Re-Fetch** (zwischen
+Beleg-Test und Ablage liegt ein kompletter LaTeX-Bau).
+Proben NB2-5a (Schreibfehler mitten im Ordner: kein Endname, kein Rest -- ALT hinterlaesst einen
+halben Ordner unter dem ENDNAMEN), 5b (kaputter Remote-Blick -> lauter Abbruch), 5c (vier
+Vertragsverstoesse der Wurzel, vier laute Abbrueche).
+
+## MITTEL-Restbefunde (mitgeheilt)
+* `af_sha256` ist fail-loud: der frueher moegliche Doppelfehler-Vergleich `""==""` ist ausgeschlossen.
+* Leerer/ungueltiger 289-SHA im `AF_NO_PUSH`-Pfad ist FATAL (ALT schrieb `thesis_commit_sha=`).
+* `AF_SNAPSHOT_ROOT`-Vertrag wird **durchgesetzt** (`AF_SNAP_ROOT_STRICT`, Default true): kein
+  Arbeitsbaum / Toplevel selbst / fremdes Repo / von .gitignore ignoriert -> lauter Abbruch statt
+  gruenem Job ohne Beleg. `AF_SNAP_ROOT_STRICT=false` ist die bewusste Labor-Abschaltung; **die CI
+  setzt sie nie**.
+* Rollback: zentral (greift auch beim Abbruch mitten in der Kopie), TOCTOU minimiert (der "neu"-Fall
+  wird per `noclobber` atomar belegt statt nur geprueft).
+* `AF_LANGS`: Duplikate werden entfernt, `|` (und jedes andere Sonderzeichen) ist verboten -- es ist
+  der Feldtrenner der Rollback-Buchfuehrung. Alle `for lang in $LANGS` sind durch ein Array ersetzt.
+* `git ls-tree -r -z` statt Pathspec: Glob-Zeichen in der Wurzel und Leerzeichen in Repo-Pfaden
+  koennen die Praefix-Pruefung nicht mehr daneben greifen lassen.
+* Ernte-Ablage wird vor jedem Einsammeln geleert (keine Datei aus einem alten Bau im neuen Beleg);
+  `FETCH_HEAD` wird sofort auf die unveraenderliche SHA aufgeloest.
+* `copied=0` beendet den Lauf NICHT mehr vor der Nachhol-/Recovery-Wache.
+
+## Writeback-Delta (LEAD-ONLY, in `gitlab-ci-delta.patch` mitgezogen)
+Der 288-Writeback bekommt zwei Zeilen mehr Wahrheit: die Vollstaendigkeits-Wache verlangt
+zusaetzlich `thesis_commit_sha=<40-hex>`, und ein ueberlebender `.tmp`-Halbstand (SIGKILL) wird
+gemeldet und entfernt statt still mitgestagt. Belegt in `proben.sh`, Abschnitt "patch NB2".
+`git apply --check` gegen die echte `.gitlab-ci.yml` ist gruen; die Datei selbst bleibt unberuehrt.
+
+## Bewusste Grenzen (NB2)
+1. **Marker-Reichweite:** erreicht ein Lauf den 288-Writeback ueberhaupt nicht mehr, stirbt sein
+   Marker mit dem Workspace. Dafuer gibt es die Bot-Historie als zweite Quelle -- deren Reichweite
+   ist `AF_RECOVER_TIEFE` (Default 20 Bot-Commits).
+2. **Eine Nachholung je Lauf** (`AF_RECOVER_MAX=1`): bewusst, damit ein Job nicht in eine lange
+   Nachhol-Kette laeuft. Der naechste Lauf holt den naechsten Beleg -- monotoner Fortschritt.
+3. **Marker-Ansammlung:** je Pipeline-Lauf entsteht eine kleine `PENDING-*.txt`. Sie wird nie
+   geloescht (nur um `erfuellt_durch=` ergaenzt). Ein Aufraeum-Entscheid ist Lead-Sache.
+4. **`quelle_kind`/`quelle_ref` im Recovery-Beleg** beschreiben die Quelle DIESES Laufs, nicht die
+   des nachgeholten Standes; `modus=recovery` sagt das literal.
+5. Die atomare Veroeffentlichung per `mv` ist gegen ein gleichzeitiges Anlegen des Endnamens durch
+   einen Fremdprozess nicht formal geschuetzt -- durch die eindeutige Lauf-Kennung ist der Name aber
+   je Lauf disjunkt, und vor dem `mv` steht eine erneute Existenzpruefung.
