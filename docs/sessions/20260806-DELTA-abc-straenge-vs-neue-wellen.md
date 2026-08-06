@@ -216,3 +216,83 @@ gehoeren:**
 Abgabe-Posten (V-02, V-03, V-08) und den zwei Sofort-Posten (V-11, V-13) heilt den gesamten
 Befund; alles Uebrige gehoert als **eine** additive NACH-ABGABE-Sammelzeile mit Anker
 `LEDGER:2829-3060` und `synthese.md:58-136` ins Register.
+
+---
+
+## 6. KONSOLIDIERUNGS-VOLLZUG (V-01/A15)
+
+> OWNER-AUFTRAG verbatim (06.08.): "Bitte konsolidiere die gefundene fehlende Arbeit, sofern sie
+> den neuen Plaenen und Aussagen nicht wiederspricht, die neuesten Aussagen gewinnen. Die Planung
+> wurde schliesslich mehrfach erweitert und geaendert."
+>
+> Regel angewandt: NEUESTE gewinnt -- aber "neueste gewinnt" heisst NICHT "alt = ungueltig".
+> Wo nichts Neueres widerspricht, bleibt der Posten GUELTIG und wird uebernommen (Regelfall:
+> 10 von 20). Quellen-Rangfolge: (a) Owner-Aussagen/Entscheide 05.-06.08. im Ledger,
+> (b) docs/plaene/*.md 06.08., (c) Register 20260806-REGISTER-todo-konsolidierung-14-tage.md,
+> (d) das Objekt (Code/Tests/CI/Thesis-Repo).
+>
+> Ziel-Doc der Uebernahmen: `docs/sessions/20260806-REGISTER-todo-konsolidierung-14-tage.md`,
+> Abschnitt "NACHTRAG V-01/A15". Ab dort hat jeder uebernommene Posten einen BESITZER.
+
+**BILANZ: 10 UEBERNOMMEN (i) . 4 SUPERSEDED (ii) . 5 BEREITS ERLEDIGT (iii) . 1 OWNER-ENTSCHEID (iv).**
+
+### 6.1 Entscheidungs-Tabelle aller 20 Positionen
+
+| Position | Entscheid | Begruendung + Anker | Ziel-Klasse bzw. Nachfolger |
+|---|---|---|---|
+| **V-01** A15 Paragraf-55-Reconcile | **(iii) BEREITS ERLEDIGT** | Vollzogen mit genau diesem Pass: 20 Positionen einzeln gegen den heutigen Stand geprueft, Uebernahmen in die Klassen-Tabellen des Registers geschrieben. Anmahnung `LEDGER:4862`/`:4900`; Delta-Verbuchung `LEDGER:4224-4232`. | ERLEDIGT-Register (Register-Nachtrag, ERLEDIGT-Tabelle) |
+| **V-02** A14 FF0 + Anhaenge-B/E + Mess-Manifest | **(ii) SUPERSEDED (2 Teile) + (i) UEBERNEHMEN (1 Rest)** | FF0: `kapitel/de/06_fazit.tex:22-33` (EN-Paritaet) beantwortet FF0 explizit multi-plattform ("erst nach den End-to-End-Laeufen je Plattform beziffern"; "auf Hybrid-CPUs und Sapphire-Rapids gegenuebergestellt") -- die Abgabe-Blocker-Lage von `LEDGER:2916` besteht nicht mehr, offen ist nur die Bezifferung. Anhaenge-B/E: keine 4-Zeilen-Stubs mehr (B 257 Z. / E 151 Z. DE, 256/153 EN; Anhaenge-Realm-Welle gelandet 29a1700, `LEDGER:3748`). | FF0 -> P3 Trigger/Voll-Bau-4 + Phase 6 USER-GO-STOPP . Anhaenge -> ERLEDIGT . **Rest Mess-Manifest/Provenance -> VOR-ABGABE** (an E8/Trigger-Checkliste) |
+| **V-03** Thesis-Text "neunzehn Achsen" DE+EN | **(iii) BEREITS ERLEDIGT (Abgabe-Dokument) + (i) Rest-Auflage** | `diplomarbeit.tex:280-295` included NUR die 6 Habich-Kapitel + Anhaenge A-F. In JEDER included Datei ist "neunzehn"/"nineteen"/"T0--T18" ausdruecklich als historische Vorstufe markiert ("Zwischenstand Juli 2026"), DE+EN paritaetisch; der Kanon 18/T0--T17 steht literal (`04_implementierung.tex:173`, `06_fazit.tex:35-37`). **Die 7 im Delta zitierten Stellen liegen ALLE in un-included Alt-Kapiteln** (`diplomarbeit.tex:278-279`: "bleiben als Inhalts-Quelle auf der Platte (un-included)"). Damit war die Abgabe-Blocker-Einstufung in Abschn. 3.3/4 ein FALSCH-POSITIV -- hiermit korrigiert. | ERLEDIGT . **Rest: stehende Stufe-3-Umzugs-Auflage -> NACH-ABGABE** |
+| **V-04** M-8/M-9/M-15 Auswertungs-Writer | **(iv) OWNER-ENTSCHEID NOETIG** | Neueste Aussagen decken den Posten weder noch loesen sie ihn ab. Kern: Anhang A DE+EN haengt an M-9 (`LEDGER:2924`). Ist-Stand: `anhang/de/A_measurements.tex` ist gefuellt (137 Z.) und kompiliert -- mit den ALT-Messreihen. Frage: sollen Sensitivitaets-/Kurven-/Welch-Writer noch in die Abgabe (dann rutscht V-04 in die Abgabe-Klasse) oder bleibt Anhang A wie er ist? | **OWNER-FENSTER O-4 "Anhang-A-Reichweite"** (Default-Vorschlag: NACH-ABGABE) |
+| **V-05** #162 + PRT-ART-Stub-Quarantaene | **(iii) BEREITS ERLEDIGT (Quarantaene) + (i) UEBERNEHMEN (#162)** | Quarantaene VOLLZOGEN am Objekt: Kopf "ALT-PFAD -- NICHT Teil des Mess-Pfads! ... traegt bewusst Stub-/Surrogat-Code -- sie darf NIE in den Mess-Pfad verdrahtet werden" in `comdare-prt-art/.../identity/prt_art_pruefling_factory.hpp:2-6` UND `prt_art_execution_engine_adapter.hpp:6` (AP-2-neu/#236 W4, 07.07.), ce-Gegenbeweis `tests/unit/thesis_tiere/test_ap2_katalog_pfad_stubfrei.cpp`. Die Mess-Echtheits-Gefahr aus Abschn. 4 Punkt 2 besteht damit NICHT. Offen bleibt nur der Zaehl-/Vollzugsbeleg der >=8 Rang-1-SOTA-Lebewesen. | Quarantaene -> ERLEDIGT . **#162 -> P2/P3 vor Messauswertung** (HELD; Vollzug oder deklarierte Herabstufung) |
+| **V-06** GN-9 Feasibility-/Kalibrierungs-Gate | **(ii) SUPERSEDED + (i) Rest** | (a) Gate-Begruendung entfaellt: Owner 23.07. "die 6-TB-Rechnung bezog sich auf Cluster-Storage, nicht auf lokale Platten" (`LEDGER:3443`). (b) Messfunktion in die Bestandslog-Maschinerie gewandert: Mini-Batch-ETA statt Vorlauf-Schaetzung (`LEDGER:3325`, `builder/bestandslog/eta_estimator.hpp`) + avg_size als 2. Log-Wert je Batch-Block (`LEDGER:3429`). (c) Platz-Schutz = P3-Zeile Forecast/df-Wache (Register `:54`/`:315`). | Nachfolger: **ETA/avg_size-Bestandslog + Forecast-Platzpflege** . **Rest: "ETA-Erst-Batch-Abnahme" -> P3-Trigger-Checkliste** |
+| **V-07** #47 COMPARE (4. Modus je Maschine) | **(i) UEBERNEHMEN** | Nichts Neueres widerspricht. Owner-KERN Paragraf 62-C ist unveraendert gueltig: COMPARE laeuft "erst zum Schluss, NACH dem Release ... je Maschine" aus dem Mess-Replay; `run_methodology` erhaelt den 4. Wert `compare` (`LEDGER:3343`), autonom freigegeben (`LEDGER:3370`). Im Register 0 Treffer. | **NACH-ABGABE**, einzuhaengen in die bindende Kette (Register `:344`) |
+| **V-08** #152 Cache-Misses + I-PMC-2/3 + #165 | **(iii) BEREITS ERLEDIGT (Kern) + (i) 2 Reste** | Am Objekt gebaut: `measurement_snapshot.hpp:44-46` (l1/l2/l3), `:77` branch_misses, `:162/:194` CSV-Header; `linux_perf_pmc_source.hpp:191-194` (L1+LL real, L2 ehrlich 0 "kein RAW-Rateversuch"); `windows_pcm_pmc_source.hpp:54-55`; `cache_engine_builder_iterator.hpp:475-480/:750-753` (branch_misses emittiert); `#165-B annotate_quality_flags` (`profile_run_entry.hpp:605-609`, `experiment_run_entry.hpp:244`); PMC-Preflight #37 (Register `:149`). Die Befuerchtung "Kernmetrik = 0" ist am Code widerlegt. | ERLEDIGT . **Rest 1: Anhang-A-Limitierung-1 nach der Messung nachziehen -> VOR-ABGABE** (`anhang/de/A_measurements.tex:11`, EN `:10`) . **Rest 2: I-PMC-3 Zen-5-RAW + system_disturbed-Provenienz -> NACH-ABGABE** (ausdruecklich GETRENNT deklariert, `cache_engine_builder_iterator.hpp:334`) |
+| **V-09** Hybrid-Bau + PL-19/PL-21 | **(ii) SUPERSEDED (Etikette) + (i) UEBERNEHMEN (Bau)** | Die Etikette "ABGABE-PFLICHT vor 28.07." (`LEDGER:2952`) ist doppelt abgeloest: Frist neu (Abgabe 08.08.) UND Verortung geaendert -- Hybrid-Tier = eigene Stufe HINTER der CEB (`LEDGER:3529`, Owner-E1) mit "Bau in der Auswertungsphase" (`LEDGER:3602`). Der Bau-Posten selbst hat keinen Nachfolger und bleibt. Ist-Beleg heute verifiziert: `libs/cache_engine/hybrid/` enthaelt NUR `README.md`. | **NACH-ABGABE** (Auswertungsphase); PL-19/PL-21 Gattungs-Docks in derselben Zeile |
+| **V-10** L21-Phase-6.5-Behaelter | **(i) UEBERNEHMEN** | Owner H.7 "Rest nach Abgabe PFLICHT" ist unwidersprochen; das Register traegt nur K5, Posten 43, OD-1 einzeln, "L21"/"E-01"/"O-6" = 0 Treffer (`synthese.md:118-120`). | **NACH-ABGABE** (Behaelter-Zeile) |
+| **V-11** #327 PAT-Rotation | **(ii) SUPERSEDED (Termin) -- Posten bleibt** | Owner terminiert: "#327 NUR-KENNTNIS (Rotation nach Messfenster, Handout liegt)" (`LEDGER:3727`). Das "Security SOFORT, deadline-unabhaengig" des Alt-Blocks (`LEDGER:2993`) ist damit abgeloest. Nicht gestrichen -- sonst faellt die Rotation nach dem Messfenster erneut aus. | **OWNER-FENSTER**, Termin "nach Messfenster", Infra-Lane (Cluster read-only fuer diese Linie) |
+| **V-12** #274/G5 measurement-all-Modul-Migration | **(i) UEBERNEHMEN** | Nichts Neueres widerspricht; GO unter 3 Auflagen steht (`LEDGER:3007`/`:3050`), "ans Projektende geparkt". Der Register-Supersede von G5 betrifft das **Lager-Pruning**-G5 (Register `:53`/`:316` -> O-3) und deckt diesen Posten NICHT ab -- Namenskollision explizit verbucht. | **NACH-ABGABE** (Projektende), mit Kollisions-Vermerk |
+| **V-13** rescue/e24-c3-wip-pause (0bac9fbe) | **(iii) BEREITS ERLEDIGT** | Heute am Objekt verifiziert: `refs/rescue/e24-c3-wip-pause = 0bac9fbe83e5c5ae2cabd970cea0b6dd8c0dffe5` auf **beiden** Remotes (origin gitlab.comdare.local UND github). Der Namespace `refs/rescue/*` liegt ausserhalb `refs/heads/*` -> Branch-/Worktree-Abbau kann ihn nicht treffen. Der Sweep-Auflagen-Vermerk ist hiermit erfolgt. | ERLEDIGT-Register; Quellen-Vermerk am W3-Posten (Register `:344`) |
+| **V-14** A16 Posten-Register-Basis (2)-(18)/(25)-(29) | **(i) UEBERNEHMEN** | Unwidersprochen und billig; ohne Rekonstruktion ist die bindende Nach-Abgabe-Kette "... -> Posten-Register" (Register `:344`) nicht ausfuehrbar (`synthese.md:67-69`). | **VOR-ABGABE** (billig) |
+| **V-15** A17 ce-Doku-Nachzuege / Stufen-Doktrin C1 | **(i) UEBERNEHMEN (Doku-Rest)** | Der Sach-Konflikt ist inzwischen entschieden (3 Realm-Zeilen + Fingerprint-Zeile, vierte Stempel-Zeile abgeschafft -- thesis 00876ea; Owner-KERN Stempel-Regression). OFFEN bleibt der DOKU-Nachzug in `hybrid_tier_stufe_soll_design.md:286-288` ("[[System],[Organ]]") sowie C3/K4-Supersede-Vermerke. Register traegt nur "Posten 46" (`:129`). | **NACH-ABGABE** (naechstes ce-Doku-Fenster) |
+| **V-16** A25-Kleinposten (8 ohne Heimat) | **(i) UEBERNEHMEN** | Unwidersprochen; nur G-E3-Host-Binder (Register `:307`) und W-11 Cache-Key (`:344`) sind aus dieser Liste angekommen (`synthese.md:96-101`). Anmerkung: "A9-S2" ist gegen den Register-Vermerk "A8-S2 nie vergeben" (`:171`) zu triangulieren -- andere Nummer, kein Supersede. | **NACH-ABGABE / Aufraeumpass** |
+| **V-17** A19 planer_block-Reaper | **(i) UEBERNEHMEN** | Bedingung "Zweit-Planer-Konsument real" durch W1-Split erfuellt; als deklarierte Luecke verbucht (`LEDGER:3790`) mit Folge-Beobachtung (`LEDGER:3630`). Mess-Relevanz strittig -> vor Messbeginn kurz bewerten. | **P2** (Bewertung vor Messbeginn), sonst NACH-ABGABE |
+| **V-18** A20 Z-02/Z-03 . A23 . A24 | **(ii) SUPERSEDED (A20) + (i) UEBERNEHMEN (A23/A24)** | A20: Wegwahl entschieden ("Z-02-Wegwahl NUR-KENNTNIS, Weg (i) F6-Grammatik als M3a", `LEDGER:3727`; Z-03 = M3a-Commit C2, `LEDGER:3686`), und der Sonderwunsch "zweite Lens am dringendsten" (`LEDGER:3698`) ist seit mittag-18 stehende DUAL-REVIEW-PFLICHT vor JEDER Landung -> im Regelbetrieb aufgegangen. A23/A24 unwidersprochen offen. | A20 -> SUPERSEDED (Dual-Review-Regelbetrieb) . **A24 -> Aufraeumpass-Kandidat Nr. 10 (sofort)** . A23 -> NACH-ABGABE/Infra |
+| **V-19** D5/D6/D7 STRITTIG-Vermerke | **(i) UEBERNEHMEN** | Unwidersprochen, reine Vermerke (Posten-30-Tempdir, W12-B Cache-Key-Spiegelung, #18 Goldener Coverage-Test; `synthese.md:148-150`, `LEDGER:2919`, `LEDGER:2972`). | **VOR-ABGABE** (billig) |
+| **V-20** Paragraf-55-Restposten (Sammelzeile) | **(i) UEBERNEHMEN** | Kein Einzelposten hat einen Nachfolger; keiner widerspricht neueren Aussagen. Owner-Doktrin verbietet ersatzloses Streichen -> EINE Sammelzeile mit Anker `LEDGER:2829-3060` + `synthese.md:58-136`, Einzelposten namentlich aufgefuehrt (inkl. B12-alt/F-SPREAD, das sonst in der Namenskollision verschwindet). | **NACH-ABGABE** (Sammelzeile) |
+
+### 6.2 Korrektur an Abschnitt 3/4 dieses Dokuments (Selbstcheck aus dem Objekt)
+
+Drei Einstufungen dieses Delta-Berichts haben der Objekt-Pruefung **nicht** standgehalten und
+werden hiermit richtiggestellt -- sie bleiben oben als Historie stehen (Doku nie loeschen):
+
+1. **V-03 war KEIN Abgabe-Blocker.** Die 7 zitierten Textstellen liegen samtlich in
+   un-included Alt-Kapiteln (`diplomarbeit.tex:278-279`). Der Fund war ein reiner Grep-Treffer
+   ohne Build-Pruefung. Damit entfaellt Punkt 3 der Liste in Abschnitt 4.
+2. **V-05 war KEIN Mess-Echtheits-Risiko.** Die Stub-Quarantaene ist seit 07.07. am Objekt
+   vollzogen und per ce-Test bewiesen; nur der #162-Zaehlbeleg ist offen. Punkt 2 in Abschnitt 4
+   ist entsprechend zu entschaerfen.
+3. **V-08 misst NICHT gegen 0.** Cache-Misses L1/L3, branch_misses und quality_flag sind real
+   erhoben und emittiert; L2 steht ehrlich auf 0 mit ausdruecklichem Verzicht auf einen
+   RAW-Rateversuch. Punkt 6 in Abschnitt 4 reduziert sich auf zwei Reste (Anhang-A-Limitierung,
+   Zen-5-RAW/system_disturbed).
+
+**Verbleibende trigger-/abgaberelevante Substanz nach dem Vollzug:** V-02-Rest
+(Mess-Manifest/Provenance), V-05-Rest (#162), V-06-Rest (ETA-Erst-Batch-Abnahme), V-08-Rest
+(Anhang-A-Limitierung nach der Messung), V-14 und V-19 (beide billig) -- plus der eine
+Owner-Entscheid O-4 (Anhang-A-Reichweite / V-04).
+
+### 6.3 Naechste-Schritt-Zeilen fuer die 6+1 kritischen Posten
+
+| # | Posten | WAS genau | WO | WER entscheidet |
+|---|---|---|---|---|
+| 1 | **V-01 / A15** | ERLEDIGT mit diesem Pass -- verbleibende Handlung: der Lead committet Register-Nachtrag + diesen Abschnitt und setzt eine Ledger-Nachtrag-Zeile "A15 VOLLZOGEN, 10/4/5/1". | super `docs/sessions/20260806-REGISTER-...md` + `...DELTA-...md` + Ledger | Lead (kein Owner-Entscheid) |
+| 2 | **V-02-Rest** | Die Zeile "Mess-Manifest/Provenance" in die **P3-Trigger-Checkliste** aufnehmen und mit der bestehenden E8-Zeile zusammenfuehren: Voll-Bau-4 darf nur mit aktivem Provenienz-Log + geklaerter PMC-Beleg-Form starten. FF0-Anteil NICHT nachbauen (superseded). | Register P3-Zeile "Trigger + Voll-Bau-4" (`:313`) + "E8" (`:56`) | Lead setzt, Owner nur bei Herabstufung |
+| 3 | **V-03** | KEINE Aenderung im Thesis-Repo. Stattdessen einen Deprecation-Kopf-Vermerk fuer die 8 un-included Alt-Kapitel je Sprache als **NACH-ABGABE**-Zeile fuehren + die Stufe-3-Umzugs-Auflage (bei jedem Abschnitts-Umzug 19 -> 18/T0--T17 mitziehen). Anderes Repo, eigene Welle. | `/home/comdare/Projekte/Research/20260931-overleaf-diplomarbeit` (spaeter); Zeile heute nur im Register | Lead; kein Abgabe-Risiko mehr |
+| 4 | **V-05-Rest** | Vor der ersten Messauswertung: den Katalog-Pfad auf **>=8 Rang-1-SOTA-Lebewesen** zaehlen (sota_catalog) und das Ergebnis literal ins Ledger schreiben. Bei <8: ausdrueckliche Herabstufung als Shortcut=Regression+TODO, nicht stillschweigend. | ce `libs/cache_engine/profile_facade/` (sota_catalog); Ausgabe ins Ledger | Lead zaehlt, **Owner entscheidet ueber Herabstufung** |
+| 6 | **V-06-Rest** | In die P3-Trigger-Checkliste: **"ETA-Erst-Batch-Abnahme"** -- nach dem ERSTEN Mini-Batch des Voll-Bau-4 werden t/TU und avg_size (Bytes/DLL) aus dem Bestandslog gegen den freien Plattenplatz beider Maschinen gerechnet, BEVOR die Matrix weiterlaeuft. Kein separater 1-Zellen-Vorlauf (superseded). | Register P3 "Trigger + Voll-Bau-4" (`:313`); Traeger `builder/bestandslog/eta_estimator.hpp` | Lead; Owner nur bei Abbruch/Herabstufung |
+| 7 | **V-08-Rest** | Nach dem Messlauf: `anhang/de/A_measurements.tex:11-12` und `anhang/en/A_measurements.tex:10-11` ("Cache-Misses L1--L3 derzeit 0/nicht erhoben, vgl. Limitierung 1") DE+EN gegen die neuen PMC-Werte nachziehen -- sonst steht eine widerlegte Limitierung in der Abgabe. L2 bleibt ehrlich 0 (kein RAW-Rateversuch) und ist als solche zu formulieren. | Thesis-Repo `anhang/{de,en}/A_measurements.tex` | Lead nach Vorliegen der Messdaten |
+| +1 | **V-11 #327 PAT-Rotation (SECURITY)** | Nicht mehr "sofort": Owner hat auf **nach dem Messfenster** terminiert (`LEDGER:3727`, Handout liegt). Handlung jetzt: Zeile im OWNER-FENSTER mit Termin fuehren + im Handout die Rotations-Schritte (Vault-Kandidaten RUECKWAERTS gegen `/api/v4/user` bis HTTP 200, Position rotiert -- nie hartcodieren) festhalten. Ausfuehrung durch die Infra-Lane; Cluster fuer diese Linie read-only. | Register OWNER-FENSTER; Infra-Handout | **Owner gibt das Rotations-Fenster frei** (nach Messfenster) |
+
+*(Position 5 des urspruenglichen Prioritaeten-Fadens -- V-13 rescue-Ref -- ist erledigt: Ref auf
+beiden Remotes verifiziert, Vermerk erfolgt. Deshalb springt die Nummerierung.)*
