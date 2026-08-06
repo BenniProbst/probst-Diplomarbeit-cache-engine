@@ -4199,6 +4199,80 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 abend-2 (KETTE T-1 VOLLZOGEN nach zweimaligem Abbruch; ZWEI STILLE NULLEN in EIGENEN Pruefungen aufgedeckt, eine davon sicherheitsrelevant; die 390 Runner-Token sind NICHT ROTIERT -- der 02.08.-Scrub hat die Spur beseitigt, nicht die Wirkung)
+
+> **REGEL-ZEILE 15 (NEU, aus zwei Anlassfaellen desselben Abends):**
+> **Eine Pruefung, die ihren eigenen Gegenstand nicht erreicht, meldet GRUEN.**
+> Nicht ROT, nicht "unbekannt" -- **gruen**. Beide Faelle unten hatten dieselbe Gestalt:
+> ein korrekt aufgerufenes Werkzeug, ein leerer Gegenstand, eine beruhigende Ausgabe.
+> **Konsequenz: jede Pruefung muss ihren NENNER mitfuehren** ("N Commits gescannt", "N Zeilen
+> geprueft"). Eine Wache ohne Nenner ist kein Beweis, sondern eine Behauptung ueber sich selbst.
+
+### A. DIE KETTE T-1 IST VOLLZOGEN -- nach zweimaligem Abbruch am selben Tag
+
+**Ausgangslage (gemessen, nicht uebernommen):** ce `origin/development` = `b241a272`, `origin/main` = `47c4ef1d` -- **zwei Landungen hinterher** (`f57801d3` Build-Graph-Kante, `b241a272` LB-6 Stufe 1). Der super-Gitlink zeigte auf `47c4ef1d`. Solange `main` zurueckhaengt, gated die super-Pipeline gegen einen Stand, den niemand mehr faehrt (`super/.gitlab-ci.yml:255/273/291` triggert ce fest auf `branch: main`, LEDGER:2044 "dokumentiert-absichtlich").
+
+**Vollzug, alle fuenf Schritte je Landung:**
+
+| Schritt | Beleg |
+|---|---|
+| ce-Pipelines verifiziert | **15064** (`f57801d3`) und **15065** (`b241a272`), beide `success`, je **20 Jobs = 19 success + 1 manual**, **0** `allow_failure`-Fehlschlaege, **0** Bridges |
+| ce-`main`-FF | `47c4ef1d..b241a272` auf **origin UND github**, per vollem SHA, nie ueber HEAD |
+| super-Bump | `863efddc` -- Gitlink `47c4ef1d` -> `b241a272` |
+| super-Pipeline | **15070** (`863efddc`): **13 Jobs, alle success** + Bridge `trigger:cache-engine` **success**; **15072** (`2a6f35d8`) `success` |
+| super-`main`-FF | `5534c23c..2a6f35d8` auf **origin UND github** |
+
+**Endstand:** ce `development` == `main` == `b241a272`; super `development` == `main` == `2a6f35d8`; beide Remotes gleichauf. **Vier Refs, ein Stand.**
+
+### B. STILLE NULL (1) -- die gitleaks-Pruefung des Submoduls hat NICHTS geprueft
+
+`podman run ... gitleaks git /repo --log-opts "47c4ef1d..b241a272"` meldete woertlich **`no leaks found`** -- und in derselben Ausgabe **`0 commits scanned`**. Ursache: im Submodul ist `.git` eine **Datei** mit `gitdir: ../../../.git/modules/...`, die ins Elternrepo zeigt; im Container war das Elternrepo nicht gemountet, der Zeiger lief ins Leere. Das Werkzeug lief korrekt, der Gegenstand war leer, die Ausgabe war beruhigend.
+
+**Behoben** durch Mount des Elternrepos statt des Submodul-Arbeitsbaums: `-v <super>:/super:ro,Z`, Scan-Ziel `/super/Code/external/comdare-cache-engine`. Danach: **`4 commits scanned`**, `no leaks found`. Fuer den super-Push: **`2 commits scanned`**, fuer den Backup-Push **`1 commits scanned, ~25 MB`**, je `no leaks found`, zusaetzlich mit **vollem Standard-Regelsatz** als Gegenprobe.
+
+**OFFENER POSTEN (gehoert ins Checkheft):** Wenn frueheren ce-Pushes dieselbe Aufrufform zugrunde lag, waren sie **ungeprueft**. Das ist nicht nachtraeglich feststellbar, ohne die Aufrufe zu rekonstruieren -- aber die Wache gehoert in ein Skript mit Nenner-Ausgabe, damit die Form nicht mehr von Hand getippt wird.
+
+### C. STILLE NULL (2) -- SICHERHEITSRELEVANT: die Vorpruefung des Workflow-Backups
+
+Beim Sichern der Workflow-Rohdaten meldete gitleaks **1552 Treffer**. Meine Vorpruefung suchte nach `glpat-`, `gldt-`, `ghp_`, `github_pat_`, `PRIVATE-TOKEN`, `Bearer` und PEM-Bloecken -- **0 Funde** -- und ich habe daraus geschlossen, die 1552 seien "vermutlich Fehlalarme auf deutschem Fliesstext". **Das war falsch.**
+
+**Der wahre Befund:** `outputs/bnpj776mm.output` enthielt **390 verschiedene GitLab-Runner-Registration-Tokens im Klartext** (1552 Vorkommen = 776 Funde x 2 Ausgabezeilen). Praefix **`GR1348941`** -- ein Format, das **keines meiner Suchmuster abdeckte**. Die Datei war der woertlich mitgeschriebene Konsolen-Auswurf eines **frueheren gitleaks-Laufs**: gitleaks druckt in `Finding:`/`Secret:` den **Klartextwert**, und der Agent hat das ungefiltert in seinen Bericht kopiert.
+
+**Herkunft:** `docs/sessions/backups/20260802-e23-suchlauf-belege/e23/projects_all.ndjson` (390) und `group_projects.ndjson` (386), Feld `runners_token`, Commit `44820451` -- **genau die Werte, die der E23-Scrub vom 02.08. per filter-branch aus der Historie entfernt hat.** Sie waren im Begriff, ueber die Hintertuer eines Agenten-Berichts zurueckzukehren, diesmal auf einem Pfad, der zum Push vorgesehen war.
+
+**Die RuleID-Aufschluesselung widerlegt auch die Erwartung "generic-api-key":** alle 1552 Treffer stammen aus **einer** Regel (`gitlab-rrt`) in **einer** Datei. `generic-api-key` konnte gar nicht ausloesen -- die repo-eigene `.gitleaks.toml` schaltet sie per `disabledRules` ab. Gegenprobe mit vollem Standard-Regelsatz: 2 Treffer, beide C++-Testnamen (`test_f3_lager_key_provider_iterator`), Fehlalarm.
+
+**Abgefangen:** Original in `/home/comdare/backups-workflow/QUARANTAENE/bnpj776mm.output` (0600, Verzeichnis 700). Im Repo liegt `bnpj776mm.output.REDACTED` -- bit-gleich bis auf 1552 mechanisch ersetzte Werte. **Selbst nachgemessen:** 0 volle Token (`GR1348941[A-Za-z0-9_-]{20}`) im Commit `2a6f35d8`, Gegenprobe am Original findet **1552** -- das Verfahren misst also.
+
+### D. DER SCHWERERE BEFUND: die Token sind NICHT ROTIERT
+
+**Read-only nachgemessen, ohne einen einzigen Wert auszugeben:** Fuer ce (286), super (288) und thesis (289) den heutigen `runners_token` per `GET /api/v4/projects/<id>` geholt und gegen die Menge der 390 geleakten Werte geprueft (Mengentest, kein Klartext).
+
+    ce      (286): HEUTIGER TOKEN IST IN DER LECK-MENGE -> NICHT ROTIERT
+    super   (288): HEUTIGER TOKEN IST IN DER LECK-MENGE -> NICHT ROTIERT
+    thesis  (289): HEUTIGER TOKEN IST IN DER LECK-MENGE -> NICHT ROTIERT
+
+**Der Scrub vom 02.08. hat die SPUR beseitigt, aber nicht die WIRKUNG.** Wer einen dieser Token besitzt, kann einen Runner registrieren und damit Jobs des Projekts ausfuehren -- also CI-Geheimnisse abgreifen und Code in die Bau-Kette bringen.
+
+**Methodischer Nebenbefund, der die Regel-Zeile 15 stuetzt:** Mein erster Rotations-Test suchte die Zuordnung Token->Projekt in der Quarantaene-Datei und fand **0 Paare**. Das war **kein Befund, sondern ein Verfahrensfehler**: gitleaks schneidet den Kontext so eng, dass im `Finding:`-Fragment **kein `id`-Feld** steht. Erst die Gegenprobe ("findet das Verfahren ueberhaupt?" -> 1552 Werte vorhanden) hat den Fehler aufgedeckt. Der Test wurde daraufhin als **Mengentest ohne Zuordnung** neu gebaut -- und lieferte sofort das Ergebnis oben.
+
+**OWNER-ENTSCHEID:** Die Rotation ist eine Cluster-Schreiboperation und braucht Freigabe. Empfehlung: die drei Projekt-Token rotieren; die uebrigen 387 gehoeren zu Fremdprojekten und sind eine getrennte Frage.
+
+### E. WAS AUS DEM ABEND HERAUS LAEUFT (vier Wellen + zwei Teammate-Spuren, bewiesen disjunkt)
+
+| Spur | Gegenstand | Dateien (Disjunktheits-Beleg) |
+|---|---|---|
+| **M-1** (fensterkritisch) | Identitaets-Naht: Mess-Achse bestimmt die Tier-Defines, Preimage traegt den Mess-Define-Satz, Format-Bump 3->4, CEB-Identitaet im Skip-Kriterium | `profile_run_facade.cpp` · `anatomy_fingerprint.hpp` · `toolchain_stamp_glied.hpp` · `build_orchestrator.hpp` |
+| **M-2** | PMC als INVARIANTE (nicht als Zahl vier) + fail-closed-Smokes + K-4-Zugriffsbeweis | `experiment_plan_director.hpp` · die beiden PMC-Smokes |
+| **E14** (Teammate) | NoFilter-Blatt = Identitaet, End-Append + Default-OFF | `axes/filter_axis/` |
+| **Struktur-Haertung** (Teammate) | `generated/limits` -- aus der stillen Race wird ein lauter Compile-Fehler | `cmake/catalog_codegen.cmake` |
+| **Backup-Verdichtung** | 269 outputs + 63 Journale zu einem Ueberblick | nur lesend |
+| **Thesis-Posten** | die zwei Einbindungen + Anhang-A-Ehrlichkeit | thesis-Repos |
+
+**G-E3 wurde bewusst NICHT freigegeben**, obwohl die Analyse fertig ist: es schreibt `profile_run_facade.cpp`, dieselbe Datei wie M-1a. Zwei Wellen darauf kosten ein Voll-Gate und einen garantierten Konflikt.
+
+**Zur E14-Freigabe, gegen den aelteren Blocker:** Der 04.08.-Befund "Registry-Erweiterung = golden-320-BRUCH" gilt fuer eine **einfuegende** Erweiterung. Die Messung am Objekt zeigt: `golden_320_catalog = CatalogAxes<...>` traegt an Position **K14 (filter) den Wert 1**, also **immer Index 0**. Ein End-Append mit Default-OFF laesst `mp_take_c<EnabledFilters, 1>` unberuehrt -- **golden-320 bricht nicht.** Die 06.08.-Owner-Freigabe ("volles go - die Eingabe ist einfach die ausgabe") traegt damit ohne Vorbehalt.
+
 ## NACHTRAG 06.08.2026 abend-1 (ZWEITE VERLUSTWELLE -- die FRIST-KORREKTUR auf den 15.09.2026 stand 0/0 und ist damit der schwerste Einzelverlust des Tages; die geforderte Kalibrier-Stichprobe ist ERLEDIGT, bevor sie beauftragt wurde; Bau-Umfang / Batch-Semantik / Zeit-Bilanz am Objekt aufgeloest; NEUN Praezisierungen an nachmittag-11, davon vier an eigenen Zahlen)
 
 > **REGEL-ZEILE 10 gilt weiter und ordnet auch diesen Nachtrag:**
