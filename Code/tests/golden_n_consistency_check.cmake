@@ -11,7 +11,8 @@
 # ZWEI DIALEKTE, EINE AUSSAGE. Die Traeger sind bewusst NICHT byte-gleich (verschiedene Wurzeln,
 # verschiedene Aufgaben) -- verglichen wird deshalb die SEMANTIK:
 #   comdare_experiment  : <axes_default_lookup><axis ref=".." allowed_variants="v1 v2"/>  + <run_options cap=..>
-#   comdare_thesis_profile: <permute_axes><axis ref=".."><value>v1</value><value>v2</value></axis> + <run_options cap=..>
+#   comdare_thesis_profile: <permute_axes><axis ref=".."><value>v1</value><value>v2</value></axis>
+#     + <run_options cap=..>
 #
 # GEPRUEFT WIRD (alles FATAL):
 #   (1) beide Traeger nennen dieselbe Achsen-MENGE (keine Achse fehlt, keine ist zuviel);

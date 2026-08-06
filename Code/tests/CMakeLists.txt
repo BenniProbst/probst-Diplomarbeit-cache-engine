@@ -199,10 +199,17 @@ add_test(NAME test_fixture_schema_experiment_golden
 # durchlaeuft -- und sie wird FATAL, sobald die ce-Datei roh wohlgeformt ist. Sie zieht sich damit selbst
 # zurueck. ce-AUFLAGE: '--' in den drei Kommentaren beseitigen, danach diese Zeile ENTFERNEN.
 # SCRATCH_DIR: Ablage der kommentarfreien Arbeitskopie -- Build-Verzeichnis, nie der Quellbaum.
+# >120-Spalten-Wache (scripts/ci_diff_ascii_width_guard.sh): der PROFILE-Pfad unten wuerde als eine
+# einzelne "-DPROFILE=..."-Zeile 128 Byte tragen. In eine Zwischenvariable gezogen, damit CMakes
+# eigene Zeilenumbruch-Regeln (Backslash-Fortsetzung wuerde fuehrende Leerzeichen der Folgezeile IN
+# den Wert einbacken, empirisch geprueft) nicht angetastet werden muessen -- der resultierende
+# Kommandozeilen-Wert ist byte-identisch zur vorherigen einzeiligen Fassung.
+set(_golden_profile_path
+    "${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml")
 add_test(NAME test_golden_n_consistency
     COMMAND "${CMAKE_COMMAND}"
         "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
-        "-DPROFILE=${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml"
+        "-DPROFILE=${_golden_profile_path}"
         "-DPROFILE_ALLOW_COMMENT_TEXT_DEFECT=ON"
         "-DSCRATCH_DIR=${CMAKE_CURRENT_BINARY_DIR}"
         # B14-NB4 / Befund B7: der ABSOLUTE golden-Kanon. Die Wache prueft bis dahin nur RELATIV
