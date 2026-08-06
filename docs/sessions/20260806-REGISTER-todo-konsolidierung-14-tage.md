@@ -359,3 +359,33 @@ Korrektur: P2-Zeile ergänzen (bei P2-Start prüfen/einplanen).
 3. Vorbehalt: Die Register-Eingabe war nach „Posten 36" trunkiert; die NACH-ABGABE-Pflicht-Zeilen (B-10) sind gegen den trunkierten Teil gegenzuzeichnen, bevor sie als „fehlend" verbucht werden.
 4. Zwei Zeilen verlangen Prüfung IM L1-Fenster (nicht später): Stempel-/RF-Rest-ultracode-Gegenprüfung (inkl. O-2-Ratifikations-Vermerk) und der VOR-ABGABE-Prüfpass OD-2/OD-1.
 5. Live-verifizierte Fakten dieses Laufs: wt-b14-golden EXISTIERT, wt-b13-eta ENTFERNT, kein committetes Register-Doc mit Stand 05./06.08. unter super docs/ — die hier korrigierte Fassung ist damit die aktuellste.
+
+---
+
+## NACHTRAG 06.08. ~10:45 (Session-Log-Luecken-Explore + E1-E4-Karte + Journal-Vollpruefung — nachregistrierte Zeilen)
+
+Quellen: Opus-max-Explore ueber alle 5 heutigen Transkripte (satzweiser Owner-Abgleich), E1-E4-Ueberschneidungs-Karte (backups/20260806-e1e4-ueberschneidungen/ergebnis-roh.json), explore-luecken-Posten (Ledger nacht-6 L3999 / mittag-2 L4044). KEIN Posten gestrichen — nur fehlende Register-Zeilen nachgezogen.
+
+### P0-Ergaenzung
+| **Atlas-Nachzug nach L1** | 05b-UML-Klassenatlas (REV 5, Stand 98eea2e7 = VOR W5/W3+Neuanker) nach der L1-Buendel-Landung auf End-Stand nachziehen, mit Korpus-Gegenpruefung (Dauer-Regel feedback_atlas_immer_korpus_gegenpruefung); auch die ce-Kopie (be4f0a16) nachfuehren. | OFFEN (gated auf L1) | Ledger vormittag-19 L4273 |
+
+### P1-Ergaenzung
+| **DELTA C golden-XML system_axes** | atomic128/target_isa fehlen im system_axes-Block der golden-XML — dokumentierte Folge-Zeile der B14-Kartierung; billigstes Fenster = B14-NB2/Verifikation bei B14-Landung. | OFFEN | Ledger vormittag-17 L4281 |
+
+### P2/P3-Ergaenzung
+| **Posten 89 T6-Rebound-Leaf-Einpreisung** (MESSTECHNIK-KENNTNIS, HOCH/zeitkritisch) | Seit Phase B materialisiert fremde T6-Wahl den Rebound-Leaf statt der Fassade -> Allokationszahlen steigen exakt um den Organ-Anteil; MUSS beim ERSTEN Vergleich gegen Alt-Mess-CSV eingepreist werden (sonst Falsch-Regressions-Lesung). | OFFEN (P2/P3-Checkliste) | Ledger mittag-2 L4044 |
+| **Posten 88 anatomy_execution_context einarmig** | :50-63 zweiter Trait-Konsument einarmig — NICHT die Genus-Erst-Instanziierungs-Ausnahme; gegen die GENERALISIERTE SCHNITT-REGEL (04.08. abend-6) triangulieren. | OFFEN (mittel) | Ledger mittag-2 L4044 |
+
+### P4-Ergaenzung: Aufraeumpass-KANDIDATENLISTE (fortgeschrieben, Owner-KERN: Liste statt Sammelwort)
+1. leere 3D-caption (write_surface3d data.title nie gesetzt; vormittag-14-Randbefund) 2. 1xN-Matrix-Bestandsfehler 3. Posten 86 (Kosmetik Commit-27ef28ea-Benennung) 4. Posten 73 cacheline-Default-Literal 5. A8-S6 17 stale-Kommentar-Stellen 6. Posten 45 stale-17er-Spuren 7. M1-M3 der Teil-2-Review 8. honest-0-MUSTERFORTSETZUNG: die honest-empty-Doktrin (nie-ausgefuehrt=Auslass, echt-0=eigene Klasse) auf kuenftige Writer/Graph-Umbauten uebertragen (E1-E4-Karten-Residuum).
+
+### NACH-ABGABE-Ergaenzung
+| **Posten 84 Observer-Copy-Semantik** | der migrierten 03a-Organe deklarieren (messwirksam inert, OBSERVER_PUSH Default OFF). | OFFEN (niedrig) | Ledger nacht-6 L3999 |
+| **Posten 85 h81-Wachen-Haertung** | legitimer Overload-Satz macht Member-Pointer ambig -> bricht ill-formed statt erklaerender Meldung. | OFFEN (niedrig) | Ledger nacht-6 L3999 |
+| **Posten 87 organ_hull_ Level-2** | ObservableComposedContainer ohne rebind_allocator. | OFFEN (niedrig) | Ledger mittag-2 L4044 |
+| **Apple-Clang-Vendor-Kollision** | dokumentierte Grenze; Nach-Abgabe-TODO. | OFFEN (dokumentierte Grenze) | Ledger frueh-9 L4417 |
+| **kDetectedCompilerIsKnown-static_assert** | sperrt Fremd-Toolchains der Test-Suite aus -> TODO Oeffnung/erklaerende Meldung. | OFFEN (niedrig) | Ledger frueh-9 L4417 |
+| **#221-Rest T8 thread_count** | Setter vorhanden, bewusst NICHT als applied gezaehlt (In-Prozess-Tier ohne realen Konsumenten — ehrlich dokumentiert); Rest-Klaerung nach Abgabe. | OFFEN (by design) | E1-E4-Karte (backups/20260806-e1e4-ueberschneidungen/) |
+
+### VOR-ABGABE-Klaerungszeile
+| **DoD-7-Vollzugsstand Planer-Kette** | Phase-4-Abnahmekriterium ist von DoD-7 (LEDGER:205, E9 16.07.) ueberholt; Vollzugsstand war NICHT Gegenstand der E1-E4-Karte — vermutlich durch 982er-Wahrheits-Anker/Planer-Kette-Audit 05.08. gedeckt: GEGENZEICHNEN statt neu auditieren. | KLAEREN (billig) | E1-E4-Karte |
