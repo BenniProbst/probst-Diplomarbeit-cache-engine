@@ -6,6 +6,8 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
+#include <iostream> // E-2a: stderr-Log-Zeile der HONEST-EMPTY-Wache (Diagnose-Ebene wie 08/main_cli)
+#include <limits>   // E-2a: quiet_NaN als "nicht gemessen"-Sentinel der Flaechen-Matrix
 #include <map>
 #include <set>
 #include <sstream>
@@ -39,23 +41,29 @@ namespace {
 // spiegelt die 5 in WideMeasurementRow getragenen p50/p99). SINGLE-SOURCE für (a) den p99-Parse (Spaltenname +
 // Ziel-Member per Pointer-to-Member) und (b) die Range-Aggregation (p50/p99-Accessor je Op). Reihenfolge =
 // feste Stapel-/Legenden-/x-Reihenfolge. p99_col fehlt für den Parse; die Aggregation nutzt nur die Member.
+// E-2a (2026-08-06): zusaetzlich n_col/n_mem -- der AUSFUEHRUNGS-ZAEHLER op_<art>_n je Op-Art. Damit traegt
+// dieselbe Single-Source jetzt (a) Parse-Spalte + Ziel-Member fuer p99 UND n, (b) die Range-Aggregation und
+// (c) die Ausgefuehrt-Wache des Flaechen-Aggregats (z_field_executed).
 struct OpRangeSpec {
     std::string_view display;                       // Anzeigename (insert/lookup/erase/scan/rmw)
     std::string_view p50_col;                       // WIDE-Spaltenname der p50
     std::string_view p99_col;                       // WIDE-Spaltenname der p99
+    std::string_view n_col;                         // WIDE-Spaltenname des Ausfuehrungs-Zaehlers op_<art>_n
     double WideMeasurementRow::* p50_mem = nullptr; // Ziel-Member p50 (cppcheck uninitMemberVarNoCtor)
     double WideMeasurementRow::* p99_mem = nullptr; // Ziel-Member p99 (dito; kRangeOps initialisiert beide)
+    std::uint64_t WideMeasurementRow::* n_mem = nullptr; // Ziel-Member des Zaehlers (dito)
 };
 constexpr std::array<OpRangeSpec, 5> kRangeOps = {{
-    {"insert", "op_insert_p50_ns", "op_insert_p99_ns", &WideMeasurementRow::op_insert_p50_ns,
-     &WideMeasurementRow::op_insert_p99_ns},
-    {"lookup", "op_lookup_p50_ns", "op_lookup_p99_ns", &WideMeasurementRow::op_lookup_p50_ns,
-     &WideMeasurementRow::op_lookup_p99_ns},
-    {"erase", "op_erase_p50_ns", "op_erase_p99_ns", &WideMeasurementRow::op_erase_p50_ns,
-     &WideMeasurementRow::op_erase_p99_ns},
-    {"scan", "op_scan_p50_ns", "op_scan_p99_ns", &WideMeasurementRow::op_scan_p50_ns,
-     &WideMeasurementRow::op_scan_p99_ns},
-    {"rmw", "op_rmw_p50_ns", "op_rmw_p99_ns", &WideMeasurementRow::op_rmw_p50_ns, &WideMeasurementRow::op_rmw_p99_ns},
+    {"insert", "op_insert_p50_ns", "op_insert_p99_ns", "op_insert_n", &WideMeasurementRow::op_insert_p50_ns,
+     &WideMeasurementRow::op_insert_p99_ns, &WideMeasurementRow::op_insert_n},
+    {"lookup", "op_lookup_p50_ns", "op_lookup_p99_ns", "op_lookup_n", &WideMeasurementRow::op_lookup_p50_ns,
+     &WideMeasurementRow::op_lookup_p99_ns, &WideMeasurementRow::op_lookup_n},
+    {"erase", "op_erase_p50_ns", "op_erase_p99_ns", "op_erase_n", &WideMeasurementRow::op_erase_p50_ns,
+     &WideMeasurementRow::op_erase_p99_ns, &WideMeasurementRow::op_erase_n},
+    {"scan", "op_scan_p50_ns", "op_scan_p99_ns", "op_scan_n", &WideMeasurementRow::op_scan_p50_ns,
+     &WideMeasurementRow::op_scan_p99_ns, &WideMeasurementRow::op_scan_n},
+    {"rmw", "op_rmw_p50_ns", "op_rmw_p99_ns", "op_rmw_n", &WideMeasurementRow::op_rmw_p50_ns,
+     &WideMeasurementRow::op_rmw_p99_ns, &WideMeasurementRow::op_rmw_n},
 }};
 
 void write_pgfplots_axis_options(std::ostream& out, PageConstraints const& cnst, std::string const& title,
@@ -79,6 +87,54 @@ void open_resizebox(std::ostream& out, PageConstraints const& cnst) {
 }
 void close_resizebox(std::ostream& out, PageConstraints const& cnst) {
     if (cnst.resizebox_wrap) out << "}%\n";
+}
+
+// E-2a/HONEST-EMPTY (2026-08-06) -- der EINE Ort, an dem ein datenloser Flaechen-Writer statt einer
+// entarteten pgfplots-Figur einen ehrlichen Vermerk schreibt. Bewusst OHNE pgfplots/tikz: der Vermerk
+// muss auch dann kompilieren, wenn die Farbskala mangels positiver Zelle gar nicht bestimmbar waere
+// (Fixture-Beleg D-03: alle 8 Zellen 0.0000 -> "I got too few coordinates" -> Fatal, kein PDF).
+// Der Writer liefert danach status_ok, weil die Datei EXISTIEREN muss: die 6 lc_surface_<z>.tex haengen
+// in A_measurements.tex an blankem \input (kein \InputIfFileExists) -- eine ausgelassene Datei waere nur
+// ein zweiter, ebenso fataler LaTeX-Fehler. Deshalb hier Platzhalter statt status_empty_input.
+// ASCII-only (Doktrin), Text kommt escape_latex-durchgereicht aus dem Aufrufer.
+[[nodiscard]] int write_honest_empty_placeholder(std::filesystem::path const& out_path, std::string const& title,
+                                                 std::string const& note, PageConstraints const& cnst) {
+    std::ofstream f{out_path};
+    if (!f) return status_io_error;
+    f << "% AUTO-GENERATED durch diagram_generator (E-2a HONEST-EMPTY: Metrik ohne Messwerte)\n";
+    f << "% KEINE Zelle dieser (search_algo x workload)-Flaeche traegt einen ausgefuehrten Messwert.\n";
+    f << "% Eine Heatmap daraus waere eine erfundene 0-ns-Flaeche (und bricht pgfplots fatal, weil die\n";
+    f << "% Farbskala auf eine entartete [0.0:0.0]-Domaene faellt). Daher: ehrlicher Vermerk statt Figur.\n";
+    if (!cnst.body_only) { f << "\\begin{figure}[" << cnst.position_hint << "]\n\\centering\n"; }
+    f << "\\emph{" << escape_latex(note) << "}\n";
+    if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
+    return f.good() ? status_ok : status_io_error;
+}
+
+// E-2b (2026-08-06) -- der EINE Ort fuer die Frage "traegt diese Zelle einen DARSTELLBAREN Messwert?".
+// 2D-Heatmap und 3D-Surface MUESSEN dieselbe Antwort geben: dass der 3D-Pfad frueher eigenstaendig nach
+// "z > 0" urteilte (und alles andere auf einen Phantom-Vertex hob), waehrend 2D auslies, war genau der
+// Divergenz-Befund. Wahrheitsquelle ist HeatmapData::executed (die durchgereichte z_field_executed-
+// Klassifikation); fehlt die Maske, gilt exakt die alte Heuristik = BESTANDSVERHALTEN.
+[[nodiscard]] bool heatmap_mask_matches(HeatmapData const& d) {
+    if (d.executed.size() != d.matrix.size()) return false;
+    for (std::size_t y = 0; y < d.matrix.size(); ++y)
+        if (d.executed[y].size() != d.matrix[y].size()) return false;
+    return true;
+}
+
+// have_mask = Ergebnis von heatmap_mask_matches (einmal je Writer bestimmt, nicht je Zelle).
+// Eine ausgefuehrte 0 ist DARSTELLBAR; NaN (keine Stichprobe) und negative Werte (keine Latenz) nie.
+[[nodiscard]] bool cell_displayable(HeatmapData const& d, bool have_mask, std::size_t y, std::size_t x) {
+    double const v = d.matrix[y][x];
+    if (!std::isfinite(v) || v < 0.0) return false;
+    return have_mask ? static_cast<bool>(d.executed[y][x]) : (v > 0.0);
+}
+
+// Neutraler ASCII-Default-Vermerk, falls der Aufrufer HeatmapData::empty_note leer laesst.
+[[nodiscard]] std::string default_empty_note() {
+    return "(No measured values: this metric was never executed in the present corpus -- the surface is "
+           "honestly omitted instead of showing invented zeros.)";
 }
 
 } // anonymous namespace
@@ -180,9 +236,6 @@ int write_scatter_plot(std::filesystem::path const& out_path, ScatterData const&
 int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data, PageConstraints const& cnst) {
     if (data.matrix.empty() || data.matrix[0].empty()) return status_empty_input;
 
-    std::ofstream f{out_path};
-    if (!f) return status_io_error;
-
     std::size_t const nx = data.matrix[0].size();
     std::size_t const ny = data.matrix.size();
 
@@ -191,14 +244,29 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     // verschluckt die eigentlichen Verfahrens-Unterschiede. Fix: point meta = log10(z),
     // Colorbar-Ticks als echte ns-Dekaden (10^k) relabelt. Konsistent mit dem 3D-Pfad
     // (write_surface3d_..., zmode=log). Farb-Domaene = tatsaechliche Log-Spanne der
-    // positiven Zellen (maximaler Kontrast). z<=0 / fehlende Zelle → point meta = nan
+    // positiven Zellen (maximaler Kontrast). Fehlende Zelle -> point meta = nan
     // (NICHT log10(0)=-inf): pgfplots zeichnet die Zelle, ohne sie in die Skala zu ziehen.
-    double pos_min  = 0.0;
-    double pos_max  = 0.0;
-    bool   have_pos = false;
-    for (auto const& row : data.matrix) {
-        for (double v : row) {
-            if (!(v > 0.0)) continue;
+    // E-2b (2026-08-06): die DARSTELLBAR-Wache liest jetzt die AUSGEFUEHRT-Maske (HeatmapData::executed)
+    // statt das Vorzeichen. Vorher galt "nur Wert > 0 ist Datum" -- damit fiel eine ECHT GEMESSENE 0
+    // (op_<art>_n > 0 bei p50 == 0) faelschlich unter "nicht ausgefuehrt" und eine Flaeche aus lauter
+    // echten Nullen erhielt sogar den "never executed"-Platzhalter. Fehlt die Maske (Direkt-Aufrufer
+    // ohne Ausfuehrungs-Wissen), bleibt exakt die alte Heuristik "endlich und > 0" = BESTANDSVERHALTEN.
+    bool const have_mask = heatmap_mask_matches(data);
+
+    // Zwei getrennte Wachen: have_pos traegt die LOG-Farbdomaene (nur > 0 ist log-faehig), have_zero die
+    // ECHT GEMESSENEN Nullen. Datenlos ist die Flaeche erst, wenn WEDER noch -- eine 0 ist ein Messwert.
+    double pos_min   = 0.0;
+    double pos_max   = 0.0;
+    bool   have_pos  = false;
+    bool   have_zero = false;
+    for (std::size_t y = 0; y < ny; ++y) {
+        for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
+            if (!cell_displayable(data, have_mask, y, x)) continue;
+            double const v = data.matrix[y][x];
+            if (v == 0.0) {
+                have_zero = true;
+                continue;
+            }
             if (!have_pos) {
                 pos_min  = v;
                 pos_max  = v;
@@ -209,9 +277,52 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
             }
         }
     }
-    double log_min = have_pos ? std::log10(pos_min) : 0.0;
-    double log_max = have_pos ? std::log10(pos_max) : 0.0;
-    if (have_pos && !(log_max > log_min)) log_max = log_min + 1.0; // entartete Ein-Wert-Matrix aufweiten
+
+    // -- E-2a/HONEST-EMPTY (VOR dem ofstream, Muster wie write_axis_observer_detail_table): keine einzige
+    //    darstellbare Zelle -> KEINE entartete Heatmap (pgfplots-Fatal), sondern ein ehrlicher Vermerk.
+    //    E-2b: NUR wenn auch keine echte 0 vorliegt -- eine Flaeche aus lauter gemessenen Nullen ist
+    //    gemessen und wird gezeichnet (sie ist gerade das interessante Ergebnis "0 ns gemessen").
+    //    Log-Zeile auf stderr (dieselbe Diagnose-Ebene, die appendix_generator/main_cli bereits nutzen).
+    if (!have_pos && !have_zero) {
+        std::cerr << "diagram-generator: HONEST-EMPTY -- keine ausgefuehrte Messung in der " << ny << "x" << nx
+                  << "-Flaeche \"" << data.title << "\" -> Platzhalter-Vermerk statt Heatmap: " << out_path.string()
+                  << "\n";
+        return write_honest_empty_placeholder(out_path, data.title,
+                                              data.empty_note.empty() ? default_empty_note() : data.empty_note, cnst);
+    }
+
+    std::ofstream f{out_path};
+    if (!f) return status_io_error;
+
+    // E-2b/META-SKALA. log10(0) existiert nicht -- eine ausgefuehrte 0 braucht daher eine EIGENE, ehrlich
+    // beschriftete Farbklasse statt eines erfundenen Ersatzwertes:
+    //   (a) positive Werte vorhanden -> Domaene = Log-Spanne der positiven Zellen; liegt zusaetzlich eine
+    //       echte 0 vor, wird die Domaene um GENAU EINE Dekade nach unten erweitert und dieser unterste
+    //       Colorbar-Tick literal mit "$0$" beschriftet (die 0 sitzt exakt auf ihm). Damit ist die 0
+    //       sichtbar UND von der kleinsten positiven Messung unterscheidbar (symlog-Muster).
+    //   (b) NUR echte Nullen -> es gibt keine Log-Spanne. Domaene [0:1] (nicht entartet, sonst pgfplots-
+    //       Fatal "too few coordinates"), Colorbar traegt genau EINEN Tick "$0$".
+    // pdflatex-Proben 2026-08-06 (texlive 2026, pgfplots compat=1.18): (a) RC=0 / 0 Warnungen;
+    // (b) RC=0 erst MIT explizitem zmin/zmax -- der blanke Mesh-Traeger waere sonst eine entartete
+    // z-Domaene ("Axis range for axis z is approximately empty"); (b) ohne point meta min/max: Fatal.
+    bool const log_scale = have_pos;
+    double     log_min   = 0.0;
+    double     log_max   = 1.0;
+    double     zero_meta = 0.0; // point meta einer ECHT GEMESSENEN 0
+    int        k_lo      = 0;
+    int        k_hi      = 1;
+    if (log_scale) {
+        log_min = std::log10(pos_min);
+        log_max = std::log10(pos_max);
+        if (!(log_max > log_min)) log_max = log_min + 1.0; // entartete Ein-Wert-Matrix aufweiten
+        k_lo = static_cast<int>(std::floor(log_min));
+        k_hi = static_cast<int>(std::ceil(log_max));
+        if (have_zero) {
+            --k_lo;                                // eine volle Dekade Luft fuer die 0-Klasse
+            zero_meta = static_cast<double>(k_lo); // die 0 sitzt exakt auf dem untersten Tick
+            log_min   = zero_meta;                 // Domaenen-Untergrenze = 0-Klasse
+        }
+    }
 
     f << "% AUTO-GENERATED durch diagram_generator (REV 7.6, TikZ-Heatmap, P6 log-Farbskala)\n";
     if (!cnst.body_only) {
@@ -225,14 +336,16 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     f << "    view={0}{90},\n";
     f << "    colorbar,\n";
     f << "    colormap/viridis,\n";
-    if (have_pos) {
-        // P6: Farb-Domaene in log10(ns). point meta min/max = tatsaechliche Log-Spanne (max. Kontrast).
-        f << "    point meta min=" << fmt_double(log_min) << ",\n";
-        f << "    point meta max=" << fmt_double(log_max) << ",\n";
+    // P6: Farb-Domaene in log10(ns). point meta min/max = tatsaechliche Log-Spanne (max. Kontrast).
+    // E-2a: ab hier IMMER gesetzt -- die datenlose Matrix ist oben schon als Platzhalter abgegangen,
+    // die frueher moegliche entartete [0.0:0.0]-Domaene kann hier nicht mehr entstehen.
+    f << "    point meta min=" << fmt_double(log_min) << ",\n";
+    f << "    point meta max=" << fmt_double(log_max) << ",\n";
+    if (log_scale) {
         // Colorbar-Ticks auf ganzzahlige ns-Dekaden relabeln (10^k). Randticks ausserhalb
         // [min,max] clippt pgfplots automatisch → Achse zeigt echte ns-Werte statt log-Zahlen.
-        int const k_lo = static_cast<int>(std::floor(log_min));
-        int const k_hi = static_cast<int>(std::ceil(log_max));
+        // E-2b: liegt eine ECHT GEMESSENE 0 vor, ist der unterste Tick (k_lo, die zusaetzliche Dekade)
+        // ihre eigene Klasse und wird literal "$0$" beschriftet -- KEINE erfundene 10^k-Behauptung.
         f << "    colorbar style={ytick={";
         for (int k = k_lo; k <= k_hi; ++k) {
             if (k > k_lo) f << ",";
@@ -241,9 +354,19 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
         f << "}, yticklabels={";
         for (int k = k_lo; k <= k_hi; ++k) {
             if (k > k_lo) f << ",";
-            f << "$10^{" << k << "}$";
+            if (have_zero && k == k_lo) {
+                f << "$0$";
+            } else {
+                f << "$10^{" << k << "}$";
+            }
         }
         f << "}},\n";
+    } else {
+        // E-2b: NUR echte Nullen -> genau EINE Farbklasse, ehrlich mit "$0$" beschriftet. zmin/zmax
+        // haelt zusaetzlich die z-Domaene des blanken Mesh-Traegers nicht-entartet (pdflatex-Probe:
+        // ohne sie "Axis range for axis z is approximately empty"; z ist bei view={0}{90} kein Datum).
+        f << "    colorbar style={ytick={0}, yticklabels={$0$}},\n";
+        f << "    zmin=0, zmax=1,\n";
     }
     f << "    mesh/cols=" << nx << ",\n"; // PFLICHT fuer matrix plot* (sonst 'matrix input=image' unsupported)
     f << "    xtick={0,1,...," << (nx - 1) << "},\n";
@@ -267,16 +390,36 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
         f << "    y tick label style={font=\\tiny},\n";
     }
     f << "]\n";
+    // -- E-2a/AUSLASS-STRATEGIE der Heatmap (empirisch festgelegt, pdflatex+pgfplots-Proben 2026-08-06) --
+    // Eine Zelle OHNE Messwert (nicht ausgefuehrt laut Maske bzw. NaN aus aggregate_surface_matrix) wird
+    // ueber den EINEN Kanal ausgelassen, den pgfplots' matrix plot dafuer hergibt: point meta = nan.
+    // Die Zelle zieht dann die Farbskala NICHT und erscheint als Leerstelle (kein log10(0) = -inf).
+    // Die dritte Koordinate ist bei view={0}{90} KEIN Datum, sondern nur der Mesh-Traeger; sie MUSS
+    // endlich und lueckenlos sein: matrix plot erlaubt keine Loecher. Belegt durch 3 Proben:
+    //   z=nan (Default unbounded coords=discard) -> "coordinate ... has been dropped", Mesh verkuerzt
+    //     sich still und mesh/cols interpretiert die Restpunkte falsch (stille Fehl-Darstellung);
+    //   z=nan + unbounded coords=jump           -> "Sorry, 'matrix plot' supports no holes (jumps)", Fatal;
+    //   addplot3 mit reinen (x,y)-Paaren        -> Fatal (addplot3 verlangt 3 Koordinaten).
+    // Deshalb traegt eine nicht gemessene Zelle die blanke 0 OHNE Nachkommastellen: sie ist damit vom
+    // %.4f-Format ECHTER Messwerte unterscheidbar und behauptet gerade NICHT den frueheren Literal-Wert
+    // "0.0000" (= eine erfundene 0-ns-Messung, Phantom-Falle; vgl. aggregate_latency_range).
+    // E-2b: GENAU DREI Zell-Klassen, sauber getrennt (vorher fielen die letzten beiden zusammen):
+    //   (1) ausgefuehrt, Wert > 0  -> z="%.4f", meta=log10(z)      (Bestand)
+    //   (2) ausgefuehrt, Wert == 0 -> z="0.0000", meta=zero_meta   (DARSTELLBAR: eigene 0-Farbklasse;
+    //                                 die 4 Nachkommastellen weisen sie als ECHTE Messung aus)
+    //   (3) nicht ausgefuehrt      -> z="0" (blanker Mesh-Traeger), meta=nan (Auslass)
+    f << "% HONEST-EMPTY: point meta nan = Zelle NICHT gemessen (Operation nicht ausgefuehrt). Deren\n";
+    f << "% dritte Koordinate ist eine blanke 0 = reiner Mesh-Traeger (matrix plot duldet keine Loecher),\n";
+    f << "% KEIN Messwert. Echte Messwerte stehen immer mit 4 Nachkommastellen -- auch die gemessene\n";
+    f << "% 0.0000, die ihre eigene unterste Farbklasse traegt (Colorbar-Tick literal 0).\n";
     f << "\\addplot3[matrix plot*, point meta=explicit] coordinates {\n";
     for (std::size_t y = 0; y < ny; ++y) {
         for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
-            double const z = data.matrix[y][x];
-            // Koordinaten-z bleibt der Roh-ns-Wert (bei view={0}{90} flach → nur Position).
-            // FARBE (point meta) = log10(z); z<=0/fehlend → nan (nicht log10(0)=-inf).
-            // have_pos==false (unmoegliche rein-nicht-positive Matrix) → linear wie zuvor.
-            std::string const meta =
-                have_pos ? (z > 0.0 ? fmt_double(std::log10(z)) : std::string{"nan"}) : fmt_double(z);
-            f << "    (" << x << "," << y << "," << fmt_double(z) << ") [" << meta << "]\n";
+            double const      z    = data.matrix[y][x];
+            bool const        has  = cell_displayable(data, have_mask, y, x);
+            std::string const zs   = has ? fmt_double(z) : std::string{"0"};
+            std::string const meta = has ? fmt_double(z > 0.0 ? std::log10(z) : zero_meta) : std::string{"nan"};
+            f << "    (" << x << "," << y << "," << zs << ") [" << meta << "]\n";
         }
     }
     f << "};\n";
@@ -424,12 +567,37 @@ namespace {
     return r.ns_per_op; // "ns_per_op" + Default
 }
 
+// E-2a/PHANTOM-FALLE (2026-08-06) -- "wurde die Operation dieser Zeile fuer das gewaehlte z-Feld ueberhaupt
+// AUSGEFUEHRT?". Exakt das bereits im Modul etablierte und dokumentierte Muster aus aggregate_latency_range
+// ("nicht gelaufen" != "0 ns"), hier aber mit der PRIMAERQUELLE statt der Heuristik:
+//   1. op_<art>_n (Ausfuehrungs-Zaehler) -- das echte Signal, sobald der Parser es hat (has_op_n).
+//   2. sonst p50 > 0 -- die im Bestand etablierte Heuristik (cowfix-v1-CSV ohne die Zaehler-Spalten);
+//      damit bleibt das Verhalten fuer alte Korpora unveraendert (BESTANDSVERHALTEN).
+// "ns_per_op" (Gesamt-Latenz ueber alle Operationen) kennt keinen eigenen Zaehler -> gemessen <=> > 0.
+[[nodiscard]] bool z_field_executed(WideMeasurementRow const& r, std::string const& z_field) {
+    for (auto const& spec : kRangeOps)
+        if (z_field == spec.p50_col) return r.has_op_n ? (r.*(spec.n_mem) > 0U) : (r.*(spec.p50_mem) > 0.0);
+    return r.ns_per_op > 0.0;
+}
+
+// E-2a: Ergebnis der Flaechen-Aggregation. axes_present trennt "gar keine gueltige Zeile" (Bestandsfall,
+// Aufrufer: status_empty_input OHNE Datei) von any_data ("Achsen da, aber KEINE Zelle traegt einen
+// darstellbaren Messwert" -> HONEST-EMPTY-Platzhalter). Frueher waren beide Faelle ununterscheidbar.
+struct SurfaceAggregate {
+    bool axes_present = false;
+    bool any_data     = false;
+};
+
 // Gemeinsame Aggregation für 2D-Heatmap und echte 3D-Surface: füllt die
 // (search_algo × workload)-Matrix mit nearest-rank-Median des z-Feldes, NUR über
 // two_phase_valid==true. Beim scan-Surface werden die No-Op-Scan-Profile
-// "ycsb_e"/"lp_range_scan" ausgeschlossen. Liefert false bei leerer Matrix.
-[[nodiscard]] bool aggregate_surface_matrix(std::span<WideMeasurementRow const> rows, std::string const& z_field,
-                                            HeatmapData& data) {
+// "ycsb_e"/"lp_range_scan" ausgeschlossen.
+// E-2a: Die ACHSEN entstehen weiterhin aus ALLEN gueltigen Zeilen (unveraendert) -- sie duerfen NICHT auf
+// die Zellen mit Daten schrumpfen, weil eine 1-spaltige/1-zeilige Matrix fuer pgfplots' matrix plot* selbst
+// fatal ist ("'matrix input=image' is unsupported for line plots", Probe 2026-08-06). Nur die ZELLWERTE
+// unterscheiden jetzt: nicht ausgefuehrt -> NaN (nicht 0.0), damit die .tex keine 0-ns-Messung erfindet.
+[[nodiscard]] SurfaceAggregate aggregate_surface_matrix(std::span<WideMeasurementRow const> rows,
+                                                        std::string const& z_field, HeatmapData& data) {
     bool const is_scan = (z_field == "op_scan_p50_ns");
     // std::map → deterministisch sortierte Achsen-Ordnung (Zeilen y, Spalten x).
     std::map<std::pair<std::string, std::string>, std::vector<double>> groups;
@@ -439,22 +607,44 @@ namespace {
         if (!r.two_phase_valid) continue;
         if (r.search_algo.empty()) continue;
         if (is_scan && (r.workload == "ycsb_e" || r.workload == "lp_range_scan")) continue;
-        groups[{r.search_algo, r.workload}].push_back(pick_z_field(r, z_field));
         algos.insert(r.search_algo);
         workloads.insert(r.workload);
+        // Nur AUSGEFUEHRTE Operationen sind eine Stichprobe. Eine nicht ausgefuehrte Zeile traegt gar
+        // nichts bei (statt eine 0 in den Median zu ziehen) -- Muster aggregate_latency_range.
+        if (!z_field_executed(r, z_field)) continue;
+        groups[{r.search_algo, r.workload}].push_back(pick_z_field(r, z_field));
     }
-    if (algos.empty() || workloads.empty()) return false;
+    SurfaceAggregate agg;
+    if (algos.empty() || workloads.empty()) return agg; // axes_present bleibt false (Bestandsverhalten)
+    agg.axes_present = true;
 
     data.y_labels.assign(algos.begin(), algos.end());         // Zeilen = search_algo
     data.x_labels.assign(workloads.begin(), workloads.end()); // Spalten = workload
-    data.matrix.assign(data.y_labels.size(), std::vector<double>(data.x_labels.size(), 0.0));
+    // Default JETZT NaN statt 0.0: eine Zelle ohne Stichprobe ist "nicht gemessen", nicht "0 ns gemessen".
+    data.matrix.assign(data.y_labels.size(),
+                       std::vector<double>(data.x_labels.size(), std::numeric_limits<double>::quiet_NaN()));
+    // E-2b: die AUSGEFUEHRT-Maske wird hier gefuellt und bis in die Writer durchgereicht. Nur HIER ist die
+    // Ausfuehrungs-Wahrheit bekannt (z_field_executed ueber op_<art>_n); der Writer darf sie NICHT aus dem
+    // Wert zurueckraten -- genau daran scheiterte die echt gemessene 0.
+    data.executed.assign(data.y_labels.size(), std::vector<bool>(data.x_labels.size(), false));
     for (std::size_t y = 0; y < data.y_labels.size(); ++y) {
         for (std::size_t x = 0; x < data.x_labels.size(); ++x) {
             auto it = groups.find({data.y_labels[y], data.x_labels[x]});
-            if (it != groups.end()) { data.matrix[y][x] = nearest_rank_median(std::move(it->second)); }
+            if (it == groups.end()) continue; // kein Treffer -> Zelle bleibt NaN (ehrlich ausgelassen)
+            double const med  = nearest_rank_median(std::move(it->second));
+            data.matrix[y][x] = med;
+            // Eine Gruppe existiert NUR aus ausgefuehrten Stichproben (z_field_executed-Filter oben) ->
+            // die Zelle ist gemessen, AUCH wenn der Median 0 ist. any_data == "mindestens eine
+            // DARSTELLBARE Zelle" -- deckungsgleich mit der displayable-Wache in write_heatmap, damit
+            // Aggregat und Writer nie widerspruechlich urteilen (der Negativ-Zweig ist reine Abwehr:
+            // ein negativer/nicht-endlicher Median waere keine Latenz und bleibt ausgelassen).
+            if (std::isfinite(med) && med >= 0.0) {
+                data.executed[y][x] = true;
+                agg.any_data        = true;
+            }
         }
     }
-    return true;
+    return agg;
 }
 
 // Lokalisierte Titel/Achsen-Beschriftung je z-Feld.
@@ -590,6 +780,34 @@ int parse_wide_csv(std::filesystem::path const& in, std::vector<WideMeasurementR
                 }
                 r.has_op_p99 = all_present;
             }
+            // E-2a/HONEST-EMPTY (2026-08-06): die 5 AUSFUEHRUNGS-ZAEHLER op_<art>_n. Sie sind das direkte
+            // Signal "Operation nicht ausgefuehrt" (n==0) und trennen es von "echt 0 ns" -- bisher wurde das
+            // Signal aus der WIDE-CSV schlicht verworfen. Gleiches Muster wie der p99-Block darueber:
+            // OPTIONAL/header-getrieben (NICHT in required[]), n-a-tolerant, stoull-Wurf LOKAL geschluckt.
+            // Fehlt EINE der 5 Spalten ODER ist EINE Zelle leer/"n/a"/nicht-numerisch -> has_op_n bleibt
+            // false und die Auswertung faellt auf die p50>0-Heuristik zurueck = BESTANDSVERHALTEN.
+            {
+                bool all_present = true;
+                for (auto const& spec : kRangeOps) {
+                    auto nit = col.find(std::string{spec.n_col});
+                    if (nit == col.end()) {
+                        all_present = false;
+                        break;
+                    }
+                    std::string const& cell = cols[nit->second];
+                    if (cell.empty() || cell == "n/a") {
+                        all_present = false;
+                        break;
+                    }
+                    try {
+                        r.*(spec.n_mem) = std::stoull(cell);
+                    } catch (std::exception const&) {
+                        all_present = false;
+                        break;
+                    }
+                }
+                r.has_op_n = all_present;
+            }
             out_rows.push_back(std::move(r));
         } catch (std::exception const&) { return status_empty_input; }
     }
@@ -601,7 +819,7 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
                                          PageConstraints const& cnst) {
     if (rows.empty()) return status_empty_input;
     HeatmapData data;
-    if (!aggregate_surface_matrix(rows, z_field, data)) return status_empty_input;
+    if (!aggregate_surface_matrix(rows, z_field, data).axes_present) return status_empty_input;
 
     bool const        de     = (lang == "de");
     std::string const metric = z_field_human(z_field, lang);
@@ -609,6 +827,16 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
                                (de ? " (Suchalgorithmus x Workload)" : " (search algorithm x workload)");
     data.x_label             = de ? "Workload" : "workload";
     data.y_label             = de ? "Suchalgorithmus" : "search algorithm";
+    // E-2a: sprach-lokalisierter HONEST-EMPTY-Vermerk. write_heatmap nutzt ihn NUR, wenn keine einzige
+    // Zelle einen darstellbaren Messwert traegt (dann Platzhalter statt entarteter Heatmap).
+    // Reiner Text (escape_latex-durchgereicht) -- kein Mathe-Modus, keine Nicht-ASCII-Zeichen.
+    data.empty_note =
+        de ? ("(Keine Messwerte: " + metric +
+              " wurde im vorliegenden Korpus nie ausgefuehrt. Diese Flaeche wird ehrlich ausgelassen, "
+              "statt eine 0-ns-Messung zu behaupten.)")
+           : ("(No measured values: " + metric +
+              " was never executed in the present corpus. This surface is honestly omitted instead of "
+              "claiming a 0 ns measurement.)");
     // write_heatmap WIEDERVERWENDEN (view={0}{90} matrix plot + colormap/viridis).
     return write_heatmap(out, data, cnst);
 }
@@ -617,18 +845,68 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
                                            std::string const& z_field, std::string const& lang,
                                            PageConstraints const& cnst) {
     if (rows.empty()) return status_empty_input;
-    HeatmapData data;
-    if (!aggregate_surface_matrix(rows, z_field, data)) return status_empty_input;
+    HeatmapData      data;
+    auto const       agg = aggregate_surface_matrix(rows, z_field, data);
+    if (!agg.axes_present) return status_empty_input;
+
+    bool const        de     = (lang == "de");
+    std::string const metric = z_field_human(z_field, lang);
+
+    // E-2a/HONEST-EMPTY: dieselbe Wache wie im 2D-Pfad -- keine einzige ausgefuehrte Zelle -> ehrlicher
+    // Platzhalter statt Figur. E-2b: any_data zaehlt jetzt AUCH ausgefuehrte Nullen als Daten, der
+    // Platzhalter greift also nur noch bei wirklich nie ausgefuehrter Metrik (ein Ort, ein Muster wie 2D).
+    if (!agg.any_data) {
+        std::string const title3d = (de ? "3D-Surface: " : "3D surface: ") + metric;
+        std::cerr << "diagram-generator: HONEST-EMPTY -- keine ausgefuehrte Messung fuer z=" << z_field
+                  << " -> Platzhalter-Vermerk statt 3D-Surface: " << out.string() << "\n";
+        return write_honest_empty_placeholder(
+            out, title3d,
+            de ? ("(Keine Messwerte: " + metric +
+                  " wurde im vorliegenden Korpus nie ausgefuehrt. Diese Flaeche wird ehrlich ausgelassen.)")
+               : ("(No measured values: " + metric +
+                  " was never executed in the present corpus. This surface is honestly omitted.)"),
+            cnst);
+    }
 
     std::ofstream f{out};
     if (!f) return status_io_error;
 
-    std::size_t const nx     = data.matrix[0].size();
-    std::size_t const ny     = data.matrix.size();
-    bool const        de     = (lang == "de");
-    std::string const metric = z_field_human(z_field, lang);
+    std::size_t const nx = data.matrix[0].size();
+    std::size_t const ny = data.matrix.size();
 
-    f << "% AUTO-GENERATED durch diagram_generator (L-c, echte-3D-Surface, z log-skaliert)\n";
+    // E-2b/DARSTELLBAR-Wache des 3D-Pfades -- WORTGLEICH zur 2D-Wache (die Maske kommt aus derselben
+    // Aggregation). Vorher urteilte der 3D-Pfad allein ueber "z > 0" und hob JEDE andere Zelle auf einen
+    // Phantom-Vertex 1.0e-3, sobald irgendeine Zelle positiv war -- inkonsistent zu 2D und still erfunden.
+    bool const have_mask = heatmap_mask_matches(data);
+    double     val_min   = 0.0;
+    double     val_max   = 0.0;
+    bool       have_val  = false;
+    bool       have_zero = false;
+    for (std::size_t y = 0; y < ny; ++y) {
+        for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
+            if (!cell_displayable(data, have_mask, y, x)) continue;
+            double const v = data.matrix[y][x];
+            if (v == 0.0) have_zero = true;
+            if (!have_val) {
+                val_min  = v;
+                val_max  = v;
+                have_val = true;
+            } else {
+                val_min = std::min(val_min, v);
+                val_max = std::max(val_max, v);
+            }
+        }
+    }
+    // E-2b/Z-ACHSEN-MODUS. Der log-z-Boden ist der Grund, warum hier frueher ein Phantom entstand: eine
+    // log-Achse kann WEDER ein Loch NOCH die 0 tragen. Die dokumentierte kleinste ehrliche Alternative:
+    //   - ohne echte 0  -> zmode=log (Bestand; die ~14000x-Workload-Spanne braucht die Log-Hoehe),
+    //   - mit echter 0  -> LINEARE z-Achse. Nur so ist die gemessene 0 ein ECHTER Vertex bei z=0 statt
+    //                      erfunden (1.0e-3) oder verschwiegen (auf der Log-Achse wird sie zum Loch).
+    // pdflatex-Probe 2026-08-06: linear + 0.0000 + nan-Loch -> RC=0, 0 Warnungen; log + 0.0000 -> die 0
+    // faellt still als unbounded coordinate heraus (waere ein verschwiegener Messwert).
+    bool const z_log = !have_zero;
+    f << "% AUTO-GENERATED durch diagram_generator (L-c, echte-3D-Surface, z "
+      << (z_log ? "log-skaliert" : "LINEAR -- echte 0 gemessen, log kann 0 nicht tragen") << ")\n";
     if (!cnst.body_only) {
         f << "\\begin{figure}[" << cnst.position_hint << "]\n";
         f << "\\centering\n";
@@ -641,7 +919,13 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
     // Echte 3D-Projektion + surf-Plot. z LOG-skaliert: Workload-Spanne ~14000×,
     // sonst dominiert eine Zelle die Höhen-Achse vollständig.
     f << "    view={45}{30},\n";
-    f << "    zmode=log,\n";
+    if (z_log) f << "    zmode=log,\n"; // E-2b: entfaellt genau dann, wenn eine echte 0 zu tragen ist
+    // E-2b/AUSLASS-STRATEGIE des 3D-Pfades. "unbounded coords=jump" ist der EINE Kanal, mit dem surf ein
+    // Loch traegt (Gegenprobe 2026-08-06: ohne die Option wird die nan-Koordinate VERWORFEN -- "has been
+    // dropped" -- und pgfplots bricht anschliessend fatal im z-buffer-Reordering ab, RC=1, kein PDF).
+    // Mit ihr: RC=0, 0 Warnungen, die Nachbar-Patches der Luecke entfallen ehrlich. Damit gilt jetzt in
+    // 2D UND 3D dieselbe Regel: nicht ausgefuehrt = ausgelassen, NIE ein stiller Ersatzwert.
+    f << "    unbounded coords=jump,\n";
     f << "    colorbar,\n";
     f << "    colormap/viridis,\n";
     f << "    zlabel={" << escape_latex(metric) << "},\n";
@@ -666,15 +950,39 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
         f << "    y tick label style={font=\\tiny},\n";
     }
     f << "    mesh/cols=" << nx << ",\n";
+    // E-2b: x/y-Grenzen explizit auf das VOLLE Index-Gitter. Loecher zaehlen fuer pgfplots nicht mehr zur
+    // Datenspanne -- faellt eine ganze Rand-Spalte/-Zeile aus (realer Fall: eine Op laeuft nur in einem
+    // Workload), schrumpfte die Achse sonst auf die Rest-Punkte und die Tick-Beschriftung stuende an der
+    // falschen Stelle (Probe: "Axis range for axis x is approximately empty"). +-0.5 = die Zell-Ausdehnung
+    // des Index-Gitters, also genau die Flaeche, die die Labels beschriften.
+    f << "    xmin=" << fmt_double(-0.5) << ", xmax=" << fmt_double(static_cast<double>(nx) - 0.5) << ",\n";
+    f << "    ymin=" << fmt_double(-0.5) << ", ymax=" << fmt_double(static_cast<double>(ny) - 0.5) << ",\n";
+    // E-2b/ENTARTUNGS-WACHE: traegt die Flaeche nur EINEN verschiedenen Wert (Ein-Zell-Matrix oder lauter
+    // gleiche Werte -- insbesondere lauter echte Nullen), kollabieren z- UND Farb-Domaene. Gegenprobe
+    // 2026-08-06: pgfplots bricht dann fatal ab ("Error using 'plot graphics': I got too few
+    // coordinates"), exakt die D-03-Wurzel. Deshalb hier eine EXPLIZITE, aufgeweitete Domaene:
+    // log -> eine Dekade ueber dem Wert; linear (nur bei echter 0, also Wert==0) -> [0:1]. Das weitet
+    // ausschliesslich die ACHSE, kein Datum wird veraendert oder erfunden. have_val ist hier immer wahr
+    // (die voll datenlose Flaeche ist oben als Platzhalter abgegangen) -- die Bedingung haelt die Wache
+    // trotzdem praezise: ohne einen einzigen Wert gibt es nichts aufzuweiten.
+    if (have_val && !(val_max > val_min)) {
+        double const lo = z_log ? val_min : 0.0;
+        double const hi = z_log ? val_min * 10.0 : 1.0;
+        f << "    point meta min=" << fmt_double(lo) << ", point meta max=" << fmt_double(hi) << ",\n";
+        f << "    zmin=" << fmt_double(lo) << ", zmax=" << fmt_double(hi) << ",\n";
+    }
     f << "]\n";
+    // E-2b: GENAU ZWEI Vertex-Klassen (der Phantom-Boden 1.0e-3 ist getilgt):
+    //   ausgefuehrt      -> "%.4f" des Messwertes (auch die echte 0 als "0.0000", lineare z-Achse),
+    //   nicht ausgefuehrt-> "nan" = Loch (unbounded coords=jump), KEIN Ersatzwert.
+    f << "% HONEST-EMPTY: z=nan = Zelle NICHT gemessen -> Loch im Mesh (unbounded coords=jump), KEIN\n";
+    f << "% Ersatzwert. Echte Messwerte stehen mit 4 Nachkommastellen -- auch die gemessene 0.0000.\n";
     f << "\\addplot3[surf] coordinates {\n";
     for (std::size_t y = 0; y < ny; ++y) {
         for (std::size_t x = 0; x < nx; ++x) {
-            // z log-skaliert → 0/negative Werte auf kleinen Positiv-Floor heben,
-            // damit pgfplots' log-Achse nicht auf log(0) läuft.
-            double z = data.matrix[y][x];
-            if (!(z > 0.0)) z = 1.0e-3;
-            f << "    (" << x << "," << y << "," << fmt_double(z) << ")\n";
+            bool const has = cell_displayable(data, have_mask, y, x);
+            f << "    (" << x << "," << y << "," << (has ? fmt_double(data.matrix[y][x]) : std::string{"nan"})
+              << ")\n";
         }
         f << "\n"; // Leerzeile → neue mesh-Zeile (pgfplots surf-Konvention).
     }

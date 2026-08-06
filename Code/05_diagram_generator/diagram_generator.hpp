@@ -102,9 +102,38 @@ struct HeatmapData {
     std::string                      y_label;
     std::vector<std::string>         x_labels;
     std::vector<std::string>         y_labels;
-    std::vector<std::vector<double>> matrix; // matrix[y][x]
+    // matrix[y][x]. NaN (quiet_NaN) = Zelle OHNE Messwert ("nicht ausgefuehrt"), ausdruecklich NICHT 0.0
+    // -- write_heatmap laesst solche Zellen ueber point meta = nan aus und schreibt als dritte Koordinate
+    // nur den blanken Mesh-Traeger 0 (kein "0.0000"), damit die .tex keine 0-ns-Messung behauptet.
+    // Details + die drei pgfplots-Proben, die diese Auslass-Strategie erzwingen: siehe write_heatmap.
+    std::vector<std::vector<double>> matrix;
+    // E-2b/AUSGEFUEHRT-MASKE (2026-08-06) -- executed[y][x] parallel zu matrix[y][x]. Sie traegt die
+    // AUSFUEHRUNGS-Klassifikation (z_field_executed: Zaehler op_<art>_n zuerst, sonst p50>0-Heuristik) bis
+    // in den Writer. Ohne sie musste write_heatmap "gemessen" aus dem Wert selbst raten (v>0) -- und eine
+    // ECHT GEMESSENE 0 (op_<art>_n>0 bei p50==0) fiel faelschlich unter "nicht ausgefuehrt".
+    //   executed[y][x] == true  -> die Zelle traegt einen ECHTEN Messwert. Auch die 0 ist dann ein
+    //                              DARSTELLBARER Wert (Zelle mit Wert 0 und ehrlichem point meta, NICHT nan,
+    //                              NICHT Auslass, NICHT Platzhalter-Grund).
+    //   executed[y][x] == false -> nicht ausgefuehrt/keine Stichprobe -> Auslass ueber point meta = nan.
+    // LEER (oder dimensions-abweichend) -> BESTANDSVERHALTEN: der Writer faellt auf die alte Heuristik
+    // "endlich und > 0" zurueck. Direkt-Aufrufer ohne Ausfuehrungs-Wissen (Alt-Tests, Fremdmodule) bleiben
+    // damit unveraendert; nur wer die Wahrheit KENNT (aggregate_surface_matrix), reicht sie hier durch.
+    std::vector<std::vector<bool>> executed;
+    // E-2a/HONEST-EMPTY (2026-08-06): Vermerk-Text, den write_heatmap ANSTELLE einer datenlosen Heatmap
+    // emittiert (reiner Text, wird escape_latex-durchgereicht). Leer -> neutraler ASCII-Default. Der
+    // Aufrufer (write_surface_search_algo_x_workload) fuellt ihn sprach-lokalisiert.
+    std::string empty_note;
 };
 
+// Emittiert die 2D-Heatmap (matrix plot*, view={0}{90}, viridis, log-Farbskala).
+// HONEST-EMPTY (E-2a): traegt KEINE Zelle einen darstellbaren Messwert, wird KEINE entartete Heatmap
+// geschrieben (pgfplots-Fatal "too few coordinates" bei [0.0:0.0]-Farbdomaene), sondern ein ehrlicher,
+// kompilierfaehiger LaTeX-Platzhalter-Vermerk -- Rueckgabe status_ok, weil die Datei existieren MUSS
+// (die 6 lc_surface_<z>.tex haengen an blankem \input, kein \InputIfFileExists).
+// E-2b: "darstellbar" richtet sich nach HeatmapData::executed (falls gesetzt), NICHT nach dem Vorzeichen:
+// eine ausgefuehrte 0 wird DARGESTELLT (eigene 0-Farbklasse eine Dekade unter der kleinsten gemessenen
+// Dekade; besteht die Flaeche NUR aus echten Nullen, traegt die Colorbar genau diese eine 0-Klasse).
+// Strukturell leere Matrix (0 Zeilen/Spalten) bleibt status_empty_input OHNE Datei (Bestandsverhalten).
 [[nodiscard]] int write_heatmap(std::filesystem::path const& out, HeatmapData const& data,
                                 PageConstraints const& cnst = {});
 
@@ -173,6 +202,20 @@ struct WideMeasurementRow {
     double op_scan_p99_ns   = 0.0;
     double op_rmw_p99_ns    = 0.0;
     bool   has_op_p99       = false; // true ⇔ alle 5 op_*_p99_ns-Spalten vorhanden UND numerisch
+    // E-2a/HONEST-EMPTY (2026-08-06) -- die 5 AUSFUEHRUNGS-ZAEHLER op_<art>_n (Stueckzahl der in diesem Lauf
+    // tatsaechlich ausgefuehrten Operationen dieser Art). Sie sind das EINZIGE direkte Signal fuer
+    // "Operation nicht ausgefuehrt" (op_<art>_n == 0) und trennen es von "echt 0 ns gemessen"; ohne sie
+    // muss die Auswertung auf die p50>0-Heuristik zurueckfallen (Phantom-Falle, siehe
+    // aggregate_latency_range im .cpp). Beleg fuer die Spalten-Existenz im realen WIDE-Schema:
+    // measurement/20260726-164259-d03-strukt-r-erstbeleg/measurements.csv (Spalten 7/10/13/19/22).
+    // OPTIONAL/header-getrieben (NICHT Pflichtspalte, NICHT in required[]): fehlt EINE der 5 Spalten ODER
+    // ist EINE Zelle leer/"n/a"/nicht-numerisch, bleibt has_op_n=false -> BESTANDSVERHALTEN (p50>0-Heuristik).
+    std::uint64_t op_insert_n = 0;
+    std::uint64_t op_lookup_n = 0;
+    std::uint64_t op_erase_n  = 0;
+    std::uint64_t op_scan_n   = 0;
+    std::uint64_t op_rmw_n    = 0;
+    bool          has_op_n    = false; // true <=> alle 5 op_<art>_n-Spalten vorhanden UND numerisch
     bool   two_phase_valid  = false; // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
     // M3v2-Tag-Spalten (Task #156, ans Schema-Ende gehängt). OPTIONAL/header-getrieben aufgelöst:
     // fehlt die Spalte (cowfix-v1-Schema), bleibt das Feld leer/0 — KEIN Parse-Fehler (n/a).
@@ -264,6 +307,9 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
 // Additive echte-3D-Variante (view={45}{30}, \addplot3[surf], z LOG-skaliert wegen
 // ~14000× Workload-Spanne). Gleiche Aggregation wie write_surface_search_algo_x_workload,
 // nur andere pgfplots-Projektion. Bricht write_heatmap NICHT.
+// E-2b: nicht ausgefuehrte Zellen sind Loecher (z=nan + unbounded coords=jump), NIE ein Ersatzwert.
+// Traegt die Flaeche eine ECHT GEMESSENE 0, faellt die z-Achse auf LINEAR zurueck -- eine log-Achse
+// kann die 0 weder zeigen noch ehrlich ersetzen (Begruendung + Proben im .cpp).
 [[nodiscard]] int write_surface3d_search_algo_x_workload(std::filesystem::path const&        out,
                                                          std::span<WideMeasurementRow const> rows,
                                                          std::string const& z_field, std::string const& lang = "en",
