@@ -4199,6 +4199,439 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 abend-1 (ZWEITE VERLUSTWELLE -- die FRIST-KORREKTUR auf den 15.09.2026 stand 0/0 und ist damit der schwerste Einzelverlust des Tages; die geforderte Kalibrier-Stichprobe ist ERLEDIGT, bevor sie beauftragt wurde; Bau-Umfang / Batch-Semantik / Zeit-Bilanz am Objekt aufgeloest; NEUN Praezisierungen an nachmittag-11, davon vier an eigenen Zahlen)
+
+> **REGEL-ZEILE 10 gilt weiter und ordnet auch diesen Nachtrag:**
+> **Ein Paketschnitt, der nur in einem Session-Dokument steht, existiert fuer die Ausfuehrung nicht.**
+>
+> **REGEL-ZEILE 13 (NEU, aus dem Anlassfall genau dieses Nachtrags):**
+> **Das gilt auch fuer TERMINE.** Eine Frist, die nur in einer Kontext-Uebergabe steht, ordnet
+> keine einzige Prioritaet -- sie ist der teuerste denkbare Verlust, weil sie NICHT eine Position
+> falsch stellt, sondern ALLE.
+>
+> **REGEL-ZEILE 14 (NEU, aus der Nachmessung dieses Nachtrags):**
+> **Ein Buchfuehrungs-Nachtrag veraltet selbst.** nachmittag-11 misst "Ledger 5840 Zeilen" und
+> "LB-[0-9] = 0/0 zum Zeitpunkt der Ruege"; beim Schreiben DIESES Nachtrags sind es 6169 Zeilen
+> und 11 LB-Treffer. Wer die Zahlen eines aelteren Nachtrags uebernimmt statt sie neu zu messen,
+> zementiert einen Stand, den derselbe Ledger schon widerlegt hat. **Jede Trefferzahl traegt ab
+> sofort ihre Bezugsgroesse (Zeilenzahl + Datum) mit.**
+
+### A) ANLASS UND BEZUGSGROESSEN
+
+**ANLASS.** Owner 06.08. verbatim: *"Bitte dokumentiere die gesamte fehlende Buchfuehrung in deine
+Buchfuehrung."* nachmittag-11 hat die vier Codex-/Explore-Erhebungen konsolidiert. Danach lief die
+Abend-Uebergabe (`docs/sessions/20260806-KONTEXTUEBERGABE-abend-praezise.md`, 223 Zeilen, versioniert)
+und foerderte eine **ZWEITE Verlustwelle** zutage, die nachmittag-11 strukturell nicht sehen konnte:
+sie besteht aus Owner-Aussagen und Objekt-Messungen **desselben Abends**, also aus Stoff, der zum
+Zeitpunkt der Konsolidierung noch nicht existierte. **Sie ist trotzdem derselbe Mechanismus M2
+(Quellenklasse `docs/sessions/*` wird nicht ausgewertet) -- nur in Echtzeit.**
+
+**BEZUGSGROESSEN dieser Erhebung (alles mit `/usr/bin/grep` absolut gemessen; `grep` ist in dieser
+Shell eine Funktion auf ugrep und wurde NICHT verwendet):**
+- Ledger `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md`: **6169 Zeilen** (06.08. abends, HEAD `699edaa2`).
+  nachmittag-11 mass 5840 -- der Ledger ist seither um 329 Zeilen gewachsen.
+- TODO-Register `docs/sessions/20260806-REGISTER-todo-konsolidierung-14-tage.md`: **474 Zeilen**.
+- `.gitlab-ci.yml` (super): **1278 Zeilen**.
+- ce-HEAD: **`b241a272`** (`development`, auch auf `origin` und `github`).
+- Jede Fundstelle unten wurde einzeln aufgeschlagen und gelesen, keine Trefferzahl blind uebernommen.
+
+---
+
+### B) DIE NACHGEBUCHTEN POSTEN
+
+---
+
+**N-1 -- FRIST-KORREKTUR: ENDTERMIN 15.09.2026, WOECHENTLICHE LIEFERUNG JEDEN FREITAG.
+Der schwerste Einzelverlust des Tages.**
+
+- **QUELLE (woertlich, 06.08.2026 abends):**
+  `docs/sessions/20260806-KONTEXTUEBERGABE-abend-praezise.md:67`:
+  *"FRIST-KORREKTUR: Endtermin ist der 15.09.2026, mit woechentlicher Lieferung jeden Freitag.
+  Der 08.08. war ein Zwischenziel. Jede Priorisierung, die gegen den 08.08. gerechnet wurde, ist falsch."*
+  Gleichlautend `docs/ARBEITSWEISE-GESAMT-DOKTRIN.md:359` (*"Endtermin 15.09.2026, woechentliche
+  Lieferung jeden Freitag"*, versioniert seit `77993f6e`) und
+  `docs/sessions/20260806-DOSSIER-regressionen-checkheft.md:21`.
+- **BUCHUNGSSTAND (gemessen 06.08. abends):** `15.09` = **0 Treffer im Ledger (6169 Z.)**,
+  **0 Treffer im 14-Tage-Register (474 Z.)**. Die Frist lebt in genau drei Dokumenten.
+  *(Beim Beginn dieser Erhebung war das Checkheft noch UNVERSIONIERT -- `?? docs/sessions/
+  20260806-DOSSIER-regressionen-checkheft.md`; es wurde WAEHREND des Schreibens dieses Nachtrags
+  mit `e110cf6d` versioniert. Regel-Zeile 14 in Aktion.)*
+- **ANSPRUCH: ORDNET ALLES.** Dieser Posten ist keine Aufgabe, sondern der **Bezugsrahmen jeder
+  anderen Aufgabe**. Der Ledger fuehrt bis hierher durchgehend "Trigger Do 07.08. / Abgabe Fr 08.08."
+  als Termin-Achse -- zuletzt in nachmittag-11 Abschnitt F ("Trigger Do 07.08.; Abgabe Fr 08.08.").
+  **Diese Achse ist ueberholt.** Jede Einordnung "vor Trigger / vor Abgabe / nach Abgabe" in
+  nachmittag-11 und frueher ist gegen ein Zwischenziel gerechnet, nicht gegen den Endtermin.
+- **CODE-STAND:** nicht anwendbar (Governance).
+- **ZU TUN:** (1) **hiermit gebucht**; (2) das Termin-Vokabular des Ledgers umstellen -- die
+  Klassen des Regressions-Checkhefts sind bereits darauf geschnitten und werden hier uebernommen:
+  **T1 = vor dem ersten 4096er-Batch · T2 = vor der Voll-Messung · T3 = vor dem 15.09.2026 · T4 = danach**
+  (`20260806-DOSSIER-regressionen-checkheft.md:31`); (3) die **woechentliche Freitags-Lieferung** als
+  eigener wiederkehrender Betriebs-Posten (der 08.08. ist damit die ERSTE Wochen-Lieferung, nicht die
+  Abgabe); (4) das unversionierte Checkheft versionieren -- sonst ist die Termin-Klassifikation
+  selbst wieder nur ein Beleg ohne Register.
+
+---
+
+**N-2 -- KALIBRIER-STICHPROBE: ERLEDIGT, BEVOR SIE BEAUFTRAGT WURDE. Entlastung, die einen
+Vor-Trigger-Posten von nachmittag-11 aufloest.**
+
+- **QUELLE DER FORDERUNG (06.08.):** `docs/sessions/20260806-FAHRPLAN-hauptstrang-landung.md:428-435`:
+  *"Daraus folgt ein Vor-Trigger-Posten, der bisher in keiner Liste steht: eine Kalibrier-Stichprobe
+  -- z.B. 200 Binaries im Trigger-Modus bauen, Zeit stoppen, hochrechnen. Kosten: Minuten. Ohne sie
+  ist der Trigger ein Sprung ins Dunkle"*. Begruendung `:415`: die Kompilierzeit je Binary sei
+  *"unbekannt, nicht gemessen"*. nachmittag-11 hat diese Forderung als Posten (a-2) mit dem
+  Code-Stand *"nichts gebaut, nichts gemessen"* uebernommen und als **Vor-Trigger-Posten Nr. 1**
+  gefuehrt.
+- **QUELLE DER ENTLASTUNG (23.07.2026, aelter als die Forderung):**
+  `docs/sessions/20260723-SESSION-mittag-neustart-zug-vollbau4.md:41-45`, Kopf woertlich
+  *"Slice-1-Empirie Voll-Bau-3 (live, aus Job-Traces 306305/306306)"*:
+  - `:42` *"amd@32W: 11:14:24 -> 11:34:21 = 19,95 min (vs. 19,4 min @24W in 12690)"*
+  - `:44` *"intel@24W: 11:14:36 -> 11:46:51 = 32,25 min (vs. 35,5 min @16W)"*
+  **Die Bezugsgroesse der Slice ist am Objekt belegt** (nicht angenommen):
+  `docs/sessions/20260723-SESSION-vormittag-kette2-komplett-vollbau-start.md:33-34` --
+  *"GN_TOTAL=131072 Default ... je Maschine EIN Build+Pruef-Batch (32 Slices a 4096 je Perm,
+  Pruef-Gate je Perm, [TESTAT]-Fortschritt, K-Budgets amd=24/intel=16)"*.
+- **BUCHUNGSSTAND:** die Zahlen `19,95`/`32,25`/`19,4` = **0 Treffer im Ledger (6169 Z.)** und
+  **0 im Register**. Sie standen seit dem 23.07. in einem Session-Doc und sind nie in ein Register
+  gekommen -- **exakt der F9/LB-Mechanismus, hier mit dem teuren Nebeneffekt, dass 14 Tage spaeter
+  ein Fahrplan dieselbe Zahl als "nicht gemessen" ausweist und Arbeit dafuer bestellt.**
+- **ANSPRUCH: entfaellt.** Es gibt nichts mehr zu bauen. Ein realer Lauf ueber zwei Maschinen mit
+  32 Slices je Perm ist eine **belastbarere** Stichprobe als 200 einzeln gebaute Binaries.
+- **ZU TUN:** nachmittag-11 Abschnitt F Zeile 1 ("O-A + Kalibrier-Stichprobe ... **NEU, stand in
+  keiner Liste**") wird **hiermit geteilt**: der **Stichproben-Teil ist ERLEDIGT/gestrichen**, der
+  **O-A-Entscheid-Teil bleibt offen** und ist jetzt entscheidbar, weil die Zahl vorliegt (s. N-3/N-4).
+  Task **#21** ("VOR-TRIGGER, NEU: Kalibrier-Stichprobe") ist damit **erledigt**.
+
+---
+
+**N-3 -- DIE ZEIT-BILANZ. Ausgerechnet, mit Bezugsgroessen, und der Owner-Zahl gegenuebergestellt.**
+
+- **QUELLE der Owner-Zahl (06.08.):** `docs/sessions/20260806-KONTEXTUEBERGABE-abend-praezise.md:102`:
+  *"die grosse Maschine schafft den compile … in 11 Sekunden fuer eine Tier-Binary"*.
+- **RECHNUNG (Bezug: 4096 Binaries je Slice, 24 Worker je Lane; von mir nachgerechnet, nicht uebernommen):**
+
+        Lane            je Slice (4096)   je Binary Wanduhr   je Binary 1-Thread-aequivalent
+        amd/prod1 @24W   19,4  min          0,284 s             6,8  s
+        intel/prod2 @24W  32,25 min          0,472 s            11,3  s
+
+  (1164 s / 4096 = 0,2842 s; x24 = 6,82 s. 1935 s / 4096 = 0,4724 s; x24 = 11,34 s.)
+- **DECKUNG DER OWNER-ZAHL:** 11,3 s trifft die Owner-Angabe "11 Sekunden" auf ein Zehntel genau --
+  **aber es ist das 1-Thread-Aequivalent der INTEL-Lane.** Der Owner sagt "die **grosse** Maschine";
+  prod1/amd ist nach RAM- und Kern-Lage die groessere und liegt bei **6,8 s**. **Die Zahl deckt sich,
+  die Zuordnung ist NICHT belegt.** Beide Lesarten sind unschaedlich: mit 11 s rechnet man
+  konservativ, mit 6,8 s optimistisch; der Engpass ist in beiden Faellen intel.
+- **VOLL-BAU-HOCHRECHNUNG:** 524.288 Binaries (s. N-4) = 4 System-Perms x 32 Slices = 128 Slices,
+  auf 2 Lanes verteilt = **64 Slices je Maschine**. prod1: 64 x 19,4 min = **20,7 h**.
+  prod2: 64 x 32,25 min = **34,4 h**. **Engpass intel, ~34,4 h Wanduhr** bei parallelen Lanes.
+  **Erstes Batch: 19,4 min (prod1) / 32,25 min (prod2).**
+- **EHRLICHE EINSCHRAENKUNGEN, ausdruecklich ausgewiesen:** (a) die beiden verwendeten Zahlen
+  stammen aus **zwei verschiedenen Pipelines** -- amd 19,4 min @24W aus **12690**, intel 32,25 min
+  @24W aus **12713**; nur die 19,95-min-Zahl (amd@32W) und die 32,25-min-Zahl sind direkt
+  Trace-belegt, die 19,4 min sind im selben Dokument als Vergleichswert zitiert. (b) Der Zuschlag
+  *"zzgl. 4 unvermessene PRUEF-Durchlaeufe"* aus der Abend-Uebergabe ist **UNBELEGT** -- ich habe
+  die Zahl 4 nicht am Objekt verifizieren koennen (der Planer emittiert im Debug-Zweig einen
+  (j3)-Dual-Compile, `experiment_plan_director.hpp:1395-1415`); der Zuschlag existiert, seine
+  Groesse ist offen. (c) Die Werte stammen vom 23.07.; seither hat sich der Bau-Inhalt geaendert.
+- **ANSPRUCH:** T1 (ordnet das erste Batch) und Entscheidungs-Grundlage fuer O-A.
+- **ZU TUN:** nichts bauen. Beim ersten realen 4096er-Batch die Slice-Zeit **erneut** stoppen und
+  gegen diese Tabelle halten -- das ist die Nachkalibrierung, die die Alters-Einschraenkung (c) heilt.
+
+---
+
+**N-4 -- DER BAU-UMFANG: drei Zahlen, eine Wahrheit -- und es gibt KEINE KAPPUNG.
+Korrigiert nachmittag-11 und den Fahrplan.**
+
+- **WAS BISHER GEBUCHT IST (und falsch ist):** nachmittag-11 Abschnitt C/a-2 schreibt
+  *"deklariert sind 2.097.152 Tier-Binaries, gekappt auf 131.072"*; gleichlautend
+  `20260806-FAHRPLAN-hauptstrang-landung.md:498-505` (O-A) und die Task-Zeile #11
+  ("die 131.072er-Matrix"). **Beide Teile der Aussage halten der Nachmessung nicht stand.**
+- **(i) `131072` ist das Fenster JE SYSTEM-PERM, nicht der Gesamt-Umfang.**
+  Beleg: `.gitlab-ci.yml:79` `COMDARE_GN_TOTAL: "131072"`, im Kopfkommentar `:75-78` ausdruecklich
+  als *"Fenster"* gefuehrt (*"Ueberschreibbar je Trigger (z.B. Kalibrierlauf COMDARE_GN_TOTAL=64)"*).
+  Der Planer laeuft dieses Fenster **je Perm**: `experiment_plan_director.hpp:989`
+  *"je Perm laeuft er das [0,COMDARE_GN_TOTAL)-Fenster in kGnBatchSlice-Scheiben"*.
+- **(ii) Der reale Bau-Umfang ist `524.288`.** `perm_count = |opt x simd|`
+  (`experiment_plan_director.hpp:138`, berechnet `:2044` als `opt_perms.size() * simd_perms.size()`)
+  = 2 x 2 = **4** (opt {O2,O3} x simd {no_extension,avx2}; `target_isa` Faktor 1).
+  4 x 131.072 = **524.288**.
+- **(iii) `2.097.152` ist eine Kommentar-Zahl.** `Code/test_data_xml/experiment_golden_kern.xml:285`
+  (*"line_size 4 x system 4 x N 131072 = 2097152 Tier-Binaries"*) liegt **innerhalb eines
+  XML-Kommentars** (`<!--` auf `:248`, `-->` auf `:324` -- beide von mir aufgeschlagen). Der
+  `line_size`-Faktor 4 steht in `<organ_subaxes>`, und dieselbe Datei sagt `:300-301` ueber sich
+  selbst: *"HEUTE DEKLARATIV: parse_experiment_profile liest `<organ_subaxes>` noch nicht
+  (unbekannte Wurzel-Kinder werden still ignoriert)"*.
+- **(iv) ES GIBT KEINE KAPPUNG.** `cap="131072"` steht an zwei Stellen und wirkt an keiner:
+  - **`comdare_experiment`-Dialekt** (`experiment_golden_kern.xml:246`): **gar nicht geparst.**
+    `struct ExperimentProfile` (`xml_config_parser.hpp:440-473`) besitzt **kein** `run_options`- und
+    kein `cap`-Feld. Die Zahl ist dort Text.
+  - **`comdare_thesis_profile`-Dialekt** (`all_axes_golden.profile.xml:163`): geparst
+    (`xml_config_parser.cpp:426`), aufgeloest durch `profile_effective_cap`
+    (`profile_runner.hpp:163-169`) als `min(eff, basis_count)`. Da der golden-Organraum
+    N = 2^17 = 131072 IST, ist `cap=131072` ein **min gegen sich selbst = wirkungslos**.
+    *(Diese letzte Gleichsetzung ist aus der Deklaration abgeleitet -- 17 Binaer-Achsen = 2^17,
+    `experiment_golden_kern.xml:156` -- und nicht zur Laufzeit gemessen; als solche gekennzeichnet.)*
+  **=> "gekappt auf 131.072" ist eine Fehlbeschreibung und wird hiermit zurueckgezogen.**
+- **PRAEZISIERUNG AN EINER FORMULIERUNG DER ABEND-UEBERGABE (eigene Korrektur, s. Abschnitt C):**
+  die dortige Wendung, die 2.097.152 stuende *"in einer Datei, die die Pipeline nie anfasst"*, ist
+  **zu weit**. `experiment_golden_kern.xml` **wird** von der Pipeline angefasst -- von vier
+  super-ctest-Wachen (`Code/tests/CMakeLists.txt:170/:173/:211`, `golden_n_consistency_check.cmake`,
+  `fixture_schema_subset_check.cmake`, `fixture_sync_check.cmake`), die in `test:unit` laufen.
+  **Richtig ist die engere Aussage:** die Datei ist **nicht** das Profil, das die golden-BAU-/MESS-Kette
+  liest -- das ist `all_axes_golden.profile.xml` (`.gitlab-ci.yml:1152`, `COMDARE_GOLDEN_N_PROFILE`).
+- **ANSPRUCH:** T1/T2 -- die Zahl bestimmt Bau-Dauer, Plattenbedarf und die O-A-Vorlage.
+- **ZU TUN:** die Zahl **524.288** wird die kanonische Umfangs-Zahl; `2.097.152` gilt als
+  Kommentar-Deklaration eines heute nicht gelesenen Kanals; "Kappung" faellt als Begriff weg.
+  Task **#11** ist entsprechend umzuformulieren ("die 524.288er-Matrix misst OHNE Cache-Zaehler").
+
+---
+
+**N-5 -- DIE BATCH-SEMANTIK, aufgeloest: "4096 jobs" und "4096 Einheiten" sind dasselbe.**
+
+- **QUELLE (Owner, im Ledger schon vorhanden, aber nie zusammengefuehrt):**
+  - **LEDGER:3324** (Owner 22.07.): *"Batch-Groesse: die Batches enthalten STETS 4096 Binaries,
+    die eine CEB aufnimmt und MIT ZEITSTEMPEL reserviert."*
+  - **LEDGER:3318** (Owner 21.07., §62-B BATCH-JOB-PRINZIP): *"Bei ~130.000 Tier-Binaries werden
+    NIEMALS Einzel-Jobs je Binary angelegt ... Job-Anzahl = O(konstant), NIE O(Binaries)."*
+  - **LEDGER:3320** (Owner 22.07., IST-VERSTOSS): *"Job-Anzahl O(Maschinen), nie O(Perms x Chunks)."*
+- **CODE-DECKUNG (am Objekt, deckungsgleich):**
+  `BuildJob` = **eine Tier-Binary** (`build_orchestrator.hpp:124-131`, Kommentar woertlich
+  *"Ein Build-Auftrag (eine Tier-Binary)"*) · `kGnBatchSlice = 4096`
+  (`experiment_plan_director.hpp:610`) · `kBuildSliceGrain = 4096`
+  (`planer_driven_build.hpp:60`, Kommentar *"spiegelt experiment_plan_director kGnBatchSlice=4096"*).
+- **BUCHUNGSSTAND:** die Einzelteile sind gebucht, **die Aufloesung war es nicht** -- die
+  Doppeldeutigkeit "4096 jobs" vs. "4096 Einheiten" hat die Planung mehrfach beschaeftigt.
+- **AUFLOESUNG (hiermit gebucht):** **beide bezeichnen 4096 BINARIES je Scheibe.**
+  **GitLab-Jobs sind O(Maschinen) = 4** (2 Maschinen x {Build+Pruef, Messung}). Ein Job je Binary
+  hat es nie gegeben und darf es nach §62-B nie geben.
+- **ANSPRUCH:** Verstaendigungs-Posten, kein Bau. **ZU TUN:** nichts -- ab jetzt zitierbar.
+
+---
+
+**N-6 -- DIE XML-TRENNUNG BAU/MESSUNG. Owner-Regression bestaetigt, Bau-Posten.**
+
+- **QUELLE (Owner, 06.08. abends, woertlich):**
+  `docs/sessions/20260806-KONTEXTUEBERGABE-abend-praezise.md:74-76`:
+  *"nur weil sie kompiliert werden sollten, heisst es nicht dass sie auch gemessen werden muessen,
+  das muss die XML getrennt fuer build und Messung definieren koennen sonst regression."*
+- **BUCHUNGSSTAND:** `0 Treffer im Ledger (6169 Z.)`, `0 im Register`. Zweitbeleg in
+  `docs/plaene/20260806-PLAN-owner-antworten-vertiefung.md:84` -- **diese Datei war bei Beginn der
+  Erhebung UNVERSIONIERT** und ist waehrenddessen mit `e110cf6d` versioniert worden.
+  Es war damit der dritte Fall der Klasse "Disposition liegt in einer Datei, die kein Commit kennt"
+  an einem einzigen Tag (nach KK-5 in nachmittag-11 und dem Checkheft in N-1) -- **alle drei sind
+  inzwischen geheilt, s. Abschnitt D.**
+- **IST-STAND AM OBJEKT (bestaetigt die Regression):** die Trennung existiert heute **ausschliesslich**
+  - **als Env-Schalter:** `COMDARE_GOLDEN_N_RANGE="start:count"` und
+    `COMDARE_GOLDEN_N_PROVISION_ONLY` (`planer_cli_env.hpp:49/:58`, `profile_run_facade.hpp:61`);
+  - **als hartkodierte Emitter-Asymmetrie im Planer:** der Provision-Zweig setzt
+    `COMDARE_GOLDEN_N_PROVISION_ONLY=true` (`experiment_plan_director.hpp:1247`, `:1406`, `:1696`,
+    `:1753`), der Mess-Zweig laesst ihn weg -- `:1293` woertlich: *"Er baut+misst OHNE
+    COMDARE_GOLDEN_N_PROVISION_ONLY => run_profile"*, `:1758` *"realer Mess-COMMAND -- OHNE
+    COMDARE_GOLDEN_N_PROVISION_ONLY (=> misst)"*.
+  - **Im XML gibt es die Trennung nicht.** `experiment_golden_kern.xml:270` sagt es selbst:
+    *"Diese XML deklariert also die BAU-Menge, der Planer die MESS-Menge."*
+- **ANSPRUCH: BAU-POSTEN, KEIN ENTSCHEID.** Der Owner hat das Mittel benannt; zu bauen ist ein
+  XML-Kanal, der Bau-Menge und Mess-Menge getrennt deklariert. Termin: **T2** (vor der Voll-Messung)
+  -- vorher genuegt der Env-Weg, nachher ist jede Abweichung eine Regression im Owner-Sinn.
+- **ZU TUN:** Paket schneiden (XSD + Parser + Planer-Emission + Wache, dass beide Mengen
+  unterscheidbar sind); die unversionierte Plandatei versionieren.
+
+---
+
+**N-7 -- F9 / LB-0..LB-6: STATUS-KONSOLIDIERUNG. Die Antwort auf "ist LB komplett?" lag ueber
+DREI Dokumente verstreut.**
+
+- **QUELLE des Paketschnitts (Owner-Entscheid 01.08., woertlich):**
+  `docs/sessions/20260801-KONSOLIDIERT-gesamtarchitektur-lager-batch-eta-sha512.md:76`:
+  *"Vor-Trigger-Pflicht-Paketschnitt Lager-Baum-Vollausbau (F9: erst Baum fertig, dann
+  Voll-Bau-Trigger; 'der Voll-Bau-Trigger IST der Baum-Vollausbau')"* -- mit **LB-0** Pfad-Grammatik ·
+  **LB-1** Knoten-Log + Truncate-Zustandsmaschine · **LB-2** Baum-Writer Binaries-Realm ·
+  **LB-3** Baum-Writer Messdaten-Realm + xlsx · **LB-4** Bestandslog<->Baum-Integration ·
+  **LB-5** Planer/CEB-Scharfschaltung · **LB-6** Beweise. Zweitbeleg
+  `20260801-FAHRPLAN-vollbau4-beweise-g6-trigger.md:227-228`.
+- **BUCHUNGSSTAND -- HIER MUSSTE ICH DEN EINGEHENDEN BERICHT KORRIGIEREN:** die Angabe
+  "LB-0..LB-6 = 0 Treffer im Ledger, OE-A..OE-F = 0/0" ist **UEBERHOLT**. Gemessen 06.08. abends
+  gegen **6169** Zeilen: `LB-0|LB-1|...|LB-6` = **11 Treffer**, `OE-A|...|OE-F` = **6 Treffer** --
+  gebucht durch **nachmittag-10** (LEDGER:4418-4475) und **nachmittag-11** (Abschnitt E/1 und F/4).
+  **Der Buchungs-Fall ist geschlossen.** Was **weiterhin 0/0 ist: das 14-Tage-Register** (474 Z.,
+  `LB-` = 0, `OE-` = 0) -- die Regel-Zeile-10-Auflage ("Ledger **UND** Checkliste") ist damit
+  **halb erfuellt**.
+- **CODE-STAND, am Objekt und praeziser als bisher gebucht:**
+  - **LB-0/LB-1/LB-2/LB-3 Header existieren:** `libs/cache_engine/builder/bestandslog/lager_pfad_grammatik.hpp`,
+    `knoten_heuristik_log.hpp`, `lager_baum_writer.hpp` (dazu `lager_ziel_strategie.hpp` als Konsument).
+  - **Eigene Test-TUs haben nur LB-0 und LB-1:** `tests/unit/test_lb0_lager_pfad_grammatik.cpp`
+    (**34** `TEST`/`TEST_F`) und `tests/unit/test_lb1_knoten_heuristik_log.cpp` (**26**).
+    *(nachmittag-11 sprach von "23 Testfaellen" -- nachgemessen sind es 26; s. Abschnitt C.)*
+  - **LB-2/LB-3 haben KEINE eigene Beweiswelle:** `lager_baum_writer` wird ausserhalb von
+    test_lb0/test_lb1 nur von drei `test_s5_*_alloc_conformance`-TUs mitberuehrt.
+  - **LB-6 STUFE 1 IST HEUTE GEBAUT UND GELANDET:** ce **`b241a272`** (Merge `b-lb6-stufe1`,
+    06.08. 20:06 UTC, jetzt ce-HEAD auf `development` + `origin` + `github`). Inhalt laut
+    Commit-Text und Diff: zeilenweise **Ruecklesung aus echten Dateien** (bewusst ueber `ifstream`
+    statt `datei_lesen`, damit ein symmetrischer Schreib-/Lesefehler sich nicht selbst aufhebt),
+    **mehrzeiliger OE-B-Stempel-Fixture** (`tests/unit/support/oeb_stempel_zeilen.hpp`), **echte
+    FS-Konkurrenz mit zwei bzw. vier `std::thread`**, Bisse mit **Produktions**-Mutation
+    (`lager_baum_writer:489`, `bestandslog_lock:192`), 200 Laeufe Race-Messung (79 mit >1 Thread im
+    Alleinschreiber-Abschnitt). Gates laut Commit: 2x seriell 407/407, gtest 8439 -> 8444,
+    Frozen-Block byte-unbewegt, TABU 0. **Geaenderte Dateien: 5** (kein separates `test_lb6`-TU --
+    Stufe 1 erweitert die bestehenden LB-0/LB-1-TUs).
+  - **NICHT GEBAUT:** LB-4, LB-5, LB-6 Stufen ueber 1 hinaus.
+- **DER EIGENTLICHE BEFUND:** *"Ist LB komplett?"* war bis eben **nur ueber drei Dokumente
+  beantwortbar** (Owner-Entscheid im Session-Doc / Buchung in nachmittag-10+11 / Bau-Stand im
+  ce-Commit). **Genau das behebt dieser Absatz: der Stand steht ab jetzt an EINER Stelle.**
+- **ANSPRUCH:** **T1** (Owner: der Voll-Bau-Trigger IST der Baum-Vollausbau) fuer LB-6 Stufe 1
+  (**erfuellt**); LB-4/LB-5 sind **T2**.
+- **ZU TUN:** (1) `LB-0..LB-6` **ins Register** ueberfuehren -- das ist die noch offene Haelfte der
+  Regel-Zeile 10; (2) Task **#9** von "der GANZE LB-Schnitt fehlt in Ledger UND Register" auf
+  "Stufe 1 gelandet (`b241a272`); Register-Eintrag + LB-4/LB-5 offen" umschreiben.
+
+---
+
+**N-8 -- A10 / HW-ERKENNUNG P4-P6.**
+
+- **QUELLE (02.08., woertlich):** `docs/sessions/20260802-KATALOG-offene-strecke-gesamtplan.md:26`:
+  *"A10 | HW-Erkennung P4-P6 | P4 CSV-Spalten/Provenienz-Rueckschrieb, P5 Passungs-Stempel
+  (Vendor-Familie x OS), P6 Rest-Verdrahtung/Roundtrip (Plan 20260727; P1-P3 gebaut) ... | offen"*.
+  Als "Pflicht vor Trigger" in mehreren Session-Docs 02.-04.08. fortgeschrieben, zuletzt
+  `20260804-UEBERGABE-e24-vollzogen-vor-anker-strecke.md:67`.
+- **BUCHUNGSSTAND:** **seit nachmittag-11 (Abschnitt C/a-3) im Ledger gebucht** -- die eingehende
+  Angabe "danach 0 Treffer" ist ueberholt (s. Abschnitt C). **Im Register weiterhin 0.**
+  **NAMENSKOLLISION bleibt gueltig** (M3, nachmittag-11): die Roh-Treffer fuer `A10` bezeichnen
+  ueberwiegend §54-T2-Terminologie bzw. "A10/E-3 MSVC-Fenster", nicht diese Position.
+- **CODE-STAND: nicht gebaut, und der Code sagt es selbst** (beide Stellen aufgeschlagen):
+  `libs/cache_engine/include/cache_engine/measurement/hardware_probe_factory.hpp:118`
+  *"Etikett fuer Log und (spaeter, P5) das Mess-Stempel-Segment"* und `:331-333`
+  *"Heute stehen hier die Defaults der Achsen (linux + prod1-Klasse) -- beweglich, kein Pin.
+  In P5 setzt der PLANER die Zelle"*.
+- **ANSPRUCH: T2, nicht T1** (nachmittag-11-Einordnung bestaetigt): Provenienz-Spalten sind vor
+  dem **Messlauf** faellig, nicht vor einem reinen Vorbau. **ZU TUN:** ins Register; P4-P6 bauen.
+
+---
+
+**N-9 -- A11 / ccache-ALLOWLIST-DROP. OWNER-ENTSCHEID, weil der Code dem Plan WIDERSPRICHT.**
+
+- **QUELLE (02.08., woertlich):** `20260802-KATALOG-offene-strecke-gesamtplan.md:27`:
+  *"A11 | Klein-Sammel | ccache-Allowlist-Drop; gebuendelter Ledger-Nachtrag (inkl. 5 veraltete
+  Zeilen + 4 Erledigt-Befunde aus G.0) | offen"*; praezisiert
+  `20260802-UEBERGABE-kontextende-neugruendung.md:60-61`.
+- **BUCHUNGSSTAND:** **seit nachmittag-11 (C/a-4) im Ledger**; **im Register 0**. Die Roh-Treffer
+  fuer `A11` bezeichnen "A11-Audit" (20.07.) und "A11-Buendel" (03.08.) -- fremde Bedeutung (M3).
+- **CODE-STAND: der Eintrag lebt weiter, mit eigener Gegenbegruendung.** `.gitleaks.toml:29`
+  `'''(^|/)\.ccache/'''`, davor `:24-28` woertlich:
+  *"MARATHON-SCAN-FALLE (27.07.): der persistente Runner-Checkout traegt untracked Bau-Artefakte -
+  der ccache-Store sind GB Binaerdaten. Ohne diesen Eintrag scannt gitleaks sie mit (Job 335274 lief
+  24 min ohne Trace-Ausgabe). **Dieser Eintrag MUSS hier stehen**: der Job waehlt bei vorhandener
+  Projekt-toml AUSSCHLIESSLICH diese (-c ./.gitleaks.toml), die zentrale ci-templates-Basis greift
+  dann NICHT."*
+- **ANSPRUCH:** **OWNER-ENTSCHEID, T3.** Zwei dokumentierte Anweisungen widersprechen sich:
+  der A11-Plan (02.08.) will den Eintrag weg, der Code-Kommentar (27.07.) sagt, er MUSS bleiben.
+  **Eines von beiden muss weichen -- stillschweigendes Verschwinden waere die schlechteste Variante.**
+- **VORLAGE:** die Marathon-Scan-Begruendung ist am Objekt konkret (Job 335274, 24 min ohne Trace)
+  und juenger als nichts anderes im Widerspruch; **Empfehlung: A11 zurueckziehen und den
+  Code-Kommentar zur geltenden Wahrheit erklaeren** -- Owner-Entscheid abwarten, nicht vorwegnehmen.
+
+---
+
+**N-10 -- A12 / E-14: NAS-CREDS backup1/backup2.**
+
+- **QUELLE (02.08., woertlich):** `20260802-KATALOG-offene-strecke-gesamtplan.md:28`:
+  *"A12 | NAS-Creds backup1/backup2 (E-14) | Zugangs-/Mount-Strecke fuer die Mess-CSV-Ablage --
+  trigger-nah, stand bis zur Inventur in KEINER Paketliste; neben A1/G-E7 einplanen | offen"*.
+- **BUCHUNGSSTAND:** **seit nachmittag-11 (C/a-5) im Ledger**; **im Register 0**. Der A12-Fall ist
+  der Musterfall der Namenskollision: 17 der 18 Roh-Treffer sind **Substring im golden-CRC-Anker
+  `0xF1C1F26A1232073B`** (nachmittag-11 M3, von mir uebernommen, nicht neu gezaehlt).
+- **CODE-STAND:** nicht gebaut (Zugangs-/Mount-Strecke, Infra-nah).
+- **ANSPRUCH: T3, kein T1** -- Ablage und Transport, nicht Binary-Identitaet und nicht Messinhalt;
+  CSV ist nachtraeglich uebertragbar. **OFFENE OWNER-FRAGE (unveraendert):** gilt A12 noch, ist es
+  erledigt, oder ist es verworfen? Es liegt kein Beleg fuer eine Erledigung vor.
+- **ZU TUN:** ins Register; Owner-Frage stellen.
+
+---
+
+### C) WAS ICH BEIM NACHPRUEFEN KORRIGIEREN MUSSTE (neun Punkte, offen ausgewiesen)
+
+**Die Vorgaben zu diesem Nachtrag stammten aus Berichten. Neun ihrer Angaben haben der eigenen
+Messung nicht standgehalten. Das ist kein Nebenbefund -- es ist derselbe Fehler, den Regel-Zeile 11
+beschreibt (Trefferzahlen ohne Lektuere), nur eine Ebene hoeher.**
+
+1. **`LB-0..LB-6` = 0/0 -- FALSCH, ueberholt.** Gemessen: **11** Ledger-Treffer (6169 Z.).
+   `OE-A..OE-F` = **6**, nicht 0. Gebucht durch nachmittag-10/-11. **0 gilt nur noch fuers Register.**
+2. **`A10`/`A11`/`A12` "0/0 gebucht" -- FALSCH.** Alle drei stehen seit nachmittag-11 (HEAD
+   `699edaa2`) im Ledger. Richtig bleibt: **0 im Register**, und die Namenskollision der Roh-Treffer.
+3. **Ledger 5840 Zeilen -- ueberholt.** Es sind **6169**. Register **474**, nicht 475.
+4. **§62-B-Fundstelle falsch:** *"NIEMALS Einzel-Jobs je Binary ... Job-Anzahl = O(konstant)"*
+   steht **LEDGER:3318**, nicht 3320. `:3320` ist die IST-VERSTOSS-Zeile mit
+   *"Job-Anzahl O(Maschinen), nie O(Perms x Chunks)"* -- inhaltlich verwandt, andere Aussage.
+   (`:3324` fuer "STETS 4096 Binaries" war korrekt.)
+5. **`.gitleaks.toml:23-29` -- unpraezise.** Der Kommentar steht `:24-28`, der Eintrag
+   `'''(^|/)\.ccache/'''` auf **`:29`**.
+6. **`build_orchestrator.hpp:125-131` -- unpraezise.** Der tragende Kommentar
+   *"Ein Build-Auftrag (eine Tier-Binary)"* steht auf **`:124`**, `struct BuildJob` auf `:125-131`.
+7. **"in einer Datei, die die Pipeline nie anfasst" -- ZU WEIT und damit falsch.**
+   `experiment_golden_kern.xml` wird von **vier** super-ctest-Wachen konsumiert, die in `test:unit`
+   laufen. Richtig ist nur: **sie ist nicht das Profil der golden-Bau-/Mess-Kette**
+   (das ist `all_axes_golden.profile.xml`, `.gitlab-ci.yml:1152`).
+8. **"knoten_heuristik_log.hpp mit 23 Testfaellen" -- nachgemessen 26** (`test_lb1`, `^TEST(`/`^TEST_F(`);
+   `test_lb0` hat 34.
+9. **"Die Owner-Angabe '11 Sekunden' trifft das 1-Thread-Aequivalent der intel-Lane exakt" --
+   numerisch ja, in der Zuordnung UNBELEGT.** Der Owner sagt *"die grosse Maschine"*; das ist nach
+   Kern-/RAM-Lage prod1/amd, und dort betraegt das 1-Thread-Aequivalent **6,8 s**.
+
+**Zusaetzlich als UNBELEGT gekennzeichnet (nicht weggelassen):**
+- der Zuschlag *"4 unvermessene PRUEF-Durchlaeufe"* auf die 34,4 h -- die **Zahl 4** ist am Objekt
+  nicht verifiziert; der Zuschlag als solcher existiert.
+- die Gleichung *"cap == Basis-Kardinalitaet"* im Thesis-Dialekt ist aus der XML-Deklaration
+  **abgeleitet** (17 Binaer-Achsen = 2^17 = 131072), nicht zur Laufzeit gemessen. Die staerkere
+  Aussage -- *im `comdare_experiment`-Dialekt gar nicht geparst* -- ist dagegen **hart belegt**
+  (kein `cap`-Feld in `struct ExperimentProfile`).
+- die Herkunft der beiden Zeit-Werte aus **zwei verschiedenen Pipelines** (12690 / 12713).
+
+---
+
+### D) DER STRUKTURBEFUND DIESES NACHTRAGS
+
+nachmittag-11 nannte als schaerfsten Strukturbefund einen **Ort**: die Disposition eines
+Messvaliditaets-Postens (KK-5) lag in einer unversionierten Datei. **Dieser Nachtrag fand denselben
+Ort zwei weitere Male** -- `docs/sessions/20260806-DOSSIER-regressionen-checkheft.md` (traegt die
+Termin-Klassifikation T1-T4) und `docs/plaene/20260806-PLAN-owner-antworten-vertiefung.md` (traegt
+die XML-Trennungs-Disposition), beide `??` im `git status` zu Beginn der Erhebung.
+
+**ENTLASTUNG, waehrend dieser Nachtrag entstand:** die Commits **`1517071b`** und **`e110cf6d`**
+haben **alle drei** Dateien versioniert -- inklusive der von nachmittag-11 angeprangerten
+`docs/plaene/20260806-PLAN-kostenklammer-restposten.md`. **Der schaerfste Strukturbefund von
+nachmittag-11 ist damit geheilt** (`git ls-files` bestaetigt alle drei). Der Ledger sagt es hier
+ausdruecklich, weil eine ungebuchte Heilung genauso verlorengeht wie ein ungebuchter Defekt.
+
+**Und er findet eine neue, schwerere Klasse:** N-1 zeigt, dass nicht nur Paketschnitte, sondern
+**Termine** durch dieselbe Ritze fallen. Ein verlorener Paketschnitt kostet ein Paket. Eine
+verlorene Frist kostet **die Reihenfolge aller Pakete** -- und genau das ist eingetreten:
+nachmittag-11 hat noch am selben Tag saemtliche 33 Positionen gegen den 08.08. sortiert.
+
+---
+
+### E) CHECKLISTE DER NACHGETRAGENEN POSTEN (eine Zeile je Posten)
+
+| # | Posten | Quelle | Buchungsstand vorher | Termin | Was zu tun ist |
+|---|---|---|---|---|---|
+| **N-1** | **FRIST-KORREKTUR: Endtermin 15.09.2026, woechentliche Lieferung freitags** | `20260806-KONTEXTUEBERGABE-abend-praezise.md:67` · `ARBEITSWEISE-GESAMT-DOKTRIN.md:359` | **0 Ledger / 0 Register** | ordnet ALLES | Termin-Vokabular auf T1-T4 umstellen; Freitags-Lieferung als Betriebs-Posten |
+| **N-2** | **Kalibrier-Stichprobe = ERLEDIGT** (Entlastung) | Forderung `20260806-FAHRPLAN-hauptstrang-landung.md:428-435` · Entlastung `20260723-SESSION-mittag-...:41-45` + `20260723-SESSION-vormittag-...:33-34` | Forderung gebucht (nachmittag-11 a-2), Messung 0/0 | entfaellt | Posten streichen (Task #21 erledigt); O-A-Entscheid bleibt offen |
+| **N-3** | **Zeit-Bilanz:** 19,4 min (prod1) / 32,25 min (prod2) je 4096er-Slice; 6,8 s / **11,3 s** 1-Thread; Voll-Bau **~34,4 h**, Engpass intel | `20260723-SESSION-mittag-...:41-45`; Owner-Zahl `...abend-praezise.md:102` | 0 Ledger / 0 Register | T1 | nichts bauen; beim ersten realen Batch nachkalibrieren |
+| **N-4** | **Bau-Umfang = 524.288** (nicht 131.072, nicht 2.097.152) und **KEINE Kappung** | `.gitlab-ci.yml:79` · `experiment_plan_director.hpp:138/:2044/:989` · `experiment_golden_kern.xml:246/:285` (Kommentar `:248`-`:324`) · `xml_config_parser.hpp:440-473` · `profile_runner.hpp:163-169` | falsch gebucht ("gekappt auf 131.072") | T1/T2 | 524.288 wird kanonisch; "Kappung" faellt weg; Task #11 umformulieren |
+| **N-5** | **Batch-Semantik:** 4096 = **BINARIES** je Scheibe; GitLab-Jobs O(Maschinen) = 4 | LEDGER:3324 + LEDGER:3318 + LEDGER:3320 · `build_orchestrator.hpp:124-131` · `experiment_plan_director.hpp:610` · `planer_driven_build.hpp:60` | Teile gebucht, Aufloesung nie | -- | nichts; ab jetzt zitierbar |
+| **N-6** | **XML-Trennung Bau/Messung fehlt** -- heute nur Env-Schalter + Emitter-Asymmetrie | Owner `...abend-praezise.md:74-76`; Ist: `planer_cli_env.hpp:49/:58` · `experiment_plan_director.hpp:1247/:1293/:1758` · `experiment_golden_kern.xml:270` | **0 Ledger / 0 Register** | **T2** | **BAU-POSTEN** (XSD+Parser+Emission+Wache) |
+| **N-7** | **F9 / LB-0..LB-6 Status konsolidiert:** LB-0..LB-3 Header da (Tests nur LB-0/34 + LB-1/26), **LB-6 Stufe 1 GELANDET ce `b241a272`**, LB-4/LB-5 offen | Owner `20260801-KONSOLIDIERT-...:76` · `20260801-FAHRPLAN-...:227-228` · ce `b241a272` | Ledger **11 Treffer** (nachmittag-10/-11), **Register 0** | Stufe 1 = T1 (**erfuellt**); LB-4/LB-5 = T2 | **ins Register** (offene Haelfte der Regel-Zeile 10); Task #9 umschreiben |
+| **N-8** | **A10 / HW-Erkennung P4-P6** -- nicht gebaut, Code sagt es selbst | `20260802-KATALOG-...:26` · `hardware_probe_factory.hpp:118` + `:331-333` | Ledger seit nachmittag-11, **Register 0** | **T2** | ins Register; P4-P6 bauen |
+| **N-9** | **A11 / ccache-Allowlist-Drop -- OWNER-ENTSCHEID**, Code widerspricht dem Plan | `20260802-KATALOG-...:27` · `.gitleaks.toml:24-28` (*"Dieser Eintrag MUSS hier stehen"*) + `:29` | Ledger seit nachmittag-11, **Register 0** | **T3** | Owner entscheidet; Empfehlung: A11 zurueckziehen |
+| **N-10** | **A12 / E-14 NAS-Creds backup1/backup2** -- Status unklar | `20260802-KATALOG-...:28` | Ledger seit nachmittag-11, **Register 0** | **T3** | ins Register; **Owner-Frage:** gilt / erledigt / verworfen? |
+
+**REGEL-ZEILEN dieses Nachtrags:** **13** (Termine fallen durch dieselbe Ritze wie Paketschnitte --
+und kosten die Reihenfolge ALLER Pakete) · **14** (ein Buchfuehrungs-Nachtrag veraltet selbst;
+jede Trefferzahl traegt ihre Bezugsgroesse mit).
+
+**WAS DIESER NACHTRAG NICHT LEISTET:** er wertet dieselben Quellenklassen aus wie nachmittag-11 und
+ist damit **derselben M2-Anfaelligkeit ausgesetzt** -- `docs/audits/`, die drei repo-lokalen Ledger
+(ce/prt-art/thesis) und das Cluster-Ledger waren erneut **nicht** im Scope. Zusaetzlich gilt: er ist
+in **einer** Sitzung geschrieben worden, waehrend andere Agenten im selben Repo arbeiten; die
+Zeilenzahl 6169 ist ein Momentanwert.
+
 ## NACHTRAG 06.08.2026 nachmittag-11 (BUCHFUEHRUNGS-NACHTRAG nach dem F9/LB-Fall: vier Erhebungen konsolidiert -- 18 Positionen waren WIRKLICH verloren, 15 waren NUR ANDERS BENANNT; VIERTER Verlustmechanismus gemessen [NAMENSKOLLISION]; 15 Streichungen; GENAU ZWEI neue Vor-Trigger-Posten)
 
 > **REGEL-ZEILE 10, hier als Kopf, weil sie diesen ganzen Nachtrag ordnet:**
