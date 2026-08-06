@@ -63,6 +63,40 @@
 #       Wer die Pruefung erzwingen will, setzt AF_PDF_GATE=on (fehlende Toolchain = Fehler).
 #   (c) Das Gate prueft die BAUBARKEIT, nicht die inhaltliche Richtigkeit der Tabellen.
 #
+# E-18-SNAP -- COMPILE-SCHNAPPSCHUSS (OWNER-KERN, Ledger frueh-6, VERBATIM):
+#   "in Zukunft soll die Diplomarbeit einerseits fertig auf den branch gepusht werden, aber
+#    andererseits wird sie zusaetzlich in einen Ordner an der Wurzel der Messwerte kopiert, samt
+#    latex compile-export (Benennung nach Datum und Uhrzeit). so laesst sich ein compile
+#    nachvollziehen."
+#   UMSETZUNG: das PDF-Gate baut die Thesis-PDF ohnehin schon (s.o.) -- E-18-SNAP ERNTET dieses
+#   Bau-Produkt, statt ein zweites Mal zu kompilieren. Es landet zusaetzlich unter
+#   <AF_SNAPSHOT_ROOT>/<JJJJMMTT-HHMMSS>/ :
+#     <haupt>.pdf         die kompilierte Diplomarbeit (Kopie, sha256-verifiziert)
+#     compile-export.txt  der vollstaendige latexmk/pdflatex-Lauf (der "latex compile-export")
+#     QUELLSTAND.txt      289-SHA + 288-SHA + Kanal-Lauf-ID -> der Compile ist nachvollziehbar
+#
+#   WARUM compile-export.txt UND NICHT compile.log (load-bearing, nicht kosmetisch): die super-
+#   .gitignore ignoriert global `*.log` (Zeile 49) und hat -- anders als fuer `*.csv` (Zeile 43
+#   `!measurement/**/*.csv`) -- KEINE Gegenausnahme fuer measurement/. Ein `compile.log` wuerde vom
+#   `git add` des Writebacks STILL weggeworfen; der Schnappschuss kaeme ohne sein Kernstueck an.
+#   Die .txt-Endung haelt den Schnappschuss ohne .gitignore-Aenderung trackbar; Alternative waere
+#   ein `!measurement/**/*.log` analog zur CSV-Zeile (Entscheid Lead, s. Backup-ANWENDUNG.md).
+#
+#   ADDITIV, NIE UEBERSCHREIBEN (Messdaten-Doktrin): existiert der Zeitstempel-Ordner bereits, wird
+#   ein Kollisions-Suffix -2, -3, ... angehaengt. Ein bestehender Ordner wird NIE angefasst, nie
+#   ueberschrieben, nie geloescht -- auch nicht teilweise.
+#
+#   DEKLARIERTE GRENZE (bewusst, kein Versehen): OHNE Compile gibt es KEINEN Schnappschuss. Wird
+#   AF_PDF_GATE uebersprungen (auto ohne TeX-Toolchain) oder ist es off, entsteht gar kein
+#   Bau-Produkt -- dann sagt die Funktion das LITERAL, statt einen leeren Ordner anzulegen. Die
+#   AF_PDF_GATE-Semantik bleibt dadurch UNVERAENDERT: E-18-SNAP erzwingt kein Gate und verschiebt
+#   keine Gate-Grenze, es erntet ausschliesslich, was das Gate ohnehin baut.
+#
+#   WER COMMITTET: der Kern LEGT den Schnappschuss nur an. In das super-Repo (288) bringt ihn der
+#   BESTEHENDE 288-Writeback des Job-Blocks (heute der Gitlink-Bump) -- der muss measurement/
+#   mitstagen. Solange diese Job-Block-Aenderung nicht angewandt ist, entsteht der Ordner im
+#   CI-Workspace und wird am Pipeline-Ende verworfen (kein Datenverlust, aber auch kein Nutzen).
+#
 # ENV-KONTRAKT
 #   AF_DEST_REPO      (Pflicht) Arbeitsklon des Thesis-Repos (Projekt 289)
 #   AF_BRANCH         Ziel-Branch im Ziel-Repo                      (Default: development)
@@ -81,6 +115,9 @@
 #                     Geltungsbereich s.o. (a)-(c): NUR das ERSTE Top-Level-Haupt-.tex.
 #   AF_PUSH_RETRIES   Push-/Merge-Versuche                          (Default: 5)
 #   AF_PROV_*         Provenance fuer die Commit-Botschaft (PIPELINE_ID/URL/SUPER_SHA/REF)
+#   AF_COMPILE_SNAPSHOT true (Default) | false -- E-18-SNAP-Compile-Schnappschuss an/aus
+#   AF_SNAPSHOT_ROOT  Wurzel der Schnappschuss-Ordner ("Wurzel der Messwerte")
+#                     (Default: <AF_WORK_ROOT>/<AF_CORPUS_ROOT>/thesis_compiles)
 #
 # EXIT: 0 = Commit gelandet ODER bewusst nichts zu tun. 1 = fail-loud (nie stilles Gruen).
 # =====================================================================================
@@ -101,6 +138,17 @@ AF_PROV_PIPELINE_ID="${AF_PROV_PIPELINE_ID:-NA}"
 AF_PROV_PIPELINE_URL="${AF_PROV_PIPELINE_URL:-NA}"
 AF_PROV_SUPER_SHA="${AF_PROV_SUPER_SHA:-NA}"
 AF_PROV_SUPER_REF="${AF_PROV_SUPER_REF:-NA}"
+AF_COMPILE_SNAPSHOT="${AF_COMPILE_SNAPSHOT:-true}"
+# "Wurzel der Messwerte" = der Rueckschreibe-Korpus; thesis_compiles/ ist dort ein GESCHWISTER der
+# measurement/<RUN_TS>/-Laufordner. Das ist mit der Korpus-Kaskade (1b) vertraeglich, WEIL deren
+# Laufordner-Auswahl einen Ordner nur nimmt, wenn er *.result.csv enthaelt -- der Schnappschuss legt
+# ausschliesslich .pdf/.txt ab und kann daher nie als Mess-Laufordner missgedeutet werden.
+# (Wer hier je eine *.result.csv ablegt, bricht genau diese Zusage.)
+AF_SNAPSHOT_ROOT="${AF_SNAPSHOT_ROOT:-$AF_WORK_ROOT/$AF_CORPUS_ROOT/thesis_compiles}"
+# Bau-Produkt-Buchfuehrung des PDF-Gates (von run_pdf_gate gesetzt; leer = es wurde NICHT gebaut).
+AF_GATE_MAIN=""
+AF_GATE_TOOL=""
+AF_GATE_PDF=""
 
 echo "== anhang:forward KERN (E-18 Vorwaerts-Kanal) =="
 
@@ -113,6 +161,9 @@ if [ ! -d "$AF_DEST_REPO/.git" ]; then
 fi
 AF_TMP="${AF_TMP:-$(mktemp -d)}"
 mkdir -p "$AF_TMP"
+# EINE Quelle fuer den Gate-Log-Pfad: run_pdf_gate schreibt ihn, E-18-SNAP erntet ihn als
+# "compile-export". Zwei Literale wuerden hier stumm auseinanderlaufen.
+AF_GATE_LOG="$AF_TMP/pdf_gate.log"
 LANGS="$(printf '%s' "$AF_LANGS" | tr ',' ' ')"
 echo "   ziel_repo=$AF_DEST_REPO  branch=$AF_BRANCH  sprachen=[$LANGS]"
 echo "   work_root=$AF_WORK_ROOT  dry_run=$AF_DRY_RUN  no_push=$AF_NO_PUSH"
@@ -266,7 +317,7 @@ run_pdf_gate() {
     return 0
   fi
   echo "   baue $main mit $tex_tool ..."
-  local log="$AF_TMP/pdf_gate.log" rc=0
+  local log="$AF_GATE_LOG" rc=0
   if [ "$tex_tool" = "latexmk" ]; then
     ( cd "$AF_DEST_REPO" && latexmk -pdf -interaction=nonstopmode -halt-on-error "$main" ) > "$log" 2>&1 || rc=$?
   else
@@ -280,6 +331,12 @@ run_pdf_gate() {
     return 1
   fi
   echo "   PDF-Gate GRUEN: $main gebaut"
+  # Bau-Produkt fuer E-18-SNAP buchen. Die Auswahl des Hauptdokuments wird BEWUSST nicht ein
+  # zweites Mal berechnet ("EINE Quelle statt zwei", s. Datei-Kopf) -- der Schnappschuss erntet
+  # exakt das Dokument, das dieses Gate gerade gebaut hat.
+  AF_GATE_MAIN="$main"
+  AF_GATE_TOOL="$tex_tool"
+  AF_GATE_PDF="$AF_DEST_REPO/${main%.tex}.pdf"
   return 0
 }
 # Der PDF-Bau fasst getrackte Dateien AUSSERHALB von anhang/ an (z.B. die eingecheckte
@@ -288,6 +345,123 @@ run_pdf_gate() {
 pdf_gate_aufraeumen() {
   git -C "$AF_DEST_REPO" checkout -q -- ':(exclude)anhang' . 2>/dev/null || true
 }
+
+# ---- (3c) E-18-SNAP: Compile-Schnappschuss (OWNER-KERN Ledger frueh-6) ----------------
+# WARUM ZWEI PHASEN -- die Reihenfolge ist load-bearing, nicht Stil:
+#   Phase 1 (ERNTEN) MUSS VOR pdf_gate_aufraeumen laufen. Das Aufraeumen holt getrackte Dateien
+#     ausserhalb von anhang/ per `git checkout` zurueck. Waere die gebaute PDF im Ziel-Repo
+#     getrackt, setzte das Aufraeumen sie auf den EINGECHECKTEN Stand zurueck -- der Schnappschuss
+#     zeigte dann eine ALTE PDF und wuerde genau die Nachvollziehbarkeit vortaeuschen, die er
+#     herstellen soll. Im 289-Stand vom 06.08.2026 ist diplomarbeit.pdf per .gitignore ignoriert
+#     (Regel `diplomarbeit*.pdf`), die frische PDF ueberlebt also zufaellig -- auf dieses
+#     Zufallsglueck baut der Kanal NICHT.
+#   Phase 2 (SCHREIBEN) kann erst NACH dem Commit laufen: vorher existiert die 289-SHA nicht, und
+#     ohne sie ist der Compile nicht nachvollziehbar -- sie ist der halbe Zweck des Ordners.
+AF_SNAP_STAGE="$AF_TMP/compile_snapshot"
+af_sha256() { sha256sum < "$1" | cut -d' ' -f1; }
+
+compile_snapshot_einsammeln() {
+  if [ "$AF_COMPILE_SNAPSHOT" != "true" ]; then
+    echo "   E-18-SNAP: ABGESCHALTET (AF_COMPILE_SNAPSHOT=$AF_COMPILE_SNAPSHOT) -- kein Schnappschuss"
+    return 0
+  fi
+  if [ -z "$AF_GATE_PDF" ]; then
+    echo "   E-18-SNAP: KEIN Schnappschuss -- das PDF-Gate hat nicht gebaut (AF_PDF_GATE=$AF_PDF_GATE)"
+    echo "   (kein Haken ohne Ausgabe: ohne Compile gibt es nichts nachzuvollziehen; ein leerer"
+    echo "    Ordner waere eine Luege. Die AF_PDF_GATE-Semantik bleibt davon unberuehrt.)"
+    return 0
+  fi
+  if [ ! -f "$AF_GATE_PDF" ]; then
+    echo "FEHLER: PDF-Gate meldete GRUEN, aber sein Bau-Produkt '$AF_GATE_PDF' existiert nicht." >&2
+    echo "       Das ist KEIN honest-empty-Fall, sondern ein Widerspruch in der Kanal-Logik (z.B." >&2
+    echo "       latexmk-Ausgabeverzeichnis umgestellt) -> Abbruch statt leerem Schnappschuss." >&2
+    return 1
+  fi
+  if [ ! -f "$AF_GATE_LOG" ]; then
+    echo "FEHLER: Gate-Log '$AF_GATE_LOG' fehlt -- der 'latex compile-export' ist der Kern des" >&2
+    echo "       Schnappschusses (OWNER-KERN). Ohne ihn wird KEIN halber Ordner abgelegt." >&2
+    return 1
+  fi
+  mkdir -p "$AF_SNAP_STAGE"
+  local pdf_base sha_src sha_dst
+  pdf_base="$(basename "$AF_GATE_PDF")"
+  cp -- "$AF_GATE_PDF" "$AF_SNAP_STAGE/$pdf_base"
+  sha_src="$(af_sha256 "$AF_GATE_PDF")"; sha_dst="$(af_sha256 "$AF_SNAP_STAGE/$pdf_base")"
+  if [ "$sha_src" != "$sha_dst" ]; then
+    echo "FEHLER: E-18-SNAP sha256-Mismatch beim Ernten der PDF ($sha_src != $sha_dst)" >&2
+    return 1
+  fi
+  # .txt statt .log ist PFLICHT, nicht Geschmack: die super-.gitignore ignoriert global *.log und
+  # hat fuer measurement/ keine Gegenausnahme -> ein compile.log wuerde beim Writeback still
+  # weggeworfen (s. Datei-Kopf). Der Inhalt ist unveraendert der volle latexmk/pdflatex-Lauf.
+  cp -- "$AF_GATE_LOG" "$AF_SNAP_STAGE/compile-export.txt"
+  echo "   E-18-SNAP: geerntet $pdf_base ($(wc -c < "$AF_SNAP_STAGE/$pdf_base") Bytes, sha256=$sha_src)"
+  echo "   E-18-SNAP: geerntet compile-export.txt ($(wc -l < "$AF_SNAP_STAGE/compile-export.txt") Zeilen $AF_GATE_TOOL-Ausgabe)"
+  return 0
+}
+
+compile_snapshot_schreiben() {
+  local thesis_sha="$1"
+  [ "$AF_COMPILE_SNAPSHOT" = "true" ] || return 0
+  # Phase 1 hat mit Begruendung nichts geerntet (kein Compile) -> hier ist ehrlich nichts zu tun.
+  [ -d "$AF_SNAP_STAGE" ] || return 0
+  local ts basis dir k f b n
+  ts="$(date -u +%Y%m%d-%H%M%S)"     # "Benennung nach Datum und Uhrzeit" (OWNER-KERN), UTC, FS-sicher
+  basis="$AF_SNAPSHOT_ROOT/$ts"
+  dir="$basis"; k=2
+  # MESSDATEN-DOKTRIN: NUR ADDITIV. Ein bestehender Ordner wird NIE angefasst, nie ueberschrieben,
+  # nie geloescht -- bei gleichem Zeitstempel (zwei Laeufe in derselben Sekunde) waechst ein
+  # Kollisions-Suffix an. Lieber lauter Abbruch als ein ueberschriebener Compile-Beleg.
+  while [ -e "$dir" ]; do
+    if [ "$k" -gt 99 ]; then
+      echo "FEHLER: E-18-SNAP: '$basis' und 98 Kollisions-Suffixe existieren bereits -> Abbruch" >&2
+      echo "       (ueberschreiben ist unter der Messdaten-Doktrin verboten)" >&2
+      return 1
+    fi
+    dir="$basis-$k"; k=$((k + 1))
+  done
+  mkdir -p "$dir"
+  n=0
+  for f in "$AF_SNAP_STAGE"/*; do
+    [ -f "$f" ] || continue
+    b="$(basename "$f")"
+    cp -- "$f" "$dir/$b"
+    if [ "$(af_sha256 "$f")" != "$(af_sha256 "$dir/$b")" ]; then
+      echo "FEHLER: E-18-SNAP sha256-Mismatch beim Ablegen von '$b' in '$dir'" >&2; return 1
+    fi
+    n=$((n + 1))
+  done
+  local pdf_name
+  pdf_name="$(basename "$AF_GATE_PDF")"
+  {
+    echo "# E-18-SNAP Compile-Schnappschuss -- QUELLSTAND"
+    echo "# OWNER-KERN (Ledger frueh-6): 'so laesst sich ein compile nachvollziehen'."
+    echo "# Diese Datei nennt GENAU die Staende, aus denen die danebenliegende PDF entstanden ist:"
+    echo "# thesis_commit_sha ist der Quellstand der Diplomarbeit (Projekt 289), super_commit_sha"
+    echo "# der Stand des Mess-/Bau-Repos (Projekt 288), der den Kanal-Lauf ausgeloest hat."
+    echo "snapshot_id=$(basename "$dir")"
+    echo "generiert_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "thesis_commit_sha=$thesis_sha"
+    echo "thesis_branch=$AF_BRANCH"
+    echo "super_commit_sha=$AF_PROV_SUPER_SHA"
+    echo "super_commit_ref=$AF_PROV_SUPER_REF"
+    echo "kanal_lauf_id=${AF_PROV_PIPELINE_ID}"
+    echo "kanal_lauf_url=${AF_PROV_PIPELINE_URL}"
+    echo "quelle_kind=$SRC_KIND"
+    echo "quelle_ref=$SRC_NOTE"
+    echo "haupt_dokument=$AF_GATE_MAIN"
+    echo "tex_werkzeug=$AF_GATE_TOOL"
+    echo "pdf_datei=$pdf_name"
+    echo "pdf_bytes=$(wc -c < "$dir/$pdf_name")"
+    echo "pdf_sha256=$(af_sha256 "$dir/$pdf_name")"
+    echo "compile_export=compile-export.txt"
+    echo "anhang_dateien_uebernommen=$changed"
+  } > "$dir/QUELLSTAND.txt"
+  echo "   E-18-SNAP: Schnappschuss abgelegt ($n Bau-Datei(en) + QUELLSTAND.txt) -> $dir"
+  find "$dir" -type f | sort | sed 's/^/     /'
+  return 0
+}
+
 if [ "$AF_PDF_GATE" != "off" ]; then
   if ! run_pdf_gate; then
     echo "   Rollback: gestagte Anhang-Aenderungen werden verworfen (nichts wird gelandet)" >&2
@@ -308,9 +482,17 @@ if [ "$AF_PDF_GATE" != "off" ]; then
     echo "=== anhang:forward ABGEBROCHEN: PDF-Gate rot -> KEIN Commit, KEIN Push ===" >&2
     exit 1
   fi
+  # E-18-SNAP Phase 1: ZWINGEND vor dem Aufraeumen (Begruendung s. Funktions-Kopf oben).
+  if ! compile_snapshot_einsammeln; then
+    echo "=== anhang:forward ABGEBROCHEN: E-18-SNAP konnte den Compile nicht sichern ===" >&2
+    echo "    (KEIN Commit, KEIN Push -- der 289-Klon ist ephemer und wird je Lauf neu geholt)" >&2
+    exit 1
+  fi
   pdf_gate_aufraeumen
 else
   echo "   ABGESCHALTET (AF_PDF_GATE=off) -- es wurde NICHT geprueft, ob die PDF noch baut"
+  # Ohne Gate gibt es kein Bau-Produkt; die Funktion sagt genau das literal (kein stiller Ausfall).
+  compile_snapshot_einsammeln
 fi
 
 # ---- (4) Commit mit Provenance -------------------------------------------------------
@@ -327,6 +509,14 @@ ci_pipeline_id=$AF_PROV_PIPELINE_ID
 ci_pipeline_url=$AF_PROV_PIPELINE_URL
 generiert_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "   commit: $(git -C "$AF_DEST_REPO" log --oneline -1)"
+
+# ---- (4b) E-18-SNAP Phase 2: Schnappschuss ablegen (jetzt ist die 289-SHA bekannt) ----
+echo "-- (4b) E-18-SNAP Compile-Schnappschuss --"
+if ! compile_snapshot_schreiben "$(git -C "$AF_DEST_REPO" rev-parse HEAD)"; then
+  echo "=== anhang:forward ABGEBROCHEN: E-18-SNAP-Schnappschuss fehlgeschlagen ===" >&2
+  echo "    (der 289-Commit ist lokal entstanden, aber NICHT gepusht -- nichts ist gelandet)" >&2
+  exit 1
+fi
 
 if [ "$AF_NO_PUSH" = "true" ]; then
   echo "=== anhang:forward OK (lokal committet; AF_NO_PUSH=true -> kein Push) ==="
