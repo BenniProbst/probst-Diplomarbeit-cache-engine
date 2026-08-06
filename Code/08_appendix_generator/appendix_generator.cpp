@@ -468,12 +468,10 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
         // Die Referenz-Umrechnung ist exakt (nicht blosse Vorzeichen-Umkehr), siehe
         // select_exchange_vs_reference. KEINE std::map-Baseline: die gibt es im Korpus nicht.
         {
-            auto const ref_aggs = c2l::select_exchange_vs_reference(exch_aggs, cfg.reference_axis,
-                                                                     cfg.reference_value);
-            if (int const rc = c2l::write_exchange_forest_plot(out_dir / "exchange_forest_vs_reference.tex", ref_aggs,
-                                                               exch_counts, lang, /*body_only=*/false,
-                                                               c2l::kExchangeForestSmallSampleThreshold,
-                                                               cfg.reference_value);
+            auto const ref_aggs = c2l::select_exchange_vs_reference(exch_aggs, cfg.reference_axis, cfg.reference_value);
+            if (int const rc = c2l::write_exchange_forest_plot(
+                    out_dir / "exchange_forest_vs_reference.tex", ref_aggs, exch_counts, lang, /*body_only=*/false,
+                    c2l::kExchangeForestSmallSampleThreshold, cfg.reference_value);
                 !c2l_ok(rc)) {
                 std::cerr << "appendix-generator: write_exchange_forest_plot (vs-reference," << lang << ") failed "
                           << rc << "\n";
@@ -489,10 +487,10 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
         for (auto const z_sv : kSurfaceFields) {
             std::string const z{z_sv};
             if (int const rc = dg::write_surface_ratio_vs_reference(out_dir / ("lc_surface_ratio_" + z + ".tex"),
-                                                                     surf_rows, z, cfg.reference_value, lang);
+                                                                    surf_rows, z, cfg.reference_value, lang);
                 !dg_ok(rc)) {
-                std::cerr << "appendix-generator: write_surface_ratio_vs_reference (" << z << "," << lang
-                          << ") failed " << rc << "\n";
+                std::cerr << "appendix-generator: write_surface_ratio_vs_reference (" << z << "," << lang << ") failed "
+                          << rc << "\n";
                 return status_io_error;
             }
         }
@@ -504,7 +502,7 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
         for (auto const z_sv : kSurfaceFields) {
             std::string const z{z_sv};
             if (int const rc = dg::write_normalized_bar_vs_reference(out_dir / ("lc_normbar_" + z + ".tex"), surf_rows,
-                                                                      z, cfg.reference_value, lang);
+                                                                     z, cfg.reference_value, lang);
                 !dg_ok(rc)) {
                 std::cerr << "appendix-generator: write_normalized_bar_vs_reference (" << z << "," << lang
                           << ") failed " << rc << "\n";

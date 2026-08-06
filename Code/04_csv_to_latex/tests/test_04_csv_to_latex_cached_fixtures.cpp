@@ -433,7 +433,7 @@ TEST(Stufe04Pipeline, SelectExchangeVsReferenceFlipsWithCorrectRelativeBase) {
     ASSERT_EQ(sel.size(), 1u);
     EXPECT_EQ(sel[0].value_from, "linear_scan"); // Referenz steht jetzt links
     EXPECT_EQ(sel[0].value_to, "k_ary");
-    EXPECT_NEAR(sel[0].median_rel_delta, -0.5, 1e-12); // -d/(1+d) = -1/2, NICHT -1.0
+    EXPECT_NEAR(sel[0].median_rel_delta, -0.5, 1e-12);     // -d/(1+d) = -1/2, NICHT -1.0
     EXPECT_NEAR(sel[0].median_abs_delta_ns, -40.0, 1e-12); // absolutes Delta: exakte Negation
     EXPECT_EQ(sel[0].pair_workload_samples, 100u);         // Stichprobenzahl bleibt
     EXPECT_EQ(sel[0].interface_fn, "ns_per_op");
@@ -470,9 +470,9 @@ TEST(Stufe04Pipeline, SelectExchangeVsReferenceTransformsIqrThroughTheSameMap) {
 // (P1c-t4) Fremde Achsen und Paare ohne Referenz-Beteiligung fallen heraus.
 TEST(Stufe04Pipeline, SelectExchangeVsReferenceFiltersAxisAndUnrelatedPairs) {
     std::vector<c2l::ExchangeAggregate> aggs = {
-        mk_exch("search_algo", "k_ary", "linear_scan", 1.0, 0.0, 40.0, 100),  // trifft zu (gedreht)
-        mk_exch("search_algo", "eytzinger", "k_ary", 0.2, 0.0, 5.0, 100),     // beruehrt Referenz nicht
-        mk_exch("node_type", "node4", "linear_scan", 0.3, 0.0, 7.0, 100)};    // falsche Achse
+        mk_exch("search_algo", "k_ary", "linear_scan", 1.0, 0.0, 40.0, 100), // trifft zu (gedreht)
+        mk_exch("search_algo", "eytzinger", "k_ary", 0.2, 0.0, 5.0, 100),    // beruehrt Referenz nicht
+        mk_exch("node_type", "node4", "linear_scan", 0.3, 0.0, 7.0, 100)};   // falsche Achse
 
     auto const sel = c2l::select_exchange_vs_reference(aggs, "search_algo", "linear_scan");
     ASSERT_EQ(sel.size(), 1u);
@@ -488,11 +488,11 @@ TEST(Stufe04Pipeline, SelectExchangeVsReferenceEmptyWhenReferenceNeverMeasured) 
     EXPECT_TRUE(sel.empty());
 
     std::vector<c2l::SiblingPairCount> counts;
-    auto            out = comdare_user_tmp() / "p1c_forest_ref_empty.tex";
-    std::error_code ec;
+    auto                               out = comdare_user_tmp() / "p1c_forest_ref_empty.tex";
+    std::error_code                    ec;
     fs::remove(out, ec);
-    EXPECT_EQ(c2l::write_exchange_forest_plot(out, sel, counts, "en", false,
-                                              c2l::kExchangeForestSmallSampleThreshold, "linear_scan"),
+    EXPECT_EQ(c2l::write_exchange_forest_plot(out, sel, counts, "en", false, c2l::kExchangeForestSmallSampleThreshold,
+                                              "linear_scan"),
               c2l::status_empty_input);
     EXPECT_FALSE(fs::exists(out)); // KEINE Datei
 }
@@ -501,10 +501,9 @@ TEST(Stufe04Pipeline, SelectExchangeVsReferenceEmptyWhenReferenceNeverMeasured) 
 // xlabel, eigenes \label. Ohne das eigene \label waeren beide Figuren im selben Dokument "multiply
 // defined". Bei LEEREM reference_value bleibt alles exakt beim Bestand (Byte-Identitaet der Alt-Figur).
 TEST(Stufe04Pipeline, ForestPlotReferenceVariantIsDistinguishableAndLabelIsUnique) {
-    std::vector<c2l::ExchangeAggregate> aggs = {
-        mk_exch("search_algo", "k_ary", "linear_scan", 1.0, 0.2, 40.0, 100)};
-    std::vector<c2l::SiblingPairCount> counts;
-    std::error_code                    ec;
+    std::vector<c2l::ExchangeAggregate> aggs = {mk_exch("search_algo", "k_ary", "linear_scan", 1.0, 0.2, 40.0, 100)};
+    std::vector<c2l::SiblingPairCount>  counts;
+    std::error_code                     ec;
 
     // (a) Referenz-Variante
     auto out_ref = comdare_user_tmp() / "p1c_forest_ref.tex";

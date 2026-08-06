@@ -554,9 +554,9 @@ std::vector<ExchangeAggregate> select_exchange_vs_reference(std::span<ExchangeAg
         double const hi  = med + a.iqr_rel_delta / 2.0;
         if (!(med > -1.0) || !(lo > -1.0) || !(hi > -1.0)) continue;
 
-        ExchangeAggregate e = a;
-        e.value_from        = a.value_to; // = die Referenz
-        e.value_to          = a.value_from;
+        ExchangeAggregate e   = a;
+        e.value_from          = a.value_to; // = die Referenz
+        e.value_to            = a.value_from;
         e.median_abs_delta_ns = -a.median_abs_delta_ns; // exakte Negation
         e.median_rel_delta    = flip_rel_delta(med);
         // f ist fallend -> f(hi) ist die neue untere, f(lo) die neue obere Grenze; die Breite ist ihr Abstand.
@@ -732,7 +732,7 @@ int write_exchange_forest_plot(std::filesystem::path const& out, std::span<Excha
     // P1c: leer = Bestandsverhalten (Geschwister-Paare untereinander). Gesetzt = alle Zeilen sind bereits
     // auf DIESE Referenz-Achsenauspraegung gedreht (select_exchange_vs_reference), die Beschriftung muss
     // das sagen -- sonst stuenden zwei optisch gleiche Figuren mit verschiedener Aussage im Anhang.
-    bool const        vs_ref = !reference_value.empty();
+    bool const        vs_ref  = !reference_value.empty();
     std::string const ref_tex = vs_ref ? escape_latex(std::string{reference_value}) : std::string{};
 
     // 1) NUR die ns_per_op-Headline; je Achse (kVariableAxes-Reihenfolge) die Wertepaare sortiert. n=0-Aggregate
@@ -842,12 +842,11 @@ int write_exchange_forest_plot(std::filesystem::path const& out, std::span<Excha
     f << "    y tick label style={font=\\tiny},\n";
     f << "    x tick label style={font=\\tiny},\n";
     f << "    xlabel={"
-      << (vs_ref ? (de ? ("Median rel.\\ $\\Delta$ ns/op (bzgl.\\ Referenz \\texttt{" + ref_tex +
-                          "}; $<0$ = schneller)")
-                       : ("median rel.\\ $\\Delta$ ns/op (w.r.t.\\ reference \\texttt{" + ref_tex +
-                          "}; $<0$ = faster)"))
-                 : std::string{de ? "Median rel.\\ $\\Delta$ ns/op (bzgl.\\ $v$; $<0$ = schneller)"
-                                  : "median rel.\\ $\\Delta$ ns/op (w.r.t.\\ $v$; $<0$ = faster)"})
+      << (vs_ref
+              ? (de ? ("Median rel.\\ $\\Delta$ ns/op (bzgl.\\ Referenz \\texttt{" + ref_tex + "}; $<0$ = schneller)")
+                    : ("median rel.\\ $\\Delta$ ns/op (w.r.t.\\ reference \\texttt{" + ref_tex + "}; $<0$ = faster)"))
+              : std::string{de ? "Median rel.\\ $\\Delta$ ns/op (bzgl.\\ $v$; $<0$ = schneller)"
+                               : "median rel.\\ $\\Delta$ ns/op (w.r.t.\\ $v$; $<0$ = faster)"})
       << "},\n";
     f << "    xlabel style={font=\\footnotesize},\n";
     f << "    title={"
@@ -942,8 +941,8 @@ int write_exchange_forest_plot(std::filesystem::path const& out, std::span<Excha
                                    "}: $v$ is always the reference, $v'$ the compared value. The reference is a "
                                    "measured axis value, NOT an external library baseline.")))
                    : cap;
-        f << "\\caption{" << cap_full << "}\\label{fig:ld:exchange:forest"
-          << (vs_ref ? ":ref" : "") << "}\n\\end{figure}\n";
+        f << "\\caption{" << cap_full << "}\\label{fig:ld:exchange:forest" << (vs_ref ? ":ref" : "")
+          << "}\n\\end{figure}\n";
     }
 
     return f.good() ? status_ok : status_io_error;

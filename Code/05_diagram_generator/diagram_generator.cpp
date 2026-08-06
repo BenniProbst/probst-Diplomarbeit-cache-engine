@@ -45,12 +45,12 @@ namespace {
 // dieselbe Single-Source jetzt (a) Parse-Spalte + Ziel-Member fuer p99 UND n, (b) die Range-Aggregation und
 // (c) die Ausgefuehrt-Wache des Flaechen-Aggregats (z_field_executed).
 struct OpRangeSpec {
-    std::string_view display;                       // Anzeigename (insert/lookup/erase/scan/rmw)
-    std::string_view p50_col;                       // WIDE-Spaltenname der p50
-    std::string_view p99_col;                       // WIDE-Spaltenname der p99
-    std::string_view n_col;                         // WIDE-Spaltenname des Ausfuehrungs-Zaehlers op_<art>_n
-    double WideMeasurementRow::* p50_mem = nullptr; // Ziel-Member p50 (cppcheck uninitMemberVarNoCtor)
-    double WideMeasurementRow::* p99_mem = nullptr; // Ziel-Member p99 (dito; kRangeOps initialisiert beide)
+    std::string_view display;                            // Anzeigename (insert/lookup/erase/scan/rmw)
+    std::string_view p50_col;                            // WIDE-Spaltenname der p50
+    std::string_view p99_col;                            // WIDE-Spaltenname der p99
+    std::string_view n_col;                              // WIDE-Spaltenname des Ausfuehrungs-Zaehlers op_<art>_n
+    double WideMeasurementRow::* p50_mem      = nullptr; // Ziel-Member p50 (cppcheck uninitMemberVarNoCtor)
+    double WideMeasurementRow::* p99_mem      = nullptr; // Ziel-Member p99 (dito; kRangeOps initialisiert beide)
     std::uint64_t WideMeasurementRow::* n_mem = nullptr; // Ziel-Member des Zaehlers (dito)
 };
 constexpr std::array<OpRangeSpec, 5> kRangeOps = {{
@@ -310,10 +310,10 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     double     div_zero_meta = 0.0;
     bool const log_scale     = have_pos;
     double     log_min       = 0.0;
-    double     log_max   = 1.0;
-    double     zero_meta = 0.0; // point meta einer ECHT GEMESSENEN 0
-    int        k_lo      = 0;
-    int        k_hi      = 1;
+    double     log_max       = 1.0;
+    double     zero_meta     = 0.0; // point meta einer ECHT GEMESSENEN 0
+    int        k_lo          = 0;
+    int        k_hi          = 1;
     if (log_scale) {
         log_min = std::log10(pos_min);
         log_max = std::log10(pos_max);
@@ -363,7 +363,7 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
         //      2.3-fach schnellerer Algorithmus waere von "gleich schnell" farblich nicht zu
         //      unterscheiden. Das waere eine systematische Untertreibung genau der Unterschiede, die
         //      diese Figur zeigen soll.
-        double half      = 0.0;
+        double half            = 0.0;
         bool   have_ratio_zero = false;
         for (std::size_t y = 0; y < ny; ++y)
             for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
@@ -432,35 +432,35 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
         if (!(zc_max > zc_min))
             f << "    zmin=" << fmt_double(zc_min) << ", zmax=" << fmt_double(zc_min + 1.0) << ",\n";
     } else {
-    f << "    point meta min=" << fmt_double(log_min) << ",\n";
-    f << "    point meta max=" << fmt_double(log_max) << ",\n";
-    if (log_scale) {
-        // Colorbar-Ticks auf ganzzahlige ns-Dekaden relabeln (10^k). Randticks ausserhalb
-        // [min,max] clippt pgfplots automatisch → Achse zeigt echte ns-Werte statt log-Zahlen.
-        // E-2b: liegt eine ECHT GEMESSENE 0 vor, ist der unterste Tick (k_lo, die zusaetzliche Dekade)
-        // ihre eigene Klasse und wird literal "$0$" beschriftet -- KEINE erfundene 10^k-Behauptung.
-        f << "    colorbar style={ytick={";
-        for (int k = k_lo; k <= k_hi; ++k) {
-            if (k > k_lo) f << ",";
-            f << k;
-        }
-        f << "}, yticklabels={";
-        for (int k = k_lo; k <= k_hi; ++k) {
-            if (k > k_lo) f << ",";
-            if (have_zero && k == k_lo) {
-                f << "$0$";
-            } else {
-                f << "$10^{" << k << "}$";
+        f << "    point meta min=" << fmt_double(log_min) << ",\n";
+        f << "    point meta max=" << fmt_double(log_max) << ",\n";
+        if (log_scale) {
+            // Colorbar-Ticks auf ganzzahlige ns-Dekaden relabeln (10^k). Randticks ausserhalb
+            // [min,max] clippt pgfplots automatisch -> Achse zeigt echte ns-Werte statt log-Zahlen.
+            // E-2b: liegt eine ECHT GEMESSENE 0 vor, ist der unterste Tick (k_lo, die zusaetzliche Dekade)
+            // ihre eigene Klasse und wird literal "$0$" beschriftet -- KEINE erfundene 10^k-Behauptung.
+            f << "    colorbar style={ytick={";
+            for (int k = k_lo; k <= k_hi; ++k) {
+                if (k > k_lo) f << ",";
+                f << k;
             }
+            f << "}, yticklabels={";
+            for (int k = k_lo; k <= k_hi; ++k) {
+                if (k > k_lo) f << ",";
+                if (have_zero && k == k_lo) {
+                    f << "$0$";
+                } else {
+                    f << "$10^{" << k << "}$";
+                }
+            }
+            f << "}},\n";
+        } else {
+            // E-2b: NUR echte Nullen -> genau EINE Farbklasse, ehrlich mit "$0$" beschriftet. zmin/zmax
+            // haelt zusaetzlich die z-Domaene des blanken Mesh-Traegers nicht-entartet (pdflatex-Probe:
+            // ohne sie "Axis range for axis z is approximately empty"; z ist bei view={0}{90} kein Datum).
+            f << "    colorbar style={ytick={0}, yticklabels={$0$}},\n";
+            f << "    zmin=0, zmax=1,\n";
         }
-        f << "}},\n";
-    } else {
-        // E-2b: NUR echte Nullen -> genau EINE Farbklasse, ehrlich mit "$0$" beschriftet. zmin/zmax
-        // haelt zusaetzlich die z-Domaene des blanken Mesh-Traegers nicht-entartet (pdflatex-Probe:
-        // ohne sie "Axis range for axis z is approximately empty"; z ist bei view={0}{90} kein Datum).
-        f << "    colorbar style={ytick={0}, yticklabels={$0$}},\n";
-        f << "    zmin=0, zmax=1,\n";
-    }
     } // Ende des NICHT-divergenten Zweiges (P2)
     f << "    mesh/cols=" << nx << ",\n"; // PFLICHT fuer matrix plot* (sonst 'matrix input=image' unsupported)
     f << "    xtick={0,1,...," << (nx - 1) << "},\n";
@@ -509,9 +509,9 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
     f << "\\addplot3[matrix plot*, point meta=explicit] coordinates {\n";
     for (std::size_t y = 0; y < ny; ++y) {
         for (std::size_t x = 0; x < data.matrix[y].size(); ++x) {
-            double const      z    = data.matrix[y][x];
-            bool const        has  = cell_displayable(data, have_mask, y, x);
-            std::string const zs = has ? fmt_double(z) : std::string{"0"};
+            double const      z   = data.matrix[y][x];
+            bool const        has = cell_displayable(data, have_mask, y, x);
+            std::string const zs  = has ? fmt_double(z) : std::string{"0"};
             // P2: im divergenten Modus ist die Farb-Groesse log10(z/center) -- ein Verhaeltnis ist
             // multiplikativ, "halb so lang" und "doppelt so lang" muessen gleich weit von der Mitte
             // liegen. Ein Verhaeltnis 0 (Zaehler echt 0 gemessen) hat keinen Logarithmus und traegt
@@ -804,8 +804,8 @@ struct SurfaceAggregate {
             // (c) Ein Nenner von ECHT GEMESSENEN 0 ns macht das Verhaeltnis undefiniert (nicht unendlich).
             //     Ehrlich ausgelassen statt als Unendlich/Ersatzwert behauptet.
             if (!(den > 0.0)) continue;
-            ratio[y][x] = data.matrix[y][x] / den; // Zaehler darf 0 sein -> Verhaeltnis 0 ist gueltig
-            exec[y][x]  = true;
+            ratio[y][x]  = data.matrix[y][x] / den; // Zaehler darf 0 sein -> Verhaeltnis 0 ist gueltig
+            exec[y][x]   = true;
             agg.any_data = true;
         }
     }
@@ -999,13 +999,12 @@ int write_surface_search_algo_x_workload(std::filesystem::path const& out, std::
     // E-2a: sprach-lokalisierter HONEST-EMPTY-Vermerk. write_heatmap nutzt ihn NUR, wenn keine einzige
     // Zelle einen darstellbaren Messwert traegt (dann Platzhalter statt entarteter Heatmap).
     // Reiner Text (escape_latex-durchgereicht) -- kein Mathe-Modus, keine Nicht-ASCII-Zeichen.
-    data.empty_note =
-        de ? ("(Keine Messwerte: " + metric +
-              " wurde im vorliegenden Korpus nie ausgefuehrt. Diese Flaeche wird ehrlich ausgelassen, "
-              "statt eine 0-ns-Messung zu behaupten.)")
-           : ("(No measured values: " + metric +
-              " was never executed in the present corpus. This surface is honestly omitted instead of "
-              "claiming a 0 ns measurement.)");
+    data.empty_note = de ? ("(Keine Messwerte: " + metric +
+                            " wurde im vorliegenden Korpus nie ausgefuehrt. Diese Flaeche wird ehrlich ausgelassen, "
+                            "statt eine 0-ns-Messung zu behaupten.)")
+                         : ("(No measured values: " + metric +
+                            " was never executed in the present corpus. This surface is honestly omitted instead of "
+                            "claiming a 0 ns measurement.)");
     // write_heatmap WIEDERVERWENDEN (view={0}{90} matrix plot + colormap/viridis).
     return write_heatmap(out, data, cnst);
 }
@@ -1023,21 +1022,20 @@ int write_surface_ratio_vs_reference(std::filesystem::path const& out, std::span
     // weitere sequentielle Flaeche und die Gleichheit mit der Referenz optisch nicht auffindbar.
     data.divergent        = true;
     data.divergent_center = 1.0;
-    data.title = (de ? "Verhaeltnis zur Referenz " : "Ratio to reference ") + reference_algo + ": " + metric +
-                 (de ? " (1 = wie die Referenz)" : " (1 = same as reference)");
+    data.title   = (de ? "Verhaeltnis zur Referenz " : "Ratio to reference ") + reference_algo + ": " + metric +
+                   (de ? " (1 = wie die Referenz)" : " (1 = same as reference)");
     data.x_label = de ? "Workload" : "workload";
     data.y_label = de ? "Suchalgorithmus" : "search algorithm";
     // HONEST-EMPTY-Vermerk. Er nennt die Referenz beim Namen: "keine Daten" hat hier zwei ganz
     // verschiedene Ursachen (Metrik nie ausgefuehrt ODER Referenz nicht gemessen), und der Leser muss
     // beide unterscheiden koennen.
-    data.empty_note = de ? ("(Keine vergleichbaren Messwerte: " + metric + " liegt im vorliegenden Korpus fuer " +
-                            reference_algo +
-                            " nicht als Referenz vor (oder wurde nie ausgefuehrt). Diese Flaeche wird ehrlich "
-                            "ausgelassen, statt ein Verhaeltnis gegen eine fehlende Referenz zu behaupten.)")
-                         : ("(No comparable measurements: " + metric + " has no reference series for " +
-                            reference_algo +
-                            " in the present corpus (or was never executed). This surface is honestly omitted "
-                            "instead of claiming a ratio against a missing reference.)");
+    data.empty_note =
+        de ? ("(Keine vergleichbaren Messwerte: " + metric + " liegt im vorliegenden Korpus fuer " + reference_algo +
+              " nicht als Referenz vor (oder wurde nie ausgefuehrt). Diese Flaeche wird ehrlich "
+              "ausgelassen, statt ein Verhaeltnis gegen eine fehlende Referenz zu behaupten.)")
+           : ("(No comparable measurements: " + metric + " has no reference series for " + reference_algo +
+              " in the present corpus (or was never executed). This surface is honestly omitted "
+              "instead of claiming a ratio against a missing reference.)");
     return write_heatmap(out, data, cnst);
 }
 
@@ -1058,8 +1056,7 @@ std::vector<LatencyTradeoffPoint> aggregate_latency_tradeoff(std::span<WideMeasu
         if (!r.has_op_p99) continue;
         for (auto const& spec : kRangeOps) {
             // scan-No-Op-Profile wie im Flaechen-/Range-Pfad ausschliessen (fuer Scan invalide).
-            if (spec.display == "scan" && (r.workload == "ycsb_e" || r.workload == "lp_range_scan"))
-                continue;
+            if (spec.display == "scan" && (r.workload == "ycsb_e" || r.workload == "lp_range_scan")) continue;
             // AUSGEFUEHRT? Zaehler zuerst, sonst die p50>0-Heuristik -- wortgleich zu z_field_executed.
             bool const executed = r.has_op_n ? (r.*(spec.n_mem) > 0U) : (r.*(spec.p50_mem) > 0.0);
             if (!executed) continue;
@@ -1098,7 +1095,7 @@ int write_latency_tradeoff_scatter(std::filesystem::path const& out, std::span<W
     // faellt aber EIN darzustellender Wert auf exakt 0 (echt gemessene 0), fallen BEIDE Achsen auf
     // LINEAR zurueck. Eine log-Achse verschluckt die 0 lautlos als unbounded coordinate; das waere ein
     // verschwiegener Messwert.
-    bool have_zero = false;
+    bool   have_zero = false;
     double lo = 0.0, hi = 0.0;
     bool   have_val = false;
     for (auto const& p : points) {
@@ -1118,8 +1115,7 @@ int write_latency_tradeoff_scatter(std::filesystem::path const& out, std::span<W
 
     std::ofstream f{out};
     if (!f) return status_io_error;
-    f << "% AUTO-GENERATED durch diagram_generator (E-2c, Pareto-/Tradeoff-Streuung p50 vs p99; lang=" << lang
-      << ")\n";
+    f << "% AUTO-GENERATED durch diagram_generator (E-2c, Pareto-/Tradeoff-Streuung p50 vs p99; lang=" << lang << ")\n";
     f << "% Ein Punkt je (Konfiguration x Op-Art): x = Median-Latenz, y = Tail-Latenz (p99). Beide Groessen\n";
     f << "% stehen SO im WIDE-Schema -- nichts ist erfunden, nichts aggregiert. Diagonale y=x = kein\n";
     f << "% Tail-Aufschlag; je weiter ein Punkt darueber liegt, desto teurer sein Ausreisser-Verhalten.\n";
@@ -1130,17 +1126,16 @@ int write_latency_tradeoff_scatter(std::filesystem::path const& out, std::span<W
     for (std::size_t i = 0; i < algos.size(); ++i) {
         double const hue =
             (algos.size() <= 1) ? 0.0 : (360.0 * static_cast<double>(i) / static_cast<double>(algos.size()));
-        int          r = 0, g = 0, b = 0;
+        int r = 0, g = 0, b = 0;
         hsv_to_rgb(hue, 0.65, 0.85, r, g, b);
         f << "\\definecolor{tradeoff" << i << "}{RGB}{" << r << "," << g << "," << b << "}\n";
     }
     f << "\\definecolor{tradeoffdiag}{RGB}{120,120,120}\n";
     f << "\\begin{axis}[\n";
-    write_pgfplots_axis_options(f, cnst,
-                                de ? "Pareto-Streuung: Median- gegen Tail-Latenz"
-                                   : "Pareto scatter: median vs tail latency",
-                                de ? "Median-Latenz p50 (ns/op)" : "median latency p50 (ns/op)",
-                                de ? "Tail-Latenz p99 (ns/op)" : "tail latency p99 (ns/op)");
+    write_pgfplots_axis_options(
+        f, cnst, de ? "Pareto-Streuung: Median- gegen Tail-Latenz" : "Pareto scatter: median vs tail latency",
+        de ? "Median-Latenz p50 (ns/op)" : "median latency p50 (ns/op)",
+        de ? "Tail-Latenz p99 (ns/op)" : "tail latency p99 (ns/op)");
     if (log_axes) f << "    xmode=log,\n    ymode=log,\n";
     f << "    legend style={at={(1.03,1)},anchor=north west,font=\\tiny,legend cell align=left},\n";
     f << "    mark size=1.6pt,\n";
@@ -1213,8 +1208,8 @@ int write_normalized_bar_vs_reference(std::filesystem::path const& out, std::spa
 
     bool const        de     = (lang == "de");
     std::string const metric = z_field_human(z_field, lang);
-    std::string const title  = (de ? "Normalisiert zur Referenz " : "Normalised to reference ") + reference_algo +
-                              ": " + metric + (de ? " (1 = wie die Referenz)" : " (1 = same as reference)");
+    std::string const title = (de ? "Normalisiert zur Referenz " : "Normalised to reference ") + reference_algo + ": " +
+                              metric + (de ? " (1 = wie die Referenz)" : " (1 = same as reference)");
 
     // E-2b-Praezedenz: ein Balken auf exakt 0 (Zaehler echt 0 gemessen) kann auf einer log-Achse weder
     // gezeigt noch ehrlich ersetzt werden -> dann LINEAR. Sonst log (Verhaeltnisse spannen Dekaden).
@@ -1289,8 +1284,8 @@ int write_normalized_bar_vs_reference(std::filesystem::path const& out, std::spa
     // ist ein \addplot mit den beiden aeusseren SYMBOLISCHEN x-Werten. sharp plot hebt das
     // axis-weite ybar fuer genau diese Linie auf, forget plot haelt sie aus der Legende.
     f << "% P3a-REFERENZLINIE: y=1 ist die Referenz selbst (Verhaeltnis 1 = gleich schnell).\n";
-    f << "\\addplot[sharp plot,no marks,dashed,nbref,thick,forget plot] coordinates {("
-      << escape_latex(labels.front()) << ",1) (" << escape_latex(labels.back()) << ",1)};\n";
+    f << "\\addplot[sharp plot,no marks,dashed,nbref,thick,forget plot] coordinates {(" << escape_latex(labels.front())
+      << ",1) (" << escape_latex(labels.back()) << ",1)};\n";
     f << "\\end{axis}\n\\end{tikzpicture}\n";
     close_resizebox(f, cnst);
     if (!cnst.body_only) { f << "\\caption{" << escape_latex(title) << "}\n\\end{figure}\n"; }
@@ -1301,8 +1296,8 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
                                            std::string const& z_field, std::string const& lang,
                                            PageConstraints const& cnst) {
     if (rows.empty()) return status_empty_input;
-    HeatmapData      data;
-    auto const       agg = aggregate_surface_matrix(rows, z_field, data);
+    HeatmapData data;
+    auto const  agg = aggregate_surface_matrix(rows, z_field, data);
     if (!agg.axes_present) return status_empty_input;
 
     bool const        de     = (lang == "de");
@@ -1439,8 +1434,7 @@ int write_surface3d_search_algo_x_workload(std::filesystem::path const& out, std
     for (std::size_t y = 0; y < ny; ++y) {
         for (std::size_t x = 0; x < nx; ++x) {
             bool const has = cell_displayable(data, have_mask, y, x);
-            f << "    (" << x << "," << y << "," << (has ? fmt_double(data.matrix[y][x]) : std::string{"nan"})
-              << ")\n";
+            f << "    (" << x << "," << y << "," << (has ? fmt_double(data.matrix[y][x]) : std::string{"nan"}) << ")\n";
         }
         f << "\n"; // Leerzeile → neue mesh-Zeile (pgfplots surf-Konvention).
     }
@@ -1542,8 +1536,8 @@ int write_working_set_sweep_curve(std::filesystem::path const& out, std::span<Wi
     if (degenerate_x) {
         f << "    % P1b: nur EIN gemessener working_set_n -> Achse explizit auf eine Oktave geweitet\n";
         f << "    % (sonst xmin==xmax -> \"Axis range for axis x is approximately empty\"). Nur die ACHSE.\n";
-        f << "    xmin=" << fmt_double(static_cast<double>(only_x) / 2.0) << ", xmax="
-          << fmt_double(static_cast<double>(only_x) * 2.0) << ",\n";
+        f << "    xmin=" << fmt_double(static_cast<double>(only_x) / 2.0)
+          << ", xmax=" << fmt_double(static_cast<double>(only_x) * 2.0) << ",\n";
     }
     f << "    legend pos=north west,\n    legend style={font=\\tiny},\n";
     f << "    mark size=2pt,\n";

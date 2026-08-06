@@ -230,9 +230,9 @@ inline constexpr std::size_t kExchangeForestSmallSampleThreshold = 30;
 // zweites Mal dasselbe \label waere ein "multiply defined"-Fehler.
 [[nodiscard]] int write_exchange_forest_plot(std::filesystem::path const& out, std::span<ExchangeAggregate const> aggs,
                                              std::span<SiblingPairCount const> counts, std::string const& lang = "en",
-                                             bool        body_only         = false,
-                                             std::size_t small_n_threshold = kExchangeForestSmallSampleThreshold,
-                                             std::string_view reference_value = {});
+                                             bool             body_only         = false,
+                                             std::size_t      small_n_threshold = kExchangeForestSmallSampleThreshold,
+                                             std::string_view reference_value   = {});
 
 // L-e.1: schreibt die EINE ehrliche Limitierungs-longtable (anhang/<lang>/tabellen/le_limitierung.tex).
 // Zeile 1 (Spitzenplatz) = Cache-Misses/PMC = 0/nicht-erhoben (Kernmetrik). Inhalt ist statisch (die

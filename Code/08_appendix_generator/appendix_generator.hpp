@@ -53,8 +53,7 @@ inline constexpr std::array<std::string_view, 6> kSurfaceFields = {
 // (working_set_n), und nur diese drei sind im Sweep-Korpus durchgaengig besetzt. Die Auswahl ist rein
 // additiv erweiterbar. HEADER-GETRIEBEN/n-a-tolerant: fehlt die working_set_n-Spalte (cowfix-v1-Korpus),
 // liefert write_working_set_sweep_curve status_empty_input -> KEINE Datei, KEIN Fehler.
-inline constexpr std::array<std::string_view, 3> kSweepFields = {"ns_per_op", "op_insert_p50_ns",
-                                                                 "op_lookup_p50_ns"};
+inline constexpr std::array<std::string_view, 3> kSweepFields = {"ns_per_op", "op_insert_p50_ns", "op_lookup_p50_ns"};
 
 // ── ACHSEN-INVENTAR (2026-08-03) ──────────────────────────────────────────────
 // DIE LUECKE: bis hierher kannte diese Stufe NUR die VIER variablen Mess-Achsen

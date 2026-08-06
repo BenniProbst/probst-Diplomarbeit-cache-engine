@@ -727,9 +727,9 @@ TEST(Stufe05Pipeline, ParseWideCsvOpExecutionCounts) {
     EXPECT_TRUE(rows[0].has_op_n);
     EXPECT_EQ(rows[0].op_insert_n, 1000u);
     EXPECT_EQ(rows[0].op_lookup_n, 2000u);
-    EXPECT_EQ(rows[0].op_erase_n, 0u);   // erase nie ausgefuehrt -> das Signal, das frueher verworfen wurde
-    EXPECT_EQ(rows[1].op_insert_n, 0u);  // ycsb_c ohne insert
-    EXPECT_EQ(rows[0].op_rmw_n, 0u);     // Widerspruchs-Zeile: Zaehler 0 trotz p50=777
+    EXPECT_EQ(rows[0].op_erase_n, 0u);  // erase nie ausgefuehrt -> das Signal, das frueher verworfen wurde
+    EXPECT_EQ(rows[1].op_insert_n, 0u); // ycsb_c ohne insert
+    EXPECT_EQ(rows[0].op_rmw_n, 0u);    // Widerspruchs-Zeile: Zaehler 0 trotz p50=777
     EXPECT_DOUBLE_EQ(rows[0].op_rmw_p50_ns, 777.0);
 
     // Bestandsschema OHNE op_<art>_n-Spalten -> has_op_n=false, KEIN Parse-Fehler.
@@ -850,7 +850,7 @@ TEST(Stufe05Pipeline, SurfaceExecutionCounterOverridesP50Heuristic) {
     std::error_code ec;
     fs::remove(out, ec);
     ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "op_rmw_p50_ns", "en"), dg::status_ok);
-    EXPECT_FALSE(file_contains(out, "addplot3"));  // Zaehler gewinnt -> Platzhalter statt Heatmap
+    EXPECT_FALSE(file_contains(out, "addplot3")); // Zaehler gewinnt -> Platzhalter statt Heatmap
     EXPECT_FALSE(file_contains(out, "777.0000")); // die widerspruechliche p50 wird NICHT geplottet
     EXPECT_TRUE(file_contains(out, "HONEST-EMPTY"));
 
@@ -912,10 +912,10 @@ void write_wide_csv_with_true_zeros(fs::path const& p, int counter_mode) {
     };
     std::size_t i = 0;
     for (auto const& s : specs) {
-        f << "search_algo=" << s.algo << "/mapping=direct;" << s.ns_per_op << ";" //
-          << s.insert_n << ";" << s.insert_p50 << ";"                             // insert
-          << "2000;0;"                                                            // lookup: ausgefuehrt, echt 0
-          << "0;0;";                                                              // erase: nie ausgefuehrt
+        f << "search_algo=" << s.algo << "/mapping=direct;" << s.ns_per_op << ";"    //
+          << s.insert_n << ";" << s.insert_p50 << ";"                                // insert
+          << "2000;0;"                                                               // lookup: ausgefuehrt, echt 0
+          << "0;0;";                                                                 // erase: nie ausgefuehrt
         if (!drop_scan_n) f << ((counter_mode == 2 && i == 0) ? "n/a" : "0") << ";"; // scan-Zaehler
         f << "0;"                                                                    // op_scan_p50_ns
           << "0;0;"                                                                  // rmw: nie ausgefuehrt
@@ -934,7 +934,7 @@ TEST(Stufe05Pipeline, SurfaceTrueZeroCellIsPlottedNotOmitted) {
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
     ASSERT_EQ(rows.size(), 4u);
     ASSERT_TRUE(rows[0].has_op_n);
-    EXPECT_EQ(rows[0].op_insert_n, 1000u);        // ausgefuehrt ...
+    EXPECT_EQ(rows[0].op_insert_n, 1000u);           // ausgefuehrt ...
     EXPECT_DOUBLE_EQ(rows[0].op_insert_p50_ns, 0.0); // ... und exakt 0 ns gemessen
 
     // -- 2D --
@@ -942,9 +942,9 @@ TEST(Stufe05Pipeline, SurfaceTrueZeroCellIsPlottedNotOmitted) {
     std::error_code ec;
     fs::remove(out, ec);
     ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "op_insert_p50_ns", "en"), dg::status_ok);
-    EXPECT_TRUE(file_contains(out, "matrix plot*"));            // echte Figur ...
-    EXPECT_FALSE(file_contains(out, "Metrik ohne Messwerte"));  // ... KEIN Platzhalter
-    EXPECT_EQ(count_occurrences(out, "[nan]"), 0u);             // und KEINE ausgelassene Zelle
+    EXPECT_TRUE(file_contains(out, "matrix plot*"));           // echte Figur ...
+    EXPECT_FALSE(file_contains(out, "Metrik ohne Messwerte")); // ... KEIN Platzhalter
+    EXPECT_EQ(count_occurrences(out, "[nan]"), 0u);            // und KEINE ausgelassene Zelle
     // Die 0 steht als ECHTER Wert (4 Nachkommastellen) mit ehrlichem Meta = eigene 0-Klasse eine Dekade
     // unter der kleinsten gemessenen Dekade (kleinster positiver Wert 100 -> floor(log10)=2 -> Klasse 1).
     EXPECT_TRUE(file_contains(out, "(0,1,0.0000) [1.0000]"));
@@ -995,8 +995,8 @@ TEST(Stufe05Pipeline, SurfaceAllTrueZeroMatrixIsNoPlaceholder) {
     fs::remove(out, ec);
     ASSERT_EQ(dg::write_surface_search_algo_x_workload(out, rows, "op_lookup_p50_ns", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "matrix plot*"));
-    EXPECT_FALSE(file_contains(out, "Metrik ohne Messwerte")); // KEIN Platzhalter
-    EXPECT_EQ(count_occurrences(out, "[nan]"), 0u);            // KEIN Auslass
+    EXPECT_FALSE(file_contains(out, "Metrik ohne Messwerte"));  // KEIN Platzhalter
+    EXPECT_EQ(count_occurrences(out, "[nan]"), 0u);             // KEIN Auslass
     EXPECT_EQ(count_occurrences(out, ",0.0000) [0.0000]"), 4u); // 4 echte Nullen in der 0-Klasse
     // Nicht-entartete Farb-Domaene + Ein-Klassen-Colorbar (die [0.0:0.0]-Domaene war der pgfplots-Fatal).
     EXPECT_TRUE(file_contains(out, "point meta min=0.0000"));
@@ -1038,8 +1038,7 @@ TEST(Stufe05Pipeline, SurfaceOneMissingCounterColumnFallsBackToP50Heuristic) {
     // insert: die echte 0 faellt unter die Heuristik -> genau EINE ausgelassene Zelle, 3 echte Werte.
     auto out_ins = comdare_user_tmp() / "e2b_fallback_insert.tex";
     fs::remove(out_ins, ec);
-    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_ins, rows_missing, "op_insert_p50_ns", "en"),
-              dg::status_ok);
+    ASSERT_EQ(dg::write_surface_search_algo_x_workload(out_ins, rows_missing, "op_insert_p50_ns", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out_ins, "matrix plot*"));
     EXPECT_EQ(count_occurrences(out_ins, ",0) [nan]"), 1u);
     EXPECT_FALSE(file_contains(out_ins, ",0.0000)")); // keine erfundene 0-ns-Messung
@@ -1367,9 +1366,8 @@ TEST(Stufe05Pipeline, RatioMatrixDivergentScaleIsLogSymmetricAroundEquality) {
     auto p = comdare_user_tmp() / "p2_divergent.csv";
     // Referenz 100; k_ary 200 -> Verhaeltnis 2.0; eytzinger 50 -> Verhaeltnis 0.5.
     // Genau der Prueffall: beide sind "Faktor 2" von der Referenz entfernt, nur in andere Richtung.
-    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
-                                 {"k_ary", "ycsb_a", 200.0},
-                                 {"eytzinger", "ycsb_a", 50.0}});
+    write_wide_csv_for_ratio(
+        p, {{"linear_scan", "ycsb_a", 100.0}, {"k_ary", "ycsb_a", 200.0}, {"eytzinger", "ycsb_a", 50.0}});
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
@@ -1488,9 +1486,8 @@ TEST(Stufe05Pipeline, NormalizedBarAggregatesRatiosNotRawMedians) {
 TEST(Stufe05Pipeline, NormalizedBarOmitsGroupsWithoutAnyValidRatio) {
     auto p = comdare_user_tmp() / "p3a_group_without_ref.csv";
     // Referenz laeuft NUR in ycsb_a. eytzinger laeuft NUR in ycsb_c -> hat nie einen Nenner.
-    write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
-                                 {"k_ary", "ycsb_a", 50.0},
-                                 {"eytzinger", "ycsb_c", 35.0}});
+    write_wide_csv_for_ratio(
+        p, {{"linear_scan", "ycsb_a", 100.0}, {"k_ary", "ycsb_a", 50.0}, {"eytzinger", "ycsb_c", 35.0}});
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
 
@@ -1539,8 +1536,7 @@ TEST(Stufe05Pipeline, NormalizedBarFallsBackToLinearWhenABarIsTrueZero) {
     std::error_code ec;
     fs::remove(out, ec);
     // op_insert_p50_ns, weil nur dort der Zaehler op_insert_n die 0 als GEMESSEN ausweisen kann.
-    ASSERT_EQ(dg::write_normalized_bar_vs_reference(out, rows, "op_insert_p50_ns", "linear_scan", "en"),
-              dg::status_ok);
+    ASSERT_EQ(dg::write_normalized_bar_vs_reference(out, rows, "op_insert_p50_ns", "linear_scan", "en"), dg::status_ok);
     EXPECT_TRUE(file_contains(out, "(k\\_ary,0.0000)")); // die 0 ist ein echter Balken
     EXPECT_FALSE(file_contains(out, "ymode=log"));       // ... und die Achse ist linear
 
@@ -1587,11 +1583,9 @@ void write_wide_csv_for_tradeoff(fs::path const& p, std::vector<TradeoffRow> con
 // Punktwolke IST die Aussage. Serien = search_algo, plus die Diagonale y=x als Referenz.
 TEST(Stufe05Pipeline, LatencyTradeoffEmitsOnePointPerExecutedOpAndTheDiagonal) {
     auto p = comdare_user_tmp() / "p3b_points.csv";
-    write_wide_csv_for_tradeoff(p,
-                                {{"k_ary", "ycsb_a", 100.0, 400.0},
-                                 {"k_ary", "ycsb_c", 120.0, 500.0},
-                                 {"eytzinger", "ycsb_a", 80.0, 90.0}},
-                                /*has_p99=*/true);
+    write_wide_csv_for_tradeoff(
+        p, {{"k_ary", "ycsb_a", 100.0, 400.0}, {"k_ary", "ycsb_c", 120.0, 500.0}, {"eytzinger", "ycsb_a", 80.0, 90.0}},
+        /*has_p99=*/true);
     std::vector<dg::WideMeasurementRow> rows;
     ASSERT_EQ(dg::parse_wide_csv(p, rows), dg::status_ok);
     ASSERT_TRUE(rows[0].has_op_p99);

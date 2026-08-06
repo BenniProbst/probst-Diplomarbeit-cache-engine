@@ -97,11 +97,11 @@ struct ScatterData {
 // Heatmap (2D-Matrix)
 // ─────────────────────────────────────────────────────────────────────────────
 struct HeatmapData {
-    std::string                      title;
-    std::string                      x_label;
-    std::string                      y_label;
-    std::vector<std::string>         x_labels;
-    std::vector<std::string>         y_labels;
+    std::string              title;
+    std::string              x_label;
+    std::string              y_label;
+    std::vector<std::string> x_labels;
+    std::vector<std::string> y_labels;
     // matrix[y][x]. NaN (quiet_NaN) = Zelle OHNE Messwert ("nicht ausgefuehrt"), ausdruecklich NICHT 0.0
     // -- write_heatmap laesst solche Zellen ueber point meta = nan aus und schreibt als dritte Koordinate
     // nur den blanken Mesh-Traeger 0 (kein "0.0000"), damit die .tex keine 0-ns-Messung behauptet.
@@ -236,13 +236,13 @@ struct WideMeasurementRow {
     // measurement/20260726-164259-d03-strukt-r-erstbeleg/measurements.csv (Spalten 7/10/13/19/22).
     // OPTIONAL/header-getrieben (NICHT Pflichtspalte, NICHT in required[]): fehlt EINE der 5 Spalten ODER
     // ist EINE Zelle leer/"n/a"/nicht-numerisch, bleibt has_op_n=false -> BESTANDSVERHALTEN (p50>0-Heuristik).
-    std::uint64_t op_insert_n = 0;
-    std::uint64_t op_lookup_n = 0;
-    std::uint64_t op_erase_n  = 0;
-    std::uint64_t op_scan_n   = 0;
-    std::uint64_t op_rmw_n    = 0;
-    bool          has_op_n    = false; // true <=> alle 5 op_<art>_n-Spalten vorhanden UND numerisch
-    bool   two_phase_valid  = false; // Mess-GÜLTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
+    std::uint64_t op_insert_n     = 0;
+    std::uint64_t op_lookup_n     = 0;
+    std::uint64_t op_erase_n      = 0;
+    std::uint64_t op_scan_n       = 0;
+    std::uint64_t op_rmw_n        = 0;
+    bool          has_op_n        = false; // true <=> alle 5 op_<art>_n-Spalten vorhanden UND numerisch
+    bool          two_phase_valid = false; // Mess-GUELTIGKEIT (Zwei-Phasen-Cache-Warmup exakt)
     // M3v2-Tag-Spalten (Task #156, ans Schema-Ende gehängt). OPTIONAL/header-getrieben aufgelöst:
     // fehlt die Spalte (cowfix-v1-Schema), bleibt das Feld leer/0 — KEIN Parse-Fehler (n/a).
     std::string   series;                    // SOTA-Reihe (A/B/C/-); leer falls Spalte fehlt
@@ -366,9 +366,9 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
 // Fehlt die Referenz-Zeile im gesamten Korpus, traegt KEINE Zelle Daten -> write_heatmap schreibt seinen
 // ehrlichen Platzhalter-Vermerk (kein pgfplots-Fatal, kompilierfaehige Datei).
 [[nodiscard]] int write_surface_ratio_vs_reference(std::filesystem::path const&        out,
-                                                   std::span<WideMeasurementRow const> rows,
-                                                   std::string const& z_field, std::string const& reference_algo,
-                                                   std::string const& lang = "en", PageConstraints const& cnst = {});
+                                                   std::span<WideMeasurementRow const> rows, std::string const& z_field,
+                                                   std::string const& reference_algo, std::string const& lang = "en",
+                                                   PageConstraints const& cnst = {});
 
 // GRAPH-UMBAU 2D/3D, P3a (2026-08-06) -- BASELINE-NORMALISIERTES BALKENDIAGRAMM
 // -----------------------------------------------------------------------------
