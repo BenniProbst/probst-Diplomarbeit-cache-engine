@@ -389,3 +389,6 @@ Quellen: Opus-max-Explore ueber alle 5 heutigen Transkripte (satzweiser Owner-Ab
 
 ### VOR-ABGABE-Klaerungszeile
 | **DoD-7-Vollzugsstand Planer-Kette** | Phase-4-Abnahmekriterium ist von DoD-7 (LEDGER:205, E9 16.07.) ueberholt; Vollzugsstand war NICHT Gegenstand der E1-E4-Karte — vermutlich durch 982er-Wahrheits-Anker/Planer-Kette-Audit 05.08. gedeckt: GEGENZEICHNEN statt neu auditieren. | KLAEREN (billig) | E1-E4-Karte |
+
+### Aufraeumpass-Kandidat Nr. 9 (NEU 06.08. mittags, aus Gate-8-Welle)
+| **axis_inventory.tex nie eingebunden** | Die Facade SCHREIBT die Datei (Code/08_appendix_generator/appendix_generator.cpp:423), aber KEINE .tex des Thesis-Repos bindet sie ein -- dieselbe Luecken-Klasse wie die 23 Graph-Abbildungen (Gate 8), nur aelter/laenger unbemerkt. Braucht einen kleinen Owner-/Lead-Entscheid: in welchen Anhang-Abschnitt gehoert die Achsen-Inventar-Tabelle? | OFFEN (klein) | Gate-8-Welle wf_c974dbd3 |
