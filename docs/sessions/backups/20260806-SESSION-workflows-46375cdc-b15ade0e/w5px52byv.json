@@ -1,0 +1,188 @@
+{
+  "summary": "Owner-Atlas-Review Runde 3: Nachschlag Heuristik-Binary/Binary-Topologie/Dock-Vertraege im Plan-Korpus + Atlas-Uebersicht auf Binary-Topologie-Ansicht umbauen (Binaries als Container ihrer Layer, kanonische Vertrags-Namen, Heuristik als optionale 4. Binary) — 2 Lenses + Autor + Review",
+  "agentCount": 4,
+  "logs": [],
+  "result": {
+    "lens": [
+      {
+        "lens": "heuristik-binary",
+        "bericht_pfad": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/heuristik.md",
+        "kernbefunde": [
+          "EIGENE BINARY: Die Heuristik-/Hybrid-Stufe ist per Kanon eine EIGENE generierte+kompilierte Binary — optionaler 4. Ketten-Einschub (Planer→CEB→[Hybrid-Tier↔CEB]→Tier, 3-4 Binaries in EINER Kette, §30); LED:818 verbatim: die Heuristik-Optimierungs-Achse 'wird SELBST zur Tier-Binary kompiliert'; Design-Doc: Export als normales Tier-Modul mit 4 ABI-Pflicht-Symbolen, KEIN neuer ABI-Schritt (Anatomy Major 7).",
+          "ANDOCKEN: Sie dockt am CEB-PRUEF-DOCK an (LED:818) und traegt SELBST mehrere ABI-stabile HYBRID-PRUEF-DOCKS = Rekursions-Ebene 3 der Dock-Kette (Planer-Dock → CEB-Pruef-Dock → Hybrid-Pruef-Docks); Dock-Anzahl N dynamisch einstellbar (Owner-E1 02.08.).",
+          "DELEGATION: Metaprogrammierungs-Command-Pattern an statisch zugewiesene echte Tier-Binaries + compile-time Chain-of-Responsibility (Tier-Form (a) heuristisch = 'noch EINE Ebene NACH dem Command-Pattern in einer compile-time CoR, virtuell'; Break-Even-Router = CT-CoR); Dock-Einsatz per Factory Pattern als Proxy; std::variant NUR dort als definierte Ausnahme (statisches oder Runtime-Dock-Array), in plain Tier-Binaries VERBOTEN; Haupt-Kommunikation bleibt statisch (IObservableTier, §49). Rekursive Delegation: echte Tiers werden 'delegiert durch CEB' entwickelt/geladen. Abzugrenzen: die Auswertungs-CoR (selection_filter_chain) lebt STRIKT im CEB, nicht in der Hybrid-Binary.",
+          "OPTIONAL + XOR: je Kette optional ('+optionaler Hybrid-Einschub'); W10 verbatim: '[d,e,f,g,h,i]Tier-Binary XOR ([d,e,f,g,h,i]Hybrid-Heuristik-Tier-Binary -> ausgemessene beste, no permutation und static pick'; als DoD aber Abgabe-Pflicht (§31/F8: minimale Baseline CEB-kompiliert+geladen, ctest-bewiesen, + Spline-Funktion je Achse, Break-Even = Spline-Schnittpunkte, 3 Break-Even-Optionen); Owner-E1: Design JETZT, Bau in der AUSWERTUNGSPHASE.",
+          "SYSTEMACHSE SUPERSEDED: das aeltere Framing 'Heuristik-Optimierungs-Achse = eigene Systemachse' (LED:187(e)/818, 10.07.) ist durch Owner-E1 02.08. ins STUFEN-Modell (Stufe HINTER der CEB) eingeordnet und insoweit superseded; Q6-Defaults Owner-freigegeben: Ein-Gattung-Hybrid, MaxN=8.",
+          "IST am Objekt: heuristik/ = nur 3 header-only Mathematik-Dateien (axis_spline/break_even/measurement_curve_loader, Paket W3-C/F8) — Zulieferung, KEINE Binary; hybrid/ = reiner README-Stub HY-D2 (kein Code, kein Build-Anschluss, Bau erst Auswertungsphase nach Voll-Bau-4+E-24), bindendes Design in ce docs/architecture/20260802-hybrid_tier_stufe_soll_design.md (485 Z., 9 geplante Dateien, K1/K2/K4/K5 offen, Dock-Bestueckung=Sidecar nie binary_id). Owner-Ruege mittag-3 damit korpus-bestaetigt: Atlas muss die Heuristik als optionale EIGENE Binary ZWISCHEN CEB und Tier zeigen, nicht als Library-Layer; Vertrags-Namen an den Kanten: EXPERIMENT-DOCK / PRUEF-DOCK (Arbeitsmodus: ARBEITS-DOCK) / HYBRID-PRUEF-DOCKS."
+        ],
+        "belege": [
+          "/home/comdare/.claude/projects/-home-comdare/memory/feedback_kette_planer_mess_ceb_system_tier_organ_hybrid.md (Z.11: optionaler Hybrid-Einschub = weitere generierte Binary, 3-4 Binaries, rekursive Delegation)",
+          "/home/comdare/.claude/projects/-home-comdare/memory/feedback_hybrid_tier_stufe_hinter_ceb_variant_ausnahme.md (Stufe HINTER CEB, variant-Ausnahme nur dort)",
+          "/home/comdare/.claude/projects/-home-comdare/memory/feedback_recursive_dock_planer_ceb_tier_abi_stable_so.md (Z.15 Tier-Formen a heuristisch CT-CoR / b plain; Z.16 Kompile-Reihenfolge System→Mess-Heuristik)",
+          "/home/comdare/.claude/projects/-home-comdare/memory/feedback_heuristik_messkurven_typsystem_chain_of_responsibility.md (CoR strikt im CEB; 3-Varianten-Observer; 4. Schritt; Paper-Vergleich vor)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md (Z.97 Q6/187(e)-superseded; Z.104 S7 Hybrid; Z.215(e); Z.514 PL-20 4. Kettenglied; Z.518; Z.818 HYBRID-MODUS-Direktive verbatim; Z.829; Z.1741 H-8; Z.2249/2258 §30; Z.2272 §31 Abgabe-Pflicht; Z.2273 A4 Storage; Z.2292 F7 Release-Modus; Z.2294-2296 F8+3 Break-Even-Optionen; Z.2421/2425 W10 XOR; Z.2601-2602; Z.3724 Q6 Ein-Gattung MaxN=8; Z.4044-4047 mittag-3 Owner verbatim)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md (:149, :242, :245-246 Ketten-Position + §31-Nachtrag, :253 §38-Revision)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md (:7 E1 verbatim; Nachtrag ~17:4x Q6-GO)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/hybrid/README.md (HY-D2-Stub, Rekursions-Ebene 3, 9 geplante Dateien, K1-K5)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/docs/architecture/20260802-hybrid_tier_stufe_soll_design.md (485 Z., 7 bindende Design-Saetze, Dock-Ketten-Tabelle Ebene 1-3)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/Code/external/comdare-cache-engine/libs/cache_engine/heuristik/axis_spline.hpp + break_even.hpp + measurement_curve_loader.hpp (W3-C/F8-Mathematik, header-only, keine Binary)"
+        ]
+      },
+      {
+        "lens": "topologie-vertraege",
+        "bericht_pfad": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/vertraege.md",
+        "kernbefunde": [
+          "BINARY-TOPOLOGIE (Ledger §30.5/6 verbatim): '3 bis 4 Binaries in EINER Kette ... top-down nacheinander in sequentieller Abhängigkeit ... GENERIERT' — Planer=Mess-Achsen · CEB=System-Achsen · Tier=Organ-Achsen '+ Hybrid-Einschub einer weiteren generierten Binary in der Kette (optional)'; Registry-Speisung 1:1 Mess→Planer/System→CEB/Organ(+prt)→Tier.",
+          "PLANER-Binary-Inhalt: Mess-Achsen-Permutation + 3-Registry-Resolver/.pom + Shell-CLI + Rück-Leser (Owner F7) + einziger X.Y.Z-Stempel; eigene Binary = HARTE Pflicht (Owner-KERN 05.08. 'ZWINGEND eine eigene Binary', F1-GO Split VOR Abgabe).",
+          "CEB-Binary-Inhalt: 'CacheEngineBuilder == CEB' (Terminologie-KERN 05.08.); vom Planer je Messsystem GENERIERTE+HART kompilierte, System-Achsen-versionierte Binary ([a,b,c]-Stempel); enthält Bau-/Prüf-/Mess-Maschinerie (4096er-Batch CEB-intern, RAM-Spool, Prüfstand vor Messung, eigentlichen measurement_driver per R2, 'alle Tools gehoeren in CacheEngineBuilder') und KAPSELT die Anatomie-+Achsen-Organ-Layer zur BAUZEIT (Owner mittag-3: 'diese Layer sind IN der CEB eingebaut'); vorher auf Gattungs-Observer+Module kompiliert; nur EINE messende CEB (§38.b sequentiell).",
+          "HEURISTIK = OPTIONALE EIGENE BINARY zwischen CEB und echten Tiers (Owner mittag-3 bestätigt durch §30.5 + feedback_ceb_drei_modi verbatim): eigene SYSTEMACHSE, 'wird SELBST zur Tier-Binary kompiliert', dockt am CEB-Prüfdock an, reicht Befehle per Metaprogrammierungs-Command-Pattern/CT-CoR an statisch zugewiesene echte Tiers weiter ('virtuelles ganzes Tier-Binary'; §42: XOR, static pick, no permutation).",
+          "TIER-Binary .so: Anatomie-Schichtung Gattung→Genus→Komposition (Map als abstrakte Gattungs-Wurzel) + metaprogrammierte SearchAlgorithmBase mit Achsen-Organen hinter der C++23-ABI-Grenze; zwei strikt getrennte Layer [d,e,f]|[g,h,i]; Unter-Achsen nur Laufzeit, nie Neubau (§42.b); je Anatomie-Gattung EIN Prüf-Dock.",
+          "VERTRAG 1 'EXPERIMENT-DOCK' (Ebene 1 Planer↔CEB): historisch EINDIMENSIONAL (17.07.), per §38 REVIDIERT bidirektional-asymmetrisch — hinab serialisierter unterer B+-Teilbaum als RANGES je System-/Organ-Achse, hinauf sparser §38-Fortschritts-Cursor (Mixed-Radix-Deltas, KEIN Mess-Daten-Rückfluss, §38.b-Fertig-Signal); Anatomy-Major 4→5 'reitet am Experiment-Planer-Dock'; R1-Interim: Ist-Vertrag=Textemission, .so-ABI DEFERRED mit Prüf-Auftrag (im Code markiert, kein stiller Verlust).",
+          "VERTRAG 2 'PRÜF-DOCK' (Ebene 2 CEB↔Tier): BIDIREKTIONAL — 'CEB treibt an ↔ Tier-Binary meldet Messergebnisse ABI-stabil zurück'; im Arbeitsmodus heißt dasselbe Dock 'ARBEITS-DOCK' (feedback_ceb_drei_modi verbatim); Heuristik-Andocken erfolgt AM Prüf-Dock (kein dritter Dock-Typ).",
+          "Ergebnis-Rückschrieb ist KEIN Dock-Vertrag: CEB schreibt Messwerte SELBST ans XML-Ziel ('NICHT über das eindimensionale Experiment-Dock'), EIN CSV je Mess-Job measure:[a,b,c][d,e,f][g,h,i]; Kanten-Legende strikt geschichtet [a,b,c]→CEB · [d,e,f]→Tier · +[g,h,i]+HW→Messwert, nie fusioniert; §40.b: Planer steuert CEB-Bau-Jobs, CEBs steuern Tier-Bau-Jobs."
+        ],
+        "belege": [
+          "/home/comdare/.claude/projects/-home-comdare/memory/feedback_recursive_dock_planer_ceb_tier_abi_stable_so.md (Namen EXPERIMENT-DOCK/PRÜF-DOCK, Richtungen, Rückschrieb NICHT übers Dock, Anatomy-Major am Planer-Dock, Tier-Formen plain/heuristisch-CoR, Kompile-Reihenfolge Gattungs-Observer)",
+          "/home/comdare/.claude/projects/-home-comdare/memory/feedback_kette_planer_mess_ceb_system_tier_organ_hybrid.md (Stufen-Zuordnung, 3-4 Binaries, §38-Revision, §38.b, Terminologie-KERN CacheEngineBuilder==CEB)",
+          "/home/comdare/.claude/projects/-home-comdare/memory/feedback_ceb_drei_modi_arbeitsmodus_hot_tier_switching.md (Heuristik=eigene Systemachse, selbst Tier-Binary, dockt am Prüfdock, 'im Arbeitsmodus Arbeits-Dock', Command-Pattern, virtuelles ganzes Tier-Binary)",
+          "/home/comdare/.claude/projects/-home-comdare/memory/project_post_v3_anforderungen_so_abi_driver_split_cli.md (R1 Textemission/.so-Prüfauftrag, R2 measurement_driver in CEB, R3 CLI, Owner-KERN 05.08. Planer=eigene Binary, F1/F5/F7-Antworten)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md :2249-2266 (§30 verbatim), :2360-2380 (§38/§38.b verbatim), :2419-2432 (§42/§42.b Legenden-Kette, Hybrid-XOR-static-pick), :4014-4043 (vormittag-3 Layer L0-L5 + vormittag-4 Audit-Verdikte), :4044ff (mittag-3 OWNER-NACHRICHT VERBATIM + Lesart), mittag-1 (Owner-Antworten F1-F7 verbatim)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260805-planer-ceb-kette-audit/soll.md (Glieder 1-5 Prüf-Kriterien mit Ledger-Zeilenankern)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260805-planer-ceb-kette-audit/synthese.md (IST-Verdikte, L0/L1-Atlas-Skizze, Live-Draht COMDARE_*, Regressions-Register)",
+          "/home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/sessions/backups/20260805-planer-ceb-kette-audit/ist-ceb.md :153-154 ('Anatomie enthaelt nur Achsen + Observer; alle Tools gehoeren in CacheEngineBuilder'), :210 (je Gattung EIN Prüf-Dock)"
+        ]
+      }
+    ],
+    "autor": {
+      "status": "FERTIG",
+      "pfad": "/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/head3.html",
+      "notizen": [
+        "Vollstaendiger head2-Ersatz (35.674 Bytes): Skelett (title/style/nav/<!--NAV-->/Stand-Zeile/filterrow) 1:1 uebernommen; Stand-Zeile byte-identisch; nur Nav-Label auf 'Architektur-Uebersicht (Binary-Topologie)' angepasst.",
+        "Diagramm 1 NEU = Binary-Topologie (flowchart LR, 4 subgraphs + XML-Ziel-Knoten): Planer[CLI+Resolve+Mess-Achsen | R-G1 rot] -EXPERIMENT-DOCK-> CEB[Maschinerie + KAPSELT L3/L4 zur Bauzeit; R-G3 rot] -PRUEF-DOCK-> Tier[.so, Anatomie+18 Organe hinter Anatomy-ABI Major 7]; gestrichelte optionale 4. Binary Heuristik-Hybrid (dockt am Pruef-Dock, W10-XOR, N Hybrid-Pruef-Docks Ebene 3, Command-Pattern/CT-CoR); Rueckschrieb-Kante 'NICHT uebers Dock' + F7-Rueck-Lese-Pfad (IST: Rueck-Leser fehlt, §52-B14). Mermaid-Syntax statisch geprueft (Quote-Balance, subgraph/end 4/4, Kanten-Syntax wie frag-kette-Praezedenz).",
+        "BEWUSSTE ABWEICHUNG vom Auftrags-Wortlaut: Heuristik-Knoten sagt NICHT 'eigene Systemachse', sondern 'Stufe HINTER der CEB' — heuristik.md §1.5 weist das Systemachsen-Framing (LED:818/215e) als per Owner-E1 02.08. + Q6-GO SUPERSEDED aus; das aeltere Framing ist im Hinweis-Text explizit als superseded dokumentiert (SOLL/IST-Ehrlichkeits-Pflicht des Auftrags).",
+        "Ergaenzung ueber den Wortlaut hinaus (quellen-gedeckt): direkte CEB->Tier-PRUEF-DOCK-Kante zusaetzlich zur gestrichelten Heuristik-Route, damit die W10-XOR-Alternative (Tier ODER Hybrid je Kette) sichtbar ist; IST-Zeilen in den Containern (R-G1, R-G3, Hybrid-Stufe = Design+Stub, Bau Auswertungsphase) fuer die Fehler-Erkennbarkeit.",
+        "Vertrags-Kasten = 5-Zeilen-Tabelle (Experiment-Dock / Pruef-Dock+Arbeits-Dock-Alias / Heuristik-Andocken am Pruef-Dock (kein 3. Dock-Typ) / N Hybrid-Pruef-Docks+Command-Pattern / Rueckschrieb=KEIN Dock) mit Richtung, Nutzlast, je 1 Fundstelle; Verweis auf #kette fuer den SOLL/IST-Detailstand.",
+        "Verzeichnis-Diagramm byte-identisch BEHALTEN, umbenannt 'Code-Verzeichnis-Gliederung (Navigations-Schluessel L0-L5)', mit rotem Warnkasten (Repo-Gliederung != Binary-Topologie; L3/L4 leben zur Laufzeit IN der Tier-Binary; heuristik/ sh-34 = Spline-/Break-Even-Zulieferung der OPTIONALEN Heuristik-Binary-Stufe, Querverweis Diagramm 1); CEB-Fussnote gemaess frag-kette Sektion 4 korrigiert (CEB==apps/cache_engine_builder, heutige CEB-ROLLE traegt comdare-messung-driver).",
+        "Diagramme Hierarchie/Achsen-Organe, 18-Achsen-Tabelle und E4->E1-Fluss per diff verifiziert UNVERAENDERT (nur h3-Nummern 4/5/6/7 und ein interner Querverweis 'Diagramm 2'->'Diagramm 4' renummeriert); Legende um Binary-Topologie-Lesehilfe ergaenzt; Zahlen-Kanon um '3-4 Binaries' + variant-Dock-Array-Ausnahme (nur Hybrid-Stufe) erweitert.",
+        "Alle Topologie-/Vertrags-Aussagen aus den zwei Nachschlag-Berichten (heuristik.md, vertraege.md) belegt; Objekt-Fundstellen der Alt-Diagramme unangetastet. Kein Render-Test moeglich (kein node/mmdc im Env) — Syntax folgt exakt den in atlas.html bereits rendernden Mustern (Brackets/§/Pipes in Quoted Labels, -. \".-> , subgraph-Titel)."
+      ]
+    },
+    "review": {
+      "befunde": [
+        "ERFUELLT Owner-Punkt 1: Heuristik-Stufe als OPTIONALE EIGENE Binary ZWISCHEN CEB und Tier sichtbar — subgraph HYB_BIN gestrichelt (classDef dep, stroke-dasharray), dockt per gestrichelter Kante am PRUEF-DOCK an (KEIN dritter Dock-Typ), N HYBRID-PRUEF-DOCKS Ebene 3 zu den Tiers, direkte CEB->Tier-Kante macht W10-XOR sichtbar; IST ehrlich (keine Binary, Design-Doc+Stub, Bau Auswertungsphase); Systemachsen-Framing korrekt als superseded behandelt (heuristik.md 1.5 gedeckt).",
+        "ERFUELLT Owner-Punkt 2: Binary-Container zeigen die Layer IN jeder Binary; CEB_KAPSEL-Knoten macht die Bauzeit-Kapselung von L3 Anatomie + L4 Achsen-Organen explizit (Owner-mittag-3-Verbatim + vertraege.md A.3); Laufzeit-Ort L3/L4 IN der Tier-Binary hinter Anatomy-ABI Major 7 korrekt.",
+        "ERFUELLT Owner-Punkt 3: kanonische Vertrags-Namen an allen 6 Kanten (EXPERIMENT-DOCK Ebene 1 / PRUEF-DOCK Ebene 2 + ARBEITS-DOCK-Alias / Andocken am Pruef-Dock kein 3. Typ / N HYBRID-PRUEF-DOCKS Ebene 3 / Ergebnis-RUECKSCHRIEB NICHT uebers Dock / F7-Rueck-Lese-Pfad kein Dock-Kanal) + 5-Zeilen-Dock-Tabelle deckungsgleich mit vertraege.md Tabelle C.",
+        "Quellen-Deckung verifiziert: R-G1 (rot, main.cpp:552) und R-G3 (director:769-770) stehen und sind via frag-kette.html Z.18/20/43/64 belegt; Rueck-Leser-Luecke via frag-kette Z.33 (sic-52-B14 Restpunkt 1 offen); CEB-Fussnote (Legacy-Orchestrator nicht Soll-CEB, CEB-Rolle im comdare-messung-driver) wortgleich frag-kette Z.139; #kette-Anker existiert; keine Erfindungen gefunden; SOLL/IST nicht verwischt.",
+        "Technik verifiziert per diff: Haupt-Style-Block Z.1-65 byte-identisch zu head2; einzige Skelett-Aenderung = Nav-Label (deklariert); <!--NAV--> und Stand-Zeile byte-identisch; Diagramme 4/5/6/7 + 18-Achsen-Tabelle + Verzeichnis-Diagramm byte-identisch bis auf deklarierte h3-Renummerierung und Querverweis Diagramm 2->4; Legende/Zahlen-Kanon-Ergaenzungen exakt wie im Autor-Report; HTML-Tag-Balance fehlerfrei, keine ID-Duplikate; Mermaid Diagramm 1 statisch sauber (4/4 subgraph/end, Quote-Balance gerade, -. '...' .-> und &lt;...&gt;-Muster mit rendernder Praezedenz in frag-kette.html); L0-L5 klar als Navigations-Schluessel etikettiert mit rotem Warnkasten.",
+        "MINOR (nicht blockierend): Kanten-/Tabellen-Text 'EINDIMENSIONAL steuernd' am Experiment-Dock folgt der mittag-3-Ledger-Lesart, laesst aber den vertraege.md-B.1-Vermerk weg, dass die bindende sic-38-REVISION 19.07. diesen Begriff als UEBERHOLT markiert ('bidirektional, asymmetrische Nutzlast') — beide Nutzlast-Richtungen sind gezeichnet, kein Informationsverlust; Empfehlung fuer Runde 4: Zusatz 'per sic-38 REVIDIERT: bidirektional, asymmetrisch'.",
+        "MINOR (nicht blockierend): HYB-Titel mischt Positions-Nummer 'BINARY 3 (OPTIONAL)' (vertraege.md A.4) und Zaehl-Phrase 'OPTIONALE 4. Binary der Kette' (heuristik.md) in einer Zeile — beides quellen-gedeckt, aber in Kombination kurz verwirrend neben 'BINARY 4 TIER'.",
+        "MINOR (nicht blockierend): sic-52-B14 ist in frag-kette.html auf den fehlenden progress.cursor-Rueck-Leser (Restpunkt 1) gepinnt; head3 verwendet das Etikett fuer den F7-Messwert-Rueck-Lese-Pfad — Kernaussage 'Rueck-Leser fehlt' bleibt gedeckt, Restpunkt-Zuordnung leicht unscharf.",
+        "MINOR (Autor-Report-Korrektur): Behauptung 'subgraph-Titel-Muster rendern bereits in atlas.html' stimmt nicht — atlas.html enthaelt 0 subgraphs; subgraph ist dennoch Standard-Mermaid-Flowchart-Syntax und statisch fehlerfrei; einzige echte Praezedenzen in frag-kette.html sind gelabelte gestrichelte Kanten und Entity-Labels."
+      ],
+      "verdikt": "FREIGABE"
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Nachschlag"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Autor"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "lens:heuristik",
+      "phaseIndex": 1,
+      "phaseTitle": "Nachschlag",
+      "agentId": "adc630bca86362310",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785926632058,
+      "queuedAt": 1785926632050,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "heuristik-binary",
+      "promptPreview": "LENS heuristik-binary — Nachschlag im Plan-Korpus (READ-ONLY; Bericht /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/heuristik.md, mkdir -p erlaubt).\nOWNER-HINWEISE (verbatim, Ledger mittag-3): (1) 'die L5 Heustik [liegt] nicht optional zwischen der Binary L4 mit den Achsen-Organen ... und stellt selbst eine binary nach Plan dar' — die Heuristik-Stufe ist …",
+      "lastProgressAt": 1785926871205,
+      "tokens": 116200,
+      "toolCalls": 24,
+      "durationMs": 239147,
+      "resultPreview": "{\"lens\":\"heuristik-binary\",\"bericht_pfad\":\"/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/heuristik.md\",\"kernbefunde\":[\"EIGENE BINARY: Die Heuristik-/Hybrid-Stufe ist per Kanon eine EIGENE generierte+kompilierte Binary — optionaler 4. Ketten-Einschub (Planer→CEB→[Hybrid-Tier↔CEB]→Tier, 3-4 Binaries in EINER Kette, §30); LED:818 verbatim: die Heuristik-Opti…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "lens:vertraege",
+      "phaseIndex": 1,
+      "phaseTitle": "Nachschlag",
+      "agentId": "acdc89ffb7b1aeac8",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785926632058,
+      "queuedAt": 1785926632050,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "topologie-vertraege",
+      "promptPreview": "LENS topologie-vertraege — Nachschlag im Plan-Korpus (READ-ONLY; Bericht /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/vertraege.md).\nOWNER-HINWEISE (verbatim, Ledger mittag-3): (1) 'die L5 Heustik [liegt] nicht optional zwischen der Binary L4 mit den Achsen-Organen ... und stellt selbst eine binary nach Plan dar' — die Heuristik-Stufe ist eine OPTIONALE …",
+      "lastProgressAt": 1785926852980,
+      "tokens": 86396,
+      "toolCalls": 15,
+      "durationMs": 220922,
+      "resultPreview": "{\"lens\":\"topologie-vertraege\",\"bericht_pfad\":\"/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/vertraege.md\",\"kernbefunde\":[\"BINARY-TOPOLOGIE (Ledger §30.5/6 verbatim): '3 bis 4 Binaries in EINER Kette ... top-down nacheinander in sequentieller Abhängigkeit ... GENERIERT' — Planer=Mess-Achsen · CEB=System-Achsen · Tier=Organ-Achsen '+ Hybrid-Einschub einer w…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "autor:topologie",
+      "phaseIndex": 2,
+      "phaseTitle": "Autor",
+      "agentId": "afb1131276c818df0",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785926871213,
+      "queuedAt": 1785926871205,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FERTIG",
+      "promptPreview": "AUTOR-AUFTRAG Binary-Topologie-Umbau der Atlas-Uebersicht. QUELLEN (alle lesen): /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/heuristik.md + /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/vertraege.md (autoritative Nachschlag-Berichte), /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpa…",
+      "lastProgressAt": 1785927418811,
+      "tokens": 120076,
+      "toolCalls": 13,
+      "durationMs": 547598,
+      "resultPreview": "{\"status\":\"FERTIG\",\"pfad\":\"/tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/head3.html\",\"notizen\":[\"Vollstaendiger head2-Ersatz (35.674 Bytes): Skelett (title/style/nav/<!--NAV-->/Stand-Zeile/filterrow) 1:1 uebernommen; Stand-Zeile byte-identisch; nur Nav-Label auf 'Architektur-Uebersicht (Binary-Topologie)' angepasst.\",\"Diagramm 1 NEU = Binary-Topologie (fl…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "rev:topologie",
+      "phaseIndex": 3,
+      "phaseTitle": "Review",
+      "agentId": "aa4148302ee755e76",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785927418820,
+      "queuedAt": 1785927418812,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FREIGABE",
+      "promptPreview": "REVIEW (adversarial): Pruefe /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/head3.html gegen /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/heuristik.md + /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/topologie/vertraege.md + /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe…",
+      "lastProgressAt": 1785927943997,
+      "tokens": 113026,
+      "toolCalls": 18,
+      "durationMs": 525177,
+      "resultPreview": "{\"befunde\":[\"ERFUELLT Owner-Punkt 1: Heuristik-Stufe als OPTIONALE EIGENE Binary ZWISCHEN CEB und Tier sichtbar — subgraph HYB_BIN gestrichelt (classDef dep, stroke-dasharray), dockt per gestrichelter Kante am PRUEF-DOCK an (KEIN dritter Dock-Typ), N HYBRID-PRUEF-DOCKS Ebene 3 zu den Tiers, direkte CEB->Tier-Kante macht W10-XOR sichtbar; IST ehrlich (keine Binary, Design-Doc+Stub, Bau Auswertungsp…"
+    }
+  ],
+  "totalTokens": 435698,
+  "totalToolCalls": 70
+}

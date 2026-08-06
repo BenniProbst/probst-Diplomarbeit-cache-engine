@@ -1,0 +1,166 @@
+{
+  "summary": "W5/W3-Nachbesserung der 9 Codex-Befunde (H1 Fenster-Filter, H2 Zell-Summen-Bilanz, 5x MITTEL, 2x NIEDRIG) in wt-e24 Branch w5-w3-kern — Opus-Fix + Dual-Zweitblick (Fable + Codex inline)",
+  "agentCount": 4,
+  "logs": [],
+  "result": {
+    "fix": {
+      "status": "FERTIG -- alle 9 Codex-Befunde gefixt (2 Commits auf w5-w3-kern, ac033634 -> 6a79c896, kein amend, kein Push/Merge). Working Tree sauber (Freeze). AUFLAGEN alle erfuellt: cf22 --dry-run --Werror rc=0 auf allen 6 C++-Dateien; ASCII-Selbstcheck diff-getrieben LEER; 3-Marker (Zeilenanfangs-Form) 0/0/0/0/0/0; cppcheck 2.21.0 unknownMacro+syntaxError+error = 0; Fingerprint-Neutralitaet voll (abi/ 0 Zeilen, Frozen-Vektor 0fe275bd in 3 TUs unberuehrt, golden-CRC 0xF1C1F26A1232073B keine der 5 Fundstellen im Diff, golden-320 3/3 + Roundtrip 4/4 gruen); frisches Configure am Commit-Objekt 6a79c896 (Zwei-Pass-Falle aufgeloest: comdare_adhoc_emitter_cli + comdare_anatomy_codegen_cli bauen -> re-configure -> R5.G/R5.I ACTIVE -> Test-Set BIT-IDENTISCH zur 408er-Basis); Doppellauf 2x voll-ctest SERIELL (-j1) gruen. EINE deklarierte, am Ist verifizierte Abweichung vom Befund-Wortlaut bei N1 (siehe notizen).",
+      "commits": [
+        "2216d130 fix(w5): der status-Bericht darf nicht luegen -- Fenster-Treue, Summen-Treue, Cursor-Wahrheit (Codex-Nachbesserung H1/H2/M1/M2/M3/M4/N2) -- planner_status_reader.hpp, planner_status_types.hpp, progress_cursor_reader.hpp, apps/experiment_planner/main.cpp, tests/unit/test_w5_status_reader.cpp, MANUAL_RUN.md",
+        "6a79c896 fix(w3): Nullpunkt VOR dem ersten Observer-Fenster + Sentinel statt Null-POD (Codex-Nachbesserung M5/N1) -- libs/cache_engine/builder/pruef_dock/mess_interface_testate.hpp"
+      ],
+      "doppellauf": "Frisches Configure + Voll-Bau am Commit-Objekt 6a79c896d4767029b59fec9176f8aa040e2d2e06 in /home/comdare/wt-e24/build-verify (rm -rf, cmake -S . -B build-verify -G Ninja -DCOMDARE_BUILD_TESTS=ON -DCOMDARE_MEASUREMENT_MODE=ON; danach die dokumentierte 2-Pass-Kette: comdare_adhoc_emitter_cli + comdare_anatomy_codegen_cli bauen -> cmake . -> \"R5.I: configure-time codegen ACTIVE\" + \"R5.G: Auto-Permutations-Skalierung ACTIVE (48 auto-gebaute DLLs)\" -> Total Tests: 408, Test-Set per comm -3 IDENTISCH zur 408er-Basis build-e24). Beide Laeufe SERIELL mit `ctest -j1`, literal:\nLAUF 1/2: 100% tests passed, 0 tests failed out of 408\nLAUF 2/2: 100% tests passed, 0 tests failed out of 408\n(Voll-Bau 2022 Ziele, real 1m52s; Voll-ctest real 63.15 sec.)\nZusatz-Belege am selben frischen Baum:\n- golden-320-Byte-Wache + Roundtrip: 100% tests passed, 0 tests failed out of 7 (test_smoke_coverage_profile #320, test_wdk_datasets_fairness #321, test_measurement_categories #322, test_profile_roundtrip #378, test_axis_registry_roundtrip #379, test_system_axis_registry_roundtrip #380, test_measurement_axis_registry_roundtrip #381 -- alle Passed)\n- W5/W3-Flaeche: 100% tests passed, 0 tests failed out of 3 (test_w5_status_reader #312, test_w3_mess_interface_testate_dock #340, test_w3_mess_interface_testate_biss #341 -- alle Passed)",
+      "befund_beweise": [
+        "H1 (main.cpp:336 / Fenster-Filter) -- FIX: StatusBericht::fenster_start neu + `perm_im_fenster(fenster_bekannt, start, count, perm)` (Subtraktion statt Addition gegen size_t-Ueberlauf) + ZellStand::im_fenster + eigene [status-fremdfenster]-Zeile + fremdfenster=N/fenster_zellen=N in der Gesamt-Zeile; Fremd-Zelle traegt offen=unbelegt. BEWEIS (TU-Fall 8, Alt-Logik temporaer zurueckgesetzt): ALT `[status-gesamt] zellen=3 ... fenster=0:2 ... gemessen=4 ... offen=0` (3 Fremd-Messungen aus perm7 als Fortschritt gezaehlt, offen auf 0 geklemmt) -> NEU `[status-gesamt] zellen=3 fenster_zellen=2 fremdfenster=1 fenster=0:2 ... gemessen=1 ... offen=3` + `[status-fremdfenster] zellen=1 fenster=0:2 gebaut=0 gemessen=3 ...`; 13 Faelle beissen am Alt-Stand. Binary-Rauchtest: COMDARE_GOLDEN_N_RANGE=5:2 -> `im_fenster=nein ... offen=unbelegt`, `fenster_zellen=0 fremdfenster=1`, rc 0.",
+        "H2 (planner_status_reader.hpp:393 / Summen-Bilanz) -- FIX: neues `gesamt_offen_feld(b)` summiert je Fenster-Zelle `count - gemessen_in_zelle` (zell_offen), die Gesamt-Zeile nutzt es statt `offen_feld(b, g_gemessen)`. BEWEIS (TU-Fall 7, 2 Zellen x 16 SOLL, je 1 Messung): ALT `[status-gesamt] zellen=2 ... gemessen=2 ... offen=14` -> NEU `... offen=30`; zusaetzlich Fall 5 ALT offen=14 -> NEU offen=30 (=14 perm0 + 16 perm1). Die Zell-Zeilen bleiben unveraendert richtig (perm0 offen=14/perm1 offen=16 bzw. 15/15) -- die TU prueft darum ZEILENGENAU (Helfer zeile_mit), sonst koennte ein Volltext-find die beiden Zeilen nicht trennen. 4 Faelle beissen am Alt-Stand.",
+        "M1 (progress_cursor_reader.hpp:96 / sticky done) -- FIX: `progress_cursor_detail::fenster_laeuft_wieder(stand)` (done_gesehen=false, done_perm=0) wird nach JEDER nicht-gueltigen done-Zeile gerufen (eine Stelle, direkt hinter dem done-Zweig) -- done gilt bis zur naechsten Nicht-done-Zeile. BEWEIS (TU-Fall 1b): perm=0 -> done perm=3 -> perm=0: ALT FAIL `done faellt bei der spaeteren perm-Zeile zurueck` (done blieb ja) + `done_perm = 3 (erwartet 0)`; NEU beides gruen, zeilen_done=1 bleibt als ehrliche Historie, das zweite Fenster meldet wieder done (zeilen_done=2). Binary-Rauchtest: `done=nein zeilen_done=1` bei einer Datei mit done-dann-perm-Folge.",
+        "M2 (progress_cursor_reader.hpp:108 / Abbruch-Fragment) -- FIX: nach ` axes_changed=` wird der Wert <K> per lies_u64 als vorhanden UND numerisch gefordert; schlaegt das fehl, zaehlt die Zeile in den NEUEN Zaehler CursorStand::zeilen_abgebrochen (Render-Feld `abgebrochene_zeile=`), NICHT in zeilen_perm und NICHT in zeilen_fremd (fehlender Schluessel bleibt fremd -- die Klassen bleiben getrennt, die bestehende Drift-Gegenprobe zeilen_fremd=3 bleibt gruen). BEWEIS (TU-Fall 1c): ALT FAIL `letzte_perm = 7 (erwartet 2)`, `zeilen_perm = 2 (erwartet 1)`, `abgebrochene Zeile = 0 (erwartet 1)`; 5 Faelle beissen. Binary-Rauchtest: `zeilen_perm=2 abgebrochene_zeile=1 letzte_perm=0` bei Fixture mit `[progress] perm=7 axes_changed=`.",
+        "M3 (planner_status_reader.hpp:174 / Breiten-Kappe) -- FIX: `kMaxScanEintraege = 200000` in planner_status_types.hpp; lies_binaer_stand zaehlt BinaerStand::scan_eintraege und bricht bei Erreichen mit scan_gekappt=true ab. Render: `scan_gekappt=ja|nein` je Zell-Zeile + `scan_gekappt_zellen=N` in der Gesamt-Zeile. BEWEIS (Ist-Ausgabe): `[status-zelle] ... zeilen_abweichung=0 scan_gekappt=nein offen=15` und `[status-gesamt] ... sidecar_ungueltig=0 scan_gekappt_zellen=0 offen=30`; TU-Fall 5 assertiert beide Felder literal. Begruendung im Code: die Tiefen-Kappe allein laesst einen flachen Baum mit Millionen Geschwistern unbegrenzt -- 'bounded' war nur behauptet.",
+        "M4 (main.cpp:322 / Transport-Ausnahme) -- FIX: der gesamte Rumpf von lies_bestand_sicht() ab dem Env-Gate liegt in try/catch(std::exception + ...); im Fehlerfall BestandSicht::fehler=true + grund = e.what(); der Renderer gibt `[status-bestand] quelle=fehler (<what>)` aus und run_status_guarded bleibt bei rc 0. BEWEIS (TU-Fall 9, ohne Netz): `die Fehler-Zeile steht literal im Bericht` -> `[status-bestand] quelle=fehler (minio: connection refused)` UND `der Transportfehler wird NICHT als blosses 'keine Daten' verschluckt`. Binary-Rauchtest der beiden nicht-werfenden Klassen bereits rc 0: `quelle=bestandslog keine Daten (Ebene B (minio) ist nicht konfiguriert)` / `... (Dokument 'doc.xml' im Objekt-Store nicht gefunden/nicht lesbar)`. EHRLICH: die heutige Kette (ArtifactCache::object_fetch nutzt temp_directory_path(ec), xml_reader hat 0 throw-Stellen) wirft aktuell nicht -- der Fix schliesst eine LATENTE Klasse (ArtefaktPushFehler : std::runtime_error, bad_alloc, kuenftige Transport-Aenderungen), die sonst rc 2 ergaebe. Kein erfundener Ausloese-Beweis am Binary.",
+        "M5 (mess_interface_testate.hpp:183 / Nullpunkt vor Fenster 1) -- FIX: `obs.tier_reset_statistics();` steht jetzt direkt nach obs.tier_clear() und VOR dem ersten drive_ops/tier_observe-Fenster. BEWEIS: test_w3_mess_interface_testate_dock (import -> GATE -> Testate an ZWEI ECHTEN dlopen-Modulen, d.h. genau der Pfad mit Gate-Vorlast) Passed 0.13 sec; test_w3_mess_interface_testate_biss Passed. Begruendung im Code: tier_clear leert die DATEN, nicht die STATISTIK -- run_conformance_gate hat vorher Tausende Ops ueber dasselbe Objekt gefahren, deren Zaehler kippten summe1 und konnten die Anti-Leerlauf-Aussage 'summe2 > summe1' REAL falsch (False-Reject) machen.",
+        "N1 (mess_interface_testate.hpp:259/:310 / Sentinel-POD) -- FIX: neue Helfer `setze_sentinel<Pod>` (memset 0xAB, static_assert is_trivially_copyable) + `byte_gleich<Pod>` (memcmp inkl. Padding); beide 0-Lauf-Randfaelle (V2 batches==0, V3 ops_per_batch==0) belegen den Ausgabe-POD mit 0xAB und pruefen jetzt ZWEI scharfe Faelle: (a) `!byte_gleich(leer, sentinel)` = es wurde GESCHRIEBEN, (b) `leer == Default{}` = und zwar exakt der Nullpunkt. BEWEIS der Nicht-Vakuositaet (Probe: KorrekteHuelle so geaendert, dass sie den Nullpunkt NICHT schreibt): `IMeasurableWorkloadV2 / total_ns != Summe der Segmente: gut 11/13 (first_fail=3)` + `[FAIL] korrekte Huelle: Testat bestanden` -- am Alt-Stand waere diese Huelle gruen gewesen. Probe danach vollstaendig zurueckgenommen (git status sauber), biss-TU wieder rc 0.",
+        "N2 (planner_status_reader.hpp / fehlendes <utility>) -- FIX: `#include <utility>` in die Include-Liste eingefuegt (std::move wird an zwei Stellen benutzt: ohne_zeilenende(std::move(zeile)) und bericht.zellen.push_back(std::move(st))). BEWEIS: Include-Block enthaelt jetzt `<system_error>`, `<utility>`, `<vector>`; TU + App uebersetzen und der frische Voll-Bau (2022 Ziele) ist fehlerfrei."
+      ],
+      "notizen": [
+        "DEKLARIERTE, AM IST VERIFIZIERTE ABWEICHUNG BEI N1 -- BITTE IM ZWEITBLICK PRUEFEN: Codex' N1-Wortlaut ('vertragswidriges Null-Ueberschreiben wird erkennbar') setzt voraus, dass der 0-Lauf den POD UNBERUEHRT laesst. Der Ist ist umgekehrt: abi_adapter.hpp:541-542 (`*out = ComdareSegmentLatencyV1{};`) und :641-642 (`*out = ComdareSegmentLatencyV2{};`) schreiben den Nullpunkt VOR der 0-Pruefung -- und das ist die EINE Produktiv-Implementierung (Vollgrep: run_workload_segmented(_v2) existiert sonst nur im Interface-Header und in den Test-Fakes). Ein Testat auf 'unberuehrt' haette die beiden ECHTEN dlopen-Module im Dock-TU zu Unrecht abgewiesen (False-Reject des Produktiv-Pfades). Ich habe darum den MECHANISMUS des Befundes (Sentinel 0xAB) uebernommen und die vakuose Zusicherung in zwei scharfe Faelle aufgeteilt (geschrieben? + exakt Nullpunkt?), statt eine Unwahrheit zu assertieren -- dieselbe Lesart, die die Datei beim Migrations-Testat schon fuehrt ('eine solche Forderung waere ein Testat, das die Wirklichkeit nicht kennt'). Begruendung steht im Code-Kommentar UND in der Commit-Message.",
+        "M1-SCOPE-ENTSCHEID (bewusst, dokumentiert): der Auftrag nannte als Regel '(done gilt bis zur naechsten Nicht-done-Zeile)'. Ich habe LITERAL implementiert -- fenster_laeuft_wieder wird nach JEDER Zeile gerufen, die keine gueltige done-Zeile ist (also auch nach Drift-/Fremd-Zeilen), nicht nur nach perm-Zeilen. Das ist ein Superset der Haupt-Forderung und passt zur Unter- statt Falsch-Berichten-Doktrin; die bestehende Drift-Gegenprobe der TU (zeilen_fremd=3, done bleibt nein) bleibt gruen.",
+        "M2-KLASSEN-TRENNUNG (bewusst): 'axes_changed-Schluessel fehlt GANZ' bleibt zeilen_fremd (haelt die bestehende Drift-Assertion `[progress] perm=3` -> fremd gruen); nur 'Schluessel da, Wert leer/nicht-numerisch' ist die neue Klasse abgebrochene_zeile. Codex' Beispiel ('[progress] perm=7 axes_changed=') faellt exakt in die neue Klasse.",
+        "NEUE BERICHTS-FELDER (Ausgabe-Vertrag erweitert, rein additiv -- ein Konsument mit Feld-Parsern bleibt heil, ein Positions-Parser nicht; es gibt heute keinen): [status-zelle] +im_fenster=ja|nein +scan_gekappt=ja|nein; [status-cursor] +abgebrochene_zeile=N; [status-gesamt] +fenster_zellen=N +fremdfenster=N +scan_gekappt_zellen=N; NEUE ZEILE [status-fremdfenster] zellen= fenster= gebaut= gemessen= teilweise= stale= csv_gesehen=; NEUE ZEILE [status-bestand] quelle=fehler (<what>).",
+        "HONESTY-DETAIL: die 'keine Daten'-Zeilen (quelle=progress_cursor / quelle=result_csv) zaehlen bewusst ueber ALLE Zellen (alle_csv/alle_ohne_cursor), nicht nur ueber Fenster-Zellen -- sonst behauptete der Bericht 'kein result.csv', waehrend welche in Fremd-Fenstern liegen. Nur die BILANZ-Zaehler sind fenster-gefiltert.",
+        "FALLE BESTAETIGT (reference_lokale_vollbau_luecken_falsches_gruen): ein blankes frisches Configure ergab 404 statt 408 Tests -- R5.G und R5.I sind DOKUMENTIERTE 2-Pass-Konstrukte (Tool bauen -> re-configure). Ohne die zweite Runde waeren 4 Tests still weggefallen und der Doppellauf haette 'falsches Gruen' gemeldet. Ich habe die Kette explizit gefahren und das Test-SET per `comm -3` gegen die 408er-Basis auf Namensgleichheit geprueft (leer), nicht nur die Zahl. Alle COMDARE_*-Cache-Variablen der beiden Baeume sind bis auf COMDARE_BUILDER_OUTPUT_DIR (Pfad) identisch.",
+        "MANUAL_RUN.md Abschnitt 6 nachgezogen (Fenster-Filter-Semantik, Summen-Semantik, done-Rueckfall, abgebrochene_zeile, Transportfehler-Zeile mit rc 0, scan_gekappt) -- sonst haette die Doku die alte, jetzt falsche Fenster-Aussage weitergetragen. help_for(\"status\") ebenfalls nachgezogen.",
+        "cppcheck-ADJAZENZ: 0 Treffer der Klassen unknownMacro/syntaxError/preprocessorErrorDirective/error auf allen 6 Dateien (cppcheck 2.21.0, --enable=all --std=c++23). Die verbleibenden Meldungen sind BESTANDS-style-Klassen (unusedStructMember an PlanZelleSoll-Feldern, useStlAlgorithm in fremden Headern), unveraendert gegenueber dem Alt-Stand. Die bekannte Makro-in-String-Literal-Adjazenz-Falle wurde nicht neu erzeugt (keine Makros in Literal-Adjazenz in den neuen Hilfe-/Render-Texten).",
+        "NICHT GETAN, wie beauftragt: kein Push, kein Merge, kein amend auf ac033634. Branch w5-w3-kern steht lokal auf 6a79c896, Working Tree sauber (Freeze). Verifikations-Baum /home/comdare/wt-e24/build-verify liegt noch da (untracked ausserhalb des Repos-Index; build-e24 unveraendert daneben) -- falls er weg soll, bitte Bescheid geben; Mess-CSV-Falle beachtet (in build-verify liegen keine getrackten Mess-CSV, es ist ein frisch erzeugter Baum).",
+        "FUER DEN ZWEITBLICK (Codex+Fable): die vier Biss-Belege sind reproduzierbar, indem man vier Logik-Stellen zuruecksetzt -- planner_status_reader.hpp `gesamt_offen_feld(b)` -> `offen_feld(b, g_gemessen)` (H2), `st.im_fenster = perm_im_fenster(...)` -> `st.im_fenster = true;` (H1), progress_cursor_reader.hpp den freistehenden `d::fenster_laeuft_wieder(stand);` samt Kommentar entfernen (M1), die K-Numerik-Pruefung durch `if (false)` ersetzen (M2). Ich habe genau das gefahren; die TU meldete 24 [FAIL] (13 H1 / 4 H2 / 2 M1 / 5 M2) und danach wieder rc 0 nach Restore."
+      ]
+    },
+    "fable": {
+      "befunde": [
+        "VERIFIZIERT H1 (Objekt+Binary): perm_im_fenster filtert [start,start+count) ueberlaufsicher per Subtraktion; Bilanz nur Fenster-Zellen; Fremd-Zellen mit im_fenster=nein + offen=unbelegt + eigener [status-fremdfenster]-Zeile; gesamt traegt fenster_zellen/fremdfenster. Eigener Rauchtest mit Fremd-Fenster-Fixture am Binary gefahren: Fenster 5:2 -> gesamt gemessen=0/fenster_zellen=0/fremdfenster=1, die 1 Messung steht NUR in der Fremd-Zeile; Fenster 0:2 -> gemessen=1/offen=1; beide rc 0.",
+        "VERIFIZIERT H2 (nachgerechnet): gesamt_offen_feld = Summe(count-gemessen) ueber Fenster-Zellen. 2-Zellen-Beispiel selbst nachgerechnet: 2x16 SOLL, je 1 Messung -> 15+15=30 (TU-Fall 7 prueft zeilengenau offen=30, NICHT 14, NICHT 15); Fall 5: 14+16=30. Zell-Zeilen unveraendert richtig.",
+        "VERIFIZIERT M1 (inkl. Randfall): done faellt bei jeder Nicht-done-Zeile zurueck; kritischer Randfall geprueft: Leerzeilen (Datei endet mit \\n) returnen VOR dem Reset (Zeile 105-106) -> kein False-Reset des done am Normalfall; gueltige done-Zeile returnt vor dem Reset. Am Binary bestaetigt: done->perm-Folge ergibt done=nein, zeilen_done=1.",
+        "VERIFIZIERT M2: axes_changed-Wert muss vorhanden UND numerisch sein; Fragment -> eigene Klasse zeilen_abgebrochen, fehlender Schluessel bleibt fremd (Drift-Gegenprobe unberuehrt). Am Binary: abgebrochene_zeile=1, letzte_perm=0 statt 7, zeilen_perm=2.",
+        "VERIFIZIERT M3/M4/N2: Breiten-Kappe kMaxScanEintraege=200000 mit break+scan_gekappt je Zelle und scan_gekappt_zellen gesamt (im Binary-Output sichtbar); M4 kompletter Transport-Rumpf in try/catch(std::exception+...), [status-bestand] quelle=fehler(<what>) bei rc 0, Latenz-Ehrlichkeit korrekt deklariert; N2 #include <utility> vorhanden.",
+        "VERIFIZIERT M5 (Kernfrage): tier_reset_statistics() steht nach tier_clear() und VOR Fenster 1. Der Reset verfaelscht KEIN Vorlauf-Testat: Dock-Reihenfolge GATE (dock-TU Z.141) -> Observer (Z.160) -> V2/V3 (Z.162/164); Vorlauf-Ergebnisse sind by-value versiegelt, V2/V3-Testate selbsttragend (eigene PODs/Laeufe, mess_interface_testate.hpp Z.292-392), Reset daten-erhaltend (im Testat assertiert Z.284, tier_clear stand schon vorher da). Dock-TU mit 2 echten dlopen-Modulen Passed.",
+        "VERIFIZIERT N1 inkl. deklarierter Abweichung: abi_adapter.hpp schreibt *out = ComdareSegmentLatencyV1{}/V2{} VOR der 0-Pruefung an beiden Stellen (selbst gesehen, Z.541f/641f) und ist die EINZIGE Produktiv-Implementierung (Vollgrep: uebrige Fundstellen sind Interface-Deklaration und Aufrufer). Codex' Unberuehrt-Wortlaut haette den Produktiv-Pfad false-rejected; Sentinel-0xAB-Mechanismus + Nullpunkt-Exaktheit ist die staerkere, wahre Zusicherung. Abweichung im Code-Kommentar und Commit dokumentiert.",
+        "EIGENER DOPPELLAUF: frisches Configure am Commit-Objekt 6a79c896 in EIGENEM Build-Verzeichnis ausserhalb des Worktrees (/home/comdare/zb-build-e24), 2-Pass-Kette gefahren (R5.I configure-time codegen ACTIVE + R5.G 48 auto-gebaute DLLs), Total Tests: 408, Test-SET per comm -3 identisch zur build-e24-Basis (0 Differenz-Zeilen). 2x ctest -j1 SERIELL: LAUF 1/2 und LAUF 2/2 beide literal '100% tests passed, 0 tests failed out of 408' (62.09s/62.12s).",
+        "NEUTRALITAET SELBST BELEGT: Diff ac033634..6a79c896 gegen abi/ + anatomy/ = 0 Zeilen; Frozen-Vektor 0fe275bd nur in den 3 bekannten TUs, 0x im Diff; golden-CRC F1C1F26A 0x im Diff; golden-320-Wache + Roundtrip (#320/321/322/378-381) und W5/W3 (#312/340/341) namentlich 10/10 Passed. ASCII: keine Non-ASCII-Zeichen in Added-Zeilen des Diffs.",
+        "BISS-BEWEIS EIGENSTAENDIG REPRODUZIERT (nicht-invasiv): die 4 ALT-Reversionen (H1 im_fenster=true, H2 offen_feld(b,g_gemessen), M1 freistehenden Rueckfall entfernt, M2 if(false)) ueber Schatten-Include-Kopien in /tmp/zb_alt kompiliert -- exakt 24 [FAIL] (13 H1 / 4 H2 / 2 M1 / 5 M2), rc=1; deckt sich mit der Fixer-Angabe. Der Worktree wurde dabei NIE angefasst.",
+        "FREEZE INTAKT: w5-w3-kern lokal auf 6a79c896, Kette ac033634 -> 2216d130 -> 6a79c896 ohne amend, kein Push/Merge, git status porcelain leer -- auch nach dem gesamten Zweitblick. MANUAL_RUN.md Abschnitt 6 und help_for('status') tragen die neue Semantik korrekt.",
+        "HINWEIS (nicht blockierend, Falle bestaetigt): ein blanker 'cmake --build' laesst die 4 EXCLUDE_FROM_ALL-Roundtrip-Binaries weg (4x 'Not Run' von 408) -- sie kommen erst ueber das Sammel-Target comdare_tests; zudem brauchte der erste ninja-Lauf am frischen Baum einen zweiten Anlauf (Scan-Race an generated_source_catalog.hpp, Scan vor Codegen). Beides Bestands-Infrastruktur, nicht durch die 2 Commits verursacht -- deckt sich mit reference_lokale_vollbau_luecken_falsches_gruen.",
+        "HINWEIS (kosmetisch, nicht blockierend): bei komplett fremdem Fenster (fenster_zellen=0) zeigt die Gesamt-Zeile offen=0 (Summe ueber 0 Zellen) -- daneben stehen fenster_zellen=0 und fremdfenster=N, die Aussage ist damit ehrlich lesbar; ein Konsument sollte offen= nur zusammen mit fenster_zellen deuten. Kein Handlungsbedarf vor Landung.",
+        "M1-SCOPE-ENTSCHEID (Superset: Reset auch nach Drift-/Fremd-Zeilen) und M2-KLASSEN-TRENNUNG des Fixers am Objekt geprueft und als vertraeglich bewertet; die neuen Berichts-Felder sind rein additiv (kein Positions-Parser existiert)."
+      ],
+      "verdikt": "LANDEBEREIT"
+    },
+    "codex": {
+      "befunde": [
+        "B1 - SEVERITY: HIGH - Stelle: planner_status_reader.hpp::render_status(), Ausgabe [status-cursor]: Fuer eine Fremdzelle wird weiterhin fenster=<aktuelles Fenster> und gegebenenfalls done=ja ausgegeben, ohne im_fenster=nein. Damit kann der Fremd-Cursor zeilenweise als Fortschritt des aktuellen Fensters erscheinen. Die vorherige Zellzeile reicht fuer unabhaengige Marker-Konsumenten nicht aus. Cursorzeile ebenfalls markieren, sentinelisieren oder separat als Fremdfenster ausgeben.",
+        "B2 - SEVERITY: HIGH - Stelle: planner_status_reader.hpp::gesamt_offen_feld(): Bei !b.soll.erhoben oder leerer Plansicht ist b.zellen leer; die leere Summe liefert offen=0, obwohl unmittelbar zuvor quelle=plan keine Daten ausgegeben wird. Das ist eine neue falsche Fertig-Aussage. Hier muss unbelegt erscheinen.",
+        "B3 - SEVERITY: MEDIUM - Stelle: gesamt_offen_feld(), summe += zell_offen(...): Die neue size_t-Summe kann ueberlaufen. Beispiel auf 64 Bit: zwei Zellen, count=2^63, keine Messungen -> offen=0. Entweder Ueberlauf erkennen und kenntlich machen oder in einem ausreichend grossen/dezimalen Akkumulator rechnen.",
+        "B4 - SEVERITY: MEDIUM - Stelle: progress_cursor_reader.hpp::verarbeite_cursor_zeile(), nach dem Parsen von axes_changed=<K>: Nur leerer oder nichtnumerischer Wert wird erkannt. k und k_end werden danach nicht validiert. Fragmente wie 'axes_changed=1', 'axes_changed=1x' oder 'axes_changed=1 0-' zaehlen weiterhin als vollstaendiger Fortschritt und veraendern letzte_perm. Die vollstaendige Writer-Grammatik einschliesslich der K Mappings muss geprueft werden.",
+        "B5 - SEVERITY: LOW - Stelle: planner_status_reader.hpp::render_status(), Feld letzte_perm=: Enthaelt eine vorhandene Datei ausschliesslich Fragmente, bleibt letzte_perm beim Default 0, wird aber als 0 statt unbelegt gerendert. Es fehlt ein Zustand 'mindestens ein gueltiger Cursor gelesen'.",
+        "B6 - SEVERITY: MEDIUM - Stelle: planner_status_reader.hpp::lies_binaer_stand(), Zweig it.depth() >= kMaxScanTiefe: Die Tiefenkappe ueberspringt Eintraege beziehungsweise Unterbaeume, setzt aber kein Unvollstaendigkeitsmerkmal. Daher kann scan_gekappt=nein trotz ausgelassener Messdateien erscheinen. Entweder denselben Marker setzen oder Breiten- und Tiefenkappung getrennt ausweisen. Zudem fehlt im Test ein Grenztest fuer 200000/200001 Eintraege.",
+        "OHNE BEFUND: H1-Praedikat perm_im_fenster (Grenzen [start,start+count) korrekt, ueberlaufsicher per Subtraktion), M1 done-Fallback, M4 rc0-Zusage (funktional; Test prueft aber nur Rendering, nicht echten Wurf mit run_status_guarded()==0), M5 Reset-Position, N1 Sentinel, N2 Includes.",
+        "Codex-Thread-Id: 019fd318-24e7-7e52-aa55-59883ae2bbe0"
+      ],
+      "verdikt": "NACHBESSERN"
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Fix"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "probe",
+      "phaseIndex": 1,
+      "phaseTitle": "Fix",
+      "agentId": "a5fca821510d1b0a2",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785949641382,
+      "queuedAt": 1785949641382,
+      "attempt": 1,
+      "promptPreview": "Antworte NUR mit OK.",
+      "lastProgressAt": 1785949643460,
+      "tokens": 22227,
+      "toolCalls": 0,
+      "durationMs": 2078,
+      "resultPreview": "OK"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "fix:w5w3",
+      "phaseIndex": 1,
+      "phaseTitle": "Fix",
+      "agentId": "a0bdf13bd83067802",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1785949643469,
+      "queuedAt": 1785949643460,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "FERTIG -- alle 9 Codex-Befunde gefixt (2 Commits auf w5-w3-…",
+      "promptPreview": "FIX-AUFTRAG W5/W3-Nachbesserung (Ort /home/comdare/wt-e24 Branch w5-w3-kern @ac033634 WEITER — kein amend; Ledger-Nachtrag nachmittag-10 ZUERST lesen [grep -n 'nachmittag-10' im super-Ledger /home/comdare/Projekte/Research/probst-diplomarbeit-cache-engine/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md]):\nDIE 9 CODEX-BEFUNDE (alle fixen; Fundstellen live verifizieren):\n(H1) apps/experiment_planner…",
+      "lastProgressAt": 1785951694964,
+      "tokens": 252007,
+      "toolCalls": 159,
+      "durationMs": 2051495,
+      "resultPreview": "{\"status\":\"FERTIG -- alle 9 Codex-Befunde gefixt (2 Commits auf w5-w3-kern, ac033634 -> 6a79c896, kein amend, kein Push/Merge). Working Tree sauber (Freeze). AUFLAGEN alle erfuellt: cf22 --dry-run --Werror rc=0 auf allen 6 C++-Dateien; ASCII-Selbstcheck diff-getrieben LEER; 3-Marker (Zeilenanfangs-Form) 0/0/0/0/0/0; cppcheck 2.21.0 unknownMacro+syntaxError+error = 0; Fingerprint-Neutralitaet voll …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "rev:fable",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "a0e1b39e74fc40bed",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785951694976,
+      "queuedAt": 1785951694966,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LANDEBEREIT",
+      "promptPreview": "FABLE-ZWEITBLICK W5/W3-Nachbesserung (READ-ONLY /home/comdare/wt-e24): Fix-Report: {\"status\":\"FERTIG -- alle 9 Codex-Befunde gefixt (2 Commits auf w5-w3-kern, ac033634 -> 6a79c896, kein amend, kein Push/Merge). Working Tree sauber (Freeze). AUFLAGEN alle erfuellt: cf22 --dry-run --Werror rc=0 auf allen 6 C++-Dateien; ASCII-Selbstcheck diff-getrieben LEER; 3-Marker (Zeilenanfangs-Form) 0/0/0/0/0/0;…",
+      "lastProgressAt": 1785952849548,
+      "tokens": 138939,
+      "toolCalls": 67,
+      "durationMs": 1154572,
+      "resultPreview": "{\"befunde\":[\"VERIFIZIERT H1 (Objekt+Binary): perm_im_fenster filtert [start,start+count) ueberlaufsicher per Subtraktion; Bilanz nur Fenster-Zellen; Fremd-Zellen mit im_fenster=nein + offen=unbelegt + eigener [status-fremdfenster]-Zeile; gesamt traegt fenster_zellen/fremdfenster. Eigener Rauchtest mit Fremd-Fenster-Fixture am Binary gefahren: Fenster 5:2 -> gesamt gemessen=0/fenster_zellen=0/fremd…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "rev:codex",
+      "phaseIndex": 2,
+      "phaseTitle": "Review",
+      "agentId": "a19daad3c75450aa4",
+      "model": "claude-fable-5",
+      "state": "done",
+      "startedAt": 1785952849549,
+      "queuedAt": 1785952849548,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NACHBESSERN",
+      "promptPreview": "CODEX-ZWEITBLICK (INLINE-Rezept): (1) In /home/comdare/wt-e24: git diff --no-ext-diff --unified=8 ac033634..HEAD > /tmp/claude-1001/-home-comdare/46375cdc-821a-4bf9-93d4-fe0a5687f489/scratchpad/w5w3fix/nb-diff.txt (mkdir -p). (2) ToolSearch select:mcp__codex__codex. (3) Codex-Call OHNE cwd, sandbox='read-only', approval-policy='never', prompt = 'Zweitblick auf die Nachbesserung deiner 9 W5/W3-Befu…",
+      "lastProgressAt": 1785954421594,
+      "tokens": 91024,
+      "toolCalls": 8,
+      "durationMs": 1572045,
+      "resultPreview": "{\"befunde\":[\"B1 - SEVERITY: HIGH - Stelle: planner_status_reader.hpp::render_status(), Ausgabe [status-cursor]: Fuer eine Fremdzelle wird weiterhin fenster=<aktuelles Fenster> und gegebenenfalls done=ja ausgegeben, ohne im_fenster=nein. Damit kann der Fremd-Cursor zeilenweise als Fortschritt des aktuellen Fensters erscheinen. Die vorherige Zellzeile reicht fuer unabhaengige Marker-Konsumenten nich…"
+    }
+  ],
+  "totalTokens": 504197,
+  "totalToolCalls": 234
+}
