@@ -4199,6 +4199,200 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 nachmittag-10 (VOLLZUG: beide Repos gruen, `main`-FF in beiden vollzogen, Thesis Gate 8 gelandet; Regel-Zeilen 8+9 -- ein Zeiger kann RUECKWAERTS zeigen, und eine rescue-Ref ist KEINE Landung; A1 = LANDEN mit Auflage; der PMC-Sperrposten ist SCHWERER als nachmittag-9 sagt)
+
+### A) DER STAND, jede Zahl am Objekt erhoben
+
+**ce (Projekt 286):** `development` = `origin/development` = `github/development` =
+`e7aa124445e5ddab461251bdb43f81e4562b9213`. **Pipeline 15025: SUCCESS**, 279 s, auf genau diesem
+SHA. Job-Bilanz aus der API (`/pipelines/15025/jobs`, nicht aus der Weboberflaeche geschaetzt):
+**20 Jobs, davon 19 `success` und 1 `manual`** (`is_original:relock`, bewusst manuell), **0 `failed`**.
+
+**super (Projekt 288):** Ledger-Stand `5534c23c`, ebenfalls auf beiden Remotes. **Pipeline 15026:
+SUCCESS**, 280 s, **13 von 13 Jobs gruen** -- `thesis:pdf`, `prebackup:measurements`,
+`manifest:provenance`, `integration:smoke`, `test:unit`, `visibility:tier-binaries`,
+`analyse:thesis-data`, `build:clang`, **`verify:submodules`**, `lint:static`, `lint:format`,
+`lint:secrets`, `toolchain:probe`.
+
+**Der Gitlink-Bump ist damit keine Setzung mehr, sondern eine gemessene Tatsache.** Commit
+`9a2ef3b2` zieht den ce-Zeiger auf `e7aa1244`; `verify:submodules` in 15026 ist der Job, der genau
+diesen neuen Gegenstand prueft, und er ist gruen. Vorher war der Bump eine Behauptung ueber einen
+fremden Baum; jetzt hat ihn die CI angefasst.
+
+**`main`-FF IN BEIDEN REPOS VOLLZOGEN** (Owner-Freigabe), auf exakt die gruen gemessenen Staende,
+**nie ueber `HEAD`, sondern ueber den Voll-SHA**:
+
+    ce   : c837d830..e7aa1244  -> refs/heads/main   (origin + github)
+    super: 030d2c62..5534c23c  -> refs/heads/main   (origin + github)
+
+Beides sind **echte Fast-Forwards** (je per `merge-base --is-ancestor` nachgeprueft), kein `--force`.
+Die ausgeloesten Laeufe `ce 15029`, `ce 15031` und `super 15030` sind **alle drei `success`**. Das war
+keine Formalie: die letzte super-`main`-Pipeline davor (`14823` auf `030d2c62`, 09:07) war
+**`failed`** -- `main` trug also bis heute Abend einen roten Kopf, und erst dieser FF hat ihn geheilt.
+
+**BILANZ DES ABENDS ueber beide Repos und beide Zweige:** `ce/development` 15025, `ce/main` 15029 und
+15031, `super/development` 15026 und 15034, `super/main` 15030 -- **sechs gruene Pipelines, kein roter
+Job.** Der Owner-Auftrag lautete, die Pipeline solle "irgendwann auch mal laufen und gruen
+durchlaufen"; das ist jetzt fuer jeden Zweig beider Repos am Objekt belegt.
+
+### B) DIE ZWEI LINT-FIXES -- und ihre gemeinsame Ursache
+
+Pipeline 15022 (der erste Lauf ueber das gelandete Buendel) fiel mit **genau zwei roten Jobs**:
+`lint:format` (Job 364227) und `lint:static` (Job 364228). Zwei Ursachen, eine Wurzel.
+
+**Fix 1 -- Formatierung (`98952e02`).** Der Job-Trace nennt **13 Dateien mit insgesamt 94
+Verstoss-Zeilen** (gezaehlt ueber `error: code should be clang-formatted`, nicht ueber blosse
+Dateinamen im Log -- der Runner-Cleanup nennt zwei `ext/`-Pfade, die keine Beanstandung sind).
+Herkunft je Datei zurueckverfolgt: **12 aus der T2-A-Serie** (`b2-neuanker-format3`, Merge
+`86be2420`) und **1 aus B14** (`test_b14_abi_adapter_line_subaxis_paths.cpp`, ueber `cc20b63d`,
+Merge `f577f886`).
+
+**KORREKTUR AN DER EIGENEN COMMIT-BOTSCHAFT:** `98952e02` sagt "ueber die 13 Dateien", der Baum sagt
+**12** (+86/-89). Die dreizehnte, `system_version_suffix.hpp`, wurde **im Folge-Commit `e7aa1244`
+mitgeheilt**: dessen Diff hat zwei Hunks -- `@@ -124,3 +124,3 @@` trifft exakt die drei gemeldeten
+Verstoss-Stellen (124:21, 125:26, 125:116), `@@ -248,0 +249,9 @@` setzt den cppcheck-Kommentar. Die
+Botschaft ist ungenau, das Ergebnis nicht.
+
+**Fix 2 -- statische Analyse (`e7aa1244`).** cppcheck 2.21.0 meldete `syntaxError` an einem
+`static_assert`, dessen Argument ein Lambda mit `for`-Schleife ist. **Am Objekt isoliert, nicht
+vermutet:** dasselbe Lambda OHNE Schleife passiert, dieselbe Schleife in einer BENANNTEN
+`constexpr`-Funktion passiert -- nur die Kombination stolpert; `g++-15 -std=c++23 -fsyntax-only`
+ueber genau diese Datei liefert RC 0. Der Code ist gueltiges C++23, das Werkzeug hat ein
+Parser-Limit. Unterdrueckt wurde daher **punktgenau diese eine Stelle mit ausgeschriebener
+Begruendung im Quelltext**; die Wache selbst (Aufruf, Flags, Ausschlussliste) bleibt unveraendert.
+Ein Werkzeug-Limit darf eine Zeile entschaerfen, nie eine Wache.
+
+**DIE GEMEINSAME URSACHE:** `lint:format` prueft **ganze Dateien**. Die Pakete T2-A und B14 sind
+gelandet, **ohne je gegen cf22 gefahren zu sein** -- die Wache, die waehrend des Baus lief, war die
+Diff-Hygiene-Wache (ASCII + Spaltenbreite ueber Diff-Zeilen). Im super wiederholt sich exakt dasselbe
+**unabhaengig, eine Ebene hoeher**: `b35aea1b` musste **8 Dateien des Graph-Pakets** nachformatieren
+(`04_csv_to_latex`, `05_diagram_generator`, `08_appendix_generator`, +147/-164), Commit-Titel
+woertlich: "lint:format war nie gegen die Landung gefahren". **Zwei Repos, kein gemeinsamer Bauweg,
+dasselbe Loch** -- das ist kein Zufall zweier Wellen, sondern eine fehlende Stufe im Bau-Ritual.
+
+### C) DIE REGEL-ZEILEN 8 UND 9 -- beide heute an Abgabe-Substanz gelernt
+
+> **8. Ein Submodul-Zeiger im Working Tree kann RUECKWAERTS zeigen. `M` heisst nicht "neuer".**
+> Vor jedem Commit, der einen Gitlink beruehren koennte: Richtung pruefen
+> (`git merge-base --is-ancestor <checkout> <zeiger>`), nicht die Aenderung als Nachzug annehmen.
+>
+> **9. Eine rescue-Ref ist KEINE Landung.** Fertige, gepushte, auf BEIDEN Remotes liegende Arbeit
+> kann trotzdem in **keinem Zweig** sein. "Liegt auf origin" beantwortet die Frage "ist es gelandet?"
+> nicht -- das tut nur `merge-base --is-ancestor <commit> <zweig>`.
+
+**BELEG ZU REGEL 8.** Beim Sichern des super-Pushes stand im Status ein unscheinbares
+` M Code/external/20260931-overleaf-diplomarbeit`. Am Objekt gemessen: der ausgecheckte Stand war
+`ef448e4b` (**21.07.**, gesetzt am 26.07. um 12:18 und seitdem elf Tage unbewegt), der **committete**
+Zeiger `29a1700d` (**03.08.**). `merge-base --is-ancestor` sagt: der Checkout ist **Vorfahr** des
+Zeigers, Distanz **78 Commits** -- der Arbeitsbaum lag 78 Commits ZURUECK, das `M` war kein
+Fortschritt, sondern ein Rueckstand. Ein `git add .` oder `git commit -a` haette den Zeiger auf den
+21.07. zurueckgedreht, und zwar lautlos: im Diff steht nur eine Zeile mit einem Hash. Verloren waeren
+**Abgabe-Substanz zwei Tage vor der Frist** gewesen -- Kapitel 6 (Fazit, FF2-Erweiterbarkeit),
+Kapitel 5 (Auswertung, Mess-Schema-Modi), Kapitel 3 (`sec:stamp-model`). **Dass nichts passiert ist,
+liegt allein daran, dass jeder Commit dieser Strecke einen expliziten Pathspec trug.** Gegenprobe:
+der ce-Zeiger zeigte korrekt vorwaerts -- die Richtung ist je Submodul zu messen, nie fortzuschreiben.
+
+**BELEG ZU REGEL 9 -- der zweite Boden desselben Lochs.** Unter dem Rueckstand lag ein zweiter
+Befund: **`rescue/gate8-graph-abbildungen-8970465d` lag seit heute Mittag auf BEIDEN Remotes und war
+in KEINEM Zweig.** Am Objekt: die Ref existiert als `refs/remotes/origin/...` **und**
+`refs/remotes/github/...`, beide auf `8970465d`; der Commit (12:38) ist **genau einer** ueber
+`29a1700d` und aendert **2 Dateien, +199/-2** -- `anhang/de/A_measurements.tex` und
+`anhang/en/A_measurements.tex`, "die 23 Abbildungen des Graph-Umbaus eingebunden (DE+EN)". **Das ist
+der TEXT-Teil genau des Graph-Pakets, dessen CODE-Teil heute im super gelandet ist** (`b35aea1b`,
+Abschnitt B). Die Arbeit war fertig, gesichert, auf zwei Remotes -- und haette gefehlt, weil
+"gesichert" mit "gelandet" verwechselt wurde. Das ist dieselbe Fehlerklasse wie R4 und wie Regel 6:
+**eine Zusage, die eine andere Frage beantwortet als die gestellte.**
+
+**VOLLZUG (Reihenfolge eingehalten, Besitzfrage zuerst).** `git status --porcelain`, `git stash list`
+und `git branch -a --no-merged 29a1700d` im Thesis-Submodul waren **alle drei leer** -- keine fremde
+Arbeit, die ein Checkout weggezogen haette. Erst danach `git submodule update -- <pfad>` (18:30:09,
+`ef448e4b -> 29a1700d`), **kein Commit**: der Zeiger im Baum war richtig, falsch war nur der Checkout.
+Anschliessend wurde Gate 8 gelandet -- FF-Kette belegt (`29a1700d` Vorfahr von `8970465`), Thesis
+`development` UND `main` auf beiden Remotes vorgezogen, Zeiger im super mit **expliziten Pathspec und
+genau einer Datei** nachgezogen (`85b74237`), gitleaks ueber den Push-Inhalt `no leaks found`,
+Backup-Ref-Kontrolle ohne Zugang. **Endstand: Zeiger im super = Checkout = `8970465d`, Status sauber,
+super `development` = `85b74237` auf beiden Remotes, Pipeline 15034 `success` (178 s).**
+
+### D) A1 -- VERDIKT: LANDEN MIT EINER AUFLAGE (Lead-Entscheid, Bau laeuft)
+
+Der Lens hat die Kernaussage der Welle **am Objekt bestaetigt**: der reallocate-Fix trifft
+**24 Strategie-Header** (gezaehlt in `9eb1e7d6`: 25 geaenderte Dateien, davon 24 unter `axes/alloc/`
+plus ein Test), und er kommt **ohne ABI-Bump** aus, weil die betroffene Bedingung **0 Aufrufer** hat.
+
+**Befunden wurde nicht die Aussage, sondern ihre INKONSISTENZ zur eigenen Vorwelle:** dort wurden
+26 Strategien **gebumpt** -- bei derselben Aussageform "Bedingung, die nie feuert". Zwei gleiche
+Saetze, zwei entgegengesetzte Konsequenzen; genau das darf ein Versions-Vertrag nicht.
+
+**ENTSCHIEDEN (Lead): FUER den Bump.** Begruendung: dieselbe Aussageform muss dieselbe Folge haben,
+und die Owner-Doktrin sagt, **"heute unerreichbar" entlastet nicht**. Das konkrete Risiko ist ein
+kuenftiger Verbraucher, der ein **vor** dem Fix gecachtes Binary mit dem Phantom-Byte-Fehler
+weiterverwendet -- der Bump ist die einzige Stelle, an der das auffaellt. Der Bau laeuft.
+
+**ZAHL-KORREKTUR zur bisherigen Buchung:** es sind **VIER neue Sub-Concepts, nicht drei** -- am Objekt
+ueber die Wellen-Commits (`0b5ed557^..fdfa68ee`) gezaehlt: `ThrowTranslatingStrategy`,
+`StdAllocatorAdaptingStrategy`, `ValueSemanticStrategy`, `StatisticsReportingStrategy`. Wellen-Umfang
+insgesamt: **36 Dateien, 2114 Einfuegungen**.
+
+### E) DER PMC-SPERRPOSTEN IST SCHWERER ALS IN nachmittag-9 STEHT -- ES SIND VIER WACHEN
+
+nachmittag-9 sagt "Drei Wachen, keine loest aus". **Das ist zu milde: es sind vier, und die vierte
+ist die eigens dafuer gebaute.**
+
+**DIE VIERTE WACHE.** Der **#37-PMC-Preflight** wird in jeden Mess-Batch emittiert --
+`experiment_plan_director.hpp:1361-1364`, drei Zeilen Shell plus Testat:
+`cmake --build build --target m3v2_pmc_smoke linux_perf_pmc_smoke`, dann
+`ctest --test-dir build -L pmc --output-on-failure`. Sein Kommentar (`:1352-1360`) benennt die
+Gefahr **woertlich und exakt**: "ohne Preflight koennte eine Lane eine mehrtaegige Messung mit
+kaputtem `perf_event_open` durchlaufen und **lauter 0-Zaehler produzieren**"; er steht ausdruecklich
+"HART in BEIDEN Profilen, auch smoke".
+
+**UND ER BEISST TROTZDEM NICHT.** Am Objekt gelesen, `linux_perf_pmc_smoke.cpp:58-63`:
+
+    if (!delta.available) {
+        // EHRLICHER Skip: kein Counter-Zugriff (...)
+        std::cout << "SMOKE_SKIP (no PMC access - honest available=0)\n";
+        return 0;
+    }
+
+**Exit 0.** Die Wache fragt "ist perf kaputt?" -- aber ohne das Flag ist die Quelle gar nicht erst
+gebaut (`CMakeLists:69-77` und der Header-Guard `#if defined(COMDARE_ENABLE_PMC) && defined(__linux__)`),
+also ist sie schlicht **nicht vorhanden**, und Nicht-Vorhandensein gilt korrekt als ehrlicher Skip.
+**Die Wache ist nicht defekt -- sie beantwortet eine andere Frage als die, um die es geht.** Dieselbe
+Klasse wie Regel 6, diesmal an der teuersten Stelle des Projekts. Aus dem Bau-Bericht (nicht selbst
+nachgefahren, daher als Bericht gekennzeichnet): ohne Flag `SMOKE_SKIP` / `available=0` / alle Zaehler
+0; mit Flag `available=1`, `cache_misses_l1=4191307`.
+
+**DIE WURZEL IST NICHT DIE IRREFUEHRENDE OPTION-BESCHREIBUNG**, wie nachmittag-9 nahelegt, sondern:
+**die PMC-Pflicht war an ZWEI JOB-NAMEN geheftet statt an eine Invariante.** Ledger-Beleg
+(Ledger-Abschnitt 12, 2026-07-16, I-PMC-1/F9) woertlich: "`-DCOMDARE_ENABLE_PMC=ON` in **GENAU die
+2 Mess-Jobs**
+(`measure:smoke` Z.449 + `measure:golden-320` Z.529)". Beim Wechsel auf die dynamische Kette blieb
+die Pflicht bei den alten Job-Namen zurueck. **Exakt die Fehlerklasse von R4** (eine Naht, die an
+einen Job-Namen statt an eine Vollstaendigkeits-Bedingung gebunden ist).
+
+**DIE PLAN-AUSSAGE, die die Schwere entscheidet** -- Owner F9, 16.07., verbatim aus dem Ledger:
+> "Die Infra hat die Einrichtung schon seit Tagen fertig. NICHT mehr gegated, kann von MIR [Agent]
+> installiert werden und **MUSS als PFLICHT fuer die Vollstaendigkeit aller perf-Messwerte mit in
+> die Ergebnisse**"
+
+Die haeufig zitierte Gegenstelle ("reale Cache-Misses/PMC bleiben **honest-0 bis #26**") stammt aus
+dem Block "AKTUALISIERT **2026-07-12**" und ist damit **vier Tage aelter als die Pflicht** -- sie
+traegt an derselben Stelle bereits einen SUPERSEDED-Vermerk vom 19.07. **Ueberholt, nicht gueltig.**
+
+**I-PMC-2 BLEIBT OFFEN, und das begrenzt den Anhang:** auch **mit** Flag bleiben L3, L2, coherence
+und energy auf 0 (Ledger: I-PMC-2 = L3-Mapping + branch_misses, I-PMC-3/#187 = L2 + coherence via
+Zen-5-RAW). **Der Anhang kann also selbst im besten Fall nur L1D + dTLB zeigen** -- das gehoert vor
+Phase 6 entschieden, nicht nach der Messung entdeckt.
+
+### F) OFFEN / NICHT VON DIESER LINIE ZU ENTSCHEIDEN
+
+- **PMC (Abschnitt E)**: Owner-Entscheid vor Phase 6. Zu entscheiden sind DREI Dinge, nicht eins:
+  (1) das Flag in die dynamische Kette **als Invariante**, nicht als Job-Name; (2) die Wache so
+  drehen, dass **"Quelle nicht gebaut"** ein Fehler ist und nicht ein Skip; (3) der Anhangs-Umfang
+  angesichts I-PMC-2/3 (nur L1D+dTLB).
+- **`present_`-Gate** fuer die `offen > 0`-Abschneidung und die **Verfeinerung der Formwache**
+  (Atom statt plan-global): beide nach der Abgabe, zusammen mit Option 2 der Plan-Ablage.
+
 ## NACHTRAG 06.08.2026 nachmittag-9 (DER ERSTE ECHTE PIPELINE-LAUF: 15022 ROT -> 15025 GRUEN; zwei Lint-Fixes; Regel-Zeilen 6+7; PMC-Sperrposten am Objekt gegengeprueft und VERSCHAERFT)
 
 ### A) DER OWNER-AUFTRAG IST FUER ce ERFUELLT -- und der Weg dahin ist der Ertrag
