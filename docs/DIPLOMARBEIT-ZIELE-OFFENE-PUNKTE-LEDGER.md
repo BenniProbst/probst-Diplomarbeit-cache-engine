@@ -4199,6 +4199,12 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 vormittag-11 (EIN-INSTANZ-REGIME -- VERBATIM; Alt-Worktree-Abbau vollzogen)
+
+- OWNER VERBATIM: "Alles klar, dann volle Freigabe, du bist die einzige Instanz"
+- KONSEQUENZ: Zwei-Sessions-Besitz-Register GESCHLOSSEN -- alle Hoheiten (Landebahn, saemtliche Worktrees inkl. Bau-Session-Erbschaft, PID-Relikt irrelevant) bei DIESER Linie. Acht Straenge laufen (vormittag-10-Tabelle).
+- ALT-WORKTREE-ABBAU (Doktrin: Ancestor-Beweis + Mess-CSV-Check je Baum VOR rm, alle Ausgaben literal im Kontext): wt-e24 (ff6560b9 IN dev), wt-b1-e18 (253bcd86 IN dev), wt-super-w1 (5714f94b IN super-dev), wt-b13-eta (0 eigene Commits ueber b4110cd0) -- ALLE 0 relevante untracked (0 CSV) -> removed + lokale Branches geloescht (Remote-Branches/rescue-Refs UNBERUEHRT, Remote-Loeschung nur mit explizitem GO). B13-Bau erfolgt ohnehin mit NEUEM Branch ab dev (Re-Anker-Pass, Plan-Auflage).
+
 ## NACHTRAG 06.08.2026 vormittag-10 (VOLLES GO TEIL-2-UEBERNAHME -- VERBATIM; Welle laeuft)
 
 - OWNER VERBATIM: "Gut dann mache das ebenfalls parallel, ich hatte die andere Session manuell geschlossen, also ist sie Weg. volles GO"
