@@ -429,7 +429,8 @@ int write_heatmap(std::filesystem::path const& out_path, HeatmapData const& data
                 zc_min               = (y == 0 && x == 0) ? carrier : std::min(zc_min, carrier);
                 zc_max               = (y == 0 && x == 0) ? carrier : std::max(zc_max, carrier);
             }
-        if (!(zc_max > zc_min)) f << "    zmin=" << fmt_double(zc_min) << ", zmax=" << fmt_double(zc_min + 1.0) << ",\n";
+        if (!(zc_max > zc_min))
+            f << "    zmin=" << fmt_double(zc_min) << ", zmax=" << fmt_double(zc_min + 1.0) << ",\n";
     } else {
     f << "    point meta min=" << fmt_double(log_min) << ",\n";
     f << "    point meta max=" << fmt_double(log_max) << ",\n";
@@ -1127,7 +1128,8 @@ int write_latency_tradeoff_scatter(std::filesystem::path const& out, std::span<W
     open_resizebox(f, cnst);
     f << "\\begin{tikzpicture}\n";
     for (std::size_t i = 0; i < algos.size(); ++i) {
-        double const hue = (algos.size() <= 1) ? 0.0 : (360.0 * static_cast<double>(i) / static_cast<double>(algos.size()));
+        double const hue =
+            (algos.size() <= 1) ? 0.0 : (360.0 * static_cast<double>(i) / static_cast<double>(algos.size()));
         int          r = 0, g = 0, b = 0;
         hsv_to_rgb(hue, 0.65, 0.85, r, g, b);
         f << "\\definecolor{tradeoff" << i << "}{RGB}{" << r << "," << g << "," << b << "}\n";
