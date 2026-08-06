@@ -4199,6 +4199,65 @@ Owner verbatim: „Volles go für alle offenen Punkte wie empfohlen" — auf die
 - LESART: (1) Die ACHSEN-ARTEN-TRICHOTOMIE (AxisKind: MESS-Achsen [Planer-Ebene] / SYSTEM-Achsen [CEB-Ebene] / ORGAN-Achsen [Tier-Ebene], §30-Stufen-Zuordnung + Haupt=CT-statisch/Unter=RT-dynamisch-Semantik) muss als KLAMMER ueber jeder Haupt-Achse mit ihren Unter-Achsen sichtbar sein — die 18er-Tabelle deckt nur die Organ-Haupt-Achsen, Mess-/System-Achsen samt Unter-Achsen fehlen als Struktur. (2) Die Sektions-Mermaids zeigen VIELE verbindungslose Knoten (nur basen-Kanten extrahiert; Organe ohne Vererbung fliegen lose) — Organ-Klassen muessen mindestens ueber ihre ACHSEN-Zugehoerigkeit angebunden werden (Achsen-Anker/subgraph je Achse), Mess-/System-Traeger analog.
 - VOLLZUG geplant als Atlas-Runde 4 NACH der laufenden Topologie-Welle (wf_f80815cf): Korpus-Nachschlag Achsen-Arten-Registries (3 Registries §28! Organ/System/Mess) + Unter-Achsen-Kanon -> Klammer-Sektion in der Uebersicht (3 Klammern, je Haupt-Achse mit Unter-Achsen, CT/RT-Kennung) + Neugenerierung der L4-Sektions-Diagramme mit Achsen-subgraphs/Zugehoerigkeits-Kanten (mechanisch aus den Shard-JSONs; loest die losen Knoten strukturell).
 
+## NACHTRAG 06.08.2026 abend-3 (SECHS LANDUNGEN in drei Repos; die 121 gesicherten Wellen-Ergebnisse als Checkheft verdichtet; EINE laufende Bau-Welle wegen ueberholter Annahmen GESTOPPT und korrigiert neu gestartet)
+
+> **REGEL-ZEILE 16 (NEU, aus dem Anlassfall dieses Abschnitts):**
+> **Gesicherte Vorarbeit, die niemand liest, ist verlorene Vorarbeit.**
+> Sechs Bau-Wellen wurden gestartet, bevor die gesicherten Ergebnisse der frueheren Wellen
+> abgeglichen waren. Die erste Stichprobe warf sofort einen Auftrag um. **Vor jeder Welle
+> gehoert der Abgleich gegen das, was schon gemessen wurde** -- nicht danach.
+
+### A. WAS GELANDET IST (sechs Pakete, alle Remotes, je mit Beleg)
+
+| Paket | Repo/SHA | Beleg |
+|---|---|---|
+| Anhang-A-Ehrlichkeit | thesis `19e1592` (dev+main) | 28/28 Eintraege mit eigenem Ersatztext (vorher 11); Pipelines 15087/15088 gruen |
+| Beide Thesis-Zeiger | super `123b2f32` | Gitlinks identisch; Pipeline 15089 gruen |
+| super-Diff-Hygiene-Wache | super `7780c6af` | selbst ausgefuehrt: 558 Zeilen, 0 Verstoesse, EXIT=0 |
+| Ueberblick 677 Zeilen | super `1c7cdcb6` | Pipeline 15101 gruen |
+| Struktur-Haertung Codegen | ce `b708c572` (aus `6ddd7fd4`) | 3/3 deterministischer Compile-Fehler beim Attach-Entzug |
+| E14 NoneFilter | ce `77ed15fa` (aus `ed67661c`) | golden-320 Round-Trip "ALLE OK (Diff leer)", cap=0 -> 320, id-Liste byte-unveraendert |
+
+ASCII-Wache ueber die ce-Doppellandung ab merge-base `b241a272`: **137 von 139 Zusatzzeilen geprueft, 0 Verstoesse**, die eine uebersprungene Datei namentlich genannt.
+
+### B. DER UEBERBLICK -- 22 MB Rohdaten auf 677 Zeilen
+
+Owner-Auftrag: *"kippe alle Ergebnisse der Workflows aus dem letzten Kontext in diesen Kontext"*. Die Rohmenge passt in keinen Kontext (~1 Mio Token allein fuer die Berichte). **Der methodische Kern:** die ergiebige Quelle sind **nicht** die 269 `.output`-Transkripte (ueberwiegend Werkzeug-Ausgabe), sondern die **121 `result`-Ereignisse in den 63 Journalen** -- dort stehen die Ergebnisse statt der Herleitungen. 26 Agenten haben sie gelesen und verdichtet.
+
+Ablage: `docs/sessions/20260806-UEBERBLICK-workflow-ergebnisse.md`. Zehn Befund-Gruppen (A Messvaliditaet · B Bau-Menge/Zeit · C Abgabe-Substanz · D CI-Wachen · E Lager · F Sicherheit · G Landungen · H Buchfuehrung · I Struktur · J Owner-Entscheide), jeder Befund mit Status: `[B]` am Objekt belegt · `[B2]` mehrfach unabhaengig · `[B!]` mit offenem Widerspruch · `[?]` unbelegt · `[RAW]` nur Rohbefund.
+
+### C. DIE GESTOPPTE WELLE -- M-1 baute gegen eine ueberholte Annahme
+
+Der erste M-1-Auftrag liess ein Feld ins Fingerprint-Preimage einbauen und einen **Format-Bump 3 -> 4** fahren. Der bereits gesicherte F2-Deep-Research hatte am Objekt gemessen, dass die Mess-Zeile dort **laengst steht -- als Glied [3] von 8** (`abi/anatomy_fingerprint.hpp:341` + `:431-432`, `kAnatomyFingerprintGliedCount = 8`). Der Bump waere teure Arbeit an der falschen Stelle gewesen.
+
+**Die drei ECHTEN Defekte, die der Auftrag verfehlt hatte:**
+
+| # | Defekt | Beleg |
+|---|---|---|
+| **D-1** | Die Mess-Achse hat **0 funktionale Konsumenten**. 27 Treffer auf `MeasurementTooling`, alle in Legende, Stempel-Renderern oder XML-Trage-Pfad; **keiner schaltet Messcode**. `perm_mess_defines()` setzt **hart** `-DCOMDARE_MEASUREMENT_ON=1` (`profile_run_facade.cpp:273-275`). **Glied [3] deklariert eine Ausstattung, die der Bau ignoriert -- der Stempel luegt.** |
+| **D-4** | `kCebFingerprint` rendert das **ANGEBOT** der Registry statt der einkompilierten **WAHL** (`ceb_version_stamp.hpp:3-5`, `:159-161` `consteval` ueber die komplette Registry). Zwei CEBs mit `[wallclock]` und `[macro]` tragen **denselben** `ceb_key_sha512`. Paragraf 58-V verlangt "je EINKOMPILIERTER Mess-Achse" -- **Injektivitaets-Verletzung, bricht Owner-KERN F6 auf CEB-Ebene**. |
+| **D-2** | `measurement_line` / `measurement_entries` haben **0 produktive Leser** (2 Treffer, beide in Unit-Tests). Die "Tooling-Konsistenz CEB<->Tier" (LEDGER:3319) **existiert im Code nicht**. |
+
+**PRAEZISIERUNG aus dem Ueberblick (Befund A-6), die den korrigierten Auftrag noch schaerft:** `COMDARE_MEASUREMENT_ON` ist **ABI-wirksam**, steht aber nicht im Preimage. Eine Release-Nachmessung erzeugt also eine **andere Binary mit identischem Fingerprint**; `dll_is_current` ist genau ein Vergleich -> **stiller Falsch-Skip**. Der Stempel traegt die Tooling-**Wahl**, nicht die Compile-**Defines**. Beide Befunde sind damit vereinbar und zusammen schaerfer als jeder einzelne.
+
+### D. ZWEI EIGENE FEHLGRIFFE, benannt statt verschwiegen
+
+Ich habe **zweimal in den Arbeitsbranch einer laufenden Welle committet**, weil der Hauptklon nicht mehr auf `development` stand (ce auf `b-m2-pmc-invariante`, super auf `b-ci-rueckschrieb-beide-zeiger`). Kein Datenverlust -- beide Wellen hatten ihre Arbeit gesichert. **Konsequenz, ab sofort bindend: Landungen laufen ueber eigene Worktrees** (`wt-landung`, `wt-super-landung`); Hauptklone werden nicht angefasst, solange dort gebaut wird.
+
+**Dazu die dritte stille Null desselben Abends:** gitleaks ueber das **thesis**-Submodul meldete erneut `no leaks found` bei `0 commits scanned` -- keine zwei Stunden nach der Formulierung von Regel-Zeile 15. Der Elternrepo-Mount heilt es (1 Commit gescannt). **Die Regel greift nur, weil jemand hinsieht -- sie gehoert in ein Skript.**
+
+### E. ENTLASTUNGEN, am Objekt gemessen
+
+- **Der Fingerprint-Block ist vollstaendig auf `main`**: R4 (`b5e0e4e7`), T2-A (`e7aa1244`), B14 (`f577f886`) **und A1** (`fdfa68ee`). Ein frueherer Bericht fuehrte A1 als offen und warnte, ein Voll-Bau ohne es waere Makulatur. **Erledigt.**
+- Mein erster Test dazu sagte faelschlich "NEIN" -- er lief gegen den **lokalen** `main` des Hauptklons, der 50 Commits alt war (Dossier-Befund N-4). Lokalen `main` nachgezogen, damit die Falle nicht wieder zuschnappt.
+- **Anhang A bricht den Bau nicht**: die 28 `\InputIfFileExists` haben 0 Zieldateien, aber die **16 harten `\input` sind vollzaehlig** (16/16). Das ist der lastende Unterschied, der im Ursprungsbefund fehlte.
+
+### F. NEU EINGEREIHT
+
+- **Die CI erzeugt die Thesis-Divergenz selbst neu**: `anhang:forward` (`.gitlab-ci.yml:1111`) bumpt nur `thesis/diplomarbeit`; der zweite Pfad kommt in der gesamten CI **null Mal** vor, und `verify:submodules` (`:309`) prueft ebenfalls nur den ersten. Die heutige Heilung ist eine Momentaufnahme, keine Struktur. Welle laeuft praeventiv.
+- **Alt-Bestands-Befund der neuen super-Wache**: `--bestand` meldet **845 Nicht-ASCII- und 174 Breiten-Zeilen aus 18714** super-eigenen Codezeilen. Bewusst nicht gegatet (eine Bestands-Wache waere am Tag ihrer Einfuehrung rot geboren). Ein Grossteil der 174 ist Folge des ASCII-Verstosses: Trennlinien aus U+2500 sind 80 Zeichen, aber 234 Byte.
+- **Zwei unwahre Messgroessen vor der Messung** (Ueberblick A-7/A-8): `bytes_in_use_peak` wird aus einem Momentanwert befuellt (`measurement_snapshot.hpp:124`, der Kommentar sagt selbst "END-Wert"); das Literal 64 ueberlebt die B14-Heilung im CLU-Konsumenten (`system_axis.hpp:336`) und ergaebe unter KF-6 8/16/33/66 % statt ~16 %. **Beide muessen vor dem ersten Batch stehen** -- danach tragen die vorher erhobenen Zeilen andere Semantik als die spaeteren: ein Datenbruch ohne Neubau, unsichtbar.
+
 ## NACHTRAG 06.08.2026 abend-2 (KETTE T-1 VOLLZOGEN nach zweimaligem Abbruch; ZWEI STILLE NULLEN in EIGENEN Pruefungen aufgedeckt, eine davon sicherheitsrelevant; die 390 Runner-Token sind NICHT ROTIERT -- der 02.08.-Scrub hat die Spur beseitigt, nicht die Wirkung)
 
 > **REGEL-ZEILE 15 (NEU, aus zwei Anlassfaellen desselben Abends):**
