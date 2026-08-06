@@ -1,0 +1,256 @@
+diff --git a/libs/cache_engine/anatomy/abi_adapter.hpp b/libs/cache_engine/anatomy/abi_adapter.hpp
+index dacb3a9d..ceb85bfa 100644
+--- a/libs/cache_engine/anatomy/abi_adapter.hpp
++++ b/libs/cache_engine/anatomy/abi_adapter.hpp
+@@ -234,6 +234,24 @@ template <class L>
+ /// IDENTISCHEN (bytes, alignment) wie bei der Allokation -- die pmr-Achsen verlangen das.
+ /// Byte-neutral: auf dem Erfolgspfad passiert exakt dieselbe eine deallocate wie bisher, nur am
+ /// Block-Ende statt eine Zeile davor (dazwischen liegt keine Messung).
++///
++/// WAS DIESER WAECHTER NICHT ABDECKT -- OFFENER POSTEN, ehrlich beziffert (B14-NB4, Lead-Entscheid nach
++/// Codex/Opus-Divergenz). Die kChurn=2048 Bloecke des Segment-2-Churn (`blocks`) lecken weiterhin, wenn
++/// `alloc.allocate` MITTEN in der Churn-Schleife wirft: die Dealloc-Schleife darunter wird dann nie
++/// erreicht. Groessenordnung max. 2048 * 256 B = 512 KiB je Fehlschlag, gegen die 1--4 MiB des oben
++/// geheilten Scan-Puffers.
++/// FRUEHERE BEGRUENDUNG, HIERMIT ZURUECKGENOMMEN: "liegt im gemessenen T6-Fenster, also nicht ohne
++/// Mess-Eingriff heilbar". Das traegt nur zur Haelfte. RICHTIG daran ist, dass die Dealloc-Schleife VOR
++/// `s2b` liegt und Segment 2 GENAU die Allokator-Achse misst -- ein naiver Guard-Destruktor schoebe die
++/// Freigabe hinter den Zeitnehmer und veraenderte damit, was gemessen wird. FALSCH daran ist das
++/// "nicht moeglich": beim Wurf wird der Endmarker ohnehin nie erreicht, der ganze Aufruf liefert 0, es
++/// existiert also gar kein Messwert, den ein Cleanup verfaelschen koennte. Und eine leckfreie Fassung
++/// OHNE jeden Eingriff ins Mess-Fenster ist konstruierbar: Guard VOR `s1a` anlegen, nach der bestehenden
++/// Dealloc-Schleife ein `released`-Flag setzen, Destruktor auf dem Erfolgspfad No-op. Kosten: EIN
++/// bool-Store je Batch, nach 2048 Allokations-/Freigabe-Paaren -- im Rauschen.
++/// STATUS: BEWUSST ZURUECKGESTELLT (Kosten-Nutzen: kleinerer Block, eigenes Exception-Safety-Gate,
++/// gleiche Klasse aber eigener Schnitt ueber alle drei Mess-Pfade), NICHT "nicht machbar". Der Posten
++/// bleibt OFFEN und ist als solcher gefuehrt; diese Zeilen sind die Zusage, die der Code auch haelt.
+ template <class Alloc>
+ class ScanBufferGuard {
+ public:
+@@ -1475,6 +1493,15 @@ public:
+             r[2]          = ml.field_bytes_read;
+             r[3]          = ml.cache_lines_touched;
+             r[4]          = ml.last_checksum;
++            // B14-NB4: die EINHEIT von r[3] wandert MIT ueber die ABI. r[3] zaehlt seit B14-NB3 in Linien
++            // DER cacheline-Unterachse; der Host-Verbraucher (measurement/system_axis.hpp) bildet
++            // CLU = field_bytes/(cache_lines*line_bytes) und kann die Line-Groesse aus dem POD sonst nicht
++            // rekonstruieren -- sie ist eine Compile-Zeit-Eigenschaft DIESER DLL. Der Slot war reserviert
++            // (nullptr), sizeof(ComdareTierObserverSnapshot) bleibt 1344 -> kein ABI-Major-Bump.
++            static_assert(std::string_view{kV3AxisSchema[5].names[5]} == std::string_view{"line_bytes"},
++                          "B14-NB4: der T5-Slot [5][5] traegt nicht mehr line_bytes -- die CLU-Kette "
++                          "Observer -> POD -> ObserverSnapshotSystemAxis ist am Schema gerissen.");
++            r[5] = ml.line_bytes;
+             ++filled;
+         }
+         // ── T6 allocator (dasselbe getriebene container_algorithm_-Allocator-Organ wie der frühere V2-Pfad) ───────────
+diff --git a/libs/cache_engine/anatomy/observable_tier.hpp b/libs/cache_engine/anatomy/observable_tier.hpp
+index 6f61af15..bcc83c6d 100644
+--- a/libs/cache_engine/anatomy/observable_tier.hpp
++++ b/libs/cache_engine/anatomy/observable_tier.hpp
+@@ -77,7 +77,15 @@ inline constexpr V3AxisFieldNames kV3AxisSchema[kV3AxisCount] = {
+     /*T3  path_compression*/
+     {{"compress", "prefix_len", "bytes_saved", "cuts", "checksum", nullptr, nullptr, nullptr}}, // Phase B (T3)
+     /*T4  node_type*/ {{"find", "keys_stored", "queries", "checksum", nullptr, nullptr, nullptr, nullptr}},
+-    /*T5  memory_layout*/ {{"scan", "records", "field_bytes", "cache_lines", "checksum", nullptr, nullptr, nullptr}},
++    /*T5  memory_layout. B14-NB4: line_bytes in den RESERVIERTEN Slot [5][5] (vorher nullptr) -- die EINHEIT
++      von cache_lines. Seit B14-NB3 zaehlt cache_lines in Linien DER cacheline-Unterachse; der Verbraucher
++      (measurement/system_axis.hpp, CLU = field_bytes/(cache_lines*line_bytes)) sitzt HINTER der Modul-ABI
++      und kann die Line-Groesse dort nicht rekonstruieren -- sie ist Compile-Zeit-Eigenschaft der DLL.
++      LAYOUT-NEUTRAL wie der T2-Praezedenzfall indirect_steps in [2][6]: axis_stats ist fix [18][8],
++      sizeof bleibt 1344 (ABI-7), kein ABI-Major-Bump. Additiv ist nur die CSV-Spalte
++      stat_memory_layout_line_bytes -- genau der Fall, den lazy_csv_header als "Phase B fuellt leere
++      Schema-Slots" vorsieht.*/
++    {{"scan", "records", "field_bytes", "cache_lines", "checksum", "line_bytes", nullptr, nullptr}},
+     /*T6  allocator*/
+     {{"bytes_alloc", "bytes_in_use", "alloc_cnt", "dealloc_cnt", "fail", "budget_reject", nullptr, nullptr}},
+     /*T7  prefetch*/
+diff --git a/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp b/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp
+index a1d1e023..9dc5a6e1 100644
+--- a/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp
++++ b/libs/cache_engine/axes/layout/axis_05_memory_layout_observable.hpp
+@@ -35,6 +35,18 @@ struct MemoryLayoutSnapshot {
+                                            ///< LAYOUT-ABHAENGIG). B14-NB3: `line` ist die Groesse der
+                                            ///< cacheline-Unterachse (Default 64), kein Literal mehr.
+     std::uint64_t last_checksum = 0; ///< letztes scan_field_sum-Ergebnis (Korrektheits-Anker)
++    /// B14-NB4 (2026-08-06) -- die EINHEIT von cache_lines_touched, mitgefuehrt statt vorausgesetzt.
++    /// BEFUND, der dieses Feld erzwingt (Codex + Opus unabhaengig, Lead-Entscheid Weg (ii)): seit B14-NB3
++    /// zaehlt cache_lines_touched in Linien DER ACHSE, nicht mehr in 64-B-Linien. Der einzige aktive
++    /// Verbraucher (ObserverSnapshotSystemAxis, measurement/system_axis.hpp) bildet daraus die CLU als
++    /// field_bytes/(cache_lines*line) -- und hatte dort das Literal 64 stehen. Unter KF-6 haette das
++    /// 8/16/33/66 % statt durchgaengig ~16 % ergeben, obwohl die WAHREN beruehrten Bytes konstant sind.
++    /// Der Verbraucher sitzt HINTER der Modul-ABI (er liest einen POD aus einer geladenen .so) und kann
++    /// die Line-Groesse dort NICHT rekonstruieren -- sie ist eine Compile-Zeit-Eigenschaft der DLL.
++    /// Deshalb reist sie ab jetzt NEBEN dem Zaehler: wer den Zaehler liest, bekommt seine Einheit mit.
++    /// 0 = KEINE eindeutige Einheit (nichts gemessen ODER zwei Produzenten mit verschiedenen Linien) ->
++    /// der Verbraucher meldet ehrlich source-unavailable statt eine Zahl zu erfinden (fail-closed).
++    std::uint64_t line_bytes = 0;
+ 
+     [[nodiscard]] bool operator==(MemoryLayoutSnapshot const&) const noexcept = default;
+ };
+@@ -138,6 +150,18 @@ public:
+         // BYTE-NEUTRAL: alle fuenf Strategien stehen am Default-NTTP CacheLineConfig{} == B64.
+         // (Der REALE, representation-genaue Footprint kommt weiterhin aus observe_real_footprint(); der
+         // Store speist ihn seit P-CACHELINE-LITERAL bereits achsen-treu.)
++        // B14-NB4 (Codex-Befund "die Scan-Seite ist fail-closed, die OBSERVER-Seite nicht"): dieselbe
++        // Disziplin wie detail::layout_scan_stride_bytes im abi_adapter. Ohne den Zwang faellt eine
++        // Strategie/Huelle, die cacheline_subaxis_line_bytes() nicht beantwortet, in line_bytes_of<>
++        // STILL auf den Achsen-Default 64 zurueck -- und zaehlt dann eine MESSGROESSE in einer Einheit,
++        // die mit ihrem eigenen Scan-Stride nichts zu tun hat. Genau dieses stille Auseinanderlaufen ist
++        // die Klasse, die B14 heilt; sie darf auf der Mess-Seite nicht durch die Hintertuer bleiben.
++        static_assert(::comdare::cache_engine::cacheline::CacheLineLineBytesAware<Strategy>,
++                      "ObservableMemoryLayout<Strategy>: die gewrappte Strategie beantwortet "
++                      "cacheline_subaxis_line_bytes() nicht. line_bytes_of<> faellt damit STILL auf den "
++                      "Achsen-Default 64 zurueck und cache_lines_touched zaehlte in einer Einheit, die "
++                      "der Scan gar nicht benutzt. Strategie von MemoryLayoutStrategyBase ableiten oder "
++                      "den Zugriff forwarden (reference_observable_wrapper_must_forward_concept_members).");
+         constexpr std::size_t kKeyBytes  = sizeof(std::uint64_t);
+         constexpr std::size_t kLineBytes = ::comdare::cache_engine::cacheline::line_bytes_of<Strategy>();
+         static_assert(kLineBytes > 0u, "cacheline-Unterachse liefert Line-Groesse 0 -- Linienzaehlung unmoeglich");
+@@ -145,6 +169,7 @@ public:
+         std::uint64_t const   touched_bytes = static_cast<std::uint64_t>(n) * static_cast<std::uint64_t>(rs);
+         stats_.field_bytes_read += static_cast<std::uint64_t>(n) * static_cast<std::uint64_t>(kKeyBytes);
+         stats_.cache_lines_touched += (touched_bytes + (kLineBytes - 1u)) / kLineBytes;
++        note_line_unit_(static_cast<std::uint64_t>(kLineBytes)); // B14-NB4: Einheit reist mit dem Zaehler
+         stats_.last_checksum = checksum;
+ #endif
+         return checksum;
+@@ -152,21 +177,32 @@ public:
+ 
+     /// observe_real_footprint (P-MD1-ERDUNG #167): der REALE, vom LayoutAwareChunkedStore representation-genau
+     /// vermessene Key-Scan-Footprint EINES Chunks. `field_bytes` = real beruehrte NUTZ-Key-Bytes, `cache_lines` =
+-    /// real beruehrte DISTINKTE 64-B-Linien aus dem echten Byte-Layout der Repraesentation. CLU =
+-    /// field_bytes/(cache_lines*64) folgt damit aus dem ECHTEN Store-Footprint, nicht aus einem Modell. Der
+-    /// Store ruft dies pro Chunk; die Werte werden akkumuliert (`records` = Chunk-Record-Zahl als Anker).
++    /// real beruehrte DISTINKTE Linien aus dem echten Byte-Layout der Repraesentation, `line_bytes` = die
++    /// Groesse GENAU DIESER Linien (die cacheline-Unterachse des Stores). CLU = field_bytes/(cache_lines*
++    /// line_bytes) folgt damit aus dem ECHTEN Store-Footprint, nicht aus einem Modell. Der Store ruft dies
++    /// pro Chunk; die Werte werden akkumuliert (`records` = Chunk-Record-Zahl als Anker).
++    ///
++    /// B14-NB4 -- WARUM line_bytes ein PARAMETER ist und nicht line_bytes_of<Strategy>(): der Zaehler
++    /// `cache_lines` entsteht im STORE (LayoutAwareChunkedStore<N,L,A>::key_scan_footprint_), nicht hier.
++    /// Wer den Zaehler bildet, muss auch seine Einheit nennen -- sonst ist die Gleichheit "Store-L ==
++    /// Organ-Strategy" eine ANNAHME. Genau der tautologische Selbstbeleg, den der Codex-Review an der
++    /// NB3-Fassung geruegt hat ("ein Wrapper, der 32 meldet, waehrend seine innere Strategie mit 256
++    /// scannt, besteht den Audit"). note_line_unit_ vergleicht die beiden Quellen jetzt WIRKLICH.
+     [[nodiscard]] std::uint64_t observe_real_footprint(std::uint64_t checksum, std::size_t records,
+-                                                       std::uint64_t field_bytes, std::uint64_t cache_lines) noexcept {
++                                                       std::uint64_t field_bytes, std::uint64_t cache_lines,
++                                                       std::uint64_t line_bytes) noexcept {
+ #ifdef COMDARE_CE_ENABLE_STATISTICS
+         ++stats_.scan_count;
+         stats_.records_scanned += static_cast<std::uint64_t>(records);
+         stats_.field_bytes_read += field_bytes;
+         stats_.cache_lines_touched += cache_lines;
++        note_line_unit_(line_bytes);
+         stats_.last_checksum = checksum;
+ #else
+         (void)records;
+         (void)field_bytes;
+         (void)cache_lines;
++        (void)line_bytes;
+ #endif
+         return checksum;
+     }
+@@ -177,6 +213,20 @@ public:
+     void                     reset() noexcept { stats_ = {}; }
+ 
+ private:
++    /// B14-NB4 -- die EINE Stelle, an der die Einheit des Linien-Zaehlers gebucht wird.
++    /// REGEL (fail-closed, bewusst ohne Ausnahme): solange alle Beitraege eines Snapshots in DERSELBEN
++    /// Linien-Groesse zaehlen, traegt der Snapshot diese Groesse. Melden zwei Beitraege verschiedene
++    /// Groessen (Store-Achse != Organ-Achse, oder ein 0-Wert), ist die Einheit des akkumulierten
++    /// Zaehlers nicht mehr definiert -- dann wird sie auf 0 vergiftet, und der Verbraucher meldet
++    /// ehrlich source-unavailable statt eine Prozentzahl aus zwei Einheiten zu mischen.
++    void note_line_unit_(std::uint64_t line_bytes) noexcept {
++        if (line_bytes == 0u || (stats_.line_bytes != 0u && stats_.line_bytes != line_bytes)) {
++            stats_.line_bytes = 0u;
++            return;
++        }
++        stats_.line_bytes = line_bytes;
++    }
++
+     snapshot_t stats_{};
+ #endif
+ };
+diff --git a/libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp b/libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp
+index e31cd802..22e01f5f 100644
+--- a/libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp
++++ b/libs/cache_engine/axes/node/axis_04_node_type_layout_aware_store.hpp
+@@ -341,10 +341,17 @@ public:
+             std::uint64_t checksum  = 0;
+             std::uint64_t key_bytes = 0, lines = 0;
+             key_scan_footprint_(c, checksum, key_bytes, lines);
++            // B14-NB4: der Store nennt die EINHEIT seiner Linienzahl mit. `lines` entsteht in
++            // key_scan_footprint_ aus kLineBytes = line_bytes_of<L>() -- diese Zeile reicht GENAU diese
++            // Quelle weiter, damit der Verbraucher hinter der Modul-ABI (ObserverSnapshotSystemAxis) die
++            // CLU mit demselben Nenner bildet, mit dem hier gezaehlt wurde. Ohne sie waere die Einheit
++            // am Verbraucher nicht rekonstruierbar (observable_tier.hpp-POD transportierte sie nicht).
+             if constexpr (requires {
+-                              org.observe_real_footprint(checksum, std::size_t{}, std::uint64_t{}, std::uint64_t{});
++                              org.observe_real_footprint(checksum, std::size_t{}, std::uint64_t{}, std::uint64_t{},
++                                                         std::uint64_t{});
+                           }) {
+-                acc += org.observe_real_footprint(checksum, c.count, key_bytes, lines);
++                acc += org.observe_real_footprint(checksum, c.count, key_bytes, lines,
++                                                  static_cast<std::uint64_t>(kLineBytes));
+             } else {
+                 // Fallback (alte Observer ohne Real-Footprint-API): der bestehende observe_scan-Pfad.
+                 acc += org.observe_scan(c.data, c.count, record_phys_bytes());
+diff --git a/libs/cache_engine/include/cache_engine/measurement/system_axis.hpp b/libs/cache_engine/include/cache_engine/measurement/system_axis.hpp
+index 2ac64f03..c4ffba42 100644
+--- a/libs/cache_engine/include/cache_engine/measurement/system_axis.hpp
++++ b/libs/cache_engine/include/cache_engine/measurement/system_axis.hpp
+@@ -323,17 +323,39 @@ struct ObserverSnapshotSystemAxis final : SystemAxis<ObserverSnapshotSystemAxis>
+ 
+         switch (sample.category) {
+             case MeasurementCategory::CLU: {
+-                // Cache-Line-AUSLASTUNG (Thesis 03:383) = field_bytes / (cache_lines * 64), hier als Prozent.
++                // Cache-Line-AUSLASTUNG (Thesis 03:383) = field_bytes / (cache_lines * line_bytes), als Prozent.
+                 // Der rohe cache_lines-Zaehler waere die INVERSE Metrik (Review wf_f1604ba3, CONFIRMED-major).
++                //
++                // B14-NB4 (2026-08-06) -- HIER STAND DAS LITERAL 64, und es war der Landeblocker von B14.
++                // B14-NB3 hat die EINHEIT von cache_lines geaendert: der Zaehler laeuft seitdem in Linien
++                // DER cacheline-Unterachse (32/64/128/256), nicht mehr in 64-B-Linien. Der Nenner blieb
++                // stehen -- mit dem Ergebnis, dass dieselbe, physisch UNVERAENDERTE Messung je Line-Groesse
++                // eine andere Auslastung gemeldet haette. Nachgerechnet (Codex und Opus unabhaengig, mit
++                // n=1024, record_size=48, field_bytes=8192, wahre beruehrte Bytes konstant 49152):
++                // B32 -> 8 %, B64 -> 16 %, B128 -> 33 %, B256 -> 66 %, wo durchgaengig ~16 % richtig ist.
++                // Eine Messgroesse zu korrigieren, ohne ihren Verbraucher mitzuziehen, ist schlimmer als
++                // der Ausgangszustand: der Fehler wandert von der Einheit in den WERT.
++                //
++                // WARUM DER NENNER JETZT AUS DEM SNAPSHOT KOMMT und nicht "ueber dieselbe Achse" gezogen
++                // wird: diese Achse liest einen POD ueber die Modul-ABI-Grenze (eine geladene Tier-.so).
++                // Die Line-Groesse ist eine COMPILE-ZEIT-Eigenschaft der DLL; im Host existiert der
++                // Layout-Typ nicht einmal. Ein Achsen-Zugriff hier waere entweder ein zweites Literal oder
++                // eine Annahme ueber fremden Code. Der Produzent legt sie deshalb NEBEN den Zaehler
++                // (axis_stats[5][5], reservierter Slot, sizeof unveraendert).
+                 std::uint64_t const field_bytes = snapshot->axis_stats[5][2];
+                 std::uint64_t const cache_lines = snapshot->axis_stats[5][3];
+-                if (cache_lines == 0) {
+-                    // Der Snapshot liegt vor, traegt aber keinen Nenner: die QUELLE hat nichts geliefert.
++                std::uint64_t const line_bytes  = snapshot->axis_stats[5][5];
++                if (cache_lines == 0 || line_bytes == 0) {
++                    // Der Snapshot liegt vor, traegt aber keinen brauchbaren Nenner: entweder hat die
++                    // QUELLE nichts geliefert (cache_lines == 0) oder sie nennt die Einheit ihres Zaehlers
++                    // nicht eindeutig (line_bytes == 0; der Observer vergiftet den Wert, wenn zwei
++                    // Produzenten mit verschiedenen Linien in denselben Zaehler geschrieben haben).
+                     // Kein Fehler des Algorithmus, aber auch keine bildbare Auslastung -> n/a.
++                    // FAIL-CLOSED und mit Absicht: eine Prozentzahl aus zwei Einheiten waere ein Phantom.
+                     sample.mark_source_unavailable();
+                     return;
+                 }
+-                sample.mark_ok((field_bytes * 100u) / (cache_lines * 64u));
++                sample.mark_ok((field_bytes * 100u) / (cache_lines * line_bytes));
+                 return;
+             }
+             case MeasurementCategory::MEMORY_FOOTPRINT:
+@@ -360,6 +382,9 @@ struct ObserverSnapshotSystemAxis final : SystemAxis<ObserverSnapshotSystemAxis>
+ // Compile-time-Bindung an den Schema-Vertrag (kV3AxisSchema IST der Vertrag — keine stille Index-Drift).
+ static_assert(std::string_view{::comdare::cache_engine::anatomy::kV3AxisSchema[5].names[2]} == "field_bytes");
+ static_assert(std::string_view{::comdare::cache_engine::anatomy::kV3AxisSchema[5].names[3]} == "cache_lines");
++// B14-NB4: der Nenner-Slot. Er ist Teil DESSELBEN Vertrags -- faellt er weg oder wandert er, muss der
++// Build brechen und nicht die CLU stillschweigend wieder auf eine Fremd-Einheit rechnen.
++static_assert(std::string_view{::comdare::cache_engine::anatomy::kV3AxisSchema[5].names[5]} == "line_bytes");
+ 
+ struct PmcSystemAxis final : SystemAxis<PmcSystemAxis> {
+     using counters_t = ::comdare::cache_engine::measurement::PmcCounters;
