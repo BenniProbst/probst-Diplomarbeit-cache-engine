@@ -32,9 +32,11 @@
 # Ausserdem zerriss ein ';' im Tag (z.B. aus einer Entity-Referenz) die CMake-Listenarithmetik der
 # Tag-Zaehlung. Geheilt ist das NICHT durch weitere Regex-Pflaster, sondern durch den Wegfall des
 # Selbstbau-Parsers: gelesen wird ueber xmllint, gefragt wird per XPath (s. xml_canonical_utils.cmake).
-# Die Wohlgeformtheit beider Traeger ist damit selbst Teil der Aussage; --noent erzwingt die
-# Entity-Expansion, so dass zwei gleich geschriebene, aber verschieden DEFINIERTE Entities nicht mehr
-# faelschlich als derselbe Wert gelten. Preis: xmllint ist Pflicht (Begruendung dort).
+# Die Wohlgeformtheit beider Traeger ist damit selbst Teil der Aussage. B14-NB5-KORREKTUR einer
+# NB3-Aussage: "--noent erzwingt die Entity-Expansion" gilt NICHT mehr -- --noent wurde wegen eines
+# XXE-Lecks (lokale SYSTEM-Entity, von --nonet nicht erfasst) entfernt; Entities werden seither
+# strukturell VERBOTEN (DOCTYPE-Sperre, s. comdare_xml_has_doctype), nicht mehr substituiert. Preis:
+# xmllint ist Pflicht (Begruendung dort).
 #
 # OFFENE ce-AUFLAGE (B14-NB3, am Objekt festgestellt): all_axes_golden.profile.xml ist derzeit KEIN
 # wohlgeformtes XML -- in drei Kommentaren steht ein '--', was XML verbietet (libxml2 lehnt die Datei
@@ -44,6 +46,20 @@
 # NICHT angefasst; die add_test-Zeile schaltet stattdessen fuer GENAU DIESEN Traeger den Kommentar-Text-
 # Ausnahmeweg frei. Der ist in beide Richtungen verriegelt und zieht sich selbst zurueck: sobald die
 # ce-Datei roh wohlgeformt ist, wird die Freischaltung FATAL und muss entfernt werden.
+#
+# AUSGEWIESENE GRENZE (B14-NB4/NB5, geprueft statt behauptet): ALLE XPath-Pfade dieser Wache sind
+# unpraefixierte Elementnamen (/comdare_experiment/..., //axis, //run_options, ...). Ein Dokument mit
+# Namensraum-Praefix ODER Default-Namensraum an der Wurzel wuerde JEDEN dieser Pfade auf 0 Treffer
+# fallen lassen -- FAIL-CLOSED (die Wache FATALt "Dokumentwurzel ist nicht <comdare_experiment>" statt
+# still falsch gruen zu sein), aber NICHT namensraum-robust. Das ist BEWUSST keine Luecke, die hier
+# per local-name()/namespace-uri() geschlossen wird (wie bei der XSD-Vokabular-Zaehlung in
+# fixture_schema_subset_check.cmake): der REALE Verbraucher dieser Dateien ist selbst
+# namensraum-unwissend -- xml_config_parser.cpp liest Kindknoten ueber unqualifizierte Namen, und
+# experiment_schema.xsd deklariert KEIN targetNamespace (per grep verifiziert, kein einziger Treffer).
+# Eine Wache, die Namensraeume toleriert, waere PERMISSIVER als der Parser, den sie absichert -- eine
+# eigene, neue Klasse falsch-gruen ("die Wache sagt gueltig, der reale Parser liest die Datei gar
+# nicht"). Die Grenze bleibt deshalb bewusst bestehen und wird hier benannt statt sie zu verschweigen;
+# sie waere erst zu verschieben, wenn Parser UND Schema selbst namensraum-bewusst werden.
 #
 # SKIP-DISZIPLIN (identisch zu fixture_schema_subset_check.cmake): MASTER liegt im super-Repo selbst ->
 # fehlt er, ist das FATAL. PROFILE liegt im ce-Submodul -> fehlt der Nachbar-Checkout, wird sauber
@@ -186,13 +202,21 @@ function(comdare_n_axes_experiment _ctx _file _doc _names_var _vals_prefix)
         # Kardinalitaet und dieses Produkt waere still falsch. Also STOLPERDRAHT statt Annahme.
         comdare_xml_count("${_ctx}" "MASTER" "${_doc}" "(${_axpath})[${_i}]/@active" _has_active)
         if(NOT _has_active EQUAL 0)
+            # B14-NB5 / Punkt E (nachgeschaerft): dies ist ein BEWUSSTER Stolperdraht, kein Bug -- er
+            # loest auf JEDEN Wert des Attributs aus, auch active="true", nicht nur auf potenziell
+            # gefaehrliche Werte. Der Grund: solange niemand active im comdare_experiment-Dialekt
+            # auswertet, kann die Wache den Wert nicht sinnvoll gegenpruefen -- also verweigert sie
+            # JEDE Aussage, sobald das Attribut ueberhaupt auftaucht, statt seinen Inhalt zu bewerten.
             message(FATAL_ERROR
-                "${_ctx}: MASTER '${_file}': Achse '${_ref}' traegt ein active-Attribut. Diese Wache "
-                "rechnet das Produkt ueber ALLE deklarierten Achsen -- richtig genau so lange, wie "
-                "active im comdare_experiment-Dialekt wirkungslos ist (heute: ja, s. XSD und "
-                "validate_profile). Wer den Verbraucher scharfschaltet, muss DIESE Stelle mitziehen; "
-                "bis dahin verweigert die Wache die Aussage, statt ein Produkt zu behaupten, das den "
-                "gebauten Raum vielleicht nicht mehr trifft.")
+                "${_ctx}: MASTER '${_file}': Achse '${_ref}' traegt ein active-Attribut (Wert "
+                "irrelevant -- dieser Stolperdraht loest auf JEDEM Wert aus, auch active=\"true\"). "
+                "Diese Wache rechnet das Produkt ueber ALLE deklarierten Achsen -- richtig genau so "
+                "lange, wie active im comdare_experiment-Dialekt wirkungslos ist (heute: ja, s. XSD "
+                "und validate_profile). Wer den Verbraucher scharfschaltet, muss DIESE Stelle "
+                "mitziehen (die Semantik hier implementieren und gegenpruefen); bis dahin verweigert "
+                "die Wache absichtlich JEDE Aussage, statt ein Produkt zu behaupten, das den gebauten "
+                "Raum vielleicht nicht mehr trifft. Kein Bug -- ein Stolperdraht, der einen Menschen "
+                "zu dieser Stelle zieht, sobald das Attribut zum ersten Mal benutzt wird.")
         endif()
         list(APPEND _names "${_ref}")
         set(${_vals_prefix}_${_ref} "${_vals}" PARENT_SCOPE)
@@ -286,30 +310,60 @@ function(comdare_n_axes_thesis _ctx _file _doc _names_var _vals_prefix)
         # deshalb die Aussage, statt eine Semantik zu implementieren, die sie nicht gegenpruefen kann.
         comdare_xml_count("${_ctx}" "PROFILE" "${_doc}" "(${_axpath})[${_i}]/@active" _has_active)
         if(NOT _has_active EQUAL 0)
+            # B14-NB5 / Punkt E (nachgeschaerft): auch dieser Stolperdraht loest auf JEDEM Wert aus,
+            # auch active="true" -- nicht nur auf false. Anders als beim MASTER-Zweig ist der Grund
+            # hier nicht "Wert unbekannt", sondern "diese Wache rechnet heute unbedingt ueber ALLE
+            # Achsen"; ein "true" waere zwar semantisch neutral, aber ein "false" irgendwo anders
+            # bliebe unentdeckt, wenn die Wache erst bei false reagiert. Sie reagiert deshalb auf die
+            # blosse ANWESENHEIT.
             message(FATAL_ERROR
-                "${_ctx}: PROFILE '${_file}': Achse '${_ref}' traegt ein active-Attribut. Im "
-                "comdare_thesis_profile-Dialekt ist das WIRKSAM (profile_to_tree.hpp: "
+                "${_ctx}: PROFILE '${_file}': Achse '${_ref}' traegt ein active-Attribut (Wert "
+                "irrelevant -- dieser Stolperdraht loest auf JEDEM Wert aus, auch active=\"true\"). "
+                "Im comdare_thesis_profile-Dialekt ist das WIRKSAM (profile_to_tree.hpp: "
                 "'if (!ax.active) continue;') -- eine abgewaehlte Achse faellt aus dem gebauten Raum, "
-                "und dieses Produkt traefe ihn nicht mehr. Wer eine Achse abwaehlt, zieht diese Wache "
-                "mit; bis dahin: keine Aussage statt einer falschen.")
+                "und dieses Produkt traefe ihn nicht mehr. Fix: diese Wache um eine modus-genaue "
+                "active-Auswertung erweitern (spiegelbildlich zur active_axes-Pruefung oben), bevor "
+                "das Attribut produktiv verwendet wird; bis dahin: keine Aussage statt einer falschen.")
         endif()
-        # ... und der Modus MUSS die Achse freigeben, sonst gilt dasselbe.
-        foreach(_mi RANGE 1 ${_n_modes})
-            comdare_xml_string("${_ctx}" "PROFILE" "${_doc}"
-                "(/comdare_thesis_profile/modes/mode)[${_mi}]/@active_axes" _aa)
-            string(REGEX REPLACE "[ \t\r\n]+" ";" _aalist "${_aa}")
-            list(REMOVE_ITEM _aalist "")
-            if(NOT "${_ref}" IN_LIST _aalist)
+        # ... und, FALLS Modi deklariert sind, MUSS jeder von ihnen die Achse freigeben.
+        #
+        # B14-NB5-HEILUNG eines von B6 selbst eingefuehrten Defekts (im NB4-Gegenpruef-Lauf gefunden
+        # und auf dieser Maschine mit CMake 4.3.4 reproduziert): die Schleife stand vorher
+        # unbedingt als "foreach(_mi RANGE 1 ${_n_modes})". Bei _n_modes==0 (ein PROFILE OHNE
+        # <mode>-Block) wird daraus "RANGE 1 0" -- und CMake iteriert das NICHT null Mal. Empirisch:
+        #   foreach(_mi RANGE 1 0)  ->  Folge "1;0" (zwei Durchlaeufe, nicht null)
+        # (die CMake-Doku nennt start>stop fuer RANGE ausdruecklich undefiniert; auf dieser Maschine
+        # iteriert es abwaerts statt leer zu bleiben). Die Schleife fragte dann einen NICHT
+        # EXISTIERENDEN Modus-Knoten [1] ab, active_axes kam leer zurueck, die Achsen-Referenz war
+        # folgerichtig nie IN_LIST der leeren Menge -- FATAL, mit einem LEEREN Modusnamen zitiert
+        # (dieselbe nicht-existente Knoten-Abfrage fuer @name). Der reale Verbraucher behandelt "kein
+        # Modus" dagegen ausdruecklich als "keine Einschraenkung", nicht als "keine Achse freigegeben"
+        # (profile_to_tree.hpp: is_active(ref) := (kein Modus) ? true : ref in mode.active_axes) -- die
+        # Wache haette einen KORREKTEN Bestand fuer kaputt erklaert. Geheilt wird das NICHT durch eine
+        # Sonderbehandlung des Fehlerfalls, sondern durch die semantisch richtige Vorbedingung: OHNE
+        # Modi ist nichts zu pruefen, die Schleife laeuft dann schlicht nicht.
+        # "Heute unerreichbar" entlastet nicht: die reale all_axes_golden.profile.xml traegt aktuell
+        # genau EIN <mode> (dieser Zweig ist heute dormant), aber jedes kuenftige Profil OHNE
+        # <mode>-Block waere sonst betroffen.
+        if(_n_modes GREATER 0)
+            foreach(_mi RANGE 1 ${_n_modes})
                 comdare_xml_string("${_ctx}" "PROFILE" "${_doc}"
-                    "(/comdare_thesis_profile/modes/mode)[${_mi}]/@name" _mname)
-                message(FATAL_ERROR
-                    "${_ctx}: PROFILE '${_file}': der Modus '${_mname}' gibt die Achse '${_ref}' NICHT "
-                    "frei (active_axes). Der Bau-Pfad ueberspringt sie dann (profile_to_tree.hpp: "
-                    "'if (!is_active(ax.ref)) continue;'), das Produkt dieser Wache zaehlt sie aber "
-                    "mit -- die Wache prueefte einen ANDEREN Raum als den gebauten. Entweder gibt jeder "
-                    "Modus alle deklarierten Achsen frei, oder diese Wache muss modus-genau rechnen.")
-            endif()
-        endforeach()
+                    "(/comdare_thesis_profile/modes/mode)[${_mi}]/@active_axes" _aa)
+                string(REGEX REPLACE "[ \t\r\n]+" ";" _aalist "${_aa}")
+                list(REMOVE_ITEM _aalist "")
+                if(NOT "${_ref}" IN_LIST _aalist)
+                    comdare_xml_string("${_ctx}" "PROFILE" "${_doc}"
+                        "(/comdare_thesis_profile/modes/mode)[${_mi}]/@name" _mname)
+                    message(FATAL_ERROR
+                        "${_ctx}: PROFILE '${_file}': der Modus '${_mname}' gibt die Achse '${_ref}' "
+                        "NICHT frei (active_axes). Der Bau-Pfad ueberspringt sie dann "
+                        "(profile_to_tree.hpp: 'if (!is_active(ax.ref)) continue;'), das Produkt "
+                        "dieser Wache zaehlt sie aber mit -- die Wache pruefte einen ANDEREN Raum als "
+                        "den gebauten. Entweder gibt jeder Modus alle deklarierten Achsen frei, oder "
+                        "diese Wache muss modus-genau rechnen.")
+                endif()
+            endforeach()
+        endif()
         list(APPEND _names "${_ref}")
         set(${_vals_prefix}_${_ref} "${_curvals}" PARENT_SCOPE)
     endforeach()

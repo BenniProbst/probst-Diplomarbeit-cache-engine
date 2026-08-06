@@ -114,6 +114,58 @@ comdare_xml_count("${_ctx}" "SCHEMA" "${_schema_doc}"
     "//*[local-name()='element' and namespace-uri()='${_xsd_ns}' and @name]" _n_se)
 comdare_xml_count("${_ctx}" "SCHEMA" "${_schema_doc}"
     "//*[local-name()='attribute' and namespace-uri()='${_xsd_ns}' and @name]" _n_sa)
+
+# -- B14-NB5: xs:include/xs:import-BLINDHEIT geschlossen (fuer die HAEUFIGE Form: das Hauptdokument
+#    verweist DIREKT auf 1..n weitere Dateien). Vorher sah die Vokabular-Zaehlung oben nur
+#    Deklarationen im HAUPTDOKUMENT; eine ueber <xs:include schemaLocation="../> bzw. <xs:import .../>
+#    verteilte Schema-Evolution waere unsichtbar geblieben -- im Extremfall haette ein Hauptdokument
+#    OHNE lokale Deklarationen, aber mit vollstaendigem Vokabular in inkludierten Dateien, den Riegel
+#    gegen "leeres Schema" (unten) faelschlich ausgeloest.
+#    AUSGEWIESENE GRENZE, nicht verschwiegen: nur EINE Ebene. Includet eine inkludierte Datei ihrerseits
+#    weiter, zaehlt diese Funktion deren Vokabular NICHT mit -- eine echte, unbegrenzte Rekursion haette
+#    in CMake eine fehleranfaellige Listen-Weiterreichung ueber mehrere Funktions-Scopes gebraucht (jede
+#    cmake-Funktion oeffnet einen neuen Scope; PARENT_SCOPE reicht genau EINE Ebene). Das Risiko einer
+#    subtil falschen Rekursion fuer einen Fall, der in dieser Domaene (zwei kleine, handgeschriebene
+#    XSD-Dateien) nicht auftritt, wog schwerer als der Nutzen; die Grenze wird deshalb bewusst gezogen
+#    und hier benannt. Heute (per grep verifiziert) nutzt experiment_schema.xsd weder include noch
+#    import -- diese Funktion deckt trotzdem den haeufigen, einstufigen Fall ab, statt "heute
+#    unerreichbar" als Entlastung zu nehmen.
+function(comdare_xml_count_schema_includes _ctx _file _doc _xsd_ns _elems_var _attrs_var)
+    set(_incpath
+        "//*[(local-name()='include' or local-name()='import') and namespace-uri()='${_xsd_ns}' and @schemaLocation]")
+    comdare_xml_count("${_ctx}" "SCHEMA" "${_doc}" "${_incpath}" _n_inc)
+    set(_e 0)
+    set(_a 0)
+    if(_n_inc GREATER 0)
+        get_filename_component(_basedir "${_file}" DIRECTORY)
+        foreach(_i RANGE 1 ${_n_inc})
+            comdare_xml_string("${_ctx}" "SCHEMA" "${_doc}" "(${_incpath})[${_i}]/@schemaLocation" _loc)
+            if(NOT IS_ABSOLUTE "${_loc}")
+                set(_loc "${_basedir}/${_loc}")
+            endif()
+            get_filename_component(_loc "${_loc}" ABSOLUTE)
+            if(NOT EXISTS "${_loc}")
+                message(FATAL_ERROR
+                    "${_ctx}: SCHEMA '${_file}' verweist per include/import auf '${_loc}', die NICHT "
+                    "existiert.")
+            endif()
+            comdare_xml_open("${_ctx}" "SCHEMA-INCLUDE" "${_loc}" FALSE _incdoc)
+            comdare_xml_count("${_ctx}" "SCHEMA-INCLUDE" "${_incdoc}"
+                "//*[local-name()='element' and namespace-uri()='${_xsd_ns}' and @name]" _ie)
+            comdare_xml_count("${_ctx}" "SCHEMA-INCLUDE" "${_incdoc}"
+                "//*[local-name()='attribute' and namespace-uri()='${_xsd_ns}' and @name]" _ia)
+            comdare_xml_close("${_incdoc}" "${_loc}")
+            math(EXPR _e "${_e} + ${_ie}")
+            math(EXPR _a "${_a} + ${_ia}")
+        endforeach()
+    endif()
+    set(${_elems_var} "${_e}" PARENT_SCOPE)
+    set(${_attrs_var} "${_a}" PARENT_SCOPE)
+endfunction()
+comdare_xml_count_schema_includes("${_ctx}" "${SCHEMA}" "${_schema_doc}" "${_xsd_ns}" _n_se_inc _n_sa_inc)
+math(EXPR _n_se "${_n_se} + ${_n_se_inc}")
+math(EXPR _n_sa "${_n_sa} + ${_n_sa_inc}")
+
 if(_n_se EQUAL 0 OR _n_sa EQUAL 0)
     message(FATAL_ERROR
         "${_ctx}: SCHEMA '${SCHEMA}' deklariert kein Vokabular (Elemente=${_n_se}, "
@@ -122,14 +174,19 @@ if(_n_se EQUAL 0 OR _n_sa EQUAL 0)
 endif()
 message(STATUS "${_ctx}: '${SCHEMA}' traegt ${_n_se} <element>- und ${_n_sa} <attribute>-Deklarationen "
                "(Deklarationen, nicht verschiedene Namen -- derselbe Name darf in mehreren "
-               "complexTypes deklariert sein).")
+               "complexTypes deklariert sein; ${_n_se_inc}/${_n_sa_inc} davon aus direkt "
+               "inkludierten/importierten Dateien, s. comdare_xml_count_schema_includes).")
 comdare_xml_close("${_schema_doc}" "${SCHEMA}")
 
 function(comdare_check_instance _ctx _label _file _schema)
     comdare_xml_open("${_ctx}" "${_label}" "${_file}" FALSE _doc)
+    # B14-NB5: KEIN --noent mehr -- comdare_xml_open hat "${_doc}" bereits als DOCTYPE-frei bestaetigt
+    # (Entity-Sperre, s. xml_canonical_utils.cmake/comdare_xml_has_doctype), --noent waere hier ohnehin
+    # wirkungslos, aber auch ueberfluessige Angriffsflaeche, wenn diese Zeile je isoliert kopiert wird.
     execute_process(
-        COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet --noent --schema "${_schema}" "${_doc}"
-        RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_VARIABLE _err ERROR_STRIP_TRAILING_WHITESPACE)
+        COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet --schema "${_schema}" "${_doc}"
+        RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_VARIABLE _err ERROR_STRIP_TRAILING_WHITESPACE
+        TIMEOUT 10)
     # B14-NB4 / Befund B3: auch der Schema-Lauf laedt das Dokument -- und meldet einen durch --nonet
     # blockierten externen Entity-Load NUR ueber stderr, bei RC 0. Die Validierung liefe dann gegen
     # einen Baum OHNE den Entity-Inhalt und meldete "gueltig". Der Riegel steht deshalb VOR der

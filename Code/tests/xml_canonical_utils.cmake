@@ -89,6 +89,97 @@ function(comdare_xml_require_tool _ctx)
     endif()
 endfunction()
 
+# -- B14-NB5 (2026-08-06): DIE ENTITY-SPERRE, AN DER WURZEL STATT AN DEN SPUREN. ------------------------
+#
+# BEFUND (Opus-Review, im NB4-Gegenpruef-Lauf am Objekt reproduziert): der B14-NB4-Stderr-Riegel
+# (comdare_xml_assert_clean_stderr) faengt nur den Fall "ein Load schlaegt fehl und beschwert sich
+# auf stderr" -- das war das --nonet-Praeparat (eine BLOCKIERTE Netz-Entity). Er faengt NICHT den
+# eigentlich gemeinten Fall: eine ERFOLGREICH gelesene LOKALE Datei-Entity. --nonet verbietet nur
+# Netzzugriff, nicht das lokale Dateisystem. Literal gefahren (Kanarienvogel-Praeparat):
+#   Datei : <!DOCTYPE r [<!ENTITY x SYSTEM "file:///pfad/zu/canary.txt">]><r>&x;</r>
+#   Lauf  : xmllint --noout --nonet --noent  ->  RC=0, stdout LEER, stderr LEER (0 Byte)
+#   `xmllint --noent --nonet --xpath 'string(/r)'` liefert den KOMPLETTEN Dateiinhalt zurueck.
+# Ein erfolgreicher lokaler Load beschwert sich nirgends -- es gibt fuer den Stderr-Riegel nichts zu
+# fangen. B3 loeste ein aehnlich aussehendes, aber ANDERES Problem.
+#
+# DIE HEILUNG SUCHT DESHALB NICHT NACH SPUREN EINES LOADS, SONDERN LAESST IHN GAR NICHT ERST ZU:
+#   (a) --noent faellt an ALLEN Aufrufstellen weg (comdare_xml_open x2, comdare_xml_query). Empirisch
+#       belegt (Kanarienvogel-Gegenprobe, Gate-Log nb5-super-biss-beweise.txt): OHNE --noent wird eine
+#       externe SYSTEM-Entity gar nicht erst geladen -- weder Netz noch lokale Datei, RC=0, die Abfrage
+#       liefert eine LEERE Antwort statt des Dateiinhalts. Attributwerte sind davon NICHT beruehrt: die
+#       XML-Attributwert-Normalisierung loest Entity-Referenzen in Attributen UNABHAENGIG von --noent
+#       auf (ebenfalls empirisch belegt) -- der Weg, auf dem diese Wachen ihr Vokabular tatsaechlich
+#       lesen (ref="..." etc.), bleibt vollstaendig intakt.
+#   (b) Den einen Fall, den (a) alleine NICHT abdeckt, deckt (a) nicht ab: B14-NB3s urspruenglicher
+#       Befund 2 (per Entity ELEMENT-erzeugter Inhalt -- '&node;' expandiert zu einem neuen Element --
+#       bleibt ohne --noent unsichtbar, ebenfalls empirisch nachgewiesen). Statt diesen Fall
+#       SYMPTOMATISCH wieder zuzulassen (z.B. --noent nur fuer "sichere" Entities), wird er
+#       STRUKTURELL verboten: ein Dokument mit DOCTYPE wird von dieser Wache komplett abgelehnt, FATAL,
+#       bevor irgendeine Abfrage laeuft. XML erlaubt keine <!ENTITY>-Deklaration ohne DOCTYPE -- kein
+#       DOCTYPE heisst GARANTIERT keine Entity-Deklaration moeglich; das ist eine Grammatik-Tatsache
+#       des XML-Standards, keine Heuristik ueber Werkzeug-Ausgaben.
+#       ERKANNT wird die DOCTYPE-Praesenz PARSER-BASIERT, nicht per Text-Muster (s.
+#       comdare_xml_has_doctype): xmllint serialisiert die Datei einmal normal und einmal mit
+#       --dropdtd (das laut xmllint --help NUR die DOCTYPE-Zeile aus der Ausgabe entfernt, den Rest
+#       byte-identisch laesst); unterscheiden sich die zwei Ausgaben, existiert eine DOCTYPE. Diese
+#       Erkennung selbst braucht KEIN --noent -- sie loest also nichts aus, was sie nicht sehen soll.
+#
+# FOLGE, EHRLICH BENANNT (dieselbe Ehrlichkeitspflicht wie beim NB3-PROFILE_ALLOW_COMMENT_TEXT_DEFECT-
+# Ausnahmeweg): eine XML-Datei mit DOCTYPE -- ob harmlos, ob mit Entities, ob mit externen Entities --
+# wird von dieser Wache VOLLSTAENDIG abgelehnt, nicht nur ihre Entities einzeln geprueft. Heute traegt
+# KEINE der gewachten Dateien eine DOCTYPE (verifiziert: experiment_golden_kern.xml,
+# all_axes_golden.profile.xml, experiment_schema.xsd, die ce-Fixture -- keine einzige). Das ist eine
+# bewusste, SICHTBARE Grenze: diese Wache unterstuetzt ausschliesslich DOCTYPE-freie XML. Wer eine
+# DOCTYPE fachlich braucht, muss diese Grenze verschieben (und dann neu ueber Entity-Sicherheit
+# nachdenken) -- nicht diese Wache stillschweigend umgehen.
+function(comdare_xml_has_doctype _ctx _label _file _out_var)
+    execute_process(
+        COMMAND "${COMDARE_XMLLINT_EXE}" --nonet "${_file}"
+        OUTPUT_VARIABLE _full RESULT_VARIABLE _rc1 ERROR_QUIET
+        TIMEOUT 10)
+    execute_process(
+        COMMAND "${COMDARE_XMLLINT_EXE}" --nonet --dropdtd "${_file}"
+        OUTPUT_VARIABLE _nodtd RESULT_VARIABLE _rc2 ERROR_QUIET
+        TIMEOUT 10)
+    if(NOT _rc1 EQUAL 0 OR NOT _rc2 EQUAL 0)
+        message(FATAL_ERROR
+            "${_ctx}: DOCTYPE-Erkennung auf ${_label} '${_file}' schlug fehl (RC_normal=${_rc1}, "
+            "RC_dropdtd=${_rc2}). Diese Funktion laeuft NUR auf Dateien, die kurz zuvor bereits als "
+            "wohlgeformt bestaetigt wurden -- ein Fehlschlag hier ist unerwartet und wird nicht "
+            "stillschweigend uebergangen.")
+    endif()
+    if("${_full}" STREQUAL "${_nodtd}")
+        set(${_out_var} FALSE PARENT_SCOPE)
+    else()
+        set(${_out_var} TRUE PARENT_SCOPE)
+    endif()
+endfunction()
+
+# -- Best-effort Aufraeumen ALTER, LIEGENGEBLIEBENER Ausnahme-Kopien (B14-NB5). Notwendig, weil
+#    cmake -P KEINE Fehlerbehandlung kennt -- kein try/finally, kein RAII, kein Destruktor. Bricht ein
+#    Schritt in comdare_xml_open zwischen file(WRITE) und dem folgenden comdare_xml_close via
+#    FATAL_ERROR ab (z.B. ein neu gefundenes DOCTYPE, s.o.), bleibt die Temp-Datei LIEGEN: das Skript
+#    endet sofort, es gibt schlicht keinen Ort fuer Cleanup-Code danach. DAS IST EINE STRUKTURELLE
+#    GRENZE VON CMAKE -P, hier bewusst offen benannt statt verschwiegen -- eine ausgewiesene Grenze
+#    ist zulaessig, eine stille nicht. Gemildert (nicht geloest) wird nur die FOLGE, die unbegrenzte
+#    Ansammlung ueber viele fehlgeschlagene Laeufe: bei jedem NEUEN comdare_xml_open werden eigene
+#    liegengebliebene Dateien aelter als eine Stunde entfernt. Die Alters-Schwelle existiert, damit
+#    ein PARALLEL laufender anderer Test (ctest -j) seine eigene, gerade erst geschriebene Kopie
+#    nicht verliert.
+function(comdare_xml_sweep_stale_temp _scratch)
+    file(GLOB _stale "${_scratch}/comdare-xmlwache-*.xml")
+    string(TIMESTAMP _now "%s")
+    foreach(_f IN LISTS _stale)
+        file(TIMESTAMP "${_f}" _ts "%s")
+        if(_ts AND _now)
+            math(EXPR _age "${_now} - ${_ts}")
+            if(_age GREATER 3600)
+                file(REMOVE "${_f}")
+            endif()
+        endif()
+    endforeach()
+endfunction()
+
 # -- Scratch-Verzeichnis fuer den EINEN Ausnahmefall unten. -DSCRATCH_DIR wird von der
 #    add_test-Zeile auf das Build-Verzeichnis gesetzt (raeumt sich mit dem Build ab); fuer den
 #    Standalone-Lauf 'cmake -P' faellt es auf TMPDIR/TEMP/'/tmp' zurueck. Das Quellverzeichnis
@@ -254,8 +345,13 @@ endfunction()
 #
 #    Das ist der strukturelle Riegel gegen Befund 4 (Fehlverschachtelung, unquotierte oder
 #    duplizierte Attribute, Truncation mitten im Dokument): nicht mehr "kommt der Wurzelname
-#    textuell nochmal vor", sondern "libxml2 akzeptiert das Dokument". --noent zwingt zugleich
-#    die Entity-Expansion (Befund 2), --nonet verbietet jeden Netzzugriff auf externe DTDs.
+#    textuell nochmal vor", sondern "libxml2 akzeptiert das Dokument". --nonet verbietet jeden
+#    Netzzugriff auf externe DTDs/Entities.
+#
+#    B14-NB5: KEIN --noent mehr (s. Kopf-Block "DIE ENTITY-SPERRE" oben bei comdare_xml_has_doctype).
+#    Entity-Expansion wird nicht mehr erzwungen -- stattdessen wird jede Datei mit DOCTYPE strukturell
+#    abgelehnt (comdare_xml_has_doctype), womit Befund 2 (per Entity erzeugte Elemente) nicht mehr
+#    durch Substitution geloest wird, sondern durch Verbot der ganzen Entity-Maschinerie.
 #
 #    _tolerate_comment_text_defect: der EINE freischaltbare Ausnahmeweg (s.
 #    comdare_xml_lex_strip_comments). Er ist in BEIDE Richtungen verriegelt --
@@ -278,11 +374,13 @@ function(comdare_xml_open _ctx _label _file _tolerate_comment_text_defect _out_v
             "Kein Gruen ohne Inhalt.")
     endif()
     execute_process(
-        COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet --noent "${_file}"
-        RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_VARIABLE _err ERROR_STRIP_TRAILING_WHITESPACE)
+        COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet "${_file}"
+        RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_VARIABLE _err ERROR_STRIP_TRAILING_WHITESPACE
+        TIMEOUT 10)
     if(_rc EQUAL 0)
-        # B14-NB4 / Befund B3: RC 0 ist NICHT gleich "sauber gelesen". Der blockierte Entity-Load
-        # meldet sich nur hier.
+        # B14-NB4 / Befund B3 (weiterhin als allgemeiner Riegel gueltig -- RC 0 heisst nicht "sauber
+        # gelesen", auch unabhaengig von Entities: jede stderr-Ausgabe bei RC 0 ist eine Aussage des
+        # Parsers, die nicht wegfallen darf).
         comdare_xml_assert_clean_stderr("${_ctx}" "${_label}" "Wohlgeformtheits-Lauf" "${_file}" "${_err}")
         if(_tolerate_comment_text_defect)
             message(FATAL_ERROR
@@ -290,6 +388,17 @@ function(comdare_xml_open _ctx _label _file _tolerate_comment_text_defect _out_v
                 "die Datei ist aber inzwischen ROH wohlgeformt. Die Ausnahme ist damit erledigt: "
                 "die Freischaltung in tests/CMakeLists.txt ist zu ENTFERNEN. Eine Ausnahme, die "
                 "sich selbst ueberlebt, deckt irgendwann etwas anderes zu.")
+        endif()
+        # B14-NB5: DIE ENTITY-SPERRE (s. Kopf-Block bei comdare_xml_has_doctype). Kein --noent mehr,
+        # also strukturelles DOCTYPE-Verbot statt Entity-Einzelpruefung.
+        comdare_xml_has_doctype("${_ctx}" "${_label}" "${_file}" _has_dt)
+        if(_has_dt)
+            message(FATAL_ERROR
+                "${_ctx}: ${_label} '${_file}' traegt eine DOCTYPE-Deklaration. Diese Wache verbietet "
+                "DOCTYPE strukturell (B14-NB5, XXE-Heilung): ohne DOCTYPE kann XML KEINE <!ENTITY> "
+                "deklarieren, mit --noent waere jede -- auch eine lokale Datei-SYSTEM-Entity -- "
+                "geladen und in jede XPath-Antwort eingemischt worden. Fix: DOCTYPE aus der Datei "
+                "entfernen, oder diese Wache um eine begruendete Entity-Politik erweitern.")
         endif()
         set(${_out_var} "${_file}" PARENT_SCOPE)
         return()
@@ -319,13 +428,33 @@ function(comdare_xml_open _ctx _label _file _tolerate_comment_text_defect _out_v
     endif()
     comdare_xml_lex_strip_comments("${_ctx}" "${_file}" "${_raw}" _nocmt)
     comdare_xml_scratch_dir("${_ctx}" _scratch)
+    # B14-NB5: liegengebliebene ALTE Kopien fegen, BEVOR eine neue entsteht (Begruendung s.
+    # comdare_xml_sweep_stale_temp -- Milderung, keine Loesung, der cmake -P-Cleanup-Grenze).
+    comdare_xml_sweep_stale_temp("${_scratch}")
     string(MD5 _tag "${_file}")
-    string(RANDOM LENGTH 8 ALPHABET "0123456789abcdef" _rnd)
-    set(_tmp "${_scratch}/comdare-xmlwache-${_tag}-${_rnd}.xml")
+    # B14-NB5: 16 statt 8 Hex-Zeichen (64 statt 32 Bit Zufall) PLUS eine EXISTS-Gegenprobe mit
+    # begrenztem Neuversuch. Das ist keine echte Atomaritaet (file(WRITE) kennt kein O_EXCL, ein
+    # theoretisches TOCTOU-Fenster bleibt) -- aber fuer einen Test-Harness ohne feindliche
+    # Mitbenutzer des Scratch-Verzeichnisses senkt es die Kollisionswahrscheinlichkeit von
+    # praktisch relevant auf vernachlaessigbar.
+    set(_tmp "")
+    foreach(_attempt RANGE 1 5)
+        string(RANDOM LENGTH 16 ALPHABET "0123456789abcdef" _rnd)
+        set(_cand "${_scratch}/comdare-xmlwache-${_tag}-${_rnd}.xml")
+        if(NOT EXISTS "${_cand}")
+            set(_tmp "${_cand}")
+            break()
+        endif()
+    endforeach()
+    if(_tmp STREQUAL "")
+        message(FATAL_ERROR
+            "${_ctx}: konnte nach 5 Versuchen keinen freien Temp-Dateinamen in '${_scratch}' finden.")
+    endif()
     file(WRITE "${_tmp}" "${_nocmt}")
     execute_process(
-        COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet --noent "${_tmp}"
-        RESULT_VARIABLE _rc2 OUTPUT_QUIET ERROR_VARIABLE _err2 ERROR_STRIP_TRAILING_WHITESPACE)
+        COMMAND "${COMDARE_XMLLINT_EXE}" --noout --nonet "${_tmp}"
+        RESULT_VARIABLE _rc2 OUTPUT_QUIET ERROR_VARIABLE _err2 ERROR_STRIP_TRAILING_WHITESPACE
+        TIMEOUT 10)
     if(_rc2 EQUAL 0 AND NOT "${_err2}" STREQUAL "")
         file(REMOVE "${_tmp}")
         comdare_xml_assert_clean_stderr("${_ctx}" "${_label}" "Wohlgeformtheits-Lauf (kommentarfrei)"
@@ -338,6 +467,16 @@ function(comdare_xml_open _ctx _label _file _tolerate_comment_text_defect _out_v
             "Der Defekt liegt also NICHT nur im Kommentar-Text, und die Ausnahme deckt ihn nicht.\n"
             "  xmllint roh (RC=${_rc}):\n${_err}\n"
             "  xmllint kommentarfrei (RC=${_rc2}):\n${_err2}")
+    endif()
+    # B14-NB5: DIE ENTITY-SPERRE, auch fuer die kommentarfreie Ausnahme-Kopie (dieselbe Begruendung
+    # wie im rohen Zweig oben) -- mit Cleanup VOR dem FATAL, sonst bliebe die Kopie liegen.
+    comdare_xml_has_doctype("${_ctx}" "${_label}" "${_tmp}" _has_dt)
+    if(_has_dt)
+        file(REMOVE "${_tmp}")
+        message(FATAL_ERROR
+            "${_ctx}: ${_label} '${_file}' traegt eine DOCTYPE-Deklaration (auch nach Entfernen der "
+            "Kommentare noch vorhanden). Diese Wache verbietet DOCTYPE strukturell (B14-NB5, "
+            "XXE-Heilung, s. comdare_xml_has_doctype). Fix: DOCTYPE aus der Datei entfernen.")
     endif()
     message(STATUS
         "${_ctx}: XML-KOMMENTAR-TEXT-DEFEKT in ${_label} '${_file}' -- die Datei ist roh NICHT "
@@ -366,10 +505,14 @@ function(comdare_xml_query _ctx _label _file _expr _out_var)
     # Entfernt wird deshalb GENAU EIN abschliessender Zeilenumbruch (das Werkzeug-Artefakt), sonst
     # nichts. Wo eine Normalisierung fachlich gewollt ist (der Textinhalt eines <value>-Elements traegt
     # die Einrueckung des Dokuments), macht sie der AUFRUFER sichtbar per string(STRIP).
+    # B14-NB5: KEIN --noent mehr (Entity-Sperre s. comdare_xml_has_doctype) -- Attributwerte werden
+    # davon nicht beruehrt (XML-Attributwert-Normalisierung ist unabhaengig von --noent, empirisch
+    # belegt), und ein DOCTYPE-tragendes Dokument hat comdare_xml_open bereits vorher abgelehnt.
     execute_process(
-        COMMAND "${COMDARE_XMLLINT_EXE}" --noent --nonet --xpath "${_expr}" "${_file}"
+        COMMAND "${COMDARE_XMLLINT_EXE}" --nonet --xpath "${_expr}" "${_file}"
         OUTPUT_VARIABLE _out ERROR_VARIABLE _err RESULT_VARIABLE _rc
-        ERROR_STRIP_TRAILING_WHITESPACE)
+        ERROR_STRIP_TRAILING_WHITESPACE
+        TIMEOUT 10)
     if(NOT _rc EQUAL 0)
         message(FATAL_ERROR
             "${_ctx}: XPath-Abfrage auf ${_label} '${_file}' fehlgeschlagen (RC=${_rc}).\n"
@@ -384,11 +527,27 @@ function(comdare_xml_query _ctx _label _file _expr _out_var)
 endfunction()
 
 # -- count(): liefert immer eine Zahl, auch fuer die leere Knotenmenge.
+#
+#    AUSGEWIESENE GRENZE (B14-NB5, am Objekt geprueft statt behauptet): xmllints XPath-Zahl-zu-String-
+#    Wandlung bleibt fuer diesen Werkzeugstand bis in hohe zweistellige Milliarden dezimal (empirisch:
+#    string(1000000) = "1000000"), wechselt aber irgendwo zwischen 10^9 und 10^12 in Exponentialschreib-
+#    weise (empirisch: string(999999999999) = "9.99999999999e+11"). Der Regex unten erkennt nur die
+#    dezimale Form und FATALt auf der exponentiellen -- absichtlich LAUT, nicht still falsch: ein
+#    Vergleich gegen "9.99999999999e+11" waere mit CMakes EQUAL/GREATER ohnehin keine sinnvolle
+#    Ganzzahl-Aussage mehr. Eine Umwandlung wird hier NICHT gebaut: die Achsen-/Attribut-Zaehlungen
+#    dieser Wachen bewegen sich im ein- bis niedrigen zweistelligen Bereich (aktuell < 20 Achsen), viele
+#    Groessenordnungen unter der Schwelle. Eine Exponential-Parser-Implementierung fuer einen Bereich,
+#    der in dieser Domaene (handgeschriebene XML-Konfigurationsdateien) nie erreicht wird, waere selbst
+#    neues, ungetestetes Risiko fuer einen Fall, der nie eintritt -- die Grenze wird deshalb benannt,
+#    nicht verdeckt umgangen.
 function(comdare_xml_count _ctx _label _file _expr _out_var)
     comdare_xml_query("${_ctx}" "${_label}" "${_file}" "count(${_expr})" _n)
     if(NOT _n MATCHES "^[0-9]+$")
         message(FATAL_ERROR
-            "${_ctx}: count(${_expr}) auf ${_label} '${_file}' lieferte '${_n}' statt einer Zahl.")
+            "${_ctx}: count(${_expr}) auf ${_label} '${_file}' lieferte '${_n}' statt einer dezimalen "
+            "Ganzzahl -- vermutlich Exponentialschreibweise bei sehr grossen Knotenmengen (s. "
+            "Kopf-Kommentar dieser Funktion, AUSGEWIESENE GRENZE). Kein stilles Weiterrechnen mit "
+            "einem Wert, den EQUAL/GREATER nicht sinnvoll vergleichen koennen.")
     endif()
     set(${_out_var} "${_n}" PARENT_SCOPE)
 endfunction()
