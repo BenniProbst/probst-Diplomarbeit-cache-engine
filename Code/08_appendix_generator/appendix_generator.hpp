@@ -48,6 +48,14 @@ inline constexpr int status_empty_input = 12;
 inline constexpr std::array<std::string_view, 6> kSurfaceFields = {
     "ns_per_op", "op_insert_p50_ns", "op_lookup_p50_ns", "op_erase_p50_ns", "op_scan_p50_ns", "op_rmw_p50_ns"};
 
+// P1b (2026-08-06): die z-Felder der Working-Set-Sweep-Kurve -> ld_sweep_<z>.tex. Bewusst eine
+// MINIMALAUSWAHL statt aller 6: die Kurve traegt die Metrik ueber die Arbeitsmengen-Groesse
+// (working_set_n), und nur diese drei sind im Sweep-Korpus durchgaengig besetzt. Die Auswahl ist rein
+// additiv erweiterbar. HEADER-GETRIEBEN/n-a-tolerant: fehlt die working_set_n-Spalte (cowfix-v1-Korpus),
+// liefert write_working_set_sweep_curve status_empty_input -> KEINE Datei, KEIN Fehler.
+inline constexpr std::array<std::string_view, 3> kSweepFields = {"ns_per_op", "op_insert_p50_ns",
+                                                                 "op_lookup_p50_ns"};
+
 // ── ACHSEN-INVENTAR (2026-08-03) ──────────────────────────────────────────────
 // DIE LUECKE: bis hierher kannte diese Stufe NUR die VIER variablen Mess-Achsen
 // (c2l::kVariableAxes: search_algo, node_type, memory_layout, prefetch) — exakt
@@ -128,6 +136,14 @@ struct AppendixConfig {
     std::filesystem::path organ_axis_registry;
     std::filesystem::path system_axis_registry;
     std::filesystem::path measurement_axis_registry;
+    // -- GRAPH-UMBAU 2D/3D, P1c (2026-08-06): Referenz fuer die baseline-bezogenen Formen --------------
+    // Die Referenz ist eine ACHSENAUSPRAEGUNG des Korpus, KEINE externe Bibliothek: eine gemessene
+    // std::map-Serie existiert nicht (jedes std::map im Korpus ist das Konformitaets-Oracle des
+    // Pruefdocks, ein Korrektheits- und kein Leistungs-Datenpunkt). Default linear_scan = das
+    // unspezialisierte Suchverfahren, die naechstliegende ehrliche Naeherung an einen gemeinsamen Nenner.
+    // Kommt der Wert im Korpus nicht vor, sind die referenz-bezogenen Formen honest-empty.
+    std::string reference_axis  = "search_algo";
+    std::string reference_value = "linear_scan";
 };
 
 // Eingebaute Default-Bias-Caption je Sprache (= generate_wide_appendix.ps1:61-64).
@@ -147,6 +163,24 @@ struct AppendixConfig {
 // PLUS additiv (2026-08-03) das VOLLE Achsen-Inventar aus den drei generierten
 // Registry-XML, sofern die Pfade gesetzt sind:
 //   axis_inventory.tex  (Organ-Slots T00-T17 + System-Realm + Mess-Realm)
+// PLUS additiv (GRAPH-UMBAU 2D/3D, 2026-08-06) die 2D-/3D-Graph-Formen aus DENSELBEN
+// surf_rows (kein Doppel-Parsen); beide Writer existierten laengst, waren aber nie
+// verdrahtet:
+//   lc_surface3d_<z>.tex (6x, P1a: echte 3D-Flaeche je z-Feld, Rohdaten-/QA-Rolle)
+//   ld_sweep_<z>.tex     (3x, P1b: Metrik ueber working_set_n, eine Kurve je
+//                         gesweepter Achsen-Auspraegung; ohne die Spalte honest-empty)
+// PLUS die REFERENZ-BEZOGENEN Formen (Referenz = reference_axis/reference_value, eine
+// ACHSENAUSPRAEGUNG des Korpus, KEINE externe Bibliothek -- eine gemessene std::map-
+// Serie existiert nicht; fehlt die Referenz im Korpus, sind sie honest-empty):
+//   exchange_forest_vs_reference.tex (P1c, alle Geschwister-Paare EINER Achse auf die
+//                         Referenz gedreht; eigenes \label, sonst "multiply defined")
+//   lc_surface_ratio_<z>.tex (6x, P2: Median/Referenz-Median je Workload-Spalte,
+//                         divergente Farbskala um die Gleichheit -- die Abloesung der
+//                         Heatmap als ANALYSE-Figur; die rohe Heatmap bleibt daneben)
+//   lc_normbar_<z>.tex   (6x, P3a: dieselbe Aussage ueber die Lastprofile verdichtet,
+//                         EIN Balken je search_algo, Referenzlinie bei 1)
+//   latency_tradeoff.tex (P3b: Pareto-Streuung p50 gegen p99, ein Punkt je
+//                         Konfiguration und Op-Art; ohne p99-Spalten honest-empty)
 // HONEST-EMPTY: liefert ein Darstellungs-Writer status_empty_input (n/a-Daten), wird
 // die betreffende Datei bewusst NICHT geschrieben — das ist KEIN Facade-Fehler (die 12
 // Kern-.tex bleiben unberührt). Die 12 Kern-.tex sind byte-identisch zu den bisherigen

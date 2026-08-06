@@ -123,6 +123,32 @@ struct HeatmapData {
     // emittiert (reiner Text, wird escape_latex-durchgereicht). Leer -> neutraler ASCII-Default. Der
     // Aufrufer (write_surface_search_algo_x_workload) fuellt ihn sprach-lokalisiert.
     std::string empty_note;
+    // P2/DIVERGENTE FARBSKALA (2026-08-06) -- additiv, Default false = exakt das Bestandsverhalten
+    // (log10-viridis). Die Matrix traegt dann keine Latenzen in ns, sondern VERHAELTNISSE zu einer
+    // Referenz; deren aussagekraeftiger Punkt ist nicht das Minimum, sondern die Gleichheit
+    // (divergent_center, Default 1.0 = "so schnell wie die Referenz"). Eine sequentielle Skala kann das
+    // nicht zeigen: sie faerbt "20% schneller" und "20% langsamer" verschieden weit vom Rand, aber nie
+    // erkennbar als die zwei Seiten derselben Mitte.
+    //   divergent == true  -> point meta = log10(z / divergent_center), Farb-Domaene SYMMETRISCH um 0,
+    //                         3-Stuetzstellen-Colormap blau/weiss/rot (weiss sitzt damit exakt auf der
+    //                         Mitte, also auf der Gleichheit). KEIN externes Paket noetig.
+    //                         WARUM logarithmisch und nicht z-center: ein Verhaeltnis ist MULTIPLIKATIV --
+    //                         "doppelt so schnell" (0.5) und "doppelt so langsam" (2.0) muessen gleich
+    //                         weit von der Mitte liegen. Linear waeren sie es nicht (Abstand 0.5 gegen
+    //                         1.0), die schnellere Haelfte wuerde also systematisch zusammengedrueckt.
+    //                         Beleg am d03-Korpus: Verhaeltnisse 0.44..9.22 -> auf einer linearen, um 1
+    //                         zentrierten Domaene [-7.2:9.2] laegen ALLE Zellen unter 1 zwischen 46.6%
+    //                         und 50% der Skala, ein 2.3-fach schnellerer Algorithmus waere von "gleich
+    //                         schnell" farblich nicht zu unterscheiden.
+    //                         Ein Verhaeltnis 0 (Zaehler echt 0 gemessen) hat keinen Logarithmus und
+    //                         bekommt -- wortgleich zum log-Modus -- eine eigene Klasse eine Dekade
+    //                         unterhalb; die Domaene waechst dafuer SYMMETRISCH, damit die Mitte die
+    //                         Mitte bleibt.
+    //   divergent == false -> Bestand: point meta = log10(z), viridis, eigene 0-Farbklasse.
+    // Die drei Zell-Klassen (Wert > 0 / echte 0 / nicht ausgefuehrt) bleiben in BEIDEN Modi unveraendert;
+    // nur die Meta-Berechnung und die Colorbar-Beschriftung wechseln.
+    bool   divergent        = false;
+    double divergent_center = 1.0;
 };
 
 // Emittiert die 2D-Heatmap (matrix plot*, view={0}{90}, viridis, log-Farbskala).
@@ -310,10 +336,62 @@ inline constexpr std::array<std::string_view, WideMeasurementRow::kSegmentCount>
 // E-2b: nicht ausgefuehrte Zellen sind Loecher (z=nan + unbounded coords=jump), NIE ein Ersatzwert.
 // Traegt die Flaeche eine ECHT GEMESSENE 0, faellt die z-Achse auf LINEAR zurueck -- eine log-Achse
 // kann die 0 weder zeigen noch ehrlich ersetzen (Begruendung + Proben im .cpp).
+// P1a (2026-08-06): ROLLE = "3D-Rohdaten-Ansicht" (Diagnose/QA), NICHT Ergebnis-Abbildung. Beide
+// Flaechen-Achsen sind NOMINAL -- die aufgespannte Flaeche traegt keine Interpolations-/Trendaussage.
+// Titel UND Caption kommen ab P1a aus EINER Quelle (surface3d_title im .cpp); vorher blieb die Caption
+// leer, weil aggregate_surface_matrix nur Labels/Matrix/Maske fuellt und niemand data.title setzte.
 [[nodiscard]] int write_surface3d_search_algo_x_workload(std::filesystem::path const&        out,
                                                          std::span<WideMeasurementRow const> rows,
                                                          std::string const& z_field, std::string const& lang = "en",
                                                          PageConstraints const& cnst = {});
+
+// GRAPH-UMBAU 2D/3D, P2 (2026-08-06) -- BASELINE-RELATIVE VERHAELTNIS-MATRIX
+// -----------------------------------------------------------------------------
+// Die Abloesung der Heatmap als ANALYSE-Figur (die rohe Latenz-Heatmap bleibt als Rohdaten-/QA-Ansicht
+// bestehen). Zellwert ist nicht mehr der Rohmedian, sondern
+//     median(algo, workload) / median(reference_algo, workload)
+// also "wie viel langsamer/schneller als die Referenz in genau diesem Lastprofil". Erst dadurch traegt
+// die Flaeche einen Bezugspunkt (1.0) und damit ueberhaupt eine Aussage; zwei nominale Achsen ohne
+// Referenz sind methodisch schwach. reference_algo ist eine ACHSENAUSPRAEGUNG (z.B. "linear_scan"),
+// KEINE externe Bibliothek -- eine gemessene std::map-Serie existiert im Korpus nicht.
+//
+// AUSFUEHRUNGS-REGEL (die honest-empty-Kernwache dieser Form): eine Verhaeltnis-Zelle ist NUR dann
+// executed, wenn ZAEHLER UND NENNER EINZELN ausgefuehrt und darstellbar sind. Fehlt die Referenz fuer
+// eine Workload-Spalte (kein Referenz-Lauf in diesem Lastprofil), bleibt die GANZE Spalte
+// nicht-ausgefuehrt -- NIEMALS eine Ratio gegen eine fehlende Baseline. Zusaetzlich gilt: ein Nenner von
+// ECHT GEMESSENEN 0 ns macht das Verhaeltnis mathematisch undefiniert (nicht unendlich) -> die Zelle
+// wird ausgelassen. Ein ZAEHLER von echt 0 ist dagegen ein gueltiges Verhaeltnis 0 und wird DARGESTELLT
+// (E-2b-Doktrin: die gemessene 0 ist ein Messwert).
+//
+// Fehlt die Referenz-Zeile im gesamten Korpus, traegt KEINE Zelle Daten -> write_heatmap schreibt seinen
+// ehrlichen Platzhalter-Vermerk (kein pgfplots-Fatal, kompilierfaehige Datei).
+[[nodiscard]] int write_surface_ratio_vs_reference(std::filesystem::path const&        out,
+                                                   std::span<WideMeasurementRow const> rows,
+                                                   std::string const& z_field, std::string const& reference_algo,
+                                                   std::string const& lang = "en", PageConstraints const& cnst = {});
+
+// GRAPH-UMBAU 2D/3D, P3a (2026-08-06) -- BASELINE-NORMALISIERTES BALKENDIAGRAMM
+// -----------------------------------------------------------------------------
+// Dieselbe Aussage wie die Verhaeltnis-Matrix (P2), aber ueber die Lastprofile ZUSAMMENGEFASST: EIN
+// Balken je search_algo, Hoehe = nearest-rank-Median der lastprofil-weisen Verhaeltnisse zur Referenz.
+// Waagerechte Referenzlinie bei 1. Faerbung nach Seite (unter 1 = schneller, ueber 1 = langsamer).
+// Die Matrix zeigt, WO ein Unterschied herkommt; der Balken zeigt, OB er ueber die Lastprofile traegt.
+//
+// AGGREGATION UEBER VERHAELTNISSE, NICHT UEBER ROHWERTEN: der Median wird ueber die je Lastprofil
+// gebildeten Verhaeltnisse genommen, nicht als Verhaeltnis zweier Roh-Mediane. Nur so zaehlt jedes
+// Lastprofil gleich; sonst dominierte das langsamste Lastprofil die Aussage allein durch seine
+// absolute Groesse.
+//
+// HONEST-EMPTY: Gruppen ohne ein einziges gueltiges Verhaeltnis (keine Referenz in ihren Lastprofilen)
+// werden AUSGELASSEN -- niemals auf 1.0 ("wie die Referenz") oder 0 gesetzt. Traegt KEINE Gruppe ein
+// gueltiges Verhaeltnis -> status_empty_input, KEINE Datei (Muster der Darstellungs-Writer 5a-5e).
+// y-ACHSEN-MODUS (E-2b-Praezedenz): LOG, weil Verhaeltnisse Dekaden spannen -- faellt aber ein Balken
+// auf exakt 0 (Zaehler echt 0 gemessen), fallen alle auf LINEAR zurueck: eine log-Achse kann die 0
+// weder zeigen noch ehrlich ersetzen.
+[[nodiscard]] int write_normalized_bar_vs_reference(std::filesystem::path const&        out,
+                                                    std::span<WideMeasurementRow const> rows,
+                                                    std::string const& z_field, std::string const& reference_algo,
+                                                    std::string const& lang = "en", PageConstraints const& cnst = {});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // A2 / m3v2 (2026-06-20) — Working-Set-Sweep-Kurve (Metrik über working_set_n)
@@ -414,6 +492,50 @@ struct LatencyEcdfSeries {
 // Konfigurationen" (Config-Streuung) aus — NICHT Per-Operation. Guard: keine gültige Zeile → status_empty_input.
 [[nodiscard]] int write_latency_ecdf(std::filesystem::path const& out, std::span<WideMeasurementRow const> rows,
                                      std::string const& lang = "en", PageConstraints const& cnst = {});
+
+// -----------------------------------------------------------------------------
+// E-2c (2026-08-06) -- Pareto-/Tradeoff-Streuung Median-Latenz vs. Tail-Latenz
+// -----------------------------------------------------------------------------
+//
+// OWNER-KERN E-2 ("eine Heatmap ist vielleicht nicht die geeignete Form, wie machen das die anderen Paper?
+// Orientiere dich daran und verwende 2D und 3D Graphen."). Der SOTA-Katalog der Planungs-Welle
+// (docs/sessions/backups/20260806-e2a-planungs-welle/, Katalog-Position #7) benennt den Scatter-/Pareto-
+// Tradeoff-Plot als eine der Kernformen der einschlaegigen Paper-Familie (Idreos/Dayan "Learning Key-Value
+// Store Design" Fig. 8; Monkey/Dostoevsky Pareto-Fronten) -- zwei KONKURRIERENDE Kostenachsen, je
+// Konfiguration ein Punkt, statt zweier nominaler Kategorien in einer Farbskala.
+//
+// EHRLICHKEITS-GRUNDLAGE (dieselbe wie P3): das WIDE-Schema traegt je Permutation NUR p50/p99, NICHT die
+// rohen Einzel-Op-Latenzen. Genau diese zwei Perzentile SIND aber ein echtes Kostenpaar: Median-Latenz
+// (typischer Fall) gegen Tail-Latenz (p99, Dienstguete-Fall). Der Plot erfindet also nichts, sondern traegt
+// exakt die beiden vorhandenen Groessen gegeneinander auf. KEINE Aggregation ueber Konfigurationen: jede
+// gueltige (Zeile x Op-Art) ist EIN Punkt -- die Punktwolke IST die Aussage (Streuung der Konfigurationen).
+struct LatencyTradeoffPoint {
+    std::string algo;     // search_algo (Serie/Farbe)
+    std::string op;       // Op-Art (insert/lookup/erase/scan/rmw)
+    std::string workload; // Lastprofil der Zeile (Diagnose; nicht plot-tragend)
+    double      p50_ns = 0.0;
+    double      p99_ns = 0.0;
+};
+
+// Sammelt die Tradeoff-Punkte. AUFNAHME-REGELN (alle bereits im Modul etabliert, hier nur wiederverwendet):
+// two_phase_valid UND search_algo nicht leer UND has_op_p99 (ohne p99 gibt es kein Kostenpaar -> Zeile honest
+// ausgelassen, NICHT p99:=p50 gesetzt) UND Op AUSGEFUEHRT (Zaehler op_<art>_n zuerst, sonst p50>0-Heuristik --
+// wortgleich zu z_field_executed) UND scan-No-Op-Profile "ycsb_e"/"lp_range_scan" ausgeschlossen. Eine ECHT
+// GEMESSENE 0 ist ein gueltiger Punkt (E-2b-Doktrin), KEIN Ausschlussgrund. Leer <=> keine gueltige Zeile.
+[[nodiscard]] std::vector<LatencyTradeoffPoint> aggregate_latency_tradeoff(std::span<WideMeasurementRow const> rows);
+
+// Emittiert die Pareto-/Tradeoff-Streuung (x = p50, y = p99, `only marks`, 1 Serie je search_algo mit eigener
+// Farbe+Marke, plus die Diagonale y=x als Referenz "kein Tail-Aufschlag"; Punkte oberhalb der Diagonale
+// zahlen Tail-Aufschlag, das ist die Lese-Anweisung im Titel).
+// ACHSEN-MODUS (E-2b-Praezedenz des 3D-Pfades, wortgleich uebernommen): beide Achsen LOG, weil die Latenz
+// Dekaden spannt -- ABER faellt EIN darzustellender Wert auf exakt 0 (echt gemessene 0), fallen BEIDE Achsen
+// auf LINEAR zurueck: eine log-Achse kann die 0 weder zeigen noch ehrlich ersetzen (sie verschluckt sie
+// lautlos als unbounded coordinate = verschwiegener Messwert).
+// HONEST-EMPTY: kein einziger gueltiger Punkt -> status_empty_input (KEINE Datei, kein leerer Plot) -- exakt
+// das write_latency_range_bar/write_segment_attribution_stacked_bar-Muster. Breiten-sicher (resizebox_wrap).
+[[nodiscard]] int write_latency_tradeoff_scatter(std::filesystem::path const&        out,
+                                                 std::span<WideMeasurementRow const> rows,
+                                                 std::string const& lang = "en", PageConstraints const& cnst = {});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INC-4 (2026-07-13) — Modus-2 Per-Achsen-Observer-Detail-Tabelle (stat_<achse>_<feld>)

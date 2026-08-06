@@ -521,6 +521,53 @@ std::vector<ExchangeAggregate> aggregate_exchange(std::span<WideFullRow const>  
 
 namespace {
 
+// P1c (2026-08-06) -- exakte Richtungs-Umkehr des RELATIVEN Deltas.
+// d = (m_to - m_from)/m_from, gesucht ist d' = (m_from - m_to)/m_to. Aus m_to/m_from = 1+d folgt
+// d' = 1/(1+d) - 1 = -d/(1+d). Streng monoton fallend auf d > -1 -> bildet Median auf Median ab.
+// Blosse Vorzeichen-Umkehr waere falsch (bei d=+1.0 lieferte sie -1.0 statt der korrekten -0.5).
+[[nodiscard]] double flip_rel_delta(double d) { return -d / (1.0 + d); }
+
+} // namespace
+
+std::vector<ExchangeAggregate> select_exchange_vs_reference(std::span<ExchangeAggregate const> aggs,
+                                                            std::string_view axis, std::string_view reference_value) {
+    std::vector<ExchangeAggregate> out;
+    for (auto const& a : aggs) {
+        if (a.axis != axis) continue;
+        bool const ref_is_from = (a.value_from == reference_value);
+        bool const ref_is_to   = (a.value_to == reference_value);
+        if (!ref_is_from && !ref_is_to) continue; // Paar beruehrt die Referenz nicht
+        if (ref_is_from && ref_is_to) continue;   // entartetes Paar (kann aggregate_exchange nicht bilden)
+
+        if (ref_is_from) { // kanonische Richtung passt bereits: Referenz steht links
+            out.push_back(a);
+            continue;
+        }
+
+        // Referenz steht rechts -> Paar drehen, damit sie IMMER value_from ist.
+        // Die drei umzurechnenden Punkte sind der Median und die beiden Whisker-Endpunkte, die der
+        // Forest-Plot ohnehin zeichnet (Median +- IQR/2). Alle drei muessen > -1 liegen (bei positiven
+        // Latenz-Medianen immer erfuellt); sonst ist die Umrechnung undefiniert und das Paar wird HONEST
+        // AUSGELASSEN statt mit einem erfundenen Wert gefuehrt.
+        double const med = a.median_rel_delta;
+        double const lo  = med - a.iqr_rel_delta / 2.0;
+        double const hi  = med + a.iqr_rel_delta / 2.0;
+        if (!(med > -1.0) || !(lo > -1.0) || !(hi > -1.0)) continue;
+
+        ExchangeAggregate e = a;
+        e.value_from        = a.value_to; // = die Referenz
+        e.value_to          = a.value_from;
+        e.median_abs_delta_ns = -a.median_abs_delta_ns; // exakte Negation
+        e.median_rel_delta    = flip_rel_delta(med);
+        // f ist fallend -> f(hi) ist die neue untere, f(lo) die neue obere Grenze; die Breite ist ihr Abstand.
+        e.iqr_rel_delta = std::abs(flip_rel_delta(lo) - flip_rel_delta(hi));
+        out.push_back(std::move(e));
+    }
+    return out;
+}
+
+namespace {
+
 // Vorbehalt-Klassifikation der 4 variablen Achsen (Plan-Default-Auflösung L-d.2).
 [[nodiscard]] bool axis_has_q2_caveat(std::string const& axis) {
     return axis == "node_type" || axis == "memory_layout"; // Q2-Schritt-4-Beschattung möglich
@@ -680,8 +727,13 @@ struct ForestRow {
 
 int write_exchange_forest_plot(std::filesystem::path const& out, std::span<ExchangeAggregate const> aggs,
                                std::span<SiblingPairCount const> counts, std::string const& lang, bool body_only,
-                               std::size_t small_n_threshold) {
+                               std::size_t small_n_threshold, std::string_view reference_value) {
     bool const de = (lang == "de");
+    // P1c: leer = Bestandsverhalten (Geschwister-Paare untereinander). Gesetzt = alle Zeilen sind bereits
+    // auf DIESE Referenz-Achsenauspraegung gedreht (select_exchange_vs_reference), die Beschriftung muss
+    // das sagen -- sonst stuenden zwei optisch gleiche Figuren mit verschiedener Aussage im Anhang.
+    bool const        vs_ref = !reference_value.empty();
+    std::string const ref_tex = vs_ref ? escape_latex(std::string{reference_value}) : std::string{};
 
     // 1) NUR die ns_per_op-Headline; je Achse (kVariableAxes-Reihenfolge) die Wertepaare sortiert. n=0-Aggregate
     //    (kein definiertes rel-Delta, z.B. durchweg Zero-Baseline) werden NIE als „+0"-Zeile aufgenommen (Phantom).
@@ -790,13 +842,19 @@ int write_exchange_forest_plot(std::filesystem::path const& out, std::span<Excha
     f << "    y tick label style={font=\\tiny},\n";
     f << "    x tick label style={font=\\tiny},\n";
     f << "    xlabel={"
-      << (de ? "Median rel.\\ $\\Delta$ ns/op (bzgl.\\ $v$; $<0$ = schneller)"
-             : "median rel.\\ $\\Delta$ ns/op (w.r.t.\\ $v$; $<0$ = faster)")
+      << (vs_ref ? (de ? ("Median rel.\\ $\\Delta$ ns/op (bzgl.\\ Referenz \\texttt{" + ref_tex +
+                          "}; $<0$ = schneller)")
+                       : ("median rel.\\ $\\Delta$ ns/op (w.r.t.\\ reference \\texttt{" + ref_tex +
+                          "}; $<0$ = faster)"))
+                 : std::string{de ? "Median rel.\\ $\\Delta$ ns/op (bzgl.\\ $v$; $<0$ = schneller)"
+                                  : "median rel.\\ $\\Delta$ ns/op (w.r.t.\\ $v$; $<0$ = faster)"})
       << "},\n";
     f << "    xlabel style={font=\\footnotesize},\n";
     f << "    title={"
-      << (de ? "Achsen-Austauschbarkeit (Forest-Plot, ns/op-Headline)"
-             : "Axis exchangeability (forest plot, ns/op headline)")
+      << (vs_ref ? (de ? ("Vergleich gegen Referenz \\texttt{" + ref_tex + "} (Forest-Plot, ns/op-Headline)")
+                       : ("Comparison against reference \\texttt{" + ref_tex + "} (forest plot, ns/op headline)"))
+                 : std::string{de ? "Achsen-Austauschbarkeit (Forest-Plot, ns/op-Headline)"
+                                  : "Axis exchangeability (forest plot, ns/op headline)"})
       << "},\n";
     f << "    title style={font=\\footnotesize},\n";
     f << "    xmajorgrids=true,\n";
@@ -871,7 +929,21 @@ int write_exchange_forest_plot(std::filesystem::path const& out, std::span<Excha
                   std::to_string(small_n_threshold) +
                   "$ pair-workload diffs, division-by-$\\approx$0 "
                   "unstable). Only real aggregate values; visual complement to the ld\\_exchange longtables.");
-        f << "\\caption{" << cap << "}\\label{fig:ld:exchange:forest}\n\\end{figure}\n";
+        // P1c: die referenz-bezogene Variante bekommt einen eigenen Caption-Zusatz UND ein eigenes \label.
+        // Der Zusatz benennt die Referenz als ACHSENAUSPRAEGUNG -- im Korpus existiert KEINE std::map-
+        // Leistungsserie (jedes std::map dort ist das Konformitaets-Oracle des Pruefdocks), eine
+        // "gegen std::map"-Behauptung waere also frei erfunden.
+        std::string const cap_full =
+            vs_ref ? (cap + (de ? (" ALLE Zeilen sind auf die Referenz-Achsenauspraegung \\texttt{" + ref_tex +
+                                   "} gedreht: $v$ ist durchweg die Referenz, $v'$ die verglichene "
+                                   "Auspraegung. Die Referenz ist eine gemessene Achsenauspraegung, "
+                                   "KEINE externe Bibliotheks-Baseline.")
+                                : (" All rows are oriented towards the reference axis value \\texttt{" + ref_tex +
+                                   "}: $v$ is always the reference, $v'$ the compared value. The reference is a "
+                                   "measured axis value, NOT an external library baseline.")))
+                   : cap;
+        f << "\\caption{" << cap_full << "}\\label{fig:ld:exchange:forest"
+          << (vs_ref ? ":ref" : "") << "}\n\\end{figure}\n";
     }
 
     return f.good() ? status_ok : status_io_error;

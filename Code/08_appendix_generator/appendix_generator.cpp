@@ -426,8 +426,106 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             return status_io_error;
         }
 
+        // -- (5g) GRAPH-UMBAU 2D/3D, P1a (2026-08-06): die echte 3D-Flaeche je z-Feld ---------------------
+        // Die Funktion war seit L-c gebaut und honest-empty-hart (E-2b), aber NIRGENDS verdrahtet -- im
+        // Anhang stand je Metrik ausschliesslich die 2D-Heatmap. Owner-KERN E-2 verlangt 2D UND 3D.
+        // ROLLEN-SCHNITT: lc_surface_<z> (2D) und lc_surface3d_<z> (3D) sind beide Rohdaten-/QA-Ansichten
+        // derselben (search_algo x workload)-Matrix -- zwei NOMINALE Achsen tragen keine Trendaussage.
+        // KEIN Ersatz: die 6 lc_surface_<z> oben bleiben unveraendert (blankes \input in A_measurements).
+        // dg_ok-Toleranz wie (5a)-(5e): ohne gueltige Achsen gibt es keine Datei, das ist kein Fehler.
+        for (auto const z_sv : kSurfaceFields) {
+            std::string const z{z_sv};
+            if (int const rc = dg::write_surface3d_search_algo_x_workload(out_dir / ("lc_surface3d_" + z + ".tex"),
+                                                                          surf_rows, z, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_surface3d (" << z << "," << lang << ") failed " << rc << "\n";
+                return status_io_error;
+            }
+        }
+
+        // -- (5h) GRAPH-UMBAU 2D/3D, P1b (2026-08-06): Working-Set-Sweep-Kurve je z-Feld ------------------
+        // Die klassische 2D-Paper-Form: Metrik ueber die Arbeitsmengen-Groesse, eine Kurve je gesweepter
+        // Achsen-Auspraegung. Anders als die Flaeche traegt hier die x-Achse eine ECHTE Ordnung
+        // (working_set_n), die Kurve zwischen den Stuetzstellen ist also lesbar. Ebenfalls seit A2 gebaut
+        // und bis hier unverdrahtet. Auf cowfix-v1-Korpora ohne working_set_n-Spalte ist der Aufruf ein
+        // reines No-Op (status_empty_input, keine Datei) -- deshalb ist das Wiring risikofrei.
+        for (auto const z_sv : kSweepFields) {
+            std::string const z{z_sv};
+            if (int const rc =
+                    dg::write_working_set_sweep_curve(out_dir / ("ld_sweep_" + z + ".tex"), surf_rows, z, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_working_set_sweep_curve (" << z << "," << lang << ") failed "
+                          << rc << "\n";
+                return status_io_error;
+            }
+        }
+
+        // -- (5i) GRAPH-UMBAU 2D/3D, P1c (2026-08-06): Forest-Plot gegen eine FESTE Referenz ------------
+        // Der bestehende exchange_forest.tex vergleicht Geschwister-Paare UNTEREINANDER; welche
+        // Auspraegung "der Massstab" ist, bleibt dort offen. Diese Variante dreht alle Paare EINER Achse
+        // auf EINE Referenz-Auspraegung (Default search_algo/linear_scan) -- dieselbe Aggregation,
+        // dieselbe Zeichen-Funktion, nur eine duenne Auswahl-/Umrechnungsschicht davor.
+        // Die Referenz-Umrechnung ist exakt (nicht blosse Vorzeichen-Umkehr), siehe
+        // select_exchange_vs_reference. KEINE std::map-Baseline: die gibt es im Korpus nicht.
+        {
+            auto const ref_aggs = c2l::select_exchange_vs_reference(exch_aggs, cfg.reference_axis,
+                                                                     cfg.reference_value);
+            if (int const rc = c2l::write_exchange_forest_plot(out_dir / "exchange_forest_vs_reference.tex", ref_aggs,
+                                                               exch_counts, lang, /*body_only=*/false,
+                                                               c2l::kExchangeForestSmallSampleThreshold,
+                                                               cfg.reference_value);
+                !c2l_ok(rc)) {
+                std::cerr << "appendix-generator: write_exchange_forest_plot (vs-reference," << lang << ") failed "
+                          << rc << "\n";
+                return status_io_error;
+            }
+        }
+
+        // -- (5j) GRAPH-UMBAU 2D/3D, P2 (2026-08-06): baseline-relative Verhaeltnis-Matrix -------------
+        // Die vom SOTA-Katalog empfohlene Abloesung der Heatmap als ANALYSE-Figur. Die rohe Latenz-
+        // Heatmap (lc_surface_<z>) bleibt daneben bestehen und wechselt nur die Rolle zur Rohdaten-/QA-
+        // Ansicht. Zellwert = Median / Referenz-Median DERSELBEN Workload-Spalte, divergente Farbskala
+        // um 1.0. Referenz = cfg.reference_value (Achsenauspraegung, KEINE externe Bibliothek).
+        for (auto const z_sv : kSurfaceFields) {
+            std::string const z{z_sv};
+            if (int const rc = dg::write_surface_ratio_vs_reference(out_dir / ("lc_surface_ratio_" + z + ".tex"),
+                                                                     surf_rows, z, cfg.reference_value, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_surface_ratio_vs_reference (" << z << "," << lang
+                          << ") failed " << rc << "\n";
+                return status_io_error;
+            }
+        }
+
+        // -- (5k) GRAPH-UMBAU 2D/3D, P3a (2026-08-06): baseline-normalisierte Balken -------------------
+        // Verdichtet die Verhaeltnis-Matrix ueber die Lastprofile zu EINEM Balken je search_algo. Die
+        // Matrix zeigt, WO ein Unterschied herkommt; der Balken, OB er ueber die Lastprofile traegt.
+        // honest-empty: ohne gueltiges Verhaeltnis KEINE Datei (dg_ok-Toleranz).
+        for (auto const z_sv : kSurfaceFields) {
+            std::string const z{z_sv};
+            if (int const rc = dg::write_normalized_bar_vs_reference(out_dir / ("lc_normbar_" + z + ".tex"), surf_rows,
+                                                                      z, cfg.reference_value, lang);
+                !dg_ok(rc)) {
+                std::cerr << "appendix-generator: write_normalized_bar_vs_reference (" << z << "," << lang
+                          << ") failed " << rc << "\n";
+                return status_io_error;
+            }
+        }
+
+        // -- (5l) GRAPH-UMBAU 2D/3D, P3b (2026-08-06): Pareto-/Tradeoff-Streuung p50 gegen p99 ---------
+        // Die einzige Form hier, die ZWEI KONKURRIERENDE Kostenachsen gegeneinander auftraegt (Idreos/
+        // Dayan-Familie). Ein echter Lese-vs-Speicher-Pareto ist NICHT moeglich: das WIDE-Schema traegt
+        // keine Speicher-/Byte-Spalte -- p50 gegen p99 (typischer Fall gegen Dienstguete-Fall) ist das
+        // Kostenpaar, das die Daten wirklich hergeben. honest-empty ohne p99 (dg_ok-Toleranz).
+        if (int const rc = dg::write_latency_tradeoff_scatter(out_dir / "latency_tradeoff.tex", surf_rows, lang);
+            !dg_ok(rc)) {
+            std::cerr << "appendix-generator: write_latency_tradeoff_scatter (" << lang << ") failed " << rc << "\n";
+            return status_io_error;
+        }
+
         std::cout << "appendix-generator [" << lang
-                  << "]: 12 Kern- + 5 Darstellungs-.tex + Achsen-Inventar (honest-empty ⇒ ggf. ausgelassen) -> "
+                  << "]: 12 Kern- + 5 Darstellungs-.tex + 3D-Flaechen + Sweep-Kurven + Achsen-Inventar "
+                     "(honest-empty ausgelassen wo ohne Daten) -> "
                   << out_dir << "\n";
     }
     return status_ok;

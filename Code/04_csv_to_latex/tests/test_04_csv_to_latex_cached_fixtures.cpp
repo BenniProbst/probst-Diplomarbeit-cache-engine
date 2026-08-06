@@ -395,3 +395,142 @@ TEST(Stufe04Pipeline, ForestPlotHonestEmptyGuard) {
     EXPECT_EQ(c2l::write_exchange_forest_plot(out, only_lookup, counts, "de", false, 3), c2l::status_empty_input);
     EXPECT_FALSE(fs::exists(out));
 }
+
+// -----------------------------------------------------------------------------
+// GRAPH-UMBAU 2D/3D, P1c (2026-08-06) -- select_exchange_vs_reference
+// -----------------------------------------------------------------------------
+// aggregate_exchange kanonisiert jedes ungeordnete Geschwister-Paar lexikographisch (value_from <
+// value_to). Eine feste Referenz steht deshalb je nach Name mal links, mal rechts -- "linear_scan" ist
+// der lexikographisch letzte search_algo-Wert und steht IMMER rechts, jedes Paar muss also gedreht
+// werden. Die Drehung des RELATIVEN Deltas ist KEINE Vorzeichen-Umkehr: der Bezugswert (Nenner)
+// wechselt mit, exakt gilt d' = -d/(1+d).
+namespace {
+
+c2l::ExchangeAggregate mk_exch(std::string const& axis, std::string const& from, std::string const& to, double rel,
+                               double iqr, double abs_ns, std::size_t n) {
+    c2l::ExchangeAggregate e;
+    e.axis                  = axis;
+    e.value_from            = from;
+    e.value_to              = to;
+    e.interface_fn          = "ns_per_op";
+    e.pair_workload_samples = n;
+    e.median_abs_delta_ns   = abs_ns;
+    e.median_rel_delta      = rel;
+    e.iqr_rel_delta         = iqr;
+    return e;
+}
+
+} // namespace
+
+// (P1c-t1) Steht die Referenz rechts, wird das Paar gedreht UND das relative Delta korrekt umgerechnet.
+// Prueffall d = +1.0 ("Ziel doppelt so langsam wie v"): die korrekte Gegenrichtung ist -0.5 (die
+// Referenz ist halb so langsam), NICHT -1.0. Genau hier scheitert eine blosse Vorzeichen-Umkehr.
+TEST(Stufe04Pipeline, SelectExchangeVsReferenceFlipsWithCorrectRelativeBase) {
+    std::vector<c2l::ExchangeAggregate> aggs = {
+        mk_exch("search_algo", "k_ary", "linear_scan", /*rel=*/1.0, /*iqr=*/0.0, /*abs_ns=*/40.0, /*n=*/100)};
+
+    auto const sel = c2l::select_exchange_vs_reference(aggs, "search_algo", "linear_scan");
+    ASSERT_EQ(sel.size(), 1u);
+    EXPECT_EQ(sel[0].value_from, "linear_scan"); // Referenz steht jetzt links
+    EXPECT_EQ(sel[0].value_to, "k_ary");
+    EXPECT_NEAR(sel[0].median_rel_delta, -0.5, 1e-12); // -d/(1+d) = -1/2, NICHT -1.0
+    EXPECT_NEAR(sel[0].median_abs_delta_ns, -40.0, 1e-12); // absolutes Delta: exakte Negation
+    EXPECT_EQ(sel[0].pair_workload_samples, 100u);         // Stichprobenzahl bleibt
+    EXPECT_EQ(sel[0].interface_fn, "ns_per_op");
+}
+
+// (P1c-t2) Steht die Referenz bereits links, bleibt das Aggregat UNVERAENDERT (keine Umrechnung).
+TEST(Stufe04Pipeline, SelectExchangeVsReferenceKeepsAlreadyCanonicalPairs) {
+    std::vector<c2l::ExchangeAggregate> aggs = {
+        mk_exch("search_algo", "eytzinger", "k_ary", /*rel=*/0.25, /*iqr=*/0.1, /*abs_ns=*/12.0, /*n=*/50)};
+
+    auto const sel = c2l::select_exchange_vs_reference(aggs, "search_algo", "eytzinger");
+    ASSERT_EQ(sel.size(), 1u);
+    EXPECT_EQ(sel[0].value_from, "eytzinger");
+    EXPECT_EQ(sel[0].value_to, "k_ary");
+    EXPECT_NEAR(sel[0].median_rel_delta, 0.25, 1e-12);
+    EXPECT_NEAR(sel[0].median_abs_delta_ns, 12.0, 1e-12);
+    EXPECT_NEAR(sel[0].iqr_rel_delta, 0.1, 1e-12);
+}
+
+// (P1c-t3) Der IQR wird ueber die Endpunkte umgerechnet, die der Forest-Plot ohnehin zeichnet
+// (Median +- IQR/2), nicht einfach uebernommen: f ist nichtlinear, eine unveraenderte Breite waere falsch.
+// d=1.0, IQR=1.0 -> Endpunkte 0.5 und 1.5 -> f(0.5)=-1/3, f(1.5)=-0.6 -> neue Breite 4/15.
+TEST(Stufe04Pipeline, SelectExchangeVsReferenceTransformsIqrThroughTheSameMap) {
+    std::vector<c2l::ExchangeAggregate> aggs = {
+        mk_exch("search_algo", "k_ary", "linear_scan", /*rel=*/1.0, /*iqr=*/1.0, /*abs_ns=*/40.0, /*n=*/100)};
+
+    auto const sel = c2l::select_exchange_vs_reference(aggs, "search_algo", "linear_scan");
+    ASSERT_EQ(sel.size(), 1u);
+    EXPECT_NEAR(sel[0].median_rel_delta, -0.5, 1e-12);
+    EXPECT_NEAR(sel[0].iqr_rel_delta, 4.0 / 15.0, 1e-12); // |f(0.5) - f(1.5)| = |-1/3 + 3/5|
+    EXPECT_NE(sel[0].iqr_rel_delta, 1.0);                 // ausdruecklich NICHT unveraendert uebernommen
+}
+
+// (P1c-t4) Fremde Achsen und Paare ohne Referenz-Beteiligung fallen heraus.
+TEST(Stufe04Pipeline, SelectExchangeVsReferenceFiltersAxisAndUnrelatedPairs) {
+    std::vector<c2l::ExchangeAggregate> aggs = {
+        mk_exch("search_algo", "k_ary", "linear_scan", 1.0, 0.0, 40.0, 100),  // trifft zu (gedreht)
+        mk_exch("search_algo", "eytzinger", "k_ary", 0.2, 0.0, 5.0, 100),     // beruehrt Referenz nicht
+        mk_exch("node_type", "node4", "linear_scan", 0.3, 0.0, 7.0, 100)};    // falsche Achse
+
+    auto const sel = c2l::select_exchange_vs_reference(aggs, "search_algo", "linear_scan");
+    ASSERT_EQ(sel.size(), 1u);
+    EXPECT_EQ(sel[0].value_to, "k_ary");
+}
+
+// (P1c-t5) HONEST-EMPTY: kommt die Referenz in keinem Paar vor (nie gemessen), ist das Ergebnis leer --
+// und die bestehende Wache von write_exchange_forest_plot liefert dann status_empty_input OHNE Datei.
+TEST(Stufe04Pipeline, SelectExchangeVsReferenceEmptyWhenReferenceNeverMeasured) {
+    std::vector<c2l::ExchangeAggregate> aggs = {mk_exch("search_algo", "eytzinger", "k_ary", 0.2, 0.0, 5.0, 100)};
+
+    auto const sel = c2l::select_exchange_vs_reference(aggs, "search_algo", "linear_scan");
+    EXPECT_TRUE(sel.empty());
+
+    std::vector<c2l::SiblingPairCount> counts;
+    auto            out = comdare_user_tmp() / "p1c_forest_ref_empty.tex";
+    std::error_code ec;
+    fs::remove(out, ec);
+    EXPECT_EQ(c2l::write_exchange_forest_plot(out, sel, counts, "en", false,
+                                              c2l::kExchangeForestSmallSampleThreshold, "linear_scan"),
+              c2l::status_empty_input);
+    EXPECT_FALSE(fs::exists(out)); // KEINE Datei
+}
+
+// (P1c-t6) Die referenz-bezogene Figur ist von der Bestands-Figur UNTERSCHEIDBAR: eigener Titel, eigenes
+// xlabel, eigenes \label. Ohne das eigene \label waeren beide Figuren im selben Dokument "multiply
+// defined". Bei LEEREM reference_value bleibt alles exakt beim Bestand (Byte-Identitaet der Alt-Figur).
+TEST(Stufe04Pipeline, ForestPlotReferenceVariantIsDistinguishableAndLabelIsUnique) {
+    std::vector<c2l::ExchangeAggregate> aggs = {
+        mk_exch("search_algo", "k_ary", "linear_scan", 1.0, 0.2, 40.0, 100)};
+    std::vector<c2l::SiblingPairCount> counts;
+    std::error_code                    ec;
+
+    // (a) Referenz-Variante
+    auto out_ref = comdare_user_tmp() / "p1c_forest_ref.tex";
+    fs::remove(out_ref, ec);
+    auto const sel = c2l::select_exchange_vs_reference(aggs, "search_algo", "linear_scan");
+    ASSERT_EQ(c2l::write_exchange_forest_plot(out_ref, sel, counts, "en", false,
+                                              c2l::kExchangeForestSmallSampleThreshold, "linear_scan"),
+              c2l::status_ok);
+    auto const cref = read_all(out_ref);
+    EXPECT_NE(cref.find("\\label{fig:ld:exchange:forest:ref}"), std::string::npos);
+    EXPECT_NE(cref.find("Comparison against reference"), std::string::npos);
+    EXPECT_NE(cref.find("reference \\texttt{linear\\_scan}"), std::string::npos);
+    // KEINE erfundene std::map-Baseline-Behauptung.
+    EXPECT_EQ(cref.find("std::map"), std::string::npos);
+    EXPECT_NE(cref.find("NOT an external library baseline"), std::string::npos);
+
+    // (b) Bestandsvariante (leeres reference_value) -- altes Label, alter Titel.
+    auto out_plain = comdare_user_tmp() / "p1c_forest_plain.tex";
+    fs::remove(out_plain, ec);
+    ASSERT_EQ(c2l::write_exchange_forest_plot(out_plain, aggs, counts, "en"), c2l::status_ok);
+    auto const cpl = read_all(out_plain);
+    EXPECT_NE(cpl.find("\\label{fig:ld:exchange:forest}"), std::string::npos);
+    EXPECT_EQ(cpl.find("fig:ld:exchange:forest:ref"), std::string::npos);
+    EXPECT_NE(cpl.find("Axis exchangeability (forest plot"), std::string::npos);
+    EXPECT_EQ(cpl.find("Comparison against reference"), std::string::npos);
+
+    fs::remove(out_ref, ec);
+    fs::remove(out_plain, ec);
+}
