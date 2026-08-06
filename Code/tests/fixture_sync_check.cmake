@@ -9,6 +9,17 @@
 # UEBERGANG bis E7-Single-Source (Bruecke I7): User-E7 will langfristig EINE Quelle statt Kopien; dieses
 # Gate ist die Uebergangs-Sicherung, bis die Single-Source-Struktur steht — danach ersatzlos abloesbar.
 #
+# STAND-NACHZUG 2026-08-06 (#48-SCHEIBE-6, B14; loest den Ledger-Posten zu Zeile 3 dieser Datei):
+# Die oben genannte experiment_golden.xml ist seit dem 27.07. NICHT mehr die kanonische golden -- das ist
+# experiment_golden_kern.xml (comdare_experiment v2). Dieses Byte-Gate bleibt trotzdem in Kraft, weil das
+# Alt-Paar weiter produktiv ist: 02_messung_driver/CMakeLists.txt setzt COMDARE_V32_EXPERIMENT_GOLDEN_XML
+# real auf experiment_golden.xml, der Antriebs-Test faehrt also nach wie vor darueber.
+# Das Neu-Paar bekommt KEIN Byte-Gate, sondern eine eigene Vokabular-Wache
+# (tests/fixture_schema_subset_check.cmake, ctest test_fixture_schema_experiment_golden_kern): die
+# ce-Datei gleichen Namens ist eine eigenstaendige Naht-Fixture mit absichtlich abweichenden Werten,
+# ein Byte-Vergleich wuerde test_experiment_kern_seam.cpp sofort rot schiessen. Die Begruendung und die
+# offene ce-Umbenennungs-Auflage stehen im Kopf jener Datei.
+#
 # MECHANIK: KOPIE == MASTER byte-genau, NACH Ausblendung des markierten FIXTURE-PROVENIENZ-Kommentar-
 # Blocks in der Kopie (der Block dokumentiert Herkunft+Sync-Pflicht IN der Kopie und existiert im Master
 # bewusst nicht). Fehlt ein Nachbar-Checkout (Submodule nicht ausgecheckt), wird sauber GESKIPPT

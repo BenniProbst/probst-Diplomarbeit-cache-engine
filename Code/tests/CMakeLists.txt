@@ -142,6 +142,9 @@ endif()
 # (fixture_sync_check.cmake). Fehlt ein Nachbar-Checkout, SKIP sauber (SKIP_REGULAR_EXPRESSION).
 # UEBERGANG bis E7-Single-Source (Bruecke I7) — danach durch die Single-Source-Struktur abloesbar.
 # Label da_unit: laeuft im test:unit-Gate (ctest -L da_unit); braucht kein Build-Target.
+# STAND-NACHZUG 2026-08-06 (B14/Scheibe 6): die KANONISCHE golden ist seit dem 27.07. NICHT mehr
+# experiment_golden.xml, sondern experiment_golden_kern.xml. Deren Wache steht weiter unten
+# (fixture_schema_subset_check.cmake); dieser Block hier bewacht das WEITER PRODUKTIVE Alt-Paar.
 # ─────────────────────────────────────────────────────────────────────────────
 add_test(NAME test_fixture_sync_experiment_golden
     COMMAND "${CMAKE_COMMAND}"
@@ -153,6 +156,32 @@ add_test(NAME test_fixture_sync_prt_registry
         "-DMASTER=${COMDARE_PRT_ART_DIR}/prt_art/algorithm_profiles/prt_art_axis_registry.xml"
         "-DKOPIE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/prt_art_axis_registry.xml"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_sync_check.cmake")
+
+# #48-SCHEIBE-6 (B14, 2026-08-06) -- die Wache des NEU-PAARES experiment_golden_kern.xml.
+# Die zwei add_test oben bleiben UNVERAENDERT: das Alt-Paar experiment_golden.xml ist zwar seit dem
+# 27.07. inhaltlich deprecated, treibt aber weiterhin real den Antriebs-Test (02_messung_driver/
+# CMakeLists.txt setzt COMDARE_V32_EXPERIMENT_GOLDEN_XML darauf). Seine Wache abzuschalten waere ein
+# Wach-Verlust ohne Gegenwert -- Scheibe 6 ist deshalb ein HINZUFUEGEN, kein Umbiegen.
+# Das Neu-Paar ist KEIN Byte-Paar (die ce-Datei ist eine eigenstaendige Naht-Fixture mit absichtlich
+# abweichenden Werten, literal verdrahtet in test_experiment_kern_seam.cpp) -- die Begruendung und die
+# offene ce-Umbenennungs-Auflage stehen im Kopf von fixture_schema_subset_check.cmake.
+# Geprueft wird deshalb das gemeinsame VOKABULAR gegen die EINE Single-Source experiment_schema.xsd:
+# beide Seiten duerfen nur Element-/Attribut-Namen benutzen, die das Ziel-Schema deklariert.
+add_test(NAME test_fixture_schema_experiment_golden_kern
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSCHEMA=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_schema.xsd"
+        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
+        "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden_kern.xml"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_schema_subset_check.cmake")
+# Zweites Bein derselben Wache auf dem ALT-Paar: es kostet nichts und haelt die v1-Instanz + ihre
+# ce-Kopie ebenfalls am EINEN Schema-Vokabular (das Byte-Gate oben sagt nur "gleich", nicht "gueltig").
+add_test(NAME test_fixture_schema_experiment_golden
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSCHEMA=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_schema.xsd"
+        "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden.xml"
+        "-DFIXTURE=${COMDARE_CACHE_ENGINE_DIR}/tests/unit/thesis_tiere/experiment_golden.xml"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/fixture_schema_subset_check.cmake")
 set_tests_properties(test_fixture_sync_experiment_golden test_fixture_sync_prt_registry
+                     test_fixture_schema_experiment_golden_kern test_fixture_schema_experiment_golden
     PROPERTIES LABELS "da_unit;fixture_sync" TIMEOUT 60
     SKIP_REGULAR_EXPRESSION "FIXTURE-SYNC-SKIP")
