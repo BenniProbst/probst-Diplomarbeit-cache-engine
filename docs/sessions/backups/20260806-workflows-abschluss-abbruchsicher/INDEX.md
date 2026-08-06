@@ -4,6 +4,7 @@ Sicherung aller Wellen-Journale + WIP + rescue-Refs vor Kompaktierung (Session-F
 
 ## journale/ (16 Workflow-Journale des Tages, roh)
 Alle wf_* dieser Session (5a19728e). Ergebnis-Stände je Journal per `grep '"type":"result"'`.
+NACHTRAG 10:30: 4 Journale waren beim Erst-Snapshot noch in der Bau-Phase (125-Byte-Stummel bzw. ohne Review-Results) und sind jetzt durch die VOLLSTAENDIGEN Live-Journale ersetzt: wf_058d646c (E18-SNAP-NB, 1ae02cdf), wf_c76d0070 (A1-NB-Vorstufe, STOPP+Re-Review), wf_e49325a7 (A1-NB-Fixup, 62d8c715), wf_c72fb788 (Teil-2, jetzt inkl. beider Review-Results). Journal-Vollpruefung 16/16: alle Ergebnisse im Ledger verbucht, 0 Voll-Luecken.
 
 ## wip-patches/ (uncommittete NB-Arbeit -- abbruchsicher, additiv)
 - e18snap-nb-wip.patch (787Z) + status + proben.sh: E18-SNAP-NB heilte 6 Codex-Befunde in ci/anhang_forward_core.sh, UNCOMMITTET (Session-Fork). Resume: Patch auf wt-b-e18snap @bda34e79 anwenden ODER Welle wf_058d646c frisch.
