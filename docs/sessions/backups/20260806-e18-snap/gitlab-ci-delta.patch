@@ -1,6 +1,6 @@
 --- a/.gitlab-ci.yml
 +++ b/.gitlab-ci.yml
-@@ -837,8 +837,9 @@
+@@ -837,8 +837,9 @@ measure:golden-320:
  #    beide Richtungen. persist:measurements holt die Mess-Ergebnisse IN das super-Repo; anhang:forward
  #    schiebt die daraus regenerierten LaTeX-Anhang-Tabellen VORWAERTS in das Thesis-Submodul (Projekt 289)
  #    und zieht den super-Gitlink nach. Beide sind unabhaengig inert-schaltbar (COMDARE_PERSIST_MEASUREMENTS
@@ -12,7 +12,7 @@
  persist:measurements:
    stage: persist
    tags: [baremetal]
-@@ -1022,6 +1023,22 @@
+@@ -1022,6 +1023,30 @@ persist:measurements:
  #    dem Lebend-Check (eine getriggerte Pipeline: 289-Commit sichtbar + 289-Pipeline gruen + Gitlink-Bump
  #    gelandet + KEINE Echo-Pipeline auf 288).
  #
@@ -21,7 +21,7 @@
 +#    zusaetzlich in einen Ordner an der Wurzel der Messwerte kopiert, samt latex compile-export
 +#    (Benennung nach Datum und Uhrzeit). so laesst sich ein compile nachvollziehen."
 +#    UMSETZUNG OHNE ZWEITEN COMPILE: das PDF-Gate baut die Thesis-PDF ohnehin schon im 289-Klon --
-+#    der Kern ERNTET dieses Bau-Produkt (Phase 3c/4b in ci/anhang_forward_core.sh) nach
++#    der Kern ERNTET dieses Bau-Produkt (Phase 3c/3d/5b in ci/anhang_forward_core.sh) nach
 +#    measurement/thesis_compiles/<JJJJMMTT-HHMMSS>/ mit <haupt>.pdf + compile-export.txt +
 +#    QUELLSTAND.txt (289-SHA + 288-SHA + Kanal-Lauf-ID). Committet wird der Ordner NICHT vom Kern,
 +#    sondern vom 288-Writeback in Block (4) unten -- derselbe Pfad, der auch den Gitlink landet.
@@ -30,12 +30,38 @@
 +#    einen leeren Ordner anzulegen. Die AF_PDF_GATE-Semantik ist dadurch UNVERAENDERT -- E-18-SNAP
 +#    erzwingt kein Gate und verschiebt keine Gate-Grenze, es erntet nur, was das Gate ohnehin baut.
 +#    ADDITIV: bei gleichem Zeitstempel waechst ein Kollisions-Suffix -2, -3, ...; ein bestehender
-+#    Ordner wird NIE ueberschrieben und NIE geloescht (Messdaten-Doktrin).
++#    Ordner wird NIE ueberschrieben und NIE geloescht (Messdaten-Doktrin). Die Suffix-Wahl prueft
++#    lokal UND den REMOTE-Stand des Ziel-Branches und nimmt den Ordner per `mkdir` ohne -p als
++#    atomaren Lock -- zwei Laeufe derselben Sekunde auf verschiedenen Runnern koennen sonst denselben
++#    Namen waehlen und der 288-Merge liefe in einen add/add-Konflikt (= verlorener Beleg).
++#    NACHHOLUNG: der Beleg haengt NICHT am Anhang-Byte-Delta. Ein Lauf, der 289 pusht und vor dem
++#    Writeback stirbt, hinterlaesst einen 289-Stand ohne Compile-Beleg; der naechste Lauf erkennt das
++#    (kein QUELLSTAND mit dieser thesis_commit_sha, lokal wie remote) und holt NUR den Beleg nach --
++#    ohne 289-Commit, ohne Push. Darum darf der Frueh-Abbruch unten nicht mehr allein am Gitlink
++#    haengen, und die Commit-Botschaft wird aus dem GESTAGTEN Ist gebildet statt pauschal behauptet.
 +#
  #    INFRA-VORAUSSETZUNG (Handout 2026-08-05, E-20-Kanal): EIGENES Write-Token AUF PROJEKT 289
  #    (COMDARE_THESIS_WRITEBACK_USER / COMDARE_THESIS_WRITEBACK_TOKEN; write_repository-only, Rolle
  #    Developer, masked+hidden+protected). BEWUSST NICHT das 288-Token (COMDARE_WRITEBACK_USER/TOKEN,
-@@ -1098,26 +1115,49 @@
+@@ -1083,6 +1108,12 @@ anhang:forward:
+         "$THESIS_CLONE"
+       echo "289-Klon auf development: $(git -C "$THESIS_CLONE" rev-parse --short HEAD)"
+       # -- (3) KERN: Quellen-Kaskade + Whitelist-Kopie + Idempotenz + Commit + Push (ci/anhang_forward_core.sh) --
++      #    EINE QUELLE fuer die Schnappschuss-Wurzel: derselbe Pfad geht als AF_SNAPSHOT_ROOT in den
++      #    Kern und als $SNAP_DIR in den 288-Writeback unten. Frueher stand er hier hart und dort
++      #    nochmal hart -- wer AF_SNAPSHOT_ROOT umsetzte, bekam den Ordner still nie committet.
++      #    KONTRAKT: der Pfad MUSS repo-relativ unter $CI_PROJECT_DIR liegen, sonst kann git ihn nicht
++      #    stagen (der Kern sagt es zusaetzlich literal, wenn die Wurzel in keinem Arbeitsbaum liegt).
++      SNAP_DIR="measurement/thesis_compiles"
+       AF_DEST_REPO="$THESIS_CLONE" \
+       AF_BRANCH="development" \
+       AF_LANGS="de,en" \
+@@ -1095,29 +1126,80 @@ anhang:forward:
+       AF_PROV_PIPELINE_URL="${CI_PIPELINE_URL:-NA}" \
+       AF_PROV_SUPER_SHA="${CI_COMMIT_SHA:-NA}" \
+       AF_PROV_SUPER_REF="${CI_COMMIT_REF_NAME:-NA}" \
++      AF_SNAPSHOT_ROOT="$CI_PROJECT_DIR/$SNAP_DIR" \
++      AF_SNAP_REMOTE_BRANCH="${CI_COMMIT_BRANCH:-${CI_COMMIT_REF_NAME:-NA}}" \
          ci/anhang_forward_core.sh
        NEW_THESIS_SHA=$(git -C "$THESIS_CLONE" rev-parse HEAD)
        echo "289-HEAD nach dem Kanal: $NEW_THESIS_SHA"
@@ -43,22 +69,36 @@
 +      # -- (4) 288-Writeback: Gitlink-Bump + E-18-SNAP-Compile-Schnappschuss (EIN Commit) --
 +      #    Beides gehoert in DENSELBEN Commit, weil beides denselben Lauf belegt: der Gitlink sagt,
 +      #    WELCHER 289-Stand gilt; der Schnappschuss belegt, WIE dessen PDF entstanden ist.
-+      #    Der Kern (ci/anhang_forward_core.sh, Phase 4b) LEGT den Schnappschuss nur an -- in das
++      #    Der Kern (ci/anhang_forward_core.sh, Phase 3d/5b) LEGT den Schnappschuss nur an -- in das
 +      #    super-Repo bringt ihn genau dieser bestehende 288-Writeback-Pfad.
        OLD_LINK=$(git ls-tree HEAD thesis/diplomarbeit | awk '{print $3}')
        echo "Gitlink alt=$OLD_LINK neu=$NEW_THESIS_SHA"
 -      if [ "$OLD_LINK" = "$NEW_THESIS_SHA" ]; then
 -        echo "=== anhang:forward OK: Gitlink bereits aktuell -> kein Bump-Commit ==="; exit 0
-+      SNAP_DIR="measurement/thesis_compiles"
 +      SNAP_PENDING=0
-+      if [ -d "$SNAP_DIR" ] && [ -n "$(git status --porcelain -- "$SNAP_DIR")" ]; then SNAP_PENDING=1; fi
++      if [ -d "$SNAP_DIR" ] && [ -n "$(git status --porcelain -uall -- "$SNAP_DIR")" ]; then SNAP_PENDING=1; fi
 +      echo "E-18-SNAP: ausstehender Compile-Schnappschuss: $SNAP_PENDING"
 +      # Frueh-Abbruch NUR, wenn BEIDE Richtungen nichts zu sagen haben. Wuerde hier weiterhin allein
 +      # der Gitlink entscheiden, ginge ein frischer Compile-Beleg still verloren (Owner-KERN: "so
-+      # laesst sich ein compile nachvollziehen") -- genau das darf nicht passieren.
++      # laesst sich ein compile nachvollziehen") -- genau das darf nicht passieren. Der Kern kann
++      # einen Beleg auch OHNE Gitlink-Bewegung liefern (Nachhol-Modus nach abgerissenem Vorlauf).
 +      if [ "$OLD_LINK" = "$NEW_THESIS_SHA" ] && [ "$SNAP_PENDING" = "0" ]; then
 +        echo "=== anhang:forward OK: Gitlink aktuell + kein neuer Schnappschuss -> kein Bump-Commit ==="; exit 0
        fi
++      # VOLLSTAENDIGKEITS-WACHE: ein Compile-Beleg ist nur mit ALLEN DREI Pflichtstuecken wahr
++      # (<haupt>.pdf + compile-export.txt + QUELLSTAND.txt). Ein halber Ordner wird NICHT gestagt,
++      # sondern bricht LAUT ab: im Repo saehe er vollstaendig aus und belegte einen Compile, den es
++      # so nie gab. Geprueft werden nur Ordner mit ausstehender Aenderung -- bereits committete
++      # Belege bleiben unangetastet (Messdaten-Doktrin).
++      for snap in "$SNAP_DIR"/*/; do
++        [ -d "$snap" ] || continue
++        [ -n "$(git status --porcelain -uall -- "$snap")" ] || continue
++        if [ "$(find "$snap" -maxdepth 1 -type f -name '*.pdf' | wc -l)" -lt 1 ] || [ ! -s "$snap/compile-export.txt" ] || [ ! -s "$snap/QUELLSTAND.txt" ]; then
++          echo "FEHLER: unvollstaendiger Compile-Schnappschuss '$snap' -- erwartet <haupt>.pdf + compile-export.txt + QUELLSTAND.txt:" >&2
++          find "$snap" -maxdepth 1 -type f | sed 's/^/  /' >&2
++          echo "       NICHTS wird gestagt (kein halber Beleg im Repo)." >&2; exit 1
++        fi
++      done
        git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
        git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
        git fetch origin "$CI_COMMIT_BRANCH"
@@ -79,7 +119,19 @@
 +        git diff --cached --name-only -- "$SNAP_DIR" | sed 's/^/  /'
 +      fi
 +      if git diff --cached --quiet; then echo "weder Gitlink noch Schnappschuss veraendert (Race) -> kein Commit"; exit 0; fi
-+      git commit -m "thesis(E-18): Gitlink auf ${NEW_THESIS_SHA} + Compile-Schnappschuss (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
++      SNAP_STAGED=$(git diff --cached --name-only -- "$SNAP_DIR" | wc -l)
++      LINK_STAGED=$(git diff --cached --name-only -- thesis/diplomarbeit | wc -l)
++      # COMMIT-TEXT NIE LUEGEN: die Botschaft nennt genau das, was GESTAGT ist. Ein pauschales
++      # "Gitlink auf X + Compile-Schnappschuss" waere im Nachhol-Fall (Gitlink unbewegt) und im
++      # reinen Bump-Fall (kein Beleg) schlicht falsch -- und der Git-Log ist Beweismittel.
++      if [ "$LINK_STAGED" -gt 0 ] && [ "$SNAP_STAGED" -gt 0 ]; then
++        SNAP_MSG="thesis(E-18): Gitlink auf ${NEW_THESIS_SHA} + Compile-Schnappschuss (${SNAP_STAGED} Datei(en))"
++      elif [ "$LINK_STAGED" -gt 0 ]; then
++        SNAP_MSG="thesis(E-18): Gitlink auf ${NEW_THESIS_SHA} (kein neuer Compile-Schnappschuss)"
++      else
++        SNAP_MSG="thesis(E-18): Compile-Schnappschuss (${SNAP_STAGED} Datei(en)), Gitlink unveraendert bei ${NEW_THESIS_SHA}"
++      fi
++      git commit -m "${SNAP_MSG} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
        for attempt in 1 2 3 4 5; do
          if git push -o ci.skip origin "HEAD:$CI_COMMIT_BRANCH"; then
            echo "=== anhang:forward OK: Gitlink gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
