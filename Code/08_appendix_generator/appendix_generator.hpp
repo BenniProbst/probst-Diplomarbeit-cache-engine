@@ -169,6 +169,18 @@ struct AppendixConfig {
 //   lc_surface3d_<z>.tex (6x, P1a: echte 3D-Flaeche je z-Feld, Rohdaten-/QA-Rolle)
 //   ld_sweep_<z>.tex     (3x, P1b: Metrik ueber working_set_n, eine Kurve je
 //                         gesweepter Achsen-Auspraegung; ohne die Spalte honest-empty)
+// PLUS die REFERENZ-BEZOGENEN Formen (Referenz = reference_axis/reference_value, eine
+// ACHSENAUSPRAEGUNG des Korpus, KEINE externe Bibliothek -- eine gemessene std::map-
+// Serie existiert nicht; fehlt die Referenz im Korpus, sind sie honest-empty):
+//   exchange_forest_vs_reference.tex (P1c, alle Geschwister-Paare EINER Achse auf die
+//                         Referenz gedreht; eigenes \label, sonst "multiply defined")
+//   lc_surface_ratio_<z>.tex (6x, P2: Median/Referenz-Median je Workload-Spalte,
+//                         divergente Farbskala um die Gleichheit -- die Abloesung der
+//                         Heatmap als ANALYSE-Figur; die rohe Heatmap bleibt daneben)
+//   lc_normbar_<z>.tex   (6x, P3a: dieselbe Aussage ueber die Lastprofile verdichtet,
+//                         EIN Balken je search_algo, Referenzlinie bei 1)
+//   latency_tradeoff.tex (P3b: Pareto-Streuung p50 gegen p99, ein Punkt je
+//                         Konfiguration und Op-Art; ohne p99-Spalten honest-empty)
 // HONEST-EMPTY: liefert ein Darstellungs-Writer status_empty_input (n/a-Daten), wird
 // die betreffende Datei bewusst NICHT geschrieben — das ist KEIN Facade-Fehler (die 12
 // Kern-.tex bleiben unberührt). Die 12 Kern-.tex sind byte-identisch zu den bisherigen
