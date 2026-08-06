@@ -1,0 +1,9 @@
+RUN-KONSTANT (compose_live)     : 'tc=1;cxx=gcc:g++-16@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+atomic128-Wahl dieses Baus      : id='no_cx16' flags=''
+PERM opt=O2                     : 'tc=1;cxx=gcc:g++-16@1.0.0c;opt=O2{-O2}@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+PERM opt=O3                     : 'tc=1;cxx=gcc:g++-16@1.0.0c;opt=O3{-O3}@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+PERM opt=O3 ext=avx512          : 'tc=1;cxx=gcc:g++-16@1.0.0c;opt=O3{-O3}@1.0.0c;ext=avx512;ceb=8.0;atomic128=no_cx16@1.0.0c'
+Fingerprint(32) O2 / O3 / O3avx : cae277151ff5df26c596a7a9c488671f / 2f5c297a5ad969116edac73af258071f / 1d60f567b1c87da06f29d2f65327fb33
+O2 != O3 ?                      : JA (geheilt)
+O3 != O3+avx512 ?               : JA (geheilt)
+leere Achsen == compose_live ?  : JA

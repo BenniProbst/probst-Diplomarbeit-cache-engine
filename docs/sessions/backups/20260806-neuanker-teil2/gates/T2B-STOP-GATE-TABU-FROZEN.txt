@@ -1,0 +1,39 @@
+==== T2-B: STOP-GATE-STATUS + TABU + FROZEN ====
+erzeugt 2026-08-06T09:08:36+00:00
+
+-- STOP-GATE: DAS NB-2-EINFRIEREN ENDET MIT DIESEM PAKET, BEWUSST UND BENANNT --
+  Die drei C-3-Dateien waren waehrend NB/NB-2 eingefroren, WEIL das Buendel dort nur Wachen
+  nachzog. T2-B ist die Scheibe, fuer die sie freigegeben wurden (Ledger vormittag-1: 'per-Perm-
+  Glieder [5] ... in EINEN Schnitt mit der Perm-Schleife'). Angefasst und WARUM:
+    profile_run_entry.hpp        -- die optxsimd-Schleife bildet den per-Perm-Glied-Wert.
+    experiment_run_entry.hpp     -- der Spiegel derselben Schleife (Bau-Haelfte).
+  NICHT angefasst (bleiben eingefroren bis T2-A):
+    IDENTISCH  7ff382bc84a131bc9e663ba0d9cbdd6772ca7a13  libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp
+    IDENTISCH  73ef488cfe16de5b81f5a687bbab6de9e1ff7e1d  libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp
+
+-- TABU-LISTE der soll-spez, Punkt fuer Punkt --
+  (1) binary_id-Welt unberuehrt          : Treffer 'binary_id' im Diff: 0
+  (2) Glieder [1]-[3]-Literale unberuehrt: anatomy_version_stamp.hpp im Diff: 0
+  (3) kSystemCellValueKeys unberuehrt    : system_cell_values.hpp im Diff: 0
+  (5) Overlay-Glied bleibt LEER          : COMDARE_OVERLAY_SOURCE_HASH im Diff: 0
+  (7) kFrozenFingerprintV1 nicht geloescht: 10 Fundstellen in test_g3
+
+-- FROZEN-VEKTOR --
+  tests/unit/test_w10_system_cell_values.cpp:432:        "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+  tests/unit/test_m_w12_stamp_bausteine.cpp:663:        "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+  tests/unit/test_g3_sha512_index.cpp:68:constexpr std::string_view kFrozenFingerprintV1 = "17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9"
+  Die drei Frozen-TUs blob-identisch zu HEAD (test_m_w12 traegt NEUE Faelle, der Frozen-BLOCK selbst nicht):
+    IDENTISCH  27cfbecb61f8c2276d4e01f6f4d6b7437d02923b  tests/unit/test_g3_sha512_index.cpp
+    IDENTISCH  9555a696cb1ae34fac6377c0fcb9b505c4a0e57d  tests/unit/test_w10_system_cell_values.cpp
+
+-- ASCII-only in den Diff-ZUSAETZEN (SOLL 0) --
+  Nicht-ASCII-Zeilen: 0
+
+-- Diffstat gegen cb9a7204 --
+   .../profile_facade/experiment_run_entry.hpp        |  32 ++++--
+   .../profile_facade/profile_run_entry.hpp           |  46 ++++++--
+   .../profile_facade/profile_run_facade.cpp          |  63 ++++++++---
+   .../profile_facade/toolchain_stamp_naht.hpp        | 120 +++++++++++++++++++--
+   tests/unit/test_m_w12_stamp_bausteine.cpp          |  68 ++++++++++++
+   5 files changed, 290 insertions(+), 39 deletions(-)
+==== ENDE ====

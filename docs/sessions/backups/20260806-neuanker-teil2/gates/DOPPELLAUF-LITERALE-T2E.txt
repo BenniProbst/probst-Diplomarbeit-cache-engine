@@ -1,0 +1,33 @@
+==== DOPPELLAUF-LITERALE -- NEUANKER TEIL 2, PAKET [T2-E] (tc=1-Alt/Neu-Kollisions-VERIFIKATION) ====
+erzeugt 2026-08-06T09:23:02+00:00
+Worktree /home/comdare/wt-b2-neuanker, Vor-Stand bbd72c2a (T2-C)
+
+GATE-BASIS: "Total Tests: 408" -- UNVERAENDERT (ein neuer gtest-Fall, 40 -> 41).
+
+-- VOLL-BAU --
+  make -j 6 (all) : 0 Zeilen "error:" / MAKE_ALL_RC=0
+  Zusatz-Targets  : 0 Zeilen "error:" / MAKE_ZUSATZ_RC=0
+
+-- ZWEI SERIELLE ctest-LAEUFE, identische Gesamtzahl --
+  LAUF 1: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+  LAUF 2: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+
+-- golden 3/3 + CRC-Anker + Roundtrip --
+  1/5 Test #320: test_smoke_coverage_profile ........   Passed    0.03 sec
+  2/5 Test #321: test_wdk_datasets_fairness .........   Passed    0.00 sec
+  3/5 Test #322: test_measurement_categories ........   Passed    0.00 sec
+  4/5 Test #367: test_limits_entkopplung_vorstufe ...   Passed    1.44 sec
+  5/5 Test #378: test_profile_roundtrip .............   Passed    0.01 sec
+  100% tests passed, 0 tests failed out of 5
+
+-- DAS VERDIKT: KEIN FORMAT-BUMP --
+  (V1) Alt-Form nicht mehr herstellbar: Dialekt ohne Treiber-Tag => Abhaengigkeits-Diagnose
+       'cxx_dialect' => FAIL-LOUD (std::invalid_argument). Kein Eingabe-Vektor erzeugt sie noch.
+  (V2) Selbst dann keine Kollision: Neu-Form traegt GENAU EIN ':', Alt-Form keines.
+       Renderer-Wache (T2-E) prueft das ZUSAMMENGESETZTE Feld, nicht nur die drei Teile.
+  => kToolchainStampGliedFormat bleibt "1". Der Frozen-Vektor bleibt in END-Form, kein dritter Dreh.
+
+-- FROZEN-VEKTOR: NICHT GEFALLEN --
+  Frozen-Preimage Laenge : 560 Bytes
+  Frozen-Digest (RT-Weg) : 17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9b7fd37fbba76414be4718ad2180deecbb14387293935a8eff1469cef8ce89374
+==== ENDE ====

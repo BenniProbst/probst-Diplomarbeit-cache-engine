@@ -1,0 +1,55 @@
+==== DOPPELLAUF-LITERALE -- NEUANKER TEIL 2, PAKET [T2-B] (per-Perm-Glieder, Codex CX-B1 KRITISCH) ====
+erzeugt 2026-08-06T09:08:36+00:00
+Worktree /home/comdare/wt-b2-neuanker, Branch b2-neuanker-format3, Vor-Stand cb9a7204 (T2-D-FERTIG)
+
+GATE-BASIS: "Total Tests: 408" -- UNVERAENDERT (die zwei neuen gtest-Faelle liegen in der bestehenden
+TU test_m_w12_stamp_bausteine, dort 36 -> 38 Faelle). Alle Laeufe SERIELL (ctest -j 1).
+
+-- VOLL-BAU --
+  make -j 6 (all) : 0 Zeilen "error:" / MAKE_ALL_RC=0
+  Zusatz-Targets  : 0 Zeilen "error:" / MAKE_ZUSATZ_RC=0
+
+-- ZWEI SERIELLE ctest-LAEUFE, identische Gesamtzahl --
+  LAUF 1: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+  LAUF 2: 100% tests passed, 0 tests failed out of 408 / CTEST_RC=0
+
+-- golden 3/3 + CRC-Anker + Roundtrip --
+  1/5 Test #320: test_smoke_coverage_profile ........   Passed    0.03 sec
+  2/5 Test #321: test_wdk_datasets_fairness .........   Passed    0.00 sec
+  3/5 Test #322: test_measurement_categories ........   Passed    0.00 sec
+  4/5 Test #367: test_limits_entkopplung_vorstufe ...   Passed    1.36 sec
+  5/5 Test #378: test_profile_roundtrip .............   Passed    0.01 sec
+  100% tests passed, 0 tests failed out of 5
+
+-- DER BEFUND CX-B1, AM OBJEKT GEHEILT (Sonde ueber den realen Renderer-Weg) --
+  RUN-KONSTANT (compose_live)     : 'tc=1;cxx=gcc:g++-16@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+  atomic128-Wahl dieses Baus      : id='no_cx16' flags=''
+  PERM opt=O2                     : 'tc=1;cxx=gcc:g++-16@1.0.0c;opt=O2{-O2}@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+  PERM opt=O3                     : 'tc=1;cxx=gcc:g++-16@1.0.0c;opt=O3{-O3}@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+  PERM opt=O3 ext=avx512          : 'tc=1;cxx=gcc:g++-16@1.0.0c;opt=O3{-O3}@1.0.0c;ext=avx512;ceb=8.0;atomic128=no_cx16@1.0.0c'
+  Fingerprint(32) O2 / O3 / O3avx : cae277151ff5df26c596a7a9c488671f / 2f5c297a5ad969116edac73af258071f / 1d60f567b1c87da06f29d2f65327fb33
+  O2 != O3 ?                      : JA (geheilt)
+  O3 != O3+avx512 ?               : JA (geheilt)
+  leere Achsen == compose_live ?  : JA
+
+-- FROZEN-VEKTOR: NICHT GEFALLEN (Sonde nach T2-B neu uebersetzt) --
+  CEB-Realversion (CT)   : '15.3.0'
+  CEB-Dialekt (CT)       : 'gcc'
+  Tier-Treiber-Tag (live): 'g++-16'
+  Deckung (NB2-1 streng) : NEIN
+  LIVE Glied [5] (NB2-1) : 'tc=1;cxx=gcc:g++-16@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+  LIVE Glied [5] Laenge  : 59 (Budget 512)
+  LIVE Glied [6] Praefix : 'bvset=1;bv=2;page_type[{page_dense_byte;...'
+  g++-17 -> 'tc=1;cxx=gcc:g++-17@1.0.0c'
+  g++-18 -> 'tc=1;cxx=gcc:g++-18@1.0.0c'
+  Frozen-Preimage Laenge : 560 Bytes
+  Frozen-Digest (RT-Weg) : 17148e5a4d0f4a2d96e1f5ad97dc4c727b99fce6e38bd6e337fb6dbf0e4461f9b7fd37fbba76414be4718ad2180deecbb14387293935a8eff1469cef8ce89374
+
+-- WAS SICH BEWUSST BEWEGT (das IST die Heilung, kein Nebeneffekt) --
+  Der LIVE (run-konstante) Wert des Glieds [5] traegt ab jetzt die atomic128-Achse:
+    VORHER (cb9a7204): 'tc=1;cxx=gcc:g++-16@1.0.0c;ceb=8.0'
+    NACHHER          : 'tc=1;cxx=gcc:g++-16@1.0.0c;ceb=8.0;atomic128=no_cx16@1.0.0c'
+  Der PER-PERM-Wert traegt zusaetzlich opt{flags}/ext/gate dieser Permutation. Beides ist genau der
+  Zweck des Pakets. Das Buendel ist UNGELANDET -- es existiert kein Bestands-Artefakt auf dem
+  Vorher-Wert; die Frozen-Vektoren rechnen bewusst ueber Literale und bleiben maschinen-unabhaengig.
+==== ENDE ====
