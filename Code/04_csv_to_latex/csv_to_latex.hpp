@@ -158,6 +158,45 @@ struct SiblingPairCount {
 [[nodiscard]] std::vector<ExchangeAggregate> aggregate_exchange(std::span<WideFullRow const>   rows,
                                                                 std::vector<SiblingPairCount>& out_counts);
 
+// GRAPH-UMBAU 2D/3D, P1c (2026-08-06): AUSWAHL der Geschwister-Paare EINER Achse gegen EINE feste
+// Referenz-Auspraegung -- reine Filter-/Umrechnungsfunktion, KEIN neuer Aggregationscode.
+//
+// WARUM UEBERHAUPT: der SOTA-Katalog fuehrt "Vergleich gegen eine Baseline" als eigene Mess-Dimension.
+// Eine `std::map`-Baseline gibt es im Korpus NICHT (jedes Vorkommen von std::map ist das Konformitaets-
+// Oracle des Pruefdocks, KEIN gemessener Leistungs-Datenpunkt) -- deshalb ist die Referenz hier eine
+// ACHSEN-AUSPRAEGUNG und ausdruecklich als solche zu benennen. Default-Vorschlag der Aufrufer:
+// axis="search_algo", reference_value="linear_scan" (das unspezialisierte Verfahren).
+//
+// AUSWAHL: alle Aggregate mit a.axis == axis UND (value_from == reference_value ODER
+// value_to == reference_value). Ergebnis-Konvention: die Referenz ist IMMER value_from, das Delta liest
+// sich also durchweg als "Auspraegung X gegenueber der Referenz".
+//
+// RICHTUNGS-UMRECHNUNG (der load-bearing Teil). aggregate_exchange kanonisiert jedes ungeordnete Paar
+// lexikographisch (value_from < value_to), die Referenz steht also je nach Name mal links, mal rechts
+// ("linear_scan" ist lexikographisch letzter Wert von search_algo -> IMMER rechts). Steht sie rechts,
+// muss das Paar gedreht werden. Dabei gilt:
+//   absolutes Delta: exakte Negation (Median der negierten Diffs = negierter Median, bis auf die
+//                    nearest-rank-Konvention bei gerader Stichprobenzahl).
+//   relatives Delta: NICHT einfach das Vorzeichen drehen -- der Bezugswert (Nenner) wechselt mit.
+//                    Mit d = (m_to - m_from)/m_from folgt exakt d' = (m_from - m_to)/m_to = -d/(1+d).
+//                    f(d) = -d/(1+d) ist auf d > -1 (immer erfuellt: beide Mediane sind positiv) streng
+//                    monoton fallend, bildet den Median also exakt auf den Median ab. Blosse Negation
+//                    waere ein echter Rechenfehler: bei d = +1.0 (Ziel doppelt so langsam) behauptete
+//                    sie "-100%", richtig sind -50%.
+//   IQR:             das Aggregat traegt nur die BREITE, nicht p25/p75. Umgerechnet werden daher genau
+//                    die Endpunkte, die der Forest-Plot ohnehin zeichnet (Median +- IQR/2); die neue
+//                    Breite ist ihr Abstand nach f. Das erbt die bereits dokumentierte Symmetrie-
+//                    Konvention des Plots und erfindet keine Perzentile.
+// Ist ein umzurechnender Punkt <= -1 (physikalisch unmoeglich, da Latenzen positiv sind -- die Pruefung
+// ist reine Abwehr), wird das Paar HONEST AUSGELASSEN statt mit einem erfundenen Wert gefuehrt.
+//
+// Ergebnis leer <=> die Referenz kommt in keinem Paar dieser Achse vor (nie gemessen). Der Aufrufer
+// reicht das Ergebnis unveraendert an write_exchange_forest_plot, dessen bestehende Wache dann
+// status_empty_input liefert (KEINE Datei).
+[[nodiscard]] std::vector<ExchangeAggregate> select_exchange_vs_reference(std::span<ExchangeAggregate const> aggs,
+                                                                          std::string_view                   axis,
+                                                                          std::string_view reference_value);
+
 // L-d.2: schreibt je VARIABLER Achse eine Sammel-longtable (eine Zeile je Wertepaar × Interface-Fn).
 // node_type+memory_layout erhalten einen Vorbehalt-Marker (Q2-Schritt-4-Beschattung), search_algo+prefetch
 // werden als „am wenigsten konfundiert" gekennzeichnet. Diagnose-Flag = nachweislich verschiedener
@@ -183,10 +222,17 @@ inline constexpr std::size_t kExchangeForestSmallSampleThreshold = 30;
 // „+0"-Zeile gezeigt; kleine-n-Zeilen (pair_workload_samples < small_n_threshold) werden ausgegraut + offener
 // Marker. Keine gueltige ns_per_op-Zeile → status_empty_input (honest-leer, KEINE Datei). body_only: nur der
 // tikzpicture-Rumpf (ohne figure/caption) — der Aufrufer wrappt Float+Caption+Label selbst.
+// P1c (2026-08-06): reference_value ist ADDITIV und default LEER = exakt das Bestandsverhalten (die
+// bestehende exchange_forest.tex bleibt byte-identisch). Ist es GESETZT, weist die Figur sich als
+// referenz-bezogene Variante aus: Titel/xlabel/Caption nennen die Referenz-ACHSENAUSPRAEGUNG beim Namen
+// (ausdruecklich KEINE std::map-Behauptung -- die gibt es im Korpus nicht) und das \label wechselt auf
+// fig:ld:exchange:forest:ref. Letzteres ist zwingend: beide Figuren stehen im selben Dokument, ein
+// zweites Mal dasselbe \label waere ein "multiply defined"-Fehler.
 [[nodiscard]] int write_exchange_forest_plot(std::filesystem::path const& out, std::span<ExchangeAggregate const> aggs,
                                              std::span<SiblingPairCount const> counts, std::string const& lang = "en",
                                              bool        body_only         = false,
-                                             std::size_t small_n_threshold = kExchangeForestSmallSampleThreshold);
+                                             std::size_t small_n_threshold = kExchangeForestSmallSampleThreshold,
+                                             std::string_view reference_value = {});
 
 // L-e.1: schreibt die EINE ehrliche Limitierungs-longtable (anhang/<lang>/tabellen/le_limitierung.tex).
 // Zeile 1 (Spitzenplatz) = Cache-Misses/PMC = 0/nicht-erhoben (Kernmetrik). Inhalt ist statisch (die

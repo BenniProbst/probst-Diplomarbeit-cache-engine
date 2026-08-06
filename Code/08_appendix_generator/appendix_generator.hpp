@@ -136,6 +136,14 @@ struct AppendixConfig {
     std::filesystem::path organ_axis_registry;
     std::filesystem::path system_axis_registry;
     std::filesystem::path measurement_axis_registry;
+    // -- GRAPH-UMBAU 2D/3D, P1c (2026-08-06): Referenz fuer die baseline-bezogenen Formen --------------
+    // Die Referenz ist eine ACHSENAUSPRAEGUNG des Korpus, KEINE externe Bibliothek: eine gemessene
+    // std::map-Serie existiert nicht (jedes std::map im Korpus ist das Konformitaets-Oracle des
+    // Pruefdocks, ein Korrektheits- und kein Leistungs-Datenpunkt). Default linear_scan = das
+    // unspezialisierte Suchverfahren, die naechstliegende ehrliche Naeherung an einen gemeinsamen Nenner.
+    // Kommt der Wert im Korpus nicht vor, sind die referenz-bezogenen Formen honest-empty.
+    std::string reference_axis  = "search_algo";
+    std::string reference_value = "linear_scan";
 };
 
 // Eingebaute Default-Bias-Caption je Sprache (= generate_wide_appendix.ps1:61-64).

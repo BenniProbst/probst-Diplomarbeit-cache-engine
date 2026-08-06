@@ -460,6 +460,27 @@ int generate_wide_appendix(AppendixConfig const& cfg) {
             }
         }
 
+        // -- (5i) GRAPH-UMBAU 2D/3D, P1c (2026-08-06): Forest-Plot gegen eine FESTE Referenz ------------
+        // Der bestehende exchange_forest.tex vergleicht Geschwister-Paare UNTEREINANDER; welche
+        // Auspraegung "der Massstab" ist, bleibt dort offen. Diese Variante dreht alle Paare EINER Achse
+        // auf EINE Referenz-Auspraegung (Default search_algo/linear_scan) -- dieselbe Aggregation,
+        // dieselbe Zeichen-Funktion, nur eine duenne Auswahl-/Umrechnungsschicht davor.
+        // Die Referenz-Umrechnung ist exakt (nicht blosse Vorzeichen-Umkehr), siehe
+        // select_exchange_vs_reference. KEINE std::map-Baseline: die gibt es im Korpus nicht.
+        {
+            auto const ref_aggs = c2l::select_exchange_vs_reference(exch_aggs, cfg.reference_axis,
+                                                                     cfg.reference_value);
+            if (int const rc = c2l::write_exchange_forest_plot(out_dir / "exchange_forest_vs_reference.tex", ref_aggs,
+                                                               exch_counts, lang, /*body_only=*/false,
+                                                               c2l::kExchangeForestSmallSampleThreshold,
+                                                               cfg.reference_value);
+                !c2l_ok(rc)) {
+                std::cerr << "appendix-generator: write_exchange_forest_plot (vs-reference," << lang << ") failed "
+                          << rc << "\n";
+                return status_io_error;
+            }
+        }
+
         std::cout << "appendix-generator [" << lang
                   << "]: 12 Kern- + 5 Darstellungs-.tex + 3D-Flaechen + Sweep-Kurven + Achsen-Inventar "
                      "(honest-empty ausgelassen wo ohne Daten) -> "

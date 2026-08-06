@@ -184,6 +184,14 @@ int run_individual_writers(fs::path const& csv, fs::path const& out_root, std::v
             if (!dg_ok(dg::write_working_set_sweep_curve(out_dir / ("ld_sweep_" + z + ".tex"), surf_rows, z, lang)))
                 return 11;
         }
+        // (7) P1c: Forest-Plot gegen die feste Referenz-Achsenauspraegung (Default der Facade).
+        ag::AppendixConfig const defaults{};
+        auto const               ref_aggs =
+            c2l::select_exchange_vs_reference(exch_aggs, defaults.reference_axis, defaults.reference_value);
+        if (!c2l_ok(c2l::write_exchange_forest_plot(out_dir / "exchange_forest_vs_reference.tex", ref_aggs, counts,
+                                                    lang, false, c2l::kExchangeForestSmallSampleThreshold,
+                                                    defaults.reference_value)))
+            return 12;
     }
     return 0;
 }
@@ -381,6 +389,49 @@ TEST(Stufe08Appendix, SweepCurvesAreHonestEmptyOnFixtureWithoutWorkingSetColumn)
     EXPECT_TRUE(fs::exists(tab / "bias_matrix_table.tex"));
 
     fs::remove_all(dir, ec);
+}
+
+// GRAPH-UMBAU 2D/3D, P1c (2026-08-06): die Referenz ist eine ACHSENAUSPRAEGUNG des Korpus. Die Fixture
+// kennt nur search_algo in {k_ary, eytzinger} -- die Default-Referenz "linear_scan" kommt darin NICHT
+// vor. Dann darf die referenz-bezogene Figur nicht entstehen (honest-empty), und die Facade bleibt
+// gruen. Mit einer im Korpus VORHANDENEN Referenz entsteht sie sehr wohl -- beides wird hier geprueft,
+// damit "keine Datei" nicht mit "Writer kaputt" verwechselt werden kann.
+TEST(Stufe08Appendix, ReferenceForestIsHonestEmptyForAbsentReferenceAndAppearsForPresentOne) {
+    auto const fixture = fixtures_dir() / "tier_wide_appendix.csv";
+    ensure_fixture(fixture);
+    std::error_code ec;
+
+    // (a) Default-Referenz linear_scan -- im Korpus NICHT vorhanden.
+    auto const dir_absent = comdare_user_tmp() / "appendix_ref_absent";
+    fs::remove_all(dir_absent, ec);
+    ag::AppendixConfig cfg_absent;
+    cfg_absent.csv      = fixture;
+    cfg_absent.out_root = dir_absent;
+    cfg_absent.langs    = {"en"};
+    ASSERT_EQ(cfg_absent.reference_value, "linear_scan"); // Default literal festgehalten
+    ASSERT_EQ(ag::generate_wide_appendix(cfg_absent), ag::status_ok);
+    EXPECT_FALSE(fs::exists(dir_absent / "en" / "tabellen" / "exchange_forest_vs_reference.tex"));
+    // Die Bestands-Figur (Geschwister-Paare untereinander) bleibt davon voellig unberuehrt.
+    EXPECT_TRUE(fs::exists(dir_absent / "en" / "tabellen" / "exchange_forest.tex"));
+
+    // (b) Referenz eytzinger -- im Korpus vorhanden.
+    auto const dir_present = comdare_user_tmp() / "appendix_ref_present";
+    fs::remove_all(dir_present, ec);
+    ag::AppendixConfig cfg_present;
+    cfg_present.csv             = fixture;
+    cfg_present.out_root        = dir_present;
+    cfg_present.langs           = {"en"};
+    cfg_present.reference_value = "eytzinger";
+    ASSERT_EQ(ag::generate_wide_appendix(cfg_present), ag::status_ok);
+    auto const f = dir_present / "en" / "tabellen" / "exchange_forest_vs_reference.tex";
+    ASSERT_TRUE(fs::exists(f));
+    auto const c = read_all(f);
+    EXPECT_NE(c.find("reference \\texttt{eytzinger}"), std::string::npos);
+    // Eigenes \label -- sonst kollidiert sie im Dokument mit der Bestands-Figur.
+    EXPECT_NE(c.find("\\label{fig:ld:exchange:forest:ref}"), std::string::npos);
+
+    fs::remove_all(dir_absent, ec);
+    fs::remove_all(dir_present, ec);
 }
 
 // ── Achsen-Inventar (2026-08-03) ──────────────────────────────────────────────
