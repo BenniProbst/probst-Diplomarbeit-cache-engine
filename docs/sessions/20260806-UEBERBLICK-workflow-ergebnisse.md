@@ -20,6 +20,47 @@ selbst sagen das an vielen Stellen ausdruecklich. Ich kennzeichne:
 
 Ohne Marke steht nur, was strukturell aus dem Material folgt (z. B. Dateizaehlungen).
 
+**ZWEITE LESEKONVENTION — nachgetragen am selben Abend, aus einem realen Fehlgriff.**
+
+Die Marken oben sagen, wie SICHER ein Befund ist. Sie sagen nicht, wie ALT er ist. Das ist die
+zweite Achse, und sie hat noch am Abend der Entstehung zugeschlagen:
+
+> **Jeder Befund dieses Dokuments traegt sein Erhebungsdatum, nicht den Stand von heute.**
+
+Die 121 zugrundeliegenden Berichte entstanden ueber den ganzen 06.08. verteilt; verdichtet wurden
+sie am Abend, **ohne Nachmessung gegen den dann aktuellen HEAD**. In der Zwischenzeit sind
+Landungen erfolgt, die Befunde erledigt haben, bevor irgendjemand sie las.
+
+**Der Anlassfall, dokumentiert statt verschwiegen:** Die Befunde **A-7** (`bytes_in_use_peak` ist
+kein Peak) und **A-8** (Literal 64 im CLU-Konsumenten) wurden als Bau-Paket vergeben, mit der
+Begruendung "muss vor dem ersten Batch stehen". Die Nachpruefung ergab:
+
+- **A-8 ist an beiden lebenden Stellen bereits geheilt**, durch zwei Commits **desselben Tages**:
+  `c1c76c87` (B14-NB4) zieht in `system_axis.hpp:347` den Nenner aus `axis_stats[5][5]` -- derselben
+  Quelle wie den Zaehler -- und ist `:348` fail-closed; `0b5ed557` (A1-Scheibe) ersetzt das Literal
+  in `node_width_config.hpp` durch die Single-Source `cacheline_line_bytes.hpp`.
+- **Zwei der vier A-8-Fundstellen waren ausserdem falsch zugeordnet:** `measure.hpp:38` ist toter
+  Beispielcode mit einem Unit-Test als einzigem Aufrufer (seit Ledger mittag-22 bekannt), und
+  `axis_05_memory_layout_cache_line_aligned.hpp:60` ist eine **andere Fehlerklasse** -- der
+  intrinsische Design-Deskriptor einer Strategie, die per Design auf 64 Byte gebaut ist. Der Code
+  zieht diese Trennlinie an zwei Stellen selbst ("NICHT mit `L::cache_line_size()` verwechseln").
+- **A-7 stimmt im Fakt, aber nicht in der Dringlichkeit.** Der END-Wert steht wirklich unter einem
+  Peak-Namen -- aber `bytes_in_use_peak` kommt im Voll-Lauf-Writer **0-mal** vor. Die Spalte lebt
+  nur im separaten `f15_compare`-Tool; der Voll-Lauf schreibt bereits ehrlich `n/a`, und der Name
+  ist ein Owner-Entscheid von vorgestern (A8-S3: CSV-Namen sind stabil, Alt-Mess-CSV ist Archiv).
+
+**Daraus die bindende Regel fuer die Benutzung dieses Dokuments:**
+
+> **Wer einen Eintrag zur Handlung macht, misst ihn VORHER gegen den heutigen HEAD.**
+> Ein Checkheft ist eine Spurenliste, kein Arbeitsauftrag. Ohne diese Nachmessung schickt dasselbe
+> Dokument jede Folge-Session auf dieselben toten Spuren -- und das kostet mehr als der
+> urspruengliche Defekt.
+
+**Was die Entlastung hier belastbar gemacht hat** (und was jede kuenftige Entlastung braucht):
+eine **repoweite Gegenprobe** auf `* 64` / `/ 64` im CLU-Kontext ausserhalb `tests/`, `ext/` und
+`build/`, die **keine weitere lebende Fundstelle** fand. Ohne sie waere der Befund "an vier Stellen
+nichts gefunden"; mit ihr ist er "eine fuenfte existiert nicht".
+
 ---
 
 ## 1. Was gelaufen ist
