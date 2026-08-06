@@ -8,11 +8,49 @@
 	url = ../comdare-cache-engine.git
 	branch = development
 	update = merge
+; ===================================================================
+;  ACHTUNG - DAS THESIS-REPO IST ZWEIMAL EINGEBUNDEN
+;  Die beiden folgenden Submodule zeigen auf DIESELBE url
+;  (../20260931-overleaf-diplomarbeit.git). Das ist keine Absicht, die
+;  sich aus dem Bau ergibt, sondern eine gewachsene Doppelung.
+;
+;  DIE LEBENDE EINBINDUNG ist  thesis/diplomarbeit.
+;    Nur sie wird von .gitlab-ci.yml gelesen, an 8 wirksamen Stellen:
+;      :102 :181 :285  changes:-Gates
+;      :309             verify:submodules (test -d + ls *.tex)
+;      :560 :565        PDF-Bau (cd thesis/diplomarbeit) + Artefakt
+;      :901             prebackup der PDFs
+;      :1102 :1111      Rueckschrieb anhang:forward (ls-tree / update-index)
+;
+;  DIE TOTE EINBINDUNG ist  Code/external/20260931-overleaf-diplomarbeit.
+;    Als PFAD kommt sie in .gitlab-ci.yml NULL Mal vor (gemessen:
+;    grep -n "Code/external/20260931" .gitlab-ci.yml -> exit 1).
+;    Sie wird nur ausgecheckt, von nichts gebaut und von nichts gelesen.
+;
+;  DARAUS FOLGT EIN STRUKTURELLES DRIFT-RISIKO:
+;    Der Rueckschrieb-Job anhang:forward bumpt NUR thesis/diplomarbeit
+;    (.gitlab-ci.yml:1111). Die tote Einbindung wird von keinem CI-Pfad je
+;    nachgezogen. Jeder CI-Rueckschrieb laesst die beiden Zeiger also
+;    erneut auseinanderlaufen - und verify:submodules (:309) prueft nur
+;    den lebenden Pfad, merkt es also nicht an dieser Stelle. Gefangen
+;    wird es erst von der git-submodule-status-Wache (^[-+U]) im selben
+;    Job, also NACHDEM die CI den Drift selbst erzeugt hat.
+;
+;  BEIM HANDANLEGEN GILT DAHER: beide Zeiger immer GEMEINSAM setzen.
+;
+;  ENTFERNEN IST NICHT ENTSCHIEDEN. Ob die tote Einbindung entfallen
+;  darf, ist Owner-Entscheid (Loeschung = GO). Bis dahin bleibt sie
+;  stehen und ist hier als tot MARKIERT, nicht geloescht.
+; ===================================================================
 [submodule "thesis/diplomarbeit"]
+	; LEBEND - diese Einbindung baut die CI.
 	path = thesis/diplomarbeit
 	url = ../20260931-overleaf-diplomarbeit.git
 	branch = development
 	update = merge
 [submodule "Code/external/20260931-overleaf-diplomarbeit"]
+	; TOT - kein CI-Pfad, kein CMake-Konsument; nur ausgecheckt.
+	; Hat bewusst KEIN branch/update: sie wird von keiner Automatik
+	; nachgezogen. Zeiger von Hand mit thesis/diplomarbeit gleichhalten.
 	path = Code/external/20260931-overleaf-diplomarbeit
 	url = ../20260931-overleaf-diplomarbeit.git
