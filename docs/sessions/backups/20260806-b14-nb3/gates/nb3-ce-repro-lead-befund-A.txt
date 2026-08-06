@@ -1,0 +1,27 @@
+== B14-NB3 REPRODUKTION, LEAD-BEFUND A ==
+-- (1) Was SAGT die Achse? (line_bytes_of ueber die Konsum-Bruecke) --
+  [OK]  Achse ProbeIst<B32>   line_bytes_of = 32
+  [OK]  Achse ProbeIst<B64>   line_bytes_of = 64
+  [OK]  Achse ProbeIst<B128>  line_bytes_of = 128
+  [OK]  Achse ProbeIst<B256>  line_bytes_of = 256
+-- (2) Was TUT der HEUTIGE Rumpf (Literal 64)? realer Lese-Offset von Record 1 --
+  [OK]  IST-Rumpf B32   effektiver Stride = 64
+  [OK]  IST-Rumpf B64   effektiver Stride = 64
+  [OK]  IST-Rumpf B128  effektiver Stride = 64
+  [OK]  IST-Rumpf B256  effektiver Stride = 64
+  ==> BEFUND A REPRODUZIERT: vier verschiedene Achsen-Belegungen, EIN einziger Stride 64.
+      KF-6-line_size-Permutationen differenzieren den CLA-Scan NICHT (Mess-Validitaets-Loch).
+-- (3) Was TUT der achsen-gebundene Rumpf? --
+  [OK]  SOLL-Rumpf B32   effektiver Stride = 64
+  [OK]  SOLL-Rumpf B64   effektiver Stride = 64
+  [OK]  SOLL-Rumpf B128  effektiver Stride = 128
+  [OK]  SOLL-Rumpf B256  effektiver Stride = 256
+  HINWEIS B32: round_up(48,32) = 64 -- der Stride BLEIBT 64. B32 und B64 sind auf der
+  Scan-Seite bei kRecordSize=48 zwangslaeufig gleich; der Unterschied liegt beim Alignment.
+-- (4) HEUTE (alle 5 Strategien am Default B64): Ist == Soll, also byte-neutral --
+  [OK]  CLA line_bytes_of (real) = 64
+  [OK]  CLA effektiver Stride (real, IST-Quelle) = 64
+  [OK]  CLA effektiver Stride via Observable-Huelle = 64
+
+== SONDE OK (alle Erwartungen getroffen) ==
+repro-rc=0

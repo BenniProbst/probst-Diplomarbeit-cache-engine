@@ -1,0 +1,28 @@
+Test project /home/comdare/wt-b14-ce/build/nb3-gate
+    Start 320: test_smoke_coverage_profile
+1/5 Test #320: test_smoke_coverage_profile ........   Passed    0.00 sec
+    Start 321: test_wdk_datasets_fairness
+2/5 Test #321: test_wdk_datasets_fairness .........   Passed    0.00 sec
+    Start 322: test_measurement_categories
+3/5 Test #322: test_measurement_categories ........   Passed    0.00 sec
+    Start 367: test_limits_entkopplung_vorstufe
+4/5 Test #367: test_limits_entkopplung_vorstufe ...   Passed    0.23 sec
+    Start 378: test_profile_roundtrip
+5/5 Test #378: test_profile_roundtrip .............   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+contract        =   0.01 sec*proc (4 tests)
+coverage        =   0.00 sec*proc (1 test)
+e4              =   0.23 sec*proc (3 tests)
+go5             =   0.00 sec*proc (1 test)
+golden          =   0.00 sec*proc (1 test)
+inc3            =   0.00 sec*proc (1 test)
+limits          =   0.23 sec*proc (1 test)
+profiles        =   0.01 sec*proc (3 tests)
+roundtrip       =   0.00 sec*proc (1 test)
+smoke           =   0.00 sec*proc (1 test)
+thesis_tiere    =   0.00 sec*proc (1 test)
+
+Total Test time (real) =   0.24 sec

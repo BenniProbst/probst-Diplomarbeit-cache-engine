@@ -1,0 +1,13 @@
+== B14-NB3 CLU-BEWEIS (cache_lines_touched folgt der Unterachse) ==
+-- (1) Byte-Neutralitaet am Achsen-Default (Soll: Alt-Formel 768) --
+  [OK]  CLA (echte Strategie) = 768
+  [OK]  ProbeCla<B64> = 768
+-- (2) Schaerfe: dieselben Daten, nur die Unterachse permutiert --
+  [OK]  B32  (ceil(1024*48/32)) = 1536
+  [OK]  B64  (ceil(1024*48/64)) = 768
+  [OK]  B128 (ceil(1024*48/128)) = 384
+  [OK]  B256 (ceil(1024*48/256)) = 192
+  [OK]  vier paarweise VERSCHIEDENE Werte (am Alt-Stand waeren alle gleich gewesen) = 1
+
+== CLU-BEWEIS OK -- byte-neutral am Default, scharf bei Permutation ==
+clu-rc=0
