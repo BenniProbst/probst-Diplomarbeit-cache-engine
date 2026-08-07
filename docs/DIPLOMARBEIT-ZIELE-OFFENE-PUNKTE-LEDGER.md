@@ -10283,3 +10283,71 @@ als das gemountete backup2. **backup1 ist erreichbar** (`:2049` NFS, `:445` SMB,
 Ohne Root kann ich **keinen Mount anlegen**. Der bestehende backup2-Mount laeuft als systemd-Unit
 `mnt-backup2\x2dnfs.mount`, **steht aber nicht in `/etc/fstab`** -> vermutlich transient,
 **ueberlebt keinen Reboot**. Das ist ein zweiter, unabhaengiger Befund.
+
+---
+
+## NACHTRAG 07.08.2026 abend-26 — E-E GELANDET · lint:static GEHEILT (die erste Heilung war halb) · A6
+
+### GELANDET, ce `development` = `a2b928eb`
+| Paket | Beleg |
+|---|---|
+| **E-E Overlay-Glied** | 711 Dateien im Schnitt, **428/428 gruen** ueber den GEMERGTEN Stand, 12 `static_assert` im Schnitt-Header, sechs Anker (drei auf Literale gezogen) |
+| **A6 NAS-Kommentar** | die "backup1 ist abgeschaltet"-Begruendung war falsch, am Objekt widerlegt |
+| **lint:static-Heilung** | Volllauf `rc=0`, 0 Fehlerzeilen |
+
+### DER SCHWERSTE FUND DES ABSCHNITTS: MEINE ERSTE HEILUNG WAR AN DER FALSCHEN ZEILE -- UND NUR HALB
+`development` war **schon vor E-E rot** -- Pipeline 15239 UND 15245, beide am selben cppcheck-Befund,
+**19 von 20 Jobs gruen, nur `lint:static` rot.** Zwei getrennte Fehler in meiner ersten Heilung:
+
+1. **DIE ZEILE ZAEHLT.** `// cppcheck-suppress` gilt fuer die **unmittelbar folgende** Zeile. Ich hatte
+   sie vor das `#if` gesetzt; cppcheck meldet aber die **`#error`-ZEILE** (50, nicht 49). Die
+   Suppression ging ins Leere -- **und ich hatte sie nie verifiziert, sondern angenommen.**
+2. **CPPCHECK MELDET NUR DEN ERSTEN preprocessorErrorDirective JE DATEI.** Haette ich nur Stelle 1
+   geheilt, waere die Blindheits-Gegenprobe darunter zum **neuen** roten Job geworden -- die Pipeline
+   waere rot geblieben, mit anderer Fehlermeldung. **Eine halbe Heilung, die wie eine ganze aussieht.**
+
+**Lokal mit dem EXAKTEN CI-Aufruf reproduziert** (cppcheck 2.21.0, dieselbe Version wie die CI,
+Aufruf aus `ci-templates/base-pipeline.yml:337` geholt statt geraten):
+```
+Ist-Stand          rc=2, meldet Zeile 50
+nur Zeile 50 fix   rc=2, meldet jetzt Zeile 59   <== die halbe Heilung
+beide fix          rc=0, null Ausgabe
+Volllauf (libs apps tests adapters benchmark_suite benchmarks + CI-Ignores)  rc=0, 0 Fehler
+```
+**GEGENPROBE, damit die Heilung nicht die Wache frisst:** mit erzwungenem `-DBOOST_MP11_VERSION` feuert
+der `#error` unter g++ **weiterhin**. Die Suppression ist **punktuell fuer den Analysator**, der
+Compiler bleibt scharf. Die Umkehrung waere der eigentliche Schaden gewesen.
+
+### DIE WACHE HAETTE ES ZWEIMAL FANGEN KOENNEN -- SIE SAGT, IHR FEHLE EIN WERKZEUG, DAS DA IST
+`vor_push_alle_wachen.sh` meldet cppcheck als *"lokal nicht vorhanden (MinIO-Cache-Artefakt)"*.
+**Das stimmt nicht:** `/home/comdare/tools/cppcheck-2.21.0/bin/cppcheck` traegt **exakt** die
+CI-Version. Beide roten Pipelines waeren vor dem Push sichtbar gewesen. **Eigener Auftrag** (nicht
+in diesem Abschnitt gebaut, damit die Landung nicht daran haengt).
+
+### DREI WEITERE EIGENE FEHLER IN DIESEM ABSCHNITT, alle am Objekt gefangen
+- **Zwei Agenten auf einen Checkout angesetzt, der 14 Commits zurueckliegt** (`wt-ce-rest` auf einem
+  Bau-Branch). Beide auf `origin/development` umgestellt; beide haben ihre Befunde **nachverifiziert**
+  und einer davon (FK-3/FK-4) kippte dadurch von "existiert nicht" auf "vollstaendig gelandet".
+- **E-E gegen einen unvollstaendigen Bauablauf gemessen:** 4/424 rot. Ursache war **mein** fehlender
+  2-Pass -- der Test sagt die Loesung selbst an (*"Generator-Tool nicht gebaut, vorher bauen"*).
+  Nach vollstaendiger Kette: **428/428**. Ich haette das fast als E-E-Defekt gebucht.
+- **`rc=$?` nach einer Pipe gemessen** -- das ist der Code von `head`, nicht von cppcheck. Zwei Laeufe
+  meldeten beide "rc=0", einer davon war rot. **Eine Zahl gemessen, die nicht die gemeinte war.**
+- **Zwei Gegenproben waren gegenstandslos:** `#if 1` ist fuer cppcheck eindeutig, es meldet nur
+  **bedingte** Direktiven. Erst die strukturgleiche Probe (undefiniertes Makro) trug etwas bei.
+
+### PLATTE: 7,8 GB -> 33 GB
+`/` stand bei **97 %**. Der GitLab-Runner laeuft auf **dieser** Platte -- am selben Tag hat ein volles
+`/` schon einmal eine Pipeline mit `ld: No space left on device` gerissen. Sieben `build/`-Verzeichnisse
+abgeschlossener Pakete entfernt, **je mit `git checkout -- build/` danach** (dort liegt eine GETRACKTE
+Mess-CSV); alle sieben Worktrees danach `status --porcelain` = **0 Zeilen**, kein Datenverlust.
+
+### OWNER-ENTSCHEID F4 (07.08. abends): `mmx` BLEIBT DEKLARIERT
+Ich hatte gefragt, ob `mmx` unterdrueckt werden soll, weil es auf x86-64 zur Grundlinie gehoert und in
+**jedem** Preimage staende. Owner verbatim:
+> *"Das ist technisch korrekt, wenn die Hardware vorhanden ist, dann wird sie deklariert. wir haben
+> auch einen Vision5 2 mit RISC-V, mmx ist nicht selbstverstaendlich"*
+
+**Meine Praemisse war zu eng.** "`mmx` ist immer wahr" gilt **nur auf x86-64**. Im Cluster steht ein
+**VisionFive 2 (RISC-V)** -- dort traegt die Abwesenheit von MMX echte Information. Der Katalog
+beschreibt eine **plattformuebergreifende** Landschaft, nicht nur die x86-Zelle.
