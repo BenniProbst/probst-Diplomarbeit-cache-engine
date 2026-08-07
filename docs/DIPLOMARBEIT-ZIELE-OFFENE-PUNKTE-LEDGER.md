@@ -10494,3 +10494,52 @@ Architektur parallel zur echten Pipeline. **Kein Risiko, aber viel Rauschen bei 
 - `concepts/pressure_state.hpp` (`std::variant<Idle,Warmup,...>`): **Konsumenten nicht verfolgt**, unklar
   ob erreichbar.
 - **Kein eigener L5-Sweep** ueber `axes/`/`topics/` -- Heap nur in den zwei bestaetigten heissen Pfaden geprueft.
+
+---
+
+## NACHTRAG 07.08.2026 abend-29 — DIE WACHE HAT JETZT DAS GATE, DAS IHR HEUTE ZWEIMAL GEFEHLT HAT
+
+### GELANDET ce `db6cc047`: cppcheck-Gate in `vor_push_alle_wachen.sh`
+Die Wache fuehrte cppcheck als *"Werkzeug lokal nicht vorhanden (MinIO-Cache-Artefakt)"*.
+**Das war falsch** -- `/home/comdare/tools/cppcheck-2.21.0/bin/cppcheck` traegt **exakt** die
+CI-Version. Die Behauptung hat an EINEM Tag **zwei rote Pipelines** durchgelassen.
+**Eine Wache, die ein vorhandenes Werkzeug fuer fehlend erklaert, ist schlimmer als gar keine:
+sie erzeugt die Gewissheit, geprueft zu haben.**
+
+**Drei Entscheidungen im Bau, jede gegen eine naheliegende Abkuerzung:**
+1. **VOLLER Scope statt Diff-Scope.** cppcheck meldet nur den **ersten**
+   `preprocessorErrorDirective` **je Datei** -- eine Aenderung in Datei A kann einen Befund in
+   Datei B sichtbar machen, die selbst unberuehrt ist. **Genau das ist heute passiert.**
+2. **Die Pfade kommen aus der `.gitlab-ci.yml`**, nicht aus einer Kopie im Skript -- eine Kopie
+   driftet, und die Wache waere wieder eine Aussage ueber sich selbst statt ueber den Job.
+   Faellt die Variable weg, wird der Template-Default **benannt**, nicht angenommen.
+3. **Fehlt das Werkzeug, wird gesagt WO gesucht wurde**, und das Gate gilt als **OFFEN**, nicht als
+   gruen. *Ein nicht gelaufener Test ist kein bestandener.*
+
+**POSIX beachtet:** `#!/bin/sh` mit `set -eu`. Keine Process Substitution (unter dash gebrochen),
+kein `while read` hinter einer Pipe (Subshell -> Ignore-Liste verloren). **Mit `dash -n` gegengeprueft,
+nicht nur mit bash.**
+
+**BEIDE Richtungen bewiesen:**
+```
+ohne Koeder:  Exit 0, 0 Fehlerzeilen  -> WACHE GRUEN
+mit Koeder:   uninitvar gemeldet      -> WACHE ROT (rc=1)
+danach: reset --hard, 0 uncommittet, Koeder-Datei weg
+```
+
+### K13 -- EINE LEHRE, DIE HEUTE DREIMAL FAELLIG WAR: DER KOEDER MUSS ERST BEISSEN
+Meine erste Bissprobe fuer dieses Gate war **untauglich** und die Wache blieb gruen:
+`#if defined(COMDARE_BISSPROBE_NIE_DEFINIERT)` -- **cppcheck probiert Konfigurationen, deren Makro
+nirgends definiert wird, gar nicht erst durch.** Vorher schon zweimal dasselbe Muster mit `#if 1`
+(fuer cppcheck eindeutig, also keine *bedingte* Direktive).
+**Die Regel, die daraus folgt:** eine Gegenprobe zaehlt erst, wenn der eingebaute Fehler
+**nachweislich direkt** gemeldet wird. **Reihenfolge: Koeder gegen das WERKZEUG -> erst dann gegen
+die WACHE.** Wer die Wache mit einem stummen Koeder testet, misst nichts und glaubt, gemessen zu haben.
+Das ist dieselbe Fehlerklasse wie "rc nach einer Pipe" (K11): **eine Zahl erhoben, die nicht die
+gemeinte war.**
+
+### STAND ce/super nach diesem Abschnitt
+| | Ref | Pipeline |
+|---|---|---|
+| ce `development` | **`db6cc047`** | 15250 (Vorgaenger `a2b928eb`) **gruen** |
+| super `development` | dieser Commit | 15251 gruen |
