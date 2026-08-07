@@ -8045,3 +8045,48 @@ Und: ein wiederverwendetes `build/`-Verzeichnis aus einer fremden Sitzung ist **
 Dies ist dieselbe Familie wie [[reference_lokale_vollbau_luecken_falsches_gruen]], nur in der
 Richtung **FALSCHES ROT** -- und damit die dritte Variante derselben Fehlerklasse an einem Tag
 (nach `/build` frisst `/builder/` und dem falschen Checkout).
+
+---
+
+## NACHTRAG 07.08.2026 mittag-6 -- WELLE A GELANDET: T-9 MIN/MAX-KATALOG SPEIST DEN BREAK-EVEN-VERGLEICH
+
+**MODUS-WECHSEL (Owner-Direktive mittags):** Arbeit ab jetzt strikt parallel nach Wellenplan --
+temporaere Branches je Welle, bei Erfolg merge + LOESCHEN, Schar delegierter Agenten. Parallel
+laeuft ein ultracode-DOPPEL-AUDIT (Fable 5 xhigh + Codex, wf_355205a7) ueber die gesamte
+Opus-Arbeit der letzten 3 Kontexte. Ausserdem Owner-Frage beantwortet: **KEIN Datum/Uhrzeit im
+Fingerprint** -- die Hash-Bildung ist consteval (Uhr = Compile-Fehler), alle 9 Glieder zeitfrei,
+die einzige Datumsbildung (experiment_substitute_date) fliesst nur in eine cout-Logzeile.
+
+### T-9 GELANDET (ce 875a57cd, Welle-A-Worktree 5f21305a, Branch nach Merge geloescht)
+- **NEU `heuristik/axis_optimization_catalog.hpp`** (436 Z., constexpr, kein Runtime-Switch):
+  19 Achsen T0..T18, **45 Zielgroessen** mit expliziter Richtung, jede mit BEFUND-Zeilennummer
+  rueckverfolgbar. **Kern-Entscheidung: die Richtung haengt an der ZIELGROESSE, nicht an der
+  Achse** (T3 will MAX Kompressionsrate UND MIN Baumhoehe -- eine "Achse->eine Richtung"-Tabelle
+  waere eine Faelschung der Quelle gewesen).
+- **Pareto-Achsen T5/T6/T18 verweigern compile-time** die Einzel-Richtungs-Frage (static_assert
+  mit sprechendem Text). Quelle dafuer ist der BEFUND :450-453 -- NICHT der Ledger (die
+  Lead-Behauptung "Pareto-Sonderbehandlung steht im Ledger" war falsch, 0 Treffer).
+- `break_even.hpp` v1->v2: OptimizationDirection als NTTP, `if constexpr`, Default Minimize
+  haelt Alt-Aufrufer quellkompatibel. axis_version_lock mitgezogen (Bump + 4. Header).
+- **DREI Bissbeweise literal:** Alt-Stand zurueckgesetzt -> 3 FAILED (die MAX-Groesse meldet
+  die niedrigere Kurve als besser -- exakt der Defekt); Pareto-Frage -> static_assert-Fehler;
+  unbekannte Zielgroesse -> consteval-Uebersetzungsfehler statt stillem MIN-Default.
+- 417/417 im Worktree; am Merge-Stand einmalig test_rcu/test_rcu_concurrency parallel-flaky
+  (3x seriell gruen, RCU von Welle A unberuehrt -- **vorbestehende Flakiness, kein
+  Regressionsbefund**, aber als Beobachtung notiert).
+
+### ZWEI KORREKTUREN AN DER LEAD-VORERHEBUNG (nachgezaehlt und bestaetigt)
+Die mittag-4-Zahlen "13 MAX / 19 MIN" waren FALSCH -- das Suchmuster `**MAX**` verfehlte
+inline-Nennungen ohne Bold. Korrekt: **17 MAX / 32 MIN Nennungen, 15 von 19 Zeilen tragen MAX**
+(als Zielgroessen operationalisiert: 17 MAX / 28 MIN / 45). Die static_asserts im Katalog tragen
+die korrekten Zahlen als Anker. Fehlerklasse: dieselbe wie beim ugrep-Gate -- ein zu enges
+Muster liefert eine plausible, falsche Zahl.
+
+### NEU OFFEN (Owner-Entscheid): T19 persistence_target hat KEINE Katalog-Zeile
+Der BEFUND ist Stand 09.07. (mit telemetry/isa, die seither System-Achsen wurden);
+`persistence_target` ist seit STRUKT-R ORG-18 in der Komposition, hat aber **keine
+Min/Max-Aussage**. Welle A hat KEINE Richtung geraten: `catalog_axis_from_name` ist dort
+honest-empty, und ein consteval-Anker (17 gemeinsam + 2 nur-Katalog + 1 nur-Komposition)
+bricht bei jeder kuenftigen Verschiebung. **=> Owner-Frage: welche Optimierungs-Semantik hat
+persistence_target?** Kleiner Folge-Schnitt daneben: BEFUND Abschnitt 2 traegt weitere
+Zielgroessen (T0 throughput, T6 Reklamation), bewusst noch nicht uebernommen.
