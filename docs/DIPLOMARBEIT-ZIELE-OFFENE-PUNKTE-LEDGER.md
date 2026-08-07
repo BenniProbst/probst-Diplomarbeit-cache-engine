@@ -9048,3 +9048,69 @@ Zeile** gilt.
    zum alten `DD-A..DD-E`-Satz -- `LEDGER:400` dokumentiert, dass der **damals schon** wegen
    Kollision mit E0-E4 umbenannt wurde. **Vorschlag: diese sechs als `VS-A..VS-F` (Versions-Stempel)
    fuehren.**
+
+---
+
+## NACHTRAG 07.08.2026 abend-11 — FLAG-GRAMMATIK v2 GEBAUT: der laute Bruch ist vom Lead AM COMPILER bewiesen
+
+Branch `bau/flag-grammatik-v2-s1`, zwei Commits, **181 Dateien, 2537+/1916-**, Arbeitsstand sauber.
+`ab0b352e` (die Grammatik) und `44397f58` ("Deckel am echten SIMD-Katalog bemessen + der stille
+Sentinel bricht jetzt laut"). **Noch NICHT gelandet** -- der volle ctest-Lauf fehlt.
+
+### DER LEAD HAT DIE KERNBEDINGUNG SELBST GEPRUEFT -- nicht dem Bericht geglaubt
+Eigener Uebersetzungslauf gegen den Header (`g++ -std=c++23 -fsyntax-only`), vier Proben:
+```
+static_assert(!ce_owned_version_is_wellformed("v1.0.0c"));                       // Alt-Form schlaegt an
+static_assert(!ce_owned_version_is_wellformed("1.0.0c"));                        // Q3 ohne Punkt schlaegt an
+static_assert( ce_owned_version_is_wellformed("1.0.0.c"));                       // neue Form gueltig
+static_assert( ce_owned_version_is_wellformed("1.0.0.c{p.e}.x512{f.vl.bw.dq}.gfni")); // Owner-Beispiel gueltig
+```
+**EXIT=0, keine Diagnose.** Damit ist zweierlei bewiesen: der Header uebersetzt (also sind **alle**
+`static_assert`s darin wahr), **und** die Alt-Form schlaegt an der Wache an.
+
+### DIE OWNER-BEDINGUNG IST ERFUELLT: der Bruch ist LAUT, nicht still
+Der Owner hatte genau eine Auflage: *"der Bruch muss LAUT sein"*. Die Wache
+`ce_owned_version_is_wellformed` steht als **`static_assert` an den echten Versions-Stellen**:
+`profile_facade/planner/planner_version.hpp:84` und `builder/pruef_dock/pruef_dock_version.hpp:105,
+108, 111, 114, 117` (fuenf Dock-Versionen). **Ein Alt-Literal bricht damit den Compiler**, es wird
+nicht still zum Sentinel.
+Der Header nennt die drei Wachen ausdruecklich: `ce_owned_version_is_wellformed` /
+`_satisfies_cpu_enforce` (dort), `measurement::axis_version_entries_are_wellformed` (an den
+Stempel-Stellen), `abi::dotted_version_is_wellformed` (Ruecklese-Seite).
+
+### ACHT REGELN, JEDE EINZELN COMPILE-TIME BEWIESEN
+Der Header fuehrt zu jeder Regel Positiv- **und** Negativfaelle als `static_assert` -- sie koennen
+nicht "vergessen werden zu laufen". Auszug:
+- **R1** kein `v`: `parse("v1.0.0c") == AlgoSemVer{}`, ebenso `"v1.0.0"`, `"v1.0.0ce"`, `"v0.0.0"`,
+  **und `"v1.0.0.c"`** (v + neue Notation ist ebenfalls falsch)
+- **R2** Punkt vor jedem Flag: `"1.0.0c"` Sentinel · `"1.0.0..c"` Sentinel · `"1.0.0."` Sentinel ·
+  und die feine Probe `parse("1.0.0.cp") != parse("1.0.0.c.p")` -- **`cp` ist EIN Token**
+- **R3** Basis an ihrer Klammer: `"1.0.0.c.{p.e}"` Sentinel · `"1.0.0.{p.e}"` (Klammer ohne Basis) Sentinel
+- **R4** kein fuehrender Punkt hinter `{`, keine leere Gruppe
+
+### DER BEDEUTUNGSWECHSEL IST DOKUMENTIERT, MIT NENNER
+Der Header haelt fest: `"v1.0.0ce"` hiess bis 06.08. *CPU + EXPERIMENTELL*, ab 07.08. ist `e` der
+**Efficiency Core**. Ein Alt-`ce` uebersetzt sich deshalb auf `1.0.0.c` -- das `e` faellt weg, weil
+das Konzept ersatzlos deprecated ist. **Und der Agent hat den Nenner erhoben:** im ce-Bestand kam
+dieser Fall **null Mal** vor (per grep). Die Regel steht fuer Fremd-Literale und die Lesbarkeit der
+git-Historie.
+
+### DIE REPRAESENTATION -- flach statt verschachtelt, mit begruendeter Ablehnung der Alternative
+`std::array<FlagToken, kMaxFlagNodes>` + Belegungszaehler, jeder Knoten traegt Token und Tiefe --
+**nicht** das naheliegende `array<FlagEntry, N>` mit geschachteltem Sub-Array (die Ablehnung ist im
+Header begruendet). Deckel: `kMaxFlagNodes = 96`, `kMaxFlagTokenLen = 16`, `kMaxFlagDepth = 4`, alle
+drei mit `static_assert` gesichert. **Der Deckel ist am echten SIMD-Katalog bemessen**, nicht geraten
+(Commit `44397f58`). Heute uebt der Bestand Tiefe 1 aus (`c{p}`).
+
+### EIN FUND, DEN DER LEAD NICHT BEAUFTRAGT HATTE
+Der Auftrag nannte die Punkt-Kollision nur fuer `-msse4.1`. Der Agent hat sie auf **`avx10.1` /
+`avx10.2`** erweitert: *"Die DOTTED-Katalognamen (avx10.1/avx10.2) brechen LAUT statt still in zwei
+Knoten zu zerfallen"*. Ohne das waere `avx10.1` als zwei Sub-Token gelesen worden -- eine stille
+Fehlinterpretation genau der Klasse, gegen die die ganze Grammatik gebaut ist.
+
+### WAS NOCH FEHLT, BEVOR GELANDET WIRD
+1. **Der volle ctest-Lauf** -- 181 beruehrte Dateien sind zu viel fuer eine Header-Probe. Angefordert.
+2. Die Angabe, **ob bei der Massen-Migration irgendwo inhaltlich geraten** wurde, welche Flags eine
+   Stelle traegt. Mechanisch ist richtig; geraten waere die Stelle, die nachzupruefen ist.
+3. Was mit der **Negativ-Test-Batterie** geschehen ist -- sie testete die ALTE Grammatik und waere
+   danach wertlos oder falsch gruen.
