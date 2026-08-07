@@ -207,7 +207,12 @@ Am Objekt geprueft (nicht am Ledger-Zitat). Vorstufen und Phase 1–3 **alle erl
    Konstrukt (C0..C19), XML-unabhaengig.
 3. `golden_320_catalog` bleibt ein **handgetippter Literal-Alias** — die 320-Semantik lebt als
    Literal, nicht als Ableitung.
-**Das ist der konkreteste Hauptstrang-Posten, den es gerade gibt.**
+**ABER: DIESER POSTEN IST OWNER-GATED, nicht entscheidungsfrei.** Der Lead hatte ihn zuerst als
+baubar ausgewiesen -- falsch. LEDGER:812 (10.07. nachts) haelt fest, verbatim: *„die Umsetzung ist
+compile-time-gebunden (Pre-Build-Codegen, kein Runtime) und **golden-heikel** ==> **eigener
+Increment mit separatem GO**."* Die drei Luecken sind der bewusst zurueckgestellte Rest eines
+Increments, nicht ein Rueckstand. **Vor jedem Bau: pruefen, ob das GO inzwischen erteilt wurde**,
+und `LIMITS-ENTKOPPLUNG-ANALYSE.md` lesen (traegt Risiken und Gate-Plan).
 
 ### 4.3 DER EINE VERGESSENE POSTEN aus 30 Plan-Straengen
 `allocators/*.profile.xml` — **23 Akten**, vom Parser nie geladen (`parse()` scannt nur `sota/`),
@@ -241,11 +246,30 @@ Gesichert: `docs/sessions/backups/20260807-explores-und-simd-katalog/` (6 Lenses
 **Beide sind gegenzulesen, bevor etwas gelandet wird** (Explore-Doktrin Stufe 2). Der Bau-Agent hat
 Anweisung, **nicht** zu pushen und **nicht** zu mergen.
 
-### 4.7 Was der Lead heute an sich selbst korrigiert hat
-Die Phasen-Zuordnung wurde **zweimal** angefasst. Endstand: **beide Nummerierungen existieren real**
-(XML-Roadmap *und* Fahrplan); LEDGER:3774 verweist auf den **Fahrplan**; **beide Lesarten fuehren
-zum selben Ort**. Der erste Nachtrag („FALSCH") war zu hart und ist in abend-2 relativiert.
-**Sprachregelung ab jetzt: „XML-Phase n" vs. „Fahrplan-Phase n".**
+### 4.7 Die Phasen-Korrektur wurde VERIFIZIERT — richtig, an zwei Stellen zu grob
+Eine adversarische Pruefung (Auftrag: widerlegen) hat sie gegen Primaerquellen und das Transkript
+geprueft. **VERDIKT: RICHTIG.** Der tragende Beleg ist sogar staerker als gefuehrt: alle vier
+Ledger-Stellen folgen dem Muster `Phasen 3-5 -> TRIGGER -> Phase 6 / USER-GO`, und **nur** der
+Fahrplan hat Phase 5 = Trigger und Phase 6 = Messung. Das ist Struktur, nicht Deutung.
+
+**Drei Berichtigungen, die daraus folgen:**
+1. **Es sind mindestens DREI Nummernkreise, nicht zwei.** Dossier 16
+   (`16_E1_E4_KONSOLIDIERUNG_DOSSIER.md:199`) fuehrt „Phase 4 (#31 = das Abnahmekriterium)" --
+   eine dritte Bedeutung. Beide Zaehlungen stehen im **selben Ledger** nebeneinander (:812 traegt
+   woertlich „Limits-Entkopplung (Dossier 17 Phase 4)"). Der Dossier-16-Kreis ist laut :6855
+   erledigt/superseded, existiert aber. Dazu zwei entfernte (`02_aktueller_master_REV7_7.md:176`;
+   LEDGER:1370/:3178).
+2. **„Flag-Grammatik ist Phase-4-Vorarbeit" ist eine INTERPRETATION**, kein Beleg. Der Fahrplan
+   traegt die 12-Perm woertlich, aber den Kausalzusammenhang zur Grammatik traegt **kein** Dokument.
+   Plausibel -- ab hier als Schluss gekennzeichnet, nicht als Faktum.
+3. **Ein Prozessfehler, schwerer als beide Sachfehler:** der Lead hat die unverifizierte Behauptung
+   **committet und gepusht** (`09b85095`), waehrend die eigene Pruefung dazu noch lief. Ein Commit
+   ist eine Festlegung; er darf einer laufenden Verifikation nicht vorgreifen. Gebucht als
+   Arbeitsfehler-**Klasse 7**. Regel: entweder die Aussage nicht ins Dokument -- oder der Vorbehalt
+   **in denselben Absatz**.
+
+**Sprachregelung, praezisiert:** „Fahrplan-Phase n" (aktiv) · „XML-Phase n" (Dossier 17, aktiv) ·
+Dossier-16-Phasen (historisch, erledigt). Wer eine Phase-Nummer liest, bestimmt zuerst den Kreis.
 
 ## 5. Offene Owner-Entscheide
 

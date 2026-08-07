@@ -8476,3 +8476,79 @@ verweist. Bemerkenswert: **beide Lesarten fuehren zum selben Ort** -- Phase 1-3 
 angefangen. Die Owner-Erinnerung war in JEDER Lesart richtig. Eine unabhaengige Verifikation der
 Korrektur laeuft noch (Agent `Verify-Phasen-Korrektur`); ihr Ergebnis ist nachzutragen.
 **Empfehlung zur Vermeidung der naechsten Verwechslung: kuenftig "XML-Phase n" vs. "Fahrplan-Phase n".**
+
+---
+
+## NACHTRAG 07.08.2026 abend-3 — DIE KORREKTUR WURDE VERIFIZIERT: richtig, aber an zwei Stellen zu grob
+
+Eine adversarische Pruefung (Auftrag: die Korrektur zu WIDERLEGEN) hat abend-1/abend-2 gegen
+Primaerquellen und das Transkript geprueft. **VERDIKT: RICHTIG.** Kein Kernbefund faellt. Aber zwei
+eigene Ungenauigkeiten sind aufgedeckt und werden hier berichtigt, plus ein Fund, der die
+Phase-4-Arbeit anders einordnet als gedacht.
+
+### BESTAETIGT -- der tragende Beleg ist staerker, als der Lead ihn gefuehrt hatte
+Der Lead hatte die Fahrplan-Zuordnung mit dem Inhalt begruendet. Der eigentliche Beweis ist die
+**Nachbarschaft**: alle vier Ledger-Stellen folgen demselben Muster
+`Phasen 3-5 -> TRIGGER -> Phase 6 / Messung / USER-GO`:
+- :3774 "... -> Phase 3/4 -> TRIGGER-SEQUENZ ... -> Phase 6 STOPP am USER-GO"
+- :3991 "... -> **Phasen 3-5**; Trigger-Ziel Do 07.08. haelt; **Messung Phase 6 = USER-GO**"
+- :4061 "... **Phasen 3-5** dazwischen/danach -> **Trigger** Do ..."
+- :4119 "P3 unveraendert: **Phasen 3-5** -> **Trigger** Do 07.08. ... -> **Phase 6 USER-GO-STOPP**"
+Nur der Fahrplan hat Phase 5 = "Trigger-Sequenz" und Phase 6 = "Nach Trigger (Messung USER-GO)".
+Dossier 17 traegt an 5/6 "Framework x Workload" / "Mess-System" und erst an 8 den Voll-Lauf --
+semantisch deutlich schlechter passend. **Die Zuordnung ist damit nicht Deutung, sondern Struktur.**
+
+### BERICHTIGUNG 1 -- es sind MINDESTENS DREI Nummernkreise, nicht zwei
+abend-2 schrieb "beide Nummernkreise leben nebeneinander weiter". Das ist als
+Vollstaendigkeitsanspruch **falsch**. Selbst nachgelesen:
+- **Dossier 16** `docs/architektur/16_E1_E4_KONSOLIDIERUNG_DOSSIER.md:199` fuehrt einen DRITTEN:
+  *"Phase 4 (#31 = das Abnahmekriterium): ein Experiment laesst sich allein durch XML-Aenderung
+  definieren"* -- weder Dossier-17s #229-Limits-Entkopplung noch Fahrplans Beweise+12-Perm.
+- Beide Zaehlungen stehen **im selben Ledger nebeneinander**, ohne Trennung: LEDGER:812 traegt
+  woertlich *"(b) Limits-Entkopplung (Dossier 17 Phase 4)"*, waehrend derselbe Absatzbereich
+  Phase 4/#31 meint.
+- Praktisch entschaerft: LEDGER:6855 verbucht *"Phase 4/#31-messreihen-Pfad"* unter den
+  6/8 ERLEDIGT/superseded-Paketen. Der Kreis ist historisch, aber er existiert.
+- Zwei weitere, thematisch entfernte Zaehlungen: `02_aktueller_master_REV7_7.md:176` ("Phase 4 load
+  -- ModuleLoader", 13.05.) und die 3-Phasen-Vorlage LEDGER:1370/:3178 (prt-art / cache-engine /
+  kombinierte Achsen).
+**KORREKTE FASSUNG: mindestens DREI dokumentierte "Phase N"-Zaehlkreise, davon einer historisch,
+plus zwei entfernte.** Die Sprachregelung "XML-Phase n" vs. "Fahrplan-Phase n" reicht nicht --
+sie braucht einen dritten Namen oder den ausdruecklichen Vermerk, dass Dossier 16 erledigt ist.
+
+### BERICHTIGUNG 2 -- eine Folgerung war eine INTERPRETATION, gebucht als Faktum
+abend-1/abend-2 buchten: *"Die heutige Flag-Grammatik-Arbeit IST Phase-4-Vorarbeit."* Der Fahrplan
+traegt zwar woertlich `A4/12-Perm (O0-O3 x {no_ext,avx2,avx512})` -- aber **der Kausalzusammenhang
+zur Flag-Grammatik steht NIRGENDS im Korpus**. Er ist plausibel (die Notation fuer
+no_ext/avx2/avx512 muss vor der 12-Perm-Messung stehen), aber er ist eine **Schlussfolgerung des
+Leads, kein Beleg**. Ab hier als Interpretation gekennzeichnet.
+
+### BERICHTIGUNG 3 -- ein PROZESSFEHLER des Leads, der schwerer wiegt als beide Sachfehler
+Die Pruefung hat die Reihenfolge rekonstruiert:
+1. Der Lead behauptet Phase 3/4 = Dossier 17.
+2. Der Owner fragt nach.
+3. Der Lead startet eine Verifikation.
+4. **Der Lead schreibt und COMMITTET (`09b85095`) eine Kontextuebergabe, die die unverifizierte
+   Behauptung noch einmal bekraeftigt -- BEVOR irgendein Verifikationsergebnis vorliegt.**
+5. Erst danach kommt die Kartierung und widerlegt sie.
+**Das ist eine neue Facette der eigenen Fehlerklasse:** nicht nur "nichts behaupten ohne Quelle",
+sondern **nichts in ein dauerhaftes, gepushtes Dokument schreiben, waehrend die eigene Pruefung
+dazu noch laeuft**. Ein Commit ist eine Festlegung; er darf einer laufenden Verifikation nicht
+vorgreifen. Wo es eilt, gehoert der Vorbehalt IN das Dokument ("Verifikation laeuft, Ergebnis
+abwarten") -- das war hier an einer Stelle getan, an der tragenden aber nicht.
+
+### FUND BEIM GEGENLESEN -- Phase 4 ist NICHT vergessen, sondern GATED
+Beim Nachlesen von LEDGER:812 (Belegstelle fuer Berichtigung 1) faellt der eigentliche Satz auf,
+Eintrag 10.07. nachts, verbatim:
+> *"(b) Limits-Entkopplung (Dossier 17 Phase 4): bewusst NUR als Analyse geliefert
+> (`LIMITS-ENTKOPPLUNG-ANALYSE.md` ...); die Umsetzung ist compile-time-gebunden (Pre-Build-Codegen,
+> kein Runtime) und golden-heikel ==> **eigener Increment mit separatem GO**."*
+
+**Das aendert die Einordnung des Postens grundlegend.** Die drei Luecken aus abend-2
+(`comdare_attach_generated_catalog` nur test-seitig, hardcodierte `PilotEngine`, Literal-Alias
+`golden_320_catalog`) sind **kein Rueckstand und kein Versehen** -- sie sind der bewusst
+zurueckgestellte Rest eines Increments, der seit dem 10.07. auf ein **separates Owner-GO** wartet.
+Der Grund ist genannt und gilt weiter: **golden-heikel**.
+**=> Task #40 ist damit nicht "bauen, kein Entscheid noetig", sondern OWNER-GATED.** Die
+Gegenprobe -- ob das GO zwischenzeitlich erteilt wurde -- steht noch aus und ist vor jedem Bau zu
+fuehren. Der Lead hatte den Posten in abend-2 als entscheidungsfrei ausgewiesen; das war falsch.
