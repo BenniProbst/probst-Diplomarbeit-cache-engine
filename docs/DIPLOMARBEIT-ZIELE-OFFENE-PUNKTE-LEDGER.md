@@ -8232,3 +8232,146 @@ Jetzt vollzogen an drei Stellen je Sprache: Praesens Passiv -> Sollform + Vollzu
 ADR-12 behaelt ihr Entscheidungs-Praesens (ADR-Konvention) und bekommt ein eigenes Feld
 **Vollzugsstand**. DE gefuehrt, EN inhaltsgleich nachgezogen. chktex auf ALLEN SECHS beruehrten
 Dateien 0 Warnings, DE 204 / EN 194 Seiten, .blg 0/0.
+
+---
+
+## OWNER-KERN 07.08.2026 nachmittags -- DIE FLAG-GRAMMATIK WIRD NEU DEFINIERT (Punkt-Notation, Komposit-Flags, 'e' = EFFICIENCY)
+
+**Owner verbatim, in zwei Schritten an einem Nachmittag:**
+
+Schritt 1 (Filter-Semantik): *"Nun e hat die hoechste Prioritaet und steht ganz vorn (jedes
+character ist ein filter fuer einen Hardware Bereich oder Eigenschaft in der die Binary gueltig
+ist und dort laufen kann), danach koennen fuer den Algorithmus gueltige filter wie c fuer CPU
+folgen. Die Filter p oder e schraenken die CPU compile Nutzung noch weiter ein. Die Reihenfolge
+ist tatsaechlich nicht relevant aber wird formal eingehalten. Es sind filter-flags. Weitere
+Filterflags sind xNUMBER fuer AVX128,AVX512 oder AVX256 als x128* x256* x512** mit '*' als
+Hardware Flags speziell nachfolgend fuer die AVX verbauten Register. Die Flags bezeichnen also
+fuer jeden Algorithmus als Organ in einer Achse, fuer welche hardware er gebaut wurde. Wenn die
+System-Achse flags und Hardware freigibt, muessen auch nur Achsen-Algorithmen verwendet werden,
+die mindestens die minimal-Anforderungen unterstuetzen, also ohne Erweiterung oder stufenweise mit
+Erweiterung bis zur vollen Optimierungs-Stufe."*
+
+Schritt 2 (die Notation, nach dem Lead-Befund "x128/x256/x512 gibt es nirgends"): *"Ja korrekt,
+habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und trennen das
+Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes Organ/Algorithmus
+einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil es jetzt fuer
+efficiency core steht. Jeder Algorithmus kann eigenstaendig gegen zusaetzliche Meta-Meta-Achsen
+als Komposit-Erweiterungs-Flags optimiert und kompiliert werden. Die Basis-System-Achsen sind
+statisch in ihrer Zeile der System-Achsen, aber die Meta-Meta-Achsen bilden je Algorithmus eine
+spezielle Signatur fuer die Kennzeichnung der eignung einer binary fuer ein System. Ich aendere
+hiermit die Formatierung durch das Trennen durch '.' . Die Reihenfolge aller Flags und
+Komposit-Flag-Flags ist weiterhin egal."*
+
+### DIE NEUE FORM (Lead-Auslegung, Bestaetigung ausstehend)
+```
+achse@X.Y.Z.<flag>.<flag>.{<komposit>.<sub>.<sub>}...
+Beispiel:   memory@1.0.0c.p.e.{x512.f.vl.bw.dq}
+```
+- **Trenner ist '.'** zwischen allen Flags -- die bisherige Aneinanderreihung ohne Trenner faellt.
+- **Komposit-Flags in geschweiften Klammern**, intern ebenfalls '.'-getrennt.
+- **'e' == EFFICIENCY CORE.** Die Bedeutung *experimental* ist **DEPRECATED**.
+- **'p' == performance core** (beide verengen die CPU-Nutzung weiter).
+- **Reihenfolge sachlich egal**, formal eingehalten.
+- **Je Algorithmus eine eigene Meta-Meta-Signatur** -- sie kennzeichnet die EIGNUNG einer Binary
+  fuer ein System. Basis-System-Achsen bleiben statisch in ihrer System-Achsen-Zeile.
+
+### WAS DAS BRICHT (heutiger Stand, vom Lead am Objekt gelesen)
+`algo_semver.hpp:26-30` bindend seit Owner-Q3 vom 02.08.:
+```
+version := 'v' UINT '.' UINT '.' UINT [ HWFLAG [ 'e' ] ]
+HWFLAG  := 'c'|'g'|'f'|'n'  -- GENAU EINES, klein, DIREKT angehaengt, kein Trenner
+```
+Sechs harte Bruchstellen: (1) Kardinalitaet 1 -> n Zeichen · (2) 'e' war SUFFIX, ist jetzt
+gleichrangiger Filter · (3) 'e' bedeutet etwas anderes · (4) Trenner '.' kollidiert mit dem
+SemVer-Punkt -- der Parser muss zwischen Tripel-Punkt und Flag-Punkt unterscheiden ·
+(5) Komposit-Klammern sind eine neue Syntax-Ebene · (6) die POD-Kodierung nutzt **genau 2 Bit**
+fuer das Hardware-Flag (4 Werte) und **1 Bit** fuer experimental.
+Betroffen sind ausserdem: die B12-Wache *"ce-Registry traegt NIE 'e'"* (jetzt sinnwidrig, denn 'e'
+ist ein legitimer Core-Filter), die Negativ-Test-Batterie (`v1.0.0cc`, `v1.0.0cg`, `v1.0.0ec` ...
+alle bisher Sentinel), **138 Bestands-Literale**, und die Thesis-Aussage (Quellrang 1,
+`anhang/de/D_building_block_matrix.tex:1138`): *"Das Hardware-Flag ist genau ein Kleinbuchstabe."*
+
+### WAS DAS BESTAETIGT (kein Bau noetig -- vom Lead selbst gegengelesen)
+Der Owner-Satz zur Freigabe-Kette ist **bereits geplant**, dreifach belegt:
+- **LEDGER Sec.40.a:2402** (19.07.), verbatim: *"Die Hardware-System-Achse (6. Achse) wird
+  feingranular: je Maschine eine DEKLARIERTE Signatur einzelner SIMD-Flags (cpuid-Ebene, z.B.
+  avx512f/vl/bw/dq/vnni/...), NICHT der Grob-Level avx2/avx512. Organ-Achsen deklarieren
+  ihrerseits, welche Flags sie sinnvoll konsumieren (Organ <= Maschinen-Signatur geschnitten
+  Organ-Sinnhaftigkeit)."* -- das IST die neue Komposit-Notation, nur ohne Schreibweise.
+- **LEDGER Sec.37:2348/2356** (19.07.): *"bis zu ihrer maximalen Faehigkeitsstufe permutieren"* /
+  *"die Organ-Repraesentation permutiert dann bis zur freigegebenen Maximal-Faehigkeitsstufe"* --
+  das ist "stufenweise mit Erweiterung bis zur vollen Optimierungs-Stufe".
+- **Die Leiter ist GEBAUT, aber INERT.** `simd_build_gate.hpp:67-74` traegt
+  NoExtension/Avx2/Avx512 mit *"512-bit-Route: alle Tiers kumulativ"*; `simd_organ_requirement.hpp`
+  traegt den Beweis der Inertheit als eigenen static_assert, wortwoertlich kommentiert:
+  `static_assert(!any_organ_declares_required()); // heutiger Stand: ALLE leer -> Gate inert`.
+  Alle **neun** Organ-Klassen tragen die Leermenge.
+
+### NULLBEFUND, VOM LEAD SELBST NACHGEPRUEFT (inkl. eigenem Suchfehler)
+`x128`/`x256`/`x512` existierten vor dieser Owner-Nachricht **nirgends**. Erste eigene Gegenprobe
+lief in die Substring-Falle (`x512` trifft `avx512`, 119 Schein-Treffer). Mit Wortgrenzen:
+**0 Treffer in ce**, in super nur die eigene Explore-Sicherung. Gegenprobe `avx2` = 1117 Token.
+Der Owner bestaetigt: *"Ja korrekt, habe ich gerade definiert."*
+
+=> **Vereinigungs-Workflow `wf_2d080235-585` laeuft**: vier Sonnet-5-Kartierungen (Grammatik-
+Historie 4 Wochen, Meta-Meta-Achsen, SIMD-Signatur, P/E-Core) + eine Fable-xhigh-Vereinigung, die
+Konflikte mit Nennern, Bestaetigungen und eine Bau-Reihenfolge liefert. Der Lead liest danach jede
+tragende Referenz selbst (Explore-Doktrin Stufe 2).
+
+---
+
+## NACHTRAG 07.08.2026 abend-1 — KORREKTUR EINER LEAD-FEHLZUORDNUNG: "Phase 3/4"
+
+**Der Owner fragte:** *"Stehen wir wirklich in Phase 3/4?"* — und beauftragte eine Explore-Kartierung
+nach der neuen Zweistufen-Doktrin.
+
+**Was der Lead zuerst behauptete (FALSCH):** "Phase 3/4" seien die Phasen der E4-XML-Vollvision-
+Roadmap aus Dossier 17 TEIL D — Phase 3 = Achsen-Uniformitaet (#188), Phase 4 = Limits-
+Entkopplung (#229-Kern). Diese Deutung stuetzte sich auf eine Roadmap-Tabelle, die tatsaechlich
+existiert, aber eine ANDERE Nummerierung traegt.
+
+**Was gilt (am Objekt gegengelesen):** die Phase-Nummerierung, auf die LEDGER:3774 und drei weitere
+Ledger-Stellen (:3991, :4061, :4119) verweisen, steht in
+`docs/sessions/20260803-FAHRPLAN-gesamtkette-wellen-phasen.md:7-42`:
+
+  1 Laufend + Lager · 2 Stempel-/ABI-Abschluss (W10, E-24, A2) · **3 Parallel-Spuren** (A8-Schnitt,
+  A9-xlsx, A7/E-04-Rest, A14/OS-U4, A15 FK-3/FK-4, A10 HW, A11+A12, E-19, Thesis C1) ·
+  **4 Beweise + Permutationen** (A3/Beweise 1-5, A4/12-Perm O0-O3 x {no_ext,avx2,avx512},
+  A5 ETA/Kalibrier) · 5 Trigger-Sequenz · 6 Nach Trigger (Messung USER-GO) · 7 Aufraeumpass
+
+**DIE OWNER-ERINNERUNG WAR RICHTIG, DIE LEAD-ZUORDNUNG WAR FALSCH.** Fehlerklasse: fremde
+Nummerierung an die naechstbeste Tabelle geheftet, statt die verweisende Stelle
+(LEDGER:3774 -> Fahrplan) zurueckzuverfolgen. Das ist dieselbe Klasse wie der V-08-Fehlalarm:
+eine Behauptung ohne Quellenkette.
+
+### Der sachliche Befund, den die Korrektur nicht beruehrt
+**Null Binaries gemessen** ("Sidecar-Bestand aktuell gemessen = 0"). Phase 5 (Trigger) und Phase 6
+(Messung) haben faktisch NICHT begonnen. Der Hauptstrang steht inhaltlich genau dort, wo der
+Owner ihn vermutete.
+
+### Drei Folgerungen
+1. **Die heutige Flag-Grammatik-Arbeit IST Phase-4-Vorarbeit.** Phase 4 traegt woertlich
+   `A4/12-Perm (O0-O3 x {no_ext, avx2, avx512})` — genau die SIMD-Routen-Leiter, die die Grammatik
+   v2 in Notation fasst. Task #36 ist kein Seitenstrang. Ebenso haengt A9-xlsx (Phase 3) an der
+   offenen Blattform-Frage (R-3).
+2. **Die Tages-Zuordnungen des Fahrplans sind gegenstandslos.** Er wurde am 03.08. gegen
+   "Trigger Do 07.08. / Abgabe Fr 08.08." gerechnet; seit 06.08. abends gilt 15.09. mit
+   woechentlicher Freitagslieferung. Die REIHENFOLGE bleibt, die Termine fallen.
+3. **B9 bleibt offen und ist jetzt begruendet.** *"Phasen 3-5 ausfalten; 'Blackbox=Verlustklasse'"*
+   steht seit dem 06.08. offen. Die Phase-Buchhaltung wurde in das P0-P4-Bandsystem eingedampft
+   statt abgearbeitet — daher die verblasste Erinnerung an die Nummern. Das Ausfalten ist
+   nachzuholen, bevor Phase 3/4 als "erledigt" gebucht werden kann.
+
+### Eine Namensfalle, die dieser Nachtrag mit aufnimmt
+**"T-n" bedeutet im Korpus DREI verschiedene Dinge:** die Achsen **T0-T18** · die Themenposten
+**T-8/T-9/T-10** (heute gelandet) · die Zeitfenster **T1-T4** (T1 = vor dem ersten 4096er-Batch,
+T2 = vor der Voll-Messung, T3 = vor dem 15.09., T4 = danach). Ebenso sind die Wellen-Labels
+**W1/W2/W3/W5/W10** vom Juli am 03.-05.08. fuer voellig andere Inhalte wiederverwendet worden —
+Namenskollision, nicht Fortsetzung. Wer eine dieser Marken liest, muss zuerst den Namensraum
+bestimmen.
+
+### Verbleibende Doku-Diskrepanz (nicht aufgeloest, nur benannt)
+Dossier 17 TEIL D fuehrt eine EIGENE Phase-Nummerierung fuer die E4-XML-Roadmap. Innerhalb dieser
+zweiten Nummerierung nennt C.3:51 die Limits-Entkopplung "Phase 3", die Roadmap-Tabelle "Phase 4".
+Beide Nummernkreise leben nebeneinander weiter. Empfehlung: die E4-XML-Roadmap kuenftig mit
+"XML-Phase n" ansprechen, den Fahrplan mit "Fahrplan-Phase n".

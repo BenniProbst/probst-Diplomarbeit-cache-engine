@@ -126,39 +126,64 @@ S7 Thesis-Nachzug.
 
 ## 3. DER HAUPTSTRANG — wo wir stehen
 
-**Die Sequenz, wörtlich aus LEDGER:3774:**
-> Lager-Rest-Welle → **W10** → E-24-Fenster → A2-Eichung → **Phase 3/4** → TRIGGER-SEQUENZ →
-> **Phase 6 STOPP am USER-GO**
+### 3.1 KORREKTUR EINER LEAD-FEHLZUORDNUNG (wichtig für den Wiederanlauf)
+Der Lead hatte „Phase 3/4" zunächst der **E4-XML-Vollvision-Roadmap** (Dossier 17) zugeordnet —
+**das war falsch**. Eine Sonnet-Kartierung hat es widerlegt, der Lead hat es am Objekt
+nachgelesen und bestätigt.
 
-**„Phase 3/4" sind zwei benachbarte Phasen** der Roadmap in
-`docs/architektur/17_E4_XML_VOLLVISION_ROADMAP.md` TEIL D:
+**Die richtige Quelle:** `docs/sessions/20260803-FAHRPLAN-gesamtkette-wellen-phasen.md:7-42`.
+LEDGER:3774 bezieht sich auf **diese** Nummerierung.
 
-| Phase | Inhalt | # | Gate |
-|---|---|---|---|
-| 1 | Produktiv-Andockung `run_profile` | #230 | ctest + golden-320 |
-| 2 | RC-Dynamik: 4 fehlende Setter | #221 | RC-Konsum-Test |
-| **3** | **Achsen-Uniformität: `search_organ_`-Monolith tilgen** | **#188** | ctest je Familie |
-| **4** | **Limits-Entkopplung: `CatalogAxes<4,4,5,4>` aus XML ableiten** | **#229-Kern** | golden-Roundtrip==320 |
-| 5 | Framework×Workload-Bibliothek | #31/F7 | measurement-all |
-| 6 | Paralleles Mess-System | (M) | ctest + PMC-honest-0 |
-| 7 | Parser-Konsolidierung | #223 | Gate-Regression |
-| 8 | Voll-Lauf 320 DLL | #215 | **gated, mehrtägig, Cluster** |
+| Phase | Inhalt (verbatim aus dem Fahrplan) |
+|---|---|
+| 1 | Laufend + Lager — OD-10-RT, A1-Lager-Rest, TP1-Inventur |
+| 2 | Stempel-/ABI-Abschluss — **W10** (System-Zellwerte), **E-24** (Major 7→8), **A2-Eichung** |
+| **3** | **Parallel-Spuren** — A8-Schnitt · **A9-xlsx** · A7/E-04-Rest · A14/OS-U4 · A15 FK-3/FK-4 · A10 HW P4–P6 + prod2-SPD · A11+A12 NAS-Creds · E-19 Stufe 1 · Thesis C1-Rest |
+| **4** | **Beweise + Permutationen** — A3/Beweise 1–5 + §61-Dual-Weg · **A4/12-Perm (O0–O3 × {no_ext, avx2, avx512}, ≥16 Anker)** · A5 ETA/Kalibrier-Prinzip |
+| 5 | Trigger-Sequenz — J-Kette → heavy-Signal → Kalibrierlauf GN_TOTAL=64 → ETA → Voll-Bau-Trigger |
+| 6 | Nach Trigger — E.0 KERN-Mess-Schema (Pflicht) → 320er-Abgabemessung → Voll-Messung → Rückschrieb → Auswertung → Hybrid → COMPARE/D2 → Thesis C5 |
+| 7 | ZULETZT — §75-Aufräumpass |
 
-**Doku-Diskrepanz, aktenkundig:** C.3:51 nennt die Limits-Entkopplung „Phase 3", die
-Roadmap-Tabelle „Phase 4" — derselbe Schritt, zwei Nummern. Der R9-Nachtrag vermerkt das.
+### 3.2 DIE HEUTIGE GRAMMATIK-ARBEIT GEHÖRT IN PHASE 4
+**Phase 4 enthält wörtlich `A4/12-Perm (O0–O3 × {no_ext, avx2, avx512})`** — das ist exakt die
+SIMD-Routen-Leiter, die die Flag-Grammatik v2 jetzt in Notation fasst. Die heutige Arbeit ist also
+kein Seitenstrang, sondern **die Vorarbeit für die Phase-4-Permutationen**. Auch A9-xlsx (Phase 3)
+hängt an der offenen Blattform-Frage.
 
-**Status Phase 4 (Ledger 10.07.):** NON_GATED und baubar — CatalogAxes-XML-Ableitung +
-Pre-Build-Codegen binary_id→Source-Map + adhoc_emitter-Entkopplung; golden-320 als Pflicht-Gate,
-kein Runtime, kein ABI-Bump.
+### 3.3 ZWEI BEFUNDE, die die alte Phasen-Rechnung entwerten
+1. **Die Frist-Prämisse ist widerrufen.** Der Fahrplan wurde am 03.08. gegen „Trigger Do 07.08. /
+   Abgabe Fr 08.08." entworfen. Seit 06.08. abends gilt: **Endtermin 15.09.2026, Lieferung
+   jeden Freitag** — *„Jede Priorisierung, die gegen den 08.08. gerechnet wurde, ist falsch."*
+   Die Tages-Zuordnungen im Fahrplan (Mo/Di/Mi/Do) sind damit gegenstandslos, die **Reihenfolge**
+   bleibt.
+2. **Phase 3–5 wurde nie ausgefaltet.** Der Posten **B9** (*„Phasen 3-5 ausfalten;
+   'Blackbox=Verlustklasse'"*) steht bis heute OFFEN. Die Phase-Buchhaltung wurde in das
+   P0–P4-Bandsystem eingedampft statt abgearbeitet — das erklärt, warum die Nummern nur noch vage
+   erinnert werden.
 
-**Sperrposten vor Phase 6** (jüngster Wellenplan, Abschnitt 1.4): der PMC-Posten. Er blockiert 6,
-nicht 3/4.
+### 3.4 DER OBJEKTIVE IST-STAND
+**Null Binaries gemessen** — *„Sidecar-Bestand aktuell gemessen = 0"*. Phase 5 (Trigger) und
+Phase 6 (Messung) haben **faktisch nicht begonnen**. Der Hauptstrang steht inhaltlich in dem
+Bereich, den der Fahrplan Phase 3/4 nennt. **Die Owner-Erinnerung war richtig.**
 
-**VERIFIKATION LÄUFT:** ein Explore prüft am Objekt, ob die Phasen 1 und 2 wirklich durch sind und
-ob die vier Schritte vor 3/4 (Lager-Rest-Welle, W10, E-24-Fenster, A2-Eichung) erledigt sind.
-**Ergebnis vor dem Einstieg abwarten.**
+**Der Trigger ist neu definiert:** statt eines 131.072-Binary-Voll-Baus gilt **Batch-Kadenz max.
+4096** für Compile UND Messung.
 
----
+### 3.5 DER NÄCHSTE KONKRETE SCHRITT (aus der Owner-Vorlage von heute früh)
+1. **FENSTER 0 schließen** (schließt sich, sobald die erste `.fingerprint`-Datei existiert — jetzt
+   0 h Strafzeit, danach 34,4 h Neubau-Strafe): R-3 ✅ *(heute gelandet)* · D-1 PMU-Domäne ·
+   B-4 Break-Even-Tabelle als Lager-Objekt
+2. **FENSTER T1 schließen** (blockiert die Messung): **D-2 Bau-Menge** (131.072 / 524.288 /
+   1.572.864 / 2.097.152 — vier Kandidaten, keiner entschieden) · D-3 Mess-Teilmenge ·
+   D-4 allow_failure · D-5 PMC fail-closed · D-7 Core-Achsen-Faktorisierung · R-2 XML-Trennung
+3. **Dann erst** der erste 4096er-Batch + 320er-Folgemessung
+
+### 3.6 EINE NAMENSFALLE, dreifach
+„T-n" bedeutet im Korpus **drei verschiedene Dinge**: die Achsen **T0–T18** · die Themenposten
+**T-8/T-9/T-10** (heute gelandet) · die Zeitfenster **T1–T4** (T1 = vor dem ersten 4096er-Batch,
+T2 = vor der Voll-Messung, T3 = vor dem 15.09., T4 = danach). Ebenso sind die **Wellen-Labels
+W1/W2/W3/W5/W10** vom Juli am 03.–05.08. für andere Inhalte wiederverwendet worden — Kollision,
+nicht Fortsetzung.
 
 ## 4. Laufende Arbeit bei Kontextende
 
