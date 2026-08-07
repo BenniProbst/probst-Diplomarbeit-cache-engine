@@ -9862,3 +9862,111 @@ drei Worktrees.** Das Glied kann direkt befuellt werden, der Fingerprint verschi
 (0 Treffer). Die im Plan skizzierte Wache `static_assert(kStampKategorieCount ==
 kAnatomyFingerprintGliedCount)` waere beim ersten Bau von S1 **`8 != 9`** -- dem Plan fehlt das
 Mess-Gates-Glied aus R-3 komplett. **Kein Entscheid, ein Nachzug -- aber er faellt sofort an.**
+
+---
+
+## NACHTRAG 07.08.2026 abend-21 — FK-3/FK-4 GELANDET (ce `f2709599`) · variant-Verbot verifiziert · SIDECAR-VERDIKT
+
+### FK-3/FK-4 GELANDET -- 424/424, acht Bissproben
+`axis_error_traits.hpp` (FK-3, **20 Achsen-Familien**) + `axis_error_traits_organ.hpp` (FK-4,
+**18 Slots T0..T17**). Reine Compile-Zeit-Deklarationen, **keine Laufzeit-Spur**, kein TABU beruehrt.
+Basis vom Agenten **selbst gerechnet** (`git merge-base`), keine SHA aus dem Auftrag uebernommen --
+die heute gebuchte Klasse 9 wirkt bereits.
+
+**DER BESTE MOMENT: der Agent hatte `{Failed}` GERATEN und sich am Code korrigiert.**
+`observer_snapshot` und `pmc` rufen `mark_failed` **gar nicht** auf -- sie tragen nur
+`NotApplicable` und `SourceUnavailable`. Sein Satz steht jetzt im Header (`:387`):
+> *"Failed hier zu deklarieren waere bequem gewesen, aber ein Fehlerraum, der mehr behauptet als er
+> haelt, ist so wenig wert wie einer, der schweigt."*
+**Das ist die Auftragsfrage -- *was waere ohne diese Klasse die stille Variante?* -- auf die eigene
+Arbeit angewandt.**
+
+**Die stille Variante, die FK-3 abschafft:** klassifiziert wurde bisher **nur an den
+Pipeline-Naehten** -- dort, wo ein Fehler *ankommt*, nie dort, wo er *entsteht*. Ein fehlender
+`clang++-22` und ein abgelehnter Achsen-Schnitt landeten unter **demselben Sammel-Etikett**;
+*"das Werkzeug war nie da"* war von *"der Code liess sich nicht uebersetzen"* nicht mehr zu trennen.
+**Tragend: kein Sammel-Eintrag.** Die Wurzeln tragen bewusst **keinen** Eintrag -- ein vererbter
+Auffang-Eintrag waere genau der stille Default, den FK-3 abschafft.
+
+**ZWEI EIGENE FEHLER, gefunden und gemeldet:**
+1. Ein Separat-Header auf **falscher Praemisse** gebaut -- sein `grep -l 'boost/'` traf nur
+   **Kommentarzeilen**, keine Includes. Zurueckgebaut; geblieben ist die *Wache* statt der
+   vorsorglichen Struktur.
+2. **Seine erste Bissprobe meldete faelschlich GRUEN** -- der Patch-Suchtext passte nach
+   `clang-format` nicht mehr, die Datei war unveraendert. *"Nicht die Wache war blind, meine Probe
+   war es."* **Daraus eine Haertung:** die Hermetik-Wache belegt jetzt **im selben Lauf**, dass ihr
+   Makro ueberhaupt anschlaegt. Ohne diesen Nachweis waere der `#error` gruen gewesen, **weil blind.**
+
+**NICHT GESCHAFFT (gemeldet):** Blatt->Familien-Aufloesung (braeuchte mp11 im Header = Hermetik-Bruch,
+hat heute keinen Konsumenten) · Vollstaendigkeit der Saetze ist **nicht** compile-pruefbar (fuer die
+drei Mess-Achsen laufzeit-verwacht, fuer die D1-Achsen **ungedeckt**) · `kOrganSlotCount` und die 18
+Namen sind **Spiegel** (measurement/ darf abi/ nicht sehen), in der TU rueckgebunden · nur GCC.
+
+### TEIL 1 -- DAS `std::variant`-VERBOT: eingehalten. Und die Begruendung ist SPEICHER-MATHEMATIK
+Direktive verbatim (Ledger §23, 18.07.): *"Fuer alle statischen (Haupt-)Achsen ist std::variant
+VERBOTEN. Stattdessen wird per geeigneter Metaprogrammierung (CRTP + Concept, static dispatch, keine
+vtable) exakt der eine gewaehlte Achsen-Algorithmus je Organ-Achse ... einkompiliert. Kein
+Runtime-Tag, kein std::visit, keine ungenutzten Alternativen im Objektcode."*
+**DER EIGENTLICHE GRUND ist keine Stil-Frage:** golden N = 131.072 x ~60 MB (variant-Bloat, alle
+Alternativen im Objektcode) **= 7,5 TB > 6 TB verfuegbar**. Bloat-reduziert (nur der gewaehlte Algo,
+~2-5 MB) = **256-640 GB -> passt**. **`std::variant` ist damit die dritte Voraussetzung fuer das
+golden N ueberhaupt.**
+Geschaerft §66-N3 (23.07.): *"NUR compile-time->compile-time und runtime->runtime Abbildungen; KEINE
+runtime->CT-Bruecken."*
+
+**IST-ZUSTAND, 68 Treffer ueber 45 Nicht-Build-Dateien, jeder geprueft -- KEIN Verstoss:**
+- **~55** sind **Kommentar-Zitate der Doktrin selbst** (Waechter-Kommentare)
+- **2 Dateien in QUARANTAENE**, test-only, mit **Compile-Guard**:
+  `test_striktheit_metaprog_guard.cpp:85-97` prueft alle 11 Referenz-Anatomien auf
+  `is_variant_free_hot_path` -- **wuerde der Baustein-Cluster live verdrahtet, bricht der Bau.**
+- **2 legitim ausserhalb des Scopes:** `BuildError` (typisierte Fehler-Summe, kalter Pfad) und
+  `PressureState` (Runtime-Laststatus, State-Pattern) -- **das Verbot gilt Achsen, nicht
+  Runtime-Zustaenden.**
+- **1 dokumentierte Ausnahme** (Owner-KERN 02.08.): `HybridDockVariant` -- **nur** die Hybrid-Stufe
+  **hinter** der CEB. Verbatim: *"In den plain Tier-Binaries bleibt std::variant verboten
+  (uneingeschraenkt)."* Diese Stufe ist **noch nicht gebaut**; K1-K6 sind bindend VOR dem Bau.
+
+### TEIL 2 -- DIE SIDECAR-FRAGE: die Owner-Frage trifft fuer DREI von VIER zu
+Der Owner fragte: *"ueberpruefe die Sinnhaftigkeit von Sidecars, wenn doch eigentlich alles in C++ in
+den binaries abgebildet sein muss"*.
+
+| Sidecar | auch in der Binary? | Verdikt |
+|---|---|---|
+| `.fingerprint` | **JA, exakt** (`comdare_anatomy_version_lines()` liefert dasselbe `sha512_line`) | **UNENTBEHRLICH** |
+| `.version` | teilweise (Segmente im Toolchain-Glied, aber nicht isoliert lesbar) | **UNENTBEHRLICH** |
+| `.algos` | wahrscheinlich aequivalent (Byte-Vergleich **nicht abgeschlossen**) | technisch entbehrlich |
+| `.variant` | **JA, exakt** (`comdare_build_variant_inspect()` liefert genau das POD) | technisch entbehrlich |
+
+**`.fingerprint` -- unentbehrlich NICHT wegen der Information, sondern wegen LESE-ZEITPUNKT und
+LESE-SKALA:**
+- **Der Lookup laeuft strukturell VOR dem Bau** (`bestandslog_index.hpp:21`: *"der Lookup laeuft vor
+  dem Bau, nicht im gemessenen Pfad"*) -- **fuer eine Binary, die in diesem Moment noch nicht
+  existiert, ist ein Probe-Symbol strukturell unerreichbar.**
+- **Bis zu 131.072-mal je Lauf** gegen Alt-Bestand. `dlopen`+`dlsym`+`dlclose` je Pruefung waere
+  Performance- **und** Prozess-Stabilitaetsrisiko (viele gleichzeitig geladene `.so`).
+- Er ist zugleich der **Lager-Index-Schluessel** fuer Cross-Maschinen-Transport ueber minio --
+  **ohne Laden**. F7-Absicht *"eine Schluessel-Welt"*: Skip-Gate == minio-Key == Bestandslog-Key ==
+  Baum-Blatt-Identitaet.
+
+**`.version` -- unentbehrlich aus einem GANZ ANDEREN Grund: es ist kein Identitaets-Duplikat,
+sondern ein TRANSPORT-VOLLSTAENDIGKEITS-SENTINEL.** Das Push-Protokoll schreibt die DLL **zuerst**
+und `.version` **zuletzt**; `prune_verdict` laesst ein lokales Loeschen nur bei **byte-gleicher**
+Remote-Spiegelung zu. **Eine byte-perfekte DLL mit abgebrochenem `.version`-Schreiben waere selbst
+vollstaendig ladbar** -- die Frage *"wurde der GANZE Satz uebertragen"* kann die Binary **nie**
+beantworten. Sie betrifft den **Uebertragungsvorgang**, nicht den Dateiinhalt.
+
+**`.algos`/`.variant` -- seit der A2-Eichung GATE-LOS.** Eine Streichung wuerde **nichts** am Skip-
+oder Lager-Verhalten aendern (per Code bewiesen), sondern nur die schnelle, per `cat` lesbare
+Provenienz-Legende kosten -- sonst nur per `dlopen`+`dlsym` je Binary. Betroffen waeren drei Tests
+und die Transportliste.
+
+**DIE ANTWORT IN EINEM SATZ:** die Owner-Praemisse trifft technisch fuer drei der vier zu -- aber
+`.fingerprint` und `.version` beantworten Fragen, **die sich nicht auf "was ist der Inhalt dieser
+Binary" reduzieren lassen**, sondern auf *"existiert sie schon / wurde sie vollstaendig uebertragen /
+kann ich das pruefen, ohne 131.072 Shared Libraries zu laden"*.
+
+**EHRLICH NICHT GEKLAERT:** die vom Owner genannte Plan-Stelle (*"alles in C++ in den binaries"*)
+wurde **nicht woertlich gefunden** -- gesucht mit `in der Binary abgebildet`, `self-contained`,
+`Compile-Time-Identitaet`, `Lager-Identitaet`. Naechstliegend: `build_type_stamp.hpp:31` (*"jede
+Binary traegt ihre volle Compile-Einstellung"*). Ebenso offen: der byte-genaue Formatvergleich
+`.algos` gegen die Organ-Zeile.
