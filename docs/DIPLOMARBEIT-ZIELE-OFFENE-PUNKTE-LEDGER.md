@@ -10418,3 +10418,79 @@ existiert in Live-AD **nicht** (*"2026-06-01 verifiziert: `samba-tool user list`
 "maskiert". Nur blind: `mapfile` -> nur `${#P[@]}` ausgeben -> per **stdin** testen. Und ueber die
 **LAENGE** selektieren (`len:40`), nie ueber die Position -- meine positionsbasierte Regex griff
 **6 Zeichen statt 40** und der erste sudo-Test schlug deshalb fehl.
+
+---
+
+## NACHTRAG 07.08.2026 abend-28 — A9 JITTER-REVIEW: DER ACHSEN-KERN IST SAUBER
+
+### DAS ERGEBNIS IN EINEM SATZ
+**Der tatsaechlich verdrahtete Achsen-Kern ist compile-time dispatcht, wie die Doktrin verlangt.**
+Geprueft gegen `origin/development` (`fea430d0`), Suchraum `libs/cache_engine/` (1246 Dateien),
+sechs Klassen L1-L6 (variant/visit/any · virtual · std::function · Runtime-Switch ueber eine Achse ·
+Heap im Batch · map/dlopen/Funktionszeiger).
+
+| | roh | im heissen Pfad |
+|---|---|---|
+| **L1 `std::variant`/`visit`/`any`** | 11 echte Codezeilen | **0** -- alle an Expected/Result-Naehten (Config-/Probe-Zeit) |
+| **L2 `virtual`** | 465 Treffer / 68 Dateien | **1** (architektonisch erzwungen, s.u.) |
+| **L3 `std::function`** | 26 Dateien | **1** (nachweislich toter Demo-Pfad) |
+| **L4 Runtime-Switch ueber eine Achse** | 0 im Achsen-Dispatch | **0** |
+| **L5 Heap im Batch** | -- | **0** (Setup-Allokation liegt VOR den Timern, RAII-Guard) |
+| **L6 map/dlopen** | 2 Dateien | 0 gewertet |
+
+**Der heisse Pfad wurde nicht geraten**, sondern ueber `steady_clock`/`rdtsc`/`perf_event` gefunden und
+gelesen. Es gibt **zwei** Messpfade: **Pfad A** (in-DLL, segmentiert, `abi_adapter.hpp` -- die
+Batch-Schleife laeuft komplett INNERHALB eines Aufrufs) und **Pfad B** (host-getrieben, pro Operation
+ueber die ABI-Grenze).
+
+### DER EINE ECHTE BEFUND -- und er ist KEIN Versehen
+`host_measure_loop.hpp:43-47` und `tier_observe_trace_abi.hpp:141-174` umklammern mit
+`steady_clock` **genau einen virtuellen Aufruf**, **pro Operation**:
+```
+t0 = clock::now();  tier.tier_insert(...);  t1 = clock::now();     // tier_insert ist virtual/override
+```
+**Der Code kennt das selbst** und hat Pfad A **genau deswegen** gebaut (`measurable_workload.hpp:1-14`).
+Pfad B arbeitet ueber eine **dynamisch geladene .so-Grenze** -- die Komposition ist dem Host zur
+Compile-Zeit unbekannt. **CRTP ist dort unmoeglich, ohne die ABI-Faehigkeit aufzugeben** (verschiedene
+Kompositionen als separate Binaries -- das ist der Kern des ganzen Experiments).
+**=> Kein Ersatz ohne Architekturwechsel. Die Empfehlung ist eine DOKU-Auflage:** *Latenz-kritisches
+IMMER ueber Pfad A; Pfad B nur fuer Fuellstand/Observer-Snapshots.* An einer Stelle steht das schon,
+**durchgaengig erzwungen ist es nicht.**
+
+### DER ZWEITE BEFUND: TOTER V32-DEMO-PFAD -- vom Lead gegengelesen, haelt
+`builder/commands/execute_engine_command.hpp:51` traegt ein `std::function` im Timing-Fenster.
+**Selbst nachgeprueft**, weil der Agentenbefund "tot" zunaechst wackelte: `git grep` zeigte
+`profile_facade/mess_achsen_naht.hpp` als Treffer -- **Produktionscode, kein Test**. Nachgelesen:
+**es ist eine blosse KOMMENTAR-Erwaehnung** (die Datei zaehlt sieben Fundstellen eines Suchmusters
+auf), **kein Include, keine Nutzung**. Der Befund haelt.
+**Genau die Falle, vor der die eigene Doktrin warnt: ein Treffer im Kommentar ist keine Nutzung.**
+Ein `grep -l` allein haette hier "lebendig" gesagt.
+
+### WAS SONST NOCH AUFFIEL -- Aufraeum-Kandidaten, KEINE Jitter-Befunde
+**Ein erheblicher Teil der 465 rohen `virtual`-Treffer sitzt in komplett unverdrahtetem Geruest** --
+per Konsumenten-Grep mit **null** Treffern ausserhalb des eigenen Unterbaums:
+`subsystems/c01..c12` (12 Engine-Interfaces) · `include/cache_engine/platform/*` ·
+`concepts/i_observer.hpp`, `concurrency_manager.hpp` · `api/i_cache_engine.hpp` (und die Fassade
+`cache_engine.hpp` selbst hat **0** Konsumenten). Alle tragen das Etikett "Termin 7" -- Fruehphasen-
+Architektur parallel zur echten Pipeline. **Kein Risiko, aber viel Rauschen bei jeder kuenftigen Suche.**
+
+**Bewusst NICHT als Verstoss gewertet, mit Begruendung:**
+- **ART-Trie** (`art_trie_node_pool_store.hpp`, 8x `switch (ref_kind(r))`): das ist der **Node-KIND**
+  (N4/N16/N48/N256), der von der **Baumform zur Laufzeit** abhaengt -- *Adaptive* Radix Tree per
+  Definition. **Nicht CT-machbar, ohne den Algorithmus aufzugeben.**
+- **SuRF** (`surf_suffix_bits.hpp:53`): MurmurHash-Tail-Dispatch (0-3 Restbytes), Standard-Idiom.
+- **wormhole** `std::map`: interne Datenstruktur EINER Suchalgorithmus-Strategie, keine
+  Achsen-Dispatch-Indirektion; `lookup()` liest nur.
+- **17 `anatomy/*_tier.hpp`** mit `virtual`: durchgaengig das dokumentierte Muster *"Host fragt via
+  `dynamic_cast` 1x KALT je Modul, nie im Hot-Loop"* -- stichprobenartig gegengelesen, bestaetigt.
+
+### WAS DER REVIEW NICHT LEISTET (ehrlich, vom Agenten selbst gemeldet)
+- Nicht jede der 465 `virtual`-Fundstellen einzeln bis zur Aufrufstelle verfolgt -- fuer die grossen
+  Cluster wurden **Konsumenten-Greps** genutzt (an einem POSITIVEN Fall validiert: `execution_engine_base`
+  zeigte 6 Konsumenten im selben Lauf, in dem platform/concepts/api **0** zeigten -- die Methode
+  unterscheidet also live von tot).
+- `harness/perm_runner.hpp` (die eigentliche Pro-Setting-Messung) **nicht einzeln gegengelesen**.
+- `builder/pruef_dock/*` (6 Dock-Klassen mit `virtual measure()`) nur oberflaechlich.
+- `concepts/pressure_state.hpp` (`std::variant<Idle,Warmup,...>`): **Konsumenten nicht verfolgt**, unklar
+  ob erreichbar.
+- **Kein eigener L5-Sweep** ueber `axes/`/`topics/` -- Heap nur in den zwei bestaetigten heissen Pfaden geprueft.
