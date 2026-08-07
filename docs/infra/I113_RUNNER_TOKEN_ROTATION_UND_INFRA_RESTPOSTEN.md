@@ -186,3 +186,53 @@ Diplomarbeitslinie baut die getrennte Messung selbst.
 | P-5 | Platz und `df`-Wache vor dem Voll-Bau | mittel | vor dem naechsten Voll-Bau |
 
 Rueckfragen an die Diplomarbeitslinie jederzeit; die Messkette selbst bleibt dort.
+
+---
+
+## P-6 — NACHTRAG 07.08.: die `amd_l3`-Uncore-PMU ist nicht geladen
+
+**Schwere: mittel. Aber sie entscheidet, ob eine Anhang-Spalte real misst oder honest-`n/a` bleibt.**
+
+### Der Befund
+
+`pmc_cache_misses_l3` liefert auf prod1 (AMD Ryzen 9 9950X3D) nichts --
+`perf_event_open` scheitert mit `errno=2 (No such file or directory)`, weil der generische
+`PERF_TYPE_HW_CACHE`-Zaehler fuer Last-Level-Misses auf dieser Mikroarchitektur in dieser
+Kodierung **nicht existiert**.
+
+**Ein AMD-Rohevent dafuer gibt es** (`l3_lookup_state`, dokumentiert im AMD PPR). Es braucht
+aber die **`amd_l3`-Uncore-PMU**. Auf baugleicher Hardware (derselbe Ryzen 9 9950X3D, Kernel
+`6.17.0-35-generic`) wurde gemessen: das noetige **Kernelmodul liegt signiert vor, ist aber
+nicht geladen**.
+
+**Das ist eine Infra-Frage, keine Code-Frage.**
+
+### Was daran haengt
+
+Bis das Modul geladen ist, traegt die Spalte auf der AMD-Lane ehrlich `n/a` statt einer Zahl
+(gelandet als ce `c4c04315`). **Das ist korrekt, aber es ist eine Luecke in den Messdaten** --
+und die Diplomarbeit misst Cache-Verhalten. Auf der Intel-Lane liefert dieselbe Spalte real
+(4M+ Treffer), die beiden Mess-Maschinen haben also **unterschiedliche Spalten-Semantik**.
+
+### Was der Infra-Agent pruefen soll
+
+1. Ist `amd_l3` (bzw. das zustaendige `amd_uncore`-Modul) auf **prod1** verfuegbar und ladbar?
+2. Falls ja: laden, dauerhaft machen (`/etc/modules-load.d/`), und pruefen, ob
+   `/sys/bus/event_source/devices/` danach eine `amd_l3`-PMU zeigt.
+3. **Gegenprobe nach dem Laden:** ein `perf stat -e amd_l3/...` auf einer speicherruehrenden
+   Last muss einen von 0 verschiedenen Wert liefern. Erst dann ist es wirklich messbar.
+4. **Sicherheitslage:** Uncore-PMUs sind maschinenweit, nicht prozess-lokal. Auf einer reinen
+   Mess-Maschine ist das unkritisch; bitte trotzdem bewusst entscheiden.
+
+### Was NICHT zu tun ist
+
+**Keine Ersatzmessung ueber eine geratene Core-PMC-Rohkodierung.** Ein solcher Versuch wurde
+gemacht und **verworfen**: die Skalierungsprobe war unplausibel -- eine 1-GiB-Arbeitslast
+lieferte **weniger** Treffer als eine 32-MiB-Last. Ein Zaehler, der sich so verhaelt, misst
+nicht das, was sein Name sagt. **Lieber ein ehrlicher Token als eine erfundene Zahl.**
+
+### Wenn es nicht geht
+
+Dann bleibt `n/a` mit Begruendung, und die Arbeit fuehrt die Spalte fuer die AMD-Lane
+ausdruecklich als nicht erhebbar. Das ist ehrlich und tragfaehig -- aber es ist die zweitbeste
+Loesung, und die Entscheidung sollte bewusst fallen, nicht durch Unterlassen.
