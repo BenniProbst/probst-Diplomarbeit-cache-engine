@@ -7328,6 +7328,7 @@ eingestellten Mess-Apparat. NIE RATEN, IMMER LESEN."*
   Werte-Token heissen heute `kern_uniform` / `kern_hohe_leistung` / `kern_hohe_effizienz` /
   `kern_grosser_cache` / `kern_kleiner_cache` (`numa_cpu_pin_process_probe.hpp:183-189`).
   **OFFEN (Bau-Auftrag, kein Entscheid):** wie `cpe` sich zu diesen Token verhaelt -- Ersatz,
+  **[KORREKTUR 07.08.2026 abend (G-7): DIESE ZEILE IST UEBERHOLT UND WAR IRREFUEHREND.** Sie klassifizierte den `cpe`-Einbau als *Bau-Auftrag OHNE Entscheid* -- wer die Ledger-Liste abarbeitet, haette einen stempel- und ABI-relevanten Einbau OHNE Owner-Entscheid begonnen. Spaetere Eintraege (:7673 ff., :7811 ff., Nachtrag mittag-4) stellen den Charakter als echten Owner-Entscheid klar. **Zweifach ueberholt:** der Owner hat die Flag-Grammatik am 07.08. in acht Nachrichten VOLLSTAENDIG neu definiert (Punkt-Notation, Komposit-Flags, `e` = efficiency core) -- der Entscheid ist gefallen, und `cpe` in dieser Form existiert nicht mehr. Massgeblich ist `docs/plaene/20260807-DESIGN-flag-grammatik-v2-punkt-notation-komposit.md`. Die Zeile bleibt als Historie stehen (Doku wird deprecatet, nie geloescht).]**
   Kurzform in der Mess-Spalte, oder zusaetzliches Segment.
 
 ### 2. OWNER-ENTSCHEIDE dieser Runde (bindend)
