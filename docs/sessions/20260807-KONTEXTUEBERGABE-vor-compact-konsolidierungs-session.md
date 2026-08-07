@@ -46,10 +46,21 @@ Konsolidierung: die neueste Information fuehrt, neuere Aussagen verdraengen alte
 `/home/comdare/.claude/jobs/5a19728e/tmp/fold/` (Epochen-Listen fold-*.txt/hist-*.txt +
 planungsrealitaet-owner-log.md); Script `/home/comdare/.claude/jobs/5a19728e/tmp/konsolidierung-fold.js`.
 
-**NACH DEM COMPACT ZU TUN:** Ergebnis von wtdpeiotj abholen (Task-Notification oder /workflows).
-Die Ziel-Datei lesen, die zwei Verify-Berichte pruefen, dann gitleaks (Elternrepo-Mount!) + commit
-+ dual-push aus wt-super-landung. Falls der Workflow beim Compact abbrach: die Ziel-Datei traegt den
-letzten seriellen Fold-Stand (abbruchsicher); mit resumeFromRunId wf_e19d0850-9f7 fortsetzbar.
+**STAND 07.08. ~03:10: wtdpeiotj FERTIG** (19 Agenten). Ziel-Dossier auf 3581 Z. gewachsen
+(Fold-Rohstand gesichert in backups-workflow/20260807-gesamtdossier-fold-rohstand/). Die Verify-Phase
+fand REST-MAENGEL, die ein Nacharbeits-Agent (a3c7a284) gerade behebt (uncommittet):
+- zwei falsche Datei:Zeile-Anker: system_axis.hpp real :22/:193/:238 (nicht :2837/:2667/:2882 = stale
+  Vor-Split); abi_adapter.hpp SearchAlgorithmAbiAdapter real :386 (nicht :230). allow_failure-Anker ok.
+- vier fehlende morgen-1-Bloecke (Ledger-Nachtrag lag dem Fold zeitlich vor, war aber nicht als Quelle
+  gelistet): die drei Selbst-Audit-Verdikte, F-01 dritter Weg (Rollentrennung, nicht "zuruecknehmen"),
+  B-3-Objektbefunde, O-4 Anhang-A OFFEN.
+- zwei Owner-Entscheide faelschlich als offen gefuehrt: Frist 15.09. ist FESTGELEGT; §17.10/§17.12
+  Paraphrase-Fehler (PR-3 "letzte 3 Wellenplaene"; Aussage-39 "Abgabe morgen" = Zwischenabgabe).
+
+**NACH DEM COMPACT ZU TUN:** Ergebnis des Nacharbeits-Agenten a3c7a284 abholen, dann das Ziel-Dossier
+gitleaks-pruefen (Elternrepo-Mount!) + committen + dual-push aus wt-super-landung. Das Dossier ist
+uncommittet -- der Fold-Rohstand ist als Backup gesichert, falls die Nacharbeit schiefging.
+Workflow-Vollergebnis (Verify-Berichte) in Task #32 + im journal wf_e19d0850-9f7.
 
 ## 2. WAS DIESE SESSION VOLLZOGEN HAT (chronologisch)
 
