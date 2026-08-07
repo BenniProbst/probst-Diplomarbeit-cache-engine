@@ -9782,3 +9782,83 @@ RAM-Sammelpuffer-Budget, Storage-Forecast -- **gar nicht angefasst**) · Baupunk
 verdrahtet (Befund 3) · **kein Lauf auf echter Hardware** -- alle Zahlen aus Stub-Compiles mit
 25-ms-Schlaf: *"Die Formel ist belegt, ihre Guete unter echter Bau-Last nicht."* · cppcheck lokal
 nicht fahrbar.
+
+---
+
+## NACHTRAG 07.08.2026 abend-20 — E-E: OWNER-GO ERTEILT · die Naht ist fertig, es fehlt der Fueller
+
+### DER OWNER-ENTSCHEID, verbatim
+> *"Volles GO wie empfohlen fuer E-E. Bitte loese die Ordnung wie geplant (Konkatenation einer
+> festen statischen Ordnung auf je der Mess-Achse, System-Achse und Organ-Achse)."*
+
+**Das weicht bewusst von der Lead-Empfehlung ab** (der Lead hatte Hash-je-Datei und lexikografisch
+vorgeschlagen). **Die Owner-Vorgabe gilt: Konkatenation, feste Ordnung je Achsen-Kategorie.**
+
+### DIE NAHT IST BEREITS GEBAUT -- es fehlt AUSSCHLIESSLICH der Fueller
+- Position **7 von 9** im Preimage: `kAnatomyFingerprintOverlayGlied = 7`
+  (`anatomy_fingerprint.hpp:407`), Format-Kennung **`fingerprint_format=4`** (`:106`).
+- Das Tier-Makro reicht es **explizit durch**: `OverlayHash{...kOverlaySourceHash}`
+  (`anatomy_module_abi_v1.hpp:175`).
+- Es kommt heute **leer** an: `#ifndef COMDARE_OVERLAY_SOURCE_HASH / #define ... ""` (`:125-127`).
+- **Ein Pre-Build-Codegen, der es fuellt, existiert nicht** (0 Treffer im Baum).
+- Der Header sagt selbst (`:118`): sobald der Hash da ist, wandert er *"ohne jede weitere Aenderung
+  in alle Fingerprints"*. **Das Budget ist bereits eingepreist** (`kAnatomyFingerprintOverlayMax =
+  128`, ein SHA-512-Hex; Summe 3688 <= 4096).
+
+### ZWEI DER DREI UNTERFRAGEN SIND BEANTWORTET -- die kanonische Ordnung MUSS NICHT ERFUNDEN WERDEN
+Der Header markiert drei offene Fragen (`:120-123`, verbatim): *"WELCHE Dateimenge 'das Overlay' ist
+(Verzeichnis-Schnitt, Sortier-Ordnung, Hash je Datei vs. ueber die Konkatenation)."*
+- **Sortier-Ordnung -> beantwortet.** Und sie existiert bereits im Code:
+  **`kCompositionAxisNames`** (`axis_path_serialization.hpp:31-34`, die 18 Organ-Achsen in
+  kanonischer Slot-Reihenfolge) und **`kSystemAxisOrder`** (`system_axis_order.hpp:42-46`:
+  `target_isa, operating_system, external_utils`, mit eigener Drift-Wache).
+  **Die Owner-Vorgabe ist damit ein VERWEIS auf bestehenden Code, keine Neuerfindung.**
+- **Hash je Datei vs. Konkatenation -> beantwortet:** Konkatenation.
+- **Mess-Achsen: es gibt nichts zu sortieren.** Mess hat strukturell **eine** Haupt-Achse
+  (`measurement_tooling`, Enum `{WallClock, Macro, Micro}`) -- pro Binary wird **genau eine**
+  gewaehlt, nicht mehrere konkateniert.
+
+### DIE EINE OFFENE FRAGE: DER VERZEICHNIS-SCHNITT
+**Der Owner hat nicht gesagt, WELCHE Dateien.** Und es steht nirgends im Bestand -- 0 Treffer fuer
+ein Verzeichnis namens `overlay`. Der Explore hat einen Kandidaten genannt und ihn **ausdruecklich
+als Interpretation gekennzeichnet, nicht als Befund** -- vorbildlich.
+**Vom Lead am Objekt geprueft und als Vorschlag vorgelegt:**
+```
+libs/cache_engine/topics/*/axis_*     <- die comdare-EIGENEN Achsen-Implementierungen (das Overlay)
+ext/*/P0X-*, ext/*/A0X-*              <- die VENDORIERTEN Bibliotheken (draussen)
+```
+Belegt: `topics/traversal/axis_03a_search_algo`, `topics/memory_layout/axis_05_memory_layout`,
+`topics/prefetch/axis_07_prefetch` usw. existieren; daneben `ext/traversal/P02-HOT`,
+`ext/allocator/A04-mimalloc` als vendorierte Gegenstuecke.
+**Die Trennung waere sauber:** aendert sich **unsere** Implementierung einer Achse, aendert sich die
+Binary-Identitaet; aendert sich eine **Fremdbibliothek**, greift dafuer das Toolchain-Glied, und der
+Vendor-Snapshot ist ohnehin versioniert. **Wartet auf Owner-Bestaetigung.**
+
+### DIE BRUCHLISTE -- VIER Anker, nicht drei
+Beim Scharfschalten wandern mit:
+1.-3. **Drei Frozen-Vektoren, EIN Zeuge:** `test_m_w12_stamp_bausteine.cpp`,
+   `test_g3_sha512_index.cpp`, `test_w10_system_cell_values.cpp` -- alle drei tragen denselben
+   Hex-Wert (aktueller Format-4-Stand seit `2e1f9c1d`).
+4. **`kCebFingerprint`** in `test_d4_ceb_schluessel_wahl` -- **der vierte, den die Lead-Liste bisher
+   nicht nannte.** Der R-3-Commit fuehrt ihn als deklariertes Byte-Ereignis mit.
+
+### KEIN FORMAT-BUMP NOETIG -- und der Grund ist praezise
+Anders als bei R-3 (wo ein **stiller Skip** ueber eine Ausstattungsgrenze drohte und deshalb ein
+deterministischer Bump noetig war) gibt es hier **keinen Bestand, der faelschlich uebersprungen
+werden koennte**. **Vom Lead und vom Explore unabhaengig nachgemessen: 0 `.fingerprint`-Dateien in
+drei Worktrees.** Das Glied kann direkt befuellt werden, der Fingerprint verschiebt sich einfach.
+
+### BAU-SCHNITT (sobald der Verzeichnis-Schnitt steht)
+1. Pre-Build-Codegen: liest die Dateien in der Ordnung `kCompositionAxisNames` -> `kSystemAxisOrder`
+   -> Mess, **konkateniert die Bytes** (nicht einzeln hashen), SHA-512, reicht sie als
+   `-DCOMDARE_OVERLAY_SOURCE_HASH="<hex>"` herein -- **dieselbe Injektions-Naht, die
+   `COMDARE_SYSTEM_CELL_VALUES` und `COMDARE_TOOLCHAIN_STAMP_GLIED` schon benutzen.**
+2. Die vier Anker im **selben** Commit neu erheben, mit literalem Vorher/Nachher (R-3-Vorbild).
+3. **Die "OFFEN"-Passage in `anatomy_fingerprint.hpp:120-123` durch den Entscheid ersetzen** --
+   sonst landet die naechste Suche wieder auf einer Frage, die beantwortet ist.
+
+### NEBENBEFUND, der S1 trifft
+`StampGliedKategorie` / `kStampKategorieCount` / `version_stamp_interface.hpp` existieren **nicht**
+(0 Treffer). Die im Plan skizzierte Wache `static_assert(kStampKategorieCount ==
+kAnatomyFingerprintGliedCount)` waere beim ersten Bau von S1 **`8 != 9`** -- dem Plan fehlt das
+Mess-Gates-Glied aus R-3 komplett. **Kein Entscheid, ein Nachzug -- aber er faellt sofort an.**
