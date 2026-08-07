@@ -7613,3 +7613,154 @@ fraglich, zaehlt drei statt vier -- bewusst stehengelassen).
 
 **STAND am Ende dieser Spanne:** ce `85847715` (dev==main) · thesis `8197a2c` (dev==main) ·
 super `5ed70229` (dev; main-FF nach Pipeline 15174) · cluster `d7eab98`.
+
+---
+
+## NACHTRAG 07.08.2026 mittag-3 -- OWNER-ENTSCHEIDE O-A/O-B/O-C/O-E/O-F + eine Lead-Fehlfrage
+
+**ANLASS:** Owner-Runde zu den sechs offenen Punkten der Session-Uebergabe. FUENF entschieden,
+bei EINEM war die Frage des Leads grundlegend falsch gestellt.
+
+### O-A  MODI-SEQUENZ: `compare` steht VOR `release` -- Sec.62-C ist damit SUPERSEDED
+Owner verbatim: *"Es bleiben 2 Dinge, aber formal kommt compare als Stufe mit eigenen Optionen
+(lesend Messwertlager) vor dem release, der auch die Messwerte nachlesen muss, aber dann eine
+optimale binary produziert."*
+=> **AUFLOESUNG:** Die zwei Vergleichs-Konzepte bleiben getrennt (intra-Maschine-Kurvenvergleich
+vs. Cross-Maschinen-Replay), ABER der FORMALE Modus `run_methodology::Compare` ist eine STUFE VOR
+`release`, mit **eigenen Optionen** und **lesendem** Zugriff aufs Messwertlager. `release` liest
+die Messwerte ebenfalls nach, produziert daraus aber die OPTIMALE BINARY.
+=> **SUPERSEDED:** `LEDGER:3343` (Sec.62-C, 21.07.: *"ERST ZUM SCHLUSS, NACH DEM RELEASE, folgt je
+Maschine der erweiterte COMPARE-Modus"*) und der gleichlautende Kopfkommentar
+`measurement/run_methodology_registry.hpp:7-8`. Die geltende Ordnung ist
+**`measure` -> `compare` -> `release`**, kumulativ (jede Stufe enthaelt die vorige).
+=> BAU-FOLGE: der Registry-Kopfkommentar und die Sec.62-C-Zeile sind nachzuziehen; `compare`
+braucht seine eigenen Optionen (lesender Lager-Zugriff).
+
+### O-B / W-3  EBENE 2: DIE STRENGERE VARIANTE GILT
+Owner verbatim: *"Na jeder Funktionsaufruf in der Kette aller Aufrufe der CEB ueber die
+Lastprofile am Pruefdock gegen die Tier-Binary wird als Macro-Benchmark aufgenommen. ... Die
+Granularitaet von Micro/Macro/Wallclock Benchmarks und deren Stufen ist bewiesen. Das Profil wird
+je Mess-Layer aufgezeichnet und in einem zeitlich orientierten chart als Profil abgespeichert, der
+formal als xlsx Messwerte gilt. Die Strengere Variante ist es."*
+=> **ENTSCHIEDEN:** Schritte UND Checkpoints (KERN 11), nicht das blosse Zeitpaar (KERN 12).
+Der Widerspruch zwischen den beiden Aussagen vom 06.08. ist damit zugunsten der strengeren
+aufgeloest -- KERN 12 beschreibt die Wallclock-VERORTUNG, KERN 11 die Mess-GRANULARITAET.
+=> **NEUE PRAEZISIERUNG (ueber beide KERNe hinaus):** das Profil wird **je MESS-LAYER**
+aufgezeichnet und als **zeitlich orientierter CHART** abgelegt, der **formal als xlsx-Messwerte
+gilt**. Damit ist der xlsx-Writer nicht nur Auswertungs-Ausgabe, sondern Traeger des
+MESS-PROFILS selbst.
+=> LAUFENDER AUFTRAG: Explore `wf_acd866c1-fc8` ermittelt, wo welche Benchmarks hingehoeren, was
+sie wie und in welcher REIHENFOLGE messen -- inkl. Session-Log-Belege (Owner: *"Ich erinnere
+mich, dass diese Planung erfolgt ist. Explore Agent durch den session log bitte."*).
+
+### O-C  DISTRIBUTIONS-MATRIX: LISTE 3 x LISTE 1 = 7 OS x 3 neueste Versionen
+Owner verbatim: *"Wir machen die vollstaendigste Liste 3 ueber alle 7 OS der Liste 1 ueber 3
+neueste Versionen jedes OS."*
+=> **ENTSCHIEDEN: 21 Images** -- die SIEBEN OS der produktiven Cluster-Registry
+(`debian-sid`, `ubuntu-2404`, `fedora-42`, `alpine-321` [musl], `archlinux`, `opensuse-tw`,
+`rocky-9`; Beleg `Cluster/docs/sessions/20260221-...-node8-buildtools-gcc15-rollout.md:669-687`)
+in der FORM der cache-engine-Matrix (je 3 neueste Versionen, bisher 6 Familien x 3 = 18).
+=> Damit ist die 7-vs-8-Frage (Gate W10-00) **beantwortet**: nicht 7, nicht 8, nicht 18, sondern
+**7 OS x 3 Versionen = 21**. Die aeltere 8er-Direktive (03.07., "inkl. Ubuntu") ist insoweit
+praezisiert -- Ubuntu IST eines der sieben.
+
+### O-E  ANHANG D: an die Plan-Realitaet anpassen
+Owner: *"Das muss in der Diplomarbeit der an die Realitaet der Pläne angepasst werden."*
+=> Der Satz *"die drei Mess-Modi ... existieren noch nicht als Typen"* wird nachgezogen: es sind
+VIER (`RunMethodology` {debug, measure, release, compare}) und sie existieren als Enum +
+constexpr-Registry. Textnachzug unter dem bestehenden O-4-GO, DE fuehrend, EN nachziehen.
+
+### O-F  'cpe' -- DIE FRAGE DES LEADS WAR GRUNDLEGEND FALSCH GESTELLT
+Owner verbatim: *"cpe ist ein Kuerzel wie 'g', 'e', 'f', 'n' ebenfalls. Es erweitert das 'c' CPU
+kuerzel einer Algorithmus-Versionierung im Stempel mit Spezifikationen. Es ist ein string und
+nicht nur ein character. Jeder Buchstabe steht fuer eine unterstuetzte Hardware Art, die durch die
+Systemachse freigegeben wurde an die Tier-Binary. Option B ist ebenfalls korrekt, aber der Kern
+der Frage ist total verkehrt."*
+=> **LEAD-FEHLER:** Der Lead hatte `cpe` als CSV-Spalten-/Werte-Token verstanden (Alternativen
+"Ersatz der kern_*-Token / Kurzform in der Mess-Spalte / zusaetzliches Segment"). FALSCH. Es geht
+um die **Q3-HW-FLAG-GRAMMATIK der ALGORITHMUS-VERSIONIERUNG im STEMPEL** (02.08.: *"Versionen
+IMMER vX.Y.Z + Hardware-Flag (c=CPU, g=GPU, f=FPGA, n=NPU), dann optional 'e'"*; Bestandswert
+z.B. `v1.0.0c`).
+=> **DIE EIGENTLICHE AUSSAGE:** das Flag ist ein **STRING, kein einzelnes Zeichen**. Jeder
+Buchstabe steht fuer eine **unterstuetzte Hardware-Art, die die SYSTEM-ACHSE an die Tier-Binary
+FREIGEGEBEN hat**. `cpe` erweitert `c` (CPU) um die Spezifikation performance-efficiency --
+also die P/E-Kern-Unterscheidung als Teil der HARDWARE-ART im Versions-Stempel.
+=> Die CSV-Spaltenform (frueher "Option B") bleibt daneben korrekt, ist aber NICHT der Kern.
+=> LAUFENDER AUFTRAG: Explore `wf_acd866c1-fc8` ermittelt die Flag-Grammatik am Objekt (ist die
+Flag-Position heute ein Zeichen oder ein String?), die Freigabe-Kette System-Achse -> Tier-Binary,
+und was fuer 'cpe' gebaut werden muss (Parser, Wachen, Migration der Bestands-Literale mit Nenner).
+
+**LEHRE (zur Fehlerklasse "falsch gestellte Frage"):** Der Lead hat eine Owner-Vorgabe in das
+naechstliegende eigene Vokabular uebersetzt (CSV-Spalte), statt zu pruefen, in welchem
+SUBSYSTEM sie lebt. Dieselbe Bauart wie die drei Vokabular-Falschbefunde des Tages -- nur eine
+Ebene hoeher: nicht das Suchwort war falsch, sondern das ANGENOMMENE SUBSYSTEM.
+**AB SOFORT:** bei jedem Owner-Begriff, der wie ein Bezeichner klingt, ZUERST am Objekt
+feststellen, zu welchem Subsystem er gehoert (Stempel? Achse? CSV? XML?), DANN die Frage stellen.
+
+### O-F NACHTRAG (Owner-Praezisierung unmittelbar danach) -- FLAGS GELTEN FUER BEIDES
+Owner verbatim: *"Ja genau, aber die Versionierung wird ja zur Unterscheidung auch in die XLSX und
+CSV mit angegeben, damit klar ist, welche Konfiguration gemessen wurde, daher gelten die
+Hardware-Flags fuer beides."*
+=> **AUFLOESUNG des scheinbaren Widerspruchs:** Es ist KEIN Entweder-oder. Der Hardware-Flag-String
+lebt PRIMAER in der **Algorithmus-Versionierung im Stempel** (dort wird er gebildet und
+durchgesetzt) und wird SEKUNDAER **in die Mess-Ausgabe (xlsx UND CSV) mitgeschrieben**, damit an
+der Messzeile ablesbar ist, WELCHE KONFIGURATION gemessen wurde.
+=> Der Lead-Fehler war also nicht "CSV ist falsch", sondern "CSV ALLEIN ist falsch": die Frage
+hat den Stempel -- die QUELLE des Flags -- ganz weggelassen und nur die Senke betrachtet.
+=> **BAU-FOLGE (drei Glieder, in dieser Reihenfolge):**
+   1. **Stempel-Grammatik**: Flag-Position wird vom einzelnen `char` zum **STRING** erweitert;
+      jeder Buchstabe = eine von der System-Achse an die Tier-Binary freigegebene Hardware-Art.
+      `cpe` = CPU mit performance/efficiency-Spezifikation (Intel-Hybrid, P- und E-Kerne).
+   2. **Freigabe-Kette**: die System-Achse bestimmt, welche Buchstaben ueberhaupt im String stehen
+      duerfen -- der Flag ist damit eine PROJEKTION der Achsen-Freigabe, kein freies Textfeld.
+   3. **Mess-Ausgabe**: derselbe Flag-String erscheint als Unterscheidungsmerkmal in xlsx und CSV
+      (Konfigurations-Identitaet der Messzeile). Eine Quelle, zwei Senken -- NICHT zwei
+      unabhaengig gepflegte Werte.
+=> Das ist konsistent mit dem PMC-KERN (P-Core und E-Core sind ZWEI getrennte PMC, CT je
+Konfiguration in die CEB) und mit der `core_class`-Ordnung: `core_class` bleibt RT-Unter-Achse
+und binary-stempel-GESPERRT, waehrend die HW-ART (`cpe`) sehr wohl in den Versions-Stempel gehoert.
+Kein Widerspruch: `cpe` sagt "diese Binary KANN P/E unterscheiden" (Faehigkeit, CT),
+`core_class` sagt "diese Messung LIEF auf Kern-Klasse X" (Laufzeit-Tatsache, RT).
+
+### O-F OBJEKTBEFUND (Lead, am Objekt durch AUSFUEHRUNG belegt) -- 'cpe' KOLLIDIERT MIT DEM experimental-'e'
+Quelle: `libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp`
+(Suchfalle dabei: der erste grep lief gegen `$CE/include` + `$CE/src` -- **beide Pfade existieren
+nicht**, das Layout ist `libs/cache_engine/...`. Ergebnis war eine STILLE NULL. Erneut dieselbe
+Fehlerklasse; Gegenmittel bleibt: bei 0 Treffern ZUERST den Suchraum beweisen, nicht die These.)
+
+**IST-GRAMMATIK (`:26-30`, aus Owner-Q3 vom 02.08.):**
+```
+version := 'v' UINT '.' UINT '.' UINT [ HWFLAG [ 'e' ] ]
+HWFLAG  := 'c' (CPU) | 'g' (GPU) | 'f' (FPGA) | 'n' (NPU)   -- GENAU EINES, klein, direkt angehaengt
+```
+`HardwareFlag` ist ein `enum class : uint8_t {none,cpu,gpu,fpga,npu}` (`:182`), gelesen ueber
+`hardware_flag_from_char()` -- **ein einzelnes `char`**, `take_hardware_flag()` konsumiert
+`s.front()`. Das trailing `'e'` bedeutet **experimental** (Owner-E2, 02.08.).
+
+**BISSBEWEIS (kompiliert und ausgefuehrt gegen den Kopf, nicht gelesen):**
+```
+v1.0.0c    -> {1,0,0} hw=cpu exp=0 sentinel=0
+v1.0.0ce   -> {1,0,0} hw=cpu exp=1 sentinel=0     <-- 'e' == EXPERIMENTAL
+v1.0.0cp   -> {0,0,0} hw=none exp=0 sentinel=1    <-- Zusatz-Rest -> Sentinel
+v1.0.0cpe  -> {0,0,0} hw=none exp=0 sentinel=1    <-- 'cpe' wird HEUTE ABGELEHNT
+```
+
+**DIE KOLLISION:** Wird HWFLAG zum STRING, ist die Endung `'e'` zweideutig --
+`cpe` = ("cp" + experimental) ODER (Flag-String "cpe", 'e' = Efficiency-Kern)?
+Die Grammatik kann nicht beides, solange 'e' Suffix UND Flag-Buchstabe ist.
+
+**MIGRATIONS-NENNER (guenstig):** die 175x `"v1.0.0c"` + 27x `"v1.0.2c"` usw. sind flag-EINSTELLIG
+und blieben unter jeder String-Grammatik gueltig. Echte `ce`-Literale gibt es **genau EINES**
+(`hardware_meta_meta_axis.hpp:164`, `kProbeVersionCe` -- eine Pruefling-MARKIERUNG); alle uebrigen
+22 Fundstellen sind Kommentare und `static_assert`-Testzeilen in `algo_semver.hpp`. Ein Umbau der
+'e'-Semantik traefe also **keinen produktiven Bestand**.
+
+**BETROFFENE WACHEN (mitzuziehen):** `version_satisfies_cpu_only_policy()` (`:369`, prueft
+`hardware == HardwareFlag::cpu` -- ein Skalar-Vergleich, der unter einem String nicht mehr traegt),
+`COMDARE_VERSION_HW_FLAG_ENFORCE` an 5 Stellen (planner_version, system_axis_code_versions,
+meta_meta_stamp_suffix, measurement_framework_registry, anatomy_module_abi_v1_decl),
+`algo_semver_string()` (`:354-357`, rendert genau EIN Zeichen), `parse_dotted_semver` (A3-Umkehrung),
+sowie die Sentinel-Wache K-5 (`:57-61`).
+=> **VORGELEGT (siehe Owner-Vorlage-Abschnitt):** wie wird 'e'(experimental) von 'e'(efficiency)
+getrennt? Der Explore `wf_acd866c1-fc8` sucht die Antwort ZUERST im Session-Log (Owner: *"Die Tags
+sind bereits geplant, alles Gedaechtnislueckn"*) -- es wird NICHT geraten.
