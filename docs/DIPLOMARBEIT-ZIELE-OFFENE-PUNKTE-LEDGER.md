@@ -10191,3 +10191,95 @@ Erst-Klammerung (19./20.07.) liefert erst die kanonische **Drei-Typen-Trennung**
 **Ob die Lager-Pfad-Grammatik (LB-0, 06.08.) eine Fortschreibung von §43/§58 ist oder eine
 eigenstaendige Neukonzeption** -- die beiden Textkoerper wurden **nicht** Wort fuer Wort verglichen.
 Zwei Wochen liegen dazwischen. Falls das fuer E-B entscheidungsrelevant wird: eigener kurzer Auftrag.
+
+---
+
+## NACHTRAG 07.08.2026 abend-25 — A3 ETA-VERSTAENDNIS (Lead, am Code gelesen) · Q3 ENTSCHAERFT · A8 IST-LAGE
+
+### A3 — WIE ICH DAS ETA-SYSTEM VERSTEHE (Owner-Frage, Antwort am Objekt statt aus dem Gedaechtnis)
+
+**1. ETA ist ein SELBSTKALIBRIERENDES LEASE, keine Fortschrittsanzeige.**
+Die Lagerhaltung ist ein verteiltes Bau-Kollektiv (prod1 32 Threads, prod2 24) **ohne gemeinsame Uhr
+und ohne Koordinator**. Jeder Bauer reserviert ein Slice im 4096er-Korn. Die eine Frage, die das
+System beantworten muss: **wann darf ein anderer eine fremde Reservierung uebernehmen?**
+Eine feste TTL loest das schlecht -- zu kurz enteignet lebende Bauer, zu lang laesst tote Pipelines
+stundenlang blockieren. **Die ETA macht die Frist proportional zur tatsaechlichen Arbeit.** Das ist
+der ganze Trick.
+
+**2. Die Formel sagt etwas ueber die Physik** (`eta_estimator.hpp:32-43`):
+```
+ETA = max( Sum(t_i) / N_threads ,  max(t_i) )
+```
+Der zweite Term ist der interessante: **selbst mit unendlich vielen Threads kann ein Batch nie
+schneller sein als sein laengster einzelner Compile.** Das ist Amdahl in einer Zeile -- und es
+verhindert, dass ein Batch mit einem Ausreisser-Compile sich selbst eine unmoeglich kurze Frist gibt
+und dann zu Unrecht enteignet wird.
+
+**3. Zwei Zweige** (`reservation_lifecycle.hpp:141-150`):
+- **ohne** brauchbare ETA -> pro-forma-Frist, pauschal **30 min** (`kProFormaMinutes = 30`)
+- **mit** brauchbarer ETA -> `elapsed > 1.5 * eta_s` (`kTakeoverFactor = 1.5`)
+
+**4. "Brauchbar" ist dreifach gehaertet, und jede Bedingung wehrt einen realen Fehlerpfad ab**
+(`has_usable_eta`, `:75-78`): parsbar UND positiv UND **endlich**.
+- nicht parsbar / nicht positiv -> waere 0 -> "sofort uebernehmbar" -> **Falsch-Enteignung**
+- `"inf"` -> `elapsed > 1.5*inf` ist **IMMER false** -> **permanente Verklemmung**, nie uebernehmbar
+Der dritte ist der subtilste; der Kommentar `:67-74` benennt ihn ausdruecklich als **Gegenrichtung**
+des ersten. **Die Wache kennt beide Fehlerrichtungen** -- das ist die Qualitaet, die hier zaehlt.
+
+### Q3 IST ENTSCHAERFT -- meine eigene Dringlichkeitsmeldung war ueberzogen
+Ich hatte vorgelegt: `merge_documents(remote{eta=100}, lokal{eta=250})` liefert **100**, der Merge
+verwirft also die neuere Fortschreibung (`pick_reservierung`, `bestandslog_lock.hpp:380-388`: bei
+gleichem Rang gewinnt die mit gefuellter `eta_s`, **sonst stabil a**).
+**Am Code nachgelesen ist das heute GAR KEIN LIVE-PFAD** (`builder_registration.hpp:282-285`):
+> *"ETA-ZWEIG = VORHALTUNG, KEIN LIVE-PFAD (A-4): eine OFFENE Reservierung mit gefuellter eta_s hat
+> heute **keinen Produzenten** -- apply_calibration wird produktiv nur unmittelbar vor mark_done
+> geschrieben (Post-hoc-Kalibrierung), der Record ist dann done und **nie uebernehmbar**."*
+
+**Zwei gefuellte ETAs auf derselben OFFENEN Reservierung koennen heute nicht entstehen.** Der
+Konflikt ist real, aber er wird erst scharf, **wenn das F5-Paket periodische Updates baut**.
+=> **Q3 gehoert INS F5-Paket, nicht davor.** Der Code sagt das selbst: *"Befund in der Paketmeldung,
+nicht hier improvisiert."*
+
+### UND DANN SIND ES ZWEI FIXES, DIE DASSELBE FELD BRAUCHEN
+`builder_registration.hpp:275-280` hat es vorhergesehen:
+> *"TAKEOVER-UHR-ANKER: 'seit letztem Update' wird an **reserviert_utc** gemessen. Das ist HEUTE
+> exakt richtig, weil eine Reservierung genau **zweimal** geschrieben wird. Wenn das F5-ETA-Paket
+> periodische Updates baut, **stellt JEDES Update die Uhr** -- dann muss der Anker mitziehen."*
+
+**`BatchReservierung` traegt KEIN `last_update`-Feld** (nachgezaehlt, `bestandslog_document.hpp`).
+Sobald F5 Updates schreibt, brauchen wir **beides zusammen**:
+1. ein **monotones Ordnungsfeld** -- der Merge braucht eine Ordnung zwischen zwei gefuellten ETAs
+2. den **Uhr-Anker** -- das Praedikat braucht "letztes Update", nicht "reserviert"
+
+**Und EIN Feld traegt beides.** Ein `last_update_utc` auf der Reservierung (syntax-Bump, ans ENDE
+der Feld-Folge wegen Byte-Stabilitaet) loest den Merge-Konflikt UND den Uhr-Anker in einem Zug.
+**Das ist der sauberste Schnitt -- ein Feld, zwei Defekte, ein Bump.**
+
+### DIE LUECKE, DIE ICH SEHE -- OFFENE FRAGE AN DEN OWNER
+`eta_s` wird von **genau zwei** Stellen gelesen: dem Takeover-Praedikat und
+`planner_status_reader.hpp:330`, der nur **zaehlt**, wie viele Reservierungen *keine* ETA haben.
+**Es gibt keinen Verbraucher, der die ETA fuer eine DISPOSITION nutzt** ("Bauer B, geh nicht auf
+Slice 7, dort laeuft noch 4 h -- nimm Slice 12"). Und `avg_size_bytes` wird **eingetragen**, aber
+keine Stelle rechnet daraus eine **Platzvorhersage** ("131.072 Binaries a ~428 KB = ~55 GB -- passt
+das aufs Ziel?").
+**FRAGE: ist ETA nur der Lease-Timer, oder soll es auch der Dispositions- und Kapazitaetswert
+werden?** Das ist nicht akademisch -- es entscheidet, ob `avg_size_bytes` ein blosser Log-Wert
+bleibt oder der Eingang in die **df-Wache** wird, die §V7.4 fuer den Voll-Bau fordert.
+
+### A8 — IST-LAGE AM OBJEKT ERHOBEN (drei Prämissen umgestossen)
+| Was ich annahm | Was gemessen ist |
+|---|---|
+| prod1 haengt in V10, muss cross-VLAN | **prod1 hat DREI Beine: `br0` 10.0.10.211, `br0.20` 10.0.20.211, `br0.60` 10.0.60.211** -- kein Cross-VLAN-Problem |
+| `Cluster_NFS` ist schreib-only | **`/mnt/backup2-nfs` ist `rw` gemountet; Lesen, Schreiben und Rücklesen selbst geprüft -- alle drei ok** |
+| Ziel ist backup1 | **gemountet ist backup2** (`10.0.20.242:/mnt/HD/HD_a2/Cluster_NFS`), Export nur an `10.0.20.0/24` |
+
+**Kapazitaet gemessen: `7,3 T gesamt / 6,5 T frei`** auf backup2 -- **nicht 16 TB.**
+**Die 8 TB Messdaten passen dort NICHT hin.** Der VERORTUNGS-BRIEF `:64` nennt **backup1 = PR4100,
+`/Cluster_NFS`, V10-CARP-VIP `10.0.10.243`** als Haupt-Backup-Ziel -- das ist ein **anderes Geraet**
+als das gemountete backup2. **backup1 ist erreichbar** (`:2049` NFS, `:445` SMB, `:443` HTTP/2 404,
+`:22` offen; `:111` zu -> **NFSv4**, deshalb liefert `showmount` nichts).
+
+**HARTE GRENZE, die A8 blockiert: `sudo -n` schlaegt fehl -- kein NOPASSWD auf prod1.**
+Ohne Root kann ich **keinen Mount anlegen**. Der bestehende backup2-Mount laeuft als systemd-Unit
+`mnt-backup2\x2dnfs.mount`, **steht aber nicht in `/etc/fstab`** -> vermutlich transient,
+**ueberlebt keinen Reboot**. Das ist ein zweiter, unabhaengiger Befund.
