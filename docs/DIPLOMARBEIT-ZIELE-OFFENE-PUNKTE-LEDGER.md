@@ -7283,3 +7283,100 @@ Zwei ungeschlossene Mess-Sperrposten, jeweils AM OBJEKT gegen ce-HEAD `54106bc9`
 - **SW-5 / E-14 -- `active_telemetry_is_silent()` konstant `false`: OFFEN, golden-beruehrend.** Messung: `git grep -n "active_telemetry_is_silent|return false" 54106bc9 -- libs/cache_engine/profile_facade/profile_run_facade.cpp` = Definition `:241` `[[nodiscard]] bool active_telemetry_is_silent()`, Rumpf `:242` `return false;` (Kommentar verbatim: "Default = Active (TelemetryMode::Active); A9.3 golden-neutral: kein Profil-Wiring"), Aufrufer `:533`. Die Funktion gibt konstant `false` zurueck, OBWOHL mindestens 10 `thesis_profiles/*.profile.xml` ein `<telemetry silent="true">` deklarieren (u.a. `all_axes_golden.profile.xml`, `m3_golden_coverage.profile.xml`; Nenner: `git grep -rln 'silent="true"' 54106bc9 -- '*.xml'`). Der Kommentar `:236-240` erklaert es selbst: ein Durchreichen von `telemetry_silent` haenge `+tel=silent` ans golden-`build_version` und BRECHE die Byte-Identitaet -- das Wiring ist ein bewusst golden-BRECHENDER Folge-Schritt, deshalb heute deaktiviert. Verbucht als OFFEN (golden-beruehrend), nicht als Defekt.
 
 **STAND:** Reiner docs-Diff (super, diese Datei), auf eigenem Branch, nicht gepusht. Kein Code-Diff. Der Lead committet zentral.
+
+---
+
+## NACHTRAG 07.08.2026 mittag-1 -- OWNER-ENTSCHEIDE + drei aufgeloeste Gedaechtnisluecken
+
+**ANLASS:** Owner-Runde 07.08. vormittags/mittags. Der Owner hat drei Lead-Befunde als
+"Gedaechtnisluecke" bzw. "TOTAL FALSCH" zurueckgewiesen und Explore verlangt statt Rueckfragen.
+Alle Belege am Objekt gegen ce-HEAD `aa223961` bzw. thesis `19e1592` nachgemessen.
+
+### 1. D-1 PMU-DOMAENE -- der Lead lag falsch, die Aufloesung trennt ZWEI Objekte
+
+Owner verbatim: *"D-1: TOTAL FALSCH. ... Klar ist die PMU Domaene auf der System-Achse und damit
+auch wie alle Haupt-Achsen Stempel-Pflichtig fuer alle Details. Wir fuehren hier den Tag 'cpe' ein
+fuer cpu-performance-efficiency fuer die Intel Cores. Die Tags sind bereits geplant, alles
+Gedaechtnisluecken. ... CEB und Tier-Binary bauen fuer die Messung den vom Planer DREIPHASIG
+eingestellten Mess-Apparat. NIE RATEN, IMMER LESEN."*
+
+**BEFUND (Explore wf_fb636090-418, 4 Sonnet-Sucher, am Objekt verifiziert):**
+- **Verortung SYSTEM-ACHSE: bestaetigt und seit 16.07. durchgehend geplant** (Ledger §16.3-E17:
+  *"Der P/E-Core-Aspekt ist eine SEPARATE System-Achse, jedoch als DYNAMISCHE Unter-Achse unter der
+  Hardware-Systemachse"*), bestaetigt in beiden 06.08.-Plaenen -- und **inzwischen GEBAUT**:
+  `core_class` als dritte RT-Unter-Achse am target_isa-Komplex, gelandet mit `aa223961`
+  (`target_isa_sub_axes.hpp:10/:104`). Der Owner-Befund "Gedaechtnisluecke" trifft exakt.
+- **STEMPEL-PFLICHT: gilt VOLL -- aber fuer die MESS-Zeile, nicht fuer die BINARY-Identitaet.**
+  Die beiden Saetze widersprechen sich nicht, sie betreffen zwei im Code getrennte Objekte:
+  * **Mess-Zeilen-Stempel (RF-6, Ledger:3580):** *"Nur stempel Identitaet Auswirkung fuer gleiche
+    Kombination auch gleicher Stempel."* Angewandt (PLAN-hybrid-architektur:822-825): *"eine
+    PMU-Domaene ist eine deklarierte Maschinen-Eigenschaft mit Stempel-Wirkung, aber ohne
+    Bau-Wirkung ... Der prod2/cpu_core-Satz und der prod2/cpu_atom-Satz sind zwei verschiedene
+    Kombinationen und bekommen zwei verschiedene Stempel; die Binary bleibt eine."*
+  * **Binary-Stempel: COMPILE-HART GESPERRT.** `abi/system_cell_values.hpp:174` fuehrt
+    `core_class` als achten Eintrag in `kSystemCellValueForbiddenKeys`; die Begruendung steht
+    woertlich im Code (:166-172): *"stuende sie im Stempel, waere die Kern-Klasse Teil der
+    Binary-Identitaet -- und die CEB koennte NICHT 'DIESELBE Tier-Binary einmal auf einen E-Core
+    und einmal auf einen P-Core gepinnt' starten ... Genau das schliesst der KERN aus."*
+  => **Die Stempel-Pflicht materialisiert sich als PFLICHT-SPALTEN der Mess-Zeile**
+  (pe_policy = Konfiguration, ran_on_core_type = Beobachtung, Segment `numa.core_type=<p|e>`),
+  bereits am 16.07. so verankert (§16.2-M2: *"NUR dynamische Unter-Achsen (Workload, RC-Settings,
+  P/E-Core, NUMA, Multithreading) bleiben Spalten"*). Flotte bleibt EINE Binary, kein Neubau.
+- **TAG `cpe`: NEU.** Die Substanz ist geplant, der NAME nicht: `"cpe"` als Token = **0 Treffer**
+  am Ref (Gegenprobe: 17 Roh-Treffer, ALLE in vendored Fremdcode `ext/traversal/P01-ART/unodb/
+  olc_art.hpp` als lokale Variable + 2 Binaerdateien -- kein Projekt-Token). Die GEBAUTEN
+  Werte-Token heissen heute `kern_uniform` / `kern_hohe_leistung` / `kern_hohe_effizienz` /
+  `kern_grosser_cache` / `kern_kleiner_cache` (`numa_cpu_pin_process_probe.hpp:183-189`).
+  **OFFEN (Bau-Auftrag, kein Entscheid):** wie `cpe` sich zu diesen Token verhaelt -- Ersatz,
+  Kurzform in der Mess-Spalte, oder zusaetzliches Segment.
+
+### 2. OWNER-ENTSCHEIDE dieser Runde (bindend)
+
+- **B-4 KORRIGIERT (Lead-Empfehlung war falsch):** Break-Even ist **KEIN Lager-Objekt**. Owner:
+  *"Break even lebt nur in der CEB nach Messungs-Schluss und wird dort im RAM ueber alle
+  Tier-Binary-Messergebnisse ausgewertet, um dann von der CEB auch bei Anforderung durch den
+  Planer in Latex Dokumente, PDF oder xlsx Tabellen nach Zielorte zu giessen (XML bestimmt
+  Verhalten -> Feature Pflicht zusammen mit Modi der Cache Engine Debug/Release/etc). Das
+  Verwerfen IST FALSCH, da wird NICHTS gekuerzt. Voll-Build."*
+- **D-3 ENTSCHIEDEN:** *"Wir bauen nur die 320er die wir auch tatsaechlich messen und stellen die
+  golden XML darauf um."* => Bau-Menge folgt der Mess-Menge; golden-XML wird umgestellt.
+- **O-C ENTSCHIEDEN:** *"Pinning ist Pflicht bei hybrid Architekturen, deren CPU-Kerne sich
+  unterscheiden (sofern pinning durch mehrere Achsen freigegeben ist -> bereits geplant)."*
+- **PLATTFORM-ROLLE:** Empfehlung angenommen (prod1/prod2 als lokaler Pilot), **aber die
+  Erweiterung auf die ZIH-Maschinen wird trotzdem vollzogen**.
+- **MODI-STAFFELUNG (Lead-Fehldeutung korrigiert):** die vier Modi sind KUMULATIV, nicht flach --
+  `measure` ⊂ `compare` ⊂ `release`. Owner: *"release beinhaltet den vorgeschalteten Modus measure
+  und erweitert ihn, und compare beinhaltet den Modus measure ebenfalls als Basis. Wir koennen nur
+  das bauen oder vergleichen, was wir schon gemessen haben. Allerdings hat release auch den
+  gesamten compare als Grundlage vorangestellt und erweitert diesen, aber nicht umgekehrt. Der
+  release veroeffentlicht binaries aufgrund der Auswertung der vergleichbaren Messdaten."*
+  Die `single_thread`-Spalte der Registry ist damit MISSVERSTAENDLICH: release/compare messen
+  ebenfalls 1-threadig, SOFERN eine Messung noetig ist -- der Regelfall ist Replay.
+  Das entspricht der geplanten Kette **XML -> Messung -> Auswertung -> Binary/Messwert/PDF**.
+- **O-4 VOLLES GO:** *"Da ist die Diplomarbeit veraltet und hier muessen wir ausnahmsweise bitte
+  den Text an den Code nachziehen, volles GO dafuer. Bitte hier ein Audit ueber die Diplomarbeit
+  gegen das diff fahren."* (Richtungs-Umkehr NUR fuer belegt veraltete Stellen; wo der Code hinter
+  einer gewollten Zusage zurueckliegt, gilt CODE_RUECKSTAND und der Text bleibt.)
+- **xlsx:** *"Der Standard fuer die Messung ist xlsx."* -- Bau-Stand: der xlsx-Writer EXISTIERT
+  NICHT (0 Treffer auf `worksheet|sharedStrings|xl/workbook` in libs/, Gegenprobe csv=103; die 3
+  xlsx-Fundstellen sind Kommentare).
+
+### 3. O-4 ZAHLENBASIS KORRIGIERT -- beide Plandokumente hatten am falschen Objekt gemessen
+
+Der dokumentierte Widerspruch ("16 von 44" vs "Scope 4 hat alle 28 bedient") loest sich auf:
+**beide Fassungen massen gegen den VERALTETEN Separat-Klon** `20260931-overleaf-diplomarbeit`
+@ `29a1700` statt gegen das Submodul `thesis/diplomarbeit` @ `19e1592`.
+Am richtigen Objekt gemessen (Lead, 07.08.): **31 gegatete `\InputIfFileExists` je Sprache,
+18 harte `\input`, 18 real existierende Dateien in `anhang/de/`** -- die harten Includes decken
+sich exakt mit den existierenden Dateien, das PDF bricht nicht.
+**FALLEN-EINTRAG (neu):** es existieren ZWEI Thesis-Checkouts; der Separat-Klon ist veraltet.
+Jede Thesis-Messung IMMER gegen das Submodul fahren.
+
+### 4. METHODEN-LEHRE dieser Runde
+
+**Eine Negativ-Suche ist nur so gut wie ihr VOKABULAR.** Drei Falschbefunde derselben Bauart:
+T-10 ("Last-Erkennung" fand nichts -- der Plan heisst "Workload-Cluster", 327 Zeilen seit 09.07.),
+D-1 (Substanz seit 16.07. geplant, unter anderem Namen gesucht), und beinahe `cpe`
+(17 Roh-Treffer, alle Fremdcode -- ohne Kontrolltest waere daraus ein Falschbefund geworden).
+**AB SOFORT:** jede "existiert nicht"-Aussage braucht (a) einen SYNONYM-Durchgang und
+(b) eine Klassifikation der Roh-Treffer, bevor sie ausgesprochen wird.
