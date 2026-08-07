@@ -58,7 +58,7 @@ haben in keinem realen Lauf je gegriffen.
 - `tests/unit/CMakeLists.txt:3552-3554` -- `linux_perf_pmc_smoke` wird unter `if(UNIX AND NOT APPLE)`
   registriert, **unabhaengig vom Flag**; sein dokumentiertes Verhalten ohne Zugriff ist
   "sauberer Skip (Exit 0, available==0)". Der Preflight bricht also nicht einmal am fehlenden Target ab.
-- `experiment_plan_director.hpp:1333` -- `allow_failure: true` auf demselben Job.
+- `experiment_plan_director.hpp:1373` -- `allow_failure: true` auf demselben Job.
 
 **Die zitierte Begruendung -- sie steht direkt ueber dem Preflight (`:1353-1360`, verbatim):**
 > "G4a #37 / §66-N2 (PMC-DOKTRIN je Vendor): HARTER PMC-Preflight auf DIESER Lane-Maschine, VOR der ersten
@@ -87,7 +87,7 @@ Und `:1362-1364` emittiert daraufhin `echo "[PMC-TESTAT] ... pmc=ok"`.
 | | SOLL | IST |
 |---|---|---|
 | Flag | `-DCOMDARE_ENABLE_PMC=ON` in JEDEM Mess-Bau (Owner: "PFLICHT") | 4/4 Emissionen des Planers ohne Flag; nur die beiden STATISCHEN super-Jobs (`measure:smoke:672`, `measure:golden-320:763`) tragen es -- und `measure:smoke` ist ausdruecklich als DEPRECATED-Fallback stillgelegt (`super .gitlab-ci.yml:665-669`, "durch die dynamische Kette [...] abgeloest", laeuft nur mit `COMDARE_STATIC_SMOKE_FALLBACK=true`) |
-| Wache | "HART in BEIDEN Profilen, auch smoke" (§66-N2: kein Gate, kein allow_failure) | Verdikt `available \|\| counters_all_zero` -- der Ausfallfall IST das Erfolgskriterium; zusaetzlich `allow_failure: true` (`:1333`) |
+| Wache | "HART in BEIDEN Profilen, auch smoke" (§66-N2: kein Gate, kein allow_failure) | Verdikt `available \|\| counters_all_zero` -- der Ausfallfall IST das Erfolgskriterium; zusaetzlich `allow_failure: true` (`:1373`) |
 | Messwerte | `pmc_available=1`, reale `cache_misses_l1/l2/l3`, `dtlb_misses`, `coherence_invalidations` | `NullPmcSource` -> `available=0`, alle sieben Spalten strukturell 0 -- exakt der Zustand, den LEDGER Z.555 als "honest-0-Aufgeben" ausdruecklich verbietet |
 
 **Was zerstoert ist:** Die 131.072-Zellen-Vollmatrix -- der empirische Kern der Diplomarbeit --
@@ -215,7 +215,7 @@ sie wird erst schaedlich, wenn KK-2 repariert wird. Wer nur KK-2 repariert, scha
 
 ### KK-5 [ZERSTOERT GEPLANTE ARBEIT -- WACHE] `allow_failure: true` am Voll-Mess-Batch
 
-**Ort:** `experiment_plan_director.hpp:1333`, direkt unter dem Kommentar:
+**Ort:** `experiment_plan_director.hpp:1373` (gemessen ce-HEAD 54106bc9, `git grep allow_failure` = 1 Treffer; Alt-Anker :1333 um 40 gedriftet), direkt unter dem Kommentar:
 > "Sichtbarkeits-Doktrin: Mess-Fehler => CSV 'failed' + Log, die Pipeline bleibt gruen (nicht still verschluckt)."
 
 **Das Plan-SOLL** (Memory-KERN `feedback_measurement_failure_visibility_csv_failed_not_null_plus_log`):
@@ -389,7 +389,7 @@ setzt -- und diese Stelle im Baum belegen.** Alle drei schwersten Posten dieser 
 - *Ledger:* Z.3499, User 23.07., "KERN=Gesetz".
 - *Gegenbeweis:* `pmc:amd` / `pmc:intel` (ce `.gitlab-ci.yml:133/139` ueber `.pmc:106-118`) halten die
   Zusage -- sie bauen mit `-DCOMDARE_ENABLE_PMC=ON` und laufen ohne `allow_failure`. Der emittierte
-  Mess-Batch dagegen traegt `allow_failure: true` (`experiment_plan_director.hpp:1333`) und einen
+  Mess-Batch dagegen traegt `allow_failure: true` (`experiment_plan_director.hpp:1373`) und einen
   Preflight, dessen Verdikt nicht faellt (`m3v2_pmc_smoke.cpp:71`). Die Doktrin ist an der Stelle
   erfuellt, an der sie nichts kostet, und an der Stelle verletzt, an der sie zaehlt.
 
@@ -426,7 +426,7 @@ Selbstcheck aus dem Diff. "Abgabe Fr 08.08." ist der harte Rahmen.
 |---|---|---|---|---|
 | **i-1** | `libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:1342` (Mess-Batch; danach 841/877/1194 pruefen) | `-DCOMDARE_ENABLE_PMC=ON` in die `cmake`-Emission des Mess-Batches aufnehmen -- I-PMC-1 auf dem dynamischen Weg nachziehen. Biss: ein Director-Test, der die emittierte YAML auf das Flag prueft (Muster `test_experiment_plan_director.cpp` vorhanden). | S (1-2 h) | **Blockiert den Messbeginn.** Unabhaengig von T2-A/B14/A1; beruehrt weder golden-Bytes noch ABI. Nach der Landung: super-Submodul-Bump noetig, sonst wirkungslos. |
 | **i-2** | `tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:71` + `experiment_plan_director.hpp:1362-1364` | Preflight-Verdikt am Preflight-Ort auf **echte Verfuegbarkeit** verengen: der Batch darf nur starten, wenn `pmc_available=1`. Den 13.07.-Inversionsfix NICHT ruecknehmen -- stattdessen zweiter Modus (z.B. `--require-available`) oder Preflight prueft die Ausgabe `pmc_available=1` explizit statt nur den Exit-Code. Biss: Preflight muss ohne Flag rot werden. | S-M (2-3 h) | Zwingend **zusammen mit i-1** landen -- i-1 allein liesse die Wache blind, i-2 allein blockierte den Lauf. |
-| **i-3** | `experiment_plan_director.hpp:1333` | `allow_failure: true` am Mess-Batch entfernen oder auf die Zell-Ebene zurueckfuehren (CSV `'failed'` bleibt, der JOB faellt). §66-N2: "kein Gate/allow_failure". | S (< 1 h) | Mit i-1/i-2 in einer Welle. Vorher pruefen, ob eine Pipeline-Politik (Landewarteschlange) daran haengt. |
+| **i-3** | `experiment_plan_director.hpp:1373` | `allow_failure: true` am Mess-Batch entfernen oder auf die Zell-Ebene zurueckfuehren (CSV `'failed'` bleibt, der JOB faellt). §66-N2: "kein Gate/allow_failure". | S (< 1 h) | Mit i-1/i-2 in einer Welle. Vorher pruefen, ob eine Pipeline-Politik (Landewarteschlange) daran haengt. |
 | **i-4** | `.gitlab-ci.yml` (ce) `:343` vs `:502` | Doppel-Definition aufloesen: die INERT-Variante (`:502` samt `rules`-Zeile) entfernen, die harte (`:343`) behalten -- oder umgekehrt EINE Definition ohne `rules`. Biss: der Abdeckungs-Invarianten-Job aus `dcb2f08f` um eine Doppel-Key-Wache erweitern (YAML-Keys eindeutig). | S (1 h) | **Gehoert in die CI-Invariante (`dcb2f08f`)** -- deren Zweck ist exakt das. Steht bereits als Satz in Task #6. Nach dem Fix laeuft der Tripwire erstmals: mit rotem Ergebnis rechnen (Header koennen seit Wochen driften). |
 | **i-5** | `profile_run_entry.hpp:436` (+ Kette bis `build_orchestrator.hpp`) | **Owner-Entscheid noetig (F7 vs. Betriebsrealitaet).** Plan-SOLL ist: Provider immer aktiv, kein Opt-in. Machbar bis Abgabe: Env-Gate umkehren (Default AN, Abschalten nur explizit) ODER das Gate im Trigger-Rezept fuer Voll-Bau-4 verbindlich setzen und im Planer eine harte Wache ergaenzen, die den Voll-Lauf ohne Provider **abbricht** statt stumm zu degradieren. | M-L (0,5-1 Tag; Entscheid vorab) | **Beruehrt T2-A/L1 direkt** (der Eichungsstrang wird damit erstmals produktiv scharf) und ist Voraussetzung fuer P3-TRIGGER Task #4, Task #9 (Lager-Basis-Tests) und F9/LB-*. **Erst nach i-1..i-4**, weil ein scharfes Skip-Gate ohne PMC-Fix nur schneller falsch misst. |
 | **i-6** | `cache_engine_builder_iterator.hpp:1658-1660` | `cfg.bestand_fingerprint_fn` in `bestandslog_active` aufnehmen (fail-closed, analog `plan_anker_befund`). Biss: T2-C-Fall + `na`-Fall muessen das Lager stumm halten. | S (1-2 h) | **Muss mit i-5 in derselben Welle landen** -- i-5 allein schaltet KK-4 scharf. Kollisionsgefahr mit T2-A/L1 (dieselbe Datei, gleiche Region wie `plan_anker_befund`): nach T2-A-Landung einplanen. |

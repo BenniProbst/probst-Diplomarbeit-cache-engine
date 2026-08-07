@@ -256,7 +256,7 @@ diesem Projekt **mehrfach** zugeschlagen haben.
   `CMakeLists.txt:67` setzt den Default auf `OFF`. Der Preflight
   (`tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:71`) wertet mit
   `pmc_seam_ok = delta.available || counters_all_zero` den Ausfall als
-  Erfolg. Dazu `allow_failure: true` auf demselben Batch (Zeile **1333**).
+  Erfolg. Dazu `allow_failure: true` auf demselben Batch (Zeile **1373**).
   **Drei hintereinandergeschaltete Wachen, keine loest aus.**
 * **Was der Test beweist:** dass das erzeugte CI-YAML des Voll-Mess-Pfads das
   PMC-Flag traegt.
@@ -329,7 +329,7 @@ entlastet -- zwei haben sich aber **verschoben**.
 | **K-03 / KK-6 Axis-Lock doppelt** | **auf `development` GEHEILT** (1 Vorkommen, Z. 447), auf `main` weiter doppelt (Z. 343 + 502) | **VOR Abgabe -- aber Landung, nicht Bau.** Der Fix existiert; er muss nur auf den getriggerten Branch. Bissprobe = T-i-2. |
 | **K-01 BESTANDSLOG-Wurzel** | **WIDERLEGT** (Ledger 4286 ff., Durchreichung Z. 952-955) | erledigt; hebt aber KK-4/K-06/K-07 von "tot" auf "still falsch bei opt-in" |
 | **KK-1 / K-02 PMC-Flag fehlt** | **BESTAETIGT**: 0 Treffer, Emission Z. 841/877/1194/1342 | **VOR Abgabe -- Owner-Entscheid O-A.** Kein Kostenposten: hieran haengt, ob die 131.072-Zellen-Matrix Cache-Zaehler misst oder Nullen. Das ist die Beweisbasis der Arbeit. |
-| **K-02b `allow_failure: true`** Z. 1333 | **BESTAETIGT** | **VOR Abgabe -- Owner-Entscheid O-B** (mit O-A zusammen entscheiden) |
+| **K-02b `allow_failure: true`** Z. 1373 | **BESTAETIGT** | **VOR Abgabe -- Owner-Entscheid O-B** (mit O-A zusammen entscheiden) |
 | **KK-4 `bestandslog_active` ohne Fingerprint** | **BESTAETIGT** (~Z. 1657) | **VOR Abgabe nur, wenn der Messlauf opt-in faehrt** (O-C); sonst danach. Test = T-ii-3 |
 | **K-06 doppeltes Fingerprint-Leeren**, **K-07 `kPlanOhneAnker`** (`planer_driven_build.hpp` ~297, bestaetigt) | Code-Existenz gesichert | **abhaengig von O-C**, gleiche Klammer wie KK-4 |
 | **K-04 234-V-b Shaped-Emission** | **BESTAETIGT**: Konsumenten = die 2 Definitionsdateien + `test_234_va_*` / `test_234_vb_*`. **Kein** Aufrufer im Produktivpfad | **NACH Abgabe.** Fertige, nie angeschlossene Arbeit -- kein Messergebnis haengt daran |
@@ -436,7 +436,7 @@ den der Trigger nicht anfasst.
 | ID | Frage | Warum nicht am Repo entscheidbar | Empfehlung |
 |---|---|---|---|
 | **O-A** | **PMC-Flag im Voll-Mess-Pfad: fixen und neu messen, oder ohne Zaehler messen und die Grenze in der Arbeit benennen?** | Haengt am Messfenster bis Fr 08.08., nicht am Code | **Schwerster offener Posten.** Entscheiden, **bevor** Phase 6 startet -- danach ist es irreversibel |
-| **O-B** | `allow_failure: true` (Z. 1333) auf dem Mess-Batch: bleibt (langer Lauf soll die Welle nicht killen) oder wird hart? | Betriebsentscheid | mit O-A zusammen |
+| **O-B** | `allow_failure: true` (Z. 1373) auf dem Mess-Batch: bleibt (langer Lauf soll die Welle nicht killen) oder wird hart? | Betriebsentscheid | mit O-A zusammen |
 | **O-C** | Faehrt der Trigger-Lauf mit gesetztem `COMDARE_BESTANDSLOG`? | Runner-Env / GitLab-Projektvariablen / Aufrufskript **ausserhalb** des Repos -- vom Repo aus nicht entscheidbar (so auch das Ledger) | beantwortet zugleich KK-4/K-06/K-07 und T-ii-3 |
 | **O-D** | `xmllint` auf prod1/prod2: nachinstallieren (braucht Cluster-Schreibrecht, Doktrin sagt read-only) **oder** die 5 Fixture-Wachen fuer den Abgabe-Lauf herausnehmen? | Infra-Zugriff | Nachinstallieren ist ein Paket (`libxml2-utils`); Herausnehmen waere ein stiller Skip und widerspraeche der SKIP-DISZIPLIN der Datei |
 | **O-E** | `target_isa.numa_node` / `.page`: vor der Abgabe anschliessen, oder als *declared-inert* in der Arbeit ausweisen? | Scope der Diplomarbeit | Ausweisen. Der Code-Anschluss ist nach der Abgabe billig; eine unbenannte Schein-Achse ist es nie |

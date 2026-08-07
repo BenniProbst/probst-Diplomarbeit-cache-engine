@@ -176,7 +176,7 @@ bleibt · Fingerprint uneingeschraenkt · Bestandslog Pflicht · L2/L3 nachruest
 ## 7. VOR-MESSBEGINN-POSTEN (offen)
 
 - **PMC ueber die Mess-Achse in die CEB/Pruefdock** (Deep Research laeuft) — **Sperrposten.**
-- **`allow_failure: true`** am Voll-Mess-Batch (`experiment_plan_director.hpp:1333`) deckt auch
+- **`allow_failure: true`** am Voll-Mess-Batch (`experiment_plan_director.hpp:1373`) deckt auch
   **Configure-, Build-, Driver- und Preflight-Fehler** — §66-N2 verlangt *"BEIDE hart"*.
   Die ce-eigenen `pmc:amd`/`pmc:intel` halten die Doktrin korrekt — **erfuellt, wo es nichts kostet,
   verletzt, wo es zaehlt.**

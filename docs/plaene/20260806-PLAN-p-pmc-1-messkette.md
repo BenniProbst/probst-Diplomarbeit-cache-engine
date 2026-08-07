@@ -141,7 +141,7 @@ setzt `add_compile_definitions(COMDARE_ENABLE_PMC)` -- laut eigenem Kommentar be
 |---|---|---|---|
 | W1 | `m3v2_pmc_smoke` | `tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:71` | Verdikt `pmc_seam_ok = delta.available \|\| counters_all_zero` -- **lauter Nullzaehler sind das Erfolgskriterium.** |
 | W2 | `linux_perf_pmc_smoke` | `.../linux_perf_pmc_smoke.cpp:58-63` | `if (!delta.available) { ... SMOKE_SKIP ...; return 0; }` -- **Exit 0.** |
-| W3 | `allow_failure` | `experiment_plan_director.hpp:1333` | `allow_failure: true` am Mess-Batch -- der Job kann fallen, ohne die Ampel zu faerben. |
+| W3 | `allow_failure` | `experiment_plan_director.hpp:1373` | `allow_failure: true` am Mess-Batch -- der Job kann fallen, ohne die Ampel zu faerben. |
 | W4 | **#37-PMC-Preflight** (die eigens dagegen gebaute) | `experiment_plan_director.hpp:1352-1364` | Er baut W1+W2 **in genau dem flaglosen Baum** und ruft `ctest --test-dir build -L pmc`; beide bestehen -> `echo "[PMC-TESTAT] ... pmc=ok"`. |
 
 Der Kommentar ueber W4 (`:1352-1360`) benennt die Gefahr exakt und woertlich:
@@ -368,7 +368,7 @@ im Normallauf < 3 min bei 15 min Timeout.
 
 ### B4 -- `allow_failure: true` am Mess-Batch (Bau trivial, haengt an O-PMC-1)
 
-**Datei:** `experiment_plan_director.hpp:1333`. Die Zeile entfernen.
+**Datei:** `experiment_plan_director.hpp:1373` (gemessen ce-HEAD 54106bc9, `git grep allow_failure` = 1 Treffer; Alt-Anker :1333 war um 40 gedriftet). Die Zeile entfernen.
 **Sichtbarkeit geht nicht verloren:** die Sichtbarkeits-Doktrin (V6.4) ist eine **Zell**-Doktrin --
 "Algo-Fehler -> CSV-Zelle 'failed' + Log". Das bleibt unberuehrt. D4 und D5 sprechen ueber den
 **Job**.
@@ -482,7 +482,7 @@ ist billig (Abschnitt 7, Punkt 6) und muss vorher laufen.
 
 Diese drei entscheidet **nicht** die Bau-Linie. Je Entscheid: Lage, beide Wege mit Folge, Empfehlung.
 
-### O-PMC-1 -- `allow_failure: true` am Mess-Batch (`director:1333`)
+### O-PMC-1 -- `allow_failure: true` am Mess-Batch (`director:1373`)
 
 **Lage.** D5 (#278, Owner-PFLICHT) verlangt "0 allow_failure im GESAMTEN Matrix-System, einzige
 Ausnahme by design: `is_original:relock`, manual Utility"; die CI-Direktive vom 17.07. verschaerft

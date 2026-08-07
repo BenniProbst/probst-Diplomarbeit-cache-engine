@@ -520,7 +520,7 @@ Beide Diffs beruehren Zeile 2 des Headers **nicht** -- der Versions-Marker blieb
 
 **`[ ] OFFEN` -- Owner-Entscheid, hoechste offene Position dieses Kapitels.** Handlungsteile als A-1 bis A-4 gefuehrt.
 
-**Ort:** `ce/libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:841 / :877 / :1194 / :1342` (Emissionsstellen), `:1333` (`allow_failure`), `:1352-1364` (Preflight); `ce/tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:71`; `ce/tests/unit/thesis_tiere/linux_perf_pmc_smoke.cpp:61`; `ce/CMakeLists.txt:67` und `:69-77`.
+**Ort:** `ce/libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:841 / :877 / :1194 / :1342` (Emissionsstellen), `:1373` (`allow_failure`, gemessen ce-HEAD 54106bc9 = 1 Treffer; s. Nachtrag N-T), `:1352-1364` (Preflight); `ce/tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:71`; `ce/tests/unit/thesis_tiere/linux_perf_pmc_smoke.cpp:61`; `ce/CMakeLists.txt:67` und `:69-77`.
 
 **Der Kern, in einem Satz:** die 131.072er-Matrix laeuft **ohne** Hardware-Zaehler und meldet gruen.
 
@@ -540,7 +540,7 @@ bool const pmc_seam_ok       = delta.available || counters_all_zero;
 
 Verdikt in `:76`. Bittere Pointe: diese Abschwaechung stammt aus **demselben** Commit, der SW-2 einmal geflickt hatte -- `1a111ed6` (13.07.): *"m3v2_pmc_smoke-Inversion (live-PMC kippte SMOKE_FAIL) -> pmc_seam_ok=available||all-zero"*. Der Fix war sachlich richtig (ein echt gemessener Zaehler darf nicht als Fehler gelten), hat aber den Gegenfall mit freigegeben.
 
-**Wache 3 -- `allow_failure: true` auf dem Mess-Batch.** `experiment_plan_director.hpp:1333` emittiert `s += "  allow_failure: true\n";` (heute nachgemessen: genau ein Treffer in der Datei). Selbst ein rotes Verdikt faerbte die Pipeline nicht.
+**Wache 3 -- `allow_failure: true` auf dem Mess-Batch.** `experiment_plan_director.hpp:1373` emittiert `s += "  allow_failure: true\n";` (nachgemessen ce-HEAD 54106bc9: genau ein Treffer in der Datei @1373; Alt-Anker :1333 um 40 gedriftet, s. Nachtrag N-T). Selbst ein rotes Verdikt faerbte die Pipeline nicht.
 
 **Wache 4 -- der eigens dafuer gebaute Preflight, und er beantwortet die falsche Frage.** `:1352-1364` emittiert in **jeden** Mess-Batch: `echo "== [PMC-PREFLIGHT] ..."`, `cmake --build build --target m3v2_pmc_smoke linux_perf_pmc_smoke`, `ctest --test-dir build -L pmc --output-on-failure`, `echo "[PMC-TESTAT] ... pmc=ok"`. Sein Kommentar benennt die Gefahr woertlich: *"ohne Preflight koennte eine Lane eine mehrtaegige Messung mit kaputtem perf_event_open durchlaufen und lauter 0-Zaehler produzieren"*, ausdruecklich *"HART in BEIDEN Profilen, auch smoke"*. Am Objekt, `linux_perf_pmc_smoke.cpp:58-62`:
 
@@ -1297,7 +1297,7 @@ Vier Posten, die **beim Schreiben dieses Dossiers** live gemessen wurden. Sie si
 
 ### A-3 `[ ] OFFEN` -- `allow_failure` am Mess-Batch deckt mehr als Mess-Zell-Fehler
 
-**Ort:** `experiment_plan_director.hpp:1333` (heute nachgemessen: genau ein Treffer), Wirkbereich `:1342-1344` (CMake-Configure + Build), `:1349-1350` (fehlender Driver), `:1352-1364` (PMC-Preflight).
+**Ort:** `experiment_plan_director.hpp:1373` (nachgemessen ce-HEAD 54106bc9: genau ein Treffer; Alt-Anker :1333 um 40 gedriftet, s. Nachtrag N-T), Wirkbereich `:1342-1344` (CMake-Configure + Build), `:1349-1350` (fehlender Driver), `:1352-1364` (PMC-Preflight).
 
 **Beleg:** der Schalter steht am **Job**, der Kommentar darueber (`:1332`) begruendet ihn mit der **Zell**-Doktrin ("Mess-Fehler => CSV 'failed' + Log"). Gegenprobe, die es entscheidet: die ce-eigenen `pmc:amd`/`pmc:intel` (`ce/.gitlab-ci.yml:147`, `:153`, Template `.pmc` ab `:113`, Flag bei `:119`) halten die Doktrin 66-N2 ("BEIDE hart, kein Gate/allow_failure") **korrekt** ein. **Die Doktrin ist dort erfuellt, wo sie nichts kostet, und am Mess-Batch verletzt, wo sie zaehlt.**
 

@@ -90,9 +90,17 @@ kannte sie nicht und wurde deshalb gestoppt und neu gestartet.
    eine eigene SwissTable-Reimplementierung).
 2. **Sechs Planungs-Rueckfragen** (Owner: *"Dann gerne Rueckfragen um die Planung zu
    vervollstaendigen, weil diese Plaene 6 Wochen alt sind"*): welche Aufrufe auf Ebene 1 getimt
-   werden · ob die Messung ans Pruefdock wandert · Break-Even je Ebene? · was "Orchestration
-   ueber das Lager" umfasst · wo die Schaltlogik lebt (CT oder Lager-Laufzeit) · ob ein Parameter
-   je Kanal reicht.
+   werden [F1] · ob die Messung ans Pruefdock wandert [F2] · Break-Even je Ebene? [F3] · was
+   "Orchestration ueber das Lager" umfasst [F4] · wo die Schaltlogik lebt (CT oder Lager-Laufzeit)
+   [F5] · ob ein Parameter je Kanal reicht [F6]. **KORREKTUR: nicht alle sechs unbeantwortet.**
+   Laut Explore-Bericht `acd614d772b8ecb00.md` (Zusammenfassung Z.112-119) sind **vier
+   dokumentiert**: F1 jeder Achsenaufruf in der Tier-Binary (`ROH:7716/7761`), F3 Break-Even
+   **pro Ebene** (`PLAN-BREAK:334-339` -- am Objekt verifiziert), F5 Schaltlogik als
+   **CT-Chain-of-Responsibility** (`PLAN-KURVEN:250-252` -- am Objekt verifiziert), F6 **mehrere**
+   Optima je Last-Kanal (`ROH:7601/7603`). **Wirklich offen** sind nur: F4 -- die Phrase
+   "Orchestration ueber das Lager" (0 Treffer im Session-Log; Substanz = Rueckschreiben in den
+   Hybrid DEFERRED #156) -- plus je EIN Restentscheid bei F2 (Messpunkt **wandert vs. testiert**)
+   und F5 (**CT-Einbau vs. RT-Tausch**).
 3. **Faktorisierung der Core-Achse:** Betreuer-Plan nennt `{P|E} x {Single|All}` + Referenz;
    das Achsen-Dossier nennt `{Unpinned|PCoresOnly|ECoresOnly|HybridAware}`. **Nicht dasselbe.**
 4. **Runner-Token-Rotation** — an Infra abgegeben (Handout I113), unerledigt.
@@ -101,7 +109,20 @@ kannte sie nicht und wurde deshalb gestoppt und neu gestartet.
 - Getrennte Ablage je PMU-Domaene im CSV-/Lager-Schema
 - RAW-Events je Mikroarchitektur (Deep-Research-Pflicht)
 - Die Bau-Menge ist unbekannt: **131.072 / 524.288 / 2.097.152**, Faktor 16, keine gemessen.
-  `<run_options cap="131072"/>` ist **dekorativ** — kein Parser liest es.
+  `<run_options cap="131072"/>` ist NICHT pauschal dekorativ -- die Vorlage-Aussage "kein Parser
+  liest es" ist zu weit. Im `comdare_thesis_profile`-Zweig parst der Parser `cap` (ce 54106bc9,
+  `libs/common/serialization/xml_config_parser/xml_config_parser.cpp:426`,
+  `tp.run_options.cap = to_int(...)`) UND wendet es an: `profile_run_options`
+  (`profile_runner.hpp:148`) reicht es an `profile_effective_cap` (`profile_runner.hpp:163`, Aufruf
+  `profile_run_entry.hpp:388`), das die Basis-Zellen-Selektion auf `min(cap, basis_count)` aufloest
+  (Semantik dokumentiert `algorithm_profiles/thesis_profiles/SCHEMA.md:41`: `cap="N"` = genau N
+  Basis-Zellen, auf die Basis-Zellen-Zahl geklemmt; `cap="0"`/fehlend = KEIN Cap). NUR im
+  `comdare_experiment`-Zweig (`parse_experiment_profile`, ab `:448`) wird `run_options` gar nicht
+  gelesen -- alle 8 `run_options`-Zeilen der Datei stehen in `:424-432`, innerhalb
+  `parse_thesis_profile`. Einschraenkung/Beleg-Nenner: `cap` steuert die Zahl der SELEKTIERTEN
+  Basis-Binaries; ob der konkrete Wert 131072 N tatsaechlich verkleinert, haengt per `min` an der
+  Basis-Zellen-Zahl -- auch der Vorlage-Zusatz "kappt aber nichts / No-op" trifft also nur einen
+  Grenzfall, nicht den Mechanismus.
 
 ---
 

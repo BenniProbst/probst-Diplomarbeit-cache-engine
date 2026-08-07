@@ -324,9 +324,16 @@ per `ls`/`cat` im Arbeitsbaum.
 
 ### 🔵 IN ARBEIT — nicht vergessen, aber offen
 
-- **Sechs Planungs-Rueckfragen an den Owner** (23:47): Ebene-1-Timing, Pruefdock-Wanderung,
-  Break-Even je Ebene, Lager-Orchestrierung, CT-vs-RT-Schaltlogik, Mehrdimensionalitaet.
-  Gestellt, **unbeantwortet** — Owner-seitig, blockiert aber weiter.
+- **Sechs Planungs-Rueckfragen an den Owner** (23:47): Ebene-1-Timing [F1], Pruefdock-Wanderung
+  [F2], Break-Even je Ebene [F3], Lager-Orchestrierung [F4], CT-vs-RT-Schaltlogik [F5],
+  Mehrdimensionalitaet [F6]. Gestellt -- aber **NICHT alle unbeantwortet.** Laut Explore-Bericht
+  `acd614d772b8ecb00.md` (Zusammenfassung Z.112-119) sind **vier dokumentiert**: F1
+  (`ROH:7716/7761`), F3 Break-Even pro Ebene (`PLAN-BREAK:334-339`, am Objekt verifiziert), F5
+  CT-Chain-of-Responsibility (`PLAN-KURVEN:250-252`, am Objekt verifiziert), F6 mehrere Optima
+  (`ROH:7601/7603`). **Offen bleiben nur** F4 (Phrase "Orchestration ueber das Lager" = 0 Treffer
+  im Session-Log; Substanz = Rueckschreiben DEFERRED #156) und **je ein Restentscheid** bei F2
+  (wandert vs. testiert) und F5 (CT-Einbau vs. RT-Tausch) -- Owner-seitig, blockiert insoweit
+  weiter.
 - **Das 80-Seiten-Gesamt-Dossier** (23:32): vom Lead bei der Pause ehrlich als einziger nicht
   begonnener Auftrag gemeldet, dann gestartet, um die 86 Journale nachgeruestet und neu
   gestartet. Status **unklar** — kein Artefakt gefunden.

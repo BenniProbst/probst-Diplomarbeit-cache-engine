@@ -163,13 +163,13 @@ KK-5 und V-C mitgefuehrt. **Nicht doppelt bearbeiten.**
 
 ### P-1 [MESSVALIDITAET] `allow_failure: true` am generierten Voll-Mess-Batch -- Pass B (KK-5)
 
-**Ort:** `libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:1332-1333`, in
-`emit_batch_measure_job` (ab `:1300`).
+**Ort:** `libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp:1372-1373`, in
+`emit_batch_measure_job` (gemessen ce-HEAD 54106bc9: `git grep allow_failure` = 1 Treffer @1373, Kommentar direkt darueber @1372; Alt-Anker :1332-1333 war um 40 gedriftet). (Hinweis: die weiteren Anker in diesem Abschnitt -- `:1300`, `:1336-1364` u.a. -- sind NICHT nachgemessen und stehen auf dem Alt-Stand.)
 
 **IST, am Objekt gelesen:**
 
-    :1332  // Sichtbarkeits-Doktrin: Mess-Fehler => CSV 'failed' + Log, die Pipeline bleibt gruen (nicht still verschluckt).
-    :1333  s += "  allow_failure: true\n";
+    :1372  // Sichtbarkeits-Doktrin: Mess-Fehler => CSV 'failed' + Log, die Pipeline bleibt gruen (nicht still verschluckt).
+    :1373  s += "  allow_failure: true\n";
 
 `allow_failure` steht **auf JOB-Ebene**, ausserhalb von `rules:` -- es deckt damit den **ganzen
 Job**, nicht nur die Mess-Zellen.
@@ -204,7 +204,7 @@ hart (`set -euo pipefail`, `:1346`) -- er bricht den Batch ab. Pipeline-**weit**
 rote Batch ist erlaubt, die Pipeline bleibt gruen. **Die Lane stirbt still.** Bei einer mehrtaegigen
 Messung ueber mehrere Lanes heisst das: eine Lane liefert nichts, und kein Signal sagt es an.
 
-**Wirkung je rules-Zweig** (`:1328-1333`):
+**Wirkung je rules-Zweig** (`:1368-1373`, gemessen ce-HEAD 54106bc9: `rules:` @1368, `allow_failure` @1373):
 - `smoke` -> `when: on_success`, laeuft automatisch, **bleibt pipeline-weich**.
 - sonst -> `when: manual` (320er-§41-Gate). Ohne manuellen Start laeuft dort auch der Preflight
   nicht.

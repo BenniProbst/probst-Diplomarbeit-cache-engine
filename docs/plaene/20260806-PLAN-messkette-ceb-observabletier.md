@@ -510,7 +510,7 @@ STETS 4096 Binaries"*) fuer die Mess-Scheibung.
   denselben Fehler eine Ebene hoeher.)
 - **B3** Die beiden Smokes fail-**closed** drehen: ist die Quelle einkompiliert, ist "kein Zugriff"
   ein FEHLER; ist sie es nicht, bleibt der ehrliche Skip.
-- **B4** `allow_failure: true` (`:1333`) -- **Owner-Entscheid O-1**, s. Abschnitt 5.
+- **B4** `allow_failure: true` (`:1373`) -- **Owner-Entscheid O-1**, s. Abschnitt 5.
 - **B5** Doku-Drift (`CMakeLists.txt:67` nennt nur Windows; `linux_perf_pmc_smoke.cpp:4`;
   `linux_perf_pmc_source.hpp:5`).
 
@@ -854,7 +854,7 @@ weiterhin und werden hier **nicht** wiederholt -- sie bleiben Vorbedingung von M
 
 ---
 
-### O-1 -- `allow_failure: true` am Mess-Batch (`experiment_plan_director.hpp:1333`)
+### O-1 -- `allow_failure: true` am Mess-Batch (`experiment_plan_director.hpp:1373`)
 
 **Lage.** #278 (Owner 06.07., PFLICHT, `LEDGER:1140`): *"in einer harten Pipeline darf es kein
 allow_failure geben"*; Endstand-Buchung `LEDGER:692`: *"0 allow_failure im GESAMTEN Matrix-System

@@ -289,7 +289,7 @@ Im Wellen-/Scheiben-Papier `wf_ebe2aced-d4b` / `a6847e8d9e5bcb322` gilt:
 |---|---|---|
 | M-1 | "PMC-Flag in alle 4 Emissionen" | **M-7** (Mess-Glied des Fingerprints vervollstaendigen) |
 | M-2 | Smokes | (deckungsgleich) |
-| M-3 | `allow_failure: true` am Mess-Batch (`:1333`) | **M-14** (L2 + Kohaerenz + branch_misses + IPC) |
+| M-3 | `allow_failure: true` am Mess-Batch (`:1373`) | **M-14** (L2 + Kohaerenz + branch_misses + IPC) |
 | M-5 | P-KAL Kalibrier-Stichprobe | **M-13** (ObservableTier-Vertrags-Audit) |
 | M-6 | die beiden Aktiv-Gates (`:1658` und `:1665`) | (heutiges M-6 = XML-Trennung, dort B-D + B-E) |
 

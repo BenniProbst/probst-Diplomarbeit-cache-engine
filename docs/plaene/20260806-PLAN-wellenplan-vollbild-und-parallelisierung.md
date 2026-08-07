@@ -193,7 +193,7 @@ Alle anderen 13 Worktrees: `dirty=0`.
 |---|---|---|
 | `COMDARE_ENABLE_PMC` im Planer | **0 Vorkommen** (`grep -c`) | `libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp` |
 | vier `cmake -B build`-Emissionen, alle mit `-DCOMDARE_V32_ENABLE=ON`, **keine** mit PMC-Flag | Z. **841, 877, 1194, 1342** | ebd. |
-| `allow_failure: true` am Mess-Batch | Z. **1333** | ebd. |
+| `allow_failure: true` am Mess-Batch | Z. **1373** | ebd. |
 | PMC-Preflight emittiert in jeden Batch | Z. **1361-1364** (Ledger); Kommentar `:1352-1360` | ebd. |
 | Preflight-Verdikt | `bool const pmc_seam_ok = delta.available \|\| counters_all_zero;` | `tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:71` |
 | zweite Wache: ehrlicher Skip | `if (!delta.available) { ... "SMOKE_SKIP" ...; return 0; }` | `tests/unit/thesis_tiere/linux_perf_pmc_smoke.cpp:58-63` |
@@ -254,7 +254,7 @@ traegt (sie tut es nachweislich nicht, s. Tabelle oben).
   (`i-2`, Z. 428): *"Den 13.07.-Inversionsfix NICHT ruecknehmen"* -- der Fix gehoert an den
   **Preflight-Ort** verengt (`--require-available` bzw. Preflight prueft `pmc_available=1`
   explizit), nicht in das allgemeine Verdikt.
-- **`allow_failure: true` (Z. 1333) hat ZWEI Doktrinen gegen sich stehen, nicht eine.**
+- **`allow_failure: true` (Z. 1373) hat ZWEI Doktrinen gegen sich stehen, nicht eine.**
   (a) Der Kommentar direkt darueber (`:1332`) traegt die Sichtbarkeits-Doktrin
   (Memory `feedback_measurement_failure_visibility_csv_failed_not_null_plus_log`):
   Mess-Fehler => CSV `'failed'` + Log, Pipeline bleibt gruen.
@@ -268,7 +268,7 @@ traegt (sie tut es nachweislich nicht, s. Tabelle oben).
 | Posten | Stand an `e7aa1244` (selbst gemessen) | Einordnung |
 |---|---|---|
 | **KK-1 / K-02 PMC-Flag fehlt** | **BESTAETIGT** (0 Treffer, Emissionen 841/877/1194/1342) | **VOR Abgabe -- Owner O-A.** Nicht warten (stumme Entwertung der Messung) |
-| **KK-5 / K-02b `allow_failure`** | **BESTAETIGT** (`:1333`) | **Owner O-B**, mit O-A zusammen; V-C schraenkt Sec.66-N2 ein |
+| **KK-5 / K-02b `allow_failure`** | **BESTAETIGT** (`:1373`) | **Owner O-B**, mit O-A zusammen; V-C schraenkt Sec.66-N2 ein |
 | **KK-3 / K-03 / KK-6 Axis-Lock doppelt** | **GEHEILT** -- `grep -c '^contract:axis-version-lock:'` = **1** (`:447`) auf `development`; und da `main == development`, **auch auf `main` geheilt** | erledigt. Historie: Testplan (18:06) fuehrt "auf main weiter doppelt" -- durch den FF ueberholt |
 | **KK-2 / K-01 BESTANDSLOG-Wurzel** | **Opt-in BESTAETIGT** (`profile_run_entry.hpp:435`: `if (bl == nullptr \|\| ... != "true") return ex::FingerprintFn{};`). Die Ledger-Behauptung "totes Holz" ist **WIDERLEGT**: `experiment_plan_director.hpp:952-955` reicht `COMDARE_BESTANDSLOG` + `_DOC_KEY` + `_OWNER_UUID` + `_MASCHINE` per `append_forward_var_literal` durch (4 Zeilen, selbst gelesen) | **Owner O-C.** Der Posten faellt aus "tot" in "laeuft still falsch, sobald jemand opt-in setzt" |
 | **KK-4 `bestandslog_active` ohne Fingerprint** | **BESTAETIGT** `cache_engine_builder_iterator.hpp:1658-1660`: `fetch && store && bestand_key_of && !bestand_doc_key.empty()` -- `bestand_fingerprint_fn` fehlt. **ERGAENZUNG, die in keiner Liste steht: daneben (`:1665-1668`) sitzt `mess_bestandslog_active` mit DERSELBEN Luecke** ("G-E3: der Messwert-Genus-Zustand. EIGENES Gate") | Der Fix muss **beide** Gates fassen, sonst heilt er die Haelfte |
@@ -600,7 +600,7 @@ D(P-LOCK-B) = {
 ### P-PMC -- i-1 + i-2 + i-3, die PMC-Welle (ce), gated auf O-A/O-B
 ```
 D(P-PMC) = {
-  libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp   (Z. 841/877/1194/1333/1342/1352-1364)
+  libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp   (Z. 841/877/1194/1373/1342/1352-1364; 1373=allow_failure gemessen ce-HEAD 54106bc9, uebrige Anker nicht nachgemessen)
   tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp                              (Z. 71 + Preflight-Ort)
   tests/unit/thesis_tiere/linux_perf_pmc_smoke.cpp                        (Z. 58-63, zweiter Modus)
   tests/unit/thesis_tiere/test_experiment_plan_director.cpp               (Biss auf die emittierte YAML)
@@ -931,7 +931,7 @@ verfaelscht die Zeitmessung von 2C.
 
 | Gruppe | Gate | Inhalt |
 |---|---|---|
-| **3A** | **O-A + O-B** | **P-PMC (i-1 + i-2 + i-3) als EINE Welle.** i-1: `-DCOMDARE_ENABLE_PMC=ON` in die vier Emissionen (mindestens `:1342`, danach 841/877/1194 pruefen) -- **als Invariante, nicht am Job-Namen** (Ledger nachmittag-10 E). i-2: Preflight-Verdikt am **Preflight-Ort** auf `pmc_available=1` verengen, den 13.07.-Inversionsfix NICHT ruecknehmen (zweiter Modus `--require-available` oder Preflight prueft die Ausgabe explizit). i-3: `allow_failure` (`:1333`) entfernen **oder** auf Zell-Ebene zurueckfuehren -- vorher pruefen, ob eine Pipeline-Politik daran haengt. Plus **T-ii-1** (Emissions-Test auf das Flag; `test_experiment_plan_director.cpp` existiert, kein CMakeLists-Eingriff). Worktree `wt-b-pmc`. |
+| **3A** | **O-A + O-B** | **P-PMC (i-1 + i-2 + i-3) als EINE Welle.** i-1: `-DCOMDARE_ENABLE_PMC=ON` in die vier Emissionen (mindestens `:1342`, danach 841/877/1194 pruefen) -- **als Invariante, nicht am Job-Namen** (Ledger nachmittag-10 E). i-2: Preflight-Verdikt am **Preflight-Ort** auf `pmc_available=1` verengen, den 13.07.-Inversionsfix NICHT ruecknehmen (zweiter Modus `--require-available` oder Preflight prueft die Ausgabe explizit). i-3: `allow_failure` (`:1373`) entfernen **oder** auf Zell-Ebene zurueckfuehren -- vorher pruefen, ob eine Pipeline-Politik daran haengt. Plus **T-ii-1** (Emissions-Test auf das Flag; `test_experiment_plan_director.cpp` existiert, kein CMakeLists-Eingriff). Worktree `wt-b-pmc`. |
 | **3B** | **nach 3A**, plus **O-C** | **P-BEST (i-5 + i-6) als EINE Welle.** i-5: `COMDARE_BESTANDSLOG`-Gate umkehren (Default AN) **oder** im Trigger-Rezept verbindlich setzen **und** im Planer eine harte Wache ergaenzen, die den Voll-Lauf ohne Provider **abbricht** statt stumm zu degradieren. i-6: `cfg.bestand_fingerprint_fn` in `bestandslog_active` (`:1658-1660`) **UND** in `mess_bestandslog_active` (`:1665-1668`) aufnehmen, fail-closed. Biss: T2-C-Fall + `na`-Fall muessen das Lager stumm halten. |
 | **3C** | **O-Token** | Behandlung von `refs/backup/pre-secret-scrub-20260802` (`5ba3d03f`). **Loeschung nur mit expliziter Owner-Autorisierung.** |
 | **3D** | **O-1 (Mess-GO)** | Phase 6. Harter Stopp. |
@@ -1198,7 +1198,7 @@ erledigt wurde -- in einer Liste, damit es nicht verlorengeht.
 - `git diff --name-only development...5c4cf900` (E18-SNAP, 6 Pfade).
 - `git ls-remote origin 'refs/backup/*' 'refs/rescue/*'` in beiden Repos.
 - `grep -c COMDARE_ENABLE_PMC` in `experiment_plan_director.hpp` -> **0**;
-  `grep -n "cmake -B build"` -> 841/877/1194/1342; `grep -n allow_failure` -> 1333.
+  `grep -n "cmake -B build"` -> 841/877/1194/1342; `grep -n allow_failure` -> 1373.
 - `grep -n '^contract:axis-version-lock:'` in ce `.gitlab-ci.yml` -> genau **`:447`**.
 - `grep -rlE 'DOCTYPE|ENTITY|xxe|XXE'` ueber ce `tests/` -> **0 von 457 Dateien**; ueber super
   `Code/tests/` -> 3 (die Wachen selbst).

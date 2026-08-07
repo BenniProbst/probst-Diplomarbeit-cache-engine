@@ -2,7 +2,7 @@
 
 *Konsolidierung aus zehn Erzeugnissen, 86 Wellen-Journalen und dem Verbatim-Transkript einer Session.*
 
-**Erstellt:** 2026-08-07, 00:20–02:10 Z
+**Erstellt:** 2026-08-07, 00:20–01:37 Z (Fenster-Ende = letzter Inhalts-`mtime` der Datei, `stat`; die frueher genannte „02:10 Z" lag in der Zukunft)
 **Gemessen gegen:** ce `origin/development` = `c4c04315` · ce `origin/main` = `2b5ecd29` · super `origin/development` = `5a98036d` · super `origin/main` = `71591a24` · thesis `origin/main` = `origin/development` = `19e15920`
 **Alle Suchlaeufe:** `/usr/bin/grep`, durchgaengig `-i`, Verzeichnisse als **Positivliste** (nie `grep -v "/build"` — das frisst `/builder/`). Jede Null traegt Nenner und Gegenprobe.
 
@@ -264,7 +264,7 @@ Kapitel I misst gegen den zweiten Satz und findet die Ebene gebaut. Kapitel II m
 **Zwei Nebenbefunde derselben Nachmessung**, die keine Widersprueche sind, aber genannt gehoeren, weil sie beide aus einem **ungenannten Nenner** entstehen:
 
 - Kapitel I: Pruefdock = *„17 Dateien, 3161 Zeilen"*. Gemessen an `c4c04315`: **18 Dateien**.
-- Kapitel II: `seg_ns` = *„326"*, Kapitel-Nachmessung ueber `libs`: **117**. Kapitel II hat ueber `libs apps tools tests adapters modules` gemessen und den Suchraum genannt — beide Zahlen sind richtig, sobald der Nenner dabeisteht.
+- Kapitel II: `seg_ns` = *„326"* — **nicht reproduzierbar**. Kapitel-Nachmessung ueber `libs`: **117** (`git grep -n seg_ns 54106bc9 -- libs` = 117 Treffer, korrekt). Ueber den in Kapitel II genannten Suchraum `libs apps tools tests adapters modules` misst dieselbe Methode an ce `54106bc9` **308** Treffer (`git grep -n seg_ns 54106bc9 -- libs apps tools tests adapters modules`), nicht 326; ueber den ganzen Baum sind es 424 Treffer in 65 Dateien. Die `libs`-Zahl traegt ihren Nenner und stimmt; „326" ist an keinem dieser Nenner belegbar und wird hier durch die real gemessene **308** (Nenner: sechs genannte Verzeichnisse, ce `54106bc9`) ersetzt.
 - Kapitel I: `perf_event_open` = *„18 Treffer"*; Kapitel V: *„3 Dateien"*. Gemessen an `c4c04315`: **18 Treffer ueber 4 Dateien**. Kapitel V hat gegen den **ausgecheckten Arbeitsbaum** gemessen, und der steht auf `90bca126` (Zweig `b-m2-pmc-invariante`) — also auf einem fremden Wellen-Branch.
 
 > **Der letzte Punkt ist mehr als eine Fussnote.** Checkheft-Posten **N-AD** („beide Hauptklone stehen auf fremden Wellen-Branches") wird in Kapitel III und IV als offene Hygiene-Frage gefuehrt. **Er hat in diesem Werk real zwei divergierende Zahlen erzeugt.** Live gemessen, 07.08. 00:50 Z: super-Hauptklon HEAD `18a0bdf3` auf `b-ci-rueckschrieb-beide-zeiger`, ce-Submodul-Checkout HEAD `90bca126` auf `b-m2-pmc-invariante`. **Wer im Hauptklon misst, misst nicht `development`.** Ab sofort bindend fuer jede Erhebung: `git grep <muster> origin/development -- <pfad>` gegen den **Ref**, nie gegen den Arbeitsbaum.
@@ -477,7 +477,7 @@ Die Hybrid-CPU ist ausserdem ein **Term der Forschungsfrage** (Termin 4, Scope-F
 |---|---|---|
 | PMU-Domaenen-Trennung im Code | **0** | `cpu_atom` in `libs/` = **0 Treffer**; Gegenprobe `perf_event_open` = **18 Treffer ueber 4 Dateien** — die Suche sieht |
 | Vokabular dafuer | **existiert, ist aber bewusst leer** | `platform/i_platform_probe.hpp:15,19,20`: `has_hybrid_cores`, `cpu_core_atom_perf_separation`, `preferred_pinning_policy` — und `platform_probe/cpuid_platform_probe.hpp:38-39` verbatim: „AP-13: **Topologie/Pinning bleibt bewusst ungesetzt**" |
-| Der Aktuator | **gebaut, nicht gerufen** | `builder/measurement/thread_pinning.hpp` (106 Z.): `class ScopedThreadPin` mit `sched_setaffinity` (`:61`) / `SetThreadAffinityMask` (`:47`), RAII-restore (`:70-78`), plus `NoPinPolicy`/`CorePinPolicy` (`:96-104`). Kein Doppelstart, kein Aufrufer im Mess-Loop |
+| Der Aktuator | **gebaut, nicht gerufen** | `builder/measurement/thread_pinning.hpp` (105 Z., `wc -l` an ce `54106bc9`): `class ScopedThreadPin` mit `sched_setaffinity` (`:61`) / `SetThreadAffinityMask` (`:47`), RAII-restore (`:70-78`), plus `NoPinPolicy`/`CorePinPolicy` (`:96-104`). Kein Doppelstart, kein Aufrufer im Mess-Loop |
 | Die Collector-Achse | drei Bausteine, PMC traegt 7 Kategorien | `measurement_axis_registry.xml:25-42`: `WallClockSystemAxis` · `ObserverSnapshotSystemAxis` · `PmcSystemAxis` (`CACHE_MISS_L1/L2/L3`, `DTLB_MISS`, `BRANCH_MISS`, `IPC_CPI`, `ENERGY_J`), alle `binary_id="never"` |
 
 **Zur `thread_pinning.hpp`-Zeile eine Warnung fuer jeden Folge-Agenten:** ein erster Sweep meldete `sched_setaffinity` = 0 Treffer im ce. **Falsch.** Der Filter lautete `grep -v "/build"` und frisst `/builder/` mit — und genau dort liegt der einzige Aktuator des Repos. Die falsche Null haette einen Neubau ausgeloest, den es nicht braucht. (Kapitel III, **FA-3**.)
@@ -492,7 +492,7 @@ event=cache_misses_l3_ll  type=3  config=65538  errno=2 (No such file or directo
 
 **L2 und L3 sind auf AMD nicht „null" — sie existieren in dieser Kodierung nicht.** Auf Intel liefert derselbe Zaehler 3,2–4,1 Mio. Waere der Voll-Lauf so gestartet, haetten alle AMD-Zeilen eine Null getragen, die eine Messung behauptet; eine Reparatur danach haette frueh und spaet erhobene Zeilen mit **verschiedener Semantik unter derselben Ueberschrift** hinterlassen — ein Datenbruch ohne Neubau, schlimmer als ein Neubau, weil unsichtbar.
 
-**Neuer Stand gegenueber allen drei Bestandsaufnahmen dieses Dossiers:** der Posten ist **gelandet**, ce `5c102e05`, Merge `c4c04315`, 07.08.2026 00:13 UTC. `PmcCounters` traegt jetzt vier Pro-Zaehler-Verfuegbarkeitsflags — `pmc_source.hpp:36-42`: `cache_misses_l2_source_available`, `cache_misses_l3_source_available`, `coherence_invalidations_source_available`, `energy_micro_joules_source_available`, alle Default `false` (Fail-Safe). Die CSV-Zelle rendert `SourceUnavailable`/`n/a` statt einer erfundenen 0 — **nur wenn die Zeile ueberhaupt real gemessen wurde**; eine echte 0 bleibt 0, und PMC-off-Zeilen sind byte-identisch unveraendert.
+**Neuer Stand gegenueber allen drei Bestandsaufnahmen dieses Dossiers:** der Posten ist **gelandet**, ce `5c102e05`, Merge `c4c04315`, 07.08.2026 00:13 UTC. `PmcCounters` traegt jetzt vier Pro-Zaehler-Verfuegbarkeitsflags — `pmc_source.hpp:37-43` (ce `54106bc9`): `cache_misses_l2_source_available` (`:37`), `cache_misses_l3_source_available` (`:38`), `coherence_invalidations_source_available` (`:39`), `energy_micro_joules_source_available` (`:43`), alle Default `false` (Fail-Safe). Die CSV-Zelle rendert `SourceUnavailable`/`n/a` statt einer erfundenen 0 — **nur wenn die Zeile ueberhaupt real gemessen wurde**; eine echte 0 bleibt 0, und PMC-off-Zeilen sind byte-identisch unveraendert.
 
 > **Siehe Abschnitt 0 / W-2:** Kapitel III fuehrt diesen Posten noch als uncommitteten WIP-Patch. Beide Angaben sind korrekt, acht Minuten auseinander. **Verbindlich ist: gelandet.**
 
@@ -637,7 +637,7 @@ Er praezisiert im Uebrigen exakt eine aeltere Owner-Direktive, Ledger `:3403` (�
 
 Das ist die Aufloesung der Verwechslung, die den Abend gekostet hat: **Tooling** und **Ebene** sind zwei Achsen, keine.
 
-- **Tooling** (Auffaecherungs-Achse, Mengenwert): `wallclock` / `macro` / `micro`. Am Objekt: `measurement_tooling_registry.hpp:27-31` (`enum class MeasurementTooling`), `kMeasurementToolingCount = 3` (`:35`) als Single-Source gegen stille Drift, Registry-Tabelle `:48-52` — **Index == Enum-Wert, `static_assert`-gesichert**.
+- **Tooling** (Auffaecherungs-Achse, Mengenwert): `wallclock` / `macro` / `micro`. Am Objekt (ce `54106bc9`): `measurement_tooling_registry.hpp:27-31` (`enum class MeasurementTooling`), `kMeasurementToolingCount = 3` (`:34`) als Single-Source gegen stille Drift, Registry-Tabelle `:46-50` — **Index == Enum-Wert, `static_assert`-gesichert**.
 - **Ebene** (Erhebungs-**Ort**): E1 Achsenaufruf · E2 Gattungs-Funktionsaufruf · E3 Last-Sequenz.
 
 **Beleg, dass es zwei sind:** `profile_facade/profile_run_facade.cpp:273-275` emittiert eine **feste** Define-Menge; die Tooling-Wahl kommt darin nicht vor. Kein Timer-Ort im Code ist heute durch `wallclock`/`macro`/`micro` gegatet. Waere „wallclock" eine Ebene, muesste sie es koennen. Die Thesis sagt dasselbe (`kapitel/de/03_messsystem_prtart.tex:1305-1312`): der Apparat misst „**zusaetzlich** drei *Wallclock-Ebenen*" — das Wort „zusaetzlich" traegt die Orthogonalitaet.
@@ -647,7 +647,7 @@ Das ist die Aufloesung der Verwechslung, die den Abend gekostet hat: **Tooling**
 | # | Drei | Elemente | Anker |
 |---|---|---|---|
 | 1 | **Bau-Phasen** der Mess-Achse | Planer (RT) → CEB (CT) → Tier (CT) | Ledger `:4258` |
-| 2 | **Tooling-Werte** | `wallclock` / `macro` / `micro` | `measurement_tooling_registry.hpp:48-52` |
+| 2 | **Tooling-Werte** | `wallclock` / `macro` / `micro` | `measurement_tooling_registry.hpp:46-50` |
 | 3 | **Erhebungs-Ebenen** (Orte) | Achsenaufruf / Gattungs-Funktionsaufruf / Last-Sequenz | `03_messsystem_prtart.tex:1310-1312` |
 | 4 | **Collector-Bausteine** | `WallClockSystemAxis` / `ObserverSnapshotSystemAxis` / `PmcSystemAxis` | `measurement_axis_registry.xml:26-41` |
 
@@ -713,11 +713,11 @@ Erhebung 07.08.2026, ce `c4c04315` / super `5a98036d`.
 | Mess-Achse Stufe 2 (CEB-CT-Einbau der WAHL) | **geheilt und gelandet** | M-1/D-1 `b9fd81ff`, D-4 `62a5b6f7`, Merge `bba4d90f` |
 | Mess-Achse Stufe 3 (Tier-Deklaration + Leser) | **erster Leser gebaut** | M-1/D-2 `246b2793` (`mess_konsistenz_gate.hpp`) |
 | PMC-Pflicht als Invariante | **gelandet, 4/4 Bissbeweis** | `8894d983` |
-| PMC-Ehrlichkeit L2/L3/coherence/energy | **gelandet in dieser Nacht** | `5c102e05` / `c4c04315`; `pmc_source.hpp:36-42` |
+| PMC-Ehrlichkeit L2/L3/coherence/energy | **gelandet in dieser Nacht** | `5c102e05` / `c4c04315`; `pmc_source.hpp:37-43` |
 | PMC `branch_misses` (M-3a) | **offen** | keine Quelle schreibt das Feld; einzige Zuweisung ist eine Kopie (`measurement_snapshot.hpp:145`) |
 | **PMU-Domaenen-Trennung P/E** | **fehlt** | `cpu_atom` in `libs/` = **0**; Gegenprobe `perf_event_open` = **18 ueber 4 Dateien** |
 | Hybrid-Erkennung | **Vokabular da, bewusst leer** | `i_platform_probe.hpp:15,19,20`; `cpuid_platform_probe.hpp:38-39` |
-| Pinning-Aktuator | **gebaut, kein Aufrufer im Mess-Loop** | `thread_pinning.hpp` (106 Z.) |
+| Pinning-Aktuator | **gebaut, kein Aufrufer im Mess-Loop** | `thread_pinning.hpp` (105 Z.) |
 | **Pinning-Permutation (Doppelstart)** | **fehlt** | kein Doppelstart; Planer-Abfrage fehlt |
 | `numa_cpu_pin_process_probe` | **fehlt** | 11 `sub_axis`-IDs, keine mit „core"; ce-Anteil ungelandet (`b4cebdc4`), super-Anteil **uncommittet** |
 | Warntext `warn: no pinned locality on hybrid architecture` | **nicht im Code** | 0 Treffer; Gegenprobe `sched_setaffinity` = 2 |
@@ -745,7 +745,7 @@ Erhebung 07.08.2026, ce `c4c04315` / super `5a98036d`.
 ## KAPITEL II — VON DER MESSUNG ZUR BINARY-WAHL
 
 > **Stand aller Ist-Angaben:** eigene Erhebung am Objekt, **2026-08-07, 00:15–00:40 Z**, gegen ce `development` = **`c4c04315`**, thesis `19e15920`, Ledger 7248 Zeilen. Alle `grep` als `/usr/bin/grep`, durchgaengig `-i`, Verzeichnisse als Positivliste statt `-v`.
-> **Wo dieses Kapitel nur verweist:** die Einzelbefunde stehen ausgeschrieben in `docs/plaene/20260806-PLAN-break-even-und-drei-benchmark-ebenen.md` (825 Z.), `docs/plaene/20260806-PLAN-messkurven-synthese-und-hybrid-binary.md` (768 Z., **nie versioniert**) und `LEDGER` Nachtrag **abend-4**, Abschnitte 9–12.
+> **Wo dieses Kapitel nur verweist:** die Einzelbefunde stehen ausgeschrieben in `docs/plaene/20260806-PLAN-break-even-und-drei-benchmark-ebenen.md` (825 Z.), `docs/plaene/20260806-PLAN-messkurven-synthese-und-hybrid-binary.md` (768 Z., **seit super `1aba34f8`/00:30:30 Z versioniert**, zum 00:20-Messstand noch untracked) und `LEDGER` Nachtrag **abend-4**, Abschnitte 9–12.
 
 ### II.1 Vier Owner-Nachrichten in einundvierzig Minuten
 
@@ -1037,7 +1037,7 @@ Vier x-Werte, autoritativ aus dem Profil (`profile_run_entry.hpp:531,534`), pro 
 | Ebene | Zustand | Beleg, heute |
 |---|---|---|
 | **MICRO** | **halb** | Traegt: 17 `<axis_sweep>` + 18 Per-Achsen-Zeitspalten `seg_*_ns` (CSV-Spalten 25–42) + `sweep_axis`-Tag. Traegt **nicht**: was heute „Micro" heisst, sweept die **Algorithmen-Wahl** einer Achse und misst am **Gattungs-Interface** (`ns_per_op`) — nicht einen *Parameter* ueber das *Achsen-Interface*. Beide dafuer angelegten Orte sind leer: `benchmarks/microbenchmarks/` = `.gitkeep` (0 Byte) + CMakeLists mit **einer** Kommentarzeile; `builder/runtime_micro_benchmarks/` = `.gitkeep` + `add_library(… INTERFACE)` mit dem Kommentar „**Skelett (Phase 4.B) — keine Implementation**". Nenner `benchmarks/`: **7 Dateien**, davon 3 `.gitkeep` und 4 CMakeLists |
-| **MACRO (timed)** | **fehlt** | Suche nach Schritt-Zeitnahmen: `lap_ns` 0 · `split_ns` 0 · `phase_ns` 0 · `stage_ns` 0 · `step_ns` 0 · `marker_ns` 0 · `trace_point`/`tracepoint` 0. **Gegenprobe `seg_ns` = 326** (Suchraum `libs apps tools tests adapters modules`; ueber `libs` allein: 117) — die Suche greift. Vorhanden sind zwei Halbstuecke, die nicht verbunden sind: `op_lat[6]` (p50/p99 je Op-Art) und `seg_ns[18]` (lauf-aggregiert je Achse). Die `fill_checkpoints{10,100,1000}` sind **Fuellstands**-Stuetzpunkte auf der Datenmengen-Kurve, nicht Punkte innerhalb eines Aufrufs — und ihre CSV exportiert **2 von 18 Achsen** (hartkodiert `axis_stats[0]` und `[6]`). **⚠ W-3** |
+| **MACRO (timed)** | **fehlt** | Suche nach Schritt-Zeitnahmen: `lap_ns` 0 · `split_ns` 0 · `phase_ns` 0 · `stage_ns` 0 · `step_ns` 0 · `marker_ns` 0 · `trace_point`/`tracepoint` 0. **Gegenprobe `seg_ns` = 308** (Suchraum `libs apps tools tests adapters modules`, `git grep -n` an ce `54106bc9`; ueber `libs` allein: 117; ganzer Baum 424) — die Suche greift. Vorhanden sind zwei Halbstuecke, die nicht verbunden sind: `op_lat[6]` (p50/p99 je Op-Art) und `seg_ns[18]` (lauf-aggregiert je Achse). Die `fill_checkpoints{10,100,1000}` sind **Fuellstands**-Stuetzpunkte auf der Datenmengen-Kurve, nicht Punkte innerhalb eines Aufrufs — und ihre CSV exportiert **2 von 18 Achsen** (hartkodiert `axis_stats[0]` und `[6]`). **⚠ W-3** |
 | **MACRO large scope** | **Traegerschicht ja, Auswertung nein** | 21 Lastprofil-XML unter `algorithm_profiles/load_profiles/`, 6 davon im golden, `workload` als CSV-Spalte 155, unbekannte id = **harter Fehler** (`validate_profile.hpp:463`, exit 4, kein stiller Rueckfall). Was fehlt: **kein Aggregations-Artefakt** „Gesamtheit der Macro-Charts eines Lastprofils" — weder Writer noch Schema |
 
 **Und die Pointe des Ist-Stands:** `Code/05_diagram_generator/diagram_generator.hpp:397-405` **zeichnet** genau die Kurven, die sich schneiden muessten — „Working-Set-Sweep-Kurve (Metrik ueber `working_set_n`) … eine Kurve je gesweepter Achsen-Auspraegung". Er legt sie uebereinander. **Niemand schneidet sie.** Gegenprobe mit Nenner: `break.even|schnittpunkt|crossover|intersect` ueber `Code/05_diagram_generator Code/08_appendix_generator Code/tools Code/02_messung_driver Code/04_csv_to_latex` = **0 Treffer**; derselbe Ausdruck findet im ce ueber 50 Treffer. Der super-Auswertungspfad kennt den Begriff nicht.
@@ -1118,7 +1118,7 @@ Die Bau-Posten selbst sind im Ledger als **B-7 … B-10** verbucht (`:4637-4643`
 
 Dieses Kapitel schreibt die Einzelbefunde der Session nicht noch einmal ab. Sie stehen bereits, mit vollem Kontext, an vier Orten: `docs/sessions/20260806-DOSSIER-regressionen-checkheft.md` (**2486** Zeilen — die Posten N-1..N-AE, SW-1..SW-4, Z-1..Z-8 und die Regel-Zeilen), `docs/sessions/20260806-UEBERBLICK-workflow-ergebnisse.md` (**677** Zeilen — §4.1 Widersprueche W-1..W-21, §4.2 zwanzig Selbstkorrekturen mit Bericht-ID, §4.3 der Codex-Kipp-Zaehler), die Ledger-Nachtraege abend-1 bis abend-4, und `docs/ARBEITSWEISE-GESAMT-DOKTRIN.md` (v3, ce-Repo, Commit `77993f6e`, Teil V — die sechzehn Arbeitsfehler des Leads in fuenf Klassen).
 
-Was hier neu ist, ist der **Zusammenhang**: dass alle diese Befunde **eine Gestalt** haben, dass diese Gestalt einen **Namen vom Owner** bekommen hat, dass sie eine **Gegenseite** hat, die genauso systematisch ist wie die Fehlerseite, und dass am Ende dieser Erfahrung eine **Schwere-Leiter** steht, die nicht erfunden, sondern erarbeitet wurde.
+Was hier neu ist, ist der **Zusammenhang**: dass diese Befunde ganz ueberwiegend **eine Gestalt** teilen — die **Hauptklasse**, nicht die vollstaendige Typologie —, dass diese Gestalt einen **Namen vom Owner** bekommen hat, dass sie eine **Gegenseite** hat, die genauso systematisch ist wie die Fehlerseite, und dass am Ende dieser Erfahrung eine **Schwere-Leiter** steht, die nicht erfunden, sondern erarbeitet wurde. (Das Checkheft prueft die These in **VII.5** ausdruecklich nach und haelt fest: *„Die These bleibt richtig und bleibt die Hauptklasse. Sie ist aber nicht vollstaendig"* — es fuehrt dort drei Gestalten, die sie nicht abdeckt.)
 
 **Erhebungsdatum: 2026-08-07, 00:05–00:40 Z.** Gemessen gegen ce `origin/development` = `bba4d90f` / `origin/main` = `2b5ecd29`, super `71591a24`, thesis `19e15920`.
 
@@ -1365,7 +1365,7 @@ Dieser Fall ist der Kern von Kapitel III und verdient die volle Chronologie.
 329: SMOKE_OK
 ```
 
-**Der echte Defekt, dritte Korrektur:** Test 304 `m3v2_pmc_smoke` misst ein **leeres Fenster**. Am Objekt verifiziert: `tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:41-43` —
+**Der echte Defekt, dritte Korrektur:** Test 304 `m3v2_pmc_smoke` mass ein **leeres Fenster**. Im **Vor-Heilungs-Stand** `2b5ecd29~1` am Objekt verifiziert, `tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp:41-42` (an ce-HEAD `54106bc9` **geheilt**: dort klammert `begin()/end()` ein reales Pointer-Chasing-Fenster ueber 32 MiB, `:62-69`) —
 
 ```cpp
 // (1) begin()/end() um den (hier leeren) Mess-Batch — genau das Muster aus run_observable_perm. Delta = 0/false.
@@ -1373,7 +1373,7 @@ pmc->begin();
 ::comdare::cache_engine::measurement::PmcCounters const delta = pmc->end();
 ```
 
-und der Dateikopf `:12` sagt es selbst: *„befuellt row.pmc EXAKT ueber die EINE PMC-Quelle (begin()→[leerer Batch]→end())"*. Folge: `d.t_running == 0` → `read_scaled` liefert `ok=false` → `delta.available = 0`, obwohl die Quelle offen ist.
+und der Dateikopf `:12` sagte es in diesem Stand selbst: *„befuellt row.pmc EXAKT ueber die EINE PMC-Quelle (begin()→[leerer Batch]→end())"*. Folge: `d.t_running == 0` → `read_scaled` liefert `ok=false` → `delta.available = 0`, obwohl die Quelle offen ist. **An ce-HEAD `54106bc9` liest dieselbe Zeile `:12` jetzt** *„begin()->[ECHTES Messfenster]->end()"* (ASCII-Pfeil im Quelltext) — der Defekt ist geschlossen (`2b5ecd29`).
 
 **Und der unangenehmste Teil**, verbatim aus dem Wellenbericht: *„Auf AMD besteht derselbe Test **durch Zufall**. 34–53 L1-Misses, 5–6 dTLB — das ist der Overhead der ioctl/read-Syscalls selbst, Rauschgrenze. 13 Job-Traces ausgewertet: **7/7 AMD nonzero, 6/6 Intel exakt null**, keine Ausnahme. Deterministisch, nicht flaky. **Die intel-Lane hat diesen Test NIE bestanden — sie hat ihn stillgeschaltet.**"*
 
@@ -1383,7 +1383,7 @@ Der eigentliche Fund ist nicht der Zugriff, sondern die **Fehlermeldung**. `wf_d
 
 > *„`m3v2_pmc_smoke.cpp:92-95` druckt: `[PMC-FEHLER] … Ursache pruefen: perf_event_paranoid, CAP_PERFMON/Executor-Rechte, Container ohne perf.` — **die zitierte Ursachenliste ist eine hartkodierte Vermutung im Testcode, keine Messung.** Und `linux_perf_pmc_source.hpp:111-114` verwirft `errno` ersatzlos: `if (r < 0) { fd_ = -1; return false; }`. **Sie hat drei Fehldiagnosen und einen beinahe ausgefuehrten Cluster-Rechte-Eingriff erzeugt.** Das ist R-1 in der Ausgabe-Richtung: **keine Ursache ohne Messung.**"*
 
-Beide Stellen sind am Objekt verifiziert.
+Beide Stellen sind am Objekt verifiziert — die zitierten Zeilennummern gehoeren dem **Vor-Heilungs-Stand** (`2b5ecd29~1`). An ce-HEAD `54106bc9` gilt: die **hartkodierte Ursachenliste steht weiter** (jetzt `m3v2_pmc_smoke.cpp:124-126`, die Ursachen-Zeile `:125`), die **`errno`-Verwerfung ist geheilt** — `linux_perf_pmc_source.hpp` sichert `errno` heute sofort (`:116` *„`int const eno = errno;`"*, Heilung `22e17f57`).
 
 **Die Pointe, die dieses Kapitel traegt: die falsche Lead-Empfehlung war nicht aus der Luft gegriffen. Sie war woertlich aus einer Fehlermeldung im eigenen Code abgeschrieben, die selbst nie gemessen hatte.** Der Fehler war im Produkt vorprogrammiert; der Lead war nur sein Uebertraeger. Eine Vermutung, die einmal als Hilfetext in eine Ausgabe geschrieben wurde, wird beim naechsten Lesen zur Diagnose — und beim uebernaechsten zur Handlungsanweisung an den Owner.
 
@@ -1524,7 +1524,7 @@ Das ist die direkte Umsetzung des Owner-Verbots aus `live 3041`: *„Ein Ausschl
 
 #### III.7.1 Die Selbstkorrektur als Arbeitsform
 
-Der Ueberblick (§4.2) fuehrt **zwanzig** Selbstkorrekturen mit Bericht-ID; sie werden hier nicht wiederholt. Was dort **fehlt**, weil das Dokument um 20:32 aus dem Backup-Stand erhoben wurde, sind die Abend-Wellen. Eine eigene Nachzaehlung ueber alle 86 Journale (Muster `selbstkorrektur|EIGENER ARBEITSFEHLER|praemisse|widerlegt|zurueckgewiesen|TRIFFT NICHT ZU|korrigiert und benannt|ich rate nicht`, case-insensitiv) findet das Signal in **104 von 265 `result`-Ereignissen**. Fuenf davon gehoeren ins Kapitel, weil sie die These an ihrem eigenen Werkzeug zeigen:
+Der Ueberblick (§4.2) fuehrt **zwanzig** Selbstkorrekturen mit Bericht-ID; sie werden hier nicht wiederholt. Was dort **fehlt**, weil das Dokument um 20:32 aus dem Backup-Stand erhoben wurde, sind die Abend-Wellen. Eine eigene Nachzaehlung ueber alle Journale (Muster `selbstkorrektur|EIGENER ARBEITSFEHLER|praemisse|widerlegt|zurueckgewiesen|TRIFFT NICHT ZU|korrigiert und benannt|ich rate nicht`, case-insensitiv, `grep -iEc` ueber die `"type":"result"`-Zeilen) findet das Signal mit **exakt diesem ASCII-Muster in 101 von 265 `result`-Ereignissen** (Stand 07.08., 265 = alle `result`-Ereignisse; mit Umlaut-Varianten wie `Prämisse`/`zurückgewiesen` sind es 108 — die Zahl ist markermusterabhaengig, die urspruenglich genannte „104" ist mit dem Rezept nicht mehr reproduzierbar, da die Journale wachsen). Fuenf davon gehoeren ins Kapitel, weil sie die These an ihrem eigenen Werkzeug zeigen:
 
 **Die schaerfste**, verbatim: *„**EHRLICHE SELBSTKORREKTUR:** meine TSAN-Sonde des Erst-Reviews hatte genau diesen Fall nachgestellt und als [OK] gebucht — **ich hatte gefragt ‚haengt drain()?' (nein) statt ‚haelt die Barriere?' (nein)**. Der Befund kam von Codex; **ich hatte ihn in der Hand und nicht gesehen.**"* — Die Sonde lief korrekt. Sie beantwortete die falsche Frage. Der Satz ist die These, geschrieben von jemandem, der sie nicht als These kannte.
 
@@ -1659,7 +1659,7 @@ Die Regeln sind Kondensat, nicht Ersatz. Ihr Wert liegt darin, dass sie sagen, *
 | **R-6** Ein gruenes Gate deckt nur seinen eigenen Gegenstand | 12 Format-Nachzuege an einem Tag |
 | **R-8/R-12** Ein Submodul-Zeiger kann rueckwaerts zeigen; **Richtung ist nicht Erreichbarkeit** | die vorgeschlagene Gitlink-Wache haette den live stehenden Fall **durchgewunken**: `merge-base --is-ancestor b241a272 90bca126` = wahr, aber `90bca126` liegt **auf keinem Remote** |
 | **R-9** Eine rescue-Ref ist keine Landung | 13 von 18 ce-rescue-Refs fuhren rot, alle inhaltlich korrekt |
-| **R-11** **Keine Ursache ohne Messung** | die hartkodierte Ursachenliste in `m3v2_pmc_smoke.cpp:94-95` bei verworfenem `errno` — drei Fehldiagnosen, ein beinahe ausgefuehrter Cluster-Eingriff |
+| **R-11** **Keine Ursache ohne Messung** | die hartkodierte Ursachenliste in `m3v2_pmc_smoke.cpp` (ce-HEAD `54106bc9`: `:124-126`, Ursachen-Zeile `:125`; Anlassfall-Stand `2b5ecd29~1`: `:94-95`) bei — im Anlassfall — verworfenem `errno` (seit `22e17f57` gesichert) — drei Fehldiagnosen, ein beinahe ausgefuehrter Cluster-Eingriff |
 | **R-13** Eine Wache darf nicht im Gegenstand ihrer eigenen Fehlerklasse wohnen; ihr Sollwert nicht aus demselben Commit stammen wie ihr Istwert | `557d8023` setzte die Version **und** erzeugte die Lock-Datei neu ⇒ **gruen per Konstruktion** |
 | **R-14** **Eine Migration erbt die Fehlerklasse, die sie beseitigt** | die xmllint-Migration baute **elf neue False-Green-Pfade** ein; `2c631551` sagt es selbst: *„Die Befunde hier sind LUECKEN DER MIGRATION SELBST."* |
 | **R-17** Die Ablage darf ihren eigenen Beleg nicht verschlucken | `.gitignore:49` = `*.log`; von 155 `.log` unter `docs/sessions/backups/` kennt git **77**, die anderen **78 liegen in keinem git-Objekt** |
@@ -1689,7 +1689,7 @@ Fuenf Posten, die aus III.1 bis III.9 unmittelbar hervorgehen und heute offen si
 
 ### III.11 Schlussbemerkung
 
-Die Fehler dieses Tages sind nicht deshalb interessant, weil sie schwer waren. Sie sind interessant, weil sie **eine** Gestalt haben und weil diese Gestalt eine Bauform hat.
+Die Fehler dieses Tages sind nicht deshalb interessant, weil sie schwer waren. Sie sind interessant, weil sie ganz ueberwiegend **eine** Gestalt teilen — die Hauptklasse, nicht die vollstaendige Typologie (das Checkheft nennt in VII.5 drei Gestalten, die sie nicht abdeckt) — und weil diese Gestalt eine Bauform hat.
 
 Die Gestalt: **eine korrekte Messung, die die falsche Frage beantwortet.** Sie entsteht aus vier Ausschnitten — Zeit, Schreibweise, Ort, Form — und aus einer Lesart, die zwischen die Messung und ihre Auswertung tritt.
 
@@ -1809,9 +1809,9 @@ Die `§3.2`-Liste des Ueberblick-Dokuments („Fertig gebaut, ungelandet") fuehr
 
 Die Herkunft ist Owner-**KERN 8** (22:36:35Z) samt Namensratifizierung *„Alles korrekt erkannt"* (22:40:07Z).
 
-#### IV.2.4 (3) Drei Plandokumente, die nie versioniert wurden
+#### IV.2.4 (3) Drei Plandokumente, die erst nach der Messung versioniert wurden
 
-Im super-Hauptklon untracked, live nachgemessen gegen `origin/development`:
+Zum Erhebungszeitpunkt (00:20 Z) im super-Hauptklon untracked, live gegen `origin/development` nachgemessen:
 
 | Datei | Zeilen | erstellt |
 |---|---:|---|
@@ -1819,7 +1819,9 @@ Im super-Hauptklon untracked, live nachgemessen gegen `origin/development`:
 | `docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md` | **1043** | 22:20 |
 | `docs/plaene/20260806-PLAN-messkurven-synthese-und-hybrid-binary.md` | **768** | 23:27 |
 
-**2433 Zeilen.** Die Gegenprobe ist wichtig: die **zehn** anderen untracked Plan-/Session-Dokumente desselben Klons sind **alle** auf `development` vorhanden — sie erscheinen nur deshalb als untracked, weil der Hauptklon auf einem 20 Stunden alten Arbeitszweig steht. **Diese drei sind es nicht.**
+**2433 Zeilen.** Die Gegenprobe ist wichtig: die **zehn** anderen untracked Plan-/Session-Dokumente desselben Klons sind **alle** auf `development` vorhanden — sie erscheinen nur deshalb als untracked, weil der Hauptklon auf einem 20 Stunden alten Arbeitszweig steht. **Diese drei waren es zum Messzeitpunkt nicht.**
+
+> **Nachtrag (Landung):** Der Befund war zu 00:20 Z korrekt, ist aber **10 Minuten spaeter geheilt worden**: super `1aba34f8` („docs(plaene): drei Wellen-Dokumente sichern, die auf KEINEM Zweig lagen", 00:30:30 Z) versioniert alle drei; sie stehen heute auf `origin/development` **und** `origin/main` (per `git cat-file -e` verifiziert). Genau das Muster, das dieses Werk beschreibt — eine Zahl/Aussage traegt ihren Erhebungsstand.
 
 Das erste ist unmittelbar messkritisch: es beruft sich auf die ce-Laeufe **15104/15110** und die Jobs `pmc:intel` (365187/365257) / `pmc:amd` (365186/365256) — genau die zwei roten Laeufe, aus denen der `pmc:intel`-Befund stammt. Das dritte ist die Ausarbeitung der Break-Even-Kette. **Beide sind Primaermaterial fuer die Kapitel II und V dieses Werks und liegen in keinem git-Objekt.**
 
@@ -1993,7 +1995,7 @@ Das Pruefdock **ist gebaut** — und im Produktionspfad **nicht befahren** (I.7.
 
 **Warum nach B-3 und B-4:** jedes Testat muesste sonst zweimal geschrieben werden — einmal gegen die alte, einmal gegen die neue Zaehler- bzw. Selektionsmenge.
 
-**Im selben Zug O-1:** `experiment_plan_director.hpp:1333` traegt `allow_failure: true` am Mess-Batch. Der Owner-Kanon dazu ist eindeutig (#278, 06.07., PFLICHT, `LEDGER:1140`: *„in einer harten Pipeline darf es kein allow_failure geben"*; Endstand `LEDGER:692`: *„0 allow_failure im GESAMTEN Matrix-System, einzige Ausnahme by design: ce `is_original:relock`"*). Der Code begruendet die Zeile mit der Sichtbarkeits-Doktrin — **aber das ist eine Zell-Doktrin (CSV `failed` + Log), keine Job-Doktrin.** Gegenprobe mit Nenner: 20 `allow_failure`-Treffer im Ledger, **keiner autorisiert diese Zeile**.
+**Im selben Zug O-1:** `experiment_plan_director.hpp:1373` traegt `allow_failure: true` am Mess-Batch (am Objekt ce `54106bc9`, `git grep -n allow_failure` = genau **1** Treffer, Zeile 1373; `:1332` ist der Batch-Kommentarkopf, nicht die Zeile). Der Owner-Kanon dazu ist eindeutig (#278, 06.07., PFLICHT, `LEDGER:1140`: *„in einer harten Pipeline darf es kein allow_failure geben"*; Endstand `LEDGER:692`: *„0 allow_failure im GESAMTEN Matrix-System, einzige Ausnahme by design: ce `is_original:relock`"*). Der Code begruendet die Zeile mit der Sichtbarkeits-Doktrin — **aber das ist eine Zell-Doktrin (CSV `failed` + Log), keine Job-Doktrin.** Gegenprobe mit Nenner: 20 `allow_failure`-Treffer im Ledger, **keiner autorisiert diese Zeile**.
 
 **Ein mehrtaegiger Lauf kann heute komplett scheitern, und die Ampel bleibt gruen.** Eine Zeile, jederzeit reversibel; der verlorene Messlauf ist es nicht. — Die Pruef-Welle hat es bewusst **nicht** gebaut, und die Begruendung gehoert ins Dossier, weil sie vorbildlich ist: *„Ich habe es bewusst nicht gebaut — der Auftrag sagt ‚nicht anfassen', und das Ledger-Schweigen zu dieser Zeile ist **kein Beweis der Abwesenheit einer Owner-Entscheidung**."*
 
@@ -2111,9 +2113,9 @@ Termin-Klassen wie im Checkheft: **T1** = vor dem ersten 4096er-Batch · **T2** 
 
 | # | Posten | Beleg | Stand 00:50 |
 |---|---|---|---|
-| **S-1** | ce-`main`-FF (10 zurueck) + super-Gitlink-Bump + super-`main`-FF | `.gitlab-ci.yml:297-315` `branch: main` | **OFFEN, sechstes Eintreten** |
+| **S-1** | ce-`main`-FF (10 zurueck) + super-Gitlink-Bump + super-`main`-FF | `.gitlab-ci.yml:297-315` `branch: main` | **GESCHLOSSEN ~00:43 Z** — ce `main`-FF auf `54106bc9` (Merge-Zeit 00:34:58 Z), super-Gitlink-Bump + `main`-FF auf `2871fabf` (00:43:39 Z); Kette T-1 vollzogen. War bei Aufstellung dieser „Stand 00:50"-Tabelle bereits erledigt |
 | **S-2** | super-Haelfte von OD-11-RT sichern (XSD +24 Z., uncommittet, keine zweite Kopie) | `git status --porcelain` live | **OFFEN — Verlustrisiko** |
-| **S-3** | 3 Plandokumente (2433 Z.) versionieren | `git cat-file -e` → alle drei fehlen | **OFFEN** |
+| **S-3** | 3 Plandokumente (2433 Z.) versionieren | `git cat-file -e` → jetzt alle drei present | **GELANDET** — super `1aba34f8` („docs(plaene): drei Wellen-Dokumente sichern, die auf KEINEM Zweig lagen", 00:30:30 Z) sichert alle drei; heute auf `origin/development` und `origin/main` (per `git cat-file -e` verifiziert). Bei Aufstellung dieser Tabelle bereits erledigt |
 | **S-4** | `Code/measure_out_d03/` (66 Dateien, 3.651.143 B) sichern + `.gitignore`-Negation fuer Messpfade | `.gitignore:39/43/46`; `git log --all` = 0 | **OFFEN** |
 | **S-5** | Beide Hauptklone von den fremden Wellen-Branches nehmen | HEAD `18a0bdf3` / `90bca126` | **OFFEN (N-AD)** — hat in diesem Werk eine Zahlendifferenz erzeugt (Abschnitt 0 / W-3) |
 
@@ -2374,7 +2376,7 @@ Diese ist die schwerere von beiden, weil sie in dem Text steht, der **den gering
 
 ```
 /usr/bin/grep -rli "flat_hash_map" libs apps tools tests   -> 0 Treffer
-Gegenprobe: /usr/bin/grep -rli "swisstable" libs           -> 5 Dateien
+Gegenprobe: /usr/bin/grep -rli "swisstable" libs           -> 11 Dateien (ce 54106bc9; identisch via `git grep -il swisstable 54106bc9 -- libs`)
 ```
 
 Repoweit trifft `flat_hash_map` zehnmal, **keiner** davon ist Projektcode — drei Thesis-Spiegel, einer in der googletest-Doku, sechs im vendorten Fremdtest `ext/allocator/A06-tcmalloc/…`. Was existiert, ist eine **eigene Re-Implementierung**: `axis_03a_search_algo_swisstable.hpp:4` „@family S22 SwissTableSearchAlgo", und `:12` sagt selbst *„AP-7b: Weg-B-Organ (SwissTableOrgan) fuer den echten Mess-Pfad noch offen"*. Ledger: **0**. Register: **0**.
@@ -2482,7 +2484,7 @@ Der Owner hat die Voll-Messung freigegeben, aber an Bedingungen gebunden (19:37:
 | ALLE bekannte offene Arbeit steht | **offen** — E18-SNAP ungelandet, `numa_cpu_pin_process_probe` ungelandet, die super-Haelfte nicht einmal committet | IV.2 |
 | voller Umfang der Mess-Parameter | **offen** — die Reihe-B/Durchsatz/ValueHandle-Kette steht nicht | V.4.2 |
 | **XML trennt Bau von Messung** | **offen, am Objekt belegt** | IV.3.3/B-3 |
-| Mess-Seite in 4096er-Scheiben | **offen** — der Bau slict korrekt, die Messung faehrt „das VOLLE `[0:COMDARE_GN_TOTAL)` … einmal je Batch" | `experiment_plan_director.hpp:1367-1369` |
+| Mess-Seite in 4096er-Scheiben | **offen** — der Bau slict korrekt, die Messung faehrt „das VOLLE `[0:COMDARE_GN_TOTAL)` … einmal je Batch" | `experiment_plan_director.hpp:1410-1413` (Kommentar `:1410`, `export COMDARE_GOLDEN_N_RANGE` `:1412-1413`, ce `54106bc9`; `:1367-1369` ist die `rules:`-Emission) |
 
 **Die Freigabe ist erteilt und greift heute nicht.** Das ist kein Widerspruch und keine Blockade — es ist eine Liste. Sechs Posten trennen den Stand von der Voll-Messung, und fuenf davon sind Bau-Arbeit von Stunden bis wenigen Tagen.
 
@@ -2919,9 +2921,9 @@ Sie sind der Grund, warum IV.5.1 die Posten S-2 bis S-4 als SOFORT fuehrt.
 
 | Bestand | Umfang | Zustand |
 |---|---:|---|
-| `<super>/docs/plaene/20260806-ANWEISUNG-pmc-intel-perf-rechte.md` | 622 Z. | **untracked**, nie versioniert. Beruft sich auf die ce-Laeufe 15104/15110 und die Jobs 365186/365187/365256/365257 |
-| `<super>/docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md` | 1043 Z. | **untracked**, nie versioniert |
-| `<super>/docs/plaene/20260806-PLAN-messkurven-synthese-und-hybrid-binary.md` | 768 Z. | **untracked**, nie versioniert. Primaermaterial fuer Kapitel II und V |
+| `<super>/docs/plaene/20260806-ANWEISUNG-pmc-intel-perf-rechte.md` | 622 Z. | zum 00:20-Messstand **untracked**, seit super `1aba34f8` (00:30:30 Z) versioniert (auf `development` + `main`). Beruft sich auf die ce-Laeufe 15104/15110 und die Jobs 365186/365187/365256/365257 |
+| `<super>/docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md` | 1043 Z. | zum 00:20-Messstand **untracked**, seit super `1aba34f8` (00:30:30 Z) versioniert |
+| `<super>/docs/plaene/20260806-PLAN-messkurven-synthese-und-hybrid-binary.md` | 768 Z. | zum 00:20-Messstand **untracked**, seit super `1aba34f8` (00:30:30 Z) versioniert. Primaermaterial fuer Kapitel II und V |
 | `<super>/Code/test_data_xml/experiment_schema.xsd` (Delta) | +24 Z. | **uncommittet**, kein rescue-Ref, keine zweite Kopie. Die super-Haelfte von OD-11-RT |
 | `<super>/Code/measure_out_d03/` | 66 Dateien, 3.651.143 B | **untracked und nirgends gesichert**; von der `.gitignore` strukturell verschluckt |
 
@@ -2929,7 +2931,7 @@ Sie sind der Grund, warum IV.5.1 die Posten S-2 bis S-4 als SOFORT fuehrt.
 
 | Quelle | Umfang | Wofuer |
 |---|---:|---|
-| `/home/comdare/.claude/projects/-home-comdare/5a19728e-…/subagents/workflows/*/journal.jsonl` | **86 Journale, 265 `result`-Ereignisse, 4,29 MB** | **Die ergiebigste Quelle.** Jedes `result` traegt den vollen Agenten-Bericht einer Welle: Rohbefunde, Gegenproben, Selbstkorrekturen, Nenner. Lesen: je Zeile ein JSON, `type=="result"` filtern, Feld `result` nehmen; Ordnername = Wellen-Kennung, `label` = Agent. **Signal-Nachzaehlung: 104 von 265 Ereignissen enthalten Selbstkorrektur- oder Praemissen-Marker** |
+| `/home/comdare/.claude/projects/-home-comdare/5a19728e-…/subagents/workflows/*/journal.jsonl` | **86 Journale, 265 `result`-Ereignisse, 4,29 MB** | **Die ergiebigste Quelle.** Jedes `result` traegt den vollen Agenten-Bericht einer Welle: Rohbefunde, Gegenproben, Selbstkorrekturen, Nenner. Lesen: je Zeile ein JSON, `type=="result"` filtern, Feld `result` nehmen; Ordnername = Wellen-Kennung, `label` = Agent. **Signal-Nachzaehlung: 101 von 265 Ereignissen enthalten Selbstkorrektur- oder Praemissen-Marker** (`grep -iEc` mit dem ASCII-Muster ueber die `result`-Zeilen; Umlaut-Varianten: 108) |
 | `<super>/docs/sessions/backups/20260806-session-transkript-verbatim/session-ab-vorletzter-kompaktierung.jsonl` | 3847 Z. | **Wortlaut-Quelle** der `bak`-Fundstellen. Deckt **43 von 104** Owner-Nachrichten; enthaelt die `queue-operation`-Datensaetze **mit** |
 | `/home/comdare/.claude/projects/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1.jsonl` | 8070 Z. | Vollspanne, Quelle der `live`-Fundstellen. **1.524 `user`-Datensaetze, davon 106 nach dem kanonischen Filter — acht der zwoelf KERNe liegen ausserhalb** |
 | `<super>/docs/sessions/backups/20260806-workflow-rohdaten/` | 269 outputs + 63 Journale | Im Repo gesichert (`2a6f35d8`), **1 Datei redigiert** |
@@ -2942,18 +2944,18 @@ Sie sind der Grund, warum IV.5.1 die Posten S-2 bis S-4 als SOFORT fuehrt.
 |---|---|
 | `libs/cache_engine/include/cache_engine/measurement/system_axis_registry.xml` | `:10` `target_isa` mit `binary_id="never"` · `:38` `numa_node` als RT-Unterachse · `:5-7` Haupt-/Unter-Achsen-Vertrag · **generiert, nie von Hand editieren** |
 | `libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.xml` | `:25-42` die drei Collector-Bausteine, PMC mit 7 Kategorien |
-| `libs/cache_engine/measurement/axis_error.hpp` (655 Z.) | `SampleStatus{Ok, NotApplicable, SourceUnavailable, Failed}` · `HardwareErweiterungFehlt` (mit dem **GPU**-Beispiel des Owners seit 26.07.) · `BetriebssystemFeatureFehlt` |
-| `libs/cache_engine/builder/measurement/thread_pinning.hpp` (106 Z.) | `class ScopedThreadPin`, `sched_setaffinity` `:61` / `SetThreadAffinityMask` `:47`, RAII-restore `:70-78` — **der einzige Pinning-Aktuator des Repos** |
+| `libs/cache_engine/include/cache_engine/measurement/axis_error.hpp` (655 Z.) | `SampleStatus{Ok, NotApplicable, SourceUnavailable, Failed}` · `HardwareErweiterungFehlt` (mit dem **GPU**-Beispiel des Owners seit 26.07.) · `BetriebssystemFeatureFehlt` |
+| `libs/cache_engine/builder/measurement/thread_pinning.hpp` (105 Z., `wc -l` an ce `54106bc9`) | `class ScopedThreadPin`, `sched_setaffinity` `:61` / `SetThreadAffinityMask` `:47`, RAII-restore `:70-78` — **der einzige Pinning-Aktuator des Repos** |
 | `libs/cache_engine/builder/linux_perf_pmc_source.hpp` | `:9-17` die Selbstkorrektur vom 06.08. · `:111-114` der frueher verworfene `errno` · `:201-207` die drei generischen Counter |
-| `libs/cache_engine/builder/pmc_source.hpp` | `:36-42` die vier Pro-Zaehler-Verfuegbarkeitsflags (seit `5c102e05`) |
+| `libs/cache_engine/include/cache_engine/measurement/pmc_source.hpp` | `:37-43` die vier Pro-Zaehler-Verfuegbarkeitsflags (`:37/:38/:39` L2/L3/coherence, `:43` energy_micro_joules; seit `5c102e05`) |
 | `libs/cache_engine/heuristik/{axis_spline,break_even,measurement_curve_loader}.hpp` | Die Break-Even-Mathematik. `axis_spline.hpp:15-25` die Fritsch-Carlson-Begruendung · `break_even.hpp:10-17` Verfahren und Konvention · **§75-geschuetzt** |
 | `libs/cache_engine/builder/best_binary_selector/` | `rank_binaries` (produktiv) + die **zweite, groebere** Break-Even-Implementierung (`hpp:263`, `:321-327`) |
 | `libs/cache_engine/hybrid/README.md` | **Die einzige Datei der vierten Stufe.** „RESERVIERTER STUB … KEIN CODE" |
-| `libs/cache_engine/abi/anatomy_fingerprint.hpp` | `:341` `kAnatomyFingerprintGliedCount = 8` · `:428-431` die Preimage-Ordnung, Mess-Zeile = **Glied [3]** |
+| `libs/cache_engine/include/cache_engine/abi/anatomy_fingerprint.hpp` | `:341` `kAnatomyFingerprintGliedCount = 8` · `:428-431` die Preimage-Ordnung, Mess-Zeile = **Glied [3]** |
 | `libs/cache_engine/profile_facade/mess_achsen_naht.hpp` | Seit M-1 (00:06) die **vier produktiven Konsumenten** der Mess-Tooling-Achse. Kopf: *„Der Stempel log."* |
 | `libs/cache_engine/algorithm_profiles/thesis_profiles/all_axes_golden.profile.xml` | `:66-84` 17 `<axis_sweep>` · `:112` `<working_set_sweep>` mit **vier** x-Werten · `:126` 6 Workloads · `:221-226` die eine Vollmengen-Combo `[all]` |
-| `tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp` | `:12`, `:41-43` das leere Messfenster · `:92-95` die **hartkodierte Ursachenliste** (Anlassfall R-11) |
-| `libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp` | `:34/:39-40` INERT-by-default · `:1332-1333` `allow_failure: true` · `:1367-1369` die ungeslicte Mess-Seite · `:2101-2102` der Perm-Walk |
+| `tests/unit/thesis_tiere/m3v2_pmc_smoke.cpp` | ce-HEAD `54106bc9`: `:12` sagt *„[ECHTES Messfenster]"*, reales Fenster `:62-69` (das leere Fenster war der Vor-Heilungs-Stand `2b5ecd29~1:41-42`, geheilt `2b5ecd29`) · `:124-126` die **hartkodierte Ursachenliste** (Anlassfall R-11; im Anlassfall-Stand `:92-95`) |
+| `libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp` | `:34/:39-40` INERT-by-default · `:1373` `allow_failure: true` (`:1332` = Batch-Kommentarkopf) · `:1410-1413` die ungeslicte Mess-Seite (`export COMDARE_GOLDEN_N_RANGE="0:${COMDARE_GN_TOTAL:-16}"`; `:1367-1369` ist die `rules:`-Emission) · `:2101-2102` der Perm-Walk |
 
 | Ort (in `<super>`) | Was dort steht |
 |---|---|
@@ -2980,7 +2982,7 @@ Sie sind der Grund, warum IV.5.1 die Posten S-2 bis S-4 als SOFORT fuehrt.
 > **Fortpflanzung:** eine MESS-Aenderung baut CEB **und** Flotte neu; System/Organ nur die Tiers.
 > **Break-Even:** ein Kipppunkt, kein Optimum — „ab wo ist welche besser", nicht „welche ist die beste".
 > **Auswertung:** sie produziert eine **Schaltlogik**, keinen Rat.
-> **Fehlerklasse:** eine korrekte Messung, die die falsche Frage beantwortet — vier Ausschnitte: **Zeit, Schreibweise, Ort, Form**.
+> **Fehlerklasse:** eine korrekte Messung, die die falsche Frage beantwortet — vier Ausschnitte: **Zeit, Schreibweise, Ort, Form**. Das ist die **Hauptklasse**, nicht die vollstaendige Typologie (Checkheft VII.5 fuehrt drei Gestalten, die sie nicht abdeckt).
 > **Bauform:** der stille Rueckfall. Er ist gruen. Er ist verboten.
 > **Schwere:** WARN = der Wert existiert, seine Verwendbarkeit ist fraglich · ERROR = die Anforderung trifft auf eine fehlende Systemeigenschaft, **oder etwas faellt still zurueck** · FATAL = die Integritaet ist zerstoert, **Lager-Inkonsistenz gehoert hierher**.
 > **Beweis:** eine Null braucht Nenner **und** Gegenprobe. Eine Anzahl ist eine Behauptung ueber das, was man nicht gesehen hat — eine **Liste** ist eine Behauptung ueber das, was man gesehen hat.
@@ -2988,4 +2990,4 @@ Sie sind der Grund, warum IV.5.1 die Posten S-2 bis S-4 als SOFORT fuehrt.
 
 ---
 
-*Gesamt-Dossier erstellt am 07.08.2026, 00:20–02:10 Z, gegen ce `c4c04315` / `2b5ecd29`, super `5a98036d` / `71591a24`, thesis `19e15920`. Alle Objekt-Aussagen dieses Werks sind entweder in den fuenf Quell-Kapiteln am Objekt erhoben oder bei der Zusammenstellung nachgemessen; die drei Widersprueche zwischen den Kapiteln sind in Abschnitt 0 mit Nachmessung gefuehrt und **nicht** geglaettet. Als **unbelegt** gefuehrt bleiben die in IV.7 aufgezaehlten zehn Punkte sowie die Gleichsetzung „drittes Glied" = Preimage-Glied [3] (I.7.4). READ-ONLY eingehalten — ausser dieser Datei wurde kein Repo-Zustand veraendert.*
+*Gesamt-Dossier erstellt am 07.08.2026, 00:20–01:37 Z (Fenster-Ende = realer letzter Inhalts-`mtime`; „02:10 Z" war Zukunft), gegen ce `c4c04315` / `2b5ecd29`, super `5a98036d` / `71591a24`, thesis `19e15920`. Alle Objekt-Aussagen dieses Werks sind entweder in den fuenf Quell-Kapiteln am Objekt erhoben oder bei der Zusammenstellung nachgemessen; die drei Widersprueche zwischen den Kapiteln sind in Abschnitt 0 mit Nachmessung gefuehrt und **nicht** geglaettet. Als **unbelegt** gefuehrt bleiben die in IV.7 aufgezaehlten zehn Punkte sowie die Gleichsetzung „drittes Glied" = Preimage-Glied [3] (I.7.4). READ-ONLY eingehalten — ausser dieser Datei wurde kein Repo-Zustand veraendert.*
