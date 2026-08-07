@@ -9970,3 +9970,76 @@ wurde **nicht woertlich gefunden** -- gesucht mit `in der Binary abgebildet`, `s
 `Compile-Time-Identitaet`, `Lager-Identitaet`. Naechstliegend: `build_type_stamp.hpp:31` (*"jede
 Binary traegt ihre volle Compile-Einstellung"*). Ebenso offen: der byte-genaue Formatvergleich
 `.algos` gegen die Organ-Zeile.
+
+---
+
+## NACHTRAG 07.08.2026 abend-22 — E-B: die behauptete Planung wurde NICHT gefunden · und der Plan rechnet mit einem TOTEN Anker
+
+### DER RANDBEFUND WIEGT SCHWERER ALS DIE FRAGE: der Versionierungs-Plan zitiert einen ueberholten golden-CRC
+Vom Lead nachgezaehlt in `docs/plaene/20260806-PLAN-versionierungs-interface-stempel.md`:
+- **4 Treffer** auf `0xF1C1F26A1232073B` -- den **alten** Wert
+- **0 Treffer** auf `0x56F1B721C72DC10E` -- den **geltenden**
+
+Der Code sagt es selbst (`source_catalog.hpp:187`): der Alt-Wert steht dort mit dem Vermerk
+**`[MISMATCH]`**, seit der 18. Organ-Achse (26.07.) gilt der neue. **Der Plan, aus dem ALLE SECHS
+Stempel-Entscheide stammen, rechnet an dieser Stelle mit einem Anker, den es seit zwoelf Tagen nicht
+mehr gibt.** Aendert nichts an der Struktur der Argumente -- gehoert aber korrigiert, bevor jemand
+danach baut. **Zweiter Stale-Punkt desselben Plans** (der erste: Format 3 / 8 Glieder gegen die
+heutigen Format 4 / 9).
+
+### E-B: DER EXPLORE HAT DIE VOM OWNER BEHAUPTETE PLANUNG NICHT GEFUNDEN -- und meldet es offen
+Owner-Aussage: *"der Vorschlag ist irrsinnig und bereits praezise ueber die Lagerhaltung geplant.
+Wir brechen golden-CRC!"*
+**Der Explore hat gruendlich gesucht und das Gegenteil gefunden -- und das gemeldet, statt eine
+Bestaetigung zu konstruieren.** Das ist die richtige Antwort, auch wenn sie unbequem ist.
+
+**Was die Lagerhaltung wirklich tut, vierfach belegt:** sie identifiziert eine Binary ueber den
+**vollen 128-hex-SHA512-Fingerprint** (`key_sha512`), gelesen aus dem **Sidecar NEBEN der Datei** --
+nicht aus ihrer Symboltabelle.
+- Ledger `:3413` (User-Direktive 22.07., verbatim): *"identifizierbar ueber die
+  K7b-SHA512-Fingerprint-Stempel (constexpr, **std::map-Lookup SHA512->Pfad**)"*
+- `bestandslog_index.hpp:6,42`: `Sha512Key` -- *"der 64-Byte-Anatomie-Digest ueber die
+  Stempel-Zeilen"*, vom Lead nachgesehen
+- `fingerprint_key_source.hpp` liest den Key aus dem **`.fingerprint`-Sidecar**
+- `lager_pfad_grammatik.hpp:15`: *"Baum-Pfad == minio-Objekt-Praefix == Verortung des
+  key_sha512-Blatts"* -- **die Lager-Identitaet ist der PFAD, nicht der Binary-Inhalt**
+
+**Keine dieser Quellen verlangt einen Namen im Symbol.** Und `(ii)` wurde bei **drei** unabhaengigen
+Konsolidierungen bestaetigt (06.08., 07.08. nachmittags, 07.08. abends -- die letzte vom Lead selbst).
+**Der Explore formuliert die Alternative praezise:** *"Das ist entweder ein starkes Indiz, dass (ii)
+richtig ist -- oder ein Indiz, dass alle drei Paesse denselben blinden Fleck teilen, den der Owner
+jetzt benennt. Ich kann das nicht von hier aus entscheiden."*
+
+### WAS DER PLAN SELBST SCHON SAH -- und was der Lead-Einwand uebersah
+Plan Abschnitt 4.3 listet drei Lesewege: `strings | grep '^cds1_'` (`.rodata`, **architektur-
+unabhaengig**) · `nm` auf das Symbol (*"und mit Variante (iii) steht der Hex in der Mangelung"*) ·
+`dlsym` -> POD.
+**Der Plan hat also selbst gesehen, dass (ii) NICHT dieselbe Eigenschaft liefert wie (iii)** -- und
+trotzdem `(ii) + spaeter (iii)` empfohlen. Der einzige echte Zusatznutzen von (iii): **Auffindbarkeit
+ohne Kenntnis eines Grep-Musters** (`nm` listet Symbolnamen ohnehin auf, `strings|grep` braucht ein
+bekanntes Praefix). **Dafuer fand der Explore keinen Beleg in der Lagerhaltungs-Planung.**
+
+### DER LEAD-EINWAND WAR SCHWAECHER ALS FORMULIERT
+Er lautete *"kostet einen CRC-Neuanker fuer Null-Zusatznutzen"*. **Der Bruch ist nicht teuer:** der
+golden-CRC **wurde am 26.07. schon einmal gebrochen** (18. Organ-Achse), ueber ein dokumentiertes
+Verfahren -- `gen_golden_fullpilot --crc64`, zwei Stellen nachtragen, Bissprobe (alten Wert kurz
+zurueck, Test muss rot). **Das erklaert die Owner-Gelassenheit: "wir wissen, wie man das macht."**
+Ein geplantes golden-Update-Fenster existiert, ruehrt den CRC aber **ausdruecklich nicht an**
+(`20260806-PLAN-golden-update-fenster.md:228-229`).
+
+### DIE OWNER-AUSSAGE TRAEGT EINE ENTSCHEIDUNG -- der Lead nimmt sie an
+*"Wir brechen golden-CRC"* zeigt auf **(i)** -- den Emitter, der den Namen in den generierten
+Quelltext schreibt. **(iii) waere preimage-neutral und braeuchte gar keinen Bruch.**
+**Offen bleibt nur der GRUND** -- nicht als Rueckfrage an die Entscheidung, sondern **fuer den
+Kommentar an der Stelle**: welche Lagerhaltungs-Operation braucht den Namen im Symbol, die ihn nicht
+aus dem `.fingerprint`-Sidecar oder per `strings` bekommt? **Ohne diesen Satz entsteht eine Wache,
+die spaeter niemand begruenden kann** -- genau die Klasse, die heute mehrfach zu Fehlbefunden
+gefuehrt hat, weil die Absicht verlorenging.
+
+### DREI MOEGLICHKEITEN, die der Explore sauber trennt
+(a) Der Owner spricht aus nicht-dokumentiertem Kontext -> die Fundstelle oder das Szenario nachfragen.
+(b) Der Owner meint **(iii) sofort** statt *"(ii) + spaeter (iii)"* -> **keine Ablehnung von (ii),
+    sondern eine Sequenz-Korrektur** -- und dann faellt der CRC gar nicht.
+(c) Der Owner will **(i)** und nimmt den Bruch bewusst in Kauf, weil er ihn (zu Recht) fuer geuebt
+    haelt.
+**Die Formulierung "wir brechen golden-CRC" spricht fuer (c).**
