@@ -565,6 +565,30 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <!-- Unter-Achse core_class (OD-11-RT, Owner-KERN 06.08.2026): die AUSFUEHRUNGS-Lokalitaet als
+                 Gegenstueck zu numa_node/page, die die SPEICHER-Lokalitaet tragen. Werte-Bereich aus
+                 demselben Grund wie dort ein offener xs:string und KEINE Enumeration: welche Kern-Klassen
+                 eine Maschine fuehrt (Intel-Hybrid P/E, AMD-V-Cache-CCD gegen Frequenz-CCD, oder uniform)
+                 ist zur Bauzeit nicht erkennbar und wird vom Resolver gegen das Registry-ANGEBOT geprueft,
+                 nicht vom Schema. Eine Enumeration hier waere eine Zusage, die das Schema nicht halten
+                 kann - und sie waere zusaetzlich falsch, weil dieselbe Enumeration auf prod1 (Zen5,
+                 uniform) und prod2 (Raptor Lake, hybrid) verschiedene Mengen bezeichnen muesste.
+                 NICHT "scheduling" oder "hetero_core_dispatch" benennen: das ist die CT-POLICY (was der
+                 Bau tun soll, system_axis_registry.xml stage="ct"), core_class ist das RT-FAKTUM (was die
+                 Maschine hat, stage="runtime"). Namensfalle, Muster IV-BLOCKER-5.
+                 ADDITIV: minOccurs="0" und HINTER <page> - bestehende Profile bleiben unveraendert valide
+                 (xs:sequence, nur Anhang), genau wie es der O-2-Block oben ausdruecklich vorsieht. -->
+            <xs:element name="core_class" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:attribute name="value" type="xs:string" use="required"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
