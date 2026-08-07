@@ -7380,3 +7380,236 @@ D-1 (Substanz seit 16.07. geplant, unter anderem Namen gesucht), und beinahe `cp
 (17 Roh-Treffer, alle Fremdcode -- ohne Kontrolltest waere daraus ein Falschbefund geworden).
 **AB SOFORT:** jede "existiert nicht"-Aussage braucht (a) einen SYNONYM-Durchgang und
 (b) eine Klassifikation der Roh-Treffer, bevor sie ausgesprochen wird.
+
+---
+
+## NACHTRAG 07.08.2026 mittag-2 -- VOLLKONSOLIDIERUNG des Kontextes (Owner: "nie wieder den Faden verlieren")
+
+**AUFTRAG (Owner verbatim):** *"Bitte Konsolidiere alle Details und offenen Punkte des gesamten
+Kontextes in das Gesamt-Leger, sodass wir nie wieder in der Gesamt-Übersicht den Faden verliere.
+Bitte gib auch alle gefundenen Meta-Referenzen mit"*
+
+**SPANNE:** Neugruendung nach Compact (07.08. ~05:00) bis mittags. Neun Workflows, ~40 Agenten.
+Alle Werte am Objekt gemessen gegen ce `85847715` / super `5ed70229` / thesis `8197a2c`.
+**META-REFERENZEN-REGISTER** (155 Dateien, 337 Zeilen-Referenzen, thematisch gruppiert):
+`docs/sessions/20260807-META-REFERENZEN-register.md`.
+
+### 1. VOLLZUG -- was in diesem Kontext gelandet ist
+
+| Paket | Ref | Beleg |
+|---|---|---|
+| numa/core_class (beide Repo-Haelften) | ce `aa223961`, super `397710d2` | Pipeline 15155 gruen; Dual-Review Fable+Codex |
+| R-3 Mess-Gates im Preimage | ce `85847715` (dev==main) | Pipeline 15167 gruen (19+1); Bissbeweis durch Ausfuehrung |
+| O-4 Thesis-Textnachzug + EN-Korrekturen | thesis `8197a2c` (dev==main) | Pipeline 15172 gruen (4/4); PDF DE 204 S. |
+| Gitlink-Bump (ce + BEIDE Thesis-Zeiger) | super `5ed70229` | Pipeline 15174 |
+| Owner-Vorlage / Explore-Ergebnis / Zwischenstand / Ledger | super `bcaae1e7`, `b6384c98`, `07c5d871`, `200366eb` | -- |
+
+### 2. AUFGELOESTE ARCHITEKTUR-ENTSCHEIDE (mit tragenden Meta-Referenzen)
+
+**2.1 D-1 PMU-DOMAENE -- zwei getrennte Objekte, beide Owner-Saetze wahr.**
+Lead lag falsch (hatte die Stempel-Pflicht verneint). Aufloesung:
+- VERORTUNG System-Achse, RT-Unter-Achse `core_class` am target_isa-Komplex. Geplant seit
+  **16.07.** (`LEDGER:1576-1580`, §16.3-E17: *"Der P/E-Core-Aspekt ist eine SEPARATE System-Achse,
+  jedoch als DYNAMISCHE Unter-Achse unter der Hardware-Systemachse"*), bestaetigt
+  `docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md:135,:318` und
+  `...-PLAN-hybrid-pmc-numa-core-permutation.md:639,:919`. **GEBAUT** mit `aa223961`
+  (`measurement/target_isa_sub_axes.hpp:10,:104`).
+- STEMPEL-PFLICHT **MESS-ZEILE: JA** -- RF-6 (`LEDGER:3580`), angewandt
+  `PLAN-hybrid-architektur:822-825`: *"eine PMU-Domaene ist eine deklarierte Maschinen-Eigenschaft
+  mit Stempel-Wirkung, aber ohne Bau-Wirkung ... zwei verschiedene Kombinationen und bekommen zwei
+  verschiedene Stempel; die Binary bleibt eine."* Pflicht-Spalten `pe_policy` +
+  `ran_on_core_type` + Segment `numa.core_type=<p|e>` (`LEDGER:1538`, §16.2-M2, 16.07.).
+- STEMPEL-PFLICHT **BINARY: NEIN, compile-hart gesperrt** --
+  `abi/system_cell_values.hpp:174` fuehrt `core_class` in `kSystemCellValueForbiddenKeys`;
+  Begruendung woertlich im Code `:166-172`.
+- **TAG `cpe` ist NEU:** `"cpe"` als Token = 0 Treffer (17 Roh-Treffer ALLE vendored Fremdcode
+  `ext/traversal/P01-ART/unodb/olc_art.hpp` + 2 Binaerdateien). Gebaute Werte-Token:
+  `kern_uniform` / `kern_hohe_leistung` / `kern_hohe_effizienz` / `kern_grosser_cache` /
+  `kern_kleiner_cache` (`measurement/numa_cpu_pin_process_probe.hpp:183-189`).
+  **OFFEN als BAU-Auftrag** (kein Entscheid): Ersatz, Kurzform in der Mess-Spalte, oder
+  zusaetzliches Segment. Lead-Empfehlung: Kurzform in der Mess-Spalte.
+
+**2.2 B-4 BREAK-EVEN -- CEB-RAM, kein Lager-Objekt.** Lead-Empfehlung war falsch.
+Owner: Break-Even lebt NUR in der CEB nach Messungs-Schluss, im RAM, ueber ALLE
+Tier-Binary-Messergebnisse; wird auf Anforderung des Planers nach LaTeX / PDF / xlsx
+"nach Zielorten" gegossen; XML bestimmt das Verhalten ZUSAMMEN mit den Modi.
+**NICHTS wird gekuerzt -- Voll-Build.**
+
+**2.3 DIE MODI SIND KUMULATIV.** `measure` ⊂ `compare` ⊂ `release`.
+- `measure ⊂ release` woertlich belegt: `LEDGER:3287-3291` (§61-STUFEN, 21.07., Ueberschrift
+  *"Modi bauen STUFENWEISE aufeinander auf; PFLICHT fuer die CI"*): *"RELEASE benoetigt die VOLLE
+  MESSUNG (Replay moeglich wie geplant, §58-REPLAY) aus Modus Messung."*
+- Owner-Verbatim 05.08. (`ce/docs/architecture/05b_uml_klassenatlas_20260805.html:712`) nimmt die
+  Kette vorweg: Messwerte -> Messkurven -> Vergleich je Eingangslast -> beste Binary ->
+  *"im release Modus ohne Mess-Einrichtungen neu kompiliert"*.
+- **OFFENE SPANNUNG (dem Owner gemeldet):** der FORMALE `run_methodology::Compare` wird in JEDER
+  bisherigen Quelle NACH Release sequenziert (`LEDGER:3343` §62-C: *"ERST ZUM SCHLUSS, NACH DEM
+  RELEASE"*; `run_methodology_registry.hpp:7-8`). Es existieren ZWEI Vergleichs-Konzepte:
+  (i) Kurven-Vergleich VOR Release (intra-Maschine, Phase 2b) und (ii) Cross-Maschinen-
+  Replay-Vergleich NACH Release. Die 07.08.-Korrektur verschmilzt sie erstmals -- das ist eine
+  PRAEZISIERUNG, keine Bestaetigung. **Frage an den Owner:** soll `Compare` kuenftig die
+  Vor-Release-Auswertung SEIN, oder bleiben es zwei Dinge?
+
+**2.4 `RunMethodology` -- die Modi selbst, XML-PFLICHT.**
+Vier Werte in `measurement/run_methodology_registry.hpp:37-41` + Registry `:74-78`:
+`debug` (Debug-Build, measurement_on, parallel -- *"DASS es funktioniert"*, KEINE golden-Zahlen) /
+`measure` (Release, measurement_on, 1-Thread -- die golden-Messung) / `release` / `compare`.
+XML-Pflicht `LEDGER:3295` (§61-STUFEN, 21.07.): *"MODUS-WAHL PER XML, EIN Modus je Call ... immer
+nur EIN Modus je Call."* Element `<run_methodology><method value="..."/>`,
+XSD `Code/test_data_xml/experiment_schema.xsd:101` + `:292-300`, exactly-one.
+**=> Die "OS-Support-Build"-Frage ist damit strukturell beantwortet:** der Debug-Modus IST als
+Verdrahtungs-Check ohne golden-Zahlen definiert -- genau die Semantik fuer Nicht-baremetal.
+**VERWECHSLUNGS-WARNUNG:** drei weitere namensgleiche Modi-Vokabulare existieren -- die vier
+"Betriebsmodi des Builders" (`kapitel/de/03_messsystem_prtart.tex:1428-1431`, Zukunftsbild), die
+drei Pruefling-Mess-Schema-Modi (`kapitel/de/05_evaluation.tex:212-216`) und
+`--mode=defined|full|full-sampled` (`apps/cache_engine_builder/main.cpp:52,79`).
+
+**2.5 PLATTFORM-MATRIX -- transitiv ueber das buildsystem.** Lead lag falsch (hatte Talos als
+"nur CI" eingeordnet). Owner: die Diplomarbeit baut den Kern des buildsystem, das buildsystem baut
+comdare-db -- die Vorbereitung der cache-engine IST die Vorbereitung der comdare-db. Die
+comdare-db-Fundstelle ist deshalb **gewollt**, kein Fremdkoerper.
+- Docker-Builds auf bare metal UND Talos in voller Matrix (Memory
+  `feedback_build_matrix_8_docker_distros_full_platform_doctrine:10-15`).
+- prod1+prod2 tragen zusaetzlich **Windows Server 2022 + Win 11**: vier VMs als eigene Runner
+  (`Cluster/docs/sessions/2026-07-26-INFRA-runner-matrix-DONE.md:26-31`: id53/id55 prod1,
+  id54/id19 prod2; nur id19 online, drei brauchen Auth-Token-Reset + Vault-Creds). In der
+  cache-engine-CI: 0 Windows-Jobs.
+- macOS x86+ARM, RISC-V (VisionFive 2), Pi 5: kompilieren und messen, aber nur im DEBUG-Modus.
+- **PILOT-ENTSCHEID:** prod1+prod2 zuerst vollstaendig, NUR echt gemessenes bare metal; Rest nach
+  der Abgabe. **ZIH-Erweiterung wird trotzdem vollzogen.**
+- **OFFENE DISKREPANZ 7 vs 8 Distributionen** (nicht vom Lead zu entscheiden): Memory 03.07. +
+  `LEDGER:3364` (21.07.) sagen 8 inkl. Ubuntu; eine reale Cluster-Registry hat 7
+  (`Cluster/docs/sessions/20260221-...-node8-buildtools-gcc15-rollout.md:669-687`); die
+  cache-engine faehrt real 18 Images (`docs/sessions/20260706-276-VOLL-PLATTFORM-MATRIX.md:9`);
+  die Thesis nennt KEINE Zahl (`anhang/de/D_building_block_matrix.tex:917`). Im Ledger als Gate
+  W10-00 (`LEDGER:5423-5424,:5540`) auf "nach der Abgabe" gebucht.
+
+**2.6 F-01 TALOS -- keine Falschaussage, sondern uneingeloeste Anforderung.**
+Alle sechs Fundstellen stehen im PRAESENS PASSIV ("wird erhoben"/"is collected"), also als
+bestehende Tatsache. Die Erhebung laeuft heute nur unter root-Linux baremetal (16/16 CSV-Zeilen
+`platform=linux-x86_64`; Mess-Jobs `.gitlab-ci.yml:719,:806` = `[prod,baremetal,amd]`).
+Loesung ist Tempus/Status praezisieren -- NICHT streichen, NICHT "Rollentrennung".
+
+**2.7 F-02 flat_hash_map + GATTUNGS-EINORDNUNG.** Owner-Entscheid: Textpass (Option a).
+SwissTable liegt unter Genus **SearchAlgorithm**, der per `gattung_of()` zur Gattung **MAP**
+gehoert -- NICHT Container. Die Aufgabenstellung sagt selbst *"als Gegenprobe INNERHALB DERSELBEN
+Gattung"*. Die Owner-Begruendung (Achsen-Steuerbarkeit) heisst im Plan **SUBSTITUTIONS-PRINZIP**
++ `vendor->faithful->self`; am Objekt durchgesetzt (SwissTable alloziert zwingend ueber `axis_06`,
+kein abseil-Wrap). Fundstellen: `axes/lookup/axis_03a_search_algo_swisstable.hpp`,
+`axes/lookup/composable/tier_to_organ_mapping.hpp:82`, `anatomy/anatomy_base.hpp:49-64`.
+
+### 3. OWNER-ENTSCHEIDE dieser Runde (bindend)
+- **D-3 BAU-MENGE:** *"Wir bauen nur die 320er die wir auch tatsaechlich messen und stellen die
+  golden XML darauf um."* => Bau-Menge folgt der Mess-Menge; golden-XML wird umgestellt.
+- **O-C PINNING:** *"Pinning ist Pflicht bei hybrid Architekturen, deren CPU-Kerne sich
+  unterscheiden (sofern pinning durch mehrere Achsen freigegeben ist)."*
+- **O-4:** volles GO fuer den Textnachzug an den Code (ausnahmsweise Richtungs-Umkehr).
+- **xlsx ist Mess-Standard.** IST: der Writer EXISTIERT NICHT (0 Treffer auf
+  `worksheet|sharedStrings|xl/workbook` in `libs/`, Gegenprobe csv=103; Design-Doc vorhanden:
+  `ce/docs/architecture/20260803-a9_xlsx_writer_f3_soll_design.md`).
+- **THESIS-SPRACHRICHTUNG (neu, Dauer-Regel):** *"Die deutsche Version FÜHRT IMMER"* +
+  *"Wir schreiben in die deutsche Version und ziehen stets die englische nach! Bitte pruefe stets
+  auf Konsistenz beider Texte, manche stehen noch in der Synchronisation aus."*
+  Memory: `feedback_thesis_deutsche_version_fuehrt_englische_nachziehen`.
+- **ROLLEN:** Der LEAD ist CTO/Director; **Fable-5 bleibt Agenten-Modell** fuer Planung/Design/
+  Review/Synthese-Zuarbeit, aber NIE als Director. Explore bleibt Sonnet-5-max.
+
+### 4. DREI POSTEN WAREN BAU-RUECKSTAND, KEINE ENTSCHEIDUNG
+- **T-8 "beste Binary" = PARETO-FRONT**, entschieden 10.07. (einer von 7 Forks). IST:
+  `rank_binaries` im best_binary_selector rankt Einzelsieger je Metrik.
+- **T-9 MIN/MAX-KATALOG je Achse EXISTIERT** (04.08., T0..T17+, Deep-Research-gestuetzt, mit
+  Pareto-Sonderbehandlung T5/T6/T18). IST: `heuristik/break_even.hpp` konsumiert ihn NICHT
+  (`break_even.hpp:17` -- pauschal "kleinerer y-Wert = besser").
+  **=> Der Kurvenvergleich ist fuer JEDE Max-Achse systematisch FALSCH HERUM. Hoechste Prioritaet.**
+- **T-10 LAST-ERKENNUNGSHEURISTIK:** der zweimal erhobene Befund "0 Code, 0 Design, 0 Register"
+  war FALSCH -- 327-zeiliger committeter Deep-Research-BEFUND vom 09.07. (OtterTune SIGMOD 2017,
+  QueryBot 5000 SIGMOD 2018, Self-Driving-DBMS CIDR 2017) mit Merkmalsvektor, Clusterverfahren
+  (offline hierarchisch + k-Means, online modifiziertes DBSCAN) und Laufzeit-Zuordnung inkl.
+  Default-Fallback. Uebersehen, weil die Suchbegriffe die Plan-Terminologie ("Workload-Cluster")
+  verfehlten.
+
+### 5. NEUE DEFEKTE MIT MESS-RELEVANZ
+- **PMU ist eine EXKLUSIVE Ressource ohne `resource_group`.** Die super-Pipeline fiel in der
+  BRIDGE (14/14 Jobs gruen, Bridge rot -- die `/jobs`-API zeigt Bridges NICHT). `pmc:intel`
+  meldete `pmc_available=0`, waehrend IM SELBEN JOB ein zweiter Test echte Zaehler lieferte
+  (`l1 = 7.052.220`). Transienz BELEGT: Pipeline 15157 auf DEMSELBEN SHA war zwei Minuten vorher
+  gruen. `resource_group` kommt in der CI **null**-mal vor (Gegenprobe: `pmc:` achtmal).
+  **RISIKO:** waehrend der mehrtaegigen Messung verfaelscht jede parallele PMC-Nutzung still.
+- **Stiller Rueckfall auf `measure`** bei fehlendem ODER unbekanntem `<run_methodology>`-Wert
+  (`run_methodology_registry.hpp:137,:140,:144-151`). Nur `--validate` bricht hart. Nach
+  Owner-KERN 10 ein stiller Rueckfall = Schwere-Stufe ERROR: ein Debug-Lauf mit Tippfehler
+  liefert Zahlen, die wie eine golden-Messung aussehen.
+- **`PlanBuildSemantic::measurement_on` hat NULL Konsumenten** (`experiment_plan_director.hpp:115`,
+  gesetzt `:1994`) -- wird geschrieben, nie gelesen, gatet nichts.
+- **macOS-Blatt Off-by-one am Maximalwert** (Codex-Befund, NIEDRIG, Bestand):
+  `numa_cpu_pin_process_probe_macos.hpp:98` weist 65536 CPUs (gueltige Ids 0..65535) ab, weil die
+  ANZAHL-Summe gegen den ID-Deckel `kMaxCpuId` geprueft wird; der Linux-Zwilling prueft korrekt
+  eine ID (`..._linux.hpp:168`).
+- **`single_thread` kann die Owner-Semantik nicht ausdruecken:** die Felder sind
+  Compile-Time-Konstanten (`run_methodology_registry.hpp:74-79`); einziger Konsument
+  `measure_parallelism.hpp:23-25` steuert nur den Parallelitaetsgrad, nicht ob gemessen oder
+  Replay abgefragt wird. Der Mechanismus dafuer ist **§58-REPLAY** (`LEDGER:2968,:3133`) --
+  im Ledger als **OFFEN, hoch** gefuehrt, ohne GEBAUT-Vermerk.
+
+### 6. DE/EN-KONSISTENZPRUEFUNG (3 Sucher ueber den Korpus)
+**4 Abweichungen gesamt.** Zwei HOCH, beide behoben (nur EN geaendert, DE unberuehrt):
+- `anhang/en/D_building_block_matrix.tex:588` T15 -> **T13** (Migration Strategy)
+- `anhang/en/D_building_block_matrix.tex:642` T16 -> **T14** (Filter)
+Beide widersprachen ihrer eigenen Section-Ueberschrift (`:584`/`:638`), dem Vorsatz (`:586`/`:640`),
+der DE-Fassung UND der Code-Registry (`cache_engine_axis_registry.xml:89` slot="T13",
+`:95` slot="T14"). Die uebrigen T15/T16 sind die ECHTEN Buffering-Achsen Q1/Q2 -- ein pauschales
+Ersetzen haette vier korrekte Stellen zerstoert.
+**Zwei NIEDRIG (nur Stil, NICHT geaendert, hier gebucht):**
+`kapitel/en/03_messsystem_prtart.tex:731` -- Einordnungsbegriff fehlt ("subclass (SearchAlgorithm)"
+vs. "tier subclass" an zwei Parallelstellen); `:796` "eleven-axis" wo DE "11-Achsen" schreibt.
+
+### 7. OFFENE PUNKTE, nach VERFALLSFENSTER
+**FENSTER 0 (vor der ersten .fingerprint-Datei):** R-3 ist GESCHLOSSEN (gelandet). D-1 ist
+inhaltlich geklaert (Mess-Zeile ja / Binary nein) -- offen bleibt nur der **`cpe`-Tag-Einbau**
+(Bau, kein Entscheid). B-4 ist geklaert (CEB-RAM).
+**T1 (vor dem ersten 4096er-Batch):** D-4 `allow_failure` am Voll-Mess-Batch · D-5 PMC
+fail-closed via `kPmcExpected` · R-2 XML-Trennung Bau/Messung + Mess-Slicing 4096 ·
+D-3-Umsetzung (golden-XML auf die 320er umstellen).
+**BAU-RUECKSTAENDE (kein Entscheid noetig), nach Wirkung:** T-9 Min/Max in `break_even.hpp`
+(hoechste Prio -- sonst rechnet die Auswertung falsch herum) · T-8 Pareto statt Einzelsieger ·
+T-10 Last-Erkennungsheuristik nach dem 09.07.-Plan · xlsx-Writer · `cpe`-Tag ·
+`resource_group` fuer PMC-Jobs · Modus-Fallback fail-closed · macOS-Off-by-one ·
+`PlanBuildSemantic::measurement_on` (Phantom) · §58-REPLAY.
+**OWNER-ENTSCHEIDE, die BLEIBEN:** die `compare`-Sequenz-Spannung (2.3) · W-3 Akzeptanzkriterium
+Ebene 2 (zwei Owner-Aussagen, 6 Min 53 Sek auseinander -- gehoert entschieden, nicht abgeleitet) ·
+B-5 Break-Even-Schwellenwerte CT vs RT · 7-vs-8-Distributionen (Gate W10-00) · C-4 H2 braucht die
+fehlende Durchsatz-Spalte · C-5 vier Lastprofil-XML · C-6 ChainRef bis 28.08. ·
+Anhang D "drei Mess-Modi existieren noch nicht als Typen" (gegen `run_methodology_registry.hpp`
+fraglich, zaehlt drei statt vier -- bewusst stehengelassen).
+
+### 8. METHODEN-LEHREN (jede real eingetreten, alle heute)
+1. **EINE NEGATIV-SUCHE IST NUR SO GUT WIE IHR VOKABULAR.** Drei Falschbefunde derselben Bauart
+   an einem Tag: T-10 ("Last-Erkennung" statt "Workload-Cluster"), D-1 (Substanz seit 16.07.
+   geplant, unter anderem Namen gesucht), beinahe `cpe` (17 Roh-Treffer, alle Fremdcode).
+   **AB SOFORT: jede "existiert nicht"-Aussage braucht (a) einen SYNONYM-Durchgang und (b) eine
+   KLASSIFIKATION der Roh-Treffer.**
+2. **ES GIBT ZWEI THESIS-CHECKOUTS.** Der Separat-Klon
+   `/home/comdare/Projekte/Research/20260931-overleaf-diplomarbeit` ist VERALTET (`29a1700`);
+   das Submodul `thesis/diplomarbeit` traegt den Stand. ZWEI Plandokumente UND ein Agent haben
+   sich daran verlesen (O-4 "16 von 44" vs "Scope 4 bedient alle 28" -- beide falsch; real
+   31 gegatet / 18 harte `\input` / 18 Dateien). Auch "Gate 8 nicht gelandet" entstand so.
+3. **GEFILTERTE WERKZEUG-AUSGABE VERSCHLUCKT DAS VERDIKT.** Der erste R-3-Lint-Fix scheiterte,
+   weil der Job-Trace mit `tail -18` gelesen wurde und vier von fuenf Dateien im abgeschnittenen
+   Teil lagen. **Regel: nicht die GEMELDETEN Dateien formatieren, sondern ALLE im Paket
+   beruehrten (`git diff --name-only <basis>..HEAD`).**
+4. **KOMMANDOS, DIE NICHT LAUFEN, MELDEN TROTZDEM "sauber".** Ein `find` lieferte den
+   clang-format-Pfad nicht; das Skript gab "(leer = sauber)" aus, obwohl nichts geprueft wurde.
+   **Jeder Selbstcheck braucht eine GEGENPROBE an einer bekannten Fehl-Probe.**
+5. **`gitleaks` meldet "no leaks found" bei 0 commits scanned** (Submodul-git-dir zeigt per
+   `core.worktree` auf einen Pfad, den der Container nicht sieht). Loesung: echten Klon erzeugen,
+   Nenner lesen.
+6. **Der ASCII-Selbstcheck braucht `LC_ALL=C`** (ohne meldete er 1133 Verstoesse, wo `od -c` NULL
+   Bytes findet); und `rc=$?` nach einer Pipe misst die LETZTE Stufe, nicht `grep`.
+7. **Die `/jobs`-API zeigt keine Bridges** -- eine Pipeline kann rot sein, waehrend alle Jobs
+   gruen sind.
+8. **"Offene Frage" und "Bau-Rueckstand" sind verschiedene Dinge** (Abschnitt 4).
+9. **Ein Lint-Werkzeug darf nie den fuehrenden (deutschen) Text umformen** -- der projekteigene
+   Weg ist die Inline-Ausnahme `% chktex NN` (17 .tex-Dateien im Korpus nutzen sie).
+
+**STAND am Ende dieser Spanne:** ce `85847715` (dev==main) · thesis `8197a2c` (dev==main) ·
+super `5ed70229` (dev; main-FF nach Pipeline 15174) · cluster `d7eab98`.
