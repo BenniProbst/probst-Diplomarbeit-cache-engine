@@ -7764,3 +7764,179 @@ sowie die Sentinel-Wache K-5 (`:57-61`).
 => **VORGELEGT (siehe Owner-Vorlage-Abschnitt):** wie wird 'e'(experimental) von 'e'(efficiency)
 getrennt? Der Explore `wf_acd866c1-fc8` sucht die Antwort ZUERST im Session-Log (Owner: *"Die Tags
 sind bereits geplant, alles Gedaechtnislueckn"*) -- es wird NICHT geraten.
+
+---
+
+## NACHTRAG 07.08.2026 mittag-4 -- EXPLORE-ERNTE: BENCHMARK-ZUORDNUNG, 'cpe' IST NEU, UND EINE FALSCHE ENTLASTUNG
+
+**QUELLEN:** Workflow `wf_acd866c1-fc8` (4 Explores: Benchmark-Zuordnung, Mess-Layer/Profil-Chart,
+Flag-Grammatik/cpe, Session-Log-Belege) + Workflow `wf_82d1a21f-4cc` (Ledger-Vollstaendigkeits-Audit,
+6 Agenten, 43 Positionen geprueft).
+
+### A) WO WELCHE BENCHMARKS HINGEHOEREN (Owner-Auftrag O-B, jetzt beantwortet)
+
+| Ebene | GEGENSTAND | MESSORT | INSTRUMENT |
+|---|---|---|---|
+| **E1 Micro** | EINE Achse ueber ihr **Achsen-Interface** (nicht Gattungs-Interface) | **IN die Tier-Binary einkompiliert** | GEMISCHT: Wallclock **und** PMC |
+| **E2 Macro (timed)** | EINE Gattung+Genus-Funktion | **CEB-seitig, auf dem Pruefdock**, gegen die Tier-Binary | Wallclock + Schritt-Checkpoints |
+| **E3 Macro large scope** | EIN Lastprofil = Aggregat ALLER E2-Charts der aufgerufenen Funktionen | CEB | aggregiert E2 |
+
+REIHENFOLGE/AUFBAU: **E3 aggregiert E2**; E1 steht daneben und misst den Achsen-Boden.
+Der Messvertrag fuer E1 ist als **18-Zeilen-Tabelle T0..T17** ausgeschrieben (z.B. T0 search_algo =
+insert/lookup/erase/clear; T6 allocator = allocate/deallocate REALE Ops, **kein Stats-READ als
+Zeit-Surrogat**), Quelle `ce docs/architecture/20260803-a8_f2_benchmarking_schnitt_soll_design.md:187-211`.
+STUFIGKEIT: alle drei Ebenen sind Auspraegungen **derselben Mess-Achse** und erben deren
+**Dreistufigkeit** (Planer RT-Freigabe -> CEB CT-Einbau -> Tier-Binary CT). Es gibt **keine**
+Owner-Aussage zu je Ebene unterschiedlicher Stufenzahl (Nullbefund mit Gegenprobe).
+
+**NAMENSKOLLISION (aktenkundig, nicht verwechseln):** "Micro" bedeutet ZWEIERLEI --
+(1) Benchmark-EBENE (Gegenstand: Achsenaufruf) und (2) Mess-Tooling-INSTRUMENT
+(`measurement_tooling_registry.hpp:30`: "feinkoernige PMC/Counter-Instrumentierung").
+Die Tooling-Achse {wallclock,macro,micro} schneidet **INSTRUMENTE**, die Ebenen schneiden
+**GEGENSTAENDE**. Ebenso traegt "Mess-Layer" ZWEI Bedeutungen: die drei Erhebungs-Ebenen UND
+den **VIERTEN Observer-Layer** (Gattung/Genus, Owner-KERN 06.08.) -- fuer die heutige
+Profil-Chart-Aussage ist der VIERTE gemeint.
+
+**OFFEN GEBLIEBEN (ECHT_OFFEN, Owner-Entscheid noetig):** die Bruecke Profil -> xlsx.
+Die a9-xlsx-Struktur ist eine **Zeile-pro-Messergebnis**-Tabelle je Unter-Achsen-Permutation
+(`SheetSchluessel{mess_unter,system_unter,organ_unter}`) -- **kein Zeitreihen-Traeger**, keine
+nativen Chart-Objekte (obwohl die vendorte libxlsxwriter das koennte). Das 06.08.-Dossier sagt
+ausdruecklich: *"Es gibt keine Datenstruktur namens Chart/Diagramm im Mess-Kern"*. Und: eine
+Zeitnahme INNERHALB eines Funktionsaufrufs existiert heute nicht (0 Treffer fuer sieben
+Namensmuster; Gegenprobe `seg_ns` = 326 Treffer, die Suche greift). Die vorhandenen
+`fill_checkpoints{10,100,1000}` sind FUELLSTANDS-Stuetzpunkte, keine Ausfuehrungs-Checkpoints.
+=> Der Owner-Satz *"formal als xlsx Messwerte"* ist damit eine **NEUE Festlegung**, die Spalten,
+Sheets und Zeitachse noch braucht.
+
+### B) 'cpe' IST **NICHT** BEREITS GEPLANT -- es ist eine NEUE Grammatik-Erweiterung
+
+Der Owner sagte: *"Die Tags sind bereits geplant, alles Gedaechtnislueckn."* Der Explore hat mit
+vollstaendigem Synonym-Durchgang ueber **alle vier Quellenstufen** (Thesis, Ledger, Plaene, Code)
+das Gegenteil belegt -- und zwar mit Nenner und Gegenprobe:
+- **Kein** Vorkommen von `cpe` in irgendeiner Quelle.
+- **Keine** Vorsehung fuer mehrstellige Hardware-Flags.
+- Im Gegenteil: die Ein-Zeichen-Regel ist **DREIFACH ratifiziert** -- im Code (Owner-Q3 wortgleich
+  im Kopfkommentar), im Ledger, und **in der THESIS selbst** (Quellrang 1):
+  *"Das Hardware-Flag ist genau EIN Kleinbuchstabe, direkt an das Zahlen-Tripel angehaengt."*
+
+**DREI STRUKTURBEWEISE, dass heute genau ein Zeichen gilt:**
+1. `hardware_flag_from_char(char)` nimmt `char` (Singular), nicht `string_view`.
+2. Die Stempel-POD-Kodierung nutzt **exakt 2 Bits = 4 Werte** -- deckungsgleich mit c/g/f/n.
+3. Es existieren **EXPLIZITE Negativ-Tests**, die ein zweites Zeichen hart zurueckweisen:
+   `v1.0.0cc`, `v1.0.0cg` -> Sentinel; `a=x@1.0.0cg` -> **consteval throw**, mit dem Kommentar
+   *"zweites Hardware-Flag: unparsbarer Rest, kein stiller Sentinel-Kollaps"*.
+
+**DIE KOLLISION IST STRUKTURELL, NICHT KOSMETISCH:** die Position hinter dem HW-Flag ist durch
+`'e'` (experimental, Owner-E2) **vollstaendig belegt**, und die B12-Wache *"ce-Registry traegt
+NIE 'e'"* ist bindend. `cpe` kann also nicht einfach angehaengt werden.
+
+**NENNER (live gezaehlt, mit Gegenproben korrigiert): 138 Bestands-Literale**, ausnahmslos
+einbuchstabig -- 122 Organ-Achsen-`algo_version` + 3 System-Achsen + 1 Meta-Meta + 3 Mess-Tooling
++ 1 Mess-Framework + 1 Planer + 2 Probe + 5 Pruef-Dock. (Zwei grep-Treffer wurden als KOMMENTARE
+aussortiert, nicht als Bestand mitgezaehlt.) NULL davon mehrstellig.
+
+**FREIGABE-KETTE (TEILWEISE):** das Muster *"System-Achse gibt frei"* ist real gebaut -- aber fuer
+die **Ziel-ISA** (`TargetIsaSystemAxis`: x86_64/arm64/riscv64), NICHT fuer die Hardware-FAMILIE
+(CPU/GPU/FPGA/NPU). Fuer letztere gibt es heute nur eine **globale** Politik ("wir produzieren nur
+CPU-Code"), keinen differenzierenden Mechanismus. g/f/n sind laut Code-Kommentar
+(`algo_semver.hpp:387`) *"reserviert, nicht produziert"*; NULL echte Bestands-Literale damit.
+
+**ENTLASTUNG BEIM POD:** das `reserved`-Feld ist ein `uint32_t`, von dem heute nur **6 von 32 Bit**
+belegt sind -- eine breitere Flag-Kodierung braucht also **nicht** zwingend den `sizeof==48` des
+Entry-PODs zu brechen. Es bleibt aber ein deklariertes Byte-Ereignis mit neuer CT-Wachen-Batterie.
+
+=> **VORGELEGT** (Owner-Entscheid, drei Fragen: Trennzeichen? Bedeutung von 'e'? Pflicht oder
+optional?). Der Bau folgt dem bereits einmal vollzogenen Q3/A13-Praezedenzfall (02.08. -> 03.08.),
+also **EIN gebuendeltes Byte-Ereignis, kein zweiter Neuanker**.
+
+### C) EINE ENTLASTUNG DES LEADS WAR FALSCH -- V-08 branch_misses
+
+Der Ledger-Audit bestritt die in Task #8 gebuchte Entlastung *"V-08 misst real
+(L1/L3/branch_misses)"*. Der Lead hat daraufhin **selbst am Objekt nachgemessen** und den Audit
+**bestaetigt** -- die eigene fruehere Entlastung war falsch:
+- `branch_misses` hat in `libs/apps/adapters` **5** Fundstellen; alle drei "Zuweisungen" sind
+  Member-DEKLARATIONEN mit `= 0`. **Keine produktive Schreibstelle.**
+- Die einzigen echten Zuweisungen (`= 17`, `= 17`, `= 4711`) stehen in **TESTS**.
+- **Kein** `perf_event_open`/`PERF_COUNT_HW_BRANCH_MISSES`/`rdpmc`-Setup in libs oder apps.
+- Es gibt **LESER**, die ein strukturell nie befuelltes Feld lesen
+  (`i_measurement_source.hpp:175`, `system_axis.hpp:413` mit `mark_ok`).
+- `pmc_source.hpp` ist ein Interface mit `NullPmcSource`; sein eigener Kopf sagt, die realen Werte
+  braeuchten Intel PCM / RDPMC / RAPL-MSR = **extern, P4**.
+
+**DIE FEHLERQUELLE SIND ZWEI KOMMENTARE, die das Gegenteil behaupten:**
+`test_a8s3_csv_klasse_c.cpp:6` *"PmcCounters ERHOB branch_misses real"* und
+`tests/unit/CMakeLists.txt:5128` *"pmc_branch_misses = real erhoben aber bisher stumm"*.
+Wer den Kommentar liest statt den Code, entlastet faelschlich. **Beide sind zu korrigieren.**
+
+**LEHRE (zur Fehlerklasse "Berichte nie ungeprueft uebernehmen"):** die falsche Entlastung kam aus
+einem Reconcile-Pass, dessen Ergebnis der Lead uebernommen hat, ohne am Objekt gegenzumessen.
+=> **Die uebrigen zwei Entlastungen desselben Passes (V-03, V-05) sind bisher UNGEPRUEFT** und mit
+demselben Mass nachzuholen.
+
+### D) LEDGER-AUDIT: 43 von 43 geprueften Positionen NICHT sauber erfasst
+Wurzel-Fund: der **A15/Sec.55-Gesamt-Reconcile** ist selbst nie vollzogen worden -- das
+Konsolidierungs-Register ist per Konstruktion ein 14-Tage-Fenster ab 23.07., der letzte
+Voll-Block Sec.55 (LEDGER:2829-3060, 20.07.) liegt **davor** und wurde nie ueberfuehrt. Die
+B-Liste (B1-B13) wurde mitgenommen, die A-Liste (A14/A15) derselben Quelle nicht -- und der
+Posten, der genau diese Uebertragung anmahnte, ist selbst der prominenteste Verlust.
+Weitere ungeloeste Posten: **A14/FF0 Multi-Plattform-Generalitaet** (im Alt-Block ausdruecklich
+"Abgabe-Blocker", seither nur zweimal selbstreferenziell erwaehnt, nie bearbeitet),
+**GN-9 Feasibility-/Kalibrierungs-Gate** (per Definition VOR der Voll-Matrix, hat bis heute
+keinen Slot im Fahrplan). Volle Liste: `tmp/wisfvjd8z.output`, zu ueberfuehren.
+
+### C-BERICHTIGUNG (Lead, unmittelbar danach) -- ABSCHNITT C OBEN WAR ZU SCHARF UND TEILS FALSCH
+
+**Der Lead ist beim Nachmessen in die EIGENE, im Memory dokumentierte Falle getreten:**
+`grep -v '/build'` bzw. `find -not -path '*/build*'` **FRISST das Verzeichnis `builder/`**. Genau
+dort -- `libs/cache_engine/builder/` -- liegt die gesamte reale PMC-Implementierung. Alle vorherigen
+Suchen dieses Nachtrags waren dadurch BLIND fuer den entscheidenden Teil des Codes. Zusaetzlich hat
+der Lead am FALSCHEN Checkout gemessen: `Code/external/comdare-cache-engine` steht auf dem
+Feature-Branch `b-m2-pmc-invariante`, nicht auf `development`. Zwei Fehler derselben Familie in
+einem Pass.
+
+**KORREKTE LAGE (am Ref `development` = 85847715, Filter `/build/` mit Schraegstrichen):**
+
+REAL ERHOBEN via `perf_event_open(2)` (`builder/linux_perf_pmc_source.hpp`, hinter
+`COMDARE_ENABLE_PMC && __linux__`):
+- `cache_misses_l1` <- PERF_COUNT_HW_CACHE_L1D / OP_READ / RESULT_MISS
+- `cache_misses_l3` <- LAST-LEVEL / OP_READ / RESULT_MISS (im Kopf ausdruecklich "ehrlich LL")
+- `dtlb_misses`     <- DTLB / OP_READ / RESULT_MISS
+- `energy_micro_joules` <- RAPL, best-effort (root-/Zonen-abhaengig)
+
+BLEIBEN honest-0, mit Begruendung im Code:
+- `cache_misses_l2` und `coherence_invalidations` -- kein portabler generischer Counter, ein
+  RAW-Rateversuch ist BEWUSST unterblieben.
+- `branch_misses` -- **offener Posten M-3a**.
+
+**WAS DAVON STIMMT UND WAS NICHT:**
+- **STIMMT:** `branch_misses` wird von KEINER PMC-Quelle befuellt. Das ist am Objekt bestaetigt.
+- **STIMMT NICHT (Abschnitt C oben):** die Behauptung, es gebe ueberhaupt keine echte
+  Counter-Quelle. Es gibt drei Dateien -- `linux_perf_pmc_source.hpp`,
+  `windows_pcm_pmc_source.hpp`, `pmc_source_factory.hpp` -- und L1/L3/DTLB werden real gemessen.
+- **STIMMT NICHT:** die Behauptung, die falschen Kommentare stuenden unkorrigiert da. Das Projekt
+  hat sie am **06.08. selbst zurueckgenommen** (B5/M-2-KORREKTUR-2), an zwei Stellen wortdeutlich:
+  `cache_engine_builder_iterator.hpp:549` *"die urspruengliche Zusage 'PmcCounters ERHEBT
+  branch_misses real' war FALSCH und wird hiermit zurueckgenommen"* und
+  `linux_perf_pmc_source.hpp:16` *"branch_misses wird von KEINER PMC-Quelle befuellt (offener
+  Posten M-3a). Diese honest-0-Spalten sind im Anhang als solche zu fuehren, nicht als gemessen."*
+
+**DAMIT IST DIE HONEST-0-DOKTRIN GEWAHRT** -- das System behauptet nichts Falsches. Es war der
+LEAD, der zweimal falsch behauptet hat: erst mit der Entlastung, dann mit dem Alarm.
+
+**EINZIGER ECHTER RESTFEHLER, gefunden und BEHOBEN:** `tests/unit/CMakeLists.txt:5338` trug als
+einzige Stelle noch den alten Text *"pmc_branch_misses = real erhoben aber bisher stumm"* -- bei der
+Korrektur am 06.08. uebersehen. Auf *"honest-0, NICHT erhoben -- offener Posten M-3a"* gezogen.
+
+**KORRIGIERTE BILANZ zur V-08-Entlastung:** sie war zu **zwei Dritteln richtig** (L1 und L3 werden
+real erhoben) und **bei `branch_misses` falsch**. Nicht die ganze Entlastung faellt, nur ihr
+dritter Teil. Der offene Posten heisst **M-3a** und ist im Code bereits gefuehrt.
+
+**LEHRE, doppelt (in die Fehlerklassen-Pruefliste):**
+1. `/build` als Filter ist VERBOTEN -- immer `/build/` **mit beiden Schraegstrichen**, sonst
+   verschwindet `builder/` lautlos aus jedem Befund. Diese Falle steht seit Wochen im Memory und
+   wurde heute trotzdem getreten.
+2. Vor jeder Objekt-Messung den **CHECKOUT und seinen BRANCH** feststellen. Der Haupt-Checkout des
+   Submoduls kann auf einem Feature-Branch stehen; der Landungs-Worktree traegt die Spitze.
+3. Ein ALARM ist genauso begruendungspflichtig wie eine Entlastung. Der Lead hat den Audit-Bericht
+   nicht ungeprueft uebernommen (richtig), aber seine eigene Gegenmessung nicht auf Blindheit
+   geprueft (falsch) -- und daraus eine schaerfere Behauptung gebaut als die Faktenlage trug.
