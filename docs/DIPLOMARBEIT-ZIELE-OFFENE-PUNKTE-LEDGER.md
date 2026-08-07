@@ -9370,3 +9370,89 @@ wird. **So sieht ein belegter Nullbefund aus.**
 cppcheck lokal (Werkzeug fehlt) · Windows-Pfad (`WindowsPcmPmcSource` erhebt `branch_misses` nicht,
 das Feld bleibt dort korrekt `false`) · `l1`/`dtlb` haben **weiterhin kein eigenes Flag** -- bewusst
 keins erfunden, das waere ein POD-Zusatz ohne Auftrag.
+
+---
+
+## NACHTRAG 07.08.2026 abend-15 — P1 P/E-CORE: BAU BEWUSST ANGEHALTEN. Und ein Befund, der die Lage dreht
+
+Entwurf: `docs/plaene/20260807-DESIGN-pe-core-getrennte-messung.md`. Worktree unveraendert,
+**nichts gebaut** -- und das ist das richtige Ergebnis.
+
+### prod1 IST NICHT HYBRID -- aber KERN-ASYMMETRISCH. Vom Lead selbst nachgemessen
+```
+model name : AMD Ryzen 9 9950X3D 16-Core Processor
+/sys/devices/cpu_core, /sys/devices/cpu_atom  -> existieren NICHT
+cat /sys/devices/system/cpu/cpu*/cache/index3/size | sort | uniq -c
+     16 32768K
+     16 98304K
+```
+**Zwei L3-Domaenen, 96 MB gegen 32 MB -- Faktor 3 auf DERSELBEN CPU.** Das ist der X3D mit einem
+3D-V-Cache-CCD. prod2 ist derzeit nicht aufloesbar (haengt an Infra **#207**, Ledger `:340`).
+
+**FUER EINE CACHE-ENGINE-ARBEIT IST DAS EIN ERGEBNIS FUER SICH** -- derselbe Algorithmus, dieselbe
+Binary, dieselbe Maschine, dreifacher L3. Die **Mechanik** (Klasse erkennen -> pinnen -> getrennt
+ablegen) ist damit auf prod1 an der **L3-Achse vollstaendig verifizierbar**: dieselbe Achse
+`core_class`, dasselbe Pinning, dieselbe Ablage. Nur die **P/E-Auspraegung** wartet auf prod2.
+**Der Auftrag ist nicht blockiert, nur die Auspraegung.**
+
+**Die Probe ist gebaut und beweist ihre eigene Ehrlichkeit** (literale Ausgabe):
+```
+quelle  = quelle_l3_domaene          gruppen = 2
+  klasse=kern_grosser_cache  cpus=16  [0..7,16..23]
+  klasse=kern_kleiner_cache  cpus=16  [8..15,24..31]
+pinning = erlaubte_kerne=32  maske_wiederhergestellt=1
+```
+Sie findet **keine** Hybrid-PMU, faellt **ehrlich** auf die L3-Stufe und **behauptet nirgends P/E**.
+**Der gefuerchtete Defekt -- "misst einmal und nennt es P-Core" -- tritt nicht ein.**
+
+### DER WURZEL-BEFUND: das Angebot hat keinen Abnehmer
+`probe_numa_cpu_pin_process_topology()` (`hardware_probe_factory.hpp:481`) ist **Produktionscode mit
+NULL Rufern** -- vom Lead nachgezaehlt: **3 Fundstellen, alle in den definierenden Headern,
+0 echte Aufrufe**. Die Schwester `probe_numa_page_topology()` hat genau einen: eine Testzeile.
+**Weder OD-10-RT-K noch OD-11-RT-K existiert.** Was fehlt, ist der **RESOLVER**
+(`machine_resolved` -> Permutation) -- und er fehlt fuer **alle drei** RT-Unter-Achsen
+(`numa_node`, `page`, `core_class`).
+**Praezisierung, die der Agent an der Lead-Lagebeschreibung anbringt und die tragend ist:** die
+Topologie wird heute **nicht** erkannt -- sie **wuerde** erkannt, wenn jemand fragte. **Niemand
+fragt.** Der Lead hatte in abend-8 geschrieben, die Erkennungs-Vorstufe sei "gebaut"; richtiger ist
+"gebaut, aber unaufgerufen".
+
+### DIE VORGESCHLAGENE MINI-STUFE WAERE EIN FEIGENBLATT GEWESEN
+Der Lead hatte vorgeschlagen, `hybrid_core_aware` "wahrheitsgemaess zu setzen".
+**`hybrid_core_aware` hat GENAU EINE Fundstelle im ganzen Baum -- die Deklaration**
+(`i_measurement_source.hpp:55`). Vom Lead verifiziert. **Kein Schreiber, kein Leser, kein Test.**
+Und es sitzt in der **falschen Familie**: `MeasurementSourceCaps`/`IMeasurementSource`, waehrend der
+reale Messpfad ueber `IPmcSource`/`LinuxPerfPmcSource` laeuft.
+Ein `true` haette die Messung **nicht geaendert -- nur so ausgesehen, als sei P/E beruecksichtigt**.
+**Genau die Fehlerklasse, die der Auftrag verbietet. Der Agent hat es deshalb nicht gesetzt --
+gegen die ausdrueckliche Anregung des Leads. Richtig so.**
+
+### KEIN BYTE-EREIGNIS -- dreifach belegt
+1. `system_axis_registry.xml:10`: `target_isa` traegt `binary_id="never"`.
+2. `system_cell_values.hpp:166-172` fuehrt `core_class` als Stempel-**Verbot**, verbatim: *"stuende
+   sie im Stempel, [...] koennte die CEB NICHT 'DIESELBE Tier-Binary einmal auf einen E-Core und
+   einmal auf einen P-Core gepinnt' starten"*.
+3. A-15-Neutralitaet im Probe-Header.
+
+**EINE FALLE, benannt statt uebergangen:** `core_class` lebt in der **Registry/RT-Welt**, nicht in
+der **axes26/CT-Welt** von `build_system_axis_levels()`. **Wer beides verwechselt und `core_class`
+als CT-Achse einhaengt, erzeugt sehr wohl ein Byte-Ereignis.** Im Entwurf als Risiko R-1 mit
+`static_assert`-Gegenmassnahme.
+
+### DREI OWNER-ENTSCHEIDE
+- **Ω-1 Resolver-Zuschnitt:** generisch ueber `TargetIsaOpenSubAxes` (loest OD-10 **und** OD-11
+  zugleich, vermeidet einen dritten B7-Sonderweg) **[Empfehlung]** -- oder nur `core_class`?
+- **Ω-2 Ablage-Form:** CSV-Spalten `core_class` **+ `core_class_source`** additiv **[Empfehlung]** /
+  Unterordner / Sidecar? **Die Provenienz MUSS mit** -- sonst wird `kern_grosser_cache` spaeter als
+  `kern_hohe_leistung` ausgewertet, und das waere eine Falschaussage in den Daten.
+- **Ω-3:** auf prod1 an der **L3-Achse** scharf schalten, sobald der Resolver steht
+  **[Empfehlung]** -- oder bis prod2/#207 schlafen lassen? Scharf schalten heisst: **die Mechanik ist
+  am echten Objekt bewiesen**, prod2 wird zum blossen Zuschalten einer Provenienz -- und Faktor 3 im
+  L3 ist fuer eine Cache-Arbeit ein Ergebnis, kein Nebenprodukt.
+
+### NICHT GESCHAFFT (selbst gemeldet)
+Kein Bau, kein ctest (nichts geaendert) · **G-8 echte PMU-Trennung unerreichbar ohne prod2** ·
+ungeprueft: ob der Planer den Resolver ohne Plan-Cache-Invalidierung aufnimmt · ob die
+`<machines>`-Deklaration ein **zweiter** Kanal fuer Klassenwerte ist (Doppelquellen-Gefahr) ·
+Windows/macOS nur im Kopf · PAPI-Zweig gar nicht.
+**Ein Gate ist bestanden: G-1 (Erkennung ehrlich), mit literaler Ausgabe.**
