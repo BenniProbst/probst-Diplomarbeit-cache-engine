@@ -9210,3 +9210,71 @@ die ZEILEN gewandert sind und nicht die Glied-Struktur.
    Welche richtig ist, ist eine **Aussage ueber die Hardware**, keine Formfrage.
 2. **Praefix-Stripping-Kurzform** `x128{2.3.41.42}`: verlangt, die Token-Regel aufzugeben, und
    oeffnet damit die stille Fehllesung von `avx10.1`.
+
+---
+
+## NACHTRAG 07.08.2026 abend-13 — PLATZ-INVENTAR: 57 GB risikofrei · und die lokale Maschine IST prod1
+
+**Nichts geloescht.** Das Inventar ist eine Vorlage, kein Vollzug.
+
+### DER KONTEXT-FUND, der eine Zaehlung korrigiert
+**`hostname` = `prod1`, `hostname -I` = `10.0.10.211`** -- vom Lead selbst geprueft.
+**Die "lokale Maschine" und prod1 sind DIESELBE.** Es gibt nur ZWEI Hosts, nicht drei. Der Auftrag
+"pruefe lokal UND prod1" war ein Auftrag zu viel.
+**Die wichtigste Folge: der GitLab-Runner laeuft auf DIESER Platte.** Wer hier Klone, Worktrees oder
+Build-Baeume anhaeuft, **verbraucht CI-Kapazitaet** -- genau so ist heute Pipeline 15221 rot geworden.
+Gebucht als Memory `reference_lokale_maschine_ist_prod1_kein_dritter_host`.
+
+### prod2 ist NICHT die Ursache -- und nicht das Problem
+`df`: **104 G von 251 G belegt, 135 G frei (44 %)**. `/home/comdare` dort praktisch leer (36 K,
+nur Dotfiles), keine Worktrees, kein Diplomarbeit-Bezug, podman/docker leer.
+**~100 G liegen unter root-only-Pfaden** (`/var/lib/libvirt/images`, vermutlich das Talos-VM-Image
+des K8s-Node) -- **aktive Infrastruktur, kein Aufraeum-Kandidat**, ohne Root nicht pruefbar.
+
+### KLASSE 1 -- risikofrei, ca. **57 GB** (prod1)
+- **21 Worktrees, 38,47 GB** (exakt per `du -sb`): **alle** mit `git status --porcelain` = 0 Zeilen,
+  **alle** Branches per `merge-base --is-ancestor` in `origin/development`. Prozess-Scan ueber
+  `/proc/*/cwd`: **kein aktiver Prozess** in diesen Pfaden. **Lead-Stichprobe an dreien
+  (`wt-b-a1`, `wt-r3-preimage`, `wt-b14-ce`): bestaetigt, je sauber UND gemergt.**
+  Groesste: `wt-b-a1` 5,9 G · `wt-r3-preimage` 5,1 G · `wt-b14-ce` 4,5 G · `wt-landung` 3,2 G ·
+  `wt-lb6` / `wt-m1-naht` / `wt-numa-process` je 3,1 G.
+- **Stale/verwaiste Build-Baeume, ~5 GB**: `build-go2` (1,7 G, 25 Tage alt) · `build-cmd1a` (1,4 G,
+  27 Tage) · `build-go2-pre` · **`zb-build-e24` (3,3 G)** -- dessen `CMAKE_HOME_DIRECTORY` zeigt auf
+  `/home/comdare/wt-e24`, **das es nicht mehr gibt**: reiner Build-Output ohne Quelle, 0 CSV.
+- **comdare-web-Builds, 12,5 GB** (`build-prod1` 6,3 G, `build-va10-off` 6,2 G) -- anderes Produkt.
+- `di-freshverify` + `di-verify` (0,68 G, bare-git-Spiegel, re-klonbar) · podman-Images (51 M, laut
+  `podman system df` **100 % reclaimable**) · `.ccache` (611 M, **Hit-Rate nur 6,3 %**).
+
+### KLASSE 2 -- braucht Freigabe
+`scrub-work` (2,6 G, PII-Scrub-Historie ueber ~40 Repos) · `comdare-web-work` (1,7 G, gemischt) ·
+`comdare-transkripte-privat` (81 M, **enthaelt Live-Token**) · `raceaudit` + `diag-scope4` (237 M,
+von **gestern** -- evtl. noch in Untersuchung) · **`git gc`** auf super/ce/comdare-web (super hat
+185 M lose Objekte von 635 M; verlustfrei, aber nicht die Entscheidung eines Agenten) ·
+das **aktive** ce-`build/` (3,5 G, Hauptcheckout steht auf `b-m2-pmc-invariante`).
+
+### KLASSE 3 -- NIE ANFASSEN
+`measurements/golden-320-run1` (221 M, **321 CSV/JSON echte golden-Run-Daten**) · `scrub-backups`
+(3,0 G) · `prescrub-bundles-2026-07-25` · `backups-workflow` (Rohdaten von **heute**) ·
+`o8-baseline-sicherung` · `purge-projekte-work/old.git` · **alle `Cluster/keys`-Backups** ·
+`comdare-web/sessions` (689 M Doku) · `.claude` / `.codex` (Werkzeug-Zustand).
+
+### SECHS WORKTREES SIND **KEIN** KANDIDAT -- Branch nicht gemergt
+`wt-checkheft-nachtrag` (414 M) · `wt-b-e18snap` (374 M) · `wt-pmc-errno` (211 M) ·
+`wt-w2-E02-thesis` · `wt-w2-E02-prtart` -- zusammen ~1 GB, **bei Loeschung unwiederbringlich**.
+**KORREKTUR AM INVENTAR:** es listet `wt-ce-pmc` (2,7 G) als sechsten "nur lokal". **Ueberholt** --
+der Lead hat `bau/m3a-branch-misses-ehrlichkeit` inzwischen **gepusht** (verifiziert: Upstream
+gesetzt, 0 ungepusht). Der Explore hat vor diesem Push gemessen. **wt-ce-pmc ist damit
+remote-rueckholbar**, bleibt aber wegen des ausstehenden Abschlussberichts in Benutzung.
+
+### BESTAETIGT: die getrackte Messdaten-CSV im ce-`build/`
+`build/thesis_tiere/tier150_measurements.csv` ist per `git ls-files --error-unmatch` **getrackt** --
+vom Lead selbst nachgeprueft. Sie ist damit versioniert und geht bei einer Loeschung des
+Build-Baums **nicht** verloren. **Das entkraeftet die `rm build:`-Falle fuer genau diesen Fall --
+aber nur, weil es geprueft wurde, nicht als Regel.**
+
+### ZUGANGSLAGE (fuer kuenftige Infra-Fragen erhoben)
+`sudo` als `comdare` verlangt auf **beiden** Hosts ein Passwort -- **kein NOPASSWD**. Der
+NOPASSWD-Admin `admin-management` liess sich mit den dokumentierten Vault-Werten **nicht** anmelden
+(der Vault fuehrt mehrere rotierte, widerspruechliche Eintraege; der Agent hat bewusst **nicht
+weitergeraten**, um keinen Lockout zu riskieren). `/home/gitlab-runner/builds` ist fuer `comdare`
+**nicht lesbar** -- der Runner-Platzverbrauch ist von hier aus **nicht messbar**.
