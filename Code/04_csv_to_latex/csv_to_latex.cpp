@@ -974,23 +974,41 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
       << "}\\\\\n\\endfoot\n\\bottomrule\n\\endlastfoot\n";
 
     // Zeilen als (Vorbehalt, Status)-Paare. Reihenfolge bindend: Zeile 1 = Cache-Misses/PMC.
+    // trailer: optionaler Kommentar HINTER dem LaTeX-Zeilenende. Er traegt die chktex-Inline-
+    // Ausnahmen, die einzelne Zeilen brauchen (projekteigener Weg, s. 17 .tex-Dateien im Bestand).
+    // OHNE ihn verliert ein Generatorlauf die Suppression und lint:latex geht rot -- genau die
+    // Rueckdreh-Falle, wegen der dieser Generator am 07.08.2026 nachgezogen wurde.
     struct Row {
         std::string caveat;
         std::string status;
+        std::string trailer;
     };
     std::vector<Row> rows;
 
     if (de) {
         rows.push_back(
-            {"\\textbf{Cache-Misses (Kernmetrik):} L1/L2/L3 + dTLB + Coherence + Energy = 0 / nicht erhoben",
-             "NullPmcSource, available=false; Intel-PCM-Windows-Treiber + Linux-PAPI ausstehend (\\#26/P4); "
-             "Cache-Verhalten nur indirekt \\\"uber Wall-Clock-Proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
-        rows.push_back(
-            {"15 gepinnte Achsen = 0 Austauschbarkeits-Belege",
-             "Nur 4 Achsen variieren (search\\_algo, node\\_type, memory\\_layout, prefetch). Gepinnt (je 1 Wert): "
-             "cache\\_traversal, mapping, path\\_compression, allocator, concurrency, serialization, telemetry, "
-             "value\\_handle, isa, index\\_organization, io\\_dispatch, migration\\_policy, filter, queuing\\_q1, "
-             "queuing\\_q2."});
+            {"\\textbf{Cache-Misses (Kernmetrik):} L2 + Coherence strukturell 0; L1/L3/dTLB nur mit gesetztem "
+             "PMC-Schalter erhoben; Energy best-effort",
+             "Ohne \\texttt{COMDARE\\_ENABLE\\_PMC} (Build-Default OFF, damit \\texttt{test:unit} ohne "
+             "HW-Zugriff baut) liefert \\texttt{NullPmcSource} available=false, und alle HW-Spalten bleiben 0 "
+             "-- so entstanden die tabellierten Nullen. Mit dem Schalter erhebt \\texttt{LinuxPerfPmcSource} "
+             "L1-, L3- (Last-Level) und dTLB-Misses real \\\"uber \\texttt{perf\\_event\\_open}(2) "
+             "(Kernel-Syscall, keine Vendor-Lib, kein PAPI n\\\"otig -- PAPI bleibt optionaler "
+             "Sekund\\\"arpfad). L2 und Coherence-Invalidierungen bleiben mangels portablem generischem "
+             "Z\\\"ahler auch dann strukturell 0; L3 kann auf einzelnen AMD-Plattformen zus\\\"atzlich beim "
+             "\\\"Offnen des Z\\\"ahlers scheitern; Energie l\\\"auft best-effort \\\"uber RAPL-sysfs und "
+             "bleibt ohne Zonen-Leserecht leer. Der Intel-PCM-Windows-Treiber steht f\\\"ur die Windows-Lane "
+             "weiterhin aus (\\#26/P4). Die verbleibende L2/Coherence-L\\\"ucke ist nur indirekt \\\"uber den "
+             "Wall-Clock-Proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op) beobachtbar."});
+        rows.push_back({"14 gepinnte Achsen = 0 Austauschbarkeits-Belege",
+                        "Nur 4 der 18 Kompositions-Achsen variieren (search\\_algo, node\\_type, memory\\_layout, "
+                        "prefetch). Gepinnt (je 1 Wert): cache\\_traversal, mapping, path\\_compression, allocator, "
+                        "concurrency, serialization, value\\_handle, index\\_organization, io\\_dispatch, "
+                        "migration\\_policy, filter, queuing\\_q1, queuing\\_q2, persistence\\_target. (isa ist seit "
+                        "INC-2d die System-Achse \\texttt{target\\_isa} und telemetry seit INC-2c keine "
+                        "binary\\_id-Kompositions-Achse mehr -- beide z\\\"ahlen daher nicht mehr als gepinnte "
+                        "Organ-Achsen.)",
+                        "% chktex 12 (Satzende vor Klammer -- kein Abkuerzungspunkt)"});
         rows.push_back(
             {"Observer-Proben-Z\\\"ahler ($\\ast$\\_find/$\\ast$\\_probe/$\\ast$\\_get) by-design $\\approx 1$",
              "Erwartetes Verhalten, kein Phantom: je Lookup eine Probe. Keine Aussage \\\"uber interne Iterationen."});
@@ -1064,15 +1082,26 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
                         "auf Messwerte (G5-Audit, PATTERN-MINOR-1..7)."});
     } else {
         rows.push_back(
-            {"\\textbf{Cache misses (core metric):} L1/L2/L3 + dTLB + coherence + energy = 0 / not collected",
-             "NullPmcSource, available=false; Intel PCM Windows driver + Linux PAPI pending (\\#26/P4); "
-             "cache behaviour only indirect via wall-clock proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
+            {"\\textbf{Cache misses (core metric):} L2 + coherence structurally 0; L1/L3/dTLB only collected "
+             "with the PMC switch set; energy best-effort",
+             "Without \\texttt{COMDARE\\_ENABLE\\_PMC} (build default OFF, so that \\texttt{test:unit} builds "
+             "without HW access) \\texttt{NullPmcSource} reports available=false and all HW columns stay 0 --- "
+             "that is how the tabulated zeros arose. With the switch, \\texttt{LinuxPerfPmcSource} collects "
+             "L1, L3 (last-level) and dTLB misses for real via \\texttt{perf\\_event\\_open}(2) (kernel "
+             "syscall, no vendor library, no PAPI required --- PAPI remains an optional secondary path). L2 "
+             "and coherence invalidations stay structurally 0 even then, for lack of a portable generic "
+             "counter; L3 can additionally fail to open on individual AMD platforms; energy runs best-effort "
+             "via RAPL sysfs and stays empty without read access to the zone. The Intel PCM Windows driver is "
+             "still pending for the Windows lane (\\#26/P4). The remaining L2/coherence gap is observable only "
+             "indirectly via the wall-clock proxy (seg\\_memory\\_layout\\_ns/ns\\_per\\_op)."});
         rows.push_back(
-            {"15 pinned axes = 0 exchangeability evidence",
-             "Only 4 axes vary (search\\_algo, node\\_type, memory\\_layout, prefetch). Pinned (1 value each): "
-             "cache\\_traversal, mapping, path\\_compression, allocator, concurrency, serialization, telemetry, "
-             "value\\_handle, isa, index\\_organization, io\\_dispatch, migration\\_policy, filter, queuing\\_q1, "
-             "queuing\\_q2."});
+            {"14 pinned axes = 0 exchangeability evidence",
+             "Only 4 of the 18 composition axes vary (search\\_algo, node\\_type, memory\\_layout, prefetch). "
+             "Pinned (1 value each): cache\\_traversal, mapping, path\\_compression, allocator, concurrency, "
+             "serialization, value\\_handle, index\\_organization, io\\_dispatch, migration\\_policy, filter, "
+             "queuing\\_q1, queuing\\_q2, persistence\\_target. (Since INC-2d, isa is the system axis "
+             "\\texttt{target\\_isa}, and since INC-2c telemetry is no longer a binary\\_id composition axis "
+             "--- neither therefore counts as a pinned organ axis any more.)"});
         rows.push_back(
             {"Observer probe counters ($\\ast$\\_find/$\\ast$\\_probe/$\\ast$\\_get) by design $\\approx 1$",
              "Expected behaviour, no phantom: one probe per lookup. Says nothing about internal iterations."});
@@ -1135,7 +1164,11 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
     }
 
     int n = 1;
-    for (auto const& r : rows) f << n++ << " & " << r.caveat << " & " << r.status << " \\\\\n";
+    for (auto const& r : rows) {
+        f << n++ << " & " << r.caveat << " & " << r.status << " \\\\";
+        if (!r.trailer.empty()) f << " " << r.trailer;
+        f << "\n";
+    }
 
     f << "\\end{longtable}\n\\end{scriptsize}\n";
     return f.good() ? status_ok : status_io_error;
