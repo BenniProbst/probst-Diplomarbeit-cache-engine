@@ -10655,3 +10655,50 @@ Die Grenze liegt bei `E.0 KERN-Mess-Schema`, dem ersten Punkt INNERHALB Phase 6.
 ja -- MESSEN nein.**
 **Stand:** Phasen 1-3 gelandet, Phase 4 vollzogen. **Phase 5 hat faktisch NICHT begonnen**
 (*"Null Binaries gemessen"*). Das ist die naechste autonome Strecke.
+
+---
+
+## NACHTRAG 07.08.2026 abend-31 — F1 ABSCHLIESSEND GEKLAERT · ALLE VIER REFS GLEICHAUF · PIPELINES GRUEN
+
+### F1: WO DIE ~11 TB LIEGEN -- und warum sie KEIN Aufraeum-Kandidat sind
+`/mnt/HD/HD_a2/sort` (107 Eintraege auf oberster Ebene) ist ein **privates Datenarchiv des Owners** --
+persoenliche Backups ueber viele Jahre, alte Partitionsrettungen, Familien-Datenbestaende.
+**Kein Projektmaterial.** Ich habe die Verzeichnisnamen gesehen, weil die Kapazitaetsfrage es
+verlangte, **nichts angefasst und nichts aufgelistet** -- die Namen gehoeren nicht in dieses Dokument.
+**Fuer die Diplomarbeit ist dieser Platz nicht verfuegbar, ausser der Owner entscheidet es selbst.**
+(Zwei rekursive `du`-Laeufe liefen in den Timeout -- ueber NFSv3 ist ein Archiv dieser Groesse nicht in
+Minuten vermessbar. Die Zahl ~11 T bleibt eine **Differenzrechnung** aus `df` minus dem gemessenen
+`Cluster_NFS`-Anteil, keine Direktmessung. Ehrlich benannt statt praezise behauptet.)
+
+**F1 ist damit vollstaendig beantwortet:**
+| | |
+|---|---|
+| backup1 (PR4100, prod) | 19 T / **3,6 T frei** -- davon im `Cluster_NFS`-Export nur ~3,8 T belegt |
+| grosster Projekt-Posten dort | **`gharchive` 2,6 T**, dann `github-repos-bigquery` 905 G |
+| backup2 (PR2100, dev) | 7,3 T / **6,5 T frei** |
+| **zusammen verfuegbar** | **~10,1 T** -- die genannten 16 T existieren in keinem Dokument und auf keinem Geraet |
+| der Rest von backup1 | privates Archiv, **Owner-Sache** |
+
+**=> Die 8 TB passen auf backup1 NICHT (3,6 T frei), auf backup1+backup2 zusammen schon (10,1 T) --
+aber nur, wenn die Ablage ueber BEIDE Geraete verteilt wird. Das ist der Entscheid, der beim Owner
+liegt.**
+
+### STAND BEI ABSCHLUSS DIESES ABSCHNITTS -- alle vier Refs gleichauf, alle Pipelines gruen
+| Repo | Ref | Pipeline |
+|---|---|---|
+| **ce** `development` | **`15522cdc`** | 15256 **gruen** |
+| **super** `development` | **`6d8dd432`** | 15258 gruen (15259 laeuft auf den Gitlink-Bump) |
+| **thesis** `development` | **`798e946`** | 15257 **gruen** |
+| **cluster** `development` | `cd7c64d` | -- |
+
+**Die Gitlinks sind nachgezogen** (ce 37 Commits, thesis beide Zeiger), je mit **Vorwaerts-Beweis vor
+dem Setzen** und per `update-index` statt `rev-parse` im leeren Submodul-Verzeichnis.
+
+### EINE EIGENE FEHLDIAGNOSE, GEFANGEN BEVOR SIE ALARM AUSLOESTE
+Der alte ce-Gitlink zeigte in `git submodule status` als
+`pre-delegation-sweep-20260603-1204-ga1d0c201` -- das **sah aus wie ein Juni-Stand**, und ich war
+kurz davor, einen schweren Rueckstands-Befund zu melden. **`git describe` nennt das naechstgelegene
+TAG, nicht das Commit-Datum.** `a1d0c201` ist von **heute 11:53**. Es war kein Alarm noetig, nur ein
+faelliger Bump.
+**Neue Falle fuers Register:** *ein `git describe`-Suffix ist KEINE Datumsangabe. Wer das Alter eines
+Commits wissen will, fragt `git log -1 --format=%ad`.*
