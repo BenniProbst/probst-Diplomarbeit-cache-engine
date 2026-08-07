@@ -8090,3 +8090,87 @@ honest-empty, und ein consteval-Anker (17 gemeinsam + 2 nur-Katalog + 1 nur-Komp
 bricht bei jeder kuenftigen Verschiebung. **=> Owner-Frage: welche Optimierungs-Semantik hat
 persistence_target?** Kleiner Folge-Schnitt daneben: BEFUND Abschnitt 2 traegt weitere
 Zielgroessen (T0 throughput, T6 Reklamation), bewusst noch nicht uebernommen.
+
+---
+
+## NACHTRAG 07.08.2026 mittag-7 -- EXPLORE "UNGELESENE WORKFLOWS": DER AUDIT, DER SELBST NUR ZUR HAELFTE LIEF
+
+**Owner-Auftrag:** die letzten 2 Kontexte nach vergessener Arbeit und ungelesenen Workflows
+durchsuchen. Ergebnis: **100 wf_-Verzeichnisse, 375 started, 341 result -- 34 Agenten ohne
+Ergebnis.** 90 von 100 Workflows sind in den Docs zitiert; die Gegenprobe (bekannte verwertete
+Workflows werden gefunden) greift, der Nullbefund ist also ausgeschlossen.
+
+**DER SYSTEMISCHE BEFUND:** Genau der Workflow, dessen Auftrag *"finde die vergessene Arbeit"*
+lautete (`wf_90b95e92`, 07.08. 07:17), ist **selbst zur Haelfte gestorben** -- 4 von 8 Lenses am
+Monats-Spend-Limit, nach 33-55 Toolcalls, **ohne eine einzige Textausgabe**; deren Arbeit ist
+nicht rekonstruierbar. Danach fiel er durch die Kompaktierung und wurde **nirgends zitiert**.
+
+### BEFUND 1 (KRITISCH, vom Lead am Objekt VERIFIZIERT): der Generator dreht die heutige
+### Thesis-Korrektur still zurueck -- und schreibt dabei eine FALSCHE Aussage
+`anhang/{de,en}/tabellen/le_limitierung.tex` tragen in Zeile 1:
+`% AUTO-GENERATED durch csv_to_latex::write_limitations_longtable`.
+Der Explore verortete den Generator im ce-Repo -- **das war ungenau**; er lebt in **super**:
+`Code/04_csv_to_latex/csv_to_latex.cpp:951 ff.` (vom Lead nachgemessen, ce hat 0 Fundstellen,
+Gegenprobe greift).
+
+**DIE ZWEI FASSUNGEN, woertlich gegenuebergestellt:**
+- **Generator emittiert (`csv_to_latex.cpp:985-986`):** *"Cache-Misses (Kernmetrik): L1/L2/L3 +
+  dTLB + Coherence + Energy = 0 / nicht erhoben"* / *"NullPmcSource, available=false;
+  Intel-PCM-Windows-Treiber + Linux-PAPI ausstehend"*
+- **Thesis traegt HEUTE:** *"L2 + Coherence strukturell 0; L1/L3/dTLB nur mit gesetztem
+  PMC-Schalter erhoben; Energy best-effort"* -- die Fassung, die aus der V-08-Nachmessung folgt.
+
+=> Der naechste Generatorlauf ersetzt die **richtige** Aussage durch die **falsche**. Die
+Behauptung "L1/L3 = 0 / nicht erhoben" ist seit der heutigen Nachmessung widerlegt: L1, L3
+(ehrlich LL), dTLB und RAPL-Energie werden real via `perf_event_open` erhoben; nur
+`branch_misses` nicht (Posten M-3a). **Die gerade gelandete Ehrlichkeits-Korrektur hat damit ein
+Verfallsdatum, das niemand notiert hatte.**
+=> ZU TUN (nicht gebaut, Owner-Pause): den Nachzug im Generator spiegeln -- EINE Textstelle in
+`super/Code/04_csv_to_latex/csv_to_latex.cpp`. Klein, aber ohne sie ist die Abgabe-Ehrlichkeit
+an eine Zufalls-Reihenfolge gebunden.
+
+### BEFUND 2 (HOCH): sechs STOPP-Gate-Entscheide E-A..E-F sind durch DREI Konsolidierungen gefallen
+`docs/plaene/20260806-PLAN-versionierungs-interface-stempel.md` Sec.5 fuehrt sechs Entscheide zum
+Versionierungs-Interface mit der eigenen Doktrin **"STOPP (generell): ohne Entscheid kein Byte"**:
+Hex-Laenge im Stempel-Namen · Name im Symbol? · drei Provenienz-Sidecars auf den POD? ·
+Ordner/CSV auf Stempel-Namen? · Overlay-Glied scharf? · E-F Planer-Stufe honest-empty oder
+eigenes Set? Lead-Empfehlungen liegen ausgearbeitet vor (`b/ii/b/a/b/a`).
+**Nachgeprueft: 0 echte Treffer** fuer `E-A`/`E-F` in Ledger, Gesamtdossier und beiden
+Owner-Vorlagen vom 07.08. => **blockiert den Owner-KERN F7=b vollstaendig.** Gehoert in die
+naechste Owner-Vorlage.
+
+### BEFUND 3 (MITTEL): drei stale Anker, zwei davon im Selbstwiderspruch
+- `LEDGER:5328` nennt `experiment_plan_director.hpp:1332-1333` als **Ist-Zustand**
+  ("CODE-STAND: unveraendert"). Real: `allow_failure` auf **1373**, Drift 40 Zeilen.
+- `docs/sessions/20260806-DOSSIER-regressionen-checkheft.md:1302` traegt denselben Fehler --
+  **waehrend dieselbe Datei auf :1300/:405/:543 bereits korrekt `:1373` sagt.**
+- `LEDGER:7282` behauptet "8 Treffer" fuer `measurement_tooling` in `anatomy_version_stamp.hpp`;
+  gemessen wurden **7**. Off-by-one, Substanz (R-3) unberuehrt.
+
+### BEFUND 4 (MITTEL): die "RAPL ist root-only"-Ursache wird als Tatsache fortgeschrieben
+Job 364757 (`pmc:intel`, Pipeline 15071) meldete **success trotz** `SMOKE_SKIP no PMC access`
+(1 von 5 Intel-Laeufen, ca. 20 %). Das Gesamtdossier Sec.16.7 fuehrt "RAPL ist root-only" als
+gesetzte Tatsache -- der Ursprungsbericht sagt dagegen ausdruecklich *"KEINE Probe existiert.
+UNGEPRUEFT"*. `grep 364757|intel-rapl|powercap` ueber Ledger + alle 20260807-Docs = **0 Treffer**.
+Vorschlag aus dem Bericht: eine RAPL-Probe an `.bare_metal.before_script` -- kostet ein `cat`
+im Job-Trace.
+
+### BEFUND 5 (KLEIN): 79 von 220 CMake-Zielen tot
+`tests/unit/CMakeLists.txt`: 35 namentlich + 44 schleifengeneriert. Als Zweizeiler im
+ZWISCHENSTAND gelandet, aber **nicht** in der Sec.-75-Kandidatenliste (`LEDGER:3602 ff.`) --
+die namentliche Liste existiert nur im Endbericht des Workflows. Ebenso fehlt
+`COMDARE_VARIANT_GATE` in der Aufraeumpass-Liste.
+
+### ZWEI EMPFEHLUNGEN DES WORKFLOWS SIND SACHLICH FALSCH -- NICHT AUSFUEHREN
+- *"E18-SNAP `5c4cf900` mergen"*: steht unter stehendem NICHT-LANDEN-Verdikt
+  (`docs/sessions/backups/20260806-e18-snap-welle/CODEX-VERDIKT-NB2-...`).
+- *"Gate-8 `8970465d` mergen"*: ist laengst Vorfahr von thesis `19e1592`.
+Das ist die Lehre in Reinform: **auch ein Fund-Bericht ist eine Behauptung.** Von sieben
+Empfehlungen waren zwei falsch; sie waeren ungeprueft ausgefuehrt worden.
+
+### ENTLASTUNG
+7 unreferenzierte Alt-Workflows (06.08.) gepruft: ihre Ergebnisse sind als **Commits
+materialisiert** (`0b5ed557`, `838612f3`, `bda34e79`, `d8073913`) und ueber die Branch-Bilanz
+erfasst -- nur die wf-ID fehlt als Zitat. **Kein Arbeitsverlust.** Ebenso ohne Verlust: die
+Abbrueche in `wf_664f0a48`, `wf_f4ebffd6`, `wf_50e0559b` (jeweils unmittelbar nach Start, keine
+Ausgabe; die uebrigen Agenten derselben Wellen haben geliefert).
