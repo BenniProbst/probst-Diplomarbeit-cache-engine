@@ -10043,3 +10043,87 @@ gefuehrt hat, weil die Absicht verlorenging.
 (c) Der Owner will **(i)** und nimmt den Bruch bewusst in Kauf, weil er ihn (zu Recht) fuer geuebt
     haelt.
 **Die Formulierung "wir brechen golden-CRC" spricht fuer (c).**
+
+---
+
+## NACHTRAG 07.08.2026 abend-23 — OWNER-FREIGABEN: E-A bis E-F entschieden · Overlay-Schnitt steht · NAS-Befunde
+
+### DIE ENTSCHEIDE, gebucht
+| Id | Entscheid | Herkunft |
+|---|---|---|
+| **E-A** | **SHA-256, 64 Hex** | Owner: *"wir verwenden dann bitte doch der Einfachheit wegen SHA256"* |
+| **E-B** | **(i)** -- der Emitter schreibt den Namen, **golden-CRC bricht** | Owner: *"Wir brechen golden-CRC!"* |
+| **E-C** | **mitziehen** | Owner: *"Korrekt, wir waren noch gar nicht beim bauen, also geht auch nichts verloren"* |
+| **E-D** | Ordnernamen auf den Stempel, Doppelspalte im Uebergang | Pauschalfreigabe *"wie empfohlen"* |
+| **E-E** | Konkatenation · feste Ordnung je Achsen-Kategorie · **Schnitt ueber die drei kanonischen Achsen-Ordnungen + `anatomy/`** | Owner, zwei Nachrichten |
+| **E-F** | **honest-empty** | Pauschalfreigabe; die Owner-Aussage *"Er sollte eine Versionsnummer tragen als Stempel"* bestaetigt §43.b fuer die **gerenderte Zeile** |
+| **Ω-1** | Resolver **generisch** ueber alle drei RT-Unter-Achsen (loest OD-10 **und** OD-11) | Pauschalfreigabe |
+| **Ω-2** | CSV-Spalten `core_class` **und** `core_class_source` -- **die Provenienz muss mit** | Pauschalfreigabe |
+| **Ω-3** | auf prod1 an der **L3-Achse** scharfschalten, sobald der Resolver steht | Pauschalfreigabe |
+
+**E-A, praezisiert:** SHA-256 = 64 Hex passt unter `kStemMax = 120` -- der 128-Hex-Konflikt mit dem
+Windows-MAX_PATH-Deckel ist damit weg (Vorfall 03.06.: ungekappter Stem -> **stiller**
+`ofstream`-Fehlschlag, `built=0`). **Beide Verfahren liegen bereits im Baum** (`src/sha512/ctsha512.hpp`,
+`src/sha256/ctsha.hpp`), beide compile-time-faehig. **ACHTUNG fuer den Bau: der Name ist damit KEIN
+Praefix des Fingerprints** (der bleibt SHA-512), sondern ein **eigener Hash ueber dasselbe Preimage**.
+Wer spaeter `name == fingerprint[0:64]` annimmt, irrt -- das gehoert als Kommentar an die Stelle.
+
+**E-B, ehrlich eingeordnet:** der Explore konnte die vom Owner genannte Lagerhaltungs-Begruendung
+**nicht finden** (alle vier Code-Belege zeigen: Identitaet ueber `key_sha512` aus dem **Sidecar**,
+nicht ueber die Symboltabelle). **Der Bau folgt der Owner-Setzung** -- aber der Kommentar an der
+Stelle wird sagen, dass die Begruendung eine **Setzung** ist und nicht aus dem Code folgt.
+**Entlastend:** der golden-CRC wurde am 26.07. schon einmal gebrochen, ueber ein dokumentiertes
+Verfahren mit Werkzeug und Bissprobe -- der Lead-Einwand *"kostet einen Neuanker"* war schwaecher
+als formuliert.
+
+### VIER PUNKTE, DIE DIE PAUSCHALFREIGABE NICHT TRAEGT -- weil es keine Empfehlung gab
+1. **MMX-Basisfrage** -- blosses Token oder eigene Basis (`c.x64{mmx...}`)? **Eine Aussage ueber die
+   Hardware**, keine Formfrage: x87-aliasierte Register haben keine "Breite" im Sinne der anderen
+   Basen. Sechs Zeilen sind `static_assert`-markiert. **Der falsche Schnitt stuende danach in JEDEM
+   Fingerprint-Preimage.**
+2. **Bau-Menge D-2** -- vier Kandidaten, Faktor 16. Haengt am Messumfang, nicht an einer Empfehlung.
+3. **Merge-Konfliktaufloesung (ETA)** -- geaenderte Aufloesung **oder** monotones Ordnungsfeld;
+   beides beruehrt Draht und Semantik.
+4. **Lizenzen** -- Recherche laeuft.
+**Und eine Frage, die dem Owner gehoert: darf der Lead die THESIS anfassen?** (Stolperstelle
+"achtzehn Achsen ... 2^17"; Lizenz-Tabelle.) Sie ist persoenliche Pruefungsleistung -- **ohne
+ausdrueckliches Wort wird sie nicht angefasst, auch nicht unter einer Pauschalfreigabe.**
+
+### NAS/STORAGE -- drei Befunde, die der Owner-Anweisung widersprechen
+Owner: *"Messergebnisse und Binaries koennen getrennt auch an Netzwerkziele wie
+**backup1.comdare.de** Cluster_NFS ... Bitte falle auf das **NAS PR4100** zurueck um die **8TB** zu
+speichern."*
+
+1. **Der Host-Widerspruch.** `scripts/copy_results_to_nas.sh:4` fuehrt genau diesen Host als
+   **abgeschaltet**: *"der UNC-Zielhost `\\backup1.comdare.de` ist abgeschaltet (.de -> .local)"*.
+   **Vom Lead geprueft: `.de` LOEST AUF, `.local` NICHT.** Der Skript-Kommentar stimmt also nicht
+   mehr -- **oder die Umstellung wurde zurueckgenommen.** Ungeklaert, gehoert vor jeder Ablage geklaert.
+2. **Die 8 TB sind nirgends belegt.** Die dokumentierten **6 TB** gehoeren zu einem **anderen** Ziel
+   (`prod-longhorn`-Coldstore). **Fuer backup1/PR4100 nennt kein gefundenes Dokument eine
+   Kapazitaet.**
+3. **Runner duerfen `Cluster_NFS` NIE lesen** -- nur schreiben, ueber einen Filterpod per
+   `PUT https://measure-drop.comdare.local/<ts>/<datei>`, Backend `nfsvers=3`. **Ein einfacher Mount
+   ist nicht der geplante Weg.**
+
+**Die Struktur IST geplant** -- zwei Dokumente vom **18.07.**, beide *"GATED auf User-GO"*, mit drei
+Ebenen: **A** Standard-Compiles (GitLab-Cache, bestehend) · **B** Tier-Binaeren (neuer MinIO-Bucket,
+**0 Code**) · **C** Messergebnisse (**0 Code**). **Sechs offene Entscheidungen blockieren die
+Aktivierung**, darunter ein **ungeloester Transport-Widerspruch**: Design will POSIX-Mount-Copy, die
+Infra nutzt HTTPS-PUT.
+**Und ein Widerspruch zwischen den Plaenen selbst:** der Verortungs-Brief (18.07.) plant Ebene C auf
+einer **neuen** `prod-longhorn`-NFS; die **juengere** Dual-ccache-Doktrin (01.08.) sagt *"NAS (PR4100
+Cluster_NFS) = Mess-CSV/Ergebnisse"*. **Die juengere deckt sich mit der Owner-Formulierung.**
+**"buildsystem Ordner" existiert woertlich nicht** -- nur als MinIO-**Bucket-Name**
+(`buildsystem-cache`). Der live genutzte NAS-Unterordner heisst `Cluster_NFS/cache-engine-experiment/`.
+
+**A12-Stand:** das Skript ist **deprecatet -- die METHODE (rohe UNC/SMB-Kopie), nicht das ZIEL.**
+Spaetere Dokumente referenzieren PR4100 weiterhin aktiv, ueber den CI-WRITE-Token-Weg.
+**A12/E-14 "NAS-Creds" ist heute noch offen** -- kein Erledigungsbeleg, kein Vor-Trigger-Blocker,
+aber vor der Abgabe zu klaeren.
+
+### ZUR SPEICHER-BEGRUENDUNG DES variant-VERBOTS
+Der Owner: *"Der Speicher ist kein Problem."* **Richtig -- und der Lead liest das als "kein Blocker
+fuer den Bau", NICHT als "das Verbot faellt".** Die Direktive nennt zwei weitere Gruende, die vom
+Speicher unberuehrt sind: *"Kein Runtime-Tag, kein std::visit"* und *"der Compile muss REIN sein:
+KEINE runtime->CT-Bruecken"*. **Praktisch bleibt es ohnehin gleich:** der Bau ist **ohne** Bloat, also
+256-640 GB statt 7,5 TB. **Das NAS ist Reserve, nicht Notwendigkeit.**
