@@ -8620,3 +8620,51 @@ NULLBEFUND -- und ein Nullbefund ist erst dann eine Aussage, wenn die Gegenprobe
    kennzeichnen.
 
 **=> Task #40 ist ERLEDIGT (Fehlbefund), der Rest ist Doku-Nachzug. Kein Bau, kein Owner-Entscheid.**
+
+---
+
+## NACHTRAG 07.08.2026 abend-5 — ACHT PARALLELE STRAENGE (Owner-Auftrag)
+
+Owner: *"Bitte pruefe die restlichen offenen Punkte genauso am Objekt. Bitte schau dir aus den
+Lageplaenen noch weitere parallelisierbare disjunkte Punkte an und ziehe auf bis zu 8
+Arbeitstraenge parallel hoch."* -- "genauso am Objekt" bezieht sich auf die Methode, die heute
+zweimal einen Fehlbefund aufgedeckt hat: **nicht dem Bericht glauben, die Kette selbst lesen.**
+
+| # | Strang | Beruehrte Menge | Art | Worktree |
+|---|---|---|---|---|
+| 1 | Flag-Grammatik v2 | `algo_semver.hpp` + Versions-Literale + Wachen | BAU | `wt-landung`, Branch `bau/flag-grammatik-v2-s1` |
+| 2 | allocators-Coverage-Gate | `allocators/*.profile.xml`, Parser, neue Tests | BAU | `wt-ce-allocators`, Branch `bau/allocators-coverage-gate` |
+| 3 | Trigger-/Restposten-Block | Tasks #4/#13/#14/#16/#21/#23 | PRUEFUNG | read-only |
+| 4 | PMC-Mess-Ehrlichkeit | branch_misses, L3-auf-AMD, P/E-Cores, Methoden-Befunde | PRUEFUNG | read-only |
+| 5 | Lageplan-Disponent | Ledger + alle Plaene | SICHTUNG | read-only |
+| 6 | Stale-Doku-Sweep | `docs/architektur/*.md` | BAU (Doku) | super |
+| 7 | STOPP-Gates E-A..E-F | EINE neue Vorlage-Datei | AUSARBEITUNG | super |
+| 8 | Thesis DE/EN-Drift | Thesis-Submodul | KARTIERUNG | read-only |
+
+**Disjunktheit:** die beiden ce-Bauten liegen in getrennten Worktrees; 6 und 7 schreiben in
+verschiedene super-Verzeichnisse und committen NICHT (der Lead landet); 3/4/5/8 sind rein lesend.
+Keiner der acht darf pushen oder mergen.
+
+### DIE REGEL, die JEDEM Auftrag mitgegeben wurde
+**Ein Befund der Form "X ist nicht verdrahtet / fehlt / ist nicht gebaut" ist ein NULLBEFUND** und
+wird erst zur Aussage, wenn die Gegenprobe gefahren ist: *wer inkludiert, linkt, ruft, referenziert
+X?* Dazu der konkrete Fall, an dem es heute scheiterte: der Aufruf stand in einem
+`cmake_language(DEFER DIRECTORY ... CALL <fn> <target>)` -- eine Namenssuche in `tests/` findet ihn
+nicht, und der Bericht meldete faelschlich "nur Test-Targets".
+
+**Zusaetzlich in 5 und 7:** jeder Vorschlag braucht eine **Code-Stichprobe, ob der Posten ueberhaupt
+noch offen ist**. Ein "scheinbar offen, in Wahrheit erledigt" ist so wertvoll wie ein neuer Fund --
+heute hat genau das einen ganzen Bau-Auftrag aufgeloest.
+
+**Zusaetzlich in 4:** je Befund ist zu klaeren, ob der Wert **bis in die Thesis-Tabelle durchreicht**
+(CSV -> xlsx -> LaTeX), und ob es ueberhaupt eine Wache gibt, die "nicht erhoben" von "0" trennt.
+Fehlt sie, ist jede honest-0-Zusicherung im Projekt unbelegt -- das waere der schwerste Einzelbefund.
+
+**Zusaetzlich in 6:** Heilung nach dem heute gesetzten Muster (Dossier 17): prominenter STALE-Block
+mit Ist-Tabelle, Vollzugs-Marken, Inline-Korrekturen -- **deprecaten, nie loeschen**.
+
+### WIEDERANLAUF
+Faellt der Kontext, sind die beiden Bau-Branches der Wert: `bau/flag-grammatik-v2-s1` und
+`bau/allocators-coverage-gate`. Beide sind angewiesen, auf ihrem Branch zu committen. Die
+Pruef-Straenge (3/4/5/8) hinterlassen nichts und muessen neu gefahren werden -- ihre Auftraege
+stehen oben vollstaendig genug, um sie zu rekonstruieren.
