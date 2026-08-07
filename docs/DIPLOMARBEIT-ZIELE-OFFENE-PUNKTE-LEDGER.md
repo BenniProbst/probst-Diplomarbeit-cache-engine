@@ -9617,3 +9617,85 @@ ist ein Echo, keine Bestaetigung.**
 Der Agent hat ausserdem den Beruehrungspunkt zu `e4dc0b84` **geprueft statt angenommen**
 (`git show --stat` -> nur `profile_run_entry.hpp`, kein Konflikt) und nach dem Merge des Leads
 **neu gemessen**: 419/419 auf `5788dc12`.
+
+---
+
+## NACHTRAG 07.08.2026 abend-18 — §55-RECONCILE: 43 Meldungen sind 36 Posten · A9-S1 GELANDET
+
+### A9-S1 GELANDET (ce `351205f5`) -- und der Blocker war eine Wache, die sich selbst widerspricht
+420/420, gitleaks sauber, Repo-Pack 34,6 MiB. Snapshot scharf geprunt: **libxlsxwriter 37 MB -> 1,9 MB**,
+zlib 4,3 -> 1,2 MB; **767 KB wandern ueber die Spiegel**. Lizenzen **live aus der Quelle** erhoben,
+Tags gepinnt (libxlsxwriter v1.2.4 BSD-2-Clause, zlib v1.3.2 zlib-Lizenz).
+**MPL-Frage sauber geklaert:** ein tmpfileplus-Header wird **unbedingt** inkludiert, laesst sich also
+nicht prunen -- aber `nm` findet **0 Symbole** davon im Archiv. **Am Objekt belegt statt behauptet.**
+Der Rauchtest liest die Zelle ueber die **ZIP-Zentral-Directory** zurueck, nicht ueber die lokalen
+Kopfsaetze (die tragen bei Streaming-Flag Nullgroessen -- ein naiver Leser laese still nichts).
+Mit Bissprobe: Wert verstellt -> rot, Meldung druckt das echte Blatt-XML.
+
+**DER BLOCKER:** die Diff-Hygiene-Wache verspricht im Kopf, *"nur SELBST VERFASSTEN Code"* zu
+pruefen -- implementiert war das **allein ueber die Dateiendung**. 20 Treffer, **alle im Fremdcode**
+(ein `"Cafe"` in einem Upstream-Doku-Kommentar, ein russisches Beispiel, ueberlange minizip-Zeilen).
+**Sie haette den Autor gezwungen, FREMDEN Quelltext umzuschreiben** -- was die Vendoring-Doktrin auf
+der Stufe *faithful* verbietet. Es fiel nie auf, weil die Wache am 06.08. entstand und seither kein
+Fremdcode in einem Diff lag.
+**Geheilt ueber den Marker, den das Haus ohnehin setzt** (`COMDARE-VENDOR-PROVENANCE.md`) -- **keine
+pauschale `ext/`-Ausnahme**, die haette comdare-eigene Dateien dort blind gestellt. **Und nicht
+still:** die uebersprungenen Baeume stehen namentlich im Verdikt. Beide Richtungen belegt: eigener
+Code mit Em-Dash -> **ROT**, Vendor-Datei mit Em-Dash -> gruen.
+*(Lead-Notiz: die erste Gegenprobe war falsch aufgebaut -- eine untrackte Datei zeigt `git diff`
+gar nicht. Mit einer getrackten wiederholt.)*
+**Zwei Funde ausserhalb des Auftrags:** die Lead-Ausgangslage stimmte wieder nicht (`grep xlsx` hat
+**nicht** 0 Treffer -- `lager_pfad_grammatik.hpp` existiert und traegt den Ownership-Entscheid
+*"A9 KONSUMIERT sie"*, damit ist **A9-S2 offenbar erledigt**); und **liburing steht in KEINER der
+beiden Lizenzdateien**, obwohl der Snapshot seit dem 23.07. im Baum liegt -> gehoert zu Task #42.
+
+### §55-RECONCILE -- die Zahl schrumpft, und der Ledger irrt in BEIDE Richtungen
+`docs/sessions/20260807-RECONCILE-43-positionen-disposition.md`.
+**43 Meldungen = 36 unikate Posten.** VOLLZOGEN 5 · SUPERSEDED 5 · DUPLIKAT 7 · OWNER-FRAGE 5 ·
+OFFEN 19 · NICHT ENTSCHEIDBAR 2.
+**=> 26 Posten tragen noch Arbeit**, davon **6 rein dokumentarisch (je eine Zeile)**.
+
+**SIEBEN Duplikat-Paare, nicht fuenf:** #1-#19 · #3-#26 · #6-#21 · #12-#40 · #13-#41 · #14-#36 ·
+#18-#35. **Drei fehlten in der Vortriage** -- und die `diff`-Bilanz des Audits **nennt dieselben
+sieben**. Die Vortriage hat gegen ihre eigene Quelle verloren.
+
+**ZEHN der 43 tragen eine andere Disposition als ihr Audit-Status.** Die haertesten Umschlaege:
+- **#24 (D-4 Fingerprint-Injektivitaet) ist VOLLZOGEN** -- Commit `62a5b6f7`, Code
+  `ceb_version_stamp.hpp:26-28` **plus ODR-Wache** `:179-180` (`#error`). Der Audit fuehrte ihn als
+  **WIDERSPRUCH**, seine eigene Bilanz als offene Luecke *"heilt aber nichts"*. **Am Objekt geheilt
+  UND zusaetzlich abgesichert.**
+- **#37 (T-9) und #2 (branch_misses) sind VOLLZOGEN** -- beide **nach** der Audit-Erhebung gelandet.
+- **#3 am Objekt WIDERLEGT:** *"Anhaenge B/E nur 4-Zeilen-Stubs"* ist falsch -- B = 257/256, E =
+  156/158 Zeilen (DE/EN).
+
+**DER LEDGER IRRT IN BEIDE RICHTUNGEN, belegt:** `:7885` fuehrt GN-9 als offen, obwohl das Dossier
+ihn superseded -- und `:7016` **entlastet woertlich einen xlsx-Writer, der nicht existiert**.
+**Deshalb gilt: ein Ledger-Satz ist kein Beleg.** Fuer VOLLZOGEN wurde durchgehend eine Code- oder
+Commit-Stichprobe verlangt.
+
+**NEUN Kuerzel-Kollisionen tabelliert** (A15, O-A, D-4, R-2, F3, E18-SNAP, P-1, T-n, B-1). Die
+schaerfste neue: **`P-1` bezeichnet gleichzeitig KK-5 `allow_failure` UND die 30 Review-TODOs.**
+**Die zwei A15 sind jetzt am Objekt belegt:** `:8339` fuehrt A15 FK-3/FK-4 (Fehlerklassen),
+`:7878` den §55-Reconcile.
+
+### EINE NEUE SUCHFALLE -- sie haette einen Posten faelschlich fuer gebucht erklaert
+`grep 'ESET'` = **26 Treffer** · `grep -w 'ESET'` = **0** -- alle 26 stecken in *UMGESETZT*,
+*GESETZ*, *WERTESET*, *RESET*. **Ein Zaehler ohne Wortgrenze haette #33 als erledigt gemeldet.**
+Dazu: `A12` kollidiert mit dem golden-CRC `0xF1C1F26A1232073B`.
+**Und die bekannte Klon-Falle hat wieder zugebissen:** ein **stale Thesis-Klon** (`main`=29a1700
+gegen `origin/development`=eaf7fe8) lieferte eine ueberholte Anhang-A-Fassung -- erst die Messung
+**am Ref** gab den heutigen Stand.
+
+### MESS-STAND, im Dokument fixiert
+super `c26f8a77` (Ledger 9619 Z.) · ce `5788dc12` · thesis `eaf7fe8` · prt-art `c6f07540`.
+**Alle Ledger-Zeilennummern im Reconcile beziehen sich auf den 9619-Zeilen-Stand** -- die Audit-Zeilen
+ab 7250 sind um **bis zu 1896 Zeilen** verschoben. Wer beide nebeneinander liest, muss das wissen.
+
+### WAS DER AGENT AUSDRUECKLICH NICHT GESCHAFFT HAT
+Mess-Manifest/Provenance (dritter Teil von #3, kein Suchlauf) · die Einzel-Dispositionen der
+B-6-Restliste (#20; die zitierte Quelle traegt heute **anderen Inhalt**, Datei am 07.08. 02:17
+umgeschrieben) · `COMDARE_ANHANG_FORWARD` auf Projekt 288 (#22, ohne Cluster-Zugriff nicht messbar
+-- der Ziel-Branch-Teil ist dagegen entschieden, `:7100` *"(a) development GEWAEHLT"*) · B-3 aus dem
+PMC-Paket (#9, Baugebiet belegt) · V-13..V-19 (#1) · und ehrlich: **die DEG-3-Dreifachbuchung (#16)
+ist ein Ledger-ZITAT, kein eigener Beleg** -- die Code-Luecke dagegen selbst gemessen, mit
+**11 Geschwisterdateien als Positiv-Kontrolle**.
