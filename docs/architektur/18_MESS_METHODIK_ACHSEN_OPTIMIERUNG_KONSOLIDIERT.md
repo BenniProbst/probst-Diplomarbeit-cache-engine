@@ -2,6 +2,49 @@
 
 > **Status:** Planungs-Dossier (2026-07-09). Konsolidiert die umfangreiche Planung + die Lehren aus zwei adversarial-revertierten Umsetzungen (Phase 1 #230, Phase 2 #221) dieser Session. **Erweitert Dossier 17** (E4-XML-Roadmap) um die vom User geklärte Mess-Methodik + Architektur. Baut auf Dossier 16 (E1-E4-Konsolidierung). Belege `datei:zeile`; Wurzeln: super = `probst-diplomarbeit-cache-engine`, ce = `super/Code/external/comdare-cache-engine`, mod = `Modules/comdare-measurement-all`, LEDGER = `super/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md`.
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: BELEGSTELLEN VERALTET, VIER PLANPOSTEN SIND GEBAUT
+>
+> **Die Methodik (honest-0 vor Phantom, Min/Max-Semantik, Mess-Kategorien-Denken) gilt weiter.
+> Die Zahlen, die T-Indizes und der Fortschritts-Stand nicht.** Wer dieses Dossier heute als
+> Aufgabenliste liest, plant mehrfach Gebautes erneut. Belege gegen ce `ba069e38` (identisch in
+> `ab0b352e`).
+>
+> ### Die harten Anker
+>
+> | Aussage im Dossier | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|
+> | `:104` TABU „**ABI-MAJOR (==4)**" | **8** (Minor 0) | `abi/anatomy_module_abi_v1_decl.hpp:89`, `:90` |
+> | `:104` TABU „POD-`sizeof`" (1416 gemeint) | **1344** | `anatomy/observable_tier.hpp:168` |
+> | `:23` „Anzahl **~19 (T0-T18)**" | **18** (T0..T17) | `anatomy/composition_factory.hpp:104` |
+> | `:116` „**T11 value_handle**" | value_handle ist **L10**; L11 ist `index_organization` | `profile_facade/source_catalog.hpp:104-107` |
+> | `:119` „**14 honest-0-Achsen** … T0, T2 … **T18**" | **Als Index-Liste unbrauchbar.** T18 existiert nicht; telemetry (ex-T10) und isa sind keine Kompositions-Achsen mehr, alle Indizes darueber sind verschoben | `source_catalog.hpp:94-118` |
+> | `:114` „`ComdareResourceControlV1`, **5 Felder**" | **6 Member** = 5 Achsen-Felder + `controllable_axis_count` (Meta). Als „5 steuerbare Achsen" weiterhin richtig | `anatomy/resource_controllable_tier.hpp:34-41` |
+>
+> ### Vollzugs-Marken (am Objekt geprueft 07.08.)
+>
+> - `:82` Roadmap-Zeile „**M1 System-Achsen-Wurzel (Blut)** — gemeinsame abstrakte Basis" und `:30`
+>   „das System-Achsen-System liegt nur **fragmentiert** vor, ohne gemeinsame abstrakte Wurzel"
+>   — **GEBAUT.** Wurzel, Regime-Trennung und Registry existieren:
+>   `include/cache_engine/measurement/system_axis.hpp`, `.../i_measurement_source.hpp`,
+>   `.../measurement_axis_registry.hpp`; dazu der Generator `tools/system_axis_registry_gen/`.
+> - `:116` „**#221-Rest (Setter fehlen = Phantom):** T6 allocator, T8 concurrency, T1 cache_traversal,
+>   T11 value_handle" und `:131` „2' (#221 ehrlich neu) = genau T6/T8/T1/T11 verdrahten"
+>   — **VOLLZOGEN.** Alle vier sind verdrahtet: `anatomy/abi_adapter.hpp:473-496`;
+>   `batch_size` als Fenster-Semantik `:1392-1401`.
+> - `:115` „T7 prefetch — **einzig vollstaendig verdrahtet**" — **nicht mehr „einzig"**; vier weitere
+>   Felder sind verdrahtet, `thread_count` mit ausgewiesener honest-0-Grenze (`abi_adapter.hpp:467-473`).
+>
+> **Weiterhin korrekt (nicht anfassen):** `:143` die golden-320-Herleitung 4x4x5x4 = 320
+> (`profile_facade/source_catalog.hpp:144` + `static_assert :172`) · `:122` die
+> `cacheline_policy_selector`-Ableitung samt honest-0-Aussage
+> (`builder/cacheline_policy/cacheline_policy_selector.hpp:67`, `:172-173`) · `:105` das Prinzip
+> „honest-0 > Phantom" — im Code weiterhin gelebt und ausdruecklich dokumentiert · die Zahl **16**
+> der Mess-Kategorien.
+>
+> ---
+
 ## 0. ZWECK & LEITSATZ
 
 Diese Session hat **umfassend geplant, aber implementativ nichts persistiert** — beide Umsetzungsversuche (die `run_profile`-Fassade und die RC-Achsen-Verdrahtung) wurden nach max-Effort-code-reviews sauber revertiert, weil sie reale Fehler enthielten, die lokale Tests + Zeile-für-Zeile-Review übersahen. **Der bleibende Wert ist die Erkenntnis.** Dieses Dossier gießt sie in die belastbare, korrigierte Plangrundlage.

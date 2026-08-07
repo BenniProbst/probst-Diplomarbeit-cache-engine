@@ -2,6 +2,63 @@
 
 > **Status:** Planungs-Dossier (2026-07-09, abends). Setzt die **User-Direktive 09.07.** um: *„Wir möchten jede dieser Schichten mit sauberen Interfaces nacheinander separat fertigstellen und getrennt testen können. Das System ist für multiple Ebenen gleichzeitig zu groß."* Re-etabliert die ORIGIN-Direktive vom 28.06. (top-down ab E4, E0 zuletzt — ce `docs/sessions/20260628-KONTEXT-DOSSIER-…A2welle.md §16`; Vier-Ebenen-Definition ebd. `§13`; super `20260628-SESSION-ENDE-9-…md`). **Erweitert Dossier 18** (Mess-Methodik) um die Schicht-Sequenzierung; präzisiert die Reihenfolgen aus Dossier 17 Teil D und Dossier 18 Teil C. Wurzeln wie in Dossier 16-18; LEDGER = `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md` (663 Z., Voll-Read Codex + eigene Detail-Lektüre 09.07. abends).
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DIE E3-/E1-SCHICHT IST WEITER, ALS DIESES DOSSIER SIE FUEHRT
+>
+> **Die Schicht-Doktrin (Interface-Vertraege, getrennte Testbarkeit, top-down ab E4) gilt weiter.
+> Der Fortschritts-Stand nicht.** Dieses Dossier fuehrt als offen, was seither gebaut wurde — es ist
+> damit derselbe Fehlbefund-Traeger wie Dossier 17. Belege gegen ce `ba069e38` (identisch in
+> `ab0b352e`).
+>
+> ### Die harten Anker
+>
+> | Aussage im Dossier | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|
+> | `:20` „`kV3AxisSchema` (`axis_stats[**19**][8]`+seg_ns+Meta, **ABI-Major 4**)" | `axis_stats[**18**][8]` + `seg_ns[18]`; ABI-Major **8** | `anatomy/observable_tier.hpp:50`, `:141`; `abi/anatomy_module_abi_v1_decl.hpp:89` |
+> | `:21` „`ObserverAggregate<**19**>`" | **`<18>`** | `observable_tier.hpp:50` |
+> | `:17` „traegt **19** `permute_axes`" | **18** Achsen (T0..T17) | `anatomy/composition_factory.hpp:104` |
+>
+> ### Vollzugs-Marken (am Objekt geprueft 07.08.) — vier als offen gefuehrte Posten sind gebaut
+>
+> - `:19` „**Tier-Seite konsumiert nur `prefetch_distance`** (T7); **4 Felder = Phantom**"
+>   — **VOLLZOGEN.** Alle fuenf RC-Felder werden appliziert: `anatomy/abi_adapter.hpp:462-496`.
+>   `thread_count` ist ausgewiesen honest-0 (`:467-473`), nicht Phantom.
+> - `:17` „`runtime_dynamic` (**nur thread_count/hw_prefetcher**); **4 RC-POD-Felder ohne XML-Eingang**"
+>   — **VOLLZOGEN.** `build_axis_levels` emittiert heute alle RC-Dimensionen als dynamische Ebenen:
+>   `builder/experiment_tree/profile_to_tree.hpp:127-140`, Wiederholungs-Achse `:141-148`.
+> - `:18` „aber **Limits hartkodiert** (`source_catalog.hpp:83-116` `CatalogAxes<4,4,5,4>`=320)" und
+>   `:30` E3-DoD (2) „Limits-Entkopplung" — **VOLLZOGEN und haerter gebaut als geplant.** Der
+>   materialisierte Katalog entsteht per Codegen aus der XML (`cmake/catalog_codegen.cmake`);
+>   `CatalogAxes` ist ueber 18 Parameter K00..K17 parametrisiert
+>   (`profile_facade/source_catalog.hpp:94-118`); `golden_320_catalog` ist nur noch ein benannter,
+>   messdaten-erhaltender Alias (`:144`). Darueber hinaus sichert der GN-2/§26.6-Guard die
+>   Entkopplung **compile-time** ab: `kMaxMaterializableCatalogCardinality = 4096` (`:205`), zwei
+>   `static_assert`s schliessen die 2^17-Vollform aus (`:209`, `:211`).
+> - `:21` „`SystemAxis`/`IMeasurementSource` … heute fragmentiert, **Wurzel fehlt**; = Aufgabe M1"
+>   — **GEBAUT.** `include/cache_engine/measurement/system_axis.hpp`, `.../i_measurement_source.hpp`,
+>   `.../measurement_axis_registry.hpp`.
+> - `:21` „`MeasurementCategory` (16, **isoliert**)" — die **Zahl 16 stimmt**, das Attribut „isoliert"
+>   nicht mehr: die Kategorien haengen an der Wurzel und an einer compile-time-Registry.
+>
+> ### Zeilen-Drift in den Belegen (Inhalt vorhanden, Nummer wandert)
+>
+> `:17` `parse_thesis_profile` steht heute bei `libs/common/serialization/xml_config_parser/xml_config_parser.cpp:272`
+> (nicht `:199-296`) · `:17` `build_axis_levels` bei `profile_to_tree.hpp:39` · `:18`
+> `BuildOrchestrator::provision_all` bei `build_orchestrator.hpp:476`/`:483` (nicht `:171-349`) ·
+> `:19` der apply-Block bei `abi_adapter.hpp:447-496`.
+>
+> **Ungeprueft:** alle `*.tex`-Anker (`:32`, `:9`) — das thesis-Submodul ist in diesem Arbeitsbaum
+> nicht ausgecheckt. Ebenso `:20` `generate_wide_appendix.ps1`: im super- und ce-Baum null Treffer,
+> aber wegen des leeren Submoduls **kein belastbarer Nullbefund**. Siehe dazu die Vollzugs-Marke in
+> Dossier 22, wo der .ps1-Nullbefund fuer den super-Baum belegt ist.
+>
+> **Weiterhin korrekt:** `:19` POD `ComdareResourceControlV1` und die Methodennamen
+> `tier_query_resource_caps` / `tier_apply_resource_control` (`abi_adapter.hpp:437`, `:447`) ·
+> `:20` die Werkzeuge `04_csv_to_latex` / `05_diagram_generator` (super `Code/`) · `:32` PMC-honest-0.
+>
+> ---
+
 ## 0. ZWECK & BEGRÜNDUNG
 
 Beide 09.07.-Reverts (Phase 1 `#230`, Phase 2 `#221`) hatten dieselbe Fehlerklasse: **Increments, die mehrere E-Ebenen gleichzeitig berührten**, scheiterten an Wechselwirkungen, die weder lokale Tests noch Zeile-für-Zeile-Review sahen (super-Sub-Build-Linkage; Mess-Bugs, die erst zur #156-Laufzeit manifestieren). Die Konsequenz (User): **eine Schicht nach der anderen fertigstellen** — jede mit (a) explizit eingefrorenem Interface-Vertrag zur Nachbar-Ebene, (b) eigenem Test-Harness, der die Nachbar-Ebene durch Fakes ersetzt (Contract-Tests), (c) eigener Definition-of-Done. Damit wird jede Ebene **einzeln abnehmbar**, bevor die nächste beginnt.

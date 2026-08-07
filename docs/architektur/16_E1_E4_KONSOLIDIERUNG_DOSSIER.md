@@ -2,6 +2,63 @@
 
 > **Status:** GENEHMIGT 2026-07-09 (User). Autoritative E1–E4-Konsolidierungs-Doku + Umsetzungs-Roadmap. Konsolidiert 5 Analyse-Läufe (2 ultracode-Workflows + Memory-Kartierung + 3 Explore-Kartierungen + TODO-Audit), Backups super `844d3f8`/`51b4d45`/`f92e7d9`/`157a3d6`/`a219605`/`33c89d4`. Alle Belege `datei:zeile`; Wurzeln: **super** = `probst-diplomarbeit-cache-engine`, **ce** = `super/Code/external/comdare-cache-engine`, **mod** = `Modules/comdare-measurement-all`, **LEDGER** = `super/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md`.
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DIE BELEGSTELLEN DIESES DOSSIERS SIND VERALTET
+>
+> **Der Inhalt (E1-E4-Ebenen-Modell, Bruch-Analyse, Ebenen-Doktrin) gilt weiter. Die Zahlen, die
+> ABI-Angaben und der Fortschritts-Stand nicht.** Dieses Dossier traegt dieselbe Krankheit wie
+> Dossier 17, das am 07.08. nachweislich einen Pruef-Agenten in einen Fehlbefund gefuehrt hat.
+> **Wer hier liest, muss den Ist-Stand zuerst am Code pruefen.** Belege unten gegen ce `ba069e38`
+> erhoben (identisch in `ab0b352e`).
+>
+> ### Die harten Anker
+>
+> | Aussage im Dossier | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|
+> | `:189` TABU „**ABI-MAJOR==4**" | **8** (Minor 0) | `abi/anatomy_module_abi_v1_decl.hpp:89`, `:90` |
+> | `:189` TABU „POD `sizeof==1416`" | **1344** | `anatomy/observable_tier.hpp:168` (`static_assert`) |
+> | `:69` „`kV3AxisSchema` = `axis_stats[19][8]+seg_ns[19]`, **ABI-Major 3**" | `axis_stats[**18**][8]` + `seg_ns[18]`; ABI-Major **8** | `observable_tier.hpp:50` (`kV3AxisCount = 18`), `:168` |
+> | `:271` [R9] „additiv auf **ABI-Major 4** nachziehen" | **Die Korrektur ist selbst veraltet.** Wer ihr folgt, landet vier Majors daneben | `anatomy_module_abi_v1_decl.hpp:89` |
+> | `:32` „**19 named using-Slots**, `static_assert sizeof...==19`" | **18** (T0..T17) | `anatomy/composition_factory.hpp:104` |
+> | `:28` Genus-Slots „**19 / 15 / 11 / 13 / 7**" (SA/Set/Sequence/Adapter/View) | **18 / 13 / 9 / 11 / 5** | `builder/experiment_tree/genus_binding_traits.hpp:48`, `:102`, `:132`, `:74`, `:160` |
+> | `:55` „`COMDARE_DEFINE_ANATOMY_MODULE_ADHOC(<19 FQ>)`" | **18** FQ-Achsen | `composition_factory.hpp:104` |
+> | `:158` Beleg `config_b_cache_engine_perms.xml` | **umgezogen** nach `Code/experiment_config/deprecated/` | dort |
+>
+> **Warum die 19 ueberall steht und heute 18 richtig ist:** die Kette lautet 19 → 18 (INC-2c, telemetry
+> raus) → 17 (INC-2d, isa raus) → **18** (STRUKT-R ORG-18, `persistence_target` rein). Die 18 steht also
+> zweimal mit **verschiedenem** Achsen-Satz. Der Code warnt selbst davor: `observable_tier.hpp:166-167`.
+>
+> ### Vollzugs-Marken (am Objekt geprueft 07.08.)
+>
+> - `:137` „**#221** nur 1/5 RC-Achsen laufzeit-konsumiert, 4 Setter fehlen" — **VOLLZOGEN.** Alle fuenf
+>   RC-Felder werden appliziert (`anatomy/abi_adapter.hpp:462-496`). `thread_count` wird gesetzt, aber
+>   bewusst nicht als konsumiert gezaehlt (honest-0, `:467-473`) — das ist Absicht, kein Rest.
+> - `:76` „`search_organ_`-Monolith beschattet node_type/memory_layout — **der eine echte
+>   Architektur-Defekt**" — **GETILGT.** Nur noch fuenf erklaerende Kommentare („ist entfallen"),
+>   keine lebende Deklaration: `axes/lookup/composable/store_traversable_search_algo.hpp:19-25`.
+>   (Teil C `:137` desselben Dokuments sagt das bereits — Teil A.5 widerspricht sich also selbst.)
+> - `:7`, `:148` „`workload_matrix.hpp:105` = 36 Zellen compile-time in der Library" — **ENTFERNT.**
+>   Der G2-Revert ist vollzogen; `workload_matrix` hat im ce **null** Treffer. Der Fehlbau, um den
+>   Teil D kreist, existiert nicht mehr.
+> - `:160` „`main.cpp:483` hartkodiert `YcsbWorkload::C`" — **XML gewinnt.** Der Messreihen-Pfad liest
+>   `spec.workload.value_or(...)` (super `Code/02_messung_driver/main.cpp:1410`). Als Vorgabe je
+>   Messreihen-Art besteht die Konstante fort (`:177`, `:182`) — das ist Fallback, keine Hartkodierung.
+>
+> ### Pfad-Warnung zur Wurzel-Definition
+>
+> `:3` definiert **ce** = `super/Code/external/comdare-cache-engine`. Dieser Checkout steht
+> regelmaessig auf einem **anderen Commit** als der Entwicklungsstand. Wer die `datei:zeile`-Belege
+> dort nachschlaegt, misst gegen den falschen Stand. Massgeblich ist der ce-Arbeitsbaum auf
+> `development`.
+>
+> **Weiterhin korrekt (nicht anfassen):** die Literalzahl `137.594.142.720.000`
+> (`axes/mapping/axis_03m_mapping_registry.hpp:21`) · `ComdareMeasurementSnapshotV1` 16+6 Spalten
+> (`builder/measurement_snapshot.hpp:34-66`) · `m3v2_study.profile.xml:127-131` samt der Aussage
+> „`<datasets>` fehlt" · `golden_320` = 320 · `tests/unit/thesis_tiere/` besteht fort (30 Dateien).
+>
+> ---
+
 ## 0. Zweck & Auslöser
 
 Die Diplomarbeit ist ein Experiment-System, dessen compile-time-Permutationsraum **137.594.142.720.000 Tier-Binaries** umfasst (`CE/34:61-62`, nie materialisiert, C1060) — gefahren über eine **vierstufige Experiment-Maschinerie E1–E4** (28.06. etabliert, code-verankert). Diese Maschinerie ging in einem **datierten Wissensverlust (Bruch 02.–03.07.)** aus dem aktiven Vokabular verloren; seither wurde ohne die Ebenen-Linse weitergearbeitet. Symptom und Anlass: **#31 (Mess-Frameworks × Workloads) wurde als tote compile-time-Insel in der cache-engine (E2) gebaut**, obwohl es E4-XML-Definition ist — der Autor benennt es selbst E1/E4, materialisiert es aber E2 (`workload_matrix.hpp:10-11,19` vs. `:105`). Der Korrektur-Plan F7-Doc-15 (08.07.) empfahl denselben Fehler erneut.

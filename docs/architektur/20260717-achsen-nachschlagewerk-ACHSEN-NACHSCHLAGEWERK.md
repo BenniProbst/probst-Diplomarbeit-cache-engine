@@ -1,5 +1,95 @@
 # ACHSEN-NACHSCHLAGEWERK — CacheEngine (Stand nach INC-2c)
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DIESES NACHSCHLAGEWERK STEHT DREI ABI-MAJORS ZURUECK
+>
+> **Struktur und Systematik (fuenf orthogonale Dimensionen, binary_id-Disziplin, honest-0) gelten
+> weiter. Die Zahlen nicht.** Dieses Dokument ist ein **Nachschlagewerk** — die Gefahr ist deshalb
+> besonders gross: wer hier eine Slot-Nummer oder eine ABI-Zahl abliest, uebernimmt einen Stand vom
+> 17.07. Der INC-2d-Nachtrag (`20260719-achsen-nachschlagewerk-INC2D-DELTA-NACHTRAG.md`) hebt
+> **nicht** weit genug: auch er ist inzwischen zwei Majors alt. **Beide zusammen ergeben nicht den
+> Ist-Stand.** Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> ### Die Kopf-Zeile `:7` Wort fuer Wort
+>
+> | Angabe im Kopf | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|
+> | „Organ-Achsen **19 → 18**" | **18** — aber mit **anderem Achsen-Satz**: ohne `isa`, dafuer mit `persistence_target` | `builder/experiment_tree/axis_path_serialization.hpp:40` |
+> | „ABI-Major **4 → 5**" | **8** (Minor 0) | `abi/anatomy_module_abi_v1_decl.hpp:89`, `:90` |
+> | „Observer-POD-Version **5 → 6**" | **8** | `anatomy/observable_tier.hpp:174` |
+> | „`sizeof` **1416 → 1344**" | **1344** — Zahl stimmt, **Begruendung nicht**: heute 18 Achsen inkl. `persistence_target`, nicht inkl. `isa` | `observable_tier.hpp:168`, Warnung `:166-167` |
+> | „golden-Roundtrip **== 320 intakt**" | **weiterhin korrekt** | `profile_facade/source_catalog.hpp:144`, `static_assert :172` |
+>
+> **DIE ZENTRALE FALLE — die 18 steht zweimal mit verschiedenem Inhalt.** Die Kette lautet
+> 19 → 18 (INC-2c, telemetry raus) → 17 (INC-2d, isa raus) → **18** (STRUKT-R ORG-18,
+> `persistence_target` rein). Die Falle `(B)` in `:319` („19 → 18, haeufigste Stale-Falle") ist damit
+> **verschaerft**, nicht entschaerft. Der Code warnt selbst: `observable_tier.hpp:166-167` —
+> *„1344 gab es schon einmal (INC-2c, 18 Achsen INKLUSIVE isa) — gleiche Groesse, anderer
+> Achsen-Satz; die Unterscheidung leistet ausschliesslich der Major."*
+>
+> ### Die Slot-Tabelle §2 ab `:104` ist verschoben — T11 aufwaerts stimmt keine Nummer mehr
+>
+> `:93-103` (T0 search_algo bis T10 value_handle) sind **unveraendert korrekt**. Ab `:104` gilt:
+>
+> | Zeile | steht im Dossier | Ist heute |
+> |---|---|---|
+> | `:104` | T11 = **isa** | **isa ist kein Organ-Slot mehr** (INC-2d); T11 = `index_organization` |
+> | `:105` | T12 index_organization | **T11** |
+> | `:106` | T13 io_dispatch | **T12** |
+> | `:107` | T14 migration_policy | **T13** |
+> | `:108` | T15 filter | **T14** |
+> | `:109` | T16 queuing_q1 | **T15** (Auspraegungszahl 15 stimmt) |
+> | `:110` | T17 queuing_q2 | **T16** (Auspraegungszahl 5 stimmt) |
+> | — | *fehlt vollstaendig* | **T17 `persistence_target`** — die 18. Organ-Haupt-Achse, gepinnt auf `persistence_memory_only` |
+>
+> Massgeblich: `builder/experiment_tree/axis_path_serialization.hpp:40-43` und
+> `profile_facade/source_catalog.hpp:95-120`.
+>
+> ### Genus-Slot-Counts §3
+>
+> `:136-140` fuehrt SearchAlgorithm 18 / Adapter 12 / Set 14 / Sequence 10 / View 6.
+> Ist: **18 / 11 / 13 / 9 / 5** — `builder/experiment_tree/genus_binding_traits.hpp:48`, `:74`,
+> `:102`, `:132`, `:160`. Nur die SearchAlgorithm-18 stimmt (zufaellig wieder, nach 18→17→18).
+> **Die Warnung `:142` ueber stale `k*SlotCount`-Konstanten ist ueberholt** — Set, Sequence und View
+> sind nachgezogen (`set_composition.hpp:62` = 13, `sequence_composition.hpp:69` = 9,
+> `view_composition.hpp:77` = 5). Nur Adapter = 13 besteht als **bewusst** eingefrorener
+> Legacy-Count fort (`adapter_anatomy.hpp:200`).
+>
+> ### Weitere Einzelkorrekturen
+>
+> - `:265` „`FullSourceCatalog = CatalogAxes<4,4,5,4> = 320`" — **`FullSourceCatalog` = 2^17 =
+>   131.072** (`source_catalog.hpp:139`). Die 320er-Semantik heisst heute **`golden_320_catalog`**
+>   (`:144`).
+> - `:273` „die uebrigen **14** Slots gepinnt … **isa=isa_amd64**" — **13** gepinnte von 18;
+>   `isa` entfaellt, dafuer `persistence_target=persistence_memory_only`.
+> - `:297` „OFFENE AUDIT-AUFLAGE: `build_system_axis_levels()` hat repo-weit **KEINEN Aufrufer**"
+>   — **ueberholt.** Aufrufer ist `build_all_axis_levels()`
+>   (`builder/experiment_tree/registry_to_axis_levels.hpp:182`).
+> - `:336` „(I) `all_axes_binary_count()`" — Funktion **umbenannt** zu `all_axes_matrix_count()`
+>   (`registry_to_axis_levels.hpp:191`). Der Befund selbst besteht fort: telemetry und isa sind
+>   weiter im Produkt.
+> - `:309` „axes26 (Registry-Reflexion) **26**" — **27** Aliasse; `T26_persistence_target` kam dazu
+>   (`registry_to_axis_levels.hpp:47-82`). Der Namensraum heisst weiter `axes26`.
+> - `:10` **ce-Wurzel**: der genannte absolute Pfad gilt in dieser Umgebung nicht mehr als
+>   Bezugswurzel. Alle `quelle`-Pfade sind gegen `libs/cache_engine/` zu lesen; mehrere Header sind
+>   nach `libs/cache_engine/include/cache_engine/measurement/` umgezogen (u.a. `system_axis.hpp`,
+>   `compiler_system_axis.hpp`, `measurement_category.hpp`). `measurement_snapshot.hpp` liegt
+>   abweichend unter `libs/cache_engine/builder/`.
+>
+> **Weiterhin korrekt (nicht anfassen):** Mess-Kategorien = **16** samt Zeilenanker
+> `measurement_category.hpp:32` · `kV3FieldCount` = **8** (`observable_tier.hpp:53`) ·
+> T0..T10 der Slot-Tabelle · queuing_q1 = 15 / queuing_q2 = 5 Auspraegungen · telemetry ohne Slot ·
+> golden-320 = 320 · die Pfade `topics/axis.hpp`, `anatomy/anatomy_base.hpp`,
+> `algorithm_profiles/permutation_axes.xml`.
+>
+> **Ungeprueft:** die Strategien-Summe „**127** Strategien" (`:126`) — nicht nachgezaehlt; die
+> Registry-Header tragen die `AllStrategies`-Aliasse heute nicht mehr unter diesem Namen. Ebenso die
+> System-Konfig-Zahl „6" (`:19`, `:286`, `:308`) — siehe dazu die im Dossier 23 belegte Zahl **drei**
+> System-Haupt-Achsen (`abi/system_axis_order.hpp:37`).
+>
+> ---
+
 ## (0) Kopf
 
 **Zweck.** Konsolidiertes Übersichts-Nachschlagewerk *aller* Achsen des CacheEngine-Systems über die fünf orthogonalen Dimensionen (System-Konfig · Organ/Komposition · Gattung/Genus · Messung · Compile-/Registry-XML). Synthese aus 172 kartierten Achsen-Einträgen. Referenz gegen Überblicksverlust — jede Zeile mit Quelle.

@@ -8962,3 +8962,89 @@ bestaetigt das selbst, `:8161-8162`).
 durch das bvset-Fingerprint-Glied (`anatomy_fingerprint.hpp:299-306`) **funktional obsolet**, die
 tote Env-Var aber **nicht entfernt**. Das deckt sich mit Restposten (2) -- derselbe Posten von zwei
 Seiten.
+
+---
+
+## NACHTRAG 07.08.2026 abend-10 — ALLOCATORS GELANDET · STOPP-GATES-VORLAGE FERTIG (Plangrundlage ueberholt)
+
+### ce `5adf59ea` GELANDET -- das Abdeckungs-Gate, mit sieben Bissproben
+Merge `bau/allocators-coverage-gate` -> `development`, gitleaks ueber den **gemergten** Stand sauber.
+- **Sieben Bisse, alle rot, alle zurueckgebaut:** Akte versteckt (3 Fehler) · Akte beschaedigt ·
+  README-Zahl zurueckgedreht · README-Zeile geloescht · README-Ueberschrift umformuliert ·
+  Adapter-Verzeichnis entfernt · ALLE Akten weg (*"NENNER: 0 ... jede weitere Pruefung waere
+  vakuum-wahr"*).
+- **BISS B DECKTE EINE FALSCHAUSSAGE IM EIGENEN KOMMENTAR AUF:** der KF-1-Reader ist
+  **fehlertolerant, nicht validierend** -- eine abgeschnittene Datei zaehlt weiter als "sauber
+  geparst" (PARSE-QUOTE blieb 23/23). Rot wird das Gate ueber die **Pflichtfeld**-Pruefung
+  (`expected_workload` leer). Die Wohlgeformtheits-Zusage der ersten Kommentarfassung wurde
+  zurueckgenommen. *"Ohne die Bissprobe waere die Falschaussage im Repo gelandet."*
+- **Der Agent meldete einen eigenen Verfahrensfehler:** `git checkout -- README.md` als Rueckweg,
+  waehrend die README-Aenderung noch **uncommittet** war -> der Rueckbau loeschte sie mit, zwei
+  Bisse liefen gegen die ALTE Fassung und **sahen wie Erfolge aus**. Erst committen, dann bissen.
+
+### DREI MENGEN -- die alte README verwechselte zwei
+`23` Doku-Akten · `10` implementierte (Adapter-Skelett unter `adapters/`, **exakt die zehn der
+Thesis-Tabelle**: A01 A03 A04 A05 A06 A07 A08 A10 A11 A20) · `13` reine Doku.
+**Die alte "Mitglieder (10)" war NICHT falsch** -- sie benannte die **mittlere** Menge, las sich aber
+wie die erste, und die 13 kamen gar nicht vor. **Damit ist auch das Thesis-Wort "die zehn
+LAUFFAEHIGEN" sachlich gedeckt.**
+
+### OFFEN FUER DEN OWNER -- drei Lizenz-Abweichungen Thesis <-> Akte
+Vom Lead in den Akten selbst nachgelesen:
+| Profil | Akte (`<license>`) | Thesis-Tabelle |
+|---|---|---|
+| `michael_lockfree` | **LGPL-2.1-or-later** | BSD-3 |
+| `tcmalloc` | **Apache-2.0** | BSD-3 |
+| `lrmalloc` | **MIT** | BSD-3 |
+`PAPER_REFERENCES.md` nennt fuer `michael_lockfree` noch eine dritte Angabe (MIT). **Das Gate faengt
+das nicht** -- die Thesis liegt in einem anderen Repo -- und **sagt das in seinem Selbstcheck auch**.
+Bei einer Diplomarbeit mit gedruckter Lizenz-Tabelle ist das nichts, was still korrigiert wird.
+**Nebenbefund:** `ext/A05-jemalloc` ist eine **getrackte Dublette** zu `ext/allocator/A05-jemalloc`.
+
+### STOPP-GATES E-A..E-F: Vorlage fertig (537 Z.), ALLE SECHS OFFEN
+`docs/sessions/20260807-OWNER-VORLAGE-stopp-gates-E-A-bis-E-F.md`. Keiner hat sich selbst
+beantwortet (Gegenprobe: 2 Treffer auf die geplanten Symbole, beide unbeteiligt; keine der beiden
+geplanten Dateien existiert).
+
+**DER EIGENTLICHE FUND: DIE PLANGRUNDLAGE IST UEBERHOLT.** Der Plan rechnet durchgehend mit
+**"Format 3, 8 Glieder"** und dem Frozen-Vektor `17148e5a`. **`development` traegt Format 4, 9
+Glieder** -- vom Lead verifiziert: `anatomy_fingerprint.hpp:106` = `"fingerprint_format=4"`, und
+`MessGatesGlied` (`:369`) ist das neunte. `17148e5a` steht nur noch als Vorgaenger-Kommentar.
+**Konkrete Folge:** der POD-Entwurf (Plan Sec. 3.1) kennt nur **acht** Kategorien -- die dort
+vorgesehene Wache `static_assert(kStampKategorieCount == kAnatomyFingerprintGliedCount)` wuerde in
+Entwurfsform **NICHT KOMPILIEREN** (8 != 9).
+
+**Empfehlung geaendert: `b / ii / b / a / b / a` -> `b / ii / a / a / a / a`.** Zwei Buchstaben
+kippen, **beide weil eine Kostenannahme des Plans am Code widerlegt ist:**
+- **E-C entlastet:** der Plan begruendet (b) mit "Flotten-Neubau, weil `dll_is_current` mismatcht".
+  `dll_is_current` (`build_orchestrator.hpp:331-338`) liest heute **ausschliesslich** das
+  `.fingerprint`; `:307-309` sagt woertlich, die drei Sidecars *"entscheiden aber ueber KEINEN Skip
+  mehr"* (A2-Eichung 05.08.). **Das Invalidierungs-Ereignis, das gebuendelt werden sollte, gibt es
+  nicht mehr.** Der Plan weiss das in Sec. 4b selbst und widerspricht sich in S6.
+- **E-E verbilligt:** der Grund fuer (b) war *"kostet den Anker"*. Der Anker ist im laufenden Fenster
+  durch R-3 **bereits gedreht**. Empfehlung: jetzt beantworten, Scharfschaltung in **dasselbe
+  Fenster wie die Flag-Grammatik v2**, wo die Invalidierung ohnehin gewollt ist.
+
+**TEUERSTER AUFSCHUB: E-E, mit Abstand.** Es ist der **einzige** der sechs im Fenster 0.
+**Fenster 0 selbst nachgemessen (Lead, 07.08.):** `find ... -name "*.fingerprint"` = **0** in beiden
+Worktrees. Heute kostet der Dreh **null**; nach dem ersten Batch ~34,4 h Voll-Neubau plus
+Entwertung aller Messdaten.
+
+**E-E ist groesser als (a)/(b):** `anatomy_fingerprint.hpp:120-123` benennt **drei Unterfragen**, die
+der Plan nicht nennt -- Verzeichnis-Schnitt, Sortier-Ordnung, Hash je Datei vs. Konkatenation.
+**Ohne sie ist E-E auch bei "ja" nicht baubar.**
+
+**E-F kollidiert mit einer bestehenden Direktive:** `planner/planner_version.hpp:4-7` zitiert
+Section43.b -- der Planer traegt *"KEINE Achsen-Arrays, nur die Selbst-Version X.Y.Z + ISA/OS"*.
+Empfehlung (a) honest-empty braucht die Owner-Bestaetigung, dass Section43.b fuer die **gerenderte
+Zeile** gilt.
+
+**ZWEI HINWEISE ZUR VERBUCHUNG:**
+1. **Die STOPP-Doktrin deckt nicht alle sechs.** Der Satz steht unter der Gate-GRUPPE
+   G-S6/G-S7/G-S8/G-S9(i) und nennt namentlich nur **E-C/E-D/E-E/E-B**. **E-A und E-F stehen NICHT
+   darunter** -- sie sind Bau-Parameter von S1/S2. Wer nur zwei Entscheide treffen will: **E-E**
+   (Fenster) und **E-F** (schaltet S1 frei, den einzigen jederzeit landbaren Schritt).
+2. **DRITTE Namenskollision auf demselben Buchstabenraum.** Alle 43 `E-x`-Treffer im Ledger gehoeren
+   zum alten `DD-A..DD-E`-Satz -- `LEDGER:400` dokumentiert, dass der **damals schon** wegen
+   Kollision mit E0-E4 umbenannt wurde. **Vorschlag: diese sechs als `VS-A..VS-F` (Versions-Stempel)
+   fuehren.**
