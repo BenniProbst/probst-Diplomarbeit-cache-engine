@@ -10543,3 +10543,115 @@ gemeinte war.**
 |---|---|---|
 | ce `development` | **`db6cc047`** | 15250 (Vorgaenger `a2b928eb`) **gruen** |
 | super `development` | dieser Commit | 15251 gruen |
+
+---
+
+## NACHTRAG 07.08.2026 abend-30 — A1 + A4 GELANDET · A2 GERECHNET · PHASE 6 IST EIN STOPP, KEIN ZIEL
+
+### A1 — DIE MEDIEN-BASIS `m64` GELANDET (ce `15522cdc`, 428/428)
+**Der Owner-Entscheid ist durch SEIN EIGENES Kriterium gefallen** (*"Gehoert es zusammen -> eigene
+Basis"*). Die Webrecherche belegt am AMD APM Vol. 3, Anhang D §D.1: MMX und 3DNow! sind **eine**
+Gruppe ("64-bit media Instructions") auf **einem** Registersatz (MM0-MM7, x87-ueberlagert), mit vier
+Subsets -- **woertlich die AVX-512-Konstruktion**. Haertester Einzelbeleg: **3DNow! hat keinen einzigen
+Transferbefehl**, `MOVD`/`MOVQ` sind MMX-gegatet. *3DNow! ohne MMX ist ein Rechenwerk ohne Tueren.*
+
+**Der Name ist `m64`, NICHT `x64`** -- drei Gruende: "x64" ist die Industriebezeichnung der
+**Architektur** x86-64 · "64" ist in derselben Datei schon mit der **Adressbreite** belegt · das
+`x`-Praefix behauptete eine gemeinsame Achse mit `x128/x256/x512`, und **genau das widerlegt die
+Recherche**: MM ist eine **andere Registerdatei in einer anderen Gruppe**, kein vierter Breitengrad.
+
+**Die vier Bissbeweise mit echter Compiler-Ausgabe:** `m64{mmx}` parst und rendert **byte-identisch
+zurueck** (Roundtrip, nicht nur Parse-Erfolg) · `x128{mmx}` **bricht** (12-fache Negativ-Wache: alle 4
+Subsets x alle 3 Breiten-Basen) · die alte Schreibweise **bricht laut**, kein stilles `@0.0.0` ·
+**Entscheide-Zaehler 6 -> 0** (nicht 6->5: der Basis-Entscheid schliesst fuenf, N-3 schliesst
+`3dnowprefetch` **separat**).
+
+**N-1 gemessen statt behauptet:** der Katalog fuehrte `mmxext` unter `-m3dnowa`. **Gemessen falsch**
+(gcc 15.3.0): `-m3dnowa` setzt nur `__MMX__`/`__3dNOW__`/`__3dNOW_A__`; **`gcc -mmmxext` ist
+*unrecognized*, ein mmxext-Makro existiert in GCC ueberhaupt nicht.** Die MmxExt-Intrinsics
+(`_mm_avg_pu8` = PAVGB) stehen in `xmmintrin.h` unter `target("sse")`. Korrigiert auf `-msse`.
+
+**ZWEI EIGENE NACHBESSERUNGEN am Agentenstand -- beide von der Wache gefunden, nicht von mir:**
+1. **clang-format**: der Agent meldete *"120 Spalten eingehalten (nicht maschinell geprueft, aber beim
+   Schreiben beachtet)"*. **Zwei von drei Dateien wichen ab.** *Beim Schreiben beachten ist keine
+   Pruefung.*
+2. **Testzahl-Differenz aufgeklaert:** der Agent mass **424/424**, ich messe **428/428**. Die vier
+   fehlenden sind die Zweit-Configure-Tests (`test_v41_*`, `f15_compare_cli_smoke`) -- **die
+   Reihenfolge zaehlt**: erst bauen, dann Generatoren, dann **re-configure**, DANN die v41-Targets.
+   Wer sie vor dem Re-Configure baut, bekommt "FEHLER: Target existiert nicht".
+
+### A4 — THESIS NACHGEZOGEN (thesis `798e946`, DE 204 / EN 194 Seiten)
+| Auftrag | was korrigiert |
+|---|---|
+| **B1** ADR-2 | die 2^17-Stolperstelle traegt jetzt den Pinning-Halbsatz + `\ref{sec:mess-chain}` im Beleg-Feld, DE und EN |
+| **B2** Lizenzen | `michael_lockfree` BSD-3 -> **LGPL-2.1-or-later** · `tcmalloc` -> **Apache-2.0** · `lrmalloc` -> **MIT**; **8 Fundorte** (4 Tabellen + Anhang D Kurz-/Langform), je DE+EN. Anhang D sagte zusaetzlich "MIT Re-Impl" -> **"LGPL Re-Impl"** |
+| **B3** Flag-Grammatik | der ganze BNF-Block auf v2 (kein `v`-Praefix, Punkt vor jedem Flag, Basis an der Klammer, `e` = **efficiency core**) |
+| **B4** `branch_misses` | *"nicht verdrahtet"* -> real erhoben; **IPC/CPI bleibt unverdrahtet**, diese Aussage ist weiter wahr |
+
+**ZWEI ERWEITERUNGEN ueber den Auftrag hinaus -- vom Agenten gemeldet, vom Lead am Code gegengelesen:**
+- *"Namens- und Suffix-Ebene"* -> *"Namens-Ebene"*: der Folgesatz baute auf der jetzt-falschen
+  `e`-Bedeutung auf und waere **selbstwidersprueglich** geblieben. **Richtig.**
+- *"genau drei generische Zaehler"* -> *"vier"*: **am Code belegt**, `linux_perf_pmc_source.hpp:11-13`
+  sagt woertlich *"TATSAECHLICH GEOEFFNET werden VIER generische Counter"*. **Richtig.**
+
+**Bau verifiziert nach dem Merge von 7 development-Commits:** DE 204, EN 194 Seiten, `latexmk`
+Exit 0 beide Sprachen, chktex **0 Funde** auf allen 12 Dateien, `.blg` DE `alphadin` / EN `alpha`
+(sprachabhaengig **gewollt**, `diplomarbeit.tex:102`). **Kein `Co-Authored-By`-Trailer** (Thesis-Regel).
+**Eigener Fehlalarm dabei:** mein `grep -ci warning` auf die `.blg` meldete "1 Warnung" -- das ist die
+BibTeX-**Statistikzeile** `warning$ -- 0`, also **null** Warnungen. Teilwort-Falle.
+
+### A2 — DIE PERMUTATIONEN, GERECHNET (Dossier `docs/plaene/20260807-ANALYSE-paper-permutationen-*.md`)
+**Die Owner-Intuition traegt, und zwar staerker als gedacht: Einschraenkungsfaktor 3.972.**
+| Groesse | Zahl |
+|---|---|
+| heutiges Profil (2 opt x 2 simd) | 524.288 |
+| **PAPER-REPLIKEN: 33 Paper x 4 System-Perms** | **132** |
+| prod1 (12 Perms, AVX-512 live verifiziert) | 1.572.864 |
+| **prod2 (nur 8 -- KEIN AVX-512)** | 1.048.576 |
+
+**Der Rechenweg:** die 33 sota-Akten sind **vollstaendige Kompositionen** (jede belegt alle 11 Achsen
+gleichzeitig), also **33 Punkte im Raum, nicht 33 Faktoren** -- deshalb kollabiert 2^17 auf 33 (davon
+**30 distinkt**, drei Paar-Kollisionen). Von den 17 Achsen sind **7 paper-getrieben, 9 frei, 1 gepinnt**.
+Und: System-Achsen multiplizieren die **Bau-Matrix**, nicht die `binary_id` -- 524.288 gebaute `.so`
+tragen nur **131.072 distinkte** Identitaeten.
+
+**DREI BEFUNDE, die schwerer wiegen als die Zahl:**
+1. 🔴 **Die Paper-Kopplung ist HEUTE NICHT VERDRAHTET.** Drei unabhaengige Belege: getrennte
+   Vokabulare (Paper sagen `SPARSE_NODE4_ART`, das Profil `node4`, **keine Naht dazwischen**) · die
+   `permute_axes`-Werte sind laut eigenem XML-Kommentar *"die ersten 2 Enabled-name()-Werte"* -- ein
+   **Listen-Praefix**, keine Paper-Auswahl · der produktive Lauf zieht die Paper-Ebene per
+   `drop_tier_level` **explizit ab**. **Die 7 base_tiers erzeugen keine einzige Binary.**
+   **=> Die ehrliche Antwort ist nicht "132", sondern "heute 0". Der Owner-Satz beschreibt einen
+   ZIELzustand.**
+2. 🔴 **Ein FUENFTER D-2-Kandidat: 917.504** (7 base_tiers x 2^17) -- die Paper-Tier-Ebene ist
+   `is_static=true` und geht damit in `binary_count()` ein. Heute durch `drop_tier_level` inaktiv,
+   **wird aktiv, sobald jemand `build_axis_levels` statt `build_profile_basis_levels` faehrt -- beide
+   liegen nebeneinander in derselben Datei.** Keiner der vier bekannten Kandidaten rechnet das mit.
+3. 🔴 **`compare` vergleicht heute nichts** -- `run_methodology_registry.hpp:144-148` nagelt per
+   `static_assert`: *"compare = {Release, misst NICHT, parallel} (Etikett-Stand, Vollzug D2)"*.
+
+**Zwei Korrekturen an MEINEN Vorgaben:** die L3-Asymmetrie auf prod1 ist **8 physische Kerne je
+Domaene**, nicht 16 (SMT-Geschwister, `core_id` verifiziert) -- sie beruehrt die **Binary-Zahl nicht**
+(Pinning ist dynamisch), verdoppelt aber die **Messungen**. Und die Platten-Schranke des Agenten
+(*"4,8 GB frei"*) **ist ueberholt**: er mass vor meiner Raeumung, jetzt sind es **32 GB** -- und mit
+backup1 (3,6 T) existiert der Abfluss inzwischen.
+
+### PHASE 6 IST EIN STOPP, KEIN ZIEL -- vierfach belegt
+Der Owner sagte *"fahre bis zum Phase 6 Go-Punkt autonom fort"*. **Nach seiner eigenen Direktive
+("es ist IMMER alles geplant") habe ich das recherchiert statt gefragt.** Ergebnis:
+
+**Es gibt VIER Phasen-Zaehlkreise nebeneinander.** Massgeblich ist **Reihe A, der Fahrplan**
+(`docs/sessions/20260803-FAHRPLAN-gesamtkette-wellen-phasen.md`), 7 Phasen. Reihe B (Dossier 17) ist
+als **stale bestaetigt**, Reihe C (Dossier 16) superseded.
+
+**PHASE 6 = "Nach Trigger (Messung USER-GO)"**, verbatim. Vier Ledger-Stellen sagen dasselbe:
+> `:3774` *"Phase 6 STOPP am USER-GO"* · `:3991` *"Messung Phase 6 = USER-GO"* ·
+> `:4119` *"Phase 6 USER-GO-STOPP"* · `:7105` **Owner-Zitat**: *"ziehe autonom bis zur Messung durch"*
+> -> *"autonome Strecke bis Phase 6 (Messung bleibt USER-GO-STOPP)"*
+
+**Der heutige Satzbau ist praktisch identisch mit dem von `:7105`.**
+**=> PHASE 5 (Trigger-Sequenz) IST IM FAHRPLAN SELBST ALS "AUTONOM" MARKIERT und damit mein Auftrag.
+Die Grenze liegt bei `E.0 KERN-Mess-Schema`, dem ersten Punkt INNERHALB Phase 6. Bauen ja, TRIGGERN
+ja -- MESSEN nein.**
+**Stand:** Phasen 1-3 gelandet, Phase 4 vollzogen. **Phase 5 hat faktisch NICHT begonnen**
+(*"Null Binaries gemessen"*). Das ist die naechste autonome Strecke.
