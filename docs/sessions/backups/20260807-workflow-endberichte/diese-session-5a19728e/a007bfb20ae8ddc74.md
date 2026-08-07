@@ -1,0 +1,23 @@
+# a007bfb20ae8ddc74 (tx=494KB tools=60)
+
+Zensus abgeschlossen. **Die Prämisse kippt: die ~150 Zeilen sind überwiegend KEIN toter Ballast.**
+
+## Punkt 1 — Exakte Zählung
+
+`/home/comdare/wt-genroots-explore/tests/unit/CMakeLists.txt`: **146** wörtliche Vorkommen von `"${PROJECT_BINARY_DIR}/generated"`. Davon **145 in `target_include_directories(...)`-Blöcken**, **1 in `set(COMDARE_MCE24_INCLUDES ...)` (Z. 2094)** → das ist Punkt 4. Die 145 Blöcke decken **220 konkrete Ziele** (127 Blöcke = 1 Ziel; 18 Blöcke stehen in `foreach`/`function` und expandieren, u. a. Z. 1670→25, Z. 2029→31, Z. 1744→12, Z. 4558→3).
+
+## Punkt 2/3 — Ergebnis
+
+Der bloße `generated/`-Wurzelpfad wird real gebraucht, aber fast nie wegen `generated_source_catalog.hpp`. Grund: **39 generierte Header liegen unter `generated/axes/…` und `generated/topics/…` und werden in PFAD-FORM inkludiert** (z. B. `libs/cache_engine/axes/layout/axis_05_memory_layout_registry.hpp:15: #include <axes/layout/axis_05_memory_layout_flags.hpp>`). `COMDARE_ALL_AXIS_GENERATED_DIRS` löst nur die BLOSSE Form (`axis_05_..._flags.hpp`) auf — die Pfad-Form braucht zwingend die Wurzel. Verifiziert: alle 39 existieren **0-mal** im Quellbaum, nur in `build/generated/` (0 Mehrdeutigkeiten). Die Kette ist meist **transitiv über Projekt-Header**, nicht im Test-`.cpp` selbst.
+
+**Nenner: 220 Ziele geprüft — 141 brauchen die Zeile wirklich, 79 sind toter Ballast.** Auf Blockebene: 145 Blöcke — 99 nötig, 45 Ballast, 1 unklar (Z. 928, Prüfling-Schleife: `COMDARE_PRUEFLING_TEST_SOURCES` wird nirgends gesetzt → 0 Ziele in diesem Checkout; Bau-Probe mit `COMDARE_CE_PRUEFLINGE` nötig).
+
+**Toter Ballast, literale Ziele (35):** test_ctsha512(419), test_v41_anatomy_pruefling_merge(582), test_v41_anatomy_codegen(652), test_v41_anatomy_module_loader(675), test_v41_anatomy_multi_codegen(710), test_v41_anatomy_codegen_tool(727), test_v41_anatomy_r5i_configure_codegen(1089), test_ap13_thread_pinning(1300), test_ap10_dataset_akte(1311), test_184_dataset_loader_wiring(1325), test_25_kanon_dataset_akten(1343), test_45_sosd_uint64_loader(1358), test_v41_anatomy_adhoc_dll_load(1489), test_pruef_only_gate(1506), test_v41_anatomy_adhoc_autobuilt_load(1551), test_29_container_framework(2451), test_striktheit_abi_pod_guard(2568), m3v2_pmc_smoke(2949), test_tp1_planer_filter_iterator(2999), test_f3_lager_key_provider_iterator(3063), test_lazy_resume_binary(3082), test_w5_status_reader(3108), test_experiment_dock_payload(3132), test_progress_delta(3151), linux_perf_pmc_smoke(3578), test_e2_contract_abi_vertrag(4170), test_m_simd_feature_flag_catalog(4213), test_p1_spd_ddr5_parser(4233), test_os_u3_probe(4278), test_od10_numa_page_probe(4299), test_w10_system_cell_values(4386), test_g1_binary_version_stamp(4405), test_planner_version_flag_grammatik(4857), test_fk1_nicht_gebaut_marker(5117), test_a8s3_csv_klasse_c(5140). **Ballast-Schleifenblöcke (44 weitere Ziele):** Z. 1707 (C6V, 4), 1744 (C6, 12), 1777+1804 (EXCLUDE_FROM_ALL, je 1), 1832, 1855, 3669 (2), 4257 (2), 4320, 4342 (2), plus 17 von 25 in Z. 1670.
+
+**Echte Konsumenten mit Sonderbeleg** (die restlichen 139 belegen sich über je einen der 39 generierten Achsen-Header): `test_ap9_provenance_manifest` (Z. 1289) — einziger `build_provenance.hpp`-Konsument, via `libs/cache_engine/builder/provenance_manifest.hpp:5`. **Das widerlegt „0 `#include`-Konsumenten repoweit" aus deinem Kontext.** Entwarnung zum Wettlauf: `build_provenance.hpp` entsteht per `configure_file` zur Configure-Zeit, nicht per `add_custom_command` — keine Race. `test_t2a_f4_facade_plan_durchreichung` (Z. 3033) zieht `generated_source_catalog.hpp` transitiv über `libs/cache_engine/profile_facade/profile_run_entry.hpp:29`, ruft aber `comdare_attach_generated_catalog` (Z. 3041) — gedeckt. **Alle 4 TUs, die den Katalog erreichen, rufen attach** (Z. 3041/3468/4443/4471) — die Katalog-Race ist auf TU-Ebene geschlossen.
+
+## Punkt 4 — Viertes Leck-Muster (bestätigt)
+
+`tests/unit/CMakeLists.txt:2094`, in `set(COMDARE_MCE24_INCLUDES ...)`. Die Variable wird an **8 `target_include_directories`-Stellen** ausgerollt (Z. 2141, 2177 als Schleifen über `COMDARE_MCE24_PLAIN_TESTS`/`_MEASURED_TESTS`, plus Z. 2199, 2224, 2239, 4936, 4950) → **52 Ziele**, von denen **26 die Wurzel wirklich brauchen**. Keine dieser 8 Stellen enthält die wörtliche Zeile, sie sind also nicht in den 145 — ein eigener Kanal. Gegenprobe: `comdare_set_platform_defines` (cmake/compiler_flags.cmake:46) ist sauber (0 `generated`-Referenzen), und in `tests/unit/CMakeLists.txt` gibt es **kein** verzeichnisweites `include_directories(`.
+
+Nichts gebaut, nichts geändert.

@@ -1,0 +1,20 @@
+a3115bb12a2a9e09b    tx=  946KB bericht= 19263 tools=81
+a9ef0d77beab825cc    tx=  637KB bericht= 18683 tools=55
+a2a9678e69e6ed72c    tx=  466KB bericht= 14244 tools=27
+afe765d34f2f5c715    tx=  492KB bericht= 13926 tools=35
+acfca558cae8045c7    tx=  485KB bericht= 12955 tools=26
+acd614d772b8ecb00    tx=  828KB bericht= 12798 tools=34
+a11735fcdd4f54b3a    tx=  569KB bericht= 12275 tools=44
+a67b9019a6f610937    tx=  450KB bericht=  8446 tools=34
+a9a2b597006efcd8c    tx= 1422KB bericht=  7999 tools=104
+af51918544612a92a    tx=  664KB bericht=  7234 tools=28
+a007bfb20ae8ddc74    tx=  494KB bericht=  4587 tools=60
+a0a5982f72e650725    tx= 1918KB bericht=  4477 tools=221
+awelche-probleme-und-310337572ad80eb4 tx=   12KB bericht=  4449 tools=0
+adeb6e141404a7fd7    tx=  309KB bericht=  4306 tools=30
+afea5d5e5721b640e    tx=  311KB bericht=  3793 tools=35
+a829a4fdfc5c3b359    tx=  552KB bericht=  3392 tools=64
+abitte-beschreibe-mir-5181e58578f311e8 tx=   80KB bericht=  3119 tools=5
+ac42a19adf597bd40    tx=  890KB bericht=  1809 tools=49
+acdd6a9b1415c4a28    tx=  766KB bericht=   184 tools=97
+# HINWEIS: afea5d5e5721b640e.md (gitleaks-Vorpruefungs-Meta-Bericht) wegen generic-api-key-Match AUSGESCHLOSSEN; Inhalt in docs/infra/I113 konsolidiert. Rohdaten lokal in backups-workflow/.
