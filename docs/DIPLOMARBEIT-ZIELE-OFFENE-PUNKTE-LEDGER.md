@@ -9278,3 +9278,95 @@ NOPASSWD-Admin `admin-management` liess sich mit den dokumentierten Vault-Werten
 (der Vault fuehrt mehrere rotierte, widerspruechliche Eintraege; der Agent hat bewusst **nicht
 weitergeraten**, um keinen Lockout zu riskieren). `/home/gitlab-runner/builds` ist fuer `comdare`
 **nicht lesbar** -- der Runner-Platzverbrauch ist von hier aus **nicht messbar**.
+
+---
+
+## NACHTRAG 07.08.2026 abend-14 — M-3a GELANDET (ce `6a8ab995`): `branch_misses` wird real erhoben
+
+**419/419 gruen ueber den GEMERGTEN Stand** (Flag-Grammatik v2 + M-3a zusammen). Der Lead hat den
+Merge **selbst gebaut und getestet** -- auf ausdrueckliche Warnung des Agenten:
+*"Konfliktfrei und disjunkt ist NICHT dasselbe wie 'baut gruen'. Vor dem Landen selbst bauen."*
+
+### DIE LAST WURDE VALIDIERT, NICHT GERATEN -- und der erste Entwurf war falsch
+Der Agent hat seinen **eigenen** Entwurf verworfen, weil er ihn gemessen hat:
+- **Reines Pointer-Chasing** -- die Last, die **beide bestehenden Smoke-Tests** fahren -- liefert
+  **704 Misses auf 4 M Iterationen**. Rauschen. Ein Rueck-Sprung, den jeder Predictor lernt.
+- **Sein erster Zweig-Entwurf** (`idx & 1` auf der Chasing-Kette) lieferte ebenfalls fast nichts --
+  **die Verkettung ist nicht 50/50, der else-Zweig wurde nie genommen**.
+- **Gewaehlt:** 1 M pseudo-zufaellige Bytes (xorshift64) gegen die Mitte des Wertebereichs,
+  8.388.608 Zweige, Ausgang ~50/50, keine lernbare Struktur.
+
+**DER COMPILER-BARRIER IST TRAGEND, nicht Schmuck** -- an derselben Last gemessen:
+| Variante | Misses |
+|---|---|
+| mit Barrier | **8.396.125** (50,0 %) |
+| OHNE Barrier | **54** (0,0 %) -- `-O3` faltet zu `cmov` |
+| SORTIERT + Barrier | **265** (0,0 %) -- Gegenprobe |
+**Die sortierte Gegenprobe belegt, dass der Zaehler der ZWEIG-STRUKTUR folgt und nicht einem
+Speicher-Nebeneffekt.** Drei Messungen, die zusammen eine Aussage tragen.
+
+**Ergebnis auf AMD Zen5:** `delta.branch_misses = 4.202.818`, Rate **50,1 %**; clang-Gegenprobe
+4.199.438 / 50,06 %.
+
+### DAS GATE BEISST -- ein nie rotes Gate ist unbewiesen
+Regression simuliert (Zaehler oeffnet, Wert wird **nicht** zugewiesen):
+`SMOKE_FAIL (branch_misses_source_available=1, aber branch_misses=0 nach 8388608 unvorhersagbaren
+Zweigen -- der Zaehler ist geoeffnet, aber nicht angebunden. M-3a-Regression.)` **EXIT=1.**
+Danach zurueckgesetzt, Gegenprobe wieder `SMOKE_OK` / EXIT=0.
+
+### EHRLICHKEIT AUF ECHTER HARDWARE, kein Mock
+Auf dieser Maschine scheitert das LL-Event **real**:
+`perf_event_open fehlgeschlagen: event=cache_misses_l3_ll type=3 config=65538 errno=2`.
+Die daraus gerenderte **echte** CSV-Zeile:
+`pmc_cache_misses_l1='4190854' · l2='n/a' · l3='n/a' · dtlb='2107961' · coherence='n/a' ·
+energy='n/a' · pmc_available='1'`
+**`pmc_available=1` UND trotzdem `n/a`** -- genau die Unterscheidung, die vorher fehlte.
+Dazu **beide Grenzfaelle** fuer branch_misses nebeneinander: nie geoeffnete Quelle -> `'n/a'`,
+**echte** 0 bei offener Quelle -> `'0'`. **Das Flag traegt die Unterscheidung, nicht der Zahlenwert.**
+
+### VOR DEM FELD-ZUSATZ ANGEHALTEN UND GESUCHT, statt anzunehmen
+`grep "static_assert(sizeof"` = 41 Treffer, **keiner auf `PmcCounters`**. Der POD geht nicht ueber
+die ABI-Grenze; die Byte-Wachen sitzen auf `ComdareTierObserverSnapshot` (1344),
+`AnatomyStampEntryV1` (48), `SystemAxisSample` (24) -- alle unberuehrt.
+**Nebenbefund:** zwei Kommentare fuehrten `PmcCounters` als *"TABU, Bestand"* und sicherten
+*"byte-unberuehrt"* zu -- **beide waren schon vor ihm ueberholt** (die Korrekturen vom 06.08. hatten
+den POD bereits um vier Flags erweitert). Er hat den Vermerk **praezisiert statt umgangen**.
+
+### ZWEI WEITERE FUNDORTE DERSELBEN FEHLERKLASSE, ueber den Auftrag hinaus geschlossen
+- `PmcSystemAxis::do_collect` (`system_axis.hpp:413`) stempelte `mark_ok()`, sobald die **Zeile**
+  verfuegbar war -- auf AMD also `mark_ok(0)` fuer L3: **eine 0, die als gueltiger Messwert auftrat.**
+- `PmcSourceAdapter::read_delta` stempelte `valid` grobkoernig aus `counters.available`, obwohl
+  `MeasuredDelta` per-Event-Gueltigkeit immer ausdruecken konnte.
+Begruendung des Agenten: *"Ein Flag, das drei von vier Konsumenten ignorieren, waere
+Schein-Ehrlichkeit."*
+
+### EHRLICHE SELBSTEINORDNUNG, die der Agent nicht schoengeredet hat
+Die Haertung an Pipeline B **aendert am heutigen Bestand keinen einzigen Zahlenwert** -- alle
+`IPmcSource`-Implementierungen setzen Wert und Flag gemeinsam. **Es ist eine Wache gegen Drift,
+keine Korrektur eines Falschwerts.**
+
+### ZURUECKGEHALTEN -- CSV-Schema, Owner-Entscheid
+Der Ziel-POD `ComdareMeasurementSnapshotV1` traegt nur die grobe `pmc_available`-Marke: **an dieser
+Naht geht die feinkoernige Wahrheit verloren** -- ein Zaehler ohne Quelle landet als 0 im POD,
+ununterscheidbar von einer echten Nullmessung. Heilbar nur durch Flag-Felder im POD und damit **neue
+CSV-Spalten**; `pipeline16` traegt nicht einmal `pmc_available`. **Entlastend:** `f15_compare` haengt
+an keinem CI-Job, der Defekt bleibt latent.
+
+### DIE VIER ROTEN TESTS BEIM VERIFY WAREN DIE BEKANNTE FALLE
+`test_profile_roundtrip` + die drei Registry-Roundtrips schlugen fehl, weil die
+`comdare_*_registry_gen`-Generatoren **`EXCLUDE_FROM_ALL`** sind und nicht am Default-Target haengen.
+**Die Fehlermeldung sagt es woertlich** (`registry_roundtrip: Generator-Tool nicht gebaut: ...`).
+Nach explizitem Bau der drei Targets: alle gruen. **Nicht der Code.**
+
+### KONSUMENTEN-SUCHE: die Lead-Zahl war im Ergebnis richtig, als Zahl falsch
+Der Lead hatte *"0 Treffer"* gemeldet. Real: **14 Treffer** auf `branch_misses`, 3 auf
+`pmc_branch_misses` -- **alle im gespiegelten ce-Baum selbst**. Kein super-eigener Konsument
+(`03_binary_to_csv` liest `cache_misses_l1`, aber **nicht** `branch_misses`), kein Thesis-Treffer
+(26 Dateien im Nenner), keine golden-Datei. **Nenner 5709 Dateien, mit Positiv-Kontrolle ueber
+`cache_misses_l1`**, damit ein leeres Ergebnis nicht mit einem stillen grep-Fehlschlag verwechselt
+wird. **So sieht ein belegter Nullbefund aus.**
+
+### NICHT GEFAHREN (selbst gemeldet)
+cppcheck lokal (Werkzeug fehlt) · Windows-Pfad (`WindowsPcmPmcSource` erhebt `branch_misses` nicht,
+das Feld bleibt dort korrekt `false`) · `l1`/`dtlb` haben **weiterhin kein eigenes Flag** -- bewusst
+keins erfunden, das waere ein POD-Zusatz ohne Auftrag.
