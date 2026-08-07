@@ -8794,3 +8794,88 @@ Schicht wie die laufende Flag-Grammatik. Richtig erkannt.
 ausgecheckt, und `git -C` sucht aufwaerts, statt zu scheitern. Wer hier den Thesis-Commit abfragt,
 bekommt **den des Elternrepos** und merkt es nicht. Der lebende Thesis-Checkout ist
 `Projekte/Research/probst-diplomarbeit-cache-engine/thesis/diplomarbeit`.
+
+---
+
+## NACHTRAG 07.08.2026 abend-8 — MESS-EHRLICHKEIT: der schaerfste Befund des Tages, vom Lead nachgeprueft
+
+Strang 4 hat vier Behauptungen zur Mess-Ehrlichkeit geprueft. **Der Lead hat die vier tragenden
+Stellen selbst nachgelesen** -- alle bestaetigt.
+
+### P-1 -- `branch_misses` IST eine nackte Null, die nie "n/a" werden kann. BESTAETIGT
+- `pmc_source.hpp:24`: `std::uint64_t branch_misses = 0;`
+- `:37-43`: **VIER** Felder tragen ein Verfuegbarkeits-Flag (`cache_misses_l2_`, `cache_misses_l3_`,
+  `coherence_invalidations_`, `energy_micro_joules_source_available`). **`branch_misses` hat keins.**
+  Es kann strukturell nicht ausdruecken "nicht erhoben".
+- `cache_engine_builder_iterator.hpp:868-871`, verbatim: *"der Wert ist IMMER der PmcCounters-Default
+  0 (keine IPmcSource weist ihn zu) ... unabhaengig von pmc_available. Die Spalte emittiert trotzdem
+  stabil weiter: eine spaetere echte Quelle (M-3a) fuellt hier ohne Schema-Bruch."* Emittiert per
+  `zelle(...)`, **nicht** per `pmc_zelle(...)` (dem n/a-Renderer).
+- `linux_perf_pmc_source.hpp:16-17` fordert selbst: *"Diese honest-0-Spalten sind im Anhang als
+  solche zu fuehren, nicht als gemessen."* **Diese Anhang-Kennzeichnung existiert nicht.**
+- **ENTLASTUNG (Gegenprobe gefahren):** `grep -rl "branch_misses"` ueber `super/Code` und die Thesis
+  = **0 Treffer**. Kein Downstream-Konsument zieht die Spalte namentlich. **Der Schaden ist latent,
+  nicht ausgeliefert.**
+
+### P-2 -- L3-auf-AMD: im Produktionspfad WIDERLEGT, in einem zweiten Pfad BESTAETIGT
+Es gibt **zwei** CSV-Pipelines:
+- **(A) golden/CI** (`cache_engine_builder_iterator.hpp:828-842`): rendert nur bei
+  `*_source_available == true` eine Zahl, sonst `"n/a"`. **Der Guard haelt** (B5/M-2-KORREKTUR-2 vom
+  06.08.). `LinuxPerfPmcSource::end()` setzt `cache_misses_l3_source_available = ll_ok_`, und `ll_ok_`
+  ist das Oeffnungsergebnis von `PERF_TYPE_HW_CACHE/LL` -- auf AMD Zen5 ENOENT.
+- **(B) `measurement_snapshot.hpp:140-143`**: kopiert bei `pmc.available == true` **alle sechs**
+  Counter **blind**, ohne die feinkoernigen Flags. Auf AMD ist `pmc.available == true` (L1D oeffnete),
+  `cache_misses_l3` bleibt POD-Default `0`, und `pmc_available = 1` **behauptet, alle sechs seien
+  real gemessen**. Die Datei nennt sich viermal "EHRLICH" (`:15/:50/:108/:135`) -- die Marke ist aber
+  **grobkoernig**: "PMC angebunden ja/nein", nicht "dieser Zaehler war verfuegbar".
+- **ENTLASTUNG:** `grep -c f15_compare .gitlab-ci.yml` = **0** in beiden Repos. Pfad B haengt an
+  KEINEM CI-Job. **Latent, nicht ausgeliefert** -- aber lauffaehiges, getestetes Werkzeug im Repo.
+
+### P-3 -- P/E-Core-Trennung: BESTAETIGT offen, aber die Vorstufe steht seit HEUTE
+- Kein `HybridCorePinning`, kein `measure_per_class()`, kein zweifacher gepinnter Start. `hybrid_core_aware`
+  (`i_measurement_source.hpp:55`) defaultet `false`, **kein Fundort setzt es `true`**.
+- `LinuxPerfPmcSource` oeffnet **generische** `PERF_TYPE_HW_CACHE`-Events, nicht die PMU-typisierten
+  `cpu_core`/`cpu_atom`-Events, die eine Hybrid-CPU fuer getrennte P/E-Zaehlung braucht.
+- **ABER die Erkennungs-Vorstufe ist gebaut, datiert 2026-08-07 (heute):**
+  `numa_cpu_pin_process_probe_linux.hpp` liest `<pmu_root>/cpu_core/cpus` + `cpu_atom/cpus`,
+  Konsument ist `hardware_probe_factory.hpp` (Produktionscode). Das ist **Topologie-Erkennung**,
+  nicht die geforderte getrennte MESSUNG.
+- **Bemerkenswerte Kopplung:** der Owner hat heute die Flag-Grammatik so definiert, dass `c{p.e}`
+  Performance- und Efficiency-Cores unterscheidet. **Die Notation existiert, die Messung nicht.**
+
+### P-4 -- die "drei Wege" gibt es so nicht; der einschlaegige Fund heisst SW-3 und ist ueberwiegend geheilt
+Gesucht mit `Methoden-Befund`, `falsche Frage`, `drei Wege` ueber `super/docs/` -- **kein Dokument mit
+dieser Zaehlung**. Die "Methoden-Befunde" in `20260806-DOSSIER-regressionen-checkheft.md:115` sind
+**vier** (N-1..N-4) und betreffen Tooling/Git, nicht PMC.
+Der inhaltlich passende Fund ist **SW-3** (`:519-559`): *"Der PMC-Preflight: vier Wachen, und keine
+beisst"* -- Wache 1 fehlendes `-DCOMDARE_ENABLE_PMC=ON` an allen vier Emissionsstellen (der Golden-Lauf
+haette **die gesamte 131.072er-Matrix ohne jeden HW-Counter** gemessen, gruen und unbemerkt) ·
+Wache 2 Smoke akzeptierte `counters_all_zero` · Wache 3 `allow_failure: true` · Wache 4 Preflight
+fragt die falsche Frage.
+**Stand heute, live nachgeprueft:** Wache 1 **geheilt** (`ceb_pmc_compile_define()` an allen vier
+Stellen `:895/:933/:1254/:1407`, gepinnt durch den Invarianten-Test
+`JedeTreiberKonfigurationTraegtDasPmcFlag`, gelandet als `8894d983`). Wache 2 **geheilt**
+(`kPmcExpected`-Gate). Wache 3 **vorhanden, aber jetzt als Absicht kommentiert** ("Mess-Fehler => CSV
+'failed' + Log, Pipeline bleibt gruen -- nicht still verschluckt"). Wache 4 wird durch die
+Wache-1-Heilung erst sinnvoll. **Der einzige mit echter Abgabe-Reichweite traegt heute nicht mehr.**
+
+### DIE GEGENPROBE -- der wichtigste Einzelbefund
+| Feld | Guard vorhanden? | greift in A (golden) | greift in B (f15_compare) |
+|---|---|---|---|
+| cache_misses_l2 / l3 / coherence / energy | ja | **ja** | **nein** |
+| **branch_misses** | **existiert nicht** | **nie** | **nie** |
+| cache_misses_l1 / dtlb_misses | nicht noetig (portabel, oeffnen auf beiden Vendoren) | -- | -- |
+
+**Die Wache existiert, aber sie deckt nicht alle Faelle.** Bei `branch_misses` gibt es die
+Wache-Kategorie strukturell gar nicht.
+
+### DARAUS FOLGT EIN BAU (Strang 9, laeuft): `bau/m3a-branch-misses-ehrlichkeit`
+**Der Schluessel, der M-3a baubar macht:** `branch_misses` ist ein **generischer, portabler** Zaehler
+unter `PERF_TYPE_HARDWARE` / `PERF_COUNT_HW_BRANCH_MISSES` -- er oeffnet auf Intel **und** AMD,
+anders als das LL-Event. Der Bestand oeffnet bereits drei Zaehler ueber `PERF_TYPE_HW_CACHE`
+(`linux_perf_pmc_source.hpp:220-231`). **Die Mechanik ist da, es fehlt ein vierter Zaehler.**
+Auftrag: (1) real erheben, (2) `branch_misses_source_available` + `pmc_zelle` statt `zelle`,
+(3) Pipeline B feinkoernig pruefen. Mit Bissprobe-Pflicht: ein Lauf muss einen **von Null
+verschiedenen** Wert liefern, sonst waere das Feld nur umbenannt.
+**Zurueckgehalten:** die pipeline16-CSV traegt nicht einmal eine `pmc_available`-Spalte. Ein
+Schema-Zusatz waere noetig -- der Agent hat Anweisung, ihn NICHT zu bauen, sondern vorzulegen.
