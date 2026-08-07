@@ -7993,3 +7993,55 @@ Alt-Pfade seien nur *"MARKIERT"*. Ausserdem unterschlug die Entlastung den weite
 **keine einzige** unverändert haltbar -- V-08 zu 2/3 richtig, V-03 in der Formel falsch aber in
 der Sache haltbar, V-05 im Kern widerlegt. Das bestaetigt die Lehre: **eine Entlastung ist eine
 Behauptung.** Die uebrigen 17 Positionen desselben Passes sind damit ebenfalls verdaechtig.
+
+---
+
+## NACHTRAG 07.08.2026 mittag-5 -- ZWEI GELANDETE PAKETE + EINE NEUE LOKALE BAU-FALLE
+
+### 1. O-A IM CODE NACHGEZOGEN (ce 491fff65, Pipeline 15189 gruen)
+Der Owner-Entscheid stand bis heute an **vier Stellen im Code als GEGENTEIL**:
+`run_methodology_registry.hpp:7-8` / `:51` / `:81` und `test_experiment_parser.cpp:720-721`
+sagten uebereinstimmend *"NACH der Release-Messung"*. Alle vier auf die geltende Ordnung
+**measure -> compare -> release** gezogen, mit ausdruecklichem SUPERSEDED-Vermerk auf Sec.62-C,
+damit die alte Fassung nachvollziehbar bleibt statt stillschweigend zu verschwinden.
+Die zwei Bau-Konsequenzen sind im Kopf festgehalten (beide Paket D2, ungebaut): compare braucht
+**eigene Optionen mit lesendem Lager-Zugriff**; release liest die Messwerte ebenfalls nach und
+erzeugt daraus die **optimale Binary**.
+**BEOBACHTUNG statt Alleingang:** die Registry-Reihenfolge ist `{debug, measure, release, compare}`
+und entspricht damit NICHT der Stufenordnung. Der Enum wurde **bewusst nicht umgestellt** -- er ist
+stempel-/ABI-relevant, und O-A betrifft die formale Stufen-Ordnung, nicht die Aufzaehlung.
+Stattdessen steht dort jetzt eine NICHT-VERWECHSELN-Notiz, die auf die Enthaltungs-Ordnung
+verweist. **Falls der Owner will, dass der Enum die Ordnung abbildet, ist das ein eigenes
+Byte-Ereignis** -- vorgelegt, nicht vorgegriffen.
+
+### 2. TASK #37 / W4 GEBAUT: DIE PRT-ART-QUARANTAENE IST JETZT EIN GATE (ce 2f9c6abc)
+W4 verlangte *delegieren ODER hart gaten*; seit dem 07.07. war keines gebaut. **Gebaut ist jetzt
+das Gate.** Betritt der Codegen den prt-art-Alt-Pfad fuer `profile.id == "prtart"`, wirft er --
+statt still den 90ns-Stub einzubauen. Schnitt chirurgisch: **nur diese eine Id**; andere
+Pruefling-Templates unter `prt_art_root` bleiben unberuehrt. Die Id steht als benannte Konstante
+`kQuarantinedPrtArtProfileId`, nicht als Magic-String.
+**Der gruene Test war Teil des Problems** und ist umgedreht:
+`MultiPath_PrtArtTemplateFoundWhenSotaMissing` (behauptete POSITIV, dass der Fallback greift) ->
+`MultiPath_PrtArtStubIsRejectedNotSilentlyUsed` (prueft den Wurf UND dass kein halb geschriebenes
+Modul zurueckbleibt). Neu als Gegenprobe: `MultiPath_NonQuarantinedPrtArtTemplateStillWorks`.
+**VERIFIKATION:** Bissbeweis (Gate entschaerft -> Test FAILED; mit Gate gruen, keine Reste) ·
+**421/421 ctest gruen** · Voll-Bau rc=0 · 521 vorbestehende Warnungen, davon **0** in den beruehrten
+Dateien · kein `-Werror` im Projekt · gitleaks 3171 commits ohne Fund.
+
+### 3. NEUE LOKALE BAU-FALLE (ins Fallen-Register): FALSCHES ROT DURCH STALE GENERATOR
+Der erste "Voll-Bau" war **KEINER**: `ninja` hat Targets uebersprungen, das
+`comdare_system_axis_registry_gen`-Binary blieb vom **Vortag** stehen (06.08. 23:13 gegen Quellen
+vom 07.08. 06:43). Folge: `test_system_axis_registry_roundtrip` wurde **FALSCH ROT**, und der Diff
+war ausgerechnet **die `core_class`-Zeile** -- also genau die Unter-Achse des heute gelandeten
+numa-Pakets. Das sah aus wie ein Byte-Drift am frisch gelandeten Paket und war ein Bau-Artefakt.
+Zweiter Test `test_profile_roundtrip` stand aus demselben Grund auf "Not Run" (Executable
+ungebaut). Nach erzwungenem Neubau der Targets: **beide gruen, 421/421**.
+**WIE DER FEHLBEFUND VERMIEDEN WURDE:** vor jeder Meldung die eigenen Aenderungen **weggestasht**
+und erneut gemessen -- die Tests waren **auch ohne sie** rot. Damit war die Regressions-These
+widerlegt, bevor sie behauptet wurde.
+**GEGENMITTEL (bindend):** bei einem roten Roundtrip-/Reflexions-Test ZUERST das **Alter des
+Generator-Binaries gegen die Quellen** pruefen (`stat -c '%y'`), erst danach den Code verdaechtigen.
+Und: ein wiederverwendetes `build/`-Verzeichnis aus einer fremden Sitzung ist **kein** Beweis-Boden.
+Dies ist dieselbe Familie wie [[reference_lokale_vollbau_luecken_falsches_gruen]], nur in der
+Richtung **FALSCHES ROT** -- und damit die dritte Variante derselben Fehlerklasse an einem Tag
+(nach `/build` frisst `/builder/` und dem falschen Checkout).
