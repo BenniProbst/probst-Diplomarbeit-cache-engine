@@ -7940,3 +7940,56 @@ dritter Teil. Der offene Posten heisst **M-3a** und ist im Code bereits gefuehrt
 3. Ein ALARM ist genauso begruendungspflichtig wie eine Entlastung. Der Lead hat den Audit-Bericht
    nicht ungeprueft uebernommen (richtig), aber seine eigene Gegenmessung nicht auf Blindheit
    geprueft (falsch) -- und daraus eine schaerfere Behauptung gebaut als die Faktenlage trug.
+
+### D) V-03 UND V-05 NACHGEMESSEN -- BEIDE "TEILWEISE", V-05 IM ENTLASTUNGSGEHALT WIDERLEGT
+
+Die zwei uebrigen Entlastungen desselben Reconcile-Passes (nach dem V-08-Fehlbefund faellig)
+sind nachgemessen. Kernbehauptungen vom Lead SELBST gegengeprueft, nicht nur aus dem Bericht.
+
+**V-03 = TEILWEISE.** Die Kurzformel *"nur un-included Dateien"* ist **woertlich falsch**:
+von 92 Fundstellen der Neunzehner-Zaehlung stehen **26 in eingebundenen Dateien** (13 DE + 13 EN),
+darunter **zwei Anhaenge**, die in keiner der drei Entlastungsfassungen erwaehnt werden --
+`anhang/{de,en}/A_measurements.tex:27,146,147` und `D_building_block_matrix.tex:792,1203`.
+Selbst nachgeprueft: beide Anhaenge haben **12 Vorkommen** in `diplomarbeit-de.fls` des echten
+Laufs; die acht Alt-Kapitel haben dort **je 0** (Gegenprobe `04_concept_architecture` = 0).
+**ABER die Sachaussage "kein Abgabe-Defekt" HAELT:** jede der 26 Stellen ist ausdruecklich als
+historisch markiert -- *"in der Neunzehner-Zaehlung ... seit der Achsen-Neuordnung"*,
+*"im Datenstand der damaligen Neunzehner-Zaehlung"*. Der Kanon (achtzehn / T0--T17) steht
+literal und haeufig, DE/EN-Paritaet exakt.
+=> ZWEI NEBENBEFUNDE: (1) `06_evaluation_methodology.tex` war das **einzige** Alt-Kapitel je
+Sprache **ohne** Deprecation-Kopf -- GESETZT (DE geschrieben, EN nachgezogen). (2) Die
+Rest-Auflage war im **falschen Checkout** verortet (Separat-Klon `29a1700` vom 03.08., vier Tage
+hinter dem Submodul) -- eine dort ausgefuehrte Auflage haette den geltenden Stand verfehlt.
+
+**V-05 = WIDERLEGT (im Entlastungsgehalt).** Behauptet war: *"war KEIN Mess-Echtheits-Risiko,
+die Stub-Quarantaene ist seit 07.07. am Objekt vollzogen"*. W4 (`LEDGER:1229`) verlangte
+*delegieren ODER hart gaten* -- **keines von beidem ist geschehen**. Der Ledger-Eintrag vom
+07.07. sagt es selbst (`:706`): angelegt *"als Kommentar-Notizen OHNE Verhaltens-Change"*.
+Selbst nachgemessen:
+- Der Stub steht unveraendert: `prtart_body.hpp.template:74`
+  `out->cycles_per_op = ops_executed_.load(...) > 0 ? 90u : 0u;`
+- Der Zweig ist **ungegatet**: `codegen.cpp:115`
+  `else if (!opts_.prt_art_root.empty() && std::filesystem::exists(prt_art_template))`
+  -- darueber steht nur ein Kommentar (`:103-106`), kein Gate, kein Assert.
+- ce liefert **kein eigenes** prtart-Template (9 Templates, keines fuer prtart) -- fuer
+  `profile.id == "prtart"` waere der quarantaenisierte Stub der **einzige** Kandidat.
+- Der Aufrufer ist der **Mess-Pfad** (`experiment_driver.cpp:148/:198`, Phase 2).
+- **Ein gruener Test zementiert den Alt-Pfad als SOLL:**
+  `test_codegen_from_profile.cpp:226 MultiPath_PrtArtTemplateFoundWhenSotaMissing` behauptet
+  POSITIV, dass der Fallback greift. Genau die Fehlerklasse "gruene Tests zementieren die alte
+  Ordnung" aus der eigenen Pruefliste.
+**Unerreichbar ist der Pfad heute nur durch DREI ZUFAELLE**, nicht durch die Quarantaene:
+`main.cpp` setzt `prt_art_root` nie (0 von 25 `opts.`-Zuweisungen, Nullbefund mit Gegenprobe);
+es gibt kein `prtart.profile.xml` im Auto-Pickup; `IPruefling::run` wird ausserhalb von Tests
+nicht gerufen. **Jeder dieser Zufaelle kann durch eine harmlose Aenderung kippen** -- dann
+liefert der Mess-Pfad still 90ns-Konstanten statt Messwerten.
+Der zitierte Beweis-Test `test_ap2_katalog_pfad_stubfrei` zeigt, dass der **Katalog**-Pfad
+stubfrei ist -- nicht, dass der Alt-Pfad unbetretbar ist; sein eigener Kopf (`:12-13`) sagt, die
+Alt-Pfade seien nur *"MARKIERT"*. Ausserdem unterschlug die Entlastung den weiterhin offenen
+**#162-Zaehlbeleg**.
+=> **Task #37 angelegt, vor der ersten Messung faellig.**
+
+**BILANZ des Reconcile-Passes, jetzt vollstaendig:** von drei geprueften Entlastungen ist
+**keine einzige** unverändert haltbar -- V-08 zu 2/3 richtig, V-03 in der Formel falsch aber in
+der Sache haltbar, V-05 im Kern widerlegt. Das bestaetigt die Lehre: **eine Entlastung ist eine
+Behauptung.** Die uebrigen 17 Positionen desselben Passes sind damit ebenfalls verdaechtig.
