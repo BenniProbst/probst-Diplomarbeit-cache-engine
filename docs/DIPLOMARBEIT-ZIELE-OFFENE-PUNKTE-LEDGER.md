@@ -8668,3 +8668,60 @@ Faellt der Kontext, sind die beiden Bau-Branches der Wert: `bau/flag-grammatik-v
 `bau/allocators-coverage-gate`. Beide sind angewiesen, auf ihrem Branch zu committen. Die
 Pruef-Straenge (3/4/5/8) hinterlassen nichts und muessen neu gefahren werden -- ihre Auftraege
 stehen oben vollstaendig genug, um sie zu rekonstruieren.
+
+---
+
+## NACHTRAG 07.08.2026 abend-6 — DER "VERGESSENE POSTEN" WAR BEANTWORTET. Im Aktenkopf, nicht im Ledger
+
+**Vierte Korrektur des Tages, gleiche Fehlerklasse.** abend-2 buchte die 23 Akten
+`allocators/*.profile.xml` als *"den einen echten vergessenen Posten aus 30 Plan-Straengen"*.
+Der Bau-Agent hat beim ersten Blick in die Akten das Gegenteil gefunden -- und der Lead hat es
+selbst nachgeprueft.
+
+### DER BEFUND, vom Lead verifiziert (vier Proben)
+1. `ls libs/cache_engine/algorithm_profiles/allocators/*.profile.xml | wc -l` = **23**
+2. `grep -l 'DOKU-AKTE' .../allocators/*.profile.xml | wc -l` = **23** -- **ALLE** tragen ihn
+3. Der Kopf, verbatim aus `hoard.profile.xml`:
+   `<!-- DOKU-AKTE (#48 Scheibe 2, 2026-07-22): kein Code-Leser; Allocator-Wahl = CT-Adapter (Statischer-Dispatch-Doktrin). -->`
+4. Alle zehn namentlich in der Thesis gefuehrten Profile existieren als Akte (10/10)
+
+**Die Frage aus dem #48-Dossier vom 22.07. -- *"bewusste Doku-Akten oder vergessener Ausbau?"* --
+ist am selben Tag BEANTWORTET worden: bewusste Doku-Akten.** Die Antwort steht in jeder einzelnen
+Datei. Sie steht nur nicht im Ledger.
+
+### DIE FEHLERKLASSE, praeziser gefasst
+Der Explore meldete korrekt *"0 Treffer im Ledger"* -- und der Lead deutete das als **"vergessen"**.
+Das ist der Fehlschluss: **ein Nullbefund in EINER Quelle ist kein Befund ueber die Sache.** Die
+fehlende Gegenprobe hiess hier: *steht die Antwort woanders?* Sie stand im Artefakt selbst, eine
+`grep`-Zeile entfernt.
+Damit ist das heute die **vierte** Auspraegung derselben Klasse: Phasen-Fehlzuordnung ·
+Committen waehrend laufender Pruefung (K7) · Limits-Entkopplung "nicht verdrahtet" ·
+allocators "vergessen". **Gemeinsamer Nenner: eine Abwesenheit wurde als Aussage genommen.**
+
+### DIE ENTSCHEIDUNG DES BAU-AGENTEN WAR RICHTIG -- und richtig begruendet
+Er hat die **Verdrahtung bewusst NICHT gebaut**, mit dem Argument (Code-Kommentar): ein
+XML-Laufzeit-Leser fuer die Allokator-Wahl waere *"ein Runtime-Switch gegen die
+Statischer-Dispatch-Doktrin und damit eine Regression, kein Fortschritt"*. Das deckt sich mit
+[[feedback_no_runtime_switch]] und mit dem Aktenkopf selbst.
+**Der Lead hatte ihm "vergessener Posten" in den Auftrag geschrieben -- er hat sich davon nicht
+treiben lassen. Genau so soll ein Auftrag geprueft werden.**
+
+### WAS TROTZDEM EIN ECHTER FUND BLEIBT
+1. **Es gibt kein Gate, das den Aktenbestand schuetzt** -- obwohl die Thesis
+   (`kapitel/de/03_state_of_the_art.tex`, Tabelle `\label{tab:allocator-profiles}`, inhaltsgleich in
+   `03_messsystem_prtart.tex`) **zehn Profile namentlich** mit Familie, Lizenz und
+   `expected_workload` listet und im Fliesstext behauptet, alle zehn seien getaggt. Faellt eine
+   Akte weg, verliert eine **gedruckte Tabelle** ihren Beleg -- heute wuerde das nichts bemerken.
+   => Das Gate ist berechtigt, aber aus einem ANDEREN Grund als angenommen: nicht "vergessene
+   Verdrahtung", sondern **Schutz eines Abgabe-Belegs**.
+2. **Die README des Verzeichnisses ist selbst gedriftet:** `README*:14` sagt *"## Mitglieder (10)"*
+   bei **23** realen Akten. Genau die Verrottung, gegen die das Gate gebaut wird -- im selben
+   Verzeichnis.
+
+### GEBAUT (wartet auf Landung)
+ce Branch `bau/allocators-coverage-gate`, Commit `077e6e61`:
+`tests/unit/test_allocator_profile_bestand.cpp` (205 Z.) + CMake-Block. Prueft Existenz und
+Wohlgeformtheit, fordert die **zehn Thesis-Profile namentlich** (nicht bloss gezaehlt) und haelt
+den Bestand gegen eine **hart notierte** Erwartung -- mit der richtigen Begruendung im Kommentar:
+*"ein Bestands-Gate, das sich seine Erwartung aus demselben Verzeichnis holt, das es prueft, kann
+per Konstruktion nichts entdecken."* Landung erst nach woertlicher ctest-Ausgabe UND Bissprobe.
