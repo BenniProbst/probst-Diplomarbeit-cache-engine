@@ -8725,3 +8725,72 @@ Wohlgeformtheit, fordert die **zehn Thesis-Profile namentlich** (nicht bloss gez
 den Bestand gegen eine **hart notierte** Erwartung -- mit der richtigen Begruendung im Kommentar:
 *"ein Bestands-Gate, das sich seine Erwartung aus demselben Verzeichnis holt, das es prueft, kann
 per Konstruktion nichts entdecken."* Landung erst nach woertlicher ctest-Ausgabe UND Bissprobe.
+
+---
+
+## NACHTRAG 07.08.2026 abend-7 — DREI STRAENGE ZURUECK: Thesis-Drift KLEIN, ein Scheinfehler aufgeklaert
+
+### STRANG 8 -- THESIS DE/EN: DER DRIFT IST KLEIN. Entgegen der Erwartung
+Geprueft am lebenden Checkout `Projekte/Research/probst-diplomarbeit-cache-engine/thesis/diplomarbeit`,
+Commit `eaf7fe8`, Branch `development`.
+- **Struktur 1:1**: 6 lebende Kapitel + 6 Anhaenge je Sprache, Section-/Subsection-Zahlen und
+  `\label{}`-Namen **zu 100 % identisch** -- keine einzige Abweichung.
+- **Umfang normal**: EN/DE-Wortverhaeltnis durchgehend **1,08-1,27** (typisch 1,15-1,25; deutsche
+  Komposita gegen englische Mehrwortformen). Kein Ausreisser deutet auf fehlenden Inhalt.
+- **Beide bauen fehlerfrei**: DE **204 Seiten**, EN **194 Seiten**, 0 LaTeX-Fehler, 0 undefined refs.
+- **Die PMC-Ehrlichkeits-Korrektur traegt in BEIDEN Sprachen** (`05_evaluation.tex` ~:94-105):
+  drei generische Zaehler via `perf_event_open` (L1D, LLC, dTLB), Branch-Misses/IPC/CPI
+  *"nicht verdrahtet"/"not wired up"*, Energie best-effort ueber RAPL. Nicht erhobene Felder tragen
+  **`n/a`, nie eine gemessene Null.**
+- **Anhang A symmetrisch**: `\InputIfFileExists`-Zaehler DE=30, EN=30.
+- **Messwerte identisch**: in den 18 auto-generierten Tabellen sind die Zahlen byte-gleich, nur die
+  Diagnose-Prosa ist uebersetzt.
+- **Der tote Archiv-Bereich ist symmetrisch tot**: die acht nicht eingebundenen Alt-Kapitel liegen in
+  BEIDEN Sprachordnern mit Deprecation-Kopf und **identischen** Fundstellen-Zahlen.
+**=> Die Doktrin "DE fuehrt, EN zieht nach" wird im gelebten Workflow eingehalten** (fast jeder
+Commit traegt "(DE+EN)" und aendert beide Seiten in derselben Aenderung). **Null Widersprueche**
+gefunden -- kein Fall "DE sagt X, EN sagt Y".
+
+### EIN GEMELDETER FEHLER, DER KEINER IST -- vom Lead am Code aufgeklaert
+Der Strang meldete `anhang/{de,en}/E_architecture_decisions.tex:27-29` als moeglichen Rechenfehler:
+*"Achtzehn Organ-Kompositions-Achsen zaehlen ... $2^{17} = 131072$ Binary-Identitaeten"* -- 18 Achsen
+liessen 2^18 erwarten.
+**Die Thesis rechnet RICHTIG.** `source_catalog.hpp:135` sagt es explizit:
+`STRUKT-R ORG-18 / Owner-Entscheid Q-1 = FALL B: 17 Achsen je 2, persistence_target (K17) auf 1 GEPINNT.`
+und `:139`: `CatalogAxes<2,2,...,2,1>  // 2^17 * 1 = 131.072`. Es sind **achtzehn** Achsen, von denen
+**eine gepinnt** ist -- 2^17 x 1. Die Aufschaltung waere K17 auf 2 **und**
+`COMDARE_AXIS_PERSISTENCE_ENABLE_DISK_WRITEBACK=ON`, beides zusammen.
+**Was bleibt: eine STOLPERSTELLE, kein Fehler.** Die Formulierung nennt das Pinning nicht -- ein
+Pruefer, der 2^18 rechnet und 2^17 liest, verliert Vertrauen in die Zahl. **Empfehlung: einen
+Halbsatz ergaenzen** ("davon eine auf einen Wert gepinnt"), DE fuehrend, EN nachziehen. Kein
+Zahlen-Eingriff.
+
+### STRANG 5 -- DISPONENT: nur EIN zusaetzlicher Strang, und er laeuft schon
+Die Sichtung des gesamten Registers ergab **genau einen** sauber disjunkten Kandidaten: die
+Architektur-Doku-ABI-Korrektur -- **exakt der Strang 6, der bereits laeuft**. Seine vier konkreten
+Fundstellen sind an ihn weitergereicht:
+`16_E1_E4_KONSOLIDIERUNG_DOSSIER.md:189` und `:271`, `18_MESS_METHODIK_...md:104` und `:144` (alle
+nennen `ABI-MAJOR==4` als **heute geltend**, Ist ist 8).
+**Mit Gegenprobe:** `11_konzept_achsen_extension_visitor_pattern.md:1906` nennt denselben Wert, aber
+**historisiert** -- gesund, nicht anfassen. Ebenso zwei Delta-Nachtraege, die ABI-5/6 als damaligen
+Stand fuehren. **Der Test lautet: nennt das Dokument den alten Stand als DAMALIGEN (gesund) oder als
+HEUTE GELTENDEN (krank)?**
+
+**Der Rest des Registers ist KEIN Arbeitsvorrat:** er ist entweder owner-gated (G-1 STOPP-Gates, die
+10 Punkte des STAND-07.08., O-A..O-F, A11/A12/#327), belegt (Flag-Grammatik, allocators, die beiden
+Verify-Laeufe) oder beim Nachmessen zerfallen. **Zwei Stichproben, die zerfielen:**
+1. *"16 verwaiste Thesis-Alt-Kapitel"* -- sah aus wie die 23-Akten-Klasse, ist aber laengst
+   dokumentiert (`20260806-DIFF-thesis-soll-gegen-ledger-und-code.md:47`) und die Dateien tragen
+   seit `bdd1e16` **Selbst-Marker**. Projektkonform deprecatet.
+2. *"Geschwister von `allocators/`"* -- die drei Nachbar-Ordner `sota/` (34), `load_profiles/` (21),
+   `thesis_profiles/` (11) sind **alle drei aktiv gelesen**, je mit benanntem Konsumenten. Keine
+   Geschwister.
+**Auch §58-REPLAY wurde bewusst NICHT vergeben:** es beruehrt `kOrganAxisVersionLine` -- dieselbe
+Schicht wie die laufende Flag-Grammatik. Richtig erkannt.
+
+### FALLE BESTAETIGT (stand im Register, hier unabhaengig wiederentdeckt)
+`git -C /home/comdare/wt-super-landung/thesis rev-parse --show-toplevel` liefert
+**`/home/comdare/wt-super-landung`** -- das ELTERNREPO. Das Submodul ist in diesem Worktree nicht
+ausgecheckt, und `git -C` sucht aufwaerts, statt zu scheitern. Wer hier den Thesis-Commit abfragt,
+bekommt **den des Elternrepos** und merkt es nicht. Der lebende Thesis-Checkout ist
+`Projekte/Research/probst-diplomarbeit-cache-engine/thesis/diplomarbeit`.
