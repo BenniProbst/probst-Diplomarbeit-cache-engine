@@ -98,3 +98,16 @@ docs/sessions/20260710-SESSION-TRANSKRIPT-LESBAR.md
 # Voll-Review-Rohdaten (2026-07-12): 51MB Agent-Transkripte, enthalten Token-Muster aus CI/Secrets-Scan
 # -> LOKAL erhalten (Workflow-Backup-Doktrin), NIE pushen (wie Session-Transkripte).
 docs/sessions/backups/20260712-full-line-review/rohdaten/
+
+# Bau-Ausgabe-Ordner des Mess-Treibers (Code/measure_out_*): reine Zwischenablage.
+# NACHGEMESSEN 2026-08-07 an measure_out_d03 (66 Dateien, 3,7 MB): NICHTS darin ist
+# einzigartig -- measurements.csv ist byte-identisch zur getrackten Fassung unter
+# measurement/20260726-164259-d03-strukt-r-erstbeleg/, alle 8 per-Binary-result.csv
+# liegen dort unter per_binary/ (Hash-Vergleich: 8 gesichert, 0 fehlen), und die 8
+# .cxx.log sind 8/8 LEER. Der Rest (24 .dll/.cpp/.rsp, 3,4 MB) ist reproduzierbar.
+# Ignoriert, damit `git clean -fd` ihn nicht mehr trifft UND er nicht mehr als
+# vermeintlich gefaehrdete Messdaten in Erhebungen auftaucht -- ein Befund vom
+# 07.08. hielt die Logs faelschlich fuer "den einzigen Zugang zur PMC-Ursachenfrage".
+# Die ECHTEN Messdaten liegen unter measurement/ und sind dort ausdruecklich
+# trackbar (s. die !measurement/**/*.csv-Ausnahme oben).
+Code/measure_out_*/
