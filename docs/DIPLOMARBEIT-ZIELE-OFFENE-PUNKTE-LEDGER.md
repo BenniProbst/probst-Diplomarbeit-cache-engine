@@ -8552,3 +8552,71 @@ Der Grund ist genannt und gilt weiter: **golden-heikel**.
 **=> Task #40 ist damit nicht "bauen, kein Entscheid noetig", sondern OWNER-GATED.** Die
 Gegenprobe -- ob das GO zwischenzeitlich erteilt wurde -- steht noch aus und ist vor jedem Bau zu
 fuehren. Der Lead hatte den Posten in abend-2 als entscheidungsfrei ausgewiesen; das war falsch.
+
+---
+
+## NACHTRAG 07.08.2026 abend-4 — WIDERRUF: die Limits-Entkopplung IST VOLLZOGEN. Der Lead hat einen Fehlbefund gebucht
+
+**Owner-GO lag vor** ("Volles Go fuer alle Punkte, ja heikel ist das, aber da muessen wir mit
+sauberster Planung durch"). Die saubere Planung begann mit dem Lesen der Bestands-Analyse -- und
+hat den Posten selbst aufgeloest: **es ist nichts zu bauen, es ist gebaut.**
+
+### DER BEWEIS (drei Glieder, selbst gelesen, Kette geschlossen)
+1. `libs/cache_engine/profile_facade/profile_run_entry.hpp:29`
+   `#include "generated_source_catalog.hpp" // generated_make_catalog_source_gen (Basis-320-Quelle)`
+   -- **die produktive Fassade konsumiert den generierten Katalog.**
+2. `libs/cache_engine/profile_facade/CMakeLists.txt:120-121`
+   `cmake_language(DEFER ... CALL comdare_attach_generated_catalog comdare_profile_run_facade)`
+   -- **die Bibliothek**, nicht ein Test-Target, traegt Bau-Abhaengigkeit und Include-Pfade.
+3. `super/Code/02_messung_driver/CMakeLists.txt:30` linkt `comdare::profile_run_facade`; `:48`
+   macht ihr Fehlen zum `FATAL_ERROR` -- **der produktive Messtreiber haengt daran.**
+
+### DIE ENTKOPPLUNG IST SOGAR HAERTER GEBAUT ALS GEPLANT
+Der Gate-Plan der Analyse (§4) endete bei "Produktivumschaltung". Der Bestand geht darueber hinaus:
+`source_catalog.hpp:192-212` traegt den **GN-2/§26.6-Guard**, der die Entkopplung **compile-time
+erzwingt** statt sie nur zu konventionieren:
+- `kMaxMaterializableCatalogCardinality = 4096`
+- `static_assert(catalog_axis_product<FullSourceCatalog>() > 4096)` -- die 2^17-Vollform ist
+  IMMER ausgeschlossen
+- `static_assert(catalog_axis_product<golden_320_catalog>() <= 4096)` -- die 320-Basis ist IMMER zugelassen
+Kommentar verbatim: *"die materialisierende Naht ... bricht ill-formed, BEVOR ein kuenftiger
+Codegen-/Repoint-Change die 2^17-Vollform je materialisieren kann"*. Das ist genau das Risiko
+"Compile-Explosion" aus Analyse §3 -- geschlossen, nicht offen.
+
+### DIE DREI GEMELDETEN "LUECKEN" -- alle drei falsch
+- **(a) "attach nur an Test-Targets, kein Produktions-Target"** -- **FALSCH.** Siehe Glied 2. Der
+  Bericht hat `libs/cache_engine/profile_facade/CMakeLists.txt:120` uebersehen; vermutlich, weil
+  die `cmake_language(DEFER ...)`-Konstruktion nicht als Aufruf erkannt wurde.
+- **(b) "golden_320_catalog ist ein handgetippter Literal-Alias"** -- **richtig beobachtet, falsch
+  gedeutet.** Der Kommentar :140-143 sagt: *"Messdaten-erhaltend: die ALTE 320-Semantik ... als
+  benannter Alias ... bleibt compile-verankert (static_assert) + test-verankert"*. Das ist die
+  ABSICHT (Messdaten-Erhalt, [[Messdaten nie loeschen]]), keine Nachlaessigkeit.
+- **(c) "adhoc_emitter PilotEngine hardcodiert"** -- **richtig, aber kein Teil dieses Postens.**
+  Der `adhoc_emitter` emittiert Permutations-Module zur Configure-Time (`cmake/adhoc_emitter.cmake`);
+  sein kuratierter Pilot ist Absicht, und er traegt zusaetzlich `--full-coverage` ueber die echten
+  Registry-Listen. Er ist keine `CatalogAxes`-Kante -- das steht schon in der Analyse selbst
+  (§1: *"`--full-coverage` ... ist keine `CatalogAxes`-Kante"*).
+
+### FEHLERKLASSE, ZUM DRITTEN MAL AN EINEM TAG
+Der Lead hat einen Agentenbericht **ungeprueft** in Ledger (abend-2), Kontextuebergabe und Task #40
+geschrieben -- und ihn dabei sogar noch verschaerft ("der konkreteste Hauptstrang-Posten, den es
+gerade gibt"). Erst der Einstieg in den BAU hat den Fehlbefund aufgedeckt.
+**Das ist Klasse 1 (Berichte nie ungeprueft uebernehmen), heute zum dritten Mal.** Die zwei
+Vorfaelle davor: die Phasen-Fehlzuordnung und das Committen waehrend laufender Pruefung (Klasse 7).
+**Verschaerfung, die daraus folgt:** ein Agentenbefund der Form *"X ist nicht verdrahtet"* ist ein
+NULLBEFUND -- und ein Nullbefund ist erst dann eine Aussage, wenn die Gegenprobe gefahren wurde
+("wer inkludiert/linkt/ruft X?"). Diese Gegenprobe kostete hier **drei greps**.
+
+### WAS DER FEHLBEFUND WERT WAR (nicht nichts)
+1. Der GN-2-Guard und die 4096-Grenze sind jetzt aktenkundig -- eine Anhebung braucht einen
+   Compile-Feasibility-Bauplan, "KEIN stilles Hochdrehen" (:203).
+2. **`docs/architektur/17_E4_XML_VOLLVISION_ROADMAP.md` ist bestaetigt STALE** und faehrt Leser in
+   genau diesen Irrtum: TABU-Zeile :71 nennt "ABI-MAJOR==4" (Ist: **8**), der Andockpunkt
+   "main.cpp:513-521" existiert nicht mehr, und die Roadmap fuehrt Phase 4 als offen, obwohl sie
+   vollzogen ist. **Das ist der einzige echte Bau-Rest dieses Postens: die Roadmap nachziehen.**
+3. Die Analyse `20260710-schicht-e3-impl-LIMITS-ENTKOPPLUNG-ANALYSE.md` nennt durchgehend Pfade
+   unter `tests/unit/thesis_tiere/` -- der Code ist seither nach `libs/cache_engine/profile_facade/`
+   gehoben ("P0-Hebung", so benannt in `catalog_codegen.cmake:71`). Auch sie ist als HISTORISCH zu
+   kennzeichnen.
+
+**=> Task #40 ist ERLEDIGT (Fehlbefund), der Rest ist Doku-Nachzug. Kein Bau, kein Owner-Entscheid.**

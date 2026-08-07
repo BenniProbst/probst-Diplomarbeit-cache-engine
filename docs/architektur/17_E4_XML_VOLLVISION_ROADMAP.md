@@ -2,6 +2,59 @@
 
 > **Status:** Planungs-Dossier zur Freigabe (2026-07-09). Synthese aus der User-Vision 09.07. ([[feedback_e4_xml_autoritative_bauanleitung_ceb_orchestriert]]) + drei Thesis-verankerten Explore-Kartierungen (Backup `docs/sessions/backups/20260709-e4xml-vollvision-kartierung/`). Baut auf `16_E1_E4_KONSOLIDIERUNG_DOSSIER.md` (genehmigt). Belege `datei:zeile`; Thesis = `thesis/diplomarbeit/kapitel/de/`, ce = `Code/external/comdare-cache-engine`, mod = `/home/comdare/Projekte/Modules/comdare-measurement-all`.
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DIESES DOSSIER IST IN SEINEN BELEGSTELLEN VERALTET
+>
+> **Der Inhalt (Vision, Phasen-Schnitt, Gate-Denken) gilt weiter. Die `datei:zeile`-Belege und der
+> Fortschritts-Stand nicht.** Dieses Dossier hat am 07.08. nachweislich einen Fehlbefund erzeugt:
+> ein Prüf-Agent las die Phase-4-Zeile, suchte an den genannten Pfaden, fand dort nichts Produktives
+> und meldete „nicht verdrahtet" — obwohl die Kette seit Wochen geschlossen ist. **Wer hier liest,
+> muss zuerst den Ist-Stand am Code prüfen.**
+>
+> **Was sich seit dem 09.07. geändert hat:**
+> | Aussage im Dossier | Ist-Stand 07.08. | Beleg |
+> |---|---|---|
+> | „ABI-MAJOR==4" (TABU-Zeile) | **8** (Minor bereits auf 1) | `anatomy_module_abi_v1_decl.hpp:89` |
+> | „eingesperrt im `tests/unit/thesis_tiere/`-Harness" | nach `libs/cache_engine/profile_facade/` **gehoben** („P0-Hebung") | `cmake/catalog_codegen.cmake:71` |
+> | `CatalogAxes<4,4,5,4>` = 320 | **18 Achsen**; `FullSourceCatalog` = 2^17 = 131.072 (golden-REFERENZ), `golden_320_catalog` = benannter Alias (messdaten-erhaltend) | `source_catalog.hpp:139-144` |
+> | `main.cpp:513-521` (Andockpunkt Phase 1) | existiert nicht mehr; produktiver Aufrufer ist **super** `Code/02_messung_driver/main.cpp:1256`/`:1351` | dort |
+> | `source_catalog.hpp:83-116` (Andockpunkt Phase 4) | Zeilen verschoben, Datei umgezogen | `libs/cache_engine/profile_facade/source_catalog.hpp` |
+>
+> **Phasen-Vollzug (am Objekt geprüft, 07.08.):** Phase 1 **erledigt** · Phase 2 **erledigt** (5 statt 4
+> RC-Pfade) · Phase 3 **erledigt** (null lebende `search_organ_`-Deklarationen) · Phase 4 **erledigt
+> und härter gebaut als geplant** (s.u.) · Phasen 5–8 unverändert offen.
+>
+> **Phase 4 im Detail — die Kette ist geschlossen:**
+> 1. `libs/cache_engine/profile_facade/profile_run_entry.hpp:29` inkludiert `generated_source_catalog.hpp`
+>    („Basis-320-Quelle") — die **produktive Fassade** konsumiert den generierten Katalog.
+> 2. `libs/cache_engine/profile_facade/CMakeLists.txt:120-121` hängt `comdare_attach_generated_catalog`
+>    an **`comdare_profile_run_facade`** — die Bibliothek, nicht ein Test-Target. (Der Aufruf steht in
+>    einem `cmake_language(DEFER ...)`; **eine naive Suche nach dem Funktionsnamen in `tests/` findet
+>    ihn nicht** — genau daran ist der Fehlbefund entstanden.)
+> 3. `super/Code/02_messung_driver/CMakeLists.txt:30` linkt `comdare::profile_run_facade`; `:48` macht
+>    ihr Fehlen zum `FATAL_ERROR`.
+>
+> **Über den Plan hinaus gebaut:** `source_catalog.hpp:192-212` trägt den **GN-2/§26.6-Guard**, der die
+> Entkopplung **compile-time erzwingt** statt sie zu konventionieren —
+> `kMaxMaterializableCatalogCardinality = 4096`, zwei `static_assert`s schließen die 2^17-Vollform
+> aus und lassen die 320-Basis zu. Damit ist auch das Risiko „Compile-Explosion" der
+> Limits-Entkopplungs-Analyse (§3) geschlossen. **Eine Anhebung der 4096-Grenze braucht einen
+> Compile-Feasibility-Bauplan — „KEIN stilles Hochdrehen" (`:203`).**
+>
+> **Die zugehörige Analyse** `docs/audits/20260710-schicht-e3-impl-LIMITS-ENTKOPPLUNG-ANALYSE.md` ist
+> aus demselben Grund historisch: ihre Pfade zeigen durchgehend auf `tests/unit/thesis_tiere/`.
+> Ihr **Gate-Plan §4** ist inhaltlich erfüllt (Stufen 1–3 mit adversarialem Review am 10.07.,
+> Stufen 4–6 im Bestand).
+>
+> **Namensraum-Warnung:** die Phasen 1–8 dieses Dossiers sind **NICHT** die Phasen 1–7 des
+> `20260803-FAHRPLAN-gesamtkette-wellen-phasen.md` und **NICHT** die Phasen aus Dossier 16
+> (`16_E1_E4_KONSOLIDIERUNG_DOSSIER.md:197-199`, dort ist „Phase 4" = #31). Drei getrennte
+> Zählkreise. Sprachregelung: **„XML-Phase n"** (dieses Dossier) · **„Fahrplan-Phase n"** ·
+> Dossier-16-Phasen (historisch).
+>
+> ---
+
 ## TEIL A — DIE VISION & DER ZENTRALE STRATEGISCHE BEFUND
 
 **User-Vision (09.07., bindend):** Die XML ist die **autoritative Bauanleitung des gesamten Versuchsaufbaus**. Sie treibt (1) die **Limits der 19 statischen Hauptachsen** → welche Tier-Binaries entstehen (E3/E2), (2) deren **dynamische Unter-Achs-Konfigurationen** (RC-Laufzeit, E1), (3) **gegen ein paralleles Achsen-Messsystem** (separate System-Achsen mit eigenen Abstractions, M). Der **CacheEngineBuilder liest die XML zu seiner Laufzeit und lässt die Tier-Binaries kompilieren / orchestriert ihren Aufbau** (E4→E3→E2). Workload = **eigene Bibliothek-Kategorie** (dutzende Frameworks × Workloads, nicht YcsbWorkload A–F).
@@ -54,10 +107,10 @@ Das ist **#229 in Vollform** — die ZIEL-Invariante ist thesis- und dossier-ver
 
 | Phase | Inhalt | #-Nummer | Kern-Andockpunkt | Gate |
 |---|---|---|---|---|
-| **1 Produktiv-Andockung** | `run_profile` aus Test-Harness in produktive Lib/App heben; `messung_driver` ruft es statt/neben `ExperimentDriver` → die #229-Kette läuft produktiv (auf golden-320) | **#230** | `profile_run_entry.hpp:104` → `main.cpp:513-521` | ctest + golden-Roundtrip==320 |
-| **2 RC-Dynamik-Vollendung** | 4 fehlende RC-Setter; `runtime_dynamic`-XML-Achsen (thread_count/hw_prefetcher) real an `ComdareResourceControlV1` verdrahten; Hard-Gate vor #156 (Phantom-Zeilen) | **#221** | `abi_adapter.hpp:239`, `experiment_tree.hpp:136-155` | RC-Konsum-Test |
-| **3 Achsen-Uniformität** | `search_organ_`-Monolith tilgen → Lebewesen routen uniform durch node_type/memory_layout (Apparat-Artefakt vs. Signal) | **#188** | `CE/34:156-164`, ce Dossier §17 | ctest je Familie |
-| **4 Limits-Entkopplung** | `CatalogAxes<4,4,5,4>` → aus `ThesisProfile.permute_axes` ableiten; XML treibt die Limits WIRKLICH (nicht nur innerhalb golden-320); `adhoc_emitter`-PilotEngine → XML-Achsenliste | **#229-Kern** | `source_catalog.hpp:83-116`, `apps/adhoc_emitter/main.cpp:139` | golden-Roundtrip als Gate (C.3) |
+| **1 Produktiv-Andockung** | ✅ VOLLZOGEN (07.08. am Objekt geprüft; Aufrufer in super, nicht ce apps/) —  `run_profile` aus Test-Harness in produktive Lib/App heben; `messung_driver` ruft es statt/neben `ExperimentDriver` → die #229-Kette läuft produktiv (auf golden-320) | **#230** | `profile_run_entry.hpp:104` → `main.cpp:513-521` | ctest + golden-Roundtrip==320 |
+| **2 RC-Dynamik-Vollendung** | ✅ VOLLZOGEN (5 statt 4 RC-Pfade, `abi_adapter.hpp:437-498`) —  4 fehlende RC-Setter; `runtime_dynamic`-XML-Achsen (thread_count/hw_prefetcher) real an `ComdareResourceControlV1` verdrahten; Hard-Gate vor #156 (Phantom-Zeilen) | **#221** | `abi_adapter.hpp:239`, `experiment_tree.hpp:136-155` | RC-Konsum-Test |
+| **3 Achsen-Uniformität** | ✅ VOLLZOGEN (null lebende `search_organ_`-Deklarationen) —  `search_organ_`-Monolith tilgen → Lebewesen routen uniform durch node_type/memory_layout (Apparat-Artefakt vs. Signal) | **#188** | `CE/34:156-164`, ce Dossier §17 | ctest je Familie |
+| **4 Limits-Entkopplung** | ✅ VOLLZOGEN + GN-2-Guard darüber hinaus —  `CatalogAxes<4,4,5,4>` → aus `ThesisProfile.permute_axes` ableiten; XML treibt die Limits WIRKLICH (nicht nur innerhalb golden-320); `adhoc_emitter`-PilotEngine → XML-Achsenliste | **#229-Kern** | `source_catalog.hpp:83-116`, `apps/adhoc_emitter/main.cpp:139` | golden-Roundtrip als Gate (C.3) |
 | **5 Framework×Workload-Bibliothek** | `comdare-workloads` (measurement-all): Framework-Registry (13) + 14-LP-Katalog + konkrete Loader (TPC/SPEC/CloudSuite/mimalloc-bench) + 6-Kanon-Akten; Dataset-Parser-Bruch heilen | **#31/F7** | `dataset_loader.hpp:59-85`, `15_F7…md` | measurement-all gated Schritt 13 |
 | **6 Paralleles Mess-System** | vereinheitlichte `IMeasurementSource` (vendor-neutral) + `<measurement_categories>`-XML + Verdrahtung Prüf-Dock → POD (4. orthogonale Dimension) | neu (M) | `20260531-mess-abstraktion…:81-135`, `SCHEMA.md` | ctest + PMC-honest-0 |
 | **7 Parser-/Gating-Konsolidierung** | `XmlConfigParser`-Vereinheitlichung (2 Reader → 1), `COMDARE_EXPERIMENT_MODE` verdrahten, 4-Datei-Schema bereinigen, `#223` E3-Gate re-verifizieren | #223 | `xml_config_parser.cpp:70-296` | Gate-Regression |
@@ -68,7 +121,7 @@ Das ist **#229 in Vollform** — die ZIEL-Invariante ist thesis- und dossier-ver
 ## TEIL E — KADENZ · GATES · DIREKTIVEN
 
 - **Metaprogrammierung:** compile-time only im Hot-Path (kein Runtime-Switch — `pilot_source_map` bestätigt: String→Typ nur compile-time); die Achsen bleiben CRTP+Concept; W/D/M bewusst runtime (E4/E1) = korrekte Grenze.
-- **TABU ohne separates GO:** `permutation_axes.xml`, `golden_fullpilot_320`, POD `sizeof`, `GenusBindingTraits`, ABI-MAJOR==4. Phase 4 (Limits-Entkopplung) berührt den golden-Raum → golden-Roundtrip==320 als Pflicht-Gate, kein ABI-Bump ohne GO.
+- **TABU ohne separates GO:** `permutation_axes.xml`, `golden_fullpilot_320`, POD `sizeof`, `GenusBindingTraits`, ABI-MAJOR. **[STAND 07.08.: ABI-MAJOR ist 8, nicht 4 — der hier genannte Wert 4 ist der Stand vom 09.07.]** Phase 4 (Limits-Entkopplung) berührt den golden-Raum → golden-Roundtrip==320 als Pflicht-Gate, kein ABI-Bump ohne GO. **[STAND 07.08.: Phase 4 ist VOLLZOGEN; die Entkopplung ist zusätzlich compile-time durch den GN-2/§26.6-Guard erzwungen.]**
 - **Freeze:** main.cpp-V31.F-Freeze für die E4-XML-Verdrahtung **aufgehoben** (User-GO 09.07.).
 - **Verifikation je Increment:** fresh-context-Kartierung → manuelle Umsetzung → Voll-Review → Mojibake-grep==0 → clang-format-dry-run==0 → doppelt-literal (g++-16 + eigener Lauf) → golden-Roundtrip==320 wo berührt → granularer Commit (nie `git add -A`) → beide Remotes → CI STRIKT GRÜN.
 - **Backups:** jeder Analyse-Lauf → `docs/sessions/backups/` (fortlaufend).
