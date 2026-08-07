@@ -8174,3 +8174,61 @@ materialisiert** (`0b5ed557`, `838612f3`, `bda34e79`, `d8073913`) und ueber die 
 erfasst -- nur die wf-ID fehlt als Zitat. **Kein Arbeitsverlust.** Ebenso ohne Verlust: die
 Abbrueche in `wf_664f0a48`, `wf_f4ebffd6`, `wf_50e0559b` (jeweils unmittelbar nach Start, keine
 Ausgabe; die uebrigen Agenten derselben Wellen haben geliefert).
+
+---
+
+## NACHTRAG 07.08.2026 nachmittag-1 -- ALLE WELLEN GELANDET + DIE VERGESSENE TALOS-KORREKTUR VOLLZOGEN
+
+**WELLENPLAN VOLLSTAENDIG ABGEARBEITET.** Fuenf Wellen, jede in eigenem temporaerem Branch,
+jede mit Bissbeweis, jeder Branch nach dem Merge geloescht (Owner-Direktive).
+
+| Welle | Inhalt | Ref |
+|---|---|---|
+| A | T-9 Min/Max-Katalog speist break_even | ce 875a57cd |
+| B | fail-closed Modus + macOS-Off-by-one + Phantom angenagelt | ce 0c08fa15 |
+| E | resource_group PMU host-scoped | ce 0c80aa78 |
+| C | T-8 Pareto-Front | ce 21560a2e |
+| D | T-10 Workload-Cluster offline (2. Anlauf) | ce a1d0c201 |
+
+### DER SCHWERSTE FUND DES NACHMITTAGS (Welle C): der Selektor lieferte eine DOMINIERTE Binary aus
+`rank_binaries` rankte EINE Metrik; `best_binary_selector_main` nahm `ranked.front()`. Bei
+Median-Gleichstand entschied der Tie-Break *"mehr Samples zuerst"* -- und konnte damit eine
+dominierte Binary kueren UND VERSENDEN. **Bissbeweis mit dem echten CLI am unveraenderten Stand:**
+`bin_tie_loser` (lookup=100, scan=500) wurde versandt, obwohl `bin_true` (lookup=100, scan=200)
+sie strikt dominiert. Das war kein theoretischer Defekt -- es ist der Auslieferungspfad.
+**Bruecke zum T-9-Katalog sauber geloest:** der Selektor ist self-contained C++17, der Katalog
+C++23 -- deshalb SPIEGEL statt Include (K-5-Muster), aber mit **echtem Paritaets-Gate**: der Test
+inkludiert den ECHTEN Katalog-Header und haelt Enum-Gleichheit + zwei Katalog-Zeugen per
+`static_assert`. Drift bricht compile-time. Vom Lead nachgeprueft.
+
+### WELLE D: DIE RETTUNG WAR RICHTIG -- UND DIE WARNUNG DARIN AUCH
+Der erste Anlauf starb am Spend-Limit; der Lead entfernte den Worktree mit `--force`, **obwohl
+die drei ungetrackten Dateien in der Zeile unmittelbar davor standen** -- die Arbeit war
+geloescht. Geborgen aus dem Agenten-Transkript (660 KB, vollstaendige Write-Aufrufe), gesichert
+unter `docs/sessions/backups/20260807-welleD-t10-spendlimit-rettung/` mit ausdruecklichem
+UNGEPRUEFT-Vermerk.
+**Der Audit des zweiten Anlaufs bestaetigte den Vermerk: die gerettete Fassung war NICHT
+UEBERSETZBAR** -- die gtest-Makros zerbrachen an Komma-getrennten Template-Argumenten
+(`EXPECT_FALSE(cluster_offline<Linkage, 2>(...))`, 4 Fundstellen, vom Lead nachgemessen). Der
+Vorgaenger haette es beim ersten Bauversuch gesehen; er kam nicht dazu. Plan-Treue und
+Testsubstanz waren dagegen hoch -> uebernehmen-und-haerten.
+**Echte Luecke geschlossen:** die k-Wahl (BEFUND Abschnitt 3) fehlte ganz. Neu: Sweep +
+Silhouette-/Elbow-Votum + Domaenen-Anker -- **gemeldet, nie erzwungen**. Der Agent baute
+BEWUSST KEINE Funktion, die "das" k liefert: Gap braucht Zufalls-Referenz + Seed, BIC eine
+GMM-Variante; ein Zwei-von-vier-Konsens waere die stille Festlegung, die der Auftrag verbietet.
+**LEHRE (ins Fallen-Register):** vor `worktree remove --force` IMMER die ungetrackten Dateien
+sichern. Ein Agent, der am Limit stirbt, hat typischerweise NICHT committet. Und: Agenten
+sollen in kleinen, committeten Schritten arbeiten -- der zweite Anlauf tat es (3 Commits) und
+haette bei einem Abbruch nichts verloren.
+
+### VERGESSENE ARBEIT V2 VOLLZOGEN: die Talos-Tempus-Korrektur (thesis eaf7fe8)
+Der Ledger hatte sie **verordnet** (*"Loesung ist Tempus/Status praezisieren -- NICHT streichen,
+NICHT 'Rollentrennung'"*), ausgefuehrt wurde sie nie -- und der zugehoerige Task wurde trotzdem
+geschlossen (mit der richtigen Umklassifizierung "keine Falschaussage, sondern uneingeloeste
+Anforderung"). **Mit dem Task verschwand der einzige Traeger des Restauftrags.** Das ist die
+Fehlerklasse: eine Umklassifizierung ERSETZT die verordnete Massnahme nicht.
+Jetzt vollzogen an drei Stellen je Sprache: Praesens Passiv -> Sollform + Vollzugsstand
+("entworfen, aber nicht vollzogen"; alle berichteten Messungen aus dem root-Linux-Regime).
+ADR-12 behaelt ihr Entscheidungs-Praesens (ADR-Konvention) und bekommt ein eigenes Feld
+**Vollzugsstand**. DE gefuehrt, EN inhaltsgleich nachgezogen. chktex auf ALLEN SECHS beruehrten
+Dateien 0 Warnings, DE 204 / EN 194 Seiten, .blg 0/0.
