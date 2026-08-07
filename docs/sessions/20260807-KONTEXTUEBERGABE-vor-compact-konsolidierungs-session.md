@@ -57,10 +57,11 @@ fand REST-MAENGEL, die ein Nacharbeits-Agent (a3c7a284) gerade behebt (uncommitt
 - zwei Owner-Entscheide faelschlich als offen gefuehrt: Frist 15.09. ist FESTGELEGT; §17.10/§17.12
   Paraphrase-Fehler (PR-3 "letzte 3 Wellenplaene"; Aussage-39 "Abgabe morgen" = Zwischenabgabe).
 
-**NACH DEM COMPACT ZU TUN:** Ergebnis des Nacharbeits-Agenten a3c7a284 abholen, dann das Ziel-Dossier
-gitleaks-pruefen (Elternrepo-Mount!) + committen + dual-push aus wt-super-landung. Das Dossier ist
-uncommittet -- der Fold-Rohstand ist als Backup gesichert, falls die Nacharbeit schiefging.
-Workflow-Vollergebnis (Verify-Berichte) in Task #32 + im journal wf_e19d0850-9f7.
+**STAND 07.08. ~05:00: VOLLZOGEN.** Nacharbeit a3c7a284 fertig, Dossier 3704 Z., beide Anker am
+Objekt gegengeprueft (system_axis.hpp 431 Z. -> :22/:193/:238; abi_adapter.hpp :386), morgen-1-Bloecke
++ STATUS-Block eingearbeitet. GELANDET als super a6f8b8d8 (development, beide Remotes, gitleaks sauber).
+Das neue Gesamt-Dossier ist damit committet -- KEINE offene Nacharbeit mehr an ihm.
+Workflow-Vollergebnis (Verify-Berichte) im journal wf_e19d0850-9f7.
 
 ## 2. WAS DIESE SESSION VOLLZOGEN HAT (chronologisch)
 
