@@ -1,0 +1,1148 @@
+{
+  "summary": "Owner-KERN 07.08. (Punkt-Notation, Komposit-Flags, e=efficiency) gegen die Planung der letzten 4 Wochen halten: kartieren, Konflikte finden, vereinen",
+  "agentCount": 5,
+  "logs": [],
+  "result": {
+    "karten": [
+      {
+        "luecken": [
+          "Die \"Lead-Auslegung\" der neuen Grammatik (Schema achse@X.Y.Z.<flag>.<flag>.{<komposit>...}) ist laut Ledger selbst noch nicht Owner-bestaetigt (\"Bestaetigung ausstehend\", super LEDGER:8265) -- das Beispiel \"memory@1.0.0c.p.e.{x512.f.vl.bw.dq}\" zeigt 'c' OHNE Punkt direkt am Zahlentripel, waehrend die abstrakte Formel darueber einen Punkt VOR jedem Flag verlangt; dieser innere Widerspruch der Auslegung selbst ist ungeklärt.",
+          "Ob der SemVer-interne '.' (Trenner von X.Y.Z) und der neue Flag-Trenner '.' fuer einen kuenftigen Parser unterscheidbar sind, ist im Owner-Wortlaut nicht spezifiziert (im super LEDGER:8286 bereits als eigene Bruchstelle (4) vermerkt, aber nicht aufgeloest).",
+          "Das Flag 'p' (performance core) ist im gesamten 4-Wochen-Fenster vor dem 07.08.2026 in keiner durchsuchten Quelle (ce-Code, super-Ledger, Thesis, Live-Transkript) belegt -- es erscheint erstmals im Owner-KERN vom 07.08.2026 selbst, ohne fruehere Planungshistorie.",
+          "Ob die fuenf Pruef-Dock-Versionen (E-24/C4, Commit 9de12722) und die probe_id-Literale der OS-U3/OD-10-RT/OD-11-RT-Familien ebenfalls unter die neue Grammatik fallen sollen, ist unentschieden -- der Owner-KERN spricht woertlich nur von \"Organ/Algorithmus einer Tier-Binary Achse\".",
+          "Fuer den Zeitraum 10.07.-18.07.2026 (die ersten anderthalb Wochen des 4-Wochen-Fensters) wurde kein Live-Transkript durchsucht, da nur die eine zugewiesene Transkript-Datei (deckt 06.08.-07.08. ab) vorlag; die Abdeckung fuer diesen fruehen Teilzeitraum stuetzt sich ausschliesslich auf ce-Commit-Historie und super-Ledger/Sessions-Dokumente."
+        ],
+        "nenner": "Die gesamte A13-Kette (M1 02.08. ~14:2x UTC bis M4 03.08. ~18:5x UTC; Code-Stand algo_semver.hpp:26-30 unveraendert bis zum 07.08.) beruht auf zwei Owner-Entscheiden vom 02.08.2026: Q3 (dreistellig, GENAU EIN Hardware-Flag c/g/f/n DIREKT ohne Trenner angehaengt) und E2 ('e' = experimentelle Pruefling-Markierung, verankert u.a. in der B12-Wache \"ce-Registry traegt nie ein 'e'\"). Der Owner-KERN vom 07.08. (12:19-12:49 UTC) widerspricht beiden Punkten woertlich und frontal: '.' wird ab jetzt Trenner zwischen ALLEN Flags (bricht \"kein Trenner\"/\"GENAU EINES\"), und 'e' wird explizit von 'experimental' auf 'efficiency core' umdefiniert (\"ist deprecated\"), was die B12-Wache sinnwidrig macht. Eine dritte, strukturelle Spannung betrifft A13-M2 (Owner-Q1/E2, 02.08.): dort haengt genau EIN Meta-Meta-Klammer-Anhang am ENDE jeder Realm-Zeile (System/Mess/Organ), waehrend der Owner-KERN eine Signatur JE ALGORITHMUS verlangt. Mechanisch unvereinbar mit alledem ist die 2-Bit-Kodierung des Hardware-Flags im 48-Byte-Stempel-POD (anatomy_stamp_entries.hpp, A13-M1b) -- sie fasst nur 4 feste Werte, keine variable Flag-Kette mit Komposit-Klammern.",
+        "referenzen": [
+          {
+            "fundort": "Live-Transkript Zeile 13808 (2026-08-07T12:42:11.001Z)",
+            "was_dort_steht": "Der Owner erklaert woertlich, dass '.' ab jetzt Trenner zwischen allen Flags ist, dass Komposit-Flags in geschweiften Klammern stehen, dass 'e' fuer 'experimental' deprecated ist weil es jetzt 'efficiency core' bedeutet, und dass jeder Algorithmus eine eigene Meta-Meta-Signatur traegt.",
+            "relevanz": "TRAGEND",
+            "zitat": "Wir machen also x512.f.vl.bw.dq..... aus der Notation und trennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes Organ/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil es jetzt fuer efficiency core steht. Jeder Algorithmus kann eigenstaendig gegen zusaetzliche Meta-Meta-Achsen als Komposit-Erweiterungs-Flags optimiert und kompiliert werden. [...] Ich aendere hiermit die Formatierung durch das Trennen durch '.' .",
+            "datum": "2026-08-07 12:42 UTC"
+          },
+          {
+            "fundort": "Live-Transkript Zeile 13579 (2026-08-07T12:19:01.855Z)",
+            "was_dort_steht": "Der Owner erklaert woertlich, dass 'e' die hoechste Prioritaet hat und ganz vorn steht, dass jedes Zeichen ein Filter fuer einen Hardware-Bereich ist, und kuendigt weitere Filterflags xNUMBER (x128*/x256*/x512**) fuer AVX-Registerbreiten an.",
+            "relevanz": "TRAGEND",
+            "zitat": "Nun e hat die hoechste Prioritaet nd steht ganz vorn (jedes character ist ein filter fuer einen Hardware Bereich oder Eigenschaft [...]). [...] Weitere Filterflags sind xNUMBER fuer AVX128,AVX512 oder AVX256 als x128* x256* x512** mit '*' als Hardware Flags speziell nachfolgend fuer die AVX verbauten Register.",
+            "datum": "2026-08-07 12:19 UTC"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 95fc814c, libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "was_dort_steht": "Der Commit zitiert Owner-Q3 vom 02.08.2026 woertlich im Commit-Text und baut daraus die Grammatik 'v' UINT.UINT.UINT [HWFLAG['e']] mit GENAU EINEM Hardware-Flag, das ohne Trennzeichen direkt an das Zahlentripel angehaengt wird.",
+            "relevanz": "TRAGEND",
+            "zitat": "Die Kurzform ist verboten, Versionierungen sind einheitlich und immer 3-Stellig und beginnen mit 'v'. Das 'e' ist eine Flag und kann spaeter gegen andere Falgs wie 'g' fuer GPU, 'c' fuer CPU, 'f' fuer FPGA und 'n' fuer NPU code erweitert werden. Wir produzieren nur CPU code, daher muessen alle Versionen mit 'c' oder 'ce' enden.",
+            "datum": "2026-08-02T15:52:54Z"
+          },
+          {
+            "fundort": "super (wt-super-landung) docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:60-68",
+            "was_dort_steht": "Die Primaerquelle des Owner-Q3-Wortlauts (NACHTRAG ~17:0x CEST 02.08.2026) leitet fuenf bindende Punkte ab: Form-Pflicht dreistellig+'v', erweiterbare Flag-Familie c/g/f/n dann optional 'e', CPU-only-Pflicht 'c'/'ce', Bestandsmigration als Byte-Ereignis, Wachen-Anpassung.",
+            "relevanz": "TRAGEND",
+            "zitat": "Die Kurzform ist verboten, Versionierungen sind einheitlich und immer 3-Stellig und beginnen mit 'v'. [...] Wir produzieren nur CPU code, daher muessen alle Versionen mit 'c' oder 'ce' enden. Bitte halte das so fest",
+            "datum": "2026-08-02 ca. 17:0x CEST"
+          },
+          {
+            "fundort": "ce (wt-landung) commit bf830c03, libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "was_dort_steht": "Der Commit zitiert Owner-Entscheid E2 vom 02.08.2026 woertlich: das angehaengte 'e' markiert einen experimentellen Achsen-Algorithmus aus einem Pruefling.",
+            "relevanz": "TRAGEND",
+            "zitat": "Die Markierung experimenteller Achsen-Algorithmen aus einem Pruefling wird in der Versionsbezifferung eines jeden Achsen-Algorithmus mit einem angehaengten 'e' fuer 'experimental' markiert.",
+            "datum": "2026-08-02T14:20:58Z"
+          },
+          {
+            "fundort": "super (wt-super-landung) docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:9",
+            "was_dort_steht": "Die Primaerquelle des Owner-Entscheids 2 (E2, ~11:0x CEST 02.08.2026) legt fest, dass Meta-Meta-Achsen wie alle Hauptachsen PFLICHT sind, dynamisch ans Ende der bestehenden Realm-Zeilen angehaengt werden, und dass experimentelle Pruefling-Algorithmen ein 'e' in der Versionsbezifferung tragen.",
+            "relevanz": "TRAGEND",
+            "zitat": "Die Markierung experimenteller Achsen-Algorithmen aus einem Pruefling wird in der Versionsbezifferung eines jeden Achsen-Algorithmus mit einem angehaengten 'e' fuer 'experimental' markiert.",
+            "datum": "2026-08-02 ca. 11:0x CEST"
+          },
+          {
+            "fundort": "ce (wt-landung) libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:26-30 (aktueller Code-Stand)",
+            "was_dort_steht": "Der aktuell im Repository stehende Code traegt die EBNF version:='v'UINT.UINT.UINT[HWFLAG['e']] mit HWFLAG:='c'|'g'|'f'|'n' als GENAU EINEM klein geschriebenen, direkt angehaengten Zeichen ohne Trenner, Reihenfolge fest Hardware-Flag-dann-'e'.",
+            "relevanz": "TRAGEND",
+            "zitat": "version := 'v' UINT '.' UINT '.' UINT [ HWFLAG [ 'e' ] ] [...] HWFLAG := 'c' (CPU) | 'g' (GPU) | 'f' (FPGA) | 'n' (NPU) -- GENAU EINES, klein, direkt angehaengt",
+            "datum": "Stand 07.08.2026 (Code seit A13-M3/C4 vom 03.08.2026 unveraendert)"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 593ccf85, libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "was_dort_steht": "Der Commit baut die K-5-Sentinel-Praedikat-Verschaerfung und einen static_assert, der ein 'e' in einer ce-EIGENEN Registry compile-zeitig hart zurueckweist.",
+            "relevanz": "TRAGEND",
+            "zitat": "reflect_versions erhaelt einen zweiten static_assert: ein 'e' in einer ce-Registry bricht compile-time MIT dem Typ-Namen",
+            "datum": "2026-08-02T14:21:22Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 2eda6f64, tests/unit/test_m_w12",
+            "was_dort_steht": "Der Commit-Titel selbst nennt woertlich die 'K-5-Sentinel-Wache' und verankert sie zusammen mit der 'e'-Suffix-Grammatik und der Q2-Namens-Toleranz im Test-Querschnitt.",
+            "relevanz": "TRAGEND",
+            "zitat": "test(A13-M1): 'e'-Suffix, K-5-Sentinel-Wache und Q2-Namens-Toleranz im W12-Querschnitt",
+            "datum": "2026-08-02T14:21:37Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit c7f3e005, libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "was_dort_steht": "Der Commit-Titel nennt woertlich 'B12' (Codex-Review, 02.08.2026) und baut ce_owned_version_is_wellformed(), die u.a. verlangt, dass eine ce-EIGENE Version NIE 'e' traegt, weil 'e' ausschliesslich die Pruefling-Markierung ist.",
+            "relevanz": "TRAGEND",
+            "zitat": "fix(B12): Registry-Versions-Politik EINMAL - parsbar + nie 'e' + Flag, alle vier Wachen",
+            "datum": "2026-08-02T17:59:06Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 67e4965f, mehrere Dateien (A13-M3/C4)",
+            "was_dort_steht": "Der Commit-Titel nennt woertlich 'A13-M3/C4' und migriert den gesamten Bestand (122 Organ- + 7 Nicht-Organ- + 5 Meta-Meta-Literale + Planer/OS-Probe) von der flaglosen dreistelligen Form auf 'v1.0.0c' und setzt COMDARE_VERSION_HW_FLAG_ENFORCE im selben Commit auf 1.",
+            "relevanz": "TRAGEND",
+            "zitat": "feat(versionen)!: A13-M3/C4 -- Owner-Q3-Flag-Migration + ENFORCE=1 im SELBEN Commit",
+            "datum": "2026-08-03T17:18:04Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 9c42f3fa, libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp",
+            "was_dort_steht": "Der Commit zitiert Owner-Antwort Q1 vom 02.08.2026 woertlich und erhebt die bereits im Code kodifizierte Klammer-Grammatik (Klammer-Tiefe kodiert die Meta-Meta-Ebene) zur verbindlichen Zeilen-Grammatik, wobei die zuvor erwogene Punkt-Pfad-Form verworfen wird.",
+            "relevanz": "TRAGEND",
+            "zitat": "Q1 - Wie empfohlen nach Klammern (derzeit auch so geplant, bitte nachlesen).",
+            "datum": "2026-08-02T16:45:09Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 78bcdc5a, libs/cache_engine/include/cache_engine/abi/anatomy_version_stamp.hpp",
+            "was_dort_steht": "Der Commit haengt die Meta-Meta-Achsen als EIN gemeinsames geklammertes ';'-Segment an das ENDE der jeweiligen Realm-Zeile (System-/Mess-/Organ-Zeile) an, nicht an das einzelne Organ- bzw. Algorithmus-Segment.",
+            "relevanz": "TRAGEND",
+            "zitat": "Der Anhang ist ein eigenes ';'-Segment am Zeilen-ENDE, nie zwischen den Haupt-Achsen und nie eine Sonderzeile (Owner-E2 \"ans Ende der Kette\").",
+            "datum": "2026-08-02T16:52:41Z"
+          },
+          {
+            "fundort": "super (wt-super-landung) DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:8279-8292",
+            "was_dort_steht": "Der Lead selbst listet unmittelbar nach dem Owner-KERN-Zitat sechs harte Bruchstellen des damaligen Ist-Standes auf, darunter die Kardinalitaet von 1 auf n Zeichen, die Bedeutungsaenderung von 'e', den neuen '.'-Trenner und die auf 2 Bit begrenzte POD-Kodierung des Hardware-Flags.",
+            "relevanz": "TRAGEND",
+            "zitat": "Sechs harte Bruchstellen: (1) Kardinalitaet 1 -> n Zeichen [...] (6) die POD-Kodierung nutzt genau 2 Bit fuer das Hardware-Flag (4 Werte) und 1 Bit fuer experimental.",
+            "datum": "2026-08-07 (Ledger-Nachtrag)"
+          },
+          {
+            "fundort": "ce (wt-landung) libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp:105-163 (aktueller Code-Stand)",
+            "was_dort_steht": "Das reserved-Feld des 48-Byte AnatomyStampEntryV1-PODs kodiert das Experimental-Flag in Bit 0 und das Hardware-Flag in genau zwei Bits (Bits 1-2, kStampEntryHwFlagMask = 0x3u verschoben um 1) mit vier festen Codepunkten 00=c/01=g/10=f/11=n.",
+            "relevanz": "TRAGEND",
+            "zitat": "inline constexpr std::uint32_t kStampEntryHwFlagShift = 1u; inline constexpr std::uint32_t kStampEntryHwFlagMask = 0x3u << kStampEntryHwFlagShift;",
+            "datum": "Stand 07.08.2026 (Bits 1-2 seit A13-M1b, Commit 23085ab1 vom 02.08.2026)"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 23085ab1, libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp",
+            "was_dort_steht": "Der Commit-Titel nennt woertlich 'A13-M1b' und legt Bits 1-2 des reserved-Feldes als zweistellige Hardware-Flag-Kodierung mit 'c' als Default-Kodierung 00 fest.",
+            "relevanz": "TRAGEND",
+            "zitat": "feat(A13-M1b): Hardware-Flag als Bits 1-2 im reserved-Feld des Stempel-Entry-PODs",
+            "datum": "2026-08-02T15:58:20Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 130d2914, libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp",
+            "was_dort_steht": "Der Commit-Titel nennt woertlich 'A13-M1' und legt Bit 0 des reserved-Feldes als Experimental-Flag-Kodierung fest, als Array-POD-Pendant zur Grammatik-Aenderung in bf830c03.",
+            "relevanz": "STUETZEND",
+            "zitat": "feat(A13-M1): Experimental-Bit 0 im reserved-Feld des Stempel-Entry-PODs",
+            "datum": "2026-08-02T14:21:12Z"
+          },
+          {
+            "fundort": "super (wt-super-landung) docs/sessions/20260802-BAUPLAN-owner-entscheide-synthese-kritischer-pfad.md:17",
+            "was_dort_steht": "Die 'AUFLAGE K-5' (Sentinel-Wache fuer 'v0e') stammt aus einer Manager-Synthese von sechs adversarialen Fable-xhigh-Reviews gegen die Owner-Entscheide vom 02.08.2026, nicht aus einer eigenen Owner-Aeusserung.",
+            "relevanz": "STUETZEND",
+            "zitat": "M1 'e'-Fundament sofort (golden-neutral; AUFLAGE K-5: 'v0e'->Sentinel-Wache)",
+            "datum": "2026-08-02"
+          },
+          {
+            "fundort": "ce (wt-landung) commit b86b9d30, libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "was_dort_steht": "Der Commit schaltet die volle Owner-Q3-Pflicht (Hardware-Flag zwingend vorhanden und 'c') hinter das Macro COMDARE_VERSION_HW_FLAG_ENFORCE, mit dem Vermerk, das Define gehe im Migrations-Commit des A13-M2/M3-Fensters auf ON.",
+            "relevanz": "STUETZEND",
+            "zitat": "Wer es heute auf 0 zuruecksetzt, laesst die Owner-Pflicht undurchgesetzt",
+            "datum": "2026-08-02T15:58:00Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 85ee0805, libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "was_dort_steht": "Der Commit-Titel nennt woertlich 'B11' (Codex-Review, 02.08.2026) und baut eine Ueberlauf- und Leading-Zero-Wache gegen Alias-Identitaeten wie 'v01.0.0c' und 'v1.0.0c'.",
+            "relevanz": "STUETZEND",
+            "zitat": "fix(B11): take_uint mit Ueberlauf-Wache + Leading-Zero-Verbot (Alias-Identitaeten)",
+            "datum": "2026-08-02T17:57:57Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 049e4337, libs/cache_engine/include/cache_engine/abi/anatomy_version_stamp.hpp",
+            "was_dort_steht": "Der Commit verschiebt load_framework von der ersten Stelle der Mess-Zeile (Manager-Entscheid O-8 Schritt 9 vom 27.07.2026) an die letzte Stelle als geklammerten Meta-Meta-Anhang gemaess Owner-E2.",
+            "relevanz": "STUETZEND",
+            "zitat": "Bisher: load_framework als ERSTES Segment der Mess-Zeile (O-8 Schritt 9, OP-3 = Manager-Entscheid 27.07.2026, super docs/sessions/20260727-PLAN-o8-fenster-atomar-ultracode.md:781-783).",
+            "datum": "2026-08-02T17:00:52Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit d5643e70, libs/cache_engine/builder/experiment_tree/merge_plan.hpp (A13-M3/C5)",
+            "was_dort_steht": "Der Commit baut eine CT-Wache, die als einzige zulaessige Unterscheidung zwischen zwei byte-verschiedenen Merge-Binaries entweder das 'e'-Experimentalflag oder einen erweiterten hierarchischen Namen zulaesst, gemaess Owner-Q2 vom 02.08.2026.",
+            "relevanz": "STUETZEND",
+            "zitat": "BEIDE Owner-Q2-Auswege (hierarchischer Name / 'e'-Flag) machen die Zeilen wieder unterscheidbar.",
+            "datum": "2026-08-03T17:27:21Z"
+          },
+          {
+            "fundort": "super (wt-super-landung) DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:7673-7850 (Abschnitt 'O-F')",
+            "was_dort_steht": "Der Abschnitt dokumentiert eine dem Owner-KERN unmittelbar vorausgehende Fehldeutung des Leads ('cpe' als CSV-Spalten-Token) und die Owner-Klarstellung, dass 'cpe' ein STRING statt eines einzelnen Zeichens im Hardware-Flag ist, mit einer Zaehlung von 138 einbuchstabigen Bestands-Literalen.",
+            "relevanz": "STUETZEND",
+            "zitat": "cpe ist ein Kuerzel wie 'g', 'e', 'f', 'n' ebenfalls. [...] Es ist ein string und nicht nur ein character.",
+            "datum": "2026-08-07 (vormittags, vor dem Owner-KERN)"
+          },
+          {
+            "fundort": "Live-Transkript Zeile 11321 (2026-08-07T09:20:41.182Z)",
+            "was_dort_steht": "Die primaerquellenverifizierte Owner-Aeusserung erklaert 'cpe' als String-Flag, bei dem jeder Buchstabe eine von der System-Achse an die Tier-Binary freigegebene Hardware-Art bezeichnet, als unmittelbare Vorstufe des spaeteren Owner-KERN.",
+            "relevanz": "STUETZEND",
+            "zitat": "O-F: cpe ist ein Kuerzel wie 'g', 'e', 'f', 'n' ebenfalls. Es erweitert das 'c' CPU kuerzel einer Algorithmus-Versionierung im Stempel mit Spezifikationen. Es ist ein string und nicht nur ein character.",
+            "datum": "2026-08-07 09:20 UTC"
+          },
+          {
+            "fundort": "thesis anhang/de/D_building_block_matrix.tex:1138 (Commit ac9bc2b) und identisch anhang/en/D_building_block_matrix.tex:1138",
+            "was_dort_steht": "Die Thesis dokumentiert als Quellrang-1-Spezifikation die Grammatik-Regel, dass das Hardware-Flag genau ein Kleinbuchstabe ist, direkt an das Zahlentripel angehaengt, mit fester Reihenfolge Hardware-Flag-dann-optional-'e'-fuer-experimentellen-Pruefling.",
+            "relevanz": "STUETZEND",
+            "zitat": "Das Hardware-Flag ist genau \\emph{ein} Kleinbuchstabe, direkt an das Zahlen-Tripel angehaengt; die Reihenfolge ist fest: erst das Hardware-Flag, dann optional das \\texttt{e} fuer einen experimentellen Pruefungs-Algorithmus.",
+            "datum": "2026-08-03T15:18:59Z"
+          },
+          {
+            "fundort": "super (wt-super-landung) DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2448 (Abschnitt '§43.b')",
+            "was_dort_steht": "Eine aeltere, verbatim gesicherte User-Direktive vom 19.07.2026 nachts legt das X.Y.Z-Schema (X.Y=Feature-Version, Z=Debug-Revision) fuer jeden Achsen-Algorithmus einzeln und fuer den Planer statisch fest, noch vor jeder Hardware-Flag- oder Experimental-Erweiterung.",
+            "relevanz": "STUETZEND",
+            "zitat": "Die Versionierung und Stempel sind X.Y.Z mit X.Y die Feature-Version und Z die Revision des Debuggings im selben Feature-Stand -- das gilt fuer jeden Achsen-Algorithmus (alle Typen) einzeln sowie fuer den Experiment-Planer statisch.",
+            "datum": "2026-07-19 nachts"
+          },
+          {
+            "fundort": "ce (wt-landung) commit f90272c3, libs/cache_engine/builder/experiment_tree/axis_variant_version_table.hpp (G2-A1)",
+            "was_dort_steht": "Der Commit migriert 120 Versions-Literale von einer reinen 'v1'-Kurzform auf die dreistellige 'v1.0.0'-Form und friert den ersten Fingerprint-Vektor ein, noch ohne jedes Hardware- oder Experimental-Flag.",
+            "relevanz": "STUETZEND",
+            "zitat": "feat(stempel): G2-A1 v1->v1.0.0-Migration (120 Literale) + X.Y.Z-Concept-Guard + Frozen-Fingerprint-Vektor",
+            "datum": "2026-07-23T13:06:11Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 9de12722, libs/cache_engine/builder/pruef_dock/pruef_dock_version.hpp (E-24 C4)",
+            "was_dort_steht": "Der Commit uebertraegt die Owner-Q3-Flag-Grammatik zusaetzlich auf fuenf Pruef-Dock-Versionen (SearchAlgorithm/Set/Sequence/Adapter/View, je 'v1.0.0c'), als weitere Quelle des einbuchstabigen Hardware-Flags neben den 122 Organ-Literalen.",
+            "relevanz": "STUETZEND",
+            "zitat": "NEU: libs/cache_engine/builder/pruef_dock/pruef_dock_version.hpp -- fuenf ce-eigene Literale (SearchAlgorithm/Set/Sequence/Adapter/View, alle \"v1.0.0c\")",
+            "datum": "2026-08-04T06:54:11Z"
+          },
+          {
+            "fundort": "ce (wt-landung) commit 2fdd644b, libs/cache_engine (best_binary_selector)",
+            "was_dort_steht": "Der Commit traegt ebenfalls das Kuerzel 'K-5', bezeichnet dort aber einen ABI-Spiegel-Sync vom 19.07.2026 ohne inhaltlichen Bezug zur Versions-Flag-Grammatik oder zur 'K-5-Sentinel-Wache' vom 02.08.2026 -- eine reine Namensgleichheit ohne Sachzusammenhang.",
+            "relevanz": "RANDNOTIZ",
+            "zitat": "fix(K-5): best_binary_selector-ABI-Spiegel 5/.A5. -> 6/.A6. + Paritaets-Gate gegen anatomy_module_abi_v1_decl",
+            "datum": "2026-07-19T08:32:44Z"
+          },
+          {
+            "fundort": "super (wt-super-landung) DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2026 (Abschnitt 'Bau-INC-1-Rulings')",
+            "was_dort_steht": "Der Ledger-Eintrag traegt ebenfalls das Kuerzel 'Q3', bezeichnet dort aber die Owner-Entscheidung vom 17.07.2026 zur Compiler-System-Achse ohne inhaltlichen Bezug zum 'Owner-Q3' der Flag-Grammatik vom 02.08.2026 -- die Fragen-Nummerierung wird je Owner-Antwortrunde neu vergeben.",
+            "relevanz": "RANDNOTIZ",
+            "zitat": "(Q3 ENTSCHIEDEN) Compiler = VOLLE 5. System-Achse",
+            "datum": "2026-07-17"
+          },
+          {
+            "fundort": "super (wt-super-landung) docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:90",
+            "was_dort_steht": "Die Owner-Antwort Q10 vom 02.08.2026 legt fest, dass die gerenderte Stempel-Form praefixfrei bleibt (kein 'v'); das Beispiel des Owner-KERN vom 07.08. ('memory@1.0.0c.p.e...') traegt ebenfalls kein 'v'-Praefix und steht damit nicht im Widerspruch zu Q10.",
+            "relevanz": "RANDNOTIZ",
+            "zitat": "Q10: Bitte ohne 'v' , lass es jetzt so, also Option A",
+            "datum": "2026-08-02 ca. 19:5x CEST"
+          },
+          {
+            "fundort": "ce (wt-landung) Commit-Historie 24.07.-01.08.2026 (git log --since/--until, --grep)",
+            "was_dort_steht": "Im Zeitraum zwischen der G2-Lane (23.07.2026) und dem Beginn der A13-Welle (02.08.2026) aendert kein Commit algo_semver.hpp oder anatomy_stamp_entries.hpp und keine Commit-Nachricht erwaehnt Versions-, Flag- oder Stempel-Grammatik.",
+            "relevanz": "RANDNOTIZ",
+            "datum": "24.07.-01.08.2026 (Nullbefund-Zeitraum)"
+          },
+          {
+            "fundort": "super (wt-super-landung) DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:8316-8319",
+            "was_dort_steht": "Der vorliegende Kartierungsauftrag ist Teil eines Vier-Sonnet-plus-Fable-Vereinigungsworkflows (wf_2d080235-585), der parallel zur Grammatik-Historie auch Meta-Meta-Achsen, SIMD-Signatur und P/E-Core kartiert.",
+            "relevanz": "RANDNOTIZ",
+            "zitat": "Vereinigungs-Workflow wf_2d080235-585 laeuft: vier Sonnet-5-Kartierungen (Grammatik-Historie 4 Wochen, Meta-Meta-Achsen, SIMD-Signatur, P/E-Core) + eine Fable-xhigh-Vereinigung",
+            "datum": "2026-08-07"
+          }
+        ]
+      },
+      {
+        "luecken": [
+          "Ob 'je Algorithmus' im Owner-Zitat die 18 Organ-Haupt-Achsen (individuelle Algorithmus-Implementierungen) oder die Meta-Meta-Hub-Glieder (heute nur 'simd') meint, ist aus keiner gelesenen Quelle eindeutig entscheidbar -- das Owner-Beispiel 'memory@1.0.0c.p.e.{...}' deutet auf ersteres (ein Organ-Achsen-Name traegt die Komposit-Klammer direkt), der existierende Code realisiert nur letzteres (Meta-Meta-Klammer haengt an der SYSTEM-Zeile, nicht am einzelnen Organ-Eintrag).",
+          "Eine Organ-Achse traegt ihren Meta-Meta-Klammer-Anhang heute nie inline am eigenen Stempel-Eintrag, sondern nur gemeinsam mit allen anderen Eintraegen derselben Realm-Zeile (RF-7-Doktrin: eine Array-Zeile je Achsen-Typ, Organ- und System-Array bleiben zwei getrennte, nie fusionierte Felder). Ein per-Organ-eigener Komposit-Anhang wie im Owner-Beispiel existiert nirgends im Code.",
+          "Die Bedeutung der '*'/'**'-Suffixe an x128*/x256*/x512** ('Hardware-Flags speziell nachfolgend fuer die AVX verbauten Register') ist auch nach eigener Wortgrenzen-Suche durch keine Quelle beantwortet -- weder Katalog-Flag noch Registerbreite noch Anzahl ist belegt; der Lead selbst notiert das als einzige offene Frage seiner eigenen Kartierung.",
+          "Die Kollision des neu definierten 'p'/'e'-Filter-Paars mit der sechs Tage alten Owner-E2-Bedeutung von 'e'=experimental (02.08.2026) und mit dem bestehenden 'c'/'g'/'f'/'n'-Hardware-Alphabet (algo_semver.hpp) ist an keiner Stelle als bereits aufgeloest dokumentiert; render_meta_meta_entry() in meta_meta_stamp_suffix.hpp ruft heute noch direkt die alte algo_semver_string()-Grammatik.",
+          "Ob 'Meta-Meta-Achsen als Komposit-Erweiterungs-Flags' einen vierten Realm neben system_meta_meta/measurement_meta_meta/organ_meta_meta meint oder die drei bestehenden Realms nur um eine neue Notation erweitert, ist in keiner gelesenen Quelle explizit entschieden."
+        ],
+        "nenner": "Kartierung ueber alle vier vorgegebenen Quellen: ce (13 Header vollstaendig gelesen -- hardware_meta_meta_axis.hpp, external_utils_family_axis.hpp, meta_meta_stamp_suffix.hpp, algo_semver.hpp, anatomy_stamp_entries.hpp, anatomy_version_stamp.hpp, topics/axis.hpp, topics/organ_meta_meta_axis.hpp, measurement_meta_meta_axis.hpp, load_framework_measurement_axis.hpp, meta_meta_identity.hpp, meta_meta_admission.hpp, simd_organ_requirement.hpp, system_axis_order.hpp -- plus 2 Test-Dateien fuer Fixture-Namen plus git log auf 5 Kern-Header), super (AUFTRAG-Dokument 26.07. Abschnitt 1, Ledger-Bereich Zeile 2340-3030 und 8220-8320, versionierungs-interface-stempel.md, STAND/OWNER-VORLAGE/KLAERUNG vom 07.08., 3 weitere Plan-Dokumente per grep auf Meta-Meta-Treffer geprueft), thesis (beide Tex-Dateien mit Meta-Meta-Treffern vollstaendig gelesen: 04_implementierung.tex, D_building_block_matrix.tex), Live-Transkript (60,85 MB, 22 Zeilentreffer auf die drei Owner-Suchbegriffe, davon 2 als echte Owner-Nachrichten ueber promptSource=typed + originKind=human verifiziert, Rest = Agenten-Echo/Tool-Output/Task-Notifications). Gegenprobe x128/x256/x512 wortgrenzen-sicher (eigene Ausfuehrung, nicht nur uebernommen): 0 Treffer in ce (rekursiv, /build/ ausgeschlossen) und in der Thesis vor heute; in super-Dokumenten nur in Dateien mit heutigem mtime (07.08., 12:34-12:46 Uhr). Keine der 26 Referenzen stammt aus /build/-Pfaden oder generiertem Code. Alle zitierten Commit-Daten sind per git log --follow gegen den ce-Verlauf gegengeprueft, nicht behauptet.",
+        "referenzen": [
+          {
+            "fundort": "Live-Transkript /home/comdare/.claude/projects/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1.jsonl, Zeile 13808 (type=user, promptSource=typed, originKind=human)",
+            "was_dort_steht": "Der Owner definiert woertlich die neue Punkt-Notation memory@1.0.0c.p.e.{x512.f.vl.bw.dq}, erklaert 'e' zu EFFICIENCY-CORE statt experimental, sagt jeder Algorithmus koenne eigenstaendig gegen zusaetzliche Meta-Meta-Achsen als Komposit-Erweiterungs-Flags optimiert und kompiliert werden, und dass die Basis-System-Achsen statisch in ihrer Zeile der System-Achsen bleiben, waehrend die Meta-Meta-Achsen je Algorithmus eine eigene Eignungs-Signatur bilden.",
+            "relevanz": "TRAGEND",
+            "zitat": "Ja korrekt, habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und trennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes Organ/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil es jetzt fuer efficiency core steht. Jeder Algorithmus kann eigenstaendig gegen zusaetzliche Meta-Meta-Achsen als Komposit-Erweiterungs-Flags optimiert und kompiliert werden. Die Basis-System-Achsen sind statisch in ihrer Zeile der System-Achsen, aber die Meta-Meta-Achsen bilden je Algorithmus eine spezielle Signatur fuer die Kennzeichnung der eignung einer binary fuer ein System.",
+            "datum": "2026-08-07 nachmittags"
+          },
+          {
+            "fundort": "Live-Transkript ...jsonl, Zeile 13579 (type=user, promptSource=typed, originKind=human)",
+            "was_dort_steht": "In der vorangehenden Nachricht fuehrt der Owner die Filter-Flag-Semantik ein ('e' vorn mit hoechster Prioritaet, danach c/p/e als CPU-verengende Filter, xNUMBER fuer AVX128/256/512 mit '*'-Hardware-Flags 'geplant bitte Explore') und verweist auf einen angeblich bereits vorhandenen Stufenplan fuer die stufenweise Freigabe bis zur vollen Optimierungsstufe ('Plan vorhanden, lies nach').",
+            "relevanz": "TRAGEND",
+            "zitat": "Weitere Filterflags sind xNUMBER fuer AVX128,AVX512 oder AVX256 als x128* x256* x512** mit '*' als Hardware Flags speziell nachfolgend fuer die AVX verbauten Register (geplant bitte Explore). Die Flags bezeichnen also fuer jeden Algorithmus als Organ in einer Achse, fuer welche hardware er gebaut wurde. [...] also ohne Erweiterung oder stufenweise mit Erweiterung bis zur vollen Optimierungs-Stufe (Plan vorhanden, lies nach).",
+            "datum": "2026-08-07 nachmittags"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/measurement/hardware_meta_meta_axis.hpp:82-123",
+            "was_dort_steht": "Der Header definiert SystemMetaMetaAxis<Derived> als volle CT-Haupt-Achse mit leerem Marker-Tag, fordert im SystemMetaMetaAxisConcept eine eigene axis_label(), sub_axis_label() und eine eigene bump-bare axis_code_version je Meta-Meta (Owner-Entscheid E2 02.08.2026), und stellt fest, dass eine Achse ohne eigene RT-Unter-Achse keine Meta-Meta, sondern eine gewoehnliche Konfig-Achse ist.",
+            "relevanz": "TRAGEND",
+            "zitat": "Wer keine eigene Unter-Achse spannt, ist keine Meta-Meta, sondern eine gewoehnliche Konfig-Achse."
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/measurement/external_utils_family_axis.hpp:96-131,163-238",
+            "was_dort_steht": "SimdExternalUtilsFamily ist die einzige heute instanzierte System-Meta-Meta, traegt eine eigene axis_code_version='v1.0.0c' unabhaengig von den drei System-Haupt-Achsen-Versionen, und ExternalUtilsHub verwaltet sie als Command-Pattern-Manager mit heute genau einem Glied in MetaMetaMembers<SimdExternalUtilsFamily>.",
+            "relevanz": "TRAGEND",
+            "datum": "2026-08-02 (A13-M2)"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/abi/meta_meta_stamp_suffix.hpp:43-161",
+            "was_dort_steht": "Der Header rendert den Meta-Meta-Klammer-Anhang einer Realm-Zeile per Fold-Expression aus der Hub-Typliste (typgetrieben, meta_meta_stamp_suffix<Hub>()) oder aus einer Registry-Entry-Liste (entrygetrieben), haengt ihn ueber append_meta_meta_suffix() ans Ende der bereits gerenderten Zeile an, und laesst bei leerem Hub den Anhang vollstaendig leer statt eines leeren Klammer-Paars.",
+            "relevanz": "TRAGEND",
+            "datum": "2026-08-02"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp:105-129",
+            "was_dort_steht": "Das reserved-Feld jedes 48-Byte-Stempel-Eintrags kodiert Bit 0 als experimental-Flag, Bits 1-2 als Hardware-Flag (00=CPU/01=GPU/10=FPGA/11=NPU) und Bits 3-5 als Meta-Meta-Klammertiefe (0=Hauptachse, 1-7=Meta-Meta-Ebene), disjunkt und ohne sizeof-Aenderung am Entry-POD.",
+            "relevanz": "TRAGEND",
+            "datum": "2026-08-02"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/topics/axis.hpp:17-50",
+            "was_dort_steht": "Das gemeinsame Achsen-Dach definiert AxisKind mit organ, system_measurement, system_config sowie drei additiven Meta-Meta-Diskriminatoren system_meta_meta, measurement_meta_meta und organ_meta_meta, je einem pro Realm, ohne dass eine bestehende Haupt-Achse dadurch veraendert wird.",
+            "relevanz": "TRAGEND"
+          },
+          {
+            "fundort": "super docs/sessions/20260726-AUFTRAG-lane-a-sys-tax-und-lane-c-hub.md:64-67 (Abschnitt 1, Punkt 4 -- die im Code als 'Auftrag Abschnitt 1.4' zitierte Stelle)",
+            "was_dort_steht": "Das Auftragsdokument definiert external_utils als Kopf/Hub fuer alle Meta-Meta-Achsen und legt fest, dass Meta-Metas volle CT-Haupt-Achsen-Typen mit eigenen RT-Unter-Achsen sind, als variadisches Array ohne std::variant, mit Identitaet nur aufwaerts kompatibel ab der Basis CPU-only.",
+            "relevanz": "TRAGEND",
+            "zitat": "external_utils (Rename von extension_hardware, Schreibweise FINAL) = KOPF/HUB fuer ALLE Meta-Meta-Achsen (externe HW, SIMD/AVX, Mess-Framework). load_framework = ERSTE Meta-Meta. Meta-Metas sind volle CT-Haupt-Achsen-TYPEN mit eigenen RT-Unter-Achsen, variadisches Array OHNE std::variant, Identitaet nur AUFWAERTS kompatibel ab Basis CPU-only.",
+            "datum": "2026-07-26"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/abi/system_axis_order.hpp:36-46,102-110",
+            "was_dort_steht": "kSystemAxisOrder listet exakt drei System-Haupt-Achsen (target_isa, operating_system, external_utils) als die eine kanonische, compile-time gewachte Ordnungs-Quelle; drei fruehere Glieder (compiler, scheduling, load_framework) sind per static_assert dauerhaft ausgeschlossen und duerfen nicht still zurueckkehren.",
+            "relevanz": "TRAGEND",
+            "datum": "2026-07-27 (Commit cc0ac4da, O-8 Schritt 4)"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/abi/anatomy_version_stamp.hpp:144-161 (system_stamp_line())",
+            "was_dort_steht": "system_stamp_line() rendert zuerst eine feste Schleife ueber genau kSystemAxisCodeCount (=3) Haupt-Achsen-Segmente aus der Single-Source kSystemAxisCodeVersions und haengt danach ueber append_meta_meta_suffix() den aus ExternalUtilsHub::meta_metas gefalteten, dynamisch wachsenden Klammer-Anhang an.",
+            "relevanz": "TRAGEND"
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:8238-8320 (Abschnitt 'OWNER-KERN 07.08.2026 nachmittags')",
+            "was_dort_steht": "Der Ledger fuehrt den Owner-KERN 07.08.2026 nachmittags in zwei Schritten woertlich mit, listet sechs Bruchstellen zum bestehenden algo_semver.hpp-Format, benennt Ledger-§40.a/§37 sowie simd_build_gate.hpp sowie simd_organ_requirement.hpp als bereits gebaute, aber inerte Vorstufe der Freigabe-Kette, und dokumentiert einen eigenen wortgrenzen-korrigierten Nullbefund fuer x128/x256/x512 vor dieser Nachricht.",
+            "relevanz": "TRAGEND",
+            "datum": "2026-08-07"
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md, §40 Punkt 'a' (Abschnitt §40, gelesen im Kontext §37-§41, Zeile ca. 2395-2402)",
+            "was_dort_steht": "Die User-Direktive vom 19.07.2026 verlangt eine feingranulare, je-Maschine deklarierte Signatur einzelner SIMD-Flags (z.B. avx512f/vl/bw/dq/vnni) statt der Grobstufen avx2/avx512, wobei Organ-Achsen ihrerseits deklarieren, welche Flags sie sinnvoll konsumieren.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-19"
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md, §37 (Zeile ca. 2342-2356)",
+            "was_dort_steht": "Die User-Direktive vom 19.07.2026 verlangt, dass Organ-Systemconsumer-Achsen die Freigabe der System-Achsen bis zu ihrer maximalen Faehigkeitsstufe permutieren duerfen, um einen mehrdimensionalen feingliedrigen Cross-Compile zu erzeugen.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-19"
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md, §54-Konformitaetsaudit Punkte T5-T7",
+            "was_dort_steht": "Der Konformitaetsaudit vom 20.07.2026 haelt fest, dass die Hardware-Haupt-Achse die Meta-Meta-Achsen verwaltet und freigibt, jede Meta-Meta-Achse per Command-Pattern eigenstaendig die Organ-Freigaben erteilt, und eine zweischichtige Kern-Permutation vorgesehen ist (Schicht 1 = Existenz einer Meta-Meta compile-time, Schicht 2 = deren Werte).",
+            "relevanz": "STUETZEND",
+            "zitat": "Hardware-Haupt-Achse VERWALTET+GIBT FREI die Meta-Meta-Achsen; jede Meta-Meta-Achse erteilt per COMMAND-Pattern (eigenstaendige Instanz) die Organ-Freigaben; System-/Organ-Achsen-Zahl waechst dynamisch je Maschine.",
+            "datum": "2026-07-20"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/measurement/simd_build_gate.hpp und .../measurement/simd_organ_requirement.hpp:1-93",
+            "was_dort_steht": "Die beiden Header tragen eine dreistufige Freigabe-Leiter NoExtension->Avx2->Avx512 sowie eine Tabelle aus neun Organ-Klassen mit je einer heute leeren required-SIMD-Flag-Menge; ein static_assert belegt, dass das Gate mangels Eintraegen heute inert ist.",
+            "relevanz": "STUETZEND",
+            "zitat": "static_assert(!any_organ_declares_required()); // heutiger Stand: ALLE leer -> Gate inert -> byte-/golden-neutral",
+            "datum": "2026-07-19 (Section 40.a-E4)"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/measurement/meta_meta_identity.hpp:38-70",
+            "was_dort_steht": "Der Header definiert MetaMetaSet als Typliste und subsumes_v<Machine,Program> als Halbordnungs-Praedikat, ob eine Maschinen-Meta-Meta-Identitaet die Meta-Meta-Menge eines Programms als Teilmenge traegt, mit der leeren CpuOnlyIdentity als ueberall lauffaehiger Basis.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-26"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/measurement/meta_meta_admission.hpp:60-67",
+            "was_dort_steht": "admit_organ_on_machine<MachineIdentity,ProgramIdentity>() liefert die Fehlerklasse HardwareErweiterungFehlt genau dann, wenn die Maschinen-Meta-Meta-Menge die Programm-Menge nicht traegt, ist als additive Ueberladung neben der bestehenden Flag-Ebene angelegt und hat heute keinen Produktions-Konsumenten.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-26"
+          },
+          {
+            "fundort": "thesis/diplomarbeit/anhang/de/D_building_block_matrix.tex:10,932,1063,1243-1247",
+            "was_dort_steht": "Der Thesis-Anhang (Quellrang 1) beschreibt den System-Realm mit genau drei Haupt-Achsen plus einer aeusseren Komplex-Klammer, die ausdruecklich keine vierte Haupt-Achse ist, und fuehrt load_framework als die Meta-Meta-Haupt-Achse des Mess-Realms an dessen Zeilen-Ende, ohne eine Komposit-Flag- oder Punkt-Notation zu erwaehnen.",
+            "relevanz": "STUETZEND"
+          },
+          {
+            "fundort": "super docs/sessions/20260807-OWNER-VORLAGE-cpe-grammatik-und-profil-chart.md:1-90",
+            "was_dort_steht": "Die Owner-Vorlage vom selben Vormittag legt dem Owner drei Optionen zur Trennung von experimental-'e' und einem neuen 'p'/'e'-Performance/Efficiency-Flag vor (Trennzeichen, Reihenfolge-Tausch, oder Aufgabe des experimental-'e') und empfiehlt ein Trennzeichen wie 'v1.0.0c-pe'.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-08-07 mittags"
+          },
+          {
+            "fundort": "eigene grep-Ausfuehrung (Wortgrenzen-Muster \\bx128\\b|\\bx256\\b|\\bx512\\b) ueber /home/comdare/wt-landung ohne /build/, /home/comdare/Projekte/.../thesis/diplomarbeit und /home/comdare/wt-super-landung/docs",
+            "was_dort_steht": "Die wortgrenzen-korrigierte Suche liefert null Treffer in ce und in der Thesis; in super-Dokumenten treten die Token ausschliesslich in Dateien auf, deren Änderungszeit heute (07.08., 12:34-12:46 Uhr) ist.",
+            "relevanz": "STUETZEND"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/include/cache_engine/measurement/load_framework_measurement_axis.hpp:32-70",
+            "was_dort_steht": "YcsbLoadFrameworkAxis ist die einzige heute instanzierte Mess-Realm-Meta-Meta, leitet von MeasurementMetaMetaAxis ab und liefert axis_kind()==measurement_meta_meta, mit einem static_assert gegen einen stillen Rueckfall auf system_config.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-27 (K1-Umzug, O-8 Schritt 4)"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/libs/cache_engine/topics/organ_meta_meta_axis.hpp:15-31 und abi/anatomy_version_stamp.hpp:51",
+            "was_dort_steht": "OrganMetaMetaAxis<Derived> ist der Mechanismus fuer Organ-Realm-Meta-Metas mit eigenem Diskriminator organ_meta_meta, aber abi::OrganMetaMetas ist als MetaMetaMembers<> leer definiert, sodass die Organ-Zeile heute byte-identisch ohne Klammer-Anhang bleibt.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-08-02"
+          },
+          {
+            "fundort": "topics/organ_meta_meta_axis.hpp:15-17 und abi/anatomy_stamp_entries.hpp Kopfkommentar Zeile 6-7",
+            "was_dort_steht": "Die RF-7-Doktrin haelt fest, dass jeder Achsen-Typ genau eine eigene Array-Zeile stempelt und eine Meta-Meta nie zeilenfremd in eine andere Realm-Zeile geraet; Organ- und System-Stempel-Array bleiben laut Kopfkommentar zwei getrennte, nie fusionierte Felder.",
+            "relevanz": "STUETZEND",
+            "zitat": "je Achsen-Typ EINE Array-Zeile [...]; Organ- und System-Array bleiben ZWEI getrennte Felder, NIE fusioniert"
+          },
+          {
+            "fundort": "/home/comdare/wt-landung/tests/unit/test_meta_meta_halbordnung.cpp:63-85 und tests/unit/test_striktheit_axis_dach_guard.cpp:186-201",
+            "was_dort_steht": "Avx512MetaMeta, GpuMetaMeta, GpuClusterMetaMeta und ProofOrganMetaMeta sind testlokale Beweis-Typen fuer die Halbordnung bzw. die Dach-Konformitaet und keine produktiv registrierten Meta-Meta-Achsen.",
+            "relevanz": "RANDNOTIZ"
+          },
+          {
+            "fundort": "eigene grep-Pruefung ueber ce (kein Treffer fuer den exakten Achsen-Namen \"memory\"), Gegenprobe .../measurement/simd_organ_requirement.hpp:40-50",
+            "was_dort_steht": "Der Owner-Beispielname 'memory' im Zitat 'memory@1.0.0c.p.e.{...}' hat keine woertliche Entsprechung unter den heute bekannten Organ- oder System-Achsen-Namen; die naechstliegende ist 'memory_layout' in der Organ-Klassen-Liste.",
+            "relevanz": "RANDNOTIZ"
+          },
+          {
+            "fundort": "git log --follow auf hardware_meta_meta_axis.hpp / external_utils_family_axis.hpp / meta_meta_stamp_suffix.hpp / system_axis_order.hpp im Repo /home/comdare/wt-landung",
+            "was_dort_steht": "Die Commits a3644cb8/429240f9 (26.07.), cc0ac4da/b539ed9f (27.07.) und 756bbedb/e15edb9a/65268c1a/a3e1a9c2 (02.-03.08.) datieren Einfuehrung und Ausbau der heutigen Meta-Meta-Mechanik vollstaendig innerhalb des vorgegebenen 4-Wochen-Fensters.",
+            "relevanz": "RANDNOTIZ"
+          }
+        ],
+        "suchvokabular": [
+          "Meta-Meta",
+          "Meta-Meta-Achse",
+          "meta_meta",
+          "SystemMetaMetaAxis",
+          "MeasurementMetaMetaAxis",
+          "OrganMetaMetaAxis",
+          "external_utils",
+          "ExternalUtilsHub",
+          "axis_code_version",
+          "meta_meta_stamp_suffix",
+          "kMetaMetaGroupOpen",
+          "stamp_entry_meta_level",
+          "subsumes_v",
+          "admit_organ_on_machine",
+          "je Algorithmus",
+          "eigene Signatur",
+          "spezielle Signatur",
+          "Kennzeichnung der Eignung",
+          "x128",
+          "x256",
+          "x512",
+          "Komposit-Erweiterungs-Flags",
+          "kSystemAxisOrder",
+          "statisch in ihrer Zeile",
+          "Auftrag Abschnitt 1.4",
+          "Bauplan-v3",
+          "Layer-Modell D3/D4/D5",
+          "cpe",
+          "Freigabe-Kette",
+          "simd_build_gate",
+          "simd_organ_requirement",
+          "RF-7",
+          "Halbordnung"
+        ]
+      },
+      {
+        "nenner": "Vollstaendig gelesen: docs/architektur/20260719-simd-flag-signaturen-REFERENZ.md (7 Abschnitte, 41 dokumentierte Subset-/Flag-Namen: 18 AVX-512-Zeilen + 3 EVEX/VEX-Begleiter + 4 AVX/AVX2 + 5 Skalar-Begleiter + 3 256-bit-VEX-Neuzugaenge + 8 SSE/128-bit-Historie). simd_feature_flag.hpp: 23 Katalogeintraege (14 avx512 + 4 avx256 + 3 companion + 2 scalar), durch static_assert(size()==23) und static_assert(count_flags_of_tier(Avx512)==14) im Code selbst bestaetigt. machine_simd_signature.hpp: 3 Maschinen-Signaturen (prod1_zen5=13 avx512-Flags/22 gesamt, prod2_raptor_lake=0 avx512/9 gesamt, odroid_gracemont=0 avx512/9 gesamt). simd_organ_sensibility.hpp + simd_organ_requirement.hpp: 9 Organ-Achsen-Klassen, davon 9/9 mit required=leer (kRequiredNone, static_assert(!any_organ_declares_required())) und 9/9 mit befuellter Sinnhaftigkeit (6 als [solide], 3 als [spekulativ] markiert). simd_build_gate.hpp: 3 Hooks (C-3a), Tripwire organ_required_union_size()==0 bestaetigt Inertheit im Code. system_axis_registry.xml: 1 <simd_feature_catalog count=\"23\"> + 3 <machine>-Bloecke, generiert von tools/system_axis_registry_gen (Paket W2-B). Wellenplan W7-W9 (docs/plaene/20260719-wellenplan-w7-w9-NACH-UEBERBLICK.md): W8 nennt 4 Teilziele a-d; (a) als XML gebaut, (b) nur als leerer C++-Scaffold (0/9 Organe mit realem required), (c)+(d) als Code gebaut aber laut Ledger:2462/:2735/:2930 UND Testdatei test_c3a_gate_scharfschaltung.cpp explizit inert/byte-neutral (0 effektive Flags in jedem Testfall). Negativ-Suchen mit Gegenprobe: eigenstaendiges Token \"x512\" (nicht \"avx512\") = 0 Treffer in ce+super+thesis (Regex-Ausschlusslogik gegen \"avx512\" manuell verifiziert); \"isa-signature\"/\"isa required\"/\"isa optional\" in allen *.xml/*.xsd von ce+super = 0 Treffer (Gegenprobe: dieselbe Suchmethode findet die vorhandenen flag-cpuinfo=-Attribute problemlos). Zeitraum 10.07.-07.08.2026 abgedeckt durch 7 Commit-SHAs (3111adba, e3f504298, 6d65b0e6, acf237b0 fuer W8/§40.a; bf830c03, 95fc814c, 67e4965f fuer A13/§43.b) + 2 Ledger-Paragraphen vom 19.07. (§37, §40/§40.a) + 5 Session-/Plan-Dokumente vom 06.-07.08. + 1 Thesis-Commit vom 06./07.08. (df54a2cc/47018e7).",
+        "referenzen": [
+          {
+            "fundort": "ce (via super-Gitlink) libs/cache_engine/include/cache_engine/measurement/simd_organ_sensibility.hpp:33 gegen den Owner-Kern-Beispieltext memory@1.0.0c.p.e.{x512.f.vl.bw.dq}",
+            "was_dort_steht": "Die Flag-Menge {F, VL, BW, DQ} aus dem Owner-Beispiel-Komposit {x512.f.vl.bw.dq} ist mengengleich mit dem dort deklarierten kSensibilitySearchAlgoFlags-Array fuer die Organ-Achsen-Klasse 'search_algo'.",
+            "zitat": "inline constexpr std::array kSensibilitySearchAlgoFlags{kAvx512Bw, kAvx512Dq, kAvx512F, kAvx512Vl};",
+            "relevanz": "TRAGEND",
+            "datum": "gebaut 2026-07-19, commit 3111adba (W8-E1..E3/§40.a)"
+          },
+          {
+            "fundort": "docs/architektur/20260719-simd-flag-signaturen-REFERENZ.md Abschnitte 1-3 GEGEN ce libs/cache_engine/include/cache_engine/measurement/simd_feature_flag.hpp:66-119",
+            "was_dort_steht": "Der 23-teilige Code-Katalog ist eine Teilmenge des in REFERENZ.md dokumentierten 41-teiligen Vokabulars.",
+            "zitat": "REFERENZ.md dokumentiert (1) AVX-512, 18 Subset-Zeilen mit Kurzcode/cpuinfo: F=avx512f, CD=avx512cd, ER=avx512er, PF=avx512pf, VL=avx512vl, DQ=avx512dq, BW=avx512bw, IFMA=avx512ifma, VBMI=avx512vbmi, VBMI2=avx512_vbmi2, VNNI=avx512_vnni, BITALG=avx512_bitalg, VPOPCNTDQ=avx512_vpopcntdq, VP2INTERSECT=avx512_vp2intersect, BF16=avx512_bf16, FP16=avx512_fp16, 4VNNIW=avx512_4vnniw, 4FMAPS=avx512_4fmaps; plus 3 EVEX/VEX-Begleiter GFNI=gfni, VAES=vaes, VPCLMULQDQ=vpclmulqdq. (2) AVX/AVX2: AVX=avx, AVX2=avx2, FMA=fma, F16C=f16c; Skalar-Begleiter BMI1=bmi1, BMI2=bmi2, MOVBE=movbe, POPCNT=popcnt, LZCNT/ABM=abm; 256-bit-VEX-Neuzugaenge AVX-VNNI=avx_vnni, AVX-IFMA=avx_ifma ('auf Ziel verifizieren'), AVX-VNNI-INT8=avx_vnni_int8 ('auf Ziel verifizieren'). (3) 128-bit-Historie: MMX, SSE, SSE2, SSE3/PNI, SSSE3, SSE4.1, SSE4.2, SSE4a. -- Der Code-Katalog kSimdFeatureFlagCatalog uebernimmt exakt die 14 Nicht-Xeon-Phi-AVX512-Flags (F,CD,VL,DQ,BW,IFMA,VBMI,VBMI2,VNNI,BITALG,VPOPCNTDQ,VP2INTERSECT,BF16,FP16) + AVX2,FMA,F16C,AVX-VNNI + GFNI,VAES,VPCLMULQDQ + BMI2,POPCNT = 23. Fehlend im Code: ER,PF,4VNNIW,4FMAPS (laut REFERENZ.md 'Nur Xeon Phi'/'In GCC 14+ entfernt'), reine AVX-Basis, BMI1/MOVBE/LZCNT-ABM, AVX-IFMA/AVX-VNNI-INT8 (laut REFERENZ.md selbst unverifiziert), gesamte SSE/128-bit-Familie.",
+            "relevanz": "TRAGEND"
+          },
+          {
+            "fundort": "docs/architektur/20260719-simd-flag-signaturen-REFERENZ.md:22-46 (Abschnitt 1, Tabelle 'Subset')",
+            "was_dort_steht": "Die Tabelle fuehrt je AVX-512-Subset einen kurzen Grossbuchstaben-Code in der Spalte 'Subset' neben dem vollen cpuinfo-String und dem GCC-Flag.",
+            "zitat": "| **F** | AVX-512 Foundation | (7,0):EBX[16] | avx512f | -mavx512f | ... || **VL** | Vector Length Extensions | (7,0):EBX[31] | avx512vl | -mavx512vl | ... || **DQ** | Doubleword & Quadword | (7,0):EBX[17] | avx512dq | -mavx512dq | ... || **BW** | Byte & Word | (7,0):EBX[30] | avx512bw | -mavx512bw |",
+            "relevanz": "TRAGEND"
+          },
+          {
+            "fundort": "ce (via super-Gitlink, diff-verifiziert byte-identisch) libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:26-30",
+            "was_dort_steht": "Der Kopfkommentar traegt woertlich die im Auftrag als 'VORHER GALT' zitierte Grammatik.",
+            "zitat": "version := 'v' UINT '.' UINT '.' UINT [ HWFLAG [ 'e' ] ]     (rohe Form, parse_algo_semver)\ndotted  :=     UINT '.' UINT '.' UINT [ HWFLAG [ 'e' ] ]     (gerenderte Form, parse_dotted_semver)\nHWFLAG  := 'c' (CPU) | 'g' (GPU) | 'f' (FPGA) | 'n' (NPU)    -- GENAU EINES, klein, direkt angehaengt",
+            "relevanz": "TRAGEND",
+            "datum": "A13-M1b 2026-08-02 (commit 95fc814c), scharfgeschaltet A13-M3/C4 2026-08-03 (commit 67e4965f)"
+          },
+          {
+            "fundort": "ce (via super-Gitlink) libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:528-538",
+            "was_dort_steht": "Eine static_assert-Batterie weist jede Form mit einem zweiten Zeichen nach dem Hardware-Flag sowie ein 'e' ohne vorangehendes Hardware-Flag als Sentinel zurueck.",
+            "zitat": "static_assert(parse_algo_semver(\"v1.0.0cc\") == AlgoSemVer{});   // zweites Flag\nstatic_assert(parse_algo_semver(\"v1.0.0cg\") == AlgoSemVer{});   // zwei verschiedene Flags\nstatic_assert(parse_algo_semver(\"v1.0.0ec\") == AlgoSemVer{});   // Reihenfolge verdreht\nstatic_assert(parse_algo_semver(\"v1.0.0e\") == AlgoSemVer{});    // 'e' OHNE Hardware-Flag\nstatic_assert(parse_algo_semver(\"v1.0.0x\") == AlgoSemVer{});    // unbekanntes Flag-Zeichen",
+            "relevanz": "TRAGEND"
+          },
+          {
+            "fundort": "ce (via super-Gitlink) libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:16-23 (Kopfkommentar, Owner-Zitate)",
+            "was_dort_steht": "Der Kommentar zitiert den Owner woertlich vom 02.08.2026, wonach 'e' experimentelle Achsen-Algorithmen markiert und Hardware-Flags spaeter um g/f/n erweiterbar sind.",
+            "zitat": "A13-M1 (Owner-Entscheid E2 vom 02.08.2026, verbatim): \"Die Markierung experimenteller Achsen-Algorithmen aus einem Pruefling wird in der Versionsbezifferung eines jeden Achsen-Algorithmus mit einem angehaengten 'e' fuer 'experimental' markiert.\"",
+            "relevanz": "TRAGEND",
+            "datum": "02.08.2026"
+          },
+          {
+            "fundort": "thesis (Quellrang 1 laut MEMORY-Doktrin) anhang/de/D_building_block_matrix.tex:1131-1138",
+            "was_dort_steht": "Die Thesis druckt unter der Ueberschrift 'Versions-Flag-Grammatik' dieselbe EBNF wie algo_semver.hpp und den Satz, dass das Hardware-Flag genau ein Kleinbuchstabe ist.",
+            "zitat": "version := 'v' UINT '.' UINT '.' UINT [ HWFLAG [ 'e' ] ]\nHWFLAG  := 'c' (CPU) | 'g' (GPU) | 'f' (FPGA) | 'n' (NPU)\n[...] Das Hardware-Flag ist genau ein Kleinbuchstabe, direkt an das Zahlen-Tripel angehaengt; die Reihenfolge ist fest: erst das Hardware-Flag, dann optional das e fuer einen experimentellen Pruefungs-Algorithmus. Ein e ohne Hardware-Flag ist ungueltig.",
+            "relevanz": "TRAGEND",
+            "datum": "eingefuegt 2026-08-06 (thesis-commit df54a2cc), zuletzt beruehrt 2026-08-07 (47018e7)"
+          },
+          {
+            "fundort": "ce (via super-Gitlink) libs/cache_engine/include/cache_engine/measurement/simd_organ_requirement.hpp:40-50, :87-88",
+            "was_dort_steht": "Alle 9 Organ-Achsen-Klassen tragen heute kRequiredNone, und ein static_assert erzwingt, dass kein Organ ueberhaupt required-Flags deklariert.",
+            "zitat": "inline constexpr std::array<OrganSimdRequirement, 9> kSimdOrganRequirement{{ {\"filter\", kRequiredNone}, {\"search_algo\", kRequiredNone}, ... }};\nstatic_assert(!any_organ_declares_required());",
+            "relevanz": "TRAGEND"
+          },
+          {
+            "fundort": "ce (via super-Gitlink) libs/cache_engine/include/cache_engine/measurement/simd_build_gate.hpp:258-278",
+            "was_dort_steht": "active_organ_required() liefert hart-codiert die leere Menge, und ein consteval-Tripwire bricht die Kompilierung, sobald ein Organ eine nicht-leere required-Menge eintraegt, mit dem Hinweis auf einen noch fehlenden Owner-Paket-Entscheid.",
+            "zitat": "[[nodiscard]] inline std::span<SimdFeatureFlag const> active_organ_required() noexcept { return {}; }\n...\nstatic_assert(detail::organ_required_union_size() == 0, \"C-3a-TRIPWIRE: ... braucht VOR der ersten required-Deklaration einen eigenen Owner-Paket-Entscheid.\");",
+            "relevanz": "TRAGEND"
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2462 (wiederholt :2735, :2930)",
+            "was_dort_steht": "Der Ledger fuehrt die organ_required-Deklarationen und die aktive Maschinen-Signatur-Wahl explizit als 'bewusst spaeter' verschobenen W8-Nachlauf.",
+            "zitat": "W8-Gate-Aktivierungs-Nachlauf (explizit getrackt): organ_required-Deklarationen + per-Binary-Feinschliff + Host-Wahl active_machine_signature() = bewusst spaeter (§37 HART-SIMD-Organe); Naht steht.",
+            "relevanz": "TRAGEND",
+            "datum": "2026-07-19 nachts (§44-Konsolidierung)"
+          },
+          {
+            "fundort": "super Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/system_axis_registry.xml:1-9, :69-93, :155-202",
+            "was_dort_steht": "Die generierte Registry-XML traegt den 23-Flag-Katalog als simd_feature_catalog und drei machine-Bloecke mit je einer flachen flag-cpuinfo-Liste, aber kein isa-required/optional-Element je Organ-Algorithmus-Variante.",
+            "zitat": "<!-- GENERIERT von tools/system_axis_registry_gen (PAKET W2-B) ... --><simd_feature_catalog count=\"23\">...<machine_signatures count=\"3\"><machine id=\"prod1_zen5\" host_isa=\"x86_64\" flag_count=\"22\">...<machine id=\"prod2_raptor_lake\" ... flag_count=\"9\">...<machine id=\"odroid_gracemont\" ... flag_count=\"9\">",
+            "relevanz": "STUETZEND"
+          },
+          {
+            "fundort": "super docs/plaene/20260719-wellenplan-w7-w9-NACH-UEBERBLICK.md:14-15 (W8)",
+            "was_dort_steht": "Der Wellenplan nennt fuer W8 vier Teilziele: Maschinen-Signatur-XML, Organ-isa-required/optional je Algorithmus-Variante, Resolver-Schnitt mit Fallback-Kette, CompileFn-Flag-Bundles aus GCC-Attributen.",
+            "zitat": "System-Registry-Ausbau nach docs/architektur/20260719-simd-flag-signaturen-REFERENZ.md: (a) Maschinen-Signatur-XML (isa-signature je Node, Quelle /proc/cpuinfo), (b) Organ-`<isa required/optional>`-Deklaration je Algorithmus-Variante, (c) Resolver-Schnitt (Variante faellt weg wenn required-Flag fehlt -> Fallback-Kette), (d) CompileFn-Flag-Bundles aus gcc-Attributen.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-19 spaet"
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2397-2408 (§40, §40.a)",
+            "was_dort_steht": "Die urspruengliche User-Direktive verlangt eine je-Maschine deklarierte SIMD-Flag-Signatur und eine Organ-seitige Sinnhaftigkeits-Deklaration, gekoppelt ueber Organ<=Maschinen-Signatur GESCHNITTEN Organ-Sinnhaftigkeit, und nennt dabei bereits die Schreibweise 'avx512f/vl/bw/dq/vnni' mit Schraegstrich als Beispiel.",
+            "zitat": "je Maschine eine DEKLARIERTE Signatur einzelner SIMD-Flags (cpuid-/proc-cpuinfo-Ebene, z.B. avx512f/vl/bw/dq/vnni/...), NICHT der Grob-Level avx2/avx512.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-19 abends"
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:2342 (§37 Ueberschrift)",
+            "was_dort_steht": "Die Kopplungsregel Organ<=Maschinen-Signatur GESCHNITTEN Organ-Sinnhaftigkeit, die simd_build_gate.hpp durchgaengig referenziert, stammt aus §37.",
+            "zitat": "§37 -- 2026-07-19: FREIGABE-PRINZIP GENERALISIERT -- ALLE System-Achsen koppeln gegen Organ-Achsen; SIMD=Pilot; Freigabe-System-Organ-Achsen mit Dual-Aufnahme + State-Pattern-Freischaltung",
+            "relevanz": "STUETZEND",
+            "datum": "2026-07-19"
+          },
+          {
+            "fundort": "ce git log -- libs/cache_engine/include/cache_engine/measurement/{simd_feature_flag,machine_simd_signature,simd_organ_sensibility,simd_organ_requirement,simd_build_gate}.hpp",
+            "was_dort_steht": "Vier Commits vom 19.07.2026 bauen Katalog, Signaturen, Sinnhaftigkeit, Gate und leere Organ-Requirement-Deklaration; ein fuenfter Commit vom 26.07.2026 verdrahtet alle drei Hooks scharf.",
+            "zitat": "3111adba 2026-07-19 feat(W8-E1..E3/§40.a): SIMD-Flag-Signatur-Modell -- 23-Flag-Katalog ...\ne3f504298 2026-07-19 feat(W8-E4/§40.a): simd_build_gate -- State-Pattern Pruef-Dock ...\n6d65b0e6 2026-07-19 feat(W8-E4b/§40.a): volle Live-Naht -- simd_organ_requirement ...\nacf237b0 2026-07-26 feat(gate): C-3a Scharfschaltung - alle DREI Hooks gemeinsam ... SCHARF+BYTE-NEUTRAL bewiesen: rsp-Zeilen je Route zeichengleich",
+            "relevanz": "STUETZEND"
+          },
+          {
+            "fundort": "ce git log -- libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "was_dort_steht": "Die Hardware-Flag-Grammatik entstand am 02.08.2026 in zwei Schritten und wurde am 03.08.2026 im selben Commit wie die 138-Literal-Migration scharfgeschaltet.",
+            "zitat": "bf830c03 2026-08-02 feat(A13-M1): 'e'-Versions-Suffix als Experimental-Markierung im AlgoSemVer-Parser\n95fc814c 2026-08-02 feat(A13-M1b)!: OWNER-Q3-FLAG-GRAMMATIK im AlgoSemVer-Parser/Renderer (Kurzform-Rueckbau)\n67e4965f 2026-08-03 feat(versionen)!: A13-M3/C4 -- Owner-Q3-Flag-Migration + ENFORCE=1 im SELBEN Commit",
+            "relevanz": "STUETZEND"
+          },
+          {
+            "fundort": "super docs/sessions/20260807-OWNER-VORLAGE-cpe-grammatik-und-profil-chart.md:49-63",
+            "was_dort_steht": "Am selben Tag mittags legte der Lead dem Owner drei Trennungs-Optionen fuer die e/e-Kollision vor und empfahl ein Trennzeichen wie 'v1.0.0c-pe'.",
+            "zitat": "Frage 1a -- wie trennen wir die beiden e? (a) Trennzeichen einfuehren, z.B. v1.0.0c-pe oder v1.0.0c.pe. Flag-String und experimental bleiben eindeutig, alle 138 Bestands-Literale bleiben gueltig. Meine Empfehlung -- billigster Schnitt, keine Mehrdeutigkeit.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-08-07 mittags"
+          },
+          {
+            "fundort": "super docs/sessions/20260807-STAND-wellenplan-abgeschlossen-und-offene-entscheide.md:61-67 (R-2)",
+            "was_dort_steht": "Dasselbe Dokument beziffert die migrationspflichtigen Bestands-Literale mit 138 und nennt die Ein-Zeichen-Regel dreifach ratifiziert in Code, Ledger und Thesis.",
+            "zitat": "Objektbefund: die Ein-Zeichen-Regel ist dreifach ratifiziert (Code, Ledger, Thesis), die Position hinter dem Flag ist durch e belegt, v1.0.0cpe -> Sentinel.",
+            "relevanz": "STUETZEND",
+            "datum": "2026-08-07 mittags"
+          },
+          {
+            "fundort": "ce tests/unit/test_c3a_gate_scharfschaltung.cpp:54-107",
+            "was_dort_steht": "Testnamen und Assertions bestaetigen die Inertheit des Gates: NotApplicable-Zustand und byte-identische rsp-Zeilen mit und ohne aktiviertes Gate.",
+            "zitat": "TEST(C3aScharfschaltung, DerGrundIstDieLEEREOrganSeite) { ... EXPECT_EQ(r.state, meas::SimdGateState::NotApplicable); }\nTEST(C3aScharfschaltung, RspZeilenSindMitScharfemGateZeichengleich) { ... }\nTEST(C3aScharfschaltung, IdentitaetsTextIstHeuteLEER) { ... }",
+            "relevanz": "STUETZEND"
+          },
+          {
+            "fundort": "thesis anhang/de/D_building_block_matrix.tex:964, :972-985",
+            "was_dort_steht": "Die Thesis druckt dieselben 23 Katalog-Zeilen wie simd_feature_flag.hpp und system_axis_registry.xml in voller cpuinfo-Schreibweise, ohne eigene Subset-Kurzcode-Spalte.",
+            "zitat": "Zur Unter-Achse gehoert ein feiner Merkmals-Katalog simd_feature_catalog mit count=23 Merkmalen, gestuft nach tier: vierzehn Merkmale der Stufe avx512, vier der Stufe avx256, drei Begleit-Merkmale (companion) und zwei skalare (scalar).",
+            "relevanz": "RANDNOTIZ"
+          },
+          {
+            "fundort": "Grep ueber ce+super+thesis, Muster (^|[^a-z])x512([^a-z0-9]|$) case-insensitive in *.hpp/*.cpp/*.md/*.xml/*.tex",
+            "was_dort_steht": "Das eigenstaendige Token x512 (im Unterschied zu avx512) hat null Treffer in allen drei Repos.",
+            "zitat": "0 Treffer; Gegenprobe: dieselbe Regex-Konstruktion schliesst 'avx512' korrekt wegen des vorangehenden Buchstabens 'v' aus (kein zu weiter Ausschlussfilter), tier_label(SimdFlagTier::Avx512) rendert 'avx512', nicht 'x512' (simd_feature_flag.hpp:57).",
+            "relevanz": "RANDNOTIZ"
+          },
+          {
+            "fundort": "Grep ueber alle *.xml/*.xsd in ce+super nach isa-signature, isa required, isa optional",
+            "was_dort_steht": "Kein XML oder XSD in ce oder super traegt ein isa-signature- oder isa-required/optional-Element.",
+            "zitat": "0 Treffer (Gegenprobe: dieselbe Suchmethode findet die vorhandenen flag-cpuinfo=-Attribute in system_axis_registry.xml anstandslos).",
+            "relevanz": "RANDNOTIZ"
+          },
+          {
+            "fundort": "super Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/cache_engine_axis_registry.xml:35 gegen simd_organ_sensibility.hpp:34",
+            "was_dort_steht": "Der einzige registrierte Achsen-Id mit dem Wortstamm memory heisst memory_layout, dessen eigenes Sinnhaftigkeits-Flag-Set sich vom Flag-Satz im Owner-Beispiel unterscheidet.",
+            "zitat": "<axis id=\"memory_layout\" slot=\"T05\" category=\"composition\" genus=\"SearchAlgorithm\" baustein_count=\"5\">\n---\ninline constexpr std::array kSensibilityMemoryLayoutFlags{kAvx512Vbmi, kAvx512Vbmi2, kAvx512Bw};",
+            "relevanz": "RANDNOTIZ"
+          }
+        ],
+        "suchvokabular": [
+          "SimdFeatureFlag",
+          "SimdFlagTier",
+          "kSimdFeatureFlagCatalog",
+          "MachineSimdSignature",
+          "Prod1Zen5Signature",
+          "OrganSimdSensibility",
+          "OrganSimdRequirement",
+          "kRequiredNone",
+          "SimdGateState",
+          "pruef_dock",
+          "active_organ_required",
+          "active_machine_signature",
+          "kSimdGateArmed",
+          "COMDARE_SIMD_GATE_ARMED",
+          "gate_extra_march_flags_for_build",
+          "format_gate_contribution",
+          "AlgoSemVer",
+          "HardwareFlag",
+          "hardware_flag_char",
+          "parse_algo_semver",
+          "ce_owned_version_satisfies_cpu_enforce",
+          "A13-M1",
+          "A13-M1b",
+          "A13-M3/C4",
+          "W8-E1",
+          "W8-E4",
+          "W8-E4b",
+          "C-3a",
+          "Paket W2-B",
+          "§37",
+          "§40.a",
+          "§43.b",
+          "kSensibilitySearchAlgoFlags",
+          "system_axis_registry_gen",
+          "Unterstrich-Falle avx512vbmi vs avx512_vbmi2",
+          "x512",
+          "memory_layout",
+          "cpe",
+          "Subset-Kurzcode"
+        ],
+        "luecken": [
+          "Kein Beleg, dass 'x512' (statt 'avx512') als eigener Kurz-Tier-Token irgendwo im bestehenden Vokabular vorgesehen ist -- weder als cpuinfo-String noch als tier_label()-Ausgabe (die liefert 'avx512').",
+          "Keine XML-Materialisierung von REFERENZ.md Abschnitt 6(b) gefunden ('Organ <isa required/optional> je Algorithmus-Variante'); nur die C++-Seite existiert, und die ist bei allen 9 Organ-Klassen leer (kRequiredNone).",
+          "Keine Datei verknuepft das HardwareFlag-Konzept aus algo_semver.hpp (c/g/f/n, GENAU EIN Flag je Binary-Stempel-Zeile) mit dem SimdFeatureFlag-Konzept aus simd_feature_flag.hpp (viele gleichzeitige Flags je Organ-Klasse) im selben Format -- 'memory@1.0.0c.p.e.{x512.f.vl.bw.dq}' fuehrt beide Konzepte erstmals im selben Ausdruck zusammen.",
+          "Kein registrierter Organ-Achsen-Name 'memory' (nur 'memory_layout' mit einem ANDEREN Sinnhaftigkeits-Flag-Set als im Owner-Beispiel); ob 'memory' im neuen Schema ein austauschbares Beispiel oder eine geplante neue Achse ist, laesst sich aus dem durchsuchten Korpus nicht entscheiden.",
+          "'p' kommt in keiner HardwareFlag-Enum-Definition vor (nur c/g/f/n als Kern-Alphabet); wo 'p' als Kern-/Hardware-Flag-Wert definiert werden soll, gehoert eher zum cpe-/core_class-Strang als zur SIMD-Katalog-Seite dieses Los.",
+          "docs/plaene/20260806-PLAN-versionierungs-interface-stempel.md (Sec.5, sechs STOPP-Gate-Entscheide E-A..E-F) wurde wegen Los-C-Fokus auf die SIMD-Signatur-Seite nicht vollstaendig gelesen -- moeglicherweise dort weitere fuer die neue Notation relevante Vorarbeit."
+        ]
+      },
+      {
+        "luecken": [
+          "Zwei mögliche Orte für 'P/E' koexistieren jetzt unverbunden: die System-Achse core_class (OD-11-RT, pro Maschine/Messzeile, Owner-KERN 06.08., Werte kern_hohe_leistung/kern_hohe_effizienz) und die neuen algo_semver-Flags 'p'/'e' (pro Algorithmus/Tier-Binary-Kompilat, Owner-KERN 07.08. 12:42). Kein gefundenes Dokument sagt, ob beide unabhängig bleiben oder zusammengeführt werden.",
+          "Die neue Klammer-Notation '{x512.f.vl.bw.dq}' (geschweift, punktgetrennt, INNERHALB des einzelnen algo_version-Strings) trifft auf eine bestehende, erst am 02.08.2026 vom Owner selbst entschiedene Grammatik: die eckige-Klammer-Form '[name=code@X.Y.Z]' für Meta-Meta-Anhänge an einer ganzen Realm-Stempel-Zeile (Owner-Q1, ausdrücklich GEGEN eine 'Punkt-Pfad-Form' entschieden, die als 'VERWORFEN' im Code und in zwei Tests verankert ist). Kein Fund sagt, ob die neue Notation diese Q1-Entscheidung ersetzt, ergänzt oder mit ihr kollidiert.",
+          "Ob 'p' und 'e' als Komposit-Flag PFLICHT oder OPTIONAL sind (analog Frage 1b der eigenen OWNER-VORLAGE von 09:45 UTC desselben Tages) beantwortet der KERN-Text selbst nicht ausdrücklich.",
+          "kProbeVersionCe ist heute eine explizite NEGATIV-Testsonde (hardware_meta_meta_axis.hpp:164,174-178), die die Kombination 'c'+'e' bewusst als UNGÜLTIG festschreibt, weil 'e' bisher ausschließlich experimental bedeutete. Mit der Umwidmung von 'e' zu Efficiency-Kern ist unklar, ob genau diese Kombination (CPU-Flag + Efficiency-Flag) jetzt GÜLTIG werden soll, was die static_asserts an dieser Stelle umkehren würde.",
+          "Die 138 in der eigenen OWNER-VORLAGE genannten migrationspflichtigen Bestands-Literale (122 Organ-Achsen + 3 System + 1 Meta-Meta + 3 Mess-Tooling + 1 Mess-Framework + 1 Planer + 2 Probe + 5 Prüf-Dock) sind gegen die NEUE Grammatik (Punkt-Trenner zwischen ALLEN Flags, keine Verkettung ohne Trenner mehr) nicht durchgezählt oder neu bestätigt.",
+          "Kein Fund zeigt, ob die Basis-Hardware-Flags c/g/f/n (HardwareFlag-Enum) und die neuen Flags p/e im selben Namensraum/derselben Positionsregel stehen oder als zwei getrennte Flag-Familien behandelt werden sollen (der Owner nennt 'Basis-System-Achsen ... statisch' getrennt von 'Meta-Meta-Achsen ... je Algorithmus eine spezielle Signatur', ohne das Verhältnis zu HardwareFlag zu benennen).",
+          "Die einzige VORHERIGE Verwendung von bloßen Buchstaben 'p'/'e' für Performance/Efficiency-Kern im Korpus ist die CSV-Segment-Notation `numa.core_type=<p|e>` (PMU-Domäne/Mess-BEOBACHTUNG, System-Achsen-Ebene) -- ein GANZ ANDERER Ort als die neuen algo_semver-Flags (Tier-Binary-Kompilat-SIGNATUR, Organ/Algorithmus-Ebene). Ob der Owner beide Vokabulare bewusst zusammenführt oder nur zufällig dieselben Buchstaben wiederverwendet, ist nicht belegt."
+        ],
+        "nenner": "Durchsucht (10.07.-07.08.2026, Fokus letzte 48h da dort alle Treffer liegen): ce (/home/comdare/wt-landung, git-historie 02.08.-07.08.), super/docs (/home/comdare/wt-super-landung, LEDGER 8300+ Zeilen + 40 docs/plaene+sessions-Dokumente vom 06.-07.08.), Live-Transkript (60,8 MB / 13811 Zeilen bis zum KERN). 'experimental' als Code-Bezug: 9 Produktions- + 7 Testdateien in ce (0 Treffer außerhalb, exkl. vendorten ext/-Fremdcode wo das Wort etwas anderes bedeutet). 'core_class'/OD-11-RT: ca. 45 Fundstellen in ce + identische Spiegelung in super Code/external/comdare-cache-engine (Submodul, gleicher Stand). 'cpe' als Projekt-Token: 0 Treffer (17 Rohtreffer alle vendorter Fremdcode/Binärdateien) -- selbst durch Lead-Explore vom 07.08. bestätigt. 'kern_*'-Werte-Token: 5 Treffer, alle in numa_cpu_pin_process_probe.hpp:185-189. Live-Transkript-Suche nach dem Owner-KERN-Wortlaut ('x512.f.vl.bw.dq'): 11 Treffer, alle im selben ~30-Minuten-Fenster (12:14-12:42 UTC) derselben Session. Alle Datei:Zeile-Angaben mit /usr/bin/grep-artigem Bash-grep erhoben, Wortgrenzen wo nötig geprüft (x512 vs. avx512-Substring-Falle beachtet).",
+        "referenzen": [
+          {
+            "fundort": "Live-Transkript 5a19728e-...jsonl:13808 (type=user, promptSource=typed, origin.kind=human)",
+            "datum": "2026-08-07T12:42:11.001Z",
+            "zitat": "\"gibt es nirgends\": Ja korrekt, habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und trennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes Organ/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' für experimental ist deprecated weil es jetzt für efficiency core steht.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Owner-KERN aus dem Auftrag steht hier wortgleich im Live-Transkript, als getippte Owner-Nachricht (promptSource=typed, origin.kind=human) direkt im Anschluss an eine Lead-Aussage 'x128/x256/x512 gibt es nirgends' (Zeile 13805, 12:35 Uhr) zu einer separaten SIMD-Notations-Recherche."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:16-30",
+            "datum": "2026-08-02",
+            "zitat": "HWFLAG  := 'c' (CPU) | 'g' (GPU) | 'f' (FPGA) | 'n' (NPU) -- GENAU EINES, klein, direkt angehaengt / Reihenfolge FIX: erst das Hardware-Flag, dann optional 'e'.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Datei-Kopf dokumentiert die zwei Owner-Entscheide (E2 und Q3, beide 02.08.2026), die die HEUTIGE (vom KERN abgelöste) Grammatik festlegen: genau EIN Hardware-Flag-Zeichen direkt ohne Trenner ans X.Y.Z-Tripel angehängt, danach optional das Zeichen 'e' für 'experimental'."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:229-248,296-330,373",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Struct AlgoSemVer führt ein bool-Feld 'experimental' (Zeile 239), das per take_experimental()/take_flag_tail() aus einem angehängten 'e'-Zeichen geparst und in algo_semver_string() wieder als 'e' gerendert wird -- das ist die vollständige Implementierung des heutigen (vom KERN betroffenen) Experimental-Flags."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:396-420,602-629",
+            "datum": "2026-08-02",
+            "zitat": "(b) ce-EIGENE Versionen tragen NIE 'e' -- weder flaglos-experimentell (grammatisch schon Sentinel) noch als wohlgeformtes \"ce\".",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "ce_owned_version_is_wellformed() und ce_owned_version_satisfies_cpu_enforce() (die 'B12'-Politik) prüfen unter anderem explizit '!experimental' und weisen jedes ce-eigene Versions-Literal mit 'e' zurück; die static_assert-Batterie ab Zeile 602 beweist dies compile-time."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp:105-107,149-150,364,552-653",
+            "datum": "2026-08-02 (Commit 130d2914)",
+            "zitat": "inline constexpr std::uint32_t kStampEntryFlagExperimental = 1u << 0;",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Bit 0 des reserved-Feldes im 48-Byte AnatomyStampEntryV1-POD ist als 'experimenteller Achsen-Algorithmus' belegt (Owner-E2); stamp_entry_is_experimental() liest dieses Bit, make_anatomy_stamp_entry setzt es aus AlgoSemVer::experimental (Zeile 364); mehrere static_asserts (552,556,576,579,647,652,653) beweisen die Bit-Lage/-Disjunktheit gegen die Hardware-Flag-Bits 1-2."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/measurement/hardware_meta_meta_axis.hpp:164,174-178",
+            "datum": "2026-08-02/03",
+            "zitat": "kProbeVersionCe = \"v1.0.0ce\"; // Pruefling-Markierung an ce-Achse / static_assert(!meta_meta_version_wohlgeformt<...kProbeVersionCe>(), \"Z-03: 'e' ist AUSSCHLIESSLICH die Pruefling-Markierung (Owner-E2) und an einer ce-eigenen Meta-Meta nie zulaessig -- auch nicht zusammen mit dem CPU-Flag.\")",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "kProbeVersionCe ist eine dediziert angelegte NEGATIV-Testsonde, die die Kombination Hardware-Flag 'c' plus Experimental-Flag 'e' ('v1.0.0ce') per zwei static_asserts als compile-time-Fehler festschreibt -- genau die Buchstabenfolge, die unter der neuen KERN-Bedeutung von 'e' (Efficiency-Kern statt Experimental) plötzlich eine andere fachliche Aussage träfe."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp:33-82; libs/cache_engine/include/cache_engine/abi/meta_meta_stamp_suffix.hpp:43-78; tests/unit/test_m_w12_stamp_bausteine.cpp:285-293; tests/unit/test_lazy_adhoc_source_gen.cpp:138-142",
+            "datum": "2026-08-02 (Owner-Q1)",
+            "zitat": "Owner-Q1 verbatim: \"Q1 - Wie empfohlen nach Klammern (derzeit auch so geplant, bitte nachlesen).\" [...] die Punkt-Pfad-Empfehlung des A13-Designs ist VERWORFEN.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Die heute gebaute und getestete Grammatik haengt Meta-Meta-Achsen als eckige Klammer-Gruppe '[name=code@X.Y.Z;...]' ans Ende einer ganzen Realm-Stempelzeile; eine alternative 'Punkt-Pfad-Form' (z.B. 'external_utils.simd=code@...') wurde vom Owner am 02.08.2026 unter der Frage Q1 ausdruecklich abgelehnt und ist per Namen in zwei Tests als verbotene Form negativ geprüft."
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:1576-1577 (§16.3-E17)",
+            "datum": "2026-07-16",
+            "zitat": "Der P/E-Core-Aspekt ist eine SEPARATE System-Achse, jedoch als DYNAMISCHE Unter-Achse unter der Hardware-Systemachse (neben NUMA, Multithreading) [...] H-1 = wie empfohlen: Hardware traegt das FAKTUM (Core-Typ-Karte + ran_on_core_type), die aktive Pinning-POLICY als Scheduling-Unter-Achse.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Ledger-Eintrag §16.3-E17 dokumentiert den Owner-Entscheid vom 16.07.2026, dass P/E-Core als dynamische RT-Unter-Achse unter der Hardware-System-Achse modelliert wird -- die Grundlage, auf der spaeter core_class (OD-11-RT) gebaut wurde."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/measurement/target_isa_sub_axes.hpp:10,16-20,96-111; libs/cache_engine/include/cache_engine/measurement/numa_cpu_pin_process_probe.hpp:1-40,154-192; libs/cache_engine/include/cache_engine/measurement/system_axis_registry.xml:40",
+            "datum": "2026-08-06/07 (Commits b4cebdc4, b1753926)",
+            "zitat": "DAZU TRITT core_class (Paket OD-11-RT, Owner-KERN 06.08.2026). / case CoreClassKind::HoheLeistung: return \"kern_hohe_leistung\"; case CoreClassKind::HoheEffizienz: return \"kern_hohe_effizienz\";",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "core_class ist als dritte RT-Unter-Achse am target_isa-Komplex gebaut, mit fuenf Werten (Uniform/HoheLeistung/HoheEffizienz/GrosserCache/KleinerCache) und den Log-/CSV-Token kern_uniform/kern_hohe_leistung/kern_hohe_effizienz/kern_grosser_cache/kern_kleiner_cache; HoheLeistung wird im Kommentar explizit als 'Intel P-Core / cpu_core-PMU' und HoheEffizienz als 'Intel E-Core / cpu_atom-PMU' bezeichnet."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/abi/system_cell_values.hpp:164-172,174",
+            "datum": "2026-08-06/07",
+            "zitat": "stuende sie im Stempel, waere die Kern-Klasse Teil der Binary-Identitaet -- und die CEB koennte NICHT 'DIESELBE Tier-Binary einmal auf einen E-Core und einmal auf einen P-Core gepinnt' starten [...] Genau das schliesst der KERN aus.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "core_class steht als achter Eintrag in kSystemCellValueForbiddenKeys und ist damit compile-hart aus dem Binary-Stempel ausgeschlossen -- die P/E-Unterscheidung wirkt nur auf die Mess-Zeile, nicht auf die Tier-Binary-Identitaet."
+          },
+          {
+            "fundort": "super docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md:16-33 (Abschnitt 0)",
+            "datum": "2026-08-06",
+            "zitat": "Soweit ich mich erinnere muessen ALLE per deep research belegbaren Architekturen von AMD und Intel mit PMC unterstuetzt werden. Dazu gehoeren Performance Core und E-Core PMC Einrichtungen, die getrennt gemessen und ausgewertet werden. Damit hat die Intel Maschine effektiv 2 PMC und nicht nur eins. Dieses muss je Konfiguration compile time nach der Freigabe durch den Planer in die CEB eingearbeitet werden.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Owner-KERN vom 06.08.2026 (Abend) legt vier Festlegungen fest (K-1 PMC als Menge je Maschine, K-2 P-/E-Core getrennt gemessen UND ausgewertet, K-3 Deep-Research-Pflicht ueber alle AMD/Intel-Architekturen, K-4 Planer-RT-Freigabe -> CEB-CT-Einbau), die dieses gesamte Plandokument ausbuchstabiert."
+          },
+          {
+            "fundort": "super docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md:105-121 (Abschnitt 1.3)",
+            "datum": "2026-04-09 / 2026-04-12 (zitiert, ausserhalb des 4-Wochen-Fensters, aber durchgehend referenziert bis 07.08.)",
+            "zitat": "P- und E-Cores werden nicht zusammenaggregiert. perf dokumentiert dafuer getrennte PMUs cpu_core und cpu_atom; gruppierte Events ueber beide PMUs werden vermieden.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Die Betreuer-Dokumente Termin 3 (09.04.2026) und Termin 4/Scope-Freeze (12.04.2026) legen die P/E-Core-Trennung als Pflichtplattform-Anforderung und Teil der Forschungsfrage fest, mit fertigem aber nie gebautem Baustein-Entwurf HybridCorePinning."
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:4687-4688",
+            "datum": "2026-08-06",
+            "zitat": "Und die P/E-Core-Trennung ist P1 aus dem Scope-Freeze -- Forschungs-Kern, nicht Nacharbeit. Sie steht seit dem 09.04. in den Betreuer-Dokumenten, mit Risiko-Zeile und Baustein-Entwurf. Gebaut wurde sie nie.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Ledger haelt fest, dass die P/E-Core-Trennung als Prioritaet 1 des Scope-Freeze klassifiziert und bis 06.08.2026 nicht gebaut war."
+          },
+          {
+            "fundort": "super docs/sessions/20260807-OWNER-VORLAGE-cpe-grammatik-und-profil-chart.md:10-63",
+            "datum": "2026-08-07T09:45Z",
+            "zitat": "cpe kommt in keiner Quelle vor. Auch keine Vorsehung fuer mehrstellige Flags. [...] Die Kollision ist strukturell, nicht kosmetisch [...] cpe endet auf e -- die Grammatik kann nicht beides, solange e Suffix UND Flag-Buchstabe ist.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Lead legt dem Owner um 09:45 UTC desselben Tages drei Optionen zur Aufloesung der 'e'-Kollision vor (Trennzeichen / Reihenfolge umdrehen / e-experimental aufgeben) und stellt zusaetzlich die Fragen, ob cpe Pflicht oder optional ist und welche weiteren Buchstaben ins Alphabet gehoeren; das Dokument datiert knapp drei Stunden vor dem Owner-KERN von 12:42 Uhr."
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:7295-7331 (NACHTRAG 07.08.2026 mittag-1)",
+            "datum": "2026-08-07 (Commit eb4bb2b7, 08:57 UTC)",
+            "zitat": "TAG cpe: NEU. Die Substanz ist geplant, der NAME nicht: \"cpe\" als Token = 0 Treffer am Ref [...] Die GEBAUTEN Werte-Token heissen heute kern_uniform / kern_hohe_leistung / kern_hohe_effizienz / kern_grosser_cache / kern_kleiner_cache.",
+            "relevanz": "TRAGEND",
+            "was_dort_steht": "Der Lead dokumentiert vor dem KERN, dass der Owner am selben Tag behauptet hatte, der Tag 'cpe' sei 'bereits geplant', dies aber durch Vier-Sucher-Explore widerlegt wurde: das Wort 'cpe' kommt im gesamten Projekt nicht vor, nur die deutschsprachigen kern_*-Werte-Token existieren."
+          },
+          {
+            "fundort": "ce git log (Commits bf830c03, 95fc814c, 7603453b, c7f3e005, 67e4965f, 130d2914, 23085ab1) -- Pfad libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp",
+            "datum": "2026-08-02 bis 2026-08-03",
+            "zitat": "bf830c03 feat(A13-M1): 'e'-Versions-Suffix als Experimental-Markierung im AlgoSemVer-Parser / 67e4965f feat(versionen)!: A13-M3/C4 -- Owner-Q3-Flag-Migration + ENFORCE=1 im SELBEN Commit",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Die Commit-Historie datiert die Einfuehrung des Experimental-Flags (02.08.) und dessen scharfe Durchsetzung samt Migration der 122 Bestands-Literale auf 'v1.0.0c' (03.08.) -- die gesamte Grammatik, die der neue KERN vom 07.08. abloest, ist damit nur 4-5 Tage alt."
+          },
+          {
+            "fundort": "ce libs/cache_engine/builder/experiment_tree/axis_variant_version_table.hpp:62-119",
+            "datum": "2026-08-02",
+            "zitat": "static_assert(!...parse_algo_semver(W::algo_version).experimental, \"algo_version experimentell ('e'-Suffix): das 'e' ist AUSSCHLIESSLICH die Pruefling-Markierung (Owner-E2 02.08.2026) -- ce-eigene Registry-Varianten tragen es NIE\");",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "assert_version_grammar<W>() ist die zentrale CT-Wache, die fuer jede registrierte Organ-Variante parsbare Version, Nicht-Experimentalitaet und (falls Flag vorhanden) das CPU-Flag durchsetzt -- die konkrete Stelle, an der die heutige Bedeutung von 'e' compile-time erzwungen wird."
+          },
+          {
+            "fundort": "ce Testdateien: tests/unit/test_od10_numa_page_probe.cpp:81; tests/unit/test_os_u3_probe.cpp:71; tests/unit/test_m_w12_stamp_bausteine.cpp:119,120,133,166,168,353,904,908,923,925,929,930,941,942,1066; tests/unit/test_w10_system_cell_values.cpp:271; tests/unit/test_od11_numa_cpu_pin_process_probe.cpp:91; tests/unit/test_a1_algo_version_pin_alloc_axis.cpp:164,172",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Diese sieben Testdateien pruefen das Experimental-Flag / kStampEntryFlagExperimental an unterschiedlichen Stellen der Kette (Parser, POD-Bit, Rendering) -- die vollstaendige, per grep erhobene Testabdeckung fuer den Teil (c) der Aufgabe."
+          },
+          {
+            "fundort": "super docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md:805-806,909,975-986",
+            "datum": "2026-08-06",
+            "zitat": "pe_policy | worauf gepinnt wurde (Unpinned / PCoresOnly / ECoresOnly / HybridAware) -- Konfiguration [...] CSV platform=intel@prod2 | pmu_domain=cpu_atom | pe_policy=ECoresOnly | ran_on_core_type=E",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "pe_policy ist als vierwertiger Enum (Unpinned/PCoresOnly/ECoresOnly/HybridAware) fuer die CSV-Mess-Spalte geplant -- ein Wort-basiertes, kein Einzelbuchstaben-Vokabular, das mit dem Anfangsbuchstaben P/E arbeitet aber nicht mit den blossen Zeichen 'p'/'e' des neuen KERN identisch ist."
+          },
+          {
+            "fundort": "super docs/plaene/20260806-PLAN-hybrid-pmc-numa-core-permutation.md:588-592",
+            "datum": "2026-08-06",
+            "zitat": "Eine Zeile mit numa.core_type=e, die faktisch auf einem P-Core lief, waere eine Falschaussage ohne Signal.",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Dies ist die frueheste im Korpus gefundene Verwendung eines BLOSSEN Buchstabens 'e' (nicht 'HoheEffizienz' oder 'ECoresOnly') fuer die Efficiency-Kern-Klasse, als hypothetisches CSV-Spalten-Beispiel in einem am 06.08. geschriebenen Plandokument -- einen Tag vor dem Owner-KERN, in einem anderen Namensraum (Mess-Beobachtung statt Algo-Flag)."
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:7322,7421; docs/sessions/20260807-ZWISCHENSTAND-aufgeloeste-architektur-entscheide.md:61-62",
+            "datum": "2026-08-07 (Commit eb4bb2b7, 08:57 UTC)",
+            "zitat": "Pflicht-Spalten pe_policy = Konfiguration, ran_on_core_type = Beobachtung, Segment numa.core_type=<p|e>",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Am Morgen des 07.08., gut drei Stunden vor dem Owner-KERN, verwendet der Lead selbst erstmals die Kurzschreibweise 'numa.core_type=<p|e>' mit beiden Buchstaben zusammen -- als eigene Kurzfassung des 16.07.-Entscheids, nicht als Owner-Zitat."
+          },
+          {
+            "fundort": "ce libs/cache_engine/topics/hardware/axis_09b_simd_extension/axis_09b_simd_extension_avx512.hpp:50-65; libs/cache_engine/topics/hardware/axis_09b_simd_extension/axis_09b_simd_extension_strategy_base.hpp:37-51",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Die 14 AVX-512-Subsets (f/cd/bw/dq/vl/ifma/vbmi/vbmi2/vnni/bitalg/vpopcntdq/bf16/fp16/er/pf) existieren heute als benannte boolesche provides_avx512*()-Methoden je SIMD-Extension-Strategie, nicht als eine einzelne punktgetrennte Zeichenkette wie im KERN-Beispiel 'x512.f.vl.bw.dq'."
+          },
+          {
+            "fundort": "super docs/plaene/20260806-PLAN-hybrid-architektur-pmc-achsen-zuordnung.md:607-635 (Abschnitt 3b.4)",
+            "datum": "2026-08-06",
+            "zitat": "Tabelle roher Event-Codes je Mikroarchitektur | NEIN | PERF_TYPE_RAW: 0 von 1929 Quelldateien",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Der Plan haelt fest, dass eine Tabelle roher PMC-Event-Codes je Mikroarchitektur (Golden Cove/Gracemont/Zen 5) heute in 0 von 1929 Quelldateien existiert und schlaegt sysfs-Ereignisnamen als primaeren, mikroarchitektur-unabhaengigen Weg vor, eine CT-Tabelle je Mikroarchitektur nur sekundaer fuer sysfs-luecken (L2, Kohaerenz-Invalidierungen)."
+          },
+          {
+            "fundort": "ce libs/cache_engine/include/cache_engine/abi/anatomy_stamp_entries.hpp:114-115; kStampEntryHwFlagShift/Mask Zeilen 109-112",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Im 48-Byte-Stempel-Entry-POD belegen Hardware-Flag (Bits 1-2, 4 Werte c/g/f/n) und Meta-Meta-Klammertiefe (Bits 3-5) bereits feste, knappe Bit-Bereiche des reserved-Feldes -- jede Erweiterung um weitere Flag-Zeichen wie p/e muesste sich in diese bestehende Bit-Oekonomie einfuegen oder sie aendern."
+          },
+          {
+            "fundort": "Live-Transkript 5a19728e-...jsonl:13540-13575 (OWNER-VORLAGE-Erstellung) und :13795-13805 (x128/x256/x512-Recherche)",
+            "datum": "2026-08-07T12:14-12:35Z",
+            "relevanz": "STUETZEND",
+            "was_dort_steht": "Unmittelbar vor dem Owner-KERN dokumentiert der Lead im selben Sessions-Strang zwei getrennte laufende Fäden -- die Erstellung des Erst-Ankers mit den zehn offenen Owner-Entscheiden (12:14 Uhr) und eine live laufende Suche nach 'x128/x256/x512' als moeglicher SIMD-Flag-Notation, die als 'gibt es nirgends' endet (12:35 Uhr) -- auf die der Owner mit dem KERN direkt antwortet."
+          },
+          {
+            "fundort": "super docs/ledger-sections/architektur-ziele-offene-punkte-ledger.md:211 (R5.D)",
+            "datum": "2026-05-30 / Nachtrag 2026-07-16",
+            "relevanz": "RANDNOTIZ",
+            "was_dort_steht": "Aeltere Ledger-Sektion haelt fest, dass PMC-Hardware-Counter historisch als 'blocked-external' galten, mit Nachtrag vom 16.07., dass perf/PAPI auf prod1 inzwischen real verfuegbar sind -- reiner Hintergrund zur PMC-Vorgeschichte, nicht zur Flag-Grammatik."
+          },
+          {
+            "fundort": "Auto-Memory MEMORY.md, Abschnitt 'Stand/aktiv', Task-Liste Eintrag #36 (Workflow-interne Task-Verwaltung, nicht Teil der drei Repos)",
+            "datum": "2026-08-07 (nach 12:42Z aktualisiert)",
+            "zitat": "FLAG-GRAMMATIK NEU DEFINIERT (Owner-KERN 07.08.): Punkt-Notation, Komposit-Flags, 'e' = EFFICIENCY (experimental deprecated)",
+            "relevanz": "RANDNOTIZ",
+            "was_dort_steht": "Die workflow-interne Task-Liste des Hauptagenten fuehrt den KERN bereits als offenen Punkt #36 -- eine Meta-Bestaetigung, dass der Fund bereits registriert, aber noch nicht bearbeitet ist; keine eigenstaendige Quelle."
+          },
+          {
+            "fundort": "super docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:1537 (§16.2-M2)",
+            "datum": "2026-07-16",
+            "zitat": "NUR dynamische Unter-Achsen (Workload, RC-Settings, P/E-Core, NUMA, Multithreading) bleiben Spalten.",
+            "relevanz": "RANDNOTIZ",
+            "was_dort_steht": "P/E-Core wird hier nur als eines von mehreren Beispielen dynamischer Spalten in der Serialisierungs-Doktrin genannt, ohne eigene Buchstaben-Notation -- allgemeinerer Hintergrund zu §16.3-E17."
+          },
+          {
+            "fundort": "super docs/sessions/20260806-GESAMTDOSSIER-session-architektur-und-befunde.md:1802,1952,2117,2927; docs/sessions/20260807-BILANZ-vergessene-arbeit.md:54,141",
+            "datum": "2026-08-06/07",
+            "relevanz": "RANDNOTIZ",
+            "was_dort_steht": "Diese Session-Dossiers dokumentieren den Baufortschritt und eine offene Verlustgefahr der super-Haelfte von OD-11-RT (unkommittete XSD-Aenderung, inzwischen laut spaeteren Funden gesichert) -- Verlaufs-Kontext zu core_class, nicht zur Flag-Grammatik selbst."
+          }
+        ],
+        "suchvokabular": [
+          "core_class",
+          "OD-11-RT",
+          "numa_cpu_pin_process_probe",
+          "CoreClassKind",
+          "kern_uniform",
+          "kern_hohe_leistung",
+          "kern_hohe_effizienz",
+          "kern_grosser_cache",
+          "kern_kleiner_cache",
+          "PMU",
+          "PMC",
+          "cpu_core",
+          "cpu_atom",
+          "HybridPmu",
+          "experimental",
+          "AlgoSemVer::experimental",
+          "kStampEntryFlagExperimental",
+          "kProbeVersionCe",
+          "B12",
+          "B12-Wache",
+          "ce_owned_version_is_wellformed",
+          "ce_owned_version_satisfies_cpu_enforce",
+          "HardwareFlag",
+          "cpe",
+          "pe_policy",
+          "ran_on_core_type",
+          "core_type=<p|e>",
+          "PCoresOnly",
+          "ECoresOnly",
+          "HybridAware",
+          "Punkt-Pfad-Form",
+          "Meta-Meta-Klammer",
+          "Komposit Flag",
+          "x512.f.vl.bw.dq",
+          "avx512",
+          "provides_avx512",
+          "Scope-Freeze",
+          "P1 aus dem Scope-Freeze",
+          "Hybrid-Regel lokal",
+          "Mikroarchitektur",
+          "PERF_TYPE_RAW",
+          "OWNER-KERN 06.08",
+          "K-1 K-2 K-3 K-4",
+          "Efficiency Core",
+          "Performance Core",
+          "target_isa_sub_axes",
+          "system_axis_registry.xml",
+          "kSystemCellValueForbiddenKeys"
+        ]
+      }
+    ],
+    "vereinigung": {
+      "konflikte": [
+        {
+          "was": "Erstes Flag geklebt oder getrennt -- der innere Widerspruch der neuen Form selbst. Das Owner-Beispiel schreibt '1.0.0c.p.e': 'c' steht OHNE Punkt direkt am Tripel, erst 'p' und 'e' sind punktgetrennt. Die abstrakte Lead-Auslegung verlangt dagegen einen Punkt VOR jedem Flag. An dieser einen Frage haengt der gesamte Migrations-Nenner.",
+          "alt": "HWFLAG direkt an das Zahlen-Tripel angehaengt, kein Trenner ('v1.0.0c')",
+          "neu": "'.' ist Trenner zwischen ALLEN Flags -- aber das Owner-Beispiel klebt das erste Flag weiterhin",
+          "fundort": "ce /home/comdare/wt-landung/libs/cache_engine/include/cache_engine/measurement/algo_semver.hpp:26-30 · Owner-Beispiel im Live-Transkript Z.13808 · super /home/comdare/wt-super-landung/docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:8265 ('Bestaetigung ausstehend')",
+          "schwere": "BRAUCHT_MIGRATION",
+          "nenner": "Fall A (geklebt bleibt gueltig): 0 Literale zu migrieren. Fall B (Punkt vor jedem Flag): 114 tragende Definitionsstellen in ce/libs -- 108 benannte Konstanten-Deklarationen der Form `= \"v1.0.0c\";` (davon 97 `algo_version`, 1 `axis_code_version`, 10 weitere kXxxVersion) plus 6 Registry-Array-Eintraege (3 in abi/system_axis_code_versions.hpp, 3 in abi/toolchain_stamp_glied.hpp:216-218). Dazu 42 Vorkommen in tests/ und 25 in algo_semver.hpp selbst; 219 Vorkommen des Literals \"v1.0.0c\" gesamt in ce ohne /build/ (alles selbst gezaehlt, .hpp/.cpp/.h/.cc). Der Ledger:8290 nennt '138 Bestands-Literale' -- eine dritte Zaehlbasis, die ich weder auf 114 noch auf 219 abbilden konnte; die Differenz ist unbelegt."
+        },
+        {
+          "was": "Bedeutungswechsel von 'e': experimental -> efficiency core. Die alte Bedeutung ist nicht nur ein Kommentar, sie traegt eine Politik (ce-eigene Registry darf NIE 'e' tragen), ein POD-Bit und einen Owner-Q2-Ausweg zur Unterscheidung byte-verschiedener Merge-Binaries.",
+          "alt": "'e' == experimenteller Achsen-Algorithmus aus einem Pruefling (Owner-E2 02.08.2026), nur als Suffix NACH dem Hardware-Flag zulaessig",
+          "neu": "'e' == efficiency core, gleichrangiger Filter-Flag, an einer ce-eigenen Binary legitim; 'experimental' ist DEPRECATED",
+          "fundort": "ce algo_semver.hpp:16-19 (Owner-E2 verbatim im Kopfkommentar), :237-239 (Feld `bool experimental`), :296 (take_experimental), :406-416 (ce_owned_version_is_wellformed), :607-608 · ce abi/anatomy_stamp_entries.hpp:105-107 (kStampEntryFlagExperimental = Bit 0) · ce tests/unit/test_e24_c4_dock_version_negativ.cpp:45 (kDockVersionExperimentell) · super docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:9",
+          "schwere": "BRICHT_BESTAND",
+          "nenner": "43 Code-Stellen konsumieren das experimental-Feld bzw. -Bit (selbst gezaehlt ueber libs/ + tests/, ohne algo_semver.hpp): 20 in libs/ (14 davon allein in abi/anatomy_stamp_entries.hpp, 3 in builder/ceb_version_stamp.hpp, 1 in builder/experiment_tree/axis_variant_version_table.hpp, je 1 in operating_system_probe.hpp / numa_page_probe.hpp / numa_cpu_pin_process_probe.hpp) und 23 in tests/ (16 davon in test_m_w12_stamp_bausteine.cpp). Dazu 16 Produktions-Aufrufstellen der B12-Wache ce_owned_version_is_wellformed und 18 von ce_owned_version_satisfies_cpu_enforce in libs/."
+        },
+        {
+          "was": "Ein-Zeichen-Regel faellt: Kardinalitaet 1 -> n. Das Datenmodell traegt heute genau EIN skalares Hardware-Flag plus EIN bool, keine Flag-Menge.",
+          "alt": "HWFLAG := 'c'|'g'|'f'|'n' -- GENAU EINES, klein, direkt angehaengt; Reihenfolge FIX (erst Hardware, dann 'e')",
+          "neu": "beliebig viele punktgetrennte Filter-Flags (c, p, e, xNUMBER, ...) plus eine Komposit-Klammer; Reihenfolge sachlich egal",
+          "fundort": "ce algo_semver.hpp:26-30 (EBNF), :197 (`enum class HardwareFlag : uint8_t {none,cpu,gpu,fpga,npu}` -- ein Skalar), :229-239 (struct AlgoSemVer: EIN `HardwareFlag hardware` + EIN `bool experimental`), :304-344 (take_hardware_flag / take_flag_tail) · thesis anhang/de/D_building_block_matrix.tex:1138 und anhang/en/D_building_block_matrix.tex:1138",
+          "schwere": "BRICHT_BESTAND",
+          "nenner": "1 Enum mit 5 Werten, 2 Struct-Felder, 3 Parser-Hilfsfunktionen, 2 Parser-Einstiege (parse_algo_semver:346, parse_dotted_semver:430), 1 Renderer (algo_semver_string:369). Thesis: 2 Stellen (DE und EN je Zeile 1138, wortgleich; DE fuehrt)."
+        },
+        {
+          "was": "'.' bekommt eine dritte Rolle. Im Stempel-Segment hat der Punkt heute genau zwei definierte Bedeutungen, beide durch die Position am '@' getrennt: VOR dem '@' transparenter Namens-Bestandteil des Zellwerts ('code' -> 'code.<token>', Owner-Q2), NACH dem '@' die zwei Trenner des Zahlen-Tripels. Der Zellwert-Zeichenvorrat schliesst '.' ausdruecklich AUS.",
+          "alt": "nach dem '@' genau zwei Punkte, beide Tripel-Trenner; '.' im Zellwert-Token verboten (Alphabet [a-z0-9_])",
+          "neu": "nach dem '@' erst zwei Tripel-Punkte, danach beliebig viele Flag-Trenner-Punkte",
+          "fundort": "ce abi/system_cell_values.hpp:9,14 (Owner-Q2-Grammatik), :67-78 (system_cell_token_char_is_allowed), :98 (`static_assert(!system_cell_token_is_wellformed(\"1.0.0c\"), \"ein Token kann keine Version sein ('.' fehlt im Vorrat)\")`), :254-255, :382-408 (emit('.')) · ce measurement/axis_version_stamp.hpp:37-48 (build_axis_version_stamp_line) · ce algo_semver.hpp:369-376, :430",
+          "schwere": "BRAUCHT_MIGRATION",
+          "nenner": "2 Parser-Einstiege, 1 Renderer, 1 Zeilen-Bauer, 1 Zellwert-Vervollstaendiger, 1 Zeichenvorrat-Wache mit 4 static_asserts (system_cell_values.hpp:92,98,99,100,101). Ohne eine explizite Regel 'die ersten zwei Punkte nach dem @ gehoeren zum Tripel' ist '1.0.0.5' nicht entscheidbar."
+        },
+        {
+          "was": "Komposit-Klammern '{' '}' sind im Stempel-Preimage BEREITS belegt -- und zwar fuer etwas anderes. Das Toolchain-Glied schreibt materialisierte Compiler-Flags als 'key=<id>{<flags>}@X.Y.Zc', also '{}' VOR dem '@'. Die Meta-Meta-Gruppe benutzt '[' ']'. Owner setzt '{}' NACH dem '@'.",
+          "alt": "'{' '}' == materialisierte Toolchain-Flags vor dem '@'; '[' ']' == Meta-Meta-Gruppe am Zeilen-Ende",
+          "neu": "'{' '}' == Komposit-Erweiterungs-Flags nach dem '@'",
+          "fundort": "ce abi/toolchain_stamp_glied.hpp:495-513 (toolchain_append_axis, out += '{' / '}'), :187, :316, :602 · ce abi/meta_meta_stamp_suffix.hpp:47-48 (kMetaMetaGroupOpen='[' / kMetaMetaGroupClose=']') · ce abi/anatomy_fingerprint.hpp:154-159 (Zeichenvorrat erlaubt alle vier Klammern), :172",
+          "schwere": "BRAUCHT_MIGRATION",
+          "nenner": "3 toolchain_append_axis-Aufrufe (toolchain_stamp_glied.hpp:643, :645, :653), davon 2 mit nicht-leerem Flags-Argument (opt_level, atomic128); 2 Klammer-Konstanten in meta_meta_stamp_suffix.hpp; 1 Zeichenvorrat-Wache. Die Wache faengt den Konflikt NICHT: anatomy_fingerprint.hpp:159 erlaubt '{','}','[',']' bereits alle -- die Mehrdeutigkeit waere still, nicht laut."
+        },
+        {
+          "was": "Die 2-Bit-Kodierung des Hardware-Flags im 48-Byte-Stempel-POD fasst 4 feste Werte, keine Flag-Menge.",
+          "alt": "reserved-Feld (uint32) des AnatomyStampEntryV1: Bit 0 = experimental, Bits 1-2 = Hardware-Flag (00=c, 01=g, 10=f, 11=n), Bits 3-5 = Meta-Meta-Klammertiefe (max 7)",
+          "neu": "je Eintrag eine variable Flag-MENGE (c, p, e, x128/x256/x512, plus Komposit-Sub-Flags)",
+          "fundort": "ce abi/anatomy_stamp_entries.hpp:105-129 (kStampEntryFlagExperimental, kStampEntryHwFlagShift=1u, kStampEntryHwFlagMask=0x3u<<1, kStampEntryMetaLevelShift=3u, kStampEntryMaxMetaLevel=7u, vier Codepunkte), :137-163 (stamp_entry_hw_code / stamp_entry_hardware_flag / stamp_entry_is_experimental / stamp_entry_meta_level) · super LEDGER:8286-8288 Bruchstelle (6)",
+          "schwere": "BRICHT_BESTAND",
+          "nenner": "2 Bit fuer 4 Hardware-Werte, 1 Bit fuer experimental, 3 Bit fuer die Klammertiefe = 6 belegte Bits, 26 freie Bits (Bits 6-31). Der SIMD-Katalog allein traegt 23 Flags (ce measurement/simd_feature_flag.hpp:155 `static_assert(kSimdFeatureFlagCatalog.size() == 23)`). Eine Ein-Bit-je-Flag-Kodierung braeuchte mindestens 23 + 'p' + 'e' + 3 xNUMBER-Stufen = 28 Bit und passt damit nicht in die 26 freien Bits (eigene Rechnung aus den beiden gelesenen Zahlen). 14 Fundstellen in anatomy_stamp_entries.hpp konsumieren das Feld."
+        },
+        {
+          "was": "'f' ist unter der neuen Notation doppelt belegt: ausserhalb der Klammer FPGA, innerhalb des Owner-Komposits {x512.f.vl.bw.dq} das AVX-512-Subset Foundation.",
+          "alt": "'f' == FPGA, eines von vier Hardware-Flag-Zeichen",
+          "neu": "'f' innerhalb der Komposit-Klammer == avx512f (Foundation); ausserhalb weiterhin FPGA",
+          "fundort": "ce algo_semver.hpp:201-209 (hardware_flag_char: case fpga -> 'f') · ce measurement/simd_organ_sensibility.hpp:33 (`kSensibilitySearchAlgoFlags{kAvx512Bw, kAvx512Dq, kAvx512F, kAvx512Vl}`) · super docs/architektur/20260719-simd-flag-signaturen-REFERENZ.md Abschnitt 1 (Subset-Kurzcode F = avx512f)",
+          "schwere": "BRAUCHT_MIGRATION",
+          "nenner": "1 Zeichen mit zwei Bedeutungen; 4 Hardware-Flag-Zeichen gesamt (c/g/f/n); 23 SIMD-Katalog-Flags, deren Kurzcodes laut REFERENZ.md mindestens bei 'F' mit einem Hardware-Flag-Zeichen kollidieren. Aufgeloest heute allein durch die Klammer-Position -- eine Regel, die nirgends geschrieben steht."
+        },
+        {
+          "was": "Meta-Meta-Signatur JE ALGORITHMUS statt EINE Klammer je Realm-Zeile. Owner-E2 vom 02.08. haengt genau EINEN geklammerten Anhang ans ENDE der Zeile; der Owner-KERN vom 07.08. haengt das Komposit an ein einzelnes Achsen/Algorithmus-Segment.",
+          "alt": "EIN Klammer-Anhang am Zeilen-ENDE je Realm (System: '[simd=code@1.0.0c]', Mess: '[load_framework=ycsb@1.0.0c]'), Organ-Zeile ohne Anhang",
+          "neu": "jedes Algorithmus-Segment traegt seine eigene Komposit-Signatur ('memory@1.0.0c.p.e.{x512.f.vl.bw.dq}')",
+          "fundort": "ce abi/anatomy_version_stamp.hpp:144-161 (system_stamp_line: feste Schleife ueber kSystemAxisCodeCount, danach append_meta_meta_suffix ans Ende), :51 (`using OrganMetaMetas = MetaMetaMembers<>` -- leer), :39 (kOrganAxisCount = 18) · ce abi/meta_meta_stamp_suffix.hpp:56-68 (wrap_meta_meta_group) · ce abi/anatomy_stamp_entries.hpp:115-122 (Klammertiefe als Ebene) · super docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:9 (Owner-E2 'ans Ende der Kette')",
+          "schwere": "BRICHT_BESTAND",
+          "nenner": "3 Realm-Zeilen, heute 2 mit je genau 1 Klammer-Gruppe und 1 leer. Betroffen waeren kuenftig 18 Organ-Achsen-Segmente je Organ-Zeile (kOrganAxisCount = 18) und 3 System-Haupt-Achsen-Segmente (kSystemAxisOrder, abi/system_axis_order.hpp:41-45: target_isa, operating_system, external_utils) -- also bis zu 21 Segmente mit je eigener Signatur statt heute 2 Zeilen-Anhaengen."
+        },
+        {
+          "was": "Die Negativ-Test-Batterie bleibt zwar in ihren Urteilen stehen (geklebte Mehrfach-Flags sind auch unter der Punkt-Notation ungueltig), aber ein Teil ihrer BEGRUENDUNGEN wird sachlich falsch.",
+          "alt": "'Reihenfolge verdreht' (v1.0.0ec), \"'e' OHNE Hardware-Flag\" (v1.0.0e, v2.3.4e), 'unbekanntes Flag-Zeichen' (v1.0.0x), \"'e' == Pruefling-Markierung\" (!wellformed v1.0.0ce)",
+          "neu": "Reihenfolge ist sachlich egal; 'e' ist ein eigenstaendiger Filter, kein Suffix; 'x' ist der Praefix der xNUMBER-Flag-Familie; 'e' an einer ce-eigenen Version ist legitim",
+          "fundort": "ce algo_semver.hpp:529-545 (Flag-Batterie), :548-552 (Sentinel-mit-Flags), :604-616 (ce_owned_version_is_wellformed-Batterie), speziell :531, :532, :533, :538, :607, :608 · ce tests/unit/test_e24_c4_dock_version_negativ.cpp:50-60",
+          "schwere": "KOMMENTAR_NACHZUG",
+          "nenner": "35 static_asserts in algo_semver.hpp (17 in der Flag-Batterie Z.529-545, 5 in der Sentinel-Batterie Z.548-552, 13 in der wellformed-Batterie Z.604-616 -- selbst gezaehlt). Davon 4 mit sachlich falsch werdender Begruendung (Z.531, 532, 533, 538) und 2 mit sinnwidrig werdender Politik (Z.607, 608). Dazu 3 Dock-Negativ-Asserts, davon 1 ('e', test_e24_c4_dock_version_negativ.cpp:54) sinnwidrig. Gesamt-static_assert-Zahl der Datei: 148."
+        },
+        {
+          "was": "Das 'v'-Praefix. Owner schreibt '1.0.0c' ohne 'v' -- das ist die GERENDERTE Form und entspricht bereits Owner-Q10 vom 02.08. Die ROHE Literal-Form beginnt weiterhin zwingend mit 'v' (Owner-Q3). Der Owner-KERN sagt zur rohen Form nichts.",
+          "alt": "rohe Literale beginnen ZWINGEND mit 'v' (Owner-Q3); gerenderte Form praefixfrei (Owner-Q10)",
+          "neu": "unveraendert -- das Owner-Beispiel ist die gerenderte Form; zur rohen Form schweigt der KERN",
+          "fundort": "ce algo_semver.hpp:26-27 (beide Formen nebeneinander: `version := 'v' ...` / `dotted := UINT ...`), :369-376 · ce abi/toolchain_stamp_glied.hpp:195 ('rohe Code-Version in Q3-Grammatik (\"v1.0.0c\"); gerendert praefixfrei (Q10)') · ce tests/unit/test_planner_version_flag_grammatik.cpp:6,12 · super docs/sessions/20260802-OWNER-entscheide-hybrid-tier-stempel-regression-os-unterachsen.md:90 (Q10: 'Bitte ohne v, lass es jetzt so, also Option A')",
+          "schwere": "KOMMENTAR_NACHZUG",
+          "nenner": "0 Code-Stellen zu aendern -- die Zwei-Formen-Trennung traegt den Owner-Wortlaut bereits. Zu praezisieren sind 2 Kommentar-Stellen (algo_semver.hpp:26-27, toolchain_stamp_glied.hpp:195), damit spaeter niemand die Abwesenheit des 'v' im Owner-Beispiel als Abschaffung liest."
+        }
+      ],
+      "passt_zusammen": [
+        "Sec.40.a (Ledger:2397-2408, User-Direktive 19.07.2026) fordert bereits woertlich 'je Maschine eine DEKLARIERTE Signatur einzelner SIMD-Flags (cpuid-Ebene, z.B. avx512f/vl/bw/dq/vnni/...), NICHT der Grob-Level avx2/avx512'. Die neue Komposit-Notation {x512.f.vl.bw.dq} IST diese Forderung -- nur mit einer Schreibweise versehen. Das Modell ist gebaut: ce libs/cache_engine/include/cache_engine/measurement/simd_feature_flag.hpp:155 (`static_assert(kSimdFeatureFlagCatalog.size() == 23)`) und :168 (`static_assert(count_flags_of_tier(SimdFlagTier::Avx512) == 14)`). Hier ist KEIN neues Vokabular zu bauen.",
+        "Sec.37 (Ledger:2342ff, 19.07.2026) 'bis zu ihrer maximalen Faehigkeitsstufe permutieren' entspricht dem Owner-Satz 'ohne Erweiterung oder stufenweise mit Erweiterung bis zur vollen Optimierungs-Stufe'. Die Leiter ist gebaut: ce measurement/simd_build_gate.hpp:58-75 traegt SimdRoute NoExtension/Avx2/Avx512 mit route_allows() und dem Kommentar '512-bit-Route: alle Tiers kumulativ'. Kein Bau noetig, nur Scharfschaltung.",
+        "Der Owner-Satz 'jeder Algorithmus kann eigenstaendig gegen zusaetzliche Meta-Meta-Achsen optimiert und kompiliert werden' trifft auf einen bereits gebauten, nur inerten Mechanismus: ce measurement/simd_organ_requirement.hpp:40-50 fuehrt 9 Organ-Klassen (filter, search_algo, memory_layout, mapping, index_organization, value_handle, cache_traversal, scoring, prefetch) mit je einer required-Menge; :87-88 beweist die Inertheit per `static_assert(kSimdOrganRequirement.size() == 9)` und `static_assert(!any_organ_declares_required())`. Die Aktivierung ist als W8-Nachlauf explizit getrackt (Ledger:2462).",
+        "Die Owner-Beispiel-Flagmenge {f, vl, bw, dq} ist MENGENGLEICH mit der bereits deklarierten Sinnhaftigkeits-Menge einer Organ-Klasse: ce measurement/simd_organ_sensibility.hpp:33 `kSensibilitySearchAlgoFlags{kAvx512Bw, kAvx512Dq, kAvx512F, kAvx512Vl}`. Die Sinnhaftigkeits-Tabelle ist damit die fertige Quelle fuer die Komposit-Inhalte -- sie muss nicht neu erhoben werden. (Randnotiz: die Menge gehoert zu 'search_algo', der Owner nennt im Beispiel aber 'memory'.)",
+        "Eine zweite Syntax-EBENE braucht kein neues POD-Feld: ce abi/anatomy_stamp_entries.hpp:115-122 kodiert die Klammer-Tiefe bereits in Bits 3-5 mit kStampEntryMaxMetaLevel = 7, also bis zu sieben Ebenen. Das Komposit ist eine Ebene, keine neue Feld-Art.",
+        "Die Grammatik hat genau ZWEI Renderer-Engpaesse, nicht n: ce measurement/axis_version_stamp.hpp:37-48 (build_axis_version_stamp_line, baut alle drei Realm-Zeilen) und ce abi/meta_meta_stamp_suffix.hpp:96ff (render_meta_meta_entry, jedes Meta-Meta-Glied). Der Kopfkommentar von render_meta_meta_entry benennt das selbst als bewusste Engpass-Wahl ('eine Wache am Engpass KANN NIEMAND VERGESSEN'). Eine Grammatik-Umschaltung hat damit zwei Anfasspunkte, nicht 219.",
+        "Die praefixfreie Render-Form des Owner-Beispiels ('1.0.0c...') entspricht bereits Owner-Q10 vom 02.08.2026 ('Bitte ohne v, lass es jetzt so, also Option A'). ce abi/toolchain_stamp_glied.hpp:195 haelt rohe und gerenderte Form getrennt. Kein Widerspruch, kein Bau.",
+        "Der Fingerprint-Zeichenvorrat traegt die neue Notation bereits: ce abi/anatomy_fingerprint.hpp:157-160 erlaubt '.', '{', '}', '[', ']', '@', '=', ';'. Die Preimage-Wohlgeformtheits-Wache bricht an der neuen Form NICHT. (Kehrseite: sie faengt die Klammer-Mehrdeutigkeit aus Konflikt 5 deshalb auch nicht.)",
+        "Owner: 'Die Basis-System-Achsen sind statisch in ihrer Zeile der System-Achsen.' Das bestaetigt den heutigen Stand exakt: ce abi/system_axis_order.hpp:41-45 fuehrt genau drei System-Haupt-Achsen (target_isa, operating_system, external_utils) als kanonische Ordnung, und ce abi/anatomy_version_stamp.hpp:144-161 rendert sie in einer festen Schleife ueber kSystemAxisCodeCount. Die System-Zeile wird von der neuen Notation nicht umgebaut.",
+        "Das Muster fuer die Migration existiert und hat sich bewaehrt: A13-M3/C4 (ce commit 67e4965f, 03.08.2026) hat Renderer-Umschaltung, Bestands-Migration und ENFORCE=1 in EINEM Commit als EIN Byte-Ereignis gefahren. Die Bau-Reihenfolge unten wiederholt dieses Muster, sie erfindet es nicht."
+      ],
+      "luecken": [
+        "FRAGE 1 (blockierend, entscheidet den gesamten Migrations-Nenner): Bleibt das ERSTE Flag am Zahlen-Tripel geklebt, wie im Beispiel 'memory@1.0.0c.p.e' das 'c'? Oder muss auch davor ein Punkt stehen ('1.0.0.c.p.e')? KONTEXT: Bei geklebt bleiben 114 tragende Definitionsstellen in ce/libs unveraendert (108 Deklarationen + 6 Registry-Array-Eintraege, selbst gezaehlt) und es gibt gar keine Literal-Migration; bei getrennt muessen alle 114 plus 42 Test-Vorkommen migriert werden. Der Ledger vermerkt die Lead-Auslegung selbst als 'Bestaetigung ausstehend' (super LEDGER:8265).",
+        "FRAGE 2 (blockierend, ohne sie ist kein eindeutiger Parser baubar): Wo endet das Zahlen-Tripel und wo beginnt die Flag-Kette, wenn beide denselben Trenner '.' benutzen? Vorschlag zur Bestaetigung: die ersten ZWEI Punkte nach dem '@' gehoeren zum Tripel, jeder weitere ist Flag-Trenner. KONTEXT: '1.0.0.5' ist ohne diese Regel nicht entscheidbar (vierstellige Version oder Flag '5'?). Betroffen sind die zwei Parser-Einstiege parse_algo_semver (ce algo_semver.hpp:346) und parse_dotted_semver (:430).",
+        "FRAGE 3 (blockierend fuer die Klammer-Syntax): Welches Klammerpaar traegt das Komposit? '{' '}' sind im Stempel-Preimage bereits belegt -- sie umschliessen die materialisierten Toolchain-Flags VOR dem '@' (ce abi/toolchain_stamp_glied.hpp:507-509, Form 'key=<id>{<flags>}@X.Y.Zc'); '[' ']' sind die Meta-Meta-Gruppe (ce abi/meta_meta_stamp_suffix.hpp:47-48). KONTEXT: Loest die POSITION (vor/nach dem '@') die Mehrdeutigkeit auf, oder braucht das Komposit ein drittes Klammerpaar? Die Zeichenvorrat-Wache erlaubt alle vier Klammern (ce abi/anatomy_fingerprint.hpp:159) und wuerde eine Kollision NICHT laut melden.",
+        "FRAGE 4: 'f' bedeutet ausserhalb der Klammer FPGA (ce algo_semver.hpp:205), im Owner-Komposit {x512.f.vl.bw.dq} aber avx512f (Foundation). Ist die Klammer-Position die einzige und ausreichende Aufloesung, oder bekommen Komposit-Sub-Flags ein eigenes Praefix? KONTEXT: Ohne Festlegung ist ein Komposit-Inhalt nicht von einem Hardware-Flag unterscheidbar, sobald ein Werkzeug die Klammer verliert (z.B. beim Zerlegen in CSV-Spalten).",
+        "FRAGE 5 (blockierend fuer Konflikt 2): Was ersetzt die Pruefling-Markierung, die 'e' bisher trug? Owner-E2 vom 02.08.2026 verlangt sie ausdruecklich fuer 'jeden Achsen-Algorithmus'; mit 'e' == efficiency core ist der Traeger weg. KONTEXT: 43 Code-Stellen konsumieren das experimental-Feld/Bit, Bit 0 des 48-Byte-Stempel-PODs ist dafuer reserviert, die B12-Wache steht an 16 Produktions-Aufrufstellen, und Owner-Q2 hat 'e' als einen der zwei Auswege genannt, um zwei byte-verschiedene Merge-Binaries unterscheidbar zu halten. Optionen zur Wahl: (a) neues Zeichen fuer experimental, (b) eigenes Feld ausserhalb der Versionsbezifferung, (c) Markierung faellt ersatzlos.",
+        "FRAGE 6: Traegt die Signatur 'je Algorithmus' auch die ORGAN-Zeile, und dann je Segment? KONTEXT: Heute haengt genau EIN Klammer-Anhang am Zeilen-ENDE (Owner-E2 02.08.: 'ans Ende der Kette'), die Organ-Zeile hat 18 Segmente (ce abi/anatomy_version_stamp.hpp:39, kOrganAxisCount = 18) und heute gar keinen Anhang (:51, OrganMetaMetas ist leer). 'Je Algorithmus' wuerde aus 2 Zeilen-Anhaengen bis zu 21 Segment-Signaturen machen (18 Organ + 3 System).",
+        "FRAGE 7: Ist 'memory' im Beispiel ein Achsen-Name oder ein Algorithmus-Name? Die Zeilen-Grammatik ist 'achse=algo@X.Y.Z' (ce measurement/axis_version_stamp.hpp:41-45); das Owner-Beispiel hat kein '='. KONTEXT: Ein Achsen- oder Organ-Name 'memory' existiert in ce nicht -- die naechste Entsprechung ist 'memory_layout' (ce measurement/simd_organ_requirement.hpp:42). Zusatzbefund: die Flagmenge des Beispiels {f,vl,bw,dq} ist mengengleich mit kSensibilitySearchAlgoFlags, also der Menge von 'search_algo', nicht von 'memory_layout' (ce measurement/simd_organ_sensibility.hpp:33-34). Beispiel-Name und Beispiel-Flags passen nicht zusammen.",
+        "FRAGE 8: Was bedeuten die Sternchen an x128*/x256*/x512** aus Owner-Schritt 1 ('mit * als Hardware Flags speziell nachfolgend fuer die AVX verbauten Register')? KONTEXT: Keine der vier Kartierungen hat dazu einen Beleg gefunden; ob das Registerbreite, Registeranzahl oder ein Platzhalter fuer nachfolgende Sub-Flags meint, ist unbelegt. Die Notation im spaeteren Beispiel ({x512.f.vl.bw.dq}) traegt keine Sternchen mehr.",
+        "FRAGE 9: Gilt die neue Grammatik auch ausserhalb der Organ-Algorithmen? Der Owner-Wortlaut nennt woertlich nur 'ein definiertes Organ/Algorithmus einer Tier-Binary Achse'. KONTEXT: Dieselbe Grammatik traegt heute zusaetzlich 5 Pruef-Dock-Versionen (ce builder/pruef_dock/pruef_dock_version.hpp), 3 Toolchain-Achsen-Versionen (ce abi/toolchain_stamp_glied.hpp:216-218), 3 System-Achsen-Code-Versionen, 3 Mess-Tooling- und 1 Mess-Framework-Version, die Planer-Version und die Probe-Versionen (OS-U3, OD-10-RT, OD-11-RT).",
+        "FRAGE 10: Gibt es eine Obergrenze fuer die Flag-Zahl je Eintrag? KONTEXT: Das reserved-Feld des 48-Byte-Stempel-PODs hat nach experimental (Bit 0), Hardware (Bits 1-2) und Klammertiefe (Bits 3-5) noch 26 freie Bits; allein der SIMD-Katalog traegt 23 Flags (ce measurement/simd_feature_flag.hpp:155). Eine Ein-Bit-je-Flag-Kodierung braeuchte mindestens 28 Bit und passt nicht. Entweder faellt eine Obergrenze, oder die Bit-Kodierung wird zugunsten der Zeilen-Wahrheit aufgegeben -- letzteres aendert die ABI-Bedeutung des PODs.",
+        "FRAGE 11: Ist die Reihenfolge, die formal einzuhalten ist, festgelegt? Owner: 'Die Reihenfolge aller Flags und Komposit-Flag-Flags ist weiterhin egal' und zugleich 'wird formal eingehalten'. KONTEXT: Fuer die Byte-Identitaet des Stempels ist das nicht egal -- zwei Reihenfolgen derselben Menge ergeben zwei verschiedene Fingerprints und damit zwei Lager-Keys fuer dieselbe Binary. Es braucht eine kanonische Sortierung. Owner-Schritt 1 nennt nur eine Teilordnung ('e hat die hoechste Prioritaet und steht ganz vorn') -- die aber unter der neuen Bedeutung von 'e' vermutlich nicht mehr gemeint ist."
+      ],
+      "bau_reihenfolge": [
+        "STUFE 0 -- KEIN CODE: Owner-Antworten auf Frage 1, 2, 3, 5 und 11 einholen. BEGRUENDUNG: Frage 1 entscheidet, ob 114 Definitionsstellen migriert werden oder null. Frage 2 entscheidet, ob ein eindeutiger Parser ueberhaupt existieren kann. Frage 3 entscheidet, ob die Klammer eine zweite Bedeutung erhaelt, die keine Wache faengt. Frage 5 entscheidet, ob die Pruefling-Markierung ersatzlos entfaellt. Frage 11 entscheidet, ob der Stempel byte-eindeutig bleibt. Jede Zeile Code vor diesen Antworten ist ein Rateschritt an einer Stelle, die Binary-Identitaet stiftet.",
+        "STUFE 1 -- BYTE-NEUTRAL, ADDITIV: das Grammatik-MODELL erweitern, den RENDERER nicht anfassen. AlgoSemVer bekommt neben dem skalaren `hardware`-Feld eine Flag-Menge; take_flag_tail lernt die Punkt-Notation; algo_semver_string (ce algo_semver.hpp:369) rendert weiter unveraendert die Alt-Form. PRUEFBEDINGUNG dieser Stufe: der Bestand 'v1.0.0c' parst in alter und neuer Grammatik auf denselben Wert. BEGRUENDUNG: Parser (:346, :430) und Renderer (:369) sind im Header bereits getrennte Funktionen -- solange der Renderer schweigt, bewegt sich kein Byte, kein Fingerprint, kein Lager-Key. Das ist die einzige Stufe, in der man die neue Grammatik gefahrlos falsch bauen und korrigieren kann.",
+        "STUFE 2 -- BYTE-NEUTRAL: das experimental-Bit VOM Zeichen 'e' entkoppeln, BEVOR 'e' die Bedeutung wechselt. Bit 0 des Stempel-PODs (ce abi/anatomy_stamp_entries.hpp:105-107) bleibt bestehen und bekommt den in Frage 5 bestimmten neuen Traeger. BEGRUENDUNG: Reihenfolge-kritisch. Wuerde 'e' erst umdefiniert und danach der Ersatz-Traeger gesucht, gaebe es ein Fenster, in dem eine Pruefling-Binary nicht mehr von einer Efficiency-Core-Binary zu unterscheiden ist -- genau die Stempel-Uneindeutigkeit, die diese Reihenfolge vermeiden soll. 43 Konsumenten-Stellen ziehen mit.",
+        "STUFE 3 -- BYTE-NEUTRAL: die Wachen auf die neue Bedeutung umstellen, aber weiterhin gegen die ALTE Render-Form pruefen lassen. Betroffen: die B12-Wache ce_owned_version_is_wellformed (16 Produktions-Aufrufstellen in libs/), ce_owned_version_satisfies_cpu_enforce (18), version_satisfies_cpu_only_policy (12), die 35 static_asserts der drei Batterien in algo_semver.hpp und die 3 Dock-Negativ-Asserts. BEGRUENDUNG: die Wachen sind das Netz, das Stufe 5 auffaengt. Stehen sie beim Migrations-Commit noch auf der alten Politik, laesst genau der Commit eine Fehlform durch, der sie zementiert. Insbesondere die Regel 'ce-Registry traegt nie e' muss VOR dem Byte-Ereignis durch die Antwort auf Frage 5 ersetzt sein.",
+        "STUFE 4 -- BYTE-NEUTRAL, ABER ABI-BERUEHREND: die POD-Kodierung entscheiden und bauen (Antwort auf Frage 10). Entweder Bits 6-31 als Flag-Maske mit fester Obergrenze, oder Verzicht auf die Bit-Kodierung zugunsten der Zeilen-Wahrheit. BEGRUENDUNG: der 48-Byte-Entry ist ABI. Eine sizeof-Aenderung waere ein ZWEITES, vom Grammatik-Ereignis unabhaengiges Byte-Ereignis. Sie muss deshalb entweder vorher fallen (dann ist sie fuer sich pruefbar) oder bewusst mit Stufe 5 zusammengelegt werden -- was sie nicht darf, ist als Nebenwirkung passieren.",
+        "STUFE 5 -- DAS EINE BYTE-EREIGNIS: Renderer umschalten, alle Bestands-Literale migrieren und die ENFORCE-Wache scharf stellen -- alles im SELBEN Commit. BEGRUENDUNG: Renderer und Literale getrennt zu schalten erzeugt zwangslaeufig einen Zwischenstand, in dem zwei Stempel-Formen fuer dieselbe Binary im selben Lager stehen -- also genau die Uneindeutigkeit, die die Frage stellt. Das Muster ist erprobt: A13-M3/C4 (ce commit 67e4965f, 03.08.2026) hat die Q3-Migration exakt so gefahren, mit COMDARE_VERSION_HW_FLAG_ENFORCE=1 im selben Commit. Zaehlbasis fuer den Umfang: 114 tragende Definitionsstellen in libs/ plus 42 Test-Vorkommen -- oder 0, falls Frage 1 zugunsten der geklebten Form ausgeht.",
+        "STUFE 6 -- NACHZUG, KEIN BYTE-EREIGNIS: Thesis fuehren. anhang/de/D_building_block_matrix.tex:1131-1138 zuerst (DE fuehrt), anhang/en/D_building_block_matrix.tex:1131-1138 wortgleich nachziehen. Danach Ledger und Session-Dokumente. Die Zitate der Owner-Entscheide E2 und Q3 vom 02.08.2026 in den Kopfkommentaren bleiben als HISTORIE stehen und werden als superseded markiert, nicht geloescht (Doku-Doktrin; ce abi/anatomy_version_stamp.hpp:63-72 zeigt das Muster bereits vor). BEGRUENDUNG: die Thesis ist Quellrang 1 -- eine Spezifikation, die den Code widerlegt, ist selbst ein Defekt, aber sie darf den Code nicht vorwegnehmen: erst wenn Stufe 5 steht, ist die neue Aussage wahr.",
+        "STUFE 7 -- ERST DANACH, EIGENES EREIGNIS: die Organ-seitige required-Deklaration scharf schalten (ce measurement/simd_organ_requirement.hpp, 9 Klassen, heute alle mit kRequiredNone und per static_assert als inert bewiesen). BEGRUENDUNG: das ist ein eigenes Selektions- und Byte-Ereignis und laut Ledger:2462 ohnehin ein eigener Owner-Paket-Entscheid ('W8-Gate-Aktivierungs-Nachlauf ... bewusst spaeter'). Mit dem Grammatik-Ereignis vermischt waere hinterher nicht mehr feststellbar, welche der beiden Aenderungen eine Fingerprint-Verschiebung verursacht hat -- und damit auch nicht, welche man zurueckdrehen muss, wenn eine Messung abweicht."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Kartierung"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Vereinigung"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "karte:grammatik-historie",
+      "phaseIndex": 1,
+      "phaseTitle": "Kartierung",
+      "agentId": "a1322b33cc227519e",
+      "model": "claude-sonnet-5",
+      "state": "done",
+      "startedAt": 1786106658355,
+      "queuedAt": 1786106658348,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Die gesamte A13-Kette (M1 02.08. ~14:2x UTC bis M4 03.08. ~…",
+      "promptPreview": "OWNER-KERN 07.08.2026 (verbatim, die NEUE Flag-Grammatik):\n\n\"Ja korrekt, habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und\ntrennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes\nOrgan/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil\nes jetzt fuer efficiency core steht. Jeder Algorithmus…",
+      "lastProgressAt": 1786107584707,
+      "tokens": 276692,
+      "toolCalls": 35,
+      "durationMs": 926352,
+      "resultPreview": "{\"luecken\":[\"Die \\\"Lead-Auslegung\\\" der neuen Grammatik (Schema achse@X.Y.Z.<flag>.<flag>.{<komposit>...}) ist laut Ledger selbst noch nicht Owner-bestaetigt (\\\"Bestaetigung ausstehend\\\", super LEDGER:8265) -- das Beispiel \\\"memory@1.0.0c.p.e.{x512.f.vl.bw.dq}\\\" zeigt 'c' OHNE Punkt direkt am Zahlentripel, waehrend die abstrakte Formel darueber einen Punkt VOR jedem Flag verlangt; dieser innere Wi…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "karte:meta-meta",
+      "phaseIndex": 1,
+      "phaseTitle": "Kartierung",
+      "agentId": "a5e0fd68e78e8b582",
+      "model": "claude-sonnet-5",
+      "state": "done",
+      "startedAt": 1786106658356,
+      "queuedAt": 1786106658348,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Kartierung ueber alle vier vorgegebenen Quellen: ce (13 Hea…",
+      "promptPreview": "OWNER-KERN 07.08.2026 (verbatim, die NEUE Flag-Grammatik):\n\n\"Ja korrekt, habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und\ntrennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes\nOrgan/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil\nes jetzt fuer efficiency core steht. Jeder Algorithmus…",
+      "lastProgressAt": 1786107289003,
+      "tokens": 280436,
+      "toolCalls": 60,
+      "durationMs": 630647,
+      "resultPreview": "{\"luecken\":[\"Ob 'je Algorithmus' im Owner-Zitat die 18 Organ-Haupt-Achsen (individuelle Algorithmus-Implementierungen) oder die Meta-Meta-Hub-Glieder (heute nur 'simd') meint, ist aus keiner gelesenen Quelle eindeutig entscheidbar -- das Owner-Beispiel 'memory@1.0.0c.p.e.{...}' deutet auf ersteres (ein Organ-Achsen-Name traegt die Komposit-Klammer direkt), der existierende Code realisiert nur letz…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "karte:simd-signatur",
+      "phaseIndex": 1,
+      "phaseTitle": "Kartierung",
+      "agentId": "a7f06286bf8f8384a",
+      "model": "claude-sonnet-5",
+      "state": "done",
+      "startedAt": 1786106658356,
+      "queuedAt": 1786106658348,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Vollstaendig gelesen: docs/architektur/20260719-simd-flag-s…",
+      "promptPreview": "OWNER-KERN 07.08.2026 (verbatim, die NEUE Flag-Grammatik):\n\n\"Ja korrekt, habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und\ntrennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes\nOrgan/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil\nes jetzt fuer efficiency core steht. Jeder Algorithmus…",
+      "lastProgressAt": 1786107486666,
+      "tokens": 237742,
+      "toolCalls": 42,
+      "durationMs": 828310,
+      "resultPreview": "{\"nenner\":\"Vollstaendig gelesen: docs/architektur/20260719-simd-flag-signaturen-REFERENZ.md (7 Abschnitte, 41 dokumentierte Subset-/Flag-Namen: 18 AVX-512-Zeilen + 3 EVEX/VEX-Begleiter + 4 AVX/AVX2 + 5 Skalar-Begleiter + 3 256-bit-VEX-Neuzugaenge + 8 SSE/128-bit-Historie). simd_feature_flag.hpp: 23 Katalogeintraege (14 avx512 + 4 avx256 + 3 companion + 2 scalar), durch static_assert(size()==23) un…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "karte:core-class-pe",
+      "phaseIndex": 1,
+      "phaseTitle": "Kartierung",
+      "agentId": "aed2380647e38ab93",
+      "model": "claude-sonnet-5",
+      "state": "done",
+      "startedAt": 1786106658356,
+      "queuedAt": 1786106658348,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Durchsucht (10.07.-07.08.2026, Fokus letzte 48h da dort all…",
+      "promptPreview": "OWNER-KERN 07.08.2026 (verbatim, die NEUE Flag-Grammatik):\n\n\"Ja korrekt, habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und\ntrennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes\nOrgan/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil\nes jetzt fuer efficiency core steht. Jeder Algorithmus…",
+      "lastProgressAt": 1786107340674,
+      "tokens": 288858,
+      "toolCalls": 66,
+      "durationMs": 682318,
+      "resultPreview": "{\"luecken\":[\"Zwei mögliche Orte für 'P/E' koexistieren jetzt unverbunden: die System-Achse core_class (OD-11-RT, pro Maschine/Messzeile, Owner-KERN 06.08., Werte kern_hohe_leistung/kern_hohe_effizienz) und die neuen algo_semver-Flags 'p'/'e' (pro Algorithmus/Tier-Binary-Kompilat, Owner-KERN 07.08. 12:42). Kein gefundenes Dokument sagt, ob beide unabhängig bleiben oder zusammengeführt werden.\",\"Die…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "vereinigung",
+      "phaseIndex": 2,
+      "phaseTitle": "Vereinigung",
+      "agentId": "acc5cee5db4b40b0b",
+      "model": "claude-fable-5",
+      "fallbackModel": "claude-opus-5",
+      "state": "done",
+      "startedAt": 1786107584717,
+      "queuedAt": 1786107584708,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "OWNER-KERN 07.08.2026 (verbatim, die NEUE Flag-Grammatik):\n\n\"Ja korrekt, habe ich gerade definiert. Wir machen also x512.f.vl.bw.dq..... aus der Notation und\ntrennen das Komposit Flag memory@1.0.0c.p.e.{x512.f.vl.bw.dq}..... so als ein definiertes\nOrgan/Algorithmus einer Tier-Binary Achse auf. Das flag 'e' fuer experimental ist deprecated weil\nes jetzt fuer efficiency core steht. Jeder Algorithmus…",
+      "lastProgressAt": 1786108106892,
+      "tokens": 136709,
+      "toolCalls": 25,
+      "durationMs": 522175,
+      "resultPreview": "{\"konflikte\":[{\"was\":\"Erstes Flag geklebt oder getrennt -- der innere Widerspruch der neuen Form selbst. Das Owner-Beispiel schreibt '1.0.0c.p.e': 'c' steht OHNE Punkt direkt am Tripel, erst 'p' und 'e' sind punktgetrennt. Die abstrakte Lead-Auslegung verlangt dagegen einen Punkt VOR jedem Flag. An dieser einen Frage haengt der gesamte Migrations-Nenner.\",\"alt\":\"HWFLAG direkt an das Zahlen-Tripel …"
+    }
+  ],
+  "totalTokens": 1220437,
+  "totalToolCalls": 228
+}
