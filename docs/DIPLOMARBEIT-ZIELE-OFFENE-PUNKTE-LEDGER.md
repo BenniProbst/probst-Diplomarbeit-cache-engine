@@ -10351,3 +10351,70 @@ Ich hatte gefragt, ob `mmx` unterdrueckt werden soll, weil es auf x86-64 zur Gru
 **Meine Praemisse war zu eng.** "`mmx` ist immer wahr" gilt **nur auf x86-64**. Im Cluster steht ein
 **VisionFive 2 (RISC-V)** -- dort traegt die Abwesenheit von MMX echte Information. Der Katalog
 beschreibt eine **plattformuebergreifende** Landschaft, nicht nur die x86-Zelle.
+
+---
+
+## NACHTRAG 07.08.2026 abend-27 — A8 VOLLZOGEN (NAS lesbar UND schreibbar, reboot-fest) · F1 HART BELEGT
+
+### A8 IST ERLEDIGT -- der Owner hat den Blocker selbst aufgeloest
+Ich hatte gemeldet: *"ohne Root kann ich keinen Mount anlegen"*. Der Owner committete daraufhin das
+lokale `comdare`-Passwort ins Cluster-Repo (`a3d653d`). **Damit ist A8 vollstaendig gebaut:**
+
+| | backup1 (PR4100, prod) | backup2 (PR2100, dev) |
+|---|---|---|
+| Adresse | **10.0.20.241** | 10.0.20.242 |
+| Mountpunkt | `/mnt/backup1-nfs` | `/mnt/backup2-nfs` |
+| **Lesen** | **verifiziert** | **verifiziert** |
+| **Schreiben + Ruecklesen** | **verifiziert** | **verifiziert** |
+| Kapazitaet | **19 T / 15 T belegt / 3,6 T frei** | 7,3 T / 714 G / 6,5 T frei |
+
+**Reboot-fest ueber `/etc/fstab` mit `noauto,x-systemd.automount,idle-timeout=600`.**
+**Warum NICHT hart eingetragen:** ein hartes NFS im fstab blockiert den Boot, wenn das NAS schweigt --
+und **prod1 traegt den GitLab-Runner**, ein haengender Boot legt die CI lahm. Der Automount entsteht
+**erst beim Zugriff** und gibt nach 10 min Ruhe wieder frei. `soft,timeo=100,retrans=2`: ein totes NAS
+liefert einen **Fehler** statt zu haengen.
+**Bissprobe gefahren, nicht behauptet:** beide Mounts geloest, dann per blossem `ls` wieder ausgeloest
+-- beide kamen zurueck. Beide Units `active`, aus fstab `generated`.
+Sicherung: `/etc/fstab.bak-20260807-comdare-nas`.
+
+### DREI MEINER PRAEMISSEN WAREN FALSCH -- alle am Objekt widerlegt
+1. **"prod1 muss cross-VLAN uebers SNI-Pattern"** -- FALSCH. prod1 hat **drei Beine**: `br0` V10,
+   `br0.20` V20 (10.0.20.211), `br0.60` V60. Das NAS liegt in V20. **Kein Cross-VLAN, keine VIP.**
+2. **"backup1 ist unter 10.0.10.243 erreichbar"** -- das ist die **CARP-VIP**, nicht das Geraet. Mein
+   `showmount -e 10.0.10.243` hing deshalb ins Leere; ueber **10.0.20.241** antwortet es sofort.
+   **Der Agent hatte recht, ich hatte die falsche Adresse geprueft.**
+3. **"Cluster_NFS ist schreib-only"** -- gilt fuer die **V60-Runner** (Filterpod `measure-drop`,
+   `limit_except PUT`, live geprueft: GET liefert 403). **Fuer prod1 gilt es nicht** -- prod1 ist im
+   V20 und mountet direkt.
+
+### F1 IST DAMIT HART BELEGT -- die 8 TB passen NICHT
+**Selbst gemessen: `19T / 15T belegt / 3,6T frei (81%)`.** Deckt sich exakt mit der Cluster-Doku vom
+06.08. **Eine 16-TB-Angabe existiert in keinem Dokument** (gesucht ueber das ganze Cluster-Repo; die
+"6 TB" aus aelterer Doku gehoeren zu `prod-longhorn-cold-storage`, einem ANDEREN Ziel; eine Mai-Planung
+nannte RAID0 2x20 TB = 40 TB, **nie umgesetzt**, das laufende System ist RAID1).
+
+**WO DER PLATZ LIEGT** (selbst gemessen). Im `Cluster_NFS`-Export summieren die Unterordner nur
+**~3,8 T**:
+```
+2,6 T  gharchive              905 G  github-repos-bigquery      114 G  cluster-backups
+ 41 G  etcd-snapshots          22 G  longhorn-prod               14 G  je pve-iso/longhorn-backup/gluster-migration
+160 M  "experiment results"    28 M  cache-engine-experiment
+```
+**`df` misst aber das GANZE Backend-Dateisystem `/mnt/HD/HD_a2`, nicht nur den Export.** Die
+Nachbar-Freigaben sind fast leer (`TimeMachineBackup` 4 K, `Public` 4 K) -- **die fehlenden ~11 TB
+liegen in `/mnt/HD/HD_a2/sort`** (Messung lief in den Timeout, laeuft nach).
+
+**=> Der Weg zu mehr Platz fuehrt ueber `sort` oder `gharchive` (2,6 T), nicht ueber Kleinkram.
+Beides ist Owner-Entscheidung -- ich fasse fremde Datensaetze nicht an.**
+
+### EIGENER FEHLER, gemeldet statt verschwiegen: EIN VAULT-WERT IST INS TRANSKRIPT GERATEN
+Ich wollte die Vault-Struktur ohne Werte verstehen und maskierte per `sed` auf `schluessel: wert` am
+**Zeilenende**. **Der Vault ist aber eine Markdown-TABELLE** -- Werte stehen in Spalten. **Ein
+Klartext-Passwort (`samba-comdare-socks-pw`) steht damit im Session-Transkript.**
+**Entlastung, aber keine Entschuldigung:** der Vault-Kommentar an derselben Zeile sagt, dieses Konto
+existiert in Live-AD **nicht** (*"2026-06-01 verifiziert: `samba-tool user list` kennt ihn nicht"*).
+**Der Wert gilt trotzdem ab jetzt als kompromittiert und gehoert in die Rotationsliste.**
+**Regel daraus (in Memory gebucht):** Vault-Dateien **nie greppen mit Ausgabe**, auch nicht
+"maskiert". Nur blind: `mapfile` -> nur `${#P[@]}` ausgeben -> per **stdin** testen. Und ueber die
+**LAENGE** selektieren (`len:40`), nie ueber die Position -- meine positionsbasierte Regex griff
+**6 Zeichen statt 40** und der erste sudo-Test schlug deshalb fehl.
