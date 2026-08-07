@@ -9456,3 +9456,77 @@ ungeprueft: ob der Planer den Resolver ohne Plan-Cache-Invalidierung aufnimmt ·
 `<machines>`-Deklaration ein **zweiter** Kanal fuer Klassenwerte ist (Doppelquellen-Gefahr) ·
 Windows/macOS nur im Kopf · PAPI-Zweig gar nicht.
 **Ein Gate ist bestanden: G-1 (Erkennung ehrlich), mit literaler Ausgabe.**
+
+---
+
+## NACHTRAG 07.08.2026 abend-16 — RESTPOSTEN: beide Praemissen widerlegt · DIE VOR-PUSH-WACHE LOG
+
+**Gelandet: ce `5aad9c43`.** Zwei Commits, **beide etwas anderes als beauftragt** -- und in beiden
+Faellen zu Recht.
+
+### DIE WACHE MASS DEN RUECKSTAND, NICHT DIE ARBEIT -- ein Defekt in einer HEUTE gebauten Wache
+Der Agent fasste **eine** Datei an. `vor_push_alle_wachen.sh` schlug in einer an, die er **nie
+beruehrt** hatte (`i_measurement_source.hpp:9`/`:131`). Vom Lead am Objekt nachgemessen:
+```
+git diff origin/development..HEAD    -> 12 Dateien   (ZWEI Punkte: Endpunkt gegen Endpunkt)
+git diff origin/development...HEAD   ->  1 Datei     (DREI Punkte: ab der Abzweigung)
+```
+**Ursache:** `origin/development` war seit der Abzweigung dreimal weitergezogen. Der Zwei-Punkt-Diff
+zeigt fremde, dort **laengst geheilte** Zeilen als "hinzugefuegt".
+
+**ZWEI SCHAEDEN, der zweite ist der schlimmere:**
+1. Der Autor sucht in fremdem Code nach einem Verstoss, der ihm nicht gehoert.
+2. **Er "heilt" fremde Zeilen auf seinen ALTEN Stand zurueck und schleppt einen Rueckwaerts-Merge
+   ein.** *Eine Wache, die zu einer Regression verleitet, ist schlechter als keine.*
+
+**Behoben** (`962457b0`): Drei-Punkt-Semantik, die **Abzweigung wird mit ausgegeben**, und wenn die
+Basis weitergezogen ist, sagt die Wache das ausdruecklich -- samt Erinnerung, vor dem Landen
+trotzdem zu mergen. Ein stiller Unterschied zwischen "gemessen ab Abzweigung" und "landet gegen
+Endpunkt" waere die naechste Falle gewesen. **Der laufende S2-Strang wurde gewarnt.**
+
+**LEHRE FUER DEN LEAD, an sich selbst:** bei der Gegenpruefung zaehlte der Lead zunaechst
+**Nicht-ASCII ueber die GANZE Datei** (134 Treffer) statt ueber die **Zusatzzeilen** (0 Treffer) --
+und haette beinahe wegen einer eigenen Fehlmessung angehalten. **Dieselbe Fehlerklasse wie die
+Wache: die falsche Menge gemessen.**
+
+### RESTPOSTEN 1 -- die Auslassung ist ABSICHT, vierfach belegt. Nichts gebaut.
+Die fail-closed-Pruefung fuer `target_isa.numa_node`/`.page` fehlt **absichtlich**:
+1. `xml_config_parser.hpp:234-235` verbatim: *"KEIN KONSUMENT in diesem Paket: der Parser fuellt sie,
+   niemand liest sie."*
+2. `xml_config_parser.cpp:125-127`: *"die Gueltigkeits-Pruefung gegen das Angebot folgt mit dem
+   **Resolver-Schritt**"* -- fuer `core_class` mit Aktenzeichen **OD-11-RT-K**.
+3. XSD `experiment_schema.xsd:79-80`: beide Felder sind **absichtlich** `xs:string`, *"damit eine
+   additive Erweiterung des Wertraums das Schema nicht bricht"* -- **keine Enumeration, gegen die man
+   pruefen koennte**.
+4. `target_isa_system_axis.hpp` traegt nur die ISA-Familie -- **es gibt keine Soll-Seite**.
+**Eine Wache zu bauen hiesse, einen Wertebereich zu ERFINDEN** -- was dieselbe Datei 50 Zeilen weiter
+oben verbietet (*"es wird KEIN Default erfunden"*).
+**Belegt mit einer Kontrastprobe am echten CLI**, nicht behauptet: Bogus-`isa` wird **abgelehnt**
+(*"Erlaubt = x86_64, aarch64"*, VALIDAT FEHLGESCHLAGEN), Bogus in **allen drei** Unter-Achsen
+**laeuft durch** (VALIDAT OK).
+**NACHTRAG: es sind DREI Felder, nicht zwei.** `core_class` (OD-11-RT, Owner-KERN 06.08.) teilt die
+Lage. **Dieselbe Resolver-Luecke, die der P/E-Core-Strang unabhaengig als Wurzel-Befund fand.**
+
+### RESTPOSTEN 2 -- die Variable ist NICHT tot. Sie wirkt.
+**Nenner: 10 Fundstellen vorher, 10 nachher.** `COMDARE_VARIANT_GATE` steuert ueber
+`variant_gate_sig` -> `build_variant_sig`, **ob das `.variant`-Provenienz-Sidecar neben der Binary
+liegt** (`build_orchestrator.hpp:702-703`; bei leerem Wert wird ein vorhandenes **geloescht**,
+`:440-446`). **Ihr Entfernen waere eine Verhaltensaenderung, kein Aufraeumen.**
+**Obsolet ist nur der GATE-Aspekt** -- `dll_is_current` (`:330-337`) traegt genau einen Vergleich
+("DER EINE VERGLEICH") und der laeuft ueber `.fingerprint`.
+
+**ZWEI KORREKTUREN AN DER AUFTRAGSLAGE DES LEADS:**
+1. **Der Posten fehlt NICHT in der Aufraeumpass-Liste.** Er steht dort als **AP-11**
+   (`20260806-PLAN-f3-f5-r4-aufraeumpass.md:673-706`) mit Verdikt *"KANDIDAT JA -- aber als
+   deprecated, NICHT als tot"* und harter Vorbedingung: *"F7-(b) muss vollstaendig gelandet und
+   gemessen sein ... ihre Entfernung waere ein stiller Deckungsverlust."* **Der Ledger-Eintrag
+   `:8161-8162`, der die Auftragsgrundlage war, ist der ueberholte von beiden.**
+2. **Die echte Unehrlichkeit lag woanders -- und die ist geheilt.** Der Kommentar am Leser versprach
+   verbatim *"eine andere Signatur -> `.variant`-Mismatch -> Neubau GENAU dieser Binary (das
+   Cross-Maschinen-Gate)"*. **Diesen Mechanismus gibt es seit der A2-Eichung nicht mehr.** Wer die
+   Variable setzt, glaubt ein Gate zu schalten **und bekommt ein Provenienz-Sidecar**. Historik steht
+   (Doku-Doktrin), ein `[NACHGEFUEHRT 2026-08-07]`-Block sagt, was heute gilt und dass die Entfernung
+   an AP-11/F7-(b) haengt.
+
+**Der Agent hat damit eine DRITTE Option gewaehlt** -- der Auftrag sagte "entfernen ODER stehenlassen
+und melden". Begruendung: rein Kommentar, **kein Byte-Ereignis**. **Richtig entschieden.**
