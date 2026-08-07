@@ -8880,3 +8880,85 @@ Auftrag: (1) real erheben, (2) `branch_misses_source_available` + `pmc_zelle` st
 verschiedenen** Wert liefern, sonst waere das Feld nur umbenannt.
 **Zurueckgehalten:** die pipeline16-CSV traegt nicht einmal eine `pmc_available`-Spalte. Ein
 Schema-Zusatz waere noetig -- der Agent hat Anweisung, ihn NICHT zu bauen, sondern vorzulegen.
+
+---
+
+## NACHTRAG 07.08.2026 abend-9 — TRIGGER-/RESTPOSTEN-BLOCK am Objekt: eine Korrektur, der Rest bestaetigt
+
+### METHODISCHE WARNUNG des Pruefers (wichtig fuer jede weitere Pruefung heute)
+Der ce-Checkout `/home/comdare/wt-landung` steht **nicht** auf `development`, sondern auf
+`bau/flag-grammatik-v2-s1` (HEAD deckungsgleich `ba069e38`) und traegt **173 uncommittete
+Aenderungen** (2146+/1498-) -- die laufende Grammatik-v2-Arbeit. Der Pruefer hat deshalb fuer jede
+Ist-Aussage `git show ba069e38:<pfad>` benutzt, **nie den Arbeitsbaum**. Wer heute noch in diesem
+Worktree liest, muss dasselbe tun.
+
+### T-A -- P3-TRIGGER-Blocker: BESTAETIGT, und tiefer als behauptet
+`847c93c9` und `41091cb4` sind beide Vorfahren von `ba069e38` (`merge-base --is-ancestor` = YES/YES).
+- **Der "Lese-Punkt im toten Winkel" ist real und praezise:** der alte Code las die Plan-Werte nur bei
+  `slice_seq == 0` **innerhalb des Loop-Rumpfs** -- den ein **voll resumierter** Lauf nie betritt. Der
+  Fix setzt `lies_plan_werte()` an **zwei** Lesepunkte (erstes gezogenes Fach ODER Schleifenende).
+- Tripwire umgeschlagen: `check_eq(...exit_code, 1)` -> `check_eq("...geheilt...", ..., 0)`.
+- Batchplan-Kette lebt durch **alle drei Schichten**: `profile_run_facade.hpp:128`, `.cpp:758`,
+  `profile_run_entry.hpp:181,679`.
+- **Produktiv, nicht nur Test:** `run_planer_driven_provision` wird aus dem echten Bau-Pfad gerufen
+  (`cache_engine_builder_iterator.hpp:1900`).
+- **Beide Tests laufen in CI:** Job `test_unit` faehrt `ctest -LE pmc` mit Gate `always`; die Labels
+  tragen kein "pmc", also sind sie eingeschlossen.
+
+### T-D -- BAU-MENGE: das Dringlichkeits-Framing des Leads war FALSCH
+Der Lead fuehrte den Posten als *"VOR DEM ERSTEN BATCH ... unbekannt"*. **Das eigene Gesamtdossier
+widerspricht** (`20260807-GESAMTDOSSIER-aktuell-jetzt-konsolidiert.md:694, :2599-2601`): der
+Entscheid ist *"faellig vor der Voll-Messung, NICHT vor dem ersten Batch"* -- weil **der erste Batch
+in allen Varianten identisch ist** (Scheibe aus Perm 0).
+**Der Zahlenkonflikt selbst besteht weiter, und er ist jetzt praezise gefasst:**
+- `source_catalog.hpp:139,169`: 2^17 = 131.072 ist das **ORGAN-Fenster JE SYSTEM-PERMUTATION**,
+  nicht der Gesamt-Bau-Umfang. Diese Unterscheidung fehlte in der Task-Formulierung.
+- `all_axes_golden.profile.xml:189-198` deklariert **vier** System-Perms (O2/O3 x no_extension/avx2)
+  => realer Ist-Umfang **524.288**.
+- Die **12-Perm-Doktrin (OE-D)** ist **nicht** ins Profil nachgezogen; der **line_size-Faktor 4**
+  (-> 2.097.152) ebenfalls nicht.
+**=> Der "Faktor 16" kam aus DREI vermischten Ebenen** (Organ-Fenster / System-Perms / line_size).
+Die Frage lautet nicht "welche Zahl", sondern **"welche System-Perm-Menge, und faellt line_size mit
+hinein"**.
+
+### T-E -- FRIST: sauber. Keine aktive Stelle rechnet gegen den 08.08.
+Geprueft: `.gitlab-ci.yml` beider Repos, beide READMEs, alle Thesis-`.tex`. **Null Treffer.** Die
+einzigen Fundstellen sind historische Ledger-Eintraege, die den 08.08. **selbst korrigieren**
+(`:4873`, `:8358`), und datierte `20260806-PLAN-*`-Dokumente, die legitim das Denken **von damals**
+protokollieren.
+
+### T-F -- die acht verbleibenden Owner-Entscheide: ALLE BESTAETIGT
+Verbatim am Objekt nachgewiesen: **R-3** (kein xlsx-Writer, nur Design-Doc) · **G-1** (Tabelle in
+`20260806-PLAN-versionierungs-interface-stempel.md:644-653` unter **§5.2**, STOPP-Doktrin `:704`
+unter §6; Empfehlungen `b/ii/b/a/b/a` verbatim; **0 echte Ledger-Treffer** -- die scheinbaren sind
+eine **Namenskollision mit `DD-A..DD-E`**) · **G-2** (`axis_optimization_catalog.hpp:50-53`
+"OFFEN, NICHT ERFUNDEN ... honest-empty") · **G-3** 4/4 (`best_binary_selector.hpp:236-254`: alle
+sechs Metriken hart `Minimize`) · **G-4** 5/5 · **G-5** (`run_methodology_registry.hpp:54-59`) ·
+**G-6** · **G-7**.
+
+**G-5 Zusatzfund:** Owner-Entscheid O-A (07.08.) hat die Stufen-Doktrin `measure -> compare ->
+release` inzwischen geklaert -- der Enum-Index blieb bewusst unveraendert. Das **verstaerkt** die
+Frage, ob der Enum die Ordnung tragen soll, statt sie zu erledigen.
+
+**G-6 Dual-Review, ehrlich eingeschraenkt:** bei den fuenf heutigen Wellenplan-Landungen steht **kein**
+"Dual-Review Codex+Fable"-Vermerk. Der Pruefer nennt die Grenze seines eigenen Befunds: *"keinen
+Zugriff auf tatsaechliche Codex-MCP-Aufruf-Logs gehabt; falls es Aufrufe gab, die NICHT im Ledger
+verbucht wurden, wuerde das mein Ergebnis nicht zeigen."* Ein Aussetzungsvermerk existiert -- aber
+**global fuer den pausierten Audit-Workflow**, nicht bei den Landungen.
+
+### G-7 SOFORT ERLEDIGT (der Posten verlangte "eine Zeile Korrektur")
+`LEDGER:7330` trug woertlich *"**OFFEN (Bau-Auftrag, kein Entscheid):** wie `cpe` sich zu diesen
+Token verhaelt"*. **Wer die Ledger-Liste abarbeitet, haette einen stempel- und ABI-relevanten Einbau
+OHNE Owner-Entscheid begonnen.** Additiv korrigiert (Historie bleibt stehen): zweifach ueberholt --
+durch die spaeteren Eintraege `:7673 ff.`/`:7811 ff.` **und** dadurch, dass der Owner die
+Flag-Grammatik am 07.08. vollstaendig neu definiert hat. `cpe` in dieser Form existiert nicht mehr.
+
+### T-B/T-C -- Restposten und Entlastungen
+**Zwei echt offene Restposten** aus den Codex-Focus-Scopes: (1) die fail-closed-Wache fuer
+`target_isa.numa_node`/`.page` fehlt in `validate_profile.hpp` (nur `.isa` wird geprueft,
+`:1058-1071`); (2) `COMDARE_VARIANT_GATE` fehlt in der Aufraeumpass-Kandidatenliste (der Ledger
+bestaetigt das selbst, `:8161-8162`).
+**Entlastungen 3/3 stichprobenhaft bestaetigt** -- mit einem Randbefund: `COMDARE_VARIANT_GATE` ist
+durch das bvset-Fingerprint-Glied (`anatomy_fingerprint.hpp:299-306`) **funktional obsolet**, die
+tote Env-Var aber **nicht entfernt**. Das deckt sich mit Restposten (2) -- derselbe Posten von zwei
+Seiten.
