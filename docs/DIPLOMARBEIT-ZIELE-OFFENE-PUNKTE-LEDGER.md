@@ -10127,3 +10127,67 @@ fuer den Bau", NICHT als "das Verbot faellt".** Die Direktive nennt zwei weitere
 Speicher unberuehrt sind: *"Kein Runtime-Tag, kein std::visit"* und *"der Compile muss REIN sein:
 KEINE runtime->CT-Bruecken"*. **Praktisch bleibt es ohnehin gleich:** der Bau ist **ohne** Bloat, also
 256-640 GB statt 7,5 TB. **Das NAS ist Reserve, nicht Notwendigkeit.**
+
+---
+
+## NACHTRAG 07.08.2026 abend-24 — DIE ERST-KLAMMERUNG GEFUNDEN (19./20.07.) · §43 ist die E-B-Begruendung
+
+### DIE OWNER-STELLE, verbatim (Nacht 19.07., `verlauf-23.txt:100`)
+> *"Es muss also eine build-Stufe fuer Mess-Achsen mit Achsen Array fuer je eine dynamische CEB
+> pipeline [...] **Mess-Achse[a,b,c]->[a,b,c]CEB-Typ->CEB definiert System-Achsen
+> [d,e,f]->[d,e,f]Pipeline-fuer-Build-Freigegebenen CEB-Raum->CEB-Raum permutiert System-Achsen
+> [d,e,f] und Organ-Achsen[g,h,i]->[d,e,f,g,h,i]Tier-Binary**"*
+
+**Und die SOFORT-KORREKTUR am Folgetag** (`verlauf-24.txt:869`, 20.07.) -- der Code hatte
+faelschlich `[a,b,c][d,e,f]` gebaut (Mess x System, Organ nur als anonymer Chunk):
+> *"**measure:[a,b,c]->Mess-Achse, [d,e,f]->System-Achse, [g,h,i]->Organ-Achse komplett
+> durchgemessen wird**. Die Mess-Achse baut nur das CEB auf und delegiert es"*
+
+**Die Rollenteilung, die daraus folgt:**
+```
+ceb:build:[a,b,c]              Mess-Achse baut NUR die CEB (CEB = statische Repraesentative)
+tier:build:[d,e,f][g,h,i]      System x Organ baut die Tier-Binary -- Mess gehoert NICHT hinein
+measure:[a,b,c][d,e,f][g,h,i]  alle drei durchgemessen
+```
+Beide Stellen sind im Ledger als **verbatim-treu** gesichert (§42 `:2425`, §56 `:3066`
+*"LEGENDEN-VERTRAG KORRIGIERT"*) -- **die Abschrift ist deckungsgleich mit dem Roh-Log, kein Drift.**
+
+### DAS ERKLAERT AUCH DIE E-E-VORGABE VON HEUTE
+Der Owner schrieb heute: *"Konkatenation einer festen statischen Ordnung auf **je der Mess-Achse,
+System-Achse und Organ-Achse**"*. **Das ist dieselbe Drei-Typen-Struktur vom 19./20.07.** -- kein
+neuer Einfall, sondern der Verweis auf eine Klammerung, die seit drei Wochen steht.
+
+### §43 IST DIE GESUCHTE E-B-BEGRUENDUNG -- mit einer Einschraenkung, die benannt gehoert
+Ledger `:2441`, User-Direktive verbatim:
+> *"jede Achse den durch sie gewaehlten Algorithmus und daher das gesamte Array an
+> Achsen-Algorithmen [...] **als string_view in die Tier-Binary zur Versionierung einkompiliert**.
+> Dieses **statische Versionierungs-Array** einer Tier-Binary gibt uns die Moeglichkeit zu erkennen,
+> **welche Tier-Binaries bei Update eines einzelnen Achsen-Algorithmus neu gebaut werden muessen und
+> welche nicht**. Unveraenderte bleiben bestehen und koennen **aus dem Cache wiederverwendet**
+> werden [...] Die Tier-Binaries haben ihren string_view-Versionierungs-Stempel ueber die
+> [d,e,f][g,h,i]-Kombination in **2 verschiedenen string_view-Zeilen: eine fuer System-Achsen und
+> eine fuer Organ-Achsen**."*
+
+**DER OWNER-PUNKT TRAEGT:** der Stempel muss **IN** der Binary sein, nicht nur daneben -- die
+**selektive Cache-Wiederverwendung** haengt daran. **Der Lead-Einwand *"die Information ist ohnehin
+abrufbar"* verkannte, dass sie Teil der Binary sein muss, damit man VON DER BINARY AUS entscheiden
+kann.** Und die *"2 verschiedenen string_view-Zeilen"* sind exakt die Struktur, die heute gebaut ist.
+
+**DIE EINSCHRAENKUNG, ehrlich:** §43 sagt *"einkompiliert"* -- das ist erfuellt, sobald der Stempel
+in `.rodata` liegt, also **Variante (ii)**. **Eine woertliche Aussage, dass er zusaetzlich im
+SYMBOLNAMEN stehen muss, enthaelt §43 nicht.** Der Explore markiert das ausdruecklich als **seine
+Verkettung** zweier belegter Saetze (§43 + §58 Replay-Suche), **nicht als dritte Quelle**.
+**=> Der Bau folgt (i) wie entschieden. Der Kommentar sagt BEIDES: dass §43 die Einkompilierung
+fordert (belegt), und dass die Symbolnamen-Form darueber hinausgeht (Owner-Setzung).**
+
+### EINE FRUEHERE VORSTUFE der Filesystem-Lagerhaltung (16.07., Ledger §16.2-M2, verbatim)
+> *"Systemachsen-Ebene -> **FLACH als Ordnerstruktur** (je Kombination ein Ordner). Tier-Binary-Achsen
+> + CSV-Messwerte -> **serialisierter TIEFER Baum**. [...] statische compile-time-Achsen NICHT als
+> CSV-Spalten -> in Ordnerstruktur + Datei-Beschriftung/Metadaten."*
+**Damals nur ZWEIGETEILT** (System flach / Tier tief), **ohne Organ als eigenen Typ**. Die
+Erst-Klammerung (19./20.07.) liefert erst die kanonische **Drei-Typen-Trennung**.
+
+### WAS OFFEN BLEIBT -- vom Explore gemeldet statt geraten
+**Ob die Lager-Pfad-Grammatik (LB-0, 06.08.) eine Fortschreibung von §43/§58 ist oder eine
+eigenstaendige Neukonzeption** -- die beiden Textkoerper wurden **nicht** Wort fuer Wort verglichen.
+Zwei Wochen liegen dazwischen. Falls das fuer E-B entscheidungsrelevant wird: eigener kurzer Auftrag.
