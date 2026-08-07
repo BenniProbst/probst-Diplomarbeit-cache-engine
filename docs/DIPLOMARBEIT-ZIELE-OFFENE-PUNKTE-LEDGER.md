@@ -9114,3 +9114,99 @@ Fehlinterpretation genau der Klasse, gegen die die ganze Grammatik gebaut ist.
    Stelle traegt. Mechanisch ist richtig; geraten waere die Stelle, die nachzupruefen ist.
 3. Was mit der **Negativ-Test-Batterie** geschehen ist -- sie testete die ALTE Grammatik und waere
    danach wertlos oder falsch gruen.
+
+---
+
+## NACHTRAG 07.08.2026 abend-12 — FLAG-GRAMMATIK v2 GELANDET (ce `5060489e`) · Pipeline-Stand
+
+**ce `development` = `5060489e`** (178 Dateien, 2518+/1553-), gitleaks ueber den **gemergten** Stand
+sauber, auf `development` gegengeprueft (R1-Regel und die Stempel-Wache sind dort angekommen).
+**422/422 Tests gruen.** Vor-Push-Wache gruen: 2518 Zusatzzeilen, 0 Nicht-ASCII, 0 ueber 120 Spalten,
+178 C++-Dateien formatgeprueft, 0 abweichend.
+
+### PIPELINES (per API abgefragt)
+| Projekt | Pipeline | SHA | Stand |
+|---|---|---|---|
+| ce 286 | **15221** | `5060489e` (Grammatik) | **LAEUFT** -- der kritische Lauf |
+| ce 286 | 15218 | `5adf59ea` (allocators) | **success** |
+| super 288 | 15220 / 15219 / 15217 | `46f531aa` / `3e2c79ee` / `412c5105` | **success** |
+**Der 15221 ist zu beobachten:** 178 beruehrte Dateien, und **cppcheck war lokal nicht fahrbar**
+(Werkzeug fehlt) -- der letzte rote Lauf des Projekts kam aus genau dieser Klasse.
+
+### DER VORGANG, DER DIESEN BAU AUSZEICHNET
+Der Agent hat die Owner-Auflage (*"der Bruch muss LAUT sein"*) **nicht behauptet, sondern gemessen**
+-- und **sein eigener erster Commit bestand die Probe nicht**. Eine Composition mit `"v1.0.0c"` an
+allen 18 Organ-Achsen uebersetzte **klaglos** und lieferte achtzehn `@0.0.0` auf dem Weg in den
+SHA512-Fingerprint und die Lager-Identitaet.
+**URSACHE:** `guard_all_registered_organ_versions()` deckt die **registrierten** Varianten und wird
+nur dort instanziiert, wo die Tabelle gebaut wird. `organ_stamp_line<Comp>` stempelt aber **JEDE**
+Composition -- auch test-lokale und pruefling-eigene. Fuer die gab es **gar keine** Wache.
+**GESCHLOSSEN** durch eine `static_assert` **an der Stempel-STELLE**
+(`anatomy_version_stamp.hpp:125`/`:185`), nach dem Muster von `meta_meta_stamp_suffix.hpp`.
+**Vom Lead nachgezaehlt: 4 `static_assert`s im ersten Commit, 7 im zweiten.**
+
+**LEHRE FUER DEN LEAD:** die eigene Compile-Probe des Leads (vier Literale gegen
+`ce_owned_version_is_wellformed`) haette diese Luecke **nicht gefunden** -- sie prueft die **Wache**,
+nicht die **Stelle, an der der Schaden entsteht**. Wer eine Wache verifiziert, muss fragen: *deckt
+sie jeden Pfad, auf dem der geschuetzte Wert entsteht?*
+
+### ZWEI WEITERE SELBSTKORREKTUREN DES AGENTEN
+1. **Der Knoten-Deckel war zu klein.** Am **echten** SIMD-Katalog gerechnet braucht eine vollstaendig
+   deklarierte Organ-Version **58 Knoten** (c{p.e} 3 + x128 11 + x256 13 + x512 15 + Companion/Skalar
+   11 + MMX 5). Der urspruengliche Deckel **32** haette eine **legitime** Eingabe abgelehnt.
+   Sein Satz: *"Ein Deckel, der eine legitime Eingabe verwirft, ist ein Defekt und keine Wache."*
+   Jetzt 96, mit dem Vollausbau als CT-Beweis.
+2. **Die Negativ-Batterie wurde NEU GEDACHT, nicht umgeschrieben.** Die Q3-Negativa testeten Regeln,
+   die es nicht mehr gibt -- umgeschrieben waeren sie **gruen geblieben und haetten tote Regeln
+   bezeugt**. `"v1.0.0e"` wurde sogar in eine **Positiv**-Probe gedreht, weil `e` heute legitim ist.
+   Drei Negativ-Compile-Fixtures gedreht auf den heute wahrscheinlichsten Fehler (Alt-Schreibweise).
+
+### MIGRATION: rein mechanisch, mit Nenner
+143 Bestands-Quellen tragen nach der Migration **genau die Flags wie vorher**: 97x `1.0.0.c`,
+2x `1.0.1.c`, 24x `1.0.2.c` (= 123 `W::algo_version`) + 20 Nicht-Organ. **Kein Flag erfunden, keins
+weggelassen. Kein `{...}`, kein `x512`, kein Companion im Bestand** -- die inhaltliche Anreicherung
+(S3b) ist unangetastet und braucht die Sinnhaftigkeits-Matrix.
+**`v1.0.0ce` hatte im Bestand die Haeufigkeit NULL** -- die verlustbehaftete Uebersetzung, ueber die
+der Lead nachdenken liess, war nie noetig.
+**Selbst gemeldet:** an **zwei** Stellen wurde eine Flag-Kombination **erfunden** -- beide
+Testmaterial (`hardware_meta_meta_axis.hpp:164` `kProbeVersionEffizienz`,
+`test_v41_anatomy_pruefling_merge.cpp:210`). Sie behaupten **nicht**, dass eine reale Achse
+Efficiency-Cores hat.
+
+### UNBEAUFTRAGTER FUND: die Punkt-Kollision ist groesser
+Der Auftrag nannte nur `-msse4.1`. Der Katalog enthaelt aber auch **`avx10.1`/`avx10.2`** -- AVX10
+versioniert sich **mit Punkt**. Ohne Gegenmassnahme laese sich `x512{avx10.1}` **still** als zwei
+Geschwister `avx10` und `1`. Die Regel *"Token enthaelt mindestens einen Buchstaben"* schliesst das,
+CT-bewiesen. **Preis, offen gelegt:** die Praefix-Stripping-Kurzform `x128{2.3.41.42}` ist damit
+nicht schreibbar.
+
+### DREI NAMENSRAEUME sind jetzt im Header dokumentiert
+`algo_semver.hpp:671-690` fuehrt die Tabelle: SSE3 = `pni` / `-msse3` / **`sse3`** · SSE4.1 =
+`sse4_1` / `-msse4.1` / **`sse41`** · VBMI2 = `avx512_vbmi2` / `-mavx512vbmi2` / **`vbmi2`** ·
+PCLMULQDQ = `pclmulqdq` / `-mpclmul` / **`pclmulqdq`**. Satz im Header: *"Unsere Token sind also
+AUSDRUECKLICH NICHT die Compiler-Schalter und NICHT die Kernel-Namen."*
+
+### VIER EINGEFRORENE FINGERPRINTS SIND DEKLARIERT GEWANDERT
+Der Testvektor an drei Fundstellen, der CEB-Vollmengen-Schluessel, der Referenz-Digest der
+Identitaets-Bilanz -- **alle aus LITERALEN Laeufen uebernommen, nicht vorausberechnet**, jeder mit
+Historie im Kommentar. **Der LEER-Digest blieb unberuehrt** -- genau diese Asymmetrie belegt, dass
+die ZEILEN gewandert sind und nicht die Glied-Struktur.
+
+### NICHT GEBAUT / NICHT GEFAHREN (selbst gemeldet)
+- **Katalog-Wache S2**: wie beauftragt nicht gebaut. Andockstelle als Grep-Anker
+  `S2-KATALOG-ANDOCKSTELLE` + Traversal-Primitive `for_each_flag_node`. **Bewusst KEINE Attrappe:**
+  *"eine Wache, die nichts prueft, aber so heisst, als prueue sie etwas, ist die gefaehrlichere Form
+  von 'nicht gebaut'."*
+- **S3b** (inhaltliche Anreicherung) unangetastet.
+- **cppcheck / `lint:static`** lokal nicht fahrbar -- **faellt in Pipeline 15221**.
+- **Nur gcc-release**, keine clang-/MSVC-Bahn. Die `RenderedFlagTail`-Lebenszeitfalle wurde explizit
+  gebunden statt auf P2718R0 zu vertrauen -- aber nicht auf beiden Bahnen gefahren.
+- Der 96er-Deckel ist an **heute** bemessen (58), nicht an AVX10/APX im Vollausbau. Sprengt ihn eine
+  kuenftige ISA-Generation, **bricht sie laut**.
+
+### ZWEI OFFENE OWNER-ENTSCHEIDE (im Header markiert, bewusst nicht entschieden)
+1. **MMX-Basis-Frage:** MMX/3DNow liegen auf x87-aliasierten MM-Registern. Die Form traegt **beide**
+   Gestalten -- blosses Top-Level-Token (wie ein Companion) **oder** eigene Basis (`c.x64{mmx...}`).
+   Welche richtig ist, ist eine **Aussage ueber die Hardware**, keine Formfrage.
+2. **Praefix-Stripping-Kurzform** `x128{2.3.41.42}`: verlangt, die Token-Regel aufzugeben, und
+   oeffnet damit die stille Fehllesung von `avx10.1`.
