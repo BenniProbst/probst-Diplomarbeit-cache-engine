@@ -9699,3 +9699,86 @@ umgeschrieben) · `COMDARE_ANHANG_FORWARD` auf Projekt 288 (#22, ohne Cluster-Zu
 PMC-Paket (#9, Baugebiet belegt) · V-13..V-19 (#1) · und ehrlich: **die DEG-3-Dreifachbuchung (#16)
 ist ein Ledger-ZITAT, kein eigener Beleg** -- die Code-Luecke dagegen selbst gemessen, mit
 **11 Geschwisterdateien als Positiv-Kontrolle**.
+
+---
+
+## NACHTRAG 07.08.2026 abend-19 — A5/ETA GELANDET (ce `73f9a56f`) · und ein Merge, der still verwirft
+
+**422/422 ueber den gemergten Stand, vom Lead selbst gebaut.** Wachen gruen.
+
+### DIE LEAD-LAGEBESCHREIBUNG WAR UNGENAU -- die Praezisierung ist der Kern
+Der Lead schrieb *"`project_slice_eta_s` hat keinen produktiven Aufrufer"*. **Richtig, aber
+irrefuehrend.** `reservation_lifecycle.hpp` **war** produktiv verdrahtet (`PromiseGuard`,
+`has_usable_eta`, `is_takeable_by_eta` laufen live an vier Stellen), und `apply_calibration` **hat**
+einen Aufrufer. Der Code sagt es selbst (`builder_registration.hpp:282-284`, verbatim):
+> *"ETA-ZWEIG = VORHALTUNG, KEIN LIVE-PFAD (A-4): eine OFFENE Reservierung mit gefuellter eta_s hat
+> heute keinen Produzenten -- apply_calibration wird produktiv nur unmittelbar vor mark_done
+> geschrieben, der Record ist dann done und nie uebernehmbar."*
+**Es rechnete also jemand -- aber die Zahl entstand erst, als sie niemand mehr brauchen konnte.**
+Das ist eine andere Diagnose als "unverdrahtet", und sie fuehrt zu einem anderen Bau.
+
+**Ausserdem: ZWEI F5-NAMENSRAEUME.** Das ETA-F5 steht **nicht** im Aufraeumpass-Plan (dort ist F5 das
+golden-Update-Fenster), sondern in
+`20260801-KONSOLIDIERT-gesamtarchitektur-lager-batch-eta-sha512.md:68`. **Zehnte Kuerzel-Kollision.**
+
+### BEFUND 1 (HART, am Objekt gemessen): DER MERGE VERWIRFT STILL
+`merge_documents(remote{offen, eta=100}, lokal{offen, eta=250})` liefert **100**. Die
+B2-Konfliktaufloesung entscheidet bei gleichem Rang zugunsten der **gefuellten** `eta_s` -- tragen
+**beide** eine, gewinnt **stabil das Remote**. **Jede zweite Fortschreibung derselben offenen
+Reservierung wird verworfen, waehrend `store()` `true` meldet.**
+Trennung, die der Agent gezogen hat: **Re-Kalibrierung je Block traegt** (jeder Slice hat eigene Id,
+kein Konflikt) · **periodische Fortschreibung traegt nicht**.
+Er hat deshalb **auf einen Schrieb je Block umgestellt statt einen stillen No-Op zu liefern** -- und
+einen Test gebaut, der das **heutige** Merge-Verhalten festnagelt (`test_a5_eta_kalibrierung.cpp:309,
+:314`). **Schlaegt der Test fehl, kann die Fortschreibung scharfgeschaltet werden.**
+**OWNER-ENTSCHEID:** geaenderte Konflikt-Aufloesung **ODER** ein monotones Ordnungs-Feld. Beides
+beruehrt Draht und Semantik -- **bewusst nicht improvisiert.**
+
+### BEFUND 2 (VERHALTENSAENDERUNG auf dem LIVE-TAKEOVER-PFAD -- der Lead nennt sie ausdruecklich)
+Ein Record, der **mitten im Slice** eine ETA bekommt, wechselt vom pro-forma-Zweig (**pauschal
+30 min**) auf **1,5 x ETA**.
+- Fuer Slices ueber ~20 min ist das **besser als heute** -- **heute ist ein laufender 4096er-Slice
+  nach 30 Minuten fuer eine fremde Maschine uebernehmbar.** Das ist der eigentliche Defekt.
+- Fuer **kurze** Slices **verkuerzt** es das Uebernahme-Fenster.
+Der Agent: *"Ich halte das fuer die richtige Richtung, aber es ist eine Verhaltensaenderung auf dem
+Live-Takeover-Pfad und keine reine Zutat."* **Der Lead landet es, weil der heutige Zustand der
+gefaehrlichere ist -- und benennt es hier, damit es revidierbar bleibt.**
+Der **Takeover-Uhr-Anker** selbst (*"seit letztem Update"* misst an `reserviert_utc`, das sich nicht
+bewegt) wurde **nicht angefasst** -- `builder_registration.hpp:279` verweist ihn ausdruecklich in die
+Paketmeldung.
+
+### DIE DREI ENTWURFSFRAGEN -- beantwortet, nicht umgangen
+**Belastbarkeit:** ab `n_threads` Punkten -- **keine gewaehlte Zahl, die Doktrin-Zahl**
+(LEDGER:3290). Darunter gibt es **keine Zahl**. Das `n/a`-Prinzip in **zwei** Formen, weil es zwei
+Senken gibt: auf dem Draht der **leere String** (die *bestehende* Konvention des Feldes --
+**kein Schema-Ereignis**), in der Log-Zeile `n/a`. **Nie eine 0:** `is_takeable_by_eta(0, ...)` ist
+sofort wahr und haette **eine lebende Maschine enteignet**.
+**Ausreisser -- getrennt nach Fall, und das ist der Kern:** der vermessene Block ist eine
+**Beobachtung** (die 20 s wurden bezahlt -> Doktrin-Formel, kein Wegmitteln), das Rest-Fenster eine
+**Projektion** (-> Median). Gemessen: 31x2,0 s + 1x20,0 s, 32 Threads, 4096 Rest -> Median 256,0 s
+gegen Mittelwert 328,0 s = **28,1 % Aufschlag, den der Median nicht zahlt**. `longest_seen`
+ueberlebt den Block-Schnitt als Untergrenze -- **konservativ in die sichere Richtung, denn eine zu
+KURZE ETA ist die gefaehrliche.**
+**Re-Kalibrierung:** je Block (Pflicht, LEDGER:3299) **plus** 25 % relative Abweichung dazwischen --
+abweichungs- statt zaehl-getrieben, weil der ETA-Schrieb laut ABNAHME-1 **der einzige lange
+Exklusiv-Lock** des Systems ist. **Die 25 sind gewaehlt, nicht gemessen** -- so benannt im Header.
+
+### ZWEI FALLEN NEBENBEI GESCHLOSSEN
+1. **`set_on_binary_done` UEBERSCHREIBT** -- und der Iterator hatte den Hook bereits mit dem
+   Push-Pump belegt (`:1849`). **Ein zweites `set_` haette den asynchronen Push-Pump STILL
+   abgeschaltet.** Jetzt steht `add_on_binary_done` daneben, mit Test.
+2. Die Testat-Zeile hiess erst `fenster=` und liess einen fremden Test rot laufen -- **eine Wache
+   zaehlt dieses Marker-Pflichtfeld ueber den ganzen Log-Strom.**
+
+### EHRLICHKEIT IN EIGENER SACHE (der Agent meldet es selbst)
+**Die Kampagnen-Projektion hat null Produktions-Aufrufer** -- *"genau die Klasse, gegen die ich
+geschickt wurde."* Grund benannt und im Header: **`BatchReservierung` traegt kein Perm-Feld**, eine
+Kalibrierung ist ihrer System-Permutation gar nicht zuzuordnen; Nachruesten waere ein
+`syntax_version`-Bump. **Die Funktion rechnet geprueft, die Eingabe muss der Aufrufer beschaffen.**
+
+### NICHT GESCHAFFT
+Baupunkt 3 (periodische Fortschreibung -- **blockiert, Befund 1**) · Baupunkt 5 (avg_size-Konsumenten:
+RAM-Sammelpuffer-Budget, Storage-Forecast -- **gar nicht angefasst**) · Baupunkt 6 produktiv
+verdrahtet (Befund 3) · **kein Lauf auf echter Hardware** -- alle Zahlen aus Stub-Compiles mit
+25-ms-Schlaf: *"Die Formel ist belegt, ihre Guete unter echter Bau-Last nicht."* · cppcheck lokal
+nicht fahrbar.
