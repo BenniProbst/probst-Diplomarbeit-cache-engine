@@ -1,5 +1,36 @@
 # Achsen vs Strategien vs CE-Services — Anti-Vermischungs-Master
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DER HIER SELBST GEFORDERTE BANNER -- UND DIE KORREKTUR DER KORREKTUR
+>
+> **Die Vier-Konzept-Ebenen-Disambiguierung (Ebene I-IV, C-/F-/S-Trennung) bleibt inhaltlich
+> gueltig. Die Achsen-Zahlen nicht.**
+>
+> Der Nachtrag `:347-348` (R9) **fordert genau diesen Banner** und stellt selbst fest: *„Doc nicht
+> als superseded markiert."* Das ist hiermit nachgeholt. **Der Nachtrag nennt dabei allerdings die
+> falsche Zielzahl:** er ersetzt die 13 durch „die kanonische **19**-Achsen-Anatomie" und beruft
+> sich auf `axis_stats[19][8]`. Auch das trifft nicht mehr.
+>
+> | Angabe | Ist-Stand 07.08. | Beleg (ce `ba069e38`) |
+> |---|---|---|
+> | `:35` „**13 Hauptachsen** (Stand 2026-05-18)", ebenso `:59`, `:210` „alle 13 Algorithmus-Achsen" | **18 Organ-Slots** (T0..T17) | `anatomy/composition_factory.hpp:104`; `builder/experiment_tree/axis_path_serialization.hpp:40` |
+> | `:347` „die kanonische **19**-Achsen-Anatomie … `axis_stats[**19**][8]`" | **Auch die Korrektur ist veraltet.** Es waren nie stabil 19: der Code fuehrt die 19er-Phase selbst als „war [19] bei Konsolidierung" und ist ueber 17 auf **18** gegangen. Heute `axis_stats[18][8]` + `seg_ns[18]`, sizeof 1344 | `anatomy/observable_tier.hpp:50`, `:141-142`, `:168`; Historie `abi/anatomy_module_abi_v1_decl.hpp:38`, `:60` |
+> | `:37-57` die 13er-Liste (PAGE-TYPE, ISA, MEASUREMENT, TELEMETRY, HARDWARE, SCHEDULING …) | **kaum noch Namens-Deckung** mit der heutigen L00..L17-Reihenfolge. `isa` und `telemetry` sind per INC-2c/INC-2d aus der Komposition **heraus** in die System-Schicht gewandert | `profile_facade/source_catalog.hpp:95-120`; `builder/experiment_tree/registry_to_axis_levels.hpp:157-158` |
+>
+> **Die Zahlenkette im Ueberblick:** 13 (dieses Doc, 05.) → 19 (der Nachtrag, 07.) → 18 (INC-2c)
+> → 17 (INC-2d) → **18** (STRUKT-R ORG-18, mit `persistence_target` statt `isa`). Die 18 steht
+> zweimal mit verschiedenem Achsen-Satz; der Code warnt ausdruecklich davor
+> (`observable_tier.hpp:166-167`).
+>
+> **Weiterhin korrekt (nicht anfassen):** die Disambiguierung selbst -- fuer die Trennung der vier
+> Konzept-Ebenen habe ich **keinen Code-Widerspruch** gefunden. Ebenso `:33`, `:331` der Verweis
+> auf `docs/bausteine/01_bausteine_matrix.md` (existiert).
+>
+> **Ungeprueft:** `:2.4` „30 Such-Engine-Familien S1-S30" -- kein Code-Anker gefunden.
+>
+> ---
+
 **Stand:** 2026-05-18 (Phase R.11)
 **Trigger:** User-Direktive 2026-05-18 + 12 identifizierte Vermischungen in K-Bildern (R.1-R.10)
 **Zweck:** Eindeutige Trennung der **4 unabhaengigen Konzept-Ebenen** im Cache-Engine-Modell.

@@ -4,6 +4,70 @@
 >
 > **UPDATE-VERWEIS (2026-07-22):** Der Abschnitt **„UPDATE 2026-07-22"** am Ende konsolidiert dieses Dokument mit den seither vom Autor gesetzten Gesetzen **§61 (Modi/Stufen/Dual-Compile/Compile-Stempel)**, **§62 (Multi-Maschinen-Architektur A–H)** und **§63 (Arbeitsmodus)** — auf User-Anweisung in meinen exakten Worten aus der Drei-Zeitschnitte-Beschreibung. Bei Konflikt mit den Abschnitten 1–17 gilt das Update. Status-/Zeitschnitt-Anteile derselben Beschreibung liegen bewusst NICHT hier, sondern in `docs/sessions/20260722-SESSION-STATUS-drei-zeitschnitte.md`.
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DER CRC64-ANKER IST GEWANDERT -- UND EINE ZUSAGE HIER WURDE GEBROCHEN
+>
+> **Die Gesamtsicht traegt weiter. Drei Zahlen und zwei Statusaussagen nicht.** Der schaerfste
+> Befund betrifft eine Zusage, die dieses Dokument macht. Belege gegen ce `ba069e38` (identisch in
+> `ab0b352e`).
+>
+> ### Der CRC64-Anker
+>
+> `:123` und `:189` nennen `0xF1C1F26A1232073B` und sagen zu, der ce-only-golden bleibe
+> **„byte-identisch"**. **Genau das ist gebrochen worden.** Ist heute:
+>
+> ```
+> kNewGolden131072Crc64 = 0x56F1B721C72DC10E     (profile_facade/source_catalog.hpp:190)
+> ```
+>
+> Der alte Wert steht im Code noch -- als dokumentierter `[MISMATCH]`
+> (`source_catalog.hpp:187`), samt Begruendung `:183-188`: der Bruch geschah mit STRUKT-R ORG-18
+> unter Owner-GO vom 26.07., als `persistence_target` als 18. Organ-Achse einzog. **Der alte Anker
+> ist laut Code „nicht mehr reproduzierbar".** Wer die Zusage `:189` heute liest und gegen den alten
+> Wert prueft, meldet einen Regressionsverdacht, wo eine bewusste Entscheidung steht.
+>
+> ### Die Achsenliste ist unvollstaendig -- es fehlt genau die Achse, die den CRC brach
+>
+> `:61`, `:63`, `:84`, `:123`, `:213` sprechen von den **„17 Organ-Achsen"**. Ist: **18 Slots**
+> (`anatomy/composition_factory.hpp:104`; `builder/experiment_tree/axis_path_serialization.hpp:40`).
+> Die Namensliste `:84` endet bei `queuing_q1/q2` -- **`persistence_target` (L17) fehlt vollstaendig**
+> (`profile_facade/source_catalog.hpp:120`).
+>
+> **Die Zahl 2^17 = 131.072 bleibt dennoch korrekt** (`:123`), weil L17 auf K17 = 1 gepinnt ist
+> (`source_catalog.hpp:139` und `:130-138`). Nur die Begruendung „17 Achsen je 2" ist es nicht:
+> es sind 18 Slots, von denen 17 variieren.
+>
+> ### Weitere Korrekturen
+>
+> | Zeile | steht im Dokument | Ist heute | Beleg (ce) |
+> |---|---|---|---|
+> | `:24` | „**Planer** … Existiert als Executable **noch nicht** — der **groesste offene Bau-Block**" | **VOLLZOGEN.** Eigene Binary, wird gebaut und installiert | `apps/experiment_planner/CMakeLists.txt:13` |
+> | `:108` | „**Set / Sequence / Adapter / View** sind bisher **Skelette (je nur 1 Organ getrieben)**; ihre Vervollstaendigung ist der **letzte, grosse ABI-Schritt**" | **Der ABI-Schritt ist gegangen** (E-24 C8, 04.08., MAJOR 7→8). Die vier Gattungen haben eigene benannte Wire-Formen; „je 1 Organ getrieben" stimmt nur noch fuer Set (1), Sequence hat 2, View hat 2 | `abi/anatomy_module_abi_v1_decl.hpp:65`; `anatomy/set_abi_adapter.hpp:84`, `sequence_abi_adapter.hpp:74`, `view_abi_adapter.hpp:65` |
+> | `:108` | „**SearchAlgorithm** ist voll ausgebaut — **17 Achsen**" | **18** Organ-Achsen; ausserdem heisst die **Gattung** (Ebene 1) seit E-24 C7-1 **`Map`**, nicht SearchAlgorithm -- das **Genus** (Ebene 2) heisst weiterhin so | `composition_factory.hpp:104`; `anatomy/anatomy_base.hpp:49-57` |
+> | `:123` | „golden-320 ist nur eine Byte-Wache (**13/17 gepinnt**)" | **14 von 18** gepinnt (variiert werden search_algo 4, node_type 4, memory_layout 5, prefetch 4). Produkt 320 bleibt korrekt | `source_catalog.hpp:144`, `static_assert :172` |
+> | `:99` | „*Ist-Code-Regress:* `plan_legend.hpp:109` emittiert heute noch `[a,b,c][d,e,f]:chunk<k>` — Fix als **GO-pflichtiger TODO**" | **DOPPELT ueberholt.** (1) Der Regress ist geheilt: emittiert wird `tier:build:[d,e,f][g,h,i]:chunk<k>` (`plan_legend.hpp:19`). (2) Die per-chunk-Einzeljobs sind seit §62-B (23.07.) **deprecated** zugunsten je-Host-Batches (`:124-129`) | ebd. |
+> | `:92`, `:148` | „*Konformitaets-Residue:* `plan_legend.hpp` faechert `[a,b,c]` **heute noch aus `measurement_categories`** auf — **die einzige echte Residue**" | **GEHEILT.** `[a,b,c]` ist heute die Mess-Tooling-KONFIG; der Header schliesst die alte Auffaecherung ausdruecklich aus | `plan_legend.hpp:86-89`, `:95` |
+>
+> **ABI-Anker fehlt ganz:** das Dokument argumentiert durchgehend ueber ABI-Stabilitaet
+> (`:108` „der letzte, grosse ABI-Schritt"), nennt aber **keine einzige Versionszahl**. Zum
+> Nachtragen: ABI-MAJOR **8**, MINOR **0** (`abi/anatomy_module_abi_v1_decl.hpp:89-90`),
+> `fingerprint_format=4` (`abi/anatomy_fingerprint.hpp:106`).
+>
+> **Weiterhin korrekt (nicht anfassen):** `:123` der Wert 2^17 = 131.072 und die Aussage, golden-320
+> sei nur eine Byte-Wache · `:48` „`AxisKind = {organ, system_measurement, system_config}` — es gibt
+> **keinen `genus`-Enumerator**" (literal bestaetigt, `topics/axis.hpp:17-20`) · `:63` der
+> strukturelle Guard, dass nur Organ-Achsen binary_id-Ebenen bilden · `:90` die **16**
+> `measurement_categories` · `:165` `pruefling_merge.hpp` / `sota_catalog.hpp` ·
+> `:187` die drei Legenden-Formen.
+>
+> **Ungeprueft:** `:13`, `:181` die Groessenordnungs-Angaben (10^14 / „137 Billionen") -- nicht
+> nachgerechnet. `:201` die beiden „neuen" System-Haupt-Achsen RAM-Frequenz und CAS-Latenz sowie
+> CPU-Fabrikation (#49) -- Bau-Status nicht geprueft. Beachte dazu: es gibt heute **drei**
+> System-Haupt-Achsen (`abi/system_axis_order.hpp:37`).
+>
+> ---
+
 ---
 
 ## 1. Die Grundidee: eine Experiment-Maschine, kein Cache

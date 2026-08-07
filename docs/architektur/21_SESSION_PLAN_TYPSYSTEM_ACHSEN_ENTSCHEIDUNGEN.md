@@ -6,6 +6,55 @@
 > **CI grün + messfähig, Kern vollständig vorhanden — ab jetzt nur PUNKTUELLE Refactorings, kein Greenfield.**
 > Stand: ce `c022ce05` (ctest 199/199), super development `e2888c3`. Belege alle `datei:zeile`.
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DER BAUPLAN GILT, SEINE IST-ANALYSE IST UEBERHOLT
+>
+> **Das Layer-/Haupt-Unter-Achsen-Modell bleibt bindend. Der Zustands-Teil nicht.** Der
+> schwerwiegendste Posten: **Phase 6 (telemetry-Root-Umbau) ist vollzogen** -- das Dokument fuehrt
+> ihn als „zuletzt" zu erledigen. Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> ### Vollzugs-Marken
+>
+> - `:107-115`, `:172-173` „telemetry ist heute **FAELSCHLICH Organ-Slot T10** in den 19
+>   gleichrangigen Achsen (`observable_tier.hpp:47` `kV3AxisCount=19`, `:85` Slot T10)" und
+>   „**Phase 6** — telemetry-Root-Umbau … **zuletzt**" -- **VOLLZOGEN.** telemetry hat die
+>   Komposition mit INC-2c (ABI-5) verlassen und ist CEB-System-Achse; isa folgte mit INC-2d (ABI-6);
+>   `persistence_target` kam als T17 dazu (ABI-7). **T10 ist heute `value_handle`.**
+>   `anatomy/observable_tier.hpp:50` (`kV3AxisCount = 18`); `profile_facade/source_catalog.hpp:104-106`.
+> - `:70` „`batch_size` (cache_traversal) = **NO-OP** (keine Strategie liest es; Namens-Drift
+>   axis_03a/03b)" -- **NICHT MEHR NO-OP.** `batch_size` wird als Fenster-Semantik konsumiert
+>   (`anatomy/abi_adapter.hpp:1392-1401`) und zaehlt als `applied` (`:494-496`); es ist zudem
+>   V3-Schemafeld (`observable_tier.hpp:71-73`). Die Namens-Drift ist aufgeloest
+>   (`anatomy/resource_controllable_tier.hpp:38`).
+>
+> ### Zahlen und Anker
+>
+> | Zeile | steht im Dokument | Ist heute | Beleg (ce) |
+> |---|---|---|---|
+> | `:50`, `:111-113`, `:120` | „Alle **19 Slots** strukturell intakt", „`axis_stats[19]`", „beruehrt **kV3AxisCount=19**-Vertraege" | **18** Slots; `axis_stats[18][8]` | `anatomy/composition_factory.hpp:104`; `observable_tier.hpp:50`, `:141` |
+> | `:263` | „golden-320 / **POD-1416** / **ABI-4** … byte-unberuehrt" | POD ist **1344**, ABI-MAJOR ist **8** | `observable_tier.hpp:168`; `abi/anatomy_module_abi_v1_decl.hpp:89` |
+> | `:7` | „ce **`c022ce05`**, super development **`e2888c3`**" | beide Staende ueberholt | -- |
+> | `:63` | „der **EINZIGE** real gekreuzte Fall ISA x SIMD-Compat-Filter" | Anker vorhanden, aber **nicht mehr der einzige**: dieselbe Datei traegt ab `:62` eine zweite Cross-Axis-Constraint (ISA x Plattform-Familie) | `topics/hardware/topic_hardware_config_set.hpp:41-61`, `:62 ff.` |
+> | `:48` (H5) | „die **13-Framework-Registry** als Vokabular" | Eine Registry existiert, aber bewusst **honest-1**: `kMeasurementFrameworkCount = 1`, Enum nur `{Ycsb}`, mit compile-time-Wache gegen stilles Drift. **Kein 13er-Schluesselraum** | `include/cache_engine/measurement/measurement_framework_registry.hpp:31` |
+> | `:44` (H1) | „**14 Lastprofile LP01-LP14**" | LP-IDs existieren, aber nur rund **10** der 14 sind real belegt | `builder/workload_driver/test_load_profile_writer.cpp:101-125`; `algorithm_profiles/load_profiles/` |
+>
+> ### Mehrdeutige Belege
+>
+> `:67-68`, `:86`, `:124` zitieren mehrere Header nur mit Basisnamen
+> (`observable_composed_search.hpp`, `axis_14_value_handle_observable.hpp`,
+> `axis_05_memory_layout_registry.hpp`, `axis_03a_search_algo_eytzinger.hpp`). **Jede dieser Dateien
+> existiert heute zweimal** -- unter `libs/cache_engine/axes/…` und unter
+> `libs/cache_engine/topics/…`. Ohne Pfad ist nicht entscheidbar, welche gemeint ist.
+>
+> **Weiterhin korrekt (nicht anfassen):** `:71` „`thread_count` (concurrency) = **NO-OP**" -- und
+> inzwischen als Invariante gehaertet (`builder/pruef_dock/mess_interface_testate.hpp:499`, `:558`,
+> „T8-Phantom-Guard: thread_count ist label-only und zaehlt NIE als applied") ·
+> `:134-139` Phase 2 `PrefetchShape` bleibt **offen** (null Treffer) ·
+> `:243-262` GO-3 R1 (`cmake/isa_features.cmake`, Guard-Header, Striktheits-Test) existiert.
+>
+> ---
+
 Dieses Dokument ist der **bindende Bauplan** für die E4′-/Arbeitsmodus-/Hybrid-Strecke. Es ersetzt das
 „orthogonal compile/dynamic"-Bild aus Doc 20 §I durch das korrigierte **Layer-/Haupt-Unter-Achsen-Modell**.
 

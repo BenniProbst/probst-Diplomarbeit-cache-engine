@@ -1,5 +1,84 @@
 # ACHSEN-NACHSCHLAGEWERK — INC-2d-DELTA-NACHTRAG (2026-07-19)
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: AUCH DIESER NACHTRAG IST UEBERHOLT -- ZWEI ABI-MAJORS
+>
+> **Dieser Nachtrag hob das Original von ABI-5/18-Slots auf ABI-6/17-Slots. Seither ist zweimal
+> weitergezogen worden: ABI-7 (STRUKT-R ORG-18) und ABI-8 (E-24 C8).** Wer Original plus Nachtrag
+> liest, hat damit **immer noch nicht** den Ist-Stand. Das ist die gefaehrlichste Eigenschaft dieses
+> Dokuments: es sieht wie die Korrektur aus, ist aber selbst korrekturbeduerftig. Belege gegen ce
+> `ba069e38` (identisch in `ab0b352e`).
+>
+> **Was an diesem Nachtrag NICHT zu beanstanden ist.** Seine Delta-Notation ist gesund und bleibt
+> stehen: wo er schreibt „18x8 sizeof 1344 V6 ABI-5 → 17x8 sizeof 1272 V7 ABI-6" (`:98`), nennt er
+> einen **Zeitschnitt**, keinen Ist-Zustand. Solche Zeilen sind der historische Wert des Dossiers
+> und **nicht** zu korrigieren. Der Vermerk unten richtet sich ausschliesslich gegen drei andere
+> Textsorten, die als *heute geltend* gelesen werden:
+> - **die Vorrang-Regel `:7`** („Bei Widerspruch gilt der Nachtrag") -- sie erklaert den ABI-6-Stand
+>   zur massgeblichen Fassung und ist damit die Zeile, die den Fehlbefund traegt;
+> - **die als OFFEN gefuehrten Audit-Posten** (`:102` L4/G8==P2, `:111` Quick-Win L3, `:150` V7/P4,
+>   `:11` G2/E-4) -- sie sind Gate-Bedingungen im Praesens und **alle vier inzwischen erledigt**;
+> - **der CRC64-Anker `:138`/`:166`**, als Tatsache formuliert und inzwischen gewandert.
+>
+> ### Der Kopf `:5` und die Kern-Ereignisse `:10-15`
+>
+> | Angabe | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|
+> | `:5` „auf den Stand **ABI-6, 17 Slots**" | **ABI-8, 18 Slots** | `abi/anatomy_module_abi_v1_decl.hpp:89`; `builder/experiment_tree/axis_path_serialization.hpp:40` |
+> | `:5` „live gegen ce HEAD `5da2caf7` verifiziert" | Verifikationsbasis ueberholt; ebenso der `a9c433d0`-Block in §G (`:210`, `:229`) -- **alle dort „woertlich bestaetigten" ABI-6/17-Anker sind heute falsch** | -- |
+> | `:10` „isa verliess die Komposition (**18→17** Organ-Slots)" | isa ist weiterhin raus (**korrekt**), aber die Kette ging weiter: **17→18**, `persistence_target` kam als T17 dazu | `axis_path_serialization.hpp:40-43` |
+> | `:14` „`FullSourceCatalog` = alle **17** Achsen je 2 = 2^17 = 131.072" | **Der Wert 131.072 stimmt.** Die Formulierung nicht: `CatalogAxes` hat **18** Parameter, K17 (`persistence_target`) ist auf **1 gepinnt** → 2^17 x 1 | `profile_facade/source_catalog.hpp:139`, `:135-138` |
+> | `:11` „Der aktive Familien-Knoten `axis_label()=="extension_hardware"` **FEHLT** (Audit G2/E-4 offen)" | **GESCHLOSSEN -- zweifach.** (1) Der Knoten existiert: `measurement/external_utils_family_axis.hpp`. (2) Er heisst nach dem A2-Rename **`external_utils`**, und `SimdSubAxis::parent_axis_label()` liefert genau das | `external_utils_family_axis.hpp:1`; `simd_sub_axis.hpp:38` |
+>
+> ### Die Zahlen im Fliesstext
+>
+> | Zeile | steht im Nachtrag | Ist heute | Beleg (ce) |
+> |---|---|---|---|
+> | `:24` | `std::array<std::string_view, **17**>` | `<…, **18**>` | `axis_path_serialization.hpp:40` |
+> | `:26`, `:97`, `:148` | Genus-Counts „**17**-11-13-9-5" | **18**-11-13-9-5 (nur SA bewegt sich) | `genus_binding_traits.hpp:48`, `:74`, `:102`, `:132`, `:160` |
+> | `:30`, `:110`, `:111` | „**17x8**, sizeof **1272**, Version **7**, ABI-**6**, Magic `.A6.`" | **18x8**, sizeof **1344**, Version **8**, ABI-**8**, Magic `.A8.` = `0x434F4D444141382E` | `observable_tier.hpp:50`, `:168`, `:174`; `anatomy_module_abi_v1_decl.hpp:89`, `:93` |
+> | `:42` | „NUR die **17** Organ-Achsen permutieren" | **18** | `axis_path_serialization.hpp:40` |
+> | `:52` | „`kCebContractCodegenMinor` (**=0**)" | **= 1** → `+ceb=8.1` | `anatomy_module_abi_v1_decl.hpp:460` |
+> | `:60` | „`static_assert sizeof...==17`; `kV3AxisCount=17`" | **==18**; **=18** | `composition_factory.hpp:104`; `observable_tier.hpp:50` |
+> | `:132` | „`CatalogAxes` ueber alle 17 Achsen (**K00..K16**)" | **K00..K17** (18 Parameter) | `source_catalog.hpp:91-93` |
+> | `:138`, `:166` | CRC64-Anker `kNewGolden131072Crc64` = **`0xF1C1F26A1232073B`** | **`0x56F1B721C72DC10E`**. Der alte Wert steht im Code noch als dokumentierter `[MISMATCH]` -- das ist der Beweis, dass er ueberholt ist | `source_catalog.hpp:190`, MISMATCH-Zeile `:187` |
+> | `:145` | „axes26 bleibt **26** Aliasse" | **27** (`T26_persistence_target` kam dazu) | `registry_to_axis_levels.hpp:47-82` |
+> | `:146` | „**16 vs 17 vs 8** NIE verwechseln" | **16 vs 18 vs 8** | `observable_tier.hpp:50`, `:53` |
+> | `:147` | „(B) Jetzt **DOPPEL**-Shift 19→18→17" | **DREIFACH: 19→18→17→18** | `observable_tier.hpp:45-49` |
+>
+> ### Die Slot-Tabelle `:64-82`
+>
+> **T0..T16 stimmen alle** -- Namen, Reihenfolge und golden-Pins. Es fehlt genau eine Zeile:
+> **T17 `persistence_target`**, gepinnt auf `persistence_memory_only`
+> (`axis_path_serialization.hpp:43`; `algorithm_profiles/cache_engine_axis_registry.xml:125`).
+> Entsprechend gilt `grep -c "<axis " == 18`, nicht 17 wie in `:122` behauptet -- die beiden dort
+> genannten Einzel-Anker (`index_organization slot="T11"` Z.77, `io_dispatch slot="T12"` Z.83) sind
+> dagegen **woertlich weiterhin richtig**.
+>
+> ### Als ERLEDIGT zu markierende Audit-Posten
+>
+> - `:102` „stale `k*SlotCount` … **alle bestehen unveraendert**; AKTIVER stale `static_assert`
+>   `tests/unit/test_d9_set.cpp:38` (15). **Audit L4/G8==P2 OFFEN**" -- **ERLEDIGT.** Set = 13
+>   (`set_composition.hpp:62`), Sequence = 9 (`:69`), View = 5 (`view_composition.hpp:77`);
+>   `test_d9_set.cpp:38` steht auf 13 und bindet zusaetzlich gegen `SC::slot_count` (`:40-41`).
+>   Nur Adapter = 13 bleibt **bewusst** frozen (`adapter_anatomy.hpp:200`).
+> - `:111` „der geforderte `static_assert(sizeof==1272)` **fehlt noch = Quick-Win L3 offen**"
+>   -- **ERLEDIGT**, mit dem Ist-Wert: `static_assert(sizeof(...) == 1344)`, `observable_tier.hpp:168`.
+> - `:150` „Rename `all_axes_binary_count`→`all_axes_matrix_count` = **Audit V7/P4 OFFEN**"
+>   -- **ERLEDIGT** (`registry_to_axis_levels.hpp:191`).
+> - `:139` Aufrufer-Frage zu `build_system_axis_levels()` -- Aufrufer ist `build_all_axis_levels()`
+>   (`registry_to_axis_levels.hpp:178`).
+>
+> **Weiterhin korrekt (nicht anfassen):** isa ohne Organ-Slot (`:86`) · `build_system_axis_levels()`
+> = 5 Achsen (`:31`) · Adapter/Set/Sequence/View = 11/13/9/5 (`:98-101`) · `kV3FieldCount` = 8
+> (`:196`) · Mess-Kategorien 16 · 13 gepinnte Slots im golden-320 (`:133`) · der Wert 131.072 ·
+> die flache `ExtensionHardwareSystemAxis` bleibt deprecated, nicht geloescht (`:50`, `:124`) ·
+> die Existenz von `TargetIsaSystemAxis`, `OptimizationLevelSubAxis`, `CompilerAtomicSubAxis`,
+> `artifact_cache.hpp`.
+>
+> ---
+
 ## (A) Kopf
 
 **Zweck.** Dieser Nachtrag hebt das Nachschlagewerk `20260717-achsen-nachschlagewerk-ACHSEN-NACHSCHLAGEWERK.md` (Stand INC-2c, 18 Slots, ABI-5) auf den Stand **INC-2d + #50 + #51 + F-SIMD-DEPRECATED (ABI-6, 17 Slots)**. Das Original bleibt UNVERÄNDERT als historische Referenz des INC-2c-Standes (Doku-nie-löschen); dieses Dokument ist ADDITIV und führt NUR die überholten bzw. neuen Zeilen. **Jede Delta-Zeile ist live gegen ce HEAD `5da2caf7` verifiziert** (2026-07-19; `git log`: `5da2caf7` #51-iostream-Fix, `f1562636` #50-algo_version-Weiterleitung).

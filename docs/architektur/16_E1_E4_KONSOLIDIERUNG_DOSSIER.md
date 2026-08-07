@@ -31,19 +31,19 @@
 >
 > ### Vollzugs-Marken (am Objekt geprueft 07.08.)
 >
-> - `:137` „**#221** nur 1/5 RC-Achsen laufzeit-konsumiert, 4 Setter fehlen" — **VOLLZOGEN.** Alle fuenf
+> - `:137` „**#221** nur 1/5 RC-Achsen laufzeit-konsumiert, 4 Setter fehlen" -- **VOLLZOGEN.** Alle fuenf
 >   RC-Felder werden appliziert (`anatomy/abi_adapter.hpp:462-496`). `thread_count` wird gesetzt, aber
->   bewusst nicht als konsumiert gezaehlt (honest-0, `:467-473`) — das ist Absicht, kein Rest.
+>   bewusst nicht als konsumiert gezaehlt (honest-0, `:467-473`) -- das ist Absicht, kein Rest.
 > - `:76` „`search_organ_`-Monolith beschattet node_type/memory_layout — **der eine echte
->   Architektur-Defekt**" — **GETILGT.** Nur noch fuenf erklaerende Kommentare („ist entfallen"),
+>   Architektur-Defekt**" -- **GETILGT.** Nur noch fuenf erklaerende Kommentare („ist entfallen"),
 >   keine lebende Deklaration: `axes/lookup/composable/store_traversable_search_algo.hpp:19-25`.
->   (Teil C `:137` desselben Dokuments sagt das bereits — Teil A.5 widerspricht sich also selbst.)
-> - `:7`, `:148` „`workload_matrix.hpp:105` = 36 Zellen compile-time in der Library" — **ENTFERNT.**
+>   (Teil C `:137` desselben Dokuments sagt das bereits -- Teil A.5 widerspricht sich also selbst.)
+> - `:7`, `:148` „`workload_matrix.hpp:105` = 36 Zellen compile-time in der Library" -- **ENTFERNT.**
 >   Der G2-Revert ist vollzogen; `workload_matrix` hat im ce **null** Treffer. Der Fehlbau, um den
 >   Teil D kreist, existiert nicht mehr.
-> - `:160` „`main.cpp:483` hartkodiert `YcsbWorkload::C`" — **XML gewinnt.** Der Messreihen-Pfad liest
+> - `:160` „`main.cpp:483` hartkodiert `YcsbWorkload::C`" -- **XML gewinnt.** Der Messreihen-Pfad liest
 >   `spec.workload.value_or(...)` (super `Code/02_messung_driver/main.cpp:1410`). Als Vorgabe je
->   Messreihen-Art besteht die Konstante fort (`:177`, `:182`) — das ist Fallback, keine Hartkodierung.
+>   Messreihen-Art besteht die Konstante fort (`:177`, `:182`) -- das ist Fallback, keine Hartkodierung.
 >
 > ### Pfad-Warnung zur Wurzel-Definition
 >

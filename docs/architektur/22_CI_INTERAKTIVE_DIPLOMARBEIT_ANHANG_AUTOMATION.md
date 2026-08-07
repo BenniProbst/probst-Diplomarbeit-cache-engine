@@ -9,6 +9,50 @@
 
 ---
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DIE IST-ANALYSE BESCHREIBT EINEN ZUSTAND, DEN ES NICHT MEHR GIBT
+>
+> **Der Auftrag und der Zuschnitt gelten weiter. Teil A ist ueberholt -- und zwar gruendlich:
+> das Vehikel ist gebaut, die PowerShell-Skripte sind weg, und die Stufen-Nummern stimmen nicht.**
+> Belege gegen super HEAD und ce `ba069e38`.
+>
+> ### Die Stufen-Nummern: 06 ist heute 08 und 09
+>
+> `:105`, `:138`, `:156` nennen `Code/06_appendix_generator` und `Code/06_tex_formatter`.
+> **Ist:** `Code/08_appendix_generator/` und `Code/09_tex_formatter/` (je CLI, Lib und Tests);
+> Stufe `06` ist `06_latex_to_pdf`. Die Pipeline laeuft `01_sample_data_generator` bis
+> `09_tex_formatter`. Der R10-Nachtrag `:168` flaggt das bereits -- **der Haupttext bleibt
+> irrefuehrend und ist die Stelle, die zuerst gelesen wird.**
+>
+> ### Vollzugs-Marken
+>
+> - `:31-40`, `:154-155` „Die **einzige** Verdrahtung sind **zwei Windows-only PowerShell-Skripte**:
+>   `generate_measurement_appendix.ps1`, `generate_wide_appendix.ps1`" -- **BEIDE WEG.**
+>   `find` ueber den super-Baum liefert **null `.ps1`-Dateien ueberhaupt** (ebenso im ce).
+>   Ersetzt durch die In-Process-Fassade; der Ersatz ist im Header ausdruecklich benannt
+>   (`Code/08_appendix_generator/appendix_generator.hpp:10-16`).
+> - `:121-124` „**Pipeline-Stufe** (`.gitlab-ci.yml`): nach `measure` … regeneriert
+>   `anhang/<lang>/tabellen/*.tex`" (im Futur formuliert) -- **VERDRAHTET.** Das Ziel
+>   `appendix_generator_cli` wird in drei CI-Bloecken gebaut und ausgefuehrt
+>   (`.gitlab-ci.yml:765`, `:857`, `:1136`). **Der Job heisst aber nicht „appendix_generator"**,
+>   sondern **`anhang:forward`** (`.gitlab-ci.yml:1093`, Stage `persist`, opt-in ueber
+>   `COMDARE_ANHANG_FORWARD`). Wer nach dem Doku-Namen sucht, findet nichts.
+> - `:91-96` Status-Spalte B.3: P2 „`write_scatter_plot` existiert, **unverdrahtet**", P3 „neu",
+>   P4 „neu", P5, P6 -- **P2 bis P6 sind gebaut.** Nur **P1 (Fit-Overlay)** fehlt weiterhin, und das
+>   ist korrekt so: es ist daten-gated (`:144`).
+> - `:157` „`ce/tools/permutation_codegen/codegen.sh` … ersetzt den Dreifach-Sync in
+>   `cmake/permutations.cmake:60-84`" -- **alle drei Pfade existieren nicht.** Der Codegen liegt
+>   heute in `cmake/anatomy_codegen.cmake`, `cmake/catalog_codegen.cmake`,
+>   `cmake/adhoc_emitter.cmake`, `cmake/anatomy_codegen_runner.cmake`.
+>
+> **Weiterhin korrekt (nicht anfassen):** `:49` „`curve_fit::fit_log_linear` wird in **KEINEM**
+> Diagramm genutzt" · `:144` P1 Working-Set-Kurve ohne Fit-Overlay, daten-gated ·
+> `:47-48` `write_heatmap` weiterhin nur intern (fuer `write_scatter_plot` gilt das **nicht** mehr,
+> s.o.).
+>
+> ---
+
 ## TEIL A — IST-ANALYSE
 
 ### A.1 Anhang-Automatisierbarkeit (A–F, DE+EN)

@@ -6,6 +6,48 @@
 > **Implementierung des Diffs = E4′-/Arbeitsmodus-Strecke** (nach den DATEN_GATED-Vorbauten,
 > ce `c022ce05`), nicht vorgezogen.
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: ZWEI ALS „FEHLT" GEFUEHRTE BLOECKE SIND GEBAUT
+>
+> **Die Vision (Messkurven-Typsystem, Chain of Responsibility, Monolith-Doktrin) gilt weiter.
+> Der Ist-Abgleich nicht.** Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> ### Vollzugs-Marken
+>
+> - `:65` „Kardinalitaets-Klassen/Hierarchien (B) | **fehlt** | E4'-Strecke, nach Deep-Research"
+>   -- **GEBAUT.** `libs/cache_engine/heuristik/` traegt sechs Header: `axis_spline.hpp`,
+>   `break_even.hpp`, `measurement_curve_loader.hpp`, `workload_feature_vector.hpp`,
+>   `workload_cluster_offline.hpp`, `axis_optimization_catalog.hpp`.
+> - `:67` „3-Varianten-Observer-Einbau (D) | **fehlt** — Facade/Treiber geben `COMDARE_MEASUREMENT_ON=1
+>   COMDARE_CE_ENABLE_STATISTICS=1` **HART** an alle Tier-Kompilate; **eine Varianten-Matrix existiert
+>   nicht**" -- **WEITGEHEND GEBAUT.** Die Mess-Combo-Legende `[all]/[wallclock]/[macro]/[micro]`
+>   loest je Tier-Kompilat einen eigenen Define-Vektor auf
+>   (`profile_facade/mess_achsen_naht.hpp`), getragen von einer Tooling-Registry mit drei Eintraegen
+>   (`include/cache_engine/measurement/measurement_tooling_registry.hpp:34`,
+>   `kMeasurementToolingCount = 3`). Die Combo reist als Glied ins Fingerprint-Preimage
+>   (`include/cache_engine/abi/anatomy_fingerprint.hpp:92`).
+>
+> ### Zahlen
+>
+> | Zeile | steht im Dokument | Ist heute | Beleg (ce) |
+> |---|---|---|---|
+> | `:86` | „`tree<axis>` | **19 Slots**" | **18** (T0..T17) | `anatomy/composition_factory.hpp:104` |
+> | `:91` | „16 MeasurementCategory … **19x8=152 Slots / 97 Felder**" | **16 Kategorien korrekt**; Slots **18x8 = 144** | `include/cache_engine/measurement/measurement_category.hpp:32`; `anatomy/observable_tier.hpp:50`, `:53` |
+> | `:7`, `:64` | „ce **`c022ce05`**" | Stand ueberholt | -- |
+> | `:128` | Beleg `profile_to_tree.hpp:68-87` | **Zeilen-Drift**: `is_static` steht bei `:48`, der Single-Source-Satz bei `:120` | `builder/experiment_tree/profile_to_tree.hpp:48`, `:120` |
+>
+> **Weiterhin korrekt (nicht anfassen):** `:66` CoR-Filterkette Slice 1
+> (`builder/experiment_tree/selection_filter_chain.hpp` + `tests/unit/test_d15_*`) -- und mehr als das:
+> die Kette ist inzwischen **verdrahtet**, `resolve_selection` sitzt an beiden offiziellen
+> Einstiegen (`profile_facade/profile_run_entry.hpp:757`, `:809`, `:874`) ·
+> `:68` `best_binary_selector` und `sota_catalog` existieren · `:86` der Registry-Gesamtraum **26** ·
+> `:87-88` YCSB als einziges verdrahtetes Framework und 21 LP-XML im Bestand ·
+> `:94-96` die Literalzahl `137.594.142.720.000` samt Nicht-Materialisierungs-Doktrin ·
+> die acht in `:64`, `:66`, `:80` genannten Backup-/Audit-Pfade existieren im super-Repo.
+>
+> ---
+
 ## A. Monolith-Doktrin (Organisationsform)
 
 Die cache-engine wird als **Monolith fertiggestellt**. Die spätere Zergliederung in die

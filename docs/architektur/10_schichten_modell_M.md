@@ -1,5 +1,32 @@
 # Schichten-Modell M — Diplomarbeit / CacheEngineBuilder / CacheEngine / Pruefling
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: PFADE UND REPO-ZUSCHNITT UEBERHOLT (Dokument vom 18.05.)
+>
+> **Die Vier-Subsystem-Trennung und die bidirektionale Pruefling-Beziehung gelten weiter. Die
+> Pfad- und Repo-Angaben nicht.** Dieses Dokument traegt keinen SUPERSEDED-Banner, ist aber knapp
+> drei Monate alt. Belege gegen ce `ba069e38` und super HEAD.
+>
+> | Zeile | steht im Dokument | Ist-Stand 07.08. | Beleg |
+> |---|---|---|---|
+> | `:107` | „`Diplomarbeit/Code/messung_driver/` — **eigenes Repo + eigene Build-Unit**" | **Pfad existiert nicht.** Heute `Code/02_messung_driver/` -- nummeriertes Glied einer neunteiligen Pipeline (`01_sample_data_generator` bis `09_tex_formatter`), **kein eigenes Repo**, sondern Unterordner von `Code/`. (`find` nach dem Basisnamen `messung_driver*` ueber beide Baeume: null Treffer) | super `Code/02_messung_driver/` |
+> | `:199` | „`cache-engine/libs/cache_engine/cache_engine.hpp`" | **eine Ebene tiefer**: `libs/cache_engine/include/cache_engine/cache_engine.hpp` | ce, `find`-belegt |
+> | `:110`, `:186` | „`comdare-prt-art/prt_art/`", `prt_art_search_engine_adapter.hpp` | Repo-Wurzel verschoben: prt-art liegt heute als Submodul unter `Code/external/comdare-prt-art`. **Im Arbeitsbaum ist es leer (nicht ausgecheckt)** -- der Unterpfad ist damit **nicht verifizierbar**; die genannte Adapter-Datei findet sich in keinem der beiden Baeume. **Kein belastbarer Nullbefund** | super `Code/external/` |
+> | `:262-263` | §8 „`CacheEngine::register_engine(IExecutingEngine&)` muss public + dokumentiert sein — V32 Code-Audit"; „`prt_art` Constructor muss `CacheEngine&` annehmen — V32 Refactor" | **Gegenstandslos.** Das prt_art-Legacy-Skelett wurde am **2026-06-01 entfernt**; der Adapter heisst heute `cache_engine_execution_engine_adapter.hpp`. `register_engine` existiert im ce-Code nicht | ce `execution_engine/execution_engine_base.hpp:20`; `include/cache_engine/abi/cache_engine_execution_engine_adapter.hpp:9` |
+>
+> **Weiterhin korrekt (nicht anfassen):** `:82`, `:108`, `:199` `cache-engine/apps/cache_engine_builder/`
+> samt `main.cpp` · `:109` `cache-engine/libs/cache_engine/`.
+>
+> **Ungeprueft:** `:2`/`:4` die Zaehlungen „12 Sub-Engines C1-C12", „29 Cache-Strategien F1-F29",
+> „~80-85 IHeuristik-Instanzen", „ConcurrencyManager (8 Disziplinen + 3 Mechaniken)" -- dafuer
+> liess sich **kein Code-Anker finden**. Die heutige `ICacheEngine`-Fassade vermittelt sechs
+> ausgelagerte Submodule, die laut Header „via E4.1 noch leer und damit V42-gated" sind
+> (`ce include/cache_engine/api/i_cache_engine_tools.hpp:9-11`). Ob 12/29/80-85 je Code waren oder
+> reine Konzept-Zaehlungen sind, ist aus dem Code nicht entscheidbar.
+>
+> ---
+
 **Stand:** 2026-05-18 (Phase M.2)
 **Vorgaenger:** `02_aktueller_master_REV7_7.md` §2 Drei-Repo-Layer (REV7.6)
 **Trigger:** User-Direktive 2026-05-18 (KRITISCHE KLARSTELLUNG)

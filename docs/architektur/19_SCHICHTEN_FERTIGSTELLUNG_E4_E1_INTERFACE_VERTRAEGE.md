@@ -7,7 +7,7 @@
 > ## ⚠️ STAND 2026-08-07: DIE E3-/E1-SCHICHT IST WEITER, ALS DIESES DOSSIER SIE FUEHRT
 >
 > **Die Schicht-Doktrin (Interface-Vertraege, getrennte Testbarkeit, top-down ab E4) gilt weiter.
-> Der Fortschritts-Stand nicht.** Dieses Dossier fuehrt als offen, was seither gebaut wurde — es ist
+> Der Fortschritts-Stand nicht.** Dieses Dossier fuehrt als offen, was seither gebaut wurde -- es ist
 > damit derselbe Fehlbefund-Traeger wie Dossier 17. Belege gegen ce `ba069e38` (identisch in
 > `ab0b352e`).
 >
@@ -19,16 +19,16 @@
 > | `:21` „`ObserverAggregate<**19**>`" | **`<18>`** | `observable_tier.hpp:50` |
 > | `:17` „traegt **19** `permute_axes`" | **18** Achsen (T0..T17) | `anatomy/composition_factory.hpp:104` |
 >
-> ### Vollzugs-Marken (am Objekt geprueft 07.08.) — vier als offen gefuehrte Posten sind gebaut
+> ### Vollzugs-Marken (am Objekt geprueft 07.08.) -- vier als offen gefuehrte Posten sind gebaut
 >
 > - `:19` „**Tier-Seite konsumiert nur `prefetch_distance`** (T7); **4 Felder = Phantom**"
->   — **VOLLZOGEN.** Alle fuenf RC-Felder werden appliziert: `anatomy/abi_adapter.hpp:462-496`.
+>   -- **VOLLZOGEN.** Alle fuenf RC-Felder werden appliziert: `anatomy/abi_adapter.hpp:462-496`.
 >   `thread_count` ist ausgewiesen honest-0 (`:467-473`), nicht Phantom.
 > - `:17` „`runtime_dynamic` (**nur thread_count/hw_prefetcher**); **4 RC-POD-Felder ohne XML-Eingang**"
->   — **VOLLZOGEN.** `build_axis_levels` emittiert heute alle RC-Dimensionen als dynamische Ebenen:
+>   -- **VOLLZOGEN.** `build_axis_levels` emittiert heute alle RC-Dimensionen als dynamische Ebenen:
 >   `builder/experiment_tree/profile_to_tree.hpp:127-140`, Wiederholungs-Achse `:141-148`.
 > - `:18` „aber **Limits hartkodiert** (`source_catalog.hpp:83-116` `CatalogAxes<4,4,5,4>`=320)" und
->   `:30` E3-DoD (2) „Limits-Entkopplung" — **VOLLZOGEN und haerter gebaut als geplant.** Der
+>   `:30` E3-DoD (2) „Limits-Entkopplung" -- **VOLLZOGEN und haerter gebaut als geplant.** Der
 >   materialisierte Katalog entsteht per Codegen aus der XML (`cmake/catalog_codegen.cmake`);
 >   `CatalogAxes` ist ueber 18 Parameter K00..K17 parametrisiert
 >   (`profile_facade/source_catalog.hpp:94-118`); `golden_320_catalog` ist nur noch ein benannter,
@@ -36,9 +36,9 @@
 >   Entkopplung **compile-time** ab: `kMaxMaterializableCatalogCardinality = 4096` (`:205`), zwei
 >   `static_assert`s schliessen die 2^17-Vollform aus (`:209`, `:211`).
 > - `:21` „`SystemAxis`/`IMeasurementSource` … heute fragmentiert, **Wurzel fehlt**; = Aufgabe M1"
->   — **GEBAUT.** `include/cache_engine/measurement/system_axis.hpp`, `.../i_measurement_source.hpp`,
+>   -- **GEBAUT.** `include/cache_engine/measurement/system_axis.hpp`, `.../i_measurement_source.hpp`,
 >   `.../measurement_axis_registry.hpp`.
-> - `:21` „`MeasurementCategory` (16, **isoliert**)" — die **Zahl 16 stimmt**, das Attribut „isoliert"
+> - `:21` „`MeasurementCategory` (16, **isoliert**)" -- die **Zahl 16 stimmt**, das Attribut „isoliert"
 >   nicht mehr: die Kategorien haengen an der Wurzel und an einer compile-time-Registry.
 >
 > ### Zeilen-Drift in den Belegen (Inhalt vorhanden, Nummer wandert)
@@ -48,7 +48,7 @@
 > `BuildOrchestrator::provision_all` bei `build_orchestrator.hpp:476`/`:483` (nicht `:171-349`) ·
 > `:19` der apply-Block bei `abi_adapter.hpp:447-496`.
 >
-> **Ungeprueft:** alle `*.tex`-Anker (`:32`, `:9`) — das thesis-Submodul ist in diesem Arbeitsbaum
+> **Ungeprueft:** alle `*.tex`-Anker (`:32`, `:9`) -- das thesis-Submodul ist in diesem Arbeitsbaum
 > nicht ausgecheckt. Ebenso `:20` `generate_wide_appendix.ps1`: im super- und ce-Baum null Treffer,
 > aber wegen des leeren Submoduls **kein belastbarer Nullbefund**. Siehe dazu die Vollzugs-Marke in
 > Dossier 22, wo der .ps1-Nullbefund fuer den super-Baum belegt ist.

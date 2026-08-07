@@ -1,5 +1,70 @@
 # Groß-Audit: „Tier"-Auflösung — Begriffstrennung, Architektur-Landkarte, Identifier-Mapping-Plan
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DER CODE-RENAME IST UNAUSGEFUEHRT -- UND SEIN BUMP-FENSTER IST VERBRAUCHT
+>
+> **Anders als die uebrigen Dossiers dieses Ordners ist dieses hier nicht deshalb gefaehrlich, weil
+> es Gebautes fuer offen haelt, sondern umgekehrt:** der Doku-Teil (A-E) ist erledigt, der
+> Code-Teil ist **null Prozent** ausgefuehrt, und die Kopplung an ein ABI-Fenster, die §6 herstellt,
+> traegt nicht mehr. Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> ### §5.2 Identifier-Mapping-Plan: KEINE einzige Umbenennung ist vollzogen
+>
+> Am Code ausgezaehlt (`grep -rl` ueber `libs/`, `tests/`, `apps/`):
+>
+> | Ziel-Bezeichner (`:222-237`) | Treffer heute | Alt-Bezeichner | Treffer heute |
+> |---|---|---|---|
+> | `IObservableSubject` | **0** | `IObservableTier` | **25 Dateien** |
+> | `IDriveableSubject` | **0** | `tier_insert` | **21 Dateien** |
+> | `ISetSubject` | **0** | `tier_lookup` | **11 Dateien** |
+> | `subject_insert` / `subject_lookup` | **0** / **0** | -- | -- |
+> | `ComdareSubjectObserverSnapshot` | **0** | -- | -- |
+> | `AnatomyOrganismSubclass` (`:217-219`) | **0** | `AnatomyTierSubclass` | 1 (als Ziel-Verweis) |
+> | `MemoryBandBudget` (`:239-243`) | **0** | `IMigratableTier`, `tier_moves` | bestehen |
+>
+> Die Dateinamen sind ebenfalls unveraendert `*_tier.hpp`. Beleg fuer den Bestand:
+> `anatomy/idriveable_tier.hpp:46`, `:49`; `anatomy/observable_tier.hpp:181`;
+> `anatomy/resource_controllable_tier.hpp:56`, `:67`.
+>
+> **Das Dokument selbst ist an dieser Stelle ehrlich:** `:400` fuehrt den Code-Rename korrekt als
+> „Verbleibend NUR Implementierungs-Agent". Irrefuehrend sind §5.2 und §4.4, die prospektiv
+> formuliert sind, ohne diesen Status zu tragen.
+>
+> ### §6.6: das Bump-Fenster, an das der Rename gebunden ist, ist fuenffach verbraucht
+>
+> `:261-263` bindet den Rename an einen **„ABI-Major-Bump 3→4"**. Dieser Bump ist am #216-H2
+> vergeben worden (`tier_reset_statistics`-vtable-Slot) -- der Rename ritt nicht mit. Seither gab es
+> **vier weitere** Brueche, jeder ein freies Fenster, keines genutzt:
+> 4→5 (Bau-INC-2b, 17.07.), 5→6 (Bau-INC-2d, 18.07.), 6→7 (STRUKT-R ORG-18, 26.07.),
+> 7→8 (E-24 C8, 04.08.) -- `abi/anatomy_module_abi_v1_decl.hpp:46`, `:52`, `:57`, `:65`; Ist-Major
+> **8** an `:89`. **Wer den Rename heute plant, braucht ein neues Fenster; die Kopplung an „3→4"
+> ist gegenstandslos.**
+>
+> ### Achsenzahlen
+>
+> | Zeile | steht im Audit | Ist heute | Beleg (ce) |
+> |---|---|---|---|
+> | `:113` | „Achse = Organ … **19** (SearchAlgorithm)" | **18** | `builder/experiment_tree/axis_path_serialization.hpp:40` |
+> | `:117` | „SA **19**, Set **15**, Sequence **11**, Adapter **13**, View **7**" | **18 / 13 / 9 / 11 / 5** | `builder/experiment_tree/genus_binding_traits.hpp:48`, `:102`, `:132`, `:74`, `:160` |
+> | `:142` | „Autoritative Zahl **19** = `kV3AxisCount`" | `kV3AxisCount = **18**` | `anatomy/observable_tier.hpp:50` |
+> | `:182-183` | „`axis_stats[19][8]` + `seg_ns[19]`" | `[18][8]` + `seg_ns[18]` | `observable_tier.hpp:141-142` |
+> | `:111` | „`enum AnatomyGattung` — 3: **SearchAlgorithm** · Container · Graph" | Enumerator umbenannt zu **`Map = 0`** (E-24 C7-1, 04.08.); Zahlenwert und Reihenfolge unangetastet | `anatomy/anatomy_base.hpp:49-57` |
+> | `:119-120` | „**nur die SearchAlgorithm-Unterklasse ist voll gebaut**, die uebrigen 4 existieren als `GenusBindingTraits`" | **ueberholt** -- alle fuenf Genera haben ein Pruef-Dock; Set hat native ABI | `builder/pruef_dock/{set,sequence,adapter,view}_dock.hpp` |
+>
+> **Weiterhin korrekt (nicht anfassen):** `:63-65`, `:153` die Direktive „Anatomy-ABI orthogonal zur
+> Observer-Schnittstelle" · `:140-144` die 26 Registry-Achsen mit 3 build-only · `:116`, `:121-122`
+> `gattung_of()` und die Zoologie-Bruecke · `:216` „`enum AnatomyGenus` neutral, **bleibt**" --
+> heisst tatsaechlich weiterhin so · `:319` „bewusst belassen: `thesis_tiere/`" -- das Verzeichnis
+> besteht fort (30 Dateien).
+>
+> **Ungeprueft:** `:145-147` die Zaehlung „74 Tag-Structs + 54 Strategy-Concepts + 151 Wrapper" --
+> nicht nachgezaehlt. `:239-243` die prt-art-Haelfte (`multi_level_layout.hpp`, `CacheTier`,
+> `TierBudget`) -- das prt-art-Submodul ist in diesem Arbeitsbaum nicht ausgecheckt; **die ce-Seite
+> ist nachweislich unveraendert**, die prt-art-Seite konnte ich nicht pruefen.
+>
+> ---
+
 > **Status:** AUTORITATIVE GRUNDLAGE für die codebasis-weite Auflösung des doppeldeutigen Wortes
 > „Tier". Erstellt 2026-06-15 aus einem 4-Strang-Groß-Audit (Konzeption / Achsen / Anatomie /
 > prt-art) + Lektüre von Aufgabenstellung & Einleitung + sechs User-Festlegungen.

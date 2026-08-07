@@ -1,5 +1,86 @@
 # F12(iii) — ABI-GRENZEN-DESIGN-VORLAGE (koordinierter Anatomy-Major 4→5)
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DER BRUCH, DEN DIESE VORLAGE PLANT, IST VOLLZOGEN -- UND DREIMAL UEBERHOLT
+>
+> **Diese Vorlage ist ein Bauplan im Futur. Der Bau hat stattgefunden.** Der Titel-Bruch „Major 4→5"
+> wurde noch **am Tag der Erstellung** (2026-07-17, Bau-INC-2b, TABU-GO) vollzogen; seither ist
+> dreimal weiter gebumpt worden. Wer die Vorlage heute als offene Auflage liest, plant einen Bruch,
+> der vier Majors zurueckliegt. **Die Vorlage bleibt als Design-Begruendung wertvoll -- als Zustands-
+> beschreibung nicht.** Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> **Warum hier ein Vermerk noetig ist, an vergleichbaren Stellen aber nicht.** Ein Dokument, das
+> einen alten ABI-Stand **als den damaligen** nennt, ist gesund und braucht keinen Vermerk. Diese
+> Vorlage tut an zwei Stellen etwas anderes:
+> - `:11-12` schreibt woertlich **„Verifiziert (Ist): `COMDARE_ANATOMY_ABI_MAJOR 4`"**. Das Wort
+>   **„(Ist)"** gibt den Wert als *heute geltenden Zustand* aus, nicht als Zeitschnitt.
+> - `:8-9` formuliert ein **offenes Gate**: „sie wird erst mit koordiniertem **4→5-GO** vollzogen."
+>   Ein Gate im Futur liest sich als ausstehende Auflage, die es nicht mehr ist.
+>
+> Die reinen Delta-Angaben dieses Dokuments (der geplante Umbau 4→5 als solcher, die Marker-Tabellen
+> unter ABI-5) bleiben davon unberuehrt und sind **nicht** zu korrigieren: sie sind der historische
+> Wert des Dossiers.
+>
+> ### Der ABI-Verlauf
+>
+> | Bruch | Anlass | Beleg (`abi/anatomy_module_abi_v1_decl.hpp`) |
+> |---|---|---|
+> | **4 → 5** | Bau-INC-2b, 2026-07-17, TABU-GO -- **genau das Buendel dieser Vorlage** (F12iii + F1b + F2 + #37) | `:46` |
+> | 5 → 6 | Bau-INC-2d, 2026-07-18, isa-Herausloesung | `:52` |
+> | 6 → 7 | STRUKT-R ORG-18, 2026-07-26, `persistence_target` als 18. Organ-Achse | `:57` |
+> | 7 → 8 | E-24 C8, 2026-08-04, Ebene-1-Gattung wird ABI-Flaeche | `:65` |
+>
+> Ist heute: **MAJOR 8**, MINOR 0, Magic `.A8.` (`:89`, `:90`, `:92`).
+>
+> ### Die Anker im Einzelnen
+>
+> | Zeile | steht in der Vorlage | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|---|
+> | `:8-9` | „ABI-Major 4→5 … sind TABU … wird erst mit koordiniertem **4→5-GO vollzogen**" | GO erteilt, Bump vollzogen (17.07.) | `anatomy_module_abi_v1_decl.hpp:46` |
+> | `:11-12` | „Verifiziert (Ist): `COMDARE_ANATOMY_ABI_MAJOR 4`, Magic `.A4.`; Diagnose-Format = 5" | MAJOR **8**, Magic **`.A8.`**, Diagnose-Version **8** | `:89`, `:92`; `anatomy/observable_tier.hpp:174` |
+> | `:86-88` | „Neue Marker: `COMDARE_ANATOMY_ABI_MAJOR 5`, Magic `.A5.`" | uebersprungen; ausserdem steht das `#define` heute auf `:89`, nicht `:43` | `:89` |
+> | `:111` | „`ComdareTierObserverSnapshot` (POD, **`sizeof==1416`**)" | **1344** (`static_assert`) | `observable_tier.hpp:168` |
+> | `:128` | „`FullSourceCatalog = CatalogAxes<4,4,5,4>`" | `FullSourceCatalog` = **2^17 = 131072**; die 320er-Semantik heisst heute `golden_320_catalog` | `profile_facade/source_catalog.hpp:139`, `:144` |
+> | `:129-130` | „**19 Kompositions-Achsen L00..L18** … die uebrigen **15** Slots gepinnt" | **18 Achsen L00..L17**; im 320er-Katalog **14** gepinnt | `source_catalog.hpp:95-118`, `:144` |
+> | `:140-142` | „`kCompositionAxisNames` hart auf **19**; Set **15** / Sequence **11**" | **18**; Set **13** / Sequence **9** | `builder/experiment_tree/axis_path_serialization.hpp:40`; `genus_binding_traits.hpp:102`, `:132` |
+> | `:171` | „`SearchAlgorithmAnatomy` … **19**" | **18** | `anatomy/composition_factory.hpp:104` |
+> | `:131-132` | „Jeder der 320 Pfade traegt fix `isa=isa_amd64` und `telemetry=…`" | **Beide Segmente sind aus der binary_id verschwunden** (telemetry ab ABI-5, isa ab ABI-6). Die Fixture besteht fort, plus die Historien-Freezes `_abi4/_abi5/_abi6.txt` | `axis_path_serialization.hpp:27-31`; `tests/unit/thesis_tiere/` |
+>
+> ### Die eigene KORREKTUR-Box `:65-70` ist selbst ueberholt -- und trifft die dokumentierte Falle
+>
+> Sie erklaert den „massgeblichen Stand" zu `axis_stats[18][8]`, `kV3AxisCount == 18`,
+> `sizeof 1416 → 1344`. **Die Zahlen stimmen zufaellig, der Achsen-Satz nicht:** der heutige
+> 18er-Satz enthaelt `persistence_target`, **nicht** mehr `isa`. Zudem ist
+> `kTierObserverSnapshotVersionUnified` heute **8**, nicht 6. Der Code warnt genau davor:
+> `observable_tier.hpp:166-167` -- *„1344 gab es schon einmal (INC-2c, 18 Achsen INKLUSIVE isa);
+> die Unterscheidung leistet ausschliesslich der Major."* (`T10 = value_handle` stimmt.)
+>
+> ### Vollzugs-Marken der Increment-Liste
+>
+> - `:195-197` **INC-0** DLL-Load-Fix Option B -- **VOLLZOGEN.** `link_libs`-Parameter
+>   (`builder/build_orchestrator/build_orchestrator.hpp:880`, `:911`) und Fassaden-Bake
+>   (`profile_facade/CMakeLists.txt:198-211`).
+> - `:207-212` **INC-2** (der koordinierte 4→5-Bruch) -- **VOLLZOGEN** als Bau-INC-2b, 17.07.
+> - `:26`, `:83`, `:173` **F2** Set-ABI (`ISetTier` + POD + `SetDock`) -- **GEBAUT**, dazu
+>   `ISetTierV2` und `ISetAlgebraTier` (ABI-8): `anatomy/set_tier.hpp`, `set_tier_v2.hpp`,
+>   `set_tier_algebra.hpp`; `builder/pruef_dock/set_dock.hpp`.
+> - `:25` **F1b** Set-Ebene-1-Promotion -- **anders vollzogen**: Set blieb Genus unter Container,
+>   bekam aber native Komposition, Anatomie, Observer und eigene ABI. Der Header erklaert die
+>   Ebene-1-Promotion ausdruecklich fuer **gegenstandslos** (`anatomy/anatomy_base.hpp:94-98`).
+> - `:218` **INC-4** -- Sequence/Adapter/View/Set-Docks gebaut (E-24 C4). **Graph bleibt offen**
+>   („Stub, noch kein Genus implementiert, Q5 nach Abgabe", `anatomy_base.hpp:57`).
+> - `:203-204` `-march`/`-mavx`-Luecke -- **GEHEILT** (`opt_flag`, `build_orchestrator.hpp:881`).
+> - `:156`, `:216` „neue eingefrorene Fixtures **je Gattung** (`golden_abi5_map_/_set_/_sequence_`)"
+>   -- **so nicht gebaut.** Die Messdaten-Erhaltung lief ueber Major-nummerierte Freezes
+>   (`golden_fullpilot_320_binary_ids_abi4/5/6.txt`); fuer ABI-7 und ABI-8 entfiel der Freeze
+>   bewusst, weil sich die binary_id nicht bewegte.
+>
+> **Weiterhin offen (Vorlage hat recht):** `:112`, `:205` das AVX10-Versionsfeld in
+> `BuildVariantDefinitionV1` -- null Treffer fuer `avx10` in `include/cache_engine/abi/`.
+>
+> ---
+
 Stand 2026-07-17. Basis = USER-KONSTRUKTIONS-MODELL 2026-07-17 (autoritativ).
 Schwester-Dokument: `KONSTRUKTIONSLOGIK.md` (definiert Achsen/Gattungen/Prüf-Dock/DLL-Load).
 Diese Vorlage ist die **Design-Grundlage** für den einen koordinierten ABI-Bruch; sie entscheidet

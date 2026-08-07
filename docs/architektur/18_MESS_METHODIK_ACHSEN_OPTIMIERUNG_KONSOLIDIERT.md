@@ -16,6 +16,7 @@
 > | Aussage im Dossier | Ist-Stand 07.08. | Beleg (ce) |
 > |---|---|---|
 > | `:104` TABU „**ABI-MAJOR (==4)**" | **8** (Minor 0) | `abi/anatomy_module_abi_v1_decl.hpp:89`, `:90` |
+> | `:144` R9-Bezugszeile „TABU ohne GO … **ABI-MAJOR==4** …" | **dieselbe Zahl ein zweites Mal.** Der R9-Nachtrag wiederholt die TABU-Liste und schreibt die 4 damit fort -- wer nur den Nachtrag liest (weil er neuer aussieht), uebernimmt sie erneut | ebd. |
 > | `:104` TABU „POD-`sizeof`" (1416 gemeint) | **1344** | `anatomy/observable_tier.hpp:168` |
 > | `:23` „Anzahl **~19 (T0-T18)**" | **18** (T0..T17) | `anatomy/composition_factory.hpp:104` |
 > | `:116` „**T11 value_handle**" | value_handle ist **L10**; L11 ist `index_organization` | `profile_facade/source_catalog.hpp:104-107` |
@@ -26,21 +27,21 @@
 >
 > - `:82` Roadmap-Zeile „**M1 System-Achsen-Wurzel (Blut)** — gemeinsame abstrakte Basis" und `:30`
 >   „das System-Achsen-System liegt nur **fragmentiert** vor, ohne gemeinsame abstrakte Wurzel"
->   — **GEBAUT.** Wurzel, Regime-Trennung und Registry existieren:
+>   -- **GEBAUT.** Wurzel, Regime-Trennung und Registry existieren:
 >   `include/cache_engine/measurement/system_axis.hpp`, `.../i_measurement_source.hpp`,
 >   `.../measurement_axis_registry.hpp`; dazu der Generator `tools/system_axis_registry_gen/`.
 > - `:116` „**#221-Rest (Setter fehlen = Phantom):** T6 allocator, T8 concurrency, T1 cache_traversal,
 >   T11 value_handle" und `:131` „2' (#221 ehrlich neu) = genau T6/T8/T1/T11 verdrahten"
->   — **VOLLZOGEN.** Alle vier sind verdrahtet: `anatomy/abi_adapter.hpp:473-496`;
+>   -- **VOLLZOGEN.** Alle vier sind verdrahtet: `anatomy/abi_adapter.hpp:473-496`;
 >   `batch_size` als Fenster-Semantik `:1392-1401`.
-> - `:115` „T7 prefetch — **einzig vollstaendig verdrahtet**" — **nicht mehr „einzig"**; vier weitere
+> - `:115` „T7 prefetch — **einzig vollstaendig verdrahtet**" -- **nicht mehr „einzig"**; vier weitere
 >   Felder sind verdrahtet, `thread_count` mit ausgewiesener honest-0-Grenze (`abi_adapter.hpp:467-473`).
 >
 > **Weiterhin korrekt (nicht anfassen):** `:143` die golden-320-Herleitung 4x4x5x4 = 320
 > (`profile_facade/source_catalog.hpp:144` + `static_assert :172`) · `:122` die
 > `cacheline_policy_selector`-Ableitung samt honest-0-Aussage
 > (`builder/cacheline_policy/cacheline_policy_selector.hpp:67`, `:172-173`) · `:105` das Prinzip
-> „honest-0 > Phantom" — im Code weiterhin gelebt und ausdruecklich dokumentiert · die Zahl **16**
+> „honest-0 > Phantom" -- im Code weiterhin gelebt und ausdruecklich dokumentiert · die Zahl **16**
 > der Mess-Kategorien.
 >
 > ---

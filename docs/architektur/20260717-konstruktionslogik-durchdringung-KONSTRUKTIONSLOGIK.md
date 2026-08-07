@@ -1,5 +1,90 @@
 # KONSTRUKTIONSLOGIK — comdare-cache-engine (DEFINITIV)
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DER MODELL-TEIL GILT, DER IST-TEIL IST VIER ABI-MAJORS ALT
+>
+> **Das Wort „DEFINITIV" im Titel bezieht sich auf das Konstruktions-MODELL -- nicht auf die
+> Code-Kartierung.** Genau die ist veraltet. Das Dokument sagt von sich, es „kartiert das Modell
+> gegen den Ist-Code (datei:zeile) und markiert jedes Delta" (`:4-5`); mehrere dieser Deltas sind
+> inzwischen geschlossen, und die Kartierung nennt durchgehend 19 Achsen und ABI-Major 4.
+> Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> ### ABI: der im Dokument als bevorstehend gefuehrte 4→5-Bruch ist vollzogen -- und dreimal ueberholt
+>
+> `:10` „TABU (Golden/ABI-Major) nur mit koordiniertem **4→5-GO**", `:181-182` „**ABI-Major = 4**
+> (verifiziert)", `:194` „**ABI-Major noch 4**, kein 4→5", `:180` Magic `.A4.` -- alle vier sind
+> ueberholt. Ist: **ABI-MAJOR 8**, Minor 0, Magic `.A8.` = `0x434F4D444141382E`
+> (`abi/anatomy_module_abi_v1_decl.hpp:89`, `:90`, `:92`).
+>
+> Der belegte Verlauf, alles im selben Header:
+>
+> | Bruch | Anlass | Beleg |
+> |---|---|---|
+> | 4 → 5 | Bau-INC-2b, **2026-07-17**, TABU-GO (das Buendel, das F12iii vorbereitete) | `:46` |
+> | 5 → 6 | Bau-INC-2d, 2026-07-18, isa-Herausloesung | `:52` |
+> | 6 → 7 | STRUKT-R ORG-18, 2026-07-26, `persistence_target` als 18. Organ-Achse | `:57` |
+> | 7 → 8 | E-24 C8, 2026-08-04, Ebene-1-Gattung wird ABI-Flaeche | `:65` |
+>
+> Das Dokument entstand also **am Tag des ersten dieser vier Brueche** -- sein ABI-Stand war schon
+> bei Erstellung im Begriff zu kippen.
+>
+> ### Achsenzahlen: durchgehend 19, Ist ist 18
+>
+> | Zeile | steht im Dokument | Ist heute | Beleg (ce) |
+> |---|---|---|---|
+> | `:44-45` | „**19 Organ-Achsen** = Slots T0..T18" | **18**, T0..T17 | `anatomy/composition_factory.hpp:104` |
+> | `:46-49` | „`kCompositionAxisNames` … `array<…,19>`: … telemetry, value_handle, **isa**, …" | `array<…,**18**>`; **telemetry und isa sind raus**, `persistence_target` ist neu als T17 | `builder/experiment_tree/axis_path_serialization.hpp:40-43` |
+> | `:52-54` | „`static_assert(sizeof...(Vs)==19)`" | **== 18** | `composition_factory.hpp:104` |
+> | `:55-56` | die binary_id endet auf `queuing_q2=<V18::name()>` | endet auf `persistence_target=<V17::name()>` | `axis_path_serialization.hpp:58-60` |
+> | `:115` | Genus-Slots „SA=**19**, Adapter=**13**, Set=**15**, Sequence=**11**, View=**7**" | **18 / 11 / 13 / 9 / 5** | `builder/experiment_tree/genus_binding_traits.hpp:48`, `:74`, `:102`, `:132`, `:160` |
+> | `:170-173` | „`axis_stats[19][8]` + `seg_ns[19]` … `sizeof==1416`" | `[18][8]`, `seg_ns[18]`, **sizeof 1344** | `anatomy/observable_tier.hpp:141-142`, `:168` |
+> | `:270` | „`COMDARE_DEFINE_ANATOMY_MODULE_ADHOC(<19 FQ-Typen>)`" | **18** | `composition_factory.hpp:104` |
+>
+> ### Gattungs-Vokabular: der Enumerator wurde umbenannt
+>
+> `:105-106` „Ebene 1 `AnatomyGattung` … **NUR 3**: `SearchAlgorithm=0`, `Container=1`, `Graph=2`" --
+> der Enumerator heisst seit E-24 C7-1 (04.08.) **`Map = 0`**; der Zahlenwert 0 blieb unangetastet,
+> die Enum-Reihenfolge ist TABU (`anatomy/anatomy_base.hpp:49-57`). Ebene 2 heisst weiterhin
+> `AnatomyGenus::SearchAlgorithm` -- **das Genus** heisst so, nicht die Gattung. Damit ist auch
+> `:127` („User-,Gattung' == Code-`AnatomyGenus`") ueberholt: „Gattung" ist im finalen Owner-Modell
+> eindeutig Ebene 1.
+>
+> ### Vollzugs-Marken -- als Delta gefuehrt, inzwischen geschlossen
+>
+> - `:249-250` „**Es gibt heute keinen benannten Experiment-Planer-Dock** (grep = leer)" --
+>   **ES GIBT IHN.** Ganzes Planer-Verzeichnis `profile_facade/planner/` (u.a.
+>   `experiment_plan_director.hpp`, GoF Director/Builder) plus eigene Binary
+>   `apps/experiment_planner/CMakeLists.txt:13`.
+> - `:305-312`, `:356-365` DLL-Load-Bruch, „**Kein `-l`, kein Archiv**; `BuildJob` traegt **kein
+>   Link-Input-Kanal**" und der dort vorgeschlagene Fix Option B -- **BEIDE PUNKTE GEBAUT.**
+>   `make_gpp_compile_fn` hat einen `link_libs`-Parameter
+>   (`builder/build_orchestrator/build_orchestrator.hpp:880`, Anhang nach der Quelle `:911`), und die
+>   Fassade backt die Archiv-Pfade (`profile_facade/CMakeLists.txt:198-211`,
+>   `COMDARE_FACADE_PERM_LINK_LIBS`).
+> - `:191-192` „Nur 1 von 3 Gattungs-Docks; Set/Sequence/Adapter/View kommen mit V42" --
+>   **FUENF Docks.** Der zitierte Satz ist im Code selbst als „UEBERHOLT, steht nur noch als
+>   Historie" markiert (`builder/pruef_dock/pruef_dock_registry.hpp:11-19`).
+> - `:215-219`, `:235-236` „`build_all_axis_levels` reflektiert 26 Achsen **flach**, **es fehlt die
+>   Schichtung**; Andockpunkt: abspalten in `build_system_axis_levels()`" -- **GEBAUT**
+>   (`builder/experiment_tree/registry_to_axis_levels.hpp:144-151`).
+> - `:226` „`make_gpp_compile_fn` hat **KEIN `-march`/`-mavx`**" -- **GEHEILT**, `opt_flag`-Parameter
+>   (`build_orchestrator.hpp:881`, `:895`).
+> - `:300-304`, `:348`, `:364` verweisen auf `tools/permutation_codegen/codegen.cmake:584` usw. --
+>   **dieses Verzeichnis existiert nicht mehr.** (`find` ueber den ganzen ce-Baum: kein
+>   `codegen.cmake`; `tools/` enthaelt 16 andere Werkzeuge.) Neuer Ort der Aussage:
+>   `cmake/adhoc_emitter.cmake:141` (`add_library(${_target} SHARED …)`), `:165`.
+>   Die konkreten Zeilenverweise `:584`/`:594`/`:607-632` sind damit belegfrei.
+>
+> **Weiterhin korrekt (nicht anfassen):** `:21`, `:39-40` `topics::AxisBase` samt
+> `AxisBaseConcept` · `:74-77`, `:83` das Mimalloc-CRTP-Muster · `:88-90` die MP11-Registry-Form
+> („26 Vendor", `axes/alloc/axis_06_allocator_registry.hpp:99`) · `:156-160` `ComdareResourceControlV1`
+> mit 6 Membern und die beiden RC-Methodennamen · `:138`, `:146` `IPruefDock` ·
+> `:313-315` `dlopen(RTLD_NOW|RTLD_LOCAL)` (`abi/module_loader.hpp:26`, Zeile exakt getroffen) ·
+> `:286-289` das AVX10-Delta ist **weiterhin offen**.
+>
+> ---
+
 Stand 2026-07-17. Basis = USER-KONSTRUKTIONS-MODELL 2026-07-17 (autoritativ, Ledger §12-Kopf).
 Diese Datei ist die durchdrungene, code-belegte Konstruktionslogik: sie ENTSCHEIDET NICHT neu,
 sondern kartiert das Modell gegen den Ist-Code (datei:zeile) und markiert jedes Delta.

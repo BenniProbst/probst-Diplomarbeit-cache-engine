@@ -1,5 +1,41 @@
 # queuing-Topic: Achsen-Eigenschaften (V41.F.6.1 Pilot, 2026-05-26)
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DER „PILOT"-RAHMEN DIESES DOKUMENTS IST UEBERHOLT -- DER VOLLAUSBAU IST DA
+>
+> **Die Achsen-Eigenschafts-Systematik (7 Pflicht-Properties, Edge-Case-Denken, Zero-Cap) gilt
+> weiter. Der Pilot-Rahmen und alle Zahlen nicht.** Dieses Dokument beschreibt einen Pilot-Zustand
+> mit 4 bzw. 3 Auspraegungen; Q1 und Q2 sind beide im Vollausbau. Belege gegen ce `ba069e38`
+> (identisch in `ab0b352e`).
+>
+> | Zeile | steht im Dokument | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|---|
+> | `:4` | „**Vorlage:** Allocator-Achse 6 (**24 Vendor**, 7 Pflicht-Properties)" | **26 Vendor.** Nach Batch 1-8 kamen `PoolResourceAllocator` (R5.B) und `VampirNfpAllocator` (P33) dazu. Die **7 Pflicht-Properties stimmen** | `axes/alloc/axis_06_allocator_registry.hpp:99` (Selbstauskunft „KOMPLETT (26 Vendor …)") |
+> | `:16-19` | „`axis_q1_queuing` … Pilot **4** … Vollausbau **13** (Q01-Q13 + LF-MPMC)" | **14 Strategien**, Vollausbau erreicht (Batch 5) | `topics/queuing/axis_q1_queuing/axis_q1_queuing_registry.hpp:37` („KOMPLETTE Liste aller 14 W2-Strategien") |
+> | `:16-19` | „`axis_q2_queuing` Pilot **3** … Vollausbau **5**" | **5 Policies**, Vollausbau erreicht (Batch 2) | `.../axis_q2_queuing/axis_q2_queuing_registry.hpp:20` |
+> | `:178-180` | „Pilot Cartesian 4 x 3 = **12**"; „Vollausbau 13 x 5 = **65**" | **14 x 5 = 70.** Die 65 zaehlt „13 + LF-MPMC" als 13 | beide Registries, s.o. |
+> | `:5` | „**Tests:** 81/81 standalone gruen" | **Zahl gilt nicht mehr.** `tests/unit/test_v41_topic_queuing.cpp` traegt heute 39 Test-Makros, davon **20 TYPED_TEST**, die ueber `AllStrategies`/`AllPolicies` laufen statt ueber 4/3 Pilot-Typen -- die Fallzahl ist entsprechend ein Vielfaches. **Die exakte heutige Zahl habe ich nicht ausgefuehrt (kein ctest-Lauf) -- sie ist hier ungeprueft** | `tests/unit/test_v41_topic_queuing.cpp:33`, `:37`, `:289`, `:293` |
+> | `:233-245` | §7-Tabelle „Q1BufferStrategyTest 8 x 4 = 32 … Q2 5 x 3 = 15" | dieselbe Ursache: die Multiplikatoren 4 und 3 sind die Pilot-Zahlen | ebd. |
+> | `:200-224` | §6-Dateibaum | **Pfad-Praefix `libs/cache_engine/topics/queuing/` korrekt**, zwei Drifts: `axis_q2_queuing_subaxes_fs1_to_fs**3**.hpp` heisst heute `…_fs1_to_fs**4**.hpp`; neu und im Baum fehlend: `axis_q1_queuing_axis_storage.hpp`, `axis_q1_queuing_original_concurrentqueue.hpp`, `axis_q2_queuing_strategy_base.hpp` | `topics/queuing/axis_q2_queuing/axis_q2_queuing_subaxes_fs1_to_fs4.hpp` |
+>
+> ### Namens-Warnung: „Q2" heisst hier etwas anderes als im Systemachsen-Entscheid
+>
+> Es gibt einen Owner-Entscheid **„Q2 = Erweiterungshardware = sechste Systemachse"**. **Der meint
+> nicht die Q2 dieses Dokuments.** Im Code sind Q1/Q2 unveraendert die queuing-**Organ**-Achsen
+> (Buffer-Strategy / Flush-Policy), Slots L15/L16 der binary_id-bildenden Komposition
+> (`profile_facade/source_catalog.hpp:111-112`). Erweiterungshardware lebt in einem eigenen
+> `AxisKind`-Zweig unter dem `external_utils`-Hub (`topics/axis.hpp:17-25`) und ist ausdruecklich
+> von `organ` getrennt. **Die Aussagen dieses Dokuments bleiben gueltig; wer „Q2" aus dem
+> Systemachsen-Entscheid hierher liest, landet in der falschen Achse.**
+>
+> **Ungeprueft:** `:184-194` §5 Cross-Constraints („TODO Batch 5+, heute noch nicht enforced") --
+> in den Q1/Q2-Registries kein Constraint-Praedikat gefunden, die PermutationEngine-Seite habe ich
+> nicht durchsucht. Bemerkenswert: Batch 5 ist beim Q1-Vollausbau erreicht, das TODO-Fenster ist
+> also ueberschritten. Ebenso ungeprueft: `:2.5`/`:3.5` die Edge-Case-Werte Wert fuer Wert.
+>
+> ---
+
 **Stand:** 2026-05-26 nach Naming-Refactor + Edge-Case-Tests + Zero-Cap-Fix
 **Vorlage:** Allocator-Achse 6 (24 Vendor, 7 Pflicht-Properties)
 **Tests:** 81/81 standalone gruen

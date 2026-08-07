@@ -1,5 +1,75 @@
 # 23 — SYSTEMACHSEN-KONZEPT: WIEDERHERSTELLUNGS-DOSSIER (F4/F3i, 2026-07-16)
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: DIES IST EIN REPARATUR-BAUPLAN, KEIN IST-STAND -- DIE REPARATUR IST GEBAUT
+>
+> **Die Systematik (System- vs. Organ-Achsen, Mess-Wurzel, Haupt-/Unter-Struktur) gilt weiter.
+> Der Befund-Teil nicht.** Praktisch die gesamte Roadmap §6 (S-1 bis S-6) ist inzwischen ausgefuehrt
+> -- die Registry zitiert dieses Dossier sogar woertlich als Auftrag ihrer eigenen Reparatur
+> (`builder/commands/axis_library_registry.hpp:120-131`). **Wer das Dokument heute als Ist-Stand
+> liest, haelt fuer „TODO", was gebaut ist, und fuer „existiert nirgends", was in ueber 60 Dateien
+> lebt.** Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> ### Die Zahl, um die es geht: DREI System-Haupt-Achsen
+>
+> Das Dossier baut sein SOLL aus „16 Mess-Kategorien + 4 Pflicht + 1 Compiler" (`:91`, `:130-144`)
+> und nennt die Compiler-Achse „strukturell die **fuenfte**" (`:142`). Diese Rechnung traegt nicht
+> mehr. Ist heute:
+>
+> **`target_isa` · `operating_system` · `external_utils`** -- hart gepinnt in
+> `abi/system_axis_order.hpp:37`, `:42-46` und `abi/system_axis_code_versions.hpp:38`
+> (`kSystemAxisCodeCount = 3`), gesichert durch Drift-Wachen und Index-Selbsttests.
+>
+> Die Historie steht im Header selbst (`system_axis_order.hpp:12-22`): A1 legte **fuenf** an
+> (compiler, external_utils, target_isa, scheduling, load_framework), **A3 setzte 5 → 3**. Die drei
+> Abgaenge sind Umzuege, keine Streichungen, per `static_assert` gegen stille Rueckkehr gesichert
+> (`:102-110`): `compiler` wurde Unter-Achsen-Gruppe der aeusseren Komplex-Achse, `scheduling` wurde
+> sub_axis am `target_isa`-Wrapper, `load_framework` ging in den Mess-Realm.
+>
+> **Der Owner-Entscheid „Q2/Erweiterungshardware = die sechste Systemachse" ist im Code angekommen
+> -- und seither zweimal ueberholt.** Kette: er landete am 17.07.
+> (`measurement/extension_hardware_system_axis.hpp:1-2`, „6. CEB-Konfig-System-Achse, Q2-Ruling
+> Option C"), wurde am 18.07. zur DEPRECATED-Insel (`:4-10`, „NICHT LOESCHEN, endgueltige Entfernung
+> ist user-gated"), und sein lebender Nachfolger heisst nach dem A2-Rename **`external_utils`**
+> (`measurement/external_utils_family_axis.hpp`). Wer heute nach „Q2" oder „Erweiterungshardware"
+> sucht, findet die tote Insel und uebersieht den lebenden Knoten.
+>
+> ### Vollzugs-Marken -- was als „fehlt/existiert nirgends" gefuehrt wird und gebaut ist
+>
+> | Zeile | Aussage im Dossier | Ist-Stand 07.08. | Beleg (ce) |
+> |---|---|---|---|
+> | `:71-72` | „Eine SYSTEMACHSEN-Auspraegung existiert **nirgends** (grep-Befund: Treffer nur in 3 Dateien)" | **66 Dateien** tragen `system_axis`/`SystemAxis`; es existiert eine komplette zweite Familie `CebSystemAxis` neben der Mess-Wurzel | `measurement/ceb_system_axis.hpp:21`; `abi/system_axis_order.hpp:42-46` |
+> | `:137-139` | „**Pflicht-Systemachsen (TODO):** Scheduling, Hardware, NUMA, Locking — keine Code-Stelle modelliert sie" | **3 von 4 gebaut** (Scheduling, Hardware/ISA, NUMA). **Locking bleibt ungebaut** -- das ist der einzige der vier, bei dem das Dossier weiterhin recht hat | `measurement/scheduling_system_axis.hpp:31`; `.../target_isa_system_axis.hpp`; `.../numa_cpu_pin_process_probe*.hpp` |
+> | `:140-144` | „**Compiler-Systemachse (TODO, NEU)**" | **GEBAUT**, heute Unter-Achsen-Gruppe `build_toolchain` der aeusseren Komplex-Achse | `measurement/compiler_system_axis.hpp:24`; `.../ceb_complex_system_axis.hpp:59` |
+> | `:563-571` | „**KERNBEFUND:** Der Filter ist **UNVERDRAHTET** — einziger Konsument ist `test_d15`" | **VERDRAHTET.** `resolve_selection` sitzt an den Selektions-Bau-Naehten **beider** offizieller Einstiege | `profile_facade/profile_run_entry.hpp:757`, `:809`, `:874`; `.../experiment_run_entry.hpp:429`; Naht `builder/experiment_tree/selection_filter_chain.hpp:103` |
+> | `:541-547` | „Ein Executable mit der Aufgabe ‚Experiment PLANEN' **existiert nicht**" | **EXISTIERT** als eigene Binary plus achtteilige Lib-Schicht | `apps/experiment_planner/CMakeLists.txt:13` (`add_executable(comdare_experiment_planner main.cpp)`); `profile_facade/planner/` |
+> | `:272`, `:279`, `:300-301` | „Registry-Reparatur (4/4 Phantom-Enumeratoren)", „PHANTOM-SYMBOL", „Enum `NumaAffinity` existiert nicht" | **REPARIERT** -- mit woertlichem Verweis auf *dieses* Dossier | `builder/commands/axis_library_registry.hpp:120-131`, `:174-192` |
+> | `:326`, `:509-513` | „Registry-Achse 14 … **Spannungsfeld** zum User-Diktum, Klaerung = Fork S-3" | **ENTSCHIEDEN und etikettiert** („Betriebswahl != Pruefstufe") | `axis_library_registry.hpp:327-333` |
+> | `:384`, `:617` | „**PFLICHT-Stamp-Bump resume-v5 → v6**" (als kuenftige Auflage) | **VOLLZOGEN** | `builder/experiment_tree/cache_engine_builder_iterator.hpp:1029` (`kLazyResumeStampFormat[] = "resume-v6"`) |
+> | `:108-112` | „**KEINE Haupt-/Unter-Struktur im Code**" | **GEBAUT**: eigene Unter-Achsen-Wurzel `CebSubAxis` + generierte Registry-XML mit `<sub_axis>`-Ebenen | `measurement/ceb_sub_axis.hpp`; `measurement/system_axis_registry.xml` |
+> | `:117-122` | „die **heute fehlende** Auffaecherungs-Achse (Mess-Tooling)" | **GEBAUT**: 3-Eintraege-Registry plus die `ceb:build:[a,b,c]`-Strecken im Planer | `measurement/measurement_tooling_registry.hpp:34`; `planner/experiment_plan_director.hpp:503-532` |
+>
+> ### Kardinalitaeten
+>
+> `:91`, `:104`, `:181`, `:199`, `:460` fuehren **fuenfmal** „19 Komposition-Slots T0..T18".
+> Ist: **18** (T0..T17), davon 17 variierend, T17 `persistence_target` gepinnt --
+> `anatomy/composition_factory.hpp:104`; `builder/experiment_tree/axis_path_serialization.hpp:40`.
+> Auch der eigene Nachtrag `:213` („die Slot-Zahl 19→17 wird nicht hier nachgezogen") trifft nicht:
+> es sind 18, nicht 17.
+>
+> **Weiterhin korrekt (nicht anfassen):** `:91` die 16 Mess-Kategorien samt Zeilenanker
+> `measurement_category.hpp:10-27`, `:32` · `:363-364` die 320 eingefrorenen golden-ids ·
+> `:104` die 3 Build-Achsen · `:106`, `:289` der RC-POD mit 6 Feldern · `:271` „Locking existiert
+> NIRGENDS" · `:204`, `:285` `c11_scheduler_engine` weiterhin Skelett ohne Implementierung.
+>
+> **Zeilen-Drift (Inhalt vorhanden, Nummer wandert):** `system_axis.hpp:147-190` → `:193`, `:238` ·
+> `experiment_tree.hpp:266-288` → `:237`, `:281` · `build_orchestrator.hpp:466-489` → `:878` ·
+> `cache_engine_builder_iterator.hpp:559-613` → `:1022-1057` · `builder/adhoc_emitter.hpp` liegt
+> heute unter `builder/codegen/adhoc_emitter.hpp`.
+>
+> ---
+
 > **Auftrag:** 20-Seiten-Dossier zur Wiederherstellung des Systemachsen-Konzepts nach der
 > USER-KONZEPT-KLÄRUNG vom 2026-07-16 (LEDGER:368; „wir brauchen ein 20-Seiten-Dossier, um den
 > Überblick wiederherzustellen"). Erstellt read-only (einzige Schreiboperation = diese Datei);

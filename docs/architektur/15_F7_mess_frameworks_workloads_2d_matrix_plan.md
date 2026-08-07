@@ -4,6 +4,32 @@
 **Bezug:** Ledger-F7 (`docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:298` „die gesamte Matrix aller Mess-Frameworks × Workloads muss noch als Module mit feingliedriger Baseline-2D-Matrix-Struktur abstrahiert werden"), F14-Recherche (Task #30, ADDENDUM 2 Pkt 4), Diplomarbeit `thesis/…/kapitel/de/{03_messsystem_prtart,06_evaluation_methodology}.tex`.
 **Invarianz:** rein additiv, golden/ABI-neutral, INV-1..4-treu. Dieses Dokument definiert die 2D-Achsen und legt den Struktur-Fork offen; es nimmt KEINE Realisierung vorweg. `comdare-measurement-all` (metrics/pmc/workloads), die laufende Mess-Pipeline 286 und der ce-Monolith bleiben unberührt, bis ein konkreter Realisierungs-Increment (eigene Kadenz, ggf. User-GO) folgt.
 
+> ---
+>
+> ## ⚠️ STAND 2026-08-07: BELEGSTELLEN VERALTET
+>
+> **Der Plan (2D-Matrix-Zuschnitt, Struktur-Fork, Invarianz-Zusage) gilt weiter. Zwei Anker nicht.**
+> Belege gegen ce `ba069e38` (identisch in `ab0b352e`).
+>
+> | Aussage im Dokument | Ist-Stand 07.08. | Beleg |
+> |---|---|---|
+> | `:70` „golden_fullpilot_320 / conformance-Oracle / **ABI-4** unberuehrt" | ABI-MAJOR ist **8** | ce `abi/anatomy_module_abi_v1_decl.hpp:89` |
+> | `:16` „**Der committete** ce-`workload_matrix.hpp` … 36 Zellen compile-time" | **ENTFERNT.** Der G2-Revert ist vollzogen; `workload_matrix` hat im ce **null** Treffer (Datei und Inhalt). Die Praesens-Formulierung liest sich als Ist-Zustand und ist es nicht | Nullbefund nach Basisnamen-Suche ueber den ce-Baum |
+> | `:4` Ledger-Anker „**`…LEDGER.md:298`**" | **Zeile falsch.** `:298` traegt heute „## §2 BLOCKER — MUSS ZUERST KLAEREN". Das zitierte F7-Diktum steht verbatim bei **`:724`** | super `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:724` |
+> | `:13` Ledger-Anker „**`:371`**" | **Zeile falsch.** `:371` traegt „### §10.1 NOMENKLATUR-KONSOLIDIERUNG E0-E4"; das Zitat steht bei **`:797`** | ebd. `:797` |
+> | `:49` „F6-Doktrin (**Ledger:298**)" | derselbe falsche Anker wie `:4` | ebd. `:724` |
+>
+> **Weiterhin korrekt (nicht anfassen):** `:29` „der gleichnamige ce-Ort
+> `libs/cache_engine/builder/measurement_matrix/` ist ein **leeres Skelett**" -- trifft woertlich zu:
+> das Verzeichnis enthaelt nur `.gitkeep` und eine `CMakeLists.txt` ohne Quellen.
+> `:37`, `:55` der 6er-Datensatz-Kanon: die Loader sind gebaut
+> (`libs/common/measurement/dataset_loader/`).
+>
+> **Ungeprueft:** die Ist-Tabelle `:20-27` zu `comdare-measurement-all` -- diese Zellen liegen in
+> eigenen GitLab-Repos, in keinem der beiden Arbeitsbaeume.
+>
+> ---
+
 ## 0. E-EBENEN-KORREKTUR (Nachtrag 2026-07-09 — additiv, autoritativ)
 
 > **Bezug:** `docs/architektur/16_E1_E4_KONSOLIDIERUNG_DOSSIER.md` (Teil B.5 + D), Ledger `§10.1` + `:371`. Dieser Nachtrag ordnet die zwei Achsen dieses Plans **ebenen-richtig** in die E0-E4-Experiment-Maschinerie ein — der ursprüngliche Plan (Abschnitte 1-6) liest „Workload als dynamische Achse" teils als compile-time und rahmt M×W ohne E-Bezug. Additiv, golden/ABI-neutral; die Abschnitte 1-6 bleiben als measurement-all-**Modul-Organisations**-Sicht (Option A) gültig, werden aber durch die folgende E-Zuordnung präzisiert.
