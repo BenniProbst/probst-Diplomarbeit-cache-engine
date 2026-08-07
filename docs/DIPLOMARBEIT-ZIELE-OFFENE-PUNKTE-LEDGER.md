@@ -8375,3 +8375,104 @@ Dossier 17 TEIL D fuehrt eine EIGENE Phase-Nummerierung fuer die E4-XML-Roadmap.
 zweiten Nummerierung nennt C.3:51 die Limits-Entkopplung "Phase 3", die Roadmap-Tabelle "Phase 4".
 Beide Nummernkreise leben nebeneinander weiter. Empfehlung: die E4-XML-Roadmap kuenftig mit
 "XML-Phase n" ansprechen, den Fahrplan mit "Fahrplan-Phase n".
+
+---
+
+## NACHTRAG 07.08.2026 abend-2 — VIER ERKUNDUNGEN ZURUECK, ein OWNER-KERN, ein vergessener Posten
+
+### O-KERN 07.08. abends: INVALIDIERUNG IST DAS ZIEL
+Owner, verbatim: **"Wir WOLLEN den gesamten Bestand invalidieren, weil uns das spaeter das Leben
+erleichtert. Die Entscheidung fuer den Umbau steht"**
+
+Der Lead hatte den Grammatik-Bau an die Ruecwaertsvertraeglichkeit gefesselt (Argument: sonst
+werden alle 338 Bestands-Literale unparsbar). Die Fessel ist aufgehoben -- das Unparsbar-Werden
+ist der ZWECK. Folgen, bindend:
+- **Keine Uebergangs-Toleranz, kein Doppel-Parser, keine Migrations-Kruecke im neuen Code.**
+- **Die Massen-Migration ist ein EIGENES Paket** und darf den Umbau nicht aufhalten.
+- **Einzige Pflicht: der Bruch muss LAUT sein.** Ein Alt-Literal darf nie still zum Sentinel werden
+  und weiterlaufen -- es muss compile-time anschlagen. Ein stiller Sentinel ist eine
+  Alias-Identitaet, genau die Klasse, gegen die die B11-Wachen gebaut wurden.
+- **Der Zeitpunkt ist der guenstigste, den es je gibt:** Fenster 0 steht offen (null Binaries, null
+  .fingerprint-Dateien), ein Byte-Ereignis kostet JETZT nichts, spaeter 34,4 h Neubau.
+Gebucht als Memory `feedback_bestand_invalidieren_ist_gewollt_kein_migrationszwang`.
+
+### BEFUND 1 -- PHASE 4 ist TEILWEISE, mit zwei benennbaren Luecken (am Objekt geprueft)
+Die Verifikation hat die vier Vorstufen UND die vier Phasen der XML-Roadmap-Lesart am Code geprueft
+(nicht am Ledger-Zitat):
+- **Alle vier Vorstufen ERLEDIGT**: Lager-Rest-Welle (`f40dfb4b`), W10 (`51c012c5`), E-24/Major 7->8
+  (Objektbeleg `anatomy_module_abi_v1_decl.hpp:89`: `#define COMDARE_ANATOMY_ABI_MAJOR 8`, inzwischen
+  sogar Minor 0->1), A2-Eichung (`86be2420` ist Vorfahr von HEAD, 88 Commits zurueck).
+- **Phase 1 (#230 run_profile) ERLEDIGT** -- aber der produktive Aufrufer sitzt architektonisch in
+  **super** (`Code/02_messung_driver/main.cpp:1256`/`:1351`), nicht in ce `apps/`. Innerhalb ce
+  allein waere es nur TEILWEISE. `ExperimentDriver` ist dort auf Opt-in zurueckgestuft (`:1369`).
+- **Phase 2 (#221 RC-Setter) ERLEDIGT** -- `abi_adapter.hpp:437-498` traegt 5 reale Pfade.
+- **Phase 3 (#188 search_organ_) ERLEDIGT** -- 6 Treffer in 2 Dateien, ALLE sind Kommentare, die
+  die Entfernung dokumentieren. Null lebende Deklarationen.
+- **Phase 4 (#229-Kern) TEILWEISE** -- und hier liegt die Arbeit:
+  1. `comdare_attach_generated_catalog(...)` wird **ausschliesslich aus `tests/unit/CMakeLists.txt`**
+     aufgerufen (6 Fundstellen, alle Test-Targets). **Kein Produktions-Target** haengt daran.
+  2. `apps/adhoc_emitter/main.cpp:141-143` -- die `PilotEngine` ist weiterhin ein **handgeschriebenes**
+     18-Slot-Konstrukt (C0..C19 mit `mp::mp_list<Type>`), XML-unabhaengig.
+  3. `CatalogAxes` ist auf 18 Achsen generalisiert, aber `golden_320_catalog` bleibt ein
+     **handgetippter Literal-Alias** -- die 320-Semantik lebt als Literal, nicht als Ableitung.
+**=> Der Hauptstrang steht nicht "bei" der Grenze 3/4, sondern HINTER Phase 3 und MITTEN in Phase 4.**
+
+### BEFUND 2 -- DER EINZIGE ECHTE VERGESSENE POSTEN: allocators/*.profile.xml (DEG-AP6-A)
+Aus rund 30 eigenstaendig geprueften Plan-Straengen des Fensters 17.07.-07.08. ist genau EINER
+tatsaechlich durchgefallen -- durch ZWEI unabhaengige Entdeckungen (04.07. und 22.07.), ohne je im
+Ledger zu landen:
+- **23 Akten** `allocators/*.profile.xml` (`comdare_allocator_profile`) werden vom Parser NICHT
+  geladen -- `parse()` scannt nur `sota/` (`xml_config_parser.cpp:79-80`).
+- **Kein Commit:** `grep -rn "comdare_allocator_profile" libs/ builder/ apps/` = **0 Treffer**, heute
+  wie am 04.07. Der damals selbst spezifizierte Coverage-Gate-Test (ASSERT 23/23) existiert nirgends.
+- **Kein Ledger-Eintrag:** `grep -n "DEG-AP6"` ueber alle 8319 Zeilen = **0 Treffer**. Zum Vergleich:
+  der Schwester-Posten DEG-3 ist dreifach gefuehrt (Z. 5387/5540/5552).
+- **Gegenprobe bestanden:** die zwei benachbarten Familien `sota/` (33) und `load_profiles/` (21)
+  sind BEIDE aktiv verdrahtet. Nur `allocators/` ist die Ausnahme -- kein Suchbegriff-Artefakt.
+- **Wirkung:** keine Messung betroffen (reine Metadaten). Das Risiko ist ein stiller
+  **Abdeckungs-Anspruch ohne Code-Beleg** -- falls die Thesis "23/23 Allokator-SOTA" behauptet, ohne
+  dass ein Gate es je geprueft hat.
+**ENTSCHEID NOETIG:** Ledger-Zeile "Doku-only, Verdrahtung NACH Abgabe" ODER den fertig
+spezifizierten Coverage-Gate-Test nachbauen (~30 min laut damaliger Schaetzung).
+
+### BEFUND 3 -- FEHLRICHTUNG: der Ledger fuehrt vier Posten strenger als der Code hergibt
+`R3-R7/R9` des Nacht-Audits 22.07. stehen im Ledger (:5499/:5575) als "**UNBELEGT**, keine Codespur"
+im NACH-DER-ABGABE-Band. Am Objekt geprueft sind **vier davon nachweislich GEFIXT**:
+- **R4** `experiment_plan_director.hpp:1725` -- Kommentar woertlich "(j3)/R4: nur Debug COMDARE_ARTEFAKT_TRIES=1"
+- **R5** `profile_run_facade.cpp:559-564` -- "(R5) Pre-Flight-Validat ... SYMMETRISCH zum ep-Pfad"
+- **R6** `merge_plan.hpp:69-71` -- `"merge"->Stufe2_Hybrid`, `"fulljoin"->Stufe3_FullJoin`, sauber getrennt
+- **R7** `experiment_golden_kern.xml:104` -- traegt `amd_zen5_avx512`
+R9 ohne Treffer mehr (Indiz, nicht abschliessend). R3 nicht verifizierbar: die zitierten Job-Namen
+(`measure:golden-320`, `.golden_n_build`) existieren im heutigen `.gitlab-ci.yml` nicht mehr.
+**Kein Substanzverlust, aber eine stale Zeile, die bei jeder Konsolidierung Restarbeit vortaeuscht.**
+
+### BEFUND 4 -- SIMD-KATALOG VOLLSTAENDIG (6 Lenses, 32-bit UND 64-bit)
+Gesichert unter `docs/sessions/backups/20260807-explores-und-simd-katalog/`. Drei Dinge, die die
+Grammatik v2 unmittelbar betreffen:
+1. **Die Basis-Zuordnung ist VIERTEILIG, nicht dreiteilig.** MMX, 3DNow!, 3DNowExt und MMXExt liegen
+   auf den x87-aliasierten 64-bit-MM-Registern und gehoeren unter KEINE der Basen x128/x256/x512.
+   Die Grammatik braucht einen Fall dafuer.
+2. **`-msse4.1` traegt einen PUNKT** -- und der Punkt ist unser Trenner. Ein Token `sse4.1` wuerde als
+   zwei Subs gelesen. Vorschlag der Recherche: `sse41` (weder Punkt noch Unterstrich). Das legt fest,
+   dass unsere Token **nicht** die Compiler-Schalter sind.
+3. **DREI Namensraeume**, nicht zwei: cpuinfo-Name / Compiler-Schalter / unser Token. SSE3 heisst in
+   `/proc/cpuinfo` **`pni`**; `pclmulqdq` heisst als Schalter `-mpclmul`. `simd_feature_flag.hpp`
+   trennt cpuinfo-Id und g++-Flag bereits fuer `avx512_vbmi2` -- diesem Muster folgen, kein zweites
+   erfinden.
+Ausserdem: `3dnowprefetch` ist der einzige 3DNow!-Rest, der in modernen Intel- UND AMD-CPUs
+weiterlebt (PREFETCH/PREFETCHW) -- fuer eine **Cache**-Engine unmittelbar relevant.
+
+### BEFUND 5 -- Doku-Hygiene: die XML-Roadmap ist stale
+`docs/architektur/17_E4_XML_VOLLVISION_ROADMAP.md` TEIL D/E ist an mehreren Ankern veraltet: die
+TABU-Zeile (:71) nennt noch "ABI-MAJOR==4" (Ist: **8**), und der Andockpunkt "`main.cpp:513-521`"
+existiert in der heutigen `apps/`-Landschaft nicht mehr. Die Objektpruefung lief deshalb unabhaengig
+von den Roadmap-Zeilennummern.
+
+### ZUR PHASEN-KORREKTUR VON abend-1: TEILWEISE ZURUECKGENOMMEN
+Der Nachtrag abend-1 nannte die erste Lead-Deutung (E4-XML-Roadmap) schlicht "FALSCH". Das ist zu
+hart: **beide Nummerierungen existieren real** -- die XML-Roadmap-Phasen (Dossier 17 TEIL D) UND die
+Fahrplan-Phasen (20260803-FAHRPLAN:7-42). Richtig bleibt, dass LEDGER:3774 auf den **Fahrplan**
+verweist. Bemerkenswert: **beide Lesarten fuehren zum selben Ort** -- Phase 1-3 fertig, Phase 4
+angefangen. Die Owner-Erinnerung war in JEDER Lesart richtig. Eine unabhaengige Verifikation der
+Korrektur laeuft noch (Agent `Verify-Phasen-Korrektur`); ihr Ergebnis ist nachzutragen.
+**Empfehlung zur Vermeidung der naechsten Verwechslung: kuenftig "XML-Phase n" vs. "Fahrplan-Phase n".**

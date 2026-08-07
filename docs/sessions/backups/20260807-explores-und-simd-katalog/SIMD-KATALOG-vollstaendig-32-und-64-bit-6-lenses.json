@@ -1,0 +1,1911 @@
+{
+  "summary": "Owner-Auftrag: Web-Recherche ueber ALLE SIMD-Versionen und Vorgaenger-Erweiterungen fuer 32-bit UND 64-bit ISA, plus die Komposit-Basen x128/x256/x512 und ihre Sub-Flags",
+  "agentCount": 6,
+  "logs": [],
+  "result": {
+    "lenses": [
+      {
+        "flags": [
+          {
+            "token": "mmx",
+            "cpuid_name": "mmx / -mmmx",
+            "basis": "NONE",
+            "jahr": "1997",
+            "bit32": true,
+            "bemerkung": "Erste x86-SIMD-Stufe (Pentium MMX). 64-bit-Register MM0-MM7, ALIASIERT auf den x87-FP-Stack -- daher KEINE Basis x128/x256/x512, gehoert unter keine der drei Klammern. Nur Ganzzahl. Auf IA-32 voll verfuegbar (dort geboren). FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "3dnow",
+            "cpuid_name": "3dnow / -m3dnow",
+            "basis": "NONE",
+            "jahr": "1998",
+            "bit32": true,
+            "bemerkung": "AMD K6-2 (Mai 1998), Antwort auf MMX ohne FP-SIMD: 21 Befehle, single-precision FP auf denselben 64-bit-MMX-Registern. 2010 von AMD abgekuendigt, in Zen (2017) endgueltig weg -- nur PREFETCH/PREFETCHW ueberleben. Rein IA-32-Aera, historisch fuer 32-bit-Altmaschinen relevant. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "3dnowext",
+            "cpuid_name": "3dnowext / -m3dnowa",
+            "basis": "NONE",
+            "jahr": "1999",
+            "bit32": true,
+            "bemerkung": "Extended 3DNow! (AMD Athlon K7). Erweitert 3DNow! um DSP-/Ganzzahl-Befehle. GCC-Schalter -m3dnowa ('Athlon 3Dnow!'). Gleiche Register wie MMX -> Basis NONE. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "mmxext",
+            "cpuid_name": "mmxext / -m3dnowa",
+            "basis": "NONE",
+            "jahr": "1999",
+            "bit32": true,
+            "bemerkung": "AMD 'Extended MMX'/MMX+ (Athlon K7). Inhaltlich die Ganzzahl-Teilmenge, die Intel gleichzeitig in SSE steckte (PSHUFW, PMAXUB, MASKMOVQ, PREFETCHNTA usw.). Auf Intel-CPUs wird derselbe Befehlsvorrat ueber sse gemeldet. Basis NONE (MMX-Register). FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "3dnowprefetch",
+            "cpuid_name": "3dnowprefetch / -mprfchw",
+            "basis": "companion",
+            "jahr": "1998",
+            "bit32": true,
+            "bemerkung": "PREFETCH/PREFETCHW -- der EINZIGE Rest von 3DNow!, der in modernen AMD- UND Intel-CPUs weiterlebt. Cache-relevant und damit fuer eine Cache-Engine unmittelbar interessant (Software-Prefetch-Achse). GCC-Schalter -mprfchw (lokal mit g++ 15.3 unter -m32 und -m64 akzeptiert). FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sse",
+            "cpuid_name": "sse / -msse",
+            "basis": "x128",
+            "jahr": "1999",
+            "bit32": true,
+            "bemerkung": "Intel Pentium III (Feb 1999), 70 Befehle, ERSTE eigene 128-bit-Registerdatei XMM (nicht mehr x87-aliasiert). Nur single-precision FP. Auf IA-32 nur XMM0-XMM7 (8 Register), unter x86-64 XMM0-XMM15. Wurzel der gesamten Basis x128. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sse2",
+            "cpuid_name": "sse2 / -msse2",
+            "basis": "x128",
+            "jahr": "2000",
+            "bit32": true,
+            "bemerkung": "Intel Pentium 4 (Nov 2000). Bringt double-precision FP und die volle Ganzzahl-Palette auf XMM -- macht MMX ueberfluessig. WICHTIG: SSE2 ist verpflichtender Teil der x86-64-Baseline, auf 64-bit also IMMER da; auf IA-32 nicht garantiert (Pentium III / Athlon XP haben nur SSE). Damit ist sse2 das einzig sinnvolle 32-bit-Mindestniveau. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sse3",
+            "cpuid_name": "pni / -msse3",
+            "basis": "x128",
+            "jahr": "2004",
+            "bit32": true,
+            "bemerkung": "FALLE: der Linux-/proc/cpuinfo-String heisst NICHT 'sse3', sondern 'pni' (Prescott New Instructions) -- belegt in arch/x86/include/asm/cpufeatures.h Zeile 106: X86_FEATURE_XMM3 (4*32+0) /* \"pni\" SSE-3 */. Compiler-Schalter dagegen -msse3. Genau die Trennung cpuinfo-Id vs. g++-Flag, die simd_feature_flag.hpp schon fuer avx512_vbmi2 zementiert. Intel Prescott. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "ssse3",
+            "cpuid_name": "ssse3 / -mssse3",
+            "basis": "x128",
+            "jahr": "2006",
+            "bit32": true,
+            "bemerkung": "Supplemental SSE3, Intel Core 2 'Conroe'. Bringt PSHUFB -- fuer Layout-/Shuffle-lastige Container-Achsen (SoA/AoS-Umpackung) der wichtigste 128-bit-Befehl ueberhaupt. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sse41",
+            "cpuid_name": "sse4_1 / -msse4.1",
+            "basis": "x128",
+            "jahr": "2007",
+            "bit32": true,
+            "bemerkung": "Intel Core 2 'Penryn'. DOPPELTE SCHREIBFALLE: cpuinfo 'sse4_1' mit UNTERSTRICH (cpufeatures.h Z.124), GCC-Schalter '-msse4.1' mit PUNKT. Der Punkt kollidiert mit der geplanten Punkt-Notation der Komposit-Grammatik -> Token hier bewusst 'sse41' ohne Punkt und ohne Unterstrich. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sse42",
+            "cpuid_name": "sse4_2 / -msse4.2",
+            "basis": "x128",
+            "jahr": "2008",
+            "bit32": true,
+            "bemerkung": "Intel Core i7 'Nehalem'. Bringt String-/Textvergleich (PCMPESTRI...) und CRC32; POPCNT wird ueblicherweise mit SSE4.2 zusammen gemeldet, ist aber ein EIGENES CPUID-Bit. Gleiche Punkt/Unterstrich-Falle wie sse4.1. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sse4a",
+            "cpuid_name": "sse4a / -msse4a",
+            "basis": "x128",
+            "jahr": "2007",
+            "bit32": true,
+            "bemerkung": "AMD-ONLY (K10 'Barcelona'), NICHT identisch mit Intel SSE4.1/4.2 -- eigenes CPUID-Bit (cpufeatures.h Z.157, Blatt 8000_0001h ECX). Enthaelt EXTRQ/INSERTQ und die non-temporalen MOVNTSS/MOVNTSD -- letztere sind fuer Cache-Bypass-Messungen unmittelbar relevant. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "aes",
+            "cpuid_name": "aes / -maes",
+            "basis": "companion",
+            "jahr": "2010",
+            "bit32": true,
+            "bemerkung": "AES-NI, von Intel im Maerz 2008 vorgeschlagen, erstes Silizium Westmere (2010), bei AMD ab Bulldozer. 128-bit-XMM-Begleiter ohne eigene Registerbreite -> Companion. Ist die skalare Vorstufe zu vaes, das der Ist-Katalog bereits fuehrt. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "pclmulqdq",
+            "cpuid_name": "pclmulqdq / -mpclmul",
+            "basis": "companion",
+            "jahr": "2010",
+            "bit32": true,
+            "bemerkung": "Carry-less Multiply, zusammen mit AES-NI in Westmere. FALLE: cpuinfo-String 'pclmulqdq' (cpufeatures.h Z.107), GCC-Schalter aber '-mpclmul' OHNE 'qdq'. Vorstufe zu vpclmulqdq, das der Ist-Katalog schon fuehrt. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "avx",
+            "cpuid_name": "avx / -mavx",
+            "basis": "x256",
+            "jahr": "2011",
+            "bit32": true,
+            "bemerkung": "Von Intel im Maerz 2008 vorgeschlagen, erstes Silizium Sandy Bridge Q1/2011. VEX-Codierung, 256-bit-YMM, aber NUR FP. Wikipedia woertlich: 'renamed from XMM0-XMM7 to YMM0-YMM7 (in x86-64 mode, from XMM0-XMM15 to YMM0-YMM15)' -- auf IA-32 also nur 8 YMM. Lokal verifiziert: gcc -m32 -mavx erzeugt 'vmulps %ymm1, %ymm0, %ymm0'. Wurzel der Basis x256. FEHLT im Ist-Katalog (dort beginnt der Avx256-Tier erst bei avx2)."
+          },
+          {
+            "token": "xop",
+            "cpuid_name": "xop / -mxop",
+            "basis": "x128",
+            "jahr": "2011",
+            "bit32": true,
+            "bemerkung": "AMD-ONLY, Bulldozer (12.10.2011), angekuendigt 01.05.2009. CPUID 8000_0001h ECX Bit 11. Ueberwiegend 128-bit; einige FP-Befehle (VFRCZPS/PD) auch 256-bit -- Basis-Zuordnung daher nicht sauber eindeutig, siehe luecken. In Zen (2017) ERSATZLOS GESTRICHEN. Historische Achse fuer AMD-FX-Altmaschinen. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "fma4",
+            "cpuid_name": "fma4 / -mfma4",
+            "basis": "x256",
+            "jahr": "2011",
+            "bit32": true,
+            "bemerkung": "AMD-ONLY, Bulldozer. 4-Operanden-FMA (nicht-destruktiv), CPUID 8000_0001h ECX Bit 16, cpufeatures.h Z.166. INKOMPATIBEL zu Intels 3-Operanden-FMA3; in Zen (2017) gestrichen. Wer -march=bdver* baut, kann das Binary auf Zen NICHT ausfuehren -- harte Bau-Gate-Relevanz. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "f16c",
+            "cpuid_name": "f16c / -mf16c",
+            "basis": "x256",
+            "jahr": "2012",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kAvx16c/kF16c, Tier Avx256). Halbpraezisions-Konvertierung, CPUID EAX=1 ECX Bit 29. Erstes Silizium AMD Piledriver (Q4/2012) UND Intel Ivy Bridge (2012) -- AMD war hier gleichauf/frueher. 128- und 256-bit-Formen."
+          },
+          {
+            "token": "fma",
+            "cpuid_name": "fma / -mfma",
+            "basis": "x256",
+            "jahr": "2012 (AMD) / 2013 (Intel)",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kFma). FMA3, 3-Operanden. KORREKTUR gaengiger Annahme: AMD Piledriver (Mai/Q4 2012) hatte FMA3 VOR Intel Haswell (Q2/2013). cpuinfo-String schlicht 'fma' (cpufeatures.h Z.118), Compiler-Schalter -mfma."
+          },
+          {
+            "token": "avx2",
+            "cpuid_name": "avx2 / -mavx2",
+            "basis": "x256",
+            "jahr": "2013",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kAvx2). Intel Haswell Q2/2013. Zieht die Ganzzahl-Operationen auf 256 bit und bringt Gather -- fuer indirekte Container-Zugriffsmuster die relevante Stufe. Auf IA-32 gueltig, aber nur YMM0-YMM7."
+          },
+          {
+            "token": "avx512",
+            "cpuid_name": "avx512f / -mavx512f",
+            "basis": "x512",
+            "jahr": "2013 spezifiziert / 2016 erstes Silizium",
+            "bit32": true,
+            "bemerkung": "GRUPPEN-EINTRAG (Subsets = Lens 2). Von Intel Juli 2013 vorgeschlagen, erstes Silizium Xeon Phi x200 'Knights Landing' 2016, Mainstream Skylake-SP 2017, AMD ab Zen 4 (2022). EVEX-Codierung, ZMM. 32-BIT-BEFUND, HART VERIFIZIERT: EVEX ist auf IA-32 gueltig -- felixcloutier/Intel-SDM-Tabelle zu VADDPS gibt fuer 'EVEX.512.0F.W0 58 /r' die Spalte '64/32 bit Mode Support' als V/V an; lokal reproduziert mit gcc 15.3: 'gcc -m32 -mavx512f' erzeugt 'vaddpd %zmm1, %zmm0, %zmm0'. ABER: unter -m32 vergibt GCC nur zmm0-zmm7 (gemessen: hoechstes Register zmm7), unter -m64 zmm0-zmm31 (gemessen: zmm20 in Gebrauch). Auf 32-bit steht also ein Viertel der Registerdatei zur Verfuegung -- messrelevanter Unterschied, kein Verfuegbarkeitsproblem."
+          },
+          {
+            "token": "shani",
+            "cpuid_name": "sha_ni / -msha",
+            "basis": "companion",
+            "jahr": "2013 spezifiziert / 2016 erstes Silizium",
+            "bit32": true,
+            "bemerkung": "Intel SHA Extensions, 2013 spezifiziert, erstes Silizium Atom 'Goldmont' 2016, bei AMD ab Zen (2017), Intel-Mainstream erst Ice Lake/Rocket Lake. FALLE: cpuinfo 'sha_ni' MIT Unterstrich (cpufeatures.h Z.261), GCC-Schalter aber '-msha'. Companion ohne eigene Breite. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "gfni",
+            "cpuid_name": "gfni / -mgfni",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kGfni, Tier Companion) -- Tier-Zuordnung bestaetigt sich: GFNI existiert in SSE-, VEX128/256- UND EVEX512-Form, hat also KEINE eigene Basis. Erstes Silizium laut Intel Ice Lake / Ice Lake-SP. Genau der Fall, den die Grammatik als Companion OHNE Klammer neben {x512...} schreibt."
+          },
+          {
+            "token": "vaes",
+            "cpuid_name": "vaes / -mvaes",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kVaes). Vektorisiertes AES ueber VEX256/EVEX512. Setzt aes voraus, das im Ist-Katalog FEHLT -- die Voraussetzungskette aes -> vaes ist damit heute nicht abbildbar."
+          },
+          {
+            "token": "vpclmulqdq",
+            "cpuid_name": "vpclmulqdq / -mvpclmulqdq",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kVpclmulqdq). Setzt pclmulqdq voraus, das im Ist-Katalog FEHLT -- gleiche Luecke in der Voraussetzungskette wie bei vaes."
+          },
+          {
+            "token": "vnni",
+            "cpuid_name": "avx_vnni / -mavxvnni",
+            "basis": "x256",
+            "jahr": "2021",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kAvxVnni, Tier Avx256). Intel Alder Lake Q4/2021. VEX-codierte VNNI ohne AVX-512-Zwang -- gedacht fuer E-Cores. ACHTUNG TOKEN-KOLLISION: Token 'vnni' existiert auch unter x512 (avx512_vnni). Nur die Basis-Klammer trennt {x256.vnni} von {x512.vnni}; ohne Basis ist der Token mehrdeutig."
+          },
+          {
+            "token": "ifma",
+            "cpuid_name": "X86_FEATURE_AVX_IFMA (KEIN cpuinfo-String) / -mavxifma",
+            "basis": "x256",
+            "jahr": "2023",
+            "bit32": true,
+            "bemerkung": "Intel Meteor Lake Q4/2023. VEX-codiertes IFMA (VPMADD52[H,L]UQ) ohne AVX-512. HARTE FALLE FUER DIESES PROJEKT: cpufeatures.h Z.327 definiert das Makro OHNE Anzeige-String -- das Flag erscheint also NICHT in /proc/cpuinfo. Da simd_feature_flag.hpp den cpuinfo-String als IDENTITAET fuehrt, ist dieses Flag ueber den heutigen Weg NICHT erhebbar (Ausweg: CPUID direkt oder /sys). Zweite Kollision: Token 'ifma' gibt es auch unter x512 (avx512ifma). FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "vnniint8",
+            "cpuid_name": "(NICHT in cpufeatures.h) / -mavxvnniint8",
+            "basis": "x256",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "Intel Arrow Lake / Sierra Forest. GCC-Schalter belegt auf gcc.gnu.org/onlinedocs/gcc/x86-Options.html und lokal von g++ 15.3 unter -m32 und -m64 akzeptiert. Im heutigen torvalds/master von cpufeatures.h gibt es WEDER Makro NOCH cpuinfo-String -> ueber /proc/cpuinfo nicht erhebbar. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "vnniint16",
+            "cpuid_name": "(NICHT in cpufeatures.h) / -mavxvnniint16",
+            "basis": "x256",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "Intel Arrow Lake. Gleiche Lage wie vnniint8: Compiler kennt es, Linux-cpuinfo nicht. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "neconvert",
+            "cpuid_name": "(NICHT in cpufeatures.h) / -mavxneconvert",
+            "basis": "x256",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "AVX-NE-CONVERT, Intel Arrow Lake und Sierra Forest (Q2/2024). Konvertierungen bf16/fp16 <-> fp32 ohne AVX-512. Gleiche cpuinfo-Luecke. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sha512",
+            "cpuid_name": "X86_FEATURE_SHA512 (KEIN cpuinfo-String) / -msha512",
+            "basis": "companion",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "Intel Arrow Lake und Lunar Lake, 2024. cpufeatures.h Z.312 definiert das Makro ohne Anzeige-String -> nicht in /proc/cpuinfo. VEX-codiert ('V'-Praefix der Mnemonics). FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sm3",
+            "cpuid_name": "X86_FEATURE_SM3 (KEIN cpuinfo-String) / -msm3",
+            "basis": "companion",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "Chinesischer Hash-Standard SM3, Intel Arrow Lake/Lunar Lake, cpufeatures.h Z.313 ohne Anzeige-String. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "sm4",
+            "cpuid_name": "X86_FEATURE_SM4 (KEIN cpuinfo-String) / -msm4",
+            "basis": "companion",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "Chinesische Blockchiffre SM4, Intel Arrow Lake/Lunar Lake, cpufeatures.h Z.314 ohne Anzeige-String. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "avx10.1",
+            "cpuid_name": "(NICHT in cpufeatures.h; CPUID-Blatt 0x24) / -mavx10.1",
+            "basis": "x512",
+            "jahr": "2023 angekuendigt / 2024 erstes Silizium",
+            "bit32": true,
+            "bemerkung": "NACHFOLGER von AVX-512, Juli 2023 angekuendigt, erstes Silizium Granite Rapids Q3/2024. Loest die Zersplitterung in ~20 Einzel-Flags durch EINE Versionsnummer ab (jede spaetere Version ist Obermenge). Version 1 bringt KEINE neuen Befehle gegenueber AVX-512. WICHTIG FUER DIE BASIS-ZUORDNUNG: fruehe Revisionen trugen die Breite im Namen (AVX10.2/256), ab Revision 3.0 ist die Laengen-Enumeration ENTFERNT und 512 bit VERPFLICHTEND -> eindeutig Basis x512. GCC-Beleg lokal: g++ 15.3 warnt woertlich, -mavx10.1 sei 'aliased to 512 bit since GCC14.3 and GCC15.1', -mavx10.1-256/-512 wuerden 'deprecated in GCC 16'. DOPPELTE FALLE: (a) der Punkt im Namen kollidiert mit der Punkt-Notation der Komposit-Grammatik, (b) kein cpuinfo-String -> ueber den heutigen Erhebungsweg unsichtbar. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "avx10.2",
+            "cpuid_name": "(NICHT in cpufeatures.h) / -mavx10.2",
+            "basis": "x512",
+            "jahr": "2024/2025 spezifiziert",
+            "bit32": true,
+            "bemerkung": "Diamond Rapids und Nova Lake. GCC 15 hat AVX10.2-Unterstuetzung, -mavx10.2 lokal von g++ 15.3 unter -m32 und -m64 akzeptiert (ohne Warnung). Gleiche Punkt- und cpuinfo-Falle wie avx10.1. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "amx",
+            "cpuid_name": "amx_tile/amx_bf16/amx_int8 / -mamx-tile, -mamx-int8, -mamx-bf16, -mamx-fp16, -mamx-complex, -mamx-avx512, -mamx-fp8, -mamx-movrs",
+            "basis": "NONE",
+            "jahr": "2023",
+            "bit32": false,
+            "bemerkung": "EINZIGER 64-BIT-EXKLUSIVER EINTRAG DER GANZEN LISTE. Advanced Matrix Extensions arbeiten auf 2D-'Tiles' (TMM-Register), nicht auf ZMM -> Basis NONE. 32-BIT-AUSSCHLUSS ZWEIFACH BELEGT: (1) die Intel-SDM-Tabelle zu LDTILECFG gibt in der Spalte '64/32 bit Mode Support' den Wert 'V/N.E.' an -- in 32-bit NICHT CODIERBAR; (2) lokal reproduziert: 'gcc -m32 -mamx-tile' kennt __builtin_ia32_ldtilecfg NICHT ('implicit declaration'), unter -m64 uebersetzt es fehlerfrei. ACHTUNG: der blosse Schalter -mamx-tile wird auch unter -m32 angenommen -- Schalter-Akzeptanz ist also KEIN Verfuegbarkeitsbeweis. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "popcnt",
+            "cpuid_name": "popcnt / -mpopcnt",
+            "basis": "scalar",
+            "jahr": "2007 (AMD) / 2008 (Intel)",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kPopcnt, Tier Scalar). Eigenes CPUID-Bit (EAX=1 ECX Bit 23, cpufeatures.h Z.128), wird nur ueblicherweise gemeinsam mit SSE4.2 (Intel Nehalem) bzw. ABM (AMD K10) geliefert -- daher NICHT aus sse4_2 ableitbar."
+          },
+          {
+            "token": "abm",
+            "cpuid_name": "abm / -mabm, -mlzcnt",
+            "basis": "scalar",
+            "jahr": "2007",
+            "bit32": true,
+            "bemerkung": "Advanced Bit Manipulation (AMD K10): LZCNT + POPCNT. GCC fuehrt -mabm UND -mlzcnt getrennt (beide auf der GCC-Optionsseite belegt, beide lokal unter -m32 und -m64 akzeptiert). cpuinfo-String 'abm' (cpufeatures.h Z.156); LZCNT hat auf Intel ein eigenes Bit. FALLE: ohne lzcnt dekodiert der Opcode als BSR mit anderer Semantik. FEHLT im Ist-Katalog."
+          },
+          {
+            "token": "bmi1",
+            "cpuid_name": "bmi1 / -mbmi",
+            "basis": "scalar",
+            "jahr": "2012 (AMD) / 2013 (Intel)",
+            "bit32": true,
+            "bemerkung": "AMD Piledriver bzw. Intel Haswell. FALLE: cpuinfo-String 'bmi1' MIT Ziffer (cpufeatures.h Z.236), GCC-Schalter aber '-mbmi' OHNE Ziffer -- wieder ein Fall, in dem eine String-Heuristik cpuinfo->Compiler-Flag falsch laege. bmi2 ist im Ist-Katalog, bmi1 FEHLT."
+          },
+          {
+            "token": "bmi2",
+            "cpuid_name": "bmi2 / -mbmi2",
+            "basis": "scalar",
+            "jahr": "2013",
+            "bit32": true,
+            "bemerkung": "IM IST-KATALOG VORHANDEN (kBmi2, Tier Scalar). Intel Haswell; bei AMD erst ab Excavator/Zen, und auf Zen1/Zen2 sind PDEP/PEXT mikrocodiert und sehr langsam -- 'vorhanden' heisst hier ausdruecklich NICHT 'schnell', fuer eine Mess-Achse ein eigener Fall."
+          },
+          {
+            "token": "movbe",
+            "cpuid_name": "movbe / -mmovbe",
+            "basis": "scalar",
+            "jahr": "2008",
+            "bit32": true,
+            "bemerkung": "Byte-Swap beim Laden/Speichern, zuerst Intel Atom. Eigenes CPUID-Bit (cpufeatures.h Z.127). Fuer Serialisierungs-/Endianness-Pfade relevant, nicht fuer die Vektorbreite. FEHLT im Ist-Katalog."
+          }
+        ],
+        "luecken": [
+          "BEFUND ZUM AUFTRAGSTEXT (kein Recherche-Mangel, aber Korrektur): Der Auftrag nennt 30 Flags in vier Tiers (17 Avx512, 5 Avx256, 5 Companion, 3 Scalar). Der tatsaechliche Bestand ist 23: 14 Avx512, 4 Avx256, 3 Companion, 2 Scalar -- verifiziert per static_assert(kSimdFeatureFlagCatalog.size() == 23) und count_flags_of_tier(Avx512) == 14 in /home/comdare/wt-b14-ce/libs/cache_engine/include/cache_engine/measurement/simd_feature_flag.hpp, und identisch in allen vier vorhandenen ce-Checkouts (wt-lb6, wt-pmc-l3-honest, wt-b-r4-ci, wt-b14-ce). Die genannten Beispiele avx512_bf16, avx2, fma, f16c, avx_vnni, gfni, vaes, vpclmulqdq stimmen; ein 'avx256'-Tier mit 5 Eintraegen und ein Companion-Tier mit 5 Eintraegen existieren nicht.",
+          "XOP-Basiszuordnung nicht eindeutig belegt: XOP ist ueberwiegend 128-bit, enthaelt aber auch 256-bit-FP-Befehle (VFRCZPS/VFRCZPD auf ymm). Ich habe das AMD-APM-Dokument 43479 ('128-Bit and 256-Bit XOP and FMA4 Instructions') nur als Suchtreffer gesehen, NICHT gelesen. Die Einordnung x128 ist daher eine Naeherung, keine belegte Aussage.",
+          "Erstes Silizium fuer GFNI/VAES/VPCLMULQDQ: belegt ist nur 'Ice Lake / Ice Lake-SP' (Intel-Artikel zur IPP-Crypto-Beschleunigung). Ob die SSE-Form von GFNI schon frueher in Goldmont Plus (2017) oder Tremont ausgeliefert wurde, konnte ich NICHT gegen eine Intel-Primaerquelle belegen. Jahr 2019 ist daher als 'nicht frueher als' zu lesen.",
+          "CPUID-Blatt/Bit fuer SSE4a nicht gegen das AMD APM verifiziert -- nur ueber den Linux-Kernel-Header (Wort 6 = Blatt 8000_0001h ECX, Bit 6) belegt.",
+          "Die Struktur des AVX10-CPUID-Blatts 0x24 (Versionsfeld, Vektorlaengen-Bits) habe ich NICHT gelesen. Die Intel-AVX10-Spezifikation selbst wurde nicht abgerufen; die Aussagen zu Revision 3.0 und zur Pflicht-512-bit stammen aus der Wikipedia-Uebersicht plus der woertlichen GCC-15.3-Warnung.",
+          "Auslieferungsjahr von AVX10.2-Silizium nicht belegt: 'Diamond Rapids und Nova Lake' ist die Quellenaussage, ein bestaetigtes Auslieferungsdatum habe ich nicht gefunden.",
+          "3DNow!-Entfernung: Wikipedia nennt 2010 (Abkuendigung) und 2017/Zen (endgueltig weg), sowie die A8-3870K/Llano als letzte APU mit 3DNow!. Die verbreitete Aussage, Bulldozer (2011) habe 3DNow! bereits gestrichen, konnte ich gegen AMD-Dokumente NICHT belegen und habe sie deshalb nicht uebernommen.",
+          "mmxext/3dnowext und der GCC-Schalter: die GCC-Optionsseite fuehrt nur -m3dnow und -m3dnowa. Ob -m3dnowa das Feature mmxext separat einschaltet oder ob GCC mmxext gar nicht getrennt modelliert, habe ich NICHT im GCC-Quelltext (i386.opt/cpuid.h) nachgeprueft.",
+          "AVX-512-SUBSETS SIND HIER BEWUSST NICHT AUFGESCHLUESSELT (Lens 2). Nur als Zeiger, aus dem gelesenen Kernel-Header: cpufeatures.h kennt 18 avx512*-cpuinfo-Strings, der Ist-Katalog fuehrt 14. Es fehlen mindestens avx512pf, avx512er, avx512_4vnniw, avx512_4fmaps (alle vier Xeon-Phi/KNL-Erbe) sowie X86_FEATURE_AVX512_BMM (Z.477, ohne Anzeige-String).",
+          "Ich habe KEIN Intel-SDM-PDF direkt gelesen. Die 32-bit-Gueltigkeit von VEX/EVEX ist belegt ueber felixcloutier.com (SDM-abgeleitete Opcode-Tabellen, Spalte '64/32 bit Mode Support': VADDPS EVEX.512 = V/V, LDTILECFG = V/N.E.) plus lokal reproduzierte GCC-15.3-Codeerzeugung. Die woertliche SDM-Formulierung zu ZMM8-ZMM31 in 32-bit stammt aus einem Suchtreffer-Zitat, nicht aus dem Primaerdokument.",
+          "Windows-spezifisch NICHT geprueft: ob 32-bit-Windows-10 die AVX-512-Zustandsrettung (XCR0-Bits fuer Opmask/ZMM_Hi256/Hi16_ZMM) ueberhaupt aktiviert. Der Owner-Hinweis 'In Indien ist 32bit noch aktuell unter Windows 10' beruehrt genau diesen Punkt: die ISA-Gueltigkeit in 32-bit ist belegt, die OS-seitige Freischaltung unter 32-bit-Windows ist es NICHT. Das ist die einzige verbliebene echte Unsicherheit der 32-bit-Frage."
+        ],
+        "quellen": [
+          "https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html",
+          "https://raw.githubusercontent.com/torvalds/linux/master/arch/x86/include/asm/cpufeatures.h",
+          "https://en.wikipedia.org/wiki/X86_SIMD_instruction_listings",
+          "https://en.wikipedia.org/wiki/Advanced_Vector_Extensions",
+          "https://en.wikipedia.org/wiki/AVX-512",
+          "https://en.wikipedia.org/wiki/AVX10",
+          "https://en.wikipedia.org/wiki/3DNow!",
+          "https://en.wikipedia.org/wiki/Intel_SHA_extensions",
+          "https://en.wikipedia.org/wiki/AES_instruction_set",
+          "https://www.felixcloutier.com/x86/addps",
+          "https://www.felixcloutier.com/x86/ldtilecfg",
+          "https://www.felixcloutier.com/x86/index.html",
+          "https://www.intel.com/content/www/us/en/developer/articles/technical/ipp-crypto-acceleration-with-processor-code-named-ice-lake.html",
+          "https://gcc.gnu.org/gcc-15/changes.html",
+          "https://www.phoronix.com/news/Intel-AVX10.2-256-Merged-GCC-15",
+          "https://www.kitguru.net/components/cpu/anton-shilov/amd-cuts-bulldozer-instructions-from-zen-processors/"
+        ]
+      },
+      {
+        "flags": [
+          {
+            "token": "f",
+            "cpuid_name": "avx512f / -mavx512f",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": true,
+            "bemerkung": "AVX-512 Foundation, Pflichtwurzel jeder AVX-512-Implementierung; EVEX-Codierung, 512-bit-Register, Opmask k0-k7, Broadcast, embedded rounding. CPUID.(EAX=07h,ECX=0):EBX bit 16 (Kernel-Wort 9 = CPUID_7_0_EBX). Eingefuehrt Knights Landing / Skylake-SP. IM BESTAND VORHANDEN. 32-bit: lokal verifiziert (gcc 15.3.0, clang 22.1.8) -- 'g++ -m32 -mavx512f' erzeugt echte EVEX/zmm-Instruktionen (vpaddd %zmm1,%zmm0,%zmm0), ABER nur zmm0-zmm7: ein asm-Clobber auf zmm18 wird unter -m32 abgelehnt, unter -m64 akzeptiert."
+          },
+          {
+            "token": "cd",
+            "cpuid_name": "avx512cd / -mavx512cd",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": true,
+            "bemerkung": "Conflict Detection -- Konflikterkennung fuer Scatter/Gather-Vektorisierung. CPUID.(07h,0):EBX bit 28. Knights Landing + Skylake-X. Auf JEDER heutigen AVX-512-CPU vorhanden (Intel wie AMD). IM BESTAND VORHANDEN. 32-bit: -m32 akzeptiert (lokal geprueft)."
+          },
+          {
+            "token": "er",
+            "cpuid_name": "avx512er / -mavx512er",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": false,
+            "bemerkung": "FEHLT IM BESTAND -- aber als TOTE ALTLAST. Exponential and Reciprocal (VEXP2PS/PD, VRCP28, VRSQRT28, rel. Fehler <= 2^-28). CPUID.(07h,0):EBX bit 27. AUSSCHLIESSLICH Knights Landing/Knights Mill (Xeon Phi), nie in einer Mainstream-CPU. Kernel fuehrt den cpuinfo-String 'avx512er' bis heute (cpufeatures.h Zeile 259), die TOOLCHAIN aber NICHT MEHR: GCC 15 hat -mavx512er entfernt (GCC-14-Deprecation-Warnung, Entfernung in 15), Clang 19 ebenso. Lokal verifiziert: g++ 15.3.0 -> 'unrecognized command-line option -mavx512er'; clang++ 22.1.8 -> 'unknown argument'. bit32=false weil weder 32- noch 64-bit baubar. EMPFEHLUNG: nur als historisches Vokabular fuehren, NICHT als baubares Flag."
+          },
+          {
+            "token": "pf",
+            "cpuid_name": "avx512pf / -mavx512pf",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": false,
+            "bemerkung": "FEHLT IM BESTAND -- ebenfalls tote Altlast. Prefetch Instructions (VGATHERPF/VSCATTERPF) fuer Scatter/Gather-Vorabruf. CPUID.(07h,0):EBX bit 26. Nur Knights Landing/Mill. Kernel-cpuinfo-String 'avx512pf' existiert weiter (cpufeatures.h Zeile 258), Toolchain nicht: GCC 15 entfernt, Clang 19 entfernt (lokal verifiziert, beide Compiler lehnen ab). Begleiter -mprefetchwt1 wurde gleichzeitig entfernt. Fuer eine Cache-Engine inhaltlich interessant (Prefetch!), praktisch aber unbaubar."
+          },
+          {
+            "token": "vl",
+            "cpuid_name": "avx512vl / -mavx512vl",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": true,
+            "bemerkung": "Vector Length Extensions -- erlaubt AVX-512-Semantik (Masken, 32 Register, Broadcast) auf xmm/ymm, also 128 und 256 bit. CPUID.(07h,0):EBX bit 31. Skylake-SP/X. ARCHITEKTONISCH ZENTRAL fuer die Flag-Grammatik: 'vl' ist das Flag, das eine x512-Basis auch auf x128/x256 anwendbar macht -- ohne vl gibt es EVEX nur in 512 bit. IM BESTAND VORHANDEN. 32-bit: akzeptiert."
+          },
+          {
+            "token": "dq",
+            "cpuid_name": "avx512dq / -mavx512dq",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": true,
+            "bemerkung": "Doubleword and Quadword Instructions -- 32/64-bit-Integer- und zusaetzliche FP-Operationen (u.a. VPMULLQ, Konvertierungen int64<->float). CPUID.(07h,0):EBX bit 17. Skylake-SP/X. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "bw",
+            "cpuid_name": "avx512bw / -mavx512bw",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": true,
+            "bemerkung": "Byte and Word Instructions -- 8- und 16-bit-Integeroperationen unter EVEX, dazu die 32/64-bit-breiten Maskenregister. CPUID.(07h,0):EBX bit 30. Skylake-SP/X. Fuer Container-/Layout-Algorithmen auf schmalen Typen die entscheidende Voraussetzung. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "ifma",
+            "cpuid_name": "avx512ifma / -mavx512ifma",
+            "basis": "x512",
+            "jahr": "2018",
+            "bit32": true,
+            "bemerkung": "Integer Fused Multiply-Add mit 52-bit-Genauigkeit (VPMADD52LUQ/HUQ), Ziel: Big-Integer-/Krypto-Arithmetik. CPUID.(07h,0):EBX bit 21. Cannon Lake. ACHTUNG Abgrenzung: das SEPARATE, NICHT zur AVX-512-Familie gehoerende AVX-IFMA (VEX-codiert, -mavxifma, X86_FEATURE_AVX_IFMA = CPUID.(07h,1):EAX bit 23) ist ein anderes Flag und traegt im Kernel KEINEN cpuinfo-String. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "vbmi",
+            "cpuid_name": "avx512vbmi / -mavx512vbmi",
+            "basis": "x512",
+            "jahr": "2018",
+            "bit32": true,
+            "bemerkung": "Vector Bit Manipulation Instructions -- Byte-Permutation (VPERMB, VPERMI2B, VPMULTISHIFTQB), die in BW fehlte. CPUID.(07h,0):ECX bit 1 (Kernel-Wort 16). Cannon Lake. cpuinfo OHNE Unterstrich. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "vbmi2",
+            "cpuid_name": "avx512_vbmi2 / -mavx512vbmi2",
+            "basis": "x512",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "VBMI2 -- Byte/Word-Compress/Expand (VPCOMPRESSB/W, VPEXPANDB/W) und Shift-with-concatenate (VPSHLDV*). CPUID.(07h,0):ECX bit 6. Ice Lake. Fuer Cache-Engine-Layouts (SoA-Kompaktierung) einschlaegig. cpuinfo MIT Unterstrich. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "vnni",
+            "cpuid_name": "avx512_vnni / -mavx512vnni",
+            "basis": "x512",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Vector Neural Network Instructions (VPDPBUSD, VPDPWSSD) -- int8/int16-Dot-Product mit Akkumulation. CPUID.(07h,0):ECX bit 11. Cascade Lake. Abzugrenzen vom 256-bit-VEX-Pendant AVX-VNNI (cpuinfo 'avx_vnni', -mavxvnni, CPUID.(07h,1):EAX bit 4) -- das ist im Bestand korrekt als Avx256 gefuehrt. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "bitalg",
+            "cpuid_name": "avx512_bitalg / -mavx512bitalg",
+            "basis": "x512",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Bit Algorithms -- VPOPCNTB/W und VPSHUFBITQMB, erweitert VPOPCNTDQ auf Byte/Word. CPUID.(07h,0):ECX bit 12. Ice Lake. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "vpopcntdq",
+            "cpuid_name": "avx512_vpopcntdq / -mavx512vpopcntdq",
+            "basis": "x512",
+            "jahr": "2017 (Knights Mill) / 2019 (Ice Lake)",
+            "bit32": true,
+            "bemerkung": "Vector Population Count fuer Doubleword/Quadword (VPOPCNTD/Q). CPUID.(07h,0):ECX bit 14. Erstmals Knights Mill 2017, danach regulaer ab Ice Lake 2019 -- also KEINE reine Xeon-Phi-Altlast, im Gegensatz zu 4vnniw/4fmaps. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "vp2intersect",
+            "cpuid_name": "avx512_vp2intersect / -mavx512vp2intersect",
+            "basis": "x512",
+            "jahr": "2020",
+            "bit32": true,
+            "bemerkung": "Vector Pair Intersection to a Pair of Mask Registers (VP2INTERSECTD/Q). CPUID.(07h,0):EDX bit 8 (Kernel-Wort 18). Eingefuehrt Tiger Lake 2020. BESONDERHEIT: Intel hat es danach FALLEN GELASSEN -- Sapphire Rapids, Alder Lake und alle spaeteren Intel-Kerne haben es NICHT; AMD hat es ab Zen 5 (2024) aufgenommen. Es ist damit das einzige Subset, das heute AMD-only ist und in AVX10.1 NICHT enthalten ist. Toolchain lebt: g++ 15.3.0 und clang 22.1.8 akzeptieren -mavx512vp2intersect (lokal verifiziert). IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "bf16",
+            "cpuid_name": "avx512_bf16 / -mavx512bf16",
+            "basis": "x512",
+            "jahr": "2020",
+            "bit32": true,
+            "bemerkung": "bfloat16-Konvertierung und Dot-Product (VCVTNE2PS2BF16, VDPBF16PS). CPUID.(07h,1):EAX bit 5 (Kernel-Wort 12 -- ACHTUNG: liegt NICHT in Leaf 7 Subleaf 0, sondern Subleaf 1). Cooper Lake 2020; auch Zen 4/5, Sapphire Rapids. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "fp16",
+            "cpuid_name": "avx512_fp16 / -mavx512fp16",
+            "basis": "x512",
+            "jahr": "2021 (Alder Lake, ab Werk deaktiviert) / 2023 (Sapphire Rapids)",
+            "bit32": true,
+            "bemerkung": "Vollstaendige binary16-Arithmetik (nicht nur Konvertierung wie f16c), inkl. komplexer Zahlen; Skalar und gepackt. CPUID.(07h,0):EDX bit 23. Auf Alder Lake war AVX-512 ab Werk abgeschaltet -> praktisch erst Sapphire Rapids 2023. AMD erst ab Zen 6. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "4vnniw",
+            "cpuid_name": "avx512_4vnniw / -mavx5124vnniw",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": false,
+            "bemerkung": "FEHLT IM BESTAND -- tote Knights-Mill-Altlast. '4-iteration VNNI Word variable precision' (V4DPWSSD/V4DPWSSDS). CPUID.(07h,0):EDX bit 2. AUSSCHLIESSLICH Knights Mill (Xeon Phi x205), nie sonst. Kernel-cpuinfo-String 'avx512_4vnniw' existiert weiter, Toolchain nicht: GCC 15 hat -mavx5124vnniw entfernt, Clang ebenso. Lokal verifiziert: beide Compiler lehnen ab. Beachte die BIZARRE Flag-Schreibweise -mavx5124vnniw (avx512 + 4vnniw ohne Trenner) -- das ist die offizielle GCC-Schreibweise gewesen, kein Tippfehler."
+          },
+          {
+            "token": "4fmaps",
+            "cpuid_name": "avx512_4fmaps / -mavx5124fmaps",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": false,
+            "bemerkung": "FEHLT IM BESTAND -- tote Knights-Mill-Altlast. 'Fused Multiply Accumulation Packed Single precision, 4 iterations' (V4FMADDPS/SS, V4FNMADDPS/SS). CPUID.(07h,0):EDX bit 3. Nur Knights Mill. GCC 15 und Clang 19 haben -mavx5124fmaps entfernt (lokal verifiziert). Wie 4vnniw: cpuinfo-Vokabular lebt, Bau ist unmoeglich."
+          },
+          {
+            "token": "bmm",
+            "cpuid_name": "avx512_bmm / -mavx512bmm",
+            "basis": "x512",
+            "jahr": "TBD -- AMD Zen 6, Toolchain-Patches Nov 2025 (binutils) / Dez 2025 (GCC)",
+            "bit32": true,
+            "bemerkung": "FEHLT IM BESTAND -- das NEUESTE AVX-512-Subset, AMD-exklusiv. 'Bit Matrix Multiply' mit den drei Instruktionen VBITREVB (Bit-Reverse je Byte), VBMACOR und VBMACXOR (Bitmatrix-Multiplikation mit OR- bzw. XOR-Akkumulation). ACHTUNG SONDERWEG: enumeriert NICHT ueber Leaf 7, sondern ueber CPUID.8000_0021:EAX bit 23 (AMD-Leaf; Kernel-Wort 20 = CPUID_8000_0021_EAX). Der Kernel hat X86_FEATURE_AVX512_BMM bereits, aber OHNE cpuinfo-String (unterdrueckt) -> per /proc/cpuinfo NICHT signaturfaehig. Toolchain-Stand hier: GCC 15.3.0 und clang 22.1.8 lehnen -mavx512bmm ab (lokal verifiziert); die Option existiert nur in GCC-Trunk/16. Fuer die Diplomarbeit derzeit NICHT baubar -- als Vokabular-Reserve auffuehren."
+          },
+          {
+            "token": "gfni",
+            "cpuid_name": "gfni / -mgfni",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "ANTWORT AUF DIE FRAGE 'GFNI-in-512-Form': ES GIBT KEIN SEPARATES AVX512-GFNI-FLAG. GFNI ist EIN einziges CPUID-Bit, CPUID.(07h,0):ECX bit 8. Welche Codierung damit freigeschaltet wird, ergibt sich aus den ANDEREN vorhandenen Flags: allein -> Legacy-SSE (128 bit); mit AVX -> VEX (128/256); mit AVX512F -> EVEX 512 bit; mit AVX512F+AVX512VL -> EVEX auch 128/256. GFNI haengt NICHT von AVX ab und existiert auf CPUs ohne AVX-512 (z.B. Tremont/Gracemont). Die Grammatik-Entscheidung des Owners, Companion-Flags OHNE Klammer neben die Basis zu stellen (…{x512.f.vl.bw.dq}.gfni), ist damit ARCHITEKTONISCH KORREKT und durch die ISA gedeckt -- ein 'x512.gfni' innerhalb der Klammer waere falsch, weil kein solches CPUID-Bit existiert. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "vaes",
+            "cpuid_name": "vaes / -mvaes",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Wie gfni ein Companion mit EINEM CPUID-Bit: CPUID.(07h,0):ECX bit 9. Fuegt VEX-256 hinzu; zusammen mit AVX512F die EVEX-512-Form, mit AVX512VL zusaetzlich EVEX-128/256. Ice Lake. Kein eigenes 512-bit-Flag. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "vpclmulqdq",
+            "cpuid_name": "vpclmulqdq / -mvpclmulqdq",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Companion, CPUID.(07h,0):ECX bit 10. Allein (ohne AVX-512) nur die VEX-256-Variante; mit AVX512F die EVEX-512-Variante, mit AVX512VL zusaetzlich EVEX-128/256. Die VEX-128-Variante wird ueber die AELTEREN Bits PCLMULQDQ+AVX angezeigt, nicht ueber dieses. Ice Lake. IM BESTAND VORHANDEN."
+          },
+          {
+            "token": "avx10.1",
+            "cpuid_name": "avx10.1 (CPUID.(07h,1):EDX bit 19 = AVX10 + CPUID.24h:EBX[7:0] = Version) / -mavx10.1",
+            "basis": "x512",
+            "jahr": "2024 (Granite Rapids)",
+            "bit32": true,
+            "bemerkung": "FEHLT IM BESTAND. AVX10.1 fuegt KEINE neue Instruktion gegenueber AVX-512 hinzu -- es ist exakt das Sapphire-Rapids-Subset-Buendel unter EINER Versionsnummer: F, CD, VL, DQ, BW, IFMA, VBMI, VBMI2, BITALG, VNNI, GFNI, VPOPCNTDQ, VPCLMULQDQ, VAES, BF16, FP16. NICHT enthalten: VP2INTERSECT, ER, PF, 4VNNIW, 4FMAPS, BMM. VEKTORLAENGEN (die Basis-Frage): urspruenglich sollten CPUID.24h:EBX bits 16/17/18 die maximale Breite 128/256/512 anzeigen (Namen AVX10/128, /256, /512). Intel hat AVX10/128 gestrichen (Spec-Rev 355989-003US, Juli 2024) und mit Whitepaper-Rev 3.0 die Breitenunterscheidung GANZ fallen gelassen: 512 bit ist PFLICHT, auch auf E-Cores. Die drei Bits sind heute als reserviert dokumentiert und lesen 111b. Es wurde NIE eine AVX10/256-CPU ausgeliefert. FOLGE FUER DIE GRAMMATIK: AVX10.1 impliziert x128 UND x256 UND x512 gleichzeitig (VL ist eingebaut) -- ich ordne es der Basis x512 zu, weil 512 die mandatierte Maximalbreite ist, aber es ist KEIN Subset-Token einer Basis, sondern eine ALTERNATIVE, versionierte Ausdrucksform derselben Menge. Compiler: g++ 15.3.0 und clang 22.1.8 akzeptieren -mavx10.1 (lokal verifiziert), g++ warnt dabei, dass -mavx10.1 seit GCC 14.3/15.1 auf 512 bit aliast und -mavx10.1-256/-512 in GCC 16 entfallen; clang 22 kennt -mavx10.1-512 bereits NICHT mehr. 32-bit: -m32 -mavx10.2 lokal akzeptiert (gcc und clang). GRAMMATIK-WARNUNG: der Name enthaelt einen PUNKT ('avx10.1'), und der Punkt ist in der Komposit-Notation der Trennzeichen -- das kollidiert und braucht eine Owner-Entscheidung (z.B. Token 'avx10_1' oder 'avx101')."
+          },
+          {
+            "token": "avx10.2",
+            "cpuid_name": "avx10.2 (CPUID.24h:EBX[7:0] >= 2; Zusatzbits CPUID.24h.ECX bit 2 AVX10_VNNI_INT, bit 3 AVX10_V2_AUX) / -mavx10.2",
+            "basis": "x512",
+            "jahr": "TBD -- Diamond Rapids (Server) und Nova Lake (Desktop)",
+            "bit32": true,
+            "bemerkung": "FEHLT IM BESTAND. Erste AVX10-Version, die WIRKLICH neue Instruktionen bringt: FP8 (OCP-Formate E5M2 und E4M3) mit Konvertierungen zwischen FP32/FP16/BF16/FP8, Post-Convolution-Arithmetik (Scale, Min/Max, Transzendente), VMPSADBW auf 512 bit (Motion Estimation), 16-bit-VNNI mit allen Vorzeichenkombinationen, MOVRS-Vektorvarianten. Vektorlaengen 128/256/512 sind ALLE verpflichtend (Spec-Rev 4.0: 'AVX10/512 will be used in all Intel products'). Compiler: g++ 15.3.0 und clang 22.1.8 akzeptieren -mavx10.2 (lokal verifiziert, auch unter -m32). GCC 15 hat AVX10.2 neu aufgenommen; -march=diamondrapids zieht AVX10.2 plus APX_F, AVX-IFMA, AVX-NE-CONVERT, AVX-VNNI-INT8/16, SHA512, SM3, SM4, MOVRS, AMX-* nach. Kein /proc/cpuinfo-String im Kernel -> Signaturmatching nur ueber CPUID direkt."
+          }
+        ],
+        "luecken": [
+          "INTEL-PRIMAERQUELLE NICHT GELESEN: Die AVX10.2-Architekturspezifikation (Intel 361050-006, Jan 2026) wurde heruntergeladen, ist aber auf dieser Maschine NICHT lesbar -- kein pdftotext/poppler, kein mutool, kein pip/pypdf. Eigene zlib-Extraktion lieferte nur das Inhaltsverzeichnis (Kapitel '2 CPUID', '3.1.2 FEATURE ENUMERATION', '3.1.4 INTEL AVX10.2 NEW INSTRUCTIONS'), keinen Fliesstext. www.intel.com liefert HTTP 403 auf WebFetch. Die AVX10-Angaben zu CPUID-Leaf 24h (EBX[7:0] Version, Bits 16/17/18 reserviert als 111b, ECX-Subleaf-1-Bits) stammen daher aus der Wikipedia-CPUID-Seite, die die Intel-Spezifikationen 355989-001/-003 und 361050-004 seitengenau zitiert -- also SEKUNDAERQUELLE MIT PRIMAERBELEG, nicht am Primaerdokument geprueft.",
+          "WINDOWS 32-BIT (der Indien-Fall des Owners): Ob der 32-bit-Kernel von Windows 10 den AVX-512-XSAVE-Zustand (XCR0 Bits 5/6/7: Opmask, ZMM_Hi256, Hi16_ZMM) tatsaechlich freischaltet, konnte ich NICHT belegen. Ohne diese OS-Freigabe meldet CPUID zwar die Flags, die Instruktionen loesen aber #UD aus. Architektonisch und toolchain-seitig ist AVX-512 unter IA-32 nachweislich verfuegbar (siehe unten), die OS-Seite auf 32-bit-Windows bleibt offen. Das ist der einzige Punkt, an dem die Owner-Frage nach 32-bit unbeantwortet bleibt -- er braucht eine Messung auf einer echten 32-bit-Windows-Installation oder eine Microsoft-Primaerquelle.",
+          "AVX10.2 NEUE INSTRUKTIONEN: die Liste (FP8 E5M2/E4M3, VMPSADBW, 16-bit-VNNI, MOVRS-Vektorformen, Post-Convolution) stuetzt sich auf Phoronix/TechPowerUp/Blogbeitraege und die GCC-Release-Notes, NICHT auf die gelesene Intel-Spezifikation. Die genaue Opcode-Liste ist damit nicht belastbar erhoben.",
+          "AVX512_BMM: dass es genau drei Instruktionen sind (VBITREVB, VBMACOR, VBMACXOR) und CPUID.8000_0021:EAX bit 23 gilt, stammt aus dem binutils-Patch vom 07.11.2025 und dem Linux-Kernel-Patch, beides ueber Suchergebnisse referiert -- die AMD-APM-Primaerquelle wurde nicht gelesen. Der Kernel-Eintrag X86_FEATURE_AVX512_BMM = (20*32+23) ist dagegen direkt aus torvalds/linux master verifiziert.",
+          "GENERATIONS-JAHRE: die Zuordnung Subset -> erste ausliefernde Mikroarchitektur stammt aus der Wikipedia-AVX-512-Seite (die ihrerseits Intel ISA-Extensions-Reference und GCC-Commits zitiert). Ich habe KEINE Intel-ARK-Einzelbelege je CPU geprueft. Insbesondere das FP16-Jahr ist zweideutig (Alder Lake 2021 hatte die Silizium-Faehigkeit, AVX-512 war aber ab Werk deaktiviert; erstes real nutzbares Produkt Sapphire Rapids 2023).",
+          "NICHT GEPRUEFT: ob es weitere, noch unveroeffentlichte AVX-512-Subsets in kommenden AMD- oder Intel-Generationen gibt. Der Kernel-Stand (master, heute abgerufen) und die GCC-15/16- sowie Clang-22-Optionslisten sind die Obergrenze meines Nachweises."
+        ],
+        "quellen": [
+          "https://raw.githubusercontent.com/torvalds/linux/master/arch/x86/include/asm/cpufeatures.h",
+          "https://raw.githubusercontent.com/torvalds/linux/master/arch/x86/include/asm/cpufeature.h",
+          "https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html",
+          "https://gcc.gnu.org/onlinedocs/gcc-14.2.0/gcc/x86-Options.html",
+          "https://gcc.gnu.org/gcc-15/changes.html",
+          "https://en.wikipedia.org/wiki/AVX-512",
+          "https://en.wikipedia.org/w/index.php?title=AVX-512&action=raw",
+          "https://en.wikipedia.org/wiki/AVX10",
+          "https://en.wikipedia.org/wiki/CPUID",
+          "https://en.wikipedia.org/w/index.php?title=CPUID&action=raw",
+          "https://www.phoronix.com/news/Intel-AVX10-Drops-256-Bit",
+          "https://www.phoronix.com/news/LLVM-19-Drops-Xeon-Phi",
+          "https://www.phoronix.com/news/AMD-Zen-6-Znver6-Binutils",
+          "https://www.phoronix.com/news/Intel-Diamond-Rapids-APX-AVX10",
+          "https://sourceware.org/pipermail/binutils/2025-November/145449.html",
+          "https://gcc.gnu.org/pipermail/gcc-patches/2025-December/703024.html",
+          "https://releases.llvm.org/19.1.0/tools/clang/docs/ReleaseNotes.html",
+          "https://discourse.llvm.org/t/rfc-x86-intel-remove-all-end-supports-of-intel-knl-knm-mic-avx512-targets/70901",
+          "https://en.wikipedia.org/wiki/EVEX_prefix",
+          "https://cdrdv2-public.intel.com/913918/361050-006-intel-avx10.2-arch-spec.pdf"
+        ]
+      },
+      {
+        "flags": [
+          {
+            "token": "mmx",
+            "cpuid_name": "mmx / -mmmx",
+            "basis": "NONE",
+            "jahr": "1997",
+            "bit32": true,
+            "bemerkung": "64-bit MM-Register (alias auf x87-Stack) -- KEINE der drei Basen x128/x256/x512. Fuer die Grammatik irrelevant, aber historischer Vorgaenger. cpuinfo 'mmx'. AMD-Erweiterung 'mmxext' (K7). gcc -m32 -mmmx akzeptiert (lokal verifiziert)."
+          },
+          {
+            "token": "3dnow",
+            "cpuid_name": "3dnow / -m3dnow",
+            "basis": "NONE",
+            "jahr": "1998",
+            "bit32": true,
+            "bemerkung": "AMD K6-2, gepaart mit 3dnowext (-m3dnowa) und 3dnowprefetch. TOT: seit Zen 1 aus AMD-CPUs entfernt. gcc 15.3 akzeptiert -m3dnow auch mit -m32 (lokal verifiziert). Nur Vollstaendigkeit der Vorgaengerkette."
+          },
+          {
+            "token": "sse",
+            "cpuid_name": "sse / -msse",
+            "basis": "x128",
+            "jahr": "1999",
+            "bit32": true,
+            "bemerkung": "Pentium III. Erste echte XMM-Basis (128 bit, nur float). MSVC: /arch:SSE, laut MS-Doku ausdruecklich nur fuer x86 (32 bit). Untergrenze fuer x128."
+          },
+          {
+            "token": "2",
+            "cpuid_name": "sse2 / -msse2",
+            "basis": "x128",
+            "jahr": "2000",
+            "bit32": true,
+            "bemerkung": "SCHARNIER FUER LENS 3: sse2 ist die harte Windows-10-32-Bit-Mindestanforderung (PAE + NX + SSE2). MSVC-Default fuer x86 ist /arch:SSE2. Auf x86-64 ohnehin Baseline. Damit ist x128/sse2 der einzige Basispunkt, der auf JEDER 32-Bit-Windows-10-Maschine garantiert existiert. Fedora hob auch die i686-Baseline auf SSE2 an."
+          },
+          {
+            "token": "3",
+            "cpuid_name": "sse3 -- cpuinfo heisst \"pni\"! / -msse3",
+            "basis": "x128",
+            "jahr": "2004",
+            "bit32": true,
+            "bemerkung": "FALLE: /proc/cpuinfo meldet NICHT 'sse3', sondern \"pni\" (Prescott New Instructions) -- so in arch/x86/include/asm/cpufeatures.h: X86_FEATURE_XMM3 -> \"pni\". Wenn x128 in den Katalog kommt, muss diese Falle wie die Unterstrich-Falle per static_assert zementiert werden."
+          },
+          {
+            "token": "ssse3",
+            "cpuid_name": "ssse3 / -mssse3",
+            "basis": "x128",
+            "jahr": "2006",
+            "bit32": true,
+            "bemerkung": "Merom. cpuinfo 'ssse3'. Bringt PSHUFB -- fuer Layout-/Permutations-Algorithmen relevant."
+          },
+          {
+            "token": "41",
+            "cpuid_name": "sse4_1 / -msse4.1",
+            "basis": "x128",
+            "jahr": "2007",
+            "bit32": true,
+            "bemerkung": "Penryn. cpuinfo 'sse4_1' MIT Unterstrich, gcc-Flag '-msse4.1' MIT PUNKT -- der Punkt kollidiert mit dem Punkt-Trenner der Komposit-Notation. Token-Vorschlag '41', Owner-Entscheid noetig."
+          },
+          {
+            "token": "42",
+            "cpuid_name": "sse4_2 / -msse4.2",
+            "basis": "x128",
+            "jahr": "2008",
+            "bit32": true,
+            "bemerkung": "Nehalem. Seit Windows 11 24H2 harte OS-Mindestanforderung (zusammen mit POPCNT) -- fuer die 32-Bit-Frage belanglos, weil Windows 11 gar kein 32-Bit-x86 mehr kennt. Gleiche Punkt-Kollision wie sse4_1."
+          },
+          {
+            "token": "4a",
+            "cpuid_name": "sse4a / -msse4a",
+            "basis": "x128",
+            "jahr": "2007",
+            "bit32": true,
+            "bemerkung": "AMD K10. Anders als XOP/FMA4/TBM/LWP NICHT aus Zen entfernt -- auf der prod1/Zen5-Maschine ist -msse4a laut 'gcc -march=native -Q --help=target' [enabled] (lokal verifiziert). Reines AMD-Flag, auf Intel nie vorhanden."
+          },
+          {
+            "token": "aes",
+            "cpuid_name": "aes / -maes",
+            "basis": "x128",
+            "jahr": "2010",
+            "bit32": true,
+            "bemerkung": "Westmere. 128-bit-Vorgaenger von vaes (Companion). cpuinfo 'aes'."
+          },
+          {
+            "token": "pclmulqdq",
+            "cpuid_name": "pclmulqdq / -mpclmul",
+            "basis": "x128",
+            "jahr": "2010",
+            "bit32": true,
+            "bemerkung": "FALLE: cpuinfo 'pclmulqdq', gcc-Flag aber '-mpclmul' (OHNE qdq). Genau die im Header dokumentierte Trennung cpuinfo-Id vs. Compiler-Flag -- darf nicht per String-Heuristik abgeleitet werden. 128-bit-Vorgaenger von vpclmulqdq."
+          },
+          {
+            "token": "shani",
+            "cpuid_name": "sha_ni / -msha",
+            "basis": "x128",
+            "jahr": "2016",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. FALLE: cpuinfo 'sha_ni', gcc-Flag '-msha'. Goldmont 2016, AMD ab Zen 1 2017. Auf prod1/Zen5 [enabled] (lokal verifiziert)."
+          },
+          {
+            "token": "avx",
+            "cpuid_name": "avx / -mavx",
+            "basis": "x256",
+            "jahr": "2011",
+            "bit32": true,
+            "bemerkung": "LUECKE IM IST-KATALOG: der Avx256-Tier fuehrt avx2/fma/f16c/avx_vnni, aber NICHT das Basisflag 'avx' selbst. Sandy Bridge 2011 / Bulldozer 2011. Braucht OS-XSAVE-Freigabe des YMM-State. Laeuft im 32-Bit-Modus, aber nur ymm0-ymm7: 'In 32-bit mode VEX encoded instructions can only access the first 8 YMM/XMM registers' (Wikipedia VEX prefix)."
+          },
+          {
+            "token": "2",
+            "cpuid_name": "avx2 / -mavx2",
+            "basis": "x256",
+            "jahr": "2013",
+            "bit32": true,
+            "bemerkung": "Haswell 2013, AMD Excavator 2015. Im Ist-Katalog. Im 32-Bit-Modus voll uebersetzbar, aber nur ymm0-ymm7."
+          },
+          {
+            "token": "fma",
+            "cpuid_name": "fma (FMA3) / -mfma",
+            "basis": "x256",
+            "jahr": "2012",
+            "bit32": true,
+            "bemerkung": "AMD Piledriver 2012, Intel Haswell 2013. cpuinfo 'fma'. Im Ist-Katalog."
+          },
+          {
+            "token": "f16c",
+            "cpuid_name": "f16c / -mf16c",
+            "basis": "x256",
+            "jahr": "2011",
+            "bit32": true,
+            "bemerkung": "AMD Bulldozer 2011, Intel Ivy Bridge 2012. Im Ist-Katalog."
+          },
+          {
+            "token": "fma4",
+            "cpuid_name": "fma4 / -mfma4",
+            "basis": "x256",
+            "jahr": "2011",
+            "bit32": true,
+            "bemerkung": "AMD-only (Bulldozer). TOT: seit Zen 1 entfernt. gcc 15.3 akzeptiert -mfma4 mit -m32 (lokal verifiziert). Nur Vollstaendigkeit."
+          },
+          {
+            "token": "xop",
+            "cpuid_name": "xop / -mxop",
+            "basis": "x256",
+            "jahr": "2011",
+            "bit32": true,
+            "bemerkung": "AMD-only (Bulldozer), 4-Operanden-Vektorbefehle. TOT: seit Zen 1 entfernt (zusammen mit TBM und LWP). gcc 15.3 akzeptiert -mxop mit -m32."
+          },
+          {
+            "token": "vnni",
+            "cpuid_name": "avx_vnni / -mavxvnni",
+            "basis": "x256",
+            "jahr": "2021",
+            "bit32": true,
+            "bemerkung": "Alder Lake. VEX-kodierte 256-bit-Variante von avx512_vnni -- laeuft auch auf E-Cores ohne AVX-512. Im Ist-Katalog. cpuinfo MIT Unterstrich ('avx_vnni'), gcc-Flag OHNE ('-mavxvnni')."
+          },
+          {
+            "token": "ifma",
+            "cpuid_name": "AVX_IFMA / -mavxifma",
+            "basis": "x256",
+            "jahr": "2023",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. Sierra Forest / Arrow Lake. SIGNATUR-FALLE: X86_FEATURE_AVX_IFMA (12*32+23) hat im Kernel KEINEN quotierten Namen -> erscheint gar NICHT in /proc/cpuinfo. Signatur-Matching ueber cpuinfo kann dieses Flag NIE sehen, es braucht CPUID-Direktabfrage. gcc -m32 -mavxifma akzeptiert (lokal verifiziert)."
+          },
+          {
+            "token": "vnniint8",
+            "cpuid_name": "AVX-VNNI-INT8 / -mavxvnniint8",
+            "basis": "x256",
+            "jahr": "2023",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. Sierra Forest / Arrow Lake. gcc 15.3 UND clang 22.1.8 akzeptieren -mavxvnniint8 mit -m32 (lokal verifiziert). Kernel-cpuinfo-String nicht belegbar, siehe luecken."
+          },
+          {
+            "token": "vnniint16",
+            "cpuid_name": "AVX-VNNI-INT16 / -mavxvnniint16",
+            "basis": "x256",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. Arrow Lake / Lunar Lake. gcc -m32 -mavxvnniint16 akzeptiert (lokal verifiziert). Kernel-cpuinfo-String nicht belegbar."
+          },
+          {
+            "token": "neconvert",
+            "cpuid_name": "AVX-NE-CONVERT / -mavxneconvert",
+            "basis": "x256",
+            "jahr": "2023",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. BF16/FP16/FP32-Konvertierung VEX-kodiert (ohne AVX-512). Sierra Forest / Arrow Lake. gcc -m32 -mavxneconvert akzeptiert (lokal verifiziert)."
+          },
+          {
+            "token": "f",
+            "cpuid_name": "avx512f / -mavx512f",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": true,
+            "bemerkung": "Knights Landing 2016, Skylake-SP 2017. Pflichtbasis jedes AVX-512. Im Ist-Katalog. LENS-3-KERNBEFUND: LAEUFT im 32-Bit-Modus -- lokal bewiesen, 'gcc -m32 -O2 -mavx512f' erzeugt echte vmovdqa32/vpaddd auf %zmm."
+          },
+          {
+            "token": "cd",
+            "cpuid_name": "avx512cd / -mavx512cd",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": true,
+            "bemerkung": "Conflict Detection. Im Ist-Katalog."
+          },
+          {
+            "token": "er",
+            "cpuid_name": "avx512er / -mavx512er (ENTFERNT in GCC 15)",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": false,
+            "bemerkung": "FEHLT im Ist-Katalog -- und das ist RICHTIG SO. Nur Knights Landing/Mill, nie in einer Server-/Desktop-CPU. HARTER BEFUND: gcc 15.3 kennt '-mavx512er' NICHT MEHR ('unrecognized command-line option', lokal verifiziert). Hoechstens als historischer Eintrag, NIE als Compile-Flag."
+          },
+          {
+            "token": "pf",
+            "cpuid_name": "avx512pf / -mavx512pf (ENTFERNT in GCC 15)",
+            "basis": "x512",
+            "jahr": "2016",
+            "bit32": false,
+            "bemerkung": "Wie 'er': nur Knights Landing/Mill. gcc 15.3 kennt '-mavx512pf' NICHT MEHR (lokal verifiziert)."
+          },
+          {
+            "token": "vl",
+            "cpuid_name": "avx512vl / -mavx512vl",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": true,
+            "bemerkung": "Skylake-SP. Erlaubt EVEX-Befehle auf xmm/ymm -- damit ist vl der Bruecken-Token zwischen x512 und x128/x256. Im Ist-Katalog. Fuer LENS 3 der wichtigste Subtoken: auf 32-Bit ist der Registerdruck bei zmm am hoechsten (nur 8 statt 32), vl macht EVEX auf schmaleren Registern nutzbar."
+          },
+          {
+            "token": "dq",
+            "cpuid_name": "avx512dq / -mavx512dq",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": true,
+            "bemerkung": "Doubleword/Quadword. Im Ist-Katalog."
+          },
+          {
+            "token": "bw",
+            "cpuid_name": "avx512bw / -mavx512bw",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": true,
+            "bemerkung": "Byte/Word (8/16-bit-Integer). Im Ist-Katalog."
+          },
+          {
+            "token": "ifma",
+            "cpuid_name": "avx512ifma / -mavx512ifma",
+            "basis": "x512",
+            "jahr": "2018",
+            "bit32": true,
+            "bemerkung": "Cannon Lake. cpuinfo OHNE Unterstrich ('avx512ifma'). Im Ist-Katalog. TOKEN-KOLLISION: 'ifma' ist zugleich Token von AVX_IFMA (x256) -- in der Komposit-Notation nur ueber die Basis unterscheidbar ({x512.ifma} vs. {x256.ifma})."
+          },
+          {
+            "token": "vbmi",
+            "cpuid_name": "avx512vbmi / -mavx512vbmi",
+            "basis": "x512",
+            "jahr": "2018",
+            "bit32": true,
+            "bemerkung": "Cannon Lake. cpuinfo OHNE Unterstrich. Im Ist-Katalog."
+          },
+          {
+            "token": "4vnniw",
+            "cpuid_name": "avx512_4vnniw / -mavx5124vnniw (ENTFERNT in GCC 15)",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": false,
+            "bemerkung": "FEHLT im Ist-Katalog -- richtig so. Nur Knights Mill. gcc 15.3 kennt '-mavx5124vnniw' NICHT MEHR (lokal verifiziert). cpuinfo-String 'avx512_4vnniw' existiert im Kernel weiterhin -- ein Flag, das die Signatur melden koennte, das aber kein Compiler mehr bauen kann."
+          },
+          {
+            "token": "4fmaps",
+            "cpuid_name": "avx512_4fmaps / -mavx5124fmaps (ENTFERNT in GCC 15)",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": false,
+            "bemerkung": "Wie 4vnniw: nur Knights Mill, gcc 15.3 kennt das Flag nicht mehr (lokal verifiziert). cpuinfo-String 'avx512_4fmaps' existiert im Kernel."
+          },
+          {
+            "token": "vpopcntdq",
+            "cpuid_name": "avx512_vpopcntdq / -mavx512vpopcntdq",
+            "basis": "x512",
+            "jahr": "2017",
+            "bit32": true,
+            "bemerkung": "Knights Mill 2017, Ice Lake 2019. Im Ist-Katalog. cpuinfo MIT Unterstrich."
+          },
+          {
+            "token": "vnni",
+            "cpuid_name": "avx512_vnni / -mavx512vnni",
+            "basis": "x512",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Cascade Lake. Im Ist-Katalog. TOKEN-KOLLISION mit avx_vnni (x256): {x512.vnni} vs. {x256.vnni}."
+          },
+          {
+            "token": "vbmi2",
+            "cpuid_name": "avx512_vbmi2 / -mavx512vbmi2",
+            "basis": "x512",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Ice Lake. Im Ist-Katalog. Unterstrich-Falle: cpuinfo MIT, gcc-Flag OHNE."
+          },
+          {
+            "token": "bitalg",
+            "cpuid_name": "avx512_bitalg / -mavx512bitalg",
+            "basis": "x512",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Ice Lake. Im Ist-Katalog."
+          },
+          {
+            "token": "vp2intersect",
+            "cpuid_name": "avx512_vp2intersect / -mavx512vp2intersect",
+            "basis": "x512",
+            "jahr": "2020",
+            "bit32": true,
+            "bemerkung": "Tiger Lake 2020; von Intel spaeter wieder fallengelassen, aber von AMD Zen 5 implementiert -- auf prod1/Zen5 laut 'gcc -march=native -Q --help=target' [enabled] (lokal verifiziert). Im Ist-Katalog. gcc 15.3 kennt das Flag noch, anders als er/pf/4vnniw/4fmaps."
+          },
+          {
+            "token": "bf16",
+            "cpuid_name": "avx512_bf16 / -mavx512bf16",
+            "basis": "x512",
+            "jahr": "2020",
+            "bit32": true,
+            "bemerkung": "Cooper Lake. Kernel: X86_FEATURE_AVX512_BF16 (12*32+5) MIT quotiertem Namen \"avx512_bf16\" -> erscheint in /proc/cpuinfo. Im Ist-Katalog."
+          },
+          {
+            "token": "fp16",
+            "cpuid_name": "avx512_fp16 / -mavx512fp16",
+            "basis": "x512",
+            "jahr": "2021",
+            "bit32": true,
+            "bemerkung": "Sapphire Rapids / Alder Lake. Im Ist-Katalog. Zen 6 wird es laut GCC-znver6-Patch ebenfalls bringen."
+          },
+          {
+            "token": "bmm",
+            "cpuid_name": "AVX512_BMM / -mavx512bmm",
+            "basis": "x512",
+            "jahr": "2026",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG -- NEUESTES AVX-512-Subset. AMD Zen 6 (znver6). Bit-Matrix-Multiply/Bit-Reversal (VBMACOR16x16x16, VBMACXOR16x16x16, VBITREV). CPUID 0x80000021 EAX[23]. Kernel-Macro X86_FEATURE_AVX512_BMM existiert, aber OHNE quotierten Namen -> NICHT in /proc/cpuinfo sichtbar. gcc 15.3 kennt '-mavx512bmm' NOCH NICHT ('unrecognized command-line option', lokal verifiziert); erst GCC 16 / LLVM-PR 182556. Erst aufnehmen, wenn die 8er-Docker-Matrix eine Toolchain hat, die es kennt."
+          },
+          {
+            "token": "gfni",
+            "cpuid_name": "gfni / -mgfni",
+            "basis": "companion",
+            "jahr": "2018",
+            "bit32": true,
+            "bemerkung": "Ice Lake / Tremont. Echter Companion: existiert in SSE-, VEX- UND EVEX-Kodierung -- deshalb korrekt OHNE Klammer neben der Basis. Im Ist-Katalog. Auf prod1/Zen5 [enabled]."
+          },
+          {
+            "token": "vaes",
+            "cpuid_name": "vaes / -mvaes",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Ice Lake. VEX/EVEX-Vektorvariante von aes. Im Ist-Katalog."
+          },
+          {
+            "token": "vpclmulqdq",
+            "cpuid_name": "vpclmulqdq / -mvpclmulqdq",
+            "basis": "companion",
+            "jahr": "2019",
+            "bit32": true,
+            "bemerkung": "Ice Lake. VEX/EVEX-Vektorvariante von pclmulqdq. Im Ist-Katalog."
+          },
+          {
+            "token": "sha512",
+            "cpuid_name": "SHA512 / -msha512",
+            "basis": "companion",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. Arrow Lake / Lunar Lake, VEX-kodiert (256 bit). SIGNATUR-FALLE: X86_FEATURE_SHA512 (12*32+0) hat KEINEN quotierten Namen -> erscheint NICHT in /proc/cpuinfo. gcc -m32 -msha512 akzeptiert (lokal verifiziert)."
+          },
+          {
+            "token": "sm3",
+            "cpuid_name": "SM3 / -msm3",
+            "basis": "companion",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. Chinesischer Hash-Standard, Arrow Lake / Lunar Lake. X86_FEATURE_SM3 (12*32+1), KEIN quotierter Name -> NICHT in /proc/cpuinfo. gcc -m32 -msm3 akzeptiert."
+          },
+          {
+            "token": "sm4",
+            "cpuid_name": "SM4 / -msm4",
+            "basis": "companion",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. Chinesische Blockchiffre. X86_FEATURE_SM4 (12*32+2), KEIN quotierter Name -> NICHT in /proc/cpuinfo. gcc -m32 -msm4 akzeptiert."
+          },
+          {
+            "token": "popcnt",
+            "cpuid_name": "popcnt / -mpopcnt",
+            "basis": "scalar",
+            "jahr": "2008",
+            "bit32": true,
+            "bemerkung": "Nehalem (zusammen mit SSE4.2). Im Ist-Katalog. Seit Windows 11 24H2 OS-Mindestanforderung -- fuer 32-Bit belanglos."
+          },
+          {
+            "token": "bmi1",
+            "cpuid_name": "bmi1 / -mbmi",
+            "basis": "scalar",
+            "jahr": "2013",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG (nur bmi2 ist drin). FALLE: cpuinfo 'bmi1', gcc-Flag '-mbmi' (OHNE die 1). Haswell 2013 / AMD Piledriver 2012. ANDN/BEXTR/BLSI/TZCNT."
+          },
+          {
+            "token": "bmi2",
+            "cpuid_name": "bmi2 / -mbmi2",
+            "basis": "scalar",
+            "jahr": "2013",
+            "bit32": true,
+            "bemerkung": "Haswell. Im Ist-Katalog. PDEP/PEXT -- fuer Bit-Interleaving in Layout-Algorithmen zentral. ACHTUNG fuer die Messung: PDEP/PEXT sind auf Zen 1/2 mikrokodiert und um Groessenordnungen langsamer; das ist ein Mess-, kein Verfuegbarkeitsproblem."
+          },
+          {
+            "token": "abm",
+            "cpuid_name": "abm / -mabm (bzw. lzcnt / -mlzcnt)",
+            "basis": "scalar",
+            "jahr": "2007",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. AMD K10 'Advanced Bit Manipulation' = LZCNT + POPCNT. cpuinfo 'abm'. Intel fuehrt LZCNT stattdessen unter BMI1. gcc kennt sowohl -mabm als auch -mlzcnt (beide -m32-tauglich, lokal verifiziert). Auf prod1/Zen5 [enabled]."
+          },
+          {
+            "token": "movbe",
+            "cpuid_name": "movbe / -mmovbe",
+            "basis": "scalar",
+            "jahr": "2008",
+            "bit32": true,
+            "bemerkung": "FEHLT IM IST-KATALOG. Byte-Swap beim Laden/Speichern. Atom 2008, Haswell 2013. Fuer Serialisierung/Endianness in der Mess-Kette potenziell relevant."
+          },
+          {
+            "token": "avx10",
+            "cpuid_name": "AVX10.1 / AVX10.2 (-mavx10.1, -mavx10.2; MSVC /arch:AVX10.1, /arch:AVX10.2)",
+            "basis": "NONE",
+            "jahr": "2024",
+            "bit32": true,
+            "bemerkung": "STRUKTURBRUCH FUER DIE GRAMMATIK: AVX10 ersetzt die Subset-Flag-Wolke durch eine VERSIONSNUMMER (monoton steigend, inklusiv, alle Vektorlaengen). Granite Rapids 2024 (10.1), Diamond Rapids/Nova Lake (10.2). Das Modell 'Basis + Subtokens in Klammern' passt darauf NICHT. gcc 15.3: -mavx10.1 ist auf 512 bit aliased, -mavx10.1-256/-512 werden in GCC 16 deprecatet; -mavx10.2 existiert, -mavx10.2-256/-512 NICHT (alles lokal verifiziert). MSVC dokumentiert /arch:AVX10.1 und /arch:AVX10.2 AUSDRUECKLICH auch fuer x86 (32 bit), Default-Vektorlaenge 256, umschaltbar mit /vlen. Kernel: KEIN AVX10-Feature-Bit in cpufeatures.h gefunden -> ueber /proc/cpuinfo nicht erkennbar."
+          },
+          {
+            "token": "apx",
+            "cpuid_name": "APX / -mapxf",
+            "basis": "NONE",
+            "jahr": "2026",
+            "bit32": false,
+            "bemerkung": "HARTE 32-BIT-GRENZE, LOKAL BEWIESEN: 'gcc -m32 -mapxf' -> \"cc1: error: '-mapxf' is not supported for 32-bit code\"; 'clang -m32 -mapxf' -> \"error: unsupported option '-mapxf' for target 'i386-pc-linux-gnu'\". Grund: REX2 belegt den Opcode der in 64-bit ungueltigen AAD-Instruktion, EGPRs r16-r31 gibt es nur im 64-bit-Modus. Kein SIMD-Flag im engeren Sinn (GPR-Erweiterung), aber der sauberste Beleg, dass x86-Erweiterungen seit 2024 64-Bit-only gebaut werden. Kernel-Macro X86_FEATURE_APX (21*32+9) ohne quotierten Namen -> nicht in /proc/cpuinfo."
+          },
+          {
+            "token": "amx",
+            "cpuid_name": "amx_tile / amx_int8 / amx_bf16 / amx_fp16 (-mamx-tile, -mamx-int8, ...)",
+            "basis": "NONE",
+            "jahr": "2023",
+            "bit32": false,
+            "bemerkung": "ZWEITE HARTE 32-BIT-GRENZE, LOKAL BEWIESEN: das Kommandozeilen-Flag '-mamx-tile' wird mit -m32 zwar ANGENOMMEN, aber die Intrinsics fehlen -- '_tile_loadd'/'_tile_dpbssd' ergeben mit -m32 'implicit declaration of function', mit -m64 uebersetzen sie fehlerfrei. Ursache: die AMX-Intrinsic-Header sind mit #ifdef __x86_64__ geklammert. Das Flag allein ist also KEIN Beweis fuer Verfuegbarkeit. AMX ist eine Kachel-Matrix-Einheit, KEINE Vektorregisterbreite -- gehoert nicht in die x128/x256/x512-Achse. cpuinfo: amx_tile/amx_bf16/amx_int8 sind quotiert (sichtbar), amx_fp16 NICHT."
+          }
+        ],
+        "luecken": [
+          "IST-KATALOG-DISKREPANZ (nicht geraten, nachgezaehlt): Der Auftrag nennt 30 Flags in vier Tiers (17 Avx512, 5 Avx256, 5 Companion, 3 Scalar). In ALLEN vier lokalen Arbeitsbaeumen (/home/comdare/wt-b14-ce, wt-b-r4-ci, wt-lb6, wt-pmc-l3-honest) steht in libs/cache_engine/include/cache_engine/measurement/simd_feature_flag.hpp aber 'std::array<SimdFeatureFlag, 23>' mit 'static_assert(kSimdFeatureFlagCatalog.size() == 23)' und 'static_assert(count_flags_of_tier(SimdFlagTier::Avx512) == 14)'. Ist-Stand = 23 Flags: 14 Avx512, 4 Avx256, 3 Companion, 2 Scalar. Entweder stammt die 30er-Zahl aus einer nicht gelandeten Aenderung oder sie ist falsch. VOR jeder Erweiterung klaeren, sonst wird gegen einen Phantom-Bestand gebaut.",
+          "Kernel-cpuinfo-Strings fuer AVX_VNNI_INT8, AVX_VNNI_INT16, AVX_NE_CONVERT und AVX10 nicht belegbar: in arch/x86/include/asm/cpufeatures.h und tools/arch/x86/include/asm/cpufeatures.h (torvalds/linux master) wurden diese Macros nicht gefunden. Ob sie unter anderem Namen/Wort existieren oder gar nicht im Mainline-Kernel sind, bleibt offen. Die Compiler-Flags (-mavxvnniint8/-mavxvnniint16/-mavxneconvert) sind dagegen lokal an gcc 15.3 und clang 22.1.8 verifiziert.",
+          "LENS 3 (b), offen: Ob Windows 10 32-Bit die AVX-512-XSTATE-Komponenten (Opmask, ZMM_Hi256) per XSETBV ueberhaupt freigibt, konnte NICHT belegt werden. Belegt ist nur die ISA-Seite (Intel SDM Vol.1: 'the extended processor states (ZMM and opmask registers) exist in all operating modes'; 'ZMM0_H-ZMM7_H are updated in 32-bit mode'; 'Hi16_ZMM state is always in its initial configuration outside 64-bit mode') und die Compiler-Seite. Die OS-Freigabe unter 32-Bit-Windows ist ungeprueft -- ein AVX-512-Binary koennte dort trotz passender CPU mit #UD sterben. Muss auf echter 32-Bit-Windows-10-Hardware gemessen werden, bevor x512 fuer Windows-32-Bit als lieferbar erklaert wird.",
+          "LENS 3 (d), die eigentliche Owner-Frage: Keine belastbare Zahl zur Verbreitung von Windows 10 32-Bit IN INDIEN gefunden. Statcounter (gs.statcounter.com/os-market-share/desktop/india) schluesselt Windows nach VERSION auf, NICHT nach 32/64 Bit. Es gibt damit keine oeffentliche Quelle, die die Owner-Aussage 'In Indien ist 32bit noch aktuell unter Windows 10' quantitativ stuetzt ODER widerlegt. Was belegbar ist, zeigt in die Gegenrichtung: die Steam Hardware Survey Juli 2026 listet GAR KEINEN 32-Bit-Eintrag mehr (Windows 11 64 bit 70,26 %, Windows 10 64 bit 23,30 %, Windows 7 64 bit 0,08 %); Valve gab bei der Abkuendigung an, Windows 10 32-Bit laufe auf 0,01 % der gemeldeten Systeme, und stellte den Support zum 01.01.2026 ein. Steam ist aber eine Gamer-Stichprobe und fuer indische Buero-/Bildungs-PCs nicht repraesentativ -- genau das ist die Luecke.",
+          "Token-Grammatik ungeklaert (Owner-Entscheid, nicht recherchierbar): (a) PUNKT-KOLLISION -- die gcc-Flags -msse4.1/-msse4.2 und -mavx10.1/-mavx10.2 enthalten selbst einen PUNKT, der in 'memory_layout=...{x512.f.vl.bw.dq}.gfni' der Trenner ist. (b) TOKEN-KOLLISIONEN -- 'ifma' existiert als avx512ifma (x512) UND AVX_IFMA (x256); 'vnni' als avx512_vnni (x512) UND avx_vnni (x256); '2' waere sowohl sse2 (x128) als auch avx2 (x256). Nur die Basis-Vorsilbe trennt sie, was die Tokens ausserhalb der Klammer mehrdeutig macht. (c) AVX10 ist versioniert statt subset-basiert und passt strukturell nicht in 'Basis + Subtoken-Klammer'.",
+          "Die Regel 'Token = Name ohne Basis-Vorsilbe und ohne Unterstriche' bricht bei Flags mit eigenem v-Praefix: aus 'avx512_vpopcntdq' wird 'vpopcntdq', aber das Companion-Flag 'vpclmulqdq' behaelt sein 'v'. Ob 'v' Basis-Vorsilbe (zu streichen) oder Namensbestandteil ist, ist aus der Regel nicht ableitbar. Ebenso ungeklaert: 'sha_ni' -> 'shani' oder 'sha'? Der gcc-Flag heisst '-msha'.",
+          "Intel SDM und AMD APM wurden NICHT als PDF-Primaerquelle gelesen. Die SDM-Zitate stammen aus dem HTML-Spiegel xem.github.io/minix86 (SDM Vol.1 Abschnitt 15.1.2 '32 SIMD Register Support': 'The number of available vector registers in 32-bit mode is still 8.') und aus felixcloutier.com (VZEROALL: 'In Compatibility and legacy 32-bit mode only the lower 8 registers are modified.'). Beides sind Spiegel, keine intel.com-URLs. Die AMD APM wurde ueberhaupt nicht gelesen -- die AMD-Angaben (Zen entfernt XOP/TBM/LWP/FMA4; Zen 6 bringt AVX512_BMM) stuetzen sich auf WikiChip, Phoronix und GCC-/LLVM-Patch-Mails.",
+          "Nicht geprueft: Verhalten von MSVC im 32-Bit-Modus jenseits der Doku (kein Windows-Toolchain-Zugriff in dieser Umgebung). Die MSVC-Aussagen stammen ausschliesslich aus learn.microsoft.com /arch (x86), nicht aus einem eigenen Uebersetzungslauf.",
+          "Nicht belegt: ob eine der 8 Ziel-Distributionen der 8er-Docker-Matrix ueberhaupt noch ein 32-Bit-Ziel-Image anbietet. Belegt ist nur, dass Ubuntu i386 ab 19.10 als Host-Architektur entfallen ist, Arch i686 ab November 2017 nicht mehr unterstuetzt und Debian 13 'Trixie' keinen i386-Kernel und keinen i386-Installer mehr liefert (i386 nur noch als multiarch-/chroot-Teilarchitektur auf amd64)."
+        ],
+        "quellen": [
+          "https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html",
+          "https://en.wikipedia.org/wiki/AVX-512",
+          "https://en.wikipedia.org/wiki/Advanced_Vector_Extensions",
+          "https://en.wikipedia.org/wiki/EVEX_prefix",
+          "https://en.wikipedia.org/wiki/VEX_prefix",
+          "https://xem.github.io/minix86/manual/intel-x86-and-64-manual-vol1/o_7281d5ea06a5b67a-365.html",
+          "https://xem.github.io/minix86/manual/intel-x86-and-64-manual-vol1/o_7281d5ea06a5b67a-367.html",
+          "https://www.felixcloutier.com/x86/vzeroall",
+          "https://learn.microsoft.com/en-us/cpp/build/reference/arch-x86",
+          "https://raw.githubusercontent.com/torvalds/linux/master/arch/x86/include/asm/cpufeatures.h",
+          "https://raw.githubusercontent.com/torvalds/linux/master/tools/arch/x86/include/asm/cpufeatures.h",
+          "https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam",
+          "https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-8.1-and-8/dn482072(v=win.10)",
+          "https://www.tomshardware.com/software/windows/microsoft-updates-windows-11-24h2-requirements-cpu-must-support-sse42-or-the-os-will-not-boot",
+          "https://www.theregister.com/software/2025/08/12/debian_13_trixie_arrives_x86_32_and_mips_out_risc_v_in/807026",
+          "https://lists.ubuntu.com/archives/ubuntu-announce/2019-June/000245.html",
+          "https://archlinux.org/news/phasing-out-i686-support/",
+          "https://fedoraproject.org/wiki/Changes/Update_i686_architectural_baseline_to_include_SSE2",
+          "https://www.phoronix.com/news/Linux-7.1-KVM-AVX-512-BMM",
+          "https://en.wikichip.org/wiki/x86/extensions",
+          "https://www.techpowerup.com/341141/steam-confirms-end-of-support-for-32-bit-windows-os-in-2026",
+          "https://gs.statcounter.com/os-market-share/desktop/india",
+          "https://cdrdv2-public.intel.com/849709/356368-003-intel-avx10-technical-paper.pdf",
+          "https://cdrdv2-public.intel.com/861610/355828-007-intel-apx-spec.pdf"
+        ]
+      },
+      {
+        "flags": [
+          {
+            "token": "aes",
+            "cpuid_name": "AES (CPUID.01H:ECX[25]) / cpuinfo \"aes\" / GCC+Clang -maes",
+            "basis": "companion",
+            "jahr": "2010 (Intel Westmere), 2011 (AMD Bulldozer)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. AES-Runden auf XMM. EINORDNUNG=COMPANION, harte Begruendung aus der Intel-Instruktionstabelle AESENC: die einzigen Formen sind '66 0F 38 DC AESENC xmm1,xmm2/m128 -> CPUID AES' und 'VEX.128 VAESENC xmm -> CPUID AES AVX'. Es gibt KEINE 256/512-Form unter dem aes-Bit. aes ist also 128-bit-fest und traegt keinerlei Breiteninformation -> steht IMMER ohne Klammer. 32-bit: Modus-Spalte 'V/V' (valid in 64-bit UND compat/legacy) -> voll IA-32-tauglich."
+          },
+          {
+            "token": "vaes",
+            "cpuid_name": "VAES (CPUID.07H:0:ECX[9]) / cpuinfo \"vaes\" / GCC+Clang -mvaes",
+            "basis": "companion",
+            "jahr": "2019 (Intel Ice Lake), 2020 (AMD Zen 3)",
+            "bit32": true,
+            "bemerkung": "IM Ist-Katalog (Tier Companion) -- Einordnung BESTAETIGT, aber die Semantik ist subtiler als 'gleiche Faehigkeit, breiter'. VAESENC-Tabelle verbatim: VEX.256 -> 'VAES'; EVEX.512 -> 'VAES AVX512F'; EVEX.128/256 -> 'VAES AVX512VL'. Das vaes-Bit zertifiziert also NUR >=256; die 128-bit-Form bleibt unter aes. vaes ist damit die BREITEN-PROMOTION von aes, aber es ist trotzdem ein eigenstaendiges CPUID-Bit, dessen erreichte Breite sich aus der Basis der Klammer ergibt: {x256...}.vaes = VEX.256, {x512.f}.vaes = EVEX.512, {x512.f.vl}.vaes = EVEX.128/256. -> COMPANION ohne Klammer, mit Aufloesungsregel gegen die Basis. 32-bit: alle Formen 'V/V'."
+          },
+          {
+            "token": "pclmulqdq",
+            "cpuid_name": "PCLMULQDQ (CPUID.01H:ECX[1]) / cpuinfo \"pclmulqdq\" / GCC+Clang -mpclmul",
+            "basis": "companion",
+            "jahr": "2010 (Intel Westmere), 2011 (AMD Bulldozer)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. Carry-less Multiply (CRC, GF(2^128)-Arithmetik). NAMENSFALLE, exakt von der Art der bereits dokumentierten Unterstrich-Falle: cpuinfo heisst \"pclmulqdq\", das GCC-Flag heisst ABER -mpclmul (ohne qdq). Getrennt fuehren, nie ableiten. EINORDNUNG=COMPANION: PCLMULQDQ-Tabelle zeigt nur '66 0F3A 44 -> PCLMULQDQ' und 'VEX.128 -> PCLMULQDQ AVX'. 128-bit-fest, keine Breiteninformation. 32-bit: 'V/V'."
+          },
+          {
+            "token": "vpclmulqdq",
+            "cpuid_name": "VPCLMULQDQ (CPUID.07H:0:ECX[10]) / cpuinfo \"vpclmulqdq\" / GCC+Clang -mvpclmulqdq",
+            "basis": "companion",
+            "jahr": "2019 (Intel Ice Lake), 2020 (AMD Zen 3)",
+            "bit32": true,
+            "bemerkung": "IM Ist-Katalog (Tier Companion) -- BESTAETIGT. Exakt dasselbe Muster wie vaes, verbatim aus der Tabelle: VEX.256 -> 'VPCLMULQDQ AVX'; EVEX.512 -> 'VPCLMULQDQ AVX512F'; EVEX.128/256 -> 'VPCLMULQDQ AVX512VL'. Auch hier bleibt die 128-bit-Form unter dem ALTEN Bit (pclmulqdq). -> COMPANION mit Basis-Aufloesung. 32-bit: 'V/V'."
+          },
+          {
+            "token": "gfni",
+            "cpuid_name": "GFNI (CPUID.07H:0:ECX[8]) / cpuinfo \"gfni\" / GCC+Clang -mgfni",
+            "basis": "companion",
+            "jahr": "2019 (Intel Ice Lake; Tremont OHNE AVX-512), 2022 (AMD Zen 4)",
+            "bit32": true,
+            "bemerkung": "IM Ist-Katalog (Tier Companion) -- BESTAETIGT, und der SAUBERSTE Companion-Fall ueberhaupt. GF2P8AFFINEQB-Tabelle verbatim: Legacy-SSE '66 0F3A CE -> GFNI' (128, OHNE AVX!); VEX.128 und VEX.256 -> 'AVX GFNI'; EVEX.512 -> 'AVX512F GFNI'; EVEX.128/256 -> 'AVX512VL GFNI'. EIN Bit deckt ALLE drei Breiten ab -- die Breite kommt ausschliesslich aus der Basis. Zusatzbeleg gegen jede Klammer-Einordnung: Intel Tremont hat GFNI OHNE AVX-512, GFNI haengt nicht einmal an AVX. -> zwingend COMPANION. 32-bit: 'V/V'."
+          },
+          {
+            "token": "sha",
+            "cpuid_name": "SHA / SHA_NI (CPUID.07H:0:EBX[29]) / cpuinfo \"sha_ni\" / GCC+Clang -msha",
+            "basis": "companion",
+            "jahr": "2013 spezifiziert; 2016 (Intel Goldmont), 2017 (AMD Zen), 2021 (Intel Rocket Lake Desktop)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. SHA1RNDS4/SHA1NEXTE/SHA1MSG1/SHA1MSG2/SHA256RNDS2/SHA256MSG1/SHA256MSG2. EINORDNUNG=COMPANION, staerkster Fall der Liste: SHA256RNDS2 hat verbatim NUR die Zeile 'NP 0F 38 CB /r SHA256RNDS2 xmm1, xmm2/m128, <XMM0> | RMI | V/V | SHA'. Es existiert UEBERHAUPT keine VEX- und keine EVEX-Form -- die Faehigkeit ist strukturell an XMM gebunden und kann in keiner Klammer je etwas anderes bedeuten. DREIFACHE NAMENSFALLE: cpuinfo \"sha_ni\" (mit Unterstrich), Intel-Tabelle 'SHA', GCC -msha. 32-bit: 'V/V'."
+          },
+          {
+            "token": "sha512",
+            "cpuid_name": "SHA512 (CPUID.07H:1:EAX) / Kernel-Makro X86_FEATURE_SHA512 / GCC -msha512",
+            "basis": "companion",
+            "jahr": "2024 (Intel Arrow Lake / Lunar Lake)",
+            "bemerkung": "FEHLT im Ist-Katalog, NEU. VSHA512RNDS2/VSHA512MSG1/VSHA512MSG2 -- VEX-kodiert auf YMM. EINORDNUNG=COMPANION (eigene Faehigkeit), aber ANDERS als sha: hier ist die Traegerbreite 256 fix in der Faehigkeit selbst enthalten, nicht aus der Basis abgeleitet. Kandidat fuer eine Companion-Unterklasse 'breitenfest-256'. 32-bit-Zeile NICHT primaerquellenbelegt (siehe luecken); der cpuinfo-String ist im Kernel-Header nicht als expliziter Quoted-String gefuehrt -> nicht als \"sha512\" zementieren, bevor das gegen einen echten /proc/cpuinfo geprueft ist."
+          },
+          {
+            "token": "sm3",
+            "cpuid_name": "SM3 (CPUID.07H:1:EAX) / Kernel-Makro X86_FEATURE_SM3 / GCC -msm3",
+            "basis": "companion",
+            "jahr": "2024 (Intel Arrow Lake / Lunar Lake)",
+            "bemerkung": "FEHLT im Ist-Katalog, NEU. Chinesischer Hash-Standard, VEX-kodiert. EINORDNUNG=COMPANION (eigenstaendige Krypto-Faehigkeit, kein Breitenbezug zur x*-Familie). Fuer die Diplomarbeit vermutlich irrelevant (kein Cache-/Layout-Bezug) -- der Vollstaendigkeit halber gelistet, damit der Katalog nicht stillschweigend luecken hat. cpuinfo-String nicht als Quoted-String belegt."
+          },
+          {
+            "token": "sm4",
+            "cpuid_name": "SM4 (CPUID.07H:1:EAX) / Kernel-Makro X86_FEATURE_SM4 / GCC -msm4",
+            "basis": "companion",
+            "jahr": "2024 (Intel Arrow Lake / Lunar Lake)",
+            "bemerkung": "FEHLT im Ist-Katalog, NEU. Chinesische Blockchiffre, VEX-kodiert. EINORDNUNG=COMPANION, gleiche Begruendung wie sm3. cpuinfo-String nicht als Quoted-String belegt."
+          },
+          {
+            "token": "bmi1",
+            "cpuid_name": "BMI1 (CPUID.07H:0:EBX[3]) / cpuinfo \"bmi1\" / GCC+Clang -mbmi",
+            "basis": "scalar",
+            "jahr": "2012 (AMD Piledriver), 2013 (Intel Haswell)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog (bmi2 ist da, bmi1 nicht -- eine echte Luecke, denn beide sind unabhaengige Bits). ANDN, BEXTR, BLSI, BLSMSK, BLSR, TZCNT. EINORDNUNG=SCALAR: reine GPR-Instruktionen, kein Vektorregister beteiligt, gehoert NIE in eine x*-Klammer. NAMENSFALLE: cpuinfo \"bmi1\", GCC-Flag aber -mbmi (ohne 1). 32-bit: TZCNT-Tabelle verbatim 'F3 0F BC TZCNT r16/r32 -> V/V | BMI1', 'F3 REX.W ... r64 -> V/N.E.' -- also alle 16/32-bit-Formen auf IA-32 nutzbar, nur die 64-bit-GPR-Form faellt weg."
+          },
+          {
+            "token": "bmi2",
+            "cpuid_name": "BMI2 (CPUID.07H:0:EBX[8]) / cpuinfo \"bmi2\" / GCC+Clang -mbmi2",
+            "basis": "scalar",
+            "jahr": "2013 (Intel Haswell), 2015 (AMD Excavator)",
+            "bit32": true,
+            "bemerkung": "IM Ist-Katalog (Tier Scalar) -- BESTAETIGT. BZHI, MULX, PDEP, PEXT, RORX, SARX, SHRX, SHLX. EINORDNUNG=SCALAR, GPR-only. 32-bit-BEFUND mit Praxisrelevanz fuer Indien/Win10-32: PDEP-Tabelle verbatim 'VEX.LZ.F2.0F38.W0 F5 PDEP r32a,r32b,r/m32 -> V/V | BMI2' und 'VEX.LZ.F2.0F38.W1 ... r64 -> V/N.E.', dazu 'The operand size is always 32 bits if not in 64-bit mode'. Bit-Gather/Scatter-Kerne, die auf PDEP/PEXT r64 bauen, verlieren auf IA-32 also den halben Durchsatz pro Instruktion -- das ist ein messbarer 32/64-Unterschied, kein blosser Verfuegbarkeitsvermerk."
+          },
+          {
+            "token": "popcnt",
+            "cpuid_name": "POPCNT (CPUID.01H:ECX[23]) / cpuinfo \"popcnt\" / GCC+Clang -mpopcnt",
+            "basis": "scalar",
+            "jahr": "2007 (AMD K10, via ABM), 2008 (Intel Nehalem, als Teil von SSE4.2)",
+            "bit32": true,
+            "bemerkung": "IM Ist-Katalog (Tier Scalar) -- BESTAETIGT. EINORDNUNG=SCALAR, GPR-only. Nicht mit avx512_vpopcntdq verwechseln: das ist die VEKTOR-Variante und liegt korrekt im Avx512-Tier. 32-bit: Tabelle verbatim 'F3 0F B8 POPCNT r16/r32 -> Valid/Valid', 'F3 REX.W ... r64 -> Valid/N.E.'. Historische Falle: Intel fuehrt POPCNT unter SSE4.2, AMD unter ABM -- ein eigenes CPUID-Bit hat es aber in beiden Faellen."
+          },
+          {
+            "token": "abm",
+            "cpuid_name": "ABM (AMD) = LZCNT (Intel), CPUID.80000001H:ECX[5] / cpuinfo \"abm\" / GCC -mabm bzw. -mlzcnt",
+            "basis": "scalar",
+            "jahr": "2007 (AMD K10), 2013 (Intel Haswell)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. EIN Bit, DREI Namen -- die haerteste Namensfalle dieser Lens: Linux-cpuinfo sagt \"abm\", die Intel-Instruktionstabelle nennt das CPUID-Feature 'LZCNT', AMD nennt es ABM (Advanced Bit Manipulation, = POPCNT+LZCNT), und GCC hat DAFUER ZWEI Flags: -mabm UND -mlzcnt. Empfehlung: cpuinfo-Id \"abm\" als Identitaet, -mlzcnt als Compile-Flag (praeziser, LZCNT ist die tatsaechlich neue Instruktion), beide getrennt fuehren. EINORDNUNG=SCALAR. 32-bit: 'F3 0F BD LZCNT r16/r32 -> V/V', 'REX.W r64 -> V/N.E.'."
+          },
+          {
+            "token": "lzcnt",
+            "cpuid_name": "LZCNT -- IDENTISCHES CPUID-Bit wie ABM (CPUID.80000001H:ECX[5]); GCC -mlzcnt; KEIN eigener cpuinfo-String",
+            "basis": "scalar",
+            "jahr": "2007 (AMD K10, als ABM), 2013 (Intel Haswell)",
+            "bit32": true,
+            "bemerkung": "WARNUNG -- KEIN eigenstaendiges Flag. Der Owner-Auftrag listet LZCNT separat, aber es gibt auf Linux keinen cpuinfo-String \"lzcnt\": das Bit wird als \"abm\" ausgegeben. Wenn 'lzcnt' als eigener Token in die Grammatik kaeme, entstuende ein PHANTOM-Flag, das kein Signatur-Matching gegen /proc/cpuinfo je treffen kann. Empfehlung: NICHT als eigenen Katalogeintrag aufnehmen, sondern als Alias/Compile-Flag am abm-Eintrag fuehren. Hier nur gelistet, damit die Entscheidung dokumentiert ist."
+          },
+          {
+            "token": "tzcnt",
+            "cpuid_name": "KEIN eigenes CPUID-Bit -- Teil von BMI1; kein cpuinfo-String; kein eigenes GCC-Flag",
+            "basis": "NONE",
+            "jahr": "2013 (mit BMI1)",
+            "bit32": true,
+            "bemerkung": "WARNUNG -- PHANTOM-KANDIDAT, DARF NICHT IN DEN KATALOG. Der Owner-Auftrag listet TZCNT, aber die Intel-Tabelle weist TZCNT verbatim die CPUID-Feature-Flag-Spalte 'BMI1' zu. Es gibt kein tzcnt-Bit, keinen tzcnt-cpuinfo-String und kein -mtzcnt. Ein Token 'tzcnt' waere ein nicht matchbares Phantom -- exakt die Fehlerklasse, die die bestehende Datei mit is_known_simd_flag(\"avx512_phantom\")==false abwehrt. Auswirkung: wer TZCNT braucht, fordert bmi1. Historische Feinheit: TZCNT ist auf aelteren CPUs abwaertskompatibel als BSF dekodierbar (stille Fehlmessung moeglich, wenn man 'laeuft' als 'unterstuetzt' liest)."
+          },
+          {
+            "token": "adx",
+            "cpuid_name": "ADX (CPUID.07H:0:EBX[19]) / cpuinfo \"adx\" / GCC+Clang -madx",
+            "basis": "scalar",
+            "jahr": "2014 (Intel Broadwell), 2017 (AMD Zen)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. ADCX/ADOX -- zwei unabhaengige Carry-Ketten fuer Langzahlarithmetik. EINORDNUNG=SCALAR, GPR-only, kein Vektorbezug. 32-bit-BEFUND mit direkter Praxisfolge: Tabelle verbatim '66 0F 38 F6 ADCX r32, r/m32 -> V/V | ADX' und '66 REX.w 0F 38 F6 ADCX r64,r/m64 -> V/N.E.'. Auf IA-32 also nur 32-bit-Limbs statt 64-bit-Limbs -- fuer Langzahl-Kerne halbiert das die Wortbreite pro Schritt."
+          },
+          {
+            "token": "movbe",
+            "cpuid_name": "MOVBE (CPUID.01H:ECX[22]) / cpuinfo \"movbe\" / GCC+Clang -mmovbe",
+            "basis": "scalar",
+            "jahr": "2013 (Intel Haswell, Mainstream-Core); Atom-Einfuehrungsjahr NICHT belegt (siehe luecken)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. Load/Store mit Byte-Swap (Big-Endian <-> Little-Endian in einer Instruktion). EINORDNUNG=SCALAR, GPR<->Speicher, kein Vektorregister. Fuer eine Cache-Engine durchaus relevant (Serialisierungspfade). 32-bit: Tabelle verbatim 'MOVBE r16,m16 -> V/V', 'MOVBE r32,m32 -> V/V', 'REX.W MOVBE r64,m64 -> V/N.E.'."
+          },
+          {
+            "token": "rdrand",
+            "cpuid_name": "RDRAND (CPUID.01H:ECX[30]) / cpuinfo \"rdrand\" / GCC+Clang -mrdrnd",
+            "basis": "scalar",
+            "jahr": "2012 (Intel Ivy Bridge), 2015 (AMD)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. Hardware-RNG (DRBG). NAMENSFALLE: cpuinfo \"rdrand\" mit a, GCC-Flag aber -mrdrnd OHNE a. Getrennt fuehren. EINORDNUNG=SCALAR, GPR-only. 32-bit: Operandengroessen 16/32/64 dokumentiert, die 16/32-Formen sind auf IA-32 nutzbar. Fuer eine Mess-Engine eher Stoerquelle als Nutzen (nichtdeterministische Latenz, mikroarchitekturabhaengig) -- als Signaturflag trotzdem korrekt zu erheben."
+          },
+          {
+            "token": "rdseed",
+            "cpuid_name": "RDSEED (CPUID.07H:0:EBX[18]) / cpuinfo \"rdseed\" / GCC+Clang -mrdseed",
+            "basis": "scalar",
+            "jahr": "2014 (Intel Broadwell), 2017 (AMD Zen)",
+            "bit32": true,
+            "bemerkung": "FEHLT im Ist-Katalog. Entropie-Quelle fuer Seeding (staerkere Garantie als RDRAND). EINORDNUNG=SCALAR. 32-bit: 16/32-bit-Formen vorhanden. FALLE FUER DIE MESSUNG: ein Erratum von Oktober 2025 betrifft auf AMD Zen 5 ausschliesslich die 16- und 32-bit-Formen, NICHT die 64-bit-Form -- also genau der 32-bit-Pfad, um den es dem Owner geht. Wenn rdseed je in einen Messpfad geriete, waere das eine 32/64-Divergenz mit echtem Korrektheitsgewicht."
+          },
+          {
+            "token": "f16c",
+            "cpuid_name": "F16C (CPUID.01H:ECX[29]) / cpuinfo \"f16c\" / GCC+Clang -mf16c",
+            "basis": "x256",
+            "jahr": "2011/2012 (AMD Piledriver Q4 2012), 2012 (Intel Ivy Bridge)",
+            "bit32": true,
+            "bemerkung": "IM Ist-Katalog (Tier Avx256) -- EINORDNUNG BESTAETIGT, und das ist ein Gegenbeispiel zu den Companions: VCVTPH2PS/VCVTPS2PH gibt es unter dem f16c-Bit ausschliesslich VEX-kodiert auf XMM (4 Werte) und YMM (8 Werte). Die EVEX/512-Formen derselben Konvertierung kommen NICHT aus f16c, sondern aus AVX512F. Damit ist f16c an die 256-bit-Familie gebunden und traegt selbst Breiteninformation -> gehoert IN die x256-Klammer, nicht daneben. 32-bit: VEX-kodiert, damit im compat/legacy-Modus gueltig (abgeleitet aus der VEX-Regel, siehe luecken)."
+          },
+          {
+            "token": "fma",
+            "cpuid_name": "FMA / FMA3 (CPUID.01H:ECX[12]) / cpuinfo \"fma\" / GCC+Clang -mfma",
+            "basis": "x256",
+            "jahr": "2012 (AMD Piledriver), 2013 (Intel Haswell)",
+            "bit32": true,
+            "bemerkung": "IM Ist-Katalog (Tier Avx256) -- BESTAETIGT. Drei-Operanden-FMA, VEX-kodiert auf XMM/YMM. EINORDNUNG=BREITEN-EIGENSCHAFT der x256-Basis, gleiche Begruendung wie f16c: die 512-bit-FMA-Formen sind AVX512F-Instruktionen, nicht fma-Instruktionen. -> IN die x256-Klammer. WICHTIG fuer die Grammatik: '{x512.f}.fma' waere semantisch falsch/redundant -- x512.f impliziert bereits 512-bit-FMA. Ein Regelwerk sollte fma innerhalb einer x512-Klammer als Fehler oder als reine Abwaertsdeklaration behandeln."
+          },
+          {
+            "token": "fma4",
+            "cpuid_name": "FMA4 (CPUID.80000001H:ECX[16]) / cpuinfo \"fma4\" / GCC+Clang -mfma4",
+            "basis": "x256",
+            "jahr": "2011 (AMD Bulldozer); ab Zen (2017) nicht mehr unterstuetzt",
+            "bemerkung": "FEHLT im Ist-Katalog. AMD-only, Vier-Operanden-FMA auf XMM/YMM. EINORDNUNG=BREITEN-EIGENSCHAFT x256 (gleiche Logik wie fma), ABER PRAKTISCH TOT: AMD hat FMA4 mit Zen entfernt und meldet es nicht mehr via CPUID. Empfehlung: NICHT in den Produktivkatalog, hoechstens als historischer/deprecated-Eintrag -- sonst entsteht eine Achse, die auf keiner erreichbaren Maschine je wahr wird. Zusatzfalle: Zen-Dekoder verarbeiten FMA4 teils noch, OHNE es via CPUID zu melden -> 'laeuft' ist hier definitiv kein Beleg fuer 'unterstuetzt'. 32-bit nicht primaerquellenbelegt."
+          },
+          {
+            "token": "xop",
+            "cpuid_name": "XOP (CPUID.80000001H:ECX[11]) / cpuinfo \"xop\" / GCC+Clang -mxop",
+            "basis": "x256",
+            "jahr": "2011 (AMD Bulldozer, angekuendigt 2009); ab Zen (2017) entfernt",
+            "bemerkung": "FEHLT im Ist-Katalog. AMD-only, eigene XOP-Praefix-Kodierung, Erweiterung der 128-bit-SSE-Kernbefehle (Permutation, Integer-Multiply-Accumulate, Rotationen). EINORDNUNG=BREITEN-EIGENSCHAFT x128/x256 -- aber wie fma4 mit Zen ersatzlos gestrichen. Empfehlung: NICHT in den Produktivkatalog. Dass XOP eine EIGENE Praefixfamilie ist (weder VEX noch EVEX), waere ausserdem ein Bruch der bisherigen Basis-Systematik -- ein weiterer Grund, es nicht aufzunehmen. 32-bit nicht primaerquellenbelegt."
+          },
+          {
+            "token": "tbm",
+            "cpuid_name": "TBM (CPUID.80000001H:ECX[21]) / cpuinfo \"tbm\" / GCC+Clang -mtbm",
+            "basis": "scalar",
+            "jahr": "2012 (AMD Piledriver); ab Zen (2017) entfernt",
+            "bemerkung": "FEHLT im Ist-Katalog. AMD-only Erweiterung von BMI1: BEXTR mit Immediate, BLCFILL, BLCI, BLCIC, BLCMSK, BLCS, BLSFILL, BLSIC, T1MSKC, TZMSK. EINORDNUNG=SCALAR, GPR-only, nie in einer Klammer. Kein Intel-Support, nie gehabt; von AMD mit Zen gestrichen. Empfehlung: NICHT in den Produktivkatalog -- die Schnittmenge 'lebende Maschine im Messpark' ist leer. 32-bit nicht primaerquellenbelegt."
+          },
+          {
+            "token": "lwp",
+            "cpuid_name": "LWP (CPUID.80000001H:ECX[15]) / cpuinfo \"lwp\" / GCC -mlwp",
+            "basis": "scalar",
+            "jahr": "2011 (AMD Bulldozer); ab Zen (2017) entfernt",
+            "bemerkung": "FEHLT im Ist-Katalog. AMD Lightweight Profiling -- User-Mode-Sampling von Cache-Misses/Branch-Misses OHNE Kernel-Beteiligung. EINORDNUNG=SCALAR bzw. streng genommen gar keine SIMD-Faehigkeit; gehoert konzeptionell eher in die PMC-Achse als in den SIMD-Katalog. Hier trotzdem genannt, weil es fuer eine Cache-Engine thematisch nahe liegt -- aber es ist mit Zen tot, also nur historisch. 32-bit nicht primaerquellenbelegt."
+          }
+        ],
+        "luecken": [
+          "IST-KATALOG-KORREKTUR (wichtigster Befund): Der Auftrag nennt '30 Flags in vier Tiers -- 17 Avx512, 5 Avx256, 5 Companion, 3 Scalar'. Das trifft NICHT zu. Die Datei libs/cache_engine/include/cache_engine/measurement/simd_feature_flag.hpp fuehrt 23 Flags: 14 Avx512, 4 Avx256, 3 Companion, 2 Scalar. Belegt durch static_assert(kSimdFeatureFlagCatalog.size() == 23), std::array<SimdFeatureFlag, 23> und static_assert(count_flags_of_tier(SimdFlagTier::Avx512) == 14). Geprueft in FUENF Arbeitsbaeumen (wt-b14-ce, wt-b-r4-ci, wt-lb6, wt-b-p92, wt-pmc-l3-honest) -- alle identisch 172 Zeilen, alle Katalog 23. Es gibt in diesen Checkouts KEINE 30-Flag-Fassung. Die Zahl 30/17/5/5/3 stammt aus einer anderen Quelle als dem Code und muss vor jeder Planung geklaert werden.",
+          "MOVBE-Einfuehrungsjahr auf Atom/Bonnell nicht belegbar. Die Wikipedia-Seite zu Bonnell erwaehnt MOVBE ueberhaupt nicht (nur MMX/SSE/SSE2/SSE3/SSSE3). Belegt ist nur die Mainstream-Core-Einfuehrung mit Haswell (2013). Die verbreitete Angabe 'Atom 2008' konnte ich NICHT gegen eine Quelle stellen und habe sie deshalb nicht uebernommen.",
+          "32-bit-Modus-Spalten fuer f16c (VCVTPH2PS/VCVTPS2PH) und fma (VFMADD*) habe ich NICHT einzeln in der Instruktionstabelle gelesen. Das 'true' bei bit32 ist abgeleitet aus der VEX-Regel, die ich primaer an VAESENC (VEX.128/VEX.256 -> 'V/V') und VGF2P8AFFINEQB verifiziert habe. Vor Zementierung im Code bitte die beiden Instruktionsseiten direkt lesen.",
+          "32-bit-Verfuegbarkeit von fma4, xop, tbm, lwp NICHT primaerquellenbelegt -- deshalb bei diesen vier das Feld bit32 weggelassen statt geraten. Grund: das sind AMD-only-Erweiterungen, die in der Intel-SDM-Instruktionsreferenz (felixcloutier) gar nicht vorkommen.",
+          "AMD-Primaerquelle NICHT gelesen: Ich habe das AMD APM (Architecture Programmer's Manual) nicht abgerufen. ALLE AMD-spezifischen Aussagen (XOP/FMA4/TBM/LWP-Entfernung mit Zen, ABM-Herkunft, Zen-3/Zen-4-Jahre) stuetzen sich auf Wikipedia, GCC-Doku, Linux-cpufeatures.h und Presseberichte -- nicht auf die AMD-Primaerquelle.",
+          "Die Behauptung 'Zen-Dekoder verarbeiten FMA4 noch, obwohl CPUID es nicht meldet' stammt aus einer Suchzusammenfassung eines WikiChip-Tests, nicht aus einer gelesenen Primaerquelle. Als Warnung wertvoll, als Fakt unbestaetigt.",
+          "cpuinfo-Strings fuer sha512, sm3, sm4 sind im Linux-Header NICHT als explizite Quoted-Strings belegt (nur als Makronamen X86_FEATURE_SHA512/SM3/SM4). Der tatsaechliche /proc/cpuinfo-String muss an einer realen Maschine verifiziert werden, bevor er als Signatur-Schluessel in den Katalog geht -- exakt die Sorgfalt, die die bestehende Unterstrich-Falle-Doku verlangt.",
+          "AMD-Zen-4-Jahr fuer GFNI (2022) stammt aus einer Suchzusammenfassung, nicht aus einer gelesenen Tabelle. Zen 3 fuer VAES/VPCLMULQDQ (05.11.2020) ist dagegen direkt aus der Wikipedia-Zen-3-Seite belegt.",
+          "AVX-512-Registeranzahl im 32-bit-Modus (nur ZMM0-ZMM7 statt ZMM0-ZMM31, weil EVEX.R'/V' Long Mode brauchen): aus Suchzusammenfassungen belegt, ABER die Wikipedia-AVX-512-Seite selbst enthaelt dazu nichts. Fuer die Owner-Frage 'Indien/Win10-32-bit' ist das die wichtigste Einzelaussage ueberhaupt -- sie sollte vor Verwendung gegen Intel SDM Vol.1 Kap. 15 direkt geprueft werden.",
+          "MSVC- und ICC/ICX-Flag-Namen NICHT erhoben. Gelesen wurde ausschliesslich die GCC-x86-Options-Seite; die bestehende Datei behandelt gpp und clang als deckungsgleich, was fuer alle hier erhobenen Flags plausibel, aber fuer keine der neuen (sha512/sm3/sm4/avxvnniint8/16) verifiziert ist.",
+          "Nicht Teil dieser Lens (Lens 4), aber beim Lesen der GCC-Doku aufgefallen und im Ist-Katalog ebenfalls fehlend -- gehoert in Lens 2/3: -mavxifma, -mavxneconvert, -mavxvnniint8, -mavxvnniint16, -mcmpccxadd, sowie das Basis-Flag avx selbst (der Katalog hat avx2, aber kein avx -- und GFNI/VAES/VPCLMULQDQ brauchen laut Instruktionstabelle explizit 'AVX' fuer ihre VEX-Formen, nicht AVX2)."
+        ],
+        "quellen": [
+          "https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html",
+          "https://raw.githubusercontent.com/torvalds/linux/master/arch/x86/include/asm/cpufeatures.h",
+          "https://www.felixcloutier.com/x86/aesenc",
+          "https://www.felixcloutier.com/x86/gf2p8affineqb",
+          "https://www.felixcloutier.com/x86/pclmulqdq",
+          "https://www.felixcloutier.com/x86/sha256rnds2",
+          "https://www.felixcloutier.com/x86/pdep",
+          "https://www.felixcloutier.com/x86/adcx",
+          "https://www.felixcloutier.com/x86/lzcnt",
+          "https://www.felixcloutier.com/x86/tzcnt",
+          "https://www.felixcloutier.com/x86/popcnt",
+          "https://www.felixcloutier.com/x86/movbe",
+          "https://en.wikipedia.org/wiki/X86_Bit_manipulation_instruction_set",
+          "https://en.wikipedia.org/wiki/AES_instruction_set",
+          "https://en.wikipedia.org/wiki/CLMUL_instruction_set",
+          "https://en.wikipedia.org/wiki/AVX-512",
+          "https://en.wikipedia.org/wiki/Intel_SHA_extensions",
+          "https://en.wikipedia.org/wiki/FMA_instruction_set",
+          "https://en.wikipedia.org/wiki/F16C",
+          "https://en.wikipedia.org/wiki/RDRAND",
+          "https://en.wikipedia.org/wiki/Zen_3",
+          "https://en.wikipedia.org/wiki/Bonnell_(microarchitecture)",
+          "https://en.wikipedia.org/wiki/XOP_instruction_set"
+        ]
+      },
+      {
+        "flags": [
+          {
+            "token": "neon",
+            "cpuid_name": "neon (AArch32 /proc/cpuinfo HWCAP_NEON) | -mfpu=neon, -mfpu=neon-vfpv3/-neon-vfpv4/-neon-fp-armv8, -march=armv7-a+simd",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "AArch32 Advanced SIMD. bit32 hier = AArch32 (NICHT IA-32). Registerfile: 32x64-bit D-Regs = 16x128-bit Q-Regs -> feste 128 Bit, passt als einziger Nicht-x86-Fall echt auf eine Basis x128. cpuinfo-String ist 'neon', der Compiler-Schalter ist KEIN -m<flag>, sondern -mfpu=/-march=+simd -> die zweispaltige Struktur cpuinfo/gpp des Ist-Katalogs traegt das nicht.",
+            "bit32": true
+          },
+          {
+            "token": "vfp",
+            "cpuid_name": "vfp / vfpv3 / vfpv3d16 / vfpv4 / vfpd32 (AArch32 HWCAP) | -mfpu=vfpv3, -mfpu=vfpv4",
+            "basis": "scalar",
+            "jahr": "unbelegt",
+            "bemerkung": "VFP-Skalar-FPU, Vorgaenger und Traeger von NEON auf 32-bit-ARM. bit32 = AArch32. Ohne VFP kein NEON-Datenpfad. Fehlt komplett im Ist-Katalog.",
+            "bit32": true
+          },
+          {
+            "token": "iwmmxt",
+            "cpuid_name": "iwmmxt (AArch32 HWCAP_IWMMXT)",
+            "basis": "scalar",
+            "jahr": "unbelegt",
+            "bemerkung": "Intel/Marvell XScale Wireless MMX, 64-bit-SIMD, echter NEON-Vorgaenger auf 32-bit-ARM. Historisch, auf heutiger Hardware tot -- fuer Vollstaendigkeit der Vorgaengerkette erhoben.",
+            "bit32": true
+          },
+          {
+            "token": "asimd",
+            "cpuid_name": "asimd (AArch64 /proc/cpuinfo, HWCAP_ASIMD) | -march=armv8-a+simd",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "AArch64 Advanced SIMD (NEON64). In ARMv8-A faktisch obligatorisch -> als Signaturflag fast wertlos, als BASIS aber korrekt: feste 128 Bit. bit32=false, denn auf AArch32 heisst dasselbe 'neon'. WICHTIG: derselbe Silizium-Block hat auf 32-bit und 64-bit ZWEI verschiedene cpuinfo-Namen.",
+            "bit32": false
+          },
+          {
+            "token": "fphp",
+            "cpuid_name": "fphp (HWCAP_FPHP) | -march=...+fp16",
+            "basis": "scalar",
+            "jahr": "unbelegt",
+            "bemerkung": "Skalares FP16. Paar-Partner zu asimdhp; Linux meldet beide getrennt.",
+            "bit32": true
+          },
+          {
+            "token": "asimdhp",
+            "cpuid_name": "asimdhp (HWCAP_ASIMDHP) | -march=armv8.2-a+fp16",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "Vektor-FP16-Arithmetik. Entspricht funktional dem x86-Paar f16c/avx512_fp16. Erscheint in BEIDEN Kernel-Tabellen (arm und arm64) -> auch auf AArch32 sichtbar.",
+            "bit32": true
+          },
+          {
+            "token": "asimdrdm",
+            "cpuid_name": "asimdrdm (HWCAP_ASIMDRDM) | -march=armv8.1-a+rdma",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "SQRDMLAH/SQRDMLSH (ARMv8.1). Compiler-Modifier heisst +rdma, cpuinfo heisst asimdrdm -> NAMENSBRUCH wie bei avx512_vbmi2/-mavx512vbmi2; bestaetigt die Doktrin 'cpuinfo-Id und Compiler-Flag getrennt fuehren'.",
+            "bit32": false
+          },
+          {
+            "token": "asimddp",
+            "cpuid_name": "asimddp (HWCAP_ASIMDDP) | -march=...+dotprod",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "SDOT/UDOT Int8-Dot-Product. Direktes Gegenstueck zu avx_vnni/avx512_vnni. Auch in der AArch32-hwcap-Tabelle.",
+            "bit32": true
+          },
+          {
+            "token": "asimdfhm",
+            "cpuid_name": "asimdfhm (HWCAP_ASIMDFHM) | -march=...+fp16fml",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "FP16 Fused Multiply (FMLAL/FMLSL). Wieder Namensbruch cpuinfo(asimdfhm) vs Modifier(+fp16fml). Auch AArch32.",
+            "bit32": true
+          },
+          {
+            "token": "asimdbf16",
+            "cpuid_name": "asimdbf16 (nur AArch32-hwcap-Tabelle) / bf16 + ebf16 (AArch64 HWCAP2_BF16) | -march=...+bf16",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "BFloat16-Vektorbefehle, Gegenstueck zu avx512_bf16. HEIKEL: heisst auf 32-bit 'asimdbf16', auf 64-bit schlicht 'bf16' -- zwei Namen, ein Feature.",
+            "bit32": true
+          },
+          {
+            "token": "i8mm",
+            "cpuid_name": "i8mm (HWCAP2_I8MM, auch AArch32) | -march=...+i8mm",
+            "basis": "x128",
+            "jahr": "unbelegt",
+            "bemerkung": "Int8-Matrixmultiplikation (SMMLA/UMMLA). Kein x86-Aequivalent unterhalb von AMX.",
+            "bit32": true
+          },
+          {
+            "token": "aes",
+            "cpuid_name": "aes / pmull / sha1 / sha2 / sha3 / sm3 / sm4 / sha512 / crc32 (AArch64 HWCAP; AArch32 HWCAP2) | -march=...+aes,+sha2,+sha3,+sm4,+crc bzw. Sammelmodifier +crypto, -mfpu=crypto-neon-fp-armv8",
+            "basis": "companion",
+            "jahr": "unbelegt",
+            "bemerkung": "ARM-Krypto-Begleiter -- exakt die Rolle, die gfni/vaes/vpclmulqdq im Ist-Katalog als Tier Companion spielen. Der Sammelname +crypto ist GCC-seitig deprecatet zugunsten der Einzelmodifier; auf AArch32 liegen sie in HWCAP2, auf AArch64 in HWCAP1 -- also andere Bitbank je Wortbreite.",
+            "bit32": true
+          },
+          {
+            "token": "sve",
+            "cpuid_name": "sve (HWCAP_SVE) | -march=armv8.2-a+sve; Breitensteuerung -msve-vector-bits=scalable|128|256|512|1024|2048",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "KERNBEFUND: SVE hat KEINE Registerbreite im Flag. Erlaubt sind 128..2048 Bit in 128-Bit-Schritten (Kernel: 16 <= VL <= VLmax Bytes, VL Vielfaches von 16; 16 <= VLmax <= 256 Quadwords). Die Breite ist LAUFZEIT-Eigenschaft (RDVL / prctl(PR_SVE_GET_VL) & PR_SVE_VL_LEN_MASK), nicht Bau-Eigenschaft. Eine Grammatik mit festen Basen x128/x256/x512 kann SVE nur abbilden, wenn -msve-vector-bits=N gesetzt wird -- dann wird die Basis zur BAUENTSCHEIDUNG, nicht zur Maschinen-Eigenschaft.",
+            "bit32": false
+          },
+          {
+            "token": "sve2",
+            "cpuid_name": "sve2 (HWCAP2_SVE2) | -march=armv9-a+sve2",
+            "basis": "NONE",
+            "jahr": "2021 (Armv9-Ankuendigung Maerz 2021)",
+            "bemerkung": "SVE2 = SVE + NEON-aequivalente Integer-/DSP-Breite, Baseline von Armv9-A. Traegt selbst KEINE Breite. Ist die natuerliche BASIS einer ARM-Komposit-Notation: {sve2.aes.bitperm.sha3.sm4} -- aber die Basis kodiert dann Generation, nicht Breite.",
+            "bit32": false
+          },
+          {
+            "token": "aes",
+            "cpuid_name": "sveaes + svepmull (HWCAP2_SVEAES, HWCAP2_SVEPMULL) | -march=...+sve2-aes",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "SVE2-Subset. ASYMMETRIE: EIN Compiler-Modifier (+sve2-aes) schaltet ZWEI cpuinfo-Flags (sveaes, svepmull). Der Ist-Katalog nimmt 1:1 zwischen cpuinfo und gpp an -- diese Annahme bricht hier.",
+            "bit32": false
+          },
+          {
+            "token": "bitperm",
+            "cpuid_name": "svebitperm (HWCAP2_SVEBITPERM) | -march=...+sve2-bitperm",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "SVE2-Bitpermutation, funktional die Ecke von avx512_bitalg/avx512_vbmi2.",
+            "bit32": false
+          },
+          {
+            "token": "sha3",
+            "cpuid_name": "svesha3 (HWCAP2_SVESHA3) | -march=...+sve2-sha3",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "SVE2-Subset.",
+            "bit32": false
+          },
+          {
+            "token": "sm4",
+            "cpuid_name": "svesm4 (HWCAP2_SVESM4) | -march=...+sve2-sm4",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "SVE2-Subset.",
+            "bit32": false
+          },
+          {
+            "token": "i8mm",
+            "cpuid_name": "svei8mm (HWCAP2_SVEI8MM) | -march=...+i8mm (in SVE-Kontext)",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "SVE-Variante des Int8-Matrix-Multiply. Beachte: es gibt i8mm UND svei8mm als getrennte cpuinfo-Flags -- dieselbe Faehigkeit in zwei Registerdomaenen.",
+            "bit32": false
+          },
+          {
+            "token": "f32mm",
+            "cpuid_name": "svef32mm (HWCAP2_SVEF32MM) | -march=...+f32mm",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "SVE FP32-Matrixmultiplikation.",
+            "bit32": false
+          },
+          {
+            "token": "f64mm",
+            "cpuid_name": "svef64mm (HWCAP2_SVEF64MM) | -march=...+f64mm",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "SVE FP64-Matrixmultiplikation.",
+            "bit32": false
+          },
+          {
+            "token": "bf16",
+            "cpuid_name": "svebf16 + sveebf16 (HWCAP2_SVEBF16) | -march=...+bf16",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "BFloat16 in SVE-Registern.",
+            "bit32": false
+          },
+          {
+            "token": "2p1",
+            "cpuid_name": "sve2p1 (HWCAP2_SVE2P1) | -march=...+sve2p1; ferner sve2p2, sve2p3 in aktuellen Kernel-Tabellen",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "SVE2.1/2.2/2.3 -- Punkt-Versionierung IM FLAGNAMEN ('p1' = '.1'). Direkter Konflikt mit der neuen Punkt-Notation des Projekts: 'sve2p1' waere in Punktschreibweise 'sve2.1', aber der Punkt ist im Projekt schon Trenner. ARM hat dieses Problem mit 'p' geloest.",
+            "bit32": false
+          },
+          {
+            "token": "sme",
+            "cpuid_name": "sme (HWCAP2_SME) | -march=...+sme",
+            "basis": "NONE",
+            "jahr": "2021 (Armv9-A, technische Details Juli 2021)",
+            "bemerkung": "Scalable Matrix Extension. Eigener Modus (Streaming SVE) mit EIGENER, von SVE abweichender Vektorlaenge (SVL) plus ZA-Kachelspeicher. Fuer eine Breiten-Grammatik doppelt sperrig: nicht nur agnostisch, sondern ZWEI verschiedene Laengen im selben Prozess.",
+            "bit32": false
+          },
+          {
+            "token": "sme2",
+            "cpuid_name": "sme2 (HWCAP2_SME2) | -march=...+sme2; ferner sme2p1/sme2p2/sme2p3",
+            "basis": "NONE",
+            "jahr": "2022",
+            "bemerkung": "SME2 als Armv9-Erweiterung.",
+            "bit32": false
+          },
+          {
+            "token": "f64f64",
+            "cpuid_name": "smef64f64 (HWCAP2_SME_F64F64) | -march=...+sme-f64f64",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "SME-Subset. Die SME-Subsets sind nach DATENTYP-PAAREN benannt (f64f64, i16i64, i8i32, f16f32, b16f32, f32f32, fa64) -- ein Namensschema, das x86 nicht kennt und das ein reiner Token-Split auf Unterstrichen nicht erschliesst.",
+            "bit32": false
+          },
+          {
+            "token": "i16i64",
+            "cpuid_name": "smei16i64 (HWCAP2_SME_I16I64) | -march=...+sme-i16i64",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "SME-Subset (Datentyp-Paar-Benennung).",
+            "bit32": false
+          },
+          {
+            "token": "fa64",
+            "cpuid_name": "smefa64 (HWCAP2_SME_FA64)",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "SME-Subset: volles A64-Instruktionsset auch im Streaming-Modus. Rein modaler Schalter, KEINE Rechenfaehigkeit -- zeigt, dass ARM-Flags nicht durchgaengig 'Faehigkeit' bedeuten.",
+            "bit32": false
+          },
+          {
+            "token": "v",
+            "cpuid_name": "v (RVV 1.0) | -march=rv64gcv bzw. rv32gcv; Breitensteuerung -mrvv-vector-bits=scalable|zvl",
+            "basis": "NONE",
+            "jahr": "2021 (ratifiziert Nov/Dez 2021; Public Review 2021-09-19)",
+            "bemerkung": "KERNBEFUND RISC-V: VLEN ist implementierungsabhaengig (Minimum 128 Bit fuer 'V', Maximum 65536 Bit laut Spec). Zusaetzlich skaliert LMUL in {1/8,1/4,1/2,1,2,4,8} die effektive Registergruppe zur LAUFZEIT via vsetvli. Damit ist die wirksame Breite nicht einmal pro Maschine konstant, sondern pro Schleife -- eine Basis x128/x256/x512 ist hier prinzipiell nicht bildbar. Auch das 'g' in rv64gcv ist ein Sammelbuchstabe, kein Einzelflag.",
+            "bit32": true
+          },
+          {
+            "token": "zve32x",
+            "cpuid_name": "zve32x, zve32f, zve64x, zve64f, zve64d | -march=rv64i...+zve64d",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "Embedded-Vektor-Subsets: die Zahl (32/64) ist die maximale ELEMENT-Breite, NICHT die Registerbreite. Falle fuer jede Grammatik, die Zahlen im Flagnamen als Breite liest -- genau der Fehler, den x512 nahelegt.",
+            "bit32": true
+          },
+          {
+            "token": "zvl128b",
+            "cpuid_name": "zvl32b, zvl64b, zvl128b, zvl256b, zvl512b, zvl1024b, zvl2048b, zvl4096b, zvl8192b, zvl16384b, zvl32768b, zvl65536b",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "DAS ist RISC-Vs Antwort auf das Basis-Problem: eine eigene Flagfamilie, die eine MINDEST-VLEN zusichert (zvl128b = mindestens 128 Bit). Semantik ist 'mindestens', nicht 'genau' -- damit monoton/subsumierend und additiv, im Gegensatz zu einer exklusiven Basis. Fuer das Projekt das direkt uebertragbare Muster.",
+            "bit32": true
+          },
+          {
+            "token": "zvbb",
+            "cpuid_name": "zvbb (Vector Basic Bit-manipulation) | -march=...+zvbb",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "Gegenstueck zu avx512_bitalg/avx512_vpopcntdq.",
+            "bit32": true
+          },
+          {
+            "token": "zvbc",
+            "cpuid_name": "zvbc (Vector Carry-less Multiplication) | -march=...+zvbc",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "Gegenstueck zu vpclmulqdq -- also ein RISC-V-Companion.",
+            "bit32": true
+          },
+          {
+            "token": "zvkn",
+            "cpuid_name": "zvkb, zvkg, zvkn, zvknha, zvknhb, zvkned, zvks | -march=...+zvkn",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "Vektor-Krypto-Suite. zvkn/zvks sind SAMMEL-Flags, die Einzelflags implizieren -- Implikationsgraph statt flacher Menge. Der Ist-Katalog kennt keine Implikation zwischen Flags.",
+            "bit32": true
+          },
+          {
+            "token": "zvfh",
+            "cpuid_name": "zvfh, zvfhmin | -march=...+zvfh",
+            "basis": "NONE",
+            "jahr": "2021",
+            "bemerkung": "Vektor-FP16 (voll bzw. minimal/nur Konversion). Die 'min'-Variante als eigenes Flag = abgestufte Teilfaehigkeit, in x86 unbekannt.",
+            "bit32": true
+          },
+          {
+            "token": "zvfbfmin",
+            "cpuid_name": "zvfbfmin, zvfbfwma | -march=...+zvfbfwma",
+            "basis": "NONE",
+            "jahr": "unbelegt",
+            "bemerkung": "Vektor-BF16: Konversion (zvfbfmin) bzw. widening multiply-add (zvfbfwma). Gegenstueck zu avx512_bf16.",
+            "bit32": true
+          },
+          {
+            "token": "MUSTER-highway",
+            "cpuid_name": "google/highway -- ScalableTag<T,kPow2> / CappedTag<T,N> / FixedTag<T,N>, Lanes(d), HWY_MAX_LANES_D; Targets HWY_NEON, HWY_SVE, HWY_SVE2, HWY_SVE_256, HWY_SVE2_128, HWY_RVV",
+            "basis": "NONE",
+            "jahr": "n/a",
+            "bemerkung": "DESIGN-MUSTER 1 (Tag/Deskriptor statt Typ): Auf SVE/RVV sind Vektortypen 'sizeless' und duerfen laut Clang nicht Member einer Klasse sein. Highway wickelt sie deshalb NICHT in eine Klasse, sondern uebergibt ein nullgrosses Tag 'd' als Funktionsargument; die Spurzahl kommt zur Laufzeit aus Lanes(d). Die Breite ist damit kein Typparameter mehr. Highway ist nach eigener Doku die einzige C++-Vektorbibliothek, die SVE und RISC-V OHNE Compilerflag zur Laufzeitbreite unterstuetzt. Zusaetzlich existieren HWY_SVE_256 und HWY_SVE2_128 als SEPARATE Targets fuer bekannte feste Breiten -- also: agnostischer Standardpfad PLUS optionale breitenfeste Spezialisierung, beides im selben Target-Register.",
+            "bit32": false
+          },
+          {
+            "token": "MUSTER-xsimd",
+            "cpuid_name": "xtensor-stack/xsimd -- arch-Tags sve128 / sve256 / sve512",
+            "basis": "NONE",
+            "jahr": "n/a",
+            "bemerkung": "DESIGN-MUSTER 2 (Breite einfrieren): xsimd haelt an batch<T,A> mit echtem Registermember fest, was mit sizeless-Typen unmoeglich ist. Loesung: SVE wird NUR breitenfest unterstuetzt (SVE-128/256/512), der Nutzer muss fuer die Zielmaschine NEU UEBERSETZEN. Das ist exakt das Modell, in das eine Grammatik mit festen Basen x128/x256/x512 passen wuerde -- Preis: die Breite wird zur Bau-Achse, ein Binary laeuft nicht mehr breitenuebergreifend.",
+            "bit32": false
+          },
+          {
+            "token": "MUSTER-compilerflag",
+            "cpuid_name": "GCC/Clang -msve-vector-bits=scalable|128|256|512|1024|2048 und -mrvv-vector-bits=scalable|zvl; ACLE-Attribute arm_sve_vector_bits(N) / riscv_rvv_vector_bits(N)",
+            "basis": "NONE",
+            "jahr": "n/a",
+            "bemerkung": "DESIGN-MUSTER 3 (VLS-Bruecke im Compiler): Beide ISAs bieten offiziell einen Schalter, der aus den sizeless-Typen feste VLS-Typen macht -- erst damit duerfen Vektoren in Globals, Structs, Unions und Arrays stehen. Default ist auf beiden Seiten 'scalable'. FOLGERUNG fuers Projekt: eine Basis x128/x256/x512 auf ARM/RISC-V ist nur dann eine wahre Aussage, wenn sie MIT diesem Compilerflag gepaart gebucht wird; ohne es ist die Basis eine Fiktion.",
+            "bit32": false
+          },
+          {
+            "token": "MUSTER-stdsimd",
+            "cpuid_name": "C++26 <simd> (P1928): std::simd::basic_vec<T,Abi>, native-abi<T>, fixed-size Abi-Tags",
+            "basis": "NONE",
+            "jahr": "2026 (C++26)",
+            "bemerkung": "DESIGN-MUSTER 4 (Breite als ABI-Tag, agnostisch nicht abgebildet): std::simd parametrisiert ueber ein ABI-Tag, native-abi<T> ist implementierungsdefiniert. Der Standard schreibt KEINE laengenagnostische Form vor; die Breite steckt im Typ. Damit ist std::simd fuer SVE/RVV das schwaechste der vier Muster und belegt eher, dass die Frage offen ist, als dass sie geloest waere. (Bewertungen zur Praxistauglichkeit sind Blogmeinung, nicht belegt -- nicht uebernommen.)",
+            "bit32": false
+          }
+        ],
+        "quellen": [
+          "https://docs.kernel.org/arch/arm64/elf_hwcaps.html",
+          "https://docs.kernel.org/arch/arm64/sve.html",
+          "https://raw.githubusercontent.com/torvalds/linux/master/arch/arm64/kernel/cpuinfo.c",
+          "https://raw.githubusercontent.com/torvalds/linux/master/arch/arm/kernel/setup.c",
+          "https://gcc.gnu.org/onlinedocs/gcc/AArch64-Options.html",
+          "https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html",
+          "https://gcc.gnu.org/onlinedocs/gcc/RISC-V-Options.html",
+          "https://github.com/google/highway/blob/master/g3doc/quick_reference.md",
+          "https://google.github.io/highway/en/master/impl_details.html",
+          "https://docs.riscv.org/reference/isa/extensions/vector/_attachments/riscv-v-spec.pdf",
+          "https://developer.arm.com/community/arm-community-blogs/b/architectures-and-processors-blog/posts/scalable-matrix-extension-armv9-a-architecture",
+          "https://developer.arm.com/documentation/101458/2404/Compile-and-Link/Support-for-Vector-Length-Specific--VLS--programming",
+          "https://github.com/xtensor-stack/xsimd/issues/786",
+          "https://developer.arm.com/community/arm-community-blogs/b/architectures-and-processors-blog/posts/sve-sve2-enablement-in-simd-library",
+          "https://en.cppreference.com/cpp/numeric/simd"
+        ],
+        "luecken": [
+          "BRIEFING-ABWEICHUNG (harte Zahl, geprueft): Der Auftrag nennt 30 Flags in vier Tiers (17 Avx512, 5 Avx256, 5 Companion, 3 Scalar). Die Datei /home/comdare/wt-super-landung/Code/external/comdare-cache-engine/libs/cache_engine/include/cache_engine/measurement/simd_feature_flag.hpp fuehrt TATSAECHLICH 23 Flags: 14 Avx512, 4 Avx256, 3 Companion, 2 Scalar -- zementiert durch static_assert(kSimdFeatureFlagCatalog.size() == 23) und static_assert(count_flags_of_tier(SimdFlagTier::Avx512) == 14). Entweder ist die Briefing-Zahl veraltet, oder es existiert ein zweiter Checkout mit anderem Stand. NICHT geraten, welche Version gilt.",
+          "JAHRESZAHLEN: Fuer NEON (AArch32/AArch64), VFPv3/v4, iwmmxt, asimdrdm, asimddp, asimdfhm, i8mm, bf16, SVE (v1) sowie die SVE-Matrix-Subsets svef32mm/svef64mm/svei8mm konnte ich in dieser Recherche KEINE Primaerquelle mit Jahr lesen. Belegt sind nur: Armv9/SVE2 = Maerz 2021, SME = 2021, SME2 = 2022, RVV 1.0 = Public Review 2021-09-19 / Ratifizierung Nov-Dez 2021 (zwei Quellen nennen Nov, andere Dez -- nicht aufgeloest). Das SVE-Ankuendigungsjahr 2016 ist mir gelaeufig, aber in dieser Sitzung NICHT belegt -- deshalb ueberall 'unbelegt'.",
+          "AArch32-hwcap-Tabelle des Kernels enthaelt asimdhp/asimddp/asimdfhm/asimdbf16/i8mm. Ob diese auf realer 32-bit-Hardware in freier Wildbahn je gesetzt sind (AArch32-Ausfuehrung auf ARMv8.2+-Kernen), habe ich NICHT verifiziert -- ich habe nur die Kernel-Stringtabelle gelesen, keine cpuinfo einer echten Maschine.",
+          "Der Owner-Satz 'In Indien ist 32bit noch aktuell unter Windows 10' zielt auf IA-32. Fuer ARM/RISC-V habe ich das Feld bit32 deshalb umgedeutet auf 'auf der 32-bit-Variante DERSELBEN ISA verfuegbar' (AArch32 bzw. RV32). Das ist eine Interpretation, keine Belegstelle -- der Elternagent muss entscheiden, ob das Feld ISA-uebergreifend eine Bedeutung hat.",
+          "Windows-Seite komplett ungeprueft: ob und wie Windows on ARM SVE/SVE2 an Anwendungen meldet (IsProcessorFeaturePresent-Konstanten), habe ich nicht recherchiert. Alle ARM-Feature-Namen hier sind LINUX-hwcap/cpuinfo-Namen. Fuer eine plattformneutrale Grammatik ist das eine offene Flanke -- der x86-Zweig hat mit CPUID eine ISA-Quelle, der ARM-Zweig hat mit HWCAP eine BETRIEBSSYSTEM-Quelle (die ARM-ID-Register ID_AA64PFR0_EL1/ID_AA64ZFR0_EL1 sind aus User-Space nur ueber Kernel-Emulation lesbar).",
+          "RISC-V 'P'-Extension (Packed SIMD in GPRs, das eigentliche Gegenstueck zu MMX/SSE) ist nach meinem Kenntnisstand nicht ratifiziert; ich habe KEINE Quelle dazu gelesen. Nicht in die Tabelle aufgenommen.",
+          "Wie RISC-V-Vektorfaehigkeiten unter Linux an User-Space gemeldet werden (riscv_hwprobe-Syscall statt klassischer HWCAP-Stringliste), habe ich NICHT gelesen. Fuer RISC-V nenne ich deshalb nur die -march-Extensionsnamen aus der GCC-Doku, KEINE cpuinfo-Strings -- das ist eine echte Asymmetrie zu ARM und x86 in der Tabelle.",
+          "SME Streaming Vector Length (SVL) vs. SVE VL: dass beide getrennte Laengen sind, entnehme ich der SME-Kernel-Doku-Zusammenfassung; die konkreten erlaubten SVL-Werte habe ich NICHT nachgelesen.",
+          "Highway-Detail HWY_SVE_256/HWY_SVE2_128: dass es sich um breitenfeste Spezialisierungen handelt, ist belegt; WARUM genau diese zwei Breiten (vermutlich A64FX=512 vs. Neoverse V1/N2) ist NICHT belegt.",
+          "Die Behauptung 'xsimd unterstuetzt SVE nur breitenfest und verlangt Neuuebersetzung' stammt aus einem xsimd-Issue und einem Arm-Community-Blog, NICHT aus der xsimd-Referenzdoku. Der aktuelle Stand des xsimd-master koennte abweichen -- nicht gegen den Quellcode geprueft.",
+          "std::simd/P1928: Ob und wie eine Implementierung SVE/RVV hinter native-abi<T> abbildet, ist implementierungsdefiniert und in den gelesenen Quellen NICHT ausgefuehrt. Aussagen zur Performance von std::simd habe ich bewusst verworfen (einzige Fundstelle war ein Meinungs-Blog)."
+        ]
+      }
+    ],
+    "katalog": {
+      "basen": [
+        {
+          "basis": "x128",
+          "sub_tokens": [
+            "sse",
+            "2",
+            "3",
+            "ssse3",
+            "41",
+            "42",
+            "4a",
+            "aes",
+            "pclmulqdq",
+            "sha"
+          ],
+          "begruendung": "Registerbreite 128 bit, Legacy-SSE-Kodierung (66/F2/F3 0F) bzw. VEX.128. Aufnahmekriterium: das eigene CPUID-Bit kennt AUSSCHLIESSLICH eine 128-bit-Form, die Breite waechst nie mit der Basis mit. Belege: sse legt die erste eigene XMM-Registerdatei an (nicht mehr x87-aliasiert, Lens 1); sse2 bringt double + volle Integer-Palette auf XMM. WICHTIG -- SYNTHESE-KORREKTUR: die Lenses widersprechen sich bei aes/pclmulqdq/sha. Lens 3 ordnet sie x128 zu, Lens 4 nennt sie Companion. Ich loese zugunsten x128 auf, und zwar mit Lens 4s EIGENEM Beleg: die AESENC-Tabelle kennt nur '66 0F38 DC AESENC xmm1,xmm2/m128 -> AES' und 'VEX.128 VAESENC -> AES AVX' -- es gibt KEINE 256/512-Form unter dem aes-Bit. SHA256RNDS2 hat verbatim NUR 'NP 0F38 CB ... xmm1, xmm2/m128 -> SHA', ueberhaupt keine VEX- und keine EVEX-Form. Breitenfest 128 IST Breiteninformation, also gehoert es in die Klammer. Lens 4s Kriterium 'traegt keine Breiteninformation' trifft nur auf gfni/vaes/vpclmulqdq zu, deren Breite der Basis FOLGT -- das ist der echte Companion-Test. Namensfallen live gegen /proc/cpuinfo dieser Maschine verifiziert: sse3 heisst 'pni', sse4.1/4.2 heissen 'sse4_1'/'sse4_2' (Unterstrich) bei g++-Flag '-msse4.1' (PUNKT), pclmulqdq hat g++-Flag '-mpclmul' (ohne qdq), sha_ni hat '-msha'.",
+          "bit32_relevant": true
+        },
+        {
+          "basis": "x256",
+          "sub_tokens": [
+            "avx",
+            "2",
+            "fma",
+            "f16c",
+            "vnni",
+            "ifma",
+            "vnniint8",
+            "vnniint16",
+            "neconvert",
+            "sha512",
+            "sm3",
+            "sm4"
+          ],
+          "begruendung": "Registerbreite 256 bit YMM, VEX-Kodierung. Aufnahmekriterium: das eigene CPUID-Bit deckt VEX.128/VEX.256 ab, die 512-bit-Form DERSELBEN Operation kommt aus einem anderen Bit (AVX512F). Staerkster Beleg (Lens 4, Instruktionstabellen): VCVTPH2PS/VCVTPS2PH existieren unter dem f16c-Bit nur VEX-kodiert auf XMM/YMM -- die EVEX/512-Konvertierung stammt aus AVX512F, NICHT aus f16c. Gleiches Muster bei fma (3-Operanden, VEX auf XMM/YMM; 512-bit-FMA ist AVX512F). Daraus folgt eine harte Grammatikregel: '{x512.f}.fma' ist semantisch falsch bzw. redundant, weil x512.f die 512-bit-FMA bereits impliziert. Der Ist-Katalog hat hier eine Wurzel-Luecke: er fuehrt avx2/fma/f16c/avx_vnni, aber NICHT das Basisflag 'avx' selbst. sha512/sm3/sm4 liegen hier statt bei den Companions, weil ihre Traegerbreite 256 in der Faehigkeit selbst fixiert ist (VEX-kodiert, Lens 3+4 uebereinstimmend) -- sie folgen keiner Basis, sie SIND 256. fma4/xop (AMD-only, mit Zen 2017 ersatzlos gestrichen) gehoeren NICHT in den Produktivkatalog: die Schnittmenge mit dem lebenden Messpark ist leer.",
+          "bit32_relevant": true
+        },
+        {
+          "basis": "x512",
+          "sub_tokens": [
+            "f",
+            "cd",
+            "vl",
+            "dq",
+            "bw",
+            "ifma",
+            "vbmi",
+            "vbmi2",
+            "vnni",
+            "bitalg",
+            "vpopcntdq",
+            "vp2intersect",
+            "bf16",
+            "fp16"
+          ],
+          "begruendung": "Registerbreite 512 bit ZMM, EVEX-Kodierung, alle gegated auf avx512f (CPUID Leaf 7). Das sind exakt die 14 Avx512-Eintraege des Ist-Katalogs -- Zuordnung bestaetigt, keine Korrektur noetig. Architektonisch zentral ist 'vl': avx512vl macht EVEX-Semantik (Masken, 32 Register, Broadcast) auf xmm/ymm nutzbar; ohne vl gibt es EVEX NUR in 512 bit. 'vl' ist damit der Bruecken-Token, der eine x512-Basis auf x128/x256 herunterreicht -- und der Grund, warum die Companions vaes/vpclmulqdq/gfni ihre 128/256-EVEX-Form erst mit vl bekommen. NICHT aufnehmen (von mir auf der Projekt-Toolchain gemessen, gcc 15.3.0, beide Bitbreiten): -mavx512er, -mavx512pf, -mavx5124vnniw, -mavx5124fmaps sind ENTFERNT ('unrecognized command-line option') -- reines Knights-Landing/Mill-Erbe, das der Kernel als cpuinfo-String weiterfuehrt, aber kein Compiler mehr bauen kann. -mavx512bmm (AMD Zen 6, Bit-Matrix-Multiply) ist NOCH NICHT da (gcc 15.3 lehnt ab, erst GCC 16). Alle fuenf sind Vokabular-Reserve, keine baubaren Flags.",
+          "bit32_relevant": true
+        }
+      ],
+      "companion": [
+        "gfni",
+        "vaes",
+        "vpclmulqdq",
+        "popcnt",
+        "bmi1",
+        "bmi2",
+        "abm",
+        "movbe",
+        "adx",
+        "rdrand",
+        "rdseed"
+      ],
+      "empfehlung": "KOMPOSIT-TABELLE, in zwei Klassen ohne Klammer.\n\nKLASSE A -- echte Companions (Breite FOLGT der Basis): gfni, vaes, vpclmulqdq.\nTest, den nur diese drei bestehen: EIN CPUID-Bit deckt mehrere Breiten ab, die erreichte Breite kommt aus der Basis. gfni ist der Musterfall (Lens 2+4, Instruktionstabelle GF2P8AFFINEQB): Legacy-SSE '66 0F3A CE -> GFNI' (128, sogar OHNE AVX), VEX.128/256 -> 'AVX GFNI', EVEX.512 -> 'AVX512F GFNI', EVEX.128/256 -> 'AVX512VL GFNI'. Es gibt KEIN separates avx512-gfni-Bit. Damit ist die Owner-Notation ...{x512.f.vl.bw.dq}.gfni durch die ISA GEDECKT, und ein 'x512.gfni' IN der Klammer waere falsch, weil kein solches CPUID-Bit existiert. Zusatzbeleg: Tremont/Gracemont haben gfni ohne jedes AVX-512. vaes/vpclmulqdq gleiches Muster mit einer Feinheit: ihr Bit zertifiziert erst ab 256 (VEX.256), die 128-bit-Form bleibt unter den ALTEN Bits aes/pclmulqdq. Aufloesungsregel: {x256...}.vaes = VEX.256, {x512.f}.vaes = EVEX.512, {x512.f.vl}.vaes = zusaetzlich EVEX.128/256.\n\nKLASSE B -- Skalare (GAR KEINE Vektorbreite): popcnt, bmi1, bmi2, abm, movbe, adx, rdrand, rdseed. Reine GPR-Instruktionen, gehoeren nie in eine Klammer. Empfehlung: eigenes Etikett 'scalar' beibehalten, NICHT mit Klasse A vermischen -- sie stehen zwar beide ohne Klammer, aber aus entgegengesetzten Gruenden (A: Breite kommt von aussen; B: es gibt keine Breite).\n\nZWEI PHANTOME, die NICHT in den Katalog duerfen (Lens 4, staerkster Einzelfund):\n- 'tzcnt' hat KEIN eigenes CPUID-Bit -- die Intel-Tabelle weist TZCNT verbatim der Feature-Spalte 'BMI1' zu. Kein cpuinfo-String, kein -mtzcnt. Wer TZCNT will, fordert bmi1. Zusatzfalle: TZCNT dekodiert auf alten CPUs still als BSF mit anderer Semantik -- 'laeuft' ist kein Beleg fuer 'unterstuetzt'.\n- 'lzcnt' ist KEIN eigenstaendiges Flag: dasselbe Bit wird als 'abm' ausgegeben. Als eigener Token entstuende ein Eintrag, den kein Signatur-Matching je trifft -- exakt die Fehlerklasse, die die Datei heute mit is_known_simd_flag(\"avx512_phantom\")==false abwehrt. Empfehlung: cpuinfo-Id 'abm' als Identitaet, -mlzcnt als Compile-Flag daneben fuehren.\n\nVORSCHLAG ZUR SCHREIBWEISE (Owner-Entscheid noetig, siehe offen): die Stripping-Regel 'Name ohne Basis-Vorsilbe' ist fuer die avx512*-Familie entworfen und ueberlebt den Kontakt mit sse*/avx* nicht sauber -- sse2 und avx2 werden beide zu '2', sse4.1 wird zu '4.1' und bringt den Trennpunkt in den Token. Innerhalb der Klammer ist die Kollision harmlos (die Basis disambiguiert: {x128.2} vs {x256.2}), ausserhalb waere sie fatal. Empfehlung: kurze Tokens NUR innerhalb der Klammer zulassen, Companions immer voll ausschreiben, und fuer x128 die Punkte tilgen (41/42 statt 4.1/4.2).\n\nBAUBARKEIT AUF DER PROJEKT-TOOLCHAIN (selbst gemessen, gcc 15.3.0, je -m32 und -m64, headerfreie Quelle): von 66 getesteten Schaltern werden 60 in BEIDEN Bitbreiten akzeptiert. Genau 5 sind tot (-mavx512er, -mavx512pf, -mavx5124vnniw, -mavx5124fmaps, -mavx512bmm), genau 1 ist 64-bit-exklusiv (-mapxf: 'is not supported for 32-bit code'). Alle uebrigen Kandidaten sind sofort baubar.",
+      "fehlt_im_bestand": [
+        "VORAB, HARTE BESTANDSKORREKTUR: Der Auftrag nennt '30 Flags in vier Tiers -- 17 Avx512, 5 Avx256, 5 Companion, 3 Scalar'. Das ist FALSCH. Der Bestand ist 23: 14 Avx512, 4 Avx256, 3 Companion, 2 Scalar. Belegt durch std::array<SimdFeatureFlag, 23>, static_assert(kSimdFeatureFlagCatalog.size() == 23) und static_assert(count_flags_of_tier(Avx512) == 14) in /home/comdare/wt-b14-ce/libs/cache_engine/include/cache_engine/measurement/simd_feature_flag.hpp. Ich habe ALLE 39 Kopien im Dateisystem gezaehlt (26 Worktrees, .claude/jobs-Klone, Desktop-Backup, Projekte/Modules und Projekte/Research) -- ausnahmslos 23. Zusaetzlich die Git-Historie geprueft: die Datei wurde in Commit 3111adba MIT 23 Flags geboren und nie mit einer anderen Zahl versioniert. Eine 30-Flag-Fassung existiert nirgends. Drei der fuenf Lenses haben das unabhaengig gemeldet. Vor jeder Planung klaeren, sonst wird gegen einen Phantom-Bestand gebaut.",
+        "STRUKTURELLER BLOCKER vor jeder Erweiterung: SimdFeatureFlag.cpuinfo ist die IDENTITAET (operator== vergleicht nur cpuinfo, MachineSimdSignature::has_flag matcht darauf). Elf der interessantesten Neuzugaenge haben KEINEN /proc/cpuinfo-String -- live gegen /proc/cpuinfo dieser Maschine geprueft, alle elf abwesend: avx_ifma, avxvnniint8, avxvnniint16, avxneconvert, sha512, sm3, sm4, avx512_bmm, avx10.1, avx10.2, apx. Sie sind ueber den heutigen Erhebungsweg NICHT signaturfaehig; ein Katalogeintrag dafuer koennte nie matchen. Entweder Erhebung auf CPUID direkt umstellen oder diese Flags bewusst draussen lassen -- aber nicht stillschweigend aufnehmen.",
+        "x128 KOMPLETT ABWESEND (10 Flags, alle live auf dieser Maschine in /proc/cpuinfo vorhanden und damit sofort signaturfaehig, alle in beiden Bitbreiten baubar): sse/-msse, sse2/-msse2, pni/-msse3 (cpuinfo heisst 'pni', NICHT 'sse3'), ssse3/-mssse3, sse4_1/-msse4.1, sse4_2/-msse4.2, sse4a/-msse4a (AMD, in Zen NICHT gestrichen), aes/-maes, pclmulqdq/-mpclmul, sha_ni/-msha. Ohne aes und pclmulqdq ist die Voraussetzungskette aes->vaes und pclmulqdq->vpclmulqdq heute nicht abbildbar, obwohl beide Nachfolger im Katalog stehen.",
+        "x256-WURZEL FEHLT: 'avx' selbst (cpuinfo 'avx', -mavx). Der Tier beginnt heute bei avx2 -- die 256-bit-Basis, auf der avx2/fma/f16c/avx_vnni aufsetzen, ist nicht deklariert. Live auf dieser Maschine vorhanden.",
+        "x256-NEUZUGAENGE, baubar aber NICHT signaturfaehig (kein cpuinfo-String): avx_ifma/-mavxifma, avxvnniint8/-mavxvnniint8, avxvnniint16/-mavxvnniint16, avxneconvert/-mavxneconvert, sha512/-msha512, sm3/-msm3, sm4/-msm4. Alle sieben von gcc 15.3 in -m32 UND -m64 akzeptiert.",
+        "SCALAR-LUECKEN (6 Flags, alle live in /proc/cpuinfo dieser Maschine, alle baubar): bmi1/-mbmi (cpuinfo 'bmi1' MIT Ziffer, g++-Flag '-mbmi' OHNE -- String-Heuristik laege falsch), abm/-mabm bzw. -mlzcnt, movbe/-mmovbe, adx/-madx, rdrand/-mrdrnd (cpuinfo mit 'a', Flag ohne), rdseed/-mrdseed. Dass bmi2 im Katalog steht und bmi1 nicht, ist eine echte Luecke -- es sind unabhaengige CPUID-Bits.",
+        "x512-VOKABULAR-RESERVE, NICHT baubar (von mir gemessen, gcc 15.3 lehnt alle fuenf in beiden Bitbreiten ab): avx512er, avx512pf, avx512_4vnniw, avx512_4fmaps (Knights-Landing/Mill-Erbe; der Kernel fuehrt die cpuinfo-Strings weiter, kein Compiler baut sie mehr) und avx512_bmm (AMD Zen 6, erst GCC 16). Das Fehlen im Bestand ist hier RICHTIG -- nur als historisches Vokabular fuehren, nie als Compile-Flag.",
+        "AVX10 fehlt ganz (avx10.1, avx10.2) -- und bringt einen Strukturbruch mit, siehe offen. Beide von gcc 15.3 in -m32 und -m64 akzeptiert.",
+        "64-BIT-EXKLUSIV, fehlt: apx (-mapxf). Von mir gemessen die EINZIGE harte 32-bit-Grenze der ganzen Liste: 'gcc -m32 -mapxf' -> \"'-mapxf' is not supported for 32-bit code\", -m64 uebersetzt. Ebenfalls fehlend: amx_tile/amx_bf16/amx_int8 -- ACHTUNG, hier akzeptiert gcc den Schalter -mamx-tile AUCH unter -m32, Schalter-Akzeptanz ist also KEIN Verfuegbarkeitsbeweis. AMX arbeitet auf 2D-Tiles (TMM), nicht auf ZMM, und gehoert in KEINE der drei Breiten-Basen.",
+        "HISTORISCHE VORGAENGER, bewusst NICHT zur Aufnahme empfohlen (alle baubar, aber auf keiner erreichbaren Maschine wahr): mmx, 3dnow, 3dnowa/mmxext (MMX-Register auf x87-Stack aliasiert -> Basis NONE), xop, fma4, tbm, lwp (AMD-only, mit Zen 2017 ersatzlos gestrichen). EINE Ausnahme lohnt die Pruefung: 3dnowprefetch/-mprfchw (PREFETCH/PREFETCHW) ist der einzige 3DNow!-Rest, der in modernen AMD- UND Intel-CPUs weiterlebt, und ist fuer eine Cache-Engine als Software-Prefetch-Achse unmittelbar einschlaegig."
+      ],
+      "offen": [
+        "PUNKT-KOLLISION IN DER NOTATION (Owner-Entscheid, nicht recherchierbar): Der Punkt ist der Trenner der Komposit-Grammatik, steckt aber in vier Flag-Namen selbst: -msse4.1, -msse4.2, -mavx10.1, -mavx10.2. Vorschlag 41/42 und avx10_1/avx101 -- aber das ist eine Setzung, keine Recherche.",
+        "TOKEN-KOLLISIONEN: 'vnni' existiert als avx512_vnni (x512) UND avx_vnni (x256); 'ifma' als avx512ifma (x512) UND AVX_IFMA (x256); '2' waere sse2 (x128) UND avx2 (x256). Innerhalb der Klammer disambiguiert die Basis, ausserhalb nicht. Ob die Grammatik Kurz-Tokens ausserhalb der Klammer ueberhaupt zulaesst, muss der Owner entscheiden.",
+        "STRIPPING-REGEL UNVOLLSTAENDIG: 'Name ohne Basis-Vorsilbe und ohne Unterstriche' laesst offen, ob das fuehrende 'v' Basis-Vorsilbe oder Namensbestandteil ist -- avx512_vpopcntdq wird zu 'vpopcntdq' (v bleibt), aber das Companion vpclmulqdq behaelt sein v aus einem anderen Grund. Und 'sha_ni' -> 'shani' oder 'sha'? Das g++-Flag heisst -msha. Die Regel entscheidet das nicht.",
+        "AVX10 IST EIN STRUKTURBRUCH -- und die Lenses widersprechen sich, ich kann es NICHT aufloesen: Lens 1 und Lens 2 ordnen AVX10 der Basis x512 zu, weil GCC -mavx10.1 auf 512 aliast. Ich habe das lokal bestaetigt (gcc 15.3 warnt woertlich: \"'-mavx10.1' is aliased to 512 bit since GCC14.3 and GCC15.1\"). ABER die MSVC-Primaerquelle sagt das GEGENTEIL: laut learn.microsoft.com /vlen ist die Default-Vektorlaenge von /arch:AVX10.1 und /arch:AVX10.2 gleich 256 Bit und wird erst mit /vlen=512 auf 512 gehoben -- verbatim: \"'/arch:AVX10.1 /vlen=512' overrides the default vector length of 256 bits\". DASSELBE Feature hat also Basis x512 unter GCC und x256 unter MSVC. Schlimmer: /arch:AVX512 /vlen=256 macht sogar klassisches AVX-512 zu einer 256-bit-Basis. Damit ist die Breite bei AVX10 KEINE Eigenschaft des Features mehr, sondern ein separater Compiler-Schalter. Welche der beiden Lesarten die Grammatik zementiert, ist eine Owner-Entscheidung mit Messfolgen, keine Recherchefrage.",
+        "VEKTORLAENGEN-AGNOSTISCHE ISA (Auftragspunkt 4) -- der MECHANISMUS ist belegt, die GRAMMATIK-ENTSCHEIDUNG ist offen. KEINE der fuenf Lenses hat das bearbeitet; ich habe es selbst recherchiert. Befund: ARM SVE und RISC-V RVV trennen BEIDE 'welche Befehle' von 'wie breit'. ARM: Feature-Modifier +sve/+sve2/+sve2-aes/+sve2-bitperm/+sve2-sha3/+sve2-sm4/+sme/+sme2 am -march, die Breite dagegen als EIGENER Schalter -msve-vector-bits={scalable,128,256,512,1024,2048}, Default 'scalable' = vector-length agnostic (GCC AArch64-Options, verbatim: \"Specifying 'scalable' selects vector-length agnostic output\"). RISC-V: Zvl<N>b-Extensions (zvl32b..zvl65536b) als MINDEST-Laenge plus -mrvv-vector-bits={scalable,zvl}; VLEN ist zur Compile-Zeit eine Unbekannte und wird zur Laufzeit aus dem CSR vlenb gelesen. Zusammen mit dem MSVC-/vlen-Befund oben heisst das: DREI unabhaengige ISA-Familien (AVX10, SVE, RVV) entkoppeln Breite und Featureset -- nur das klassische x86-Modell sse/avx/avx2/avx512f verschmilzt beide, und genau darauf ist die heutige Basis-Notation gebaut. Ein tragfaehiges Muster gibt es also (Basis-Slot muss einen Wert 'scalable' aufnehmen koennen UND die Breite muss ein eigener, explizit gesetzter Slot werden), aber OB die Grammatik so umgebaut wird, kann Recherche nicht entscheiden.",
+        "ZUSTAND DES PROJEKTS FUER NICHT-x86 (Code-Befund, Owner-Entscheid): Aarch64TargetIsa existiert bereits als System-Achse in target_isa_system_axis.hpp, emittiert aber nur do_target_march() == \"-march=armv8-a\" -- OHNE jeden NEON-, SVE- oder SVE2-Modifier. Gleichzeitig ist kAllSimdIds in simd_sub_axis.hpp auf {no_extension, avx2, avx512} festgelegt, also reines x86-Vokabular, und target_isa_system_axis.hpp haelt fest: 'Ziel != x86_64 => avx*/cx16 degradieren'. Fuer aarch64 kann die Grammatik heute also AUSSCHLIESSLICH 'no_extension' ausdruecken. Ob ARM/RISC-V ueberhaupt in den Flag-Katalog sollen, ist offen -- der reale Messpark ist rein x86-64 (prod1 Zen5, prod2 Raptor Lake, odroid Gracemont; alle drei in machine_simd_signature.hpp).",
+        "32-BIT, AUFTRAGSPUNKT 5 -- MEINE ANTWORT: x128 ist fuer DIESES Projekt heute Reserve, aber NICHT aus dem Grund, den der Auftrag vermutet, und als Vokabular ist es keine Reserve. Drei getrennte Befunde. (a) x128 ist der garantierte Boden: MSVC-Primaerquelle learn.microsoft.com /arch (x86), verbatim: \"The default instruction set is SSE2 if no /arch option is specified\" -- jeder 32-bit-Windows-Build landet ohne Zutun auf x128. Die dort dokumentierte x86-Liste ist vollstaendig IA32|SSE|SSE2|AVX|AVX2|AVX512|AVX10.1|AVX10.2, 32-bit ist also bis AVX10.2 hinauf offiziell unterstuetzt. (b) 32-bit begrenzt NICHT die Breite, sondern die ANZAHL -- das habe ich selbst headerfrei gemessen (gcc 15.3.0): 'gcc -m32 -O2 -mavx512f' erzeugt echtes EVEX ('vmovaps (%eax), %zmm0' -- 32-bit-Adressierung mit echtem zmm), aber unter Registerdruck kommt -m32 nur bis zmm7, waehrend -m64 zmm19 belegt; ein asm-Clobber auf xmm8/ymm8/zmm8 wird unter -m32 abgelehnt, unter -m64 akzeptiert. Die 32/64-Achse ist damit ORTHOGONAL zur Breiten-Achse -- '32-bit' ist NICHT gleichbedeutend mit 'x128'. (c) Fuer das Projekt selbst ist 32-bit heute nicht existent: ich habe das Repo durchsucht, JEDER Treffer auf -m32/i686/i386 liegt in vendored ext/-Fremdcode (liburing, unodb, jemalloc) -- die eigene CMake/CI-Kette hat KEIN einziges 32-bit-Ziel, und alle drei Maschinen im Park sind x86-64. x128 verdient seinen Platz trotzdem, aber wegen (a) und wegen aes/pclmulqdq/sha/sse4a, die live auf prod1 vorhanden sind -- nicht wegen 32-bit.",
+        "OFFEN GEBLIEBEN, die eigentliche Owner-Frage: ob 32-bit-Windows-10 die AVX-512-XSAVE-Zustaende (XCR0 Bits 5/6/7 Opmask/ZMM_Hi256/Hi16_ZMM) ueberhaupt freischaltet, konnte KEINE der fuenf Lenses belegen und ich auch nicht. Belegt ist die ISA-Seite (EVEX ist in IA-32 gueltig) und die Toolchain-Seite (gcc/clang uebersetzen es unter -m32); ohne OS-Freigabe meldet CPUID die Flags aber, und die Instruktion loest #UD aus. Das braucht eine Messung auf echter 32-bit-Windows-10-Installation oder eine Microsoft-Primaerquelle. Ebenfalls unbelegt: eine Zahl zur Verbreitung von 32-bit-Windows-10 in Indien -- Statcounter schluesselt nach Version, nicht nach Bitbreite; die Steam-Umfrage (Gamer-Stichprobe, fuer indische Buero-/Bildungs-PCs nicht repraesentativ) fuehrt gar keinen 32-bit-Eintrag mehr.",
+        "EIGENER MESSFEHLER, offengelegt: mein erster AMX-Test unter -m32 schlug fehl, aber NICHT wegen AMX -- diese Maschine hat keine 32-bit-libc-Header ('bits/libc-header-start.h: No such file or directory'), gcc-multilib fehlt. Jeder -m32-Test, der einen libc-Header zieht, ist hier ungueltig. Meine Flag-Akzeptanz-Tabelle und die Register-Tests sind davon NICHT betroffen (headerfreie Quellen, ich habe sie deshalb wiederholt), aber Lens 3s AMX-Beleg ('_tile_loadd ergibt mit -m32 implicit declaration') ist auf dieser Maschine so nicht reproduzierbar -- dort haette der libc-Fehler zuerst zugeschlagen. Die 32-bit-Nichtverfuegbarkeit von AMX bleibt damit fuer mich UNBELEGT; belegt ist nur die von Lens 1 zitierte SDM-Spalte 'V/N.E.' fuer LDTILECFG. Nachpruefen mit installiertem gcc-multilib.",
+        "NICHT GELESENE PRIMAERQUELLEN (gilt fuer alle fuenf Lenses und fuer mich): Intel SDM und AMD APM wurden als PDF NIE direkt gelesen. Die Instruktionstabellen stammen von felixcloutier.com (SDM-abgeleitet), die CPUID-Bit-Angaben aus dem Linux-Header cpufeatures.h und Wikipedia. Fuer die drei Aussagen mit dem groessten Gewicht -- Companion-Einordnung von gfni/vaes/vpclmulqdq, Breitenfestigkeit von aes/sha, AVX10-Leaf-0x24-Struktur -- waere die Primaerquelle vor der Zementierung im Code angezeigt."
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Recherche"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Katalog"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "simd:x86-historie",
+      "phaseIndex": 1,
+      "phaseTitle": "Recherche",
+      "agentId": "abad4c5d9f682f5cf",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786109966958,
+      "queuedAt": 1786109966949,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Fuer die Diplomarbeit \"Cache-Engine\" wird eine Flag-Grammatik gebaut, in der\nAlgorithmen ihre Hardware-Eignung als Komposit-Flags tragen:\n    memory_layout=SoaMemoryLayout@1.0.0.c.p.{x512.f.vl.bw.dq}.gfni\nDie Basen sind x128 / x256 / x512 (Registerbreite), die Sub-Tokens sind die Subset-Flags.\nCompanion-Flags stehen OHNE Klammer daneben.\n\nOWNER-AUFTRAG verbatim: \"bitte Webrecherche ueber …",
+      "lastProgressAt": 1786110512506,
+      "tokens": 85325,
+      "toolCalls": 34,
+      "durationMs": 545548,
+      "resultPreview": "{\"flags\":[{\"token\":\"mmx\",\"cpuid_name\":\"mmx / -mmmx\",\"basis\":\"NONE\",\"jahr\":\"1997\",\"bit32\":true,\"bemerkung\":\"Erste x86-SIMD-Stufe (Pentium MMX). 64-bit-Register MM0-MM7, ALIASIERT auf den x87-FP-Stack -- daher KEINE Basis x128/x256/x512, gehoert unter keine der drei Klammern. Nur Ganzzahl. Auf IA-32 voll verfuegbar (dort geboren). FEHLT im Ist-Katalog.\"},{\"token\":\"3dnow\",\"cpuid_name\":\"3dnow / -m3dno…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "simd:avx512-subsets",
+      "phaseIndex": 1,
+      "phaseTitle": "Recherche",
+      "agentId": "a22feab9689c6e147",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786109966959,
+      "queuedAt": 1786109966949,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Fuer die Diplomarbeit \"Cache-Engine\" wird eine Flag-Grammatik gebaut, in der\nAlgorithmen ihre Hardware-Eignung als Komposit-Flags tragen:\n    memory_layout=SoaMemoryLayout@1.0.0.c.p.{x512.f.vl.bw.dq}.gfni\nDie Basen sind x128 / x256 / x512 (Registerbreite), die Sub-Tokens sind die Subset-Flags.\nCompanion-Flags stehen OHNE Klammer daneben.\n\nOWNER-AUFTRAG verbatim: \"bitte Webrecherche ueber …",
+      "lastProgressAt": 1786110489027,
+      "tokens": 108134,
+      "toolCalls": 45,
+      "durationMs": 522068,
+      "resultPreview": "{\"flags\":[{\"token\":\"f\",\"cpuid_name\":\"avx512f / -mavx512f\",\"basis\":\"x512\",\"jahr\":\"2016\",\"bit32\":true,\"bemerkung\":\"AVX-512 Foundation, Pflichtwurzel jeder AVX-512-Implementierung; EVEX-Codierung, 512-bit-Register, Opmask k0-k7, Broadcast, embedded rounding. CPUID.(EAX=07h,ECX=0):EBX bit 16 (Kernel-Wort 9 = CPUID_7_0_EBX). Eingefuehrt Knights Landing / Skylake-SP. IM BESTAND VORHANDEN. 32-bit: lokal …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "simd:bit32",
+      "phaseIndex": 1,
+      "phaseTitle": "Recherche",
+      "agentId": "ab56ef5c6d7b87af7",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786109966959,
+      "queuedAt": 1786109966949,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Fuer die Diplomarbeit \"Cache-Engine\" wird eine Flag-Grammatik gebaut, in der\nAlgorithmen ihre Hardware-Eignung als Komposit-Flags tragen:\n    memory_layout=SoaMemoryLayout@1.0.0.c.p.{x512.f.vl.bw.dq}.gfni\nDie Basen sind x128 / x256 / x512 (Registerbreite), die Sub-Tokens sind die Subset-Flags.\nCompanion-Flags stehen OHNE Klammer daneben.\n\nOWNER-AUFTRAG verbatim: \"bitte Webrecherche ueber …",
+      "lastProgressAt": 1786110702175,
+      "tokens": 118608,
+      "toolCalls": 44,
+      "durationMs": 735216,
+      "resultPreview": "{\"flags\":[{\"token\":\"mmx\",\"cpuid_name\":\"mmx / -mmmx\",\"basis\":\"NONE\",\"jahr\":\"1997\",\"bit32\":true,\"bemerkung\":\"64-bit MM-Register (alias auf x87-Stack) -- KEINE der drei Basen x128/x256/x512. Fuer die Grammatik irrelevant, aber historischer Vorgaenger. cpuinfo 'mmx'. AMD-Erweiterung 'mmxext' (K7). gcc -m32 -mmmx akzeptiert (lokal verifiziert).\"},{\"token\":\"3dnow\",\"cpuid_name\":\"3dnow / -m3dnow\",\"basis\":…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "simd:companion",
+      "phaseIndex": 1,
+      "phaseTitle": "Recherche",
+      "agentId": "a261407fffa2e0522",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786109966959,
+      "queuedAt": 1786109966949,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Fuer die Diplomarbeit \"Cache-Engine\" wird eine Flag-Grammatik gebaut, in der\nAlgorithmen ihre Hardware-Eignung als Komposit-Flags tragen:\n    memory_layout=SoaMemoryLayout@1.0.0.c.p.{x512.f.vl.bw.dq}.gfni\nDie Basen sind x128 / x256 / x512 (Registerbreite), die Sub-Tokens sind die Subset-Flags.\nCompanion-Flags stehen OHNE Klammer daneben.\n\nOWNER-AUFTRAG verbatim: \"bitte Webrecherche ueber …",
+      "lastProgressAt": 1786110478049,
+      "tokens": 76355,
+      "toolCalls": 39,
+      "durationMs": 511090,
+      "resultPreview": "{\"flags\":[{\"token\":\"aes\",\"cpuid_name\":\"AES (CPUID.01H:ECX[25]) / cpuinfo \\\"aes\\\" / GCC+Clang -maes\",\"basis\":\"companion\",\"jahr\":\"2010 (Intel Westmere), 2011 (AMD Bulldozer)\",\"bit32\":true,\"bemerkung\":\"FEHLT im Ist-Katalog. AES-Runden auf XMM. EINORDNUNG=COMPANION, harte Begruendung aus der Intel-Instruktionstabelle AESENC: die einzigen Formen sind '66 0F 38 DC AESENC xmm1,xmm2/m128 -> CPUID AES' und…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "simd:arm",
+      "phaseIndex": 1,
+      "phaseTitle": "Recherche",
+      "agentId": "af0a0c79f45c4608f",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786109966959,
+      "queuedAt": 1786109966949,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "KONTEXT: Fuer die Diplomarbeit \"Cache-Engine\" wird eine Flag-Grammatik gebaut, in der\nAlgorithmen ihre Hardware-Eignung als Komposit-Flags tragen:\n    memory_layout=SoaMemoryLayout@1.0.0.c.p.{x512.f.vl.bw.dq}.gfni\nDie Basen sind x128 / x256 / x512 (Registerbreite), die Sub-Tokens sind die Subset-Flags.\nCompanion-Flags stehen OHNE Klammer daneben.\n\nOWNER-AUFTRAG verbatim: \"bitte Webrecherche ueber …",
+      "lastProgressAt": 1786110472118,
+      "tokens": 62717,
+      "toolCalls": 25,
+      "durationMs": 505158,
+      "resultPreview": "{\"flags\":[{\"token\":\"neon\",\"cpuid_name\":\"neon (AArch32 /proc/cpuinfo HWCAP_NEON) | -mfpu=neon, -mfpu=neon-vfpv3/-neon-vfpv4/-neon-fp-armv8, -march=armv7-a+simd\",\"basis\":\"x128\",\"jahr\":\"unbelegt\",\"bemerkung\":\"AArch32 Advanced SIMD. bit32 hier = AArch32 (NICHT IA-32). Registerfile: 32x64-bit D-Regs = 16x128-bit Q-Regs -> feste 128 Bit, passt als einziger Nicht-x86-Fall echt auf eine Basis x128. cpuinf…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "katalog",
+      "phaseIndex": 2,
+      "phaseTitle": "Katalog",
+      "agentId": "a526718e1265b44ec",
+      "model": "claude-fable-5",
+      "fallbackModel": "claude-opus-5",
+      "state": "done",
+      "startedAt": 1786110702185,
+      "queuedAt": 1786110702177,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "KOMPOSIT-TABELLE, in zwei Klassen ohne Klammer. KLASSE A --…",
+      "promptPreview": "KONTEXT: Fuer die Diplomarbeit \"Cache-Engine\" wird eine Flag-Grammatik gebaut, in der\nAlgorithmen ihre Hardware-Eignung als Komposit-Flags tragen:\n    memory_layout=SoaMemoryLayout@1.0.0.c.p.{x512.f.vl.bw.dq}.gfni\nDie Basen sind x128 / x256 / x512 (Registerbreite), die Sub-Tokens sind die Subset-Flags.\nCompanion-Flags stehen OHNE Klammer daneben.\n\nOWNER-AUFTRAG verbatim: \"bitte Webrecherche ueber …",
+      "lastProgressAt": 1786111188222,
+      "tokens": 145195,
+      "toolCalls": 28,
+      "durationMs": 486036,
+      "resultPreview": "{\"basen\":[{\"basis\":\"x128\",\"sub_tokens\":[\"sse\",\"2\",\"3\",\"ssse3\",\"41\",\"42\",\"4a\",\"aes\",\"pclmulqdq\",\"sha\"],\"begruendung\":\"Registerbreite 128 bit, Legacy-SSE-Kodierung (66/F2/F3 0F) bzw. VEX.128. Aufnahmekriterium: das eigene CPUID-Bit kennt AUSSCHLIESSLICH eine 128-bit-Form, die Breite waechst nie mit der Basis mit. Belege: sse legt die erste eigene XMM-Registerdatei an (nicht mehr x87-aliasiert, Lens …"
+    }
+  ],
+  "totalTokens": 596334,
+  "totalToolCalls": 215
+}

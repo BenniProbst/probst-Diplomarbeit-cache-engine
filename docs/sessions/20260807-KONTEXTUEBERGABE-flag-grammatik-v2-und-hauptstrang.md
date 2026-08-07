@@ -185,24 +185,67 @@ T2 = vor der Voll-Messung, T3 = vor dem 15.09., T4 = danach). Ebenso sind die **
 W1/W2/W3/W5/W10** vom Juli am 03.–05.08. für andere Inhalte wiederverwendet worden — Kollision,
 nicht Fortsetzung.
 
-## 4. Laufende Arbeit bei Kontextende
+## 4. STAND BEI DER NEUGRUENDUNG (07.08. abends) — vier Erkundungen zurueck
 
-| Vorgang | Zweck |
-|---|---|
-| `wf_93522b50-447` | **SIMD-Katalog-Recherche**, 5 Lenses: x86-Historie MMX→AVX10, AVX-512-Subsets, **32-bit-Lage (Owner-Schwerpunkt: Indien/Win10)**, Companion/Scalar, ARM+RISC-V-Vektorlängen-Agnostik → liefert die Komposit-Tabelle für x128/x256/x512 |
-| Explore „Pläne 3 Wochen" | Plan-Inventar 17.07.–07.08. + vergessene Aufgaben |
-| Explore „Phase 3/4?" | Objekt-Verifikation der These |
-| Explore „Hauptstrang-Stand" | Wellen-/Phasen-Systeme, welche aktiv |
-| ⏸️ `wf_355205a7-f46` | **Doppel-Audit, pausiert** — Wiederanlauf via `resumeFromRunId` |
+### 4.1 EIN NEUER OWNER-KERN, der eine Fessel loest
+> *„Wir WOLLEN den gesamten Bestand invalidieren, weil uns das spaeter das Leben erleichtert.
+> Die Entscheidung fuer den Umbau steht"*
 
-**Gesicherte Ergebnisse (nicht neu erheben!):**
-- `docs/sessions/20260807-KARTIERUNG-sonnet5-sieben-themen-referenzen.json` (173 KB)
-- `docs/sessions/20260807-EXPLORE-sechs-lose-flags-xlsx-noise-minmax-paper.json` (194 KB)
-- `docs/sessions/20260807-VEREINIGUNG-flag-grammatik-v2-gegen-4-wochen.json` (132 KB)
-- `docs/sessions/20260807-AUDIT-ledger-vollstaendigkeit-43-positionen.json`
-- `docs/sessions/backups/20260807-welleD-t10-spendlimit-rettung/`
+Der Lead hatte den Grammatik-Bau an die Rueckwaertsvertraeglichkeit gefesselt. **Die Fessel ist
+weg — das Brechen ist der Zweck.** Keine Uebergangs-Toleranz, kein Doppel-Parser, keine
+Migrations-Kruecke. Die Massen-Migration ist ein **eigenes Paket**. Einzige Pflicht: der Bruch muss
+**LAUT** sein (compile-time), nie ein stiller Sentinel.
+**Der Zeitpunkt ist der guenstigste, den es je gibt** — Fenster 0 steht offen, ein Byte-Ereignis
+kostet jetzt nichts, spaeter 34,4 h Neubau.
 
----
+### 4.2 WO PHASE 4 KLEMMT — drei benennbare Stellen, kein Entscheid noetig
+Am Objekt geprueft (nicht am Ledger-Zitat). Vorstufen und Phase 1–3 **alle erledigt**; Phase 4 ist
+**teilweise**, und die Luecke ist eng:
+1. `comdare_attach_generated_catalog(...)` haengt **nur an Test-Targets** (6 Fundstellen, alle in
+   `tests/unit/CMakeLists.txt`). **Kein Produktions-Target.**
+2. `apps/adhoc_emitter/main.cpp:141-143` — `PilotEngine` ist ein **handgeschriebenes** 18-Slot-
+   Konstrukt (C0..C19), XML-unabhaengig.
+3. `golden_320_catalog` bleibt ein **handgetippter Literal-Alias** — die 320-Semantik lebt als
+   Literal, nicht als Ableitung.
+**Das ist der konkreteste Hauptstrang-Posten, den es gerade gibt.**
+
+### 4.3 DER EINE VERGESSENE POSTEN aus 30 Plan-Straengen
+`allocators/*.profile.xml` — **23 Akten**, vom Parser nie geladen (`parse()` scannt nur `sota/`),
+`grep "comdare_allocator_profile"` = **0 Treffer** in `libs/ builder/ apps/`, **0 Treffer** im
+gesamten 8300-Zeilen-Ledger. Zweimal unabhaengig entdeckt (04.07., 22.07.), nie gebucht.
+Gegenprobe bestanden: die Schwester-Familien `sota/` (33) und `load_profiles/` (21) sind **beide**
+verdrahtet. Keine Messung betroffen — das Risiko ist ein **Abdeckungs-Anspruch ohne Code-Beleg**.
+**Entscheid noetig:** Ledger-Zeile „Doku-only, NACH Abgabe" ODER Coverage-Gate nachbauen (~30 min).
+
+### 4.4 EINE FEHLRICHTUNG: der Ledger ist strenger als der Code
+`R3-R7/R9` (Nacht-Audit 22.07.) stehen als *„UNBELEGT"* im NACH-ABGABE-Band. **Vier sind gefixt** —
+R4 (`experiment_plan_director.hpp:1725`), R5 (`profile_run_facade.cpp:559-564`),
+R6 (`merge_plan.hpp:69-71`), R7 (`experiment_golden_kern.xml:104`). Kein Substanzverlust, aber eine
+stale Zeile, die Restarbeit vortaeuscht.
+
+### 4.5 DER SIMD-KATALOG IST DA — und aendert die Grammatik an drei Stellen
+Gesichert: `docs/sessions/backups/20260807-explores-und-simd-katalog/` (6 Lenses, 32- und 64-bit).
+1. **Die Basis-Zuordnung ist VIERTEILIG.** MMX/3DNow!/3DNowExt/MMXExt liegen auf x87-aliasierten
+   MM-Registern und gehoeren unter **keine** der Basen x128/x256/x512.
+2. **`-msse4.1` traegt einen PUNKT** — unser Trenner. `sse4.1` wuerde als zwei Subs gelesen.
+   Vorschlag: `sse41`. Damit steht fest: **unsere Token sind NICHT die Compiler-Schalter.**
+3. **DREI Namensraeume**: cpuinfo (`pni` fuer SSE3!) / Schalter (`-mpclmul`) / unser Token.
+   `simd_feature_flag.hpp` trennt das fuer `avx512_vbmi2` bereits — diesem Muster folgen.
+
+### 4.6 LAUFENDE VORGAENGE bei der Neugruendung
+| Agent | Auftrag | Zustand |
+|---|---|---|
+| `Bau-Grammatik-v2` | Parser v2 auf Branch `bau/flag-grammatik-v2-s1` (ce, Basis `ba069e38`) | **LAEUFT**, hat Owner-Direktive + SIMD-Katalog nachgereicht bekommen |
+| `Verify-Phasen-Korrektur` | adversarische Pruefung der Phasen-Korrektur (F1–F7) | **LAEUFT** |
+
+**Beide sind gegenzulesen, bevor etwas gelandet wird** (Explore-Doktrin Stufe 2). Der Bau-Agent hat
+Anweisung, **nicht** zu pushen und **nicht** zu mergen.
+
+### 4.7 Was der Lead heute an sich selbst korrigiert hat
+Die Phasen-Zuordnung wurde **zweimal** angefasst. Endstand: **beide Nummerierungen existieren real**
+(XML-Roadmap *und* Fahrplan); LEDGER:3774 verweist auf den **Fahrplan**; **beide Lesarten fuehren
+zum selben Ort**. Der erste Nachtrag („FALSCH") war zu hart und ist in abend-2 relativiert.
+**Sprachregelung ab jetzt: „XML-Phase n" vs. „Fahrplan-Phase n".**
 
 ## 5. Offene Owner-Entscheide
 
