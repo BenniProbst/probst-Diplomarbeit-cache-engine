@@ -9530,3 +9530,90 @@ liegt** (`build_orchestrator.hpp:702-703`; bei leerem Wert wird ein vorhandenes 
 
 **Der Agent hat damit eine DRITTE Option gewaehlt** -- der Auftrag sagte "entfernen ODER stehenlassen
 und melden". Begruendung: rein Kommentar, **kein Byte-Ereignis**. **Richtig entschieden.**
+
+---
+
+## NACHTRAG 07.08.2026 abend-17 — S2-KATALOGWACHE GELANDET (ce `5788dc12`) · und ein Lead-Fehler in der Auftragsform
+
+**419/419 ueber den gemergten Stand, vom Lead selbst gebaut.** **104 `static_assert`s** allein im
+neuen Katalog (`flag_grammar_catalog.hpp`, 660 Z., 62 zugelassene + 14 begruendet abgelehnte Token).
+
+### DIE STRUKTUR WURDE NICHT GEWAEHLT -- DER KATALOG HAT SIE ERZWUNGEN
+**Identitaet ist das Paar `(token, eltern)`, nicht das Token.** Vom Lead am Objekt nachgeprueft:
+- `flag_grammar_catalog.hpp:144` fuehrt **`f` als FPGA**-Hardware-Basis (Tiefe 0)
+- `:208` fuehrt **`f` als AVX-512-Foundation** unter `x512`
+**Dasselbe Token, zwei Bedeutungen, entschieden allein durch das Elternteil.** Ebenso `vnni`
+(`:189` `avx_vnni`/x256 gegen `:216` `avx512_vnni`/x512 -- verschiedene CPUID-Bits, verschiedene
+Schalter) und `ifma`. **Wer nur Token prueft, kann diese Faelle nicht unterscheiden.**
+
+**Die Tiefe prueft die Wache NICHT -- sie muss nicht.** Die Eltern-Kette begrenzt sich selbst: um
+Tiefe 2 zu erreichen, muss das Elternteil auf Tiefe 1 zugelassen sein, und jedes Tiefe-1-Token hat
+als Elternteil eine Basis, die nur auf Tiefe 0 steht. `c{c{p}}` faellt schon am inneren `c`.
+
+**Leere Felder sind Aussagen, keine Luecken:** `cpuinfo == ""` heisst *"ueber /proc/cpuinfo nicht
+signaturfaehig"*. **Eine geratene Id waere schlimmer als eine leere** -- sie behauptete ein Match,
+das nie eintritt.
+
+**Drei Wachen gegen die TABELLE selbst** (nicht gegen die Eingabe): jedes Katalog-Token muss
+**grammatisch erreichbar** sein (wer `avx512_vbmi2` oder `sse4.1` einträgt, legt eine Zulassung an,
+die nie greift) · eine **Drift-Bruecke** zu allen 23 Eintraegen von `simd_feature_flag.hpp` (wer dort
+ergaenzt, bricht hier den Bau) · Paar-Eindeutigkeit und Eltern-Existenz.
+
+### FALL 4 OFFEN GEHALTEN, ohne zu verwaessern
+Feld `eltern_alternativ`: die MMX-Familie nennt **beide** Gestalten (Tiefe 0 **und** `x64`). Drei
+Sicherungen: eine zweite Platzierung ist **nur** bei `kind == BasislosFamilie` mit `entscheid_offen`
+erlaubt · `static_assert(flag_catalog_offene_entscheide() == 6)` · Laufzeit-Gegenprobe im Test.
+**Wer den Entscheid vollzieht, kommt an genau diesen sechs Zeilen nicht vorbei.**
+**Der Preis steht offen im Header:** bis dahin gibt es fuer dieselbe Tatsache **zwei schreibbare
+Byte-Folgen**, und der Stempel ist Identitaet. **Nicht offen ist die Hardware-Aussage:** die Familie
+steht unter **keiner** der drei Breiten-Basen -- `x128{mmx}` bricht.
+
+### 15 BISSPROBEN, alle brechen · 5 POSITIV-PROBEN, alle uebersetzen
+Darunter `x512{sse2}` (falsche Basis), `x128{vl}` (umgekehrt), `x512{gfni}` (Companion an
+Basis-Stelle), `x512{popcnt}` (Skalar in der Klammer), `g{p}` (p/e nur unter c), `x128{mmx}`.
+**Biss 11 ist die Gegenprobe, dass der Katalog-Term wirklich greift** und nicht von der `c`-Pflicht
+verdeckt wird. **Drei Bisse an REALEN Literalen** (Achse `PathCompressionNone`, Mess-Tooling
+`wallclock`) -- sie brechen mit dem **Typ-Namen** in der Instanziierungskette.
+**Zu `x512{gfni}`:** das ist eine **ISA-Aussage**, keine Stil-Regel -- `gfni` deckt mit *einem*
+CPUID-Bit Legacy-SSE, VEX und EVEX ab; es gibt **kein** separates avx512-gfni-Bit. Die Owner-Form
+`...x512{f.vl.bw.dq}.gfni` ist genau richtig, weil die Breite des Companions der Basis **folgt**.
+
+### DREI ABWEICHUNGEN VON DER LEAD-VORGABE -- jede mit Beleg, jede richtig
+1. **`aes`/`pclmulqdq` sind KEINE Companions**, sondern **x128** -- unter dem AES-Bit existiert keine
+   256/512-Form. **Waere der Agent der Lead-Vorgabe gefolgt, haette der bereits gelandete
+   Vollausbau-Beweis gebrochen.**
+2. **`xop`/`fma4` NICHT im Katalog** -- die Recherche schliesst beide vom Produktivkatalog aus, und
+   bei `xop` **widersprechen sich die Quellen** (Lens 1: x128, Lens 3+4: x256). Als Reserve mit
+   Beleg gefuehrt statt geraten: *"eine geratene Basis stuende sonst in jedem Preimage"*.
+3. **`3dnowprefetch` als Skalar ist die SETZUNG DES AGENTEN** -- der Katalog fuehrt das Token gar
+   nicht. Als `entscheid_offen` markiert, Begruendung an der Zeile.
+
+### ZWEI BEFUNDE MITGEHEILT
+1. **Eine Wache schlug richtig an und berichtete FALSCH:** sie meldete *"algo_version ohne
+   CPU-Basis"*, obwohl das Literal `c` trug -- der Fehler lag am neuen Katalog-Term. **Acht
+   Meldungen** nennen jetzt beide Gruende. *"Eine Wache, die richtig anschlaegt und falsch berichtet,
+   schickt den Naechsten auf die falsche Faehrte."*
+2. **Drei Meldungstexte waren SCHON VOR dieser Scheibe veraltet** -- sie nannten *"experimentelles
+   'e'"* und *"GENAU 'c' bzw. 'ce'"*, beides seit v2 gegenstandslos. Erbstueck des v2-Umbaus.
+
+### NICHT GEBAUT, im Header NAMENTLICH benannt (damit es niemand fuer geprueft haelt)
+**Doppelungen** (`x512{f.f}` geht durch) · **nackte Breiten-Basis** (`x512` ohne Sub-Liste) ·
+**Abhaengigkeitsketten** (`x512{vl}` ohne `f`; die Semantik-Frage *fordert oder impliziert?* ist ein
+eigener Schritt) · **Maschinen-Verfuegbarkeit** (bleibt beim Bau-Gate).
+**Nicht nachgeprueft, ehrlich vermerkt:** die sieben x256-Token mit leerer cpuinfo-Spalte schliessen
+aus **einer** Maschine auf "nicht signaturfaehig" -- plausibel, nicht zwingend. Und die Recherche
+hat **Intel SDM und AMD APM nie direkt gelesen** (steht in ihrem eigenen offen-Knoten) -- gerade bei
+den drei gewichtigsten Aussagen (Companion-Einordnung, Breitenfestigkeit von aes/sha, AVX10).
+
+### LEAD-FEHLER IN DER AUFTRAGSFORM -- vom Agenten selbst gemeldet
+Der Lead schrieb in **jeden** Bau-Auftrag *"Basis `origin/development` = `5060489e`"*. Der Agent fuhr
+seine Wachen gegen genau diese Zahl -- **weil sie im Auftragstext stand**, nicht weil er
+`git merge-base` gerechnet haette. **Sein Ergebnis stimmte zufaellig**: die Zahl war zum Messzeitpunkt
+noch die Abzweigung. **Bei drei Landungen an einem Nachmittag muss sie das nicht sein.**
+**Eine SHA im Auftrag ist eine Momentaufnahme, die als Tatsache gelesen wird.** Gebucht als
+Arbeitsfehler-**Klasse 9**. Regel ab sofort: Basis **benennen**, nicht beziffern -- und ausdruecklich
+verlangen, die Abzweigung selbst zu rechnen. **Eine Zahl, die der Lead vorgab und zurueckbekommt,
+ist ein Echo, keine Bestaetigung.**
+Der Agent hat ausserdem den Beruehrungspunkt zu `e4dc0b84` **geprueft statt angenommen**
+(`git show --stat` -> nur `profile_run_entry.hpp`, kein Konflikt) und nach dem Merge des Leads
+**neu gemessen**: 419/419 auf `5788dc12`.
