@@ -16,6 +16,40 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 08.08.2026 — DIE ZEHN OWNER-ENTSCHEIDE VOM 07.08.: FÜNF SIND WEG
+
+Das Board führt seit dem 07.08. *„zehn offene Owner-Entscheide"* (Erst-Anker
+`docs/sessions/20260807-STAND-wellenplan-abgeschlossen-und-offene-entscheide.md:51`). **Am Objekt
+nachgeprüft sind fünf davon erledigt oder gegenstandslos** — sie banden Aufmerksamkeit, ohne noch
+eine Frage zu sein.
+
+| Posten | Urteil | Beleg |
+|---|---|---|
+| **R-1** Generator dreht die Thesis-Korrektur zurück | **erledigt** | `grep -c 'nicht erhoben' Code/04_csv_to_latex/csv_to_latex.cpp` → **0**; gelandet als super `6d837e7d` (dort wurden **drei** Drifts gefunden statt einem) |
+| **R-2** `cpe`-Grammatik (drei Teilfragen) | **gegenstandslos** | `grep -rn 'cpe'` über `libs/` und `apps/` → **0 echte Treffer**. Die **Flag-Grammatik v2** hat die Frage abgelöst: *„der ganze BNF-Block auf v2 (kein `v`-Präfix, Punkt vor jedem Flag, Basis an der Klammer, `e` = **efficiency core**)"* (Ledger `:10662`). Damit ist auch Teilfrage (a) — *„wie trennen wir `e`(experimental) von `e`(efficiency)?"* — beantwortet |
+| **R-3** xlsx-Blattform | **erledigt** | heute vom Owner entschieden; Ledger trägt *OWNER-ENTSCHEID: DIE BLATTFORM* samt Nachtrag |
+| **G-6** Dual-Review-Pflicht: gilt sie weiter? | **beantwortet** | Doktrin **v3.1** führt seit heute **Landungsklassen** ein: Code/Skript/CMake/CI → zwei Lenses · Soll-Design → ein Lens · reine Doku → keiner · Gitlink-Bump → zwei Gates statt Lens. Die Pflicht gilt weiter, aber differenziert — die undifferenzierte Fassung war der Grund, warum sie als Ganzes ignoriert wurde |
+| **G-7** `cpe` im Ledger widersprüchlich | **erledigt** | im Ledger selbst als *„G-7 SOFORT ERLEDIGT"* vermerkt, additiv korrigiert |
+
+### Was wirklich offen bleibt — fünf, nicht zehn
+
+**G-1** sechs STOPP-Gate-Entscheide E-A…E-F (Lead-Empfehlungen liegen ausgearbeitet vor: `b / ii /
+b / a / b / a`) · **G-2** T19 `persistence_target` ohne Katalog-Zeile: welche Min/Max-Semantik? ·
+**G-3** vier Entscheide aus Welle C (Pareto) · **G-4** fünf Entscheide aus Welle D (Cluster) ·
+**G-5** `RunMethodology`-Enum-Reihenfolge — **das ist ein Stempel-/ABI-Ereignis** und damit ein
+teurer Umbau *ohne* Defekt, also der einzige der fünf, der nach der Rücksprache-Regel ausdrücklich
+beim Owner bleibt.
+
+### Der Befund über den Einzelfall hinaus
+
+**Ein Posten, der als offen geführt wird und längst erledigt ist, kostet dieselbe Aufmerksamkeit wie
+ein echter.** Fünf von zehn — die Hälfte einer Liste, die als *„was auf den Owner wartet"*
+überschrieben ist. Drei davon wurden **von der laufenden Arbeit miterledigt**, ohne dass jemand zur
+Liste zurückging.
+
+Das ist die Schwester des §75-Befunds (*„die Kandidatenliste log zwölf Tage"*) und derselbe
+Mechanismus: **eine Liste altert, während gearbeitet wird — und niemand misst sie nach.** Die
+Gegenmaßnahme ist dieselbe: vor jeder Vorlage die Posten am Objekt prüfen, nicht die Liste zitieren.
 ## NACHTRAG 08.08.2026 — ZWEI CI-BEFUNDE: EIN JOB, DER NIE LIEF, UND EIN FIX, DER SCHLIMMER WAR
 
 ### 1. `build:clang` lief in der Cache Engine **nie** — das Gate ging in diesem Repo nicht auf
