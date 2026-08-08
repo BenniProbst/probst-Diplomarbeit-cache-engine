@@ -92,7 +92,8 @@ wuerfel() {
     echo $(( _lo + (_roh % _spanne) ))
 }
 
-fall()      { N_FALL=$((N_FALL + 1)); echo "-----------------------------------------------------------------------------"; echo "FALL $N_FALL: $1"; }
+TRENNER='-----------------------------------------------------------------------------'
+fall()      { N_FALL=$((N_FALL + 1)); echo "$TRENNER"; echo "FALL $N_FALL: $1"; }
 fall_ende() { echo ""; }
 reiss()     { N_ROT=$((N_ROT + 1)); RC=1; echo "  [RISS] $1" >&2; }
 halt()      { N_OK=$((N_OK + 1)); echo "  [OK]   $1"; }
