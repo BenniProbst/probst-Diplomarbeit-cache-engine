@@ -16,6 +16,52 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 08.08.2026 — ZWEI CI-BEFUNDE: EIN JOB, DER NIE LIEF, UND EIN FIX, DER SCHLIMMER WAR
+
+### 1. `build:clang` lief in der Cache Engine **nie** — das Gate ging in diesem Repo nicht auf
+
+Der Job war *„opt-in + advisory"* über `COMDARE_CLANG_MATRIX == "1"`. Am Objekt gemessen: **diese
+Variable ist im ce-Repo nirgends gesetzt** — sie kommt in der ganzen `.gitlab-ci.yml` nur im
+Kommentar vor. In **super** ist sie gesetzt (Zeile 64), dort lief er. In ce lief er in **keiner**
+Pipeline; nachgesehen an Pipeline 15332: 21 Jobs, kein einziger clang-Job darunter.
+
+> **Ein Gate, das nie aufgeht, ist kein Gate — es ist ein abgeschalteter Job, der so aussieht, als
+> wäre er einer.**
+
+**Das ist dieselbe Klasse wie `run_all_tests.sh` und der ungefahrene GNU-Bauweg** — und damit der
+**vierte** Fall an einem Tag. Ich hatte den Job zuvor als *„läuft opt-in und advisory"* beschrieben;
+das war zu milde. Er lief gar nicht.
+
+**Umgestellt** (ce `274e4ed2`), ohne Eingriff ins read-only `ci-templates`: die `rules`-Zeile steht in
+der geerbten Vorlage `.build-clang-latest`; ein eigenes `rules: [when: on_success]` im Job
+überschreibt das geerbte vollständig. Seit Pipeline **15357** läuft er — **22 Jobs statt 21**.
+
+**Möglich wurde das erst heute:** beide clang-Blocker sind geheilt (constexpr-Grammatik ohne Heap;
+CWG 1430), der clang-Vollbau steht bei 1937/1938 und ctest bei 428/428 auf **beiden** Compilern.
+Vorher hätte der Job die Pipeline dauerhaft rot gefärbt.
+
+### 2. Eine `resource_group` gegen einen OOM-Kill hat drei Pipelines blockiert
+
+Gegen den OOM-Kill in Pipeline 15332 wurden beide Vollbau-Jobs in eine `resource_group` gelegt. Sie
+verhinderte den OOM — **und bremste das ganze Repo aus.** Live gemessen (GitLab-API, 14:08):
+
+| Pipeline | SHA | Zustand | Ref |
+|---|---|---|---|
+| 15352 | `e2a4cb45` | **waiting_for_resource** | development |
+| 15349 | `0ef4ef4f` | **waiting_for_resource** | main |
+| 15345 | `0ef4ef4f` | **waiting_for_resource** | main |
+| 15343 | `0ef4ef4f` | running (hält die Gruppe) | development |
+
+**Drei Pipelines standen still, während eine baute.** Zurückgenommen in ce `75ff9f89`.
+
+**Und ich hatte den Zustand falsch gedeutet:** ich sah dieselben `waiting_for_resource`-Meldungen und
+schrieb *„das ist die `resource_group`, sie wirkt, kein Stau"*. Sie wirkte — nur anders als gedacht.
+**Ich habe den Zustand gesehen und interpretiert; der Agent hat ihn gemessen.** Das ist wörtlich die
+Figur aus V11: der Gesamtstatus statt der Jobliste, der Eindruck statt der Zahl.
+
+**Die allgemeine Lehre daraus, über diesen Fall hinaus:** eine Serialisierung gegen Ressourcen-Druck
+löst das Problem an der Stelle, an der es auftritt, und verschiebt es auf alle anderen. Wer sie setzt,
+muss danach **die Warteschlange messen**, nicht nur den geheilten Job.
 ## NACHTRAG 08.08.2026 — DIE SIEBEN NACHTRÄGE DES TAGES STANDEN AM FALSCHEN ENDE
 
 **Dieser Eintrag ist der erste, der mit `scripts/ledger_nachtrag.sh` gesetzt wurde** — und damit
