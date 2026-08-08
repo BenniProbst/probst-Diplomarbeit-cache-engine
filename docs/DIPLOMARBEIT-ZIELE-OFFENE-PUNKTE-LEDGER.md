@@ -11185,3 +11185,67 @@ als die Entwuerfe.**
 - **Und weil es 6 Varianten gibt, liefert die Befragung nebenbei die ERSTE MESSUNG DES MESS-OVERHEADS**
   -- dieselbe Differenz, die die Mess-Kette braucht. **`--check-size` und die Messfehler-Elimination
   sind dasselbe Werkzeug.**
+
+---
+
+## NACHTRAG 08.08.2026 — F-3-ALARM ZURUECKGENOMMEN · RECORD-AND-REPLAY · RELEASE ALS REKONSTRUKTION
+
+### MEIN F-3-ALARM WAR UEBERZOGEN -- die Doktrin erlaubt die Trennung ausdruecklich
+Ich hatte gemeldet, `all_axes_golden.profile.xml` nenne die Trennung der Mess-Combos "die
+F-3-Regression" und stehe damit gegen den Owner-KERN. **Der Kommentar sagt vollstaendig** (`:220-226`):
+> *"Die frueheren 3 separaten Ein-Tool-Combos (3 CEB-Lanen) waren die F-3-Regression; **getrennt/
+> Teilmengen bleibt XML-Recht** (s. m3_smoke_coverage)."*
+
+**Die Regression war, dass drei Lanen als DEFAULT liefen -- nicht die Trennbarkeit.** Ich hatte den
+Halbsatz nach dem Semikolon nicht gelesen. **Kein Konflikt mit den 6 CEBs.**
+
+### DER ECHTE BLOCKER -- und der Code benennt ihn selbst, inklusive Folgepaket
+`profile_facade/mess_achsen_naht.hpp:81-95`:
+> *"**EHRLICHE GRENZE DIESER SCHEIBE -- macro UND micro SIND HEUTE NICHT TRENNBAR.** G2 und G3 teilen
+> sich EIN Gate. Es gibt im gesamten anatomy/-Baum kein drittes Makro, ueber das man die Segment-Timer
+> ohne die Observer-Zaehler (oder umgekehrt) entfernen koennte. **Ein solches Gate hier zu ERFINDEN
+> hiesse, Semantik zu behaupten, die der Code nicht traegt** [...] Das Herausloesen von G3 aus dem
+> STATISTICS-Gate in ein eigenes Makro ist ein **EIGENES FOLGEPAKET** (es beruehrt abi_adapter.hpp im
+> Hot-Path und die A8-S4-Praeprozessor-Wache)."*
+
+**Das ist kein Versaeumnis, sondern ein bewusst benannter Rueckstand mit benanntem Folgepaket.** Die
+Naht traegt die Trennung, **sobald es sie gibt**, und behauptet sie nicht vorher.
+**=> Der Bau-Auftrag lautet: G3 aus dem STATISTICS-Gate loesen. Das ist die Vorbedingung fuer die 6 CEBs.**
+Heute sind maximal 2 Varianten herstellbar; `wallclock` ist zudem gar nicht ausbaubar (G1 wird von
+jedem Tooling gezogen).
+
+### OWNER-KERN: RECORD-AND-REPLAY ALS MESS-VERTRAG
+Auf die Folgefrage, wie Ergebnisse geholt werden, wenn eine Stufe ausgebaut ist:
+> *"Jede Achse muss dazu in einem **original festgestellten RAM Zustandes einer Gattung** auf den
+> **exakt festgehaltenen replay Achsen-Aufruf mit warmem Cache** einzeln durchgemessen werden.
+> **Zwischen den 3 Mess-Ebenen existieren Vertraege**, die beinhalten, dass stets der **Aufruf,
+> Zeitpunkt und der Zustand** des durchzumessenden Bestandteils als **snapshot** nach jedem
+> Durchfuehrungs-Zeitpunkt eingefangen werden muss, um ihn **per replay ueber jede einzelne Komponente
+> zu wiederholen**, um nachtraeglich die **tatsaechlichen Messergebnisse ohne Messfehler**
+> zusammenzutragen."*
+
+**Statt alles gleichzeitig zu messen -- wobei sich die Sonden gegenseitig stoeren -- wird
+`(Aufruf, Zeitpunkt, Zustand)` aufgezeichnet und EINZELN nachgespielt**, im originalen RAM-Zustand mit
+warmem Cache. Die Vertraege zwischen den drei Mess-Ebenen sind der Traeger dieser Aufzeichnung.
+
+### OWNER-KERN: RELEASE IST EINE REKONSTRUKTIONS-ANFRAGE, KEIN BAU-MODUS
+> *"Der **release Modus nach compare** ist nichts anderes als die **lazy Pruefung der gesamten Kette**
+> und compile Ausgabe der Tier-Binary oder Hybrid-Tier-Binary-Kombination oder **Neu-Kompilation nur
+> dieser exakten binaries, wenn die binaries zum Platz sparen geloescht wurden waehrend wir die
+> Messwerte behalten haben** (Wenn wir die Messwerte haben, kennen wir ja die Eigenschaften der Binary
+> dazu und muessen diese nicht mehr vorhalten und koennen auf Anfrage gezielt nachbauen). Release ist
+> also eine **Anfrage an eine dokumentierte compare Bibliothek der Messwerte**, um je Ziel-Architektur
+> der System-Achse die perfekte Tier-Binary oder Hybrid-Tier-Binary zu **rekonstruieren und
+> auszuliefern** und bei Bedarf **nur mit Wall-clock time und ohne Messfuehler** kompiliert erneut in
+> ihrer Gesamt-Geschwindigkeit durchzumessen **gegen die Pruefdock google Tests als Verifikation dafuer,
+> dass sie funktioniert**."*
+
+**DIE KONSEQUENZ, DIE ALLES ENTLASTET: BINARIES MUESSEN NICHT AUFBEWAHRT WERDEN.** Die Messwerte tragen
+die Eigenschaften; die Binary ist daraus **gezielt nachbaubar**. Damit ist die Platzfrage keine
+Platzfrage mehr -- und `measure ⊂ compare ⊂ release` bekommt in seiner dritten Stufe eine echte,
+pruefbare Semantik: **Rekonstruktion + Verifikation gegen die Pruefdock-Tests**.
+
+### SESSION-DOKU
+Der ganze Verlauf ist reich dokumentiert in
+`docs/sessions/20260808-SESSION-messkette-paper-xml-und-die-vier-ultracode-laeufe.md` --
+mit allen Owner-KERNen im Wortlaut, den Befunden am Objekt, und meinen eigenen Fehlern als Muster.
