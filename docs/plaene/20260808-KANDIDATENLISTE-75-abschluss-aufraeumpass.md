@@ -400,11 +400,25 @@ Ehrlich abgegrenzt — diese Posten sind **nicht** erledigt, sondern **nicht pr�
 
 ## 7. Auflagen für den Aufräumpass, wenn er einmal läuft
 
+0. **EINE SELBSTDEKLARATION IST EIN VERDACHT, KEIN BELEG.** Ein Kopf-Kommentar, der „DEPRECATED",
+   „ECHT-TOT" oder „0 Konsumenten" sagt, ist die Behauptung eines früheren Standes — **nicht** die
+   Messung des heutigen. Vor **jedem** Entfernen frisch messen, auch wenn die Datei sich selbst
+   freigibt. **Belegter Fall aus dieser Erhebung:** der Kopf von `concepts/scheduling_strategy.hpp`
+   behauptet seit dem 16.07. „0 Konsumenten"; am Ist sind es **zwei** `#include`-Konsumenten
+   (`measurement/scheduling_system_axis.hpp:19`, `tests/unit/test_striktheit_axis_dach_guard.cpp:12`),
+   und `test_striktheit_axis_dach_guard.cpp:81` **pinnt** die Klasse per
+   `static_assert(std::is_polymorphic_v<…>)`. Wer der Selbstaussage geglaubt hätte, hätte die
+   Dach-Guard-Wache gebrochen. Die Gefahr ist hier besonders groß, weil eine Selbstdeklaration in
+   einem Aufräum-Pass **wie eine Freigabe aussieht**.
 1. **Kein Zeilen-Anker dieser Liste ist verlässlich** (Befund C). Immer über den Bezeichner suchen.
 2. **Je Fund frischer 0-Konsumenten-Beweis am Dann-Ist** — nicht der hier notierte. Die Zahlen dieser
-   Liste sind vom 08.08. und altern.
+   Liste sind vom 08.08. und altern. **Sie altern nach OBEN:** drei Umfänge sind seit der letzten
+   Erhebung gewachsen (ASCII-Altbestand 1132 → 1160, Prosa-Sweep 29 → 54, `organ_location`-Konsumenten
+   79 → 97). Ein ans Ende gestellter Aufräumpass wird während des Wartens größer — das gehört in die
+   Frist-Rechnung, nicht in eine Überraschung am Tag des Vollzugs.
 3. **Fünf Posten sind NICHT frei entfernbar**, obwohl sie sich selbst für tot erklären: X-04, X-05,
    X-07, X-10, X-24. An jedem hängt ein Test oder ein Bauweg. Reihenfolge zuerst klären.
+   (Instanz von Auflage 0.)
 4. **Nummern nie neu vergeben.** Erledigte Posten bekommen „ERLEDIGT in `<commit>`", keine Streichung.
 5. **Wer einen Kandidaten unter anderem Namen mitentfernt, zieht diese Liste im selben Commit nach.**
    Das ist die Lehre aus `813c3232` (Ledger `:11624`): ein gegatetes Paket darf nicht nebenbei zur
