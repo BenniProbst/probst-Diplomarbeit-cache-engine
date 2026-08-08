@@ -11022,3 +11022,92 @@ Zu meinen Fragen 4 (A8-S2), 9 (SF-1-Fenster), 10 (Sperrvermerk/LGPL), 11 (Hyster
 > ich verstehe dich nicht."*
 **Das ist meine Schuld, nicht seine.** Ich habe Kuerzel ohne Sachverhalt vorgelegt. Die Fragen werden
 neu gestellt -- mit dem, was tatsaechlich im Code steht, nicht mit ihrer Nummer.
+
+---
+
+## NACHTRAG 08.08.2026 — OWNER-KERN: DER MESS-BAUM (3 EBENEN, 6 CEBs) UND DAS FLATTERN ALS SIGNAL
+
+### DER MESS-BAUM -- NICHT ZU VERWECHSELN MIT DEM EXPERIMENT-BAUM
+Owner verbatim, die drei Ebenen von oben nach unten:
+
+**Ebene 1 (WURZEL) -- Gesamtverlauf, `wallclock CEB root am Pruefdock`:**
+> *"Der Gesamtverlauf ist als Wurzel der Ablauf **aller parallelen Achsen-Observer-Streams ueber
+> gemischte Lasten und multiple verschiedene Tier-Binary interface Gattung+Genus Aufrufe** der
+> Tier-Binary interface Funktionen --> wallclock CEB root am Pruefdock."*
+
+**Ebene 2 (MITTE) -- Macro, exakt EIN Funktionsaufruf:**
+> *"Der Aufruf jeder Funktion erzeugt eine weitere Ebene mit einem **checkpoint davor und danach**, als
+> Ebene des Macro-Benchmarkings ueber **exakt EINEN Funktionsaufruf** auf dem Tier-Binary Interface,
+> der **alle Observer-Streams seiner intern verwendeten Achsen exponiert** als Observer Interface der
+> mittleren Stufe."*
+
+**Ebene 3 (UNTEN) -- Micro, die Achsen selbst:**
+> *"Jede Funktion ruft schliesslich die unterste Stufe der einzelnen Achsen an verschiedenen Stellen
+> seines Gesamtkonzeptes auf, um die Tier-Binary Interface-Funktion zu erfuellen und **akkumuliert aus
+> den Einzel-Aufrufen mit checkpoint davor und danach jeden einzelnen Achsen Aufruf**. Das bedeutet,
+> dass die Achsen die unterste Ebene mit einem **eingebauten Microbenchmarking** sind (**alle
+> Messebenen compile time konfigurierbar und auch wieder ausbaubar**) und ihre **Checkpoint Ergebnisse
+> an das Macro-Benchmarking freigeben muessen**."*
+
+**=> Der MESS-Baum hat DREI Ebenen. Der EXPERIMENT-Baum ist etwas anderes (die Achsen-Kette
+Mess->System->Organ als B+-Baum). Beide nie verwechseln.**
+
+### DIE 6 CEBs -- UND WARUM: DER MESSFUEHLER IST EIN VERBRAUCHER
+> *"Dadurch hat der Mess-Baum insgesamt **3 Ebenen und 3 fakultaet, also 6 CEB Moeglichkeiten**, die
+> vom **Planer kompiliert** werden muessen, um **jede Ebene einmal mit und einmal ohne Mess-Fuehler zu
+> bauen**, um die Durchsatzzeiten zu messen und die Messfehler herauszurechnen. **Das ist wie in der
+> Elektrotechnik, weil der Messfuehler ein Verbraucher ist**, wir aber den Messfehler erkennen und dann
+> fuer das reale Ergebnis eliminieren muessen, **damit break even stimmt**."*
+
+**Das ist der Grund, warum die Messebenen compile-time AUSBAUBAR sein muessen** -- nicht als Komfort,
+sondern weil die Differenz zwischen "mit Fuehler" und "ohne Fuehler" **der Messfehler selbst ist**.
+Ohne diese Elimination waere jeder Break-Even-Punkt um die Sonden-Latenz verschoben.
+**Der Planer kompiliert die 6 Varianten** -- das ist ein Planer-Auftrag, keine Bau-Option.
+
+### BREAK-EVEN WIRD DREIMAL BERECHNET -- querschneidend je Ebene
+> *"Wir vergleichen als Ziel die **break-even-Akkumulation jeder Tier-Binary Funktion** gegen andere
+> Achsen-Permutationen, von den Achsen, die eine Funktion verwendet im Macro-Benchmarking (**break even
+> ueber Funktion**), und wir errechnen auch ueber einen **Gesamtverlauf eines gemischten Last-Ablaufes**
+> die **beste binary**. Bedeutet, das beschriebene break even wird einmal fuer die **Achsen Ebene**
+> querschneidend, fuer die **Funktions-Ebene** querschneidend und fuer die **Gesamt-Ebene**
+> querschneidend berechnet -> **Micro/Macro/combined**."*
+
+| Ebene | Break-Even ueber | Antwortet auf |
+|---|---|---|
+| **Micro** | Achsen-Algorithmen querschneidend | wann ist Algorithmus X fuer Achse A besser als Y? |
+| **Macro** | die Akkumulation je Tier-Binary-**Funktion** | welche Achsen-Permutation macht *diese Funktion* am schnellsten? |
+| **combined** | den Gesamtverlauf eines gemischten Last-Ablaufes | welche **beste Binary** insgesamt? |
+
+**Und der Vergleich laeuft je isolierter Achsen-Permutation, also je Baum-Knoten-TIEFE** (Owner:
+*"Der Break even wird also je isolierter Achsen-Permutation und damit je Baum-node-Tiefe verglichen.
+Das ist unser Ziel."*).
+
+### DAS FLATTERN IST KEIN FEHLER, SONDERN DAS SIGNAL FUER DEN HYBRIDEN
+Auf meine Hysterese-Frage:
+> *"Fuer den ersten Schritt nach Praemisse der 3 Mess-Ebenen jeweils die **durchschnittlich beste**
+> Tier-Binary zu finden flattert der Schalter offiziell erstmal nicht, weil wir fuer das direkte
+> Erkennen der perfekten Tier-Binary die **Parameter-Gesamtverlaeufe mitteln**. **ABER: fuer die
+> Hybrid-Tier-Binary sind EXAKT DIESE flatternden Bereiche der besten Tier-Binary in einem Bereich zu
+> erkennen** und die Synthetisierten Funktionen muessen **anhand der erkannten Eingangslast ihr
+> Verhalten so anpassen, dass die beste Binary fuer diese Situation geladen und durch den Hybriden
+> orchestriert wird**."*
+
+**Meine Frage war zu kurz gedacht.** Ich hatte das Flattern als Stabilitaetsproblem gesehen, das man
+wegdaempft. **Es ist die Entdeckung des Umschaltbereichs.** Wo die beste Binary wechselt, liegt genau
+die Last-Region, in der der Hybrid arbeiten muss. **Stufe 1 mittelt (kein Flattern), Stufe 2 sucht
+das Flattern gezielt** -- keine Hysterese noetig, sondern eine Bereichs-Erkennung.
+
+### DAS ERSTE TODO
+> *"**Die Groesse des Gesamtexperimentes zu erheben steht daher noch als erstes TODO fuer die Planer
+> software aus, die aber in der CEB berechnet wird. Wir kennen die Groesse nicht genau, das ist ein
+> Problem.**"*
+
+### SCHICHT-DOKTRIN -- FREIGABE ZUM SOFORTIGEN BAU
+> *"Wir muessen das beheben, die Schichten sind **strikt einsortiert und unter Gattung kommt Genus und
+> darunter die Implementierungen verschiedener realer gesamt-interface-factory-strategien**. Alles
+> andere ist unsauber. **Das Fenster ist jetzt, bevor es teuer wird.**"*
+
+**Die Schicht-Ordnung, verbindlich:** `Gattung` -> `Genus` -> `Implementierungen (reale
+Gesamt-Interface-Factory-Strategien)`. Der Verweis `anatomy/container_framework.hpp:37` ->
+`builder/.../genus_binding_traits.hpp` verletzt sie (untere Schicht kennt Namen der oberen).
+**GO fuer sofort.**
