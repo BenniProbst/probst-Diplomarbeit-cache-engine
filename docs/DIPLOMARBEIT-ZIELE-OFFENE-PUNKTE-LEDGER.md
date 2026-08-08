@@ -10929,3 +10929,96 @@ beide erfuellen das nicht: die eine ist monotone Hermite, die andere stueckweise
 
 **Der Owner kuendigt eine Fortsetzung an: *"das erklaere ich aber nochmal separat"* und *"Ich erklaere
 in der naechsten Nachricht weiter"*.**
+
+---
+
+## NACHTRAG 08.08.2026 — OWNER-KERN: DER EXPERIMENT-B+-BAUM IST DIE VERGLEICHS-ORDNUNG
+
+### DIE KERN-IDEE, Owner verbatim
+> *"Wenn nun Jede Achse ueber verschiedene geplante Permutation ein Glied in der **Sortierten Kette**
+> von der **Mess-Achsen Wurzel** statischer Achsen Reihenfolge, ueber die **System-Achsen** statischer
+> Reihenfolge, bis in die **Organ-Achsen** statischer Reihenfolge, ein Glied eines **lazy
+> materialisierten Experiment-B+-Baum**-Konfiguration ist, dann ist es als **node** zu betrachten und
+> definiert in einer **gleichen Baum-Tiefe** seiner Selbst eine bestimmte Achse im Gesamtbaum. Diese
+> Eigenschaft eines Achsen-Algorithmus laesst sich **gegen alle nodes derselben Ebene vergleichen,
+> insbesondere fuer den Fall derselben nachfolge Pfade unter der besagten Ebene**."*
+
+**DAS BEISPIEL, das es traegt:**
+> *"wir laufen ein bestimmtes memory mit einem bestimmten prefetching (sei es eine Achse hinter dem
+> memory), dann wollen wir die Unterschiede verschiedener memory verstehen, **bei dem alle prefetching
+> Algorithmen und im Baum tiefer liegenden Algorithmen dieselben sind**, um den Achsen-Algorithmus
+> **isoliert als einzige Aenderung in der Binary** querschneidend zu betrachten und **ueber das diff
+> den break even point zu isolieren**, also fuer alle Binaries die Funktionskurve zu synthetisieren und
+> zu schauen **bei welcher Last-Art und groesse die Memory Achse optimal laeuft**."*
+
+**WAS DAS BEDEUTET -- und warum ich es vorher nicht verstanden hatte:**
+Der Experiment-B+-Baum ist **nicht nur eine Speicherform, sondern die VERGLEICHS-ORDNUNG selbst.**
+Die **statische Achsen-Reihenfolge** (Mess -> System -> Organ, je in sich sortiert) legt fest, auf
+welcher **Tiefe** welche Achse sitzt. Zwei Binaries, die sich **nur in einem Knoten derselben Tiefe**
+unterscheiden und **denselben Teilbaum darunter** tragen, sind ein **kontrolliertes Experiment mit
+genau einer unabhaengigen Variablen**. Der Vergleich ist ein **Geschwister-Vergleich bei identischem
+Nachfolge-Pfad** -- und genau deshalb ist die Sortierung der Achsen keine Kosmetik, sondern die
+Voraussetzung dafuer, dass ueberhaupt isoliert gemessen werden kann.
+**Deshalb die Erst-Klammerung vom 19./20.07. und die drei kanonischen Achsen-Ordnungen (E-E).**
+
+### DIE AUSWERTUNGS-SCHLEIFE
+> *"Das wiederholen wir fuer **alle einstellbaren Haupt-Achsen und Unter-Achsen**. Jede Haupt-Achse und
+> Unter-Achse ist daher im Experiment-Baum **vollstaendig repraesentiert und typisiert** (explore).
+> Wir wollen querschneidend fuer alle Achsen-Algorithmen **nur deren isoliertes Verhalten** messen,
+> ueber die Paper-XML definitionen, die wir haben und in denen wir **sequentiell JEDE Achse einzeln
+> durch-permutieren, ob nicht die Algorithmen der Anderen Paper in dieser Achse besser gewesen waeren**."*
+
+**Das ist die wissenschaftliche Frage der Arbeit in einem Satz:** nicht *"welche Komposition ist die
+beste"*, sondern **"waere Papers X Algorithmus fuer Achse A besser gewesen als der von Paper Y, bei
+sonst gleicher Konfiguration?"** -- und das fuer jede Achse einzeln.
+**Das erklaert auch, warum die Mengen-Frage kleiner ist als mein Achsenraum-Produkt.**
+
+### DIE KONSOLIDIERUNG (Antwort auf meine Break-Even-Frage)
+> *"Wir brauchen **nur eine konsolidierte Implementierung**, bitte fuehre beide zusammen und nach
+> meiner Beschreibung zum Ziel."*
+**Kein Entweder-Oder zwischen `heuristik::` und `best_binary::` -- ZUSAMMENFUEHREN**, und zwar auf das
+Ziel hin: kubischer B-Spline, als String serialisierbar und wieder parsbar, erster Messwert = Basis 0.
+
+### DYNAMIK UND DIE NACHBAU-REGEL
+> *"Das system ist **voll dynamisch**, je nachdem was in der XML an **Bau-Material** und **Messungen**
+> angefragt wird. Wird eine Messung angefragt, die per Bau-Material nicht freigegeben ist, dann wird
+> sie **nachtraeglich noch gebaut** und es wird auf der CLI eine **Warnung** ausgegeben, aber **dennoch
+> vorbehaltslos gebaut** (nur ein Definitionsproblem)."*
+**=> Die XML trennt Bau-Material von Messungen. Eine Messung ohne passendes Bau-Material ist KEIN
+Fehler, sondern eine Warnung + Nachbau.** Fail-open mit lauter Meldung, nicht fail-closed.
+
+### DIE FUENF MESS-EBENEN -- endlich vollstaendig (Antwort auf meine Frage 5)
+> *"der Planer gibt Messwerte fuer die CLI aus und fragt die CEB ab, die CEB hat ein **Pruefdock**,
+> welches wallclock time fuer **gesamt-Zeit eines Last-Ablaufes** und **einzelne
+> Tier-Binary-Interface Funktions-Aufrufe** durchmisst (daher 2 Ebenen) und die **Tier-Binary**
+> enthaelt potentiell **Macro-** und **Micro-Benchmarks** fuer die speziellen Achsen-Parameter der
+> Funktions-Interfaces fuer Akkumulation multipler calls derselben Achse und den Micro-benchmark Teil
+> der **Observer-Messfuehler fuer jeden Algorithmus**. Also 5."*
+
+| # | Ebene | Ort | was sie misst |
+|---|---|---|---|
+| 1 | Planer-CLI | Planer | gibt Messwerte aus, fragt die CEB ab |
+| 2 | Pruefdock: Gesamt-Last | CEB | Wallclock der **Gesamtzeit eines Last-Ablaufes** |
+| 3 | Pruefdock: je Interface-Aufruf | CEB | Wallclock **einzelner Tier-Binary-Interface-Funktionsaufrufe** |
+| 4 | Macro | **Tier-Binary** | Achsen-Parameter der Funktions-Interfaces, **Akkumulation multipler Calls derselben Achse** |
+| 5 | Micro | **Tier-Binary** | **Observer-Messfuehler je Algorithmus** |
+
+**Meine Frage war doppelt falsch:** ich hatte nach einer fehlenden fuenften *Ebene* gesucht und die
+**drei Stufen** (Micro/Macro/combined) mit den **fuenf Ebenen** verwechselt -- das sind zwei
+verschiedene Achsen derselben Sache: die **Stufen** sagen, WIE fein gemessen wird, die **Ebenen**
+sagen, WO der Messpunkt sitzt (Planer / CEB-Pruefdock / Tier-Binary).
+
+### VIER ENTSCHEIDE, die der Owner in derselben Nachricht getroffen hat
+| Frage | Owner-Antwort |
+|---|---|
+| Baum-Pfad `build_axis_levels` vs. `build_profile_basis_levels` | **"Das muss abgeloest werden durch den PLANER INTERPRETER."** -- keine Wahl zwischen beiden, beide fallen |
+| Paper-Kopplung bauen? | **"Ja unter sorgfaeltiger Design Planung bitte bauen, Ruecksprache mit mir im Detail."** |
+| LaTeX-Anlage in die Abgabe? | **"In die Abgabe, das ist das Ziel eine Diplomarbeit mit Messwerten und Auswertung generieren zu koennen, indem man nur seine Wuensche in die XML schreibt und die Auswertung kommt nach ein paar Tagen von allein."** |
+| Textbausteine entgegen Habich H3? | **"Jetzt mit in die Abgabe, die Entscheidung steht neu. Die Bausteine duerfen jetzt nach sorgfaeltiger Planung auch in die Evaluation und Auswertung, sowie in den Bereich der Implementierung, weil sich je Konfiguration der XML ja auch die compiled Realitaet aendert. Das ist abgesprochen."** (mit dem Betreuer) |
+
+### WAS DER OWNER NICHT VERSTEHT -- meine Bringschuld
+Zu meinen Fragen 4 (A8-S2), 9 (SF-1-Fenster), 10 (Sperrvermerk/LGPL), 11 (Hysterese), 12 (NFS-Export):
+> *"Bitte mit mehr Kontext beschreiben, hoert sich fuerchterlich falsch an."* · *"bitte mehr Kontext,
+> ich verstehe dich nicht."*
+**Das ist meine Schuld, nicht seine.** Ich habe Kuerzel ohne Sachverhalt vorgelegt. Die Fragen werden
+neu gestellt -- mit dem, was tatsaechlich im Code steht, nicht mit ihrer Nummer.
