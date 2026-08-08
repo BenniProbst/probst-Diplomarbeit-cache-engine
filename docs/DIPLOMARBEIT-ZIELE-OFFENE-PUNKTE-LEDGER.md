@@ -11834,3 +11834,59 @@ libc++ ist gar nicht installiert. **Es wäre also verfügbar — verwendet wird 
 3. **Ebenen-Flags und CEB-Gates sollten EIN Mechanismus sein, nicht zwei.** Die sechs CEB-Varianten
    *sind* ein- und ausgebaute Mess-Ebenen; die neuen Flags beschreiben dieselbe Achse. Berührt
    unmittelbar das G3-Folgepaket.
+
+---
+
+## OWNER-ENTSCHEID 08.08.2026 (Fortsetzung) — VIRTUELLE THREAD-SLOTS, EIN `int` GENÜGT
+
+### C-14 Die ganze Funktion ist compile time, die Steuerzeile ist inline
+
+> *„Nun die ganze Funktion ist compile time. […] checkpoint_measure wird inline angelegt.“*
+
+Damit ist die Signatur-Frage entschieden: **die Aufrufstelle übergibt nichts, was zur Laufzeit ermittelt
+werden müsste.** Ebene, `IN`/`OUT`-Tag, Zielfunktion und Achsen-Parameter sind sämtlich
+Übersetzungszeit-Größen.
+
+### C-15 Thread-Nummer: virtuelle Slots statt OS-Abfrage
+
+> *„Thread Nummer wird gelöst, indem zu Beginn virtuelle Thread slots (maximale die Anzahl der Thread
+> Unterachse) formal zugewiesen wird. Daher wird ein Thread nicht über OS Aufruf, sondern custom
+> getrackt, die Identitäts-Nummer wird zu Beginn vergebenen und bleibt innerhalb des custom stacks
+> unique. Daher wird sie zwar zur Laufzeit dokumentiert, aber erst zum Schluss des rein append laufenden
+> logs auf dem stack, ausgewertet.“*
+
+> *„ja damit ist ein Thread eine Laufzeit Variable in checkpoint measure. Ein int tut es, wenn erlaubte
+> Threads bei der Entstehung vorher mit ihrer Thread nummer gegen die custom ID registriert werden, dann
+> brauchen wir sie nicht ständig identifizieren.“*
+
+| Punkt | Festlegung |
+|---|---|
+| Obergrenze der Slots | **die Anzahl der Thread-Unterachse** — also **compile-time bekannt** |
+| Vergabe | **einmal bei der Entstehung** des Threads, formal registriert |
+| Eindeutigkeit | die Nummer bleibt **innerhalb des custom stacks unique** |
+| Typ | **ein `int` genügt** |
+| Hot-Path | **kein OS-Aufruf** — die Nummer ist bereits da und wird nur gelesen |
+| Auswertung | **erst zum Schluss**, aus dem rein append laufenden Log |
+
+**Das ist der letzte teure Posten, der damit fällt.** Gemessen kostete `std::this_thread::get_id()` samt
+Hash **3,5 ns**; ein gelesener `int` kostet praktisch nichts. Und weil die Obergrenze compile-time
+feststeht, können die Slot-Puffer **statisch** angelegt werden — keine Allokation, kein Wachstum, keine
+Sperre.
+
+### C-16 Was damit die einzige echte Laufzeit-Größe bleibt
+
+Nach C-14/C-15 tut die Steuerzeile zur Laufzeit **genau drei Dinge**: den Slot-`int` lesen, einen
+Zeitstempel nehmen, einen Eintrag anhängen. **Der Zeitstempel ist damit der teuerste Posten** —
+gemessen 6,8 ns (`__rdtsc`) beziehungsweise 16,5 ns (`steady_clock::now()`), also mehr als alles andere
+zusammen. Wer den Overhead weiter drücken will, muss dort ansetzen, nicht bei der Identität.
+
+### C-17 Das Log ist **rein append** — daraus folgt mehr als Bequemlichkeit
+
+Ein rein anhängendes Log je Slot bedeutet: **ein Schreiber je Puffer, kein Leser zur Laufzeit, keine
+Synchronisation.** Damit ist auch die Ordnungsfrage beantwortet, die C-10 aufwarf — die Einträge eines
+Slots stehen in Anhänge-Reihenfolge, und genau das braucht die Aufrufer-Rekonstruktion (C-8/C-9).
+
+**Offen, im laufenden Research-and-Design-Flow zu klären:** was geschieht, wenn **mehr Threads
+entstehen als Slots vorgesehen** sind. Das ist ein Fehlerfall, kein Wrap-around — nach der Hausregel
+*Fehlerklassen sind Pflicht* braucht er eine benannte Klasse und muss laut scheitern, nicht still
+überschreiben.
