@@ -114,6 +114,23 @@ all: konfiguriert
 # codegen-abhaengiger ce-Test in den super-Baum geraet, greift dieselbe Falle.
 # Ein Reconfigure eines bereits gebauten Baums kostet Sekunden; ein still
 # fehlender Test kostet eine Regression, die niemand sieht.
+#
+# NACHTRAG 08.08.2026 (D2-G5) -- WAS AN DEN VIER ZAHLEN OBEN FEHLT.
+# 427/431/610/186 sind vier Zahlen ohne Zustand. Keine von ihnen nennt, auf
+# WELCHER MASCHINE sie entstanden ist, und genau davon haengen sie ab: 6 der
+# ctest-Registrierungen dieses Bauwegs stehen hinter einem Host-ISA-Gatter.
+# Auf einer Maschine mit AVX2 aber ohne AVX-512 (prod2/Raptor Lake, AVX-512
+# hardware-fused-off) fallen 4 davon weg, auf einer ganz ohne AVX alle 6.
+# Dieselbe Zeile 'make check' druckt dort also eine ANDERE Zahl, ohne dass
+# irgendetwas kaputt waere -- und ohne dass irgendetwas es sagen wuerde.
+# Die 610 stammt zudem von prod1 (Zen 5, avx512f), was nirgends dabeisteht.
+#
+# Wer eine dieser Zahlen braucht, holt sie NICHT hier ab, sondern rechnet sie
+# nach:   sh scripts/ci_host_klassen_bericht.sh
+# Er druckt die Host-Klasse, den Nenner (alle Registrierungen des Bauwegs) und
+# die zweistufige Untergrenze je Klasse -- alles bei jedem Lauf neu ausgerechnet,
+# ohne eine einzige Konstante. Die Zahlen oben bleiben als HISTORIE stehen; sie
+# sind nicht falsch, sie sind unvollstaendig, und ihre Luecke steht jetzt dabei.
 check: all
 	$(CMAKE) -S "$(SRCDIR)/Code" -B "$(BUILDDIR)"
 	$(CMAKE) --build "$(BUILDDIR)" $(BUILD_PAR) --target $(TEST_TARGET)

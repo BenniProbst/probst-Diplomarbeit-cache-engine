@@ -110,10 +110,34 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 | D2-G1 | 27 unsichtbare gtest-Fälle → zwei `add_test` nach dem dokumentierten Muster, in `COMDARE_TEST_TARGETS`; Erstlauf ehrlich buchen (`AllFourteenAxesPopulated` bei heute 22/18 Achsen = erwarteter Fund, kein `allow_failure`) | 2 | W0a | parallel möglich |
 | D2-G2 | ohne dieses Paket macht D2 die Hauptpipeline rot (Registrierung ohne Bau); TIMEOUT nach gemessener Zeit ×4; Exit-Code via `cmake -P`-Wrapper (Vorbild `registry_roundtrip.cmake`) | 1,5 | W0a | im D2-Bogen |
 | D2-G3 | drei Grün-ohne-Vergleich-Wege: Untergrenze, `==`-Druck → echter Vergleich mit Exit, `2>/dev/null` fällt (K11: ctest-Ausgabe in Datei, dann rc), `declared:VAR` → gezählte „ungeprüfte Gates" | 1,5 | W0a | mit D2 |
-| D2-G5 | 6 von 428 Tests registrieren sich nur auf AVX-512-Hosts → Host-Klassen-Bericht (3 Zahlen, Host-Kennung), zweistufige Untergrenze | 1 | W0b | nach D2/D2-G4 |
+| D2-G5 | ~~6 von 428 Tests registrieren sich nur auf AVX-512-Hosts~~ → Host-Klassen-Bericht (3 Zahlen, Host-Kennung), zweistufige Untergrenze — **RICHTIGSTELLUNG 08.08. am Objekt, s. Fußnote D2-G5** | 1 | W0b | **GEBAUT** (super `scripts/ci_host_klassen_bericht.sh` + Selbsttest + Job `test:host-klassen-bericht`) |
 | D2-G6 | Registry-Roundtrip-Gates hängen an Datei-Existenz, Kommentar verspricht die stille Abschaltung als Merkmal → Pflicht-Erwartung + Kommentar korrigieren; **Standard-Bissprobe** der Wache (stash-Köder, billig, rückstellbar) | 0,5 | W0a | Anhang zu D2 |
 
 **Tragende Abnahme:** die Wache druckt DREI unabhängige Zahlen (eigene Inventur N / Job-Baum-Inventur M aus dem Artefakt eines **anderen** Jobs / Gates FOUND G von G_deklariert), N≠M ⇒ Exit≠0; Zahl-Köder „345" im gefälschten Artefakt → rot; Schrumpf-Köder (N per `shuf` gewählte Tests in `if(FALSE)`) → rot mit Zahl; **unmanipulierter Lauf bleibt grün** (Gegenköder gegen Dauer-Rot). `ctest -N` zählt nach D2-G1 **+2** (heute 0 Treffer für `test_commands|test_engine_adapters`).
+
+> **FUSSNOTE D2-G5 — RICHTIGSTELLUNG 08.08.2026, am Objekt gemessen, nicht abgeschrieben.**
+> Die Planzeile „6 von 428 Tests registrieren sich nur auf AVX-512-Hosts" ist als Satz **falsch**,
+> und zwar nicht um eine Ziffer, sondern um eine **Ebene**: sie nennt eine Leiter mit einer Zahl.
+> Nachgezählt mit `sh scripts/ci_host_klassen_bericht.sh` (super, prod1/Zen 5 = Klasse `avx512f`):
+>
+> * **6** ctest-Registrierungen des Bauwegs hängen überhaupt an einer Host-ISA,
+> * davon **4** an `COMDARE_HOST_RUNS_AVX512F` — `test_buildvariant_dll_real` und
+>   `test_ap5_simd_extension_coherence` (ce `tests/unit/CMakeLists.txt:3782/3796`, Block
+>   `if(AVX2 AND AVX512F)`) plus die beiden `_avx512`-Varianten aus
+>   `comdare_add_simd_dispatch_test` / `comdare_add_simd_add_u64_test` (`:4822/:4854`),
+> * die restlichen **2** hängen nur an `COMDARE_HOST_RUNS_AVX2` (`:4809/:4851`).
+>
+> Also: **prod2** (Raptor Lake, AVX-512 hardware-fused-off) verliert **4**, eine Maschine ganz ohne
+> AVX **6**. Beide Zahlen des Plans waren real — die **6** aus dieser Zeile und die **−4** aus An-8
+> —, sie gehören nur zu **verschiedenen Sprossen**. Genau deshalb ist die Untergrenze zweistufig.
+> Dieselbe Messung ergab 6/4/2 über **drei verschiedene ce-Stände** (`a1d0c201`, `4dd5a1bc` sowie
+> den Arbeitsbaum von `wt-ce-xml`) — der Befund hängt nicht an einem Commit.
+>
+> **Die „428" ist hier NICHT bestätigt und wird nicht übernommen.** Sie ist eine ctest-Eintragszahl
+> aus einem gebauten Baum; dieses Paket hat keinen gebaut. Der Bericht zählt in einer anderen
+> Einheit (Registrierungs-**Aufrufe** im Quelltext, `gtest_discover_tests` = 1) und misst im
+> super-Baum `registrierungen_gesamt=148`. Die beiden Zahlen sind **nicht** ineinander umrechenbar;
+> wer sie gleichsetzt, wiederholt den Fehler, den die Fußnote korrigiert.
 
 ### D3 — Ein leeres Messfenster ist heute grün (8 Posten, 20 h)
 
@@ -273,7 +297,8 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
             Bilanz A+B==C; allow_failure gemaess OV-16; Byte-Determinismus-Tests
             im selben Commit.
  D3-8 [lok] Frische-Kennung (PIPELINE_ID); Altbestand gemeldet, nie geloescht.
- D2-G5[lok] Host-Klassen-Bericht (6 AVX-Registrierungen, 3 Zahlen immer gedruckt).
+ D2-G5[lok] Host-Klassen-Bericht GEBAUT: 6 ISA-Registrierungen, davon 4 an AVX-512
+            und 2 an AVX2 (Richtigstellung 08.08., s. Fussnote D2-G5). 3 Zahlen immer.
  20+D3-6 [CI, EIN Paket] anhang:forward: AF_GENERATOR belegt UND Selektor findet
             BEIDE Layouts; NO-OP nur mit Nenner. P1/P2/P3 gefahren.
  21   [CI]  Realm-Wurzeln /mnt + G-E3 + COMDARE_BESTANDSLOG in beiden CI.
@@ -479,7 +504,7 @@ Regel „ALLES IST GEPLANT": vorgelegt wird nur, was Recherche nicht auflösen k
 | An-4 | `bau/a9-s4-mess-report` ist baubar | Zahl verifiziert (6/17/1940+), Bau nicht — deshalb ##02 mit eigener Abnahme |
 | An-6 | Doku-Drift nicht abgabekritisch außer A9-Design Abschnitt 1 und der D5-3-Disposition | beide in W0b/W1 adressiert |
 | An-7 | prod1 trägt während Bau- und Messfenster keine fremde Last | **angeordnet, nicht garantiert** — Runner auf derselben Platte |
-| An-8 | Alder-Lake-Consumer-Silizium hat AVX-512 abgeschaltet (D2-G5-Folge: 424 statt 428 Tests auf prod2) | ungemessen, weil prod2 nicht existiert; wird bei Existenz mit EINEM Kommando erhoben |
+| An-8 | Consumer-Silizium mit abgeschaltetem AVX-512 verliert **4** ISA-gattierte Registrierungen (D2-G5, am Objekt gezählt 08.08.). ~~424 statt 428 Tests auf prod2~~ — die **Differenz −4** ist bestätigt, die **absoluten** Zahlen 424/428 sind es NICHT (s. Fußnote D2-G5: andere Einheit, kein gebauter Baum) | Differenz: **gemessen** über `scripts/ci_host_klassen_bericht.sh`, drei ce-Stände, gleiches Ergebnis. Absolute ctest-Zahl je Host: ungemessen, weil prod2 nicht existiert; bei Existenz mit EINEM Kommando erhoben (`ctest -N` + `--ctest-liste`) |
 | An-9 | super-Zahlen 610/186 | Agent-Behauptung aus dem super-Commit, **nicht nachgemessen** — D1g misst sie; die Erklärung (EXCLUDE_FROM_ALL vs. enable_testing-Reihenfolge) bleibt bis dahin offen |
 | An-10 | HY-A-Aufwand ~3–4 AT im F8-Minimalschnitt | Planungsschätzung ohne Objekt-Basis (Bestand = 1 README); WE-Option 22./23.08. ist die Deckung |
 | An-11 | `.test`-Template-Befunde gelten für den Live-Stand | erhoben am lokalen Klon `Cluster-ci-templates` (HEAD 5f9e04be, 27.07.), **nicht** am ref=development-Live-Stand |

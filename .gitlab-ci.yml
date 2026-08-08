@@ -363,6 +363,46 @@ test:persist-sammler-probe:
   script:
     - sh ci/tests/persist_sammler_probe.sh --selbstbiss
 
+# ── W0b-7 / D2-G5 (2026-08-08): HOST-KLASSEN-BERICHT + sein Selbsttest ──
+# DER BEFUND. Der Wellenplan schrieb "6 von 428 Tests registrieren sich nur auf AVX-512-Hosts".
+# Am Objekt nachgezaehlt (scripts/ci_host_klassen_bericht.sh, prod1/Zen 5, ce-Arbeitsbaum): SECHS
+# ctest-Registrierungen haengen ueberhaupt an einer Host-ISA, davon VIER an AVX-512F und ZWEI nur
+# an AVX2. Die "6" ist die Summe ueber die ganze Leiter, nicht die AVX-512-Stufe -- prod2
+# (Raptor Lake, AVX-512 fused off) verliert 4, eine Maschine ganz ohne AVX 6. Deshalb ist die
+# Untergrenze ZWEISTUFIG. Dieselbe Zahl fuer zwei Host-Klassen ist genau die Fehlerklasse
+# "richtiges Messgeraet am falschen Gegenstand": es klappert nichts.
+#
+# WARUM ALS EIGENER JOB UND NICHT IN test:unit: test:unit BAUT. Der Bericht darf gerade NICHT vom
+# Bau abhaengen -- was nie registriert wurde, fehlt im gebauten Baum lautlos, und ein Nenner, der
+# aus dem Ergebnis stammt, ist keiner (T-3). Seine Quelle ist der CMake-Quelltext des ganzen
+# Bauwegs (super + Submodule), deshalb braucht er die Submodule (Vorgabe recursive bleibt stehen)
+# und sonst nichts: kein Compiler, kein ccache, kein Bauverzeichnis. Er laeuft damit in Minuten
+# und ist unabhaengig davon, ob der Bau gerade traegt.
+#
+# WARUM DER SELBSTTEST MITFAEHRT (T-7): eine Wache ohne Probe ist eine Behauptung. Der Selbsttest
+# baut Fixture-Baeume mit von Hand abgezaehlten Registrierungen (zweite Quelle), wirft je Lauf
+# NEU GEWUERFELTE Koeder hinein (neue ISA-Registrierung / unbekanntes ISA-Gatter / auskommentierte
+# Zeile / mehrzeiliges add_test) und fordert, dass der Bericht sich um GENAU den richtigen Betrag
+# bewegt bzw. rot wird. Der Gegenkoeder am unmanipulierten Baum haelt fest, dass er nicht einfach
+# immer rot ist. Zusaetzlich vergleicht er die Host-Klasse gegen eine SELBST uebersetzte
+# __builtin_cpu_supports-Probe -- ein anderer Weg zu derselben Wahrheit als /proc/cpuinfo.
+#
+# WARUM KEIN allow_failure: eine advisory Wache ist die naechste stille Null (gleiche Begruendung
+# wie test:mess-ausbeute-bissprobe). Rot wird der Bericht genau dann, wenn ein ISA-Gatter auftaucht,
+# das die Klassen-Leiter nicht kennt -- dann ist JEDE Untergrenze oben geraten, und das gehoert
+# laut. KEIN .code-rules: das Gatter kann ueber einen reinen Gitlink-Bump ins Repo kommen.
+test:host-klassen-bericht:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  script:
+    - sh scripts/ci_host_klassen_bericht.selbsttest.sh
+    - sh scripts/ci_host_klassen_bericht.sh
+
 # ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
 # User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
 # lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
