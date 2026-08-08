@@ -9,6 +9,9 @@
 # Build-Artefakte
 build/
 out/
+# GNU-Bauweg (08.08.2026): von ./configure.sh erzeugte Konfigurations-Aufzeichnung.
+# Die drei Wurzeldateien configure.sh/Makefile SIND getrackt, ihr Ergebnis nicht.
+config.status
 # V34.D.2: Doxygen HTML-Output (Doxyfile bleibt)
 docs/doxygen_diplomarbeit/
 
