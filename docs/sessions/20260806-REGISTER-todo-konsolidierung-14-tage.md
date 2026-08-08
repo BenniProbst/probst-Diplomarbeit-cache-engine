@@ -377,6 +377,12 @@ Quellen: Opus-max-Explore ueber alle 5 heutigen Transkripte (satzweiser Owner-Ab
 | **Posten 88 anatomy_execution_context einarmig** | :50-63 zweiter Trait-Konsument einarmig — NICHT die Genus-Erst-Instanziierungs-Ausnahme; gegen die GENERALISIERTE SCHNITT-REGEL (04.08. abend-6) triangulieren. | OFFEN (mittel) | Ledger mittag-2 L4044 |
 
 ### P4-Ergaenzung: Aufraeumpass-KANDIDATENLISTE (fortgeschrieben, Owner-KERN: Liste statt Sammelwort)
+
+> **ZEIGER (08.08.2026): HISTORIE — zusammengefuehrt in `docs/plaene/20260808-KANDIDATENLISTE-75-abschluss-aufraeumpass.md`.**
+> Die hiesige 8er-/10er-Zaehlung ist der **dritte** Nummernkreis derselben Menge (neben der
+> Ledger-Kette `(N)` und den `AP-01…AP-13`) — die zentrale Liste ordnet sie einander zu und vergibt
+> keine neuen Nummern. **Nachtrag:** Posten 1 der Liste unten (leere 3D-caption) ist ERLEDIGT
+> (super `7969a02c`), Posten 4 (Posten 73, cacheline-Default-Literal) ebenfalls (ce `0b5ed557`).
 1. leere 3D-caption (write_surface3d data.title nie gesetzt; vormittag-14-Randbefund) 2. 1xN-Matrix-Bestandsfehler 3. Posten 86 (Kosmetik Commit-27ef28ea-Benennung) 4. Posten 73 cacheline-Default-Literal 5. A8-S6 17 stale-Kommentar-Stellen 6. Posten 45 stale-17er-Spuren 7. M1-M3 der Teil-2-Review 8. honest-0-MUSTERFORTSETZUNG: die honest-empty-Doktrin (nie-ausgefuehrt=Auslass, echt-0=eigene Klasse) auf kuenftige Writer/Graph-Umbauten uebertragen (E1-E4-Karten-Residuum).
 
 ### NACH-ABGABE-Ergaenzung

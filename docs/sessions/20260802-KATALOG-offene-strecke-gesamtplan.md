@@ -95,6 +95,11 @@ LED:3265 (#45 paralleler Mess-Loop = GEBAUT: measure_parallelism.hpp + parallel_
 - **320er-Abgabemessung:** Definition = Mess-UMFANG (Basis-320 = search_algo×node_type×memory_layout×prefetch = 4×4×5×4, 15 Slots gepinnt; m3v2-320 = +3-Combo-Tooling; wallclock-first, EINE System-Perm O3/no_extension, seriell, 3 Wiederholungen; when:manual USER-GO). Nie gelaufen; per FAHRPLAN:89 NACH Voll-Bau-4 (=E.1). DREI „320" auseinanderhalten: golden-320-Fixture (TABU, Byte-Wache) ≠ new-golden 2^17 ≠ 320er-Abgabemessung; „Gate 320/321" = CI-Testanzahl.
 
 ### G.4 §75-Kandidatenliste (IST-verifiziert; Liste fortschreiben)
+
+> **ZEIGER (08.08.2026): HISTORIE — zusammengefuehrt in `docs/plaene/20260808-KANDIDATENLISTE-75-abschluss-aufraeumpass.md`.**
+> **Dieser Abschnitt war zwoelf Tage lang der EINZIGE Ort, an dem die §75-Posten `(1)`–`(18)` im
+> Wortlaut standen** — der Ledger fuehrt erst ab `(19)`. Wer nur den Ledger las, hat sie nicht
+> gesehen. Sie sind jetzt in der zentralen Liste, je mit Ist-Zustand am Objekt.
 Bereits entfernt: permutations_runtime_check.hpp, COMDARE_apply_simd_flags, cmake/permutations.cmake, V36.B-Kanal. Kandidaten: (1) LazyRunResult::built_new/built_skip ohne Leser (cache_engine_builder_iterator.hpp:697-698/:1029-1030) · (2) director:281 Stale „17-Achsen-ids" · (3) „17-Organ-Kartesik"-Kommentare all_axes_golden.profile.xml:183 + cacheline_study.profile.xml:142 · (4) --emit-tier-ci-Alias (bewusst bis Emissions-Migration, §77-P8) · (5) test_a9b unregistriert (CMakeLists:3510) · (6) Marker-Doktrin W-2/W-3 (write-only _gn_chunk_markers; async_push_pump.hpp:63-64 YAML-Verweis tot) · (7) 3 deprecated Header: comdare_is_original_macro.hpp:3, plan_legend.hpp:124, experiment_dock_payload.hpp:58 · (8) F8-Alt-Form planer_block_value.hpp:20-26 · (9) COMDARE_VARIANT_GATE + 3 Sidecars (durch Fingerprint-Gate obsolet) · (10) Zeilen-Referenz-Drift director.hpp:868-871, batch_planner.hpp:14/:35 · (11) Copy-Paste Lane-Budget director:1107/:1255 · (12) COMDARE_GN_RANGE ohne Konsument · (13) PRUNE-TESTAT-Drift :1325 · (14) fingerprint_key_source.hpp:37-40 Doku-Drift · (15) declared-Attribut-Abbau · (16) P-C4/G-C6 Doku-Paket · (17) COMDARE_LEGACY_MESSREIHEN (nach V-5c) · (18) Alt-ISA-Doppelbestand axes/simd/axis_09_isa_* + topics/hardware/axis_09_isa/ (E-09, DEPRECATED-Marker fehlt).
 
 ### G.5 Unverbuchte Offen-Posten §59–§77 (Einordnung)
