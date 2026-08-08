@@ -53,6 +53,13 @@ else
   BUILD_PAR =
 endif
 
+# Zusaetzliche ctest-Argumente fuer 'make check'. Zweck: die CI braucht
+# '--output-junit <pfad>' fuer den GitLab-Test-Report, und ohne diese Naht
+# muesste sie ctest wieder selbst aufrufen -- also genau den offiziellen Weg
+# umgehen, den sie bewachen soll. Die AUSWAHL der Tests (Label da_unit) bleibt
+# unveraendert; hier lassen sich nur Ausgabe-Optionen ergaenzen.
+CTEST_EXTRA ?=
+
 .DEFAULT_GOAL := all
 
 .PHONY: all install check installcheck uninstall clean distclean \
@@ -94,9 +101,23 @@ all: konfiguriert
 # steht per Vorgabe auf ON (Code/CMakeLists.txt:69). Die vier V32-Tests haengen
 # zusaetzlich an COMDARE_V32_ENABLE (Code/tests/CMakeLists.txt:95) -- wer sie
 # will, konfiguriert mit  ./configure.sh --enable-v32-enable.
+# DAS RECONFIGURE -- warum es hier steht, obwohl es HEUTE nichts bringt.
+# In der cache-engine wird ein Teil der Tests erst registriert, wenn die
+# Codegen-Werkzeuge GEBAUT sind und CMake danach ein zweites Mal laeuft; dort am
+# Objekt gemessen: 427 Tests bei einem einzigen Configure gegen 431 nach 'all' +
+# Reconfigure (vier Tests waren unsichtbar).
+#
+# EHRLICHE MESSUNG FUER DIESES REPO: hier aendert es HEUTE NICHTS -- 610
+# registrierte Tests vor wie nach dem Reconfigure, davon 186 mit Label da_unit.
+# Es steht trotzdem, und zwar aus einem Grund statt aus Symmetrie: dieses Repo
+# ZIEHT die cache-engine als Sub-Build ein (Code/CMakeLists.txt:211). Sobald ein
+# codegen-abhaengiger ce-Test in den super-Baum geraet, greift dieselbe Falle.
+# Ein Reconfigure eines bereits gebauten Baums kostet Sekunden; ein still
+# fehlender Test kostet eine Regression, die niemand sieht.
 check: all
+	$(CMAKE) -S "$(SRCDIR)/Code" -B "$(BUILDDIR)"
 	$(CMAKE) --build "$(BUILDDIR)" $(BUILD_PAR) --target $(TEST_TARGET)
-	ctest --test-dir "$(BUILDDIR)" -L $(TEST_LABEL) --output-on-failure
+	ctest --test-dir "$(BUILDDIR)" -L $(TEST_LABEL) --output-on-failure $(CTEST_EXTRA)
 
 # -- install: DESTDIR-faehig --------------------------------------------------
 # DESTDIR wird dem Praefix VORANGESTELLT (GNU: staged install; CMake dokumentiert

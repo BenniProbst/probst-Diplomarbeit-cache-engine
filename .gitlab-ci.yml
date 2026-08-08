@@ -97,6 +97,14 @@ variables:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - changes:
         paths:
+          # GNU-Bauweg (08.08.2026): die drei Wurzeldateien SIND Bau-Code, auch wenn kein C++
+          # drinsteht. Sie fehlten hier zunaechst -- Folge, live beobachtet an Pipeline 15317
+          # (sha 0e32a07c): der Commit, der configure.sh und Makefile EINFUEHRTE, loeste 3 von 14
+          # Jobs aus, build:clang lief gar nicht, und die Pipeline war gruen, weil nichts geprueft
+          # wurde. Ein Bauweg ohne Wache ist derselbe Fall wie run_all_tests.sh: er verrottet
+          # unbemerkt. Wer diese Dateien anfasst, weckt ab jetzt die vollen Code-Jobs.
+          - "configure.sh"
+          - "Makefile"
           - "Code/**/*"
           - "Code/external/*"      # Gitlink-Bumps ce/prt-art (1-Zeilen-160000-Diff) => NIE docs-only
                                    # deckt AUCH Code/external/20260931-overleaf-diplomarbeit ab (2. Thesis-
@@ -283,12 +291,39 @@ test:unit:
   # aus .code-rules => beide existieren in exakt denselben Wellen, das needs haengt nie.
   needs: ["verify:submodules"]
   tags: [baremetal]
+  # -- GNU-BAUWEG (08.08.2026, Owner-Ansage; Ledger docs/DIPLOMARBEIT-...-LEDGER.md:11370-11391) --
+  # DIESER JOB FAEHRT DEN OFFIZIELLEN WEG, NICHT MEHR cmake/ctest DIREKT -- sonst gibt es fuer
+  # './configure.sh && make && make check' keine Wache und er verrottet unbemerkt. Genau das ist
+  # run_all_tests.sh passiert (13x [NOT FOUND] und trotzdem exit 0).
+  #
+  # ZUR SORGE IM KOMMENTAR OBEN ("bewusst NICHT Target all: das zoege die komplette ce-Suite,
+  # 888 Targets, doppelt") -- AM OBJEKT NACHGEMESSEN, sie trifft hier NICHT zu: 'make' (all) in
+  # diesem Repo sind 218 Ninja-Schritte, davon 58 im ce-Unterbaum. Der Grund ist die bestehende
+  # Naht: Code/CMakeLists.txt:211 zieht die ce per add_subdirectory(... EXCLUDE_FROM_ALL) ein, und
+  # nur der Planer wird per EXCLUDE_FROM_ALL=FALSE gezielt ins ALL zurueckgeholt (Zeile 234). Die
+  # ce-Suite haengt weiterhin NICHT am super-ALL und hat ihr eigenes test:unit im ce-Repo.
+  #
+  # Die Test-AUSWAHL ist unveraendert 'ctest -L da_unit' -- sie steht jetzt im Makefile statt hier.
+  # CTEST_EXTRA reicht allein die Ausgabe-Option fuer den GitLab-Test-Report durch.
+  script:
+    - |
+      set -euo pipefail
+      _CC=cc; _CXX=c++
+      if command -v gcc-15 >/dev/null 2>&1; then _CC=gcc-15; fi
+      if command -v g++-15 >/dev/null 2>&1; then _CXX=g++-15; fi
+      echo "GNU-Bauweg: CC=$_CC CXX=$_CXX"
+      CC="$_CC" CXX="$_CXX" sh ./configure.sh --with-generator=Ninja \
+        --enable-da-build-tests --enable-v32-enable --build-dir=Code/build-test
+      _built=0
+      for _a in 1 2 3 4; do
+        if make BUILD_JOBS="${CMAKE_BUILD_PARALLEL_LEVEL:-4}"; then _built=1; break; fi
+        echo "Bau-Versuch $_a fehlgeschlagen -> ninja-Resume-Retry"
+      done
+      [ "$_built" = 1 ] || { echo "FEHLER: 'make' nach 4 Versuchen nicht erfolgreich"; exit 4; }
+      make check CTEST_EXTRA="--output-junit $(pwd)/ctest-junit.xml"
   variables:
-    COMDARE_TEST_CMAKE_SOURCE_DIR: "Code"
+    # Nur noch fuer die artifacts-Pfade des .test-Templates; das Bauverzeichnis setzt configure.sh.
     COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test"
-    COMDARE_TEST_CONFIGURE_FLAGS: "-DCOMDARE_DA_BUILD_TESTS=ON -DCOMDARE_V32_ENABLE=ON"
-    COMDARE_TEST_BUILD_TARGET: "comdare_da_unit_tests"
-    COMDARE_TEST_CTEST_ARGS: "-L da_unit"
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.
