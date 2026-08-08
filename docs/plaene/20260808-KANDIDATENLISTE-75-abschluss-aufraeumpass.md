@@ -335,13 +335,29 @@ Diese sind in der Kette nie registriert worden. Sie bekommen hier **keine** neue
 
 | Klasse | Anzahl | Posten |
 |---|---|---|
-| **Kandidaten insgesamt geführt** | **126** | 92 Ketten-Posten + 34 ohne Ketten-Nummer (X-01…X-34) |
-| davon **OFFEN** | **99** | s. Tabellen |
+| **Kandidaten insgesamt geführt** | **133** | Herleitung s. Tabelle darunter |
+| davon **OFFEN** | **104** | Rest = 133 − 14 − 8 − 6 − 1 |
 | davon **BEREITS ERLEDIGT/ENTFERNT** (mit Commit belegt) | **14** | (1), (14), (20), (30), (35), (52), (64), (71), (72), (73), (74), X-26 + Startliste `cmake/permutations.cmake` und `COMDARE_apply_simd_flags` |
 | davon **GESPERRT** (Schutzklausel + Selbst-Lösch-Verbote + „nicht reparieren") | **8** | S-1…S-5, Q8-`perm_*`-Trio, X-23, X-13 (Doku) |
 | davon **UNBELEGT** (Gegenstand nicht auffindbar/nie heruntergebrochen) | **6** | Q1-„historisierte Auflagen-Hinweise", (16), (28), (29), (34), X-28 |
 | davon **WIDERLEGT am Ist** | **1** | (55) toter `xmmintrin`-Include |
 | **NACH ABGABE** ausgelagert (Teilmenge von OFFEN) | **7** | (43), (67), (81), (84), (85), (87), X-17 |
+| **TEIL-ERLEDIGT** (Teilmenge von OFFEN, kein eigener Rang) | **2** | (19) stales `build/`-Verzeichnis · V36.B-Kanal-Kommentarreste |
+
+**Zählweise offengelegt, damit die Summe nachrechenbar ist statt behauptet:**
+
+| Menge | Anzahl |
+|---|---|
+| Ketten-Posten `(1)`–`(92)` | 92 |
+| Startlisten-Posten Q1 **ohne** Ketten-Nummer (`cmake/permutations.cmake`, `COMDARE_apply_simd_flags`, V36.B-Kanal, `permutations_runtime_check.hpp`, `_IDS`-Alias, „historisierte Auflagen-Hinweise") | 6 |
+| Sammelposten „7 Waisen-TUs" (`22b`, Ledger `:3722` / GA-09, nie nummeriert) | 1 |
+| Kandidaten ohne Ketten-Nummer `X-01`…`X-34` | 34 |
+| **Summe** | **133** |
+
+*Nicht doppelt gezählt:* die Startlisten-Posten `COMDARE_LEGACY_MESSREIHEN` und `--emit-tier-ci` sind
+die Ketten-Posten `(17)` und `(4)`. — **Korrektur-Vermerk:** die Erstfassung dieser Datei nannte
+126/99; das war eine unsaubere Addition (Startlisten-Posten und der Waisen-Sammelposten fehlten in
+der Summe, und die Offen-Zahl war nicht aus den übrigen Rängen abgeleitet). Gültig ist **133/104**.
 
 **Die drei saubersten Erst-Kandidaten** (Objekt existiert, 0 Konsumenten am Ist belegt, kein Test hängt dran):
 

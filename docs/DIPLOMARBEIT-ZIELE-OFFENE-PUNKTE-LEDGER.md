@@ -11636,8 +11636,10 @@ damit ein künftiger Aufräumpass nicht an einer der Quellen vorbeiläuft. Das i
 
 > **VOLLZOGEN 08.08.2026 — und es waren nicht vier Quellen, sondern vierzehn.**
 > Die zentrale Liste steht in `docs/plaene/20260808-KANDIDATENLISTE-75-abschluss-aufraeumpass.md`:
-> **126 Kandidaten** (92 Ketten-Posten + 34 ohne Ketten-Nummer), davon **99 offen**, **14 bereits
-> erledigt/entfernt mit Commit-Beleg**, **8 gesperrt**, **6 unbelegt**, **1 am Ist widerlegt**.
+> **133 Kandidaten** (92 Ketten-Posten + 6 Startlisten-Posten ohne Nummer + 1 Waisen-Sammelposten +
+> 34 weitere ohne Ketten-Nummer), davon **104 offen**, **14 bereits erledigt/entfernt mit
+> Commit-Beleg**, **8 gesperrt**, **6 unbelegt**, **1 am Ist widerlegt**. Die Zählweise ist in der
+> Liste offengelegt und nachrechenbar.
 > Drei Befunde aus dem Zusammenführen, die vorher niemand beisammen hatte:
 > **(a)** Die Kette ist zerrissen — die Posten `(1)`–`(18)` stehen **ausschließlich** in
 > `docs/sessions/20260802-KATALOG-offene-strecke-gesamtplan.md:98`, die Posten `(25)`–`(29)`

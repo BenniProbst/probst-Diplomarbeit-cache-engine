@@ -2,7 +2,7 @@
 
 > **ZEIGER (08.08.2026): die geltende Kandidatenliste ist `20260808-KANDIDATENLISTE-75-abschluss-aufraeumpass.md`.**
 > Dieser Plan bleibt gueltig als **AP-01…AP-13-Erhebung** (die Einzel-Nachweise je AP-Posten sind dort
-> nicht wiederholt) — aber er deckt nur 13 der inzwischen **126** gefuehrten Kandidaten ab. Sein
+> nicht wiederholt) — aber er deckt nur 13 der inzwischen **133** gefuehrten Kandidaten ab. Sein
 > eigener Posten **AP-13** („die VOLLSTAENDIGKEITS-LUECKE der Liste selbst") ist mit der zentralen
 > Liste abgearbeitet: AP-13 hatte den Befund korrekt gestellt, zwei Tage vor der Ledger-Reconciliation.
 > Ein Nachtrag aus dem Zusammenfuehren: **AP-01 (leere 3D-caption) ist ERLEDIGT** — nachgewiesen an
