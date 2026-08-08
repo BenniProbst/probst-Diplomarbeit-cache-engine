@@ -818,8 +818,13 @@ measure:smoke:
       mkdir -p measure_out_smoke
       echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
       "$DRIVER" experiment_config measure_out_smoke
-      echo "== Mess-CSVs (Beleg) =="; find measure_out_smoke -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
-      test -n "$(find measure_out_smoke -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Smoke-Lauf lieferte nichts"; exit 1; }
+      # D3 (2026-08-08): die alte Erfolgsbedingung prueft nur, DASS eine measurements.csv
+      # existiert -- die Zeilenzahl wurde eine Zeile darueber AUSGEGEBEN und nirgends geprueft.
+      # Eine CSV mit nur der Kopfzeile bestand das Gate. Die Wache zaehlt jetzt Datenzeilen
+      # und nennt ihren Nenner; sie ist ein Skript, weil dieselbe Stelle ZWEIMAL existiert
+      # (hier und in measure:golden-320) und kopierter Code den Defekt mitkopiert hat.
+      test -x ../ci/mess_ausbeute_wache.sh || { echo "FEHLER: ci/mess_ausbeute_wache.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      sh ../ci/mess_ausbeute_wache.sh measure_out_smoke 1
       # ── CI-interaktiv (#24): den Anhang aus den LIVE-Smoke-Messdaten regenerieren (gleiche Logik wie golden-320) ──
       echo "== Anhang-Regenerierung aus Live-Smoke-Messdaten (#24) =="
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
@@ -907,8 +912,11 @@ measure:golden-320:
       mkdir -p measure_out
       echo "== golden-320 Voll-Messlauf (mehrtaegig, Measurement-ON, PMC auf prod1) =="
       "$DRIVER" experiment_config measure_out
-      echo "== Mess-CSVs (Beleg) =="; find measure_out -name 'measurements.csv' -exec sh -c 'echo "  $1: $(wc -l < "$1") Zeilen"' _ {} \;
-      test -n "$(find measure_out -name 'measurements.csv' | head -1)" || { echo "KEINE measurements.csv erzeugt -> Messlauf lieferte nichts"; exit 1; }
+      # D3 (2026-08-08): s. measure:smoke. Hier wiegt der Defekt am schwersten -- dies ist der
+      # Voll-Lauf. Er konnte mit "OK (golden-320 gemessen)" enden, ohne einen einzigen Messwert
+      # erzeugt zu haben, und persist:measurements haette die leeren CSVs additiv zurueckgeschrieben.
+      test -x ../ci/mess_ausbeute_wache.sh || { echo "FEHLER: ci/mess_ausbeute_wache.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      sh ../ci/mess_ausbeute_wache.sh measure_out 1
       # ── CI-interaktiv (#24): den Anhang aus den LIVE-Messdaten regenerieren ──
       # appendix_generator (Stufe 08) erzeugt je Sprache die 12 Kern- + 5 Darstellungs-.tex (K-12-Sweep 2026-07-19:
       # vorher stale "16"; Ist laut 08_appendix_generator/appendix_generator.hpp) aus der WIDE-Matrix ALLER Permutationen.
