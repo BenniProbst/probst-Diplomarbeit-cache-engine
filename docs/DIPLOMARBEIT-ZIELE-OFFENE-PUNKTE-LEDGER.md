@@ -10702,3 +10702,47 @@ TAG, nicht das Commit-Datum.** `a1d0c201` ist von **heute 11:53**. Es war kein A
 faelliger Bump.
 **Neue Falle fuers Register:** *ein `git describe`-Suffix ist KEINE Datumsangabe. Wer das Alter eines
 Commits wissen will, fragt `git log -1 --format=%ad`.*
+
+---
+
+## NACHTRAG 08.08.2026 — F1 GELOEST: DAS BUILDSYSTEM-VOLUME (20 T / 15 T FREI)
+
+### DER OWNER LOEST DIE KAPAZITAETSFRAGE MIT EINEM DRITTEN EXPORT
+> *"Ich habe auf demselben NAS auf Volume_2 folgendes bereitgestellt
+> `nfs://10.0.20.241/nfs/Comdare-Buildsystem` oder besser `nfs://backup1.comdare.de/nfs/Comdare-Buildsystem`.
+> Dort sind 14TB frei und der Ordner ist NUR fuer das buildsystem reserviert, was dem Diplomarbeit
+> Kern entspricht, wie im Plan beschrieben."*
+
+**Selbst gemessen und verdrahtet:**
+```
+10.0.20.241:/nfs/Comdare-Buildsystem   20T  5.4T  15T  28%  /mnt/comdare-buildsystem
+Lesen ok · Schreiben ok · Ruecklesen ok · reboot-fest (fstab + x-systemd.automount)
+Bissprobe: Mount geloest, blosser df loeste ihn wieder aus -> active
+```
+**15 T frei, sogar mehr als die genannten 14.** Backend ist `/mnt/HD/HD_b2` (Volume_2), also ein
+**anderes Dateisystem** als `Cluster_NFS` (`/mnt/HD/HD_a2`) -- die 3,6-T-Enge dort ist damit
+gegenstandslos fuer das Buildsystem.
+
+### EIN UNTERSCHIED, DER FUER DIE CI ZAEHLT
+```
+/mnt/HD/HD_b2/Comdare-Buildsystem   *                <-- fuer ALLE Netze exportiert
+/mnt/HD/HD_a2/Cluster_NFS           10.0.20.0/24     <-- nur V20
+```
+**Der Buildsystem-Export steht auf `*`, `Cluster_NFS` auf `10.0.20.0/24`.** Damit ist er auch fuer die
+**V60-Runner** erreichbar -- die Isolationsbegruendung, die den measure-drop-Filterpod noetig machte
+(*"V60-Runner duerfen Cluster_NFS NIE lesen"*), **greift fuer dieses Volume nicht**. Ein Runner kann
+direkt mounten, ohne HTTPS-PUT-Umweg.
+**Das ist eine Beobachtung, keine Empfehlung** -- ob der weite Export so gewollt ist, weiss nur der
+Owner. Fuer die Diplomarbeits-Ablage ist er die einfachste und zugleich sauberste Loesung: ein Ziel,
+das Bau und Messung von beiden Maschinen UND aus der CI erreichen.
+
+### DAMIT IST DIE GANZE KAPAZITAETS-RECHNUNG NEU
+| Ziel | Rolle | frei |
+|---|---|---|
+| **`/mnt/comdare-buildsystem`** (Vol_2, `*`) | **Bau-Artefakte + Messergebnisse** | **15 T** |
+| `/mnt/backup1-nfs` (Cluster_NFS, V20) | Cluster-Backups, Forschungsdatensaetze, privates Archiv | 3,6 T |
+| `/mnt/backup2-nfs` (PR2100, V20) | dev-Realm | 6,5 T |
+
+**Die 8 TB passen. Der D-2-Zahlenkonflikt (131.072 / 524.288 / 917.504 / 1.572.864 / 2.097.152) ist
+damit KEINE Platzfrage mehr** -- selbst 524.288 Binaries a ~0,44 MB (~224 GB) sind gegen 15 T
+unkritisch. Was bleibt, ist die **Zeitfrage** und die Frage, welche Menge die Thesis BRAUCHT.
