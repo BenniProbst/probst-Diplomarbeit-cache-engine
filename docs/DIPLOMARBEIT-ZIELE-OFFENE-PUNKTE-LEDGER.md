@@ -11571,3 +11571,266 @@ stehen und die Zeitbasis über die Threads hinweg vergleichbar sein.
 eine über die Threads synchronisierte Uhr. Für die Zerlegung je Thread genügt monoton je Prozess; für
 das Erkennen echter Gleichzeitigkeit über Threads hinweg genügt es **nicht**. Wird beim Bau entschieden
 und hier nachgetragen.
+
+---
+
+## §75 RECONCILIATION 08.08.2026 — DIE KANDIDATENLISTE WAR ZWÖLF TAGE LANG STALE
+
+Der Owner hat am 08.08. gefragt, in welchem Zustand der Abschluss-Aufräumpass ist: *„ich denke er war
+kritisch halb fertig."* **Er ist es — und zwar nicht im harmlosen Sinn „noch nicht angefangen".**
+
+### Was passiert ist
+
+§75 (Ledger `:3599`, ce-Commit `b4be362f0`, 27.07. 00:40) verlangt ausdrücklich ein **eigenes, ans Ende
+gestelltes Paket** mit ultracode VOR+NACH, granularen Commits und einem Aufrufer-Grep=0-Beweis je Fund.
+
+**Achtzehn Stunden später wurde ein Teil der Kandidaten unter ganz anderem Namen entfernt:** ce-Commit
+`813c3232` vom **27.07. 18:47:50**, *„refactor(build)!: V-4 — Permutations-Alt-Kanal retired
+(byte-neutral, ctest 318 -> 316)"*, deklariert als Hauptstrang-Auftrag V-4 — **ohne Bezug auf §75, ohne
+den §75-Prozess, und ohne dass die Kandidatenliste je nachgezogen wurde.**
+
+`grep -c '813c3232'` über diesen Ledger liefert bis heute **0**.
+
+### Der Ist-Stand, jeder Posten am Objekt geprüft (nicht aus einem Dokument geglaubt)
+
+| Kandidat aus der Liste `:3601` | Ist-Zustand | Beleg |
+|---|---|---|
+| `cmake/permutations.cmake` | **existiert nicht mehr** | `git ls-files` → 0; entfernt in `813c3232` |
+| `COMDARE_apply_simd_flags` | **entfernt** | nur noch als Kommentar: `cmake/isa_features.cmake:111` nennt selbst *„V-4 (27.07.) … hatte 0 Aufrufer"* |
+| V36.B-Kanal (Codegen-Tool-Trio) | **teil-entfernt** | drei Werkzeug-Verzeichnisse weg; `test_c3b_kanal_merge_beleg.cpp` bewusst behalten |
+| `permutations_runtime_check.hpp` | **unverändert da, aktiv inkludiert** | `Code/02_messung_driver/main.cpp:43` |
+| `_IDS`-Alias | **unverändert da**, 3× definiert, selbst als DEPRECATED beschriftet | `ce tests/unit/CMakeLists.txt:3330,3358,3386` |
+| `COMDARE_LEGACY_MESSREIHEN` | **unverändert da**, zwei aktive Zweige (data-gated, bewusst) | `main.cpp:701,718` |
+| „historisierte Auflagen-Hinweise" | **kein Objekt** — nie auf Datei/Zeile heruntergebrochen | — |
+
+Dazu die CLI-Alt-Flags `--emit-tier-ci`/`--emit-tier-cmake`, die an drei Stellen **selbst auf §75
+verweisen** (`main.cpp:359,432,537-538`) und funktional unverändert sind.
+
+### Warum das der schlechtere Zwischenzustand ist
+
+Die Liste ist **weder „alles noch da"** (dann wäre sie ein verlässliches TODO) **noch „alles weg"**
+(dann wäre §75 fertig). Sie ist eine **Mischung aus stillschweigend-erledigt und offen, ohne
+Abgleich** — und man sieht ihr nicht an, welcher Posten was ist, ohne jeden einzeln am Objekt zu
+prüfen. Genau das musste heute nachgeholt werden.
+
+**Verschärfend:** die Kandidaten liegen an **mindestens vier Orten** verstreut — dieser Haupteintrag
+`:3601`, der Nachtrag `:3710`ff., die Einzelvermerke `:3659` / `:3688` / `:6926`, und ce
+`docs/architecture/20260804-e24_g8_negativliste_gesperrte_abi_flaechen.md` Abschnitt 6, plus
+Kopf-Kommentare in einzelnen ce-Headern. **Eine zentrale, aktuelle Liste existiert nicht.**
+
+### Was daraus folgt
+
+**Kein Bau-Fehler, keine hängende Referenz** — `813c3232` war laut eigenem Byte-Beweis sauber. Der
+Schaden ist ausschließlich am *Wissen*: die Quelle der Wahrheit log zwölf Tage lang.
+
+Mit diesem Eintrag ist die Liste auf den Ist-Stand gebracht. **§75 ist damit wieder ein sauberes,
+vollständig offenes TODO** und kann als eigenes Paket gefahren werden, sobald die Owner-Bedingung
+(*„nach der Bearbeitung aller bekannten Aufgaben"*) erreicht ist.
+
+**Offener Folgeposten:** die vier verstreuten Fundorte in **eine** Kandidatenliste zusammenführen,
+damit ein künftiger Aufräumpass nicht an einer der Quellen vorbeiläuft. Das ist Doku-Arbeit, kein Bau.
+
+**Und eine Lehre, die über §75 hinausgeht:** ein Aufräum-Auftrag, der als *eigenes, gegatetes Paket*
+vereinbart ist, darf nicht nebenbei unter anderem Namen zur Hälfte ausgeführt werden. Wenn es doch
+geschieht, muss der ausführende Commit die Liste mitziehen — sonst entsteht genau dieser Zustand.
+
+### Namensklärung
+
+„V32" in der Owner-Frage ist **keine Verifikations- oder Versionszahl**, sondern der Name der
+historischen Messreihen-Familie (`Code/02_messung_driver/v32_*.hpp`). Reine Namensgleichheit mit den
+Alt-Flags — **nicht dasselbe Ding**. Wer nach „V32-Aufräumpass" sucht, sucht §75.
+
+---
+
+## OWNER-ENTSCHEID 08.08.2026 — `checkpoint_measure(..., IN|OUT)` IST **EINE** UNIFORME FUNKTION
+
+Ich hatte aus der Regressions-Invariante abgeleitet, IN und OUT müssten **zwei Zeilen** sein. Das
+Ergebnis stimmt — es sind zwei Ereignisse —, aber ich hatte es als *Blattform*-Frage behandelt. Der
+Owner hat den **Bau** dahinter festgelegt, und der ist einfacher, als meine Formulierung nahelegte:
+
+> *„Ja das ist eine inline Steuerzeile, die auf einen globalen memory stack schreiben soll, der die
+> Parameter und Zeitpunkte je der 3 Mess-Ebenen aufnimmt und zur Laufzeit dokumentiert. Das Verfahren
+> muss besonders sparsam sein, weil wir Latenzen nicht in der Messung dulden können. Ein checkpoint
+> loggt also den Aufrufenden, die gelandete Zielfunktion, die Systemzeit und alle dafür spezifischen
+> compile time Parameter der/aller Achsen zu diesem Zeitpunkt und ein checkpoint flag „IN". checkpoint
+> OUT unterscheidet sich also in der checkpoint Funktion NICHT, sondern hat nur ein compile time „OUT"
+> flag als Tag. Die Funktion für `checkpoint_measure(...,IN bzw. OUT)` ist uniform.“*
+
+### C-1 Eine Funktion, kein Paar
+
+**`checkpoint_measure(..., IN|OUT)` ist uniform.** Es gibt **nicht** `enter()` und `leave()`, sondern
+denselben Aufruf mit unterschiedlichem Tag. Zwei Zeilen im Blatt entstehen, weil der Aufruf **zweimal**
+steht — nicht, weil es zwei Funktionen gäbe.
+
+### C-2 Das Flag ist ein **compile-time** Tag
+
+`IN`/`OUT` ist **kein Laufzeit-Enum und kein Parameter, über den verzweigt wird**. Das fügt sich
+bruchlos in die Hausdoktrin *statischer Dispatch, kein `switch` zur Laufzeit* — und es hat eine
+praktische Folge: der `OUT`-Pfad darf **anders übersetzt** werden als der `IN`-Pfad (`if constexpr`),
+ohne dass im Hot-Path je ein Sprung entsteht.
+
+### C-3 Was ein Checkpoint aufnimmt
+
+| Feld | Herkunft |
+|---|---|
+| **Aufrufender** | Laufzeit (Prozess + Thread, s. Nachtrag N-1) |
+| **gelandete Zielfunktion** | die Funktion, in der der Checkpoint steht — **neu gegenüber N-1..N-7** |
+| **Systemzeit** | Laufzeit |
+| **alle spezifischen compile-time Parameter der/aller Achsen zu diesem Zeitpunkt** | **compile time** |
+| **Checkpoint-Flag** | **compile time** (`IN` \| `OUT`) |
+
+**Die Blattform bekommt damit eine Spalte dazu: *Ziel*.** Bisher war nur der *Aufrufer* benannt. Erst
+das Paar **(Aufrufer, Ziel)** macht die Zeile zu einer vollständigen Stack-Kante — der Aufrufer allein
+sagt, woher der Besuch kam, nicht wo er ankam.
+
+### C-4 Die Sparsamkeit ist die harte Randbedingung
+
+> *„Das Verfahren muss besonders sparsam sein, weil wir Latenzen nicht in der Messung dulden können.“*
+
+Das ist keine Stilfrage: **der Messfühler ist ein Verbraucher** (Elektrotechnik-Analogie, §*6 CEBs*).
+Was der Checkpoint kostet, misst er mit. Daraus folgen drei Bau-Regeln, die **zwingend** sind:
+
+1. **Die CT-Achsen-Parameter dürfen zur Laufzeit NICHT zusammengebaut oder kopiert werden.** Sie sind
+   compile-time bekannt, also gehört in den Stack **ein einziger Verweis auf einen statischen
+   Deskriptor** (Zeiger oder Index), nicht die ausgeschriebene Achsen-Kette. Wer die volle Beschreibung
+   je Checkpoint schreibt, erzeugt genau die Latenz, die verboten ist — und zwar proportional zur
+   Achsenzahl, also dort am stärksten, wo am feinsten gemessen wird.
+2. **Kein Speicher wird im Hot-Path angefordert.** Der Stack ist **vorab alloziert**, feste Kapazität.
+3. **Kein I/O im Hot-Path.** Der Stack ist *memory*; geschrieben wird erst beim Auslesen.
+
+### C-5 Zwei Spannungen, die der Bau auflösen muss (Bau-Detail, kein Owner-Entscheid)
+
+**(a) „global" + mehrere Threads + „sparsam" beißen sich.** Ein wirklich *geteilter* Stack braucht
+Synchronisation, und jede Sperre im Hot-Path ist die Latenz, die ausgeschlossen wurde — bei
+Contention sogar unbegrenzt. Der Nachtrag N-7 sagt zugleich, dass **mehrere Threads gleichzeitig und
+durcheinander** schreiben.
+**Empfehlung:** *thread-lokale* Puffer, die einen **prozessweit erreichbaren** Sammler bilden. Aus
+Sicht des Lesers bleibt es *ein globaler Stack* — genau wie beauftragt —, aber im Hot-Path schreibt
+jeder Thread unsynchronisiert in sein eigenes Stück. Die Zusammenführung geschieht **beim Auslesen**,
+wo Latenz nichts mehr kostet, und sie ist ohnehin nötig, weil die Blattform nach *Ankunftsfolge*
+sortiert (N-7).
+
+**(b) „Systemzeit" ist teurer als ein Zykluszähler.** Ein `clock_gettime` kostet über vDSO grob
+20–25 ns, ein Zykluszähler-Lesen etwa eine Größenordnung weniger. Auf der **Micro**-Ebene, wo vor und
+nach *jedem* Achsen-Aufruf ein Checkpoint sitzt, ist das der dominierende Anteil des Mess-Overheads.
+**Empfehlung:** im Hot-Path den billigen monotonen Zähler nehmen und **einmal je Lauf** gegen die
+Systemzeit ankern, damit die Zeitstempel absolut lesbar bleiben. Das beantwortet zugleich die aus
+N-7 offene Zeitbasis-Frage: *ein* Anker je Prozess macht die Stempel über Threads hinweg vergleichbar.
+**Und es ist ohnehin messbar**, welcher Weg wieviel kostet — die 6 CEBs sind genau dafür da.
+
+### C-6 Der Überlauf ist ein Befund, kein Verlust
+
+Ein vorab allozierter Stack kann volllaufen. Beide naheliegenden Auswege sind falsch: **verwerfen**
+lässt die Messung stillschweigend lügen, **blockieren** erzeugt die verbotene Latenz.
+**Also: weiterlaufen, aber den Überlauf zählen und beim Auslesen melden** — dieselbe Behandlung wie
+ein `IN` ohne `OUT` (N-6). Eine Messung mit gemeldetem Überlauf ist auswertbar; eine mit
+verschwiegenem nicht.
+
+---
+
+## OWNER-ENTSCHEID 08.08.2026 (Fortsetzung) — **EIGENER** STACKTRACE, EBENE ALS CMAKE-FLAG
+
+### C-7 Der Aufrufende ist ein TRIPEL
+
+> *„Der Aufrufende ist der Name des aufrufenden Prozesses, der Name der aufrufenden Funktion auf dem
+> Stack, und die Thread Nummer des aufrufenden Programm-Flusses.“*
+
+| Bestandteil | Woher | Kosten je Checkpoint |
+|---|---|---|
+| Name des **Prozesses** | einmal beim Start, danach Verweis | **null** |
+| Name der **aufrufenden Funktion auf dem Stack** | **rekonstruiert**, s. C-8 | **null** |
+| **Thread-Nummer** des Programm-Flusses | thread-lokale laufende Nummer | ~1 ns |
+
+### C-8 Der Aufrufer wird **rekonstruiert**, nicht ermittelt — und zwar aus einem **eigenen** Stack
+
+> *„Die Spannung lässt sich lösen, wenn auf dem custom Stack in einer gefilterten Ebene höher (Macro zu
+> Micro, Compare zu Macro) auf dem globalen custom stack die aufrufende Funktion mit deren IN-Checkpoint
+> notiert wird. Also müssen wir zur compile time cmake Flags setzen, die automatisch in die
+> checkpoint_measure einkompiliert werden, in welcher Mess-Ebene sich der checkpoint befindet, sodass er
+> rückwärts den nächstgelegenen checkpoint eine Ebene höher finden und als aufrufende Funktion uniform
+> identifizieren kann. Wir verwenden also ein eigenes C++ stacktrace und nicht das standard
+> stacktrace.“*
+
+1. Jeder Checkpoint trägt **compile-time seine Mess-Ebene** (`compare`/`macro`/`micro`) — gesetzt über
+   **CMake-Flags**, einkompiliert wie das `IN`/`OUT`-Tag.
+2. Der **Aufrufer** ist der **nächstgelegene, rückwärts liegende `IN`-Checkpoint der nächsthöheren
+   Ebene**. Macro zu Micro, Compare zu Macro.
+3. Aufgelöst wird **beim Auslesen**, nicht beim Schreiben.
+
+**Kosten im Hot-Path: null.** Kein Durchreichen durch die Aufrufkette, kein `return_address`, kein
+`std::stacktrace`. Ein Checkpoint schreibt weiterhin nur *Deskriptor-Verweis · Thread-Nr · Zeit · Tags*.
+
+**Und er ist schärfer als der Standard-Stacktrace**, nicht ärmer: `std::stacktrace` kennt nur
+Maschinen-Frames und liefert jede architektonisch bedeutungslose Zwischenfunktion mit. Der eigene Stack
+trägt **die Semantik, um die es geht** — die drei Mess-Ebenen.
+
+**Auch der Fehlerpfad braucht ihn nicht.** Ich hatte vorgeschlagen, `std::stacktrace` wenigstens bei
+verletzter IN/OUT-Balance zu ziehen. Unnötig: der eigene Stack weiß bereits, *welcher* `IN` offen
+blieb — samt Funktion, Ebene, Thread und Zeit. **`std::stacktrace` wird gar nicht verwendet.**
+
+### C-9 Die Rekonstruktion ist ein Durchlauf, keine Suche
+
+Eine wörtliche Rückwärtssuche je Eintrag wäre **quadratisch**. Nötig ist sie nicht: **ein einziger
+Vorwärts-Durchlauf mit je einem offenen Stapel pro Ebene** löst alle Aufrufer in **O(n)** auf. `IN`
+legt auf den Stapel seiner Ebene, `OUT` nimmt herunter, jeder Checkpoint bekommt als Aufrufer die
+Spitze des Stapels der nächsthöheren Ebene. **Was am Ende auf einem Stapel liegen bleibt, sind exakt
+die Regressionen aus N-6** — die Invariante fällt als Nebenprodukt derselben Auswertung ab.
+
+### C-10 Damit ist die Thread-Frage aus C-5(a) **entschieden** — aus Richtigkeit, nicht aus Sparsamkeit
+
+Ein Micro-Aufruf in Thread A wird von einem Macro-`IN` **in Thread A** gerufen. Auf einem geteilten
+Stack, in den mehrere Threads durcheinander schreiben, fände die Rückwärtssuche **den falschen
+Aufrufer** — den zeitlich nächsten *fremden* `IN`. **Thread-lokale Puffer machen die Rekonstruktion
+korrekt**, nicht bloß schnell. Wer einen echt geteilten Stack baut, muss bei der Auflösung zusätzlich
+nach Thread filtern und hat die Sperren im Hot-Path umsonst bezahlt.
+
+### C-11 KORREKTUR meiner eigenen Schätzung in C-5(b)
+
+Ich hatte geschätzt, `clock_gettime` koste *„grob 20–25 ns"* und ein Zykluszähler *„etwa eine
+Größenordnung weniger"*. **Beide Zahlen waren falsch.** Gemessen auf prod1 (GCC 15.3, `-O2`, 200 000
+Aufrufe je Variante, warme Werte aus drei übereinstimmenden Wiederholungen):
+
+| Kandidat | ns/Aufruf | relativ |
+|---|---|---|
+| `std::source_location` als Default-Argument | **0,92** | 1× |
+| Thread-Kennung (`get_id()`+hash, obere Schranke) | 3,5 | 3,8× |
+| `__rdtsc()` | **6,8** | 7,4× |
+| `steady_clock::now()` | **16,5** | 18× |
+| `std::stacktrace::current(1,1)`, **ein** Frame ohne Auflösung | **343** | **373×** |
+| `std::stacktrace` + `description()` | **~26 900** | **~29 000×** |
+
+`steady_clock` ist **16,5** (nicht 20–25), und `__rdtsc` ist Faktor **2,4** billiger (nicht 10). Die
+Zeitquelle bleibt der **teuerste unvermeidbare Posten** — mehr als Aufrufer, Ziel und Thread-Nummer
+zusammen —, aber die Wahl ist kein Größenordnungssprung.
+
+**Messvorbehalt:** der **erste** Lauf jeder Binary war durchweg rund doppelt so teuer (steady_clock
+37,7 statt 16,5; stacktrace 666 statt 343) — derselbe Kalt-Cache-Effekt, der als Runner-Instabilität
+bekannt ist. Die Tabelle nennt **warme** Werte; sie trägt die **Rangfolge**, nicht absolute Aussagen.
+Für absolute Zahlen gehört die Messung in die CEB-Maschinerie.
+
+**Die Rangfolge belegt den Entscheid C-8 unabhängig:** `std::stacktrace` wäre je Interface-Aufruf mit
+19 Achsen und 38 Checkpoints rund **13 µs** — mehr als die gemessene Operation. Der eigene Stack
+kostet dafür **null**.
+
+### C-12 Verfügbarkeit von `<stacktrace>` — am Objekt geprüft, für die Akte
+
+Der verbreitete Vorbehalt *„libc++ hat `<stacktrace>` nicht"* greift auf prod1 **nicht**: beide
+Compiler bauen gegen libstdc++.
+
+| Compiler | stdlib | `<stacktrace>` | `__cpp_lib_stacktrace` |
+|---|---|---|---|
+| GCC 15.3.0 | libstdc++ 15 | ja | `202011` |
+| clang 22.1.8 | libstdc++ 16 (Default) | ja | `202011` |
+
+libc++ ist gar nicht installiert. **Es wäre also verfügbar — verwendet wird es trotzdem nicht** (C-8).
+
+### C-13 Offen, am Objekt zu klären, bevor die CMake-Flags gesetzt werden
+
+1. **Ist die Mess-Ebene je Target eindeutig?** Enthielte eine Übersetzungseinheit Checkpoints zweier
+   Ebenen, reichte ein Datei-globales Flag nicht — dann müsste die Ebene am Aufruf stehen (weiterhin
+   compile-time, als Tag wie `IN`/`OUT`).
+2. **Wohin gehört die Gattungs-Interface-Ebene?** Vierte Ebene im Filter oder Sonderfall von `macro`?
+   Das entscheidet, gegen welche Ebene ein Micro-Checkpoint seinen Aufrufer sucht.
+3. **Ebenen-Flags und CEB-Gates sollten EIN Mechanismus sein, nicht zwei.** Die sechs CEB-Varianten
+   *sind* ein- und ausgebaute Mess-Ebenen; die neuen Flags beschreiben dieselbe Achse. Berührt
+   unmittelbar das G3-Folgepaket.
