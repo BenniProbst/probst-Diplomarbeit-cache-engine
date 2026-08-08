@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# ============================== DEPRECATED (2026-08-08) ==============================
+# Teil des abgeschlossenen Petri-Schalen-Versuchs vom 18.06.2026 (erster PDF-Export der
+# LaTeX-Anhaenge). KEIN aktiver Konsument: geprueft am 08.08. mit den Mustern
+# 'analyze_ff', 'Messdaten-Backup' und '\.py\b' ueber .gitlab-ci.yml, ci/ und scripts/
+# -> je 0 Treffer, bei bestandener Gegenprobe.
+#
+# WIRD BEWUSST NICHT GELOESCHT (Doku-Regel: nie loeschen, nur deprecaten) -- es ist der
+# Beleg, dass die Kette Messwerte -> Auswertung -> LaTeX -> PDF einmal durchgelaufen ist.
+#
+# ABER KEIN VORBILD FUER DEN NACHBAU. Zwei Gruende:
+#   1. Hausdoktrin "kein Python in der Buildchain" (Talos OS traegt kein Python).
+#   2. Owner-KERN B-4 (07.08.2026): "Break even lebt nur in der CEB nach Messungs-Schluss
+#      und wird dort im RAM ueber alle Tier-Binary-Messergebnisse ausgewertet, um dann von
+#      der CEB auch bei Anforderung durch den Planer in Latex Dokumente, PDF oder xlsx
+#      Tabellen nach Zielorte zu giessen (XML bestimmt Verhalten)."
+#      -> Der produktive Auswerter gehoert nach C++ IN DIE CEB, nicht in ein Skript daneben.
+#
+# Einordnung und Vergleich mit dem Soll: ../README.md
+# =====================================================================================
 """
 analyze_ff.py — leitet aus den VALIDEN Messwerten Tendenzen fuer die Forschungsfragen
 FF0-FF4 der Diplomarbeit ab (cache-line-aware / aktiv cache-bewusste Hardware-Adaption).
