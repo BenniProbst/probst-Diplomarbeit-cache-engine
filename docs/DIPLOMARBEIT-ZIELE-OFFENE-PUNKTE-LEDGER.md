@@ -11249,3 +11249,93 @@ pruefbare Semantik: **Rekonstruktion + Verifikation gegen die Pruefdock-Tests**.
 Der ganze Verlauf ist reich dokumentiert in
 `docs/sessions/20260808-SESSION-messkette-paper-xml-und-die-vier-ultracode-laeufe.md` --
 mit allen Owner-KERNen im Wortlaut, den Befunden am Objekt, und meinen eigenen Fehlern als Muster.
+
+---
+
+## NACHTRAG 08.08.2026 — XLSX: DIE DEFINITION EXISTIERT SEIT DEM 26.07., DER WRITER FEHLT
+
+### DIE RUEGE (Owner, fuenfmal gesagt)
+> *"ich habe dir schon **5 Mal** gesagt, dass die XLSX in der XML die **Standardausgabe** ist und ich habe
+> auch **den Aufbau der xlsx sheets definiert** [...] **CSV erzeugt zu viele einzelne Dateien je sheet
+> eine** und ja wir testen das, aber es ist **unuebersichtlich und nicht der standard**."*
+
+**Die Wurzel, warum sich nichts aenderte:** A9-S1 (Vendor) ist gelandet, **A9-S3/S4/S5 (Writer-Kern, CLI,
+Erstbeleg) wurde nie begonnen.** Die Bibliothek steht, das Rohr dahinter fehlt -- also faellt alles auf
+CSV zurueck. Ich habe die Ansage jedes Mal zur Kenntnis genommen, ohne den fehlenden Bau zu erkennen.
+
+### DIE SHEET-DEFINITION -- sie existiert, in DREI Fassungen
+
+**FASSUNG 1 (26.07.2026, KERN=GESETZ)** --
+`docs/sessions/20260726-SESSION-achsen-neuordnung-lager-baeume-xlsx-regressionen.md:89-98`, §6
+"MESS-ERGEBNIS-CODIERUNG (xlsx-Doktrin)". Der Dokumentkopf sagt: *"ALLES in diesem Dokument ist
+KERN=Gesetz"*:
+> *"xlsx = kuenftig DEFAULT, CSV einstellbar + Fallback. CSVs werden im **FACTORY PATTERN je Sheet
+> einzeln** gebaut; **xlsx = EINE Datei mit EINEM Sheet je gewaehlter Unter-Achsen-Permutation +
+> zusaetzlichem INFO-Sheet** (Sysinfo der testenden Maschine + verwendete Haupt-Achsen). Gegen
+> Sheet-Explosion wirken die **3 Unter-Ebenen** unter dem Haupt-Blatt (Mess-Unter -> System-Unter ->
+> Organ-Unter)."*
+
+**FASSUNG 2 (02.-03.08.2026)** -- das A9-Design-Dossier
+(`docs/sessions/backups/20260803-design-nachtraege-final/A9 (xlsx-Writer F3)-dossier-neufassung.md`,
+558 Z., von einer Sammel-Review als *"TRAGFAEHIG mit Auflagen"* abgenommen). Es macht Fassung 1 zur
+C++-API: Sheet-Namen `<=31` Zeichen ohne `[]:*?/\`, deterministisch `S001..Snnn` (mixed-radix ueber die
+Unter-Achsen-Permutationen) mit Klartext-Legende im INFO-Sheet · Zeilenlimit 1.048.576 ->
+`ErgebnisSchreibFehler{zeilenlimit}` **statt stillem Truncate** · Dateiname-Grammatik
+`datum "-" zeit "_" kvkette "." endung`, `endung := "xlsx" | "csv"` · CSV-Fallback ueber **dieselbe
+Factory**, je Sheet eine Datei (`<stamm>__S001.csv` + `<stamm>__INFO.csv`).
+
+**FASSUNG 3 (06.-07.08.2026)** -- xlsx traegt auch das **Mess-Profil** (`Ledger:7643-7651`):
+> *"Das Profil wird je Mess-Layer aufgezeichnet und in einem **zeitlich orientierten chart** als Profil
+> abgespeichert, der **formal als xlsx Messwerte gilt**."*
+
+### DER PUNKT, DER VOR DEM BAU ZU KLAEREN IST
+**Fassung 1/2 und Fassung 3 sind STRUKTURELL VERSCHIEDENE Tabellenformen.** Der Ledger sagt es selbst
+(`:7801-7809`): *"Die a9-xlsx-Struktur ist eine **Zeile-pro-Messergebnis-Tabelle** je
+Unter-Achsen-Permutation -- **kein Zeitreihen-Traeger, keine nativen Chart-Objekte**."*
+Fassung 3 verlangt eine **Zeitreihe** (Checkpoints ueber die Zeit). **Die Bruecke zwischen beiden ist
+der eigentliche offene Punkt** -- nicht die Blattform als Kosmetik.
+
+Dazu liegt eine **unbeantwortete Owner-Frage** vor (07.08., "R-3 xlsx-Blattform fuer das Profil",
+`docs/sessions/20260807-STAND-wellenplan-abgeschlossen-und-offene-entscheide.md:69-72`):
+*"ein Sheet je Mess-Layer, Zeilen = Checkpoints in Zeitreihenfolge, Zeit als erste Spalte. Dazu: native
+Excel-Charts einbetten (libxlsxwriter kann es) oder reichen die Zahlen?"*
+**ACHTUNG Buchstaben-Kollision:** dieses "R-3" ist NICHT das gelandete Fingerprint-Preimage-R-3.
+
+### DER XML-SCHALTER EXISTIERT NICHT
+`measurement/writeback_method_registry.hpp`: `enum class WritebackMethod { Csv, LatexTable,
+ComparisonMetrics }`, `kWritebackMethodCount = 3`, compile-time fixiert. **Kein `xlsx`.**
+Die XSD prueft `<method value="…"/>` nur **strukturell** (freier `xs:string`) -- wer heute
+`value="xlsx"` schreibt, bekommt keinen Compile-Bruch, sondern einen zur Laufzeit unbekannten Wert.
+**=> Ohne vierten Registry-Wert bleibt der Schalter unwirksam, egal wie fertig der Writer ist.**
+
+### DIE DATEI-FLUT IST BELEGT
+`cache_engine_builder_iterator.hpp:1119-1126, 1913`: bei `per_binary_subdirs=true` bekommt **JEDE
+Tier-Binary ihr eigenes `result.csv` im eigenen Unterordner**. Bei 320 Binaries sind das **320
+Einzeldateien** plus die aggregierte `measurements.csv`. **Genau die Unuebersichtlichkeit, die der
+Owner benennt.**
+
+### CSV XOR XLSX -- der Kanon (Owner 05.08., `Ledger:4163-4166`)
+> *"es soll doch **entweder CSV xor xlsx** schreiben und **xlsx ist default**? Alles andere ist
+> unnoetiger overhead. **Das ist ein strategy pattern, keine chain of responsabilities**"*
+
+**Wo CSV legitim BLEIBT:** als Fallback derselben Factory · als **Eingabeformat** der Heuristik-Strecke
+(*"xlsx ist AUSGABE-Default der Auswertung, nicht deren Eingabeformat"*) · als Test-/Golden-Fixture
+(20 Testdateien) · als Roh-Archiv der Messdaten von VOR der Doktrin.
+
+### DIE BAULISTE (aus dem A9-Dossier, am Objekt verifiziert)
+| # | Baustein | Stand |
+|---|---|---|
+| S1 | `ext/io/libxlsxwriter` + `zlib` vendoriert | **gelandet** (`351205f5`) |
+| S2 | `lager_pfad_grammatik.hpp` mit `blatt_dateiname()` | **halb** -- existiert aus der A1-Welle |
+| — | `ergebnis_dateiname.hpp` (A9-Namens-Fassade + Wachen) | **fehlt** |
+| — | 31-Zeichen-Sheetname-Wache · `ErgebnisSchreibFehler` | **fehlen** |
+| S3 | `IErgebnisBlatt`/`IErgebnisMappe`/`ErgebnisMappenFactory` | **nie begonnen** |
+| S3 | `XlsxErgebnisMappe` (eigene TU, PRIVATE gegen den Vendor gelinkt) | **nie begonnen** |
+| S3 | `CsvErgebnisMappe` (Fallback derselben Factory) | **nie begonnen** |
+| — | INFO-Sheet-Inhalt (Sysinfo, Haupt-Achsen, Sheet-Legende) | **fehlt** |
+| — | `WritebackMethod::Xlsx` in der Registry | **fehlt** |
+| S4 | CLI `tools/mess_report/` | **nie begonnen** |
+| S5 | Erstbeleg-Render gegen das 26.07.-Archiv | **nie begonnen** |
+
+**Der Schnitt fuer den Bau: Fassung 1/2 ist entschieden und API-fertig -- sie wird JETZT gebaut.
+Fassung 3 (Profil als Zeitreihe) wartet auf die Blattform-Antwort und wird NICHT vorweggenommen.**
