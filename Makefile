@@ -63,7 +63,7 @@ CTEST_EXTRA ?=
 .DEFAULT_GOAL := all
 
 .PHONY: all install check installcheck uninstall clean distclean \
-        mostlyclean maintainer-clean konfiguriert help
+        mostlyclean maintainer-clean konfiguriert testdata help
 
 # -- Wache: ohne configure.sh geht nichts, und zwar LAUT -----------------------
 konfiguriert:
@@ -176,6 +176,24 @@ uninstall:
 	    rm -f -- "$(DESTDIR)$$_f" && echo "entfernt: $(DESTDIR)$$_f"; \
 	  fi; \
 	done < "$$_man"
+
+# -- testdata: projekteigenes Ziel (KEIN GNU-Standardziel) --------------------
+# Beschafft die Benchmark-Korpora (~30 GB, lazy on-demand) nach
+# Code/tests/fixtures/external/ (gitignored).
+#
+# WARUM ES DIESES ZIEL GIBT: mit dem GNU-Bauweg sind die Behelfswege unter
+# Code/tools/ entfallen -- run_all_tests.{sh,bat} und cross_compiler_matrix.sh
+# ersatzlos, denn 'make check' tut dasselbe besser. fetch_testdata ist aber KEIN
+# Test-Runner, sondern ein DATENBESCHAFFER: 'make check' ersetzt ihn nicht, und
+# ihn mit den Behelfswegen zu entfernen waere ein stiller Funktionsverlust
+# gewesen. Das Skript ist deshalb nach scripts/ umgezogen und bekommt hier sein
+# offizielles Ziel. GNU kennt projekteigene Ziele neben den Standard-Zielen.
+#
+# Ohne Argument listet es die Datensaetze, statt 30 GB zu ziehen -- ein
+# versehentliches 'make testdata' soll die Leitung nicht dichtmachen.
+TESTDATA_ARGS ?= --list
+testdata:
+	sh scripts/fetch_testdata.sh $(TESTDATA_ARGS)
 
 # -- clean / mostlyclean ------------------------------------------------------
 clean: konfiguriert

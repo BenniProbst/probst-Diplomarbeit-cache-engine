@@ -17,7 +17,7 @@
   </key_value_signature>
 
   <local_path>tests/fixtures/external/english_words/words.txt</local_path>
-  <fetch_script>tools/fetch_testdata.sh --dataset english_words</fetch_script>
+  <fetch_script>make testdata TESTDATA_ARGS="--dataset english_words"</fetch_script>
 
   <!-- #269/#244 (2026-07-07): Akte gegen die ECHTE gefetchte Datei, via offizieller Mechanik
        compute_dataset_akte (FNV-1a-64 ueber Datei-Bytes + \n-Zaehlung; kein Hand-Hash). Real files

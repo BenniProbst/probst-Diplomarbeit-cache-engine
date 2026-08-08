@@ -446,7 +446,7 @@ basis für das systematische Review.
 |---|---|---|
 | `Code/sample_data_generator/` | V21.3 | Sample-CSV-Generator |
 | `Code/test_data_xml/` | V23.X1 | Diplomarbeit-eigene Testdatensatz-XMLs |
-| `Code/tools/fetch_testdata.{sh,bat}` | V23.3 | Lazy-Download fuer ~30 GB |
+| `scripts/fetch_testdata.sh` | V23.3, 08.08.2026 nach `scripts/` verschoben | Lazy-Download fuer ~30 GB, Aufruf via `make testdata` (`Code/tools/` mit dem GNU-Bauweg entfallen) |
 | `Code/tests/fixtures/external/` | V23.3 | Daten gitignored |
 | `Code/CMakePresets.json` | V24.B | analog cache-engine V23.A |
 | `docs/termine/INDEX.md` | V25.D | Wegweiser |

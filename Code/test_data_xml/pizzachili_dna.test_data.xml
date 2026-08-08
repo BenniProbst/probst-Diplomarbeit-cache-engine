@@ -17,7 +17,7 @@
   </key_value_signature>
 
   <local_path>tests/fixtures/external/pizzachili/dna</local_path>
-  <fetch_script>tools/fetch_testdata.sh --dataset pizzachili_dna</fetch_script>
+  <fetch_script>make testdata TESTDATA_ARGS="--dataset pizzachili_dna"</fetch_script>
 
   <!-- #269/#244 (2026-07-07): Akte gegen die ECHTE (gunzip-te) Datei via compute_dataset_akte.
        Die DNA ist eine quasi-durchgaengige Sequenz (line_count = rohe \n-Bytes, semantik-agnostisch);

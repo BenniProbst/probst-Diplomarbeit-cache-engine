@@ -24,7 +24,7 @@ Pro Datensatz-Spezifikation eine XML-Datei `<name>.test_data.xml`:
   </key_value_signature>
 
   <local_path>tests/fixtures/external/sosd/books_200M_uint64</local_path>
-  <fetch_script>tools/fetch_testdata.sh --dataset sosd_books_200M</fetch_script>
+  <fetch_script>make testdata TESTDATA_ARGS="--dataset sosd_books_200M"</fetch_script>
 </comdare_test_data>
 ```
 
@@ -75,4 +75,4 @@ bleibt honest-0 bis zum fetch. Der 6er-Kanon selbst braucht ihn nicht (alle Stri
 ## Querverweis
 
 - `docs/sessions/20260514-3000-v23-layout-vorschlag.md` (Layout-Plan)
-- `tools/fetch_testdata.sh` (Download-Script, V23.3)
+- `scripts/fetch_testdata.sh` (Download-Script, V23.3; Aufruf ueber `make testdata`)

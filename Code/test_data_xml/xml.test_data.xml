@@ -20,7 +20,7 @@
   </key_value_signature>
 
   <local_path>external/comdare-cache-engine/ext/traversal/P04-CoCo-trie/CoCo-trie/dataset/dblp.xml_no_suffixes_small</local_path>
-  <fetch_script>tools/fetch_testdata.sh --dataset xml</fetch_script>
+  <fetch_script>make testdata TESTDATA_ARGS="--dataset pizzachili_xml"</fetch_script>
 
   <!-- KEINE <dataset_akte>: Datei nicht lokal — honest-0. -->
 

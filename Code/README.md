@@ -136,11 +136,18 @@ Aufruf: `cmake --preset msvc-release` + `cmake --build --preset msvc-release`.
 
 ## Hilfs-Skripte
 
-| Skript | Was |
+| Befehl | Was |
 |--------|-----|
-| `tools/run_all_tests.sh` | All-in-one Test-Runner (autodetect Build-Config) |
-| `tools/cross_compiler_matrix.sh` | Cross-Compiler-Matrix (8 Combos) |
-| `tools/fetch_testdata.sh` | Test-Daten holen |
+| `make check` (Repo-Wurzel) | Selbsttests -- der offizielle Weg (GNU Standard Target) |
+| `make testdata` (Repo-Wurzel) | Test-Daten holen; `TESTDATA_ARGS="--dataset <name>"` |
+
+> **`Code/tools/` ist am 08.08.2026 entfallen** (Owner-Ansage: der offizielle Linux-Bauweg ist
+> `configure.sh`/`make`/`make install`/`make check`). `run_all_tests.{sh,bat}` und
+> `cross_compiler_matrix.sh` sind ersatzlos weg -- `make check` tut dasselbe, und zwar
+> nachweislich: `run_all_tests.sh` suchte zuletzt drei Build-Verzeichnisse, die es nicht mehr
+> gab, und meldete trotzdem Erfolg (`TOTAL_NOT_FOUND` ging nicht in den Exit-Code ein,
+> Zeilen 191-194). `fetch_testdata.sh` ist als **Datenbeschaffer** erhalten geblieben und liegt
+> jetzt unter `scripts/`; er wird ueber `make testdata` gerufen.
 
 ## CLion
 

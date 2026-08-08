@@ -1,18 +1,25 @@
-#!/usr/bin/env bash
-# REV 7.7 V23.3 (2026-05-14) — Lazy on-demand Benchmark-Daten-Download
+#!/bin/sh
+# REV 7.7 V23.3 (2026-05-14) - Lazy on-demand Benchmark-Daten-Download
+# 08.08.2026 (GNU-Bauweg): von Code/tools/ nach scripts/ umgezogen und auf POSIX sh
+# gestellt. Aufruf jetzt ueber "make testdata" (TESTDATA_ARGS=... fuer Argumente).
+# Ein Datenbeschaffer ist KEIN Test-Runner -- "make check" ersetzt ihn nicht, deshalb
+# ist er als einziger aus Code/tools/ erhalten geblieben.
 #
 # Verwendung:
 #   ./fetch_testdata.sh --dataset <name>
 #   ./fetch_testdata.sh --list
 #   ./fetch_testdata.sh --all
 #
-# Zielordner: ../tests/fixtures/external/ (gitignored).
+# Zielordner: Code/tests/fixtures/external/ (gitignored).
 # Memory-Direktive F-EXTRA-5: KEIN Python, nur sh/bat/cmake.
 
-set -euo pipefail
+# POSIX sh: kein "-o pipefail" (bash-spezifisch, dash bricht mit
+# "Illegal option -o pipefail" ab). Das Skript nutzt keine Pipes, deren
+# Zwischenglieder fehlschlagen koennten -- curl steht jeweils allein.
+set -eu
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-FIXTURES_DIR="${SCRIPT_DIR}/../tests/fixtures/external"
+SCRIPT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+FIXTURES_DIR="${SCRIPT_DIR}/../Code/tests/fixtures/external"
 mkdir -p "${FIXTURES_DIR}"
 
 datasets_list() {
@@ -20,15 +27,21 @@ datasets_list() {
 Verfuegbare Datensaetze (V23.3):
   english_words         english-words/words.txt (4 MB, MIT)              Wormhole P07
   sosd_books_200M       SOSD books_200M_uint64 (1.6 GB, CC-BY)            P05/P06/P20
-  sosd_osm_cellids      SOSD osm_cellids_800M_uint64 (6.4 GB, CC-BY)      P11-P19
   sosd_fb               SOSD fb_200M_uint64 (1.6 GB, CC-BY)               P11-P19
   sosd_wiki_ts          SOSD wiki_ts_200M_uint64 (1.6 GB, CC-BY)          P11-P19
   pizzachili_dna        Pizza&Chili DNA (404 MB, public)                  P01/P02/P04
   pizzachili_xml        Pizza&Chili XML/DBLP (295 MB, public)             P04
   pizzachili_protein    Pizza&Chili Protein (1.18 GB, public)             P04
 
-ZU BEACHTEN (User-Auth noetig):
-  it_2004_urls          247 MB, LAW akademisch — Sign-Up auf https://law.di.unimi.it/datasets.php
+ZU BEACHTEN (NICHT automatisiert -- ein Aufruf mit diesen Namen bricht mit
+"Unbekannter Datensatz" ab, das ist gewollt und kein Defekt):
+  sosd_osm_cellids      SOSD osm_cellids_800M_uint64 (6.4 GB, CC-BY)      P11-P19
+                        Stand 08.08.2026: fuer diesen Satz ist KEINE Bezugs-DOI hinterlegt.
+                        Er stand bis heute in dieser Liste, ohne dass es ihn im case gab --
+                        die Liste versprach also etwas, das das Skript nicht konnte. Statt
+                        eine DOI zu raten, steht er jetzt dort, wo er hingehoert.
+
+  it_2004_urls          247 MB, LAW akademisch (User-Auth): Sign-Up auf https://law.di.unimi.it/datasets.php
                         manuell herunterladen + nach ${FIXTURES_DIR}/it_2004/it-2004.urls.gz
 EOF
 }
