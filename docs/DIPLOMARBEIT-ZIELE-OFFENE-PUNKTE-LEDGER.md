@@ -11571,3 +11571,71 @@ stehen und die Zeitbasis über die Threads hinweg vergleichbar sein.
 eine über die Threads synchronisierte Uhr. Für die Zerlegung je Thread genügt monoton je Prozess; für
 das Erkennen echter Gleichzeitigkeit über Threads hinweg genügt es **nicht**. Wird beim Bau entschieden
 und hier nachgetragen.
+
+---
+
+## §75 RECONCILIATION 08.08.2026 — DIE KANDIDATENLISTE WAR ZWÖLF TAGE LANG STALE
+
+Der Owner hat am 08.08. gefragt, in welchem Zustand der Abschluss-Aufräumpass ist: *„ich denke er war
+kritisch halb fertig."* **Er ist es — und zwar nicht im harmlosen Sinn „noch nicht angefangen".**
+
+### Was passiert ist
+
+§75 (Ledger `:3599`, ce-Commit `b4be362f0`, 27.07. 00:40) verlangt ausdrücklich ein **eigenes, ans Ende
+gestelltes Paket** mit ultracode VOR+NACH, granularen Commits und einem Aufrufer-Grep=0-Beweis je Fund.
+
+**Achtzehn Stunden später wurde ein Teil der Kandidaten unter ganz anderem Namen entfernt:** ce-Commit
+`813c3232` vom **27.07. 18:47:50**, *„refactor(build)!: V-4 — Permutations-Alt-Kanal retired
+(byte-neutral, ctest 318 -> 316)"*, deklariert als Hauptstrang-Auftrag V-4 — **ohne Bezug auf §75, ohne
+den §75-Prozess, und ohne dass die Kandidatenliste je nachgezogen wurde.**
+
+`grep -c '813c3232'` über diesen Ledger liefert bis heute **0**.
+
+### Der Ist-Stand, jeder Posten am Objekt geprüft (nicht aus einem Dokument geglaubt)
+
+| Kandidat aus der Liste `:3601` | Ist-Zustand | Beleg |
+|---|---|---|
+| `cmake/permutations.cmake` | **existiert nicht mehr** | `git ls-files` → 0; entfernt in `813c3232` |
+| `COMDARE_apply_simd_flags` | **entfernt** | nur noch als Kommentar: `cmake/isa_features.cmake:111` nennt selbst *„V-4 (27.07.) … hatte 0 Aufrufer"* |
+| V36.B-Kanal (Codegen-Tool-Trio) | **teil-entfernt** | drei Werkzeug-Verzeichnisse weg; `test_c3b_kanal_merge_beleg.cpp` bewusst behalten |
+| `permutations_runtime_check.hpp` | **unverändert da, aktiv inkludiert** | `Code/02_messung_driver/main.cpp:43` |
+| `_IDS`-Alias | **unverändert da**, 3× definiert, selbst als DEPRECATED beschriftet | `ce tests/unit/CMakeLists.txt:3330,3358,3386` |
+| `COMDARE_LEGACY_MESSREIHEN` | **unverändert da**, zwei aktive Zweige (data-gated, bewusst) | `main.cpp:701,718` |
+| „historisierte Auflagen-Hinweise" | **kein Objekt** — nie auf Datei/Zeile heruntergebrochen | — |
+
+Dazu die CLI-Alt-Flags `--emit-tier-ci`/`--emit-tier-cmake`, die an drei Stellen **selbst auf §75
+verweisen** (`main.cpp:359,432,537-538`) und funktional unverändert sind.
+
+### Warum das der schlechtere Zwischenzustand ist
+
+Die Liste ist **weder „alles noch da"** (dann wäre sie ein verlässliches TODO) **noch „alles weg"**
+(dann wäre §75 fertig). Sie ist eine **Mischung aus stillschweigend-erledigt und offen, ohne
+Abgleich** — und man sieht ihr nicht an, welcher Posten was ist, ohne jeden einzeln am Objekt zu
+prüfen. Genau das musste heute nachgeholt werden.
+
+**Verschärfend:** die Kandidaten liegen an **mindestens vier Orten** verstreut — dieser Haupteintrag
+`:3601`, der Nachtrag `:3710`ff., die Einzelvermerke `:3659` / `:3688` / `:6926`, und ce
+`docs/architecture/20260804-e24_g8_negativliste_gesperrte_abi_flaechen.md` Abschnitt 6, plus
+Kopf-Kommentare in einzelnen ce-Headern. **Eine zentrale, aktuelle Liste existiert nicht.**
+
+### Was daraus folgt
+
+**Kein Bau-Fehler, keine hängende Referenz** — `813c3232` war laut eigenem Byte-Beweis sauber. Der
+Schaden ist ausschließlich am *Wissen*: die Quelle der Wahrheit log zwölf Tage lang.
+
+Mit diesem Eintrag ist die Liste auf den Ist-Stand gebracht. **§75 ist damit wieder ein sauberes,
+vollständig offenes TODO** und kann als eigenes Paket gefahren werden, sobald die Owner-Bedingung
+(*„nach der Bearbeitung aller bekannten Aufgaben"*) erreicht ist.
+
+**Offener Folgeposten:** die vier verstreuten Fundorte in **eine** Kandidatenliste zusammenführen,
+damit ein künftiger Aufräumpass nicht an einer der Quellen vorbeiläuft. Das ist Doku-Arbeit, kein Bau.
+
+**Und eine Lehre, die über §75 hinausgeht:** ein Aufräum-Auftrag, der als *eigenes, gegatetes Paket*
+vereinbart ist, darf nicht nebenbei unter anderem Namen zur Hälfte ausgeführt werden. Wenn es doch
+geschieht, muss der ausführende Commit die Liste mitziehen — sonst entsteht genau dieser Zustand.
+
+### Namensklärung
+
+„V32" in der Owner-Frage ist **keine Verifikations- oder Versionszahl**, sondern der Name der
+historischen Messreihen-Familie (`Code/02_messung_driver/v32_*.hpp`). Reine Namensgleichheit mit den
+Alt-Flags — **nicht dasselbe Ding**. Wer nach „V32-Aufräumpass" sucht, sucht §75.
