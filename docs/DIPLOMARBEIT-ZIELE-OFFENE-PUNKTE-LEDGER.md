@@ -16,6 +16,99 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 08.08.2026 nachts — W-1 gelandet, und die Heilung allein hätte einen NEUEN Defekt eingebaut
+
+**W-1 / ST-CTestWache ist gelandet** (`ce 1f88cfec`, davor `7dc372c7` und `1a897c98`).
+12 Köder gefahren, 17 Befunde, davon **6 ehrlich benannte Eigenfehler des Abnahme-Agenten**.
+
+### Der schwerste Befund: die Heilung allein war nicht genug
+
+`enable_testing()` vorzuziehen macht die 27 Fälle sichtbar — **und baut dabei einen neuen Defekt
+ein**, wenn man nicht weiterschaut. Denn `comdare_tests` baut die beiden Binaries **nicht**.
+
+Belegt mit einem vom Prüfling **unabhängigen Orakel** (T-3): `ninja -t query comdare_tests` zeigt
+**0 Kanten** auf `test_commands`/`test_engine_adapters`. Im Quelltext gegengelesen: das Sammel-Target
+hängt ausschließlich an `COMDARE_TEST_TARGETS`, und diese beiden standen dort **nie**.
+
+**Folge:** In einem Baum, der nur `comdare_tests` baut, erzeugt `gtest_discover_tests` die Platzhalter
+`test_commands_NOT_BUILT` und `test_engine_adapters_NOT_BUILT` — zwei Einträge, die beim Lauf
+**fehlschlagen**. Gemessen: `ctest -N` = 431 mit *„Could not find executable
+test_commands_NOT_BUILT"*.
+
+**Die CI war nur ZUFÄLLIG gedeckt**, weil `test:unit` heute von `comdare_tests` auf `make` (all)
+umgestellt wurde. **`build:clang` baut weiterhin `comdare_tests` und wäre betroffen gewesen.**
+Geheilt per `set_property(GLOBAL APPEND PROPERTY COMDARE_TEST_TARGETS …)`; danach 0 Platzhalter,
+`ctest -N` = 456, clang übersetzt beide TUs.
+
+### Die Wache war nicht in die CI verdrahtet
+
+Gemessen über die **Grundgesamtheit aller sechs Wachen-Skripte**: `ci_diff_ascii_width_guard` 1
+Nennung · `ci_test_coverage_guard` 1 · `ci_test_coverage_manifest` 6 · `ci_xml_wellformed_guard` 1 ·
+`ci_yaml_key_guard` 3 — **`ci_test_sichtbarkeit_wache` 0**.
+
+> **Sie sah aus wie ein Werkzeug und erzwang nichts.** Genau die Prüfung 4 aus GOAL v8: die Deckung
+> war Disziplin, nicht Werkzeug. Jetzt in `test:coverage-guard` verdrahtet, im echten CI-Lauf mit
+> `rc=0` belegt.
+
+### Vier weitere Stellen derselben Klasse in der Wache selbst
+
+1. **Der SOLL-Scanner war blind für die mehrzeilige Schreibweise** — drei real registrierte Tests
+   standen überhaupt nicht im SOLL (`test_axis_registry_roundtrip` und zwei Schwestern). Ihr
+   Verschwinden hätte die Wache **nicht gemeldet**. SOLL 277 → 280.
+2. **Die IST-Erkennung war in beide Richtungen falsch**: ein gieriges `sed` griff den letzten
+   Schrägstrich *jeder* Zeile. Aus einer Testkommandozeile wurde `irgendwas.csv` statt des Binaries
+   — ein sichtbares Ziel hätte als unsichtbar gegolten (Daueralarm). Umgekehrt landeten 446 Tokens
+   in der Vergleichsmenge, die Mehrzahl kein Testbinary, jedes konnte einen gleichnamigen
+   unsichtbaren Test fälschlich decken.
+3. **Ein Tabulator-Loch in der Allowlist-Prüfung**: `cut -d' ' -f2-` gibt eine Zeile ohne Leerzeichen
+   *vollständig* zurück. Eine Zeile `name<TAB>` — Tabulator ist laut Dateikopf ein zulässiger Trenner
+   — galt damit als **begründet**. *Der stille Rückfall, gegen den die Prüfung gebaut ist, in der
+   Prüfung selbst.*
+4. **19 Registrierungen tragen ihren Namen in einer CMake-Variablen** und sind statisch nicht
+   auflösbar. Nicht durch eine schärfere Regex heilbar — es braucht eine andere SOLL-Quelle
+   (`cmake --trace`). Steht jetzt bei **jedem** Lauf als eigene Zahl in der Ausgabe:
+   **eine Lücke mit Zahl statt eines Schweigens.**
+
+### Die sechs Eigenfehler — sie gehören in den Bestand, nicht in eine Fußnote
+
+- **Gegenstand:** „sind die 27 weg?" per `grep` nach `test_commands` in der `ctest -N`-Ausgabe
+  gemessen — traf 0. Das war das benachbarte, billigere Ding: `gtest_discover_tests` registriert
+  unter GTEST-Namen, der Zielname kommt darin gar nicht vor. Aufgefallen **nur**, weil
+  „Total Tests: 456" dem eigenen Ergebnis widersprach.
+- **Zeitrichtung:** die zurückgedrehte Heilung an einem *reconfigurierten* Bestandsbaum geprüft —
+  der lieferte weiter 456, weil die Discovery-Artefakte liegen blieben. **Ein Reconfigure ist keine
+  Messung des Ausgangszustands.**
+- **`run_in_background` + `nohup … &`**: die gemeldete `exit code 0` war der Exit des *Starters*.
+- **`until ! pgrep -f '…'`** wartete auf sich selbst; **`pkill -f`** erschoss die eigene Shell.
+- **„429 → 456"** — ein Sprung über zwei Grundgesamtheiten, ausgerechnet in der Wache gegen Zahlen
+  ohne Nenner. Mit eigenem Commit präzisiert.
+
+### Zwei Betriebsbefunde von eigenem Gewicht
+
+**gitleaks erkennt ein zufällig erzeugtes AWS-Schlüsselpaar NICHT** — weder mit Projekt-Config noch
+mit Defaults, beide `rc=0`. Ein grüner Lauf ist damit **keine Aussage über AWS-förmige Secrets**.
+Der Biss ist nur mit einem Private-Key-Block belegt. Wer einen AWS-Köder zum Bissbeweis nimmt,
+bekommt ein falsches Grün über die Wache selbst.
+
+**Codex ist aus Workflow-Subagenten nicht erreichbar.** Die Kritiker-Stufe lieferte null
+Beweismaterial. Gegenprobe aus dem Top-Level-Kontext derselben Minute: Codex antwortet normal.
+Folge für die Orchestrierung: **der Lead ruft Codex selbst** und übergibt die wörtliche Ausgabe an
+den Fable-Meta-Reviewer. Ein ausgefallener Prüfer und ein Prüfer ohne Befund sind sonst
+ununterscheidbar.
+
+*Beides ist als `reference_fallen_20260808_gitleaks_aws_codex_pgrep` im Gedächtnis abgelegt.*
+
+### Das Review-Verdikt
+
+**Hält stand**, mit 2 wichtigen und 4 Randmängeln. Die zwei wichtigen:
+- Die Wache prüft **weder Frische noch Zugehörigkeit ihrer IST-Quelle** — ein stale konfigurierter
+  Baum liefert ein stale Inventar, und niemand merkt es. *(Dieselbe Zeitrichtungs-Lücke, in die der
+  Abnahme-Agent selbst gefallen war — er zog die Lehre nur für seinen eigenen Messfehler, nicht für
+  das Werkzeug.)*
+- **Die super-Schwesterstelle ist am Objekt entschieden**: die Konstellation existiert dort
+  **latent** — heute ungefährlich, aber sie wartet.
+
+---
 ## NACHTRAG 08.08.2026 nachts — A1 der Doktrin ist ueberholt (Modell-Matrix)
 
 **Beim Laden der Arbeitsweise v3.1 in den Kontext (Owner-Auftrag) gefunden:**
