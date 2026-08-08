@@ -274,6 +274,31 @@ lint:diff-hygiene:
   script:
     - sh scripts/ci_diff_ascii_width_guard.sh --seit-basis
 
+# XML-WOHLGEFORMTHEIT (2026-08-08): am 08.08. war Code/experiment_config/messreihen.xml -- das
+# Standard-Template der Messreihen -- nicht wohlgeformt, zusammen mit vier weiteren XML im ce.
+# Fehlerklasse: "--" INNERHALB eines XML-Kommentars (von XML 1.0 Abschnitt 2.5 ausnahmslos
+# verboten); hier zweimal ein CLI-Flag, das im Kommentar als Aufruf-Beispiel stand. Nichts hat es
+# gemeldet. Die vorhandene XML-Maschinerie (Code/tests/xml_canonical_utils.cmake) liest zwar ueber
+# xmllint, bedient aber GENAU ZWEI Fixture-Wachen mit fest benannten Dateien -- messreihen.xml kam
+# in ihrer Liste nicht vor. Diese Wache hat keine Liste, sie fragt git nach dem Bestand.
+# Sie loest zugleich eine dort notierte Auflage ein: xmllint war "bis heute in KEINEM CI-Job dieses
+# Repos aufgerufen", seine Praesenz auf den Runnern also unbelegt. Dieser Job ist der erste, der es
+# anfasst -- fail-closed gebaut, fehlt das Werkzeug wird er ROT (rc=2) und nennt das Paket.
+# KEIN extends: .lint-base -- der Job braucht nur git und xmllint, keine .citools-Werkzeuge.
+# KEIN .code-rules -- XML aendert sich auch in docs-only-Commits, die Wache muss immer laufen.
+lint:xml-wellformed:
+  stage: lint
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigener XML-Bestand; das ce prueft seinen in SEINER Pipeline
+  script:
+    - sh scripts/ci_xml_wellformed_guard.sh
+
 # ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
 # User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
 # lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
