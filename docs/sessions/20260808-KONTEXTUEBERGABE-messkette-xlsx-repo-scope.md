@@ -174,6 +174,18 @@ Blattform-Frage offen, und Raten hat hier schon genug gekostet.
    separat über Macro gemessen werden**: sie verbindet die Achsen-Aufrufe, überwacht sie aber nicht. Ihr
    Anteil ist *Macro-Gesamt minus Summe der Micros*. **Wer Macro aus den Micros errechnet, verliert genau
    diesen Anteil und schreibt ihn fälschlich den Achsen zu.**
+   **NACHTRAG desselben Tages** (Ledger N-1..N-7): der *Aufrufer* ist **kein Name, sondern ein Paar —
+   ein Prozess UND einer seiner Threads**. Der Thread ist systemisch ein **Visitor** über alle
+   Mess-Ebenen und bewegt sich immer von einer höheren Stufe in eine tiefere und **auf dem Stack sauber
+   zurück**. Je Aufruf gibt es **zwei Checkpoints: IN** (Interface-enter) und **OUT** (return) — als
+   **zwei Zeilen**, denn eine Zeile je *abgeschlossenem* Aufruf würde einen nie zurückkehrenden Aufruf
+   gar nicht erst schreiben, und **genau der ist die Regression**, die erkannt werden soll: *„Wenn ein
+   Thread ein Interface betritt, aber es nicht wieder verlässt, ist das eine Regression."* Mehrere
+   Threads schreiben **eingedampft ins selbe Blatt** (die Blattzahl bleibt fest), müssen aber beim Lesen
+   **je Thread zerlegbar** sein — Thread-Kennung und Zeitpunkt gehören deshalb in **jede** Zeile.
+   Und die schärfste Ortsangabe bisher: **die compare-Ebene liegt IN DER CEB, noch vor dem Prüfdock**;
+   die CEB — genauer einer ihrer Threads — ist am Prüfdock der Aufrufende einer
+   Tier-Binary-Interface-Funktion. Damit ist die Aufrufer-Kette geschlossen.
 2. **Ledger §75** — Zustand des V32-Aufräumpasses (*„kritisch halb fertig"*), Explore beauftragt, noch
    nicht gelaufen.
 3. **Der Sortier-Vollzug** — das Konsolidierungs-Dossier liegt vor (253 Dokumente zugeordnet, 115 nach
