@@ -10803,3 +10803,38 @@ die **richtige** Lizenz -- LGPL-2.1-or-later statt BSD-3/MIT -- und das ist auch
 wahre Aussage ueber den vendorierten Code. **Es besteht kein Handlungsdruck, das Profil zu entfernen.**
 Die uebrigen neun implementierten Profile stehen unter Apache-2.0/MIT/BSD/Public-Domain-artigen
 Lizenzen; dort besteht das Problem ohnehin nicht.
+
+### NACHTRAG ZUR NAMENSKOLLISION -- ICH HAETTE FAST EIN DESIGN ALS BUG GEMELDET
+Ich hatte den Agentenbefund *"Namenskollision: ein gefundener Vendor aktiviert ungewollt den
+Original-Code-Pfad"* als moegliches **Mess-Integritaetsproblem** weitergegeben. **Am Objekt
+nachgelesen ist es das nicht.**
+
+**Was ich zuerst falsch hatte** (der Agent auch, in der Richtung): er schrieb, `adapters/` laufe
+**vor** `ext/`. **Umgekehrt** -- `add_subdirectory(ext)` steht auf `CMakeLists.txt:615`,
+`add_subdirectory(adapters)` auf `:679`. Das Ergebnis bleibt gleich (`option()` respektiert einen
+bestehenden Cache-Eintrag, also gewinnt der `ext`-Wert), **aber die Begruendung war falsch herum.**
+
+**Warum es kein Bug ist:** `CMakeLists.txt:641-654` erklaert das Muster selbst und ausfuehrlich. Es
+ist **Absicht** -- snmalloc und mimalloc tragen **zwingende Compile-Belange**
+(`SNMALLOC_HEADER_ONLY_LIBRARY=1`, `-mcx16` auf x86_64, sonst bricht der Bau mit *"You must compile
+with -mcx16"*). Diese Belange muessen **jedes** Target erreichen, das die Header transitiv ueber
+`topic_allocator` zieht -- und genau dafuer werden sie per `link_libraries(comdare::vendor_snmalloc)`
+im Directory-Scope vererbt. Der Kommentar sagt woertlich:
+> *"Kein Alloc-Override (header-only, INTERFACE), inert wo snmalloc.h nicht gezogen wird."*
+
+**=> Keine Mess-Verfaelschung. Der Adapter ist bei `OFF` eine LEERE INTERFACE-Library** (er setzt
+Define und Include-Pfad nur im `if()`-Zweig), und `link_libraries` auf eine leere Interface ist inert.
+
+**Eine Praezisierung zu meiner Frage-2-Antwort:** `comdare::adapter::a03_michael_lockfree` **wird**
+sehr wohl gelinkt (`profile_facade/CMakeLists.txt:72`) -- ich hatte den Eindruck erweckt, die
+Allokator-Adapter wuerden gar nicht gelinkt. **Das aendert am Ergebnis nichts**: das Target ist bei
+`COMDARE_HAVE_MICHAEL=OFF` **leer**, und `michael.c` wird weiterhin **nirgends** als Source gefuehrt.
+**Kein LGPL-Objektcode. Die Antwort steht, die Begruendung ist jetzt genauer.**
+
+**Was als echtes Restrisiko BLEIBT:** ein **stale Cache-Eintrag**. `CACHE ... FORCE` ueberschreibt bei
+jedem Configure -- aber wenn ein Vendor spaeter **verschwindet** (Systempaket deinstalliert,
+`ext/`-Verzeichnis geleert), bleibt ein einmal auf `ON` gesetzter Eintrag im **bestehenden**
+`CMakeCache.txt` stehen, solange dieser Zweig nicht erneut durchlaufen wird. Genau das ist schon
+passiert (*"hinterliess ein stale COMDARE_HAVE_MIMALLOC=ON"*). **Die Gegenmassnahme ist kein
+CMake-Umbau, sondern eine Regel, die ohnehin gilt: fuer eine Messung ein FRISCHES Build-Verzeichnis.**
+Der Ledger fuehrt das bereits als *"Alt-Build-Dir = Gift"* (G6/J-0).
