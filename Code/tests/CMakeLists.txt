@@ -189,15 +189,23 @@ add_test(NAME test_fixture_schema_experiment_golden
 # SEMANTISCH ueber die Dialekt-Grenze hinweg: gleiche Achsen-Menge, je Achse gleiche Auspraegungen,
 # gleiches Produkt, und dieses Produkt == run_options cap BEIDER Seiten.
 # all_axes_golden.profile.xml wird ausschliesslich GELESEN (sie bleibt unangetastet, s. ihr Kopf-Block).
-# B14-NB3 (2026-08-06): PROFILE_ALLOW_COMMENT_TEXT_DEFECT -- die EINE, benannte Ausnahme.
-# all_axes_golden.profile.xml ist derzeit kein wohlgeformtes XML: in drei Kommentaren steht ein '--',
-# was XML verbietet (libxml2 lehnt die Datei komplett ab; Fundstellen bei Feststellung: Zeilen 62/64/207).
-# Der Defekt liegt AUSSCHLIESSLICH im Kommentar-TEXT -- kommentarfrei parst die Datei einwandfrei. Die
-# Datei gehoert dem ce-Submodul und steht in diesem Fenster unter der Ein-Schreiber-Regel, wird hier also
-# NICHT repariert; die Wache darf sie stattdessen kommentarfrei lesen. Die Freischaltung ist in BEIDE
-# Richtungen verriegelt: sie greift nur, wenn die Datei roh WIRKLICH scheitert und kommentarfrei WIRKLICH
-# durchlaeuft -- und sie wird FATAL, sobald die ce-Datei roh wohlgeformt ist. Sie zieht sich damit selbst
-# zurueck. ce-AUFLAGE: '--' in den drei Kommentaren beseitigen, danach diese Zeile ENTFERNEN.
+# B14-NB3 (2026-08-06) -- DIE AUSNAHME IST GEZOGEN (2026-08-08). Historie, damit nachvollziehbar
+# bleibt, warum hier einmal eine Freischaltung stand:
+# all_axes_golden.profile.xml war kein wohlgeformtes XML -- in drei Kommentaren stand ein '--', was
+# XML ausnahmslos verbietet (libxml2 lehnte die Datei komplett ab; Fundstellen damals: 62/64/207).
+# Der Defekt lag AUSSCHLIESSLICH im Kommentar-TEXT; kommentarfrei parste die Datei einwandfrei. Weil
+# die Datei dem ce-Submodul gehoert und in jenem Fenster unter der Ein-Schreiber-Regel stand, wurde
+# sie hier nicht repariert, sondern die Wache durfte sie kommentarfrei lesen -- unter der ausdruecklichen
+# Auflage, die Freischaltung nach der ce-seitigen Heilung wieder zu entfernen.
+# DIE AUFLAGE IST ERFUELLT: ce hat die drei '--' beseitigt und dabei zwei Befunde mehr gefunden, als
+# der Auftrag vorsah -- die Datei war nicht die einzige (fuenf XML in zwei Repos), und zwei der fuenf
+# werden MASCHINELL erzeugt, die Generatoren schrieben den Defekt also mit (h2_score_akte.hpp:129,
+# tools/system_axis_registry_gen/main.cpp:654). Eine reine Handkorrektur waere beim naechsten
+# Regenerieren zurueckgefallen. Seither wacht in beiden Repos scripts/ci_xml_wellformed_guard.sh
+# ueber JEDE getrackte *.xml (Job lint:xml-wellformed; Nenner ce 160/0, super 66/0).
+# Die Freischaltung war in beide Richtungen verriegelt und haette sich selbst zurueckgezogen: sie
+# wird FATAL, sobald die ce-Datei roh wohlgeformt ist. Genau das ist mit diesem Gitlink der Fall --
+# deshalb faellt die Zeile im SELBEN Commit, in dem der Gitlink gehoben wird, und keinen frueher.
 # SCRATCH_DIR: Ablage der kommentarfreien Arbeitskopie -- Build-Verzeichnis, nie der Quellbaum.
 # >120-Spalten-Wache (scripts/ci_diff_ascii_width_guard.sh): der PROFILE-Pfad unten wuerde als eine
 # einzelne "-DPROFILE=..."-Zeile 128 Byte tragen. In eine Zwischenvariable gezogen, damit CMakes
@@ -210,7 +218,6 @@ add_test(NAME test_golden_n_consistency
     COMMAND "${CMAKE_COMMAND}"
         "-DMASTER=${CMAKE_SOURCE_DIR}/test_data_xml/experiment_golden_kern.xml"
         "-DPROFILE=${_golden_profile_path}"
-        "-DPROFILE_ALLOW_COMMENT_TEXT_DEFECT=ON"
         "-DSCRATCH_DIR=${CMAKE_CURRENT_BINARY_DIR}"
         # B14-NB4 / Befund B7: der ABSOLUTE golden-Kanon. Die Wache prueft bis dahin nur RELATIV
         # (Produkt == cap == cap) und BEHAUPTETE in der Erfolgsmeldung trotzdem "golden N = 2^17".
