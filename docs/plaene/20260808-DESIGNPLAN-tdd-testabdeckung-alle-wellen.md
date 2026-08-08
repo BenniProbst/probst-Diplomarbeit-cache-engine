@@ -5,6 +5,18 @@ Posten-IDs unten: MT=Messkette-Treiber, ST=Statistik-Glied, PK=Perzentil-Kanon, 
 
 ---
 
+## VORBEMERKUNG (nachgetragen 08.08.2026 abends) — dieses Dokument ist selbst Kritik-Material
+
+**Dieser Plan ist aus Kritik entstanden, und er ist inzwischen seinerseits am Objekt geprüft worden.** Das ist keine Formalie: §0 misst, dass von **157 Behauptungen zweier Kritikstufen 40 am Objekt fielen** — rund ein Viertel. Ein Dokument, das diese Quote über *anderes* Material berichtet, unterliegt ihr selbst. Die Nachprüfung hat vier Stellen gefunden; sie stehen als **B-1…B-4 in §9**, und die Textstellen tragen den Verweis.
+
+**Annotieren, nicht löschen (Hausdoktrin „Doku wird deprecatet").** Keine widerlegte Zahl ist aus dem Fließtext entfernt worden. Die alte Zahl bleibt lesbar stehen, die neue steht in §9 **daneben** — mit ihrer **Zählweise**, ihrem **Nenner** und dem **Zustand**, in dem sie erhoben wurde. Wer nur die neue Zahl sähe, könnte nicht mehr prüfen, wie die alte entstanden ist; genau das will diese Fassung erhalten.
+
+**Was die Berichtigungen NICHT antasten.** Kein Posten der 117 fällt, keine Wellen-Zuordnung, kein Aufwand ändert sich. Betroffen sind vier *Belegzahlen*; die Sachaussagen, die sie stützen sollten, halten in drei von vier Fällen unverändert (B-1, B-3, B-4) und werden in einem Fall präzisiert (B-2).
+
+**Und die Zahlen sind ab jetzt bewacht.** §9 trägt einen maschinenlesbaren Anker-Block; `ci/plan_zahlen_wache.sh` leitet dieselben Zahlen bei jedem CI-Lauf neu aus dem Code ab und wird rot, wenn Plan und Objekt auseinanderlaufen. Der Grund steht in §9.5: dass diese Zahlen überhaupt verjähren konnten, lag daran, dass sie in Prosa standen — und **Prosa wird nicht rot**.
+
+---
+
 ## 0. Die Zahlen zuerst
 
 - **157 Behauptungen** aus zwei Kritikstufen (Codex-Kritik + erste Schärfungsstufe) gingen durch die Meta-Objektprüfung: **117 von 157 bestätigt oder geschärft** (Summe **386 h**), **40 von 157 fielen** am Objekt — **rund ein Viertel**.
@@ -14,7 +26,7 @@ Posten-IDs unten: MT=Messkette-Treiber, ST=Statistik-Glied, PK=Perzentil-Kanon, 
 
 ## 1. Warum TDD und nicht Abdeckungsprozente
 
-Der 08.08. fand fünf blockierende Defekt-Familien (D1–D5, Wellenplan §2). **Dreimal war der Test selbst der Defekt:** die Abdeckungs-Wache blieb grün gegen den korrekten 431-Baum (`guard431.log`), `test_commands.cpp:183-190` sichert Welch-`t=0, p=1` über konstanten Gruppen als Sollverhalten zu, `SummarizeEmptyZeroWinRate` zementiert `win_rate=0.0` über leerer Menge. Eine Abdeckungszahl hätte in allen drei Fällen gut ausgesehen — die Zeilen **werden** ausgeführt; sie sichern nur nichts zu. Dazu der Selbstbezug als Bauform: das CSV-Schema wird von 47 von 47 Stellen gegen seine eigene Quelle geprüft.
+Der 08.08. fand fünf blockierende Defekt-Familien (D1–D5, Wellenplan §2). **Dreimal war der Test selbst der Defekt:** die Abdeckungs-Wache blieb grün gegen den korrekten 431-Baum (`guard431.log`), `test_commands.cpp:183-190` sichert Welch-`t=0, p=1` über konstanten Gruppen als Sollverhalten zu, `SummarizeEmptyZeroWinRate` zementiert `win_rate=0.0` über leerer Menge. Eine Abdeckungszahl hätte in allen drei Fällen gut ausgesehen — die Zeilen **werden** ausgeführt; sie sichern nur nichts zu. Dazu der Selbstbezug als Bauform: das CSV-Schema wird von 47 von 47 Stellen gegen seine eigene Quelle geprüft. **[B-1 → §9: die Zahl 47 ist am Objekt mit keiner von sechs benannten Zählweisen reproduzierbar; die Sachaussage hält, die belastbare Zahl lautet 29 Aufruf-Stellen in 17 Übersetzungseinheiten.]**
 
 **Prüfnorm dieses Plans:** Ein Test zählt nur, wenn drei Dinge benannt sind — welche **Aussage** er sichert, welcher **Eingang** sie fällen würde, und **woher sein Nenner** stammt (nicht aus dem Prüfling). Abdeckung misst Berührung; wir messen **Beißfähigkeit**, und zwar mit gefahrenem Biss (K13: der Köder muss erst beißen). Tests sind Gegenstand der Kritik, nicht nur ihr Werkzeug: jede Welle nimmt ihre eigene Testseite in die Objektprüfung.
 
@@ -35,7 +47,7 @@ MT-L2 ns_per_op-Token [A W2* 5] · MT-L6 Stichprobe beide Writer [A W2 3] · MT-
 MT-L4 vier Unregistrierte+Wache [A W0a 3] · MT-L5 V32-Flag+CI-Job [A W0b 4] · ST-CTestWache 0/429 [A W-1 3] · PK-F15Frei aus if-Block [A W0b 1] · LG-HostBinder 3 Felder [A W1 5] · LG-Zeilenlimit Verwendungsstelle [B W0b 3] · AS-Bewaffnung Roundtrips==3 [A W0a 3] · PM-Outcome Teil 1/2 [B W1 4] · PM-OffZwilling [B W0b 1.5] · PM-CTZweig 2 TUs [B W1 2] · AG-Noexcept-Härtung [B W1 6] · AG-DllRoundtrip [B W2 4] · XL-L7 Limit-Aufruf [B W2 5] · XL-L10 Präfix/S00N [B W2 3] · XL-L12 Idempotenz/Degradation [B W2 3] · XL-SheetZaehler gemischt [B W2 3]
 
 **K5 test-zementiert-defekt (10, inkl. selbstreferenzielles-orakel).** Der Test schreibt das falsche Verhalten als Soll fest oder bezieht sein Orakel aus dem Prüfling. Jeder Fix muss den Alt-Test im selben Commit umschreiben, sonst ist der Baum aus zwei Gründen rot.
-MT-L3 Schema-Orakel 47/47 [A W1 5] · ST-Welch bestimmbar [A W1* 2] · ST-MWU n=1 [A W0b 2] · PK-KanonWert [A W1 4] · PK-DriftGrenz absolut [B W2 2] · LG-XlsxAlt nie vernichten [A W1 4] · LG-CsvAlt Schwester [A W0b 2] · PM-Kreuz16 Offen-Liste [B W2 2] · PM-Scaled beobachtbar [A W2* 2] · AG-PunktFixes [C W7* 2]
+MT-L3 Schema-Orakel 47/47 **[B-1]** [A W1 5] · ST-Welch bestimmbar [A W1* 2] · ST-MWU n=1 [A W0b 2] · PK-KanonWert [A W1 4] · PK-DriftGrenz absolut [B W2 2] · LG-XlsxAlt nie vernichten [A W1 4] · LG-CsvAlt Schwester [A W0b 2] · PM-Kreuz16 Offen-Liste [B W2 2] · PM-Scaled beobachtbar [A W2* 2] · AG-PunktFixes [C W7* 2]
 
 **K6 kein-test / code-ohne-test (9).** Tragender Produktionscode ohne einen einzigen Testtreffer — darunter der gewollte Mechanismus `allow_failure` und die einzige Namens-Wache am Registry-Erzeuger.
 PE-AllowFailure [A W0b 1] · PE-Startgate-Vertrag [B W1 2.5] · PM-PAPI [C W7* 3] · PM-Naht perm_runner→CSV [A W1 2] · PM-Errno Voll-Sweep [B W1 1] · PM-AmdL3 (Teil 0 sofort) [C W7* 3] · PK-QFlagWache Erstwache [B W2 5] · AS-LegacyPin [B W0b 2] · HY-ModulGrenze 4 Symbole [A W1* 8]
@@ -63,11 +75,11 @@ Gilt ab sofort für jedes Paket aller Wellen; er ergänzt V-1…V-7 des Wellenpl
 
 Drei Einfüge-Regeln gegenüber den Wellen-Etiketten des Materials (`*` im Register): **(1)** Die Landung eines Begleit-Tests folgt der Bauwelle seines Gegenstands (Wellenplan ist bindend: D4→W1, D3→W0b, D5-4→W1; Tests entstehen früher, landen atomar). **(2)** W3-MESS ist blechexklusiv (Parallelität 1) — alles, was das Material „W3-MESS" nennt, landet **bis F3**; in W3 laufen nur die Gates. **(3)** HY-A liegt in W1 — die Hybrid-Verträge (HY-Reroute, HY-ModulGrenze, HY-Ebene4a) rücken von W4 nach W1 VOR den Bau; das ist der reine TDD-Fall: null Zeilen Bestand, der Test ist die Spezifikation. Sonderfall: PM-NichtGelesen-Hardwareteil braucht die pmc:intel-Lane — prod2 ist per OV-5(b) gestrichen, der Teil geht nach W7; nur der Seam-Teil bleibt.
 
-**W-1 (Sa/So 08.–09.08.) — A: 1 Posten, 3 h.** ST-CTestWache zuerst: `enable_testing()`-Wurzelfix + Nach-Build-Wache Soll (Quelltext-Scan) gegen Ist (`ctest -N`), Differenz namentlich; ohne sie sind die neuen Welch-Tests unsichtbar. Abnahme: Köder-Unterordner beißt; Zähler vorher/nachher. Offene Divergenz am Objekt klären: Material erwartet 429→456, Wellenplan §1 zählt 428 lokal + 27 = 455 — W-1 erhebt neu, beide Nenner benennen.
+**W-1 (Sa/So 08.–09.08.) — A: 1 Posten, 3 h.** ST-CTestWache zuerst: `enable_testing()`-Wurzelfix + Nach-Build-Wache Soll (Quelltext-Scan) gegen Ist (`ctest -N`), Differenz namentlich; ohne sie sind die neuen Welch-Tests unsichtbar. Abnahme: Köder-Unterordner beißt; Zähler vorher/nachher. Offene Divergenz am Objekt klären: Material erwartet 429→456, Wellenplan §1 zählt 428 lokal + 27 = 455 — W-1 erhebt neu, beide Nenner benennen. **[B-2 → §9: erledigt. W-1 ist gelandet (super `ca901c50`, ce `1f88cfec`); die Divergenz war ein Sprung über ZWEI Grundgesamtheiten. Vier Zustände, einzeln: 429/431 frischer Configure, 456 nach dem Bau, 460 CI-Baum.]**
 
 **W0a (Mo–Mi 10.–12.08.) — A: 3 Posten, 9 h; B: 1, 5 h.** MT-L4 (vier Registrierungen, jede eine Bissprobe; rf2 sicher rot = Befund, kein allow_failure) · AS-Bewaffnung (`ctest -N -R` == 3, Configure-Köder) · HY-Label-Gate (Configure-Zeit, Substring-Nenner). Dazu wird die **rote Statistik-Suite geschrieben** (ST-Welch/MultiCompare/Diskrepanz/Export/CLITestat; Landung mit D4 in W1) — rein lokal, deckungsgleich mit der W0a-Lokalspur. Abnahme-Gate: alle Registrierungswachen mit gefahrenem Rot/Grün.
 
-**W0b (Mi–Fr, F1 14.08.; Nachlauf bis Di 18.08.) — A: 15 Posten, 40 h; B: 9, 21.5 h.** Im D3-Bogen: PE-BauTestat→PE-PruefXOR (gleicher Vorzeilen-Helfer, mit `offen=`-Erweiterung der FEHLER-Zeile im selben Paket), PE-AllowFailure, PE-Rules, PE-PMCPreflight — sie sind die Testseite von D3-4/D3-5. Statistik-Härte: ST-MWU, ST-Winsor, ST-Perzentile. XL-L11-Abbildungsfunktion VOR XL-L1-Stufe-B; XL-L1-Stufe-A (Stolperdraht) sofort. LG-CsvAlt (Messdaten nie löschen — Schwester im CSV-Backend). HY-Gleichstand (heilt die zwei Break-Even-Engines, die der Router erbt — vor jedem HY-Bau). PK-F15Frei, MT-L5 (CI-Job `COMDARE_V32_DRIVER_ENABLE=ON` im Nachlauf; entsperrt MT-L10/L12 in W4), AS-OsPin. **F1-Testlieferung: kein Zähler lügt mehr über seine eigene Menge.**
+**W0b (Mi–Fr, F1 14.08.; Nachlauf bis Di 18.08.) — A: 15 Posten, 40 h; B: 9, 21.5 h.** **[B-3 → §9: der D3-Bogen ist nicht mehr vollständig offen — D3-1 (Kern) und D3-2 sind am 08.08. gelandet (`ci/mess_ausbeute_wache.sh`, `7444d8c0`, an beiden Stationen eingehängt). Offen bleibt die Marker-Hälfte von D3-1, sie hängt an D3-7.]** Im D3-Bogen: PE-BauTestat→PE-PruefXOR (gleicher Vorzeilen-Helfer, mit `offen=`-Erweiterung der FEHLER-Zeile im selben Paket), PE-AllowFailure, PE-Rules, PE-PMCPreflight — sie sind die Testseite von D3-4/D3-5. Statistik-Härte: ST-MWU, ST-Winsor, ST-Perzentile. XL-L11-Abbildungsfunktion VOR XL-L1-Stufe-B; XL-L1-Stufe-A (Stolperdraht) sofort. LG-CsvAlt (Messdaten nie löschen — Schwester im CSV-Backend). HY-Gleichstand (heilt die zwei Break-Even-Engines, die der Router erbt — vor jedem HY-Bau). PK-F15Frei, MT-L5 (CI-Job `COMDARE_V32_DRIVER_ENABLE=ON` im Nachlauf; entsperrt MT-L10/L12 in W4), AS-OsPin. **F1-Testlieferung: kein Zähler lügt mehr über seine eigene Menge.**
 
 **W1 (Mo–Fr 17.–21.08., F2 = Freeze) — A: 23 Posten, 99 h; B: 22, 62 h. Engpass des gesamten Plans (§8).** Reihenfolge hart: **MT-L3-Schema-Orakel VOR D4d** (der einen Spaltenänderung der Woche — sonst entsteht die neue Spalte am Orakel vorbei). PK-KanonWert/PK-Kreuztest/PK-KlemmJson auf dem D5-1-Kanon (liegt seit W0a-Lokalspur), PK-DeleteP99 mit D5-4. Statistik-Trio landet mit D4a–D4c; ST-CLITestat ersetzt die `PASS_REGULAR_EXPRESSION`-Wache (Wachen-Register ##31 kennt die Klasse). **HY-Reroute-Vertrag zuerst** (Concept, `gattung_of`-Pin, `kGenusCount` — definiert HY-A), dann HY-ModulGrenze atomar mit HY-A2 (F8-DoD), HY-Ebene4a nach dem 4.-Ebenen-Entscheid Mi 19.08. Lager-Kette: LG-HostBinder → LG-SkipCallback → LG-E2Exlsx + LG-WritebackXlsx (= Definition-of-done des Task-63-Strangs), LG-XlsxAlt, LG-LoadWache, LG-Idempotenz. PM-Naht, XL-L2, XL-L4. **Abnahme F2:** Invarianz-Beweis der Statistik grün NACH Heilung, HY-Verträge compile-hart, SKIP-Zweitlauf ruft den Mess-Callback 0-mal.
 
@@ -106,3 +118,98 @@ Befund aus diesem Lauf, mit Nenner: Codex lieferte die Rohbreite über 10 Teilge
 **Kapazität (Annahme, keine Messung — zweiter [lok]-Slot der Ein-Blech-Regel):** W-1 ~6 h · W0a ~8 h · W0b+Nachlauf ~18 h · W1 ~24 h · W2 ~10 h · W3 ~4 h (Batch-Pausen) · W4 ~24 h · zwei benannte Reserve-WE ~24 h = **~118 h**. Die ~75 h eigenständiges Band A passen hinein; die verbleibenden ~100 h Paket-Testseite erhöhen aber die erste Spur, die der Wellenplan bereits mit 26 von 27 Werktagen füllt.
 
 **Die wichtigste Aussage: es passt NICHT alles — und der Engpass hat einen Namen: W1.** W1 trägt 99 h Band-A-Testarbeit in einer Woche, die schon D4/D5-Rest, Menge, HY-A und die Entwicklung der W2-Pakete enthält. W1 hält nur unter vier Bedingungen: (1) Vorziehen alles Lokalen in den W0b-Nachlauf (bis Di 18.08.), (2) die Reserve-WE 15./16.08. für die Testspur und 22./23.08. für HY-A **samt seiner Verträge** — der Wellenplan benennt letzteres nur für HY-A; dass die HY-Testverträge mitgemeint sein müssen, ist ein offener Konflikt und wird dem Owner so vorgelegt, nicht glattgerechnet; (3) Band B landet im Fenster planmäßig **gar nicht** (0 von 166.5 h eingeplant; jede gelandete B-Stunde ist Beifang eines frei gewordenen Slots); (4) TDD wird als Ersatz, nicht als Zusatz gebucht — der Test ist die Abnahme des Pakets, keine zweite Abnahme daneben. Reißt eine der vier Bedingungen, fällt zuerst Band A/W2-Randwerk (MT-L6/L7), dann XL-L1-Stufe-B auf W2 — **nie** fallen: ST-CTestWache, MT-L4, die Statistik-Begleittests, PK-KanonWert, LG-XlsxAlt/LG-CsvAlt (Messdaten nie löschen), die HY-Verträge (Owner: ALLES PFLICHT). Von 386 h Bedarf landen im Fenster somit planmäßig 206 h in 53 Posten; 179.5 h in 64 Posten gehen begründet und gezählt nach W7 — diese Zahl steht ab F1 als Zähler in jeder Wellen-Abnahme.
+---
+
+## 9. BERICHTIGUNGEN AM OBJEKT (nachgetragen 08.08.2026 abends)
+
+Nichts hier ist gelöscht. Jede berichtigte Stelle steht oben unverändert und trägt den Verweis `[B-n]`; die neue Zahl steht hier **daneben**, mit **Zählweise**, **Nenner** und **Zustand**. Alle Messungen dieses Abschnitts sind am ce-Baum **`25fe4fbf`** erhoben — das ist der Gitlink, den super HEAD führt, nicht die Arbeitskopie des Submoduls (siehe §9.5, „Die Falle, die zuerst zuschlug").
+
+### 9.1 · B-1 — „47 von 47 Stellen" ist mit keiner benannten Zählweise reproduzierbar
+
+**Die Sachaussage hält, die Zahl nicht.** Am Objekt gilt weiterhin: *jede* Stelle, die das CSV-Schema prüft, zieht ihr Soll aus dem Erzeuger `lazy_csv_header()` selbst; **null** Stellen halten ein unabhängig eingefrorenes Schema dagegen. Das ist der Kern von MT-L3 und bleibt unberührt.
+
+Die Zahl **47** ließ sich nicht herstellen. Sechs Zählweisen, jede einzeln benannt, am Baum `25fe4fbf`:
+
+| # | Zählweise | Ergebnis | Nenner |
+|---|---|---|---|
+| Z1 | Aufruf-Stellen `lazy_csv_header()` unter `tests/**/*.cpp`, **ohne** Kommentarzeilen | **29 Stellen in 17 Übersetzungseinheiten** | 450 Test-`.cpp` im Baum; 35 Rohzeilen, davon 6 Kommentar |
+| Z2 | dieselben Zeilen **mit** Kommentarzeilen | 35 in 17 | 450 |
+| Z3 | Zeilen mit dem Token `lazy_csv_header` (auch ohne Klammern) unter `tests/` | 55 in 18 | 450 |
+| Z4 | Aufruf-Stellen (ohne Kommentar) über **alle** `.cpp`/`.hpp` | 37 in 22 | 2387 |
+| Z5 | Token-Zeilen über alle `.cpp`/`.hpp` | 84 in 33 | 2387 |
+| Z6 | Token-Zeilen im **gesamten** getrackten Baum (inkl. `.md`, `.json`, CMake) | 119 in 48 | 5669 |
+
+**Keine ergibt 47.** Am nächsten liegt Z6 mit 48 — aber das sind *Dateien*, nicht *Stellen*, und es sind 48, nicht 47. Die Zahl ist damit nicht „veraltet", sondern **ohne rekonstruierbare Herkunft**; sie ist genau der Fall, den §2 als Klasse `kein-nenner` führt, im Dokument, das die Klasse definiert.
+
+**Die Zahl, die MT-L3 tragen kann, ist Z1: 29 Aufruf-Stellen in 17 Übersetzungseinheiten** — sie ist mit zwei unabhängigen Werkzeugen gleich gemessen (`git grep -F` gegen den Baum, und dateiweise `git show | grep -F`), beide Male 29/17.
+
+**Der Zähler, den MT-L3 wirklich bewegen muss, ist ein anderer und er steht bei 1:** genau *eine* Testdatei führt den Voll-Header als Literal — `tests/unit/test_lazy_resume_binary.cpp:238`, und dort ist es ein **absichtlich veraltetes** Schema (`// veraltetes Schema`, Köder für den Resume-Mismatch), **kein Orakel**. Unabhängige eingefrorene Orakel: **0 von 29**. Wenn MT-L3 landet, muss diese 1 steigen — deshalb ist sie als Anker `PZW-SCHEMA-LITERAL` bewacht.
+
+### 9.2 · B-2 — die Divergenz 429→456 / 428+27=455 ist erledigt, und sie war ein Sprung über zwei Grundgesamtheiten
+
+§4 (W-1) führte die Divergenz als offen. **Sie ist geschlossen**: W-1 ist gelandet (super `ca901c50`, ce `1f88cfec`). Der Befund ist schärfer als „eine der beiden Zahlen war falsch" — **beide Zahlen des Sprungs stammten aus verschiedenen Zuständen**. Ausgerechnet in der Wache, die Zahlen ohne Nenner verhindern soll, stand eine Zahl ohne Nenner. Die vier Zustände, einzeln, mit ihrer Bedingung:
+
+| Zahl | Zustand |
+|---|---|
+| **429** | frischer Configure, **vor** der Heilung |
+| **431** | frischer Configure, **nach** der Heilung — das ist der einzige apples-to-apples-Vergleich (`429 → 431`, **+2**: die `*_NOT_BUILT`-Platzhalter) |
+| **456** | Baum **nach dem Bau** der Binaries, also mit gelaufener gtest-Discovery |
+| **460** | CI-Baum mit `all` + Reconfigure |
+
+Damit ist auch die „431" aus §1 (`guard431.log`) eingeordnet: sie ist die Frisch-Configure-Zahl, nicht dieselbe Grundgesamtheit wie 456. Zusatzbefund aus demselben Lauf, der die Zählweise selbst betrifft: der SOLL-Scanner der Wache war **blind für die mehrzeilige `add_test(`-Schreibweise** — drei real registrierte Tests fehlten im SOLL (**277 → 280**); ihr Verschwinden wäre nicht gemeldet worden.
+
+**Regel, die daraus folgt und für jede Kopfzeile dieses Plans gilt:** ein Vorher-Nachher-Sprung muss aus **demselben** Zustand stammen. Sonst Zustände einzeln nennen.
+
+### 9.3 · B-3 — D3-1 und D3-2 sind GEFALLEN (`7444d8c0`); „NICHT GEFUNDEN" galt einem Dateinamen, nicht einer Sache
+
+Das Kritik-Material meldete D3-1 und D3-2 als **NICHT GEFUNDEN**. Das war zum Meldezeitpunkt formal richtig und in der Sache irreführend: gesucht wurde `ci/measure_csv_gate.sh` — **diese Datei hat nie existiert**. Gebaut wurde dieselbe Sache unter anderem Namen.
+
+| Posten | Stand am Objekt | Beleg |
+|---|---|---|
+| **D3-1 (Kern)** | **GEFALLEN** | `ci/mess_ausbeute_wache.sh`, Commit **`7444d8c0`**. Drei Zahlen (`N_CSV`/`N_MIT`/`SUMME` ≙ `csv_gesamt`/`csv_mit_datenzeile`/`datenzeilen_gesamt`, Z. 110–112) · `awk 'END{print NR}'` **statt** `wc -l` (Z. 95, Begründung Z. 47–50: `wc` zählt Zeilenumbrüche, eine Datei ohne Schluss-Newline meldete eine Zeile zu wenig) · **0 CSV = rot** (Z. 84–88) · `exit 2` statt Grün, wenn sie nicht prüfen konnte (Z. 42–43) |
+| **D3-1 (Marker-Hälfte)** | **OFFEN** | „rot NUR bei `modus=voll` und Z==0" ist **nicht** gebaut: `modus=voll` und `provision_only` kommen in `ci/`, `scripts/` und `.gitlab-ci.yml` **0-mal** vor. Sie hängt an **D3-7** (Lauf-Marker), das nicht gelandet ist. Die Wache entscheidet stattdessen über ihr zweites Argument (Mindest-Datenzeilen), beide Stationen übergeben `1`. |
+| **D3-2** | **GEFALLEN, vollständig** | Beide Stationen rufen den Helfer aus: `.gitlab-ci.yml:931` (`measure:smoke`) und `:1023` (`measure:golden-320`), je mit `test -x`-Vorspann (`:930`/`:1022`). Abnahmekriterium erfüllt, und beide Zustände einzeln genannt statt als Sprung: **vorher** (`7444d8c0^`) **2** Vorkommen bei 1421 Zeilen, `:822` und `:911`; **nachher** (HEAD) **0** Vorkommen bei 1539 Zeilen — beides mit `-F` gemessen (siehe B-4). Die Zeilenzahl selbst ist kein Vergleich: die Datei ist zwischen den Zuständen gewachsen. |
+
+**Der Unterschied, der hier zählt:** „gefallen" heißt, die Behauptung des Kritik-Materials trägt nicht mehr. Es heißt **nicht** „erledigt". D3-1 ist zur Hälfte offen, und diese Hälfte bleibt in W0b stehen. Ein Posten, der als erledigt abgehakt wird, weil sein Kern landete, ist genau die Klasse `anwesenheit-statt-bedingung` aus §2 — eine Ebene höher.
+
+**Und die Wache ist selbst gedeckt:** `ci/tests/mess_ausbeute_bissprobe.sh`, im CI als `test:mess-ausbeute-bissprobe` **ohne** `allow_failure`, mit `--selbstbiss` (Wegwerf-Mutanten, an denen die Probe rot werden MUSS). Das ist T-1 und T-7 am selben Gegenstand.
+
+### 9.4 · B-4 — das Abnahmekriterium von D3-2 konnte nicht fehlschlagen
+
+Das Kriterium ist im Wellenplan als `grep -c 'test -n "$(find'` == 0 notiert. **So geschrieben ist es wertlos**: das Muster enthält `$(`, und die Haus-Engine (ugrep) behandelt es ohne `-F` als Anker-Konstrukt und liefert eine **stille Null** — unabhängig davon, ob das Muster im Text steht. Ein „== 0" wäre dann kein Nachweis, dass der Defekt weg ist, sondern nur, dass das Werkzeug nicht gesucht hat.
+
+**Literal nachgemessen am 08.08.**, auf `ci/tests/mess_ausbeute_bissprobe.sh` — einer Datei mit **5 echten Vorkommen**:
+
+```
+grep -c  'test -n "$(find' <datei>   ->  0   rc=1     [STILL FALSCH]
+grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
+/usr/bin/grep -c 'test -n "$(find' <datei> -> 5   rc=0
+```
+
+**Präzisierung gegenüber `ci/tests/mess_ausbeute_bissprobe.sh:44`** (dort steht, `/usr/bin/grep` sei auf dieser Maschine ugrep): `/usr/bin/grep` ist auf prod1 **GNU grep 3.11** und liefert die richtige 5. Die stille Null entsteht am **blanken `grep`**, das in der Agenten-Shell eine Funktion ist und nach ugrep umleitet. Die CI ruft `sh` ohne diese Funktion und trifft GNU grep. **Der Befund hält, die Zuschreibung nicht** — und die Unterscheidung ist nicht kosmetisch: sie entscheidet, ob die Falle in der Pipeline lauert oder nur am Arbeitsplatz.
+
+**Kriterium in seiner gültigen Form:** `grep -cF`, und die Null gilt erst **nach einem beißenden Köder** (Datei mit gewürfelter Vorkommens-Zahl, die exakt wiedergefunden werden muss). `ci/tests/mess_ausbeute_bissprobe.sh` (Fall F10) tut das bereits.
+
+### 9.5 · Die Zahlen sind ab jetzt bewacht — und die Falle, die zuerst zuschlug
+
+**`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
+
+```
+PZW-CE-SHA         = 25fe4fbfc7751a2aa94a71bd11f89409437c74a7
+PZW-SCHEMA-STELLEN = 29
+PZW-SCHEMA-DATEIEN = 17
+PZW-SCHEMA-LITERAL = 1
+PZW-CI-AUFRUFE     = 2
+PZW-CI-ALTMUSTER   = 0
+```
+
+**Die Falle, die zuerst zuschlug — sie ist der Grund für `PZW-CE-SHA`.** Die erste Messung dieses Abschnitts lieferte **28 Stellen in 16 Dateien**. Falsch, und zwar nicht knapp: die Arbeitskopie des Submoduls lag auf **`a1d0c201`** (03.06.), während super HEAD den Gitlink **`25fe4fbf`** führt — ein Submodul-`M` kann **rückwärts** zeigen, und der Objektspeicher des Submoduls kannte den Gitlink-Commit nicht einmal. Gemessen wurde ein Zustand, den niemand behauptet hatte. Die Wache misst deshalb **nie** die Arbeitskopie, sondern immer den Baum am Gitlink-SHA, und sie bricht mit `exit 2` ab, wenn der Plan einen anderen Zustand nennt als HEAD führt. Zieht der Gitlink weiter, ist das ein Befund: **neu erheben, Fußnote nachziehen, alte Fußnote stehen lassen.**
+
+Registrierung ist Teil des Tests (T-7): die Wache hängt als `docs:plan-zahlen-wache` in `.gitlab-ci.yml`, **ohne** `allow_failure`, und ihre Bissprobe `ci/tests/plan_zahlen_probe.sh` fährt beide Richtungen — den Positiv-Fall als Nenner und gewürfelte Köder, an denen die Wache rot werden **muss**.
+
+### 9.6 · Was hier ausdrücklich NICHT gedeckt ist
+
+- **Die vier ctest-Zustände aus B-2 (429/431/456/460)** sind *nicht* maschinell bewacht. Sie brauchen einen Configure bzw. einen gebauten Baum und sind nicht in Sekunden ableitbar; ein Anker dafür wäre entweder ein Daueralarm oder eine Lüge. Ihre Deckung ist die ce-seitige Sichtbarkeits-Wache (ce `1f88cfec`), nicht dieses Dokument.
+- **Sätze ohne Zahl.** Die Wache prüft Zahlen. Eine falsche Behauptung, die keine Zahl trägt, fängt sie nicht — dagegen hilft nur §6 (Codex-Pass) und T-9.
+- **Die Aufwände (386 h, 206/166,5/13).** Sie sind Schätzungen, keine Messungen, und werden hier nicht als Objektzahlen behandelt. Ihre einzige geprüfte Eigenschaft ist die innere Konsistenz: 53+59+5 = 117 Posten, 206+166,5+13 = 385,5 h — beides stimmt, und die sieben Klassenlisten in §2 tragen tatsächlich 29/25/23/16/10/9/3 Einträge + 2 Einzelfälle = 117.
+- **Die 157/117/40 aus §0** sind nicht nachgezählt worden; sie stammen aus der Meta-Stufe und stehen hier als deren Aussage, nicht als eigene Messung.

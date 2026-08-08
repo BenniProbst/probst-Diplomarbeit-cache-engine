@@ -363,6 +363,50 @@ test:persist-sammler-probe:
   script:
     - sh ci/tests/persist_sammler_probe.sh --selbstbiss
 
+# ── W0b-8 (2026-08-08): PLAN-ZAHLEN-WACHE + ihre Bissprobe ──
+# DER BEFUND. Der TDD-Designplan trug die Zahl "das CSV-Schema wird von 47 von 47 Stellen gegen
+# seine eigene Quelle geprueft". Am Objekt war sie mit KEINER von sechs benannten Zaehlweisen
+# reproduzierbar (29/35/55/37/84/119 -- keine ergibt 47). Die Sachaussage haelt, die Zahl nicht.
+# Zwei weitere Plan-Zahlen desselben Dokuments waren ueberholt: D3-1/D3-2 galten als "NICHT
+# GEFUNDEN" und sind seit 7444d8c0 gelandet, und die Divergenz "429 -> 456" war ein Sprung ueber
+# ZWEI Grundgesamtheiten (frischer Configure gegen gebauten Baum). Berichtigt in Abschnitt 9 des
+# Plans -- annotiert, nichts geloescht.
+#
+# WARUM EINE WACHE UND NICHT NUR EINE FUSSNOTE: die Zahlen konnten verjaehren, weil sie in Prosa
+# standen, und Prosa wird nicht rot. Der Plan traegt jetzt einen maschinenlesbaren Anker-Block
+# (PZW-*); die Wache leitet dieselben Zahlen bei jedem Lauf neu aus dem Code ab. SOLL kommt aus
+# dem Dokument, IST aus dem Code -- zwei Quellen (T-3), keine wird aus der anderen abgeleitet.
+#
+# WARUM DER ce-SHA IM ANKER STEHT: beim Bau dieser Wache lag die Arbeitskopie des Submoduls auf
+# a1d0c201 (03.06.), waehrend super HEAD den Gitlink 25fe4fbf fuehrt -- die erste Messung lieferte
+# deshalb 28/16 statt 29/17. Ein Submodul-"M" kann RUECKWAERTS zeigen. Die Wache misst nie die
+# Arbeitskopie, sondern immer den Baum am Gitlink-SHA, und bricht mit exit 2 ab, wenn der Plan
+# einen anderen Zustand nennt als HEAD fuehrt. Deshalb braucht der Job die Submodule (Vorgabe
+# recursive bleibt stehen) und sonst nichts: kein Compiler, kein ccache, kein Bauverzeichnis.
+#
+# WARUM DIE PROBE MITFAEHRT (T-1/T-7): eine Wache ueber Zahlen, deren eigene Zahl niemand
+# nachrechnet, ist nur eine weitere Zahl ohne Nenner. Die Probe faehrt BEIDE Richtungen: den
+# Positiv-Fall am echten Objekt als NENNER, und acht gewuerfelte Koeder, an denen die Wache rot
+# werden MUSS. Der schaerfste (K7/K8) baut ein Wegwerf-ce-Repo mit gewuerfelter Datei- und
+# Stellenzahl und verlangt erst Gruen auf genau diese Zahlen, dann Rot bei +1 -- eine Wache, die
+# die Plan-Zahl nur zurueckspiegelt, faellt dort auf.
+#
+# WARUM KEIN allow_failure: eine advisory Wache ist die naechste stille Null (gleiche Begruendung
+# wie test:mess-ausbeute-bissprobe); die Probe prueft das ausdruecklich an diesem Job (Fall K9).
+# KEIN .code-rules: die Zahlen koennen ueber einen reinen Gitlink-Bump falsch werden, ohne dass
+# eine einzige super-Codezeile sich aendert -- genau dann muss sie rot werden.
+docs:plan-zahlen-wache:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  script:
+    - sh ci/plan_zahlen_wache.sh
+    - sh ci/tests/plan_zahlen_probe.sh
+
 # ── W0b-7 / D2-G5 (2026-08-08): HOST-KLASSEN-BERICHT + sein Selbsttest ──
 # DER BEFUND. Der Wellenplan schrieb "6 von 428 Tests registrieren sich nur auf AVX-512-Hosts".
 # Am Objekt nachgezaehlt (scripts/ci_host_klassen_bericht.sh, prod1/Zen 5, ce-Arbeitsbaum): SECHS
