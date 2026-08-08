@@ -11639,3 +11639,89 @@ geschieht, muss der ausführende Commit die Liste mitziehen — sonst entsteht g
 „V32" in der Owner-Frage ist **keine Verifikations- oder Versionszahl**, sondern der Name der
 historischen Messreihen-Familie (`Code/02_messung_driver/v32_*.hpp`). Reine Namensgleichheit mit den
 Alt-Flags — **nicht dasselbe Ding**. Wer nach „V32-Aufräumpass" sucht, sucht §75.
+
+---
+
+## OWNER-ENTSCHEID 08.08.2026 — `checkpoint_measure(..., IN|OUT)` IST **EINE** UNIFORME FUNKTION
+
+Ich hatte aus der Regressions-Invariante abgeleitet, IN und OUT müssten **zwei Zeilen** sein. Das
+Ergebnis stimmt — es sind zwei Ereignisse —, aber ich hatte es als *Blattform*-Frage behandelt. Der
+Owner hat den **Bau** dahinter festgelegt, und der ist einfacher, als meine Formulierung nahelegte:
+
+> *„Ja das ist eine inline Steuerzeile, die auf einen globalen memory stack schreiben soll, der die
+> Parameter und Zeitpunkte je der 3 Mess-Ebenen aufnimmt und zur Laufzeit dokumentiert. Das Verfahren
+> muss besonders sparsam sein, weil wir Latenzen nicht in der Messung dulden können. Ein checkpoint
+> loggt also den Aufrufenden, die gelandete Zielfunktion, die Systemzeit und alle dafür spezifischen
+> compile time Parameter der/aller Achsen zu diesem Zeitpunkt und ein checkpoint flag „IN". checkpoint
+> OUT unterscheidet sich also in der checkpoint Funktion NICHT, sondern hat nur ein compile time „OUT"
+> flag als Tag. Die Funktion für `checkpoint_measure(...,IN bzw. OUT)` ist uniform.“*
+
+### C-1 Eine Funktion, kein Paar
+
+**`checkpoint_measure(..., IN|OUT)` ist uniform.** Es gibt **nicht** `enter()` und `leave()`, sondern
+denselben Aufruf mit unterschiedlichem Tag. Zwei Zeilen im Blatt entstehen, weil der Aufruf **zweimal**
+steht — nicht, weil es zwei Funktionen gäbe.
+
+### C-2 Das Flag ist ein **compile-time** Tag
+
+`IN`/`OUT` ist **kein Laufzeit-Enum und kein Parameter, über den verzweigt wird**. Das fügt sich
+bruchlos in die Hausdoktrin *statischer Dispatch, kein `switch` zur Laufzeit* — und es hat eine
+praktische Folge: der `OUT`-Pfad darf **anders übersetzt** werden als der `IN`-Pfad (`if constexpr`),
+ohne dass im Hot-Path je ein Sprung entsteht.
+
+### C-3 Was ein Checkpoint aufnimmt
+
+| Feld | Herkunft |
+|---|---|
+| **Aufrufender** | Laufzeit (Prozess + Thread, s. Nachtrag N-1) |
+| **gelandete Zielfunktion** | die Funktion, in der der Checkpoint steht — **neu gegenüber N-1..N-7** |
+| **Systemzeit** | Laufzeit |
+| **alle spezifischen compile-time Parameter der/aller Achsen zu diesem Zeitpunkt** | **compile time** |
+| **Checkpoint-Flag** | **compile time** (`IN` \| `OUT`) |
+
+**Die Blattform bekommt damit eine Spalte dazu: *Ziel*.** Bisher war nur der *Aufrufer* benannt. Erst
+das Paar **(Aufrufer, Ziel)** macht die Zeile zu einer vollständigen Stack-Kante — der Aufrufer allein
+sagt, woher der Besuch kam, nicht wo er ankam.
+
+### C-4 Die Sparsamkeit ist die harte Randbedingung
+
+> *„Das Verfahren muss besonders sparsam sein, weil wir Latenzen nicht in der Messung dulden können.“*
+
+Das ist keine Stilfrage: **der Messfühler ist ein Verbraucher** (Elektrotechnik-Analogie, §*6 CEBs*).
+Was der Checkpoint kostet, misst er mit. Daraus folgen drei Bau-Regeln, die **zwingend** sind:
+
+1. **Die CT-Achsen-Parameter dürfen zur Laufzeit NICHT zusammengebaut oder kopiert werden.** Sie sind
+   compile-time bekannt, also gehört in den Stack **ein einziger Verweis auf einen statischen
+   Deskriptor** (Zeiger oder Index), nicht die ausgeschriebene Achsen-Kette. Wer die volle Beschreibung
+   je Checkpoint schreibt, erzeugt genau die Latenz, die verboten ist — und zwar proportional zur
+   Achsenzahl, also dort am stärksten, wo am feinsten gemessen wird.
+2. **Kein Speicher wird im Hot-Path angefordert.** Der Stack ist **vorab alloziert**, feste Kapazität.
+3. **Kein I/O im Hot-Path.** Der Stack ist *memory*; geschrieben wird erst beim Auslesen.
+
+### C-5 Zwei Spannungen, die der Bau auflösen muss (Bau-Detail, kein Owner-Entscheid)
+
+**(a) „global" + mehrere Threads + „sparsam" beißen sich.** Ein wirklich *geteilter* Stack braucht
+Synchronisation, und jede Sperre im Hot-Path ist die Latenz, die ausgeschlossen wurde — bei
+Contention sogar unbegrenzt. Der Nachtrag N-7 sagt zugleich, dass **mehrere Threads gleichzeitig und
+durcheinander** schreiben.
+**Empfehlung:** *thread-lokale* Puffer, die einen **prozessweit erreichbaren** Sammler bilden. Aus
+Sicht des Lesers bleibt es *ein globaler Stack* — genau wie beauftragt —, aber im Hot-Path schreibt
+jeder Thread unsynchronisiert in sein eigenes Stück. Die Zusammenführung geschieht **beim Auslesen**,
+wo Latenz nichts mehr kostet, und sie ist ohnehin nötig, weil die Blattform nach *Ankunftsfolge*
+sortiert (N-7).
+
+**(b) „Systemzeit" ist teurer als ein Zykluszähler.** Ein `clock_gettime` kostet über vDSO grob
+20–25 ns, ein Zykluszähler-Lesen etwa eine Größenordnung weniger. Auf der **Micro**-Ebene, wo vor und
+nach *jedem* Achsen-Aufruf ein Checkpoint sitzt, ist das der dominierende Anteil des Mess-Overheads.
+**Empfehlung:** im Hot-Path den billigen monotonen Zähler nehmen und **einmal je Lauf** gegen die
+Systemzeit ankern, damit die Zeitstempel absolut lesbar bleiben. Das beantwortet zugleich die aus
+N-7 offene Zeitbasis-Frage: *ein* Anker je Prozess macht die Stempel über Threads hinweg vergleichbar.
+**Und es ist ohnehin messbar**, welcher Weg wieviel kostet — die 6 CEBs sind genau dafür da.
+
+### C-6 Der Überlauf ist ein Befund, kein Verlust
+
+Ein vorab allozierter Stack kann volllaufen. Beide naheliegenden Auswege sind falsch: **verwerfen**
+lässt die Messung stillschweigend lügen, **blockieren** erzeugt die verbotene Latenz.
+**Also: weiterlaufen, aber den Überlauf zählen und beim Auslesen melden** — dieselbe Behandlung wie
+ein `IN` ohne `OUT` (N-6). Eine Messung mit gemeldetem Überlauf ist auswertbar; eine mit
+verschwiegenem nicht.
