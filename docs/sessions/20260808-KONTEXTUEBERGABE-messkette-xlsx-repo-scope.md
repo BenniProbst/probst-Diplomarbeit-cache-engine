@@ -163,10 +163,17 @@ Blattform-Frage offen, und Raten hat hier schon genug gekostet.
 
 ## 5. WAS BEIM OWNER LIEGT
 
-1. **Blattform fürs Mess-Profil.** Fassung 1/2 (Sheet je Unter-Achsen-Permutation, Zeile pro Ergebnis)
-   und Fassung 3 (*„zeitlich orientierter chart"*) sind **strukturell verschiedene Tabellen**. Ein Sheet
-   je Mess-Layer, Checkpoints als Zeilen, Zeit als erste Spalte — und native Excel-Charts oder reichen
-   die Zahlen?
+1. ~~Blattform fuers Mess-Profil~~ — **BEANTWORTET am 08.08.**, siehe Ledger-Nachtrag *OWNER-ENTSCHEID:
+   DIE BLATTFORM*. Kurz: **ein Sheet je FUNKTION (Macro) bzw. je ACHSE (Micro), die Aufrufe werden
+   ZEILEN** mit den Spalten *Aufrufer* und *Zeitpunkt*; darüber **ein compare-Sheet je
+   Last-Messungs-Rekombination**. Blattzahl = `1 + |Funktionen| + |Achsen|` — fest, nicht mit der
+   Lauflänge wachsend. Verbunden über **interne Hyperlinks** zum Hinabsteigen. CSV bleibt flach, mit der
+   **Ebene anführend** und dem **Zeitraum parsebar** im Namen.
+   **Zwei Folgen, die über die Blattform hinausgehen:** die Mess-Ebenen **sind** das Stack-Aufrufmuster
+   der drei Layer — die Spalte *Aufrufer* ist die Stack-Kante —, und die **Gattungs-Interface-Ebene muss
+   separat über Macro gemessen werden**: sie verbindet die Achsen-Aufrufe, überwacht sie aber nicht. Ihr
+   Anteil ist *Macro-Gesamt minus Summe der Micros*. **Wer Macro aus den Micros errechnet, verliert genau
+   diesen Anteil und schreibt ihn fälschlich den Achsen zu.**
 2. **Ledger §75** — Zustand des V32-Aufräumpasses (*„kritisch halb fertig"*), Explore beauftragt, noch
    nicht gelaufen.
 3. **Der Sortier-Vollzug** — das Konsolidierungs-Dossier liegt vor (253 Dokumente zugeordnet, 115 nach
