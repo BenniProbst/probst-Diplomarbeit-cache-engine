@@ -1,5 +1,14 @@
 # PLAN F3 / F5 / R4 / B12 UND DER ABSCHLUSS-AUFRAEUMPASS
 
+> **ZEIGER (08.08.2026): die geltende Kandidatenliste ist `20260808-KANDIDATENLISTE-75-abschluss-aufraeumpass.md`.**
+> Dieser Plan bleibt gueltig als **AP-01…AP-13-Erhebung** (die Einzel-Nachweise je AP-Posten sind dort
+> nicht wiederholt) — aber er deckt nur 13 der inzwischen **133** gefuehrten Kandidaten ab. Sein
+> eigener Posten **AP-13** („die VOLLSTAENDIGKEITS-LUECKE der Liste selbst") ist mit der zentralen
+> Liste abgearbeitet: AP-13 hatte den Befund korrekt gestellt, zwei Tage vor der Ledger-Reconciliation.
+> Ein Nachtrag aus dem Zusammenfuehren: **AP-01 (leere 3D-caption) ist ERLEDIGT** — nachgewiesen an
+> `Code/05_diagram_generator/diagram_generator.cpp` (`data.title = surface3d_title(...)`, super
+> `7969a02c`); Ledger `:6926` und das Register fuehren ihn noch als offen.
+
 > Stand 06.08.2026 abends. READ-ONLY-Erhebung, keine Code-Edits, kein Commit.
 > Jeder Posten gegen den HEUTIGEN Objektstand geprueft; jede Zahl mit Bezugsgroesse.
 > Nicht Belegbares ist als UNBELEGT gekennzeichnet.
