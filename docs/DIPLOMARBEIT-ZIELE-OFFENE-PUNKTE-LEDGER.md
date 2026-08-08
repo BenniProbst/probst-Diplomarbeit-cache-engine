@@ -16,6 +16,91 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 08.08.2026 abends — BLANKO-GO + drei Owner-Entscheide (Feierabend-Übergabe)
+
+**Der Owner hat den Tag mit einem Blanko-GO beendet und drei offene Fragen beantwortet. Alle drei
+mit vollem GO. Die dritte trägt eine vollständige Architektur-Spezifikation, die es vorher nicht gab.**
+
+### GO-0 — BLANKO-GO für alle Phasen, wörtlich
+
+> „Bitte arbeite alles autonom ab, bis du kritische Rückfragen hast und nach der Claude Code
+> Arbeitsweise keinen eigenständigen Rat hast, ansonsten direktes blanko volles GO alle zukünftigen
+> Phasen autonom abzuarbeiten…wirklich ALLE am Stück."
+
+Phasengrenzen sind damit **kein Haltepunkt mehr**. Standardzustand ist Weiterarbeiten. Die Schwelle
+für eine Rückfrage bleibt: **nicht billig rücknehmbarer Schaden** oder **teurer Umbau**. Melden ist
+nicht Fragen — Vollzüge werden gemeldet, ohne auf Antwort zu warten.
+Gedächtnis: `feedback_blanko_go_alle_phasen_autonom_am_stueck`.
+
+### GO-1 — Der Messlauf wird durchgeführt, und er ist NICHT mehrtägig
+
+> „sobald der Messlauf funktioniert, führst du ihn durch unter deiner Empfehlung wie vorgeschlagen.
+> […] Es wird auch nicht mehrtägig, der Planer hat die Aufwands-Berechnung noch nicht, daher wissen
+> wir noch gar nicht wie lange das dauert, bitte nimm es als Task nach Planung auf."
+
+**Eine Prämissen-Korrektur, die meine eigene war.** Ich hatte den Voll-Messlauf durchgehend als
+„mehrtägig" geführt und daraus Risiko und Reihenfolge abgeleitet. Der Owner stellt richtig: **die
+Dauer ist unbekannt**, weil `--check-size` noch nicht existiert. „Mehrtägig" war eine Schätzung, die
+sich als Tatsache getarnt hatte — dieselbe Klasse wie die übrigen Befunde dieses Tages.
+
+Daraus folgt hart: **`--check-size` ist Vorbedingung der Messplanung, nicht ein Posten daneben.**
+Die Dauer wird nach der Planung als eigener Task aufgenommen, mit der dann errechneten Zahl.
+
+Die Durchführung erfolgt „unter meiner Empfehlung", also **erst nach D3 und D4**: solange der
+Messlauf ein leeres Fenster als Erfolg verbucht (`.gitlab-ci.yml:885-886`) und das Drift-Gate eine
+degenerierte Messung für stabil erklärt (`drift_detector.hpp:69-72`), kann ein Lauf mit „OK" enden
+und null Messwerte hinterlassen.
+
+### GO-2 — Deploy Key, aber ortsgebunden
+
+> „Ja deploy key, aber nur im privaten ci template, das NICHT public sichtbar ist, auch nicht
+> geladen in den public Diplomarbeit repos versehentlich hinein geladen. Keys stehen im cred vault."
+
+Die Grenze verläuft am **Ort**, nicht am Wert. GitLab 286/288/289 sind `private` (am 08.08. per API
+geprüft), aber der GitHub-Spiegel ist öffentlich — alles Gespiegelte ist damit öffentlich.
+Ablage: `Cluster/_infra/ci-templates/`, per `include:` eingebunden, nie in ce/super/thesis einkopiert.
+Zweiteilung bleibt: **Deploy Key (SSH, write, keine API)** für den Push, **Token mit nur `read_api`**
+für die Job-Vollständigkeitsprüfung.
+Gedächtnis: `feedback_deploy_key_nur_privates_ci_template_nie_in_public_repos`.
+
+### GO-3 — HYBRID ist Pflicht, und es ist eine GATTUNG
+
+Auf die ausdrückliche Frage, ob das zu 0 % gebaute Hybrid-Glied bei fünf verbleibenden Freitagen
+fallen darf: **„Ist Pflicht. […] Volles GO. Alles Pflicht."** Und dazu die Spezifikation, wörtlich:
+
+> „erzeugt eine neue HEURISTIK-ADAPTER Gattung und ein Genus »Function-Interface-Reroute« denn die
+> Hybrid-Tier-Binary macht nichts anderes, als per compile time die Interfaces einer Gattung+Genus
+> zu erben und diese nach heuristischen Anforderungen (wie ein Heuristik gesteuertes Mutex) an die
+> eigentlichen Tier-Binary Interfaces durchzustellen und die Ergebnisse zu empfangen.
+> Heuristik-Tier-Binary hat eine eigene Macro-Benchmarking schicht und diese wird von den 3
+> Mess-Ebenen dann auf 4 Mess-Ebenen in diesem Fall dazwischengequetscht, sonst dasselbe Prinzip,
+> wir messen den Overhead des Hybrid-Tier-Reroutes zu multiplen Tier-binary Zielen am Hybrid-Prüfdock."
+
+**Was das auflöst:** HYBRID war bisher als undefinierte „vierte Kettenstufe" geführt, deren Inhalt
+niemand benennen konnte — der Grund, warum sie neun Dateien lang ungebaut blieb. Sie ist keine
+Sonderstufe, sondern **eine Gattung im bestehenden System**, mit eigenem Genus, eigenem Interface,
+eigener ABI. Damit gilt für sie das gesamte vorhandene Gattungs-Instrumentarium.
+
+**Und sie beantwortet den Nullbefund zur fünften Mess-Ebene teilweise:** die Hybrid-Macro-Ebene wird
+**zwischen** die bestehenden Ebenen geschoben, nicht angehängt — im Hybrid-Fall sind es vier statt
+drei. Die zuvor gesuchte „fünfte" Ebene bleibt davon unberührt und weiterhin unbelegt.
+
+**Die Verschränkung, ebenfalls wörtlich:**
+
+> „jede Gattung und Achse darf wiederum andere Gattungen aufrufen (wie SearchAlgorithm wieder
+> Container Gattung verwenden) und dasselbe gilt in diesem Fall für den Einschub der
+> Heuristik-Tier-Binary Strategie, die direkt in den SearchAlgorithm Hauptalgorithmus für eine
+> Heuristik-Hybrid-Achse als Strategieplanung, aufgerufen werden kann, welche entweder direkt zu
+> einem Tier-Binary Aufbau führt oder zu einer heuristischen Aufbauweise im Hybrid-Binary
+> mehrfach-Aufbau."
+
+**Die Heuristik-Hybrid-Achse wirkt damit auf den BAUPLAN, nicht nur auf den Bauinhalt** — ihre
+Ausprägung entscheidet, ob eine einzelne Tier-Binary entsteht oder ein Hybrid-Mehrfach-Aufbau.
+Das ist eine Achse anderer Art als alle bisherigen und muss bei `--check-size` mitgerechnet werden:
+sie multipliziert die Binary-Menge.
+Gedächtnis: `project_hybrid_heuristik_adapter_gattung_reroute_genus`.
+
+---
 ## NACHTRAG 08.08.2026 — DIE ZEHN OWNER-ENTSCHEIDE VOM 07.08.: FÜNF SIND WEG
 
 Das Board führt seit dem 07.08. *„zehn offene Owner-Entscheide"* (Erst-Anker
