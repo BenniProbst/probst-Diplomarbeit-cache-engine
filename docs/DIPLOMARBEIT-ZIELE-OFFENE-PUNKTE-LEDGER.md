@@ -11965,3 +11965,38 @@ Ich habe einen Diff gelesen, die Funktion gesehen und ihre **Verwendung angenomm
 lesen. Der Bericht an den Owner trug die falsche Beschreibung, und der Gitlink-Commit trägt sie
 dauerhaft in der Historie. **Der Commit wird nicht umgeschrieben** (nie rebase) — diese
 Richtigstellung ist der Ort, an dem der Irrtum steht.
+
+---
+
+## OWNER-KERN 08.08.2026 — EIN DEFEKT WIRD BEHOBEN, EGAL WIE GROSS
+
+> *„die Sauberkeit und Gründlichkeit steht im Zentrum der Implementierung, wenn es einen Defekt gibt,
+> egal wie groß, muss er behoben werden, bitte merke dir das."*
+
+**Anlass:** Ich hatte einem Bau-Agenten die Klausel mitgegeben *„wenn die Heilung größer wird als
+erwartet, MELDEN statt bauen"* — im Glauben, das sei die vorsichtige Haltung. Der Owner hat sie
+gestrichen.
+
+### Die Unterscheidung, auf die es ankommt
+
+| Fall | Verfahren |
+|---|---|
+| **Defekt** — etwas ist kaputt, lügt, oder hält eine Zusage nicht | **bauen**, unabhängig vom Umfang. Wird es groß: in granulare Pakete teilen und den *Plan* melden — aber bauen. |
+| **Umbau ohne Defekt** — Architektur-Umzug, Scope-Änderung, teure Migration ohne akuten Schaden | Rücksprache, wie bisher (Kategorie b aus *„Alles ist geplant"*) |
+
+**Warum die Größe kein Grund ist:** ein gemeldeter, aber nicht behobener Defekt wandert in die Abgabe.
+Die Frist zum 15.09. verkürzt sich dadurch nicht — er wird nur später teurer, und dann unter mehr
+Zeitdruck. **Ein Defekt, der nur benannt und liegen gelassen wird, ist kein Befund, sondern ein
+Rückstand.**
+
+### Was das für die Auftrags-Sprache heißt
+
+Bau-Aufträge tragen ab sofort **keine** „melden statt bauen"-Klausel mehr bei einem Defekt. Statt
+dessen: *„wenn es größer wird, teile die Arbeit in Pakete und sag mir den Plan — aber bau sie."*
+
+**Die Grenze verläuft anders als bei der Größe:** *„zu groß"* ist kein Grund mehr anzuhalten — *„die
+Doktrin bricht"* ist einer. Wer beim Heilen feststellt, dass eine Hausregel im Weg steht, legt **den
+Architektur-Entscheid** vor, nicht die Aufwandsschätzung.
+
+Fügt sich in den bestehenden Kanon: *kein Quick-Fix, keine Behelfswege, der sauberste statt des
+leichtesten Weges* — und *„die Lücke ist ein Auftrag"*.
