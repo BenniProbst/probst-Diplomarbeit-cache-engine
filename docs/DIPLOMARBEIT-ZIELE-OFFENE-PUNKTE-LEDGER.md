@@ -10838,3 +10838,94 @@ jedem Configure -- aber wenn ein Vendor spaeter **verschwindet** (Systempaket de
 passiert (*"hinterliess ein stale COMDARE_HAVE_MIMALLOC=ON"*). **Die Gegenmassnahme ist kein
 CMake-Umbau, sondern eine Regel, die ohnehin gilt: fuer eine Messung ein FRISCHES Build-Verzeichnis.**
 Der Ledger fuehrt das bereits als *"Alt-Build-Dir = Gift"* (G6/J-0).
+
+---
+
+## NACHTRAG 08.08.2026 — OWNER-KERN: DIE MESSKETTE (3 STUFEN, 6 CEBs) UND `--check-size`
+
+### DIE RUEGE, die zuerst gehoert
+> *"Rechne diese bitte NIE mehr pauschal nach"*
+
+**Mein Fehler war nicht die Zahl, sondern das Verfahren.** Ich habe mehrfach Bau-Mengen geschaetzt
+(524.288 / 917.504 / 1.572.864 …) und daraus Frist-Aussagen abgeleitet. **Der Owner kann damit nichts
+anfangen** -- und er hat recht: eine Schaetzung, die niemand nachrechnen kann, ist keine Planung.
+**Die Zahl gehoert nicht in meinen Kopf, sondern in ein Programm.**
+
+### DER BAUAUFTRAG: `cache_engine --check-size "FILE"`
+Owner verbatim:
+> *"baue in den Planer eine Ausfuehrungsflag an dessen CLI **cache_engine --check-size "FILE"**, welche
+> aus einer XML Datei wie geplant die vorraussichtliche Experiment Groesse und Dauer berechnet, indem
+> das Programm bereits auf der Zielmaschine laeuft und per Hardware-Erkennung eines zu bauenden CEB die
+> Systemeigenschaften bestimmt (ist das CEB nicht vorhanden wird es vorsorglich gebaut und dann vom
+> Planer ueber den geplanten Vertrag befragt, **die Berechnung findet ebenfalls auf der CEB statt**)."*
+
+**Vier Eigenschaften, die den Entwurf binden:** laeuft **auf der Zielmaschine** · bestimmt die
+Systemeigenschaften per **Hardware-Erkennung** · baut die CEB **vorsorglich**, wenn sie fehlt · und
+**rechnet AUF der CEB**, nicht im Planer. Der Planer *befragt* sie ueber den **geplanten Vertrag**.
+
+### WARUM DIE MENGE KLEINER IST, ALS ICH RECHNETE -- drei Gruende, alle vom Owner
+1. **Die Menge folgt NUR den in der XML FREIGEGEBENEN Einstellungen** -- *"laesst sich nur fuer die von
+   mir in der XML freigegebenen einstellungen/Algorithmen in der XML permutativ mathematisch
+   bestimmen"*. Nicht der Achsenraum ist die Menge, sondern die Freigabe.
+2. **Bau-Menge != Mess-Menge** -- *"der Auftrag vor einigen Wochen war, einen groesseren Satz an
+   binaries zu bauen, aber nur einen Teil davon durchzumessen"*.
+3. **Der FULL JOIN je Achse** -- *"Die Frist ist nicht in Gefahr, wenn wir das full join Ergebnis je
+   Achse ueber alle Achsen, zusammengelegt ueber alle betrachteten Paper beobachten."*
+
+### PAPER = EIN EXPERIMENT-XML (der Auftrag, den ich als "Kandidaten"-Frage missverstanden hatte)
+> *"Ich habe dich angewiesen eigenstaendig Paper research zu betreiben, deren exakte
+> Achsen-Konfiguration zu ermitteln und als XML aufzubereiten, dass **ein Paper genau ein
+> Experiment-XML** ist, welches wiederverwendbar bereit liegt. **Die compile time stellt aus dem
+> gesplitteten Entwurfsmuster die original binary des Paper-Experimentes wieder her**, weil uns jedes
+> Paper fuer die Achsen seine Algorithmen bereitgestellt hat, die wir jetzt per statischer
+> XML Konfiguration anfordern und durchmessen koennen. **Es gibt keine Kandidaten**, sondern nur das
+> Ermitteln der XML Einstellung um ein Paper-Experiment zu reproduzieren und dann gibt es den Nachweis
+> des **PRT-ART Prueflings** und dessen Einsetzung in die Achsen."*
+
+**Das ist die wissenschaftliche Grundfigur der Arbeit:** jedes Paper wird als sein eigenes Experiment
+**reproduziert**, und der Pruefling wird **in dieselben Achsen eingesetzt**. Meine Frage *"soll ich die
+Paper-Kopplung bauen?"* war falsch gestellt -- der Auftrag lautet nicht "koppeln", sondern
+**"je Paper die XML ermitteln"**.
+
+### DIE MESSKETTE: 3 STUFEN, 6 CEBs -- Owner verbatim, das Herzstueck
+**CHECKPOINTS (Stufe 1, Micro):**
+> *"Ein checkpoint steht immer VOR der Verwendung einer Achse und verbindet die angewendeten
+> Achsen-Parameter mit der Wallclock time VOR der Durchfuehrung des Algorithmus einer Achse, der
+> Andere Checkpoint misst die Achsen-Parameter NACH der Ausfuehrung eines Achsen-Parameters und haelt
+> den wallclock time Zeitpunkt fest"*
+
+**Stufe 2 (Macro):**
+> *"Dies gilt auch fuer die Macro-Benchmarks beim Eintritt in eine Funktion des Gattung+Genus
+> interfaces aber mit der **Akkumulation ALLER verwendeten Achsen Parameter** in der gemessenen
+> Interface-Funktion"*
+
+**Stufe 3 (combined load):**
+> *"dies gilt weiterhin als **Gesamt-Akkumulation gemischter verschiedener Zugriffsmuster** ueber einen
+> Gesamt-Last-Test der CEB gegen eine Tier-Binary ueber multiple Macro-Benchmarks -> **gestaffeltes
+> observer Setup in 3 Stufen**"*
+
+**DIE MESSFEHLER-HERAUSRECHNUNG -- die eigentliche Idee:**
+> *"Um den Messfehler herauszufiltern, der durch die Messung selbst an zusaetzlicher Latenz entsteht,
+> muss die CEB einmal gebaut werden, dass sie aus Micro/Macro/combined-Load insgesamt **3 fakultaet
+> Permutationen** an eingebauten und ausgebauten Last-Messgeraeten an CEBs erzeugt, weil sich so bei
+> einem Lauf ueber die Gesamtzeit ohne eine der 3 Messeinrichtungen jeweils der eigentliche Wert
+> **ohne Messfehler** bestimmen laesst. **Es gibt also 3 Stufen und 6 CEBS (nicht 5 das war mein
+> Fehler).**"*
+
+**Das loest meine Frage nach der "fuenften Ebene" vollstaendig auf: es sind DREI Stufen. Die Sechs sind
+3! Permutationen der Messgeraete -- eine Differenz-Messung, kein Abzaehlen von Ebenen.** Wer eine
+Einrichtung ausbaut und denselben Lauf fahren laesst, misst deren eigenen Latenz-Beitrag als Differenz.
+
+### BREAK-EVEN: SPLINE B=3, ALS STRING SERIALISIERBAR
+> *"Die Heuristik von Break even nimmt sich alle verfuegbaren Messwerte und
+> Zeitpunkt-Parameter-Checkpoints und interpoliert diese mit einer **moeglichst scharfen Spline B=3**
+> in eine mathematische Funktion, die **als String gespeichert und wieder geparst und interpretiert**
+> werden kann, um die gemessenen Werte ueber die Zeit auszudruecken. **Der erste Parameter-Messwert
+> bildet im Ausgangszustand bei 0 die Basis.**"*
+
+**Damit ist die Break-Even-Frage keine Wahl zwischen zwei vorhandenen Implementierungen mehr** --
+beide erfuellen das nicht: die eine ist monotone Hermite, die andere stueckweise linear auf festem
+256-Raster. **Gefordert ist ein kubischer B-Spline mit String-Serialisierung und Parser.**
+
+**Der Owner kuendigt eine Fortsetzung an: *"das erklaere ich aber nochmal separat"* und *"Ich erklaere
+in der naechsten Nachricht weiter"*.**
