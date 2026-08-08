@@ -11339,3 +11339,59 @@ Owner benennt.**
 
 **Der Schnitt fuer den Bau: Fassung 1/2 ist entschieden und API-fertig -- sie wird JETZT gebaut.
 Fassung 3 (Profil als Zeitreihe) wartet auf die Blattform-Antwort und wird NICHT vorweggenommen.**
+
+---
+
+## NACHTRAG 08.08.2026 — VIER OWNER-ENTSCHEIDE ZUM AUFRAEUMEN + DER GNU-BAUWEG
+
+### 1. `Code/external/20260931-overleaf-diplomarbeit` BLEIBT -- mein Befund war falsch
+Ich hatte den zweiten Thesis-Zeiger als "tot" gemeldet (das `.gitmodules` nennt ihn selbst so).
+**Owner verbatim:**
+> *"stimme ich nicht zu, weil sie **gegen remote synchronisiert genau dort liegen muss**, wenn unter
+> Ausfuehrung der CI dann das **Latex Anlagen-Ergebnis in die Arbeit committet** wird und wir gegen
+> remote syncen, um es **unter Code/external wiederzufinden**. Das bleibt also und wird als
+> **statischer Pfad** in der Diplomarbeit synchronisiert. Wenn wir **lokal laufen** sollten auf einer
+> Maschine und nicht CI (**das war gefordert beides moeglich**), dann muss sich die Diplomarbeit auf
+> der Testmaschine auch **dort ohne Netzwerk-Laufwerke lokal zusammensetzen**."*
+
+**Der Zeiger ist kein Rest, sondern ein VERTRAG:** die LaTeX-Anlage entsteht in der CI und wird dorthin
+zurueckgeschrieben; derselbe Pfad muss auf einer Einzelmaschine **ohne Netz** funktionieren.
+**Die Doppelung ist die Voraussetzung dafuer, dass CI-Lauf und Lokal-Lauf denselben Pfad sehen.**
+=> Der `.gitmodules`-Kommentar, der ihn "TOT" nennt, ist **veraltet** und gehoert richtiggestellt.
+
+### 2. LEDGER §75 -- Zustand zu ermitteln
+> *"Bitte explore dazu welchen Zustand dieser Aufraeum Pass hat, ich denke er war **kritisch halb
+> fertig**."*
+Der Code sagt an mehreren Stellen selbst, die V32-Alt-Flags *"fallen im Abschluss-Aufraeumpass,
+Ledger 75"* (`Code/02_messung_driver/main.cpp:359, :432`).
+
+### 3. `Code/tools/` SIND VERBOTENE BEHELFSWEGE -- und der offizielle Bauweg steht fest
+> *"Alte mittlerweile **verbotene** behelfswege. Das **einzige auf linux offizielle Verfahren** ist ja
+> **configure.sh/make/make install oder make check** (bitte web recherche, jedes source Projekt wird so
+> aufgebaut, bitte nachholen, **diese 3 muessen im Wurzelordner liegen**)."*
+
+**Und die Schnitt-Doktrin, die daran haengt:**
+> *"Bitte **trenne dafuer auch den aufrufenden Anwender-Code nach Super gegen die cache engine
+> Bibliothek**. **super Entscheidet mit der XML was und wie ausgewertet wird**, aber **die gesamte
+> Mechanik liegt als Framework in der Cache engine samt Planer/CEB/Tier-Binaries**. Der Anwender ruft
+> also die **CLI des Planers** auf, nachdem er sie per install kompiliert hat (**cache engine und super
+> haben diese 3 befehle und ein bauendes cmake skript**) aus source kompiliert hat."*
+
+**Damit ist die Repo-Grenze aus der Sortier-Frage beantwortet, und zwar nicht ueber Dokumente, sondern
+ueber die AUSFUEHRUNG:**
+| | UMBRELLA (super) | CACHE ENGINE |
+|---|---|---|
+| Rolle | **Anwender** | **Framework/Bibliothek** |
+| Traegt | die XML: *was* und *wie* ausgewertet wird | die gesamte Mechanik: **Planer, CEB, Tier-Binaries** |
+| Bauweg | `configure.sh` / `make` / `make install` / `make check` + bauendes CMake | dieselben drei + bauendes CMake |
+| Aufruf | ruft die **Planer-CLI** auf, nachdem er sie per `install` gebaut hat | stellt die CLI bereit |
+
+**BEIDE Repos brauchen `configure.sh`, `make`, `make install`/`make check` IM WURZELORDNER.**
+Das ist zugleich der Ersatz fuer `Code/tools/` (`run_all_tests.sh/.bat`, `cross_compiler_matrix.sh`,
+`fetch_testdata.sh/.bat`) -- **`make check` ist der offizielle Weg, nicht `run_all_tests.sh`.**
+
+### 4. `tier150_measurements.csv` -- ARCHIVIEREN
+> *"Bitte **archivieren, ist veraltet**. Wir messen den **Gesamtstrang neu**."*
+**Nicht loeschen** (Messdaten-Doktrin), sondern aus `ce/build/` heraus in ein Archiv. Sie ist damit die
+einzige getrackte Datei unter `build/`, die dort verschwindet -- und das `rm -rf build`-Risiko, das
+diese Session mehrfach beschaeftigt hat, faellt mit ihr weg.
