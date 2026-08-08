@@ -44,12 +44,16 @@ ausgewiesene Zahl von einer Messung gedeckt ist, **die älter ist als der Satz, 
 
 | Rolle | Dokument |
 |---|---|
-| **Was gebaut wird** | `docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md` — **inkl. §11 Konsolidierung** |
+| **Was gebaut wird** | `docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md` — **inkl. §11 (Erkenntnis-Konsolidierung) und §12 (Test-Kritik eingearbeitet)** |
 | **Wie geprüft wird** | `docs/plaene/20260808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md` |
 | **Wie gearbeitet wird** | `docs/ARBEITSWEISE-GESAMT-DOKTRIN.md` v3.1 |
 
 Dazu als Stand-Quelle: `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md` (Nachträge **oben**, per
 `scripts/ledger_nachtrag.sh`).
+
+**Der TDD-Vertrag T-1…T-9 ist über §12 in den Wellenplan eingearbeitet und damit bindend** — er
+ergänzt V-1…V-7 um die Testseite und wird bei jeder Wellen-Abnahme mitgeprüft. §12.5 weist den
+Kapazitätskonflikt offen aus: **W1 trägt 99 h Band A auf einer Woche, die schon voll ist.**
 Und als Erfahrungsgrundlage: `docs/sessions/20260808-SESSION-ERKENNTNISSE-widerlegte-befunde-und-learnings.md`.
 
 ## I.3 Der Rahmen — nicht verhandelbar

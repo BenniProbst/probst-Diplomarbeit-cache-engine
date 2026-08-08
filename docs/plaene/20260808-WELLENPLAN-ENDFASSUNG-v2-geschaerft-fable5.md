@@ -605,3 +605,143 @@ produziert Stellvertreter — weil Aggregation genau die Operation ist, **die Ne
 
 Daraus folgt für die sequentielle Kette (§4): je Paket gilt **Objekt vor Aggregat**. Zuerst die
 Datei, die Zeile, der Lauf — dann die Zusammenfassung. Nie umgekehrt.
+
+---
+
+# 12. DIE TEST-KRITIK, EINGEARBEITET (nachgetragen 08.08.2026 nachts)
+
+> Quelle: `docs/plaene/20260808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md`
+> (10 Teilgebiete, je Codex-Kritik + Objektgegenlesung + Fable-xhigh-Meta-Review; 21/21 Agenten).
+> **Dieser Abschnitt ändert §3 (Wellensystem), §4 (sequentielle Kette) und §6
+> (Verifikationsvertrag) — er steht nicht daneben.**
+
+## 12.1 Was die Kritik über sich selbst ergab
+
+**157 Behauptungen** aus zwei Kritikstufen durch die Meta-Objektprüfung:
+**117 bestätigt oder geschärft** (386 h) · **40 fielen am Objekt** (ein Viertel) ·
+**62 Funde hatte erst die Meta-Stufe** — weder Codex noch die erste Stufe.
+
+> **Einstufige Kritik verliert am Objekt ein Viertel ihrer Behauptungen und übersieht zusätzlich
+> einen Bestand von mehr als der Hälfte ihres Fundvolumens (62 gegen 117).**
+
+**13 der 40 Gefallenen waren Fehler der ersten Schärfungsstufe selbst** — Testentwürfe, die am
+*gesunden* Objekt rot oder am *kranken* grün gewesen wären (`P99IstNichtDasMaximum` unerfüllbar,
+falsches Winsor-Orakel bei geradem n, eine Tautologie-Schleife, zwei falsche Ganzheits-Nenner).
+**Ein Testentwurf ist eine Behauptung wie jede andere.** Dieselbe Klasse misst §11.1 an Widerrufen
+(32,5 % hielten nicht) — zwei unabhängige Läufe, dasselbe Ergebnis.
+
+## 12.2 Der TDD-Vertrag T-1…T-9 — bindend ab sofort
+
+Er **ergänzt V-1…V-7 aus §6 um die Testseite**. Jede Wellen-Abnahme prüft ihn mit.
+
+| | Regel |
+|---|---|
+| **T-1** | **ROT ZUERST** — der Test ist am ersten Tag rot ODER sein Biss ist per protokollierter Wegwerf-Mutation bewiesen. Beides fehlt = kein Test. Ebenso unzulässig: ein Test, der am gesunden Objekt nie grün werden kann (Daueralarm). |
+| **T-2** | **AUSSAGE, NICHT ANWESENHEIT** — `find()`, Existenz, Exit 0, „wirft nicht" sind keine Zusicherungen. Wert, Position, Menge, Klasse. |
+| **T-3** | **NENNER, FREMD** — jeder Test nennt seine Grundgesamtheit und bezieht sie aus einer **anderen Quelle als dem Prüfling**; `ASSERT` auf die Zahl **vor** der Schleife. |
+| **T-4** | **GEGENEINGANG** — zu jeder Zusicherung ein Eingang, bei dem sie **nicht** gilt. Ein Randfall-Test, der nur Absturzfreiheit prüft, ist keiner. |
+| **T-5** | **ORAKEL UNABHÄNGIG** — Sollwerte im Test gerechnet oder als einmalig erhobene, dann eingefrorene Literale. Nie aus der geprüften Funktion, **nie aus Kritik-Material abgeschrieben**. |
+| **T-6** | **SCHWESTERPFLICHT** — jeder Fix und jeder Test sucht im selben Zug die Schwesterstelle (beide Writer, beide Genera, beide Backends, beide Engines). Ein erheblicher Teil der 62 Meta-Funde entstand genau so. |
+| **T-7** | **REGISTRIERUNG IST TEIL DES TESTS** — ein Test existiert erst, wenn er in `ctest -N` erscheint und sein Binary im Bauweg hängt. Belegstand: 4 unregistrierte Dateien, 27 unsichtbare Fälle, F15-`if`-Block. |
+| **T-8** | **ATOMARE LANDUNG** — Tag-1-Rot lebt im Feature-Branch; auf `development` landen Test + Minimalbau **atomar**. Rot-Lauf vor und Grün-Lauf nach der Heilung sind Paketbestandteil. |
+| **T-9** | **TESTKRITIK** — die neuen Tests jeder Welle gehen in der **Folgewelle** durch einen Codex-Pass + Objektprüfung. Dreimal war der Test der Defekt; das wiederholt sich, wenn nur Produktionscode kritisiert wird. |
+
+## 12.3 Die sieben Testklassen (117 Posten)
+
+| Klasse | n | Muster |
+|---|---|---|
+| `keine-negativprobe` | 29 | Zusicherung ohne Eingang, bei dem sie fällt — der Mutant überlebt, weil nur die gesunde Seite betreten wird |
+| `anwesenheit-statt-bedingung` | 25 | geprüft wird, dass etwas **da** ist, nicht dass es **gilt** |
+| `kein-nenner` | 23 | Zahl ohne Grundgesamtheit; Teilprüfung tritt als Ganzheit auf |
+| `unerreichbarer-block` | 16 | Test existiert und läuft nie — **billigste Klasse pro Stunde** |
+| `test-zementiert-defekt` | 10 | Test schreibt falsches Verhalten als Soll fest oder bezieht sein Orakel aus dem Prüfling |
+| zwei weitere | 12 | — |
+| Einzelfälle | 2 | nach Hausregel keine Klasse |
+
+## 12.4 Die Testlast je Welle — als Bestandteil der Wellen-Abnahme
+
+Bänder: **A** = landet im Fenster · **B** = nur bei freiem Slot · **C** = W7.
+
+| Welle | Band A | Band B | Eingangs-Gate / tragender Posten |
+|---|---|---|---|
+| **W-1** | 1 Posten, **3 h** | — | **ST-CTestWache zuerst** — `enable_testing()`-Wurzelfix + Nach-Build-Wache Soll (Quelltext-Scan) gegen Ist (`ctest -N`). **Ohne sie sind alle neuen Welch-Tests unsichtbar.** |
+| **W0a** | 3 Posten, **9 h** | 1, 5 h | MT-L4 (vier Registrierungen) · AS-Bewaffnung · HY-Label-Gate. Dazu wird die **rote Statistik-Suite geschrieben** (Landung mit D4 in W1) — rein lokal. |
+| **W0b** | 15 Posten, **40 h** | 9, 21,5 h | Die Testseite von D3-4/D3-5 im D3-Bogen. **F1-Testlieferung: kein Zähler lügt mehr über seine eigene Menge.** |
+| **W1** | 23 Posten, **99 h** | 22, 62 h | **ENGPASS DES GESAMTEN PLANS.** Hart: **MT-L3-Schema-Orakel VOR D4d** — sonst entsteht die neue Spalte am Orakel vorbei. **HY-Reroute-Vertrag zuerst**, er *definiert* HY-A. |
+| **W2** | 8 Posten, **21 h** | 23, 67 h | Nur Mo/Di/Fr tragen Slots (Bau-Fenster Mi–Do exklusiv). Band A = **Kampagnen-Wahrheit**, Landung bis F3 als Teil der GO-Vorlage. |
+| **W3-MESS** | **0 h neue Testarbeit** | — | Die W0b/W2-Gates **sind** die Batch-Abend-Instrumente. Band B höchstens in Batch-Pausen, ohne Landung. |
+| **W4** | 3 Posten + HY-Ebene4b, **34 h** | 4, 11 h | HY-Kurvenlage/Ausgaenge/HonestEmpty **mit** HY-C — der Router konsumiert die HY-B-Kurven, deshalb nie früher. |
+| **W5** | — | — | Keine Test-Eingriffe; nur Nachweise (Köder-Protokolle, Nenner-Zeilen) in die Abgabe-Doku. |
+| **W7** | Band C, 5 Posten, 13 h | + alles ungelandete B | **Als gezählte Warteliste** (Start: 59 Posten, 166,5 h) — nicht als stilles Vergessen. |
+
+**Drei Einfüge-Regeln gegenüber den Wellen-Etiketten des Kritik-Materials:**
+1. Die **Landung** eines Begleit-Tests folgt der **Bauwelle seines Gegenstands** (D4→W1, D3→W0b,
+   D5-4→W1). Tests entstehen früher, landen atomar (T-8).
+2. **W3-MESS ist blechexklusiv** — alles, was das Material „W3-MESS" nennt, landet **bis F3**.
+3. **HY-A liegt in W1**, die Hybrid-Verträge rücken von W4 **vor** den Bau. Das ist der reine
+   TDD-Fall: null Zeilen Bestand, **der Test ist die Spezifikation.**
+
+## 12.5 Der Kapazitätskonflikt — offen ausgewiesen
+
+**Bedarf:** 117 Posten, 386 h. **Band A = 53 Posten, 206 h.**
+
+Davon sind **~131,5 h die Testseite bereits geplanter Bauten** und wandern in deren Paketbudgets
+(HY-Verträge 58 h → HY-A/C · Lager/xlsx 39 h → Task-63-Strang · Statistik 12 h → D4 · Perzentil
+17 h → D5 · Planer 6,5 h → D3). Davon sind **~30 h in den D-Posten-Abnahmen bereits eingepreist**
+(Überschneidungen: ST-Trio↔D4a–c · PK-DeleteP99↔D5-4 · ST-CTestWache↔D2-G1 · PE-Testate↔D3-4/D3-5).
+
+**Eigenständige neue Wachen in Band A: ~75 h.**
+
+**Kapazität** (Annahme, keine Messung — zweiter `[lok]`-Slot der Ein-Blech-Regel): W-1 ~6 · W0a ~8 ·
+W0b ~18 · W1 ~24 · W2 ~10 · W3 ~4 · W4 ~24 · zwei Reserve-WE ~24 = **~118 h**.
+
+> **Die ~75 h eigenständiges Band A passen hinein. Die verbleibenden ~100 h Paket-Testseite erhöhen
+> aber die erste Spur, die §3 bereits mit 26 von 27 Werktagen füllt.** Das ist keine Randnotiz,
+> sondern die schärfste Aussage dieses Abschnitts: **W1 trägt 99 h Band A auf einer Woche, die
+> schon voll ist.** Reißt W1, reißt der Freeze — und mit ihm die gesamte Kette dahinter.
+>
+> **Konsequenz für die Fahrweise:** In W1 gilt Band B als **nicht eingeplant** (nicht „nachrangig").
+> Wird der Freeze eng, fallen zuerst die W1-Band-B-Posten (62 h) geschlossen nach W7 — **mit Zahl im
+> Protokoll**, nicht durch Weglassen.
+
+## 12.6 Codex als stehender Kritiker — Einsatzregeln aus dem Befund
+
+**Stark, belegt:** Breite über zehn Teilgebiete · Klassenbildung · Schwesterstellen in bekannten
+Dateien. Drei Codex-Kerne, die die erste Schärfungsstufe fallen ließ, holte die Meta-Stufe zurück —
+**alle drei halten.**
+
+**Schwach, belegt:** (a) er arbeitete auf **Vorfahr-SHA `85847715`** gegen HEAD `7bcf353b` — sein
+gesamter Drift-Abschnitt war durch die D4-Heilung überholt · (b) Zeilenanker auf Nachbargegenstände
+(3 belegte Fälle in einer Datei) · (c) Ganzheits-Behauptungen an Teilmengen gemessen (nur-ce-Greps)
+· (d) Köder, die nicht beißen.
+
+**Und zur Ehrlichkeit:** die erste Schärfungsstufe war **nicht besser** — 13 eigene Entwurfsfehler
+unter den 40 Gefallenen.
+
+**Einsatzregeln:**
+1. Codex **nur auf frisch gepinntem SHA**, **beide Repos**, `tests/` **gesamt**.
+2. Sein Output ist **Kartierung, nie Zitat** — jede tragende Referenz selbst lesen. **Keine
+   Codex-Zeile und keine Codex-Zahl wandert ungeprüft in einen Test.**
+3. **Meta-Stufe ist Pflicht.** Einstufig fällt ein Viertel; die Meta-Stufe fand zusätzlich 62.
+4. **Je Welle ein Codex-Pass über die neu gebauten Tests der Vorwelle** (T-9) — dort war die
+   Ausbeute am höchsten.
+5. **Nicht einsetzen für:** Aufwandsschätzung, Wellen-Zuordnung, Owner-Entscheide. Dreimal lagen
+   seine Prioritäten quer zur Frist- und Blech-Realität.
+
+## 12.7 Was ausdrücklich NICHT getestet wird
+
+**Band C (5 Posten, 13 h, W7):** MT-L8 (stillgelegter Legacy-Pfad; MT-L6 deckt die Sach-Aussage am
+Host) · PM-PAPI (toter Zweitpfad) · PM-WinPCM (kein Windows-Runner im Fristpfad — der Windows-Zweig
+bleibt **vertragslos**) · PM-AmdL3 Teile 1–2 (braucht CAP_PERFMON-Lane; **Teil 0, die
+Kommentar-Richtigstellung, 0,2 h, sofort** — ein dokumentierter Widerspruch ist ein Defekt) ·
+AG-PunktFixes. Dazu PM-NichtGelesen-**HW** (prod2 gestrichen) — die Klebrigkeits-Heilung bleibt
+hardwareseitig unbewiesen, **der Seam-Test trägt allein**.
+
+**Band B (59 Posten, 166,5 h)** geht ungelandet **mit Zählern** nach W7. Kosten je Block, ehrlich:
+AG-Pakete (33 h) — Concept-Trennschärfe bleibt Konvention, ein gelockertes `requires` fällt erst als
+**leere CSV-Spalte** auf · XL-Härtung (31 h) — Vendor-Randfälle unbelegt, der Kern ist Band A ·
+AS-Block (17 h) — Registry-Drift wird nur von den W0a-Roundtrips gefangen, **nicht semantisch** ·
+PK-Folgeposten (19 h) — der Kanon gilt, Produzenten-Grenzen bleiben ungepinnt.
+
+**Bewusst nie getestet:** Holm/Bonferroni bei malformten p-Werten · `v32_orchestrator`-Stub ·
+alpha=1-Konstruktion · HDR-Histogramm (nur falls D5-5 „führen" entscheidet).
