@@ -1,6 +1,6 @@
 # CLAUDE CODE ARBEITSWEISE — GESAMT-DOKTRIN
 
-> **Stand:** 2026-08-06 · **Fassung:** v3 (Konsolidierung v2.1 + Verifikations-Doktrin)
+> **Stand:** 2026-08-08 · **Fassung:** v3.1 (v3 + die neun Luecken, die ein Audit gegen v3 selbst fand)
 > **Zweck:** Session-uebergreifende, langfristig bindende Arbeitsanweisung fuer alle
 > Claude-Code-Agenten dieses Projekts (Coding, Buildsystem, Infra, Diplomarbeit).
 > **Herkunft:** Owner-Auftrag 06.08.2026 — *"Bitte merge die Claude Code Arbeitsweise im
@@ -46,6 +46,45 @@ Design- und Review-Breiten sind davon **ausgenommen** (Owner-Klarstellung 02.08.
 Workflow-Tool**, nicht ueber Einzel-Agent-Starts. Modell je Phase **explizit** setzen;
 Alt-Skripte vor Re-Invoke auf die aktuelle Matrix pruefen.
 
+**WARUM DIE KANAL-REGEL TECHNISCH ZWINGEND IST (08.08.2026 — am Objekt gemessen):** das
+Top-Level-Agent-Werkzeug kennt **kein `effort`-Feld** (gemessen ueber 71 Aufrufe: nur
+`description`, `isolation`, `model`, `name`, `prompt`, `subagent_type`). Die Matrix oben
+schreibt aber Effort-Stufen vor — *"max effort"*, *"xhigh"*. **Diese Vorgaben sind auf dem
+Top-Level-Kanal weder einhaltbar noch verletzbar; sie sind dort eine Regel ohne Kanal.**
+
+Daraus folgt: **Aufgaben, fuer die die Matrix eine Effort-Stufe vorschreibt, laufen ueber das
+Workflow-Tool.** Ein Top-Level-Agent-Start ist auf Erhebungen ohne Effort-Anforderung
+beschraenkt.
+
+**`defaultModel` darf keinen gueltigen Arbeitswert tragen.** Gemessen am 08.08.: **97 von 114
+Agenten** wurden allein ueber `defaultModel` besetzt, **4 von 6 Skripten** enthielten
+`model:` ueberhaupt nicht. Eine Phase ohne explizites `model` soll beim Start **scheitern**,
+nicht stillschweigend auf den Default fallen — sonst ist *"Modell je Phase explizit"* eine
+Regel mit eingebautem Umgehungsweg.
+
+## A2.0 REIHENFOLGE (Owner-KERN 08.08.2026 — NEU)
+
+**Owner verbatim:** *"Bitte arbeite strikt nach der dokumentierten Claude Code Arbeitsweise,
+wie vereinbart. Gedaechtnis-review-explore-Design->Bauen->Verify."*
+
+    GEDAECHTNIS  ->  REVIEW  ->  EXPLORE  ->  DESIGN  ->  BAUEN  ->  VERIFY
+
+**KEIN AGENTENSTART OHNE VORAUSGEHENDEN GEDAECHTNIS-BEFUND.** Der Befund ist entweder eine
+**Fundstelle** (`memory/<datei>`, Ledger-Zeile, Session-Dokument, Architektur-Doc) **oder**
+der ausdrueckliche Satz **"GEDAECHTNIS GEPRUEFT, KEIN TREFFER: `<suchmuster>`"**.
+
+Die Stufe wird bei **jedem neu aufkommenden Thema** erneut durchlaufen, **nicht einmal je
+Session**.
+
+*Anlassfall (08.08.):* zwei Explore-Agenten auf Lagerhaltung und Resume-Weg angesetzt —
+beides vollstaendig dokumentiert, in Memory **und** Ledger **und** Architektur-Doc. Owner:
+*"Die Lagerhaltung ist bekannt, daher ist es unmoeglich, dass das jemand so bauen sollte."*
+
+**Warum diese Stufe als erste faellt und deshalb geschuetzt werden muss:** sie ist die
+einzige, die **vorne Zeit kostet und hinten nichts Sichtbares liefert**. Ein Explore-Agent
+dagegen produziert einen Bericht — er *sieht aus wie* Fortschritt. Unter Takt ist der Agent
+der bequemste Stellvertreter fuer das eigene Lesen.
+
 ## A2. Pipeline je Feature-Block
 
 Lead **plant + designt** und klassifiziert → **Opus 5 misst + stellt Geruest** →
@@ -55,6 +94,22 @@ Lead **plant + designt** und klassifiziert → **Opus 5 misst + stellt Geruest**
 **A2-PFLICHT (Owner 05.08.): DUAL-REVIEW vor JEDER Landung** — Codex **und** ein
 unabhaengiger Opus-Review. Die "Ersatz-Lens"-Klausel (ein Lens faellt aus) gilt **nur nach
 frischer Defekt-Probe im selben Fenster**, nie fortgeschrieben.
+
+**LANDUNGSKLASSEN (08.08.2026 — Praezisierung, keine Aufweichung):** die Pflicht galt
+bisher unterschiedslos fuer jede Landung, auch fuer einen Ledger-Append. Am 08.08. hat das
+dazu gefuehrt, dass sie bei **19 Landungen null Mal** eingehalten wurde — und dann bekam
+auch der **eine** echte Code-Commit keinen Lens. **Eine ueberdehnte Regel wird als Ganzes
+ignoriert.** Deshalb:
+
+| Klasse | Pflicht |
+|---|---|
+| **Code · Skript · CMake · CI-YAML** | **zwei Lenses** (Codex + unabhaengiger Opus) |
+| **Soll-Design** (`.md`, das einen Bau steuert) | **ein Lens** — es ist Ausfuehrungsgrundlage fuer Bau-Agenten |
+| reine Doku · Ledger-Nachtrag · Session-Dokument | **kein Lens** |
+| **Gitlink-Bump** | **kein Lens, aber zwei Gates:** Ancestor-Beweis **und** gruene Kind-Pipeline (s. V3) |
+
+Die Verschaerfung gegenueber vorher: fuer die erste Klasse ist die Pflicht jetzt
+**durchsetzbar**, weil sie nicht mehr an der Masse erstickt.
 
 **Truth-Check** (adversarial) bei **jedem** vermeintlichen Abschluss — auch bei Abnahmen,
 nicht nur bei Literal-Diffs. Der Truth-Check ist **Teil der Abschluss-Definition** eines
@@ -83,7 +138,20 @@ Abschnitts, nicht optionales Nachlaufen.
   **Immer MIT der repo-eigenen `.gitleaks.toml`** (ohne sie Fehlalarme auf deutschen
   Fliesstext) **UND zusaetzlich ueber den Push-INHALT** (`git log -p <remote>..HEAD`) —
   ein Scan ueber den Arbeitsbaum sieht die Commit-Historie nicht.
+  **POSITIVE ZUSICHERUNG statt blosser Fehlersuche (08.08.2026):** der Lauf ist erst gueltig,
+  wenn die **Zahl gescannter Commits der Zahl der Commits im gemessenen Bereich entspricht**.
+  `"0 commits scanned"` ist nur das auffaelligste Symptom — ein Lauf mit `--depth 3` und vier
+  eigenen Commits meldet weder Null noch einen Fehler, er meldet **zu wenig**, und nichts
+  faengt das. **`--depth` ist keine Bereichsangabe.**
+  **Zwei Kanaele, zwei Config-Regeln:** im `git`-Modus auf einem echten Klon zieht gitleaks
+  die Repo-Config **automatisch** (belegt: `using existing gitleaks config /repo/.gitleaks.toml
+  from (--source)/.gitleaks.toml`). Im **`stdin`-Modus** gibt es keinen Source-Pfad — dort ist
+  **`--config` PFLICHT**, sonst laeuft man unbemerkt auf der Default-Config.
 - **R4:** kein Push waehrend abhaengiger Pipeline (1 Patch = 1 Pipeline, seriell je Ref).
+  **AUSLEGUNG (08.08.2026, aus dem Ledger nach A3 gezogen — eine Auslegung, die man nur im
+  Ledger findet, wirkt nicht):** *seriell je Ref*. Wellen auf `dev` und `main` **desselben
+  geprueften SHA** duerfen parallel laufen. **Mehrere Pushes auf denselben Ref sind davon
+  NICHT gedeckt** — auch dann nicht, wenn sie disjunkte Dateien betreffen.
 - **R6:** keine lokalen Vollbauten waehrend Host-CI; buildfreie Verifikation wo moeglich.
 - **Git universell:** NUR MERGE, **kein Rebase** · Commits nie droppen · **kein `git add -A`**
   (immer explizite Pfade) · Doku nie loeschen (`git mv`) · Messdaten nie loeschen ·
@@ -171,6 +239,13 @@ entscheidbar"** sind **Arbeitsauftraege an mich**, keine Statusmeldungen.
    was sagt Planung/Ledger, was ist der Ist-Stand, was ist zu tun, welcher Biss belegt es,
    was ist Bau und was ist Owner-Entscheid. Ergebnis: **ohne Rueckfrage ausfuehrbare
    Bau-Anweisung**. (b) **Bau MIT Verifikation** im selben Lauf.
+   **KORREKTUR 08.08.2026 zu (a):** der Halbsatz *"was sagt Planung/Ledger"* hat den
+   Bestands-Stand bisher **an den Agenten delegiert** — und damit genau das vorgeschrieben,
+   was A2.0 verbietet. **Der Ledger-/Planungs-/Memory-Stand ist VOR dem Auftrag vom Lead zu
+   erheben und dem Agenten als Befund MITZUGEBEN.** Der Agent **prueft ihn am Objekt gegen,
+   er ermittelt ihn nicht.** Ein Explore-Auftrag ohne mitgegebenen Gedaechtnis-Befund ist
+   unfertig — er muss die Frage beantworten: *"Wo habe ich schon nachgesehen, und was stand
+   dort nicht?"*
 2. **Fehlt ein Werkzeug: Alternative suchen**, nicht die Grenze melden. (Ein fehlendes
    `pdftotext` ist kein Grund, eine PDF-Pruefung offenzulassen — `gs -sDEVICE=txtwrite`,
    `mutool`, `qpdf`, oder ein selbst geschriebener Stream-Parser tun es auch.)
@@ -188,6 +263,19 @@ entscheidbar"** sind **Arbeitsauftraege an mich**, keine Statusmeldungen.
 
 **Jedes ungeprueft gelassene Glied kostet die Arbeit.** Nach der Landung den **Endzustand**
 messen, nicht den Anfangszustand melden.
+
+**WANN main-FF FAELLIG IST (08.08.2026 — das fehlende Abgrenzungskriterium):** V3 verlangt
+main-FF *je Landung*, die Gitflow-Doktrin nennt *dev voraus* den Normalzustand. Ohne
+Kriterium ist mit dem Dokument allein **nicht entscheidbar**, ob ein Tag 19 Verstoesse
+enthaelt oder null — und ein solcher Punkt entzieht sich jedem Audit und jedem Vorsatz.
+
+**Kriterium:** main-FF wird faellig, **sobald ein PAKET als abgeschlossen gilt** — erkennbar
+an einem von dreien: Owner-Meldung, Ledger-Abschluss, oder **gruene Zweit-Repo-Pipeline**.
+**Zwischen** Paketen ist *dev voraus* der Normalzustand, und dann ist kein FF faellig.
+
+**Und der FF geht auf den BELEGT gruenen Stand, nicht auf den neuesten.** Eine gruene
+Pipeline mit drei Jobs (weil `changes:`-Gates den entscheidenden Job uebersprungen haben)
+ist **kein** Beleg — vor dem FF die **Jobliste** ansehen, nicht den Gesamtstatus.
 
 *Anlassfaelle:* ein Paket gepusht und bei Schritt 1 aufgehoert — die Zweit-Repo-Pipeline
 misst dann Code, den niemand mehr faehrt · nach einer Landung nicht geprueft, ob die
@@ -305,6 +393,43 @@ der erste Kandidat fuer die naechste Pruefung.**
 Arbeit — er gehoert genauso dokumentiert wie ein bestaetigter, sonst kehrt er beim naechsten
 Suchlauf zurueck und jemand baut, was nicht gebaut werden muss.
 
+## V11. Die Belegzeile — die Messung muss AELTER sein als der Satz (NEU 08.08.2026)
+
+**V1 deckt Agentenberichte, V6.6 die Gate-Nennung — aber keine Regel verlangte bisher, dass
+die Belegausgabe VOR der Aussage im Protokoll steht.** Genau daran ist am 08.08. die Mehrzahl
+der Fehler gescheitert: **alle** Messungen existierten, sie kamen nur **zu spaet**.
+
+**Die Regel:** jeder Zustandssatz an den Owner oder in einen Commit-Text traegt die
+**Kommandoausgabe, auf die er sich stuetzt, im selben Block** — oder den ausdruecklichen
+Marker **"aus Bericht, nicht nachgemessen"**.
+
+> **Eine Messung, die nach der Aussage erfolgt, ist eine KORREKTUR, kein Beleg.**
+
+**Warum das die wirksamste Einzelregel ist (gemessen am 08.08.):** wo der Truth-Check
+**vorher** lief, fing er **4 von 4** (ein abgebrochener `git add`, eine falsche
+GELANDET-Meldung, eine falsche Heilungsbeschreibung, eine Koeder-Gegenprobe). Wo er nachlief,
+war die falsche Aussage **sechsmal** bereits beim Owner, einmal schon im Commit-Text, einmal
+schon in der CI (ein Repo 43 Minuten rot). **Die Pruefung trifft praktisch immer — sie kommt
+nur zu spaet.** V11 verschiebt sie um genau eine Position nach vorn.
+
+**Die Figur, die V11 unterbindet** (V0 eine Ebene konkreter): *der naechstliegende
+Stellvertreter wird fuer den Gegenstand genommen.* Elf Belege an einem Tag, alle nach
+demselben Schnittmuster:
+
+| gefragt war | genommen wurde |
+|---|---|
+| Was tut die Funktion? | der Diff ihrer **Verwendung** |
+| Ist die Pipeline gruen? | der **Gesamtstatus** statt der Jobliste |
+| Hat gitleaks etwas geprueft? | `rc=0` statt der Zeile *"N commits scanned"* |
+| Was steht im Commit? | die **SHA** statt `git show --stat` |
+| Stimmt die Testzahl? | der **Agentenbericht** statt eines eigenen `ctest` |
+| Was ist bereits entschieden? | ein **Explore-Agent** statt des Gedaechtnisses |
+| Was misst diese Pipe? | `$?` statt `PIPESTATUS` |
+
+**Jeder Stellvertreter ist billig, benachbart und plausibel.** Keiner ist Faulheit; jeder
+beantwortet eine Frage, die der eigentlichen sehr aehnlich sieht. Genau deshalb faellt die
+Vertauschung nicht auf — **sie faellt erst auf, wenn man den Gegenstand doch noch anfasst.**
+
 ---
 
 # TEIL B — SESSION-SPEZIFISCHE ERWEITERUNGEN
@@ -341,6 +466,13 @@ Suchlauf zurueck und jemand baut, was nicht gebaut werden muss.
 - **Kernauftrag:** Cache-Engine-EXPERIMENT-SYSTEM top-down honest-100%.
 - **SSOT/Ledger:** `docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md` (Nachtraege
   **rueckwaerts**, neueste oben).
+  **MECHANISMUS (08.08.2026): `sh scripts/ledger_nachtrag.sh <datei|->`. `cat >>` auf den
+  Ledger ist VERBOTEN.** Die Regel "neueste oben" beschrieb bisher nur eine **Eigenschaft** —
+  am 08.08. gingen **alle sieben** Nachtraege per `cat >>` ans Dateiende, wo sie bei 12.167
+  Zeilen niemand findet. *Eine Eigenschaft muss man sich merken, einen Einfuegepunkt nicht.*
+  Das Skript bestimmt den Einfuegepunkt (erste Zeile nach dem Kopf-Block — der Kopf waechst,
+  eine feste Zahl waere die naechste Falle), prueft die Zeilenzahl **vor** dem Ersetzen und
+  laesst den Ledger sonst unangetastet.
 - **Lead-only-Hotspots (nie parallel):** der Ledger (append-only, **Ein-Schreiber** — zwei
   gleichzeitige Nachtraege kollidieren garantiert am Dateiende) · `.gitlab-ci.yml` beider
   Repos · `tests/unit/CMakeLists.txt` · golden-/TABU-Artefakte.
@@ -398,3 +530,23 @@ Suchlauf zurueck und jemand baut, was nicht gebaut werden muss.
   gemessenen Betriebsrezepte ergaenzt (gitleaks mit Repo-Config **und** Push-Inhalt,
   `grep`-Shell-Funktion, `PIPESTATUS`, Ein-Schreiber-Regel fuer Worktrees, Bahn-Obergrenze
   bei Landungen, Codex-git-Haenger). B.3 um die Owner-KERNe der Mess-Kette erweitert.
+
+- **v3.1** (2026-08-08, Diplomarbeit-Session, Owner-Freigabe *"Alle Punkte, die du mir
+  uebertraegst gebe ich autonom frei. Volles GO dafuer."*): **neun Luecken geschlossen, die
+  ein Audit gegen v3 selbst gefunden hat** — 136 Regeln erfasst, 100 am Objekt geprueft,
+  52 verletzt. Neu bzw. praezisiert:
+  **A2.0 REIHENFOLGE** (Gedaechtnis -> Review -> Explore -> Design -> Bauen -> Verify; kein
+  Agentenstart ohne Gedaechtnis-Befund) · **A2 Landungsklassen** (die undifferenzierte
+  Dual-Review-Pflicht war ueberdehnt und wurde deshalb als Ganzes ignoriert) ·
+  **A1 Kanal-Regel technisch begruendet** (das Top-Level-Agent-Werkzeug hat kein
+  `effort`-Feld — gemessen ueber 71 Aufrufe) und **`defaultModel` ohne gueltigen Arbeitswert**
+  (97 von 114 Agenten liefen ueber den Default) · **A3 gitleaks positive Zusicherung**
+  (N == Commits im Bereich; `--depth` ist keine Bereichsangabe) und **stdin-Modus braucht
+  `--config`** · **A3 R4-Auslegung aus dem Ledger nach A3 gezogen** · **V2.1(a) korrigiert**
+  (der Halbsatz *"was sagt Planung/Ledger"* delegierte das Gedaechtnis-Lesen an den Agenten —
+  also genau das, was A2.0 verbietet) · **V3 main-FF-Faelligkeitskriterium** (ohne es war
+  nicht entscheidbar, ob ein Tag 19 Verstoesse enthaelt oder null) · **V11 Belegzeile NEU**
+  (die Messung muss aelter sein als der Satz) · **B.3 `scripts/ledger_nachtrag.sh`**,
+  `cat >>` verboten.
+  **Der Anlass war zur Haelfte eine Vertragsluecke:** die vom Owner genannte Sequenz stand
+  gar nicht im Dokument, und V2.1(a) schrieb das Gegenteil vor.
