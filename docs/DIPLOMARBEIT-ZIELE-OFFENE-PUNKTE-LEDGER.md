@@ -10746,3 +10746,60 @@ das Bau und Messung von beiden Maschinen UND aus der CI erreichen.
 **Die 8 TB passen. Der D-2-Zahlenkonflikt (131.072 / 524.288 / 917.504 / 1.572.864 / 2.097.152) ist
 damit KEINE Platzfrage mehr** -- selbst 524.288 Binaries a ~0,44 MB (~224 GB) sind gegen 15 T
 unkritisch. Was bleibt, ist die **Zeitfrage** und die Frage, welche Menge die Thesis BRAUCHT.
+
+---
+
+## NACHTRAG 08.08.2026 — FRAGE 2 BEANTWORTET: A03/LGPL IST IN KEINEM BAU AKTIV (dreifach blockiert)
+
+### DIE ANTWORT
+**`michael_lockfree` (A03, LGPL-2.1-or-later) ist in KEINEM Bau aktiv** -- weder im lokalen ctest-Bau
+noch in einem der 21 CI-Jobs noch im materialisierten 320er-Golden noch in der 2^17-Referenz.
+**Kein LGPL-Objektcode landet in einem Abgabe-Artefakt.** Drei **unabhaengige** Blocker, alle vom
+Lead selbst am Objekt nachgeprueft:
+
+1. **`COMDARE_HAVE_MICHAEL_LF` hat keinen Setzer.** Repo-weit **genau ein** Treffer:
+   `CMakeLists.txt:843` -- die `if()`-ABFRAGE. **Kein Detection-Block in `ext/CMakeLists.txt`**, der
+   ihn je auf ON braechte. `USE_MICHAEL_LF` ist damit in jedem konfigurierbaren Bau **0**, und
+   `axis_06_allocator_michael_lf.hpp:36` (`enabled = flags::michael_lf_enabled`) ist **compile-time
+   false** -- die `if constexpr`-Zweige mit den echten Aufrufen werden **nie instanziiert**.
+2. **`michael.c` wird NIRGENDS als CMake-Source gefuehrt.** `git grep 'michael\.c'` ueber
+   `origin/development`: **null Treffer**. **Gegenprobe gefahren** (dieselbe Suche nach `malloc\.c`
+   liefert Treffer) -- die Methode funktioniert, die Null ist echt. Selbst wenn jemand
+   `-DCOMDARE_HAVE_MICHAEL=ON` von Hand setzte: `adapters/A03-michael-lockfree/CMakeLists.txt` ist
+   eine **reine INTERFACE-Library**, sie reicht Include-Pfad und Define durch und **kompiliert nichts**.
+   Der Adapter riefe dann `malloc`/`free` -- glibc, kein LGPL-Objektcode.
+3. **Der Include zeigt auf einen Dateinamen, den es nicht gibt.** `vendor_includes/michael_lf_include.hpp`
+   erwartet `michael_lf.h`; die vendorierte Datei heisst **`michael.h`**. Selbst ein aktivierter
+   Schalter braeche den Bau, statt LGPL-Code zu ziehen.
+
+**Und in den golden-Katalogen kommt A03 nicht vor:** die 320er-Fixture traegt fuer die
+Allokator-Achse **einen einzigen Wert (`std_malloc`)**, die 2^17-Referenz zwei (`std_malloc`,
+`pmr_resource`). Konsequent -- `enabled==false` entfernt den Vendor per `mp_filter` aus
+`EnabledVendors`, **bevor** ein Profil ihn ueberhaupt waehlen koennte.
+
+### DIE VERBLEIBENDE FRAGE IST EINE ANDERE ALS MEINE URSPRUENGLICHE
+Der LGPL-Code liegt **als Repo-Text** vor und ist per `git clone` erreichbar. **Fuer das LINKEN ist
+das irrelevant** (nichts wird gelinkt), **fuer den SPERRVERMERK und die Veroeffentlichungsfrage aber
+nicht** -- das ist eine eigenstaendige Frage und nicht die, die ich gestellt hatte.
+
+### ZWEI NEBENBEFUNDE, die schwerer wiegen als die Ausgangsfrage
+1. 🔴 **NAMENSKOLLISION zwischen zwei Schalter-Familien.** `ext/CMakeLists.txt` setzt seine
+   `COMDARE_HAVE_<V>`-Flags mit **`CACHE BOOL "" FORCE`** und ueberschreibt damit die
+   `option()`-Defaults der `adapters/`-Seite -- **fuer hoard/mimalloc/jemalloc/tcmalloc/snmalloc/scalloc
+   aktiviert ein gefundener Vendor also GLEICHZEITIG den Original-Code-Pfad**, den niemand
+   eingeschaltet hat. Als Muster bereits dokumentiert (*"hinterliess ein stale
+   COMDARE_HAVE_MIMALLOC=ON"*). **Fuer A03/rpmalloc/lrmalloc/dlmalloc besteht die Kollision NICHT**
+   (ext/ setzt deren Flags nie) -- ihr adapters/-Schalter bleibt sicher OFF.
+2. 🟡 **`golden_fullpilot_131072_binary_ids.txt` wird referenziert, existiert aber nicht** --
+   und der Code sagt selbst warum (`source_catalog.hpp:178`): *"die Datei kommt NICHT ins git --
+   Repo-Bloat"*, 62 MB. **Zwei meiner Agenten widersprachen sich hier**, und beide hatten je die
+   Haelfte: der eine sah die Referenz, der andere die fehlende Datei. **Am Objekt aufgeloest.**
+   Folge: meine Thesis-Entscheidung (P3.3 unveraendert lassen) war richtig -- die Thesis beschreibt
+   beide Anker korrekt nebeneinander.
+
+### WAS SICH DAMIT ERLEDIGT
+**Die Lizenz-Frage aus Task #42 ist fuer A03 entschaerft.** Die Thesis nennt jetzt (thesis `798e946`)
+die **richtige** Lizenz -- LGPL-2.1-or-later statt BSD-3/MIT -- und das ist auch ohne Link-Bezug die
+wahre Aussage ueber den vendorierten Code. **Es besteht kein Handlungsdruck, das Profil zu entfernen.**
+Die uebrigen neun implementierten Profile stehen unter Apache-2.0/MIT/BSD/Public-Domain-artigen
+Lizenzen; dort besteht das Problem ohnehin nicht.
