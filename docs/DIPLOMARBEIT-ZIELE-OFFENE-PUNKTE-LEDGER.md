@@ -11111,3 +11111,77 @@ das Flattern gezielt** -- keine Hysterese noetig, sondern eine Bereichs-Erkennun
 Gesamt-Interface-Factory-Strategien)`. Der Verweis `anatomy/container_framework.hpp:37` ->
 `builder/.../genus_binding_traits.hpp` verletzt sie (untere Schicht kennt Namen der oberen).
 **GO fuer sofort.**
+
+---
+
+## NACHTRAG 08.08.2026 — ZWEI OWNER-ENTSCHEIDE + DER CHECK-SIZE-BERICHT
+
+### ENTSCHEID: DER WEITE NFS-EXPORT IST GEWOLLT
+> *"Ja wir lassen ihn offen, es wollen ja auch **alle Maschinen die Lagerhaltung bedienen** (explore
+> bitte). **Sync per file war geplant.** Die **V60 runner SOLLEN ja direkt mounten.** Das war der Plan."*
+
+**Damit ist mein Befund entkraeftet, aber anders als ich dachte:** ich hatte den Export auf `*` als
+moegliches Versehen gemeldet, weil `Cluster_NFS` auf `10.0.20.0/24` beschraenkt ist. **Er ist Absicht** --
+die Lagerhaltung ist ein **verteiltes** System, das von allen Maschinen bedient wird, die Synchronisation
+laeuft **ueber Dateien**, und die V60-Runner **sollen** direkt mounten. Der `measure-drop`-Filterpod war
+die Antwort auf eine andere Frage (Cluster_NFS), nicht auf diese.
+**Offener Explore-Auftrag:** die Planung "alle Maschinen bedienen die Lagerhaltung" + "Sync per file"
+heben und gegen den Ist-Stand des Bestandslogs halten.
+
+### ENTSCHEID: DIE LGPL-FRAGE IST ERLEDIGT
+> *"Tut mir leid, aber wir ignorieren die Lizenz, weil **Prof. Habich mir diese Arbeiten zur
+> Weiterverwendung freigegeben hat**, wir benutzen das. **WIRD VERWENDET OHNE SPERREN.**"*
+
+**Task #42 geschlossen.** Der A03-Code (LGPL-2.1-or-later) wird verwendet, kein Sperrvermerk-Konflikt.
+Die Thesis nennt seit `798e946` die korrekte Lizenz -- das bleibt richtig, denn es ist eine wahre
+Aussage ueber den vendorierten Code, unabhaengig von der Nutzungsfreigabe.
+
+### DER CHECK-SIZE-BERICHT -- die vier schwersten Befunde
+Volltext: `docs/plaene/20260808-BERICHT-check-size-messkette-break-even.md`.
+
+**1. DER PAPER-AUFTRAG EXISTIERT SEIT DREI MONATEN -- und ist zu zwei Dritteln erfuellt.**
+Vier Etappen belegt: 13./14.05. (*"durch die Permutationsbeschreibung wiederherstellbar"*), 27.05.,
+08.06., 20.07. Gebaut sind **33 SOTA-Profile P01..P33 lueckenlos**, 23 Allokator-Profile, 21
+Lastprofile, 21 `PAPER_REFERENCES.md`, vendorierter Original-Code in 17 `paper_*`-Baeumen.
+**Was fehlt, ist der letzte Schritt:** kein einziges **Experiment**-XML je Paper (die sota-Akten tragen
+die Wurzel `comdare_algorithm_profile`, der Planer-Eingang heisst `comdare_experiment`), der Zeiger
+`profile_ref` wird **geparst und nie dereferenziert**, und `drop_tier_level` zieht die Paper-Ebene ab.
+**Der Faden ist am 20.07. gerissen** -- der Ledger buchte den Posten als *"post-v3"* (`:3185`), obwohl
+das GO stand.
+
+**2. VON DEN 6 CEBs SIND HEUTE MAXIMAL 2 HERSTELLBAR -- und das Profil nennt die Trennung einen Fehler.**
+`mess_achsen_naht.hpp` schreibt die Grenze selbst hin: *"EHRLICHE GRENZE DIESER SCHEIBE -- macro UND
+micro SIND HEUTE NICHT TRENNBAR"*. G2 (Observer) und G3 (Feinkorn) teilen **ein** Gate
+(`COMDARE_CE_ENABLE_STATISTICS`), und **wallclock ist gar nicht ausbaubar**, weil G1 von jedem Tooling
+gezogen wird. Schaerfer noch: `all_axes_golden.profile.xml:220-226` nennt die frueheren drei
+Ein-Tool-Combos ausdruecklich **"die F-3-Regression"** und setzt EINE Vollmengen-Combo als Default.
+**=> Die Doktrin im Profil steht gegen den Owner-KERN vom 08.08. Das ist ein echter Konflikt, kein
+Versaeumnis.** Die **Differenz-Arithmetik** existiert nirgends (Nullbefund, 3 Muster, Gegenprobe
+`measurement_combo` = 27 Dateien -- die Suche greift).
+
+**3. BREAK-EVEN: vier Forderungen, alle vier nirgends.**
+Nicht zwei Code-Orte, sondern **drei** (`heuristik/`, `builder/curve_fit/`, `builder/best_binary_selector/`),
+und `curve_fit` traegt bereits eine **Kopie** der Fritsch-Carlson-Mathematik. Nullbefunde mit Gegenprobe:
+**B-Spline** (6 Muster -> 0) · **String-Serialisierung** (8 Muster -> 0) · **Basis bei 0** (nirgends) ·
+und der schaerfste: **beide Implementierungen haben x = Last, nicht x = Zeit.** Die Owner-Kurve laeuft
+ueber die **Zeitachse eines Laufs** (aus den Checkpoints), die vorhandenen ueber die **Lastachse ueber
+Laeufe hinweg**. **Beide werden gebraucht, aber es sind zwei verschiedene Objekte.**
+**Und die Datenquelle fehlt:** die CSV traegt weder Checkpoint-Spalte noch Zeitstempel.
+*"Erst Checkpoints + Wallclock, dann B-Spline."*
+
+**4. `--check-size`: alle drei Entwuerfe fielen an derselben Stelle durch -- und der Befund ist besser
+als die Entwuerfe.**
+> *"Planer und CEB linken **dieselbe Bibliothek** (`comdare::profile_run_facade`). Alles, was ein
+> Entwurf 'auf der CEB' rechnen lassen wollte -- CPU-Threads, Cache-Line, freier Platz, SIMD-Freigabe --
+> sieht der Planer-Prozess auf derselben Maschine **selbst**. Eine Prozessgrenze, ueber die nur solche
+> Werte reisen, ist eine **leere Naht**."*
+
+**Die Aufloesung, die den Owner-Satz substantiell macht:**
+- **Was der Planer allein kann: die GROESSE** -- sie folgt rein aus der XML-Freigabe und dem
+  deterministischen Director-Walk.
+- **Was nur die CEB kann: die DAUER** -- weil die **Instrumentierung in die CEB einkompiliert** ist.
+  Eine `[all]`-CEB misst langsamer als eine `[wallclock]`-CEB. **Nur die CEB-Variante selbst kann ihre
+  eigene Zeit je Messpunkt erheben.**
+- **Und weil es 6 Varianten gibt, liefert die Befragung nebenbei die ERSTE MESSUNG DES MESS-OVERHEADS**
+  -- dieselbe Differenz, die die Mess-Kette braucht. **`--check-size` und die Messfehler-Elimination
+  sind dasselbe Werkzeug.**
