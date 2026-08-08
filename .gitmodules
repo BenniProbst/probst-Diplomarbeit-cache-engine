@@ -9,48 +9,78 @@
 	branch = development
 	update = merge
 ; ===================================================================
-;  ACHTUNG - DAS THESIS-REPO IST ZWEIMAL EINGEBUNDEN
-;  Die beiden folgenden Submodule zeigen auf DIESELBE url
-;  (../20260931-overleaf-diplomarbeit.git). Das ist keine Absicht, die
-;  sich aus dem Bau ergibt, sondern eine gewachsene Doppelung.
+;  DAS THESIS-REPO IST ZWEIMAL EINGEBUNDEN - UND ZWAR MIT ABSICHT
 ;
-;  DIE LEBENDE EINBINDUNG ist  thesis/diplomarbeit.
-;    Nur sie wird von .gitlab-ci.yml gelesen, an 8 wirksamen Stellen:
+;  RICHTIGSTELLUNG 08.08.2026. Dieser Block behauptete bis heute, die
+;  Einbindung unter Code/external/ sei TOT. Das war falsch und ist vom
+;  Owner ausdruecklich zurueckgewiesen worden. Die MESSUNG stimmte -
+;  der Pfad kommt in .gitlab-ci.yml null Mal vor -, die SCHLUSSFOLGERUNG
+;  war falsch: nicht jeder Pfad, den die CI nicht liest, ist tot. Dieser
+;  hier ist ein ZIELORT, kein Verbraucher, und ein Zielort wird von der
+;  CI-Datei naturgemaess nicht genannt.
+;
+;  Owner woertlich:
+;    "Code/external/20260931-overleaf-diplomarbeit entfernen stimme ich
+;     nicht zu, weil sie gegen remote synchronisiert genau dort liegen
+;     muss, wenn unter Ausfuehrung der CI dann das Latex Anlagen-Ergebnis
+;     in die Arbeit committet wird und wir gegen remote syncen, um es
+;     unter Code/external wiederzufinden. Das bleibt also und wird als
+;     statischer Pfad in der Diplomarbeit synchronisiert. Wenn wir lokal
+;     laufen sollten auf einer Maschine und nicht CI (das war gefordert
+;     beides moeglich), dann muss sich die Diplomarbeit auf der
+;     Testmaschine auch dort ohne Netzwerk-Laufwerke lokal
+;     zusammensetzen."
+;
+;  DIE ZWEI ROLLEN SIND ALSO VERSCHIEDEN:
+;
+;  thesis/diplomarbeit  =  DER BAUPFAD.
+;    Hier baut die CI das PDF. Gelesen an 8 wirksamen Stellen der
+;    .gitlab-ci.yml:
 ;      :102 :181 :285  changes:-Gates
 ;      :309             verify:submodules (test -d + ls *.tex)
 ;      :560 :565        PDF-Bau (cd thesis/diplomarbeit) + Artefakt
 ;      :901             prebackup der PDFs
-;      :1102 :1111      Rueckschrieb anhang:forward (ls-tree / update-index)
+;      :1102 :1111      Rueckschrieb anhang:forward (ls-tree/update-index)
 ;
-;  DIE TOTE EINBINDUNG ist  Code/external/20260931-overleaf-diplomarbeit.
-;    Als PFAD kommt sie in .gitlab-ci.yml NULL Mal vor (gemessen:
-;    grep -n "Code/external/20260931" .gitlab-ci.yml -> exit 1).
-;    Sie wird nur ausgecheckt, von nichts gebaut und von nichts gelesen.
+;  Code/external/20260931-overleaf-diplomarbeit  =  DER STATISCHE
+;    FUNDORT NEBEN DEM UEBRIGEN QUELLCODE.
+;    Die LaTeX-Anlage entsteht aus der Messung, wird in die Arbeit
+;    committet und gegen remote gesynct; wiedergefunden wird sie unter
+;    Code/external - dort, wo auch cache engine und prt-art liegen.
+;    Und sie traegt den netzlosen Fall: laeuft der Lauf lokal auf einer
+;    Testmaschine statt in der CI, muss sich die Arbeit dort OHNE
+;    Netzwerk-Laufwerke zusammensetzen lassen. Beides war gefordert.
+;    Deshalb hat diese Einbindung bewusst KEIN branch/update - sie soll
+;    von keiner Automatik nachgezogen werden, sondern von Hand mit dem
+;    Baupfad gleichgehalten werden.
 ;
-;  DARAUS FOLGT EIN STRUKTURELLES DRIFT-RISIKO:
+;  DAS DRIFT-RISIKO BLEIBT BESTEHEN und ist durch die Richtigstellung
+;  eher groesser als kleiner geworden, weil der zweite Zeiger jetzt
+;  dauerhaft bleibt:
 ;    Der Rueckschrieb-Job anhang:forward bumpt NUR thesis/diplomarbeit
-;    (.gitlab-ci.yml:1111). Die tote Einbindung wird von keinem CI-Pfad je
-;    nachgezogen. Jeder CI-Rueckschrieb laesst die beiden Zeiger also
-;    erneut auseinanderlaufen - und verify:submodules (:309) prueft nur
-;    den lebenden Pfad, merkt es also nicht an dieser Stelle. Gefangen
-;    wird es erst von der git-submodule-status-Wache (^[-+U]) im selben
-;    Job, also NACHDEM die CI den Drift selbst erzeugt hat.
+;    (.gitlab-ci.yml:1111). Der statische Fundort wird von keinem
+;    CI-Pfad je nachgezogen. Jeder CI-Rueckschrieb laesst die beiden
+;    Zeiger also erneut auseinanderlaufen - und verify:submodules (:309)
+;    prueft nur den Baupfad, merkt es also dort nicht. Gefangen wird es
+;    erst von der git-submodule-status-Wache (^[-+U]) im selben Job,
+;    also NACHDEM die CI den Drift selbst erzeugt hat.
 ;
 ;  BEIM HANDANLEGEN GILT DAHER: beide Zeiger immer GEMEINSAM setzen.
 ;
-;  ENTFERNEN IST NICHT ENTSCHIEDEN. Ob die tote Einbindung entfallen
-;  darf, ist Owner-Entscheid (Loeschung = GO). Bis dahin bleibt sie
-;  stehen und ist hier als tot MARKIERT, nicht geloescht.
+;  OFFEN: ob der Rueckschrieb beide Zeiger bumpen sollte, statt den
+;  Drift jedes Mal neu zu erzeugen und hinterher zu melden. Das ist
+;  ein eigenes Paket am CI-Job anhang:forward, kein .gitmodules-Thema.
 ; ===================================================================
 [submodule "thesis/diplomarbeit"]
-	; LEBEND - diese Einbindung baut die CI.
+	; BAUPFAD - hier baut die CI das PDF.
 	path = thesis/diplomarbeit
 	url = ../20260931-overleaf-diplomarbeit.git
 	branch = development
 	update = merge
 [submodule "Code/external/20260931-overleaf-diplomarbeit"]
-	; TOT - kein CI-Pfad, kein CMake-Konsument; nur ausgecheckt.
-	; Hat bewusst KEIN branch/update: sie wird von keiner Automatik
-	; nachgezogen. Zeiger von Hand mit thesis/diplomarbeit gleichhalten.
+	; STATISCHER FUNDORT - Zielort der gesyncten LaTeX-Anlage, neben
+	; cache engine und prt-art; traegt auch den netzlosen Lokal-Fall.
+	; Bewusst KEIN branch/update: von keiner Automatik nachgezogen,
+	; Zeiger von Hand mit thesis/diplomarbeit gleichhalten.
 	path = Code/external/20260931-overleaf-diplomarbeit
 	url = ../20260931-overleaf-diplomarbeit.git
