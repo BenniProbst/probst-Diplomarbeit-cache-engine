@@ -11470,3 +11470,104 @@ Blatt-Familien in derselben Mappe**, kein Widerspruch:
 damit eine zweite Blattsorte, keinen zweiten Writer.
 **Neu hinzu kommt:** interne Hyperlinks (`write_url` auf `'Sheet'!A1`) und die Spalte **Aufrufer** als
 Stack-Kante.
+
+---
+
+## OWNER-NACHTRAG 08.08.2026 — WER DER AUFRUFER IST: EIN PROZESS UND EINER SEINER THREADS
+
+Der Owner hat die Blattform unmittelbar nach dem Entscheid präzisiert. Der Nachtrag ist **kein Detail
+der Darstellung**, er legt fest, was die Spalte *Aufrufer* überhaupt bedeutet — und er bringt eine
+prüfbare Invariante mit.
+
+> *„Der Aufrufer in den 3 Ebenen muss stets klar sein und ist in der Regel ein Thread. rufen multiple
+> Threads gleichzeitig und durcheinander auf, wird dennoch alles in den zusammengedampften sheets
+> dokumentiert, aber muss später je Thread einzeln wieder gefiltert und zerlegt werden. Ein thread kann
+> also eine Funktion betreten und am Ende wieder verlassen. Das ist ein checkpoint IN mit
+> Interface-enter und ein checkpoint OUT mit return. Ein thread ist also systemisch ein visitor in allen
+> Mess-Ebenen unter einem Prozess und kommt immer aus einer höhergelegenen Mess-Stufe in eine tiefer und
+> verlässt dann auf dem Stack die Funktion wieder sauber in eine höhere Ebene zwischen
+> compare/macro/micro. Der Aufrufer ist also nicht uniform, sondern ein Prozess UND einer von dessen
+> Threads. […] die CEB [führt] eine Last-Sequenz wie geplant durch und damit ist die CEB bzw. einer
+> ihrer Threads (die compare Messlayer liegt in der CEB noch vor dem Prüfdock) innerhalb der Sequenz am
+> Prüfdock der Aufrufende einer Tier-Binary Interface-Funktion. Wenn ein Thread ein Interface betritt,
+> aber es nicht wieder verlässt, ist das eine Regression."*
+
+### N-1 Der Aufrufer ist ein PAAR, kein Name
+
+`Aufrufer` ist **nicht uniform**. Er ist **(Prozess, Thread)**. Eine einzelne Spalte mit einem
+Funktionsnamen reicht nicht und wäre bei mehreren Threads schlicht falsch — sie würde nebeneinander
+laufende Aufrufe zu einer Folge verschmelzen, die es nie gab.
+
+### N-2 Der Thread ist ein Visitor — und zwar im Lehrbuch-Sinn
+
+> *„Ein thread ist also systemisch ein visitor in allen Mess-Ebenen unter einem Prozess."*
+
+Der Thread besucht die Mess-Ebenen; die Ebenen halten die Struktur, der Thread trägt die Operation
+hindurch. Das fügt sich in die Hausdoktrin *nur Lehrbuch-Entwurfsmuster* ein — Visitor ist GoF, und die
+Achsen-Mess-Kette führt ihn ohnehin schon (`Command`-Muster für die Achsen, `Visitor` für die Container
+in der Systemachse). **Der Mess-Visitor ist derselbe Gedanke eine Ebene höher.**
+
+### N-3 Die Bewegung ist immer eine Stack-Bewegung
+
+Ein Thread kommt **immer aus einer höhergelegenen Mess-Stufe in eine tiefere** und verlässt sie **auf dem
+Stack wieder sauber nach oben** — zwischen compare, macro und micro. Damit ist die Spalte *Aufrufer*
+endgültig als **Stack-Kante** bestimmt: sie nennt die Ebene, aus der der Besuch kam.
+
+### N-4 Je Aufruf ZWEI Checkpoints — IN und OUT
+
+| Checkpoint | Auslöser |
+|---|---|
+| **IN** | Interface-enter |
+| **OUT** | return |
+
+**Das ist eine Bau-Entscheidung, keine Notation.** Es folgt zwingend aus N-6: eine Zeile *je
+abgeschlossenem Aufruf* würde einen Aufruf, der **nie zurückkehrt**, überhaupt keine Zeile schreiben
+lassen — genau der Fall, den der Owner als Regression erkannt haben will, wäre dann **unsichtbar**.
+Also werden IN und OUT **einzeln** erfasst und die Paarung erst beim Lesen gebildet.
+
+### N-5 Die compare-Ebene liegt IN DER CEB, noch VOR dem Prüfdock
+
+Das ist die bisher schärfste Ortsangabe für die oberste Mess-Ebene. Die CEB **führt die Last-Sequenz
+durch**; innerhalb dieser Sequenz ist **die CEB — genauer: einer ihrer Threads — am Prüfdock der
+Aufrufende einer Tier-Binary-Interface-Funktion**. Damit ist die Kette der Aufrufer geschlossen:
+
+```
+CEB-Thread (compare, in der CEB, vor dem Pruefdock)
+   ruft am Pruefdock -> Interface-Funktion der Tier-Binary   (macro)
+                          ruft -> Achsen-Aufrufe             (micro)
+```
+
+Die Spalte *Aufrufer* eines Macro-Sheets nennt also einen **CEB-Thread**; die eines Micro-Sheets nennt
+die **Interface-Funktion samt Thread**, aus der der Achsen-Aufruf kam.
+
+### N-6 INVARIANTE: IN ohne OUT ist eine REGRESSION
+
+> *„Wenn ein Thread ein Interface betritt, aber es nicht wieder verlässt, ist das eine Regression."*
+
+Prüfbar und **hart**: je (Prozess, Thread, Interface) muss die Folge der Checkpoints **balanciert** sein.
+Ein Überhang an IN am Ende eines Laufs ist kein fehlender Messwert, sondern ein **Befund**. Das gehört
+als Wache in die Auswertung, nicht als Fußnote ins Blatt.
+
+### N-7 Eingedampft schreiben, je Thread zerlegbar lesen
+
+Mehrere Threads schreiben **durcheinander in dasselbe** Sheet — das bleibt so, die Blattzahl soll ja
+gerade nicht mit der Nebenläufigkeit wachsen. Die Zeilenfolge im Blatt ist damit die **Ankunftsfolge**,
+nicht die Folge eines Threads. **Die Rekonstruktion je Thread muss beim Lesen möglich sein** („später je
+Thread einzeln wieder gefiltert und zerlegt"), also müssen Thread-Kennung und Zeitpunkt in jeder Zeile
+stehen und die Zeitbasis über die Threads hinweg vergleichbar sein.
+
+### Folge für die Spalten
+
+| Spalte | Inhalt |
+|---|---|
+| **Prozess** | der Prozess, unter dem der Thread läuft |
+| **Thread** | die Thread-Kennung — Filterschlüssel für die Zerlegung |
+| **Aufrufer** | die Stack-Kante: aus welcher Mess-Ebene der Besuch kam |
+| **Checkpoint** | `IN` (Interface-enter) oder `OUT` (return) |
+| **Zeitpunkt** | gemeinsame, über Threads hinweg vergleichbare Zeitbasis |
+| Messwerte | … |
+
+**Offen (Bau-Detail, nicht Owner-Entscheid):** ob die Zeitbasis ein monotoner Zähler je Prozess ist oder
+eine über die Threads synchronisierte Uhr. Für die Zerlegung je Thread genügt monoton je Prozess; für
+das Erkennen echter Gleichzeitigkeit über Threads hinweg genügt es **nicht**. Wird beim Bau entschieden
+und hier nachgetragen.
