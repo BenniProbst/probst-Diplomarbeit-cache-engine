@@ -16,6 +16,75 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 08.08.2026 nachts — vier Landungen, und D1 ist ein FEHLBEFUND
+
+**Nach dem Blanko-GO autonom durchgezogen. Zwei der fünf blockierenden Defekte sind geheilt, einer
+existiert nicht, einer ist bestätigt und offen.**
+
+### GELANDET (vier Pakete, alle mit Bissbeweis)
+
+| Paket | SHA | Beleg |
+|---|---|---|
+| ce XML-Wohlgeformtheit + Wache | ce `25fe4fbf` | 160 XML/0; Köder 161/1 rot mit Zeilennummer; ctest 429/429 |
+| super XML + Gitlink + gefallene Ausnahme | super `4a9d3d02` | 66 XML/0; golden_n ohne Ausnahme rc=0, mit rc=1 |
+| **D3** leeres Messfenster | super `ce7d4007` | sechs Köder, alle wie erwartet |
+| **D4** Drift-Gate bei Median 0 | ce `5922bb99` | Sonde am alten Code: `stable=JA … warnzeilen=0` |
+
+**Beide Phase-6-Blocker sind damit gefallen.**
+
+### 🔴 D1 IST EIN FEHLBEFUND — und die Fehlerklasse dahinter ist die wertvollere Erkenntnis
+
+Der Gesamtstand-Workflow meldete als blockierenden Defekt Nr. 1:
+
+> *„Das ce-Makefile macht `check: all` → `cmake --build --target comdare_tests` → `ce_ctest`.
+> **Kein Configure dazwischen.** … 427 Tests bei einem einzigen Configure gegen 431 nach `all` +
+> Reconfigure (vier Tests waren unsichtbar)."*
+
+**Am Objekt geprüft, in zwei unabhängigen Schritten:**
+
+1. **Die Kette ist eine andere.** `Makefile:91` sagt `check: inventar`, nicht `check: all`. Und
+   `Makefile:124-126` lautet:
+   ```
+   inventar: all
+       $(CMAKE) -S "$(SRCDIR)" -B "$(BUILDDIR)"          <- das Reconfigure
+       $(CMAKE) --build "$(BUILDDIR)" $(BUILD_PAR) --target comdare_tests
+   ```
+   Das Reconfigure ist da. Es stand bereits im **Basis-Commit des Workflows selbst** (`274e4ed2`,
+   per `git show 274e4ed2:Makefile` nachgesehen) — der Befund war also schon zum Zeitpunkt seiner
+   Erhebung ungenau, nicht erst nachträglich überholt.
+2. **Empirisch gibt es die Lücke gar nicht.** Frisches Bauverzeichnis, ein einziges
+   `cmake -S . -B <neu>`, **kein Bau**: `ctest -N` meldet **429**. Im vollständig gebauten Baum
+   mit Reconfigure: ebenfalls **429**. Kein 427/431-Unterschied.
+
+**Woher kam die Zahl dann?** Aus einem **Kommentar im super-Makefile** (`:107-117`), der eine
+Messung vom **06.08.** festhält — vor `8945b5bd` („die CI fährt jetzt den offiziellen Weg"), das
+den GNU-Bauweg heute gelandet und dabei genau diese Lücke geschlossen hat.
+
+> **DIE KLASSE: eine dokumentierte historische Messung wurde als Ist-Zustand gelesen.**
+> Der Kommentar war zum Zeitpunkt seiner Niederschrift korrekt und ist es als Historie weiterhin.
+> Er trägt eine Zahl mit Nenner und einen Beleg — genau die Merkmale, an denen wir sonst gute
+> Befunde erkennen. Was fehlte, war die Frage *„gilt das noch?"*. Das ist die Umkehrung der Regel
+> **V11 BELEGZEILE**: dort ist eine Messung *nach* der Aussage eine Korrektur; hier ist eine Messung
+> *vor* der Aussage keine Bestätigung.
+
+Konsequenz für die Schärfung: jeder aus einem Kommentar oder Ledger-Eintrag übernommene Zahlenwert
+braucht eine eigene Ist-Messung, bevor daraus ein Bau-Posten wird.
+
+### ✅ D2 IST ECHT — am Objekt bestätigt
+
+`grep -c 'adhoc_emitter' .gitlab-ci.yml` = **0**. Kein ce-Job baut `comdare_adhoc_emitter_cli`,
+also ist `_r5g_ae_status` in **jedem** CI-Baum ungleich `FOUND`, der R5.G-Block wird übersprungen,
+und die beiden darin registrierten Tests existieren in der Inventur gar nicht. Gegenprobe in
+meinem lokal gebauten Baum **mit** Reconfigure: `test_v41_anatomy_adhoc_autobuilt_load` = 0 Treffer,
+`f15_compare_cli_smoke` = 0 Treffer.
+
+Die Wache meldet „GRÜN — kein Test ohne fahrenden Job" und hat recht **über die Menge, die sie
+sieht**. Ihr eigener Kopf kennt die Klasse und behandelt sie ausdrücklich — aber nur für den
+Codegen-Pass (*„live gemessen 2026-08-06: 404 statt 406"*), nicht für den Adhoc-Emitter-Pass.
+
+**Zwischenstand der fünf: D3 ✅ · D4 ✅ · D1 existiert nicht · D2 bestätigt und offen · D5 offen.**
+
+---
 ## NACHTRAG 08.08.2026 abends — BLANKO-GO + drei Owner-Entscheide (Feierabend-Übergabe)
 
 **Der Owner hat den Tag mit einem Blanko-GO beendet und drei offene Fragen beantwortet. Alle drei
