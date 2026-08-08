@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  REV 7.6 V11.5 — Standard-Template fuer messung_driver --messreihen-xml=...
+  REV 7.6 V11.5 - Standard-Template fuer messung_driver, Option messreihen-xml=...
   Definiert die 4 Pflicht-Messreihen (A_defined, A_full, B, C) im
   defined/full Mode (User-Direktive 2026-05-13/14 + Habich-Antwort
   2026-05-14: "Messung muss immer so vollstaendig wie moeglich sein").
 
-  Aufruf:
-    comdare-messung-driver <config_dir> <output_dir> --messreihen-xml=messreihen.xml
+  Aufruf (die CLI-Optionen tragen im echten Aufruf einen fuehrenden Doppelstrich,
+  der in einem XML-Kommentar nicht stehen darf):
+    comdare-messung-driver <config_dir> <output_dir> messreihen-xml=messreihen.xml
 
   Pro Messreihe wird ein eigener ExperimentDriver-Lauf gestartet (V11.3),
   Output unter <output_dir>/<id>/measurements.{csv,json}.
