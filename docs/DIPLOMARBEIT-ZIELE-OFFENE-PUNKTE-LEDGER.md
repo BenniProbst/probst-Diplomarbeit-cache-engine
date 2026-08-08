@@ -12140,3 +12140,28 @@ Lesart („derselbe Baum schließt auch die Kaskade ein") ist damit **gestrichen
 Stelle, die **beide Wurzeln gemeinsam** anlegt, habe ich nicht gefunden. Entweder meint „synchron"
 die gleichartige Pflege durch denselben Code (dann ist es erfüllt), oder das gemeinsame Anlegen fehlt
 (dann ist es eine Lücke). **Nicht angenommen — als offener Punkt geführt.**
+
+### NACHTRAG — „synchron" ist konzeptionell, angelegt wird LAZY. Und: ZWEI Durchläufe
+
+> *„Nun die wurzeln werden konzeptionell synchron angelegt, in der Realität werden Ordner und Daten
+> erst lazy erstellt, wenn es darauf ankommt. Die Binaries werden erst gebaut und dann in einem
+> zweiten durchlauf die Messungen darüber erzeugt und ebenfalls lazy im zweiten Baum abgelegt."*
+
+**Meine Restfrage ist damit beantwortet — und zwar als NICHT-Lücke.** Ich hatte gemeldet,
+`create_directories` stehe im Writer nur an einer Stelle (`:482`), also je Writer für seine eigene
+Wurzel, und eine Stelle für das gemeinsame Anlegen fehle. **Genau das ist das Soll:** die Wurzeln sind
+*konzeptionell* synchron — dieselbe Grammatik, dieselbe Blatt-Identität, derselbe Writer —, aber
+physisch entstehen Ordner und Dateien **lazy**, erst wenn etwas hineingeschrieben wird. Ein
+vorauseilendes gemeinsames Anlegen wäre falsch, nicht richtig.
+
+**Die Sequenz, die daraus folgt (und die im Ledger bisher nirgends in einem Satz stand):**
+
+| Durchlauf | Was entsteht | Wo |
+|---|---|---|
+| **1** | die Binaries werden **gebaut** | Wurzel `binaries`, lazy |
+| **2** | die Messungen **über diese Binaries** | Wurzel `measurements`, lazy |
+
+Beides gegen denselben Storage-Tree, mit `SKIP` bei gültigem Bestand — je Durchlauf für seinen
+Gegenstand. Das erklärt auch, warum Bau- und Mess-Fortschritt im Batchplan **zwei getrennte
+Präfix-Zähler** sind (`kompiliert` / `gemessen`) und im Code ausdrücklich nicht vermischt werden
+dürfen: sie zählen **zwei Durchläufe**, nicht zwei Sichten auf einen.
