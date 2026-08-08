@@ -16,6 +16,30 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 08.08.2026 — DIE SIEBEN NACHTRÄGE DES TAGES STANDEN AM FALSCHEN ENDE
+
+**Dieser Eintrag ist der erste, der mit `scripts/ledger_nachtrag.sh` gesetzt wurde** — und damit
+zugleich sein Beweis: er steht **oben**, wie B.3 es seit dem 06.08. verlangt (*„Nachträge rückwärts,
+neueste oben"*).
+
+Alle sieben Nachträge dieses Tages wurden per `cat >>` ans **Dateiende** gehängt. Bei 12.167 Zeilen
+findet sie dort niemand. Das Audit gegen die GESAMT-DOKTRIN v3 hat den Grund benannt (Lücke **L8**):
+die Regel beschreibt eine **Eigenschaft**, aber keinen **Mechanismus**. *Eine Eigenschaft muss man
+sich merken, einen Einfügepunkt nicht.*
+
+Das ist dieselbe Klasse wie die übrigen Befunde des Tages: **eine Regel, die nur im Kopf existiert,
+wird unter Takt zuerst fallengelassen.** Deshalb steht sie jetzt in einem Werkzeug.
+
+**Das Skript bestimmt den Einfügepunkt, statt ihn zu raten** (erste Zeile nach dem zusammenhängenden
+Kopf-Block — der Kopf wächst), prüft die Zeilenzahl **vor** dem Ersetzen und bricht sonst ab, ohne
+den Ledger anzufassen. Zwei Köder belegt: leerer Nachtrag → `rc=2`, fehlende Datei → `rc=2`.
+
+**Von den zehn Doktrin-Lücken des Audits ist dies die einzige, die keine Owner-Freigabe braucht** —
+B.3 ist der session-eigene Abschnitt, additive Präzisierungen sind dort nach Pflege-Regel 2 erlaubt.
+Die übrigen neun (darunter **L1**: die vom Owner genannte Sequenz *steht nicht im Dokument*, und
+**L2**: V2.1(a) delegiert das Gedächtnis-Lesen ausdrücklich an den Explore-Agenten — also genau das,
+was gerügt wurde) berühren Teil A und Teil V und liegen beim Owner.
+
 ---
 
 ## §0 GOAL / MISSION (autoritativ — Referenz für `/goal`)
