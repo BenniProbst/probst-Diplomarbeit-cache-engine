@@ -62,6 +62,15 @@
 
 set -eu
 
+# Werkzeug-Vorspann, fail-closed (gleiche Begruendung wie in der Wache): die
+# Probe misst mit /usr/bin/grep, nicht mit dem blanken `grep`. Fehlt es, bricht
+# sie mit 2 ab -- eine Probe, die an ihrem eigenen Werkzeug scheitert und dabei
+# einen anderen rc als 2 liefert, ist von einem echten Riss ununterscheidbar.
+if [ ! -x /usr/bin/grep ]; then
+    echo "ABBRUCH: /usr/bin/grep fehlt -- die Probe konnte nicht messen." >&2
+    exit 2
+fi
+
 SELBST_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$SELBST_DIR/../.." && pwd)
 WACHE="${COMDARE_WACHE:-$REPO/ci/plan_zahlen_wache.sh}"

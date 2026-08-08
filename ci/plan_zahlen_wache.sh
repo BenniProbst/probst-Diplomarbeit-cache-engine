@@ -89,6 +89,16 @@
 
 set -eu
 
+# Werkzeug-Vorspann, fail-closed: gemessen wird ausdruecklich mit /usr/bin/grep
+# (GNU grep 3.11 auf prod1) und NICHT mit dem blanken `grep`. In einer Agenten-
+# Shell ist `grep` eine FUNKTION, die nach ugrep umleitet, und dort ist ein
+# Muster mit `$(` ohne -F eine stille Anker-Falle. Fehlt das Werkzeug, bricht die
+# Wache mit 2 ab statt mit einem nackten 127 aus set -e.
+if [ ! -x /usr/bin/grep ]; then
+    echo "ABBRUCH: /usr/bin/grep fehlt -- die Wache konnte nicht messen." >&2
+    exit 2
+fi
+
 SELBST_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$SELBST_DIR/.." && pwd)
 
