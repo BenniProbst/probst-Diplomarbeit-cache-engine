@@ -11890,3 +11890,78 @@ Slots stehen in Anhänge-Reihenfolge, und genau das braucht die Aufrufer-Rekonst
 entstehen als Slots vorgesehen** sind. Das ist ein Fehlerfall, kein Wrap-around — nach der Hausregel
 *Fehlerklassen sind Pflicht* braucht er eine benannte Klasse und muss laut scheitern, nicht still
 überschreiben.
+
+---
+
+## RICHTIGSTELLUNG 08.08.2026 — DER E-E-ZYKLUS WURDE AN DER WURZEL GEHEILT, NICHT DURCH EINE AUSNAHME
+
+**Ich hatte die Heilung falsch beschrieben**, im Bericht an den Owner und im Gitlink-Commit
+super `56ffab37`. Dort steht, die neue Funktion `_comdare_overlay_gen_schliessung` ermittle *„die
+transitive Abhängigkeitsschließung des Generators mechanisch statt als Namensliste gepflegt"* — als
+sei damit eine **Ausnahme** von der Overlay-Kante gebildet worden. **Das trifft nicht zu**, und der
+Unterschied ist genau der, auf den es ankam.
+
+### Was tatsächlich gebaut wurde (am Objekt nachgeprüft)
+
+| | |
+|---|---|
+| Die Schließung ist eine **Wache** | `cmake/overlay_source_hash.cmake:105-118` sammelt sie und wirft `FATAL_ERROR`, wenn der Codegen an bauenden Zielen hängt |
+| Sie ist **keine Ausnahme** | **kein einziges** Ziel wird durch sie von der Kante ausgenommen |
+| Die Kanten-Schleife ist **unangetastet** | die Ausnahmen sind weiterhin nur die zwei Werkzeug-Targets sowie importierte und reine INTERFACE-Libs |
+| Geheilt wurde an der **Wurzel** | der Codegen **erbt die Verzeichnis-Kante nicht mehr**; damit ist seine Schließung leer und der Zyklus konstruktiv unmöglich |
+
+### Warum der Weg, den ich beschrieben hatte, ausdrücklich VERWORFEN wurde
+
+Der ausführende Agent hat ihn geprüft und aus **meinem eigenen Grund** verworfen: ein von der Kante
+ausgenommenes Ziel übersetzt gegen einen fehlenden oder veralteten Header. Heute träfe das nur
+vendored C-Code ohne Fingerprint — **der nächste Baustein in dieser Schließung könnte einen tragen,
+und dann löge er still.** Genau davor sollte die Bedingung *„die Kante muss nach der Heilung noch
+wirken"* schützen. Die gebaute Lösung ist strenger als die, die ich beschrieben hatte.
+
+### Die Wurzelursache, belegt
+
+`CMakeLists.txt:637` führt `link_libraries(comdare::vendor_mimalloc)` aus — eine **Verzeichnis**-Kante.
+`add_subdirectory(tools)` steht in `:708`, also **danach**; der Codegen erbt sie. Deshalb trug
+`LINK_LIBRARIES(comdare_overlay_source_hash_gen)` in Wahrheit
+`comdare::vendor_mimalloc;comdare::vendor_snmalloc;Boost::mp11`, obwohl
+`tools/overlay_source_hash_gen/CMakeLists.txt:19` **nur** `Boost::mp11` nennt.
+
+**Nicht super-spezifisch:** der dokumentierte ce-Standalone-Weg mit `-DCOMDARE_BUILD_PERMUTATIONS=ON`
+trifft dieselbe Zeile.
+
+### Die Belege, die ich nachgefordert hatte
+
+**Die Kante wirkt** — `ninja -t query`, wörtlich:
+
+```
+ext/libcomdare_vendor_mimalloc.a:
+  input: C_STATIC_LIBRARY_LINKER__comdare_vendor_mimalloc_Release
+    ext/CMakeFiles/comdare_vendor_mimalloc.dir/.../static.c.o
+    || comdare_overlay_source_hash
+```
+
+Das Ziel, das den Zyklus schloss, wartet **nach** der Heilung weiterhin auf den Codegen — nur der
+Codegen wartet nicht mehr auf es.
+
+**Kein Ziel ist herausgefallen:** 656 Kanten / 326 eindeutige Ziele **vorher wie nachher**, und der
+Diff der Ziel-*Namen* ist leer. Strukturell stärker als die Zählung: der Diff ist **rein additiv** —
+116 Einfügungen, 0 Löschungen.
+
+**Zwei Köder, beide beißen** — und beide zuerst gegen das Werkzeug: (A) direkt, (B) transitiv über
+eine INTERFACE-Zwischenstufe, die die Typ-Filterung überspringt und nur von einer echten transitiven
+Rechnung gefunden wird. Beide lösten dieselbe `FATAL_ERROR` in der Configure-Phase aus, also **vor**
+dem Generate-Fehler.
+
+**Mit eingeschaltetem mimalloc**, aus dem CMakeCache: `COMDARE_AXIS_06_ENABLE_MIMALLOC:BOOL=ON`,
+`COMDARE_HAVE_MIMALLOC:BOOL=ON`. Der Allokator war nie abgeschaltet.
+
+**Ehrliche Lücke, vom Agenten selbst benannt:** für die Konfiguration `PROVISION=ON` gibt es
+**prinzipiell keine Vorher-Zahl** — der ungeheilte Stand generiert dort gar nicht (`exit=1`, kein
+`build.ninja`). Das ist der Befund selbst, keine Ausrede.
+
+### Was daraus für mich folgt
+
+Ich habe einen Diff gelesen, die Funktion gesehen und ihre **Verwendung angenommen** statt sie zu
+lesen. Der Bericht an den Owner trug die falsche Beschreibung, und der Gitlink-Commit trägt sie
+dauerhaft in der Historie. **Der Commit wird nicht umgeschrieben** (nie rebase) — diese
+Richtigstellung ist der Ort, an dem der Irrtum steht.
