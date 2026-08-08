@@ -12024,3 +12024,119 @@ Architektur-Entscheid** vor, nicht die Aufwandsschätzung.
 
 Fügt sich in den bestehenden Kanon: *kein Quick-Fix, keine Behelfswege, der sauberste statt des
 leichtesten Weges* — und *„die Lücke ist ein Auftrag"*.
+
+---
+
+## OWNER-KERN 08.08.2026 — xlsx IST DIE AUSGABE · SKIP BEI GLEICHER BINARY · CSV NIE
+
+> *„Die operation bei Validen Messdaten ist skip für die XLSX, sofern von der exakt gleichen binary
+> gemessen wird. Jede neue Version dieser Binary erzeugt auch neue Messdaten für die geupdateten
+> Eigenschaften der binary und behält die alte Version zusätzlich. Und CSV wird NIE verwendet, ich
+> habe dir das jetzt in der letzten Stunde schon 7 Mal geschrieben."*
+
+| Fall | Operation |
+|---|---|
+| valide Messdaten, **exakt gleiche** Binary | **SKIP** — die xlsx wird nicht neu erzeugt |
+| **neue Version** derselben Binary | **neue Messdaten** für die geänderten Eigenschaften; die **alte Version bleibt zusätzlich** |
+| CSV | **wird nie verwendet** |
+
+### Damit löst sich die Löschfrage auf, statt beantwortet zu werden
+
+Es gibt **kein Überschreib-Problem, weil nie überschrieben wird**. Der Schlüssel ist die
+**Binary-Identität** (Fingerprint): gleiche Identität ⇒ skip, neue Identität ⇒ neuer Datensatz
+**neben** dem alten. Das ist derselbe Mechanismus, den Resume und Bestandslog ohnehin tragen — es
+braucht keinen neuen Baustein, nur die richtige Sicht auf den vorhandenen.
+
+Der xlsx-Writer erfüllt das bereits: atomar-additiv über tmp+rename, **null** Vorkommen von `stale`
+im gesamten Schreibweg, und `ErgebnisSchreibFehler` wirft ausdrücklich, wenn nicht still getruncatet
+werden darf.
+
+### Was daraus für meinen vorigen Befund folgt
+
+Ich hatte gemeldet, `cache_engine_builder_iterator.hpp:2800` überschreibe `result.csv` per `trunc`
+ohne Sicherung, und das als Verletzung der Messdaten-Doktrin geführt. **Der Befund traf den falschen
+Gegenstand.** `result.csv` ist ein internes Zwischenformat; CSV wird produktiv nicht verwendet. Ob
+der Pfad überhaupt bleiben soll, ist eine **Aufräum**-Frage der §75-Klasse, keine Doktrin-Frage.
+
+### Die Lehre, die über diesen Punkt hinausgeht
+
+Der Owner musste dieselbe Aussage **siebenmal** schreiben. Ich habe sie jedes Mal quittiert, ohne sie
+zum **Gegenstand** meiner Analyse zu machen — und dann eine Stunde lang das falsche Format untersucht.
+
+**Regel:** Wenn eine Aussage wiederholt wird, ist sie quittiert, aber nicht eingebaut. Dann nicht
+erneut quittieren, sondern **prüfen, wo der eigene Arbeitsgegenstand von ihr abweicht.**
+
+---
+
+## OWNER-KERN 08.08.2026 (Fortsetzung) — SKIP GILT AUCH FÜR BINARIES · EIN BAUM FÜR BEIDE
+
+> *„Die Operation bei validen Binaries ist ebenfalls skip. Die binaries und Messdaten teilen sich
+> denselben Lagerhaltungs-Baum beim Aufbau und haben nur unterschiedliche factory pattern und detail
+> pattern für das Speichern und der Umgang mit der Datei selbst. beide verwenden exakt denselben Baum."*
+
+| Gegenstand | Operation bei gültigem Bestand |
+|---|---|
+| **xlsx / Messdaten** | **SKIP**, wenn von der exakt gleichen Binary gemessen |
+| **Binaries** | **SKIP** ebenso |
+| neue Version | neuer Datensatz **neben** dem alten, nie ersetzend |
+
+**Ein Baum, zwei Policies.** Der Unterschied liegt ausschließlich im *Factory*- und *Detail*-Pattern
+für das Speichern und den Umgang mit der Datei — nicht im Baum.
+
+### Am Objekt gelesen (`ce libs/cache_engine/builder/bestandslog/lager_baum_writer.hpp:1-45`)
+
+Der Code trägt diese Einheit bereits:
+
+* **Ein Preimage:** *„BLATT-IDENTITAET = v6-FINGERPRINT (F7-Konvergenz): Skip-Marke, minio-Key,
+  Bestandslog-`key_sha512` und Baum-Blatt sind DASSELBE Preimage."* Der Writer rechnet nichts nach, er
+  prüft nur die Form — *„ein zweiter Preimage wäre genau die Drift, die A13-M3 geschlossen hat."*
+* **Eine Grammatik:** der Writer komponiert *„genau zwei Quellen und erfindet keine dritte"* —
+  `lager_pfad_grammatik.hpp` plus die bindenden Ordnungen `kSystemAxisOrder` und
+  `kCompositionAxisNames`.
+* **Policies statt Zweitweg:** *„die Realm-Wahl ist eine CT-POLICY (Template-Parameter +
+  Concept-Guard, GoF Factory/Strategy) — KEIN Runtime-Switch, KEIN `std::variant`, keine vtable."*
+  Das ist wörtlich „unterschiedliche Factory-/Detail-Pattern".
+
+### Eine Abweichung, die ich benenne statt übergehe
+
+Die **Ebenen-Reihenfolge** ist je Realm verschieden (`:13-30`):
+
+| Realm | Wurzel | … | tiefste Ebene |
+|---|---|---|---|
+| Messdaten | `mess=<tooling>+load_framework` | System-Rekombination → 5 Organ-Gruppen → Haupt-Blatt | Unter-Achsen |
+| Binaries | System-Achse **direkt** | 5 Organ-Gruppen | **Mess-Typ als letzter** (D-12) |
+
+**Zwei Lesarten, und ich entscheide sie nicht selbst:**
+1. *„Derselbe Baum"* meint dieselbe **Grammatik, Identität und Mechanik** — dann ist die verschiedene
+   Reihenfolge genau die „Detail-Pattern"-Differenz, und der Code ist konform.
+2. *„Derselbe Baum"* meint auch dieselbe **Ordner-Kaskade** — dann weicht `D-12` (Mess-Typ als
+   tiefster Knoten im Binaries-Realm) vom Soll ab und ist ein Defekt.
+
+Lesart 1 deckt sich mit dem Wortlaut *„nur unterschiedliche factory pattern und detail pattern"*.
+Beide Kaskaden sind zudem als **Owner-KERN 26.07., Section 4-6** im Kopf des Writers ausgewiesen —
+also einmal ausdrücklich so entschieden. **Zur Bestätigung vorgelegt, nicht angenommen.**
+
+### NACHTRAG zur Baum-Frage — beantwortet, meine zweite Lesart entfällt
+
+> *„Ja die Realms sind per Filesystem getrennt aber der Strategy-Storage-Tree ist im code derselbe und
+> wird einheitlich über zwei verschiedene file system wurzeln, die aber synchron angelegt werden,
+> gepflegt. Eine wurzel binaries, eine wurzel measurements."*
+
+Am Objekt bestätigt (`ce libs/cache_engine/builder/bestandslog/lager_baum_writer.hpp`):
+
+| Beleg | Zeile |
+|---|---|
+| `enum class LagerRealm { binaries, messdaten }` | `:76` |
+| `template <LagerRealmPolicy Policy> class LagerBaumWriter` — **ein** Writer | `:533-534` |
+| `MessdatenRealmPolicy` / `BinariesRealmPolicy` — **zwei** Policies | `:387` / `:419` |
+| `static_assert(LagerRealmPolicy<…>)` für beide — der CT-Vertrag ist erzwungen | `:454-455` |
+| `make_binaries_baum_writer(...)` — Factory je Realm | `:600` |
+
+**Die abweichende Ebenen-Reihenfolge ist die Detail-Pattern-Differenz, kein Defekt.** Meine zweite
+Lesart („derselbe Baum schließt auch die Kaskade ein") ist damit **gestrichen**.
+
+**Eine prüfbare Restfrage bleibt:** *„synchron angelegt"*. Im Writer findet sich
+`create_directories` nur an **einer** Stelle (`:482`) — also je Writer für **seine** Wurzel. Eine
+Stelle, die **beide Wurzeln gemeinsam** anlegt, habe ich nicht gefunden. Entweder meint „synchron"
+die gleichartige Pflege durch denselben Code (dann ist es erfüllt), oder das gemeinsame Anlegen fehlt
+(dann ist es eine Lücke). **Nicht angenommen — als offener Punkt geführt.**
