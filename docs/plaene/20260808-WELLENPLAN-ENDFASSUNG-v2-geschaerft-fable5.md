@@ -502,3 +502,106 @@ Regel „ALLES IST GEPLANT": vorgelegt wird nur, was Recherche nicht auflösen k
 8. **W5:** PDF, Spiegel, Abgabe Di 15.09. Keine Bau-Eingriffe.
 9. **Der Pfad füllt 26 von 27 Werktagen und passt NUR mit den Streichungen (##40→W7, prod2→Text, Vollmessung→Deckel) und den vier Bedingungen: Deckel an F2, ein Bump, Batch-Abend-Ehrlichkeit, GOs bis Sa 29.08. 06:00.** Ohne die Schnitte endet er 5–6 Werktage hinter der Frist — das ist die wichtigste Zahl dieses Dokuments.
 10. **Über allem:** jede Wache mit fremdem Nenner und gefahrenem Köder (rot UND grün); jeder Freitag eine für sich stehende, ehrliche Lieferung; die drei Präsens-Zusagen erfüllt oder korrigiert — still fallenlassen macht die Abgabe unwahr.
+---
+
+# 11. KONSOLIDIERUNG DER ERKENNTNIS-SESSION (nachgetragen 08.08.2026 abends)
+
+> Quelle: `docs/sessions/20260808-SESSION-ERKENNTNISSE-widerlegte-befunde-und-learnings.md`
+> (50/50 Agenten, 0 Fehler; 381 Befunde und 316 Learnings aus 8 Quellbereichen, davon **40
+> adversarisch geprüft**: 27 hielten, **13 fielen selbst**).
+> Dieser Abschnitt ändert die Abschnitte 3 und 6 dieses Plans — er steht nicht daneben.
+
+## 11.1 Die eine Zahl, die den Verifikationsvertrag ändert
+
+**32,5 % der Widerrufe hielten der Nachprüfung nicht stand.** Rund jeder dritte. Und „bestätigt"
+hieß nur, dass der *Schluss* trägt: in **9 von 9** vollständig protokollierten Bestätigungen ergab
+die Prüfung Schärfungsbedarf, in **mindestens 4 von 9** enthielt der Widerruf selbst eine am Objekt
+**falsche** Einzelaussage. Sogar die **Fehlerklassen-Etiketten** mussten in 4 von 9 Fällen ersetzt
+werden.
+
+**Konsequenz für den Plan:** eine Korrektur ist kein Endzustand. Der Verifikationsvertrag (§6) gilt
+ab sofort **auch für Widerrufe, Richtigstellungen und Klassifikationen** — nicht nur für Befunde.
+Es gibt in dieser Arbeitsweise keine Aussagenebene, die von der Beweislast ausgenommen wäre.
+
+## 11.2 Der Stellvertreter — die gemeinsame Mechanik aller Klassen
+
+Alle vier Klassen sind derselbe Griff: **etwas Benachbartes, Billigeres wird für den Gegenstand
+genommen.** Der Nullbefund des eigenen Musters für den Gegenstand · der Gesamtstatus für die
+Jobliste · der belegte Kern für seine unbelegte Reichweite · das Dokument für den Ist-Zustand ·
+die plausible für die gemessene Ursache. Fünfzehn Belege nach demselben Schnittmuster.
+
+**Warum es nicht auffällt** — und das ist der Satz, der die Abnahmen ändert:
+
+> Ein **falsches** Messgerät fällt irgendwann auf. Ein **richtiges** Messgerät am **falschen
+> Gegenstand** nie — es gibt nichts, was klappern könnte.
+
+Die Messung ist korrekt, die Zahl belastbar, das Gate grün, das Gewissen rein. Diese Fehlerklasse
+**erzeugt kein Fehlersignal**.
+
+## 11.3 Die härteste Konsequenz: Disziplin trägt hier strukturell nicht
+
+Am Objekt gemessen: von zehn Verschärfungen hielten **7 von 10** — und es sind genau die, die **in
+ein Werkzeug gebrannt** wurden. Die **drei rein disziplinären** (R-3, R-6, R-10) sind exakt die, die
+zurückkamen. Die einzige durchgängig gehaltene Verschärfung (cf22-Selbstcheck, **6 von 6**) steht
+**in einem Skript, nicht im Kopf**.
+
+Und dreimal hielt eine Regel nur scheinbar: die gitleaks-Deckung hielt **zufällig** (27 von 37
+Pushes ohne Lauf, unbemerkt), die Ein-Schreiber-Regel hielt, weil fremde Agenten 21 Stunden **still
+waren**. **Zufall, Disziplin und Maschine sehen im Rückblick identisch grün aus.** Unterscheidbar
+sind sie nur an einer Frage: *was erzwingt das Halten?*
+
+> **NEUE ABNAHME-REGEL FÜR JEDE WELLE (ändert §6):** Zu jeder Wellen-Abnahme gehört die Antwort auf
+> „**was erzwingt das Halten?**". Zulässig sind genau zwei Antworten: **ein Werkzeug** (Skript,
+> Wache, `static_assert`, CI-Job) oder **eine ausdrücklich als ungedeckt benannte Stelle**.
+> *„Wir achten darauf"* ist keine Antwort und gilt als **nicht abgenommen**.
+
+## 11.4 Die fünf Prüffragen vor jedem Paket
+
+Sie ersetzen keine Wache — sie stehen **vor** dem Bau, weil sie billig sind und die Klasse ohne
+Fehlersignal nur so früh gefangen wird.
+
+1. **Der Nenner.** Über welcher Grundgesamtheit rechne ich, und steht sie in der **Ausgabe**?
+   Alle Klassen lassen sich auf einen fehlenden Nenner zurückführen: die Menge, die mein Muster
+   überhaupt finden **kann** · die Jobs, die wirklich **liefen** · die Commits, die wirklich
+   **gescannt** wurden · die Fälle, über die der Fakt etwas **sagt** · der **Zeitpunkt**, zu dem die
+   Aussage galt. Der wirksame Fix ist überall derselbe: **den Nenner in die Ausgabe des Werkzeugs
+   zwingen.**
+2. **Der Gegenstand.** Misst mein Beleg *die Sache* — oder etwas Benachbartes, das billiger zu
+   messen war? (Diff statt Funktion · Gesamtstatus statt Jobliste · `rc=0` statt „0 commits
+   scanned" · Worktree statt Klon · `$?` statt `PIPESTATUS`.)
+3. **Die Zeitrichtung.** Lief die Messung **vor** dem Satz? **6 von 6** Selbstwiderlegungen kamen,
+   *nachdem* die falsche Aussage schon beim Owner war; wo die Messung vorher lief, fing sie
+   **4 von 4** (V11). Und die Umkehrung: eine Messung, die *lange vorher* in einem Kommentar
+   dokumentiert wurde, ist **keine** Bestätigung — genau daran ist D1 heute als Fehlbefund entstanden.
+4. **Die Deckung.** Was erzwingt, dass diese Regel morgen noch hält — Werkzeug, Disziplin oder
+   Zufall? Nur die erste Antwort zählt.
+5. **Der Widerruf.** Wenn ich gerade etwas korrigiere: **prüfe ich die neue Aussage genauso hart wie
+   die alte?** In 13 von 40 Fällen war die Antwort nein, und in allen vier auswertbaren Fällen war
+   es die **Fassung**, nicht der Kern — *Korrektur-Momentum ersetzt die Prüfung der neuen Aussage.*
+
+## 11.5 Die Schleife, die den Plan selbst gefährdet
+
+Das Material misst eine Rückkopplung: **Breite → Takt → Stellvertreter → Aussage vor Messung →
+Korrekturschleife → weniger Zeit → mehr Breite.** Belegt an 9 Workflows mit 114 Agenten, von denen
+**1 von 9 auf dem fristkritischen Pfad** lag.
+
+Und: *„die zuerst fallende Stufe ist das **Gedächtnis**, weil sie vorne kostet und hinten nichts
+Sichtbares liefert, während ein Explore-Agent wie Fortschritt aussieht."*
+
+> **KONSEQUENZ FÜR DIE WELLEN:** Ein Workflow ist ab jetzt **kein Fortschritt**, solange sein
+> Ergebnis nicht in einem Bau-Paket auf dem kritischen Pfad gelandet ist. Vor jeder Fan-out-Runde
+> steht die Frage: *liegt das, was ich gerade breit untersuche, auf dem Weg zum 15.09.?* Wenn nein,
+> gehört es in den W7-Behälter.
+
+## 11.6 Ein Datum, kein Urteil — wo Fehler entstehen
+
+Die Lead-Prämissen waren häufiger falsch als die Arbeit der Agenten (5× bzw. 8× in zwei
+Zählfenstern). **Kein Agent widerlegte je den Owner am Objekt.** Der Owner formulierte keine einzige
+Werkzeug-Falle, aber die tragenden Architektur-KERNe — und korrigierte sich zweimal selbst.
+
+Das Muster ist strukturell: **Fehler entstehen dort, wo aggregiert wird, nicht dort, wo Objekte
+angefasst werden.** Wer am Objekt arbeitet, irrt in der Sache selten; wer Breite verwaltet,
+produziert Stellvertreter — weil Aggregation genau die Operation ist, **die Nenner verschluckt.**
+
+Daraus folgt für die sequentielle Kette (§4): je Paket gilt **Objekt vor Aggregat**. Zuerst die
+Datei, die Zeile, der Lauf — dann die Zusammenfassung. Nie umgekehrt.
