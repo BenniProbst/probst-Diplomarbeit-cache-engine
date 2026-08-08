@@ -299,6 +299,38 @@ lint:xml-wellformed:
   script:
     - sh scripts/ci_xml_wellformed_guard.sh
 
+# -- W0b-0 (2026-08-08): BISSPROBE fuer die Mess-Ausbeute-Wache, die Wache wird selbst geprueft --
+# Die Mess-Ausbeute-Wache (ci/mess_ausbeute_wache.sh, gelandet 7444d8c0) entscheidet seit heute in
+# measure:smoke und measure:golden-320, ob ein Messlauf als gelungen gilt. Am mehrtaegigen golden-320
+# haengt damit der teuerste Lauf des Projekts an ihrem Urteil, und sie selbst war ungedeckt. Ihr
+# Verschwinden als DATEI faengt der `test -x`-Vorspann an beiden Aufrufstellen ab; ihre stille
+# AUFWEICHUNG (ein `exit 1` faellt weg, sie sagt weiter "OK") hat bis heute nichts gemeldet. Das ist
+# dieselbe Fehlerklasse, gegen die die Wache gebaut wurde, eine Ebene hoeher.
+#
+# WARUM --selbstbiss IM CI UND NICHT NUR EINMAL LOKAL: eine Probe, die nur am gesunden Objekt gruen
+# ist, belegt nichts, sie koennte immer gruen sein. Der Schalter baut drei Wegwerf-Mutanten der
+# Wache (je ein `exit 1` entfernt, dann beide), faehrt die Probe gegen jeden und FORDERT, dass sie
+# rot wird. So wird der Biss bei JEDEM Lauf neu bewiesen, nicht einmal behauptet. Die Mutanten
+# liegen unter mktemp -d, der Bestand wird nie angefasst.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
+# wie bei lint:diff-hygiene). Der Job prueft das ausdruecklich an sich selbst (Fall F11).
+# WARUM KEIN .code-rules: die Wache und ihre Probe muessen auch in einer docs-only-Welle laufen.
+# .gitlab-ci.yml selbst ist kein Code im Sinne dieses Gates, und genau dort wird die Wache entfernt.
+# KEIN extends: der Job braucht nur sh, awk, od und grep; kein Compile, kein ccache, kein Submodul.
+test:mess-ausbeute-bissprobe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft wird nur der super-Baum
+  script:
+    - sh ci/tests/mess_ausbeute_bissprobe.sh --selbstbiss
+
 # ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
 # User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
 # lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
