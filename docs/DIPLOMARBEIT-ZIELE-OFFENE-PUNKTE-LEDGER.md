@@ -12115,3 +12115,28 @@ Die **Ebenen-Reihenfolge** ist je Realm verschieden (`:13-30`):
 Lesart 1 deckt sich mit dem Wortlaut *„nur unterschiedliche factory pattern und detail pattern"*.
 Beide Kaskaden sind zudem als **Owner-KERN 26.07., Section 4-6** im Kopf des Writers ausgewiesen —
 also einmal ausdrücklich so entschieden. **Zur Bestätigung vorgelegt, nicht angenommen.**
+
+### NACHTRAG zur Baum-Frage — beantwortet, meine zweite Lesart entfällt
+
+> *„Ja die Realms sind per Filesystem getrennt aber der Strategy-Storage-Tree ist im code derselbe und
+> wird einheitlich über zwei verschiedene file system wurzeln, die aber synchron angelegt werden,
+> gepflegt. Eine wurzel binaries, eine wurzel measurements."*
+
+Am Objekt bestätigt (`ce libs/cache_engine/builder/bestandslog/lager_baum_writer.hpp`):
+
+| Beleg | Zeile |
+|---|---|
+| `enum class LagerRealm { binaries, messdaten }` | `:76` |
+| `template <LagerRealmPolicy Policy> class LagerBaumWriter` — **ein** Writer | `:533-534` |
+| `MessdatenRealmPolicy` / `BinariesRealmPolicy` — **zwei** Policies | `:387` / `:419` |
+| `static_assert(LagerRealmPolicy<…>)` für beide — der CT-Vertrag ist erzwungen | `:454-455` |
+| `make_binaries_baum_writer(...)` — Factory je Realm | `:600` |
+
+**Die abweichende Ebenen-Reihenfolge ist die Detail-Pattern-Differenz, kein Defekt.** Meine zweite
+Lesart („derselbe Baum schließt auch die Kaskade ein") ist damit **gestrichen**.
+
+**Eine prüfbare Restfrage bleibt:** *„synchron angelegt"*. Im Writer findet sich
+`create_directories` nur an **einer** Stelle (`:482`) — also je Writer für **seine** Wurzel. Eine
+Stelle, die **beide Wurzeln gemeinsam** anlegt, habe ich nicht gefunden. Entweder meint „synchron"
+die gleichartige Pflege durch denselben Code (dann ist es erfüllt), oder das gemeinsame Anlegen fehlt
+(dann ist es eine Lücke). **Nicht angenommen — als offener Punkt geführt.**
