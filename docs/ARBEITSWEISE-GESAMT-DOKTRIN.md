@@ -27,14 +27,19 @@
 
 ## A1. Rollen- und Modell-Matrix
 
-**STAND 06.08.2026 (Owner, verbatim): "Fable wird nicht funktionieren und ist aufgebraucht,
-bitte wechsel auf Opus 5 max effort"** — Fable 5 faellt als Agenten-Modell komplett aus.
+**STAND 08.08.2026 (Owner, verbatim): "Bitte versuche für den Bau möglichst Opus 5 max effort
+zu verwenden und nochmal mit Fable 5 xhigh nachzusetzen, wenn das Ergebnis nicht
+zufriedenstellend war."** — dazu, ebenfalls am 08.08.: *"Designplanung mit Fable 5 xhigh"* ·
+*"das Wellen design mit Fable 5 max"* · *"jeweils auch ein Fable xhigh Agent, der den review
+reviewed"*. **Fable 5 ist als Agenten-Modell in vollem Gebrauch.**
 
 | Rolle | Modell | Zustaendigkeit |
 |---|---|---|
-| **Lead / Planung / Design / Review / Synthese** | **Opus 5, max effort** | Orchestrierung, Architektur-Entscheidungen, adversariale Reviews, GO/NO-GO, Ledger-/Memory-Pflege, Owner-Entscheidungsfragen |
-| **Bau / Struktur / Messung** | **Opus 5, xhigh** | Scaffolding, Verdrahtung, Standardfall-Implementierung, Gate-Inventare |
+| **Lead / Orchestrierung / Synthese** | **Opus 5, max effort** | Ablauf-Steuerung, Architektur-Entscheidungen, GO/NO-GO, Ledger-/Memory-Pflege, Owner-Entscheidungsfragen |
+| **Bau / Struktur / Messung** | **Opus 5, max effort** — bei unbefriedigendem Ergebnis **mit Fable 5 xhigh nachsetzen** | Scaffolding, Verdrahtung, Implementierung, Gate-Inventare |
 | **Explore / Recherche** | **Sonnet 5, max effort, "very thorough"** | Korpus-Sweeps, Objekt-Kartierungen, Fundstellen-Suchen — die read-only-Erhebungsklasse. **NIE ein anderes Modell** (Owner-Dauerregel 05./06.08.) |
+| **Design / Wellenentwurf** | **Fable 5, xhigh bzw. max** | Bauplaene aus Kartierungen, Wellen-Design, Paket-Schnitt |
+| **Review-Meta-Stufe** | **Fable 5, xhigh** | prueft einen Codex-Pass adversarisch am Objekt gegen (belegt: einstufige Kritik verliert ein Viertel ihrer Behauptungen und uebersieht mehr als die Haelfte ihres Fundvolumens) |
 | **Schwer-Impl / Regressions-Lens** | **Codex** | Neue/komplexe Logik auf gestelltem Geruest; adversariale Zweit-Pruefung |
 
 **Parallelitaet:** Bau-Wellen hart <= 8 gleichzeitige Programmier-Worker. Planungs-,

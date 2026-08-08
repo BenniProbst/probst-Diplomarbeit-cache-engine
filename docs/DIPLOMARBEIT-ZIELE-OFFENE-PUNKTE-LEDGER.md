@@ -16,6 +16,66 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 08.08.2026 nachts — A1 der Doktrin ist ueberholt (Modell-Matrix)
+
+**Beim Laden der Arbeitsweise v3.1 in den Kontext (Owner-Auftrag) gefunden:**
+
+`docs/ARBEITSWEISE-GESAMT-DOKTRIN.md:30-31` traegt als Stand:
+
+> **"STAND 06.08.2026 (Owner, verbatim): 'Fable wird nicht funktionieren und ist aufgebraucht,
+> bitte wechsel auf Opus 5 max effort'"** — Fable 5 faellt als Agenten-Modell komplett aus.
+
+**Das gilt seit dem 08.08. nicht mehr.** Owner-Wort von heute, woertlich:
+
+> „Bitte versuche für den Bau möglichst Opus 5 max effort zu verwenden und nochmal mit
+> **Fable 5 xhigh** nachzusetzen, wenn das Ergebnis nicht zufriedenstellend war."
+
+und zuvor mehrfach: *„Designplanung mit Fable 5 xhigh"*, *„das Wellen design mit Fable 5 max"*,
+*„jeweils auch ein Fable xhigh Agent, der den review reviewed"*.
+
+**Am Objekt belegt, dass Fable heute traegt:** die vier grossen Laeufe dieses Tages liefen
+ueber Fable-Phasen und lieferten vollstaendig — Wellenplan-Schaerfung 23/23 Agenten 0 Fehler ·
+Erkenntnis-Session 50/50 · TDD-Designplan 21/21 · Gesamtstand 23/23.
+
+**Die Widerspruchsregel der Doktrin selbst entscheidet den Fall** (`:20`):
+*"Owner-Wort > Teil A/V > eigener B-Abschnitt > Session-Memories."* Ein Owner-Wort vom 08.08.
+schlaegt einen Doktrin-Absatz, der ein Owner-Wort vom 06.08. konserviert.
+
+**DIE AKTUELLE MATRIX, wie sie heute wirklich gefahren wird:**
+
+| Rolle | Modell |
+|---|---|
+| Lead / Orchestrierung | Opus 5, max effort |
+| **Bau** | **Opus 5, max effort** — bei unbefriedigendem Ergebnis **mit Fable 5 xhigh nachsetzen** |
+| Explore / Recherche | Sonnet 5, max effort, „very thorough" (unveraendert, Owner-Dauerregel) |
+| **Design / Wellenentwurf** | **Fable 5 xhigh bzw. max** |
+| **Review-Meta-Stufe** | **Fable 5 xhigh** ueber einem Codex-Pass |
+| Schwer-Impl / Regressions-Lens | Codex |
+
+**A1 IST ERSETZT, nicht markiert** — Owner-Entscheid vom 08.08. nachts, woertlich: *„Bitte nimm
+den Befund raus aus dem Dokument, du bist gerade Fable 5. Wir haben genug Kontingent, bitte einfach
+diesen Eintrag löschen."* Damit ist die Doktrin-Pflegeregel 3 („nichts loeschen, Ueberholtes
+markieren") fuer diesen Fall ausdruecklich ausgesetzt; die Widerspruchsregel der Doktrin selbst
+(`:20`, „Owner-Wort > Teil A/V") deckt das. Der 06.08.-Absatz ist entfernt, die Matrix traegt den
+08.08.-Stand.
+
+*Die urspruengliche Fassung dieses Nachtrags sah vor, den Absatz als „UEBERHOLT" stehenzulassen.
+Der Owner hat das korrigiert -- ein aufgebrauchtes Kontingent, das keines mehr ist, als Historie
+mitzufuehren haette den naechsten Leser erneut in die Irre gefuehrt.*
+
+**Der Befund darueber hinaus — dieselbe Klasse wie D1 heute frueh:** ein Doktrin-Absatz traegt
+ein woertliches Owner-Zitat MIT Datum und war zum Zeitpunkt seiner Niederschrift korrekt. Genau
+diese Merkmale liessen ihn wie geltendes Recht aussehen. **Eine datierte Momentaufnahme in einem
+Regelwerk altert lautlos** — sie sieht auch dann noch aus wie eine Regel, wenn sie nur noch
+Geschichte ist. Konsequenz fuer die Pflege: jedes woertliche Owner-Zitat im Regelteil braucht
+einen Gueltigkeitsvermerk, nicht nur ein Entstehungsdatum.
+
+**Was A1 dagegen unveraendert richtig sagt und heute erneut belegt wurde:** das
+Top-Level-Agent-Werkzeug kennt **kein `effort`-Feld**. Jede Aufgabe, fuer die die Matrix eine
+Effort-Stufe vorschreibt, laeuft deshalb ueber das **Workflow**-Werkzeug — sonst ist die
+Effort-Vorgabe eine Regel ohne Kanal.
+
+---
 ## NACHTRAG 08.08.2026 nachts — vier Landungen, und D1 ist ein FEHLBEFUND
 
 **Nach dem Blanko-GO autonom durchgezogen. Zwei der fünf blockierenden Defekte sind geheilt, einer
