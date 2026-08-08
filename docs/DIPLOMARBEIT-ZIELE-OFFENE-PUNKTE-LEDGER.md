@@ -11395,3 +11395,78 @@ Das ist zugleich der Ersatz fuer `Code/tools/` (`run_all_tests.sh/.bat`, `cross_
 **Nicht loeschen** (Messdaten-Doktrin), sondern aus `ce/build/` heraus in ein Archiv. Sie ist damit die
 einzige getrackte Datei unter `build/`, die dort verschwindet -- und das `rm -rf build`-Risiko, das
 diese Session mehrfach beschaeftigt hat, faellt mit ihr weg.
+
+---
+
+## NACHTRAG 08.08.2026 — OWNER-ENTSCHEID: DIE BLATTFORM (Fassung 3 ist damit beantwortet)
+
+### CSV-VARIANTE -- flach, mit sprechenden Namen
+> *"Ich wuensche mir in der CSV Variante tatsaechlich **flach einzelne sheets**, welche die **Zeitraeume
+> parse-bar im Namen** tragen und **anfuehrend im Namen ihre Ebene** fuer das Messblatt benennen."*
+
+**=> Dateiname traegt zwei Ordnungsmerkmale: die EBENE zuerst (anfuehrend), dann den parsebaren
+ZEITRAUM.** Das macht ein Verzeichnis voller CSVs ohne Werkzeug sortier- und filterbar.
+
+### XLSX-VARIANTE -- die Blattform, verbatim
+> *"Bei XLSX moechte ich gerne **je einen sheet fuer einen Messbereich aus jeder Ebene**. Die
+> **micro-Benchmarks sind einzelne sheets**, die als **Akkumulation in den sheets der Makro-Benchmarks
+> per anklickbarem link** als Gesamtwert ueber die Macro-checkpoints zusammengefasst werden ueber alle
+> dort im Macro-Gesamtwert verwendeter Achsen, sodass sich die **micro-Profile aufgliedern** lassen. Und
+> das Macro-benchmarking dasselbe als **EIN verlinkter Funktionsaufruf als Akkumulierter checkpointe
+> Wert innerhalb eines Lastprofil-Aufrufes**. Es gibt also **je Last-Messungs-Rekombination einen
+> compare sheet**, der die Funktionsaufrufe als Macro-Benchmarking aufgliedert (ein sheet je
+> Funktionsaufruf) und diese Funktionsaufrufe haben dann wiederum die einzelne Gliederung der
+> Micro-Benchmarks der Achsen-Interfaces in der untersten Ebene."*
+
+### DIE LOESUNG GEGEN DIE SHEET-EXPLOSION -- Owner verbatim
+> *"Weil das sehr viele sheets werden, wollen wir die **sheets einer jeden Achse in den
+> Micro-benchmarks stattdessen zusammenlegen** und den **Aufrufer** und den **Zeitpunkt des Aufrufes**
+> sequentiell dort mit allen messwerten loggen. Damit gibt es **nur so viele Micro-Benchmark sheets wie
+> Gesamt-Achsen** fuer genau diesen Versuch. **Dasselbe machen wir fuer das Macro-Benchmarking**, sodass
+> **jede FUNKTION einen sheet** bekommt, der die **Aufruf-Zeitpunkte mit einer Spalte fuer den Aufrufer**
+> mit den Messwerten mitloggt."*
+
+**DIE ENTSCHEIDENDE UMKEHRUNG: nicht ein Sheet je AUFRUF, sondern ein Sheet je FUNKTION bzw. je ACHSE --
+und die Aufrufe werden zu ZEILEN.** Damit ist die Blattzahl **unabhaengig von der Lauflaenge**:
+
+| Ebene | Sheets | Zeilen je Sheet | Spalten (mind.) |
+|---|---|---|---|
+| **compare** (oberste) | **1 je Last-Messungs-Rekombination** | die Funktionsaufrufe | Verweis auf das Funktions-Sheet + akkumulierter Wert |
+| **Macro** | **1 je FUNKTION** | die Aufruf-Zeitpunkte, sequentiell | **Aufrufer** · Zeitpunkt · Messwerte |
+| **Micro** | **1 je ACHSE** des Versuchs | die Achsen-Aufrufe, sequentiell | **Aufrufer** · Zeitpunkt · Messwerte |
+
+**Blattzahl = 1 + |Funktionen| + |Achsen|** -- eine feste, kleine Zahl, statt einer, die mit jedem
+Aufruf waechst. **Die Verlinkung laeuft ueber anklickbare Links** (libxlsxwriter kann interne
+`write_url`-Verweise auf `'Sheetname'!A1`), sodass man vom akkumulierten Gesamtwert **hinabsteigen** kann:
+compare -> Funktions-Sheet -> Achsen-Sheet.
+
+### DIE ERKENNTNIS, DIE UEBER DIE BLATTFORM HINAUSGEHT
+> *"**Die Mess-Ebenen entsprechen damit gleichzeitig dem Stack-Aufrufmuster zwischen 3 Layern der
+> Architektur.**"*
+
+**Der Mess-Baum ist der Aufruf-Stack.** Compare = Lastprofil-Ebene · Macro = Gattung+Genus-Interface ·
+Micro = Achsen-Interface. Die Spalte **"Aufrufer"** ist damit nicht Buchhaltung, sondern die
+**Stack-Kante** -- sie verbindet jede Zeile mit ihrem Rufer eine Ebene hoeher und macht den Baum aus
+flachen Blaettern rekonstruierbar.
+
+### DER SEPARATE MESSPUNKT -- die Klebe-Zeit der Gattungs-Interfaces
+> *"**Die Ebene der Gattungs-Interfaces und deren Funktions-implementierung die zwischen den
+> Achsen-Interface-Aufrufen liegt, muss ueber das Macro-Benchmarking separat gemessen werden**, weil es
+> die Aufrufe an Achsen zwar **verbindet aber nicht vollstaendig ueberwachen kann**."*
+
+**Das ist der Anteil, den keine Achse verantwortet:** die Zeit, die die Interface-Funktion **zwischen**
+ihren Achsen-Aufrufen verbringt (Verzweigungen, Zwischenrechnungen, Datentransport). Sie ist
+**Macro-Gesamt minus Summe der zugehoerigen Micros** -- und genau deshalb muss Macro **separat**
+gemessen werden und darf nicht als blosse Summe seiner Achsen modelliert werden.
+**Wer Macro aus den Micros errechnet, verliert genau diesen Anteil und schreibt ihn faelschlich den
+Achsen zu.**
+
+### FOLGEN FUER DEN LAUFENDEN A9-S3-BAU
+Fassung 1/2 (ein Sheet je Unter-Achsen-Permutation + INFO-Sheet) und diese Fassung 3 sind **zwei
+Blatt-Familien in derselben Mappe**, kein Widerspruch:
+- Fassung 1/2 = **Ergebnis**-Bloetter (Zeile pro Messergebnis je Permutation)
+- Fassung 3 = **Profil**-Bloetter (compare / je Funktion / je Achse, Zeile pro Aufruf)
+**Beide brauchen dieselbe Factory, dieselbe 31-Zeichen-Wache, dasselbe INFO-Sheet.** Der Writer bekommt
+damit eine zweite Blattsorte, keinen zweiten Writer.
+**Neu hinzu kommt:** interne Hyperlinks (`write_url` auf `'Sheet'!A1`) und die Spalte **Aufrufer** als
+Stack-Kante.
