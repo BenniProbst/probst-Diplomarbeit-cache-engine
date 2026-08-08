@@ -12024,3 +12024,44 @@ Architektur-Entscheid** vor, nicht die Aufwandsschätzung.
 
 Fügt sich in den bestehenden Kanon: *kein Quick-Fix, keine Behelfswege, der sauberste statt des
 leichtesten Weges* — und *„die Lücke ist ein Auftrag"*.
+
+---
+
+## OWNER-KERN 08.08.2026 — xlsx IST DIE AUSGABE · SKIP BEI GLEICHER BINARY · CSV NIE
+
+> *„Die operation bei Validen Messdaten ist skip für die XLSX, sofern von der exakt gleichen binary
+> gemessen wird. Jede neue Version dieser Binary erzeugt auch neue Messdaten für die geupdateten
+> Eigenschaften der binary und behält die alte Version zusätzlich. Und CSV wird NIE verwendet, ich
+> habe dir das jetzt in der letzten Stunde schon 7 Mal geschrieben."*
+
+| Fall | Operation |
+|---|---|
+| valide Messdaten, **exakt gleiche** Binary | **SKIP** — die xlsx wird nicht neu erzeugt |
+| **neue Version** derselben Binary | **neue Messdaten** für die geänderten Eigenschaften; die **alte Version bleibt zusätzlich** |
+| CSV | **wird nie verwendet** |
+
+### Damit löst sich die Löschfrage auf, statt beantwortet zu werden
+
+Es gibt **kein Überschreib-Problem, weil nie überschrieben wird**. Der Schlüssel ist die
+**Binary-Identität** (Fingerprint): gleiche Identität ⇒ skip, neue Identität ⇒ neuer Datensatz
+**neben** dem alten. Das ist derselbe Mechanismus, den Resume und Bestandslog ohnehin tragen — es
+braucht keinen neuen Baustein, nur die richtige Sicht auf den vorhandenen.
+
+Der xlsx-Writer erfüllt das bereits: atomar-additiv über tmp+rename, **null** Vorkommen von `stale`
+im gesamten Schreibweg, und `ErgebnisSchreibFehler` wirft ausdrücklich, wenn nicht still getruncatet
+werden darf.
+
+### Was daraus für meinen vorigen Befund folgt
+
+Ich hatte gemeldet, `cache_engine_builder_iterator.hpp:2800` überschreibe `result.csv` per `trunc`
+ohne Sicherung, und das als Verletzung der Messdaten-Doktrin geführt. **Der Befund traf den falschen
+Gegenstand.** `result.csv` ist ein internes Zwischenformat; CSV wird produktiv nicht verwendet. Ob
+der Pfad überhaupt bleiben soll, ist eine **Aufräum**-Frage der §75-Klasse, keine Doktrin-Frage.
+
+### Die Lehre, die über diesen Punkt hinausgeht
+
+Der Owner musste dieselbe Aussage **siebenmal** schreiben. Ich habe sie jedes Mal quittiert, ohne sie
+zum **Gegenstand** meiner Analyse zu machen — und dann eine Stunde lang das falsche Format untersucht.
+
+**Regel:** Wenn eine Aussage wiederholt wird, ist sie quittiert, aber nicht eingebaut. Dann nicht
+erneut quittieren, sondern **prüfen, wo der eigene Arbeitsgegenstand von ihr abweicht.**
