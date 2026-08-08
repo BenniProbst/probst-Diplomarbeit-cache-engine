@@ -331,6 +331,38 @@ test:mess-ausbeute-bissprobe:
   script:
     - sh ci/tests/mess_ausbeute_bissprobe.sh --selbstbiss
 
+# -- W0b-1 / D3-3 (2026-08-08): PROBE fuer den PERSIST-SAMMLER (ci/persist_sammler.sh) --
+# Der Sammler entscheidet, ob ein Messfenster DAUERHAFT in den Baum kommt. Unter "Messdaten werden
+# nie geloescht" ist genau diese Entscheidung nicht rueckholbar: ein einmal zurueckgeschriebener
+# Laufordner ohne einen einzigen Messwert bleibt fuer immer im Repo und faelscht jede spaetere
+# Auswertung ueber die Grundgesamtheit der Laeufe. Bis heute entschied dort die ANWESENHEIT von
+# Dateien -- und weil PROVENANCE.txt immer geschrieben wird, war der Laufordner nie leer.
+#
+# WARUM DER BEWEIS AM GIT-ZUSTAND UND NICHT AM LOG: der Defekt dieses Tages ist durchgaengig, dass
+# Behauptung und Wirkung auseinanderfallen. Die Probe legt je Fall ein bare-Repo unter mktemp -d an,
+# klont es per file:// und fragt danach git SELBST (ls-files, rev-list --count, diff --name-only,
+# show <commit>:<pfad>). Ein Sammler, der "KEIN COMMIT" druckt und trotzdem committet, faellt hier.
+# Gepusht wird nie -- auch nicht auf den file://-Remote; origin wird nicht beruehrt.
+#
+# WARUM --selbstbiss IM CI: eine Probe, die nur am gesunden Objekt gruen ist, koennte immer gruen
+# sein. Der Schalter baut drei Wegwerf-Mutanten (Gate entfernt / Dateien statt Zeilen gezaehlt /
+# measure_out_smoke aus der Summe) und FORDERT, dass die Probe an jedem rot wird. So wird der Biss
+# bei jedem Lauf neu bewiesen. WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille
+# Null. KEIN .code-rules: Sammler und Probe muessen auch in einer docs-only-Welle laufen -- genau
+# dort wird .gitlab-ci.yml angefasst.
+test:persist-sammler-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigener Sammler; die Sandbox baut sich die Probe selbst
+  script:
+    - sh ci/tests/persist_sammler_probe.sh --selbstbiss
+
 # ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
 # User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
 # lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
@@ -1045,71 +1077,33 @@ persist:measurements:
       fi
       # ── (1) FS-sicherer, kollisionsfreier, sortierbarer UTC-Laufordner (KEIN ':' -> Windows/NTFS-sicher) ──
       RUN_TS="$(date -u +%Y%m%d-%H%M%S)-p${CI_PIPELINE_ID:-0}"
-      BK=measurement; DEST="$BK/$RUN_TS"; mkdir -p "$DEST"
-      echo "== persist -> $DEST =="
-      # ── (2) prebackup(): additiv, sha256-verifiziert, NIE ueberschreiben (Muster aus prebackup:measurements) ──
-      sha() { sha256sum < "$1" | cut -d' ' -f1; }
-      prebackup() {
-        local src="$1" ver="$2" dir base dst
-        dir="$BK/$ver"; mkdir -p "$dir"; base=$(basename "$src"); dst="$dir/$base"
-        if [ -e "$dst" ]; then
-          if [ "$(sha "$src")" = "$(sha "$dst")" ]; then echo "  idempotent: $base@$ver (gleicher sha256)"; return 0; fi
-          echo "  SCHUTZ: $base@$ver ABWEICHENDER sha256 -> Overwrite VERBOTEN"; return 3
-        fi
-        cp -- "$src" "$dst"
-        [ "$(sha "$src")" = "$(sha "$dst")" ] || { echo "  FEHLER: sha-Mismatch $base@$ver"; return 1; }
-        echo "  gesichert: $base@$ver (sha256=$(sha "$dst"))"
-      }
-      # ── (3) Auswertungs-Dokumente einsammeln (fehlende tolerieren) ──
-      persisted=0
-      for pdf in thesis/diplomarbeit/*.pdf; do [ -e "$pdf" ] || continue; prebackup "$pdf" "$RUN_TS"; persisted=$((persisted+1)); done
-      if [ -f manifest_out/build_manifest.txt ]; then prebackup manifest_out/build_manifest.txt "$RUN_TS"; persisted=$((persisted+1)); fi
-      # Anti-Phantom (Review 2026-07-12, Ledger §G2 / §0-DoD-6 Mess-Integritaet): der prebackup:measurements-
-      # Job ist ein reiner MECHANISMUS-SELBSTTEST (synthetische "messung v1/v2"-CSVs in prebackup_selftest_store/).
-      # Er wird via seinem EIGENEN 12-Wochen-Artefakt belegt und bewusst NICHT in den autoritativen
-      # measurement/<RUN_TS>/-Baum kopiert — sonst akkumuliert Fake-Material unter der Nie-loeschen-Doktrin.
-      # REAL versionierte Mess-CSV-Sicherungen (NAS/MinIO) sind #202-gegatet; sobald ein echter Backup-
-      # Produzent existiert, bekommt er hier einen EIGENEN Sammler, der ausschliesslich echte Daten aufnimmt.
-      # measure_out/ = die golden-320-Mess-CSVs des measure:golden-320-Jobs (nur bei COMDARE_RUN_MEASURE-Lauf vorhanden).
-      # NUR *.csv strukturerhaltend kopieren — NIE die ~320 DLL-Binaries (Repo-Bloat). Die .gitignore-Negation
-      # !measurement/**/*.csv macht die kopierten CSVs trackbar (sonst droppt `git add` sie via *.csv-Regel).
-      if [ -d Code/measure_out ]; then
-        n_csv=0
-        while IFS= read -r f; do
-          rel="${f#Code/measure_out/}"; mkdir -p "$DEST/measure_out/$(dirname "$rel")"
-          cp -- "$f" "$DEST/measure_out/$rel"; n_csv=$((n_csv+1))
-        done < <(find Code/measure_out -type f \( -name '*.csv' -o -name '*.tex' \))
-        if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out/ ($n_csv Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
-      fi
-      # measure_out_smoke/ = die Smoke-/Coverage-Mess-CSVs des measure:smoke-Jobs (#26/GO-5) — gleiche
-      # additive Mechanik, eigener Zielordner (kollisionsfrei zum golden-Lauf derselben Pipeline).
-      if [ -d Code/measure_out_smoke ]; then
-        n_csv=0
-        while IFS= read -r f; do
-          rel="${f#Code/measure_out_smoke/}"; mkdir -p "$DEST/measure_out_smoke/$(dirname "$rel")"
-          cp -- "$f" "$DEST/measure_out_smoke/$rel"; n_csv=$((n_csv+1))
-        done < <(find Code/measure_out_smoke -type f \( -name '*.csv' -o -name '*.tex' \))
-        if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out_smoke/ ($n_csv Smoke-Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
-      fi
-      {
-        echo "# persist:measurements Laufordner — Provenance (#22, Ledger §11-G)"
-        echo "run_ts=$RUN_TS"
-        echo "generated_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-        echo "ci_pipeline_id=${CI_PIPELINE_ID:-NA}"; echo "ci_pipeline_url=${CI_PIPELINE_URL:-NA}"
-        echo "super_commit_sha=${CI_COMMIT_SHA:-$(git rev-parse HEAD 2>/dev/null || echo NA)}"
-        echo "super_commit_ref=${CI_COMMIT_REF_NAME:-NA}"; echo "persisted_artifact_count=$persisted"
-      } > "$DEST/PROVENANCE.txt"
-      echo "-- Laufordner --"; find "$DEST" -type f | sort
-      [ "$persisted" -eq 0 ] && echo "WARNUNG: keine Auswertungs-Dokumente gefunden (nur PROVENANCE.txt)"
+      # ── (2)+(3) Sammeln + DATENZEILEN-BILANZ: gehoben nach ci/persist_sammler.sh (D3-3, 2026-08-08) ──
+      #    Der Rumpf ist string-identisch aus diesem Block gehoben (Beweis: der Hebe-Commit), damit er
+      #    ueberhaupt probefaehig wird; der Beweis laeuft in ci/tests/persist_sammler_probe.sh AM
+      #    GIT-ZUSTAND eines Sandbox-Klons. Logik in einem YAML-Block ist nicht testbar, und genau
+      #    hier entschied bisher die ANWESENHEIT von Dateien ueber den dauerhaften Rueckschrieb.
+      test -x ci/persist_sammler.sh || { echo "FEHLER: ci/persist_sammler.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      bash ci/persist_sammler.sh sammeln "$RUN_TS"
       # ── (4) Writeback: commit -> bei non-ff MERGE origin-Tip (User-Direktive: MERGE, KEIN rebase) -> push ──
-      git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
       # Write-Credential NUR als Var-Referenz (maskiert+protected; KEIN set -x / kein `git remote -v`-Echo -> kein Leak).
       git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
       git fetch origin "$CI_COMMIT_BRANCH"
       git checkout -B "$CI_COMMIT_BRANCH" "origin/$CI_COMMIT_BRANCH"   # detached HEAD -> benannter Branch am origin-Tip (measurement/ bleibt untracked erhalten)
-      git add -- measurement/
-      if git diff --cached --quiet; then echo "nichts einzuchecken (leerer Commit vermieden)"; exit 0; fi
-      git commit -m "measurement(#22): Lauf ${CI_PIPELINE_ID:-NA} ${RUN_TS} [skip ci]"
+      # DAS COMMIT-GATE (D3-3): rc=10 heisst "leeres Messfenster, KEIN Rueckschrieb" und ist KEIN Fehler.
+      # Bisher war ein Laufordner nie leer -- PROVENANCE.txt wird immer geschrieben --, also war der
+      # Commit selbst dann faellig, wenn keine einzige Mess-CSV vorlag. `git config` (Identitaet der
+      # Merge-Commits weiter unten) setzt der Sammler; er laeuft vor der Push-Schleife.
+      test -x ci/persist_sammler.sh || { echo "FEHLER: ci/persist_sammler.sh nach checkout weg"; exit 1; }
+      set +e
+      bash ci/persist_sammler.sh gate "$RUN_TS"
+      gate_rc=$?
+      set -e
+      if [ "$gate_rc" -eq 10 ]; then
+        echo "=== persist:measurements OK: KEIN Rueckschrieb (leeres Messfenster) -- Job gruen, Baum sauber ==="; exit 0
+      fi
+      if [ "$gate_rc" -ne 0 ]; then
+        echo "FEHLER: ci/persist_sammler.sh gate endete mit rc=$gate_rc (kein Rueckschrieb)" >&2; exit "$gate_rc"
+      fi
       for attempt in 1 2 3 4 5; do
         if git push -o ci.skip origin "HEAD:$CI_COMMIT_BRANCH"; then
           echo "=== persist:measurements OK: gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
