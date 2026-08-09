@@ -395,6 +395,36 @@ test:bestandslog-wache-bissprobe:
   script:
     - sh ci/tests/bestandslog_wache_probe.sh --selbstbiss
 
+# -- LAG-P1 Rest (2026-08-09): PROBE fuer die OBJECT-STAT-WACHE (ci/object_stat_wache.sh) --
+# SELBSTCHECK dieses Blocks: die Probe deckt die Wache UND die Abnahme ab (26 Faelle je Lauf,
+# 4 Selbstbiss-Mutanten). Sie braucht KEIN erreichbares MinIO: die Erfolgsfaelle laufen mit der
+# ECHTEN mc-Binary gegen ein lokales Verzeichnis (mc kann lokale Pfade statten und kopieren),
+# die Store-Fehlerfaelle gegen ein Fake-mc, dessen JSON-Formen am 09.08. literal von der echten
+# mc-Binary abgenommen wurden. Deshalb faehrt sie in JEDER Pipeline und nicht nur im Opt-in.
+#
+# DER BEFUND, DER DIESE PROBE ERZWANG (09.08., selbst gemessen, nicht abgeschrieben):
+# 'mc stat --json' liefert bei FEHLENDEM OBJEKT und bei TOTEM STORE denselben Exit (1), und die
+# LETZTE Ausgabezeile ist in beiden Faellen bedeutungsgleich ('Object does not exist'). Der
+# Unterschied steckt allein in der ERSTEN Zeile. Eine Wache, die den Exit oder die letzte Zeile
+# liest, meldet einen Infrastruktur-Ausfall als harmlos fehlendes Objekt. Genau diesen Mutanten
+# faengt der Selbstbiss (M1/M4).
+#
+# KOEDER: Groessen, etags und das Schein-Geheimnis werden bei JEDEM Lauf frisch aus /dev/urandom
+# gewuerfelt, nie aus einer Doku uebernommen (K13).
+# KEIN allow_failure: eine advisory Probe ist die naechste stille Null.
+test:object-stat-wache-bissprobe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft werden nur super-Skripte
+  script:
+    - sh ci/tests/object_stat_wache_probe.sh --selbstbiss
+
 # -- P4b (2026-08-09): PROBE fuer den ANHANG-VORWAERTS-KERN (ci/anhang_forward_core.sh) --
 # SELBSTCHECK dieses Blocks: alle Zahlen unten sind am Objekt gemessen, keine ist abgeschrieben.
 #
@@ -1124,6 +1154,42 @@ thesis:pdf:
         echo "== Bestandslog-Wache: Opt-in nicht gesetzt -> nichts zu pruefen (inert-by-default) =="
       fi
 
+# ── LAG-P1 Rest (2026-08-09): die OBJECT-STAT-ABNAHME -- der Round-Trip gegen den Store.
+#    Sie schliesst die Luecke, die .bestandslog_wache in ihrem eigenen Kopf benennt: jene belegt,
+#    dass das Gate GEZUENDET hat (eine Aussage ueber den LAUF), diese belegt, dass der Store ein
+#    Objekt WIRKLICH aufnimmt und mit exakt der richtigen Groesse zurueckgibt (eine Aussage ueber
+#    den STORE). Der Unterschied ist der zwischen Gegenstand und Stellvertreter.
+#
+#    WIE DER SOLLWERT ENTSTEHT: ein Objekt ZUFAELLIGER Groesse wird frisch gewuerfelt, abgelegt und
+#    nachgemessen; der Sollwert kommt aus 'wc -c' des Dateisystems, der Istwert aus 'mc stat --json'
+#    des Stores -- zwei verschiedene Quellen (T-3/T-5). Ein Wert, den vor dem Lauf niemand kennen
+#    konnte, laesst sich nicht zufaellig richtig raten.
+#
+#    WARUM NICHT DAS BESTANDSLOG-DOKUMENT SELBST GEPRUEFT WIRD (ehrliche Grenze, 09.08. gemessen):
+#    Fuer das Dokument bestandslog/binary_bestand.xml existiert derzeit KEINE fremde Quelle fuer
+#    seine Groesse -- der Treiber schreibt es ueber den ArtifactCache direkt in den Store, eine
+#    lokale Kopie bleibt nicht liegen (im super-Baum 0 Treffer, gegengeprueft). Eine Groessen-
+#    Zusicherung gegen den Store waere hier nur gegen den Store selbst zu bilden und damit
+#    zirkulaer. Wer das Dokument namentlich abnehmen will, ruft ci/object_stat_wache.sh direkt mit
+#    einer erwarteten Groesse auf; die muss der ERZEUGER liefern. Das ist ein Folgepaket auf der
+#    ce-Seite und wird hier ausdruecklich NICHT stillschweigend mitbehauptet.
+#
+#    OPT-IN-GATE UND FAIL-CLOSED, UND WARUM DAS KEIN WIDERSPRUCH IST: Storage #51 ist im ganzen
+#    Haus inert-by-default (golden byte-neutral). Diese Abnahme laeuft deshalb NUR, wenn
+#    COMDARE_STORAGE_CACHE=true -- also nur dort, wo jemand ZUGESAGT hat, dass Ebene B lebt.
+#    INNERHALB dieses Gates gibt es kein Ueberspringen: ist der Store dann nicht erreichbar, faellt
+#    der Job hart rot (rc 3 INFRASTRUKTUR), fehlt oder differiert das Objekt, ebenfalls (rc 1
+#    FACHLICH). Eine Wache, die bei fehlendem Messgegenstand gruen meldet, waere genau die stille
+#    Null, gegen die diese Datei gebaut ist. KEIN allow_failure -- auf Job-Ebene seit 06.07. verboten.
+.object_stat_abnahme:
+  script:
+    - |
+      if [ "${COMDARE_STORAGE_CACHE:-}" = "true" ]; then
+        sh "$CI_PROJECT_DIR/ci/object_stat_abnahme.sh"
+      else
+        echo "== Object-Stat-Abnahme: Storage #51 nicht scharf -> kein Store zugesagt, nichts zu pruefen (inert-by-default) =="
+      fi
+
 # ── P11-Lehre (W9.6): Mess-Pre-Flight — HARTER Abbruch, wenn ein FREMDER comdare-messung-driver auf dem Runner
 #    laeuft. Die 1-Thread-Mess-Doktrin verlangt Allein-Belegung (ein paralleler Driver verfaelscht die Streuung).
 #    Laeuft VOR dem eigenen Driver-Start -> jeder gefundene Driver ist fremd; zusaetzlich wird die eigene
@@ -1254,6 +1320,9 @@ measure:smoke:
       echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
     # LAG-P1: Bestandslog-Wache als eigener Schritt, OHNE allow_failure (Begruendung s. measure:golden-320).
     - !reference [.bestandslog_wache, script]
+    # LAG-P1 Rest: die Wache oben belegt, dass das Gate zuendete; DIESE belegt, dass der Store
+    # ein Objekt wirklich haelt. Log-Aussage und Store-Aussage sind zwei verschiedene Dinge.
+    - !reference [.object_stat_abnahme, script]
   artifacts:
     paths:
       - Code/measure_out_smoke/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die 115 DLL-Binaries
@@ -1380,6 +1449,9 @@ measure:golden-320:
     # bewusst hinter der Mess-Ausbeute-Wache: erst "hat der Lauf Messwerte erzeugt", dann "war er dabei
     # ueberhaupt am Lager angemeldet". Beide Fragen sind getrennt beantwortbar und beide muessen ja sein.
     - !reference [.bestandslog_wache, script]
+    # LAG-P1 Rest: und danach die Store-Seite. "War der Lauf am Lager angemeldet" (oben) und
+    # "haelt der Store wirklich Objekte" (hier) sind getrennt beantwortbar; beide muessen ja sein.
+    - !reference [.object_stat_abnahme, script]
   artifacts:
     paths:
       - Code/measure_out/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die ~320 DLL-Binaries (Repo-/Artefakt-Bloat)
@@ -1766,6 +1838,9 @@ planer:delegate:
       echo "== STUFE-1 CEB-Trigger-Jobs (Grandchild -> STUFE 2): $(grep -c '# JOB ceb-trigger combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
     # LAG-P1: die Wache als EIGENER Schritt, nach dem Lauf, OHNE allow_failure.
     - !reference [.bestandslog_wache, script]
+    # LAG-P1 Rest: der Planer meldet sich am Lager an -- ob das Lager selbst traegt, sagt erst
+    # der Round-Trip gegen den Store.
+    - !reference [.object_stat_abnahme, script]
   artifacts:
     paths:
       - planer-child-ci.yml
