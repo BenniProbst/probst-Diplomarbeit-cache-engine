@@ -16,6 +16,142 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — Lager-Scharfschaltung: drei Pakete gelandet, eine Provenienz gestört, und ein Stellvertreter im eigenen Abnahme-Entwurf
+
+### PROVENIENZ-RICHTIGSTELLUNG — die Arbeit steht unter falschem Namen, und schuld bin ich
+
+**`58805728` trägt die Nachricht „docs: Rangfolge richtiggestellt" und enthält 677 Zeilen
+fremder Arbeit:**
+
+    .gitlab-ci.yml                          32 ++      <- LAG-P1
+    Code/02_messung_driver/main.cpp         11 +-      <- LAG-P1
+    ci/bestandslog_wache.sh                201 ++++    <- LAG-P1 (NEU)
+    ci/comdare_bestandslog_activation.sh   142 ++++    <- LAG-P1 (NEU)
+    ci/tests/bestandslog_wache_probe.sh    301 ++++    <- LAG-P1 (NEU)
+
+Ebenso enthält **`cc057ccf`** („fix(abnahme06)") die `.gitlab-ci.yml`-Anker
+`.bestandslog_activation` und `.bestandslog_wache` samt Verdrahtung in `planer:delegate`,
+`measure:smoke` und `measure:golden-320` — ebenfalls LAG-P1.
+
+**Der LAG-P1-Agent bekam keinen eigenen Commit.** Sein `git commit` endete mit *„no changes added
+to commit"*, weil die Staging-Area schon weg war. Er hat es korrekt gemeldet, per `git log -S` und
+`--diff-filter=A` verifiziert, und ausdrücklich **nicht** rebased.
+
+**Inhaltlich ist nichts verloren** — der Agent hat alle vier Dateien mit `cmp -s` gegen seinen
+Arbeitsstand geprüft: **4 von 4 byte-identisch**. Was fehlt, ist die **Provenienz**: der
+`Co-Authored-By`-Trailer seines Beitrags, und eine Commit-Nachricht, die sagt, was der Commit tut.
+
+**Die Ursache ist mein Orchestrierungsfehler, nicht seiner.** Ich habe drei Schreiber gleichzeitig
+in denselben Worktree gelassen — zwei Bau-Stränge und mich selbst. **Alle drei haben
+pfadbeschränkt gestaged**, niemand hat `git add -A` benutzt. Es reichte trotzdem nicht:
+**`git commit` committet die Staging-Area, nicht die eigene `git add`-Operation.** Es gibt in Git
+keine per-Agent-Staging-Area.
+
+**Regel, ab sofort und in ein Memory gebrannt: EIN SCHREIBER JE WORKTREE.** Zwei Bau-Stränge im
+selben Repo laufen nacheinander oder in getrennten Worktrees. **Auch der Lead ist ein Schreiber.**
+
+Keine Korrektur der Historie — nie rebase. Diese Zeilen sind die Richtigstellung.
+
+---
+
+### Der wichtigste inhaltliche Befund: mein Abnahme-Entwurf war ein Stellvertreter
+
+Ich hatte für LAG-P1 als Abnahme vorgegeben: *„eine echte Pipeline zeigt literal
+`[bestandslog] aktiv: doc_key=…`"*. Der Agent hat am Objekt gefunden, dass **diese Zeile nichts
+über das Lager aussagt**:
+
+> Im lokalen Planer-Lauf fiel die aktiv-Zeile, der Schreibweg scheiterte **danach** und meldete
+> `fehlerklasse=reservierung_nicht_gespeichert … Emission läuft trotzdem weiter` — **ohne
+> Abbruch**.
+
+**Wer nur die aktiv-Zeile prüft, kann ein leeres Lager für scharf halten.** Das ist exakt die
+Fehlerklasse, die GOAL v8 als *Stellvertreter* führt — ein korrektes Messgerät am falschen
+Gegenstand — und diesmal saß sie **in meinem eigenen Paket-Entwurf**, nicht im Werkzeug.
+
+Die vollständige Abnahme braucht die **Existenz des Dokuments im Store** (`object_stat`), nicht
+die Absichtserklärung im Log. Sie ist **nicht erbracht**: `gitlab.comdare.local` liefert auf allen
+authentifizierten Pfaden **HTTP 500**, also kein Push, kein Trigger, keine Jobliste.
+
+---
+
+### Was tatsächlich gelandet ist
+
+**`ce 8cbf83d5` — LAG-P4, das 4096er-Korn ist compile-hart gebunden.** Die drei Konstanten
+(`experiment_plan_director.hpp:662`, `batch_planner.hpp:51`, `planer_driven_build.hpp:60`) sind
+per `static_assert` verbunden; eine davon auf 4095 zu setzen bricht jetzt den Bau.
+
+Zwei Nebenbefunde: **der Spiegel-Kommentar war zweimal gedriftet**, nicht einmal — `batch_planner.hpp:14`
+**und** `:50` verwiesen beide auf `experiment_plan_director.hpp:439`, real steht die Konstante bei
+`:662` (**223 Zeilen** Abweichung). Und `planer_driven_build.hpp:59` verwies bereits **ohne
+Zeilennummer**, nur auf den Bezeichner — **die einzige Fassung, die nicht driften konnte.**
+
+Die tragende Schicht ist `experiment_plan_director.hpp` **selbst**, nicht `profile_run_facade.cpp`
+wie zunächst angenommen. Die Gegenrichtung ist ausdrücklich verboten (`progress_delta.hpp:5`: der
+`builder` darf nicht aufwärts in `profile_facade/planner` inkludieren) — **die Bindung kann nur
+dort stehen**.
+
+**`ce 59cc9428` — LAG-P2, das Messwert-Genus bekommt seinen Schlüssel.** Die drei toten Felder
+sind belegbar; der Agent hat die 0-Zuweiser-Behauptung mit eigenem Nenner bestätigt (ce `libs/`
+4/4/2 — alle im Iterator selbst; `apps/` 0/0/0; `tests/` 0/0/0).
+
+**Ein Entwurfspunkt, den er nicht erfunden hat:** das Paket sagte „`mess_bestand_versions` aus
+derselben Quelle wie die Binary-Seite". Am Objekt hat die Binary-Seite **gar keine
+versions-Quelle** — `LagerRunState::observe` nimmt keinen `versions`-Parameter, nur
+`MesswertRunState::observe` tut das. Das Tag existiert **nur** im Messwert-Genus. Er hat das Feld
+deshalb als durchgereichten Host-Wert gebaut, statt eine nicht existierende Quelle zu erfinden.
+
+**Und die M-1a-Rückstellung gilt nicht mehr:** M-1a ist am 07.08. als `bba4d90f` gelandet und
+Vorfahr von HEAD (`git merge-base --is-ancestor` rc=0). Der Agent konnte in `profile_run_facade.cpp`
+schreiben, statt drumherum zu bauen.
+
+---
+
+### LAG-P2 ist NICHT scharf — und der Agent sagt es selbst
+
+> „Die ce-Seite ist vollständig und bewiesen, aber der **HOST belegt die drei Felder nicht**.
+> Damit bleibt `mess_bestandslog_active` im Produktions-Lauf weiterhin **false**. Ich habe die
+> **Erreichbarkeit** hergestellt und die **Semantik** bewiesen, **NICHT die Wirkung**. Das ist
+> genau die Sorte Halb-Landung, die dieses Paket beenden sollte — ich sage es deshalb hier klar
+> statt es in eine Erfolgsmeldung zu verpacken."
+
+Fehlend ist konkret: drei Deklarationen in `super Code/02_messung_driver/main.cpp` (~:1112-1114),
+die Belegung im bereits gegateten Zweig, drei `pa.*`-Durchreich-Zeilen (~:1349-1351) — **und eine
+neue Variable `COMDARE_BESTANDSLOG_MESS_DOC_KEY`, die zusätzlich in die Forward-Liste des Planers
+muss** (`experiment_plan_director.hpp:1008-1011`), weil dynamische Child-Pipelines globale
+Parent-Variablen **nachweislich nicht erben** (belegt an Serie-E2E 11562/11566).
+
+Der Agent hat super **nicht** angefasst — richtig, denn dort schrieb in denselben Minuten ein
+anderer Strang.
+
+---
+
+### Zwei Selbstmeldungen, die den Bericht glaubwürdig machen
+
+**Mutant M3 war zuerst stumm.** Der erste Selbstbiss-Lauf war rot, weil ein Mutant („jede
+Marker-Zeile gilt als aktiv") von **keinem** Testfall erwischt wurde. **Das war eine echte Lücke
+in den eigenen Tests, kein schlechter Mutant** — es fehlte der Fall „WARNUNG, die `doc_key` und
+`owner` mitführt". Nach Ergänzung: 3 von 3 Mutanten erkannt. **Ohne `--selbstbiss` wäre die Lücke
+unentdeckt geblieben.**
+
+**Ein eigener Arbeitsfehler, selbst gemeldet:** eine Kommentarzeile in `main.cpp` mit `#` statt
+`//` begonnen — in C++ eine Präprozessor-Direktive, die den Bau gebrochen hätte. Vor dem Bau
+bemerkt und korrigiert. Seine eigene Lehre: *„mein »sieht harmlos aus«-Reflex bei Kommentaren
+trägt nicht."*
+
+---
+
+### Eine bewusste Entscheidung, die ein Owner-Einwand treffen könnte
+
+Die Wache ist **hart**, sobald `COMDARE_BESTANDSLOG=true` gesetzt ist — auch wenn Ebene B fehlt.
+Der Binder selbst bricht in diesem Fall doktrin-konform **nicht** ab („Fehlerklassen-Doktrin, nie
+Abbruch"). Der Agent hat das nicht als Widerspruch gewertet, weil die Doktrin dem **Treiber**
+verbietet, einen laufenden Bau abzubrechen, während die **Wache danach** läuft. Die Begründung
+trägt — aber es ist eine Auslegung, keine Festlegung.
+
+Ebenso eine Wahl, keine Festlegung: der `doc_key`-Default `bestandslog/binary_bestand.xml` folgt
+der im ce-Testbestand dominierenden Schreibweise. **Einen produktiven Default gab es nirgends.**
+Überschreibbar per `COMDARE_BESTANDSLOG_DOC_KEY`; falls ein anderer Schlüssel gemeint war, ist es
+eine Ein-Zeilen-Korrektur.
 ## NACHTRAG 09.08.2026 — D5-1 gelandet: der Perzentil-Kanon steht, und drei Plan-Zahlen waren falsch
 
 **Gelandet in `ce`:** `c98b4b95` (D5-1, 14 Dateien, +595/−77, neue Testdatei
