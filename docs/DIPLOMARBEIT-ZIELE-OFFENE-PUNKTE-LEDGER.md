@@ -16,6 +16,57 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — MeasureStorage: VOLLES GO, und `checkpoint_measure` hat ZWEI interne Systeme
+
+> **Owner: „Alle anderen Annahmen von dir: volles GO, alles korrekt."**
+
+Damit sind die acht Punkte des Deep Research **Festlegung, nicht Vorschlag** — `mmap` statt
+`pmr`-Typ, lineares Append-Log statt Ring, kein Lock im Hot-Path, verifizierte Hauskonstante statt
+`hardware_destructive_interference_size`, gezieltes `madvise` + Pre-Touch statt systemweitem THP,
+roh aufnehmen statt bucket-komprimieren, `ErgebnisMappe` als **Konsument** von
+`measure_to_latex`.
+
+### Die Präzisierung, die den Entwurf schärft
+
+> „es gibt also eine **Arena für die Messergebnisse mit nur append und Auswertung zum Schluss**,
+> und es gibt einen **Stack, der von `checkpoint_measure` in einer GETRENNTEN custom Arena**
+> prüft, **auf welcher Mess-Ebene wir uns befinden und in welchem Modul+Funktion**.
+> `checkpoint_measure` hat also **2 interne Systeme — Mess-Arena und Stack-Arena, custom**."
+
+| | **MESS-ARENA** | **STACK-ARENA** |
+|---|---|---|
+| **Zweck** | die Messergebnisse | **wo bin ich gerade?** — Ebene + Modul + Funktion |
+| **Zugriff** | **nur APPEND** | **LIFO** — push bei Eintritt, pop bei Austritt |
+| **Wachstum** | **monoton** | **auf und ab** mit der Verschachtelung |
+| **Dimension** | **Ereigniszahl** (`--check-size`) | **Verschachtelungstiefe** |
+| **Auswertung** | **zum Schluss** | **während** des Laufs |
+| **Inhalt** | Records (POD) | **Referenzen**, keine Kopien |
+
+### Warum das mehr ist als eine Aufteilung — vier Konsequenzen
+
+**Die Dimensionierung ist grundverschieden:** Millionen Messpunkte gegen eine typisch einstellige
+Schachtelungstiefe. In **einem** Bereich hieße das, die kleine Struktur an der großen zu
+dimensionieren — oder einen Überlauf zu riskieren.
+
+**Die Lebensdauer ist verschieden:** die Mess-Arena wird **nie** zurückgesetzt, die Stack-Arena
+**ständig**.
+
+**Das Überlauf-Verhalten ist ein Fehlerklassen-Unterschied.** Volle Mess-Arena = **Datenverlust**,
+muss laut werden. Voller Stack = **zu tiefe Verschachtelung**, also ein **Programmierfehler**.
+Zwei verschiedene Diagnosen, die sich keine Meldung teilen dürfen.
+
+**Und getrennte Cachelines sind Pflicht:** der Stack wird bei **jedem** Checkpoint gelesen *und*
+geschrieben, die Mess-Arena nur geschrieben. Beide in einer Cacheline wäre ein selbstgemachtes
+**False Sharing** — ausgerechnet in dem Modul, das solche Effekte messen soll.
+
+### Was daraus für die Aufrufer-Rekonstruktion folgt
+
+Der Stack trägt **Mess-Ebene · Modul · Funktion**. Damit ist erklärt, warum das Aufrufer-Tripel
+beim **Auslesen** rekonstruiert wird, statt bei jedem Checkpoint mitgeschrieben zu werden:
+**im Log steht der Verweis, im Stack die Herkunft.**
+
+Das deckt sich mit dem Deep-Research-Befund, dass der Stack **nur Referenzen** hält — und es
+erklärt ihn: er ist kein Zwischenspeicher für Messwerte, sondern ein **Positionsanzeiger**.
 ## NACHTRAG 09.08.2026 — MeasureStorage: der Deep Research ist da, und er widerlegt zwei naheliegende Annahmen
 
 **Volltext:** `docs/plaene/20260809-MEASURESTORAGE-design-und-deep-research.md` (Strang 30 —

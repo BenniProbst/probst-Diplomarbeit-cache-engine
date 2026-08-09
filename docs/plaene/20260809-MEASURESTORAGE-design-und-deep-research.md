@@ -10,6 +10,54 @@
 
 ---
 
+## ⭐ OWNER-FREIGABE 09.08.2026: VOLLES GO — und die Zwei-Arenen-Struktur
+
+> **„Alle anderen Annahmen von dir: volles GO, alles korrekt."**
+
+Damit sind die acht Punkte unten **Festlegung, nicht Vorschlag**. Und der Owner hat dabei die
+innere Struktur präzisiert:
+
+> „es gibt also eine **Arena für die Messergebnisse mit nur append und Auswertung zum Schluss**,
+> und es gibt einen **Stack, der von checkpoint_measure in einer GETRENNTEN custom Arena** prüft,
+> **auf welcher Mess-Ebene wir uns befinden und in welchem Modul+Funktion**. checkpoint_measure hat
+> also **2 interne Systeme — Mess-Arena und Stack-Arena, custom**."
+
+### ZWEI GETRENNTE ARENEN — nicht ein Bereich mit zwei Abschnitten
+
+| | **MESS-ARENA** | **STACK-ARENA** |
+|---|---|---|
+| **Zweck** | die Messergebnisse | **wo bin ich gerade?** — Mess-Ebene + Modul + Funktion |
+| **Zugriff** | **nur APPEND** | **LIFO** — push beim Eintritt, pop beim Austritt |
+| **Wachstum** | **monoton** über den ganzen Lauf | **auf und ab** mit der Verschachtelung |
+| **Dimension** | erwartete **Ereigniszahl** (`--check-size`) | maximale **Verschachtelungstiefe** |
+| **Auswertung** | **zum Schluss**, nach dem Lauf | **während** des Laufs, bei jedem Checkpoint |
+| **Inhalt** | Records (POD) | **Referenzen** (Index/Offset), keine Kopien |
+
+**Warum die Trennung wesentlich ist — vier Konsequenzen für den Bau:**
+
+**1. Die Dimensionierung ist grundverschieden.** Die Mess-Arena skaliert mit der Zahl der
+Messpunkte (potenziell Millionen), die Stack-Arena mit der **Schachtelungstiefe** (typisch
+einstellig). Beide in **einen** Bereich zu legen hieße, die kleine Struktur an der großen zu
+dimensionieren — oder umgekehrt einen Überlauf zu riskieren.
+
+**2. Die Lebensdauer ist verschieden.** Die Mess-Arena wird **nie** zurückgesetzt (bis zum
+Lauf-Ende), die Stack-Arena **ständig**.
+
+**3. Das Überlauf-Verhalten ist verschieden — und das ist ein Fehlerklassen-Unterschied.**
+Eine volle Mess-Arena bedeutet **Datenverlust** und muss **laut** werden. Ein voller Stack
+bedeutet **zu tiefe Verschachtelung** — ein **Programmierfehler**, kein Kapazitätsproblem. Zwei
+verschiedene Diagnosen, die nicht dieselbe Meldung teilen dürfen.
+
+**4. Getrennte Cachelines.** Der Stack wird bei **jedem** Checkpoint gelesen **und** geschrieben,
+die Mess-Arena nur geschrieben. Sie in derselben Cacheline zu führen wäre ein selbstgemachtes
+**False-Sharing-Problem** — in genau dem Modul, das solche Effekte messen soll.
+
+**Was daraus für die Aufrufer-Rekonstruktion folgt:** der Stack trägt **Mess-Ebene · Modul ·
+Funktion**. Das erklärt, warum das Aufrufer-Tripel beim **Auslesen** rekonstruiert wird statt bei
+jedem Checkpoint mitgeschrieben zu werden — **im Log steht der Verweis, im Stack die Herkunft.**
+
+---
+
 ## DIE EMPFEHLUNG IN ACHT PUNKTEN
 
 **1. Reservierung: EIN anonymer `mmap`**, dimensioniert über den `--check-size`-Hook.
