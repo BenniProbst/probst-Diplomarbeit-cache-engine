@@ -164,8 +164,28 @@ ist, überlebt jede Löschung.
    der Testsituation dummy commands als DIRECTOR von der CEB an. Ohne Planer keine CEBs, keine
    Tier-Binaries ohne CEBs, keine Hybrid-Binaries ohne Tier-Binaries."* Builder-Muster:
    Planer = Director, CEB = Builder (`director` steht in 136 ce-Dateien).
-4. **xlsx = Standard, csv wählbar, BEIDE ZUSAMMEN zulässig.** Das XOR vom 05.08. ist aufgehoben;
-   Strategy Pattern, xlsx-Default und „keine CoR-Kette" bleiben. Richtung **immer xlsx → csv**.
+4. **xlsx IST DER STANDARD. CSV WAR NIE DER STANDARD.** *(Owner 09.08., ausdrücklich klargestellt —
+   der IST-Stand im Repo legt das Gegenteil nahe und ist genau deshalb die Regression.)*
+
+   CSV ist **ausschließlich optional**, und zwar in genau zwei Formen:
+
+   | Form | Bedeutung |
+   |---|---|
+   | **einzeln STATT xlsx** | csv gewählt, xlsx nicht — die Mappe wird als flache Sheets ausgegeben |
+   | **additiv ZU xlsx** | beide gewählt — csv entsteht **nach** der xlsx, **aus deren Existenz** |
+
+   **Ohne Angabe entsteht xlsx.** Die Richtung ist **immer xlsx → csv, nie umgekehrt**: es gibt
+   keinen Parser, der eine fertige CSV einliest, um daraus eine Mappe zu bauen. Beide Ausgaben
+   speisen sich aus **denselben In-Memory-Zeilen** derselben Mappe — deshalb ist „beide zugleich"
+   auch kein Doppelschreiben, sondern eine Mappe mit zwei Ausgabe-Strategien.
+
+   Das XOR vom 05.08. ist damit **in seiner Ausschließlichkeit** aufgehoben; Strategy Pattern,
+   xlsx-Default und „keine CoR-Kette" bleiben unverändert gültig.
+
+   **Warum das in einer Übergabe steht:** der Bestand sagt etwas anderes — super-CI zählte
+   `csv 36 / xlsx 0`, das golden-Profil wählte literal `<method value="csv"/>`, und der
+   xlsx-Writer wurde von **null** Produktions-Targets gelinkt. Wer nur den Code liest, hält csv
+   für den Standard. **Er ist es nicht und war es nie** — das ist die Regression, nicht die Norm.
 5. **GOOGLE TESTS statt Shell-Proben, Debug UND Release.** *„Skripte sagen gar nichts."*
    Der Test muss drei Zustände unterscheiden: **(a)** Wache greift (mit dem erwarteten Literal),
    **(b)** Mutant überlebt → ROT, **(c)** Werkzeug kaputt → ROT, **nicht** „gefangen".
