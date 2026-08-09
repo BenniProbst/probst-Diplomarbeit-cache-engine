@@ -16,6 +16,163 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — der DURCHSTICH ist an drei Nähten offen, und die Nenner-Divergenz ist aufgelöst
+
+Zwei Stränge gelandet. Der eine trifft die **Frist am Freitag**, der andere schließt den letzten
+offenen W-1-Posten.
+
+---
+
+# TEIL A — Der F1-DURCHSTICH trägt heute nicht
+
+**Die Zusage** (GOAL v8, F1 am **Fr 14.08.**): ein am Mittwoch frisch gemessener Mini-Messwert
+liegt am Freitag als Tabellenzeile im Thesis-Submodul — durch
+`CSV → persist → xlsx → anhang:forward → PDF`, jede Stufe mit Nenner.
+
+**Der Befund:** die Kette existiert als **Werkzeugkasten**, aber sie ist **nicht verbunden**. Drei
+der vier tragenden Befunde habe ich selbst am Objekt nachgeprüft.
+
+### A1 — Die Stage-Reihenfolge macht den Durchstich strukturell unmöglich
+
+Selbst nachgesehen in `.gitlab-ci.yml:25-38`:
+
+```
+lint → orchestrate → submodules → analyse → test → integration
+     → planer → manifest → thesis-pdf → measure → persist
+```
+
+**`thesis-pdf` läuft VOR `measure` und `persist`.** Ein PDF aus derselben Pipeline kann die
+Messung dieser Pipeline **niemals** enthalten — es wird gebaut, bevor gemessen wurde. Und
+`ergebnis:holen`, die vorgesehene Brücke vom lebenden Messweg, sitzt in Stage `planer` — noch
+**weiter vorn**.
+
+Das ist kein Bug in einem Skript. Es ist die **Topologie**. Wer den Durchstich als
+Ein-Pipeline-Lauf plant, plant etwas, das die Stage-Ordnung ausschließt.
+
+### A2 — Der Glob trifft die reale Datei nie
+
+`ci/anhang_forward_core.sh:149,153` sucht `-name '*.result.csv'`. Der lebende Messweg schreibt
+`result.csv` **ohne Präfix** — belegt an zwei Stellen im ce-Code:
+
+    planner_status_types.hpp:33      inline constexpr char kResultCsvName[] = "result.csv";
+    cache_engine_builder_iterator.hpp:1149    std::filesystem::path const csv_p = dir / "result.csv";
+
+**Empirisch selbst gefahren:** Verzeichnis mit `result.csv` **und** `perm_007.result.csv`, dann
+`find -name '*.result.csv'` → **nur** `perm_007.result.csv`. Das Muster verlangt mindestens ein
+Zeichen plus Punkt davor.
+
+**Der Kanal, der die Thesis-Tabelle schreibt, kann die Datei nicht sehen, die die Messung
+erzeugt.**
+
+### A3 — Die Leerheitsprüfung verwirft genau den Mini-Messwert
+
+`anhang_forward_core.sh:167` prüft mit `wc -l`. **`wc -l` zählt Zeilenumbrüche, nicht Zeilen.**
+Eine CSV mit Kopfzeile + **einer** Datenzeile **ohne** abschließenden Newline liefert `1` und gilt
+als leer.
+
+**Das ist exakt der Durchstich-Fall.** Die Falle ist auf den Anwendungsfall zugeschnitten, den sie
+zerstört. Und sie erzeugt **kein Fehlersignal** — der Kanal meldet „nichts zu tun" und wird grün.
+
+Dieselbe `wc -l`-Prüfung sitzt laut Explore ein zweites Mal in `.gitlab-ci.yml` am WIDE-Aggregat
+der Mess-Jobs — **gleiche Klasse, gleicher Mini-Lauf-Fall**. Als Folgepaket geführt, weil die Datei
+gerade einem anderen Strang gehört.
+
+### A4 — Weitere Nähte, aus dem Explore, noch nicht selbst nachgeprüft
+
+- `persist:measurements` sammelt **kein** `*.xlsx` — obwohl **„xlsx ist die Ausgabe, CSV nie"**
+  Owner-KERN ist. Der Sammler kennt nur `*.csv` und `*.tex`.
+- `anhang:forward` hat **keine `needs`-Kante** zu `persist:measurements` — beide sind Geschwister
+  derselben Stage. Die Formel `persist → xlsx → anhang:forward` beschreibt keine reale CI-Kante.
+- `ergebnis:holen` ist ein **Skelett mit auskommentierter Sammellogik** — und wird laut Plan erst
+  **am 28.08.** scharf. Das ist **zwei Wochen nach** dem Durchstich-Termin. Ein
+  plan-interner Terminwiderspruch.
+- `AF_CORPUS_ROOT`-Default zeigt auf `measurement/`, das am Repo-Root **nicht mehr existiert**.
+
+### Was gebaut wird, und was das kostet
+
+Strang 18 läuft: **P4** (beide Transportfallen) und **P5** (xlsx in den Sammler). Beide nur in
+`ci/`-Skripten — `.gitlab-ci.yml` ist gesperrt, dort arbeitet die Lager-Scharfschaltung.
+
+**Die realistische Durchstich-Strecke für Mittwoch ist die Lokalstrecke**, nicht die CI: messen mit
+dem lebenden Treiber (1 Binary, 1 Perm), `persist_sammler.sh` lokal, CSV→xlsx, `anhang_forward_core.sh`
+gegen einen lokalen Klon mit `AF_NO_PUSH`, PDF-Gate scharf. Fünf Stufen, jede mit Nenner. Der
+CI-Nachzug folgt, sobald die Kanten existieren.
+
+**Das ist kein Ausweichen, sondern der Unterschied zwischen einem Beweis und einer Behauptung** —
+und die Lokalstrecke ist die einzige, die von der GitLab-Störung unabhängig ist.
+
+### Drei Owner-Entscheide, Frist Mi 12.08.
+
+**OV-16 — `allow_failure` am Mess-Batch: bleiben oder nicht?**
+JA (behalten): ein Zellfehler ist am roten Job sichtbar, bricht aber den mehrtägigen Lauf nicht ab.
+NEIN (entfernen): jeder Ausreißer färbt die Pipeline rot und stoppt Folge-Jobs.
+**Widerspruch offen:** die OV-Tabelle des Wellenplans trägt den LEAD-Entwurf „ja = entfernen";
+GOAL v8 Teil IX sagt bindend „behalten, Entfernen wäre Regression". Beide stehen nebeneinander.
+
+**OV-17 — ist die Flach-Ablage `<stem>.result.csv` ein geplanter Umbenenn-Schritt** (dann bauen
+wir ihn) **oder ein Archiv-Artefakt** (dann akzeptiert der Kanal beide Formen)? Ohne Antwort ist
+die Heilungsrichtung in einem Kanal geraten, der ins Thesis-Repo pusht.
+
+**OV-18 (neu) — Wegewahl:** genügt für F1 der **Lokalbeweis aller fünf Stufen** mit CI-Nachzug?
+Falls nein: (a) die `ergebnis:holen`-Minimalnaht aus W2 vorziehen (+0,5–1 AT, misst den lebenden
+Weg) oder (b) ein Lauf über den **deprecateden** `measure:smoke`-Fallback (kein Bau, aber ein
+deprecateder Messweg als Beweisträger). **Meine Empfehlung: Lokalbeweis, CI-Nachzug als (a).**
+
+---
+
+# TEIL B — Die Nenner-Divergenz ist aufgelöst: ein doppelter Kategorienfehler
+
+Der letzte offene W-1-Posten. Der Erhebungs-Strang hat **jede** Zahl an **ihrem** Commit
+reproduziert — nicht aus Dokumenten verglichen, sondern per `git archive` in einen eigenen Baum
+entpackt und neu gemessen.
+
+**Die Auflösung: „429 → 456" vergleicht zwei verschiedene Commits UND zwei verschiedene
+Baumzustände.**
+
+| Zahl | Commit | Zustand | reproduziert |
+|---|---|---|---|
+| **428** | `274e4ed2` (08.08. 14:12) | frischer Configure, kein Bau | ja, exakt |
+| **429** | `7bcf353b` (08.08. 16:51) | frischer Configure, kein Bau | ja, exakt |
+| **431** | `1f88cfec` (08.08. 20:48, W-1 gelandet) | frischer Configure | ja |
+| **456** | `1f88cfec` | **nach Bau** von `comdare_tests` | ja, exakt |
+
+Und die Rechnung geht auf: **431 − 2 Platzhalter + 27 gtest-Fälle = 456.**
+
+Die „27" sind die gtest-Fälle, die erst durch `gtest_discover_tests` **nach dem Bau** sichtbar
+werden. Sie stehen in **beiden** Rechnungen — „428 + 27 = 455" und „429 → 456" beschreiben
+denselben Sachverhalt zweimal, mit verschiedenen Ausgangs-Commits. **Die „Divergenz" war nie 27,
+sondern die Differenz zweier Commits.**
+
+### Der Ist-Stand heute, auf prod1 (AMD Zen 5, AVX-512, 13 Flags)
+
+| Zustand | `ctest -N` |
+|---|---|
+| frischer Configure, kein Bau | **432** |
+| nach `make` (all, ohne Reconfigure) | **457** |
+| nach `make inventar` (= was `make check` herstellt) | **461** |
+| was `make check` tatsächlich **fährt** (`-LE pmc`) | **459** |
+| Quelltext-Registrierungen (awk-Automat, ohne `ext/`) | **281** |
+| gtest-Fälle, im gebauten Baum | **27** |
+
+### Die prod2-Simulation — und ihre ehrliche Grenze
+
+`getent hosts prod2` → **rc=2, keine Ausgabe**. prod2 ist derzeit **nicht im Netz**. Die
+prod2-Zahlen wurden deshalb **auf prod1 simuliert**, mit zwangsweise abgeschaltetem
+AVX-512-Gatter: **428** nach Configure, **457** nach `make inventar`.
+
+**Der Strang hat das ausdrücklich als Simulation gekennzeichnet, nicht als Messung.** Das ist
+genau die Trennung, die dieses Projekt braucht — und ein Gegenbeispiel zu meinem eigenen Fehler
+von gestern, wo ich einen Befund als Aussage über etwas nahm, das ich nicht gemessen hatte.
+
+### Die Abnahmeformel, die daraus folgt
+
+Ein Vergleich ist nur gültig, wenn **Commit**, **Baumzustand** und **Host-Klasse** gleich sind.
+Alle drei gehören **in die Ausgabe** — nicht in einen Kommentar daneben. „457" ist keine Aussage;
+„457, nach `make` an `404ff6cf`, auf prod1 mit AVX-512" ist eine.
+
+**Das Werkzeug dafür existiert:** `scripts/ci_host_klassen_bericht.sh` druckt die Host-Kennung und
+prüft die erwartete Klasse gegen einen unabhängigen Gegeneingang — im Lauf 103 gegen 99 Tests je
+nach Klasse, beide Zahlen gedruckt.
 ## NACHTRAG 09.08.2026 — der nachgeholte Pflicht-Explore hat sich sofort bezahlt gemacht: die Thesis schlägt den Plan
 
 **Anlass:** Der Owner hat am 09.08. den Explore zur **Pflichtstufe vor jeder Design- und
