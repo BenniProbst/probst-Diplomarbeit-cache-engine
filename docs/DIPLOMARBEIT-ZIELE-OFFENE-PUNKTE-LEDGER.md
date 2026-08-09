@@ -12710,3 +12710,56 @@ Beides gegen denselben Storage-Tree, mit `SKIP` bei gültigem Bestand — je Dur
 Gegenstand. Das erklärt auch, warum Bau- und Mess-Fortschritt im Batchplan **zwei getrennte
 Präfix-Zähler** sind (`kompiliert` / `gemessen`) und im Code ausdrücklich nicht vermischt werden
 dürfen: sie zählen **zwei Durchläufe**, nicht zwei Sichten auf einen.
+
+## LANDUNG + NACHSATZ 09.08.2026 -- W0b-1 / D3-3: DER RUECKSCHRIEB HAENGT AM MESSFENSTER, NICHT AN DER DATEILISTE
+
+**Gelandet 08.08. 21:42Z als `4e0b7e0d`** (Vorfahre von HEAD, github/development live nachgewiesen
+per ls-remote): die Sammel-Logik des Jobs `persist:measurements` ist string-identisch nach
+`ci/persist_sammler.sh` gehoben (Hebe-Beweis sha256 beidseitig identisch) und DANN geheilt.
+Das Commit-Gate entscheidet jetzt ueber `datenzeilen_gesamt` (awk-Zaehlweise wortgleich zur
+Mess-Ausbeute-Wache, leer = 0 nicht -1, Summe ueber measure_out UND measure_out_smoke);
+`datenzeilen_gesamt == 0` heisst KEIN Commit (exit 10, Job gruen ohne Rueckschrieb). PROVENANCE.txt
+traegt additiv `csv_gesamt/csv_mit_datenzeile/datenzeilen_gesamt`. ZWEITER, im Bau selbst gefundener
+Defekt gleich mitgeheilt: `git add -- measurement/` staged auf dem persistenten baremetal-Workspace
+den Laufordner einer ABGELEHNTEN Vor-Pipeline mit -- jetzt `git add -- "$DEST"` (Fall P11, Mutant m4).
+Beweis AM GIT-ZUSTAND in Sandbox-Klonen (file://, nie origin): T-1 rot zuerst (9/10 gerissen am
+ungeheilten Stand, Protokoll literal), danach 11/11 gehalten; CI-Job `test:persist-sammler-probe`
+faehrt die Probe MIT `--selbstbiss` (4 Wegwerf-Mutanten muessen die Probe rot machen) und OHNE
+allow_failure. Ungedeckt, ausdruecklich benannt: der Netz-Push-Retry-Pfad (ohne echten, sich
+bewegenden origin nicht probefaehig) und der prebackup()-Kollisionspfad (return 3).
+
+**NACHSATZ heute (Fable, eigener Lauf):** Paketdateien seit Landung byte-unveraendert (diff --stat
+gegen HEAD leer bis auf fremde additive YAML-Bloecke); Probe frisch gefahren: **11 von 11 Faellen
+gehalten, Selbstbiss 4 von 4 Mutanten gebissen, rc=0**. Die Selbsteinstufung des Bau-Agenten
+("zufrieden=false") war in EINEM Punkt zu streng und in einem berechtigt:
+
+1. **Schwesterstelle `ci/anhang_forward_core.sh` -- Befund BESTAETIGT, Liegenlassen ist
+   PLAN-KONFORM, kein Verstoss gegen DEFEKT=IMMER-BEHEBEN.** Mit eigenem frischem Koeder
+   nachgemessen (koeder_fcbd87f4589509cf: 1 echte Datenzeile ohne Schluss-Newline -> wc -l = 1,
+   awk NR+0 = 2; das Zeile-167-Verdikt verwirft die einzige Messung als honest-empty). Drei
+   Stellen derselben Fehlerklasse (Z. 133 Dateizahl statt Inhalt, Z. 167 wc statt awk, Z. 226
+   copied-Gate). ABER: der Wellenplan v2 fuehrt die Heilung als **##20+D3-6 als EIN Paket**
+   (Z. 218: "einzeln geheilt bleibt der einzige Transport zu"), gegatet durch **OV-17**
+   (Owner-Antwort bis Mi 12.08.: "ohne dein Wort ist die Heilungsrichtung geraten"), in der
+   Kette HINTER D3-4+D3-5 (beide noch nicht gelandet). Der Pfad ist derzeit DOPPELT tot:
+   `measurement/` existiert im Baum nicht mehr (00c5c1cf verschob den Erstbeleg nach
+   docs/architektur/measurement/), und der Selektor `*.result.csv` trifft die
+   Produktions-Ablage `result.csv` nie. Die Heilung IST also eingeplant, im selben
+   W0b-Fenster, mit eigener Probe -- ein Vorgriff ohne OV-17 waere geratene Richtung in einem
+   Kanal, der ins Thesis-Repo (289) pusht.
+
+2. **"Push -> gruen verifizieren" -- berechtigt offen, jetzt als INFRA-BLOCKER belegt und
+   verbucht.** Die GitLab-Instanz reisst seit dem Fenster 01:06Z-05:45Z (09.08.) auf ALLEN
+   authentifizierten Pfaden mit HTTP 500 (API PRIVATE-TOKEN + Bearer, git-over-https),
+   waehrend anonyme Pfade gesund sind (302/200/401/404). 8 Token-Kandidaten blind nach
+   Vault-Doktrin getestet: 3x 401 (rotiert), 5x 500 (Server bricht in der Validierung).
+   **Modus a reaktiviert** (User-GO 13.07., Reaktivierungsklausel): lokal doppelt-literal
+   verifiziert, Remotes soweit erreichbar gepusht, **CI-gruen zieht BATCH nach, sobald die
+   Instanz-Auth zurueck ist** -- offene Batch-Schuld: Pipelines fuer 4e0b7e0d..HEAD.
+   Handover: `docs/sessions/20260809-INFRA-HANDOVER-gitlab-auth-500-alle-authentifizierten-pfade.md`.
+   Nebenbefund am Rande: github/development stand heute frueh noch auf 4e0b7e0d -- die fuenf
+   Folge-Landungen des 08.08.-Abends waren nur auf origin; mit diesem Commit zieht github nach
+   (Dual-Remote-Doktrin).
+
+**W0b-1 / D3-3 ist damit ABGESCHLOSSEN.** Offen im D3-Bogen bleiben (unveraendert, mit Besitzer):
+D3-7, D3-1-Resthaelfte, D3-4+D3-5 (OV-16), ##20+D3-6 (OV-17), D3-8.
