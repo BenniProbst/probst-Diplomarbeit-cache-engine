@@ -360,3 +360,119 @@ kann heute strukturell nicht laufen.
 
 Und ohne Eile im falschen Sinn: **der Plan traegt die volle Gruendlichkeit, er ist darauf
 gerechnet.**
+
+---
+
+# TEIL VIII — DIE STUMM GESTORBENEN STRÄNGE (Nachtrag 09.08. abends)
+
+**Owner-Auftrag:** *„durchsuche den session log ... welche Workflows durch das Speicher-Problem
+nicht fertiggestellt wurden und nie zurück kamen, sie sind ohne Alarm verschwunden."*
+
+## VIII.1 Wie man sie findet — und woran der erste Detektor scheiterte
+
+Die Platte lief auf **0 Bytes** voll (`/home` und `/tmp` liegen auf **derselben** Partition
+`/dev/nvme0n1p2`). Danach konnte der PreToolUse-Hook sein `uv run` nicht mehr starten und
+**jedes** Werkzeug fiel aus — Bash, Read, Write, ToolSearch. Stränge, die in diesem Fenster
+fertig wurden, konnten ihre Rückmeldung nicht mehr zustellen: **kein Alarm, kein Fehler, Stille.**
+
+Erster Ansatz war **falsch** und ist hier dokumentiert, damit ihn niemand wiederholt: gestartete
+Task-IDs gegen `<task-id>`-Notifikationen im Transkript zu stellen ergab 193 gegen 175, also 20
+Verdächtige. **Die Gegenprobe kippte das Ergebnis** — `wni7nfzlm` stand auf der Liste, war aber
+nachweislich mit vollem Ergebnis zurückgekommen. Auch die Dateigröße trügt: dessen
+`tasks/<id>.output` hat **0 Bytes**, weil die Platte voll war, während das Ergebnis über die
+Notifikation ankam.
+
+**Was wirklich trägt:** `subagents/workflows/wf_*/journal.jsonl`. Dort legt **jeder** Agent seine
+Rückgabe ab, unabhängig von Notifikation und Puffer. Ein Journal mit `results > 0`, zu dem nie
+eine Zusammenfassung eintraf, ist ein stumm gestorbener Strang — **und sein Inhalt ist bergbar.**
+
+    grep -c '"type":"result"' journal.jsonl   # je Workflow: hat er geliefert?
+
+## VIII.2 Was geborgen wurde
+
+| Strang | Zeit | Inhalt | Zustand |
+|---|---|---|---|
+| `wf_fa2f2328-b98` | 15:44 | **Warnungs-Erhebung GCC** (Owner-Auftrag) | geborgen, s. VIII.3 |
+| `wf_d213d405-6c2` | 15:22 | D5-2 · Paket ##08 · Paket ##11, je **mit Verify** | 3 Pakete, alle bestätigt |
+| `wf_1a3dfe5a-b6d` | 15:20 | 6 Befund-Berichte (Wachen, die Deckung vortäuschen; Lande-Analyse) | ungelesen |
+| `wf_110255b3-6ac` | 14:29 | 6 Berichte (Memory-Audit, Zahlen-Audit, Betriebspunkte) | ungelesen |
+
+**Die drei verifizierten Pakete sind committet und ungepusht** — `08cab824` (`wt-super-d52`,
+D5-2), `03f897dd` (`wt-ce-schema`, B-3 + Schema-Freeze), `2703814f` (`wt-ce-selection`, ##11).
+Ihre Abnahmen lauten wörtlich *„BESTAETIGT"*, *„Paket abnahmefaehig"*, *„Der Bau-Bericht HAELT"*.
+Sie warten nur auf die Lande-Runde.
+
+# TEIL IX — WARNUNGS-ERHEBUNG, RUNDE 1 (GCC) — geborgen aus dem stummen Strang
+
+## IX.1 Der Befund, der die Vorbefunde korrigiert
+
+**„Das Projekt übersetzt ohne `-Wall`" ist zur Hälfte falsch und dadurch irreführend.** Am Objekt:
+`cmake/compiler_flags.cmake:6` definiert `COMDARE_set_default_warnings()` mit neun Warn-Flags —
+und hat **genau einen Aufrufer**, `COMDARE_add_test`. Also **nur Test-Binaries**.
+
+    Komponente        mit -Wall   ohne
+    libs/ (CE-BIB)        0        16     <- die Bibliothek sieht sich selbst NIE
+    apps/                 0         9
+    tools/                0        12
+    tests/              197       309
+    SUMME               201       349
+
+Bibliotheks-Kompilierzeile: `-O3 -DNDEBUG -std=c++23` — **sonst nichts.** Die präzise Aussage ist
+also: *`-Wall` auf 201 von 550 Zielen, davon **0** in `libs/`.*
+
+**Konsequenz:** die 2.447 CI-Warnungen stammen ausschließlich aus Test-Übersetzungseinheiten.
+Die reinen Bau-Jobs `pmc:amd`/`pmc:intel` melden **0 Warnungen** — nicht weil der Code sauber ist,
+**sondern weil niemand hinsieht.** Das ist der Owner-Begriff MUTANT, angewandt auf die Warn-Wache
+selbst.
+
+**Nenner:** 46 Traces, 38.078 Zeilen, 2.447 Warnungen, **88 distinkte Stellen** (Verstärkung
+27,8x — ein Header in vielen TUs). Lokal auf der projekteigenen Stufe: **62 Warnungen, 43
+distinkte Stellen, 0 Baufehler** bei 174 Zielen. Das ist die ehrliche Kostenzahl.
+
+## IX.2 Die Defekte (der Rest ist begründetes Rauschen)
+
+- **D1 · `-Wswitch`, `pruef_dock_version.hpp:75`.** HY-A1 hat `AnatomyGenus` **heute** um
+  `FunctionInterfaceReroute` erweitert. Von den drei Switches wurden **zwei nachgezogen, der
+  dritte nicht** — genau der, den keine Wache beobachtet. Folge: `pruef_dock_version_stamp()`
+  stempelt für ein Hybrid-Dock einen **leeren** Versionsstring: eine Provenienz-Lücke. Der
+  Kommentar darüber behauptet weiter, es gebe „FUENF" Werte. Und
+  `heuristik_adapter_klassifikation.hpp:26` **sagt den Fall wörtlich vorher**. Die Vorhersage ist
+  eingetreten.
+- **D2 · SPEICHER, `result_aggregator.hpp:19`.** `std::uint64_t fingerprint;` ist das **einzige**
+  Mitglied ohne Initialisierer; der Copy-Konstruktor liest den unbestimmten Wert — **UB**. Die
+  Ursache sitzt im Struct, nicht im Test.
+- **D3 · `super build:clang` ist FAILED, nicht skipped.** `overlay_source_hash_generated.hpp` nicht
+  gefunden: der Verbraucher wird in Schritt 11/110 gescannt, der Erzeuger erst in 15/110 gebaut.
+  Eine **fehlende CMake-Abhängigkeitskante**. GCC fällt nicht darauf herein, clang schon.
+- **D4 · `ce build:clang` fährt nie**, weil `COMDARE_CLANG_MATRIX` nirgends gesetzt ist. **Damit ist
+  die Frage aus Posten #43 beantwortet: die clang-Warnungen dieses Projekts hat noch nie jemand
+  gesehen.** Vor Runde 2 muss D3 geheilt sein, sonst läuft ce in denselben Fehler.
+- **D5 · `profile_to_tree.hpp`, 7 Stellen.** `block_id` bleibt leer — die als „Bidirektionalität"
+  dokumentierte Rück-Referenz ist für profil-erzeugte Bäume **nicht hergestellt**. Als
+  Speicher-Warnung Rauschen, als Fachlogik ein Befund.
+
+**Nicht gefunden:** `-Wold-style-cast`, `-Wcast-align`, `-Wnon-virtual-dtor`,
+`-Woverloaded-virtual` liefern **null**. Der Baum ist besser, als die Rohzahl 2.447 suggeriert.
+
+## IX.3 Die Vorlage zu `-Wall`/`-Werror` — Entscheidung des Owners
+
+Es muss **keine neue Regel erfunden** werden: die Warnstufe existiert bereits und ist für Tests
+bindend. Vorgeschlagen wird nur, sie auszudehnen.
+
+1. **Stufe 1 (unstrittig):** die 43 distinkten Stellen beheben. 0 Baufehler bei 174 Zielen.
+2. **Stufe 2:** `COMDARE_set_default_warnings` auch für `libs/`, `apps/`, `tools/`. Danach sieht
+   die Bibliothek zum ersten Mal ihre eigenen Warnungen.
+3. **Stufe 3 (`-Werror`), erst danach und zuerst nur auf `libs/`.** Global sofort macht die
+   Pipeline rot (Tests tragen 88 Stellen, darunter 16x `-Wdangling-else`).
+
+**Nicht verhandelbar:** die Warnstufe wird nicht gesenkt, keine Klasse global abgeschaltet.
+Unterdrückung nur eng begrenzt und mit Begründung (einziger Fall: D7, ein absichtlicher
+`volatile`-Sink im Mess-Pfad).
+
+## IX.4 Die Lehre für den Betrieb
+
+**Ein fertiger Strang, dessen Rückmeldung nicht zugestellt werden kann, sieht aus wie ein Strang,
+der noch arbeitet.** Es gibt keinen Unterschied von außen. Deshalb gilt ab jetzt: bei jedem
+Verdacht auf Stillstand **zuerst `df -h`**, und die Journale sind die Quelle der Wahrheit, nicht
+die Notifikation. Und: `/home` und `/tmp` teilen sich eine Partition — ein Bau-Strang in Debug
+**und** Release kann die Sitzung handlungsunfähig machen.
