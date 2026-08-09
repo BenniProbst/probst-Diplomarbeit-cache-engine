@@ -16,6 +16,96 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — MeasureStorage: der Deep Research ist da, und er widerlegt zwei naheliegende Annahmen
+
+**Volltext:** `docs/plaene/20260809-MEASURESTORAGE-design-und-deep-research.md` (Strang 30 —
+drei Bestands-Linsen plus Web-Research, dann Design).
+
+### Die zwei Annahmen, die fielen
+
+**(1) `std::pmr::monotonic_buffer_resource` ist NICHT der Typ der Wahl.** Als **Konzept** stimmt
+es — vorreservierter Puffer, Bump-Offset, kein Free bis Reset. Als **Typ** fügt es einen
+virtuellen `do_allocate`-Aufruf ein, den hier niemand braucht: es werden **POD-Records
+geschrieben**, keine STL-Container gefüttert. Ein ~20-Zeilen-Eigenbau erfüllt die Bedingung
+präziser.
+
+**(2) Ein Ringpuffer wäre falsch.** Er löst ein Problem, das hier **nicht existiert** — der
+Owner verlangt „nie überschreiben", und es gibt **keinen mit dem Schreiben nebenläufigen Leser**.
+Selbst LTTng degeneriert im Discard-Modus funktional zum linearen Log mit Überlaufzähler.
+
+**Und das ist kein Einzelbefund:** Perfetto, LTTng, Tracy und moodycamel konvergieren
+**unabhängig voneinander** auf dasselbe Muster — **ein linear wachsendes Append-Log je Thread**.
+Das deckt sich mit der bereits getroffenen Entscheidung im Soll-Design („thread-lokale Puffer
+unter einem prozessweit erreichbaren Sammler").
+
+### Was der „Stack" wirklich ist — und warum `std::stack` schadet
+
+**Er ist NICHT das Append-Log.** Er ist die **LIFO-Buchhaltung für die Aufrufer-Rekonstruktion**
+und hält nur **Referenzen** (Index/Offset in den Log), keine Kopien. Seine Kapazität ist durch die
+**maximale Verschachtelungstiefe** begrenzt, nicht durch die Ereigniszahl — ein Array plus
+Top-Zähler genügt.
+
+**`std::stack` wäre aus drei unabhängigen Gründen schädlich**, nicht nur aus dem Doktrin-Grund:
+- `std::deque` **alloziert bei jedem Blockübertritt** — schon ein **einzelnes** Element alloziert
+  den vollen Block, auf 64-Bit-libstdc++ das **Achtfache** der Objektgröße,
+- eine zusätzliche **Zeiger-Indirektion** pro Zugriff,
+- die Adapter-Schicht bringt gegenüber einem rohen Index-Array **keinen Mehrwert**.
+
+### Zwei Fallstricke, die man ohne Recherche eingebaut hätte
+
+**`std::hardware_destructive_interference_size` ist NICHT stabil.** Laut Clang-Dokumentation *„not
+stable between releases"*, und der Wert hängt von **Compiler-Flags** ab. **Bei sechs
+CEB-Varianten mit potenziell verschiedenen Flags ist das ABI-Risiko real, nicht theoretisch.**
+Stattdessen: eine einmal an prod1 verifizierte **Hauskonstante**.
+
+**Systemweite Huge Pages (`THP always`) können synchrone Compaction auslösen** — und damit
+**Latenzspitzen genau in dem Moment, den man sauber messen will**. Sicher ist nur gezieltes
+`madvise(MADV_HUGEPAGE)` auf **diese eine** Reservierung, **plus Pre-Touch vor dem Lauf**: die
+Kosten wandern in die Initialisierung statt in die Messung. Das ist die subtilste
+Verzerrungsquelle des ganzen Entwurfs.
+
+### Ein Vorbild im eigenen Haus
+
+`leanstore` — im eigenen Forschungskorpus — reserviert seinen **kompletten Pufferpool in EINEM
+`mmap`-Aufruf** (`BufferManager.cpp:41`). Das Prinzip muss nicht erfunden werden; es liegt bereits
+auf der Platte.
+
+### ⚠️ Vier Bestands-Fallen, die vor dem Bau bekannt sein müssen
+
+**Zwei Kandidaten sehen aus wie die gesuchte Vorlage und sind es nicht.** `ThreadArena` und
+`InMemoryMeasurementBuffer` tragen die richtigen Namen, den Kommentar *„Hot-Path… kein Lock"* und
+`alignas(64)` — **verletzen aber genau die Randbedingung**, um die es geht. Wer sie als Vorlage
+nimmt, baut den Defekt nach.
+
+**`LIFOStackBuffer` ist eine Queuing-Achse des GEMESSENEN Containers**, kein Mess-Aggregat. Wer
+nach „Stack" greppt, findet überwiegend False Positives.
+
+**Der einzige wirklich allokationsfreie Mechanismus im Haus** (`IMeasurableWorkloadV3` /
+`ComdareSegmentLatencyV2`) hat **0 Aufrufer** in der Produktionskette — fertig implementiert,
+interface-getestet, **nie angeschlossen**. Warum, ist ungeklärt. Das ist dieselbe Klasse wie die
+Kurven-Synthese bei HYBRID: gebaut, getestet, nicht verbunden.
+
+**Und `csv_to_latex` ist KEIN totes Auslaufmodell.** Es ist ein großes, aktives, getestetes Modul
+mit CLI und mehreren Konsumenten in der Thesis-Anhang-Pipeline. *„measure_to_latex bauen"* heißt
+**Ablösung mit Migrationspfad**, nicht Neubau auf grüner Wiese.
+
+### Ein Nebenbefund, der eine eigene Wache verdient
+
+Die honest-empty-Ummantelung `|| echo "…kein Fehler"` an **allen drei** CI-Aufrufstellen von
+`appendix_generator_cli` **schluckt heute JEDEN Exit-Code** — nicht nur den beabsichtigten.
+Das ist die Klasse „grün über nichts", diesmal im Anhang-Pfad.
+
+### Vier Fragen, die vor dem Bau zu klären sind — nicht zu raten
+
+1. Ist **`ErgebnisMappe`** die literale Speicher-Klasse hinter „MeasureStorage" Punkt (2), oder
+   soll eine eigene entstehen?
+2. Ist der **„benannte Stack"** identisch mit dem „prozessweiten Speicher-Stack" aus dem
+   `checkpoint_measure`-Soll-Design, oder ein zweites Konzept?
+3. Hängt das **XML-Segment** für `measure_to_latex` an `comdare_thesis_profile`, an
+   `comdare_experiment`, oder an einer dritten Wurzel?
+4. Muss **G3** (Segment-Timer aus dem STATISTICS-Gate herauslösen) **vor** `checkpoint_measure`
+   gebaut werden? Heute teilen sich Macro und Micro **ein** Gate und sind nicht getrennt
+   abschaltbar.
 ## NACHTRAG 09.08.2026 — DER PUSH IST DURCH: beide Repos, alle Pipelines grün, main nachgezogen. Plus drei Fallen und ein Sicherheitsbefund.
 
 Der ganze Tag lag ungepusht, weil GitLab seit früh HTTP 500 lieferte. **Infra ist wieder oben,
