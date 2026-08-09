@@ -407,6 +407,34 @@ docs:plan-zahlen-wache:
     - sh ci/plan_zahlen_wache.sh
     - sh ci/tests/plan_zahlen_probe.sh
 
+# ── D5-3 (2026-08-09): ANKER-WACHE -- der ZEILENVERWEIS als Behauptung ──
+# DER BEFUND. Die WP-5-Disposition fuehrte REV-DATA-12 mit 'diagram_generator.cpp:414-420'.
+# Die gemeinte Funktion nearest_rank_median steht heute auf 653-659, also 239 Zeilen weiter.
+# In DERSELBEN Tabellenzelle stand 'csv_to_latex.cpp:48-54' -- und das stimmt unveraendert.
+# Nichts unterschied den richtigen vom falschen Verweis, und nichts haette es gemeldet.
+# D5-2 soll Sieger-Kuerung, csv_to_latex und diagram_generator auf EINE Median-Definition
+# bringen; wer dafuer :414-420 aufsucht, vereinheitlicht eine Stelle, an der die Funktion
+# nicht mehr steht -- der Kanon waere gruen, ohne den Divergenzfall zu beruehren.
+#
+# WARUM EIN EIGENER JOB UND NICHT IN docs:plan-zahlen-wache: jene Wache misst den ce-Baum am
+# Gitlink und bricht mit exit 2 ab, wenn der Submodul-Stand nicht traegt. Haengte die
+# Anker-Wache hinter ihr im selben script-Block, waere sie genau dann still, wenn am meisten
+# in Bewegung ist. Diese hier braucht KEIN Submodul und KEINEN Bau -- nur den super-Baum.
+#
+# WARUM KEIN allow_failure: eine advisory Wache ist die naechste stille Null (gleiche
+# Begruendung wie docs:plan-zahlen-wache). KEIN .code-rules: ein Anker wird durch eine
+# Aenderung an Code/ falsch, ohne dass das Dokument sich aendert -- und umgekehrt.
+docs:anker-wache:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  script:
+    - sh ci/anker_wache.sh
+
 # ── W0b-7 / D2-G5 (2026-08-08): HOST-KLASSEN-BERICHT + sein Selbsttest ──
 # DER BEFUND. Der Wellenplan schrieb "6 von 428 Tests registrieren sich nur auf AVX-512-Hosts".
 # Am Objekt nachgezaehlt (scripts/ci_host_klassen_bericht.sh, prod1/Zen 5, ce-Arbeitsbaum): SECHS

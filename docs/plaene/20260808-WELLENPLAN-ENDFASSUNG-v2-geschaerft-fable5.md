@@ -25,7 +25,7 @@
 **(2) Korrekturen an der Vorlage selbst** (v1 hätte, wörtlich gebaut, viermal die eigene Fehlerklasse erzeugt):
 
 - **##26-Formel** „N == M" ist bei N==0 **grün mit Nenner 0** — korrigiert auf `N >= 1 UND M == N UND datenzeilen_gesamt >= 1` (V-1-Verstoß in der eigenen Abnahmezeile, v1:593 gegen v1:555).
-- **##06-Formel** „für jeden der 5 STATUS_OUT ein FOUND" wäre ein **Dauer-Rot**: 2 der 5 Blöcke liegen hinter `if(COMDARE_PRUEFLING_INCLUDE_DIRS)` und werden in jedem CI-Baum **nicht erreicht** (weder FOUND noch SKIPPED). Korrigiert auf Bedingungs-Tabelle: erfüllt ODER Allowlist mit Begründung (D2-G4); zudem sind es **15 bedingte Registrierungen in 8 Klassen**, nicht 5 — STATUS_OUT deckt 20 %.
+- **##06-Formel** „für jeden der 5 STATUS_OUT ein FOUND" wäre ein **Dauer-Rot**: 2 der 5 Blöcke (`_pa_status`, `_fj_status`) liegen hinter `if(COMDARE_PRUEFLING_INCLUDE_DIRS)` und werden in jedem CI-Baum **nicht erreicht** (weder FOUND noch SKIPPED) — **und sie registrieren überhaupt keinen Test**, sie bauen DLL-Targets. Korrigiert auf Bedingungs-Tabelle: erfüllt ODER Allowlist mit Begründung (D2-G4). Zur Menge: ~~15 bedingte Registrierungen in 8 Klassen~~ — **am Objekt sind es 18 bedingte Registrierungen unter 14 verschiedenen Bedingungs-Ausdrücken**; STATUS_OUT deckt davon **4 von 18** (22 %), nicht 20 %. **Warum die 15 falsch war** (09.08. mechanisch reproduziert): sie stammt aus einer Zählweise, die den Testnamen auf der `add_test(`-Zeile erwartet — die **drei** Registry-Roundtrip-Gates (`test_axis_registry_roundtrip`, `test_system_axis_registry_roundtrip`, `test_measurement_axis_registry_roundtrip`, ce `tests/unit/CMakeLists.txt:5009/5039/5054`) schreiben `NAME` auf die Folgezeile und waren für sie unsichtbar. 18 − 3 = 15. Blind war sie also ausgerechnet für die drei Registrierungen, deren stille Abschaltung Posten **D2-G6** als Defekt führt. Die 8 „Klassen" bleiben als *semantische* Gruppierung gültig (Prüfling · Codegen-Status · Codegen-Menge · TARGET-Existenz · Plattform · Compiler-Flag · Host-ISA · Messmodus), sind aber **nicht** die Zahl der Bedingungs-Ausdrücke. Alle Zahlen gemessen mit `scripts/ci_abnahme06_bedingungs_tabelle.sh`, identisch über **drei** ce-Stände (`wt-ce-xml 404ff6cf`, `wt-ce-fk`, vendoriertes ce `a1d0c201`).
 - **##36-Köder** kann den Zielfall nicht sehen: eine Null-Fenster-Zelle liefert im ungeheillten Gate `reruns=0` — exakt die Zahl, die laut Köder „nicht verdrahtet" bedeutet. Korrigiert auf **zwei degenerierte Zellarten** (Null-Fenster → „unbestimmbar", echte Streuung → Reruns), beide Zahlen getrennt.
 - **##04/##05** waren Abnahmezeilen **ohne Bau-Paket** — die Vorlage verifizierte den `make check`-Defekt und heilte ihn nirgends. **V-6 gilt jetzt beidseitig** (Paket ohne Abnahmezeile UND Abnahmezeile ohne Paket = nicht abgenommen); D1/D1a schließen die Lücke.
 - **##57**-Köder („Datensatz mit nur einer Binary") beißt aus dem falschen Grund und wäre auch nach einer Heilung grün — der Rückgabetyp kann „nicht bestimmbar" von „bestimmt: keiner" heute gar nicht unterscheiden (D4f); Abnahme auf den Statusraum umgestellt.
@@ -105,7 +105,7 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 
 | id | Kern | h | Welle | Zwang |
 |---|---|---|---|---|
-| D2-G4 | **Textkorrektur der Abnahme ##06 VOR dem Bau**: 15 bedingte Registrierungen in 8 Klassen, davon 2 unerreichbar in jeder CI; Formel „erfüllt ODER Allowlist mit Begründung"; Zähl-Skript als unabhängige Quelle | 1 | W0a | zuerst |
+| D2-G4 | **Textkorrektur der Abnahme ##06 VOR dem Bau**: ~~15 bedingte Registrierungen in 8 Klassen~~ → **18 bedingte Registrierungen unter 14 Bedingungs-Ausdrücken** (am Objekt 09.08. nachgezählt, s. Fußnote D2-G4); 2 der 5 STATUS_OUT-Blöcke in jeder CI unerreichbar **und ohne jede Test-Registrierung**; Formel „erfüllt ODER Allowlist mit Begründung"; Zähl-Skript als unabhängige Quelle | 1 | W0a | **ERLEDIGT 09.08.** (super `scripts/ci_abnahme06_bedingungs_tabelle.sh` + `ci/abnahme06_bedingungs_allowlist.txt` + korrigierte Formel in §6) |
 | D2 | Nenner-Untergrenze (`ci_test_inventory_floor.txt`, eigener Commit), Emitter in die covguard-Prebuild-Zeile, Skip-Allowlist, Configure-Log als Artefakt (heute `paths: []`) | 3,5 | W0a | nach D2-G4 |
 | D2-G1 | 27 unsichtbare gtest-Fälle → zwei `add_test` nach dem dokumentierten Muster, in `COMDARE_TEST_TARGETS`; Erstlauf ehrlich buchen (`AllFourteenAxesPopulated` bei heute 22/18 Achsen = erwarteter Fund, kein `allow_failure`) | 2 | W0a | parallel möglich |
 | D2-G2 | ohne dieses Paket macht D2 die Hauptpipeline rot (Registrierung ohne Bau); TIMEOUT nach gemessener Zeit ×4; Exit-Code via `cmake -P`-Wrapper (Vorbild `registry_roundtrip.cmake`) | 1,5 | W0a | im D2-Bogen |
@@ -114,6 +114,93 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 | D2-G6 | Registry-Roundtrip-Gates hängen an Datei-Existenz, Kommentar verspricht die stille Abschaltung als Merkmal → Pflicht-Erwartung + Kommentar korrigieren; **Standard-Bissprobe** der Wache (stash-Köder, billig, rückstellbar) | 0,5 | W0a | Anhang zu D2 |
 
 **Tragende Abnahme:** die Wache druckt DREI unabhängige Zahlen (eigene Inventur N / Job-Baum-Inventur M aus dem Artefakt eines **anderen** Jobs / Gates FOUND G von G_deklariert), N≠M ⇒ Exit≠0; Zahl-Köder „345" im gefälschten Artefakt → rot; Schrumpf-Köder (N per `shuf` gewählte Tests in `if(FALSE)`) → rot mit Zahl; **unmanipulierter Lauf bleibt grün** (Gegenköder gegen Dauer-Rot). `ctest -N` zählt nach D2-G1 **+2** (heute 0 Treffer für `test_commands|test_engine_adapters`).
+
+> **FUSSNOTE D2-G4 — DIE KORRIGIERTE ABNAHME ##06. Textstand 09.08.2026, jede Zahl am Objekt
+> gemessen, keine abgeschrieben. Diese Fassung ist die geltende; die Fassung der Endfassung v1
+> (`20260808-WELLENPLAN-ENDFASSUNG-369-soll-211-ist.md:578`) ist damit ÜBERHOLT, bleibt aber
+> stehen — der Bestand an Fehlern ist selbst ein Datum.**
+>
+> **Was die alte Formel zusicherte.** v1:578 verlangte: `sh scripts/ci_test_coverage_guard.sh` druckt
+> „`STATUS_OUT-Bloecke in der Quelle: 5` · `FOUND im Configure-Log: 5` · Vergleich"; Köder: einen der
+> fünf Blöcke scheitern lassen → `SKIPPED` → rot; einen sechsten einfügen → Zähler auf 6.
+>
+> **Warum sie nicht trägt — drei Gründe, jeder allein hinreichend.**
+> 1. **Dauer-Rot.** Zwei der fünf Blöcke (`_pa_status` ce `tests/unit/CMakeLists.txt:1118`,
+>    `_fj_status` `:1150`) liegen hinter `if(COMDARE_PRUEFLING_INCLUDE_DIRS)` (`:1109`). Diese
+>    Variable wird über `COMDARE_CE_PRUEFLINGE` gesetzt (ce `CMakeLists.txt:723`), und
+>    `COMDARE_CE_PRUEFLINGE` ist in **ce und super zusammen an keiner Stelle** gesetzt — leerer
+>    Cache-Eintrag (`build-xml/CMakeCache.txt:881 COMDARE_CE_PRUEFLINGE:STRING=`). Beide Blöcke
+>    erreichen in keinem CI-Baum je ein FOUND. „Jeder Block braucht ein FOUND" wäre ein Job, der nie
+>    grün werden **kann** — und ein Job, der immer rot ist, ist so wertlos wie einer, der immer grün ist.
+> 2. **Falscher Gegenstand.** Genau diese zwei Blöcke registrieren **keinen einzigen Test**; sie bauen
+>    DLL-Targets. Die alte Formel maß Codegen-Blöcke und nannte das Test-Abdeckung.
+> 3. **Zu kleiner Ausschnitt.** STATUS_OUT deckt **4 von 18** bedingten Registrierungen (22 %). Die
+>    übrigen 14 hängen an Host-ISA, Compiler-Flags, TARGET-Existenz, Datei-Existenz, Messmodus und
+>    Prüfling — für die alte Formel unsichtbar.
+>
+> **DIE GELTENDE FORMEL ##06 — „erfüllt ODER Allowlist mit Begründung".**
+> Jede bedingte ctest-Registrierung des Bauwegs ist **entweder** ERFÜLLT (ihr Testname steht in der
+> `ctest -N`-Liste des gebauten Baums) **oder** sie steht **namentlich mit Begründung** in
+> `ci/abnahme06_bedingungs_allowlist.txt`. `ohne_allowlist_eintrag > 0` ⇒ Exit ≠ 0. Eine leere
+> Begründung ist kein Eintrag (fail-closed). Eine stille Ausnahme wäre wieder ein blindes Grün.
+>
+> **DIE ZWEI NENNER SIND ZWEI WEGE (T-3 NENNER FREMD) — ausdrücklich, weil daran alles hängt.**
+> *SOLL-Nenner:* der **CMake-Quelltext**. `scripts/ci_abnahme06_bedingungs_tabelle.sh` verfolgt die
+> `if/elseif/else/endif`-Klammerung und zählt jede `add_test(`/`comdare_add_test(`-Stelle mit
+> Tiefe > 0. Diese Menge existiert auch dann, wenn nie gebaut wurde.
+> *IST-Nenner:* die **`ctest -N`-Liste eines gebauten Baums** (`--ctest-liste`). Sie entsteht aus
+> einem Configure-Lauf auf einer bestimmten Maschine.
+> Die beiden Wege teilen **kein Werkzeug und keine Datei**. Genau deshalb kann der Vergleich etwas
+> finden. Die alte Wache bezog beide Zahlen aus ihrer eigenen Inventur und konnte eine fehlende
+> Registrierung deshalb grundsätzlich nicht bemerken — das ist der Auslöser des ganzen D2-Bogens.
+>
+> **HOST-KENNUNG IST TEIL DER FORMEL (Richtigstellung 09.08.2026).** Es gibt zwei bare-metal-Runner
+> — prod1/AMD **mit** AVX-512, prod2/Intel **ohne** — und **44 von 48 Jobs floaten zwischen ihnen;
+> das ist so gewollt**, die Maschinen stimmen sich über das **Lager** ab, wer welches Batch
+> verarbeitet. Die Folgerung ist deshalb **nicht** „Jobs pinnen", sondern: **eine Zahl ohne
+> Host-Kennung ist eine Zahl ohne Gegenstand.** „457 sichtbar" ohne „auf prod2" sagt nichts. ##06
+> druckt die Host-Zeile deshalb nicht selbst, sondern **delegiert an den bereits gebauten**
+> `scripts/ci_host_klassen_bericht.sh` (Posten D2-G5) und bricht ab, wenn dieser keine
+> `HOST-KENNUNG` liefert. Zwei Wahrheiten über dieselbe Maschine wären eine zu viel.
+>
+> **DIE ZAHLEN, gemessen 09.08.2026 auf prod1/`avx512f` gegen ce `404ff6cf`, IST-Nenner
+> `build-xml/ctest -N` (461 Einträge):**
+> `bedingte_registrierungen=18` · `bedingungs_klassen=14` · `erfuellt=12` ·
+> `allowlist_mit_begruendung=6` · `ohne_allowlist_eintrag=0` · `name_nicht_statisch=2`.
+> Dieselben 18/14 über **drei** ce-Stände (`wt-ce-xml 404ff6cf`, `wt-ce-fk`, vendoriertes ce
+> `a1d0c201`) — der Befund hängt nicht an einem Commit.
+> Allowgelistet sind genau zwei Bedingungen: `COMDARE_PRT_ART_LEGACY_AVAILABLE` (4 Stellen; das
+> Gatter ist reine Datei-Existenz `prt_art/include/prt_art/prt_art.hpp`, und `prt_art/` existiert in
+> keinem der drei Bäume; das super-Submodul `Code/external/comdare-prt-art` ist **nicht
+> ausgecheckt**) und `do_run` (2 Stellen in Hausfunktionen, deren Testname aus `${_tgt}`
+> entsteht — strukturell nicht namentlich auflösbar; **aufgelöst wird er von
+> `ci_host_klassen_bericht.sh`**, dort `isa_gattiert_gesamt=6`, davon 4 an AVX-512F und 2 an AVX2).
+>
+> **KÖDER, GEFAHREN (K13, gewürfelt — nicht aus dieser Datei abgeschrieben).** Eine zufällig
+> erzeugte bedingte Registrierung `test_koeder_q3ymn2vox2qwsca` unter `COMDARE_KOEDER_dfdfutimc3d3xgq`,
+> mit `NAME` **auf der Folgezeile** (genau die Form, die die alte Zählweise übersah), in eine
+> Arbeitskopie angehängt: Zähler **18 → 19**, `ohne_allowlist_eintrag=1`, Exit 1, Stelle namentlich
+> gedruckt. **Gegenprobe:** dieselbe Kopie unmanipuliert → 18, `ohne_allowlist_eintrag=0`, Exit 0.
+> Beide Läufe gehören zum Beleg; ein Köder, der immer beißt, ist so wertlos wie einer, der nie beißt.
+>
+> **DIE VORLAGE IST JETZT SELBST PRÜFBAR.** `--gegen-vorlage` liest die Markerzeile unten und
+> vergleicht sie gegen die Messung. Driftet der Plan gegen das Objekt, wird der Lauf rot — statt
+> dass ein korrekt gebautes Paket gegen eine falsche Zusicherung geprüft wird und grün wird.
+> Fehlt die Markerzeile ganz, ist das ebenfalls rot (fail-closed).
+>
+> **WAS D2-G4 NICHT LIEFERT — und was D2 deshalb mitbringen MUSS (beim Bauen gefunden, nicht
+> vermutet).** ##06 hat in der **super-CI heute keinen IST-Nenner**: `grep -n 'ctest -N'` über
+> `super/.gitlab-ci.yml` = **0 Treffer**; der einzige Job, der eine Live-Inventur herstellt, ist
+> `test:coverage-guard` auf der **ce**-Seite (`ce/.gitlab-ci.yml:281`), und dessen Ausgabe wird
+> nicht als Artefakt veröffentlicht. Ohne `--ctest-liste` ist jede der 18 Registrierungen
+> allowlist-pflichtig, d. h. ein CI-Job wäre entweder rot oder müsste alles allowlisten — beides
+> wertlos. **D2 muss daher die `ctest -N`-Liste als Job-Artefakt veröffentlichen** (es hat ohnehin
+> „Configure-Log als Artefakt, heute `paths: []`" im Auftrag); erst dann bekommt ##06 seinen
+> CI-Job. Bis dahin ist ##06 **baremetal belegt** (§61-Dual-Weg, Hälfte 1 erfüllt, Hälfte 2 offen —
+> ausdrücklich, nicht durch Weglassen). Ein Job, der ohne IST-Nenner grün wird, wäre genau der
+> Defekt, gegen den D2 gebaut wird.
+>
+> <!-- ABNAHME06-ZAHLEN bedingte_registrierungen=18 bedingungs_klassen=14 quelle=ce/tests/unit/CMakeLists.txt erhoben=2026-08-09 host=prod1/avx512f -->
 
 > **FUSSNOTE D2-G5 — RICHTIGSTELLUNG 08.08.2026, am Objekt gemessen, nicht abgeschrieben.**
 > Die Planzeile „6 von 428 Tests registrieren sich nur auf AVX-512-Hosts" ist als Satz **falsch**,
@@ -181,11 +268,35 @@ Die Klasse in einem Satz, fünffach belegt: die Null wird überall als **Divisio
 |---|---|---|---|---|
 | D5-1 | **Perzentil-KANON**: beide Formeln tragen den Namen „Nearest-Rank" zu Unrecht; Lehrbuch-Formel `ceil(q*n)-1`; `nearest_rank_p` (34 unbewachte Stellen) wird **ersatzlos gelöscht** → jede übersehene Stelle bricht compile-time laut; Pin 51→50 mit Klartext-Commit „alle vorher erhobenen p50/p95/p99 ungültig". **Einziger Posten, der den Messtermin bewegt** | 6 | **W0a (Lokalspur)** | vor jedem ernsten Messwert |
 | D5-2 | Median-Kanon = q=0.5-Fall; Sieger-Kürung, `csv_to_latex`, `diagram_generator` auf EINE Definition; `:1783/:1784` (Mediane ÜBER Konfigurationen) NICHT fälschlich umbauen; `eta_kalibrierung` begründet entscheiden | 3 | W1 | nach D5-1, nach D5-3 |
-| D5-3 | **Vorlage-Korrektur:** REV-DATA-12 zeigt auf **lebende** super-Werkzeuge (`Code/04_csv_to_latex/`, `Code/05_diagram_generator/`, letzter Commit 6d837e7d, 07.08.); Disposition-Anker um 239 Zeilen gedriftet → korrigieren | 0,5 | W1 | vor D5-2 |
+| D5-3 | **Vorlage-Korrektur:** REV-DATA-12 zeigt auf **lebende** super-Werkzeuge (`Code/04_csv_to_latex/`, `Code/05_diagram_generator/`, letzter Commit 6d837e7d, 07.08.); Disposition-Anker um 239 Zeilen gedriftet → korrigieren | 0,5 | W1 | **ERLEDIGT 09.08.** — Drift **am Objekt bestätigt** (`diagram_generator.cpp` `nearest_rank_median` 414 → **653**, Differenz **+239**; Schwester-Anker `csv_to_latex.cpp:48` **unverändert richtig**). Anker auf **Symbol-Form** umgestellt statt nur nachgezogen; `ci/anker_wache.sh` hält sie (Rot-Lauf mit 414 protokolliert, Grün-Lauf mit 653, Köder beidseitig). Nachtrag in `docs/audits/20260716-wp5-rev-mining-DISPOSITION.md`. |
 | D5-4 | `delete_p99_ns` existiert 0-mal → 9er-Feldliste als EINE Konstante, 5 Serialisierer auf den geteilten Helfer, Schema-Test in beide Richtungen (fehlend UND unerwartet) | 1,5 | W1 | mit D5-1-Flächen |
 | D5-5 | HDR-Histogramm = sechstes Verfahren, unverdrahtet, gegen die falsche Referenz (1 %-Toleranz), verschluckt 0-ns-Proben still → entscheiden (entfernen ODER begründet führen), Toleranz aus `significant_figures=3` hergeleitet | 2 | W1 (rutschfähig W2) | nach D5-1 |
 
 **Tragende Abnahme:** Wache druckt `Definitionen: 1` (heute 2); Zufalls-Seed-Test gegen zweitimplementierte Lehrbuch-Referenz (Seed gedruckt); Mutations-Köder (delta ±1 auf gewürfeltem Summanden, nur Testziel neu gebaut) → rc≠0, **vor der Heilung einmal rot gefahren**; Kreuz-Test gerader Länge über Selector/`csv_to_latex`/`diagram_generator` mit Bit-Gleichheit (Achtung: vendorierter ce-Stand in super zeigt auf alten Commit — der Kreuz-Test muss gegen den geheilten Stand prüfen, sonst grün und blind).
+
+> **FUSSNOTE D5-1/D5-3 — DER VENDORING-STAND, am 09.08.2026 gemessen (Nebenbefund aus D5-3; das
+> Nachziehen ist NICHT Teil von D5-3, die Feststellung schon — Strang 9 hängt daran).**
+> Die Warnung „vendorierter ce-Stand zeigt auf alten Commit" trifft zu, aber **an einer anderen
+> Stelle als vermutet**. Drei Zahlen, drei Zustände:
+>
+> | Was | SHA | Datum | Abstand zu ce-HEAD |
+> |---|---|---|---|
+> | **gitlink** in super HEAD (`2a787872`; unverändert auch an `7f0f6cb0`), also der *deklarierte* Stand | `25fe4fbfc7751a2aa94a71bd11f89409437c74a7` | 08.08. | **12** Commits |
+> | **Arbeitsbaum** des Submoduls `Code/external/comdare-cache-engine`, also was hier *wirklich liegt* | `a1d0c2015abc0a7b6bba79e58448ff31e74bc145` | 07.08. | **97** Commits |
+> | **ce `development`** (`wt-ce-xml`), der geheilte Stand | `404ff6cfc7fe7ee2cd6a7e8628424e8c754095b3` | 09.08. | — |
+>
+> Nicht der gitlink ist das Problem, sondern der **Arbeitsbaum**: er steht **85 Commits VOR** dem
+> eigenen gitlink, also **rückwärts** (`git merge-base --is-ancestor a1d0c201 25fe4fb` → rc 0, die
+> Gegenrichtung rc 1). `git status` in super zeigt das nur als
+> `modified: Code/external/comdare-cache-engine (new commits)` — die harmloseste Zeile, die git für
+> diesen Zustand hat. **Am Objekt belegt:** `sh ci/plan_zahlen_wache.sh` bricht heute mit **Exit 2**
+> ab, wörtlich *„der ce-Baum am Gitlink-SHA 25fe4fbf… ist nirgends lesbar"* — der Objektspeicher des
+> Submoduls kennt den eigenen gitlink-Commit **nicht einmal**. Mit
+> `COMDARE_CE_QUELLE=/home/comdare/wt-ce-xml` läuft dieselbe Wache **Exit 0, 5 von 5 Ankern**.
+> **Folge für D5-1/D5-2:** ein Kreuz-Test, der in super gegen `Code/external/comdare-cache-engine`
+> baut, prüft heute einen **97 Commits alten** ce — er wäre grün und blind, exakt wie oben
+> befürchtet. Vor dem Kreuz-Test muss der Submodul-Arbeitsbaum auf den geheilten Stand gezogen
+> werden; **das ist ein eigenes Paket (Strang 9)**, kein Nebenschritt.
 
 ---
 
@@ -270,7 +381,8 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
  05  [lok] ctest -N vor/nach Reconfigure: 427/431 + Differenz + 4 Namen.
 
 === W0a  Mo 10.08. - Mi 12.08. mittags ==========================================
- D2-G4 [lok] Abnahmetext ##06 korrigieren (erfuellt ODER Allowlist) VOR jedem Bau.
+ D2-G4 [lok] ERLEDIGT 09.08.: Abnahmetext ##06 korrigiert (erfuellt ODER Allowlist
+            mit Begruendung), 18/14 statt 15/8, Zaehl-Skript + Allowlist gelandet.
  D1e  [CI]  f15-CLI: Baukante + cmake-P-Wrapper (Exit zaehlt) + TIMEOUT gemessen.
  D1b  [CI]  Prebuild-Liste + Emitter: test:unit 429 -> 431, Job-ID + Gate-Zeile.
  D1f  [lok] 5 STATUS_OUT / 3 Zustaende; ERROR-Pfad FATAL (super-Kontext SKIPPED ok).
@@ -317,7 +429,8 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
  D4a->D4b->D4c [lok] Degenerations-Kette; Invarianz-Beweis 7-vs-9.
  D4d  [lok] success-Schaerfung = EINZIGE Spaltenaenderung der Woche. FREEZE ST. 2.
  D4e  [lok] f15-Summenzeile + Exit; Muster auf Zahlen-Zeile.
- D5-3 [lok] Vorlage-/Dispositions-Korrektur (lebende Werkzeuge, Anker 653-659).
+ D5-3 [lok] ERLEDIGT 09.08.: Dispositions-Korrektur (lebende Werkzeuge, Anker
+            414 -> 653-659 = +239, jetzt Symbol-Anker + ci/anker_wache.sh).
  D5-2 [lok] Median-Kanon ueber ce+super (Kreuz-Test gerade Laenge, Seed gedruckt).
  D5-4 [lok] delete_p99_ns + EIN geteilter Helfer + Schema-Test beidseitig.
  D5-5 [lok] HDR entscheiden (0-ns-Zaehler, Toleranz hergeleitet). [rutschfaehig]
@@ -411,7 +524,7 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 
 **W-1** (Nenner 6): ##01 `rev-list --count` 29→0, beide Zahlen · ##02 `diff --stat` 17→0 · D1/D1a: `make check` 427→431 literal, `make` allein 0→53 `.so` (6329→6749 ninja-Ziele), Doppel-Köder beider Gate-Familien vorher unsichtbar-grün/nachher rot · D1d: `grep -rn '404 statt 406'` = 0; jede verbleibende Kommentar-Zahl mit Datum+Kommando · ##04/##05 wie v1, jetzt erfüllbar.
 
-**W0a** (Nenner 14): test:unit-Job druckt Job-ID + `out of 431` + `R5.G … ACTIVE (48 auto-gebaute DLLs)` (heute 429, beide Zahlen) · Wache druckt DREI Zahlen aus DREI Quellen (V-7), Zahl-Köder 345 → rot, Schrumpf-Köder N per `shuf` → rot mit N, Gegenköder grün · Bedingungs-Tabelle: `bedingte Registrierungen: 15 / ohne Allowlist-Eintrag: 0` (16. Köder-Bedingung hebt den Zähler maschinell) · D2-G1: `ctest -N` +2, Erstlauf-Ergebnis mit bestanden/gesamt gebucht · D2-G6-Stash-Köder: XML weg → rot mit Namen und `Inventur 426, Untergrenze 428, Differenz -2` · D5-1: `Definitionen: 1`, Pin 51→50, Mutations-Köder rc≠0 mit Seed · D1g: zwei `ctest -N`-Zahlen aus einem gefahrenen super-Configure-Paar, Ursache im Kommentar benannt.
+**W0a** (Nenner 14): test:unit-Job druckt Job-ID + `out of 431` + `R5.G … ACTIVE (48 auto-gebaute DLLs)` (heute 429, beide Zahlen) · Wache druckt DREI Zahlen aus DREI Quellen (V-7), Zahl-Köder 345 → rot, Schrumpf-Köder N per `shuf` → rot mit N, Gegenköder grün · Bedingungs-Tabelle (korrigiert D2-G4, s. Fußnote): `bedingte_registrierungen: 18 / bedingungs_klassen: 14 / erfuellt: 12 / allowlist_mit_begruendung: 6 / ohne_allowlist_eintrag: 0`, jede Ausgabe mit Host-Kennung; **19. Köder-Registrierung hebt den Zähler maschinell auf 19 und wird namentlich rot**, Gegenprobe bleibt bei 18 grün · D2-G1: `ctest -N` +2, Erstlauf-Ergebnis mit bestanden/gesamt gebucht · D2-G6-Stash-Köder: XML weg → rot mit Namen und `Inventur 426, Untergrenze 428, Differenz -2` · D5-1: `Definitionen: 1`, Pin 51→50, Mutations-Köder rc≠0 mit Seed · D1g: zwei `ctest -N`-Zahlen aus einem gefahrenen super-Configure-Paar, Ursache im Kommentar benannt.
 
 **W0b** (Nenner 17 + 5 Nachlauf): D3-1-Proben P1 (Kopfzeile, `$K` im Pfad der Fehlerzeile) rot / P2 (eine Datenzeile `koeder_$K`) grün mit `datenzeilen_gesamt=1` / P3 (leer) rot mit `csv_gesamt=0` — heute P1/P3 grün, Vorher-Läufe protokolliert *(Nachtrag 08.08. abends: **gefahren und gelandet** — `ci/tests/mess_ausbeute_bissprobe.sh` mit `--selbstbiss`, im CI als `test:mess-ausbeute-bissprobe` ohne `allow_failure`; die Köder werden je Lauf gewürfelt, nicht abgeschrieben. Offen bleibt allein die Marker-Auswertung aus D3-7.)* · ##26 in korrigierter Formel `N>=1 UND M==N UND Z>=1` · Marker: fehlend = rot, `provision_only` nicht fälschlich rot, gefälschter `modus=voll measured=0` rot · persist-Beweis am Git-Zustand · Testat-XOR: gewürfelte Fehl-Zelle → genau 1 `[FEHLER-TESTAT]`, C−1 `[MESS-TESTAT]`, Bilanz stimmt (heute C+1 Testate) · Frische-Zwei-Lauf-Köder · D3-6: P1 Produktions-Layout heute unsichtbar → danach im WIDE-Aggregat, P3 NO-OP mit `laufordner_geprueft=1 / mit_material=0` · ##23/##23b wie v1 (Zeilenzahl je Blatt gegen Eingangs-CSV; SKIP-Zweitlauf zwei Zahlen) · **##25 DURCHSTICH:** Submodul-Diff zeigt die Tabellenzeile mit dem gewürfelten Mini-Lauf-Token; PDF baut; jede Stufe hat ihren Nenner gedruckt.
 

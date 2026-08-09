@@ -1,0 +1,31 @@
+# =============================================================================
+#  ALLOWLIST ZUR ABNAHME ##06 -- bedingte ctest-Registrierungen mit Begruendung
+#  Gelesen von scripts/ci_abnahme06_bedingungs_tabelle.sh (Posten D2-G4)
+# =============================================================================
+#
+# SELBSTCHECK -- was diese Datei ZUSICHERT:
+#   Jede hier stehende Bedingung ist auf der jeweils genannten Maschinenklasse
+#   NAMENTLICH UND MIT BEGRUENDUNG von der Abnahme ##06 ausgenommen. Was hier
+#   NICHT steht und nicht erfuellt ist, macht die Abnahme rot.
+# WAS SIE NICHT ZUSICHERT:
+#   Sie sagt nichts darueber, ob die Bedingung richtig formuliert ist, und sie
+#   ist KEINE Erlaubnis, den Test wegzulassen. Ein Eintrag ist ein SCHNITT mit
+#   Begruendung -- eine stille Ausnahme waere wieder ein blindes Gruen.
+#
+# FORMAT:  <Bedingungs-Ausdruck wie im CMake-Quelltext> TAB <Begruendung>
+#          Fuehrendes '#' = Kommentar. Leere Begruendung = Abbruch (fail-closed).
+#          Der Ausdruck muss WOERTLICH dem if()-Text entsprechen; driftet der
+#          Quelltext, faellt der Eintrag heraus und die Abnahme wird rot. Das ist
+#          gewollt: eine Ausnahme soll die Aenderung ueberleben MUESSEN, nicht
+#          duerfen.
+#
+# HOST-KENNUNG IST PFLICHT (Richtigstellung 09.08.2026): es gibt zwei bare-metal-
+# Runner, prod1/AMD MIT AVX-512 und prod2/Intel OHNE, und 44 von 48 Jobs floaten
+# zwischen ihnen -- gewollt, die Maschinen stimmen sich ueber das Lager ab. Eine
+# Begruendung, die eine Maschinenklasse meint, muss sie deshalb NENNEN. Welche
+# Registrierung an welcher ISA-Stufe haengt, beantwortet nicht diese Datei,
+# sondern scripts/ci_host_klassen_bericht.sh (3 Zahlen, mit Host-Kennung).
+# =============================================================================
+
+COMDARE_PRT_ART_LEGACY_AVAILABLE	Deckt 4 Registrierungen (test_concepts_compile, test_value_handle, test_three_layer_audit, test_six_page_structures). Das Gatter ist reine Datei-Existenz: tests/unit/CMakeLists.txt:96-99 setzt TRUE nur, wenn ${PROJECT_SOURCE_DIR}/prt_art/include/prt_art/prt_art.hpp existiert. Am 09.08.2026 nachgesehen: das Verzeichnis prt_art/ existiert weder in wt-ce-xml (404ff6cf) noch im vendorierten ce des super (a1d0c201), und das super-Submodul Code/external/comdare-prt-art ist NICHT AUSGECHECKT (leeres Verzeichnis). Auf ALLEN heute erreichbaren Maschinenklassen (prod1/avx512f wie prod2/avx2) ist die Bedingung damit FALSE. Verfuegbar wuerde sie erst mit befuelltem prt-art-Kontext (COMDARE_CE_PRUEFLINGE). AUFHEBUNG DIESES EINTRAGS: sobald das prt-art-Submodul in einem Bauweg ausgecheckt wird -- dann muessen die 4 Tests erfuellt sein, und dieser Eintrag faellt.
+do_run	Deckt 2 Registrierungs-STELLEN in den Hausfunktionen comdare_add_simd_dispatch_test und comdare_add_simd_add_u64_test. Der Testname entsteht dort erst aus einem Suffix-Parameter (add_test(NAME ${_tgt} ...)), ist also im Quelltext statisch nicht bestimmbar; ein geratener Name waere ein erfundener Widerspruch. Diese zwei Stellen sind deshalb strukturell nie "erfuellt" im Sinne dieser Wache -- NICHT weil sie fehlen, sondern weil dieser Zaehler sie nicht benennen kann. GEGENSTUECK, das sie sehr wohl aufloest: scripts/ci_host_klassen_bericht.sh loest die Aufrufstellen auf und weist sie namentlich der ISA-Leiter zu (Lauf 09.08.2026 auf prod1: isa_gattiert_gesamt=6, davon 4 an COMDARE_HOST_RUNS_AVX512F und 2 an COMDARE_HOST_RUNS_AVX2). Wer die Deckung dieser 2 Stellen pruefen will, prueft sie DORT -- nicht hier.
