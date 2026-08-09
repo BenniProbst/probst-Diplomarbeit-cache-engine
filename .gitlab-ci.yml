@@ -463,6 +463,16 @@ docs:anker-wache:
 # wie test:mess-ausbeute-bissprobe). Rot wird der Bericht genau dann, wenn ein ISA-Gatter auftaucht,
 # das die Klassen-Leiter nicht kennt -- dann ist JEDE Untergrenze oben geraten, und das gehoert
 # laut. KEIN .code-rules: das Gatter kann ueber einen reinen Gitlink-Bump ins Repo kommen.
+#
+# NACHSATZ 09.08. (W0b-7-Nachsatz): dazu das GEGENORAKEL. Der Bericht ist ein Quelltext-Scan;
+# sein Selbsttest beweist den Scanner, NICHT dass CMake die Gatter vollzieht (Landungsbericht
+# 3b13bf4a, Loch 3). Das Gegenorakel konfiguriert das ce-Submodul DREIMAL (Host-Antworten als
+# -D-Preset: avx512f/avx2/basis) und difft die ctest -N-Namenslisten -- die Differenzen muessen
+# die Leiter sein, Stufe fuer Stufe, Name fuer Name (am gitlink 25fe4fbf: 4 ohne AVX-512F,
+# 2 ohne AVX2, Eintraege 429/425/423). Anders als der Bericht braucht dieser Schritt CMAKE und
+# einen COMPILER (configure-only, kein Bau); er ist maschinenUNabhaengig, weil die Host-Antworten
+# Preset sind, und bricht fail-closed (rc 2) ab, wenn das Submodul nicht auf dem gitlink steht --
+# ein Configure haette sonst einen anderen Gegenstand vermessen, als das Repo deklariert.
 test:host-klassen-bericht:
   stage: test
   tags: [baremetal]
@@ -474,6 +484,8 @@ test:host-klassen-bericht:
   script:
     - sh scripts/ci_host_klassen_bericht.selbsttest.sh
     - sh scripts/ci_host_klassen_bericht.sh
+    - sh scripts/ci_host_klassen_gegenorakel.selbsttest.sh
+    - sh scripts/ci_host_klassen_gegenorakel.sh
 
 # ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
 # User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;

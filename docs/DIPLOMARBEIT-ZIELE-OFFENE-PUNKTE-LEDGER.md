@@ -16,6 +16,59 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHSATZ 09.08.2026 -- W0b-7 / D2-G5: DAS GEGENORAKEL IST GEFAHREN -- CMAKE BESTAETIGT DIE LEITER
+
+**Nachsetzer-Lauf auf die Landung `3b13bf4a` (08.08., Selbsteinstufung "zufrieden=false").** Von den
+drei benannten Loechern war das dritte tragend: der Host-Klassen-Bericht ist ein QUELLTEXT-Scan, und
+nie gefahren war die Probe, die CMake selbst befragt. Sie ist jetzt gefahren UND als Werkzeug
+dauerhaft: **`scripts/ci_host_klassen_gegenorakel.sh`** (+ Selbsttest, 9 Faelle; Job
+`test:host-klassen-bericht` faehrt beides, kein allow_failure).
+
+**DIE MESSUNG (Zustand: ce am gitlink `25fe4fbf`, Scratch-Klon aus dem Modul-Gitdir, prod1,
+configure-only).** Derselbe Baum DREIMAL konfiguriert, Host-Antworten als `-D`-Preset
+(`check_cxx_source_runs` laesst vordefinierte Variablen stehen -- der Lauf ist dadurch
+MASCHINENUNABHAENGIG), `ctest -N`-Namenslisten gedifft:
+
+* avx512f -> avx2: es verschwinden **exakt 4** -- `test_buildvariant_dll_real`,
+  `test_ap5_simd_extension_coherence`, `test_simd_field_sum_dispatch_avx512`,
+  `test_simd_add_u64_carry_avx512`. Die zwei zusammengesetzten Namen waren bisher nur als
+  Kardinalitaet behauptbar; jetzt sind sie NAMENTLICH belegt.
+* avx2 -> basis: **exakt 2** (`test_simd_field_sum_dispatch_avx2`, `test_simd_add_u64_carry_avx2`).
+* GEGENRICHTUNGEN LEER: nichts erscheint, wenn eine Faehigkeit wegfaellt.
+* Eintraege je Klasse: **429 / 425 / 423** (avx512f/avx2/basis). `gtest_discover_tests`-Platzhalter: 0.
+
+**Der `--ctest-liste`-Gegeneingang haengt jetzt an ECHTEN Listen statt an der synthetischen des
+08.08.:** je Klasse passend dreimal rc 0; EINMAL absichtlich gekreuzt (Klasse basis gegen die
+avx512f-Liste) rc 1 mit 2 Widerspruechen -- die Gegenprobe beisst.
+
+**TDD-Protokoll des Nachsatzes:** T-1 rot zuerst (Selbsttest gefahren, BEVOR das Orakel existierte:
+`FEHLT: scripts/ci_host_klassen_gegenorakel.sh`, rc 1). Drei gewuerfelte Koeder, alle gebissen:
+B1 behauptetes Gatter ohne CMake-Wirkung (set() beschattet das Preset) -> rc 1, benannt; B2
+CMake-Wirkung, die der Scan nicht sieht (Gatter in Zwischenvariable) -> rc 1, benannt; B3
+Registrierung, die bei WEGFALL erscheint -> rc 1, benannt. Gegenkoeder gruen. Fail-closed: fehlende
+Quelle rc 2, 0 Registrierungen rc 2, Submodul neben dem gitlink rc 2 (am realen Juni-Stand
+`a1d0c201` vorgefuehrt). T-7: drei Wegwerf-Mutationen der CI-Datei (allow_failure eingefuegt /
+Selbsttest-Aufruf entfernt / Job entfernt) je rot, Wiederherstellung cmp-identisch. Selbsttests
+danach: 9/9 (Gegenorakel) und 12/12 (Bericht) GRUEN.
+
+**BEFUNDE AM RANDE, nicht verschluckt:**
+1. Schwester-Beleg gefunden statt doppelt gebaut: die ce-Sichtbarkeits-Wache (ce `404ff6cf`,
+   09.08. 00:45Z) hat die avx512f-Sprosse ZWEIMASCHINIG belegt -- 461 Eintraege lokal/prod1 gegen
+   457 im CI-Baum eines Runners ohne AVX-512, Differenz exakt die vier Gatter-Eintraege. Das
+   Gegenorakel ergaenzt die basis-Sprosse (2 an AVX2), fuer die es KEINE physische Maschine gibt.
+2. SPANNUNG, offen benannt: der Wellenplan sagt bei OV-5 "prod2 existiert nicht" (getent rc 2),
+   die ce-Wache belegt einen CI-Lauf auf einem Runner OHNE AVX-512 (Trace 15412). Beides kann
+   stimmen (DNS-Sicht vs. Runner-Sicht); fuer D2-G5 ist es seit heute egal -- die Preset-Technik
+   braucht keine zweite Maschine. Nicht von mir entschieden, nur notiert.
+3. Die absolute "428" des alten Plansatzes bleibt Historie: am deklarierten Stand sind es 429
+   (avx512f-Klasse). An-8 im Wellenplan entsprechend nachgetragen (Klassen-Zahlen gemessen,
+   prod2 keine Voraussetzung mehr).
+
+**Offen aus der 3b13bf4a-Landung bleibt (unveraendert, mit Grund):** gitleaks lokal (Werkzeug auf
+prod1 nicht installiert; CI-Job lint:secrets faehrt es beim Push) und Pipeline-Gruen-Verifikation
+(GitLab-Auth-500-Blocker, Modus a, Batch-Schuld laeuft seit W0b-1/D3-3). Der ce-Submodul-Arbeitsbaum
+steht weiter auf `a1d0c201` neben dem gitlink -- das Gegenorakel bricht daran fail-closed ab statt
+den falschen Gegenstand zu vermessen; geheilt wird das in einem ce-Strang, nicht hier.
 ## NACHTRAG 09.08.2026 nachts — „EIN BLECH" ist eine Annahme, keine Zusicherung. 44 von 48 Jobs floaten.
 
 **Anlass:** Pipeline `15412` (ce, HY-0) wurde rot — die frisch eingezogene Test-Sichtbarkeits-Wache

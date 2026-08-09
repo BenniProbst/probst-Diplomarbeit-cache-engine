@@ -225,6 +225,34 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 > Einheit (Registrierungs-**Aufrufe** im Quelltext, `gtest_discover_tests` = 1) und misst im
 > super-Baum `registrierungen_gesamt=148`. Die beiden Zahlen sind **nicht** ineinander umrechenbar;
 > wer sie gleichsetzt, wiederholt den Fehler, den die Fußnote korrigiert.
+>
+> **NACHTRAG 09.08.2026 — DAS GEGENORAKEL IST GEFAHREN: CMake selbst bestätigt die Leiter.**
+> Der Landungsbericht `3b13bf4a` nannte als tragendes Loch, dass 6/4/2 eine Quelltext-Scan-Aussage
+> sei und keine von CMake bestätigte. Geschlossen mit `scripts/ci_host_klassen_gegenorakel.sh`
+> (+ Selbsttest, 9 Fälle, Köder in beide Richtungen, gewürfelt; der Job `test:host-klassen-bericht`
+> fährt beides): derselbe ce-Baum, **gitlink `25fe4fbf`**, DREIMAL konfiguriert — die Host-Antworten
+> als `-D`-Preset, denn `check_cxx_source_runs` lässt vordefinierte Variablen stehen —, dann die
+> `ctest -N`-Namenslisten gedifft:
+>
+> * avx512f→avx2: es verschwinden **exakt 4** — `test_buildvariant_dll_real`,
+>   `test_ap5_simd_extension_coherence`, `test_simd_field_sum_dispatch_avx512`,
+>   `test_simd_add_u64_carry_avx512`. Die zwei zusammengesetzten Namen, die der Scan nur als
+>   Kardinalität behaupten konnte, sind damit erstmals **namentlich** belegt.
+> * avx2→basis: **exakt 2** — `test_simd_field_sum_dispatch_avx2`, `test_simd_add_u64_carry_avx2`.
+> * Beide **Gegenrichtungen leer** (nichts erscheint bei Wegfall einer Fähigkeit).
+> * ctest-Einträge je Klasse: **429 / 425 / 423** (Zustand: ce `25fe4fbf`, configure-only, prod1;
+>   durch die Presets ist der Lauf **maschinenunabhängig**).
+>
+> Die ECHTEN Listen hingen zusätzlich am `--ctest-liste`-Gegeneingang des Berichts: je Klasse
+> passend dreimal rc 0, und EINMAL absichtlich gekreuzt (Klasse basis gegen die avx512f-Liste)
+> rc 1 mit 2 Widersprüchen — die Gegenprobe beißt. Die synthetische Liste des 08.08. ist damit
+> durch echte `ctest -N`-Ausgabe ersetzt. **Zur absoluten Zahl:** am deklarierten Stand sind die
+> Eintragszahlen je Klasse jetzt GEMESSEN (429/425/423); `gtest_discover_tests`-Platzhalter
+> entstehen dort 0. Die „428" bleibt unbestätigte Historie eines anderen Standes. Eine
+> prod2-Maschine ist für DIESE Messung nicht mehr Voraussetzung — die Preset-Technik ersetzt sie;
+> unabhängig davon hat die ce-Sichtbarkeits-Wache (ce `404ff6cf`, 09.08.) die avx512f-Sprosse auch
+> **zweimaschinig** belegt: 461 Einträge lokal/prod1 gegen 457 im CI-Baum eines Runners ohne
+> AVX-512, Differenz exakt die vier Gatter-Einträge.
 
 ### D3 — Ein leeres Messfenster ist heute grün (8 Posten, 20 h)
 
@@ -413,6 +441,8 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
  D3-8 [lok] Frische-Kennung (PIPELINE_ID); Altbestand gemeldet, nie geloescht.
  D2-G5[lok] Host-Klassen-Bericht GEBAUT: 6 ISA-Registrierungen, davon 4 an AVX-512
             und 2 an AVX2 (Richtigstellung 08.08., s. Fussnote D2-G5). 3 Zahlen immer.
+            NACHSATZ 09.08.: GEGENORAKEL GEFAHREN -- CMake bestaetigt 4/2 namentlich
+            (Triple-Configure ce 25fe4fbf, Eintraege 429/425/423, s. Fussnoten-Nachtrag).
  20+D3-6 [CI, EIN Paket] anhang:forward: AF_GENERATOR belegt UND Selektor findet
             BEIDE Layouts; NO-OP nur mit Nenner. P1/P2/P3 gefahren.
  21   [CI]  Realm-Wurzeln /mnt + G-E3 + COMDARE_BESTANDSLOG in beiden CI.
@@ -619,7 +649,7 @@ Regel „ALLES IST GEPLANT": vorgelegt wird nur, was Recherche nicht auflösen k
 | An-4 | `bau/a9-s4-mess-report` ist baubar | Zahl verifiziert (6/17/1940+), Bau nicht — deshalb ##02 mit eigener Abnahme |
 | An-6 | Doku-Drift nicht abgabekritisch außer A9-Design Abschnitt 1 und der D5-3-Disposition | beide in W0b/W1 adressiert |
 | An-7 | prod1 trägt während Bau- und Messfenster keine fremde Last | **angeordnet, nicht garantiert** — Runner auf derselben Platte |
-| An-8 | Consumer-Silizium mit abgeschaltetem AVX-512 verliert **4** ISA-gattierte Registrierungen (D2-G5, am Objekt gezählt 08.08.). ~~424 statt 428 Tests auf prod2~~ — die **Differenz −4** ist bestätigt, die **absoluten** Zahlen 424/428 sind es NICHT (s. Fußnote D2-G5: andere Einheit, kein gebauter Baum) | Differenz: **gemessen** über `scripts/ci_host_klassen_bericht.sh`, drei ce-Stände, gleiches Ergebnis. Absolute ctest-Zahl je Host: ungemessen, weil prod2 nicht existiert; bei Existenz mit EINEM Kommando erhoben (`ctest -N` + `--ctest-liste`) |
+| An-8 | Consumer-Silizium mit abgeschaltetem AVX-512 verliert **4** ISA-gattierte Registrierungen (D2-G5, am Objekt gezählt 08.08.). ~~424 statt 428 Tests auf prod2~~ — die **Differenz −4** ist bestätigt, die **absoluten** Zahlen 424/428 sind es NICHT (s. Fußnote D2-G5: andere Einheit, kein gebauter Baum) | Differenz: **gemessen** über `scripts/ci_host_klassen_bericht.sh`, drei ce-Stände, gleiches Ergebnis. Absolute ctest-Zahl je Host: ~~ungemessen, weil prod2 nicht existiert~~ **Nachtrag 09.08.: je KLASSE jetzt gemessen, ohne prod2** — `ci_host_klassen_gegenorakel.sh` (Host-Antworten als `-D`-Preset, maschinenunabhängig): am Stand `25fe4fbf` **429/425/423** Einträge (avx512f/avx2/basis), configure-only, s. Fußnoten-Nachtrag D2-G5 |
 | An-9 | super-Zahlen 610/186 | Agent-Behauptung aus dem super-Commit, **nicht nachgemessen** — D1g misst sie; die Erklärung (EXCLUDE_FROM_ALL vs. enable_testing-Reihenfolge) bleibt bis dahin offen |
 | An-10 | HY-A-Aufwand ~3–4 AT im F8-Minimalschnitt | Planungsschätzung ohne Objekt-Basis (Bestand = 1 README); WE-Option 22./23.08. ist die Deckung |
 | An-11 | `.test`-Template-Befunde gelten für den Live-Stand | erhoben am lokalen Klon `Cluster-ci-templates` (HEAD 5f9e04be, 27.07.), **nicht** am ref=development-Live-Stand |
