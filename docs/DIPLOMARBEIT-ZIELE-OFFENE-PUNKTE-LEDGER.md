@@ -16,6 +16,112 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — DAS KONFORMITÄTS-REGISTER: es passt nicht, und hier sind die Zahlen
+
+Der Owner hat den Fertigstellungs-Maßstab gesetzt: *„fertig, wenn die Realität dem Design
+entspricht"*. Strang 16 hat ihn in Zahlen übersetzt. **Volltext:**
+`docs/sessions/20260809-KONFORMITAETS-REGISTER-soll-gegen-ist.md`.
+
+### Zwei Einschränkungen, die vor jeder Zahl stehen
+
+**(1) Mein Werkzeugfehler hat 75 % des Materials verschluckt.** Die Extraktion lieferte **346**
+bindende Aussagen; die Synthese bekam **87** — mein Script kürzte mit `.slice(0, 150000)`, und die
+Stationen **s5-messen, s6-auswerten, s7-release-hybrid, s8-veröffentlichen** fielen heraus.
+
+**Der Register-Agent hat das selbst gemessen und mit Gegenprobe belegt**, statt so zu tun, als
+hätte er alles: `grep -c -F 'XMLPL-KETTE-LAGER'` = 0 über alle Logs, Gegenprobe `GOAL-V8` = 161
+Treffer. **Alle Zahlen haben den Nenner 87, nicht 346.**
+
+**(2) `s7-release-hybrid` ist in der Extraktion ausgefallen** (`StructuredOutput retry cap`) —
+ausgerechnet HYBRID, der Owner-KERN mit *„ALLES PFLICHT"*, der als 0 % gebaut gilt.
+
+**Die Bilanz ist damit eine Untergrenze**, und sie wird sich beim Nachholen eher verschlechtern:
+die schwersten Befunde liegen laut Überraschungsliste **in den ungemessenen Stationen**.
+
+### Die Bilanz der 87 gemessenen Aussagen
+
+| | Anteil |
+|---|---|
+| **ERFÜLLT** | 20 · **23 %** |
+| **TEILWEISE** | 47 · 54 % |
+| **NUR_PAPIER** (deklariert, wirkungslos) | 14 · 16 % |
+| **VERLETZT** (Realität widerspricht aktiv) | 5 · 6 % |
+| **NICHT_PRÜFBAR** | 1 · 1 % |
+
+**Nur 23 % sind voll wirksam. Mehr als jede fünfte Aussage ist wirkungslos oder widersprochen.**
+
+Und ein Muster, das der Agent benennt: **je weiter hinten in der Kette, desto weniger Realität.**
+Station 6 (Heuristik-Insel): 8 include-Treffer, **0 außerhalb `tests/`**. Station 7 (`hybrid/`):
+**nur eine README.md**. Station 8: `csv` = 33 Treffer in der CI, **`xlsx` = 0** — obwohl „xlsx ist
+die Ausgabe" Owner-KERN ist.
+
+### Die Rechnung gegen die Frist — sie geht nicht auf
+
+**Nominal 933,5 h**, nach Deduplizierung der Überlappungs-Cluster **~770 h real** — für die
+**87** gemessenen Aussagen.
+
+**Budget:** 37 Kalendertage. Bei realistischen 12 h/Tag (Lead + Agenten, abzüglich Explore-Pflicht
+je Welle *und* Strang, fünf Prüfungen, TDD-Vertrag, Reviews, Betriebsstörungen wie das aktuelle
+GitLab-500): **~440 h**. Selbst optimistische 16 h/Tag: **~590 h**.
+
+> **~770 h Bedarf gegen 440–590 h Budget = Fehlbetrag 180–330 h — und das deckt nur ein Viertel
+> der Aussagen.**
+
+**Ich sage das jetzt, nicht am 11.09.** Ein Plan, der nicht aufgeht und es verschweigt, ist
+schlechter als keiner.
+
+### Was zuerst fallen müsste — Entscheidungsvorlage, jede Zeile braucht ein GO
+
+| Streichung / Minimalform (→ nach Abgabe) | Entlastung |
+|---|---|
+| CEB-27 Arbeitsmodus (Hot-Switching im RAM) → Minimalform | −40 h |
+| CEB-43 + Post-v3 `.so`/`<modules>`-Schnitt (Textemission läuft) | −64 h |
+| CEB-12 Wallclock-Vollausbau → Nullpunkt + eine Checkpoint-Ebene | −28 h |
+| CEB-34 Release-Rekonstruktion | −24 h |
+| CEB-18 P/E-Core → nur prod2-Probe | −16 h |
+| CEB-20 L2/Kohärenz → eine RAW-Zeile je µArch | −12 h |
+| Paper-XML → 3 Referenz-Paper statt Generator für 33 | −22 h |
+| Compiler-Unterachsen Toolchain-Permutation | −12 h |
+| CEB-19 Pinning-Kette → Resolver nur `core_class` | −10 h |
+| **Summe** | **~228 h** |
+
+Danach: **~540 h Pflichtkern** — an der Obergrenze des Budgets, **ohne** die Neufunde aus s5–s8.
+
+**Die Liste nimmt bewusst nichts aus der Datenintegritäts-Klasse.** Kontaminierte Messdaten sind
+unheilbar; alles andere ist bis zum 15.09. heilbar.
+
+### Die Bau-Reihenfolge nach Schadenslogik
+
+**Zuerst die Datenintegritäts-Trias — ~30 h, verhindert die unheilbare Klasse:**
+Zell-Env (**~2 h**, läuft als Strang 20) · PMC-Glied (~12 h) · G3-Gate (~16 h).
+
+Dann: Mess-Deckel (~38 h) → Lane→Lager (~24 h) → Zeit-Nullpunkt (~12 h) → Auswertungs-Anschluss
+(~32 h) → xlsx-Durchstich → Hybrid-Minimal (~55 h).
+
+### Der akute Befund: das scharfe Lager könnte simd-blind deduplizieren
+
+**Befund 1 der Schwereliste:** kein Batch-Job setze `COMDARE_GN_SIMD/OPT/MEASUREMENT_COMBO` ⇒
+`ZellKoordinaten::empty()` ⇒ das Dedup fällt auf die **simd-blinde Alt-Form**. **Seit LAG-P1
+gelandet ist, läuft das Lager scharf — und der Fehler mit ihm.**
+
+Der Code benennt den Schaden selbst (`profile_run_entry.hpp:507-523`): *„zwei Bauten derselben
+Permutation unter avx2 und avx512 würden sonst falsch dedupliziert."* Dagegen spricht, dass der
+Director `COMDARE_GN_SIMD` an **sechs** Stellen emittiert (`:1354`, `:1391`, `:1540`, `:1549`,
+`:1558`, `:1836`).
+
+**Strang 20 prüft das adversarial und fixt bei Bestätigung sofort.** Die entscheidende Frage ist
+nicht „wird die Variable geschrieben?", sondern **„steht sie in der Umgebung genau des Prozesses,
+der sie liest?"** — der Unterschied zwischen beidem ist der Stellvertreter.
+
+### Blockierende Entscheide, Frist Mi 12.08.
+
+D-3 (6 vs. 8 vs. 4/5 CEB-Varianten) · D-5 (Bau- vs. Mess-Menge — **der Bestand widerspricht sich
+hier selbst**: Owner-Entscheid D-3 sagt „Bau folgt Mess", die 08.08.-Aussage sagt „größerer
+Bau-Satz, Teil davon messen") · K1/K2/K4/K5 (Hybrid) · PMC-als-Preimage-Glied (**Byte-Ereignis**)
+· CEB-Identität A/B · CEB-38 (CEB-Änderung = Vollrebuild ja/nein) · Wallclock-Schichtzuordnung ·
+`std::variant`-Fehlerklassen-Ausnahme.
+
+**Jede Woche Entscheid-Verzug frisst einen Puffer, den es nicht gibt.**
 ## NACHTRAG 09.08.2026 — Lager-Scharfschaltung: drei Pakete gelandet, eine Provenienz gestört, und ein Stellvertreter im eigenen Abnahme-Entwurf
 
 ### PROVENIENZ-RICHTIGSTELLUNG — die Arbeit steht unter falschem Namen, und schuld bin ich

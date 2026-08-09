@@ -71,9 +71,8 @@ Comdare-Lizenz nie eigenmächtig setzen.
 deren Begründung am Objekt widerlegt und deren Deutung vom Owner richtiggestellt wurde.)*
 
 Es gibt **zwei** bare-metal-Runner: **id=16 = prod1** (AMD Zen 5, uniform, L3-asymmetrisch, **mit**
-AVX-512) und **id=17 = prod2** (Intel Alder Lake, hybrid P/E-Cores, **ohne** AVX-512). **45 von 51 tag-tragenden
-Jobs beider Repos** tragen nur `tags:[baremetal]` *(Zahl korrigiert 09.08. spaet — 44/48 war falsch;
-Verfahren im Ledger-Nachtrag „Lagerhaltung und AVX-Maximum“)* und landen auf beiden. Belegt an Pipeline `15412`:
+AVX-512) und **id=17 = prod2** (Intel Alder Lake, hybrid P/E-Cores, **ohne** AVX-512). **47 von 53 tag-tragenden
+Jobs beider Repos** tragen nur `tags:[baremetal]` *(Stand `super af82a611`/`ce 59cc9428`; die Zahl wandert mit jedem neuen Job — 44/48 falsch, 45/51 bei `f2ea8fcd` 06:58, 47/53 heute Mittag. **Eine Zahl über eine lebende Datei gilt nur mit Commit-Anker.**)* und landen auf beiden. Belegt an Pipeline `15412`:
 `test:coverage-guard` lief auf prod2 (`== Host ==`: `Linux prod2`, `GenuineIntel`, i9-12900K) und
 meldete vier AVX-512-gegatete Tests als unsichtbar. prod1 ist zugleich die lokale Maschine; der
 Runner liegt auf derselben Platte.
@@ -90,8 +89,9 @@ GitLab-Tags. Ein fehlender Tag-Pin ist deshalb **kein Befund**.
 2. **Jede Wache, die ihren Nenner aus der Hardware zieht, muss die Maschine mit ausweisen.**
    »457 sichtbar« ohne »auf prod2« ist eine Zahl ohne Gegenstand. Werkzeug dafür existiert:
    `scripts/ci_host_klassen_bericht.sh`.
-3. **Die beiden Mess-Jobs sind echt gepinnt** (`tags:[prod, baremetal, amd]`, `.gitlab-ci.yml`
-   :923 und :1015) — Messdaten können nicht zwischen CPUs floaten. Das ist die Stelle, an der der
+3. **Die beiden Mess-Jobs sind echt gepinnt** (`tags:[prod, baremetal, amd]`, Jobs
+   `measure:smoke` und `measure:golden-320` — **Symbol-Anker: die Zeilennummern :923/:1015 sind
+   binnen Stunden auf :1097/:1194 gedriftet**) — Messdaten können nicht zwischen CPUs floaten. Das ist die Stelle, an der der
    Schaden unheilbar gewesen wäre.
 
 Volltext und Fehlerklasse: Ledger, „RICHTIGSTELLUNG 09.08.2026 — der Befund hält, meine Deutung
