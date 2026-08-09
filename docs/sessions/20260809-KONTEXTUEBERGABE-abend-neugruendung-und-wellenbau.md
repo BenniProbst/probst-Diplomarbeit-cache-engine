@@ -476,3 +476,90 @@ der noch arbeitet.** Es gibt keinen Unterschied von außen. Deshalb gilt ab jetz
 Verdacht auf Stillstand **zuerst `df -h`**, und die Journale sind die Quelle der Wahrheit, nicht
 die Notifikation. Und: `/home` und `/tmp` teilen sich eine Partition — ein Bau-Strang in Debug
 **und** Release kann die Sitzung handlungsunfähig machen.
+
+---
+
+# TEIL X — WARNUNGS-RUNDE 1: WAS WIRKLICH LIEF, UND WAS ICH SELBST ZOG
+
+## X.1 Die Bilanz des Strangs, ehrlich aufgeschlüsselt
+
+Der Strang `w8bktp12p` hatte vier Phasen. Er ist **nicht gestorben** — er **hing** seit dem
+Plattenausfall und lief noch, als ich ihn für tot hielt. Das war mein Fehler: die Fehlermeldung
+sagte wörtlich *„is still running"*, und ich habe sie als Formalie gelesen statt als Befund.
+Der Resume hat danach das Journal auf **einen** Eintrag zurückgesetzt.
+
+| Phase | Modell | Stand | Woher geborgen |
+|---|---|---|---|
+| 1 Erheben | opus | **fertig**, 12.548 Zeichen | `journal.jsonl` |
+| 2 Codex | opus | **nie durchgekommen** | s. unten |
+| 3 Heilen | opus | `NULL Codeaenderungen` (Umgebungsblocker) | `agent-a02feb…jsonl` |
+| 4 Verify | fable | nie gestartet | — |
+
+**Zu Phase 2, weil der Befund zählt:** die einzige Codex-Antwort im ganzen Transkript lautet
+*„The tool use was rejected."* Die drei Codex-Agenten haben **keinen** Bericht geschrieben (ihre
+längsten Texte sind 194, 180 und 140 Zeichen). Was in ihren Transkripten steckt, sind eigene
+Lesevorgänge — sie haben den Quelltext selbst analysiert, weil das Werkzeug nicht ansprang.
+
+**Ein Fund daraus ist trotzdem wertvoll und gehört festgehalten:**
+
+> *„`FunctionInterfaceReroute` wurde angehängt, diese TU neu übersetzt (die .o-Zeitstempel liegen
+> nach dem Header-Edit, es war kein Cache-Artefakt) — **0 Fehler, der Test blieb grün**. Eine
+> handgeführte Liste kann per Konstruktion nicht bemerken, dass das Enum länger geworden ist."*
+
+## X.2 Phase 3 und 4 selbst gezogen — drei Heilungen, in ce committet
+
+| Commit | Was | Beleg |
+|---|---|---|
+| `976f1ddb` | **D1** `-Wswitch` + **D2** uninitialisiertes Mitglied | s. unten |
+| `b64bd1af` | **D8** `-Wcomment`, 476 von 2447 Vorkommen | Debug+Release je 0 |
+
+**D1** — der Switch kannte fünf Fälle, `kAlleGenera` trägt sechs. Der Fall ist **ausgeschrieben**
+statt durchzufallen: inhaltlich ist der leere `string_view` richtig (Weg C — ein
+Klassifikations-Genus hat kein eigenes Dock), aber ein ausgeschriebener `case` hält `-Wswitch`
+scharf, während ein Durchfall den nächsten neuen Wert wieder still mit leerem Stempel quittierte.
+Der Kommentar, der „hat FUENF" behauptete, ist mitkorrigiert — **er hat den Defekt gedeckt**.
+*Köder beißt:* ohne den Fall meldet GCC `enumeration value 'FunctionInterfaceReroute' not handled`
+an Zeile 77, mit ihm null. Beide Richtungen gefahren.
+
+**D2** — `fingerprint` war das einzige Mitglied ohne Initialisierer. **Hier ist der Beleg
+schwächer, und das steht auch im Commit:** die Minimalprobe löst die Warnung nicht aus, die
+Gegenprobe blieb stumm. Der Nachweis stammt allein aus dem CI-Log. Der Fix ist sachlich richtig,
+aber **ein beißender Köder fehlt noch** — nachzuziehen, sobald `-Wall` auf `libs/` liegt.
+
+**D8** — eine `///`-Zeile endete mit `\` und setzte den Kommentar fort. Hier folgte zufällig
+wieder eine `///`-Zeile, es ging nichts verloren. Genau das macht den Fall lehrreich: **wäre die
+Folgezeile Code gewesen, wäre sie still verschwunden.**
+
+## X.3 Die nachgeholte Synthese (Phase 4)
+
+Projekteigene Warnstufe — die neun Flags aus `COMDARE_set_default_warnings`, **nicht** das
+schwächere `-Wall -Wextra`:
+
+    -O0 -g         -> 0 Projekt-Warnungen
+    -O3 -DNDEBUG   -> 0 Projekt-Warnungen
+
+Der Nenner ist getrennt: was die Probe zusätzlich meldet, stammt aus dem **Wegwerf-Testprogramm**
+(`old-style-cast`, `missing-declarations`), nicht aus dem Projektpfad. Wer das nicht trennt, hält
+seine eigene Probe für einen Befund.
+
+## X.4 Pipeline 15457 — vier rote Jobs, ZWEI Ursachen
+
+    lint:format               -> GEHEILT (3a5268f3, super, ungepusht)
+    build:clang               \
+    analyse:thesis-data        > EINE Ursache: overlay_source_hash_generated.hpp fehlt
+    visibility:tier-binaries  /
+
+**Die Wurzel, am Objekt:** `cmake/overlay_source_hash.cmake:155` legt die Wartekante über
+`PROJECT_SOURCE_DIR` — das ist **ce**, nicht super. Super bindet ce in `Code/CMakeLists.txt:211`
+ein, seine eigenen Ziele entstehen aber erst ab **Zeile 302** und existieren zum Zeitpunkt der
+Schleife noch gar nicht. Sie bekommen die Kante nie.
+
+**Und der Bericht wird dadurch präzisiert:** die Erhebung hielt das für ein clang-Spezifikum
+(*„GCC fällt nicht darauf herein"*). Gemessen fallen **auch die GCC-Jobs** darauf herein — es ist
+eine echte fehlende Abhängigkeitskante, die je nach Ninja-Scheduling zuschlägt, kein
+Übersetzer-Unterschied.
+
+**Heilung (eigenes Paket, ce + Gitlink-Bump):** `cmake_language(DEFER DIRECTORY "${CMAKE_SOURCE_DIR}"
+CALL …)`, damit die Kante läuft, wenn **alle** Ziele existieren — und automatisch für jedes
+Überprojekt gilt, nicht nur für super. Der Kommentar an Ort und Stelle begründet bereits, warum
+eine gepflegte Namensliste falsch wäre; die Doktrin bleibt also erhalten.
