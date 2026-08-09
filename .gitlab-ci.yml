@@ -735,6 +735,7 @@ test:unit:
       if command -v g++-15 >/dev/null 2>&1; then _CXX=g++-15; fi
       echo "GNU-Bauweg: CC=$_CC CXX=$_CXX"
       CC="$_CC" CXX="$_CXX" sh ./configure.sh --with-generator=Ninja \
+        --with-build-type=Release \
         --enable-da-build-tests --enable-v32-enable --build-dir=Code/build-test
       _built=0
       for _a in 1 2 3 4; do
@@ -746,6 +747,50 @@ test:unit:
   variables:
     # Nur noch fuer die artifacts-Pfade des .test-Templates; das Bauverzeichnis setzt configure.sh.
     COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test"
+
+# ── D3-4 (2026-08-09, Owner-KERN): DIESELBE SUITE EIN ZWEITES MAL, IN DEBUG ──────────
+# Der Owner woertlich: "Es waere SAUBERER IM CMAKE-DEBUG MODUS STANDARD GOOGLE TESTS ZU
+# FAHREN UND DIESE IN RELEASE ZU WIEDERHOLEN AUFGRUND VON COMPILE REGRESSIONEN."
+#
+# DIE BEGRUENDUNG IST GEMESSEN, NICHT BEHAUPTET (09.08.): lokal baut build-xml mit
+# CMAKE_BUILD_TYPE=LEER, also -O0; die CI faehrt Release, also -O3 -DNDEBUG. test_ms1
+# war LOKAL GRUEN und fiel in Pipeline 15437 -- weil der Uebersetzer unter -O3 die
+# Koeder-Allokationen als "nicht beobachtbar" ENTFERNTE (GCC -fallocation-dce,
+# -fassume-sane-operators-new-delete). Der Zaehler war nie blind; er verfehlte genau die
+# wegoptimierten Koeder. JEDE Beobachtbarkeits-Zusage ist unter -O0 SCHWAECHER als in der
+# CI -- deshalb muessen dieselben Tests in BEIDEN Stufen laufen.
+#
+# ZWEI JOBS STATT EINES SEQUENTIELLEN LAUFS: eine Compile-Regression zeigt sich damit als
+# GENAU EIN roter Job. Die Stufen-Attribution steht in der Pipeline-UI, nicht im Log-Grep.
+# EIGENES BAUVERZEICHNIS (Code/build-test-debug): zwei Stufen im selben Baum
+# ueberschrieben einander und die zweite Messung waere die erste.
+# Ninja ist Single-Config -- 'ctest -C' griffe nur bei Multi-Config-Generatoren, und ein
+# Generator-Wechsel risse configure.sh, Makefile und ccache um. Zwei Baeume sind hier der
+# schwerere, aber offizielle Weg.
+# KEIN allow_failure (Doktrin seit 06.07.: ZELLE = Warnung, JOB = hart rot).
+test:unit:debug:
+  extends: [.test, .code-rules, .ccache-pull]
+  needs: ["verify:submodules"]
+  tags: [baremetal]
+  script:
+    - |
+      set -euo pipefail
+      _CC=cc; _CXX=c++
+      if command -v gcc-15 >/dev/null 2>&1; then _CC=gcc-15; fi
+      if command -v g++-15 >/dev/null 2>&1; then _CXX=g++-15; fi
+      echo "GNU-Bauweg (Debug): CC=$_CC CXX=$_CXX"
+      CC="$_CC" CXX="$_CXX" sh ./configure.sh --with-generator=Ninja \
+        --with-build-type=Debug \
+        --enable-da-build-tests --enable-v32-enable --build-dir=Code/build-test-debug
+      _built=0
+      for _a in 1 2 3 4; do
+        if make BUILD_JOBS="${CMAKE_BUILD_PARALLEL_LEVEL:-4}"; then _built=1; break; fi
+        echo "Bau-Versuch $_a fehlgeschlagen -> ninja-Resume-Retry"
+      done
+      [ "$_built" = 1 ] || { echo "FEHLER: 'make' (Debug) nach 4 Versuchen nicht erfolgreich"; exit 4; }
+      make check CTEST_EXTRA="--output-junit $(pwd)/ctest-junit.xml"
+  variables:
+    COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test-debug"
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.

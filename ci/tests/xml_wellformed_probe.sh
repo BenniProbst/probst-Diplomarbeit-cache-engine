@@ -4,6 +4,28 @@
 #  PROBE fuer die XML-WOHLGEFORMTHEITS-WACHE (scripts/ci_xml_wellformed_guard.sh)
 #  -- die Wache selbst ist ein Pruefling, nicht nur ein Pruefer.     (2026-08-09)
 # =============================================================================
+# ABGELOEST am 2026-08-09, NOCH AM TAG IHRER LANDUNG, durch
+#   Code/tests/unit/test_ci_wache_xml_wellformed.cpp   (Google Test)
+#
+# WARUM -- der Defekt ist in dieser Datei, Zeilen 688-701 (heutige Zaehlung):
+# das Selbstbiss-Orakel zaehlte JEDEN Rueckgabewert ausser 0 und 2 als Biss.
+#     if   rc = 0 -> ROT   elif rc = 2 -> ROT   else -> "wird gefangen"
+# Am Objekt gemessen: ein `tr`-Shim, der schlicht mit 127 endet, liess ALLE FUENF
+# Mutanten als "gefangen (Probe rc=127)" durchgehen, GESAMT rc=0, "SELBSTBISS GRUEN" --
+# und kein einziger Mutant war angesehen worden. Die "Literale Ausgabe:"-Zeilen der
+# fuenf Faenge waren LEER, weil das Orakel die Riss-Literale gar nicht forderte.
+# Weitere gemessene Defekte: F11 misst TEXT statt Ausfuehrung (grep -cF ohne
+# Kommentarfilter); die allow_failure-Wache (F12) sieht NUR den eigenen Proben-Job,
+# nie lint:xml-wellformed; das Orakel ist nicht fail-closed (od-Shim mit leerer Ausgabe
+# -> 12/12 GRUEN); F11/F12 zaehlen fail-open (`N=$(grep -cF ... || true)`).
+#
+# Im Nachfolger ist ein Werkzeug-Ausfall eine EIGENE Prozess-Art (ExecFehlgeschlagen)
+# und exit_code() liefert dafuer std::nullopt -- er kann keinem Soll-Code mehr gleichen.
+#
+# DIESE DATEI BLEIBT IM BAUM (Doku wird nie geloescht, sie zieht um). Ihre Mess-Befunde
+# sind in die C++-Koepfe abgeschrieben. Ob ihr Job test:xml-wellformed-probe weiterlaeuft,
+# entscheidet der Lead nach der Abnahme.
+# =============================================================================
 #
 # SELBSTCHECK -- was diese Datei zusichert, und was NICHT:
 #   ZUSICHERT: die Wache faellt bei jedem der 7 Eingaenge, bei denen ihr eigener

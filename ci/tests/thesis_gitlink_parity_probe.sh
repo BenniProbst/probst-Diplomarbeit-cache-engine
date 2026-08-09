@@ -4,6 +4,25 @@
 #  PROBE fuer die THESIS-GITLINK-PARITAETS-WACHE (ci/thesis_gitlink_parity.sh)
 #  -- die Wache selbst ist ein Pruefling, nicht nur ein Pruefer.     (2026-08-09)
 # =============================================================================
+# ABGELOEST am 2026-08-09, NOCH AM TAG IHRER LANDUNG, durch
+#   Code/tests/unit/test_ci_wache_gitlink_parity.cpp   (Google Test)
+#
+# WARUM -- derselbe Orakel-Defekt wie in der Schwester-Probe: "alles ausser 0 und 2 ist
+# ein Biss" zaehlt einen Werkzeug-Ausfall mit 127 als Erfolg. Gemessen am 09.08.
+# Zusaetzlich hier: die allow_failure-Wache (F13) sieht NUR den eigenen Proben-Job, nie
+# verify:submodules und nie anhang:forward -- also nie die Jobs, in denen die WACHE
+# wirklich scharf ist.
+#
+# UND DER TEUERSTE BEFUND DIESER DATEI IST IM NACHFOLGER GEGENSTANDSLOS GEWORDEN:
+# die 28 Kopfzeilen Messprotokoll um F6 ("nur wenn BEIDE fehlen, stirbt M1") existieren
+# nur, weil rc=1 zwei verschiedene Zweige tragen musste. Mit ParityRissArt::GitlinkFehlt
+# gegen ::Divergenz toeten die Faelle F4 und F5 den Mutanten jetzt ebenfalls. F6 bleibt
+# als schaerfster Fall in der Tabelle -- er ist nicht mehr der einzige.
+#
+# DIESE DATEI BLEIBT IM BAUM (Doku wird nie geloescht, sie zieht um). Ihre Mess-Befunde
+# sind in die C++-Koepfe abgeschrieben. Ob ihr Job test:thesis-gitlink-probe weiterlaeuft,
+# entscheidet der Lead nach der Abnahme.
+# =============================================================================
 #
 # SELBSTCHECK -- was diese Datei zusichert, und was NICHT:
 #   ZUSICHERT: die Wache faellt bei jedem der 9 Eingaenge, bei denen ihr eigener
