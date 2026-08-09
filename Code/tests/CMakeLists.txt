@@ -4,7 +4,7 @@
 include(GoogleTest)
 
 function(comdare_da_add_test name)
-    cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES" ${ARGN})
+    cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES;LABELS" ${ARGN})
     add_executable(${name} ${ARG_SOURCES})
     # CI-Registry (User 06.07.: Tests nie manual/auslassen): Root sammelt zu comdare_da_unit_tests.
     set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS ${name})
@@ -12,9 +12,28 @@ function(comdare_da_add_test name)
         gtest gtest_main
         ${ARG_LIBRARIES})
     target_compile_features(${name} PRIVATE cxx_std_23)
+    # D3-4 (2026-08-09): optionales ZUSATZ-Label. da_unit bleibt IMMER gesetzt -- die
+    # Test-Auswahl der CI (ctest -L da_unit, Makefile:137) darf sich durch ein zweites
+    # Label nicht verschieben. Ohne LABELS-Argument ist das Verhalten byte-identisch zu
+    # vorher; die 11 bestehenden Aufrufe bleiben unberuehrt.
+    # Das Semikolon wird MASKIERT weitergereicht. Am Objekt gemessen (09.08., CMake
+    # 4.3.4): gtest_discover_tests schreibt PROPERTIES woertlich in sein generiertes
+    # set_tests_properties. Eine unmaskierte Liste landet dort als
+    # `LABELS da_unit ci_wachen` -- CMake liest dann NUR da_unit als Label und deutet
+    # ci_wachen als naechsten Property-NAMEN. Ergebnis war `ctest -N -L ci_wachen` ->
+    # "Total Tests: 0", also ein still verlorenes Label. Mit `\;` steht dort
+    # `LABELS da_unit\;ci_wachen` und CMake liest EIN Argument mit ZWEI Labels.
+    set(_comdare_labels "da_unit")
+    foreach(_comdare_label IN LISTS ARG_LABELS)
+        set(_comdare_labels "${_comdare_labels}\\;${_comdare_label}")
+    endforeach()
+    # TIMEOUT bleibt bei 60 wie bisher: die neuen Wachen-Faelle brauchen es nicht.
+    # Gemessen (09.08., alle 103 Faelle): 0,25 s GESAMT, kein Einzelfall ueber 0,01 s --
+    # auch die, die ein Wegwerf-Repo bauen und rund zwanzig git-Kindprozesse fahren.
+    # Eine Anhebung haette 11 bestehende Ziele stillschweigend mit verschoben.
     gtest_discover_tests(${name}
         DISCOVERY_TIMEOUT 30
-        PROPERTIES TIMEOUT 60 LABELS da_unit)
+        PROPERTIES TIMEOUT 60 LABELS "${_comdare_labels}")
 endfunction()
 
 comdare_da_add_test(test_binary_to_csv
@@ -89,6 +108,50 @@ file(WRITE "${_fix279_perm}/not_a_plan_dump.txt" "kein Kopf-Anker - dies ist kei
 target_compile_definitions(test_279_tier_binary_report PRIVATE
     "COMDARE_FIXTURE_DIR_279=\"${_fix279_src}\""
     "COMDARE_FIXTURE_PERM_DIR_279=\"${_fix279_perm}\"")
+
+# ---------------------------------------------------------------------------
+# D3-4/D3-5 (2026-08-09) -- DIE CI-WACHEN ALS GOOGLE TESTS (Owner-KERN: "SKRIPTE SAGEN
+# GAR NICHTS"). Sie loesen ci/tests/xml_wellformed_probe.sh (732 Z.) und
+# ci/tests/thesis_gitlink_parity_probe.sh (698 Z.) ab; beide Dateien bleiben im Baum
+# und tragen einen Verweis hierher (Bestand wird nie geloescht, nur abgeloest).
+#
+# REGISTRIERUNG UEBER DIE BESTEHENDE HAUSFORM comdare_da_add_test: gtest_discover_tests,
+# Label da_unit, Sammel-Target comdare_da_unit_tests, gtest 1.15.2 aus dem vendored
+# Tarball. KEIN neuer Mechanismus -- und damit laufen sie in test:unit (ctest -L da_unit)
+# und, neu, in test:unit:debug, also in BEIDEN Optimierungsstufen (Owner-KERN
+# "AUFGRUND VON COMPILE REGRESSIONEN"; die Klasse ist gemessen: test_ms1 war lokal unter
+# -O0 gruen und fiel in Pipeline 15437 unter -O3).
+#
+# Das Zusatz-Label ci_wachen erlaubt einen gezielten Lauf: ctest -L ci_wachen.
+# Die E2E-Faelle spawnen die ECHTEN Binaries; $<TARGET_FILE:...> wird als Define
+# durchgereicht und die Abhaengigkeit gesetzt, damit sie vor dem Test gebaut sind.
+# ---------------------------------------------------------------------------
+comdare_da_add_test(test_ci_wache_xml_wellformed
+    SOURCES unit/test_ci_wache_xml_wellformed.cpp
+    LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_xml_wellformed PRIVATE
+    "COMDARE_CI_WACHE_XML_BINARY=\"$<TARGET_FILE:ci_xml_wellformed_wache>\"")
+add_dependencies(test_ci_wache_xml_wellformed ci_xml_wellformed_wache)
+
+comdare_da_add_test(test_ci_wache_gitlink_parity
+    SOURCES unit/test_ci_wache_gitlink_parity.cpp
+    LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_gitlink_parity PRIVATE
+    "COMDARE_CI_WACHE_PARITY_BINARY=\"$<TARGET_FILE:ci_thesis_gitlink_wache>\"")
+add_dependencies(test_ci_wache_gitlink_parity ci_thesis_gitlink_wache)
+
+# T-7: die Abnahme der .gitlab-ci.yml. CMAKE_SOURCE_DIR ist Code/ (configure.sh setzt
+# cmake_unterverzeichnis="Code"), die Datei liegt also eine Ebene darueber. Dasselbe
+# Fixture-Muster wie bei test_279_tier_binary_report (Define statt CWD-Annahme).
+comdare_da_add_test(test_ci_wache_registrierung
+    SOURCES unit/test_ci_wache_registrierung.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_registrierung PRIVATE
+    "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
+    "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
 
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup

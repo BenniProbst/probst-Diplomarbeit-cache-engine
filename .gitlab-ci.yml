@@ -306,6 +306,75 @@ lint:xml-wellformed:
   script:
     - sh scripts/ci_xml_wellformed_guard.sh
 
+# -- D3-4 (2026-08-09): PROBE fuer die XML-WOHLGEFORMTHEITS-WACHE, die Wache wird selbst geprueft --
+# Die Wache darueber (lint:xml-wellformed) war ungedeckt. Ihr VERSCHWINDEN als Datei faengt `sh` mit
+# rc=127 ab, der Job wird rot -- ungedeckt war ausschliesslich ihre AUFWEICHUNG: faellt ein `exit`
+# aus ihr heraus, sagt sie weiter "OK", und nichts meldet es. Genau die Fehlerklasse, gegen die sie
+# gebaut wurde (fuenf XML lagen wochenlang kaputt im Baum, weil niemand hinsah), eine Ebene hoeher.
+#
+# WARUM --selbstbiss IM CI UND NICHT NUR EINMAL LOKAL: eine Probe, die nur am gesunden Objekt gruen
+# ist, belegt nichts -- sie koennte immer gruen sein. Der Schalter baut fuenf Wegwerf-Mutanten der
+# Wache (je ein Zweig entfernt), faehrt die Probe gegen jeden und FORDERT, dass sie rot wird. So
+# wird der Biss bei JEDEM Lauf neu bewiesen. Die Mutanten liegen unter mktemp -d, der Bestand wird
+# nie angefasst; jeder Fall bekommt ein eigenes Wegwerf-git-Repo.
+#
+# ZWEI ZWEIGE DER WACHE HABEN BEWUSST KEINEN MUTANTEN, weil sie nachweislich UNBEOBACHTBAR sind
+# (am Objekt gemessen, Begruendung im Kopf der Probe): der Nenner-Mismatch-Zweig ist tot, weil git
+# Zeilenenden in Dateinamen immer C-quotet, und der grep-Zweig ist ohne root nicht ausloesbar. Ein
+# Mutant, der stirbt, weil eine ANDERE Zeile ihn faengt, beweist das Gegenteil von dem, was er soll.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
+# wie bei lint:diff-hygiene). Der Job prueft das ausdruecklich an sich selbst (Fall F12).
+# KEIN .code-rules: die Wache und ihre Probe muessen auch in einer docs-only-Welle laufen.
+# KEIN extends: der Job braucht sh, awk, od, sed, git und xmllint -- kein Compile, kein Submodul.
+test:xml-wellformed-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft wird nur der super-Baum
+  script:
+    - sh ci/tests/xml_wellformed_probe.sh --selbstbiss
+
+# -- D3-5 (2026-08-09): PROBE fuer die THESIS-GITLINK-PARITAETS-WACHE --
+# ci/thesis_gitlink_parity.sh haelt die beiden Einbindungen DESSELBEN Thesis-Repos gleich und wird an
+# ZWEI scharfen Stellen gerufen: in verify:submodules als Praevention (--quelle head) und in
+# anhang:forward als NACHBEDINGUNG des Rueckschriebs (--quelle index --erwartet <sha>). An der
+# zweiten Stelle ist sie das EINZIGE, was beweist, dass der Rueckschrieb wirklich beide Zeiger
+# gesetzt hat. Ihr Verschwinden als Datei ist an beiden Stellen mit `test -x` abgefangen; ihre
+# stille AUFWEICHUNG war es nicht -- faellt ein `exit` aus ihr heraus, meldet sie weiter
+# "Paritaet OK", und die CI erzeugt die Divergenz ab da bei jedem Rueckschrieb selbst.
+#
+# FIXTURES OHNE ECHTE SUBMODULE: ein Gitlink ist ein Index-Eintrag mit Modus 160000; die Probe setzt
+# ihn per `git update-index --cacheinfo` in Wegwerf-Repos unter mktemp -d. Kein Netz, kein Klon,
+# keine Submodul-Initialisierung -- deshalb GIT_SUBMODULE_STRATEGY: none und keine Historie noetig.
+#
+# EIN FALL VERDIENT DIE ERWAEHNUNG (F6): der naheliegende Eingang fuer den fail-closed-Zweig ist
+# "ein Gitlink fehlt". Der taugt NICHT -- gemessen: fehlt nur einer, sind beide Zeiger ungleich und
+# ein Mutant ohne diesen `exit 1` faellt eine Handvoll Zeilen spaeter im Divergenz-Zweig, mit
+# demselben rc=1. Erst wenn BEIDE fehlen, sind sie gleich, und der Mutant meldet "Paritaet OK" mit
+# leerem SHA und rc=0. F6 ist der einzige Fall, der ihn toetet.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null. Fall F13 prueft das
+# ausdruecklich an diesem Job -- und zugleich, dass die WACHE selbst noch gerufen wird.
+# KEIN .code-rules: der Gitlink aendert sich gerade in docs-/thesis-Wellen, die Probe muss dann laufen.
+test:thesis-gitlink-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # die Probe baut sich ihre Gitlinks selbst, sie klont nichts
+  script:
+    - sh ci/tests/thesis_gitlink_parity_probe.sh --selbstbiss
+
 # -- W0b-0 (2026-08-08): BISSPROBE fuer die Mess-Ausbeute-Wache, die Wache wird selbst geprueft --
 # Die Mess-Ausbeute-Wache (ci/mess_ausbeute_wache.sh, gelandet 7444d8c0) entscheidet seit heute in
 # measure:smoke und measure:golden-320, ob ein Messlauf als gelungen gilt. Am mehrtaegigen golden-320
@@ -799,6 +868,7 @@ test:unit:
       if command -v g++-15 >/dev/null 2>&1; then _CXX=g++-15; fi
       echo "GNU-Bauweg: CC=$_CC CXX=$_CXX"
       CC="$_CC" CXX="$_CXX" sh ./configure.sh --with-generator=Ninja \
+        --with-build-type=Release \
         --enable-da-build-tests --enable-v32-enable --build-dir=Code/build-test
       _built=0
       for _a in 1 2 3 4; do
@@ -810,6 +880,50 @@ test:unit:
   variables:
     # Nur noch fuer die artifacts-Pfade des .test-Templates; das Bauverzeichnis setzt configure.sh.
     COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test"
+
+# ── D3-4 (2026-08-09, Owner-KERN): DIESELBE SUITE EIN ZWEITES MAL, IN DEBUG ──────────
+# Der Owner woertlich: "Es waere SAUBERER IM CMAKE-DEBUG MODUS STANDARD GOOGLE TESTS ZU
+# FAHREN UND DIESE IN RELEASE ZU WIEDERHOLEN AUFGRUND VON COMPILE REGRESSIONEN."
+#
+# DIE BEGRUENDUNG IST GEMESSEN, NICHT BEHAUPTET (09.08.): lokal baut build-xml mit
+# CMAKE_BUILD_TYPE=LEER, also -O0; die CI faehrt Release, also -O3 -DNDEBUG. test_ms1
+# war LOKAL GRUEN und fiel in Pipeline 15437 -- weil der Uebersetzer unter -O3 die
+# Koeder-Allokationen als "nicht beobachtbar" ENTFERNTE (GCC -fallocation-dce,
+# -fassume-sane-operators-new-delete). Der Zaehler war nie blind; er verfehlte genau die
+# wegoptimierten Koeder. JEDE Beobachtbarkeits-Zusage ist unter -O0 SCHWAECHER als in der
+# CI -- deshalb muessen dieselben Tests in BEIDEN Stufen laufen.
+#
+# ZWEI JOBS STATT EINES SEQUENTIELLEN LAUFS: eine Compile-Regression zeigt sich damit als
+# GENAU EIN roter Job. Die Stufen-Attribution steht in der Pipeline-UI, nicht im Log-Grep.
+# EIGENES BAUVERZEICHNIS (Code/build-test-debug): zwei Stufen im selben Baum
+# ueberschrieben einander und die zweite Messung waere die erste.
+# Ninja ist Single-Config -- 'ctest -C' griffe nur bei Multi-Config-Generatoren, und ein
+# Generator-Wechsel risse configure.sh, Makefile und ccache um. Zwei Baeume sind hier der
+# schwerere, aber offizielle Weg.
+# KEIN allow_failure (Doktrin seit 06.07.: ZELLE = Warnung, JOB = hart rot).
+test:unit:debug:
+  extends: [.test, .code-rules, .ccache-pull]
+  needs: ["verify:submodules"]
+  tags: [baremetal]
+  script:
+    - |
+      set -euo pipefail
+      _CC=cc; _CXX=c++
+      if command -v gcc-15 >/dev/null 2>&1; then _CC=gcc-15; fi
+      if command -v g++-15 >/dev/null 2>&1; then _CXX=g++-15; fi
+      echo "GNU-Bauweg (Debug): CC=$_CC CXX=$_CXX"
+      CC="$_CC" CXX="$_CXX" sh ./configure.sh --with-generator=Ninja \
+        --with-build-type=Debug \
+        --enable-da-build-tests --enable-v32-enable --build-dir=Code/build-test-debug
+      _built=0
+      for _a in 1 2 3 4; do
+        if make BUILD_JOBS="${CMAKE_BUILD_PARALLEL_LEVEL:-4}"; then _built=1; break; fi
+        echo "Bau-Versuch $_a fehlgeschlagen -> ninja-Resume-Retry"
+      done
+      [ "$_built" = 1 ] || { echo "FEHLER: 'make' (Debug) nach 4 Versuchen nicht erfolgreich"; exit 4; }
+      make check CTEST_EXTRA="--output-junit $(pwd)/ctest-junit.xml"
+  variables:
+    COMDARE_TEST_CMAKE_BUILD_DIR: "Code/build-test-debug"
 
 # ── Stage orchestrate (REV13, #186 §5.4): Haupt-Pipeline zieht die 3 Modul-Pipelines synchron nach ──
 # Jeder trigger startet die EIGENE Pipeline des Submodul-Projekts als downstream multi-project pipeline.

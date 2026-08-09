@@ -4,6 +4,23 @@
 # THESIS-GITLINK-PARITAET -- die beiden Einbindungen DESSELBEN Thesis-Repos
 # muessen auf DENSELBEN Commit zeigen.                            (2026-08-06)
 # =============================================================================
+# ABGELOEST am 2026-08-09 durch Code/ci_wachen (C++ + CMake).
+#   Nachfolger-Bibliothek: Code/ci_wachen/src/gitlink_parity.cpp
+#   Nachfolger-Binary:     ci_thesis_gitlink_wache (OUTPUT_NAME ci-thesis-gitlink-wache)
+#   Nachfolger-Test:       Code/tests/unit/test_ci_wache_gitlink_parity.cpp
+#
+# GRUND (Owner-KERN 09.08.): "SKRIPTE SAGEN GAR NICHTS." Hier ist der Schaden
+# besonders greifbar: "ein Gitlink fehlt" und "die Zeiger divergieren" liefern
+# BEIDE rc=1. Ein Mutant ohne den fail-closed-Zweig fiel deshalb eine Handvoll
+# Zeilen spaeter im Divergenz-Zweig, und nur EIN einziger Eingang (beide fehlen)
+# konnte ihn toeten. Im Nachfolger sind es zwei WERTE (ParityRissArt::GitlinkFehlt
+# vs. ::Divergenz) -- die Kollision ist nicht besser getestet, sie ist nicht mehr
+# formulierbar. Der CI-Exit-Vertrag 0/1/2 ist unveraendert.
+#
+# DIESE DATEI BLEIBT IM BAUM (Bestand und Doku werden nie geloescht, nur abgeloest).
+# Ob sie weiterhin in verify:submodules und anhang:forward laeuft, entscheidet der
+# Lead nach der Abnahme.
+# =============================================================================
 # DER BEFUND, GEGEN DEN DIESE DATEI GEBAUT IST (selbst nachgemessen, super
 # 7780c6af):
 #

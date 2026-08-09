@@ -1,6 +1,31 @@
 #!/bin/sh
 # ci_xml_wellformed_guard.sh -- XML-Wohlgeformtheits-Wache (2026-08-08).
 #
+# ============================================================================
+# ABGELOEST am 2026-08-09 durch Code/ci_wachen (C++ + CMake).
+#   Nachfolger-Bibliothek: Code/ci_wachen/src/xml_wellformed.cpp
+#   Nachfolger-Binary:     ci_xml_wellformed_wache  (OUTPUT_NAME ci-xml-wellformed-wache)
+#   Nachfolger-Test:       Code/tests/unit/test_ci_wache_xml_wellformed.cpp
+#
+# GRUND (Owner-KERN 09.08.): "Ich sehe einen Haufen shells statt vernuenftiger google
+# tests ... SKRIPTE SAGEN GAR NICHTS." Die Shell-Fassung presst sieben Ausstiege in drei
+# Exit-Codes; dadurch waren Zweige nicht voneinander und ein Werkzeug-Ausfall nicht von
+# einem Befund zu unterscheiden. Der Nachfolger liefert ein Wertobjekt (Status + Befund-
+# Art + Nenner + Literale); der CI-Exit-Vertrag 0/1/2 ist unveraendert.
+#
+# DIESE DATEI BLEIBT IM BAUM (Bestand und Doku werden nie geloescht, nur abgeloest).
+# Ob sie weiterhin in der CI laeuft (Job lint:xml-wellformed), entscheidet der Lead nach
+# der Abnahme -- der Schwenk braucht erstmals einen Bau in der lint-Stufe.
+#
+# ZWEI MESS-BEFUNDE DIESER DATEI SIND IN DIE C++-KOEPFE UMGEZOGEN, damit sie den
+# Uebergang ueberleben: der stderr-Riegel feuert NICHT wegen blockierter externer
+# Entities (vier Bauarten gemessen: alle rc=0 und 0 Byte stderr), sondern wegen eines
+# undefinierten Namensraum-Praefixes (rc=0, 89 Byte stderr) -- s. Kopf von
+# Code/ci_wachen/include/comdare/ci_wachen/xml_parser.hpp. Und der Nenner-Mismatch-Zweig
+# (Zeile 105-110) ist TOT, weil git Zeilenenden in Dateinamen immer C-quotet -- s. Kopf
+# von Code/ci_wachen/include/comdare/ci_wachen/git_quelle.hpp.
+# ============================================================================
+#
 # WORUM ES GEHT: am 08.08. waren FUENF getrackte XML-Dateien in den beiden Repos nicht
 # wohlgeformt -- vier im ce, eine hier (Code/experiment_config/messreihen.xml, das
 # Standard-Template der Messreihen). Kein Job, kein Test und keine Wache hat das gemeldet.

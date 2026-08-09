@@ -312,6 +312,11 @@ add_subdirectory(07_tier_binary_report)      # #279 Build-Sichtbarkeit + Interfa
 add_subdirectory(08_appendix_generator)      # Inc1: In-Process-Appendix-Orchestrator (ersetzt .ps1)
 add_subdirectory(09_tex_formatter)           # #25: LaTeX-Formatierer C++23 (ersetzt format_tex.py)
 
+# D3-4/D3-5 (2026-08-09, Owner-KERN "SKRIPTE SAGEN GAR NICHTS"): die CI-Wachen als C++.
+# OHNE Stufen-Nummer, weil 01..09 die Stufen der MESS-Pipeline sind und eine CI-Wache
+# keine ist -- dasselbe Muster wie Code/cmake/, Code/tests/, Code/experiment_config/.
+add_subdirectory(ci_wachen)                  # XML-Wohlgeformtheit + Thesis-Gitlink-Paritaet
+
 # ─────────────────────────────────────────────────────────────────────────────
 # V41.P1 (2026-05-31) — E2E-Pipeline-Orchestrierung: treibt EINEN Datensatz GESCHLOSSEN durch die
 # 6-Stufen-Kette und beweist damit den 16-Spalten-Schema-Fluss (Audit-Blocker G1/G2 behoben).
