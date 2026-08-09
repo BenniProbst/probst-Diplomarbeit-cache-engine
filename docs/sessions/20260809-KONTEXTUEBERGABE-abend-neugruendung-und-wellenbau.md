@@ -223,9 +223,44 @@ ist, überlebt jede Löschung.
 Code bestätigt es selbst (`experiment_plan_director.hpp:1473-1476`).
 
 **Folge: `ergebnis:holen` muss VOR F1 scharf werden**, nicht erst am 28.08. wie geplant.
-Ein Strang läuft dazu (`wgg3d0qjw`) mit drei Kandidaten und der Auflage: **die Messung muss frisch
-sein** (eine vorgefertigte CSV durch die Kette zu schieben prüft die Kette, nicht den Gegenstand)
-und **eine leere Messung muss ROT werden**.
+
+## III.1b DER WEG IST GEBAUT — Antwort des Strangs, differenziert
+
+Commit **`54c11a67`** in `wt-super-objectstat` (`bau/lagp1-object-stat`, 4 Dateien, +847), ungepusht.
+
+**JA für die Kette** Mini-Lauf → Marker → Gate → persist → `anhang:forward` → PDF. Sie steht
+strukturell, und **jedes Tor beißt nachweislich auf die leere Messung** — das war die Auflage:
+
+    Voll-Resume (measured=0, resumed=5)   -> rc=1
+    Gar nichts (0/0)                      -> rc=1
+    Log ohne Marker                       -> rc=2  "unpruefbare Lage -- kein Gruen"
+    Kopfzeilen-CSV am Ausbeute-Gate       -> rc=1
+    persist P1 / anhang A6+A10            -> KEIN Commit
+
+Die F1-Welle (`COMDARE_DURCHSTICH=true`) erzeugt **genau einen** messenden Job; ohne sie **null**.
+Bissprobe: `16 Fälle gefahren, 0 gerissen` · `4 Mutanten gefahren, 4 gefangen`, jeder von einem
+**benannten** Fall. Was das Halten erzwingt: **Werkzeug** — beide Wachen laufen unbedingt unter
+`set -euo pipefail`, die Mutanten werden je Pipeline-Lauf frisch gewürfelt.
+
+**NEIN für das wörtliche xlsx-Glied** am heutigen Gitlink `c6d8e573`: dort ist **kein
+xlsx-Schreiber verdrahtet** (0 Referenzen außerhalb Registry/`ext/`/Docs, Gegenprobe gefahren).
+**Der Weg dahin liegt bereit** — die xlsx-Mappe steckt in den 17 landebereiten Commits; landen
+plus Gitlink-Bump macht das Glied real. Sonst braucht es die ausdrückliche Owner-Abnahme
+*„F1 ohne xlsx-Glied"* — **eine Owner-Entscheidung, keine technische.**
+
+**Und der Strang hat seinen eigenen Bau-Bericht korrigiert** — lies das als Muster: behauptet war,
+`kWritebackMethodRegistry` kenne am Gitlink kein `xlsx`. **Gemessen: sie trägt vier Einträge
+inklusive `Xlsx`.** Die Schlussfolgerung stimmt (kein xlsx-Ergebnis erzeugbar), die zitierte
+Tatsache nicht — `xlsx` wäre dort **deklarierbar und validierte grün**, als stiller No-Op. Das ist
+der **schlimmere** Stellvertreter: eine Konfiguration, die durchgeht und nichts tut.
+
+**Drei Aufgaben bis Freitag, keine Hoffnungen:** (1) die drei Commits über die Lande-Runde auf
+`development` bringen, (2) der Probe-Durchstich Di/Mi in der CI — **sechs Jobs laufen erstmalig,
+die Laufzeit ist ungemessen**, (3) beide Write-Token (288/289) gesetzt.
+
+**Bekannte Schwäche, benannt statt verschwiegen:** `F16` zählt *Erwähnungen* statt Aufrufen
+(`grep -cF` auf den Wachen-Pfad, Schwelle ≥2, heute 4 Treffer = Kommentar + `test -x` + 2 echte).
+Ein Mutant, der **beide echten Aufrufe** löscht, ließe `F16` grün. Gehört zu Posten #27.
 
 ## III.2 Was der Wellenplan sonst noch falsch beschreibt
 
