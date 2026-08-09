@@ -44,11 +44,30 @@
 #   Takeover-Regel (ETA + 50 % ohne Update -> eine andere Maschine uebernimmt).
 #   Ist er nicht eindeutig, uebernimmt eine Maschine sich selbst.
 #
-# AUFRUF:
-#   sh ci/bestandslog_wache.sh <logdatei> <doc_key> <owner_uuid> [<maschine>]
+# DAS ZWEITE GENUS (Kette D, 09.08.2026) -- eine DRITTE Zeilenform, EIGENER Nenner:
+#     [bestandslog] messwert-genus verdrahtet: doc_key=<MK> maschine=<M> gebunden=<0|1> ...
+#   Der Treiber schreibt sie an der VERDRAHTUNGS-Stelle und liest doc_key und
+#   gebunden aus dem Fassaden-Argument ZURUECK (pa.mess_bestand_*): fehlt die
+#   Verdrahtung, meldet die Zeile ein leeres doc_key bzw. gebunden=0 -- oder sie
+#   faellt gar nicht. Gefordert wird sie nur, wenn das 5. Argument gesetzt ist
+#   (die Jobs, in denen das Genus feuert, fordern sie; der Planer-Job nicht,
+#   denn der Planer traegt das Messwert-Genus gar nicht).
+#   ZWEI BEFUNDE des Gegenlesens vom 09.08. stecken in dieser Erweiterung:
+#   B2: die messwert-genus-Zeile trug frueher das Feld "aktiv:" und fiel damit
+#       in den BINARY-Nenner -- im Drift-Fall benannte die Wache die
+#       unschuldige Messwert-Zeile als Kronzeugen. Jede Zeile mit dem Feld
+#       "messwert-genus" gehoert deshalb NIE in den Binary-Nenner.
+#   B1: ohne geforderte Zeile liessen sich die zwei pa.mess_bestand_*-
+#       Zuweisungen ersatzlos streichen und jedes Gate blieb gruen.
 #
-# EXIT: 0 = aktiv-Zeile vorhanden UND alle erwarteten Werte stimmen
-#       1 = keine aktiv-Zeile, oder ein Wert weicht ab (der eigentliche Biss)
+# AUFRUF:
+#   sh ci/bestandslog_wache.sh <logdatei> <doc_key> <owner_uuid> [<maschine>] [<mess_doc_key>]
+#
+# EXIT: 0 = aktiv-Zeile vorhanden UND alle erwarteten Werte stimmen; ist
+#           <mess_doc_key> gesetzt, zusaetzlich: messwert-genus-Zeile vorhanden
+#           mit exakt diesem doc_key, dieser maschine und gebunden=1
+#       1 = keine aktiv-Zeile, ein Wert weicht ab, oder die geforderte
+#           messwert-genus-Zeile fehlt/weicht ab (der eigentliche Biss)
 #       2 = die Wache konnte nicht pruefen (Datei/Argument fehlt) -- ausdruecklich
 #           KEIN Gruen: ein stiller Rueckfall waere derselbe Defekt, gegen den
 #           diese Wache gebaut ist.
@@ -63,6 +82,7 @@ LOGDATEI="${1:-}"
 ERW_DOC_KEY="${2:-}"
 ERW_OWNER="${3:-}"
 ERW_MASCHINE="${4:-}"
+ERW_MESS_DOC_KEY="${5:-}"
 
 if [ -z "$LOGDATEI" ] || [ -z "$ERW_DOC_KEY" ] || [ -z "$ERW_OWNER" ]; then
     echo "AUFRUF: sh ci/bestandslog_wache.sh <logdatei> <doc_key> <owner_uuid> [<maschine>]" >&2
@@ -85,6 +105,11 @@ if [ -n "$ERW_MASCHINE" ]; then
 else
     echo "  maschine = (nicht gefordert)"
 fi
+if [ -n "$ERW_MESS_DOC_KEY" ]; then
+    echo "  mess_key = $ERW_MESS_DOC_KEY  (messwert-genus-Zeile GEFORDERT)"
+else
+    echo "  mess_key = (nicht gefordert)"
+fi
 echo "-----------------------------------------------------------------------------"
 
 # Die gesamte Auswertung in EINEM awk-Lauf: Feld-Zerlegung, Wert-Vergleich und
@@ -96,9 +121,10 @@ echo "--------------------------------------------------------------------------
 BEFUND=$(mktemp) || exit 2
 trap 'rm -f "$BEFUND"' EXIT INT TERM
 
-awk -v erw_key="$ERW_DOC_KEY" -v erw_owner="$ERW_OWNER" -v erw_masch="$ERW_MASCHINE" '
+awk -v erw_key="$ERW_DOC_KEY" -v erw_owner="$ERW_OWNER" -v erw_masch="$ERW_MASCHINE" \
+    -v erw_mess="$ERW_MESS_DOC_KEY" '
 function wert(feld,   p) { p = index(feld, "="); return (p == 0) ? "" : substr(feld, p + 1) }
-BEGIN { zeilen = 0; marker = 0; aktiv = 0; warn = 0; treffer = 0 }
+BEGIN { zeilen = 0; marker = 0; aktiv = 0; warn = 0; treffer = 0; messz = 0; messtreffer = 0 }
 {
     zeilen++
     ist_marker = 0
@@ -111,6 +137,37 @@ BEGIN { zeilen = 0; marker = 0; aktiv = 0; warn = 0; treffer = 0 }
     for (i = 1; i <= NF; i++) {
         if ($i == "WARNUNG") { warn++; warnzeile = $0 }
         if ($i == "FEHLER")  { warn++; warnzeile = $0 }
+    }
+
+    # GENUS-UNTERSCHEIDUNG (Kette D, B2): eine Zeile mit dem Feld "messwert-genus"
+    # gehoert NIE in den Binary-Nenner. Vor dieser Unterscheidung fiel die
+    # messwert-genus-Zeile (die frueher das Feld "aktiv:" trug) in den Binary-
+    # Zweig und wurde im Drift-Fall als LETZTE ABWEICHENDE ZEILE benannt -- der
+    # Kronzeuge zeigte auf die unschuldige Zeile.
+    ist_mess = 0
+    for (i = 1; i <= NF; i++) if ($i == "messwert-genus") { ist_mess = 1; break }
+    if (ist_mess) {
+        messz++
+        g_mess_key = ""; g_mess_masch = ""; g_gebunden = ""
+        for (i = 1; i <= NF; i++) {
+            if (index($i, "doc_key=")  == 1) g_mess_key   = wert($i)
+            if (index($i, "maschine=") == 1) g_mess_masch = wert($i)
+            if (index($i, "gebunden=") == 1) g_gebunden   = wert($i)
+        }
+        mok = 1
+        if (g_mess_key != erw_mess) {
+            mok = 0; mabw = mabw sprintf("      mess_doc_key gelesen=[%s] erwartet=[%s]\n", g_mess_key, erw_mess)
+        }
+        if (erw_masch != "" && g_mess_masch != erw_masch) {
+            mok = 0; mabw = mabw sprintf("      maschine     gelesen=[%s] erwartet=[%s]\n", g_mess_masch, erw_masch)
+        }
+        # gebunden=1 ist Pflicht: die Zeile liest den Binder aus dem Fassaden-
+        # Argument zurueck -- gebunden=0 heisst, key_of haengt NICHT an der Fassade.
+        if (g_gebunden != "1") {
+            mok = 0; mabw = mabw sprintf("      gebunden     gelesen=[%s] erwartet=[1]\n", g_gebunden)
+        }
+        if (mok) { messtreffer++; messtrefferzeile = $0 } else { messfehlzeile = $0 }
+        next
     }
 
     # aktiv-Zeile: ein Feld ist exakt "aktiv:" (Treiber wie Planer schreiben es so).
@@ -143,11 +200,15 @@ BEGIN { zeilen = 0; marker = 0; aktiv = 0; warn = 0; treffer = 0 }
     if (ok) { treffer++; trefferzeile = $0 } else { fehlzeile = $0 }
 }
 END {
-    printf "ZEILEN=%d MARKER=%d AKTIV=%d WARN=%d TREFFER=%d\n", zeilen, marker, aktiv, warn, treffer
+    printf "ZEILEN=%d MARKER=%d AKTIV=%d WARN=%d TREFFER=%d", zeilen, marker, aktiv, warn, treffer
+    printf " MESSZ=%d MESSTREFFER=%d\n", messz, messtreffer
     printf "TREFFERZEILE=%s\n", trefferzeile
     printf "FEHLZEILE=%s\n", fehlzeile
     printf "WARNZEILE=%s\n", warnzeile
+    printf "MESSTREFFERZEILE=%s\n", messtrefferzeile
+    printf "MESSFEHLZEILE=%s\n", messfehlzeile
     printf "ABWEICHUNG_BEGIN\n%sABWEICHUNG_ENDE\n", abw
+    printf "MESS_ABWEICHUNG_BEGIN\n%sMESS_ABWEICHUNG_ENDE\n", mabw
 }
 ' "$LOGDATEI" > "$BEFUND"
 AWK_RC=$?
@@ -164,38 +225,72 @@ N_MARKER=$(printf '%s\n' "$ZAHLEN" | awk '{ sub(/^MARKER=/, "", $2); print $2 }'
 N_AKTIV=$(printf '%s\n'  "$ZAHLEN" | awk '{ sub(/^AKTIV=/,  "", $3); print $3 }')
 N_WARN=$(printf '%s\n'   "$ZAHLEN" | awk '{ sub(/^WARN=/,   "", $4); print $4 }')
 N_TREFFER=$(printf '%s\n' "$ZAHLEN" | awk '{ sub(/^TREFFER=/, "", $5); print $5 }')
+N_MESSZ=$(printf '%s\n' "$ZAHLEN" | awk '{ sub(/^MESSZ=/, "", $6); print $6 }')
+N_MESSTREFFER=$(printf '%s\n' "$ZAHLEN" | awk '{ sub(/^MESSTREFFER=/, "", $7); print $7 }')
 
 echo "NENNER (nie eine nackte Null):"
 echo "  $N_ZEILEN Log-Zeile(n) gelesen."
 echo "  $N_MARKER davon tragen den Marker [bestandslog]."
-echo "  $N_AKTIV davon sind aktiv-Zeilen, $N_WARN sind WARNUNG/FEHLER."
+echo "  $N_AKTIV davon sind aktiv-Zeilen, $N_MESSZ messwert-genus-Zeilen, $N_WARN WARNUNG/FEHLER."
 echo "  $N_TREFFER aktiv-Zeile(n) stimmen in ALLEN geforderten Werten ueberein."
+if [ -n "$ERW_MESS_DOC_KEY" ]; then
+    echo "  $N_MESSTREFFER messwert-genus-Zeile(n) melden die geforderte Verdrahtung."
+fi
 echo "-----------------------------------------------------------------------------"
 
-if [ "$N_TREFFER" -ge 1 ]; then
+BINARY_OK=0
+[ "$N_TREFFER" -ge 1 ] && BINARY_OK=1
+MESS_OK=1
+if [ -n "$ERW_MESS_DOC_KEY" ]; then
+    MESS_OK=0
+    [ "$N_MESSTREFFER" -ge 1 ] && MESS_OK=1
+fi
+
+if [ "$BINARY_OK" -eq 1 ] && [ "$MESS_OK" -eq 1 ]; then
     echo "BELEG (literal aus dem Log):"
     hole TREFFERZEILE | awk 'NF { print "  " $0 }'
-    echo "BESTANDSLOG-WACHE: OK (Gate gezuendet, doc_key und owner stimmen)."
+    if [ -n "$ERW_MESS_DOC_KEY" ]; then
+        hole MESSTREFFERZEILE | awk 'NF { print "  " $0 }'
+        echo "BESTANDSLOG-WACHE: OK (Gate gezuendet, doc_key und owner stimmen; Messwert-Genus verdrahtet)."
+    else
+        echo "BESTANDSLOG-WACHE: OK (Gate gezuendet, doc_key und owner stimmen)."
+    fi
     exit 0
 fi
 
 # --- ab hier: der Biss. Die Ursache wird BENANNT, nicht nur der Fehlschlag. ---
-echo "FEHLER: keine aktiv-Zeile mit den erwarteten Werten." >&2
-if [ "$N_MARKER" -eq 0 ]; then
-    echo "  URSACHE: das Log traegt KEINE einzige [bestandslog]-Zeile." >&2
-    echo "           Das Gate hat nie gezuendet -- COMDARE_BESTANDSLOG ist nicht 'true'," >&2
-    echo "           oder die Variable erreicht den Job gar nicht (Forward-Grenze)." >&2
-elif [ "$N_AKTIV" -eq 0 ]; then
-    echo "  URSACHE: Marker vorhanden, aber keine aktiv-Zeile -- das Opt-in ist gesetzt," >&2
-    echo "           das Lager bindet aber nicht. Typisch: Ebene B (minio) fehlt im Job." >&2
-    echo "  LETZTE WARNUNG/FEHLER-ZEILE (literal):" >&2
-    hole WARNZEILE | awk 'NF { print "    " $0 }' >&2
-else
-    echo "  URSACHE: aktiv-Zeile vorhanden, aber die Werte weichen ab (Drift)." >&2
-    echo "  LETZTE ABWEICHENDE ZEILE (literal):" >&2
-    hole FEHLZEILE | awk 'NF { print "    " $0 }' >&2
-    echo "  ABWEICHUNGEN:" >&2
-    awk '/^ABWEICHUNG_BEGIN$/ { an = 1; next } /^ABWEICHUNG_ENDE$/ { an = 0 } an && NF' "$BEFUND" >&2
+if [ "$BINARY_OK" -ne 1 ]; then
+    echo "FEHLER: keine aktiv-Zeile mit den erwarteten Werten." >&2
+    if [ "$N_MARKER" -eq 0 ]; then
+        echo "  URSACHE: das Log traegt KEINE einzige [bestandslog]-Zeile." >&2
+        echo "           Das Gate hat nie gezuendet -- COMDARE_BESTANDSLOG ist nicht 'true'," >&2
+        echo "           oder die Variable erreicht den Job gar nicht (Forward-Grenze)." >&2
+    elif [ "$N_AKTIV" -eq 0 ]; then
+        echo "  URSACHE: Marker vorhanden, aber keine aktiv-Zeile -- das Opt-in ist gesetzt," >&2
+        echo "           das Lager bindet aber nicht. Typisch: Ebene B (minio) fehlt im Job." >&2
+        echo "  LETZTE WARNUNG/FEHLER-ZEILE (literal):" >&2
+        hole WARNZEILE | awk 'NF { print "    " $0 }' >&2
+    else
+        echo "  URSACHE: aktiv-Zeile vorhanden, aber die Werte weichen ab (Drift)." >&2
+        echo "  LETZTE ABWEICHENDE ZEILE (literal):" >&2
+        hole FEHLZEILE | awk 'NF { print "    " $0 }' >&2
+        echo "  ABWEICHUNGEN:" >&2
+        awk '/^ABWEICHUNG_BEGIN$/ { an = 1; next } /^ABWEICHUNG_ENDE$/ { an = 0 } an && NF' "$BEFUND" >&2
+    fi
+fi
+if [ -n "$ERW_MESS_DOC_KEY" ] && [ "$MESS_OK" -ne 1 ]; then
+    echo "FEHLER: das MESSWERT-Genus meldet die geforderte Verdrahtung nicht." >&2
+    if [ "$N_MESSZ" -eq 0 ]; then
+        echo "  URSACHE: KEINE messwert-genus-Zeile im Log. Die Host-Belegung hat sich nie" >&2
+        echo "           als verdrahtet gemeldet -- exakt der Zustand, in dem die zwei" >&2
+        echo "           pa.mess_bestand_*-Zuweisungen fehlen oder das Genus nie feuerte." >&2
+    else
+        echo "  URSACHE: messwert-genus-Zeile(n) vorhanden, aber die Werte weichen ab." >&2
+        echo "  LETZTE ABWEICHENDE MESSWERT-ZEILE (literal):" >&2
+        hole MESSFEHLZEILE | awk 'NF { print "    " $0 }' >&2
+        echo "  ABWEICHUNGEN:" >&2
+        awk '/^MESS_ABWEICHUNG_BEGIN$/ { an = 1; next } /^MESS_ABWEICHUNG_ENDE$/ { an = 0 } an && NF' "$BEFUND" >&2
+    fi
 fi
 echo "        Ein scharfes Lager, das schweigt, ist kein scharfes Lager." >&2
 exit 1

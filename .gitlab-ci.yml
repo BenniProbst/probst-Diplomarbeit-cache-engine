@@ -273,6 +273,13 @@ lint:diff-hygiene:
     COMDARE_GUARD_BASIS_REF: "origin/$CI_DEFAULT_BRANCH"
   script:
     - sh scripts/ci_diff_ascii_width_guard.sh --seit-basis
+    # ZWEITE, UNABHAENGIGE AUFRUFSTELLE der Registrierungs-Wache (P4c, 2026-08-09).
+    # Sie steht bewusst in einem Job einer ANDEREN Familie: ihr eigener Job
+    # (test:tests-registrierung) laesst sich mitloeschen, dieser hier nicht im selben
+    # Griff. Faellt eine der beiden Stellen weg, wird die Wache ueber ihre Regel R2 rot.
+    # Hier OHNE --selbstbiss: der Mutationsbeweis kostet vier Zusatzlaeufe und gehoert
+    # in den eigenen Job; hier zaehlt nur, dass die Wache ueberhaupt noch gerufen wird.
+    - sh ci/tests_registrierung_wache.sh
 
 # XML-WOHLGEFORMTHEIT (2026-08-08): am 08.08. war Code/experiment_config/messreihen.xml -- das
 # Standard-Template der Messreihen -- nicht wohlgeformt, zusammen mit vier weiteren XML im ce.
@@ -395,6 +402,42 @@ test:bestandslog-wache-bissprobe:
   script:
     - sh ci/tests/bestandslog_wache_probe.sh --selbstbiss
 
+# -- (2026-08-09): ZELLKOORDINATEN-WACHE + PROBE (Paket Provenienz-Verlust) --
+# DER BEFUND: die beiden STATISCHEN Mess-Jobs (measure:smoke, measure:golden-320) setzten KEINE der
+# drei Variablen, aus denen ce die ZellKoordinaten eines Bestands-Eintrags speist. Jeder Eintrag
+# hatte ZellKoordinaten{"","",""}; die Lager-Identitaet (key_sha512, zelle) trennte den statischen
+# Lauf damit vom emittierten Lauf DESSELBEN Artefakts.
+#
+# WARUM DER JOB-MODUS DIE TRAGENDE DECKUNG IST -- und nicht der eintraege-Modus:
+# Das Bestandslog-Dokument liegt im Objekt-Store (doc_key bestandslog/binary_bestand.xml), nicht im
+# CI-Arbeitsverzeichnis; und beide Mess-Jobs sind opt-in (golden-320 nur mit COMDARE_RUN_MEASURE,
+# smoke zusaetzlich mit COMDARE_STATIC_SMOKE_FALLBACK). Eine Wache, die nur dort haengt, liefe im
+# Alltag NIE. Deshalb prueft dieser Job die EMITTIERENDE Seite -- die vier Exports in der YAML --
+# und zwar in JEDER Pipeline. Der eintraege-Modus wird von der Probe mit 9 Faellen gefahren und
+# steht dem Operator fuer ein geholtes Dokument zur Verfuegung; er hat heute bewusst KEINEN
+# Live-Aufrufer, und das wird hier gesagt statt versteckt.
+#
+# ZUERST ROT (T-1): gegen die unveraenderte .gitlab-ci.yml meldete der jobs-Modus am 09.08.
+# "8 von 8 Pflicht-Export(en) fehlen" ueber 2 gefundenen Jobs -- der Biss stand VOR dem Fix.
+# KOEDER: bei jedem Lauf frisch aus /dev/urandom gewuerfelt (K13), nie aus einer Doku uebernommen;
+# die Probe prueft damit die STRUKTUR, nicht das Wiedererkennen von "O3"/"no_extension".
+# KEIN allow_failure: eine advisory Wache ist die naechste stille Null.
+test:zellkoordinaten-wache:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft werden nur super-Dateien
+  script:
+    # (a) der Selbsttest der Wache samt Gegeneingaengen und Wegwerf-Mutanten
+    - sh ci/tests/zellkoordinaten_wache_probe.sh --selbstbiss
+    # (b) die Wache am ECHTEN Dokument -- (a) allein bewiese nur, dass sie sich selbst gefaellt
+    - sh ci/zellkoordinaten_wache.sh jobs .gitlab-ci.yml
+
 # -- P4b (2026-08-09): PROBE fuer den ANHANG-VORWAERTS-KERN (ci/anhang_forward_core.sh) --
 # SELBSTCHECK dieses Blocks: alle Zahlen unten sind am Objekt gemessen, keine ist abgeschrieben.
 #
@@ -450,6 +493,39 @@ test:anhang-forward-probe:
     GIT_SUBMODULE_STRATEGY: none   # super-eigener Kern; die Sandbox baut sich die Probe selbst
   script:
     - sh ci/tests/anhang_forward_probe.sh --selbstbiss
+
+# ── P4c (2026-08-09): REGISTRIERUNGS-WACHE ueber ci/tests/*.sh -- gegen eine Zirkularitaet ──
+# DER BEFUND. Jede Probe dieses Repos prueft ihre eigene Registrierung selbst (A7, F11, K9...).
+# Das faengt "Probe gebaut, Job vergessen". Es faengt NICHT den Fall, gegen den T-7 gerichtet ist:
+# wird der JOB-BLOCK geloescht, laeuft die Probe nicht mehr und kann ihre eigene Abwesenheit nicht
+# mehr melden. Eine Wache, die nur aus dem Objekt heraus spricht, das sie bewacht, ist bei dessen
+# Entfernung stumm -- rc=0, und die Pipeline sieht gruen aus.
+#
+# DIESE WACHE SPRICHT VON AUSSEN: sie liest den Datei-Bestand unter ci/tests/ und die
+# .gitlab-ci.yml und vergleicht beide. Verschwindet ein Job-Block, wird SIE rot.
+#
+# WARUM SIE ZWEIMAL GERUFEN WIRD (hier und in lint:diff-hygiene): sonst haette sie dieselbe
+# Zirkularitaet wie die Proben -- ihr eigener Job liesse sich mitloeschen. Regel R2 fordert
+# deshalb MINDESTENS ZWEI VERSCHIEDENE Job-Bloecke und wird rot, sobald einer wegfaellt.
+# Der Selbstbiss misst genau diesen Eingang (Mutant M3: EINE Aufrufstelle weg, die andere bleibt).
+# RESTRISIKO, ausdruecklich benannt: werden BEIDE Aufrufstellen im selben Commit entfernt, ist
+# auch sie stumm. Das ist dann aber ein sichtbarer Griff in genau die Datei, die der Diff zeigt.
+#
+# WARUM KEIN allow_failure: eine advisory Wache ist die naechste stille Null (gleiche Begruendung
+# wie test:mess-ausbeute-bissprobe). KEIN .code-rules: eine Registrierung faellt auch in einer
+# docs-only-Welle weg, und .gitlab-ci.yml selbst ist genau der Ort, an dem sie wegfaellt.
+test:tests-registrierung:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # reine Text-Wache ueber super-eigene Dateien
+  script:
+    - sh ci/tests_registrierung_wache.sh --selbstbiss
 
 # ── W0b-8 (2026-08-08): PLAN-ZAHLEN-WACHE + ihre Bissprobe ──
 # DER BEFUND. Der TDD-Designplan trug die Zahl "das CSV-Schema wird von 47 von 47 Stellen gegen
@@ -1113,13 +1189,29 @@ thesis:pdf:
 #    abzubrechen. Diese Wache laeuft DANACH und bewertet nur, ob der Lauf koordiniert war. Ein Lauf, der mit
 #    COMDARE_BESTANDSLOG=true startet und ohne Lager endet, ist genau der Fall, der ohne Wache erst nach zwei
 #    Tagen Messkampagne auffaellt. Ist das Opt-in nicht gesetzt, prueft sie nichts und sagt das.
+#    MESSWERT-Genus (Kette D, 09.08.2026): Jobs, in denen der TREIBER laeuft (und nur die -- der Planer
+#    traegt das Messwert-Genus nicht), setzen COMDARE_BESTANDSLOG_WACHE_MESS="true". Dann fordert die Wache
+#    zusaetzlich die verdrahtet-Zeile des Messwert-Genus (5. Argument). Abnahmekriterium des Gegenlesens:
+#    werden die zwei pa.mess_bestand_*-Zuweisungen im Treiber gestrichen, wird dieses Gate ROT -- vorher
+#    blieb jedes Gate gruen (B1: die Wache sah nur die Entscheidung, nie die Verdrahtung).
 .bestandslog_wache:
   script:
     - |
       if [ "${COMDARE_BESTANDSLOG:-}" = "true" ]; then
-        sh "$CI_PROJECT_DIR/ci/bestandslog_wache.sh" \
-           "${COMDARE_BESTANDSLOG_LOG:-$CI_PROJECT_DIR/bestandslog-lauf.log}" \
-           "$COMDARE_BESTANDSLOG_DOC_KEY" "$COMDARE_BESTANDSLOG_OWNER_UUID" "$COMDARE_BESTANDSLOG_MASCHINE"
+        _bl_log="${COMDARE_BESTANDSLOG_LOG:-$CI_PROJECT_DIR/bestandslog-lauf.log}"
+        if [ "${COMDARE_BESTANDSLOG_WACHE_MESS:-}" = "true" ]; then
+          if [ -z "${COMDARE_BESTANDSLOG_MESS_DOC_KEY:-}" ]; then
+            echo "FEHLER: COMDARE_BESTANDSLOG_WACHE_MESS=true, aber COMDARE_BESTANDSLOG_MESS_DOC_KEY ist leer." >&2
+            echo "        Kein Gruen ohne Pruefung (die Aktivierung haette den Default setzen muessen)." >&2
+            exit 2
+          fi
+          sh "$CI_PROJECT_DIR/ci/bestandslog_wache.sh" "$_bl_log" \
+             "$COMDARE_BESTANDSLOG_DOC_KEY" "$COMDARE_BESTANDSLOG_OWNER_UUID" "$COMDARE_BESTANDSLOG_MASCHINE" \
+             "$COMDARE_BESTANDSLOG_MESS_DOC_KEY"
+        else
+          sh "$CI_PROJECT_DIR/ci/bestandslog_wache.sh" "$_bl_log" \
+             "$COMDARE_BESTANDSLOG_DOC_KEY" "$COMDARE_BESTANDSLOG_OWNER_UUID" "$COMDARE_BESTANDSLOG_MASCHINE"
+        fi
       else
         echo "== Bestandslog-Wache: Opt-in nicht gesetzt -> nichts zu pruefen (inert-by-default) =="
       fi
@@ -1159,6 +1251,7 @@ measure:smoke:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
     COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3_smoke_coverage.profile.xml"
+    COMDARE_BESTANDSLOG_WACHE_MESS: "true"   # Kette D: hier laeuft der TREIBER -> die Wache fordert die messwert-genus-verdrahtet-Zeile
   needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
@@ -1195,6 +1288,47 @@ measure:smoke:
       echo "   COMDARE_THESIS_PROFILE=$COMDARE_THESIS_PROFILE"
       "$PLANNER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
       mkdir -p measure_out_smoke
+      # -- ZELL-KOORDINATEN (2026-08-09, Paket Provenienz-Verlust) ---------------------------------
+      # BEFUND: die beiden STATISCHEN Mess-Jobs setzten keine der drei Variablen, aus denen ce die
+      # ZellKoordinaten eines Bestands-Eintrags speist (profile_run_entry.hpp:514-524):
+      #   z.combo = COMDARE_MEASUREMENT_COMBO | z.opt = COMDARE_GN_OPT | z.simd = COMDARE_GN_SIMD
+      # Jeder Eintrag hatte damit ZellKoordinaten{"","",""}. Die Lager-Identitaet ist aber das TUPEL
+      # (key_sha512, zelle) -- same_eintrag_identity, bestandslog_document.hpp:225-227. Derselbe Bau
+      # stand dadurch unter ZWEI Identitaeten im Lager (statisch=leer vs. emittiert=gefuellt) und
+      # deduplizierte nicht. Der ce-Code benennt genau diesen Schadensfall selbst (:22-32).
+      #
+      # KEIN NEUES SCHEMA: die Werte-Form ist woertlich die der EMITTIERTEN Jobs
+      # (experiment_plan_director.hpp:1530 platform, :1534 lane, :1560 opt/simd).
+      #
+      # WARUM GENAU DIESE WERTE (belegt, nicht geraten):
+      #   O3 / no_extension -- beide statischen Profile deklarieren WEDER <system_axes> NOCH
+      #     <opt_levels>/<simd_options> (am Objekt gezaehlt: 0/0/0). run_profile faellt damit auf die
+      #     Bibliotheks-Defaults, die compile-hart festgenagelt sind:
+      #       static_assert(DefaultOptLevelOption::opt_level_id() == "O3")        (optimization_level_sub_axis.hpp:142)
+      #       static_assert(DefaultSimdOption::simd_id() == "no_extension")       (simd_sub_axis.hpp:113)
+      #     Dieselben zwei Literale benutzt die Emissions-Seite als Perm-Fallback (director:1543-1545).
+      #   amd -- dieser Job traegt hart tags:[prod, baremetal, amd]; ein Intel-Gegenstueck existiert nicht.
+      #
+      # COMDARE_MEASUREMENT_COMBO wird BEWUSST NICHT gesetzt. Die emittierende Seite laesst sie bei der
+      # Vollmenge ebenfalls ungesetzt (director:1269 und :1429), und ceb_combo_is_full_set() definiert
+      # leer == "[all]" == Vollmenge (director:275-277). Leer IST hier die kanonische Schreibweise, kein
+      # fehlender Wert. VERWORFEN: ein Literal-Tag wie "[static-smoke]" -- das waere ein ZWEITES Schema
+      # fuer dieselbe Aussage, und zwei Schemata sind schlimmer als eines mit Luecke.
+      #
+      # NEBENWIRKUNG, DIE GEWOLLT IST: COMDARE_PLATFORM schaltet die bisher schlafende Lane-Wache des
+      # Treibers SCHARF (main.cpp:635-657). Passt die reale CPU nicht zum Lane-Praefix, bricht der Lauf
+      # mit exit 7 ab, statt tagelang unter falscher Hardware-Provenienz zu messen. Ohne die Variable
+      # war der Zweig kSkipped, also nie beobachtbar.
+      #
+      # RESTRISIKO, ausdruecklich benannt: bekaeme dieses Profil spaeter <system_axes>, wuerde der Pin
+      # ueber den GN-Zellen-Filter die Mess-Matrix STILL verengen (heute unerreichbar, weil
+      # profile_run_entry.hpp:961 in den run_all_passes()-Zweig faellt). Dagegen deckt heute NICHTS --
+      # dieser Kommentar ist keine Wache und wird auch nicht als eine ausgegeben.
+      export COMDARE_GN_OPT="O3"
+      export COMDARE_GN_SIMD="no_extension"
+      export COMDARE_PLATFORM="amd@$(hostname)"
+      export COMDARE_LANE="amd"
+      echo "== Zell-Koordinaten: opt=$COMDARE_GN_OPT simd=$COMDARE_GN_SIMD platform=$COMDARE_PLATFORM lane=$COMDARE_LANE (combo ungesetzt = [all]) =="
       echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
       # LAG-P1: stderr mitschneiden UND live weiterreichen (Begruendung s. measure:golden-320).
       { "$DRIVER" experiment_config measure_out_smoke 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1
@@ -1210,37 +1344,27 @@ measure:smoke:
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
       APP=$(find build -type f -name "appendix-generator" | head -1)
       if [ -n "$APP" ] && [ -x "$APP" ]; then
-        # SELBSTCHECK WIDE-Aggregat (P4b, 2026-08-09) -- WORTGLEICH zu ci/anhang_forward_core.sh:320-361.
-        #   ZUGESICHERT: (a) jede uebernommene Zeile endet auf einen Newline ('awk 1' gibt jeden
-        #     Datensatz mit ORS aus), (b) der Header kommt nur aus einer Datei, die wirklich eine
-        #     erste Zeile HAT ('[ -s "$rc" ]'), (c) gezaehlt wird mit awk NR -- dieselbe Zaehlweise
-        #     wie ci/mess_ausbeute_wache.sh, ci/persist_sammler.sh und der Anhang-Kern.
-        #   DREI DEFEKTE, DIE DAS HEILT -- alle am Objekt reproduziert, alle still mit rc=0:
-        #     (1) 'wc -l' zaehlt ZEILENUMBRUECHE. Kopfzeile + EINE Datenzeile ohne Schluss-Newline
-        #         ergab 1, '-gt 1' war falsch, und der Job meldete "keine result.csv gefunden".
-        #         Das ist exakt der Mini-Messwert des Durchstichs. Nachgemessen: awk NR=2, wc -l=1.
-        #     (2) Die Konkatenation ohne 'awk 1' klebte die erste Datenzeile der naechsten Datei an
-        #         die letzte der vorigen. Nachgemessen mit zwei Permutationen: 2 Zeilen, wo 3 stehen
-        #         muessten (Kopf + 2 Daten) -- ab zwei Permutationen verlor die CI still Messwerte.
-        #     (3) DER HEADER-DIEB: eine 0-Byte-result.csv, die im 'sort' VOR der vollen liegt, setzte
-        #         '_hdr=1' ohne etwas zu schreiben; die volle Datei kam danach nur noch durch
-        #         'tail -n +2' und verlor ihre Kopfzeile. Nachgemessen: KOPFLOSES Aggregat.
-        #   NICHT zugesichert: dass die Kopfzeilen aller Dateien gleich sind (der Header wird EINMAL
-        #     genommen), und dass eine Datei mit Groesse > 0 eine brauchbare Kopfzeile hat. Hier wird
-        #     die Herkunft geprueft, nicht der Inhalt -- das ist eine andere Wache.
+        # WIDE-Aggregat (P4c, 2026-08-09): die Logik steht NICHT mehr hier, sondern EINMAL in
+        # ci/wide_aggregat.sh -- gemeinsam mit measure:golden-320 und ci/anhang_forward_core.sh.
+        #   WARUM: bis heute stand dieselbe Aggregation DREIMAL, und nur die Kopie im Anhang-Kern
+        #     war gedeckt. Am Objekt nachgemessen, bevor diese Zeilen entstanden: ein Mutant, der
+        #     den beiden YAML-Kopien ihr 'awk 1' nimmt, liess SECHS von sechs lauffaehigen Wachen
+        #     gruen; die siebte war mit und ohne Mutation gleich rot und taugt nicht als
+        #     Unterscheider. Null von sieben haben den Unterschied gesehen.
+        #   JETZT: wer die Konkatenation oder die Zaehlung mutiert, macht ci/tests/
+        #     anhang_forward_probe.sh rot (Selbstbiss N2/N3/N5) -- und deckt damit alle drei
+        #     Aufrufer. Die drei geheilten Defekte (wc -l zaehlt Umbrueche / Konkatenation ohne
+        #     'awk 1' verklebt Zeilen / 0-Byte-CSV stiehlt den Header) sind im Kopf von
+        #     ci/wide_aggregat.sh begruendet -- EINE Quelle statt drei einzeln verjaehrender Kopien.
+        #   WAS HIER BLEIBT: die AUSWAHL der Dateien (find -name 'result.csv'), das 'sort' und das
+        #     URTEIL ueber die Zahl. Der Aggregator zaehlt, er entscheidet nicht.
         find measure_out_smoke -type f -name 'result.csv' | sort > measure_out_smoke/_rc_list.txt
-        WIDE=measure_out_smoke/wide_aggregate.csv; : > "$WIDE"; _hdr=0
-        while IFS= read -r rc; do
-          [ "$_hdr" = "0" ] && [ -s "$rc" ] && { head -1 "$rc" | awk 1 >> "$WIDE"; _hdr=1; }
-          tail -n +2 "$rc" | awk 1 >> "$WIDE"
-        done < measure_out_smoke/_rc_list.txt
-        WIDE_ZEILEN=$(awk 'END{print NR+0}' "$WIDE")
-        if [ "$_hdr" = "1" ]; then
-          _hdr_txt=ja; WIDE_DATEN=$((WIDE_ZEILEN - 1))
-        else
-          _hdr_txt=nein; WIDE_DATEN=0
-        fi
-        echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), Zaehlweise awk NR"
+        WIDE=measure_out_smoke/wide_aggregate.csv
+        test -x ../ci/wide_aggregat.sh || { echo "FEHLER: ci/wide_aggregat.sh fehlt/nicht ausfuehrbar"; exit 1; }
+        sh ../ci/wide_aggregat.sh measure_out_smoke/_rc_list.txt "$WIDE" measure_out_smoke/_wide_kz.env
+        . measure_out_smoke/_wide_kz.env
+        rm -f measure_out_smoke/_wide_kz.env
+        echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$WIDE_HEADER, davon Datenzeilen=$WIDE_DATEN), awk NR"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out_smoke/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out_smoke/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
@@ -1248,7 +1372,7 @@ measure:smoke:
         else
           # Die alte Meldung behauptete "keine result.csv gefunden" -- in zwei der drei reproduzierten
           # Faelle war das FALSCH (die CSV war da, der Messwert auch). Sie nennt jetzt ihren Nenner.
-          echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$_hdr_txt) -> Anhang-Regenerierung honest uebersprungen"
+          echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$WIDE_HEADER) -> Anhang-Regenerierung honest uebersprungen"
         fi
       fi
       echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
@@ -1282,6 +1406,7 @@ measure:golden-320:
   timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
   variables:
     GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
+    COMDARE_BESTANDSLOG_WACHE_MESS: "true"   # Kette D: hier laeuft der TREIBER -> die Wache fordert die messwert-genus-verdrahtet-Zeile
   needs:
     - job: "verify:submodules"
       optional: true               # #53/R3 (2026-07-22): docs-only-DAG-sicher (analog measure:smoke); haelt die
@@ -1321,6 +1446,22 @@ measure:golden-320:
       echo "== Pre-Flight (Subkommando 'validate', rein lesende Profil-Pruefung gegen die realen config/output-Argumente) =="
       "$PLANNER" validate || { echo "Profil-Validierung fehlgeschlagen -> Abbruch vor mehrtaegigem Lauf"; exit 1; }
       mkdir -p measure_out
+      # -- ZELL-KOORDINATEN (2026-08-09, Paket Provenienz-Verlust) ---------------------------------
+      # VOLLE BEGRUENDUNG samt verworfener Alternativen: s. measure:smoke oben. Kurz:
+      #   - ohne diese Exports schreibt der Lauf ZellKoordinaten{"","",""}; die Lager-Identitaet
+      #     (key_sha512, zelle) trennt ihn dadurch vom emittierten Lauf DESSELBEN Artefakts.
+      #   - O3/no_extension sind die compile-hart per static_assert festgenagelten Defaults, auf die
+      #     m3v2_study.profile.xml mangels <system_axes>/<opt_levels>/<simd_options> real faellt.
+      #   - COMDARE_MEASUREMENT_COMBO bleibt ungesetzt: leer == "[all]" == Vollmenge (ceb_combo_is_full_set).
+      #   - COMDARE_PLATFORM schaltet die Lane-Wache scharf (exit 7 bei CPU-Vendor-Fehlrouting).
+      # HIER WIEGT ES AM SCHWERSTEN: das ist der mehrtaegige Voll-Lauf. Ein Ergebnis, das nach zehn
+      # Tagen im Lager landet und nicht sagt, welche Zelle es gemessen hat, ist nicht nachtraeglich
+      # heilbar -- die Koordinate steht in keiner CSV-Spalte und in keinem Pfad.
+      export COMDARE_GN_OPT="O3"
+      export COMDARE_GN_SIMD="no_extension"
+      export COMDARE_PLATFORM="amd@$(hostname)"
+      export COMDARE_LANE="amd"
+      echo "== Zell-Koordinaten: opt=$COMDARE_GN_OPT simd=$COMDARE_GN_SIMD platform=$COMDARE_PLATFORM lane=$COMDARE_LANE (combo ungesetzt = [all]) =="
       echo "== golden-320 Voll-Messlauf (mehrtaegig, Measurement-ON, PMC auf prod1) =="
       # LAG-P1: stderr wird MITGESCHNITTEN, damit die Bestandslog-Wache die aktiv-Zeile pruefen kann --
       # und zugleich LIVE weitergereicht, weil dieser Lauf mehrere TAGE dauert und der Fortschritts-Cursor
@@ -1342,29 +1483,22 @@ measure:golden-320:
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
       APP=$(find build -type f -name "appendix-generator" | head -1)
       if [ -n "$APP" ] && [ -x "$APP" ]; then
-        # SELBSTCHECK WIDE-Aggregat (P4b, 2026-08-09) -- WORTGLEICH zu measure:smoke oben und zu
-        #   ci/anhang_forward_core.sh:320-361. Die drei geheilten Defekte (wc -l zaehlt Umbrueche /
-        #   Konkatenation ohne 'awk 1' verklebt Zeilen / 0-Byte-CSV stiehlt den Header) sind dort
-        #   ausfuehrlich begruendet und wurden am Objekt reproduziert, BEVOR diese Zeilen entstanden.
-        #   WARUM DIE BEGRUENDUNG NICHT NOCHMAL AUSGESCHRIEBEN IST: dieselbe Stelle existiert dreimal;
-        #   drei Kopien einer Begruendung verjaehren einzeln. Der Verweis nach oben ist die eine Quelle.
+        # WIDE-Aggregat (P4c, 2026-08-09): EIN Aufruf statt einer dritten Kopie. Die Logik steht in
+        #   ci/wide_aggregat.sh -- dieselbe Datei, die measure:smoke und ci/anhang_forward_core.sh
+        #   rufen. Vorher stand sie dreimal, und nur die Kopie im Anhang-Kern war gedeckt.
+        #   WARUM DIE BEGRUENDUNG NICHT NOCHMAL AUSGESCHRIEBEN IST: drei Kopien einer Begruendung
+        #   verjaehren einzeln. Der Kopf von ci/wide_aggregat.sh ist die eine Quelle.
         #   HIER WIEGT ES AM SCHWERSTEN: dies ist der mehrtaegige Voll-Lauf. Vor der Heilung konnte er
         #   nach TAGEN mit "OK (golden-320 gemessen)" enden, waehrend das Aggregat still um Messwerte
         #   gekuerzt oder ganz verworfen war -- und persist:measurements haette genau das
         #   zurueckgeschrieben. Ein Messwert, der hier verschwindet, kostet Tage Rechenzeit.
         find measure_out -type f -name 'result.csv' | sort > measure_out/_rc_list.txt
-        WIDE=measure_out/wide_aggregate.csv; : > "$WIDE"; _hdr=0
-        while IFS= read -r rc; do
-          [ "$_hdr" = "0" ] && [ -s "$rc" ] && { head -1 "$rc" | awk 1 >> "$WIDE"; _hdr=1; }
-          tail -n +2 "$rc" | awk 1 >> "$WIDE"
-        done < measure_out/_rc_list.txt
-        WIDE_ZEILEN=$(awk 'END{print NR+0}' "$WIDE")
-        if [ "$_hdr" = "1" ]; then
-          _hdr_txt=ja; WIDE_DATEN=$((WIDE_ZEILEN - 1))
-        else
-          _hdr_txt=nein; WIDE_DATEN=0
-        fi
-        echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), Zaehlweise awk NR"
+        WIDE=measure_out/wide_aggregate.csv
+        test -x ../ci/wide_aggregat.sh || { echo "FEHLER: ci/wide_aggregat.sh fehlt/nicht ausfuehrbar"; exit 1; }
+        sh ../ci/wide_aggregat.sh measure_out/_rc_list.txt "$WIDE" measure_out/_wide_kz.env
+        . measure_out/_wide_kz.env
+        rm -f measure_out/_wide_kz.env
+        echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$WIDE_HEADER, davon Datenzeilen=$WIDE_DATEN), awk NR"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
@@ -1372,7 +1506,7 @@ measure:golden-320:
         else
           # Die alte Meldung behauptete "keine result.csv gefunden" -- in zwei der drei reproduzierten
           # Faelle war das FALSCH (die CSV war da, der Messwert auch). Sie nennt jetzt ihren Nenner.
-          echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$_hdr_txt) -> Anhang-Regenerierung honest uebersprungen"
+          echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$WIDE_HEADER) -> Anhang-Regenerierung honest uebersprungen"
         fi
       fi
       echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs + regenerierter Anhang unter measure_out/) ==="
@@ -1600,6 +1734,10 @@ anhang:forward:
         echo "FEHLER: 288-Write-Credential fehlt -> der Gitlink-Bump koennte nicht landen"; exit 1
       fi
       test -x ci/anhang_forward_core.sh || { echo "FEHLER: ci/anhang_forward_core.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      # P4c: der Kern holt sich die WIDE-Konkatenation aus ci/wide_aggregat.sh (dieselbe Datei,
+      # die measure:smoke und measure:golden-320 rufen). Er prueft sie selbst und bricht fail-loud
+      # ab, wenn sie fehlt -- diese Zeile zieht den Abbruch nur VOR den 289-Klon.
+      test -x ci/wide_aggregat.sh || { echo "FEHLER: ci/wide_aggregat.sh fehlt/nicht ausfuehrbar"; exit 1; }
       # -- (1) Generator bereitstellen (nur noetig fuer den Korpus-Zweig; Fehlschlag ist NICHT fatal:
       #        liegen frische Artefakte an, laeuft der Kanal ohne Generator) --
       GEN=""
@@ -1757,9 +1895,13 @@ planer:delegate:
       PLANER_RC=$?
       set -e
       cat "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2
-      # Exit 6 = Bestandslog-Gate-Abbruch (konfiguration_unvollstaendig). Er wird hier NICHT geschluckt:
-      # ein Planer, der ohne vollstaendige Lager-Identitaet emittiert, produziert Jobs, die sich spaeter
-      # nicht zuordnen lassen.
+      # Exit 6 = Bestandslog-Gate-Abbruch (konfiguration_unvollstaendig) -- beim Planer wie beim Treiber
+      # traegt exit 6 GENAU diese eine Klasse. Die weiteren Treiber-rcs (hier nur Doku, der Planer kennt
+      # sie nicht): 7 = Lane-Wache (Vendor-Fehlrouting), 8 = Messwert-Genus-Ablehnung (realm_kollision
+      # bzw. maschine_leer; getrennt an der fehlerklasse=-Zeile). Kette D, 09.08.2026: vorher gab der
+      # Treiber die Genus-Ablehnung ebenfalls als 6 -- zwei Zweige mit demselben rc, der aeltere davon
+      # nicht mehr beobachtbar. Er wird hier NICHT geschluckt: ein Planer, der ohne vollstaendige
+      # Lager-Identitaet emittiert, produziert Jobs, die sich spaeter nicht zuordnen lassen.
       test "$PLANER_RC" -eq 0 || { echo "planer 'plan ci' endete mit rc=$PLANER_RC"; exit "$PLANER_RC"; }
       echo "== CE-emittierte STUFE-1-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
       echo "== STUFE-1 CEB-Bau-Jobs (je Mess-Kombination): $(grep -c '# JOB ceb-build combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
