@@ -37,7 +37,7 @@
 #     TeX-Toolchain prueft AF_PDF_GATE=auto NICHTS und sagt das literal)
 #   * kein Haken ohne Ausgabe: jede Stufe druckt ihren literalen Zaehler
 #
-# DREI TRANSPORT-FALLEN, GEHEILT AM 09.08.2026 (Paket P4) -- alle drei still:
+# VIER TRANSPORT-FALLEN, GEHEILT AM 09.08.2026 (Paket P4 + Nachsatz) -- alle still:
 #   (F1) DER SELEKTOR TRAF DIE REALE DATEI NIE. Gesucht wurde '-name "*.result.csv"'
 #        (:149 :153 :165 der Vorfassung); der lebende Messweg schreibt 'result.csv'
 #        OHNE Praefix. Der Glob verlangt mindestens ein Zeichen plus Punkt davor.
@@ -49,11 +49,23 @@
 #   (F3) DIE KONKATENATION VERKLEBTE ZEILEN. 'tail -n +2 >>' ohne 'awk 1' haengte
 #        die erste Datenzeile der naechsten Datei an die letzte der vorigen, sobald
 #        der Schluss-Newline fehlte -- aus zwei Messwerten wurde eine kaputte Zeile.
-#   Alle drei endeten mit rc=0 und einer Zeile, die wie ein ehrliches "nichts zu
-#   tun" aussah. Deshalb druckt der Korpus-Zweig jetzt IMMER einen Nenner
-#   (korpus_wurzel/vorhanden + laufordner_geprueft/mit_material): eine Null ohne
-#   Nenner ist von einem echten Freispruch nicht zu unterscheiden.
-#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A7, Selbstbiss N1-N4).
+#   (F4) DER HEADER-DIEB (Nachsatz, :277 der Fassung davor). Der Header wurde von
+#        der ersten Datei genommen, die der Schleife unterkam -- ohne zu pruefen, ob
+#        die ueberhaupt eine erste Zeile HAT. Eine 0-Byte-result.csv, die im 'sort'
+#        vor der vollen liegt, lieferte nichts und setzte trotzdem '_hdr=1'; die
+#        volle Datei danach kam nur noch durch 'tail -n +2' und verlor ihre
+#        Kopfzeile. Das Aggregat war KOPFLOS. Mit EINER Datenzeile der Nachbardatei
+#        galt es als leer -> honest-empty, kein Commit, Messwert weg. Mit ZWEI
+#        Datenzeilen landete der Commit, und jeder NR>1-Konsument -- auch der echte
+#        appendix-generator -- frass die erste Datenzeile als Kopfzeile: ein
+#        GRUENER Commit mit einem Messwert weniger. Die Log-Zeile log dabei mit
+#        ("1 Zeilen (inkl. 1 Header)", obwohl kein Header da war).
+#   Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu
+#   tun" aussah (F4b sogar mit gruenem Commit). Deshalb druckt der Korpus-Zweig
+#   jetzt IMMER einen Nenner (korpus_wurzel/vorhanden + laufordner_geprueft/
+#   mit_material + header=ja|nein/Datenzeilen): eine Null ohne Nenner ist von
+#   einem echten Freispruch nicht zu unterscheiden.
+#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A10, Selbstbiss N1-N6).
 #
 # OFFEN, ausdruecklich NICHT geraten: AF_CORPUS_ROOT zeigt in der Voreinstellung
 #   (und im CI-Job, .gitlab-ci.yml AF_CORPUS_ROOT="measurement") auf 'measurement'
@@ -270,11 +282,44 @@ if [ -z "$SRC_ROOT" ]; then
     #     Und genau dieser Fall ist der Regelfall: ce schreibt die letzte Zeile
     #     ohne Schluss-Newline.
     #   NICHT zugesichert: dass die Kopfzeilen aller Dateien gleich sind. Der
-    #     Header wird EINMAL von der ersten Datei genommen; abweichende Spalten
-    #     einer spaeteren Datei faenden hier niemand. Das ist eine andere Wache.
+    #     Header wird EINMAL von der ersten Datei MIT INHALT genommen; abweichende
+    #     Spalten einer spaeteren Datei faenden hier niemand. Das ist eine andere Wache.
+    # SELBSTCHECK Header-Herkunft (P4-Nachsatz, 2026-08-09):
+    #   ZUGESICHERT: der Header wird NUR aus einer Datei genommen, die tatsaechlich
+    #     eine erste Zeile HAT. '[ -s "$rcsv" ]' ist hier kein Stil-Guard, sondern
+    #     genau die Bedingung: eine Datei mit Groesse 0 hat 0 awk-Datensaetze,
+    #     jede Datei mit Groesse > 0 hat mindestens einen. '_hdr=1' heisst damit
+    #     ab jetzt "es steht wirklich eine Kopfzeile in $WIDE" -- vorher hiess es
+    #     nur "wir waren schon mal hier".
+    #   DER DEFEKT, den das heilt (Falle 4, DER HEADER-DIEB): eine 0-Byte-
+    #     result.csv, die im 'sort' VOR der vollen Datei liegt, lieferte nichts
+    #     und setzte trotzdem _hdr=1. Die volle Datei danach kam nur noch durch
+    #     'tail -n +2' -- ihre Kopfzeile wurde uebersprungen, obwohl nie eine
+    #     geschrieben worden war. Uebrig blieb ein KOPFLOSES Aggregat. Mit EINER
+    #     Datenzeile der Nachbardatei galt das als leer (honest-empty, kein
+    #     Commit, Messwert weg); mit ZWEI Datenzeilen landete der Commit und
+    #     jeder NR>1-Konsument -- auch der echte appendix-generator -- frass die
+    #     erste Datenzeile als Kopfzeile. Beides still, beides rc=0.
+    #     Am Objekt nachgemessen, bevor diese Zeile entstand.
+    #     0-Byte-CSVs sind kein erfundener Fall: ci/tests/persist_sammler_probe.sh
+    #     fuehrt sie als P6 ("0-Byte-CSV -> 0 Datenzeilen (nicht -1)").
+    #   MITGEHAERTET: '>' wurde zu '>>'. Die Schleife ist damit rein anhaengend.
+    #     Es nimmt die Gefahr weg, dass ein spaeteres Verschieben dieser Zeile
+    #     bereits gesammelte Datenzeilen ueberschreibt.
+    #   EHRLICH DAZU -- am Objekt nachgemessen, nicht behauptet: ein Mutant, der
+    #     NUR das '>>' wieder auf '>' zurueckdreht, laesst ALLE 10 Faelle der
+    #     Probe gruen. Das '>>' ist heute also UNGEDECKT: kein Test unterscheidet
+    #     die beiden Fassungen. Es kann heute auch nichts kaputtmachen, denn der
+    #     Header wird genau einmal geschrieben, und vor ihm koennen nur
+    #     0-Byte-Dateien gelaufen sein, die nichts beitragen. Es steht hier als
+    #     Vorsorge gegen eine kuenftige Umstellung, nicht als heutige Wache --
+    #     wer die Zeile bewegt, muss diesen Satz mitlesen.
+    #   NICHT zugesichert: dass eine Datei mit Groesse > 0 eine BRAUCHBARE
+    #     Kopfzeile hat. Eine Datei aus einem einzelnen Newline liefert eine leere
+    #     Kopfzeile. Hier wird die Herkunft geprueft, nicht der Inhalt.
     WIDE="$AF_TMP/wide_aggregate.csv"; : > "$WIDE"; _hdr=0
     while IFS= read -r rcsv; do
-      [ "$_hdr" = "0" ] && { head -1 "$rcsv" | awk 1 > "$WIDE"; _hdr=1; }
+      [ "$_hdr" = "0" ] && [ -s "$rcsv" ] && { head -1 "$rcsv" | awk 1 >> "$WIDE"; _hdr=1; }
       tail -n +2 "$rcsv" | awk 1 >> "$WIDE"
     done < <(af_finde_result_csv "$RUN_DIR" | sort)
     # SELBSTCHECK Zaehlweise (P4, 2026-08-09):
@@ -295,8 +340,25 @@ if [ -z "$SRC_ROOT" ]; then
     #     Zusage "wortgleich zu Wache und Sammler" haelt und greift, falls das
     #     'awk 1' spaeter verschwindet.
     WIDE_ZEILEN=$(awk 'END{print NR+0}' "$WIDE")
-    echo "   [1b] WIDE-Aggregat: $WIDE_ZEILEN Zeilen (inkl. 1 Header), Zaehlweise awk NR"
-    if [ "$WIDE_ZEILEN" -le 1 ]; then
+    # SELBSTCHECK Zaehl-AUSSAGE (P4-Nachsatz, 2026-08-09):
+    #   ZUGESICHERT: die Zeile nennt jetzt, OB eine Kopfzeile drin ist, und die
+    #     Zahl der Datenzeilen getrennt von der Gesamtzahl. Geprueft wird auf
+    #     $WIDE_DATEN, also auf die AUSSAGE ("wieviele Messwerte") statt auf den
+    #     Stellvertreter "Gesamtzeilen kleiner gleich eins".
+    #   DER DEFEKT, den das heilt: bei einem kopflosen Aggregat log-te der Kanal
+    #     "1 Zeilen (inkl. 1 Header)" -- diese eine Zeile WAR die Datenzeile.
+    #     Die Ausgabe behauptete also einen Header, den es nicht gab, und der
+    #     Messwert verschwand als "keine Datenzeile". Ein Log, das im Fehlerfall
+    #     das Falsche sagt, ist schlimmer als keines.
+    #   NICHT zugesichert: dass die Datenzeilen inhaltlich brauchbar sind. Hier
+    #     wird gezaehlt, nicht bewertet.
+    if [ "$_hdr" = "1" ]; then
+      _hdr_txt=ja; WIDE_DATEN=$((WIDE_ZEILEN - 1))
+    else
+      _hdr_txt=nein; WIDE_DATEN=0
+    fi
+    echo "   [1b] WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), Zaehlweise awk NR"
+    if [ "$WIDE_DATEN" -le 0 ]; then
       echo "   [1b] WIDE-Aggregat hat keine Datenzeile -> honest-empty"
     else
       GEN_OUT="$AF_TMP/appendix"

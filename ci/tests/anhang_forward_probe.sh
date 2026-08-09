@@ -30,8 +30,30 @@
 #     vorherige. Zwei Messwerte wurden so zu einem einzigen, kaputten. Fall A3
 #     haelt das fest.
 #
-# ALLE DREI HABEN DIESELBE EIGENSCHAFT: sie verwerfen den einzigen Messwert
-# STILL, mit rc=0 und einer Zeile, die wie ein ehrliches "nichts zu tun" aussieht.
+#   FALLE 4, DER HEADER-DIEB (Nachsatz zu P4, :277 der Fassung davor):
+#     Der Header wurde von der ERSTEN Datei genommen, die der Schleife
+#     unterkam -- ohne zu pruefen, ob die ueberhaupt eine erste Zeile HAT.
+#     Eine 0-Byte-result.csv, die im `sort` vor der vollen liegt, lieferte
+#     also nichts und setzte trotzdem '_hdr=1'. Die volle Datei danach kam nur
+#     noch durch 'tail -n +2' -- ihre Kopfzeile wurde uebersprungen, obwohl
+#     nie eine geschrieben worden war. Das WIDE-Aggregat war KOPFLOS.
+#     Zwei Auspraegungen, beide still:
+#       (a) Nachbardatei mit EINER Datenzeile: WIDE hat 1 Zeile, die
+#           Leerheitspruefung '-le 1' haelt das fuer leer -> honest-empty,
+#           rc=0, KEIN Commit. Der Messwert ist weg.
+#       (b) Nachbardatei mit ZWEI Datenzeilen: WIDE hat 2 kopflose Zeilen,
+#           der Commit LANDET -- und jeder NR>1-Konsument (auch der echte
+#           appendix-generator) frisst die erste Datenzeile als Kopfzeile.
+#           Das ist der teurere Fall: ein gruener Commit, der einen Messwert
+#           verschluckt hat.
+#     0-Byte-CSVs sind in diesem Projekt kein erfundenes Szenario -- die
+#     Sammler-Probe fuehrt sie als eigenen Fall (ci/tests/persist_sammler_probe.sh,
+#     Fall P6 "0-Byte-CSV -> 0 Datenzeilen (nicht -1)").
+#     Faelle A8 (Auspraegung a) und A9 (Auspraegung b) halten das fest.
+#
+# ALLE VIER HABEN DIESELBE EIGENSCHAFT: sie verwerfen einen Messwert STILL,
+# mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu tun" aussieht
+# (Falle 4b sogar mit einem gruenen Commit).
 #
 # WARUM DER BEWEIS AM ZIEL-REPO GEFUEHRT WIRD:
 # Ein Log sagt, was der Kanal BEHAUPTET getan zu haben. Gefragt wird deshalb git
@@ -74,6 +96,18 @@
 #     abgeschalteten Gate und ist damit ebenfalls ungedeckt.
 #   - Ob der ECHTE appendix-generator aus einer gueltigen WIDE-Matrix richtige
 #     Tabellen macht, ist Gegenstand anderer Wachen. Hier zaehlt der TRANSPORT.
+#   - A8/A9 STELLEN die Reihenfolge her, sie messen sie nicht. Die Faelle legen
+#     die 0-Byte-Datei bewusst so ab, dass sie im `sort` vorne steht
+#     (perm0_leer vor perm1_voll), und pruefen das vorher mit demselben `sort`
+#     ab. Was sie NICHT zeigen: dass eine 0-Byte-Datei im echten Korpus
+#     tatsaechlich vor der vollen einsortiert -- das haengt an den realen
+#     Permutationsnamen. Bewiesen ist: WENN sie vorne liegt, ueberlebt der
+#     Messwert. Der umgekehrte Fall (volle Datei zuerst) war nie defekt.
+#   - DIE ZWILLINGE IN DER .gitlab-ci.yml SIND UNGEDECKT. Dieselbe Header-Logik
+#     steht dort ein zweites und drittes Mal (Jobs measure:smoke und measure,
+#     :1160 und :1265) -- dort sogar ohne 'awk 1'. Diese Probe fasst nur den
+#     Kern an; die Datei gehoert in diesem Paket einem anderen Strang. Solange
+#     die Zwillinge leben, gilt die Heilung NUR fuer den Anhang-Kanal.
 #
 # POSIX-sh (die CI ruft `sh`, das ist hier dash), ASCII-only, kein Python.
 # Der Pruefling selbst ist bash (Prozess-Substitution) und wird deshalb
@@ -175,6 +209,20 @@ csv_nur_kopf() {      # $1 = Zielpfad (absolut)
     mkdir -p "$(dirname "$1")"
     printf '%s\n' "$KOPF" > "$1"
 }
+# 0 Byte: keine Kopfzeile, keine Datenzeile, kein Newline. Das ist die Datei,
+# die ein abgebrochener oder nie beschriebener Pruefling hinterlaesst; die
+# Sammler-Probe fuehrt denselben Fall als P6.
+csv_null_byte() {     # $1 = Zielpfad (absolut)
+    mkdir -p "$(dirname "$1")"
+    : > "$1"
+}
+# Kopfzeile + ZWEI Datenzeilen, die letzte ohne Schluss-Newline (so schreibt ce).
+csv_zwei_ohne_newline() {   # $1 = Zielpfad, $2 = Token A, $3 = Token B
+    mkdir -p "$(dirname "$1")"
+    printf '%s\n' "$KOPF" > "$1"
+    printf 'perm-1,koeder_%s,1234,5678,1\n' "$2" >> "$1"
+    printf 'perm-2,koeder_%s,4321,8765,1' "$3" >> "$1"
+}
 
 # --- Lauf ohne Pipe: rc=$? nach einer Pipe misst das LETZTE Glied ------------
 kanal() {             # $1 = AF_CORPUS_ROOT (relativ zu ARBEIT)
@@ -234,6 +282,21 @@ fordere_literal() {   # $1 = Datei, $2 = literaler Text
 }
 fordere_zahl() {      # $1 = Beschreibung, $2 = Ist, $3 = Soll
     if [ "$2" -ne "$3" ]; then reiss "$1: ist=$2, gefordert war $3"; fi
+}
+# VORBEDINGUNG der Faelle A8/A9, nicht deren Behauptung: die 0-Byte-Datei MUSS
+# der vollen im `sort` des Kerns VORAUSGEHEN, sonst prueft der Fall gar nichts
+# (kaeme die volle Datei zuerst, gaebe es den Header-Dieb ueberhaupt nicht).
+# Geprueft wird mit demselben `sort` wie im Pruefling -- gleiche Binary, gleiche
+# Locale. Ein Verstoss ist KEIN roter Fall, sondern Abbruch mit 2: die Probe
+# konnte dann nicht pruefen, und ein Gruen waere hier eine Luege.
+fordere_sortiert_zuerst() {   # $1 = MUSS vorne stehen, $2 = der andere
+    _erst=$(printf '%s\n%s\n' "$2" "$1" | sort | head -1)
+    if [ "$_erst" != "$1" ]; then
+        echo "ABBRUCH: Fixture-Reihenfolge falsch -- '$2' sortiert vor '$1'." >&2
+        echo "         Der Fall pruefte dann nicht den Header-Dieb." >&2
+        exit 2
+    fi
+    echo "        Vorbedingung: '$(basename "$(dirname "$1")")' sortiert vor '$(basename "$(dirname "$2")")' (sort)."
 }
 
 # --- Ziel-Repo als Orakel (T-5: eine ANDERE Quelle als der Pruefling) --------
@@ -382,6 +445,87 @@ fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$BAS
 fall_ende
 
 # =============================================================================
+# A8  DER HEADER-DIEB, Auspraegung (a): eine 0-BYTE-result.csv liegt im `sort`
+#     VOR der vollen Datei. Sie hat keine erste Zeile -- der Kern nahm von ihr
+#     trotzdem "den Header" und merkte sich, er habe einen. Die volle Datei
+#     danach kam nur noch durch 'tail -n +2': ihre Kopfzeile wurde als Header
+#     uebersprungen, obwohl nie einer geschrieben wurde. Uebrig blieb EINE
+#     kopflose Zeile -- die Leerheitspruefung hielt sie fuer den Header und
+#     verwarf sie als "keine Datenzeile".
+#     GEFORDERT: der gewuerfelte Wert steht im COMMITTETEN .tex-Blob. Die
+#     Zeilenzahl 2 (Header + 1 Datenzeile) ist die Gegenprobe dazu: sie zeigt,
+#     dass der Header diesmal von der RICHTIGEN Datei kam.
+#     A7 (Registrierung) schliesst die Fallliste bewusst ab und bleibt letzter
+#     Fall -- die fachlichen Faelle stehen deshalb alle davor.
+# =============================================================================
+K8=$(token)
+TS8="20260812-070004-nullbyte"
+fall "A8  0-Byte-result.csv VOR voller Datei -> Wert landet trotzdem im Commit"
+sandbox a8
+A8_LEER="$ARBEIT/korpus/$TS8/measure_out/perm0_leer/result.csv"
+A8_VOLL="$ARBEIT/korpus/$TS8/measure_out/perm1_voll/result.csv"
+fordere_sortiert_zuerst "$A8_LEER" "$A8_VOLL"
+csv_null_byte "$A8_LEER"
+csv_ohne_newline "$A8_VOLL" "$K8"
+kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "laufordner_geprueft=1 mit_material=1"
+fordere_literal "$OUT" "WIDE-Aggregat: 2 Zeilen"
+fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fordere_tex de 1 "$K8"
+fordere_tex en 1 "$K8"
+fall_ende
+
+# =============================================================================
+# A9  DER HEADER-DIEB, Auspraegung (b) -- die TEURERE. Die Nachbardatei traegt
+#     ZWEI Datenzeilen. Das kopflose WIDE hat dann 2 Zeilen, gilt damit als
+#     nicht leer, und der Commit LANDET. Nur frisst jeder NR>1-Konsument -- der
+#     Wegwerf-Generator hier genau wie der echte appendix-generator -- die erste
+#     Datenzeile als Kopfzeile. Ergebnis: ein gruener Commit mit EINEM statt
+#     ZWEI Messwerten, ohne eine einzige Fehlerzeile.
+#     GEFORDERT: BEIDE Koeder einzeln im committeten Blob, datenzeilen=2.
+# =============================================================================
+K9A=$(token); K9B=$(token)
+TS9="20260812-070005-nullbyte-zweizeilig"
+fall "A9  0-Byte vor Datei mit 2 Datenzeilen -> BEIDE Werte, kein Kopf-Frass"
+sandbox a9
+A9_LEER="$ARBEIT/korpus/$TS9/measure_out/perm0_leer/result.csv"
+A9_VOLL="$ARBEIT/korpus/$TS9/measure_out/perm1_voll/result.csv"
+fordere_sortiert_zuerst "$A9_LEER" "$A9_VOLL"
+csv_null_byte "$A9_LEER"
+csv_zwei_ohne_newline "$A9_VOLL" "$K9A" "$K9B"
+kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "WIDE-Aggregat: 3 Zeilen"
+fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fordere_tex de 2 "$K9A" "$K9B"
+fall_ende
+
+# =============================================================================
+# A10 GEGENEINGANG ZUR HEILUNG (T-4): NUR 0-Byte-Dateien, kein einziger Messwert.
+#     Eine Wache, die nach der Reparatur alles durchlaesst, ist keine Wache mehr:
+#     hier MUSS honest-empty bleiben, was honest-empty ist.
+#     Zugleich ist das der einzige Fall, der den Ausgabe-Zweig 'header=nein'
+#     betritt. Vor der Heilung stand hier "0 Zeilen (inkl. 1 Header)" -- eine
+#     Zahl mit falschem Nenner ueber einer Datei, die keinen Header hatte.
+#     Der Fall beisst auch den Header-Dieb: ohne die '-s'-Wache gilt der Header
+#     als "genommen", obwohl nichts geschrieben wurde, und die Rechnung
+#     Zeilen-minus-Header liefert MINUS EINS -- sichtbar an 'header=ja'.
+# =============================================================================
+TS10="20260812-070006-alles-nullbyte"
+fall "A10 nur 0-Byte-Dateien -> header=nein, honest-empty, KEIN Commit"
+sandbox a10
+csv_null_byte "$ARBEIT/korpus/$TS10/measure_out/perm0_leer/result.csv"
+csv_null_byte "$ARBEIT/korpus/$TS10/measure_out/perm1_leer/result.csv"
+kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "laufordner_geprueft=1 mit_material=1"
+fordere_literal "$OUT" "WIDE-Aggregat: 0 Zeilen (header=nein, davon Datenzeilen=0)"
+fordere_literal "$OUT" "keine Datenzeile"
+fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$BASIS_N"
+fall_ende
+
+# =============================================================================
 # A7  REGISTRIERUNG (T-7). Ein Test, der in keinem CI-Job faehrt, ist NICHT
 #     gebaut. In diesem Projekt wurde bereits eine Wache gebaut, die nirgends
 #     aufgerufen wurde -- deshalb ist das hier ein HARTER Fall und keine
@@ -445,6 +589,15 @@ fi
 #       'awk 1' (Falle 2 + Falle 3 zusammen).
 #   N3  Nur die Konkatenation verliert ihr 'awk 1' (Falle 3 allein).
 #   N4  Die Nenner-Zeile faellt weg -- die Null steht wieder ohne Nenner da.
+#   N5  Die Wache '[ -s "$rcsv" ]' faellt weg -- eine 0-Byte-Datei darf den
+#       Header wieder "stellen" (Falle 4, der Header-Dieb).
+#   N6  Die Leerheitspruefung laesst alles durch -- der Gegeneingang (A6/A10)
+#       muss das fangen, sonst waere die Heilung ein Scheunentor.
+#
+# JEDER MUTANT FUEHRT SEINE ZAHL MIT: erwartet wird eine exakte Anzahl
+# geaenderter Quellzeilen. Ohne sie bliebe ein Mutant unauffaellig, dessen
+# sed-Ausdruck nach einer Bewegung im Kern gar nicht mehr greift -- Begruendung
+# ausfuehrlich an der Funktion 'mutant' weiter unten.
 #
 # WARUM N2 BEIDE ZEILEN ZUGLEICH ZURUECKDREHT -- ein Befund, kein Bequemlichkeit:
 #   Ein Mutant, der NUR die Zaehlweise auf 'wc -l' zurueckdreht, macht KEINEN
@@ -473,7 +626,8 @@ if [ "$MODUS" = --selbstbiss ]; then
     MUT_DIR="$WERK/mutanten"; mkdir -p "$MUT_DIR"
     N_MUT=0; N_GEBISSEN=0
 
-    mutant() {        # $1 = Name, $2 = Beschreibung, $3 = sed-Ausdruck
+    mutant() {        # $1 = Name, $2 = Beschreibung, $3 = sed-Ausdruck,
+                      # $4 = erwartete Zahl geaenderter QUELLZEILEN
         N_MUT=$((N_MUT + 1))
         _m="$MUT_DIR/$1.sh"
         sed "$3" "$KERN" > "$_m"
@@ -481,8 +635,28 @@ if [ "$MODUS" = --selbstbiss ]; then
             echo "ABBRUCH: Mutation '$1' hat NICHTS geaendert -- der Beweis waere leer." >&2
             exit 2
         fi
+        # WARUM DIE ZAHL MITGEFUEHRT WIRD -- am eigenen Bau erlebt (09.08.2026):
+        # 'cmp -s' sagt nur, dass IRGENDETWAS anders ist. Ein Mutant aus MEHREREN
+        # sed-Ausdruecken bleibt damit unauffaellig, wenn nur EINER davon noch
+        # greift. Genau das passierte N2, als seine Ziel-Zeile im Kern von '>' auf
+        # '>>' wechselte: zwei Ausdruecke trafen, der dritte lief ins Leere, und der
+        # Mutant sah weiter "gebissen" aus -- obwohl er ein Drittel weniger
+        # zurueckdrehte, als er behauptete. Ein still nicht mehr greifender
+        # sed-Ausdruck ist dieselbe Fehlerklasse wie ein still verworfener Messwert:
+        # rc=0 und eine Ausgabe, die nach Deckung aussieht. Deshalb hier die exakte
+        # Zahl statt eines "irgendwas hat sich geaendert".
+        # Gezaehlt wird die ORIGINAL-Seite des diff ('<'-Zeilen); rc des diff ist
+        # egal, weil die Pipe ohnehin den awk-Status liefert (K11).
+        _geaendert=$(diff "$KERN" "$_m" | awk '/^</{n++} END{print n+0}')
+        if [ "$_geaendert" -ne "$4" ]; then
+            echo "ABBRUCH: Mutation '$1' hat $_geaendert Quellzeile(n) geaendert, erwartet waren $4." >&2
+            echo "         Entweder greift ein sed-Ausdruck nicht mehr, oder der Kern hat sich" >&2
+            echo "         bewegt. Beides macht den Mutationsbeweis wertlos -- kein Gruen darauf." >&2
+            exit 2
+        fi
         chmod +x "$_m"
         echo "  -- $1: $2"
+        echo "     zurueckgedreht: $_geaendert Quellzeile(n) (erwartet: $4)."
         set +e
         COMDARE_ANHANG_KERN="$_m" sh "$0" > "$MUT_DIR/$1.log" 2>&1
         _rc=$?
@@ -509,13 +683,24 @@ if [ "$MODUS" = --selbstbiss ]; then
     }
 
     mutant n1_alter_glob "Selektor faellt auf '*.result.csv' zurueck (Falle 1)" \
-        's|^AF_RESULT_NAMEN=.*$|AF_RESULT_NAMEN="*.result.csv"|'
+        's|^AF_RESULT_NAMEN=.*$|AF_RESULT_NAMEN="*.result.csv"|' 1
     mutant n2_stand_vor_p4 "Aggregation wie VOR P4: wc -l UND kein awk 1 (Falle 2+3)" \
-        's@^    WIDE_ZEILEN=.*$@    WIDE_ZEILEN=$(wc -l < "$WIDE")@; s@^      tail -n +2 "$rcsv" .*$@      tail -n +2 "$rcsv" >> "$WIDE"@; s@head -1 "$rcsv" | awk 1 > "$WIDE"@head -1 "$rcsv" > "$WIDE"@'
+        's@^    WIDE_ZEILEN=.*$@    WIDE_ZEILEN=$(wc -l < "$WIDE")@; s@^      tail -n +2 "$rcsv" .*$@      tail -n +2 "$rcsv" >> "$WIDE"@; s@head -1 "$rcsv" | awk 1 >> "$WIDE"@head -1 "$rcsv" >> "$WIDE"@' 3
     mutant n3_ohne_awk1 "nur die Konkatenation verliert ihr 'awk 1' (Falle 3 allein)" \
-        's|^      tail -n +2 "$rcsv" .*$|      tail -n +2 "$rcsv" >> "$WIDE"|'
+        's|^      tail -n +2 "$rcsv" .*$|      tail -n +2 "$rcsv" >> "$WIDE"|' 1
     mutant n4_nenner_weg "die Nenner-Zeile faellt weg -- Null ohne Nenner" \
-        '/laufordner_geprueft=/d'
+        '/laufordner_geprueft=/d' 2
+    # N5 dreht GENAU die Heilung des Nachsatzes zurueck: die Wache '[ -s "$rcsv" ]'
+    # faellt weg, der Header darf wieder von einer 0-Byte-Datei "genommen" werden.
+    # Der Rest der Zeile ('>>' und 'awk 1') bleibt stehen -- damit steht fest, dass
+    # A8/A9 an DIESER Bedingung haengen und nicht an einer der P4-Heilungen.
+    mutant n5_header_dieb "die -s-Wache faellt weg -- 0-Byte-Datei stiehlt den Header (Falle 4)" \
+        's@ \[ -s "$rcsv" \] &&@@' 1
+    # N6 sperrt den Gegeneingang auf: die Leerheitspruefung laesst alles durch.
+    # Er belegt, dass A6 und A10 die WACHE sind und nicht bloss mitlaufen -- eine
+    # Heilung, die anschliessend jede Leere durchwinkt, waere keine.
+    mutant n6_leerheit_offen "die Leerheitspruefung laesst alles durch (-le 0 -> -lt 0)" \
+        's@\[ "$WIDE_DATEN" -le 0 \]@[ "$WIDE_DATEN" -lt 0 ]@' 1
 
     echo "-----------------------------------------------------------------------------"
     echo "SELBSTBISS-NENNER: $N_GEBISSEN von $N_MUT Mutanten haben die Probe rot gemacht."
