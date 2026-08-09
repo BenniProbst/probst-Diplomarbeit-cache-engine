@@ -16,6 +16,202 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — KONSOLIDIERUNG: alle Owner-Entscheide des Tages, an einem Ort
+
+Diese Entscheide lagen bisher **nur im Memory**. Der Ledger ist die Stand-Quelle — hier stehen
+sie vollständig. **Alle sind Festlegung, nicht Vorschlag; Abweichung ist Regression.**
+
+---
+
+### RAHMEN — die Rechnung geht auf, und nichts wird gestrichen
+
+> „Wir schaffen das, **der Tag hat 24 Stunden** und meine Geldbörse ist voll. **Rechne also in
+> 24 Stunden je Tag.**" · „**Wir streichen nichts** und können uns das auch nicht leisten. Wir
+> **parallelisieren disjunkte Arbeit**."
+
+**37 Tage × 24 h = 888 h** gegen ~770 h Bedarf der ersten Registermessung. **Die Streichliste
+(~228 h) ist vom Tisch** — sie bleibt als Notreserve dokumentiert, falls die nachgeholten vier
+Stationen große Neufunde bringen (sie haben: **+1564 h**, siehe Register Teil 2).
+
+Der begrenzende Faktor ist damit **nicht die Zeit, sondern die Parallelisierbarkeit** — und die
+hängt an einer Regel, nicht an Kontingent: **ein Schreiber je Worktree.**
+
+> „**bis zu 4 zusätzliche Arbeitsstränge** durch Workflows mit je multiplen Agenten und **codex
+> parallel** erlaubt und **gewünscht** … für maximale Geschwindigkeit" · „**trotz max effort
+> ultracode allzeit freigegeben** … wir brauchen **beides**"
+
+---
+
+### OV-13 — HYBRID-Zerlegung A/B/C: **JA**, mit Vorbedingung
+
+> „der **Release wird natürlich VOR der Anwendung der Hybrid-Stufe mit einem einzelnen direkten
+> Tier-Binary am Prüfdock getestet und bewiesen**, bevor wir überhaupt den Hybrid an die CEB
+> Prüfdock dran hängen. **HY braucht also Standard compare→release durch die CEB.**"
+
+Und die Verwaltung: **die CEB** verwaltet compare und release der Hybrid-Tier-Binary „über ein
+**statisches init zu Beginn** und **Übertragung der Verhaltens-Heuristik-Funktionen bei
+Verwendungsbeginn** … am Prüfdock".
+
+**Das schließt den Kreis zu K5:** genau dieser Vor-Release liefert die **Referenzwerte** für die
+Overhead-Differenz.
+
+---
+
+### E-1 — die Gattung ist **schon benannt**, kein neuer Enum-Wert zu erfinden
+
+> „**Nein, es ist einfach eine eigene bereits benannte und geplante Gattung+Genus im System, finde
+> sie mit explore.**"
+
+**Gefunden:** `HEURISTIK-ADAPTER` / `Function-Interface-Reroute`, benannt vom Owner am **08.08.**
+
+**Die Bauart, wörtlich:** Metaprogrammierungs-geerbtes Interface der Gattung+Genus-Interfaces,
+**compile-time transparenter Pass-through** · **für JEDE Gattung+Genus per google test bewiesen
+durchlässig** · wird **als Unterklasse in jeder sonstigen Gattung+Genus geladen** und **erbt
+template-Parameter** · **eigene Klassifikation im Metaprogrammier-Stil, nur als Erweiterung
+einsetzbar, allein NICHT ansprechbar.**
+
+**Die Rekursion:** baumförmig **compile-time** bis zu begrenzter Tiefe, **Mechanik = Herunterzählen
+eines Rest-Tiefen-Integers bis 0** · Tiefe **bei 1 belassen, muss aber funktionieren** · **Tiefe
+und Heuristik-Funktions-Stufen-IDs im Stempel ablesbar** · **formal EINE Binary am Stück**
+(bessere Optimierbarkeit).
+
+---
+
+### K1 — Einlagerung: **JA**, und die Ordnung ist präzisiert
+
+> „einfach eine **weitere Gattung+Genus**, die parallel zu allen anderen in den **beiden
+> Wurzel-Ordner-Ebenen des Lagerbaumes** einsortiert wird … **Es ist auch eine `.so` wie alle
+> Planer→CEB→Tier-Stufen.**"
+
+**Ich hatte einen Widerspruch zum 26.07.-KERN gemeldet. Es war keiner** — Owner-Präzisierung:
+
+> „Das ist **auch weiterhin korrekt**, aber **DAVOR** müssen zwei Ordner-Ebenen **Gattung → Genus
+> → REST** jeweils wie du gesagt hast kommen."
+
+**Zweite Präzisierung, unmittelbar danach:** *„**Binary-Ordner und Messung-Ordner branchen unter
+Gattung → Genus → Binary/Messung → REST wie gehabt.**"*
+
+```
+Gattung → Genus → Binary  → System → Organ → Mess     (Binaries-Zweig)
+Gattung → Genus → Messung → Mess   → System → Organ   (Messdaten-Zweig)
+```
+
+**Die Verzweigung Binary/Messung sitzt UNTER Gattung → Genus**, nicht darüber. Beide Kaskaden vom
+26.07. bleiben als „REST" unverändert und hängen jetzt an einem **gemeinsamen Gattung/Genus-Präfix**.
+Ich hatte „die beiden Wurzel-Ebenen" als **Ersatz** gelesen statt als **Vorsatz** — und die
+Realm-Trennung als Wurzel statt als Zweig.
+
+⇒ Die Sperre in `lager_pfad_grammatik.hpp:527` wird gedreht, **und** die Pfad-Grammatik bekommt
+zwei neue Wurzelebenen — **für alle Gattungen und Genera, nicht nur für Hybrid.**
+
+---
+
+### K2 — Loader-Extraktion: **JA**
+
+> „der Loader wandert in eine **stufen-neutrale Bibliothek**, weil das **Prüfdock der CEB und das
+> Prüfdock der Hybrid-Tier-Binary jeweils technisch identisch bei Konfiguration sein müssen**."
+
+---
+
+### K5 — Docks, Messung, Overhead
+
+**Dock-Anzahl:** so viele, wie die **gemessenen Break-Even-Grenzen im Standard-Einzel-Release** und
+**deren Überschnitte für Hybrid-compare** ergeben — mit einer **Obergrenze, die bei Hybrid-Anforderung
+IMMER in der XML stehen muss**, Default **32**.
+
+**Die vierte Ebene, konkret:** im `checkpoint_measure` wird **zusätzlich angegeben, welche
+Tier-Binary** (exakter Stempel über deren statisches Interface) **für diesen Funktionsaufruf
+verwendet wurde**. ⇒ **eine zusätzliche SPALTE** in der Macro-Benchmark-Stufe. „**Es sind dann
+4 statt 3, weil es ein weiteres Macro-Benchmarking gibt.**"
+
+**Overhead = Differenz, kein eigener Messkanal:**
+
+```
+Overhead  =  Macro-Messung(Hybrid-Aufruf)  −  bekannte Einzel-Tier-Performance
+```
+
+> „die eigentlichen Tier-Binary-Performance ist ja **VOR der Hybrid-Stufe bekannt** und kann gegen
+> den **indirekten Hybrid-Aufruf unter Macro-Messung der CEB** verglichen werden."
+
+---
+
+### OV-16 — `allow_failure`: **verboten, war es immer**
+
+> „**Allow failure war schon IMMER verboten.** Wenn dann muss ein Fehler **sauber mit einer Warnung
+> an den Anwender angezeigt und die Messung übersprungen** werden, **aber der CI-Job failed immer
+> hart.**"
+
+**Am Objekt belegt:** Owner-Direktive **06.07. 14:16:43 UTC**, noch am selben Abend **0
+`allow_failure` im gesamten System**; Verschärfung **17.07.** Zwei Tage später fügt Commit
+`b5e64a51c` es wieder ein — **ohne GO**; einen Tag darauf klebt `0d91dc1e3` den Kommentar
+„Sichtbarkeits-Doktrin" darüber. **Die Owner-Aussage vom 16.07. galt der CSV-ZELLE**, nicht dem
+Job. **Drei Audits hatten das am 06.08. gefunden.**
+
+**Zwei Ebenen, beide gültig:** ZELLE ⇒ „failed" + Warnung, Lauf misst weiter. JOB ⇒ **hart rot**.
+
+---
+
+### OV-17 — CSV ist eine **Ausgabe-Strategie**, kein Transportformat
+
+> „**csv ist ein ganz eigenes Verfahren, welches ein Strategy Pattern in der Erzeugung der xlsx
+> ist** und einfach **alle Sheets der xlsx einzeln in einem Ordner (statt der xlsx) flach als csv
+> ausgibt**, mehr nicht. **Aus csv wird kein xlsx, sondern umgekehrt** wenn gewünscht im selben
+> Prozess." · „**Flach ist falsch, die Struktur der Lagerhaltung ist definiert und strikt
+> einzuhalten Pflicht.**"
+
+**Damit ist der Register-Befund `csv 36 / xlsx 0` schärfer als gedacht:** es ist nicht „falsches
+Format", sondern **die Mappe wird gar nicht gebaut** — und damit fehlt der Gegenstand, dessen
+Strategie die CSV nur wäre.
+
+---
+
+### OV-18 — **CI UND lokal**, beide als Beweis
+
+> „Ja jetzt hast du es, **Infra ist oben**." — auf meinen Vorschlag, F1 mit einem Lokalbeweis zu
+> führen: **beide Systeme müssen gleichermaßen laufen**, also gilt F1 erst, wenn **beide** grün
+> sind. Der lokale Lauf beweist die Kette, der CI-Lauf zusätzlich Runner, Artefakt-Transport,
+> Job-Abhängigkeiten und Rückschrieb.
+
+---
+
+### Der Perzentil-Kanon für Konfigurations-Mediane: **JA, aber nachgelagert**
+
+> „Der Kanon gilt auch für Konfigurations-Mediane, **aber erst NACHDEM alles in vollständiger
+> Granularität durchgemessen ist**, um es dann **in der compare-Auswertungsphase** einzubauen …
+> eine **Darstellungsform für LaTeX und PDF, die abgeleitet berechnet wird** — **Pflicht**, aber
+> **nicht Teil des Hardware-checkpoint-measure direkt**."
+
+**Zwei Phasen:** (1) Hauptauswertung misst **stumpf** in voller Granularität — **kein Kanon**.
+(2) compare-Auswertung leitet ab — **Kanon, Pflicht**.
+
+**Damit ist auch die Reparatur-Frage entschieden:** die 11 `nearest_rank_median`-Aufrufe liegen
+**alle** in der nachgelagerten Phase. Der Umbau gehört in `measure_to_latex`, **nicht** in eine
+Reparatur des Auslaufmodells.
+
+---
+
+### NEU: das MeasureStorage-Modul
+
+> „**csv_to_latex darf es nicht mehr geben, sondern measure_to_latex**"
+
+**Vier Fähigkeiten:** Messwerte von `checkpoint_measure` **aufnehmen** · als **xlsx** exportieren
+(oder optional die Sheets als CSV) · die Aggregation als **„Stack" durchführen, custom statt std**
+· **LaTeX ausgeben** nach einem **eigenen XML-Konfigurationssegment mit eigener Syntax und
+Semantik**, das der **Planer durchreicht**.
+
+**Die harte Randbedingung, die den ganzen Entwurf bestimmt:**
+
+> „**neue Allokationen für die Messwert-Aggregation sind VERBOTEN, weil sie das Bild der Messungen
+> verzerren**" — Append in einen **vor-reservierten, möglichst großen custom Speicherbereich**.
+
+**Deep Research ausdrücklich beauftragt** (Strang 30 läuft).
+
+---
+
+### Kleinentscheide
+
+**prod2 wird umbenannt** — „Ja umbenennen", weil es dauerhaft so bleibt. Byte-Ereignis: der
+Registry-Generator spiegelt den Namen ⇒ in ein Fenster legen, in dem ohnehin ein Bump ansteht.
 ## NACHTRAG 09.08.2026 — HYBRID: die Gattung ist gefunden, die Aufruf-Regeln sind vollständig, und der Lagerbaum kennt Gattung/Genus noch nicht
 
 Drei vom Owner verlangte Explores, vier blinde Linsen (Strang 29).
