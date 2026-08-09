@@ -9,12 +9,38 @@
 
 #include <gtest/gtest.h>
 
+#include <type_traits>
+
 namespace v32 = comdare::diplomarbeit::messung_driver::v32;
 namespace cmd = comdare::cache_engine::builder::commands;
 
+// -Wdeprecated-declarations (8 Stellen in DIESER Datei, clang-Review 09.08.2026) ist hier
+// UNTERDRUECKT, und das ist die begruendete Ausnahme, nicht der Regelfall:
+// V32Orchestrator ist mit [[deprecated]] markiert ("W4: Surrogat -- nie im Mess-Pfad"), hat aber
+// noch echte Konsumenten im Produktivcode (messreihe_report_exporter.hpp, experiment_phase_strategy.hpp,
+// op_type_filter.hpp, v32_messreihe_antrieb.hpp, v32_katalog_driver.hpp). Solange die Klasse lebt,
+// MUSS sie bewacht bleiben. Die Deprecation-Warnung richtet sich an NEUE Aufrufer; dieser Test IST
+// die Wache des Bestands und kann seinen Gegenstand nicht benutzen, ohne ihn zu benennen.
+// Der Geltungsbereich ist bewusst diese eine Datei -- keine Klasse global abgeschaltet. Faellt der
+// letzte Produktiv-Aufrufer weg, gehoert Klasse UND Test geloescht, nicht diese Unterdrueckung erweitert.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+// BasicConstruction hielt bis 09.08.2026 eine Variable, die NIE benutzt wurde (-Wunused-variable):
+//     v32::V32Orchestrator orchestrator;  SUCCEED();
+// clang meldet das nur, wenn Konstruktor UND Destruktor trivial sind -- die Konstruktion hatte also
+// zur Laufzeit keinerlei beobachtbare Wirkung, und SUCCEED() sicherte nichts zu. Die einzige echte
+// Aussage des Tests war "der Typ ist default-konstruierbar", und das ist eine UEBERSETZUNGSZEIT-
+// Aussage: als static_assert ist sie strenger als das weggefallene Laufzeit-Objekt (sie bricht den
+// Bau statt einen Test rot zu faerben) und laesst nichts Ungeprueftes zurueck.
+// Der TEST-Name bleibt bestehen (die Registrierungs-Wache zaehlt Testfaelle; ein still
+// verschwundener Fall waere selbst eine Regression).
 TEST(V32Orchestrator, BasicConstruction) {
-    v32::V32Orchestrator orchestrator;
-    SUCCEED();
+    static_assert(std::is_default_constructible_v<v32::V32Orchestrator>,
+                  "V32Orchestrator muss default-konstruierbar bleiben (Bestands-Zusicherung V32.II.3)");
+    static_assert(std::is_nothrow_destructible_v<v32::V32Orchestrator>,
+                  "V32Orchestrator muss nothrow-zerstoerbar bleiben (Bestands-Zusicherung V32.II.3)");
+    SUCCEED() << "Konstruierbarkeit ist zur Uebersetzungszeit zugesichert (static_assert oben)";
 }
 
 TEST(V32Orchestrator, SubmitToBuilder) {
@@ -77,3 +103,5 @@ TEST(V32Orchestrator, RunDefaultLookupMessreihe) {
     EXPECT_LE(report.ee_a_wins + report.ee_b_wins + report.ties, report.total_variants);
     EXPECT_GT(report.total_elapsed.count(), 0);
 }
+
+#pragma GCC diagnostic pop // Ende der begruendeten -Wdeprecated-declarations-Ausnahme (s. Kopf)
