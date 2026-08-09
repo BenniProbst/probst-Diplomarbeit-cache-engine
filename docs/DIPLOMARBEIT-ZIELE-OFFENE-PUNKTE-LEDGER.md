@@ -16,6 +16,61 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (abends) — KERN: DIE MESSEINRICHTUNG AM GENUS-INTERFACE FEHLT — Sidecar ist verworfen
+
+**Owner wörtlich:**
+
+> „Derzeit **fehlt die Messeinrichtung zwischen CEB und Tier-Binary am Genus-Interface**, daher kann
+> auch **nichts gemessen werden**, der Ansatz mit den **Sidecars ist falsch**. Es muss stattdessen
+> je aktiviert/deaktiviert der Messeinrichtungen in CEB und Tier-Binary **am Interface ein
+> Mess-Visitor übergeben werden** oder bei deaktiviert eben nicht."
+
+### Drei Aussagen, jede für sich tragend
+
+1. **Es fehlt etwas, das nie gebaut wurde** — nicht „es ist kaputt". Solange es fehlt, **kann
+   nichts gemessen werden**, unabhängig davon, wie grün die Mess-Jobs melden.
+2. **Der Sidecar-Ansatz ist verworfen.** Ein Sidecar hängt *neben* dem Gegenstand und beobachtet
+   ihn von außen. Die Messung gehört **in die Naht**.
+3. **Die richtige Form ist ein Mess-Visitor am Interface:**
+
+        CEB  --- Genus-Interface --->  TIER-BINARY
+                  ^
+                  hier wird der MESS-VISITOR uebergeben -- je nachdem, ob die
+                  Messeinrichtungen in CEB UND Tier-Binary aktiviert sind.
+                  Bei DEAKTIVIERT wird KEINER uebergeben.
+
+### Warum die Visitor-Form richtig ist
+
+- **Zero-Cost bei deaktiviert.** Kein Visitor ⇒ kein Aufruf, kein Zweig, kein Zustand. Ein Sidecar
+  existiert auch dann, wenn er nichts tut — das widerspricht der Compile-Time-Doktrin des Hauses.
+- **Der Visitor ist ein Lehrbuch-Muster** und passt in „nur GoF, zero-cost". Ein Sidecar ist ein
+  Betriebsmuster, kein Entwurfsmuster.
+- **Die Aktivierung ist ZWEISEITIG** — CEB **und** Tier-Binary. Eine UND-Bedingung, keine
+  einseitige Konfigurationsoption.
+- **Er trifft den Gegenstand statt der Nachbarschaft.** Genau der Unterschied, an dem sich die
+  teuerste Fehlerklasse dieses Projekts entscheidet.
+
+### Was daraus für den Plan folgt — der Posten steht VOR allem, was misst
+
+Er blockiert den **DURCHSTICH (F1, 14.08.)**, die **Kalibrierung (##47)** und die **Kampagne
+(W3-MESS)**. Ein Durchstich durch eine Kette ohne Messeinrichtung würde **die Kette beweisen und
+den Messwert nicht** — er wäre formal grün und inhaltlich leer.
+
+> **Solange der Visitor fehlt, ist jede Mess-Abnahme ein Stellvertreter.**
+
+Das trifft rückwirkend auch die heutige F1-Bewertung: der Durchstich-Strang hat gemeldet, die Kette
+trage strukturell und jedes Tor beiße auf die leere Messung. Das bleibt gültig — es ist eine Aussage
+über die **Kette**. Über den **Messwert** sagt es nichts, und genau diese Lücke benennt der
+Owner-KERN.
+
+### Offen, am Objekt zu klären (Explore-Pflicht, nicht raten)
+
+Wo die Sidecar-Fassung heute im Code steht und wie viele Stellen sie hat · ob die drei Mess-Ebenen
+bereits eine Visitor-Naht vorsehen · wie die **vierte Hybrid-Mess-Ebene** (Owner-KERN 08.08.,
+„dazwischengeschoben, nicht angehängt") sich einfügt · und ob `mess_gates_glied` / das Prüfdock die
+Aktivierung bereits zweiseitig führen.
+
+**Fundstelle:** Memory `project_mess_visitor_am_genus_interface_sidecar_ist_falsch`.
 ## 09.08.2026 (abends) — SCHÄRFUNG DER GENUS-SCHICHTUNG (Owner, vier Sätze)
 
 **Anlass: ein Fehler von mir.** Ich hatte bei der WACHE-3-Analyse Gattung und Genus als *„zwei
