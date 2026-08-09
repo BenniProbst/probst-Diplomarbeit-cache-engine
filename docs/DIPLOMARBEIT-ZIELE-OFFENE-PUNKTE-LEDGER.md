@@ -16,6 +16,73 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (abends) — DIE KETTE IST LÄNGER: zwei symmetrische Zweige nach AUSWERTEN (Owner)
+
+**Owner wörtlich:**
+
+> „Die Kette ist vollständig korrekt, aber **nach auswerten** kommt erst **single bauen → single
+> messen → single compare → single release optimal Tier-Binary für JEDE gemessene Last der
+> Mess-Achse** → **Hybrid-Tier-Binary für optimale heuristische Performance multipler heuristisch
+> erkennbarer Eingangslasten bauen → Hybrid-Tier-Binary messen → Hybrid-Tier-Binary compare →
+> Hybrid-Tier-Binary multi release**.
+>
+> Die Strategien für single und hybrid verwenden also **exakt dieselben stateful design patterns und
+> Abläufe der Entwicklung**, aber **wir müssen erst für jede Last das optimale Tier-Binary kennen**,
+> um über gemischte Lasten je erkannte Last automatisch über das hybrid anzupassen."
+
+### Die vollständige Kette
+
+    XML -> Planer -> CEB
+        -> Tier-Binaries BAUEN     (Lagerhaltung + Hardware-Job-Pool)
+        -> Tier-Binaries MESSEN    (Lagerhaltung)
+        -> Tier-Binaries AUSWERTEN
+        |
+        +-- SINGLE-ZWEIG ------------------------------------------------
+        |    -> single BAUEN  -> single MESSEN  -> single COMPARE
+        |    -> single RELEASE = das OPTIMALE Tier-Binary
+        |                       fuer JEDE gemessene Last der Mess-Achse
+        |
+        +-- HYBRID-ZWEIG (setzt den single-Zweig voraus) ----------------
+        |    -> Hybrid-Tier-Binary BAUEN   fuer optimale heuristische Performance
+        |                                  MULTIPLER heuristisch erkennbarer Eingangslasten
+        |    -> Hybrid-Tier-Binary MESSEN -> COMPARE -> MULTI RELEASE
+        |
+        -> Messwerte als LaTeX und PDF VEROEFFENTLICHEN
+
+**Die bisherige Fassung komprimierte acht Stationen zu einer** („Tier-Binaries RELEASE +
+Hybrid-Bau", Dossier §VI.1). Das verdeckte beides: die Symmetrie und die Abhängigkeit.
+
+### Die zwei tragenden Aussagen
+
+**1. SYMMETRIE — einmal bauen, zweimal benutzen.** Single und Hybrid verwenden *exakt dieselben*
+stateful Design Patterns und *dieselben* Entwicklungsabläufe. Das ist keine Ähnlichkeit, sondern
+Identität: die Bau-, Mess-, Compare- und Release-Maschinerie des single-Zweigs **ist** die des
+Hybrid-Zweigs. Wer beide getrennt baut, baut zweimal dasselbe.
+
+**2. DIE REIHENFOLGE IST ZWINGEND, nicht organisatorisch.** Das Hybrid entscheidet *je erkannter
+Last*, welches Binary durchdarf — ohne die Einzel-Optima hat es nichts, zwischen dem es wählen
+könnte. Der Hybrid-Zweig ist damit **nicht vorziehbar und nicht parallelisierbar**.
+
+### Was daraus für den Plan folgt
+
+- **Die Wellen-Reihenfolge HY-A → HY-B → HY-C ist sachlich begründet, nicht nur terminlich.** Der
+  Plan schreibt „HY-C konsumiert die HY-B-Kurven, deshalb stand der Router nie in W1" — diese
+  Begründung ist jetzt **aus der Kette selbst ableitbar** statt aus der Terminlage.
+- **COMPARE ist eine eigene Station, zweimal.** Nicht Teil von „messen", nicht Teil von „release".
+- **RELEASE heißt „das Optimum je Last", nicht „veröffentlichen".** Der single-Release ist eine
+  **Auswahlentscheidung** je Last der Mess-Achse; der Hybrid-Release ist ein **MULTI**-Release.
+- **Die Mess-Achse liefert den Nenner des single-Zweigs:** „für JEDE gemessene Last" — die Zahl der
+  Lasten ist die Zahl der zu bestimmenden Optima. Das ist eine prüfbare Zahl, keine Formulierung.
+
+### Konsequenz für die laufende Inventur
+
+Der Explore-Auftrag zu den „gefallenen Punkten" (Workflow `w87uqz93m`) ordnet jeden gestrichenen
+Posten einer Kettenstation zu. **Die Stationsliste dieses Auftrags ist damit unvollständig** — sie
+kennt die acht Stationen der alten Fassung, nicht die fünfzehn. Beim Gegenlesen ist das
+nachzuziehen: ein Posten, der auf `single compare` oder `Hybrid multi release` zeigt, wäre in der
+alten Liste als „außerhalb der Kette" durchgegangen.
+
+**Fundstelle:** Memory `project_kette_single_und_hybrid_zweig_symmetrisch_nach_auswerten`.
 ## 09.08.2026 (abends) — ZURÜCKGENOMMEN: `checkpoint_measure` fällt NICHT nach W7. Es MUSS gebaut werden.
 
 **Owner wörtlich:**
