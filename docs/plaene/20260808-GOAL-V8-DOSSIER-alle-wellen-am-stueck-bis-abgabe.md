@@ -67,10 +67,34 @@ auch wenn danach alles abbricht.
 Venture UG, Marke Comdare**. Zwei Rechtsträger; Lizenzen und Copyright niemals vermengen, die
 Comdare-Lizenz nie eigenmächtig setzen.
 
-**Ein Blech.** Alle super-CI-Jobs tragen `tags:[baremetal]` → nur Runner id=16 = **prod1**,
-`concurrent=2`. prod1 **ist** die lokale Maschine; der GitLab-Runner liegt auf derselben Platte.
-Zwei Pakete, die beide „Pipeline grün" als Abnahme fordern, sind **seriell**, nicht parallel.
-prod2 = Intel Alder Lake (hybrid, P/E-Cores). prod1 = AMD Zen 5 (uniform, L3-asymmetrisch).
+**Zwei Bleche, ein Lager.** *(Fassung 09.08.2026 — sie ersetzt die ursprüngliche „Ein Blech"-Regel,
+deren Begründung am Objekt widerlegt und deren Deutung vom Owner richtiggestellt wurde.)*
+
+Es gibt **zwei** bare-metal-Runner: **id=16 = prod1** (AMD Zen 5, uniform, L3-asymmetrisch, **mit**
+AVX-512) und **id=17 = prod2** (Intel Alder Lake, hybrid P/E-Cores, **ohne** AVX-512). **44 von 48
+Jobs beider Repos** tragen nur `tags:[baremetal]` und landen auf beiden. Belegt an Pipeline `15412`:
+`test:coverage-guard` lief auf prod2 (`== Host ==`: `Linux prod2`, `GenuineIntel`, i9-12900K) und
+meldete vier AVX-512-gegatete Tests als unsichtbar. prod1 ist zugleich die lokale Maschine; der
+Runner liegt auf derselben Platte.
+
+**Das Floaten ist der Entwurf, nicht sein Fehlen.** Owner, wörtlich: *„das war so geplant, dass über
+das Lager die Maschinen abstimmen, wer welches Batch verarbeitet und es können auch erstmal alle
+Maschinen alle Jobs aufnehmen."* Die Koordination sitzt im **Lager** und in der **Filterung der
+Compiles je Hardware-Freigabe** — siehe das Kettenglied *Hardware-Job-Pool* in §VI.1 —, nicht in
+GitLab-Tags. Ein fehlender Tag-Pin ist deshalb **kein Befund**.
+
+**Was daraus für den Betrieb folgt, in drei Sätzen:**
+1. **Pipeline-Abnahmen bleiben seriell** — aber als *meine* Arbeitsdisziplin (ich kann nur eine
+   Abnahme zur Zeit beurteilen), nicht als Maschinen-Kapazitätsaussage.
+2. **Jede Wache, die ihren Nenner aus der Hardware zieht, muss die Maschine mit ausweisen.**
+   »457 sichtbar« ohne »auf prod2« ist eine Zahl ohne Gegenstand. Werkzeug dafür existiert:
+   `scripts/ci_host_klassen_bericht.sh`.
+3. **Die beiden Mess-Jobs sind echt gepinnt** (`tags:[prod, baremetal, amd]`, `.gitlab-ci.yml`
+   :923 und :1015) — Messdaten können nicht zwischen CPUs floaten. Das ist die Stelle, an der der
+   Schaden unheilbar gewesen wäre.
+
+Volltext und Fehlerklasse: Ledger, „RICHTIGSTELLUNG 09.08.2026 — der Befund hält, meine Deutung
+nicht".
 
 **Autonomie.** Phasengrenzen sind **kein** Haltepunkt. Standardzustand ist Weiterarbeiten.
 **Melden ≠ fragen** — Vollzüge werden gemeldet, ohne auf Antwort zu warten.
@@ -100,6 +124,39 @@ Dokumentiertes ist ein Arbeitsfehler.
 **Warum sie zuerst fällt** — am Objekt gemessen: *„die zuerst fallende Stufe ist das Gedächtnis,
 weil sie vorne kostet und hinten nichts Sichtbares liefert, während ein Explore-Agent wie
 Fortschritt aussieht."*
+
+### II.1a Der Explore ist Pflicht — je Welle und je Strang *(Owner 09.08.2026)*
+
+Owner-Wortlaut, als Präzisierung dieses Auftrags:
+
+> „…einen Sonnet 5 max effort »very thourough« explore über die letzten 9 Wochen **(gilt auch für
+> die Planung jeder Welle und jedes Strangs in der Explore Phase, die vor jeder Design und
+> Bau-Phase Pflicht ist)** an session-log/Planung/sessions/memory/code/alles, um exakt
+> herauszufinden was in der Vergangenheit zu deinem fehlenden Thema geplant war. Fahre auch immer
+> einen Explore wenn du sonst raten müsstest - **rate NIE.**"
+
+Damit ist der Explore **keine Notmaßnahme bei Unklarheit mehr, sondern eine unüberspringbare
+Stufe**: kein Design und kein Bau ohne vorgeschalteten Explore — **auch dann nicht, wenn der Plan
+eindeutig scheint.** Gerade dann, denn ein eindeutiger Plan verdeckt die Frage, worauf er beruht.
+
+**Korpus:** neun Wochen zurück, über **`session-log` (die rohen JSONL-Transkripte, nicht nur
+`docs/sessions/`)** · `docs/plaene/` · `docs/sessions/` · das Memory-Verzeichnis · den **Code**
+beider Repos · die **Thesis** — „alles".
+**Modell:** Sonnet 5, max effort, Auftrag wörtlich *„very thorough"*.
+
+**Drei Regeln, ohne die die Stufe nichts wert ist:**
+1. Die Leitfrage lautet **„was wurde dazu festgelegt?"**, nicht „wie baue ich das?".
+2. **Jeder Nichtfund braucht eine Gegenprobe** — ein Muster, das sicher trifft, mit Trefferzahl.
+   Ohne sie ist ein Nichtfund von einem kaputten Kommando nicht zu unterscheiden. Genau diese
+   Verwechslung hat schon zweimal einen falschen Befund erzeugt.
+3. Findet der Explore **gar nichts**, ist die Festlegung **neu** und wird als neu protokolliert —
+   damit sie später nicht als „war schon immer so" durchgeht.
+
+**Der Anlass:** am 09.08. startete der Lead zwei Bau-Stränge, deren Annahmen allein aus **einem
+einzigen Dokument** stammten. Unmittelbar davor war bereits eine Fehldeutung entstanden, weil eine
+vorhandene Owner-Festlegung nicht gesucht worden war. Bei Widerspruch gilt die Rangfolge
+**THESIS > OWNER > PLAN (nach Datum) > LEAD** — ein Plan kann also von etwas Älterem geschlagen
+werden, und wer nur den Plan liest, sieht das nie.
 
 ## II.2 V11 — Die Belegzeile, in beide Richtungen
 
@@ -467,7 +524,7 @@ Codex (GPT-5, read-only) bleibt eingebunden — **als Kritiker, nicht als Zusamm
 | **D4** | Drift-Gate erklärte degenerierte Messung für stabil | **geheilt** `ce 5922bb99` |
 | **D3-5** | `[MESS-TESTAT]` wurde unbedingt gedruckt | **geheilt** `ce 7bcf353b` |
 | **D1** | `make check` ohne Reconfigure | **FEHLBEFUND** — zweifach widerlegt |
-| **D2** | Abdeckungs-Wache über zu kleinem Nenner | **offen** — 18 Registrierungen unter 14 Bedingungen, `STATUS_OUT` deckt **2** |
+| **D2** | Abdeckungs-Wache über zu kleinem Nenner | **offen** — **18** bedingte Registrierungen unter **14** Bedingungen (09.08. am Objekt bestätigt, drei ce-Stände, `scripts/ci_abnahme06_bedingungs_tabelle.sh`); `STATUS_OUT` deckt davon ~~2~~ → **4 von 18** (22 %). Die „2" traf die *Blöcke ohne Registrierung* (`_pa_status`, `_fj_status` — in jeder CI unerreichbar), nicht die gedeckten Registrierungen. **Teilstück D2-G4 ERLEDIGT 09.08.**: Formel ##06 auf „erfüllt ODER Allowlist mit Begründung" korrigiert, Zähl-Skript + `ci/abnahme06_bedingungs_allowlist.txt` gelandet. |
 | **D5** | fünf Median-Implementierungen, drei Antworten | **offen** |
 | **D3-4** | Ausgabe-Gate in `allow_failure`-Job wirkungslos | **offen** — gehört in einen Folge-Job |
 

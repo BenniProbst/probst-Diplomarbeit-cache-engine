@@ -36,6 +36,12 @@ Die früheren Goals beschrieben **Bau-Strecken**. v8 beschreibt zusätzlich, **w
 
 **Ein Blech:** alle super-CI-Jobs `tags:[baremetal]` → nur prod1, `concurrent=2`. prod1 **ist** die lokale Maschine, der Runner liegt auf derselben Platte. Zwei Pakete mit „Pipeline grün" als Abnahme sind **seriell**.
 
+> ⚠️ **KORREKTUR-EINSCHUB 09.08.2026 — dieser Absatz ist überholt; er bleibt als Wortlaut stehen, weil dieses Dokument verbatim ist.**
+> Der Satz *„`tags:[baremetal]` → nur prod1"* ist **am Objekt widerlegt**: es gibt **zwei** bare-metal-Runner (id=16 prod1/AMD **mit** AVX-512, id=17 prod2/Intel **ohne**), und **44 von 48 Jobs beider Repos** landen auf beiden. Pipeline `15412` hat es bewiesen (`== Host ==`: `Linux prod2`, `GenuineIntel`, i9-12900K).
+> **Und die Folgerung, die ich daraus zog, ist ebenfalls falsch.** Der Owner, wörtlich: *„das war so geplant, dass über das Lager die Maschinen abstimmen, wer welches Batch verarbeitet und es können auch erstmal alle Maschinen alle Jobs aufnehmen."* **Das Floaten ist der Entwurf.** Die Koordination sitzt im **Lager** und in der **Filterung der Compiles je Hardware-Freigabe** (Kettenglied „Hardware-Job-Pool über Maschinenfähigkeiten"), nicht in GitLab-Tags.
+> **Was bleibt:** die Serialität von Pipeline-Abnahmen ist *meine* Arbeitsdisziplin — ich kann nur eine Abnahme zur Zeit beurteilen — und nicht länger eine Maschinen-Kapazitätsaussage. Neu hinzu kommt: **jede Wache, die ihren Nenner aus der Hardware zieht, muss die Maschine mit ausweisen.**
+> Volltext, Fehlerklasse und Beleg: Ledger, Abschnitt „RICHTIGSTELLUNG 09.08.2026 — der Befund hält, meine Deutung nicht". Die gültige Kettenfassung steht im Dossier §VI.1.
+
 **Autonomie:** Phasengrenzen sind **kein** Haltepunkt. Standardzustand ist Weiterarbeiten. **Melden ≠ fragen.** Rückfrage nur bei nicht billig rücknehmbarem Schaden oder teurem Umbau. **Ein Defekt ist nie ein Grund zu fragen.** Eine nicht auflösbare Frage ist zuerst eine **eigene Gedächtnislücke** — erst vier bis sechs Wochen Bestand durchsuchen.
 
 ---
@@ -185,6 +191,14 @@ Von den fünf Defekt-Familien war **dreimal der Test selbst der Defekt**. `test_
 | **D3-4** | Gate in `allow_failure`-Job wirkungslos | **offen** — eigener Folge-Job |
 
 `allow_failure` am Mess-Batch ist **korrekt** — es zu entfernen wäre eine **Regression**.
+
+> **NACHTRAG 09.08.2026 (Posten D2-G4) — die Tabelle oben bleibt wörtlich stehen, eine Zahl darin
+> ist überholt.** Zeile **D2**: `18` Registrierungen unter `14` Bedingungen ist am Objekt
+> **bestätigt** (drei ce-Stände, `scripts/ci_abnahme06_bedingungs_tabelle.sh`). „`STATUS_OUT` deckt
+> **2**" ist **falsch** — gedeckt sind **4 von 18** (22 %). Die 2 traf die zwei STATUS_OUT-Blöcke
+> **ohne** Test-Registrierung (`_pa_status`, `_fj_status`, in jeder CI unerreichbar), nicht die
+> gedeckten Registrierungen. Der Teilposten **D2-G4 ist erledigt**; geltende Fassung der Abnahme
+> ##06 ist die Fußnote D2-G4 in `docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md`.
 
 ---
 
