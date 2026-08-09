@@ -48,7 +48,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         -Werror=switch)
 endif()
 
-# ── Die zwei Produktions-Binaries ────────────────────────────────────────────────────
+# -- Die zwei Produktions-Binaries ----------------------------------------------------
 # AUSSERHALB des COMDARE_DA_BUILD_TESTS-Gates: sie sind Produktionswerkzeug der CI und
 # muessen auch dann gebaut werden, wenn die Tests abgeschaltet sind. Die Tests liegen
 # INNERHALB des Gates (Code/tests/CMakeLists.txt).
@@ -65,7 +65,7 @@ set_target_properties(ci_thesis_gitlink_wache PROPERTIES OUTPUT_NAME "ci-thesis-
 install(TARGETS ci_xml_wellformed_wache ci_thesis_gitlink_wache
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-# ── Die Werkbank der Tests ───────────────────────────────────────────────────────────
+# -- Die Werkbank der Tests -----------------------------------------------------------
 # Sie linkt gtest (AssertionResult ist ihr Rueckgabetyp, damit ein misslungenes
 # Arrangement als ROTER Test mit Fixture-Diagnose endet und nicht als "gefangen").
 # Deshalb liegt sie INNERHALB des Test-Gates und nicht in der Produktions-Bibliothek.

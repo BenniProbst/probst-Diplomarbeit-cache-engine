@@ -15,8 +15,8 @@ namespace fs  = std::filesystem;
 
 namespace {
 
-// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Läufe als comdare, CI als
-// gitlab-runner) — feste Namen gehören dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
+// Benutzer-eindeutige tmp-Basis: /tmp ist host-weit geteilt (prod1: lokale Laeufe als comdare, CI als
+// gitlab-runner) -- feste Namen gehoeren dem Erst-Ersteller und blocken den jeweils anderen (8081/213626).
 std::filesystem::path comdare_user_tmp() {
     auto p = std::filesystem::temp_directory_path() / ("comdare_test_" + std::to_string(::getuid()));
     std::filesystem::create_directories(p);
@@ -26,7 +26,7 @@ std::filesystem::path comdare_user_tmp() {
 void write_sample_csv(fs::path const& p) {
     fs::create_directories(p.parent_path());
     std::ofstream f(p);
-    // V41.P1-KANONISCH: 16 Spalten, workload_used als 4. Spalte (parse_csv verlangt cols>=16 —
+    // V41.P1-KANONISCH: 16 Spalten, workload_used als 4. Spalte (parse_csv verlangt cols>=16 --
     // Fix 2026-07-06: der alte 15-Spalten-Writer erzeugte status_parse_error).
     f << "permutation_id,fingerprint,succeeded,workload_used,op_count,total_cycles,"
       << "cache_misses_l1,cache_misses_l2,cache_misses_l3,dtlb_misses,"
@@ -46,7 +46,7 @@ void ensure_cached_csv(fs::path const& p) {
 fs::path fixtures_dir() {
     if (auto* env = std::getenv("COMDARE_FIXTURES_DIR_04"); env != nullptr) { return fs::path(env); }
 #ifdef COMDARE_FIXTURES_DIR_04_FALLBACK
-    // Deterministischer Fallback = per-Stufe Source-Dir (CMake-einkompiliert) — KEIN CWD-Stray (2026-06-01 gehärtet).
+    // Deterministischer Fallback = per-Stufe Source-Dir (CMake-einkompiliert) -- KEIN CWD-Stray (2026-06-01 gehaertet).
     return fs::path(COMDARE_FIXTURES_DIR_04_FALLBACK);
 #else
     return fs::current_path() / "fixtures" / "cached"; // letzter Notnagel
@@ -112,10 +112,10 @@ TEST(Stufe04Pipeline, EscapeLatexHandlesSpecialChars) {
     EXPECT_NE(escaped.find("\\&"), std::string::npos);
 }
 
-// ── WIDE-Schema (tier×workload, 2026-06-11) ──────────────────────────────────────────────────────────
-// Fixture = schema-treue Mini-Variante des Mess-CSVs (';'-getrennt; der Parser ist HEADER-getrieben →
+// -- WIDE-Schema (tier?workload, 2026-06-11) ----------------------------------------------------------
+// Fixture = schema-treue Mini-Variante des Mess-CSVs (';'-getrennt; der Parser ist HEADER-getrieben ->
 // das Fixture braucht nur die benannten Spalten + beliebige weitere [hier: 2 stat-Dummies], in beliebiger
-// Reihenfolge — exakt die Robustheits-Eigenschaft, die gegen das echte 136-Spalten-Schema trägt).
+// Reihenfolge -- exakt die Robustheits-Eigenschaft, die gegen das echte 136-Spalten-Schema traegt).
 namespace {
 
 void write_wide_sample_csv(fs::path const& p) {
@@ -123,13 +123,13 @@ void write_wide_sample_csv(fs::path const& p) {
     std::ofstream f(p);
     f << "binary_id;setting;repetition;n_ops;total_ns;ns_per_op;stat_search_algo_lookup;"
       << "stat_allocator_bytes_alloc;workload;two_phase_valid\n";
-    // k_ary × ycsb_c: 3 Samples (Mediane prüfbar: 100,200,300 → nearest-rank-Median 200)
+    // k_ary ? ycsb_c: 3 Samples (Mediane pruefbar: 100,200,300 -> nearest-rank-Median 200)
     f << "search_algo=k_ary/node_type=node4;s=1/rep=0;0;1000;100000;100.0;1000;64000;ycsb_c;1\n";
     f << "search_algo=k_ary/node_type=node4;s=1/rep=1;1;1000;200000;200.0;1000;64000;ycsb_c;1\n";
     f << "search_algo=k_ary/node_type=node4;s=1/rep=2;2;1000;300000;300.0;1000;64000;ycsb_c;1\n";
-    // k_ary × ih: 1 Sample
+    // k_ary ? ih: 1 Sample
     f << "search_algo=k_ary/node_type=node4;s=1/rep=0;0;1000;500000;500.0;1000;64000;ih;1\n";
-    // eytzinger × ycsb_c: 1 gültiges + 1 UNGÜLTIGES Sample (two_phase_valid=0 → MUSS ausgefiltert werden)
+    // eytzinger ? ycsb_c: 1 gueltiges + 1 UNGUeLTIGES Sample (two_phase_valid=0 -> MUSS ausgefiltert werden)
     f << "search_algo=eytzinger/node_type=node4;s=1/rep=0;0;1000;150000;150.0;1000;64000;ycsb_c;1\n";
     f << "search_algo=eytzinger/node_type=node4;s=1/rep=1;1;1000;90000;90.0;1000;64000;ycsb_c;0\n";
 }
@@ -156,7 +156,7 @@ TEST(Stufe04Pipeline, AggregateTierWorkloadMedianAndValidityFilter) {
     std::vector<c2l::WideMeasurementRow> rows;
     ASSERT_EQ(c2l::parse_wide_csv(dir / "sample_wide_rows.csv", rows), c2l::status_ok);
     auto const aggs = c2l::aggregate_tier_workload(rows);
-    ASSERT_EQ(aggs.size(), 3u); // (eytzinger,ycsb_c) (k_ary,ih) (k_ary,ycsb_c) — map-sortiert
+    ASSERT_EQ(aggs.size(), 3u); // (eytzinger,ycsb_c) (k_ary,ih) (k_ary,ycsb_c) -- map-sortiert
     EXPECT_EQ(aggs[0].search_algo, "eytzinger");
     EXPECT_EQ(aggs[0].samples, 1u); // das two_phase_valid=0-Sample ist GEFILTERT
     EXPECT_DOUBLE_EQ(aggs[0].median_ns_per_op, 150.0);
@@ -184,18 +184,18 @@ TEST(Stufe04Pipeline, WriteBiasMatrixLatex) {
     EXPECT_NE(content.find("\\begin{tabular}{lrr}"), std::string::npos); // 2 Workload-Spalten (ih, ycsb_c)
     EXPECT_NE(content.find("Suchverfahren"), std::string::npos);         // lang=de
     EXPECT_NE(content.find("k\\_ary"), std::string::npos);
-    EXPECT_NE(content.find("& 200"), std::string::npos); // Median-Zelle k_ary×ycsb_c
-    EXPECT_NE(content.find("& --"), std::string::npos);  // leere Zelle eytzinger×ih
+    EXPECT_NE(content.find("& 200"), std::string::npos); // Median-Zelle k_ary?ycsb_c
+    EXPECT_NE(content.find("& --"), std::string::npos);  // leere Zelle eytzinger?ih
     std::error_code ec;
     fs::remove(out, ec);
 }
 
-// ── P5 (2026-07-12): Forest-/Dot-Plot der Achsen-Austauschbarkeit (write_exchange_forest_plot) ──────────
+// -- P5 (2026-07-12): Forest-/Dot-Plot der Achsen-Austauschbarkeit (write_exchange_forest_plot) ----------
 // Fixture = schema-treue WIDE-FULL-Mini-CSV (parse_wide_csv_full: benoetigt op_<art>_p50_ns + binary_id-
 // Achsen-Tupel). 4 Lebewesen erzeugen deterministisch: 1 valide Verbesserung (search_algo alpha->beta,
 // Median rel. -0.2, IQR 0.2, n=4 -- D5-2-KANON), 1 valide Regression (node_type n4->n8, +0.3, n=4)
 // und 2 kleine-n-Zeilen
-// (gamma nur in w1 → n=1). Threshold ist Test-Parameter (klein statt 30 → kleine-n greift bei diesem Fixture).
+// (gamma nur in w1 -> n=1). Threshold ist Test-Parameter (klein statt 30 -> kleine-n greift bei diesem Fixture).
 namespace {
 
 void write_forest_full_csv(fs::path const& p) {
@@ -213,18 +213,18 @@ void write_forest_full_csv(fs::path const& p) {
     std::string const A8 = "search_algo=alpha/node_type=n8/memory_layout=aos/prefetch=off";
     // alpha: ns_per_op=100 in allen 4 Lastprofilen.
     for (auto const* wl : {"w1", "w2", "w3", "w4"}) row(A, wl, 100.0);
-    // beta: 70,80,90,100 → rel-Deltas ggü. alpha = -0.3,-0.2,-0.1,0.0.
+    // beta: 70,80,90,100 -> rel-Deltas ggue. alpha = -0.3,-0.2,-0.1,0.0.
     // D5-2 KANON (nearest-rank k = ceil(q*n)-1) auf n=4: p25=idx0=-0.3, p50=idx1=-0.2, p75=idx2=-0.1
-    // → Median -0.2, IQR 0.2 → echter Whisker >0.
-    // Bis 2026-08-09 stand hier p25=idx1, p50=idx2, p75=idx2 → Median -0.1, IQR 0.1: das war die
+    // -> Median -0.2, IQR 0.2 -> echter Whisker >0.
+    // Bis 2026-08-09 stand hier p25=idx1, p50=idx2, p75=idx2 -> Median -0.1, IQR 0.1: das war die
     // VERWORFENE Formel round(q*(n-1)), die bei GERADEM n eine Rangstelle zu hoch greift.
     row(B, "w1", 70.0);
     row(B, "w2", 80.0);
     row(B, "w3", 90.0);
     row(B, "w4", 100.0);
-    // gamma: nur w1 (=100) → mit alpha/beta nur 1 gemeinsames Lastprofil → n=1 (kleine-n-Zeilen).
+    // gamma: nur w1 (=100) -> mit alpha/beta nur 1 gemeinsames Lastprofil -> n=1 (kleine-n-Zeilen).
     row(G, "w1", 100.0);
-    // alpha@node_type=n8: 130 in allen 4 → node_type-Geschwister-Paar n4->n8, rel +0.30, n=4 (Regression).
+    // alpha@node_type=n8: 130 in allen 4 -> node_type-Geschwister-Paar n4->n8, rel +0.30, n=4 (Regression).
     for (auto const* wl : {"w1", "w2", "w3", "w4"}) row(A8, wl, 130.0);
 }
 
@@ -318,7 +318,7 @@ TEST(Stufe04Pipeline, ForestPlotStructureZeroLineAndWhisker) {
     // 4 reale Datenpunkte (== Zahl der ns_per_op-Aggregate mit n>0), nichts erfunden/verloren.
     EXPECT_EQ(count_occ(c, "+- ("), 4u);
     EXPECT_NE(c.find("ytick={0,1,2,3}"), std::string::npos);
-    // Whisker existiert real — kein erfundener Balken, aber vorhandene Streuung.
+    // Whisker existiert real -- kein erfundener Balken, aber vorhandene Streuung.
     // D5-2 KANON: IQR = p75-p25 = -0.1-(-0.3) = 0.2 -> Halb-Whisker 0.2/2 = 0.1 -> "+- (0.1000,0)".
     // Vorher 0.0500, weil die verworfene Formel IQR=0.1 lieferte.
     EXPECT_NE(c.find("+- (0.1000,0)"), std::string::npos);
@@ -327,8 +327,8 @@ TEST(Stufe04Pipeline, ForestPlotStructureZeroLineAndWhisker) {
     fs::remove(out, ec);
 }
 
-// (b) Kleine-n-Kennzeichnung greift (threshold-getrieben, nicht hartkodiert): threshold=3 → 2 kleine-n-Punkte
-//     mit fpsmalln/offenem Marker; threshold=0 → KEINE kleine-n-Klasse (alle valide).
+// (b) Kleine-n-Kennzeichnung greift (threshold-getrieben, nicht hartkodiert): threshold=3 -> 2 kleine-n-Punkte
+//     mit fpsmalln/offenem Marker; threshold=0 -> KEINE kleine-n-Klasse (alle valide).
 TEST(Stufe04Pipeline, ForestPlotSmallNMarkingIsThresholdDriven) {
     auto                               dir = fixtures_dir();
     std::vector<c2l::SiblingPairCount> counts;
@@ -348,7 +348,7 @@ TEST(Stufe04Pipeline, ForestPlotSmallNMarkingIsThresholdDriven) {
     auto out0 = comdare_user_tmp() / "p5_forest_t0.tex";
     ASSERT_EQ(c2l::write_exchange_forest_plot(out0, aggs, counts, "de", false, 0), c2l::status_ok);
     auto const c0 = read_all(out0);
-    EXPECT_EQ(c0.find("% P5-CLASS smalln"), std::string::npos); // threshold=0 → keine kleine-n-Zeile
+    EXPECT_EQ(c0.find("% P5-CLASS smalln"), std::string::npos); // threshold=0 -> keine kleine-n-Zeile
     // Dann sind alle 3 nicht-negativen Zeilen Regression (0.0, 0.25, 0.30).
     EXPECT_EQ(count_occ(class_block(c0, "regression"), "+- ("), 3u);
 
@@ -357,8 +357,8 @@ TEST(Stufe04Pipeline, ForestPlotSmallNMarkingIsThresholdDriven) {
     fs::remove(out0, ec);
 }
 
-// (c) Vorzeichen-Faerbung korrekt: Verbesserung (median<0) → fpimprove-Block mit -0.2000 (nicht 0.3000);
-//     Regression (median>=0) → fpregress-Block mit 0.3000 (nicht -0.2000).
+// (c) Vorzeichen-Faerbung korrekt: Verbesserung (median<0) -> fpimprove-Block mit -0.2000 (nicht 0.3000);
+//     Regression (median>=0) -> fpregress-Block mit 0.3000 (nicht -0.2000).
 TEST(Stufe04Pipeline, ForestPlotSignColoring) {
     auto                               dir = fixtures_dir();
     std::vector<c2l::SiblingPairCount> counts;
@@ -385,7 +385,7 @@ TEST(Stufe04Pipeline, ForestPlotSignColoring) {
     fs::remove(out, ec);
 }
 
-// (d) Honest-empty-Guard: keine gueltige ns_per_op-Zeile → status_empty_input + KEINE Datei.
+// (d) Honest-empty-Guard: keine gueltige ns_per_op-Zeile -> status_empty_input + KEINE Datei.
 TEST(Stufe04Pipeline, ForestPlotHonestEmptyGuard) {
     auto            out = comdare_user_tmp() / "p5_forest_empty.tex";
     std::error_code ec;
@@ -397,7 +397,7 @@ TEST(Stufe04Pipeline, ForestPlotHonestEmptyGuard) {
     EXPECT_EQ(c2l::write_exchange_forest_plot(out, none, counts, "de", false, 3), c2l::status_empty_input);
     EXPECT_FALSE(fs::exists(out));
 
-    // (ii) Aggregate ohne ns_per_op-Zeile (nur andere Interface-Fn) → ebenfalls honest-leer.
+    // (ii) Aggregate ohne ns_per_op-Zeile (nur andere Interface-Fn) -> ebenfalls honest-leer.
     std::vector<c2l::ExchangeAggregate> only_lookup;
     c2l::ExchangeAggregate              a;
     a.axis                  = "search_algo";
