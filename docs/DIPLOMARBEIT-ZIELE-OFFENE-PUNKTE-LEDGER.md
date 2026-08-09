@@ -16,6 +16,93 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — D5-1 gelandet: der Perzentil-Kanon steht, und drei Plan-Zahlen waren falsch
+
+**Gelandet in `ce`:** `c98b4b95` (D5-1, 14 Dateien, +595/−77, neue Testdatei
+`test_d51_perzentil_kanon.cpp`) · `0ebc5759` (ASCII-Nachzug der Kritikstufe) · `87e7fac4`
+(unterwegs gefundener Defekt, s. u.). Verdikt der Kritikstufe: **TRÄGT MIT MÄNGELN**, keine
+Blocker offen. Vier Commits warten auf den Push — der vierte, `8cbf83d5` (LAG-P4), stammt von
+einem **anderen** Strang und wurde vom Bauer korrekt als fremd gekennzeichnet.
+
+### Was der Kanon jetzt zusichert
+
+Eine Perzentil-Definition (`ceil(q*n)-1`, Hyndman/Fan Typ 1), `nearest_rank_p` **ersatzlos
+gelöscht**, der Median als Fall q=0.5. **Selbst nachgemessen:** heute noch **3** Vorkommen von
+`nearest_rank_p` in `libs/`, **alle drei in Kommentaren**, die die Löschung dokumentieren — als
+Bezeichner ist er weg. Jede übersehene Aufrufstelle hätte compile-time gebrochen; das war der
+Zweck.
+
+### Drei Plan-Zahlen, die am Objekt nicht hielten
+
+**1. „34 unbewachte Stellen" → es sind 38.** Selbst nachgemessen an `c98b4b95~1`:
+`git grep -o "nearest_rank_p(" -- 'libs/**'` liefert **39** Vorkommen, davon **1** Definition ⇒
+**38 Aufrufstellen**, verteilt auf 5 Dateien und 32 Quellzeilen. Der Bauer hat **fünf**
+Zählweisen durchprobiert (Zeilen 32 · Zeilen ohne Definition 31 · Vorkommen 39 · Aufrufe 38 ·
+alle Erwähnungen inkl. Doku 42) — **keine ergibt 34**. Die Sachaussage des Plans hält
+vollständig; nur die Zahl war zu niedrig. Möglicher Grund: der Plan nennt als Fundort
+`wt-ce-fk`, nicht `wt-ce-xml` — **eine Zahl aus einem anderen Checkout**.
+
+**2. „Pin 51→50" → es sind DREI Pins.** An denselben zwei Teststellen
+(`test_v41_anatomy_f15_measurement.cpp:535` und `:714`) dreht sich **auch** p99 von 100 auf 99.
+Und ein **p95-Pin fehlte ganz** — der Bauer hat 96→95 ergänzt, mit der richtigen Begründung: p95
+wird in Mess-CSV **und** Trace-JSON emittiert und wäre sonst ungepinnt geblieben. **Eine Wache,
+die zwei von drei Größen prüft, ist keine Wache für die dritte.**
+
+**3. „Definitionen: 1 (heute 2)" → der rote Lauf zeigte 3.** Kein Widerspruch, sondern eine
+Folge der Reihenfolge: ROT-2 lief, nachdem der Kanon-Index bereits existierte, die alte
+`percentile_ns`-Formel aber noch stand — 2 (Bestand) + 1 (Kanon) = 3. Die reine Bestandszahl 2
+ist separat per grep belegt. **Der Bauer hat das von sich aus erklärt, statt die Zahl passend zu
+machen.**
+
+### T-1 in zwei Stufen — eine bewusste Abweichung, ausdrücklich benannt
+
+Der erste rote Lauf war ein **Compile-Fehler** (`nearest_rank_index is not a member of stats`) —
+rot, aber **ohne Aussage über Werte**. Der Bauer hat deshalb nur den Kanon-Index hinzugefügt (die
+beiden alten Formeln unverändert gelassen) und einen **zweiten** roten Lauf gefahren, der die
+konkreten falschen Zahlen **51 / 96 / 100** zeigt. Beide roten Läufe stehen wörtlich im Paket.
+
+**Das ist die ehrlichere Lesart von T-1** — ein Compile-Fehler belegt Abwesenheit, nicht falsches
+Verhalten. T-2 verlangt die **Aussage**, nicht die Anwesenheit. Und die Abweichung wurde
+**benannt**, nicht verschwiegen.
+
+### Ein Nebenfund, der mehr wert ist als sein Paket
+
+`87e7fac4` — **die Diff-Hygiene-Wache war im Default-Modus blind.** Der Bauer fand das beim
+Landen der eigenen Arbeit, baute einen Selbsttest
+(`scripts/ci_diff_ascii_width_guard.selbsttest.sh`) und verdrahtete ihn. Das ist die Klasse
+„Wache, die nicht wacht" — heute bereits zum zweiten Mal.
+
+### Ein Befund für D5-2, der die Arbeit dort verkleinert
+
+**`vals[(n-1)/2]` IST der Kanon-Fall q=0.5.** Es gilt `(n-1)/2 == ceil(0.5*n)-1` für **jedes** n
+— im Test über n=1…64 nachgerechnet (`D51PerzentilKanon.MedianIstQGleichEinHalb`). Der
+`best_binary_selector` rechnete also **seit jeher kanonisch**. Die Median-Divergenz sitzt allein
+auf der **super**-Seite (`diagram_generator.cpp:1783/1784`, **obere** Mitte statt unterer).
+
+Damit sind von den „fünf Median-Implementierungen" zwei bereits kanonisch, eine wurde in D5-1
+mitgenommen (`cache_engine_builder_iterator.hpp:970`, obere Mitte, Median über
+**Messwiederholungen** — sie hätte den Kanon sofort wieder gebrochen), und zwei bleiben für D5-2.
+
+### Die Kreuz-Test-Falle ist vermessen — und sie ist größer als gedacht
+
+Der vendorierte ce-Stand in super ist `a1d0c201` vom **07.08.** und liegt **98 Commits** hinter
+dem heutigen HEAD — insbesondere **vor** D5-1. **Ein Kreuz-Test über `csv_to_latex` und
+`diagram_generator` wäre heute grün und blind.** Der Bauer hat ihn deshalb **nicht** gefahren,
+sondern durch drei echte ce-Ausgabepfade (Mess-CSV, Trace-JSON, `merged_p50_ns`) auf
+Bit-Gleichheit ersetzt und die Selector-Regel als Zahlengleichheit über n=1…64 belegt.
+
+**Das ist die richtige Entscheidung:** ein Test, der nicht beißen kann, ist schlechter als kein
+Test — er erzeugt ein Grün, das nichts bedeutet.
+
+### Was offen bleibt
+
+- **`delete_p99_ns` existiert weiterhin 0-mal** — `serialize_abi_tier_trace_json` emittiert für
+  `delete` nur p50 und p95, während write und read je p50/p95/p99 tragen. Bestätigt D5-4.
+- **Die super-Seite** (`diagram_generator.cpp:1783/1784`) ist unangetastet — richtig so, sie
+  aggregiert über **Konfigurationen**, nicht über Proben. Das ist ein anderer Gegenstand mit
+  derselben Vokabel, und der Plan warnt ausdrücklich davor, ihn mitzuziehen.
+- **Der Kreuz-Test über die super-Werkzeuge** wird erst aussagefähig, wenn das Vendoring
+  nachgezogen ist (98 Commits).
 ## NACHTRAG 09.08.2026 — der DURCHSTICH ist an drei Nähten offen, und die Nenner-Divergenz ist aufgelöst
 
 Zwei Stränge gelandet. Der eine trifft die **Frist am Freitag**, der andere schließt den letzten
