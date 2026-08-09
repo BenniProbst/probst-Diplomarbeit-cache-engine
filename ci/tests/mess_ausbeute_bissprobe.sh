@@ -147,12 +147,14 @@ mit_daten() {         # $1 = Zieldatei, $2 = Anzahl Datenzeilen ; gibt 1. Token 
 }
 
 # --- Lauf ohne Pipe: rc=$? nach einer Pipe misst das LETZTE Glied -------------
-lauf() {              # $1 = Wurzel (oder __KEIN_ARG__), $2 = Mindest (optional)
+lauf() {              # $1 = Wurzel (oder __KEIN_ARG__), $2 = Mindest, $3 = Modus
     : > "$OUT"; : > "$ERR"
     FALL_WACHE=1
     set +e
     if [ "$1" = "__KEIN_ARG__" ]; then
         sh "$WACHE" > "$OUT" 2> "$ERR"
+    elif [ "$#" -ge 3 ]; then
+        sh "$WACHE" "$1" "$2" "$3" > "$OUT" 2> "$ERR"
     elif [ "$#" -ge 2 ]; then
         sh "$WACHE" "$1" "$2" > "$OUT" 2> "$ERR"
     else
@@ -161,6 +163,17 @@ lauf() {              # $1 = Wurzel (oder __KEIN_ARG__), $2 = Mindest (optional)
     RC=$?
     set -e
     cat "$OUT" "$ERR" > "$BEIDE"
+}
+
+# Legt einen Lauf-Marker (D3-7) neben eine CSV. Die Probe schreibt ihn SELBST --
+# sie prueft hier die Wache, nicht ci/lauf_marker.sh (das hat seine eigene Probe).
+marker() {            # $1 = Verzeichnis, $2 = Modus
+    mkdir -p "$1"
+    {
+        echo "quelle=RUN_PROFILE"
+        echo "modus=$2"
+        echo "lauf_kennung=probe-$(token)"
+    } > "$1/LAUF_MARKER.txt"
 }
 
 protokoll() {         # literale Ausgabe der Wache -- nur im Fehlerfall
@@ -338,6 +351,103 @@ printf 'perm-1,%s,1001,4001,1' "$T9" >> "$D/perm-0001/measurements.csv"   # bewu
 lauf "$D" 1
 fordere_rc 0
 fordere_literal "$OUT" "1 Datenzeile(n) insgesamt"
+fall_ende
+
+# =============================================================================
+# F12 D3-1-RESTHAELFTE: "rot NUR bei modus=voll und Z==0".
+#     VORHER (am Objekt gemessen, 09.08.2026, VOR diesem Paket): das dritte
+#     Argument wurde IGNORIERT -- stdout und stderr des Laufs mit
+#     'provision_only' waren BYTE-GLEICH zu denen mit 'voll', beide rc=1.
+#     Ein provision_only-Lauf misst per Bauart nichts (ce
+#     profile_run_entry.hpp:1234/:1241) und starb an dieser Wache.
+# =============================================================================
+fall "F12 leeres Fenster, modus=provision_only -> rc=0 MIT sichtbarer WARNUNG"
+D="$WERK/f12"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 provision_only
+fordere_rc 0
+fordere_literal "$OUT" "Modus=provision_only"
+fordere_literal "$OUT" "0 Datenzeile(n) insgesamt"
+fordere_literal "$OUT" "WARNUNG: modus=provision_only"
+fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+fall_ende
+
+fall "F13 dasselbe Fenster, modus=voll -> rc=1 (die Gegenrichtung)"
+D="$WERK/f13"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 voll
+fordere_rc 1
+fordere_literal "$OUT" "Modus=voll"
+fordere_literal "$ERR" "(modus=voll -- dieser Lauf SOLLTE messen.)"
+fall_ende
+
+fall "F14 dasselbe Fenster OHNE drittes Argument -> rc=1 (Rueckwaerts-Vertrag)"
+D="$WERK/f14"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1
+fordere_rc 1
+fordere_literal "$OUT" "Modus=voll"
+fordere_literal "$OUT" "Quelle: Aufrufer-Argument"
+fall_ende
+
+fall "F15 unbekannter Modus -> rc=2, KEIN stiller Rueckfall auf einen Default"
+D="$WERK/f15"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 "voll$(token)"
+fordere_rc 2
+fordere_literal "$ERR" "unbekannter Modus"
+fordere_literal "$ERR" "wird NICHT auf einen Default zurueckgesetzt"
+fall_ende
+
+# =============================================================================
+# F16 modus=auto OHNE Lauf-Marker -> rc=2. Ein Rueckfall auf 'voll' waere zwar
+#     die scharfe Richtung, wuerde aber die FEHLENDE DECKUNG verschweigen.
+# =============================================================================
+fall "F16 modus=auto ohne LAUF_MARKER.txt -> rc=2 (kein Gruen ohne Pruefung)"
+D="$WERK/f16"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 auto
+fordere_rc 2
+fordere_literal "$ERR" "kein LAUF_MARKER.txt"
+fordere_literal "$ERR" "Kein Gruen ohne Pruefung."
+fall_ende
+
+fall "F17 modus=auto mit provision_only-Marker -> Modus wird GELESEN, rc=0"
+D="$WERK/f17"; nur_kopf "$D/perm-0001/measurements.csv"
+marker "$D/perm-0001" provision_only
+lauf "$D" 1 auto
+fordere_rc 0
+fordere_literal "$OUT" "Modus=provision_only"
+fordere_literal "$OUT" "1 Lauf-Marker, 0 davon modus=voll"
+fall_ende
+
+# =============================================================================
+# F18 DER SCHAERFSTE GEWINNT: ein voll-Marker neben einem provision_only-Marker
+#     haelt das Gate scharf. Sonst entwaffnete eine einzige weiche Zelle den
+#     ganzen Lauf.
+# =============================================================================
+fall "F18 modus=auto, 1 voll + 1 provision_only -> schaerfster gewinnt, rc=1"
+D="$WERK/f18"
+nur_kopf "$D/perm-0001/measurements.csv"; marker "$D/perm-0001" provision_only
+nur_kopf "$D/perm-0002/measurements.csv"; marker "$D/perm-0002" voll
+lauf "$D" 1 auto
+fordere_rc 1
+fordere_literal "$OUT" "Modus=voll"
+fordere_literal "$OUT" "2 Lauf-Marker, 1 davon modus=voll"
+fall_ende
+
+fall "F19 modus=auto, Marker mit unlesbarem Modus -> rc=2 statt Erlaubnis"
+D="$WERK/f19"; nur_kopf "$D/perm-0001/measurements.csv"
+marker "$D/perm-0001" "kaputt$(token)"
+lauf "$D" 1 auto
+fordere_rc 2
+fordere_literal "$ERR" "unlesbarer Marker ist keine Erlaubnis"
+fall_ende
+
+# =============================================================================
+# F20 N_CSV==0 bleibt in JEDEM Modus rot -- die Heilung darf den zweiten
+#     Exit-Zweig nicht mit entschaerft haben.
+# =============================================================================
+fall "F20 keine CSV, modus=provision_only -> trotzdem rc=1 (Zweig unveraendert)"
+D="$WERK/f20"; mkdir -p "$D/leerer_lauf"
+lauf "$D" 1 provision_only
+fordere_rc 1
+fordere_literal "$ERR" "0 CSV-Dateien"
 fall_ende
 
 # =============================================================================

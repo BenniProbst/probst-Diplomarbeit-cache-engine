@@ -30,16 +30,58 @@
 # die nur im Kopf existiert, wird unter Takt zuerst fallengelassen; deshalb steht
 # sie jetzt in einem Werkzeug, das beide Jobs aufrufen.
 #
+# DER MODUS (D3-1-Resthaelfte, 2026-08-09) -- "rot NUR bei modus=voll und Z==0":
+# Die Wache urteilte bis heute modus-BLIND. Das ist an genau einer Stelle falsch:
+# ein provision_only-Lauf MISST PER BAUART NICHTS. ce profile_run_entry.hpp:1234
+# setzt woertlich "provision_ok = a.provision_only && res.any_provisioned > 0"
+# und :1241 laesst den Lauf damit mit Exit 0 enden, obwohl measured==0 und die
+# CSV nur ihre Kopfzeile traegt. Diese Wache haette ihn getoetet -- ein richtiges
+# Messgeraet am falschen Gegenstand.
+#
+# WAS SICH AENDERT UND WAS AUSDRUECKLICH NICHT:
+#   GEAENDERT ist NUR der Datenzeilen-Zweig (Mindestzahl verfehlt). Er ist rot
+#     bei modus=voll und eine sichtbare WARNUNG bei modus=provision_only /
+#     prune_only. Die Sichtbarkeit bleibt in beiden Faellen -- Owner-KERN: "In
+#     der Wissenschaft geht nicht immer alles glatt, aber das muss SICHTBAR
+#     sein." Herabgestuft wird das URTEIL, nie die AUSGABE.
+#   NICHT GEAENDERT ist der Keine-CSV-Zweig (N_CSV==0). Er bleibt in JEDEM Modus
+#     rot. Begruendung, nicht Bequemlichkeit: auch der provision_only-Lauf
+#     schreibt seine CSV (profile_run_entry.hpp:1199/1228 werten csv_ok und
+#     spiegeln die Datei), und ein Lauf, der ueberhaupt keine Datei hinterlaesst,
+#     ist in keinem Modus ein gelungener Lauf. Wer diesen Zweig modus-abhaengig
+#     macht, baut eine Wache, die im falschen Modus gar nicht mehr beissen kann.
+#     AUSDRUECKLICH BENANNT: fuer modus=prune_only ist das zu scharf -- ein
+#     Prune-Lauf erzeugt keine CSV. Heute ruft ihn kein CI-Job (COMDARE_PRUNE_ONLY
+#     kommt in .gitlab-ci.yml und ci/ null Mal vor, gegengeprueft); wer ihn
+#     einfuehrt, ruft diese Wache NICHT, sondern nur ci/lauf_marker.sh.
+#
+# WOHER DER MODUS KOMMT -- 'auto' liest den Marker, nicht den Aufrufer:
+#   Ein Modus, den der CI-Aufrufer danebenlegt, ist eine BEHAUPTUNG ueber den
+#   Lauf. Der Marker (ci/lauf_marker.sh, D3-7) ZITIERT stattdessen die
+#   Abschluss-Zeile des Treibers. Deshalb ist 'auto' der Modus der Wahl in der
+#   CI, und ein fehlender Marker ist dort kein Rueckfall auf einen Default,
+#   sondern rc=2 -- kein Gruen ohne Pruefung.
+#   WIDERSPRECHEN sich mehrere Marker, gewinnt der SCHAERFSTE (voll). Ein
+#   provision_only-Marker neben einem voll-Marker darf das Gate nicht entwaffnen.
+#
 # AUFRUF:
-#   sh ci/mess_ausbeute_wache.sh <verzeichnis> [<mindest-datenzeilen>]
+#   sh ci/mess_ausbeute_wache.sh <verzeichnis> [<mindest-datenzeilen>] [<modus>]
 #
 #   <verzeichnis>          Wurzel, unter der rekursiv nach measurements.csv gesucht wird.
 #   <mindest-datenzeilen>  Optional. Summe der Datenzeilen ueber ALLE gefundenen CSVs,
 #                          die mindestens erreicht sein muss. Default 1.
+#   <modus>                Optional. voll | provision_only | prune_only | auto.
+#                          Default 'voll' -- der SCHAERFSTE. Ein Aufrufer, der den
+#                          Modus nicht nennt, bekommt exakt das Verhalten von vor
+#                          diesem Paket; die Heilung kann kein Gate versehentlich
+#                          entschaerfen.
 #
-# EXIT: 0 = es wurden Messwerte erzeugt (mit Nenner belegt)
-#       1 = keine CSV, oder keine einzige Datenzeile, oder Mindestzahl verfehlt
-#       2 = die Wache konnte nicht pruefen (Verzeichnis fehlt, Argument fehlt) --
+# EXIT: 0 = es wurden Messwerte erzeugt (mit Nenner belegt), oder der Modus misst
+#           per Bauart nicht und die Lage ist als WARNUNG sichtbar
+#       1 = keine CSV, oder (bei modus=voll) keine einzige Datenzeile bzw.
+#           Mindestzahl verfehlt
+#       2 = die Wache konnte nicht pruefen (Verzeichnis fehlt, Argument fehlt,
+#           unbekannter Modus, modus=auto ohne Lauf-Marker) --
 #           ausdruecklich KEIN Gruen: ein stiller Rueckfall waere derselbe Defekt.
 #
 # ZAEHLWEISE, ausdruecklich benannt:
@@ -56,9 +98,10 @@ set -eu
 
 WURZEL="${1:-}"
 MINDEST="${2:-1}"
+MODUS="${3:-voll}"
 
 if [ -z "$WURZEL" ]; then
-    echo "AUFRUF: sh ci/mess_ausbeute_wache.sh <verzeichnis> [<mindest-datenzeilen>]" >&2
+    echo "AUFRUF: sh ci/mess_ausbeute_wache.sh <verzeichnis> [<mindest-datenzeilen>] [<modus>]" >&2
     exit 2
 fi
 if [ ! -d "$WURZEL" ]; then
@@ -69,6 +112,16 @@ fi
 case "$MINDEST" in
     ''|*[!0-9]*) echo "ABBRUCH: '<mindest-datenzeilen>' muss eine Zahl sein, war '$MINDEST'." >&2; exit 2 ;;
 esac
+case "$MODUS" in
+    voll|provision_only|prune_only|auto) : ;;
+    *)
+        echo "ABBRUCH: unbekannter Modus '$MODUS'." >&2
+        echo "         Erlaubt: voll | provision_only | prune_only | auto." >&2
+        echo "         Ein unbekannter Modus wird NICHT auf einen Default zurueckgesetzt --" >&2
+        echo "         ein Tippfehler wuerde sonst still das Gate entschaerfen." >&2
+        exit 2
+        ;;
+esac
 
 TMP=$(mktemp) || exit 2
 trap 'rm -f "$TMP"' EXIT INT TERM
@@ -77,8 +130,57 @@ find "$WURZEL" -type f -name 'measurements.csv' > "$TMP" 2>/dev/null || true
 
 N_CSV=$(awk 'END{print NR+0}' "$TMP")
 
+# --- modus=auto: den Modus aus den Lauf-Markern LESEN, nicht behaupten -------
+# Der Marker zitiert die Abschluss-Zeile des Treibers (ci/lauf_marker.sh, D3-7).
+# Kein Marker => rc=2. Ein Rueckfall auf 'voll' waere zwar die scharfe Richtung,
+# aber er wuerde die FEHLENDE DECKUNG verschweigen -- und genau das Verschweigen
+# ist die Fehlerklasse dieses Pakets.
+MODUS_QUELLE="Aufrufer-Argument"
+if [ "$MODUS" = auto ]; then
+    MTMP=$(mktemp) || exit 2
+    trap 'rm -f "$TMP" "$MTMP"' EXIT INT TERM
+    find "$WURZEL" -type f -name 'LAUF_MARKER.txt' > "$MTMP" 2>/dev/null || true
+    N_MARKER=$(awk 'END{print NR+0}' "$MTMP")
+    if [ "$N_MARKER" -eq 0 ]; then
+        echo "ABBRUCH: modus=auto, aber unter '$WURZEL' liegt kein LAUF_MARKER.txt." >&2
+        echo "         Ohne Marker ist nicht entscheidbar, ob dieser Lauf messen SOLLTE." >&2
+        echo "         Zuerst 'sh ci/lauf_marker.sh schreiben <stdout-log> $WURZEL' fahren." >&2
+        echo "         Kein Gruen ohne Pruefung." >&2
+        exit 2
+    fi
+    # Der SCHAERFSTE gewinnt: ein einziger voll-Marker haelt das Gate scharf.
+    # KEIN `xargs awk` ueber die Liste: xargs zerlegt lange Listen in MEHRERE
+    # Aufrufe, und jeder druckt seine eigene Summe -- die Variable truege dann
+    # mehrere Zeilen und der Zahlenvergleich braeche. Schleife statt Trick.
+    N_VOLL=0
+    ERSTER_MODUS=''
+    while IFS= read -r MDAT; do
+        [ -n "$MDAT" ] || continue
+        MWERT=$(awk -F= '/^modus=/{print $2; exit}' "$MDAT" 2>/dev/null || true)
+        [ -n "$ERSTER_MODUS" ] || ERSTER_MODUS="$MWERT"
+        [ "$MWERT" = voll ] && N_VOLL=$((N_VOLL + 1))
+    done < "$MTMP"
+    if [ "$N_VOLL" -gt 0 ]; then
+        MODUS=voll
+    elif [ -n "$ERSTER_MODUS" ]; then
+        MODUS="$ERSTER_MODUS"
+    else
+        MODUS=voll
+    fi
+    case "$MODUS" in
+        voll|provision_only|prune_only) : ;;
+        *)
+            echo "ABBRUCH: die Lauf-Marker nennen den unbekannten Modus '$MODUS'." >&2
+            echo "         Ein unlesbarer Marker ist keine Erlaubnis -- kein Gruen." >&2
+            exit 2
+            ;;
+    esac
+    MODUS_QUELLE="$N_MARKER Lauf-Marker, $N_VOLL davon modus=voll (schaerfster gewinnt)"
+fi
+
 echo "-----------------------------------------------------------------------------"
 echo "MESS-AUSBEUTE-WACHE   Wurzel=$WURZEL   Mindest-Datenzeilen=$MINDEST"
+echo "                      Modus=$MODUS   (Quelle: $MODUS_QUELLE)"
 echo "-----------------------------------------------------------------------------"
 
 if [ "$N_CSV" -eq 0 ]; then
@@ -113,9 +215,25 @@ echo "  $SUMME Datenzeile(n) insgesamt, gefordert waren mindestens $MINDEST."
 echo "-----------------------------------------------------------------------------"
 
 if [ "$SUMME" -lt "$MINDEST" ]; then
-    echo "FEHLER: der Messlauf hat $SUMME Datenzeile(n) erzeugt, gefordert waren $MINDEST." >&2
-    echo "        Eine vorhandene Datei ist KEIN Messwert. Der Lauf gilt als gescheitert." >&2
-    exit 1
+    # D3-1-Resthaelfte: "rot NUR bei modus=voll und Z==0".
+    # Der Zweig ist EIN `exit 1`, nur unter einer Bedingung -- ausdruecklich kein
+    # zweiter Ausgang. Die AUSGABE ist in beiden Modi dieselbe Aussage; nur das
+    # URTEIL unterscheidet sich, und der Grund dafuer steht daneben.
+    echo "BEFUND: der Messlauf hat $SUMME Datenzeile(n) erzeugt, gefordert waren $MINDEST."
+    if [ "$MODUS" = voll ]; then
+        echo "FEHLER: der Messlauf hat $SUMME Datenzeile(n) erzeugt, gefordert waren $MINDEST." >&2
+        echo "        Eine vorhandene Datei ist KEIN Messwert. Der Lauf gilt als gescheitert." >&2
+        echo "        (modus=voll -- dieser Lauf SOLLTE messen.)" >&2
+        exit 1
+    fi
+    echo "WARNUNG: modus=$MODUS -- dieser Lauf misst per Bauart nicht."
+    echo "         ce profile_run_entry.hpp:1234/:1241: im provision_only-Lauf ist"
+    echo "         'mindestens eine DLL bereitgestellt' das Erfolgsmass, nicht die"
+    echo "         Datenzeile. $SUMME Datenzeile(n) sind hier ein BEFUND, kein Fehler."
+    echo "         Ob wirklich bereitgestellt wurde, entscheidet NICHT diese Wache:"
+    echo "         das Feld provisioned= steht im Lauf-Marker (ci/lauf_marker.sh)."
+    echo "MESS-AUSBEUTE-WACHE: OK ($SUMME Datenzeile(n), modus=$MODUS -- Warnung, kein Fehler)."
+    exit 0
 fi
 
 # Teil-Ausbeute ist kein Abbruch, aber sie muss SICHTBAR sein: eine leere CSV
