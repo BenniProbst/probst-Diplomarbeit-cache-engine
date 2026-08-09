@@ -27,25 +27,62 @@ sie tragen die Belege. Wer nur eine Antwort braucht, liest diesen Abschnitt.
 
 ---
 
-### DAS MUSTER
+### DAS MUSTER — VIER STATES, EIN FLAG (Owner-Richtigstellung, sie ersetzt meine erste Fassung)
+
+**Owner wörtlich:**
+
+> „Damit ist Debug auch eher **als Flag entkoppelt**, als dass es **als State gleichrangig einsortiert**
+> wird, denn es beeinflusst zwar die **Ausprägung** der States, aber **nicht ihr Verhalten der
+> Reihenfolge oder Abhängigkeiten**. Es ist also ein **CLI-Flag auf der Planer-Shell**, das aufgerufen
+> werden kann, um **Systemtests unter echten Bedingungen** zu laufen."
+
+~~*Erste Fassung (falsch, bleibt als Historie): „Fünf Begriffe, ein Typ" — `debug` als fünfter
+Enum-Wert mit `kRunMethodologyCount` 4 → 5.*~~ **Das war die falsche Modellierung**, und die
+Begründung des Owners ist das saubere Unterscheidungskriterium:
+
+    STATE  = hat Reihenfolge und Abhaengigkeiten im Automaten
+    FLAG   = veraendert die AUSPRAEGUNG eines States, nicht seine Stellung darin
+
+`debug` hat **keine Stellung in der Kette**. Es kommt nach nichts und vor nichts; es hat keine
+Vorbedingung und erfüllt keine. Wer es als fünften State führt, behauptet eine Ordnung, die es nicht
+gibt — und muss sie danach überall wegdefinieren („steht quer dazu"). **Das ist das Symptom einer
+falschen Modellierung, nicht ihr Preis.**
 
     work_mode  --  UNTER-Achse unter measurement_category
-                   STATE PATTERN; BESITZER ist der PLANER (Director), nicht die Mess-Schicht
+                   STATE PATTERN; BESITZER ist der PLANER (Director)
 
-    | Begriff  | Rolle                                          | Zulassung           |
-    |----------|------------------------------------------------|---------------------|
-    | build    | CEB-Bau orchestrieren                          | offen               |
-    | measure  | golden messen, 1-Thread/deterministisch        | offen               |
-    | compare  | Messwertlager LESEN, eigene Optionen           | offen               |
-    | release  | Lager lesen -> OPTIMALE Binary erzeugen        | offen               |
-    | debug    | Wartung: parallel bauen UND parallel messen    | **GESPERRT**        |
+    | State    | Rolle                                          |
+    |----------|------------------------------------------------|
+    | build    | CEB-Bau orchestrieren                          |
+    | measure  | golden messen, 1-Thread/deterministisch        |
+    | compare  | Messwertlager LESEN, eigene Optionen           |
+    | release  | Lager lesen -> OPTIMALE Binary erzeugen        |
 
     ABLAUF-ORDNUNG (kumulativ enthalten):  build -> measure -> compare -> release
-    debug steht QUER dazu -- kein Kettenglied, sondern ein Wartungszustand.
 
-**Fünf Begriffe, ein Typ.** Vier davon bilden die Kette, der fünfte ist Werkzeug. Das ist der Grund,
-warum sie zusammengehören und trotzdem nicht gleichrangig sind: `debug` ist **kein Abschluss-Modus**,
-er ist der Modus, in dem man die anderen vier baut und prüft.
+    --debug   CLI-FLAG auf der PLANER-SHELL, orthogonal zu allen vier States
+              wirkt auf die AUSPRAEGUNG (max. Threads, Jitter-Pruefer aus),
+              NIE auf Reihenfolge oder Abhaengigkeiten.  Fuer Anwender GESPERRT.
+
+**Die fünf Begriffe gehören weiterhin zusammen** — aber als **Vokabular einer Sache**, nicht als fünf
+gleichrangige Werte eines Enums. Vier sind Zustände, einer ist ein Schalter über ihnen.
+
+**Was das praktisch entscheidet — und es ist kein Formalismus:** ein Flag ist **mit jedem State
+kombinierbar**. `--debug` gilt für `build` genauso wie für `measure`; man kann einen Massen-Kettentest
+über den Bau **und** über den Mess-Weg fahren, ohne dafür einen eigenen Zustand zu erfinden. Als
+fünfter Enum-Wert wäre genau diese Kombination unausdrückbar gewesen: man wäre entweder *in* debug
+**oder** *in* measure — nie beides.
+
+**Und die ABI-Folge kehrt sich um.** Meine erste Fassung wollte `Build` ans Enum-Ende hängen, weil
+die Ordinale stempelrelevant sind. Richtig ist jetzt: **`Debug` verlässt das Enum** (heute Ordinal 0),
+`Build` tritt an seine Stelle in der Kette. Das verschiebt Ordinale und ist ein **echter, lauter
+Bruch** — vom Bestand vorbereitet (*„Drift einer 5. Methode bricht hier compile-time"*), aber jetzt
+aus dem anderen Grund: nicht weil eine dazukommt, sondern weil eine **an die falsche Stelle gebaut
+war**. Die Bau-Liste unten ist entsprechend korrigiert.
+
+**„Systemtests unter echten Bedingungen"** ist die Zweckformel, die den Rest bindet: *echt* sind die
+Binaries, die Kette, die Ablage, die Stationen — *unecht* ist allein die Messgenauigkeit. Genau
+deshalb darf das Flag alles beschleunigen und nichts umleiten.
 
 ### WARUM `debug` GESPERRT GEHÖRT — und es ist keine Bequemlichkeitsregel
 
@@ -142,20 +179,24 @@ gegen die constexpr-Registry — *„Single-Source = die Registry"* (`:147`), mi
 
 ### WAS ZU BAUEN IST — konsolidiert
 
-1. **`RunMethodology` um `Build` erweitern, ans ENDE des Enums.**
-   `{Debug, Measure, Release, Compare, Build}`, `kRunMethodologyCount` 4 → **5**.
-   **Ans Ende, nicht in Ablauf-Reihenfolge** — die Enum-Ordnung ist **stempel-/ABI-relevant**, und der
-   Header schreibt es selbst vor: *„Wer eine Ablauf-Ordnung braucht, leitet sie aus der
-   Enthaltungs-Ordnung ab, nicht aus dem Enum-Index."* Eine Umsortierung verschöbe alle Ordinale und
-   bräche den Stempel ohne Not.
+1. **`Debug` VERLÄSST das Enum, `Build` tritt ein.** Ziel: `{Build, Measure, Compare, Release}`,
+   `kWorkModeCount = 4` — vier States, eine Kette, keine Ausnahme im Typ.
+   **Das verschiebt Ordinale** (`Debug` steht heute auf 0) und ist ein **stempel-/ABI-relevanter,
+   lauter Bruch**. Er ist zulässig und gewollt: der Bestand hat ihn vorbereitet (*„Drift einer
+   5. Methode bricht hier compile-time"*), und er entsteht nicht aus einer Erweiterung, sondern weil
+   ein Wert **an der falschen Stelle** gebaut war. Migration ist ein eigenes Paket (Hausregel:
+   invalidieren ist gewollt, der Bruch muss laut sein).
 2. **Registry-Zeile** `{Build, "build", "Build", "Release", false, false}` — `measurement_on=false`.
-3. **Zulassung als eigenes Feld** je Modus (`AdmissionStatus`), nicht als Sonderfall im Parser.
-   `debug` → `Gesperrt`, die vier anderen → `Zugelassen`. Damit ist die Sperre **Daten**, nicht Logik,
-   und ein künftiger sechster Modus muss sich dazu erklären.
-4. **Zwei Zählungen, nicht eine:** `kRunMethodologyCount = 5` (Enum) **und**
-   `kOffizielleWorkModeCount = 4` (zugelassene). Eine einzige Zahl kann beides nicht ausdrücken —
-   „4 Modi" wäre wahr für die offiziellen und falsch für das Enum. Genau so entsteht sonst die Klasse
-   *Zahl ohne Nenner*.
+3. **`--debug` als CLI-Flag der PLANER-Shell**, orthogonal zu allen vier States und mit jedem
+   kombinierbar. Nicht als Enum-Wert, nicht als Profil-Feld neben dem State. Vorbild für die
+   CLI-Form ist `cache_engine --check-size "FILE"` (Owner-KERN 08.08.).
+4. **EINE Zählung genügt jetzt:** `kWorkModeCount = 4`. Die zweite Konstante der vorigen Fassung
+   (`kOffizielleWorkModeCount`) **entfällt ersatzlos** — sie war nur nötig, weil `debug` fälschlich
+   im Enum saß. *Eine falsche Modellierung erzeugt Zählungen, die eine richtige nicht braucht.*
+4b. **Die Zulassung hängt am FLAG, nicht am State.** `AdmissionStatus {Zugelassen, Gesperrt}`
+   (`axis_error.hpp:169-178`) bleibt die Form, aber sie bewertet, **ob `--debug` gesetzt werden
+   darf** — nicht, ob ein Zustand zulässig ist. Der fail-closed-Default („Unbekannt → gesperrt")
+   trägt unverändert.
 5. **`work_mode` als Unter-Achse unter `measurement_category`** emittieren; Vorbild ist der
    `sub_axis_label`-Mechanismus von `load_framework` („workload").
 6. **Der Zustandsautomat gehört in den PLANER — genau einmal, für beide Zweige.** Er ist gegenüber der
