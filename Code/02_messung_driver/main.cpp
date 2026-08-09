@@ -1414,11 +1414,11 @@ int main(int argc, char* argv[]) {
                     // G4b-1 (d1): die fuenf Bestandslog-Traeger. Bereits GEGATET (Doppel-Gate oben) -- ist das Gate
                     // aus, sind alle fuenf leer und bestandslog_active bleibt false => byte-neutral. NUR pa: der
                     // xa-Pfad (:962-964, comdare_experiment) bleibt in dieser Scheibe INERT (AUF-B2).
-                    pa.bestand_cache       = bestand_cache;
-                    pa.bestand_key_of      = bestand_key_of;
-                    pa.bestand_doc_key     = bestand_doc_key;
-                    pa.bestand_owner_uuid  = bestand_owner_uuid;
-                    pa.bestand_maschine    = bestand_maschine;
+                    pa.bestand_cache      = bestand_cache;
+                    pa.bestand_key_of     = bestand_key_of;
+                    pa.bestand_doc_key    = bestand_doc_key;
+                    pa.bestand_owner_uuid = bestand_owner_uuid;
+                    pa.bestand_maschine   = bestand_maschine;
                     // LAG-P2-Rest (Kette D): die zwei Traeger des Messwert-Genus. Ebenfalls bereits
                     // GEGATET -- ist das Gate aus oder der Mess-Doc-Key ungesetzt, sind beide leer und
                     // mess_bestandslog_active (iterator:2054-2056) bleibt false => byte-neutral.

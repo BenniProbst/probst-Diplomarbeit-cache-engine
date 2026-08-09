@@ -61,10 +61,10 @@ namespace comdare::diplomarbeit::messung_driver {
 
 /// Ausgang der Host-Belegung. Genau EINE Klasse je Aufruf; `aktiv` ist die einzige, die bindet.
 enum class MessBelegungKlasse {
-    aktiv,           // alles stimmig -> binden
-    aus,             // kein Mess-Doc-Key gesetzt -> Genus AUS. KEIN Fehler (inert-by-default).
-    maschine_leer,   // ABLEHNUNG: ohne Hardware-Identitaet sind zwei Maschinen ununterscheidbar
-    realm_kollision  // ABLEHNUNG: Mess- und Binary-Dokument sind dasselbe -> die Realms verschmelzen
+    aktiv,          // alles stimmig -> binden
+    aus,            // kein Mess-Doc-Key gesetzt -> Genus AUS. KEIN Fehler (inert-by-default).
+    maschine_leer,  // ABLEHNUNG: ohne Hardware-Identitaet sind zwei Maschinen ununterscheidbar
+    realm_kollision // ABLEHNUNG: Mess- und Binary-Dokument sind dasselbe -> die Realms verschmelzen
 };
 
 [[nodiscard]] constexpr std::string_view to_string(MessBelegungKlasse k) noexcept {
@@ -110,9 +110,8 @@ namespace detail {
 ///   2. Maschine leer      -> ABLEHNUNG maschine_leer
 ///   3. Mess == Binary     -> ABLEHNUNG realm_kollision
 ///   4. sonst              -> aktiv
-[[nodiscard]] MessBestandBelegung belege_mess_bestand(std::string_view maschine,
-                                                     std::string_view binary_doc_key,
-                                                     std::string_view mess_doc_key_roh);
+[[nodiscard]] MessBestandBelegung belege_mess_bestand(std::string_view maschine, std::string_view binary_doc_key,
+                                                      std::string_view mess_doc_key_roh);
 
 /// Der Schluessel-Binder des Messwert-Genus (ce bestandslog::make_messwert_key_fn).
 ///

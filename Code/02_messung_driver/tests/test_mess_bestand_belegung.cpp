@@ -64,15 +64,12 @@ static void check_eq(std::string_view ist, std::string_view soll, char const* ms
 }
 
 // -- Die frisch gewuerfelte Testbinary-Identitaet und die extern gerechneten Sollwerte -----------
-static constexpr char const* kFingerprint =
-    "b41bf4653e59791b0661eac9f871a19b192d4213bd0e036997a3eaa1044e7f02"
-    "d9c62f8621ecc394077d7276ca1b77c872aeb49faeec5605b89d39207966ac7d";
-static constexpr char const* kSollProd1 =
-    "9e3fea4dd36c05d3646f1e68205336d6353c19312beeb0c13797accf79f277ae"
-    "25b2a7ba75ccc566f7d30eb0d9295b95e163eac5e461c99e21c6d98ad8ae71f3";
-static constexpr char const* kSollProd2 =
-    "30b64719cdda16e2e6c10baf69d256be13954130cea619681f20aab5bc83f102"
-    "d613ac4eb1a4617f67da5677d37f7f4205722ea1fe2888e533407fea1df04f7d";
+static constexpr char const* kFingerprint = "b41bf4653e59791b0661eac9f871a19b192d4213bd0e036997a3eaa1044e7f02"
+                                            "d9c62f8621ecc394077d7276ca1b77c872aeb49faeec5605b89d39207966ac7d";
+static constexpr char const* kSollProd1   = "9e3fea4dd36c05d3646f1e68205336d6353c19312beeb0c13797accf79f277ae"
+                                            "25b2a7ba75ccc566f7d30eb0d9295b95e163eac5e461c99e21c6d98ad8ae71f3";
+static constexpr char const* kSollProd2   = "30b64719cdda16e2e6c10baf69d256be13954130cea619681f20aab5bc83f102"
+                                            "d613ac4eb1a4617f67da5677d37f7f4205722ea1fe2888e533407fea1df04f7d";
 
 // Der Doc-Key der BINARY-Seite, wie ci/comdare_bestandslog_activation.sh:128 ihn setzt.
 static constexpr char const* kBinaryDocKey = "bestandslog/binary_bestand.xml";
@@ -199,14 +196,14 @@ int main() {
 
     // (7) T-2 IM KERN: DIESER Wert fuer DIESE Maschine -- gegen das extern gerechnete Orakel.
     {
-        auto const  fn = md::make_mess_bestand_key_fn("prod1");
-        auto const  k  = fn(zelle);
+        auto const fn = md::make_mess_bestand_key_fn("prod1");
+        auto const k  = fn(zelle);
         check(k.has_value(), "prod1: Schluessel wird geliefert");
         if (k) check_eq(*k, kSollProd1, "prod1: Schluessel == extern gerechnetes Orakel (sha512sum)");
     }
     {
-        auto const  fn = md::make_mess_bestand_key_fn("prod2");
-        auto const  k  = fn(zelle);
+        auto const fn = md::make_mess_bestand_key_fn("prod2");
+        auto const k  = fn(zelle);
         check(k.has_value(), "prod2: Schluessel wird geliefert");
         if (k) check_eq(*k, kSollProd2, "prod2: Schluessel == extern gerechnetes Orakel (sha512sum)");
     }
