@@ -16,6 +16,88 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — Der Datenintegritäts-Alarm: widerlegt am Hauptweg, präzisiert am Nebenweg, und der Fix wurde bewusst NICHT gebaut
+
+**Gelandet:** `ce 9f92d49f` — `test_lagz1_lager_schluessel_simd.cpp`, 10 Fälle, drei Betriebsarten
+(WACHE / `--mutant` / `--selbstbiss`). **Kein Quelltext-Fix** — begründet, nicht unterlassen.
+
+### Wie geprüft wurde: den Emitter fahren statt Vorkommen zählen
+
+Die Verifikations-Stufe hat **nicht** `grep` gezählt, sondern eine Harness gegen
+`ExperimentPlanDirector` + `TierCiYamlBuilder` mit der echten `all_axes_golden.profile.xml`
+gebaut und **gefahren**: 475 Zeilen YAML, 16 Treiber-Aufrufe, **12 mit `COMDARE_GN_SIMD`**.
+
+Dann hat sie die emittierten Zeilen **wörtlich ausgeführt** (`sed -n '90,94p' tier.yaml`, kein
+Abschreiben) — mit einem Probe-Skript als `$DRIVER`, das seine eigene Umgebung druckt. **Der
+Treiber sieht die Variablen**, trotz `if !`-Guard, vier Zeilenfortsetzungen und
+Prozess-Substitution im Redirect.
+
+**Das ist der Unterschied zwischen „die Variable steht im Skript" und „der Prozess sieht sie".**
+
+### Der Register-Befund fällt am ersten Glied
+
+*„Kein Batch-Job setzt `COMDARE_GN_SIMD`"* ist **am emittierten Objekt widerlegt**: 12 von 16
+Treiber-Aufrufen tragen es als Kommando-Präfix, **je Perm** (nicht einmal je Batch — die YAML
+zeigt vier verschiedene Werte). Die vier ohne Präfix sind **PRUNE**-Aufrufe, und die erreichen den
+Leser nie: der Treiber zweigt bei `main.cpp:939` ab und kehrt bei `:969` zurück, **bevor** die
+Fassade läuft.
+
+### Was echt ist und der Register-Agent nicht angesehen hat
+
+**Die statischen super-Jobs.** `measure:golden-320` und `measure:smoke` rufen den Treiber **ohne
+jedes `COMDARE_GN_*`** (Gegenprobe: 0 Treffer im Job-Bereich, Positiv-Kontrolle 5). Sie erreichen
+den Leser mit **leerer Zelle**.
+
+**Aber die Folge ist eine andere als gemeldet.** Der Fix-Agent hat die Verifikation
+**gegengeprüft und ihr drittes Glied widerlegt**: sie hatte den **argumentlosen** Provider
+gemessen (`profile_run_entry.hpp:473`); der produktive ist **`:1094`, per Perm**. Damit trennt der
+Fingerprint sehr wohl — **es gibt keinen falschen SKIP, sondern Provenienz-Verlust**: die Einträge
+dieses Laufs tragen kein `[d,e,f]` und sind für die Director-emittierten Läufe unsichtbar.
+
+**Zwei Stufen haben sich gegenseitig korrigiert** — genau wozu die zweite Stufe da ist.
+
+### Warum der Fix bewusst nicht gebaut wurde
+
+Mein Auftrag schlug vor: *bestandslog scharf UND `bestand_zelle.empty()` ⇒ Fingerprint-Provider
+fallenlassen.* Der Agent hat das abgelehnt, und die Begründung ist richtig:
+
+> Sie hätte **jeden Lauf ohne `COMDARE_GN_OPT/SIMD` skip-unfähig** gemacht — also auch jedes
+> Profil **ohne `<system_axes>`**, das heute mit leerer Zelle **korrekt** dedupliziert.
+
+**Das ist die Überschärfe, vor der ich im selben Auftrag gewarnt hatte** — ein Schlüssel, der nie
+greift, macht jeden SKIP unmöglich. Der Agent hat den Widerspruch im eigenen Auftrag gefunden und
+die richtige Seite gewählt.
+
+### Was stattdessen entstand: eine Wache mit gefahrenem Rot-Beleg
+
+`--mutant` ersetzt den per-Perm-Provider durch den lauf-konstanten — **exakt der historische
+Rückfall**. Ergebnis: `rc=1`, **3 von 3** Trennungs-Fällen gerissen, **0 von 320** binary_ids
+getrennt, alle Fingerprints bit-identisch.
+
+**Beide Richtungen geprüft:** drei Fälle verlangen **verschiedene** Schlüssel bei verschiedener
+SIMD-Stufe (einer über **alle 320** binary_ids), drei verlangen **gleiche** bei gleicher Stufe.
+Ein immer verschiedener Schlüssel fällt damit ebenso durch wie ein immer gleicher.
+
+**Überschärfe ausgeschlossen:** fünf Wiederholungen im Prozess (5/5 gleich) und zwei **getrennte
+Prozessläufe** byte-gleich (`diff` rc=0) — kein Zeit-, PID- oder Hostname-Anteil im Schlüssel.
+
+**T-7 erfüllt:** beide Einträge in `ctest -N` (#409, #410), Inventur **463 → 465**, die
+Abdeckungs-Wache meldet **465 von 465** — die Tests fallen unter `test_unit`, die Wache fährt
+also wirklich.
+
+**Und die Staging-Kontrolle vor dem Commit** — `git diff --cached --name-only | wc -l` = **2**,
+ausschließlich eigene Dateien. Die Regel von heute Morgen hat gegriffen.
+
+### Drei Restpunkte, sauber benannt
+
+1. **ZWEI PARSES, EINE ENTSCHEIDUNG.** `profile_run_facade.cpp:605` und
+   `profile_run_entry.hpp:948` lesen **dasselbe Profil zweimal** und müssen dasselbe sagen.
+   **Driften sie, läuft die Perm-Schleife ohne `compile_for_perm`** — und dann ist die Kollision
+   echt. Eigenes Paket.
+2. **Ob eine GitLab-Gruppen-/Projekt-Variable `COMDARE_BESTANDSLOG` setzt, ist aus dem Repo nicht
+   entscheidbar.** Der Agent hat die API nicht abgefragt und sagt das ausdrücklich.
+3. **Die Wache liegt in `wt-ce-xml`, nicht im ce-Stand, den super eingebunden hat** — bis zum
+   Vendoring-Nachzug fährt LAG-Z1 nur in der ce-Pipeline.
 ## NACHTRAG 09.08.2026 — CI-Heilung gelandet, und zwei Bauer melden dieselbe Sorte Lücke an der eigenen Arbeit
 
 **Gelandet:** `super 80538ef1` (CI-Heilung) · `super 2610687e` (Mess-Ausbeute-Bissprobe, Strang 4
