@@ -563,3 +563,59 @@ eine echte fehlende Abhängigkeitskante, die je nach Ninja-Scheduling zuschlägt
 CALL …)`, damit die Kante läuft, wenn **alle** Ziele existieren — und automatisch für jedes
 Überprojekt gilt, nicht nur für super. Der Kommentar an Ort und Stelle begründet bereits, warum
 eine gepflegte Namensliste falsch wäre; die Doktrin bleibt also erhalten.
+
+---
+
+# TEIL XI — DIE GENUS-SCHICHTUNG (Owner-Praezisierung 09.08. abends)
+
+**Auslöser:** ich hatte Gattung und Genus als „zwei getrennte Achsen" bezeichnet. Der Owner hat
+das in vier Sätzen richtiggestellt, und die Korrektur reicht tiefer als eine Begriffsfrage.
+
+## XI.1 Die Schichtung, vollständig
+
+    GATTUNG                Kerninterface -- alle ihre Genus teilen es
+       |                   (wie die C++-Standardcontainer ein gemeinsames Interface teilen)
+    GENUS                  erbt das Kerninterface + eigene SPEZIAL-Funktionen
+       |                   >>> DAS sieht das PRUEFDOCK DER CEB <<<
+    GENUS_impl             ABSTRACT FACTORY -- eigene Datei
+       |
+    je Funktion EINE       jede traegt EINEN Hauptalgorithmus
+    separate Klasse
+       |
+    Achsen-Interfaces      der Hauptalgorithmus stuetzt sich AUSSCHLIESSLICH auf sie;
+                           sie duerfen REKURSIV und quer zu anderen Gattung+Genus aufrufen
+
+**Und die Gleichung, die alles adressierbar macht:** Gattung + Genus werden als **einzelnes
+Genus-Binary** kompiliert, und dieses ist **exakt ein Tier-Binary**. 1:1, keine Aufteilung.
+
+## XI.2 Was daraus folgt — vier Punkte, die den Bau berühren
+
+**Der Hauptalgorithmus rechnet nicht, er orchestriert.** *„Ausschließlich durch Achsen-Interface-
+Aufrufe gestützt"* heißt: jede Rechenleistung liegt in einer **Achse**, der Algorithmus verbindet
+sie nur. Das ist der Grund, warum die Achsen überhaupt messbar sind — sie sind die einzige Stelle,
+an der Arbeit stattfindet.
+
+**Der Aufrufgraph ist ein Netz, kein Baum.** Achsen-Aufrufe dürfen sich rekursiv und **quer zu
+anderen Gattung+Genus** aufrufen. Wer Kombinatorik über Achsen rechnet, darf nicht annehmen, dass
+ein Genus nur „seine eigenen" Achsen berührt.
+
+**Das Genus-Interface ist die ABI-Fläche zur CEB.** Das Prüfdock sieht **es** — nicht die `_impl`,
+nicht die Funktionsklassen, nicht die Achsen darunter. Alles, was die CEB braucht, muss
+**metaprogrammiert an dieser Fläche** bereitstehen, nicht zur Laufzeit nachgereicht werden.
+
+**Die Lager-Adresse ist damit vollständig.** Weil Gattung+Genus genau ein Binary ergeben, gibt es
+unterhalb nichts mehr zu unterscheiden — `gattung=<token>/genus=<token>` adressiert eindeutig. Das
+erklärt, warum `lager_baum_writer.hpp` beide Ebenen als Wurzelpaar führt, und warum ein Genus
+**ohne** Lager-Token nicht einsortierbar ist (WACHE 4).
+
+## XI.3 Die Falle, in die ich gelaufen bin
+
+Ich hatte aus „zwei Achsen" kombinatorische Schlüsse gezogen — an einer Stelle, an der eine
+**Vererbungsbeziehung** steht. Die Achsen liegen erst **unter** der `_impl`, im Hauptalgorithmus.
+Wer die Ebenen für Achsen hält, sucht Kombinatorik dort, wo Hierarchie ist.
+
+**Was von der WACHE-3-Messung unberührt bleibt:** die Zahlen. Sie permutiert `for a=0..255 ×
+for b=a+1..255` = **32.640 Paare**, real sind es **4 Gattungen (6 Paare) + 6 Genera (15) = 21**,
+Faktor **1.554**. Die Ursache ist nicht „zwei Achsen im selben Iterationsraum", sondern schlichter:
+**der volle `uint8`-Raum wird permutiert statt der tatsächlich existierenden Enumeratoren**, und
+die Orakel werden je Paar neu gerufen statt einmal eingesammelt.
