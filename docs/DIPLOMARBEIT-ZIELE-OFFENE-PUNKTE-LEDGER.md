@@ -16,6 +16,88 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — CI-Heilung gelandet, und zwei Bauer melden dieselbe Sorte Lücke an der eigenen Arbeit
+
+**Gelandet:** `super 80538ef1` (CI-Heilung) · `super 2610687e` (Mess-Ausbeute-Bissprobe, Strang 4
+nach 11 h Laufzeit).
+
+### Was `80538ef1` behebt
+
+Die beiden Mess-Jobs trugen **beide** Fallen des Anhang-Kerns als Kopie: `wc -l` als
+Leerheitsprüfung (verwirft die eine Datenzeile ohne Schluss-Newline) und die Konkatenation ohne
+`awk 1` (verklebt zwei Datenzeilen zu einer). Beide geheilt, `wc -l < "$WIDE"` kommt jetzt
+**0-mal** vor (vorher 2-mal). Und die P4-Probe ist **verdrahtet**: Nennungen vorher **0**, nachher
+**1**.
+
+**Die gemessene Wirkung des Defekts, nicht seine Beschreibung:** bei zwei Permutationen lieferte
+das Aggregat **2 Zeilen, wo 3 stehen müssen** (Kopf + 2 Daten). Bei einer Permutation zählte
+`wc -l` **1** gegen `awk NR` **2**. Beim Header-Dieb: **1 Zeile ohne Kopf**, wo 2 mit Kopf
+stehen müssen. Acht Rot-Läufe gegen HEAD, zehn Grün-Läufe gegen den geheilten Stand.
+
+### Ein Detail, das zeigt, wie genau hier gearbeitet wurde
+
+Der Bauer hat seinen **eigenen Kommentar** so umformuliert, dass er den Aufrufpfad **nicht
+literal** enthält. Begründung: Fall A7 der Probe zählt mit `grep -cF` über die **ganze** Datei und
+zählt Kommentare mit — stünde der Pfad auch im Kommentar, bliebe A7 **grün, wenn jemand den Job
+löscht und den Kommentar stehen lässt**. Der Zähler trifft jetzt genau die eine echte Aufrufzeile.
+
+**Das ist die Nenner-Doktrin, angewandt auf das eigene Werkzeug.**
+
+### Die wichtigste Lücke — vom Bauer selbst gemeldet
+
+> „Ich habe einen Defekt geheilt und die Heilung **ungedeckt** gelassen. Der Anhang-Kern hat seine
+> Probe (10 Fälle, 6 Mutanten); die zwei **Kopien** derselben Logik in den Mess-Jobs haben nichts.
+> Ein Mutant, der `| awk 1` in `.gitlab-ci.yml` wieder entfernt, würde heute von nichts gefangen.
+> **Das ist exakt die Fehlerklasse dieses Pakets, eine Ebene höher.**"
+
+Sein Vorschlag ist der richtige: **die drei Stellen in EIN Skript ziehen** (`ci/wide_aggregat.sh`),
+das Mess-Jobs und Kern gemeinsam rufen — dann deckt die bestehende Probe **alle drei**. Solange
+drei Kopien existieren, deckt jede Probe nur eine davon. Als eigenes Paket eingereiht.
+
+**Und eine Zirkularität, die er sauber benennt:** wird der Proben-Job selbst gelöscht, läuft die
+Probe nicht mehr und **kann ihre eigene Abwesenheit nicht melden**. Das ist bauartbedingt und nur
+durch eine **zweite, unabhängige** Wache auflösbar — eine Registrierungs-Wache über alle
+`ci/tests/*.sh` gegen die `.gitlab-ci.yml`.
+
+### Der Befund aus Strang 4, der die Köder-Doktrin verfeinert
+
+Die Mess-Ausbeute-Wache hat zwei `exit 1`-Zweige. **Bei `MINDEST >= 1` ist der erste überhaupt
+nicht beobachtbar** — entfernt man ihn, läuft die Wache durch, fällt eine Zeile später am
+Mindest-Vergleich und liefert **denselben rc=1**. Ein Mutations-Test, der diese Zeile entfernt,
+**bleibt grün**.
+
+**Der von mir vorgeschlagene Biss-Zweig hätte also die halbe Wache stillschweigend nicht
+gedeckt.** Sichtbar wird der Zweig erst bei `MINDEST = 0`, wo „keine CSV" ein **eigener**
+Fehlergrund ist. Der Agent hat den Fall ergänzt — er ist der **einzige**, der diesen Mutanten
+tötet.
+
+**Die Regel daraus, jetzt im Memory:** bevor ein Mutations-Köder als Beleg gilt, prüfe, ob der
+mutierte Zweig überhaupt **beobachtbar** ist. Prüffrage: *gibt es einen Eingang, bei dem sich das
+Verhalten mit und ohne diesen Zweig unterscheidet — im rc oder in der Ausgabe?* Gibt es ihn nicht,
+ist der Zweig redundant **oder** der Testfall fehlt. **Ein Mutant, der stirbt, weil eine andere
+Zeile ihn fängt, beweist das Gegenteil dessen, was er belegen soll.**
+
+### D3-2: der Wellenplan widersprach sich selbst
+
+Zeile 306 behauptete „`== 0` (heute 2)", der Nachtrag weiter unten sagte „bereits gelandet".
+**Am Objekt geprüft: 0 Treffer, Gegenprobe `find` = 22** ⇒ das Werkzeug sucht, das Muster ist weg.
+Die Tabelle war die veraltete Fassung, sie ist korrigiert.
+
+**Die Lehre ist teurer als der Posten:** eine Abnahme `== 0` ist **ohne Gegenprobe wertlos**.
+Literal belegt an einem Objekt mit **2 echten** Vorkommen: `grep -cF` → 2, `grep -c` ohne `-F` →
+**stille 0 mit rc=1**. Die Abnahme ist jetzt als Fall F10 dauerhaft bewacht, mit **gewürfeltem**
+Köder je Lauf.
+
+### Was offen bleibt
+
+- **Kein Push, keine echte Pipeline** (GitLab-500). Der neue Job ist nie in GitLab gelaufen.
+  Belegt ist: YAML parst, Job-Form maschinell identisch zur bereits verdrahteten Schwester,
+  Skript lokal `rc=0`. **Nicht belegt:** dass ein Runner ihn aufnimmt.
+- **Die Mess-Jobs sind selbst inert-by-default** — die geheilten Blöcke laufen in einer normalen
+  Pipeline nicht.
+- **`A7` kann Kommentar nicht von Aufruf unterscheiden** (vorbestehend, für den Probe-Pfad gelöst,
+  für den Kern-Pfad nicht).
+- **Vier von fünf CI-gerufenen Wachen haben weiterhin keinen Selbsttest.**
 ## NACHTRAG 09.08.2026 — Der Anhang-Kanal hatte VIER Fallen, nicht zwei. Und CI und Kern suchten verschiedene Dateien.
 
 **Gelandet:** `d7b779f7` (P5, xlsx im Sammler) · `6d2e3dce` (P4, drei Fallen) · `652083d1`
