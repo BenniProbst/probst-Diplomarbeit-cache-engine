@@ -148,9 +148,10 @@ else
     # auseinanderlaeuft, wenn hier jemand den Namen aendert.
     #
     # DER NAME MUSS SICH VOM BINARY-DOC-KEY UNTERSCHEIDEN. Sind beide gleich,
-    # bricht der Treiber mit fehlerklasse=realm_kollision ab (exit 6) -- lieber
-    # ein lauter Abbruch als zwei Realms, die still in dasselbe Dokument
-    # schreiben.
+    # bricht der Treiber mit fehlerklasse=realm_kollision ab (exit 8; eigener
+    # rc seit dem Gegenlesen 09.08., damit er das Doppel-Gate exit 6 nicht
+    # verdeckt) -- lieber ein lauter Abbruch als zwei Realms, die still in
+    # dasselbe Dokument schreiben.
     if [ -z "${COMDARE_BESTANDSLOG_MESS_DOC_KEY:-}" ]; then
         COMDARE_BESTANDSLOG_MESS_DOC_KEY="bestandslog/mess_bestand.xml"
         export COMDARE_BESTANDSLOG_MESS_DOC_KEY

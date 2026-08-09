@@ -165,6 +165,16 @@ int main() {
         auto const b = md::belege_mess_bestand("", kBinaryDocKey, "");
         check(b.klasse == K::aus, "nichts verlangt + keine Maschine -> aus (keine Ablehnung)");
     }
+    // (4c) 'maschine_leer' schlaegt 'realm_kollision' (Gegenlesen 09.08., B3): der Header
+    //      erklaert die Reihenfolge 2-vor-3 zum Vertrag, und dieser Eingang ist der EINZIGE,
+    //      der die beiden Pruefungen trennt -- Maschine leer UND Realm-Kollision zugleich.
+    //      Ohne ihn ueberlebt der Tausch von (2) und (3) jede Zusicherung dieses Gates
+    //      (Mutant M-B, am Objekt nachgemessen: 37 Zusicherungen, 0 gerissen).
+    {
+        auto const b = md::belege_mess_bestand("", kBinaryDocKey, kBinaryDocKey);
+        check(b.klasse == K::maschine_leer,
+              "Maschine leer UND Mess==Binary -> maschine_leer (Vertrag: Pruefung 2 VOR 3)");
+    }
 
     // (5) Randweiss am Doc-Key wird abgeschnitten -- der gebundene Wert ist der getrimmte.
     {

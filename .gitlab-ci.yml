@@ -1113,13 +1113,29 @@ thesis:pdf:
 #    abzubrechen. Diese Wache laeuft DANACH und bewertet nur, ob der Lauf koordiniert war. Ein Lauf, der mit
 #    COMDARE_BESTANDSLOG=true startet und ohne Lager endet, ist genau der Fall, der ohne Wache erst nach zwei
 #    Tagen Messkampagne auffaellt. Ist das Opt-in nicht gesetzt, prueft sie nichts und sagt das.
+#    MESSWERT-Genus (Kette D, 09.08.2026): Jobs, in denen der TREIBER laeuft (und nur die -- der Planer
+#    traegt das Messwert-Genus nicht), setzen COMDARE_BESTANDSLOG_WACHE_MESS="true". Dann fordert die Wache
+#    zusaetzlich die verdrahtet-Zeile des Messwert-Genus (5. Argument). Abnahmekriterium des Gegenlesens:
+#    werden die zwei pa.mess_bestand_*-Zuweisungen im Treiber gestrichen, wird dieses Gate ROT -- vorher
+#    blieb jedes Gate gruen (B1: die Wache sah nur die Entscheidung, nie die Verdrahtung).
 .bestandslog_wache:
   script:
     - |
       if [ "${COMDARE_BESTANDSLOG:-}" = "true" ]; then
-        sh "$CI_PROJECT_DIR/ci/bestandslog_wache.sh" \
-           "${COMDARE_BESTANDSLOG_LOG:-$CI_PROJECT_DIR/bestandslog-lauf.log}" \
-           "$COMDARE_BESTANDSLOG_DOC_KEY" "$COMDARE_BESTANDSLOG_OWNER_UUID" "$COMDARE_BESTANDSLOG_MASCHINE"
+        _bl_log="${COMDARE_BESTANDSLOG_LOG:-$CI_PROJECT_DIR/bestandslog-lauf.log}"
+        if [ "${COMDARE_BESTANDSLOG_WACHE_MESS:-}" = "true" ]; then
+          if [ -z "${COMDARE_BESTANDSLOG_MESS_DOC_KEY:-}" ]; then
+            echo "FEHLER: COMDARE_BESTANDSLOG_WACHE_MESS=true, aber COMDARE_BESTANDSLOG_MESS_DOC_KEY ist leer." >&2
+            echo "        Kein Gruen ohne Pruefung (die Aktivierung haette den Default setzen muessen)." >&2
+            exit 2
+          fi
+          sh "$CI_PROJECT_DIR/ci/bestandslog_wache.sh" "$_bl_log" \
+             "$COMDARE_BESTANDSLOG_DOC_KEY" "$COMDARE_BESTANDSLOG_OWNER_UUID" "$COMDARE_BESTANDSLOG_MASCHINE" \
+             "$COMDARE_BESTANDSLOG_MESS_DOC_KEY"
+        else
+          sh "$CI_PROJECT_DIR/ci/bestandslog_wache.sh" "$_bl_log" \
+             "$COMDARE_BESTANDSLOG_DOC_KEY" "$COMDARE_BESTANDSLOG_OWNER_UUID" "$COMDARE_BESTANDSLOG_MASCHINE"
+        fi
       else
         echo "== Bestandslog-Wache: Opt-in nicht gesetzt -> nichts zu pruefen (inert-by-default) =="
       fi
@@ -1159,6 +1175,7 @@ measure:smoke:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
     COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/thesis_profiles/m3_smoke_coverage.profile.xml"
+    COMDARE_BESTANDSLOG_WACHE_MESS: "true"   # Kette D: hier laeuft der TREIBER -> die Wache fordert die messwert-genus-verdrahtet-Zeile
   needs: [{job: "verify:submodules", optional: true}]  # #53: docs-only-DAG-sicher
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
@@ -1282,6 +1299,7 @@ measure:golden-320:
   timeout: 10 days                  # mehrtaegiger Voll-Messlauf (#156); < Projekt-build_timeout-Ceiling (14 d, auf 288 gesetzt)
   variables:
     GIT_SUBMODULE_STRATEGY: recursive    # (REV 16, path a) nativer CI_JOB_TOKEN-Submodul-Fetch (ce fuer Treiber/Profil)
+    COMDARE_BESTANDSLOG_WACHE_MESS: "true"   # Kette D: hier laeuft der TREIBER -> die Wache fordert die messwert-genus-verdrahtet-Zeile
   needs:
     - job: "verify:submodules"
       optional: true               # #53/R3 (2026-07-22): docs-only-DAG-sicher (analog measure:smoke); haelt die
@@ -1757,9 +1775,13 @@ planer:delegate:
       PLANER_RC=$?
       set -e
       cat "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2
-      # Exit 6 = Bestandslog-Gate-Abbruch (konfiguration_unvollstaendig). Er wird hier NICHT geschluckt:
-      # ein Planer, der ohne vollstaendige Lager-Identitaet emittiert, produziert Jobs, die sich spaeter
-      # nicht zuordnen lassen.
+      # Exit 6 = Bestandslog-Gate-Abbruch (konfiguration_unvollstaendig) -- beim Planer wie beim Treiber
+      # traegt exit 6 GENAU diese eine Klasse. Die weiteren Treiber-rcs (hier nur Doku, der Planer kennt
+      # sie nicht): 7 = Lane-Wache (Vendor-Fehlrouting), 8 = Messwert-Genus-Ablehnung (realm_kollision
+      # bzw. maschine_leer; getrennt an der fehlerklasse=-Zeile). Kette D, 09.08.2026: vorher gab der
+      # Treiber die Genus-Ablehnung ebenfalls als 6 -- zwei Zweige mit demselben rc, der aeltere davon
+      # nicht mehr beobachtbar. Er wird hier NICHT geschluckt: ein Planer, der ohne vollstaendige
+      # Lager-Identitaet emittiert, produziert Jobs, die sich spaeter nicht zuordnen lassen.
       test "$PLANER_RC" -eq 0 || { echo "planer 'plan ci' endete mit rc=$PLANER_RC"; exit "$PLANER_RC"; }
       echo "== CE-emittierte STUFE-1-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
       echo "== STUFE-1 CEB-Bau-Jobs (je Mess-Kombination): $(grep -c '# JOB ceb-build combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="

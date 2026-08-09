@@ -1122,6 +1122,7 @@ int main(int argc, char* argv[]) {
                 // das Lager fuehrte Binaries, aber keine Messungen.
                 std::function<std::optional<std::string>(std::filesystem::path const&)> mess_bestand_key_of;
                 std::string                                                             mess_bestand_doc_key;
+                std::string                                                             mess_bestand_maschine;
                 // Das Opt-in EINMAL lesen -- es entscheidet ueber beide Zweige: erfuellt zusammen mit minio_enabled()
                 // das Gate, und traegt allein die Sichtbarkeits-Warnung. Die zweite Gate-Bedingung ist
                 // minio_enabled(), NICHT !inert() (s.o.).
@@ -1181,9 +1182,15 @@ int main(int argc, char* argv[]) {
                     // FEHLERKLASSE realm_kollision: zeigen Mess- und Binary-Doc-Key auf DASSELBE
                     // Dokument, verschmelzen die beiden Realms still -- der Mess-Flush schriebe in das
                     // Binary-Dokument. Das ist derselbe Halb-Zustand, den das Doppel-Gate oben mit
-                    // exit 6 verhindert (Log an, aber falsches Ziel), und wird genauso behandelt.
-                    // Der rc ist derselbe wie oben; UNTERSCHEIDBAR sind die Zweige an der Fehlerklasse
-                    // in der Zeile -- ein gleicher rc allein waere nicht beobachtbar.
+                    // exit 6 verhindert (Log an, aber falsches Ziel).
+                    // EIGENER rc 8 (Gegenlesen 09.08., B4): das Doppel-Gate oben gibt 6, und weil
+                    // COMDARE_BESTANDSLOG_MESS_DOC_KEY per Default gesetzt ist, wuerde dieser Zweig
+                    // mit demselben rc jeden Mutanten verdecken, der den maschine.empty()-Arm oben
+                    // streicht -- ein exit-Zweig, den ein spaeterer mit demselben rc abfaengt, ist
+                    // nicht beobachtbar. rc-Vergabe im Treiber: 6 = konfiguration_unvollstaendig
+                    // (Doppel-Gate oben), 7 = Lane-Wache (s. check_lane_vendor), 8 = DIESE Ablehnung
+                    // (realm_kollision/maschine_leer; die zwei Klassen trennt die fehlerklasse=-Zeile,
+                    // deren Etiketten das Unit-Gate test_mess_bestand_belegung pinnt).
                     namespace md = comdare::diplomarbeit::messung_driver;
                     auto const mess_belegung =
                         md::belege_mess_bestand(maschine, doc_key, env_trimmed("COMDARE_BESTANDSLOG_MESS_DOC_KEY"));
@@ -1192,17 +1199,20 @@ int main(int argc, char* argv[]) {
                                   << ": die Belegung des Messwert-Genus widerspricht sich"
                                   << " (COMDARE_BESTANDSLOG_MESS_DOC_KEY gegen COMDARE_BESTANDSLOG_DOC_KEY"
                                   << "/_MASCHINE) -- Abbruch.\n";
-                        return 6;
+                        return 8;
                     }
                     if (mess_belegung.aktiv()) {
-                        mess_bestand_key_of  = md::make_mess_bestand_key_fn(mess_belegung.maschine);
-                        mess_bestand_doc_key = mess_belegung.doc_key;
-                        // SELBSTCHECK: diese Zeile sichert zu, dass das ZWEITE Genus belegt ist und mit
-                        // WELCHEM Dokument. Sie sichert NICHT zu, dass Messwerte darin landen -- das
-                        // sagt erst der Abschluss ("[bestandslog] messwert-lager=... neu=...").
-                        std::cerr << "[bestandslog] messwert-genus aktiv: doc_key=" << mess_bestand_doc_key
-                                  << " maschine=" << mess_belegung.maschine
-                                  << " key_of=messwert_key(.fingerprint,maschine) (LAG-P2)\n";
+                        mess_bestand_key_of   = md::make_mess_bestand_key_fn(mess_belegung.maschine);
+                        mess_bestand_doc_key  = mess_belegung.doc_key;
+                        mess_bestand_maschine = mess_belegung.maschine;
+                        // KEINE aktiv-Zeile mehr an dieser Stelle (Gegenlesen 09.08., B1+B2): die
+                        // Meldung des Messwert-Genus faellt an der VERDRAHTUNGS-Stelle (pa.mess_
+                        // bestand_*-Zuweisungen, unten im E4-Block) und liest die Werte aus dem
+                        // Fassaden-Argument ZURUECK. Eine Zeile HIER waere ein Stellvertreter: sie
+                        // meldete die Entscheidung, nicht die Verdrahtung -- die zwei Zuweisungen
+                        // liessen sich streichen und jedes Gate bliebe gruen. Und ihr Feld "aktiv:"
+                        // fiel in den Binary-Nenner von ci/bestandslog_wache.sh (Kronzeugen-Rauschen
+                        // im Drift-Fall).
                     } else {
                         // Inert-by-default: das Binary-Genus laeuft, das Messwert-Genus nicht. EINE Zeile,
                         // damit ein dauerhaft leeres Messwert-Lager nicht erst nach der Kampagne auffaellt.
@@ -1418,6 +1428,22 @@ int main(int argc, char* argv[]) {
                     // NUR pa, wie die fuenf darueber: der xa-Pfad bleibt INERT (AUF-B2).
                     pa.mess_bestand_key_of  = mess_bestand_key_of;
                     pa.mess_bestand_doc_key = mess_bestand_doc_key;
+                    // SELBSTCHECK (Gegenlesen 09.08., B1): diese Zeile sichert zu, dass das Messwert-
+                    // Genus an der Fassade VERDRAHTET ist, und mit welchem Dokument. doc_key und
+                    // gebunden werden aus pa ZURUECKGELESEN, nicht aus den Host-Variablen: fallen die
+                    // zwei Zuweisungen daruber weg, meldet die Zeile doc_key= (leer) bzw. gebunden=0,
+                    // und ci/bestandslog_wache.sh (5. Argument, in den Mess-Jobs gefordert) wird rot.
+                    // Sie sichert NICHT zu, dass Messwerte im Dokument landen -- das sagt erst der
+                    // Abschluss ("[bestandslog] messwert-lager=... neu=..."). KEIN Feld "aktiv:" in
+                    // dieser Zeile (B2): das ist das Schluessel-Token des BINARY-Nenners der Wache.
+                    // maschine stammt aus der Host-Entscheidung -- dieselbe Identitaet, die oben in
+                    // make_mess_bestand_key_fn eingebrannt wurde; aus pa ist sie nicht zuruecklesbar
+                    // (sie steckt im key_of-Funktor). gebunden=1 deckt genau diese Bindung.
+                    if (!mess_bestand_doc_key.empty())
+                        std::cerr << "[bestandslog] messwert-genus verdrahtet: doc_key=" << pa.mess_bestand_doc_key
+                                  << " maschine=" << mess_bestand_maschine
+                                  << " gebunden=" << (pa.mess_bestand_key_of ? "1" : "0")
+                                  << " key_of=messwert_key(.fingerprint,maschine) (LAG-P2)\n";
                     pa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
                     pa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
                     pa.progress_sink =
