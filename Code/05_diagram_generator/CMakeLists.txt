@@ -20,6 +20,9 @@ target_include_directories(comdare_diagram_generator PUBLIC
 # Boost::mp11: header-only Interface-Target des eingebetteten CE-Subprojekts (boost_mp11_setup.cmake) —
 # axis_path_serialization.hpp inkludiert <boost/mp11.hpp>; PUBLIC wegen Header-Transitivitaet.
 target_link_libraries(comdare_diagram_generator PUBLIC comdare::csv_to_latex Boost::mp11)
+# D5-2 (2026-08-09): Median aus dem ce-KANON statt aus der lokalen Abschrift der Abschrift.
+# PRIVATE: percentile_canon.hpp wird nur in diagram_generator.cpp eingebunden. Header-only.
+target_link_libraries(comdare_diagram_generator PRIVATE comdare::percentile_canon)
 add_library(comdare::diagram_generator ALIAS comdare_diagram_generator)
 
 add_executable(diagram_generator_cli main_cli.cpp)

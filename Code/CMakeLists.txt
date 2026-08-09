@@ -298,6 +298,9 @@ endif()
 # ─────────────────────────────────────────────────────────────────────────────
 # V41.E10.3-E10.5 (2026-05-31) - STATIC/SHARED-Linkage-Achse pro Untermodul (COMDARE_DA_<Mxx>_BUILD_SHARED)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/comdare_da_add_library.cmake)
+# D5-2 (2026-08-09): geteilte header-only Bausteine ZUERST -- 04/05 haengen am
+# ALIAS comdare::percentile_canon, und ein ALIAS muss vor seiner Nutzung existieren.
+add_subdirectory(common)                     # Perzentil-KANON (ruft ce latency_stats.hpp)
 # V35.A.2 (2026-05-22) - Pipeline-Module nach XX_operation/ Konvention
 add_subdirectory(01_sample_data_generator)  # Helper: synthetische Test-Daten
 add_subdirectory(02_messung_driver)          # echte Messung via V32Orchestrator

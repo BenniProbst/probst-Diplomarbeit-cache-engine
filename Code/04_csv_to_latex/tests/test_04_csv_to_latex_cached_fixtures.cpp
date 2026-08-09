@@ -193,7 +193,8 @@ TEST(Stufe04Pipeline, WriteBiasMatrixLatex) {
 // ── P5 (2026-07-12): Forest-/Dot-Plot der Achsen-Austauschbarkeit (write_exchange_forest_plot) ──────────
 // Fixture = schema-treue WIDE-FULL-Mini-CSV (parse_wide_csv_full: benoetigt op_<art>_p50_ns + binary_id-
 // Achsen-Tupel). 4 Lebewesen erzeugen deterministisch: 1 valide Verbesserung (search_algo alpha->beta,
-// Median rel. -0.2, IQR 0.1, n=4), 1 valide Regression (node_type n4->n8, +0.3, n=4) und 2 kleine-n-Zeilen
+// Median rel. -0.2, IQR 0.2, n=4 -- D5-2-KANON), 1 valide Regression (node_type n4->n8, +0.3, n=4)
+// und 2 kleine-n-Zeilen
 // (gamma nur in w1 → n=1). Threshold ist Test-Parameter (klein statt 30 → kleine-n greift bei diesem Fixture).
 namespace {
 
@@ -212,8 +213,11 @@ void write_forest_full_csv(fs::path const& p) {
     std::string const A8 = "search_algo=alpha/node_type=n8/memory_layout=aos/prefetch=off";
     // alpha: ns_per_op=100 in allen 4 Lastprofilen.
     for (auto const* wl : {"w1", "w2", "w3", "w4"}) row(A, wl, 100.0);
-    // beta: 70,80,90,100 → rel-Deltas ggü. alpha = -0.3,-0.2,-0.1,0.0 (nearest-rank auf 4 Werten: p25=idx1=-0.2,
-    // p50=idx2=-0.1, p75=idx2=-0.1 → Median -0.1, IQR 0.1 → echter Whisker >0).
+    // beta: 70,80,90,100 → rel-Deltas ggü. alpha = -0.3,-0.2,-0.1,0.0.
+    // D5-2 KANON (nearest-rank k = ceil(q*n)-1) auf n=4: p25=idx0=-0.3, p50=idx1=-0.2, p75=idx2=-0.1
+    // → Median -0.2, IQR 0.2 → echter Whisker >0.
+    // Bis 2026-08-09 stand hier p25=idx1, p50=idx2, p75=idx2 → Median -0.1, IQR 0.1: das war die
+    // VERWORFENE Formel round(q*(n-1)), die bei GERADEM n eine Rangstelle zu hoch greift.
     row(B, "w1", 70.0);
     row(B, "w2", 80.0);
     row(B, "w3", 90.0);
@@ -271,8 +275,16 @@ TEST(Stufe04Pipeline, ForestAggregatesAreRealNsPerOpMedians) {
     auto const* imp = find_agg("search_algo", "alpha", "beta");
     ASSERT_NE(imp, nullptr);
     EXPECT_EQ(imp->pair_workload_samples, 4u);
-    EXPECT_NEAR(imp->median_rel_delta, -0.1, 1e-9);
-    EXPECT_NEAR(imp->iqr_rel_delta, 0.1, 1e-9);
+    // D5-2 (2026-08-09) KANON, von Hand auf der Fixture-Stichprobe gerechnet:
+    //   rel aufsteigend = [-0.3, -0.2, -0.1, 0.0], n=4 (GERADE -> hier divergieren die Formeln)
+    //   p25: k = ceil(0.25*4)-1 = 0 -> -0.3
+    //   p50: k = ceil(0.50*4)-1 = 1 -> -0.2   (UNTERE Mitte)
+    //   p75: k = ceil(0.75*4)-1 = 2 -> -0.1
+    //   IQR = p75 - p25 = -0.1 - (-0.3) = 0.2
+    // Vorher standen hier -0.1 und 0.1: die Werte der VERWORFENEN Formel round(q*(n-1)),
+    // die p25 auf Index 1 und p50/p75 beide auf Index 2 legte.
+    EXPECT_NEAR(imp->median_rel_delta, -0.2, 1e-9);
+    EXPECT_NEAR(imp->iqr_rel_delta, 0.2, 1e-9);
     auto const* reg = find_agg("node_type", "n4", "n8");
     ASSERT_NE(reg, nullptr);
     EXPECT_EQ(reg->pair_workload_samples, 4u);
@@ -306,8 +318,10 @@ TEST(Stufe04Pipeline, ForestPlotStructureZeroLineAndWhisker) {
     // 4 reale Datenpunkte (== Zahl der ns_per_op-Aggregate mit n>0), nichts erfunden/verloren.
     EXPECT_EQ(count_occ(c, "+- ("), 4u);
     EXPECT_NE(c.find("ytick={0,1,2,3}"), std::string::npos);
-    // Whisker existiert real (IQR=0.1 → Halb-Whisker 0.05) — kein erfundener Balken, aber vorhandene Streuung.
-    EXPECT_NE(c.find("+- (0.0500,0)"), std::string::npos);
+    // Whisker existiert real — kein erfundener Balken, aber vorhandene Streuung.
+    // D5-2 KANON: IQR = p75-p25 = -0.1-(-0.3) = 0.2 -> Halb-Whisker 0.2/2 = 0.1 -> "+- (0.1000,0)".
+    // Vorher 0.0500, weil die verworfene Formel IQR=0.1 lieferte.
+    EXPECT_NE(c.find("+- (0.1000,0)"), std::string::npos);
 
     std::error_code ec;
     fs::remove(out, ec);
@@ -357,7 +371,8 @@ TEST(Stufe04Pipeline, ForestPlotSignColoring) {
     auto const imp = class_block(c, "improvement");
     ASSERT_FALSE(imp.empty());
     EXPECT_NE(imp.find("color=fpimprove"), std::string::npos);
-    EXPECT_NE(imp.find("(-0.1000,"), std::string::npos);
+    // D5-2 KANON: Median der rel-Deltas = -0.2 (untere Mitte bei n=4), vorher -0.1.
+    EXPECT_NE(imp.find("(-0.2000,"), std::string::npos);
     EXPECT_EQ(imp.find("0.3000"), std::string::npos); // Regressionswert NICHT im Verbesserungs-Block
 
     auto const reg = class_block(c, "regression");

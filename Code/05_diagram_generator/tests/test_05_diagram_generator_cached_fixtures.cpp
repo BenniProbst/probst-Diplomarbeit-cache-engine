@@ -502,9 +502,15 @@ TEST(Stufe05Pipeline, LatencyRangeAggregateMonotoneAndExclusions) {
     ASSERT_TRUE(agg.present[2][1]);  // scan × k_ary
     EXPECT_DOUBLE_EQ(agg.p50_median[2][1], 500.0);
     EXPECT_DOUBLE_EQ(agg.p99_median[2][1], 700.0);
-    // k_ary insert nearest-rank-Median [100,120] → 120 (obere), p99 [200,240] → 240.
-    EXPECT_DOUBLE_EQ(agg.p50_median[0][1], 120.0);
-    EXPECT_DOUBLE_EQ(agg.p99_median[0][1], 240.0);
+    // D5-2 KANON (2026-08-09), von Hand: k_ary insert p50 [100,120], n=2 (GERADE)
+    //   k = ceil(0.5*2)-1 = 0 -> 100 (UNTERE Mitte); p99 [200,240] ebenso -> 200.
+    // Vorher standen hier 120/240 -- die OBERE Mitte der verworfenen Formel round(q*(n-1)).
+    // ACHTUNG: das ist ein Median ueber KONFIGURATIONEN (bereits aggregierte p50/p99 je
+    // Algorithmus x Op-Art), nicht ueber Messproben. Dass der Kanon auch hier gilt, ist
+    // begruendet entschieden -- siehe Code/common/percentile_canon.hpp, Abschnitt
+    // GELTUNGSBEREICH. Die Monotonie-Zusicherung oben (p99 >= p50) bleibt erfuellt: 200 >= 100.
+    EXPECT_DOUBLE_EQ(agg.p50_median[0][1], 100.0);
+    EXPECT_DOUBLE_EQ(agg.p99_median[0][1], 200.0);
     std::error_code ec;
     fs::remove(p, ec);
 }
@@ -1463,8 +1469,10 @@ TEST(Stufe05Pipeline, NormalizedBarAggregatesRatiosNotRawMedians) {
     std::error_code ec;
     fs::remove(out, ec);
     ASSERT_EQ(dg::write_normalized_bar_vs_reference(out, rows, "ns_per_op", "linear_scan", "en"), dg::status_ok);
-    // k_ary: Median{0.5, 2.0} (nearest-rank) = 2.0 ; linear_scan gegen sich selbst = 1.0.
-    EXPECT_TRUE(file_contains(out, "(k\\_ary,2.0000)"));
+    // D5-2 KANON, von Hand: Verhaeltnisse sortiert [0.5, 2.0], n=2 (GERADE)
+    //   k = ceil(0.5*2)-1 = 0 -> 0.5 (UNTERE Mitte). Vorher stand hier 2.0 -- die obere Mitte
+    //   der verworfenen Formel round(q*(n-1)). linear_scan gegen sich selbst bleibt 1.0.
+    EXPECT_TRUE(file_contains(out, "(k\\_ary,0.5000)"));
     EXPECT_TRUE(file_contains(out, "(linear\\_scan,1.0000)"));
     // Referenzlinie bei 1 vorhanden -- und als \addplot, NICHT als \draw mit |- (das bricht auf
     // symbolischen Achsen fatal ab, pdflatex-Probe 2026-08-06).

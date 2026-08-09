@@ -6,6 +6,10 @@ comdare_da_add_library(comdare_csv_to_latex MODULE M04 SOURCES
 )
 target_compile_features(comdare_csv_to_latex PUBLIC cxx_std_23)
 target_include_directories(comdare_csv_to_latex PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# D5-2 (2026-08-09): Median/Quartile kommen aus dem ce-KANON (nearest_rank_index in
+# latency_stats.hpp) statt aus lokalen Abschriften. PRIVATE reicht: percentile_canon.hpp wird
+# nur in csv_to_latex.cpp eingebunden, nicht im oeffentlichen Header. Header-only, kein Link.
+target_link_libraries(comdare_csv_to_latex PRIVATE comdare::percentile_canon)
 add_library(comdare::csv_to_latex ALIAS comdare_csv_to_latex)
 
 add_executable(csv_to_latex_cli main_cli.cpp)
