@@ -16,6 +16,118 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (spät) — KONSOLIDIERT: EIN Muster, FÜNF Begriffe — `work_mode` in geltender Fassung
+
+**Owner-Abschluss:** *„Bitte ziehe das alte Muster und das neue zusammen, **die 5 Begriffe gehören
+zusammen**, aber **Debug ist für normale Benutzer gesperrt**."*
+
+**Dies ist die geltende Fassung.** Die drei Nachträge darunter (4!-Rekombinationen ·
+Meta-Meta-Einordnung · Work-Mode-KERN) bleiben als Herleitung stehen und werden **nicht** ersetzt —
+sie tragen die Belege. Wer nur eine Antwort braucht, liest diesen Abschnitt.
+
+---
+
+### DAS MUSTER
+
+    work_mode  --  UNTER-Achse unter measurement_category
+                   STATE PATTERN; BESITZER ist der PLANER (Director), nicht die Mess-Schicht
+
+    | Begriff  | Rolle                                          | Zulassung           |
+    |----------|------------------------------------------------|---------------------|
+    | build    | CEB-Bau orchestrieren                          | offen               |
+    | measure  | golden messen, 1-Thread/deterministisch        | offen               |
+    | compare  | Messwertlager LESEN, eigene Optionen           | offen               |
+    | release  | Lager lesen -> OPTIMALE Binary erzeugen        | offen               |
+    | debug    | Wartung: parallel bauen UND parallel messen    | **GESPERRT**        |
+
+    ABLAUF-ORDNUNG (kumulativ enthalten):  build -> measure -> compare -> release
+    debug steht QUER dazu -- kein Kettenglied, sondern ein Wartungszustand.
+
+**Fünf Begriffe, ein Typ.** Vier davon bilden die Kette, der fünfte ist Werkzeug. Das ist der Grund,
+warum sie zusammengehören und trotzdem nicht gleichrangig sind: `debug` ist **kein Abschluss-Modus**,
+er ist der Modus, in dem man die anderen vier baut und prüft.
+
+### WARUM `debug` GESPERRT GEHÖRT — und es ist keine Bequemlichkeitsregel
+
+`debug` ist das einzige `work_mode`, das **misst und dabei parallel läuft**
+(`experiment_plan_director.hpp:2098`: `Debug={Debug,misst,parallel}`; der parallele Mess-Loop
+existiert **nur** dort — `profile_run_entry.hpp:770`, `experiment_run_entry.hpp:481`). Parallel
+gemessene Latenzen sind **nicht run-to-run-stabil**; genau diese Stabilität sichert `measure` zu.
+
+    Ein Anwender, der debug waehlen koennte, bekaeme Zahlen, die wie Messwerte AUSSEHEN
+    und keine sind. Das ist die unheilbare Klasse: kontaminierte Daten.
+
+Deshalb ist die Sperre eine **Integritätsregel**, kein Komfort-Gate.
+
+### DIE SPERRFORM EXISTIERT BEREITS IM HAUS — nichts Neues zu erfinden
+
+`measurement/axis_error.hpp:169-178` führt `AdmissionStatus {Zugelassen, Gesperrt}` mit
+`admission_status_token()`. Der Kopf definiert die Semantik exakt passend:
+
+> *„**gesperrt** = die Perm wurde **NICHT gemessen**, weil sie auf dieser Maschine **nicht zugelassen**
+> ist … Unbekannt → **„gesperrt"** (sicherer Default … lieber sichtbar-nicht-gemessen als eine stille
+> Zahl)."*
+
+Und `measurement_curve_loader.hpp:62-71` grenzt die drei Vokabeln gegeneinander ab, was hier den
+Unterschied macht:
+
+    failed        = gemessen und gescheitert
+    gesperrt      = GAR NICHT ERST gemessen        <-- das ist der debug-Fall fuer Anwender
+    nicht_gebaut  = es existiert keine Binary
+
+**Der Default ist bereits fail-closed** — Unbekanntes fällt auf `gesperrt`. Das ist genau die
+Richtung, die diese Sperre braucht: wer die Entwickler-Bedingung nicht erfüllt, bekommt kein `debug`,
+und zwar **sichtbar**, nicht stillschweigend umgebogen.
+
+**Der Prüfort steht auch schon:** `validate_profile.hpp` prüft `<run_methodology><method value>`
+gegen die constexpr-Registry — *„Single-Source = die Registry"* (`:147`), mit Zähler
+`run_methodology_checked` (`:111`). Die Sperre gehört genau dort hin, nicht in einen zweiten Weg.
+
+### WAS ZU BAUEN IST — konsolidiert
+
+1. **`RunMethodology` um `Build` erweitern, ans ENDE des Enums.**
+   `{Debug, Measure, Release, Compare, Build}`, `kRunMethodologyCount` 4 → **5**.
+   **Ans Ende, nicht in Ablauf-Reihenfolge** — die Enum-Ordnung ist **stempel-/ABI-relevant**, und der
+   Header schreibt es selbst vor: *„Wer eine Ablauf-Ordnung braucht, leitet sie aus der
+   Enthaltungs-Ordnung ab, nicht aus dem Enum-Index."* Eine Umsortierung verschöbe alle Ordinale und
+   bräche den Stempel ohne Not.
+2. **Registry-Zeile** `{Build, "build", "Build", "Release", false, false}` — `measurement_on=false`.
+3. **Zulassung als eigenes Feld** je Modus (`AdmissionStatus`), nicht als Sonderfall im Parser.
+   `debug` → `Gesperrt`, die vier anderen → `Zugelassen`. Damit ist die Sperre **Daten**, nicht Logik,
+   und ein künftiger sechster Modus muss sich dazu erklären.
+4. **Zwei Zählungen, nicht eine:** `kRunMethodologyCount = 5` (Enum) **und**
+   `kOffizielleWorkModeCount = 4` (zugelassene). Eine einzige Zahl kann beides nicht ausdrücken —
+   „4 Modi" wäre wahr für die offiziellen und falsch für das Enum. Genau so entsteht sonst die Klasse
+   *Zahl ohne Nenner*.
+5. **`work_mode` als Unter-Achse unter `measurement_category`** emittieren; Vorbild ist der
+   `sub_axis_label`-Mechanismus von `load_framework` („workload").
+6. **Der Zustandsautomat gehört in den PLANER — genau einmal, für beide Zweige.** Er ist gegenüber der
+   Zahl eingesteckter Hybrid-Genus invariant; variabel ist allein die Factory, die er befragt.
+7. **Die Hybrid-Meta-Meta als FAMILIE**, je Reroute-Genus eine `MeasurementMetaMetaAxis`.
+8. **`<hybrid>`-XML-Schalter** zu Experiment-Beginn, gleichrangig zu `<measurement_tooling>`.
+
+### DIE ABNAHME (was erzwingt das Halten?)
+
+- **Werkzeug, nicht Disziplin:** die Sperre lebt im `validate_profile`-Pfad gegen die Registry.
+  Köder (K13, gewürfelt): ein Profil mit `<method value="debug"/>` **ohne** Entwickler-Bedingung muss
+  **rot** werden, namentlich; **Gegenprobe**: dasselbe Profil mit `measure` bleibt grün. Beide Läufe
+  gehören in die Abnahme — eine Wache, die immer rot ist, ist so wertlos wie eine, die nie beißt.
+- **Der 5-gegen-4-Bruch ist der Nenner:** `kRunMethodologyCount` 4 → 5 bricht compile-hart bei jedem
+  Konsumenten, der 4 annimmt. Das ist gewollt und vom Bestand vorbereitet (*„Drift einer 5. Methode
+  bricht hier compile-time, statt still 4 zu bleiben"*). Der Bruch ist die Wache.
+
+### WAS DAMIT ERLEDIGT IST — und was NICHT
+
+**Erledigt:** die Zuordnung der Modi (Planer/Director), ihre Zahl (5/4), die Kette
+(`build→measure→compare→release`), die Symmetrie (ein Automat, zwei Zweige), die Sperrform
+(`AdmissionStatus`, vorhanden), die Meta-Meta-Familie.
+
+**Nicht erledigt, unverändert offen:** **24 oder 24 × 2 = 48** (der Owner nannte 4! und die
+Fühler-Achse in einem Satz) · an welcher Haupt-Achse die **Permutations**-Unterachse hängt
+(Kandidat: `MeasurementTooling {WallClock, Macro, Micro}`, `kMeasurementToolingCount = 3`, trägt
+allein den `kMeasurementAxisVersionLine`-Stempel — **3 Ebenen ⇒ 3! = 6** fällt damit zusammen; ob die
+Hybrid-Ebene auf 4 hebt, ist die Frage) · und die **konkrete Entwickler-Bedingung**, unter der `debug`
+doch zugelassen wird (CLI-Flag? Umgebungsvariable? Build-Zeit-Schalter?) — **nicht geraten.**
 ## 09.08.2026 (spät) — OWNER-KERN: die WORK-MODE-UNTERACHSE = build→measure→compare→release + Wartungsmodus debug
 
 **Owner wörtlich, in zwei Schritten (der zweite korrigiert meine erste Lesart):**
