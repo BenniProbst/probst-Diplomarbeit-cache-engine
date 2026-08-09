@@ -16,6 +16,75 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (spät) — OWNER-KERN: 4 MESS-EBENEN IM HYBRID-FALL ⇒ 4! REKOMBINATIONEN NEBEN DEN 6 CEBs
+
+**Owner wörtlich, als ausdrückliche Ergänzung „für das Ledger für die Permutationen":**
+
+> „Bitte beachte, dass es durch **4 Messebenen mit der Hybrid-Struktur** auch **4 fakultät** auch
+> **3 fakultät CEB Systeme** geben muss, die dann **einmal gegen mit Messfühler hybrid und einmal
+> ohne Messfühler hybrid** gemessen werden müssen, weil es dann **statt 3 Ebenen 4 Ebenen** gibt,
+> es gibt also **4 fakultät Rekombinationen gegen die 6 CEBs** und den **Einbau von Messfühlern in
+> die Hybrid-Tier-Binary**."
+
+### Was sich damit ändert — die Permutationsrechnung hatte bisher nur einen Zweig
+
+Der Ledger führte bisher **eine** Zahl: 3 Mess-Stufen ⇒ **3! = 6 CEBs**
+(Nachtrag 08.08., „DIE MESSKETTE"; Owner dort: *„Es gibt also 3 Stufen und 6 CEBS (nicht 5 das war
+mein Fehler)"*). Das war vollständig **für den Single-Zweig** — und genau dort hörte die Rechnung auf.
+
+**Mit der Hybrid-Struktur kommt eine VIERTE Mess-Ebene hinzu.** Sie wird nach dem KERN vom 08.08.
+*dazwischengeschoben*, nicht angehängt (GOAL v8 VI.2: die drei Mess-Ebenen werden im Hybrid-Fall
+„auf **vier** erweitert — die neue wird **dazwischengeschoben**"). Damit gilt:
+
+    SINGLE-ZWEIG    3 Ebenen   ->  3! =  6   CEB-Systeme
+    HYBRID-ZWEIG    4 Ebenen   ->  4! = 24   Rekombinationen
+                                             gefahren GEGEN die 6 CEBs
+    dazu, als eigene Achse:     Messfühler IN der Hybrid-Tier-Binary
+                                             einmal MIT, einmal OHNE
+
+**Beide Zahlen gelten nebeneinander** — der Owner sagt ausdrücklich „auch 4 fakultät **auch** 3
+fakultät". Die 6 fallen nicht weg; sie sind der Bezugspunkt, gegen den die 24 gemessen werden.
+
+### Warum das dieselbe Logik ist wie bei den 6 — und keine neue
+
+Der Grund ist unverändert der vom 08.08.: **der Messfühler ist ein Verbraucher** (Elektrotechnik-
+Analogie des Owners). Was er kostet, misst er mit. Die Differenz „mit Fühler" gegen „ohne Fühler"
+**ist** der Messfehler — deshalb müssen die Ebenen compile-time ein- und ausbaubar sein.
+
+**Neu ist nur der Gegenstand:** bisher war der Fühler in den drei Ebenen des Single-Zweigs
+auszubauen. Jetzt kommt der Fühler **in der Hybrid-Tier-Binary selbst** dazu. Ohne diese zweite
+Messung wäre der **Reroute-Overhead des Hybriden nicht vom Overhead seiner eigenen Messung
+trennbar** — man misst sonst den Beobachter mit und schreibt ihn dem Hybriden zu.
+
+### Was daran unmittelbar auf offene Posten trifft
+
+- **OV-3 (4. Mess-Ebene) ist damit nicht mehr nur eine Bump-Frage.** Der Wellenplan stellt sie als
+  „hybrid-lokal ODER neues Glied im globalen `mess_gates_glied`" mit Empfehlung „hybrid-lokal".
+  Diese Ergänzung sagt, dass die vierte Ebene **eine eigene Permutationsachse** aufspannt — die
+  Bump-Frage bleibt, aber sie ist nicht die ganze Frage.
+- **OV-10 (CEB-Varianten) steht weiter offen und jetzt schärfer.** Der Wellenplan führt eine
+  „Teilmengen-Lesart (max. 4 erreichbar)"; die Owner-Worte nennen **6** (08.08., mit Selbstkorrektur
+  „nicht 5") und jetzt **24** für den Hybrid-Zweig. Die Lesart „max. 4" ist mit keinem Owner-Satz
+  gedeckt. **Nicht raten — vorlegen.**
+- **Die 6 Steuerdocks am Planer** (KERN vom 09.08.) sind die Gegenstücke der 6 CEBs. Wenn der
+  Hybrid-Zweig 24 Rekombinationen trägt, ist zu klären, **ob der Planer dafür 24 Steuerdocks
+  braucht** oder ob die Hybrid-Achse quer zu den Docks liegt. Das ist eine Bau-Frage an der
+  Metaprogrammier-Naht, keine Owner-Frage — sie gehört in den Explore vor HY-A.
+
+### AUSDRÜCKLICH NICHT ENTSCHIEDEN (und deshalb hier nicht ausgerechnet)
+
+Der Owner nennt **4! = 24** und die Fühler-Achse „mit/ohne Hybrid-Fühler" in **einem** Satz. Ob die
+24 diese Achse **enthalten** oder ob sie **multipliziert** (24 × 2 = 48 Bau-/Messläufe), sagt der
+Wortlaut nicht. Beide Lesarten sind mit ihm vereinbar.
+
+**Das wird nicht geraten.** Die Zahl entscheidet über Bauzeit und Messfenster unmittelbar — bei
+41,4 h für 128 Binaries ist der Unterschied zwischen 24 und 48 Varianten kein Detail. Sie geht als
+Vorlage an den Owner, zusammen mit OV-10.
+
+**Ebenso offen und benannt:** die 3! = 6 ist auch schon rechnerisch nicht die Zahl der An/Aus-
+Kombinationen dreier unabhängiger Fühler (das wären 2³ = 8). Der Owner hat 6 zweimal ausdrücklich
+gesetzt und sich dabei einmal selbst korrigiert; die Zahl gilt als **Festlegung**, nicht als
+Rechnung. Für die 24 gilt dasselbe: sie ist gesetzt, nicht abgeleitet — und wird so umgesetzt.
 ## 09.08.2026 (spät) — TIER-BINARIES WERDEN NICHT VORGEHALTEN: nur Buildsystem-Cache, hot im RAM
 
 **Owner wörtlich:**
