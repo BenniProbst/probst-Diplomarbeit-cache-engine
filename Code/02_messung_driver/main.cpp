@@ -42,6 +42,7 @@
 #include "messreihen_workload.hpp"          // #31: E4-XML Workload-Drive (<workload> via ce-DOM, kein Submodul-Bump)
 #include "permutations_runtime_check.hpp"   // V36.D
 #include "lane_vendor_guard.hpp"            // Scheibe 2a (Ledger 61/62): Lane-Fehlrouting-Wache (Runtime-CPUID)
+#include "mess_bestand_belegung.hpp"        // LAG-P2-Rest (Kette D): Host-Belegung des Messwert-Genus
 #include "measurement_writer.hpp"           // V41.B1
 #include "stats_aggregator.hpp"             // V41.B3
 
@@ -1113,6 +1114,14 @@ int main(int argc, char* argv[]) {
                 std::string                                                             bestand_doc_key;
                 std::string                                                             bestand_owner_uuid;
                 std::string                                                             bestand_maschine;
+                // LAG-P2-Rest (Kette D, 2026-08-09): die Traeger des ZWEITEN Genus. Bis hierher hatten
+                // LazyRunConfig::mess_bestand_doc_key/_key_of NULL externe Zuweiser -- die ce-Kette
+                // (Fassade -> Entry -> LazyRunConfig -> Gate :2056 / load :2058 / observe :3026 /
+                // flush :2260) war vollstaendig gebaut und aus dem Produktions-Lauf trotzdem
+                // unerreichbar, weil niemand sie belegte. mess_bestandslog_active blieb immer false:
+                // das Lager fuehrte Binaries, aber keine Messungen.
+                std::function<std::optional<std::string>(std::filesystem::path const&)> mess_bestand_key_of;
+                std::string                                                             mess_bestand_doc_key;
                 // Das Opt-in EINMAL lesen -- es entscheidet ueber beide Zweige: erfuellt zusammen mit minio_enabled()
                 // das Gate, und traegt allein die Sichtbarkeits-Warnung. Die zweite Gate-Bedingung ist
                 // minio_enabled(), NICHT !inert() (s.o.).
@@ -1150,6 +1159,56 @@ int main(int argc, char* argv[]) {
                     std::cerr << "[bestandslog] aktiv: doc_key=" << bestand_doc_key << " maschine=" << bestand_maschine
                               << " key_of=.fingerprint-Sidecar (#46b I1/I2)"
                               << " owner=" << bestand_owner_uuid << "\n";
+
+                    // -- LAG-P2-Rest (Kette D): das MESSWERT-Genus, im selben bereits gegateten Zweig. --
+                    //
+                    // EIGENE Variable und EIGENER Doc-Key, KEIN zweiter Abschnitt im Binary-Dokument:
+                    // Binaries- und Mess-Daten-Lager sind zwei getrennte Realms (Owner-Abnahme 26.07.,
+                    // A-2), in ce als D-05 gefuehrt. Der TRANSPORT ist derselbe -- es sind zwei
+                    // Dokumente in EINEM Store, nicht zwei Stores (profile_run_facade.hpp:127-129).
+                    // Deshalb wird hier weder ein zweiter Cache gebunden noch ein zweites Gate gebaut.
+                    //
+                    // DIE MASCHINEN-IDENTITAET IST DIESELBE wie oben und wird BEWUSST nicht neu aus der
+                    // Umgebung gelesen: der Messwert-Schluessel ist sha512 ueber [Binary-Fingerprint,
+                    // HARDWARE], und zwei getrennte Lesungen derselben Variablen koennten auseinander
+                    // laufen. Weil `maschine` das Gate oben schon passiert hat (leer => exit 6), ist der
+                    // Fall "hardware_leer" an DIESER Aufrufstelle strukturell ausgeschlossen -- nicht
+                    // durch Disziplin, sondern durch die Reihenfolge. Die Klasse maschine_leer wird
+                    // trotzdem behandelt: der Vertrag von belege_mess_bestand muss auch fuer einen
+                    // kuenftigen zweiten Aufrufer halten, der das Gate nicht davor hat. Belegt ist sie
+                    // im Unit-Gate test_mess_bestand_belegung, nicht hier.
+                    //
+                    // FEHLERKLASSE realm_kollision: zeigen Mess- und Binary-Doc-Key auf DASSELBE
+                    // Dokument, verschmelzen die beiden Realms still -- der Mess-Flush schriebe in das
+                    // Binary-Dokument. Das ist derselbe Halb-Zustand, den das Doppel-Gate oben mit
+                    // exit 6 verhindert (Log an, aber falsches Ziel), und wird genauso behandelt.
+                    // Der rc ist derselbe wie oben; UNTERSCHEIDBAR sind die Zweige an der Fehlerklasse
+                    // in der Zeile -- ein gleicher rc allein waere nicht beobachtbar.
+                    namespace md = comdare::diplomarbeit::messung_driver;
+                    auto const mess_belegung =
+                        md::belege_mess_bestand(maschine, doc_key, env_trimmed("COMDARE_BESTANDSLOG_MESS_DOC_KEY"));
+                    if (mess_belegung.abgelehnt()) {
+                        std::cerr << "[bestandslog] FEHLER fehlerklasse=" << md::to_string(mess_belegung.klasse)
+                                  << ": die Belegung des Messwert-Genus widerspricht sich"
+                                  << " (COMDARE_BESTANDSLOG_MESS_DOC_KEY gegen COMDARE_BESTANDSLOG_DOC_KEY"
+                                  << "/_MASCHINE) -- Abbruch.\n";
+                        return 6;
+                    }
+                    if (mess_belegung.aktiv()) {
+                        mess_bestand_key_of  = md::make_mess_bestand_key_fn(mess_belegung.maschine);
+                        mess_bestand_doc_key = mess_belegung.doc_key;
+                        // SELBSTCHECK: diese Zeile sichert zu, dass das ZWEITE Genus belegt ist und mit
+                        // WELCHEM Dokument. Sie sichert NICHT zu, dass Messwerte darin landen -- das
+                        // sagt erst der Abschluss ("[bestandslog] messwert-lager=... neu=...").
+                        std::cerr << "[bestandslog] messwert-genus aktiv: doc_key=" << mess_bestand_doc_key
+                                  << " maschine=" << mess_belegung.maschine
+                                  << " key_of=messwert_key(.fingerprint,maschine) (LAG-P2)\n";
+                    } else {
+                        // Inert-by-default: das Binary-Genus laeuft, das Messwert-Genus nicht. EINE Zeile,
+                        // damit ein dauerhaft leeres Messwert-Lager nicht erst nach der Kampagne auffaellt.
+                        std::cerr << "[bestandslog] messwert-genus aus: COMDARE_BESTANDSLOG_MESS_DOC_KEY "
+                                  << "ist nicht gesetzt -- Binaries werden verzeichnet, Messungen NICHT.\n";
+                    }
                 } else if (bestandslog_opt_in) {
                     // Opt-in gesetzt, Ebene B fehlt: die Absicht ist da, das Lager kann sie nicht erfuellen. Genau
                     // EINE Zeile, damit ein still leeres Lager nicht erst nach Stunden auffaellt. drop_enabled wird
@@ -1350,6 +1409,15 @@ int main(int argc, char* argv[]) {
                     pa.bestand_doc_key     = bestand_doc_key;
                     pa.bestand_owner_uuid  = bestand_owner_uuid;
                     pa.bestand_maschine    = bestand_maschine;
+                    // LAG-P2-Rest (Kette D): die zwei Traeger des Messwert-Genus. Ebenfalls bereits
+                    // GEGATET -- ist das Gate aus oder der Mess-Doc-Key ungesetzt, sind beide leer und
+                    // mess_bestandslog_active (iterator:2054-2056) bleibt false => byte-neutral.
+                    // mess_bestand_versions bleibt BEWUSST unbelegt: es gibt im Host keine Quelle dafuer
+                    // (die Binary-Seite hat gar keinen versions-Parameter). Leer == "nicht gemeldet" und
+                    // v3-byte-gleiche Ausgabe. Begruendung im Kopf von mess_bestand_belegung.hpp.
+                    // NUR pa, wie die fuenf darueber: der xa-Pfad bleibt INERT (AUF-B2).
+                    pa.mess_bestand_key_of  = mess_bestand_key_of;
+                    pa.mess_bestand_doc_key = mess_bestand_doc_key;
                     pa.partial_marker_sink = partial_marker_sink; // W11 (§43.c): BAU-Modus Teil-Marker (No-Op-Default)
                     pa.chunk_part_size     = chunk_part_size;     // W11 (§43.c): Teil-Marker-Intervall N
                     pa.progress_sink =

@@ -40,7 +40,53 @@ if(TARGET comdare::profile_run_facade)
     target_compile_definitions(messung_driver PRIVATE
         "COMDARE_CE_AXIS_REGISTRY_PATH=\"${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/algorithm_profiles/cache_engine_axis_registry.xml\""
         "COMDARE_PRT_AXIS_REGISTRY_PATH=\"${COMDARE_PRT_ART_DIR}/prt_art/algorithm_profiles/prt_art_axis_registry.xml\"")
+
+    # LAG-P2-Rest (Kette D, 2026-08-09) -- die HOST-BELEGUNG des Messwert-Genus als EIGENE
+    # Uebersetzungseinheit.
+    #
+    # WARUM EINE EIGENE TU UND KEIN INCLUDE IN main.cpp: der Schluessel-Provider
+    # bestandslog::make_messwert_key_fn zieht ueber messwert_registrierung.hpp ->
+    # bestandslog_document.hpp den ce-XML-DOM (<serialization/...>) und ueber bestandslog_index.hpp
+    # die ABI-Kette (anatomy_fingerprint.hpp -> das GENERIERTE overlay_source_hash_generated.hpp).
+    # Gemessen statt vermutet: mit dem Include-Satz des messung_driver-Targets bricht ein
+    # -fsyntax-only auf messwert_key_source.hpp an genau diesen zwei Stellen ab, waehrend die
+    # Schwester fingerprint_key_source.hpp (die main.cpp heute schon inkludiert) durchlaeuft.
+    # main.cpp:59-63 haelt dieselbe Grenze fuer den BestandTransport bereits fest und loest sie
+    # ebenso: die schwere Bindung sitzt in einer eigenen TU, der Host sieht nur die Signatur.
+    #
+    # VERWORFEN: die drei Include-Wurzeln an messung_driver selbst zu haengen. Es waere die
+    # kuerzere Aenderung, koppelte aber die Uebersetzung von main.cpp an JEDE ce-Quelltext-
+    # Aenderung (der Overlay-Hash bewegt sich mit dem Quellbaum, und anatomy_fingerprint.hpp
+    # traegt ihn) -- fuer zwei Zuweisungen ein dauerhafter Rebuild-Preis am groessten File des
+    # Targets.
+    #
+    # KEIN comdare_da_add_library: der Helfer vergibt Untermodul-Nummern (M03..M09) und eine
+    # SHARED/STATIC-Option je Untermodul. Dies hier ist kein Untermodul, sondern eine interne TU
+    # von 02 -- eine Modul-Nummer dafuer zu erfinden waere eine Zweit-Wahrheit im Modul-Register.
+    add_library(comdare_mess_bestand_belegung STATIC mess_bestand_belegung.cpp)
+    target_compile_features(comdare_mess_bestand_belegung PRIVATE cxx_std_23)
+    target_include_directories(comdare_mess_bestand_belegung
+        PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}                        # mess_bestand_belegung.hpp (die LEICHTE Haelfte)
+        PRIVATE ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine      # builder/bestandslog/... (Fassaden-PUBLIC-Wurzel)
+                ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/include  # cache_engine/abi/anatomy_fingerprint.hpp
+                ${COMDARE_CACHE_ENGINE_DIR}/libs/cache_engine/src      # sha512/ctsha512.hpp
+                ${COMDARE_CACHE_ENGINE_DIR}/libs/common)               # serialization/xml_config_parser/xml_reader.hpp
+    # Der generierte Overlay-Hash-Header kommt ueber die Verzeichnis-Kante aus Code/CMakeLists.txt:210
+    # (include_directories auf _cache_engine_external/generated). Die Reihenfolge-Kante auf den Codegen
+    # setzt cmake/overlay_source_hash.cmake fuer JEDES Ziel des Projekts -- deshalb hier keine eigene.
+    target_link_libraries(messung_driver PRIVATE comdare_mess_bestand_belegung)
+
+    # T-7: der Test existiert erst, wenn er in `ctest -N` steht. Gate-frei (reine Host-Logik plus
+    # zwei Dateien im Tempdir), deshalb Label da_unit wie die vier Schwester-Gates dieses Moduls.
+    add_executable(test_mess_bestand_belegung tests/test_mess_bestand_belegung.cpp)
+    target_compile_features(test_mess_bestand_belegung PRIVATE cxx_std_23)
+    target_link_libraries(test_mess_bestand_belegung PRIVATE comdare_mess_bestand_belegung)
+    add_test(NAME test_mess_bestand_belegung COMMAND test_mess_bestand_belegung)
+    set_tests_properties(test_mess_bestand_belegung PROPERTIES LABELS da_unit TIMEOUT 60)
+    set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS test_mess_bestand_belegung)
+
     message(STATUS "[messung_driver] E4-XML-Fassade angedockt (opt-in COMDARE_RUN_E4_XML=1)")
+    message(STATUS "[messung_driver] LAG-P2-Rest: Messwert-Genus-Belegung gebunden (test_mess_bestand_belegung)")
 else()
     # FATAL statt WARNING: ce und super werden atomar (Submodul-Bump) versioniert -- ein fehlendes
     # Fassaden-Target heisst de-synchronisierter ce-Klon, und COMDARE_RUN_E4_XML=1 wuerde zur

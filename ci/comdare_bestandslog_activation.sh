@@ -55,9 +55,11 @@
 # KONSUMIERTE ENV (nur Namen):
 #   COMDARE_BESTANDSLOG COMDARE_STORAGE_CACHE CI_JOB_ID
 #   COMDARE_BESTANDSLOG_DOC_KEY COMDARE_BESTANDSLOG_OWNER_UUID COMDARE_BESTANDSLOG_MASCHINE
+#   COMDARE_BESTANDSLOG_MESS_DOC_KEY
 # GESETZTE ENV:
 #   COMDARE_BESTANDSLOG COMDARE_BESTANDSLOG_DOC_KEY
 #   COMDARE_BESTANDSLOG_OWNER_UUID COMDARE_BESTANDSLOG_MASCHINE
+#   COMDARE_BESTANDSLOG_MESS_DOC_KEY
 #
 # SICHERHEIT: hier faellt KEIN Geheimnis an. Alle vier Werte sind unkritisch
 # (bool, Objekt-Schluessel im Store, Lauf-UUID, Hostname) -- genau die Klasse,
@@ -121,7 +123,7 @@ else
     # Realm-Trennung (Owner 22.07.2026, PRAEZISIERUNG-2): es gibt ZWEI Bestaende
     # mit je eigenem Log. Diese Variable speist cfg.bestand_doc_key, also den
     # BINARIES-Bestand; der Mess-Bestand haengt an cfg.mess_bestand_doc_key und
-    # hat heute keinen externen Zuweiser (eigenes Paket, hier NICHT mitgemacht).
+    # wird seit LAG-P2-Rest (Kette D, 09.08.2026) unter (5) gesetzt.
     # Der Default folgt der im ce-Testbestand dominierenden Schreibweise
     # (bestandslog/binary_bestand.xml, u.a. test_g3_lager_presence.cpp:26).
     if [ -z "${COMDARE_BESTANDSLOG_DOC_KEY:-}" ]; then
@@ -132,11 +134,37 @@ else
         _bl_key_quelle="vom Aufrufer vorgegeben"
     fi
 
+    # --- (5) mess_doc_key: das Bestands-Dokument der MESSUNGEN (LAG-P2-Rest) ---
+    # Der zweite Realm. Er speist cfg.mess_bestand_doc_key und schaltet damit im
+    # Iterator mess_bestandslog_active (:2054-2056) -- das Gate, das bis heute nie
+    # true wurde, weil die drei mess_bestand_*-Felder KEINEN externen Zuweiser
+    # hatten. Zwei Dokumente in EINEM Store, nicht zwei Stores: der Transport ist
+    # derselbe wie beim Binary-Genus.
+    #
+    # DIESE DATEI IST DIE EINZIGE QUELLE DES DEFAULTS. Der Treiber erfindet
+    # KEINEN eigenen Default: ist die Variable leer, laeuft das Messwert-Genus
+    # schlicht nicht (inert-by-default) und der Treiber sagt das in einer Zeile.
+    # Ein zweiter Default im C++-Code waere eine Zweit-Wahrheit, die genau dann
+    # auseinanderlaeuft, wenn hier jemand den Namen aendert.
+    #
+    # DER NAME MUSS SICH VOM BINARY-DOC-KEY UNTERSCHEIDEN. Sind beide gleich,
+    # bricht der Treiber mit fehlerklasse=realm_kollision ab (exit 6) -- lieber
+    # ein lauter Abbruch als zwei Realms, die still in dasselbe Dokument
+    # schreiben.
+    if [ -z "${COMDARE_BESTANDSLOG_MESS_DOC_KEY:-}" ]; then
+        COMDARE_BESTANDSLOG_MESS_DOC_KEY="bestandslog/mess_bestand.xml"
+        export COMDARE_BESTANDSLOG_MESS_DOC_KEY
+        _bl_messkey_quelle="Default"
+    else
+        _bl_messkey_quelle="vom Aufrufer vorgegeben"
+    fi
+
     echo "  doc_key  = ${COMDARE_BESTANDSLOG_DOC_KEY}  (${_bl_key_quelle})"
+    echo "  mess_key = ${COMDARE_BESTANDSLOG_MESS_DOC_KEY}  (${_bl_messkey_quelle})"
     echo "  owner    = ${COMDARE_BESTANDSLOG_OWNER_UUID}  (${_bl_owner_quelle})"
     echo "  maschine = ${COMDARE_BESTANDSLOG_MASCHINE}"
     echo "  Hinweis: Ebene B (minio) ist Vorbedingung des Binders. Fehlt sie, meldet"
     echo "           der Lauf 'fehlerklasse=lager_ebene_fehlt' und bindet NICHT."
 
-    unset _bl_host _bl_owner_quelle _bl_key_quelle
+    unset _bl_host _bl_owner_quelle _bl_key_quelle _bl_messkey_quelle
 fi

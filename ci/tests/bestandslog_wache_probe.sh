@@ -242,6 +242,34 @@ if [ -z "${WACHE_UNTER_TEST:-}" ]; then
                     COMDARE_STORAGE_CACHE=true COMDARE_BESTANDSLOG=false \
                 sh -c ". $AKT >/dev/null 2>&1; printf '%s' \"\${COMDARE_BESTANDSLOG_OWNER_UUID:-LEER}\"")
         akt_fall "explizites-false-schlaegt-kopplung" "LEER" "$A_AUS"
+
+        # --- LAG-P2-Rest (Kette D, 09.08.2026): der ZWEITE Realm ------------------------------
+        # (f) Der Mess-Doc-Key bekommt einen Default -- und der muss sich vom BINARY-Doc-Key
+        #     UNTERSCHEIDEN. Waeren beide gleich, schrieben zwei Realms in EIN Dokument; der
+        #     Treiber bricht dann mit fehlerklasse=realm_kollision ab (exit 6). Geprueft wird
+        #     hier die VERSCHIEDENHEIT, nicht bloss die Anwesenheit eines Wertes: ein Default,
+        #     der zufaellig auf den Binary-Key faellt, waere gesetzt und trotzdem falsch.
+        A_MESS=$(env -u CI_JOB_ID -u COMDARE_BESTANDSLOG_DOC_KEY -u COMDARE_BESTANDSLOG_MESS_DOC_KEY \
+                     COMDARE_BESTANDSLOG=true \
+                 sh -c ". $AKT >/dev/null 2>&1; \
+                        if [ -n \"\$COMDARE_BESTANDSLOG_MESS_DOC_KEY\" ] && \
+                           [ \"\$COMDARE_BESTANDSLOG_MESS_DOC_KEY\" != \"\$COMDARE_BESTANDSLOG_DOC_KEY\" ]; \
+                        then printf 'GETRENNT'; else printf 'KOLLISION'; fi")
+        akt_fall "mess-doc-key-getrennt-vom-binary" "GETRENNT" "$A_MESS"
+
+        # (g) ein vorgegebener Mess-Doc-Key wird NIE ueberschrieben (Muster wie (d)).
+        K_MESSVOR="bestandslog/$(wurf).xml"
+        A_MESSVOR=$(env -u CI_JOB_ID COMDARE_BESTANDSLOG=true \
+                        COMDARE_BESTANDSLOG_MESS_DOC_KEY="$K_MESSVOR" \
+                    sh -c ". $AKT >/dev/null 2>&1; printf '%s' \"\$COMDARE_BESTANDSLOG_MESS_DOC_KEY\"")
+        akt_fall "mess-doc-key-vorgabe-nicht-ueberschrieben" "$K_MESSVOR" "$A_MESSVOR"
+
+        # (h) ohne Opt-in bleibt auch der Mess-Doc-Key LEER -- die Byte-Neutralitaet des
+        #     Vor-Zustands gilt fuer den zweiten Realm genauso wie fuer den ersten.
+        A_MESSLEER=$(env -u COMDARE_BESTANDSLOG -u COMDARE_STORAGE_CACHE -u CI_JOB_ID \
+                         -u COMDARE_BESTANDSLOG_MESS_DOC_KEY \
+                     sh -c ". $AKT >/dev/null 2>&1; printf '%s' \"\${COMDARE_BESTANDSLOG_MESS_DOC_KEY:-LEER}\"")
+        akt_fall "inert-setzt-auch-mess-doc-key-nicht" "LEER" "$A_MESSLEER"
     fi
 fi
 
