@@ -333,6 +333,41 @@ test:xml-wellformed-probe:
   script:
     - sh ci/tests/xml_wellformed_probe.sh --selbstbiss
 
+# -- D3-5 (2026-08-09): PROBE fuer die THESIS-GITLINK-PARITAETS-WACHE --
+# ci/thesis_gitlink_parity.sh haelt die beiden Einbindungen DESSELBEN Thesis-Repos gleich und wird an
+# ZWEI scharfen Stellen gerufen: in verify:submodules als Praevention (--quelle head) und in
+# anhang:forward als NACHBEDINGUNG des Rueckschriebs (--quelle index --erwartet <sha>). An der
+# zweiten Stelle ist sie das EINZIGE, was beweist, dass der Rueckschrieb wirklich beide Zeiger
+# gesetzt hat. Ihr Verschwinden als Datei ist an beiden Stellen mit `test -x` abgefangen; ihre
+# stille AUFWEICHUNG war es nicht -- faellt ein `exit` aus ihr heraus, meldet sie weiter
+# "Paritaet OK", und die CI erzeugt die Divergenz ab da bei jedem Rueckschrieb selbst.
+#
+# FIXTURES OHNE ECHTE SUBMODULE: ein Gitlink ist ein Index-Eintrag mit Modus 160000; die Probe setzt
+# ihn per `git update-index --cacheinfo` in Wegwerf-Repos unter mktemp -d. Kein Netz, kein Klon,
+# keine Submodul-Initialisierung -- deshalb GIT_SUBMODULE_STRATEGY: none und keine Historie noetig.
+#
+# EIN FALL VERDIENT DIE ERWAEHNUNG (F6): der naheliegende Eingang fuer den fail-closed-Zweig ist
+# "ein Gitlink fehlt". Der taugt NICHT -- gemessen: fehlt nur einer, sind beide Zeiger ungleich und
+# ein Mutant ohne diesen `exit 1` faellt eine Handvoll Zeilen spaeter im Divergenz-Zweig, mit
+# demselben rc=1. Erst wenn BEIDE fehlen, sind sie gleich, und der Mutant meldet "Paritaet OK" mit
+# leerem SHA und rc=0. F6 ist der einzige Fall, der ihn toetet.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null. Fall F13 prueft das
+# ausdruecklich an diesem Job -- und zugleich, dass die WACHE selbst noch gerufen wird.
+# KEIN .code-rules: der Gitlink aendert sich gerade in docs-/thesis-Wellen, die Probe muss dann laufen.
+test:thesis-gitlink-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # die Probe baut sich ihre Gitlinks selbst, sie klont nichts
+  script:
+    - sh ci/tests/thesis_gitlink_parity_probe.sh --selbstbiss
+
 # -- W0b-0 (2026-08-08): BISSPROBE fuer die Mess-Ausbeute-Wache, die Wache wird selbst geprueft --
 # Die Mess-Ausbeute-Wache (ci/mess_ausbeute_wache.sh, gelandet 7444d8c0) entscheidet seit heute in
 # measure:smoke und measure:golden-320, ob ein Messlauf als gelungen gilt. Am mehrtaegigen golden-320
