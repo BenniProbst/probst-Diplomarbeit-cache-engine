@@ -78,21 +78,67 @@ Hardware zieht, ist auf zwei Maschinen zwei verschiedene Wachen.
 ### Was das für die Regel bedeutet — sie bleibt, aber aus einem anderen Grund
 
 Die EIN-BLECH-REGEL war als **Kapazitäts**-Annahme begründet („es gibt nur eine Maschine") und ist
-in dieser Begründung widerlegt. Als **Vorsichts**-Regel bleibt sie richtig, und zwar aus dem
-Befund selbst:
+in dieser Begründung widerlegt. Was daraus zu folgern ist, hat der Owner unmittelbar nach diesem
+Nachtrag richtiggestellt — siehe den folgenden Abschnitt.
 
-> Zwei Maschinen zu haben nützt nur, wenn man **weiß**, auf welcher man landet. Solange 44 von 48
-> Jobs floaten, ist die zweite Maschine kein zweiter Slot, sondern eine **zweite Fehlerquelle**.
+---
 
-Der Gewinn wäre real — aber er ist erst abrufbar, wenn die Jobs sagen, wo sie laufen wollen. Das
-ist ein eigener, kleiner Bau-Posten und keine Planungsannahme.
+## RICHTIGSTELLUNG 09.08.2026 — der Befund hält, meine Deutung nicht
+
+**Alles oberhalb dieser Linie bis `### Was das für die Regel bedeutet` ist gemessen und bleibt
+stehen:** zwei Runner, 44 von 48 Jobs floatend, prod2 ohne AVX-512, Ursache von Pipeline 15412 am
+`== Host ==`-Block bestätigt, Mess-Jobs echt gepinnt. **Was ich daraus gefolgert habe, ist falsch.**
+
+Der Owner, wörtlich, unmittelbar nach der Vorlage dieses Nachtrags:
+
+> „Ehm, das war so geplant, dass über das Lager die Maschinen abstimmen, wer welches Batch
+> verarbeitet und es können auch erstmal alle Maschinen alle Jobs aufnehmen."
+
+**Das Floaten ist der Entwurf, nicht sein Fehlen.** Die beiden Sätze, die ich geschrieben hatte —
+*„kein zweiter Slot, sondern eine zweite Fehlerquelle"* und *„der Gewinn ist erst abrufbar, wenn die
+Jobs sagen, wo sie laufen wollen"* — sind hiermit **zurückgezogen**. Sie stehen oben nur noch als
+Zitat im Wellenplan-Verweis und sind dort ebenfalls korrigiert.
+
+### Wo genau ich falsch abgebogen bin
+
+Ich habe **„kein Tag-Pin"** gelesen als **„keine Koordination"**. Das ist ein Schluss über die
+falsche Schicht. Die Abstimmung, wer welches Batch verarbeitet, findet **nicht über GitLab-Tags**
+statt, sondern **über die Lagerhaltung** — über den Bestand, den beide Maschinen sehen, und über
+die SKIP-Entscheidung, die daraus folgt. Ein Tag-Pin wäre die grobe, statische Antwort auf eine
+Frage, die im Entwurf bereits fein und dynamisch beantwortet ist. Ich habe die vorhandene Antwort
+nicht gesucht, sondern eine schlechtere neu erfunden und sie als Befund vorgelegt.
+
+Das ist [[feedback_alles_ist_geplant_gedaechtnisluecke_selbst_recherchieren]], Owner-KERN vom
+07.08., wörtlich: *eine nicht auflösbare Frage ist KEINE offene Entscheidung, sondern MEINE
+Explore-Gedächtnislücke.* Und es ist die Verletzung der Stufe **A2.0 „Gedächtnis zuerst"** — ich
+bin von der Messung direkt in die Deutung gesprungen, ohne dazwischen zu fragen, ob das Gemessene
+schon einen Entwurf hat.
+
+### Was von meinem Befund als echte Aufgabe übrig bleibt
+
+Zwei Dinge, und sie sind kleiner und schärfer als das, was ich behauptet hatte:
+
+1. **Eine Wache, die einen Nenner aus der Hardware zieht, ist auf zwei Maschinen zwei verschiedene
+   Wachen.** Das hat Pipeline 15412 bewiesen und das bleibt wahr, unabhängig davon, wer welches
+   Batch nimmt. Die Folgerung ist aber nicht „Jobs pinnen", sondern: **jede solche Wache muss ihren
+   Nenner MIT der Maschine ausweisen**, auf der sie ihn erhoben hat. Ein „457 Tests sichtbar" ohne
+   den Zusatz „auf prod2" ist eine Zahl ohne Gegenstand.
+2. **Die Frage, die ich hätte stellen sollen** und die jetzt als Strang 8 läuft: baut jede Maschine
+   zum **Maximum ihrer eigenen** technischen Möglichkeiten — prod1 mit AVX-512, prod2 mit AVX2 —
+   und **unterscheidet das Lager die beiden Ergebnisse?** Wenn zwei verschieden kompilierte Binaries
+   dieselbe Kennung bekämen, wäre der SKIP falsch: eine Maschine überspränge eine Binary, die sie
+   selbst nie hätte bauen können. **Das** wäre ein Datenintegritäts-Befund. Ob er zutrifft, ist
+   offen und wird gerade am Objekt geprüft.
 
 ### Die Klasse, zum wiederholten Mal an diesem Tag
 
-*„EIN BLECH"* stand als Tatsache in einem Plan, war aber von **nichts erzwungen** — kein Tag, kein
-Gate, keine Wache. Prüfung 4 aus GOAL v8: *was erzwingt das Halten?* Antwort hier: **Zufall.**
-Und Zufall, Disziplin und Maschine sehen im Rückblick identisch grün aus — bis ein Job das erste
-Mal woanders landet.
+Nicht *„eine Behauptung ohne Erzwinger"* — das war meine erste, falsche Diagnose. Sondern:
+**ein korrekt gemessener Befund, ausgelegt auf einen Gegenstand, der ihm nicht gehört.** Prüfung 2
+aus GOAL v8, *der Gegenstand*. Die Zahlen waren richtig, der Host-Beleg war richtig, die Arithmetik
+war richtig — und der Schluss lag trotzdem daneben, weil er eine Schicht traf, die die Frage gar
+nicht beantwortet. Ein solcher Fehler erzeugt **kein Fehlersignal**: er sieht aus wie sorgfältige
+Arbeit, weil er aus sorgfältiger Arbeit besteht. Das ist der **Stellvertreter** aus GOAL v8, hier
+ausnahmsweise nicht im Werkzeug, sondern in mir.
 
 **Gefunden hat es keine Analyse, sondern eine frisch gebaute Wache beim ersten CI-Kontakt.**
 

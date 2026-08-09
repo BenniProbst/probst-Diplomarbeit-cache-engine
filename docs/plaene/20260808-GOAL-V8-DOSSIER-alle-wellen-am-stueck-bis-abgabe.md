@@ -263,9 +263,50 @@ Transkripte nie committen · Messdaten nie löschen · Doku nur deprecaten.
 
 ## VI.1 Die Kette
 
+Es gibt **zwei** Ketten, und sie sind nicht dieselbe. Die eine beschreibt die Übergabe von
+Verantwortung im Code, die andere den Weg eines Prüflings von der XML bis ins PDF. Wer sie
+verwechselt, beurteilt die richtige Sache auf der falschen Schicht.
+
+**(a) Die Architektur-Kette — wer trägt wann:**
+
 ```
 [PLANER] fragt (Laufzeit) → [CEB] trägt (Compile-Zeit) → [HYBRID] adaptiert → [TIER] läuft
 ```
+
+**(b) Die Verarbeitungskette — der Weg des Prüflings.** Owner-Wortlaut vom 09.08., bindend:
+
+```
+XML
+ → Planer
+ → CEB
+ → Tier-Binaries BAUEN     mit Lagerhaltung + Hardware-Job-Pool über Maschinenfähigkeiten
+                            (gleiche CI für alle Maschinen,
+                             custom Filterung der Compiles je Hardware-Freigabe)
+ → Tier-Binaries MESSEN    mit Lagerhaltung
+ → Tier-Binaries AUSWERTEN
+ → Tier-Binaries RELEASE   + Hybrid-Bau
+ → Messwerte als LaTeX und PDF VERÖFFENTLICHEN
+```
+
+**Der Hardware-Job-Pool ist damit ein benanntes Kettenglied, kein Betriebsdetail.** Alle Maschinen
+fahren **dieselbe** CI und dürfen zunächst **alle** Jobs aufnehmen; was eine Maschine tatsächlich
+übernimmt, entscheidet die **Filterung der Compiles nach ihrer Hardware-Freigabe** — und die
+Abstimmung darüber, *wer welches Batch verarbeitet*, läuft **über das Lager**. Owner, wörtlich:
+
+> „das war so geplant, dass über das Lager die Maschinen abstimmen, wer welches Batch verarbeitet
+> und es können auch erstmal alle Maschinen alle Jobs aufnehmen."
+
+Daraus folgt unmittelbar die Frage, an der die Datenintegrität hängt und die separat zu klären ist:
+**baut jede Maschine zum Maximum ihrer eigenen Möglichkeiten** — prod1 mit AVX-512, prod2 mit AVX2 —
+**und unterscheidet das Lager die beiden Ergebnisse?** Trügen sie dieselbe Kennung, wäre der SKIP
+falsch: eine Maschine überspränge eine Binary, die sie selbst nie hätte bauen können.
+
+**Diese acht Stationen sind zugleich die Explore-Auslöseliste.** Owner-Anweisung vom 09.08.:
+komme ich zu einem Thema dieser Kette nicht weiter, wird **zuerst** ein Sonnet-5-max-effort-Explore
+(*„very thorough"*) gefahren, der herausfindet, **was in der Vergangenheit dazu geplant war** —
+und ebenso immer dann, wenn ich sonst raten müsste. **Raten ist nie zulässig.** Der Anlass für diese
+Regel steht im Ledger unter „RICHTIGSTELLUNG 09.08.2026": ein korrekt gemessener Befund, den ich
+gedeutet habe, ohne vorher nach dem vorhandenen Entwurf zu suchen.
 
 ## VI.2 HYBRID — Pflicht, eigene Gattung, 0 % gebaut
 
