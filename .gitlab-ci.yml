@@ -1832,6 +1832,21 @@ measure:golden-320:
       sh ../ci/mess_ausbeute_wache.sh measure_out 1 auto
       # ── FRISCHE (D-1): dieselbe Pruefung, die measure:smoke seit heute faehrt. Sie fehlte hier --
       #    T-6-Schwesterpflicht: zwei Jobs derselben Familie duerfen nicht verschieden scharf sein.
+      #    WAS DAS HIER NEU HART MACHT, ausdruecklich benannt statt versteckt: dieser Job deklariert
+      #    KEIN COMDARE_MINDEST_GEMESSEN (am Objekt gezaehlt: 0 Deklarationen im Job-Block), es
+      #    greift also der Default 1 -- ein golden-320-Lauf, der ausschliesslich RESUMIERT und
+      #    nichts neu misst, wird dadurch ROT. Das ist gewollt (ein Voll-Resume ist eine
+      #    vorgefertigte CSV, die sich nur nicht so nennt), und der Ausweg steht offen:
+      #    COMDARE_MINDEST_GEMESSEN=0 setzen. Der Resume-Deckel bleibt ungesetzt, Resume also erlaubt.
+      #    BEKANNTE LUECKE der gerufenen Wache, hier genannt weil dieser Aufruf sie erreichbar macht:
+      #    ci/durchstich_wache.sh kennt NUR die Zeile 'RUN_PROFILE fertig:' (am Objekt: 0 Vorkommen
+      #    von 'RUN_EXPERIMENT' in der Datei, 4 von 'RUN_PROFILE' als Gegenprobe). Ein Profil mit
+      #    Wurzel <comdare_experiment> emittiert stattdessen 'RUN_EXPERIMENT fertig:' und die Wache
+      #    endet mit rc=2, auch wenn measured=7 dort steht (literal nachgestellt, 2026-08-09).
+      #    HEUTE UNERREICHBAR: alle 11 thesis_profiles der ce tragen <comdare_thesis_profile>, das
+      #    einkompilierte Default m3v2_study.profile.xml eingeschlossen. Der Fall ist fail-closed
+      #    (rot, nicht still gruen) -- aber er ist ein eigenes Paket an ci/durchstich_wache.sh +
+      #    ci/tests/durchstich_bissprobe.sh, nicht hier mitgeheilt.
       sh ../ci/durchstich_wache.sh frische "$CI_PROJECT_DIR/messlauf-stdout.log" \
         "${COMDARE_MINDEST_GEMESSEN:-1}" ${COMDARE_MAX_RESUMIERT:+"$COMDARE_MAX_RESUMIERT"}
       # ── ALTBESTAND (D3-8): Code/measure_out ist vom Aufraeumen ausgenommen (GIT_CLEAN_FLAGS
