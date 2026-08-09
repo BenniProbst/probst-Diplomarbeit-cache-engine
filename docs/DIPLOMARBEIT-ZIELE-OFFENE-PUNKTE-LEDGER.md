@@ -16,6 +16,80 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — HYBRID: nicht 0 % gebaut, sondern 0 % ANGESCHLOSSEN. Und 14 Entscheide stehen davor.
+
+**Volltext:** `docs/plaene/20260809-HYBRID-bauplan-und-entscheidungsvorlage.md` (Strang 23,
+vier blinde Linsen + Nachprüfung am Objekt).
+
+### Der Befund, der den Bau umkehrt
+
+**Die Vorarbeit existiert dreifach und ist getestet — sie ist nur nirgends angeschlossen.**
+Die Kurven-Synthese-Mathematik (Fritsch-Carlson-Spline, Break-Even-Schnittpunkte), die der
+künftige Router konsumieren soll, liegt in **1802 Zeilen über drei parallele Stacks**
+(`heuristik/`, `builder/curve_fit`+`decision_lambda_trees`, `best_binary_selector`-Hälfte-B).
+**Null Produktions-Konsumenten** — nur Tests rufen sie auf.
+
+**Und der Code verweigert Hybrid heute aktiv:** `lager_pfad_grammatik.hpp:527` weist einen
+Hybrid-Pfad-Token **compile-hart per Wurf** zurück, weil K1 offen ist. Das ist kein Defekt,
+sondern eine bewusst gesetzte Sperre, die auf einen Entscheid wartet.
+
+### Drei Fallen für den, der jetzt bauen wollte
+
+**Namenskollision:** `AnatomyGenus::Adapter` **existiert bereits** als voll gebaute, andere
+Gattung (Container-Gattung, Vorbild `std::stack`/`queue`, ~170 grep-Treffer, eigenes ABI, eigenes
+Dock, eigener Snapshot-POD). Die geplante Gattung heißt `HEURISTIK-ADAPTER`.
+
+**Ein irreführender Testname:** `test_hybrid_spline_selector_scaffold` **ist grün und
+registriert** — testet aber **keine** Hybrid-Typen, sondern synthetisch die Vorläufer-Bausteine.
+Wer ihn als Beleg für die Hybrid-Stufe liest, hält Vorbau für Bau.
+
+**Zwei unvereinbare Definitionen von „beste Binary":** `best_binary_selector` (1104 Zeilen, zwei
+grüne ctest, empirisch gegen echte Mess-CSV gelaufen) kürt **einen globalen Sieger je Metrik,
+gemittelt über alle Lasten** — F8 verlangt **einen Sieger JE Eingangslast, mehrere gleichzeitig**.
+Der Fork ist real und **nicht aufgelöst**.
+
+### Die kleinste Strecke — sie ist klein
+
+**Ein Dock, zwei Ziele, ein ctest:** 5 neue Dateien + 1 CMake-Anschluss + `test_hy_f8_reroute`.
+Ohne Eviction, ohne XML, ohne Router, **ohne `variant`** — bei genau einem Dock-Typ wird die
+Ausnahme nicht gebraucht. Ziele: 2 der **76** vorhandenen plain `.so`. **1,5–2,5 AT Bau + 0,5–1
+AT dlopen-Empirie.**
+
+**Aber die Vorkosten sind nicht wegdiskutierbar:** E-1 und K2 müssen **vorher** entschieden sein,
+sonst ist schon das Linken geraten.
+
+### Die Mengenfrage ist per Konstruktion unbeantwortbar
+
+Voll-Matrix ungedeckelt: **≥143 Maschinentage** einthreadig (Untergrenze). Deckel: **4,5
+Maschinentage = 3,1 % davon.** Minimalfall F8: **+1 Hybrid-`.so`, +0 plain-Neubauten**.
+
+**HY-B steht laut OV-4 außerhalb des Deckels und ist unbeziffert.** Kein Dokument nennt
+#Lastprofile oder k je Profil. Der größte benannte Multiplikator ist die **M-06-Bau-Variante der
+Thesis (×3)** — und die ist **heute nicht herstellbar**: von den sechs geforderten CEB-Varianten
+sind höchstens **zwei** baubar, weil G2/G3 sich ein Gate teilen (`mess_achsen_naht.hpp:75-95`).
+
+**Ehrliche Antwort: unbeantwortbar, bis `--check-size` existiert und EIN HY-B-Punkt gemessen ist.**
+Deshalb ist `--check-size` **Vorbedingung der Messplanung**, nicht ein Posten daneben.
+
+### VIERZEHN Entscheide — und einer hat Frist MORGEN
+
+Der Bauplan formuliert sie alle ja/nein-fähig mit **beiden** Folgen. Die vier, die den Bau
+blockieren:
+
+| | Frage | Was daran hängt |
+|---|---|---|
+| **E-1** | Eigener Eintrag in `AnatomyGattung` (4. Wert) und `AnatomyGenus` (6. Wert)? | JA: Hauspattern greift vollständig, +1–2 AT, „KEINE ABI-Änderung" muss zu „kein Major-Bump" präzisiert werden. NEIN: ABI-Nulllast hält, aber der Owner-KERN „eigene Gattung" bleibt unerfüllt. **Merge-Angebot:** eigene Klassifikation + geerbtes Ziel-Interface — dann ist nur noch die Rückgabe von `genus()` zu wählen. |
+| **E-2 = K1** | Eigene Einlagerungsform für die Hybrid-`.so`? | JA: die L3-Sperre wird per Owner-Gate gedreht. NEIN: Hybrid = reines Auswertungs-Artefakt, je Lauf neu gebaut. |
+| **E-3 = K2** | Loader in eine stufen-neutrale Lib extrahieren? | JA: Doktrin bleibt unberührt, Extraktions-Paket vorher. NEIN: Hybrid linkt die Builder-Lib, schneller, braucht eine dokumentierte Ausnahme. |
+| **E-4 = K5** | Snapshot als **Summe** über alle Docks? | JA: Gesamtbild, Provenienz je Sub-Tier verloren. NEIN: saubere Provenienz des aktiven Ziels, übrige Docks unsichtbar. **Bis zum Entscheid gilt keine Variante als implizit gesetzt.** |
+
+**E-10 = OV-13 hat Frist Montag 10.08. — morgen:** *HY-A/HY-B/HY-C-Zerlegung mit F8-Minimal-DoD
+als Pflichtkern?* JA hält KERN und Design gleichzeitig. NEIN entspannt W1 um vier Tage, schiebt
+HYBRID nach W7 — **und kollidiert mit „ALLES PFLICHT" bei fünf verbleibenden Freitagen.**
+
+**E-5 ist der teuerste, wenn er ausbleibt:** welcher der drei Kurven-Stacks ist kanonisch?
+**Ohne Entscheid entscheidet der Aufräumpass §75 implizit** — und dann ist die Wahl getroffen,
+ohne dass jemand sie getroffen hat.
 ## NACHTRAG 09.08.2026 — Der Datenintegritäts-Alarm: widerlegt am Hauptweg, präzisiert am Nebenweg, und der Fix wurde bewusst NICHT gebaut
 
 **Gelandet:** `ce 9f92d49f` — `test_lagz1_lager_schluessel_simd.cpp`, 10 Fälle, drei Betriebsarten
