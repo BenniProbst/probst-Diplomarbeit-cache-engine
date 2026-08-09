@@ -331,6 +331,33 @@ test:mess-ausbeute-bissprobe:
   script:
     - sh ci/tests/mess_ausbeute_bissprobe.sh --selbstbiss
 
+# -- F1-DURCHSTICH (2026-08-09): PROBE fuer die DURCHSTICH-WACHE (ci/durchstich_wache.sh) --
+# Die Wache entscheidet am 14.08., ob der Mini-Lauf etwas BEWIESEN hat oder nur gruen war. Sie traegt
+# zwei Zusicherungen, die sonst niemand gibt:
+#   frische      -- es wurde in DIESEM Lauf gemessen, nicht bloss aus Alt-Bestand resumiert. Ohne sie
+#                   ist ein Voll-Resume von einer frischen Messung nicht unterscheidbar; beide enden
+#                   laut ce profile_run_entry.hpp:1203 mit Exit 0 und legen Datenzeilen vor.
+#   lastprofile  -- die deklarierten Workload-Ids sind wirklich aufloesbar. Das Pre-Flight
+#                   `planner validate` kann das nicht sehen, wenn das Profil ausserhalb von ce liegt:
+#                   der Nenner "N workloads" faellt dann still aus seiner Ausgabe (am Objekt mit
+#                   derselben Datei an zwei Orten gegengeprueft).
+# --selbstbiss IM CI, weil eine Probe, die nur am gesunden Objekt gruen ist, immer gruen sein koennte:
+# der Schalter baut vier Wegwerf-Mutanten (je ein `exit 1` entfernt) und FORDERT, dass die Probe an
+# jedem rot wird. Die Koeder werden je Lauf aus /dev/urandom gewuerfelt, nicht abgeschrieben (K13).
+# KEIN allow_failure (Owner 06.07.2026: bei einer harten Pipeline gibt es kein allow_failure).
+test:durchstich-bissprobe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft wird nur der super-Baum
+  script:
+    - sh ci/tests/durchstich_bissprobe.sh --selbstbiss
+
 # -- W0b-1 / D3-3 (2026-08-08): PROBE fuer den PERSIST-SAMMLER (ci/persist_sammler.sh) --
 # Der Sammler entscheidet, ob ein Messfenster DAUERHAFT in den Baum kommt. Unter "Messdaten werden
 # nie geloescht" ist genau diese Entscheidung nicht rueckholbar: ein einmal zurueckgeschriebener
@@ -1229,6 +1256,26 @@ measure:smoke:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
       when: never
+    # ── F1-DURCHSTICH (Wellenplan ##25, 14.08.2026) ────────────────────────────────────────────────────────────
+    # Dieselbe Maschinerie, KLEINERES Profil. Der Wellenplan verlangt "1 Binary, 1 Perm, Minuten"; das
+    # Voll-Feature-Profil m3_smoke_coverage traegt 17 axis_sweeps + 21 sota_series + 21 workloads (am Objekt mit
+    # `comdare-experiment-planner validate` nachgezaehlt) und ist per `cap` NICHT verkleinerbar -- der deep-sweep-Pass
+    # faehrt ALLE Auspraegungen einer Achse (ce profile_run_entry.hpp:790-812), cap deckelt nur den Basis-Pass.
+    # Deshalb ein eigenes Profil statt eines gedeckelten Laufs.
+    #
+    # DIESE VARIABLE IST DISJUNKT zu COMDARE_RUN_MEASURE / COMDARE_BUILD_GOLDEN_N / COMDARE_DYNAMIC_PLANER_CI.
+    # Absicht: die F1-Welle erzeugt GENAU EINEN messenden Job. COMDARE_RUN_MEASURE darf dabei NICHT gesetzt sein --
+    # es erzeugt zugleich measure:golden-320 (timeout 10 days), der per needs auf diesem Job wartet und danach den
+    # resource_group-Slot tagelang belegt.
+    #
+    # COMDARE_LOAD_PROFILE_DIR ist hier PFLICHT, nicht Kosmetik: das Profil liegt in super, die Lastprofile liegen
+    # in ce. Der Treiber loest Achse 2 sonst relativ zum Profilpfad auf und bricht mit Exit 4 ab.
+    - if: '$COMDARE_DURCHSTICH == "true"'
+      variables:
+        COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/experiment_config/thesis_profiles/f1_durchstich.profile.xml"
+        COMDARE_LOAD_PROFILE_DIR: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/load_profiles"
+        COMDARE_MINDEST_GEMESSEN: "1"      # mindestens 1 REAL gemessene Zelle
+        COMDARE_MAX_RESUMIERT: "0"         # das Profil faehrt resume="false" -> jede resumierte Zelle ist ein Befund
     # DEPRECATED-Fallback (2026-07-21, analog COMDARE_STATIC_MATRIX_FALLBACK): dieser STATISCHE Smoke-Job ist durch
     # die dynamische Kette (planer:delegate -> ceb -> tier, Profil-Methodik m3_smoke=debug, 2c-Dual-Compile) abgeloest.
     # Er laeuft NUR NOCH mit ZUSAETZLICHEM COMDARE_STATIC_SMOKE_FALLBACK=="true" (Default AUS) -- sonst kollidierte er
@@ -1260,10 +1307,28 @@ measure:smoke:
       echo "== Pre-Flight (Subkommando 'validate', rein lesende Pruefung des SMOKE-Profils gegen die EnabledStrategies) =="
       echo "   COMDARE_THESIS_PROFILE=$COMDARE_THESIS_PROFILE"
       "$PLANNER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
+      # ── LASTPROFIL-DECKUNG (D-1, 2026-08-09): der blinde Fleck des Pre-Flights ──────────────────────────────
+      # AM OBJEKT GEMESSEN (Gegenprobe: DIESELBE Datei an zwei Orten): `planner validate` loest die Lastprofile
+      # relativ zum PROFILPFAD auf. Liegt das Profil ausserhalb von ce, faellt der Nenner "N workloads" aus der
+      # Validat-Zeile ERSATZLOS weg -- die Pruefung wird still uebersprungen, nicht rot. Und der naheliegende
+      # Ausweg traegt nicht: COMDARE_LOAD_PROFILE_DIR kennt nur der TREIBER, in apps/experiment_planner/main.cpp
+      # kommt die Variable nicht vor (grep ueber die Datei: 0 Treffer bei nicht-leerer Datei).
+      # Diese Wache loest jede deklarierte Workload-Id einzeln auf und nennt ihren Nenner. Sie laeuft fuer JEDES
+      # Profil, nicht nur fuer den Durchstich: ein Profil ohne aufloesbare Achse 2 misst nichts.
+      LOADDIR="${COMDARE_LOAD_PROFILE_DIR:-$(dirname "$COMDARE_THESIS_PROFILE")/../load_profiles}"
+      test -x ../ci/durchstich_wache.sh || { echo "FEHLER: ci/durchstich_wache.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      sh ../ci/durchstich_wache.sh lastprofile "$COMDARE_THESIS_PROFILE" "$LOADDIR"
       mkdir -p measure_out_smoke
-      echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
+      echo "== Messlauf ueber $COMDARE_THESIS_PROFILE =="
       # LAG-P1: stderr mitschneiden UND live weiterreichen (Begruendung s. measure:golden-320).
-      { "$DRIVER" experiment_config measure_out_smoke 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1
+      # D-1 (2026-08-09): ZUSAETZLICH stdout mitschneiden. Der Treiber schreibt seine Bilanz-Zeile
+      #   "RUN_PROFILE fertig: ... measured=<N> resumed=<M> ... csv_ok=<0|1>"
+      # nach stdout (ce profile_run_entry.hpp:1180-1183); bisher lief stdout an fd3 direkt in das Job-Log und
+      # war fuer keine Wache greifbar. Ohne diese Zeile ist NICHT entscheidbar, ob ein Lauf gemessen oder nur
+      # Alt-Zeilen resumiert hat -- und beides endet laut :1203 mit Exit 0.
+      # Die rc-Weitergabe ist am Objekt geprueft (Stub-Treiber mit Exit 3): pipeline_rc=3, beide Logs gefuellt.
+      { "$DRIVER" experiment_config measure_out_smoke 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1 \
+        | tee "$CI_PROJECT_DIR/messlauf-stdout.log"
       # D3 (2026-08-08): die alte Erfolgsbedingung prueft nur, DASS eine measurements.csv
       # existiert -- die Zeilenzahl wurde eine Zeile darueber AUSGEGEBEN und nirgends geprueft.
       # Eine CSV mit nur der Kopfzeile bestand das Gate. Die Wache zaehlt jetzt Datenzeilen
@@ -1271,6 +1336,17 @@ measure:smoke:
       # (hier und in measure:golden-320) und kopierter Code den Defekt mitkopiert hat.
       test -x ../ci/mess_ausbeute_wache.sh || { echo "FEHLER: ci/mess_ausbeute_wache.sh fehlt/nicht ausfuehrbar"; exit 1; }
       sh ../ci/mess_ausbeute_wache.sh measure_out_smoke 1
+      # ── FRISCHE (D-1, 2026-08-09): die Ausbeute-Wache oben zaehlt ZEILEN, nicht HERKUNFT ────────────────────
+      # ce profile_run_entry.hpp:1203 setzt woertlich
+      #     exit_code = (((any_measured > 0 || any_resumed > 0) || provision_ok) && csv_ok) ? 0 : 1;
+      # Ein Lauf, der NICHTS misst und ausschliesslich Alt-Zeilen resumiert, ist damit gruen UND hat Datenzeilen.
+      # Die Ausbeute-Wache findet diese Zeilen und sagt zu Recht OK -- sie ist fuer die Menge zustaendig, nicht
+      # fuer das Alter. Fuer den Durchstich waere genau das der Stellvertreter: die Kette geprueft, der
+      # Gegenstand nicht. Ein Voll-Resume IST eine vorgefertigte CSV, sie nennt sich nur nicht so.
+      # Default 1 (jeder Mess-Job muss mindestens eine Zelle REAL gemessen haben); der Resume-Deckel bleibt leer,
+      # wo Resume legitim ist, und steht beim Durchstich auf 0 (das Profil faehrt resume="false").
+      sh ../ci/durchstich_wache.sh frische "$CI_PROJECT_DIR/messlauf-stdout.log" \
+        "${COMDARE_MINDEST_GEMESSEN:-1}" ${COMDARE_MAX_RESUMIERT:+"$COMDARE_MAX_RESUMIERT"}
       # ── CI-interaktiv (#24): den Anhang aus den LIVE-Smoke-Messdaten regenerieren (gleiche Logik wie golden-320) ──
       echo "== Anhang-Regenerierung aus Live-Smoke-Messdaten (#24) =="
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
@@ -1328,6 +1404,7 @@ measure:smoke:
       - Code/measure_out_smoke/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die 115 DLL-Binaries
       - Code/measure_out_smoke/appendix/**/*.tex # CI-interaktiv (#24): regenerierte 12 Kern- + 5 Darstellungs-.tex je Sprache (K-12-Sweep 2026-07-19)
       - bestandslog-lauf.log                     # LAG-P1: der Beleg der aktiv-Zeile, auch (gerade) im roten Fall
+      - messlauf-stdout.log                      # D-1: die Bilanz-Zeile measured=/resumed= -- der FRISCHE-Beleg
     when: always
     expire_in: 12 weeks
 

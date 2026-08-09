@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- comdare_thesis_profile - F1-DURCHSTICH (Wellenplan ##25, 14.08.2026).
+
+     ZWECK: der KLEINSTE ehrliche Messlauf, den die Kette tragen kann. Der Wellenplan verlangt woertlich
+     "Mini-Lauf (1 Binary, 1 Perm)"; dieses Profil ist genau das und nichts darueber hinaus. Es beweist die
+     KETTE (Marker, Gate, persist, anhang:forward, PDF), nicht die Streuung und nicht die Abdeckung.
+
+     WARUM EIN EIGENES PROFIL UND NICHT m3_smoke_coverage:
+     m3_smoke_coverage traegt (am Objekt mit `comdare-experiment-planner validate` nachgezaehlt)
+     18 Achsen, 17 axis_sweeps, 21 sota_series, 21 workloads, 2 working_set-Werte. Die Sweeps sind durch
+     `cap` NICHT begrenzbar: der deep-sweep-Pass faehrt ALLE Auspraegungen einer Achse (ce
+     profile_run_entry.hpp:790-812, `sweep_n == |Achsen-Auspraegungen|`), waehrend cap nur den Basis-Pass
+     deckelt. Ein "kleiner Lauf ueber ein grosses Profil" ist damit strukturell unmoeglich, nicht bloss
+     unbequem. Deshalb ein Profil, dessen Umfang schon in der Deklaration eins ist.
+
+     DIE EINE EIGENSCHAFT, DIE DIESES PROFIL VON EINEM SMOKE UNTERSCHEIDET: resume="false".
+     ce profile_run_entry.hpp:1203 setzt
+         exit_code = (((any_measured > 0 || any_resumed > 0) || provision_ok) && csv_ok) ? 0 : 1;
+     Ein Lauf, der NICHTS misst und nur Alt-Zeilen resumiert, endet also GRUEN und legt Datenzeilen vor,
+     die aelter sind als der Lauf. Fuer einen Durchstich waere das der Stellvertreter in Person: die Kette
+     waere geprueft, der Gegenstand nicht. resume="false" erzwingt, dass jede Zeile in diesem Lauf entsteht;
+     ci/mess_frische_wache.sh prueft danach am Treiber-Marker nach, dass measured >= 1 wirklich eingetreten
+     ist. Beides zusammen, weil eine Zusicherung in der XML keine Wache ist.
+
+     UMFANG, ausgeschrieben (das ist der Nenner dieses Profils):
+       1 base_tier x 1 Achsen-Permutation (18 Achsen mit je genau 1 Wert) = 1 Basis-Binary
+       0 axis_sweeps . 0 sota_series . 1 workload . 1 working_set-Wert . 1 Wiederholung
+       => 1 Binary, 1 Perm, 1 erwartete CSV-Datenzeile.
+
+     ACHSENWERTE: byte-gleich zur m3v2-Baseline (Index 0 je Achse), uebernommen aus
+     wdk_fairness_example.profile.xml. Damit ist die binary_id dieses Laufs KEINE neue Groesse, sondern die
+     schon bekannte Basis-Zelle; der golden-Roundtrip bleibt unberuehrt.
+
+     WRITEBACK: <method value="csv"/>. Der Owner-KERN vom 09.08. ("xlsx ist der Standard, csv waehlbar,
+     beide zusammen zulaessig") ist an DIESEM ce-Stand noch nicht erreichbar: kWritebackMethodRegistry
+     kennt {csv, latex_table, comparison_metrics}, ein Wert "xlsx" existiert dort nicht. csv ist hier also
+     keine Formatwahl gegen den KERN, sondern der einzige deklarierbare Wert; ausserdem entscheidet das
+     persist-Commit-Gate ohnehin CSV-basiert. Sobald der xlsx-Wert in der Registry steht, gehoert er
+     additiv hierher.
+
+     ORT: super, nicht ce. Begruendung und offene Entscheidung stehen im Kopf von
+     ci/mess_frische_wache.sh und im Commit; kurz: der Treiber ist super-seitig, die Akten sind
+     super-seitig, und base_tier/profile_ref wird nirgends dereferenziert (ce xml_config_parser.cpp:284
+     legt das Attribut nur ab). Ob das Profil dauerhaft hier oder in ce thesis_profiles/ wohnt, ist eine
+     Owner-Frage, keine technische. -->
+<comdare_thesis_profile id="f1_durchstich" schema_version="1">
+
+  <!-- EIN Lebewesen. Jedes weitere waere eine zweite Zelle und damit kein "1 Binary" mehr. -->
+  <base_tiers>
+    <tier id="prt_art" profile_ref="../sota/art.profile.xml" paper_ref="PRT"/>
+  </base_tiers>
+
+  <!-- Alle 18 Organ-Haupt-Achsen auf die m3v2-Baseline gepinnt (je 1 Wert = Index 0;
+       Reihenfolge kCompositionAxisNames). 1 x 1 x ... x 1 = genau 1 Permutation. -->
+  <permute_axes>
+    <axis ref="search_algo"><value>k_ary</value></axis>
+    <axis ref="cache_traversal"><value>linear_fanout</value></axis>
+    <axis ref="mapping"><value>direct_placement</value></axis>
+    <axis ref="path_compression"><value>path_compression_none</value></axis>
+    <axis ref="node_type"><value>node4</value></axis>
+    <axis ref="memory_layout"><value>memory_layout_cache_line_aligned</value></axis>
+    <axis ref="allocator"><value>std_malloc</value></axis>
+    <axis ref="prefetch"><value>prefetch_none</value></axis>
+    <axis ref="concurrency"><value>concurrency_none</value></axis>
+    <axis ref="serialization"><value>serialization_raw_binary</value></axis>
+    <axis ref="value_handle"><value>value_handle_inline</value></axis>
+    <axis ref="index_organization"><value>index_org_heap</value></axis>
+    <axis ref="io_dispatch"><value>io_in_memory_only</value></axis>
+    <axis ref="migration_policy"><value>migration_none</value></axis>
+    <axis ref="filter"><value>filter_bloom</value></axis>
+    <axis ref="queuing_q1"><value>no_buffer</value></axis>
+    <axis ref="queuing_q2"><value>eager_flush</value></axis>
+    <axis ref="persistence_target"><value>persistence_memory_only</value></axis>
+  </permute_axes>
+
+  <!-- KEIN <axis_sweeps> und KEIN <sota_series_set>: beide sind Mengen-Multiplikatoren, und der
+       Durchstich hat als einzige Aufgabe, dass die Kette EINEN echten Wert traegt. -->
+
+  <!-- EIN kleiner Working-Set-Wert (Cache-nah, Minuten statt Stunden). -->
+  <working_set_sweep>4096</working_set_sweep>
+
+  <compile_dims>
+    <workloads>ycsb_c</workloads>
+    <telemetry mode="on" silent="true"/>
+  </compile_dims>
+
+  <runtime_dynamic>
+    <thread_count>1</thread_count>
+    <hw_prefetcher>all_on</hw_prefetcher>
+  </runtime_dynamic>
+
+  <!-- 1 Wiederholung: der Durchstich prueft Funktion, nicht Streuung. -->
+  <repetitions count="1" interpolate="false" overlay_in_chart="true"/>
+
+  <!-- cap="1": exakt die eine deklarierte Basis-Zelle.
+       resume="false": KEIN Alt-Bestand darf diesen Lauf gruen machen (Begruendung im Kopf). -->
+  <run_options cap="1" platform="linux-x86_64" build_version="f1-durchstich" resume="false"/>
+
+  <modes>
+    <mode name="f1_durchstich_base" merge="Stufe1_CeOnly"
+          active_axes="search_algo cache_traversal mapping path_compression node_type memory_layout allocator prefetch concurrency serialization value_handle index_organization io_dispatch migration_policy filter queuing_q1 queuing_q2 persistence_target"/>
+  </modes>
+
+  <static_axes from="base_tier"/>
+
+  <key_value_signature>
+    <key_types>std::uint64_t</key_types>
+    <value_types>std::string</value_types>
+  </key_value_signature>
+
+  <!-- Mess-Unter-Achsen, binary_id-neutral. debug = Verdrahtungs-Check "DASS es laeuft" (Section 61),
+       genau die Rolle dieses Laufs. -->
+  <run_methodology>
+    <method value="debug"/>
+  </run_methodology>
+  <measurement_framework name="ycsb"/>
+  <writeback_methods>
+    <method value="csv"/>
+  </writeback_methods>
+  <measurement_tooling>
+    <combo tools="wallclock"/>
+  </measurement_tooling>
+</comdare_thesis_profile>
