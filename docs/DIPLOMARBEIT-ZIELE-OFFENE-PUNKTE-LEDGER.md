@@ -16,6 +16,97 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — DAS REGISTER IST VOLLSTÄNDIG: 17 % erfüllt, und eine Wurzel erklärt den Rest
+
+Die vier ungemessenen Kettenstationen sind nachgeholt (Strang 22, je Station eigene Messung ohne
+Sammelstufe — der Kürzungsfehler des ersten Laufs ist behoben).
+
+### Die Gesamtbilanz über 256 gemessene Aussagen
+
+| | | |
+|---|---|---|
+| **ERFÜLLT** | 44 | **17 %** |
+| TEILWEISE | 118 | 46 % |
+| **NUR_PAPIER** | 65 | **25 %** |
+| **VERLETZT** | 22 | **9 %** |
+| NICHT_PRÜFBAR | 7 | 3 % |
+
+**Das Kettenmuster ist bestätigt und schärfer als vermutet:** die ersten 87 Aussagen (Stationen
+XML/Planer/CEB) lagen bei 23 % erfüllt — die vier hinteren Stationen bei **14 %**. Je weiter
+hinten, desto weniger Realität. **Ein Viertel des Bestands ist deklariert und wirkungslos.**
+
+Nachgeholter Aufwand: **1564 h** (Stationen 5–8) zusätzlich zu den ~770 h der ersten Messung.
+
+### DIE WURZEL — sie erklärt mehr als jeder Einzelbefund
+
+**Das ce-Submodul, das super tatsächlich kompiliert** (`Code/external/comdare-cache-engine`,
+Stand `a1d0c201`), **enthält beide am 09.08. verworfenen Perzentil-Formeln lebendig** und ruft sie
+an rund **24 Stellen**:
+
+    detail::nearest_rank_p   = round(q*(n-1))        tier_observe_trace_abi.hpp:69-75
+    k = min(n-1, floor(q*n))                          commands/latency_stats.hpp:12,23-31
+
+Die Wache, die den Kanon zertifiziert („Definitionen: 1, `nearest_rank_p`: 0"), läuft
+**ausschließlich im ce-Checkout**.
+
+> **Jede Zahl, die die super-Auswertungskette heute produziert, ist nach genau den Formeln
+> gerechnet, die der Kanon verwirft.**
+
+Damit ist das Vendoring kein Aufräumposten mehr, sondern **die erste Bau-Priorität**. Solange es
+steht, ist D5-1 in der Praxis wirkungslos — und jede Wache, die im ce-Checkout grün ist, sagt
+nichts über das, was super rechnet.
+
+### Der zweite harte Befund: „xlsx ist die Ausgabe" ist aktiv verletzt
+
+| Ort | csv | xlsx |
+|---|---|---|
+| `super .gitlab-ci.yml` | **36** | **0** |
+| `ce .gitlab-ci.yml` | **2** | **0** |
+
+Und es ist keine Unterlassung, sondern eine **aktive Wahl**: das produktive golden-Profil schreibt
+literal `<method value="csv"/>` (`m3_golden_coverage.profile.xml:153`). Der xlsx-Writer wird von
+**drei Test-Targets** gelinkt und von **null** Produktions-Targets; der lebende Messweg schreibt
+roh per `std::ofstream` nach `result.csv`. Die Registry deklariert sich selbst als „PASSIV".
+
+**Das ist ein Owner-KERN, der im Code umgekehrt ist.**
+
+### Der dritte: die Lagerhaltung der Messdaten kann strukturell nie anspringen
+
+Station 5 heißt „MESSEN **mit Lagerhaltung**". Der lebende Treiber
+(`super Code/02_messung_driver/main.cpp`) verdrahtet **nur** das Binary-Genus und enthält
+**0 Treffer** für `mess_bestand`/`messwert` (Gegenprobe `bestand_key_of` = 3). Das Gate im Iterator
+bleibt damit **dauerhaft false**.
+
+Die Datei, die es heilen würde (`messwert_key_source.hpp`, heute in ce gebaut, Unit-Test grün),
+**existiert im vendorierten ce gar nicht** — dieselbe Wurzel wie oben.
+
+### Station 7: HYBRID hat null Zeilen Produktionscode
+
+`libs/cache_engine/hybrid/` enthält in **beiden** ce-Checkouts **genau eine Datei** (README.md);
+**0 von 9** geplanten Dateien existieren; und `libs/cache_engine/CMakeLists.txt` führt **fünf**
+Unterverzeichnisse, von denen **keines** `hybrid` heißt.
+
+Die Station ist gespalten: der **RELEASE**-Strang trägt 4 erfüllt und **0** nur-Papier, der
+**HYBRID**-Strang 3 erfüllt und **18** nur-Papier.
+
+**Und ein Befund über meine eigene Vorlage:** ich hatte OV-13 als „Owner-bestätigt" geführt.
+Am Objekt: **0 Treffer für OV-13 im Ledger** (Gegenprobe OV-1 = 8). Es ist eine **Empfehlung mit
+Frist morgen**, keine Bestätigung. Ich habe eine offene Frage als beantwortet geführt.
+
+### Das Drift-Gate läuft über keinen einzigen realen Messwert
+
+Die 5-%-Regel über 3 Wiederholungen ist implementiert und getestet — aber **nicht in die
+Mess-Schleife geklammert**. Es existiert nur ein Gruppen-Rerun, nicht der „ganzer Lauf neu"-Fall.
+Der braucht einen **Wiederaufsetzpunkt** (Batch-Reservierung freigeben und neu greifen) — das ist
+die eigentliche Arbeit daran.
+
+### Was daraus für die Reihenfolge folgt
+
+1. **Vendoring nachziehen** — ohne das ist jede Auswertungs-Zahl nach verworfenen Formeln
+   gerechnet, und drei weitere Befunde lösen sich mit auf.
+2. **xlsx scharfschalten** — Owner-KERN, heute im Profil aktiv gegenteilig gesetzt.
+3. **Mess-Genus im Treiber verdrahten** — hängt an (1).
+4. Dann HYBRID (nach den vier Entscheiden) und das Drift-Gate.
 ## NACHTRAG 09.08.2026 — HYBRID: nicht 0 % gebaut, sondern 0 % ANGESCHLOSSEN. Und 14 Entscheide stehen davor.
 
 **Volltext:** `docs/plaene/20260809-HYBRID-bauplan-und-entscheidungsvorlage.md` (Strang 23,
