@@ -146,10 +146,16 @@ enum class ParityBauart {
     GitKaputt,
 };
 
+// 09.08.2026: Default-Initialisierer je POD-Member. cppcheck meldet sonst
+// uninitMemberVarNoCtor, und lint:static ist fail-closed (super-Pipeline 15474).
+// Alle Instanzen werden per Aggregat-Initialisierung vollstaendig belegt, der Wert
+// ist also heute nie unbestimmt -- der Initialisierer nimmt der Klasse die
+// Moeglichkeit, es spaeter doch zu sein, wenn jemand eine Zeile unvollstaendig anlegt.
+// Aggregat bleibt Aggregat: NSDMI sind seit C++14 zulaessig.
 struct ParityFall {
-    const char*                       name;
-    ParityBauart                      bauart;
-    WacheStatus                       soll_status;
+    const char*                       name{};
+    ParityBauart                      bauart{};
+    WacheStatus                       soll_status{};
     std::optional<ParityRissArt>      soll_riss;
     std::optional<ParityAbbruchGrund> soll_abbruch;
     std::vector<std::string>          soll_literale;

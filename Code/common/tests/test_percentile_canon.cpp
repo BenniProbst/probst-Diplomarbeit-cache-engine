@@ -78,11 +78,17 @@ namespace stats = comdare::da::stats;
     return v.back();
 }
 
+// 09.08.2026: Default-Initialisierer je POD-Member. cppcheck meldet sonst
+// uninitMemberVarNoCtor, und lint:static ist fail-closed (super-Pipeline 15474).
+// Alle Instanzen werden per Aggregat-Initialisierung vollstaendig belegt, der Wert
+// ist also heute nie unbestimmt -- der Initialisierer nimmt der Klasse die
+// Moeglichkeit, es spaeter doch zu sein, wenn jemand eine Zeile unvollstaendig anlegt.
+// Aggregat bleibt Aggregat: NSDMI sind seit C++14 zulaessig.
 struct HandFall {
-    char const*         name;
+    char const*         name{};
     std::vector<double> feld;
-    double              q;
-    double              soll; // VON HAND: k = ceil(q*n) - 1
+    double              q{};
+    double              soll{}; // VON HAND: k = ceil(q*n) - 1
 };
 
 [[nodiscard]] std::vector<double> eins_bis(int n) {

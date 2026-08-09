@@ -175,10 +175,16 @@ struct XmlBauplan {
     bool      doctype             = false; // DOCTYPE + Einzelbindestrich
 };
 
+// 09.08.2026: Default-Initialisierer je POD-Member. cppcheck meldet sonst
+// uninitMemberVarNoCtor, und lint:static ist fail-closed (super-Pipeline 15474).
+// Alle Instanzen werden per Aggregat-Initialisierung vollstaendig belegt, der Wert
+// ist also heute nie unbestimmt -- der Initialisierer nimmt der Klasse die
+// Moeglichkeit, es spaeter doch zu sein, wenn jemand eine Zeile unvollstaendig anlegt.
+// Aggregat bleibt Aggregat: NSDMI sind seit C++14 zulaessig.
 struct XmlFall {
-    const char*                    name;
-    XmlBauplan                     bauplan;
-    WacheStatus                    soll_status;
+    const char*                    name{};
+    XmlBauplan                     bauplan{};
+    WacheStatus                    soll_status{};
     std::optional<XmlAbbruchGrund> soll_abbruch;
     std::optional<XmlBefundArt>    soll_befund_art; // Art JEDES erwarteten Risses
     std::vector<std::string>       soll_literale;   // PFLICHT: mindestens eines
