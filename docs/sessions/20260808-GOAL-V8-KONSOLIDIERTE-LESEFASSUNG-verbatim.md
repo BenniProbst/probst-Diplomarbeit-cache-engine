@@ -190,7 +190,31 @@ Von den fünf Defekt-Familien war **dreimal der Test selbst der Defekt**. `test_
 | **D5** | fünf Median-Implementierungen | **offen** |
 | **D3-4** | Gate in `allow_failure`-Job wirkungslos | **offen** — eigener Folge-Job |
 
-`allow_failure` am Mess-Batch ist **korrekt** — es zu entfernen wäre eine **Regression**.
+~~`allow_failure` am Mess-Batch ist **korrekt** — es zu entfernen wäre eine **Regression**.~~
+
+> ⚠️ **KORREKTUR-EINSCHUB 09.08.2026 — dieser Satz ist WIDERLEGT; er bleibt als Wortlaut stehen,
+> weil dieses Dokument verbatim ist.**
+> Owner-Direktive OV-16, wörtlich: *„Das ist falsch, allow failure ist verboten … allow failure war
+> schon IMMER verboten."* Dreifach im Roh-Transkript belegt (06.07. · 26.07. · 09.08.).
+>
+> **Die Verwechslung, aus der der Satz entstand:** die Sichtbarkeits-Doktrin galt der **CSV-ZELLE**,
+> nicht dem **CI-JOB**.
+>
+> | Ebene | Verhalten bei einem Messfehler |
+> |---|---|
+> | **CSV-Zelle** | trägt `failed` (nicht `null`), plus Warnung an den Anwender, Messung wird übersprungen |
+> | **CI-Job** | fällt **immer hart rot** — nie `allow_failure` |
+>
+> *Owner (09.08.): „Wenn dann muss ein Fehler sauber mit einer Warnung an den Anwender angezeigt und
+> die Messung übersprungen werden, aber der CI job failed immer hart."*
+>
+> **Warum dieser Einschub nötig ist, obwohl das Dossier längst korrigiert wurde:** zwei andere
+> überholte Stellen dieses Dokuments (die „Ein Blech"-Regel und die D2-Zahl) tragen bereits
+> Korrektur-Einschübe — **diese nicht**. Wer die Lesefassung als Einstieg nimmt, was ihr Zweck ist,
+> hätte hier die widerlegte Fassung gelesen und die beiden anderen für vollständig gehalten.
+> Der Code hat das Dossier ohnehin überholt: `ce a558e87c` entfernt `allow_failure: true` aus der
+> emittierten Mess-Job-YAML. **Offen bleibt eine zweite, lebende Stelle:** `super .gitlab-ci.yml`
+> (`ergebnis:holen`, `when: manual`) — eigener Posten, nicht mit diesem Satz verwechseln.
 
 > **NACHTRAG 09.08.2026 (Posten D2-G4) — die Tabelle oben bleibt wörtlich stehen, eine Zahl darin
 > ist überholt.** Zeile **D2**: `18` Registrierungen unter `14` Bedingungen ist am Objekt
