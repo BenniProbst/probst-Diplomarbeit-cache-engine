@@ -16,6 +16,164 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (abends) — RESTPOSTEN: was heute gefallen ist und noch NICHT im Ledger stand
+
+**Auf Owner-Auftrag „ergänze alle fehlenden Punkte".** Vorher am Objekt geprüft, welche Themen der
+Ledger schon trägt (`grep -cF` je Suchmuster, mit Gegenprobe auf „Mess-Visitor" = 9 Treffer, damit
+ein Nullbefund nicht von einem kaputten Kommando stammt). Vier Themen hatten **null** Treffer.
+
+---
+
+### A. xlsx/csv — die ABLEITUNGSRICHTUNG (Owner-Korrektur)
+
+Der Entscheid „xlsx Standard, csv wählbar, beide zusammen zulässig" stand bereits. **Was fehlte,
+ist die Richtung.** Owner wörtlich:
+
+> „die csv wird doch **aus der xlsx gebildet, IMMER**. es wird nur entweder xlsx oder csv oder BEIDE
+> **auf Platte** gesichert, **was auf dem RAM liegt ist etwas völlig anderes**."
+
+    ERZEUGUNG (Speicher)    die xlsx-MAPPE entsteht IMMER.
+                            Aus ihr -- und nur aus ihr -- wird die csv gebildet.
+                            Auch dann, wenn am Ende keine xlsx auf Platte liegt.
+
+    PERSISTENZ (Platte)     hier, und NUR hier, wird gewaehlt:
+                              (a) xlsx   (b) csv einzeln   (c) BEIDE
+
+**Die csv ist kein Geschwister der xlsx, sondern ihr KIND.** Meine erste Fassung schrieb „beide
+Ausgaben speisen sich aus denselben In-Memory-Zeilen" — das macht aus einer Kette zwei parallele
+Wege und ist falsch.
+
+**Die harte Folge, die ohne die Trennung unsichtbar bleibt:** ein Lauf, der nur csv persistiert, hat
+die xlsx-Erzeugung **vollständig durchlaufen**. Bricht sie, ist auch die csv ungültig — sie kann
+nicht „einfacher" gelingen. **Ein csv-Ergebnis ohne funktionierenden xlsx-Weg ist ein Widerspruch,
+kein Sparmodus.** Damit liest sich der Ist-Zustand anders: `csv 36 / xlsx 0` mit einem xlsx-Writer
+ohne einen einzigen Produktions-Aufrufer ist nicht nur eine falsche Voreinstellung, sondern der
+Beleg, dass die Kette **an ihrer Wurzel nicht lief**. Der erste Produktions-Aufrufer ist seit heute
+gelandet (ce `d2e20e7c`/`f82707bc`, in `579e4099`).
+
+---
+
+### B. DIE ZWEI WARNUNGS-RUNDEN — Struktur und Defekte
+
+**Der Befund, der alles andere erklärt** (am Objekt, `cmake/compiler_flags.cmake:6`):
+`COMDARE_set_default_warnings()` definiert neun Warn-Flags und hat **genau EINEN Aufrufer** —
+`COMDARE_add_test`. Also **nur Test-Binaries**.
+
+    Komponente        mit -Wall   ohne
+    libs/ (CE-BIB)        0        16     <- die Bibliothek sieht sich selbst NIE
+    apps/                 0         9
+    tools/                0        12
+    tests/              197       309
+    SUMME               201       349
+
+Bibliotheks-Kompilierzeile: `-O3 -DNDEBUG -std=c++23`, sonst nichts. **Die Bau-Jobs melden 0
+Warnungen nicht, weil der Code sauber ist, sondern weil niemand hinsieht** — der Owner-Begriff
+MUTANT, angewandt auf die Warn-Wache selbst.
+
+**Die Erhebungen, je mit Nenner und Erhebungsstufe:**
+
+| Runde | Übersetzer | Gegenstand | vorher | nachher |
+|---|---|---|---|---|
+| 1 | GCC | Tests (CI-Logs) | 2.447 Vork. / 88 Stellen | — |
+| 1c | GCC | libs + Warnstufe | 47 (Debug) / 48 (Release) | **0 / 0** |
+| 2a | clang | libs + Warnstufe | 36 / 19 Stellen | **4** (= 1 Stelle, bloom) |
+| 2b | clang | Tests | 1 Fehler-Stelle (4 TUs) + 34 Stellen | 0 Fehler + 10 Stellen |
+
+**Zwei Stränge maßen 2b über verschiedene Bäume und kamen auf verschiedene Zahlen** (10 Stellen /
+59 Vorkommen gegen 213 Vorkommen / 30 Stellen). Das ist **kein Widerspruch, sondern ein anderer
+Nenner** — beide Zahlen stehen hier, keine wird gewählt.
+
+**Die Defekte, geheilt und gelandet:**
+
+- **D1 `-Wswitch`, `pruef_dock_version.hpp`** — HY-A1 erweiterte `AnatomyGenus`; von drei Switches
+  wurden **zwei nachgezogen, der dritte nicht**. Hybrid-Docks bekamen einen **leeren**
+  Versionsstempel: eine Provenienz-Lücke. `heuristik_adapter_klassifikation.hpp:26` **sagte den
+  Fall wörtlich voraus.**
+- **D2 `result_aggregator.hpp`** — `fingerprint` war das einzige Mitglied ohne Initialisierer, der
+  Copy-Konstruktor las den unbestimmten Wert (UB). **Der beißende Köder fehlt noch** — meine
+  Minimalprobe löste die Warnung nicht aus. Ausdrücklich offen.
+- **D8 `-Wcomment`, `algo_semver.hpp:127`** — 476 von 2.447 Vorkommen (19 %), eine `///`-Zeile
+  endete mit `\`. Hier ging nichts verloren; wäre die Folgezeile Code gewesen, wäre sie **still**
+  verschwunden.
+- **`planner_mengen_types.hpp:340`** — `KapazitaetRechnung` an `uint64_t` zugewiesen. Entstand im
+  **Merge** zweier einzeln grüner Pakete (MS-1 änderte die Signatur, der Planer-Aufrufer kam aus
+  einem anderen Zweig). **Brach GCC UND clang** — meine Aussage „nur clang" war falsch.
+- **`axis_filter_bloom.hpp:111`** — ein zweites `kHashes` verdeckte das Klassen-Member. Kein aktiver
+  Defekt (beide trugen 4), aber: zöge jemand k auf 6, meldete `probe_multiplicity()` sechs, während
+  die Sonde vier probt. **Stille Divergenz in einem Mess-Algorithmus.**
+- **`HandPin::wert`** ohne Initialisierer — cppcheck, `lint:static` fail-closed.
+- **`AxisKind`** trägt **sechs** Enumeratoren, der Kommentar behauptete drei. Jede Meta-Meta-Achse
+  wäre still als `"organ"` verdrahtet worden; der Roundtrip war für drei Kinds **unerfüllbar**.
+- **Acht hohle Test-Orakel** (`-Wunused-result`) — Tests, die ihre Ergebnisse verwarfen.
+
+**Die zwei clang-Strukturbefunde:**
+
+- **`ce build:clang` fährt NIE** — `COMDARE_CLANG_MATRIX` ist nirgends gesetzt (einziger Treffer ist
+  ein Kommentar). **Die clang-Warnungen dieses Projekts hat noch nie jemand gesehen.**
+- **`super build:clang` war FAILED, nicht skipped** — fehlende CMake-Abhängigkeitskante
+  (`overlay_source_hash.cmake` legte die Wartekante nur über `PROJECT_SOURCE_DIR` = ce; die
+  super-Ziele entstehen später und bekamen sie nie). **Geheilt mit `cmake_language(DEFER)`**; in
+  Pipeline 15463 sind `build:clang`, `analyse:thesis-data` und `visibility:tier-binaries` seither
+  grün.
+
+---
+
+### C. DIE STUMMEN WORKFLOW-TODE — `journal.jsonl` ist die Wahrheit
+
+`/dev/nvme0n1p2` lief auf **0 Bytes**. Danach konnte der PreToolUse-Hook sein `uv run` nicht mehr
+starten und **jedes** Werkzeug fiel aus — Bash, Read, Write, ToolSearch, auch die der Agenten.
+**`/home` und `/tmp` liegen auf derselben Partition**; ein Bau-Strang in Debug *und* Release kann
+die Sitzung handlungsunfähig machen.
+
+**Die Fehlerklasse:** ein Strang, dessen Rückmeldung nicht zugestellt werden kann, sieht von außen
+aus wie einer, der noch arbeitet. Kein Alarm, kein Fehler, kein Timeout.
+
+**Der Detektor, der NICHT funktioniert** (selbst gemessen): gestartete Task-IDs gegen Notifikationen
+zu stellen ergab 193 gegen 175 — **die Gegenprobe kippte es**, ein nachweislich zurückgekehrter
+Strang stand auf der Liste. Und die Dateigröße trügt genauso: dessen `tasks/<id>.output` hat
+**0 Bytes**, weil die Platte voll war, während das Ergebnis über die Notifikation ankam.
+
+> **0 Bytes ≠ verloren · keine Notifikation ≠ tot**
+
+**Was trägt:** `subagents/workflows/wf_*/journal.jsonl` — dort legt **jeder** Agent seine Rückgabe
+ab, unabhängig von Zustellung und Puffer. `grep -c '"type":"result"'` beantwortet die Frage „hat er
+geliefert?". **Geborgen wurden:** die Warnungs-Erhebung (12,5 kB), drei fertig verifizierte Pakete
+(D5-2 `08cab824`, Schema-Freeze `03f897dd`, ##11 `2703814f`) und zwölf weitere Berichte.
+
+**Betriebsregel:** bei jedem Verdacht auf Stillstand **zuerst `df -h`** — nicht das Werkzeug
+verdächtigen, bevor die Platte gemessen ist.
+
+---
+
+### D. DER LANDUNGSSTAND DES TAGES — gemessen, nicht erinnert
+
+    super  origin/development = df21ab01   (78 Commits heute gelandet)
+    ce     origin/development = 0f08fab5   (49 Commits heute gelandet)
+    super  ungepusht: 8 Commits (diese Ledger-Nachträge und die Doku-Korrekturen)
+
+**Offen und geprüft bereit:** die ce-Sammellandung in `wt-ce-gnu` (8 Commits: D2-Abdeckungs-Wache,
+„zwei Parses eine Entscheidung", Schema-Freeze, `<measure_selection>`; gitleaks 5/5) · die
+Warnungs-Runde-2 in `wt-ce-fk` (3 Commits, darunter die **clang-Blocker-Heilung**) · die zwei
+Warnungs-Stränge `wt-ce-warn-tests` (`211f6daa`) und `wt-ce-warn-libs` (`530343d2`), beide mit
+unabhängigem Verify.
+
+**Vier dieser Fassungen berühren `lager_baum_writer.hpp`** — der Merge braucht die eingesammelte
+Form der WACHE 3 als tragende Basis, mit den Hybrid-Token **darin**, nicht daneben.
+
+---
+
+### E. DOKU-KORREKTUREN, die heute nötig waren
+
+- **GOAL v8 Dossier**: `allow_failure`-Aussage durchgestrichen (OV-16), xlsx/csv nachgezogen samt
+  Ableitungsrichtung.
+- **Konsolidierte Lesefassung**: Korrektur-Einschub zu `allow_failure`. **Sie trug den widerlegten
+  Satz ungekennzeichnet**, während zwei andere überholte Stellen bereits Einschübe hatten — eine
+  halb korrigierte Lesefassung ist gefährlicher als eine unkorrigierte, weil die vorhandenen
+  Einschübe Vollständigkeit suggerieren.
+- **`docs/audits/…DISPOSITION.md`**: beide Anker um je 9 Zeilen nachgezogen (D5-2-Merge). Dabei mein
+  eigener Stellvertreter: ich heilte zuerst die **Prosa-Tabelle** und fuhr die Wache erneut — sie
+  blieb rot mit denselben Zahlen. Die Wache liest ausschließlich `ANKER-SYMBOL`-Zeilen; **ich hatte
+  die Beschreibung des Ankers geheilt, nicht den Anker.**
 ## 09.08.2026 (abends) — DIE KETTE IST LÄNGER: zwei symmetrische Zweige nach AUSWERTEN (Owner)
 
 **Owner wörtlich:**
