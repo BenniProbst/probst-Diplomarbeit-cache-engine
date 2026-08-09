@@ -16,6 +16,88 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — Der Vendoring-Nachzug hat die falschen Zahlen NICHT geheilt. Und drei meiner Zahlen fielen.
+
+**Gelandet:** `super dfdf8bbe` — Gitlink auf `ce 9f92d49f`.
+
+### Der Bau blieb grün — und genau das ist der Befund
+
+D5-1 löschte `nearest_rank_p` **ersatzlos**, damit jede übersehene Stelle **compile-time laut
+bricht**. Nach dem Nachzug war der super-Bau **grün**. Das klang nach Erfolg.
+
+> **super hat die Formel ABGESCHRIEBEN statt sie zu rufen. Gegen eine Abschrift ist eine Löschung
+> wirkungslos.**
+
+Am Objekt, vom Bau-Agenten gezählt und von mir nachgeprüft:
+
+    Code/04_csv_to_latex/csv_to_latex.cpp:48              double nearest_rank_median(...)
+    Code/05_diagram_generator/diagram_generator.cpp:653   (zweite Definition, gleicher Rumpf)
+
+Rumpf: `rank = (size_t)(0.5*(n-1)+0.5)` = **`round(q*(n-1))`** — exakt die verworfene Formel.
+**2 Definitionen, 11 Aufrufe.** Aufrufer der gelöschten ce-Funktion: **0 von 813** super-eigenen
+C++-Dateien. **Das Sicherheitsnetz konnte gar nicht greifen.**
+
+Und ausgerechnet diese beiden Werkzeuge **emittieren die Perzentil-Zahlen der Thesis** —
+`04_csv_to_latex` hat **null** ce-Includes, `05_diagram_generator` nur Lese-Zugriff ohne Link.
+
+**Die Heilung läuft als Strang 28.**
+
+### Der Zweitbefund: die Tests können den Wechsel nicht bemerken
+
+**12 Testdateien, 478 `EXPECT_`-Zeilen**, davon 132 mit Perzentilen — **keine bricht**. Der Grund
+ist gemessen, nicht vermutet: alle scharfen Literale liegen auf Stichproben mit **ungeradem n**
+bzw. dort, wo beide Formeln **übereinstimmen**. Sie pinnen den **gemeinsamen Bereich**.
+
+**Bei gerader Länge divergieren die Formeln** — dort fehlt der Fall. Eine grüne Suite, die zwei
+verschiedene Formeln nicht unterscheidet, ist für diese Frage kein Test. Strang 28 zieht je
+Testdatei einen divergierenden Fall ein.
+
+### Drei meiner eigenen Zahlen sind gefallen
+
+**1. „~100 Commits Rückstand" war falsch — es waren 18.** Und der Grund ist wichtiger als die
+Zahl: **mein Register hat den falschen Zeiger abgelesen.** `a1d0c201` ist der veraltete
+Tracking-Ref `origin/development` **im Submodul-Klon**, nicht der Gitlink. Der Gitlink stand 85
+Commits weiter auf `25fe4fbf`.
+
+**Prüfregel für künftige Register:** den vendorierten Stand **immer** per `git ls-tree HEAD <pfad>`
+oder `git submodule status` lesen — **nie** per `rev-parse` auf einen Tracking-Ref im Submodul.
+
+Die Kernaussage des Registers blieb trotzdem wahr — aber **aus einem anderen Grund** als
+angenommen.
+
+**2. „rund 24 Stellen" ist mit keiner Zählweise reproduzierbar.** Gemessen: **39 Vorkommen** =
+1 Definition + **38 Aufrufstellen**, verteilt auf 34 Trefferzeilen in 5 Dateien. Das deckt sich
+exakt mit der bereits am 09.08. korrigierten Plan-Zahl. **Meine 24 und die ältere Planfassung mit
+34 waren beide zu niedrig.**
+
+**3. Meine Prämisse „der Bruch wird laut" war falsch** — er wurde still, aus dem Grund oben.
+
+### Eine neue Werkzeug-Falle, die in diesem Lauf zuschlug
+
+Der git-grep-Pathspec **`Code/**/tests/`** liefert eine **stille Null** — 0 Treffer, Exit 1, keine
+Fehlermeldung. Der Agent hätte daraus „keine byte-fixierten Erwartungen" geschlossen. **Die
+Pflicht-Gegenprobe fing es:** mit `Code/*/tests/*.cpp` sind es 478 `EXPECT_`-Zeilen.
+
+**Ohne die Gegenprobe wäre ein Nullbefund entstanden, der das Gegenteil der Wahrheit behauptet.**
+
+### Was sich mit dem Nachzug aufgelöst hat — und was nicht
+
+| | |
+|---|---|
+| `messwert_key_source.hpp` im vendorierten Stand | **JA** — 100 Zeilen, getrackt |
+| LAG-Z1 fährt in der super-Pipeline | **NEIN** — das Binary existiert nicht: ce wird per `EXCLUDE_FROM_ALL` eingebunden, und `make check` fährt `ctest -L da_unit` (0 von 186 Treffern). **Hängt an der Bau-Naht, nicht am Vendoring.** |
+| Mess-Genus erreichbar | **TEILWEISE** — die Datei ist da, aber **0 super-Übersetzungseinheiten** ziehen sie (Gegenprobe: `fingerprint_key_source.hpp` = 1 Treffer). Der Schalter ist nicht umgelegt. |
+
+### Die Lehre, die über den Fall hinausgeht
+
+Dieselbe Klasse ist im Haus jetzt **dreimal** belegt: die ABI-Major-Kopie in `observable_tier.hpp`
+(13 Tage falsch über zwei Bumps), der 4096-Korn-Spiegelkommentar (zweimal gedriftet, 223 Zeilen
+daneben — geheilt durch `static_assert`, also durch **Bindung** statt Wiederholung), und jetzt
+diese Formel.
+
+> **Eine Zahl oder Formel, die als Kopie lebt, veraltet lautlos.** Kein Plan darf sich auf eine
+> Löschung als Wache verlassen, solange nicht belegt ist, dass es **Aufrufer** gibt und **keine
+> Abschriften**.
 ## NACHTRAG 09.08.2026 — DAS REGISTER IST VOLLSTÄNDIG: 17 % erfüllt, und eine Wurzel erklärt den Rest
 
 Die vier ungemessenen Kettenstationen sind nachgeholt (Strang 22, je Station eigene Messung ohne
