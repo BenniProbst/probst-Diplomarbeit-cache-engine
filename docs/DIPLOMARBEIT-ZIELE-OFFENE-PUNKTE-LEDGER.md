@@ -16,6 +16,73 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (abends) — DIE URSACHE HINTER DEM FEHLENDEN MESS-KANAL (Owner, Kausalkette)
+
+**Owner wörtlich, als Präzisierung des Mess-Visitor-KERNs:**
+
+> „Die **variadische Template Variable(n) der Messung für Obvervable Tier** wird **nicht über
+> Gattung+Genus Interface per Metaprogrammierung durchgereicht** und **in die Genus-Implementierung
+> hinter die Gattung+Interface Kaskade gebaut**. Damit **kommt kein Signal und Kommunikationskanal
+> beim Tier-Binary an**. Eine **globale Initialisierung der beiden Arenen von `checkpoint_measure`
+> zum `init()`** geht daher **nicht wie geplant**. Die **CEB kann nach einem Durchlauf über den
+> Observer keinen `flush()` der Messwerte (je Arena getrennt) beauftragen und übermitteln**.
+> **Signale können nicht gesendet werden** am **ABI-stabilen, modules-metaprogrammierten
+> Prüfdock**."
+
+### Die Kausalkette — ein Defekt, vier Folgen
+
+    1. Die variadischen Mess-Template-Variablen (Observable Tier) werden NICHT per
+       Metaprogrammierung durch die Gattung+Genus-Interface-Kaskade gereicht und
+       NICHT in die Genus-_impl HINTER der Kaskade gebaut.
+                    |
+    2. => im Tier-Binary kommt KEIN Signal- und Kommunikationskanal an
+                    |
+    3. => die globale Initialisierung der ZWEI checkpoint_measure-Arenen im init()
+          geht nicht wie geplant
+                    |
+    4. => die CEB kann nach einem Durchlauf über den Observer keinen flush() der
+          Messwerte beauftragen -- und zwar JE ARENA GETRENNT
+                    |
+    5. => am ABI-stabilen, modules-metaprogrammierten Prüfdock können keine Signale
+          gesendet werden
+
+**Der Defekt ist EINER — die fehlende Durchreichung. Alles Weitere ist seine Folge.** Wer Stufe 3,
+4 oder 5 einzeln reparieren wollte, baute an Symptomen.
+
+### Fünf Punkte, die den Bau binden
+
+- **Es ist eine METAPROGRAMMIER-Lücke, keine Laufzeit-Lücke.** Die Variablen müssen durch die
+  Kaskade *durchgereicht* und *hinter* ihr in die `_impl` *eingebaut* werden — zur Übersetzungszeit
+  oder gar nicht.
+- **„Hinter die Gattung+Interface Kaskade"** ist der Ort: nicht am Interface davor, sondern in der
+  Implementierung dahinter, wo die Funktionsklassen mit ihren Hauptalgorithmen sitzen.
+- **ZWEI Arenen, getrennt geflusht** — Mess-Arena (Append) und Stack-Arena (LIFO). Der `flush()`
+  wird **je Arena** beauftragt, nicht gebündelt.
+- **Das Prüfdock ist ABI-stabil und modules-metaprogrammiert** — es ist der einzige stabile Kanal
+  zwischen CEB und Tier-Binary, und Signale müssen über diese Fläche gehen.
+- **`checkpoint_measure`** stand als „spezifiziert, nicht gebaut" in W7 (OV-2b). Dieser Befund zeigt,
+  dass seine **Arenen-Initialisierung Teil der fehlenden Kette** ist — der Posten ist damit nicht
+  mehr sauber nach W7 schiebbar, ohne die Messung mitzuschieben. **Das ist ein Konflikt mit der
+  bisherigen Streichliste und gehört dem Owner vorgelegt.**
+
+### Warum das den Sidecar-Ansatz endgültig erledigt
+
+Ein Sidecar kann diese Kette **strukturell nicht** herstellen: er hängt neben dem Binary und hat
+keinen Zugriff auf dessen Template-Instanziierung. Die Mess-Variablen müssen **in** die
+Genus-Implementierung hinein-metaprogrammiert werden — ein Beobachter von außen kann das nicht
+nachrüsten.
+
+> **Der Visitor ist damit nicht die schönere, sondern die einzige mögliche Form.**
+
+### Stellung im Plan
+
+Der Posten steht **VOR** F1 (Durchstich, 14.08.), **##47** (Kalibrierlauf) und **W3-MESS**
+(Kampagne). Solange die Durchreichung fehlt, **kann kein Messwert entstehen** — eine grüne
+Mess-Pipeline belegt dann die Kette und nicht die Zahl.
+
+**Fundstelle:** Memory `project_variadische_mess_template_nicht_durch_die_kaskade_gereicht`.
+**Bau delegiert:** Workflow `wlf7ym1nn` (Explore → Design → Bau → Verify); die Präzisierung dieses
+Nachtrags geht in dessen Design-Phase ein — der Explore-Auftrag kannte sie noch nicht.
 ## 09.08.2026 (abends) — KERN: DIE MESSEINRICHTUNG AM GENUS-INTERFACE FEHLT — Sidecar ist verworfen
 
 **Owner wörtlich:**
