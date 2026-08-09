@@ -16,6 +16,77 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (abends) — DIE LÜCKE IST DOPPELT: auch der STEUERKANAL Planer↔CEB fehlt (Owner)
+
+**Owner wörtlich, unmittelbar nach dem Mess-Kanal-KERN:**
+
+> „Dasselbe Spektakel wiederholt sich bezüglich der **Kanäle die je durch den Planer gebauten
+> Messeinrichtung zwischen Planer und CEB kommuniziert** werden, was auch die **Steuereinrichtung
+> durch die Freigabe des Experiment-Baumes im Planer** zur Durchführung der **Freigabe der
+> System-Achse** und **Durchsetzung der Organ-Achse** betrifft. Es betrifft also nicht nur den
+> Mess-Kanal zwischen CEB und Tier-Binary variadisch, sondern auch den **Steuerungskanal zwischen
+> Planer und CEB**, der sich ebenfalls **variadisch an die 3 fakultät vorhandenen CEB Versionen**
+> jeweils anpassen muss. Damit hat der Planer **6 STEUERDOCKS** — für jede CEB einen, der **genau
+> auf vorhandene einkompilierte Messeinrichtungen passt** und auch **nur bestimmte Steuerbefehle
+> freigibt, die tatsächlich existieren laut Plan**. Der **Release kann nur unter Logging der CEB an
+> den Planer auf die CLI des Planers vor oder nach der Gesamt-Messung GESAMMELT erfolgen**, weil ein
+> **Sendevorgang zwischen Planer und CEB Latenzen erzeugt**."
+
+### Die Symmetrie — zwei Kanäle, dieselbe Ursache
+
+    PLANER  --- Steuerkanal (variadisch, 6 Steuerdocks) --->  CEB
+                                                               |
+                                                    Mess-Kanal (variadisch,
+                                                    Mess-Visitor am Genus-Interface)
+                                                               |
+                                                               v
+                                                          TIER-BINARY
+
+**Beide fehlen aus demselben Grund:** die variadischen Template-Variablen werden nicht per
+Metaprogrammierung durch die jeweilige Interface-Kaskade gereicht. Der Nachtrag darunter beschreibt
+den unteren Kanal — dies ist sein Gegenstück eine Ebene höher.
+
+### Die sechs Steuerdocks
+
+**3! = 6** — der Planer hält **je CEB-Version ein eigenes Steuerdock**. Jedes Dock
+
+- **passt genau auf die vorhandenen einkompilierten Messeinrichtungen** dieser CEB — nicht auf die
+  möglichen, sondern auf die tatsächlich einkompilierten,
+- **gibt nur die Steuerbefehle frei, die laut Plan tatsächlich existieren.** Ein Befehl, den diese
+  CEB nicht kennt, ist am Dock nicht aufrufbar.
+
+**Dieselbe Bauform wie das Prüfdock der CEB zum Tier-Binary, eine Ebene höher:** ABI-stabile,
+metaprogrammierte Fläche, die genau das anbietet, was dahinter existiert.
+
+### Was der Steuerkanal trägt — zwei verschiedene Rechtsakte
+
+Die **Freigabe des Experiment-Baumes** im Planer, und darüber: **FREIGABE der System-Achse** und
+**DURCHSETZUNG der Organ-Achse**. Die Begriffe sind nicht austauschbar (Systemachsen werden
+*freigegeben*, Organachsen *durchgesetzt*) — der Kanal transportiert also keinen generischen
+Befehlsstrom.
+
+### Der Release: gesammelt, nicht laufend — eine Mess-Integritäts-Regel
+
+    ERLAUBT:  Logging CEB -> Planer-CLI, GESAMMELT, VOR oder NACH der Gesamt-Messung
+    VERBOTEN: Senden waehrend der Messung -- es erzeugt genau die Latenz, die gemessen wird
+
+Das ist keine Bequemlichkeit, sondern derselbe Grundsatz wie „während W2 und W3 null CI-Last auf
+prod1": **kontaminierte Daten sind die unheilbare Klasse.**
+
+### OFFENER KONFLIKT — gehört dem Owner, wird nicht geraten
+
+**OV-10** führt die CEB-Varianten als *„Teilmengen-Lesart (max. 4 erreichbar), Abnahme: 4 + belegte
+Begründung warum nicht 6"* — mit Empfehlung „ja", weil eine echte 3!-Permutation ein
+Gate-Modell-Umbau im Identitätsfenster mit Bump-Folge wäre.
+
+**Dieser KERN nennt 3! = 6, als Zahl der Steuerdocks.** Zwei Lesarten:
+1. OV-10 ist überholt → der Gate-Modell-Umbau fällt doch an, mit Bump-Folge im Freeze-Fenster.
+2. Die 6 Steuerdocks decken auch die 2 unerreichbaren Varianten ab → kein Widerspruch, sondern
+   Vollständigkeit am Dock.
+
+**Vorlage, keine Entscheidung meinerseits.**
+
+**Fundstelle:** Memory `project_steuerkanal_planer_ceb_sechs_steuerdocks_variadisch`.
 ## 09.08.2026 (abends) — DIE URSACHE HINTER DEM FEHLENDEN MESS-KANAL (Owner, Kausalkette)
 
 **Owner wörtlich, als Präzisierung des Mess-Visitor-KERNs:**
