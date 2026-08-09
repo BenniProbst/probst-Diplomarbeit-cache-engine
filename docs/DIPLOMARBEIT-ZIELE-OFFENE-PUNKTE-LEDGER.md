@@ -16,6 +16,80 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (abends) — SCHÄRFUNG DER GENUS-SCHICHTUNG (Owner, vier Sätze)
+
+**Anlass: ein Fehler von mir.** Ich hatte bei der WACHE-3-Analyse Gattung und Genus als *„zwei
+getrennte Achsen"* bezeichnet und daraus kombinatorische Schlüsse gezogen. Der Owner hat das
+richtiggestellt — und die Korrektur reicht tiefer als eine Begriffsfrage.
+
+**Owner wörtlich:**
+
+> „Gattung und Genus sind Kategorien für einzelne Implementierungs-Interfaces für Tier-Binaries.
+> Sie stellen nur eine metaprogrammierte Fassung eines **Gattungs-Kerninterfaces** bereit, welches
+> sich **alle Genus teilen** (wie bei C++ standard containern) und jedes Interface verfügt darüber
+> hinaus noch **Genus spezial Interface-Funktionen**. Das ist also eine konzeptionelle
+> metaprogrammierte abstrakte Klassenhierarchie. Die Gattung und Genus sind **KEINE Achsen**."
+>
+> „Unter dem Genus steckt eine **abstract factory Implementierung** des Genus als **_impl Datei**.
+> Diese führt **je Funktion in einer separaten Klasse** einen **Hauptalgorithmus** durch, der
+> **ausschließlich durch Achsen-Interface Aufrufe gestützt** wird, die sich **rekursiv** und auch
+> **andere Gattung+Genus**, aufrufen dürfen."
+>
+> „**Gattung+Genus werden als EINZELNES Genus Binary kompiliert und das ist EXAKT EIN
+> Tier-Binary.**"
+>
+> „Damit ist das **Genus interface** das, was das **Prüfdock der CEB** sieht. Und dieses braucht
+> auch die **Einrichtungen und Erweiterungen metaprogrammiert für die CEB**."
+
+### Die Schichtung
+
+    GATTUNG                Kerninterface -- alle ihre Genus teilen es
+       |                   (wie die C++-Standardcontainer ein gemeinsames Interface teilen)
+    GENUS                  erbt das Kerninterface + eigene SPEZIAL-Funktionen
+       |                   >>> DAS sieht das PRUEFDOCK DER CEB <<<
+    GENUS_impl             ABSTRACT FACTORY -- eigene Datei
+       |
+    je Funktion EINE       jede traegt EINEN Hauptalgorithmus
+    separate Klasse
+       |
+    Achsen-Interfaces      der Hauptalgorithmus stuetzt sich AUSSCHLIESSLICH auf sie;
+                           sie duerfen REKURSIV und QUER zu anderen Gattung+Genus aufrufen
+
+    Gattung + Genus  ->  EIN Genus-Binary  ->  EXAKT EIN Tier-Binary   (1:1)
+
+### Vier Folgen für den Bau
+
+1. **Der Hauptalgorithmus rechnet nicht — er orchestriert.** Jede Rechenleistung liegt in einer
+   **Achse**; der Algorithmus verbindet sie. Das ist der Grund, warum die Achsen überhaupt messbar
+   sind: sie sind die einzige Stelle, an der Arbeit stattfindet.
+2. **Der Aufrufgraph ist ein Netz, kein Baum.** Achsen dürfen rekursiv und **quer zu anderen
+   Gattung+Genus** aufrufen. Wer Kombinatorik über Achsen rechnet, darf nicht annehmen, ein Genus
+   berühre nur „seine eigenen".
+3. **Das Genus-Interface ist die ABI-Fläche zur CEB.** Das Prüfdock sieht **es** — nicht die
+   `_impl`, nicht die Funktionsklassen, nicht die Achsen darunter. Die Einrichtungen und
+   Erweiterungen müssen **metaprogrammiert an dieser Fläche** stehen, nicht zur Laufzeit kommen.
+4. **Die Lager-Adresse ist vollständig.** Weil Gattung+Genus genau ein Binary ergeben, gibt es
+   unterhalb nichts mehr zu unterscheiden — `gattung=<token>/genus=<token>` adressiert eindeutig.
+   Das erklärt WACHE 4 in `lager_baum_writer.hpp` nachträglich: ein Genus **ohne** Lager-Token ist
+   nicht einsortierbar, und das ist kein Formalismus.
+
+### Was von der WACHE-3-Messung unberührt bleibt
+
+Die Zahlen halten. Die Wache permutiert `for a=0..255 × for b=a+1..255` = **32.640 Paare**; real
+sind es **4 Gattungen (6 Paare) + 6 Genera (15 Paare) = 21**. **Faktor 1.554**, über 2,6 Mio.
+constexpr-Schritte. GCCs Budget (33.554.432) trägt das, **clangs (1.048.576) nicht** — vier TUs
+brechen hart, `origin/development` ist damit **clang-unbaubar**.
+
+**Aber die Begründung war falsch und ist korrigiert:** die Ursache ist nicht „zwei Achsen im
+selben Iterationsraum", sondern schlichter — **der volle `uint8`-Wertebereich wird permutiert statt
+der tatsächlich existierenden Enumeratoren**, und die Orakel werden je Paar neu gerufen statt
+einmal eingesammelt. Der Owner hatte die Mechanik vermutet (*„möglicherweise am Stück permutiert,
+was nicht hält"*) und zum Messen aufgefordert; die Messung bestätigt die Mechanik und verschiebt
+die Ebene.
+
+**Fundstellen:** Memory `reference_gattung_genus_sind_interface_hierarchie_keine_achsen` und
+`reference_genus_impl_abstract_factory_ein_tier_binary` · Übergabe
+`docs/sessions/20260809-KONTEXTUEBERGABE-abend-neugruendung-und-wellenbau.md` Teil XI (`ea71a7c2`).
 ## NACHTRAG 09.08.2026 — Das Nachtrags-Audit: fünf echte Lücken von dreizehn Kandidaten. Und ich habe eine Owner-Frage stillschweigend ersetzt.
 
 **Verfahren:** Strang 32, ultracode — fünf blinde Linsen über die letzten Kontexte, dann **drei
