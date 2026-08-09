@@ -16,6 +16,84 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — T-15: das Drift-Gate klammert die Messung. Und drei Dinge blieben bewusst ungebaut.
+
+**Gelandet:** `ce 4cd1ab91` — 8 Dateien, **913 Zeilen**. Das Gate klammert jetzt die Zeitnahme
+**je Zelle**; die Parameter kommen aus dem Profil, nicht aus dem Code.
+
+### Der Ausgangsbefund, selbst nachgemessen
+
+**0 produktive Aufrufer** von `run_with_drift_gate` — Nenner **1824** `.hpp`/`.cpp`-Dateien
+(ohne `build*/`, ohne `ext/`); genau **drei** Nicht-Build-Dateien nannten den Namen überhaupt.
+Der Mechanismus war gebaut, getestet — und lief über **keinen einzigen realen Messwert**.
+
+### Was jetzt läuft
+
+| | |
+|---|---|
+| `ctest -N` | **465 → 466** (neuer Test #47) |
+| Volle Suite | **466/466 grün**, voller Bau `rc=0` |
+| T-15-Test | **71 Zusicherungen**, 0 Fehler, 9 Abschnitte |
+| Mess-Aufrufe je Zelle | vorher **1** · nachher **6** bei Drift (2 Gruppen à 3, 1 Rerun), **3** ohne Drift |
+| CSV-Spalten | 185 → 189 (vier END-Appends), Zellenzahl == Spaltenzahl verifiziert |
+
+**Vier Mutations-Köder, vier bissen — jeder einzelursächlich.** Und: **eine Negativ-Kontrolle
+blieb bewusst grün = eine bezifferte Deckungslücke.** Das ist die richtige Art, eine Lücke zu
+melden: nicht als Fußnote, sondern als Zahl.
+
+### ⚠️ DIE KOSTENZAHL, die eine Entscheidung braucht
+
+> **`reps=3` misst jede Zelle DREIMAL statt einmal.** Zusammen mit der KF-10-Achse
+> (`<repetitions count=3>`) sind das **9 Messungen je (Binary × Einstellung) statt 3**.
+> **Die Mess-Phase verdreifacht sich** — die Bau-Phase nicht. Reruns kommen gedeckelt obendrauf.
+
+Das trifft direkt den Mess-Deckel (ETA ≤ 4,5 Maschinentage) und muss in die `--check-size`-Rechnung.
+
+### Drei Dinge bewusst NICHT gebaut — und warum das richtig ist
+
+**(1) „Ganzen Lauf neu starten" — die Granularität ist nirgends definiert.**
+Umfasst „ganzer Lauf" eine **Zelle**, einen **4096er-Batch**, einen **Kampagnentag** oder die
+**gesamte mehrtägige Kampagne**? Der Register-Vorschlag („Batch-Reservierung freigeben und neu
+greifen") ist ausdrücklich ein **Vorschlag des Register-Autors**, kein zitierter Owner-Entscheid.
+
+Bei mehreren Messtagen ist der Unterschied zwischen „ein Batch neu" und „die Kampagne neu"
+enorm. Der Agent hat stattdessen die im Code durchgehaltene Trennung respektiert — **„Gruppe" ist
+gebaut, „Lauf" ist Regeltext** — und die Lücke **im Header dokumentiert**, damit der nächste Leser
+sie nicht für ein Versehen hält.
+
+**Sobald die Granularität feststeht, ist das Bauteil klein:** der Wiederaufsetzpunkt existiert
+bereits (Takeover über ETA+50 %, PromiseGuard-Release).
+
+**(2) Retry einer als „failed" klassifizierten Messung — die Lesart ist unentscheidbar.**
+Der Satz *„beim Scheitern bis zu 5 Wiederholungen"* kann **zwei** Achsen meinen: dieselbe wie
+`max_reruns` (Drift-Instabilität der Gruppe) — oder eine **dritte, komplett ungebaute** (Retry
+einer gescheiterten Messung; im gesamten `perm_runner`-Pfad gibt es dafür **keine** Schleife).
+
+Die Satzstellung im GOAL-Dossier legt durch die Nachbarschaft zu *„ein gescheiterter Algorithmus
+schreibt failed…"* die **zweite** Lesart nahe; das Register unterstellt implizit die **erste**.
+**Aus dem Korpus allein nicht zu entscheiden.**
+
+Der Agent hat die Owner-Zahl **5** auf die Achse gelegt, **die existiert**, und die offene Lesart
+gemeldet — mit dem Argument: unter der gewählten Lesart kostet ein zu großes Budget **nur
+Messzeit und nie eine falsche Zahl**, weil das Gate advisory ist und nie abbricht.
+
+**(3) Den Default `max_reruns` 3→5 NICHT geändert** — und die Begründung ist die beste der drei:
+
+> „Die Änderung wäre von **keinem Test und keinem Aufrufer beobachtet** worden — **ein Mutant, der
+> nicht stirbt, also Scheinvollzug.**"
+
+Jede Aufrufstelle übergibt den Wert explizit. Die Owner-Zahl 5 steht jetzt dort, **wo sie wirkt
+und wo ein Test sie sieht**; der alte Default trägt nur einen Verweis auf die Produktionsquelle.
+
+**Das ist die Regel von heute früh, angewandt bevor sie gebrochen wurde:** vor jedem Köder prüfen,
+ob der mutierte Zweig überhaupt **beobachtbar** ist.
+
+### Was noch offen ist
+
+`chaos:drift` in der CI baut heute **nur** `test_chaos_drift_gate`. T-15 dort als hartes Gate zu
+ergänzen wäre die natürliche Fortsetzung — der Agent hat es gelassen, weil `.gitlab-ci.yml` eine
+hohe Konfliktfläche hat und parallel ein anderer Strang pushte. **Der Test läuft über die
+Voll-Suite mit**, aber nicht als eigenes CI-Gate.
 ## NACHTRAG 09.08.2026 — KONSOLIDIERUNG: alle Owner-Entscheide des Tages, an einem Ort
 
 Diese Entscheide lagen bisher **nur im Memory**. Der Ledger ist die Stand-Quelle — hier stehen
