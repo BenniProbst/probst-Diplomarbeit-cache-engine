@@ -16,6 +16,78 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — HYBRID: die Gattung ist gefunden, die Aufruf-Regeln sind vollständig, und der Lagerbaum kennt Gattung/Genus noch nicht
+
+Drei vom Owner verlangte Explores, vier blinde Linsen (Strang 29).
+
+### (1) Die Gattung+Genus ist gefunden — sie ist vom 08.08.
+
+**`HEURISTIK-ADAPTER` (Gattung) / `Function-Interface-Reroute` (Genus)** — erste Nennung
+**08.08.2026, vom Owner selbst**, als Antwort auf die Frage, ob Hybrid trotz 0 % Baustand Pflicht
+bleibt.
+
+**Damit stimmt „bereits benannt und geplant" — nur ist es einen Tag alt, nicht Wochen.** Meine
+Suche nach einer *älteren* Quelle war die falsche Erwartung; die Benennung **ist** die
+Festlegung.
+
+**Aber der Entwurf dahinter ist älter:** am **02.08.** entschied der Owner (E1/E2/E3), dass
+Hybrid-Tier-Binaries **eine eigene Stufe hinter der CEB** sind — *Factory-Facade-Adapter*, mit
+**ABI-Nulllast**. Und **Q6** legte fest: **ein Hybrid-Binary je Gattung**, es übernimmt die
+Gattung seiner Tier-Binaries.
+
+### (2) Die Aufruf- und Weiterleitungsregeln — vollständig, datiert
+
+| Datum | Regel |
+|---|---|
+| **20.07.** | **Strikte Vertragsschicht:** jede Stufe ruft und prüft **nur die direkt darunterliegende** |
+| **04.08.** vm | **Die Kernkette:** „Das Interface der Gattung ruft die Suchalgorithmen" — SearchAlgorithm ruft Achsen, die die **Container-Gattung** rufen, die **ihre** Achsen ruft. Und: **Genus erbt von Gattung** |
+| **04.08.** nm | **Schnitt-Regel:** Achsen-Eigenschaften **nur über Achsen** — einzige Ausnahme: die Genus-Erst-Instanziierung |
+| **05.08.** | **Stufen-Symmetrie:** Laufzeit-Freigabe, dann CT-Einbau je Achsen-Art. **Organ-Achsen berühren Hybrid NICHT direkt** |
+| **08.08.** | **Verschränkung, wörtlich:** „jede Gattung und Achse darf wiederum **andere Gattungen aufrufen** (wie SearchAlgorithm wieder Container-Gattung verwenden)" |
+
+**Und die zwei Ausgänge sind älter als gedacht** — schon am **19.07.**: der Planer emittiert die
+CEB, und die **CEB baut/ruft Hybride ODER Tier-Binaries**. Wichtig dabei: **Hybrid delegiert
+Tier-Bau und -Laden IMMER durch die CEB**. Das deckt sich exakt mit der heutigen OV-13-Antwort
+(„CEB verwaltet compare und release über statisches init").
+
+### (3) Das Layered Design
+
+**Das 3-Ebenen-Modell** (Dok 27, 02./03.06.): **Gattung** = Interface + Prüfdock · **Unterklasse**
+= fester Achsen-Satz · **Achsen** = Organe. Dort wurde auch ein Kategorienfehler korrigiert:
+„SearchAlgorithm = eigene Gattung" war **falsch** — seit E-24 (04.08.) heißt die Gattung **`Map`**,
+und **`SearchAlgorithm` ist der Genus-Name**.
+
+**Die drei Achsen-Kategorien** (Registry-Dreiteilung, 18./19.07.): **Organ · System · Mess** —
+mit der Stufenzuordnung **Planer → CEB = System → Tier = Organ**.
+
+**Das Stufen-Vererbungs-Gesetz** (05.08., vom Owner ausdrücklich „GESETZ" genannt): **Mess ist
+3-stufig, System und Organ sind 2-stufig.** Die System-Achsen sind final **drei**:
+`target_isa`, `operating_system`, `external_utils`.
+
+### (4) Der Widerspruch, den ich melden muss
+
+**Der Owner sagte heute zu K1:** Hybrid werde „parallel zu allen anderen Gattung+Genus **in den
+beiden Wurzel-Ordner-Ebenen des Lagerbaumes**" einsortiert, „danach folgt das System wieder den
+geplanten 3 Achsen-Kategorien".
+
+**Der Owner-KERN vom 26.07. definiert die Ordner-Kaskaden aber anders** — und **ohne jede
+Erwähnung von Gattung oder Genus als Ordnungsebene**:
+
+    Messdaten-Realm:  Mess  ->  System  ->  Organ
+    Binaries-Realm:   System ->  Organ  ->  Mess
+
+**Nach „neu schlägt alt" gilt die heutige Fassung.** Aber die Folge ist größer als ein
+Sperr-Umlegen: **der Lagerbaum bekommt zwei neue Wurzelebenen, die es heute nicht gibt** — und
+die Pfad-Grammatik, die Tests und die Wachen müssen mit.
+
+**Das ist kein Einwand gegen den Entscheid**, sondern die Ansage, dass K1 mehr kostet als die eine
+Zeile in `lager_pfad_grammatik.hpp:527`.
+
+### (5) Eine ehrlich benannte Suchlücke
+
+Der Explore hat **`docs/termine/` nicht durchsucht** — dort liegen überwiegend `.docx` und
+`.pptx`. Falls „bereits benannt und geplant" auf eine **ältere Betreuer-Quelle** zielt, wäre sie
+dort. Die Formate sind lesbar (ZIP-Archive), die Suche ist nachholbar.
 ## NACHTRAG 09.08.2026 — Ein Agent hat angehalten statt zu bauen. Und er hatte in beiden Punkten recht.
 
 **Kein Commit. Kein Bau.** Der Bericht ist trotzdem das wertvollste Ergebnis des Nachmittags,
