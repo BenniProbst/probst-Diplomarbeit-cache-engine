@@ -195,9 +195,9 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = db3c648bcf852f21eebf9b6f3f4434a0c855a8a0
-PZW-SCHEMA-STELLEN = 30
-PZW-SCHEMA-DATEIEN = 18
+PZW-CE-SHA         = cb263dc9edc6d0061ce5b5c163a1cc164ea9d581
+PZW-SCHEMA-STELLEN = 33
+PZW-SCHEMA-DATEIEN = 19
 PZW-SCHEMA-LITERAL = 1
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
@@ -214,7 +214,8 @@ weggeklickt.
 | **alt** (Stand dieses Abschnitts, **bleibt stehen**) | `25fe4fbf` | 29 | 17 | 1 | — |
 | Zwischenstand (Gitlink-Bump `dfdf8bbe`, nie erhoben) | `9f92d49f` | 29 | 17 | 1 | 453 |
 | ~~gültig~~ (Stand 09.08. mittags, **bleibt stehen**) | `c6d8e573` | 30 | 18 | 1 | 454 |
-| **gültig** | `db3c648b` | **30** | **18** | 1 | **468** |
+| ~~gültig~~ (Stand 09.08. abends, **bleibt stehen**) | `db3c648b` | 30 | 18 | 1 | 468 |
+| **gültig** | `cb263dc9` | **33** | **19** | 1 | **474** |
 
 **Nachzug 09.08.2026, 16:40 UTC — dritter Gitlink-Zug an einem Tag, und die Wache hat ihn wieder
 erzwungen.** super-Pipeline **15463**, Job **369917**, `exit 2`: *„der Plan nennt einen ANDEREN
