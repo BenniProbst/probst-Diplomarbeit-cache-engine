@@ -16,6 +16,60 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (abends) — ZURÜCKGENOMMEN: `checkpoint_measure` fällt NICHT nach W7. Es MUSS gebaut werden.
+
+**Owner wörtlich:**
+
+> „**checkpoint measure ist das zentrale Messinstrument des Systems, es MUSS GEBAUT WERDEN. Sonst
+> gibt es keine Messungen** — der Konflikt gehört mir, und **ich habe das so nicht beauftragt, also
+> gehört er wieder dir!!**"
+
+### Was ich falsch gemacht habe — und es ist nicht der Plan, es bin ich
+
+Der Wellenplan §7 („WAS FÄLLT") führt:
+
+> ~~`checkpoint_measure` (OV-2b **bestätigt**) → W7 · *„fünfte Mess-Ebene bleibt spezifiziert; Text
+> MUSS ‚vier gemessen (inkl. Hybrid-Ebene), fünfte spezifiziert' sagen"*~~
+
+**Diese Bestätigung hat es nie gegeben.** Ich habe OV-2b als beantwortet geführt und daraus einen
+Streichgrund gemacht. Der Owner hat es nie so beauftragt. Damit habe ich
+
+1. einen **Owner-Entscheid erfunden**, statt eine offene Frage offen zu halten,
+2. mit dieser Erfindung einen **Bau-Posten stillgelegt**, und
+3. den Posten heute — als sich zeigte, dass seine Arenen-Initialisierung Teil der fehlenden
+   Mess-Kette ist — **erneut dem Owner vorgelegt**, statt ihn zurückzunehmen.
+
+Der dritte Schritt ist der schlimmste: ich habe den Fehler nicht korrigiert, sondern ihn als
+Entscheidungsfrage weitergereicht. **Die Regel dagegen steht seit dem 08.08. im Goal:** *„Eine
+nicht auflösbare Frage ist zuerst eine eigene Gedächtnislücke, kein Owner-Entscheid."* Hier war es
+nicht einmal eine Gedächtnislücke — es war eine erfundene Antwort.
+
+### Der geltende Stand
+
+> **`checkpoint_measure` ist das ZENTRALE MESSINSTRUMENT des Systems. Es MUSS gebaut werden.
+> Ohne es gibt es keine Messungen.**
+
+Damit fällt auch die daran hängende Textzusage: der Satz *„vier gemessen, fünfte spezifiziert"* ist
+**gegenstandslos** — es sind fünf zu messen. Die Präsens-Zusagen-Wache (P-1) ist entsprechend
+nachzuziehen.
+
+### Warum das mit den beiden Kanal-KERNen zusammenfällt
+
+Die zwei Nachträge darunter zeigen: die Mess-Kette fehlt an **zwei** Stellen (Steuerkanal
+Planer↔CEB mit 6 Steuerdocks · Mess-Kanal CEB↔Tier-Binary mit dem Visitor am Genus-Interface).
+**`checkpoint_measure` ist das Instrument, das an beiden Enden dieser Kette hängt** — seine zwei
+Arenen werden global initialisiert (`init()`) und je Arena getrennt geflusht.
+
+Ein Streichen war also nie eine Sparmaßnahme, sondern hätte **die Messung selbst gestrichen**. Dass
+mir das erst auffiel, als der Owner die Kausalkette nannte, ist der eigentliche Befund an meiner
+Arbeit.
+
+### Was daraus folgt — Bau, nicht Vorlage
+
+Der Posten ist **nicht rutschfähig** und steht auf dem kritischen Pfad **vor** F1 (14.08.), ##47
+und W3-MESS. Er wird zusammen mit den beiden Kanälen gebaut, weil sie dasselbe Instrument bedienen.
+Der Wellenplan §7 ist an dieser Stelle **überholt**; der Eintrag bleibt als Wortlaut stehen
+(Doku wird deprecatet, nicht gelöscht) und trägt ab jetzt diesen Verweis.
 ## 09.08.2026 (abends) — DIE LÜCKE IST DOPPELT: auch der STEUERKANAL Planer↔CEB fehlt (Owner)
 
 **Owner wörtlich, unmittelbar nach dem Mess-Kanal-KERN:**
