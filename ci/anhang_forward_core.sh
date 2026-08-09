@@ -13,7 +13,8 @@
 #   (1) frische Pipeline-Artefakte  <root>/<lang>/tabellen/*.tex   (AF_ARTIFACT_ROOTS,
 #       in DEKLARIERTER Reihenfolge; der erste Wurzel-Kandidat mit >0 .tex gewinnt)
 #   (2) sonst Korpus-Regeneration aus dem NEUESTEN <AF_CORPUS_ROOT>/<RUN_TS>/ mit
-#       *.result.csv (replace-Semantik: neuester Lauf gewinnt) -> WIDE-Konkatenation
+#       Mess-CSV (Selektor AF_RESULT_NAMEN: 'result.csv' UND '*.result.csv';
+#       replace-Semantik: neuester Lauf gewinnt) -> WIDE-Konkatenation
 #       -> appendix-generator
 #   (3) sonst honest-empty: NO-OP-Testat, Exit 0, KEIN Commit
 #       (die Thesis haelt das per \InputIfFileExists aus -- Weg A ist gebaut)
@@ -35,6 +36,36 @@
 #     mehr baut (PDF-GATE; deklarierter Geltungsbereich + Grenzen s.u. -- ohne
 #     TeX-Toolchain prueft AF_PDF_GATE=auto NICHTS und sagt das literal)
 #   * kein Haken ohne Ausgabe: jede Stufe druckt ihren literalen Zaehler
+#
+# DREI TRANSPORT-FALLEN, GEHEILT AM 09.08.2026 (Paket P4) -- alle drei still:
+#   (F1) DER SELEKTOR TRAF DIE REALE DATEI NIE. Gesucht wurde '-name "*.result.csv"'
+#        (:149 :153 :165 der Vorfassung); der lebende Messweg schreibt 'result.csv'
+#        OHNE Praefix. Der Glob verlangt mindestens ein Zeichen plus Punkt davor.
+#        Selbst nachgemessen: ein Verzeichnis mit result.csv UND perm_007.result.csv,
+#        dann 'find -name "*.result.csv"' liefert ausschliesslich perm_007.result.csv.
+#   (F2) DIE LEERHEITSPRUEFUNG VERWARF GENAU EINE DATENZEILE. 'wc -l' zaehlt
+#        Zeilenumbrueche; Kopfzeile + EINE Datenzeile ohne Schluss-Newline ergab 1
+#        und galt als leer. Das ist exakt der Mini-Messwert des Durchstichs.
+#   (F3) DIE KONKATENATION VERKLEBTE ZEILEN. 'tail -n +2 >>' ohne 'awk 1' haengte
+#        die erste Datenzeile der naechsten Datei an die letzte der vorigen, sobald
+#        der Schluss-Newline fehlte -- aus zwei Messwerten wurde eine kaputte Zeile.
+#   Alle drei endeten mit rc=0 und einer Zeile, die wie ein ehrliches "nichts zu
+#   tun" aussah. Deshalb druckt der Korpus-Zweig jetzt IMMER einen Nenner
+#   (korpus_wurzel/vorhanden + laufordner_geprueft/mit_material): eine Null ohne
+#   Nenner ist von einem echten Freispruch nicht zu unterscheiden.
+#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A7, Selbstbiss N1-N4).
+#
+# OFFEN, ausdruecklich NICHT geraten: AF_CORPUS_ROOT zeigt in der Voreinstellung
+#   (und im CI-Job, .gitlab-ci.yml AF_CORPUS_ROOT="measurement") auf 'measurement'
+#   am Repo-Root. Dieses Verzeichnis EXISTIERT dort nicht mehr -- 'git ls-files
+#   measurement/*' liefert 0 Eintraege, der getrackte Korpus liegt seit dem
+#   08.08.2026 unter docs/architektur/measurement/ (18 Dateien). Zur CI-Laufzeit
+#   legt persist:measurements den Pfad auf dem baremetal-Workspace selbst an; ob
+#   der Kanal DEN oder den getrackten Korpus lesen soll, ist eine Owner-Frage und
+#   wird hier NICHT durch eine geratene Zweit-Wurzel beantwortet: der archivierte
+#   Baum liegt eine Ebene tiefer verschachtelt, eine automatische Aufnahme wuerde
+#   den Erstbeleg vom 26.07. als "neuesten Lauf" vorwaerts schieben. Statt zu
+#   raten sagt der Kanal jetzt literal 'vorhanden=nein' und nennt den Nenner.
 #
 # PDF-GATE -- WARUM ES HIER STEHT UND NICHT ERST IN DER 289-PIPELINE:
 #   Am Fixture (2026-08-05, echte D-03-Erstbeleg-Daten) hat sich gezeigt, dass der
@@ -71,6 +102,9 @@
 #   AF_ARTIFACT_ROOTS Leerzeichen-Liste der Artefakt-Wurzeln
 #                     (Default: Code/measure_out/appendix Code/measure_out_smoke/appendix)
 #   AF_CORPUS_ROOT    Rueckschreibe-Korpus                          (Default: measurement)
+#                     ACHTUNG: dieser Default zeigt am Repo-Root ins Leere, s.o.
+#   AF_RESULT_NAMEN   Namensformen der Mess-CSV, Leerzeichen-Liste
+#                     (Default: "result.csv *.result.csv" -- BEIDE, OV-17 offen)
 #   AF_GENERATOR      Pfad zur appendix-generator-Binary            (Default: leer)
 #   AF_TMP            Arbeitsverzeichnis                            (Default: mktemp -d)
 #   AF_DRY_RUN        true => kopieren+stagen, aber KEIN Commit, KEIN Push
@@ -102,6 +136,48 @@ AF_PROV_PIPELINE_URL="${AF_PROV_PIPELINE_URL:-NA}"
 AF_PROV_SUPER_SHA="${AF_PROV_SUPER_SHA:-NA}"
 AF_PROV_SUPER_REF="${AF_PROV_SUPER_REF:-NA}"
 
+# ---- DER SELEKTOR: EINE Definition, DREI Verwendungen ---------------------------------
+# SELBSTCHECK (P4, 2026-08-09):
+#   ZUGESICHERT: alle drei Fundstellen der Korpus-Kaskade -- Laufordner-Suche,
+#     Zaehlung, Konkatenation -- benutzen GENAU DIESE Namensliste. Sie koennen
+#     nicht mehr auseinanderlaufen, weil es nur noch eine Stelle gibt, an der ein
+#     Name steht. Vor diesem Paket standen drei Kopien des Musters nebeneinander
+#     (:149, :153, :165).
+#   ZUGESICHERT: BEIDE Namensformen werden akzeptiert.
+#     * 'result.csv' OHNE Praefix ist der LEBENDE Messweg. Beleg: ce
+#       libs/cache_engine/profile_facade/planner/planner_status_types.hpp:33
+#       'inline constexpr char kResultCsvName[] = "result.csv"' und
+#       libs/cache_engine/builder/experiment_tree/cache_engine_builder_iterator.hpp:1142
+#       'std::filesystem::path const csv_p = dir / "result.csv"'.
+#     * '<stem>.result.csv' ist die ARCHIVFORM. Sie existiert real: 8 Dateien
+#       unter docs/architektur/measurement/erstbeleg-d03-20260726/.../per_binary/.
+#   NICHT zugesichert -- und das ist der Grund fuer die Doppelung: welche der
+#     beiden Formen die GEPLANTE ist. Das ist Owner-Frage OV-17 (Ledger:112).
+#     Bis zur Antwort werden beide genommen; das ist die einzige Richtung, die
+#     keinen Messwert verwerfen kann. Faellt der Entscheid, wird HIER eine Zeile
+#     geaendert und sonst nichts.
+#   DER DEFEKT, den das heilt: '-name "*.result.csv"' verlangt mindestens ein
+#     Zeichen plus Punkt vor 'result.csv' und traf die reale Datei damit NIE --
+#     still, mit rc=0 und der Zeile "kein Korpus-Laufordner".
+AF_RESULT_NAMEN="${AF_RESULT_NAMEN:-result.csv *.result.csv}"
+
+af_finde_result_csv() {   # $1 = Wurzel ; alle weiteren Argumente = zusaetzliche find-Praedikate
+  local wurzel="$1"; shift
+  local ausdruck="" n rc=0
+  # set -f (Glob-Sperre) ist hier PFLICHT, nicht Stil: die Namensliste enthaelt
+  # '*'. Ohne die Sperre loeste die Shell sie gegen das ARBEITSVERZEICHNIS auf,
+  # bevor find sie ueberhaupt zu sehen bekaeme -- und je nach cwd kaeme ein
+  # anderer Selektor heraus. Danach wird sie sofort wieder aufgehoben.
+  set -f
+  for n in $AF_RESULT_NAMEN; do
+    if [ -z "$ausdruck" ]; then ausdruck="-name $n"; else ausdruck="$ausdruck -o -name $n"; fi
+  done
+  # shellcheck disable=SC2086 -- $ausdruck MUSS wortgetrennt werden, das ist die find-Syntax.
+  find "$wurzel" -type f \( $ausdruck \) "$@" || rc=$?
+  set +f
+  return "$rc"
+}
+
 echo "== anhang:forward KERN (E-18 Vorwaerts-Kanal) =="
 
 # ---- (0) Vorbedingungen: fail-loud statt stilles Gruen -------------------------------
@@ -130,7 +206,7 @@ for root in $AF_ARTIFACT_ROOTS; do
   n=0
   for lang in $LANGS; do
     [ -d "$cand/$lang/tabellen" ] || continue
-    c=$(find "$cand/$lang/tabellen" -maxdepth 1 -type f -name '*.tex' | wc -l)
+    c=$(find "$cand/$lang/tabellen" -maxdepth 1 -type f -name '*.tex' | awk 'END{print NR+0}')
     n=$((n + c))
   done
   echo "   [1a] $root: $n .tex"
@@ -140,17 +216,44 @@ for root in $AF_ARTIFACT_ROOTS; do
 done
 
 # (1b) sonst Korpus-Regeneration (replace-Semantik: NEUESTER Laufordner gewinnt)
+# SELBSTCHECK Nenner (P4, 2026-08-09):
+#   ZUGESICHERT: dieser Zweig druckt IMMER zwei Zahlen mit Nenner --
+#     'korpus_wurzel=<pfad> vorhanden=ja|nein' und
+#     'laufordner_geprueft=<N> mit_material=<M>'.
+#     EINE NULL OHNE NENNER IST VON EINEM ECHTEN FREISPRUCH NICHT ZU
+#     UNTERSCHEIDEN. Vorher stand hier nur "kein Korpus-Laufordner mit
+#     *.result.csv" -- dieselbe Zeile bei "Korpus leer", "Korpus existiert
+#     nicht" und "Selektor trifft nicht". Genau diese Ununterscheidbarkeit hat
+#     die Glob-Falle so lange getragen.
+#   PREIS, ausdruecklich benannt: fuer den Nenner werden ALLE Laufordner
+#     angesehen und nicht mehr beim ersten Treffer abgebrochen. Ordner MIT
+#     Material kosten nichts ('-print -quit' haelt beim ersten Fund), Ordner
+#     OHNE Material kosten je einen vollen Baumlauf. Das ist der Preis dafuer,
+#     dass die Null einen Nenner hat.
+#   NICHT geaendert: die replace-Semantik. Der NEUESTE Laufordner (sort -r) mit
+#     Material gewinnt weiterhin, jetzt ueber die erste Zuweisung statt ueber
+#     ein break.
 if [ -z "$SRC_ROOT" ]; then
   CORPUS="$AF_WORK_ROOT/$AF_CORPUS_ROOT"
   RUN_DIR=""
+  n_laufordner=0
+  n_mit_material=0
+  korpus_da=nein
   if [ -d "$CORPUS" ]; then
+    korpus_da=ja
     while IFS= read -r d; do
       [ -n "$d" ] || continue
-      if [ -n "$(find "$d" -type f -name '*.result.csv' -print -quit)" ]; then RUN_DIR="$d"; break; fi
+      n_laufordner=$((n_laufordner + 1))
+      if [ -n "$(af_finde_result_csv "$d" -print -quit)" ]; then
+        n_mit_material=$((n_mit_material + 1))
+        [ -z "$RUN_DIR" ] && RUN_DIR="$d"
+      fi
     done < <(find "$CORPUS" -mindepth 1 -maxdepth 1 -type d | sort -r)
   fi
+  echo "   [1b] korpus_wurzel=$CORPUS vorhanden=$korpus_da"
+  echo "   [1b] laufordner_geprueft=$n_laufordner mit_material=$n_mit_material (Selektor: $AF_RESULT_NAMEN)"
   if [ -n "$RUN_DIR" ]; then
-    n_csv=$(find "$RUN_DIR" -type f -name '*.result.csv' | wc -l)
+    n_csv=$(af_finde_result_csv "$RUN_DIR" | awk 'END{print NR+0}')
     echo "   [1b] Korpus-Regeneration aus $(basename "$RUN_DIR") ($n_csv result.csv, replace-Semantik: neuester Lauf gewinnt)"
     if [ -z "$AF_GENERATOR" ] || [ ! -x "$AF_GENERATOR" ]; then
       echo "FEHLER: Korpus-Daten vorhanden ($n_csv result.csv), aber AF_GENERATOR fehlt/ist nicht ausfuehrbar ('$AF_GENERATOR')." >&2
@@ -158,13 +261,42 @@ if [ -z "$SRC_ROOT" ]; then
       exit 1
     fi
     # WIDE-Aggregat = Header EINMAL + alle Datenzeilen (Literal-Spiegel der measure-Jobs).
+    # SELBSTCHECK Konkatenation (P4, 2026-08-09):
+    #   ZUGESICHERT: jede uebernommene Zeile endet mit einem Newline, auch wenn
+    #     die Quelldatei keinen Schluss-Newline hat. Dafuer steht das 'awk 1':
+    #     es gibt jeden Datensatz mit ORS aus. Ohne das klebte die erste
+    #     Datenzeile der naechsten Datei an die letzte der vorigen -- aus zwei
+    #     Messwerten wurde EINE kaputte Zeile, und der Verlust war still.
+    #     Und genau dieser Fall ist der Regelfall: ce schreibt die letzte Zeile
+    #     ohne Schluss-Newline.
+    #   NICHT zugesichert: dass die Kopfzeilen aller Dateien gleich sind. Der
+    #     Header wird EINMAL von der ersten Datei genommen; abweichende Spalten
+    #     einer spaeteren Datei faenden hier niemand. Das ist eine andere Wache.
     WIDE="$AF_TMP/wide_aggregate.csv"; : > "$WIDE"; _hdr=0
-    while IFS= read -r rc; do
-      [ "$_hdr" = "0" ] && { head -1 "$rc" > "$WIDE"; _hdr=1; }
-      tail -n +2 "$rc" >> "$WIDE"
-    done < <(find "$RUN_DIR" -type f -name '*.result.csv' | sort)
-    echo "   [1b] WIDE-Aggregat: $(wc -l < "$WIDE") Zeilen (inkl. 1 Header)"
-    if [ "$(wc -l < "$WIDE")" -le 1 ]; then
+    while IFS= read -r rcsv; do
+      [ "$_hdr" = "0" ] && { head -1 "$rcsv" | awk 1 > "$WIDE"; _hdr=1; }
+      tail -n +2 "$rcsv" | awk 1 >> "$WIDE"
+    done < <(af_finde_result_csv "$RUN_DIR" | sort)
+    # SELBSTCHECK Zaehlweise (P4, 2026-08-09):
+    #   ZUGESICHERT: gezaehlt wird mit awk NR, WORTGLEICH zu ci/mess_ausbeute_wache.sh
+    #     und ci/persist_sammler.sh. Zwei verschiedene Zaehlweisen in EINER Kette
+    #     sind eine Fehlerquelle fuer sich.
+    #   DER DEFEKT, den das heilt: 'wc -l' zaehlt ZEILENUMBRUECHE, nicht Zeilen.
+    #     Kopfzeile + EINE Datenzeile ohne Schluss-Newline ergaben wc -l = 1 und
+    #     galten damit als leer -- exakt der Mini-Messwert des Durchstichs.
+    #   NICHT zugesichert: dass die Datenzeilen inhaltlich brauchbar sind. Hier
+    #     wird gezaehlt, nicht bewertet.
+    #   EHRLICH DAZU: seit die Konkatenation oben 'awk 1' benutzt, endet $WIDE
+    #     immer auf einen Newline -- 'wc -l' und 'awk NR' liefern hier also
+    #     dieselbe Zahl. Am Objekt nachgemessen: ein Mutant, der NUR diese Zeile
+    #     auf wc -l zurueckdreht, macht keinen einzigen fachlichen Fall der Probe
+    #     rot. Diese Zeile ist damit heute REDUNDANTE Deckung, nicht die
+    #     tragende; tragend ist das 'awk 1'. Sie bleibt trotzdem, weil sie die
+    #     Zusage "wortgleich zu Wache und Sammler" haelt und greift, falls das
+    #     'awk 1' spaeter verschwindet.
+    WIDE_ZEILEN=$(awk 'END{print NR+0}' "$WIDE")
+    echo "   [1b] WIDE-Aggregat: $WIDE_ZEILEN Zeilen (inkl. 1 Header), Zaehlweise awk NR"
+    if [ "$WIDE_ZEILEN" -le 1 ]; then
       echo "   [1b] WIDE-Aggregat hat keine Datenzeile -> honest-empty"
     else
       GEN_OUT="$AF_TMP/appendix"
@@ -175,7 +307,7 @@ if [ -z "$SRC_ROOT" ]; then
       n=0
       for lang in $LANGS; do
         [ -d "$GEN_OUT/$lang/tabellen" ] || continue
-        c=$(find "$GEN_OUT/$lang/tabellen" -maxdepth 1 -type f -name '*.tex' | wc -l)
+        c=$(find "$GEN_OUT/$lang/tabellen" -maxdepth 1 -type f -name '*.tex' | awk 'END{print NR+0}')
         n=$((n + c))
       done
       echo "   [1b] regeneriert: $n .tex"
@@ -184,7 +316,8 @@ if [ -z "$SRC_ROOT" ]; then
       fi
     fi
   else
-    echo "   [1b] kein Korpus-Laufordner mit *.result.csv unter $AF_CORPUS_ROOT/"
+    echo "   [1b] kein Laufordner mit Mess-CSV (Selektor: $AF_RESULT_NAMEN) unter $AF_CORPUS_ROOT/"
+    echo "   [1b] das ist eine Null MIT Nenner: $n_laufordner Laufordner angesehen, $n_mit_material mit Material"
   fi
 fi
 
@@ -234,7 +367,7 @@ echo "-- (3) Idempotenz-Pruefung im Ziel-Repo --"
 for lang in $LANGS; do
   git -C "$AF_DEST_REPO" add -- "anhang/$lang/tabellen" 2>/dev/null || true
 done
-changed=$(git -C "$AF_DEST_REPO" diff --cached --name-only | wc -l)
+changed=$(git -C "$AF_DEST_REPO" diff --cached --name-only | awk 'END{print NR+0}')
 echo "   gestagte Aenderungen: $changed Datei(en)"
 if [ "$changed" -gt 0 ]; then git -C "$AF_DEST_REPO" diff --cached --name-only | sed 's/^/     /'; fi
 if git -C "$AF_DEST_REPO" diff --cached --quiet; then
