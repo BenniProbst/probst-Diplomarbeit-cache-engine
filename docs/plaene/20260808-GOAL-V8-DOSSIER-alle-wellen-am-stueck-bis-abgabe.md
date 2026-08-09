@@ -412,7 +412,43 @@ Lehrbuch-Entwurfsmuster, zero-cost · **kein `std::variant`** über statische Ac
 angelegt, in **zwei Durchläufen** — erst bauen, dann messen. Gültiger Bestand ⇒ **SKIP**, für
 Messdaten **und** Binaries. Neue Binary-Version ⇒ neuer Datensatz **neben** dem alten.
 
-**Die Ausgabe ist xlsx. CSV wird NIE verwendet.**
+**Die Ausgabe ist xlsx.** ~~CSV wird NIE verwendet.~~
+
+> **NACHGEZOGEN 09.08.2026 — Owner-Entscheid. Der durchgestrichene Satz war zu kurz und wurde
+> dadurch falsch gelesen.**
+>
+> Gemeint war: **CSV ist nie die QUELLE**, aus der weitergerechnet wird — die Auswertung liest die
+> **Mappe**, nicht eine CSV. Gelesen wurde er als „es darf keine CSV-Dateien geben", und daraus
+> entstand die Frage, ob csv überhaupt zulässig ist. Sie ist es.
+>
+> **Der geltende Entscheid, Owner wörtlich:** *„xlsx ist der **Standard** und CSV ist **wählbar**,
+> und ich lege jetzt fest, dass **auch beide zusammen wählbar** sein können. **Nicht nur entweder
+> oder.**"* Und als Präzisierung: *„xlsx ist der Standard und CSV nur optional entweder einzeln
+> statt xlsx oder additiv zu XLSX **nach dessen Existenz** persistiert wird. **CSV war nie der
+> Standard.**"*
+>
+>     xlsx   -> DER STANDARD. Ohne Angabe entsteht die Mappe als xlsx.
+>     csv    -> NUR OPTIONAL, in genau zwei Formen:
+>                 (a) EINZELN STATT xlsx -- jedes Sheet flach in EINEN Ordner
+>                 (b) ADDITIV ZU xlsx    -- csv entsteht NACH der xlsx,
+>                                           AUS DEREN EXISTENZ
+>
+> **Warum das keine Aufweichung ist:** csv ist ein **Strategy Pattern der xlsx-Erzeugung**, kein
+> zweiter Schreibweg. Beide Ausgaben speisen sich aus **denselben In-Memory-Zeilen**; die Mappe wird
+> einmal gebaut, die Strategien schreiben sie nur verschieden heraus. Genau deshalb ist „beide
+> zugleich" **kein** Doppelschreiben — was der 05.08.-Nachtrag zu Recht verbot. Die
+> **Ausschließlichkeit** jenes Nachtrags (`CSV XOR xlsx`) ist aufgehoben, seine Substanz bleibt.
+> **Die Richtung ist immer xlsx → csv**, nie umgekehrt: es gibt keinen Parser, der eine fertige CSV
+> zu einer Mappe zurückliest.
+>
+> **Für den Bau folgt daraus:** eine Regel `writeback_methods.size() > 1 => Fehler` ist **falsch**,
+> auch über der Teilmenge `{csv,xlsx}`. Beide Formate zugleich sind ein **gültiger** Eingang.
+>
+> **Und der Bestand sagt heute etwas anderes — das ist die Regression, nicht die Norm:** super-CI
+> zählte `csv 36 / xlsx 0`, das produktive golden-Profil wählt literal `<method value="csv"/>`, und
+> der xlsx-Writer wurde von **null** Produktions-Targets gelinkt. Wer nur den Code liest, hält csv
+> für den Standard. Er ist es nicht und war es nie. *(Erster Produktions-Aufrufer des
+> xlsx-Writers: ce `d2e20e7c`/`f82707bc`, gelandet 09.08. als `579e4099`.)*
 
 ## VI.5 Messung
 
