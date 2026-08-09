@@ -427,19 +427,35 @@ Messdaten **und** Binaries. Neue Binary-Version ⇒ neuer Datensatz **neben** de
 > statt xlsx oder additiv zu XLSX **nach dessen Existenz** persistiert wird. **CSV war nie der
 > Standard.**"*
 >
->     xlsx   -> DER STANDARD. Ohne Angabe entsteht die Mappe als xlsx.
->     csv    -> NUR OPTIONAL, in genau zwei Formen:
->                 (a) EINZELN STATT xlsx -- jedes Sheet flach in EINEN Ordner
->                 (b) ADDITIV ZU xlsx    -- csv entsteht NACH der xlsx,
->                                           AUS DEREN EXISTENZ
+> **ZWEI EBENEN, DIE NICHT VERWECHSELT WERDEN DÜRFEN** *(Owner-Richtigstellung 09.08.2026 — meine
+> erste Fassung hat sie vermengt und war dadurch falsch).*
 >
-> **Warum das keine Aufweichung ist:** csv ist ein **Strategy Pattern der xlsx-Erzeugung**, kein
-> zweiter Schreibweg. Beide Ausgaben speisen sich aus **denselben In-Memory-Zeilen**; die Mappe wird
-> einmal gebaut, die Strategien schreiben sie nur verschieden heraus. Genau deshalb ist „beide
-> zugleich" **kein** Doppelschreiben — was der 05.08.-Nachtrag zu Recht verbot. Die
-> **Ausschließlichkeit** jenes Nachtrags (`CSV XOR xlsx`) ist aufgehoben, seine Substanz bleibt.
-> **Die Richtung ist immer xlsx → csv**, nie umgekehrt: es gibt keinen Parser, der eine fertige CSV
-> zu einer Mappe zurückliest.
+>     ERZEUGUNG (im Speicher)      die xlsx-MAPPE entsteht IMMER.
+>                                  Aus ihr -- und nur aus ihr -- wird die csv gebildet.
+>                                  Das gilt AUCH, wenn am Ende gar keine xlsx auf Platte liegt.
+>
+>     PERSISTENZ (auf Platte)      hier, und NUR hier, wird gewaehlt:
+>                                    (a) xlsx          <- der Standard, ohne Angabe
+>                                    (b) csv einzeln   <- jedes Sheet flach in EINEN Ordner
+>                                    (c) BEIDE
+>
+> **Die csv ist kein Geschwister der xlsx, sondern ihr Kind.** Sie wird **immer aus der xlsx**
+> gebildet, nie aus Rohzeilen — auch im Fall (b), wo die Mappe den Speicher nie verlässt. Wer sagt
+> „beide speisen sich aus denselben In-Memory-Zeilen", hat die Ableitungsrichtung verloren und macht
+> aus einer Kette zwei parallele Wege. **Was im RAM liegt, ist etwas völlig anderes als das, was
+> auf Platte gesichert wird** — die Wahl betrifft ausschließlich die zweite Ebene.
+>
+> **Daraus folgt, was ohne diese Trennung nicht sichtbar wäre:** ein Lauf, der nur csv persistiert,
+> hat die xlsx-Erzeugung trotzdem **vollständig durchlaufen**. Bricht sie, ist auch die csv
+> ungültig — sie kann nicht „einfacher" gelingen. Ein csv-Ergebnis ohne funktionierenden
+> xlsx-Weg ist deshalb ein **Widerspruch**, kein Sparmodus. Genau deshalb ist der Ist-Zustand
+> (`csv 36 / xlsx 0`, xlsx-Writer ohne Produktions-Aufrufer) nicht nur eine falsche Voreinstellung,
+> sondern ein Beleg, dass die Kette an ihrer Wurzel gar nicht lief.
+>
+> **Kein Doppelschreiben:** auch Fall (c) baut die Mappe **einmal** und schreibt sie zweimal heraus —
+> das ist es, was der 05.08.-Nachtrag verbieten wollte, und es bleibt verboten. Aufgehoben ist nur
+> dessen **Ausschließlichkeit** (`CSV XOR xlsx`). **Die Richtung ist immer xlsx → csv**, nie
+> umgekehrt: es gibt keinen Parser, der eine fertige CSV zu einer Mappe zurückliest.
 >
 > **Für den Bau folgt daraus:** eine Regel `writeback_methods.size() > 1 => Fehler` ist **falsch**,
 > auch über der Teilmenge `{csv,xlsx}`. Beide Formate zugleich sind ein **gültiger** Eingang.
