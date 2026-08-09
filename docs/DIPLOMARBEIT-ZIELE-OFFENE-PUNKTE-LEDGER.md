@@ -16,6 +16,92 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+### W0a IST ANGELAUFEN 09.08.2026 23:00 — vier Bau-Straenge, vier Explores, und die Reihenfolge stimmt wieder
+
+**Der Kontext wurde neu gegruendet.** Owner-Direktive, woertlich: *"arbeite im Sinne der gesetzten
+Regeln und Konventionen des Goals v8 (die du bitte ALLE WIRKLICH in den Kontext kippst und IMMER
+nach Kompaktierung neu hineinkippst -> merke dir das) maximal parallel weiter. Rate NIE."*
+
+**Was "WIRKLICH kippen" heisst, und warum es eine Verschaerfung ist.** Nicht anlesen, nicht greppen,
+nicht "ich kenne das aus der Zusammenfassung" — jede der bindenden Dateien vollstaendig mit `Read`,
+notfalls in Portionen, bis zum Dateiende. Vollzogen und mit Nenner belegt:
+
+    Lesefassung GOAL v8 verbatim        241 von 241 Zeilen
+    ARBEITSWEISE-GESAMT-DOKTRIN v3.1    557 von 557
+    GOAL-V8-DOSSIER                     659 von 659
+    WELLENPLAN-ENDFASSUNG v2            971 von 971   (vier Portionen)
+    DESIGNPLAN TDD                      289 von 289
+    ------------------------------------------------
+    SUMME                             2.717 Zeilen
+
+Der Grund fuer die Verschaerfung steht im Memory-Eintrag: ein Compact loescht die Dokumente aus dem
+Kontext, egal wie oft sie vorher drin waren, und **anlesen erzeugt das Gefuehl, die Regel zu kennen,
+und laesst genau die Stellen weg, die im Summary nie vorkamen.**
+
+### Der Stand, den das Lesen zutage gefoerdert hat
+
+**W-1 ist abgeschlossen** — und zwar belegbar, nicht nur laut Plan: der ST-CTestWache-Wurzelfix
+steht am Objekt. `enable_testing()` liegt in ce `CMakeLists.txt:695`, **vor**
+`add_subdirectory(libs/cache_engine)`; der Kommentarblock :672-:695 traegt den Befund (es stand
+vorher bei :717, also danach). Damit ist die Ursache geheilt, die **27 gtest-Faelle 79 Tage lang
+unsichtbar** gemacht hat — darunter `WelchTTest.*`, das Verfahren, das "signifikant schneller"
+entscheidet.
+
+**W0a ist der naechste Block**, und sein IST-Stand wurde vor der Delegation vom Lead selbst erhoben
+(A2.0: kein Agentenstart ohne vorausgehenden Gedaechtnis-Befund; V2.1-Korrektur: der Stand wird dem
+Agenten MITGEGEBEN, nicht von ihm ermittelt):
+
+| Posten | IST am Objekt (ce `aebc4f2c`) |
+|---|---|
+| **D1b** CI-Prebuild | `adhoc_emitter` = **0** in `.gitlab-ci.yml`; Gegenprobe: existiert in `CMakeLists.txt`, `cmake/adhoc_emitter.cmake`, `tests/unit/CMakeLists.txt` ⇒ **offen** |
+| **D2** Untergrenze | `floor`/`inventory`/`inventar` = **0 Dateien im ganzen getrackten Baum** ⇒ **offen** |
+| **D2-G1** 27 gtest-Faelle | registriert per `gtest_discover_tests` in `libs/cache_engine/builder/commands/tests/` — der einzigen Stelle im Repo, die das tut. **Ob der Wurzelfix sie sichtbar gemacht hat, ist UNGEMESSEN.** |
+| **D1e** f15-Smoke | 10 Treffer + `tests/unit/cli_smoke.cmake` existiert ⇒ **teilgebaut** |
+| **D1f** STATUS_OUT | **6** Bloecke am Objekt, der Plan sagt **5** ⇒ die Zahl driftet, beide gehoeren in den Bericht |
+
+**Messgeraet-Gegenprobe (V4), ohne die die vier Nullbefunde wertlos waeren:** `add_test` in
+`tests/unit/CMakeLists.txt` = **355 Treffer bei 6.348 Zeilen**. Das Werkzeug sucht also. Ohne diese
+Zeile waeren die Nullen von einem kaputten `grep` nicht zu unterscheiden — genau die Verwechslung,
+die in diesem Projekt schon zweimal einen falschen Befund erzeugt hat.
+
+### Was jetzt laeuft — fuenf Straenge, disjunkt geschnitten
+
+Der Schnitt folgt den **Lead-only-Hotspots** aus ARBEITSWEISE B.3: `tests/unit/CMakeLists.txt` und
+`.gitlab-ci.yml` duerfen **nie parallel** beschrieben werden. Jeder gehoert in diesem Lauf genau
+einem Strang.
+
+    A  wt-ce-w0a        D2-G1 + D1f + MT-L4 + AS-Bewaffnung   tests/unit/CMakeLists.txt
+    B  wt-ce-d4         D1b + D1e                             ce .gitlab-ci.yml
+    C  wt-ce-fk         D2 + D2-G3 + D2-G6                    ce scripts/
+    D  wt-super-warn    D1g (610/186 messen statt behaupten)  super Code/CMakeLists.txt
+    +  wt-ce-gnu        die 58 Diff-Hygiene-Verstoesse        (laeuft seit 22:30)
+
+Je Strang: **Explore (Sonnet 5, max effort, "very thorough") → Bau (Opus 5, max effort) → Verify
+(adversarisch)**. Der Explore ist Pflicht vor jeder Design- und Bau-Phase — Owner 09.08.:
+*"Fahre auch immer einen Explore wenn du sonst raten muesstest - rate NIE."*
+
+Parallel dazu, read-only und ohne Plattenkosten, ein **zweiter Workflow fuer den W0b-Vorlauf**:
+D3-7 (Lauf-Marker, die Wurzel der ganzen D3-Kette) · ##25 DURCHSTICH (die Kette bis ins PDF) ·
+die Selbsttest-Luecke der CI-Wachen · ##08 Schema-Freeze. Zweistufig: Sonnet-5-Kartierung, dann
+Opus-5-Gegenlesung, die jede tragende Referenz selbst oeffnet.
+
+### Die Kanal-Regel, technisch begruendet
+
+Beide Laeufe gehen ueber das **Workflow-Tool**, nicht ueber Einzel-Agent-Starts. Der Grund steht in
+ARBEITSWEISE A1 und ist am Objekt gemessen: das Top-Level-Agent-Werkzeug **kennt kein
+`effort`-Feld**. Die Modell-Matrix schreibt aber Effort-Stufen vor ("max effort", "xhigh"). Auf dem
+Top-Level-Kanal sind diese Vorgaben **weder einhaltbar noch verletzbar** — eine Regel ohne Kanal.
+Nur `agent(prompt, {model, effort})` im Workflow-Skript kann sie tatsaechlich setzen.
+
+### Ausdruecklich offen
+
+`is_original:relock` (manual, `allow_failure: true`, ce `.gitlab-ci.yml:693-715`) ist **geklaert und
+kein Verstoss**: `when: manual` ohne `allow_failure` setzt eine GitLab-Pipeline auf `blocked` statt
+`success`. Beleg statt Vermutung: Pipeline **15490** stand auf `success` mit demselben manual-Job.
+Es ist ein Wartungswerkzeug, das die SHA256-Locks der vendorten Paper-Allokatoren neu erzeugt
+(13 codegen-Targets). Die zweite aktive `allow_failure`-Stelle in ce ist `build:arm64-smoke`
+(`:231`) — sie traegt ihr Ablaufdatum im Kommentar: *"advisory bis #179-Bereinigung, danach HART"*.
+Alle uebrigen Treffer sind Kommentare, die das Wort nur erwaehnen. **Die Doktrin steht.**
 ### BEFUND 09.08.2026 spaet abends — super ist rot, aber nicht in super: die Bridge-Luecke und der `branch: main`-Trigger
 
 **Der Widerspruch, der es ausgeloest hat.** super-Pipeline **15496** auf `310ea9d3` steht auf
