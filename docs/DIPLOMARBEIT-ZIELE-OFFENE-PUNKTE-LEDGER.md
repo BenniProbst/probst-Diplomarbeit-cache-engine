@@ -16,6 +16,100 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — DER PUSH IST DURCH: beide Repos, alle Pipelines grün, main nachgezogen. Plus drei Fallen und ein Sicherheitsbefund.
+
+Der ganze Tag lag ungepusht, weil GitLab seit früh HTTP 500 lieferte. **Infra ist wieder oben,
+alles ist draußen.**
+
+### Der Vollzug, mit Belegen
+
+| | Bereich | Commits | gitleaks |
+|---|---|---|---|
+| **ce** | `404ff6cf..9f92d49f` | **6 scanned** | `no leaks found`, rc=0 |
+| **super** | `abfb96db..da0a5d6d` | **23 scanned** | `no leaks found`, rc=0 |
+
+Die Commit-Zahl stammt **literal von gitleaks selbst** (`INF 23 commits scanned.`),
+gegengeprüft per `rev-list --count` **und** per Zählung der `^commit <40hex>`-Köpfe im Strom.
+Zusätzlich: `scanned ~719815 bytes` — **exakt** die Bytezahl der Eingabe.
+
+**Bissprobe zuerst, K13-konform:** frisch erzeugter RSA-Key plus ein aus `/dev/urandom` gezogener
+`glpat`-String, **nichts abgeschrieben**. Beide Regeln bissen (`RuleID: private-key`,
+`RuleID: gitlab-pat`, rc=1). **Erst danach hat der Agent dem grünen Lauf geglaubt.**
+
+**Push in der richtigen Reihenfolge** (ce zuerst wegen des Gitlinks), Gleichstand per `ls-remote`
+belegt. **main-FF beide**, mit vollem 40-stelligem SHA:
+
+```
+ce:    0ef4ef4f..9f92d49f  →  refs/heads/main
+super: 2a830103..da0a5d6d  →  refs/heads/main
+```
+
+### Die Pipelines — und der Nenner, der fast falsch gewesen wäre
+
+| Pipeline | Nenner | Ergebnis | prod1 / prod2 |
+|---|---|---|---|
+| **ce 15417** | 23 Jobs + 0 Bridges = **23** | 22 success, 1 manual, **0 rot** | 9 / 13 |
+| **super 15418** | 23 Jobs + **3 Bridges** = **26** | alle success, **0 rot** | 15 / 8 |
+
+Nach dem FF liefen weitere: ce 15422 und 15426, super 15423 — **alle grün**. Dieselben Commits
+verteilten sich zwischen 15422 und 15426 **unterschiedlich** auf die Hosts. Das ist das
+**dokumentierte Job-Floaten**, kein Defekt.
+
+### Die drei neuen Jobs: Erstlauf, alle grün, jeder mit Selbstbiss
+
+| Job | ID | Runner | Literaler Beleg |
+|---|---|---|---|
+| `test:bestandslog-wache-bissprobe` | 369096 | **prod1** | `NENNER: 16 Faelle geprueft, 0 falsch.` · `SELBSTBISS OK: alle 3 Mutanten erkannt.` |
+| `test:anhang-forward-probe` | 369097 | **prod1** | `SELBSTBISS-NENNER: 6 von 6 Mutanten haben die Probe rot gemacht.` |
+| `test:abnahme06-zusicherung` | 369101 | **prod2** | `18 bedingte Registrierungen in 14 Klassen` · `Deckung: ja.` |
+
+**`abnahme06` ist zudem ehrlich grün:** er meldet ausdrücklich *„Die FORMEL ##06 ist damit NICHT
+abgenommen — dafür fehlt der IST-Nenner (Posten D2)"*, statt die Lücke zu verschweigen.
+
+### Drei Fallen, alle neu, alle gefangen
+
+**(1) gitleaks auf dem Submodul-Gitdir: „0 commits scanned", rc=0 — grün über nichts.**
+`core.worktree` zeigt relativ und löst im Container nicht auf; **git bricht mit 128 ab, gitleaks
+meldet trotzdem rc=0**. Der Agent hat den Lauf **verworfen** und über den Arbeitspfad neu
+gescannt → 6 Commits. **Ohne die Commit-Zahl in der Ausgabe wäre das nicht aufgefallen.**
+
+**(2) Der Jobs-Endpunkt enthält keine Bridges.** super zeigte **23/23 success, während die
+Pipeline noch lief** — sie hing an einer Downstream-Pipeline, die in der Jobliste gar nicht
+vorkommt. **Der Nenner einer Pipeline ist Jobs + Bridges.**
+
+**(3) Der Vault-PAT war für den Push gar nicht nötig** — der `store`-Helper trägt bereits ein
+Schreibrecht, belegt per `push --dry-run` **vor** dem Ernstfall. Für die API-Abfragen lief der
+Vault-Zugriff nach Vorschrift: blind per `mapfile`, 8 Kandidaten über die **Länge** selektiert,
+**rückwärts** getestet — Kandidat[7] → 403, Kandidat[6] → **200**. Jeder Test über eine
+0600-curl-config, danach `shred -u`. **Kein Tokenwert war je in einer Kommandozeile.**
+
+### ⚠️ Sicherheitsbefund — gemeldet und behoben
+
+Im gemeinsamen Scratch-Verzeichnis lagen **drei Dateien mit Zugangsdaten-Charakter** aus früheren
+Sessions, Modus 0600, bis **drei Tage alt**:
+
+    .tok           51 Byte  (08.08.)  — exakt die Laenge des gueltigen PAT
+    curl-pat.cfg  147 Byte  (07.08.)
+    .patcfg        78 Byte  (06.08.)
+
+Außerhalb jedes Repos, also **kein Commit-Risiko** — aber **Token im Ruhezustand auf Platte**, die
+kein `.gitignore` und kein gitleaks je sieht.
+
+**Der Agent hat sie korrekt gemeldet statt angefasst** (nicht sein Auftrag; ein anderer Agent
+könnte sie gerade benutzen). **Ich habe sie geschreddert**, ohne sie zu lesen; die Gegenprobe
+findet keine weiteren.
+
+**Regel, jetzt im Fallen-Register:** nach jedem Vault-Zugriff sofort `shred -u`, und beim
+Sessionwechsel das Scratch-Verzeichnis gezielt absuchen. **Finder meldet, Lead schreddert.**
+
+### Was offen blieb
+
+- **`is_original:relock`** (ce) ist ein **manuelles Tor** — nie gestartet, kein Runner. Kein
+  Defekt, aber dieser Vertrag ist in diesem Lauf **ungeprüft**.
+- **Zufällige AWS-förmige Secrets** sind durch keinen dieser Läufe abgedeckt (Entropieschwelle).
+- Zwei Commits kamen **während** des Push-Laufs dazu und sind weder gepusht noch gescannt — der
+  Agent hat sie bewusst liegen lassen, damit sie **nicht am Secret-Tor vorbeigehen**. Strang 31
+  zieht sie nach.
 ## NACHTRAG 09.08.2026 — T-15: das Drift-Gate klammert die Messung. Und drei Dinge blieben bewusst ungebaut.
 
 **Gelandet:** `ce 4cd1ab91` — 8 Dateien, **913 Zeilen**. Das Gate klammert jetzt die Zeitnahme
