@@ -338,6 +338,33 @@ test:mess-ausbeute-bissprobe:
   script:
     - sh ci/tests/mess_ausbeute_bissprobe.sh --selbstbiss
 
+# -- F1-DURCHSTICH (2026-08-09): PROBE fuer die DURCHSTICH-WACHE (ci/durchstich_wache.sh) --
+# Die Wache entscheidet am 14.08., ob der Mini-Lauf etwas BEWIESEN hat oder nur gruen war. Sie traegt
+# zwei Zusicherungen, die sonst niemand gibt:
+#   frische      -- es wurde in DIESEM Lauf gemessen, nicht bloss aus Alt-Bestand resumiert. Ohne sie
+#                   ist ein Voll-Resume von einer frischen Messung nicht unterscheidbar; beide enden
+#                   laut ce profile_run_entry.hpp:1203 mit Exit 0 und legen Datenzeilen vor.
+#   lastprofile  -- die deklarierten Workload-Ids sind wirklich aufloesbar. Das Pre-Flight
+#                   `planner validate` kann das nicht sehen, wenn das Profil ausserhalb von ce liegt:
+#                   der Nenner "N workloads" faellt dann still aus seiner Ausgabe (am Objekt mit
+#                   derselben Datei an zwei Orten gegengeprueft).
+# --selbstbiss IM CI, weil eine Probe, die nur am gesunden Objekt gruen ist, immer gruen sein koennte:
+# der Schalter baut vier Wegwerf-Mutanten (je ein `exit 1` entfernt) und FORDERT, dass die Probe an
+# jedem rot wird. Die Koeder werden je Lauf aus /dev/urandom gewuerfelt, nicht abgeschrieben (K13).
+# KEIN allow_failure (Owner 06.07.2026: bei einer harten Pipeline gibt es kein allow_failure).
+test:durchstich-bissprobe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft wird nur der super-Baum
+  script:
+    - sh ci/tests/durchstich_bissprobe.sh --selbstbiss
+
 # -- W0b-1 / D3-3 (2026-08-08): PROBE fuer den PERSIST-SAMMLER (ci/persist_sammler.sh) --
 # Der Sammler entscheidet, ob ein Messfenster DAUERHAFT in den Baum kommt. Unter "Messdaten werden
 # nie geloescht" ist genau diese Entscheidung nicht rueckholbar: ein einmal zurueckgeschriebener
@@ -437,6 +464,36 @@ test:zellkoordinaten-wache:
     - sh ci/tests/zellkoordinaten_wache_probe.sh --selbstbiss
     # (b) die Wache am ECHTEN Dokument -- (a) allein bewiese nur, dass sie sich selbst gefaellt
     - sh ci/zellkoordinaten_wache.sh jobs .gitlab-ci.yml
+
+# -- LAG-P1 Rest (2026-08-09): PROBE fuer die OBJECT-STAT-WACHE (ci/object_stat_wache.sh) --
+# SELBSTCHECK dieses Blocks: die Probe deckt die Wache UND die Abnahme ab (28 Faelle je Lauf,
+# 6 Selbstbiss-Mutanten). Sie braucht KEIN erreichbares MinIO: die Erfolgsfaelle laufen mit der
+# ECHTEN mc-Binary gegen ein lokales Verzeichnis (mc kann lokale Pfade statten und kopieren),
+# die Store-Fehlerfaelle gegen ein Fake-mc, dessen JSON-Formen am 09.08. literal von der echten
+# mc-Binary abgenommen wurden. Deshalb faehrt sie in JEDER Pipeline und nicht nur im Opt-in.
+#
+# DER BEFUND, DER DIESE PROBE ERZWANG (09.08., selbst gemessen, nicht abgeschrieben):
+# 'mc stat --json' liefert bei FEHLENDEM OBJEKT und bei TOTEM STORE denselben Exit (1), und die
+# LETZTE Ausgabezeile ist in beiden Faellen bedeutungsgleich ('Object does not exist'). Der
+# Unterschied steckt allein in der ERSTEN Zeile. Eine Wache, die den Exit oder die letzte Zeile
+# liest, meldet einen Infrastruktur-Ausfall als harmlos fehlendes Objekt. Genau diesen Mutanten
+# faengt der Selbstbiss (M1/M4).
+#
+# KOEDER: Groessen, etags und das Schein-Geheimnis werden bei JEDEM Lauf frisch aus /dev/urandom
+# gewuerfelt, nie aus einer Doku uebernommen (K13).
+# KEIN allow_failure: eine advisory Probe ist die naechste stille Null.
+test:object-stat-wache-bissprobe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft werden nur super-Skripte
+  script:
+    - sh ci/tests/object_stat_wache_probe.sh --selbstbiss
 
 # -- P4b (2026-08-09): PROBE fuer den ANHANG-VORWAERTS-KERN (ci/anhang_forward_core.sh) --
 # SELBSTCHECK dieses Blocks: alle Zahlen unten sind am Objekt gemessen, keine ist abgeschrieben.
@@ -1216,6 +1273,42 @@ thesis:pdf:
         echo "== Bestandslog-Wache: Opt-in nicht gesetzt -> nichts zu pruefen (inert-by-default) =="
       fi
 
+# ── LAG-P1 Rest (2026-08-09): die OBJECT-STAT-ABNAHME -- der Round-Trip gegen den Store.
+#    Sie schliesst die Luecke, die .bestandslog_wache in ihrem eigenen Kopf benennt: jene belegt,
+#    dass das Gate GEZUENDET hat (eine Aussage ueber den LAUF), diese belegt, dass der Store ein
+#    Objekt WIRKLICH aufnimmt und mit exakt der richtigen Groesse zurueckgibt (eine Aussage ueber
+#    den STORE). Der Unterschied ist der zwischen Gegenstand und Stellvertreter.
+#
+#    WIE DER SOLLWERT ENTSTEHT: ein Objekt ZUFAELLIGER Groesse wird frisch gewuerfelt, abgelegt und
+#    nachgemessen; der Sollwert kommt aus 'wc -c' des Dateisystems, der Istwert aus 'mc stat --json'
+#    des Stores -- zwei verschiedene Quellen (T-3/T-5). Ein Wert, den vor dem Lauf niemand kennen
+#    konnte, laesst sich nicht zufaellig richtig raten.
+#
+#    WARUM NICHT DAS BESTANDSLOG-DOKUMENT SELBST GEPRUEFT WIRD (ehrliche Grenze, 09.08. gemessen):
+#    Fuer das Dokument bestandslog/binary_bestand.xml existiert derzeit KEINE fremde Quelle fuer
+#    seine Groesse -- der Treiber schreibt es ueber den ArtifactCache direkt in den Store, eine
+#    lokale Kopie bleibt nicht liegen (im super-Baum 0 Treffer, gegengeprueft). Eine Groessen-
+#    Zusicherung gegen den Store waere hier nur gegen den Store selbst zu bilden und damit
+#    zirkulaer. Wer das Dokument namentlich abnehmen will, ruft ci/object_stat_wache.sh direkt mit
+#    einer erwarteten Groesse auf; die muss der ERZEUGER liefern. Das ist ein Folgepaket auf der
+#    ce-Seite und wird hier ausdruecklich NICHT stillschweigend mitbehauptet.
+#
+#    OPT-IN-GATE UND FAIL-CLOSED, UND WARUM DAS KEIN WIDERSPRUCH IST: Storage #51 ist im ganzen
+#    Haus inert-by-default (golden byte-neutral). Diese Abnahme laeuft deshalb NUR, wenn
+#    COMDARE_STORAGE_CACHE=true -- also nur dort, wo jemand ZUGESAGT hat, dass Ebene B lebt.
+#    INNERHALB dieses Gates gibt es kein Ueberspringen: ist der Store dann nicht erreichbar, faellt
+#    der Job hart rot (rc 3 INFRASTRUKTUR), fehlt oder differiert das Objekt, ebenfalls (rc 1
+#    FACHLICH). Eine Wache, die bei fehlendem Messgegenstand gruen meldet, waere genau die stille
+#    Null, gegen die diese Datei gebaut ist. KEIN allow_failure -- auf Job-Ebene seit 06.07. verboten.
+.object_stat_abnahme:
+  script:
+    - |
+      if [ "${COMDARE_STORAGE_CACHE:-}" = "true" ]; then
+        sh "$CI_PROJECT_DIR/ci/object_stat_abnahme.sh"
+      else
+        echo "== Object-Stat-Abnahme: Storage #51 nicht scharf -> kein Store zugesagt, nichts zu pruefen (inert-by-default) =="
+      fi
+
 # ── P11-Lehre (W9.6): Mess-Pre-Flight — HARTER Abbruch, wenn ein FREMDER comdare-messung-driver auf dem Runner
 #    laeuft. Die 1-Thread-Mess-Doktrin verlangt Allein-Belegung (ein paralleler Driver verfaelscht die Streuung).
 #    Laeuft VOR dem eigenen Driver-Start -> jeder gefundene Driver ist fremd; zusaetzlich wird die eigene
@@ -1256,6 +1349,26 @@ measure:smoke:
   rules:
     - if: '$GITLAB_USER_LOGIN =~ /_bot_/'          # (Netz) Bot-Writeback triggert NIE einen Messlauf
       when: never
+    # ── F1-DURCHSTICH (Wellenplan ##25, 14.08.2026) ────────────────────────────────────────────────────────────
+    # Dieselbe Maschinerie, KLEINERES Profil. Der Wellenplan verlangt "1 Binary, 1 Perm, Minuten"; das
+    # Voll-Feature-Profil m3_smoke_coverage traegt 17 axis_sweeps + 21 sota_series + 21 workloads (am Objekt mit
+    # `comdare-experiment-planner validate` nachgezaehlt) und ist per `cap` NICHT verkleinerbar -- der deep-sweep-Pass
+    # faehrt ALLE Auspraegungen einer Achse (ce profile_run_entry.hpp:790-812), cap deckelt nur den Basis-Pass.
+    # Deshalb ein eigenes Profil statt eines gedeckelten Laufs.
+    #
+    # DIESE VARIABLE IST DISJUNKT zu COMDARE_RUN_MEASURE / COMDARE_BUILD_GOLDEN_N / COMDARE_DYNAMIC_PLANER_CI.
+    # Absicht: die F1-Welle erzeugt GENAU EINEN messenden Job. COMDARE_RUN_MEASURE darf dabei NICHT gesetzt sein --
+    # es erzeugt zugleich measure:golden-320 (timeout 10 days), der per needs auf diesem Job wartet und danach den
+    # resource_group-Slot tagelang belegt.
+    #
+    # COMDARE_LOAD_PROFILE_DIR ist hier PFLICHT, nicht Kosmetik: das Profil liegt in super, die Lastprofile liegen
+    # in ce. Der Treiber loest Achse 2 sonst relativ zum Profilpfad auf und bricht mit Exit 4 ab.
+    - if: '$COMDARE_DURCHSTICH == "true"'
+      variables:
+        COMDARE_THESIS_PROFILE: "$CI_PROJECT_DIR/Code/experiment_config/thesis_profiles/f1_durchstich.profile.xml"
+        COMDARE_LOAD_PROFILE_DIR: "$CI_PROJECT_DIR/Code/external/comdare-cache-engine/libs/cache_engine/algorithm_profiles/load_profiles"
+        COMDARE_MINDEST_GEMESSEN: "1"      # mindestens 1 REAL gemessene Zelle
+        COMDARE_MAX_RESUMIERT: "0"         # das Profil faehrt resume="false" -> jede resumierte Zelle ist ein Befund
     # DEPRECATED-Fallback (2026-07-21, analog COMDARE_STATIC_MATRIX_FALLBACK): dieser STATISCHE Smoke-Job ist durch
     # die dynamische Kette (planer:delegate -> ceb -> tier, Profil-Methodik m3_smoke=debug, 2c-Dual-Compile) abgeloest.
     # Er laeuft NUR NOCH mit ZUSAETZLICHEM COMDARE_STATIC_SMOKE_FALLBACK=="true" (Default AUS) -- sonst kollidierte er
@@ -1287,6 +1400,17 @@ measure:smoke:
       echo "== Pre-Flight (Subkommando 'validate', rein lesende Pruefung des SMOKE-Profils gegen die EnabledStrategies) =="
       echo "   COMDARE_THESIS_PROFILE=$COMDARE_THESIS_PROFILE"
       "$PLANNER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
+      # ── LASTPROFIL-DECKUNG (D-1, 2026-08-09): der blinde Fleck des Pre-Flights ──────────────────────────────
+      # AM OBJEKT GEMESSEN (Gegenprobe: DIESELBE Datei an zwei Orten): `planner validate` loest die Lastprofile
+      # relativ zum PROFILPFAD auf. Liegt das Profil ausserhalb von ce, faellt der Nenner "N workloads" aus der
+      # Validat-Zeile ERSATZLOS weg -- die Pruefung wird still uebersprungen, nicht rot. Und der naheliegende
+      # Ausweg traegt nicht: COMDARE_LOAD_PROFILE_DIR kennt nur der TREIBER, in apps/experiment_planner/main.cpp
+      # kommt die Variable nicht vor (grep ueber die Datei: 0 Treffer bei nicht-leerer Datei).
+      # Diese Wache loest jede deklarierte Workload-Id einzeln auf und nennt ihren Nenner. Sie laeuft fuer JEDES
+      # Profil, nicht nur fuer den Durchstich: ein Profil ohne aufloesbare Achse 2 misst nichts.
+      LOADDIR="${COMDARE_LOAD_PROFILE_DIR:-$(dirname "$COMDARE_THESIS_PROFILE")/../load_profiles}"
+      test -x ../ci/durchstich_wache.sh || { echo "FEHLER: ci/durchstich_wache.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      sh ../ci/durchstich_wache.sh lastprofile "$COMDARE_THESIS_PROFILE" "$LOADDIR"
       mkdir -p measure_out_smoke
       # -- ZELL-KOORDINATEN (2026-08-09, Paket Provenienz-Verlust) ---------------------------------
       # BEFUND: die beiden STATISCHEN Mess-Jobs setzten keine der drei Variablen, aus denen ce die
@@ -1329,9 +1453,16 @@ measure:smoke:
       export COMDARE_PLATFORM="amd@$(hostname)"
       export COMDARE_LANE="amd"
       echo "== Zell-Koordinaten: opt=$COMDARE_GN_OPT simd=$COMDARE_GN_SIMD platform=$COMDARE_PLATFORM lane=$COMDARE_LANE (combo ungesetzt = [all]) =="
-      echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
+      echo "== Messlauf ueber $COMDARE_THESIS_PROFILE =="
       # LAG-P1: stderr mitschneiden UND live weiterreichen (Begruendung s. measure:golden-320).
-      { "$DRIVER" experiment_config measure_out_smoke 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1
+      # D-1 (2026-08-09): ZUSAETZLICH stdout mitschneiden. Der Treiber schreibt seine Bilanz-Zeile
+      #   "RUN_PROFILE fertig: ... measured=<N> resumed=<M> ... csv_ok=<0|1>"
+      # nach stdout (ce profile_run_entry.hpp:1180-1183); bisher lief stdout an fd3 direkt in das Job-Log und
+      # war fuer keine Wache greifbar. Ohne diese Zeile ist NICHT entscheidbar, ob ein Lauf gemessen oder nur
+      # Alt-Zeilen resumiert hat -- und beides endet laut :1203 mit Exit 0.
+      # Die rc-Weitergabe ist am Objekt geprueft (Stub-Treiber mit Exit 3): pipeline_rc=3, beide Logs gefuellt.
+      { "$DRIVER" experiment_config measure_out_smoke 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1 \
+        | tee "$CI_PROJECT_DIR/messlauf-stdout.log"
       # D3 (2026-08-08): die alte Erfolgsbedingung prueft nur, DASS eine measurements.csv
       # existiert -- die Zeilenzahl wurde eine Zeile darueber AUSGEGEBEN und nirgends geprueft.
       # Eine CSV mit nur der Kopfzeile bestand das Gate. Die Wache zaehlt jetzt Datenzeilen
@@ -1339,6 +1470,17 @@ measure:smoke:
       # (hier und in measure:golden-320) und kopierter Code den Defekt mitkopiert hat.
       test -x ../ci/mess_ausbeute_wache.sh || { echo "FEHLER: ci/mess_ausbeute_wache.sh fehlt/nicht ausfuehrbar"; exit 1; }
       sh ../ci/mess_ausbeute_wache.sh measure_out_smoke 1
+      # ── FRISCHE (D-1, 2026-08-09): die Ausbeute-Wache oben zaehlt ZEILEN, nicht HERKUNFT ────────────────────
+      # ce profile_run_entry.hpp:1203 setzt woertlich
+      #     exit_code = (((any_measured > 0 || any_resumed > 0) || provision_ok) && csv_ok) ? 0 : 1;
+      # Ein Lauf, der NICHTS misst und ausschliesslich Alt-Zeilen resumiert, ist damit gruen UND hat Datenzeilen.
+      # Die Ausbeute-Wache findet diese Zeilen und sagt zu Recht OK -- sie ist fuer die Menge zustaendig, nicht
+      # fuer das Alter. Fuer den Durchstich waere genau das der Stellvertreter: die Kette geprueft, der
+      # Gegenstand nicht. Ein Voll-Resume IST eine vorgefertigte CSV, sie nennt sich nur nicht so.
+      # Default 1 (jeder Mess-Job muss mindestens eine Zelle REAL gemessen haben); der Resume-Deckel bleibt leer,
+      # wo Resume legitim ist, und steht beim Durchstich auf 0 (das Profil faehrt resume="false").
+      sh ../ci/durchstich_wache.sh frische "$CI_PROJECT_DIR/messlauf-stdout.log" \
+        "${COMDARE_MINDEST_GEMESSEN:-1}" ${COMDARE_MAX_RESUMIERT:+"$COMDARE_MAX_RESUMIERT"}
       # ── CI-interaktiv (#24): den Anhang aus den LIVE-Smoke-Messdaten regenerieren (gleiche Logik wie golden-320) ──
       echo "== Anhang-Regenerierung aus Live-Smoke-Messdaten (#24) =="
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
@@ -1378,11 +1520,15 @@ measure:smoke:
       echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
     # LAG-P1: Bestandslog-Wache als eigener Schritt, OHNE allow_failure (Begruendung s. measure:golden-320).
     - !reference [.bestandslog_wache, script]
+    # LAG-P1 Rest: die Wache oben belegt, dass das Gate zuendete; DIESE belegt, dass der Store
+    # ein Objekt wirklich haelt. Log-Aussage und Store-Aussage sind zwei verschiedene Dinge.
+    - !reference [.object_stat_abnahme, script]
   artifacts:
     paths:
       - Code/measure_out_smoke/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die 115 DLL-Binaries
       - Code/measure_out_smoke/appendix/**/*.tex # CI-interaktiv (#24): regenerierte 12 Kern- + 5 Darstellungs-.tex je Sprache (K-12-Sweep 2026-07-19)
       - bestandslog-lauf.log                     # LAG-P1: der Beleg der aktiv-Zeile, auch (gerade) im roten Fall
+      - messlauf-stdout.log                      # D-1: die Bilanz-Zeile measured=/resumed= -- der FRISCHE-Beleg
     when: always
     expire_in: 12 weeks
 
@@ -1514,6 +1660,9 @@ measure:golden-320:
     # bewusst hinter der Mess-Ausbeute-Wache: erst "hat der Lauf Messwerte erzeugt", dann "war er dabei
     # ueberhaupt am Lager angemeldet". Beide Fragen sind getrennt beantwortbar und beide muessen ja sein.
     - !reference [.bestandslog_wache, script]
+    # LAG-P1 Rest: und danach die Store-Seite. "War der Lauf am Lager angemeldet" (oben) und
+    # "haelt der Store wirklich Objekte" (hier) sind getrennt beantwortbar; beide muessen ja sein.
+    - !reference [.object_stat_abnahme, script]
   artifacts:
     paths:
       - Code/measure_out/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die ~320 DLL-Binaries (Repo-/Artefakt-Bloat)
@@ -1908,6 +2057,9 @@ planer:delegate:
       echo "== STUFE-1 CEB-Trigger-Jobs (Grandchild -> STUFE 2): $(grep -c '# JOB ceb-trigger combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
     # LAG-P1: die Wache als EIGENER Schritt, nach dem Lauf, OHNE allow_failure.
     - !reference [.bestandslog_wache, script]
+    # LAG-P1 Rest: der Planer meldet sich am Lager an -- ob das Lager selbst traegt, sagt erst
+    # der Round-Trip gegen den Store.
+    - !reference [.object_stat_abnahme, script]
   artifacts:
     paths:
       - planer-child-ci.yml
