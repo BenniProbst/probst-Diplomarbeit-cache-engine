@@ -173,7 +173,28 @@ Alle drei gehören **in die Ausgabe** — nicht in einen Kommentar daneben. „4
 **Das Werkzeug dafür existiert:** `scripts/ci_host_klassen_bericht.sh` druckt die Host-Kennung und
 prüft die erwartete Klasse gegen einen unabhängigen Gegeneingang — im Lauf 103 gegen 99 Tests je
 nach Klasse, beide Zahlen gedruckt.
-## NACHTRAG 09.08.2026 — der nachgeholte Pflicht-Explore hat sich sofort bezahlt gemacht: die Thesis schlägt den Plan
+## NACHTRAG 09.08.2026 — der nachgeholte Pflicht-Explore hat sich sofort bezahlt gemacht *(Titel überholt: siehe Korrektur-Kasten)*
+
+> **!! RANGFOLGE-KORREKTUR 09.08.2026 (Owner) — die Begruendung dieses Abschnitts faellt, das Ergebnis bleibt.**
+> Die geltende Rangfolge lautet **OWNER > PLAN > THESIS** — nicht umgekehrt. Owner woertlich:
+> *„Es gilt Owner > Plan > Thesis. Bei Konflikt gilt in der Regel diese Rangordnung, oder wo mehr
+> Gründlichkeit erreicht werden kann, ein merge zweiter Eigenschaften. Die Frage ist auch immer,
+> ob sich das eine mit dem anderen ausschließt. **Thesis entsprechend Plan und Owner nachziehen
+> ist erlaubt.**"*
+>
+> **Die Rangordnung ist damit Stufe 3, nicht Stufe 1.** Zuerst fragen: *schliesst es sich
+> ueberhaupt aus?* Dann: *laesst sich mehr Gruendlichkeit erreichen?* — dann wird **gemergt**.
+>
+> **Fuer D5-5 heisst das:** meine Begruendung „die Thesis schlaegt den Plan" ist **zurueckgezogen**.
+> Das Ergebnis (HDR bleibt und wird verdrahtet) steht trotzdem, aus zwei staerkeren Gruenden:
+> **(1)** HDR ist eine **Erhebungsstruktur**, der Perzentil-Kanon eine **Index-Formel** — zwei
+> Schichten, kein Gegensatz; beides zu fuehren ist **gruendlicher**.
+> **(2)** Der Wellenplan liess die Frage ohnehin **offen** („entfernen ODER fuehren") — ein offener
+> Posten kann nichts schlagen; es war nie ein Rangkonflikt.
+>
+> **Und die Entlastung:** die K3-Anhang-Kollision und die interne Zweistimmigkeit der Thesis waren
+> als Dilemmata gefuehrt. **Beides ist keines mehr** — die Thesis wird nachgezogen.
+
 
 **Anlass:** Der Owner hat am 09.08. den Explore zur **Pflichtstufe vor jeder Design- und
 Bau-Phase** gemacht — je Welle und je Strang. Die Stränge 9 (D5-1 Perzentil-KANON) und 10

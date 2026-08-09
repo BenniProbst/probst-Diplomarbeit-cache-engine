@@ -363,6 +363,38 @@ test:persist-sammler-probe:
   script:
     - sh ci/tests/persist_sammler_probe.sh --selbstbiss
 
+# ── LAG-P1 (2026-08-09): BISSPROBE der BESTANDSLOG-WACHE + der Scharfschaltung ──
+# DER BEFUND, der diesen Job erzwingt (selbst gezaehlt): COMDARE_BESTANDSLOG stand in NULL von zwei
+# aktiven .gitlab-ci.yml -- die gesamte Lager-Koordination war in Produktion AUS. Ohne sie gibt es
+# keinen SKIP, kein Takeover und keine Gleichverteilung ueber die Maschinen; die Messkampagne liefe
+# einmaschinig oder mit Doppelarbeit, und beides faellt erst auf, wenn sie schon laeuft.
+#
+# WARUM DIESER JOB UND NICHT NUR DIE WACHE (T-7): die Wache selbst laeuft ausschliesslich in
+# gegateten Jobs (planer:delegate, measure:*), die im Alltag gar nicht starten. Genau dieser Fehler
+# ist in diesem Repo schon passiert -- eine Wache wurde gebaut und nirgends aufgerufen. Dieser Job
+# laeuft in JEDER Pipeline und beweist den Biss bei jedem Lauf neu.
+#
+# WARUM --selbstbiss: die Probe baut drei Wegwerf-Mutanten der Wache (owner-Vergleich entfernt /
+# Feld-Gleichheit durch Teilzeichenketten-Suche ersetzt / jede Marker-Zeile gilt als aktiv) und
+# FORDERT, dass sie an jedem rot wird. Der dritte Mutant hat beim Bau eine echte Luecke in den
+# Faellen aufgedeckt (eine WARNUNG, die ihre Werte mitfuehrt, wurde nicht abgedeckt) -- er ist der
+# Grund, warum Fall (4b) existiert.
+#
+# KOEDER: bei jedem Lauf frisch aus /dev/urandom gewuerfelt, nie aus einer Doku uebernommen (K13).
+# KEIN allow_failure: eine advisory Probe ist die naechste stille Null.
+test:bestandslog-wache-bissprobe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft werden nur super-Skripte
+  script:
+    - sh ci/tests/bestandslog_wache_probe.sh --selbstbiss
+
 # ── W0b-8 (2026-08-08): PLAN-ZAHLEN-WACHE + ihre Bissprobe ──
 # DER BEFUND. Der TDD-Designplan trug die Zahl "das CSV-Schema wird von 47 von 47 Stellen gegen
 # seine eigene Quelle geprueft". Am Objekt war sie mit KEINER von sechs benannten Zaehlweisen

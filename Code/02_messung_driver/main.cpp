@@ -1139,8 +1139,17 @@ int main(int argc, char* argv[]) {
                     bestand_doc_key    = doc_key;
                     bestand_owner_uuid = owner_uuid;
                     bestand_maschine   = maschine;
+                    // LAG-P1 (2026-08-09) SELBSTCHECK: diese Zeile sichert zu, dass das Gate GEZUENDET hat und
+                    // MIT WELCHEN WERTEN. Sie sichert NICHT zu, dass das Dokument im Store entstanden ist -- das
+                    // sagt erst der spaetere flush ("[bestandslog] lager=... neu=...").
+                    // WARUM owner= NEU DAZUKAM: an der owner_uuid haengt die Takeover-Regel (ETA + 50 % ohne
+                    // Update -> andere Maschinen uebernehmen). Bis heute stand sie in KEINER Log-Zeile dieses
+                    // Treibers -- eine Wache konnte also nie pruefen, ob der Lauf unter einer EINDEUTIGEN
+                    // Identitaet reserviert. ANGEHAENGT statt eingeschoben: der bisherige Zeilenanfang bis
+                    // "key_of=..." bleibt damit byte-identisch (er ist in verlauf-32.txt:115 protokolliert).
                     std::cerr << "[bestandslog] aktiv: doc_key=" << bestand_doc_key << " maschine=" << bestand_maschine
-                              << " key_of=.fingerprint-Sidecar (#46b I1/I2)\n";
+                              << " key_of=.fingerprint-Sidecar (#46b I1/I2)"
+                              << " owner=" << bestand_owner_uuid << "\n";
                 } else if (bestandslog_opt_in) {
                     // Opt-in gesetzt, Ebene B fehlt: die Absicht ist da, das Lager kann sie nicht erfuellen. Genau
                     // EINE Zeile, damit ein still leeres Lager nicht erst nach Stunden auffaellt. drop_enabled wird

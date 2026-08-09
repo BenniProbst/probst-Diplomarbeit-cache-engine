@@ -156,8 +156,24 @@ beider Repos · die **Thesis** — „alles".
 **Der Anlass:** am 09.08. startete der Lead zwei Bau-Stränge, deren Annahmen allein aus **einem
 einzigen Dokument** stammten. Unmittelbar davor war bereits eine Fehldeutung entstanden, weil eine
 vorhandene Owner-Festlegung nicht gesucht worden war. Bei Widerspruch gilt die Rangfolge
-**THESIS > OWNER > PLAN (nach Datum) > LEAD** — ein Plan kann also von etwas Älterem geschlagen
-werden, und wer nur den Plan liest, sieht das nie.
+**OWNER > PLAN > THESIS** *(Fassung 09.08.2026 — sie ersetzt die zuvor hier stehende, falsche
+Ordnung „THESIS > OWNER > PLAN")*, innerhalb derselben Stufe **neuer schlägt alt**. Ein Plan kann
+also von etwas Älterem geschlagen werden, und wer nur den Plan liest, sieht das nie.
+
+**Aber die Rangordnung ist Stufe 3, nicht Stufe 1.** Owner wörtlich: *„Bei Konflikt gilt in der
+Regel diese Rangordnung, oder wo **mehr Gründlichkeit** erreicht werden kann, ein **merge zweiter
+Eigenschaften**. Die Frage ist auch immer, **ob sich das eine mit dem anderen ausschließt**.
+**Thesis entsprechend Plan und Owner nachziehen ist erlaubt.**"* Daraus die Prüffolge:
+
+1. **Schließt es sich überhaupt aus?** Zwei Aussagen über **verschiedene Schichten** widersprechen
+   sich nicht, auch wenn sie dasselbe Wort benutzen.
+2. **Lässt sich mehr Gründlichkeit erreichen?** Dann wird **gemergt**, nicht verdrängt.
+3. **Erst dann** die Rangordnung.
+
+**Die Thesis steht unten und wird nachgezogen** — sie ist die *Beschreibung* des Baus, nicht das
+Gesetz darüber. Eine Thesis-Stelle blockiert deshalb **nie** einen Bau; sie ist Kandidat für
+Nachzug oder Merge. Präsens-Zusagen bleiben trotzdem ernst: wird nicht gebaut, **muss** der Text
+nachgezogen werden, sonst steht am 15.09. eine Behauptung ohne Deckung im Dokument.
 
 ## II.2 V11 — Die Belegzeile, in beide Richtungen
 
