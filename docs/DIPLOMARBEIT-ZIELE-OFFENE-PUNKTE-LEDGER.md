@@ -16,6 +16,98 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — Das Nachtrags-Audit: fünf echte Lücken von dreizehn Kandidaten. Und ich habe eine Owner-Frage stillschweigend ersetzt.
+
+**Verfahren:** Strang 32, ultracode — fünf blinde Linsen über die letzten Kontexte, dann **drei
+Skeptiker je Kandidat** mit dem Auftrag, ihn zu **widerlegen** (steht er doch schon irgendwo?).
+33 Agenten, 805 Werkzeugaufrufe.
+
+**Bilanz: 13 Kandidaten → 9 geprüft → 5 echte Lücken, 4 gefallen.**
+
+### Der wichtigste Befund ist ein Nebenbefund: die Erfassung ist besser als vermutet
+
+> Von rund **20** einzeln geprüften, sehr spezifischen Owner-Aussagen waren **18 bereits wörtlich
+> im Ledger** verankert — teils in eigens dafür verfassten Nachträgen. In einem Fall lag der
+> `modified`-Zeitstempel der Memory-Datei **eine Sekunde** nach der Owner-Nachricht.
+
+Geprüft wurden unter anderem: `concurrency=3` · Pareto-Front/H6 · die Stufendoktrin
+DREISTUFIG/ZWEISTUFIG · Strategy-Pattern CSV-xor-xlsx · Hybrid als Factory-Facade-Adapter ·
+32 Prüfdocks Default · die sechs CEBs und „der Messfühler ist selbst ein Verbraucher" ·
+Habich-Lizenzfreigabe · OV-16/17/18 · die sechs parallelen Stränge · MeasureStorage ·
+checkpoint IN/OUT als Visitor.
+
+**Das ist die eigentliche Aussage dieses Audits:** die Erfassungsschleife hält. Die fünf Lücken
+sind **Ausnahmen**, nicht die Spitze eines Eisbergs.
+
+---
+
+### ⚠️ LÜCKE 1 (HOCH) — ich habe K4 stillschweigend durch E-1 ersetzt
+
+**Der HYBRID-Bauplan benennt einen bestätigten Dokument-Widerspruch:** Label **K4** gilt laut
+Design-Dokument **seit dem 02.08. als ENTSCHIEDEN** (Systemachsen-Framing) — das
+Konformitäts-Register vom 09.08. führt **dasselbe Label** als **bis Mittwoch ungeklärt**,
+vermutlich für einen neuen Gattung-gegen-Stufe-Konflikt, der **nirgends ausformuliert** ist.
+
+Der Plan fordert wörtlich *„klären, nicht glätten"*.
+
+**Ich habe es geglättet.** Die Owner-Vorlage deckte E-1, K1, K2 und K5 einzeln ab — **K4 wurde
+nicht einmal gefragt** und in meiner Zusammenfassung **stillschweigend durch E-1 ersetzt**.
+
+Das ist derselbe Fehlertyp wie die Sichtbarkeits-Doktrin: **ein Label wandert, und niemand merkt
+es, weil die Zusammenfassung plausibel klingt.** K4 gehört auf die nächste Owner-Vorlage,
+**getrennt** von E-1.
+
+### LÜCKE 2 (HOCH) — die dritte Push-Falle fehlte im Register
+
+Von den drei Fallen des Push-Nachtrags haben nur zwei einen Register-Eintrag bekommen. Die
+dritte — **der Vault-PAT war für den Push gar nicht nötig**, weil der `store`-Helper bereits ein
+Schreibrecht trägt (per `push --dry-run` **vorher** belegt) — kam erst **nach** dem
+Register-Update dazu und wurde nie nachgetragen. **Jetzt als G-J drin.**
+
+Die Regel daraus ist billiger als sie klingt: **vor jedem Vault-Zugriff erst `push --dry-run`**.
+Jeder vermiedene Token-Zugriff ist ein vermiedenes Leck-Risiko.
+
+### LÜCKE 3 (MITTEL) — drei Fallen vom 05.08. standen nur in einer Klammer
+
+Sie lagen als Aufzählung in **einer** dichten Ledger-Zeile und hatten nie einen eigenen Eintrag.
+**Jetzt als G-K im Register**, davon zwei eigenständig:
+
+- **`clang-format` auf `.hpp.in`/Scratchpad-Kopien** meldet ohne `--assume-filename` **84
+  Abweichungen statt 20** — eine Zahl, die wie ein Befund aussieht und keiner ist.
+- **Biss-Nachvollzüge brauchen eine frische Vollkopie**, sonst kontaminieren Alt-Artefakte die
+  Include-Overlays und **der Mutant stirbt an der falschen Ursache**.
+
+### LÜCKE 4 (MITTEL) — die P5-Gegenprobe-Zahlen fehlten
+
+Der Ledger nannte nur das Ergebnis („P5, xlsx im Sammler", `d7b779f7`), nicht die Zahlen, mit
+denen die Null **vor** dem Fix verifiziert wurde:
+
+> `xlsx` kam in **beiden** betroffenen Skripten **exakt 0×** vor — mit einer **15×-Gegenprobe**
+> (`measure_out`), die belegt, dass das Muster funktionierte und **nicht** in die ugrep-Falle
+> lief. Dazu eine `.gitignore`-Probe mit zwei Köder-Pfaden und konkreten Zeilennummern
+> (`:46` / `:42`), die zeigte, dass xlsx **nicht** versehentlich ignoriert wird.
+
+**Ohne die Gegenprobe ist die Null wertlos** — genau die Regel, die hier fast an sich selbst
+gescheitert wäre.
+
+### LÜCKE 5 (MITTEL) — `docs/termine/` wurde nie als Posten eingereiht
+
+Der HYBRID-Explore hat die Benennung gefunden (08.08.), aber **`docs/termine/` ausdrücklich nicht
+durchsucht** (`.docx`/`.pptx`). Falls dort eine ältere Quelle liegt, fehlt sie. Der Nachtrag nannte
+es „nachholbar" — **eingereiht wurde es nie**.
+
+---
+
+### Die Einschränkung, die der Strang selbst benennt
+
+Von 14 Roh-Transkripten wurden fünf **vollständig** gelesen. Bei der größten (**107 400 Zeilen**,
+06.07.–08.08.) wurde **nicht** jede Owner-Nachricht einzeln gelesen, sondern der August-Rand
+vollständig plus ein Pflicht/Verboten/IMMER/NIE-Sweep (**261 Treffer**, die ersten 41
+volltextgelesen) plus zehn gezielte Verifikationen — **alle zehn bereits gefunden**.
+
+**Der Juli-Korpus ist damit nicht zeilenweise gegengelesen.** Angesichts der Fundquote im
+geprüften Ausschnitt ist die Wahrscheinlichkeit weiterer Lücken gering — **aber nicht auf null
+belegt.**
 ## NACHTRAG 09.08.2026 — MeasureStorage: VOLLES GO, und `checkpoint_measure` hat ZWEI interne Systeme
 
 > **Owner: „Alle anderen Annahmen von dir: volles GO, alles korrekt."**
