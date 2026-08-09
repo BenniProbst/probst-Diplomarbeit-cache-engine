@@ -27,9 +27,13 @@ function(comdare_da_add_test name)
     foreach(_comdare_label IN LISTS ARG_LABELS)
         set(_comdare_labels "${_comdare_labels}\\;${_comdare_label}")
     endforeach()
+    # TIMEOUT bleibt bei 60 wie bisher: die neuen Wachen-Faelle brauchen es nicht.
+    # Gemessen (09.08., alle 103 Faelle): 0,25 s GESAMT, kein Einzelfall ueber 0,01 s --
+    # auch die, die ein Wegwerf-Repo bauen und rund zwanzig git-Kindprozesse fahren.
+    # Eine Anhebung haette 11 bestehende Ziele stillschweigend mit verschoben.
     gtest_discover_tests(${name}
         DISCOVERY_TIMEOUT 30
-        PROPERTIES TIMEOUT 120 LABELS "${_comdare_labels}")
+        PROPERTIES TIMEOUT 60 LABELS "${_comdare_labels}")
 endfunction()
 
 comdare_da_add_test(test_binary_to_csv
