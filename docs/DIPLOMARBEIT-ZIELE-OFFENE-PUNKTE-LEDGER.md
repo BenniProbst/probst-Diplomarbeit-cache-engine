@@ -16,6 +16,131 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (spät) — EINORDNUNG: die HYBRID-META-META-ACHSE gehört in die MESS-ZEILE
+
+**Owner-Auftrag:** *„die Permutations-Achse ist nur eine **Unter-Achse** in den Mess-Achsen, bitte
+schlage diese nach und ordne die **Hybrid Meta-Meta-Achse** ein. Per XML bestimmt der Anwender
+**gleich bei Experiment-Beginn**, ob die Einrichtungen für den **Hybrid-Modus** gewünscht sind und
+**mit einkompiliert** werden müssen. Dasselbe gilt schließlich auch (wie geplant) für die
+**Mess-Einrichtungen**."*
+
+**Nachgeschlagen am Objekt** (ce `landung/20260809-w0a-d4-hdr`), nicht abgeleitet:
+
+### 1. Der IST-Stand der Mess-Achsen-Registry
+
+`libs/cache_engine/include/cache_engine/measurement/measurement_axis_registry.xml` (62 Zeilen,
+GENERIERT von `tools/measurement_axis_registry_gen`, nicht handeditierbar) führt **drei** Achsen —
+**alle `binary_id="never"`, alle `stage="ct"`**:
+
+| Achse | `axis_kind` | Bausteine | sagt |
+|---|---|---|---|
+| `measurement_category` | `system_measurement` | 16 (CLU, CACHE_MISS_L1…L3, DTLB, BRANCH, IPC, LATENCY_P50/95/99/999, ENERGY_J …) | **WAS** gemessen wird |
+| `collector` | `system_measurement` | 3 (WallClock, ObserverSnapshot, Pmc) | **WOMIT** gemessen wird |
+| **`load_framework`** | **`measurement_meta_meta`** | 1 (`ycsb`, `sub_axis_label="workload"`) | **OB/WELCHES** Last-Framework einkompiliert wird |
+
+### 2. Die Achsen-Art existiert bereits — und sie hat genau einen Vertreter
+
+Das Enum `topics::AxisKind` kennt **drei** Meta-Meta-Arten: `system_meta_meta` ·
+`measurement_meta_meta` · `organ_meta_meta` (`profile_facade/planner/experiment_dock_payload.hpp:96-98`).
+
+Unter dem gemeinsamen Dach `topics::Axis` (`topics/organ_meta_meta_axis.hpp:26-31`):
+
+    OrganAxis                -- die 18 permutierenden Organ-HAUPT-Achsen (binary_id!)
+    CebSystemAxis            -- CEB-Konfig-System-Achsen
+    SystemMetaMetaAxis       -- System-Meta-Metas (ExternalUtilsFamilyAxis, HardwareMetaMetaAxis)
+    MeasurementMetaMetaAxis  -- Mess-Meta-Metas  --> HEUTE EIN VERTRETER: LoadFrameworkMeasurementAxis
+    OrganMetaMetaAxis        -- Organ-Realm (Typliste LEER, Mechanismus gebaut)
+
+`MeasurementMetaMetaAxis` erbt **direkt vom Dach**, nicht von `SystemAxis`
+(`measurement/measurement_meta_meta_axis.hpp:38`) — begründet damit, dass `AxisBase` seine
+cross-axis-Pflichten nur für eine *permutierende* Strategie trägt, nicht für eine Meta-Meta *über* ihr.
+
+**Das Muster, dem die Hybrid-Achse zu folgen hat** (`load_framework_measurement_axis.hpp:33-45`):
+
+    template <class Derived>
+    struct LoadFrameworkMeasurementAxis : MeasurementMetaMetaAxis<Derived> {
+        static constexpr std::string_view do_axis_label()  { return "load_framework"; }
+        static constexpr std::string_view framework_id()   { return Derived::do_framework_id(); }
+        static constexpr std::string_view sub_axis_label() { return "workload"; }   // <-- die UNTER-Achse
+    };
+
+### 3. DIE EINORDNUNG — und sie ist vom Owner schon entschieden, am 02.08.
+
+`topics/organ_meta_meta_axis.hpp:4-7` zitiert den **Owner-Entscheid E2 vom 02.08.2026, verbatim**:
+
+> „Die Meta-Meta-Achsen und deren Stempel-Einträge sind **wie alle Hauptachsen PFLICHT**, das gilt
+> für ALLE Hauptachsen. … Da eine Meta-Meta-Achse **immer zu den Mess-Achsen, System-Achsen oder
+> Organ-Achsen gehört**, wird sie auch **einfach dynamisch ans Ende der Kette in den bestehenden
+> Zeilen angehängt**."
+
+Dazu **RF-7, unverändert gültig:** *„je Achsen-Typ EINE Array-Zeile"* — `load_framework` stempelt in
+der **Mess-Zeile**, die System-Meta-Metas in der System-Zeile.
+
+**Daraus folgt die Einordnung ohne Ermessensspielraum:**
+
+    MESS-ACHSEN  (binary_id="never", stage="ct")
+    ├── measurement_category      system_measurement        WAS
+    ├── collector                 system_measurement        WOMIT
+    ├── load_framework            measurement_meta_meta     OB/WELCHES Last-Framework
+    │     └── Unter-Achse: workload
+    └── hybrid            [NEU]   measurement_meta_meta     OB die HYBRID-Einrichtungen
+          └── Unter-Achse: (Permutation der Mess-Einrichtungen)   einkompiliert werden
+
+**Die Hybrid-Meta-Meta ist eine ZWEITE `MeasurementMetaMetaAxis`, Geschwister von `load_framework`,
+in derselben Mess-Zeile.** Kein neues Array, kein Zeilen-Umbau, kein ABI-Bump aus der Struktur
+heraus — genau das sichert E2 zu („dynamisch ans Ende der Kette in den bestehenden Zeilen").
+
+### 4. Warum die Permutation eine UNTER-Achse ist und keine Hauptachse
+
+Der Owner stellt das ausdrücklich richtig. Am Objekt fügt es sich bruchlos:
+
+- Eine **Haupt**-Achse der Mess-Registry beantwortet *was/womit/ob*. Die Permutation beantwortet
+  keine dieser Fragen — sie sagt, **welche Kombination der Einrichtungen einkompiliert ist**. Das ist
+  dieselbe Rolle, die `workload` gegenüber `load_framework` hat: eine Ausprägung, kein eigener Träger.
+- Die Registry **benennt die Lücke bereits selbst** (`measurement_axis_registry.xml:59-60`):
+  *„TODO(W2-B, §32-F1/F7): die 3 Mess-Modi Debug/Mess/Release existieren NICHT als Typen → nicht
+  emittiert; erst nach ihrer **Typisierung als Mess-Unter-Achse** reflektierbar."*
+  Die Registry erwartet Mess-Modi also **als Unter-Achse** — genau die Form, die der Owner nennt.
+- **Gegenprobe gefahren:** `MessModus|mess_modus|CebVariante|MessEinrichtung` = **0 Treffer** im
+  ganzen ce-Baum; Gegenprobe `load_framework` = **69 Treffer**. Der Nichtfund ist belastbar:
+  **die Permutations-Unter-Achse existiert heute nicht.**
+
+### 5. Die Spannung, die sich damit auflöst — `binary_id="never"` gegen „einkompiliert"
+
+Alle Mess-Achsen tragen `binary_id="never"` („Blut"), der Owner sagt zugleich, die Einrichtungen
+würden **mit einkompiliert**. Das ist **kein Widerspruch**, sobald man die zwei Binary-Sorten trennt:
+
+    binary_id  identifiziert das TIER-BINARY.  Mess-Achsen stehen dort NIE drin.
+    Die 6 (bzw. 24) Varianten sind CEB-Binaries -- ein anderer Gegenstand.
+
+Eine ein-/ausgebaute Messeinrichtung erzeugt eine **andere CEB**, nicht ein anderes Tier-Binary.
+Deshalb kann die Permutations-Achse eine **Mess**-Achse sein und trotzdem Kompilate unterscheiden.
+**Wer beides gleichsetzt, hält die Mess-Achse fälschlich für identitätsstiftend am Tier — und käme
+auf einen Bump, der nicht anfällt.**
+
+### 6. Der XML-Schalter — was schon steht und was fehlt
+
+**Steht bereits** in den Profil-XMLs: `<measurement_framework name="ycsb"/>` und ein Block
+`<measurement_tooling>` (u. a. `m3v2_study.profile.xml:178/182`). Die Mess-Seite hat ihren
+Anwender-Schalter also im Ansatz — „wie geplant", wie der Owner sagt.
+
+**Fehlt:** der gleichrangige `<hybrid>`-Schalter zu Experiment-Beginn, der die Hybrid-Einrichtungen
+anfordert. Er gehört an dieselbe Stelle der XML und in dieselbe Erzeugungs-Kaskade (Planer → CEB),
+weil beide Meta-Meta-Achsen dasselbe entscheiden: **was überhaupt einkompiliert wird**.
+
+**Nebenbefund, ungeprüft weitergereicht wäre er ein Fehler:** `measure_selection` hat im heutigen
+ce-Baum **0 Treffer**, obwohl Paket #11 als erledigt geführt wird. Entweder liegt es in einem noch
+nicht gemergten Worktree oder auf der super-Seite. **Nicht geraten — eigener Prüfposten.**
+
+### 7. Was OFFEN bleibt, ausdrücklich
+
+**An welcher Haupt-Achse die Permutations-Unter-Achse hängt.** Der Owner sagt „Unter-Achse in den
+Mess-Achsen", nennt aber keine Träger-Hauptachse. Drei Kandidaten sind mit dem Wortlaut vereinbar:
+an `collector` (die Einrichtungen) · an der neuen `hybrid`-Meta-Meta · an einer noch zu typisierenden
+Mess-Ebenen-Hauptachse (die es laut TODO oben nicht gibt). **Das wird nicht geraten** — es entscheidet,
+gegen welche Ebene ein Micro-Checkpoint seinen Aufrufer sucht (offener Punkt C-13.2 vom 08.08.).
+
+Ebenso offen bleibt die Zahl aus dem vorigen Nachtrag: **24 oder 24 × 2 = 48**.
 ## 09.08.2026 (spät) — OWNER-KERN: 4 MESS-EBENEN IM HYBRID-FALL ⇒ 4! REKOMBINATIONEN NEBEN DEN 6 CEBs
 
 **Owner wörtlich, als ausdrückliche Ergänzung „für das Ledger für die Permutationen":**
