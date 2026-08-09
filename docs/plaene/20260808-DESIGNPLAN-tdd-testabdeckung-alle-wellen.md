@@ -195,7 +195,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 9a4c4be0d56f905c0a65bf01992b845636e61aa5
+PZW-CE-SHA         = 2385e6ec0478943f777cf978b50e853715188c36
 PZW-SCHEMA-STELLEN = 33
 PZW-SCHEMA-DATEIEN = 19
 PZW-SCHEMA-LITERAL = 1
