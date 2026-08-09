@@ -16,6 +16,47 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (spät) — TIER-BINARIES WERDEN NICHT VORGEHALTEN: nur Buildsystem-Cache, hot im RAM
+
+**Owner wörtlich:**
+
+> „Per Plan hatten wir definiert, dass die **Tier-Binaries NUR direkt im buildsystem cache landen**
+> sollen, weil **die Maschine den Speicher nicht vorhalten kann**, sie werden also auf prod1 und
+> prod2 nur **hot in den RAM gecached und dann verworfen nach der Ausführung**."
+
+### Die Regel
+
+    BAUEN     -> Tier-Binary entsteht im BUILDSYSTEM-CACHE, sonst nirgends
+    AUSFUEHREN-> hot in den RAM (prod1 UND prod2)
+    DANACH    -> VERWORFEN
+
+**Kein Vorhalten auf Platte.** Das ist keine Optimierung, sondern eine Kapazitätsaussage: die
+Maschine *kann* den Bestand nicht halten. Bei 2^17 Achsen-Permutationen × zwei Vertretern ist das
+auch offensichtlich — der Vollraum wäre nie speicherbar.
+
+### Was daraus folgt
+
+- **Die Lagerhaltung lagert MESSDATEN, nicht Binaries.** Der SKIP-Mechanismus („gültiger Bestand ⇒
+  SKIP") entscheidet über die *Messung*; das Binary selbst wird bei Bedarf neu erzeugt. Wer den
+  Lagerbaum als Binary-Archiv liest, plant Platte ein, die es nicht gibt.
+- **Der Buildsystem-Cache ist die einzige Persistenzstufe** zwischen Bau und Ausführung — was er
+  nicht hält, wird neu gebaut.
+- **Die Zwei-Maschinen-Abstimmung über das Lager** (Hardware-Job-Pool) betrifft damit die
+  *Zuteilung von Batches*, nicht das Verteilen fertiger Binaries.
+
+### Der praktische Befund von heute, der die Regel unterstreicht
+
+Beim Aufräumen gemessen: **17 GB in `build/`-Verzeichnissen INNERHALB der Worktrees**
+(`wt-ce-gnu/build-covguard` 3,2 G · `wt-ce-fk/build` 3,2 G + `build-clang` 2,3 G ·
+`wt-ce-w0a/build` 3,1 G · `wt-ce-messvisitor/build` 2,8 G · `wt-ce-schema/build` 2,6 G).
+Die Bau-Aufträge geben ausdrücklich vor, **außerhalb** des Worktrees zu bauen — vier Stränge haben
+das nicht befolgt, und die Platte lief zweimal an ihre Grenze (0 Bytes am Nachmittag, 9,8 GB am
+Abend).
+
+**Nach dem Räumen der Wegwerf-Ware: 9,8 → 29 GB, ohne einen einzigen Worktree zu löschen.**
+
+Die Regel oben ist also nicht nur Architektur, sondern **Betriebspraxis**: was gebaut wurde und
+gemessen ist, gehört nicht auf die Platte.
 ## 09.08.2026 (spät) — DER WELLENPLAN STEHT. Nur die Streichliste ist aufgehoben.
 
 **Owner wörtlich, unmittelbar nach der Inventur der gefallenen Punkte:**
