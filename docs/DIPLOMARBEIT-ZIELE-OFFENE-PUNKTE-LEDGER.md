@@ -16,6 +16,94 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 nachts — „EIN BLECH" ist eine Annahme, keine Zusicherung. 44 von 48 Jobs floaten.
+
+**Anlass:** Pipeline `15412` (ce, HY-0) wurde rot — die frisch eingezogene Test-Sichtbarkeits-Wache
+biss beim **ersten CI-Kontakt**. Zwei Registrierungen waren im CI-Baum unsichtbar, die lokal
+sichtbar sind: `test_ap5_simd_extension_coherence` und `test_buildvariant_dll_real`, beide hinter
+`if(COMDARE_HOST_RUNS_AVX2 AND COMDARE_HOST_RUNS_AVX512F)`.
+
+### Meine Prämisse war falsch — und die Widerlegung kam per Arithmetik
+
+Ich hatte den Strang mit der Prämisse beauftragt: *„Das ist dieselbe Maschine. prod1 ist der
+GitLab-Runner UND der lokale Host."* **Das ist zu eng.**
+
+Es gibt **zwei** bare-metal-Runner, und **beide** tragen das Tag, das der Job verlangt:
+id=16 (prod1, AMD Zen 5, **mit** AVX-512) und id=17 (prod2, Intel). `test:coverage-guard` fragt
+`tags: [baremetal]` — das erfüllen beide.
+
+**Der Beweis war arithmetisch, bevor irgendjemand den Host nachgesehen hat.**
+`COMDARE_HOST_RUNS_AVX512F` und `…AVX2` entstehen aus **demselben** `check_cxx_source_runs`.
+Wäre die Probe im CI-Baum gescheitert (Sandbox, Compile-Fehler, kein Exec), wären **beide** falsch
+→ **sechs** fehlende Einträge. Es fehlen **vier** (461 lokal / 457 im CI). Also hat die Probe
+kompiliert, ist gelaufen und hat korrekt *„AVX2 ja, AVX-512F nein"* gemeldet. **Die Erkennung ist
+heil; die CPU war eine andere.**
+
+**Gegenprobe vom Lead am Objekt** (der Agent hat ausdrücklich darum gebeten und angeboten, seine
+Allowlist-Zeilen zurückzuziehen, falls sie fehlschlägt): der `== Host ==`-Block aus Job 368969
+zeigt `Linux prod2`, `GenuineIntel`, `12th Gen Intel(R) Core(TM) i9-12900K`. **Alder Lake hat kein
+AVX-512.** Ursache bestätigt.
+
+### Der Nenner, der die Planung berührt
+
+| Repo | `tags: [baremetal]` (floatend) | maschinen-gepinnt |
+|---|---|---|
+| super | **23** | 2 |
+| ce | **21** | 2 |
+| **Summe** | **44** | **4** |
+
+**44 von 48 Jobs beider Repos können auf prod1 ODER prod2 landen.**
+
+Der Wellenplan v2 begründet seine **EIN-BLECH-REGEL** (`:40`, `:194`) damit, prod1 sei
+„Runner id=16 UND Arbeitsmaschine". Als Beschreibung der Runner-Landschaft ist das **falsch**.
+
+### Die Entwarnung — und wo sie endet
+
+**Die Messkampagne ist gedeckt.** Beide Mess-Jobs tragen einen echten Maschinen-Pin:
+
+    measure:golden-320   Z.1015   tags: [prod, baremetal, amd]
+    measure:smoke        Z.923    tags: [prod, baremetal, amd]
+
+Die Messdaten können also nicht zwischen zwei verschiedenen CPUs floaten. **Das ist die wichtigste
+Einzelaussage dieses Nachtrags** — hier wäre der Schaden unheilbar gewesen.
+
+`persist:measurements` (Z.1122) floatet dagegen (`tags: [baremetal]`) — er misst nicht, er
+committet nur, ist also nicht datenkritisch. Trotzdem: er ist der Rückschreib-Weg, und ob er
+maschinenabhängige Annahmen trägt, ist **nicht geprüft**. Als offener Punkt geführt.
+
+**Wo die Gefahr wirklich liegt:** bei den **Verifikations-Jobs**, die maschinenabhängige Annahmen
+tragen, ohne es zu wissen. Genau das ist heute passiert. Jede Wache, die einen Nenner aus der
+Hardware zieht, ist auf zwei Maschinen zwei verschiedene Wachen.
+
+### Was das für die Regel bedeutet — sie bleibt, aber aus einem anderen Grund
+
+Die EIN-BLECH-REGEL war als **Kapazitäts**-Annahme begründet („es gibt nur eine Maschine") und ist
+in dieser Begründung widerlegt. Als **Vorsichts**-Regel bleibt sie richtig, und zwar aus dem
+Befund selbst:
+
+> Zwei Maschinen zu haben nützt nur, wenn man **weiß**, auf welcher man landet. Solange 44 von 48
+> Jobs floaten, ist die zweite Maschine kein zweiter Slot, sondern eine **zweite Fehlerquelle**.
+
+Der Gewinn wäre real — aber er ist erst abrufbar, wenn die Jobs sagen, wo sie laufen wollen. Das
+ist ein eigener, kleiner Bau-Posten und keine Planungsannahme.
+
+### Die Klasse, zum wiederholten Mal an diesem Tag
+
+*„EIN BLECH"* stand als Tatsache in einem Plan, war aber von **nichts erzwungen** — kein Tag, kein
+Gate, keine Wache. Prüfung 4 aus GOAL v8: *was erzwingt das Halten?* Antwort hier: **Zufall.**
+Und Zufall, Disziplin und Maschine sehen im Rückblick identisch grün aus — bis ein Job das erste
+Mal woanders landet.
+
+**Gefunden hat es keine Analyse, sondern eine frisch gebaute Wache beim ersten CI-Kontakt.**
+
+### T-6: die Hardware-Klasse hat vier Mitglieder, die Wache sieht zwei
+
+`test_simd_field_sum_dispatch_avx512` (`:4869`) und `test_simd_add_u64_carry_avx512` (`:4914`)
+hängen an derselben Bedingung, tragen ihre Namen aber in `${_tgt}` — sie fallen damit in die 19
+„nicht statisch auflösbaren". Die Wache **zählt** sie, kann sie aber nicht prüfen. Die Lücke hat
+eine Zahl; die Klasse ist größer, als die Meldung zeigt.
+
+---
 ## NACHTRAG 08.08.2026 nachts — W-1 gelandet, und die Heilung allein hätte einen NEUEN Defekt eingebaut
 
 **W-1 / ST-CTestWache ist gelandet** (`ce 1f88cfec`, davor `7dc372c7` und `1a897c98`).
