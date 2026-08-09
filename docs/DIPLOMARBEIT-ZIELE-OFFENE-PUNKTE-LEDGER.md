@@ -16,6 +16,135 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — Lagerhaltung und AVX-Maximum: der Entwurf ist vollständig, die Scharfschaltung fehlt
+
+**Zwei Stränge, zwei Materialsorten, ein Bild.** Strang 11 (fünf blinde Suchmodalitäten über
+213 Sessions / 126 Pläne / 248 Memories, 111 Funde) hat den **Entwurf** gehoben; Strang 8
+(drei Linsen über den Code beider Repos, 16 Pakete / 172 h) den **Objektbefund**. Sie
+widersprechen sich nicht — sie liegen auf verschiedenen Ebenen.
+
+### Der Owner hatte recht, und zwar vollständig
+
+Der Begriff *„Hardware-Job-Pool"* ist neu vom 09.08. — **das Konzept ist seit dem 19.–22.07.
+festgelegt und seit dem 25.06. angelegt.** Es heißt **§62 MULTI-MASCHINEN-ARCHITEKTUR** und
+trägt das **SYMMETRIE-PRINZIP** (Owner 21.07., Ledger:3851-3862):
+
+> „prod1 baut ALLES, was es kann, und prod2 baut ALLES, was es kann — beide Maschinen führen
+> aus, was sie können, und MESSEN es durch. Die XML ist für BEIDE Maschinen GLEICH."
+
+Damit ist die Frage *„wie kompiliert eine Maschine zum Maximum ihrer technischen
+Möglichkeiten?"* seit 19 Tagen beantwortet. Gegenprobe belegt: **„Hardware-Job-Pool" und
+„Maschinenfähigkeiten" haben vor dem 09.08. null Treffer** in sessions/, plaene/, Ledger und
+248 Memories — drei Modalitäten, Kontrollmuster bestanden. Der **Begriff** ist neu, die
+**Sache** nicht.
+
+Die Koordination ist ebenso ausbuchstabiert: **gelocktes Bestandslog auf minio**,
+Batch-Reservierung à **4096 Binaries mit Zeitstempel**, **Gleichverteilungs-Pflicht** für die
+Menge, die beide Maschinen bauen können, **First-come** für den ersten Zugriff,
+**Takeover bei ETA + 50 % ohne Update** („Maschine GESTORBEN"), Schreib-Lock mit harter
+Obergrenze 1800 s.
+
+### Wie das AVX-Maximum entsteht — anders als ich vermutet hatte
+
+**`-march=native` ist ausdrücklich verworfen** (17.07.: *„host-abhängig, nicht
+golden-portabel"*). Das Maximum entsteht **nicht** durch Host-Erkennung beim Compile, sondern
+dadurch, dass die CEB die SIMD-Stufe als **deklarierte Achsen-Ausprägung** selbst permutiert
+(`no_extension` / `avx2` / `avx512`) und jede Maschine **alle Zellen baut, die ihre Hardware
+freigibt**. Was sie nicht kann, fällt **nicht durch einen CI-Vorfilter** weg, sondern
+maschinenseitig — mit **Warnung samt `machine_id` und Fehlerklasse
+`HardwareErweiterungFehlt`**; das Experiment misst weiter.
+
+**Meine Sorge um den SKIP ist auf Entwurfsebene unbegründet.** Die Trennung von AVX-512- und
+AVX2-Binaries desselben Prüflings läuft nicht über die `binary_id` — die trägt SIMD
+ausdrücklich **nie** (`binary_id="never"`, 26.07.) —, sondern über `build_version` +
+`+ext=`-Sidecar + den **SHA512-Fingerprint über die Stempel-Zeilen**. Strang 8 hat zusätzlich
+belegt, dass **Fingerprint-Format 3 die ISA über das `toolchain_stamp_glied` bereits
+unterscheidet**; die gegenteilige Kommentarzeile in `bestandslog_document.hpp:22-26` ist
+**veraltet**.
+
+### Der Objektbefund: gebaut, getestet — und in Produktion aus
+
+Die Maschinerie existiert weitgehend: **22 Header** unter `ce libs/cache_engine/builder/bestandslog/`
+(Dokument v4, Lock, Index, Reservierungs-Lifecycle inklusive Takeover, `PresenceFn` als
+Bau-Filter, ETA-Kalibrierung, Pfad-Grammatik, xlsx-Writer), **16 Testdateien** registriert,
+fail-loud bis in den Super-Treiber (`return 6`). Der Mount `/mnt/comdare-buildsystem` ist auf
+prod1 live nachgemessen (20 T / 5,4 T / 15 T / 28 %).
+
+**Was fehlt, ist der Schalter.** Vier Befunde, jeder mit Gegenprobe:
+
+1. **`COMDARE_BESTANDSLOG` steht in 0 von 2 aktiven `.gitlab-ci.yml`** (super und ce je
+   0 Treffer). **Die gesamte Lager-Koordination ist in Produktion heute AUS.**
+2. **Das Messwert-Genus ist tot:** `mess_bestand_doc_key` / `_key_of` / `_versions` haben
+   **0 externe Zuweiser**; `mess_bestandslog_active` wird nie `true`.
+3. **`LagerBaumWriter` hat 0 Produktions-Aufrufer** — die Realm-Wurzeln zeigen nicht auf den
+   Mount, und auf prod2 ist er nicht belegt.
+4. **Das `simd_build_gate` ist scharf, aber wirkungslos:** alle neun Organ-Klassen deklarieren
+   `kRequiredNone`, die Maschinen-Deklaration ist per Default leer — der Fähigkeits-Filter
+   existiert als Werkzeug und filtert heute **0 Compiles**.
+
+Dazu ein billiger, harter Fund: die **drei 4096-Korn-Konstanten** sind nur durch Kommentare
+aneinandergebunden. Eine davon auf 4095 zu setzen **kompiliert durch**. Ein `static_assert`
+kostet zwei Stunden und macht daraus einen compile-harten Bruch.
+
+### Korrektur einer eigenen Zahl — zum dritten Mal gemessen, zum ersten Mal mit Verfahren
+
+Meine Angabe **„44 von 48 Jobs floaten"** ist **falsch**. Die Gegenrechnung des Agenten
+(„42 von 48") ist **ebenfalls falsch**. Selbst ausgezählt, mit dem Verfahren im Klartext:
+
+| | Jobs gesamt | mit `tags:` | exakt `[baremetal]` = floatend | nicht floatend |
+|---|---|---|---|---|
+| super | 31 | 27 | **24** | `measure:smoke`, `measure:golden-320` (`[prod, baremetal, amd]`), `runner:sweep-zombies` (`["$SWEEP_TAG"]`) |
+| ce | 24 | 24 | **21** | `pmc:amd`, `pmc:intel`, `build:arm64-smoke` |
+| **Summe** | **55** | **51** | **45** | 6 |
+
+**45 von 51 tag-tragenden Jobs floaten.** Die vier Trigger-Jobs in super
+(`trigger:cache-engine`, `trigger:prt-art`, `trigger:thesis`, `planer:delegate-trigger`) tragen
+korrekt keine Tags — sie laufen auf dem Koordinator, nicht auf einem Runner.
+
+**Warum die Zahl dreimal anders herauskam, ist die eigentliche Lehre.** Die Tags stehen in
+**Flow-Syntax** (`tags: [baremetal]`), nicht in Block-Syntax; ein Parser für Block-Listen
+liefert **stille Null**. Genau das ist mir beim ersten Versuch dieser Messung passiert — und
+ich habe die Null nicht als Befund genommen, sondern die Struktur angesehen. Der Nenner hängt
+zusätzlich daran, ob man Trigger-Jobs, Templates und den globalen `cache:`-Block mitzählt.
+**Eine Zahl ohne ihr Verfahren ist hier nicht überprüfbar** — deshalb steht das Verfahren in
+der Tabelle und nicht nur ihr Ergebnis.
+
+### Ein Widerspruch, der nicht mir gehört: prod2 ist nicht, was der Code sagt
+
+`machine_simd_signature.hpp:90` deklariert **„Intel Core i9-14900KS (Raptor Lake)"**, und
+Ledger:1330 (08.07.) sagt dasselbe. Der **live gemessene** Host-Block aus Job 368969 zeigt
+**i9-12900K** — das ist **Alder Lake**, nicht Raptor Lake. **Die Thesis sagt korrekt
+„Alder Lake".** Nach der Rangfolge *THESIS > OWNER > PLAN > LEAD* und der Regel *neu schlägt
+alt* gewinnt die Messung: **das Etikett `prod2_raptor_lake` ist falsch.**
+
+Funktional folgenlos — die Flag-Sets beider Generationen sind für unsere Zwecke identisch, und
+**keine** von beiden hat AVX-512. Aber eine Umbenennung der `machine_id` ist laut
+`machine_identity.hpp:38-42` ein **Byte-Ereignis** (der Registry-Generator spiegelt den Namen).
+Vorschlag: **dulden bis nach der Abgabe**, im Ledger als bekannt geführt — ein Byte-Ereignis
+vor der Kampagne einzuziehen wäre teurer als der Fehler.
+
+### Was daraus folgt
+
+Der Entwurf ist **vollständig**; die Umsetzung ist **gebaut und getestet, aber nicht scharf**.
+Das ist keine Lücke im Denken, sondern eine Lücke zwischen Werkstatt und Betrieb — und genau
+die Sorte, die eine Zählung von Deklarationen als „erledigt" führt. Vier Pakete adressieren
+sie (LAG-P1 Scharfschaltung 6 h · LAG-P2 Messwert-Genus 8 h · LAG-P3 Realm-Wurzeln + prod2-Mount
+6 h · LAG-P4 `static_assert` auf das 4096-Korn 2 h). Volltext:
+`docs/sessions/20260809-EXPLORE-lagerhaltung-hardware-job-pool-avx-maximum.md`.
+
+**Zwei echte Owner-Entscheide** stehen an, beide nicht billig rücknehmbar:
+- **AVX-512 in die golden-Bau-Matrix?** Das kippt ein stehendes, **zweifach deklariertes**
+  Owner-Wort (*„avx512 ist nicht universell und bleibt draußen"*,
+  `experiment_golden_kern.xml:339`, `all_axes_golden.profile.xml:181-182`). Eine bewusste
+  Umkehr, kein Nachziehen.
+- **Cross-Maschinen-SKIP für `no_extension`:** eine `no_extension`-Binary trägt auf beiden
+  Maschinen **denselben** Fingerprint (kein `+ext`-Segment, kein Maschinen-Glied im Preimage).
+  Damit würde prod2 eine von prod1 gebaute Binary per SKIP übernehmen. Ist das gewollt? Für
+  den **Bau** plausibel, für die **Mess-Provenienz** heikel.
+
+**Und die Lehre, die über den Fall hinausgeht:** die Antwort auf meine Frage lag 19 Tage vor
+der Frage im Ledger, in einem Abschnitt, der genau danach benannt ist. Nicht die Deutung war
+das Problem, sondern dass ich gedeutet habe, bevor ich gesucht hatte.
 ## NACHSATZ 09.08.2026 -- W0b-7 / D2-G5: DAS GEGENORAKEL IST GEFAHREN -- CMAKE BESTAETIGT DIE LEITER
 
 **Nachsetzer-Lauf auf die Landung `3b13bf4a` (08.08., Selbsteinstufung "zufrieden=false").** Von den
