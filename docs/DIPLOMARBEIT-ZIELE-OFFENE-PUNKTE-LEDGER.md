@@ -16,6 +16,138 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — der nachgeholte Pflicht-Explore hat sich sofort bezahlt gemacht: die Thesis schlägt den Plan
+
+**Anlass:** Der Owner hat am 09.08. den Explore zur **Pflichtstufe vor jeder Design- und
+Bau-Phase** gemacht — je Welle und je Strang. Die Stränge 9 (D5-1 Perzentil-KANON) und 10
+(D2-G4/D5-3) waren **vor** dieser Ansage in den Bau gegangen, ohne Explore. Ich habe ihn als
+Strang 14 nachgeschoben, mit der ausdrücklichen Konsequenz, zurückzubauen, falls der Bestand
+widerspricht. **Er widerspricht — aber nicht dort, wo gebaut wurde.**
+
+### Das Urteil in einem Satz
+
+**Kein Rücknahme-Fall.** Die **Index-Formel** war neun Wochen lang unreguliert; der echte
+Widerspruch sitzt **eine Ebene höher, beim Mechanismus** — und trifft einen Posten, der noch
+gar nicht gebaut ist.
+
+### K1 — Die Thesis sagt HDR im Präsens zu. Die „entfernen"-Option ist rangwidrig.
+
+Der Wellenplan führte für **D5-5** zwei gleichwertige Optionen: *„entscheiden (**entfernen**
+ODER begründet führen)"*. Die Thesis lässt nur eine davon zu. Drei Stellen im **gepinnten**
+Stand `798e946` — ich habe den Submodul-Pin selbst geprüft, `git submodule status` und
+`git -C wt-thesis-nachzug rev-parse HEAD` liefern **denselben SHA**:
+
+| Fundstelle | Wortlaut |
+|---|---|
+| `aufgabenstellung/de.tex:130` | „(Perzentile über **HDR-Histogramme** statt Mittelung)" |
+| `kapitel/de/03_messsystem_prtart.tex:552` | „das *HdrHistogram* **erhebt** die Latenz-Perzentile (p50/p95/p99)" |
+| `kapitel/de/05_evaluation.tex:129` | „jede Konfiguration wird in mehreren getrennten Läufen mit über **HDR-Histogramme** bestimmten Perzentilen vermessen." |
+
+Dazu die Owner-Primärquelle **Termin 3 vom 09.04.**, nie widerrufen und am 06.08. im KANON-Plan
+erneut als geltend katalogisiert:
+
+> „Perzentile werden nicht gemittelt. **Je Lauf werden HDR-Histogramme persistiert**;
+> Auswertung erfolgt auf den separaten Rohläufen oder über korrekt zusammengeführte
+> Histogramme."
+
+Nach der Rangfolge **THESIS > OWNER > PLAN** gewinnt die Zusage. **Ein Plan kann sie nicht
+wegentscheiden** — das könnte nur ein Owner-Edit des Thesis-Textes. Der Gegenweg existiert
+übrigens im Bestand, aber nur als **nie ausgeführter Vorschlag** (Audit 02.07. „vor Abgabe
+empfohlen"; KATALOG 19.07.:291 „Text angleichen statt Code aufblasen") — ein LEAD-Vorschlag
+schlägt Rang 1 nicht.
+
+**Der Ist-Zustand, selbst gegrept:** `latency_hdr_histogram.hpp` wird von **genau einer** Datei
+inkludiert — `tests/unit/test_ap8_hdr_histogram.cpp`. **Null Produktions-Konsumenten.** Die
+Thesis sagt „erhebt"; der Code erhebt nichts.
+
+**Konsequenz, im Wellenplan vollzogen:** D5-5 heißt nicht mehr *„entscheiden"*, sondern
+**„HDR verdrahten + Je-Lauf-Persistenz + 0-ns-Zähler + Toleranz aus `significant_figures=3`"*.
+Der Posten ist aus der Rutschliste **entfernt** — eine Thesis-Zusage kann nicht als erstes
+fallen. **Die 2-h-Schätzung ist hinfällig** und steht als offen; sie galt für eine Entscheidung,
+nicht für einen Bau.
+
+### K3 — Ein Nebeneffekt meines eigenen Baus, der eine Textpflicht auslöst
+
+D5-1 vermerkt „alle vorher erhobenen p50/p95/p99 ungültig". Im **lebenden** Thesis-Anhang stehen
+genau solche Zahlen — `A_measurements.tex:46-49` und `tabellen/bias_matrix_table.tex:2`,
+gemessene Mediane „ns/op, **nearest-rank**" — **unmarkiert als gültig**. Zwei geltende
+Festlegungen kollidieren: der Owner-KERN *„Invalidieren ist das Ziel, der Bruch muss laut sein"*
+deckt meinen Vermerk; die Thesis (Rang 1) zeigt die alten Zahlen als gültig.
+
+**Wie diese Kollision aufzulösen ist — markieren oder neu erheben —, ist nirgends festgelegt.**
+Es ist kein Rücknahmegrund, sondern eine durch den Bau ausgelöste **offene Textpflicht**. Sie
+gehört auf die Liste bis zum 15.09.
+
+**Und eine Feststellung, die niemand gern hört:** die Thesis ist beim Median-Mechanismus
+**intern zweistimmig** — Hauptkapitel HDR, Anhang nearest-rank. Keine Quelle im Korpus löst
+diese Binnendifferenz auf.
+
+### Was NEU ist und deshalb als neu protokolliert gehört
+
+Die Formel `ceil(q*n)-1` (Hyndman/Fan 1996 Typ 1), die Median-Regel „untere Mitte = Fall q=0.5"
+und der Interpolations-Ausschluss stammen **allein** aus dem Bau vom 08./09.08. Vier Linsen
+fanden unabhängig nichts Älteres, jede mit Gegenprobe; Drittprobe: `grep -rl Hyndman` über docs,
+memory und ce-libs trifft **nur** die neue `latency_stats.hpp`, `grep -rlF "ceil(q*n)"` über
+docs und memory **nur** den Wellenplan v2. **Die Festlegung ist zulässig — aber sie ist neu und
+darf später nicht als „war schon immer so" gelten.** Ebenfalls neu ohne ältere Grundlage: die
+„entfernen"-Option selbst (vor dem 08.08. sprach der Bestand nur von „Text angleichen" oder
+„nicht verdrahtet", **nie** vom Entfernen) und die ##06-Allowlist-Formel.
+
+### Die Nachprüfquote bestätigt erneut, warum zwei Stufen nötig sind
+
+Von **22** markierten Konflikten hielten **10**, fielen **11**, blieb **1** unklar. Die Fallquote
+liegt mit **11 von 22** über dem sonst beobachteten Drittel. Drei der Fehlalarme stammten aus
+**toten Thesis-Dateien** (Kopfvermerk „NICHT eingebunden", von `diplomarbeit.tex` nicht
+referenziert) — ihre lebenden Zwillinge zählen, sie selbst nicht. Wer nur greppt, ohne die
+Einbindung zu prüfen, verdreifacht hier seine Befunde.
+
+### Strang 12 korrigiert einen meiner Memory-Einträge um Faktor zwölf
+
+Der Rohtranskript-Strang hat die Owner-Pfade **kalibriert statt geglaubt** — und mein
+Memory-Eintrag war deutlich zu optimistisch. Gemessen an der größten Datei (9 Wochen,
+06.07.–08.08.):
+
+| Pfad | distinkte Owner-Texte |
+|---|---|
+| Pfad 1 (`type=="user"`, `promptSource`/`origin.kind`) | 761 |
+| Pfad 2a (`queued_command/prompt`) | 483 |
+| **Schnittmenge** | **11** |
+| **NUR über Pfad 2 — für Pfad 1 unsichtbar** | **472** |
+
+**Nicht ~40, sondern 472.** Meine Zahl stammte aus einer einzelnen Tages-Session und wurde von
+mir auf den Gesamtbestand hochgerechnet — ein Nenner-Fehler in eigener Sache.
+
+**Und es gibt einen dritten Pfad.** `queue-operation/enqueue` ist **nicht** redundant zu
+`queued_command`: in der laufenden Session tragen **49** distinkte Texte **ausschließlich** diese
+Form. Das „bzw." meiner alten Regel muss als **UNION der drei Zweige** gelesen werden, nicht als
+Alternative. Wer zwei von drei liest, sieht einen Owner, der geschwiegen hat, während er sprach.
+
+Die Gegenprobe des Strangs ist vorbildlich: `jq -c 'select(.type=="assistant")'` liefert 857
+Treffer in derselben Datei — damit ist belegt, dass `jq` liest und ein 0-Befund ein **echter**
+Nullbefund wäre, kein Werkzeugfehler.
+
+### Neue Thesis-Bauverpflichtungen, die dieser Explore nebenbei gehoben hat
+
+Zehn Präsens-Zusagen aus dem gepinnten Stand, jede mit Ist-Abgleich. Die vier mit der größten
+Lücke:
+
+1. **„HdrHistogram erhebt p50/p95/p99"** — erhebt nichts (0 Produktions-Konsumenten). Zusätzlich
+   exportiert die CSV **kein p95**: `LATENCY_P95` ist deklariert, aber nicht exportiert.
+2. **„Fairness-Protokollierung je Fremdbibliothek: Compiler, Flags, ISA-Pfad, Allokator,
+   Commit-Hash"** — fehlt im Mess-Output vollständig.
+3. **„Datensatz-Akte: Quelle, Prüfsumme, Seed-Regel je Datensatz"** — `<datasets>`-Bindung offen.
+4. **„Berichtsgrößen Mittel und Perzentile p50–p999"** — p999-Produzenten-Grenzen ungepinnt.
+
+Diese vier sind **keine Wünsche, sondern Zusagen im Präsens** in einem Dokument, das am 15.09.
+abgegeben wird. Sie gehören in das Soll-Ist-Register (Strang 16, läuft).
+
+### Die Lehre
+
+Der Explore hat **einen Tag nach** seiner Einführung als Pflichtstufe einen Plan-Posten
+umgedreht, der sonst mit „entfernen" hätte enden können — und damit eine Thesis-Zusage
+gebrochen hätte, die seit Monaten im Dokument steht. Der Aufwand war ein Workflow; der
+verhinderte Schaden wäre ein Widerspruch zwischen abgegebenem Text und abgegebenem Code
+gewesen, gefunden vom Gutachter statt von mir.
 ## NACHTRAG 09.08.2026 — Lagerhaltung und AVX-Maximum: der Entwurf ist vollständig, die Scharfschaltung fehlt
 
 **Zwei Stränge, zwei Materialsorten, ein Bild.** Strang 11 (fünf blinde Suchmodalitäten über
