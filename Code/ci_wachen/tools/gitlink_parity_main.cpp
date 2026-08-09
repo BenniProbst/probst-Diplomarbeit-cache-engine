@@ -21,9 +21,8 @@
 #include "comdare/ci_wachen/gitlink_parity.hpp"
 
 int main(int argc, char** argv) {
-    const std::vector<std::string> argumente(argv + 1, argv + argc);
-    const comdare::ci_wachen::ParityArgumente parse =
-        comdare::ci_wachen::parse_parity_argumente(argumente);
+    const std::vector<std::string>            argumente(argv + 1, argv + argc);
+    const comdare::ci_wachen::ParityArgumente parse = comdare::ci_wachen::parse_parity_argumente(argumente);
 
     if (!parse.ok) {
         std::fprintf(stderr, "%s\n", parse.fehler.c_str());

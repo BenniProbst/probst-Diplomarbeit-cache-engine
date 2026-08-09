@@ -60,9 +60,9 @@ enum class XmlUrteilArt {
 };
 
 struct XmlUrteil {
-    XmlUrteilArt art = XmlUrteilArt::ParserNichtVerfuegbar;  // fail-closed als Vorgabe
-    std::vector<std::string> meldungen;  // die Zeilen des Parsers, woertlich
-    std::string werkzeug_diagnose;       // nur bei ParserNichtVerfuegbar gefuellt
+    XmlUrteilArt             art = XmlUrteilArt::ParserNichtVerfuegbar; // fail-closed als Vorgabe
+    std::vector<std::string> meldungen;                                 // die Zeilen des Parsers, woertlich
+    std::string              werkzeug_diagnose;                         // nur bei ParserNichtVerfuegbar gefuellt
 };
 
 inline constexpr XmlUrteilArt alle_xml_urteil_arten[] = {
@@ -76,9 +76,9 @@ static_assert(sizeof(alle_xml_urteil_arten) / sizeof(alle_xml_urteil_arten[0]) =
 
 class XmlParser {
 public:
-    virtual ~XmlParser() = default;
-    virtual XmlUrteil pruefe(const std::filesystem::path& datei) const = 0;
-    virtual std::string bezeichnung() const = 0;
+    virtual ~XmlParser()                                                 = default;
+    virtual XmlUrteil   pruefe(const std::filesystem::path& datei) const = 0;
+    virtual std::string bezeichnung() const                              = 0;
 };
 
 // Die Produktions-Implementierung: ein Kindprozess ueber die Prozess-Naht.
@@ -86,10 +86,10 @@ public:
 // ParserNichtVerfuegbar -- niemals zu "Wohlgeformt".
 class XmllintParser final : public XmlParser {
 public:
-    XmlUrteil pruefe(const std::filesystem::path& datei) const override;
+    XmlUrteil   pruefe(const std::filesystem::path& datei) const override;
     std::string bezeichnung() const override;
 };
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
 
-#endif  // COMDARE_CI_WACHEN_XML_PARSER_HPP
+#endif // COMDARE_CI_WACHEN_XML_PARSER_HPP

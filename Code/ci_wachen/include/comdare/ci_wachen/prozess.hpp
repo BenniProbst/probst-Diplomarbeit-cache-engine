@@ -47,28 +47,28 @@ namespace comdare::ci_wachen {
 // Die drei Arten sind DISJUNKT und erschoepfend. Wer eine vierte hinzufuegt, bricht
 // zuerst an alle_prozess_arten() (static_assert unten), dann an den Fall-Tabellen.
 enum class ProzessArt {
-    Exit,                // lief, endete per exit(code)
-    Signal,              // lief, starb an Signal(nummer)
-    ExecFehlgeschlagen,  // lief NIE: execvp/chdir schlug fehl, code = errno
+    Exit,               // lief, endete per exit(code)
+    Signal,             // lief, starb an Signal(nummer)
+    ExecFehlgeschlagen, // lief NIE: execvp/chdir schlug fehl, code = errno
 };
 
 // Wo genau es scheiterte, wenn der Prozess nie lief. Ohne diese Unterscheidung waere
 // "Werkzeug fehlt" nicht von "Arbeitsverzeichnis fehlt" zu trennen.
 enum class ExecStufe {
     Keine,
-    Arbeitsverzeichnis,  // chdir() im Kind schlug fehl
-    Ausfuehrung,         // execvp() schlug fehl
+    Arbeitsverzeichnis, // chdir() im Kind schlug fehl
+    Ausfuehrung,        // execvp() schlug fehl
 };
 
 struct ProzessAusgang {
     ProzessArt art = ProzessArt::ExecFehlgeschlagen;
     // Exit: der Exit-Code. Signal: die Signalnummer. ExecFehlgeschlagen: errno.
     // ABSICHTLICH NICHT "rc": es gibt keinen gemeinsamen Zahlenraum mehr.
-    int code = -1;
-    ExecStufe stufe = ExecStufe::Keine;
-    std::string ausgabe;   // stdout, vollstaendig
-    std::string fehler;    // stderr, vollstaendig
-    std::string werkzeug;  // argv[0] -- damit die Diagnose das Werkzeug benennt
+    int         code  = -1;
+    ExecStufe   stufe = ExecStufe::Keine;
+    std::string ausgabe;  // stdout, vollstaendig
+    std::string fehler;   // stderr, vollstaendig
+    std::string werkzeug; // argv[0] -- damit die Diagnose das Werkzeug benennt
 
     // Menschenlesbare Form fuer Testausgaben und Protokolle. Traegt IMMER die Art,
     // nie nur die Zahl -- eine nackte Zahl war der Defekt.
@@ -81,8 +81,8 @@ struct ProzessAusgang {
 std::optional<int> exit_code(const ProzessAusgang& ausgang);
 
 struct ProzessAuftrag {
-    std::vector<std::string> argv;             // argv[0] ist das Werkzeug; NIE eine Shell
-    std::filesystem::path arbeitsverzeichnis;  // leer = vom Vater geerbt
+    std::vector<std::string> argv;               // argv[0] ist das Werkzeug; NIE eine Shell
+    std::filesystem::path    arbeitsverzeichnis; // leer = vom Vater geerbt
     // Diese Variablen werden im Kind ENTFERNT, bevor exec laeuft. Ohne das biegt ein
     // gesetztes GIT_DIR der CI die Wegwerf-Fixtures in ein fremdes Repo um (dieselbe
     // Haertung wie in der abgeloesten Shell-Probe, Zeile 142).
@@ -95,7 +95,7 @@ ProzessAusgang fuehre_aus(const ProzessAuftrag& auftrag);
 
 // Bequemform fuer git-Aufrufe: entfernt die git-Umgebungsvariablen, die Fixtures
 // umbiegen koennten, und setzt das Arbeitsverzeichnis.
-ProzessAusgang fuehre_git_aus(const std::filesystem::path& arbeitsverzeichnis,
+ProzessAusgang fuehre_git_aus(const std::filesystem::path&    arbeitsverzeichnis,
                               const std::vector<std::string>& argumente);
 
 // Vollstaendigkeits-Tabelle (T-4/Stufe 1): waechst das enum, reisst zuerst dieser
@@ -109,6 +109,6 @@ inline constexpr ProzessArt alle_prozess_arten[] = {
 static_assert(sizeof(alle_prozess_arten) / sizeof(alle_prozess_arten[0]) == 3,
               "ProzessArt hat einen neuen Wert -- alle_prozess_arten und die Fall-Tabellen nachziehen.");
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
 
-#endif  // COMDARE_CI_WACHEN_PROZESS_HPP
+#endif // COMDARE_CI_WACHEN_PROZESS_HPP

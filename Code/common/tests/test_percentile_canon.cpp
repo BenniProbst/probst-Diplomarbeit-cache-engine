@@ -221,8 +221,7 @@ TEST(PercentileCanonD52, ZufallGegenBruteForceOrakelGeradeLaenge) {
     std::printf("[D5-2] Zufallslauf: %d Vergleiche gegen den Gegeneingang, alle gleich; an %d "
                 "davon haette die VERWORFENE Formel abgewichen\n",
                 laeufe, divergent_zur_alten);
-    EXPECT_GT(divergent_zur_alten, 0)
-        << "Zufallslauf ist blind: die verworfene Formel haette ihn auch bestanden";
+    EXPECT_GT(divergent_zur_alten, 0) << "Zufallslauf ist blind: die verworfene Formel haette ihn auch bestanden";
 }
 
 // 6) Randfaelle: leere Stichprobe und Klemmung.

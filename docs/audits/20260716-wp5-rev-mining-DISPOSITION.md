@@ -55,7 +55,7 @@ Zusätzlich **F57 (Muster B, ~15 noexcept-auf-Alloc-Bodies): UMGESETZT** — 16 
 | REV-DATA-09 (P1, Legacy-Mikrobench-Achsen) | **offen — legacy-gated** | `tools/permutation_codegen/codegen.cmake:434-483` unverändert (Layout wechselt Algorithmus, Allokatorstress vor t0); Konsument ist ausschließlich der V38.C-Plugin-Mikrobench hinter `COMDARE_LEGACY_MESSREIHEN=1` (main.cpp:344ff). Wissenschaftliche Tabellen speisen sich aus dem E4-XML-Weg. Voll-Entfernung = P6, data-gated (golden-320-Subsumtion unbestätigt, §12 07-13). |
 | REV-DATA-10 (P1, ExperimentDriver-Erfolg) | **offen — legacy- + ABI-gated** | `libs/cache_engine/builder/experiment_driver/experiment_driver.cpp:497` `pr.succeeded = true;` bedingungslos; `module_abi_v1`-run_workload hat keinen Statusreturn (Fix bräuchte ABI-Kanal = ABI-gated). Pfad läuft nur bei `COMDARE_LEGACY_MESSREIHEN=1`. |
 | REV-DATA-11 (P1, Baseline≠Kandidat-Workload) | **offen — legacy-gated** | `libs/execution_engine/src/result_aggregator.cpp:21-33` compare_against_baseline prüft weiterhin nur succeeded, nicht workload_used (das Feld wird seit V20.2/V20.3 getragen und exportiert, aber nicht als Vergleichsgate genutzt). Konsument = Legacy-Pfad. |
-| REV-DATA-12 (P2, Median-Divergenz) | **offen** | Selector `best_binary_selector.cpp` lower_median (untere Mitte, `vals[(n-1)/2]`) vs. `csv_to_latex.cpp:48-54` + ~~`diagram_generator.cpp:414-420`~~ **→ `diagram_generator.cpp` `nearest_rank_median`, am 09.08.2026 auf `:653-659` (Anker gedriftet, s. Nachtrag D5-3 unter dieser Tabelle)** nearest_rank_median (obere Mitte, `rank=0.5*(n-1)+0.5`) — Divergenz bei geradem n besteht; im DATA-07-Umbau bewusst NICHT mitgeändert (nicht mandatiert; jetzt aber im Code ehrlich als „REV-DATA-12 offen" annotiert statt der früheren falschen „identisch"-Behauptung). Fix = zentrale Medianfunktion (eigener kleiner Increment). |
+| REV-DATA-12 (P2, Median-Divergenz) | **offen** | Selector `best_binary_selector.cpp` lower_median (untere Mitte, `vals[(n-1)/2]`) vs. ~~`csv_to_latex.cpp:48-54`~~ **→ `:57-63`** + ~~`diagram_generator.cpp:414-420`~~ ~~`:653-659`~~ **→ `:662-668`** (beide am 09.08.2026 abends um je **9 Zeilen** gedriftet, ausgeloest vom D5-2-Merge; alte Stellen bleiben als Datum stehen, s. Nachtrag D5-3 unter dieser Tabelle) nearest_rank_median (obere Mitte, `rank=0.5*(n-1)+0.5`) — Divergenz bei geradem n besteht; im DATA-07-Umbau bewusst NICHT mitgeändert (nicht mandatiert; jetzt aber im Code ehrlich als „REV-DATA-12 offen" annotiert statt der früheren falschen „identisch"-Behauptung). Fix = zentrale Medianfunktion (eigener kleiner Increment). |
 | REV-DATA-13 (P2, Welch-Zweitsample/Multiplizität) | **offen — legacy-gated** | `Code/02_messung_driver/main.cpp:458-515`: Welch-Sampling ist ein ZWEITER Lauf, rohe p<0,05 ohne Korrektur — unverändert; liegt vollständig im `COMDARE_LEGACY_MESSREIHEN=1`-Block (:344ff). |
 | REV-DATA-14 (P2, Writer-Teilverlust) | **offen — legacy-gated** | `measurement_writer.hpp:49-66` add() inkrementiert num_records_ ohne per-Write-Statusprüfung; `main.cpp:415` meldet „geschrieben" bei `writer.ok() \|\| count>0`. Liegt im Legacy-Block; der offizielle E4-Pfad schreibt über den ce-Iterator (stream-verifizierter CSV-Write + Stamp-Gate, GOAL-M1.4). |
 
@@ -75,7 +75,15 @@ Zusätzlich **F57 (Muster B, ~15 noexcept-auf-Alloc-Bodies): UMGESETZT** — 16 
 >
 > | Verweis in der Zelle | Ist am 09.08.2026 | Differenz |
 > |---|---|---|
-> | `csv_to_latex.cpp:48-54` | `nearest_rank_median` steht auf **48–54** | **0** — Anker hält |
+> | ~~`csv_to_latex.cpp:48-54`~~ | ~~steht auf **48–54**~~ | ~~**0** — Anker hält~~ (bis 09.08. mittags) |
+> | `csv_to_latex.cpp:57-63` | `nearest_rank_median` steht auf **57–63** | **+9** — nachgezogen 09.08. abends |
+> | `diagram_generator.cpp:662-668` | `nearest_rank_median` steht auf **662–668** | **+9** — nachgezogen 09.08. abends |
+>
+> **Warum die Anker heute ZWEIMAL wandern mussten:** vormittags trug `diagram_generator.cpp` die
+> Drift allein (414 → 653, +239). Abends hat der D5-2-Merge **beide** Dateien um je 9 Zeilen
+> verschoben — auch die, deren Anker vormittags noch „haelt" meldete. Eine Zeilennummer ist kein
+> Anker, sie ist eine Momentaufnahme; die Wache ist genau deshalb gebaut und hat beide Male
+> zugeschlagen (super-Pipeline 15470, Job docs:anker-wache, `2 von 2 Ankern gedriftet`).
 > | ~~`diagram_generator.cpp:414-420`~~ | `nearest_rank_median` steht auf **653–659** | **+239 Zeilen** |
 >
 > Die im Wellenplan v2 behauptete Drift von 239 Zeilen ist damit **am Objekt bestätigt**, nicht
@@ -98,8 +106,8 @@ Zusätzlich **F57 (Muster B, ~15 noexcept-auf-Alloc-Bodies): UMGESETZT** — 16 
 > **Belegkommandos:** `grep -n '^\[\[nodiscard\]\] double nearest_rank_median' <datei>` ·
 > `git -C /home/comdare/wt-super-landung log -1 --format='%H %ad %s' --date=short -- Code/04_csv_to_latex/ Code/05_diagram_generator/`
 >
-> ANKER-SYMBOL  Code/04_csv_to_latex/csv_to_latex.cpp  nearest_rank_median  48
-> ANKER-SYMBOL  Code/05_diagram_generator/diagram_generator.cpp  nearest_rank_median  653
+> ANKER-SYMBOL  Code/04_csv_to_latex/csv_to_latex.cpp  nearest_rank_median  57
+> ANKER-SYMBOL  Code/05_diagram_generator/diagram_generator.cpp  nearest_rank_median  662
 
 ### REV-CI (super)
 

@@ -14,7 +14,7 @@ namespace {
 // 5/5 "gefangen"). Ein Textwerkzeug, das es nicht mehr gibt, kann nicht mehr luegen.
 std::vector<std::string> in_zeilen(const std::string& text) {
     std::vector<std::string> zeilen;
-    std::string aktuell;
+    std::string              aktuell;
     for (const char c : text) {
         if (c == '\n') {
             if (!aktuell.empty()) zeilen.push_back(aktuell);
@@ -27,7 +27,7 @@ std::vector<std::string> in_zeilen(const std::string& text) {
     return zeilen;
 }
 
-}  // namespace
+} // namespace
 
 std::string XmllintParser::bezeichnung() const { return "xmllint --noout --nonet"; }
 
@@ -37,13 +37,13 @@ XmlUrteil XmllintParser::pruefe(const std::filesystem::path& datei) const {
 
     const ProzessAusgang ausgang = fuehre_aus(auftrag);
 
-    XmlUrteil urteil;
+    XmlUrteil                urteil;
     const std::optional<int> code = exit_code(ausgang);
     if (!code.has_value()) {
         // DER ENTSCHEIDENDE ZWEIG. Fehlt xmllint, endet es NICHT mit 127 -- es laeuft
         // gar nicht, und die Selbst-Pipe meldet ENOENT. Damit kann ein Werkzeug-Ausfall
         // hier keinem Dokument-Urteil gleichen; er ist eine eigene Art.
-        urteil.art = XmlUrteilArt::ParserNichtVerfuegbar;
+        urteil.art               = XmlUrteilArt::ParserNichtVerfuegbar;
         urteil.werkzeug_diagnose = ausgang.beschreibung();
         return urteil;
     }
@@ -63,4 +63,4 @@ XmlUrteil XmllintParser::pruefe(const std::filesystem::path& datei) const {
     return urteil;
 }
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen

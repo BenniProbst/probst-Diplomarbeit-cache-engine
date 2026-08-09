@@ -54,8 +54,8 @@
 namespace comdare::ci_wachen {
 
 enum class XmlBefundArt {
-    ParserFehler,          // der Parser lehnt das Dokument ab (Ex-"xmllint rc!=0")
-    DiagnoseTrotzErfolg,   // rc=0, aber der Parser beschwert sich (Ex-stderr-Riegel)
+    ParserFehler,        // der Parser lehnt das Dokument ab (Ex-"xmllint rc!=0")
+    DiagnoseTrotzErfolg, // rc=0, aber der Parser beschwert sich (Ex-stderr-Riegel)
 };
 
 inline constexpr XmlBefundArt alle_xml_befund_arten[] = {
@@ -82,18 +82,18 @@ static_assert(sizeof(alle_xml_abbruch_gruende) / sizeof(alle_xml_abbruch_gruende
               "XmlAbbruchGrund hat einen neuen Wert -- Tabelle und Fall-Tabellen nachziehen.");
 
 struct XmlBefund {
-    std::string datei;
-    XmlBefundArt art = XmlBefundArt::ParserFehler;
-    std::vector<std::string> meldungen;  // die Parser-Zeilen, woertlich
+    std::string              datei;
+    XmlBefundArt             art = XmlBefundArt::ParserFehler;
+    std::vector<std::string> meldungen; // die Parser-Zeilen, woertlich
 };
 
 struct XmlWacheErgebnis {
-    WacheStatus status = WacheStatus::Abbruch;  // fail-closed als Vorgabe
-    int nenner = 0;        // getrackte *.xml -- die Grundgesamtheit
-    int nicht_gelesen = 0; // im Index, im Arbeitsbaum nicht da (s. Kopf)
-    std::vector<XmlBefund> risse;
+    WacheStatus                    status        = WacheStatus::Abbruch; // fail-closed als Vorgabe
+    int                            nenner        = 0;                    // getrackte *.xml -- die Grundgesamtheit
+    int                            nicht_gelesen = 0;                    // im Index, im Arbeitsbaum nicht da (s. Kopf)
+    std::vector<XmlBefund>         risse;
     std::optional<XmlAbbruchGrund> abbruch;
-    std::string abbruch_detail;
+    std::string                    abbruch_detail;
 
     // EINE Formatierfunktion, sie traegt die Literale der abgeloesten Wache weiter.
     std::string protokoll() const;
@@ -107,13 +107,9 @@ XmlWacheErgebnis pruefe_xml_bestand(const GitQuelle& git, const XmlParser& parse
 std::string abbruch_text(XmlAbbruchGrund grund);
 std::string befund_text(XmlBefundArt art);
 
-inline std::ostream& operator<<(std::ostream& strom, XmlAbbruchGrund grund) {
-    return strom << abbruch_text(grund);
-}
-inline std::ostream& operator<<(std::ostream& strom, XmlBefundArt art) {
-    return strom << befund_text(art);
-}
+inline std::ostream& operator<<(std::ostream& strom, XmlAbbruchGrund grund) { return strom << abbruch_text(grund); }
+inline std::ostream& operator<<(std::ostream& strom, XmlBefundArt art) { return strom << befund_text(art); }
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
 
-#endif  // COMDARE_CI_WACHEN_XML_WELLFORMED_HPP
+#endif // COMDARE_CI_WACHEN_XML_WELLFORMED_HPP

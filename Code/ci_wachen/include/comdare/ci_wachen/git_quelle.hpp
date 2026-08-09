@@ -39,8 +39,8 @@
 namespace comdare::ci_wachen {
 
 enum class GitlinkQuelle {
-    Head,   // ls-tree HEAD  -- Praevention in verify:submodules
-    Index,  // ls-files --stage -- Nachbedingung in anhang:forward
+    Head,  // ls-tree HEAD  -- Praevention in verify:submodules
+    Index, // ls-files --stage -- Nachbedingung in anhang:forward
 };
 
 inline constexpr GitlinkQuelle alle_gitlink_quellen[] = {GitlinkQuelle::Head, GitlinkQuelle::Index};
@@ -49,37 +49,35 @@ static_assert(sizeof(alle_gitlink_quellen) / sizeof(alle_gitlink_quellen[0]) == 
 
 std::string quelle_text(GitlinkQuelle quelle);
 
-inline std::ostream& operator<<(std::ostream& strom, GitlinkQuelle quelle) {
-    return strom << quelle_text(quelle);
-}
+inline std::ostream& operator<<(std::ostream& strom, GitlinkQuelle quelle) { return strom << quelle_text(quelle); }
 
 // Antwort auf eine Bestands-Aufzaehlung. `werkzeug_ok == false` heisst: git hat nicht
 // geantwortet. Das ist NIE eine leere Liste -- ein Werkzeug-Ausfall und "nichts
 // gefunden" duerfen nicht denselben Wert haben (genau diese Verwechslung liess die
 // Shell-Probe bei leerer od-Ausgabe 12/12 gruen melden).
 struct DateiBestand {
-    bool werkzeug_ok = false;
-    std::string diagnose;
+    bool                     werkzeug_ok = false;
+    std::string              diagnose;
     std::vector<std::string> pfade;
 };
 
 // Antwort auf eine Gitlink-Abfrage. Auch hier: Werkzeug-Ausfall, "kein Eintrag" und
 // "Eintrag mit falschem Modus" sind DREI unterscheidbare Zustaende.
 struct GitlinkAntwort {
-    bool werkzeug_ok = false;
+    bool        werkzeug_ok = false;
     std::string diagnose;
-    bool eintrag_vorhanden = false;
-    std::string modus;   // z.B. "160000" (Gitlink) oder "100644" (gewoehnliche Datei)
-    std::string objekt;  // der SHA -- nur belastbar, wenn modus == "160000"
+    bool        eintrag_vorhanden = false;
+    std::string modus;  // z.B. "160000" (Gitlink) oder "100644" (gewoehnliche Datei)
+    std::string objekt; // der SHA -- nur belastbar, wenn modus == "160000"
 
     bool ist_gitlink() const { return eintrag_vorhanden && modus == "160000"; }
 };
 
 class GitQuelle {
 public:
-    virtual ~GitQuelle() = default;
-    virtual bool ist_arbeitsbaum() const = 0;
-    virtual DateiBestand ls_files_z(const std::string& muster) const = 0;
+    virtual ~GitQuelle()                                                                = default;
+    virtual bool           ist_arbeitsbaum() const                                      = 0;
+    virtual DateiBestand   ls_files_z(const std::string& muster) const                  = 0;
     virtual GitlinkAntwort gitlink(const std::string& pfad, GitlinkQuelle quelle) const = 0;
     // Absolut aufgeloester Pfad einer getrackten Datei -- damit der Parser nicht vom
     // Arbeitsverzeichnis des Aufrufers abhaengt.
@@ -90,9 +88,9 @@ public:
 class EchteGitQuelle final : public GitQuelle {
 public:
     explicit EchteGitQuelle(std::filesystem::path verzeichnis);
-    bool ist_arbeitsbaum() const override;
-    DateiBestand ls_files_z(const std::string& muster) const override;
-    GitlinkAntwort gitlink(const std::string& pfad, GitlinkQuelle quelle) const override;
+    bool                  ist_arbeitsbaum() const override;
+    DateiBestand          ls_files_z(const std::string& muster) const override;
+    GitlinkAntwort        gitlink(const std::string& pfad, GitlinkQuelle quelle) const override;
     std::filesystem::path aufloesen(const std::string& pfad) const override;
 
     // Die Wurzel, die git selbst nennt -- NICHT dirname($0)/... Die abgeloeste Wache
@@ -103,7 +101,7 @@ public:
 private:
     std::filesystem::path start_;
     std::filesystem::path wurzel_;
-    bool arbeitsbaum_ = false;
+    bool                  arbeitsbaum_ = false;
 };
 
 // ---- REINE PARSER (ohne git, ohne Prozess) ---------------------------------------
@@ -116,6 +114,6 @@ GitlinkAntwort parse_ls_files_stage_zeile(std::string_view zeile);
 // das ist der Positiv-Fall, der den toten Nenner-Mismatch-Zweig ersetzt.
 std::vector<std::string> trenne_nul(std::string_view rohdaten);
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
 
-#endif  // COMDARE_CI_WACHEN_GIT_QUELLE_HPP
+#endif // COMDARE_CI_WACHEN_GIT_QUELLE_HPP

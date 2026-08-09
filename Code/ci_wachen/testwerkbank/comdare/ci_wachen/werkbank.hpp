@@ -47,14 +47,14 @@ public:
     explicit Wuerfel(std::uint64_t seed);
 
     std::uint64_t seed() const { return seed_; }
-    int zahl(int min_inklusive, int max_inklusive);
+    int           zahl(int min_inklusive, int max_inklusive);
     // Hex-Token beliebiger Laenge -- als Koeder in Dateien eingebettet und woertlich
     // zurueckgefordert. NIE abgeschrieben, immer erzeugt.
     std::string token(std::size_t stellen = 12);
     std::string sha40();
 
 private:
-    std::uint64_t seed_;
+    std::uint64_t   seed_;
     std::mt19937_64 quelle_;
 };
 
@@ -63,7 +63,7 @@ class FixtureRepo {
 public:
     FixtureRepo();
     ~FixtureRepo();
-    FixtureRepo(const FixtureRepo&) = delete;
+    FixtureRepo(const FixtureRepo&)            = delete;
     FixtureRepo& operator=(const FixtureRepo&) = delete;
 
     const std::filesystem::path& pfad() const { return pfad_; }
@@ -85,46 +85,46 @@ public:
     // sie zu behaupten.
     testing::AssertionResult ist_verfolgt(const std::string& relativ);
     testing::AssertionResult ist_nicht_verfolgt(const std::string& relativ);
-    std::string index_modus(const std::string& relativ);
+    std::string              index_modus(const std::string& relativ);
 
 private:
     testing::AssertionResult git(const std::vector<std::string>& argumente, const char* was);
-    std::filesystem::path pfad_;
+    std::filesystem::path    pfad_;
 };
 
 // Fixture-Bausteine mit gemessenem, nicht behauptetem Verhalten (Messung 09.08. am
 // xmllint dieser Maschine, libxml 20914 -- die Zahlen stehen im Kopf von xml_parser.hpp).
 std::string xml_wohlgeformt(const std::string& token);
-std::string xml_doppelbindestrich(const std::string& token);  // -> rc=1, "Double hyphen within comment"
-std::string xml_namensraum_fehler(const std::string& token);  // -> rc=0 UND 89 Byte stderr
-std::string xml_doctype_einzelbindestrich(const std::string& token);  // -> rc=0, 0 Byte stderr
+std::string xml_doppelbindestrich(const std::string& token);         // -> rc=1, "Double hyphen within comment"
+std::string xml_namensraum_fehler(const std::string& token);         // -> rc=0 UND 89 Byte stderr
+std::string xml_doctype_einzelbindestrich(const std::string& token); // -> rc=0, 0 Byte stderr
 
 // ---- (3) DIE FAKES ----------------------------------------------------------------
 class FakeGitQuelle final : public GitQuelle {
 public:
-    bool arbeitsbaum = true;
-    DateiBestand bestand;
+    bool                                  arbeitsbaum = true;
+    DateiBestand                          bestand;
     std::map<std::string, GitlinkAntwort> gitlinks_head;
     std::map<std::string, GitlinkAntwort> gitlinks_index;
-    std::filesystem::path wurzel;
+    std::filesystem::path                 wurzel;
 
-    bool ist_arbeitsbaum() const override { return arbeitsbaum; }
-    DateiBestand ls_files_z(const std::string& muster) const override;
-    GitlinkAntwort gitlink(const std::string& pfad, GitlinkQuelle quelle) const override;
+    bool                  ist_arbeitsbaum() const override { return arbeitsbaum; }
+    DateiBestand          ls_files_z(const std::string& muster) const override;
+    GitlinkAntwort        gitlink(const std::string& pfad, GitlinkQuelle quelle) const override;
     std::filesystem::path aufloesen(const std::string& pfad) const override;
 };
 
 class FakeXmlParser final : public XmlParser {
 public:
-    std::map<std::string, XmlUrteil> urteile;  // Schluessel = Dateiname (nur der Stamm)
-    XmlUrteil vorgabe;                         // fuer alles, was nicht eingetragen ist
-    mutable int aufrufe = 0;
+    std::map<std::string, XmlUrteil> urteile; // Schluessel = Dateiname (nur der Stamm)
+    XmlUrteil                        vorgabe; // fuer alles, was nicht eingetragen ist
+    mutable int                      aufrufe = 0;
 
     FakeXmlParser();
-    XmlUrteil pruefe(const std::filesystem::path& datei) const override;
+    XmlUrteil   pruefe(const std::filesystem::path& datei) const override;
     std::string bezeichnung() const override { return "FakeXmlParser"; }
 };
 
-}  // namespace comdare::ci_wachen::werkbank
+} // namespace comdare::ci_wachen::werkbank
 
-#endif  // COMDARE_CI_WACHEN_WERKBANK_HPP
+#endif // COMDARE_CI_WACHEN_WERKBANK_HPP

@@ -53,12 +53,12 @@ namespace comdare::ci_wachen {
 // Rolle uebernimmt jetzt der Test, der sie gegen .gitmodules haelt (eine ANDERE Quelle
 // als der Pruefling, T-3) statt gegen eine Abschrift derselben Behauptung.
 inline constexpr const char* PFAD_LEBEND = "thesis/diplomarbeit";
-inline constexpr const char* PFAD_TOT = "Code/external/20260931-overleaf-diplomarbeit";
+inline constexpr const char* PFAD_TOT    = "Code/external/20260931-overleaf-diplomarbeit";
 
 enum class ParityRissArt {
-    GitlinkFehlt,      // mindestens ein Pfad ist kein Gitlink (fehlt oder falscher Modus)
-    Divergenz,         // beide vorhanden, aber sie zeigen auf verschiedene Commits
-    ErwartetVerfehlt,  // beide gleich, aber nicht auf dem geforderten SHA
+    GitlinkFehlt,     // mindestens ein Pfad ist kein Gitlink (fehlt oder falscher Modus)
+    Divergenz,        // beide vorhanden, aber sie zeigen auf verschiedene Commits
+    ErwartetVerfehlt, // beide gleich, aber nicht auf dem geforderten SHA
 };
 
 inline constexpr ParityRissArt alle_parity_riss_arten[] = {
@@ -70,9 +70,9 @@ static_assert(sizeof(alle_parity_riss_arten) / sizeof(alle_parity_riss_arten[0])
               "ParityRissArt hat einen neuen Wert -- Tabelle und Fall-Tabellen nachziehen.");
 
 enum class ParityAbbruchGrund {
-    KeinRepo,           // ausserhalb eines git-Baums aufgerufen
-    GitFehlgeschlagen,  // git hat geantwortet, aber mit Fehler
-    Bedienfehler,       // argv unbrauchbar (unbekannte Option, fehlender Wert, Unsinns-Quelle)
+    KeinRepo,          // ausserhalb eines git-Baums aufgerufen
+    GitFehlgeschlagen, // git hat geantwortet, aber mit Fehler
+    Bedienfehler,      // argv unbrauchbar (unbekannte Option, fehlender Wert, Unsinns-Quelle)
 };
 
 inline constexpr ParityAbbruchGrund alle_parity_abbruch_gruende[] = {
@@ -84,36 +84,35 @@ static_assert(sizeof(alle_parity_abbruch_gruende) / sizeof(alle_parity_abbruch_g
               "ParityAbbruchGrund hat einen neuen Wert -- Tabelle und Fall-Tabellen nachziehen.");
 
 struct ParityErgebnis {
-    WacheStatus status = WacheStatus::Abbruch;  // fail-closed als Vorgabe
+    WacheStatus   status = WacheStatus::Abbruch; // fail-closed als Vorgabe
     GitlinkQuelle quelle = GitlinkQuelle::Head;
-    int nenner = 0;  // wie viele Gitlink-Pfade die Wache ueberhaupt ansah
+    int           nenner = 0; // wie viele Gitlink-Pfade die Wache ueberhaupt ansah
 
     std::optional<ParityRissArt> riss;
-    std::vector<std::string> fehlende_pfade;  // nur bei GitlinkFehlt
-    std::string sha_lebend;
-    std::string sha_tot;
-    std::string erwartet;
+    std::vector<std::string>     fehlende_pfade; // nur bei GitlinkFehlt
+    std::string                  sha_lebend;
+    std::string                  sha_tot;
+    std::string                  erwartet;
 
     std::optional<ParityAbbruchGrund> abbruch;
-    std::string abbruch_detail;
+    std::string                       abbruch_detail;
 
     std::string protokoll() const;
 };
 
 // Die Wache. `erwartet` leer = die --erwartet-Forderung entfaellt.
-ParityErgebnis pruefe_gitlink_paritaet(const GitQuelle& git, GitlinkQuelle quelle,
-                                       const std::string& erwartet);
+ParityErgebnis pruefe_gitlink_paritaet(const GitQuelle& git, GitlinkQuelle quelle, const std::string& erwartet);
 
 // ---- argv-Parser als REINE FUNKTION ----------------------------------------------
 // In der Shell war die Optionsschleife untrennbar mit dem Prozess verwoben; ein
 // Bedienfehler war nur ueber einen Kindprozess und rc=2 beobachtbar. Hier ist er ein
 // Wert und wird ohne jeden Prozess geprueft.
 struct ParityArgumente {
-    bool ok = false;
-    bool hilfe_gewuenscht = false;
-    GitlinkQuelle quelle = GitlinkQuelle::Head;  // Vorgabe wie in der Shell-Fassung
-    std::string erwartet;
-    std::string fehler;  // Literal, das die Wache ausgibt
+    bool          ok               = false;
+    bool          hilfe_gewuenscht = false;
+    GitlinkQuelle quelle           = GitlinkQuelle::Head; // Vorgabe wie in der Shell-Fassung
+    std::string   erwartet;
+    std::string   fehler; // Literal, das die Wache ausgibt
 };
 
 // argumente OHNE argv[0].
@@ -123,13 +122,9 @@ std::string hilfe_text();
 std::string riss_text(ParityRissArt art);
 std::string abbruch_text(ParityAbbruchGrund grund);
 
-inline std::ostream& operator<<(std::ostream& strom, ParityRissArt art) {
-    return strom << riss_text(art);
-}
-inline std::ostream& operator<<(std::ostream& strom, ParityAbbruchGrund grund) {
-    return strom << abbruch_text(grund);
-}
+inline std::ostream& operator<<(std::ostream& strom, ParityRissArt art) { return strom << riss_text(art); }
+inline std::ostream& operator<<(std::ostream& strom, ParityAbbruchGrund grund) { return strom << abbruch_text(grund); }
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
 
-#endif  // COMDARE_CI_WACHEN_GITLINK_PARITY_HPP
+#endif // COMDARE_CI_WACHEN_GITLINK_PARITY_HPP

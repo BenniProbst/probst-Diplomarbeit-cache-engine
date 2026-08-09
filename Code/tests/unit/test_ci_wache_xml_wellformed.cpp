@@ -162,27 +162,27 @@ void fordere_kein_literal(const XmlWacheErgebnis& ist, const std::string& litera
 enum class KaputtArt { Doppelbindestrich, Namensraum };
 
 struct XmlBauplan {
-    bool git_init = true;
-    int gute_min = 0;
-    int gute_max = 0;
-    int kaputte_min = 0;
-    int kaputte_max = 0;
-    KaputtArt kaputt_art = KaputtArt::Doppelbindestrich;
-    bool tief = false;                  // Dateien in Unterverzeichnissen
-    int ungetrackt_kaputt = 0;          // kaputte XML, die NICHT verfolgt werden
-    bool eine_geloescht = false;        // im Index, im Arbeitsbaum weg (sparse checkout)
-    bool zeilenende_im_namen = false;   // der Positiv-Fall, der den toten Zweig ersetzt
-    bool doctype = false;               // DOCTYPE + Einzelbindestrich
+    bool      git_init            = true;
+    int       gute_min            = 0;
+    int       gute_max            = 0;
+    int       kaputte_min         = 0;
+    int       kaputte_max         = 0;
+    KaputtArt kaputt_art          = KaputtArt::Doppelbindestrich;
+    bool      tief                = false; // Dateien in Unterverzeichnissen
+    int       ungetrackt_kaputt   = 0;     // kaputte XML, die NICHT verfolgt werden
+    bool      eine_geloescht      = false; // im Index, im Arbeitsbaum weg (sparse checkout)
+    bool      zeilenende_im_namen = false; // der Positiv-Fall, der den toten Zweig ersetzt
+    bool      doctype             = false; // DOCTYPE + Einzelbindestrich
 };
 
 struct XmlFall {
-    const char* name;
-    XmlBauplan bauplan;
-    WacheStatus soll_status;
+    const char*                    name;
+    XmlBauplan                     bauplan;
+    WacheStatus                    soll_status;
     std::optional<XmlAbbruchGrund> soll_abbruch;
-    std::optional<XmlBefundArt> soll_befund_art;  // Art JEDES erwarteten Risses
-    std::vector<std::string> soll_literale;       // PFLICHT: mindestens eines
-    std::vector<std::string> verbotene_literale;
+    std::optional<XmlBefundArt>    soll_befund_art; // Art JEDES erwarteten Risses
+    std::vector<std::string>       soll_literale;   // PFLICHT: mindestens eines
+    std::vector<std::string>       verbotene_literale;
 };
 
 // Die Namen werden zu ctest-Zeilen (gtest_discover_tests) -- `ctest -N` liest sich
@@ -191,56 +191,74 @@ const std::vector<XmlFall>& xml_faelle() {
     static const std::vector<XmlFall> tabelle = {
         {"F01_gewuerfelt_alle_gut",
          XmlBauplan{.gute_min = 2, .gute_max = 6},
-         WacheStatus::Gruen, std::nullopt, std::nullopt,
+         WacheStatus::Gruen,
+         std::nullopt,
+         std::nullopt,
          {"alle wohlgeformt", "NENNER (nie eine nackte Null):"},
          {"FAILED --", "FALSE-GREEN"}},
 
         {"F02_doppelbindestrich_im_kommentar",
          XmlBauplan{.gute_min = 1, .gute_max = 3, .kaputte_min = 1, .kaputte_max = 3},
-         WacheStatus::Riss, std::nullopt, XmlBefundArt::ParserFehler,
+         WacheStatus::Riss,
+         std::nullopt,
+         XmlBefundArt::ParserFehler,
          {"FAILED --", "Double hyphen within comment", "NICHT WOHLGEFORMTE DATEIEN:"},
          {"alle wohlgeformt"}},
 
         {"F03_gemischt_in_unterverzeichnissen",
          XmlBauplan{.gute_min = 2, .gute_max = 4, .kaputte_min = 1, .kaputte_max = 2, .tief = true},
-         WacheStatus::Riss, std::nullopt, XmlBefundArt::ParserFehler,
+         WacheStatus::Riss,
+         std::nullopt,
+         XmlBefundArt::ParserFehler,
          {"FAILED --", "Double hyphen within comment"},
          {"alle wohlgeformt"}},
 
         {"F04_null_getrackte_xml_ist_ABBRUCH_kein_gruen",
          XmlBauplan{},
-         WacheStatus::Abbruch, XmlAbbruchGrund::NullDateien, std::nullopt,
+         WacheStatus::Abbruch,
+         XmlAbbruchGrund::NullDateien,
+         std::nullopt,
          {"NULL getrackte *.xml gefunden", "Ein leerer Nenner ist kein bestandener Lauf"},
          {"alle wohlgeformt", "OK ("}},
 
         {"F05_kein_git_arbeitsbaum_ist_ABBRUCH",
          XmlBauplan{.git_init = false},
-         WacheStatus::Abbruch, XmlAbbruchGrund::KeinGitBaum, std::nullopt,
+         WacheStatus::Abbruch,
+         XmlAbbruchGrund::KeinGitBaum,
+         std::nullopt,
          {"kein git-Arbeitsbaum", "also auch kein Gruen"},
          {"alle wohlgeformt"}},
 
         {"F07_namensraum_fehler_rc0_aber_diagnose_FALSE_GREEN",
-         XmlBauplan{.gute_min = 1, .gute_max = 2, .kaputte_min = 1, .kaputte_max = 2,
-                    .kaputt_art = KaputtArt::Namensraum},
-         WacheStatus::Riss, std::nullopt, XmlBefundArt::DiagnoseTrotzErfolg,
+         XmlBauplan{
+             .gute_min = 1, .gute_max = 2, .kaputte_min = 1, .kaputte_max = 2, .kaputt_art = KaputtArt::Namensraum},
+         WacheStatus::Riss,
+         std::nullopt,
+         XmlBefundArt::DiagnoseTrotzErfolg,
          {"FALSE-GREEN", "is not defined", "FAILED --"},
          {"alle wohlgeformt"}},
 
         {"F08_ungetrackt_kaputt_bleibt_gruen",
          XmlBauplan{.gute_min = 1, .gute_max = 3, .ungetrackt_kaputt = 1},
-         WacheStatus::Gruen, std::nullopt, std::nullopt,
+         WacheStatus::Gruen,
+         std::nullopt,
+         std::nullopt,
          {"alle wohlgeformt"},
          {"FAILED --", "ungetrackt_kaputt"}},
 
         {"F09_eingefroren_index_aber_nicht_im_arbeitsbaum",
          XmlBauplan{.gute_min = 1, .gute_max = 1, .eine_geloescht = true},
-         WacheStatus::Gruen, std::nullopt, std::nullopt,
+         WacheStatus::Gruen,
+         std::nullopt,
+         std::nullopt,
          {"gezaehlt, NICHT gelesen", "alle wohlgeformt"},
          {"FAILED --"}},
 
         {"F10_doctype_mit_einzelbindestrich_ist_gruen",
          XmlBauplan{.gute_min = 1, .gute_max = 2, .doctype = true},
-         WacheStatus::Gruen, std::nullopt, std::nullopt,
+         WacheStatus::Gruen,
+         std::nullopt,
+         std::nullopt,
          {"alle wohlgeformt"},
          {"FAILED --", "FALSE-GREEN"}},
 
@@ -250,9 +268,10 @@ const std::vector<XmlFall>& xml_faelle() {
         // Steuerzeichen im Nicht-`-z`-Weg immer). Hier wird nur `-z` gelesen, und ein
         // Dateiname MIT Zeilenende ist damit ein Fall, der FUNKTIONIERT.
         {"F11neu_dateiname_mit_zeilenende_wird_korrekt_gezaehlt",
-         XmlBauplan{.gute_min = 1, .gute_max = 2, .kaputte_min = 1, .kaputte_max = 1,
-                    .zeilenende_im_namen = true},
-         WacheStatus::Riss, std::nullopt, XmlBefundArt::ParserFehler,
+         XmlBauplan{.gute_min = 1, .gute_max = 2, .kaputte_min = 1, .kaputte_max = 1, .zeilenende_im_namen = true},
+         WacheStatus::Riss,
+         std::nullopt,
+         XmlBefundArt::ParserFehler,
          {"FAILED --", "Double hyphen within comment"},
          {"Nenner nicht vertrauenswuerdig"}},
     };
@@ -260,8 +279,8 @@ const std::vector<XmlFall>& xml_faelle() {
 }
 
 struct XmlAufbau {
-    int nenner_soll = 0;   // aus dem WUERFEL, nicht aus dem Pruefling (T-3)
-    int kaputte_soll = 0;
+    int                      nenner_soll  = 0; // aus dem WUERFEL, nicht aus dem Pruefling (T-3)
+    int                      kaputte_soll = 0;
     std::vector<std::string> tokens_kaputt;
 };
 
@@ -273,18 +292,17 @@ void baue(FixtureRepo& repo, Wuerfel& wuerfel, const XmlBauplan& plan, XmlAufbau
     if (!plan.git_init) return;
     ASSERT_TRUE(repo.init());
 
-    const int gute = (plan.gute_max > 0) ? wuerfel.zahl(plan.gute_min, plan.gute_max) : 0;
+    const int gute    = (plan.gute_max > 0) ? wuerfel.zahl(plan.gute_min, plan.gute_max) : 0;
     const int kaputte = (plan.kaputte_max > 0) ? wuerfel.zahl(plan.kaputte_min, plan.kaputte_max) : 0;
 
     for (int i = 0; i < gute; ++i) {
-        const std::string token = wuerfel.token();
-        const std::string unter = plan.tief ? ("tief" + std::to_string(i) + "/") : std::string();
-        const std::string name = unter + "gut_" + token + ".xml";
-        const std::string inhalt = plan.doctype
-                                       ? comdare::ci_wachen::werkbank::xml_doctype_einzelbindestrich(token)
-                                       : comdare::ci_wachen::werkbank::xml_wohlgeformt(token);
+        const std::string token  = wuerfel.token();
+        const std::string unter  = plan.tief ? ("tief" + std::to_string(i) + "/") : std::string();
+        const std::string name   = unter + "gut_" + token + ".xml";
+        const std::string inhalt = plan.doctype ? comdare::ci_wachen::werkbank::xml_doctype_einzelbindestrich(token)
+                                                : comdare::ci_wachen::werkbank::xml_wohlgeformt(token);
         ASSERT_TRUE(repo.schreibe_und_verfolge(name, inhalt));
-        ASSERT_TRUE(repo.ist_verfolgt(name));  // Gegenprobe: sie liegt WIRKLICH im Index
+        ASSERT_TRUE(repo.ist_verfolgt(name)); // Gegenprobe: sie liegt WIRKLICH im Index
     }
 
     for (int i = 0; i < kaputte; ++i) {
@@ -296,7 +314,7 @@ void baue(FixtureRepo& repo, Wuerfel& wuerfel, const XmlBauplan& plan, XmlAufbau
             name = std::string("kaputt_") + token + "\nzweite_zeile.xml";
         } else {
             const std::string unter = plan.tief ? ("tief_k" + std::to_string(i) + "/") : std::string();
-            name = unter + "kaputt_" + token + ".xml";
+            name                    = unter + "kaputt_" + token + ".xml";
         }
         const std::string inhalt = (plan.kaputt_art == KaputtArt::Namensraum)
                                        ? comdare::ci_wachen::werkbank::xml_namensraum_fehler(token)
@@ -307,22 +325,22 @@ void baue(FixtureRepo& repo, Wuerfel& wuerfel, const XmlBauplan& plan, XmlAufbau
 
     for (int i = 0; i < plan.ungetrackt_kaputt; ++i) {
         const std::string token = wuerfel.token();
-        const std::string name = "ungetrackt_" + token + ".xml";
+        const std::string name  = "ungetrackt_" + token + ".xml";
         ASSERT_TRUE(repo.schreibe(name, comdare::ci_wachen::werkbank::xml_doppelbindestrich(token)));
         // Gegenprobe: sie ist WIRKLICH ungetrackt -- sonst pruefte der Fall das Gegenteil.
         ASSERT_TRUE(repo.ist_nicht_verfolgt(name));
     }
 
-    aufbau.nenner_soll = gute + kaputte;
+    aufbau.nenner_soll  = gute + kaputte;
     aufbau.kaputte_soll = kaputte;
 
     if (plan.eine_geloescht) {
         const std::string token = wuerfel.token();
-        const std::string name = "nur_im_index_" + token + ".xml";
+        const std::string name  = "nur_im_index_" + token + ".xml";
         ASSERT_TRUE(repo.schreibe_und_verfolge(name, comdare::ci_wachen::werkbank::xml_wohlgeformt(token)));
         ASSERT_TRUE(repo.ist_verfolgt(name));
         ASSERT_TRUE(repo.loesche_aus_arbeitsbaum(name));
-        ASSERT_FALSE(std::filesystem::exists(repo.pfad() / name));  // Gegenprobe
+        ASSERT_FALSE(std::filesystem::exists(repo.pfad() / name)); // Gegenprobe
         aufbau.nenner_soll += 1;
     }
 }
@@ -339,21 +357,21 @@ TEST_P(XmlWacheFall, Fall) {
     RecordProperty("wuerfel_seed", std::to_string(wuerfel.seed()));
 
     FixtureRepo repo;
-    XmlAufbau aufbau;
+    XmlAufbau   aufbau;
     ASSERT_NO_FATAL_FAILURE(baue(repo, wuerfel, fall.bauplan, aufbau));
 
     const EchteGitQuelle git{repo.pfad()};
-    const XmllintParser parser;
+    const XmllintParser  parser;
 
     // FAIL-CLOSED: fehlt xmllint auf dieser Maschine, ist das ein ausdrueckliches SKIP
     // mit Grund -- niemals ein stilles Gruen und niemals ein Fall, der "gefangen" meldet.
     {
         ProzessAuftrag probe;
-        probe.argv = {"xmllint", "--version"};
+        probe.argv                   = {"xmllint", "--version"};
         const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(probe);
         if (ausgang.art == ProzessArt::ExecFehlgeschlagen) {
-            GTEST_SKIP() << "SKIP MIT GRUND: xmllint laeuft auf dieser Maschine nicht ("
-                         << ausgang.beschreibung() << "). Der Fall wird NICHT als bestanden gezaehlt.";
+            GTEST_SKIP() << "SKIP MIT GRUND: xmllint laeuft auf dieser Maschine nicht (" << ausgang.beschreibung()
+                         << "). Der Fall wird NICHT als bestanden gezaehlt.";
         }
     }
 
@@ -367,7 +385,7 @@ TEST_P(XmlWacheFall, Fall) {
         fordere_abbruch(ergebnis, *fall.soll_abbruch);
     } else {
         fordere_kein_abbruch(ergebnis);
-        fordere_nenner(ergebnis, aufbau.nenner_soll);  // Nenner aus dem Wuerfel (T-3)
+        fordere_nenner(ergebnis, aufbau.nenner_soll); // Nenner aus dem Wuerfel (T-3)
         fordere_riss_zahl(ergebnis, static_cast<std::size_t>(aufbau.kaputte_soll));
         if (fall.soll_befund_art.has_value()) {
             for (std::size_t i = 0; i < ergebnis.risse.size(); ++i) {
@@ -387,15 +405,11 @@ TEST_P(XmlWacheFall, Fall) {
         for (const std::string& token : aufbau.tokens_kaputt) fordere_literal(ergebnis, token);
     }
 
-    if (fall.bauplan.eine_geloescht) {
-        EXPECT_EQ(ergebnis.nicht_gelesen, 1) << "Protokoll:\n" << ergebnis.protokoll();
-    }
+    if (fall.bauplan.eine_geloescht) { EXPECT_EQ(ergebnis.nicht_gelesen, 1) << "Protokoll:\n" << ergebnis.protokoll(); }
 }
 
 INSTANTIATE_TEST_SUITE_P(XmlWache, XmlWacheFall, testing::ValuesIn(xml_faelle()),
-                         [](const testing::TestParamInfo<XmlFall>& info) {
-                             return std::string(info.param.name);
-                         });
+                         [](const testing::TestParamInfo<XmlFall>& info) { return std::string(info.param.name); });
 
 // =============================================================================
 // DIE NAHT-FAELLE: Zweige, die die abgeloeste Probe EHRLICH ALS UNGEDECKT MELDEN
@@ -405,8 +419,8 @@ INSTANTIATE_TEST_SUITE_P(XmlWache, XmlWacheFall, testing::ValuesIn(xml_faelle())
 TEST(XmlWacheNaht, F06_ParserFehltIstAbbruchNiemalsGruen) {
     FakeGitQuelle git;
     git.bestand.werkzeug_ok = true;
-    git.bestand.pfade = {"a.xml", "b.xml"};
-    git.wurzel = std::filesystem::temp_directory_path();
+    git.bestand.pfade       = {"a.xml", "b.xml"};
+    git.wurzel              = std::filesystem::temp_directory_path();
 
     // Damit die Wache ueberhaupt bis zum Parser kommt, muessen die Dateien existieren.
     FixtureRepo repo;
@@ -416,7 +430,7 @@ TEST(XmlWacheNaht, F06_ParserFehltIstAbbruchNiemalsGruen) {
     git.wurzel = repo.pfad();
 
     FakeXmlParser parser;
-    parser.vorgabe.art = XmlUrteilArt::ParserNichtVerfuegbar;
+    parser.vorgabe.art               = XmlUrteilArt::ParserNichtVerfuegbar;
     parser.vorgabe.werkzeug_diagnose = "xmllint: ExecFehlgeschlagen bei Ausfuehrung (errno 2)";
 
     const XmlWacheErgebnis ergebnis = pruefe_xml_bestand(git, parser);
@@ -434,9 +448,9 @@ TEST(XmlWacheNaht, GitFehlerIstNichtNullDateien) {
     // greift nicht" und "git ist kaputt" beobachtbar.
     FakeGitQuelle git;
     git.bestand.werkzeug_ok = false;
-    git.bestand.diagnose = "git: Exit(128) | stderr: fatal: not a git repository";
+    git.bestand.diagnose    = "git: Exit(128) | stderr: fatal: not a git repository";
 
-    FakeXmlParser parser;
+    FakeXmlParser          parser;
     const XmlWacheErgebnis ergebnis = pruefe_xml_bestand(git, parser);
 
     fordere_status(ergebnis, WacheStatus::Abbruch);
@@ -450,10 +464,10 @@ TEST(XmlWacheNaht, NennerKommtAusDerAufzaehlungNichtAusDenGelesenenDateien) {
     // Genau diese Verwechslung ist der eingefrorene F9-Defekt.
     FakeGitQuelle git;
     git.bestand.werkzeug_ok = true;
-    git.bestand.pfade = {"gibt_es_nicht_1.xml", "gibt_es_nicht_2.xml", "gibt_es_nicht_3.xml"};
-    git.wurzel = std::filesystem::temp_directory_path() / "comdare_gibt_es_sicher_nicht";
+    git.bestand.pfade       = {"gibt_es_nicht_1.xml", "gibt_es_nicht_2.xml", "gibt_es_nicht_3.xml"};
+    git.wurzel              = std::filesystem::temp_directory_path() / "comdare_gibt_es_sicher_nicht";
 
-    FakeXmlParser parser;
+    FakeXmlParser          parser;
     const XmlWacheErgebnis ergebnis = pruefe_xml_bestand(git, parser);
 
     fordere_status(ergebnis, WacheStatus::Gruen);
@@ -479,8 +493,8 @@ TEST(XmlWacheVollstaendigkeit, JederAbbruchGrundKommtAlsSollVor) {
     // eigene TESTs (sie brauchen Fakes) und werden hier NAMENTLICH mitgezaehlt --
     // eine Abschrift, die bricht, sobald einer der Tests verschwindet: der
     // Nichtfund unten meldet den fehlenden Grund.
-    gefordert.insert(XmlAbbruchGrund::ParserFehlt);        // XmlWacheNaht.F06_...
-    gefordert.insert(XmlAbbruchGrund::GitFehlgeschlagen);  // XmlWacheNaht.GitFehler...
+    gefordert.insert(XmlAbbruchGrund::ParserFehlt);       // XmlWacheNaht.F06_...
+    gefordert.insert(XmlAbbruchGrund::GitFehlgeschlagen); // XmlWacheNaht.GitFehler...
 
     for (const XmlAbbruchGrund grund : comdare::ci_wachen::alle_xml_abbruch_gruende) {
         EXPECT_TRUE(gefordert.count(grund) == 1)
@@ -571,42 +585,35 @@ XmlWacheErgebnis faelschung_m6_falsche_befund_art() {
 }
 
 TEST(XmlWacheSelbstbiss, M1_StatusForderungFaelltAmKeinGitBaumMutanten) {
-    EXPECT_NONFATAL_FAILURE(
-        fordere_status(faelschung_m1_kein_git_zweig_entfernt(), WacheStatus::Abbruch), "ABBRUCH");
+    EXPECT_NONFATAL_FAILURE(fordere_status(faelschung_m1_kein_git_zweig_entfernt(), WacheStatus::Abbruch), "ABBRUCH");
 }
 
 TEST(XmlWacheSelbstbiss, M1_LiteralForderungFaelltAmKeinGitBaumMutanten) {
-    EXPECT_NONFATAL_FAILURE(
-        fordere_literal(faelschung_m1_kein_git_zweig_entfernt(), "kein git-Arbeitsbaum"),
-        "kein git-Arbeitsbaum");
+    EXPECT_NONFATAL_FAILURE(fordere_literal(faelschung_m1_kein_git_zweig_entfernt(), "kein git-Arbeitsbaum"),
+                            "kein git-Arbeitsbaum");
 }
 
 TEST(XmlWacheSelbstbiss, M1_AbbruchGrundForderungFaelltAmKeinGitBaumMutanten) {
-    EXPECT_NONFATAL_FAILURE(
-        fordere_abbruch(faelschung_m1_kein_git_zweig_entfernt(), XmlAbbruchGrund::KeinGitBaum),
-        "KeinGitBaum");
+    EXPECT_NONFATAL_FAILURE(fordere_abbruch(faelschung_m1_kein_git_zweig_entfernt(), XmlAbbruchGrund::KeinGitBaum),
+                            "KeinGitBaum");
 }
 
 TEST(XmlWacheSelbstbiss, M3_NullDateienMutantWirdGetoetet) {
-    EXPECT_NONFATAL_FAILURE(
-        fordere_abbruch(faelschung_m3_null_xml_zweig_entfernt(), XmlAbbruchGrund::NullDateien),
-        "NullDateien");
+    EXPECT_NONFATAL_FAILURE(fordere_abbruch(faelschung_m3_null_xml_zweig_entfernt(), XmlAbbruchGrund::NullDateien),
+                            "NullDateien");
 }
 
 TEST(XmlWacheSelbstbiss, M3_LiteralNullGetrackteFehltAmMutanten) {
-    EXPECT_NONFATAL_FAILURE(
-        fordere_literal(faelschung_m3_null_xml_zweig_entfernt(), "NULL getrackte *.xml gefunden"),
-        "NULL getrackte");
+    EXPECT_NONFATAL_FAILURE(fordere_literal(faelschung_m3_null_xml_zweig_entfernt(), "NULL getrackte *.xml gefunden"),
+                            "NULL getrackte");
 }
 
 TEST(XmlWacheSelbstbiss, M4_FailedZweigMutantWirdGetoetet) {
-    EXPECT_NONFATAL_FAILURE(fordere_status(faelschung_m4_failed_zweig_entfernt(), WacheStatus::Riss),
-                            "RISS");
+    EXPECT_NONFATAL_FAILURE(fordere_status(faelschung_m4_failed_zweig_entfernt(), WacheStatus::Riss), "RISS");
 }
 
 TEST(XmlWacheSelbstbiss, M4_LiteralFAILEDFehltAmMutanten) {
-    EXPECT_NONFATAL_FAILURE(fordere_literal(faelschung_m4_failed_zweig_entfernt(), "FAILED --"),
-                            "FAILED --");
+    EXPECT_NONFATAL_FAILURE(fordere_literal(faelschung_m4_failed_zweig_entfernt(), "FAILED --"), "FAILED --");
 }
 
 TEST(XmlWacheSelbstbiss, M5_StderrRiegelMutantWirdGetoetet) {
@@ -616,8 +623,7 @@ TEST(XmlWacheSelbstbiss, M5_StderrRiegelMutantWirdGetoetet) {
 }
 
 TEST(XmlWacheSelbstbiss, M5_LiteralFALSE_GREENFehltAmMutanten) {
-    EXPECT_NONFATAL_FAILURE(fordere_literal(faelschung_m5_stderr_riegel_entfernt(), "FALSE-GREEN"),
-                            "FALSE-GREEN");
+    EXPECT_NONFATAL_FAILURE(fordere_literal(faelschung_m5_stderr_riegel_entfernt(), "FALSE-GREEN"), "FALSE-GREEN");
 }
 
 TEST(XmlWacheSelbstbiss, M6_FalscheBefundArtWirdGetoetet_InShellUnmoeglich) {
@@ -653,7 +659,7 @@ TEST(XmlWacheSelbstbiss, GegenprobeDieHelferSchweigenAmGesundenErgebnis) {
 // =============================================================================
 TEST(ProzessNaht, FehlendesWerkzeugLiefertKEINENExitCode) {
     ProzessAuftrag auftrag;
-    auftrag.argv = {"comdare_dieses_werkzeug_gibt_es_ganz_sicher_nicht_2026"};
+    auftrag.argv                 = {"comdare_dieses_werkzeug_gibt_es_ganz_sicher_nicht_2026"};
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
 
     EXPECT_EQ(ausgang.art, ProzessArt::ExecFehlgeschlagen) << ausgang.beschreibung();
@@ -666,7 +672,7 @@ TEST(ProzessNaht, FehlendesWerkzeugLiefertKEINENExitCode) {
 
 TEST(ProzessNaht, EchterExitCodeKommtDurch) {
     ProzessAuftrag auftrag;
-    auftrag.argv = {"git", "--version"};
+    auftrag.argv                 = {"git", "--version"};
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
     ASSERT_EQ(ausgang.art, ProzessArt::Exit) << ausgang.beschreibung();
     EXPECT_EQ(exit_code(ausgang), std::optional<int>{0});
@@ -677,7 +683,7 @@ TEST(ProzessNaht, StdoutUndStderrWerdenGETRENNTUndVOLLSTAENDIGGelesen) {
     // Kein Deadlock bei viel Ausgabe auf einem der beiden Rohre: die poll-Schleife
     // leert beide. Ohne sie blockierte das Kind beim Schreiben und der Test haenge.
     ProzessAuftrag auftrag;
-    auftrag.argv = {"git", "diese-unterkommandozeile-gibt-es-nicht"};
+    auftrag.argv                 = {"git", "diese-unterkommandozeile-gibt-es-nicht"};
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
     ASSERT_EQ(ausgang.art, ProzessArt::Exit) << ausgang.beschreibung();
     EXPECT_NE(exit_code(ausgang), std::optional<int>{0});
@@ -686,8 +692,8 @@ TEST(ProzessNaht, StdoutUndStderrWerdenGETRENNTUndVOLLSTAENDIGGelesen) {
 
 TEST(ProzessNaht, UnbrauchbaresArbeitsverzeichnisIstExecFehlgeschlagenKeinExit) {
     ProzessAuftrag auftrag;
-    auftrag.argv = {"git", "--version"};
-    auftrag.arbeitsverzeichnis = std::filesystem::temp_directory_path() / "comdare_gibt_es_nicht_2026";
+    auftrag.argv                 = {"git", "--version"};
+    auftrag.arbeitsverzeichnis   = std::filesystem::temp_directory_path() / "comdare_gibt_es_nicht_2026";
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
     EXPECT_EQ(ausgang.art, ProzessArt::ExecFehlgeschlagen) << ausgang.beschreibung();
     EXPECT_EQ(exit_code(ausgang), std::optional<int>{});
@@ -701,18 +707,18 @@ TEST(ProzessNaht, JedeProzessArtHatEineEIGENEUnterscheidbareBeschreibung) {
     // ist genau die Klasse, gegen die dieses Modul gebaut ist.
     ProzessAusgang beendet;
     beendet.werkzeug = "werkzeug";
-    beendet.art = ProzessArt::Exit;
-    beendet.code = 3;
+    beendet.art      = ProzessArt::Exit;
+    beendet.code     = 3;
 
     ProzessAusgang gestorben;
     gestorben.werkzeug = "werkzeug";
-    gestorben.art = ProzessArt::Signal;
-    gestorben.code = 9;
+    gestorben.art      = ProzessArt::Signal;
+    gestorben.code     = 9;
 
     ProzessAusgang nie_gelaufen;
     nie_gelaufen.werkzeug = "werkzeug";
-    nie_gelaufen.art = ProzessArt::ExecFehlgeschlagen;
-    nie_gelaufen.code = 2;
+    nie_gelaufen.art      = ProzessArt::ExecFehlgeschlagen;
+    nie_gelaufen.code     = 2;
 
     EXPECT_THAT(beendet.beschreibung(), HasSubstr("Exit(3)"));
     EXPECT_THAT(gestorben.beschreibung(), HasSubstr("Signal(9)"));
@@ -739,7 +745,7 @@ TEST(ProzessNaht, SelbstbissEinWerkzeugAusfallDarfKEINEMSollCodeGleichen) {
     // 127 aus einem Shim erfuellte das. Hier faellt jede Gleichsetzung -- unabhaengig
     // davon, welchen Code jemand erwartet haette.
     ProzessAuftrag auftrag;
-    auftrag.argv = {"comdare_dieses_werkzeug_gibt_es_ganz_sicher_nicht_2026"};
+    auftrag.argv                 = {"comdare_dieses_werkzeug_gibt_es_ganz_sicher_nicht_2026"};
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
     for (int code = 0; code <= 130; ++code) {
         ASSERT_NE(exit_code(ausgang), std::optional<int>{code})
@@ -763,13 +769,13 @@ TEST(XmlWacheE2E, GruenerBestandLiefertExit0) {
     const int gute = wuerfel.zahl(2, 5);
     for (int i = 0; i < gute; ++i) {
         const std::string token = wuerfel.token();
-        ASSERT_TRUE(repo.schreibe_und_verfolge("gut_" + token + ".xml",
-                                               comdare::ci_wachen::werkbank::xml_wohlgeformt(token)));
+        ASSERT_TRUE(
+            repo.schreibe_und_verfolge("gut_" + token + ".xml", comdare::ci_wachen::werkbank::xml_wohlgeformt(token)));
     }
 
     ProzessAuftrag auftrag;
-    auftrag.argv = {COMDARE_CI_WACHE_XML_BINARY};
-    auftrag.arbeitsverzeichnis = repo.pfad();
+    auftrag.argv                 = {COMDARE_CI_WACHE_XML_BINARY};
+    auftrag.arbeitsverzeichnis   = repo.pfad();
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
 
     // PFLICHT-RIEGEL VOR JEDEM CODE-VERGLEICH.
@@ -784,18 +790,17 @@ TEST(XmlWacheE2E, KaputterBestandLiefertExit1UndDenDateinamen) {
     FixtureRepo repo;
     ASSERT_TRUE(repo.init());
     const std::string token = wuerfel.token();
-    const std::string name = "kaputt_" + token + ".xml";
-    ASSERT_TRUE(repo.schreibe_und_verfolge(name,
-                                           comdare::ci_wachen::werkbank::xml_doppelbindestrich(token)));
+    const std::string name  = "kaputt_" + token + ".xml";
+    ASSERT_TRUE(repo.schreibe_und_verfolge(name, comdare::ci_wachen::werkbank::xml_doppelbindestrich(token)));
 
     ProzessAuftrag auftrag;
-    auftrag.argv = {COMDARE_CI_WACHE_XML_BINARY};
-    auftrag.arbeitsverzeichnis = repo.pfad();
+    auftrag.argv                 = {COMDARE_CI_WACHE_XML_BINARY};
+    auftrag.arbeitsverzeichnis   = repo.pfad();
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
 
     ASSERT_EQ(ausgang.art, ProzessArt::Exit) << ausgang.beschreibung();
     EXPECT_EQ(exit_code(ausgang), std::optional<int>{1});
-    EXPECT_THAT(ausgang.fehler, HasSubstr(name));       // der GEWUERFELTE Name, woertlich
+    EXPECT_THAT(ausgang.fehler, HasSubstr(name)); // der GEWUERFELTE Name, woertlich
     EXPECT_THAT(ausgang.fehler, HasSubstr("FAILED --"));
 }
 
@@ -803,8 +808,8 @@ TEST(XmlWacheE2E, LeererBestandLiefertExit2NichtExit0) {
     FixtureRepo repo;
     ASSERT_TRUE(repo.init());
     ProzessAuftrag auftrag;
-    auftrag.argv = {COMDARE_CI_WACHE_XML_BINARY};
-    auftrag.arbeitsverzeichnis = repo.pfad();
+    auftrag.argv                 = {COMDARE_CI_WACHE_XML_BINARY};
+    auftrag.arbeitsverzeichnis   = repo.pfad();
     const ProzessAusgang ausgang = comdare::ci_wachen::fuehre_aus(auftrag);
 
     ASSERT_EQ(ausgang.art, ProzessArt::Exit) << ausgang.beschreibung();
@@ -812,6 +817,6 @@ TEST(XmlWacheE2E, LeererBestandLiefertExit2NichtExit0) {
     EXPECT_NE(exit_code(ausgang), std::optional<int>{0}) << "Ein leerer Nenner ist KEIN Gruen.";
     EXPECT_THAT(ausgang.fehler, HasSubstr("NULL getrackte *.xml gefunden"));
 }
-#endif  // COMDARE_CI_WACHE_XML_BINARY
+#endif // COMDARE_CI_WACHE_XML_BINARY
 
-}  // namespace
+} // namespace

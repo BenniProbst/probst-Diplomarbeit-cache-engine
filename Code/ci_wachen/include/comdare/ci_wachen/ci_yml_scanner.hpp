@@ -46,9 +46,9 @@
 namespace comdare::ci_wachen {
 
 struct JobBlock {
-    std::string name;
-    std::size_t erste_zeile = 0;  // 1-basiert, wie ein Editor zaehlt
-    std::vector<std::string> zeilen;  // einschliesslich der Job-Kopfzeile
+    std::string              name;
+    std::size_t              erste_zeile = 0; // 1-basiert, wie ein Editor zaehlt
+    std::vector<std::string> zeilen;          // einschliesslich der Job-Kopfzeile
 };
 
 // Lesen ist fail-closed: eine fehlende oder unlesbare Datei liefert nullopt, nie eine
@@ -56,8 +56,7 @@ struct JobBlock {
 std::optional<std::vector<std::string>> lies_zeilen(const std::filesystem::path& datei);
 
 // Der Block eines Jobs. nullopt = der Job existiert nicht (nicht: er ist leer).
-std::optional<JobBlock> finde_job_block(const std::vector<std::string>& zeilen,
-                                        const std::string& jobname);
+std::optional<JobBlock> finde_job_block(const std::vector<std::string>& zeilen, const std::string& jobname);
 
 // Zaehlt Vorkommen eines Literals in NICHT-Kommentarzeilen. Fuehrende Leerzeichen
 // zaehlen nicht als Inhalt; entscheidend ist das erste Nicht-Leerzeichen.
@@ -69,6 +68,6 @@ std::size_t zaehle_roh(const std::vector<std::string>& zeilen, std::string_view 
 
 bool ist_kommentarzeile(std::string_view zeile);
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
 
-#endif  // COMDARE_CI_WACHEN_CI_YML_SCANNER_HPP
+#endif // COMDARE_CI_WACHEN_CI_YML_SCANNER_HPP

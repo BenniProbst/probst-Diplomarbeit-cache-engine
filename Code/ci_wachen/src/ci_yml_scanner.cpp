@@ -15,7 +15,7 @@ bool beginnt_in_spalte_null(std::string_view zeile) {
 std::size_t zaehle(std::string_view heuhaufen, std::string_view nadel) {
     if (nadel.empty()) return 0;
     std::size_t treffer = 0;
-    std::size_t i = heuhaufen.find(nadel);
+    std::size_t i       = heuhaufen.find(nadel);
     while (i != std::string_view::npos) {
         ++treffer;
         i = heuhaufen.find(nadel, i + nadel.size());
@@ -23,7 +23,7 @@ std::size_t zaehle(std::string_view heuhaufen, std::string_view nadel) {
     return treffer;
 }
 
-}  // namespace
+} // namespace
 
 bool ist_kommentarzeile(std::string_view zeile) {
     std::size_t i = 0;
@@ -33,9 +33,9 @@ bool ist_kommentarzeile(std::string_view zeile) {
 
 std::optional<std::vector<std::string>> lies_zeilen(const std::filesystem::path& datei) {
     std::ifstream strom(datei, std::ios::binary);
-    if (!strom) return std::nullopt;  // fail-closed: kein leerer Vektor als Ersatz
+    if (!strom) return std::nullopt; // fail-closed: kein leerer Vektor als Ersatz
     std::vector<std::string> zeilen;
-    std::string zeile;
+    std::string              zeile;
     while (std::getline(strom, zeile)) {
         if (!zeile.empty() && zeile.back() == '\r') zeile.pop_back();
         zeilen.push_back(zeile);
@@ -44,11 +44,10 @@ std::optional<std::vector<std::string>> lies_zeilen(const std::filesystem::path&
     return zeilen;
 }
 
-std::optional<JobBlock> finde_job_block(const std::vector<std::string>& zeilen,
-                                        const std::string& jobname) {
+std::optional<JobBlock> finde_job_block(const std::vector<std::string>& zeilen, const std::string& jobname) {
     JobBlock block;
     block.name = jobname;
-    bool drin = false;
+    bool drin  = false;
     for (std::size_t i = 0; i < zeilen.size(); ++i) {
         const std::string& zeile = zeilen[i];
         if (!drin) {
@@ -56,7 +55,7 @@ std::optional<JobBlock> finde_job_block(const std::vector<std::string>& zeilen,
             // Kopfzeile mit angehaengtem Kommentar gilt bewusst NICHT als Treffer --
             // sonst wuerde ein Fund vorgetaeuscht, wo die Struktur eine andere ist.
             if (zeile == jobname) {
-                drin = true;
+                drin              = true;
                 block.erste_zeile = i + 1;
                 block.zeilen.push_back(zeile);
             }
@@ -73,7 +72,7 @@ std::optional<JobBlock> finde_job_block(const std::vector<std::string>& zeilen,
 std::size_t zaehle_wirksam(const std::vector<std::string>& zeilen, std::string_view literal) {
     std::size_t treffer = 0;
     for (const std::string& zeile : zeilen) {
-        if (ist_kommentarzeile(zeile)) continue;  // Text ist keine Ausfuehrung
+        if (ist_kommentarzeile(zeile)) continue; // Text ist keine Ausfuehrung
         treffer += zaehle(zeile, literal);
     }
     return treffer;
@@ -85,4 +84,4 @@ std::size_t zaehle_roh(const std::vector<std::string>& zeilen, std::string_view 
     return treffer;
 }
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen

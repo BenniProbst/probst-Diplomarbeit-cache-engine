@@ -35,10 +35,9 @@ int main(int argc, char** argv) {
         return comdare::ci_wachen::exit_code_von(comdare::ci_wachen::WacheStatus::Abbruch);
     }
 
-    const comdare::ci_wachen::EchteGitQuelle git{std::filesystem::current_path()};
-    const comdare::ci_wachen::XmllintParser parser;
-    const comdare::ci_wachen::XmlWacheErgebnis ergebnis =
-        comdare::ci_wachen::pruefe_xml_bestand(git, parser);
+    const comdare::ci_wachen::EchteGitQuelle   git{std::filesystem::current_path()};
+    const comdare::ci_wachen::XmllintParser    parser;
+    const comdare::ci_wachen::XmlWacheErgebnis ergebnis = comdare::ci_wachen::pruefe_xml_bestand(git, parser);
 
     const std::string protokoll = ergebnis.protokoll();
     if (ergebnis.status == comdare::ci_wachen::WacheStatus::Gruen) {

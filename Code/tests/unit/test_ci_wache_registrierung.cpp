@@ -176,8 +176,8 @@ TEST(CiYmlAbnahme, DieDateiIstUeberhauptDaUndNichtLeer) {
 // umstellt.
 struct WachenAufruf {
     const char* job;
-    const char* aufruf;             // das Literal, das die Wache wirklich startet
-    const char* pflicht_argumente;  // leer = keine Argument-Forderung
+    const char* aufruf;            // das Literal, das die Wache wirklich startet
+    const char* pflicht_argumente; // leer = keine Argument-Forderung
 };
 
 const std::vector<WachenAufruf>& aufrufstellen() {
@@ -240,10 +240,8 @@ TEST(CiYmlAbnahme, DieUnitSuiteLaeuftInBEIDENStufenUndOhneAllowFailure) {
     ASSERT_FALSE(ci_yml().empty());
     for (const char* job : {"test:unit:", "test:unit:debug:"}) {
         const std::optional<JobBlock> block = finde_job_block(ci_yml(), job);
-        ASSERT_TRUE(block.has_value())
-            << "Job '" << job << "' fehlt -- die Suite liefe nicht in beiden Stufen.";
-        EXPECT_EQ(zaehle_wirksam(block->zeilen, "allow_failure"), 0u)
-            << "Job '" << job << "' traegt allow_failure.";
+        ASSERT_TRUE(block.has_value()) << "Job '" << job << "' fehlt -- die Suite liefe nicht in beiden Stufen.";
+        EXPECT_EQ(zaehle_wirksam(block->zeilen, "allow_failure"), 0u) << "Job '" << job << "' traegt allow_failure.";
     }
 
     const std::optional<JobBlock> debug = finde_job_block(ci_yml(), "test:unit:debug:");
@@ -260,7 +258,7 @@ TEST(CiYmlAbnahme, DieUnitSuiteLaeuftInBEIDENStufenUndOhneAllowFailure) {
     EXPECT_GE(zaehle_wirksam(debug->zeilen, "Code/build-test-debug"), 1u);
 }
 
-#endif  // COMDARE_CI_YML_PFAD
+#endif // COMDARE_CI_YML_PFAD
 
 // =============================================================================
 // TEIL 3 -- ABSCHRIFT SCHLAEGT LOESCHUNG.
@@ -272,7 +270,7 @@ TEST(CiYmlAbnahme, DieUnitSuiteLaeuftInBEIDENStufenUndOhneAllowFailure) {
 #ifdef COMDARE_REPO_WURZEL
 struct AbgeloesteDatei {
     const char* pfad;
-    const char* verweis;  // der Nachfolger, der im Kopf stehen MUSS
+    const char* verweis; // der Nachfolger, der im Kopf stehen MUSS
 };
 
 const std::vector<AbgeloesteDatei>& abgeloeste_dateien() {
@@ -288,8 +286,8 @@ const std::vector<AbgeloesteDatei>& abgeloeste_dateien() {
 class AbgeloestTest : public testing::TestWithParam<AbgeloesteDatei> {};
 
 TEST_P(AbgeloestTest, KopfNenntAbloesungUndNachfolger) {
-    const AbgeloesteDatei& datei = GetParam();
-    const std::filesystem::path voll = std::filesystem::path(COMDARE_REPO_WURZEL) / datei.pfad;
+    const AbgeloesteDatei&      datei = GetParam();
+    const std::filesystem::path voll  = std::filesystem::path(COMDARE_REPO_WURZEL) / datei.pfad;
 
     const std::optional<std::vector<std::string>> zeilen = lies_zeilen(voll);
     // FAIL-CLOSED: fehlt die Datei, ist das ROT. Sie wurde ausdruecklich NICHT geloescht;
@@ -299,7 +297,7 @@ TEST_P(AbgeloestTest, KopfNenntAbloesungUndNachfolger) {
     ASSERT_FALSE(zeilen->empty());
 
     // Nur der Kopf zaehlt: die Kennzeichnung muss lesen, wer die Datei oeffnet.
-    const std::size_t kopf = std::min<std::size_t>(zeilen->size(), 40);
+    const std::size_t              kopf = std::min<std::size_t>(zeilen->size(), 40);
     const std::vector<std::string> kopfzeilen(zeilen->begin(), zeilen->begin() + kopf);
 
     EXPECT_GE(zaehle_roh(kopfzeilen, "ABGELOEST"), 1u)
@@ -311,8 +309,7 @@ TEST_P(AbgeloestTest, KopfNenntAbloesungUndNachfolger) {
     RecordProperty("datei_zeilen", std::to_string(zeilen->size()));
 }
 
-INSTANTIATE_TEST_SUITE_P(AbschriftStattLoeschung, AbgeloestTest,
-                         testing::ValuesIn(abgeloeste_dateien()),
+INSTANTIATE_TEST_SUITE_P(AbschriftStattLoeschung, AbgeloestTest, testing::ValuesIn(abgeloeste_dateien()),
                          [](const testing::TestParamInfo<AbgeloesteDatei>& info) {
                              std::string name(info.param.pfad);
                              for (char& c : name) {
@@ -323,9 +320,8 @@ INSTANTIATE_TEST_SUITE_P(AbschriftStattLoeschung, AbgeloestTest,
 
 TEST(AbschriftStattLoeschung, DerNennerStehtDabei) {
     // Eine Zahl ohne Grundgesamtheit ist keine Aussage.
-    EXPECT_EQ(abgeloeste_dateien().size(), 4u)
-        << "Vier Shell-Dateien werden abgeloest: 2 Wachen + 2 Proben.";
+    EXPECT_EQ(abgeloeste_dateien().size(), 4u) << "Vier Shell-Dateien werden abgeloest: 2 Wachen + 2 Proben.";
 }
-#endif  // COMDARE_REPO_WURZEL
+#endif // COMDARE_REPO_WURZEL
 
-}  // namespace
+} // namespace

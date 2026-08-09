@@ -32,9 +32,9 @@
 namespace comdare::ci_wachen {
 
 enum class WacheStatus {
-    Gruen,    // die Zusicherung haelt              -> Exit 0
-    Riss,     // die Zusicherung ist VERLETZT       -> Exit 1
-    Abbruch,  // die Wache konnte nicht pruefen     -> Exit 2 (ausdruecklich KEIN Gruen)
+    Gruen,   // die Zusicherung haelt              -> Exit 0
+    Riss,    // die Zusicherung ist VERLETZT       -> Exit 1
+    Abbruch, // die Wache konnte nicht pruefen     -> Exit 2 (ausdruecklich KEIN Gruen)
 };
 
 // Die einzige Stelle, an der aus einem Status wieder eine Zahl wird. Sie steht hier und
@@ -42,11 +42,11 @@ enum class WacheStatus {
 // koennen -- eine Abschrift ist eine Gelegenheit zur Divergenz.
 constexpr int exit_code_von(WacheStatus status) {
     switch (status) {
-        case WacheStatus::Gruen:   return 0;
-        case WacheStatus::Riss:    return 1;
+        case WacheStatus::Gruen: return 0;
+        case WacheStatus::Riss: return 1;
         case WacheStatus::Abbruch: return 2;
     }
-    return 2;  // fail-closed: ein unbekannter Status ist ein Abbruch, nie ein Gruen
+    return 2; // fail-closed: ein unbekannter Status ist ein Abbruch, nie ein Gruen
 }
 
 std::string status_text(WacheStatus status);
@@ -54,9 +54,7 @@ std::string status_text(WacheStatus status);
 // Damit ein fehlgeschlagenes EXPECT_EQ den NAMEN druckt und nicht eine nackte Zahl.
 // Eine Zahl ohne Bedeutung war der Defekt, den dieses Modul ersetzt -- er darf auch in
 // der Fehlermeldung nicht zurueckkommen.
-inline std::ostream& operator<<(std::ostream& strom, WacheStatus status) {
-    return strom << status_text(status);
-}
+inline std::ostream& operator<<(std::ostream& strom, WacheStatus status) { return strom << status_text(status); }
 
 // Vollstaendigkeits-Tabelle (T-4/Stufe 1). Der static_assert reisst, sobald jemand einen
 // vierten Status einfuehrt, ohne die Fall-Tabellen der Tests nachzuziehen.
@@ -74,6 +72,6 @@ static_assert(exit_code_von(WacheStatus::Gruen) == 0, "CI-Vertrag: Gruen ist Exi
 static_assert(exit_code_von(WacheStatus::Riss) == 1, "CI-Vertrag: Riss ist Exit 1.");
 static_assert(exit_code_von(WacheStatus::Abbruch) == 2, "CI-Vertrag: Abbruch ist Exit 2.");
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
 
-#endif  // COMDARE_CI_WACHEN_ERGEBNIS_HPP
+#endif // COMDARE_CI_WACHEN_ERGEBNIS_HPP

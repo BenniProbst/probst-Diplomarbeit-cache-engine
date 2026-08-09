@@ -7,8 +7,8 @@ namespace comdare::ci_wachen {
 
 std::string riss_text(ParityRissArt art) {
     switch (art) {
-        case ParityRissArt::GitlinkFehlt:     return "GitlinkFehlt";
-        case ParityRissArt::Divergenz:        return "Divergenz";
+        case ParityRissArt::GitlinkFehlt: return "GitlinkFehlt";
+        case ParityRissArt::Divergenz: return "Divergenz";
         case ParityRissArt::ErwartetVerfehlt: return "ErwartetVerfehlt";
     }
     return "UNBEKANNT";
@@ -16,9 +16,9 @@ std::string riss_text(ParityRissArt art) {
 
 std::string abbruch_text(ParityAbbruchGrund grund) {
     switch (grund) {
-        case ParityAbbruchGrund::KeinRepo:          return "KeinRepo";
+        case ParityAbbruchGrund::KeinRepo: return "KeinRepo";
         case ParityAbbruchGrund::GitFehlgeschlagen: return "GitFehlgeschlagen";
-        case ParityAbbruchGrund::Bedienfehler:      return "Bedienfehler";
+        case ParityAbbruchGrund::Bedienfehler: return "Bedienfehler";
     }
     return "UNBEKANNT";
 }
@@ -58,7 +58,7 @@ ParityArgumente parse_parity_argumente(const std::vector<std::string>& argumente
             ergebnis.erwartet = argumente[++i];
         } else if (arg == "-h" || arg == "--hilfe" || arg == "--help") {
             ergebnis.hilfe_gewuenscht = true;
-            ergebnis.ok = true;
+            ergebnis.ok               = true;
             return ergebnis;
         } else {
             ergebnis.fehler = "FEHLER: unbekannte Option '" + arg + "'";
@@ -69,33 +69,32 @@ ParityArgumente parse_parity_argumente(const std::vector<std::string>& argumente
     return ergebnis;
 }
 
-ParityErgebnis pruefe_gitlink_paritaet(const GitQuelle& git, GitlinkQuelle quelle,
-                                       const std::string& erwartet) {
+ParityErgebnis pruefe_gitlink_paritaet(const GitQuelle& git, GitlinkQuelle quelle, const std::string& erwartet) {
     ParityErgebnis ergebnis;
-    ergebnis.quelle = quelle;
+    ergebnis.quelle   = quelle;
     ergebnis.erwartet = erwartet;
 
     if (!git.ist_arbeitsbaum()) {
-        ergebnis.status = WacheStatus::Abbruch;
+        ergebnis.status  = WacheStatus::Abbruch;
         ergebnis.abbruch = ParityAbbruchGrund::KeinRepo;
         return ergebnis;
     }
 
     const GitlinkAntwort a = git.gitlink(PFAD_LEBEND, quelle);
     const GitlinkAntwort b = git.gitlink(PFAD_TOT, quelle);
-    ergebnis.nenner = 2;  // der Nenner steht IMMER dabei, auch wenn er konstant ist
+    ergebnis.nenner        = 2; // der Nenner steht IMMER dabei, auch wenn er konstant ist
 
     if (!a.werkzeug_ok || !b.werkzeug_ok) {
         // git-Fehler sind fatal, nie eine stille Null. In der Shell-Fassung hing das an
         // der Abwesenheit eines `|| true`; hier ist es ein eigener Zustand.
-        ergebnis.status = WacheStatus::Abbruch;
-        ergebnis.abbruch = ParityAbbruchGrund::GitFehlgeschlagen;
+        ergebnis.status         = WacheStatus::Abbruch;
+        ergebnis.abbruch        = ParityAbbruchGrund::GitFehlgeschlagen;
         ergebnis.abbruch_detail = a.werkzeug_ok ? b.diagnose : a.diagnose;
         return ergebnis;
     }
 
     ergebnis.sha_lebend = a.ist_gitlink() ? a.objekt : std::string();
-    ergebnis.sha_tot = b.ist_gitlink() ? b.objekt : std::string();
+    ergebnis.sha_tot    = b.ist_gitlink() ? b.objekt : std::string();
 
     // FAIL-CLOSED IST DER KERN: ein fehlender Pfad ist ein FEHLER, kein Freifahrtschein.
     // Waere er einer, koennte jede Umbenennung eines der beiden Gitlinks die Wache still
@@ -104,19 +103,19 @@ ParityErgebnis pruefe_gitlink_paritaet(const GitQuelle& git, GitlinkQuelle quell
     if (!b.ist_gitlink()) ergebnis.fehlende_pfade.emplace_back(PFAD_TOT);
     if (!ergebnis.fehlende_pfade.empty()) {
         ergebnis.status = WacheStatus::Riss;
-        ergebnis.riss = ParityRissArt::GitlinkFehlt;
+        ergebnis.riss   = ParityRissArt::GitlinkFehlt;
         return ergebnis;
     }
 
     if (ergebnis.sha_lebend != ergebnis.sha_tot) {
         ergebnis.status = WacheStatus::Riss;
-        ergebnis.riss = ParityRissArt::Divergenz;
+        ergebnis.riss   = ParityRissArt::Divergenz;
         return ergebnis;
     }
 
     if (!erwartet.empty() && ergebnis.sha_lebend != erwartet) {
         ergebnis.status = WacheStatus::Riss;
-        ergebnis.riss = ParityRissArt::ErwartetVerfehlt;
+        ergebnis.riss   = ParityRissArt::ErwartetVerfehlt;
         return ergebnis;
     }
 
@@ -126,19 +125,15 @@ ParityErgebnis pruefe_gitlink_paritaet(const GitQuelle& git, GitlinkQuelle quell
 
 std::string ParityErgebnis::protokoll() const {
     const std::string q = quelle_text(quelle);
-    std::string text;
+    std::string       text;
 
     if (abbruch.has_value()) {
         switch (*abbruch) {
-            case ParityAbbruchGrund::KeinRepo:
-                text += "FEHLER: kein git-Repository\n";
-                break;
+            case ParityAbbruchGrund::KeinRepo: text += "FEHLER: kein git-Repository\n"; break;
             case ParityAbbruchGrund::GitFehlgeschlagen:
                 text += "FEHLER: git hat die Gitlink-Abfrage nicht beantwortet (Quelle '" + q + "').\n";
                 break;
-            case ParityAbbruchGrund::Bedienfehler:
-                text += "FEHLER: Bedienfehler\n";
-                break;
+            case ParityAbbruchGrund::Bedienfehler: text += "FEHLER: Bedienfehler\n"; break;
         }
         if (!abbruch_detail.empty()) text += "  Diagnose: " + abbruch_detail + "\n";
         text += "NENNER: " + std::to_string(nenner) + " Gitlink-Pfade vorgesehen, 0 beurteilt.\n";
@@ -182,4 +177,4 @@ std::string ParityErgebnis::protokoll() const {
     return text;
 }
 
-}  // namespace comdare::ci_wachen
+} // namespace comdare::ci_wachen
