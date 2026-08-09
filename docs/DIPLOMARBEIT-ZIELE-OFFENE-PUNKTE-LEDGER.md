@@ -16,6 +16,43 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (spät) — DER WELLENPLAN STEHT. Nur die Streichliste ist aufgehoben.
+
+**Owner wörtlich, unmittelbar nach der Inventur der gefallenen Punkte:**
+
+> „Korrekt, **der Wellenplan steht und gilt**, er wird **höchstens durch mich geschärft**, aber das
+> **Fundament bleibt stehen**."
+
+### Warum dieser Satz nötig war — der Fehlschluss, der nahegelegen hätte
+
+Die Inventur hat sechs erfundene oder ungedeckte Streichungen gefunden, darunter zwei
+(`checkpoint_measure`, F-07b), die gegen echte Owner-KERNe standen. **Daraus ließe sich fälschlich
+schließen, der Plan sei insgesamt unzuverlässig** — und die Arbeit von zwei Tagen wäre entwertet.
+
+**Das ist ausdrücklich nicht der Fall.** Was fällt, ist **allein die Streichliste** (Abschnitt 7 und
+die Streichkaskade). Was steht:
+
+- die **Wellen** W-1 … W5 mit ihren Fenstern und Freitags-Lieferungen
+- die **Reihenfolge-Zwänge** (D1e vor D1b · D3-7 vor allen D3-Gates · D4a/b vor D4c · D5-1 vor jedem
+  ernsten Messwert · HY-A → HY-B → HY-C)
+- der **Verifikationsvertrag** V-1 … V-8 und der **TDD-Vertrag** T-1 … T-9
+- die **Abnahme-Regel** („was erzwingt das Halten?" — Werkzeug oder ausdrücklich ungedeckt)
+- die **fünf Prüfungen**, der **Stellvertreter**-Begriff, die **Nenner**-Pflicht
+- der **kritische Pfad** und die **Kapazitätsrechnung** — Letztere allerdings unter der neuen
+  Prämisse „24 Stunden je Tag" statt der alten Werktags-Rechnung
+
+### Die Zuständigkeit, klar geschnitten
+
+> **Der Plan wird geschärft — vom Owner. Nicht vom Lead, und nicht durch Streichen.**
+
+Der Lead darf am Plan **messen**, **Widersprüche benennen** und **Vorlagen machen**. Er darf ihn
+nicht durch eigene Entscheide verkürzen. Genau diese Grenze war bei `checkpoint_measure` und F-07b
+überschritten: aus einer Vorlage („soll das fallen?") wurde ohne Antwort ein Vollzug („OV-x
+bestätigt").
+
+**Praktische Regel daraus:** ein Posten verlässt den Plan nur mit einem **zitierbaren Owner-Satz zum
+Gegenstand** — nicht mit einer OV-Nummer, nicht mit einer Empfehlung, nicht mit Zeitdruck.
+Andernfalls bleibt er Bau-Posten, auch wenn er heute nicht bearbeitet wird.
 ## 09.08.2026 (spät) — DIE INVENTUR DER GEFALLENEN PUNKTE: „wir streichen nichts" + F-07b
 
 **Zweistufiger Explore auf Owner-Auftrag** („nenne mir ALLE gefallenen Punkte … RATE NIE"): Erhebung
