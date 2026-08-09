@@ -103,11 +103,21 @@
 #     tatsaechlich vor der vollen einsortiert -- das haengt an den realen
 #     Permutationsnamen. Bewiesen ist: WENN sie vorne liegt, ueberlebt der
 #     Messwert. Der umgekehrte Fall (volle Datei zuerst) war nie defekt.
-#   - DIE ZWILLINGE IN DER .gitlab-ci.yml SIND UNGEDECKT. Dieselbe Header-Logik
-#     steht dort ein zweites und drittes Mal (Jobs measure:smoke und measure,
-#     :1160 und :1265) -- dort sogar ohne 'awk 1'. Diese Probe fasst nur den
-#     Kern an; die Datei gehoert in diesem Paket einem anderen Strang. Solange
-#     die Zwillinge leben, gilt die Heilung NUR fuer den Anhang-Kanal.
+#   - DIE ZWILLINGE IN DER .gitlab-ci.yml SIND SEIT P4c (09.08.2026) GEDECKT --
+#     aber ueber die VEREINIGUNG, nicht ueber einen Lauf. Die Aggregation stand
+#     dreimal (Kern, Job measure:smoke, Job measure:golden-320); jetzt steht sie
+#     einmal in ci/wide_aggregat.sh, und alle drei rufen sie. Die Mutanten
+#     N2/N3/N5 greifen dort an und decken damit alle drei Aufrufer.
+#     WAS DAMIT NICHT bewiesen ist: dass die measure-JOBS laufen. Sie sind
+#     inert-by-default und mehrtaegig; diese Probe faehrt sie nicht. Bewiesen
+#     ist, dass sie auf dieselbe geprueft Stelle zeigen (Fall A11) und dass
+#     diese Stelle haelt (A1-A10, N1-N6). Der Sprung von "zeigt darauf" zu
+#     "tut es im Job" bleibt eine Text-Aussage ueber die YAML-Struktur.
+#   - DIE ZEILENANKER IN DIESER DATEI SIND GEWANDERT. Die Zwillinge standen am
+#     08.08. auf :1027/:1122, spaeter auf :1163/:1268, am 09.08. auf :1234/:1358.
+#     Deshalb nennt A11 keine Zeilennummern mehr, sondern die JOB-NAMEN und
+#     zaehlt je Block: ein Anker, der driftet, ist keine Wache, sondern eine
+#     stille Null in Wartestellung.
 #
 # POSIX-sh (die CI ruft `sh`, das ist hier dash), ASCII-only, kein Python.
 # Der Pruefling selbst ist bash (Prozess-Substitution) und wird deshalb
@@ -119,6 +129,12 @@ set -eu
 SELBST_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$SELBST_DIR/../.." && pwd)
 KERN="${COMDARE_ANHANG_KERN:-$REPO/ci/anhang_forward_core.sh}"
+# DER ZWEITE PRUEFLING (P4c, 2026-08-09): seit die WIDE-Konkatenation aus dem
+# Kern UND aus den beiden measure-Jobs der .gitlab-ci.yml in EINE Datei gezogen
+# ist, prueft diese Probe zwei Dateien statt einer -- und deckt damit alle DREI
+# Aufrufer. Die Mutanten N2/N3/N5 greifen ab jetzt hier an; N1/N4/N6 bleiben am
+# Kern, weil Selektor, Nenner-Zeile und Leerheits-URTEIL dort geblieben sind.
+AGGREGAT="${COMDARE_WIDE_AGGREGAT:-$REPO/ci/wide_aggregat.sh}"
 CI_YML="$REPO/.gitlab-ci.yml"
 
 MODUS="${1:-}"
@@ -129,6 +145,12 @@ esac
 
 if [ ! -f "$KERN" ]; then
     echo "ABBRUCH: Pruefling '$KERN' nicht gefunden -- die Probe konnte nicht pruefen." >&2
+    exit 2
+fi
+if [ ! -f "$AGGREGAT" ]; then
+    echo "ABBRUCH: Pruefling '$AGGREGAT' nicht gefunden -- die Probe konnte nicht pruefen." >&2
+    echo "         Ohne den gemeinsamen Aggregator waere ein Gruen hier eine Luege: die" >&2
+    echo "         beiden measure-Jobs der .gitlab-ci.yml haengen an derselben Datei." >&2
     exit 2
 fi
 
@@ -233,6 +255,7 @@ kanal() {             # $1 = AF_CORPUS_ROOT (relativ zu ARBEIT)
     AF_CORPUS_ROOT="$1" \
     AF_ARTIFACT_ROOTS="artefaktwurzel_gibt_es_in_dieser_probe_nicht" \
     AF_GENERATOR="$GEN" \
+    AF_WIDE_AGGREGAT="$AGGREGAT" \
     AF_NO_PUSH=true \
     AF_PDF_GATE=off \
     AF_TMP="$WERK/tmp_$N_FALL" \
@@ -526,6 +549,71 @@ fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$BAS
 fall_ende
 
 # =============================================================================
+# A11 KEIN VIERTER ZWILLING (P4c, 2026-08-09).
+#     Die Mutanten N2/N3/N5 decken die beiden measure-Jobs NUR, solange die dort
+#     keine eigene Kopie mehr tragen. Kaeme eine zurueck -- durch ein Zurueck-
+#     Inlinen "damit der Job ohne die Datei laeuft" --, waere sie sofort wieder
+#     ungedeckt, und die Probe bliebe gruen. GENAU DAS war der Zustand vor
+#     diesem Paket. Der Fall haelt die Vereinigung fest.
+#     ER PRUEFT ZWEI RICHTUNGEN, weil eine allein nicht reicht:
+#       (a) BEIDE Job-Bloecke rufen ci/wide_aggregat.sh. Gezaehlt wird je Block,
+#           nicht ueber die ganze Datei -- eine Datei-weite Zahl von 2 waere auch
+#           dann erfuellt, wenn beide Aufrufe in EINEM Job staenden.
+#       (b) Die Inline-Konkatenation ist in der ganzen Datei VERSCHWUNDEN.
+#     ZUR NULL AUS (b) GEHOERT EIN KOEDER: /usr/bin/grep ist hier ugrep, und
+#     eine Null ohne beissenden Koeder kann auch Werkzeug-Versagen sein.
+#     WAS ER NICHT PRUEFT, ausdruecklich: ob die Job-Bloecke inhaltlich richtig
+#     sind. Das ist eine Text-Wache ueber die STRUKTUR, kein Lauf der Jobs --
+#     die measure-Jobs sind inert-by-default und mehrtaegig, ein Lauf ist hier
+#     nicht zu haben. Bewiesen wird: es gibt genau eine Stelle, und beide Jobs
+#     zeigen darauf. Dass die eine Stelle stimmt, beweisen A1-A10.
+# =============================================================================
+fall "A11 beide measure-Jobs rufen den EINEN Aggregator, kein Inline-Zwilling" 0
+KOEDER_A11="$WERK/koeder_a11"
+K11=$(token)
+N_KOEDER11=2
+: > "$KOEDER_A11"
+_i=1
+while [ "$_i" -le "$N_KOEDER11" ]; do
+    printf 'zeile %s: tail -n +2 "$rc" | awk 1 >> "$WIDE"  # marker_%s\n' "$_i" "$K11" >> "$KOEDER_A11"
+    _i=$((_i + 1))
+done
+N_BISS11=$(grep -cF 'awk 1 >> "$WIDE"' "$KOEDER_A11" || true)
+if [ "$N_BISS11" -ne "$N_KOEDER11" ]; then
+    echo "ABBRUCH: der Koeder von A11 biss nicht -- grep fand $N_BISS11 von $N_KOEDER11." >&2
+    echo "         Ohne beissenden Koeder ist die Null an .gitlab-ci.yml wertlos." >&2
+    exit 2
+fi
+echo "        Koeder biss: $N_BISS11 von $N_KOEDER11 Inline-Konkatenationen gefunden (grep -cF)."
+if [ -f "$CI_YML" ]; then
+    # (a) je Job-Block zaehlen. Der Block reicht vom Job-Namen (Spalte 1) bis zum
+    #     naechsten Schluessel in Spalte 1 -- das ist die YAML-Struktur selbst.
+    for _job in measure:smoke measure:golden-320; do
+        _n=$(awk -v job="$_job" '
+            $0 == job ":" { drin = 1; next }
+            drin && /^[^ #]/ { drin = 0 }
+            drin && index($0, "sh ../ci/wide_aggregat.sh") > 0 { n++ }
+            END { print n + 0 }' "$CI_YML")
+        if [ "$_n" -lt 1 ]; then
+            reiss "Job '$_job' ruft ci/wide_aggregat.sh nicht ($_n Aufrufe im Block)"
+        else
+            echo "        $_job: $_n Aufruf(e) von ci/wide_aggregat.sh im Job-Block."
+        fi
+    done
+    # (b) kein Inline-Zwilling mehr in der GANZEN Datei.
+    N_INLINE=$(grep -cF 'awk 1 >> "$WIDE"' "$CI_YML" || true)
+    if [ "$N_INLINE" -ne 0 ]; then
+        reiss "die .gitlab-ci.yml traegt wieder $N_INLINE Inline-Konkatenation(en) --"
+        echo "        damit ist diese Stelle wieder ungedeckt (N2/N3/N5 fassen sie nicht an)."
+    else
+        echo "        Inline-Konkatenationen in .gitlab-ci.yml: 0 (Koeder-geprueft)."
+    fi
+else
+    reiss ".gitlab-ci.yml nicht gefunden unter $CI_YML"
+fi
+fall_ende
+
+# =============================================================================
 # A7  REGISTRIERUNG (T-7). Ein Test, der in keinem CI-Job faehrt, ist NICHT
 #     gebaut. In diesem Projekt wurde bereits eine Wache gebaut, die nirgends
 #     aufgerufen wurde -- deshalb ist das hier ein HARTER Fall und keine
@@ -626,12 +714,24 @@ if [ "$MODUS" = --selbstbiss ]; then
     MUT_DIR="$WERK/mutanten"; mkdir -p "$MUT_DIR"
     N_MUT=0; N_GEBISSEN=0
 
+    # DAS MUTATIONS-ZIEL ($5) IST SEIT P4c EIN PARAMETER, kein zweiter Funktions-
+    # Zwilling: die WIDE-Konkatenation ist aus dem Kern in ci/wide_aggregat.sh
+    # gewandert, und dieselbe Maschinerie muss beide Dateien mutieren koennen.
+    # Eine zweite Kopie dieser Funktion waere genau der Fehler gewesen, gegen den
+    # dieses Paket gebaut ist -- drei Kopien einer Logik, von denen eine gedeckt ist.
     mutant() {        # $1 = Name, $2 = Beschreibung, $3 = sed-Ausdruck,
-                      # $4 = erwartete Zahl geaenderter QUELLZEILEN
+                      # $4 = erwartete Zahl geaenderter QUELLZEILEN,
+                      # $5 = Ziel: 'kern' (Default) oder 'aggregat'
         N_MUT=$((N_MUT + 1))
+        _ziel="${5:-kern}"
+        case "$_ziel" in
+            kern)     _orig="$KERN" ;;
+            aggregat) _orig="$AGGREGAT" ;;
+            *) echo "ABBRUCH: unbekanntes Mutations-Ziel '$_ziel' bei '$1'." >&2; exit 2 ;;
+        esac
         _m="$MUT_DIR/$1.sh"
-        sed "$3" "$KERN" > "$_m"
-        if cmp -s "$KERN" "$_m"; then
+        sed "$3" "$_orig" > "$_m"
+        if cmp -s "$_orig" "$_m"; then
             echo "ABBRUCH: Mutation '$1' hat NICHTS geaendert -- der Beweis waere leer." >&2
             exit 2
         fi
@@ -647,18 +747,24 @@ if [ "$MODUS" = --selbstbiss ]; then
         # Zahl statt eines "irgendwas hat sich geaendert".
         # Gezaehlt wird die ORIGINAL-Seite des diff ('<'-Zeilen); rc des diff ist
         # egal, weil die Pipe ohnehin den awk-Status liefert (K11).
-        _geaendert=$(diff "$KERN" "$_m" | awk '/^</{n++} END{print n+0}')
+        _geaendert=$(diff "$_orig" "$_m" | awk '/^</{n++} END{print n+0}')
         if [ "$_geaendert" -ne "$4" ]; then
             echo "ABBRUCH: Mutation '$1' hat $_geaendert Quellzeile(n) geaendert, erwartet waren $4." >&2
-            echo "         Entweder greift ein sed-Ausdruck nicht mehr, oder der Kern hat sich" >&2
+            echo "         Ziel war '$_ziel' ($_orig)." >&2
+            echo "         Entweder greift ein sed-Ausdruck nicht mehr, oder die Quelle hat sich" >&2
             echo "         bewegt. Beides macht den Mutationsbeweis wertlos -- kein Gruen darauf." >&2
             exit 2
         fi
         chmod +x "$_m"
         echo "  -- $1: $2"
+        echo "     Ziel: $_ziel ($(basename "$_orig"))"
         echo "     zurueckgedreht: $_geaendert Quellzeile(n) (erwartet: $4)."
         set +e
-        COMDARE_ANHANG_KERN="$_m" sh "$0" > "$MUT_DIR/$1.log" 2>&1
+        if [ "$_ziel" = kern ]; then
+            COMDARE_ANHANG_KERN="$_m" sh "$0" > "$MUT_DIR/$1.log" 2>&1
+        else
+            COMDARE_WIDE_AGGREGAT="$_m" sh "$0" > "$MUT_DIR/$1.log" 2>&1
+        fi
         _rc=$?
         set -e
         if [ "$_rc" -eq 0 ]; then
@@ -684,10 +790,23 @@ if [ "$MODUS" = --selbstbiss ]; then
 
     mutant n1_alter_glob "Selektor faellt auf '*.result.csv' zurueck (Falle 1)" \
         's|^AF_RESULT_NAMEN=.*$|AF_RESULT_NAMEN="*.result.csv"|' 1
+    # N2/N3/N5 greifen seit P4c am GEMEINSAMEN Aggregator an (ci/wide_aggregat.sh).
+    # DAS IST DER PUNKT DES PAKETS: dieselben drei Mutationen decken jetzt auch die
+    # beiden measure-Jobs der .gitlab-ci.yml, weil dort keine eigene Kopie mehr steht.
+    # Vorher waren die YAML-Zwillinge nachweislich UNGEDECKT -- am Objekt gemessen:
+    # ein Mutant, der ihnen ihr 'awk 1' nahm, liess sechs von sechs lauffaehigen
+    # Wachen gruen (die siebte war mit und ohne Mutation gleich rot).
+    # Die drei Ausdruecke stehen einzeln, damit keine Zeile ueber 120 Spalten geht
+    # (die Diff-Hygiene-Wache hat heute schon eine Pipeline rot gemacht). Alle drei
+    # sind EINFACH gequotet -- in doppelten Anfuehrungszeichen wuerde die Shell die
+    # '$rcsv'/'$WIDE' im Muster expandieren, und der sed liefe still ins Leere.
+    _n2a='s@^WIDE_ZEILEN=.*$@WIDE_ZEILEN=$(wc -l < "$WIDE")@'
+    _n2b='s@^  tail -n +2 "$rcsv" .*$@  tail -n +2 "$rcsv" >> "$WIDE"@'
+    _n2c='s@head -1 "$rcsv" | awk 1 >> "$WIDE"@head -1 "$rcsv" >> "$WIDE"@'
     mutant n2_stand_vor_p4 "Aggregation wie VOR P4: wc -l UND kein awk 1 (Falle 2+3)" \
-        's@^    WIDE_ZEILEN=.*$@    WIDE_ZEILEN=$(wc -l < "$WIDE")@; s@^      tail -n +2 "$rcsv" .*$@      tail -n +2 "$rcsv" >> "$WIDE"@; s@head -1 "$rcsv" | awk 1 >> "$WIDE"@head -1 "$rcsv" >> "$WIDE"@' 3
+        "$_n2a; $_n2b; $_n2c" 3 aggregat
     mutant n3_ohne_awk1 "nur die Konkatenation verliert ihr 'awk 1' (Falle 3 allein)" \
-        's|^      tail -n +2 "$rcsv" .*$|      tail -n +2 "$rcsv" >> "$WIDE"|' 1
+        's|^  tail -n +2 "$rcsv" .*$|  tail -n +2 "$rcsv" >> "$WIDE"|' 1 aggregat
     mutant n4_nenner_weg "die Nenner-Zeile faellt weg -- Null ohne Nenner" \
         '/laufordner_geprueft=/d' 2
     # N5 dreht GENAU die Heilung des Nachsatzes zurueck: die Wache '[ -s "$rcsv" ]'
@@ -695,7 +814,7 @@ if [ "$MODUS" = --selbstbiss ]; then
     # Der Rest der Zeile ('>>' und 'awk 1') bleibt stehen -- damit steht fest, dass
     # A8/A9 an DIESER Bedingung haengen und nicht an einer der P4-Heilungen.
     mutant n5_header_dieb "die -s-Wache faellt weg -- 0-Byte-Datei stiehlt den Header (Falle 4)" \
-        's@ \[ -s "$rcsv" \] &&@@' 1
+        's@ \[ -s "$rcsv" \] &&@@' 1 aggregat
     # N6 sperrt den Gegeneingang auf: die Leerheitspruefung laesst alles durch.
     # Er belegt, dass A6 und A10 die WACHE sind und nicht bloss mitlaufen -- eine
     # Heilung, die anschliessend jede Leere durchwinkt, waere keine.

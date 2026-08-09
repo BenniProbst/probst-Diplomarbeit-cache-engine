@@ -65,7 +65,16 @@
 #   jetzt IMMER einen Nenner (korpus_wurzel/vorhanden + laufordner_geprueft/
 #   mit_material + header=ja|nein/Datenzeilen): eine Null ohne Nenner ist von
 #   einem echten Freispruch nicht zu unterscheiden.
-#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A10, Selbstbiss N1-N6).
+#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A11, Selbstbiss N1-N6).
+#
+# WO DIE KONKATENATION SEIT DEM 09.08.2026 WOHNT (P4c):
+#   NICHT MEHR HIER. F2/F3/F4 sassen in Zeilen, die WORTGLEICH auch in den beiden
+#   measure-Jobs der .gitlab-ci.yml standen -- drei Kopien, von denen nur diese
+#   gedeckt war. Sie stehen jetzt EINMAL in ci/wide_aggregat.sh, und alle drei
+#   rufen sie. Die Mutanten N2/N3/N5 greifen dort an und decken damit alle drei
+#   Aufrufer; Fall A11 haelt fest, dass kein vierter Zwilling zurueckkehrt.
+#   HIER GEBLIEBEN ist, was nur den Anhang-Kanal angeht: der Selektor (F1), das
+#   'sort' und das Urteil ueber die Zahl (honest-empty).
 #
 # OFFEN, ausdruecklich NICHT geraten: AF_CORPUS_ROOT zeigt in der Voreinstellung
 #   (und im CI-Job, .gitlab-ci.yml AF_CORPUS_ROOT="measurement") auf 'measurement'
@@ -118,6 +127,9 @@
 #   AF_RESULT_NAMEN   Namensformen der Mess-CSV, Leerzeichen-Liste
 #                     (Default: "result.csv *.result.csv" -- BEIDE, OV-17 offen)
 #   AF_GENERATOR      Pfad zur appendix-generator-Binary            (Default: leer)
+#   AF_WIDE_AGGREGAT  Pfad zur EINEN WIDE-Konkatenation
+#                     (Default: <verzeichnis dieser datei>/wide_aggregat.sh)
+#                     Die Probe setzt ihn auf ihre Mutanten (Selbstbiss N2/N3/N5).
 #   AF_TMP            Arbeitsverzeichnis                            (Default: mktemp -d)
 #   AF_DRY_RUN        true => kopieren+stagen, aber KEIN Commit, KEIN Push
 #   AF_NO_PUSH        true => Commit ja, Push nein (Fixture ohne Remote)
@@ -147,6 +159,22 @@ AF_PROV_PIPELINE_ID="${AF_PROV_PIPELINE_ID:-NA}"
 AF_PROV_PIPELINE_URL="${AF_PROV_PIPELINE_URL:-NA}"
 AF_PROV_SUPER_SHA="${AF_PROV_SUPER_SHA:-NA}"
 AF_PROV_SUPER_REF="${AF_PROV_SUPER_REF:-NA}"
+
+# ---- DIE EINE WIDE-KONKATENATION: DREI AUFRUFER, EINE DATEI ---------------------------
+# SELBSTCHECK (P4c, 2026-08-09):
+#   DER DEFEKT, den das heilt: dieselbe Aggregation stand DREIMAL im Bestand --
+#     hier, in .gitlab-ci.yml Job measure:smoke und in Job measure:golden-320.
+#     Nur DIESE Kopie war gedeckt. Am Objekt nachgemessen, bevor die Datei
+#     entstand: ein Mutant, der den beiden YAML-Kopien ihr 'awk 1' nimmt, liess
+#     SECHS von sechs lauffaehigen Wachen gruen (die siebte war mit und ohne
+#     Mutation gleich rot und taugt nicht als Unterscheider).
+#   ZUGESICHERT: es gibt die Konkatenation und die Zaehlung ab jetzt genau
+#     einmal, in ci/wide_aggregat.sh. Wer sie dort mutiert, macht diese Probe
+#     rot -- und deckt damit alle drei Aufrufer.
+#   NICHT zugesichert: dass niemand eine VIERTE Kopie einfuegt. Dagegen steht
+#     Fall A11 der Probe (kein Inline-Zwilling mehr in der .gitlab-ci.yml).
+AF_SELBST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+AF_WIDE_AGGREGAT="${AF_WIDE_AGGREGAT:-$AF_SELBST_DIR/wide_aggregat.sh}"
 
 # ---- DER SELEKTOR: EINE Definition, DREI Verwendungen ---------------------------------
 # SELBSTCHECK (P4, 2026-08-09):
@@ -272,92 +300,45 @@ if [ -z "$SRC_ROOT" ]; then
       echo "       Das ist KEIN honest-empty-Fall, sondern eine kaputte Job-Konfiguration -> Abbruch (kein stilles Gruen)." >&2
       exit 1
     fi
-    # WIDE-Aggregat = Header EINMAL + alle Datenzeilen (Literal-Spiegel der measure-Jobs).
-    # SELBSTCHECK Konkatenation (P4, 2026-08-09):
-    #   ZUGESICHERT: jede uebernommene Zeile endet mit einem Newline, auch wenn
-    #     die Quelldatei keinen Schluss-Newline hat. Dafuer steht das 'awk 1':
-    #     es gibt jeden Datensatz mit ORS aus. Ohne das klebte die erste
-    #     Datenzeile der naechsten Datei an die letzte der vorigen -- aus zwei
-    #     Messwerten wurde EINE kaputte Zeile, und der Verlust war still.
-    #     Und genau dieser Fall ist der Regelfall: ce schreibt die letzte Zeile
-    #     ohne Schluss-Newline.
-    #   NICHT zugesichert: dass die Kopfzeilen aller Dateien gleich sind. Der
-    #     Header wird EINMAL von der ersten Datei MIT INHALT genommen; abweichende
-    #     Spalten einer spaeteren Datei faenden hier niemand. Das ist eine andere Wache.
-    # SELBSTCHECK Header-Herkunft (P4-Nachsatz, 2026-08-09):
-    #   ZUGESICHERT: der Header wird NUR aus einer Datei genommen, die tatsaechlich
-    #     eine erste Zeile HAT. '[ -s "$rcsv" ]' ist hier kein Stil-Guard, sondern
-    #     genau die Bedingung: eine Datei mit Groesse 0 hat 0 awk-Datensaetze,
-    #     jede Datei mit Groesse > 0 hat mindestens einen. '_hdr=1' heisst damit
-    #     ab jetzt "es steht wirklich eine Kopfzeile in $WIDE" -- vorher hiess es
-    #     nur "wir waren schon mal hier".
-    #   DER DEFEKT, den das heilt (Falle 4, DER HEADER-DIEB): eine 0-Byte-
-    #     result.csv, die im 'sort' VOR der vollen Datei liegt, lieferte nichts
-    #     und setzte trotzdem _hdr=1. Die volle Datei danach kam nur noch durch
-    #     'tail -n +2' -- ihre Kopfzeile wurde uebersprungen, obwohl nie eine
-    #     geschrieben worden war. Uebrig blieb ein KOPFLOSES Aggregat. Mit EINER
-    #     Datenzeile der Nachbardatei galt das als leer (honest-empty, kein
-    #     Commit, Messwert weg); mit ZWEI Datenzeilen landete der Commit und
-    #     jeder NR>1-Konsument -- auch der echte appendix-generator -- frass die
-    #     erste Datenzeile als Kopfzeile. Beides still, beides rc=0.
-    #     Am Objekt nachgemessen, bevor diese Zeile entstand.
-    #     0-Byte-CSVs sind kein erfundener Fall: ci/tests/persist_sammler_probe.sh
-    #     fuehrt sie als P6 ("0-Byte-CSV -> 0 Datenzeilen (nicht -1)").
-    #   MITGEHAERTET: '>' wurde zu '>>'. Die Schleife ist damit rein anhaengend.
-    #     Es nimmt die Gefahr weg, dass ein spaeteres Verschieben dieser Zeile
-    #     bereits gesammelte Datenzeilen ueberschreibt.
-    #   EHRLICH DAZU -- am Objekt nachgemessen, nicht behauptet: ein Mutant, der
-    #     NUR das '>>' wieder auf '>' zurueckdreht, laesst ALLE 10 Faelle der
-    #     Probe gruen. Das '>>' ist heute also UNGEDECKT: kein Test unterscheidet
-    #     die beiden Fassungen. Es kann heute auch nichts kaputtmachen, denn der
-    #     Header wird genau einmal geschrieben, und vor ihm koennen nur
-    #     0-Byte-Dateien gelaufen sein, die nichts beitragen. Es steht hier als
-    #     Vorsorge gegen eine kuenftige Umstellung, nicht als heutige Wache --
-    #     wer die Zeile bewegt, muss diesen Satz mitlesen.
-    #   NICHT zugesichert: dass eine Datei mit Groesse > 0 eine BRAUCHBARE
-    #     Kopfzeile hat. Eine Datei aus einem einzelnen Newline liefert eine leere
-    #     Kopfzeile. Hier wird die Herkunft geprueft, nicht der Inhalt.
-    WIDE="$AF_TMP/wide_aggregate.csv"; : > "$WIDE"; _hdr=0
-    while IFS= read -r rcsv; do
-      [ "$_hdr" = "0" ] && [ -s "$rcsv" ] && { head -1 "$rcsv" | awk 1 >> "$WIDE"; _hdr=1; }
-      tail -n +2 "$rcsv" | awk 1 >> "$WIDE"
-    done < <(af_finde_result_csv "$RUN_DIR" | sort)
-    # SELBSTCHECK Zaehlweise (P4, 2026-08-09):
-    #   ZUGESICHERT: gezaehlt wird mit awk NR, WORTGLEICH zu ci/mess_ausbeute_wache.sh
-    #     und ci/persist_sammler.sh. Zwei verschiedene Zaehlweisen in EINER Kette
-    #     sind eine Fehlerquelle fuer sich.
-    #   DER DEFEKT, den das heilt: 'wc -l' zaehlt ZEILENUMBRUECHE, nicht Zeilen.
-    #     Kopfzeile + EINE Datenzeile ohne Schluss-Newline ergaben wc -l = 1 und
-    #     galten damit als leer -- exakt der Mini-Messwert des Durchstichs.
-    #   NICHT zugesichert: dass die Datenzeilen inhaltlich brauchbar sind. Hier
-    #     wird gezaehlt, nicht bewertet.
-    #   EHRLICH DAZU: seit die Konkatenation oben 'awk 1' benutzt, endet $WIDE
-    #     immer auf einen Newline -- 'wc -l' und 'awk NR' liefern hier also
-    #     dieselbe Zahl. Am Objekt nachgemessen: ein Mutant, der NUR diese Zeile
-    #     auf wc -l zurueckdreht, macht keinen einzigen fachlichen Fall der Probe
-    #     rot. Diese Zeile ist damit heute REDUNDANTE Deckung, nicht die
-    #     tragende; tragend ist das 'awk 1'. Sie bleibt trotzdem, weil sie die
-    #     Zusage "wortgleich zu Wache und Sammler" haelt und greift, falls das
-    #     'awk 1' spaeter verschwindet.
-    WIDE_ZEILEN=$(awk 'END{print NR+0}' "$WIDE")
-    # SELBSTCHECK Zaehl-AUSSAGE (P4-Nachsatz, 2026-08-09):
-    #   ZUGESICHERT: die Zeile nennt jetzt, OB eine Kopfzeile drin ist, und die
-    #     Zahl der Datenzeilen getrennt von der Gesamtzahl. Geprueft wird auf
-    #     $WIDE_DATEN, also auf die AUSSAGE ("wieviele Messwerte") statt auf den
-    #     Stellvertreter "Gesamtzeilen kleiner gleich eins".
-    #   DER DEFEKT, den das heilt: bei einem kopflosen Aggregat log-te der Kanal
-    #     "1 Zeilen (inkl. 1 Header)" -- diese eine Zeile WAR die Datenzeile.
-    #     Die Ausgabe behauptete also einen Header, den es nicht gab, und der
-    #     Messwert verschwand als "keine Datenzeile". Ein Log, das im Fehlerfall
-    #     das Falsche sagt, ist schlimmer als keines.
-    #   NICHT zugesichert: dass die Datenzeilen inhaltlich brauchbar sind. Hier
-    #     wird gezaehlt, nicht bewertet.
-    if [ "$_hdr" = "1" ]; then
-      _hdr_txt=ja; WIDE_DATEN=$((WIDE_ZEILEN - 1))
-    else
-      _hdr_txt=nein; WIDE_DATEN=0
+    # WIDE-Aggregat = Header EINMAL + alle Datenzeilen. DIE LOGIK STEHT NICHT MEHR HIER,
+    # sondern in ci/wide_aggregat.sh -- gemeinsam mit den beiden measure-Jobs der
+    # .gitlab-ci.yml, die vorher jeder eine eigene Kopie trugen (Begruendung und die
+    # drei geheilten Defekte F2/F3/F4 ausfuehrlich im Kopf jener Datei).
+    # SELBSTCHECK Arbeitsteilung (P4c, 2026-08-09):
+    #   ZUGESICHERT: HIER bleibt, was NUR den Anhang-Kanal angeht -- welche Dateien
+    #     ueberhaupt gefunden werden (af_finde_result_csv/AF_RESULT_NAMEN), das 'sort',
+    #     und das URTEIL ueber die Zahl (honest-empty). DORT liegt, was alle drei
+    #     Aufrufer teilen: die Konkatenation und die Zaehlung.
+    #   WARUM DAS 'sort' HIER BLEIBT: sonst haetten Kern und CI zwei verschiedene
+    #     'sort'-Aufrufe, und die Frage "welche Datei stellt den Header" haette zwei
+    #     Antworten. Der Aufrufer legt die Reihenfolge fest, der Aggregator folgt ihr.
+    #   NICHT zugesichert: dass der Aggregator existiert. Deshalb der 'test -x'-Vorspann
+    #     -- sein Verschwinden als DATEI ist fail-loud, nicht honest-empty.
+    WIDE="$AF_TMP/wide_aggregate.csv"
+    AF_RC_LISTE="$AF_TMP/wide_rc_liste.txt"
+    AF_KENNZAHLEN="$AF_TMP/wide_kennzahlen.env"
+    af_finde_result_csv "$RUN_DIR" | sort > "$AF_RC_LISTE"
+    if [ ! -x "$AF_WIDE_AGGREGAT" ]; then
+      echo "FEHLER: WIDE-Aggregator '$AF_WIDE_AGGREGAT' fehlt oder ist nicht ausfuehrbar." >&2
+      echo "       Ohne ihn gaebe es kein Aggregat -- und ein leeres Aggregat waere von" >&2
+      echo "       einem echten honest-empty nicht zu unterscheiden. Abbruch." >&2
+      exit 1
     fi
-    echo "   [1b] WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), Zaehlweise awk NR"
+    # K11: kein 'rc=$?' hinter einer Pipe. Der Status wird direkt am Aufruf genommen.
+    _agg_rc=0
+    sh "$AF_WIDE_AGGREGAT" "$AF_RC_LISTE" "$WIDE" "$AF_KENNZAHLEN" || _agg_rc=$?
+    if [ "$_agg_rc" -ne 0 ]; then
+      echo "FEHLER: WIDE-Aggregation fehlgeschlagen (rc=$_agg_rc) -> Abbruch, kein stilles Gruen." >&2
+      exit 1
+    fi
+    # shellcheck source=/dev/null -- Kennzahlen-Datei, vom Aggregator eben geschrieben.
+    . "$AF_KENNZAHLEN"
+    _hdr_txt="$WIDE_HEADER"
+    # Der Nachsatz steht in einer Variablen, damit die Zeile unter 120 Spalten
+    # bleibt (Diff-Hygiene-Wache). Die AUSGABE ist Zeichen fuer Zeichen dieselbe
+    # wie vorher -- die Probe prueft sie literal (A1/A3/A6/A8/A9/A10).
+    _zaehlweise="Zaehlweise awk NR"
+    echo "   [1b] WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), $_zaehlweise"
     if [ "$WIDE_DATEN" -le 0 ]; then
       echo "   [1b] WIDE-Aggregat hat keine Datenzeile -> honest-empty"
     else
