@@ -299,6 +299,40 @@ lint:xml-wellformed:
   script:
     - sh scripts/ci_xml_wellformed_guard.sh
 
+# -- D3-4 (2026-08-09): PROBE fuer die XML-WOHLGEFORMTHEITS-WACHE, die Wache wird selbst geprueft --
+# Die Wache darueber (lint:xml-wellformed) war ungedeckt. Ihr VERSCHWINDEN als Datei faengt `sh` mit
+# rc=127 ab, der Job wird rot -- ungedeckt war ausschliesslich ihre AUFWEICHUNG: faellt ein `exit`
+# aus ihr heraus, sagt sie weiter "OK", und nichts meldet es. Genau die Fehlerklasse, gegen die sie
+# gebaut wurde (fuenf XML lagen wochenlang kaputt im Baum, weil niemand hinsah), eine Ebene hoeher.
+#
+# WARUM --selbstbiss IM CI UND NICHT NUR EINMAL LOKAL: eine Probe, die nur am gesunden Objekt gruen
+# ist, belegt nichts -- sie koennte immer gruen sein. Der Schalter baut fuenf Wegwerf-Mutanten der
+# Wache (je ein Zweig entfernt), faehrt die Probe gegen jeden und FORDERT, dass sie rot wird. So
+# wird der Biss bei JEDEM Lauf neu bewiesen. Die Mutanten liegen unter mktemp -d, der Bestand wird
+# nie angefasst; jeder Fall bekommt ein eigenes Wegwerf-git-Repo.
+#
+# ZWEI ZWEIGE DER WACHE HABEN BEWUSST KEINEN MUTANTEN, weil sie nachweislich UNBEOBACHTBAR sind
+# (am Objekt gemessen, Begruendung im Kopf der Probe): der Nenner-Mismatch-Zweig ist tot, weil git
+# Zeilenenden in Dateinamen immer C-quotet, und der grep-Zweig ist ohne root nicht ausloesbar. Ein
+# Mutant, der stirbt, weil eine ANDERE Zeile ihn faengt, beweist das Gegenteil von dem, was er soll.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
+# wie bei lint:diff-hygiene). Der Job prueft das ausdruecklich an sich selbst (Fall F12).
+# KEIN .code-rules: die Wache und ihre Probe muessen auch in einer docs-only-Welle laufen.
+# KEIN extends: der Job braucht sh, awk, od, sed, git und xmllint -- kein Compile, kein Submodul.
+test:xml-wellformed-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft wird nur der super-Baum
+  script:
+    - sh ci/tests/xml_wellformed_probe.sh --selbstbiss
+
 # -- W0b-0 (2026-08-08): BISSPROBE fuer die Mess-Ausbeute-Wache, die Wache wird selbst geprueft --
 # Die Mess-Ausbeute-Wache (ci/mess_ausbeute_wache.sh, gelandet 7444d8c0) entscheidet seit heute in
 # measure:smoke und measure:golden-320, ob ein Messlauf als gelungen gilt. Am mehrtaegigen golden-320
