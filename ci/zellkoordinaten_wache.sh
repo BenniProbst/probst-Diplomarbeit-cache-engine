@@ -8,14 +8,41 @@
 # SELBSTCHECK -- was diese Datei zusichert, und was NICHT:
 #   ZUSICHERT: (Modus eintraege) dass JEDER <eintrag> eines Bestandslog-Dokuments
 #     eine nicht-leere opt- UND simd-Koordinate traegt, mit Nenner ueber der
-#     Grundgesamtheit aller gefundenen Eintraege. (Modus jobs) dass die STATISCHEN
-#     Mess-Jobs einer .gitlab-ci.yml die vier Koordinaten-Variablen exportieren.
+#     Grundgesamtheit aller gefundenen Eintraege. (Modus jobs) dass JEDER Job mit
+#     stage: measure einer .gitlab-ci.yml die vier Koordinaten-Variablen AKTIV
+#     (nicht auskommentiert) exportiert, und zwar VOR dem ersten messenden
+#     "$DRIVER"-Aufruf seines Blocks. Die Job-Liste wird aus dem DOKUMENT
+#     abgeleitet (alle Spalte-1-Schluessel mit stage: measure), nicht behauptet.
 #   ZUSICHERT NICHT: dass die Werte RICHTIG sind (dass also opt="O3" der real
 #     gebauten Optimierungsstufe entspricht). Das kann diese Wache nicht sehen --
 #     sie prueft Anwesenheit UND Nicht-Leere der Koordinate, nicht ihre Wahrheit.
 #     Die Wahrheit der platform/lane-Koordinate erzwingt zur Laufzeit die
 #     Lane-Wache des Treibers (Code/02_messung_driver/main.cpp:635-657, exit 7);
 #     fuer opt/simd gibt es heute KEINE solche Laufzeit-Gegenprobe (s. RESTRISIKO).
+#
+# NACHTRAG (Lens-Befund D1-D4, 2026-08-09) -- vier Gegeneingaenge, an denen die
+# erste Fassung dieser Wache FALSCH-GRUEN war, jetzt gedeckt:
+#   D1  Ein AUSKOMMENTIERTER Export ('#  export VAR="..."') zaehlte als Treffer.
+#       Jetzt: Zeilen, deren erstes Nicht-Leerzeichen '#' ist, werden VOR der
+#       Suche verworfen (kopf_ist_kommentar).
+#   D2  Der Block-Ausschnitt endete nur an Spalte-1-Zeilen, die KEIN Kommentar
+#       sind -- der Kommentar-Kopf des NAECHSTEN Jobs wurde mitgelesen. Jetzt:
+#       JEDE nicht-leere Spalte-1-Zeile schliesst den Block.
+#   D3  Die Job-Liste war hart kodiert; ein dritter stage:measure-Job war
+#       unsichtbar. Jetzt: die Grundgesamtheit wird aus dem Dokument abgeleitet
+#       (ableiten_stage_measure); explizite Argumente kommen HINZU, sie ersetzen
+#       die Ableitung nicht. Null ableitbare und null verlangte Jobs -> exit 2.
+#   D4  Die REIHENFOLGE war unbewacht: Exports NACH dem Treiber-Aufruf waren
+#       gruen, zur Messzeit aber ungesetzt. Jetzt: enthaelt ein Block einen
+#       "$DRIVER"-Aufruf (Zeilen, deren Rumpf mit 'test ' beginnt, sind
+#       Existenz-Pruefungen und zaehlen nicht), muss jeder Pflicht-Export auf
+#       einer FRUEHEREN Block-Zeile stehen.
+#   BLIND BLEIBT (benannt statt verschwiegen): ein Export hinter einem
+#   Zeilen-Ende-Kommentar auf einer aktiven Zeile; ein per extends/YAML-Anker
+#   geerbtes stage: measure (die Ableitung liest Text, keinen YAML-Graphen);
+#   ein Treiber-Aufruf ohne das woertliche "$DRIVER" (Wrapper, unquoted $DRIVER).
+#   Die Ableitung irrt dabei in die SICHERE Richtung: ein zu viel erkannter Job
+#   macht rot/unpruefbar, nie still gruen.
 #
 # DER BEFUND, GEGEN DEN SIE GEBAUT IST (am Objekt erhoben, 09.08.2026):
 # Die beiden STATISCHEN Mess-Jobs (measure:smoke, measure:golden-320) setzten
@@ -63,12 +90,16 @@
 # AUFRUF:
 #   sh ci/zellkoordinaten_wache.sh eintraege <bestandslog.xml>
 #   sh ci/zellkoordinaten_wache.sh jobs      <gitlab-ci.yml> [<job> ...]
+#     (jobs: die Liste der Pflicht-Jobs wird IMMER aus dem Dokument abgeleitet;
+#      zusaetzlich genannte Jobs werden MIT geprueft, nie an ihrer Stelle.)
 #
 # EXIT: 0 = geprueft und gehalten (mit Nenner belegt)
-#       1 = mindestens eine Koordinate fehlt -- der eigentliche Biss
+#       1 = mindestens eine Koordinate fehlt, ist leer, ist nur auskommentiert
+#           ODER steht erst NACH dem Treiber-Aufruf -- der eigentliche Biss
 #       2 = die Wache konnte nicht pruefen (Datei/Argument/Job fehlt, keine
-#           Eintraege). AUSDRUECKLICH KEIN GRUEN: ein stiller Rueckfall auf 0
-#           waere dieselbe Fehlerklasse, gegen die sie gebaut ist.
+#           Eintraege, kein einziger stage:measure-Job ableitbar). AUSDRUECKLICH
+#           KEIN GRUEN: ein stiller Rueckfall auf 0 waere dieselbe Fehlerklasse,
+#           gegen die sie gebaut ist.
 #
 # RESTRISIKO, ausdruecklich benannt statt verschwiegen:
 # Der Modus jobs prueft, DASS die vier Variablen exportiert werden, nicht, dass
@@ -183,10 +214,58 @@ fi
 # =============================================================================
 if [ "$MODUS" = "jobs" ]; then
     shift 2
-    if [ "$#" -gt 0 ]; then
-        JOBS="$*"
-    else
-        JOBS="measure:smoke measure:golden-320"
+
+    # D3: die Grundgesamtheit der Pflicht-Jobs wird aus dem DOKUMENT abgeleitet,
+    # nicht behauptet: jeder Spalte-1-Schluessel (nicht versteckt, kein '.'-Prefix),
+    # in dessen Block eine AKTIVE (nicht auskommentierte) Zeile 'stage: measure'
+    # steht. Die Ableitung liest Text, keinen YAML-Graphen -- ein per extends
+    # geerbtes stage sieht sie nicht (im Kopf als blind benannt). Sie irrt in die
+    # sichere Richtung: ein zu viel erkannter Schluessel macht rot, nie gruen.
+    ableiten_stage_measure() {
+        awk '
+            /^[ \t]/ || $0 == "" {
+                if (cur == "") next
+                m = $0; sub(/^[ \t]+/, "", m)
+                if (index(m, "#") == 1) next       # auskommentiertes stage: zaehlt nicht
+                if (m ~ /^stage:/) {
+                    v = substr(m, 7)
+                    sub(/[ \t]*#.*$/, "", v)
+                    gsub(/[ \t"]/, "", v)
+                    if (v == "measure" && !seen[cur]++) print cur
+                }
+                next
+            }
+            {
+                cur = ""
+                z = $0
+                sub(/[ \t]*#.*$/, "", z)
+                sub(/[ \t]+$/, "", z)
+                if (z ~ /:$/ && z !~ /^[.#]/ && z !~ /[ \t]/) cur = substr(z, 1, length(z) - 1)
+            }
+        ' "$1"
+    }
+
+    JOBS_ABGELEITET=$(ableiten_stage_measure "$ZIEL")
+
+    JOBS=" "
+    N_ABGELEITET=0
+    for J in $JOBS_ABGELEITET; do
+        JOBS="$JOBS$J "
+        N_ABGELEITET=$((N_ABGELEITET + 1))
+    done
+    N_EXPLIZIT=0
+    for J in "$@"; do
+        N_EXPLIZIT=$((N_EXPLIZIT + 1))
+        case "$JOBS" in
+            *" $J "*) : ;;
+            *) JOBS="$JOBS$J " ;;
+        esac
+    done
+
+    if [ "$JOBS" = " " ]; then
+        echo "ABBRUCH: kein Job mit stage: measure in '$ZIEL' ableitbar und keiner explizit" >&2
+        echo "         verlangt -- die Wache hatte keinen Gegenstand. Kein Gruen ohne Pruefung." >&2
+        exit 2
     fi
 
     # Die vier Pflicht-Variablen. COMDARE_MEASUREMENT_COMBO steht bewusst NICHT
@@ -196,14 +275,18 @@ if [ "$MODUS" = "jobs" ]; then
     N_JOB=0
     N_JOB_OK=0
     N_FEHLT=0
+    N_SPAET=0
     N_PRUEF=0
+    N_DRV=0
     NICHT_GEFUNDEN=0
 
     for J in $JOBS; do
         N_JOB=$((N_JOB + 1))
 
-        # Job-Block ausschneiden: von '^<job>:' bis zur naechsten Zeile, die in
-        # Spalte 1 beginnt und nicht Kommentar/leer ist.
+        # Job-Block ausschneiden: von '^<job>:' bis zur naechsten nicht-leeren
+        # Spalte-1-Zeile. D2: AUCH eine Spalte-1-Kommentarzeile schliesst den
+        # Block -- sonst laese die Wache den Kommentar-Kopf des NAECHSTEN Jobs
+        # mit und faende dort Treffer, die dem geprueften Job nicht gehoeren.
         BLOCK=$(awk -v job="$J" '
             BEGIN { drin = 0 }
             {
@@ -211,7 +294,7 @@ if [ "$MODUS" = "jobs" ]; then
                     if ($0 == job ":") { drin = 1; next }
                     next
                 }
-                if ($0 ~ /^[^ \t#]/) { drin = 0; next }
+                if ($0 ~ /^[^ \t]/) { drin = 0; next }
                 print
             }
         ' "$ZIEL")
@@ -222,12 +305,34 @@ if [ "$MODUS" = "jobs" ]; then
             continue
         fi
 
+        # D4: die Block-Zeile des ersten MESSENDEN Treiber-Aufrufs. Zeilen, deren
+        # Rumpf mit 'test ' beginnt, sind Existenz-Pruefungen ('test -x "$DRIVER"'),
+        # kein Messlauf. Kommentare zaehlen nicht (D1). Kein Treffer = kein
+        # Treiber-Aufruf im Block = keine Reihenfolge zu pruefen.
+        POS_DRV=$(printf '%s\n' "$BLOCK" | awk '
+            function kopf_ist_kommentar(zeile,   t) { t = zeile; sub(/^[ \t]+/, "", t); return index(t, "#") == 1 }
+            kopf_ist_kommentar($0) { next }
+            {
+                m = $0; sub(/^[ \t]+/, "", m)
+                if (index(m, "test ") == 1) next
+                if (index($0, "\"$DRIVER\"") > 0) { print NR; exit }
+            }
+        ')
+        if [ -n "$POS_DRV" ]; then
+            N_DRV=$((N_DRV + 1))
+        fi
+
         JOB_FEHLT=0
+        JOB_SPAET=0
         for V in $PFLICHT; do
             N_PRUEF=$((N_PRUEF + 1))
-            # Gefordert ist ein EXPORT mit nicht-leerem Wert: 'export VAR="..."'.
-            # Ein blosses Vorkommen des Namens (Kommentar!) zaehlt nicht.
+            # Gefordert ist ein AKTIVER EXPORT mit nicht-leerem Wert:
+            # 'export VAR="..."'. Ein blosses Vorkommen des Namens zaehlt nicht,
+            # und eine Zeile, deren erstes Nicht-Leerzeichen '#' ist, zaehlt
+            # NICHT (D1: Auskommentieren ist der wahrscheinlichere Weg, einen
+            # Export zu verlieren, als Loeschen). Ausgegeben wird 'Zeile Wert'.
             TREFFER=$(printf '%s\n' "$BLOCK" | awk -v v="$V" '
+                function kopf_ist_kommentar(zeile,   t) { t = zeile; sub(/^[ \t]+/, "", t); return index(t, "#") == 1 }
                 function attr_wert(zeile, name,   marke, p, rest, q) {
                     marke = "export " name "=\""
                     p = index(zeile, marke)
@@ -237,24 +342,39 @@ if [ "$MODUS" = "jobs" ]; then
                     if (q == 0) return "\001"
                     return substr(rest, 1, q - 1)
                 }
-                { w = attr_wert($0, v); if (w != "\001" && w != "") { print w; exit } }
+                kopf_ist_kommentar($0) { next }
+                { w = attr_wert($0, v); if (w != "\001" && w != "") { print NR " " w; exit } }
             ')
             if [ -z "$TREFFER" ]; then
-                echo "  OHNE   $J: export $V=\"...\" fehlt oder ist leer."
+                echo "  OHNE   $J: export $V=\"...\" fehlt, ist leer oder nur auskommentiert."
                 JOB_FEHLT=$((JOB_FEHLT + 1))
                 N_FEHLT=$((N_FEHLT + 1))
             else
-                echo "  MIT    $J: export $V=\"$TREFFER\""
+                POS_EXP="${TREFFER%% *}"
+                WERT="${TREFFER#* }"
+                if [ -n "$POS_DRV" ] && [ "$POS_EXP" -gt "$POS_DRV" ]; then
+                    echo "  SPAET  $J: export $V=\"$WERT\" erst auf Block-Zeile $POS_EXP, der Treiber-Aufruf steht auf Block-Zeile $POS_DRV -- zur Messzeit ungesetzt."
+                    JOB_SPAET=$((JOB_SPAET + 1))
+                    N_SPAET=$((N_SPAET + 1))
+                else
+                    echo "  MIT    $J: export $V=\"$WERT\""
+                fi
             fi
         done
-        [ "$JOB_FEHLT" -eq 0 ] && N_JOB_OK=$((N_JOB_OK + 1))
+        if [ "$JOB_FEHLT" -eq 0 ] && [ "$JOB_SPAET" -eq 0 ]; then
+            N_JOB_OK=$((N_JOB_OK + 1))
+        fi
     done
+
+    N_JOB_GEF=$((N_JOB - NICHT_GEFUNDEN))
 
     echo "-----------------------------------------------------------------------------"
     echo "NENNER (nie eine nackte Zahl):"
-    echo "  $N_JOB Job(s) verlangt, davon $NICHT_GEFUNDEN in '$ZIEL' nicht gefunden."
+    echo "  Grundgesamtheit der Jobs: $N_ABGELEITET aus dem Dokument abgeleitet (stage: measure),"
+    echo "  $N_EXPLIZIT explizit verlangt, $N_JOB in der Vereinigung, davon $NICHT_GEFUNDEN nicht gefunden."
     echo "  4 Pflicht-Variablen je gefundenem Job -> $N_PRUEF Einzelpruefung(en) gefahren."
-    echo "  $N_JOB_OK von $N_JOB Job(s) vollstaendig, $N_FEHLT Einzelpruefung(en) gerissen."
+    echo "  Reihenfolge (Export VOR Treiber) prueffbar in $N_DRV von $N_JOB_GEF gefundenen Job-Block(s) mit \"\$DRIVER\"-Aufruf."
+    echo "  $N_JOB_OK von $N_JOB Job(s) vollstaendig, $N_FEHLT Export(s) fehlend/leer/auskommentiert, $N_SPAET nach dem Treiber."
     echo "  Grundgesamtheit der Pflicht-Variablen: $PFLICHT"
     echo "-----------------------------------------------------------------------------"
 
@@ -263,13 +383,14 @@ if [ "$MODUS" = "jobs" ]; then
         echo "         Kein Gruen ohne Pruefung (ein umbenannter Job darf nicht still durchrutschen)." >&2
         exit 2
     fi
-    if [ "$N_FEHLT" -gt 0 ]; then
-        echo "FEHLER: $N_FEHLT von $N_PRUEF Pflicht-Export(en) fehlen." >&2
-        echo "        Ein statischer Mess-Job ohne diese Exports schreibt seine Ergebnisse" >&2
-        echo "        ohne Zell-Koordinaten -- der Verlust ist aus der Zeile nicht heilbar." >&2
+    if [ "$N_FEHLT" -gt 0 ] || [ "$N_SPAET" -gt 0 ]; then
+        echo "FEHLER: $N_FEHLT von $N_PRUEF Pflicht-Export(en) fehlen/leer/auskommentiert, $N_SPAET stehen NACH dem Treiber-Aufruf." >&2
+        echo "        Ein statischer Mess-Job ohne diese Exports (oder mit Exports nach dem" >&2
+        echo "        Treiber) schreibt seine Ergebnisse ohne Zell-Koordinaten -- der Verlust" >&2
+        echo "        ist aus der Zeile nicht heilbar." >&2
         exit 1
     fi
-    echo "ZELLKOORDINATEN-WACHE: OK ($N_PRUEF Pflicht-Export(e) in $N_JOB_OK Job(s) belegt)."
+    echo "ZELLKOORDINATEN-WACHE: OK ($N_PRUEF Pflicht-Export(e) in $N_JOB_OK Job(s) belegt; Job-Liste aus dem Dokument abgeleitet)."
     exit 0
 fi
 
