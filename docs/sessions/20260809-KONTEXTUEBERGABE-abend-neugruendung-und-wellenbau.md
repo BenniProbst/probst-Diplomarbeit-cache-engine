@@ -1,7 +1,23 @@
 # KONTEXTÜBERGABE 09.08.2026 abends — Neugründung, Stand, Wellenbau
 
-**Für den Nachfolger.** Diese Übergabe ist so gebaut, dass du in **20 Minuten** arbeitsfähig bist
-und danach weißt, wo alles liegt. Sie ersetzt kein Dokument — sie sagt dir, welche du brauchst.
+**Für den Nachfolger.** Diese Übergabe sagt dir, welche Dokumente du brauchst und in welcher
+Reihenfolge — sie ersetzt keines davon.
+
+> ## ES GIBT KEIN ZEITBUDGET
+>
+> **Owner, 09.08.2026:** *„Die Wellenplanung hat errechnet, dass **maximale Gründlichkeit**
+> dennoch den Zeitplan nicht reißt, daher **keine Abstriche**."*
+>
+> Das ist keine Ermutigung, sondern eine **Vorgabe**. Lies **vollständig**. Miss **am Objekt**.
+> Fahre **jeden Köder**. Nimm **jede** Prüffrage.
+>
+> Wer hier kürzt, spart nichts — er verlagert die Arbeit in eine Korrekturschleife, und die ist
+> teurer als die Gründlichkeit, die sie ersetzen sollte. Genau diese Schleife ist im Haus gemessen:
+> *Breite → Takt → Stellvertreter → Aussage vor Messung → Korrektur → weniger Zeit → mehr Breite.*
+> **Der Wellenplan hat den vollen Aufwand eingerechnet.**
+>
+> Was den 15.09. gefährdet, ist nicht die Zeit, die eine saubere Messung kostet. Es ist eine Zahl
+> ohne Deckung, eine Wache ohne Biss, ein Bericht, den niemand am Objekt nachgemessen hat.
 
 ---
 
@@ -13,7 +29,7 @@ kamen im Verlauf ja nie vor, sie sind gerade das, was ohne Erwähnung gilt. Wer 
 arbeitet mit vollem Sachwissen und halbierter Regelkenntnis und merkt es nicht. Am 09.08. hat genau
 das drei Regelverstöße in einer Stunde erzeugt.
 
-## Schritt 1 (5 min) — die vier bindenden Dokumente
+## Schritt 1 — die vier bindenden Dokumente
 
 | Rolle | Datei |
 |---|---|
@@ -29,7 +45,7 @@ auf dem falschen Weg.
 **Der Auftragssatz, an dem alles hängt:** *eine Diplomarbeit, deren jede ausgewiesene Zahl von
 einer Messung gedeckt ist, **die älter ist als der Satz, der sie behauptet**.*
 
-## Schritt 2 (5 min) — die Sessions ab dem 08.08.
+## Schritt 2 — die Sessions ab dem 08.08.
 
 **Owner, wörtlich:** *„Du brauchst auch nicht ständig reviews machen, bitte lies einfach gründlich
 alle Sessions inklusive und ab dem 08.08. vollständig, dort stehen alle gefundenen, Pläne,
@@ -47,7 +63,7 @@ Zwei davon sind Pflicht:
 Ein Review ist erst gerechtfertigt, wenn die Frage dort **nachweislich nicht** beantwortet ist —
 mit der Fundstelle, wo gesucht wurde.
 
-## Schritt 3 (5 min) — Memory-Index und die tragenden Kerne
+## Schritt 3 — Memory-Index und die tragenden Kerne
 
 `~/.claude/projects/-home-comdare/memory/MEMORY.md` — eine Zeile je Datei, 267 Dateien.
 **Gesichert liegt er auch im Repo:** `docs/memory-index/MEMORY-index-snapshot.md` (vor jeder
@@ -60,7 +76,7 @@ Selbst lesen, nicht delegieren:
 `project_verarbeitungskette_acht_stationen_hardware_job_pool` ·
 `project_vier_binary_typen_ceb_traegt_alles_acht_behelfs_clis`
 
-## Schritt 4 (5 min) — der lebende Stand
+## Schritt 4 — der lebende Stand
 
     git -C <repo> fetch origin main development
     # je Worktree: ungepusht? dirty? läuft dort ein Strang?
@@ -283,6 +299,9 @@ ist nicht rekonstruierbar, ein heutiger „Schnappschuss" trüge denselben Namen
 
 ---
 
-**Die eine Zahl, die alles rahmt:** noch **37 Tage** bis zum 15.09., fünf Freitagslieferungen,
-und der erste ist am **14.08.** — in fünf Tagen, mit einem Durchstich, der heute strukturell
-nicht laufen kann. Dort fängst du an.
+**Wo du anfaengst:** beim roten `lint:format` in beiden Repos, dann bei den 17 landebereiten
+Commits, dann beim **Durchstich** -- er ist der F1-Liefergegenstand vom Freitag 14.08. und
+kann heute strukturell nicht laufen.
+
+Und ohne Eile im falschen Sinn: **der Plan traegt die volle Gruendlichkeit, er ist darauf
+gerechnet.**
