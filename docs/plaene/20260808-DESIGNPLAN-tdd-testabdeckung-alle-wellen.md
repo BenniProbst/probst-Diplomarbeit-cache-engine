@@ -195,13 +195,37 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 25fe4fbfc7751a2aa94a71bd11f89409437c74a7
-PZW-SCHEMA-STELLEN = 29
-PZW-SCHEMA-DATEIEN = 17
+PZW-CE-SHA         = c6d8e57357e71117d3808512f0ee848ef258c76d
+PZW-SCHEMA-STELLEN = 30
+PZW-SCHEMA-DATEIEN = 18
 PZW-SCHEMA-LITERAL = 1
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 09.08.2026, 11:35 UTC — der Gitlink ist zweimal weitergezogen, die Fußnote hier zog nach.**
+Die Wache selbst hat es erzwungen: super-Pipeline **15428**, Job **369258**, `exit 2` mit dem Wortlaut
+*„der Plan nennt einen ANDEREN ce-Zustand als super HEAD fuehrt. Plan=25fe4fbf… Gitlink=9f92d49f…"*.
+Genau der Befund, den der Absatz darunter angekündigt hat — er ist eingetreten und wurde **nicht**
+weggeklickt.
+
+| Zustand | ce-Baum | STELLEN | DATEIEN | LITERAL | Nenner (Test-`.cpp` im Baum) |
+|---|---|---|---|---|---|
+| **alt** (Stand dieses Abschnitts, **bleibt stehen**) | `25fe4fbf` | 29 | 17 | 1 | — |
+| Zwischenstand (Gitlink-Bump `dfdf8bbe`, nie erhoben) | `9f92d49f` | 29 | 17 | 1 | 453 |
+| **gültig** | `c6d8e573` | **30** | **18** | 1 | **454** |
+
+**Zählweise, unverändert dieselbe wie oben:** `git grep -F -n 'lazy_csv_header()' <sha> -- 'tests/*.cpp'`,
+davon die Zeilen abgezogen, deren erstes Nicht-Leerzeichen `//`, `*` oder `/*` ist; **36 Rohzeilen** am
+Baum `c6d8e573`. **Warum +1/+1:** `c6d8e573` trägt die T-15-Strecke (`tests/unit/test_t15_drift_gate_messschleife.cpp`,
+Commit `4cd1ab91`) — eine neue Test-`.cpp` mit einer Schema-Stelle, deshalb 453 → 454 im Nenner und
+29 → 30 / 17 → 18 im Zähler. Die alte Fußnote ist **deprecatet, nicht gelöscht**; sie beschreibt
+`25fe4fbf` und bleibt für diesen Zustand richtig.
+
+**Was der Gitlink-Bump auf `c6d8e573` inhaltlich trägt** (der eigentliche Grund, ihn zu ziehen): den
+`#278`-Fix — der `ExperimentPlanDirector` emittiert **kein** `allow_failure` mehr in den Mess-Batch-Job.
+Ohne diesen Bump führte super weiter den alten Emitter, und die Owner-Direktive wäre nur im ce-Repo,
+nicht auf dem **lebenden** Weg erfüllt.
 
 **Die Falle, die zuerst zuschlug — sie ist der Grund für `PZW-CE-SHA`.** Die erste Messung dieses Abschnitts lieferte **28 Stellen in 16 Dateien**. Falsch, und zwar nicht knapp: die Arbeitskopie des Submoduls lag auf **`a1d0c201`** (03.06.), während super HEAD den Gitlink **`25fe4fbf`** führt — ein Submodul-`M` kann **rückwärts** zeigen, und der Objektspeicher des Submoduls kannte den Gitlink-Commit nicht einmal. Gemessen wurde ein Zustand, den niemand behauptet hatte. Die Wache misst deshalb **nie** die Arbeitskopie, sondern immer den Baum am Gitlink-SHA, und sie bricht mit `exit 2` ab, wenn der Plan einen anderen Zustand nennt als HEAD führt. Zieht der Gitlink weiter, ist das ein Befund: **neu erheben, Fußnote nachziehen, alte Fußnote stehen lassen.**
 
