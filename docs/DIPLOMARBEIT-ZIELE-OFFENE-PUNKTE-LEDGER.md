@@ -16,6 +16,87 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — Ein Agent hat angehalten statt zu bauen. Und er hatte in beiden Punkten recht.
+
+**Kein Commit. Kein Bau.** Der Bericht ist trotzdem das wertvollste Ergebnis des Nachmittags,
+weil er **meine Auftragsprämisse widerlegt** — und zwar mit einer Messung, nicht mit einem
+Argument.
+
+### Was ich beauftragt hatte
+
+Die verworfene Perzentil-Formel lebt in super als **Abschrift** (`nearest_rank_median`, 2
+Definitionen, 11 Aufrufe). Ich schrieb in den Auftrag, **neun** dieser Aufrufe seien
+Proben-Perzentile und **zwei** (`diagram_generator.cpp:1783/1784`) seien Mediane **über
+Konfigurationen** — ein anderer Gegenstand, den man nicht mitziehen dürfe.
+
+### Was am Objekt steht
+
+> **Alle 11 aggregieren über Konfigurationen. Null über Roh-Proben.**
+
+Der Grund steht als tragende Aussage **in der Quelle selbst**
+(`diagram_generator.cpp:1737-1739`):
+
+> „das WIDE-Schema trägt je Permutation **NUR aggregierte Perzentile**
+> (`op_<art>_p50_ns` / `op_<art>_p99_ns`), **NICHT die rohen Einzel-Op-Latenzen**."
+
+**super sieht überhaupt nie Roh-Proben.** Zwei der elf aggregieren sogar auf **zweiter** Stufe
+(`04:513` über Differenzen bereits gemedianter Zellen, `05:1205` über `data.matrix[y][x]`).
+
+**Meine Trennlinie 9-gegen-2 existiert nicht.** Und `05:735` verarbeitet dieselbe Datenart wie
+`05:1783` — beide über `pick_z_field`, beide bereits aggregierte Perzentile je Zeile.
+
+### Warum der Agent nicht gebaut hat — und warum das richtig war
+
+Jede denkbare Heilungsform **ist bereits der Entscheid**, den er laut Auftrag nicht fällen durfte:
+
+| Form | Entscheidet stillschweigend |
+|---|---|
+| in-place heilen | `:1783/:1784` kippen **mit** |
+| heilen + aufspalten | sie behalten die **alte** Formel |
+| alle 11 ziehen | sie **gehen mit** |
+
+**Die eigentliche Frage ist deshalb größer als „9 heilen, 2 einfrieren":**
+
+> **Gilt ein Stichproben-Perzentil-Kanon (Hyndman/Fan Typ 1) für Konfigurations-Mediane
+> überhaupt?**
+
+Das ist ein Owner-/D5-2-Entscheid, kein Bau-Detail. **Hätte er gebaut, hätte er ihn stillschweigend
+mit „ja, für alle 11" beantwortet** — und dabei zwei bestehende Tests umgeschrieben, deren
+Kommentare die **gegenteilige** Konvention ausdrücklich festhalten.
+
+### Mein zweiter Befund ist für eine der beiden Dateien WIDERLEGT
+
+Ich hatte geschrieben: *„keine bricht … diese Tests können einen Formel-Wechsel nicht bemerken."*
+
+**Gemessen:** unter dem Kanon brechen `test_05:506/507` und `test_05:1467` — **ohne dass eine
+einzige Testdatei angefasst wurde**. Für `04` stimmt mein Befund (20/20 grün), für `05` **nicht**.
+
+Und die Begründung war ebenfalls falsch: `test_05:505-507` pinnt `[100,120]` und `[200,240]`,
+**beide n=2, beide divergent**. Der Kommentar dort benennt die Konvention sogar wörtlich —
+*„nearest-rank-Median [100,120] → 120 (obere)"* — also **genau die obere Mitte, die der Kanon
+verwirft**. Ebenso `test_05:1448-1452`.
+
+**Die Tests sind schärfer als ich dachte.** Sie halten fest, was heute gilt — und sie brechen
+korrekt, wenn man es ändert.
+
+### Eine neue Falle beim Testbau, die der Agent selbst fand
+
+**Gerade Stichprobenlänge allein genügt nicht.** Bei `{5,5,5,5}` sind die Indizes verschieden
+(2 gegen 1), die **Werte** aber gleich — der Fall pinnt **nichts**. Die Werte müssen **an den
+beiden Indizes verschieden** sein.
+
+Das ist dieselbe Klasse wie der verdeckte `exit`-Zweig von heute früh: **ein Testfall, der zwei
+Wege nicht unterscheiden kann, prüft nur, dass beide existieren.**
+
+### Was der Agent nebenbei belegt hat
+
+**Weg (a) — den ce-Kanon direkt einbinden — ist technisch verfügbar, gemessen statt geraten:**
+`latency_stats.hpp` ist header-only, standalone kompiliert und gelinkt (`rc=0`), in-tree
+gebaut mit **einer einzigen** zusätzlichen CMake-Zeile in `04`; `05` hat den Include-Pfad ohnehin.
+**Kein Link gegen ce-Code.**
+
+**Wäre nur die Formel-Frage offen, wäre (a) klar richtig** — es beseitigt beide Kopien, statt eine
+zu verwalten. Der Patch liegt fertig; die Ausführung ist klein, sobald der Entscheid fällt.
 ## NACHTRAG 09.08.2026 — Der Vendoring-Nachzug hat die falschen Zahlen NICHT geheilt. Und drei meiner Zahlen fielen.
 
 **Gelandet:** `super dfdf8bbe` — Gitlink auf `ce 9f92d49f`.
