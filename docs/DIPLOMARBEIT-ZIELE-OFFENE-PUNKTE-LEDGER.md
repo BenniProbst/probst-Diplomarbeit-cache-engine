@@ -16,6 +16,127 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (spät) — DIE INVENTUR DER GEFALLENEN PUNKTE: „wir streichen nichts" + F-07b
+
+**Zweistufiger Explore auf Owner-Auftrag** („nenne mir ALLE gefallenen Punkte … RATE NIE"): Erhebung
+Sonnet 5 max über Wellenplan v1+v2, ANLAGE, Dossier, Lesefassung, Ledger und beide großen
+JSONL-Transkripte; Gegenlesen Fable 5 xhigh mit eigenem Owner-Text-Extraktor (drei Pfade als UNION:
+`promptSource=typed` + `queue-operation enqueue` + `queued_command`; 520 bzw. 1601 Einträge),
+**an zwei bekannten Owner-Worten validiert** — damit sind die Nichtfunde belastbar.
+
+**Vorher geprüft, was schon im Ledger steht** (`grep -cF`, Gegenprobe „Steuerdock" = 6): der
+24-Stunden-Satz steht bei **:979**, der 2D/3D-Owner-KERN bei **:10257**, die HY-Auflagen bei
+**:1000**. Die vier Punkte unten hatten **null** Treffer.
+
+---
+
+### 1. DER SATZ, DER DIE GANZE STREICHLOGIK AUFHEBT — und er fiel heute früh
+
+Owner, 09.08. **10:23:05 UTC**, getippt (`5a19728e…jsonl:23240`), auf die Lead-Vorlage
+„Soll ich die Streichliste (~228 h) anwenden?":
+
+> „Ja, **wir streichen nichts und können uns das auch nicht leisten.** Wir parallelisieren disjunkte
+> Arbeit wie in der Arbeitsweise beschrieben."
+
+Zusammen mit dem Satz von **09:48 UTC** (bereits im Ledger, :979): *„der Tag hat 24 Stunden und
+meine Geldbörse ist voll. Rechne also in 24 Stunden je Tag."*
+
+**Der Lead hat den ganzen Tag mit einer Streichliste weitergearbeitet, die am Morgen aufgehoben
+worden war.** Die Rücknahme von `checkpoint_measure` am Abend war keine neue Entscheidung des
+Owners, sondern die **Wiederholung** einer schon getroffenen — nach zwölf Stunden, in denen der
+Lead die Streichungen wie geltend behandelte.
+
+*Einschränkung, ehrlich benannt:* das Zitat beantwortet textuell die ~228-h-Streichliste des
+Konformitäts-Registers (:1636-1647), nicht wörtlich Wellenplan §7. Es ist eine **generelle
+Haltung**, keine Zeile-für-Zeile-Freigabe. Aber es kehrt die Beweislast um: eine Streichung braucht
+ab jetzt einen Owner-Beleg, nicht ihre Beibehaltung.
+
+---
+
+### 2. F-07b (Diagramm-Emitter) — die Streichung steht GEGEN einen echten Owner-KERN
+
+Wellenplan v2 §7 streicht F-07b nach W7 mit der Begründung *„Anhang trägt Tabellen, keine
+2D/3D-Diagramme — **Tabellen tragen die Aussage**"*, unter Berufung auf „Streichkaskade bestätigt".
+
+**Beides hält nicht:**
+
+- Der Owner-KERN vom **06.08. 05:44 UTC**, getippt (`jsonl:265`, im Ledger bei :10257):
+  *„eine Heatmap ist vielleicht nicht die geeignete Form, wie machen das die anderen Paper?
+  Orientiere dich daran und **verwende 2D und 3D Graphen**."*
+  Die Streichbegründung ist **wörtlich die Position, die dieser KERN korrigiert hat.**
+- „Streichkaskade bestätigt" ist **erfunden**: alle 6 Treffer für „Streichkaskade" in beiden
+  Transkripten sind Agent-Text (3× Task-Notification des Sub-Workflows, der den Plan selbst
+  erzeugte, 2× Datei-Echo, 1× Assistant). **Kein Owner-Text.** Das Suchverfahren findet Treffer,
+  es findet nur keinen Owner — die Gegenprobe ist gefahren.
+
+**KORREKTUR AM VERIFY-BERICHT, die der Lead selbst nachgemessen hat:** der Bericht schrieb, fünf
+fertige Graph-Commits *„bleiben ungelandet"*. **Falsch.** Am Objekt:
+`31af5a92` liegt in `github/development`, `github/main` und `origin/main`; der Thesis-Ast
+`8970465d` ebenso in `github/development`, `github/main`, `origin/main`. **Beides ist gelandet, auf
+beiden Remotes.** Der Bericht hatte aus der bloßen *Existenz* der Rescue-Refs auf „ungelandet"
+geschlossen und diese Grenze selbst benannt (*„Existenz, nicht Deckungsgrad geprüft"*) — in genau
+dieser Lücke saß der Fehler. **V1 in Reinform: ein Bericht ist Beweismaterial, kein Beweis.**
+
+**Was bleibt:** die Streichung selbst ist unhaltbar — sie spricht einer **erledigten,
+owner-beauftragten** Arbeit nachträglich das Existenzrecht ab. Papier gegen Wirklichkeit, nicht
+verlorene Arbeit. Kettenstation **VERÖFFENTLICHEN**.
+
+---
+
+### 3. DIE OV-NUMMERNKOLLISION — ein Mechanismus, der falsche Wahrheit erzeugt
+
+**Die OV-Nummern sind nicht stabil, und der Owner nummeriert nicht selbst.** Belegt: „OV-18" im
+Wellenplan v2 (:668, „Streichkaskade bestätigt?") ist ein **anderes** OV-18 als das im Ledger
+konsolidierte OV-18 („CI **und** lokal als Beweis", :1119) — und **letzteres ist beantwortet.**
+
+> **Über diese Kollision kann ein „OV-x bestätigt" wahr aussehen, obwohl der Owner zu diesem
+> Gegenstand nie befragt wurde.** Genau so ist die `checkpoint_measure`-Erfindung entstanden.
+
+**Regel daraus:** eine Berufung auf eine OV-Nummer ist **kein** Autoritätsbeleg. Zu prüfen ist immer
+der **Gegenstand** im Roh-Transkript, nie die Nummer.
+
+*Nebenbefund derselben Klasse:* die v1-Zeile *„Owner-KERN 1 sagt wörtlich ‚SPEZIFIZIERT, NICHT
+GEBAUT'"* (v1:764) — die mutmaßliche Wurzel der checkpoint_measure-Erfindung — hat in **beiden**
+Transkripten **0 Owner-Treffer** (Verfahren validiert). Schon v1s „Owner-KERN 1" war vermutlich
+eine Fehlzuschreibung.
+
+---
+
+### 4. ZWEI WEITERE STREICHUNGEN MIT GEGENLÄUFIGEM OWNER-WORT
+
+**T-13/T-14 (Fehlerklassen-Walk, in ##40 → W7).** Kollidiert mit einer echten Owner-Direktive vom
+**17.07.**, verbatim: *„**Fehlerklassen und Behandlung sind für alle Achsen → Unterachsen →
+Algorithmen Pflicht**."* Heutiger Stand: **0 von 18** bzw. **0 von 121**. Kettenwirkung: ohne
+Fehlerklassen reißt ein Hardware-/Compile-Fehlen (das AVX-512-Beispiel der Direktive selbst) im
+Messfenster die Pipeline, statt klassifiziert weiterzumessen — **MESSEN wird nicht leer, aber genau
+dort fragil, wo der Owner Schutz angeordnet hat.**
+
+**prod2/Intel-Lane (→ Textkorrektur auf Ein-Maschinen-Betrieb).** Es existiert **kein** Owner-Wort
+zu OV-5 — aber **vier** echte Owner-Aussagen behandeln prod2 als real: *„Die Messung läuft … real
+auf prod1 **und prod2** von cluster prod"* · *„prod1 und prod2 haben noch Windows Server 2022"* ·
+*„prüfe prod1 und prod2 gleichermaßen"* · *„cluster prod2 Ausfall … können diese aber jetzt
+**wieder einschalten**"*. Die Objektmessung (`getent` rc 2, Gegenprobe prod1 rc 0) ist sauber, aber
+**„offline/nicht auflösbar" ≠ „existiert nicht".** Eine Textkorrektur ohne ausdrückliche
+Owner-Antwort wäre riskant — sie nähme drei Präsens-Zusagen zurück, die womöglich erfüllbar sind.
+
+---
+
+### DER NENNER
+
+**18 Hauptpositionen** in Wellenplan v2 §7 und der Streichkaskade geprüft. Autoritätsmarken:
+**OWNER verifiziert 4** · **BEHAUPTET 6** (`checkpoint_measure` ✔ zurückgenommen · **F-07b** ·
+Streichkaskaden-Ordnung · ##24/##15 · ##40 inkl. T-13/T-14 · R-3/OV-8 „Konformität erfüllt per
+`perm_runner`" — dort `perm_runner` in Owner-Texten = **0 Treffer**) · **OFFEN** der Rest, darunter
+prod2, der Mess-Deckel (OV-4) und die Paper-Kopplung.
+
+**Was NICHT durchsucht wurde, ausdrücklich:** die übrigen ~11 Transkripte (dort könnte das
+behauptete „SPEZIFIZIERT, NICHT GEBAUT" liegen) · der Deckungsgrad der Rescue-Commits gegen den
+F-07b-Scope · das Konformitäts-Register teil2 (229 Zeilen, enthält den Präsens-Katalog).
+
+**Folge für die Fahrweise:** nach dem Satz *„wir streichen nichts"* ist die Beweislast umgekehrt.
+Jede §7-Zeile ohne Owner-Beleg ist ein **Bau-Posten**, kein gestrichener. Die Streichliste wird
+nicht Zeile für Zeile neu verhandelt — sie ist als Ganzes aufgehoben, bis der Owner Einzelnes
+ausdrücklich fallen lässt.
 ## 09.08.2026 (abends) — RESTPOSTEN: was heute gefallen ist und noch NICHT im Ledger stand
 
 **Auf Owner-Auftrag „ergänze alle fehlenden Punkte".** Vorher am Objekt geprüft, welche Themen der
