@@ -236,7 +236,12 @@ fi
 # Die Reihenfolge der Zweige ist der Kern dieser Wache: die NETZ-Signatur der
 # ersten Zeile schlaegt die FEHLT-Signatur der letzten. Genau umgekehrt waere
 # der Stellvertreter (siehe gemessener Befund im Kopf).
-awk '
+# Der rc wird im if-Kopf gemessen (wie beim mc-Aufruf oben): ein nacktes
+# "AWK_RC=$?" NACH dem Aufruf waere unter set -e unerreichbar -- die Shell
+# endete beim awk-Fehlschlag sofort, mit einem rc AUSSERHALB des Vertrags
+# {0,1,2,3} (z. B. 127 bei fehlendem awk). Lens-Befund 09.08., verdeckter
+# Zweig; das FALLEN-REGISTER kennt die Klasse als "verdeckte exit-Zweige".
+if awk '
 function hat(s, n) { return index(s, n) > 0 }
 function redigiere(s) { gsub(/:\/\/[^ "@]*@/, "://***REDIGIERT***@", s); return s }
 # Nur die OBERSTE Ebene des JSON behalten -- ein "size" in "metadata" darf die
@@ -334,8 +339,11 @@ END {
     printf "ETAG=%s\n",       etag
     printf "ERSTFEHLER=%s\n", erste_fehlerzeile
 }
-' "$ROH" > "$BEFUND"
-AWK_RC=$?
+' "$ROH" > "$BEFUND"; then
+    AWK_RC=0
+else
+    AWK_RC=$?
+fi
 if [ "$AWK_RC" -ne 0 ]; then
     echo "ABBRUCH: awk endete mit rc=$AWK_RC -- die Wache konnte nicht auswerten." >&2
     exit 2

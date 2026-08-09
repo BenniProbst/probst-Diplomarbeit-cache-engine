@@ -396,8 +396,8 @@ test:bestandslog-wache-bissprobe:
     - sh ci/tests/bestandslog_wache_probe.sh --selbstbiss
 
 # -- LAG-P1 Rest (2026-08-09): PROBE fuer die OBJECT-STAT-WACHE (ci/object_stat_wache.sh) --
-# SELBSTCHECK dieses Blocks: die Probe deckt die Wache UND die Abnahme ab (26 Faelle je Lauf,
-# 4 Selbstbiss-Mutanten). Sie braucht KEIN erreichbares MinIO: die Erfolgsfaelle laufen mit der
+# SELBSTCHECK dieses Blocks: die Probe deckt die Wache UND die Abnahme ab (28 Faelle je Lauf,
+# 6 Selbstbiss-Mutanten). Sie braucht KEIN erreichbares MinIO: die Erfolgsfaelle laufen mit der
 # ECHTEN mc-Binary gegen ein lokales Verzeichnis (mc kann lokale Pfade statten und kopieren),
 # die Store-Fehlerfaelle gegen ein Fake-mc, dessen JSON-Formen am 09.08. literal von der echten
 # mc-Binary abgenommen wurden. Deshalb faehrt sie in JEDER Pipeline und nicht nur im Opt-in.

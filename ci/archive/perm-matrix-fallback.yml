@@ -5,6 +5,14 @@
 # fingerprint); der Treiber beantwortet die Alt-Flags mit einer Verweis-Zeile und rc 1. Dieses Archiv ist
 # NICHT in die super-Pipeline eingebunden (s. .gitlab-ci.yml) und bleibt inhaltlich unangetastet --
 # Doku wird deprecatet, nie geloescht. Wer den Fallback je reaktiviert, muss die Aufrufe umstellen.
+# ARCHIV-NACHTRAG LAG-P1 Rest (09.08.2026, Lens-Befund 5, Schwesterstelle): die unten VERBATIM erhaltenen
+# Stellen `if mc stat "$MARKER" >/dev/null 2>&1` (HIT-Pruefung) und `mc ls ... | grep -q` (Teil-Resume)
+# sind VERALTET und duerfen so nie reaktiviert werden. Gemessener Grund (09.08., mc RELEASE.2025-08-13):
+# `mc stat` liefert bei TOTEM STORE und bei FEHLENDEM Objekt denselben rc=1 -- ein Infrastruktur-Ausfall
+# wuerde hier als "Marker nicht da" gelesen und loeste stumm einen lokalen Neubau aus (exakt der
+# Stellvertreter, gegen den ci/object_stat_wache.sh gebaut ist). Zusaetzlich misst `rc=$?` nach einer
+# Pipe nur das letzte Glied (K11). Wer den Fallback reaktiviert, ersetzt beide Stellen durch Aufrufe von
+# ci/object_stat_wache.sh (rc-Vertrag 0/1/2/3; NETZ schlaegt FEHLT). Der Inhalt unten bleibt VERBATIM.
 # ==========================================================================================================
 # Herkunft: super/.gitlab-ci.yml (probst-diplomarbeit-cache-engine, Projekt 288), vormals Zeilen ~786-1082.
 # Owner-Entscheid (Handout DIPLOM->INFRA 2026-07-26 §2, Diplom-Ledger §70.4/RF-4): "Bitte ins Archiv. Aber
