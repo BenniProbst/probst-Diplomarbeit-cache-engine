@@ -48,6 +48,28 @@
 #        awk-Datensaetze, jede mit Groesse > 0 hat mindestens einen. '_hdr=1'
 #        heisst damit "es steht wirklich eine Kopfzeile in $WIDE".
 #
+# ZWEI STELLEN SIND HEUTE UNGEDECKT -- am Objekt nachgemessen, nicht behauptet.
+# Die beiden Saetze standen vor dem Umzug in ci/anhang_forward_core.sh und waeren
+# beim Verschieben fast verlorengegangen; die Zahlen sind hier NEU gemessen
+# (11 Faelle, nicht mehr 10 wie in der Fassung davor):
+#   * '>>' STATT '>' in der Header-Zeile. Ein Mutant, der NUR das zurueckdreht,
+#     laesst ALLE 11 Faelle der Probe gruen -- kein Test unterscheidet die beiden
+#     Fassungen. Es kann heute auch nichts kaputtmachen: der Header wird genau
+#     einmal geschrieben, und vor ihm koennen nur 0-Byte-Dateien gelaufen sein,
+#     die nichts beitragen. Es steht als Vorsorge gegen eine kuenftige
+#     Umstellung, nicht als heutige Wache -- wer die Zeile bewegt, liest das mit.
+#   * 'awk END{NR+0}' STATT 'wc -l'. Ein Mutant, der NUR die Zaehlung
+#     zurueckdreht, laesst ebenfalls alle 11 Faelle gruen. Der Grund ist die
+#     Heilung von F3: seit 'awk 1' endet das Aggregat immer auf einen Newline,
+#     und dann liefern beide Zaehlweisen zwangslaeufig dieselbe Zahl. Die
+#     awk-Zaehlung ist hier also REDUNDANTE Deckung, nicht die tragende --
+#     tragend ist das 'awk 1'. Sie bleibt: sie haelt die Zusage "wortgleich zu
+#     Wache und Sammler" und greift, falls das 'awk 1' spaeter verschwindet.
+#   Der Mutant N2 der Probe dreht beide Zeilen ZUSAMMEN mit der Konkatenation
+#   zurueck und beisst dann -- er belegt also den Stand vor P4 als Ganzes, nicht
+#   diese beiden Zeilen einzeln. Zwei Deckungen desselben Falls sind kein Fehler;
+#   sie unbenannt zu lassen waere einer.
+#
 # NICHT ZUGESICHERT -- ausdruecklich benannt, damit niemand mehr hineinliest:
 #   * dass die Kopfzeilen aller Dateien GLEICH sind. Der Header wird EINMAL von
 #     der ersten Datei mit Inhalt genommen; abweichende Spalten einer spaeteren
