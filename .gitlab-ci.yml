@@ -395,6 +395,62 @@ test:bestandslog-wache-bissprobe:
   script:
     - sh ci/tests/bestandslog_wache_probe.sh --selbstbiss
 
+# -- P4b (2026-08-09): PROBE fuer den ANHANG-VORWAERTS-KERN (ci/anhang_forward_core.sh) --
+# SELBSTCHECK dieses Blocks: alle Zahlen unten sind am Objekt gemessen, keine ist abgeschrieben.
+#
+# DER BEFUND, der diesen Job erzwingt (selbst gezaehlt): die Probe existierte, war gebaut und
+# gruen -- und wurde von KEINEM Job aufgerufen. Ein grep -cF auf ihren Aufrufpfad gegen diese
+# Datei lieferte 0. Ein Test, der in keiner Pipeline faehrt, ist nicht gebaut.
+#
+# WARUM DER PFAD HIER NICHT AUSGESCHRIEBEN STEHT: Fall A7 der Probe zaehlt ihre eigene
+# Registrierung mit 'grep -cF' ueber die GANZE Datei -- Kommentare zaehlen mit. Stuende der
+# Aufrufpfad auch hier, bliebe A7 gruen, wenn jemand den Job unten loescht und diesen Block
+# stehen laesst. Der Zaehler soll genau die eine echte Aufrufzeile treffen: gemessen nach der
+# Umformulierung 1 Treffer, und der liegt im script-Block.
+#
+# WARUM DIE PROBE DIE EINZIGE DECKUNG IST: der Kern selbst laeuft ausschliesslich im Job
+# anhang:forward (:1577 dieser Datei, die einzige Ausfuehrungsstelle -- die uebrigen Nennungen
+# sind Kommentare). Dieser Job ist INERT-by-default: ohne COMDARE_ANHANG_FORWARD=="true" wird er
+# gar nicht erst erzeugt. Im Alltag faehrt der Kern also NIE. Ohne diesen Job wird der Anhang-
+# Kanal erst dann zum ersten Mal ausgefuehrt, wenn er scharf geschaltet wird -- am Ende eines
+# mehrtaegigen Messlaufs, mit echten Messdaten, ohne Netz. Genau dieser Fehler ist in diesem
+# Repo schon passiert: eine Wache wurde gebaut und nirgends aufgerufen.
+#
+# WAS DIE PROBE HAELT: 10 Faelle (A1-A10) gegen die VIER stillen Transportfallen, die der Kern
+# am 09.08. geheilt hat -- Selektor traf 'result.csv' nie / 'wc -l' verwarf genau eine Datenzeile
+# / Konkatenation ohne 'awk 1' verklebte zwei Messwerte zu einem / 0-Byte-CSV stahl den Header.
+# Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu tun" aussah.
+# Der Beweis wird am ZIEL-REPO gefuehrt (git rev-list --count, git show HEAD:<pfad>), nicht am
+# Log: gefragt wird, ob der gewuerfelte Koeder im COMMITTETEN Blob steht.
+#
+# WARUM --selbstbiss IM CI: eine Probe, die nur am gesunden Objekt gruen ist, belegt nichts. Der
+# Schalter baut SECHS Wegwerf-Mutanten des Kerns (N1-N6: alter Glob / Stand vor P4 / kein awk 1 /
+# Nenner-Zeile weg / -s-Wache weg / Leerheitspruefung offen) und FORDERT, dass jeder die Probe rot
+# macht. Am Objekt gemessen bei der Verdrahtung: 6 von 6 gebissen. Der Nenner faehrt bei jedem
+# Lauf mit, statt hier als Prosa zu verjaehren.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
+# wie bei den drei Proben darueber). KEIN .code-rules: der Kern kann ueber eine reine Aenderung an
+# .gitlab-ci.yml brechen -- Fall A7 der Probe prueft genau diese Datei -- und das ist eine
+# docs-only-Welle, in der .code-rules den Job wegfiltern wuerde.
+#
+# GIT_SUBMODULE_STRATEGY: none ist geprueft, nicht uebernommen: die Probe referenziert kein
+# Code/external (0 Treffer) und faehrt alle Faelle mit AF_PDF_GATE=off (:237), braucht also weder
+# Submodule noch TeX-Toolchain. Sie legt ihre Ziel-Repos per mktemp -d an und setzt die
+# git-Identitaet selbst (:190/:191) -- kein Verlass auf eine Runner-Konfiguration.
+test:anhang-forward-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigener Kern; die Sandbox baut sich die Probe selbst
+  script:
+    - sh ci/tests/anhang_forward_probe.sh --selbstbiss
+
 # ── W0b-8 (2026-08-08): PLAN-ZAHLEN-WACHE + ihre Bissprobe ──
 # DER BEFUND. Der TDD-Designplan trug die Zahl "das CSV-Schema wird von 47 von 47 Stellen gegen
 # seine eigene Quelle geprueft". Am Objekt war sie mit KEINER von sechs benannten Zaehlweisen
@@ -1154,18 +1210,45 @@ measure:smoke:
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
       APP=$(find build -type f -name "appendix-generator" | head -1)
       if [ -n "$APP" ] && [ -x "$APP" ]; then
+        # SELBSTCHECK WIDE-Aggregat (P4b, 2026-08-09) -- WORTGLEICH zu ci/anhang_forward_core.sh:320-361.
+        #   ZUGESICHERT: (a) jede uebernommene Zeile endet auf einen Newline ('awk 1' gibt jeden
+        #     Datensatz mit ORS aus), (b) der Header kommt nur aus einer Datei, die wirklich eine
+        #     erste Zeile HAT ('[ -s "$rc" ]'), (c) gezaehlt wird mit awk NR -- dieselbe Zaehlweise
+        #     wie ci/mess_ausbeute_wache.sh, ci/persist_sammler.sh und der Anhang-Kern.
+        #   DREI DEFEKTE, DIE DAS HEILT -- alle am Objekt reproduziert, alle still mit rc=0:
+        #     (1) 'wc -l' zaehlt ZEILENUMBRUECHE. Kopfzeile + EINE Datenzeile ohne Schluss-Newline
+        #         ergab 1, '-gt 1' war falsch, und der Job meldete "keine result.csv gefunden".
+        #         Das ist exakt der Mini-Messwert des Durchstichs. Nachgemessen: awk NR=2, wc -l=1.
+        #     (2) Die Konkatenation ohne 'awk 1' klebte die erste Datenzeile der naechsten Datei an
+        #         die letzte der vorigen. Nachgemessen mit zwei Permutationen: 2 Zeilen, wo 3 stehen
+        #         muessten (Kopf + 2 Daten) -- ab zwei Permutationen verlor die CI still Messwerte.
+        #     (3) DER HEADER-DIEB: eine 0-Byte-result.csv, die im 'sort' VOR der vollen liegt, setzte
+        #         '_hdr=1' ohne etwas zu schreiben; die volle Datei kam danach nur noch durch
+        #         'tail -n +2' und verlor ihre Kopfzeile. Nachgemessen: KOPFLOSES Aggregat.
+        #   NICHT zugesichert: dass die Kopfzeilen aller Dateien gleich sind (der Header wird EINMAL
+        #     genommen), und dass eine Datei mit Groesse > 0 eine brauchbare Kopfzeile hat. Hier wird
+        #     die Herkunft geprueft, nicht der Inhalt -- das ist eine andere Wache.
         find measure_out_smoke -type f -name 'result.csv' | sort > measure_out_smoke/_rc_list.txt
         WIDE=measure_out_smoke/wide_aggregate.csv; : > "$WIDE"; _hdr=0
         while IFS= read -r rc; do
-          [ "$_hdr" = "0" ] && { head -1 "$rc" > "$WIDE"; _hdr=1; }
-          tail -n +2 "$rc" >> "$WIDE"
+          [ "$_hdr" = "0" ] && [ -s "$rc" ] && { head -1 "$rc" | awk 1 >> "$WIDE"; _hdr=1; }
+          tail -n +2 "$rc" | awk 1 >> "$WIDE"
         done < measure_out_smoke/_rc_list.txt
-        if [ -s "$WIDE" ] && [ "$(wc -l < "$WIDE")" -gt 1 ]; then
+        WIDE_ZEILEN=$(awk 'END{print NR+0}' "$WIDE")
+        if [ "$_hdr" = "1" ]; then
+          _hdr_txt=ja; WIDE_DATEN=$((WIDE_ZEILEN - 1))
+        else
+          _hdr_txt=nein; WIDE_DATEN=0
+        fi
+        echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), Zaehlweise awk NR"
+        if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out_smoke/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out_smoke/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
           rm -f "$WIDE" measure_out_smoke/_rc_list.txt   # Intermediates NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
         else
-          echo "kein WIDE-Aggregat (keine result.csv gefunden) -> Anhang-Regenerierung honest uebersprungen"
+          # Die alte Meldung behauptete "keine result.csv gefunden" -- in zwei der drei reproduzierten
+          # Faelle war das FALSCH (die CSV war da, der Messwert auch). Sie nennt jetzt ihren Nenner.
+          echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$_hdr_txt) -> Anhang-Regenerierung honest uebersprungen"
         fi
       fi
       echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
@@ -1259,18 +1342,37 @@ measure:golden-320:
       cmake --build build --target appendix_generator_cli || echo "appendix_generator_cli-Build fehlgeschlagen -> Anhang uebersprungen"
       APP=$(find build -type f -name "appendix-generator" | head -1)
       if [ -n "$APP" ] && [ -x "$APP" ]; then
+        # SELBSTCHECK WIDE-Aggregat (P4b, 2026-08-09) -- WORTGLEICH zu measure:smoke oben und zu
+        #   ci/anhang_forward_core.sh:320-361. Die drei geheilten Defekte (wc -l zaehlt Umbrueche /
+        #   Konkatenation ohne 'awk 1' verklebt Zeilen / 0-Byte-CSV stiehlt den Header) sind dort
+        #   ausfuehrlich begruendet und wurden am Objekt reproduziert, BEVOR diese Zeilen entstanden.
+        #   WARUM DIE BEGRUENDUNG NICHT NOCHMAL AUSGESCHRIEBEN IST: dieselbe Stelle existiert dreimal;
+        #   drei Kopien einer Begruendung verjaehren einzeln. Der Verweis nach oben ist die eine Quelle.
+        #   HIER WIEGT ES AM SCHWERSTEN: dies ist der mehrtaegige Voll-Lauf. Vor der Heilung konnte er
+        #   nach TAGEN mit "OK (golden-320 gemessen)" enden, waehrend das Aggregat still um Messwerte
+        #   gekuerzt oder ganz verworfen war -- und persist:measurements haette genau das
+        #   zurueckgeschrieben. Ein Messwert, der hier verschwindet, kostet Tage Rechenzeit.
         find measure_out -type f -name 'result.csv' | sort > measure_out/_rc_list.txt
         WIDE=measure_out/wide_aggregate.csv; : > "$WIDE"; _hdr=0
         while IFS= read -r rc; do
-          [ "$_hdr" = "0" ] && { head -1 "$rc" > "$WIDE"; _hdr=1; }
-          tail -n +2 "$rc" >> "$WIDE"
+          [ "$_hdr" = "0" ] && [ -s "$rc" ] && { head -1 "$rc" | awk 1 >> "$WIDE"; _hdr=1; }
+          tail -n +2 "$rc" | awk 1 >> "$WIDE"
         done < measure_out/_rc_list.txt
-        if [ -s "$WIDE" ] && [ "$(wc -l < "$WIDE")" -gt 1 ]; then
+        WIDE_ZEILEN=$(awk 'END{print NR+0}' "$WIDE")
+        if [ "$_hdr" = "1" ]; then
+          _hdr_txt=ja; WIDE_DATEN=$((WIDE_ZEILEN - 1))
+        else
+          _hdr_txt=nein; WIDE_DATEN=0
+        fi
+        echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), Zaehlweise awk NR"
+        if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
           rm -f "$WIDE" measure_out/_rc_list.txt   # Intermediates (39k-Zeilen-Konkatenation) NICHT artefakten/persistieren — das per-Perm-Rohmaterial reicht
         else
-          echo "kein WIDE-Aggregat (keine result.csv gefunden) -> Anhang-Regenerierung honest uebersprungen"
+          # Die alte Meldung behauptete "keine result.csv gefunden" -- in zwei der drei reproduzierten
+          # Faelle war das FALSCH (die CSV war da, der Messwert auch). Sie nennt jetzt ihren Nenner.
+          echo "WIDE-Aggregat hat keine Datenzeile (Zeilen=$WIDE_ZEILEN, header=$_hdr_txt) -> Anhang-Regenerierung honest uebersprungen"
         fi
       fi
       echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs + regenerierter Anhang unter measure_out/) ==="
