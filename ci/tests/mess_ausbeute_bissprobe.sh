@@ -42,11 +42,19 @@
 # ABNAHME-TEIL (Fall F10/F11): die Probe traegt zusaetzlich die Abnahme des
 # D3-Pakets -- das alte, defekte Praesenz-Muster `test -n "$(find ...)"` ist aus
 # .gitlab-ci.yml verschwunden -- und ihre eigene Registrierung (T-7).
-# WARUM DORT EIN KOEDER STEHT: `/usr/bin/grep` ist auf dieser Maschine ugrep
-# 7.5.0, und ein Muster mit `$(` ist ihm ohne -F eine stille Anker-Falle. Am
-# selben Tag literal nachgemessen, auf EINER Datei mit zwei echten Vorkommen:
-#     grep -cF 'test -n "$(find' <datei>   -> 2   (rc=0)   [richtig]
-#     grep -c  'test -n "$(find' <datei>   -> 0   (rc=1)   [STILL FALSCH]
+# WARUM DORT EIN KOEDER STEHT: der `grep` der Agenten-Shell ist eine Funktion
+# auf ugrep 7.5.0, und ein Muster mit `$(` ist ihm ohne -F eine stille
+# Anker-Falle -- stumm im Wortsinn: 0 Bytes auf stderr.
+# RICHTIGSTELLUNG 09.08.2026 (die urspruengliche Fassung dieses Kopfes behauptete
+# "/usr/bin/grep ist auf dieser Maschine ugrep"; das ist am Objekt FALSCH):
+# /usr/bin/grep ist GNU grep 3.11, und GNU grep findet das Muster auch OHNE -F.
+# Die Falle haengt am AUFRUFER, nicht am Pfad. Dieses Skript laeuft als /bin/sh
+# und sieht damit GNU grep. Der Koeder bleibt trotzdem Pflicht: er ist die
+# einzige Deckung, die haelt, ohne zu wissen, welche Engine den Lauf faehrt.
+# Am selben Tag literal nachgemessen, auf EINER Datei mit zwei echten Vorkommen:
+#   ugrep 7.5.0:  grep -cF 'test -n "$(find' <datei> -> 2  (rc=0)  [richtig]
+#   ugrep 7.5.0:  grep -c  'test -n "$(find' <datei> -> 0  (rc=1)  [STILL FALSCH]
+#   GNU grep 3.11: grep -c 'test -n "$(find' <datei> -> 2  (rc=0)  [richtig]
 # Ein "== 0" ohne Gegenprobe ist damit wertlos: es kann bedeuten, dass das
 # Muster weg ist, oder dass das Werkzeug nicht sucht. Die Probe schreibt sich
 # deshalb zuerst eine Koeder-Datei mit einer GEWUERFELTEN Anzahl echter
