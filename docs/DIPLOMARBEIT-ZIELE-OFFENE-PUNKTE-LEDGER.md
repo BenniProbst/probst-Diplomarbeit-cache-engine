@@ -16,6 +16,81 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 09.08.2026 — Der Anhang-Kanal hatte VIER Fallen, nicht zwei. Und CI und Kern suchten verschiedene Dateien.
+
+**Gelandet:** `d7b779f7` (P5, xlsx im Sammler) · `6d2e3dce` (P4, drei Fallen) · `652083d1`
+(Nachsatz, vierte Falle). Verdikt: **trägt mit Mängeln**, keine Blocker. Der Bauer hat die Grenze
+eingehalten — beide Commits enthalten **ausschließlich** seine vier Dateien, per `git show --stat`
+gegengeprüft.
+
+### Die vier Fallen — alle mit derselben Eigenschaft: sie enden mit `rc=0`
+
+**Falle 1 — der Glob traf die reale Datei nie.** Drei Kopien von `-name '*.result.csv'`
+(`:149`, `:153`, `:165`); der lebende Messweg schreibt `result.csv` **ohne Präfix**
+(`planner_status_types.hpp:33`).
+
+**Falle 2 — `wc -l` verwarf genau die eine Datenzeile.** Zweimal berechnet (`:166`, `:167`).
+
+**Falle 3, im Auftrag nicht genannt — die WIDE-Konkatenation ohne `awk 1`.** `head -1 > $WIDE`
+plus `tail -n +2 >> $WIDE` **ohne Newline-Sicherung**: fehlt der Quelle der Schluss-Newline,
+**klebt die erste Datenzeile der nächsten Datei an die letzte der vorigen**. Ab zwei Permutationen
+verliert der Kanal still Messwerte.
+
+**Falle 4, erst der Nachsatz fand sie — eine 0-Byte-CSV stahl den Header.** Eine leere Datei als
+erste in der Reihe setzt das Header-Flag, ohne einen Header zu liefern; alle folgenden Daten
+landen ohne Kopfzeile.
+
+**Alle vier melden „nichts zu tun" und werden grün.** Das ist die Fehlerklasse, die kein Signal
+erzeugt — viermal in einer Datei.
+
+### Der Querbefund, der erklärt, wie Falle 1 entstehen konnte
+
+**Die CI aggregiert mit dem richtigen Namen, der Kern suchte den falschen:**
+
+    .gitlab-ci.yml:1157 / :1262   find … -name 'result.csv'      <- richtig
+    ci/anhang_forward_core.sh     find … -name '*.result.csv'    <- traf nie
+
+**Zwei Stellen desselben Systems benutzten verschiedene Selektoren für dieselbe Datei.** Nach P4
+nimmt der Kern **beide** Formen, die CI weiterhin nur die exakte. **Fällt OV-17 zugunsten der
+Archivform, müssen beide nachgezogen werden.**
+
+### `AF_CORPUS_ROOT` zeigt ins Leere — die fünfte Falle
+
+Der Default ist `measurement`; am Repo-Root existiert das **nicht** (`ls -ld` → *No such file*,
+`git ls-files 'measurement/*'` → **0**). Der getrackte Korpus liegt unter
+`docs/architektur/measurement/` — 18 Dateien, davon **8 im Archivformat** `<stem>.result.csv`.
+Und `.gitlab-ci.yml:1524` setzt denselben ins Leere zeigenden Wert.
+
+**Das ist der Grund, warum OV-17 nicht geraten werden darf:** beide Namensformen existieren real
+im Bestand.
+
+### Zwei Defekte außerhalb der Grenze — sauber gemeldet, mit selbst korrigierten Zeilennummern
+
+Der Bauer sollte sie **nicht** anfassen (`.gitlab-ci.yml` gehörte einem anderen Strang) und hat
+sie stattdessen dokumentiert — **inklusive der Feststellung, dass meine Zeilenangaben gedriftet
+waren**:
+
+| Was | mein Auftrag sagte | am Objekt |
+|---|---|---|
+| `wc -l`-Leerheitsprüfung | `:1027`, `:1122` | **`:1163`, `:1268`** |
+| Konkatenation ohne `awk 1` | *(nicht genannt)* | `:1160/:1161`, `:1265/:1266` |
+
+Der Zwischen-Commit eines parallelen Strangs (+32 Zeilen) hatte sie verschoben. **Er hat
+nachgemessen statt übernommen** — genau das, was ich von jedem Anker verlange.
+
+### Der P4-Proben-Job fehlt noch — und ohne ihn ist das Halten ungedeckt
+
+Der Bauer hat `ci/tests/anhang_forward_probe.sh` gebaut, konnte ihn aber **nicht verdrahten**
+(gesperrte Datei). Er liefert den Job-Block kopierfertig und sagt ausdrücklich: **ohne
+Verdrahtung fährt die Probe in keiner Pipeline.**
+
+Seine Begründung trifft den Kern: *„eine Wache, die nirgends aufgerufen wird, ist in diesem Repo
+schon einmal gebaut worden."* Der Kern läuft ausschließlich im Job `anhang:forward`, und der ist
+hinter `COMDARE_ANHANG_FORWARD` **inert**.
+
+Die Probe fährt **vier Wegwerf-Mutanten** (alter Glob · Stand vor P4 · `awk 1` entfernt ·
+Nenner-Zeile entfernt) und verlangt, dass jeder mit einem **fachlichen** Riss rot wird — nicht
+bloß über den Registrierungsfall. **Die Probe prüft ihren eigenen Biss auf Echtheit.**
 ## NACHTRAG 09.08.2026 — DAS KONFORMITÄTS-REGISTER: es passt nicht, und hier sind die Zahlen
 
 Der Owner hat den Fertigstellungs-Maßstab gesetzt: *„fertig, wenn die Realität dem Design
