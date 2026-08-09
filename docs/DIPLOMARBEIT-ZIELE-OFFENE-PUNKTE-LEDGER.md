@@ -16,6 +16,186 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## 09.08.2026 (spät) — OWNER-KERN: die WORK-MODE-UNTERACHSE = build→measure→compare→release + Wartungsmodus debug
+
+**Owner wörtlich, in zwei Schritten (der zweite korrigiert meine erste Lesart):**
+
+> „Die anzulegende Mess-Achse wäre die **Work-Mode Unter-Achse unter der `measurement_category`** für
+> die **4 Grund-Abschluss-Modi der cache engine**. Diese laufen ja **symmetrisch in der Hybrid-Version
+> nochmal durch**. Weil es **multiple Reroute-Systeme** geben kann, müssen diese als **separate
+> Meta-Meta-Mess-Achsen erweiterbar** sein, und die Work-Mode-Achse bedient das **generelle State
+> Pattern über das Factory Pattern der eingesteckten Hybrid-Haupt-Achse bzw. Hybrid-Haupt-Achsen**,
+> falls es später noch **mehrere zu orchestrierende Genus** wie den derzeitigen Hybrid-Aufbau geben
+> sollte."
+
+> „Ich meinte **build → measure → compare → release** Modi. Und zu denen gehört auch ein **fünfter
+> Wartungsmodus „Debug"**, aber der ist **nicht offiziell** und den verwenden wir als Entwickler für
+> **schnelles paralleles Bauen UND paralleles nicht-regelkonformes Messen**, wie dokumentiert und
+> geplant."
+
+*(Meine erste Lesart hatte die vier Modi auf `RunMethodology {Debug, Measure, Release, Compare}`
+bezogen und wäre damit an `Debug` hängengeblieben — der Owner hat sie richtiggestellt, bevor sie in
+den Ledger kam. Sie steht hier nur als Fehlerbeleg, nicht als Fassung.)*
+
+### DER BEFUND, den erst diese Richtigstellung sichtbar macht: `build` FEHLT
+
+`measurement/run_methodology_registry.hpp` führt heute (am Objekt gelesen, ce
+`landung/20260809-w0a-d4-hdr`):
+
+    enum class RunMethodology : std::uint8_t { Debug, Measure, Release, Compare };
+    inline constexpr std::size_t kRunMethodologyCount = 4;
+
+`/usr/bin/grep -c "Build,"` über diese Datei → **0**. **Es gibt keinen Bau-Modus.**
+
+Die Registry-Tabelle (`:94-97`), Spalten `id · cmake_build_type · measurement_on · single_thread`:
+
+| Modus | build_type | misst | 1-Thread |
+|---|---|---|---|
+| `debug` | Debug | **ja** | **nein** ⇒ parallel |
+| `measure` | Release | ja | ja |
+| `release` | Release | nein | nein |
+| `compare` | Release | nein | nein |
+
+**Die Debug-Semantik ist exakt die, die der Owner beschreibt, und sie ist gebaut:**
+`experiment_plan_director.hpp:2098` — *„Debug={Debug,misst,parallel}"*; der parallele Mess-Loop läuft
+**nur** im Debug-Modus (`profile_run_entry.hpp:770`, `experiment_run_entry.hpp:481`, je §16.2-M1/§61-MODI);
+`:1732` hält fest, dass **der Bau immer parallel läuft, nur das Messen 1-Thread ist**.
+Das „nicht regelkonform" des Owners ist im Code also präzise dies: **Debug misst, aber parallel** —
+und verletzt damit die Run-to-Run-Stabilität, die `measure` zusichert.
+
+### DIE SOLL-STRUKTUR
+
+    work_mode   -- UNTER-Achse unter measurement_category, STATE PATTERN
+    |
+    |-- build     OFFIZIELL   << FEHLT HEUTE IM ENUM
+    |-- measure   OFFIZIELL   {Release, misst, 1-Thread}          vorhanden
+    |-- compare   OFFIZIELL   {Release, liest Messwertlager}      vorhanden
+    |-- release   OFFIZIELL   {Release, erzeugt optimale Binary}  vorhanden
+    `-- debug     WARTUNG, NICHT OFFIZIELL
+                  {Debug, misst PARALLEL = nicht regelkonform}    vorhanden
+
+**Vier offizielle Modi, ein Wartungsmodus — fünf Enum-Werte.** Daraus folgt unmittelbar, was zu bauen
+ist: `kRunMethodologyCount` geht von 4 auf **5**, und die Zählung braucht eine **zweite** Konstante
+bzw. ein Feld, das offiziell von Wartung trennt. Eine einzige Zahl kann beides nicht ausdrücken —
+und genau so entsteht sonst die Klasse „Zahl ohne Nenner": „4 Modi" wäre wahr für die offiziellen und
+falsch für das Enum.
+
+**Der Bruch ist gewollt und laut:** der Header sagt selbst *„Single-Source: Drift einer 5. Methode
+bricht hier compile-time (statt still 4 zu bleiben)"* — die 5. Methode ist `build`. Wer sie ergänzt,
+bricht compile-hart alle Konsumenten. Das ist die Hausregel „Invalidieren ist gewollt, der Bruch muss
+LAUT sein", hier vom Bestand bereits vorbereitet.
+
+### DIE ABLAUF-ORDNUNG — `build` tritt VOR die bestehende Kette
+
+Der Header führt (Owner-Entscheid O-A, 07.08., §62-C insoweit superseded) die Ordnung
+`measure → compare → release`, **kumulativ enthalten** (measure in compare, compare in release).
+**Mit dem KERN von heute steht `build` davor:**
+
+    build -> measure -> compare -> release        (kumulativ, offizieller Zweig)
+    debug                                          (WARTUNG -- quer dazu, nicht in der Kette)
+
+Das deckt sich Station für Station mit dem Ketten-KERN von heute Nachmittag: *„single bauen → single
+messen → single compare → single release"*, und der Owner sagt ausdrücklich, dass die Modi
+**symmetrisch in der Hybrid-Version nochmal durchlaufen** — dort als *bauen → messen → compare →
+**multi**-release*. **Die Work-Mode-Achse ist damit die Typisierung der Kette selbst**, nicht eine
+Nebenbeschreibung des Mess-Vollzugs.
+
+### MULTIPLE REROUTE-SYSTEME: eine FAMILIE von Meta-Meta-Mess-Achsen, keine einzelne `hybrid`-Achse
+
+Der vorige Nachtrag ordnete die Hybrid-Meta-Meta als **eine** zweite `MeasurementMetaMetaAxis` ein.
+**Das ist zu eng.** Der Owner: *„weil es multiple Reroute-Systeme geben kann, müssen diese als
+separate Meta-Meta-Mess-Achsen erweiterbar sein"*.
+
+    load_framework        measurement_meta_meta   (ycsb -> workload)      vorhanden
+    hybrid_<genus_1>      measurement_meta_meta   ein Reroute-System      NEU
+    hybrid_<genus_2>      measurement_meta_meta   erweiterbar             NEU
+    ...                                            je Genus EINE Achse
+
+Das fügt sich in E2 vom 02.08. (*„dynamisch ans Ende der Kette in den bestehenden Zeilen angehängt"*)
+und in RF-7 (*„je Achsen-Typ EINE Array-Zeile"*): alle Reroute-Achsen stempeln in **derselben**
+Mess-Zeile, die Zeile wächst, die Struktur nicht. Und die Stempelzeile kann das bereits:
+`anatomy_version_stamp.hpp:266` trägt seit K7b-2 die **MENGE** der Mess-Tools als N Einträge, nicht
+eine einzelne Wahl.
+
+### DAS MUSTER: State über Factory
+
+> „die Work-Mode-Achse bedient das **generelle State Pattern** über das **Factory Pattern** der
+> eingesteckten Hybrid-Haupt-Achse bzw. Hybrid-Haupt-Achsen"
+
+    work_mode              = STATE       -- der Zustand des Ablaufs (build/measure/compare/release)
+    Hybrid-Haupt-Achse     = FACTORY     -- erzeugt, was in diesem Zustand zu tun ist
+    mehrere Hybrid-Achsen  = mehrere Factories, EIN State-Automat darüber
+
+Das ist bruchlos anschlussfähig an `GENUS_impl = Abstract Factory` (KERN 09.08.) — die Factory
+existiert bereits als Bauform eine Schicht tiefer; die Work-Mode-Achse ist der **Zustandsautomat
+darüber**, und er ist gegenüber der Zahl der eingesteckten Genus **invariant**. Beides sind
+Lehrbuch-Muster (Hausdoktrin „nur GoF, zero-cost").
+
+### DIE MODI GEHÖREN DEM PLANER — und damit sitzt der Zustandsautomat im DIRECTOR
+
+**Owner, unmittelbar nachgesetzt:**
+
+> „Und diese 4 Modi sind ja **Teil des Planers**, denn er **orchestriert den CEB-Bau und deren
+> Verwaltung**. Diese 4 State-Pattern sind in **single und multi-hybrid Bau symmetrisch** — haben wir
+> im letzten Kontext festgestellt."
+
+**Das verortet die Achse eindeutig und räumt eine Verwechslung aus, die nahegelegen hätte.** Die
+Work-Mode-Achse beschreibt **nicht**, wie die CEB misst, und **nicht**, was das Tier-Binary tut. Sie
+beschreibt, **in welchem Zustand der PLANER gerade orchestriert**. Der Bezug zur Architektur-Kette
+ist damit exakt:
+
+    [PLANER] orchestriert  ->  [CEB] traegt  ->  [HYBRID] adaptiert  ->  [TIER] laeuft
+       ^
+       hier sitzt work_mode: build / measure / compare / release   (+ debug als Wartung)
+
+**Und das trifft ein GoF-Muster, das der Bestand bereits führt:** die vier Binary-Typen sind
+`Planer (DIRECTOR) → CEB (BUILDER) → Tier → Hybrid`. Im Builder-Muster ist der **Director** genau
+die Instanz, die *die Reihenfolge der Bauschritte* bestimmt, während der Builder sie *ausführt*.
+`work_mode` ist damit **der Zustandsautomat des Directors** — kein Etikett an der Messung, sondern
+die Ablaufsteuerung selbst. Die Mess-Achse trägt ihn, weil er `binary_id`-neutral ist und in die
+Mess-Zeile stempelt; **besitzen** tut ihn der Planer.
+
+**„Verwaltung" ist dabei nicht Beiwerk:** der Owner nennt „den CEB-Bau **und deren Verwaltung**".
+`compare` liest das Messwertlager, `release` liest es ebenfalls und erzeugt daraus die optimale
+Binary (O-A, 07.08.) — beides sind Verwaltungs-Zustände über gebautem Bestand, keine Bau-Zustände.
+Das ist der Grund, warum vier Modi nötig sind und nicht zwei.
+
+**Die Symmetrie ist bereits festgestellter Bestand, nicht neu.** Der KERN vom 09.08.
+(„SINGLE- und HYBRID-Zweig symmetrisch nach AUSWERTEN") sagt wörtlich, beide Zweige verwendeten
+*„EXAKT DIESELBEN stateful Design Patterns und Abläufe der Entwicklung"*. Der heutige Satz benennt,
+**welche** stateful Patterns das sind: **diese vier.** Damit schließt sich der Kreis — die Symmetrie
+war die Beobachtung, die Work-Mode-Achse ist ihr Typ:
+
+    SINGLE-ZWEIG        build -> measure -> compare -> release
+    MULTI-HYBRID-ZWEIG  build -> measure -> compare -> multi-release
+                        ^^^^^ derselbe Automat, andere Factory
+
+**Was daraus für den Bau folgt und vorher nicht sichtbar war:** der Zustandsautomat wird **einmal**
+gebaut, nicht zweimal. Wer für den Hybrid-Zweig eine eigene Ablaufsteuerung schriebe, baute dasselbe
+ein zweites Mal — und würde die Symmetrie, die der Owner zweimal ausgesprochen hat, im Code wieder
+auflösen. Die Hybrid-Haupt-Achse liefert **nur die Factory**, nie den Automaten.
+
+### WAS ZU BAUEN IST (abgeleitet, nicht beauftragt — als Vorlage)
+
+1. `RunMethodology` um `Build` erweitern; `kRunMethodologyCount` 4 → 5; Registry-Zeile
+   `{Build, "build", "Build", "Release", false, false}` — **misst nicht**.
+2. Offiziell/Wartung im Typ trennen (Feld oder zweite Konstante), damit „4 Modi" und „5 Enum-Werte"
+   beide ausdrückbar sind.
+3. `work_mode` als Unter-Achse unter `measurement_category` in die Registry emittieren — der
+   `sub_axis_label`-Mechanismus von `load_framework` („workload") ist das Vorbild.
+4. Die Hybrid-Meta-Meta als **Familie** anlegen, nicht als Einzelachse.
+5. Den `<hybrid>`-XML-Schalter zu Experiment-Beginn, gleichrangig zu `<measurement_tooling>`.
+6. **Den Zustandsautomaten im PLANER bauen — genau einmal, für beide Zweige.** Er ist gegenüber der
+   Zahl der eingesteckten Hybrid-Genus invariant; variabel ist allein die Factory, die er befragt.
+   Eine zweite Ablaufsteuerung für den Hybrid-Zweig wäre eine Regression gegen die vom Owner
+   zweimal ausgesprochene Symmetrie.
+
+**Offen bleibt** (unverändert aus den beiden vorigen Nachträgen): 24 oder 24 × 2 = 48; und an welcher
+Haupt-Achse die **Permutations**-Unterachse hängt — Kandidat ist jetzt klar benennbar:
+`MeasurementTooling {WallClock, Macro, Micro}` ist die Haupt-Auffächerung mit `kMeasurementToolingCount = 3`
+und trägt allein den `kMeasurementAxisVersionLine`-Stempel. **3 Ebenen ⇒ 3! = 6** fällt damit
+zusammen. Ob die Hybrid-Ebene diese Zahl auf 4 hebt (⇒ 4! = 24), ist die noch offene Frage — nicht
+geraten, vorgelegt.
 ## 09.08.2026 (spät) — EINORDNUNG: die HYBRID-META-META-ACHSE gehört in die MESS-ZEILE
 
 **Owner-Auftrag:** *„die Permutations-Achse ist nur eine **Unter-Achse** in den Mess-Achsen, bitte
