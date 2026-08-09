@@ -395,6 +395,42 @@ test:bestandslog-wache-bissprobe:
   script:
     - sh ci/tests/bestandslog_wache_probe.sh --selbstbiss
 
+# -- (2026-08-09): ZELLKOORDINATEN-WACHE + PROBE (Paket Provenienz-Verlust) --
+# DER BEFUND: die beiden STATISCHEN Mess-Jobs (measure:smoke, measure:golden-320) setzten KEINE der
+# drei Variablen, aus denen ce die ZellKoordinaten eines Bestands-Eintrags speist. Jeder Eintrag
+# hatte ZellKoordinaten{"","",""}; die Lager-Identitaet (key_sha512, zelle) trennte den statischen
+# Lauf damit vom emittierten Lauf DESSELBEN Artefakts.
+#
+# WARUM DER JOB-MODUS DIE TRAGENDE DECKUNG IST -- und nicht der eintraege-Modus:
+# Das Bestandslog-Dokument liegt im Objekt-Store (doc_key bestandslog/binary_bestand.xml), nicht im
+# CI-Arbeitsverzeichnis; und beide Mess-Jobs sind opt-in (golden-320 nur mit COMDARE_RUN_MEASURE,
+# smoke zusaetzlich mit COMDARE_STATIC_SMOKE_FALLBACK). Eine Wache, die nur dort haengt, liefe im
+# Alltag NIE. Deshalb prueft dieser Job die EMITTIERENDE Seite -- die vier Exports in der YAML --
+# und zwar in JEDER Pipeline. Der eintraege-Modus wird von der Probe mit 9 Faellen gefahren und
+# steht dem Operator fuer ein geholtes Dokument zur Verfuegung; er hat heute bewusst KEINEN
+# Live-Aufrufer, und das wird hier gesagt statt versteckt.
+#
+# ZUERST ROT (T-1): gegen die unveraenderte .gitlab-ci.yml meldete der jobs-Modus am 09.08.
+# "8 von 8 Pflicht-Export(en) fehlen" ueber 2 gefundenen Jobs -- der Biss stand VOR dem Fix.
+# KOEDER: bei jedem Lauf frisch aus /dev/urandom gewuerfelt (K13), nie aus einer Doku uebernommen;
+# die Probe prueft damit die STRUKTUR, nicht das Wiedererkennen von "O3"/"no_extension".
+# KEIN allow_failure: eine advisory Wache ist die naechste stille Null.
+test:zellkoordinaten-wache:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft werden nur super-Dateien
+  script:
+    # (a) der Selbsttest der Wache samt Gegeneingaengen und Wegwerf-Mutanten
+    - sh ci/tests/zellkoordinaten_wache_probe.sh --selbstbiss
+    # (b) die Wache am ECHTEN Dokument -- (a) allein bewiese nur, dass sie sich selbst gefaellt
+    - sh ci/zellkoordinaten_wache.sh jobs .gitlab-ci.yml
+
 # -- P4b (2026-08-09): PROBE fuer den ANHANG-VORWAERTS-KERN (ci/anhang_forward_core.sh) --
 # SELBSTCHECK dieses Blocks: alle Zahlen unten sind am Objekt gemessen, keine ist abgeschrieben.
 #
@@ -1195,6 +1231,47 @@ measure:smoke:
       echo "   COMDARE_THESIS_PROFILE=$COMDARE_THESIS_PROFILE"
       "$PLANNER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
       mkdir -p measure_out_smoke
+      # -- ZELL-KOORDINATEN (2026-08-09, Paket Provenienz-Verlust) ---------------------------------
+      # BEFUND: die beiden STATISCHEN Mess-Jobs setzten keine der drei Variablen, aus denen ce die
+      # ZellKoordinaten eines Bestands-Eintrags speist (profile_run_entry.hpp:514-524):
+      #   z.combo = COMDARE_MEASUREMENT_COMBO | z.opt = COMDARE_GN_OPT | z.simd = COMDARE_GN_SIMD
+      # Jeder Eintrag hatte damit ZellKoordinaten{"","",""}. Die Lager-Identitaet ist aber das TUPEL
+      # (key_sha512, zelle) -- same_eintrag_identity, bestandslog_document.hpp:225-227. Derselbe Bau
+      # stand dadurch unter ZWEI Identitaeten im Lager (statisch=leer vs. emittiert=gefuellt) und
+      # deduplizierte nicht. Der ce-Code benennt genau diesen Schadensfall selbst (:22-32).
+      #
+      # KEIN NEUES SCHEMA: die Werte-Form ist woertlich die der EMITTIERTEN Jobs
+      # (experiment_plan_director.hpp:1530 platform, :1534 lane, :1560 opt/simd).
+      #
+      # WARUM GENAU DIESE WERTE (belegt, nicht geraten):
+      #   O3 / no_extension -- beide statischen Profile deklarieren WEDER <system_axes> NOCH
+      #     <opt_levels>/<simd_options> (am Objekt gezaehlt: 0/0/0). run_profile faellt damit auf die
+      #     Bibliotheks-Defaults, die compile-hart festgenagelt sind:
+      #       static_assert(DefaultOptLevelOption::opt_level_id() == "O3")        (optimization_level_sub_axis.hpp:142)
+      #       static_assert(DefaultSimdOption::simd_id() == "no_extension")       (simd_sub_axis.hpp:113)
+      #     Dieselben zwei Literale benutzt die Emissions-Seite als Perm-Fallback (director:1543-1545).
+      #   amd -- dieser Job traegt hart tags:[prod, baremetal, amd]; ein Intel-Gegenstueck existiert nicht.
+      #
+      # COMDARE_MEASUREMENT_COMBO wird BEWUSST NICHT gesetzt. Die emittierende Seite laesst sie bei der
+      # Vollmenge ebenfalls ungesetzt (director:1269 und :1429), und ceb_combo_is_full_set() definiert
+      # leer == "[all]" == Vollmenge (director:275-277). Leer IST hier die kanonische Schreibweise, kein
+      # fehlender Wert. VERWORFEN: ein Literal-Tag wie "[static-smoke]" -- das waere ein ZWEITES Schema
+      # fuer dieselbe Aussage, und zwei Schemata sind schlimmer als eines mit Luecke.
+      #
+      # NEBENWIRKUNG, DIE GEWOLLT IST: COMDARE_PLATFORM schaltet die bisher schlafende Lane-Wache des
+      # Treibers SCHARF (main.cpp:635-657). Passt die reale CPU nicht zum Lane-Praefix, bricht der Lauf
+      # mit exit 7 ab, statt tagelang unter falscher Hardware-Provenienz zu messen. Ohne die Variable
+      # war der Zweig kSkipped, also nie beobachtbar.
+      #
+      # RESTRISIKO, ausdruecklich benannt: bekaeme dieses Profil spaeter <system_axes>, wuerde der Pin
+      # ueber den GN-Zellen-Filter die Mess-Matrix STILL verengen (heute unerreichbar, weil
+      # profile_run_entry.hpp:961 in den run_all_passes()-Zweig faellt). Dagegen deckt heute NICHTS --
+      # dieser Kommentar ist keine Wache und wird auch nicht als eine ausgegeben.
+      export COMDARE_GN_OPT="O3"
+      export COMDARE_GN_SIMD="no_extension"
+      export COMDARE_PLATFORM="amd@$(hostname)"
+      export COMDARE_LANE="amd"
+      echo "== Zell-Koordinaten: opt=$COMDARE_GN_OPT simd=$COMDARE_GN_SIMD platform=$COMDARE_PLATFORM lane=$COMDARE_LANE (combo ungesetzt = [all]) =="
       echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
       # LAG-P1: stderr mitschneiden UND live weiterreichen (Begruendung s. measure:golden-320).
       { "$DRIVER" experiment_config measure_out_smoke 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1
@@ -1321,6 +1398,22 @@ measure:golden-320:
       echo "== Pre-Flight (Subkommando 'validate', rein lesende Profil-Pruefung gegen die realen config/output-Argumente) =="
       "$PLANNER" validate || { echo "Profil-Validierung fehlgeschlagen -> Abbruch vor mehrtaegigem Lauf"; exit 1; }
       mkdir -p measure_out
+      # -- ZELL-KOORDINATEN (2026-08-09, Paket Provenienz-Verlust) ---------------------------------
+      # VOLLE BEGRUENDUNG samt verworfener Alternativen: s. measure:smoke oben. Kurz:
+      #   - ohne diese Exports schreibt der Lauf ZellKoordinaten{"","",""}; die Lager-Identitaet
+      #     (key_sha512, zelle) trennt ihn dadurch vom emittierten Lauf DESSELBEN Artefakts.
+      #   - O3/no_extension sind die compile-hart per static_assert festgenagelten Defaults, auf die
+      #     m3v2_study.profile.xml mangels <system_axes>/<opt_levels>/<simd_options> real faellt.
+      #   - COMDARE_MEASUREMENT_COMBO bleibt ungesetzt: leer == "[all]" == Vollmenge (ceb_combo_is_full_set).
+      #   - COMDARE_PLATFORM schaltet die Lane-Wache scharf (exit 7 bei CPU-Vendor-Fehlrouting).
+      # HIER WIEGT ES AM SCHWERSTEN: das ist der mehrtaegige Voll-Lauf. Ein Ergebnis, das nach zehn
+      # Tagen im Lager landet und nicht sagt, welche Zelle es gemessen hat, ist nicht nachtraeglich
+      # heilbar -- die Koordinate steht in keiner CSV-Spalte und in keinem Pfad.
+      export COMDARE_GN_OPT="O3"
+      export COMDARE_GN_SIMD="no_extension"
+      export COMDARE_PLATFORM="amd@$(hostname)"
+      export COMDARE_LANE="amd"
+      echo "== Zell-Koordinaten: opt=$COMDARE_GN_OPT simd=$COMDARE_GN_SIMD platform=$COMDARE_PLATFORM lane=$COMDARE_LANE (combo ungesetzt = [all]) =="
       echo "== golden-320 Voll-Messlauf (mehrtaegig, Measurement-ON, PMC auf prod1) =="
       # LAG-P1: stderr wird MITGESCHNITTEN, damit die Bestandslog-Wache die aktiv-Zeile pruefen kann --
       # und zugleich LIVE weitergereicht, weil dieser Lauf mehrere TAGE dauert und der Fortschritts-Cursor
