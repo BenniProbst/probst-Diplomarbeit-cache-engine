@@ -44,8 +44,7 @@ MessBestandBelegung belege_mess_bestand(std::string_view maschine, std::string_v
     return MessBestandBelegung{MessBelegungKlasse::aktiv, std::string{mess}, std::string{masch}};
 }
 
-std::function<std::optional<std::string>(std::filesystem::path const&)>
-make_mess_bestand_key_fn(std::string maschine) {
+std::function<std::optional<std::string>(std::filesystem::path const&)> make_mess_bestand_key_fn(std::string maschine) {
     // Der Dateiname der Tier-Binary bleibt der ce-Default (kTierBinaryDateiname == "perm.dll") --
     // ihn hier zu wiederholen waere eine siebte Kopie desselben Literals (messwert_key_source.hpp
     // :74-80 fuehrt die sechs bestehenden auf und begruendet den Default-Parameter genau damit).

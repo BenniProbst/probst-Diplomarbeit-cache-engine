@@ -195,7 +195,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = c6d8e57357e71117d3808512f0ee848ef258c76d
+PZW-CE-SHA         = db3c648bcf852f21eebf9b6f3f4434a0c855a8a0
 PZW-SCHEMA-STELLEN = 30
 PZW-SCHEMA-DATEIEN = 18
 PZW-SCHEMA-LITERAL = 1
@@ -213,7 +213,40 @@ weggeklickt.
 |---|---|---|---|---|---|
 | **alt** (Stand dieses Abschnitts, **bleibt stehen**) | `25fe4fbf` | 29 | 17 | 1 | — |
 | Zwischenstand (Gitlink-Bump `dfdf8bbe`, nie erhoben) | `9f92d49f` | 29 | 17 | 1 | 453 |
-| **gültig** | `c6d8e573` | **30** | **18** | 1 | **454** |
+| ~~gültig~~ (Stand 09.08. mittags, **bleibt stehen**) | `c6d8e573` | 30 | 18 | 1 | 454 |
+| **gültig** | `db3c648b` | **30** | **18** | 1 | **468** |
+
+**Nachzug 09.08.2026, 16:40 UTC — dritter Gitlink-Zug an einem Tag, und die Wache hat ihn wieder
+erzwungen.** super-Pipeline **15463**, Job **369917**, `exit 2`: *„der Plan nennt einen ANDEREN
+ce-Zustand als super HEAD fuehrt. Plan=c6d8e573… Gitlink=db3c648b…"* Der Gitlink wanderte heute
+`c6d8e573 → 99040ae1 → 579e4099 → db3c648b`; die letzten beiden Züge trugen das A9-S4-Paket
+(25 Commits, u. a. der erste Produktions-Aufrufer des xlsx-Writers) und die zwei Heilungen der
+roten ce-Pipeline 15465.
+
+**Neu erhoben am Stand `db3c648b`, mit der unveränderten Zählweise dieses Abschnitts:**
+`git grep -F -n 'lazy_csv_header()' <sha> -- 'tests/*.cpp'` → **37 Rohzeilen**, davon die Zeilen
+abgezogen, deren erstes Nicht-Leerzeichen `//`, `*` oder `/*` ist → **30 STELLEN in 19 DATEIEN**,
+Nenner **468** Test-`.cpp`.
+
+**Warum sich trotz 14 neuer Test-`.cpp` (454 → 468) KEINE der drei Zahlen bewegt:** die neuen
+Dateien rufen `lazy_csv_header()` nicht — bis auf **eine Kommentarerwähnung**, die die Rohzeilen
+von 36 auf 37 hebt und nach dem Abzug verschwindet. STELLEN 30, DATEIEN 18, LITERAL 1 bleiben.
+
+**Und hier ist mir beim Nachziehen selbst der Stellvertreter passiert — er steht hier, weil er die
+Regel belegt, gegen die dieser Abschnitt gebaut ist.** Ich hatte DATEIEN mit
+`git grep -F -l 'lazy_csv_header()' -- 'tests/*.cpp'` gemessen und **19** erhalten; die Wache
+liefert **18**. Der Unterschied: `-l` zählt jede Datei mit einem Treffer — **auch wenn der Treffer
+eine Kommentarzeile ist**. Die Wache zieht die Kommentarzeilen **zuerst** ab und zählt dann die
+verbleibenden Dateien. Zwei plausible Zählweisen, eine Ziffer Unterschied, und die falsche wäre als
+Anker in den Plan gewandert, wo sie die Wache **dauerhaft rot** gemacht hätte. Gefunden hat es
+nicht mein Nachdenken, sondern der Lauf: `ROT SCHEMA-DATEIEN: Plan sagt 19, Objekt liefert 18`.
+**Das ist der Grund, warum der Anker nach dem Setzen noch einmal gegen das Objekt gefahren wird.**
+
+**Gegenprobe (T-3, zwei unabhängige Werkzeuge):** `git grep -F` gegen den Baum und dateiweises
+`git show | grep -F` liefern beide 30/19. Zusätzlich mit einem **weiter gefassten** Muster
+(`lazy_csv_header` ohne Klammern) gemessen: 39 Stellen in 18 TUs — eine **andere Einheit**, die
+hier ausdrücklich **nicht** eingesetzt wird. Sie steht nur da, damit niemand sie später für
+dieselbe Zahl hält; genau diese Verwechslung hat die „47" erzeugt, die §9.1 widerlegt.
 
 **Zählweise, unverändert dieselbe wie oben:** `git grep -F -n 'lazy_csv_header()' <sha> -- 'tests/*.cpp'`,
 davon die Zeilen abgezogen, deren erstes Nicht-Leerzeichen `//`, `*` oder `/*` ist; **36 Rohzeilen** am
