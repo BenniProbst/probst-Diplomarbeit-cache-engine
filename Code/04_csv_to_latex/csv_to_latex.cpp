@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "csv_to_latex.hpp"
 
+// D5-2: EIN geteilter Zugang zum Perzentil-KANON der ce (kein zweiter Rang-Rechner in super).
+#include "percentile_canon.hpp"
+
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
@@ -44,14 +47,14 @@ namespace {
     return out;
 }
 
-// Nearest-Rank-Median (konsistent zur Mess-Seite, nearest_rank_p(0.5)); leere Stichprobe → 0.
-[[nodiscard]] double nearest_rank_median(std::vector<double> v) {
-    if (v.empty()) return 0.0;
-    std::sort(v.begin(), v.end());
-    std::size_t rank = static_cast<std::size_t>(0.5 * static_cast<double>(v.size() - 1) + 0.5);
-    if (rank >= v.size()) rank = v.size() - 1;
-    return v[rank];
-}
+// D5-2 (2026-08-09): der Median kommt jetzt aus dem KANON, nicht mehr aus einer Abschrift.
+// Hier stand bis heute rank = (size_t)(0.5*(n-1)+0.5) == round(q*(n-1)) -- die in der ce am
+// 2026-08-09 (D5-1) VERWORFENE Formel. Der Kommentar behauptete dabei Konsistenz "zur
+// Mess-Seite, nearest_rank_p(0.5)"; nearest_rank_p war zu diesem Zeitpunkt in der ce bereits
+// ersatzlos geloescht, weil sie den Namen Nearest-Rank zu Unrecht trug. Die Loeschung blieb
+// hier folgenlos, weil super die Formel ABGESCHRIEBEN statt gerufen hat.
+// Jetzt gerufen: Code/common/percentile_canon.hpp -> ce nearest_rank_index.
+using comdare::da::stats::nearest_rank_median;
 
 [[nodiscard]] std::vector<std::string_view> split_colons(std::string_view s) {
     std::vector<std::string_view> out;
@@ -286,24 +289,11 @@ namespace {
     return axes;
 }
 
-// p25/median/p75 (nearest-rank, konsistent zu nearest_rank_median) auf einer Kopie der Stichprobe.
-struct Quartiles {
-    double p25 = 0.0, p50 = 0.0, p75 = 0.0;
-};
-[[nodiscard]] Quartiles nearest_rank_quartiles(std::vector<double> v) {
-    Quartiles q;
-    if (v.empty()) return q;
-    std::sort(v.begin(), v.end());
-    auto pick = [&v](double p) {
-        std::size_t rank = static_cast<std::size_t>(p * static_cast<double>(v.size() - 1) + 0.5);
-        if (rank >= v.size()) rank = v.size() - 1;
-        return v[rank];
-    };
-    q.p25 = pick(0.25);
-    q.p50 = pick(0.50);
-    q.p75 = pick(0.75);
-    return q;
-}
+// D5-2 (2026-08-09): p25/median/p75 aus dem KANON. Der lokale pick()-Lambda rechnete
+// dieselbe verworfene Formel round(p*(n-1)) -- auf gerader Laenge lieferte er fuer
+// {10,20,30,40} (20,30,30) statt der Kanon-Werte (10,20,30).
+using comdare::da::stats::nearest_rank_quartiles;
+using comdare::da::stats::Quartiles;
 
 // 2 No-Op-Scan-Profile: bei scan-bezogenen Diffs auszuschließen (19 valide Workloads).
 [[nodiscard]] bool is_noop_scan_workload(std::string const& w) { return w == "ycsb_e" || w == "lp_range_scan"; }

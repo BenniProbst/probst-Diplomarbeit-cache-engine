@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "diagram_generator.hpp"
 
+// D5-2: EIN geteilter Zugang zum Perzentil-KANON der ce (kein zweiter Rang-Rechner in super).
+#include "percentile_canon.hpp"
+
 #include <algorithm>
 #include <charconv>
 #include <cmath>
@@ -648,15 +651,15 @@ namespace {
     return out;
 }
 
-// Nearest-Rank-Median (konsistent zur Mess-Seite, csv_to_latex.cpp:39-45,
-// nearest_rank_p(0.5)); leere Stichprobe → 0.
-[[nodiscard]] double nearest_rank_median(std::vector<double> v) {
-    if (v.empty()) return 0.0;
-    std::sort(v.begin(), v.end());
-    std::size_t rank = static_cast<std::size_t>(0.5 * static_cast<double>(v.size() - 1) + 0.5);
-    if (rank >= v.size()) rank = v.size() - 1;
-    return v[rank];
-}
+// D5-2 (2026-08-09): der Median kommt jetzt aus dem KANON, nicht mehr aus einer Abschrift.
+// Hier stand eine Abschrift DER ABSCHRIFT: der Kommentar verwies auf csv_to_latex.cpp, das
+// seinerseits auf ce nearest_rank_p verwies -- eine Funktion, die in der ce als zu Unrecht
+// "Nearest-Rank" benannt ersatzlos geloescht wurde. Der Rumpf rechnete round(0.5*(n-1)) und
+// traf damit auf GERADER Laenge die OBERE Mitte statt der kanonischen UNTEREN.
+// ACHTUNG Geltungsbereich: die Aufrufer bei 1205/1783/1784 mitteln ueber KONFIGURATIONEN
+// (bereits aggregierte p50/p99), nicht ueber Messproben. Dass der Kanon auch dort gilt, ist
+// eine begruendete Entscheidung -- siehe den Block in Code/common/percentile_canon.hpp.
+using comdare::da::stats::nearest_rank_median;
 
 // Wählt das z-Feld einer Zeile per Feld-Name. Unbekannter Name → ns_per_op (Gesamt).
 [[nodiscard]] double pick_z_field(WideMeasurementRow const& r, std::string const& z_field) {
