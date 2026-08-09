@@ -195,7 +195,7 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 7c3d29349dbb3293c954d30385320954beba76eb
+PZW-CE-SHA         = 9a4c4be0d56f905c0a65bf01992b845636e61aa5
 PZW-SCHEMA-STELLEN = 33
 PZW-SCHEMA-DATEIEN = 19
 PZW-SCHEMA-LITERAL = 1
@@ -216,7 +216,22 @@ weggeklickt.
 | ~~gültig~~ (Stand 09.08. mittags, **bleibt stehen**) | `c6d8e573` | 30 | 18 | 1 | 454 |
 | ~~gültig~~ (Stand 09.08. abends, **bleibt stehen**) | `db3c648b` | 30 | 18 | 1 | 468 |
 | ~~gültig~~ (Stand 09.08. nachts, bleibt stehen) | `cb263dc9` | 33 | 19 | 1 | 474 |
-| **gültig** | `7c3d2934` | **33** | **19** | 1 | **479** |
+| ~~gültig~~ (Stand 09.08. nachts, **bleibt stehen**) | `7c3d2934` | 33 | 19 | 1 | 479 |
+| **gültig** | `9a4c4be0` | **33** | **19** | 1 | **479** |
+
+**Nachzug 09.08.2026, spät — vierter Gitlink-Zug an einem Tag, und diesmal bewegt sich KEINE der
+drei Zahlen.** Der Zug trägt die Sammellandung `7c3d2934..9a4c4be0` (15 Commits: w0a-Bauweg ·
+D4-Statistik-Kette · D5-5 HDR · die block_id-Klassenheilung). **Neu erhoben mit der unveränderten
+Zählweise dieses Abschnitts:** 41 Rohzeilen → nach Abzug der Kommentarzeilen **33 STELLEN in 19
+DATEIEN**, Nenner **479** Test-`.cpp`.
+
+**Warum sich trotz 15 Commits und +3 ctest-Einträgen nichts bewegt** — und das ist der eigentliche
+Beleg, nicht die Gleichheit selbst: die drei Pakete legen **keine neue Test-`.cpp` an**. Sie
+*erweitern* bestehende Dateien (`test_v41_anatomy_f15_measurement.cpp` +608 Zeilen,
+`test_d55_hdr_verdrahtung.cpp` +228) und fügen ein CMake-Modul hinzu (`cli_smoke.cmake`). Der
+Nenner zählt Dateien, nicht Fälle — deshalb bleibt er bei 479, während `ctest -N` von 487 auf 490
+steigt. **Zwei Einheiten, zwei Zahlen; wer sie gleichsetzt, sieht hier einen Widerspruch, wo keiner
+ist.**
 
 **Nachzug 09.08.2026, 16:40 UTC — dritter Gitlink-Zug an einem Tag, und die Wache hat ihn wieder
 erzwungen.** super-Pipeline **15463**, Job **369917**, `exit 2`: *„der Plan nennt einen ANDEREN
