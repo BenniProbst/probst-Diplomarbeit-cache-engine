@@ -59,6 +59,63 @@ gemessene Latenzen sind **nicht run-to-run-stabil**; genau diese Stabilität sic
 
 Deshalb ist die Sperre eine **Integritätsregel**, kein Komfort-Gate.
 
+### WOZU `debug` DA IST — Owner-Schärfung: der MASSEN-KETTENBEWEIS
+
+**Owner wörtlich:**
+
+> „Der Debug-Modus erlaubt beim Einschalten **nicht regelkonformes Messen in JEDER Factory**, also die
+> **Parallelisierung des Messens mit MAXIMALER Thread-Zahl**, um in **schnellen CI-Durchläufen das
+> System zu testen, egal wie genau die Messwerte sind** (Prüfer der Abweichungen der Messwerte-Jitter
+> schaltet Debug daher ab). So ist es möglich, die **bereits gebauten hunderttausenden Binaries
+> schnell zu beweisen**, ob sie **prinzipiell korrekte xlsx erzeugen und ablegen** und **ob alles
+> korrekt gemessen wird**."
+
+**Damit ist `debug` kein „schneller Modus", sondern ein eigenes Prüfwerkzeug mit eigenem
+Prüfgegenstand.** Der Unterschied ist die ganze Begründung:
+
+    measure  prueft die ZAHL   -- ist der Messwert richtig?
+    debug    prueft die KETTE  -- entsteht ueberhaupt eine xlsx, wird sie abgelegt,
+                                  misst der Weg an jeder Station?
+
+**Der DURCHSTICH in groß.** F1 (14.08.) beweist die Kette an **einem** Mini-Messwert bis in den
+Thesis-Anhang. `debug` ist derselbe Beweis über **hunderttausende** bereits gebaute Binaries — in
+CI-Geschwindigkeit, weil die Genauigkeit hier ausdrücklich nicht der Gegenstand ist.
+
+**Drei Merkmale, die aus dem Wortlaut folgen und den Bau binden:**
+
+1. **„in JEDER Factory"** — die Freigabe ist **global**, nicht an einer Station. Sie greift überall
+   dort, wo eine Factory einen Mess-Vollzug erzeugt. Ein Debug-Schalter an nur einer Stelle wäre
+   wirkungslos: die langsamste nicht befreite Station bestimmt die Laufzeit.
+2. **„maximale Thread-Zahl"** — nicht „parallel", sondern **maximal**. Das ist eine schärfere Zusage
+   als der heutige Bestand (`Debug={Debug,misst,parallel}`), der nur *nicht-1-Thread* sagt.
+3. **„egal wie genau die Messwerte sind"** — die Zahlen eines Debug-Laufs sind **ausdrücklich
+   Ausschuss**. Sie dürfen **nie** in das Messwertlager, nie in eine Auswertung, nie in die Thesis.
+
+### DIE KOPPLUNG AN DEN JITTER-PRÜFER — und sie FEHLT heute
+
+> „(Prüfer der Abweichungen der Messwerte-Jitter **schaltet Debug daher ab**)"
+
+**Debug und Jitter-Prüfer schließen einander aus.** Technisch ist das zwingend: paralleles Messen mit
+maximaler Thread-Zahl **erzeugt** genau die Abweichung, die das Drift-Gate sucht. Liefe der Prüfer
+mit, wäre **jede** Debug-Zelle rot — eine Wache, die konstant rot ist, ist so wertlos wie eine, die
+nie beißt (V-2).
+
+**Am Objekt gemessen: die Kopplung existiert nicht.**
+`/usr/bin/grep -c 'RunMethodology\|run_methodology' libs/cache_engine/builder/commands/drift_detector.hpp`
+→ **0**. Der Drift-Detektor kennt den Modus nicht; Gegenprobe: die Datei existiert (14.872 Byte,
+Stand 09.08. 17:19) und wird von `harness/drift_gated_cell.hpp`, `profile_run_entry.hpp`,
+`profile_run_facade.cpp` und `test_t15_drift_gate_messschleife.cpp` konsumiert.
+
+**Das ist ein Bau-Posten, kein Bestand** — und er hängt unmittelbar an **T-15 + D4** (W2, ##36), wo
+das Drift-Gate ohnehin verdrahtet wird. **Beide gehören in dasselbe Paket:** wer T-15 verdrahtet,
+ohne die Debug-Ausnahme mitzubauen, macht jeden künftigen Debug-Lauf rot; wer die Ausnahme baut, ohne
+T-15, hat kein Gate, das sie ausnehmen könnte.
+
+**Die Richtung der Abschaltung** (schaltet der Prüfer `debug` ab, oder `debug` den Prüfer) ist im
+Wortlaut nicht eindeutig und wird **nicht geraten** — praktisch fällt beides zusammen: die beiden
+dürfen nie gleichzeitig aktiv sein. Gebaut wird es als **eine** Regel mit **einer** Fehlerklasse, nicht
+als zwei Schalter, die sich gegenseitig überstimmen können.
+
 ### DIE SPERRFORM EXISTIERT BEREITS IM HAUS — nichts Neues zu erfinden
 
 `measurement/axis_error.hpp:169-178` führt `AdmissionStatus {Zugelassen, Gesperrt}` mit
@@ -105,6 +162,17 @@ gegen die constexpr-Registry — *„Single-Source = die Registry"* (`:147`), mi
    Zahl eingesteckter Hybrid-Genus invariant; variabel ist allein die Factory, die er befragt.
 7. **Die Hybrid-Meta-Meta als FAMILIE**, je Reroute-Genus eine `MeasurementMetaMetaAxis`.
 8. **`<hybrid>`-XML-Schalter** zu Experiment-Beginn, gleichrangig zu `<measurement_tooling>`.
+9. **Die Debug-Freigabe gilt in JEDER Factory** — global, nicht je Station. Und sie bedeutet
+   **maximale** Thread-Zahl, nicht bloß „nicht 1-Thread" (der Bestand sagt heute nur
+   `single_thread=false`). Eine nicht befreite Station bestimmt sonst die Laufzeit des ganzen Laufs.
+10. **Debug-Ausnahme im Drift-Gate — ins SELBE Paket wie T-15 + D4 (W2, ##36).** Der Drift-Detektor
+   kennt den Modus heute nicht (`grep -c RunMethodology drift_detector.hpp` = **0**). Wer T-15
+   verdrahtet **ohne** die Ausnahme, macht jeden künftigen Debug-Lauf rot; wer die Ausnahme baut
+   **ohne** T-15, hat kein Gate, das sie ausnehmen könnte. **Eine** Regel, **eine** Fehlerklasse —
+   nicht zwei Schalter, die einander überstimmen.
+11. **Debug-Zahlen dürfen nie ins Messwertlager.** „Egal wie genau" heißt: sie sind Ausschuss. Sie
+   gehören nicht in die Auswertung, nicht in die Thesis, und der Rückschrieb muss sie erkennen und
+   verweigern — sonst entsteht genau die kontaminierte Klasse, gegen die die Sperre gebaut ist.
 
 ### DIE ABNAHME (was erzwingt das Halten?)
 
