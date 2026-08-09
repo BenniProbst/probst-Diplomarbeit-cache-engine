@@ -615,8 +615,57 @@ TEST(Stufe08Appendix, AxisInventoryWriterIsHonestEmptyAndComplete) {
         ASSERT_NE(dims_pos, std::string::npos);
         EXPECT_GT(dims_pos, table_end);
         // Kein roher Unterstrich ausserhalb der Maskierung (sonst bricht der LaTeX-Lauf).
-        for (std::size_t i = 0; i < text.size(); ++i)
-            if (text[i] == '_') ASSERT_GT(i, 0u) << "roher Unterstrich am Textanfang";
+        //
+        // STELLVERTRETER, gefunden im Warnungs-Review 09.08.2026 (GCC -Wdangling-else auf dieser Zeile;
+        // clang meldet sie NICHT). Der Bestand lautete:
+        //     for (std::size_t i = 0; i < text.size(); ++i)
+        //         if (text[i] == '_') ASSERT_GT(i, 0u) << "roher Unterstrich am Textanfang";
+        // Der Kommentar sagt "kein roher Unterstrich ausserhalb der Maskierung" -- gemessen wurde aber
+        // "der Unterstrich steht nicht an Position 0". Das ist ein anderer, billigerer Gegenstand: eine
+        // erzeugte .tex-Datei beginnt nie mit '_', die Zusicherung war also fuer JEDE realistische
+        // Eingabe wahr und konnte den Fehler, den sie zu bewachen vorgab (unmaskierter Unterstrich
+        // MITTEN im Text -> LaTeX-Lauf bricht), nicht sehen. Gruen per Konstruktion.
+        //
+        // Jetzt wird der Gegenstand selbst gemessen: JEDER Unterstrich muss von einem Backslash
+        // eingeleitet sein. Zusaetzlich steht der NENNER in der Ausgabe und wird selbst bewacht --
+        // ein Text ganz ohne Unterstrich haette sonst wieder null Zusicherungen ergeben, also
+        // dieselbe hohle Wache in neuer Form.
+        // GELTUNGSBEREICH, an der ersten Fassung dieser Wache GEMESSEN und dann eingegrenzt: die
+        // erste Formulierung ("jeder Unterstrich braucht einen Backslash") schlug an 4 Stellen an,
+        // die ALLE in LaTeX-Kommentarzeilen lagen (% AUTO-GENERATED durch appendix_generator::
+        // write_axis_inventory_table ...). TeX verwirft alles hinter einem unmaskierten '%' bis zum
+        // Zeilenende -- dort bricht ein roher Unterstrich den Lauf NICHT. Der Gegenstand ist der
+        // GESETZTE Text, nicht die Kommentarzeile; die Wache haette sonst einen Fehler behauptet,
+        // den es nicht gibt. (Das war ein Befund ueber das Messverfahren, kein Befund am Code.)
+        auto const backslashes_before = [&text](std::size_t pos) {
+            std::size_t n = 0;
+            while (pos > n && text[pos - 1 - n] == '\\') ++n;
+            return n;
+        };
+        std::size_t underscores_checked = 0;
+        bool        in_comment          = false;
+        for (std::size_t i = 0; i < text.size(); ++i) {
+            char const c = text[i];
+            if (c == '\n') {
+                in_comment = false;
+                continue;
+            }
+            if (in_comment) continue;
+            // '%' leitet nur dann einen Kommentar ein, wenn es NICHT maskiert ist (\% ist ein
+            // gesetztes Prozentzeichen). Ungerade Zahl vorangehender Backslashes = maskiert.
+            if (c == '%' && (backslashes_before(i) % 2) == 0) {
+                in_comment = true;
+                continue;
+            }
+            if (c != '_') continue;
+            ++underscores_checked;
+            ASSERT_GT(i, 0u) << "roher Unterstrich am Textanfang (" << lang << ")";
+            EXPECT_EQ(text[i - 1], '\\') << "unmaskierter Unterstrich im GESETZTEN Text an Position " << i << " ("
+                                         << lang << "), Umgebung: " << text.substr(i >= 40 ? i - 40 : 0, 80);
+        }
+        RecordProperty("underscores_checked", static_cast<int>(underscores_checked));
+        EXPECT_GT(underscores_checked, 0u)
+            << "kein einziger Unterstrich im Text (" << lang << ") -- die Wache haette nichts geprueft";
     }
 
     fs::remove_all(dir, ec);

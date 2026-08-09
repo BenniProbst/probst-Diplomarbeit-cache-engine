@@ -492,9 +492,21 @@ TEST(Stufe05Pipeline, LatencyRangeAggregateMonotoneAndExclusions) {
     EXPECT_EQ(agg.ops[2], "scan");
 
     // Monotonie: fuer JEDE vorhandene Zelle gilt Median-p99 >= Median-p50 (Whisker zeigt nach OBEN).
-    for (std::size_t oi = 0; oi < agg.ops.size(); ++oi)
-        for (std::size_t ai = 0; ai < agg.algos.size(); ++ai)
-            if (agg.present[oi][ai]) EXPECT_GE(agg.p99_median[oi][ai], agg.p50_median[oi][ai]);
+    // Geschweifte Klammern gegen -Wdangling-else (GCC meldet die klammerlose Fassung, clang nicht):
+    // ein gtest-Makro traegt intern ein if/else, das ohne Klammern mehrdeutig an ein spaeter
+    // hinzugefuegtes else binden koennte. Zusaetzlich der NENNER: ohne ihn wuerde ein Aggregat, in dem
+    // keine einzige Zelle present ist, still null Zusicherungen ausfuehren und trotzdem gruen melden.
+    std::size_t monotone_cells_checked = 0;
+    for (std::size_t oi = 0; oi < agg.ops.size(); ++oi) {
+        for (std::size_t ai = 0; ai < agg.algos.size(); ++ai) {
+            if (!agg.present[oi][ai]) continue;
+            ++monotone_cells_checked;
+            EXPECT_GE(agg.p99_median[oi][ai], agg.p50_median[oi][ai])
+                << "Zelle op=" << agg.ops[oi] << " algo=" << agg.algos[ai];
+        }
+    }
+    RecordProperty("monotone_cells_checked", static_cast<int>(monotone_cells_checked));
+    EXPECT_GT(monotone_cells_checked, 0u) << "keine einzige present-Zelle -- die Monotonie-Wache lief leer";
 
     // scan nur fuer k_ary (Index 1) vorhanden, NICHT fuer eytzinger; No-Op ycsb_e (1/2) ausgeschlossen →
     // Median bleibt 500/700 (nicht durch 1/2 verwaessert).

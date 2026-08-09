@@ -95,16 +95,91 @@ TEST(HardwareFilter, NeonOnX86Skipped) {
     EXPECT_FALSE(decision.passes());
 }
 
-TEST(HostCapabilities, DetectCompileTime) {
-    auto hc = v32::HostCapabilities::detect_compile_time();
-    // Auf x86_64 erwarten wir mindestens SSE/AVX
+// ---------------------------------------------------------------------------
+// HOHLE WACHE, gefunden im clang-Warnungs-Review am 09.08.2026 (-Wunused-variable auf 'hc').
+//
+// BESTAND war:
+//     auto hc = v32::HostCapabilities::detect_compile_time();
+//     #if defined(__AVX2__)   EXPECT_TRUE(hc.supports_avx2);   #endif
+//     #if defined(__AVX512F__) EXPECT_TRUE(hc.supports_avx512); #endif
+//     SUCCEED();
+//
+// ZWEI Defekte, beide vom Uebersetzer belegt, nicht vermutet:
+//  (1) NULL Zusicherungen. Das Projekt uebersetzt ohne -march/-mavx2, also ist WEDER __AVX2__ NOCH
+//      __AVX512F__ definiert; beide #if-Bloecke verschwinden im Praeprozessor. Uebrig blieb
+//      "auto hc = ...; SUCCEED();". Genau deshalb meldete clang 'hc' als UNBENUTZT -- die Warnung
+//      war das einzige Signal, dass diese Wache nichts mehr zusichert. Der Test war gruen
+//      per Konstruktion.
+//  (2) Nur die WAHR-Richtung. Selbst mit -mavx2 stand dort ausschliesslich "Makro gesetzt =>
+//      Flag true". Die Gegenrichtung fehlte, und genau sie faengt die realistische Mutation:
+//      ein hart verdrahtetes supports_avx2 = true haette den Bestandstest NIE rot gemacht.
+//
+// WAS JETZT ZUGESICHERT WIRD: fuer JEDES der vier ISA-Flags BEIDE Richtungen (Makro gesetzt =>
+// true, Makro nicht gesetzt => false), also in jeder Bau-Konfiguration 4 laufende Zusicherungen
+// statt 0 bis 2. Der Nenner steht in der Ausgabe (RecordProperty + SCOPED_TRACE), damit eine
+// spaetere Null von einem echten Freispruch unterscheidbar bleibt.
+//
+// EHRLICHE GRENZE (bewusst nicht ueberschritten): das Orakel teilt sich die Praeprozessor-Makros
+// mit dem Prueflind, ist also kein VOLL unabhaengiges Orakel im Sinne T-3/T-5. Das unabhaengige
+// Orakel waere die Bauflagge selbst: dieselbe Erhebung in zwei TUs, eine mit -mavx2, eine mit
+// -mno-avx2. Dieser Weg ist HIER NICHT GANGBAR, und das ist der Grund: detect_compile_time() ist
+// eine inline Member-Funktion im Header. Zwei TUs mit verschiedenem Makro-Stand ergaeben zwei
+// verschiedene Rueumpfe DERSELBEN inline-Funktion -- eine ODR-Verletzung (IFNDR). Der Linker
+// behaelt genau EIN COMDAT, ohne -O2 wird nicht inlinet, und beide Sonden lieferten still
+// denselben Wert. Der Test waere dann kein schaerferes Messgeraet, sondern ein LUEGENDES.
+// Die saubere Loesung ist ein Architektur-Schnitt (ISA-Erhebung in EINE TU statt inline im
+// Header) und liegt als benanntes Paket beim Owner -- nicht als halber Umbau hier.
+// ---------------------------------------------------------------------------
+TEST(HostCapabilities, DetectCompileTimeMirrorsBuildFlagsBothDirections) {
+    auto const hc = v32::HostCapabilities::detect_compile_time();
+
+    // Nenner in die Ausgabe: wie viele ISA-Flags diese Wache ueberhaupt prueft.
+    int constexpr kIsaFlagsChecked = 4;
+    RecordProperty("isa_flags_checked", kIsaFlagsChecked);
+    RecordProperty("isa_flags_total", 4);
+
+    {
+        SCOPED_TRACE("ISA-Flag 1 von 4: supports_avx2 (__AVX2__)");
 #if defined(__AVX2__)
-    EXPECT_TRUE(hc.supports_avx2);
+        EXPECT_TRUE(hc.supports_avx2) << "__AVX2__ ist gesetzt, das Flag muss true sein";
+#else
+        EXPECT_FALSE(hc.supports_avx2) << "__AVX2__ ist NICHT gesetzt, das Flag darf nicht true sein";
 #endif
+    }
+    {
+        SCOPED_TRACE("ISA-Flag 2 von 4: supports_avx512 (__AVX512F__)");
 #if defined(__AVX512F__)
-    EXPECT_TRUE(hc.supports_avx512);
+        EXPECT_TRUE(hc.supports_avx512) << "__AVX512F__ ist gesetzt, das Flag muss true sein";
+#else
+        EXPECT_FALSE(hc.supports_avx512) << "__AVX512F__ ist NICHT gesetzt, das Flag darf nicht true sein";
 #endif
-    SUCCEED(); // mindestens default-Konstruktion
+    }
+    {
+        SCOPED_TRACE("ISA-Flag 3 von 4: supports_neon (__ARM_NEON)");
+#if defined(__ARM_NEON)
+        EXPECT_TRUE(hc.supports_neon) << "__ARM_NEON ist gesetzt, das Flag muss true sein";
+#else
+        EXPECT_FALSE(hc.supports_neon) << "__ARM_NEON ist NICHT gesetzt, das Flag darf nicht true sein";
+#endif
+    }
+    {
+        SCOPED_TRACE("ISA-Flag 4 von 4: supports_sve2 (__ARM_FEATURE_SVE2)");
+#if defined(__ARM_FEATURE_SVE2)
+        EXPECT_TRUE(hc.supports_sve2) << "__ARM_FEATURE_SVE2 ist gesetzt, das Flag muss true sein";
+#else
+        EXPECT_FALSE(hc.supports_sve2) << "__ARM_FEATURE_SVE2 ist NICHT gesetzt, das Flag darf nicht true sein";
+#endif
+    }
+
+    // Gegenprobe zur Selbstverwechslung: x86- und ARM-Flags duerfen nie gleichzeitig gesetzt sein.
+    // Faengt die Kopier-Mutation (avx512 aus dem avx2-Makro, neon aus dem x86-Zweig) unabhaengig
+    // von der Makro-Lage der Plattform.
+    EXPECT_FALSE((hc.supports_avx2 || hc.supports_avx512) && (hc.supports_neon || hc.supports_sve2))
+        << "x86- und ARM-ISA gleichzeitig gemeldet -- die Zweige sind vertauscht oder kopiert";
+
+    // Der Compiler, der DIESE TU uebersetzt, muss erkannt sein. Unknown = Erkennung ist durchgefallen.
+    EXPECT_NE(hc.compiler_family, v32::CompilerFamily::Unknown)
+        << "compiler_family bleibt Unknown -- die Compiler-Erkennung greift fuer diesen Uebersetzer nicht";
 }
 
 // ===========================================================================

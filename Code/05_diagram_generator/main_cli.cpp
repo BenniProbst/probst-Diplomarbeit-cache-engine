@@ -249,7 +249,6 @@ int main(int argc, char* argv[]) {
         auto comma = line.find(',');
         if (comma == std::string::npos) continue;
         bar.labels.push_back(line.substr(0, comma));
-        auto next_comma = line.find(',', comma + 1);
         // op_count + total_cycles als value (Spalte 4 nach Schema)
         // iss beginnt NACH dem ersten Komma: idx0=fingerprint, idx1=succeeded,
         // idx2=workload_used, idx3=op_count, idx4=total_cycles. Die Y-Achse heißt

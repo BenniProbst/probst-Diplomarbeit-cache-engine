@@ -978,10 +978,17 @@ int write_limitations_longtable(std::filesystem::path const& out, std::string co
     // Ausnahmen, die einzelne Zeilen brauchen (projekteigener Weg, s. 17 .tex-Dateien im Bestand).
     // OHNE ihn verliert ein Generatorlauf die Suppression und lint:latex geht rot -- genau die
     // Rueckdreh-Falle, wegen der dieser Generator am 07.08.2026 nachgezogen wurde.
+    // trailer traegt einen NSDMI (= leer), weil er ECHT optional ist: nur 2 der 33 Zeilen brauchen
+    // eine chktex-Ausnahme. Ohne den NSDMI meldet die Warnstufe an JEDER der 31 trailer-losen Zeilen
+    // -Wmissing-field-initializers (clang) bzw. -Wmissing-initializer (GCC) -- 31 von 44 super-Warnungen
+    // des clang-Laufs vom 09.08. stammten aus genau diesen 31 Stellen. Der NSDMI sagt die Absicht im TYP
+    // statt sie 31-mal per Hand zu wiederholen; gemessen schweigen damit BEIDE Uebersetzer. Verhalten
+    // unveraendert: die weggelassene Aggregat-Komponente wurde vorher wert-initialisiert (= leerer
+    // String), der NSDMI liefert denselben leeren String -- die erzeugte .tex bleibt byte-identisch.
     struct Row {
         std::string caveat;
         std::string status;
-        std::string trailer;
+        std::string trailer{};
     };
     std::vector<Row> rows;
 

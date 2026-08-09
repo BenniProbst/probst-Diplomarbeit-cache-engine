@@ -156,10 +156,14 @@ int main(int argc, char* argv[]) {
 
     for (int i = 2; i < argc; ++i) {
         std::string const a{argv[i]};
-        if (std::string const v = opt_value(a, "--out="); !v.empty()) {
-            out_override = v;
-        } else if (std::string const v = opt_value(a, "--builder-exe="); !v.empty()) {
-            builder_exe = v;
+        // Eigene Namen je Zweig (v_out/v_builder) statt zweimal 'v': der else-Zweig liegt IM Scope des
+        // ersten if-init, das zweite 'v' verdeckte also das erste (-Wshadow). Hier harmlos -- im else-Zweig
+        // ist das aeussere 'v' per Konstruktion leer --, aber die Verdeckung ist genau das Muster, unter dem
+        // eine spaetere Zeile still den falschen Wert liest. Getrennte Namen machen das strukturell unmoeglich.
+        if (std::string const v_out = opt_value(a, "--out="); !v_out.empty()) {
+            out_override = v_out;
+        } else if (std::string const v_builder = opt_value(a, "--builder-exe="); !v_builder.empty()) {
+            builder_exe = v_builder;
         } else if (a.rfind("--", 0) == 0) {
             std::cerr << "Unbekannte Option: " << a << "\n";
             print_usage();
