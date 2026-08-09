@@ -487,6 +487,58 @@ test:host-klassen-bericht:
     - sh scripts/ci_host_klassen_gegenorakel.selbsttest.sh
     - sh scripts/ci_host_klassen_gegenorakel.sh
 
+# ── D2-G4 NACHSATZ (2026-08-09): ALLOWLIST-ZUSICHERUNG DER ABNAHME ##06 ──
+# DER BEFUND, der diesen Job erzwingt. Die Allowlist der Abnahme ##06 deckte
+# BEDINGUNGEN statt STELLEN. Ein gewuerfelter Koeder
+# 'add_test(NAME test_schleich_<zufall>)' hinter dem bereits allowgelisteten
+# if(COMDARE_PRT_ART_LEGACY_AVAILABLE) lief mit EXIT 0 durch: der Zaehler
+# allowlist_mit_begruendung stieg still 6 -> 7, obwohl der Eintrag woertlich
+# "Deckt 4 Registrierungen" zusichert. Wer eine neue Registrierung unter eine
+# bestehende Ausnahme haengt, hat sie nicht begruendet, sondern versteckt --
+# exakt die Fehlerklasse "stille Ausnahme", gegen die ##06 gebaut ist.
+#
+# WARUM DIESER JOB HEUTE SCHON FAHRBAR IST, DIE VOLLE FORMEL ABER NICHT.
+# ##06 hat in der super-CI keinen IST-Nenner: 'ctest -N' kommt in dieser Datei
+# nicht vor, und der einzige Job mit Live-Inventur (test:coverage-guard auf der
+# ce-Seite) veroeffentlicht seine Ausgabe nicht als Artefakt. Ohne IST-Nenner
+# waere die volle Formel entweder dauerrot oder muesste alles allowlisten --
+# beides wertlos, deshalb bleibt sie bis Posten D2 baremetal (Fussnote D2-G4).
+# Die ZUSICHERUNG dagegen braucht keinen Bau: die Stellenzahl je Bedingung kommt
+# allein aus dem CMake-Quelltext. Genau der Teil, ueber den der Koeder
+# hereinkam, ist damit ab heute in der CI und nicht erst nach D2.
+#
+# WARUM --gegen-vorlage MITFAEHRT: sonst bleibt die Plan-Zahl eine Behauptung,
+# die nur beim Schreiben einmal stimmte. Der Marker im Wellenplan v2 wird gegen
+# die Messung gehalten; driftet er, wird der Job rot. Der umgekehrte Weg ist
+# ausdruecklich zu: ein Marker-Bump legalisiert eine Schleich-Registrierung
+# NICHT, weil die Zusicherung in der Allowlist steht und nicht im Marker
+# (Selbsttest-Fall K6 haelt genau das fest).
+#
+# WARUM DER SELBSTTEST ZUERST LAEUFT (T-7): eine Wache ohne Probe ist eine
+# Behauptung. Er baut eine Fixture mit von Hand abgezaehltem Inventar (zweite
+# Quelle, T-3) und wirft je Lauf NEU GEWUERFELTE Koeder hinein: unter
+# allowgelisteter Bedingung, unter neuer Bedingung, entfallende Stelle, altes
+# Zweifeld-Format, tote Ausnahme, Marker-Bump. Der Gegenkoeder am
+# unmanipulierten Baum haelt fest, dass die Wache nicht einfach immer rot ist.
+#
+# WARUM KEIN allow_failure: eine advisory Wache ist die naechste stille Null
+# (gleiche Begruendung wie test:host-klassen-bericht). KEIN .code-rules: eine
+# Schleich-Registrierung kommt ueber einen reinen Gitlink-Bump des ce ins Repo,
+# ohne dass sich im super eine einzige Code-Datei aendert.
+test:abnahme06-zusicherung:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  script:
+    # EINZEILIG mit Absicht: eine gefaltete YAML-Fortsetzung waere zwar gueltig,
+    # aber sie ist genau die Sorte Konstrukt, die man nicht mehr nachliest.
+    - sh scripts/ci_abnahme06_bedingungs_tabelle.selbsttest.sh
+    - sh scripts/ci_abnahme06_bedingungs_tabelle.sh --nur-zusicherung --gegen-vorlage docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md
+
 # ── Stufe 3: Test (aus ci-templates .test) — super-eigene Unit-Suite (11 Code/tests + 4 Stufen-Fixtures) ──
 # User-Direktive 06.07.: strikt grün = Tests NIE manual/auslassen → automatisch + HART (kein allow_failure;
 # lokal g++-bewiesen vor Scharfschaltung). Scope = Sammel-Target comdare_da_unit_tests + ctest -L da_unit —
@@ -934,6 +986,56 @@ thesis:pdf:
         echo "== Storage #51 INERT (COMDARE_STORAGE_CACHE != true) -> from_env() No-Op, golden byte-neutral =="
       fi
 
+# ── LAG-P1 (2026-08-09): BESTANDSLOG-SCHARFSCHALTUNG (§62 Lager-Koordination), DRY via !reference ──
+#    SELBSTCHECK: dieser Anker sichert zu, dass bei gesetztem Opt-in die drei Pflicht-Variablen des Binders
+#    belegt sind und der owner_uuid der Konvention CI_JOB_ID@host folgt. Er sichert NICHT zu, dass Ebene B
+#    erreichbar ist oder das Dokument entsteht -- das belegen erst die aktiv-Zeile (.bestandslog_wache) und
+#    ein object_stat im Store.
+#
+#    DER BEFUND (09.08.2026, selbst gezaehlt): COMDARE_BESTANDSLOG stand in NULL von zwei aktiven
+#    .gitlab-ci.yml -- super 0 Treffer, ce 0 Treffer. Die gesamte Lager-Koordination war damit in Produktion
+#    AUS: kein SKIP, kein Takeover, keine Gleichverteilung ueber die Maschinen. Binder (fail-loud, exit 6),
+#    Director-Durchreiche ueber beide Trigger-Grenzen und 22 Lager-Header waren fertig -- es fehlte der
+#    Schalter. Genau EINE Zeile Ursache, zwei Tage Messkampagne Wirkung.
+#
+#    WARUM EIN SKRIPT UND KEIN YAML-BLOCK: die owner_uuid-Konvention (CI: CI_JOB_ID@host, lokal: pid@host)
+#    existierte bis heute NUR als Kommentar in ce planer_block_value.hpp:24-25, mit null Code-Treffern im
+#    ganzen ce-Baum. Sie gehoert an EINEN Ort, den beide Wege benutzen -- der Dual-Weg (§61) verlangt, dass
+#    jede Funktion sowohl ueber die CI als auch bare-metal laeuft. Deshalb liegt die Logik in
+#    ci/comdare_bestandslog_activation.sh (gequellt, nicht ausgefuehrt) und dieser Anker ruft sie nur auf.
+#
+#    INERT-BY-DEFAULT: ohne COMDARE_STORAGE_CACHE/COMDARE_BESTANDSLOG faellt eine Zeile und es wird keine
+#    Variable gesetzt -> golden byte-identisch (Doktrin "CI-Gruen = Messung AUS"). Die Kopplung an
+#    COMDARE_STORAGE_CACHE ist kein neuer Entwurf, sondern der im ce-Code benannte Betriebs-Kontrakt
+#    (cache_engine_builder_iterator.hpp:2154). Einzeln abschaltbar mit COMDARE_BESTANDSLOG=false.
+#    PFAD ABSOLUT ueber $CI_PROJECT_DIR: die Mess-/Planer-Jobs wechseln vor dem Bau nach Code/, ein
+#    relativer Pfad wuerde je nach Einbau-Stelle mal treffen und mal nicht. Bare-metal quellt der Operator
+#    die Datei direkt (siehe Kopf der Datei) -- dort gibt es kein $CI_PROJECT_DIR und es braucht auch keins.
+.bestandslog_activation:
+  script:
+    - . "$CI_PROJECT_DIR/ci/comdare_bestandslog_activation.sh"
+
+# ── LAG-P1: die LOG-WACHE als eigener Schritt. OHNE allow_failure -- eine advisory Wache ist die naechste
+#    stille Null. Sie prueft die AUSSAGE (doc_key + owner exakt wie gesetzt), nicht die Anwesenheit des
+#    Wortes "bestandslog": ein Grep auf ein Wort, das auch in einem Kommentar oder in der WARNUNG
+#    "Bestandslog bleibt AUS" vorkommt, waere keine Wache.
+#
+#    HART, SOBALD DAS OPT-IN GESETZT IST -- auch wenn Ebene B fehlt. Das widerspricht NICHT der
+#    Fehlerklassen-Doktrin ("nie Abbruch"): die verbietet dem TREIBER, einen laufenden Bau mitten im Lauf
+#    abzubrechen. Diese Wache laeuft DANACH und bewertet nur, ob der Lauf koordiniert war. Ein Lauf, der mit
+#    COMDARE_BESTANDSLOG=true startet und ohne Lager endet, ist genau der Fall, der ohne Wache erst nach zwei
+#    Tagen Messkampagne auffaellt. Ist das Opt-in nicht gesetzt, prueft sie nichts und sagt das.
+.bestandslog_wache:
+  script:
+    - |
+      if [ "${COMDARE_BESTANDSLOG:-}" = "true" ]; then
+        sh "$CI_PROJECT_DIR/ci/bestandslog_wache.sh" \
+           "${COMDARE_BESTANDSLOG_LOG:-$CI_PROJECT_DIR/bestandslog-lauf.log}" \
+           "$COMDARE_BESTANDSLOG_DOC_KEY" "$COMDARE_BESTANDSLOG_OWNER_UUID" "$COMDARE_BESTANDSLOG_MASCHINE"
+      else
+        echo "== Bestandslog-Wache: Opt-in nicht gesetzt -> nichts zu pruefen (inert-by-default) =="
+      fi
+
 # ── P11-Lehre (W9.6): Mess-Pre-Flight — HARTER Abbruch, wenn ein FREMDER comdare-messung-driver auf dem Runner
 #    laeuft. Die 1-Thread-Mess-Doktrin verlangt Allein-Belegung (ein paralleler Driver verfaelscht die Streuung).
 #    Laeuft VOR dem eigenen Driver-Start -> jeder gefundene Driver ist fremd; zusaetzlich wird die eigene
@@ -993,6 +1095,7 @@ measure:smoke:
     # er faehrt gleich den Mess-Lauf). Beide Binaries kommen aus DEMSELBEN Configure/ce-Stand.
     - cmake --build build --target comdare_experiment_planner
     - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
+    - !reference [.bestandslog_activation, script]     # LAG-P1: Lager-Opt-in + owner_uuid=CI_JOB_ID@host
     - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
     - |
       set -euo pipefail
@@ -1005,7 +1108,8 @@ measure:smoke:
       "$PLANNER" validate || { echo "Smoke-Profil-Validierung fehlgeschlagen -> Abbruch vor dem Lauf"; exit 1; }
       mkdir -p measure_out_smoke
       echo "== Smoke-/Coverage-Messlauf (m3_smoke_coverage: alle 19 Achsen-Sweeps + 21 SOTA, jedes Feature 1x) =="
-      "$DRIVER" experiment_config measure_out_smoke
+      # LAG-P1: stderr mitschneiden UND live weiterreichen (Begruendung s. measure:golden-320).
+      { "$DRIVER" experiment_config measure_out_smoke 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1
       # D3 (2026-08-08): die alte Erfolgsbedingung prueft nur, DASS eine measurements.csv
       # existiert -- die Zeilenzahl wurde eine Zeile darueber AUSGEGEBEN und nirgends geprueft.
       # Eine CSV mit nur der Kopfzeile bestand das Gate. Die Wache zaehlt jetzt Datenzeilen
@@ -1033,10 +1137,13 @@ measure:smoke:
         fi
       fi
       echo "=== measure:smoke OK (Voll-Feature-Smoke gemessen; CSVs + regenerierter Anhang unter measure_out_smoke/) ==="
+    # LAG-P1: Bestandslog-Wache als eigener Schritt, OHNE allow_failure (Begruendung s. measure:golden-320).
+    - !reference [.bestandslog_wache, script]
   artifacts:
     paths:
       - Code/measure_out_smoke/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die 115 DLL-Binaries
       - Code/measure_out_smoke/appendix/**/*.tex # CI-interaktiv (#24): regenerierte 12 Kern- + 5 Darstellungs-.tex je Sprache (K-12-Sweep 2026-07-19)
+      - bestandslog-lauf.log                     # LAG-P1: der Beleg der aktiv-Zeile, auch (gerade) im roten Fall
     when: always
     expire_in: 12 weeks
 
@@ -1088,6 +1195,7 @@ measure:golden-320:
     # W1 (05.08.2026): 'validate' ist die PLANER-Rolle -> eigenes ce-Target (Spiegel des Smoke-Jobs oben).
     - cmake --build build --target comdare_experiment_planner
     - !reference [.storage_cache_activation, script]   # Storage #51 opt-in scharfschalten (inert-by-default)
+    - !reference [.bestandslog_activation, script]     # LAG-P1: Lager-Opt-in + owner_uuid=CI_JOB_ID@host
     - !reference [.measurement_preflight_no_foreign_driver, script]   # P11 (W9.6): HARTER Abbruch bei fremdem comdare-messung-driver (VOR dem Lauf)
     - |
       set -euo pipefail
@@ -1099,7 +1207,13 @@ measure:golden-320:
       "$PLANNER" validate || { echo "Profil-Validierung fehlgeschlagen -> Abbruch vor mehrtaegigem Lauf"; exit 1; }
       mkdir -p measure_out
       echo "== golden-320 Voll-Messlauf (mehrtaegig, Measurement-ON, PMC auf prod1) =="
-      "$DRIVER" experiment_config measure_out
+      # LAG-P1: stderr wird MITGESCHNITTEN, damit die Bestandslog-Wache die aktiv-Zeile pruefen kann --
+      # und zugleich LIVE weitergereicht, weil dieser Lauf mehrere TAGE dauert und der Fortschritts-Cursor
+      # auf stderr sonst tagelang unsichtbar waere. Der 3>&1-Tausch schickt nur stderr durch tee; stdout
+      # bleibt unberuehrt (die Mess-Ausgabe darf nicht durch das Log laufen und es aufblaehen).
+      # K11: 'set -o pipefail' steht oben -- ohne es maesse der Status das letzte Glied (tee) statt des
+      # Treibers, und ein abgestuerzter Messlauf endete gruen.
+      { "$DRIVER" experiment_config measure_out 2>&1 1>&3 | tee "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2; } 3>&1
       # D3 (2026-08-08): s. measure:smoke. Hier wiegt der Defekt am schwersten -- dies ist der
       # Voll-Lauf. Er konnte mit "OK (golden-320 gemessen)" enden, ohne einen einzigen Messwert
       # erzeugt zu haben, und persist:measurements haette die leeren CSVs additiv zurueckgeschrieben.
@@ -1128,10 +1242,15 @@ measure:golden-320:
         fi
       fi
       echo "=== measure:golden-320 OK (golden-320 gemessen; CSVs + regenerierter Anhang unter measure_out/) ==="
+    # LAG-P1: die Bestandslog-Wache als EIGENER Schritt, NACH dem Lauf, OHNE allow_failure. Sie steht
+    # bewusst hinter der Mess-Ausbeute-Wache: erst "hat der Lauf Messwerte erzeugt", dann "war er dabei
+    # ueberhaupt am Lager angemeldet". Beide Fragen sind getrennt beantwortbar und beide muessen ja sein.
+    - !reference [.bestandslog_wache, script]
   artifacts:
     paths:
       - Code/measure_out/**/*.csv          # NUR die Mess-CSVs (Ergebnisse) — NICHT die ~320 DLL-Binaries (Repo-/Artefakt-Bloat)
       - Code/measure_out/appendix/**/*.tex # CI-interaktiv (#24): die aus Live-Messdaten regenerierten 12 Kern- + 5 Darstellungs-.tex
+      - bestandslog-lauf.log               # LAG-P1: der Beleg der aktiv-Zeile, auch (gerade) im roten Fall
     when: always
     expire_in: 12 weeks
 
@@ -1473,6 +1592,15 @@ planer:delegate:
     - if: '$COMDARE_DYNAMIC_PLANER_CI == "true"'   # ISOLIERTES Opt-in (nur die Delegation, ohne den Rest)
   script:
     - 'echo "== Toolchain =="; cmake --version; (g++ --version || c++ --version || echo "KEIN C++-Compiler")'
+    # LAG-P1 (2026-08-09): Ebene B ZUERST, dann das Lager. Reihenfolge ist keine Kosmetik -- der Binder gatet
+    # auf minio_enabled(), also muessen COMDARE_MINIO_ENDPOINT/_BUCKET stehen, BEVOR der Planer startet.
+    # BEFUND, der diesen Einbau erzwang: planer:delegate referenzierte .storage_cache_activation bisher GAR
+    # NICHT (nur die beiden statischen measure-Jobs taten es). Der Planer haette das Opt-in also selbst dann
+    # nur mit "fehlerklasse=lager_ebene_fehlt" quittiert, wenn die Variablen gesetzt gewesen waeren.
+    # BEIDE VOR 'cd Code': die Anker quellen ci/-Skripte ueber $CI_PROJECT_DIR und die env-Exports muessen in
+    # die Folge-Schritte durchschlagen (gleiche Shell).
+    - !reference [.storage_cache_activation, script]   # Ebene B/C -- Vorbedingung des Bestandslog-Binders
+    - !reference [.bestandslog_activation, script]     # LAG-P1: Opt-in + owner_uuid=CI_JOB_ID@host + doc_key
     - cd Code
     - cmake -B build -G Ninja -DCOMDARE_V32_ENABLE=ON -DCMAKE_BUILD_TYPE=Release
     # W1 (05.08.2026, F1-HART): die DELEGATION ist die PLANER-Rolle -- sie laeuft ab hier ueber die eigene
@@ -1485,13 +1613,30 @@ planer:delegate:
       test -n "$PLANNER" -a -x "$PLANNER" || { echo "comdare-experiment-planner fehlt: $PLANNER"; exit 1; }
       test -f "$COMDARE_GOLDEN_N_PROFILE" || { echo "golden-Profil fehlt: $COMDARE_GOLDEN_N_PROFILE"; exit 1; }
       echo "== W10-B: super delegiert die Anwender-XML an die CE (Subkommando 'plan ci' = STUFE 1, rein lesend, KEIN Bau/Messung) =="
-      "$PLANNER" plan ci "$COMDARE_GOLDEN_N_PROFILE" > "$CI_PROJECT_DIR/planer-child-ci.yml"
+      # LAG-P1: stderr geht ZUSAETZLICH in eine Datei, damit die Bestandslog-Wache die aktiv-Zeile pruefen
+      # kann. Der Planer schreibt Daten nach stdout und Diagnose nach stderr (clig.dev) -- die aktiv-Zeile
+      # ist Diagnose. K11-Falle bewusst umgangen: KEINE Pipe zwischen Planer und Wache, sonst maesse $? das
+      # letzte Glied. Erst umlenken, dann rc lesen, dann das Log unveraendert ins Job-Log spiegeln.
+      set +e
+      "$PLANNER" plan ci "$COMDARE_GOLDEN_N_PROFILE" \
+        > "$CI_PROJECT_DIR/planer-child-ci.yml" 2> "$CI_PROJECT_DIR/bestandslog-lauf.log"
+      PLANER_RC=$?
+      set -e
+      cat "$CI_PROJECT_DIR/bestandslog-lauf.log" >&2
+      # Exit 6 = Bestandslog-Gate-Abbruch (konfiguration_unvollstaendig). Er wird hier NICHT geschluckt:
+      # ein Planer, der ohne vollstaendige Lager-Identitaet emittiert, produziert Jobs, die sich spaeter
+      # nicht zuordnen lassen.
+      test "$PLANER_RC" -eq 0 || { echo "planer 'plan ci' endete mit rc=$PLANER_RC"; exit "$PLANER_RC"; }
       echo "== CE-emittierte STUFE-1-Pipeline (erste 40 Zeilen) =="; head -40 "$CI_PROJECT_DIR/planer-child-ci.yml"
       echo "== STUFE-1 CEB-Bau-Jobs (je Mess-Kombination): $(grep -c '# JOB ceb-build combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
       echo "== STUFE-1 CEB-Trigger-Jobs (Grandchild -> STUFE 2): $(grep -c '# JOB ceb-trigger combo ' "$CI_PROJECT_DIR/planer-child-ci.yml") =="
+    # LAG-P1: die Wache als EIGENER Schritt, nach dem Lauf, OHNE allow_failure.
+    - !reference [.bestandslog_wache, script]
   artifacts:
     paths:
       - planer-child-ci.yml
+      - bestandslog-lauf.log      # LAG-P1: der Beleg der aktiv-Zeile bleibt als Artefakt nachlesbar
+    when: always                  # gerade der ROTE Lauf ist der interessante -- sein Log darf nicht verfallen
     expire_in: 1 week
 
 # ── planer:delegate-trigger (W10-B): triggert die CE-emittierte STUFE-1-Child-Pipeline (Dynamic-Child-Pipeline,

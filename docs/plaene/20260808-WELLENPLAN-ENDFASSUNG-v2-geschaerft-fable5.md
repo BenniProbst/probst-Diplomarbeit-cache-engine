@@ -200,6 +200,46 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 > ausdrücklich, nicht durch Weglassen). Ein Job, der ohne IST-Nenner grün wird, wäre genau der
 > Defekt, gegen den D2 gebaut wird.
 >
+> **NACHTRAG D2-G4/Z — 09.08.2026 abends: DIE ALLOWLIST DECKTE BEDINGUNGEN, NICHT STELLEN.**
+> Die obige Fassung der Formel trägt weiter, ihre **Umsetzung** hatte ein Loch, und zwar genau das,
+> gegen das sie gebaut ist. Am Objekt mit gewürfeltem Köder nachgestellt: eine **neue** bedingte
+> Registrierung unter einer **bereits allowgelisteten** Bedingung rutschte still grün durch.
+> `if(COMDARE_PRT_ART_LEGACY_AVAILABLE) add_test(NAME test_schleich_kqwg3p3clrgxrky …)` an eine
+> Arbeitskopie angehängt → **EXIT 0**, `allowlist_mit_begruendung` stieg lautlos **6 → 7**, obwohl der
+> Allowlist-Eintrag wörtlich *„Deckt 4 Registrierungen"* zusichert. Wer eine Registrierung unter eine
+> bestehende Ausnahme hängt, hat sie nicht begründet — er hat sie **versteckt**. Die W0a-Abnahme
+> unten verlangt „**namentlich rot**"; für diesen Weg hielt die gebaute Wache das nicht.
+>
+> **Was daraus folgt (gebaut, nicht vorgeschlagen).** Die Allowlist trägt jetzt je Eintrag eine
+> **Zusicherung** `stellen=N` als zweites TAB-Feld (`COMDARE_PRT_ART_LEGACY_AVAILABLE stellen=4`,
+> `do_run stellen=2`). Die Wache misst die Stellenzahl je Bedingung aus dem CMake-Quelltext und hält
+> sie dagegen: **`allowlist_zusicherung_verletzt > 0` ⇒ Exit ≠ 0**, mit **beiden** Zahlen und den
+> Stellen namentlich. Abweichung in **beide** Richtungen ist ein Befund — `ist > soll` ist die
+> Schleich-Registrierung, `ist < soll` eine tote Ausnahme, deren Begründungstext ab dann falsch ist.
+> Das **alte Zweifeld-Format bricht laut** (fail-closed), nicht leise weiter.
+>
+> **Der Restweg ist mit geschlossen.** Ein im selben Change mitgezogener Marker-Bump `18 → 19` bringt
+> `--gegen-vorlage` wieder zur Deckung — am Objekt gefahren: „`Vorlage sagt: 19 · Objekt sagt: 19 ·
+> Deckung: ja.`" — und der Lauf bleibt trotzdem **rot**, weil die Zusicherung in der Allowlist steht
+> und **nicht** im Marker. Deshalb wandert `stellen=N` ausdrücklich **nicht** in die Markerzeile:
+> eine Zahl, die im selben Dokument steht wie die Behauptung, kann sie nicht prüfen.
+>
+> **§61-Dual-Weg, Hälfte 2 — für diesen Teil ab heute erfüllt.** Die Zusicherung braucht **kein**
+> Bauverzeichnis (die Stellenzahl kommt allein aus dem Quelltext), also ist sie ohne IST-Nenner
+> CI-fahrbar: neuer Job **`test:abnahme06-zusicherung`** (`.gitlab-ci.yml`, kein `allow_failure`,
+> kein `.code-rules`) fährt `scripts/ci_abnahme06_bedingungs_tabelle.selbsttest.sh` und danach
+> `--nur-zusicherung --gegen-vorlage <diese Datei>`. Die **volle** Formel ##06 bleibt bis Posten D2
+> baremetal — der Modus druckt deshalb `ZAHL 3 NICHT AUSGEWERTET` statt einer 0, denn eine 0 wäre
+> eine Behauptung über Ungemessenes.
+>
+> **Köder, gefahren (K13, je Lauf frisch gewürfelt).** `test_schleich_kqwg3p3clrgxrky` unter
+> `COMDARE_PRT_ART_LEGACY_AVAILABLE` → **vor** dem Bau EXIT 0 (6→7, kein Signal), **nach** dem Bau
+> EXIT 1, `soll=4 ist=5`, Stelle namentlich. Zweitköder `test_zweitkoeder_z45suqh3wytu6ki` unter
+> `do_run` → EXIT 1, `soll=2 ist=3`. **Gegenprobe:** dieselbe Quelle unmanipuliert → EXIT 0,
+> `allowlist_zusicherung_verletzt=0`, `6 von 6` zugesicherten Stellen gedeckt.
+> Selbsttest (Fixture mit von Hand abgezähltem Inventar, T-3): **11 von 11 Fällen grün**, davor
+> **8 von 11 rot** — der Rot-Lauf ging dem Bau voraus (T-1).
+>
 > <!-- ABNAHME06-ZAHLEN bedingte_registrierungen=18 bedingungs_klassen=14 quelle=ce/tests/unit/CMakeLists.txt erhoben=2026-08-09 host=prod1/avx512f -->
 
 > **FUSSNOTE D2-G5 — RICHTIGSTELLUNG 08.08.2026, am Objekt gemessen, nicht abgeschrieben.**
@@ -298,7 +338,7 @@ Die Klasse in einem Satz, fünffach belegt: die Null wird überall als **Divisio
 | D5-2 | Median-Kanon = q=0.5-Fall; Sieger-Kürung, `csv_to_latex`, `diagram_generator` auf EINE Definition; `:1783/:1784` (Mediane ÜBER Konfigurationen) NICHT fälschlich umbauen; `eta_kalibrierung` begründet entscheiden | 3 | W1 | nach D5-1, nach D5-3 |
 | D5-3 | **Vorlage-Korrektur:** REV-DATA-12 zeigt auf **lebende** super-Werkzeuge (`Code/04_csv_to_latex/`, `Code/05_diagram_generator/`, letzter Commit 6d837e7d, 07.08.); Disposition-Anker um 239 Zeilen gedriftet → korrigieren | 0,5 | W1 | **ERLEDIGT 09.08.** — Drift **am Objekt bestätigt** (`diagram_generator.cpp` `nearest_rank_median` 414 → **653**, Differenz **+239**; Schwester-Anker `csv_to_latex.cpp:48` **unverändert richtig**). Anker auf **Symbol-Form** umgestellt statt nur nachgezogen; `ci/anker_wache.sh` hält sie (Rot-Lauf mit 414 protokolliert, Grün-Lauf mit 653, Köder beidseitig). Nachtrag in `docs/audits/20260716-wp5-rev-mining-DISPOSITION.md`. |
 | D5-4 | `delete_p99_ns` existiert 0-mal → 9er-Feldliste als EINE Konstante, 5 Serialisierer auf den geteilten Helfer, Schema-Test in beide Richtungen (fehlend UND unerwartet) | 1,5 | W1 | mit D5-1-Flächen |
-| D5-5 | HDR-Histogramm = sechstes Verfahren, unverdrahtet, gegen die falsche Referenz (1 %-Toleranz), verschluckt 0-ns-Proben still → entscheiden (entfernen ODER begründet führen), Toleranz aus `significant_figures=3` hergeleitet | 2 | W1 (rutschfähig W2) | nach D5-1 |
+| D5-5 | **ENTSCHIEDEN 09.08. — die Option „entfernen" ist RANGWIDRIG und gestrichen.** Die **Thesis** sagt HDR im Präsens zu, dreifach im gepinnten Stand `798e946`: Aufgabenstellung `de.tex:130` („Perzentile über HDR-Histogramme statt Mittelung"), `03_messsystem_prtart.tex:552` („das HdrHistogram **erhebt** die Latenz-Perzentile (p50/p95/p99)") und `05_evaluation.tex:129` („jede Konfiguration wird … mit über HDR-Histogramme bestimmten Perzentilen vermessen"). Dazu Owner-Primärquelle Termin 3 (09.04., nie widerrufen): *„Perzentile werden nicht gemittelt. **Je Lauf werden HDR-Histogramme persistiert.**"* Nach **THESIS > OWNER > PLAN** gewinnt die Zusage; ein Plan kann sie nicht wegentscheiden — nur ein Owner-Edit des Thesis-Textes könnte das. **Neuer Auftrag: HDR verdrahten** (heute **0 Produktions-Konsumenten**, selbst gegrept: `latency_hdr_histogram.hpp` wird ausschließlich von `tests/unit/test_ap8_hdr_histogram.cpp` inkludiert) **+ Je-Lauf-Persistenz + 0-ns-Zähler + Toleranz aus `significant_figures=3`**. **Aufwand 2 h → offen, neu zu schätzen.** **Nicht mehr rutschfähig.** | **?** | W1 | nach D5-1 |
 
 **Tragende Abnahme:** Wache druckt `Definitionen: 1` (heute 2); Zufalls-Seed-Test gegen zweitimplementierte Lehrbuch-Referenz (Seed gedruckt); Mutations-Köder (delta ±1 auf gewürfeltem Summanden, nur Testziel neu gebaut) → rc≠0, **vor der Heilung einmal rot gefahren**; Kreuz-Test gerader Länge über Selector/`csv_to_latex`/`diagram_generator` mit Bit-Gleichheit (Achtung: vendorierter ce-Stand in super zeigt auf alten Commit — der Kreuz-Test muss gegen den geheilten Stand prüfen, sonst grün und blind).
 
@@ -463,7 +503,7 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
             414 -> 653-659 = +239, jetzt Symbol-Anker + ci/anker_wache.sh).
  D5-2 [lok] Median-Kanon ueber ce+super (Kreuz-Test gerade Laenge, Seed gedruckt).
  D5-4 [lok] delete_p99_ns + EIN geteilter Helfer + Schema-Test beidseitig.
- D5-5 [lok] HDR entscheiden (0-ns-Zaehler, Toleranz hergeleitet). [rutschfaehig]
+ D5-5 [lok] HDR VERDRAHTEN + Je-Lauf-Persistenz (0-ns-Zaehler, Toleranz hergeleitet). [NICHT rutschfaehig -- Thesis-Zusage, s. Posten-Tabelle]
  10+10b [lok+1 Lauf] --check-size: 2 Zahlenreihen + Messpunkt working_set 8388608.
  11   [lok] <measure_selection>: Schema+XSD+Validator+Teilmengen-Garantie.
  12   [lok] configure --enable-X=no; 5 XMLs wohlgeformt (2 generiert).
@@ -554,7 +594,7 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 
 **W-1** (Nenner 6): ##01 `rev-list --count` 29→0, beide Zahlen · ##02 `diff --stat` 17→0 · D1/D1a: `make check` 427→431 literal, `make` allein 0→53 `.so` (6329→6749 ninja-Ziele), Doppel-Köder beider Gate-Familien vorher unsichtbar-grün/nachher rot · D1d: `grep -rn '404 statt 406'` = 0; jede verbleibende Kommentar-Zahl mit Datum+Kommando · ##04/##05 wie v1, jetzt erfüllbar.
 
-**W0a** (Nenner 14): test:unit-Job druckt Job-ID + `out of 431` + `R5.G … ACTIVE (48 auto-gebaute DLLs)` (heute 429, beide Zahlen) · Wache druckt DREI Zahlen aus DREI Quellen (V-7), Zahl-Köder 345 → rot, Schrumpf-Köder N per `shuf` → rot mit N, Gegenköder grün · Bedingungs-Tabelle (korrigiert D2-G4, s. Fußnote): `bedingte_registrierungen: 18 / bedingungs_klassen: 14 / erfuellt: 12 / allowlist_mit_begruendung: 6 / ohne_allowlist_eintrag: 0`, jede Ausgabe mit Host-Kennung; **19. Köder-Registrierung hebt den Zähler maschinell auf 19 und wird namentlich rot**, Gegenprobe bleibt bei 18 grün · D2-G1: `ctest -N` +2, Erstlauf-Ergebnis mit bestanden/gesamt gebucht · D2-G6-Stash-Köder: XML weg → rot mit Namen und `Inventur 426, Untergrenze 428, Differenz -2` · D5-1: `Definitionen: 1`, Pin 51→50, Mutations-Köder rc≠0 mit Seed · D1g: zwei `ctest -N`-Zahlen aus einem gefahrenen super-Configure-Paar, Ursache im Kommentar benannt.
+**W0a** (Nenner 14): test:unit-Job druckt Job-ID + `out of 431` + `R5.G … ACTIVE (48 auto-gebaute DLLs)` (heute 429, beide Zahlen) · Wache druckt DREI Zahlen aus DREI Quellen (V-7), Zahl-Köder 345 → rot, Schrumpf-Köder N per `shuf` → rot mit N, Gegenköder grün · Bedingungs-Tabelle (korrigiert D2-G4, s. Fußnote): `bedingte_registrierungen: 18 / bedingungs_klassen: 14 / erfuellt: 12 / allowlist_mit_begruendung: 6 / ohne_allowlist_eintrag: 0 / allowlist_zusicherung_verletzt: 0`, jede Ausgabe mit Host-Kennung; **19. Köder-Registrierung hebt den Zähler maschinell auf 19 und wird namentlich rot — auf BEIDEN Wegen: unter einer neuen Bedingung (`ohne_allowlist_eintrag=1`) wie unter einer bereits allowgelisteten (`soll=4 ist=5`, s. Nachtrag D2-G4/Z)**, Gegenprobe bleibt bei 18 grün · D2-G1: `ctest -N` +2, Erstlauf-Ergebnis mit bestanden/gesamt gebucht · D2-G6-Stash-Köder: XML weg → rot mit Namen und `Inventur 426, Untergrenze 428, Differenz -2` · D5-1: `Definitionen: 1`, Pin 51→50, Mutations-Köder rc≠0 mit Seed · D1g: zwei `ctest -N`-Zahlen aus einem gefahrenen super-Configure-Paar, Ursache im Kommentar benannt.
 
 **W0b** (Nenner 17 + 5 Nachlauf): D3-1-Proben P1 (Kopfzeile, `$K` im Pfad der Fehlerzeile) rot / P2 (eine Datenzeile `koeder_$K`) grün mit `datenzeilen_gesamt=1` / P3 (leer) rot mit `csv_gesamt=0` — heute P1/P3 grün, Vorher-Läufe protokolliert *(Nachtrag 08.08. abends: **gefahren und gelandet** — `ci/tests/mess_ausbeute_bissprobe.sh` mit `--selbstbiss`, im CI als `test:mess-ausbeute-bissprobe` ohne `allow_failure`; die Köder werden je Lauf gewürfelt, nicht abgeschrieben. Offen bleibt allein die Marker-Auswertung aus D3-7.)* · ##26 in korrigierter Formel `N>=1 UND M==N UND Z>=1` · Marker: fehlend = rot, `provision_only` nicht fälschlich rot, gefälschter `modus=voll measured=0` rot · persist-Beweis am Git-Zustand · Testat-XOR: gewürfelte Fehl-Zelle → genau 1 `[FEHLER-TESTAT]`, C−1 `[MESS-TESTAT]`, Bilanz stimmt (heute C+1 Testate) · Frische-Zwei-Lauf-Köder · D3-6: P1 Produktions-Layout heute unsichtbar → danach im WIDE-Aggregat, P3 NO-OP mit `laufordner_geprueft=1 / mit_material=0` · ##23/##23b wie v1 (Zeilenzahl je Blatt gegen Eingangs-CSV; SKIP-Zweitlauf zwei Zahlen) · **##25 DURCHSTICH:** Submodul-Diff zeigt die Tabellenzeile mit dem gewürfelten Mini-Lauf-Token; PDF baut; jede Stufe hat ihren Nenner gedruckt.
 
@@ -584,7 +624,7 @@ Vier Formen von Schein-Grün sind belegt (übersprungener Job, Nenner 0, Köder 
 | §75-Aufräumpass (104), Record-and-Replay, PV-1 | → W7; ab W0b nur Zuwachs-Stopp | Zähler bleiben hoch und sichtbar (ASCII 1160, Prosa 54, `organ_location` 97) |
 | Break-Even-Neubau B=3 | gemäß OV-1; fällt die Definitions-Konsolidierung nicht bis F2, fällt Break-Even **ganz** aus den Ergebnissen | fehlende Leistung, keine Falschaussage (`kapitel/` = 0 Treffer „Break-Even"); D4f-Typ wird trotzdem gebaut |
 | D4a-Vorzeichenfrage (p=1.0 vs. 0.0 bei se=0, mean_a≠mean_b) | NICHT im Code entschieden; nur `degeneriert=true` + Ausschluss aus der Familie | eine ehrlich benannte Methodik-Fußnote statt einer still geänderten Zahl |
-| ##24 A9-S5a (Archiv-xlsx), ##15-EMITTER/TEMPLATE, D5-5 | nachrangig / rutschfähig — fallen zuerst bei lokalem Riss | kein Rückbeleg über den Alt-Korpus (der Fassung-3-Beweis hängt am frischen ##25 — der ohnehin allein etwas über die September-Kette aussagt) |
+| ##24 A9-S5a (Archiv-xlsx), ##15-EMITTER/TEMPLATE | nachrangig / rutschfähig — fallen zuerst bei lokalem Riss (**D5-5 am 09.08. hier entfernt: Thesis-Zusage, nicht rutschfähig**) | kein Rückbeleg über den Alt-Korpus (der Fassung-3-Beweis hängt am frischen ##25 — der ohnehin allein etwas über die September-Kette aussagt) |
 | ##31-Vollautomation, D1c-Vollausbau | gebaut; benannte **Rückfallstufen** (manuelles Register / Floor-Variante) nur bei Zeitriss, Entnahme wird gebucht | deklarierte Grenzen im Register, W7-Nacharbeit |
 | EN-Nachzug | nur berührte Kapitel (Doktrin: DE führt) | EN zur Abgabe nicht vollsynchron; Bestand war es vorher auch nicht, es wächst nur nicht |
 | measure:smoke-Wiederbelebung | fällt (bleibt deprecated; nur der 3-Zeilen-Helfer-Umbau D3-2) | keine — der lebende Weg ist der CEB-emittierte, und genau der wird gehärtet |
