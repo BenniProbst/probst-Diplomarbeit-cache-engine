@@ -545,8 +545,39 @@ Codex (GPT-5, read-only) bleibt eingebunden — **als Kritiker, nicht als Zusamm
 | **D5** | fünf Median-Implementierungen, drei Antworten | **offen** |
 | **D3-4** | Ausgabe-Gate in `allow_failure`-Job wirkungslos | **offen** — gehört in einen Folge-Job |
 
-**`allow_failure: true` am Mess-Batch ist korrekt** und doktrinär begründet (Sichtbarkeits-Doktrin).
-Es zu entfernen wäre eine **Regression**.
+> **KORRIGIERT 09.08.2026 — die folgende Aussage war FALSCH und ist zurückgenommen.**
+> Sie stand seit der Ersterstellung (`25040237`, 08.08. 19:29 UTC) unverändert über acht
+> Folge-Commits hier und wurde von jedem Agenten mitgelesen, der dieses Dossier öffnet.
+>
+> ~~**`allow_failure: true` am Mess-Batch ist korrekt** und doktrinär begründet
+> (Sichtbarkeits-Doktrin). Es zu entfernen wäre eine **Regression**.~~
+
+**`allow_failure: true` ist auf JOB-Ebene VERBOTEN.** Owner-Direktive, dreifach im
+Roh-Transkript belegt (06.07. · 26.07. · 09.08. als OV-16: *„Das ist falsch, allow failure ist
+verboten … allow failure war schon IMMER verboten"*).
+
+**Die Sichtbarkeits-Doktrin galt der CSV-ZELLE, nicht dem CI-JOB** — das ist die Verwechslung,
+aus der die falsche Aussage entstand. Richtig ist:
+
+| Ebene | Verhalten bei einem Messfehler |
+|---|---|
+| **CSV-Zelle** | trägt `failed` (nicht `null`), plus Warnung an den Anwender, die Messung wird übersprungen |
+| **CI-Job** | fällt **immer hart rot** — nie `allow_failure` |
+
+*Owner wörtlich (09.08.): „Wenn dann muss ein Fehler sauber mit einer Warnung an den Anwender
+angezeigt und die Messung übersprungen werden, aber der CI job failed immer hart."*
+
+**Der Code hat das Dossier bereits überholt:** `ce a558e87c` (09.08. 11:17) entfernt
+`allow_failure: true` aus der emittierten Mess-Job-YAML, Test rot → grün, vendored als
+`c6d8e573`.
+
+**Offen bleibt eine zweite, lebende Stelle:** `super .gitlab-ci.yml:1841` (`ergebnis:holen`,
+`when: manual`) trägt weiterhin `allow_failure: true` und ist nirgends als Ausnahme begründet.
+Das ist ein eigener Posten — nicht mit dem hier korrigierten Satz verwechseln.
+
+*(Damit ist auch die Zeile zu D3-4 in der Tabelle darüber zu lesen: das Ausgabe-Gate gehört
+nicht deshalb in einen Folge-Job, weil `allow_failure` bleibt, sondern weil der Job selbst hart
+rot fallen muss.)*
 
 ---
 
