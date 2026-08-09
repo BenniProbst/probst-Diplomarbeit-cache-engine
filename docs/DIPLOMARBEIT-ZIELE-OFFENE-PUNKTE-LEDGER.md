@@ -16,6 +16,59 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+### BEFUND 09.08.2026 spaet abends — super ist rot, aber nicht in super: die Bridge-Luecke und der `branch: main`-Trigger
+
+**Der Widerspruch, der es ausgeloest hat.** super-Pipeline **15496** auf `310ea9d3` steht auf
+`failed`. Die eigene Jobbilanz derselben Pipeline: **32 success, 0 failed**. Zweiunddreissig von
+zweiunddreissig gruen — und die Pipeline rot.
+
+**Aufloesung.** Die GitLab-API trennt Jobs und Bridges in zwei Endpunkte.
+`/pipelines/<id>/jobs` **enthaelt keine Trigger-Jobs**. Die Rot-Quelle war eine Bridge:
+
+    BRIDGE: trigger:cache-engine = failed / child 15497 : failed
+
+**Methodenlehre.** Die Jobmenge einer Pipeline mit downstream-Kindern ist `/jobs` UNION
+`/bridges`. Wer nur `/jobs` zaehlt, misst strukturell zu wenig. Der **Pipeline-Gesamtstatus** ist
+der Schiedsrichter, nicht die selbst gezaehlte Bilanz — er schliesst die Bridges bereits ein.
+
+**Gegenprobe zum main-FF-Anker.** `85dc85e8` (Pipeline 15489) wurde nachtraeglich auf seine Bridge
+geprueft: `trigger:cache-engine = success / child 15490 : success`. Der main-FF vom 09.08. war
+**gedeckt**. Die Deckung hielt — aber die Methode war schwaecher als ihr Ergebnis: sie haette
+dasselbe Urteil auch bei roter Bridge gefaellt. Ein Verfahren, das nur zufaellig recht behaelt,
+ist kein Verfahren.
+
+**Die eigentliche Kette, nachgelesen statt geraten** (`super .gitlab-ci.yml:1002-1005`):
+
+    trigger:
+      project: comdare/research/comdare-cache-engine
+      branch: main                 # <-- nicht der vendored Stand
+      strategy: depend
+
+Das `rules:changes`-Gate horcht auf `Code/external/comdare-cache-engine` — gefahren wird danach
+trotzdem ce/**main**. Gegenprobe: `ce/main == 8fcf0c0e ==` exakt der SHA des roten Kindes.
+
+| Ref | SHA | Abstand zur ce-Spitze | `pmc:intel` |
+|---|---|---|---|
+| ce/development (Spitze) | `aebc4f2c` | 0 | **success** (15498) |
+| Gitlink in super | `2eb310ae` | 1 | — |
+| **ce/main** = was der Trigger faehrt | `8fcf0c0e` | **86** | **failed** (15497) |
+
+Der einzige rote Job im Kind war `pmc:intel [build]`. Der Fix liegt in den 86 Commits, die main
+noch fehlen.
+
+**Folge — die Reihenfolge dreht sich.** Der bisher notierte Posten "Gitlink-Bump in super auf
+`aebc4f2c`" ist **nicht** das Heilmittel. Ein Bump ohne main-FF laesst den Trigger erneut feuern,
+und der faehrt weiterhin das alte main: dasselbe Rot noch einmal.
+
+    1. ce 15498 zu Ende sehen  (Monitor laeuft fail-closed; zuletzt 22 gruen, 0 rot)
+    2. ce main-FF auf aebc4f2c  (reiner FF verifiziert: is-ancestor = ja, 86 Commits)
+    3. DANN Gitlink-Bump + PZW-Anker im selben Commit
+
+Punkt 2 vor Punkt 3.
+
+**Offen, nicht geraten:** `is_original:relock` steht in 15498 auf `manual`. Ob der Handschalter
+fuer "gruen" gezogen werden muss oder bewusst offen bleibt, ist ungemessen — vor dem main-FF
+nachschlagen.
 ## 09.08.2026 (spät) — KONSOLIDIERT: EIN Muster, FÜNF Begriffe — `work_mode` in geltender Fassung
 
 **Owner-Abschluss:** *„Bitte ziehe das alte Muster und das neue zusammen, **die 5 Begriffe gehören
