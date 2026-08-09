@@ -32,6 +32,22 @@
 #   Zwei Gates derselben Kette duerfen sich nicht in der Zaehlweise
 #   widersprechen; deshalb wortgleich uebernommen.
 #
+# XLSX IST DIE AUSGABE (P5, 09.08.2026) -- was sich geaendert hat und was nicht:
+#   Owner-KERN, mehrfach bestaetigt: "xlsx ist die Ausgabe. CSV wird NIE
+#   verwendet." Bis zu diesem Paket sammelten BEIDE find-Selektoren
+#   ausschliesslich *.csv und *.tex ein. Eine Auswertungs-xlsx im Laufordner
+#   wurde damit weder kopiert noch zurueckgeschrieben -- ohne eine einzige
+#   Fehlerzeile. Der Durchstich haette an dieser Naht sein Ergebnis verloren.
+#   GEAENDERT: beide Selektoren nehmen zusaetzlich *.xlsx; die kopierten Dateien
+#   werden je Gattung getrennt gezaehlt (csv/tex/xlsx statt eines n_csv, das
+#   auch die .tex mitzaehlte); die Bilanz und die PROVENANCE tragen ein neues,
+#   ADDITIVES Feld xlsx_gesamt.
+#   NICHT GEAENDERT -- und das ist die eigentliche Entscheidung: das
+#   COMMIT-GATE bleibt CSV-BASIERT. Eine xlsx ist binaer, "Datenzeilen" sind
+#   daran nicht messbar. Wer das Gate auf xlsx ausweitet, baut eine Wache, die
+#   nicht mehr beissen kann -- jeder Laufordner mit irgendeiner Binaerdatei
+#   waere dann "voll". xlsx_gesamt ist deshalb NENNER, nicht Entscheider.
+#
 # WELCHE DATEIEN GEZAEHLT WERDEN -- und worin das von der Wache ABWEICHT:
 #   Gezaehlt werden ALLE *.csv unter measure_out/ und measure_out_smoke/ des
 #   Laufordners. Die Mess-Ausbeute-Wache zaehlt enger, naemlich nur Dateien
@@ -96,21 +112,34 @@ git rev-parse --git-dir > /dev/null 2>&1 || {
 
 BK=measurement; DEST="$BK/$RUN_TS"
 
-CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0
+CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0; XLSX_GESAMT=0
 
-# Zaehlt die Datenzeilen im Laufordner $1. Setzt die drei Zahlen oben.
-# DREI ZAHLEN, nie eine nackte Null: "0 Datenzeilen" heisst etwas voellig
+# SELBSTCHECK bilanz_zaehlen (P5, 2026-08-09):
+#   ZUGESICHERT: die Datenzeilen-Bilanz zaehlt weiterhin AUSSCHLIESSLICH *.csv;
+#   XLSX_GESAMT ist ein reiner NENNER daneben und geht in KEINE Entscheidung ein.
+#   NICHT zugesichert: dass eine gezaehlte xlsx lesbar, gueltig oder befuellt ist
+#   -- an einer Binaerdatei sind "Datenzeilen" nicht messbar. Genau deshalb bleibt
+#   das Gate CSV-basiert: eine Wache, die jede Binaerdatei als Messwert nimmt,
+#   kann nicht mehr beissen.
+#
+# Zaehlt die Datenzeilen im Laufordner $1. Setzt die vier Zahlen oben.
+# VIER ZAHLEN, nie eine nackte Null: "0 Datenzeilen" heisst etwas voellig
 # anderes bei 0 gefundenen CSVs (der Messlauf lief gar nicht) als bei 40
-# gefundenen CSVs (40 Prueflinge haben nichts geliefert).
+# gefundenen CSVs (40 Prueflinge haben nichts geliefert) -- und wieder etwas
+# anderes, wenn daneben eine Auswertungs-xlsx liegt (dann gibt es Material,
+# aber keinen zaehlbaren Messwert).
 bilanz_zaehlen() {
-    local wurzel liste zf zeilen daten
-    CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0
+    local wurzel liste xliste zf zeilen daten
+    CSV_GESAMT=0; CSV_MIT_DATENZEILE=0; DATENZEILEN_GESAMT=0; XLSX_GESAMT=0
     liste=$(mktemp) || exit 2
+    xliste=$(mktemp) || exit 2
     for wurzel in $ZAEHL_WURZELN; do
         [ -d "$1/$wurzel" ] || continue
-        find "$1/$wurzel" -type f -name '*.csv' >> "$liste"
+        find "$1/$wurzel" -type f -name '*.csv'  >> "$liste"
+        find "$1/$wurzel" -type f -name '*.xlsx' >> "$xliste"
     done
     CSV_GESAMT=$(awk 'END{print NR+0}' "$liste")
+    XLSX_GESAMT=$(awk 'END{print NR+0}' "$xliste")
     while IFS= read -r zf; do
         [ -n "$zf" ] || continue
         zeilen=$(awk 'END{print NR+0}' "$zf")
@@ -122,7 +151,7 @@ bilanz_zaehlen() {
         fi
         DATENZEILEN_GESAMT=$((DATENZEILEN_GESAMT + daten))
     done < "$liste"
-    rm -f "$liste"
+    rm -f "$liste" "$xliste"
 }
 
 bilanz_drucken() {
@@ -130,6 +159,7 @@ bilanz_drucken() {
     echo "  csv_gesamt=$CSV_GESAMT"
     echo "  csv_mit_datenzeile=$CSV_MIT_DATENZEILE"
     echo "  datenzeilen_gesamt=$DATENZEILEN_GESAMT"
+    echo "  xlsx_gesamt=$XLSX_GESAMT"
 }
 
 if [ "$MODUS" = sammeln ]; then
@@ -162,25 +192,43 @@ if [ -f manifest_out/build_manifest.txt ]; then prebackup manifest_out/build_man
 # measure_out/ = die golden-320-Mess-CSVs des measure:golden-320-Jobs (nur bei COMDARE_RUN_MEASURE-Lauf vorhanden).
 # NUR *.csv strukturerhaltend kopieren — NIE die ~320 DLL-Binaries (Repo-Bloat). Die .gitignore-Negation
 # !measurement/**/*.csv macht die kopierten CSVs trackbar (sonst droppt `git add` sie via *.csv-Regel).
+# SELBSTCHECK Sammel-Selektor golden (P5, 2026-08-09):
+#   ZUGESICHERT: *.csv, *.tex UND *.xlsx werden strukturerhaltend kopiert, und
+#   jede Gattung hat ihren EIGENEN Zaehler -- "n_csv" trug bisher auch die .tex
+#   und war damit als Nenner schon falsch beschriftet.
+#   NICHT zugesichert: dass eine xlsx gueltig ist oder Messwerte traegt. Sie geht
+#   ausdruecklich NICHT ins Datenzeilen-Gate ein (Begruendung s. bilanz_zaehlen).
+#   Weiterhin NICHT kopiert werden die ~320 DLL-Binaries (Repo-Bloat).
 if [ -d Code/measure_out ]; then
-  n_csv=0
+  n_csv=0; n_tex=0; n_xlsx=0
   while IFS= read -r f; do
     rel="${f#Code/measure_out/}"; mkdir -p "$DEST/measure_out/$(dirname "$rel")"
-    cp -- "$f" "$DEST/measure_out/$rel"; n_csv=$((n_csv+1))
-  done < <(find Code/measure_out -type f \( -name '*.csv' -o -name '*.tex' \))
-  if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out/ ($n_csv Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
+    cp -- "$f" "$DEST/measure_out/$rel"
+    case "$f" in *.csv) n_csv=$((n_csv+1)) ;; *.tex) n_tex=$((n_tex+1)) ;; *.xlsx) n_xlsx=$((n_xlsx+1)) ;; esac
+  done < <(find Code/measure_out -type f \( -name '*.csv' -o -name '*.tex' -o -name '*.xlsx' \))
+  if [ "$((n_csv + n_tex + n_xlsx))" -gt 0 ]; then echo "  gesichert: measure_out/ (csv=$n_csv tex=$n_tex xlsx=$n_xlsx, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
 fi
 # measure_out_smoke/ = die Smoke-/Coverage-Mess-CSVs des measure:smoke-Jobs (#26/GO-5) — gleiche
 # additive Mechanik, eigener Zielordner (kollisionsfrei zum golden-Lauf derselben Pipeline).
+# SELBSTCHECK Sammel-Selektor smoke (P5, 2026-08-09): wortgleich zur golden-Wurzel
+#   oben -- zwei Wurzeln derselben Kette duerfen sich im Selektor nicht
+#   unterscheiden, sonst haengt es vom Job ab, ob die Auswertung ueberlebt.
 if [ -d Code/measure_out_smoke ]; then
-  n_csv=0
+  n_csv=0; n_tex=0; n_xlsx=0
   while IFS= read -r f; do
     rel="${f#Code/measure_out_smoke/}"; mkdir -p "$DEST/measure_out_smoke/$(dirname "$rel")"
-    cp -- "$f" "$DEST/measure_out_smoke/$rel"; n_csv=$((n_csv+1))
-  done < <(find Code/measure_out_smoke -type f \( -name '*.csv' -o -name '*.tex' \))
-  if [ "$n_csv" -gt 0 ]; then echo "  gesichert: measure_out_smoke/ ($n_csv Smoke-Mess-CSVs + regenerierte Anhang-.tex, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
+    cp -- "$f" "$DEST/measure_out_smoke/$rel"
+    case "$f" in *.csv) n_csv=$((n_csv+1)) ;; *.tex) n_tex=$((n_tex+1)) ;; *.xlsx) n_xlsx=$((n_xlsx+1)) ;; esac
+  done < <(find Code/measure_out_smoke -type f \( -name '*.csv' -o -name '*.tex' -o -name '*.xlsx' \))
+  if [ "$((n_csv + n_tex + n_xlsx))" -gt 0 ]; then echo "  gesichert: measure_out_smoke/ (csv=$n_csv tex=$n_tex xlsx=$n_xlsx, keine DLL-Binaries)"; persisted=$((persisted+1)); fi
 fi
-# --- ENDE GEHOBENER BLOCK A (bis hierher string-identisch) -------------------
+# --- ENDE BLOCK A -- NICHT MEHR string-identisch zum YAML-Rumpf --------------
+# Der Block war beim Heben string-identisch und ist es seit P5 (09.08.2026)
+# NICHT mehr: die Sammel-Selektoren beider Wurzeln nehmen jetzt zusaetzlich
+# *.xlsx auf, und die Zaehler sind je Gattung getrennt. Das ist ausdruecklich
+# gewollt (Owner-KERN "xlsx ist die Ausgabe") und hier benannt, damit niemand
+# die Gleichheit noch voraussetzt. Der alte Rumpf steht nicht mehr im YAML
+# (Fall P10 der Probe faellt, wenn er zurueckkaeme).
     # HEILUNG (D3-3): erst zaehlen, dann die PROVENANCE schreiben. Die drei
     # Zahlen sind ADDITIV -- alle bisherigen Felder bleiben unveraendert
     # stehen, damit niemand, der die Datei heute liest, still bricht.
@@ -195,6 +243,7 @@ fi
       echo "csv_gesamt=$CSV_GESAMT"
       echo "csv_mit_datenzeile=$CSV_MIT_DATENZEILE"
       echo "datenzeilen_gesamt=$DATENZEILEN_GESAMT"
+      echo "xlsx_gesamt=$XLSX_GESAMT"
     } > "$DEST/PROVENANCE.txt"
     echo "-- Laufordner --"; find "$DEST" -type f | sort
     bilanz_drucken
@@ -242,7 +291,12 @@ fi
 
 gate_verweigern() {
     echo "KEIN COMMIT: das Messfenster traegt 0 Datenzeile(n)."
-    echo "  csv_gesamt=$CSV_GESAMT  csv_mit_datenzeile=$CSV_MIT_DATENZEILE  datenzeilen_gesamt=$DATENZEILEN_GESAMT"
+    echo "  csv_gesamt=$CSV_GESAMT  csv_mit_datenzeile=$CSV_MIT_DATENZEILE  datenzeilen_gesamt=$DATENZEILEN_GESAMT  xlsx_gesamt=$XLSX_GESAMT"
+    if [ "$XLSX_GESAMT" -gt 0 ]; then
+        echo "  HINWEIS: $XLSX_GESAMT xlsx im Fenster, aber kein zaehlbarer Messwert. Die xlsx"
+        echo "  entsteht AUS der CSV; ohne CSV-Datenzeile belegt sie nichts. Das Gate bleibt"
+        echo "  darum CSV-basiert -- an einer Binaerdatei sind Datenzeilen nicht messbar."
+    fi
     echo "  Eine vorhandene Datei ist KEIN Messwert. Der Laufordner bleibt auf der"
     echo "  Platte (das Artefakt haelt ihn 12 Wochen), aber er wird NICHT additiv"
     echo "  nach '$( [ -n "${CI_COMMIT_BRANCH:-}" ] && echo "$CI_COMMIT_BRANCH" || echo development )' zurueckgeschrieben."

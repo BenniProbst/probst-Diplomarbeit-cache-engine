@@ -151,6 +151,29 @@ mit_daten() {         # $1 = Zieldatei (relativ), $2 = Anzahl Datenzeilen, $3 = 
         _i=$((_i + 1))
     done
 }
+# SELBSTCHECK mit_xlsx: legt eine BINAERE Auswertungsdatei an (ZIP-Magic 'PK\003\004',
+# wie eine echte xlsx) mit einem gewuerfelten Token darin. Zugesichert ist NUR, dass die
+# Datei binaer beginnt und den Token traegt -- sie ist KEINE gueltige xlsx und darf von
+# keinem Fall als solche geoeffnet werden. Das reicht: geprueft wird der TRANSPORT
+# (Byte-Gleichheit Quelle <-> committeter Blob), nicht das Tabellenformat.
+mit_xlsx() {          # $1 = Zieldatei (relativ), $2 = Token
+    mkdir -p "$(dirname "$KLON/$1")"
+    printf 'PK\003\004xlsx-koeder_%s-ende\n' "$2" > "$KLON/$1"
+}
+
+# --- .gitignore als eigenes Orakel (P5-Forderung 4) --------------------------
+# `git check-ignore -v` statt Augenschein: die Frage "verschluckt ein Ignore den
+# Rueckschrieb still?" wird von git selbst beantwortet, nicht von einem Blick in
+# die Datei. rc=0 heisst IGNORIERT (mit Regel-Fundstelle), rc=1 heisst NICHT
+# ignoriert. Vor jeder Aussage laeuft der Koeder unten -- eine 1, die auch bei
+# kaputtem Aufruf kaeme, waere kein Beweis.
+IGN_RC=0
+pruefe_ignore() {     # $1 = Pfad relativ zum Klon ; setzt IGN_RC, schreibt $WERK/_ignore
+    set +e
+    git -C "$KLON" check-ignore -v -- "$1" > "$WERK/_ignore" 2>&1
+    IGN_RC=$?
+    set -e
+}
 
 # --- Laeufe ohne Pipe: rc=$? nach einer Pipe misst das LETZTE Glied ----------
 sammle() {            # $1 = RUN_TS
@@ -499,6 +522,113 @@ fordere_zahl "Dateien des abgelehnten Laufs im INDEX" \
 fall_ende
 
 # =============================================================================
+# P12 XLSX WIRD EINGESAMMELT (golden-Wurzel, ci/persist_sammler.sh:170)
+#
+#     OWNER-KERN, mehrfach bestaetigt: "xlsx ist die Ausgabe. CSV wird NIE
+#     verwendet." Der Sammler kannte bis zu diesem Paket nur *.csv und *.tex.
+#     Eine Auswertungs-xlsx im Laufordner wurde damit weder kopiert noch
+#     zurueckgeschrieben -- STILL, ohne eine einzige Fehlerzeile. Der Durchstich
+#     (CSV -> persist -> xlsx -> anhang:forward -> PDF) haette an genau dieser
+#     Naht sein Ergebnis verloren, und zwar unbemerkt.
+#
+#     GEPRUEFT WIRD DER WERT, NICHT DIE ANWESENHEIT (T-2): der committete Blob
+#     muss BYTE-GLEICH zur Quelle sein (cmp), nicht bloss existieren. Eine
+#     abgeschnittene oder text-mangled Kopie waere bei einer Binaerdatei der
+#     naechste stille Verlust.
+# =============================================================================
+PIPE_ID=$(wuerfel 10000 65000)
+TS12="20260809-000013-p$PIPE_ID"
+N12=$(wuerfel 1 5)
+K12=$(token)
+X12=$(token)
+XNAME12="auswertung_$X12.xlsx"
+fall "P12 xlsx neben CSV -> mitgesammelt, byte-gleich committet, xlsx_gesamt=1"
+sandbox p12
+mit_daten "Code/measure_out/perm-0001/measurements.csv" "$N12" "$K12"
+mit_xlsx  "Code/measure_out/perm-0001/$XNAME12" "$X12"
+XQUELLE="$KLON/Code/measure_out/perm-0001/$XNAME12"
+XZIEL_REL="measurement/$TS12/measure_out/perm-0001/$XNAME12"
+sammle "$TS12"
+fordere_rc 0
+fordere_literal "$OUT" "datenzeilen_gesamt=$N12"
+fordere_literal "$OUT" "xlsx_gesamt=1"
+fordere_literal "$KLON/measurement/$TS12/PROVENANCE.txt" "xlsx_gesamt=1"
+if [ ! -f "$KLON/$XZIEL_REL" ]; then
+    reiss "die xlsx wurde NICHT in den Laufordner kopiert: $XZIEL_REL fehlt"
+fi
+# --- .gitignore-Beleg, KOEDER ZUERST ----------------------------------------
+# Ein rc=1 ("nicht ignoriert") waere auch die Antwort eines kaputten Aufrufs.
+# Darum zuerst ein Pfad, der IGNORIERT SEIN MUSS (*.csv ausserhalb measurement/).
+pruefe_ignore "Code/measure_out/perm-0001/measurements.csv"
+if [ "$IGN_RC" -ne 0 ]; then
+    echo "ABBRUCH: der check-ignore-Koeder biss nicht -- ein Pfad, der von .gitignore:*.csv" >&2
+    echo "         gedeckt sein MUSS, wurde als nicht-ignoriert gemeldet (rc=$IGN_RC)." >&2
+    echo "         Ohne beissenden Koeder ist jede Ignore-Aussage wertlos." >&2
+    exit 2
+fi
+echo "        Koeder biss: check-ignore rc=0 fuer die Quell-CSV, Regel literal:"
+sed 's/^/          > /' "$WERK/_ignore"
+pruefe_ignore "$XZIEL_REL"
+if [ "$IGN_RC" -ne 1 ]; then
+    reiss "die Ziel-xlsx wird von .gitignore verschluckt (check-ignore rc=$IGN_RC), Regel literal:"
+    sed 's/^/          > /' "$WERK/_ignore"
+fi
+gate "$TS12"
+fordere_rc 0
+fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$((BASIS_N + 1))"
+g_neue_dateien "$WERK/p12_neu"
+fordere_zahl "neue Dateien im Commit (CSV + xlsx + PROVENANCE.txt)" \
+    "$(awk 'END{print NR+0}' "$WERK/p12_neu")" 3
+fordere_zahl "davon *.xlsx" "$(grep -cF '.xlsx' "$WERK/p12_neu" || true)" 1
+if git -C "$KLON" show "HEAD:$XZIEL_REL" > "$WERK/p12_blob" 2>/dev/null; then
+    if cmp -s "$XQUELLE" "$WERK/p12_blob"; then :; else
+        reiss "der committete xlsx-Blob ist NICHT byte-gleich zur Quelle"
+    fi
+    fordere_literal "$WERK/p12_blob" "xlsx-koeder_$X12-ende"
+else
+    reiss "der committete Baum enthaelt '$XZIEL_REL' nicht"
+fi
+fall_ende
+
+# =============================================================================
+# P13 XLSX ALLEIN OEFFNET DAS GATE NICHT (smoke-Wurzel, ci/persist_sammler.sh:180)
+#
+#     ZWEI Forderungen in einem Fall, und die zweite ist die wichtigere:
+#     (a) auch die smoke-Wurzel sammelt xlsx ein -- sonst waere nur eine der
+#         beiden Fundstellen geheilt und die andere bliebe still.
+#     (b) das DATENZEILEN-GATE bleibt CSV-BASIERT. Eine xlsx ist binaer;
+#         "Datenzeilen" sind daran nicht messbar. Wer das Gate auf xlsx
+#         ausweitet, baut eine Wache, die nicht mehr beissen kann: jeder
+#         Laufordner mit irgendeiner Binaerdatei waere dann "voll".
+#     GEFORDERT: die xlsx IST im Laufordner, der Rueckschrieb findet TROTZDEM
+#     NICHT statt, und der Nenner sagt beides gleichzeitig
+#     (xlsx_gesamt=1 neben datenzeilen_gesamt=0).
+# =============================================================================
+PIPE_ID=$(wuerfel 10000 65000)
+TS13="20260809-000014-p$PIPE_ID"
+X13=$(token)
+XNAME13="ergebnis_$X13.xlsx"
+fall "P13 nur xlsx (smoke) -> eingesammelt, aber KEIN Commit (Gate bleibt CSV)"
+sandbox p13
+mit_xlsx "Code/measure_out_smoke/perm-0002/$XNAME13" "$X13"
+sammle "$TS13"
+fordere_rc 0
+fordere_literal "$OUT" "csv_gesamt=0"
+fordere_literal "$OUT" "datenzeilen_gesamt=0"
+fordere_literal "$OUT" "xlsx_gesamt=1"
+fordere_literal "$OUT" "persisted_artifact_count=1"
+if [ ! -f "$KLON/measurement/$TS13/measure_out_smoke/perm-0002/$XNAME13" ]; then
+    reiss "die xlsx der smoke-Wurzel wurde NICHT kopiert: measure_out_smoke/perm-0002/$XNAME13 fehlt"
+fi
+gate "$TS13"
+fordere_rc 10
+fordere_literal "$OUT" "KEIN COMMIT"
+fordere_literal "$OUT" "xlsx_gesamt=1"
+fordere_zahl "Dateien im INDEX unter measurement/" "$(g_indexzahl)" 0
+fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$BASIS_N"
+fall_ende
+
+# =============================================================================
 # P10 ABNAHME + REGISTRIERUNG (T-7): der Job ruft den gehobenen Sammler, und
 #     diese Probe hat ihren eigenen CI-Job. Eine Probe, die nur lokal existiert,
 #     ist ab dem naechsten Commit unsichtbar.
@@ -559,6 +689,9 @@ echo "PROBE PERSIST-SAMMLER: OK ($N_OK von $N_FALL Faellen gehalten)."
 #   M1  Das Commit-Gate faellt weg  -> das leere Fenster committet wieder.
 #   M2  Die Datenzeilen-Zaehlung zaehlt DATEIEN statt ZEILEN (der Originaldefekt).
 #   M3  Nur measure_out wird gezaehlt, measure_out_smoke faellt weg.
+#   M4  Gestaged wird wieder measurement/ als GANZES statt nur $DEST.
+#   M5  xlsx faellt aus dem Sammel-Selektor der golden-Wurzel (P5).
+#   M6  xlsx faellt aus dem Sammel-Selektor der smoke-Wurzel  (P5).
 # =============================================================================
 if [ "$MODUS" = --selbstbiss ]; then
     echo
@@ -601,6 +734,14 @@ if [ "$MODUS" = --selbstbiss ]; then
         's|^ZAEHL_WURZELN=.*$|ZAEHL_WURZELN="measure_out"|'
     mutant m4_add_ganzer_baum "staged wieder measurement/ als GANZES statt nur \$DEST" \
         's|^git add -- "\$DEST"$|git add -- measurement/|'
+    # M5/M6 (P5): je Wurzel EIN Mutant. Zwei getrennte Mutanten und nicht einer
+    # ueber beide Zeilen -- sonst waere nicht belegt, dass BEIDE Fundstellen
+    # geheilt sind. Der Adressteil trifft genau eine Zeile: '/measure_out -type f/'
+    # steht nicht in der smoke-Zeile ('measure_out_smoke -type f').
+    mutant m5_xlsx_weg_golden "xlsx faellt aus dem Sammel-Selektor der golden-Wurzel" \
+        '/measure_out -type f/s/ -o -name .\*\.xlsx.//'
+    mutant m6_xlsx_weg_smoke "xlsx faellt aus dem Sammel-Selektor der smoke-Wurzel" \
+        '/measure_out_smoke -type f/s/ -o -name .\*\.xlsx.//'
 
     echo "-----------------------------------------------------------------------------"
     echo "SELBSTBISS-NENNER: $N_GEBISSEN von $N_MUT Mutanten haben die Probe rot gemacht."
