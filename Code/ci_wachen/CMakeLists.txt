@@ -31,6 +31,7 @@ comdare_da_add_library(comdare_ci_wachen MODULE M10 SOURCES
     src/gitlink_parity.cpp
     src/ci_yml_scanner.cpp
     src/wide_aggregat.cpp
+    src/mutations_lauf.cpp
 )
 target_compile_features(comdare_ci_wachen PUBLIC cxx_std_23)
 target_include_directories(comdare_ci_wachen PUBLIC
@@ -72,7 +73,18 @@ target_compile_features(ci_wide_aggregat PRIVATE cxx_std_23)
 target_link_libraries(ci_wide_aggregat PRIVATE comdare::ci_wachen)
 set_target_properties(ci_wide_aggregat PROPERTIES OUTPUT_NAME "ci-wide-aggregat")
 
-install(TARGETS ci_xml_wellformed_wache ci_thesis_gitlink_wache ci_wide_aggregat
+# MUT (2026-08-10): DER MUTATIONS-HARNESS. Er ist KEINE Wache ueber den Bestand, sondern
+# eine Wache ueber die SUITE -- er baut eine benannte Produktions-Mutation ein, faehrt die
+# Tests und nimmt die Mutation zurueck. Begruendung vollstaendig im Kopf von
+# mutations_lauf.hpp; die Abgrenzung zum Koeder-Verfahren (K13) steht dort ebenfalls.
+# BEWUSST NICHT in .gitlab-ci.yml verdrahtet: er schreibt in Produktionsdateien. Ob er in
+# eine Pipeline gehoert, ist ein Owner-/Lead-Entscheid, kein Modul-Entscheid.
+add_executable(ci_mutations_lauf tools/mutations_lauf_main.cpp)
+target_compile_features(ci_mutations_lauf PRIVATE cxx_std_23)
+target_link_libraries(ci_mutations_lauf PRIVATE comdare::ci_wachen)
+set_target_properties(ci_mutations_lauf PROPERTIES OUTPUT_NAME "ci-mutations-lauf")
+
+install(TARGETS ci_xml_wellformed_wache ci_thesis_gitlink_wache ci_wide_aggregat ci_mutations_lauf
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # -- Die Werkbank der Tests -----------------------------------------------------------
