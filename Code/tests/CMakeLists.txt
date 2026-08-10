@@ -168,6 +168,23 @@ target_compile_definitions(test_ci_wache_registrierung PRIVATE
     "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
     "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
 
+# CI-INV (2026-08-10) -- DIE ZWEI ABSCHALT-KLASSEN. Owner 10.08.: "Gebaut wird immer,
+# skip ist VERBOTEN." Ein Job kann aber auch aufhoeren zu existieren, ohne dass jemand
+# ihn abschaltet: ein doppelter Top-Level-Schluessel loescht den ersten wortlos, und ein
+# rules-Gate auf eine nirgends gesetzte Variable ist von einem toten Job nicht zu
+# unterscheiden. Beides ist im Haus belegt (contract:axis-version-lock, drei Wochen in
+# keinem Lauf bei gruener Pipeline) und war bis heute durch nichts gedeckt.
+#
+# Der Pfad kommt als Define, NICHT aus dem Arbeitsverzeichnis -- dieselbe Haertung wie
+# bei test_ci_wache_registrierung (eine CWD-Annahme ist keine Zusicherung).
+comdare_da_add_test(test_ci_wache_invarianten
+    SOURCES unit/test_ci_wache_invarianten.cpp
+    LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_invarianten PRIVATE
+    "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
+    "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
+
 # MUT (2026-08-10) -- DER MUTATIONS-HARNESS UNTER TEST. Begruendung im Kopf von
 # Code/ci_wachen/include/comdare/ci_wachen/mutations_lauf.hpp.
 #

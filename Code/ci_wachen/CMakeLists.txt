@@ -30,6 +30,7 @@ comdare_da_add_library(comdare_ci_wachen MODULE M10 SOURCES
     src/xml_wellformed.cpp
     src/gitlink_parity.cpp
     src/ci_yml_scanner.cpp
+    src/ci_invarianten.cpp
     src/wide_aggregat.cpp
     src/mutations_lauf.cpp
 )
