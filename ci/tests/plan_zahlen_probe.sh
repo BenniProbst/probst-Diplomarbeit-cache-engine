@@ -290,7 +290,15 @@ while [ "$_d" -le "$D" ]; do
     } > "$F"
     _d=$((_d + 1))
 done
-# genau EINE Datei mit dem Voll-Header-Literal, wie im echten Bestand
+# Genau EINE Datei mit dem Voll-Header-Literal. Die Zahl steht in SOLL_LITERAL und wird
+# unten IN DEN WEGWERF-PLAN GESCHRIEBEN -- sie darf NICHT aus dem echten Plan stehenbleiben.
+# WARUM DAS HIER STEHT (10.08.2026, am Objekt gefallen): bis heute setzte der Plan-Klon nur
+# STELLEN und DATEIEN um; SCHEMA-LITERAL blieb der ECHTE Wert. Das war grün, solange der echte
+# Bestand ebenfalls 1 Literal trug -- also aus ZUFALL, nicht aus Konstruktion. Als der echte
+# Wert mit dem Gitlink-Zug auf e114cabd von 1 auf 2 stieg, riss K7 sofort. Eine Wegwerf-Lage,
+# die eine Zahl vom echten Bestand erbt, prueft nicht die Wache, sondern die Gleichheit zweier
+# unabhaengiger Zahlen. Wer hier eine sechste Zahl hinzufuegt, setzt sie EBENFALLS explizit.
+SOLL_LITERAL=1
 echo 'const char* alt = "binary_id;setting;repetition;n_ops";' > "$FAKE/tests/unit/test_wegwerf_literal.cpp"
 # und eine Datei OHNE alles, damit der Nenner groesser ist als der Zaehler
 echo 'int leer() { return 0; }' > "$FAKE/tests/unit/test_wegwerf_leer.cpp"
@@ -301,9 +309,10 @@ FAKE_SHA=$(git -C "$FAKE" rev-parse HEAD)
 
 fall "K7 Wegwerf-ce: $SOLL_STELLEN gewuerfelte Aufruf-Stellen in $SOLL_DATEIEN Dateien (+ je $KOM Kommentar-Aufrufe)"
 plan_klon "$WERK/p7a.md" CE-SHA "$FAKE_SHA"
-awk -v a="$SOLL_STELLEN" -v b="$SOLL_DATEIEN" '
+awk -v a="$SOLL_STELLEN" -v b="$SOLL_DATEIEN" -v c="$SOLL_LITERAL" '
     $1 == "PZW-SCHEMA-STELLEN" && $2 == "=" { printf "%-18s = %s\n", $1, a; next }
     $1 == "PZW-SCHEMA-DATEIEN" && $2 == "=" { printf "%-18s = %s\n", $1, b; next }
+    $1 == "PZW-SCHEMA-LITERAL" && $2 == "=" { printf "%-18s = %s\n", $1, c; next }
     { print }
 ' "$WERK/p7a.md" > "$WERK/plan_k7.md"
 set +e
