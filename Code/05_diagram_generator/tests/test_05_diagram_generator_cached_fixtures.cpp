@@ -1463,12 +1463,94 @@ TEST(Stufe05Pipeline, RatioModeDoesNotLeakIntoThePlainLatencyHeatmap) {
 // Verdichtet die Verhaeltnis-Matrix ueber die Lastprofile zu EINEM Balken je search_algo.
 // -----------------------------------------------------------------------------
 
-// (P3a-t1) Der Balken ist der Median der lastprofil-weisen VERHAELTNISSE, nicht das Verhaeltnis der
-// Roh-Mediane. Prueffall: Referenz 100/1000 in zwei Lastprofilen, k_ary 50/2000. Lastprofil-weise
-// Verhaeltnisse sind 0.5 und 2.0; nearest-rank-Median davon = 2.0. Das Verhaeltnis der Roh-Mediane waere
-// dagegen 1000/100 bzw. 2000/1000 -- eine ganz andere Zahl. So zaehlt jedes Lastprofil gleich, statt dass
-// das langsamste allein durch seine absolute Groesse dominiert.
+// (P3a-t1) HYPOTHESEN-TRENNUNG: der Balken ist der Median der lastprofil-weisen VERHAELTNISSE
+// (Hypothese A), NICHT das Verhaeltnis der Roh-Mediane (Hypothese B).
+//
+// WARUM DIESER EINGANG NEU IST -- Posten #42, 2026-08-10. Bis heute stand hier Referenz 100/1000
+// gegen k_ary 50/2000 ueber ZWEI Lastprofile. Dieser Eingang TRENNT DIE BEIDEN HYPOTHESEN NICHT:
+// bei n=2 ist der Kanon-Median die UNTERE Mitte, also das Minimum, und beide Seiten haben ihr
+// Minimum im selben Lastprofil (ycsb_a). A liefert median(0.5, 2.0) = 0.5; B liefert
+// median(50,2000)/median(100,1000) = 50/100 = 0.5. Exakt dieselbe Zahl. Der Test trug den
+// Hypothesen-Namen und mass die Hypothese nicht. Belegt mit einer WEGWERF-MUTATION, die Hypothese B
+// in den Pruefling einbaute -- Spaltenauswahl und Auslass-Regel buchstabengleich, NUR Median und
+// Division vertauscht: alle 46 Tests dieser Datei blieben gruen.
+//
+// EIN TRENNENDER EINGANG BRAUCHT ZWEIERLEI: (a) UNGERADES n, damit der Median die echte Mitte ist
+// und nicht das Minimum, und (b) eine Referenz, die NICHT gleichsinnig mit dem Herausforderer ueber
+// die Lastprofile laeuft. Fehlt (b), ist die Gleichheit sogar ein Satz und kein Zufall: der Median
+// vertauscht mit jeder streng monotonen Transformation.
+//
+// ORAKEL (T-3, FREMDE QUELLE): die Erwartungswerte sind von Hand gegen den PERZENTIL-KANON der
+// cache-engine gerechnet -- ce_canon::nearest_rank_index, erreichbar ueber
+// Code/common/percentile_canon.hpp -- und NICHT aus dem Pruefling abgelesen. Fuer n=3 gilt
+// k(0.5,3) = ceil(1.5)-1 = 1, also die echte Mitte des aufsteigend sortierten Feldes.
+//
+// BEIDE RICHTUNGEN (T-4, K13): Fall 1 hat A > B, Fall 2 hat A < B. Ein Pruefling, der immer die
+// kleinere oder immer die groessere der beiden Zahlen liefert, faellt dadurch in genau einem der
+// beiden Faelle auf. Eine einzige Richtung waere ein Koeder, an dem man vorbeikommt.
 TEST(Stufe05Pipeline, NormalizedBarAggregatesRatiosNotRawMedians) {
+    std::error_code ec;
+
+    // FALL 1 -- Hypothese A LIEGT UEBER Hypothese B.
+    //   Verhaeltnisse: 50/100 = 0.5, 50/300 = 0.1667, 4000/500 = 8.0
+    //   A: sortiert [0.1667, 0.5, 8.0], n=3, Index 1                     -> 0.5000
+    //   B: Roh-Median k_ary [50,50,4000] = 50, linear_scan [100,300,500] = 300 -> 0.1667
+    auto p1 = comdare_user_tmp() / "p3a_ratio_of_ratios_a_ueber_b.csv";
+    write_wide_csv_for_ratio(p1, {{"linear_scan", "ycsb_a", 100.0},
+                                  {"linear_scan", "ycsb_b", 300.0},
+                                  {"linear_scan", "ycsb_c", 500.0},
+                                  {"k_ary", "ycsb_a", 50.0},
+                                  {"k_ary", "ycsb_b", 50.0},
+                                  {"k_ary", "ycsb_c", 4000.0}});
+    std::vector<dg::WideMeasurementRow> rows1;
+    ASSERT_EQ(dg::parse_wide_csv(p1, rows1), dg::status_ok);
+
+    auto out1 = comdare_user_tmp() / "p3a_bar_a_ueber_b.tex";
+    fs::remove(out1, ec);
+    ASSERT_EQ(dg::write_normalized_bar_vs_reference(out1, rows1, "ns_per_op", "linear_scan", "en"), dg::status_ok);
+    // Die beiden Zusicherungen sind ein PAAR: das EXPECT_TRUE allein liesse sich durch eine leere
+    // Datei nicht erfuellen, das EXPECT_FALSE allein von einer leeren Datei trivial bestehen.
+    EXPECT_TRUE(file_contains(out1, "(k\\_ary,0.5000)"));  // Hypothese A -- muss dastehen
+    EXPECT_FALSE(file_contains(out1, "(k\\_ary,0.1667)")); // Hypothese B -- darf NICHT dastehen
+    EXPECT_TRUE(file_contains(out1, "(linear\\_scan,1.0000)"));
+
+    // FALL 2 -- GEGENRICHTUNG, Hypothese A LIEGT UNTER Hypothese B.
+    //   Verhaeltnisse: 900/100 = 9.0, 100/300 = 0.3333, 200/500 = 0.4
+    //   A: sortiert [0.3333, 0.4, 9.0], n=3, Index 1                      -> 0.4000
+    //   B: Roh-Median k_ary [900,100,200] = 200, linear_scan = 300         -> 0.6667
+    auto p2 = comdare_user_tmp() / "p3a_ratio_of_ratios_a_unter_b.csv";
+    write_wide_csv_for_ratio(p2, {{"linear_scan", "ycsb_a", 100.0},
+                                  {"linear_scan", "ycsb_b", 300.0},
+                                  {"linear_scan", "ycsb_c", 500.0},
+                                  {"k_ary", "ycsb_a", 900.0},
+                                  {"k_ary", "ycsb_b", 100.0},
+                                  {"k_ary", "ycsb_c", 200.0}});
+    std::vector<dg::WideMeasurementRow> rows2;
+    ASSERT_EQ(dg::parse_wide_csv(p2, rows2), dg::status_ok);
+
+    auto out2 = comdare_user_tmp() / "p3a_bar_a_unter_b.tex";
+    fs::remove(out2, ec);
+    ASSERT_EQ(dg::write_normalized_bar_vs_reference(out2, rows2, "ns_per_op", "linear_scan", "en"), dg::status_ok);
+    EXPECT_TRUE(file_contains(out2, "(k\\_ary,0.4000)"));  // Hypothese A -- muss dastehen
+    EXPECT_FALSE(file_contains(out2, "(k\\_ary,0.6667)")); // Hypothese B -- darf NICHT dastehen
+    EXPECT_TRUE(file_contains(out2, "(linear\\_scan,1.0000)"));
+
+    fs::remove(out1, ec);
+    fs::remove(out2, ec);
+    fs::remove(p1, ec);
+    fs::remove(p2, ec);
+}
+
+// (P3a-t1b) KANON-WACHE ueber demselben Writer -- und AUSDRUECKLICH NICHT die Hypothesen-Wache.
+// Bei GERADEM n liefert der Perzentil-Kanon die UNTERE Mitte: Verhaeltnisse [0.5, 2.0], n=2,
+// k = ceil(0.5*2)-1 = 0 -> 0.5. Die am 2026-08-09 verworfene Formel round(q*(n-1)) haette hier 2.0
+// geliefert; genau diese Regression faengt dieser Eingang. Er traegt zusaetzlich die
+// LaTeX-Formwachen des Writers (Referenzlinie, log-Achse, relative enlarge-x-limits-Form).
+//
+// ZUSICHERT NICHT: nichts ueber die Aggregations-REIHENFOLGE. Dieser Eingang liefert fuer BEIDE
+// Hypothesen 0.5000 und ist fuer die Frage "Median der Verhaeltnisse oder Verhaeltnis der
+// Roh-Mediane" nachweislich blind (Posten #42). Diese Frage traegt allein (P3a-t1) darueber.
+TEST(Stufe05Pipeline, NormalizedBarMedianUsesLowerMiddleOnEvenN) {
     auto p = comdare_user_tmp() / "p3a_ratio_of_ratios.csv";
     write_wide_csv_for_ratio(p, {{"linear_scan", "ycsb_a", 100.0},
                                  {"linear_scan", "ycsb_c", 1000.0},
@@ -1485,6 +1567,7 @@ TEST(Stufe05Pipeline, NormalizedBarAggregatesRatiosNotRawMedians) {
     //   k = ceil(0.5*2)-1 = 0 -> 0.5 (UNTERE Mitte). Vorher stand hier 2.0 -- die obere Mitte
     //   der verworfenen Formel round(q*(n-1)). linear_scan gegen sich selbst bleibt 1.0.
     EXPECT_TRUE(file_contains(out, "(k\\_ary,0.5000)"));
+    EXPECT_FALSE(file_contains(out, "(k\\_ary,2.0000)")); // die verworfene OBERE Mitte
     EXPECT_TRUE(file_contains(out, "(linear\\_scan,1.0000)"));
     // Referenzlinie bei 1 vorhanden -- und als \addplot, NICHT als \draw mit |- (das bricht auf
     // symbolischen Achsen fatal ab, pdflatex-Probe 2026-08-06).
