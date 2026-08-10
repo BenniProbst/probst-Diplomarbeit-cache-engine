@@ -451,6 +451,56 @@ fordere_literal "$ERR" "0 CSV-Dateien"
 fall_ende
 
 # =============================================================================
+# F21..F23 DER DRITTE MODUS (D3-7b): pruef_only.
+#     Der S3-Konformitaets-Lauf (ce planner/experiment_plan_director.hpp,
+#     COMDARE_PRUEF_ONLY=true; ce profile_run_entry.hpp 'if (a.pruef_only)')
+#     MISST NICHT und BAUT NICHT -- er laedt jede fertige .so und faehrt nur ihr
+#     Gate. 0 Datenzeilen sind sein SOLL, genau wie bei provision_only.
+#     WARUM DAS HIER STEHEN MUSS UND NICHT NUR IM MARKER: die Allowlist dieser
+#     Wache kannte bis D3-7b nur voll|provision_only|prune_only|auto. Ein Marker
+#     mit modus=pruef_only waere in den Zweig "unlesbarer Marker ist keine
+#     Erlaubnis" gefallen -- rc=2, JOB ROT. Der Marker allein haette den Lauf
+#     also nicht gerettet, sondern erst getoetet; die zwei Seiten gehoeren
+#     zusammen. (F19 bleibt daneben stehen und deckt weiterhin den ECHTEN
+#     Tippfehler-Fall: ein Modus, den niemand vergeben hat, ist weiter rc=2.)
+# =============================================================================
+fall "F21 leeres Fenster, modus=pruef_only -> rc=0 MIT sichtbarer WARNUNG"
+D="$WERK/f21"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 pruef_only
+fordere_rc 0
+fordere_literal "$OUT" "Modus=pruef_only"
+fordere_literal "$OUT" "0 Datenzeile(n) insgesamt"
+fordere_literal "$OUT" "WARNUNG: modus=pruef_only"
+fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+fall_ende
+
+fall "F22 modus=auto mit pruef_only-Marker -> Modus wird GELESEN, rc=0"
+D="$WERK/f22"; nur_kopf "$D/perm-0001/measurements.csv"
+marker "$D/perm-0001" pruef_only
+lauf "$D" 1 auto
+fordere_rc 0
+fordere_literal "$OUT" "Modus=pruef_only"
+fordere_literal "$OUT" "1 Lauf-Marker, 0 davon modus=voll"
+fall_ende
+
+fall "F23 modus=auto, 1 voll + 1 pruef_only -> schaerfster gewinnt, rc=1"
+D="$WERK/f23"
+nur_kopf "$D/perm-0001/measurements.csv"; marker "$D/perm-0001" pruef_only
+nur_kopf "$D/perm-0002/measurements.csv"; marker "$D/perm-0002" voll
+lauf "$D" 1 auto
+fordere_rc 1
+fordere_literal "$OUT" "Modus=voll"
+fordere_literal "$OUT" "2 Lauf-Marker, 1 davon modus=voll"
+fall_ende
+
+fall "F24 keine CSV, modus=pruef_only -> trotzdem rc=1 (Zweig unveraendert)"
+D="$WERK/f24"; mkdir -p "$D/leerer_lauf"
+lauf "$D" 1 pruef_only
+fordere_rc 1
+fordere_literal "$ERR" "0 CSV-Dateien"
+fall_ende
+
+# =============================================================================
 # F10 ABNAHME D3: das alte Praesenz-Muster ist aus .gitlab-ci.yml verschwunden.
 #     ZUERST der Koeder -- eine Null ohne beissenden Koeder ist keine Aussage,
 #     sondern ein moegliches Werkzeug-Versagen (ugrep + `$(` ohne -F).

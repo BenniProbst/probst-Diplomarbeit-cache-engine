@@ -9,9 +9,18 @@
 # Eine measurements.csv im Arbeitsbaum sagt NICHT, aus welchem Lauf sie stammt.
 # Damit ist jedes Inhalts-Gate entweder zu scharf oder zu stumpf:
 #   * zu scharf -- ein provision_only-Lauf misst per Bauart NICHTS (ce
-#     profile_run_entry.hpp:1234 "provision_ok = a.provision_only &&
-#     res.any_provisioned > 0"; :1241 laesst ihn mit Exit 0 enden). Eine
-#     Ausbeute-Wache, die immer "0 Datenzeilen = rot" sagt, toetet ihn.
+#     profile_run_entry.hpp, "provision_ok = a.provision_only &&
+#     res.any_provisioned > 0"; der Zweig darunter laesst ihn mit Exit 0 enden).
+#     Eine Ausbeute-Wache, die immer "0 Datenzeilen = rot" sagt, toetet ihn.
+#     DASSELBE GILT FUER EINEN ZWEITEN LAUF (D3-7b, 2026-08-10): der
+#     S3-Konformitaets-Lauf, ce profile_run_entry.hpp "if (a.pruef_only)
+#     { exit = any_pruef_ok > 0 && any_pruef_failed == 0 }". Er baut NICHT und
+#     misst NICHT -- er laedt jede fertige .so und faehrt nur ihr Gate. Die
+#     emittierte Kampagnen-Pipeline faehrt ihn je Perm (ce planner/
+#     experiment_plan_director.hpp, COMDARE_PRUEF_ONLY=true). Bis D3-7b trug
+#     seine Bilanz-Zeile KEINEN Zusatz -- der Marker schrieb modus=voll, und die
+#     Ausbeute-Wache haette ihn mit "0 Datenzeilen" rot gefaerbt. Der Modus muss
+#     deshalb VOM TREIBER kommen (siehe naechster Absatz), nicht vom Aufrufer.
 #   * zu stumpf -- die Mess-Jobs laufen auf einem PERSISTENTEN baremetal-
 #     Workspace, und die dynamisch emittierte Kampagnen-Pipeline nimmt
 #     Code/measure_out ausdruecklich vom Aufraeumen aus (ce
@@ -26,9 +35,16 @@
 # waere eine Behauptung ueber den Lauf; hier wird der Lauf ZITIERT. Es gibt
 # DREI Abschluss-Zeilen, alle am Objekt nachgelesen (2026-08-09):
 #
-#   (1) ce profile_run_entry.hpp:1219-1223  -- der Thesis-Profil-Weg
+#   (1) ce profile_run_entry.hpp, run_profile()  -- der Thesis-Profil-Weg
 #       RUN_PROFILE fertig: basis_rows=.. sota_rows=.. (basis_ids=.. sota_ids=..)
-#         measured=<N> resumed=<M> provisioned=<K> [(provision-only)] csv_ok=<0|1> <PFEIL> <pfad>
+#         measured=<N> resumed=<M> provisioned=<K> [(provision-only)] [(pruef-only)]
+#         csv_ok=<0|1> <PFEIL> <pfad>
+#       DIE ZEILENNUMMERN SIND HIER ABSICHTLICH WEG. Sie standen bis D3-7b als
+#       ":1219-1223" da und waren am 10.08. auf BEIDEN ce-Koepfen falsch (auf
+#       development liegt die Zeile bei :1181, im w0a-Arbeitsbaum bei :1265) --
+#       eine Fundstelle, die mit jedem Nachbar-Commit verjaehrt, ist keine
+#       Quelle, sondern eine Behauptung mit Verfallsdatum. Gesucht wird ab jetzt
+#       nach dem SYMBOL ("RUN_PROFILE fertig"), das ist stabil und greppbar.
 #   (2) ce experiment_run_entry.hpp:522-524  -- der <comdare_experiment>-Weg
 #       RUN_EXPERIMENT fertig: phasen=.. sota_rows=.. sota_ids=..
 #         measured=<N> resumed=<M> csv_ok=<0|1> <PFEIL> <pfad>
@@ -72,8 +88,10 @@
 #                 auf -- so, wie der Treiber sie geschrieben hat.
 #
 # EXIT (schreiben): 0 = fuer JEDE Bilanz-Zeile wurde ein Marker platziert
-#                   1 = mindestens eine Bilanz-Zeile blieb ohne Marker (der
-#                       Pfad war nicht aufloesbar) -- benannt, nie still
+#                   1 = mindestens eine Bilanz-Zeile blieb ohne Marker -- benannt,
+#                       nie still. Zwei Gruende: der Pfad war nicht aufloesbar,
+#                       ODER die Zeile trug BEIDE Modus-Zusaetze zugleich (dann
+#                       ist der Modus nicht bekannt und wird nicht geraten).
 #                   2 = keine Bilanz-Zeile und kein PRUNE-TESTAT im Log; es
 #                       wurde NICHTS geschrieben. Die ABWESENHEIT der Datei ist
 #                       das Signal fuer jeden Abnehmer.
@@ -166,8 +184,8 @@ marker_schreiben_lauf() {
             sub(/[ \t\r]+$/, "", out)
             return out
         }
-        function felder(s,   i, n, teile, m, r, pv, ok, po, res) {
-            m = "unbekannt"; r = "unbekannt"; pv = "unbekannt"; ok = "unbekannt"; po = 0
+        function felder(s,   i, n, teile, m, r, pv, ok, po, pr, res) {
+            m = "unbekannt"; r = "unbekannt"; pv = "unbekannt"; ok = "unbekannt"; po = 0; pr = 0
             n = split(s, teile, /[ \t]+/)
             for (i = 1; i <= n; i++) {
                 if (teile[i] ~ /^measured=[0-9]+$/)    { m  = substr(teile[i], 10) }
@@ -175,8 +193,9 @@ marker_schreiben_lauf() {
                 if (teile[i] ~ /^provisioned=[0-9]+$/) { pv = substr(teile[i], 13) }
                 if (teile[i] ~ /^csv_ok=[0-9]+$/)      { ok = substr(teile[i], 8)  }
                 if (teile[i] == "(provision-only)")    { po = 1 }
+                if (teile[i] == "(pruef-only)")        { pr = 1 }
             }
-            res = m "\t" r "\t" pv "\t" ok "\t" po
+            res = m "\t" r "\t" pv "\t" ok "\t" po "\t" pr
             return res
         }
         {
@@ -190,11 +209,11 @@ marker_schreiben_lauf() {
             if (quelle == "") next
             pfad = pfad_nach($0, trenner)
             if (quelle == "MESSREIHE") {
-                print quelle "\tunbekannt\tunbekannt\tunbekannt\tunbekannt\t0\t" pfad
+                print quelle "\tunbekannt\tunbekannt\tunbekannt\tunbekannt\t0\t0\t" pfad
                 next
             }
             split(felder($0), f, "\t")
-            print quelle "\t" f[1] "\t" f[2] "\t" f[3] "\t" f[4] "\t" f[5] "\t" pfad
+            print quelle "\t" f[1] "\t" f[2] "\t" f[3] "\t" f[4] "\t" f[5] "\t" f[6] "\t" pfad
         }
     ' "$LOG" > "$TMP"
 
@@ -233,10 +252,27 @@ marker_schreiben_lauf() {
     N_PLATZIERT=0
     N_OFFEN=0
     OFFEN_LISTE=''
-    while IFS="$(printf '\t')" read -r Q M R P OK PO PFAD; do
+    while IFS="$(printf '\t')" read -r Q M R P OK PO PR PFAD; do
         [ -n "$Q" ] || continue
         MODUS=voll
         [ "$PO" = "1" ] && MODUS=provision_only
+        # D3-7b: der DRITTE Modus. Der S3-Konformitaets-Lauf misst NICHT und baut
+        # NICHT -- er laedt jede fertige .so und faehrt nur ihr Gate. 0 Datenzeilen
+        # sind sein SOLL. Bis hierher lief er als modus=voll durch und starb an der
+        # Ausbeute-Wache.
+        [ "$PR" = "1" ] && MODUS=pruef_only
+        # BEIDE Zusaetze in EINER Zeile kann der Treiber nicht schreiben (die zwei
+        # Schalter sind gegenseitig ausschliessend). Steht es doch da, hat sich das
+        # Zeilenformat bewegt -- dann wird hier NICHT geraten. Fail-closed und
+        # benannt: die Zeile bleibt OFFEN, der Lauf endet rot statt mit einem
+        # Marker, der einen Modus behauptet, den er nicht wissen kann.
+        if [ "$PO" = "1" ] && [ "$PR" = "1" ]; then
+            N_OFFEN=$((N_OFFEN + 1))
+            OFFEN_LISTE="$OFFEN_LISTE
+    $Q: '(provision-only)' UND '(pruef-only)' in derselben Bilanz-Zeile"
+            echo "  OFFEN   $Q -- beide Modus-Zusaetze in EINER Zeile (Format geaendert?)"
+            continue
+        fi
         if [ -z "$PFAD" ]; then
             N_OFFEN=$((N_OFFEN + 1))
             OFFEN_LISTE="$OFFEN_LISTE
