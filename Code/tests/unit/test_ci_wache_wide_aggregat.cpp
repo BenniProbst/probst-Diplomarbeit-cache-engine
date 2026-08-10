@@ -44,6 +44,15 @@
 //     Die ausfuehrliche Begruendung -- samt der zwei Defekte, die der Riegel bis zum
 //     10.08.2026 hatte -- steht unmittelbar vor Abschnitt (4) weiter unten.
 //
+// (5) DER NENNER-RIEGEL (Posten M4). Der Riegel aus (4) zaehlt Implementierungen; der
+//     NENNER, ueber dem er zaehlt, war bis zum 10.08.2026 selbst unbewacht. Wer den Gang
+//     verkuerzt, bekam weiter "1 Implementierung" und damit GRUEN. Jetzt haelt ein SOLL
+//     aus fremder Quelle dagegen: `git ls-files` nennt die Skripte aus dem INDEX, und
+//     jedes davon, das auf der Platte liegt, MUSS im Gang vorgekommen sein -- als MENGE
+//     verglichen, nicht als Zahl, damit die Meldung sagt WELCHE fehlt. Dazu vier
+//     eingefrorene Anker in vier Zweigen und eine grobe Untergrenze. Begruendung, die
+//     drei Instrumente und was jedes NICHT deckt: Abschnitt (4a).
+//
 // -----------------------------------------------------------------------------
 // T-1 ROT ZUERST -- protokolliert, nicht behauptet
 // -----------------------------------------------------------------------------
@@ -64,6 +73,19 @@
 //     0 Dateien angesehen -- das waere eine Null ohne Nenner, also kein Gruen
 //     [  FAILED  ] WideFall.DieKonkatenationStehtImBaumGenauEinmal (0 ms)   rc=8
 // Byte-gleich zur CI, inklusive der (0 ms): es wurde keine einzige Datei gelesen.
+//
+// DRITTER ROT-LAUF, 10.08.2026 -- Posten M4, der Nenner-Riegel gegen sich selbst. Hier
+// war das "Rot" ein GRUEN, das keines sein durfte. Derselbe Mutant (der Gang auf den
+// Zweig 'ci' verkuerzt, gewuerfelte Grenze aus /dev/urandom, Seed 4108327412), zweimal
+// gefahren, literal:
+//   VORHER, ohne (4a):  <property name="nenner_skripte" value="31"/>
+//                       [       OK ] WideFall.DieKonkatenationStehtImBaumGenauEinmal (1 ms)
+//                       [  PASSED  ] 1 test.
+//   NACHHER, mit (4a):  [  NENNER  ] SOLL 100 Skripte (git ls-files, 114 getrackt) -- IST 31
+//                       Actual: false (DER GANG IST VERKUERZT -- SOLL 100 ..., IST 31 gesehen;
+//                                69 fehlen: .github/workflows/ci.yml, ...)
+//                       [  FAILED  ] WideFall.DieKonkatenationStehtImBaumGenauEinmal   rc=1
+// GEGENPROBE: unmanipuliert 21 von 21 gruen in Release UND Debug.
 //
 // -----------------------------------------------------------------------------
 // TESTKRITIK (T-9) -- WAS DIESE SUITE NICHT DECKT
@@ -93,6 +115,21 @@
 //   * Die Bau-Erkennung haengt an CMakeCache.txt. Ein Bauverzeichnis eines ANDEREN
 //     Werkzeugs (Meson, Bazel) traegt diese Datei nicht und wuerde mitgelesen. Fuer
 //     diesen Baum -- er ist reines CMake -- ist das gedeckt, fuer einen fremden nicht.
+//   * DER NENNER-RIEGEL (4a) haengt an git. Faellt git aus, ist der Fall ROT und nicht
+//     etwa schwaecher -- aber er ist dann eben ROT, auch wenn der Bestand in Ordnung ist.
+//     Das ist die bewusst gewaehlte Seite des Irrtums (fail-closed), keine Deckung.
+//   * Er sieht nur, was git AUFFUEHRT. `git rm --cached` verkleinert das Soll lautlos;
+//     dagegen stehen allein die vier Anker, und die decken Forschungsarbeiten/ (57 der
+//     100 Skripte, der groesste Zweig) ausdruecklich NICHT ab.
+//   * Die Anker sind eingefroren. Wird eine der vier Dateien umbenannt oder entfernt, ist
+//     der Fall rot und die Zeile in (4a) NACHZUZIEHEN. Das ist Wartung mit Ansage, kein
+//     Defekt -- aber es ist Wartung.
+//   * Ein getracktes Skript INNERHALB eines CMake-Baubaums wird vom Gang abgeschnitten,
+//     vom Soll aber gefordert; der Fall waere rot. Er kommt heute nicht vor (Baubaeume
+//     sind gitignoriert) und ist deshalb nicht modelliert, sondern benannt.
+//   * Ein Submodul-Gitlink, dessen PFAD auf .sh/.yml/.yaml endete, kaeme als getrackter
+//     Eintrag zurueck, ohne eine Datei zu sein. Der stat faengt das ab; geprueft ist es
+//     nicht, weil es diesen Fall im Baum nicht gibt.
 //
 // ORAKEL (T-5 / K13): kein Fall schreibt eine Zahl ab. Anzahl der Quellen, ihre Art und
 // jeder Koeder werden je Lauf gewuerfelt und WOERTLICH zurueckgefordert; der Seed steht
@@ -106,6 +143,8 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <functional>
+#include <iostream>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -116,6 +155,7 @@
 
 #include "comdare/ci_wachen/ci_yml_scanner.hpp"
 #include "comdare/ci_wachen/ergebnis.hpp"
+#include "comdare/ci_wachen/git_quelle.hpp"
 #include "comdare/ci_wachen/prozess.hpp"
 #include "comdare/ci_wachen/werkbank.hpp"
 #include "comdare/ci_wachen/wide_aggregat.hpp"
@@ -123,6 +163,8 @@
 namespace {
 
 using comdare::ci_wachen::AggregatAbbruchGrund;
+using comdare::ci_wachen::DateiBestand;
+using comdare::ci_wachen::EchteGitQuelle;
 using comdare::ci_wachen::exit_code;
 using comdare::ci_wachen::exit_code_von;
 using comdare::ci_wachen::fuehre_aus;
@@ -131,8 +173,10 @@ using comdare::ci_wachen::ProzessAusgang;
 using comdare::ci_wachen::QuellBefund;
 using comdare::ci_wachen::WacheStatus;
 using comdare::ci_wachen::WideErgebnis;
+using comdare::ci_wachen::werkbank::FixtureRepo;
 using comdare::ci_wachen::werkbank::Wuerfel;
 using testing::HasSubstr;
+using testing::UnorderedElementsAre;
 
 #ifndef COMDARE_WIDE_AGGREGAT_SH
 #error "COMDARE_WIDE_AGGREGAT_SH fehlt -- ohne den Pfad der Produktions-Shell ist die Paritaet nicht pruefbar."
@@ -693,6 +737,13 @@ struct Fundstelle {
 };
 
 struct Riegelbefund {
+    // ACHTUNG, MASCHINEN-ABHAENGIG: 'verzeichnisse' zaehlt auch die Baubaeume, die unter
+    // der Wurzel liegen -- der Ordner wird gezaehlt und DANN abgeschnitten. Am Objekt
+    // gemessen (10.08.2026, derselbe Bestand): 410 ohne Bauverzeichnis, 411 mit einem,
+    // 412 mit zweien. Die "412" aus 88b6409d war also keine Eigenschaft des Bestands,
+    // sondern eine der Maschine. Auf diese Zahl gehoert KEINE Zusicherung; sie steht in
+    // der Meldung als Zusammenhang, nicht als Nenner. 'dateien' und 'skripte' sind
+    // dagegen stabil, weil der INHALT der Baubaeume nicht mitgeht.
     int                      verzeichnisse = 0;
     int                      dateien       = 0; // alle regulaeren Dateien im Gang
     int                      skripte       = 0; // davon .sh/.yml/.yaml -- DER NENNER
@@ -700,6 +751,10 @@ struct Riegelbefund {
     std::vector<Fundstelle>  implementierungen;
     std::vector<std::string> nennungen; // Dateien, die die Operation nur NENNEN
     std::vector<std::string> unlesbar;  // fail-closed: "nicht lesbar" ist nicht "enthaelt nichts"
+    // WELCHE Skripte der Gang gesehen hat, nicht nur WIE VIELE (Posten M4). Eine Zahl
+    // laesst sich nur gegen eine Zahl halten; erst die MENGE laesst sich gegen eine
+    // fremde Aufzaehlung halten und benennt, was fehlt. skripte == gesehen.size().
+    std::vector<std::string> gesehen;
 };
 
 // Ein CMake-Baubaum wird an seinem ERZEUGNIS erkannt, nicht an seinem NAMEN. Ein Name ist
@@ -721,7 +776,15 @@ bool verzeichnis_bleibt_draussen(const std::filesystem::path& verzeichnis, const
     return ist_cmake_baubaum(verzeichnis);
 }
 
-Riegelbefund riegel_scan(const std::filesystem::path& roh_wurzel) {
+// Der Ausschluss ist INJIZIERBAR -- nicht aus Bequemlichkeit. Der Mutant, gegen den der
+// Nenner-Riegel (4a) gebaut ist, greift GENAU HIER an: wer den Gang verkuerzt, faelscht
+// den Nenner. Ein Koeder, der sich nicht formulieren laesst, ist keiner (K13). Die
+// Produktion uebergibt nichts und faehrt damit verzeichnis_bleibt_draussen; die
+// verkuerzte Fassung existiert ausschliesslich im Koeder-Fall.
+using AusschlussRegel = std::function<bool(const std::filesystem::path&, const std::string&)>;
+
+Riegelbefund riegel_scan(const std::filesystem::path& roh_wurzel,
+                         const AusschlussRegel&       bleibt_draussen = verzeichnis_bleibt_draussen) {
     Riegelbefund b;
     // Die Wurzel wird EINMAL lexikalisch normalisiert und der Gang von dort gestartet;
     // damit tragen alle Eintraege exakt dieses Praefix und der relative Pfad ist reine
@@ -741,7 +804,7 @@ Riegelbefund riegel_scan(const std::filesystem::path& roh_wurzel) {
             b.verzeichnisse += 1;
             // Backups, Fremdbaeume und Baubaeume bleiben draussen -- Historie und Erzeugnis,
             // kein Bestand.
-            if (verzeichnis_bleibt_draussen(p, relativ)) { it.disable_recursion_pending(); }
+            if (bleibt_draussen(p, relativ)) { it.disable_recursion_pending(); }
             continue;
         }
         if (!it->is_regular_file(art) || art) { continue; }
@@ -749,6 +812,7 @@ Riegelbefund riegel_scan(const std::filesystem::path& roh_wurzel) {
         const std::string ext = p.extension().string();
         if (ext != ".sh" && ext != ".yml" && ext != ".yaml") { continue; }
         b.skripte += 1;
+        b.gesehen.push_back(relativ);
 
         // FAIL-CLOSED gelesen: eine unlesbare Datei liefert nullopt und wird GEMELDET. Ein
         // stiller ifstream, der nichts liefert, waere von "Datei ohne Treffer" nicht zu
@@ -781,6 +845,7 @@ Riegelbefund riegel_scan(const std::filesystem::path& roh_wurzel) {
     });
     std::sort(b.nennungen.begin(), b.nennungen.end());
     std::sort(b.unlesbar.begin(), b.unlesbar.end());
+    std::sort(b.gesehen.begin(), b.gesehen.end()); // Voraussetzung fuer den Mengen-Abgleich in (4a)
     return b;
 }
 
@@ -819,10 +884,214 @@ std::string befund_liste(const Riegelbefund& b) {
     return aus.str();
 }
 
+// ===========================================================================
+// (4a) DER NENNER-RIEGEL -- wer den GANG verkuerzt, faelscht die AUSSAGE
+// ===========================================================================
+//
+// BIS ZUM 10.08.2026 WAR ER NICHT DA, und das stand als Posten M4 ausdruecklich offen.
+//
+// DIE LUECKE, am Objekt belegt und nicht vermutet. Der Riegel oben zaehlt
+// Implementierungen -- aber der NENNER, ueber dem er zaehlt, war selbst unbewacht. Ein
+// Eingriff in riegel_scan, der den Gang auf den Zweig 'ci' verkuerzt (gewuerfelte Grenze
+// aus /dev/urandom, Seed 4108327412), lieferte literal:
+//     <property name="nenner_skripte" value="31"/>
+//     [       OK ] WideFall.DieKonkatenationStehtImBaumGenauEinmal (1 ms)
+//     [  PASSED  ] 1 test.
+// GRUEN, mit 69 von 100 Skripten NIE ANGESEHEN. Der bestehende ASSERT_GT(skripte, 0)
+// faengt genau eine Zahl: die Null. Eine kleine Zahl faengt er nicht -- und das ist
+// dieselbe Klasse, die diesen Test am selben Tag schon einmal getroffen hat, als
+// s.find("/build") den Runner-Pfad /builds/ traf und 'angesehen' auf 0 fiel. Damals war
+// es eine Null und schlug an; 31 statt 100 waere lautlos durchgegangen.
+//
+// DIE ANTWORT IST EIN SOLL AUS FREMDER QUELLE (T-3). Drei Instrumente, absichtlich
+// ungleich stark -- jedes beantwortet eine ANDERE Frage:
+//
+//   (i)  GIT ALS ZWEITE AUFZAEHLUNG -- das tragende Instrument. `git ls-files` kennt den
+//        Bestand aus dem INDEX; das ist ein anderer Apparat als der Verzeichnis-Iterator
+//        und von jedem Eingriff in ihn unberuehrt. Verglichen werden nicht Zahlen,
+//        sondern MENGEN: jede getrackte .sh/.yml/.yaml ausserhalb der Ausschluesse, die
+//        auf der Platte liegt, MUSS im Gang vorgekommen sein. Fehlt EINE, wird sie
+//        NAMENTLICH gemeldet -- eine blosse Untergrenze taete das nicht.
+//        WAS ES NICHT DECKT: was git selbst nicht mehr auffuehrt. Wer eine Datei per
+//        `git rm --cached` aus dem Index nimmt, verkleinert das Soll lautlos mit.
+//        Ebenso: Dateien, die es nur im Arbeitsbaum gibt (unverfolgt). Das Soll ist eine
+//        UNTERGRENZE, nie eine Gleichheit -- der Gang darf mehr sehen, nie weniger.
+//
+//   (ii) VIER EINGEFRORENE ANKER -- gegen genau die Luecke von (i). Sie stehen hier
+//        woertlich, kommen weder aus git noch aus dem Gang und liegen in VIER
+//        verschiedenen obersten Zweigen, damit ein auf EINEN Zweig verkuerzter Gang an
+//        mindestens zweien scheitert. Ausgewaehlt sind sie nach TRAGFAEHIGKEIT, nicht
+//        nach Groesse: jede ist Gegenstand oder Voraussetzung genau dieser Suite.
+//        Verschwindet eine, ist die Zeile NACHZUZIEHEN -- nicht der Riegel zu entfernen.
+//        WAS ES NICHT DECKT: die 57 Skripte unter Forschungsarbeiten/. Der GROESSTE
+//        Einzelzweig des Nenners hat mit Absicht KEINEN Anker, weil vendorierte
+//        Fremdkorpora legitim neu gezogen oder entfernt werden. Fuer ihn traegt allein (i).
+//
+//   (iii) EINE GROBE UNTERGRENZE, absichtlich niedrig. Das schwaechste der drei: den
+//        'ci'-Mutanten mit seinen 31 Skripten faengt sie NICHT -- sie soll ihn auch nicht
+//        fangen. Sie beantwortet nur "gibt es ueberhaupt noch einen Bestand" fuer den
+//        Fall, dass (i) und (ii) zugleich ausfielen, und sie traegt eine Zahl in die
+//        Ausgabe (V-1). Hoch angesetzt waere sie ein programmierter Daueralarm, denn die
+//        .sh-Haelfte des Nenners SOLL schrumpfen (Owner-KERN 09.08.: die Shells werden
+//        zu Google Tests).
+//
+// FAIL-CLOSED, OHNE HINTERTUER: antwortet git nicht -- Werkzeug fehlt, kein Arbeitsbaum,
+// `safe.directory` schlaegt zu --, ist das ROT mit git-eigener Diagnose und NICHT ein
+// stiller Rueckfall auf (ii)+(iii). Ein Rueckfall waere die naechste stille Null: die
+// Wache liefe weiter, aber ihre Aussage waere heimlich kleiner geworden, ohne dass es
+// jemand saehe. Genau diese Verwechslung -- Werkzeug-Ausfall gegen leeres Ergebnis --
+// traegt DateiBestand::werkzeug_ok als eigenes Feld, statt sie in eine Liste zu falten.
+
+// Die vier eingefrorenen Anker (Stand 10.08.2026), je einer in einem anderen obersten
+// Zweig. Sie sind KEINE Stichprobe, sondern Voraussetzungen dieser Suite.
+const char* const W29_ANKER[] = {
+    ".gitlab-ci.yml",                       // Wurzel  -- die Pipeline, die den Aggregator ruft
+    ".github/workflows/ci.yml",             // .github -- der Spiegel; fuer DEFEKT II war er blind
+    "ci/wide_aggregat.sh",                  // ci      -- der Gegenstand des Postens selbst
+    "scripts/ci_diff_ascii_width_guard.sh", // scripts -- die Wache, der DIESE Datei gehorcht
+};
+
+// (iii) Die grobe Untergrenze. Am 10.08.2026 sah der Gang 100 Skripte, davon 27
+// .yml/.yaml. 12 ist bewusst weit darunter: die Zahl soll die geplante Schrumpfung der
+// Shell-Menge ueberleben und nur den Zusammenbruch des Gangs anzeigen.
+constexpr int W29_NENNER_UNTERGRENZE = 12;
+
+// Der Ausschluss auf der GIT-Seite ist mit Absicht EIGENSTAENDIG formuliert und ruft
+// verzeichnis_bleibt_draussen NICHT auf. Riefe er es, mutierte ein Eingriff in den Gang
+// die Referenz gleich mit -- und der Abgleich waere wieder sein eigener Nenner (T-3).
+// SEGMENTE, nie Teilzeichenketten: ein find("external") traefe auch 'my_external_tool/',
+// genau wie s.find("/build") das '/builds/' des Runners traf. Der Dateiname am Ende wird
+// nicht geprueft -- er ist kein Verzeichnis.
+bool git_pfad_bleibt_draussen(const std::string& relativ) {
+    if (relativ.rfind("docs/sessions/backups/", 0) == 0) { return true; } // Historie, kein Bestand
+    std::size_t start = 0;
+    while (true) {
+        const std::size_t ende = relativ.find('/', start);
+        if (ende == std::string::npos) { return false; }
+        if (relativ.compare(start, ende - start, "external") == 0) { return true; }
+        if (relativ.compare(start, ende - start, ".git") == 0) { return true; }
+        start = ende + 1;
+    }
+}
+
+// Das SOLL: was der Gang gesehen haben MUSS. Es kommt aus git und aus einem direkten
+// stat, nie aus dem Gang. git_ok == false ist ein WERKZEUG-AUSFALL und nie eine leere
+// Liste -- die beiden duerfen nicht denselben Wert haben.
+struct NennerSoll {
+    bool                     git_ok = false;
+    std::string              diagnose;
+    std::size_t              getrackt_gesamt = 0; // alle getrackten .sh/.yml/.yaml
+    std::vector<std::string> im_gang;             // davon: nicht ausgeschlossen UND auf der Platte
+};
+
+NennerSoll nenner_soll_aus_git(const std::filesystem::path& wurzel) {
+    NennerSoll           soll;
+    const EchteGitQuelle git(wurzel);
+    if (!git.ist_arbeitsbaum()) {
+        soll.diagnose = "git nennt unter '" + wurzel.string() + "' keinen Arbeitsbaum";
+        return soll;
+    }
+    // DIE WURZELN MUESSEN DIESELBE SEIN. Antwortete git ueber einen ANDEREN Baum als den
+    // gegangenen, fiele der Abgleich beliebig aus. Verglichen wird ueber equivalent(),
+    // also ueber die Inode: ein Symlink im Pfad -- genau die /builds/-Lage des Runners --
+    // darf hier nichts entscheiden, und ein Zeichenketten-Vergleich taete es.
+    std::error_code fehler;
+    if (!std::filesystem::equivalent(git.wurzel(), wurzel, fehler) || fehler) {
+        soll.diagnose =
+            "git-Wurzel '" + git.wurzel().string() + "' ist nicht der gegangene Baum '" + wurzel.string() + "'";
+        return soll;
+    }
+    for (const char* muster : {"*.sh", "*.yml", "*.yaml"}) {
+        const DateiBestand bestand = git.ls_files_z(muster);
+        if (!bestand.werkzeug_ok) {
+            soll.diagnose = std::string("git ls-files ") + muster + " hat nicht geantwortet: " + bestand.diagnose;
+            return soll;
+        }
+        for (const std::string& pfad : bestand.pfade) {
+            if (pfad.empty()) { continue; }
+            soll.getrackt_gesamt += 1;
+            if (git_pfad_bleibt_draussen(pfad)) { continue; }
+            // DIREKTER stat auf den BENANNTEN Pfad -- nicht der Iterator. Genau deshalb
+            // ueberlebt diese Frage jede Manipulation des Gangs. Und deshalb ist eine im
+            // Arbeitsbaum geloeschte, aber noch indizierte Datei kein Fehlalarm: sie
+            // faellt hier heraus, statt spaeter als "nicht gegangen" gemeldet zu werden.
+            std::error_code art;
+            if (!std::filesystem::is_regular_file(wurzel / pfad, art) || art) { continue; }
+            soll.im_gang.push_back(pfad);
+        }
+    }
+    std::sort(soll.im_gang.begin(), soll.im_gang.end());
+    soll.git_ok = true;
+    return soll;
+}
+
+// REINE FUNKTION: welche Soll-Pfade fehlen im Gang? Ohne git, ohne Platte, ohne Zustand --
+// damit sie fuer sich geprueft werden kann. 'gesehen' kommt sortiert aus riegel_scan.
+std::vector<std::string> fehlende_im_gang(const std::vector<std::string>& soll,
+                                          const std::vector<std::string>& gesehen) {
+    std::vector<std::string> fehlend;
+    for (const std::string& pfad : soll) {
+        if (!std::binary_search(gesehen.begin(), gesehen.end(), pfad)) { fehlend.push_back(pfad); }
+    }
+    return fehlend;
+}
+
+// Groesse als int -- die Vergleiche unten halten int gegen int, statt eine
+// vorzeichenlose Subtraktion zu riskieren.
+int gross(const std::vector<std::string>& liste) { return static_cast<int>(liste.size()); }
+
+std::string erste_drei(const std::vector<std::string>& liste) {
+    std::ostringstream aus;
+    for (std::size_t i = 0; i < liste.size() && i < 3; ++i) { aus << (i > 0 ? ", " : "") << liste[i]; }
+    if (liste.size() > 3) { aus << ", ... (+" << (liste.size() - 3) << " weitere)"; }
+    return aus.str();
+}
+
+// DER RIEGEL. Als AssertionResult, damit ihn jeder Fall gleich faehrt und BEIDE ZAHLEN --
+// Soll und Ist -- in JEDER Meldung stehen (V-1). Er gilt fuer den ECHTEN Baum: (ii) und
+// (iii) sind auf ihn eingefroren und haben in einem Wegwerf-Repo nichts zu suchen.
+testing::AssertionResult nenner_haelt(const NennerSoll& soll, const Riegelbefund& b) {
+    if (!soll.git_ok) {
+        return testing::AssertionFailure()
+               << "FAIL-CLOSED: das Soll aus fremder Quelle fehlt -- " << soll.diagnose
+               << ". Ohne zweite Aufzaehlung ist der Gang unbewacht, und ein unbewachter Nenner "
+               << "ist kein Gruen. IST: " << befund_nenner(b);
+    }
+    const std::vector<std::string> fehlend = fehlende_im_gang(soll.im_gang, b.gesehen);
+    if (!fehlend.empty()) {
+        return testing::AssertionFailure()
+               << "DER GANG IST VERKUERZT -- SOLL " << soll.im_gang.size() << " Skripte (git ls-files, "
+               << soll.getrackt_gesamt << " getrackt), IST " << b.skripte << " gesehen; " << fehlend.size()
+               << " fehlen: " << erste_drei(fehlend) << ". " << befund_nenner(b);
+    }
+    std::vector<std::string> anker_fehlen;
+    for (const char* anker : W29_ANKER) {
+        if (!std::binary_search(b.gesehen.begin(), b.gesehen.end(), std::string(anker))) {
+            anker_fehlen.push_back(anker);
+        }
+    }
+    if (!anker_fehlen.empty()) {
+        return testing::AssertionFailure()
+               << "EINGEFRORENE ANKER FEHLEN IM GANG -- SOLL " << (sizeof(W29_ANKER) / sizeof(W29_ANKER[0]))
+               << " Anker, IST " << b.skripte << " Skripte gesehen; nicht dabei: " << erste_drei(anker_fehlen)
+               << ". Entweder ist der Gang verkuerzt, oder die Datei ist weg und die Anker-Zeile "
+               << "in (4a) ist nachzuziehen -- der Riegel ist es nicht. " << befund_nenner(b);
+    }
+    if (b.skripte < W29_NENNER_UNTERGRENZE) {
+        return testing::AssertionFailure()
+               << "NENNER UNTER DER EINGEFRORENEN GRENZE -- SOLL mindestens " << W29_NENNER_UNTERGRENZE << ", IST "
+               << b.skripte << ". " << befund_nenner(b);
+    }
+    return testing::AssertionSuccess() << "SOLL " << soll.im_gang.size() << ", IST " << b.skripte;
+}
+
 TEST_F(WideFall, DieKonkatenationStehtImBaumGenauEinmal) {
     // T-3: die Grundgesamtheit kommt aus einem Verzeichnis-Durchlauf, nicht aus einer
     // Liste im Pruefling. V-1: der Nenner steht in der MELDUNG, nicht nur im Kopf.
-    const Riegelbefund b = riegel_scan(std::filesystem::path(COMDARE_REPO_WURZEL_W29));
+    const std::filesystem::path wurzel(COMDARE_REPO_WURZEL_W29);
+    const Riegelbefund          b = riegel_scan(wurzel);
+    RecordProperty("nenner_verzeichnisse", std::to_string(b.verzeichnisse));
+    RecordProperty("nenner_dateien", std::to_string(b.dateien));
     RecordProperty("nenner_skripte", std::to_string(b.skripte));
     RecordProperty("nenner_code_zeilen", std::to_string(b.code_zeilen));
     RecordProperty("nenner_nennungen", std::to_string(b.nennungen.size()));
@@ -830,6 +1099,19 @@ TEST_F(WideFall, DieKonkatenationStehtImBaumGenauEinmal) {
     // V-8: eine Null ohne Nenner ist kein Gruen. Der Gang muss ueberhaupt stattgefunden
     // haben, bevor sein Ergebnis etwas bedeutet.
     ASSERT_GT(b.skripte, 0) << "0 Skripte angesehen -- die Wache ist blind, nicht gruen. " << befund_nenner(b);
+
+    // POSTEN M4 -- DER NENNER-RIEGEL. Die Null oben ist zu wenig: 31 statt 100 Skripte war
+    // am 10.08.2026 literal gruen. Das SOLL kommt aus git und aus einem direkten stat,
+    // nicht aus dem Gang (T-3); die Begruendung samt dem, was die Wahl NICHT deckt, steht
+    // vollstaendig in (4a) unmittelbar oben.
+    const NennerSoll soll = nenner_soll_aus_git(wurzel);
+    RecordProperty("nenner_soll_git", std::to_string(soll.im_gang.size()));
+    RecordProperty("nenner_soll_getrackt", std::to_string(soll.getrackt_gesamt));
+    // V-1: BEIDE ZAHLEN in die Ausgabe, nicht nur in die Fehlermeldung. Wer den Lauf liest,
+    // soll den Nenner sehen, ohne dass erst etwas kaputt sein muss.
+    std::cout << "[  NENNER  ] SOLL " << soll.im_gang.size() << " Skripte (git ls-files, " << soll.getrackt_gesamt
+              << " getrackt) -- IST " << b.skripte << " gesehen; " << befund_nenner(b) << std::endl;
+    ASSERT_TRUE(nenner_haelt(soll, b));
     // FAIL-CLOSED: ein Skript, das nicht gelesen werden konnte, ist ein Loch im Nenner und
     // damit kein Gruen. Es zu uebergehen hiesse, "nicht angesehen" fuer "sauber" zu halten.
     const std::string erstes_unlesbares = befund_unlesbar(b);
@@ -844,6 +1126,143 @@ TEST_F(WideFall, DieKonkatenationStehtImBaumGenauEinmal) {
     // diese Zeile sagt, welche Datei gefehlt hat, statt nur eine Zahl zu nennen.
     EXPECT_EQ(b.implementierungen.front().datei, "ci/wide_aggregat.sh")
         << "die eine Implementierung liegt nicht dort, wo sie liegen soll. " << befund_nenner(b) << befund_liste(b);
+}
+
+TEST_F(WideFall, EinVerkuerzterGangMachtDenNennerRiegelRot) {
+    // K13 BEIDSEITIG, AM ECHTEN BAUM. Der Koeder ist genau der Mutant, der am 10.08.2026
+    // noch ueberlebte: der Gang wird auf Zweige verkuerzt, 'ci' bleibt stehen. Die eine
+    // Implementierung wird also weiterhin gefunden -- der ALTE Riegel bleibt gruen --, und
+    // nur der NENNER faellt. Wer 'ci' mit abschnitte, scheiterte schon am Positiv-Test und
+    // bewiese ueber den Nenner nichts; deshalb ist 'ci' vom Wurf ausgenommen.
+    const std::filesystem::path wurzel(COMDARE_REPO_WURZEL_W29);
+    const NennerSoll            soll = nenner_soll_aus_git(wurzel);
+    ASSERT_TRUE(soll.git_ok) << "ohne fremdes Soll ist dieser Fall nicht fahrbar: " << soll.diagnose;
+
+    // (a) DER GEGENKOEDER ZUERST (T-1): unmanipuliert ist der Riegel GRUEN. Ohne diese
+    //     Haelfte waere eine immer-rote Wache von einer richtigen nicht zu unterscheiden.
+    const Riegelbefund voll = riegel_scan(wurzel);
+    ASSERT_TRUE(nenner_haelt(soll, voll));
+
+    // (b) DIE GEWUERFELTE GRENZE. Welche obersten Zweige es ueberhaupt gibt, kommt aus dem
+    //     SOLL (git) -- nicht aus dem Gang, den der Koeder gleich manipuliert.
+    std::vector<std::string> zweige;
+    for (const std::string& pfad : soll.im_gang) {
+        const std::size_t schnitt = pfad.find('/');
+        if (schnitt == std::string::npos) { continue; } // Datei in der Wurzel, kein Zweig
+        const std::string zweig = pfad.substr(0, schnitt);
+        if (zweig == "ci") { continue; }
+        if (std::find(zweige.begin(), zweige.end(), zweig) == zweige.end()) { zweige.push_back(zweig); }
+    }
+    std::sort(zweige.begin(), zweige.end());
+    ASSERT_FALSE(zweige.empty()) << "kein Zweig ausser 'ci' traegt Skripte -- dann liesse sich dieser "
+                                 << "Koeder nicht formulieren und der Fall waere ein stilles Gruen. "
+                                 << befund_nenner(voll);
+
+    std::vector<std::string> gekappt;
+    for (const std::string& zweig : zweige) {
+        if (wuerfel_.zahl(0, 1) == 1) { gekappt.push_back(zweig); }
+    }
+    // Der Wurf darf leer ausfallen; dann wird EIN gewuerfelter Zweig erzwungen. Ein Koeder,
+    // der sich je nach Wurf selbst ueberspringt, waere keiner.
+    if (gekappt.empty()) { gekappt.push_back(zweige[static_cast<std::size_t>(wuerfel_.zahl(0, gross(zweige) - 1))]); }
+    RecordProperty("gekappte_zweige", erste_drei(gekappt));
+
+    const Riegelbefund mutant =
+        riegel_scan(wurzel, [&gekappt](const std::filesystem::path& v, const std::string& relativ) {
+            if (verzeichnis_bleibt_draussen(v, relativ)) { return true; }
+            return std::find(gekappt.begin(), gekappt.end(), relativ) != gekappt.end();
+        });
+
+    // DER ALTE RIEGEL BLEIBT GRUEN -- das ist die Aussage des Postens, hier festgehalten
+    // statt erzaehlt: die Zahl der Implementierungen sagt ueber den Nenner NICHTS.
+    ASSERT_EQ(mutant.implementierungen.size(), 1u)
+        << "der Koeder sollte die eine Implementierung stehen lassen -- sonst prueft dieser Fall "
+        << "den Positiv-Test und nicht den Nenner. " << befund_nenner(mutant) << befund_liste(mutant);
+    EXPECT_EQ(mutant.implementierungen.front().datei, "ci/wide_aggregat.sh");
+    ASSERT_LT(mutant.skripte, voll.skripte) << "der Koeder hat den Gang gar nicht verkuerzt -- dann beweist "
+                                            << "sein Biss nichts. " << befund_nenner(mutant);
+
+    // UND DER NENNER-RIEGEL BEISST. Die Meldung wird GEDRUCKT, nicht nur geprueft: ein
+    // Biss, den niemand im Lauf sieht, ist eine Behauptung ueber einen Biss (V-8).
+    const testing::AssertionResult verdikt = nenner_haelt(soll, mutant);
+    std::cout << "[  BISS    ] gekappt: " << erste_drei(gekappt) << " -- " << verdikt.message() << std::endl;
+    EXPECT_FALSE(verdikt) << "DER KOEDER HAT NICHT GEBISSEN: der Gang sah nur noch " << mutant.skripte << " von "
+                          << soll.im_gang.size() << " Skripten -- und der Nenner-Riegel blieb "
+                          << "gruen. Genau dieser Zustand war bis zum 10.08.2026 der Bestand. "
+                          << befund_nenner(mutant);
+    // Er NENNT, was fehlt, statt nur eine Zahl zu melden -- sonst waere die Meldung so
+    // wenig verwertbar wie das stille Gruen, das sie ersetzt.
+    const std::vector<std::string> fehlend = fehlende_im_gang(soll.im_gang, mutant.gesehen);
+    ASSERT_FALSE(fehlend.empty()) << "der gekappte Zweig trug keine Skripte -- der Koeder hat nichts entfernt. "
+                                  << befund_nenner(mutant);
+    EXPECT_THAT(std::string(verdikt.message()), HasSubstr(fehlend.front()))
+        << "die Meldung nennt die erste fehlende Datei nicht: " << verdikt.message();
+    // BEIDE ZAHLEN in der Meldung (V-1), woertlich nachgefordert statt geglaubt.
+    EXPECT_THAT(std::string(verdikt.message()), HasSubstr(std::to_string(soll.im_gang.size())));
+    EXPECT_THAT(std::string(verdikt.message()), HasSubstr(std::to_string(mutant.skripte)));
+}
+
+TEST_F(WideFall, DasSollKommtAusGitUndNichtAusDemGang) {
+    // T-4 GEGENEINGANG fuer das SOLL selbst. Ohne diesen Fall bliebe unbewiesen, dass
+    // nenner_soll_aus_git ueberhaupt git liest -- eine Funktion, die immer dieselbe Liste
+    // lieferte, saehe von aussen genauso aus. Gefahren wird gegen ein WEGWERF-REPO, in dem
+    // jeder Eintrag von Hand abgezaehlt ist (zweite Quelle), mit gewuerfelten Namen.
+    FixtureRepo repo;
+    ASSERT_TRUE(repo.init());
+    const std::string koeder = wuerfel_.token(16);
+    RecordProperty("koeder", koeder);
+
+    // (a) verfolgt UND auf der Platte -- gehoert ins Soll.
+    ASSERT_TRUE(repo.schreibe_und_verfolge("ci/w_" + koeder + ".sh", "#!/bin/sh\necho " + koeder + "\n"));
+    ASSERT_TRUE(repo.schreibe_und_verfolge("stufe/zwei_" + koeder + ".yml", "job:\n  script: [echo]\n"));
+    // (b) NICHT verfolgt -- git kennt es nicht, der Gang sieht es sehr wohl. Das Soll ist
+    //     eine UNTERGRENZE, keine Gleichheit; deshalb darf es hier fehlen.
+    ASSERT_TRUE(repo.schreibe("ci/unverfolgt_" + koeder + ".sh", "#!/bin/sh\n"));
+    // (c) verfolgt, aber im Arbeitsbaum GELOESCHT -- git nennt es, die Platte nicht. Es darf
+    //     NICHT ins Soll, sonst waere jeder halbfertige Checkout ein Fehlalarm.
+    ASSERT_TRUE(repo.schreibe_und_verfolge("ci/weg_" + koeder + ".sh", "#!/bin/sh\n"));
+    ASSERT_TRUE(repo.loesche_aus_arbeitsbaum("ci/weg_" + koeder + ".sh"));
+    // (d) verfolgt, aber unter einem SEGMENT 'external' -- draussen, wie im Gang.
+    ASSERT_TRUE(repo.schreibe_und_verfolge("Code/external/fremd_" + koeder + ".sh", "#!/bin/sh\n"));
+    // (e) verfolgt, aber unter 'my_external_tool' -- das ist KEIN Segment 'external' und
+    //     bleibt drin. Der Gegeneingang zur Teilzeichenketten-Falle (/build vs. /builds/).
+    ASSERT_TRUE(repo.schreibe_und_verfolge("my_external_tool/drin_" + koeder + ".sh", "#!/bin/sh\n"));
+    // (f) keine Skript-Endung -- danach wird gar nicht erst gefragt.
+    ASSERT_TRUE(repo.schreibe_und_verfolge("ci/notiz_" + koeder + ".md", "text\n"));
+
+    const NennerSoll soll = nenner_soll_aus_git(repo.pfad());
+    ASSERT_TRUE(soll.git_ok) << soll.diagnose;
+    // WOERTLICH zurueckgefordert, nicht gezaehlt: (b) fehlt (unverfolgt), (c) fehlt (nicht
+    // auf der Platte), (d) fehlt (Segment 'external'), (f) fehlt (keine Skript-Endung).
+    EXPECT_THAT(soll.im_gang, UnorderedElementsAre("ci/w_" + koeder + ".sh", "my_external_tool/drin_" + koeder + ".sh",
+                                                   "stufe/zwei_" + koeder + ".yml"));
+    EXPECT_EQ(soll.getrackt_gesamt, 5u) << "fuenf getrackte Skripte: (a) zwei, (c) eins, (d) eins, (e) eins. "
+                                        << "Die .md aus (f) wird nicht abgefragt.";
+
+    // UND DER ABGLEICH HAELT: der Gang sieht alles aus dem Soll -- und MEHR, naemlich die
+    // unverfolgte Datei aus (b). Mehr ist erlaubt, weniger nicht.
+    const Riegelbefund b = riegel_scan(repo.pfad());
+    EXPECT_TRUE(fehlende_im_gang(soll.im_gang, b.gesehen).empty())
+        << "der Gang hat ein getracktes Skript nicht gesehen. " << befund_nenner(b);
+    EXPECT_GT(b.skripte, gross(soll.im_gang))
+        << "der Gang muesste MEHR sehen als git nennt (die unverfolgte Datei aus (b)) -- sonst "
+        << "misst das Soll nicht als Untergrenze, sondern als Gleichheit. " << befund_nenner(b);
+}
+
+TEST_F(WideFall, OhneGitIstDasSollRotUndNichtLeer) {
+    // FAIL-CLOSED, der Gegeneingang zur schlimmsten Verwechslung: "git hat nicht
+    // geantwortet" darf nicht wie "es gibt nichts" aussehen. Ein leeres Soll waere
+    // NAEMLICH IMMER ERFUELLT -- die Wache liefe weiter und sagte nichts mehr aus. Die
+    // Werkstatt ist ein gewoehnliches Verzeichnis ohne .git.
+    const NennerSoll soll = nenner_soll_aus_git(werk_.pfad());
+    EXPECT_FALSE(soll.git_ok) << "ein Verzeichnis ohne git-Arbeitsbaum wurde als gueltiges Soll gewertet";
+    EXPECT_TRUE(soll.im_gang.empty());
+    EXPECT_THAT(soll.diagnose, HasSubstr("Arbeitsbaum")) << "die Diagnose benennt den Grund nicht: " << soll.diagnose;
+    // UND DER RIEGEL MACHT DARAUS ROT, nicht Gruen-mit-leerem-Soll.
+    Riegelbefund frei;
+    frei.skripte = 4711; // ein Gang, der alles gesehen haette -- und trotzdem kein Gruen
+    EXPECT_FALSE(nenner_haelt(soll, frei))
+        << "ohne fremdes Soll war der Riegel gruen -- genau der stille Rueckfall, den (4a) verbietet";
 }
 
 TEST_F(WideFall, EinPfadMitBuildsImNamenBlendetDenRiegelNichtAus) {
