@@ -800,6 +800,19 @@ std::string befund_nenner(const Riegelbefund& b) {
     return aus.str();
 }
 
+// Die Fehlermeldung des Unlesbar-Riegels, die den LEEREN Fall selbst traegt. gtest wertet den
+// Stream hinter einem ASSERT nur im Fehlerfall aus -- ein b.unlesbar.front() direkt dort ist zur
+// Laufzeit also sicher. Eine statische Analyse sieht diese Kopplung nicht: cppcheck 2.21.0 meldet
+// containerOutOfBounds ("Either the condition 'b.unlesbar.empty()' is redundant or expression
+// 'b.unlesbar.front()' causes access out of bounds", Pipeline 15534, lint:static). Der Zugriff
+// wandert deshalb hierher, wo die Leerheit VOR dem Lesen entschieden wird. Die Aussage des Tests
+// aendert sich nicht: gedruckt wird der Text nur, wenn die Liste nicht leer ist, und dann steht
+// dort dieselbe erste Datei wie zuvor.
+std::string befund_unlesbar(const Riegelbefund& b) {
+    if (b.unlesbar.empty()) { return "(keine)"; }
+    return b.unlesbar.front();
+}
+
 std::string befund_liste(const Riegelbefund& b) {
     std::ostringstream aus;
     for (const Fundstelle& f : b.implementierungen) { aus << "\n  " << f.datei << ":" << f.zeile << "  " << f.code; }
@@ -819,7 +832,8 @@ TEST_F(WideFall, DieKonkatenationStehtImBaumGenauEinmal) {
     ASSERT_GT(b.skripte, 0) << "0 Skripte angesehen -- die Wache ist blind, nicht gruen. " << befund_nenner(b);
     // FAIL-CLOSED: ein Skript, das nicht gelesen werden konnte, ist ein Loch im Nenner und
     // damit kein Gruen. Es zu uebergehen hiesse, "nicht angesehen" fuer "sauber" zu halten.
-    ASSERT_TRUE(b.unlesbar.empty()) << "unlesbare Skripte im Gang -- der Nenner hat ein Loch: " << b.unlesbar.front()
+    const std::string erstes_unlesbares = befund_unlesbar(b);
+    ASSERT_TRUE(b.unlesbar.empty()) << "unlesbare Skripte im Gang -- der Nenner hat ein Loch: " << erstes_unlesbares
                                     << " (" << befund_nenner(b) << ")";
 
     ASSERT_EQ(b.implementierungen.size(), 1u)
