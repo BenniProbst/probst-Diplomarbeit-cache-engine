@@ -30,14 +30,17 @@
 #     `git ls-files --error-unmatch` geprueft. Getrackte Dateien werden per `git checkout`
 #     zurueckgeholt (nie geloescht); fremde unversionierte Dateien im selben Verzeichnis
 #     bleiben unangetastet (am Fixture sha256-identisch nachgewiesen).
-#   * ohne Byte-Delta entsteht KEIN Commit  (Loop-/Rausch-Wache)
+#   * ohne Byte-Delta entsteht KEIN Commit  (Loop-/Rausch-Wache) -- und "kein Delta"
+#     ist BELEGT, nicht behauptet: jede kopierte .tex wird gegen den Index des
+#     Ziel-Repos nachgezaehlt; erreicht eine den Index nicht, bricht der Kanal LAUT
+#     ab statt "IDEMPOTENT" zu melden (##20, 10.08.2026, Falle F5 unten)
 #   * ohne Quelle entsteht KEIN Commit und KEIN Fehler (honest-empty)
 #   * landet AUF EINEM TeX-FAEHIGEN RUNNER nie einen Stand, mit dem die Thesis-PDF nicht
 #     mehr baut (PDF-GATE; deklarierter Geltungsbereich + Grenzen s.u. -- ohne
 #     TeX-Toolchain prueft AF_PDF_GATE=auto NICHTS und sagt das literal)
 #   * kein Haken ohne Ausgabe: jede Stufe druckt ihren literalen Zaehler
 #
-# VIER TRANSPORT-FALLEN, GEHEILT AM 09.08.2026 (Paket P4 + Nachsatz) -- alle still:
+# FUENF TRANSPORT-FALLEN, GEHEILT AM 09./10.08.2026 (P4 + Nachsatz + ##20) -- alle still:
 #   (F1) DER SELEKTOR TRAF DIE REALE DATEI NIE. Gesucht wurde '-name "*.result.csv"'
 #        (:149 :153 :165 der Vorfassung); der lebende Messweg schreibt 'result.csv'
 #        OHNE Praefix. Der Glob verlangt mindestens ein Zeichen plus Punkt davor.
@@ -60,12 +63,18 @@
 #        appendix-generator -- frass die erste Datenzeile als Kopfzeile: ein
 #        GRUENER Commit mit einem Messwert weniger. Die Log-Zeile log dabei mit
 #        ("1 Zeilen (inkl. 1 Header)", obwohl kein Header da war).
-#   Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu
+#   (F5) DIE UEBERNAHME INS ZIEL-REPO WURDE NIE NACHGEZAEHLT (10.08.2026, ##20).
+#        Gestagt wurde das VERZEICHNIS mit geschluckten Fehlern; ob die kopierten
+#        .tex im Index ankamen, hat niemand gefragt. Nahm git sie nicht, sagte der
+#        Kanal "IDEMPOTENT: 0 Aenderungen" und ging mit rc=0 -- dasselbe Wort fuer
+#        "nichts geaendert" und "nichts angekommen". Ausfuehrlich am Abschnitt (3).
+#   Alle fuenf endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu
 #   tun" aussah (F4b sogar mit gruenem Commit). Deshalb druckt der Korpus-Zweig
 #   jetzt IMMER einen Nenner (korpus_wurzel/vorhanden + laufordner_geprueft/
-#   mit_material + header=ja|nein/Datenzeilen): eine Null ohne Nenner ist von
-#   einem echten Freispruch nicht zu unterscheiden.
-#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A11, Selbstbiss N1-N6).
+#   mit_material + header=ja|nein/Datenzeilen) und die Uebernahme ebenfalls
+#   (kopiert/im_index/nicht_uebernommen/git_add_fehler): eine Null ohne Nenner ist
+#   von einem echten Freispruch nicht zu unterscheiden.
+#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A14, Selbstbiss N1-N7).
 #
 # WO DIE KONKATENATION SEIT DEM 09.08.2026 WOHNT (P4c):
 #   NICHT MEHR HIER. F2/F3/F4 sassen in Zeilen, die WORTGLEICH auch in den beiden
@@ -412,15 +421,80 @@ if [ "$copied" -eq 0 ]; then
 fi
 
 # ---- (3) Idempotenz: Commit NUR bei Byte-Delta ---------------------------------------
+# FUENFTE TRANSPORT-FALLE, GEHEILT AM 10.08.2026 (Posten ##20) -- die letzte still:
+#   (F5) DIE UEBERNAHME WURDE NIE NACHGEZAEHLT. Gestagt wurde das VERZEICHNIS
+#        ('git add -- "anhang/$lang/tabellen" 2>/dev/null || true'); ob die eben
+#        kopierten .tex dabei wirklich in den Index kamen, hat niemand gefragt.
+#        Nahm git sie nicht (.gitignore im Ziel-Repo, index.lock, fehlendes
+#        Schreibrecht), blieb 'changed' auf 0 -- und der Kanal sagte "IDEMPOTENT:
+#        0 Aenderungen", rc=0. DASSELBE WORT fuer "nichts hat sich geaendert" und
+#        "nichts ist angekommen". Am Objekt gemessen (10.08.2026, gewuerfelter
+#        Koeder): Ziel-Repo mit 'anhang/**/tabellen/*.tex' in der .gitignore ->
+#        "kopiert gesamt: 1 .tex" + "gestagte Aenderungen: 0" -> IDEMPOTENT, rc=0,
+#        Commits 1->1, Koeder NICHT im Blob. GEGENPROBE ohne die Ignorier-Regel,
+#        sonst identische Fixture: Commit, Koeder im committeten Blob. Der Messwert
+#        war weg und der Job gruen -- fail-OPEN, die teuerste Richtung.
+#
+# WARUM NICHT EINFACH DAS '|| true' FAELLT (so verlangte es Posten ##20 woertlich:
+#   "`|| true` beim git add faellt") -- am Objekt gemessen und WIDERLEGT: der CI-Job
+#   setzt AF_LANGS="de,en", eine Quelle darf aber legitim nur 'de' tragen. Dann gibt
+#   es 'anhang/en/tabellen' im Ziel gar nicht, 'git add' bricht mit "pathspec
+#   'anhang/en/tabellen' did not match any files" ab und 'set -e' toetet den ganzen
+#   Kanal -- gemessen: rc=128, kein Commit, obwohl die de-Haelfte fertig kopiert
+#   dalag. Das '|| true' war also nicht der Defekt, sondern die Kruecke fuer ein
+#   falsches Pathspec. Geheilt wird das PATHSPEC: gestagt wird genau das, was DIESER
+#   Lauf geschrieben hat -- die Buchfuehrungs-Liste $COPIED_LIST, die es fuer den
+#   Rollback ohnehin schon gibt. Damit kann 'git add' an einer nicht bedienten
+#   Sprache nicht mehr scheitern, und ein Fehlschlag ist wieder ein echter.
+#
+# SELBSTCHECK (##20, 2026-08-10):
+#   ZUGESICHERT: die Null bekommt ihren Nenner. Es wird IMMER gedruckt
+#     'Uebernahme-Nenner: kopiert=N im_index=M nicht_uebernommen=K git_add_fehler=F'.
+#     "0 Aenderungen" heisst ab jetzt belegbar "alle N liegen im Index und sind
+#     byte-gleich zum Bestand" -- und nicht mehr auch "keine ist angekommen".
+#   ZUGESICHERT: K>0 oder F>0 ist fail-loud (exit 1) und nennt die DATEINAMEN.
+#   NICHT zugesichert: der Push-/Merge-Retry-Pfad danach. Er bleibt ungedeckt
+#     (AF_NO_PUSH=true in allen Faellen), s. Testkritik in der Probe.
 echo "-- (3) Idempotenz-Pruefung im Ziel-Repo --"
-for lang in $LANGS; do
-  git -C "$AF_DEST_REPO" add -- "anhang/$lang/tabellen" 2>/dev/null || true
-done
+af_add_fehler=0
+while IFS= read -r rel; do
+  [ -n "$rel" ] || continue
+  git -C "$AF_DEST_REPO" add -- "$rel" || af_add_fehler=$((af_add_fehler + 1))
+done < "$COPIED_LIST"
+# DAS ORAKEL IST DER INDEX, NICHT DER RUECKGABEWERT: gefragt wird nicht, ob
+# 'git add' zufrieden aussah, sondern ob die Datei danach WIRKLICH drinsteht.
+NICHT_UEBERNOMMEN="$AF_TMP/nicht_uebernommen.txt"; : > "$NICHT_UEBERNOMMEN"
+nicht_uebernommen=0
+while IFS= read -r rel; do
+  [ -n "$rel" ] || continue
+  if ! git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$rel" >/dev/null 2>&1; then
+    nicht_uebernommen=$((nicht_uebernommen + 1))
+    printf '%s\n' "$rel" >> "$NICHT_UEBERNOMMEN"
+  fi
+done < "$COPIED_LIST"
+im_index=$((copied - nicht_uebernommen))
+_uebernahme="kopiert=$copied im_index=$im_index nicht_uebernommen=$nicht_uebernommen"
+echo "   Uebernahme-Nenner: $_uebernahme git_add_fehler=$af_add_fehler"
 changed=$(git -C "$AF_DEST_REPO" diff --cached --name-only | awk 'END{print NR+0}')
 echo "   gestagte Aenderungen: $changed Datei(en)"
 if [ "$changed" -gt 0 ]; then git -C "$AF_DEST_REPO" diff --cached --name-only | sed 's/^/     /'; fi
+# EINE Entscheidung ueber BEIDE Zahlen: sie sind zwei Symptome desselben Sachverhalts
+# -- die kopierte .tex hat den Index nicht erreicht. Zwei getrennte Abbrueche haetten
+# bedeutet, dass der erste den zweiten nie zum Zug kommen laesst; der zweite bliebe
+# dann ungedeckt, und ein Mutant auf ihn bliebe gruen.
+if [ "$nicht_uebernommen" -gt 0 ] || [ "$af_add_fehler" -gt 0 ]; then
+  echo "FEHLER: $nicht_uebernommen von $copied kopierten .tex sind NICHT im Index des" >&2
+  echo "        Ziel-Repos ('git add' meldete $af_add_fehler Fehlschlag/Fehlschlaege)." >&2
+  if [ -s "$NICHT_UEBERNOMMEN" ]; then sed 's/^/          /' "$NICHT_UEBERNOMMEN" >&2; fi
+  echo "        Bekannte Ursachen: .gitignore im Ziel-Repo, index.lock eines" >&2
+  echo "        Parallel-Laufs, fehlendes Schreibrecht auf dem Klon." >&2
+  echo "        Das ist KEIN Idempotenz-Fall: der Messwert waere still verloren und" >&2
+  echo "        der Job trotzdem gruen. Abbruch (fail-loud)." >&2
+  exit 1
+fi
 if git -C "$AF_DEST_REPO" diff --cached --quiet; then
   echo "=== anhang:forward IDEMPOTENT: 0 Aenderungen -> kein Commit ==="
+  echo "    belegt: alle $copied kopierten .tex liegen im Index und sind byte-gleich."
   exit 0
 fi
 if [ "$AF_DRY_RUN" = "true" ]; then
