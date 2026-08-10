@@ -123,6 +123,23 @@ std::span<const Mutant> katalog();
 // des Katalogs an GENAU EINER Stelle nachgezogen werden muss.
 inline constexpr std::size_t KATALOG_SOLL = 5;
 
+// ---- DAS SELBSTBEZUGS-PROBLEM, am eigenen Objekt gemessen ---------------------------
+// ERSTER LAUF 2026-08-10, woertlich: alle fuenf Mutanten "VOM-TEST-GETOETET" -- aber bei
+// M4 und M5 waren die EINZIGEN zwei roten Tests
+// MutationsKatalog.JederAnkerStehtGENAUSooftInDerECHTENProduktionsdatei und
+// MutationsKatalog.JederMutantVERAENDERTDieDateiWIRKLICH. Beide lesen die
+// Produktionsdatei VON DER PLATTE und werden deshalb von JEDEM Mutanten rot -- der
+// Harness toetete seine eigenen Mutanten. Die Ueberlebensrate waere per Konstruktion
+// immer 0 gewesen: das selbstreferenzielle Orakel in Reinform (Designplan V7, K5).
+//
+// DIE ABHILFE IST EIN MECHANISMUS, KEIN VORSATZ. Die Katalog-Faelle liegen in einem
+// EIGENEN ctest-Ziel mit dem Zusatz-Label unten; der Harness waehlt die Suite mit
+// `-LE <Label>` ab UND prueft danach die Auswahl per `ctest -N` gegen das Praefix.
+// Faellt die Abwahl aus (Label umbenannt, Ziel verschoben), ist das ein ABBRUCH --
+// fail-closed, nie ein stiller Nullwert.
+inline constexpr std::string_view SELBSTBEZUG_LABEL   = "mut_selbstbezug";
+inline constexpr std::string_view SELBSTBEZUG_PRAEFIX = "MutationsKatalog.";
+
 // ---- Die reinen Bausteine (ohne Datei, ohne Prozess) --------------------------------
 std::size_t zaehle_vorkommen(std::string_view heuhaufen, std::string_view nadel);
 
@@ -152,6 +169,16 @@ struct CtestBefund {
 
 CtestBefund lies_ctest_befund(std::string_view ausgabe);
 
+// Was `ctest -N` AUSWAEHLT. Der Harness braucht die NAMEN, nicht nur die Zahl: nur an
+// ihnen laesst sich belegen, dass kein selbstbezueglicher Fall in der Suite steckt.
+struct CtestListe {
+    bool                     gesamtzeile_gelesen = false;
+    int                      gesamt              = 0;
+    std::vector<std::string> namen;
+};
+
+CtestListe lies_ctest_liste(std::string_view ausgabe);
+
 // ---- Die Naht zur Aussenwelt --------------------------------------------------------
 // Dieselbe Bauform wie GitQuelle/XmlParser: bauen, Suite fahren und den Arbeitsbaum
 // befragen sind Parameter. Damit erreicht ein Test JEDEN der vier Ausgaenge, ohne
@@ -161,6 +188,7 @@ public:
     virtual ~LaufNaht()                      = default;
     virtual bool        baue()               = 0; // true = Bau gruen
     virtual std::string fahre_suite()        = 0; // die VOLLSTAENDIGE ctest-Ausgabe
+    virtual std::string liste_suite()        = 0; // `ctest -N` mit DERSELBEN Auswahl
     virtual std::string arbeitsbaum_status() = 0; // git status --porcelain, woertlich
     virtual std::string bezeichnung() const  = 0;
 };
@@ -174,6 +202,7 @@ public:
 
     bool        baue() override;
     std::string fahre_suite() override;
+    std::string liste_suite() override;
     std::string arbeitsbaum_status() override;
     std::string bezeichnung() const override;
 
@@ -181,6 +210,9 @@ public:
     const std::string& letzte_bau_ausgabe() const { return letzte_bau_ausgabe_; }
 
 private:
+    // Die Suite-Auswahl -- EINE Quelle fuer den Mess-Lauf und fuer die Auswahl-Liste.
+    std::vector<std::string> auswahl_argumente() const;
+
     std::filesystem::path repo_;
     std::filesystem::path bau_;
     std::string           label_;
@@ -191,6 +223,8 @@ private:
 // ---- Warum ein ganzer Lauf abbrechen kann -------------------------------------------
 enum class LaufAbbruchGrund {
     BaumSchmutzigVorher,       // ohne sauberen Baum ist "byte-gleich danach" nicht belegbar
+    SuiteAuswahlUnlesbar,      // `ctest -N` hat keine Gesamtzeile geliefert
+    SelbstbezugInDerSuite,     // die Katalog-Faelle stecken in der gemessenen Suite (s. Kopf)
     GrundlaufBauRot,           // schon ohne Mutation kaputt -- kein Mutant waere zurechenbar
     GrundlaufSuiteUnlesbar,    // ctest hat nicht geantwortet
     GrundlaufSuiteRot,         // K13 Gegenkoeder verletzt: der unmanipulierte Lauf ist NICHT gruen
@@ -200,12 +234,13 @@ enum class LaufAbbruchGrund {
 };
 
 inline constexpr LaufAbbruchGrund alle_lauf_abbruch_gruende[] = {
-    LaufAbbruchGrund::BaumSchmutzigVorher,    LaufAbbruchGrund::GrundlaufBauRot,
+    LaufAbbruchGrund::BaumSchmutzigVorher,    LaufAbbruchGrund::SuiteAuswahlUnlesbar,
+    LaufAbbruchGrund::SelbstbezugInDerSuite,  LaufAbbruchGrund::GrundlaufBauRot,
     LaufAbbruchGrund::GrundlaufSuiteUnlesbar, LaufAbbruchGrund::GrundlaufSuiteRot,
     LaufAbbruchGrund::GrundlaufLeererNenner,  LaufAbbruchGrund::RuecknahmeNichtByteGleich,
     LaufAbbruchGrund::BaumSchmutzigNachher,
 };
-static_assert(sizeof(alle_lauf_abbruch_gruende) / sizeof(alle_lauf_abbruch_gruende[0]) == 7,
+static_assert(sizeof(alle_lauf_abbruch_gruende) / sizeof(alle_lauf_abbruch_gruende[0]) == 9,
               "LaufAbbruchGrund hat einen neuen Wert -- Tabelle und Fall-Tabellen nachziehen.");
 
 std::string          lauf_abbruch_text(LaufAbbruchGrund grund);
@@ -226,14 +261,17 @@ struct MutantLaufErgebnis {
 };
 
 struct MutationsLaufErgebnis {
-    WacheStatus                     status            = WacheStatus::Abbruch; // fail-closed
-    std::size_t                     katalog_gesamt    = 0;                    // DER NENNER
-    std::size_t                     gefahren          = 0;
-    std::size_t                     vom_bau_getoetet  = 0;
-    std::size_t                     vom_test_getoetet = 0;
-    std::size_t                     ueberlebend       = 0;
-    std::size_t                     harness_abbruch   = 0;
-    int                             basis_tests       = 0; // Suite-Nenner aus dem Grundlauf
+    WacheStatus status            = WacheStatus::Abbruch; // fail-closed
+    std::size_t katalog_gesamt    = 0;                    // DER NENNER
+    std::size_t gefahren          = 0;
+    std::size_t vom_bau_getoetet  = 0;
+    std::size_t vom_test_getoetet = 0;
+    std::size_t ueberlebend       = 0;
+    std::size_t harness_abbruch   = 0;
+    int         basis_tests       = 0; // Suite-Nenner aus dem Grundlauf
+    // Was `ctest -N` mit DERSELBEN Auswahl aufzaehlt. Zweite, unabhaengige Quelle fuer
+    // denselben Nenner (V-7): weicht sie vom Grundlauf ab, wurden Tests uebersprungen.
+    int                             suite_auswahl = 0;
     std::optional<LaufAbbruchGrund> abbruch;
     std::string                     abbruch_detail;
     std::vector<MutantLaufErgebnis> je_mutant;

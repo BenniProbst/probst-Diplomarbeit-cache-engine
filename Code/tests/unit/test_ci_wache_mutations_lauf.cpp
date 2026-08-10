@@ -42,6 +42,7 @@
 using comdare::ci_wachen::alle_mutant_ausgaenge;
 using comdare::ci_wachen::alle_testklassen;
 using comdare::ci_wachen::CtestBefund;
+using comdare::ci_wachen::CtestListe;
 using comdare::ci_wachen::ersetze_genau;
 using comdare::ci_wachen::ErsetzErgebnis;
 using comdare::ci_wachen::fahre_mutationslauf;
@@ -50,11 +51,14 @@ using comdare::ci_wachen::KATALOG_SOLL;
 using comdare::ci_wachen::LaufAbbruchGrund;
 using comdare::ci_wachen::LaufNaht;
 using comdare::ci_wachen::lies_ctest_befund;
+using comdare::ci_wachen::lies_ctest_liste;
 using comdare::ci_wachen::lies_datei_ganz;
 using comdare::ci_wachen::Mutant;
 using comdare::ci_wachen::MutantAusgang;
 using comdare::ci_wachen::MutationsLaufErgebnis;
 using comdare::ci_wachen::schreibe_datei_ganz;
+using comdare::ci_wachen::SELBSTBEZUG_LABEL;
+using comdare::ci_wachen::SELBSTBEZUG_PRAEFIX;
 using comdare::ci_wachen::Testklasse;
 using comdare::ci_wachen::WacheStatus;
 using comdare::ci_wachen::zaehle_vorkommen;
@@ -62,7 +66,9 @@ using comdare::ci_wachen::werkbank::Wuerfel;
 
 namespace {
 
-std::filesystem::path repo_wurzel() { return std::filesystem::path(COMDARE_REPO_WURZEL_MUT); }
+// KEIN Zugriff auf den echten Baum in DIESER Datei -- das ist Absicht und der Kern der
+// Trennung: die Faelle, die die Produktionsdateien lesen, liegen in
+// test_ci_wache_mutations_katalog.cpp und tragen dort das Label mut_selbstbezug.
 
 // Ein Wegwerf-Verzeichnis. Kein git noetig: der Arbeitsbaum-Status kommt in diesen
 // Faellen aus der Fake-Naht, nicht aus git.
@@ -101,6 +107,8 @@ public:
     int                      bau_aufrufe    = 0;
     int                      suite_aufrufe  = 0;
     int                      status_aufrufe = 0;
+    // Vorgabe: eine gesunde `ctest -N`-Auswahl ohne selbstbezuegliche Faelle.
+    std::string listen_antwort = "Test project /irgendwo\n  Test #1: Alpha.Beta\n\nTotal Tests: 1\n";
 
     bool baue() override {
         const std::size_t i = static_cast<std::size_t>(bau_aufrufe++);
@@ -112,6 +120,7 @@ public:
         if (suite_antworten.empty()) return {};
         return suite_antworten[std::min(i, suite_antworten.size() - 1)];
     }
+    std::string liste_suite() override { return listen_antwort; }
     std::string arbeitsbaum_status() override { return (status_aufrufe++ == 0) ? status_vorher : status_nachher; }
     std::string bezeichnung() const override { return "FakeLaufNaht"; }
 };
@@ -152,73 +161,6 @@ struct MutantHalter {
 };
 
 } // namespace
-
-// =============================================================================
-// 1. DER KATALOG GEGEN DIE ECHTEN PRODUKTIONSDATEIEN
-// =============================================================================
-
-TEST(MutationsKatalog, NennerIstFUENFUndJedeIdKommtGENAUEinmalVor) {
-    // T-3: der Nenner steht als eingefrorene Konstante NEBEN dem Katalog, nicht in ihm,
-    // und die Zusicherung steht VOR der Schleife.
-    ASSERT_EQ(katalog().size(), KATALOG_SOLL) << "Der Katalog ist gewachsen/geschrumpft.";
-    ASSERT_EQ(KATALOG_SOLL, 5u) << "Der Auftrag verlangt FUENF Mutanten.";
-
-    std::vector<std::string> ids;
-    for (const Mutant& m : katalog()) ids.emplace_back(m.id);
-    std::vector<std::string> sortiert = ids;
-    std::sort(sortiert.begin(), sortiert.end());
-    ASSERT_EQ(std::unique(sortiert.begin(), sortiert.end()) - sortiert.begin(), static_cast<long>(ids.size()))
-        << "Doppelte Mutanten-ID -- die Ergebnisse waeren nicht mehr zuzuordnen.";
-}
-
-TEST(MutationsKatalog, JederAnkerStehtGENAUSooftInDerECHTENProduktionsdatei) {
-    // DAS IST DIE LEBENDE WACHE. Formatiert jemand eine der vier Produktionsdateien um,
-    // wird dieser Test rot -- statt dass der Harness spaeter still ins Leere mutiert und
-    // "alle Mutanten getoetet" meldet.
-    ASSERT_EQ(katalog().size(), KATALOG_SOLL);
-    std::size_t geprueft = 0;
-    for (const Mutant& m : katalog()) {
-        const std::filesystem::path datei  = repo_wurzel() / std::string(m.datei);
-        const auto                  inhalt = lies_datei_ganz(datei);
-        ASSERT_TRUE(inhalt.has_value()) << "Produktionsdatei nicht lesbar: " << datei.string();
-        EXPECT_EQ(zaehle_vorkommen(*inhalt, m.suchen), m.erwartete_treffer)
-            << "Mutant " << m.id << ": der Anker passt nicht mehr auf " << m.datei;
-        ++geprueft;
-    }
-    EXPECT_EQ(geprueft, KATALOG_SOLL) << "NENNER: es wurden nicht alle Katalog-Anker geprueft.";
-}
-
-TEST(MutationsKatalog, JederMutantVERAENDERTDieDateiWIRKLICH) {
-    // Anwesenheit des Ankers genuegt nicht (T-2). Die Ersetzung muss einen ANDEREN
-    // Dateiinhalt ergeben -- sonst waere der Mutant per Konstruktion ueberlebensfaehig.
-    ASSERT_EQ(katalog().size(), KATALOG_SOLL);
-    for (const Mutant& m : katalog()) {
-        const auto inhalt = lies_datei_ganz(repo_wurzel() / std::string(m.datei));
-        ASSERT_TRUE(inhalt.has_value()) << m.id;
-        const ErsetzErgebnis e = ersetze_genau(*inhalt, m.suchen, m.ersetzen, m.erwartete_treffer);
-        ASSERT_TRUE(e.ok) << m.id << ": " << e.diagnose;
-        EXPECT_NE(e.inhalt, *inhalt) << "Mutant " << m.id << " aendert die Datei NICHT.";
-    }
-}
-
-TEST(MutationsKatalog, JedeGefuehrteTestklasseKommtImKatalogVor) {
-    // Vollstaendigkeits-Tabelle: waechst Testklasse, faellt zuerst der static_assert im
-    // Header, dann dieser Fall. Der Auftrag nennt beide Klassen ausdruecklich.
-    ASSERT_EQ(sizeof(alle_testklassen) / sizeof(alle_testklassen[0]), 2u);
-    for (const Testklasse klasse : alle_testklassen) {
-        const bool vorhanden =
-            std::any_of(katalog().begin(), katalog().end(), [&](const Mutant& m) { return m.klasse == klasse; });
-        EXPECT_TRUE(vorhanden) << "Keine Mutante der Klasse " << klasse << " im Katalog.";
-    }
-}
-
-TEST(MutationsKatalog, JederMutantNenntEineAussageUndMindestensEineVorhersage) {
-    ASSERT_EQ(katalog().size(), KATALOG_SOLL);
-    for (const Mutant& m : katalog()) {
-        EXPECT_FALSE(m.aussage.empty()) << m.id << ": ohne benannte Aussage ist ein Mutant nur Rauschen.";
-        EXPECT_FALSE(m.erwartet_rot[0].empty()) << m.id << ": ohne Vorhersage ist das Ergebnis nicht pruefbar.";
-    }
-}
 
 // =============================================================================
 // 2. ersetze_genau -- die Fail-Closed-Kante
@@ -391,6 +333,7 @@ TEST(MutationsLauf, WAEHREND_DesLaufsIstDieDateiWIRKLICHMutiert) {
         std::string fahre_suite() override {
             return (++suite_aufrufe == 1) ? ctest_ausgabe(0, 310, {}) : ctest_ausgabe(1, 310, {"Vorhergesagt.Rot"});
         }
+        std::string liste_suite() override { return "  Test #1: Alpha.Beta\n\nTotal Tests: 1\n"; }
         std::string arbeitsbaum_status() override { return {}; }
         std::string bezeichnung() const override { return "SpaehendeNaht"; }
     } naht;
@@ -598,4 +541,96 @@ TEST(MutationsLauf, DER_NENNER_IST_EINE_IDENTITAET_UndStehtInDerAUSGABE) {
     EXPECT_THAT(text, testing::HasSubstr("2 Mutanten im Katalog, 2 gefahren"));
     EXPECT_THAT(text, testing::HasSubstr("Suite-Nenner: 310 Tests je Lauf"));
     EXPECT_THAT(text, testing::HasSubstr("UEBERLEBENSRATE: 1 von 2"));
+}
+
+// =============================================================================
+// 5. DER SELBSTBEZUGS-RIEGEL -- die Lehre aus dem ersten Lauf
+// =============================================================================
+
+TEST(CtestListe, AUSWAHL_WirdMitNAMENGelesenNichtNurGezaehlt) {
+    // Eingefrorenes Literal in der ECHTEN Form von `ctest -N` (erhoben 2026-08-10,
+    // ctest 3.28, Bauverzeichnis Code/build/mut).
+    const std::string ausgabe = "Test project /home/comdare/wt-super-d3naht/Code/build/mut\n"
+                                "  Test #504: MutationsLauf.BAUM_NACH_DEM_LAUF_SCHMUTZIG_IstAbbruch\n"
+                                "  Test #505: MutationsLauf.VORHERSAGE_VERFEHLT_WirdBENANNT\n"
+                                "\n"
+                                "Total Tests: 2\n";
+    const CtestListe  liste   = lies_ctest_liste(ausgabe);
+    ASSERT_TRUE(liste.gesamtzeile_gelesen);
+    EXPECT_EQ(liste.gesamt, 2);
+    ASSERT_EQ(liste.namen.size(), 2u);
+    EXPECT_EQ(liste.namen[0], "MutationsLauf.BAUM_NACH_DEM_LAUF_SCHMUTZIG_IstAbbruch");
+    EXPECT_EQ(liste.namen[1], "MutationsLauf.VORHERSAGE_VERFEHLT_WirdBENANNT");
+}
+
+TEST(CtestListe, OHNE_GesamtzeileIstNICHTGelesen) {
+    const CtestListe liste = lies_ctest_liste("ctest: kein Bauverzeichnis\n");
+    EXPECT_FALSE(liste.gesamtzeile_gelesen);
+    EXPECT_EQ(liste.gesamt, 0) << "0 darf hier NICHT als 'leere Suite' gelesen werden";
+}
+
+TEST(MutationsLauf, SELBSTBEZUG_IN_DER_SUITE_IstAbbruchVorDemErstenMutanten) {
+    // DER FALL, DEN DER ERSTE LAUF AM 10.08. GEZEIGT HAT: liegt ein Katalog-Fall in der
+    // gemessenen Suite, toetet er JEDEN Mutanten und die Ueberlebensrate ist eine
+    // Konstante. Der Harness darf dann gar nicht erst messen.
+    Wuerfel wuerfel;
+    RecordProperty("wuerfel_seed", std::to_string(wuerfel.seed()));
+    Fixture      fix(wuerfel, "ANKER_" + wuerfel.token(8));
+    const Mutant m = fix.halter.mutant();
+
+    FakeLaufNaht naht;
+    naht.listen_antwort  = "  Test #1: Alpha.Beta\n"
+                           "  Test #2: " +
+                           std::string(SELBSTBEZUG_PRAEFIX) +
+                           "JederAnkerSteht\n"
+                           "\nTotal Tests: 2\n";
+    naht.suite_antworten = {ctest_ausgabe(0, 2, {})};
+
+    const auto e = fahre_mutationslauf(fix.baum.pfad(), naht, std::span<const Mutant>(&m, 1));
+    ASSERT_TRUE(e.abbruch.has_value());
+    EXPECT_EQ(*e.abbruch, LaufAbbruchGrund::SelbstbezugInDerSuite);
+    EXPECT_EQ(e.gefahren, 0u);
+    EXPECT_EQ(naht.bau_aufrufe, 0) << "es darf nicht einmal gebaut worden sein";
+    EXPECT_THAT(e.abbruch_detail, testing::HasSubstr("JederAnkerSteht"));
+
+    // GEGENPROBE (T-4): dieselbe Naht ohne den selbstbezueglichen Eintrag laeuft durch.
+    FakeLaufNaht sauber;
+    sauber.suite_antworten = {ctest_ausgabe(0, 2, {}), ctest_ausgabe(1, 2, {"Vorhergesagt.Rot"})};
+    const auto gut         = fahre_mutationslauf(fix.baum.pfad(), sauber, std::span<const Mutant>(&m, 1));
+    EXPECT_FALSE(gut.abbruch.has_value());
+    EXPECT_EQ(gut.gefahren, 1u);
+}
+
+TEST(MutationsLauf, UNLESBARE_AUSWAHL_IstAbbruchNichtLeereSuite) {
+    Wuerfel wuerfel;
+    RecordProperty("wuerfel_seed", std::to_string(wuerfel.seed()));
+    Fixture      fix(wuerfel, "ANKER_" + wuerfel.token(8));
+    const Mutant m = fix.halter.mutant();
+
+    FakeLaufNaht naht;
+    naht.listen_antwort  = "ctest: --test-dir zeigt ins Leere\n";
+    naht.suite_antworten = {ctest_ausgabe(0, 2, {})};
+
+    const auto e = fahre_mutationslauf(fix.baum.pfad(), naht, std::span<const Mutant>(&m, 1));
+    ASSERT_TRUE(e.abbruch.has_value());
+    EXPECT_EQ(*e.abbruch, LaufAbbruchGrund::SuiteAuswahlUnlesbar);
+}
+
+TEST(MutationsLauf, DIE_ABGEWAEHLTE_MENGE_StehtInDerAUSGABE) {
+    // V-1: was der Harness NICHT gemessen hat, gehoert in seine Ausgabe -- sonst liest
+    // ein spaeterer Leser die Rate, ohne die Auswahl zu kennen.
+    Wuerfel wuerfel;
+    RecordProperty("wuerfel_seed", std::to_string(wuerfel.seed()));
+    Fixture      fix(wuerfel, "ANKER_" + wuerfel.token(8));
+    const Mutant m = fix.halter.mutant();
+
+    FakeLaufNaht naht;
+    naht.listen_antwort  = "  Test #1: Alpha.Beta\n  Test #2: Gamma.Delta\n\nTotal Tests: 2\n";
+    naht.suite_antworten = {ctest_ausgabe(0, 2, {}), ctest_ausgabe(1, 2, {"Vorhergesagt.Rot"})};
+
+    const auto        e    = fahre_mutationslauf(fix.baum.pfad(), naht, std::span<const Mutant>(&m, 1));
+    const std::string text = e.protokoll();
+    EXPECT_EQ(e.suite_auswahl, 2);
+    EXPECT_THAT(text, testing::HasSubstr(std::string(SELBSTBEZUG_LABEL)));
+    EXPECT_THAT(text, testing::HasSubstr("2 aus 'ctest -N'"));
 }

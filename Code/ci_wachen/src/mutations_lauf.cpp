@@ -155,6 +155,8 @@ std::string klasse_text(Testklasse klasse) {
 std::string lauf_abbruch_text(LaufAbbruchGrund grund) {
     switch (grund) {
         case LaufAbbruchGrund::BaumSchmutzigVorher: return "BaumSchmutzigVorher";
+        case LaufAbbruchGrund::SuiteAuswahlUnlesbar: return "SuiteAuswahlUnlesbar";
+        case LaufAbbruchGrund::SelbstbezugInDerSuite: return "SelbstbezugInDerSuite";
         case LaufAbbruchGrund::GrundlaufBauRot: return "GrundlaufBauRot";
         case LaufAbbruchGrund::GrundlaufSuiteUnlesbar: return "GrundlaufSuiteUnlesbar";
         case LaufAbbruchGrund::GrundlaufSuiteRot: return "GrundlaufSuiteRot";
@@ -244,6 +246,27 @@ CtestBefund lies_ctest_befund(std::string_view ausgabe) {
     return befund;
 }
 
+CtestListe lies_ctest_liste(std::string_view ausgabe) {
+    CtestListe                     liste;
+    const std::vector<std::string> zeilen = in_zeilen(ausgabe);
+    for (const std::string& zeile : zeilen) {
+        int gesamt = 0;
+        if (std::sscanf(zeile.c_str(), "Total Tests: %d", &gesamt) == 1) {
+            liste.gesamtzeile_gelesen = true;
+            liste.gesamt              = gesamt;
+            continue;
+        }
+        // "  Test #504: Name.Fall" -- der Name beginnt hinter dem Doppelpunkt.
+        std::size_t i = 0;
+        while (i < zeile.size() && (zeile[i] == ' ' || zeile[i] == '\t')) ++i;
+        if (zeile.compare(i, 6, "Test #") != 0) continue;
+        const std::size_t doppelpunkt = zeile.find(": ", i);
+        if (doppelpunkt == std::string::npos) continue;
+        liste.namen.push_back(zeile.substr(doppelpunkt + 2));
+    }
+    return liste;
+}
+
 std::optional<std::string> lies_datei_ganz(const std::filesystem::path& datei) {
     std::error_code fehler;
     if (!std::filesystem::is_regular_file(datei, fehler) || fehler) return std::nullopt;
@@ -281,9 +304,29 @@ bool EchteLaufNaht::baue() {
     return exit_code(aus).value_or(-1) == 0;
 }
 
+// DIE AUSWAHL STEHT AN GENAU EINER STELLE. Waeren `fahre_suite` und `liste_suite`
+// verschieden gefiltert, prueefte der Selbstbezugs-Riegel eine andere Menge als die
+// gemessene -- eine Abschrift ist eine Gelegenheit zur Divergenz (ergebnis.hpp).
+std::vector<std::string> EchteLaufNaht::auswahl_argumente() const {
+    return {"--test-dir", bau_.string(), "-L", label_, "-LE", std::string(SELBSTBEZUG_LABEL)};
+}
+
 std::string EchteLaufNaht::fahre_suite() {
     ProzessAuftrag auftrag;
-    auftrag.argv             = {"ctest", "--test-dir", bau_.string(), "-L", label_, "-j", "4", "--output-on-failure"};
+    auftrag.argv = {"ctest"};
+    for (const std::string& teil : auswahl_argumente()) auftrag.argv.push_back(teil);
+    auftrag.argv.push_back("-j");
+    auftrag.argv.push_back("4");
+    auftrag.argv.push_back("--output-on-failure");
+    const ProzessAusgang aus = fuehre_aus(auftrag);
+    return aus.ausgabe + aus.fehler;
+}
+
+std::string EchteLaufNaht::liste_suite() {
+    ProzessAuftrag auftrag;
+    auftrag.argv = {"ctest"};
+    for (const std::string& teil : auswahl_argumente()) auftrag.argv.push_back(teil);
+    auftrag.argv.push_back("-N");
     const ProzessAusgang aus = fuehre_aus(auftrag);
     return aus.ausgabe + aus.fehler;
 }
@@ -315,6 +358,27 @@ MutationsLaufErgebnis fahre_mutationslauf(const std::filesystem::path& repo, Lau
         ergebnis.abbruch_detail = status_vorher;
         return ergebnis;
     }
+
+    // (0b) DER SELBSTBEZUGS-RIEGEL. Gemessen am eigenen Objekt (erster Lauf 10.08.):
+    //      die Katalog-Faelle des Harness lesen die Produktionsdatei und werden von
+    //      JEDEM Mutanten rot -- sie toeteten alle fuenf und machten die Ueberlebensrate
+    //      zu einer Konstanten. Hier wird die tatsaechliche AUSWAHL befragt, nicht die
+    //      Absicht: steht ein Fall mit dem Selbstbezugs-Praefix drin, ist das ABBRUCH.
+    const CtestListe auswahl = lies_ctest_liste(naht.liste_suite());
+    if (!auswahl.gesamtzeile_gelesen) {
+        ergebnis.abbruch        = LaufAbbruchGrund::SuiteAuswahlUnlesbar;
+        ergebnis.abbruch_detail = "'ctest -N' hat keine 'Total Tests:'-Zeile geliefert";
+        return ergebnis;
+    }
+    for (const std::string& name : auswahl.namen) {
+        if (name.rfind(std::string(SELBSTBEZUG_PRAEFIX), 0) == 0) {
+            ergebnis.abbruch = LaufAbbruchGrund::SelbstbezugInDerSuite;
+            ergebnis.abbruch_detail =
+                "selbstbezueglicher Fall in der gemessenen Suite: " + name + " -- er wird von JEDEM Mutanten rot";
+            return ergebnis;
+        }
+    }
+    ergebnis.suite_auswahl = auswahl.gesamt;
 
     // (1) DER GEGENKOEDER (K13): der UNMANIPULIERTE Lauf muss gruen sein. Ist er es
     //     nicht, ist kein einziger Mutant zurechenbar.
@@ -496,7 +560,12 @@ std::string MutationsLaufErgebnis::protokoll() const {
     aus << "  " << katalog_gesamt << " Mutanten im Katalog, " << gefahren << " gefahren.\n";
     aus << "  " << vom_test_getoetet << " von der SUITE getoetet, " << vom_bau_getoetet << " vom UEBERSETZER getoetet, "
         << ueberlebend << " UEBERLEBEND, " << harness_abbruch << " Harness-Abbruch.\n";
-    aus << "  Suite-Nenner: " << basis_tests << " Tests je Lauf (aus der ctest-Zusammenfassung).\n";
+    aus << "  Suite-Nenner: " << basis_tests << " Tests je Lauf (aus der ctest-Zusammenfassung), " << suite_auswahl
+        << " aus 'ctest -N' -- zwei Quellen fuer dieselbe Zahl.\n";
+    aus << "  ABGEWAEHLT: alle Faelle mit Label '" << SELBSTBEZUG_LABEL << "' (Praefix '" << SELBSTBEZUG_PRAEFIX
+        << "').\n";
+    aus << "   Sie lesen die Produktionsdatei und werden von JEDEM Mutanten rot -- in der\n";
+    aus << "   Suite belassen wuerden sie jeden Mutanten toeten und die Rate auf 0 nageln.\n";
     aus << "  UEBERLEBENSRATE: " << ueberlebend << " von " << gefahren
         << " gefahrenen Mutanten ueberleben die Suite.\n";
     aus << "  (Ein vom Uebersetzer getoeteter Mutant ist KEIN Beleg fuer Test-Deckung -- die\n";

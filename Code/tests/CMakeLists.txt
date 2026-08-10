@@ -185,9 +185,26 @@ comdare_da_add_test(test_ci_wache_mutations_lauf
     SOURCES unit/test_ci_wache_mutations_lauf.cpp
     LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
     LABELS ci_wachen)
-target_compile_definitions(test_ci_wache_mutations_lauf PRIVATE
-    "COMDARE_REPO_WURZEL_MUT=\"${CMAKE_SOURCE_DIR}/..\"")
 add_dependencies(test_ci_wache_mutations_lauf ci_mutations_lauf)
+
+# ── DAS ZWEITE ZIEL: die Katalog-Faelle, ABGEWAEHLT vom Mess-Lauf ────────────────────
+# Sie lesen die Produktionsdateien von der Platte und sind deshalb unter JEDEM Mutanten
+# rot -- unabhaengig davon, ob die Suite den Fehler wirklich faengt. Am Objekt gemessen
+# (erster Harness-Lauf 10.08.): sie toeteten alle fuenf Mutanten, waehrend die
+# vorhergesagten Deckungstests bei M4 und M5 gruen blieben. Die Rate "0 von 5" war eine
+# Konstante des Aufbaus, keine Messung.
+#
+# Das ZUSATZ-LABEL mut_selbstbezug ist der Mechanismus: der Harness faehrt die Suite mit
+# `-LE mut_selbstbezug`. Es steht hier -- die Zeichenkette selbst kommt aus
+# comdare::ci_wachen::SELBSTBEZUG_LABEL, und der Fall
+# MutationsKatalog.DIE_ABWAHL_StehtPOSITIONSGEBUNDENInDerCMakeDatei haelt beide
+# zusammen: er liest DIESE Datei und verlangt das Label GENAU in diesem Ziel-Block.
+comdare_da_add_test(test_ci_wache_mutations_katalog
+    SOURCES unit/test_ci_wache_mutations_katalog.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen mut_selbstbezug)
+target_compile_definitions(test_ci_wache_mutations_katalog PRIVATE
+    "COMDARE_REPO_WURZEL_MUT=\"${CMAKE_SOURCE_DIR}/..\"")
 
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
