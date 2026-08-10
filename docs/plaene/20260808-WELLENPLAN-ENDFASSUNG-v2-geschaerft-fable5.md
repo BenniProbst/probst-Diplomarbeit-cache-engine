@@ -250,7 +250,30 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 > Selbsttest (Fixture mit von Hand abgezähltem Inventar, T-3): **11 von 11 Fällen grün**, davor
 > **8 von 11 rot** — der Rot-Lauf ging dem Bau voraus (T-1).
 >
-> <!-- ABNAHME06-ZAHLEN bedingte_registrierungen=18 bedingungs_klassen=14 quelle=ce/tests/unit/CMakeLists.txt erhoben=2026-08-09 host=prod1/avx512f -->
+> **NACHZUG 10.08.2026 — DIE VIER PRT-ART-REGISTRIERUNGEN SIND ENTFALLEN, DIE ZAHLEN ZIEHEN NACH.**
+> Der Gitlink-Bump auf `ce e114cabd` (super `0e11e1f8`) hat es ausgelöst, und **beide Wachen haben
+> gefangen**, was sonst still falsch geworden wäre — super-Pipeline **15615**, Jobs **373214** und
+> **373217**.
+>
+> | Zahl | alt (09.08., Stand `1880f296`) | neu (10.08., Stand `e114cabd`) |
+> |---|---|---|
+> | `bedingte_registrierungen` | 18 | **14** |
+> | `bedingungs_klassen` | 14 | **13** |
+> | Allowlist `stellen_soll` | 6 | **2** |
+>
+> **Die Differenz ist exakt die Allowlist-Position `COMDARE_PRT_ART_LEGACY_AVAILABLE`** (18 − 4 = 14).
+> Am Objekt gemessen: die Bedingung kommt in `ce tests/unit/CMakeLists.txt` nur noch **zweimal** vor
+> — `:87` auskommentiert, `:148` im Erklärungstext. **Beide sind Kommentare.** Der Code begründet den
+> Wegfall selbst (`:148`): *„ein Gatter, das per Konstruktion nie TRUE werden konnte"*; die drei
+> Quelldateien liegen weiter im Baum, ihre Disposition ist **Ledger PA-3 (Owner)**.
+>
+> Der Allowlist-Eintrag ist damit **aufgehoben** — nicht gelöscht, sondern in
+> `ci/abnahme06_bedingungs_allowlist.txt` auskommentiert mit voller Begründung. Es war die
+> `ist < soll`-Richtung (`soll=4 ist=0`), also *„eine tote Ausnahme, deren Begründungstext ab dann
+> falsch ist"* — genau der Fall, für den der Nachtrag D2-G4/Z die Zusicherung gebaut hat.
+> **Zum ersten Mal hat die `ist<soll`-Hälfte gebissen**; bisher war nur die Schleichweg-Richtung belegt.
+
+> <!-- ABNAHME06-ZAHLEN bedingte_registrierungen=14 bedingungs_klassen=13 quelle=ce/tests/unit/CMakeLists.txt erhoben=2026-08-10 host=prod1/avx512f -->
 
 > **FUSSNOTE D2-G5 — RICHTIGSTELLUNG 08.08.2026, am Objekt gemessen, nicht abgeschrieben.**
 > Die Planzeile „6 von 428 Tests registrieren sich nur auf AVX-512-Hosts" ist als Satz **falsch**,

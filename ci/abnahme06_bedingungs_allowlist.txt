@@ -46,5 +46,24 @@
 # sondern scripts/ci_host_klassen_bericht.sh (3 Zahlen, mit Host-Kennung).
 # =============================================================================
 
-COMDARE_PRT_ART_LEGACY_AVAILABLE	stellen=4	Deckt 4 Registrierungen (test_concepts_compile, test_value_handle, test_three_layer_audit, test_six_page_structures). Das Gatter ist reine Datei-Existenz: tests/unit/CMakeLists.txt:96-99 setzt TRUE nur, wenn ${PROJECT_SOURCE_DIR}/prt_art/include/prt_art/prt_art.hpp existiert. Am 09.08.2026 nachgesehen: das Verzeichnis prt_art/ existiert weder in wt-ce-xml (404ff6cf) noch im vendorierten ce des super (a1d0c201), und das super-Submodul Code/external/comdare-prt-art ist NICHT AUSGECHECKT (leeres Verzeichnis). Auf ALLEN heute erreichbaren Maschinenklassen (prod1/avx512f wie prod2/avx2) ist die Bedingung damit FALSE. Verfuegbar wuerde sie erst mit befuelltem prt-art-Kontext (COMDARE_CE_PRUEFLINGE). AUFHEBUNG DIESES EINTRAGS: sobald das prt-art-Submodul in einem Bauweg ausgecheckt wird -- dann muessen die 4 Tests erfuellt sein, und dieser Eintrag faellt.
+# ---------------------------------------------------------------------------
+# AUFGEHOBEN 10.08.2026 -- der Eintrag ist TOT, nicht erfuellt. Er bleibt hier
+# auskommentiert stehen (Doku wird deprecatet, nicht geloescht).
+#
+# GRUND, am Objekt gemessen im vendorierten ce e114cabd: die Bedingung
+# COMDARE_PRT_ART_LEGACY_AVAILABLE kommt in tests/unit/CMakeLists.txt nur noch
+# ZWEIMAL vor -- :87 auskommentiert, :148 im Erklaerungstext. BEIDE sind
+# Kommentare. Die vier Registrierungen wurden BEWUSST entfernt; der Code
+# begruendet es selbst (:148): "ein Gatter, das per Konstruktion nie TRUE
+# werden konnte". Die drei Quelldateien liegen weiter im Baum, ihre
+# Disposition ist Ledger PA-3 (Owner).
+#
+# Die Zusicherungs-Wache hat das gefangen: soll=4 ist=0, also die
+# ist<soll-Richtung -- "eine tote Ausnahme, deren Begruendungstext ab dann
+# falsch ist" (Fussnote D2-G4/Z). Genau wofuer sie gebaut wurde.
+#
+# WIEDERAUFNAHME: sollten die vier Registrierungen je zurueckkehren, gehoert
+# der Eintrag mit NEU GEZAEHLTER stellen-Zahl zurueck -- nicht mit dieser.
+# ---------------------------------------------------------------------------
+# COMDARE_PRT_ART_LEGACY_AVAILABLE	stellen=4	Deckt 4 Registrierungen (test_concepts_compile, test_value_handle, test_three_layer_audit, test_six_page_structures). Das Gatter ist reine Datei-Existenz: tests/unit/CMakeLists.txt:96-99 setzt TRUE nur, wenn ${PROJECT_SOURCE_DIR}/prt_art/include/prt_art/prt_art.hpp existiert. Am 09.08.2026 nachgesehen: das Verzeichnis prt_art/ existiert weder in wt-ce-xml (404ff6cf) noch im vendorierten ce des super (a1d0c201), und das super-Submodul Code/external/comdare-prt-art ist NICHT AUSGECHECKT (leeres Verzeichnis). Auf ALLEN heute erreichbaren Maschinenklassen (prod1/avx512f wie prod2/avx2) ist die Bedingung damit FALSE. Verfuegbar wuerde sie erst mit befuelltem prt-art-Kontext (COMDARE_CE_PRUEFLINGE). AUFHEBUNG DIESES EINTRAGS: sobald das prt-art-Submodul in einem Bauweg ausgecheckt wird -- dann muessen die 4 Tests erfuellt sein, und dieser Eintrag faellt.
 do_run	stellen=2	Deckt 2 Registrierungs-STELLEN in den Hausfunktionen comdare_add_simd_dispatch_test und comdare_add_simd_add_u64_test. Der Testname entsteht dort erst aus einem Suffix-Parameter (add_test(NAME ${_tgt} ...)), ist also im Quelltext statisch nicht bestimmbar; ein geratener Name waere ein erfundener Widerspruch. Diese zwei Stellen sind deshalb strukturell nie "erfuellt" im Sinne dieser Wache -- NICHT weil sie fehlen, sondern weil dieser Zaehler sie nicht benennen kann. GEGENSTUECK, das sie sehr wohl aufloest: scripts/ci_host_klassen_bericht.sh loest die Aufrufstellen auf und weist sie namentlich der ISA-Leiter zu (Lauf 09.08.2026 auf prod1: isa_gattiert_gesamt=6, davon 4 an COMDARE_HOST_RUNS_AVX512F und 2 an COMDARE_HOST_RUNS_AVX2). Wer die Deckung dieser 2 Stellen pruefen will, prueft sie DORT -- nicht hier.
