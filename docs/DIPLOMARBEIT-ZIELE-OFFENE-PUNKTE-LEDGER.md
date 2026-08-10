@@ -16,6 +16,540 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## LEDGER-KONSOLIDIERUNG III -- 10.08.2026, Session-Log-Durchgang
+
+Auftrag Owner 10.08.2026: "Bitte pruefe auch den gesamten Kontext auf alle anderen Probleme, die
+noch persistiert werden muessen und schreibe sie direkt nieder. Wiederhole das aus dem session log
+mit den letzten 5 Kontexten."
+
+Gegenstand sind NUR Probleme: gefundene und nicht behobene Defekte, Wachen die nicht beissen,
+gebrochene Zusagen, abgebrochene Straenge, Widersprueche zwischen Messungen, Werkzeugfallen ohne
+Register, Fristen ohne Nachverfolgung. Owner-Entscheide sind in KON-01..66 und KON2-01..36 gebucht
+und werden hier nicht wiederholt.
+
+VERFAHREN. Zwei Rohtranskripte mit 143.097 Zeilen / 478 MB, zeilenweise mit einem Python-Filter
+gelesen, nie am Stueck. Sieben Musterklassen, je Klasse ein eigener Durchlauf ueber beide Dateien:
+harte Defekt-Signale (865 Treffer), Defekt/Rot (2587), Widerspruch (4426), Frist (2119), Strang-
+Abbruch (764), Werkzeugfalle (3710). Jede Ledger-Probe gegen eine geflachte Kopie
+(`tr '\n' ' '`, 2.696.353 Byte), mit `/usr/bin/grep -o -i -F | wc -l`, nie mit dem blanken `grep`
+(das ist ugrep 7.5.0 und zaehlt anders). Gegenprobe je Lauf: "Ledger" 781, "OWNER" 1288,
+"Pruefung" 94 gegen "Pruefung" mit Umlaut 82 -- die Suche greift, und beide Schreibungen sind
+abgedeckt.
+
+AUFLAGE EINGEHALTEN. Es wurde zu keinem Zeitpunkt nach Token-WERTEN gesucht und keiner ausgegeben.
+Der Extraktor traegt einen Redaktionsfilter, der jede Ausgabe vor dem Verlassen des Prozesses
+maskiert (glpat/gldt/glrt/glcbt/gloas, AKIA/ASIA, gh*_, sk-, BEGIN-Bloecke, Base64 ab 40 Zeichen).
+Er hat waehrend des Laufs mehrfach gegriffen; die betroffenen Stellen sind unten nur als Variable
+und Fundort benannt, nie als Wert.
+
+---
+
+#### KON3-01 Die gesicherte Abbruch-Arbeit liegt in einem Job-Verzeichnis, das mit dem Job stirbt
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (gemessen 10.08. am Objekt)
+
+Am 09.08. um 14:35 wurde abgebrochene Arbeit gesichert statt geloescht. Das war richtig. Der ORT
+ist es nicht: `/home/comdare/.claude/jobs/5a19728e/tmp/abbruch-bewahrt/`. Dieses Verzeichnis wird
+mit dem Job geloescht, es liegt in keinem Repository und in keinem Backup.
+
+GEMESSEN 10.08.:
+
+    abbruch-bewahrt/wt-ce-gnu-D2-work-in-progress.diff   16.998 Byte   09.08. 14:35
+    abbruch-bewahrt/registrierungs_protokoll.cmake        7.821 Byte   09.08. 14:35
+    abbruch-bewahrt/wt-super-d3-waisen/
+      _mess_thesis_gitlink_parity_probe.sh               33.015 Byte   09.08. 14:26
+      _mess_xml_wellformed_probe.sh                      35.386 Byte   09.08. 14:26
+      _probe_shim_mess_xml.sh                            35.409 Byte   09.08. 14:28
+
+Der Worktree, aus dem die drei Waisen stammen, EXISTIERT NICHT MEHR: `ls -d /home/comdare/wt-super-d3`
+-> "No such file or directory". Gegenprobe im selben Lauf: 21 andere `wt-*`-Verzeichnisse sind da.
+Die Dateien sind damit die einzige Kopie.
+
+**Ledger-Stand:** FEHLT. `abbruch-bewahrt` = 0 Treffer, `wt-super-d3` = 0, `d3-waisen` = 0, je gegen
+die geflachte Kopie mit `-i -F`. Gegenprobe: `wt-ce-gnu` = 3 Treffer -- die Suche findet Worktree-
+Namen, die Null ist echt. Der Ort steht nur in Aufgabe #41.
+
+**Was daran haengt:** die D2-Abdeckungs-Arbeit und drei Proben-Skripte mit zusammen 103.810 Byte.
+Faellt der Job, ist die Arbeit weg und niemand wuesste, dass sie existierte.
+
+---
+
+#### KON3-02 Der 102-Minuten-Haenger auf prod2 ist nirgends gebucht, und die Owner-Frage dazu offen
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (10.08. 01:17, gemessen an der Pipeline) + OW (Frage offen)
+
+Derselbe Job `test:secrets` lief auf prod1 in 16 Sekunden gruen und hing auf prod2 102 Minuten,
+ohne ein einziges Byte zu schreiben, bis GitLab ihn mit `stuck_or_timeout_failure` abbrach
+(Transkript 5a19728e L32138, 10.08. 01:17:08). Um 07:17 wurde daraus eine Owner-Vorlage:
+"Bleibt prod2 im Job-Pool, oder nehmen wir ihn bis zur Kampagne heraus?" (L33169), mit der
+Begruendung, dass 47 von 53 tag-tragenden Jobs zwischen beiden Maschinen floaten.
+
+Die URSACHE ist inzwischen geklaert und gehoert dem Owner: parallele Pipelines, OOM bei RAM,
+ab sofort sequentiell. Das ist im Memory persistiert. Die MESSUNG und die daraus folgende
+Job-Pool-Frage sind es nicht.
+
+**Ledger-Stand:** FEHLT. `test:secrets` = 0, `102 Minuten` = 0, `102 min` = 0. Gegenprobe:
+`prod2` = 166 Treffer, `stuck_or_timeout` = 1 -- letzterer aber in einem ANDEREN Gegenstand
+(Bau-Phase 2b vom 10.07., SIMD-Phase-0.1). Der Vorfall vom 10.08. ist nicht darunter.
+
+**DIE VORGESCHICHTE, die den Posten verschaerft.** Der 10.08. ist nicht der erste Fall. Am
+09.07. um 07:35 stand bereits im aelteren Transkript (46375cdc L17941), woertlich: "Der
+configure-Hang ist prod2-Node-spezifisch und besteht fort, unabhaengig von Last/Slot-Konkurrenz"
+-- gemessen gegen `contract` (54 s), `sanitize:asan-ubsan` (31 s) und `pmc:amd` (39 s), die alle
+gruen auf prod1 durchliefen. Dieser aeltere Befund IST gebucht (`configure-Hang` = 4 Treffer,
+`Node-spezifisch` = 2, `prod2-Node` = 1). Was fehlt, ist die Verbindung: dieselbe Maschine zeigt
+seit 32 Tagen dieselbe Klasse von Verhalten, und die Ursachenzuschreibung wechselte inzwischen
+von "Node-spezifisch" zu "meine parallelen Pipelines". Beide koennen wahr sein; sie sind aber nie
+gegeneinander geprueft worden.
+
+**Was daran haengt:** die Kampagne ab 29.08. Wenn prod2 Jobs annimmt und nicht ausfuehrt, ist
+jede Zelle, die dort landet, ein stiller Ausfall im mehrtaegigen Lauf. Und die Entscheidung
+"drin lassen oder herausnehmen" ruht derzeit auf einer Ursachenzuschreibung, die eine aeltere,
+gebuchte Gegenmessung hat.
+
+---
+
+#### KON3-03 Die XML-Wache hat zwei Zweighaelften, die nachweislich nichts beobachten koennen
+
+**Rang:** BLOCKIEREND  **Herkunft:** AB (Selbstmeldung des Bauenden, 09.08. 12:49)
+
+Der Bauende hat zwei Stellen seiner eigenen Arbeit ausdruecklich als ungedeckt gemeldet
+(5a19728e L24190, 09.08. 12:49:25), woertlich:
+
+    "[t6-wachen] XML-Wache: grep-Zweig (nicht ausloesbar ohne root) und Nenner-Mismatch-Zweig
+     (nachweislich unbeobachtbar, Mutant ueberlebt -- literal belegt)."
+    "[t6-wachen] scripts/ci_diff_ascii_width_guard.sh -- 2 CI-Referenzen, weiterhin ohne Probe
+     im super."
+
+Ein Nachpruef-Auftrag wurde um 12:53 gestellt (L24236) mit der richtigen Frage: "ist eine
+unbeobachtbare Zweighaelfte ueberhaupt zulaessig?". Eine Antwort darauf findet sich im weiteren
+Verlauf des Transkripts nicht.
+
+**Ledger-Stand:** FEHLT. `grep-Zweig` = 0, `Nenner-Mismatch` = 0, `nicht ausloesbar ohne root` = 0.
+Gegenprobe: `ohne root` = 3 Treffer (andere Gegenstaende), `ci_diff_ascii_width_guard` = 3 Treffer
+-- der Ledger kennt das Skript, aber nur seinen Selbsttest und seine CI-Verdrahtung, nicht die hier
+gemeldete super-seitige Luecke.
+
+**Was daran haengt:** eine Wache mit einer unbeobachtbaren Haelfte meldet Vollstaendigkeit ueber
+einen Nenner, den sie nur halb kennt. Das ist die Klasse, gegen die T-6 und K13 gebaut sind.
+
+---
+
+#### KON3-04 Die 117-Posten-Inventur der ungedeckten Stellen vom 08.08. ist nirgends gebucht
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (08.08. 18:52)
+
+Eine Ordnung nach Klasse, nicht nach Datei, mit vollstaendigem Nenner (5a19728e L21242,
+08.08. 18:52:06), woertlich:
+
+    "Nenner: 117 Posten = 29+25+23+16+10+9+3 in sieben Klassen + 2 Einzelfaelle.
+     K1 keine-negativprobe (29 von 117). Eine Zusicherung existiert, aber kein Eingang, bei dem
+     sie faellt: Klemmen ohne Klemmprobe, Wachen ohne Fremd-Genus, Vertraege ohne Fehlerpfad.
+     Der Mutant ueberlebt, weil nur die gesunde Seite je betreten wird."
+
+**Ledger-Stand:** FEHLT. `117 Posten` = 0, `keine-negativprobe` = 0, `29 von 117` = 0. Gegenprobe:
+`Posten` allein hat im Ledger sehr viele Treffer -- die Null ist also nicht die Folge eines
+kaputten Suchbefehls, sondern des fehlenden Gegenstands.
+
+**Was daran haengt:** dies ist die einzige bekannte GESAMTZAEHLUNG der ungedeckten Stellen mit
+Klassenverteilung. Ohne sie hat jede spaetere Aussage "das ist ungedeckt" keinen Nenner.
+
+---
+
+#### KON3-05 Von 246 Ernte-Funden sind 161 als FEHLEND vermerkt -- gebucht ist bislang die Zahl
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (Selbstmessung des Ernte-Strangs, 10.08. 11:25)
+
+Der Ernte-Strang hat seine eigene Ledger-Deckung gemessen und gibt sie mit Nenner aus
+(5a19728e L35328, 10.08. 11:25:59), woertlich:
+
+    GESAMT: 246
+    nach DRINGLICHKEIT: {'BLOCKIEREND': 34, 'HOCH': 91, 'NORMAL': 64, 'NOTIZ': 15, '?': 42}
+    nach LEDGER-STAND : {'FEHLT': 161, 'DELTA': 80, 'STEHT_DRIN': 5}
+    nach HERKUNFT     : {'M': 210, 'OW': 18, 'AB': 18}
+
+**Ledger-Stand:** DELTA. Die Zahl 246 ist gebucht (`246` = 22 Treffer, `Ernte` = 58). Der INHALT
+nicht: von 246 Positionen fuehrt die Selbstmessung 5 als STEHT_DRIN. Stichprobenartig
+nachgeprueft und bestaetigt: `menge-deckel` = 0, `Platzhalter-Kapitulation` = 0,
+`Bauweg-Wache` -- der Strang gibt fuer jede seiner Positionen den eigenen Suchbeleg mit.
+
+Die 34 BLOCKIEREND-Positionen tragen unter anderem: der Bauweg-Wachen-Selbsttest ist hohl
+(Mutationsbatterie 7, davon 5 ueberleben, Nenner rutscht still 473 -> 451); die M4-Wache laesst
+48,7 % des Korpus ungesehen verschwinden bei 21 gruenen Tests; `gattung_of()` faellt still auf
+eine gueltige falsche Gattung; der Export verliert die statistische Gegenprobe vollstaendig
+(0 von 10 CSV-Spalten).
+
+**Was daran haengt:** dieser Posten gehoert dem Ernte-Strang, nicht diesem Durchgang. Er steht
+hier, weil sonst die Zahl im Ledger den Eindruck erweckt, die Sache sei erledigt.
+
+---
+
+#### KON3-06 Der Bestandslog schreibt EINEN Eintrag je binary_id, obwohl die Matrix viele baut
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (09.08. 08:51, mit ausdruecklich benannter Nachweisgrenze)
+
+Gemessen im golden-320 / measure:smoke-Pfad (5a19728e L22997, 09.08. 08:51:08): falls
+`COMDARE_BESTANDSLOG` samt minio und `DOC_KEY`/`OWNER_UUID`/`MASCHINE` per CI-Variable gesetzt
+sind, schreibt der Lauf je `binary_id` GENAU EINEN Bestands-Eintrag mit LEERER Zelle -- obwohl er
+dieselbe `binary_id` ueber die ganze opt-x-simd-Matrix baut. Der Fingerprint war bei allen 320
+geprueften ids unter `[O2,avx2]` und `[O3,avx512]` bit-identisch.
+
+Der Melder hat seine eigene Grenze benannt (L23001): ob eine GitLab-Gruppen- oder Projektvariable
+`COMDARE_BESTANDSLOG` ueberhaupt setzt, hat er NICHT geprueft, weil er die API nicht angefasst hat.
+Aus dem Repo ist es nicht entscheidbar. Diese Verifikationsluecke ist bis heute offen -- und sie
+wurde durch das Geheimnis-Leck vom 10.08. eher groesser, weil der nachfolgende Verify-Agent die
+CI/CD-API ausdruecklich nicht mehr angefasst hat.
+
+**Ledger-Stand:** DELTA. `COMDARE_BESTANDSLOG` = 21 Treffer, `bit-identisch` = 11 -- die Klasse ist
+bekannt. Die konkrete Kollisionsmessung nicht: `je binary_id` = 0, `320 geprueften` = 0,
+`320 gepruefte` = 0.
+
+**Was daran haengt:** die Mess-Provenienz. Ein Bestand, dessen Zelle leer ist und dessen
+Fingerprint zwei verschiedene Bauweisen nicht unterscheidet, kann einen SKIP falsch begruenden.
+
+---
+
+#### KON3-07 Zwei Bau-Workflows wurden mitten im Lauf gestoppt und nie aufgeraeumt
+
+**Rang:** HOCH  **Herkunft:** OW (Owner-Ruege 09.08. 14:31) + M
+
+Zweimal derselbe Vorgang am 09.08.: `wm1mm5nu2` gestoppt um 14:26:18, Ersatz `w0kmlbvln`
+gestartet um 14:26:33, ebenfalls gestoppt um 14:35:23 (5a19728e L25439, L25450, L25575). Beide
+trugen dieselbe Beschreibung "D2-Nenner, T-6-Orakel hohl, xlsx+csv gleichzeitig, D5-Rest".
+
+Der Owner hat das unmittelbar geruegt (L25513, 09.08. 14:31:20), woertlich:
+
+    "Du hattest in dem Geschlossenen Workflow ... eine Aufgabe gekillt - mitten im Bau - und sie
+     weder analysiert, aufgeraeumt, noch den fehlenden dritten strang wieder aufgenommen.
+     Das haengt in der Luft"
+
+**Ledger-Stand:** FEHLT. `wm1mm5nu2` = 0, `w0kmlbvln` = 0, `haengt in der Luft` = 0 und mit
+Umlaut ebenfalls 0. Gegenprobe: andere Task-IDs desselben Tages stehen im Ledger, die Null ist
+also nicht die Folge eines Formatproblems.
+
+**Was daran haengt:** die Owner-Regel, die daraus folgt -- ein gestoppter Workflow braucht drei
+Schritte (analysieren, aufraeumen, den fehlenden Strang wieder aufnehmen) -- ist nirgends als
+Regel niedergeschrieben, obwohl sie woertlich ausgesprochen wurde.
+
+---
+
+#### KON3-08 Sechseinhalb Gigabyte im Job-Verzeichnis, davon 3 GB als "koennten Belege sein" geparkt
+
+**Rang:** HOCH  **Herkunft:** M (gemessen 10.08.)
+
+GEMESSEN 10.08.: `/home/comdare/.claude/jobs/5a19728e/tmp` = 6,8 G. Die groessten Posten:
+
+    nachpruefung-w1    2,2 G     seit 09.08. 23:40 als "NICHT angefasst, koennten Belege sein"
+    l1_landing         792 M     dieselbe Markierung
+    widerlege          440 M
+    ce_audit           278 M
+    audit-zahlen       263 M
+    acht weitere Klone je 170-241 M (gitleaks_clone, gitleaks_clone2, gitleaks_clone3,
+    gitleaks-klon, scan-clone, scan-r3, gl2, lagp4check, pass1-probe)
+
+Platte: `df -h /home` -> 206 G von 251 G belegt, 87 %. Am 09.08. 23:40 wurden 15 Klone mit
+zusammen 13.054 MB gemessen und teilweise abgeraeumt; die drei als Beleg markierten Verzeichnisse
+wurden bewusst stehen gelassen -- und seither nicht ausgewertet.
+
+**Ledger-Stand:** FEHLT. `nachpruefung` = 2 Treffer (anderer Gegenstand), `l1_landing` = 0,
+`15 Klone` = 0, `13054` = 0. Gegenprobe: `Platte` und Speicherposten stehen mehrfach im Ledger.
+
+**Was daran haengt:** zwei gegenlaeufige Doktrinen treffen sich hier. "Bei Stillstand ZUERST
+`df -h`" verlangt Platz; "was im Worktree liegt, ueberlebt das Aufraeumen nicht" verlangt
+Bewahrung. Ohne Auswertung ist unentscheidbar, welche der drei Belegsammlungen noch traegt.
+
+---
+
+#### KON3-09 Die Frage ans Pruefungsamt zum Ausfertigungsdatum wurde nie nachverfolgt
+
+**Rang:** HOCH  **Herkunft:** M (07.08. 18:15)
+
+Am 07.08. um 18:15 (5a19728e L15787) wurde ein Negativbefund zum Platzhalter "Vom
+#Ausfertigungsdatum#" ausdruecklich NICHT als Entwarnung behandelt, woertlich: "Eine E-Mail ans
+Pruefungsamt klaert es. Die Anmeldeunterlagen im Repo enthalten nichts dazu (das
+Fakultaetsformular regelt nur Zulassung/Fristen/Pruefer)."
+
+Eine Nachverfolgung findet sich weder im weiteren Transkript noch im Ledger.
+
+**Ledger-Stand:** FEHLT. `Ausfertigungsdatum` = 0, `Pruefungsamt` = 0, `Pruefungsamt` mit Umlaut
+= 0. Gegenprobe: `Frist` und `Termin` haben im Ledger dreistellige Trefferzahlen -- die
+Terminfuehrung ist da, dieser Posten fehlt darin.
+
+**Was daran haengt:** die Abgabe am 15.09.2026. Ein formaler Mangel am Deckblatt ist billig zu
+beheben, solange Zeit ist, und teuer danach. Das ist der einzige gefundene Posten dieses
+Durchgangs, der eine EXTERNE Partei braucht und deshalb Vorlauf hat.
+
+---
+
+#### KON3-10 Die gitleaks-Vakuumfalle ist am 10.08. erneut zugeschnappt, trotz Register
+
+**Rang:** HOCH  **Herkunft:** M (10.08. 06:49, Selbstanzeige mit literaler Ausgabe)
+
+Am 10.08. um 06:49 lief ein gitleaks-Lauf mit `0 commits scanned` durch, der Push war zu diesem
+Zeitpunkt bereits vollzogen (5a19728e L32985). Selbstanzeige woertlich: "das ist die
+Vakuum-Gruen-Falle, die die Doktrin als erste nennt, und ich bin selbst hineingelaufen".
+Die Pruefung wurde sofort nachgeholt, diesmal mit explizitem Bereich (`7af380e..4b18f72`), und
+lieferte `1 commits scanned` gegen die erwartete 1.
+
+Der Fall ist damit geheilt. Gebucht gehoert nicht der Fall, sondern die WIEDERHOLUNG: die Falle
+steht seit Tagen im Register, wird in jedem Bau-Auftrag zitiert -- und hat trotzdem erneut
+gegriffen, weil im frischen Klon `origin/development` auf denselben Stand zeigte wie HEAD und der
+Bereich dadurch leer war. Das ist eine ZWEITE Eintrittsart derselben Falle, neben dem bekannten
+Worktree-Mount.
+
+**Ledger-Stand:** DELTA. `0 commits scanned` = 8 Treffer, `Vakuum-Gruen` = 1 -- die Klasse steht
+drin, aber nur mit der Worktree-Ursache. Die Klon-Ursache "leerer Bereich, weil origin == HEAD"
+ist als eigene Eintrittsart nicht benannt.
+
+**Was daran haengt:** die Gegenmassnahme ist eine andere. Gegen den Worktree-Mount hilft ein
+echter Klon; gegen den leeren Bereich hilft nur, die erwartete Commit-Zahl VOR dem Lauf zu
+nennen und die Ausgabe dagegen zu halten.
+
+---
+
+#### KON3-11 Ein Werkzeug-Ausfall wurde als Erfolg gezaehlt: Schema-Abweisung ohne Signal
+
+**Rang:** HOCH  **Herkunft:** M (10.08. 11:26, mit vollem Nenner)
+
+Der teuerste Explore einer Nacht meldete `durchgelaufen=3` und "3 von 3 Themen durch", lieferte
+aber fuer Thema 2 in allen sechs Feldern nur den Platzhalter `test` (5a19728e L35332).
+Die Zahlen: 381.691 Tokens, 97 Tool-Calls, 1.360.280 ms = 22,7 min, `state=done`. Zum Vergleich
+die beiden Geschwister-Straenge: 219.653 und 316.119 Tokens.
+
+URSACHE am Objekt: drei `StructuredOutput`-Aufrufe. Versuch 1 und 2 trugen den echten Volltext und
+wurden abgewiesen mit "Output does not match required schema: root: must have required property
+ist_stand". Der Agent kapitulierte im dritten Versuch auf Platzhalter. `journal.jsonl` traegt
+denselben Muell -- der Verlust liegt im Agenten, nicht in der Datei.
+
+**Ledger-Stand:** DELTA. `StructuredOutput` = 2 Treffer, `menge-deckel` = 0,
+`Platzhalter-Kapitulation` = 0. Der Mechanismus ist damit nicht als Werkzeugfalle registriert.
+
+**Was daran haengt:** dies ist ein stummer Workflow-Tod einer NEUEN Art. Die bekannte Regel
+"`journal.jsonl` ist die Wahrheit" traegt hier nicht, weil das Journal die Kapitulation als
+Erfolg protokolliert. Die einzige Erkennungsmarke ist der Inhalt selbst.
+
+---
+
+#### KON3-12 Werkzeugfalle ohne Register: YAML-Flow-Syntax liefert dem Block-Parser eine stille Null
+
+**Rang:** HOCH  **Herkunft:** M (09.08. 06:57, dreifache Fehlmessung desselben Gegenstands)
+
+Dieselbe Zahl kam dreimal verschieden heraus: 44 von 48, dann 42 von 48, dann 45 von 51
+(5a19728e L22420, 09.08. 06:57). Ursache woertlich: "die Tags stehen in FLOW-Syntax
+(`tags: [baremetal]`), ein Block-Listen-Parser liefert stille Null -- mir beim ersten Versuch
+selbst passiert."
+
+Das ist die K11-Klasse in neuem Gewand: ein Werkzeug, das sucht und nichts findet, weil es die
+falsche Notation kennt, ist von einem Werkzeug, bei dem es nichts zu finden gibt, nicht zu
+unterscheiden.
+
+**Ledger-Stand:** DELTA. `Flow-Syntax` = 1 Treffer, `45 von 51` = 1 -- das ERGEBNIS ist gebucht.
+`Block-Listen-Parser` = 0: das VERFAHREN, also die Falle als solche, nicht.
+
+**Was daran haengt:** das Fallen-Register. Solange nur die korrigierte Zahl im Ledger steht und
+nicht die Ursache, wiederholt der naechste Zaehler denselben Fehler.
+
+---
+
+#### KON3-13 Zwei Bau-Straenge liefen ohne Pflicht-Explore, die angekuendigte Rueckbau-Folge blieb aus
+
+**Rang:** HOCH  **Herkunft:** M (Selbstanzeige 09.08. 06:40) + AB
+
+Selbstanzeige woertlich (5a19728e L22284, 09.08. 06:40:44): "die Straenge 9 und 10 sind VOR deiner
+Ansage in den Bau gegangen, ohne Explore. Ich habe ihn als Strang 14 nachgeschoben -- mit der
+ausdruecklichen Konsequenz, dass zurueckgebaut wird, falls ..."
+
+Der nachgeholte Explore hat genau den Fall gefunden, fuer den er da war (L22481, 07:11:40):
+"die Thesis widerspricht dem Bau, der gerade gelandet ist." Die Aufloesung fiel dann zugunsten
+des Baus aus -- Nearest-Rank erfuellt das Mittelungsverbot aus Termin 3, weil dort woertlich
+"Auswertung ... auf den separaten Rohlaeufen" steht (Termin-3-Rohtext:21, 09.04.).
+
+Damit ist der Rueckbau sachlich abgewendet. Was fehlt, ist der EINTRAG, dass die angekuendigte
+Konsequenz geprueft und mit Begruendung nicht gezogen wurde.
+
+**Ledger-Stand:** DELTA. `Nearest-Rank` = 4 Treffer, `ceil(q*n)` = 3, `Strang 9` = 1,
+`ohne Explore` = 1. Der Gegenstand ist da; die Kette Ankuendigung -> Pruefung -> Nichtziehung mit
+Begruendung ist es nicht.
+
+**Was daran haengt:** eine angekuendigte und dann stillschweigend fallengelassene Konsequenz ist
+von einer vergessenen nicht zu unterscheiden. Genau diese Ununterscheidbarkeit ist die
+Fehlerklasse dieses Projekts.
+
+---
+
+#### KON3-14 Vorbedingung der clang-Warnungsrunde ungeklaert: unter welcher Bedingung faehrt build:clang
+
+**Rang:** HOCH  **Herkunft:** AB (08.08. 13:56, ausdruecklich dem Owner uebergeben)
+
+Woertlich (5a19728e L19377, 08.08. 13:56:01): "die Latenz-Wurzel ueber beiden: `build:clang` ist
+opt-in und advisory, laeuft im Normalfall gar nicht. Das bleibt offen und bei dir." Am 09.08. in
+ce-Pipeline 15447 gemessen: `test:unit` und `test:coverage-guard` laufen, `build:clang` hatte
+Status `skipped`.
+
+Aufgabe #43 fuehrt genau dies als Vorbedingung der Runde 2. Der Posten selbst ist im Ledger nicht
+als OFFENE FRAGE gefuehrt, sondern nur als Zustandsbeschreibung.
+
+**Ledger-Stand:** DELTA. `build:clang` = 27 Treffer, `opt-in` = 31, `advisory` = 18,
+`skipped` = 37 -- der Zustand ist reichlich belegt. Was fehlt, ist die Markierung, dass hier eine
+UNBEANTWORTETE Frage liegt, die eine geplante Arbeit blockiert.
+
+**Was daran haengt:** ein Job, der nicht faehrt, erzeugt keine Warnungen und verdeckt alles, was
+nur sein Uebersetzer sieht. Am 08.08. waren alle drei clang-Blocker Dinge, die GCC gar nicht
+meldet.
+
+---
+
+#### KON3-15 Die Quellenlage selbst: drei der fuenf genannten Kontexte enthalten keine Nachricht
+
+**Rang:** NORMAL  **Herkunft:** M (gemessen 10.08.)
+
+Der Auftrag nennt fuenf Kontextdateien. Drei davon sind 226 Byte gross und tragen genau zwei
+Zeilen, beide reine Metadaten (`ai-title`, `agent-name`), keine einzige Nachricht:
+
+    2bcc1a88-eee6-4b0d-ac52-a2e93f16ab39.jsonl   2 Zeilen, 0 Nachrichten
+    fe6a7d97-07f4-43a4-940a-1293eb3bb780.jsonl   2 Zeilen, 0 Nachrichten
+    bf019fae-7346-4717-9ab8-225763bdaded.jsonl   2 Zeilen, 0 Nachrichten
+
+Fuenf weitere Dateien im selben Verzeichnis zeigen dasselbe Muster. Die tatsaechliche Abdeckung
+liefern zwei Dateien:
+
+    5a19728e   35.672 Zeilen   24.575 Timestamps   06.08. 04:54 -- 10.08. 11:53
+    46375cdc  107.400 Zeilen   77.726 Timestamps   06.07. 09:31 -- 08.08. 19:23
+
+Ein dritter Traeger fuer den Zeitraum 05.-06.08. ist `b15ade0e` (2.209 Zeilen). Die Angabe
+"46375cdc bis 10.08. 06:16" im Auftrag ist der Datei-mtime, nicht der letzte Eintrag; der letzte
+Eintrag ist 08.08. 19:23.
+
+**Ledger-Stand:** FEHLT. `2bcc1a88` = 0, `fe6a7d97` = 0, `bf019fae` = 0.
+
+**Was daran haengt:** kuenftige Durchgaenge dieser Art. Wer "die letzten fuenf Kontexte" nach
+Dateiliste greift, liest faktisch zwei und haelt das fuer fuenf -- ein Deckungs-Irrtum ohne
+Fehlermeldung.
+
+---
+
+#### KON3-16 Die Hybrid-Gattung ist auf der Bibliotheksseite nicht registriert
+
+**Rang:** NORMAL  **Herkunft:** M (09.08. 13:02 erhoben, 10.08. am Objekt nachgemessen)
+
+Am 09.08. wurde gemeldet (5a19728e L24311), die Hybrid-Arbeit sei "inhaltlich weit, aber nach der
+eigenen T-7-Doktrin des Projekts NICHT fertig", mit zwei Nullmessungen: `test_hy_a1` in
+`tests/unit/CMakeLists.txt` = 0 und `hybrid` in `libs/cache_engine/CMakeLists.txt` = 0.
+
+NACHGEMESSEN 10.08. in `/home/comdare/wt-ce-w0a` und `/home/comdare/wt-ce-sammel`, beide gleich:
+
+    test_hy_a1 in tests/unit/CMakeLists.txt        4   (war 0 -- INZWISCHEN BEHOBEN)
+    hybrid     in libs/cache_engine/CMakeLists.txt 0   (unveraendert)
+    Gegenprobe add_executable in derselben Datei 109   (die Suche greift)
+
+Vorhanden sind `tests/unit/test_hy_a1_heuristik_adapter_gattung.cpp` und
+`test_hy_a1_reroute_gate_negativ.cpp`.
+
+Die Testhaelfte ist damit erledigt. Ob die Bibliothekshaelfte einen Eintrag BRAUCHT, ist nicht
+entschieden -- bei einer header-only-Gattung waere die Null korrekt. Das ist die Frage, die zu
+klaeren ist, nicht der Befund.
+
+**Ledger-Stand:** FEHLT. `test_hy_a1` = 0 Treffer. Gegenprobe: `Hybrid` steht vielfach im Ledger.
+
+---
+
+#### KON3-17 Zwei benannte Leseluecken aus dem 07.08. wurden nie geschlossen
+
+**Rang:** NORMAL  **Herkunft:** AB (Selbstmeldungen 07.08.)
+
+Zwei Stellen, die ihre Melder ausdruecklich als offen gekennzeichnet haben:
+
+(a) `harness/perm_runner.hpp` -- "diese letzte Datei habe ich NICHT einzeln gegengelesen -- bleibt
+offener Punkt (war schon im Erstbericht unter Paragraf 7)" (5a19728e L15924, 07.08. 18:47). Die
+Datei traegt die eigentliche Pro-Setting-Messung ueber `run_observable_perm`.
+
+(b) Der Verzeichnis-Schnitt des Overlays -- "welche Dateimenge ist das Overlay -> bleibt offen.
+Der Owner sagt NICHT, welche ..." (L15558, 07.08. 17:28). Zwei benachbarte Fragen desselben
+Pakets (Sortier-Ordnung, Hash je Datei gegen Konkatenation) wurden beantwortet, diese nicht.
+
+**Ledger-Stand:** DELTA. `perm_runner` = 40 Treffer, `Overlay` = 45 -- beide Gegenstaende sind
+breit dokumentiert. Dass an genau diesen zwei Stellen eine als OFFEN gemeldete Luecke sitzt, ist
+in dieser Menge nicht auffindbar.
+
+---
+
+#### KON3-18 Der Owner-Auftrag "abbruchsichere Pause" ist eine Betriebsregel ohne Niederschrift
+
+**Rang:** NORMAL  **Herkunft:** OW (01.08. 13:59, 03.08. 06:31)
+
+Zweimal gefordert, woertlich: "Bitte lege aus den abgebrochenen Workflows bitte eine
+abbruchsichere Pause ein" (46375cdc L89754, 01.08. 13:59:18) und "Bitte lege eine abbruchsichere
+Pause ein, lasse nur Welle 2d auslaufen" (L95531, 03.08.). Damals wurde jeweils ein
+Pausendokument geschrieben.
+
+Als REGEL -- was eine abbruchsichere Pause umfassen muss, damit sie diesen Namen verdient -- ist
+es nirgends festgehalten. Der Bezug zu KON3-07 ist unmittelbar: dort wurde ein Workflow gekillt,
+ohne dass eine solche Pause eingelegt wurde.
+
+**Ledger-Stand:** DELTA. `abbruchsicher` steht mehrfach im Ledger, jeweils als Name eines
+konkreten Pausendokuments, nicht als Verfahren.
+
+---
+
+## EHRLICHER REST
+
+**Was ich NICHT geschafft habe.**
+
+Die Datei `46375cdc` deckt 07.07. bis 08.08. ab, also 34 Tage mit 107.400 Zeilen. Ich habe sie
+mit allen sieben Musterklassen gefiltert (Treffer: 363 hart, 1164 Defekt, 2922 Widerspruch, 1144
+Frist, 240 Strang, 1698 Falle) und daraus die Owner-Turns des gesamten Zeitraums sowie die
+Agenten-Befunde mit harten Signalen gesichtet -- aber nur die Trefferzeilen, nie die Umgebung.
+Aus 34 Tagen stammen in diesem Nachtrag zwei Positionen (KON3-18 und die Vorgeschichte in
+KON3-02). Das ist wenig. Zwei Erklaerungen dafuer, die ich nicht auseinanderhalten kann: der
+Zeitraum ist bereits gut abgearbeitet (viele Juli-Treffer wiederholen sich als Zitat in spaeteren
+Zusammenfassungen), oder mein Filter passt schlechter auf die aeltere Sprache. Die zweite
+Moeglichkeit habe ich nicht ausgeschlossen.
+
+Zwei Juli-Kandidaten habe ich geprueft und ENTLASTET, statt sie zu buchen. (a) Der am 27.07.
+dokumentierte "OFFENE WIDERSPRUCH: dmidecode weist prod2 als DDR5 aus, Schluessel lautet
+ddr4_2x32" (46375cdc L88963, `machine_identity.hpp:208`) ist am Objekt behoben: Zeile 213
+fuehrt heute `ram_pair="ddr5_2x32"` fuer prod2, und `ddr4_2x32` hat 0 Treffer sowohl im Code als
+auch im Ledger. (b) Der prod2-configure-Hang vom 09.07. ist gebucht -- er steht jetzt als
+Vorgeschichte in KON3-02, nicht als eigene Position.
+
+Die Datei `b15ade0e` (2.209 Zeilen, 05.-06.08.) habe ich nur strukturell erfasst -- Zeitbereich
+und Typverteilung -- und nicht gefiltert. Sie schliesst eine Luecke zwischen den beiden grossen
+Dateien und stand nicht im Auftrag.
+
+**Was ich nur angelesen habe.**
+
+Den Ledger selbst. Ich habe ihn nie gelesen, sondern ausschliesslich gegen die geflachte Kopie
+gesucht und je Treffer bis zu drei Kontextfenster von 560 Zeichen gezogen. Bei den Positionen mit
+DELTA-Vermerk beruht meine Aussage "der Gegenstand steht drin, dieser Aspekt nicht" damit auf
+Stichproben, nicht auf vollstaendiger Lektuere. Wer eine dieser Positionen einspielt, sollte die
+Stelle im Ledger noch einmal im Volltext ansehen.
+
+Die 246-Ernte (KON3-05) habe ich NICHT nachgeprueft. Ich habe die Selbstmessung des Ernte-Strangs
+uebernommen und als solche gekennzeichnet. Ein Bericht ist Beweismaterial, kein Beweis -- die
+Zahl 161 FEHLT stammt von dem Strang, der auch die Funde erhoben hat.
+
+**Die Differenz zwischen gefundener und gebuchter Zahl, nicht glattgerechnet.**
+
+Ich habe 18 Positionen gebucht. Aus den Trefferlisten habe ich rund 40 Kandidaten aufgestellt und
+etwa die Haelfte verworfen, weil die Ledger-Probe sie als bereits gebucht auswies -- darunter die
+Order-Dependency von `generated_source_catalog` (11 Treffer), die 23 allocator-Akten (2 Treffer),
+`MT-L3` (6), `wide_aggregat` (1), die A7-Schwaeche Kommentar-gegen-Aufruf (1), die Stage-Topologie
+von `ergebnis:holen` (3). Diese Verwerfungen sind Einzelproben, keine Volltextlektuere; bei einer
+davon kann ich falsch liegen.
+
+Von den 18 Positionen sind 12 GEMESSEN (mit mitgefuehrter Ausgabe oder eigener Nachmessung am
+Objekt) und 6 BEHAUPTET im Sinne von: aus einem Bericht im Transkript uebernommen, ohne dass ich
+den Gegenstand selbst angefasst habe. Das sind KON3-03, KON3-04, KON3-05, KON3-06, KON3-11 und
+KON3-12. Sie sind an ihrer Herkunftsmarke AB oder M mit Zeitstempel erkennbar; bei allen sechs
+liegt die Originalausgabe im Transkript und ist ueber die genannte Zeilennummer auffindbar.
+
+**Was der Redaktionsfilter beruehrt hat.**
+
+An mehreren Stellen des Transkripts hat der Filter Zeichenketten maskiert. Ich habe sie nicht
+darauf geprueft, ob es sich um echte Geheimnisse handelt -- das haette bedeutet, sie anzusehen.
+Die einzige Stelle, die ich benenne, ist die bereits bekannte und in Aufgabe #70 gefuehrte:
+Gruppe 3 und Projekt 288, sieben Variablen, im Transkript 5a19728e um 11:25 als Rotationsliste
+zusammengefasst. Projekt 286 enthielt keine.
 ## LEDGER-KONSOLIDIERUNG II -- 10.08.2026, Nachmittag (KON2-01..KON2-31)
 
 Zweiter Nachtrag des Tages. Nachtrag I (KON-01..KON-66) steht darueber und deckt Sessions,
