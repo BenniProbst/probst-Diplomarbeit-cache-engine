@@ -16,6 +16,110 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 10.08.2026 SPAETABENDS -- KORREKTUR AN KON4-10: ES GIBT KEINEN STEMPEL-RISS
+
+**Dieser Nachtrag widerruft eine Aussage, die ich WENIGE STUNDEN VORHER selbst in denselben
+Ledger geschrieben habe.** KON4-10 bleibt woertlich stehen; er ist ab hier ueberholt.
+
+### KON5-01 -- WAS KON4-10 BEHAUPTETE UND WARUM ES FALSCH IST
+
+KON4-10 sagte: "measurement_line ist leer, weil der Perm-Pfad den 2-arg-Zweig von
+COMDARE_ANATOMY_VERSION_STAMP trifft. Fix: den 3-arg-Zweig treffen."
+
+**Am Objekt widerlegt.** Die Kette ist korrekt verdrahtet, vollstaendig verfolgt:
+
+    profile_run_entry.hpp:482    ruft make_lazy_adhoc_source_gen_from_env()   RICHTIG
+    lazy_adhoc_source_gen:312    liest COMDARE_MEASUREMENT_COMBO aus der Umgebung
+    lazy_adhoc_source_gen:221    make_lazy_adhoc_source_gen(measurement_stamp = {})
+    adhoc_emitter.hpp:122        if (measurement_stamp.empty()) -> 2-arg, sonst 3-arg
+
+Und der Kommentar an der Aufrufstelle (profile_run_entry.hpp:480-482) sagt es woertlich:
+
+    "S6-P1b Env-Bruecke (e): die vom Planer gewaehlte Mess-Combo reist via
+     COMDARE_MEASUREMENT_COMBO in den lazy Source-Gen -> die je-Combo-Bauten stempeln
+     ihre DLLs REAL. UNGESETZT/[all] => "" => byte-identische Quellen"
+
+**Der leere Mess-Stempel bei ungesetzter Combo ist dokumentiertes SOLLVERHALTEN.** Er schuetzt
+den golden-320-Pfad vor Byte-Drift. Die Verzweigung ist korrekt. Das Prueff-Dock-Gate hat
+KORREKT angeschlagen -- es meldete eine leere Mess-Deklaration, was bei einer ECHTEN Messung ein
+Fehler waere. Der Durchstich-Agent hatte die Variable nicht gesetzt.
+
+**Es gibt keinen Code-Riss zu heilen. Ich haette einen funktionierenden Mechanismus
+"repariert".**
+
+### KON5-02 -- DIE FEHLERKLASSE, und sie ist dieselbe wie in KON4-09
+
+KON4-09 haelt fest: "Der Plan ist keine Quelle ueber den Code. Er ist eine Behauptung ueber
+ihn." Genau dasselbe gilt fuer MEINEN EIGENEN Postenschnitt. Ich hatte den Agentenbericht
+("der Perm-Pfad trifft den 2-arg-Zweig") uebernommen, ohne die Kette zu Ende zu verfolgen --
+also die Klasse V1: ein Bericht ist Beweismaterial, kein Beweis.
+
+Was den Fehler gefangen hat: der Kern-Explore, angewandt auf den EIGENEN Posten. Die Regel
+gilt nicht nur fuer geerbte Aufgaben, sondern auch fuer selbst geschriebene.
+
+### KON5-03 -- DIE RICHTIGE AUFGABE, neu geschnitten
+
+    (A) DURCHSTICH: der Mini-Lauf muss COMDARE_MEASUREMENT_COMBO setzen -- die vom Planer
+        gewaehlte Combo. ZU PRUEFEN: emittiert der CEB sie in die Mess-Jobs? Im
+        cache_engine_builder_iterator.hpp erscheint sie in ZWEI Kommentaren (:152, :347),
+        nicht als sichtbare Emission. DAS ist die Luecke, nicht der Emitter.
+    (B) GATE-SCHAERFE (Haertung, kein Riss): unterscheidet das Prueff-Dock zwischen
+        "Provisionierungs-Lauf ohne Combo" (legitim) und "Mess-Lauf ohne Combo" (Fehler)?
+
+### KON5-04 -- DIE REIHENFOLGE BLEIBT OFFEN, ALS OWNER-VORLAGE (nicht als Bau)
+
+Die Owner-Anweisung "system vorn, organ hinten" ist von diesem Befund UNBERUEHRT und weiterhin
+gueltig. Sie trifft aber DREI Ebenen mit sehr verschiedenen Kosten:
+
+    (1) Makro-Argumente        anatomy_module_abi_v1.hpp:213 / :162
+        KOSTEN: der emittierte Quelltext aendert sich -> die 320er-Byte-Identitaets-Wachen
+        (adhoc_emitter.hpp:119 benennt sie selbst). 88 Test-Dateien tragen
+        golden/CRC/Roundtrip, 16 fassen Stempel oder Fingerprint an. Neuer golden-Stand noetig.
+
+    (2) POD-Feldreihenfolge    anatomy_module_abi_v1_decl.hpp:200
+        KOSTEN: ABI-BRUCH. stamp_layout_version 6 -> 7, jeder Loader, jede vendorierte DLL,
+        alle Tier-Binaries neu.
+
+    (3) Preimage-Glied-Folge   anatomy_fingerprint.hpp:601, Glied-Count FEST = 9
+        KOSTEN: JEDER SHA-512-FINGERPRINT AENDERT SICH -- alle Lager-Anker, alle
+        .fingerprint-Sidecars, jeder binary_id-Bezug. Der teuerste Bruch des Systems.
+
+EMPFEHLUNG: Option (1). Der Owner-Satz fiel im Kontext des EMITTIERTEN Makro-Calls, und die
+Stufen-Ordnung ist eine Aussage ueber die lesbare Form des Stempels, nicht ueber die
+Byte-Reihenfolge einer Hash-Eingabe. Guenstigster Moment: zusammen mit einer ohnehin faelligen
+Aenderung am emittierten Quelltext -- EIN golden-Bruch statt zwei.
+
+OFFEN UND NICHT ZU RATEN: wo die MESS-Stufe steht. Der Satz ordnet nur system und organ.
+
+### KON5-05 -- ZEHN-WOCHEN-EXPLORE GEFAHREN: es gab NIE eine Festlegung
+
+Der gesamte Bestand hat organ zuerst -- Makro, POD, Preimage, und das Enum
+AxisKind{organ, system_measurement, system_config} (axis.hpp:17-21).
+
+Ledger flach durchsucht (2.734.392 Byte, tr '\n' ' ' gegen die Zeilenumbruch-Falle):
+
+    "Preimage-Ordnung"      0
+    "feste Preimage"        0
+    "system vor organ"      0
+    "Stempel-Reihenfolge"   1   -- und dieser Treffer meint die Reihenfolge der 18
+                                   ORGAN-ACHSEN INNERHALB der Organ-Zeile, nicht organ-vs-system
+
+**Die Owner-Anweisung ist eine NEUORDNUNG, keine Wiederherstellung.** Das ist fuer die
+Kostenabwaegung wesentlich: es gibt keinen frueheren Zustand, zu dem man zurueckkehrt.
+
+### KON5-06 -- NEBENFUND: die Diff-Hygiene-Wache existiert in ZWEI Fassungen
+
+Beim Fahren aufgefallen (sie brach mit "Unbekannte Option '--bereich'" ab):
+
+    ce     scripts/ci_diff_ascii_width_guard.sh   779 Zeilen  sha1 6d98605a62ee  --bereich
+    super  scripts/ci_diff_ascii_width_guard.sh   558 Zeilen  sha1 0014fe29648c  --seit-basis --bestand
+
+Dieselbe Datei, derselbe Zweck, zwei Fassungen -- der Abschrift-Fall, gegen den B-3 gebaut ist,
+im Wachen-Werkzeug selbst. Heute knallt es nicht, weil die Optionsnamen sich unterscheiden und
+ein falscher Aufruf sauber abbricht. Das ist Glueck, keine Konstruktion. Gefaehrlich bleibt:
+`--stdin` gibt es in BEIDEN -- der einzige gemeinsame Pfad, mit moeglicherweise
+unterschiedlichem Verhalten und ohne Abbruch. Und ce hat 221 Zeilen MEHR: beim super-main-FF
+misst also eine schwaechere Wache, und beide drucken "GRUEN".
 ## NACHTRAG 10.08.2026 ABENDS -- DIE SIEBEN KERN-EXPLORES: KEIN EINZIGES "STIMMT"
 
 **Anlass, Owner verbatim 10.08.:** "Jede Verarbeitung braucht vorne einen Explore, ob ueberhaupt
