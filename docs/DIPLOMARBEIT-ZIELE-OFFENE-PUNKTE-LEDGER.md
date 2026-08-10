@@ -16,6 +16,181 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 10.08.2026 ABENDS -- DIE SIEBEN KERN-EXPLORES: KEIN EINZIGES "STIMMT"
+
+**Anlass, Owner verbatim 10.08.:** "Jede Verarbeitung braucht vorne einen Explore, ob ueberhaupt
+der KERN ihrer Aufgabe stimmt, sonst muessen wir die DEFINITION der Aufgabe korrigieren."
+
+Daraufhin bekam jedes Paket der F1-Kette eine Pflicht-Stufe 0 mit vier zulaessigen Urteilen,
+als Pflichtfeld im Schema. Gefahren als Workflow wf_e22d25ef-71c, 11 Agenten, 0 Fehler.
+
+    SCHON_ERLEDIGT     5    D1b - D2-G1 - D3-7 - D3-3 - ##23
+    STIMMT_TEILWEISE   2    ##08 - ##20+D3-6
+    STIMMT             0
+
+Fuenf von sieben Paketen waeren neu gebaut worden, obwohl sie fertig sind. Jeder Neubau haette
+eine ZWEITE WAHRHEIT neben der bestehenden erzeugt und deren gefahrene Koeder entwertet.
+
+Vollstaendige Fassung mit allen Belegen: Fussnote **F1-KERN** in
+docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md.
+
+### KON4-01 -- LEDGER-KORREKTUR: die D2-G1-Zeile war falsch UND gefaehrlich
+
+Ledger-Zeile 2626 sagt: "zwei gegenstandslos -- D2-G1 durch den W-1-Wurzelfix geheilt, D1b
+durch eine Bauweg-Aenderung ueberholt."
+
+**Der D2-G1-Teil dieses Satzes ist am Objekt falsch.** Er verharmlost die Fehlerklasse. Richtig:
+
+    Es waren ZWEI unabhaengige Defekte, nicht einer.
+      (a) enable_testing()-Reihenfolge  -> keine CTestTestfile.cmake  (W-1-Wurzelfix)
+      (b) gtest_discover_tests-Defekt   -> vom Wurzelfix ERST SICHTBAR GEMACHT
+
+Der Wurzelfix hat (a) geheilt und dabei (b) als NOT_BUILT-Daueralarm freigelegt. Geschlossen
+wurde (b) zwei Tage spaeter mit **ce ca6d8af1** ("D2-G1: die zwei gtest-Binaries unter libs/
+nach dem Repo-Muster registrieren"). SELBST GEPRUEFT: der Commit existiert und ist Vorfahr von
+origin/development.
+
+**Geltende Fassung:** "D2-G1 war NICHT gegenstandslos -- der Wurzelfix legte einen zweiten,
+unabhaengigen Defekt frei (gtest_discover_tests), der am 10.08. mit ca6d8af1 geschlossen wurde."
+
+**Warum das zaehlt:** ein Satz, der einen zweiten Defekt als "gegenstandslos" fuehrt, loescht
+genau die Information, die beim naechsten Mal noetig waere. Ein Wurzelfix, der etwas sichtbar
+macht, ist keine Heilung des Sichtbargewordenen.
+
+### KON4-02 -- die 27 ist heute 30
+
+test_commands.cpp = 23, test_engine_adapters.cpp = 7. SELBST NACHGEZAEHLT aus dem Git-Index
+(git show HEAD:<pfad>, ^TEST(_F|_P)?\(). Die "20+7=27" war der Stand von 759b695a (06.07.);
+am 09.08. kamen mit cc9c233e/905bd1aa drei Welch-Faelle dazu.
+
+### KON4-03 -- D1b IST ZU STREICHEN, nicht zu bauen
+
+Die Messung des Plans stimmt, die Schlussfolgerung nicht.
+
+    grep -c -F "adhoc_emitter" .gitlab-ci.yml        = 0    (Gegenprobe comdare_tests = 10)
+
+ABER: es gibt keine Prebuild-Liste mehr, in die man ihn eintragen koennte. SELBST GEMESSEN:
+
+    aktive Zeile  ^\s*COMDARE_TEST_PREBUILD_TARGET   = 0
+    GEGENPROBE    ^\s*COMDARE_TEST_CMAKE_BUILD_DIR   = 1    (die Null traegt)
+    Vorkommen gesamt                                  = 2, BEIDE in Kommentaren
+
+Die verlangte Massnahme wuerde die am 08.08. bewusst zurueckgebaute Fehlerklasse -- eine
+Handliste neben dem Bauweg -- wieder einfuehren.
+
+**Was stattdessen offen ist**, vom CI-File selbst benannt (ce/.gitlab-ci.yml:934-938,
+Kommentar "OFFEN (eigenes Paket)"): test:unit veroeffentlicht seit D1c seine Inventur als
+build/Testing/ctest_unit_inventar.txt -- DER VERBRAUCHER FEHLT. test:coverage-guard liegt in
+Stage 'contract', test:unit in Stage 'test'; needs darf nicht vorwaerts zeigen (17 needs-Kanten,
+0 vorwaerts). Das ist ein STAGE-TOPOLOGIE-Posten, kein Prebuild-Posten.
+
+### KON4-04 -- der Selektor ist NICHT MEHR DISJUNKT (Wellenplan Z.67 ueberholt)
+
+Der Plan behauptet: "der anhang:forward-Selektor (*.result.csv) trifft die Produktions-Ablage
+(result.csv) NIE -- die Muster sind disjunkt, nachgemessen."
+
+SELBST GEMESSEN, ci/anhang_forward_core.sh:202:
+
+    AF_RESULT_NAMEN="${AF_RESULT_NAMEN:-result.csv *.result.csv}"
+
+BEIDE Formen, EINE Definition, drei Verwendungen. Gelandet mit 6d2e3dce (09.08.), in
+origin/development; der Kopf der Datei fuehrt den alten Zustand als geheilte Falle F1 (:41-45)
+namentlich. Selbstbiss am unveraenderten Stand gefahren: "11 Faelle, 11 gehalten, 0 gerissen"
+und "6 von 6 Mutanten haben die Probe rot gemacht".
+
+**D3-6 ist damit erledigt.**
+
+### KON4-05 -- ##08: der Auftrag hat einen NAMEN missverstanden
+
+"lazy_csv_header" -- das Wort "lazy" ist das Praefix der lazy-LAUF-Familie
+(run_lazy_static_then_dynamic, LazyRunConfig, LazyMeasuredRow, lazy_try_resume_binary), es ist
+KEIN Emissionsverhalten. Und "EINMAL" im Postentitel heisst "EINE Definition" (B-3 =
+Abschrift-Beseitigung), nicht "einmal geschrieben". Nenner: 3531 durchsuchte C/C++-Dateien,
+1 Definition (cache_engine_builder_iterator.hpp:504).
+
+Eine gebaute lazy-Header-Emission wuerde ci/mess_ausbeute_wache.sh:186-190 modus-blind rot
+machen und das N_LEER-Signal loeschen. **NIE BAUEN.**
+
+Schema-Freeze Stufe 1 + B-3 sind erledigt (schema_freeze.hpp Kopf "2026-08-09",
+kWideSchemaFreezeStufe1 = 189 Spalten, zwei gtests, Ledger:4079 03f897dd).
+
+### KON4-06 -- ##20: die VORSCHRIFT ist falsch, nicht der Code
+
+##20 sagt "`|| true` beim git add faellt". Am Objekt: rc=128 bei JEDEM DE-only-Lauf -- genau
+deshalb stand die Zeile jahrelang so. Ein blindes Entfernen macht den Kanal rot.
+
+### KON4-07 -- ##23: der Auftrag vermischte ZWEI Nahtstellen
+
+    (A) ergebnis_mappe_naht.hpp   die Mappe IM LAUF, Richtung xlsx -> csv
+    (B) tools/mess_report/        ein CLI, das eine BESTEHENDE Mess-CSV liest
+
+Der Postentitel "Mess-CSV -> xlsx" beschreibt (A) falsch herum -- die Owner-Doktrin ist
+xlsx -> csv, die Mappe entsteht zuerst. Alle vier Teile sind gebaut, die Abnahme wurde gegen
+das ECHTE 320er-Archiv gefahren.
+
+**Restposten R1, Blocker fuer jede echte Kampagne:** die acht vendorierten thesis_profiles sind
+xlsx-blind (mit_xlsx=1 ohne_xlsx=8 ueber Nenner 9). Der Gitlink wurde am 10.08. auf e114cabd
+gehoben (super 0e11e1f8); ob das den geforderten Stand >= 4a26b6a3 einschliesst, ist beim Bau
+NEU AUSZUZAEHLEN, nicht anzunehmen.
+
+### KON4-08 -- FUENF NEU GESCHNITTENE RESTPOSTEN, keiner davon vermessen
+
+    Stage-Topologie   der Verbraucher der test:unit-Inventur fehlt (aus D1b)
+    D3-7b             der dritte Modus (pruef_only) fehlt in der Treiber-Bilanzzeile
+    D3-3b             eine LEERZEILE ist kein Messwert -- drei Dateien in EINEM Commit
+    ##20-B            die Vorschrift korrigieren, nicht den Code
+    ##23-R1           die acht vendorierten Profile sind xlsx-blind
+
+Die alten Aufwaende (D1b 1,5 h, D2-G1 2 h) fallen. Die Restposten duerfen NICHT stillschweigend
+als gleich teuer gefuehrt werden.
+
+### KON4-09 -- DIE ALLGEMEINE LEHRE, und sie ist teuer bezahlt
+
+Derselbe Kern-Explore lief im Hauptstrang-Workflow NICHT vorgeschaltet, sondern erst beim
+Bauen. Dort war in FUENF VON FUENF Faellen der Bauauftrag am Objekt falsch, weil er aus Plaenen
+und Ledger-Zitaten gebaut war, die selbst veraltet sind. Vier der fuenf Bauenden haben ihren
+eigenen Auftrag widerlegt und damit einen Fehlbau verhindert.
+
+**Der Plan ist keine Quelle ueber den Code. Er ist eine Behauptung ueber ihn.**
+
+Schaerfster Einzelbeleg (P5): der Ledger korrigierte in KON2-15 eine tote Zeilennummer -- auf
+eine ZWEITE tote Zeilennummer. Drei Zahlen fuer einen unveraenderten Satz, die mittlere
+geschrieben von jemandem, der gerade eine tote Zahl reparierte.
+
+### KON4-10 -- STEMPEL: SYSTEM VORN, ORGAN HINTEN (Owner 10.08.)
+
+> "system sollte immer vorn stehen und organ hinten. Das entspricht der Anordnung der Stufen."
+
+Die Argument-Reihenfolge bildet die Stufen-Ordnung ab: System gibt frei, Organ setzt durch --
+die Freigabe steht vorn. Verwandt und begruendend: System-Achsen = Freigabe, Organ-Achsen =
+Durchsetzung.
+
+**Der IST-Stand ist falsch herum**, gemessen im F1-Durchstich am erzeugten perm.cpp:
+
+    COMDARE_ANATOMY_VERSION_STAMP("<organ>", "<system>")     <- ORGAN zuerst
+
+Und die 2-arg-Form ist in anatomy_module_abi_v1.hpp:213 definiert als _M(organ, system, "") --
+mit LEEREM Mess-Stempel. Die 3-arg-Vollform steht daneben (:162); adhoc_emitter.hpp hat beide
+Zweige (:124 / :131), Verzweigung an if (measurement_stamp.empty()).
+
+Gemessen im Tier-Binary (eigenes dlopen, FREMDE Quelle -- nicht die Gate-Meldung):
+
+    organ_line        len=666, 18 Eintraege   belegt
+    system_line       len=101                 belegt
+    measurement_line  len=0                   LEER
+
+Deshalb bricht die Kette an Stufe 1: fehlerklasse=mess_konsistenz status=deklaration_leer,
+haupt_ist=0 haupt_soll=3.
+
+**ZWEI Aenderungen, nicht eine.** Wer nur den leeren Mess-Stempel heilt, zementiert die
+Stufen-Ordnung falsch. OFFEN und vor dem Bau zu klaeren, nicht zu raten: wo die MESS-Stufe in
+der Reihenfolge steht -- der Owner hat in diesem Satz nur System und Organ geordnet.
+
+### KON4-11 -- die Kette bis ##25 ist LEER
+
+Nach diesen Urteilen sind alle Vorglieder des Durchstichs erledigt oder gestrichen. Der
+Durchstich haengt nicht mehr an ihnen, sondern allein an KON4-10. **Das ist der einzige
+verbleibende Blocker vor F1 (Fr 14.08.).**
 ## LEDGER-KONSOLIDIERUNG III -- 10.08.2026, Session-Log-Durchgang
 
 Auftrag Owner 10.08.2026: "Bitte pruefe auch den gesamten Kontext auf alle anderen Probleme, die
