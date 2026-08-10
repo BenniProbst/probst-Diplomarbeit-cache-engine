@@ -16,6 +16,82 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+### W0b-VERIFY 10.08.2026 — der Bau haelt, die BEWEISFUEHRUNG faellt
+
+Drei Straenge, neun Agenten, 0 Fehler. Der adversarische Durchgang hat mit **eigenen,
+frisch gewuerfelten** Koedern geprueft — nicht die des Bau-Agenten nachgefahren — und dabei
+die Klasse getroffen, gegen die der ganze Verifikationsvertrag gebaut ist.
+
+#### Der Kernbefund: ein Koeder INNERHALB der geaenderten Datei, und nichts klappert
+
+Koeder `M3s` (aus `/dev/urandom`, roh=1476330722 → M=3): `schreibe()` fragt den Stamm gar
+nicht erst, der Zaehler laeuft weiter.
+
+| Messstelle | gesund | unter M3s |
+|---|---|---|
+| `bestand()` | `zeilen=S1:7/7 angeboten verworfen=0` | **identisch** |
+| csv auf Platte | 8 Zeilen | **8 Zeilen** |
+| `.xlsx` auf Platte | vorhanden | **vorhanden** |
+| **Mappen-Inhalt** | `dimension ref="A1:C8"`, 8 rows | **`A1:C1`, 1 row** |
+| Paket-Tests | 21/21 | **22/22 PASSED, rc=0** |
+| S3-Schicht (5 Ziele) | gruen | **alle rc=0** |
+
+**Null von sieben Messzeilen im Werk — kein Signal in irgendeiner Schicht.**
+
+Die drei neuen `A9S5Bestand`-Tests belegen, dass die Naht die Zeilen **angeboten** hat, und
+werden als Beleg dafuer gefuehrt, dass die Mappe sie **haelt**. Dazwischen liegt die Strecke,
+auf der M3s sitzt.
+
+**Und die Verteidigung des Bau-Berichts ist widerlegt.** Er argumentierte, die Kopplung an die
+csv lasse einen luegenden Zaehler auffliegen. Aber: die csv ist an dieser Stelle **kein Kind der
+xlsx**, sondern ein zweiter Writer, dem `schreibe()` dieselben Felder reicht. Eine Mutation auf
+dem Weg Naht→Mappe bewegt Zaehler und csv **gemeinsam** — das Messgeraet steht am Nachbarn.
+
+**Zur Ehrlichkeit des Pruefers:** sein erster Wuerfel `M3` (no-op im Writer) **wird** gefangen —
+`test_a9s3_xlsx_ergebnis_writer` 1 von 3 rot. Die S3-Schicht verteidigt ihren eigenen Vertrag.
+`M3s` zeigt nur, dass die **Naht** davon nicht gedeckt ist.
+
+#### Drei weitere Funde derselben Klasse
+
+**Der Nenner steht im Ausgabe-PFAD, war nie in einer AUSGABE.** `[MAPPE-BESTAND]` hat **zwei
+Treffer im Baum — beide Erzeuger**. Kein Test, kein CI-Skript, keine Wache liest die Zeile. Der
+als V-1-Beleg zitierte String stammt aus dem Unit-Test, nicht aus einem Lauf des Werkzeugs.
+
+**Die Stamm/Kind-Kopplung ist UNGEDECKT.** Koeder `N1` loescht `kind_blatt_ = nullptr;` — die
+eine Zeile, die *"legt der Stamm die Annahme nieder, faellt das Kind im selben Zug mit"*
+implementiert. Ergebnis: **21/21 PASSED, rc=0**. Grund: `verworfen()` steht dreimal im Testfile,
+**immer** als `EXPECT_EQ(…, 0u)` — kein Test faehrt den Ablehnungspfad. Die Ueberschrift des
+Commits ist damit **Disziplin, kein Werkzeug**.
+
+**Der eigene Widerruf ist im Artefakt nicht nachgezogen.** Der Bericht korrigiert "9 von 12
+Profilen" auf gemessene **11 Profile, 8 mit csv, 3 ohne `<writeback_methods>`, 0 mit xlsx** —
+aber Commit `579ec9f1` traegt weiter die widerrufene Zahl. Der Widerruf lebt im Bericht; das
+Artefakt, das in die Historie geht, behauptet weiter das Korrigierte.
+
+**Und ein Index ist kein Name:** "registriert als ctest #483" wandert mit Configure-Flags —
+unter Standard-Configure ist es `Test #451` von 460.
+
+#### Was HAELT (Entlastungen, vollwertige Ergebnisse)
+
+Die **Sache selbst funktioniert** — am echten Werk gemessen, nicht geglaubt:
+`dimension ref="A1:C8"`, 8 rows. Der Owner-KERN ist real erfuellt.
+Dazu: Ahnenschaft `907b0433 → 1880f296` (`is-ancestor rc=0`) · Diff-Hygiene 0/0 ·
+fail-closed und die K1-Deckung ("ein Bit steuert beides") unabhaengig reproduziert:
+eigener Koeder → **exakt 5 rot, exakt das benannte Praedikat**
+(`DerBestandHaengtNICHTAnDerPersistenzWahl`).
+
+**`persist:measurements` sammelt weiterhin 0 x xlsx** — bestaetigt, aber mit korrigiertem
+Nenner: csv **44 Zeilen**, nicht 28 (andere Zaehlweise). Ohne diesen Nachzug bleibt der
+DURCHSTICH blockiert, auch mit gepatchtem Profil.
+
+#### Die Lehre, die ueber diesen Posten hinausgeht
+
+> **Ein Test, der eine Mutation innerhalb der geaenderten Datei nicht faengt, ist fuer diese
+> Sache kein Test — auch wenn er gruen ist, auch wenn er neu ist, auch wenn er 22 von 22 zeigt.**
+
+Der Bau wird deshalb NICHT verworfen (die Sache ist richtig gebaut), aber er ist **noch nicht
+abgenommen**: es fehlt ein Orakel, das die Mappe am **Inhalt** prueft (`dimension ref`), nicht
+am angebotenen Zaehler.
 ### DREI ENTLASTUNGEN UND EIN OWNER-WORT 09.08.2026 23:50 — Ergebnis zweier Workflows
 
 Elf Agenten, 0 Fehler. Drei Befunde entlasten, einer verschaerft — und der verschaerfende trifft
