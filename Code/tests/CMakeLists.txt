@@ -187,7 +187,7 @@ comdare_da_add_test(test_ci_wache_mutations_lauf
     LABELS ci_wachen)
 add_dependencies(test_ci_wache_mutations_lauf ci_mutations_lauf)
 
-# ── DAS ZWEITE ZIEL: die Katalog-Faelle, ABGEWAEHLT vom Mess-Lauf ────────────────────
+# -- DAS ZWEITE ZIEL: die Katalog-Faelle, ABGEWAEHLT vom Mess-Lauf --------------------
 # Sie lesen die Produktionsdateien von der Platte und sind deshalb unter JEDEM Mutanten
 # rot -- unabhaengig davon, ob die Suite den Fehler wirklich faengt. Am Objekt gemessen
 # (erster Harness-Lauf 10.08.): sie toeteten alle fuenf Mutanten, waehrend die
