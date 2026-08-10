@@ -246,11 +246,34 @@ if [ "$SUMME" -lt "$MINDEST" ]; then
         exit 1
     fi
     echo "WARNUNG: modus=$MODUS -- dieser Lauf misst per Bauart nicht."
-    echo "         ce profile_run_entry.hpp:1234/:1241: im provision_only-Lauf ist"
-    echo "         'mindestens eine DLL bereitgestellt' das Erfolgsmass, nicht die"
-    echo "         Datenzeile. $SUMME Datenzeile(n) sind hier ein BEFUND, kein Fehler."
-    echo "         Ob wirklich bereitgestellt wurde, entscheidet NICHT diese Wache:"
-    echo "         das Feld provisioned= steht im Lauf-Marker (ci/lauf_marker.sh)."
+    # D3-7b: DAS ERFOLGSMASS IST JE MODUS EIN ANDERES, und der Text muss das
+    # sagen. Bis hierher nannte er in JEDEM weichen Modus das provision_only-
+    # Erfolgsmass -- unter modus=pruef_only oder prune_only war das eine falsche
+    # Auskunft mitten in einer gruenen Ausgabe, also genau die zweite Wahrheit,
+    # gegen die diese Wache gebaut ist.
+    case "$MODUS" in
+        provision_only)
+            echo "         ce profile_run_entry.hpp ('provision_ok = a.provision_only &&"
+            echo "         res.any_provisioned > 0'): im provision_only-Lauf ist 'mindestens"
+            echo "         eine DLL bereitgestellt' das Erfolgsmass, nicht die Datenzeile."
+            echo "         Ob wirklich bereitgestellt wurde, entscheidet NICHT diese Wache:"
+            echo "         das Feld provisioned= steht im Lauf-Marker (ci/lauf_marker.sh)."
+            ;;
+        pruef_only)
+            echo "         ce profile_run_entry.hpp ('if (a.pruef_only) { exit = any_pruef_ok"
+            echo "         > 0 && any_pruef_failed == 0 }'): der S3-Konformitaets-Lauf baut"
+            echo "         nicht und misst nicht -- er laedt jede fertige .so und faehrt nur"
+            echo "         ihr Gate. Erfolgsmass ist das GATE, nicht die Datenzeile."
+            echo "         Ob das Gate hielt, entscheidet NICHT diese Wache, sondern der"
+            echo "         Exit-Code des Treibers selbst (exit!=0 bei JEDEM Gate-Fail)."
+            ;;
+        *)
+            echo "         In diesem Modus ist die Datenzeile ueberhaupt nicht das"
+            echo "         Erfolgsmass. Was der Lauf geleistet hat, entscheidet NICHT diese"
+            echo "         Wache -- sie zaehlt nur Datenzeilen und sagt es hier laut."
+            ;;
+    esac
+    echo "         $SUMME Datenzeile(n) sind hier ein BEFUND, kein Fehler."
     echo "MESS-AUSBEUTE-WACHE: OK ($SUMME Datenzeile(n), modus=$MODUS -- Warnung, kein Fehler)."
     exit 0
 fi

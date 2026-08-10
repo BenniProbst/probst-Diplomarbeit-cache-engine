@@ -369,6 +369,12 @@ fordere_literal "$OUT" "Modus=provision_only"
 fordere_literal "$OUT" "0 Datenzeile(n) insgesamt"
 fordere_literal "$OUT" "WARNUNG: modus=provision_only"
 fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+# D3-7b: die BEGRUENDUNG muss zum Modus passen. Bis D3-7b stand in JEDEM weichen
+# Modus das provision_only-Erfolgsmass -- eine falsche Auskunft mitten in einer
+# gruenen Ausgabe. Ohne diese zwei Zeilen waere ein Vertauschen der Texte nicht
+# zu bemerken (die case-Zweige waeren stille Zweige).
+fordere_literal "$OUT" "eine DLL bereitgestellt' das Erfolgsmass"
+fordere_kein_literal "$OUT" "S3-Konformitaets-Lauf"
 fall_ende
 
 fall "F13 dasselbe Fenster, modus=voll -> rc=1 (die Gegenrichtung)"
@@ -472,6 +478,20 @@ fordere_literal "$OUT" "Modus=pruef_only"
 fordere_literal "$OUT" "0 Datenzeile(n) insgesamt"
 fordere_literal "$OUT" "WARNUNG: modus=pruef_only"
 fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+# Die Gegenrichtung zu F12: hier MUSS die S3-Begruendung stehen und die
+# provision_only-Begruendung fehlen.
+fordere_literal "$OUT" "der S3-Konformitaets-Lauf baut"
+fordere_kein_literal "$OUT" "eine DLL bereitgestellt' das Erfolgsmass"
+fall_ende
+
+fall "F21b leeres Fenster, modus=prune_only -> rc=0, WEDER die eine NOCH die andere Begruendung"
+D="$WERK/f21b"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 prune_only
+fordere_rc 0
+fordere_literal "$OUT" "WARNUNG: modus=prune_only"
+fordere_literal "$OUT" "In diesem Modus ist die Datenzeile ueberhaupt nicht das"
+fordere_kein_literal "$OUT" "eine DLL bereitgestellt' das Erfolgsmass"
+fordere_kein_literal "$OUT" "der S3-Konformitaets-Lauf baut"
 fall_ende
 
 fall "F22 modus=auto mit pruef_only-Marker -> Modus wird GELESEN, rc=0"
