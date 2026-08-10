@@ -31,12 +31,23 @@
      wdk_fairness_example.profile.xml. Damit ist die binary_id dieses Laufs KEINE neue Groesse, sondern die
      schon bekannte Basis-Zelle; der golden-Roundtrip bleibt unberuehrt.
 
-     WRITEBACK: <method value="csv"/>. Der Owner-KERN vom 09.08. ("xlsx ist der Standard, csv waehlbar,
-     beide zusammen zulaessig") ist an DIESEM ce-Stand noch nicht erreichbar: kWritebackMethodRegistry
-     kennt {csv, latex_table, comparison_metrics}, ein Wert "xlsx" existiert dort nicht. csv ist hier also
-     keine Formatwahl gegen den KERN, sondern der einzige deklarierbare Wert; ausserdem entscheidet das
-     persist-Commit-Gate ohnehin CSV-basiert. Sobald der xlsx-Wert in der Registry steht, gehoert er
-     additiv hierher.
+     WRITEBACK: <method value="csv"/> UND <method value="xlsx"/>, also BEIDE (W0b, 2026-08-10).
+     KORREKTUR EINER FALSCHEN BEGRUENDUNG: hier stand, der Owner-KERN vom 09.08. ("xlsx ist der Standard,
+     csv waehlbar, beide zusammen zulaessig") sei an diesem ce-Stand nicht erreichbar, weil
+     kWritebackMethodRegistry nur {csv, latex_table, comparison_metrics} kenne. Das war schon beim
+     Schreiben dieser Datei falsch, am Objekt nachgemessen: WritebackMethod::Xlsx kam mit ce-Commit
+     907b0433 (2026-08-08 11:51 UTC), also VOR der Erstellung dieses Profils (super 54c11a67,
+     2026-08-09 15:24 UTC), und steht in writeback_method_registry.hpp:51 als
+     {WritebackMethod::Xlsx, "xlsx", "Xlsx"}. Die Nachbesserungs-Bedingung des alten Kommentars
+     ("sobald der xlsx-Wert in der Registry steht, gehoert er additiv hierher") war zum Zeitpunkt ihrer
+     Niederschrift bereits erfuellt; sie wird hiermit eingeloest, ADDITIV: csv bleibt stehen.
+     WARUM BEIDE UND NICHT xlsx ALLEIN: die Durchstich-Kette lautet CSV nach persist nach xlsx nach
+     anhang:forward nach PDF. Sie braucht beide Enden. Der Owner-Entscheid 09.08. erlaubt genau das
+     ("AUCH BEIDE ZUSAMMEN ... NICHT NUR ENTWEDER ODER"); ce ergebnis_mappe_naht.hpp fuehrt diesen
+     Eingang als FormatLage::beide, also EINE Mappe, EIN Dateiname-Stamm, zwei Ausgaben.
+     UNABHAENGIG DAVON gilt seit W0b in ce: die xlsx-Mappe entsteht IMMER im Speicher, auch bei einem
+     reinen csv-Profil. <writeback_methods> entscheidet nur noch, WAS auf die Platte geht, nicht mehr,
+     WAS im Speicher entsteht.
 
      ORT: super, nicht ce. Begruendung und offene Entscheidung stehen im Kopf von
      ci/mess_frische_wache.sh und im Commit; kurz: der Treiber ist super-seitig, die Akten sind
@@ -116,6 +127,7 @@
   <measurement_framework name="ycsb"/>
   <writeback_methods>
     <method value="csv"/>
+    <method value="xlsx"/>
   </writeback_methods>
   <measurement_tooling>
     <combo tools="wallclock"/>

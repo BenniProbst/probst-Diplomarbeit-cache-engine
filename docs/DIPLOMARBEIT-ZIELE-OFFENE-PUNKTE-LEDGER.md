@@ -16,6 +16,328 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+### W0b-VERIFY 10.08.2026 — der Bau haelt, die BEWEISFUEHRUNG faellt
+
+Drei Straenge, neun Agenten, 0 Fehler. Der adversarische Durchgang hat mit **eigenen,
+frisch gewuerfelten** Koedern geprueft — nicht die des Bau-Agenten nachgefahren — und dabei
+die Klasse getroffen, gegen die der ganze Verifikationsvertrag gebaut ist.
+
+#### Der Kernbefund: ein Koeder INNERHALB der geaenderten Datei, und nichts klappert
+
+Koeder `M3s` (aus `/dev/urandom`, roh=1476330722 → M=3): `schreibe()` fragt den Stamm gar
+nicht erst, der Zaehler laeuft weiter.
+
+| Messstelle | gesund | unter M3s |
+|---|---|---|
+| `bestand()` | `zeilen=S1:7/7 angeboten verworfen=0` | **identisch** |
+| csv auf Platte | 8 Zeilen | **8 Zeilen** |
+| `.xlsx` auf Platte | vorhanden | **vorhanden** |
+| **Mappen-Inhalt** | `dimension ref="A1:C8"`, 8 rows | **`A1:C1`, 1 row** |
+| Paket-Tests | 21/21 | **22/22 PASSED, rc=0** |
+| S3-Schicht (5 Ziele) | gruen | **alle rc=0** |
+
+**Null von sieben Messzeilen im Werk — kein Signal in irgendeiner Schicht.**
+
+Die drei neuen `A9S5Bestand`-Tests belegen, dass die Naht die Zeilen **angeboten** hat, und
+werden als Beleg dafuer gefuehrt, dass die Mappe sie **haelt**. Dazwischen liegt die Strecke,
+auf der M3s sitzt.
+
+**Und die Verteidigung des Bau-Berichts ist widerlegt.** Er argumentierte, die Kopplung an die
+csv lasse einen luegenden Zaehler auffliegen. Aber: die csv ist an dieser Stelle **kein Kind der
+xlsx**, sondern ein zweiter Writer, dem `schreibe()` dieselben Felder reicht. Eine Mutation auf
+dem Weg Naht→Mappe bewegt Zaehler und csv **gemeinsam** — das Messgeraet steht am Nachbarn.
+
+**Zur Ehrlichkeit des Pruefers:** sein erster Wuerfel `M3` (no-op im Writer) **wird** gefangen —
+`test_a9s3_xlsx_ergebnis_writer` 1 von 3 rot. Die S3-Schicht verteidigt ihren eigenen Vertrag.
+`M3s` zeigt nur, dass die **Naht** davon nicht gedeckt ist.
+
+#### Drei weitere Funde derselben Klasse
+
+**Der Nenner steht im Ausgabe-PFAD, war nie in einer AUSGABE.** `[MAPPE-BESTAND]` hat **zwei
+Treffer im Baum — beide Erzeuger**. Kein Test, kein CI-Skript, keine Wache liest die Zeile. Der
+als V-1-Beleg zitierte String stammt aus dem Unit-Test, nicht aus einem Lauf des Werkzeugs.
+
+**Die Stamm/Kind-Kopplung ist UNGEDECKT.** Koeder `N1` loescht `kind_blatt_ = nullptr;` — die
+eine Zeile, die *"legt der Stamm die Annahme nieder, faellt das Kind im selben Zug mit"*
+implementiert. Ergebnis: **21/21 PASSED, rc=0**. Grund: `verworfen()` steht dreimal im Testfile,
+**immer** als `EXPECT_EQ(…, 0u)` — kein Test faehrt den Ablehnungspfad. Die Ueberschrift des
+Commits ist damit **Disziplin, kein Werkzeug**.
+
+**Der eigene Widerruf ist im Artefakt nicht nachgezogen.** Der Bericht korrigiert "9 von 12
+Profilen" auf gemessene **11 Profile, 8 mit csv, 3 ohne `<writeback_methods>`, 0 mit xlsx** —
+aber Commit `579ec9f1` traegt weiter die widerrufene Zahl. Der Widerruf lebt im Bericht; das
+Artefakt, das in die Historie geht, behauptet weiter das Korrigierte.
+
+**Und ein Index ist kein Name:** "registriert als ctest #483" wandert mit Configure-Flags —
+unter Standard-Configure ist es `Test #451` von 460.
+
+#### Was HAELT (Entlastungen, vollwertige Ergebnisse)
+
+Die **Sache selbst funktioniert** — am echten Werk gemessen, nicht geglaubt:
+`dimension ref="A1:C8"`, 8 rows. Der Owner-KERN ist real erfuellt.
+Dazu: Ahnenschaft `907b0433 → 1880f296` (`is-ancestor rc=0`) · Diff-Hygiene 0/0 ·
+fail-closed und die K1-Deckung ("ein Bit steuert beides") unabhaengig reproduziert:
+eigener Koeder → **exakt 5 rot, exakt das benannte Praedikat**
+(`DerBestandHaengtNICHTAnDerPersistenzWahl`).
+
+**`persist:measurements` sammelt weiterhin 0 x xlsx** — bestaetigt, aber mit korrigiertem
+Nenner: csv **44 Zeilen**, nicht 28 (andere Zaehlweise). Ohne diesen Nachzug bleibt der
+DURCHSTICH blockiert, auch mit gepatchtem Profil.
+
+#### Die Lehre, die ueber diesen Posten hinausgeht
+
+> **Ein Test, der eine Mutation innerhalb der geaenderten Datei nicht faengt, ist fuer diese
+> Sache kein Test — auch wenn er gruen ist, auch wenn er neu ist, auch wenn er 22 von 22 zeigt.**
+
+Der Bau wird deshalb NICHT verworfen (die Sache ist richtig gebaut), aber er ist **noch nicht
+abgenommen**: es fehlt ein Orakel, das die Mappe am **Inhalt** prueft (`dimension ref`), nicht
+am angebotenen Zaehler.
+### DREI ENTLASTUNGEN UND EIN OWNER-WORT 09.08.2026 23:50 — Ergebnis zweier Workflows
+
+Elf Agenten, 0 Fehler. Drei Befunde entlasten, einer verschaerft — und der verschaerfende trifft
+einen Posten, den ich selbst falsch formuliert hatte.
+
+---
+
+#### 1. DAS OWNER-WORT, das die Bauform aller Wachen aendert
+
+Verifiziert am Rohtranskript: **Zeile 25562, `type=user`, `promptSource=typed`,
+`2026-08-09T14:34:47.202Z`**, 19 Rohtreffer im Transkript. Woertlich:
+
+> „Ich sehe einen Haufen shells statt vernuenftiger google tests, was soll das? Es waere
+> sauberer im cmake-Debug Modus standard google Tests zu fahren und diese in Release zu
+> wiederholen aufgrund von compile regressionen. **Skripte sagen gar nichts.** Bitte
+> recherchiere **Mutations-Sicheres Testen**. Die Waisen muessen fertig gebaut werden, also die
+> C++ Implementierung dazu."
+
+Dazu, 13:31 desselben Tages: *„Und es war ja auch nur C++ und cmake erlaubt, es gibt ja keine
+skripte."*
+
+**Was das an meiner eigenen Aufgabenliste umwirft:** Posten #27 („T-6-Luecke") verlangte in
+seiner bisherigen Fassung *„je Wache einen Selbsttest nach dem Muster
+`ci/tests/mess_ausbeute_bissprobe.sh`"* — also **weitere Shell-Proben**. Nach RANGFOLGE
+OWNER > PLAN ist das kein Detail, sondern ein Konflikt. **Belastend:**
+`frische_wache_probe.sh` und `lauf_marker_probe.sh` wurden am 09.08. um **18:55** — vier Stunden
+NACH dem Owner-Wort — als Shell-Proben hinzugefuegt.
+
+**Die gute Nachricht: der Weg ist schon gebaut.** Es existiert ein gelandetes, CMake-registriertes
+C++23-Modul `Code/ci_wachen/` mit Testwerkbank und drei Google Tests. `Code/tests/CMakeLists.txt:112`
+traegt die Ueberschrift woertlich: *„DIE CI-WACHEN ALS GOOGLE TESTS (Owner-KERN: 'SKRIPTE SAGEN GAR
+NICHTS')"*, und `ci/tests/xml_wellformed_probe.sh:7-8` sagt ueber sich selbst: *„ABGELOEST am
+2026-08-09, NOCH AM TAG IHRER LANDUNG, durch Code/tests/unit/test_ci_wache_xml_wellformed.cpp"*.
+Die Hausform laeuft in `test:unit` UND `test:unit:debug` — beide Optimierungsstufen, genau was der
+zweite Teil des Owner-Worts verlangt.
+
+**ABER: die Migration steht auf Stufe 1 von 2.** Die *Proben* sind C++, die *Wachen selbst* noch
+Shell. Die Pipeline ruft weiterhin `sh scripts/ci_xml_wellformed_guard.sh` (`.gitlab-ci.yml:307`);
+die C++-Binaries sind gebaut und installiert, aber **werden nicht gerufen**. Dieser Ist-Stand
+steht in KEINEM Plandokument.
+
+**Und ein offener Owner-Auftrag, der bisher nirgends als Posten gefuehrt wird:**
+*„Bitte recherchiere Mutations-Sicheres Testen."* (10 Rohtreffer im Transkript.)
+
+---
+
+#### 2. ENTLASTUNG: das Magic-Budget ist verbraucht — und das kostet heute nichts
+
+**Genau EIN Wechsel im Fenster.** Der ##34-Filter selbst gefahren, **mit Nenner**: 159 Commits
+liegen im Fenster [08.08. 00:00, 10.08. 00:00] auf `origin/main`; davon beruehren **2** die
+Magic-Definitionsdatei (der Bump `d4c0b49c` + ein reiner Zeilenumbruch-Hygienecommit `95ce4372`,
+der die Werte nicht anfasst); davon ist **1** eine echte Wertaenderung.
+
+Das Budget ist damit verbraucht — **aber der Schaden ist heute null**, weil noch nichts Grosses
+gebaut wurde. Er wuerde erst real, wenn **nach dem 26.08. 06:00** noch ein Bump kaeme, unabhaengig
+davon, ob das der urspruenglich fuer den 24.08. geplante ist oder ein neuer. Die Konsequenz ist
+also nicht „der Plan ist gebrochen", sondern: **ab jetzt gilt die NULL-BUMP-Regel, nicht erst ab
+dem 24.08.**
+
+**Nebenbefund am Plan selbst:** ##34 traegt an einer von zwei Parallelstellen noch den Wortlaut
+„genau EIN Magic-Wechsel **4→5**" (Zeile 411), waehrend Zeile 616 korrekt nur „genau EIN Wechsel"
+sagt. Die „4→5" ist ein **unbereinigter Textrest** aus einer aelteren Fassung — Major stand bei 4,
+bevor INC-2b am 17.07. auf 5 bumpte, war zum Zeitpunkt der Niederschrift also schon Geschichte.
+Ein Kopierfehler an einer von zwei Stellen; inhaltlich folgenlos, aber er zeigt, dass „geschaerft"
+nicht heisst „ueberall nachgezogen".
+
+---
+
+#### 3. ENTLASTUNG: die -Wall-Luecke ist real, der verdeckte Bestand ist KLEIN
+
+Drei Repos einzeln gemessen, drei Zaehlweisen offengelegt, die empfohlene benannt:
+
+    Nenner (Methode A, compile_commands.json = was der Compiler wirklich faehrt)
+      comdare-cache-engine   575 Uebersetzungsvorgaenge
+      comdare-prt-art         17
+      super Code/             46
+
+    -Wall   214 von 574 Bau-Kanten -- ausschliesslich tests/unit + googletest
+    -Werror   0 von 575  -- buchstaeblich nirgends in der Default-Konfiguration
+
+**Die Verfeinerung, die den bisherigen Stand korrigiert:** „ist ein Test" ist **nicht**
+gleichbedeutend mit „hat -Wall". Von 471 `tests/`-Uebersetzungsvorgaengen tragen nur **208
+(44,2 %)** das Flag. Grund, im Quelltext dokumentiert (`tests/unit/CMakeLists.txt:1765-1770`):
+eine **zweite, parallele Testklasse** — standalone `main()`-Tests ohne gtest, per `add_test`
+direkt registriert statt ueber `comdare_add_test`. Sie umgeht den Warnstufen-Mechanismus
+**strukturell**, nicht aus Nachlaessigkeit.
+
+**Was ein Einschalten kostet — gemessen, nicht geschaetzt.** 114 Uebersetzungsvorgaenge per
+`-fsyntax-only` geprueft (GCC 15.3.0 + Clang 22.1.8), Flags 1:1 aus `compile_commands.json`,
+Stichproben mit gedrucktem Seed (`random.seed(20260809)`) und ausgewiesener Ausschlussquote:
+
+    SPEICHER    KEINER    0 von 114 geprueften Uebersetzungsvorgaengen
+    MUTANT      2         beide erklaert: print_help() ist unter -D*_TEST_NO_MAIN real unbenutzt
+    REGRESSION  ~20-26 gesamt, ueberwiegend Stil-/API-Hygiene, keine Datei mit mehr als 7 Treffern
+
+**Das ist kein grosser verdeckter Bestand.** Die Owner-Verdachtsklasse SPEICHER — die
+gefaehrlichste — ist **leer**. Damit ist die Entscheidung „-Wall/-Werror einfuehren?" keine
+Risikofrage mehr, sondern eine reine Kosten-Nutzen-Frage, und die Vorlage kann dem Owner mit
+Zahlen statt mit Vermutungen vorgelegt werden.
+
+---
+
+#### 4. ENTLASTUNG: die ~11 undurchsuchten Transkripte enthalten das Material NICHT
+
+Der Ledger fuehrte sie als offenen Rest (`:944-946`). Alle 14 JSONL-Dateien inventarisiert:
+**sieben sind 226-Byte-Metadaten-Stubs**, eine ist ein reiner `file-history-snapshot` ohne
+Konversation, zwei tragen je **eine** Owner-Zeile ohne Bezug zum Gegenstand, eine ist
+Terminal-Escape-Rauschen. **Substantiell ist genau eine** (`b15ade0e`, 7,3 MB, 2209 Zeilen) — und
+sie behandelt ein anderes Thema (Architektur-Atlas/UML, 05.–06.08.).
+
+**Fuer keine der sechs BEHAUPTETEN Streichungen** (F-07b · Streichkaskaden-Ordnung · ##24/##15 ·
+##40 inkl. T-13/T-14 · R-3/perm_runner · checkpoint_measure) liefert der Rest-Korpus einen
+Owner-Beleg — **weder stuetzend noch widersprechend**. Das ist eine **Entlastung des
+Suchverfahrens**, keine Erkenntnis zur Sache: die Fundstelle existiert nicht, die Frage bleibt
+beim Owner.
+
+**Methodisch der wichtigste Teil des Berichts:** ueber 90 % der Rohtreffer waren
+**Tool-Result-Echos** — Ledger-Zitate, die ein Agent sich selbst zurueckliest. Erst die
+Verifikation gegen `origin.kind=="human"` trennt Owner-Wort von Agenten-Text. Wer roh greppt und
+zaehlt, misst seine eigene Vergangenheit. Gegenprobe bestanden: `"Atlas"` = 5 Treffer in den 20
+echten Owner-Zeilen, `"prod2"` = 34 Rohtreffer, davon **0** mit `origin=human`.
+
+**„SPEZIFIZIERT, NICHT GEBAUT"** — dritte unabhaengige Bestaetigung des Nullbefunds, diesmal in
+einem inhaltlich voellig anderen Transkript. **Die checkpoint_measure-Erfindung ist endgueltig
+belegt.**
+### DER 2-PASS-BEFUND 09.08.2026 23:20 — ein frischer Configure verschweigt vier Tests UND bleibt gruen
+
+**Unabhaengig reproduziert**, an einem anderen Gegenstand als D1, von einem Strang, der gar nicht
+danach gesucht hat. Er heilte 58 Diff-Hygiene-Verstoesse und fuhr zur Abnahme die Tests:
+
+    erster Lauf    99% tests passed, 4 tests failed out of 488
+    nach 2-Pass   100% tests passed, 0 tests failed out of 492
+
+**Ein frisch konfiguriertes Build-Verzeichnis ueberspringt vier bedingte Bloecke**, weil die
+Codegen-Werkzeuge zum Configure-Zeitpunkt noch nicht existieren. Das Repo protokolliert es
+selbst: `build-hyg/comdare_registrierungs_protokoll.txt` traegt
+`UEBERSPRUNGEN|test_v41_anatomy_f15_measurement`. Erst der 2-Pass — `comdare_anatomy_codegen_cli`
+und `comdare_adhoc_emitter_cli` bauen, reconfigure, neu bauen — setzt alle vier auf AKTIV.
+Vier weitere Ziele sind `EXCLUDE_FROM_ALL` (drei Registry-Generatoren + `test_profile_roundtrip`)
+und brauchen je einen eigenen `--target`-Aufruf; deren erstes Rot war eine **Bau-Luecke, kein
+Defekt**.
+
+**Warum das mehr ist als eine Fussnote:** `test_v41_anatomy_f15_measurement` traegt **30 der 58
+geheilten Stellen**. Genau diese Datei waere ungetestet durchgerutscht — **bei gruener
+Gesamtbilanz**. Das ist die D1-Klasse ("`make check` faehrt 427 statt 431") an einem zweiten
+Gegenstand, und sie ist damit nicht mehr ein Einzelbefund des Bauwegs, sondern ein **Muster**.
+
+**Und eine Zahl von mir faellt.** Ich hatte den Bau-Straengen "Sollstand 490 Tests" mitgegeben.
+**490 trifft keine der beiden Konfigurationen** (488 ohne 2-Pass, 492 mit); sie stammt aus einem
+dritten Bau-Zustand. Die Test-Registrierungen in `tests/unit/CMakeLists.txt` sind auf
+`origin/development` und dem Heiler-Branch **identisch (323)** — die Differenz kommt nicht aus
+dem Diff, sondern aus dem Bau. Das ist V6.5 woertlich: **zur Testzahl gehoert der BAU-ZUSTAND,
+nicht nur der Commit.** Drei Zustaende, drei Zahlen.
+
+---
+
+### B1 — EIN KOMMANDO, DAS SICH SELBST ZAEHLT: der Selbsttreffer-Befund
+
+Gefunden vom **zweiten Lens**, nicht vom Bau-Agenten und nicht vom Lead. Er ist der Grund, warum
+Code-Landungen zwei Lenses brauchen.
+
+Der Bau-Agent hatte eine als **BINDEND** markierte Wachen-Zeile (`algo_semver.hpp:127`) von 143
+auf 119 Byte verdichtet und die Aequivalenz belegt: *"beide Formen liefern dieselben 131 Treffer"*.
+Der Lead hat unabhaengig nachgemessen und **130** erhalten. Zwei sorgfaeltige Messungen, eine
+Ziffer Unterschied — und **beide sind richtig**:
+
+    Selbsttreffer, nur algo_semver.hpp:      Repo-weit:
+    ALT-Datei / ALT-Muster   51              rev=aebc4f2c   ALT=131  NEU=131
+    ALT-Datei / NEU-Muster   51              rev=HEAD       ALT=130  NEU=130
+    NEU-Datei / ALT-Muster   50
+    NEU-Datei / NEU-Muster   50
+
+**Die alte Kommandozeile enthielt ihr eigenes Suchmuster woertlich und traf damit sich selbst.**
+Die verdichtete Form schiebt `\(` zwischen Praefix und Alternative — sie trifft sich nicht mehr.
+Der verlorene Treffer war ein **Phantom**: eine Doku-Zeile, keine Wache. Die Zaehlung wird durch
+die Aenderung also **besser**.
+
+**Der Schaden liegt woanders:** das Dokument beschreibt die Wirkung seiner eigenen Aenderung
+falsch, und zwar in einem als bindend markierten Kommando. Wer es faehrt, bekommt 130, vergleicht
+gegen die dokumentierten 131 und schliesst, dass eine ce-eigene Versions-Wache verschwunden ist.
+**Ein Fehlalarm, eingebaut in ein Dokument, das Alarme schlichten soll.**
+
+Die Fehlerklasse in einem Satz: **ein transkribierter String, der als WERT auftritt.** Reiner
+Text nach aussen, ein Datum nach innen. Genau die Klasse, nach der der zweite Lens suchen sollte
+— und er fand sie an der einzigen Stelle, an der sie ueberhaupt sein konnte.
+
+**Zweiter Blocker desselben Laufs (B2):** die Aufteilung einer `#include`-Zeile verschiebt
+`measurement_snapshot.hpp` ab Zeile 24 um **+1**; der Anker `:191` steht zweimal im Baum
+(`pipeline_csv_schema.hpp:7`, `test_b3_schema_freeze_stufe1.cpp:219`) und zeigte an der Basis
+exakt. Keine Wache haengt daran (gemessen: 0 Treffer ueber `scripts`, `cmake`, `.gitlab-ci.yml`),
+aber es ist der eine Anker, den **dieser Diff selbst gebrochen hat** — in einem Repo mit
+dokumentierter Anker-Drift-Historie (einer wanderte um 239 Zeilen).
+
+---
+
+### REICHWEITE-KORREKTUR: die Heilung macht Pipeline 15501 NICHT gruen — und soll es nicht
+
+Meine Erwartung war falsch. Der Bereich von 15501 ist `8fcf0c0e..aebc4f2c`, **durch zwei SHAs
+festgenagelt**; ein Job-Retry liest dieselbe `CI_COMMIT_BEFORE_SHA` und bleibt rot. Keiner der
+fuenf Heilungs-Commits liegt in diesem Bereich (`merge-base --is-ancestor` fuenfmal NEIN — was
+richtig ist, sie entstanden danach).
+
+Da `origin/main == origin/development == aebc4f2c`, misst der **naechste** FF `aebc4f2c..<neu>`,
+und der ist gruen (`rc=0`, 48 Zusatzzeilen, 0 Nicht-ASCII, 0 ueber 120 Spalten).
+
+**Das Paket verhindert die WIEDERHOLUNG, es heilt nicht die Vergangenheit.** Wer als Kriterium
+"15501 wird gruen" setzt, setzt ein unerfuellbares — und wer es erfuellen wollte, muesste die
+Historie umschreiben. Das ist ausgeschlossen.
+
+---
+
+### ZWEI WERKZEUG-FALLEN, am Objekt gefunden und vom Lead nachgemessen
+
+**`g++-15` existiert auf prod1 NICHT.** Das blanke `g++` **ist** GCC 15.3.0; versioniert gibt es
+nur `g++-13` und `g++-16`. Wer `CC=gcc-15 CXX=g++-15` aus einem Explore-Bericht abschreibt,
+bekommt einen Configure-Abbruch, der wie ein Umgebungsproblem aussieht statt wie ein Tippfehler.
+
+**`scripts/ci_host_klassen_gegenorakel.sh` gibt es nur in super, nicht in ce** (ce 0 Treffer,
+super 2). Die Zahl **423** fuer die basis-Host-Klasse stammt aus einer super-Messung und ist in
+ce nicht reproduzierbar. Der betroffene Strang hat sich geweigert, die Floor-Zahl darauf zu
+stuetzen — **richtig, und aus einem schaerferen Grund als Vorsicht**: V-7 verlangt die zweite
+Zahl aus einer FREMDEN Quelle, aber "fremd" heisst *unabhaengig erhoben*, nicht *aus einem
+anderen Repo uebertragen*. **Eine importierte Zahl ist ein Stellvertreter mit
+Fremdsprachen-Anstrich.** Laesst sie sich im eigenen Repo nicht erheben, wird die Stelle
+ausdruecklich als ungedeckt benannt — das ist eine zulaessige Antwort auf "was erzwingt das
+Halten?", eine geliehene Zahl nicht.
+
+---
+
+### EIN SCHNITTFEHLER DES LEADS, durch Nachfragen statt Bauen gefunden
+
+Strang C (D2-Abdeckungswache) hat gemeldet, dass sein Posten **D2-G6** ausschliesslich in
+`tests/unit/CMakeLists.txt` sitzt — der Datei, die laut Auftrag Strang A gehoert. Nachgemessen:
+D2-G6 und die **AS-Bewaffnung** von Strang A betreffen **dieselben drei Registrierungen**
+(`test_axis_registry_roundtrip` :5379, `test_system_axis_registry_roundtrip` :5409,
+`test_measurement_axis_registry_roundtrip`). **Ein Gegenstand mit zwei Namen, vom Lead auf zwei
+Straenge verteilt.**
+
+Der Strang hat NICHT gebaut, sondern gefragt — obwohl beide Nachbar-Baeume gerade sauber waren.
+Das ist die richtige Lesart der Ein-Schreiber-Regel: sie schuetzt nicht vor gleichzeitigem
+Schreiben, sondern vor **zwei Autoren desselben Gegenstands**. Aufloesung: Strang C liefert die
+woertliche Patch-Vorlage, Strang A baut sie ein — in EINEM Commit.
+
+Nebenbefund derselben Meldung: die Zeilenanker des Explores (5218/5225/5240) sind gegen das
+Objekt (5400-5403/5407/5422) um **~180 Zeilen gedriftet**. Zeilennummern gelten nur mit
+Commit-Anker.
 ### W0a IST ANGELAUFEN 09.08.2026 23:00 — vier Bau-Straenge, vier Explores, und die Reihenfolge stimmt wieder
 
 **Der Kontext wurde neu gegruendet.** Owner-Direktive, woertlich: *"arbeite im Sinne der gesetzten
