@@ -153,6 +153,18 @@ target_compile_definitions(test_ci_wache_registrierung PRIVATE
     "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
     "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
 
+# Owner-Auftrag 10.08.2026 ("mal schauen, ob nicht dort speicher eingespart sein kann"):
+# das Bau-Parallelitaets-Budget. Dieselben zwei Defines wie oben -- die Wache liest die
+# .gitlab-ci.yml BEIDER Repositories (super direkt, ce ueber die Repo-Wurzel), weil beide
+# Pipelines sich denselben Runner und damit denselben Arbeitsspeicher teilen.
+comdare_da_add_test(test_ci_wache_speicherbudget
+    SOURCES unit/test_ci_wache_speicherbudget.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_speicherbudget PRIVATE
+    "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
+    "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
+
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
 if(COMDARE_V32_ENABLE)

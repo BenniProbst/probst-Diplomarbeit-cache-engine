@@ -65,7 +65,22 @@ variables:
   GIT_STRATEGY: fetch                      # (REV 16, path a) natives Repo-Setup -> get_sources injiziert CI_JOB_TOKEN via extraheader
   GIT_SUBMODULE_STRATEGY: recursive        # (REV 16, path a) nativer rekursiver Submodul-Fetch mit CI_JOB_TOKEN (ersetzt den manuellen Deploy-Token-Klon)
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
-  CMAKE_BUILD_PARALLEL_LEVEL: "6"          # User 2026-07-06: 2x6 Kerne bei concurrent=2 (prod1 16C/60G, 17G frei, kein earlyoom; revidiert 8@concurrent=1)
+  # DIESER WERT WIRKT GLOBAL, ALSO IN JEDEM BAU-JOB. Der Spitzenbedarf ist deshalb
+  # (Jobs gleichzeitig) x (dieser Wert) x (Speicher je Uebersetzer) -- ein Produkt aus
+  # drei Zahlen, die in drei verschiedenen Systemen stehen.
+  # KORREKTUR 10.08.2026 (Owner-Auftrag "mal schauen, ob nicht dort speicher eingespart
+  # sein kann"): die alte Begruendung "2x6 Kerne bei concurrent=2" war seit der
+  # Runner-Umstellung FALSCH. /usr/local/sbin/runner-mode.sh:43 setzt im Normalbetrieb
+  # NORMAL_CC=4 auf prod1 UND prod2 -- vier Jobs gleichzeitig, nicht zwei. Der Ansatz war
+  # damit um den Faktor 2 zu klein gerechnet, ohne dass etwas rot wurde.
+  # GEMESSEN am selben Tag (26 TUs von 635, /usr/bin/time -v, Release-Flags aus
+  # compile_commands.json): groesste TU 660 MB, Permutations-TUs Median 580 MB.
+  # 4 x 6 x 660 MB = 15840 MB Spitze gegen rund 24576 MB, die auf prod1 dafuer frei sind.
+  # DER WERT BLEIBT BEI 6 -- das Budget haelt. Was sich aendert: es wird jetzt GEPRUEFT.
+  # Die Wache ist Code/tests/unit/test_ci_wache_speicherbudget.cpp (ctest -L ci_wachen);
+  # sie faellt, wenn dieser Wert, der ce-Zwilling oder die Runner-Annahme auseinanderlaufen.
+  # Ein Kommentar konnte das nie -- er hat drei Wochen lang das Falsche behauptet.
+  CMAKE_BUILD_PARALLEL_LEVEL: "6"
   COMDARE_LINT_PATHS: "Code"
   COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
   # cppcheck-Pendant zur EXCLUDE_RE (Template 237b6ec): OHNE external/thesis scannt lint:static die
