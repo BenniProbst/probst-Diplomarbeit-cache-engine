@@ -155,6 +155,25 @@ zelle_ohne_marker() {   # $1=verzeichnis $2=anzahl-datenzeilen
         _i=$((_i + 1))
     done
 }
+# D3-3b: eine Zelle, die NUR Kopfzeile und Leerzeilen geschrieben hat. Die drei
+# Leerzeilen sind bewusst VERSCHIEDEN (voellig leer / nur Blanks / Tab+Blank) --
+# eine Heilung, die nur `^$` verwirft, faellt an den letzten beiden.
+zelle_leerzeilen() {   # $1=verzeichnis $2=lauf_kennung $3=modus
+    mkdir -p "$1"
+    printf '%s\n' "$KOPF" > "$1/measurements.csv"
+    printf '\n'    >> "$1/measurements.csv"
+    printf '   \n' >> "$1/measurements.csv"
+    printf '\t \n' >> "$1/measurements.csv"
+    {
+        echo "quelle=RUN_PROFILE"
+        echo "modus=$3"
+        echo "measured=0"
+        echo "resumed=0"
+        echo "provisioned=0"
+        echo "csv_ok=1"
+        echo "lauf_kennung=$2"
+    } > "$1/LAUF_MARKER.txt"
+}
 
 echo "============================================================================="
 echo "PROBE FRISCHE-WACHE"
@@ -279,6 +298,32 @@ fordere_rc 1
 fordere_literal "$OUT" "csv_dieser_lauf=1"
 fordere_literal "$OUT" "datenzeilen_dieser_lauf=0"
 fordere_literal "$OUT" "datenzeilen_altbestand=$ZA"
+fordere_literal "$ERR" "aus FREMDEN Laeufen liegen im selben Verzeichnis"
+fall_ende
+
+# =============================================================================
+# F6b D3-3b -- DIESELBE MASKIERUNG, ABER DURCH EIGENE LEERZEILEN.
+#     F6 oben deckt nur die Neuzelle mit NUR Kopfzeile ab. Schreibt dieselbe
+#     Zelle Kopfzeile PLUS Leerzeilen, war der Befund bis 10.08.2026 unsichtbar:
+#     `Datenzeilen = Zeilen - 1` ergab datenzeilen_dieser_lauf=3, das
+#     Maskierungs-Gate haengt an `== 0` -- und blieb still. Am Objekt gemessen,
+#     nicht vermutet: gegen die HEAD-Fassung vor der Heilung meldet dieser Fall
+#     rc=0 statt rc=1.
+#     Der Fall ist damit die Naht zwischen D3-8 (Maskierung) und D3-3b
+#     (Leerzeile ist kein Messwert): keins der beiden Gates faengt ihn allein.
+# =============================================================================
+KA="$(wuerfel 1000 49999)-$(wuerfel 1000 49999)"
+KN="$(wuerfel 50000 99999)-$(wuerfel 50000 99999)"
+ZA=$(wuerfel 1 6)
+fall "F6b Alt($ZA Zeilen) + Neu(nur Kopf + 3 LEERZEILEN, modus=voll) -> rc=1"
+D="$WERK/f6b"; zelle "$D/altzelle" "$KA" voll "$ZA"
+zelle_leerzeilen "$D/neuzelle" "$KN" voll
+lauf pruefen "$D" "$KN"
+fordere_rc 1
+fordere_literal "$OUT" "csv_dieser_lauf=1"
+fordere_literal "$OUT" "datenzeilen_dieser_lauf=0"
+fordere_literal "$OUT" "datenzeilen_altbestand=$ZA"
+fordere_literal "$OUT" "datenzeilen_verworfen=3"
 fordere_literal "$ERR" "aus FREMDEN Laeufen liegen im selben Verzeichnis"
 fall_ende
 
@@ -530,8 +575,12 @@ sed 's|if \[ "\$_k" = "\$KENNUNG" \]; then|if [ -n "$_k" ]; then|' "$WACHE" > "$
 mutant_fahren "M3  ohne Kennungs-Vergleich (jede CSV gilt als frisch)" "$MU"
 
 # M4: die Datenzeilen werden nicht mehr gezaehlt -- der zweite Ausgang verhungert.
+# Die Zieladresse ist seit D3-3b (10.08.2026) die Zuweisung aus dem awk-Paar und
+# nicht mehr der alte `-le 1`-Zweig; die alte Adresse traf nichts mehr. Dass die
+# neue trifft, ist nicht behauptet, sondern erzwungen: mutant_fahren bricht mit
+# rc=2 ab, wenn der Mutant byte-gleich zum Original bleibt.
 MU="$WERK/mut_zeilen.sh"
-sed 's|if \[ "\$_zeilen" -le 1 \]; then _daten=0; else _daten=\$((_zeilen - 1)); fi|_daten=1|' "$WACHE" > "$MU"
+sed 's|^        _daten=${_paar##\* }$|        _daten=1|' "$WACHE" > "$MU"
 mutant_fahren "M4  Datenzeilen konstant 1 (Maskierung wird unsichtbar)" "$MU"
 
 echo ""

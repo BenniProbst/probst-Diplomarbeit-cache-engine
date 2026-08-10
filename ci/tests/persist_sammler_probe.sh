@@ -142,6 +142,21 @@ nur_kopf() {          # $1 = Zieldatei (relativ zum Klon)
     mkdir -p "$(dirname "$KLON/$1")"
     printf '%s\n' "$KOPF" > "$KLON/$1"
 }
+# D3-3b: Kopfzeile + drei LEERZEILEN + optional echte Datenzeilen. Die drei
+# Leerzeilen sind bewusst VERSCHIEDEN (voellig leer / nur Blanks / Tab+Blank) --
+# eine Heilung, die nur `^$` verwirft, faellt an den letzten beiden.
+mit_leerzeilen() {    # $1 = Zieldatei (relativ), $2 = echte Datenzeilen, $3 = Token
+    mkdir -p "$(dirname "$KLON/$1")"
+    printf '%s\n' "$KOPF" > "$KLON/$1"
+    printf '\n'    >> "$KLON/$1"
+    printf '   \n' >> "$KLON/$1"
+    printf '\t \n' >> "$KLON/$1"
+    _i=1
+    while [ "$_i" -le "$2" ]; do
+        printf 'perm-%s,koeder_%s,%s,%s,1\n' "$_i" "$3" "$((1000 + _i))" "$((4000 + _i))" >> "$KLON/$1"
+        _i=$((_i + 1))
+    done
+}
 mit_daten() {         # $1 = Zieldatei (relativ), $2 = Anzahl Datenzeilen, $3 = Token
     mkdir -p "$(dirname "$KLON/$1")"
     printf '%s\n' "$KOPF" > "$KLON/$1"
@@ -626,6 +641,71 @@ fordere_literal "$OUT" "KEIN COMMIT"
 fordere_literal "$OUT" "xlsx_gesamt=1"
 fordere_zahl "Dateien im INDEX unter measurement/" "$(g_indexzahl)" 0
 fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$BASIS_N"
+fall_ende
+
+# =============================================================================
+# P14 D3-3b -- EINE LEERZEILE OEFFNET DAS COMMIT-GATE NICHT.
+#     P1 deckt nur die CSV mit NUR der Kopfzeile ab. Kommen Leerzeilen dazu,
+#     war der Befund bis 10.08.2026 unsichtbar: der Sammler rechnete
+#     `Datenzeilen = Zeilen - 1`, meldete datenzeilen_gesamt=3 und das Gate
+#     (`-eq 0`) liess den Rueckschrieb durch. Am Objekt gemessen, nicht
+#     vermutet: gegen die HEAD-Fassung vor der Heilung committet dieser Fall.
+#     Damit waere ein Laufordner OHNE einen einzigen Messwert dauerhaft im
+#     Mess-Archiv gelandet -- unter der Nie-loeschen-Doktrin irreversibel.
+#     Der Beweis wird wie in P1 an GIT gefuehrt, nicht an der Ausgabe.
+# =============================================================================
+PIPE_ID=$(wuerfel 10000 65000)
+TS14="20260810-000015-p$PIPE_ID"
+K14=$(token)
+fall "P14 Kopf + NUR 3 Leerzeilen -> datenzeilen_gesamt=0, KEIN Commit"
+sandbox p14
+mit_leerzeilen "Code/measure_out/perm-0001/measurements.csv" 0 "$K14"
+sammle "$TS14"
+fordere_rc 0
+fordere_literal "$OUT" "csv_gesamt=1"
+fordere_literal "$OUT" "datenzeilen_gesamt=0"
+fordere_literal "$OUT" "leerzeilen_gesamt=3"
+fordere_literal "$KLON/measurement/$TS14/PROVENANCE.txt" "datenzeilen_gesamt=0"
+fordere_literal "$KLON/measurement/$TS14/PROVENANCE.txt" "leerzeilen_gesamt=3"
+gate "$TS14"
+fordere_rc 10
+fordere_literal "$OUT" "KEIN COMMIT"
+fordere_literal "$OUT" "leerzeilen_gesamt=3"
+fordere_zahl "Dateien im INDEX unter measurement/" "$(g_indexzahl)" 0
+fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$BASIS_N"
+g_status_ohne_untracked "$WERK/p14_status"
+fordere_leer "git status --porcelain -uno" "$WERK/p14_status"
+fall_ende
+
+# =============================================================================
+# P15 DIE GEGENRICHTUNG (K13): dieselbe Datei MIT echten Datenzeilen daneben
+#     muss WEITER committen -- und mit der ECHTEN Zahl, nicht mit N+3.
+#     Ohne diesen Fall belegte P14 nur, dass etwas strenger geworden ist; er
+#     belegt, dass genau die Leerzeilen und nichts sonst verworfen werden.
+# =============================================================================
+PIPE_ID=$(wuerfel 10000 65000)
+TS15="20260810-000016-p$PIPE_ID"
+N15=$(wuerfel 1 5)
+K15=$(token)
+fall "P15 Kopf + 3 Leerzeilen + $N15 echte -> datenzeilen_gesamt=$N15, 1 Commit"
+sandbox p15
+mit_leerzeilen "Code/measure_out/perm-0001/measurements.csv" "$N15" "$K15"
+sammle "$TS15"
+fordere_rc 0
+fordere_literal "$OUT" "csv_mit_datenzeile=1"
+fordere_literal "$OUT" "datenzeilen_gesamt=$N15"
+fordere_literal "$OUT" "leerzeilen_gesamt=3"
+gate "$TS15"
+fordere_rc 0
+fordere_literal "$OUT" "COMMIT-GATE OK: $N15 Datenzeile(n)"
+fordere_zahl "Commits (Sandbox-Basis war $BASIS_N)" "$(g_commitzahl)" "$((BASIS_N + 1))"
+# Der Token muss im COMMITTETEN BLOB stehen, nicht bloss auf der Platte --
+# und die Leerzeilen duerfen die Datei nicht veraendert haben.
+git -C "$KLON" show "HEAD:measurement/$TS15/measure_out/perm-0001/measurements.csv" \
+    > "$WERK/p15_blob" 2>/dev/null || : > "$WERK/p15_blob"
+fordere_literal "$WERK/p15_blob" "koeder_$K15"
+fordere_zahl "Rohzeilen im committeten Blob (Kopf + 3 Leer + $N15)" \
+    "$(awk 'END{print NR+0}' "$WERK/p15_blob")" "$((N15 + 4))"
 fall_ende
 
 # =============================================================================

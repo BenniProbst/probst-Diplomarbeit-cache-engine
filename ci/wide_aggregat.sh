@@ -36,7 +36,21 @@
 # alle still mit rc=0 -- ausfuehrlich begruendet in ci/anhang_forward_core.sh):
 #   (F2) 'wc -l' zaehlt ZEILENUMBRUECHE, nicht Zeilen. Kopfzeile + EINE Datenzeile
 #        ohne Schluss-Newline ergab 1 und galt als leer. Deshalb 'awk END{NR+0}' --
-#        wortgleich zu ci/mess_ausbeute_wache.sh und ci/persist_sammler.sh.
+#        dasselbe Zaehl-WERKZEUG wie in ci/mess_ausbeute_wache.sh und
+#        ci/persist_sammler.sh.
+#
+# ABGRENZUNG ZU D3-3b (10.08.2026) -- ABSICHTLICH NICHT WORTGLEICH:
+#   Die drei Gates (mess_ausbeute_wache / persist_sammler / frische_wache) zaehlen
+#   seit D3-3b nur noch Zeilen mit nicht-leerem Inhalt: eine LEERZEILE ist dort
+#   kein Messwert. DIESE Datei zaehlt weiter 'NR - 1' und tut das mit Absicht.
+#   Sie beantwortet eine ANDERE Frage: nicht "wie viele Messwerte gibt es", sondern
+#   "sind beim Zusammenkleben Zeilen verlorengegangen oder verklebt". Ihr Mass muss
+#   deshalb genau das abbilden, was 'tail -n +2 | awk 1' TATSAECHLICH angehaengt hat
+#   -- und das sind auch die Leerzeilen. Selbstcheck 2 unten rechnet die Summe der
+#   Einzelbeitraege gegen die Zeilen des Aggregats; wuerde hier gefiltert und dort
+#   nicht, faellt er sofort. Wer den Filter hierher traegt, muss ihn in BEIDE Zahlen
+#   UND in die Konkatenation tragen -- sonst tauscht er eine echte Wache gegen einen
+#   Abbruch. Das ist ein eigenes Paket, keine Randnotiz dieses hier.
 #   (F3) Die Konkatenation ohne 'awk 1' klebte die erste Datenzeile der naechsten
 #        Datei an die letzte der vorigen, sobald der Schluss-Newline fehlte. Und
 #        genau das ist der Regelfall: ce schreibt die letzte Zeile ohne Newline.
@@ -63,8 +77,9 @@
 #     Heilung von F3: seit 'awk 1' endet das Aggregat immer auf einen Newline,
 #     und dann liefern beide Zaehlweisen zwangslaeufig dieselbe Zahl. Die
 #     awk-Zaehlung ist hier also REDUNDANTE Deckung, nicht die tragende --
-#     tragend ist das 'awk 1'. Sie bleibt: sie haelt die Zusage "wortgleich zu
-#     Wache und Sammler" und greift, falls das 'awk 1' spaeter verschwindet.
+#     tragend ist das 'awk 1'. Sie bleibt: sie haelt die Zusage "dasselbe
+#     Zaehl-WERKZEUG wie Wache und Sammler" (nicht mehr dieselbe Zaehl-REGEL,
+#     s. Abgrenzung zu D3-3b oben) und greift, falls 'awk 1' spaeter verschwindet.
 #   Der Mutant N2 der Probe dreht beide Zeilen ZUSAMMEN mit der Konkatenation
 #   zurueck und beisst dann -- er belegt also den Stand vor P4 als Ganzes, nicht
 #   diese beiden Zeilen einzeln. Zwei Deckungen desselben Falls sind kein Fehler;

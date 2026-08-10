@@ -451,6 +451,54 @@ fordere_literal "$ERR" "0 CSV-Dateien"
 fall_ende
 
 # =============================================================================
+# F21/F22  D3-3b: EINE LEERZEILE IST KEIN MESSWERT.
+#     VORHER am Objekt gemessen (10.08.2026, vor dem Paket): eine CSV aus
+#     Kopfzeile + 3 Leerzeilen + 1 echter Datenzeile meldete "4 Datenzeile(n)
+#     insgesamt", rc=0 -- die Wache rechnete `Zeilen - 1`. Damit war
+#     <mindest-datenzeilen> mit Leerzeilen erreichbar.
+#     Die drei Leerzeilen sind bewusst VERSCHIEDEN: voellig leer, nur Blanks,
+#     Tab+Blank. Eine Heilung, die nur `^$` verwirft, faellt an den letzten
+#     beiden -- deshalb steht [^[:space:]] in der Zaehlweise und nicht `NF`.
+# =============================================================================
+leerzeilen_koeder() {   # $1 = Zieldatei, $2 = Anzahl echter Datenzeilen
+    mkdir -p "$(dirname "$1")"
+    printf '%s\n' "$KOPF" > "$1"
+    printf '\n'      >> "$1"          # leer
+    printf '   \n'   >> "$1"          # nur Blanks
+    printf '\t \n'   >> "$1"          # Tab + Blank
+    _i=1
+    while [ "$_i" -le "$2" ]; do
+        printf 'perm-%s,%s,%s,%s,1\n' "$_i" "$(token)" "$((1000 + _i))" "$((4000 + _i))" >> "$1"
+        _i=$((_i + 1))
+    done
+}
+
+N21=$(wuerfel 1 4)
+fall "F21 Kopf + 3 Leerzeilen + $N21 echte Zeile(n) -> GENAU $N21, nicht $((N21 + 3))"
+D="$WERK/f21"
+leerzeilen_koeder "$D/perm-0001/measurements.csv" "$N21"
+lauf "$D" 1 voll
+fordere_rc 0
+fordere_literal "$OUT" "$N21 Datenzeile(n) insgesamt"
+fordere_literal "$OUT" "3 Leerzeile(n) verworfen"
+fordere_literal "$OUT" "davon 1 mit Datenzeilen, 0 ohne"
+fall_ende
+
+# Die scharfe Gegenrichtung: NUR Leerzeilen. Vor der Heilung meldete dieselbe
+# Datei "3 Datenzeile(n) insgesamt" und rc=0 -- ein Messlauf ohne einen einzigen
+# Messwert galt als gelungen. Das ist der eigentliche Befund des Pakets.
+fall "F22 Kopf + NUR 3 Leerzeilen, modus=voll -> rc=1, 0 Datenzeilen"
+D="$WERK/f22"
+leerzeilen_koeder "$D/perm-0001/measurements.csv" 0
+lauf "$D" 1 voll
+fordere_rc 1
+fordere_literal "$OUT" "0 Datenzeile(n) insgesamt"
+fordere_literal "$OUT" "3 Leerzeile(n) verworfen"
+fordere_literal "$OUT" "davon 0 mit Datenzeilen, 1 ohne"
+fordere_literal "$ERR" "der Messlauf hat 0 Datenzeile(n) erzeugt"
+fall_ende
+
+# =============================================================================
 # F10 ABNAHME D3: das alte Praesenz-Muster ist aus .gitlab-ci.yml verschwunden.
 #     ZUERST der Koeder -- eine Null ohne beissenden Koeder ist keine Aussage,
 #     sondern ein moegliches Werkzeug-Versagen (ugrep + `$(` ohne -F).

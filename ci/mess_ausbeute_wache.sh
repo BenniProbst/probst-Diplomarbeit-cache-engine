@@ -84,12 +84,29 @@
 #           unbekannter Modus, modus=auto ohne Lauf-Marker) --
 #           ausdruecklich KEIN Gruen: ein stiller Rueckfall waere derselbe Defekt.
 #
-# ZAEHLWEISE, ausdruecklich benannt:
-#   Datenzeilen = (Zeilen der Datei) - 1, weil die erste Zeile der CSV-Kopf ist.
-#   Gezaehlt wird mit awk 'END{print NR}', NICHT mit `wc -l`: wc zaehlt
-#   Zeilenumbrueche, eine Datei ohne abschliessenden Newline wuerde eine Zeile zu
-#   wenig melden. Eine voellig leere Datei hat 0 Zeilen und damit 0 Datenzeilen
-#   (nicht -1) -- der Sonderfall ist unten ausdruecklich behandelt.
+# ZAEHLWEISE, ausdruecklich benannt -- WORTGLEICH zu ci/persist_sammler.sh und
+# ci/frische_wache.sh (dasselbe awk-Programm, Byte fuer Byte):
+#   Datenzeilen = alle Zeilen AB DER ZWEITEN, die mindestens ein Zeichen tragen,
+#   das kein Leerraum ist. Die erste Zeile ist der CSV-Kopf und zaehlt nie mit.
+#   Gezaehlt wird mit awk, NICHT mit `wc -l`: wc zaehlt Zeilenumbrueche, eine
+#   Datei ohne abschliessenden Newline wuerde eine Zeile zu wenig melden. Eine
+#   voellig leere Datei hat 0 Zeilen und damit 0 Datenzeilen (nicht -1).
+#
+#   EINE LEERZEILE IST KEIN MESSWERT (D3-3b). Bis 10.08.2026 rechnete die Wache
+#   `Datenzeilen = Zeilen - 1` und zaehlte damit jede leere und jede nur aus
+#   Blanks/Tabs bestehende Zeile als Messwert mit: eine CSV aus Kopf + drei
+#   Leerzeilen + EINER echten Zeile meldete 4. Genau die Zahl entscheidet ueber
+#   `<mindest-datenzeilen>`, ueber das Commit-Gate des Sammlers und ueber das
+#   Maskierungs-Gate der Frische-Wache -- ein Messlauf konnte die Mindestzahl
+#   also mit Leerzeilen erreichen. Die Heilung geht nur in die scharfe Richtung:
+#   die Zahl kann seither nur kleiner werden, nie groesser, und keine Wache wird
+#   dadurch weicher.
+#
+#   EIN DURCHLAUF, ZWEI ZAHLEN: das awk-Programm gibt "<rohzeilen> <datenzeilen>"
+#   aus. Der Rohwert bleibt damit als NENNER in der Ausgabe stehen -- sonst waere
+#   nach dieser Heilung nicht mehr sichtbar, ob eine Datei leer war oder ob ihre
+#   Zeilen verworfen wurden. Ein zweiter Lesevorgang je Datei waere der falsche
+#   Preis dafuer.
 #
 # POSIX-sh, ASCII-only, kein Python (Hausdoktrin: kein Python in der Buildchain).
 # =============================================================================
@@ -192,17 +209,23 @@ fi
 SUMME=0
 N_LEER=0
 N_MIT=0
+LEERZEILEN=0
 while IFS= read -r F; do
     [ -n "$F" ] || continue
-    ZEILEN=$(awk 'END{print NR+0}' "$F")
-    if [ "$ZEILEN" -le 1 ]; then
-        DATEN=0
+    # Ein Lesevorgang, zwei Zahlen: "<rohzeilen> <datenzeilen>". Das awk-Programm
+    # steht Byte-gleich in ci/persist_sammler.sh und ci/frische_wache.sh.
+    PAAR=$(awk 'NR>1 && $0 ~ /[^[:space:]]/ {n++} END{printf "%d %d\n", NR+0, n+0}' "$F")
+    ZEILEN=${PAAR%% *}
+    DATEN=${PAAR##* }
+    if [ "$ZEILEN" -gt 1 ]; then
+        LEERZEILEN=$((LEERZEILEN + ZEILEN - 1 - DATEN))
+    fi
+    if [ "$DATEN" -eq 0 ]; then
         N_LEER=$((N_LEER + 1))
-        echo "  LEER   $F  ($ZEILEN Zeile(n) = nur Kopf oder gar nichts)"
+        echo "  LEER   $F  ($ZEILEN Rohzeile(n), 0 Datenzeile(n) = Kopf, nichts oder nur Leerzeilen)"
     else
-        DATEN=$((ZEILEN - 1))
         N_MIT=$((N_MIT + 1))
-        echo "  DATEN  $F  ($DATEN Datenzeile(n))"
+        echo "  DATEN  $F  ($DATEN Datenzeile(n) aus $ZEILEN Rohzeile(n))"
     fi
     SUMME=$((SUMME + DATEN))
 done < "$TMP"
@@ -212,6 +235,7 @@ echo "NENNER (nie eine nackte Null):"
 echo "  $N_CSV measurements.csv gefunden."
 echo "  davon $N_MIT mit Datenzeilen, $N_LEER ohne (nur Kopfzeile oder leer)."
 echo "  $SUMME Datenzeile(n) insgesamt, gefordert waren mindestens $MINDEST."
+echo "  $LEERZEILEN Leerzeile(n) verworfen (leer oder nur Leerraum -- kein Messwert)."
 echo "-----------------------------------------------------------------------------"
 
 if [ "$SUMME" -lt "$MINDEST" ]; then
