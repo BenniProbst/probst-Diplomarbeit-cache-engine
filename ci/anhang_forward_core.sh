@@ -339,6 +339,12 @@ if [ -z "$SRC_ROOT" ]; then
     # wie vorher -- die Probe prueft sie literal (A1/A3/A6/A8/A9/A10).
     _zaehlweise="Zaehlweise awk NR"
     echo "   [1b] WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), $_zaehlweise"
+    # P29 (10.08.2026) DER NENNER GEHOERT IN DIE AUSGABE (V-1). Die Zeile oben nennt nur
+    # das ERGEBNIS; ohne die Grundgesamtheit ist "0 Datenzeilen" nicht von "0 Quellen
+    # gelistet" zu unterscheiden. Sie steht ZUSAETZLICH, nicht anstelle: die Probe
+    # (A1/A3/A6/A8/A9/A10) fordert die obere Zeile literal.
+    _nenner="$WIDE_QUELLEN Quelle(n) gelistet -- $WIDE_MIT_DATEN mit Daten,"
+    echo "   [1b] WIDE-Nenner: $_nenner $WIDE_OHNE_DATEN ohne Daten, $WIDE_FEHLEND nicht lesbar"
     if [ "$WIDE_DATEN" -le 0 ]; then
       echo "   [1b] WIDE-Aggregat hat keine Datenzeile -> honest-empty"
     else

@@ -142,6 +142,21 @@ target_compile_definitions(test_ci_wache_gitlink_parity PRIVATE
     "COMDARE_CI_WACHE_PARITY_BINARY=\"$<TARGET_FILE:ci_thesis_gitlink_wache>\"")
 add_dependencies(test_ci_wache_gitlink_parity ci_thesis_gitlink_wache)
 
+# P29 (2026-08-10) -- DIE WIDE-KONKATENATION. Sie prueft ZWEI Gegenstaende in einem Ziel:
+# die C++-Fassung (Stufe 1 des Owner-KERN-Umbaus) UND, ueber die Prozess-Naht, die heute
+# in der CI laufende Produktions-Shell ci/wide_aggregat.sh. Der Pfad kommt als Define,
+# nicht aus dem Arbeitsverzeichnis -- dieselbe Haertung wie bei test_279 und
+# test_ci_wache_registrierung (eine CWD-Annahme ist keine Zusicherung).
+comdare_da_add_test(test_ci_wache_wide_aggregat
+    SOURCES unit/test_ci_wache_wide_aggregat.cpp
+    LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_wide_aggregat PRIVATE
+    "COMDARE_WIDE_AGGREGAT_SH=\"${CMAKE_SOURCE_DIR}/../ci/wide_aggregat.sh\""
+    "COMDARE_REPO_WURZEL_W29=\"${CMAKE_SOURCE_DIR}/..\""
+    "COMDARE_CI_WIDE_AGGREGAT_BINARY=\"$<TARGET_FILE:ci_wide_aggregat>\"")
+add_dependencies(test_ci_wache_wide_aggregat ci_wide_aggregat)
+
 # T-7: die Abnahme der .gitlab-ci.yml. CMAKE_SOURCE_DIR ist Code/ (configure.sh setzt
 # cmake_unterverzeichnis="Code"), die Datei liegt also eine Ebene darueber. Dasselbe
 # Fixture-Muster wie bei test_279_tier_binary_report (Define statt CWD-Annahme).

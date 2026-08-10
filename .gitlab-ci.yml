@@ -1695,6 +1695,9 @@ measure:smoke:
         . measure_out_smoke/_wide_kz.env
         rm -f measure_out_smoke/_wide_kz.env
         echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$WIDE_HEADER, davon Datenzeilen=$WIDE_DATEN), awk NR"
+        # P29 (10.08.2026): DER NENNER. Ohne ihn ist "0 Datenzeilen" nicht von "0 Quellen gelistet"
+        # zu unterscheiden -- und eine gelistete, verschwundene CSV war bis heute STILL (rc=0).
+        echo "  WIDE-Nenner: $WIDE_QUELLEN gelistet, $WIDE_MIT_DATEN voll, $WIDE_OHNE_DATEN leer, $WIDE_FEHLEND weg"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out_smoke/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out_smoke/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
@@ -1880,6 +1883,9 @@ measure:golden-320:
         . measure_out/_wide_kz.env
         rm -f measure_out/_wide_kz.env
         echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$WIDE_HEADER, davon Datenzeilen=$WIDE_DATEN), awk NR"
+        # P29 (10.08.2026): DER NENNER. Am mehrtaegigen golden-320 ist er die teuerste Zahl im Log --
+        # eine gelistete, verschwundene result.csv war bis heute STILL (rc=0, eine tail-Zeile auf stderr).
+        echo "  WIDE-Nenner: $WIDE_QUELLEN gelistet, $WIDE_MIT_DATEN voll, $WIDE_OHNE_DATEN leer, $WIDE_FEHLEND weg"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
