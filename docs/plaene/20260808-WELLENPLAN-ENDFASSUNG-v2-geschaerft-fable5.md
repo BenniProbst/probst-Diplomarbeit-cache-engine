@@ -29,6 +29,7 @@
 - **##36-Köder** kann den Zielfall nicht sehen: eine Null-Fenster-Zelle liefert im ungeheillten Gate `reruns=0` — exakt die Zahl, die laut Köder „nicht verdrahtet" bedeutet. Korrigiert auf **zwei degenerierte Zellarten** (Null-Fenster → „unbestimmbar", echte Streuung → Reruns), beide Zahlen getrennt.
 - **##04/##05** waren Abnahmezeilen **ohne Bau-Paket** — die Vorlage verifizierte den `make check`-Defekt und heilte ihn nirgends. **V-6 gilt jetzt beidseitig** (Paket ohne Abnahmezeile UND Abnahmezeile ohne Paket = nicht abgenommen); D1/D1a schließen die Lücke.
 - **##57**-Köder („Datensatz mit nur einer Binary") beißt aus dem falschen Grund und wäre auch nach einer Heilung grün — der Rückgabetyp kann „nicht bestimmbar" von „bestimmt: keiner" heute gar nicht unterscheiden (D4f); Abnahme auf den Statusraum umgestellt.
+- **##20-Vorschrift** ~~„`AF_GENERATOR` belegen, `|| true` beim `git add` fällt"~~ → **„`AF_GENERATOR` belegen (erledigt); das `git add` nennt statt Verzeichnissen die Buchführungsliste `$COPIED_LIST` dieses Laufes, `2>/dev/null` UND `|| true` fallen dabei beide, Ausgabe `im Index: N von M kopierten Datei(en)`, `N != M` = Abbruch"** — **RICHTIGSTELLUNG 10.08.2026 am Objekt, s. Fußnote ##20-B**. Wörtlich gebaut hätte v1 hier den Kanal rot gemacht (DE-only gegen ein Ziel ohne `anhang/en`: rc **128**); die Begründung des Kern-Explores („rc=128 bei *jedem* DE-only-Lauf", „stand *jahrelang* so") ist ihrerseits zu stark bzw. falsch — 289 trägt **18 von 18** je Sprache, und die Zeile ist vom **06.08.2026**. Der echte Defekt liegt daneben und ist reproduziert: bei jedem `git add`-Fehlschlag aus anderem Grund (gemessen: stale `index.lock`) meldet der Kanal `IDEMPOTENT: 0 Aenderungen`, **Exit 0**, und **0 von 2** Messwert-Dateien landen.
 - **Einwand-36-Erklärung** („610 Tests = Folge von EXCLUDE_FROM_ALL") wird **nicht festgeschrieben**: super `Code/CMakeLists.txt:278 enable_testing()` steht ebenfalls NACH den `add_subdirectory`-Aufrufen (:211/:243) — dieselbe D2-G1-Konstellation; welche Ursache trägt, entscheidet die Messung in D1g, nicht der Plan.
 
 **(3) HYBRID kehrt ins Fenster zurück.** v1 führte Hybrid-Bau als Streichkaskade Position 2 / W7. Der Owner-KERN 08.08. („Volles GO. Alles Pflicht.", Gattung `HEURISTIK-ADAPTER`, Genus `Function-Interface-Reroute`, 4. Mess-Ebene DAZWISCHEN) verbietet das. Der Widerspruch wird **zerlegt statt glattgerechnet**, entlang des älteren, als bindend markierten Owner-E1-Designs (`hybrid/README.md`: „kein eigener ABI-Schritt", „Erster Meilenstein = F8-Minimal-DoD, genau 1 Standard-Dock", Router = Break-Even-Router, der Messkurven **konsumiert**): **HY-A** (Struktur+Dock+Achse+Parser) in die Freeze-Woche, **HY-B** (Overhead-Messung mit Stub-Heuristik, eigene kleine Teilmatrix) in die Mess-Welle, **HY-C** (Router aus echten Kurven) in die Auswertung. **Preis, offen ausgewiesen:** der W2-S-E-Restbau (##40: T-06…T-14, W-03, W-08, A14, A10) fällt nach W7 (Abschnitt 7).
@@ -407,6 +408,10 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 > (B) **die Vorschrift selbst ist zu korrigieren:** ##20 sagt „`|| true` beim `git add` fällt". Das ist
 > am Objekt **falsch** — es gibt `rc=128` bei **jedem DE-only-Lauf**, und genau deshalb stand die Zeile
 > jahrelang so. Ein blindes Entfernen macht den Kanal rot.
+> *(Nachtrag 10.08. abends, Paket ##20-B: diese drei Zeilen bleiben wörtlich stehen — sie sind die
+> Fassung, gegen die gemessen wurde. **Die Richtung hält, zwei ihrer drei Begründungen nicht**, und der
+> Code ist nicht unschuldig: er ist anders defekt, als ##20 behauptet. Vollständig am Objekt
+> nachgemessen, s. **FUSSNOTE ##20-B** unmittelbar nach dieser Fußnote.)*
 >
 > **##23 — ERLEDIGT, und der Auftrag vermischte zwei Nahtstellen.**
 > Es gibt **zwei**: (A) `ergebnis_mappe_naht.hpp` — die Mappe **im Lauf**, Richtung **xlsx → csv**
@@ -425,11 +430,160 @@ Nenner der Abdeckungs-Wache = eigene Inventur; keine Untergrenze (`:87` prüft n
 > (Stage-Topologie · D3-7b · D3-3b · ##20-B · ##23-R1) und **eine Ledger-Korrektur**. Die
 > ursprünglichen Aufwände (D1b 1,5 h · D2-G1 2 h) fallen; die Restposten sind **nicht** vermessen und
 > dürfen nicht stillschweigend als gleich teuer geführt werden.
+> *(Nachtrag 10.08. abends: **einer von den fünfen ist es jetzt** — ##20-B ist am Objekt durchgemessen
+> und als Doku-Paket geschlossen; was von ihm als BAU übrig bleibt, ist die eine ersetzte Zeile aus der
+> Fußnote ##20-B, offen nur noch an der git-Version des Runners. Die anderen vier bleiben unvermessen.)*
 >
 > **Und die allgemeine Lehre, die über F1 hinausgeht:** derselbe Kern-Explore lief im
 > Hauptstrang-Workflow **nicht** vorgeschaltet, sondern erst beim Bauen — dort war in **fünf von fünf**
 > Fällen der Bauauftrag am Objekt falsch, weil er aus Plänen und Ledger-Zitaten gebaut war, die selbst
 > veraltet sind. **Der Plan ist keine Quelle über den Code. Er ist eine Behauptung über ihn.**
+
+> **FUSSNOTE ##20-B — DIE VORSCHRIFT, AM OBJEKT NACHGEMESSEN. 10.08.2026 abends.
+> Die alte Fassung oben bleibt stehen; die korrigierte steht hier daneben (Muster D2-G4/D2-G5).**
+>
+> **MESSORT, selbst gemessen statt abgeschrieben.** super `probst-diplomarbeit-cache-engine`,
+> Worktree `.claude/worktrees/wf_bc389245-884-4`, **HEAD `7144f4f6`** (`git rev-parse HEAD`);
+> `6d2e3dce` ist Vorfahr (`git merge-base --is-ancestor` → rc **0**). Gegenstand ist **eine Zeile**:
+> `ci/anhang_forward_core.sh:417` `git -C "$AF_DEST_REPO" add -- "anhang/$lang/tabellen" 2>/dev/null || true`.
+> `git version 2.43.0`. **Jedes rc unten ohne Pipe gemessen** (K11). Alle Fixtures unter `mktemp -d`,
+> kein Projekt-Repo berührt, **kein CI-YAML angefasst** — dies ist ein Doku-Paket plus eine Messung.
+>
+> **(A) bestätigt, nichts zu tun:** `:202` `AF_RESULT_NAMEN="${AF_RESULT_NAMEN:-result.csv *.result.csv}"`
+> trägt beide Namensformen.
+>
+> **DIE DREI BEHAUPTUNGEN VON (B), EINZELN GEMESSEN — eine hält, zwei nicht:**
+>
+> | Behauptung | Urteil | Beleg, literal |
+> |---|---|---|
+> | „Ein blindes Entfernen macht den Kanal rot" | **HÄLT** | DE-only gegen ein Ziel **ohne** `anhang/en/tabellen`: unverändert rc=**0** (Commit landet), mit gestrichenem `\|\| true` rc=**128**, `fatal: pathspec 'anhang/en/tabellen' did not match any files` |
+> | „`rc=128` bei **jedem** DE-only-Lauf" | **ZU STARK** | rc=128 **nur**, wenn das ZIEL den Pfad weder im Baum noch im Index trägt. Gegen ein Ziel **mit** `anhang/en`-Bestand: rc=**0**, auch mit gestrichenem `\|\| true` |
+> | „genau deshalb stand die Zeile **jahrelang** so" | **FALSCH** | die Zeile kam mit dem **ersten** Commit der Datei überhaupt: `347684cb`, **2026-08-06** — vier Tage. `git log -S` auf `.gitlab-ci.yml` findet **keinen** Vorläufer |
+>
+> **WARUM DIE ZWEITE BEHAUPTUNG DEN POSTEN VERSCHIEBT.** `git add -- <pfad>` ist nur dann `rc=128`,
+> wenn die Pathspec **nichts** trifft. **3 von 3 Zuständen gemessen:** Pfad fehlt ganz → **128**;
+> Verzeichnis existiert und ist leer → **0**; Verzeichnis mit Datei → **0**. Und das reale Ziel trägt
+> den Pfad: im 289-Baum am gepinnten Gitlink `798e9460` liegen `anhang/de/tabellen` = **18** und
+> `anhang/en/tabellen` = **18** getrackte Dateien (Gegenprobe `kapitel/de` = **14**, also keine
+> Werkzeug-Null). **Der `|| true` ist heute im CI-Pfad also gar nicht tragend** — er ist ein latenter
+> Schutz für einen Fall, den die Pipeline in ihrer heutigen Konfiguration nicht erreicht. Er wird
+> tragend in dem Moment, in dem `AF_LANGS` eine Sprache bekommt, die 289 noch nicht führt.
+>
+> **UND JETZT DER TEIL, DEN ##20 RICHTIG GEROCHEN UND FALSCH BENANNT HAT.** Die v1-Fassung führte den
+> Defekt als *„`git add … 2>/dev/null || true` + ‚IDEMPOTENT: 0 Aenderungen' + Exit 0"*
+> (`…-369-soll-211-ist.md:509` und `:641`). **Das ist am Objekt WAHR und reproduziert** — nur hat es
+> mit der Sprachauswahl nichts zu tun. Gemessen an einem Ziel, das **beide** Sprachen getrackt trägt
+> (wie 289), mit einer **stale `.git/index.lock`** — dem klassischen Runner-Rest eines abgebrochenen
+> Vorlaufs:
+>
+> ```
+>    [de] kopiert: 1 .tex -> anhang/de/tabellen/
+>    [en] kopiert: 1 .tex -> anhang/en/tabellen/
+>    kopiert gesamt: 2 .tex
+> -- (3) Idempotenz-Pruefung im Ziel-Repo --
+>    gestagte Aenderungen: 0 Datei(en)
+> === anhang:forward IDEMPOTENT: 0 Aenderungen -> kein Commit ===
+> ```
+>
+> **rc=0. Commits vorher 2, nachher 2. Im Zielbaum gelandet: 0 von 2 kopierten Messwert-Dateien.
+> stderr LEER** — das `2>/dev/null` hat den `fatal: Unable to create … index.lock` verschluckt, das
+> `|| true` das rc. Der Lauf ist von einem ehrlichen „nichts zu tun" **nicht zu unterscheiden**; das
+> ist exakt die Fehlerklasse, gegen die derselbe Kanal in seinem eigenen Kopf vier Fallen dokumentiert
+> („Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches ‚nichts zu tun' aussah").
+> **Gegenprobe im selben Lauf:** ohne `index.lock` rc=0, Commits 2→3, **2 von 2** Dateien gelandet —
+> die Null oben ist also keine Werkzeug-Null.
+>
+> **ZWEITER, UNABHÄNGIGER BEFUND derselben Zeile (nicht von ##20 genannt).** `git add -- <verzeichnis>`
+> nimmt **fremde** unversionierte Dateien im selben Verzeichnis mit. Gemessen: eine `fremd_entwurf.tex`,
+> die dieser Lauf nie geschrieben hat, liegt in `anhang/de/tabellen/` → `gestagte Aenderungen: 3` statt
+> 2, und die Datei steht danach **im committeten Baum** (1 Treffer, Nenner 5 Dateien unter `anhang/`).
+> **Präzise eingeordnet, damit daraus keine neue Falschaussage wird:** die Kopfzusage der Datei
+> (`:26-33`) betrifft den **Rollback**-Pfad — „löscht niemals fremde unversionierte Dateien" — und die
+> hält. Was **nirgends** zugesichert ist und **nicht** gilt: dass der *Commit* nur die Dateien dieses
+> Laufes enthält.
+>
+> **DIE KORRIGIERTE VORSCHRIFT — die alte bleibt oben stehen, diese tritt daneben:**
+>
+> ~~„`AF_GENERATOR` belegen, `|| true` beim `git add` fällt."~~ →
+> **„`AF_GENERATOR` belegen (erledigt). Das `git add` nennt keine Verzeichnisse mehr, sondern die
+> Buchführungsliste `$COPIED_LIST` dieses Laufes. `2>/dev/null` und `|| true` fallen dabei BEIDE —
+> nicht als Streichung, sondern weil der Fall, den sie abfingen, dann nicht mehr entstehen kann.
+> Dazu ein Nenner in der Ausgabe: `im Index: N von M kopierten Datei(en)`, und `N != M` ist Abbruch."**
+>
+> **DER VORSCHLAG IM WORTLAUT — GEMESSEN, ABER AUSDRÜCKLICH NICHT GEBAUT** (Auftrag ##20-B: „falls es
+> eine saubere Lösung gibt, die das `|| true` ersetzt statt streicht — vorschlagen, nicht bauen"):
+>
+> ```sh
+> git -C "$AF_DEST_REPO" add --pathspec-from-file="$COPIED_LIST" --
+> im_index=0
+> while IFS= read -r _p; do
+>   [ -n "$_p" ] || continue
+>   if git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$_p" >/dev/null 2>&1; then
+>     im_index=$((im_index + 1))
+>   fi
+> done < "$COPIED_LIST"
+> echo "   im Index: $im_index von $copied kopierten Datei(en)"
+> if [ "$im_index" -ne "$copied" ]; then
+>   echo "FEHLER: $((copied - im_index)) von $copied kopierten Dateien stehen NICHT im Index." >&2
+>   exit 1
+> fi
+> ```
+>
+> **Warum das die Ursache trifft und nicht die Wache abschwächt:** `$COPIED_LIST` existiert bereits
+> (`:388`, gebaut für den Rollback) und enthält **genau** die Pfade, die dieser Lauf geschrieben hat.
+> Wer nur diese Pfade nennt, kann die Pathspec-Null gar nicht mehr erzeugen — die Sprache ohne Quelle
+> steht schlicht nicht in der Liste. Damit braucht es kein `|| true`, und jeder verbleibende
+> Fehlschlag ist ein echter, den `set -euo pipefail` trägt. Der Leerlauf-Fall ist vorher schon
+> abgefangen (`:409-412`, `copied -eq 0` → NO-OP, Exit 0), die Liste ist hier also nie leer.
+>
+> **DER VORSCHLAG, GEFAHREN — 5 von 5 Fällen, rc je ohne Pipe:**
+>
+> | Fall | Lage | rc | gelandet |
+> |---|---|---|---|
+> | V1 | DE-only gegen Ziel **ohne** `anhang/en` (der Fall, der ##20 rot macht) | **0** | 1 von 1 |
+> | V2 | DE-only gegen Ziel **mit** `en`-Bestand (wie 289) | **0** | 1 von 1 |
+> | V3 | beide Sprachen, Normalfall | **0** | 2 von 2 |
+> | V4 | derselbe Lauf ein zweites Mal → `IDEMPOTENT: 0 Aenderungen`, kein Leer-Commit | **0** | 2 (unverändert) |
+> | V5 | **KÖDER** stale `index.lock` — heute still grün | **128** | 0, mit dem echten `fatal` auf stderr |
+>
+> **Beide Richtungen (K13):** der Köder beißt (V5 rot), die unmanipulierten Läufe bleiben grün (V1–V4).
+> Zusätzlich fällt der Fremd-Datei-Befund weg: `gestagte Aenderungen: 2` statt 3, `fremd_entwurf.tex`
+> **0** Treffer im committeten Baum.
+>
+> **WAS AM VORSCHLAG NOCH NICHT GEMESSEN IST — und vor dem Bau zu messen wäre:**
+> `--pathspec-from-file` verlangt **git ≥ 2.25**. Hier lokal `2.43.0`; **die git-Version auf dem
+> baremetal-Runner ist NICHT geprüft** und darf nicht angenommen werden. Fällt sie zu alt aus, ist die
+> Rückfallform `git add -- $(cat …)` **nicht** zulässig (Wortaufspaltung); dann `xargs -0` mit
+> NUL-getrennter Liste — und `$COPIED_LIST` müsste `printf '%s\0'` schreiben.
+>
+> **SO IST JEDE ZAHL OBEN REPRODUZIERBAR** (kein Repo nötig, alles unter `mktemp -d`; die Läufe oben
+> sind mit genau dieser Lage gefahren):
+>
+> ```sh
+> # Ziel-Repo:  git init --bare fern.git; git clone file://…/fern.git ziel; ein Ausgangs-Commit.
+> #   Variante "ohne en"  : nichts weiter anlegen.
+> #   Variante "wie 289"  : anhang/{de,en}/tabellen/bestand.tex anlegen, add, commit.
+> # Quelle:     arbeit/artefakte/de/tabellen/A_messwerte.tex   (DE-only)
+> #             + …/en/tabellen/A_messwerte.tex                (beide Sprachen)
+> # Koeder:     : > ziel/.git/index.lock                       (der stille Fall)
+> AF_DEST_REPO=…/ziel AF_WORK_ROOT=…/arbeit AF_LANGS="de,en" AF_ARTIFACT_ROOTS="artefakte" \
+> AF_CORPUS_ROOT="korpus_gibt_es_nicht" AF_NO_PUSH=true AF_PDF_GATE=off \
+>   bash ci/anhang_forward_core.sh > out 2> err        # rc DANACH ohne Pipe lesen (K11)
+> ```
+>
+> Die „Vorschrift angewandt"-Läufe liefen gegen eine **Wegwerf-Kopie** des Kerns, in der genau eine
+> Zeile ersetzt war (Diff-Nenner: **2** geänderte Zeilen, 1 raus / 1 rein). **`ci/anhang_forward_core.sh`
+> selbst wurde in diesem Paket nicht angefasst** — `git diff` über `ci/` ist leer.
+>
+> **WAS DIESES PAKET NICHT GEPRÜFT HAT** (V-8: beide Mengen nennen): den `anhang:forward`-Job im
+> Lauf (er ist inert-by-default hinter `COMDARE_ANHANG_FORWARD`), den Push-/Merge-Retry-Zweig, das
+> PDF-Gate (in allen Läufen `AF_PDF_GATE=off`), und den Korpus-Zweig (alle Läufe über den
+> Artefakt-Zweig). Geprüft wurde **ausschließlich** Block (3), die Idempotenz-Prüfung, `:416-418`.
+>
+> **NACHZUZIEHEN, NICHT VON MIR** (Ledger ist Single-Writer): der Ledger führt unter **KON4-06**
+> (`docs/DIPLOMARBEIT-ZIELE-OFFENE-PUNKTE-LEDGER.md:221-223`) dieselbe zu starke Fassung
+> („rc=128 bei JEDEM DE-only-Lauf"). Sie ist nach dieser Messung um die Ziel-Bedingung zu ergänzen
+> und die „jahrelang"-Begründung zu streichen.
 
 ### D3 — Ein leeres Messfenster ist heute grün (8 Posten, 20 h)
 
@@ -628,6 +782,15 @@ Für EINE Instanz, ohne Rücksprung lesbar. `[R]` = Reserve-Entnahme. `[lok]` = 
             (Triple-Configure ce 25fe4fbf, Eintraege 429/425/423, s. Fussnoten-Nachtrag).
  20+D3-6 [CI, EIN Paket] anhang:forward: AF_GENERATOR belegt UND Selektor findet
             BEIDE Layouts; NO-OP nur mit Nenner. P1/P2/P3 gefahren.
+            NACHSATZ 10.08. (##20-B, s. Fussnote): die Zeile "|| true beim git add
+            faellt" NICHT so bauen -- DE-only gegen ein Ziel ohne anhang/en ist
+            damit rc=128 (gemessen, ohne Pipe). Ersetzen statt streichen:
+            git add --pathspec-from-file="$COPIED_LIST" -- , dazu die Zeile
+            "im Index: N von M kopierten Datei(en)" und Abbruch bei N != M.
+            Der echte Defekt ist ein anderer: faellt git add aus anderem Grund
+            (gemessen: stale index.lock), meldet der Kanal "IDEMPOTENT: 0
+            Aenderungen", Exit 0, und 0 von 2 Messwerten landen. Offen vor Bau:
+            git-Version auf dem baremetal-Runner (--pathspec-from-file ab 2.25).
  21   [CI]  Realm-Wurzeln /mnt + G-E3 + COMDARE_BESTANDSLOG in beiden CI.
             ACHTUNG V-3/V-8: "steht in beiden CI" ist Praesenz in der YAML, also
             reine Ankuendigung. Abnahme sind die aktiv-Zeile (Feldgleichheit, via
