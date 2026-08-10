@@ -293,7 +293,7 @@ done
 # Genau EINE Datei mit dem Voll-Header-Literal. Die Zahl steht in SOLL_LITERAL und wird
 # unten IN DEN WEGWERF-PLAN GESCHRIEBEN -- sie darf NICHT aus dem echten Plan stehenbleiben.
 # WARUM DAS HIER STEHT (10.08.2026, am Objekt gefallen): bis heute setzte der Plan-Klon nur
-# STELLEN und DATEIEN um; SCHEMA-LITERAL blieb der ECHTE Wert. Das war grün, solange der echte
+# STELLEN und DATEIEN um; SCHEMA-LITERAL blieb der ECHTE Wert. Das war gruen, solange der echte
 # Bestand ebenfalls 1 Literal trug -- also aus ZUFALL, nicht aus Konstruktion. Als der echte
 # Wert mit dem Gitlink-Zug auf e114cabd von 1 auf 2 stieg, riss K7 sofort. Eine Wegwerf-Lage,
 # die eine Zahl vom echten Bestand erbt, prueft nicht die Wache, sondern die Gleichheit zweier
