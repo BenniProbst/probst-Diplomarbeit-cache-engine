@@ -134,6 +134,76 @@ Konsolidierungen dieser Session. Der Ledger ist die Stand-Quelle; die Plandokume
 **Freitag** bewegt, ist eine Owner-Vorlage, kein Bau. Die Wellen-Zuordnung ist ausdrücklich vom
 Codex-/Agenten-Urteil ausgenommen (Goal v8 §VIII).
 
+### 1.4a ⭐ DIE ERSTEN URTEILE SIND DA — UND SIE BESTÄTIGEN DEN OWNER-SATZ
+
+Die F1-Kette lief bis zum Session-Limit durch und lieferte **fünf** Kern-Urteile. Sie sind der
+Beleg, dass die Regel nötig war:
+
+| Paket | Urteil |
+|---|---|
+| **D1b** — „adhoc_emitter fehlt in der CI-Prebuild-Liste" | **SCHON_ERLEDIGT** |
+| **D2-G1** — „27 gtest-Fälle seit 21.05. unsichtbar" | **SCHON_ERLEDIGT** |
+| **Glied 1** — `##08 schema-freeze` | **STIMMT_TEILWEISE** |
+| **Glied 2** — `d3-7 lauf-marker` | **SCHON_ERLEDIGT** |
+| **Glied 3** — `d3-3 persist-zeilen` | **SCHON_ERLEDIGT** |
+
+**Vier von fünf geprüften Paketen waren bereits erledigt.** Ohne die vorangestellte Stufe 0 hätte
+der Workflow sie alle gebaut — gegen einen Wellenplan, der zwei Tage und zwei Sammellandungen alt
+ist. Genau das meinte der Owner-Satz.
+
+**Noch offen** (am Limit gestorben, mit dem Resume `w9shenfjt` neu gestartet): Glied 4
+(`20-d3-6-transport`), Glied 5 (`23-naht-csv-xlsx` — der xlsx→csv-Richtungswiderspruch), der
+Durchstich selbst und beide Abnahmen.
+
+### 1.4b DIE KONFLIKTPRÜFUNG — drei Befunde, die den Plan bewegen
+
+**(1) Workflow A hat nie begonnen.** Von seinen sechs Worktrees (`wt-ce-tax`, `wt-ce-warnsplit`,
+`wt-ce-ci`, `wt-ce-d2p`, `wt-ce-anker`, `wt-super-lizenz`) existiert **keiner**. Die A-Liste ist
+erklärte Absicht, kein Bestand — jede Kollision gegen sie ist Kollision gegen Papier.
+
+**(2) 18 von 20 Worktrees sind Leergut.** Nur zwei trugen ungelandete Arbeit, und beide standen in
+keiner der Listen:
+
+| Worktree | Branch | Stand |
+|---|---|---|
+| `wt-ce-checkpoint` | `bau/pmc-meta-meta-achse` | 1 Commit, 13 Dateien, **1558+** — Merge sauber, 0 Konflikte, Bau läuft |
+| `wt-ce-d2floor` | `w0a/d2-floor` | 3 Commits, 76 hinter development — **als Branch überholt** |
+
+**(3) p6 (Lizenz) ist in super zu drei Vierteln auf Papier gebaut** — von mir am Objekt
+nachgeprüft, nicht vom Agenten übernommen:
+
+    LICENSE        DA
+    NOTICE         FEHLT
+    README.md      FEHLT
+    CMakeLists.txt FEHLT   (liegt unter Code/CMakeLists.txt)
+
+Die Lizenz-Umsetzung (Posten #66) muss ihre super-Hälfte also neu fassen: entweder die Dateien
+anlegen oder die Aufgabe auf `LICENSE` + `Code/CMakeLists.txt` zurückschneiden. **Ein
+Aufgabenkern, der auf drei nicht existierende Dateien zeigt, ist ein `STIMMT_NICHT`.**
+
+### 1.4c d2floor — warum ein Merge hier eine REGRESSION wäre
+
+Der Branch ist überholt, trägt aber echte Reste. Beim Merge fielen drei Konflikte, und der erste
+erklärt alles:
+
+    scripts/ci_test_inventory_floor.txt   add/add
+      development:  "EINE ZAHL JE HOST-KLASSE (D2-G5, 2026-08-10)"
+      d2floor:      einstufig, 2026-08-09
+
+**Ein Merge hätte die Host-Klassen-Fähigkeit zurückgedreht** — eine Regression, getarnt als
+Landung. Gemessen wurde stattdessen, was wirklich fehlt:
+
+    test_d2_abdeckungs_wache_nenner.cpp    development 41 Faelle · d2floor 15 · nur in d2floor: 5
+
+Die fünf: `AbgestuerztesCtestWirdNichtAlsLeererBaumGemeldet` · `HeilePartitionIstKeinBefund` ·
+`InventurUnterDerUntergrenzeIstEinNennerBefund` · `PartitionsWiderspruchIstEinNennerBefund` ·
+`UngepruefteGatesWerdenGezaehltOhneDenExitCodeZuAendern`. Die beiden Partitions-Fälle sind genau
+der Gegenköder, den Posten **#64** seit Tagen als Lücke führt.
+
+**Die richtige Form ist chirurgisch**, nicht der Branch-Merge: die fünf Fälle einzeln in die
+heutige Datei übernehmen, gegen die heutige Wache — und vorher prüfen, ob ihre Annahme gegen die
+host-klassenfähige Fassung überhaupt noch hält. Vollständig in Posten #64 gebucht.
+
 ### 1.5 Der Hauptstrang-Workflow liefert dieselbe Klasse
 
 `wf_5834b706-7b5` beantwortet die Owner-Fragen **B-1/B-2/B-3** und legt **E-1…E-4** mit vollem
