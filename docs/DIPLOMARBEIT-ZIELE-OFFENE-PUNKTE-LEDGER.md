@@ -16,6 +16,101 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## REGRESSION 10.08.2026 — PRT-ART: VIER TESTS SIND SEIT 70 TAGEN UNERREICHBAR, UND DIE AUSNAHME NENNT SIE "OPTIONAL"
+
+**Anlass:** Owner-Auftrag 10.08.2026 — *"notiere nach dem Aufraeumen von Projekte git die Ledger
+regression von PRT-ART"*. Gefunden hat sie die neue Registrierungs-Wache (Paket W0a/MT-L4, ce
+`9f932e91`) im ersten CI-Lauf; die Aufklaerung am Objekt kam danach.
+
+### Was die CI gemeldet hat (ce-Pipeline 15517, Job 371160, `test:coverage-guard`)
+
+```
+  test_six_page_structures  -- Bedingung `if(COMDARE_PRT_ART_LEGACY_AVAILABLE)`, :188 -- optionaler prt-art-Legacy-Baum
+  test_three_layer_audit    -- Bedingung `if(COMDARE_PRT_ART_LEGACY_AVAILABLE)`, :125 -- optionaler prt-art-Legacy-Baum
+  test_value_handle         -- Bedingung `if(COMDARE_PRT_ART_LEGACY_AVAILABLE)`, :121 -- optionaler prt-art-Legacy-Baum
+  davon 4 begruendet, 0 mit ERLOSCHENER Begruendung, 1 ohne Begruendung.
+  TEST-REGISTRIERUNGS-WACHE: ROT (1 von 459 ohne Begruendung, 0 erloschen).
+```
+
+Die Wache schlug wegen eines **anderen** Falls an (`test_ap5_simd_extension_coherence.cpp`, ISA-gattiert,
+ohne Allowlist-Eintrag). Die vier PRT-ART-Zeilen daneben gelten ihr als **sauber begruendet** — und
+genau das ist der Befund.
+
+### Die Regression, in einem Satz
+
+**Die Begruendung beschreibt einen Zustand, der nicht eintreten kann.** "Optionaler Legacy-Baum"
+liest sich wie "heute abwesend, morgen vielleicht da". Am Objekt ist er weder abwesend noch optional:
+er ist **geloescht**, und die Datei, auf die das Gatter prueft, hat **nie existiert**.
+
+### Die vier Belege, jeder einzeln nachgemessen
+
+**(1) Das Gatter prueft eine Datei, die es nirgends gibt.**
+`ce tests/unit/CMakeLists.txt:96-99`:
+```cmake
+set(COMDARE_PRT_ART_LEGACY_AVAILABLE FALSE)
+if(EXISTS "${PROJECT_SOURCE_DIR}/prt_art/include/prt_art/prt_art.hpp")
+    set(COMDARE_PRT_ART_LEGACY_AVAILABLE TRUE)
+endif()
+```
+`find /home/comdare -name 'prt_art.hpp' -not -path '*/.git/*'` -> **0 Treffer**, im gesamten
+Heimatbaum. **Gegenprobe im selben Lauf:** dieselbe Suche nach `cache_engine.hpp` findet
+`libs/cache_engine/include/cache_engine/cache_engine.hpp` — das Werkzeug sucht.
+
+**(2) Es kann auch mit ausgechecktem Submodul nie TRUE werden.**
+Das eigenstaendige Repo `Projekte/Research/comdare-prt-art` traegt unter
+`prt_art/include/prt_art/` **52 Header** — aber ausschliesslich in Unterverzeichnissen
+(`allocator/`, `concurrency/`, `nodes/`, `slots/`, `internal_search/` u. a.). Eine
+Umbrella-Datei `prt_art.hpp` gibt es dort **nicht** (`find ... -name prt_art.hpp` = 0).
+Das Gatter ist damit **strukturell** unerfuellbar, nicht nur heute unerfuellt.
+
+**(3) Der Zustand besteht seit 70 Tagen, und er war zweistufig gewollt.**
+```
+d07a8f6d  2026-05-14  V23.E: prt_art -> libs/deprecated/prt_art_legacy/ (Folly-Stil)
+13eb0353  2026-06-01  cleanup: libs/deprecated/prt_art_legacy entfernt (User-OK, Habich-Gate aufgehoben)
+```
+Erst verschoben, dann mit ausdruecklichem User-OK entfernt. Die Loeschung ist also **legitim** —
+was zurueckblieb, ist ein Gatter ohne Gegenstand und vier Testdateien, die niemand mehr uebersetzt.
+
+**(4) Der Designplan fuehrt sie nicht.**
+`grep -c 'test_concepts_compile|test_value_handle|test_three_layer_audit|test_six_page_structures'`
+ueber `docs/plaene/20260808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md` -> **0**.
+**Gegenprobe:** `MT-L4` liefert **4** Treffer in derselben Datei — das Werkzeug sucht.
+Die Klasse **K4 unerreichbarer-block** (16 Posten) beschreibt sie woertlich (*"Der Test existiert
+und laeuft nie: nicht registriert, hinter OFF-Flags, in bedingten CMake-Bloecken"*), fuehrt aber
+diese vier nicht auf. Der Nenner der Klasse ist damit um vier zu klein.
+
+### Und die Wache, die es gefunden hat, sieht es selbst nicht
+
+`ci_test_registrierungs_wache.sh:226` definiert ERLOSCHEN in **einer** Richtung:
+```
+'%s -- ERLOSCHEN: "%s" existiert wieder, die Ausnahme traegt nicht mehr'
+```
+Sie faengt den Fall *"der Gegenstand kehrt zurueck, die Ausnahme wird unnoetig"*. Sie faengt
+**nicht** den Fall *"der Gegenstand kann nie wiederkommen, die Ausnahme wird dauerhaft"*.
+Deshalb meldet sie `0 erloschen`, obwohl vier Begruendungen auf einen unmoeglichen Zustand
+verweisen. **Das ist dieselbe Klasse, gegen die die Wache gebaut wurde, eine Ebene hoeher:**
+eine korrekt arbeitende Pruefung am falschen Gegenstand.
+
+### Was daraus folgt — drei Posten, getrennt
+
+| # | Posten | Klasse | Wer entscheidet |
+|---|---|---|---|
+| **PA-1** | Die Wache bekommt die **zweite** ERLOSCHEN-Richtung: eine Bedingung, deren Gegenstand in keinem erreichbaren Baum existieren KANN, ist eine tote Ausnahme und wird benannt (nicht automatisch rot — benannt, mit Nenner). | Bau, ce | ich |
+| **PA-2** | Die vier Testdateien in den Designplan als **K4-Posten** nachtragen; der Klassen-Nenner 16 steigt auf 20. | Plan, super | ich |
+| **PA-3** | **Was geschieht mit den vier Dateien?** Drei Wege: (a) gegen das heutige Plugin-Modell neu verdrahten (`COMDARE_CE_PRUEFLINGE`), (b) als Legacy-Zeugnis ins Archiv verschieben, (c) loeschen. Sie pruefen Concepts und Seitentypen einer Fassung, die es nicht mehr gibt. | **OWNER** | — |
+
+**PA-3 ist ausdruecklich nicht meine Entscheidung.** Die Hausregel lautet "nie loeschen, nur
+deprecaten"; sie gilt fuer Doku und Messdaten. Ob sie auch fuer Testdateien gilt, deren Pruefgegenstand
+mit ausdruecklichem User-OK entfernt wurde, ist nicht entschieden — und ein stilles Loeschen waere
+genau die Art von Entscheidung, die spaeter niemand mehr findet.
+
+### Zusatzbefund aus derselben Erhebung (gehoert nicht zu PRT-ART, gehoert aber gemeldet)
+
+`tests/unit/test_ap5_simd_extension_coherence.cpp` ist die **eine** unbegruendete Stelle
+(1 von 459). Sie haengt an `if(AVX2 AND AVX512F)` (D2-G5: 4 Registrierungen an AVX-512F) und
+wird auf jedem Runner ohne AVX-512 nie uebersetzt — ohne dass das je begruendet wurde. Das ist
+kein Fehler der Wache, sondern ihr erster echter Fang. Heilung: Allowlist-Eintrag mit
+ISA-Begruendung, im selben Zug mit der zweistufigen Untergrenze (Posten D2-G5).
 ### W1-PFLICHT-EXPLORE 10.08.2026 — der Engpass ist kleiner als geplant, und es gab eine SECHSTE Fundstelle
 
 Drei Straenge, Sonnet 5 max effort, read-only. Der Explore lief **vor** W1, weil diese Nacht
