@@ -16,6 +16,804 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## LEDGER-KONSOLIDIERUNG II -- 10.08.2026, Nachmittag (KON2-01..KON2-31)
+
+Zweiter Nachtrag des Tages. Nachtrag I (KON-01..KON-66) steht darueber und deckt Sessions,
+Plaene, Backups und Rohtranskripte. DIESER Nachtrag deckt, was DANACH entstand: die
+Workflow-Journale als eigene Quelle, vier Owner-Entscheide, die Versionierungs-Forensik und
+vier neu gefundene Werkzeug-Fallen.
+
+MESSORT aller Code-Aussagen: `/home/comdare/wt-ce-w0a` = origin/development = `6c010cdc`,
+bzw. `/home/comdare/wt-super-landung`. Wo ein Befund von einem anderen Stand stammt, steht es
+an der Position.
+
+### DIE DRITTE FALSCH-NULL-KLASSE -- vor jeder kuenftigen Ledger-Suche lesen
+
+Dieser Ledger erzeugt DREI Arten falscher Nullen. Wer nur gegen eine absichert, meldet Luecken,
+die keine sind (am 10.08. sind so 9 Falsch-Nullen entstanden):
+
+    1  MIXED ENCODING     Umlaute UND ASCII-Transliteration nebeneinander.
+                          Belege: `Pruefung`=48 gegen `Prüfung`=47;
+                          `geprueft`=111 gegen `geprüft`=69.
+    2  GROSS/KLEIN        der Owner schreibt VERSALIEN -- immer zusaetzlich `-i`.
+    3  HARTER ZEILENUMBRUCH bei ca. 95 Zeichen  <-- NEU, 10.08. gefunden
+                          JEDER mehrwortige Suchbegriff zerreisst an einer Zeilengrenze.
+                          Beleg: `streng sequentiell` = 0 einzeilig, 1 nach `tr '\n' ' '`.
+                          Ebenso `PIPELINES STRENG` = 0 einzeilig / 1 flach.
+
+VERFAHREN, das alle drei deckt: gegen eine geflachte Kopie suchen --
+`tr '\n' ' ' < <ledger> > /tmp/ledger_flach.txt` -- und mehrwortige Begriffe DORT pruefen,
+zusaetzlich beide Encodings und `-i`.
+
+---
+
+## RANG A -- SICHERHEIT
+
+#### KON2-01 -- SIEBEN GITLAB-GEHEIMNISSE SIND IN EIN TRANSKRIPT GERATEN
+
+**FEHLT** · **Herkunft M** (Selbstanzeige des Bau-Agenten im eigenen Bericht)
+
+Beim Abfragen der CI/CD-Variablen hat ein Agent die WERTE statt der Schluesselnamen ausgegeben.
+Damit stehen sie im Session-Transkript. Betroffen und ab sofort als KOMPROMITTIERT zu behandeln:
+
+    Gruppe 3      MINIO_SECRET_KEY
+                  GITLAB_DEPLOY_TOKEN              (ein glpat-)
+    Projekt 288   CE_SUBMODULE_TOKEN               (ein gldt-)
+                  MINIO_ACCESS_KEY
+                  MINIO_SECRET_KEY
+                  COMDARE_NFS_DROP_TOKEN
+                  COMDARE_THESIS_WRITEBACK_TOKEN   (ein glpat-)
+    Projekt 286   keine Geheimnisse enthalten -- nicht betroffen.
+
+Der Agent hat danach selbst auf reine Schluesselnamen-Projektion umgestellt.
+
+**WAS ZU TUN IST, in dieser Reihenfolge:** (1) alle sieben rotieren. (2) pruefen, wo die alten
+Werte sonst liegen (lokale Konfigs, CI-Caches, Runner-Konfiguration). (3) ERST DANACH die
+Historie scrubben -- solange die Schluessel gueltig sind, nuetzt das Entfernen aus der Historie
+nichts.
+
+**WAS NIEMAND TUN DARF:** das Transkript nach den WERTEN durchsuchen, um den Fund zu
+"verifizieren". Das laese sie erneut und traegt sie in weitere Kontexte. Die Selbstanzeige mit
+namentlicher Variablenliste ist Beleg genug.
+
+**FOLGESCHADEN, belegt:** der Verify-Agent hat die CI/CD-API danach BEWUSST NICHT MEHR
+angefasst. Dadurch steht der Widerruf von `CMAKE_BUILD_PARALLEL_LEVEL=12` (HTTP 404 auf
+Gruppe 3, 286 UND 288, mit Gegenprobe: vorhandene Schluessel -> 200, erfundener -> 404) auf
+nur EINER Messung statt zwei.
+
+#### KON2-02 -- 776 RUNNER-TOKEN LIEGEN WEITER AUF super origin
+
+**DELTA** · **Herkunft AB** (Plandokument), **die Ref-Existenz ist im Ledger selbst belegt**
+
+`refs/backup/pre-secret-scrub-20260802` (`5ba3d03f`) auf super origin. LEDGER:11648 haelt fest:
+"origin traegt genau 5ba3d03f refs/backup/pre-secret-scrub-20260802 und nichts Neues, github
+leer". Die Loeschung einer Remote-Ref braucht explizite Owner-Autorisierung -- offenbar bis
+heute nicht eingeholt.
+
+**DAS DELTA:** der Ledger fuehrt den Posten mit ANDERER Zahl und als "niedrige Konfidenz,
+moeglicherweise fremde Infra-Domaene". Die Zahl 776 stammt aus
+`docs/plaene/20260806-PLAN-wellenplan-vollbild-und-parallelisierung.md:442`.
+
+#### KON2-03 -- gitleaks MELDETE EINMAL 89 FUNDE BEI EXIT 0
+
+**FEHLT** · **Herkunft M**
+
+Nur 3 sichtbar, Herkunft der uebrigen 86 unbelegt. Der Auditor stuft es ausdruecklich als
+VIERTE stille Null ein ("Kapitel III.2 fuehrt nur SN-1..SN-3"). Faellt in die dokumentierte
+gitleaks-Fallenklasse (stdin-Modus, `--config`-Pflicht, Bereich statt geratener Klontiefe).
+Aus derselben Quelle: "Der Scrub vom 02.08. hat den Leak-Commit nicht erfasst; Re-Scan aller
+4 Klone und des thesis-Repos fehlt."
+
+#### KON2-04 -- gitleaks IST AUF prod1 NIRGENDS DAUERHAFT INSTALLIERT
+
+**FEHLT** · **Herkunft M** (zwei unabhaengige Befunde am selben Tag)
+
+Zwei Straenge fanden es am 10.08. unabhaengig nicht im PATH (kein /usr/local/bin, kein ~/go/bin).
+Einer kopierte eine 8.30.1-Binary aus dem Scratchpad einer fremden Session in sein
+Job-Verzeichnis und fuhr damit -- korrekt belegt: 249.699 Bytes gescannt = exakt die
+Patch-Groesse, 12 commit-Zeilen, Config nachweislich aus `--config`, rc 0; Koeder mit
+zufaelligem glpat-Muster an denselben Patch gehaengt -> rc 1, "leaks found: 1".
+
+**WARUM DAS EIN BEFUND IST:** ein Werkzeug, das laut Doktrin vor JEDEM Push laufen soll, muss
+auffindbar sein. Sonst faehrt es irgendwann jemand nicht und meldet gruen.
+
+#### KON2-05 -- gitleaks-VAKUUM AM WORKTREE, mit literaler Ausgabe
+
+**DELTA** · **Herkunft M**
+
+Transkript 2026-08-08T11:42:25Z, woertlich: "RC_GITLEAKS=0 / ERR [git] fatal: not a git
+repository: .../worktrees/wt-super-landung / ERR error=\"stderr is not empty\" / INF 0 commits
+scanned. / INF scanned ~0 bytes (0) in 14.8ms / INF no leaks found". Der Lauf trug die
+SELBSTBESCHREIBUNG "korrekte Syntax" und rc=0. 95 Sekunden spaeter ging der super-Push
+`48c5c37d` hinaus.
+
+**ZWEITER TEIL, mit Nenner:** der von der Doktrin verlangte Scan ueber den Push-INHALT
+(`git log -p <remote>..HEAD`) lief an **0 von 49 Pushes** des Tages.
+
+**DAS DELTA:** die KLASSE steht im Ledger (`0 commits scanned` = 6 Treffer, u.a. :3456, :10238,
+:10499, :10540, :13366) -- dieser konkrete Fall und die 0-von-49-Zahl nicht.
+
+---
+
+## RANG B -- DIE VERSIONIERUNGS-ARCHITEKTUR
+
+#### KON2-06 -- DAS SOLL JE STUFE, OWNER-WORT 10.08.2026, VERBATIM
+
+**FEHLT** · **Herkunft OW** · **vom Owner am selben Tag bestaetigt: "Das ist jetzt alles korrekt."**
+
+> "Jeder Achsen-Algorithmus hat eine Versionierung, was sich in der Tier-Binary spaeter
+> wiederspiegelt. Die CEB haben nur Mess-Achsen und System-Achsen Versionierungen. Jedes Genus
+> hat fuer sein Interface eine Versionierung fuer das was es Leistet und das setzt sich als
+> compile time Versionierungsstempel aus allen Mess/System/Organ-Achsen zusammen. System-Achsen
+> sind die einzigen Achsen mit komplexer Syntax und Grammatik um exakte Hardware Komponenten
+> wie CPU/GPU/FPGA/NPU oder AVX Erweiterung etc. anzuzeigen. Der Planer, der ja DREIPHASIG nur
+> Messachsen freigibt, hat laut Plan eine simple X.Y.Z Versionierung und einen Fingerprint SHA
+> wie alle Planer/CEB/Tier-Binary/Hybrid-Tier-Binary. Das waere alles gewesen."
+
+Als Tabelle:
+
+    Achsen-Algorithmus  eigene Version, spiegelt sich in der Tier-Binary    Fingerprint --
+    Genus (Interface)   ZUSAMMENGESETZT, compile time, aus ALLEN            Fingerprint --
+                        Mess/System/Organ-Achsen
+    Planer              simple X.Y.Z                                       Fingerprint JA
+    CEB                 nur Mess- und System-Achsen (keine Organ)          Fingerprint JA
+    Tier-Binary         Mess + System + Organ                              Fingerprint JA
+    Hybrid-Tier-Binary  dito                                               Fingerprint JA
+
+#### KON2-07 -- DER MECHANISMUS, OWNER-WORT 10.08.2026, VERBATIM
+
+**FEHLT** · **Herkunft OW**
+
+> "Die Organ-Achsen bilden aus der gewaehlten lokalen Organ-Algorithmus-Versionierung ein
+> Durchreichen des Algorithmus Namens ueber das Achsen-Interface und bauen daraus zur compile
+> time einen Algorithmus-Version-Stempel, der in fester Achsen-Reihenfolge in der
+> Organ-Achsen-Klammer eingereiht wird. Die System-Achsen machen das isoliert fuer hardware,
+> die Mess-Achsen isoliert bei Anforderung eines Compile einer CEB statisch zur compile time
+> und die CEB uebergibt ihre Mess-Achsen Eigenschaften an die Tier-Binaries, damit der Vertrag
+> CEB -> Tier-Binary am Pruefdock compile time veraenderlich haelt."
+
+#### KON2-08 -- DIE MESS-ACHSEN SIND NICHT GLEICH, OWNER-WORT 10.08.2026
+
+**FEHLT** · **Herkunft OW**
+
+> "die measurement_tooling_registry ist die einzige Mess-Achse, die eine System-Achsen Syntax
+> und Semantik in Verbindung damit eine Haupt-Achse zu sein, beinhaltet. Die anderen
+> Mess-Achsen haben nur wenn dafuer anwendbar hardware flags, haben also nur eine X.Y.Z
+> Versionierung ohne die geplanten komplexen Tag Systeme."
+
+    measurement_tooling_registry   Haupt-Achse + System-Achsen-Syntax/Semantik
+                                   -> darf die komplexe Tag-Grammatik tragen
+    alle uebrigen Mess-Achsen      nur X.Y.Z + hardware flags WO ANWENDBAR
+                                   -> KEIN komplexes Tag-System
+
+**DAS ENTLASTET EINEN IST-BEFUND:** `measurement_tooling_registry.hpp:47-49` fuehrt drei
+Eintraege (wallclock/macro/micro), alle auf `"1.0.0.c"`, nie gebumpt. Das ist kein Mangel --
+niemand hat je einen Mess-Tooling-Algorithmus revisioniert. **Konsequenz fuer kuenftige Bauten:**
+wer eine komplexe Tag-Syntax an einer Mess-Achse anbringt, die NICHT die tooling_registry ist,
+baut gegen den Entwurf.
+
+#### KON2-09 -- W12-B: DIE ANTWORT AUF "WAS IST PASSIERT", ZUR HAELFTE ERLEDIGT
+
+**DELTA** · **Herkunft M** · **Die Einzelteile stehen im Ledger, der ZUSAMMENHANG nicht.**
+
+Owner-Frage 10.08.: "Aber das hat doch alles schon mal sauber je Stufe funktioniert? Was ist
+passiert?" -- Antwort: **§43 war ZWEITEILIG** (LEDGER:8225):
+
+    W12-A  Stempel-ERZEUGUNG     "startet JETZT"  -> GEBAUT (b23b7ee2, 19.07., 7 Dateien)
+    W12-B  Stempel-KONSUMPTION   "nach W11"       -> nie als Ticket abgehakt
+
+Was W12-B leisten sollte (LEDGER:8202): "die Cache-Invalidierung bei Einzel-Algorithmus-Updates
+CHIRURGISCH: nur Binaries, deren Stempel-Zeile den geaenderten Algorithmus traegt, werden neu
+gebaut ... alle anderen sind Cache-Hits." **Das ist woertlich die Owner-Erinnerung.**
+
+**DIE GENAUE LAGE, aus zwei Straengen zusammengelegt:**
+
+    Organ-Aenderung   -> Glied [1] per-Permutation  -> chirurgisch  W12-B FUNKTIONAL ERFUELLT
+    System-Aenderung  -> Glied [6] run-konstant     -> Vollbau      W12-B FEHLT
+
+Der juengere Kanal ist die **A2-Eichung (05.08.2026)**: `dll_is_current()`
+(`build_orchestrator.hpp:345-352`) vergleicht seither den SHA512-Fingerprint fail-closed, und
+der traegt die Mess-Zeile als Preimage-Glied [3]. Kommentar dort: "`.fingerprint` IST seit der
+Eichung das Skip-Kriterium von dll_is_current."
+
+**Das Ticket ist also nicht offen geblieben -- es hat sich zur HAELFTE durch einen juengeren
+Kanal erledigt, und niemand hat gemerkt, dass die andere Haelfte offen blieb.**
+Ledger-Fundstellen der Einzelteile: :8377, :8730, :12966 ("vermutlich subsumiert (STRITTIG)").
+
+#### KON2-10 -- DIE KOSTEN-URSACHE IST DER HASH, NICHT DIE VERGLEICHSZEILE
+
+**FEHLT** · **Herkunft M**
+
+Der Alt-Kanal verglich **KLARTEXT**: `_current_axes_sig` je Permutation aus DEREN EIGENEN
+Achsen-Werten, Sidecar hielt `axes=<sig>` im Klartext, Vergleich per `STREQUAL`
+(`codegen.cmake:148-250`, entfernt am 27.07. mit `813c3232`).
+
+Heute liegt Glied [6] in einem **SHA-512**. **Auf einem Hash ist keine Teilmenge pruefbar** --
+`recorded ⊆ current` laesst sich in `dll_is_current` NICHT nachruesten, solange das bvset nur
+gehasht im Sidecar steht. Das ist die Kosten-Ursache, nicht die Vergleichszeile.
+
+**Das Muster existiert im Haus:** Bestandslog v4 (`bestandslog_document.hpp:95-105`): "OE-C
+verlangt, dass ein Versions-Bump EINER Haupt-Achse alle Bestaende selektiv invalidieren kann ...
+dafuer muss die Version LESBAR am Eintrag stehen."
+
+#### KON2-11 -- EINE SCHRIFTLICHE ZUSAGE IST VERLETZT
+
+**FEHLT** · **Herkunft M**
+
+`ERWEITERUNGS-LEITFADEN.md:116` verspricht: "bestehende DLLs ohne `myalgo` bleiben unter Resume
+unveraendert (Skip via `.version`-Sidecar)". Abgeschaltet seit 05.08.
+(`build_orchestrator.hpp:321-323`): "mit F7 (\"NUR\") ERSETZT ... entscheiden aber ueber KEINEN
+Skip mehr."
+
+**Der Leitfaden ist heute falsch und muss korrigiert werden** -- er verspricht Aussenstehenden
+eine Eigenschaft, die es nicht mehr gibt.
+
+#### KON2-12 -- "BUILD UNMOEGLICH": EINE BRUCHSTELLE, BENANNT
+
+**FEHLT** · **Herkunft M**
+
+Owner 10.08.: "sonst ist der Build fuer die Tier-Binaries und der build der CEB unmoeglich nach
+den aktuellen Vorgaben." Vier Kandidaten gegeneinander geprueft:
+
+    Organ-Achsen-Bump                traegt   Glied [1] per-Perm, Wirkung bewiesen
+    Lager "gueltiger Bestand => SKIP" traegt   Bestandslog v4
+    2^17-Flotte                      Folge, nicht Ursache
+    Hardware-Erweiterung ist ADDITIV  BRICHT   <-- die eine Bruchstelle
+
+Dreifach belegt: `build_orchestrator.hpp:311-312` -- Glied [6] ist "RUN-KONSTANT ... keine
+Perm-Eigenschaft"; `driver_build_variant_signature.hpp:33-36` speist `EnabledExtensions` hinein;
+`dll_is_current:345-352` vergleicht auf Gleichheit. Ergebnis: JEDE Tier-Binary bekommt einen
+neuen Fingerprint.
+
+**In einem Satz: nicht unmoeglich, sondern wirtschaftlich unbezahlbar** -- jede
+Hardware-Erweiterung kostet einen Vollbau statt der neuen Permutationen. Bei 2^17 dasselbe.
+
+#### KON2-13 -- DER WIEDERAUFBAU-PLAN, SECHS PAKETE MIT REIHENFOLGE-BEGRUENDUNG
+
+**FEHLT** · **Herkunft M** (Aufwand aus gemessenen Groessen abgeleitet)
+
+    #  Paket                                  Aufwand              Invalidiert
+    1  bvset-Glied im KLARTEXT ins Sidecar    klein + Format-Bump  JA, einmal alles
+    2  Glied [6]: recorded ⊆ current          Vergleich = 1 Zeile; nein
+                                              Logik+Koeder mittel
+    3  Bump-Erzwingung auf die uebrigen 17    98 Literale,         nein
+       Achsen (A1-Pin als Muster)             mechanisch
+    4  Hybrid versionieren                    5 Dateien, klein     nein
+    5  CEB-Array-Form (§58-V)                 4 Inkludenten        JA (Glied [3])
+    6  Doku + Namensordnung                   klein                nein
+
+**1 vor 2, weil ein Hash keine Teilmenge kennt. 2 vor 3, weil Bump-Disziplin ohne
+funktionierendes Gate nur Buchhaltung ist.** Die zwei Invalidierungen (1 und 5) sind
+unvermeidbar und BUENDELBAR ZU EINEM Vollbau, wenn beide im selben Format-Bump landen -- bewusst
+zu terminieren, nicht nebenbei. (`build_orchestrator.hpp:304`: "kein Grandfathering".)
+
+#### KON2-14 -- DER BEOBACHTBARKEITS-RIEGEL: WORAN MERKT MAN EINEN ERNEUTEN AUSFALL
+
+**FEHLT** · **Herkunft M** · **Lehre aus KON2-19 (drei Wochen stummes Gate)**
+
+1. **SELBSTBEWACHUNG AM OBJEKT** -- ein ctest, der zwei bvset-Mengen `A ⊂ B` konstruiert und
+   verlangt: A skippt gegen B, B skippt NICHT gegen A. Faellt die Teilmengen-Logik auf
+   Gleichheit zurueck, BEISST der Koeder: die Richtungsblindheit ist genau das, was der Test
+   sieht. Kein CI-Job noetig, laeuft im Default-ctest. **Das ist der eigentliche Riegel.**
+2. **ZAEHLER IN DIE AUSGABE** -- der Alt-Kanal hatte `_perm_count_skipped`/`_bumped`. Ein Lauf,
+   der "0 uebersprungen" meldet, wo hunderte faellig waeren, ist NUMERISCH auffaellig statt nur
+   teuer.
+3. Die YAML-Doppelschluessel-Klasse ist durch `scripts/ci_yaml_key_guard.sh` gedeckt; die Klasse
+   "Job mit `rules`, dessen Variable nirgends gesetzt ist" NICHT -- eigener kleiner Posten.
+
+#### KON2-15 -- DER VERTRAG CEB <-> TIER-BINARY EXISTIERT, MIT DEM OWNER-SATZ ALS DATEITITEL
+
+**FEHLT** · **Herkunft M** · **der staerkste Einzelfund des Tages**
+
+`libs/cache_engine/builder/pruef_dock/mess_konsistenz_gate.hpp:2`, woertlich:
+"M-1/D-2 (06.08.2026): DER VERTRAG CEB <-> TIER-BINARY AM PRUEFDOCK."
+
+**PRODUKTIV VERDRAHTET, nicht nur gebaut:** `cache_engine_builder_iterator.hpp:2815` ruft
+`pruef_dock::pruefe_mess_konsistenz(handle, cfg.erwartete_mess_zeile)` VOR JEDER MESSUNG,
+fail-closed; dazu `pruef_only.hpp:53`. Sechs Ablehnungsklassen (erwartung_leer / stempel_fehlt /
+layout_fremd / deklaration_leer / zeile_abweichung / entries_widerspruch).
+
+**DREI GESCHWISTER-GATTER am Dock, je eine Frage:**
+
+    conformance_gate.hpp         KANN die Huelle es?
+    mess_interface_testate.hpp   WIRKT es wirklich?
+    mess_konsistenz_gate.hpp     IST die Ausstattung DIE, die die CEB einkompiliert hat?
+
+**Der Befund, den es heilt:** vor D-2 hatte `measurement_line` NULL produktive Leser
+(Vollzensus 20 Treffer, alle Deklaration/Erzeugung/Tests). Gegenprobe der Methode: derselbe
+Zensus auf `organ_line`/`system_line` findet 31 Treffer, davon 2 produktiv in
+`bestandslog_factory.hpp` -- die Methode findet produktive Leser, wo es welche gibt.
+
+**"compile time veraenderlich" konkret:** die CEB ist EIN Binary, das der Planer pro Aufruf mit
+einer anderen Combo-Legende beauftragen kann. Der Vertrag wird JE CEB-LAUF neu gesetzt; das Gate
+haelt SOLL (aktueller Lauf) und IST (was in einer bestimmten Tier-.so einkompiliert wurde)
+byte-gleich synchron.
+
+**Plan-Quellen, per WORTLAUT gefunden** (die im Code zitierte Zeilennummer LEDGER:3319 ist
+verschoben -- s. KON2-22): **§62-B, 21.07., LEDGER:9077** "KOMPILATIONS-STATUS-KOPPLUNG: welche
+Pruef-Tools in die CEB EINKOMPILIERT sind (Mess-Tooling-Achse), bestimmt, was auch das
+Tier-Binary beinhalten MUSS" · **§64, 22.07., LEDGER:9161-9162**.
+
+#### KON2-16 -- ZWEI ALTE KRITIKEN SIND GESCHLOSSEN; EINE IST NICHT NACHGETRAGEN
+
+**DELTA** · **Herkunft M**
+
+Beide stammen aus dem 22.07.-Ledger-Stand, beide waren DAMALS wahr, beide wurden in der
+M-1/D-4-Welle (06.08.2026) geschlossen:
+
+**(a) "hartkodierter 5er-Platzhalter" in der System-Zeile -- GESCHLOSSEN, NICHT NACHGETRAGEN.**
+`libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp:38`:
+`inline constexpr std::size_t kSystemAxisCodeCount = 3;`. Die Datei traegt ihre Historie selbst
+(:32): "A3 (O-8 Schritt 4): 5 -> 3. Der Owner-KERN kennt GENAU DREI System-Haupt-Achsen".
+`system_stamp_line()` zieht die Zahl automatisch nach. **ACHTUNG: der Pfad ist `abi/`, nicht
+`measurement/`.** **Das ist die eine echte Doku-Nachzugsluecke: der Ledger hat diese Schliessung
+nirgends vermerkt.**
+
+**(b) "Mess-Array FEHLT GANZ" (§58-V) -- GESCHLOSSEN UND BEREITS NACHGETRAGEN.**
+`kCebMeasurementStampFor<L>` (`ceb_version_stamp.hpp:407-412`) existiert und rendert
+"measurement_tooling=<id>@X.Y.Z;...;[load_framework=...]". Der Ledger hat es selbst nachgezogen
+(§64-VERSIONIERUNGS-KLAERUNG, STALE-NOTE zu LED:2447/:2785). Nur zur Bestaetigung gebucht.
+
+#### KON2-17 -- DREI SOLL-IST-LUECKEN DER VERSIONIERUNG, GEMESSEN
+
+**FEHLT** · **Herkunft M**
+
+1. **Der Planer hat KEINEN Fingerprint-SHA.** `planner_version.hpp` -> 0 Treffer fuer
+   `fingerprint`/`sha`. Gegenprobe: 5 Dateien im Planer-Baum kennen Fingerprints -- das Konzept
+   existiert, der Planer benutzt es nur nicht fuer sich. Laut KON2-06 muessen ALLE VIER
+   Binary-Typen einen haben.
+2. **Die CEB traegt den System-Anteil LEER.** `ceb_version_stamp.hpp:415` `("", "", Mess-Zeile)`.
+   Die Code-Begruendung (:418-430) argumentiert gegen System-**ZELLWERTE** ("Ein Zellwert hier
+   waere schlicht falsch -- er wuerde behaupten, die CEB selbst sei fuer avx512 gebaut worden").
+   **Der Owner spricht aber von System-Achsen-VERSIONEN -- das sind zwei verschiedene Dinge.**
+   Ob beide zusammen weggelassen wurden, ist offen. NICHT mit KON2-16(a) verwechseln: das ist
+   die TIER-System-Zeile, dies hier die CEB.
+3. **Die Genus-Versionen sind HANDGESCHRIEBEN statt zusammengesetzt.**
+   `pruef_dock_version.hpp:58-64`, fuenf freie Literale. `pruef_dock_version_stamp()` hat GENAU
+   EINEN Aufrufer im ganzen Baum, und der ist ein Test
+   (`test_reflect_versions_all_registered.cpp:129`). Laut KON2-06 soll sie sich aus allen
+   Mess/System/Organ-Achsen ZUSAMMENSETZEN.
+
+#### KON2-18 -- WAS LEBT, damit die Lage nicht schwaerzer gemalt wird als sie ist
+
+**FEHLT** · **Herkunft M**
+
+- **124 `algo_version`-Literale ueber 135 Dateien**, davon **26 ECHT GEBUMPT**: 97x `1.0.0.c`,
+  24x `1.0.2.c`, 2x `1.0.1.c` (die letzten beiden NUR in `axes/alloc`). Begruendet im Code
+  (`axis_06_allocator_pmr_resource.hpp:61-64`: "ohne Bump wuerde der inkrementelle
+  Tier-Binary-Cache alte Binaries weiterverwenden"). Der Pin-Test ist ZWEISCHICHTIG:
+  Literal-Pin PLUS Wirkungs-Pin -- gegen genau die "Beruhigungspille".
+- **`test_reflect_versions_all17` ist NICHT stehengeblieben.** `kCompositionAxisNames` hat heute
+  18 Eintraege (`axis_path_serialization.hpp:40-43`), die Tabelle wuchs mit
+  (`axis_variant_version_table.hpp:234`, `T26_persistence_target`). Der Test vergleicht RELATIV
+  (`.size()`), nie gegen ein Literal -- **falsch ist nur sein NAME.**
+- **Die feste Achsen-Reihenfolge existiert:** `kCompositionAxisNames`-Ordnung, "plattform-stabil,
+  unabhaengig von der spec.axes-Reihenfolge", Entscheid W12-A-5
+  (`axis_variant_version_table.hpp:265,307`).
+- **Die Grammatik ist gemeinsam:** `algo_semver.hpp`, Flag-Grammatik v2 `X.Y.Z[.flag]*`, mit
+  zwei Politik-Wachen (`ce_owned_version_is_wellformed` ungated,
+  `ce_owned_version_satisfies_cpu_enforce` gated), 13 Nutzer. `'c'` = CPU-Basis ist PFLICHT
+  (Owner-Q3); eine flaglose `"1.0.0"` bricht COMPILE-HART, sobald
+  `COMDARE_VERSION_HW_FLAG_ENFORCE` scharf ist (Default 1). `'e'` = EFFICIENCY CORE, nicht
+  "experimental" (das ist ersatzlos deprecated).
+
+#### KON2-19 -- DER BEFUND, DER BLEIBT: DAS LOCK-GATE RIEGELT NICHT, WAS SEIN NAME SAGT
+
+**FEHLT** · **Herkunft M** · **enthaelt eine OWNER-FRAGE**
+
+`contract:axis-version-lock` prueft SHA-256 ueber **6 Heuristik-Header** in
+`libs/cache_engine/heuristik/` (break_even, axis_spline, workload_cluster_offline,
+workload_feature_vector, axis_optimization_catalog, measurement_curve_loader) gegen
+`tools/axis_version_lock/axis_version.lock`, ueber einen eigenen Marker
+`// AXIS_ALGO_VERSION: <N>` -- eine DRITTE Versions-Vokabel neben `algo_version` (124x) und
+`k*Version` (9x).
+
+**Es riegelt KEINEN einzigen Achsen-Varianten-Header.** Ein Algorithmus-Edit in einer der 124
+Varianten laeuft daran vorbei. Bump-Erzwingung deckt **1 von 18** Achsen (A1-Pin auf `alloc`);
+fuer die 17 anderen schlaegt NICHTS an.
+
+**Explizit geplant, nicht getan** (§32-F4/GN-8-Rest, zwei Ledger-Fundstellen):
+"axis_version.lock-Scope auf **Organ-Strategie-Header**" -- die Ausweitung von 6 auf potentiell
+alle 124. Status "(TEIL)"/"(niedrig)" bzw. "(TEIL, hoch)" -- **die Prioritaet ist im Ledger
+selbst inkonsistent gefuehrt** (Randbefund).
+
+**OWNER-FRAGE:** warum ist das Gate auf die Heuristik beschraenkt? NICHT AUFFINDBAR
+(Gegenprobe: `.gitlab-ci.yml` + `ci/` nach `algo_version` -> kein zweites Gate; der Kommentar
+begruendet die AUSWAHL der 6, nie den AUSSCHLUSS der Achsen).
+
+#### KON2-20 -- STEMPEL-BENENNUNG: VIER FAMILIEN, KEIN SCHEMA, TIER NICHT AUFFINDBAR
+
+**FEHLT** · **Herkunft M** · Owner 10.08.: "Die Version stamp benennungen sind das blanke
+Chaos und die Benennung wurde von dir erfunden, bitte benenne sinnvoll."
+
+**DER KILLER-BELEG:** `find . -iname '*tier*stamp*'` = **0 Treffer**, Gegenprobe `*stamp*` = 13.
+Niemand findet den Tier-Stempel ueber den Namen -- er heisst `anatomy_version_stamp.hpp`. Und
+wer dem Muster folgt und `planner_version_stamp.hpp` sucht, findet auch nichts: die Datei heisst
+`planner_version.hpp`, ohne `stamp`.
+
+**Vier lexikalische Familien ueber zehn Dateien:** `<Sache>_version_stamp` (4x) ·
+`<Sache>_version` ohne `stamp` (1x, ausgerechnet die einzige mit echter Nummer) ·
+`<Konzept>_stamp_<Rolle>` (4x, in sich konsistent, aber ohne `version` im Namen, obwohl
+`toolchain_stamp_glied.hpp:190` inhaltlich "Ein Versions-Anker je TOOLCHAIN-Achse" ist) ·
+`<Konzept>_stamp` (1x). **Kein dokumentiertes Schema irgendwo** -- Gegenprobe: 155 `.md` unter
+`docs/`, beide Encodings, kein erklaerender Treffer.
+
+**SOLL-ENTWURF, zwei Kategorien getrennt:**
+
+    KATEGORIE A -- Binary-Identitaet     <bintyp>_binary_stamp.hpp
+                                          (planner / ceb / anatomy / hybrid)
+    KATEGORIE B1 -- Achse+Algorithmus    axis_<rolle>.hpp   (Wahl-Ebene)
+    KATEGORIE B2 -- Interfaces/Verfahren <ding>_verfahren_version.hpp (Dock/Probe-Ebene)
+    Bau-Bausteine (Formatter/Parser/Verdrahtung) BEHALTEN ihre Rollen-Endung
+                                          (_entries/_suffix/_glied/_naht) -- die einzige
+                                          Teilfamilie, die heute schon konsistent ist.
+
+Regel: **"version" nur dort, wo wirklich eine Versionsnummer steht.** Wo Provenienz/Identitaet
+gemeint ist, gehoert ein anderes Wort hin -- `ceb_version_stamp.hpp` sagt in Zeile 3 selbst:
+"Die CEB hat KEINE Gesamt-Version".
+Messlatte fuer die Abnahme: nach der Umbenennung MUSS `find -iname '*tier*stamp*'` treffen.
+Wanderungskosten (gemessen): anatomy 18 #include + 13 Kommentare · ceb 4 + 10 + 2 CMake ·
+g1 4 · axis 3 · dock 6. Eine Umbenennung ist eine ABSCHRIFT-Operation, keine Loeschung.
+
+**"G1" IST AUFGELOEST:** kein Akronym, sondern der interne Codename des K7b-4-Pakets vom
+22.07. (`docs/sessions/20260722-SESSION-KONTEXTUEBERGABE-abend-k7b-komplett.md:35`).
+**Kollisionsfund:** derselbe String bezeichnet anderswo die "Lager-Gate G1-G5"-Serie
+(`docs/plaene/20260808-WELLENPLAN-ANLAGE-luecken-defekte-einwaende.md:399`). Zwei Bedeutungen,
+ein Vokabular -- ein Argument FUER die Umbenennung.
+
+#### KON2-21 -- DIE BILLIGSTE REPARATUR: EINE NEUNTE KLASSE IN EINER BESTEHENDEN TAXONOMIE
+
+**FEHLT** · **Herkunft M**
+
+`measurement/algo_semver.hpp:109-226` fuehrt bereits eine SELBSTWARTENDE Taxonomie aller
+ce-eigenen Versions-Quellen, Klassen **(a) bis (h)**, mit eigener Wartungs-Doktrin: "diese Liste
+ist AUS DEM DIFF/GREP ABZULEITEN, NIE HANDGEPFLEGT". Das bindende Kommando ist
+`grep -rn 'ce_owned_version_\(satisfies_cpu_enforce\|is_wellformed\)' --include='*.[hc]pp'
+libs tests tools apps` -- Datei-Kopf nennt 130 Treffer, unabhaengiger Lauf bestaetigt 130.
+
+**Die fuenf Dock-Versionen fehlen dort als Klasse (i)**, obwohl sie dieselben Wachen tragen und
+vom generischen Grep mitgefangen werden (12 Treffer allein in `pruef_dock_version.hpp`). Die
+Liste warnt selbst: "Jede KUENFTIGE ce-Versions-Quelle gehoert hier hinein ... sonst entsteht
+wieder eine Luecke wie bei (e)/(f)." **Genau das ist eingetreten.**
+
+Ein Kommentar-Nachtrag von ca. 10 Zeilen im bestehenden Verzeichnis -- kein neuer Name noetig.
+**Ohne ein solches Register erfindet der naechste Autor mit hoher Wahrscheinlichkeit eine
+fuenfte Familie.**
+
+#### KON2-22 -- DER BLOCKER-KOMMENTAR IST STALE, NICHT OFFEN
+
+**FEHLT** · **Herkunft M**
+
+`anatomy_version_stamp.hpp:75-80` behauptet: "Die Metadaten-Quelle fuer den realen
+Modul-Stempel ist eine offene Architektur-Frage (Registry-basiert im Emitter vs.
+Wrapper-Typ-Liste durchs Makro)". **Der Code hat die Frage laengst beantwortet:**
+`axis_variant_version_table.hpp:5-16` beschreibt den "Registry-basiert im Emitter"-Weg -- eine
+compile-time {axis,variant->algo_version}-Tabelle aus den Registry-Enabled-Listen, mit einer
+CRTP-Wache (`static_assert(requires { Derived::algo_version; })`), die verhindert, dass eine
+Variante OHNE `algo_version` in die Registry gelangt. `compose_organ_stamp_line()` (:300-330)
+liest daraus; die Kette laeuft produktiv bis in die ABI-exportierten `AnatomyVersionLines`.
+
+Gegenprobe: "Wrapper-Typ-Liste" und "Registry-basiert im Emitter" = **0 Treffer im Ledger** --
+es gibt keine Owner-Notiz, die die Frage beantwortet. **Der Bau hat entschieden, ohne dass der
+Entscheid dokumentiert wurde.** Code-Hygiene-Position, KEINE Owner-Vorlage.
+
+---
+
+## RANG C -- LIZENZ UND EIGENTUM (Owner-Entscheide 10.08.2026)
+
+#### KON2-23 -- DIE VIER-REPO-LIZENZZUORDNUNG -- W-5 IST ENTSCHIEDEN
+
+**FEHLT** · **Herkunft OW** · **loest Widerspruch W-5 aus Nachtrag I**
+
+> "Bei der Lizenz solles frei fuer die Forschung, aber sonst Kommerziell proprietaer sein.
+> Apache ist voellig falsch, bitte behebe das nach einem explore welche Lizenz fuer welches
+> Diplomarbeit repo gelten soll. super soll apache sein, PRT-ART und cache engine sollen beide
+> frei fuer die Forschung und proprietaer fuer business und Einzelnutzung sein, Diplomarbeit
+> ist nur copyright von Benjamin-Elias Probst."
+
+Vorlauf desselben Tages: "Dann machen wir die Lizenzen von der BEP Venture UG doch proprietaer.
+Und damit maximal restriktiv. Aber den code muss man public sehen koennen, das staerkt das
+Vertrauen der Nutzer."
+
+    Repo                                 LICENSE am 10.08.   SOLL
+    probst-diplomarbeit-cache-engine     Apache-2.0          Apache -- BLEIBT
+    comdare-cache-engine (ce)            Dual-Lizenz 02.08.  Forschung frei / sonst proprietaer
+    comdare-prt-art                      Apache-2.0          dito
+    20260931-overleaf-diplomarbeit       KEINE LICENSE       nur Copyright-Vermerk
+
+**DIE DREITEILUNG ist der Kern und unueblich:**
+
+    Forschung             frei
+    Business              Lizenzvertrag
+    Einzelnutzung/privat  Lizenzvertrag     <-- die Fassung vom 02.08. kannte diesen Fall nicht
+
+Uebliche Noncommercial-Lizenzen (PolyForm NC, Prosperity) erlauben private Nutzung GRATIS --
+genau das ist NICHT gewollt. Wer ein Modell vorschlaegt, muss die Dreiteilung am Lizenztext
+belegen, nicht am Namen.
+
+#### KON2-24 -- DER ext/-KOLLISIONSCHECK: KEINE KOLLISION, UNTER FUENF BEDINGUNGEN
+
+**FEHLT** · **Herkunft M**
+
+Copyleft im Baum: **GPL-3** in `ext/traversal/P04-CoCo-trie/CoCo-trie/LICENSE` und
+`ext/traversal/P07-Wormhole/wormhole/LICENSE`; **LGPL-2.1+** in `ext/traversal/P29-RCU/` und
+`ext/allocator/A03-michael-lockfree/michael.h:1-17`. Alle getrackt, alle mit Original-LICENSE
+daneben.
+
+Die vier Link-Schalter stehen OFF (alle vier sind INTERFACE-Bibliotheken, sie uebersetzen
+nichts). **Ein FUENFTER steht ON und fasst GPL-Code an:** `CMakeLists.txt:550-551`
+`COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION ON` kopiert ueber `cmake/is_original_codegen.cmake:130`
+(`configure_file ... COPYONLY`) bei JEDEM Configure `wh.c` (GPL-3) in ein Legacy-Verzeichnis.
+Entwarnung: die Kopie wird nicht uebersetzt und nicht gelinkt (kein Target fuehrt sie als
+Quelle), und der generierte Header enthaelt nur Funktionsnamen + SHA-256
+(`apps/is_original_validator/main.cpp:311-316`).
+
+**DIE FUENF BEDINGUNGEN:** LICENSE sagt nie "dieses Repositorium", sondern benennt den
+Comdare-Eigencode unter ausdruecklicher `ext/`-Ausnahme · Fremd-LICENSEs bleiben bit-identisch
+an Ort und Stelle · das NOTICE weist jede Komponente aus (**`liburing` fehlt bis heute**) · es
+bleibt bei blosser Beifuegung, kein kombiniertes Werk · **das CI-Gate muss FUENF Schalter
+erfassen, nicht vier** -- sonst ist es ein gruenes Gate, das nur seinen Gegenstand deckt.
+
+**KEINE RECHTSBERATUNG:** eine Umstellung mit Wirkung fuer Dritte gehoert anwaltlich geprueft,
+besonders der Apache-Widerruf und die `ext/`-Kollision.
+
+#### KON2-25 -- ce/NOTICE WIDERSPRICHT ce/LICENSE -- HEUTE, NICHT HISTORISCH
+
+**FEHLT** · **Herkunft M**
+
+`ce/NOTICE:6-7` sagt "Licensed under the Apache License, Version 2.0", waehrend `ce/LICENSE`
+daneben die Dual-Lizenz vom 02.08. traegt. **Zwei Dateien, ein Repo, zwei Aussagen** -- und
+NOTICE ist die Datei, auf die Apache-2.0 selbst verweist.
+
+Weitere Stellen, die aktiv Apache behaupten: **36 SPDX-Header in ce**, **28 in prt-art**,
+`README.md:7`, `README.md:197-199`, `CMakeLists.txt:3`, die GitHub-Reposeite.
+`LICENSE_AUDIT_EXT.md` traegt Kopf "V31-PRE, 2026-05-14" mit veralteten Pfaden
+(`ext/P01-ART/...` statt `ext/traversal/P01-ART/...`) und kennt `liburing` gar nicht.
+
+**Der Apache-Grant fuer Revisionen vor dem 02.08. ist UNWIDERRUFLICH** -- wer den alten Stand
+geklont hat, behaelt seine Rechte. Das steht bereits korrekt im heutigen `ce/LICENSE` und
+gehoert uebernommen.
+
+#### KON2-26 -- super TRAEGT APACHE UEBER PRUEFUNGSUNTERLAGEN UND FREMDE PERSONENDATEN
+
+**FEHLT** · **Herkunft M** · **OWNER-VORLAGE**
+
+`super/LICENSE` = volle Apache-2.0. Im Repo liegen aber: acht Exposé-`.docx` an Prof. Habich,
+**drei PDFs mit Betreuer-E-Mail-Verkehr (Kuehn, Schuele, Zhang, alle @tu-dresden)**, das
+Anmeldeformular der Abschlussarbeit, `20260502 Anmeldung_DA_Probst.pdf`. Dazu dieselben
+GPL-3-Baeume ein zweites Mal unter `Forschungsarbeiten/code/` -- unter einer Apache-LICENSE
+ohne Ausnahmesatz.
+
+Apache-2.0 ist eine SOFTWARE-Lizenz; auf Pruefungsunterlagen und E-Mail-Verkehr mit namentlich
+genannten Dritten angewandt ist sie sinnlos und potenziell heikel.
+**Wenn super public geht, ist die Frage nicht die Lizenz, sondern ob diese Dateien
+hineingehoeren.**
+
+#### KON2-27 -- ENTITAETEN-TRENNUNG: "BEP" ALLEIN IST VERBOTEN
+
+**FEHLT** · **Herkunft OW** (Ruege 10.08.2026)
+
+> "Die BEP Venture UG und Benjamin-Elias Probst sind 2 verschiedene Entitaeten und duerfen NICHT
+> unter BEP zusammengefasst werden."
+
+    Benjamin-Elias Probst                  immer AUSGESCHRIEBEN. Nie "BEP", nie "B.-E. P."
+    BEP Venture UG (haftungsbeschraenkt)   immer MIT "Venture UG". "BEP" allein ist NIE
+                                           die Gesellschaft.
+    Comdare                                die MARKE der Gesellschaft, KEIN Rechtstraeger --
+                                           eine Marke kann nicht Lizenzgeber sein.
+
+Die Firma traegt die Initialen ihres Gruenders im Namen -- daraus folgt KEINE Identitaet. Das
+ist bei inhabergefuehrten Gesellschaften der Normalfall und genau der Grund, warum die Trennung
+im Text sichtbar bleiben muss.
+
+**Eine Fundstelle im Bestand**, gemeldet: `ce docs/plaene/20260628-KONTEXT-DOSSIER-...md:91` --
+"das Achsen-Konzept stammt aus einer Vorarbeit **des Autors** (Comdare/BEP Venture, UltiHash)".
+Satzsubjekt ist die PERSON, die Klammer nennt die FIRMA als Attribution. Geprueft und NICHT
+auffaellig: die LICENSE-Dateien (trennen sauber), die E-Mail-Signaturen.
+
+---
+
+## RANG D -- WERKZEUG- UND BETRIEBSFALLEN
+
+#### KON2-28 -- DOPPELTER YAML-SCHLUESSEL: DER LETZTE GEWINNT, WORTLOS
+
+**FEHLT** · **Herkunft M** · **das Ereignis lief vom 19.07. bis 06.08.**
+
+`contract:axis-version-lock` stand ZWEIMAL als Top-Level-Job in `.gitlab-ci.yml`: die
+urspruengliche Fassung (19.07., GN-8/O-4) war ein **unbedingtes Dauergate**, die zweite
+(06.08., Paket W3-C) **inert** -- `rules: if COMDARE_AXIS_LOCK_CHECK == "true"`, und diese
+Variable ist nirgends gesetzt. **YAML verwirft bei doppeltem Schluessel alles ausser dem letzten
+ohne Fehler und ohne Warnung.**
+
+**Der Tripwire lief DREI WOCHEN in KEINEM einzigen Job -- bei durchgehend gruener Pipeline.**
+Kein Signal, kein "skipped" im UI, das jemandem aufgefallen waere. Am 06.08. gefunden und auf
+die STRENGERE Fassung vereinigt (`.gitlab-ci.yml:678-694`). Heute: lebendig, unbedingtes Gate.
+
+**PRUEFBEFEHL, ab sofort nach jeder YAML-Aenderung:**
+`grep -oE '^[a-z][a-z0-9_:.-]*:' .gitlab-ci.yml | sort | uniq -d` muss LEER sein.
+Heute in beiden Repos leer, Gegenprobe: 30 (ce) bzw. 48 (super) Schluessel erkannt.
+**Und beim Haerten eines Gates: die alte Definition ENTFERNEN, nicht die neue danebenstellen.**
+
+#### KON2-29 -- DIE EIN-BLECH-REGEL HAT EIN LOCH: ZWEI PROJEKT-IDS MESSEN NICHT DAS BLECH
+
+**FEHLT** · **Herkunft M** · **am Objekt gefangen, mit Verursacher-Adresse**
+
+Waehrend eines Release-Baus sprang die Systemlast von **4.5 auf 24.88**, die Bauleistung fiel
+von 60 Zielen je 7 min auf 7 je 10 min. Der eigene Bau nutzte genau vier `cc1plus` (`-j4`) --
+die Last kam von aussen. Verursacher:
+`/usr/bin/gitlab-runner run ... /builds/.../comdare/products/comdare-web/...
+LLVM-22.1.8-Linux-X64.tar.xz` -- ein CI-Job des Projekts **comdare-web**. Weder 286 noch 288.
+**Beide API-Abfragen standen auf 0.**
+
+**Eine Abfrage ueber zwei Projekt-IDs kann grundsaetzlich nicht beantworten, ob das BLECH frei
+ist.** Sie beantwortet nur, ob DIESE ZWEI gerade fahren.
+
+**NEUE DOKTRIN -- ZWEI Messungen vor jedem Push:**
+1. `scope=running` fuer ce (286) UND super (288) -- der Nachweis fuer unsere zwei Refs.
+2. `pgrep` auf gitlab-runner-JOBprozesse am Objekt -- die einzige Messung, die das BLECH misst.
+   (Achtung: der Runner-DAEMON laeuft immer; gesucht ist ein JOB.)
+
+**Und: die Regel schuetzt gegen OOM, nicht gegen Gesellschaft.** Bei 45 G available und ohne
+Swap-Druck ist Weiterbauen richtig -- **aber ausdruecklich als ABWAEGUNG zu benennen, nie als
+Regelauslegung.** So bleibt die Regel scharf: man beugt sie nicht still, man nennt den Fall, in
+dem ihr Zweck nicht greift.
+**Nachtrag zur Swap-Messung:** die BELEGTE Swap-Menge beantwortet die Frage NICHT. Gemessen
+wurden 19 von 31 G belegt bei `so=0` -- das ist Altlast, kein Druck. Die Antwort geben
+`vmstat`-Spalten `si`/`so`.
+
+#### KON2-30 -- DIE 2-PASS-FALLE IST FALSCH DOKUMENTIERT
+
+**FEHLT** · **Herkunft M**
+
+Sie haengt NICHT an den drei Registry-Generatoren allein, sondern daran, dass **`comdare_tests`
+die `apps/` gar nicht mitzieht**. Dadurch fehlen die CLI-Werkzeuge
+(`comdare-anatomy-codegen-tool`, `comdare-adhoc-emitter`), und das Registrierungs-Protokoll
+meldet nach dem Reconfigure weiterhin **vier von fuenf Bloecken als UEBERSPRUNGEN**.
+
+**Richtige Kette: `all -> reconfigure -> comdare_tests`.**
+
+Im Debug-Baum fiel es nicht auf, weil dort zufaellig zuerst ein voller `all`-Bau lief -- ein
+Fehler, der nur in EINER von zwei Bauarten sichtbar wird, ist genau die Klasse, die sonst als
+"geht doch" durchrutscht.
+
+#### KON2-31 -- ZWEI CHECKOUTS PRO REPO, WIEDER GETRETEN -- MESSORT GEHOERT IN JEDEN BERICHT
+
+**FEHLT** · **Herkunft M**
+
+Ein Strang stellte einen kompletten Bauplan auf `Code/external/comdare-cache-engine`
+@ `90bca126` (Branch `b-m2-pmc-invariante`, Stand **06.08.**) statt auf den lebenden Stand.
+Folgen, am lebenden Stand gegengemessen:
+
+    Behauptung des Strangs                  Wirklich auf origin/development (6c010cdc)
+    mess_achsen_naht.hpp existiert nicht    EXISTIERT (libs/cache_engine/profile_facade/)
+    "ingerprint" = 11 Treffer               27
+    Emissionsstellen :874/:912/:1233/:1386  heute :290/:303/:317 -- und es sind DREI, nicht vier
+
+**REGEL: der Messort (Pfad + SHA) gehoert in JEDEN Bericht.** Fuer git-Archaeologie ist der
+Baum unkritisch (Commits sind Commits); fuer jede Aussage ueber den HEUTIGEN Zustand ist er
+entscheidend.
+
+**VERWANDTE REGEL, aus demselben Tag:** Code-Kommentare sollen auf **Paragraphen-Marken**
+verweisen (§62-B, §43.b), NICHT auf Ledger-Zeilennummern. Der Ledger waechst; `LEDGER:3319`
+zeigt heute woandershin, ebenso die in `mess_achsen_naht.hpp:130` zitierten `:4082-4095`.
+Dreimal an einem Tag hat ein Strang deshalb einen toten Anker gemeldet.
+
+---
+
+## RANG E -- DIE ERNTE DER WORKFLOW-JOURNALE
+
+#### KON2-32 -- 246 FUNDE AUS EINER QUELLE, DIE NACHTRAG I NICHT KANNTE
+
+**FEHLT** · **Herkunft M**
+
+Nachtrag I erntete acht Quellen: Session-Log, Sessions, Plaene, Backups, Rohtranskripte.
+**Die WORKFLOW-JOURNALE waren nicht dabei.** Sie sind die einzige Quelle, in der steht, was die
+Agenten tatsaechlich GEMESSEN haben -- die Sessions enthalten nur, was davon in einen Bericht
+kam.
+
+    Bestand      205 Workflow-Journals · 687 Task-Ausgaben (84 davon 0 Byte)
+    Ernte        246 Funde aus 10 Straengen
+    Dringlich    34 BLOCKIEREND · 91 HOCH · 64 NORMAL · 15 NOTIZ
+    Ledger       161 FEHLEN · 80 DELTA · nur 5 stehen vollstaendig drin
+    Herkunft     210 Messungen · 18 Owner-Worte · 18 unbelegte Behauptungen
+
+Rohdaten je Strang: `subagents/workflows/wf_fed9658a-006/journal.jsonl` (11 Ergebniszeilen).
+**Die 34 BLOCKIEREND-Funde sind EINZELN nachzutragen -- das ist ein eigenes Paket und in
+diesem Nachtrag NICHT erledigt** (siehe EHRLICHER REST).
+
+#### KON2-33 -- METHODENFUND: EINE ZUSAMMENFUEHRUNG, DIE KUERZT, MELDET TROTZDEM "DURCHGELAUFEN"
+
+**FEHLT** · **Herkunft M** · **eigener Fehler des Leads**
+
+Die Synthese der Ernte bekam nur **40 der 246 Funde** (rund 16 %), weil im Workflow-Skript
+`.slice(0, 120000)` stand. Der Agent hat es korrekt gemeldet ("die Bloecke 3, 4, 5 und 6 habe
+ich nie gesehen ... Alles, was unten steht, ist eine Synthese ueber 40 von 246") statt
+Vollstaendigkeit vorzutaeuschen -- und dabei selbst eingeordnet: "Das ist selbst ein Befund der
+Klasse, gegen die diese Nacht gearbeitet hat."
+
+**Lehre:** eine Kuerzung im Zusammenfuehrungs-Schritt ist unsichtbar, wenn der Zusammenfuehrer
+sie nicht selbst meldet. Das vollstaendige Material lag im Journal und war rettbar.
+
+#### KON2-34 -- VIER KORREKTUREN AUS DER STICHPROBE
+
+**DELTA** · **Herkunft M** (die Synthese hat 14 Funde selbst am Objekt nachgeprueft)
+
+1. **8 von 9 "ungelandeten" Commits SIND gelandet.** `git branch -r --contains`, heute gefahren.
+   Genau einer fehlt wirklich: `282def69` (super, blinde Wache NormalizedBar). Gegenprobe am
+   Inhalt: `NormalizedBarMedianUsesLowerMiddleOnEvenN` = 0 Treffer auf `origin/development`,
+   1 in `282def69`; `git diff --stat` = 5 insertions / 88 deletions.
+2. **Der Merge-Stempel-Widerspruch war falsch gestellt.** LEDGER:9468 kennt den Owner-Entscheid
+   E-2 und ordnet die sofortige Entfernung an. **ABER: der Ledger widerspricht sich SELBST --
+   LEDGER:8941 fuehrt denselben Gegenstand weiter als offenen Bauauftrag
+   ("[§59-MERGE-STEMPEL] ... POD 56 -> 72, layout 2 -> 3, OFFEN, hoch").** Zwei Zeilen, ein
+   Gegenstand, entgegengesetzte Anweisung -- relevant VOR W2-S-B.
+   Suchbelege: `MERGE-STEMPEL` = 9 (nicht 0), `Merge Zeile kann daher nicht existieren` = 1.
+3. **KON-18 traegt eine am Objekt widerlegte Diagnose.** Das Objekt ist geheilt (die Umgebung
+   wird jetzt gescheuert, `test_d2_abdeckungs_wache_nenner.cpp:143-160` datiert die Heilung auf
+   2026-08-10 und zitiert den Job-Trace), **der Ledger-Text steht unveraendert falsch da.**
+   Gegenprobe: `Scheuerliste` = 0 im Ledger, `15515` = 3.
+4. **Es sind VIER Registries, nicht drei** -- `tests/unit/thesis_tiere/prt_art_axis_registry.xml`
+   mit 5 Achsen kam in keiner Zaehlung vor. Organ 18 · System 3 · Mess 3 · prt-art 5.
+   **Keine der vier steht auf 22**; HY-A3 ("Registry 22->23") traegt seine Zahl heute in eine
+   unbestimmte Zieldatei.
+
+---
+
+## RANG F -- OFFEN, GEHOERT DEM OWNER
+
+#### KON2-35 -- PRUEFDOCK-PAARIGKEIT: OWNER MELDET REGRESSION MIT 5
+
+**FEHLT** · **Herkunft OW**
+
+> "Es kann nur eine gerade Anzahl an Pruefdocks geben, das ist eine Regression mit 5"
+
+Gemessen: 5 Dock-Versionen (`pruef_dock_version.hpp:58-64`), 5 Dock-Header, Genus-Enum mit 5
+ABI-sichtbaren Werten + `FunctionInterfaceReroute`=6 (der laut Owner-Entscheid E-1 "Weg C"
+ausdruecklich KEIN eigenes Dock hat -- er dockt am Ziel-Genus an).
+
+**ZWEITER, UNABHAENGIGER BEFUND:** `search_algorithm_dock.hpp` inkludiert
+`pruef_dock_version.hpp` **NICHT** -- die vier anderen je 2x. Vier Docks tragen ihre Version,
+das fuenfte nicht, obwohl `kSearchAlgorithmDockVersion` existiert und im switch bedient wird.
+
+**ZWEI LESARTEN, beide offen:** (i) es fehlt/ist zu viel ein DOCK -- die Zahl ist das Problem.
+(ii) es fehlt die ABLEITUNG (KON2-06: die Genus-Version soll sich aus allen Achsen
+ZUSAMMENSETZEN) -- dann sind die fuenf handgeschriebenen Literale das Problem und die Zahl nur
+ihr Symptom. Die Regel, aus der die Paarigkeit folgt, ist noch nicht gefunden.
+
+#### KON2-36 -- OV-4 MESS-DECKEL BLEIBT UNBEANTWORTET
+
+**DELTA** -- aus der Vorlage vom 10.08. Der Owner hat die Fragen 1, 2, 3, 5 und 6 beantwortet,
+Frage 4 nicht.
+
+---
+
+## EHRLICHER REST
+
+**1. Die 34 BLOCKIEREND-Funde der Ernte sind NICHT einzeln nachgetragen.** KON2-32 nennt nur
+Zahlen und den Fundort. Das ist bewusst: sie einzeln zu buchen ist ein eigenes Paket in der
+Groessenordnung von Nachtrag I, und der Owner hat fuer heute Landung + Scrub priorisiert. Die
+Rohdaten liegen unter `wf_fed9658a-006/journal.jsonl` und sind vollstaendig -- **nichts ist
+verloren, aber es ist auch nichts davon im Ledger.** Wer sie braucht, findet dort Titel,
+Herkunft, Inhalt und Ledger-Stand je Fund.
+
+**2. Nummerierung:** dieser Nachtrag traegt KON2-01..KON2-36; im Text sind 36 Positionen
+vergeben. Die Rang-Ueberschriften zaehlen nicht mit.
+
+**3. Was ich NICHT gegengeprueft habe:** ob einzelne dieser Positionen bereits an einer dritten
+Ledger-Stelle stehen, die ich mit keinem meiner Suchbegriffe getroffen habe. Ich habe je
+Position gegen die drei Falsch-Null-Klassen abgesichert, aber eine erschoepfende Suche ueber
+17.978 Zeilen je Position ist nicht gefahren.
+
+**4. Die Zahlen aus fremden Berichten** (246 Funde, 130 Wachen-Treffer, 124 algo_version-
+Literale) sind UEBERNOMMEN, nicht alle selbst nachgezaehlt. Selbst nachgemessen habe ich:
+`kSystemAxisCodeCount = 3` · die drei Tooling-Versionen `1.0.0.c` · den Dateititel von
+`mess_konsistenz_gate.hpp:2` · die Verdrahtung `cache_engine_builder_iterator.hpp:2815` ·
+`find -iname '*tier*stamp*'` = 0 bei Gegenprobe 13 · die YAML-Dublettenpruefung in beiden Repos ·
+die Maschinenlage fuer die `-j8`-Freigabe.
+
+**5. Der Scrub der offengelegten Geheimnisse (KON2-01) ist zum Zeitpunkt dieses Nachtrags NICHT
+ausgefuehrt.** Reihenfolge laut Owner: erst alle offenen Commits landen und die Pipeline
+gruenen, dann scrubben. Die Rotation der sieben Variablen geht dem Scrub voraus.
 ## LEDGER-KONSOLIDIERUNG 10.08.2026 — 66 NACHTRÄGE AUS ACHT ERNTEN, 10 WIDERSPRÜCHE, 33 POSITIONEN GEDECKT
 
 **Anlass — Owner-Auftrag 10.08.2026, wörtlich:**
