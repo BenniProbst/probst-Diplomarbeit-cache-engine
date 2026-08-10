@@ -37,9 +37,12 @@
 //     verschiedenen, je Lauf gewuerfelten Koedern; verglichen wird nach Maskierung
 //     des jeweils eigenen Koeders.
 //
-// (4) DER ZWILLINGS-RIEGEL. Die Fingerabdruck-Zeile der Konkatenation darf im ganzen
-//     Baum GENAU EINMAL vorkommen. Der Nenner (wie viele Dateien angesehen wurden)
-//     steht in der Fehlermeldung -- eine Null ohne Nenner waere hier wertlos.
+// (4) DER ZWILLINGS-RIEGEL. Die Konkatenation ist im Baum GENAU EINMAL IMPLEMENTIERT.
+//     Gemessen wird diese AUSSAGE, nicht das Vorkommen einer Zeichenkette: Kommentare
+//     und zitierte Zeichenketten werden abgezogen, bevor gezaehlt wird. Der Nenner steht
+//     in der Meldung, und ein Positiv-Test nennt die Datei, die gefunden werden MUSS.
+//     Die ausfuehrliche Begruendung -- samt der zwei Defekte, die der Riegel bis zum
+//     10.08.2026 hatte -- steht unmittelbar vor Abschnitt (4) weiter unten.
 //
 // -----------------------------------------------------------------------------
 // T-1 ROT ZUERST -- protokolliert, nicht behauptet
@@ -52,6 +55,15 @@
 //   WideFall.DieDreiAufrufwegeLiefernDasselbeErgebnis           (kein Nenner)
 // Die zehn gruenen Faelle sind die GEGENPROBE (K13): eine Wache, die immer rot ist,
 // ist so wertlos wie eine, die nie rot wird. Nach der Heilung: 14 von 14 gruen.
+//
+// ZWEITER ROT-LAUF, 10.08.2026 -- der Riegel aus (4) gegen SICH SELBST. super/development
+// war seit Pipeline 15529 rot, test:unit UND test:unit:debug, je 1 von 310. Literal aus
+// der CI:   [  FAILED  ] WideFall.DieKonkatenationStehtImBaumGenauEinmal (0 ms)
+// Lokal war derselbe Baum GRUEN (14/14). Die Ursache war der PFAD, nicht der Inhalt --
+// nachgestellt, indem der Quellbaum ueber .../builds/... erreicht wurde:
+//     0 Dateien angesehen -- das waere eine Null ohne Nenner, also kein Gruen
+//     [  FAILED  ] WideFall.DieKonkatenationStehtImBaumGenauEinmal (0 ms)   rc=8
+// Byte-gleich zur CI, inklusive der (0 ms): es wurde keine einzige Datei gelesen.
 //
 // -----------------------------------------------------------------------------
 // TESTKRITIK (T-9) -- WAS DIESE SUITE NICHT DECKT
@@ -67,6 +79,20 @@
 //     wird nicht erzeugt. Gedeckt ist "vor dem Lesen weg", nicht "mittendrin weg".
 //   * Zeichenkodierung: die Faelle sind ASCII. CSV mit CRLF oder NUL-Bytes ist nicht
 //     Gegenstand -- benannt statt zugedeckt.
+//   * DER ZWILLINGS-RIEGEL sieht NUR .sh/.yml/.yaml. Eine zweite Implementierung in
+//     C++, Make oder CMake faende er nicht. Der C++-Zwilling in Code/ci_wachen ist
+//     GEWOLLT (Stufe 1) und durch den Paritaets-Fall oben gedeckt, nicht durch (4).
+//   * Der Riegel erkennt die Konkatenation an 'tail -n +2' + '>>'. Eine Neu-Fassung mit
+//     einem ANDEREN Kopfzeilen-Sprung ('sed 1d', "awk 'NR>1'") ginge durch. Das ist eine
+//     bewusste Grenze: das Muster deckt die Wiederkehr DIESER Kopie, nicht jede
+//     denkbare Neuerfindung derselben Idee.
+//   * nur_code() ist ein Zerleger fuer den Hausgebrauch, kein Shell-Parser. Here-Docs,
+//     Zeilenfortsetzungen mit '\' und $'...' sind nicht modelliert; ein Here-Doc-Rumpf
+//     gilt ihm als Code. Am Bestand gemessen traegt das (die Zahlen stehen im Nenner der
+//     Meldung), aber es ist eine Annahme und keine Zusicherung.
+//   * Die Bau-Erkennung haengt an CMakeCache.txt. Ein Bauverzeichnis eines ANDEREN
+//     Werkzeugs (Meson, Bazel) traegt diese Datei nicht und wuerde mitgelesen. Fuer
+//     diesen Baum -- er ist reines CMake -- ist das gedeckt, fuer einen fremden nicht.
 //
 // ORAKEL (T-5 / K13): kein Fall schreibt eine Zahl ab. Anzahl der Quellen, ihre Art und
 // jeder Koeder werden je Lauf gewuerfelt und WOERTLICH zurueckgefordert; der Seed steht
@@ -80,6 +106,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -590,55 +617,351 @@ TEST_F(WideFall, DieDreiAufrufwegeLiefernDasselbeErgebnis) {
 // ===========================================================================
 // (4) DER ZWILLINGS-RIEGEL -- gegen die Rueckkehr der drei Kopien
 // ===========================================================================
+//
+// WAS HIER BIS ZUM 10.08.2026 STAND UND WARUM ES ZWEIMAL FALSCH WAR:
+//
+// (I) FEHLERKLASSE 'anwesenheit-statt-bedingung' (T-2). Der Riegel suchte die
+//     ZEICHENKETTEN "tail -n +2 " und "awk 1 >> " im Baum und nahm zwei Dateien per
+//     NAMEN von der Wertung aus. Er beantwortete damit "nennt eine Datei diese
+//     Zeichenkette?" statt der Frage, um die es geht: "gibt es eine zweite
+//     IMPLEMENTIERUNG?". Ein Kommentar, der die geheilte Falle BESCHREIBT, zaehlte ihm
+//     wie eine Wiederholung des Defekts -- die Wache bestrafte ihre eigene
+//     Dokumentation und war damit ein Daueralarm-Kandidat, den T-1 ausdruecklich
+//     verbietet. Die Ausnahmeliste nach Dateinamen war das Symptom: wo eine Zusicherung
+//     Namen kennen muss, misst sie den falschen Gegenstand.
+//
+// (II) DER PFAD-DEFEKT -- er war die Ursache des roten development seit Pipeline 15529.
+//     Der Ausschluss lautete s.find("/build") auf dem ABSOLUTEN Pfad. Der GitLab-Runner
+//     checkt nach /home/gitlab-runner/builds/... aus, und "/builds/" ENTHAELT "/build":
+//     in der CI war damit JEDER Pfad ausgeschlossen, 'angesehen' blieb 0, der ASSERT
+//     fiel -- in Debug wie in Release, in (0 ms), weil keine einzige Datei gelesen wurde.
+//     Lokal, an einem Pfad ohne "build", war derselbe Baum gruen: die Wache mass die
+//     Maschine, nicht den Bestand. DIESELBE FALLENKLASSE hatte das Projekt am 27.07.
+//     schon einmal getroffen (P9: die gitleaks-Allowlist '(^|/)build[^/]*/' traf
+//     /builds/ im Runner-Pfad und allowlistete das ganze Repo). Deshalb haengt der
+//     Ausschluss jetzt am RELATIVEN Pfad und an VERZEICHNIS-NAMEN, nie an einer
+//     Teilzeichenkette des absoluten Pfades.
+//
+// WAS JETZT GEMESSEN WIRD -- eine Aussage ueber Implementierungen:
+//   Eine Zeile IMPLEMENTIERT die WIDE-Konkatenation, wenn sie -- nach Abzug des
+//   Kommentars und aller zitierten Zeichenketten -- immer noch 'tail -n +2' (den
+//   Kopfzeilen-Sprung) UND '>>' (das Anhaengen ins Aggregat) enthaelt.
+//     * Kommentar = ab einem '#', das am Zeilenanfang oder nach Leerraum steht. In
+//       Shell wie in YAML ist das die Doku-Grenze. Doku zu schreiben ist erwuenscht.
+//     * In Anfuehrungszeichen = die Zeile NENNT die Operation (printf-Format,
+//       sed-Ausdruck, grep-Muster); sie TUT sie nicht.
+//   Kein Dateiname steht mehr auf einer Ausnahmeliste. Der Riegel traegt seinen Nenner
+//   in der MELDUNG und einen POSITIV-Test: die eine bekannte Fundstelle MUSS gefunden
+//   werden -- das ist schaerfer als 'angesehen > 0' und faengt genau den Zustand, in
+//   dem die Wache blind statt gruen ist.
+
+// Schneidet Kommentar und zitierte Zeichenketten aus EINER Zeile. Was uebrigbleibt, ist
+// der Teil, den die Shell (bzw. der YAML-Leser) als CODE sieht -- die Grenze zwischen
+// "tut es" und "nennt es".
+std::string nur_code(const std::string& zeile) {
+    std::string aus;
+    aus.reserve(zeile.size());
+    char zitat      = '\0'; // '\0' = offen, sonst das offene Anfuehrungszeichen
+    bool wortgrenze = true; // steht der Cursor am Anfang eines Wortes?
+    for (std::size_t i = 0; i < zeile.size(); ++i) {
+        const char c = zeile[i];
+        if (zitat != '\0') {
+            // In '...' ist alles literal; in "..." maskiert '\' das naechste Zeichen.
+            if (zitat == '"' && c == '\\' && i + 1 < zeile.size()) {
+                ++i;
+                continue;
+            }
+            if (c == zitat) { zitat = '\0'; }
+            continue; // der Inhalt von Zeichenketten faellt weg
+        }
+        if (c == '#' && wortgrenze) { break; } // ab hier ist die Zeile Dokumentation
+        if (c == '\'' || c == '"') {
+            zitat      = c;
+            wortgrenze = false;
+            continue;
+        }
+        aus.push_back(c);
+        wortgrenze = (c == ' ' || c == '\t');
+    }
+    return aus;
+}
+
+struct Fundstelle {
+    std::string datei; // relativ zur Wurzel -- nie der absolute Pfad (siehe Defekt II)
+    int         zeile = 0;
+    std::string code; // die Zeile nach Abzug von Kommentar und Zeichenketten
+};
+
+struct Riegelbefund {
+    int                      verzeichnisse = 0;
+    int                      dateien       = 0; // alle regulaeren Dateien im Gang
+    int                      skripte       = 0; // davon .sh/.yml/.yaml -- DER NENNER
+    long long                code_zeilen   = 0;
+    std::vector<Fundstelle>  implementierungen;
+    std::vector<std::string> nennungen; // Dateien, die die Operation nur NENNEN
+    std::vector<std::string> unlesbar;  // fail-closed: "nicht lesbar" ist nicht "enthaelt nichts"
+};
+
+// Ein CMake-Baubaum wird an seinem ERZEUGNIS erkannt, nicht an seinem NAMEN. Ein Name ist
+// eine Vermutung: 'build-w' und 'Code/build-test-debug' heissen zufaellig so, das '/builds/'
+// im Runner-Pfad auch -- und ein Bauverzeichnis, das anders hiesse, entkaeme der Vermutung
+// lautlos. CMakeCache.txt dagegen liegt in JEDEM CMake-Bauverzeichnis und in keinem
+// Quellverzeichnis. Das ist der Unterschied zwischen einer BEDINGUNG und einem Namen.
+bool ist_cmake_baubaum(const std::filesystem::path& verzeichnis) {
+    std::error_code fehler;
+    return std::filesystem::exists(verzeichnis / "CMakeCache.txt", fehler);
+}
+
+// Ausschluss am VERZEICHNIS selbst -- nie an einer Teilzeichenkette des absoluten Pfades,
+// genau dort lag Defekt II.
+bool verzeichnis_bleibt_draussen(const std::filesystem::path& verzeichnis, const std::string& relativ) {
+    const std::string name = verzeichnis.filename().string();
+    if (name == ".git" || name == "external") { return true; }
+    if (relativ == "docs/sessions/backups") { return true; } // Historie, kein Bestand
+    return ist_cmake_baubaum(verzeichnis);
+}
+
+Riegelbefund riegel_scan(const std::filesystem::path& roh_wurzel) {
+    Riegelbefund b;
+    // Die Wurzel wird EINMAL lexikalisch normalisiert und der Gang von dort gestartet;
+    // damit tragen alle Eintraege exakt dieses Praefix und der relative Pfad ist reine
+    // Zeichenketten-Arithmetik -- ohne weakly_canonical, das Symlinks aufloesen und das
+    // Praefix zerreissen wuerde. Endet die Wurzel auf '..', traegt lexically_normal
+    // einen Schluss-Trenner nach; der muss weg, sonst zeigt lexically_relative nach oben.
+    std::filesystem::path wurzel = roh_wurzel.lexically_normal();
+    if (wurzel.filename().empty()) { wurzel = wurzel.parent_path(); }
+
+    std::error_code fehler;
+    for (std::filesystem::recursive_directory_iterator it(wurzel, fehler), ende; it != ende; it.increment(fehler)) {
+        if (fehler) { break; }
+        const std::filesystem::path& p       = it->path();
+        const std::string            relativ = p.lexically_relative(wurzel).generic_string();
+        std::error_code              art;
+        if (it->is_directory(art) && !art) {
+            b.verzeichnisse += 1;
+            // Backups, Fremdbaeume und Baubaeume bleiben draussen -- Historie und Erzeugnis,
+            // kein Bestand.
+            if (verzeichnis_bleibt_draussen(p, relativ)) { it.disable_recursion_pending(); }
+            continue;
+        }
+        if (!it->is_regular_file(art) || art) { continue; }
+        b.dateien += 1;
+        const std::string ext = p.extension().string();
+        if (ext != ".sh" && ext != ".yml" && ext != ".yaml") { continue; }
+        b.skripte += 1;
+
+        // FAIL-CLOSED gelesen: eine unlesbare Datei liefert nullopt und wird GEMELDET. Ein
+        // stiller ifstream, der nichts liefert, waere von "Datei ohne Treffer" nicht zu
+        // unterscheiden -- dieselbe Verwechslung, die F5 im Aggregator war.
+        const std::optional<std::vector<std::string>> zeilen = comdare::ci_wachen::lies_zeilen(p);
+        if (!zeilen.has_value()) {
+            b.unlesbar.push_back(relativ);
+            continue;
+        }
+        bool nur_genannt = false;
+        for (std::size_t i = 0; i < zeilen->size(); ++i) {
+            const std::string& zeile = (*zeilen)[i];
+            b.code_zeilen += 1;
+            const std::string code = nur_code(zeile);
+            if (code.find("tail -n +2") != std::string::npos && code.find(">>") != std::string::npos) {
+                b.implementierungen.push_back({relativ, static_cast<int>(i + 1), code});
+            } else if (zeile.find("tail -n +2") != std::string::npos && zeile.find(">>") != std::string::npos) {
+                nur_genannt = true; // der ALTE Riegel haette hier zugeschlagen
+            }
+        }
+        if (nur_genannt) { b.nennungen.push_back(relativ); }
+    }
+    // DETERMINISTISCH SORTIERT. recursive_directory_iterator sagt ueber die Reihenfolge
+    // NICHTS zu -- sie haengt am Dateisystem. Eine Meldung, die heute anders sortiert ist
+    // als morgen, ist nicht vergleichbar, und eine Zusicherung ueber implementierungen[1]
+    // waere ein Wuerfelwurf: am Objekt gemessen (10.08., Debug, 20 Laeufe) war genau das
+    // in 3 von 20 Laeufen rot, je nachdem wie der gewuerfelte Koeder-Name einsortierte.
+    std::sort(b.implementierungen.begin(), b.implementierungen.end(), [](const Fundstelle& l, const Fundstelle& r) {
+        return l.datei != r.datei ? l.datei < r.datei : l.zeile < r.zeile;
+    });
+    std::sort(b.nennungen.begin(), b.nennungen.end());
+    std::sort(b.unlesbar.begin(), b.unlesbar.end());
+    return b;
+}
+
+// Enthaelt der Befund eine Implementierung in dieser Datei? Zugehoerigkeit statt Position:
+// die Aussage lautet "sie wird benannt", nicht "sie steht an Stelle 1".
+bool nennt_implementierung(const Riegelbefund& b, const std::string& datei) {
+    return std::any_of(b.implementierungen.begin(), b.implementierungen.end(),
+                       [&datei](const Fundstelle& f) { return f.datei == datei; });
+}
+
+std::string befund_nenner(const Riegelbefund& b) {
+    std::ostringstream aus;
+    aus << b.verzeichnisse << " Verzeichnisse, " << b.dateien << " Dateien, davon " << b.skripte
+        << " Skripte (.sh/.yml/.yaml) mit " << b.code_zeilen << " Zeilen angesehen; " << b.implementierungen.size()
+        << " Implementierung(en), " << b.nennungen.size() << " Datei(en) nennen die Operation nur, "
+        << b.unlesbar.size() << " unlesbar";
+    return aus.str();
+}
+
+std::string befund_liste(const Riegelbefund& b) {
+    std::ostringstream aus;
+    for (const Fundstelle& f : b.implementierungen) { aus << "\n  " << f.datei << ":" << f.zeile << "  " << f.code; }
+    return aus.str();
+}
 
 TEST_F(WideFall, DieKonkatenationStehtImBaumGenauEinmal) {
     // T-3: die Grundgesamtheit kommt aus einem Verzeichnis-Durchlauf, nicht aus einer
     // Liste im Pruefling. V-1: der Nenner steht in der MELDUNG, nicht nur im Kopf.
-    const std::filesystem::path wurzel(COMDARE_REPO_WURZEL_W29);
-    const std::string           fingerabdruck = "tail -n +2 ";
-    const std::string           zweiter       = "awk 1 >> ";
+    const Riegelbefund b = riegel_scan(std::filesystem::path(COMDARE_REPO_WURZEL_W29));
+    RecordProperty("nenner_skripte", std::to_string(b.skripte));
+    RecordProperty("nenner_code_zeilen", std::to_string(b.code_zeilen));
+    RecordProperty("nenner_nennungen", std::to_string(b.nennungen.size()));
 
-    int                      angesehen = 0;
-    std::vector<std::string> treffer;
-    std::error_code          fehler;
-    for (std::filesystem::recursive_directory_iterator it(wurzel, fehler), ende; it != ende; it.increment(fehler)) {
-        if (fehler) { break; }
-        const std::filesystem::path& p = it->path();
-        const std::string            s = p.string();
-        // Backups und Fremdbaeume bleiben draussen -- sie sind Historie, kein Bestand.
-        if (s.find("/.git") != std::string::npos || s.find("/build") != std::string::npos ||
-            s.find("/docs/sessions/backups/") != std::string::npos || s.find("/external/") != std::string::npos) {
-            it.disable_recursion_pending();
-            continue;
-        }
-        if (!it->is_regular_file(fehler) || fehler) { continue; }
-        const std::string ext = p.extension().string();
-        if (ext != ".sh" && ext != ".yml" && ext != ".yaml") { continue; }
-        angesehen += 1;
-        const std::string inhalt = lies_datei(p);
-        if (inhalt.find(fingerabdruck) != std::string::npos && inhalt.find(zweiter) != std::string::npos) {
-            treffer.push_back(s);
-        }
-    }
+    // V-8: eine Null ohne Nenner ist kein Gruen. Der Gang muss ueberhaupt stattgefunden
+    // haben, bevor sein Ergebnis etwas bedeutet.
+    ASSERT_GT(b.skripte, 0) << "0 Skripte angesehen -- die Wache ist blind, nicht gruen. " << befund_nenner(b);
+    // FAIL-CLOSED: ein Skript, das nicht gelesen werden konnte, ist ein Loch im Nenner und
+    // damit kein Gruen. Es zu uebergehen hiesse, "nicht angesehen" fuer "sauber" zu halten.
+    ASSERT_TRUE(b.unlesbar.empty()) << "unlesbare Skripte im Gang -- der Nenner hat ein Loch: " << b.unlesbar.front()
+                                    << " (" << befund_nenner(b) << ")";
 
-    ASSERT_GT(angesehen, 0) << "0 Dateien angesehen -- das waere eine Null ohne Nenner, also kein Gruen";
-    // ci/wide_aggregat.sh traegt die Logik; ci/tests/anhang_forward_probe.sh traegt die
-    // sed-MUSTER der Mutanten und ist deshalb ein erlaubter Zweit-Treffer.
-    std::vector<std::string> unerwartet;
-    for (const std::string& t : treffer) {
-        if (t.find("ci/wide_aggregat.sh") == std::string::npos &&
-            t.find("ci/tests/anhang_forward_probe.sh") == std::string::npos) {
-            unerwartet.push_back(t);
-        }
-    }
-    EXPECT_TRUE(unerwartet.empty()) << "ZWILLING: die Konkatenation steht wieder mehrfach im Baum. " << angesehen
-                                    << " Dateien angesehen, " << treffer.size() << " Treffer, " << unerwartet.size()
-                                    << " davon unerwartet: "
-                                    << (unerwartet.empty() ? std::string("-") : unerwartet.front());
-    // GEGENPROBE: der Fingerabdruck wird ueberhaupt gefunden. Ein Muster, das nirgends
-    // greift, meldet 'kein Zwilling' und deckt nichts (V-8).
-    EXPECT_FALSE(treffer.empty()) << "der Fingerabdruck greift nirgends -- die Wache ist blind, "
-                                  << "nicht gruen (" << angesehen << " Dateien angesehen)";
+    ASSERT_EQ(b.implementierungen.size(), 1u)
+        << "ZWILLING: die WIDE-Konkatenation ist nicht genau einmal implementiert. " << befund_nenner(b)
+        << befund_liste(b);
+    // POSITIV-TEST (V-8, schaerfer als 'angesehen > 0'): die eine Implementierung ist
+    // die BEKANNTE. Waere der Gang je wieder verkrueppelt, faenge er 0 statt 1 -- und
+    // diese Zeile sagt, welche Datei gefehlt hat, statt nur eine Zahl zu nennen.
+    EXPECT_EQ(b.implementierungen.front().datei, "ci/wide_aggregat.sh")
+        << "die eine Implementierung liegt nicht dort, wo sie liegen soll. " << befund_nenner(b) << befund_liste(b);
+}
+
+TEST_F(WideFall, EinPfadMitBuildsImNamenBlendetDenRiegelNichtAus) {
+    // GENAU DER CI-FEHLSCHLAG seit Pipeline 15529, als dauerhafte Zusicherung. Der
+    // Runner checkt nach /home/gitlab-runner/builds/... aus; ein Ausschluss, der
+    // "/build" als Teilzeichenkette des ABSOLUTEN Pfades sucht, schliesst dort alles
+    // aus. Dieser Fall ist pfad-unabhaengig: er baut die Falle selbst nach.
+    const std::string koeder = wuerfel_.token(16);
+    RecordProperty("koeder", koeder);
+    ASSERT_TRUE(werk_.schreibe("builds/runner/0/repo/ci/wide_aggregat.sh",
+                               "#!/bin/sh\n  tail -n +2 \"$rcsv\" | awk 1 >> \"$WIDE\"  # " + koeder + "\n"));
+
+    const Riegelbefund b = riegel_scan(werk_.pfad() / "builds/runner/0/repo");
+    EXPECT_GT(b.skripte, 0) << "0 Skripte angesehen -- der Pfad hat die Wache geblendet. " << befund_nenner(b);
+    ASSERT_EQ(b.implementierungen.size(), 1u)
+        << "die gepflanzte Implementierung wurde nicht gefunden. " << befund_nenner(b) << befund_liste(b);
+    EXPECT_EQ(b.implementierungen.front().datei, "ci/wide_aggregat.sh");
+
+    // GEGENEINGANG (T-4): ein Bau-Verzeichnis INNERHALB der Wurzel bleibt sehr wohl
+    // draussen. Der Ausschluss ist geschaerft, nicht abgeschafft. Erkannt wird es an
+    // CMakeCache.txt, nicht am Namen -- deshalb liegt hier eine echte Cache-Datei.
+    ASSERT_TRUE(werk_.schreibe("builds/runner/0/repo/build-w/CMakeCache.txt", "CMAKE_PROJECT_NAME:STATIC=probe\n"));
+    ASSERT_TRUE(werk_.schreibe("builds/runner/0/repo/build-w/kopie.sh", "  tail -n +2 \"$x\" | awk 1 >> \"$W\"\n"));
+    const Riegelbefund c = riegel_scan(werk_.pfad() / "builds/runner/0/repo");
+    EXPECT_EQ(c.implementierungen.size(), 1u)
+        << "das Bau-Verzeichnis unter der Wurzel haette draussen bleiben muessen. " << befund_nenner(c)
+        << befund_liste(c);
+
+    // UND DIE GEGENPROBE ZUR GEGENPROBE: derselbe Ordner OHNE CMakeCache.txt ist ein
+    // gewoehnliches Quellverzeichnis und wird gelesen. Sonst waere nicht gezeigt, dass die
+    // BEDINGUNG traegt und nicht doch der Name 'build-w'.
+    ASSERT_TRUE(werk_.schreibe("nurname/repo/ci/wide_aggregat.sh", "  tail -n +2 \"$r\" | awk 1 >> \"$W\"\n"));
+    ASSERT_TRUE(werk_.schreibe("nurname/repo/build-w/kopie.sh", "  tail -n +2 \"$x\" | awk 1 >> \"$W\"\n"));
+    const Riegelbefund d = riegel_scan(werk_.pfad() / "nurname/repo");
+    EXPECT_EQ(d.implementierungen.size(), 2u)
+        << "ohne CMakeCache.txt ist 'build-w' nur ein Name -- der Riegel haette hineinsehen muessen. "
+        << befund_nenner(d) << befund_liste(d);
+}
+
+TEST_F(WideFall, DokumentationDerFalleMachtDenRiegelNichtRot) {
+    // T-1 KEIN DAUERALARM: wer die geheilte Falle beschreibt, darf die Wache nicht
+    // ausloesen. Alle vier Eingaenge hier sind dem Bestand nachgebaut.
+    const std::string koeder = wuerfel_.token(16);
+    RecordProperty("koeder", koeder);
+    ASSERT_TRUE(werk_.schreibe("doku/ci/wide_aggregat.sh", "#!/bin/sh\n  tail -n +2 \"$rcsv\" | awk 1 >> \"$WIDE\"\n"));
+    // (a) ein Kommentar, der die Falle BESCHREIBT -- ci/anhang_forward_core.sh:49.
+    ASSERT_TRUE(werk_.schreibe("doku/ci/anhang_forward_core.sh",
+                               "#   (F3) DIE KONKATENATION VERKLEBTE ZEILEN. 'tail -n +2 >>' ohne 'awk 1' haengte\n"
+                               "echo " +
+                                   koeder + "\n"));
+    // (b) Zeilen, die das Muster nur als Zeichenkette TRAGEN -- die sed-Mutanten und der
+    //     printf-Koeder aus ci/tests/anhang_forward_probe.sh:578/804/809.
+    ASSERT_TRUE(werk_.schreibe("doku/ci/tests/anhang_forward_probe.sh",
+                               "_n2b='s@^  tail -n +2 \"$rcsv\" .*$@  tail -n +2 \"$rcsv\" >> \"$WIDE\"@'\n"
+                               "printf 'tail -n +2 \"$rc\" | awk 1 >> \"$WIDE\"\\n' >> \"$KOEDER_A11\"\n"));
+    // (c) dieselbe TECHNIK fuer einen anderen Zweck -- scripts/ci_host_klassen_bericht.sh:174.
+    //     'awk 1' erzwingt dort den Schluss-Newline einer git-config-Liste; es gibt keinen
+    //     Kopfzeilen-Sprung, keine N-nach-1-Zusammenfuehrung, kein Mess-Aggregat.
+    ASSERT_TRUE(werk_.schreibe("doku/scripts/ci_host_klassen_bericht.sh",
+                               "git config --get-regexp x | awk '{print $2}' | awk 1 >> \"$TMP/submodule.txt\"\n"));
+    // (d) Prosa. .md wird ohnehin nicht geoeffnet -- der Fall haelt das fest.
+    ASSERT_TRUE(werk_.schreibe("doku/docs/LEDGER.md", "plus `tail -n +2 >> $WIDE` in der Kette\n"));
+
+    const Riegelbefund b = riegel_scan(werk_.pfad() / "doku");
+    ASSERT_EQ(b.implementierungen.size(), 1u)
+        << "Doku, sed-Muster und eine gleichnamige Technik duerfen nicht als Implementierung zaehlen. "
+        << befund_nenner(b) << befund_liste(b);
+    EXPECT_EQ(b.implementierungen.front().datei, "ci/wide_aggregat.sh");
+    // GEGENPROBE (V-8): die Nennungen sind da. Ohne sie waere nicht unterscheidbar, ob
+    // der Riegel richtig trennt oder ob er gar nichts mehr sieht.
+    EXPECT_GT(b.nennungen.size(), 0u) << "keine einzige Nennung erkannt -- dann trennt hier nichts, "
+                                      << "es sieht nur nichts mehr. " << befund_nenner(b);
+}
+
+TEST_F(WideFall, EineEchteZweiteImplementierungMachtDenRiegelRot) {
+    // T-4/K13 DER KOEDER MUSS BEISSEN. Eine Wache, die eine echte zweite Implementierung
+    // durchlaesst, hat die Aufgabe des Postens (#29: drei Kopien zu einer machen)
+    // unbewacht gelassen -- das waere die schlechteste aller Loesungen.
+    const std::string koeder = wuerfel_.token(16);
+    RecordProperty("koeder", koeder);
+    ASSERT_TRUE(
+        werk_.schreibe("koeder/ci/wide_aggregat.sh", "#!/bin/sh\n  tail -n +2 \"$rcsv\" | awk 1 >> \"$WIDE\"\n"));
+    const Riegelbefund vorher = riegel_scan(werk_.pfad() / "koeder");
+    ASSERT_EQ(vorher.implementierungen.size(), 1u)
+        << "der Ausgangszustand ist nicht EINE Implementierung. " << befund_nenner(vorher) << befund_liste(vorher);
+
+    // Der Koeder ist gewuerfelt benannt UND gewuerfelt markiert -- nichts abgeschrieben.
+    ASSERT_TRUE(werk_.schreibe("koeder/ci/zweitkopie_" + koeder + ".sh",
+                               "#!/bin/sh\n# marker " + koeder + "\n  tail -n +2 \"$f\" | awk 1 >> \"$AGG\"\n"));
+    // Und derselbe Koeder als INLINE-Fassung in der YAML -- der Weg, auf dem die drei
+    // Kopien seinerzeit entstanden sind.
+    ASSERT_TRUE(werk_.schreibe("koeder/.gitlab-ci.yml",
+                               "script:\n  - tail -n +2 \"$f\" | awk 1 >> wide_aggregate.csv  # " + koeder + "\n"));
+
+    const Riegelbefund nachher = riegel_scan(werk_.pfad() / "koeder");
+    ASSERT_EQ(nachher.implementierungen.size(), 3u)
+        << "DER KOEDER HAT NICHT GEBISSEN -- eine echte zweite (und dritte) Implementierung "
+        << "ist unbemerkt geblieben. " << befund_nenner(nachher) << befund_liste(nachher);
+    // Und der Riegel NENNT sie, statt nur eine Zahl zu melden -- ueber ZUGEHOERIGKEIT
+    // gefragt, nicht ueber die Position im Ergebnis.
+    EXPECT_TRUE(nennt_implementierung(nachher, "ci/zweitkopie_" + koeder + ".sh"))
+        << "die gewuerfelte Zweitkopie wird nicht benannt. " << befund_nenner(nachher) << befund_liste(nachher);
+    EXPECT_TRUE(nennt_implementierung(nachher, ".gitlab-ci.yml"))
+        << "die INLINE-Fassung in der YAML wird nicht benannt -- und genau dort standen ZWEI der drei "
+        << "urspruenglichen Kopien. " << befund_nenner(nachher) << befund_liste(nachher);
+    EXPECT_TRUE(nennt_implementierung(nachher, "ci/wide_aggregat.sh"))
+        << "die echte Fassung fehlt im Befund. " << befund_nenner(nachher) << befund_liste(nachher);
+}
+
+TEST_F(WideFall, NurCodeTrenntTunVonNennen) {
+    // Die Trennlinie selbst, an den WOERTLICHEN Zeilen des Bestands (10.08.2026).
+    // TUT es -- ci/wide_aggregat.sh:173:
+    EXPECT_NE(nur_code("  tail -n +2 \"$rcsv\" | awk 1 >> \"$WIDE\"").find("tail -n +2"), std::string::npos);
+    EXPECT_NE(nur_code("  tail -n +2 \"$rcsv\" | awk 1 >> \"$WIDE\"").find(">>"), std::string::npos);
+    // NENNT es nur -- und zwar auf jede der vier Arten, die im Baum vorkommen:
+    //   ci/anhang_forward_core.sh:49 (Kommentar)
+    EXPECT_EQ(nur_code("#   (F3) ... 'tail -n +2 >>' ohne 'awk 1' haengte"), "");
+    //   ci/tests/anhang_forward_probe.sh:804 (sed-Ausdruck in Hochkommata)
+    EXPECT_EQ(nur_code("    _n2b='s@^  tail -n +2 \"$rcsv\" .*$@  tail -n +2 \"$rcsv\" >> \"$WIDE\"@'").find("tail"),
+              std::string::npos);
+    //   ci/tests/anhang_forward_probe.sh:578 (printf-Format; das '>>' der Zeile bleibt,
+    //   der Kopfzeilen-Sprung nicht -- deshalb ist die UND-Bedingung noetig)
+    const std::string p578 = nur_code("    printf 'zeile: tail -n +2 \"$rc\" | awk 1 >> \"$W\"\\n' >> \"$KOEDER\"");
+    EXPECT_EQ(p578.find("tail -n +2"), std::string::npos);
+    EXPECT_NE(p578.find(">>"), std::string::npos);
+    //   ci/wide_aggregat.sh:172 -- der Kopfzeilen-Griff. Er haengt an, springt aber
+    //   nicht: 'head -1' ist eine ANDERE Operation und darf nicht mitzaehlen.
+    const std::string h172 = nur_code("  [ \"$_hdr\" = \"0\" ] && { head -1 \"$rcsv\" | awk 1 >> \"$WIDE\"; }");
+    EXPECT_EQ(h172.find("tail -n +2"), std::string::npos);
+    // GEGENEINGANG (T-4): ein '#' MITTEN in einem Wort ist kein Kommentar -- sonst
+    // schnitte der Zerleger '${#feld}' weg und maesse zu wenig.
+    EXPECT_NE(nur_code("n=${#feld}; tail -n +2 $a >> $b").find("tail -n +2"), std::string::npos);
 }
 
 TEST_F(WideFall, DreiAufrufstellenRufenDieEineDatei) {
