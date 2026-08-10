@@ -16,6 +16,69 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+### W1-PFLICHT-EXPLORE 10.08.2026 — der Engpass ist kleiner als geplant, und es gab eine SECHSTE Fundstelle
+
+Drei Straenge, Sonnet 5 max effort, read-only. Der Explore lief **vor** W1, weil diese Nacht
+gezeigt hat, was eine fehlende IST-Erhebung kostet: von fuenf W0a-Posten waren **zwei
+gegenstandslos** — D2-G1 durch den W-1-Wurzelfix geheilt, D1b durch eine Bauweg-Aenderung
+ueberholt. In der engsten Woche des Fensters waere dieselbe Blindheit teuer.
+
+#### Die D4-Statistik-Kette ist VOLLSTAENDIG gebaut — und bis ce/main gelandet
+
+| Posten | Commit | Kern |
+|---|---|---|
+| D4a Welch | `cc9c233e` | `se<=0` setzt `degeneriert=true`, statt sich auf `p=1.0, valid=true` zu retten |
+| D4b MWU | `e397109f` | `valid` wird HINTER den Guard gesetzt; kein Effektmass ueber Nichts |
+| D4c Bonferroni | `47f0ad89` | Familie zaehlt nur **getestete** Hypothesen; `win_rate` teilt durch den getesteten Nenner |
+| D4d success | `739d478f` | „es gab eine echte Probe" statt „der Vektor ist nicht leer"; EINE neue Spalte |
+| D4e f15-Bilanz | `46fac2e9` | vierte Ausschlussgruppe „tote Proben", Summenzeile `A+B+C+D+gemessen==geladen`, Exit 6/7 |
+
+Der Merge `ebb3cf27` liegt **16 Commits vor** `origin/main` — auch main ist bereits nachgezogen
+(`merge-base --is-ancestor` rc=0).
+
+#### Der Bonus-Fund: es waren SECHS Stellen, nicht fuenf
+
+`905bd1aa` — **D4-T6**, `compare_engine_command.hpp`: ein geretteter Nenner erzeugte dort nicht
+nur eine harmlose Null, sondern **ein falsches Urteil** (`EE_B_Wins` statt `InconclusiveData`).
+Der Plan zaehlte fuenf Fundstellen dieser Klasse; die sechste hat erst der Bau gefunden.
+
+Die Klasse in einem Satz, jetzt sechsfach belegt: **die Null wird ueberall als DIVISIONS-Gefahr
+gerettet und nirgends als DATEN-Aussage behandelt.**
+
+#### Was OFFEN bleibt — und die Vorbedingung, die formal verletzt ist
+
+**MT-L3 existiert nicht.** Ein einziger Treffer im ganzen ce-Baum, und er dokumentiert die eigene
+Abwesenheit: `test_v41_anatomy_f15_measurement.cpp:1282` — *„ERSATZ-ORAKEL fuer die auf DIESER
+Datei fehlende Schema-Wache (MT-L3 bewacht die grosse Produktions-Mess-CSV in
+`cache_engine_builder_iterator.hpp`, nicht diesen Export)."* Deckt sich mit Designplan Zeile
+144-146: **unabhaengige eingefrorene Orakel: 0 von 29.**
+
+**Die harte Regel des Designplans lautet „MT-L3-Schema-Orakel VOR D4d"** (Zeile 84, und Punkt 9
+bei Zeile 98: *„VOR JEDER End-Append-Spalte"*). D4d hat seine Spalte `degeneriert` am 09.08. um
+18:51 angehaengt — **vor** MT-L3.
+
+**Formal verletzt, sachlich ein anderer Gegenstand:** D4d haengte an `result_csv_header()` in
+`result_aggregator.hpp`, waehrend MT-L3 die **grosse Produktions-Mess-CSV** in
+`cache_engine_builder_iterator.hpp` bewachen soll. Zwei Schemata, nicht eines. Die Regel bleibt
+fuer die naechste End-Append-Spalte in Kraft — und MT-L3 bleibt ein W1-Posten.
+
+Immerhin ist die neue Spalte nicht ungedeckt: `test_v41_anatomy_f15_measurement.cpp:1281`
+(`ResultCsvHeaderIstEINGEFROREN`) pinnt den Header per Literal.
+
+#### Die Zeilenanker des Plans sind erneut gedriftet
+
+    welch_t_test.hpp        130-136  ->  171-182   (+41, durch 15 Zeilen neuen Doc-Kommentar)
+    f15_compare/main.cpp    486      ->  434       (andere Zeile, HDR-Einbau dazwischen)
+
+**Ein Zeilenanker ohne SHA ist eine Behauptung ueber einen Zustand, den niemand mehr hat.**
+Der Explore hat deshalb zu jedem Anker den Stand mitgemessen — so gehoert es in jeden Bericht.
+
+#### Was das fuer den Engpass heisst
+
+Der Designplan fuehrt W1 mit **99 h Band A auf einer Woche, die schon mit 26 von 27 Werktagen
+gefuellt ist**, und nennt sie *„den Engpass des gesamten Plans"*. Der groesste Einzelblock dieser
+99 h ist die Statistik-Kette — **und sie ist gebaut.** Die Woche wird dadurch nicht leer, aber
+der Reissfaktor sinkt messbar.
 ### W0b-VERIFY 10.08.2026 — der Bau haelt, die BEWEISFUEHRUNG faellt
 
 Drei Straenge, neun Agenten, 0 Fehler. Der adversarische Durchgang hat mit **eigenen,
