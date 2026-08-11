@@ -103,3 +103,30 @@ und die ungeprüfte Zitattreue.
 
 *Erhoben 11.08.2026 nachts. Objektstände: ce `670483c0` · super `1ecc605a`. Jede Zahl dieses
 Manifests ist gemessen oder trägt ihre Quelle.*
+
+---
+
+## NACHTRAG — die beiden Synthesen und der Fable-Lauf
+
+Der vierte Lauf ist inzwischen durch (**42 Agenten**), und die Owner-Doktrin wurde **während**
+seiner Synthese gesetzt: *„bitte merke dir in Zukunft immer mit **Fable 5 max** die Synthese
+auszuwerten"* (Arbeitsweise **v3.4 / A1**, `531d0ea`). Die laufende Opus-Synthese wurde zu Ende
+geführt, die Fable-Fassung nachgeholt — **beide über denselben Datensatz**.
+
+| Datei | Inhalt |
+|---|---|
+| `synthese-nachtrag-OPUS.md` | 23.545 Zeichen — die Fassung, die noch auf Opus lief |
+| `synthese-nachtrag-FABLE.md` | 33.936 Zeichen — die doktrin-konforme Fassung |
+| `lauf-wf_a2e3281c-663.tar.gz` | der Nachtrag-Lauf, jetzt vollständig inkl. Synthese |
+| `lauf-wf_2398a27a-a41-synthese-fable.tar.gz` | der Fable-Synthese-Lauf |
+
+**Warum beide aufgehoben werden:** sie sind nicht redundant. Die Fable-Fassung hat **vier Punkte
+selbst am Objekt nachgeprüft** statt sie zu übernehmen (S-6 an beiden Stellen · die sechs
+Marker-Träger · Wellenplan §15.1 · die KON13-Wortlaute) und **vier Befunde geliefert, die die
+Opus-Fassung nicht hat** — darunter die vier unmarkierten Eingriffe in einem Owner-Zitat (KON9-11),
+von denen einer **ein Ende vor einem Blocker-Folgesatz kappte**.
+
+Zwei unabhängige Auswertungen desselben Datensatzes sind damit selbst ein Beleg: **wo sie
+übereinstimmen, ist die Aussage doppelt getragen; wo sie abweichen, liegt der Fund.**
+
+Auswertung: Ledger **KON14**.
