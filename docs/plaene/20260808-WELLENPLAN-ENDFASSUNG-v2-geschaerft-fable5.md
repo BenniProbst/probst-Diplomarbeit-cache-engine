@@ -1277,3 +1277,239 @@ PK-Folgeposten (19 h) — der Kanon gilt, Produzenten-Grenzen bleiben ungepinnt.
 
 **Bewusst nie getestet:** Holm/Bonferroni bei malformten p-Werten · `v32_orchestrator`-Stub ·
 alpha=1-Konstruktion · HDR-Histogramm (nur falls D5-5 „führen" entscheidet).
+
+---
+
+# 13. AUFGABENSTAND-KONSOLIDIERUNG (nachgetragen 11.08.2026 nachts)
+
+> **Zweck (Owner-Auftrag 11.08.):** *„konsolidiere unseren Aufgabenstand dort hinein in die korrekt
+> passenden Wellen, sodass wir trotz Korrekturen nicht durcheinander kommen."*
+>
+> **Dieser Abschnitt ordnet ZU, er entscheidet nicht neu.** Wo er einen Abschnitt oben überholt,
+> steht es dabei; die alten Fassungen bleiben als Historie stehen (Doku wird deprecatet).
+> Quellen: Ledger **KON6…KON10** (Kopf) · die 91 Task-Posten · die Wellen-Tabellen §3/§4 oben.
+
+---
+
+## 13.0 DIE LAGE IN DREI SÄTZEN
+
+**Die Architektur ist vollständig.** Der Owner am 11.08.: *„Es ist jetzt WIRKLICH jedes Detail
+geplant und die komplexe Architektur angelegt, wir müssen ihr »nur« noch Herr werden."* Der
+Selbstkompilations-Entwurf (KON10) liegt seit dem **19.07.** vor, die Stempel-Architektur ist im
+Dialog dieser Nacht Satz für Satz abgenommen (KON7/KON8/KON9).
+
+**Was sich gegenüber diesem Plandokument geändert hat, ist nicht der Bau, sondern sein
+ANGELPUNKT.** Der Stempel trägt **fünf Rollen** — Identität · **Cache-Schlüssel** ·
+**Lager-Schlüssel** · Skip-Marke · Einordnung (KON9-11). Er entscheidet damit, **was überhaupt neu
+gebaut wird**. Das macht ihn zur Voraussetzung von W2, nicht zu dessen Beiwerk.
+
+**Und es gibt einen harten Blocker, den dieses Dokument selbst nicht kennt:** der Bauplan vom
+19.07. weist in seiner eigenen adversarialen Kritik eine **Phase 0** aus (super-Repo reconcilen),
+ohne die jeder Bau am Planer-Kopf eine **dritte** Enumerations-Engine erzeugt.
+
+---
+
+## 13.1 WO WIR HEUTE STEHEN (Di 11.08.2026, nachts)
+
+    W-1   Sa 08. - So 09.08.        ABGESCHLOSSEN
+    W0a   Mo 10. - Mi 12.08. mittag LAEUFT -- endet in wenigen Stunden
+    W0b   Mi 12. mittag - Fr 14.08. = F1        <- in 3 Tagen
+    W1    Mo 17. - Fr 21.08.        = F2 FREEZE <- in 10 Tagen
+    W2    Mo 24. - Fr 28.08.        = F3 · Bau-Trigger Mi 26.08. 06:00
+
+**W0a-Rest, korrigiert** (aus der Planabgrenzung 11.08., §1.3a): **D1e · D1f · D1c · D2-G2 ·
+##06-CI-Hälfte · ##07**. Erledigt und aus der Restliste zu streichen: D2 · D2-G1 · D2-G3 · D2-G4 ·
+D2-G5 · D5-1 · **D1g** (An-9, `super 41b20a16`). D2-G6-Status **nicht erhoben**.
+
+**W0b-Rest:** D3-1-Marker-Hälfte (hängt an D3-7b) · **D3-4+D3-5** (OV-16 ist entschieden, der Bau
+fehlt) · D3-8 · ##08-Rest · ##20-B-Restbau · ##21-zweite-Hälfte (`object_stat`) · ##23-R1 ·
+##26 · **##25 DURCHSTICH — kein Paket, kein Besitzer** · ##27–##31 (Nachlauf bis Di 18.08.).
+
+---
+
+## 13.2 DAS ZUORDNUNGS-KRITERIUM — drei Wirkungsklassen statt einer
+
+Die Wellen-Zuordnung folgt **nicht** dem Thema, sondern der **Wirkung auf den Freeze**. Drei
+Klassen, drei verschiedene Fristen:
+
+    (P) PREIMAGE-WIRKSAM   aendert die SHA JEDER Binary
+                           -> MUSS vor F2 (Fr 21.08.), sonst bricht der Identitaets-Freeze
+    (M) MENGEN-WIRKSAM     aendert, WELCHE Binaries entstehen (nicht ihre Identitaet)
+                           -> MUSS vor dem BAU-TRIGGER (Mi 26.08. 06:00), nicht zwingend vor F2
+    (W) WERKZEUG           faengt eine Fehlerklasse, aendert selbst nichts
+                           -> MUSS vor dem Gegenstand da sein, den es bewacht
+
+**Warum die Trennung zählt:** ohne sie wandert alles Stempel-Nahe pauschal vor F2 und sprengt eine
+Woche, die §12.5 bereits als *„ENGPASS DES GESAMTEN PLANS"* führt (99 h Band A). Mit ihr ist nur
+das Preimage-Wirksame terminlich hart.
+
+**Und die Kostenlage ist heute günstig, aber nicht lange:** es wurde **nie eine Flotte gebaut**
+(Owner 11.08.) — Identitäts-Umbauten kosten **heute null** invalidierte Binaries. Ab Mi 26.08.
+06:00 entwertet dieselbe Änderung **41,4 h Bau**.
+
+---
+
+## 13.3 DIE ZUORDNUNG
+
+### W0b — bis F1 (Fr 14.08.). Unverändert: „Nenner-Ehrlichkeit + DURCHSTICH"
+
+| Posten | Gegenstand | Klasse | Anmerkung |
+|---|---|---|---|
+| **#21** | **`##25` DURCHSTICH** | — | **die F1-Lieferung selbst.** Ohne Besitzer bis Mi mittag ist F1 nur halb (GOAL :494) |
+| — | D3-4+D3-5, D3-1-Marker, D3-8 | — | W0b-Kern, OV-16 entschieden |
+| — | W0a-Rest (D1e/D1f/D1c/D2-G2/##06/##07) | — | zieht in den W0b-Vorlauf |
+| **#90** | **Bump-Pflicht-Wache**, Teil 1: der Riegel | **(W)** | **VORGEZOGEN.** Begründung unten |
+| **#83** | `lint:format` ohne lokale Deckung | (W) | dreimal in Folge Format-Nachzug — blockiert jede Landung |
+| **#80** | `coverage-guard` deterministisch rot | (W) | F1-vor-F2-Reihenfolge ist bindend (Dual-Review) |
+
+**🔴 Warum die Bump-Wache nach W0b vorgezogen wird und nicht nach W2 gehört:** der Stempel ist der
+**Cache-Schlüssel** (KON9-11). Eine Implementierungsänderung **ohne `X.Y.Z`-Bump** heißt: das Binary
+wird **nicht neu gebaut**, der Lauf ist **schneller und falsch**, und der Cache-Treffer sieht aus
+wie Erfolg. **Jeder Bau ab jetzt** — auch der Kalibrierlauf `##47` — läuft ohne diese Wache blind.
+Sie ist damit ein W0b-Werkzeug, kein W2-Feinschliff.
+
+### W1 — bis F2 (Fr 21.08.) = IDENTITÄTS-FREEZE. **Hier liegt die Stempel-Strecke.**
+
+| Posten | Gegenstand | Klasse | warum vor F2 |
+|---|---|---|---|
+| **#87** | Funktions-Variablen in Stufigkeits-Ordnung | **(P)** | ändert die Argument-Reihenfolge des Preimage |
+| **#78** | Stempel-Reihenfolge System-vor-Organ | **(P)** | ändert die Zeilen-Ordnung im Preimage |
+| **#86** | **Stempel-Mechanik** — die drei Fläche-2-Schichten | **(P)** | erzeugt den Stempel überhaupt |
+| — | **KON9-05** Achsen-Algo-Hardware-Stempel `X.Y.Z` in voller System-Syntax | **(P)** | jeder Algorithmus bekommt eine neue Versionszeile |
+| — | **KON9-04** drei Grammatiken je Phasigkeit | **(P)** | bestimmt die Schreibweise jeder Zeile |
+| — | **KON9-05** die Ordnungs-Relation (`⊆`) als `constexpr` | (M) | entscheidet Teilmengen, nicht Identität |
+| **#67** | Benennung: vier Familien, 142 Include-Kanten | **(P)** | Umbenennung berührt 29 Include-Wanderungen |
+| **#68** | selektiver Rebuild / Additivität | (M) | muss **vor** dem Bau stehen, sonst baut man ohne sie |
+| — | **HY-A1…A3** (Plan §3 W1, unverändert) | **(P)** | Hybrid ist Genus mit Fläche 2 (KON9-02) |
+| — | D4a–D4f, D5-2/4/5, ##10–##19 (Plan §3 W1) | — | unverändert aus der Plan-Fassung |
+
+**Die Kollision, offen ausgewiesen (nicht glattgerechnet):** §12.5 führt W1 bereits mit **99 h
+Band A** als Engpass. Die Stempel-Strecke kommt **zusätzlich**. Drei Entlastungen sind im Plan
+schon vorgesehen und werden hiermit **gezogen**:
+
+1. **Band B in W1 fällt geschlossen** (62 h, §12.5 sieht das ausdrücklich vor: *„gilt als nicht
+   eingeplant"*) — mit Zahl im Protokoll, nicht durch Weglassen.
+2. **Die Reserve-WE 15./16.08. und 22./23.08.** werden gezogen — 22./23. war ohnehin für HY-A
+   reserviert (§3 W1).
+3. **Der Designplan-Bestand ist kleiner als gedacht:** von den fünf F1-Kern-Explores waren **5 von
+   7 Paketen SCHON ERLEDIGT** (Fußnote F1-KERN); die Stempel-Strecke erbt drei von vier
+   Selbstkompilations-Bausteinen bereits gebaut (KON10-05).
+
+**Reißt W1 trotzdem, fällt zuerst:** die Ordnungs-Relation (M) und #68 (M) nach W2 — sie sind
+mengen-, nicht preimage-wirksam. **Nie fallen darf:** #87, #78, #86, KON9-05-Stempelzeile, HY-A.
+
+### W2 — bis F3 (Fr 28.08.), Bau-Trigger Mi 26.08. 06:00
+
+| Posten | Gegenstand | Klasse |
+|---|---|---|
+| **#90** | CI-Gerüst: vier **Mini-Pipelines** je Träger (D17: fünf Stufen) | (M) |
+| — | Der Buildsystem-Cache scharf: prod-MinIO für die generierten Folge-Stufen (D18/§31-A4) | (M) |
+| — | ##32–##51 (Plan §3 W2, unverändert): Bump-Bündel, Anker, Kalibrierlauf, Bau, GO-Vorlage | — |
+| **#82** | überlebender Mutant `bvset_ist_teilmenge` | (W) |
+
+### W3-MESS / W4 / W5 — unverändert aus der Plan-Fassung
+
+Keine Zuordnungsänderung. **#19** (Thesis-Textpflichten) läuft in W4 mit ##60; **#66** (Lizenz,
+prt-art/overleaf-Rest) gehört zu W5-##62.
+
+### W7 — Behälter, gezählt
+
+**#29** wide_aggregat-Dedup · **#30** zwei Parses · **#32** LAG-Z1/EXCLUDE_FROM_ALL · **#34** zwei
+Owner-Fragen aus T-15 · **#42** blinde Wache · **#44** `-Werror` global · **#48** Gate-Lücke ·
+**#50** Mutations-Recherche · **#63** tote Ledger-Anker · **#64** d2floor-Tests · **#69** W12-B ·
+**#71** `-Wstringop-overflow` · **#72** 2-Pass-Falle · **#26** Abnahme-Entwürfe härten.
+
+**Vierzehn Posten.** Sie gehen **mit Zähler** nach W7, nicht durch Weglassen.
+
+---
+
+## 13.4 DIE DREI POSTEN, DIE IN KEINE WELLE PASSEN
+
+### (a) #91 PHASE 0 — Blocker vor der Selbstkompilations-Strecke
+
+Der Bauplan vom 19.07. weist in seiner **eigenen** adversarialen Kritik aus: die Analyse endete am
+ce-Submodul; im super-Repo liegt mit `Code/02_messung_driver/v32_messreihe_antrieb.hpp:214` eine
+**zweite** `run_experiment_profile`-Funktion, selbst betitelt *„der OFFIZIELLE Einstieg"*. Ein
+neuer `ExperimentPlanDirector` daneben wäre die **dritte** Enumerations-Engine.
+
+**Zuordnung: vor jeden Bau am Planer-Kopf, also vor der Filterkette (KON9-06).** Der Umfang ist
+klein (kartieren + Owner-Entscheid), die Wirkung groß. **Nicht terminiert, weil die
+Selbstkompilations-Strecke selbst noch keinen Wellen-Platz hat** — siehe (c).
+
+### (b) #88 KONSOLIDIERUNGS-ARCHITEKTUR — vom Owner terminiert
+
+Owner-Reihenfolge 11.08.: *„Bitte jetzt die Stempel zuende Planen und chatten, direkt damit danach
+die Konsolidierung wie geplant"* und *„debugge die Pipeline direkt nach der Stempel Planung und
+VOR der Konsolidierung."*
+
+    1. Stempel zuende planen + chatten   <- LAEUFT (KON9/KON10 gelandet)
+    2. Pipeline debuggen                 <- NAECHSTES
+    3. Konsolidierung (#88)
+
+**Das ist eine Owner-Reihenfolge, keine Wellen-Zuordnung** — sie läuft quer zu W0b/W1 und hat
+Vorrang vor deren interner Ordnung.
+
+### (c) 🔴 DIE SELBSTKOMPILATIONS-STRECKE HAT KEINEN WELLEN-PLATZ
+
+**Das ist der ehrlichste Befund dieser Konsolidierung.** KON10 belegt: der Entwurf ist vollständig
+(D1/D5/D17/D18/§38), drei von vier Bausteinen existieren am Objekt — aber der Wellenplan kennt die
+Strecke **nicht**. Der Planer-Kopf ist im Entwurf selbst als *„größtes Loch (PL-1)"* geführt.
+
+    Was der Wellenplan heute plant   :  Statistik, Menge, HY-A, Bump, Bau, Kampagne
+    Was die Kette dafuer BRAUCHT     :  Planer -> CEB -> Tier, jede Stufe kompiliert die naechste
+    Was davon im Fenster gebaut wird :  NICHTS -- W2 baut mit dem HEUTIGEN Bauweg
+
+**Die Auflösung ist keine Terminfrage, sondern eine Scope-Frage, und sie gehört dem Owner:**
+
+| Variante | Was sie bedeutet |
+|---|---|
+| **(A) Stempel ja, Selbstkompilation nach W7** | die fünf Rollen werden gebaut, der Bauweg bleibt der heutige. W2 baut wie geplant. **Der Stempel wird korrekt, die Kette bleibt provisorisch.** |
+| **(B) Beides vor F2** | verlangt Phase 0 + Planer-Kopf + CEB-Generierung in 10 Tagen, zusätzlich zu 99 h Band A. **Nach der Rechnung in §5 reißt der Pfad.** |
+| **(C) Selbstkompilation ersetzt Teile von W2** | der Bau-Trigger fährt über die neue Kette statt über den heutigen Bauweg. **Höchstes Risiko: der Bau ist der kritische Pfad.** |
+
+**Empfehlung: (A).** Begründung — der Stempel ist **preimage-wirksam** und damit an F2 gebunden;
+die Selbstkompilation ist **Bauweg**, und der heutige Bauweg **funktioniert** (128 × 19,4 min ≈
+41,4 h, gemessen). Ein Bauweg-Umbau auf dem kritischen Pfad ist genau die Klasse, die §7 als
+Streichkaskade führt. **Das ist ein Vorschlag, kein Entscheid — er gehört an F1 (Fr 14.08.) mit
+Zahlen vorgelegt.**
+
+---
+
+## 13.5 WAS DIESE KONSOLIDIERUNG AN DIESEM DOKUMENT ÜBERHOLT
+
+1. **§1 „HYBRID: Bestand = genau `README.md`"** — **überholt.** Am 11.08. gemessen:
+   `libs/cache_engine/hybrid/` trägt **vier Header, 943 Zeilen** (`heuristik_adapter_gate` 189 ·
+   `klassifikation` 256 · `strategy` 246 · `synthese_matrix` 252). HY-A ist teilweise gebaut;
+   `AnatomyGenus` hat seit HY-A1 **sechs** Werte statt fünf.
+2. **§5 Korrektur-Einschub „die Kette bis `##25` ist leer / einziger verbleibender Blocker"** —
+   **präzisiert.** Der Satz gilt für die **gestrichenen** Kettenglieder, nicht für die
+   W0b-Postenliste; die Meta-Gegenlesung vom 11.08. (§3.4) hat den Selbstwiderspruch benannt.
+   `##25` hat weiterhin **keinen Besitzer**.
+3. **Die Zeilennummern dieses Dokuments und des Ledgers driften.** Der Ledger ist an einem Abend
+   von 20.354 auf **20.973** Zeilen gewachsen (Nachträge stehen **oben**). **Jeder Ledger-Anker in
+   diesem Plan gilt nur mit Commit-Anker; sonst per Symbol suchen.**
+4. **Der Stempel-Designplan mit 15 Paketen (ST-00…ST-14) existiert nicht mehr** — 0 Treffer über
+   180 Workflow-Outputs, 0 über `docs/`. Erhalten sind Paketnamen und vier Nachbesserungs-Befunde.
+   **Neuschnitt gegen den heutigen Stand**, nicht Nachbesserung.
+
+---
+
+## 13.6 DIE BILANZ IN ZAHLEN
+
+    91 Task-Posten gesamt · 56 erledigt · 35 offen
+       davon (P) preimage-wirksam, vor F2 zwingend :   6
+             (M) mengen-wirksam,  vor 26.08.       :   4
+             (W) Werkzeug                          :   5
+             regulaerer Wellen-Inhalt              :   6
+             W7-Behaelter, gezaehlt                :  14
+
+    Owner-Entscheide, die den Bau blockieren       :   2
+       - Syntax + Semantik je Achsen-Kategorie ueber 'c' hinaus  (Abgabe-PFLICHT)
+       - Meta-Meta-Achsen von System und Organ     (ausdruecklich "zu recherchieren")
+
+    Scope-Entscheid, an F1 vorzulegen              :   1
+       - Variante (A) / (B) / (C) zur Selbstkompilations-Strecke (13.4c)
+
+**Der kritische Pfad bleibt unverändert der aus §5** — er bekommt durch diese Konsolidierung
+**einen** neuen Vorläufer: die **Bump-Pflicht-Wache** in W0b, weil ohne sie jeder folgende Bau
+(einschließlich `##47` Kalibrierlauf) auf einem blinden Cache fährt.
