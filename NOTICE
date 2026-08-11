@@ -28,6 +28,26 @@ liest sie bei jedem Testlauf, paart sie gegen .gitmodules und gegen
 den Arbeitsbaum und prueft, ob der genannte Marker WOERTLICH in der
 genannten Lizenzdatei steht.
 
+Nachgebessert am 11.08.2026, nachdem ein Dual-Review die Wache am
+Objekt als HOHL nachgewiesen hatte. Vier Dinge kommen dazu, weil
+"der Marker steht in der genannten Datei" allein nichts bindet:
+
+  * DIE DATEI IST GEBUNDEN. <relpfad> muss eine Datei sein, die an
+    der Wurzel der genannten Komponente WIRKLICH als Lizenzdatei
+    liegt (LICENSE*/LICENCE*/COPYING*). Ohne das duerfte eine Zeile
+    auf irgendeine Datei zeigen, die den Marker zufaellig traegt --
+    waehrend die echte Lizenzdatei daneben etwas anderes sagt.
+  * GENAU EINE ZEILE je Pfad, gezaehlt statt gesucht. Zwei Zeilen
+    ueber denselben Pfad koennten sonst zwei Lizenzen gleichzeitig
+    behaupten, und beide wuerden bestaetigt.
+  * DER MARKER MUSS ETWAS ZUSICHERN. Ein Marker aus einem
+    Leerzeichen oder aus einem Wort, das in jedem Text steht, wird
+    zurueckgewiesen: er koennte nie reissen.
+  * DIESE DATEI UND DIE WURZEL-LICENSE sind ASCII-only und halten
+    120 Byte je Zeile -- in JEDER Zeile, auch in dieser Prosa.
+    Die Diff-Hygiene-Wache ueberspringt beide Dateien namentlich;
+    ohne diese Zusage pruefte sie niemand.
+
 Spalte 0 bindet: die drei Muster-Zeilen gleich darunter stehen
 EINGERUECKT und sind deshalb Text, kein Eintrag. Genau dadurch kann
 diese Datei ihre eigene Grammatik erklaeren, ohne sich dabei selbst
