@@ -58,6 +58,65 @@ cache:
   key: "ccache-$CI_PROJECT_NAME"
   paths: [".ccache"]
 
+# ─────────────────────────────────────────────────────────────────────────────────────
+# DIE HERKUNFT DER REGEL-VARIABLEN, DIE HIER NICHT GESETZT WERDEN.  (CI-INV, 10.08.2026)
+#
+# WARUM DIESER BLOCK EXISTIERT. Ein Job mit `rules: - if: '$COMDARE_X == "true"'`, dessen
+# Variable in der Datei nirgends steht, ist von einem ABGESCHALTETEN Job nicht zu
+# unterscheiden. Er liest sich wie ein Gate und faehrt nie. Genau dieser Mechanismus hat
+# in der ce-Datei `contract:axis-version-lock` drei Wochen lang in KEINEM Lauf gehalten,
+# bei gruener Pipeline und ohne jedes Signal -- der Ausschalter war eine Variable
+# (COMDARE_AXIS_LOCK_CHECK), die niemand je gesetzt hat.
+#
+# WAS SICH DADURCH AENDERT. Die Absicht "inert-by-default, Opt-in per Trigger" stand
+# bisher NUR in Prosa, verteilt auf neun Kommentarbloecke ueber 2400 Zeilen. Prosa kann
+# nicht rot werden. Ab jetzt ist jede Regel-Variable entweder oben GESETZT oder hier mit
+# Grund als extern erklaert; alles andere macht CiInvarianten.JedeRegelVariableIstGedeckt
+# rot und nennt Namen und Zeile. Die Annotation ist NAMENSGEBUNDEN -- sie deckt genau den
+# genannten Namen, nie die Nachbarn.
+#
+# ALLE ZEHN SIND GEPRUEFT UND ABSICHTLICH EXTERN. Die Belegzeilen unten sind die rules-
+# Zeilen, an denen die Variable wirklich gatet -- gemessen 11.08.2026, nicht abgeschrieben.
+# Sie sind KEIN Befund: sie sind die Opt-in-Schalter der mehrtaegigen Mess- und
+# Rueckschrieb-Laeufe, die eine normale Welle gerade NICHT ausloesen soll.
+#
+# ZEILENNUMMERN VERRUTSCHEN, UND ZWAR STILL. Die hier zuvor stehenden Belege waren bei der
+# Landung samt und sonders daneben -- 13 von 16 zeigten auf fremde Stellen, weil jede
+# Einfuegung weiter oben alles darunter verschiebt und das niemandem auffaellt. Die Zahlen
+# sind deshalb eine ORIENTIERUNG, keine Zusicherung. VERBINDLICH geprueft wird das
+# Haltbare: CiInvarianten.ExternAnnotationDecktEineWirklichGatendeVariable haelt fest, dass
+# jeder annotierte Name auch wirklich in einer rules-Bedingung steht. Eine Annotation,
+# deren Regel verschwunden ist, wird damit ROT -- statt still zum Freibrief fuer den
+# naechsten Schalter gleichen Namens zu werden.
+#
+# extern: COMDARE_RUN_MEASURE -- Opt-in des mehrtaegigen golden-320-Voll-Messlaufs, per
+#         API-Trigger/manuellem Start gesetzt; inert-by-default (gatet :1807, :2020)
+# extern: COMDARE_STATIC_SMOKE_FALLBACK -- Zusatzschalter des statischen Smoke-Zweigs,
+#         Default AUS, nur zusammen mit RUN_MEASURE/MEASURE_PROFILE (gatet :1807, :1808)
+# extern: COMDARE_BUILD_GOLDEN_N -- Gate des NEUEN golden-N-Standardpfads; dreifach inert
+#         (Variable + when:manual + _bot_-never) (gatet :2509, :2513, :2600, :2603, :2634)
+# extern: COMDARE_DYNAMIC_PLANER_CI -- isoliertes Opt-in NUR der Planer-Delegation
+#         (Child-Pipeline), ohne den uebrigen Mess-Pfad (gatet :2514, :2604)
+# extern: COMDARE_DURCHSTICH -- Opt-in der F1-Durchstich-Welle; ausdruecklich DISJUNKT zu
+#         RUN_MEASURE/BUILD_GOLDEN_N/DYNAMIC_PLANER_CI (gatet :1797)
+# extern: COMDARE_PERSIST_MEASUREMENTS -- Opt-in des Mess-Rueckschriebs nach development;
+#         verlangt zusaetzlich ein Writeback-Token aus der Infra (gatet :2228)
+# extern: COMDARE_ANHANG_FORWARD -- Opt-in des Anlagen-Vorwaertsschreibens in die Thesis;
+#         verlangt zusaetzlich ein Thesis-Writeback-Token (gatet :2370)
+# extern: COMDARE_TEXLIVE_AVAILABLE -- FAEHIGKEITS-Merkmal des Runners (TeX Live
+#         vorhanden), nicht des Laufs; wird an der Maschine gesetzt (gatet :1553)
+# extern: COMDARE_SWEEP_ZOMBIES -- Not-Werkzeug: raeumt Waisen-Prozesse, nur per
+#         API-Trigger zusammen mit SWEEP_TAG=amd|intel (gatet :228)
+# extern: COMDARE_MEASURE_PROFILE -- smoke|full-Marke der Mess-Welle, per Trigger oder
+#         manuellem Start gesetzt; gatet drei echte Regeln (:1808, :2509, :2600).
+#         Die Weiterreichung :2589 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
+#         SETZT sie nicht -- sie gibt den Eltern-Wert an die Child (CI-INV 11.08.2026)
+#
+# NICHT GEDECKT UND BEWUSST SO: Variablen, die nur in `script:`-Rumpf oder in
+# Kommentaren vorkommen. Sie schalten keinen Job an oder aus und sind deshalb nicht die
+# hier gemeinte Klasse.
+# ─────────────────────────────────────────────────────────────────────────────────────
+
 variables:
   CCACHE_DIR: "$CI_PROJECT_DIR/.ccache"
   CCACHE_MAXSIZE: "3G"
@@ -233,6 +292,35 @@ lint:secrets:
   # #53-Haertung (21.07.): explizite Immer-rules — lint:secrets ist der EINZIGE Pflicht-Job jeder Welle
   # (Token-Risiko je Commit, auch docs-only). Befund 12012: docs-only-Welle entstand LEER-failed; diese
   # rules stellen sicher, dass die Minimal-Welle existiert und GRUEN werden kann.
+  #
+  # D-1 (Owner 10.08.2026, woertlich: "D-1: raus nehmen."): DIE HAENGER-KLASSE WIRD LAUT.
+  # Gemessener Anlass, nicht vermutet -- Job 15503 dieses Jobs auf prod2:
+  #     15503  lint:secrets  prod2  6155s  stuck_or_timeout_failure  Trace: 0 Byte
+  # gegen 15502/15500 auf prod1 mit 16s/15s und 5038 Byte Trace. Der Job stand 102 Minuten
+  # OHNE eine einzige Zeile Ausgabe und blockierte dabei die ganze Welle: lint:secrets ist
+  # needs-Wurzel des Trigger-Fanouts. Ohne Deckel laeuft er in den 60min-Default und
+  # danach nochmal, weil niemand ihn abbricht.
+  #
+  # timeout 10m ist der Deckel, NICHT eine Erwartung: der Normal-Lauf braucht 15-16 s, das
+  # ist Faktor 37 Luft. Praezedenz im Haus ist `.pmc timeout: 15m` (ce .gitlab-ci.yml:162,
+  # Haertung 09.07.: "fail-fast statt 60min-Default"). Ein Haenger wird damit nach
+  # hoechstens 10 min ROT statt nach 102 min still.
+  #
+  # retry NUR auf die zwei Infrastruktur-Klassen. Ein echter Fund (Token im Commit) ist
+  # script_failure und wird NICHT wiederholt -- ein Geheimnis-Leck darf nicht durch einen
+  # zweiten Versuch verschwinden.
+  #
+  # BEWUSST NICHT HIER: die Tag-Pinnung auf [baremetal, amd] (prod2 ganz aus dem Pool).
+  # Der Owner-Satz "D-1: raus nehmen." hat zwei Referenten -- die 07:17-Vorlage meinte
+  # prod2 GANZ, die 12:20-Vorlage nur diesen Job. Der Deckel oben ist unter BEIDEN
+  # Lesarten richtig; die Pinnung ist es nur unter einer und wartet deshalb auf die
+  # Ein-Satz-Bestaetigung (Vorlage V1). Sie halbierte die Runner-Kapazitaet.
+  timeout: 10m
+  retry:
+    max: 1
+    when:
+      - stuck_or_timeout_failure
+      - runner_system_failure
   rules:
     - when: on_success
   variables:
