@@ -32,22 +32,40 @@
 #
 # DER MODUS (D3-1-Resthaelfte, 2026-08-09) -- "rot NUR bei modus=voll und Z==0":
 # Die Wache urteilte bis heute modus-BLIND. Das ist an genau einer Stelle falsch:
-# ein provision_only-Lauf MISST PER BAUART NICHTS. ce profile_run_entry.hpp:1234
+# ein provision_only-Lauf MISST PER BAUART NICHTS. ce profile_run_entry.hpp
 # setzt woertlich "provision_ok = a.provision_only && res.any_provisioned > 0"
-# und :1241 laesst den Lauf damit mit Exit 0 enden, obwohl measured==0 und die
-# CSV nur ihre Kopfzeile traegt. Diese Wache haette ihn getoetet -- ein richtiges
-# Messgeraet am falschen Gegenstand.
+# und der Zweig darunter laesst den Lauf damit mit Exit 0 enden, obwohl
+# measured==0 und die CSV nur ihre Kopfzeile traegt. Diese Wache haette ihn
+# getoetet -- ein richtiges Messgeraet am falschen Gegenstand.
+#
+# DER DRITTE MODUS (D3-7b, 2026-08-10) -- pruef_only:
+# Dieselbe Lage ein zweites Mal, und sie war seit dem 09.08. offen. Der
+# S3-Konformitaets-Lauf (ce profile_run_entry.hpp "if (a.pruef_only) { exit =
+# any_pruef_ok > 0 && any_pruef_failed == 0 }") BAUT NICHT und MISST NICHT -- er
+# laedt jede fertige .so und faehrt nur ihr Gate. Die emittierte
+# Kampagnen-Pipeline faehrt ihn je Perm (ce planner/experiment_plan_director.hpp,
+# COMDARE_PRUEF_ONLY=true). 0 Datenzeilen sind sein SOLL.
+# WARUM DAS HIER STEHT UND NICHT NUR IM MARKER: bis D3-7b kannte die Allowlist
+# unten nur voll|provision_only|prune_only. Ein Marker mit modus=pruef_only waere
+# in den Zweig "unlesbarer Marker ist keine Erlaubnis" gefallen -- rc=2, JOB ROT.
+# Der Marker allein haette den Lauf also nicht gerettet, sondern erst getoetet.
+# Der Tippfehler-Zweig bleibt scharf: ein Modus, den niemand vergeben hat, ist
+# weiter rc=2 (Probe F15/F19).
 #
 # WAS SICH AENDERT UND WAS AUSDRUECKLICH NICHT:
 #   GEAENDERT ist NUR der Datenzeilen-Zweig (Mindestzahl verfehlt). Er ist rot
 #     bei modus=voll und eine sichtbare WARNUNG bei modus=provision_only /
-#     prune_only. Die Sichtbarkeit bleibt in beiden Faellen -- Owner-KERN: "In
+#     pruef_only / prune_only. Die Sichtbarkeit bleibt in allen -- Owner-KERN: "In
 #     der Wissenschaft geht nicht immer alles glatt, aber das muss SICHTBAR
 #     sein." Herabgestuft wird das URTEIL, nie die AUSGABE.
 #   NICHT GEAENDERT ist der Keine-CSV-Zweig (N_CSV==0). Er bleibt in JEDEM Modus
 #     rot. Begruendung, nicht Bequemlichkeit: auch der provision_only-Lauf
-#     schreibt seine CSV (profile_run_entry.hpp:1199/1228 werten csv_ok und
-#     spiegeln die Datei), und ein Lauf, der ueberhaupt keine Datei hinterlaesst,
+#     schreibt seine CSV, und der pruef_only-Lauf ebenso -- am Objekt
+#     nachgelesen (10.08.): profile_run_entry.hpp oeffnet den Strom
+#     ("std::ofstream csv{a.out_csv..., trunc}") und schreibt
+#     "csv << ex::lazy_csv_header()" UNBEDINGT, lange vor jedem Modus-Zweig.
+#     Beide Modi hinterlassen also eine Datei mit Kopfzeile und 0 Datenzeilen.
+#     Ein Lauf, der ueberhaupt keine Datei hinterlaesst,
 #     ist in keinem Modus ein gelungener Lauf. Wer diesen Zweig modus-abhaengig
 #     macht, baut eine Wache, die im falschen Modus gar nicht mehr beissen kann.
 #     AUSDRUECKLICH BENANNT: fuer modus=prune_only ist das zu scharf -- ein
@@ -70,7 +88,8 @@
 #   <verzeichnis>          Wurzel, unter der rekursiv nach measurements.csv gesucht wird.
 #   <mindest-datenzeilen>  Optional. Summe der Datenzeilen ueber ALLE gefundenen CSVs,
 #                          die mindestens erreicht sein muss. Default 1.
-#   <modus>                Optional. voll | provision_only | prune_only | auto.
+#   <modus>                Optional. voll | provision_only | pruef_only |
+#                          prune_only | auto.
 #                          Default 'voll' -- der SCHAERFSTE. Ein Aufrufer, der den
 #                          Modus nicht nennt, bekommt exakt das Verhalten von vor
 #                          diesem Paket; die Heilung kann kein Gate versehentlich
@@ -84,12 +103,29 @@
 #           unbekannter Modus, modus=auto ohne Lauf-Marker) --
 #           ausdruecklich KEIN Gruen: ein stiller Rueckfall waere derselbe Defekt.
 #
-# ZAEHLWEISE, ausdruecklich benannt:
-#   Datenzeilen = (Zeilen der Datei) - 1, weil die erste Zeile der CSV-Kopf ist.
-#   Gezaehlt wird mit awk 'END{print NR}', NICHT mit `wc -l`: wc zaehlt
-#   Zeilenumbrueche, eine Datei ohne abschliessenden Newline wuerde eine Zeile zu
-#   wenig melden. Eine voellig leere Datei hat 0 Zeilen und damit 0 Datenzeilen
-#   (nicht -1) -- der Sonderfall ist unten ausdruecklich behandelt.
+# ZAEHLWEISE, ausdruecklich benannt -- WORTGLEICH zu ci/persist_sammler.sh und
+# ci/frische_wache.sh (dasselbe awk-Programm, Byte fuer Byte):
+#   Datenzeilen = alle Zeilen AB DER ZWEITEN, die mindestens ein Zeichen tragen,
+#   das kein Leerraum ist. Die erste Zeile ist der CSV-Kopf und zaehlt nie mit.
+#   Gezaehlt wird mit awk, NICHT mit `wc -l`: wc zaehlt Zeilenumbrueche, eine
+#   Datei ohne abschliessenden Newline wuerde eine Zeile zu wenig melden. Eine
+#   voellig leere Datei hat 0 Zeilen und damit 0 Datenzeilen (nicht -1).
+#
+#   EINE LEERZEILE IST KEIN MESSWERT (D3-3b). Bis 10.08.2026 rechnete die Wache
+#   `Datenzeilen = Zeilen - 1` und zaehlte damit jede leere und jede nur aus
+#   Blanks/Tabs bestehende Zeile als Messwert mit: eine CSV aus Kopf + drei
+#   Leerzeilen + EINER echten Zeile meldete 4. Genau die Zahl entscheidet ueber
+#   `<mindest-datenzeilen>`, ueber das Commit-Gate des Sammlers und ueber das
+#   Maskierungs-Gate der Frische-Wache -- ein Messlauf konnte die Mindestzahl
+#   also mit Leerzeilen erreichen. Die Heilung geht nur in die scharfe Richtung:
+#   die Zahl kann seither nur kleiner werden, nie groesser, und keine Wache wird
+#   dadurch weicher.
+#
+#   EIN DURCHLAUF, ZWEI ZAHLEN: das awk-Programm gibt "<rohzeilen> <datenzeilen>"
+#   aus. Der Rohwert bleibt damit als NENNER in der Ausgabe stehen -- sonst waere
+#   nach dieser Heilung nicht mehr sichtbar, ob eine Datei leer war oder ob ihre
+#   Zeilen verworfen wurden. Ein zweiter Lesevorgang je Datei waere der falsche
+#   Preis dafuer.
 #
 # POSIX-sh, ASCII-only, kein Python (Hausdoktrin: kein Python in der Buildchain).
 # =============================================================================
@@ -113,10 +149,10 @@ case "$MINDEST" in
     ''|*[!0-9]*) echo "ABBRUCH: '<mindest-datenzeilen>' muss eine Zahl sein, war '$MINDEST'." >&2; exit 2 ;;
 esac
 case "$MODUS" in
-    voll|provision_only|prune_only|auto) : ;;
+    voll|provision_only|pruef_only|prune_only|auto) : ;;
     *)
         echo "ABBRUCH: unbekannter Modus '$MODUS'." >&2
-        echo "         Erlaubt: voll | provision_only | prune_only | auto." >&2
+        echo "         Erlaubt: voll | provision_only | pruef_only | prune_only | auto." >&2
         echo "         Ein unbekannter Modus wird NICHT auf einen Default zurueckgesetzt --" >&2
         echo "         ein Tippfehler wuerde sonst still das Gate entschaerfen." >&2
         exit 2
@@ -168,7 +204,7 @@ if [ "$MODUS" = auto ]; then
         MODUS=voll
     fi
     case "$MODUS" in
-        voll|provision_only|prune_only) : ;;
+        voll|provision_only|pruef_only|prune_only) : ;;
         *)
             echo "ABBRUCH: die Lauf-Marker nennen den unbekannten Modus '$MODUS'." >&2
             echo "         Ein unlesbarer Marker ist keine Erlaubnis -- kein Gruen." >&2
@@ -192,17 +228,23 @@ fi
 SUMME=0
 N_LEER=0
 N_MIT=0
+LEERZEILEN=0
 while IFS= read -r F; do
     [ -n "$F" ] || continue
-    ZEILEN=$(awk 'END{print NR+0}' "$F")
-    if [ "$ZEILEN" -le 1 ]; then
-        DATEN=0
+    # Ein Lesevorgang, zwei Zahlen: "<rohzeilen> <datenzeilen>". Das awk-Programm
+    # steht Byte-gleich in ci/persist_sammler.sh und ci/frische_wache.sh.
+    PAAR=$(awk 'NR>1 && $0 ~ /[^[:space:]]/ {n++} END{printf "%d %d\n", NR+0, n+0}' "$F")
+    ZEILEN=${PAAR%% *}
+    DATEN=${PAAR##* }
+    if [ "$ZEILEN" -gt 1 ]; then
+        LEERZEILEN=$((LEERZEILEN + ZEILEN - 1 - DATEN))
+    fi
+    if [ "$DATEN" -eq 0 ]; then
         N_LEER=$((N_LEER + 1))
-        echo "  LEER   $F  ($ZEILEN Zeile(n) = nur Kopf oder gar nichts)"
+        echo "  LEER   $F  ($ZEILEN Rohzeile(n), 0 Datenzeile(n) = Kopf, nichts oder nur Leerzeilen)"
     else
-        DATEN=$((ZEILEN - 1))
         N_MIT=$((N_MIT + 1))
-        echo "  DATEN  $F  ($DATEN Datenzeile(n))"
+        echo "  DATEN  $F  ($DATEN Datenzeile(n) aus $ZEILEN Rohzeile(n))"
     fi
     SUMME=$((SUMME + DATEN))
 done < "$TMP"
@@ -212,6 +254,7 @@ echo "NENNER (nie eine nackte Null):"
 echo "  $N_CSV measurements.csv gefunden."
 echo "  davon $N_MIT mit Datenzeilen, $N_LEER ohne (nur Kopfzeile oder leer)."
 echo "  $SUMME Datenzeile(n) insgesamt, gefordert waren mindestens $MINDEST."
+echo "  $LEERZEILEN Leerzeile(n) verworfen (leer oder nur Leerraum -- kein Messwert)."
 echo "-----------------------------------------------------------------------------"
 
 if [ "$SUMME" -lt "$MINDEST" ]; then
@@ -227,11 +270,34 @@ if [ "$SUMME" -lt "$MINDEST" ]; then
         exit 1
     fi
     echo "WARNUNG: modus=$MODUS -- dieser Lauf misst per Bauart nicht."
-    echo "         ce profile_run_entry.hpp:1234/:1241: im provision_only-Lauf ist"
-    echo "         'mindestens eine DLL bereitgestellt' das Erfolgsmass, nicht die"
-    echo "         Datenzeile. $SUMME Datenzeile(n) sind hier ein BEFUND, kein Fehler."
-    echo "         Ob wirklich bereitgestellt wurde, entscheidet NICHT diese Wache:"
-    echo "         das Feld provisioned= steht im Lauf-Marker (ci/lauf_marker.sh)."
+    # D3-7b: DAS ERFOLGSMASS IST JE MODUS EIN ANDERES, und der Text muss das
+    # sagen. Bis hierher nannte er in JEDEM weichen Modus das provision_only-
+    # Erfolgsmass -- unter modus=pruef_only oder prune_only war das eine falsche
+    # Auskunft mitten in einer gruenen Ausgabe, also genau die zweite Wahrheit,
+    # gegen die diese Wache gebaut ist.
+    case "$MODUS" in
+        provision_only)
+            echo "         ce profile_run_entry.hpp ('provision_ok = a.provision_only &&"
+            echo "         res.any_provisioned > 0'): im provision_only-Lauf ist 'mindestens"
+            echo "         eine DLL bereitgestellt' das Erfolgsmass, nicht die Datenzeile."
+            echo "         Ob wirklich bereitgestellt wurde, entscheidet NICHT diese Wache:"
+            echo "         das Feld provisioned= steht im Lauf-Marker (ci/lauf_marker.sh)."
+            ;;
+        pruef_only)
+            echo "         ce profile_run_entry.hpp ('if (a.pruef_only) { exit = any_pruef_ok"
+            echo "         > 0 && any_pruef_failed == 0 }'): der S3-Konformitaets-Lauf MISST"
+            echo "         NICHT und gatet nur -- er faehrt je fertiger .so ihr Gate."
+            echo "         Erfolgsmass ist das GATE, nicht die Datenzeile."
+            echo "         Ob das Gate hielt, entscheidet NICHT diese Wache, sondern der"
+            echo "         Exit-Code des Treibers selbst (exit!=0 bei JEDEM Gate-Fail)."
+            ;;
+        *)
+            echo "         In diesem Modus ist die Datenzeile ueberhaupt nicht das"
+            echo "         Erfolgsmass. Was der Lauf geleistet hat, entscheidet NICHT diese"
+            echo "         Wache -- sie zaehlt nur Datenzeilen und sagt es hier laut."
+            ;;
+    esac
+    echo "         $SUMME Datenzeile(n) sind hier ein BEFUND, kein Fehler."
     echo "MESS-AUSBEUTE-WACHE: OK ($SUMME Datenzeile(n), modus=$MODUS -- Warnung, kein Fehler)."
     exit 0
 fi

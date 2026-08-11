@@ -58,6 +58,65 @@ cache:
   key: "ccache-$CI_PROJECT_NAME"
   paths: [".ccache"]
 
+# ─────────────────────────────────────────────────────────────────────────────────────
+# DIE HERKUNFT DER REGEL-VARIABLEN, DIE HIER NICHT GESETZT WERDEN.  (CI-INV, 10.08.2026)
+#
+# WARUM DIESER BLOCK EXISTIERT. Ein Job mit `rules: - if: '$COMDARE_X == "true"'`, dessen
+# Variable in der Datei nirgends steht, ist von einem ABGESCHALTETEN Job nicht zu
+# unterscheiden. Er liest sich wie ein Gate und faehrt nie. Genau dieser Mechanismus hat
+# in der ce-Datei `contract:axis-version-lock` drei Wochen lang in KEINEM Lauf gehalten,
+# bei gruener Pipeline und ohne jedes Signal -- der Ausschalter war eine Variable
+# (COMDARE_AXIS_LOCK_CHECK), die niemand je gesetzt hat.
+#
+# WAS SICH DADURCH AENDERT. Die Absicht "inert-by-default, Opt-in per Trigger" stand
+# bisher NUR in Prosa, verteilt auf neun Kommentarbloecke ueber 2400 Zeilen. Prosa kann
+# nicht rot werden. Ab jetzt ist jede Regel-Variable entweder oben GESETZT oder hier mit
+# Grund als extern erklaert; alles andere macht CiInvarianten.JedeRegelVariableIstGedeckt
+# rot und nennt Namen und Zeile. Die Annotation ist NAMENSGEBUNDEN -- sie deckt genau den
+# genannten Namen, nie die Nachbarn.
+#
+# ALLE ZEHN SIND GEPRUEFT UND ABSICHTLICH EXTERN. Die Belegzeilen unten sind die rules-
+# Zeilen, an denen die Variable wirklich gatet -- gemessen 11.08.2026, nicht abgeschrieben.
+# Sie sind KEIN Befund: sie sind die Opt-in-Schalter der mehrtaegigen Mess- und
+# Rueckschrieb-Laeufe, die eine normale Welle gerade NICHT ausloesen soll.
+#
+# ZEILENNUMMERN VERRUTSCHEN, UND ZWAR STILL. Die hier zuvor stehenden Belege waren bei der
+# Landung samt und sonders daneben -- 13 von 16 zeigten auf fremde Stellen, weil jede
+# Einfuegung weiter oben alles darunter verschiebt und das niemandem auffaellt. Die Zahlen
+# sind deshalb eine ORIENTIERUNG, keine Zusicherung. VERBINDLICH geprueft wird das
+# Haltbare: CiInvarianten.ExternAnnotationDecktEineWirklichGatendeVariable haelt fest, dass
+# jeder annotierte Name auch wirklich in einer rules-Bedingung steht. Eine Annotation,
+# deren Regel verschwunden ist, wird damit ROT -- statt still zum Freibrief fuer den
+# naechsten Schalter gleichen Namens zu werden.
+#
+# extern: COMDARE_RUN_MEASURE -- Opt-in des mehrtaegigen golden-320-Voll-Messlaufs, per
+#         API-Trigger/manuellem Start gesetzt; inert-by-default (gatet :1807, :2020)
+# extern: COMDARE_STATIC_SMOKE_FALLBACK -- Zusatzschalter des statischen Smoke-Zweigs,
+#         Default AUS, nur zusammen mit RUN_MEASURE/MEASURE_PROFILE (gatet :1807, :1808)
+# extern: COMDARE_BUILD_GOLDEN_N -- Gate des NEUEN golden-N-Standardpfads; dreifach inert
+#         (Variable + when:manual + _bot_-never) (gatet :2509, :2513, :2600, :2603, :2634)
+# extern: COMDARE_DYNAMIC_PLANER_CI -- isoliertes Opt-in NUR der Planer-Delegation
+#         (Child-Pipeline), ohne den uebrigen Mess-Pfad (gatet :2514, :2604)
+# extern: COMDARE_DURCHSTICH -- Opt-in der F1-Durchstich-Welle; ausdruecklich DISJUNKT zu
+#         RUN_MEASURE/BUILD_GOLDEN_N/DYNAMIC_PLANER_CI (gatet :1797)
+# extern: COMDARE_PERSIST_MEASUREMENTS -- Opt-in des Mess-Rueckschriebs nach development;
+#         verlangt zusaetzlich ein Writeback-Token aus der Infra (gatet :2228)
+# extern: COMDARE_ANHANG_FORWARD -- Opt-in des Anlagen-Vorwaertsschreibens in die Thesis;
+#         verlangt zusaetzlich ein Thesis-Writeback-Token (gatet :2370)
+# extern: COMDARE_TEXLIVE_AVAILABLE -- FAEHIGKEITS-Merkmal des Runners (TeX Live
+#         vorhanden), nicht des Laufs; wird an der Maschine gesetzt (gatet :1553)
+# extern: COMDARE_SWEEP_ZOMBIES -- Not-Werkzeug: raeumt Waisen-Prozesse, nur per
+#         API-Trigger zusammen mit SWEEP_TAG=amd|intel (gatet :228)
+# extern: COMDARE_MEASURE_PROFILE -- smoke|full-Marke der Mess-Welle, per Trigger oder
+#         manuellem Start gesetzt; gatet drei echte Regeln (:1808, :2509, :2600).
+#         Die Weiterreichung :2589 `COMDARE_MEASURE_PROFILE: "$COMDARE_MEASURE_PROFILE"`
+#         SETZT sie nicht -- sie gibt den Eltern-Wert an die Child (CI-INV 11.08.2026)
+#
+# NICHT GEDECKT UND BEWUSST SO: Variablen, die nur in `script:`-Rumpf oder in
+# Kommentaren vorkommen. Sie schalten keinen Job an oder aus und sind deshalb nicht die
+# hier gemeinte Klasse.
+# ─────────────────────────────────────────────────────────────────────────────────────
+
 variables:
   CCACHE_DIR: "$CI_PROJECT_DIR/.ccache"
   CCACHE_MAXSIZE: "3G"
@@ -65,7 +124,22 @@ variables:
   GIT_STRATEGY: fetch                      # (REV 16, path a) natives Repo-Setup -> get_sources injiziert CI_JOB_TOKEN via extraheader
   GIT_SUBMODULE_STRATEGY: recursive        # (REV 16, path a) nativer rekursiver Submodul-Fetch mit CI_JOB_TOKEN (ersetzt den manuellen Deploy-Token-Klon)
   GIT_SUBMODULE_FORCE_HTTPS: "true"        # relative URLs -> GitLab-HTTPS + CI_JOB_TOKEN (air-gap)
-  CMAKE_BUILD_PARALLEL_LEVEL: "6"          # User 2026-07-06: 2x6 Kerne bei concurrent=2 (prod1 16C/60G, 17G frei, kein earlyoom; revidiert 8@concurrent=1)
+  # DIESER WERT WIRKT GLOBAL, ALSO IN JEDEM BAU-JOB. Der Spitzenbedarf ist deshalb
+  # (Jobs gleichzeitig) x (dieser Wert) x (Speicher je Uebersetzer) -- ein Produkt aus
+  # drei Zahlen, die in drei verschiedenen Systemen stehen.
+  # KORREKTUR 10.08.2026 (Owner-Auftrag "mal schauen, ob nicht dort speicher eingespart
+  # sein kann"): die alte Begruendung "2x6 Kerne bei concurrent=2" war seit der
+  # Runner-Umstellung FALSCH. /usr/local/sbin/runner-mode.sh:43 setzt im Normalbetrieb
+  # NORMAL_CC=4 auf prod1 UND prod2 -- vier Jobs gleichzeitig, nicht zwei. Der Ansatz war
+  # damit um den Faktor 2 zu klein gerechnet, ohne dass etwas rot wurde.
+  # GEMESSEN am selben Tag (26 TUs von 635, /usr/bin/time -v, Release-Flags aus
+  # compile_commands.json): groesste TU 660 MB, Permutations-TUs Median 580 MB.
+  # 4 x 6 x 660 MB = 15840 MB Spitze gegen rund 24576 MB, die auf prod1 dafuer frei sind.
+  # DER WERT BLEIBT BEI 6 -- das Budget haelt. Was sich aendert: es wird jetzt GEPRUEFT.
+  # Die Wache ist Code/tests/unit/test_ci_wache_speicherbudget.cpp (ctest -L ci_wachen);
+  # sie faellt, wenn dieser Wert, der ce-Zwilling oder die Runner-Annahme auseinanderlaufen.
+  # Ein Kommentar konnte das nie -- er hat drei Wochen lang das Falsche behauptet.
+  CMAKE_BUILD_PARALLEL_LEVEL: "6"
   COMDARE_LINT_PATHS: "Code"
   COMDARE_LINT_EXCLUDE_RE: "(^|/)(ext|build|_archive_code_pre_migration|cmake-build-[^/]*|modules|external|thesis)/"
   # cppcheck-Pendant zur EXCLUDE_RE (Template 237b6ec): OHNE external/thesis scannt lint:static die
@@ -113,6 +187,17 @@ variables:
           - "thesis/diplomarbeit"  # thesis-Gitlink (der LEBENDE der beiden)
           - ".gitmodules"
           - ".gitlab-ci.yml"
+          # DIE BEIDEN WACHEN-DATEIEN SIND BAU-CODE, genau nach derselben Ueberlegung wie
+          # configure.sh und Makefile weiter oben: sie entscheiden, WIE STRENG geprueft wird.
+          # Befund, der sie erzwang (Paket r7-wachen-divergenz, 10.08.2026): die Diff-Hygiene-
+          # Wache liegt in zwei Fassungen (hier und im ce) und war unbemerkt auseinandergelaufen.
+          # ci/wachen_paritaet.sh haelt sie zusammen und laeuft in verify:submodules -- also in
+          # einem Job unter DIESEN Regeln. Ohne diese zwei Zeilen waere er ausgerechnet fuer die
+          # Aenderung blind, die er bewacht: wer die super-eigene Fassung anfasst, aendert nichts
+          # unter Code/** und weckte den Job auf einem Feature-Zweig nicht. Der ce-Gitlink ist
+          # ueber "Code/external/*" schon gedeckt; das hier ist die andere Haelfte.
+          - "scripts/ci_diff_ascii_width_guard.sh"
+          - "ci/wachen_paritaet.sh"
     - when: never
 
 # ── #53 ccache-Hygiene: Konsumenten ziehen den ccache nur (policy: pull), EIN Writer (analyse:thesis-data)
@@ -207,6 +292,35 @@ lint:secrets:
   # #53-Haertung (21.07.): explizite Immer-rules — lint:secrets ist der EINZIGE Pflicht-Job jeder Welle
   # (Token-Risiko je Commit, auch docs-only). Befund 12012: docs-only-Welle entstand LEER-failed; diese
   # rules stellen sicher, dass die Minimal-Welle existiert und GRUEN werden kann.
+  #
+  # D-1 (Owner 10.08.2026, woertlich: "D-1: raus nehmen."): DIE HAENGER-KLASSE WIRD LAUT.
+  # Gemessener Anlass, nicht vermutet -- Job 15503 dieses Jobs auf prod2:
+  #     15503  lint:secrets  prod2  6155s  stuck_or_timeout_failure  Trace: 0 Byte
+  # gegen 15502/15500 auf prod1 mit 16s/15s und 5038 Byte Trace. Der Job stand 102 Minuten
+  # OHNE eine einzige Zeile Ausgabe und blockierte dabei die ganze Welle: lint:secrets ist
+  # needs-Wurzel des Trigger-Fanouts. Ohne Deckel laeuft er in den 60min-Default und
+  # danach nochmal, weil niemand ihn abbricht.
+  #
+  # timeout 10m ist der Deckel, NICHT eine Erwartung: der Normal-Lauf braucht 15-16 s, das
+  # ist Faktor 37 Luft. Praezedenz im Haus ist `.pmc timeout: 15m` (ce .gitlab-ci.yml:162,
+  # Haertung 09.07.: "fail-fast statt 60min-Default"). Ein Haenger wird damit nach
+  # hoechstens 10 min ROT statt nach 102 min still.
+  #
+  # retry NUR auf die zwei Infrastruktur-Klassen. Ein echter Fund (Token im Commit) ist
+  # script_failure und wird NICHT wiederholt -- ein Geheimnis-Leck darf nicht durch einen
+  # zweiten Versuch verschwinden.
+  #
+  # BEWUSST NICHT HIER: die Tag-Pinnung auf [baremetal, amd] (prod2 ganz aus dem Pool).
+  # Der Owner-Satz "D-1: raus nehmen." hat zwei Referenten -- die 07:17-Vorlage meinte
+  # prod2 GANZ, die 12:20-Vorlage nur diesen Job. Der Deckel oben ist unter BEIDEN
+  # Lesarten richtig; die Pinnung ist es nur unter einer und wartet deshalb auf die
+  # Ein-Satz-Bestaetigung (Vorlage V1). Sie halbierte die Runner-Kapazitaet.
+  timeout: 10m
+  retry:
+    max: 1
+    when:
+      - stuck_or_timeout_failure
+      - runner_system_failure
   rules:
     - when: on_success
   variables:
@@ -252,7 +366,8 @@ lint:static:
 # ("N Zeilen geprueft, davon 0 Nicht-ASCII") und benennt die uebersprungenen Dateien.
 #
 # WARUM KEIN allow_failure -- eine advisory Wache ist die naechste stille Null. Der Bereich ist
-# in der Praxis klein (nur noch nicht gelandete Commits gegen origin/$CI_DEFAULT_BRANCH), der
+# in der Praxis klein (nur die noch nicht auf main gelandeten Commits, gemessen 52 an d8f3cd77
+# mit 7007 Zeilen im Scope; die Basis steht literal unten und ist begruendet), der
 # Alt-Bestand wird bewusst NICHT geprueft: `--bestand` meldet heute 845 Nicht-ASCII- und
 # 174 Breiten-Zeilen aus 18714: eine Bestands-Wache waere am Tag ihrer Einfuehrung rot geboren.
 # Diese Wache stoppt NEUE Verstoesse, sie saniert keine alten.
@@ -270,8 +385,53 @@ lint:diff-hygiene:
   variables:
     GIT_SUBMODULE_STRATEGY: none   # super-eigener Diff; das ce lintet in SEINER Pipeline
     GIT_DEPTH: 0                   # merge-base braucht Historie -- flacher Klon => FATAL, nie still gruen
-    COMDARE_GUARD_BASIS_REF: "origin/$CI_DEFAULT_BRANCH"
+    # LITERAL, NICHT "origin/$CI_DEFAULT_BRANCH" (2026-08-10) -- zwei Gruende, beide gemessen:
+    #
+    # (1) $CI_DEFAULT_BRANCH ist eine GITLAB-UI-EINSTELLUNG. Fuer Projekt 288 steht sie heute auf
+    #     'development' (Rohbeleg: docs/sessions/backups/20260802-e23-suchlauf-belege/e23/
+    #     projects_all.ndjson, Zeile mit id=288). Wer sie im Web umstellt, verschiebt die Basis
+    #     dieser Wache -- ohne Commit, ohne Diff, ohne Review. Der versionierte Text muss sagen,
+    #     wogegen gemessen wird.
+    # (2) VIEL WICHTIGER, und erst beim Nachmessen aufgefallen: mit 'development' als Basis war
+    #     diese Wache auf JEDER development-Pipeline ein NO-OP. Gemessen an d8f3cd77 (dem Stand,
+    #     der diesen Text traegt): merge-base(origin/development, HEAD) = HEAD, also
+    #     "BEREICHSBREITE: 0 Commit(s)", "0 Zeilen geprueft", GRUEN. Sie hat dort nie etwas
+    #     angesehen. Mit origin/main sind es an demselben Stand 52 Commit(s), 60 Datei(en),
+    #     7007 Zeilen im Scope -- und 0 Verstoesse, die Umstellung ist also heute gruen
+    #     schaltbar. Waere sie es nicht gewesen, stuende hier eine Staffelung statt der Basis.
+    #
+    # WARUM main UND NICHT development: main ist die Autoritaet (Gitflow-Doktrin), development
+    # laeuft voraus. Der Bereich main..HEAD enthaelt den Bereich development..HEAD -- die
+    # Umstellung nimmt der Wache also nichts weg, sie gibt ihr nur mehr zu sehen.
+    # Auf main selbst ist der Bereich 0 Commit(s); das war mit der alten Basis genauso und
+    # bleibt hier ehrlich benannt statt weggeschwiegen.
+    #
+    # Dasselbe Muster faehrt das ce bereits (dort COMDARE_HYG_FF_BASIS mit Literal-Default
+    # 'main') -- diese Zeile zieht den super nach, sie erfindet nichts Neues.
+    COMDARE_GUARD_BASIS_REF: "origin/main"
   script:
+    # DIE BASIS MUSS IM KLON LIEGEN -- sonst haelt das Literal oben nicht (2026-08-10).
+    # Gemessen am Objekt, gleicher Baum, gleicher Koeder, einziger Unterschied "gibt es
+    # refs/remotes/origin/main": vorhanden -> 2 Commit(s), 1 Nicht-ASCII, rc=1 ROT;
+    # fehlt -> die Wache rutschte auf origin/development, 0 Commit(s), rc=0 GRUEN.
+    # Die Wache bricht seit heute in diesem Fall selbst ab (Exit 2, kein Rueckfall auf einen
+    # anderen Zweig) -- dieser Vorspann sorgt dafuer, dass es gar nicht erst dazu kommt.
+    # Der Zweigname wird aus der Variablen ABGELEITET, damit es nur EINE Quelle gibt.
+    - |
+      set -eu
+      _sup_zweig="${COMDARE_GUARD_BASIS_REF#origin/}"
+      if [ "$_sup_zweig" = "$COMDARE_GUARD_BASIS_REF" ] || [ -z "$_sup_zweig" ]; then
+        echo "COMDARE_GUARD_BASIS_REF='${COMDARE_GUARD_BASIS_REF}' hat nicht die Form" >&2
+        echo "'origin/<zweig>' -- der Vorspann kann den Zweig nicht holen. KEIN stilles Gruen." >&2
+        exit 2
+      fi
+      _sup_gitdir=$(git rev-parse --git-dir)
+      if [ -e "${_sup_gitdir}/shallow" ]; then
+        echo "DIFF-HYGIENE: flacher Klon -- wird entflacht (ohne Historie keine Abzweigung)."
+        git fetch --no-tags --unshallow origin
+      fi
+      echo "DIFF-HYGIENE: hole Basis-Zweig '${_sup_zweig}' (fail-closed: schlaegt der Fetch fehl, ist der Job rot)."
+      git fetch --no-tags origin "+refs/heads/${_sup_zweig}:refs/remotes/origin/${_sup_zweig}"
     - sh scripts/ci_diff_ascii_width_guard.sh --seit-basis
     # ZWEITE, UNABHAENGIGE AUFRUFSTELLE der Registrierungs-Wache (P4c, 2026-08-09).
     # Sie steht bewusst in einem Job einer ANDEREN Familie: ihr eigener Job
@@ -339,6 +499,47 @@ test:xml-wellformed-probe:
     GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; geprueft wird nur der super-Baum
   script:
     - sh ci/tests/xml_wellformed_probe.sh --selbstbiss
+
+# -- P3 (2026-08-11): PROBE fuer die BASIS-WAHL DER DIFF-HYGIENE-WACHE --
+# Der Fix "COMDARE_GUARD_BASIS_REF steht literal" hat drei Teile: (a) das Literal in dieser Datei,
+# (b) der fail-closed-Vorspann im Job lint:diff-hygiene, (c) die Wache BRICHT AB, wenn eine
+# GENANNTE Basis nicht aufloest. Fuer (a) und (b) gibt es sechs GoogleTest-Faelle (GuardBasis.*) --
+# die lesen aber nur den YAML-TEXT. Teil (c) ist VERHALTEN eines Shell-Skripts und war ungedeckt:
+# am 10.08. wurde der elif-Zweig der Wache probeweise entfernt und ALLE VIER damals gefahrenen
+# Gates blieben gruen (rc=0). Ein Text-Scanner mehr haette daran nichts geaendert; er sieht kein
+# Verhalten. Diese Probe RUFT die Wache in Wegwerf-git-Repos und misst ihren Exit-Code.
+#
+# DIE VIER ARME (plus die Registrierung dieser Probe selbst, Arm T7):
+#   A  Basis vorhanden, gewuerfelter Nicht-ASCII-Koeder im Bereich   -> rc=1 ROT
+#   B  KERN: genannte Basis unaufloesbar, origin/development auf HEAD -> rc=2 ABBRUCH.
+#      rc=0 waere der stille Kettenrueckfall auf einen 0-Commit-Bereich, also genau das
+#      Dauer-Gruen, gegen das der Fix gebaut ist. Der Arm belegt VORHER am Fixture, dass der
+#      Rueckfall dort wirklich 0 Commits faende -- sonst prueft er nichts.
+#   C  gesunder Baum, Basis vorhanden, kein Koeder                    -> rc=0 GRUEN
+#   D  Variable ungesetzt, Kandidaten-Kette wie dokumentiert          -> rc=0 GRUEN
+# C und D sind GEGENKOEDER gegen ein Dauer-Rot; beide fordern zusaetzlich BEREICHSBREITE >= 1,
+# denn ein Gruen ueber einem leeren Bereich ist die stille Null selbst.
+#
+# --selbstbiss baut zwei Wegwerf-Mutanten der Wache und FORDERT, dass die Probe an ihnen rot wird:
+# M1 ohne den elif-Zweig (exakt die Mutation vom 10.08.), M2 ohne das abschliessende 'exit 1'.
+# Zwei UNABHAENGIGE Richtungen -- sonst belegte der Biss nur die Empfindlichkeit eines Arms.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
+# wie bei lint:diff-hygiene). KEIN .code-rules: die Wache und ihre Probe muessen auch in einer
+# docs-only-Welle laufen. KEIN extends: der Job braucht sh, awk, od, sed und git -- kein Compile,
+# kein Submodul.
+test:guard-basis-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; die Fixtures sind Wegwerf-Repos
+  script:
+    - sh ci/tests/guard_basis_bissprobe.sh --selbstbiss
 
 # -- D3-5 (2026-08-09): PROBE fuer die THESIS-GITLINK-PARITAETS-WACHE --
 # ci/thesis_gitlink_parity.sh haelt die beiden Einbindungen DESSELBEN Thesis-Repos gleich und wird an
@@ -447,9 +648,18 @@ test:durchstich-bissprobe:
 # deshalb eine Zeile mit dem echten Byte-Trenner und beweist ZUERST mit einem Koeder, dass sie den
 # Unterschied ueberhaupt sehen kann; Mutant M3 setzt den ASCII-Pfeil zurueck und muss daran sterben.
 #
+# DER DRITTE MODUS (D3-7b, 2026-08-10, Faelle L2b/L2c/L2d): der S3-Konformitaets-Lauf
+# (COMDARE_PRUEF_ONLY=true, je Perm aus der emittierten Kampagnen-Pipeline) baut nicht und misst
+# nicht -- er laedt jede fertige .so und faehrt nur ihr Gate. Bis D3-7b trug seine Bilanz-Zeile
+# keinen Zusatz, der Marker schrieb modus=voll, und ci/mess_ausbeute_wache.sh haette den Lauf mit
+# "0 Datenzeilen" rot gefaerbt. Der Zusatz kommt jetzt AUS DEM TREIBER (ce profile_run_entry.hpp),
+# der Marker liest ihn, und die Wache kennt pruef_only in ihrer Allowlist -- alle drei Seiten, weil
+# jede allein wirkungslos oder schaedlich waere.
+#
 # WARUM --selbstbiss IM CI: eine Probe, die nur am gesunden Objekt gruen ist, koennte immer gruen
-# sein. Der Schalter baut vier SEMANTISCHE Wegwerf-Mutanten (pruefen ohne rot / ohne
-# (provision-only)-Erkennung / ASCII-Pfeil / ohne PRUNE-TESTAT-Rueckfall) und FORDERT, dass die
+# sein. Der Schalter baut sechs SEMANTISCHE Wegwerf-Mutanten (pruefen ohne rot / ohne
+# (provision-only)-Erkennung / ASCII-Pfeil / ohne PRUNE-TESTAT-Rueckfall / ohne
+# (pruef-only)-Erkennung / ohne Fail-closed bei beiden Zusaetzen) und FORDERT, dass die
 # Probe an jedem rot wird. Alle Zahlen und Koeder kommen je Lauf aus /dev/urandom (K13).
 # KEIN allow_failure (Owner 06.07.2026: bei einer harten Pipeline gibt es kein allow_failure).
 test:lauf-marker-probe:
@@ -644,18 +854,23 @@ test:object-stat-wache-bissprobe:
 # mehrtaegigen Messlaufs, mit echten Messdaten, ohne Netz. Genau dieser Fehler ist in diesem
 # Repo schon passiert: eine Wache wurde gebaut und nirgends aufgerufen.
 #
-# WAS DIE PROBE HAELT: 10 Faelle (A1-A10) gegen die VIER stillen Transportfallen, die der Kern
-# am 09.08. geheilt hat -- Selektor traf 'result.csv' nie / 'wc -l' verwarf genau eine Datenzeile
-# / Konkatenation ohne 'awk 1' verklebte zwei Messwerte zu einem / 0-Byte-CSV stahl den Header.
-# Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu tun" aussah.
-# Der Beweis wird am ZIEL-REPO gefuehrt (git rev-list --count, git show HEAD:<pfad>), nicht am
-# Log: gefragt wird, ob der gewuerfelte Koeder im COMMITTETEN Blob steht.
+# WAS DIE PROBE HAELT: 13 fachliche Faelle (A1-A6, A8-A10, A12-A14) gegen die FUENF stillen
+# Transportfallen des Kerns -- Selektor traf 'result.csv' nie / 'wc -l' verwarf genau eine
+# Datenzeile / Konkatenation ohne 'awk 1' verklebte zwei Messwerte zu einem / 0-Byte-CSV stahl
+# den Header (alle vier 09.08.) / die Uebernahme ins Ziel-Repo wurde nie nachgezaehlt, sodass
+# "git nimmt die .tex nicht" und "nichts hat sich geaendert" dieselbe Zeile "IDEMPOTENT: 0
+# Aenderungen" bekamen (##20, 10.08.). Alle fuenf endeten mit rc=0 und einer Ausgabe, die wie ein
+# ehrliches "nichts zu tun" aussah. Der Beweis wird am ZIEL-REPO gefuehrt (git rev-list --count,
+# git show HEAD:<pfad>), nicht am Log: gefragt wird, ob der gewuerfelte Koeder im COMMITTETEN
+# Blob steht. Dazu A7 (Registrierung), A11 (kein vierter Inline-Zwilling) und seit 11.08.2026
+# A15-A18 (die zwei E-18-SNAP-Wachen, JE MIT GEGENPROBE) = 18 Faelle gesamt.
 #
 # WARUM --selbstbiss IM CI: eine Probe, die nur am gesunden Objekt gruen ist, belegt nichts. Der
-# Schalter baut SECHS Wegwerf-Mutanten des Kerns (N1-N6: alter Glob / Stand vor P4 / kein awk 1 /
-# Nenner-Zeile weg / -s-Wache weg / Leerheitspruefung offen) und FORDERT, dass jeder die Probe rot
-# macht. Am Objekt gemessen bei der Verdrahtung: 6 von 6 gebissen. Der Nenner faehrt bei jedem
-# Lauf mit, statt hier als Prosa zu verjaehren.
+# Schalter baut SIEBEN Wegwerf-Mutanten (N1-N7: alter Glob / Stand vor P4 / kein awk 1 /
+# Nenner-Zeile weg / -s-Wache weg / Leerheitspruefung offen / Uebernahme gezaehlt aber nicht
+# beurteilt) und FORDERT, dass jeder die Probe rot macht. Am Objekt gemessen bei der Verdrahtung:
+# 6 von 6, nach ##20 (10.08.) 7 von 7 gebissen. Der Nenner faehrt bei jedem Lauf mit, statt hier
+# als Prosa zu verjaehren.
 #
 # WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
 # wie bei den drei Proben darueber). KEIN .code-rules: der Kern kann ueber eine reine Aenderung an
@@ -678,6 +893,46 @@ test:anhang-forward-probe:
     GIT_SUBMODULE_STRATEGY: none   # super-eigener Kern; die Sandbox baut sich die Probe selbst
   script:
     - sh ci/tests/anhang_forward_probe.sh --selbstbiss
+
+# ── E-18-SNAP (2026-08-11): PROBE DER EINBUCHUNG -- sie misst den COMMIT, nicht das Protokoll ──
+# DER BEFUND, DER SIE ERZWUNGEN HAT. Das Paket E-18-SNAP legte den Compile-Schnappschuss unter
+# measurement/thesis_compiles/ ab -- und der Job anhang:forward stagte den Pfad NICHT. Der Kern
+# druckte "Schnappschuss abgelegt", der Job wurde gruen, der Ordner starb mit dem Runner.
+# WIRKSAMKEIT NULL bei gruenem Protokoll. Ein Log-Fall haette das nie gefunden: er haette die
+# Zeile gesehen und gruen gemeldet. Diese Probe fragt darum ausschliesslich
+#   git show HEAD:<pfad> | grep koeder_<gewuerfelt>
+# also den BLOB des Commits. Ein Beleg auf Platte zaehlt hier nicht.
+#
+# ZEHN FAELLE, BEIDSEITIG: S1 Positivfall (Koeder IM Commit) / S2 der Blocker selbst reproduziert
+# (alter Weg, nur Gitlink gestagt -> Koeder NICHT im Commit) / S3 V-8 am scharfen Objekt (eine
+# .gitignore-Regel des 288-Repos schluckt den Beleg, 'git add' bleibt still erfolgreich -- NUR das
+# Index-Orakel sieht es) / S4 Gegenprobe zu S3 ohne die Regel / S5+S6 halber Beleg auf ZWEI Achsen
+# (fehlende Datei / QUELLSTAND ohne verankerte 40-hex-SHA) / S7 .tmp-Halbstand entfernt, Nachbar
+# kommt durch / S8 ehrlicher Leerlauf / S9 Additivitaet beim zweiten Lauf / S10 Registrierung.
+#
+# WARUM --selbstbiss IM CI: drei Wegwerf-Mutanten des Prueflings (Vollstaendigkeits-Wache
+# entschaerft / Index-Orakel entfernt / 'git add' faellt weg = der Blocker als Mutation) muessen die
+# Probe ROT machen. Eine Probe ohne Mutationsbeweis ist von einer Probe, die nichts prueft, nicht
+# zu unterscheiden.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null. KEIN .code-rules:
+# S10 prueft .gitlab-ci.yml selbst -- der Aufruf der Einbuchung kann in einer docs-only-Welle
+# verschwinden, und genau dann muss sie rot werden.
+#
+# GIT_SUBMODULE_STRATEGY: none ist geprueft: die Probe legt ihre 288-Sandkaesten per mktemp -d an,
+# setzt die git-Identitaet selbst und braucht weder Submodule noch TeX-Toolchain.
+test:anhang-snapshot-einbuchen-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Datei; die Sandkaesten baut die Probe selbst
+  script:
+    - sh ci/tests/anhang_snapshot_einbuchen_probe.sh --selbstbiss
 
 # ── P4c (2026-08-09): REGISTRIERUNGS-WACHE ueber ci/tests/*.sh -- gegen eine Zirkularitaet ──
 # DER BEFUND. Jede Probe dieses Repos prueft ihre eigene Registrierung selbst (A7, F11, K9...).
@@ -1075,6 +1330,30 @@ verify:submodules:
     # Freifahrtschein -- die Begruendung steht im Kopf von ci/thesis_gitlink_parity.sh.
     - 'test -x ci/thesis_gitlink_parity.sh || { echo "FEHLER: ci/thesis_gitlink_parity.sh fehlt/nicht ausfuehrbar"; exit 1; }'
     - ci/thesis_gitlink_parity.sh --quelle head
+    # WACHEN-PARITAET (Paket r7-wachen-divergenz, 2026-08-10). Die Diff-Hygiene-Wache liegt in
+    # ZWEI Fassungen -- scripts/ci_diff_ascii_width_guard.sh hier und dieselbe Datei im ce. Sie
+    # sind bis heute unbemerkt auseinandergelaufen: gemessen am Stand super 7144f4f6 / ce-Gitlink
+    # e114cabd gaben sie auf DENSELBEN --stdin-Diff bei 3 von 5 gewuerfelten Proben verschiedene
+    # Verdikte, und die ce-Fassung reichte jedes unbekannte --wort ungelesen an `git diff` weiter
+    # (`--name-only` -> Exit 0, "GRUEN", Nenner 0 -- eine Wache, die gruen meldet, ohne
+    # hingesehen zu haben).
+    #
+    # WARUM HIER UND NICHT IN lint:diff-hygiene: dieser Job hat die Submodule in der Hand, jener
+    # faehrt GIT_SUBMODULE_STRATEGY: none -- dort ist Code/external/comdare-cache-engine ein
+    # LEERES Verzeichnis, und eine Paritaets-Wache mit nur einem Gegenstand ist keine. Sie bricht
+    # dort fail-closed ab (Exit 2), statt still gruen zu werden. Und sie steht bewusst NEBEN der
+    # Thesis-Gitlink-Paritaet: es ist dieselbe Frage (zwei Zeiger auf denselben Gegenstand duerfen
+    # nicht divergieren), nur eine Ebene hoeher -- am Werkzeug statt am Gitlink.
+    #
+    # WARUM KEIN EIGENER JOB: er kostete einen Runner-Slot, und der Owner hat am 10.08.2026
+    # ausdruecklich um weniger CI-Last gebeten. Dieser Job laeuft ohnehin und hat alles zur Hand.
+    #
+    # GRENZE, EHRLICH BENANNT: dieser Job haengt an .code-rules. Ein Bump des ce-Gitlinks weckt
+    # ihn ueber "Code/external/*"; eine Aenderung NUR an der super-eigenen Fassung weckt ihn ueber
+    # den Pfad-Eintrag, der dafuer in .code-rules ergaenzt wurde. Beide Wege sind gedeckt; ohne
+    # den zweiten waere die Wache genau fuer die Aenderung blind gewesen, die sie bewacht.
+    - 'test -x ci/wachen_paritaet.sh || { echo "FEHLER: ci/wachen_paritaet.sh fehlt/nicht ausfuehrbar"; exit 1; }'
+    - sh ci/wachen_paritaet.sh
 
 # ── Stage analyse: Auswertungswerkzeuge bauen (KEIN grosses Artefakt) ──
 analyse:thesis-data:
@@ -1362,7 +1641,27 @@ thesis:pdf:
             export COMDARE_MINIO_ENDPOINT="prodcache"   # ArtifactCache liest dies als mc-ALIAS-Namen
             echo "  Ebene B aktiv: mc-Alias=prodcache Bucket=${COMDARE_MINIO_BUCKET} (Creds via MC_HOST env, nie argv)"
           else
-            echo "  [Infra-Fehler: minio-CI-Vars unvollstaendig -> Ebene B inert, Messung laeuft weiter]"
+            # LAUTER GUARD (Infra-Bitte 10.08.2026, wichtiger als der Cache selbst):
+            # Ein gesetzter ENDPOINT ist eine ABSICHTSERKLAERUNG -- "diese Messung soll
+            # cachen". Fehlt dann ein Schluessel, lief der Job bisher GRUEN OHNE CACHE.
+            # Das ist keine Fehlermeldung, das ist eine verfaelschte Messung: die
+            # Falsch-Gruen-Klasse, die in diesem Projekt am teuersten war.
+            # UNTERSCHEIDUNG, auf die es ankommt:
+            #   ENDPOINT gesetzt + Schluessel fehlt  -> KONFIGURATIONSFEHLER, hart rot
+            #   ENDPOINT ungesetzt                   -> Ebene B gar nicht gewollt, inert ok
+            if [ -n "${COMDARE_MINIO_ENDPOINT:-}" ]; then
+              echo "  [Infra-Fehler] COMDARE_MINIO_ENDPOINT ist GESETZT, aber die Zugaenge sind unvollstaendig."
+              echo "    NENNER (welche der vier fehlt, namentlich):"
+              for _v in MINIO_ACCESS_KEY MINIO_SECRET_KEY COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET; do
+                eval "_w=\${$_v:-}"
+                if [ -n "$_w" ]; then echo "      $_v = gesetzt"; else echo "      $_v = FEHLT"; fi
+              done
+              echo "    Ein gesetzter Endpunkt heisst: diese Messung SOLL cachen. Ohne Zugang"
+              echo "    liefe sie ohne Cache weiter und saehe gruen aus -- das ist eine"
+              echo "    verfaelschte Messung, kein Infra-Hinweis. Deshalb hart rot."
+              exit 1
+            fi
+            echo "  [Ebene B nicht angefordert: COMDARE_MINIO_ENDPOINT ungesetzt -> inert, Messung laeuft weiter]"
             unset COMDARE_MINIO_ENDPOINT COMDARE_MINIO_BUCKET 2>/dev/null || true
           fi
         else
@@ -1695,6 +1994,9 @@ measure:smoke:
         . measure_out_smoke/_wide_kz.env
         rm -f measure_out_smoke/_wide_kz.env
         echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$WIDE_HEADER, davon Datenzeilen=$WIDE_DATEN), awk NR"
+        # P29 (10.08.2026): DER NENNER. Ohne ihn ist "0 Datenzeilen" nicht von "0 Quellen gelistet"
+        # zu unterscheiden -- und eine gelistete, verschwundene CSV war bis heute STILL (rc=0).
+        echo "  WIDE-Nenner: $WIDE_QUELLEN gelistet, $WIDE_MIT_DATEN voll, $WIDE_OHNE_DATEN leer, $WIDE_FEHLEND weg"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out_smoke/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out_smoke/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
@@ -1880,6 +2182,9 @@ measure:golden-320:
         . measure_out/_wide_kz.env
         rm -f measure_out/_wide_kz.env
         echo "  WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$WIDE_HEADER, davon Datenzeilen=$WIDE_DATEN), awk NR"
+        # P29 (10.08.2026): DER NENNER. Am mehrtaegigen golden-320 ist er die teuerste Zahl im Log --
+        # eine gelistete, verschwundene result.csv war bis heute STILL (rc=0, eine tail-Zeile auf stderr).
+        echo "  WIDE-Nenner: $WIDE_QUELLEN gelistet, $WIDE_MIT_DATEN voll, $WIDE_OHNE_DATEN leer, $WIDE_FEHLEND weg"
         if [ "$WIDE_DATEN" -gt 0 ]; then
           "$APP" "$WIDE" measure_out/appendix --langs=de,en || echo "appendix-generator: honest-empty/Teil-Output (n/a-Spalten) — kein Fehler"
           echo "== regenerierte Anhang-.tex =="; find measure_out/appendix -name '*.tex' 2>/dev/null | wc -l | xargs echo "  Anhang-.tex je Lauf:"
@@ -1930,8 +2235,9 @@ measure:golden-320:
 #    beide Richtungen. persist:measurements holt die Mess-Ergebnisse IN das super-Repo; anhang:forward
 #    schiebt die daraus regenerierten LaTeX-Anhang-Tabellen VORWAERTS in das Thesis-Submodul (Projekt 289)
 #    und zieht den super-Gitlink nach. Beide sind unabhaengig inert-schaltbar (COMDARE_PERSIST_MEASUREMENTS
-#    bzw. COMDARE_ANHANG_FORWARD) und schreiben auf DISJUNKTE Pfade (measurement/ vs. Gitlink) -> die
-#    beidseitigen MERGE-Retry-Schleifen koennen sich mechanisch nicht in die Quere kommen.
+#    bzw. COMDARE_ANHANG_FORWARD) und schreiben auf DISJUNKTE Pfade (measurement/<RUN_TS>/ hier gegen
+#    Gitlinks + measurement/thesis_compiles/<TS>-<kennung>/ dort) -> die beidseitigen MERGE-Retry-
+#    Schleifen koennen sich mechanisch nicht in die Quere kommen.
 persist:measurements:
   stage: persist
   tags: [baremetal]
@@ -2077,6 +2383,32 @@ persist:measurements:
 #    dem Lebend-Check (eine getriggerte Pipeline: 289-Commit sichtbar + 289-Pipeline gruen + Gitlink-Bump
 #    gelandet + KEINE Echo-Pipeline auf 288).
 #
+#    E-18-SNAP -- COMPILE-SCHNAPPSCHUSS (OWNER-KERN, Ledger frueh-6, VERBATIM): "in Zukunft soll die
+#    Diplomarbeit einerseits fertig auf den branch gepusht werden, aber andererseits wird sie
+#    zusaetzlich in einen Ordner an der Wurzel der Messwerte kopiert, samt latex compile-export
+#    (Benennung nach Datum und Uhrzeit). so laesst sich ein compile nachvollziehen."
+#    UMSETZUNG OHNE ZWEITEN COMPILE: das PDF-Gate baut die Thesis-PDF ohnehin schon im 289-Klon --
+#    der Kern ERNTET dieses Bau-Produkt nach measurement/thesis_compiles/<JJJJMMTT-HHMMSS>-<kennung>/
+#    mit <haupt>.pdf + compile-export.txt + QUELLSTAND.txt (289-SHA + 288-SHA + Kanal-Lauf-ID).
+#    WER IHN EINBUCHT (und warum das eine eigene Datei ist): ci/anhang_snapshot_einbuchen.sh, gerufen
+#    aus Block (4b) unten. Der erste Entwurf dieses Pakets liess die Einbuchung WEG -- der Ordner
+#    entstand im Runner-Workspace, der Job wurde gruen, und alles war am Pipeline-Ende verloren.
+#    WIRKSAMKEIT NULL bei gruenem Protokoll; genau die Fehlerklasse, gegen die dieses Repo baut.
+#    Die Einbuchung liegt darum NICHT als YAML-Text hier, sondern in einer probefaehigen Datei:
+#    ci/tests/anhang_snapshot_einbuchen_probe.sh misst den COMMIT (git show HEAD:<pfad>) und nicht
+#    das Protokoll, mit gewuerfeltem Koeder in beide Richtungen. Dieselbe Begruendung wie bei
+#    ci/persist_sammler.sh: Logik in einem YAML-Block ist nicht testbar.
+#    GRENZE (bewusst): OHNE Compile KEIN Schnappschuss. Ueberspringt AF_PDF_GATE (auto ohne
+#    TeX-Toolchain) oder ist es off, entsteht kein Bau-Produkt; der Kern sagt das literal, statt
+#    einen leeren Ordner anzulegen. Die AF_PDF_GATE-Semantik ist dadurch UNVERAENDERT.
+#    ADDITIV: der Ordnername traegt die Lauf-Kennung r<RUNNER>-j<JOB>, ist also runneruebergreifend
+#    eindeutig; ein bestehender Ordner wird NIE ueberschrieben und NIE geloescht (Messdaten-Doktrin).
+#    NACHHOLUNG: der Beleg haengt NICHT am Anhang-Byte-Delta. Ein Lauf, der 289 pusht und vor dem
+#    Writeback stirbt, hinterlaesst einen 289-Stand ohne Compile-Beleg; der naechste Lauf erkennt das
+#    und holt NUR den Beleg nach -- ohne 289-Commit, ohne Push. Darum haengt der Frueh-Abbruch in
+#    Block (4) nicht mehr allein am Gitlink, und die Commit-Botschaft wird aus dem GESTAGTEN Ist
+#    gebildet statt pauschal behauptet.
+#
 #    INFRA-VORAUSSETZUNG (Handout 2026-08-05, E-20-Kanal): EIGENES Write-Token AUF PROJEKT 289
 #    (COMDARE_THESIS_WRITEBACK_USER / COMDARE_THESIS_WRITEBACK_TOKEN; write_repository-only, Rolle
 #    Developer, masked+hidden+protected). BEWUSST NICHT das 288-Token (COMDARE_WRITEBACK_USER/TOKEN,
@@ -2120,6 +2452,10 @@ anhang:forward:
         echo "FEHLER: 288-Write-Credential fehlt -> der Gitlink-Bump koennte nicht landen"; exit 1
       fi
       test -x ci/anhang_forward_core.sh || { echo "FEHLER: ci/anhang_forward_core.sh fehlt/nicht ausfuehrbar"; exit 1; }
+      # E-18-SNAP: die Einbuchung des Compile-Schnappschusses liegt in einer EIGENEN Datei
+      # (probefaehig, s. ci/tests/anhang_snapshot_einbuchen_probe.sh). Fehlt sie, bricht der
+      # Job VOR dem 289-Klon ab -- sonst entstuende ein Schnappschuss, den niemand einbucht.
+      test -x ci/anhang_snapshot_einbuchen.sh || { echo "FEHLER: ci/anhang_snapshot_einbuchen.sh fehlt/nicht ausfuehrbar"; exit 1; }
       # P4c: der Kern holt sich die WIDE-Konkatenation aus ci/wide_aggregat.sh (dieselbe Datei,
       # die measure:smoke und measure:golden-320 rufen). Er prueft sie selbst und bricht fail-loud
       # ab, wenn sie fehlt -- diese Zeile zieht den Abbruch nur VOR den 289-Klon.
@@ -2142,6 +2478,12 @@ anhang:forward:
         "$THESIS_CLONE"
       echo "289-Klon auf development: $(git -C "$THESIS_CLONE" rev-parse --short HEAD)"
       # -- (3) KERN: Quellen-Kaskade + Whitelist-Kopie + Idempotenz + Commit + Push (ci/anhang_forward_core.sh) --
+      #    EINE QUELLE fuer die Schnappschuss-Wurzel: derselbe Pfad geht als AF_SNAPSHOT_ROOT in
+      #    den Kern und als Argument in die Einbuchung unten. Stuende er zweimal hart da, bekaeme
+      #    jeder, der AF_SNAPSHOT_ROOT umsetzt, den Ordner still nie eingebucht.
+      #    KONTRAKT: repo-relativ unter $CI_PROJECT_DIR, sonst kann git ihn nicht stagen. Der Kern
+      #    setzt denselben Vertrag ueber AF_SNAP_ROOT_STRICT durch und sagt es literal.
+      SNAP_DIR="measurement/thesis_compiles"
       AF_DEST_REPO="$THESIS_CLONE" \
       AF_BRANCH="development" \
       AF_LANGS="de,en" \
@@ -2154,10 +2496,14 @@ anhang:forward:
       AF_PROV_PIPELINE_URL="${CI_PIPELINE_URL:-NA}" \
       AF_PROV_SUPER_SHA="${CI_COMMIT_SHA:-NA}" \
       AF_PROV_SUPER_REF="${CI_COMMIT_REF_NAME:-NA}" \
+      AF_SNAPSHOT_ROOT="$CI_PROJECT_DIR/$SNAP_DIR" \
+      AF_SNAP_REMOTE_BRANCH="${CI_COMMIT_BRANCH:-${CI_COMMIT_REF_NAME:-NA}}" \
         ci/anhang_forward_core.sh
       NEW_THESIS_SHA=$(git -C "$THESIS_CLONE" rev-parse HEAD)
       echo "289-HEAD nach dem Kanal: $NEW_THESIS_SHA"
-      # -- (4) Gitlink-Bump auf 288 -- NUR wenn sich 289 wirklich bewegt hat (sonst kein Leer-Commit) --
+      # -- (4) 288-Writeback: Gitlink-Bump + E-18-SNAP-Compile-Schnappschuss (EIN Commit) --
+      # Beides gehoert in DENSELBEN Commit, weil beides denselben Lauf belegt: der Gitlink sagt, WELCHER
+      # 289-Stand gilt; der Schnappschuss belegt, WIE dessen PDF entstanden ist.
       # BEIDE Thesis-Gitlinks (Paket b-ci-rueckschrieb-beide-zeiger, 2026-08-06): .gitmodules bindet DASSELBE
       # Repo zweimal ein. Bis zu diesem Paket bumpte der Job nur thesis/diplomarbeit -- die CI ERZEUGTE die
       # Divergenz damit bei jedem Rueckschrieb selbst und still. Der zweite Bump ist bewusst GENAUSO fehlerhart
@@ -2172,30 +2518,63 @@ anhang:forward:
         echo "Gitlink $_p: alt=$_old neu=$NEW_THESIS_SHA"
         [ "$_old" = "$NEW_THESIS_SHA" ] || _need_bump=1
       done
-      if [ "$_need_bump" -eq 0 ]; then
-        echo "=== anhang:forward OK: BEIDE Thesis-Gitlinks bereits aktuell -> kein Bump-Commit ==="; exit 0
+      # E-18-SNAP: der Frueh-Abbruch darf NICHT mehr allein am Gitlink haengen. Der Kern liefert
+      # einen Compile-Beleg auch OHNE Gitlink-Bewegung (Nachhol-Modus nach abgerissenem Vorlauf);
+      # entschiede hier weiter nur der Gitlink, ginge genau dieser Beleg still verloren -- und der
+      # Owner-KERN lautet "so laesst sich ein compile nachvollziehen".
+      _snap_offen=$(ci/anhang_snapshot_einbuchen.sh ausstehend "$SNAP_DIR")
+      echo "E-18-SNAP: ausstehende Schnappschuss-Pfade: $_snap_offen"
+      if [ "$_need_bump" -eq 0 ] && [ "$_snap_offen" -eq 0 ]; then
+        echo "=== anhang:forward OK: BEIDE Thesis-Gitlinks aktuell + kein neuer Schnappschuss -> kein Commit ==="; exit 0
       fi
       git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
       git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
       git fetch origin "$CI_COMMIT_BRANCH"
+      # untracked measurement/ ueberlebt das checkout -B (gleiche Mechanik wie persist:measurements)
       git checkout -B "$CI_COMMIT_BRANCH" "origin/$CI_COMMIT_BRANCH"
+      # BEIDE Gitlinks werden gemeinsam gesetzt, sobald EINER abweicht -- nie nur einer.
       for _p in $THESIS_GITLINKS; do
         git update-index --cacheinfo 160000 "$NEW_THESIS_SHA" "$_p"
       done
       # NACHBEDINGUNG am Objekt statt Vertrauen in die Schleife: derselbe Pruefkoerper, den auch
       # verify:submodules ruft -- hier gegen den INDEX und mit --erwartet. Schlaegt er an, bricht der Job ab,
       # BEVOR ein halb gebumpter Commit entsteht (fail-closed; ein fehlender Pfad ist dort ebenfalls FEHLER).
+      # Sie laeuft AUCH im reinen Schnappschuss-Fall (_need_bump=0): dann sind beide Gitlinks ohnehin
+      # schon NEW_THESIS_SHA, und die Wache belegt genau das -- ein Schnappschuss-Commit darf den
+      # Zeiger unter keinen Umstaenden rueckwaerts setzen.
       test -x ci/thesis_gitlink_parity.sh || { echo "FEHLER: ci/thesis_gitlink_parity.sh fehlt/nicht ausfuehrbar"; exit 1; }
       ci/thesis_gitlink_parity.sh --quelle index --erwartet "$NEW_THESIS_SHA"
-      if git diff --cached --quiet; then echo "Gitlinks unveraendert (Race) -> kein Commit"; exit 0; fi
-      git commit -m "thesis(E-18): BEIDE Gitlinks auf ${NEW_THESIS_SHA} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
+      # -- (4b) E-18-SNAP: den Compile-Schnappschuss in DENSELBEN Commit einbuchen --
+      # Der Kern LEGT ihn nur an; hierher gehoert die Uebernahme in das super-Repo. Die Datei
+      # prueft Vollstaendigkeit (kein halber Beleg), raeumt .tmp-Halbstaende und zaehlt nach dem
+      # 'git add' gegen den INDEX nach -- eine .gitignore-Regel wuerde den Beleg sonst still
+      # schlucken und der Job bliebe gruen OHNE Beleg. Sie ist fail-loud; kein '|| true'.
+      ci/anhang_snapshot_einbuchen.sh stagen "$SNAP_DIR"
+      if git diff --cached --quiet; then echo "weder Gitlinks noch Schnappschuss veraendert (Race) -> kein Commit"; exit 0; fi
+      # COMMIT-TEXT NIE LUEGEN: die Botschaft nennt genau das, was GESTAGT ist. Ein pauschales
+      # "Gitlinks + Schnappschuss" waere im Nachhol-Fall (Gitlinks unbewegt) und im reinen
+      # Bump-Fall (kein Beleg) schlicht falsch -- und der Git-Log ist Beweismittel.
+      _snap_staged=$(git diff --cached --name-only -- "$SNAP_DIR" | awk 'END{print NR+0}')
+      _link_staged=$(git diff --cached --name-only -- $THESIS_GITLINKS | awk 'END{print NR+0}')
+      echo "GESTAGT: gitlink_dateien=$_link_staged schnappschuss_dateien=$_snap_staged"
+      if [ "$_link_staged" -gt 0 ] && [ "$_snap_staged" -gt 0 ]; then
+        _msg="thesis(E-18): BEIDE Gitlinks auf ${NEW_THESIS_SHA} + Compile-Schnappschuss (${_snap_staged} Datei(en))"
+      elif [ "$_link_staged" -gt 0 ]; then
+        _msg="thesis(E-18): BEIDE Gitlinks auf ${NEW_THESIS_SHA} (kein neuer Compile-Schnappschuss)"
+      else
+        _msg="thesis(E-18): Compile-Schnappschuss (${_snap_staged} Datei(en)), Gitlinks unveraendert bei ${NEW_THESIS_SHA}"
+      fi
+      git commit -m "${_msg} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
       for attempt in 1 2 3 4 5; do
         if git push -o ci.skip origin "HEAD:$CI_COMMIT_BRANCH"; then
-          echo "=== anhang:forward OK: Gitlink gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
+          echo "=== anhang:forward OK: 288-Writeback gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
         fi
         echo "push abgelehnt (non-ff-Race gegen persist:measurements) -> fetch + MERGE (kein rebase) + retry ($attempt)" >&2
         git fetch origin "$CI_COMMIT_BRANCH"
-        # Pfade disjunkt (Gitlink vs measurement/) -> Merge mechanisch konfliktfrei; [skip ci] auch im Merge-Commit.
+        # Pfade disjunkt (Gitlinks + measurement/thesis_compiles/<TS>-<kennung>/ hier gegen
+        # measurement/<RUN_TS>/ beim Schwester-Job; die Lauf-Kennung traegt Runner+Job, also kann
+        # auch kein zweiter anhang:forward denselben Ordnernamen waehlen)
+        # -> Merge mechanisch konfliktfrei; [skip ci] auch im Merge-Commit.
         if ! git merge --no-edit -m "Merge origin/$CI_COMMIT_BRANCH in anhang-forward-gitlink [skip ci]" "origin/$CI_COMMIT_BRANCH"; then
           git merge --abort || true
           echo "UNerwarteter Merge-Konflikt (Versuch $attempt) -> echter Bug, Abbruch (kein --force)" >&2; exit 1

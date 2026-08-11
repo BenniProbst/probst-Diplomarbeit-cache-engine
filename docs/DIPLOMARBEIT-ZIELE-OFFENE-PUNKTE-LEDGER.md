@@ -16,6 +16,3412 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 10.08.2026 SPAETABENDS -- KORREKTUR AN KON4-10: ES GIBT KEINEN STEMPEL-RISS
+
+**Dieser Nachtrag widerruft eine Aussage, die ich WENIGE STUNDEN VORHER selbst in denselben
+Ledger geschrieben habe.** KON4-10 bleibt woertlich stehen; er ist ab hier ueberholt.
+
+### KON5-01 -- WAS KON4-10 BEHAUPTETE UND WARUM ES FALSCH IST
+
+KON4-10 sagte: "measurement_line ist leer, weil der Perm-Pfad den 2-arg-Zweig von
+COMDARE_ANATOMY_VERSION_STAMP trifft. Fix: den 3-arg-Zweig treffen."
+
+**Am Objekt widerlegt.** Die Kette ist korrekt verdrahtet, vollstaendig verfolgt:
+
+    profile_run_entry.hpp:482    ruft make_lazy_adhoc_source_gen_from_env()   RICHTIG
+    lazy_adhoc_source_gen:312    liest COMDARE_MEASUREMENT_COMBO aus der Umgebung
+    lazy_adhoc_source_gen:221    make_lazy_adhoc_source_gen(measurement_stamp = {})
+    adhoc_emitter.hpp:122        if (measurement_stamp.empty()) -> 2-arg, sonst 3-arg
+
+Und der Kommentar an der Aufrufstelle (profile_run_entry.hpp:480-482) sagt es woertlich:
+
+    "S6-P1b Env-Bruecke (e): die vom Planer gewaehlte Mess-Combo reist via
+     COMDARE_MEASUREMENT_COMBO in den lazy Source-Gen -> die je-Combo-Bauten stempeln
+     ihre DLLs REAL. UNGESETZT/[all] => "" => byte-identische Quellen"
+
+**Der leere Mess-Stempel bei ungesetzter Combo ist dokumentiertes SOLLVERHALTEN.** Er schuetzt
+den golden-320-Pfad vor Byte-Drift. Die Verzweigung ist korrekt. Das Prueff-Dock-Gate hat
+KORREKT angeschlagen -- es meldete eine leere Mess-Deklaration, was bei einer ECHTEN Messung ein
+Fehler waere. Der Durchstich-Agent hatte die Variable nicht gesetzt.
+
+**Es gibt keinen Code-Riss zu heilen. Ich haette einen funktionierenden Mechanismus
+"repariert".**
+
+### KON5-02 -- DIE FEHLERKLASSE, und sie ist dieselbe wie in KON4-09
+
+KON4-09 haelt fest: "Der Plan ist keine Quelle ueber den Code. Er ist eine Behauptung ueber
+ihn." Genau dasselbe gilt fuer MEINEN EIGENEN Postenschnitt. Ich hatte den Agentenbericht
+("der Perm-Pfad trifft den 2-arg-Zweig") uebernommen, ohne die Kette zu Ende zu verfolgen --
+also die Klasse V1: ein Bericht ist Beweismaterial, kein Beweis.
+
+Was den Fehler gefangen hat: der Kern-Explore, angewandt auf den EIGENEN Posten. Die Regel
+gilt nicht nur fuer geerbte Aufgaben, sondern auch fuer selbst geschriebene.
+
+### KON5-03 -- DIE RICHTIGE AUFGABE, neu geschnitten
+
+    (A) DURCHSTICH: der Mini-Lauf muss COMDARE_MEASUREMENT_COMBO setzen -- die vom Planer
+        gewaehlte Combo. ZU PRUEFEN: emittiert der CEB sie in die Mess-Jobs? Im
+        cache_engine_builder_iterator.hpp erscheint sie in ZWEI Kommentaren (:152, :347),
+        nicht als sichtbare Emission. DAS ist die Luecke, nicht der Emitter.
+    (B) GATE-SCHAERFE (Haertung, kein Riss): unterscheidet das Prueff-Dock zwischen
+        "Provisionierungs-Lauf ohne Combo" (legitim) und "Mess-Lauf ohne Combo" (Fehler)?
+
+### KON5-04 -- DIE REIHENFOLGE BLEIBT OFFEN, ALS OWNER-VORLAGE (nicht als Bau)
+
+Die Owner-Anweisung "system vorn, organ hinten" ist von diesem Befund UNBERUEHRT und weiterhin
+gueltig. Sie trifft aber DREI Ebenen mit sehr verschiedenen Kosten:
+
+    (1) Makro-Argumente        anatomy_module_abi_v1.hpp:213 / :162
+        KOSTEN: der emittierte Quelltext aendert sich -> die 320er-Byte-Identitaets-Wachen
+        (adhoc_emitter.hpp:119 benennt sie selbst). 88 Test-Dateien tragen
+        golden/CRC/Roundtrip, 16 fassen Stempel oder Fingerprint an. Neuer golden-Stand noetig.
+
+    (2) POD-Feldreihenfolge    anatomy_module_abi_v1_decl.hpp:200
+        KOSTEN: ABI-BRUCH. stamp_layout_version 6 -> 7, jeder Loader, jede vendorierte DLL,
+        alle Tier-Binaries neu.
+
+    (3) Preimage-Glied-Folge   anatomy_fingerprint.hpp:601, Glied-Count FEST = 9
+        KOSTEN: JEDER SHA-512-FINGERPRINT AENDERT SICH -- alle Lager-Anker, alle
+        .fingerprint-Sidecars, jeder binary_id-Bezug. Der teuerste Bruch des Systems.
+
+EMPFEHLUNG: Option (1). Der Owner-Satz fiel im Kontext des EMITTIERTEN Makro-Calls, und die
+Stufen-Ordnung ist eine Aussage ueber die lesbare Form des Stempels, nicht ueber die
+Byte-Reihenfolge einer Hash-Eingabe. Guenstigster Moment: zusammen mit einer ohnehin faelligen
+Aenderung am emittierten Quelltext -- EIN golden-Bruch statt zwei.
+
+OFFEN UND NICHT ZU RATEN: wo die MESS-Stufe steht. Der Satz ordnet nur system und organ.
+
+### KON5-05 -- ZEHN-WOCHEN-EXPLORE GEFAHREN: es gab NIE eine Festlegung
+
+Der gesamte Bestand hat organ zuerst -- Makro, POD, Preimage, und das Enum
+AxisKind{organ, system_measurement, system_config} (axis.hpp:17-21).
+
+Ledger flach durchsucht (2.734.392 Byte, tr '\n' ' ' gegen die Zeilenumbruch-Falle):
+
+    "Preimage-Ordnung"      0
+    "feste Preimage"        0
+    "system vor organ"      0
+    "Stempel-Reihenfolge"   1   -- und dieser Treffer meint die Reihenfolge der 18
+                                   ORGAN-ACHSEN INNERHALB der Organ-Zeile, nicht organ-vs-system
+
+**Die Owner-Anweisung ist eine NEUORDNUNG, keine Wiederherstellung.** Das ist fuer die
+Kostenabwaegung wesentlich: es gibt keinen frueheren Zustand, zu dem man zurueckkehrt.
+
+### KON5-06 -- NEBENFUND: die Diff-Hygiene-Wache existiert in ZWEI Fassungen
+
+Beim Fahren aufgefallen (sie brach mit "Unbekannte Option '--bereich'" ab):
+
+    ce     scripts/ci_diff_ascii_width_guard.sh   779 Zeilen  sha1 6d98605a62ee  --bereich
+    super  scripts/ci_diff_ascii_width_guard.sh   558 Zeilen  sha1 0014fe29648c  --seit-basis --bestand
+
+Dieselbe Datei, derselbe Zweck, zwei Fassungen -- der Abschrift-Fall, gegen den B-3 gebaut ist,
+im Wachen-Werkzeug selbst. Heute knallt es nicht, weil die Optionsnamen sich unterscheiden und
+ein falscher Aufruf sauber abbricht. Das ist Glueck, keine Konstruktion. Gefaehrlich bleibt:
+`--stdin` gibt es in BEIDEN -- der einzige gemeinsame Pfad, mit moeglicherweise
+unterschiedlichem Verhalten und ohne Abbruch. Und ce hat 221 Zeilen MEHR: beim super-main-FF
+misst also eine schwaechere Wache, und beide drucken "GRUEN".
+## NACHTRAG 10.08.2026 ABENDS -- DIE SIEBEN KERN-EXPLORES: KEIN EINZIGES "STIMMT"
+
+**Anlass, Owner verbatim 10.08.:** "Jede Verarbeitung braucht vorne einen Explore, ob ueberhaupt
+der KERN ihrer Aufgabe stimmt, sonst muessen wir die DEFINITION der Aufgabe korrigieren."
+
+Daraufhin bekam jedes Paket der F1-Kette eine Pflicht-Stufe 0 mit vier zulaessigen Urteilen,
+als Pflichtfeld im Schema. Gefahren als Workflow wf_e22d25ef-71c, 11 Agenten, 0 Fehler.
+
+    SCHON_ERLEDIGT     5    D1b - D2-G1 - D3-7 - D3-3 - ##23
+    STIMMT_TEILWEISE   2    ##08 - ##20+D3-6
+    STIMMT             0
+
+Fuenf von sieben Paketen waeren neu gebaut worden, obwohl sie fertig sind. Jeder Neubau haette
+eine ZWEITE WAHRHEIT neben der bestehenden erzeugt und deren gefahrene Koeder entwertet.
+
+Vollstaendige Fassung mit allen Belegen: Fussnote **F1-KERN** in
+docs/plaene/20260808-WELLENPLAN-ENDFASSUNG-v2-geschaerft-fable5.md.
+
+### KON4-01 -- LEDGER-KORREKTUR: die D2-G1-Zeile war falsch UND gefaehrlich
+
+Ledger-Zeile 2626 sagt: "zwei gegenstandslos -- D2-G1 durch den W-1-Wurzelfix geheilt, D1b
+durch eine Bauweg-Aenderung ueberholt."
+
+**Der D2-G1-Teil dieses Satzes ist am Objekt falsch.** Er verharmlost die Fehlerklasse. Richtig:
+
+    Es waren ZWEI unabhaengige Defekte, nicht einer.
+      (a) enable_testing()-Reihenfolge  -> keine CTestTestfile.cmake  (W-1-Wurzelfix)
+      (b) gtest_discover_tests-Defekt   -> vom Wurzelfix ERST SICHTBAR GEMACHT
+
+Der Wurzelfix hat (a) geheilt und dabei (b) als NOT_BUILT-Daueralarm freigelegt. Geschlossen
+wurde (b) zwei Tage spaeter mit **ce ca6d8af1** ("D2-G1: die zwei gtest-Binaries unter libs/
+nach dem Repo-Muster registrieren"). SELBST GEPRUEFT: der Commit existiert und ist Vorfahr von
+origin/development.
+
+**Geltende Fassung:** "D2-G1 war NICHT gegenstandslos -- der Wurzelfix legte einen zweiten,
+unabhaengigen Defekt frei (gtest_discover_tests), der am 10.08. mit ca6d8af1 geschlossen wurde."
+
+**Warum das zaehlt:** ein Satz, der einen zweiten Defekt als "gegenstandslos" fuehrt, loescht
+genau die Information, die beim naechsten Mal noetig waere. Ein Wurzelfix, der etwas sichtbar
+macht, ist keine Heilung des Sichtbargewordenen.
+
+### KON4-02 -- die 27 ist heute 30
+
+test_commands.cpp = 23, test_engine_adapters.cpp = 7. SELBST NACHGEZAEHLT aus dem Git-Index
+(git show HEAD:<pfad>, ^TEST(_F|_P)?\(). Die "20+7=27" war der Stand von 759b695a (06.07.);
+am 09.08. kamen mit cc9c233e/905bd1aa drei Welch-Faelle dazu.
+
+### KON4-03 -- D1b IST ZU STREICHEN, nicht zu bauen
+
+Die Messung des Plans stimmt, die Schlussfolgerung nicht.
+
+    grep -c -F "adhoc_emitter" .gitlab-ci.yml        = 0    (Gegenprobe comdare_tests = 10)
+
+ABER: es gibt keine Prebuild-Liste mehr, in die man ihn eintragen koennte. SELBST GEMESSEN:
+
+    aktive Zeile  ^\s*COMDARE_TEST_PREBUILD_TARGET   = 0
+    GEGENPROBE    ^\s*COMDARE_TEST_CMAKE_BUILD_DIR   = 1    (die Null traegt)
+    Vorkommen gesamt                                  = 2, BEIDE in Kommentaren
+
+Die verlangte Massnahme wuerde die am 08.08. bewusst zurueckgebaute Fehlerklasse -- eine
+Handliste neben dem Bauweg -- wieder einfuehren.
+
+**Was stattdessen offen ist**, vom CI-File selbst benannt (ce/.gitlab-ci.yml:934-938,
+Kommentar "OFFEN (eigenes Paket)"): test:unit veroeffentlicht seit D1c seine Inventur als
+build/Testing/ctest_unit_inventar.txt -- DER VERBRAUCHER FEHLT. test:coverage-guard liegt in
+Stage 'contract', test:unit in Stage 'test'; needs darf nicht vorwaerts zeigen (17 needs-Kanten,
+0 vorwaerts). Das ist ein STAGE-TOPOLOGIE-Posten, kein Prebuild-Posten.
+
+### KON4-04 -- der Selektor ist NICHT MEHR DISJUNKT (Wellenplan Z.67 ueberholt)
+
+Der Plan behauptet: "der anhang:forward-Selektor (*.result.csv) trifft die Produktions-Ablage
+(result.csv) NIE -- die Muster sind disjunkt, nachgemessen."
+
+SELBST GEMESSEN, ci/anhang_forward_core.sh:202:
+
+    AF_RESULT_NAMEN="${AF_RESULT_NAMEN:-result.csv *.result.csv}"
+
+BEIDE Formen, EINE Definition, drei Verwendungen. Gelandet mit 6d2e3dce (09.08.), in
+origin/development; der Kopf der Datei fuehrt den alten Zustand als geheilte Falle F1 (:41-45)
+namentlich. Selbstbiss am unveraenderten Stand gefahren: "11 Faelle, 11 gehalten, 0 gerissen"
+und "6 von 6 Mutanten haben die Probe rot gemacht".
+
+**D3-6 ist damit erledigt.**
+
+### KON4-05 -- ##08: der Auftrag hat einen NAMEN missverstanden
+
+"lazy_csv_header" -- das Wort "lazy" ist das Praefix der lazy-LAUF-Familie
+(run_lazy_static_then_dynamic, LazyRunConfig, LazyMeasuredRow, lazy_try_resume_binary), es ist
+KEIN Emissionsverhalten. Und "EINMAL" im Postentitel heisst "EINE Definition" (B-3 =
+Abschrift-Beseitigung), nicht "einmal geschrieben". Nenner: 3531 durchsuchte C/C++-Dateien,
+1 Definition (cache_engine_builder_iterator.hpp:504).
+
+Eine gebaute lazy-Header-Emission wuerde ci/mess_ausbeute_wache.sh:186-190 modus-blind rot
+machen und das N_LEER-Signal loeschen. **NIE BAUEN.**
+
+Schema-Freeze Stufe 1 + B-3 sind erledigt (schema_freeze.hpp Kopf "2026-08-09",
+kWideSchemaFreezeStufe1 = 189 Spalten, zwei gtests, Ledger:4079 03f897dd).
+
+### KON4-06 -- ##20: die VORSCHRIFT ist falsch, nicht der Code
+
+##20 sagt "`|| true` beim git add faellt". Am Objekt: rc=128 bei JEDEM DE-only-Lauf -- genau
+deshalb stand die Zeile jahrelang so. Ein blindes Entfernen macht den Kanal rot.
+
+### KON4-07 -- ##23: der Auftrag vermischte ZWEI Nahtstellen
+
+    (A) ergebnis_mappe_naht.hpp   die Mappe IM LAUF, Richtung xlsx -> csv
+    (B) tools/mess_report/        ein CLI, das eine BESTEHENDE Mess-CSV liest
+
+Der Postentitel "Mess-CSV -> xlsx" beschreibt (A) falsch herum -- die Owner-Doktrin ist
+xlsx -> csv, die Mappe entsteht zuerst. Alle vier Teile sind gebaut, die Abnahme wurde gegen
+das ECHTE 320er-Archiv gefahren.
+
+**Restposten R1, Blocker fuer jede echte Kampagne:** die acht vendorierten thesis_profiles sind
+xlsx-blind (mit_xlsx=1 ohne_xlsx=8 ueber Nenner 9). Der Gitlink wurde am 10.08. auf e114cabd
+gehoben (super 0e11e1f8); ob das den geforderten Stand >= 4a26b6a3 einschliesst, ist beim Bau
+NEU AUSZUZAEHLEN, nicht anzunehmen.
+
+### KON4-08 -- FUENF NEU GESCHNITTENE RESTPOSTEN, keiner davon vermessen
+
+    Stage-Topologie   der Verbraucher der test:unit-Inventur fehlt (aus D1b)
+    D3-7b             der dritte Modus (pruef_only) fehlt in der Treiber-Bilanzzeile
+    D3-3b             eine LEERZEILE ist kein Messwert -- drei Dateien in EINEM Commit
+    ##20-B            die Vorschrift korrigieren, nicht den Code
+    ##23-R1           die acht vendorierten Profile sind xlsx-blind
+
+Die alten Aufwaende (D1b 1,5 h, D2-G1 2 h) fallen. Die Restposten duerfen NICHT stillschweigend
+als gleich teuer gefuehrt werden.
+
+### KON4-09 -- DIE ALLGEMEINE LEHRE, und sie ist teuer bezahlt
+
+Derselbe Kern-Explore lief im Hauptstrang-Workflow NICHT vorgeschaltet, sondern erst beim
+Bauen. Dort war in FUENF VON FUENF Faellen der Bauauftrag am Objekt falsch, weil er aus Plaenen
+und Ledger-Zitaten gebaut war, die selbst veraltet sind. Vier der fuenf Bauenden haben ihren
+eigenen Auftrag widerlegt und damit einen Fehlbau verhindert.
+
+**Der Plan ist keine Quelle ueber den Code. Er ist eine Behauptung ueber ihn.**
+
+Schaerfster Einzelbeleg (P5): der Ledger korrigierte in KON2-15 eine tote Zeilennummer -- auf
+eine ZWEITE tote Zeilennummer. Drei Zahlen fuer einen unveraenderten Satz, die mittlere
+geschrieben von jemandem, der gerade eine tote Zahl reparierte.
+
+### KON4-10 -- STEMPEL: SYSTEM VORN, ORGAN HINTEN (Owner 10.08.)
+
+> "system sollte immer vorn stehen und organ hinten. Das entspricht der Anordnung der Stufen."
+
+Die Argument-Reihenfolge bildet die Stufen-Ordnung ab: System gibt frei, Organ setzt durch --
+die Freigabe steht vorn. Verwandt und begruendend: System-Achsen = Freigabe, Organ-Achsen =
+Durchsetzung.
+
+**Der IST-Stand ist falsch herum**, gemessen im F1-Durchstich am erzeugten perm.cpp:
+
+    COMDARE_ANATOMY_VERSION_STAMP("<organ>", "<system>")     <- ORGAN zuerst
+
+Und die 2-arg-Form ist in anatomy_module_abi_v1.hpp:213 definiert als _M(organ, system, "") --
+mit LEEREM Mess-Stempel. Die 3-arg-Vollform steht daneben (:162); adhoc_emitter.hpp hat beide
+Zweige (:124 / :131), Verzweigung an if (measurement_stamp.empty()).
+
+Gemessen im Tier-Binary (eigenes dlopen, FREMDE Quelle -- nicht die Gate-Meldung):
+
+    organ_line        len=666, 18 Eintraege   belegt
+    system_line       len=101                 belegt
+    measurement_line  len=0                   LEER
+
+Deshalb bricht die Kette an Stufe 1: fehlerklasse=mess_konsistenz status=deklaration_leer,
+haupt_ist=0 haupt_soll=3.
+
+**ZWEI Aenderungen, nicht eine.** Wer nur den leeren Mess-Stempel heilt, zementiert die
+Stufen-Ordnung falsch. OFFEN und vor dem Bau zu klaeren, nicht zu raten: wo die MESS-Stufe in
+der Reihenfolge steht -- der Owner hat in diesem Satz nur System und Organ geordnet.
+
+### KON4-11 -- die Kette bis ##25 ist LEER
+
+Nach diesen Urteilen sind alle Vorglieder des Durchstichs erledigt oder gestrichen. Der
+Durchstich haengt nicht mehr an ihnen, sondern allein an KON4-10. **Das ist der einzige
+verbleibende Blocker vor F1 (Fr 14.08.).**
+## LEDGER-KONSOLIDIERUNG III -- 10.08.2026, Session-Log-Durchgang
+
+Auftrag Owner 10.08.2026: "Bitte pruefe auch den gesamten Kontext auf alle anderen Probleme, die
+noch persistiert werden muessen und schreibe sie direkt nieder. Wiederhole das aus dem session log
+mit den letzten 5 Kontexten."
+
+Gegenstand sind NUR Probleme: gefundene und nicht behobene Defekte, Wachen die nicht beissen,
+gebrochene Zusagen, abgebrochene Straenge, Widersprueche zwischen Messungen, Werkzeugfallen ohne
+Register, Fristen ohne Nachverfolgung. Owner-Entscheide sind in KON-01..66 und KON2-01..36 gebucht
+und werden hier nicht wiederholt.
+
+VERFAHREN. Zwei Rohtranskripte mit 143.097 Zeilen / 478 MB, zeilenweise mit einem Python-Filter
+gelesen, nie am Stueck. Sieben Musterklassen, je Klasse ein eigener Durchlauf ueber beide Dateien:
+harte Defekt-Signale (865 Treffer), Defekt/Rot (2587), Widerspruch (4426), Frist (2119), Strang-
+Abbruch (764), Werkzeugfalle (3710). Jede Ledger-Probe gegen eine geflachte Kopie
+(`tr '\n' ' '`, 2.696.353 Byte), mit `/usr/bin/grep -o -i -F | wc -l`, nie mit dem blanken `grep`
+(das ist ugrep 7.5.0 und zaehlt anders). Gegenprobe je Lauf: "Ledger" 781, "OWNER" 1288,
+"Pruefung" 94 gegen "Pruefung" mit Umlaut 82 -- die Suche greift, und beide Schreibungen sind
+abgedeckt.
+
+AUFLAGE EINGEHALTEN. Es wurde zu keinem Zeitpunkt nach Token-WERTEN gesucht und keiner ausgegeben.
+Der Extraktor traegt einen Redaktionsfilter, der jede Ausgabe vor dem Verlassen des Prozesses
+maskiert (glpat/gldt/glrt/glcbt/gloas, AKIA/ASIA, gh*_, sk-, BEGIN-Bloecke, Base64 ab 40 Zeichen).
+Er hat waehrend des Laufs mehrfach gegriffen; die betroffenen Stellen sind unten nur als Variable
+und Fundort benannt, nie als Wert.
+
+---
+
+#### KON3-01 Die gesicherte Abbruch-Arbeit liegt in einem Job-Verzeichnis, das mit dem Job stirbt
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (gemessen 10.08. am Objekt)
+
+Am 09.08. um 14:35 wurde abgebrochene Arbeit gesichert statt geloescht. Das war richtig. Der ORT
+ist es nicht: `/home/comdare/.claude/jobs/5a19728e/tmp/abbruch-bewahrt/`. Dieses Verzeichnis wird
+mit dem Job geloescht, es liegt in keinem Repository und in keinem Backup.
+
+GEMESSEN 10.08.:
+
+    abbruch-bewahrt/wt-ce-gnu-D2-work-in-progress.diff   16.998 Byte   09.08. 14:35
+    abbruch-bewahrt/registrierungs_protokoll.cmake        7.821 Byte   09.08. 14:35
+    abbruch-bewahrt/wt-super-d3-waisen/
+      _mess_thesis_gitlink_parity_probe.sh               33.015 Byte   09.08. 14:26
+      _mess_xml_wellformed_probe.sh                      35.386 Byte   09.08. 14:26
+      _probe_shim_mess_xml.sh                            35.409 Byte   09.08. 14:28
+
+Der Worktree, aus dem die drei Waisen stammen, EXISTIERT NICHT MEHR: `ls -d /home/comdare/wt-super-d3`
+-> "No such file or directory". Gegenprobe im selben Lauf: 21 andere `wt-*`-Verzeichnisse sind da.
+Die Dateien sind damit die einzige Kopie.
+
+**Ledger-Stand:** FEHLT. `abbruch-bewahrt` = 0 Treffer, `wt-super-d3` = 0, `d3-waisen` = 0, je gegen
+die geflachte Kopie mit `-i -F`. Gegenprobe: `wt-ce-gnu` = 3 Treffer -- die Suche findet Worktree-
+Namen, die Null ist echt. Der Ort steht nur in Aufgabe #41.
+
+**Was daran haengt:** die D2-Abdeckungs-Arbeit und drei Proben-Skripte mit zusammen 103.810 Byte.
+Faellt der Job, ist die Arbeit weg und niemand wuesste, dass sie existierte.
+
+---
+
+#### KON3-02 Der 102-Minuten-Haenger auf prod2 ist nirgends gebucht, und die Owner-Frage dazu offen
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (10.08. 01:17, gemessen an der Pipeline) + OW (Frage offen)
+
+Derselbe Job `test:secrets` lief auf prod1 in 16 Sekunden gruen und hing auf prod2 102 Minuten,
+ohne ein einziges Byte zu schreiben, bis GitLab ihn mit `stuck_or_timeout_failure` abbrach
+(Transkript 5a19728e L32138, 10.08. 01:17:08). Um 07:17 wurde daraus eine Owner-Vorlage:
+"Bleibt prod2 im Job-Pool, oder nehmen wir ihn bis zur Kampagne heraus?" (L33169), mit der
+Begruendung, dass 47 von 53 tag-tragenden Jobs zwischen beiden Maschinen floaten.
+
+Die URSACHE ist inzwischen geklaert und gehoert dem Owner: parallele Pipelines, OOM bei RAM,
+ab sofort sequentiell. Das ist im Memory persistiert. Die MESSUNG und die daraus folgende
+Job-Pool-Frage sind es nicht.
+
+**Ledger-Stand:** FEHLT. `test:secrets` = 0, `102 Minuten` = 0, `102 min` = 0. Gegenprobe:
+`prod2` = 166 Treffer, `stuck_or_timeout` = 1 -- letzterer aber in einem ANDEREN Gegenstand
+(Bau-Phase 2b vom 10.07., SIMD-Phase-0.1). Der Vorfall vom 10.08. ist nicht darunter.
+
+**DIE VORGESCHICHTE, die den Posten verschaerft.** Der 10.08. ist nicht der erste Fall. Am
+09.07. um 07:35 stand bereits im aelteren Transkript (46375cdc L17941), woertlich: "Der
+configure-Hang ist prod2-Node-spezifisch und besteht fort, unabhaengig von Last/Slot-Konkurrenz"
+-- gemessen gegen `contract` (54 s), `sanitize:asan-ubsan` (31 s) und `pmc:amd` (39 s), die alle
+gruen auf prod1 durchliefen. Dieser aeltere Befund IST gebucht (`configure-Hang` = 4 Treffer,
+`Node-spezifisch` = 2, `prod2-Node` = 1). Was fehlt, ist die Verbindung: dieselbe Maschine zeigt
+seit 32 Tagen dieselbe Klasse von Verhalten, und die Ursachenzuschreibung wechselte inzwischen
+von "Node-spezifisch" zu "meine parallelen Pipelines". Beide koennen wahr sein; sie sind aber nie
+gegeneinander geprueft worden.
+
+**Was daran haengt:** die Kampagne ab 29.08. Wenn prod2 Jobs annimmt und nicht ausfuehrt, ist
+jede Zelle, die dort landet, ein stiller Ausfall im mehrtaegigen Lauf. Und die Entscheidung
+"drin lassen oder herausnehmen" ruht derzeit auf einer Ursachenzuschreibung, die eine aeltere,
+gebuchte Gegenmessung hat.
+
+---
+
+#### KON3-03 Die XML-Wache hat zwei Zweighaelften, die nachweislich nichts beobachten koennen
+
+**Rang:** BLOCKIEREND  **Herkunft:** AB (Selbstmeldung des Bauenden, 09.08. 12:49)
+
+Der Bauende hat zwei Stellen seiner eigenen Arbeit ausdruecklich als ungedeckt gemeldet
+(5a19728e L24190, 09.08. 12:49:25), woertlich:
+
+    "[t6-wachen] XML-Wache: grep-Zweig (nicht ausloesbar ohne root) und Nenner-Mismatch-Zweig
+     (nachweislich unbeobachtbar, Mutant ueberlebt -- literal belegt)."
+    "[t6-wachen] scripts/ci_diff_ascii_width_guard.sh -- 2 CI-Referenzen, weiterhin ohne Probe
+     im super."
+
+Ein Nachpruef-Auftrag wurde um 12:53 gestellt (L24236) mit der richtigen Frage: "ist eine
+unbeobachtbare Zweighaelfte ueberhaupt zulaessig?". Eine Antwort darauf findet sich im weiteren
+Verlauf des Transkripts nicht.
+
+**Ledger-Stand:** FEHLT. `grep-Zweig` = 0, `Nenner-Mismatch` = 0, `nicht ausloesbar ohne root` = 0.
+Gegenprobe: `ohne root` = 3 Treffer (andere Gegenstaende), `ci_diff_ascii_width_guard` = 3 Treffer
+-- der Ledger kennt das Skript, aber nur seinen Selbsttest und seine CI-Verdrahtung, nicht die hier
+gemeldete super-seitige Luecke.
+
+**Was daran haengt:** eine Wache mit einer unbeobachtbaren Haelfte meldet Vollstaendigkeit ueber
+einen Nenner, den sie nur halb kennt. Das ist die Klasse, gegen die T-6 und K13 gebaut sind.
+
+---
+
+#### KON3-04 Die 117-Posten-Inventur der ungedeckten Stellen vom 08.08. ist nirgends gebucht
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (08.08. 18:52)
+
+Eine Ordnung nach Klasse, nicht nach Datei, mit vollstaendigem Nenner (5a19728e L21242,
+08.08. 18:52:06), woertlich:
+
+    "Nenner: 117 Posten = 29+25+23+16+10+9+3 in sieben Klassen + 2 Einzelfaelle.
+     K1 keine-negativprobe (29 von 117). Eine Zusicherung existiert, aber kein Eingang, bei dem
+     sie faellt: Klemmen ohne Klemmprobe, Wachen ohne Fremd-Genus, Vertraege ohne Fehlerpfad.
+     Der Mutant ueberlebt, weil nur die gesunde Seite je betreten wird."
+
+**Ledger-Stand:** FEHLT. `117 Posten` = 0, `keine-negativprobe` = 0, `29 von 117` = 0. Gegenprobe:
+`Posten` allein hat im Ledger sehr viele Treffer -- die Null ist also nicht die Folge eines
+kaputten Suchbefehls, sondern des fehlenden Gegenstands.
+
+**Was daran haengt:** dies ist die einzige bekannte GESAMTZAEHLUNG der ungedeckten Stellen mit
+Klassenverteilung. Ohne sie hat jede spaetere Aussage "das ist ungedeckt" keinen Nenner.
+
+---
+
+#### KON3-05 Von 246 Ernte-Funden sind 161 als FEHLEND vermerkt -- gebucht ist bislang die Zahl
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (Selbstmessung des Ernte-Strangs, 10.08. 11:25)
+
+Der Ernte-Strang hat seine eigene Ledger-Deckung gemessen und gibt sie mit Nenner aus
+(5a19728e L35328, 10.08. 11:25:59), woertlich:
+
+    GESAMT: 246
+    nach DRINGLICHKEIT: {'BLOCKIEREND': 34, 'HOCH': 91, 'NORMAL': 64, 'NOTIZ': 15, '?': 42}
+    nach LEDGER-STAND : {'FEHLT': 161, 'DELTA': 80, 'STEHT_DRIN': 5}
+    nach HERKUNFT     : {'M': 210, 'OW': 18, 'AB': 18}
+
+**Ledger-Stand:** DELTA. Die Zahl 246 ist gebucht (`246` = 22 Treffer, `Ernte` = 58). Der INHALT
+nicht: von 246 Positionen fuehrt die Selbstmessung 5 als STEHT_DRIN. Stichprobenartig
+nachgeprueft und bestaetigt: `menge-deckel` = 0, `Platzhalter-Kapitulation` = 0,
+`Bauweg-Wache` -- der Strang gibt fuer jede seiner Positionen den eigenen Suchbeleg mit.
+
+Die 34 BLOCKIEREND-Positionen tragen unter anderem: der Bauweg-Wachen-Selbsttest ist hohl
+(Mutationsbatterie 7, davon 5 ueberleben, Nenner rutscht still 473 -> 451); die M4-Wache laesst
+48,7 % des Korpus ungesehen verschwinden bei 21 gruenen Tests; `gattung_of()` faellt still auf
+eine gueltige falsche Gattung; der Export verliert die statistische Gegenprobe vollstaendig
+(0 von 10 CSV-Spalten).
+
+**Was daran haengt:** dieser Posten gehoert dem Ernte-Strang, nicht diesem Durchgang. Er steht
+hier, weil sonst die Zahl im Ledger den Eindruck erweckt, die Sache sei erledigt.
+
+---
+
+#### KON3-06 Der Bestandslog schreibt EINEN Eintrag je binary_id, obwohl die Matrix viele baut
+
+**Rang:** BLOCKIEREND  **Herkunft:** M (09.08. 08:51, mit ausdruecklich benannter Nachweisgrenze)
+
+Gemessen im golden-320 / measure:smoke-Pfad (5a19728e L22997, 09.08. 08:51:08): falls
+`COMDARE_BESTANDSLOG` samt minio und `DOC_KEY`/`OWNER_UUID`/`MASCHINE` per CI-Variable gesetzt
+sind, schreibt der Lauf je `binary_id` GENAU EINEN Bestands-Eintrag mit LEERER Zelle -- obwohl er
+dieselbe `binary_id` ueber die ganze opt-x-simd-Matrix baut. Der Fingerprint war bei allen 320
+geprueften ids unter `[O2,avx2]` und `[O3,avx512]` bit-identisch.
+
+Der Melder hat seine eigene Grenze benannt (L23001): ob eine GitLab-Gruppen- oder Projektvariable
+`COMDARE_BESTANDSLOG` ueberhaupt setzt, hat er NICHT geprueft, weil er die API nicht angefasst hat.
+Aus dem Repo ist es nicht entscheidbar. Diese Verifikationsluecke ist bis heute offen -- und sie
+wurde durch das Geheimnis-Leck vom 10.08. eher groesser, weil der nachfolgende Verify-Agent die
+CI/CD-API ausdruecklich nicht mehr angefasst hat.
+
+**Ledger-Stand:** DELTA. `COMDARE_BESTANDSLOG` = 21 Treffer, `bit-identisch` = 11 -- die Klasse ist
+bekannt. Die konkrete Kollisionsmessung nicht: `je binary_id` = 0, `320 geprueften` = 0,
+`320 gepruefte` = 0.
+
+**Was daran haengt:** die Mess-Provenienz. Ein Bestand, dessen Zelle leer ist und dessen
+Fingerprint zwei verschiedene Bauweisen nicht unterscheidet, kann einen SKIP falsch begruenden.
+
+---
+
+#### KON3-07 Zwei Bau-Workflows wurden mitten im Lauf gestoppt und nie aufgeraeumt
+
+**Rang:** HOCH  **Herkunft:** OW (Owner-Ruege 09.08. 14:31) + M
+
+Zweimal derselbe Vorgang am 09.08.: `wm1mm5nu2` gestoppt um 14:26:18, Ersatz `w0kmlbvln`
+gestartet um 14:26:33, ebenfalls gestoppt um 14:35:23 (5a19728e L25439, L25450, L25575). Beide
+trugen dieselbe Beschreibung "D2-Nenner, T-6-Orakel hohl, xlsx+csv gleichzeitig, D5-Rest".
+
+Der Owner hat das unmittelbar geruegt (L25513, 09.08. 14:31:20), woertlich:
+
+    "Du hattest in dem Geschlossenen Workflow ... eine Aufgabe gekillt - mitten im Bau - und sie
+     weder analysiert, aufgeraeumt, noch den fehlenden dritten strang wieder aufgenommen.
+     Das haengt in der Luft"
+
+**Ledger-Stand:** FEHLT. `wm1mm5nu2` = 0, `w0kmlbvln` = 0, `haengt in der Luft` = 0 und mit
+Umlaut ebenfalls 0. Gegenprobe: andere Task-IDs desselben Tages stehen im Ledger, die Null ist
+also nicht die Folge eines Formatproblems.
+
+**Was daran haengt:** die Owner-Regel, die daraus folgt -- ein gestoppter Workflow braucht drei
+Schritte (analysieren, aufraeumen, den fehlenden Strang wieder aufnehmen) -- ist nirgends als
+Regel niedergeschrieben, obwohl sie woertlich ausgesprochen wurde.
+
+---
+
+#### KON3-08 Sechseinhalb Gigabyte im Job-Verzeichnis, davon 3 GB als "koennten Belege sein" geparkt
+
+**Rang:** HOCH  **Herkunft:** M (gemessen 10.08.)
+
+GEMESSEN 10.08.: `/home/comdare/.claude/jobs/5a19728e/tmp` = 6,8 G. Die groessten Posten:
+
+    nachpruefung-w1    2,2 G     seit 09.08. 23:40 als "NICHT angefasst, koennten Belege sein"
+    l1_landing         792 M     dieselbe Markierung
+    widerlege          440 M
+    ce_audit           278 M
+    audit-zahlen       263 M
+    acht weitere Klone je 170-241 M (gitleaks_clone, gitleaks_clone2, gitleaks_clone3,
+    gitleaks-klon, scan-clone, scan-r3, gl2, lagp4check, pass1-probe)
+
+Platte: `df -h /home` -> 206 G von 251 G belegt, 87 %. Am 09.08. 23:40 wurden 15 Klone mit
+zusammen 13.054 MB gemessen und teilweise abgeraeumt; die drei als Beleg markierten Verzeichnisse
+wurden bewusst stehen gelassen -- und seither nicht ausgewertet.
+
+**Ledger-Stand:** FEHLT. `nachpruefung` = 2 Treffer (anderer Gegenstand), `l1_landing` = 0,
+`15 Klone` = 0, `13054` = 0. Gegenprobe: `Platte` und Speicherposten stehen mehrfach im Ledger.
+
+**Was daran haengt:** zwei gegenlaeufige Doktrinen treffen sich hier. "Bei Stillstand ZUERST
+`df -h`" verlangt Platz; "was im Worktree liegt, ueberlebt das Aufraeumen nicht" verlangt
+Bewahrung. Ohne Auswertung ist unentscheidbar, welche der drei Belegsammlungen noch traegt.
+
+---
+
+#### KON3-09 Die Frage ans Pruefungsamt zum Ausfertigungsdatum wurde nie nachverfolgt
+
+**Rang:** HOCH  **Herkunft:** M (07.08. 18:15)
+
+Am 07.08. um 18:15 (5a19728e L15787) wurde ein Negativbefund zum Platzhalter "Vom
+#Ausfertigungsdatum#" ausdruecklich NICHT als Entwarnung behandelt, woertlich: "Eine E-Mail ans
+Pruefungsamt klaert es. Die Anmeldeunterlagen im Repo enthalten nichts dazu (das
+Fakultaetsformular regelt nur Zulassung/Fristen/Pruefer)."
+
+Eine Nachverfolgung findet sich weder im weiteren Transkript noch im Ledger.
+
+**Ledger-Stand:** FEHLT. `Ausfertigungsdatum` = 0, `Pruefungsamt` = 0, `Pruefungsamt` mit Umlaut
+= 0. Gegenprobe: `Frist` und `Termin` haben im Ledger dreistellige Trefferzahlen -- die
+Terminfuehrung ist da, dieser Posten fehlt darin.
+
+**Was daran haengt:** die Abgabe am 15.09.2026. Ein formaler Mangel am Deckblatt ist billig zu
+beheben, solange Zeit ist, und teuer danach. Das ist der einzige gefundene Posten dieses
+Durchgangs, der eine EXTERNE Partei braucht und deshalb Vorlauf hat.
+
+---
+
+#### KON3-10 Die gitleaks-Vakuumfalle ist am 10.08. erneut zugeschnappt, trotz Register
+
+**Rang:** HOCH  **Herkunft:** M (10.08. 06:49, Selbstanzeige mit literaler Ausgabe)
+
+Am 10.08. um 06:49 lief ein gitleaks-Lauf mit `0 commits scanned` durch, der Push war zu diesem
+Zeitpunkt bereits vollzogen (5a19728e L32985). Selbstanzeige woertlich: "das ist die
+Vakuum-Gruen-Falle, die die Doktrin als erste nennt, und ich bin selbst hineingelaufen".
+Die Pruefung wurde sofort nachgeholt, diesmal mit explizitem Bereich (`7af380e..4b18f72`), und
+lieferte `1 commits scanned` gegen die erwartete 1.
+
+Der Fall ist damit geheilt. Gebucht gehoert nicht der Fall, sondern die WIEDERHOLUNG: die Falle
+steht seit Tagen im Register, wird in jedem Bau-Auftrag zitiert -- und hat trotzdem erneut
+gegriffen, weil im frischen Klon `origin/development` auf denselben Stand zeigte wie HEAD und der
+Bereich dadurch leer war. Das ist eine ZWEITE Eintrittsart derselben Falle, neben dem bekannten
+Worktree-Mount.
+
+**Ledger-Stand:** DELTA. `0 commits scanned` = 8 Treffer, `Vakuum-Gruen` = 1 -- die Klasse steht
+drin, aber nur mit der Worktree-Ursache. Die Klon-Ursache "leerer Bereich, weil origin == HEAD"
+ist als eigene Eintrittsart nicht benannt.
+
+**Was daran haengt:** die Gegenmassnahme ist eine andere. Gegen den Worktree-Mount hilft ein
+echter Klon; gegen den leeren Bereich hilft nur, die erwartete Commit-Zahl VOR dem Lauf zu
+nennen und die Ausgabe dagegen zu halten.
+
+---
+
+#### KON3-11 Ein Werkzeug-Ausfall wurde als Erfolg gezaehlt: Schema-Abweisung ohne Signal
+
+**Rang:** HOCH  **Herkunft:** M (10.08. 11:26, mit vollem Nenner)
+
+Der teuerste Explore einer Nacht meldete `durchgelaufen=3` und "3 von 3 Themen durch", lieferte
+aber fuer Thema 2 in allen sechs Feldern nur den Platzhalter `test` (5a19728e L35332).
+Die Zahlen: 381.691 Tokens, 97 Tool-Calls, 1.360.280 ms = 22,7 min, `state=done`. Zum Vergleich
+die beiden Geschwister-Straenge: 219.653 und 316.119 Tokens.
+
+URSACHE am Objekt: drei `StructuredOutput`-Aufrufe. Versuch 1 und 2 trugen den echten Volltext und
+wurden abgewiesen mit "Output does not match required schema: root: must have required property
+ist_stand". Der Agent kapitulierte im dritten Versuch auf Platzhalter. `journal.jsonl` traegt
+denselben Muell -- der Verlust liegt im Agenten, nicht in der Datei.
+
+**Ledger-Stand:** DELTA. `StructuredOutput` = 2 Treffer, `menge-deckel` = 0,
+`Platzhalter-Kapitulation` = 0. Der Mechanismus ist damit nicht als Werkzeugfalle registriert.
+
+**Was daran haengt:** dies ist ein stummer Workflow-Tod einer NEUEN Art. Die bekannte Regel
+"`journal.jsonl` ist die Wahrheit" traegt hier nicht, weil das Journal die Kapitulation als
+Erfolg protokolliert. Die einzige Erkennungsmarke ist der Inhalt selbst.
+
+---
+
+#### KON3-12 Werkzeugfalle ohne Register: YAML-Flow-Syntax liefert dem Block-Parser eine stille Null
+
+**Rang:** HOCH  **Herkunft:** M (09.08. 06:57, dreifache Fehlmessung desselben Gegenstands)
+
+Dieselbe Zahl kam dreimal verschieden heraus: 44 von 48, dann 42 von 48, dann 45 von 51
+(5a19728e L22420, 09.08. 06:57). Ursache woertlich: "die Tags stehen in FLOW-Syntax
+(`tags: [baremetal]`), ein Block-Listen-Parser liefert stille Null -- mir beim ersten Versuch
+selbst passiert."
+
+Das ist die K11-Klasse in neuem Gewand: ein Werkzeug, das sucht und nichts findet, weil es die
+falsche Notation kennt, ist von einem Werkzeug, bei dem es nichts zu finden gibt, nicht zu
+unterscheiden.
+
+**Ledger-Stand:** DELTA. `Flow-Syntax` = 1 Treffer, `45 von 51` = 1 -- das ERGEBNIS ist gebucht.
+`Block-Listen-Parser` = 0: das VERFAHREN, also die Falle als solche, nicht.
+
+**Was daran haengt:** das Fallen-Register. Solange nur die korrigierte Zahl im Ledger steht und
+nicht die Ursache, wiederholt der naechste Zaehler denselben Fehler.
+
+---
+
+#### KON3-13 Zwei Bau-Straenge liefen ohne Pflicht-Explore, die angekuendigte Rueckbau-Folge blieb aus
+
+**Rang:** HOCH  **Herkunft:** M (Selbstanzeige 09.08. 06:40) + AB
+
+Selbstanzeige woertlich (5a19728e L22284, 09.08. 06:40:44): "die Straenge 9 und 10 sind VOR deiner
+Ansage in den Bau gegangen, ohne Explore. Ich habe ihn als Strang 14 nachgeschoben -- mit der
+ausdruecklichen Konsequenz, dass zurueckgebaut wird, falls ..."
+
+Der nachgeholte Explore hat genau den Fall gefunden, fuer den er da war (L22481, 07:11:40):
+"die Thesis widerspricht dem Bau, der gerade gelandet ist." Die Aufloesung fiel dann zugunsten
+des Baus aus -- Nearest-Rank erfuellt das Mittelungsverbot aus Termin 3, weil dort woertlich
+"Auswertung ... auf den separaten Rohlaeufen" steht (Termin-3-Rohtext:21, 09.04.).
+
+Damit ist der Rueckbau sachlich abgewendet. Was fehlt, ist der EINTRAG, dass die angekuendigte
+Konsequenz geprueft und mit Begruendung nicht gezogen wurde.
+
+**Ledger-Stand:** DELTA. `Nearest-Rank` = 4 Treffer, `ceil(q*n)` = 3, `Strang 9` = 1,
+`ohne Explore` = 1. Der Gegenstand ist da; die Kette Ankuendigung -> Pruefung -> Nichtziehung mit
+Begruendung ist es nicht.
+
+**Was daran haengt:** eine angekuendigte und dann stillschweigend fallengelassene Konsequenz ist
+von einer vergessenen nicht zu unterscheiden. Genau diese Ununterscheidbarkeit ist die
+Fehlerklasse dieses Projekts.
+
+---
+
+#### KON3-14 Vorbedingung der clang-Warnungsrunde ungeklaert: unter welcher Bedingung faehrt build:clang
+
+**Rang:** HOCH  **Herkunft:** AB (08.08. 13:56, ausdruecklich dem Owner uebergeben)
+
+Woertlich (5a19728e L19377, 08.08. 13:56:01): "die Latenz-Wurzel ueber beiden: `build:clang` ist
+opt-in und advisory, laeuft im Normalfall gar nicht. Das bleibt offen und bei dir." Am 09.08. in
+ce-Pipeline 15447 gemessen: `test:unit` und `test:coverage-guard` laufen, `build:clang` hatte
+Status `skipped`.
+
+Aufgabe #43 fuehrt genau dies als Vorbedingung der Runde 2. Der Posten selbst ist im Ledger nicht
+als OFFENE FRAGE gefuehrt, sondern nur als Zustandsbeschreibung.
+
+**Ledger-Stand:** DELTA. `build:clang` = 27 Treffer, `opt-in` = 31, `advisory` = 18,
+`skipped` = 37 -- der Zustand ist reichlich belegt. Was fehlt, ist die Markierung, dass hier eine
+UNBEANTWORTETE Frage liegt, die eine geplante Arbeit blockiert.
+
+**Was daran haengt:** ein Job, der nicht faehrt, erzeugt keine Warnungen und verdeckt alles, was
+nur sein Uebersetzer sieht. Am 08.08. waren alle drei clang-Blocker Dinge, die GCC gar nicht
+meldet.
+
+---
+
+#### KON3-15 Die Quellenlage selbst: drei der fuenf genannten Kontexte enthalten keine Nachricht
+
+**Rang:** NORMAL  **Herkunft:** M (gemessen 10.08.)
+
+Der Auftrag nennt fuenf Kontextdateien. Drei davon sind 226 Byte gross und tragen genau zwei
+Zeilen, beide reine Metadaten (`ai-title`, `agent-name`), keine einzige Nachricht:
+
+    2bcc1a88-eee6-4b0d-ac52-a2e93f16ab39.jsonl   2 Zeilen, 0 Nachrichten
+    fe6a7d97-07f4-43a4-940a-1293eb3bb780.jsonl   2 Zeilen, 0 Nachrichten
+    bf019fae-7346-4717-9ab8-225763bdaded.jsonl   2 Zeilen, 0 Nachrichten
+
+Fuenf weitere Dateien im selben Verzeichnis zeigen dasselbe Muster. Die tatsaechliche Abdeckung
+liefern zwei Dateien:
+
+    5a19728e   35.672 Zeilen   24.575 Timestamps   06.08. 04:54 -- 10.08. 11:53
+    46375cdc  107.400 Zeilen   77.726 Timestamps   06.07. 09:31 -- 08.08. 19:23
+
+Ein dritter Traeger fuer den Zeitraum 05.-06.08. ist `b15ade0e` (2.209 Zeilen). Die Angabe
+"46375cdc bis 10.08. 06:16" im Auftrag ist der Datei-mtime, nicht der letzte Eintrag; der letzte
+Eintrag ist 08.08. 19:23.
+
+**Ledger-Stand:** FEHLT. `2bcc1a88` = 0, `fe6a7d97` = 0, `bf019fae` = 0.
+
+**Was daran haengt:** kuenftige Durchgaenge dieser Art. Wer "die letzten fuenf Kontexte" nach
+Dateiliste greift, liest faktisch zwei und haelt das fuer fuenf -- ein Deckungs-Irrtum ohne
+Fehlermeldung.
+
+---
+
+#### KON3-16 Die Hybrid-Gattung ist auf der Bibliotheksseite nicht registriert
+
+**Rang:** NORMAL  **Herkunft:** M (09.08. 13:02 erhoben, 10.08. am Objekt nachgemessen)
+
+Am 09.08. wurde gemeldet (5a19728e L24311), die Hybrid-Arbeit sei "inhaltlich weit, aber nach der
+eigenen T-7-Doktrin des Projekts NICHT fertig", mit zwei Nullmessungen: `test_hy_a1` in
+`tests/unit/CMakeLists.txt` = 0 und `hybrid` in `libs/cache_engine/CMakeLists.txt` = 0.
+
+NACHGEMESSEN 10.08. in `/home/comdare/wt-ce-w0a` und `/home/comdare/wt-ce-sammel`, beide gleich:
+
+    test_hy_a1 in tests/unit/CMakeLists.txt        4   (war 0 -- INZWISCHEN BEHOBEN)
+    hybrid     in libs/cache_engine/CMakeLists.txt 0   (unveraendert)
+    Gegenprobe add_executable in derselben Datei 109   (die Suche greift)
+
+Vorhanden sind `tests/unit/test_hy_a1_heuristik_adapter_gattung.cpp` und
+`test_hy_a1_reroute_gate_negativ.cpp`.
+
+Die Testhaelfte ist damit erledigt. Ob die Bibliothekshaelfte einen Eintrag BRAUCHT, ist nicht
+entschieden -- bei einer header-only-Gattung waere die Null korrekt. Das ist die Frage, die zu
+klaeren ist, nicht der Befund.
+
+**Ledger-Stand:** FEHLT. `test_hy_a1` = 0 Treffer. Gegenprobe: `Hybrid` steht vielfach im Ledger.
+
+---
+
+#### KON3-17 Zwei benannte Leseluecken aus dem 07.08. wurden nie geschlossen
+
+**Rang:** NORMAL  **Herkunft:** AB (Selbstmeldungen 07.08.)
+
+Zwei Stellen, die ihre Melder ausdruecklich als offen gekennzeichnet haben:
+
+(a) `harness/perm_runner.hpp` -- "diese letzte Datei habe ich NICHT einzeln gegengelesen -- bleibt
+offener Punkt (war schon im Erstbericht unter Paragraf 7)" (5a19728e L15924, 07.08. 18:47). Die
+Datei traegt die eigentliche Pro-Setting-Messung ueber `run_observable_perm`.
+
+(b) Der Verzeichnis-Schnitt des Overlays -- "welche Dateimenge ist das Overlay -> bleibt offen.
+Der Owner sagt NICHT, welche ..." (L15558, 07.08. 17:28). Zwei benachbarte Fragen desselben
+Pakets (Sortier-Ordnung, Hash je Datei gegen Konkatenation) wurden beantwortet, diese nicht.
+
+**Ledger-Stand:** DELTA. `perm_runner` = 40 Treffer, `Overlay` = 45 -- beide Gegenstaende sind
+breit dokumentiert. Dass an genau diesen zwei Stellen eine als OFFEN gemeldete Luecke sitzt, ist
+in dieser Menge nicht auffindbar.
+
+---
+
+#### KON3-18 Der Owner-Auftrag "abbruchsichere Pause" ist eine Betriebsregel ohne Niederschrift
+
+**Rang:** NORMAL  **Herkunft:** OW (01.08. 13:59, 03.08. 06:31)
+
+Zweimal gefordert, woertlich: "Bitte lege aus den abgebrochenen Workflows bitte eine
+abbruchsichere Pause ein" (46375cdc L89754, 01.08. 13:59:18) und "Bitte lege eine abbruchsichere
+Pause ein, lasse nur Welle 2d auslaufen" (L95531, 03.08.). Damals wurde jeweils ein
+Pausendokument geschrieben.
+
+Als REGEL -- was eine abbruchsichere Pause umfassen muss, damit sie diesen Namen verdient -- ist
+es nirgends festgehalten. Der Bezug zu KON3-07 ist unmittelbar: dort wurde ein Workflow gekillt,
+ohne dass eine solche Pause eingelegt wurde.
+
+**Ledger-Stand:** DELTA. `abbruchsicher` steht mehrfach im Ledger, jeweils als Name eines
+konkreten Pausendokuments, nicht als Verfahren.
+
+---
+
+## EHRLICHER REST
+
+**Was ich NICHT geschafft habe.**
+
+Die Datei `46375cdc` deckt 07.07. bis 08.08. ab, also 34 Tage mit 107.400 Zeilen. Ich habe sie
+mit allen sieben Musterklassen gefiltert (Treffer: 363 hart, 1164 Defekt, 2922 Widerspruch, 1144
+Frist, 240 Strang, 1698 Falle) und daraus die Owner-Turns des gesamten Zeitraums sowie die
+Agenten-Befunde mit harten Signalen gesichtet -- aber nur die Trefferzeilen, nie die Umgebung.
+Aus 34 Tagen stammen in diesem Nachtrag zwei Positionen (KON3-18 und die Vorgeschichte in
+KON3-02). Das ist wenig. Zwei Erklaerungen dafuer, die ich nicht auseinanderhalten kann: der
+Zeitraum ist bereits gut abgearbeitet (viele Juli-Treffer wiederholen sich als Zitat in spaeteren
+Zusammenfassungen), oder mein Filter passt schlechter auf die aeltere Sprache. Die zweite
+Moeglichkeit habe ich nicht ausgeschlossen.
+
+Zwei Juli-Kandidaten habe ich geprueft und ENTLASTET, statt sie zu buchen. (a) Der am 27.07.
+dokumentierte "OFFENE WIDERSPRUCH: dmidecode weist prod2 als DDR5 aus, Schluessel lautet
+ddr4_2x32" (46375cdc L88963, `machine_identity.hpp:208`) ist am Objekt behoben: Zeile 213
+fuehrt heute `ram_pair="ddr5_2x32"` fuer prod2, und `ddr4_2x32` hat 0 Treffer sowohl im Code als
+auch im Ledger. (b) Der prod2-configure-Hang vom 09.07. ist gebucht -- er steht jetzt als
+Vorgeschichte in KON3-02, nicht als eigene Position.
+
+Die Datei `b15ade0e` (2.209 Zeilen, 05.-06.08.) habe ich nur strukturell erfasst -- Zeitbereich
+und Typverteilung -- und nicht gefiltert. Sie schliesst eine Luecke zwischen den beiden grossen
+Dateien und stand nicht im Auftrag.
+
+**Was ich nur angelesen habe.**
+
+Den Ledger selbst. Ich habe ihn nie gelesen, sondern ausschliesslich gegen die geflachte Kopie
+gesucht und je Treffer bis zu drei Kontextfenster von 560 Zeichen gezogen. Bei den Positionen mit
+DELTA-Vermerk beruht meine Aussage "der Gegenstand steht drin, dieser Aspekt nicht" damit auf
+Stichproben, nicht auf vollstaendiger Lektuere. Wer eine dieser Positionen einspielt, sollte die
+Stelle im Ledger noch einmal im Volltext ansehen.
+
+Die 246-Ernte (KON3-05) habe ich NICHT nachgeprueft. Ich habe die Selbstmessung des Ernte-Strangs
+uebernommen und als solche gekennzeichnet. Ein Bericht ist Beweismaterial, kein Beweis -- die
+Zahl 161 FEHLT stammt von dem Strang, der auch die Funde erhoben hat.
+
+**Die Differenz zwischen gefundener und gebuchter Zahl, nicht glattgerechnet.**
+
+Ich habe 18 Positionen gebucht. Aus den Trefferlisten habe ich rund 40 Kandidaten aufgestellt und
+etwa die Haelfte verworfen, weil die Ledger-Probe sie als bereits gebucht auswies -- darunter die
+Order-Dependency von `generated_source_catalog` (11 Treffer), die 23 allocator-Akten (2 Treffer),
+`MT-L3` (6), `wide_aggregat` (1), die A7-Schwaeche Kommentar-gegen-Aufruf (1), die Stage-Topologie
+von `ergebnis:holen` (3). Diese Verwerfungen sind Einzelproben, keine Volltextlektuere; bei einer
+davon kann ich falsch liegen.
+
+Von den 18 Positionen sind 12 GEMESSEN (mit mitgefuehrter Ausgabe oder eigener Nachmessung am
+Objekt) und 6 BEHAUPTET im Sinne von: aus einem Bericht im Transkript uebernommen, ohne dass ich
+den Gegenstand selbst angefasst habe. Das sind KON3-03, KON3-04, KON3-05, KON3-06, KON3-11 und
+KON3-12. Sie sind an ihrer Herkunftsmarke AB oder M mit Zeitstempel erkennbar; bei allen sechs
+liegt die Originalausgabe im Transkript und ist ueber die genannte Zeilennummer auffindbar.
+
+**Was der Redaktionsfilter beruehrt hat.**
+
+An mehreren Stellen des Transkripts hat der Filter Zeichenketten maskiert. Ich habe sie nicht
+darauf geprueft, ob es sich um echte Geheimnisse handelt -- das haette bedeutet, sie anzusehen.
+Die einzige Stelle, die ich benenne, ist die bereits bekannte und in Aufgabe #70 gefuehrte:
+Gruppe 3 und Projekt 288, sieben Variablen, im Transkript 5a19728e um 11:25 als Rotationsliste
+zusammengefasst. Projekt 286 enthielt keine.
+## LEDGER-KONSOLIDIERUNG II -- 10.08.2026, Nachmittag (KON2-01..KON2-31)
+
+Zweiter Nachtrag des Tages. Nachtrag I (KON-01..KON-66) steht darueber und deckt Sessions,
+Plaene, Backups und Rohtranskripte. DIESER Nachtrag deckt, was DANACH entstand: die
+Workflow-Journale als eigene Quelle, vier Owner-Entscheide, die Versionierungs-Forensik und
+vier neu gefundene Werkzeug-Fallen.
+
+MESSORT aller Code-Aussagen: `/home/comdare/wt-ce-w0a` = origin/development = `6c010cdc`,
+bzw. `/home/comdare/wt-super-landung`. Wo ein Befund von einem anderen Stand stammt, steht es
+an der Position.
+
+### DIE DRITTE FALSCH-NULL-KLASSE -- vor jeder kuenftigen Ledger-Suche lesen
+
+Dieser Ledger erzeugt DREI Arten falscher Nullen. Wer nur gegen eine absichert, meldet Luecken,
+die keine sind (am 10.08. sind so 9 Falsch-Nullen entstanden):
+
+    1  MIXED ENCODING     Umlaute UND ASCII-Transliteration nebeneinander.
+                          Belege: `Pruefung`=48 gegen `Prüfung`=47;
+                          `geprueft`=111 gegen `geprüft`=69.
+    2  GROSS/KLEIN        der Owner schreibt VERSALIEN -- immer zusaetzlich `-i`.
+    3  HARTER ZEILENUMBRUCH bei ca. 95 Zeichen  <-- NEU, 10.08. gefunden
+                          JEDER mehrwortige Suchbegriff zerreisst an einer Zeilengrenze.
+                          Beleg: `streng sequentiell` = 0 einzeilig, 1 nach `tr '\n' ' '`.
+                          Ebenso `PIPELINES STRENG` = 0 einzeilig / 1 flach.
+
+VERFAHREN, das alle drei deckt: gegen eine geflachte Kopie suchen --
+`tr '\n' ' ' < <ledger> > /tmp/ledger_flach.txt` -- und mehrwortige Begriffe DORT pruefen,
+zusaetzlich beide Encodings und `-i`.
+
+---
+
+## RANG A -- SICHERHEIT
+
+#### KON2-01 -- SIEBEN GITLAB-GEHEIMNISSE SIND IN EIN TRANSKRIPT GERATEN
+
+**FEHLT** · **Herkunft M** (Selbstanzeige des Bau-Agenten im eigenen Bericht)
+
+Beim Abfragen der CI/CD-Variablen hat ein Agent die WERTE statt der Schluesselnamen ausgegeben.
+Damit stehen sie im Session-Transkript. Betroffen und ab sofort als KOMPROMITTIERT zu behandeln:
+
+    Gruppe 3      MINIO_SECRET_KEY
+                  GITLAB_DEPLOY_TOKEN              (ein glpat-)
+    Projekt 288   CE_SUBMODULE_TOKEN               (ein gldt-)
+                  MINIO_ACCESS_KEY
+                  MINIO_SECRET_KEY
+                  COMDARE_NFS_DROP_TOKEN
+                  COMDARE_THESIS_WRITEBACK_TOKEN   (ein glpat-)
+    Projekt 286   keine Geheimnisse enthalten -- nicht betroffen.
+
+Der Agent hat danach selbst auf reine Schluesselnamen-Projektion umgestellt.
+
+**WAS ZU TUN IST, in dieser Reihenfolge:** (1) alle sieben rotieren. (2) pruefen, wo die alten
+Werte sonst liegen (lokale Konfigs, CI-Caches, Runner-Konfiguration). (3) ERST DANACH die
+Historie scrubben -- solange die Schluessel gueltig sind, nuetzt das Entfernen aus der Historie
+nichts.
+
+**WAS NIEMAND TUN DARF:** das Transkript nach den WERTEN durchsuchen, um den Fund zu
+"verifizieren". Das laese sie erneut und traegt sie in weitere Kontexte. Die Selbstanzeige mit
+namentlicher Variablenliste ist Beleg genug.
+
+**FOLGESCHADEN, belegt:** der Verify-Agent hat die CI/CD-API danach BEWUSST NICHT MEHR
+angefasst. Dadurch steht der Widerruf von `CMAKE_BUILD_PARALLEL_LEVEL=12` (HTTP 404 auf
+Gruppe 3, 286 UND 288, mit Gegenprobe: vorhandene Schluessel -> 200, erfundener -> 404) auf
+nur EINER Messung statt zwei.
+
+#### KON2-02 -- 776 RUNNER-TOKEN LIEGEN WEITER AUF super origin
+
+**DELTA** · **Herkunft AB** (Plandokument), **die Ref-Existenz ist im Ledger selbst belegt**
+
+`refs/backup/pre-secret-scrub-20260802` (`5ba3d03f`) auf super origin. LEDGER:11648 haelt fest:
+"origin traegt genau 5ba3d03f refs/backup/pre-secret-scrub-20260802 und nichts Neues, github
+leer". Die Loeschung einer Remote-Ref braucht explizite Owner-Autorisierung -- offenbar bis
+heute nicht eingeholt.
+
+**DAS DELTA:** der Ledger fuehrt den Posten mit ANDERER Zahl und als "niedrige Konfidenz,
+moeglicherweise fremde Infra-Domaene". Die Zahl 776 stammt aus
+`docs/plaene/20260806-PLAN-wellenplan-vollbild-und-parallelisierung.md:442`.
+
+#### KON2-03 -- gitleaks MELDETE EINMAL 89 FUNDE BEI EXIT 0
+
+**FEHLT** · **Herkunft M**
+
+Nur 3 sichtbar, Herkunft der uebrigen 86 unbelegt. Der Auditor stuft es ausdruecklich als
+VIERTE stille Null ein ("Kapitel III.2 fuehrt nur SN-1..SN-3"). Faellt in die dokumentierte
+gitleaks-Fallenklasse (stdin-Modus, `--config`-Pflicht, Bereich statt geratener Klontiefe).
+Aus derselben Quelle: "Der Scrub vom 02.08. hat den Leak-Commit nicht erfasst; Re-Scan aller
+4 Klone und des thesis-Repos fehlt."
+
+#### KON2-04 -- gitleaks IST AUF prod1 NIRGENDS DAUERHAFT INSTALLIERT
+
+**FEHLT** · **Herkunft M** (zwei unabhaengige Befunde am selben Tag)
+
+Zwei Straenge fanden es am 10.08. unabhaengig nicht im PATH (kein /usr/local/bin, kein ~/go/bin).
+Einer kopierte eine 8.30.1-Binary aus dem Scratchpad einer fremden Session in sein
+Job-Verzeichnis und fuhr damit -- korrekt belegt: 249.699 Bytes gescannt = exakt die
+Patch-Groesse, 12 commit-Zeilen, Config nachweislich aus `--config`, rc 0; Koeder mit
+zufaelligem glpat-Muster an denselben Patch gehaengt -> rc 1, "leaks found: 1".
+
+**WARUM DAS EIN BEFUND IST:** ein Werkzeug, das laut Doktrin vor JEDEM Push laufen soll, muss
+auffindbar sein. Sonst faehrt es irgendwann jemand nicht und meldet gruen.
+
+#### KON2-05 -- gitleaks-VAKUUM AM WORKTREE, mit literaler Ausgabe
+
+**DELTA** · **Herkunft M**
+
+Transkript 2026-08-08T11:42:25Z, woertlich: "RC_GITLEAKS=0 / ERR [git] fatal: not a git
+repository: .../worktrees/wt-super-landung / ERR error=\"stderr is not empty\" / INF 0 commits
+scanned. / INF scanned ~0 bytes (0) in 14.8ms / INF no leaks found". Der Lauf trug die
+SELBSTBESCHREIBUNG "korrekte Syntax" und rc=0. 95 Sekunden spaeter ging der super-Push
+`48c5c37d` hinaus.
+
+**ZWEITER TEIL, mit Nenner:** der von der Doktrin verlangte Scan ueber den Push-INHALT
+(`git log -p <remote>..HEAD`) lief an **0 von 49 Pushes** des Tages.
+
+**DAS DELTA:** die KLASSE steht im Ledger (`0 commits scanned` = 6 Treffer, u.a. :3456, :10238,
+:10499, :10540, :13366) -- dieser konkrete Fall und die 0-von-49-Zahl nicht.
+
+---
+
+## RANG B -- DIE VERSIONIERUNGS-ARCHITEKTUR
+
+#### KON2-06 -- DAS SOLL JE STUFE, OWNER-WORT 10.08.2026, VERBATIM
+
+**FEHLT** · **Herkunft OW** · **vom Owner am selben Tag bestaetigt: "Das ist jetzt alles korrekt."**
+
+> "Jeder Achsen-Algorithmus hat eine Versionierung, was sich in der Tier-Binary spaeter
+> wiederspiegelt. Die CEB haben nur Mess-Achsen und System-Achsen Versionierungen. Jedes Genus
+> hat fuer sein Interface eine Versionierung fuer das was es Leistet und das setzt sich als
+> compile time Versionierungsstempel aus allen Mess/System/Organ-Achsen zusammen. System-Achsen
+> sind die einzigen Achsen mit komplexer Syntax und Grammatik um exakte Hardware Komponenten
+> wie CPU/GPU/FPGA/NPU oder AVX Erweiterung etc. anzuzeigen. Der Planer, der ja DREIPHASIG nur
+> Messachsen freigibt, hat laut Plan eine simple X.Y.Z Versionierung und einen Fingerprint SHA
+> wie alle Planer/CEB/Tier-Binary/Hybrid-Tier-Binary. Das waere alles gewesen."
+
+Als Tabelle:
+
+    Achsen-Algorithmus  eigene Version, spiegelt sich in der Tier-Binary    Fingerprint --
+    Genus (Interface)   ZUSAMMENGESETZT, compile time, aus ALLEN            Fingerprint --
+                        Mess/System/Organ-Achsen
+    Planer              simple X.Y.Z                                       Fingerprint JA
+    CEB                 nur Mess- und System-Achsen (keine Organ)          Fingerprint JA
+    Tier-Binary         Mess + System + Organ                              Fingerprint JA
+    Hybrid-Tier-Binary  dito                                               Fingerprint JA
+
+#### KON2-07 -- DER MECHANISMUS, OWNER-WORT 10.08.2026, VERBATIM
+
+**FEHLT** · **Herkunft OW**
+
+> "Die Organ-Achsen bilden aus der gewaehlten lokalen Organ-Algorithmus-Versionierung ein
+> Durchreichen des Algorithmus Namens ueber das Achsen-Interface und bauen daraus zur compile
+> time einen Algorithmus-Version-Stempel, der in fester Achsen-Reihenfolge in der
+> Organ-Achsen-Klammer eingereiht wird. Die System-Achsen machen das isoliert fuer hardware,
+> die Mess-Achsen isoliert bei Anforderung eines Compile einer CEB statisch zur compile time
+> und die CEB uebergibt ihre Mess-Achsen Eigenschaften an die Tier-Binaries, damit der Vertrag
+> CEB -> Tier-Binary am Pruefdock compile time veraenderlich haelt."
+
+#### KON2-08 -- DIE MESS-ACHSEN SIND NICHT GLEICH, OWNER-WORT 10.08.2026
+
+**FEHLT** · **Herkunft OW**
+
+> "die measurement_tooling_registry ist die einzige Mess-Achse, die eine System-Achsen Syntax
+> und Semantik in Verbindung damit eine Haupt-Achse zu sein, beinhaltet. Die anderen
+> Mess-Achsen haben nur wenn dafuer anwendbar hardware flags, haben also nur eine X.Y.Z
+> Versionierung ohne die geplanten komplexen Tag Systeme."
+
+    measurement_tooling_registry   Haupt-Achse + System-Achsen-Syntax/Semantik
+                                   -> darf die komplexe Tag-Grammatik tragen
+    alle uebrigen Mess-Achsen      nur X.Y.Z + hardware flags WO ANWENDBAR
+                                   -> KEIN komplexes Tag-System
+
+**DAS ENTLASTET EINEN IST-BEFUND:** `measurement_tooling_registry.hpp:47-49` fuehrt drei
+Eintraege (wallclock/macro/micro), alle auf `"1.0.0.c"`, nie gebumpt. Das ist kein Mangel --
+niemand hat je einen Mess-Tooling-Algorithmus revisioniert. **Konsequenz fuer kuenftige Bauten:**
+wer eine komplexe Tag-Syntax an einer Mess-Achse anbringt, die NICHT die tooling_registry ist,
+baut gegen den Entwurf.
+
+#### KON2-09 -- W12-B: DIE ANTWORT AUF "WAS IST PASSIERT", ZUR HAELFTE ERLEDIGT
+
+**DELTA** · **Herkunft M** · **Die Einzelteile stehen im Ledger, der ZUSAMMENHANG nicht.**
+
+Owner-Frage 10.08.: "Aber das hat doch alles schon mal sauber je Stufe funktioniert? Was ist
+passiert?" -- Antwort: **§43 war ZWEITEILIG** (LEDGER:8225):
+
+    W12-A  Stempel-ERZEUGUNG     "startet JETZT"  -> GEBAUT (b23b7ee2, 19.07., 7 Dateien)
+    W12-B  Stempel-KONSUMPTION   "nach W11"       -> nie als Ticket abgehakt
+
+Was W12-B leisten sollte (LEDGER:8202): "die Cache-Invalidierung bei Einzel-Algorithmus-Updates
+CHIRURGISCH: nur Binaries, deren Stempel-Zeile den geaenderten Algorithmus traegt, werden neu
+gebaut ... alle anderen sind Cache-Hits." **Das ist woertlich die Owner-Erinnerung.**
+
+**DIE GENAUE LAGE, aus zwei Straengen zusammengelegt:**
+
+    Organ-Aenderung   -> Glied [1] per-Permutation  -> chirurgisch  W12-B FUNKTIONAL ERFUELLT
+    System-Aenderung  -> Glied [6] run-konstant     -> Vollbau      W12-B FEHLT
+
+Der juengere Kanal ist die **A2-Eichung (05.08.2026)**: `dll_is_current()`
+(`build_orchestrator.hpp:345-352`) vergleicht seither den SHA512-Fingerprint fail-closed, und
+der traegt die Mess-Zeile als Preimage-Glied [3]. Kommentar dort: "`.fingerprint` IST seit der
+Eichung das Skip-Kriterium von dll_is_current."
+
+**Das Ticket ist also nicht offen geblieben -- es hat sich zur HAELFTE durch einen juengeren
+Kanal erledigt, und niemand hat gemerkt, dass die andere Haelfte offen blieb.**
+Ledger-Fundstellen der Einzelteile: :8377, :8730, :12966 ("vermutlich subsumiert (STRITTIG)").
+
+#### KON2-10 -- DIE KOSTEN-URSACHE IST DER HASH, NICHT DIE VERGLEICHSZEILE
+
+**FEHLT** · **Herkunft M**
+
+Der Alt-Kanal verglich **KLARTEXT**: `_current_axes_sig` je Permutation aus DEREN EIGENEN
+Achsen-Werten, Sidecar hielt `axes=<sig>` im Klartext, Vergleich per `STREQUAL`
+(`codegen.cmake:148-250`, entfernt am 27.07. mit `813c3232`).
+
+Heute liegt Glied [6] in einem **SHA-512**. **Auf einem Hash ist keine Teilmenge pruefbar** --
+`recorded ⊆ current` laesst sich in `dll_is_current` NICHT nachruesten, solange das bvset nur
+gehasht im Sidecar steht. Das ist die Kosten-Ursache, nicht die Vergleichszeile.
+
+**Das Muster existiert im Haus:** Bestandslog v4 (`bestandslog_document.hpp:95-105`): "OE-C
+verlangt, dass ein Versions-Bump EINER Haupt-Achse alle Bestaende selektiv invalidieren kann ...
+dafuer muss die Version LESBAR am Eintrag stehen."
+
+#### KON2-11 -- EINE SCHRIFTLICHE ZUSAGE IST VERLETZT
+
+**FEHLT** · **Herkunft M**
+
+`ERWEITERUNGS-LEITFADEN.md:116` verspricht: "bestehende DLLs ohne `myalgo` bleiben unter Resume
+unveraendert (Skip via `.version`-Sidecar)". Abgeschaltet seit 05.08.
+(`build_orchestrator.hpp:321-323`): "mit F7 (\"NUR\") ERSETZT ... entscheiden aber ueber KEINEN
+Skip mehr."
+
+**Der Leitfaden ist heute falsch und muss korrigiert werden** -- er verspricht Aussenstehenden
+eine Eigenschaft, die es nicht mehr gibt.
+
+#### KON2-12 -- "BUILD UNMOEGLICH": EINE BRUCHSTELLE, BENANNT
+
+**FEHLT** · **Herkunft M**
+
+Owner 10.08.: "sonst ist der Build fuer die Tier-Binaries und der build der CEB unmoeglich nach
+den aktuellen Vorgaben." Vier Kandidaten gegeneinander geprueft:
+
+    Organ-Achsen-Bump                traegt   Glied [1] per-Perm, Wirkung bewiesen
+    Lager "gueltiger Bestand => SKIP" traegt   Bestandslog v4
+    2^17-Flotte                      Folge, nicht Ursache
+    Hardware-Erweiterung ist ADDITIV  BRICHT   <-- die eine Bruchstelle
+
+Dreifach belegt: `build_orchestrator.hpp:311-312` -- Glied [6] ist "RUN-KONSTANT ... keine
+Perm-Eigenschaft"; `driver_build_variant_signature.hpp:33-36` speist `EnabledExtensions` hinein;
+`dll_is_current:345-352` vergleicht auf Gleichheit. Ergebnis: JEDE Tier-Binary bekommt einen
+neuen Fingerprint.
+
+**In einem Satz: nicht unmoeglich, sondern wirtschaftlich unbezahlbar** -- jede
+Hardware-Erweiterung kostet einen Vollbau statt der neuen Permutationen. Bei 2^17 dasselbe.
+
+#### KON2-13 -- DER WIEDERAUFBAU-PLAN, SECHS PAKETE MIT REIHENFOLGE-BEGRUENDUNG
+
+**FEHLT** · **Herkunft M** (Aufwand aus gemessenen Groessen abgeleitet)
+
+    #  Paket                                  Aufwand              Invalidiert
+    1  bvset-Glied im KLARTEXT ins Sidecar    klein + Format-Bump  JA, einmal alles
+    2  Glied [6]: recorded ⊆ current          Vergleich = 1 Zeile; nein
+                                              Logik+Koeder mittel
+    3  Bump-Erzwingung auf die uebrigen 17    98 Literale,         nein
+       Achsen (A1-Pin als Muster)             mechanisch
+    4  Hybrid versionieren                    5 Dateien, klein     nein
+    5  CEB-Array-Form (§58-V)                 4 Inkludenten        JA (Glied [3])
+    6  Doku + Namensordnung                   klein                nein
+
+**1 vor 2, weil ein Hash keine Teilmenge kennt. 2 vor 3, weil Bump-Disziplin ohne
+funktionierendes Gate nur Buchhaltung ist.** Die zwei Invalidierungen (1 und 5) sind
+unvermeidbar und BUENDELBAR ZU EINEM Vollbau, wenn beide im selben Format-Bump landen -- bewusst
+zu terminieren, nicht nebenbei. (`build_orchestrator.hpp:304`: "kein Grandfathering".)
+
+#### KON2-14 -- DER BEOBACHTBARKEITS-RIEGEL: WORAN MERKT MAN EINEN ERNEUTEN AUSFALL
+
+**FEHLT** · **Herkunft M** · **Lehre aus KON2-19 (drei Wochen stummes Gate)**
+
+1. **SELBSTBEWACHUNG AM OBJEKT** -- ein ctest, der zwei bvset-Mengen `A ⊂ B` konstruiert und
+   verlangt: A skippt gegen B, B skippt NICHT gegen A. Faellt die Teilmengen-Logik auf
+   Gleichheit zurueck, BEISST der Koeder: die Richtungsblindheit ist genau das, was der Test
+   sieht. Kein CI-Job noetig, laeuft im Default-ctest. **Das ist der eigentliche Riegel.**
+2. **ZAEHLER IN DIE AUSGABE** -- der Alt-Kanal hatte `_perm_count_skipped`/`_bumped`. Ein Lauf,
+   der "0 uebersprungen" meldet, wo hunderte faellig waeren, ist NUMERISCH auffaellig statt nur
+   teuer.
+3. Die YAML-Doppelschluessel-Klasse ist durch `scripts/ci_yaml_key_guard.sh` gedeckt; die Klasse
+   "Job mit `rules`, dessen Variable nirgends gesetzt ist" NICHT -- eigener kleiner Posten.
+
+#### KON2-15 -- DER VERTRAG CEB <-> TIER-BINARY EXISTIERT, MIT DEM OWNER-SATZ ALS DATEITITEL
+
+**FEHLT** · **Herkunft M** · **der staerkste Einzelfund des Tages**
+
+`libs/cache_engine/builder/pruef_dock/mess_konsistenz_gate.hpp:2`, woertlich:
+"M-1/D-2 (06.08.2026): DER VERTRAG CEB <-> TIER-BINARY AM PRUEFDOCK."
+
+**PRODUKTIV VERDRAHTET, nicht nur gebaut:** `cache_engine_builder_iterator.hpp:2815` ruft
+`pruef_dock::pruefe_mess_konsistenz(handle, cfg.erwartete_mess_zeile)` VOR JEDER MESSUNG,
+fail-closed; dazu `pruef_only.hpp:53`. Sechs Ablehnungsklassen (erwartung_leer / stempel_fehlt /
+layout_fremd / deklaration_leer / zeile_abweichung / entries_widerspruch).
+
+**DREI GESCHWISTER-GATTER am Dock, je eine Frage:**
+
+    conformance_gate.hpp         KANN die Huelle es?
+    mess_interface_testate.hpp   WIRKT es wirklich?
+    mess_konsistenz_gate.hpp     IST die Ausstattung DIE, die die CEB einkompiliert hat?
+
+**Der Befund, den es heilt:** vor D-2 hatte `measurement_line` NULL produktive Leser
+(Vollzensus 20 Treffer, alle Deklaration/Erzeugung/Tests). Gegenprobe der Methode: derselbe
+Zensus auf `organ_line`/`system_line` findet 31 Treffer, davon 2 produktiv in
+`bestandslog_factory.hpp` -- die Methode findet produktive Leser, wo es welche gibt.
+
+**"compile time veraenderlich" konkret:** die CEB ist EIN Binary, das der Planer pro Aufruf mit
+einer anderen Combo-Legende beauftragen kann. Der Vertrag wird JE CEB-LAUF neu gesetzt; das Gate
+haelt SOLL (aktueller Lauf) und IST (was in einer bestimmten Tier-.so einkompiliert wurde)
+byte-gleich synchron.
+
+**Plan-Quellen, per WORTLAUT gefunden** (die im Code zitierte Zeilennummer LEDGER:3319 ist
+verschoben -- s. KON2-22): **§62-B, 21.07., LEDGER:9077** "KOMPILATIONS-STATUS-KOPPLUNG: welche
+Pruef-Tools in die CEB EINKOMPILIERT sind (Mess-Tooling-Achse), bestimmt, was auch das
+Tier-Binary beinhalten MUSS" · **§64, 22.07., LEDGER:9161-9162**.
+
+#### KON2-16 -- ZWEI ALTE KRITIKEN SIND GESCHLOSSEN; EINE IST NICHT NACHGETRAGEN
+
+**DELTA** · **Herkunft M**
+
+Beide stammen aus dem 22.07.-Ledger-Stand, beide waren DAMALS wahr, beide wurden in der
+M-1/D-4-Welle (06.08.2026) geschlossen:
+
+**(a) "hartkodierter 5er-Platzhalter" in der System-Zeile -- GESCHLOSSEN, NICHT NACHGETRAGEN.**
+`libs/cache_engine/include/cache_engine/abi/system_axis_code_versions.hpp:38`:
+`inline constexpr std::size_t kSystemAxisCodeCount = 3;`. Die Datei traegt ihre Historie selbst
+(:32): "A3 (O-8 Schritt 4): 5 -> 3. Der Owner-KERN kennt GENAU DREI System-Haupt-Achsen".
+`system_stamp_line()` zieht die Zahl automatisch nach. **ACHTUNG: der Pfad ist `abi/`, nicht
+`measurement/`.** **Das ist die eine echte Doku-Nachzugsluecke: der Ledger hat diese Schliessung
+nirgends vermerkt.**
+
+**(b) "Mess-Array FEHLT GANZ" (§58-V) -- GESCHLOSSEN UND BEREITS NACHGETRAGEN.**
+`kCebMeasurementStampFor<L>` (`ceb_version_stamp.hpp:407-412`) existiert und rendert
+"measurement_tooling=<id>@X.Y.Z;...;[load_framework=...]". Der Ledger hat es selbst nachgezogen
+(§64-VERSIONIERUNGS-KLAERUNG, STALE-NOTE zu LED:2447/:2785). Nur zur Bestaetigung gebucht.
+
+#### KON2-17 -- DREI SOLL-IST-LUECKEN DER VERSIONIERUNG, GEMESSEN
+
+**FEHLT** · **Herkunft M**
+
+1. **Der Planer hat KEINEN Fingerprint-SHA.** `planner_version.hpp` -> 0 Treffer fuer
+   `fingerprint`/`sha`. Gegenprobe: 5 Dateien im Planer-Baum kennen Fingerprints -- das Konzept
+   existiert, der Planer benutzt es nur nicht fuer sich. Laut KON2-06 muessen ALLE VIER
+   Binary-Typen einen haben.
+2. **Die CEB traegt den System-Anteil LEER.** `ceb_version_stamp.hpp:415` `("", "", Mess-Zeile)`.
+   Die Code-Begruendung (:418-430) argumentiert gegen System-**ZELLWERTE** ("Ein Zellwert hier
+   waere schlicht falsch -- er wuerde behaupten, die CEB selbst sei fuer avx512 gebaut worden").
+   **Der Owner spricht aber von System-Achsen-VERSIONEN -- das sind zwei verschiedene Dinge.**
+   Ob beide zusammen weggelassen wurden, ist offen. NICHT mit KON2-16(a) verwechseln: das ist
+   die TIER-System-Zeile, dies hier die CEB.
+3. **Die Genus-Versionen sind HANDGESCHRIEBEN statt zusammengesetzt.**
+   `pruef_dock_version.hpp:58-64`, fuenf freie Literale. `pruef_dock_version_stamp()` hat GENAU
+   EINEN Aufrufer im ganzen Baum, und der ist ein Test
+   (`test_reflect_versions_all_registered.cpp:129`). Laut KON2-06 soll sie sich aus allen
+   Mess/System/Organ-Achsen ZUSAMMENSETZEN.
+
+#### KON2-18 -- WAS LEBT, damit die Lage nicht schwaerzer gemalt wird als sie ist
+
+**FEHLT** · **Herkunft M**
+
+- **124 `algo_version`-Literale ueber 135 Dateien**, davon **26 ECHT GEBUMPT**: 97x `1.0.0.c`,
+  24x `1.0.2.c`, 2x `1.0.1.c` (die letzten beiden NUR in `axes/alloc`). Begruendet im Code
+  (`axis_06_allocator_pmr_resource.hpp:61-64`: "ohne Bump wuerde der inkrementelle
+  Tier-Binary-Cache alte Binaries weiterverwenden"). Der Pin-Test ist ZWEISCHICHTIG:
+  Literal-Pin PLUS Wirkungs-Pin -- gegen genau die "Beruhigungspille".
+- **`test_reflect_versions_all17` ist NICHT stehengeblieben.** `kCompositionAxisNames` hat heute
+  18 Eintraege (`axis_path_serialization.hpp:40-43`), die Tabelle wuchs mit
+  (`axis_variant_version_table.hpp:234`, `T26_persistence_target`). Der Test vergleicht RELATIV
+  (`.size()`), nie gegen ein Literal -- **falsch ist nur sein NAME.**
+- **Die feste Achsen-Reihenfolge existiert:** `kCompositionAxisNames`-Ordnung, "plattform-stabil,
+  unabhaengig von der spec.axes-Reihenfolge", Entscheid W12-A-5
+  (`axis_variant_version_table.hpp:265,307`).
+- **Die Grammatik ist gemeinsam:** `algo_semver.hpp`, Flag-Grammatik v2 `X.Y.Z[.flag]*`, mit
+  zwei Politik-Wachen (`ce_owned_version_is_wellformed` ungated,
+  `ce_owned_version_satisfies_cpu_enforce` gated), 13 Nutzer. `'c'` = CPU-Basis ist PFLICHT
+  (Owner-Q3); eine flaglose `"1.0.0"` bricht COMPILE-HART, sobald
+  `COMDARE_VERSION_HW_FLAG_ENFORCE` scharf ist (Default 1). `'e'` = EFFICIENCY CORE, nicht
+  "experimental" (das ist ersatzlos deprecated).
+
+#### KON2-19 -- DER BEFUND, DER BLEIBT: DAS LOCK-GATE RIEGELT NICHT, WAS SEIN NAME SAGT
+
+**FEHLT** · **Herkunft M** · **enthaelt eine OWNER-FRAGE**
+
+`contract:axis-version-lock` prueft SHA-256 ueber **6 Heuristik-Header** in
+`libs/cache_engine/heuristik/` (break_even, axis_spline, workload_cluster_offline,
+workload_feature_vector, axis_optimization_catalog, measurement_curve_loader) gegen
+`tools/axis_version_lock/axis_version.lock`, ueber einen eigenen Marker
+`// AXIS_ALGO_VERSION: <N>` -- eine DRITTE Versions-Vokabel neben `algo_version` (124x) und
+`k*Version` (9x).
+
+**Es riegelt KEINEN einzigen Achsen-Varianten-Header.** Ein Algorithmus-Edit in einer der 124
+Varianten laeuft daran vorbei. Bump-Erzwingung deckt **1 von 18** Achsen (A1-Pin auf `alloc`);
+fuer die 17 anderen schlaegt NICHTS an.
+
+**Explizit geplant, nicht getan** (§32-F4/GN-8-Rest, zwei Ledger-Fundstellen):
+"axis_version.lock-Scope auf **Organ-Strategie-Header**" -- die Ausweitung von 6 auf potentiell
+alle 124. Status "(TEIL)"/"(niedrig)" bzw. "(TEIL, hoch)" -- **die Prioritaet ist im Ledger
+selbst inkonsistent gefuehrt** (Randbefund).
+
+**OWNER-FRAGE:** warum ist das Gate auf die Heuristik beschraenkt? NICHT AUFFINDBAR
+(Gegenprobe: `.gitlab-ci.yml` + `ci/` nach `algo_version` -> kein zweites Gate; der Kommentar
+begruendet die AUSWAHL der 6, nie den AUSSCHLUSS der Achsen).
+
+#### KON2-20 -- STEMPEL-BENENNUNG: VIER FAMILIEN, KEIN SCHEMA, TIER NICHT AUFFINDBAR
+
+**FEHLT** · **Herkunft M** · Owner 10.08.: "Die Version stamp benennungen sind das blanke
+Chaos und die Benennung wurde von dir erfunden, bitte benenne sinnvoll."
+
+**DER KILLER-BELEG:** `find . -iname '*tier*stamp*'` = **0 Treffer**, Gegenprobe `*stamp*` = 13.
+Niemand findet den Tier-Stempel ueber den Namen -- er heisst `anatomy_version_stamp.hpp`. Und
+wer dem Muster folgt und `planner_version_stamp.hpp` sucht, findet auch nichts: die Datei heisst
+`planner_version.hpp`, ohne `stamp`.
+
+**Vier lexikalische Familien ueber zehn Dateien:** `<Sache>_version_stamp` (4x) ·
+`<Sache>_version` ohne `stamp` (1x, ausgerechnet die einzige mit echter Nummer) ·
+`<Konzept>_stamp_<Rolle>` (4x, in sich konsistent, aber ohne `version` im Namen, obwohl
+`toolchain_stamp_glied.hpp:190` inhaltlich "Ein Versions-Anker je TOOLCHAIN-Achse" ist) ·
+`<Konzept>_stamp` (1x). **Kein dokumentiertes Schema irgendwo** -- Gegenprobe: 155 `.md` unter
+`docs/`, beide Encodings, kein erklaerender Treffer.
+
+**SOLL-ENTWURF, zwei Kategorien getrennt:**
+
+    KATEGORIE A -- Binary-Identitaet     <bintyp>_binary_stamp.hpp
+                                          (planner / ceb / anatomy / hybrid)
+    KATEGORIE B1 -- Achse+Algorithmus    axis_<rolle>.hpp   (Wahl-Ebene)
+    KATEGORIE B2 -- Interfaces/Verfahren <ding>_verfahren_version.hpp (Dock/Probe-Ebene)
+    Bau-Bausteine (Formatter/Parser/Verdrahtung) BEHALTEN ihre Rollen-Endung
+                                          (_entries/_suffix/_glied/_naht) -- die einzige
+                                          Teilfamilie, die heute schon konsistent ist.
+
+Regel: **"version" nur dort, wo wirklich eine Versionsnummer steht.** Wo Provenienz/Identitaet
+gemeint ist, gehoert ein anderes Wort hin -- `ceb_version_stamp.hpp` sagt in Zeile 3 selbst:
+"Die CEB hat KEINE Gesamt-Version".
+Messlatte fuer die Abnahme: nach der Umbenennung MUSS `find -iname '*tier*stamp*'` treffen.
+Wanderungskosten (gemessen): anatomy 18 #include + 13 Kommentare · ceb 4 + 10 + 2 CMake ·
+g1 4 · axis 3 · dock 6. Eine Umbenennung ist eine ABSCHRIFT-Operation, keine Loeschung.
+
+**"G1" IST AUFGELOEST:** kein Akronym, sondern der interne Codename des K7b-4-Pakets vom
+22.07. (`docs/sessions/20260722-SESSION-KONTEXTUEBERGABE-abend-k7b-komplett.md:35`).
+**Kollisionsfund:** derselbe String bezeichnet anderswo die "Lager-Gate G1-G5"-Serie
+(`docs/plaene/20260808-WELLENPLAN-ANLAGE-luecken-defekte-einwaende.md:399`). Zwei Bedeutungen,
+ein Vokabular -- ein Argument FUER die Umbenennung.
+
+#### KON2-21 -- DIE BILLIGSTE REPARATUR: EINE NEUNTE KLASSE IN EINER BESTEHENDEN TAXONOMIE
+
+**FEHLT** · **Herkunft M**
+
+`measurement/algo_semver.hpp:109-226` fuehrt bereits eine SELBSTWARTENDE Taxonomie aller
+ce-eigenen Versions-Quellen, Klassen **(a) bis (h)**, mit eigener Wartungs-Doktrin: "diese Liste
+ist AUS DEM DIFF/GREP ABZULEITEN, NIE HANDGEPFLEGT". Das bindende Kommando ist
+`grep -rn 'ce_owned_version_\(satisfies_cpu_enforce\|is_wellformed\)' --include='*.[hc]pp'
+libs tests tools apps` -- Datei-Kopf nennt 130 Treffer, unabhaengiger Lauf bestaetigt 130.
+
+**Die fuenf Dock-Versionen fehlen dort als Klasse (i)**, obwohl sie dieselben Wachen tragen und
+vom generischen Grep mitgefangen werden (12 Treffer allein in `pruef_dock_version.hpp`). Die
+Liste warnt selbst: "Jede KUENFTIGE ce-Versions-Quelle gehoert hier hinein ... sonst entsteht
+wieder eine Luecke wie bei (e)/(f)." **Genau das ist eingetreten.**
+
+Ein Kommentar-Nachtrag von ca. 10 Zeilen im bestehenden Verzeichnis -- kein neuer Name noetig.
+**Ohne ein solches Register erfindet der naechste Autor mit hoher Wahrscheinlichkeit eine
+fuenfte Familie.**
+
+#### KON2-22 -- DER BLOCKER-KOMMENTAR IST STALE, NICHT OFFEN
+
+**FEHLT** · **Herkunft M**
+
+`anatomy_version_stamp.hpp:75-80` behauptet: "Die Metadaten-Quelle fuer den realen
+Modul-Stempel ist eine offene Architektur-Frage (Registry-basiert im Emitter vs.
+Wrapper-Typ-Liste durchs Makro)". **Der Code hat die Frage laengst beantwortet:**
+`axis_variant_version_table.hpp:5-16` beschreibt den "Registry-basiert im Emitter"-Weg -- eine
+compile-time {axis,variant->algo_version}-Tabelle aus den Registry-Enabled-Listen, mit einer
+CRTP-Wache (`static_assert(requires { Derived::algo_version; })`), die verhindert, dass eine
+Variante OHNE `algo_version` in die Registry gelangt. `compose_organ_stamp_line()` (:300-330)
+liest daraus; die Kette laeuft produktiv bis in die ABI-exportierten `AnatomyVersionLines`.
+
+Gegenprobe: "Wrapper-Typ-Liste" und "Registry-basiert im Emitter" = **0 Treffer im Ledger** --
+es gibt keine Owner-Notiz, die die Frage beantwortet. **Der Bau hat entschieden, ohne dass der
+Entscheid dokumentiert wurde.** Code-Hygiene-Position, KEINE Owner-Vorlage.
+
+---
+
+## RANG C -- LIZENZ UND EIGENTUM (Owner-Entscheide 10.08.2026)
+
+#### KON2-23 -- DIE VIER-REPO-LIZENZZUORDNUNG -- W-5 IST ENTSCHIEDEN
+
+**FEHLT** · **Herkunft OW** · **loest Widerspruch W-5 aus Nachtrag I**
+
+> "Bei der Lizenz solles frei fuer die Forschung, aber sonst Kommerziell proprietaer sein.
+> Apache ist voellig falsch, bitte behebe das nach einem explore welche Lizenz fuer welches
+> Diplomarbeit repo gelten soll. super soll apache sein, PRT-ART und cache engine sollen beide
+> frei fuer die Forschung und proprietaer fuer business und Einzelnutzung sein, Diplomarbeit
+> ist nur copyright von Benjamin-Elias Probst."
+
+Vorlauf desselben Tages: "Dann machen wir die Lizenzen von der BEP Venture UG doch proprietaer.
+Und damit maximal restriktiv. Aber den code muss man public sehen koennen, das staerkt das
+Vertrauen der Nutzer."
+
+    Repo                                 LICENSE am 10.08.   SOLL
+    probst-diplomarbeit-cache-engine     Apache-2.0          Apache -- BLEIBT
+    comdare-cache-engine (ce)            Dual-Lizenz 02.08.  Forschung frei / sonst proprietaer
+    comdare-prt-art                      Apache-2.0          dito
+    20260931-overleaf-diplomarbeit       KEINE LICENSE       nur Copyright-Vermerk
+
+**DIE DREITEILUNG ist der Kern und unueblich:**
+
+    Forschung             frei
+    Business              Lizenzvertrag
+    Einzelnutzung/privat  Lizenzvertrag     <-- die Fassung vom 02.08. kannte diesen Fall nicht
+
+Uebliche Noncommercial-Lizenzen (PolyForm NC, Prosperity) erlauben private Nutzung GRATIS --
+genau das ist NICHT gewollt. Wer ein Modell vorschlaegt, muss die Dreiteilung am Lizenztext
+belegen, nicht am Namen.
+
+#### KON2-24 -- DER ext/-KOLLISIONSCHECK: KEINE KOLLISION, UNTER FUENF BEDINGUNGEN
+
+**FEHLT** · **Herkunft M**
+
+Copyleft im Baum: **GPL-3** in `ext/traversal/P04-CoCo-trie/CoCo-trie/LICENSE` und
+`ext/traversal/P07-Wormhole/wormhole/LICENSE`; **LGPL-2.1+** in `ext/traversal/P29-RCU/` und
+`ext/allocator/A03-michael-lockfree/michael.h:1-17`. Alle getrackt, alle mit Original-LICENSE
+daneben.
+
+Die vier Link-Schalter stehen OFF (alle vier sind INTERFACE-Bibliotheken, sie uebersetzen
+nichts). **Ein FUENFTER steht ON und fasst GPL-Code an:** `CMakeLists.txt:550-551`
+`COMDARE_CE_ENABLE_ORIGINAL_CODE_VALIDATION ON` kopiert ueber `cmake/is_original_codegen.cmake:130`
+(`configure_file ... COPYONLY`) bei JEDEM Configure `wh.c` (GPL-3) in ein Legacy-Verzeichnis.
+Entwarnung: die Kopie wird nicht uebersetzt und nicht gelinkt (kein Target fuehrt sie als
+Quelle), und der generierte Header enthaelt nur Funktionsnamen + SHA-256
+(`apps/is_original_validator/main.cpp:311-316`).
+
+**DIE FUENF BEDINGUNGEN:** LICENSE sagt nie "dieses Repositorium", sondern benennt den
+Comdare-Eigencode unter ausdruecklicher `ext/`-Ausnahme · Fremd-LICENSEs bleiben bit-identisch
+an Ort und Stelle · das NOTICE weist jede Komponente aus (**`liburing` fehlt bis heute**) · es
+bleibt bei blosser Beifuegung, kein kombiniertes Werk · **das CI-Gate muss FUENF Schalter
+erfassen, nicht vier** -- sonst ist es ein gruenes Gate, das nur seinen Gegenstand deckt.
+
+**KEINE RECHTSBERATUNG:** eine Umstellung mit Wirkung fuer Dritte gehoert anwaltlich geprueft,
+besonders der Apache-Widerruf und die `ext/`-Kollision.
+
+#### KON2-25 -- ce/NOTICE WIDERSPRICHT ce/LICENSE -- HEUTE, NICHT HISTORISCH
+
+**FEHLT** · **Herkunft M**
+
+`ce/NOTICE:6-7` sagt "Licensed under the Apache License, Version 2.0", waehrend `ce/LICENSE`
+daneben die Dual-Lizenz vom 02.08. traegt. **Zwei Dateien, ein Repo, zwei Aussagen** -- und
+NOTICE ist die Datei, auf die Apache-2.0 selbst verweist.
+
+Weitere Stellen, die aktiv Apache behaupten: **36 SPDX-Header in ce**, **28 in prt-art**,
+`README.md:7`, `README.md:197-199`, `CMakeLists.txt:3`, die GitHub-Reposeite.
+`LICENSE_AUDIT_EXT.md` traegt Kopf "V31-PRE, 2026-05-14" mit veralteten Pfaden
+(`ext/P01-ART/...` statt `ext/traversal/P01-ART/...`) und kennt `liburing` gar nicht.
+
+**Der Apache-Grant fuer Revisionen vor dem 02.08. ist UNWIDERRUFLICH** -- wer den alten Stand
+geklont hat, behaelt seine Rechte. Das steht bereits korrekt im heutigen `ce/LICENSE` und
+gehoert uebernommen.
+
+#### KON2-26 -- super TRAEGT APACHE UEBER PRUEFUNGSUNTERLAGEN UND FREMDE PERSONENDATEN
+
+**FEHLT** · **Herkunft M** · **OWNER-VORLAGE**
+
+`super/LICENSE` = volle Apache-2.0. Im Repo liegen aber: acht Exposé-`.docx` an Prof. Habich,
+**drei PDFs mit Betreuer-E-Mail-Verkehr (Kuehn, Schuele, Zhang, alle @tu-dresden)**, das
+Anmeldeformular der Abschlussarbeit, `20260502 Anmeldung_DA_Probst.pdf`. Dazu dieselben
+GPL-3-Baeume ein zweites Mal unter `Forschungsarbeiten/code/` -- unter einer Apache-LICENSE
+ohne Ausnahmesatz.
+
+Apache-2.0 ist eine SOFTWARE-Lizenz; auf Pruefungsunterlagen und E-Mail-Verkehr mit namentlich
+genannten Dritten angewandt ist sie sinnlos und potenziell heikel.
+**Wenn super public geht, ist die Frage nicht die Lizenz, sondern ob diese Dateien
+hineingehoeren.**
+
+#### KON2-27 -- ENTITAETEN-TRENNUNG: "BEP" ALLEIN IST VERBOTEN
+
+**FEHLT** · **Herkunft OW** (Ruege 10.08.2026)
+
+> "Die BEP Venture UG und Benjamin-Elias Probst sind 2 verschiedene Entitaeten und duerfen NICHT
+> unter BEP zusammengefasst werden."
+
+    Benjamin-Elias Probst                  immer AUSGESCHRIEBEN. Nie "BEP", nie "B.-E. P."
+    BEP Venture UG (haftungsbeschraenkt)   immer MIT "Venture UG". "BEP" allein ist NIE
+                                           die Gesellschaft.
+    Comdare                                die MARKE der Gesellschaft, KEIN Rechtstraeger --
+                                           eine Marke kann nicht Lizenzgeber sein.
+
+Die Firma traegt die Initialen ihres Gruenders im Namen -- daraus folgt KEINE Identitaet. Das
+ist bei inhabergefuehrten Gesellschaften der Normalfall und genau der Grund, warum die Trennung
+im Text sichtbar bleiben muss.
+
+**Eine Fundstelle im Bestand**, gemeldet: `ce docs/plaene/20260628-KONTEXT-DOSSIER-...md:91` --
+"das Achsen-Konzept stammt aus einer Vorarbeit **des Autors** (Comdare/BEP Venture, UltiHash)".
+Satzsubjekt ist die PERSON, die Klammer nennt die FIRMA als Attribution. Geprueft und NICHT
+auffaellig: die LICENSE-Dateien (trennen sauber), die E-Mail-Signaturen.
+
+---
+
+## RANG D -- WERKZEUG- UND BETRIEBSFALLEN
+
+#### KON2-28 -- DOPPELTER YAML-SCHLUESSEL: DER LETZTE GEWINNT, WORTLOS
+
+**FEHLT** · **Herkunft M** · **das Ereignis lief vom 19.07. bis 06.08.**
+
+`contract:axis-version-lock` stand ZWEIMAL als Top-Level-Job in `.gitlab-ci.yml`: die
+urspruengliche Fassung (19.07., GN-8/O-4) war ein **unbedingtes Dauergate**, die zweite
+(06.08., Paket W3-C) **inert** -- `rules: if COMDARE_AXIS_LOCK_CHECK == "true"`, und diese
+Variable ist nirgends gesetzt. **YAML verwirft bei doppeltem Schluessel alles ausser dem letzten
+ohne Fehler und ohne Warnung.**
+
+**Der Tripwire lief DREI WOCHEN in KEINEM einzigen Job -- bei durchgehend gruener Pipeline.**
+Kein Signal, kein "skipped" im UI, das jemandem aufgefallen waere. Am 06.08. gefunden und auf
+die STRENGERE Fassung vereinigt (`.gitlab-ci.yml:678-694`). Heute: lebendig, unbedingtes Gate.
+
+**PRUEFBEFEHL, ab sofort nach jeder YAML-Aenderung:**
+`grep -oE '^[a-z][a-z0-9_:.-]*:' .gitlab-ci.yml | sort | uniq -d` muss LEER sein.
+Heute in beiden Repos leer, Gegenprobe: 30 (ce) bzw. 48 (super) Schluessel erkannt.
+**Und beim Haerten eines Gates: die alte Definition ENTFERNEN, nicht die neue danebenstellen.**
+
+#### KON2-29 -- DIE EIN-BLECH-REGEL HAT EIN LOCH: ZWEI PROJEKT-IDS MESSEN NICHT DAS BLECH
+
+**FEHLT** · **Herkunft M** · **am Objekt gefangen, mit Verursacher-Adresse**
+
+Waehrend eines Release-Baus sprang die Systemlast von **4.5 auf 24.88**, die Bauleistung fiel
+von 60 Zielen je 7 min auf 7 je 10 min. Der eigene Bau nutzte genau vier `cc1plus` (`-j4`) --
+die Last kam von aussen. Verursacher:
+`/usr/bin/gitlab-runner run ... /builds/.../comdare/products/comdare-web/...
+LLVM-22.1.8-Linux-X64.tar.xz` -- ein CI-Job des Projekts **comdare-web**. Weder 286 noch 288.
+**Beide API-Abfragen standen auf 0.**
+
+**Eine Abfrage ueber zwei Projekt-IDs kann grundsaetzlich nicht beantworten, ob das BLECH frei
+ist.** Sie beantwortet nur, ob DIESE ZWEI gerade fahren.
+
+**NEUE DOKTRIN -- ZWEI Messungen vor jedem Push:**
+1. `scope=running` fuer ce (286) UND super (288) -- der Nachweis fuer unsere zwei Refs.
+2. `pgrep` auf gitlab-runner-JOBprozesse am Objekt -- die einzige Messung, die das BLECH misst.
+   (Achtung: der Runner-DAEMON laeuft immer; gesucht ist ein JOB.)
+
+**Und: die Regel schuetzt gegen OOM, nicht gegen Gesellschaft.** Bei 45 G available und ohne
+Swap-Druck ist Weiterbauen richtig -- **aber ausdruecklich als ABWAEGUNG zu benennen, nie als
+Regelauslegung.** So bleibt die Regel scharf: man beugt sie nicht still, man nennt den Fall, in
+dem ihr Zweck nicht greift.
+**Nachtrag zur Swap-Messung:** die BELEGTE Swap-Menge beantwortet die Frage NICHT. Gemessen
+wurden 19 von 31 G belegt bei `so=0` -- das ist Altlast, kein Druck. Die Antwort geben
+`vmstat`-Spalten `si`/`so`.
+
+#### KON2-30 -- DIE 2-PASS-FALLE IST FALSCH DOKUMENTIERT
+
+**FEHLT** · **Herkunft M**
+
+Sie haengt NICHT an den drei Registry-Generatoren allein, sondern daran, dass **`comdare_tests`
+die `apps/` gar nicht mitzieht**. Dadurch fehlen die CLI-Werkzeuge
+(`comdare-anatomy-codegen-tool`, `comdare-adhoc-emitter`), und das Registrierungs-Protokoll
+meldet nach dem Reconfigure weiterhin **vier von fuenf Bloecken als UEBERSPRUNGEN**.
+
+**Richtige Kette: `all -> reconfigure -> comdare_tests`.**
+
+Im Debug-Baum fiel es nicht auf, weil dort zufaellig zuerst ein voller `all`-Bau lief -- ein
+Fehler, der nur in EINER von zwei Bauarten sichtbar wird, ist genau die Klasse, die sonst als
+"geht doch" durchrutscht.
+
+#### KON2-31 -- ZWEI CHECKOUTS PRO REPO, WIEDER GETRETEN -- MESSORT GEHOERT IN JEDEN BERICHT
+
+**FEHLT** · **Herkunft M**
+
+Ein Strang stellte einen kompletten Bauplan auf `Code/external/comdare-cache-engine`
+@ `90bca126` (Branch `b-m2-pmc-invariante`, Stand **06.08.**) statt auf den lebenden Stand.
+Folgen, am lebenden Stand gegengemessen:
+
+    Behauptung des Strangs                  Wirklich auf origin/development (6c010cdc)
+    mess_achsen_naht.hpp existiert nicht    EXISTIERT (libs/cache_engine/profile_facade/)
+    "ingerprint" = 11 Treffer               27
+    Emissionsstellen :874/:912/:1233/:1386  heute :290/:303/:317 -- und es sind DREI, nicht vier
+
+**REGEL: der Messort (Pfad + SHA) gehoert in JEDEN Bericht.** Fuer git-Archaeologie ist der
+Baum unkritisch (Commits sind Commits); fuer jede Aussage ueber den HEUTIGEN Zustand ist er
+entscheidend.
+
+**VERWANDTE REGEL, aus demselben Tag:** Code-Kommentare sollen auf **Paragraphen-Marken**
+verweisen (§62-B, §43.b), NICHT auf Ledger-Zeilennummern. Der Ledger waechst; `LEDGER:3319`
+zeigt heute woandershin, ebenso die in `mess_achsen_naht.hpp:130` zitierten `:4082-4095`.
+Dreimal an einem Tag hat ein Strang deshalb einen toten Anker gemeldet.
+
+---
+
+## RANG E -- DIE ERNTE DER WORKFLOW-JOURNALE
+
+#### KON2-32 -- 246 FUNDE AUS EINER QUELLE, DIE NACHTRAG I NICHT KANNTE
+
+**FEHLT** · **Herkunft M**
+
+Nachtrag I erntete acht Quellen: Session-Log, Sessions, Plaene, Backups, Rohtranskripte.
+**Die WORKFLOW-JOURNALE waren nicht dabei.** Sie sind die einzige Quelle, in der steht, was die
+Agenten tatsaechlich GEMESSEN haben -- die Sessions enthalten nur, was davon in einen Bericht
+kam.
+
+    Bestand      205 Workflow-Journals · 687 Task-Ausgaben (84 davon 0 Byte)
+    Ernte        246 Funde aus 10 Straengen
+    Dringlich    34 BLOCKIEREND · 91 HOCH · 64 NORMAL · 15 NOTIZ
+    Ledger       161 FEHLEN · 80 DELTA · nur 5 stehen vollstaendig drin
+    Herkunft     210 Messungen · 18 Owner-Worte · 18 unbelegte Behauptungen
+
+Rohdaten je Strang: `subagents/workflows/wf_fed9658a-006/journal.jsonl` (11 Ergebniszeilen).
+**Die 34 BLOCKIEREND-Funde sind EINZELN nachzutragen -- das ist ein eigenes Paket und in
+diesem Nachtrag NICHT erledigt** (siehe EHRLICHER REST).
+
+#### KON2-33 -- METHODENFUND: EINE ZUSAMMENFUEHRUNG, DIE KUERZT, MELDET TROTZDEM "DURCHGELAUFEN"
+
+**FEHLT** · **Herkunft M** · **eigener Fehler des Leads**
+
+Die Synthese der Ernte bekam nur **40 der 246 Funde** (rund 16 %), weil im Workflow-Skript
+`.slice(0, 120000)` stand. Der Agent hat es korrekt gemeldet ("die Bloecke 3, 4, 5 und 6 habe
+ich nie gesehen ... Alles, was unten steht, ist eine Synthese ueber 40 von 246") statt
+Vollstaendigkeit vorzutaeuschen -- und dabei selbst eingeordnet: "Das ist selbst ein Befund der
+Klasse, gegen die diese Nacht gearbeitet hat."
+
+**Lehre:** eine Kuerzung im Zusammenfuehrungs-Schritt ist unsichtbar, wenn der Zusammenfuehrer
+sie nicht selbst meldet. Das vollstaendige Material lag im Journal und war rettbar.
+
+#### KON2-34 -- VIER KORREKTUREN AUS DER STICHPROBE
+
+**DELTA** · **Herkunft M** (die Synthese hat 14 Funde selbst am Objekt nachgeprueft)
+
+1. **8 von 9 "ungelandeten" Commits SIND gelandet.** `git branch -r --contains`, heute gefahren.
+   Genau einer fehlt wirklich: `282def69` (super, blinde Wache NormalizedBar). Gegenprobe am
+   Inhalt: `NormalizedBarMedianUsesLowerMiddleOnEvenN` = 0 Treffer auf `origin/development`,
+   1 in `282def69`; `git diff --stat` = 5 insertions / 88 deletions.
+2. **Der Merge-Stempel-Widerspruch war falsch gestellt.** LEDGER:9468 kennt den Owner-Entscheid
+   E-2 und ordnet die sofortige Entfernung an. **ABER: der Ledger widerspricht sich SELBST --
+   LEDGER:8941 fuehrt denselben Gegenstand weiter als offenen Bauauftrag
+   ("[§59-MERGE-STEMPEL] ... POD 56 -> 72, layout 2 -> 3, OFFEN, hoch").** Zwei Zeilen, ein
+   Gegenstand, entgegengesetzte Anweisung -- relevant VOR W2-S-B.
+   Suchbelege: `MERGE-STEMPEL` = 9 (nicht 0), `Merge Zeile kann daher nicht existieren` = 1.
+3. **KON-18 traegt eine am Objekt widerlegte Diagnose.** Das Objekt ist geheilt (die Umgebung
+   wird jetzt gescheuert, `test_d2_abdeckungs_wache_nenner.cpp:143-160` datiert die Heilung auf
+   2026-08-10 und zitiert den Job-Trace), **der Ledger-Text steht unveraendert falsch da.**
+   Gegenprobe: `Scheuerliste` = 0 im Ledger, `15515` = 3.
+4. **Es sind VIER Registries, nicht drei** -- `tests/unit/thesis_tiere/prt_art_axis_registry.xml`
+   mit 5 Achsen kam in keiner Zaehlung vor. Organ 18 · System 3 · Mess 3 · prt-art 5.
+   **Keine der vier steht auf 22**; HY-A3 ("Registry 22->23") traegt seine Zahl heute in eine
+   unbestimmte Zieldatei.
+
+---
+
+## RANG F -- OFFEN, GEHOERT DEM OWNER
+
+#### KON2-35 -- PRUEFDOCK-PAARIGKEIT: OWNER MELDET REGRESSION MIT 5
+
+**FEHLT** · **Herkunft OW**
+
+> "Es kann nur eine gerade Anzahl an Pruefdocks geben, das ist eine Regression mit 5"
+
+Gemessen: 5 Dock-Versionen (`pruef_dock_version.hpp:58-64`), 5 Dock-Header, Genus-Enum mit 5
+ABI-sichtbaren Werten + `FunctionInterfaceReroute`=6 (der laut Owner-Entscheid E-1 "Weg C"
+ausdruecklich KEIN eigenes Dock hat -- er dockt am Ziel-Genus an).
+
+**ZWEITER, UNABHAENGIGER BEFUND:** `search_algorithm_dock.hpp` inkludiert
+`pruef_dock_version.hpp` **NICHT** -- die vier anderen je 2x. Vier Docks tragen ihre Version,
+das fuenfte nicht, obwohl `kSearchAlgorithmDockVersion` existiert und im switch bedient wird.
+
+**ZWEI LESARTEN, beide offen:** (i) es fehlt/ist zu viel ein DOCK -- die Zahl ist das Problem.
+(ii) es fehlt die ABLEITUNG (KON2-06: die Genus-Version soll sich aus allen Achsen
+ZUSAMMENSETZEN) -- dann sind die fuenf handgeschriebenen Literale das Problem und die Zahl nur
+ihr Symptom. Die Regel, aus der die Paarigkeit folgt, ist noch nicht gefunden.
+
+#### KON2-36 -- OV-4 MESS-DECKEL BLEIBT UNBEANTWORTET
+
+**DELTA** -- aus der Vorlage vom 10.08. Der Owner hat die Fragen 1, 2, 3, 5 und 6 beantwortet,
+Frage 4 nicht.
+
+---
+
+## EHRLICHER REST
+
+**1. Die 34 BLOCKIEREND-Funde der Ernte sind NICHT einzeln nachgetragen.** KON2-32 nennt nur
+Zahlen und den Fundort. Das ist bewusst: sie einzeln zu buchen ist ein eigenes Paket in der
+Groessenordnung von Nachtrag I, und der Owner hat fuer heute Landung + Scrub priorisiert. Die
+Rohdaten liegen unter `wf_fed9658a-006/journal.jsonl` und sind vollstaendig -- **nichts ist
+verloren, aber es ist auch nichts davon im Ledger.** Wer sie braucht, findet dort Titel,
+Herkunft, Inhalt und Ledger-Stand je Fund.
+
+**2. Nummerierung:** dieser Nachtrag traegt KON2-01..KON2-36; im Text sind 36 Positionen
+vergeben. Die Rang-Ueberschriften zaehlen nicht mit.
+
+**3. Was ich NICHT gegengeprueft habe:** ob einzelne dieser Positionen bereits an einer dritten
+Ledger-Stelle stehen, die ich mit keinem meiner Suchbegriffe getroffen habe. Ich habe je
+Position gegen die drei Falsch-Null-Klassen abgesichert, aber eine erschoepfende Suche ueber
+17.978 Zeilen je Position ist nicht gefahren.
+
+**4. Die Zahlen aus fremden Berichten** (246 Funde, 130 Wachen-Treffer, 124 algo_version-
+Literale) sind UEBERNOMMEN, nicht alle selbst nachgezaehlt. Selbst nachgemessen habe ich:
+`kSystemAxisCodeCount = 3` · die drei Tooling-Versionen `1.0.0.c` · den Dateititel von
+`mess_konsistenz_gate.hpp:2` · die Verdrahtung `cache_engine_builder_iterator.hpp:2815` ·
+`find -iname '*tier*stamp*'` = 0 bei Gegenprobe 13 · die YAML-Dublettenpruefung in beiden Repos ·
+die Maschinenlage fuer die `-j8`-Freigabe.
+
+**5. Der Scrub der offengelegten Geheimnisse (KON2-01) ist zum Zeitpunkt dieses Nachtrags NICHT
+ausgefuehrt.** Reihenfolge laut Owner: erst alle offenen Commits landen und die Pipeline
+gruenen, dann scrubben. Die Rotation der sieben Variablen geht dem Scrub voraus.
+## LEDGER-KONSOLIDIERUNG 10.08.2026 — 66 NACHTRÄGE AUS ACHT ERNTEN, 10 WIDERSPRÜCHE, 33 POSITIONEN GEDECKT
+
+**Anlass — Owner-Auftrag 10.08.2026, wörtlich:**
+
+> *"Bitte konsolidiere alles Informationen und Entscheidungen ins Ledger, die dort noch nicht stehen
+> und sammle das aus Session log und Sessions und Plaenen zusammen, nur damit wir alles an einem Ort
+> wiederfinden. Denn scheinbar fehlen dir bereits getroffene Entscheidungen aus diesen Bereichen als
+> vorliegende Fakten. Bitte loese jetzt alle offenen Fragen selbst mit explore auf"*
+
+**Die Rüge, an drei Fällen desselben Tages.** Der Lead hat heute dreimal nach Bestand gefragt:
+(1) ob der DREIPHASIG/ZWEIPHASIG-Vertrag bei Plan A und B gilt — Owner: *"Es ist verbatim im Session
+log der letzten 10 Wochen festgehalten"*; (2) die Paper-Kopplung als offen vorgelegt — Owner:
+*"wohl geplant"*; (3) OV-13 als offen geführt, obwohl der Owner am 09.08. *"Reihenfolge A,B,C volles
+GO, korrekt"* geschrieben hatte (gesucht wurde nach `HY-A`/`HY-B`/`HY-C`). Das ist kein Einzelfall,
+sondern ein Muster: **die Entscheidungen sind getroffen, aber nicht auffindbar.** Der Ledger ist die
+Stand-Quelle (Arbeitsweise B.3); Mess-Regel 10 sagt es hart: *"Ein Paketschnitt, der nur in einem
+Session-Dokument steht, existiert für die Ausführung nicht."*
+
+---
+
+### K0.1 QUELLUMFANG UND PRÜFMECHANIK DIESER KONSOLIDIERUNG
+
+Erhoben am 10.08.2026 über acht disjunkte Ernte-Stränge:
+
+```
+docs/sessions/            306 Dateien,  62.639 Zeilen (md, oberste Ebene)
+docs/sessions/backups/    192 Ordner, 1.890 Dateien, 141 MB
+docs/plaene/              130 Dateien,  42.690 Zeilen
+docs/audits/               48 Dateien,   5.064 Zeilen
+Rohtranskripte             16 Dateien,     458 MB
+Ledger am 10.08.:       16.785 Zeilen, 2,57 MB
+```
+
+Sessions nach Monat: 2026-05 = 77 · 2026-06 = 30 · 2026-07 = 83 · 2026-08 = 96 · undatiert = 13.
+
+**Ernte-Bilanz:** 119 Rohfunde · 6 Dubletten zusammengeführt · **113 distinkt** · davon 33 vollständig
+im Ledger gedeckt · 29 DELTA · 51 FEHLT.
+
+**Prüfmechanik:** 290 Suchbegriffe, `/usr/bin/grep -F` gegen den Ledger. **Der Ledger ist
+mixed-encoding** — 1662-mal echte Umlaut-Schreibung *und* ASCII-Transliteration nebeneinander. Die
+erste rein ASCII gefahrene Runde erzeugte darum falsche Nullen. Jede Null wurde mit Umlaut- **und**
+Case-Varianten gegengeprüft; **9 Falsch-Nullen** wurden gefangen (u. a. B15, B19, G1, G3, D1, B2,
+B14, B17, A10 — mehrere hätten sonst als FEHLT gemeldet, obwohl sie drinstehen). 178 Nullen halten
+der Gegenprobe stand. Positivkontrollen des Laufs: `OWNER` = 246, `Achse` = 1053, `CEB` = 532.
+
+**Die Fehlerklasse, die dabei bleibt:** je Fund wurden 2–4 Begriffe gesucht. Ein im Ledger **anders
+benannter** Sachverhalt kann als FEHLT durchgerutscht sein — genau die Klasse, die W-9 (OV-13) und
+der `REV-DATA-12`-Fall zeigen. Die 51 FEHLT-Urteile sind belastbar für den **Wortlaut**, nicht
+zwingend für den **Gegenstand**.
+
+### K0.2 QUELLEN-VORBEHALT — gilt für JEDEN Eintrag unten
+
+Die Ernte hat je Fund **Herkunftsart und Datum** mitgeführt, aber nicht durchgängig den Dateinamen.
+Wo der Dateiname bekannt ist, steht er. Wo nur das Datum bekannt ist, ist **das Datum der Schlüssel
+in den Session-Korpus** (`docs/sessions/YYYYMMDD-*`, `docs/plaene/YYYYMMDD-*`) — es wird hier kein
+Pfad geraten. Wo die Ernte nur paraphrasiert und keinen Wortlaut mitgeführt hat, steht das
+ausdrücklich dabei; **ein Owner-Zitat wird nie rekonstruiert.**
+
+Herkunftsarten: **OWNER-WORT** (Owner-Satz, Datum) · **MESSUNG** (am Objekt erhoben, Datum) ·
+**AGENTEN-BEHAUPTUNG** (aus einem Agenten-Dokument, nicht am Objekt belegt).
+
+### K0.3 ID-VORBEHALT — `KON-nn` ist ein Suchgriff, kein Autoritätsbeleg
+
+Die `KON-nn` unten sind **lokale Handles dieses Nachtrags**, damit man Positionen zitieren kann.
+Sie sind ausdrücklich **kein** Autoritätsbeleg — es gilt dieselbe Regel wie für OV-Nummern
+(Ledger `:1380-1387`): *"eine Berufung auf eine OV-Nummer ist kein Autoritätsbeleg. Zu prüfen ist
+immer der Gegenstand im Roh-Transkript, nie die Nummer."* Wer eine `KON-nn` zitiert, nennt den
+Gegenstand mit.
+
+### K0.4 EIGENE GEGENPROBE 10.08. — FÜNF KORREKTUREN AN DER ERNTE, bevor irgendetwas gebucht wird
+
+Vor dem Schreiben wurden die tragenden Null-Behauptungen der Ernte selbst nachgemessen. Fünf
+mussten korrigiert werden — sie stehen hier, damit niemand die Ernte-Zahlen ungeprüft weiterträgt:
+
+1. **`JEDEN Freitag` = 0 ist eine FALSCH-NULL.** `jeden Freitag` (klein) = **2 Treffer**, `Freitag`
+   = **12**. Die wöchentliche Freitagslieferung steht im Ledger, u. a. `:9441` (*"FRIST-KORREKTUR:
+   Endtermin ist der 15.09.2026, mit woechentlicher Lieferung jeden Freitag"*), `:9444`, `:9460`,
+   `:9806` (Posten N-1, Quelle `20260806-KONTEXTUEBERGABE-abend-praezise.md:67`), `:12929`.
+2. **`F1 ist Fr 14.08.` = 0 ist eine FALSCH-NULL.** `F1` = **28 Treffer**, `14.08` = **5**, darunter
+   `:3556` (*"Die Zusage (GOAL v8, F1 am Fr 14.08.)"*), `:736`, `:1707`, `:1842`, `:1885` — überall
+   als kritischer Pfad. **Folge:** KON-45 fällt von DELTA auf einen reinen Anker-Satz zurück.
+3. **`Wahrheits-Anker` = 4** (nicht 4 vs. 6 — case-sensitiv 4, case-insensitiv 6). Kein Fehler der
+   Ernte, aber der Nenner-Vorbehalt in KON-59 bleibt.
+4. **prod1 heute am Objekt gemessen** (`lscpu`, lokale Maschine = prod1): `AMD Ryzen 9 9950X3D`,
+   **16 Cores, 32 Threads, 1 Socket**, `nproc` = 32. Damit ist W-2 **entschieden, nicht offen**.
+5. **prod1-Platte heute:** `df -h /` = **251G gesamt, 211G belegt, 28G frei, 89 %**. Dritter
+   Messpunkt zu W-8.
+
+Gegenproben, die die Ernte bestätigt haben (alle case-sensitiv, `grep -F`): `F-EXTRA` = 0 ·
+`F1-F15` = 0 · `63-T-` = 0 · `Zero-Window` = 0 · `OV-14` = 0 · `assess_drift` = 0 ·
+`Lagerhaltungs-Skip` = 0 · `amd_zen4` = 0 · `hy_label_gate` = 0 · `lager_ablage` = 0 ·
+`Endless-Loop` = 0 · `OPN-Bug` = 0 · `cd-buildsystem-core` = 0 · `I113` = 0 (`I112` = 2) ·
+`syft`/`grype`/`trivy` = je 0 · `g++15.3` = 0 · `GNU 15.3` = 0 · `Alleinurheber` = 0 ·
+`Teile und Herrsche` = 0 · `PGO` = 0 · `AxisLibraryRegistry` = 0 · `zehntausende` = 0 ·
+`Organ-Metapher` = 0 · `30 von 256` = 0 · `22 Registry` = 0 · `15515` = 0. Positivkontrollen
+desselben Laufs: `xlsx` = 104 · `NUMA` = 35 · `Fallback` = 73 · `Overleaf` = 53 — das Werkzeug sucht.
+
+### K0.5 LESEREIHENFOLGE — nach Hebelwirkung, nicht nach Nummer
+
+1. **W-1** (Paper-Kopplung): eine Zeile an der Ledger-Spitze beendet die Rüge.
+2. **KON-50** (`wt-super-landung` ist ein künstlicher, nicht git-getrackter Arbeitsbereich):
+   Korpus-Integrität — betrifft sechs der acht Erntebereiche.
+3. **KON-39** (ADR-Register F1–F15 + F-EXTRA-1..8) und **KON-42** (§63-Thesis-Soll-Abgleich):
+   größte Tragweite.
+4. **KON-18** (akuter CI-Defekt heute) und **W-3** (CEB-Zahl 6 → 12, heute gefallen).
+
+*Anmerkung zur Ernte-Empfehlung:* dort ist zusätzlich ein Strang-Kürzel **G13** als "heute gefallen"
+genannt. Dessen Gegenstand ist aus dem Abgleichstext nicht eindeutig zuzuordnen — er wird hier
+**nicht** geraten; siehe EHRLICHER REST.
+
+---
+
+## WIDERSPRUCHS-BLOCK — beide Seiten, beide Daten, Auflösung oder ausdrücklich OFFEN
+
+Ein glattgerechneter Widerspruch ist schlimmer als ein benannter. Wo unten "OFFEN" steht, ist er
+offen und braucht einen Owner-Satz.
+
+#### W-1 — PAPER-KOPPLUNG: DER LEDGER WIDERSPRICHT SICH SELBST, UND GENAU DAS IST DIE RÜGE
+
+**Seite A — Ledger-Spitze `:1422`, 09.08.2026** (neuester Block, also das, was ein Leser zuerst
+sieht): *"**OFFEN** der Rest, darunter prod2, der Mess-Deckel (OV-4) und die Paper-Kopplung."*
+
+**Seite B — Ledger-Rumpf, 08.08.2026, dreimal:**
+- `:15452-15456`, Owner verbatim: *"Meine Frage »soll ich die Paper-Kopplung bauen?« war falsch
+  gestellt — der Auftrag lautet nicht »koppeln«, sondern »je Paper die XML ermitteln«."*
+- `:15584`, Owner verbatim: *"Ja unter sorgfaeltiger Design Planung bitte bauen, Ruecksprache mit
+  mir im Detail."*
+- `:15188`, Messung: *"Die ehrliche Antwort ist nicht »132«, sondern »heute 0«."*
+
+**AUFGELÖST.** Die Antwort steht dreimal im Ledger, rund 60 Zeilen tief. Der neuere Block darüber
+führt denselben Gegenstand als offen. Nachträge stehen oben — wer von oben liest, findet die
+Antwort nie. **Das erklärt das Owner-Wort *"wohl geplant"* vollständig.** Vollzug: die Spitze
+`:1422` streicht "Paper-Kopplung" aus der OFFEN-Aufzählung und verweist auf `:15452`/`:15584`;
+der Rumpf bleibt unangetastet. **prod2 und der Mess-Deckel (OV-4) bleiben in `:1422` offen** —
+nur diese eine Position wird herausgenommen.
+
+#### W-2 — prod1: DREI GRÖSSEN SIND AUF DIE EINE ZAHL "24" KOLLABIERT
+
+**Seite A — Ledger `:7901`, Owner-Wort 22.07.2026:** *"prod1 = 32 Threads / 24 Kerne; prod2 = 24
+Threads / 16 Kerne"* (Thread-Budget für Batch-Compile).
+**Seite B — Ledger `:8135`, §69.6 OD-7, Owner-Wort 26.07.2026:** *"HEAVY: concurrency=1, prod1=24
+Worker"* — am **10.08.2026 07:27 ausdrücklich bestätigt** (*"OD-7 lassen wir so"*).
+**Seite C — MEMORY-Referenz:** *"prod1 = 16 Kerne/32 Threads — die 24 war falsch"*.
+
+**AUFGELÖST DURCH MESSUNG AM OBJEKT (10.08.2026).** `lscpu` auf prod1 (= lokale Maschine):
+`AMD Ryzen 9 9950X3D`, **Core(s) per socket: 16**, **Thread(s) per core: 2**, **Socket(s): 1**,
+`CPU(s)` = 32, `nproc` = 32. Der Ledger kennt die CPU bereits (`9950X3D` = 4 Treffer, `Zen5` = 7)
+und widerspricht damit seiner eigenen Zeile `:7901`.
+
+Es sind **drei verschiedene Größen**, die dieselbe Zahl tragen:
+
+| Größe | Wert | Status |
+|---|---|---|
+| Hardware-Kerne prod1 | **16** (nicht 24) | `:7901` ist FALSCH, gemessen 10.08. |
+| Hardware-Threads prod1 | **32** | `:7901` ist richtig |
+| Betriebsregel OD-7, HEAVY | **24 Worker** | GÜLTIG, Owner-bestätigt 10.08. 07:27 |
+
+**Vollzug:** in `:7901` die Kernzahl auf 16 korrigieren, mit Datum und Messbeleg, und **einen
+Trennstrich zu OD-7 setzen**. **Wer die "24" pauschal streicht, streicht OD-7 mit** — genau davor
+warnt dieser Eintrag.
+
+#### W-3 — CEB-ZAHL: 6 GEGEN 12 (zweite Selbstkorrektur derselben Zahl)
+
+**Seite A — Ledger `:1164`/`:1177`, 08./09.08.2026, Owner:** *"3 Stufen und 6 CEBS (nicht 5 das war
+mein Fehler)"* sowie *"4 fakultät Rekombinationen gegen die 6 CEBs"*.
+**Seite B — Owner 10.08.2026 07:27 (queued), im Ledger 0 Treffer:** *"E-5: Nun eigentlich sind es
+12, weil Hybrid einmal mit und einmal ohne Macro-Benchmarking Messfühler gegen die 6 CEBs getestet
+wird. Mein Fehler."*
+
+**AUFGELÖST — Seite B ist neuer und ist eine ausdrückliche Selbstkorrektur des Owners.** Die Reihe
+lautet 5 → 6 → **12**. Der Ledger endet bei 6. Was daran hängt: die 4!=24-Rekombinationsrechnung
+(MEMORY: *"4 EBENEN im Hybrid ⇒ 4! = 24"*) rechnet gegen die CEB-Zahl; mit 12 statt 6 ändert sich
+der Nenner jeder Kapazitäts- und Batch-Planung. **Die Frage 24 oder 48 bleibt davon unberührt und
+weiterhin NICHT entschieden.**
+
+#### W-4 — LEDGER-SCHREIBREGEL: "NUR BEI TECHNISCHEN ÄNDERUNGEN" GEGEN DEN HEUTIGEN AUFTRAG
+
+**Seite A — Owner 17.07.2026:** *"Das ledger darf regulär geupdated werden, nicht nur additiv.
+Neuere Fakten schlagen immer ältere Fakten."*
+**Seite B — Owner 20.07.2026:** *"Die bestehende Doku wird nicht mehr angefasst… Den ledger ändern
+wir nur noch, wenn ich technische Änderungen aufgreife."*
+
+Beide Sätze: **0 Ledger-Treffer**. Beide fehlen also, obwohl sie die Schreibregel des Ledgers
+selbst sind.
+
+**AUFGELÖST für heute, mit Datum:** der Owner-Auftrag vom 10.08.2026 (Kopf dieses Nachtrags) hebt
+Seite B für diese Konsolidierung ausdrücklich auf — er verlangt genau das, was Seite B untersagt.
+Seite A bleibt als Kollisionsregel in Kraft: **neuere Fakten schlagen ältere.** Beide Sätze werden
+mit Datum gebucht, damit dieselbe Lähmung nicht wiederkehrt — Seite B ohne Seite A gelesen war die
+Ursache dafür, dass zwischen dem 20.07. und heute nichts konsolidiert wurde.
+
+#### W-5 — LIZENZEN: KONKRETE NAMEN (01.08.) GEGEN EIGENSCHAFTEN (07.08.) — **OFFEN**
+
+**Seite A — Owner 01.08.2026:** *"Diplomarbeit und PRT-ART müssen Apache Lizenzen tragen und die
+cache-engine und Diplomarbeit GPL…"* — **die Diplomarbeit steht in beiden Klauseln; der Satz ist
+schon in sich widersprüchlich.**
+**Seite B — Owner 07.08.2026:** *"möglichst restriktiv… die restriktivste Lizenz, die dennoch einen
+Einblick in den Code erlaubt… keinen gewerblichen Verkauf, doppelte Lizenz für freie Forschung für
+alle 3."*
+
+*"Möglichst restriktiv"* und *"kein gewerblicher Verkauf"* vertragen sich nicht mit GPL (die den
+gewerblichen Vertrieb ausdrücklich erlaubt) und nicht mit Apache. Im Ledger steht nur Task #42
+(`:15704`, A03/LGPL, Sperrvermerk-Konflikt) — **nicht** die Repo-Lizenz-Kette der drei Produkte.
+`Apache` = 6, `GPL` = 15, `LGPL` = 15 Treffer, aber keiner davon trägt diese Zuordnung.
+
+**OFFEN — braucht einen Owner-Satz.** Die Positionen, die entschieden werden müssen: (a) welche
+Lizenz trägt `Diplomarbeit`, (b) welche `comdare-prt-art`, (c) welche `comdare-cache-engine`,
+(d) was genau heißt *"doppelte Lizenz für freie Forschung"* — Dual-Licensing mit welcher zweiten
+Lizenz. **Folgenreich und leicht falsch implementiert:** die Wahl geht in jede Datei-Kopfzeile und
+ist nach dem Public-Gang (KON-51) nicht mehr geräuschlos rückholbar.
+
+#### W-6 — LOKALE KLONE: STRUKTUR-REGRESSION (07.07.) ODER ZIELZUSTAND (MEMORY)? — **OFFEN**
+
+**Seite A — Owner 07.07.2026:** *"es war nie die Absicht clone zu erzeugen… Das ist eine Struktur
+Regression, bitte notiere sie"* — **0 Ledger-Treffer. Der ausdrückliche Notier-Auftrag ist bis heute
+nicht vollzogen; er wird mit diesem Eintrag vollzogen.**
+**Seite B — MEMORY-Referenz:** *"[4 Klone] … keep in sync"* — behandelt dieselben Klone als
+akzeptierten Betriebszustand mit Synchronisationspflicht.
+
+**OFFEN.** Die beiden Seiten sind nicht auflösbar, ohne zu entscheiden, ob die vier lokalen Klone
+abgebaut oder als Zielzustand bestätigt werden. Beide Fahrweisen sind teuer: Abbau bricht laufende
+Worktrees, Bestätigung zementiert einen Zustand, den der Owner ausdrücklich Regression genannt hat.
+
+#### W-7 — COMPILER-SYSTEMACHSE: ZWEIMAL GEBOREN, DER LEDGER KENNT NUR DIE ZWEITE GEBURT
+
+**Seite A — 22.05.2026:** die Compiler-Achse war vollständig entworfen **und implementiert**, mit
+fünf Unterachsen: 15.1 Family · 15.2 Opt-Level · 15.3 LTO · 15.4 PGO · 15.5 Target-Arch.
+**Seite B — Ledger `:5098`, 16.07.2026:** dieselbe Achse taucht als *"NEUE SYSTEMACHSE"* auf, die
+der Owner **von Null spezifizieren musste**.
+
+Gegenprobe heute: `PGO` = 0, `AxisLibraryRegistry` = 0, `Compiler-Achse 15` = 0 (`Compiler-Achse`
+allein = 5, alle aus der zweiten Geburt).
+
+**AUFGELÖST als Befund, nicht als Bau-Auftrag.** Das ist der **Lehrbuchfall des vom Owner beklagten
+Musters** und der einzige Fund, bei dem der Verlust am Objekt datierbar ist: acht Wochen Arbeit
+gingen verloren, weil ein fertiger Entwurf nicht im Ledger stand. Was zu tun ist: den 22.05.-Entwurf
+gegen die 16.07.-Spezifikation lesen und **die Delta-Menge** bestimmen — nicht neu bauen.
+
+#### W-8 — prod1-PLATTE: DREI MOMENTAUFNAHMEN, DER LEDGER FÜHRT NUR DIE ÄLTESTE
+
+| Datum | Belegung | Frei | Im Ledger |
+|---|---|---|---|
+| 07.08.2026 | 99 % | 4,8 GB | 1 Treffer |
+| 08.08.2026 | 83 % | 43 G | 0 Treffer |
+| **10.08.2026 (heute, `df -h /`)** | **89 %, 211G von 251G** | **28 G** | 0 Treffer |
+
+**AUFGELÖST — alle drei gehören mit Datum in den Ledger, nicht nur die älteste.** Der Grund ist
+operativ: MEMORY-Regel *"bei Stillstand ZUERST `df -h`"* — vor mehrtägigen Baumengen (Voll-Bau,
+Batch 4096) ist der Trend die Entscheidungsgrundlage, nicht der Einzelwert. Der Trend ist
+nicht-monoton (99 → 83 → 89), also ist **jeder Einzelwert allein irreführend**.
+
+#### W-9 — OV-13 TRÄGT ZWEI GEGENSTÄNDE, UND GENAU DARUM LIEF DIE SUCHE HEUTE INS LEERE
+
+**Seite A — Ledger `:2409-2413`:** OV-13 = **HYBRID-Zerlegung A/B/C**, korrekt aufgelöst, inklusive
+*"HY braucht also Standard compare→release durch die CEB"*. **Steht drin, vollständig.**
+**Seite B:** das **zweite** OV-13 (**Paper-Kopplung, "ersetzt OV-7"**) heißt im neuesten Plan
+**OV-14** — `OV-14` = **0 Ledger-Treffer**.
+
+**AUFGELÖST.** Der Ledger dokumentiert den **Mechanismus** der OV-Nummernkollision bereits
+vorbildlich (`:1380-1387`, am Beispiel OV-18, samt Regel *"eine Berufung auf eine OV-Nummer ist kein
+Autoritätsbeleg"*) — **aber nicht diesen konkreten Fall**. Was fehlt, ist die Zeile: *OV-13 =
+Hybrid-Zerlegung A/B/C (gelöst, `:2409`); das zweite OV-13 (Paper-Kopplung) läuft heute als OV-14
+und ist über W-1 gelöst.* Ohne diese Zeile sucht der nächste Leser dieselbe Nummer erneut und findet
+den falschen Gegenstand.
+
+#### W-10 — E1-SKALIERUNGSKONVENTION: DER FINDER IST ÜBERHOLT, NICHT DER LEDGER
+
+**Seite A — Dossier 04.08.2026:** *"nirgends festgelegt, MUSS vor C6 stehen"*.
+**Seite B — Ledger `:8401`:** **entschieden** — MILLI-FIXPUNKT (×1000, Suffix `_milli`).
+
+**AUFGELÖST zugunsten des Ledgers.** Der Fund fällt raus. **Was aus demselben Strang offen bleibt:**
+**E2** (T6-Slot-Vergabe) und **E13** (`GATTUNGS-WIRE-TIMING`, 0 Treffer). Dieser Eintrag steht hier,
+damit E1 nicht ein viertes Mal aufgemacht wird.
+
+---
+
+## NACHTRAG 1 — KETTE / ARCHITEKTUR / ACHSEN (KON-01 … KON-10)
+
+#### KON-01 — TEST-SKIP IST NUR ALS LAGERHALTUNGS-SKIP ZULÄSSIG (grün inventarisierte Binaries)
+
+**DELTA** · **OWNER-WORT 26.07.2026** · Gegenprobe: `Lagerhaltungs-Skip` = 0, `Lagerhaltungs` = 6
+(alle anderer Gegenstand: `:7973`, `:8058`, `:14589`, `:14603`, `:14640`, `:16639`).
+**Steht im Ledger:** der Rest desselben Owner-Bündels — *"Ofast bleibt aus"*, *"System gibt frei"*.
+**Kommt hinzu:** ein Test darf **nur** übersprungen werden, wenn die Binary im Bestandslog als
+**grün inventarisiert** geführt wird; jeder andere Skip ist unzulässig.
+**Was daran hängt:** dies ist die **zulässige** Ausnahme zu *"gesamte Pipeline hart grün"* — und
+damit die eine Seite des offenen Widerspruchs in KON-57 (Lazy-Cache E-26). Ohne diese Zeile wirkt
+jeder Skip gleich verdächtig. *Wortlaut in der Ernte nicht mitgeführt, Gegenstand paraphrasiert.*
+
+#### KON-02 — SIEBTE SYSTEM-ACHSE NUMA/LOCKING IST PFLICHT; `page_type` IST PFLICHT FÜR CACHE-AWARENESS
+
+**FEHLT** · **OWNER-WORT 26.07.2026** (Punkt E-08) · Gegenprobe: `SIEBTE NUMA/locking` = 0;
+`NUMA` = 35 und `page_type` = 19, aber keiner der Treffer trägt die Pflicht-Aussage.
+**Inhalt:** eine **siebte** System-Achse für NUMA/Locking ist Pflicht, **sofern compile-statisch
+erkennbar**; `page_type` ist Pflicht für Cache-Awareness.
+**Was daran hängt:** die Zahl der System-Achsen ist ein Nenner, der in jede Permutationsrechnung
+eingeht. Die **Meta-Meta-Definition** selbst steht bereits im Ledger (17 Treffer) — der
+**Pflicht-Charakter dieser siebten Achse** nicht. *Wortlaut nicht mitgeführt.*
+
+#### KON-03 — HARDWARE-ERKENNUNG IST EINE ZWEIGETEILTE MESS-ACHSE (Planer grob/RT, CEB fein/CT)
+
+**FEHLT** · **OWNER-WORT 27.07.2026** · Gegenprobe: beide Kernsätze 0 Treffer.
+**Inhalt:** die Hardware-Erkennung ist **keine** System- und **keine** Organ-Achse, sondern eine
+**MESS-Achse**, und sie ist zweigeteilt: der **Planer** erkennt **grob und zur Laufzeit** und wählt
+ein; die **CEB** trägt es **fein und zur Compile-Zeit**. System- und Organ-Achsen bleiben davon
+unberührt.
+**Was daran hängt:** die **Realm-Zuordnung ist bindend für alle Folgepakete** — eine im falschen
+Realm angelegte Achse zieht die falsche Registry, den falschen Stempel und die falsche
+Freigabe-Mechanik nach sich. Vergleichbar mit `load_framework` = MESS-Realm (§69, `:8123`), das
+bereits drinsteht. *Wortlaut nicht mitgeführt.*
+
+#### KON-04 — LAYER-MODELL-STEMPEL: EINE BINARY HAT KEINE EIGENE VERSIONSNUMMER
+
+**FEHLT** · **OWNER-WORT 26.07.2026** · Owner verbatim: *"Eine Binary hat KEINE eigene
+Versionsnummer"*.
+**Inhalt:** nur der **Planner** trägt eine Versionsnummer. CEB und Tier-Binary identifizieren sich
+**aus der Rekombination der Haupt-Achsen plus der Algorithmus-Versionierung** — nicht aus einer
+eigenen Nummer.
+**Was daran hängt:** **jeder Golden-String-Neuanker.** Der Ledger führt die Fingerprint-Zeile
+(SHA512 über die Stempel-Zeilen, `:7901`-Block, F7 = gesondertes Versionierungs-Interface `:11196`)
+— aber nicht das Verbot, daneben eine eigene Binary-Version zu führen. Wer eine einführt, bricht
+den Lookup über SHA512-Keys.
+
+#### KON-05 — DIE `merge`-ZEILE IM STEMPEL DARF NICHT EXISTIEREN; META-META-ACHSEN HÄNGEN ANS REALM-ENDE
+
+**FEHLT** · **OWNER-WORT 02.08.2026** · in der Ernte als **trigger-blockierend vor Voll-Bau-4**
+markiert.
+**Inhalt:** die `merge`-Zeile im Stempel **darf nicht existieren**. Meta-Meta-Achsen werden
+**dynamisch ans Ende des Realms** gehängt, nicht in den Stempelkopf gemischt.
+**Was daran hängt:** ein Voll-Bau, der die `merge`-Zeile mitschreibt, erzeugt Stempel, die gegen
+jeden späteren Bestand nicht mehr matchen — also einen **wertlosen Binary-Bestand**. Deshalb
+*vor* Voll-Bau-4 und nicht danach.
+
+#### KON-06 — GATTUNG GRAPH HAT NOCH KEINE GENUS (bereits gedeckt — nur Verweis)
+
+**GEDECKT, KEIN NEUER INHALT** · **OWNER-WORT 04.08.2026**.
+**Steht im Ledger:** `:8410` — Gattungs-Auslegung *"Graph (Stub, keine Genera)"* deckt den
+Gegenstand. Ebenfalls drin: die Terminologie-Korrektur *"Container ist kein Genus, sondern die
+Hauptgattung; SearchAlgorithm ist ein Genus unter der Gattung Map"*.
+**Warum der Eintrag trotzdem hier steht:** die Ernte hat ihn als FEHLT geführt; er wird hier
+ausdrücklich **zurückgenommen**, damit er nicht ein zweites Mal als Lücke gemeldet wird. Von den
+66 Positionen dieses Nachtrags trägt diese **keinen** neuen Inhalt.
+
+#### KON-07 — HERKUNFT DES 19-SLOT/22-REGISTRY-SATZES (27.06.2026)
+
+**DELTA** · **AGENTEN-BEHAUPTUNG mit Owner-Bezug, 27.06.2026** · Gegenprobe: `DefinitionOnly` = 2
+(steht drin), `AUTORITATIVER SATZ` = 0, `22 Registry` = 0.
+**Steht im Ledger:** der Satz selbst, wortgleich, in späteren Einträgen.
+**Kommt hinzu:** **die Herkunft** — dass dieser Satz am 27.06. entstanden und autoritativ gesetzt
+wurde.
+**Was daran hängt:** ohne das Ursprungsdatum lässt sich die spätere **19→18-Revision der
+Organ-Achsen** (MEMORY: *"18 ORGAN-ACHSEN, nicht 19"*) **chronologisch nicht einordnen** — und genau
+diese Einordnung entscheidet, ob die 19er-Stellen Altbestand oder aktive Fehler sind (vgl. KON-42,
+Positionen T-21/T-22).
+
+#### KON-08 — URSPRUNG DER ORGAN-METAPHER: "eine Achse innerhalb der Permutation ist Schwachsinn"
+
+**FEHLT** · **OWNER-WORT 05.05.2026, bestätigt 26.05.2026** · Owner verbatim: *"Eine search algo
+Achse innerhalb der Search Algo Permutation ist Schwachsinn"*.
+**Inhalt:** daraus entstand die bis heute verbindliche Sprache — **Achse = Organ**, Permutation =
+*"genetisches Experiment am Lebewesen"*. Gegenprobe: alle drei Begriffe 0 Treffer.
+**Was daran hängt:** die Metapher ist **nicht verhandelbar**, weil sie eine abgelehnte Konstruktion
+ausschließt (eine Achse in sich selbst permutieren). Der Ledger trägt die Sprache, nicht ihren
+Grund; ohne den Grund wirkt sie wie Geschmack und wird beim nächsten Umbau geopfert. Verwandt:
+MEMORY *"GATTUNG+GENUS = Interface-Hierarchie, KEINE Achsen"*.
+
+#### KON-09 — WARUM ZEHNTAUSENDE GROSSE BINARIES IN KAUF GENOMMEN WERDEN (dynamisches Laden ist verboten)
+
+**FEHLT** · **OWNER-WORT 25.05.2026** · Owner verbatim: *"Ja das bedeutet zehntausende grosse
+Suchmodul-Binaries… und das ist in Ordnung so."* Gegenprobe: `zehntausende` = 0.
+**Inhalt und Begründung:** shared bzw. **dynamisches Laden einzelner Algorithmus-Bestandteile
+erzeugt Lade-Latenzen ⇒ verfälscht das Messergebnis ⇒ ist verboten.**
+**Was daran hängt:** das ist die **wissenschaftliche Begründung hinter dem gesamten Massenanfall**
+— hinter Batch 4096, hinter der Lagerhaltung, hinter dem mehrtägigen Voll-Bau. Wer sie nicht kennt,
+schlägt beim nächsten Kapazitätsengpass genau das vor, was hier ausgeschlossen ist, und zerstört
+die Vergleichbarkeit aller Messwerte.
+
+#### KON-10 — `queuing_q1` UND `queuing_q2` (T17/T18) SIND BEWUSST ZWEI ACHSEN, NICHT EINE
+
+**DELTA** · **OWNER-WORT 26.05.2026** · Gegenprobe: `queuing_q1` = 4 Treffer (der Begriff steht
+drin), die **Absichtserklärung** nicht.
+**Steht im Ledger:** die Achsen selbst.
+**Kommt hinzu:** sie sind **absichtlich getrennt** und stehen im **kartesischen Produkt** — Q1 =
+Buffer-Strategie, Q2 = Flush-Policy; Pilotgröße 4×3.
+**Was daran hängt:** eine spätere "Vereinfachung" auf eine Achse sieht wie eine Aufräumung aus und
+ist eine **Zerstörung des Designraums** (12 Zellen fallen auf 4). Der Ledger führt `Q1` 48-mal,
+aber ohne diesen Satz ist die Trennung nicht geschützt.
+
+---
+
+## NACHTRAG 2 — MESSUNG / DRIFT / AUSGABE (KON-11 … KON-17)
+
+#### KON-11 — DRIFT-GATE: DER OWNER-WORTLAUT (5 %, 3 aufeinanderfolgende 2-Phase-Messungen, WARNUNG)
+
+**DELTA** · **OWNER-WORT 25.06.2026** · Owner verbatim: *"Mehr als 5 % Messabweichung bei
+Wiederholung sind unzuverlässig; in einem solchen Fall müssen wir bei 3 aufeinanderfolgenden
+2-Phase-Messungen alle 3 nochmal wiederholen und das Ereignis als Warnung loggen."*
+**Steht im Ledger:** `Drift-Gate` 8-mal — aber **nur als Paraphrase**, nie als eigener Eintrag mit
+diesem Wortlaut.
+**Kommt hinzu:** der Wortlaut, und damit drei prüfbare Festlegungen: (a) Schwelle **5 %**,
+(b) Wiederholungseinheit ist **3 aufeinanderfolgende 2-Phase-Messungen, alle drei erneut**,
+(c) Ereignisklasse ist **Warnung**, nicht Fehler.
+**Was daran hängt:** MEMORY führt *"Drift-Gate = 18× je Zelle"* — die 18 ist eine
+Kapazitätsableitung, die 5 % / 3 / Warnung sind die **Regel**. Die Paraphrase erlaubt es, (c) still
+zu einem Abbruch zu machen und damit `allow_failure`-Verhalten durch die Hintertür einzuführen.
+
+#### KON-12 — T-5 OFFEN: BLEIBT ES BEI 3 WIEDERHOLUNGEN? REAL GEFAHREN WURDE 1
+
+**FEHLT** · **MESSUNG plus OFFENE OWNER-FRAGE** · Herkunft T-5.
+**Inhalt:** die Zusage lautet 3 Wiederholungen je Zelle; **real gefahren wurde 1**.
+**Was daran hängt:** **die Validität aller bisher gefahrenen Läufe.** Mit n=1 gibt es keine
+Wiederholungsabweichung, also kann das Drift-Gate (KON-11) gar nicht auslösen — das Gate war bei
+allen bisherigen Läufen strukturell wirkungslos. **Ausdrücklich OFFEN**: entweder wird der Bestand
+als "ohne Drift-Aussage" gekennzeichnet, oder er wird nachgemessen. Das ist eine Owner-Frage, keine
+Bau-Entscheidung.
+
+#### KON-13 — FÜNFTE MESS-ZELLEN-SEMANTIK: "die Werte tragen nicht" HAT KEIN TOKEN
+
+**DELTA** · **OWNER-WORT (Datum im Ledger bei `:8950`)** · Owner verbatim, bereits im Ledger:
+*"…dass die Werte nicht tragen, weil der Ort der Ausfuehrung nicht bekannt ist"*.
+**Steht im Ledger:** der Owner-Satz selbst, `:8950`.
+**Kommt hinzu, zwei Stücke:** (a) **die Konsequenz** — es gibt **kein Token** für diesen Zustand;
+die vier bestehenden Nicht-Zahl-Token reichen nicht, es braucht ein fünftes; (b) **ein offener
+Widerruf** gegen den Entscheid vom 05.07.2026 (*"perm_runner-Pinning live verworfen"*), der
+**quittiert werden muss** — solange er unquittiert ist, stehen zwei gegenläufige Entscheide
+nebeneinander.
+**Was daran hängt:** MEMORY-Regel *"Fehler→CSV: failed, nicht null"*. Ohne fünftes Token wird
+"Ort unbekannt" als eine der vier bestehenden Klassen geschrieben und ist danach nicht mehr
+unterscheidbar.
+
+#### KON-14 — `assess_drift()` ERKLÄRT MEDIAN=0 ALS "STABIL, 0 RERUNS" STATT ALS UNBESTIMMBAR
+
+**DELTA** · **MESSUNG am Objekt** · Gegenprobe: `assess_drift` = 0 Treffer, `leeres Messfenster`
+= 1 Treffer.
+**Steht im Ledger:** der Begriff des leeren Messfensters, einmal.
+**Kommt hinzu:** die konkrete Fehlfunktion — `assess_drift()` deutet **Median = 0** als *"stabil,
+0 Reruns"*. Die beiden Fälle, die tatsächlich dahinterstehen, sind **wegoptimierte Operation** und
+**kaputte Uhr**; beide erscheinen als **"GRÜN MIT NENNER 0"**.
+**Was daran hängt:** ein grünes Gate ohne Gegenstand. Das ist wortgleich die Klasse aus MEMORY
+*"EIN GRÜNES GATE deckt nur seinen Gegenstand"* und aus dem PRT-ART-Befund an der Ledger-Spitze
+(*"eine korrekt arbeitende Pruefung am falschen Gegenstand"*). Bei Median 0 muss die Zelle
+**unbestimmbar** heißen, nicht stabil.
+
+#### KON-15 — DER PLANER KANN KEINE MESS-FREIE BINARY ERZEUGEN (`measurement_on`/`single_thread` haben 0 Leser)
+
+**FEHLT** · **MESSUNG 09.08.2026, am Objekt** · Fundstelle:
+`experiment_plan_director.hpp:121-123`.
+**Befund:** `cmake_build_type` hat **8 Leser**; **`measurement_on` hat 0 Leser** und
+**`single_thread` hat 0 Leser** — beide werden **geschrieben und nie gelesen**.
+**Was daran hängt:** **Kettenstation 7 (Release-Modus) ist strukturell nicht baubar** — und der
+Bau **könnte trotzdem als "gebaut" durchgehen**, weil der Planer die Felder brav schreibt. Das
+berührt KON-46 unmittelbar: die Owner-Zusage *"Zur Abgabe wenigstens single Tier-Binary release"*
+setzt genau diesen Pfad voraus. Der Ledger führt `measurement_on` 21-mal als **Feld**, nirgends als
+**toten Leser**.
+
+#### KON-16 — DER xlsx-WRITER IST FERTIG UND GRÜN, ABER VON NULL PRODUKTIONS-TARGETS GELINKT
+
+**FEHLT** · **MESSUNG 09.08.2026, am Objekt** · Gegenprobe: `lager_ablage` = 0 Ledger-Treffer,
+`xlsx` = 104 (der Gegenstand ist breit dokumentiert, die Linker-Lücke nicht).
+**Befund:** `comdare::lager_ablage` erscheint **ausschließlich** in
+`tests/unit/CMakeLists.txt:5699`, `:5716`, `:5730`. Kein einziges Produktions-Target linkt ihn.
+**Was daran hängt:** der Owner-KERN *"xlsx IST DIE AUSGABE"* (MEMORY) **scheitert am letzten Zoll**,
+nicht am Anfang der Kette. Der Fix ist damit eindeutig benannt: **eine fehlende Linker-Kante**, kein
+Neubau. Diese Präzision ist der ganze Wert des Eintrags — ohne sie wird die xlsx-Ausgabe erneut als
+großes offenes Paket geplant.
+
+#### KON-17 — XorFilter LIEFERT 30 VON 256 ECHTE FALSE NEGATIVES (plus Posten 74 und 77)
+
+**FEHLT** · **MESSUNG 05.08.2026** · Gegenprobe: `30 von 256` = 0, `False Negative` = 0;
+`XorFilter` = 4 Treffer, alle anderer Gegenstand (`:8188`, `:8528`, `:11479`, `:11495`).
+**Befund:** der XorFilter meldet **Existierendes als nicht-existent** — 30 von 256. Dazu aus
+derselben Erhebung: **Posten 74** (Roh-Daten-Route bei OOM) und **Posten 77** (`kReal16`
+kollabiert auf einen trivialen Zustand; `kReal16` = 3 Ledger-Treffer, aber ohne diesen Befund).
+**Was daran hängt:** ein False Negative in einem Filter ist **kein Performance-Thema, sondern ein
+Korrektheitsfehler** — jede Messreihe über diesem Filter misst ein falsches Programm. Der Befund
+ist fünf Tage alt und in keinem Ledger-Posten verankert.
+
+---
+
+## NACHTRAG 3 — CI / INFRA / BETRIEB (KON-18 … KON-29)
+
+#### KON-18 — AKUTER CI-DEFEKT 10.08.: `test_d2_abdeckungs_wache_nenner` ROT AUF prod2 (486 gegen 488)
+
+**DELTA, AKUT** · **MESSUNG 10.08.2026** · Gegenprobe: `15515` = 0 Treffer, `D2-G5` = 4.
+**Steht im Ledger:** die **Arithmetik** — `:401` (*"490 trifft keine der beiden Konfigurationen
+(488 ohne 2-Pass, 492 mit)"*) und `:537` (*"D2 Untergrenze… ⇒ offen"*).
+**Kommt hinzu, drei Stücke:** (a) der **konkret fehlschlagende Test**
+`test_d2_abdeckungs_wache_nenner` mit **486 Tests gegen die committete Untergrenze 488**;
+(b) die **Host-Klassen-Blindheit** — die Untergrenze unterscheidet nicht, auf welcher Runner-Klasse
+sie gilt; (c) die **ce-Pipeline 15515 ist ROT**.
+**Was daran hängt:** der Autor der Untergrenze hat selbst gewarnt *"492 ist ein Maximum, keine
+Untergrenze"* und dennoch mit **4** statt real **6** fehlenden ISA-gebundenen Tests gerechnet. Das
+ist derselbe Gegenstand wie der Zusatzbefund an der Ledger-Spitze
+(`test_ap5_simd_extension_coherence.cpp`, `if(AVX2 AND AVX512F)`) — **beide Posten gehören
+zusammengeführt**, sonst wird die Untergrenze zweimal unabhängig korrigiert.
+
+#### KON-19 — `hy_label_gate` SCHLÄGT GEGEN DEN EIGENEN VENDORIERTEN ce-STAND AN (rc=1, 26 Befunde)
+
+**FEHLT** · **MESSUNG 09.08.2026** · Gegenprobe: `hy_label_gate` = 0.
+**Befund:** der gepinnte ce-Stand liegt **98 Commits hinter `development`** und trägt Hybrid-Doku,
+die die **eigene neue Wache** ablehnt — `rc=1`, **26 Befunde**.
+**Was daran hängt:** das ist das **erste harte Abnahme-Orakel für das Vendoring-Problem
+(Task #25)**. Bisher war "der Pin ist alt" eine Behauptung; jetzt gibt es einen Test, der rot wird.
+Damit ist Task #25 messbar abnehmbar statt verhandelbar.
+
+#### KON-20 — "BEI CI-STAUS NICHT AN DER CONCURRENCY DREHEN" — die Begründung fehlt, und sie ist tragend
+
+**FEHLT** · **OWNER-WORT 26.07.2026** · Owner verbatim: *"Bei CI-Staus NICHT an der concurrency
+drehen"*.
+**Inhalt:** `concurrency=1` war **bewusst** gewählt, **damit Messungen nicht gestört werden**.
+Pipelines queuen seriell — **das ist gewollt und kein Defekt**.
+**Was daran hängt:** ohne diese **Begründung** ist nicht mehr entscheidbar, ob OD-7 (§69.6, `:8135`,
+prod1 = 24 Worker, NORMAL concurrency=2) eine **bewusste Revision** oder eine **stillschweigend
+abweichende Weisung** ist. Zwei MEMORY-Referenzen stehen hier gegeneinander: *"PIPELINES STRENG
+SEQUENTIELL — parallele Pipelines = OOM"* und *"concurrent=4, nicht 2 — der wahre
+Speicher-Multiplikator"*. **Diese Auflösung ist selbst offen** und gehört auf die Owner-Liste.
+
+#### KON-21 — #210: ZWEI WURZELDIAGNOSEN, VIER WIDERLEGTE ALTERNATIVEN — der Ledger führt nur das Kürzel
+
+**DELTA** · **MESSUNG (Paket-Mitschnitt)** · Gegenprobe: `#210` = 6 Treffer, alle ohne Inhalt;
+`Zero-Window` = 0, `win 0` = 0.
+**Steht im Ledger:** das Kürzel #210, sechsmal.
+**Kommt hinzu:** **zwei Wurzeldiagnosen**, nicht eine — (a) **paket-bewiesene
+Zero-Window-Backpressure** beim Job-Trace-Upload (`win 0` **beidseitig** ⇒ Deadlock auf
+Anwendungsebene; Wurzel = gitlab-Storage, #207), (b) *"silent poll stall"*. Dazu **vier ausdrücklich
+widerlegte** Alternativhypothesen: HAProxy-Tunnel-Timeout · runner 19.1.1 · conntrack-Drop ·
+`connection_max_age`.
+**Was daran hängt:** die vier Widerlegungen sind teurer als die Diagnose. Ohne sie werden sie beim
+nächsten Stall erneut durchprobiert. Das ist die MEMORY-Regel *"Nichtfund nur mit Gegenprobe"* in
+ihrer nützlichsten Form.
+
+#### KON-22 — V111 / K8S-PROD-CALICO: KEIN DIREKT-CROSS-VLAN, STATTDESSEN `.1`-SNI PER GATEWAY
+
+**DELTA** · **OWNER-ENTSCHEID (Infra)** · Gegenprobe: der Ledger führt nur *"#231 V111-SNI"* ohne
+Inhalt.
+**Steht im Ledger:** die Kennung.
+**Kommt hinzu:** der **Entscheid** — **kein Direkt-Cross-VLAN**; stattdessen `.1`-SNI **per
+Gateway**, weil BM- und K8s-VLANs **per Design von V60 geblockt** sind. Dazu die lokalisierte
+Unbound-Split-Horizon-Konfiguration und das HAProxy-Backend.
+**Was daran hängt:** der nächste Infra-Agent, der Cross-VLAN als naheliegende Lösung vorschlägt,
+schlägt gegen eine bestehende Design-Entscheidung an. Infra-Hoheit liegt beim Infra-Agenten
+(MEMORY *"Cluster read-only"*) — dieser Eintrag ist eine **Notiz, kein Auftrag**.
+
+#### KON-23 — prod-MinIO ALS TIER-BINARY-COMPILE-CACHE IST DURCH OPN-BUG #72 (CARP vhid-91) BLOCKIERT
+
+**DELTA** · **MESSUNG/INFRA** · Gegenprobe: `vhid-91` = 2 Treffer, `OPN-Bug` = 0.
+**Steht im Ledger:** `vhid-91`, zweimal.
+**Kommt hinzu:** die **Blockade-Kette** — prod-MinIO als Compile-Cache für Tier-Binaries ist durch
+**OPN-Bug #72** blockiert (**CARP vhid-91 Split-Brain**, fehlender **V91-L2-Trunk**). Die CE-seitige
+**Push/Pull-Logik ist fertig, byte-neutral und env-gated inert**.
+**Was daran hängt:** **keine spätere Auflösung ist auffindbar** — der Posten kann also seit Wochen
+still liegen. Für den Voll-Bau ist er relevant: ein funktionierender Compile-Cache ändert die
+Kapazitätsrechnung, ein blockierter darf nicht eingeplant werden. Dass die CE-Seite fertig ist,
+heißt: **die Freigabe ist ein Infra-Schalter, kein Bau-Paket.**
+
+#### KON-24 — FEHLENDE REMOTES AUF Pi 5 UND node1 NACHZIEHEN (seit 23 Tagen offen)
+
+**FEHLT** · **OWNER-WORT 18.07.2026** · Owner verbatim: *"die auch halb fertige clone haben"*.
+**Inhalt:** auf **Pi 5** und **node1** fehlen Remotes und müssen nachgezogen werden. Regel dazu:
+**bei fehlendem Remote immer syncen — Ausnahme: das Cluster-git** (plain-text-cred-Vault, das ist
+**gewollt**).
+**Was daran hängt:** zum Prüfzeitpunkt **23 Tage offen, kein Erledigt-Vermerk**. Berührt die
+MEMORY-Regel *"Dual-Remote GitHub/GitLab"* und *"4 Klone keep in sync"* (siehe W-6). Die
+**Cluster-git-Ausnahme** ist der eigentlich wertvolle Teil: ohne sie synchronisiert jemand
+pflichtbewusst einen Klartext-Credential-Vault nach außen.
+
+#### KON-25 — ODROID H4 = 6 % DER LEISTUNG VON prod1; PAUSIEREN — MIT AUSDRÜCKLICHEM REAKTIVIERUNGS-AUFTRAG
+
+**DELTA** · **MESSUNG plus OWNER-WORT** · Owner verbatim: *"am Ende für den voll build mit allen
+Plattformen wieder aktivieren (bitte notieren)"*.
+**Steht im Ledger:** `Odroid` = 3 Treffer — `:6898` (*"N Nodes mit amd64-Kapazität… z. B. können die
+Odroid H4 nur Kompilation"*), `:6903` (Tag-Routing `amd64`) und `:5245`, alle in **anderem
+Zusammenhang**.
+**Kommt hinzu, zwei Stücke:** (a) die **Messzahl** — **6 % der Leistung von prod1, Build 20-mal so
+lang**, deshalb pausieren, damit prod1 alles übernimmt; (b) das **Reaktivierungs-TODO** mit dem
+ausdrücklichen Notier-Auftrag des Owners.
+**Was daran hängt:** der Reaktivierungs-Auftrag ist an den **Voll-Build mit allen Plattformen**
+gebunden — genau den Lauf, der jetzt ansteht. Ein pausierter Runner, dessen Reaktivierung nirgends
+steht, fehlt in der Plattform-Matrix, ohne dass es jemandem auffällt.
+
+#### KON-26 — RUNNER-INVENTAR 25.06.: WINDOWS-SERVER-2022-SCHLÜSSEL GEKAUFT, node5/node6 macOS VERKONFIGURIERT
+
+**FEHLT** · **OWNER-WORT/INFRA 25.06.2026**.
+**Inhalt:** der **Windows-Server-2022-Schlüssel ist bereits gekauft**; die **macOS-Runner node5 und
+node6 sind physisch vorhanden, aber verkonfiguriert**. Hier liegt zugleich der **Ursprung der Regel
+"concurrent=2 = halbe Host-Kerne"** (8 von 16 auf prod1 und prod2, 10 von 20 auf der Talos-VM).
+**Was daran hängt:** die concurrent-Regel wurde später revidiert (OD-7, `:8135`) — **ohne dass ihr
+Ursprungspunkt im Ledger stand**. Genau daraus entsteht der Streit in KON-20 und in der
+MEMORY-Referenz *"concurrent=4, nicht 2"*. Der gekaufte Schlüssel ist zudem eine bezahlte Ressource,
+die ohne Notiz ungenutzt bleibt.
+
+#### KON-27 — RF-3: OS-FEHLERKLASSE JETZT BAUEN, DIE FLOTTE STEHT BEREIT (Win11, WS2022, 7 Linux, 2 macOS)
+
+**FEHLT** · **OWNER-WORT 26.07.2026** (Punkt RF-3).
+**Inhalt:** die **OS-Fehlerklasse ist jetzt zu bauen**. Die Infrastruktur hält bereit:
+**Windows 11 · Windows Server 2022 · 7 Linux-Docker-Container · 2 macOS**.
+**Was daran hängt:** das ist die **konkrete Flottenzahl für den `operating_system`-Unterachsen-
+Katalog**. MEMORY führt *"Fehlerklassen Pflicht für alle Achsen, Unterachsen, Algorithmen"* — ohne
+die Flottenzahl ist der Katalog nicht dimensionierbar. Verbindet sich mit KON-26 (die Maschinen
+existieren, sind aber teils verkonfiguriert).
+
+#### KON-28 — I113: RUNNER-TOKEN-ROTATION UND INFRA-RESTPOSTEN (06.08.) — niedrige Konfidenz
+
+**FEHLT, mit Vorbehalt** · **AGENTEN-BEHAUPTUNG 06.08.2026** · Gegenprobe: `I113` = 0, während
+`I112` = **2 Treffer** hat.
+**Inhalt:** Runner-Token-Rotation plus Infra-Restposten.
+**Vorbehalt, ausdrücklich:** **niedrige Konfidenz** — es ist möglich, dass I113 in eine **fremde
+Infra-Domäne** gehört und im Diplomarbeits-Ledger nichts zu suchen hat. Der Eintrag steht hier als
+**Prüfauftrag an den Infra-Agenten**, nicht als Bau-Posten. Dass die Nachbarnummer I112 zweimal
+drinsteht, ist der einzige Grund, ihn überhaupt zu vermerken.
+
+#### KON-29 — `cd-buildsystem-core` v3.4.15 VIA `buildsystem.xml` ALS PFLICHT-BAUWEG — GELTUNG UNGEKLÄRT
+
+**FEHLT, mit Vorbehalt** · **OWNER-WORT/INFRA 05.07.2026** · Gegenprobe: `cd-buildsystem-core` = 0;
+`buildsystem.xml` = 13 Treffer, aber **anderer Gegenstand**.
+**Inhalt:** `cd-buildsystem-core` **v3.4.15** über `buildsystem.xml` ist der **Pflicht-Bauweg für
+comdare-Produkte**.
+**Vorbehalt, ausdrücklich:** **ungeklärt, ob die Diplomarbeit unter diese Produktpflicht fällt oder
+bewusst ausgenommen ist.** Vor einer Einstufung als Lücke ist das **am Objekt oder beim Owner** zu
+klären — die 13 vorhandenen `buildsystem.xml`-Treffer dürfen **nicht** als Bestätigung gelesen
+werden.
+**Was daran hängt:** kollidiert potenziell mit MEMORY *"CMake/ctest — immer der schwere offizielle
+Weg"* und *"keine skripte ausser cmake sparsam"* (KON-34). Falls die Pflicht gilt, ist der aktuelle
+Bauweg nicht konform; falls nicht, ist jede Anpassung Schaden.
+
+---
+
+## NACHTRAG 4 — PIPELINE-PRINZIP / QUALITÄT (KON-30 … KON-35)
+
+#### KON-30 — DIE #186-GRÜNDUNGSFORMEL: "als professioneller Entwickler besteht eine Basis-Pipeline IMMER"
+
+**DELTA** · **OWNER-WORT 25.06.2026** · Owner verbatim: *"Für mich als professionellen Entwickler
+besteht eine Basis-Pipeline IMMER, wenn umsetzbar, mindestens aus diesen Stufen."*
+**Steht im Ledger:** `#186` wird **dutzendfach** referenziert.
+**Kommt hinzu, zwei Stücke:** (a) der **Gründungssatz** selbst; (b) die **konkrete Werkzeugtabelle
+je Stufe**, darunter das **SBOM-Gate an Stufe 8** mit `syft`, `grype`, `trivy`. Gegenprobe: alle
+drei Werkzeugnamen **0 Treffer**.
+**Was daran hängt:** #186 wird als Nummer zitiert, ohne dass irgendwo steht, **was sie fordert** —
+dieselbe Klasse wie die OV-Nummernkollision (W-9). Solange die Werkzeugtabelle fehlt, ist "#186
+erfüllt" nicht prüfbar.
+
+#### KON-31 — "DIE CI/CD IST EIGENTLICH DAS FUNDAMENT" — die Wurzelbegründung für Pipeline-vor-Messlauf
+
+**FEHLT** · **OWNER-WORT 25.06.2026** · Owner verbatim, drei Sätze: *"Die CI/CD ist eigentlich das
+Fundament"* · *"Der derzeitige Code übersteht noch keine Wartbarkeit"* · *"Wir machen erst die
+Pipeline klar und dann den Messlauf voll treiben."*
+**Was daran hängt:** das ist die **Wurzelbegründung jeder Pipeline-vor-Messlauf-Priorisierung**.
+Ohne sie wirkt jede Pipeline-Arbeit im Endspurt vor dem 15.09. wie Aufschieben — mit ihr ist sie
+die vom Owner gesetzte Reihenfolge. Verbindet sich mit MEMORY *"Gesamte Pipeline immer hart grün"*
+und *"allow_failure verboten"*.
+
+#### KON-32 — ZIRKULARITÄT ce ↔ prt-art: DIE PRODUKTIONSKANTE IST EINSEITIG, DIE RÜCKKANTE IST TEST-ISOLIERT
+
+**DELTA** · **AGENTEN-BEHAUPTUNG mit Code-Beleg** · Gegenprobe: `COMDARE_CE_PRUEFLINGE` = 2 Treffer
+(nur PA-3 und CI-3); `Endless-Loop` = 0, `artefakt-isoliert` = 0.
+**Steht im Ledger:** `COMDARE_CE_PRUEFLINGE` in zwei engen Zusammenhängen.
+**Kommt hinzu:** **der Mechanismus, der den Endless-Loop bricht** — die Produktionskante läuft
+**einseitig ce → prt-art** über `COMDARE_CE_PRUEFLINGE`; eine **Rückkante existiert ausschließlich
+in einer artefakt-isolierten Teststufe**.
+**Was daran hängt:** ohne diese Erklärung sieht die Rückkante wie ein Zyklus aus und wird "repariert"
+— womit die Teststufe verschwindet. Berührt unmittelbar KON-49 (PRT-ART soll als
+Erweiterungspaket **zur Compile-Zeit** von der Cache-Engine geladen werden) und W-1.
+
+#### KON-33 — dev-FIRST-DEPLOY-GATE: PROD-DBs READ-ONLY IN DEN dev-CLUSTER, CHAOS-VERIFIKATION VOR PROD-DEPLOY
+
+**FEHLT** · **OWNER-WORT 25.06.2026**.
+**Inhalt:** Production-Datenbanken synchronisieren **read-only** in einen **isolierten
+dev-Cluster**; dort läuft die **Chaos-Engineering-Verifikation vor jedem Prod-Deploy**. Harte
+Schranken: **nie auf prod schreiben**, und **nur die zwei sanktionierten Brücken** benutzen.
+**Was daran hängt:** eine Betriebsregel mit Datenschutz- und Integritätsfolgen. Die Schranke *"nie
+auf prod schreiben"* ist die Art Satz, die man nur einmal verliert. *Wortlaut in der Ernte nicht
+mitgeführt, Gegenstand paraphrasiert.*
+
+#### KON-34 — `g++15.3 ist minimum und standard` (kein 16er-Pin) UND "keine skripte ausser cmake sparsam"
+
+**FEHLT** · **OWNER-WORT 26.07.2026** · Owner verbatim: *"g++15.3 ist minimum und standard"* und
+*"keine skripte ausser cmake sparsam"*. Gegenprobe: `g++15.3` = 0, `GNU 15.3` = 0 (`15.3` = 31, alle
+anderer Gegenstand).
+**Was daran hängt:** MEMORY *"NUR VIER BINARY-TYPEN — IST: 8 Behelfs-CLIs + 60 Shell/20.030 Zeilen
+(WÄCHST)"*. Der Satz *"keine skripte ausser cmake sparsam"* ist die **Owner-Grundlage** dieses
+Befunds und fehlte bisher.
+
+#### KON-35 — DIE GCC-WIDERRUFSKETTE IST HALB IM LEDGER: DER VOLLZUG VOM 27.07. FEHLT
+
+**DELTA** · **MESSUNG plus OWNER-WORT 27.07.2026**.
+**Steht im Ledger:** `:5165` — *"Default bleibt Trunk-16 bis gcc-15.3"* plus der GCC-16-ICE.
+**Kommt hinzu:** **der Vollzug** — am 27.07. wurde **15.3 flottenweit Kanon**, CI-bewiesen durch die
+**Pipelines 13555 und 13556 auf GNU 15.3.0**.
+**Was daran hängt:** eine halbe Widerrufskette ist gefährlicher als keine. Wer nur `:5165` liest,
+hält Trunk-16 für den Default und baut gegen einen Compiler, der flottenweit abgelöst ist. Gehört
+mit KON-34 zusammen gebucht, damit Regel und Vollzug an einer Stelle stehen.
+
+#### KON-36 — FÜNF PERMANENT ROTE super-TESTS SIND DAUERZUSTAND, MIT NAMEN UND FEHLERKLASSE
+
+**DELTA** · **MESSUNG**.
+**Steht im Ledger:** nur der erste Name.
+**Kommt hinzu, die vollständige Menge mit Fehlerklasse:**
+
+```
+test_v31_adapters                  SEGFAULT       vendor-snmalloc
+test_v41_topic_allocator_axis_06   Abort
+test_limits_entkopplung_vorstufe   CRC-MISMATCH
+test_lazy_adhoc_source_gen         CRC-MISMATCH
+test_axis_registry_roundtrip       Inventar-Drift gate-gewollt
+```
+
+**Was daran hängt:** **ohne diese Menge wirkt jeder künftige Lauf mit 5 roten Tests fälschlich wie
+eine Regression** — und umgekehrt verschwindet eine echte sechste Regression im bekannten Rauschen.
+Der letzte Eintrag ist ausdrücklich **gate-gewollt** und darf nicht "repariert" werden.
+
+---
+
+## NACHTRAG 5 — THESIS / GOVERNANCE / RECHT (KON-37 … KON-45)
+
+*Hinweis zur Nummerierung: KON-36 steht thematisch bei Block 4 (Qualität) und ist dort gebucht.*
+
+#### KON-37 — 98 VON 366 COMMITS (27 %) IM THESIS-REPO TRAGEN DEN VERBOTENEN KI-CO-AUTOR-TRAILER
+
+**DELTA** · **MESSUNG** · Gegenprobe: `Co-Authored-By` = 3 Treffer (die **Regel**), die
+**Verletzungsmessung** = 0.
+**Steht im Ledger:** die Regel, zweimal — `:15168` (*"Kein Co-Authored-By-Trailer
+(Thesis-Regel)"*) und `:5253` (*"OHNE Co-Authored-By, Overleaf-Regel"*).
+**Kommt hinzu, die Messung:** **98 von 366 Commits = 27 %**, aufgeschlüsselt:
+**78× "Claude Opus 4.8 (1M context)" · 13× "Claude Fable 5" · 6× "Claude Opus 4.8"**. Jüngster Fall
+`19e15920` vom **06.08.2026**.
+**Was daran hängt:** **das ist kein Altlast-Problem** — es passiert weiter, und das Repo wird nach
+**Overleaf und GitHub gespiegelt**. Damit ist es außenwirksam und berührt KON-38 unmittelbar.
+
+#### KON-38 — DER GRUND DER OVERLEAF-REGEL: TU-GOVERNANCE = AKADEMISCHE ALLEINURHEBERSCHAFT
+
+**DELTA** · **GOVERNANCE-QUELLE** · Gegenprobe: `Alleinurheber` = 0, `Overleaf` = 53.
+**Steht im Ledger:** die Regel, 53-mal berührt.
+**Kommt hinzu:** **ihr Grund** — die TU-Governance verlangt **akademische Alleinurheberschaft**;
+deshalb darf kein KI-Co-Autor in der Historie stehen.
+**Was daran hängt:** eine Regel ohne Grund wird beim ersten Zeitdruck als Formalie behandelt. Mit
+dem Grund ist sie eine Prüfungsbedingung. Direkte Klammer zu KON-37: dort steht die Verletzung,
+hier steht, warum sie eine ist.
+
+#### KON-39 — ARCHITEKT-DIREKTIVE II: DIE ZERSCHNITTENEN ALGORITHMUS-BESTANDTEILE ERZEUGEN EIN NEUES WERK
+
+**FEHLT** · **OWNER-WORT 08.05.2026, bestätigt 14.05.2026** · Owner verbatim: *"Da wir alle
+Algorithmus-Bestandteile zerschneiden, entsteht für alle Permutations-Achsen ein neues Werk. Das
+gilt für alle Lizenztypen. Repos ohne Lizenztypen haben nur ein formales copyright, also muss nur
+der Autor beim Zitieren genannt werden."*
+**Was daran hängt:** dieser eine Satz **löst die GPL-3-Konflikte (P04 CoCo-trie, P07 Wormhole) und
+den No-License-Status (P06, P25, P30, A03) ohne Einzelbestätigung**. Der spätere Ledger-Satz
+`:15701` (Task #42, *"wir ignorieren die Lizenz, weil Prof. Habich freigegeben hat"*) bestätigt
+dieselbe Linie **ohne Rückverweis** auf die dokumentierte Begründung — **genau das vom Owner
+gerügte Symptom**: die Entscheidung existiert, wird aber jedes Mal neu erfunden. Berührt W-5, löst
+ihn aber **nicht**: W-5 betrifft die **Repo-Lizenzen**, dieser Eintrag die **Paper-Herkunft**.
+
+#### KON-40 — DAS ADR-REGISTER: 25 ARCHITEKTURENTSCHEIDUNGEN F1–F15 PLUS F-EXTRA-1..8 (04.05.2026)
+
+**FEHLT** · **OWNER-WORT 04.05.2026** — im Register geführt als *"beschlossen durch den Architekten
+(Nutzer)"* · Gegenprobe: `F1-F15` = 0, `F-EXTRA` = 0.
+**Inhalt:** ein vollständiges ADR-Register mit 25 Entscheidungen, darunter: Singleton-Form ·
+Observer-Mechanik · Permutationsraum · Codegen-Strategie · ABI-Form · Adapter-Pattern mit der
+Habich-Direktive *"Originalcode bleibt bit-identisch in `ext/`"*.
+**Was daran hängt:** **das ist die formale Grundgesetz-Ebene der Architektur und der größte
+Einzelfund dieser Konsolidierung nach Tragweite.** Der Ledger führt die Folgen dieser Entscheidungen
+an dutzenden Stellen, aber nirgends die Entscheidungen selbst — jede Diskussion über Singleton,
+Observer oder Adapter beginnt deshalb bei Null. `F1` = 28 und `F-1` = 31 Treffer im Ledger meinen
+**andere** Gegenstände (Meilenstein F1 am 14.08. bzw. Fehlerklassen) — die Verwechslungsgefahr ist
+real und gehört mitnotiert.
+
+#### KON-41 — SECHS PFLICHT-SEITENTYPEN, DREI-REPO-ROLLENTRENNUNG UND DER 7-QUELLEN-HYBRID
+
+**FEHLT** · **OWNER-WORT 12.04.2026 und 08.05.2026**.
+**Inhalt, die Rollentrennung wörtlich benannt:** `Diplomarbeit/Code/` = **"WAS + Auswertung"** ·
+`comdare-prt-art` = **"Prüfling"** · `comdare-cache-engine` = **"WIE + Werkzeuge"**. Dazu die
+**sechs Pflicht-Seitentypen** und der **7-Quellen-Hybrid**.
+**Was daran hängt:** die Trennung wird **im Code gelebt**, hat aber **im Ledger keine autoritative
+Herkunft**. Jede Frage der Form "gehört das nach ce oder nach super?" ist damit heute Auslegung
+statt Nachschlagen. Klammert mit KON-32 (Zirkularität) und dem Owner-Wort aus KON-63 (die
+PRT-ART-Richtung).
+
+#### KON-42 — §63 THESIS-SOLL-ABGLEICH: 23 ÜBERNAHMEFERTIGE EINTRÄGE, DARUNTER ZWEI STALE-KORREKTUREN
+
+**FEHLT** · **AGENTEN-ERHEBUNG 06.08.2026, gegen einen 6.735-Zeilen-Ledger** · Gegenprobe:
+`63-T-` = **0**, heute erneut bestätigt.
+**Inhalt:** 23 fertig formatierte Einträge `§63-T-01 … §63-T-23`. Die vier kritischsten:
+- **T-01:** das **Talos-OS-Regime hat null Code- und CI-Spur**, trotz **zwei ADR-Zusagen**.
+- **T-08:** die gelieferten **Anhang-Ergebnistabellen sind aus keinem Repo-Bestand reproduzierbar**
+  — **es existiert genau EIN echter Mess-Lauf: 16 Zeilen, `057ee3e5`, 26.07.2026**.
+- **T-19:** die **bias-freie Vollmatrix** — *"der methodische Kern der Arbeit"* — ist im Register auf
+  einen **Doku-Vermerk abgestuft**.
+- **T-21 und T-22 sind STALE-KORREKTUREN:** zwei **bestehende** Ledger-Einträge zeigen auf die
+  **falsche Zielzahl (19 statt 18 Achsen)** und **würden bei Ausführung eine Regression erzeugen**.
+**Was daran hängt:** T-08 ist die härteste Zahl dieser gesamten Konsolidierung — **ein** Mess-Lauf
+mit **16 Zeilen** trägt die Anhangstabellen der Arbeit. T-21/T-22 sind der seltene Fall, in dem
+**Nicht-Handeln sicherer ist als Handeln**: die Einträge müssen korrigiert werden, **bevor** sie
+jemand abarbeitet. Klammert mit KON-07 (Herkunft der 19→18-Revision).
+
+#### KON-43 — SECHS BETREUER-PFLICHTEN, MIT GEGENPROBE BELEGT ABWESEND
+
+**FEHLT** · **MESSUNG (Gegenprobe-Lauf)**.
+**Die sechs:** Ordnungsmodi · Common-Denominator · Ablation · Relocation · Prefix-Lookup ·
+`art.profile.xml`. **Positivkontrollen desselben Laufs:** `CLU` = 270, `Adapter` = 141,
+`Hybrid` = 107 — das Werkzeug hat gesucht.
+**Drei Einzelbefunde:** **D-12** — die drei Ordnungsmodi **existieren im Code nicht**; **D-03** —
+Prefix-Lookup und Prefix-Enumeration finden sich **nirgends**; **D-04** — die Ablationsstufe
+*"Cache-Engine Off"* hat **keine CSV-Spalte**.
+**Was daran hängt:** das sind **Betreuer**-Pflichten, also Prüfungsgegenstand, nicht interne
+Qualität. D-04 ist der billigste davon (eine Spalte) und zugleich der, ohne den die Ablation
+gar nicht ausgewertet werden kann.
+
+#### KON-44 — `termine/INDEX.md` IST AUF STAND 15.05. EINGEFROREN UND LISTET T9–T11 NICHT
+
+**DELTA** · **MESSUNG**.
+**Steht im Ledger bzw. MEMORY:** die Referenz *"`docs/termine` ist die Primärquelle"*.
+**Kommt hinzu:** **die Primärquelle zeigt auf einen veralteten Index** — `termine/INDEX.md` steht
+auf **15.05.2026** und **listet T9, T10 und T11 nicht**. Strukturell verschärft: **Termin 9, 10 und
+11 haben gar keine Konsolidierung** unter `termine_konsolidiert/`; dort liegen nur rohe `.docx`- und
+`.pptx`-Dateien.
+**Was daran hängt:** das ist ein **mechanischer Lücken-Erzeuger** — wer der Regel folgt und den
+Index liest, bekommt systematisch die letzten drei Termine nicht zu sehen. Es ist damit dieselbe
+Klasse wie W-1 (Antwort vorhanden, Zugriffsweg führt daran vorbei), nur im Termin-Korpus.
+
+---
+
+## NACHTRAG 6 — TERMINE / FRISTEN / VOLL-BAU (KON-45 … KON-52)
+
+#### KON-45 — DIE FRISTEN-KETTE ALS EIN SATZ: 08.08. → jeden Freitag → F1 am 14.08. → 15.09.
+
+**DELTA, stark reduziert nach eigener Gegenprobe** · **OWNER-WORT** · Owner verbatim: *"wir müssen
+JEDEN Freitag neue Ergebnisse liefern"*.
+**Steht im Ledger — mehr als die Ernte annahm** (siehe K0.4): `15.09.2026` = 7 Treffer ·
+`jeden Freitag` = 2 (`:9441`, `:9444`), Freitags-Lieferung zusätzlich `:9460`, `:9806` (Posten N-1),
+`:12929` · **F1 = 28 Treffer, `14.08` = 5**, darunter `:3556` (*"Die Zusage (GOAL v8, F1 am
+Fr 14.08.)"*), `:736`, `:1707`, `:1842`, `:1885` — überall als kritischer Pfad.
+**Kommt hinzu — nur noch ein Anker-Satz:** die **Kette an einer Stelle**, in dieser Reihenfolge:
+**Zwischen-Abgabe 08.08. (vergangen) → wöchentliche Lieferung jeden Freitag → Meilenstein F1 am
+Fr 14.08. → End-Termin 15.09.** Die Einzelteile stehen verstreut über rund 12.000 Zeilen.
+**Ehrlich vermerkt:** die Ernte hatte hier zwei Null-Treffer gemeldet, die **falsche Nullen** waren
+(Groß-/Kleinschreibung). Der ursprüngliche Fund war deutlich größer als der verbleibende Rest.
+
+#### KON-46 — FALLBACK- UND RETRY-POLICY FÜR DEN VOLL-BUILD: 5× / 2× / 1×
+
+**FEHLT** · **OWNER-WORT 10.08.2026** · Owner verbatim zur Reihenfolge der Abgabe: *"Zur Abgabe
+wenigstens single Tier-Binary release und danach multi Hybrid-Tier-Binary release."*
+**Die Policy, drei Stufen:**
+
+```
+Tier-Binary   Wiederholung  max. 5x
+Batch 4096    Wiederholung  max. 2x
+Gesamtlauf    Wiederholung  max. 1x   (ein ganzer Lauf = ALLE Batches)
+```
+
+**Was daran hängt:** das ist die **Abbruchbedingung des mehrtägigen Voll-Builds** — ohne sie läuft
+entweder eine Endlosschleife oder ein Lauf bricht zu früh ab. Die Reihenfolge-Zusage bindet
+zusätzlich KON-15: **single Tier-Binary release** setzt den Release-Pfad voraus, der laut Messung
+heute strukturell nicht baubar ist.
+
+#### KON-47 — PLAN B WÖRTLICH: HARDWARE-ERWEITERUNG IST STETS ZULÄSSIG, NEUBAU NUR BEI FUNKTIONSEINSCHRÄNKUNG
+
+**FEHLT** · **OWNER-WORT 10.08.2026** — dies ist die Antwort auf die **zweite gerügte Frage** ·
+Owner verbatim: *"Es ist verbatim im Session log der letzten 10 Wochen festgehalten, dass eine
+Erweiterung der ISA und System-Meta-Meta-Achsen zur Hardware-Erweiterung stets zulässig ist, ein
+Neubau kann nur bei Funktionseinschränkung erfolgen. Bedeutet bei Hardwareerweiterung werden einfach
+nur die neu möglichen fehlenden Permutationen ZUSÄTZLICH gebaut."*
+**Wichtig für die Buchung, ausdrücklich:** **Plan A wurde in derselben Antwort nur als "weiterhin
+bekannt" bestätigt, nicht neu ausformuliert.** Das muss **unterschieden** im Ledger stehen — sonst
+wirkt es, als fehle Plan A ganz, und die nächste Runde fragt erneut.
+**Was daran hängt:** die Regel entscheidet, ob ein neuer Runner-Typ einen **Neubau des gesamten
+Bestands** auslöst (teuer, mehrtägig) oder nur **additive Permutationen** (billig). Sie ist damit
+die Kapazitätsregel des gesamten Voll-Baus.
+
+#### KON-48 — AVX512-FLAG-ABDECKUNG IST UNVOLLSTÄNDIG: "dutzende Flags, nicht nur f"
+
+**FEHLT** · **OWNER-WORT 10.08.2026** · Owner verbatim: *"es gibt dutzende Flags bei AVX und nicht
+nur »f« für AVX512 → da fehlt so einiges."* Gegenprobe: `AVX512` = 24, `avx512` = 49 Treffer — der
+Gegenstand ist breit vertreten, **die Unvollständigkeit nicht**.
+**Was daran hängt:** **direkt umsetzungsrelevant für die Meta-Meta-Achsen-Flag-Kodierung.** Eine
+Kodierung, die AVX-512 auf `f` reduziert, verliert die Unterscheidung der Subsets (und damit
+Permutationen, die auf prod1/Zen5 real messbar wären). Klammert mit KON-18 (die ISA-gebundenen
+Tests) und mit dem Zusatzbefund `if(AVX2 AND AVX512F)` an der Ledger-Spitze.
+
+#### KON-49 — PRT-ART-REGRESSION: DER PRÜFLING MUSS WIEDER ALS ERWEITERUNGSPAKET ZUR COMPILE TIME LADBAR SEIN
+
+**FEHLT** · **OWNER-WORT 10.08.2026** · Owner verbatim: *"Der PRT-ART muss wieder wie geplant von
+der cache engine als Erweiterungspaket zur compile time für die Organ-Achsen geladen werden
+können… Plane die Behebung dieser durch Fortschritt entstandenen Regressionen… Starte auch eine
+codex code review, wie es zu diesem Zustand kommen konnte."*
+**Was daran hängt:** drei Dinge in einem Satz — (a) ein **Bau-Auftrag** (Compile-Time-Ladepfad
+wiederherstellen), (b) ein **Planungs-Auftrag** (Behebung planen, nicht ad hoc fixen), (c) ein
+**Aufklärungs-Auftrag** (Codex-Code-Review zur Entstehung). Berührt **W-1 unmittelbar**: die
+Paper-Kopplung setzt genau diesen Ladepfad voraus. Berührt außerdem KON-32 (Kantenrichtung) und den
+PRT-ART-Block an der Ledger-Spitze (PA-1/PA-2/PA-3).
+
+#### KON-50 — DER ARBEITSBEREICH SELBST IST KÜNSTLICH: DOKUMENTATION IST NICHT GIT-GETRACKT
+
+**FEHLT** · **OWNER-WORT 08.08.2026** · Owner verbatim: *"Derzeit sind alle Dokumentationen nicht
+git tracked, das ist eine erhebliche Gefahr. Bitte sortiere sofort alle Planungsdokumente und
+sessions… aus deinem künstlichen wt-super-landung in das echte probst-Diplomarbeit umbrella."*
+**Steht im Ledger:** `wt-super-landung` dreimal — **nur als Pfad**, nie als Gefahr.
+**Was daran hängt:** **das betrifft die Integrität von sechs der acht Erntebereiche dieser
+Konsolidierung.** Alles, was oben aus `docs/sessions/`, `docs/plaene/` und `docs/audits/` gezogen
+wurde, liegt möglicherweise in einem ungetrackten Baum. **Vor jeder weiteren Konsolidierung ist zu
+klären, ob die Migration vollzogen ist** — sonst konsolidiert man aus einer Quelle, die ein
+`rm -rf` des Worktrees mitnimmt. Deshalb steht dieser Posten in der Lesereihenfolge auf Platz 2.
+
+#### KON-51 — BEIDE REMOTES WERDEN NACH DEM VOLL-BUILD PUBLIC, BESCHRÄNKT AUF DIE DIPLOMARBEIT
+
+**FEHLT** · **OWNER-WORT 26.07.2026** · Owner-Begründung verbatim: *"weil Forschung öffentlich
+zugänglich sein sollte"*.
+**Inhalt:** **beide Remotes** (GitHub und GitLab) gehen **nach dem Voll-Build public** — und zwar
+**auf die Diplomarbeit beschränkt**.
+**Was daran hängt:** eine **sicherheitsrelevante Zugriffsänderung**. Sie kollidiert potenziell mit
+dem Vault- und Key-Handling, wenn der Secrets-Bestand nicht sauber getrennt ist — MEMORY führt
+dazu *"Deploy Key nur privates CI-Template, nie in public repos"*, *"Transkripte tabu — enthalten
+live Tokens"* und *"VAULT NIE GREPPEN"*. Der Public-Gang macht außerdem W-5 (Lizenzen) unumkehrbar
+dringend: was public ist, trägt eine Lizenz, ob gewählt oder nicht.
+
+#### KON-52 — FRIST 27.07. WAR EINE ZWISCHEN-ABGABE; DIE VOLL-MESSUNG 2^17 STARTET AB 01.08.
+
+**DELTA** · **OWNER-WORT und MESSUNG, 20.07.2026** · Owner-Rahmen: *"Gründlichkeit vor Termin,
+Verzug begründbar"*.
+**Steht im Ledger:** `ZWISCHEN-Abgabe` — die Einordnung des 27.07. als Zwischen-, nicht Endtermin.
+**Kommt hinzu:** **`Voll-Messung 2^17 ab 01.08.` = 0 Treffer** — der Starttermin der Voll-Messung
+fehlt. Der Ledger trägt an `:6978` die verwandte User-Direktive (*"Wir bauen alles new golden und
+messen alles mit der 320er. Wir messen new golden ab dem 01.08."*), aber nicht die Bindung an 2^17.
+**Was daran hängt:** MEMORY führt *"golden 2^17"* und *"new golden all axes xml gt320"* getrennt;
+ohne den Starttermin ist nicht belegbar, ob die Voll-Messung verspätet ist oder planmäßig noch
+nicht begonnen hat.
+
+---
+
+## NACHTRAG 7 — PROZESS / ROLLEN (KON-53 … KON-61)
+
+#### KON-53 — DIE GRENZE "MAX. 8 AGENTEN PARALLEL" GILT NUR FÜRS PROGRAMMIEREN, NICHT FÜR DIE PLANUNG
+
+**FEHLT** · **OWNER-WORT 02.08.2026** · Owner verbatim: *"Hinweis: die Workflows von weniger als 8
+gelten nur für das Programmieren aber nicht für die Planung."*
+**Was daran hängt:** regelt **unmittelbar, wie viele Design- und Review-Stränge gleichzeitig laufen
+dürfen**. MEMORY führt *"6+ STRÄNGE + ultracode frei, sofern DISJUNKT"* — dieser Satz hebt die
+Obergrenze für Planungsstränge auf und ist damit die Grundlage für Erhebungen wie diese hier
+(acht Ernte-Stränge).
+
+#### KON-54 — DIE REGRESSIONS-BEHEBUNG R-A..R-F UND STRUKT-R IST AUSDRÜCKLICH MANAGER-AUFGABE
+
+**FEHLT** · **OWNER-WORT 26.07.2026** · Owner verbatim: *"Dann ist es auch deine Aufgabe, die
+Regressionen zu beheben"*.
+**Was daran hängt:** die Posten **R-A bis R-F** und **STRUKT-R** sind damit **nicht delegierbar an
+"jemand anderes"** — MEMORY führt dazu *"»bis jemand anderes« ist immer mein Auftrag"* und
+*"DEFEKT = IMMER BEHEBEN"*. Ohne den Owner-Satz sind die R-Posten herrenlos und rutschen.
+
+#### KON-55 — BRING-PFLICHT: WAS NUR IM MANAGER-KONTEXT LIEGT, GILT NICHT ALS KOMMUNIZIERT
+
+**DELTA** · **OWNER-WORT 26.07.2026** (Punkt E-20) · Owner verbatim: *"Du musst an den infra agenten
+pushen sonst sieht er es nicht."* Gegenprobe: `BRING-Pflicht` = 1 Treffer, der Owner-Satz = 0.
+**Steht im Ledger:** der Begriff BRING-Pflicht und der Handover-Ort.
+**Kommt hinzu:** (a) der **Owner-Satz selbst** als Begründung; (b) die scharfe Fassung —
+**Ergebnisse, die nur im Manager-Kontext liegen, gelten nicht als kommuniziert**; (c) der
+Infra-Handover-Ort ist **bereichsbegrenzt `Cluster/docs/sessions` plus Push** — der Ort allein
+genügt nicht, der Push gehört dazu.
+**Was daran hängt:** erklärt, warum Infra-Anliegen "erledigt" wirken und nie ankommen. Klammert mit
+§69.5 OD-3 (`:8109`, Handout-Kanal), das bereits drinsteht.
+
+#### KON-56 — "NIE DIE EINFACHSTE, IMMER DIE SAUBERSTE UND WARTBARSTE" GILT FÜR ALLEN CODE, NICHT NUR INFRA
+
+**FEHLT** · **OWNER-WORT 01.07.2026** · Owner verbatim: *"nie die einfachste, immer die sauberste
+UND wartbarste Strategie."*
+**Was daran hängt:** MEMORY führt diese Direktive bisher **nur für Infra**
+(`feedback_infra_cleanest_not_easiest`). **Die Verallgemeinerung auf allen Code ist der neue Fakt.**
+Zusammen mit *"Keine Quick-Fixes"* und *"immer der schwere offizielle Weg"* ist damit die
+Bau-Doktrin vollständig belegt statt aus drei Teilregeln zusammengesetzt.
+
+#### KON-57 — E-26 LAZY-CACHE AUF ALLEN PIPELINE-EBENEN INKL. TEST-SKIP — WIDERSPRUCH ZU "HART GRÜN" IST **OFFEN**
+
+**FEHLT, mit offenem Widerspruch** · **OWNER-WORT 26.07.2026** (Punkt E-26) · Owner verbatim:
+*"Wir kompilieren und Testen nur Änderungen neu"*.
+**Der Widerspruch, beide Seiten:** E-26 verlangt Lazy-Cache **auf allen Ebenen einschließlich
+Test-Skip**. Dagegen steht die Regel *"gesamte Pipeline hart grün"* (MEMORY, plus `allow_failure`
+verboten seit 06.07.).
+**AUSDRÜCKLICH OFFEN — Owner-Entscheid steht aus:** ist ein **Skip mit Fingerprint-Beweis** erlaubt,
+oder bleibt **Voll-`ctest`** Pflicht? KON-01 (Lagerhaltungs-Skip für grün inventarisierte Binaries)
+ist die **einzige heute belegte Ausnahme** und damit der wahrscheinliche Auflösungspunkt — aber sie
+deckt Binaries, nicht Tests allgemein. **Nicht glattrechnen.**
+
+#### KON-58 — E-04 CI-LIVE-FORTSCHRITT IST EIN EIGENER OWNER-ANSPRUCH (welche Rekombination, wie viele offen)
+
+**FEHLT** · **OWNER-WORT 26.07.2026** (Punkt E-04).
+**Inhalt:** der Owner will **live sehen**, ob die CEB gebaut wird, **welche** Tier-Binary-
+Rekombinationen gerade laufen und **wie viele noch offen** sind. Dazu **generische
+Interface-Tests je Tier-Binary** als **nachgelagerter** Schritt.
+**Was daran hängt:** das ist ein **Anspruch an die Beobachtbarkeit**, kein Nebenwunsch — er
+kollidiert mit MEMORY *"286 nie pollen"* und *"Agent wartet NIE auf CI"*: die Sichtbarkeit muss aus
+der Pipeline **herausgeschrieben** werden, nicht durch Pollen erzeugt. *Wortlaut nicht mitgeführt.*
+
+#### KON-59 — WAHRHEITS-ANKER 26.07.: 982 GEPRÜFTE OWNER-NACHRICHTEN, E-01 … E-26, ~93 % TREFFERQUOTE
+
+**DELTA** · **AGENTEN-ERHEBUNG 26.07.2026** · Gegenprobe: `Wahrheits-Anker` = 4 Treffer,
+`E-01` = 2.
+**Steht im Ledger:** der Begriff und einzelne E-Punkte.
+**Kommt hinzu:** (a) der **Nenner 982 geprüfte Owner-Nachrichten**; (b) dass die Erhebung **26
+Punkte E-01 bis E-26** umfasst; (c) die **Selbstprüfung "Batch-Trefferquote ~93 %"**.
+**Was daran hängt, mit Vorbehalt:** dies ist die **dichteste bekannte Quelle nicht-persistierter
+Owner-Aussagen** — sieben Positionen dieses Nachtrags stammen daraus (KON-02, KON-20, KON-27,
+KON-34, KON-54, KON-57, KON-58). **Weder der Nenner 982 noch die Vollständigkeit der 26 Punkte sind
+heute belegbar**; die ~93 % sind eine **Selbstauskunft**, keine Messung. Der Anker ist deshalb als
+**Fundort** wertvoll und als **Beleg** schwach.
+
+#### KON-60 — `REV-DATA-12` UND DAS §60-DEPRECATED-KURATIONSVERDIKT: DIE .so-ABI-GRENZE WURDE NIE VERWORFEN
+
+**FEHLT plus DELTA** · **MESSUNG 09.08.2026** · Gegenprobe: `Fork-A-.so-Schnitt` = 2 Treffer.
+**Steht im Ledger:** der Fork-A-.so-Schnitt, zweimal.
+**Kommt hinzu:** die **.so-ABI-Grenze zwischen Planer und CEB wurde nie verworfen**, sondern
+**bewusst zurückgestellt** — und ist laut **Dock-Doktrin sogar Ziel-Design**. Die kursierende
+Begründung *"kein DoD-Träger"* existiert in **keinem persistierten Dokument**: 0 grep-Treffer über
+`docs/`, `plaene/` und `sessions/`.
+**Was daran hängt:** **falls der Ledger diese Begründung trägt, ist sie unbelegt.** Das ist
+dieselbe Klasse wie die `checkpoint_measure`-Erfindung (`:1385`): eine Begründung, die durch
+Wiederholung Autorität erlangt hat. Der Eintrag verlangt keine Bau-Entscheidung, sondern eine
+**Streichung der unbelegten Begründung**.
+
+#### KON-61 — NACHT-AUDIT R7: `cpu_fabrication='amd_zen4_avx512'` FÜR prod1 WIDERSPRICHT DEM BELEGTEN ZEN5
+
+**FEHLT, als Warnung, nicht als Ist-Stand** · **MESSUNG 22.07.2026** · Gegenprobe: `amd_zen4` = 0;
+`Stufe3_FullJoin` = 7 (steht drin); `Zen5` = 7, `9950X3D` = 4.
+**Befund:** der `machines`-Kern-Schlüssel führt für prod1 `cpu_fabrication='amd_zen4_avx512'` —
+der Ledger belegt an anderer Stelle *"prod1 = Zen5 = einziger avx512-Node"*, und die heutige Messung
+(W-2) bestätigt `AMD Ryzen 9 9950X3D`, also **Zen5**.
+**Was daran hängt:** **Datenintegritäts-Risiko für jede danach gelaufene Messung** — eine falsche
+Fabrikations-Kennung im Maschinen-Schlüssel verfälscht jeden Join über Hardware-Identität
+(§58-CSV-Stempel, §62-D-Replay).
+**Alters-Vorbehalt, ausdrücklich:** der Befund ist **18 Tage alt und möglicherweise längst
+behoben**. Er wird hier **als Warnung mit Prüfauftrag** gebucht, nicht als Ist-Stand.
+
+---
+
+## NACHTRAG 8 — HISTORIE / VOR-LEDGER-ÄRA (KON-62 … KON-66)
+
+#### KON-62 — ROHTRANSKRIPTE GIBT ES HIER ERST AB 05./06.07.2026 — MÄRZ BIS JUNI IST UNWIEDERBRINGLICH
+
+**FEHLT** · **MESSUNG 10.08.2026, vierfach unabhängig**.
+**Der Befund, mit Zahlen:** **4.854 `.jsonl` im gesamten Baum**. Suche nach `"2026-01` bis
+`"2026-05` und nach `"2025` = **je 0 Treffer**. **Gegenprobe:** `"2026-07` = **238.696**,
+`"2026-08` = **313.879** — das Werkzeug sucht.
+**Die Ursache:** der Umzug von `root` nach `comdare` am **05.07.2026**; dabei wurden **nur
+Git-Klone und 60 destillierte Memories** übernommen, **keine Rohtranskripte**. `/root/.claude/` =
+Permission denied (der Pfad existiert), `/root` selbst hat Birth **22.06.2026**.
+**Was daran hängt — die Konsequenz ist hart:** **jede künftige Owner-Verifikation gegen
+Rohtranskripte für März bis Juni 2026 ist strukturell unmöglich.** Für diesen Zeitraum sind die
+**Session-Dokumente und die Memories die einzige Quelle** — genau die Bereiche, aus denen KON-08,
+KON-09, KON-10, KON-39, KON-40, KON-41, KON-64, KON-65 und KON-66 stammen. **Kein weiterer Strang
+sollte diese Suche erneut versuchen.** Das ist zugleich die Erklärung dafür, warum der Owner-Satz
+*"verbatim im Session log der letzten 10 Wochen"* auf Sessions verweist und nicht auf Transkripte.
+
+#### KON-63 — ARCHITEKTUR-UMKEHR 12.05.: "Warum ist jetzt der PRT_ART in der Cache Engine, das ist doch falsch rum"
+
+**DELTA** · **OWNER-WORT 12.05.2026, unabhängig bestätigt 28.05.2026** · Owner verbatim: *"Warum ist
+jetzt der PRT_ART in der Cache Engine, das ist doch falsch rum."*
+**Steht im Ledger:** der Submodul-Pfad `external/comdare-cache-engine` — **18 Treffer**.
+**Kommt hinzu, drei Stücke:** (a) **die Richtungsentscheidung** — PRT_ART ist der **Prüfling** und
+**konsumiert** die CacheEngine, nicht umgekehrt; (b) **ihre Begründung**, im Owner-Satz;
+(c) die **ausdrückliche `CLAUDE.md`-Ausnahme S2683**. Bestätigung 28.05.: *"Diplomarbeit kompiliert
+cache-engine + holt prt-art"*.
+**Was daran hängt:** klammert mit KON-41 (Drei-Repo-Rollentrennung), KON-32 (Kantenrichtung) und
+KON-49 (die heutige PRT-ART-Regression). Der Pfad steht 18-mal im Ledger — **die Richtung kein
+einziges Mal**, und genau die Richtung ist heute regressiv.
+
+#### KON-64 — BASELINE VOR DER INTEGRATION (28.05.2026): 348 GRÜNE TESTS ÜBER 12 DATEIEN
+
+**FEHLT** · **MESSUNG 28.05.2026**.
+**Befund:** **348 grüne Tests über 12 Dateien**; `topic_queuing` (**216 Tests**) war damals durch
+ein **fehlendes `q01`-Submodule** blockiert.
+**Was daran hängt:** das ist der **Ausgangspunkt einer längst abgelösten Zahlenreihe** — heute
+stehen 459 bzw. 486/488 Tests im Streit (KON-18). **Die Ablösung gehört als Widerruf gebucht**,
+sonst taucht die 348 irgendwann als "Regression von 486 auf 348" wieder auf. Der Wert des Eintrags
+liegt darin, die alte Zahl **ausdrücklich stillzulegen**.
+
+#### KON-65 — HABICH-ANFORDERUNG 22.05.: "Teile und Herrsche" MIT AUSGIEBIGEN TESTS JE EINZELSCHRITT
+
+**FEHLT** · **OWNER-WORT 22.05.2026** · Owner verbatim: *"Professor möchte das Prinzip Teile und
+Herrsche vorfinden, was bedeutet dass auch jeder Einzelschritt ausgiebige Tests haben muss."*
+Gegenprobe: `Teile und Herrsche` = **0 Treffer** (`Habich` = 17, alle anderer Gegenstand).
+**Was daran hängt:** im MEMORY ist die Regel verlinkt
+(`feedback_thesis_divide_and_conquer`), im Ledger fehlt sie ganz. Sie ist eine **Betreuer-
+Anforderung**, also Prüfungsgegenstand — und sie begründet die Testdichte, die sonst als
+Selbstzweck erscheint. Niedrige Dringlichkeit, aber **Owner-Sätze werden nie gekürzt**.
+
+#### KON-66 — DATIERUNG DES KERN-BEITRAGS ("raison d'être") DER ARBEIT AUF DEN 29.05.2026
+
+**FEHLT** · **OWNER-WORT 29.05.2026**.
+**Inhalt:** an diesem Tag wurde der **Kern-Beitrag** der Arbeit formuliert — MEMORY führt ihn als
+*"Kern = Achsen"* (`reference_thesis_core_contribution_axis_library`).
+**Was daran hängt:** hier ist **nur die Datums-Verankerung** nötig; der Inhalt steht anderswo.
+Der Wert liegt darin, dass die Thesis-Einleitung den Beitrag datiert belegen kann statt ihn zu
+behaupten. Geringster Umfang aller 66 Positionen.
+
+---
+
+## GEPRÜFT UND GEDECKT — 33 POSITIONEN FALLEN RAUS, MIT FUNDSTELLE
+
+Damit sie niemand erneut sucht. Jede dieser Positionen wurde in der Ernte als möglicher Fund
+gemeldet und steht **vollständig** im Ledger:
+
+- **OV-13 = HYBRID-Zerlegung A/B/C: JA** — `:2409-2413`, inkl. *"HY braucht also Standard
+  compare→release durch die CEB"* (siehe W-9 zur Nummernkollision)
+- **DREIPHASIG/ZWEIPHASIG, "3 Typen"** — `:8814-8820` (dies war die **erste** gerügte Frage)
+- **Mess-Schema-KERN** — negatives Blacklisting / Full Join / kombiniert
+- **`load_framework` = MESS-Realm** — §69, `:8123`
+- **OD-7 Runner-Zahlen** — `:8135` (siehe W-2 zur 24er-Kollision)
+- **V36.B Retire+Merge** — §71, `:8148`
+- **C-3a Folge-GO**
+- **Fable 5 nie Infra (OD-3)** — §67/§69.5, `:8109`
+- **Meta-Meta-Achsen-Definition** — §51-B3, `:7331`
+- **E-18 LaTeX-Anhang = HAUPT-ZIEL**
+- **`std::variant` Hybrid-Ausnahme** — `:4660-4661`, *"PRAEZISIERT, nicht aufgeweicht"*, Scope =
+  alle PLAIN Tier-Binaries
+- **golden-CRC-Ablösung** — `0xF1C1F26A1232073B` → `0x56F1B721C72DC10E`, `:4709`/`:4722`
+- **#276 = LETZTE Aufgabe** — `:5379`
+- **CMD-2 / `axis_stats[0][6..7]`**
+- **`target_isa` ist komplex in sich**
+- **BRING-Pflicht-Ort** (der **Owner-Satz** dazu fehlt weiterhin — siehe KON-55)
+- **ZWISCHEN-Abgabe** (der 2^17-Starttermin fehlt weiterhin — siehe KON-52)
+- **F7 = gesondertes Versionierungs-Interface** — `:11196`
+- **PMC je Mikroarchitektur / `cpu_atom` / `hybrid_core_aware`**
+- **Vault-Leak und `a3d653d`** (war die Gegenprobe des Laufs)
+- **`nearest_rank_median`** — `:2551`; nur Label-Drift gegen "REV-DATA-12", inhaltlich gedeckt
+- **Modul-Matrix-Doktrin** — §9, `:4926`
+- **GOAL-V4-TABU-Katalog** — `:4718`
+- **NFS `Comdare-Buildsystem`, 14 TB** — `:15281-15297`
+- **xlsx-Sheet-Struktur** (die **Linker-Kante** fehlt weiterhin — siehe KON-16)
+- **1.572.864 / Fingerprint-Neuanker**
+- **`configure.sh` / `make` / `make check` im Wurzelordner** — `:15939-15958`
+- **Graph = Stub, keine Genera / Container ist Gattung** — `:8410` (siehe KON-06)
+- **ein Paper = ein Experiment-XML** — `:15452`
+- **Paper → Binary heute 0, nicht 132** — `:15188`
+- **`prod1_comdare_env_setup`**
+- **`SPARSE_NODE4_ART`**
+- **E1-Skalierungskonvention = MILLI-FIXPUNKT (×1000, `_milli`)** — `:8401`; der Finder war
+  überholt, nicht der Ledger (siehe W-10)
+
+---
+
+## EHRLICHER REST — WAS DIESE KONSOLIDIERUNG NICHT ABDECKT
+
+Nach der Hausregel *"vor jeder Freigabe BEIDE Mengen nennen: geprüft UND nicht geprüft"*.
+
+**1. Rund 13 W-Positionen sind ungeprüft.** Aus `20260810-KONSOLIDIERUNG-unverlinkte-memories.md`
+sind W-02, W-03, W-05 bis W-10, W-12, W-13, W-15, W-17 und W-20 nicht gegen den Ledger gelaufen,
+ebenso wenig die erweiterte 106er-Runde. **Das Dokument sagt selbst, es habe den Ledger nie
+geprüft.** Ein Abgleich genau dieses Dokuments gegen den Ledger ist **die höchste verbleibende
+Hebelwirkung** — höher als jede einzelne Position oben.
+
+**2. Verdacht auf Doppelzählung.** `20260806-GESAMTDOSSIER` (2.993 Zeilen) und
+`20260807-GESAMTDOSSIER` (3.704 Zeilen) blieben in Ernte-Strang A **ungelesen**. Stichproben legen
+nahe, dass sie **bereits die Quelle des Architektur-Kanons im Ledger** sind. **Vor Bau-Entscheiden
+aus den Positionen des Blocks 1 sind sie gegenzulesen.**
+
+**3. Die Suchbegriff-Grenze bleibt.** Je Fund 2–4 Begriffe. Ein im Ledger **anders benannter**
+Sachverhalt kann als FEHLT durchgerutscht sein. Die eigene Gegenprobe heute (K0.4) hat genau dafür
+**zwei weitere Falsch-Nullen** gefunden (`JEDEN Freitag`, `F1 ist Fr 14.08.`), nachdem die Ernte
+bereits neun gefangen hatte. **Es ist unwahrscheinlich, dass keine weitere existiert.**
+
+**4. Nicht zugeordnet:** das Strang-Kürzel **G13** aus der Ernte-Empfehlung
+(*"A6/W-3/G13, akut bzw. heute gefallen"*). Der Gegenstand ist aus dem Abgleichstext nicht
+eindeutig ableitbar und wird hier **nicht geraten**.
+
+**5. Zahlen-Vorbehalt zur Ernte-Bilanz.** Die Ernte meldet **80 Nachtragspositionen** (29 DELTA +
+51 FEHLT). Thematisch aufgeführt und hier gebucht sind **66**. Die Differenz ist aus dem
+Abgleichstext **nicht rekonstruierbar**: mehrere Positionen bündeln zwei Funde in einem Absatz, und
+mehrere W-Positionen sind mit Themenpositionen gegenstandsgleich. **Die 66 sind gezählt, die 80
+sind übernommen** — wer die Differenz braucht, muss an die acht Ernte-Stränge zurück.
+
+**6. Nicht übernommen, ausdrücklich:** KON-06 (Gattung Graph) wurde von der Ernte als FEHLT
+gemeldet und ist hier **zurückgenommen** — `:8410` deckt den Gegenstand. KON-45 wurde von einem
+vollen DELTA auf einen **Anker-Satz** reduziert, weil die tragenden Null-Behauptungen der Ernte
+Falsch-Nullen waren. W-10 (E1-Skalierung) ist **gar nicht** als Nachtragsposition gebucht, sondern
+nur als Widerspruch mit Auflösung zugunsten des Ledgers.
+
+**7. Vorbehalt zur Korpus-Integrität.** Sechs der acht Erntebereiche liegen unter
+`wt-super-landung`, das der Owner am 08.08. ausdrücklich **"künstlich"** und **nicht git-getrackt**
+genannt hat (KON-50). **Solange die Migration ins echte Umbrella nicht bestätigt ist, steht diese
+gesamte Konsolidierung auf einem Korpus, dessen Fortbestand nicht gesichert ist.**
+## REGRESSION 10.08.2026 — PRT-ART: VIER TESTS SIND SEIT 70 TAGEN UNERREICHBAR, UND DIE AUSNAHME NENNT SIE "OPTIONAL"
+
+**Anlass:** Owner-Auftrag 10.08.2026 — *"notiere nach dem Aufraeumen von Projekte git die Ledger
+regression von PRT-ART"*. Gefunden hat sie die neue Registrierungs-Wache (Paket W0a/MT-L4, ce
+`9f932e91`) im ersten CI-Lauf; die Aufklaerung am Objekt kam danach.
+
+### Was die CI gemeldet hat (ce-Pipeline 15517, Job 371160, `test:coverage-guard`)
+
+```
+  test_six_page_structures  -- Bedingung `if(COMDARE_PRT_ART_LEGACY_AVAILABLE)`, :188 -- optionaler prt-art-Legacy-Baum
+  test_three_layer_audit    -- Bedingung `if(COMDARE_PRT_ART_LEGACY_AVAILABLE)`, :125 -- optionaler prt-art-Legacy-Baum
+  test_value_handle         -- Bedingung `if(COMDARE_PRT_ART_LEGACY_AVAILABLE)`, :121 -- optionaler prt-art-Legacy-Baum
+  davon 4 begruendet, 0 mit ERLOSCHENER Begruendung, 1 ohne Begruendung.
+  TEST-REGISTRIERUNGS-WACHE: ROT (1 von 459 ohne Begruendung, 0 erloschen).
+```
+
+Die Wache schlug wegen eines **anderen** Falls an (`test_ap5_simd_extension_coherence.cpp`, ISA-gattiert,
+ohne Allowlist-Eintrag). Die vier PRT-ART-Zeilen daneben gelten ihr als **sauber begruendet** — und
+genau das ist der Befund.
+
+### Die Regression, in einem Satz
+
+**Die Begruendung beschreibt einen Zustand, der nicht eintreten kann.** "Optionaler Legacy-Baum"
+liest sich wie "heute abwesend, morgen vielleicht da". Am Objekt ist er weder abwesend noch optional:
+er ist **geloescht**, und die Datei, auf die das Gatter prueft, hat **nie existiert**.
+
+### Die vier Belege, jeder einzeln nachgemessen
+
+**(1) Das Gatter prueft eine Datei, die es nirgends gibt.**
+`ce tests/unit/CMakeLists.txt:96-99`:
+```cmake
+set(COMDARE_PRT_ART_LEGACY_AVAILABLE FALSE)
+if(EXISTS "${PROJECT_SOURCE_DIR}/prt_art/include/prt_art/prt_art.hpp")
+    set(COMDARE_PRT_ART_LEGACY_AVAILABLE TRUE)
+endif()
+```
+`find /home/comdare -name 'prt_art.hpp' -not -path '*/.git/*'` -> **0 Treffer**, im gesamten
+Heimatbaum. **Gegenprobe im selben Lauf:** dieselbe Suche nach `cache_engine.hpp` findet
+`libs/cache_engine/include/cache_engine/cache_engine.hpp` — das Werkzeug sucht.
+
+**(2) Es kann auch mit ausgechecktem Submodul nie TRUE werden.**
+Das eigenstaendige Repo `Projekte/Research/comdare-prt-art` traegt unter
+`prt_art/include/prt_art/` **52 Header** — aber ausschliesslich in Unterverzeichnissen
+(`allocator/`, `concurrency/`, `nodes/`, `slots/`, `internal_search/` u. a.). Eine
+Umbrella-Datei `prt_art.hpp` gibt es dort **nicht** (`find ... -name prt_art.hpp` = 0).
+Das Gatter ist damit **strukturell** unerfuellbar, nicht nur heute unerfuellt.
+
+**(3) Der Zustand besteht seit 70 Tagen, und er war zweistufig gewollt.**
+```
+d07a8f6d  2026-05-14  V23.E: prt_art -> libs/deprecated/prt_art_legacy/ (Folly-Stil)
+13eb0353  2026-06-01  cleanup: libs/deprecated/prt_art_legacy entfernt (User-OK, Habich-Gate aufgehoben)
+```
+Erst verschoben, dann mit ausdruecklichem User-OK entfernt. Die Loeschung ist also **legitim** —
+was zurueckblieb, ist ein Gatter ohne Gegenstand und vier Testdateien, die niemand mehr uebersetzt.
+
+**(4) Der Designplan fuehrt sie nicht.**
+`grep -c 'test_concepts_compile|test_value_handle|test_three_layer_audit|test_six_page_structures'`
+ueber `docs/plaene/20260808-DESIGNPLAN-tdd-testabdeckung-alle-wellen.md` -> **0**.
+**Gegenprobe:** `MT-L4` liefert **4** Treffer in derselben Datei — das Werkzeug sucht.
+Die Klasse **K4 unerreichbarer-block** (16 Posten) beschreibt sie woertlich (*"Der Test existiert
+und laeuft nie: nicht registriert, hinter OFF-Flags, in bedingten CMake-Bloecken"*), fuehrt aber
+diese vier nicht auf. Der Nenner der Klasse ist damit um vier zu klein.
+
+### Und die Wache, die es gefunden hat, sieht es selbst nicht
+
+`ci_test_registrierungs_wache.sh:226` definiert ERLOSCHEN in **einer** Richtung:
+```
+'%s -- ERLOSCHEN: "%s" existiert wieder, die Ausnahme traegt nicht mehr'
+```
+Sie faengt den Fall *"der Gegenstand kehrt zurueck, die Ausnahme wird unnoetig"*. Sie faengt
+**nicht** den Fall *"der Gegenstand kann nie wiederkommen, die Ausnahme wird dauerhaft"*.
+Deshalb meldet sie `0 erloschen`, obwohl vier Begruendungen auf einen unmoeglichen Zustand
+verweisen. **Das ist dieselbe Klasse, gegen die die Wache gebaut wurde, eine Ebene hoeher:**
+eine korrekt arbeitende Pruefung am falschen Gegenstand.
+
+### Was daraus folgt — drei Posten, getrennt
+
+| # | Posten | Klasse | Wer entscheidet |
+|---|---|---|---|
+| **PA-1** | Die Wache bekommt die **zweite** ERLOSCHEN-Richtung: eine Bedingung, deren Gegenstand in keinem erreichbaren Baum existieren KANN, ist eine tote Ausnahme und wird benannt (nicht automatisch rot — benannt, mit Nenner). | Bau, ce | ich |
+| **PA-2** | Die vier Testdateien in den Designplan als **K4-Posten** nachtragen; der Klassen-Nenner 16 steigt auf 20. | Plan, super | ich |
+| **PA-3** | **Was geschieht mit den vier Dateien?** Drei Wege: (a) gegen das heutige Plugin-Modell neu verdrahten (`COMDARE_CE_PRUEFLINGE`), (b) als Legacy-Zeugnis ins Archiv verschieben, (c) loeschen. Sie pruefen Concepts und Seitentypen einer Fassung, die es nicht mehr gibt. | **OWNER** | — |
+
+**PA-3 ist ausdruecklich nicht meine Entscheidung.** Die Hausregel lautet "nie loeschen, nur
+deprecaten"; sie gilt fuer Doku und Messdaten. Ob sie auch fuer Testdateien gilt, deren Pruefgegenstand
+mit ausdruecklichem User-OK entfernt wurde, ist nicht entschieden — und ein stilles Loeschen waere
+genau die Art von Entscheidung, die spaeter niemand mehr findet.
+
+### Zusatzbefund aus derselben Erhebung (gehoert nicht zu PRT-ART, gehoert aber gemeldet)
+
+`tests/unit/test_ap5_simd_extension_coherence.cpp` ist die **eine** unbegruendete Stelle
+(1 von 459). Sie haengt an `if(AVX2 AND AVX512F)` (D2-G5: 4 Registrierungen an AVX-512F) und
+wird auf jedem Runner ohne AVX-512 nie uebersetzt — ohne dass das je begruendet wurde. Das ist
+kein Fehler der Wache, sondern ihr erster echter Fang. Heilung: Allowlist-Eintrag mit
+ISA-Begruendung, im selben Zug mit der zweistufigen Untergrenze (Posten D2-G5).
+### W1-PFLICHT-EXPLORE 10.08.2026 — der Engpass ist kleiner als geplant, und es gab eine SECHSTE Fundstelle
+
+Drei Straenge, Sonnet 5 max effort, read-only. Der Explore lief **vor** W1, weil diese Nacht
+gezeigt hat, was eine fehlende IST-Erhebung kostet: von fuenf W0a-Posten waren **zwei
+gegenstandslos** — D2-G1 durch den W-1-Wurzelfix geheilt, D1b durch eine Bauweg-Aenderung
+ueberholt. In der engsten Woche des Fensters waere dieselbe Blindheit teuer.
+
+#### Die D4-Statistik-Kette ist VOLLSTAENDIG gebaut — und bis ce/main gelandet
+
+| Posten | Commit | Kern |
+|---|---|---|
+| D4a Welch | `cc9c233e` | `se<=0` setzt `degeneriert=true`, statt sich auf `p=1.0, valid=true` zu retten |
+| D4b MWU | `e397109f` | `valid` wird HINTER den Guard gesetzt; kein Effektmass ueber Nichts |
+| D4c Bonferroni | `47f0ad89` | Familie zaehlt nur **getestete** Hypothesen; `win_rate` teilt durch den getesteten Nenner |
+| D4d success | `739d478f` | „es gab eine echte Probe" statt „der Vektor ist nicht leer"; EINE neue Spalte |
+| D4e f15-Bilanz | `46fac2e9` | vierte Ausschlussgruppe „tote Proben", Summenzeile `A+B+C+D+gemessen==geladen`, Exit 6/7 |
+
+Der Merge `ebb3cf27` liegt **16 Commits vor** `origin/main` — auch main ist bereits nachgezogen
+(`merge-base --is-ancestor` rc=0).
+
+#### Der Bonus-Fund: es waren SECHS Stellen, nicht fuenf
+
+`905bd1aa` — **D4-T6**, `compare_engine_command.hpp`: ein geretteter Nenner erzeugte dort nicht
+nur eine harmlose Null, sondern **ein falsches Urteil** (`EE_B_Wins` statt `InconclusiveData`).
+Der Plan zaehlte fuenf Fundstellen dieser Klasse; die sechste hat erst der Bau gefunden.
+
+Die Klasse in einem Satz, jetzt sechsfach belegt: **die Null wird ueberall als DIVISIONS-Gefahr
+gerettet und nirgends als DATEN-Aussage behandelt.**
+
+#### Was OFFEN bleibt — und die Vorbedingung, die formal verletzt ist
+
+**MT-L3 existiert nicht.** Ein einziger Treffer im ganzen ce-Baum, und er dokumentiert die eigene
+Abwesenheit: `test_v41_anatomy_f15_measurement.cpp:1282` — *„ERSATZ-ORAKEL fuer die auf DIESER
+Datei fehlende Schema-Wache (MT-L3 bewacht die grosse Produktions-Mess-CSV in
+`cache_engine_builder_iterator.hpp`, nicht diesen Export)."* Deckt sich mit Designplan Zeile
+144-146: **unabhaengige eingefrorene Orakel: 0 von 29.**
+
+**Die harte Regel des Designplans lautet „MT-L3-Schema-Orakel VOR D4d"** (Zeile 84, und Punkt 9
+bei Zeile 98: *„VOR JEDER End-Append-Spalte"*). D4d hat seine Spalte `degeneriert` am 09.08. um
+18:51 angehaengt — **vor** MT-L3.
+
+**Formal verletzt, sachlich ein anderer Gegenstand:** D4d haengte an `result_csv_header()` in
+`result_aggregator.hpp`, waehrend MT-L3 die **grosse Produktions-Mess-CSV** in
+`cache_engine_builder_iterator.hpp` bewachen soll. Zwei Schemata, nicht eines. Die Regel bleibt
+fuer die naechste End-Append-Spalte in Kraft — und MT-L3 bleibt ein W1-Posten.
+
+Immerhin ist die neue Spalte nicht ungedeckt: `test_v41_anatomy_f15_measurement.cpp:1281`
+(`ResultCsvHeaderIstEINGEFROREN`) pinnt den Header per Literal.
+
+#### Die Zeilenanker des Plans sind erneut gedriftet
+
+    welch_t_test.hpp        130-136  ->  171-182   (+41, durch 15 Zeilen neuen Doc-Kommentar)
+    f15_compare/main.cpp    486      ->  434       (andere Zeile, HDR-Einbau dazwischen)
+
+**Ein Zeilenanker ohne SHA ist eine Behauptung ueber einen Zustand, den niemand mehr hat.**
+Der Explore hat deshalb zu jedem Anker den Stand mitgemessen — so gehoert es in jeden Bericht.
+
+#### Was das fuer den Engpass heisst
+
+Der Designplan fuehrt W1 mit **99 h Band A auf einer Woche, die schon mit 26 von 27 Werktagen
+gefuellt ist**, und nennt sie *„den Engpass des gesamten Plans"*. Der groesste Einzelblock dieser
+99 h ist die Statistik-Kette — **und sie ist gebaut.** Die Woche wird dadurch nicht leer, aber
+der Reissfaktor sinkt messbar.
+### W0b-VERIFY 10.08.2026 — der Bau haelt, die BEWEISFUEHRUNG faellt
+
+Drei Straenge, neun Agenten, 0 Fehler. Der adversarische Durchgang hat mit **eigenen,
+frisch gewuerfelten** Koedern geprueft — nicht die des Bau-Agenten nachgefahren — und dabei
+die Klasse getroffen, gegen die der ganze Verifikationsvertrag gebaut ist.
+
+#### Der Kernbefund: ein Koeder INNERHALB der geaenderten Datei, und nichts klappert
+
+Koeder `M3s` (aus `/dev/urandom`, roh=1476330722 → M=3): `schreibe()` fragt den Stamm gar
+nicht erst, der Zaehler laeuft weiter.
+
+| Messstelle | gesund | unter M3s |
+|---|---|---|
+| `bestand()` | `zeilen=S1:7/7 angeboten verworfen=0` | **identisch** |
+| csv auf Platte | 8 Zeilen | **8 Zeilen** |
+| `.xlsx` auf Platte | vorhanden | **vorhanden** |
+| **Mappen-Inhalt** | `dimension ref="A1:C8"`, 8 rows | **`A1:C1`, 1 row** |
+| Paket-Tests | 21/21 | **22/22 PASSED, rc=0** |
+| S3-Schicht (5 Ziele) | gruen | **alle rc=0** |
+
+**Null von sieben Messzeilen im Werk — kein Signal in irgendeiner Schicht.**
+
+Die drei neuen `A9S5Bestand`-Tests belegen, dass die Naht die Zeilen **angeboten** hat, und
+werden als Beleg dafuer gefuehrt, dass die Mappe sie **haelt**. Dazwischen liegt die Strecke,
+auf der M3s sitzt.
+
+**Und die Verteidigung des Bau-Berichts ist widerlegt.** Er argumentierte, die Kopplung an die
+csv lasse einen luegenden Zaehler auffliegen. Aber: die csv ist an dieser Stelle **kein Kind der
+xlsx**, sondern ein zweiter Writer, dem `schreibe()` dieselben Felder reicht. Eine Mutation auf
+dem Weg Naht→Mappe bewegt Zaehler und csv **gemeinsam** — das Messgeraet steht am Nachbarn.
+
+**Zur Ehrlichkeit des Pruefers:** sein erster Wuerfel `M3` (no-op im Writer) **wird** gefangen —
+`test_a9s3_xlsx_ergebnis_writer` 1 von 3 rot. Die S3-Schicht verteidigt ihren eigenen Vertrag.
+`M3s` zeigt nur, dass die **Naht** davon nicht gedeckt ist.
+
+#### Drei weitere Funde derselben Klasse
+
+**Der Nenner steht im Ausgabe-PFAD, war nie in einer AUSGABE.** `[MAPPE-BESTAND]` hat **zwei
+Treffer im Baum — beide Erzeuger**. Kein Test, kein CI-Skript, keine Wache liest die Zeile. Der
+als V-1-Beleg zitierte String stammt aus dem Unit-Test, nicht aus einem Lauf des Werkzeugs.
+
+**Die Stamm/Kind-Kopplung ist UNGEDECKT.** Koeder `N1` loescht `kind_blatt_ = nullptr;` — die
+eine Zeile, die *"legt der Stamm die Annahme nieder, faellt das Kind im selben Zug mit"*
+implementiert. Ergebnis: **21/21 PASSED, rc=0**. Grund: `verworfen()` steht dreimal im Testfile,
+**immer** als `EXPECT_EQ(…, 0u)` — kein Test faehrt den Ablehnungspfad. Die Ueberschrift des
+Commits ist damit **Disziplin, kein Werkzeug**.
+
+**Der eigene Widerruf ist im Artefakt nicht nachgezogen.** Der Bericht korrigiert "9 von 12
+Profilen" auf gemessene **11 Profile, 8 mit csv, 3 ohne `<writeback_methods>`, 0 mit xlsx** —
+aber Commit `579ec9f1` traegt weiter die widerrufene Zahl. Der Widerruf lebt im Bericht; das
+Artefakt, das in die Historie geht, behauptet weiter das Korrigierte.
+
+**Und ein Index ist kein Name:** "registriert als ctest #483" wandert mit Configure-Flags —
+unter Standard-Configure ist es `Test #451` von 460.
+
+#### Was HAELT (Entlastungen, vollwertige Ergebnisse)
+
+Die **Sache selbst funktioniert** — am echten Werk gemessen, nicht geglaubt:
+`dimension ref="A1:C8"`, 8 rows. Der Owner-KERN ist real erfuellt.
+Dazu: Ahnenschaft `907b0433 → 1880f296` (`is-ancestor rc=0`) · Diff-Hygiene 0/0 ·
+fail-closed und die K1-Deckung ("ein Bit steuert beides") unabhaengig reproduziert:
+eigener Koeder → **exakt 5 rot, exakt das benannte Praedikat**
+(`DerBestandHaengtNICHTAnDerPersistenzWahl`).
+
+**`persist:measurements` sammelt weiterhin 0 x xlsx** — bestaetigt, aber mit korrigiertem
+Nenner: csv **44 Zeilen**, nicht 28 (andere Zaehlweise). Ohne diesen Nachzug bleibt der
+DURCHSTICH blockiert, auch mit gepatchtem Profil.
+
+#### Die Lehre, die ueber diesen Posten hinausgeht
+
+> **Ein Test, der eine Mutation innerhalb der geaenderten Datei nicht faengt, ist fuer diese
+> Sache kein Test — auch wenn er gruen ist, auch wenn er neu ist, auch wenn er 22 von 22 zeigt.**
+
+Der Bau wird deshalb NICHT verworfen (die Sache ist richtig gebaut), aber er ist **noch nicht
+abgenommen**: es fehlt ein Orakel, das die Mappe am **Inhalt** prueft (`dimension ref`), nicht
+am angebotenen Zaehler.
+### DREI ENTLASTUNGEN UND EIN OWNER-WORT 09.08.2026 23:50 — Ergebnis zweier Workflows
+
+Elf Agenten, 0 Fehler. Drei Befunde entlasten, einer verschaerft — und der verschaerfende trifft
+einen Posten, den ich selbst falsch formuliert hatte.
+
+---
+
+#### 1. DAS OWNER-WORT, das die Bauform aller Wachen aendert
+
+Verifiziert am Rohtranskript: **Zeile 25562, `type=user`, `promptSource=typed`,
+`2026-08-09T14:34:47.202Z`**, 19 Rohtreffer im Transkript. Woertlich:
+
+> „Ich sehe einen Haufen shells statt vernuenftiger google tests, was soll das? Es waere
+> sauberer im cmake-Debug Modus standard google Tests zu fahren und diese in Release zu
+> wiederholen aufgrund von compile regressionen. **Skripte sagen gar nichts.** Bitte
+> recherchiere **Mutations-Sicheres Testen**. Die Waisen muessen fertig gebaut werden, also die
+> C++ Implementierung dazu."
+
+Dazu, 13:31 desselben Tages: *„Und es war ja auch nur C++ und cmake erlaubt, es gibt ja keine
+skripte."*
+
+**Was das an meiner eigenen Aufgabenliste umwirft:** Posten #27 („T-6-Luecke") verlangte in
+seiner bisherigen Fassung *„je Wache einen Selbsttest nach dem Muster
+`ci/tests/mess_ausbeute_bissprobe.sh`"* — also **weitere Shell-Proben**. Nach RANGFOLGE
+OWNER > PLAN ist das kein Detail, sondern ein Konflikt. **Belastend:**
+`frische_wache_probe.sh` und `lauf_marker_probe.sh` wurden am 09.08. um **18:55** — vier Stunden
+NACH dem Owner-Wort — als Shell-Proben hinzugefuegt.
+
+**Die gute Nachricht: der Weg ist schon gebaut.** Es existiert ein gelandetes, CMake-registriertes
+C++23-Modul `Code/ci_wachen/` mit Testwerkbank und drei Google Tests. `Code/tests/CMakeLists.txt:112`
+traegt die Ueberschrift woertlich: *„DIE CI-WACHEN ALS GOOGLE TESTS (Owner-KERN: 'SKRIPTE SAGEN GAR
+NICHTS')"*, und `ci/tests/xml_wellformed_probe.sh:7-8` sagt ueber sich selbst: *„ABGELOEST am
+2026-08-09, NOCH AM TAG IHRER LANDUNG, durch Code/tests/unit/test_ci_wache_xml_wellformed.cpp"*.
+Die Hausform laeuft in `test:unit` UND `test:unit:debug` — beide Optimierungsstufen, genau was der
+zweite Teil des Owner-Worts verlangt.
+
+**ABER: die Migration steht auf Stufe 1 von 2.** Die *Proben* sind C++, die *Wachen selbst* noch
+Shell. Die Pipeline ruft weiterhin `sh scripts/ci_xml_wellformed_guard.sh` (`.gitlab-ci.yml:307`);
+die C++-Binaries sind gebaut und installiert, aber **werden nicht gerufen**. Dieser Ist-Stand
+steht in KEINEM Plandokument.
+
+**Und ein offener Owner-Auftrag, der bisher nirgends als Posten gefuehrt wird:**
+*„Bitte recherchiere Mutations-Sicheres Testen."* (10 Rohtreffer im Transkript.)
+
+---
+
+#### 2. ENTLASTUNG: das Magic-Budget ist verbraucht — und das kostet heute nichts
+
+**Genau EIN Wechsel im Fenster.** Der ##34-Filter selbst gefahren, **mit Nenner**: 159 Commits
+liegen im Fenster [08.08. 00:00, 10.08. 00:00] auf `origin/main`; davon beruehren **2** die
+Magic-Definitionsdatei (der Bump `d4c0b49c` + ein reiner Zeilenumbruch-Hygienecommit `95ce4372`,
+der die Werte nicht anfasst); davon ist **1** eine echte Wertaenderung.
+
+Das Budget ist damit verbraucht — **aber der Schaden ist heute null**, weil noch nichts Grosses
+gebaut wurde. Er wuerde erst real, wenn **nach dem 26.08. 06:00** noch ein Bump kaeme, unabhaengig
+davon, ob das der urspruenglich fuer den 24.08. geplante ist oder ein neuer. Die Konsequenz ist
+also nicht „der Plan ist gebrochen", sondern: **ab jetzt gilt die NULL-BUMP-Regel, nicht erst ab
+dem 24.08.**
+
+**Nebenbefund am Plan selbst:** ##34 traegt an einer von zwei Parallelstellen noch den Wortlaut
+„genau EIN Magic-Wechsel **4→5**" (Zeile 411), waehrend Zeile 616 korrekt nur „genau EIN Wechsel"
+sagt. Die „4→5" ist ein **unbereinigter Textrest** aus einer aelteren Fassung — Major stand bei 4,
+bevor INC-2b am 17.07. auf 5 bumpte, war zum Zeitpunkt der Niederschrift also schon Geschichte.
+Ein Kopierfehler an einer von zwei Stellen; inhaltlich folgenlos, aber er zeigt, dass „geschaerft"
+nicht heisst „ueberall nachgezogen".
+
+---
+
+#### 3. ENTLASTUNG: die -Wall-Luecke ist real, der verdeckte Bestand ist KLEIN
+
+Drei Repos einzeln gemessen, drei Zaehlweisen offengelegt, die empfohlene benannt:
+
+    Nenner (Methode A, compile_commands.json = was der Compiler wirklich faehrt)
+      comdare-cache-engine   575 Uebersetzungsvorgaenge
+      comdare-prt-art         17
+      super Code/             46
+
+    -Wall   214 von 574 Bau-Kanten -- ausschliesslich tests/unit + googletest
+    -Werror   0 von 575  -- buchstaeblich nirgends in der Default-Konfiguration
+
+**Die Verfeinerung, die den bisherigen Stand korrigiert:** „ist ein Test" ist **nicht**
+gleichbedeutend mit „hat -Wall". Von 471 `tests/`-Uebersetzungsvorgaengen tragen nur **208
+(44,2 %)** das Flag. Grund, im Quelltext dokumentiert (`tests/unit/CMakeLists.txt:1765-1770`):
+eine **zweite, parallele Testklasse** — standalone `main()`-Tests ohne gtest, per `add_test`
+direkt registriert statt ueber `comdare_add_test`. Sie umgeht den Warnstufen-Mechanismus
+**strukturell**, nicht aus Nachlaessigkeit.
+
+**Was ein Einschalten kostet — gemessen, nicht geschaetzt.** 114 Uebersetzungsvorgaenge per
+`-fsyntax-only` geprueft (GCC 15.3.0 + Clang 22.1.8), Flags 1:1 aus `compile_commands.json`,
+Stichproben mit gedrucktem Seed (`random.seed(20260809)`) und ausgewiesener Ausschlussquote:
+
+    SPEICHER    KEINER    0 von 114 geprueften Uebersetzungsvorgaengen
+    MUTANT      2         beide erklaert: print_help() ist unter -D*_TEST_NO_MAIN real unbenutzt
+    REGRESSION  ~20-26 gesamt, ueberwiegend Stil-/API-Hygiene, keine Datei mit mehr als 7 Treffern
+
+**Das ist kein grosser verdeckter Bestand.** Die Owner-Verdachtsklasse SPEICHER — die
+gefaehrlichste — ist **leer**. Damit ist die Entscheidung „-Wall/-Werror einfuehren?" keine
+Risikofrage mehr, sondern eine reine Kosten-Nutzen-Frage, und die Vorlage kann dem Owner mit
+Zahlen statt mit Vermutungen vorgelegt werden.
+
+---
+
+#### 4. ENTLASTUNG: die ~11 undurchsuchten Transkripte enthalten das Material NICHT
+
+Der Ledger fuehrte sie als offenen Rest (`:944-946`). Alle 14 JSONL-Dateien inventarisiert:
+**sieben sind 226-Byte-Metadaten-Stubs**, eine ist ein reiner `file-history-snapshot` ohne
+Konversation, zwei tragen je **eine** Owner-Zeile ohne Bezug zum Gegenstand, eine ist
+Terminal-Escape-Rauschen. **Substantiell ist genau eine** (`b15ade0e`, 7,3 MB, 2209 Zeilen) — und
+sie behandelt ein anderes Thema (Architektur-Atlas/UML, 05.–06.08.).
+
+**Fuer keine der sechs BEHAUPTETEN Streichungen** (F-07b · Streichkaskaden-Ordnung · ##24/##15 ·
+##40 inkl. T-13/T-14 · R-3/perm_runner · checkpoint_measure) liefert der Rest-Korpus einen
+Owner-Beleg — **weder stuetzend noch widersprechend**. Das ist eine **Entlastung des
+Suchverfahrens**, keine Erkenntnis zur Sache: die Fundstelle existiert nicht, die Frage bleibt
+beim Owner.
+
+**Methodisch der wichtigste Teil des Berichts:** ueber 90 % der Rohtreffer waren
+**Tool-Result-Echos** — Ledger-Zitate, die ein Agent sich selbst zurueckliest. Erst die
+Verifikation gegen `origin.kind=="human"` trennt Owner-Wort von Agenten-Text. Wer roh greppt und
+zaehlt, misst seine eigene Vergangenheit. Gegenprobe bestanden: `"Atlas"` = 5 Treffer in den 20
+echten Owner-Zeilen, `"prod2"` = 34 Rohtreffer, davon **0** mit `origin=human`.
+
+**„SPEZIFIZIERT, NICHT GEBAUT"** — dritte unabhaengige Bestaetigung des Nullbefunds, diesmal in
+einem inhaltlich voellig anderen Transkript. **Die checkpoint_measure-Erfindung ist endgueltig
+belegt.**
+### DER 2-PASS-BEFUND 09.08.2026 23:20 — ein frischer Configure verschweigt vier Tests UND bleibt gruen
+
+**Unabhaengig reproduziert**, an einem anderen Gegenstand als D1, von einem Strang, der gar nicht
+danach gesucht hat. Er heilte 58 Diff-Hygiene-Verstoesse und fuhr zur Abnahme die Tests:
+
+    erster Lauf    99% tests passed, 4 tests failed out of 488
+    nach 2-Pass   100% tests passed, 0 tests failed out of 492
+
+**Ein frisch konfiguriertes Build-Verzeichnis ueberspringt vier bedingte Bloecke**, weil die
+Codegen-Werkzeuge zum Configure-Zeitpunkt noch nicht existieren. Das Repo protokolliert es
+selbst: `build-hyg/comdare_registrierungs_protokoll.txt` traegt
+`UEBERSPRUNGEN|test_v41_anatomy_f15_measurement`. Erst der 2-Pass — `comdare_anatomy_codegen_cli`
+und `comdare_adhoc_emitter_cli` bauen, reconfigure, neu bauen — setzt alle vier auf AKTIV.
+Vier weitere Ziele sind `EXCLUDE_FROM_ALL` (drei Registry-Generatoren + `test_profile_roundtrip`)
+und brauchen je einen eigenen `--target`-Aufruf; deren erstes Rot war eine **Bau-Luecke, kein
+Defekt**.
+
+**Warum das mehr ist als eine Fussnote:** `test_v41_anatomy_f15_measurement` traegt **30 der 58
+geheilten Stellen**. Genau diese Datei waere ungetestet durchgerutscht — **bei gruener
+Gesamtbilanz**. Das ist die D1-Klasse ("`make check` faehrt 427 statt 431") an einem zweiten
+Gegenstand, und sie ist damit nicht mehr ein Einzelbefund des Bauwegs, sondern ein **Muster**.
+
+**Und eine Zahl von mir faellt.** Ich hatte den Bau-Straengen "Sollstand 490 Tests" mitgegeben.
+**490 trifft keine der beiden Konfigurationen** (488 ohne 2-Pass, 492 mit); sie stammt aus einem
+dritten Bau-Zustand. Die Test-Registrierungen in `tests/unit/CMakeLists.txt` sind auf
+`origin/development` und dem Heiler-Branch **identisch (323)** — die Differenz kommt nicht aus
+dem Diff, sondern aus dem Bau. Das ist V6.5 woertlich: **zur Testzahl gehoert der BAU-ZUSTAND,
+nicht nur der Commit.** Drei Zustaende, drei Zahlen.
+
+---
+
+### B1 — EIN KOMMANDO, DAS SICH SELBST ZAEHLT: der Selbsttreffer-Befund
+
+Gefunden vom **zweiten Lens**, nicht vom Bau-Agenten und nicht vom Lead. Er ist der Grund, warum
+Code-Landungen zwei Lenses brauchen.
+
+Der Bau-Agent hatte eine als **BINDEND** markierte Wachen-Zeile (`algo_semver.hpp:127`) von 143
+auf 119 Byte verdichtet und die Aequivalenz belegt: *"beide Formen liefern dieselben 131 Treffer"*.
+Der Lead hat unabhaengig nachgemessen und **130** erhalten. Zwei sorgfaeltige Messungen, eine
+Ziffer Unterschied — und **beide sind richtig**:
+
+    Selbsttreffer, nur algo_semver.hpp:      Repo-weit:
+    ALT-Datei / ALT-Muster   51              rev=aebc4f2c   ALT=131  NEU=131
+    ALT-Datei / NEU-Muster   51              rev=HEAD       ALT=130  NEU=130
+    NEU-Datei / ALT-Muster   50
+    NEU-Datei / NEU-Muster   50
+
+**Die alte Kommandozeile enthielt ihr eigenes Suchmuster woertlich und traf damit sich selbst.**
+Die verdichtete Form schiebt `\(` zwischen Praefix und Alternative — sie trifft sich nicht mehr.
+Der verlorene Treffer war ein **Phantom**: eine Doku-Zeile, keine Wache. Die Zaehlung wird durch
+die Aenderung also **besser**.
+
+**Der Schaden liegt woanders:** das Dokument beschreibt die Wirkung seiner eigenen Aenderung
+falsch, und zwar in einem als bindend markierten Kommando. Wer es faehrt, bekommt 130, vergleicht
+gegen die dokumentierten 131 und schliesst, dass eine ce-eigene Versions-Wache verschwunden ist.
+**Ein Fehlalarm, eingebaut in ein Dokument, das Alarme schlichten soll.**
+
+Die Fehlerklasse in einem Satz: **ein transkribierter String, der als WERT auftritt.** Reiner
+Text nach aussen, ein Datum nach innen. Genau die Klasse, nach der der zweite Lens suchen sollte
+— und er fand sie an der einzigen Stelle, an der sie ueberhaupt sein konnte.
+
+**Zweiter Blocker desselben Laufs (B2):** die Aufteilung einer `#include`-Zeile verschiebt
+`measurement_snapshot.hpp` ab Zeile 24 um **+1**; der Anker `:191` steht zweimal im Baum
+(`pipeline_csv_schema.hpp:7`, `test_b3_schema_freeze_stufe1.cpp:219`) und zeigte an der Basis
+exakt. Keine Wache haengt daran (gemessen: 0 Treffer ueber `scripts`, `cmake`, `.gitlab-ci.yml`),
+aber es ist der eine Anker, den **dieser Diff selbst gebrochen hat** — in einem Repo mit
+dokumentierter Anker-Drift-Historie (einer wanderte um 239 Zeilen).
+
+---
+
+### REICHWEITE-KORREKTUR: die Heilung macht Pipeline 15501 NICHT gruen — und soll es nicht
+
+Meine Erwartung war falsch. Der Bereich von 15501 ist `8fcf0c0e..aebc4f2c`, **durch zwei SHAs
+festgenagelt**; ein Job-Retry liest dieselbe `CI_COMMIT_BEFORE_SHA` und bleibt rot. Keiner der
+fuenf Heilungs-Commits liegt in diesem Bereich (`merge-base --is-ancestor` fuenfmal NEIN — was
+richtig ist, sie entstanden danach).
+
+Da `origin/main == origin/development == aebc4f2c`, misst der **naechste** FF `aebc4f2c..<neu>`,
+und der ist gruen (`rc=0`, 48 Zusatzzeilen, 0 Nicht-ASCII, 0 ueber 120 Spalten).
+
+**Das Paket verhindert die WIEDERHOLUNG, es heilt nicht die Vergangenheit.** Wer als Kriterium
+"15501 wird gruen" setzt, setzt ein unerfuellbares — und wer es erfuellen wollte, muesste die
+Historie umschreiben. Das ist ausgeschlossen.
+
+---
+
+### ZWEI WERKZEUG-FALLEN, am Objekt gefunden und vom Lead nachgemessen
+
+**`g++-15` existiert auf prod1 NICHT.** Das blanke `g++` **ist** GCC 15.3.0; versioniert gibt es
+nur `g++-13` und `g++-16`. Wer `CC=gcc-15 CXX=g++-15` aus einem Explore-Bericht abschreibt,
+bekommt einen Configure-Abbruch, der wie ein Umgebungsproblem aussieht statt wie ein Tippfehler.
+
+**`scripts/ci_host_klassen_gegenorakel.sh` gibt es nur in super, nicht in ce** (ce 0 Treffer,
+super 2). Die Zahl **423** fuer die basis-Host-Klasse stammt aus einer super-Messung und ist in
+ce nicht reproduzierbar. Der betroffene Strang hat sich geweigert, die Floor-Zahl darauf zu
+stuetzen — **richtig, und aus einem schaerferen Grund als Vorsicht**: V-7 verlangt die zweite
+Zahl aus einer FREMDEN Quelle, aber "fremd" heisst *unabhaengig erhoben*, nicht *aus einem
+anderen Repo uebertragen*. **Eine importierte Zahl ist ein Stellvertreter mit
+Fremdsprachen-Anstrich.** Laesst sie sich im eigenen Repo nicht erheben, wird die Stelle
+ausdruecklich als ungedeckt benannt — das ist eine zulaessige Antwort auf "was erzwingt das
+Halten?", eine geliehene Zahl nicht.
+
+---
+
+### EIN SCHNITTFEHLER DES LEADS, durch Nachfragen statt Bauen gefunden
+
+Strang C (D2-Abdeckungswache) hat gemeldet, dass sein Posten **D2-G6** ausschliesslich in
+`tests/unit/CMakeLists.txt` sitzt — der Datei, die laut Auftrag Strang A gehoert. Nachgemessen:
+D2-G6 und die **AS-Bewaffnung** von Strang A betreffen **dieselben drei Registrierungen**
+(`test_axis_registry_roundtrip` :5379, `test_system_axis_registry_roundtrip` :5409,
+`test_measurement_axis_registry_roundtrip`). **Ein Gegenstand mit zwei Namen, vom Lead auf zwei
+Straenge verteilt.**
+
+Der Strang hat NICHT gebaut, sondern gefragt — obwohl beide Nachbar-Baeume gerade sauber waren.
+Das ist die richtige Lesart der Ein-Schreiber-Regel: sie schuetzt nicht vor gleichzeitigem
+Schreiben, sondern vor **zwei Autoren desselben Gegenstands**. Aufloesung: Strang C liefert die
+woertliche Patch-Vorlage, Strang A baut sie ein — in EINEM Commit.
+
+Nebenbefund derselben Meldung: die Zeilenanker des Explores (5218/5225/5240) sind gegen das
+Objekt (5400-5403/5407/5422) um **~180 Zeilen gedriftet**. Zeilennummern gelten nur mit
+Commit-Anker.
+### W0a IST ANGELAUFEN 09.08.2026 23:00 — vier Bau-Straenge, vier Explores, und die Reihenfolge stimmt wieder
+
+**Der Kontext wurde neu gegruendet.** Owner-Direktive, woertlich: *"arbeite im Sinne der gesetzten
+Regeln und Konventionen des Goals v8 (die du bitte ALLE WIRKLICH in den Kontext kippst und IMMER
+nach Kompaktierung neu hineinkippst -> merke dir das) maximal parallel weiter. Rate NIE."*
+
+**Was "WIRKLICH kippen" heisst, und warum es eine Verschaerfung ist.** Nicht anlesen, nicht greppen,
+nicht "ich kenne das aus der Zusammenfassung" — jede der bindenden Dateien vollstaendig mit `Read`,
+notfalls in Portionen, bis zum Dateiende. Vollzogen und mit Nenner belegt:
+
+    Lesefassung GOAL v8 verbatim        241 von 241 Zeilen
+    ARBEITSWEISE-GESAMT-DOKTRIN v3.1    557 von 557
+    GOAL-V8-DOSSIER                     659 von 659
+    WELLENPLAN-ENDFASSUNG v2            971 von 971   (vier Portionen)
+    DESIGNPLAN TDD                      289 von 289
+    ------------------------------------------------
+    SUMME                             2.717 Zeilen
+
+Der Grund fuer die Verschaerfung steht im Memory-Eintrag: ein Compact loescht die Dokumente aus dem
+Kontext, egal wie oft sie vorher drin waren, und **anlesen erzeugt das Gefuehl, die Regel zu kennen,
+und laesst genau die Stellen weg, die im Summary nie vorkamen.**
+
+### Der Stand, den das Lesen zutage gefoerdert hat
+
+**W-1 ist abgeschlossen** — und zwar belegbar, nicht nur laut Plan: der ST-CTestWache-Wurzelfix
+steht am Objekt. `enable_testing()` liegt in ce `CMakeLists.txt:695`, **vor**
+`add_subdirectory(libs/cache_engine)`; der Kommentarblock :672-:695 traegt den Befund (es stand
+vorher bei :717, also danach). Damit ist die Ursache geheilt, die **27 gtest-Faelle 79 Tage lang
+unsichtbar** gemacht hat — darunter `WelchTTest.*`, das Verfahren, das "signifikant schneller"
+entscheidet.
+
+**W0a ist der naechste Block**, und sein IST-Stand wurde vor der Delegation vom Lead selbst erhoben
+(A2.0: kein Agentenstart ohne vorausgehenden Gedaechtnis-Befund; V2.1-Korrektur: der Stand wird dem
+Agenten MITGEGEBEN, nicht von ihm ermittelt):
+
+| Posten | IST am Objekt (ce `aebc4f2c`) |
+|---|---|
+| **D1b** CI-Prebuild | `adhoc_emitter` = **0** in `.gitlab-ci.yml`; Gegenprobe: existiert in `CMakeLists.txt`, `cmake/adhoc_emitter.cmake`, `tests/unit/CMakeLists.txt` ⇒ **offen** |
+| **D2** Untergrenze | `floor`/`inventory`/`inventar` = **0 Dateien im ganzen getrackten Baum** ⇒ **offen** |
+| **D2-G1** 27 gtest-Faelle | registriert per `gtest_discover_tests` in `libs/cache_engine/builder/commands/tests/` — der einzigen Stelle im Repo, die das tut. **Ob der Wurzelfix sie sichtbar gemacht hat, ist UNGEMESSEN.** |
+| **D1e** f15-Smoke | 10 Treffer + `tests/unit/cli_smoke.cmake` existiert ⇒ **teilgebaut** |
+| **D1f** STATUS_OUT | **6** Bloecke am Objekt, der Plan sagt **5** ⇒ die Zahl driftet, beide gehoeren in den Bericht |
+
+**Messgeraet-Gegenprobe (V4), ohne die die vier Nullbefunde wertlos waeren:** `add_test` in
+`tests/unit/CMakeLists.txt` = **355 Treffer bei 6.348 Zeilen**. Das Werkzeug sucht also. Ohne diese
+Zeile waeren die Nullen von einem kaputten `grep` nicht zu unterscheiden — genau die Verwechslung,
+die in diesem Projekt schon zweimal einen falschen Befund erzeugt hat.
+
+### Was jetzt laeuft — fuenf Straenge, disjunkt geschnitten
+
+Der Schnitt folgt den **Lead-only-Hotspots** aus ARBEITSWEISE B.3: `tests/unit/CMakeLists.txt` und
+`.gitlab-ci.yml` duerfen **nie parallel** beschrieben werden. Jeder gehoert in diesem Lauf genau
+einem Strang.
+
+    A  wt-ce-w0a        D2-G1 + D1f + MT-L4 + AS-Bewaffnung   tests/unit/CMakeLists.txt
+    B  wt-ce-d4         D1b + D1e                             ce .gitlab-ci.yml
+    C  wt-ce-fk         D2 + D2-G3 + D2-G6                    ce scripts/
+    D  wt-super-warn    D1g (610/186 messen statt behaupten)  super Code/CMakeLists.txt
+    +  wt-ce-gnu        die 58 Diff-Hygiene-Verstoesse        (laeuft seit 22:30)
+
+Je Strang: **Explore (Sonnet 5, max effort, "very thorough") → Bau (Opus 5, max effort) → Verify
+(adversarisch)**. Der Explore ist Pflicht vor jeder Design- und Bau-Phase — Owner 09.08.:
+*"Fahre auch immer einen Explore wenn du sonst raten muesstest - rate NIE."*
+
+Parallel dazu, read-only und ohne Plattenkosten, ein **zweiter Workflow fuer den W0b-Vorlauf**:
+D3-7 (Lauf-Marker, die Wurzel der ganzen D3-Kette) · ##25 DURCHSTICH (die Kette bis ins PDF) ·
+die Selbsttest-Luecke der CI-Wachen · ##08 Schema-Freeze. Zweistufig: Sonnet-5-Kartierung, dann
+Opus-5-Gegenlesung, die jede tragende Referenz selbst oeffnet.
+
+### Die Kanal-Regel, technisch begruendet
+
+Beide Laeufe gehen ueber das **Workflow-Tool**, nicht ueber Einzel-Agent-Starts. Der Grund steht in
+ARBEITSWEISE A1 und ist am Objekt gemessen: das Top-Level-Agent-Werkzeug **kennt kein
+`effort`-Feld**. Die Modell-Matrix schreibt aber Effort-Stufen vor ("max effort", "xhigh"). Auf dem
+Top-Level-Kanal sind diese Vorgaben **weder einhaltbar noch verletzbar** — eine Regel ohne Kanal.
+Nur `agent(prompt, {model, effort})` im Workflow-Skript kann sie tatsaechlich setzen.
+
+### Ausdruecklich offen
+
+`is_original:relock` (manual, `allow_failure: true`, ce `.gitlab-ci.yml:693-715`) ist **geklaert und
+kein Verstoss**: `when: manual` ohne `allow_failure` setzt eine GitLab-Pipeline auf `blocked` statt
+`success`. Beleg statt Vermutung: Pipeline **15490** stand auf `success` mit demselben manual-Job.
+Es ist ein Wartungswerkzeug, das die SHA256-Locks der vendorten Paper-Allokatoren neu erzeugt
+(13 codegen-Targets). Die zweite aktive `allow_failure`-Stelle in ce ist `build:arm64-smoke`
+(`:231`) — sie traegt ihr Ablaufdatum im Kommentar: *"advisory bis #179-Bereinigung, danach HART"*.
+Alle uebrigen Treffer sind Kommentare, die das Wort nur erwaehnen. **Die Doktrin steht.**
+### BEFUND 09.08.2026 spaet abends — super ist rot, aber nicht in super: die Bridge-Luecke und der `branch: main`-Trigger
+
+**Der Widerspruch, der es ausgeloest hat.** super-Pipeline **15496** auf `310ea9d3` steht auf
+`failed`. Die eigene Jobbilanz derselben Pipeline: **32 success, 0 failed**. Zweiunddreissig von
+zweiunddreissig gruen — und die Pipeline rot.
+
+**Aufloesung.** Die GitLab-API trennt Jobs und Bridges in zwei Endpunkte.
+`/pipelines/<id>/jobs` **enthaelt keine Trigger-Jobs**. Die Rot-Quelle war eine Bridge:
+
+    BRIDGE: trigger:cache-engine = failed / child 15497 : failed
+
+**Methodenlehre.** Die Jobmenge einer Pipeline mit downstream-Kindern ist `/jobs` UNION
+`/bridges`. Wer nur `/jobs` zaehlt, misst strukturell zu wenig. Der **Pipeline-Gesamtstatus** ist
+der Schiedsrichter, nicht die selbst gezaehlte Bilanz — er schliesst die Bridges bereits ein.
+
+**Gegenprobe zum main-FF-Anker.** `85dc85e8` (Pipeline 15489) wurde nachtraeglich auf seine Bridge
+geprueft: `trigger:cache-engine = success / child 15490 : success`. Der main-FF vom 09.08. war
+**gedeckt**. Die Deckung hielt — aber die Methode war schwaecher als ihr Ergebnis: sie haette
+dasselbe Urteil auch bei roter Bridge gefaellt. Ein Verfahren, das nur zufaellig recht behaelt,
+ist kein Verfahren.
+
+**Die eigentliche Kette, nachgelesen statt geraten** (`super .gitlab-ci.yml:1002-1005`):
+
+    trigger:
+      project: comdare/research/comdare-cache-engine
+      branch: main                 # <-- nicht der vendored Stand
+      strategy: depend
+
+Das `rules:changes`-Gate horcht auf `Code/external/comdare-cache-engine` — gefahren wird danach
+trotzdem ce/**main**. Gegenprobe: `ce/main == 8fcf0c0e ==` exakt der SHA des roten Kindes.
+
+| Ref | SHA | Abstand zur ce-Spitze | `pmc:intel` |
+|---|---|---|---|
+| ce/development (Spitze) | `aebc4f2c` | 0 | **success** (15498) |
+| Gitlink in super | `2eb310ae` | 1 | — |
+| **ce/main** = was der Trigger faehrt | `8fcf0c0e` | **86** | **failed** (15497) |
+
+Der einzige rote Job im Kind war `pmc:intel [build]`. Der Fix liegt in den 86 Commits, die main
+noch fehlen.
+
+**Folge — die Reihenfolge dreht sich.** Der bisher notierte Posten "Gitlink-Bump in super auf
+`aebc4f2c`" ist **nicht** das Heilmittel. Ein Bump ohne main-FF laesst den Trigger erneut feuern,
+und der faehrt weiterhin das alte main: dasselbe Rot noch einmal.
+
+    1. ce 15498 zu Ende sehen  (Monitor laeuft fail-closed; zuletzt 22 gruen, 0 rot)
+    2. ce main-FF auf aebc4f2c  (reiner FF verifiziert: is-ancestor = ja, 86 Commits)
+    3. DANN Gitlink-Bump + PZW-Anker im selben Commit
+
+Punkt 2 vor Punkt 3.
+
+**Offen, nicht geraten:** `is_original:relock` steht in 15498 auf `manual`. Ob der Handschalter
+fuer "gruen" gezogen werden muss oder bewusst offen bleibt, ist ungemessen — vor dem main-FF
+nachschlagen.
 ## 09.08.2026 (spät) — KONSOLIDIERT: EIN Muster, FÜNF Begriffe — `work_mode` in geltender Fassung
 
 **Owner-Abschluss:** *„Bitte ziehe das alte Muster und das neue zusammen, **die 5 Begriffe gehören
@@ -800,7 +4206,24 @@ Owner-Antwort wäre riskant — sie nähme drei Präsens-Zusagen zurück, die wo
 **OWNER verifiziert 4** · **BEHAUPTET 6** (`checkpoint_measure` ✔ zurückgenommen · **F-07b** ·
 Streichkaskaden-Ordnung · ##24/##15 · ##40 inkl. T-13/T-14 · R-3/OV-8 „Konformität erfüllt per
 `perm_runner`" — dort `perm_runner` in Owner-Texten = **0 Treffer**) · **OFFEN** der Rest, darunter
-prod2, der Mess-Deckel (OV-4) und die Paper-Kopplung.
+prod2 und der Mess-Deckel (OV-4). ~~und die Paper-Kopplung~~
+
+> **KORREKTUR 10.08.2026 (W-1 der Konsolidierung).** Die Paper-Kopplung stand hier zu Unrecht als
+> offen — sie ist **entschieden**, und zwar **dreimal weiter unten in dieser Datei**:
+> **`:16628`** (Owner verbatim, 08.08.: die Frage *„soll ich die Paper-Kopplung bauen?"* war
+> **falsch gestellt** — der Auftrag lautet nicht „koppeln", sondern **„je Paper die XML
+> ermitteln"**, damit jedes Paper als sein eigenes Experiment **reproduziert** wird) ·
+> **`:16760`** (Owner: *„Ja unter sorgfaeltiger Design Planung bitte bauen, Ruecksprache mit mir
+> im Detail."*) · und die Messung dazu: *„Die ehrliche Antwort ist nicht »132«, sondern
+> »heute 0«."*
+>
+> **WARUM DAS WICHTIGER IST ALS DIE EINE ZEILE:** Nachtraege stehen in diesem Ledger **oben**.
+> Wer von oben liest — also jeder — trifft zuerst auf diesen OFFEN-Block und hoert dort auf zu
+> suchen. Die Antwort lag **60 Zeilen tiefer** und wurde deshalb dreimal uebersehen; genau daraus
+> entstand am 10.08. die Owner-Ruege *„Ja das ist Pflicht und **wohl geplant** -> Explore."*
+> **Ein veralteter OFFEN-Eintrag an der Spitze ist teurer als eine fehlende Notiz**, weil er die
+> Suche aktiv beendet, statt sie nur nicht zu unterstuetzen. Wer kuenftig einen Punkt schliesst,
+> schliesst ihn an der **Spitze** mit, nicht nur am Ort der Entscheidung.
 
 **Was NICHT durchsucht wurde, ausdrücklich:** die übrigen ~11 Transkripte (dort könnte das
 behauptete „SPEZIFIZIERT, NICHT GEBAUT" liegen) · der Deckungsgrad der Rescue-Commits gegen den

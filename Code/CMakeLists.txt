@@ -207,6 +207,36 @@ endif()
 # add_subdirectory als Directory-Include setzen — vererbt sich in den gesamten
 # ce-Teilbaum und stellt Standalone-Paritaet her. Gleiche Pfad-Konvention wie
 # 02_messung_driver/CMakeLists.txt (COMDARE_V32-Include ..._cache_engine_external/generated).
+# D1g (2026-08-09): DIESES EXCLUDE_FROM_ALL IST NICHT DIE URSACHE DER TESTZAHL -- gemessen, nicht
+# abgeleitet. Zwei Erklaerungen konkurrierten: (a) das EXCLUDE_FROM_ALL bei :243 nehme dem super-
+# Baum die ce-Testziele, (b) enable_testing() bei :313 stehe zu spaet, naemlich NACH :241 und :273
+# (das ist die Konstellation, die in der cache-engine 27 Faelle verdeckt hat, s. W-1 unten).
+# ZEILENANKER: der Wellenplan (v1 Einwand 36, v2:32/98/610/706) zitiert die Nummern VOR diesem
+# Block -- :211/:213/:243/:245/:278. Es sind dieselben Stellen; dieser Kommentar hat sie um 27
+# Zeilen nach unten geschoben. Neu: :241/:243/:273/:275/:313.
+# EIN CONFIGURE-TRIPEL gegen genau diesen Baum entscheidet es. Stand: ce-Pin 2eb310ae, cmake 4.3.4,
+# Ninja 1.13.1, reiner Default (kein -D), NUR configure, kein Bau:
+#   as-is (diese Datei unveraendert)            ctest -N: 488   ctest -N -L da_unit: 10
+#   enable_testing() vor :241 vorgezogen        ctest -N: 488   ctest -N -L da_unit: 10
+#   EXCLUDE_FROM_ALL bei :243 UND :275 entfernt ctest -N: 488   ctest -N -L da_unit: 10
+# Drei Varianten, sechs Zahlen, kein Unterschied. BEIDE Erklaerungen sind damit widerlegt.
+# WARUM ce immun ist -- in ce selbst dokumentiert (external/comdare-cache-engine/CMakeLists.txt
+# :672-696, W-1/ST-CTestWache): ce ruft SEIN EIGENES enable_testing() VOR SEINEM EIGENEN ersten
+# add_subdirectory. Ein Kind, das seine Testaktivierung selbst vorzieht, ist gegen Reihenfolge UND
+# EXCLUDE_FROM_ALL des Elternscopes immun. prt-art traegt hier ohnehin BUILD_TESTS=OFF (:271).
+# UND EXCLUDE_FROM_ALL zu entfernen waere reiner Verlust: die install()-Naht bei :264 setzt voraus,
+# dass alles ausser genau einem Target ausgeschlossen bleibt.
+#
+# WORAN DIE ZAHL WIRKLICH HAENGT: an dem, was GEBAUT wird. gtest_discover_tests legt fuer ein nicht
+# gebautes Ziel den Platzhalter <ziel>_NOT_BUILT an; im reinen Configure sind das hier 20 der 488
+# Eintraege. Ein Platzhalter traegt KEINE Labels und faellt aus `ctest -L da_unit` heraus. Deshalb
+# die Deckungswache am Dateiende -- sie bewacht die Bau-Verdrahtung, nicht die Reihenfolge.
+# ZUR HISTORISCHEN ZAHL "610 Tests / 186 da_unit" (Commits 67e4e582, 58f73eb1, d48112eb, alle
+# 08.08.): sie ist NICHT mit diesen 488/10 vergleichbar. 67e4e582 nennt die Bedingung selbst --
+# sie wurde NACH einem vollstaendigen `make` erhoben UND unter der Diagnose-Konfiguration
+# -DCOMDARE_AXIS_06_ENABLE_MIMALLOC=OFF, weil der Default damals im Generate-Schritt an einem
+# Ziel-Zyklus abbrach. Dieser Zyklus besteht am heutigen Stand NICHT mehr: der Default-Configure
+# oben lief ohne jede -D-Ueberschreibung mit rc=0 durch.
 include_directories("${CMAKE_BINARY_DIR}/_cache_engine_external/generated")
 add_subdirectory(${COMDARE_CACHE_ENGINE_DIR}
                  ${CMAKE_BINARY_DIR}/_cache_engine_external
@@ -275,6 +305,11 @@ set(_CACHE_ENGINE_FORWARD "${COMDARE_CACHE_ENGINE_DIR}")
 # Tests (Top-level GoogleTest fuer alle Diplomarbeit-Code-Module)
 # ─────────────────────────────────────────────────────────────────────────────
 if(COMDARE_DA_BUILD_TESTS)
+    # D1g (2026-08-09): dass dieses enable_testing() NACH den beiden add_subdirectory-Aufrufen der
+    # Submodule (:241 ce, :273 prt-art) steht, ist GEMESSEN folgenlos -- Configure-Tripel oben,
+    # 488/10 in allen drei Varianten. Es steht dagegen VOR allen super-EIGENEN add_subdirectory
+    # (die Modul-Reihe und tests/), und nur die registrieren hier Tests. Nicht umstellen, ohne das
+    # Tripel neu zu fahren: die Umstellung war eine der beiden widerlegten Erklaerungen.
     enable_testing()
     include(FetchContent)
     set(_gtest_local "${COMDARE_CACHE_ENGINE_DIR}/cmake/third_party/googletest-1.15.2.tar.gz")
@@ -479,17 +514,121 @@ if(COMDARE_DA_BUILD_TESTS)
     # Sammel-Bau comdare_da_unit_tests → test:unit baute sie nie → ihre da_unit-Suites liefen in CI nie (silent
     # skip; tex_formatter wurde in keinem CI-Job kompiliert). Additiv in dieselbe explizite Liste wie die 03..06-
     # Fixture-Tests aufgenommen (TARGET-Guard: greift nur bei COMDARE_DA_BUILD_TESTS).
+    # D1g (2026-08-09): test_common_percentile_canon ist der SIEBTE Fall derselben Klasse --
+    # Code/common (D5-2) definiert ihn per gtest_discover_tests mit LABELS da_unit, ohne Eintrag
+    # hier und ohne COMDARE_DA_TEST_TARGETS. Gemessen vor dem Nachtrag: `ctest -N -L da_unit` = 10;
+    # nach einem gezielten Bau genau dieses Ziels = 16 (die sechs PercentileCanonD52.*). Sie liefen
+    # in test:unit nie. Die Deckungswache am Dateiende faengt den achten Fall vor dem Configure.
     foreach(_t
             test_03_binary_to_csv_cached_fixtures
             test_04_csv_to_latex_cached_fixtures
             test_05_diagram_generator_cached_fixtures
             test_06_latex_to_pdf_cached_fixtures
             test_08_appendix_generator
-            test_09_tex_formatter)
+            test_09_tex_formatter
+            test_common_percentile_canon)
         if(TARGET ${_t})
             add_dependencies(comdare_da_unit_tests ${_t})
         endif()
     endforeach()
+endif()
+
+# -----------------------------------------------------------------------------------------------
+# D1g / DECKUNGSWACHE (2026-08-09): jedes super-eigene Testziel MUSS im Sammel-Bau haengen
+# -----------------------------------------------------------------------------------------------
+# WARUM: M-SU-05 (Kommentar oben, :512) war keine einmalige Panne, sondern eine KLASSE -- und sie
+# hat sich wiederholt. Code/common (D5-2, Perzentil-KANON) registriert test_common_percentile_canon
+# per gtest_discover_tests mit LABELS da_unit, traegt sich aber weder in COMDARE_DA_TEST_TARGETS ein
+# noch in die Hand-Liste darueber. Die Kette, am Objekt gemessen: das Ziel haengt nicht an
+# comdare_da_unit_tests -> test:unit baut es nie -> gtest_discover_tests legt statt der Faelle den
+# Platzhalter test_common_percentile_canon_NOT_BUILT an -> ein Platzhalter traegt KEINE Labels ->
+# `ctest -L da_unit` sieht ihn nicht -> sechs Faelle fehlen stumm, und der Lauf meldet trotzdem
+# "100% tests passed". Zahlen aus EINEM Bauverzeichnis: `ctest -N -L da_unit` = 10 Tests; nach
+# `cmake --build . --target test_common_percentile_canon` = 16 Tests. Differenz = die sechs
+# PercentileCanonD52.* (Handwerte-Kreuztest + Brute-Force-Orakel), die niemand gefahren hat.
+#
+# DIESELBE KLASSE hat in der cache-engine 27 Faelle 79 Tage verdeckt (W-1/ST-CTestWache, ce
+# CMakeLists.txt:672-696). Dort war die Ursache die enable_testing()-Reihenfolge, hier die fehlende
+# Bau-Verdrahtung. Gleiche Wirkung: ein Test, den niemand faehrt, und eine gruene Zahl darueber.
+#
+# AUSSAGE, nicht Anwesenheit: die Menge der ausfuehrbaren Ziele mit Praefix test_ in den
+# super-EIGENEN Verzeichnissen ist gleich der Menge derer, die an comdare_da_unit_tests haengen.
+# ZWEI UNABHAENGIGE QUELLEN, keine Selbst-Inventur: der Nenner kommt aus CMakes Verzeichnis-
+# Inventar (BUILDSYSTEM_TARGETS), der Zaehler aus der Verdrahtung (MANUALLY_ADDED_DEPENDENCIES).
+# Keine der beiden Listen wird hier gepflegt -- sie werden nur gegeneinander gehalten.
+#
+# FAIL-CLOSED: Nenner 0 oder fehlendes Sammel-Ziel sind ABBRUCH, nicht Gruen. Eine leere
+# Aufzaehlung ist kein bestandener Lauf, sondern das Zeichen, dass der Lauf nicht greift.
+# AUSGENOMMEN: external/ (ce und prt-art bringen ihre eigenen test:unit-Gates mit) und alles
+# ausserhalb dieses Quellbaums (FetchContent-Baeume wie googletest liegen im User-Cache).
+if(COMDARE_DA_BUILD_TESTS)
+    set(COMDARE_DA_QUELLWURZEL "${CMAKE_CURRENT_SOURCE_DIR}")
+    function(comdare_da_sammle_testziele _dir)
+        get_property(_tgts DIRECTORY "${_dir}" PROPERTY BUILDSYSTEM_TARGETS)
+        foreach(_t IN LISTS _tgts)
+            if(_t MATCHES "^test_")
+                get_target_property(_typ ${_t} TYPE)
+                if(_typ STREQUAL "EXECUTABLE")
+                    set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TESTZIELE_IST "${_t}")
+                endif()
+            endif()
+        endforeach()
+        get_property(_subs DIRECTORY "${_dir}" PROPERTY SUBDIRECTORIES)
+        foreach(_s IN LISTS _subs)
+            file(RELATIVE_PATH _rel "${COMDARE_DA_QUELLWURZEL}" "${_s}")
+            if(NOT _rel MATCHES "^\\.\\." AND NOT _rel MATCHES "^external/")
+                comdare_da_sammle_testziele("${_s}")
+            endif()
+        endforeach()
+    endfunction()
+
+    set_property(GLOBAL PROPERTY COMDARE_DA_TESTZIELE_IST "")
+    comdare_da_sammle_testziele("${CMAKE_CURRENT_SOURCE_DIR}")
+    get_property(_da_ist GLOBAL PROPERTY COMDARE_DA_TESTZIELE_IST)
+    list(REMOVE_DUPLICATES _da_ist)
+    list(SORT _da_ist)
+    list(LENGTH _da_ist _da_n)
+
+    if(_da_n EQUAL 0)
+        message(FATAL_ERROR
+            "D1g-Deckungswache: Nenner 0 -- kein einziges Ziel mit Praefix test_ gefunden, obwohl "
+            "COMDARE_DA_BUILD_TESTS=ON. Das ist kein bestandener Lauf, sondern eine kaputte "
+            "Aufzaehlung (Verzeichnis-Walk oder Namenskonvention). ABBRUCH statt stillem Gruen.")
+    endif()
+    if(NOT TARGET comdare_da_unit_tests)
+        message(FATAL_ERROR
+            "D1g-Deckungswache: Sammel-Ziel comdare_da_unit_tests existiert nicht, es gibt aber "
+            "${_da_n} Testziele. Ohne Sammel-Ziel baut test:unit nichts davon. ABBRUCH.")
+    endif()
+
+    get_target_property(_da_verdrahtet comdare_da_unit_tests MANUALLY_ADDED_DEPENDENCIES)
+    if(NOT _da_verdrahtet)
+        set(_da_verdrahtet "")
+    endif()
+    set(_da_fehlt "")
+    foreach(_t IN LISTS _da_ist)
+        if(NOT _t IN_LIST _da_verdrahtet)
+            list(APPEND _da_fehlt "${_t}")
+        endif()
+    endforeach()
+    list(LENGTH _da_fehlt _da_nf)
+    math(EXPR _da_gedeckt "${_da_n} - ${_da_nf}")
+
+    if(_da_nf GREATER 0)
+        string(REPLACE ";" "\n      " _da_fehlt_txt "${_da_fehlt}")
+        message(FATAL_ERROR
+            "D1g-Deckungswache: ${_da_gedeckt} von ${_da_n} super-eigenen Testzielen haengen im "
+            "Sammel-Bau comdare_da_unit_tests.\n"
+            "  UNGEDECKT (${_da_nf} von ${_da_n}):\n      ${_da_fehlt_txt}\n"
+            "  Ein ungedecktes Ziel baut test:unit nie. Seine gtest-Faelle erscheinen dann nur als\n"
+            "  <ziel>_NOT_BUILT-Platzhalter, der KEINE Labels traegt und aus `ctest -L da_unit`\n"
+            "  herausfaellt -- der Lauf meldet weiter 100%, mit kleinerem Nenner (M-SU-05-Klasse).\n"
+            "  BEHEBUNG, eine von zweien:\n"
+            "    set_property(GLOBAL APPEND PROPERTY COMDARE_DA_TEST_TARGETS <ziel>)  im Modul, oder\n"
+            "    Eintrag in die explizite Liste in dieser Datei (Block M-SU-05).")
+    endif()
+    message(STATUS
+        "D1g-Deckungswache: ${_da_gedeckt} von ${_da_n} super-eigenen Testzielen im Sammel-Bau")
 endif()
 
 # ─────────────────────────────────────────────────────────────────────────────

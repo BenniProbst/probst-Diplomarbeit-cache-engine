@@ -195,13 +195,35 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = 2eb310ae62cf56314def1fa4843f6f3cca4c6051
-PZW-SCHEMA-STELLEN = 33
-PZW-SCHEMA-DATEIEN = 19
-PZW-SCHEMA-LITERAL = 1
+PZW-CE-SHA         = e114cabdcaf09c810c90f571f7cafa9c0115d07c
+PZW-SCHEMA-STELLEN = 40
+PZW-SCHEMA-DATEIEN = 21
+PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 10.08.2026, 17:35 UTC — dritter Gitlink-Zug, vier Zahlen gewandert. Die alte Fassung
+bleibt hier stehen (Doku wird deprecatet, nicht gelöscht), die neue steht oben.**
+
+| Anker | alt (Stand `1880f296`) | neu (Stand `e114cabd`) | Zählweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `1880f2968dfa…` | `e114cabdcaf0…` | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 33 | **40** | 493 Test-`.cpp` im Baum, 59 Rohzeilen, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 19 | **21** | 493 Test-`.cpp` im Baum `e114cabd` |
+| `PZW-SCHEMA-LITERAL` | 1 | **2** | 493 Test-`.cpp`; steigt, sobald MT-L3 ein echtes Orakel einfriert |
+| `PZW-CI-AUFRUFE` | 2 | 2 | unverändert, 2410 Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | 0 | unverändert, gemessen **mit** `-F` |
+
+**Auslöser war meine eigene Landung.** Der Gitlink-Bump `super 0e11e1f8` hob den vendorierten ce
+von `1880f296` auf `e114cabd` (71 Commits). Die Wache hat das im nächsten Lauf gefangen —
+super-Pipeline **15615**, Job **373214**, `exit 2`, wörtlich: *„der Plan nennt einen ANDEREN
+ce-Zustand als super HEAD fuehrt."* **Zum dritten Mal hat dieser Mechanismus getan, wofür er
+gebaut ist**; die drei Zahlen wären sonst still falsch geworden.
+
+**Die gestiegenen Zahlen sind kein Defekt, sondern Zuwachs:** zwischen den beiden Ständen liegen
+die Sammellandung und die PMC-Meta-Meta-Achse, die neue Schema-Stellen mitbringen. `SCHEMA-LITERAL`
+1 → 2 ist genau der Fall, den die Zählweise-Notiz vorhergesagt hat.
 
 **Nachzug 09.08.2026, 11:35 UTC — der Gitlink ist zweimal weitergezogen, die Fußnote hier zog nach.**
 Die Wache selbst hat es erzwungen: super-Pipeline **15428**, Job **369258**, `exit 2` mit dem Wortlaut

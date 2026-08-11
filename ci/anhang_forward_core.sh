@@ -32,14 +32,19 @@
 #     bleiben unangetastet (am Fixture sha256-identisch nachgewiesen).
 #     (Der zweite rm-Pfad liegt AUSSERHALB des Ziel-Repos und beruehrt keinen Bestand:
 #      das trap-Cleanup der EIGENEN, unveroeffentlichten .tmp-Ordner, s. E-18-SNAP unten.)
-#   * ohne Byte-Delta entsteht KEIN Commit  (Loop-/Rausch-Wache)
+#   * ohne Byte-Delta entsteht KEIN Commit  (Loop-/Rausch-Wache) -- und "kein Delta"
+#     ist BELEGT, nicht behauptet: jede kopierte .tex wird gegen den Index des
+#     Ziel-Repos nachgezaehlt; erreicht eine den Index nicht, bricht der Kanal LAUT
+#     ab statt "IDEMPOTENT" zu melden (##20, 10.08.2026, Falle F5 unten).
+#     E-18-SNAP macht daraus KEINE Ausnahme: "0 Byte-Delta" beendet den Kanal erst,
+#     wenn zusaetzlich ein gueltiger Compile-Beleg zum 289-Stand existiert (s.u.).
 #   * ohne Quelle entsteht KEIN Commit und KEIN Fehler (honest-empty)
 #   * landet AUF EINEM TeX-FAEHIGEN RUNNER nie einen Stand, mit dem die Thesis-PDF nicht
 #     mehr baut (PDF-GATE; deklarierter Geltungsbereich + Grenzen s.u. -- ohne
 #     TeX-Toolchain prueft AF_PDF_GATE=auto NICHTS und sagt das literal)
 #   * kein Haken ohne Ausgabe: jede Stufe druckt ihren literalen Zaehler
 #
-# VIER TRANSPORT-FALLEN, GEHEILT AM 09.08.2026 (Paket P4 + Nachsatz) -- alle still:
+# FUENF TRANSPORT-FALLEN, GEHEILT AM 09./10.08.2026 (P4 + Nachsatz + ##20) -- alle still:
 #   (F1) DER SELEKTOR TRAF DIE REALE DATEI NIE. Gesucht wurde '-name "*.result.csv"'
 #        (:149 :153 :165 der Vorfassung); der lebende Messweg schreibt 'result.csv'
 #        OHNE Praefix. Der Glob verlangt mindestens ein Zeichen plus Punkt davor.
@@ -62,12 +67,22 @@
 #        appendix-generator -- frass die erste Datenzeile als Kopfzeile: ein
 #        GRUENER Commit mit einem Messwert weniger. Die Log-Zeile log dabei mit
 #        ("1 Zeilen (inkl. 1 Header)", obwohl kein Header da war).
-#   Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu
+#   (F5) DIE UEBERNAHME INS ZIEL-REPO WURDE NIE NACHGEZAEHLT (10.08.2026, ##20).
+#        Gestagt wurde das VERZEICHNIS mit geschluckten Fehlern; ob die kopierten
+#        .tex im Index ankamen, hat niemand gefragt. Nahm git sie nicht, sagte der
+#        Kanal "IDEMPOTENT: 0 Aenderungen" und ging mit rc=0 -- dasselbe Wort fuer
+#        "nichts geaendert" und "nichts angekommen". Ausfuehrlich am Abschnitt (3).
+#   Alle fuenf endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu
 #   tun" aussah (F4b sogar mit gruenem Commit). Deshalb druckt der Korpus-Zweig
 #   jetzt IMMER einen Nenner (korpus_wurzel/vorhanden + laufordner_geprueft/
-#   mit_material + header=ja|nein/Datenzeilen): eine Null ohne Nenner ist von
-#   einem echten Freispruch nicht zu unterscheiden.
-#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A11, Selbstbiss N1-N6).
+#   mit_material + header=ja|nein/Datenzeilen) und die Uebernahme ebenfalls
+#   (kopiert/im_index/nicht_uebernommen/git_add_fehler): eine Null ohne Nenner ist
+#   von einem echten Freispruch nicht zu unterscheiden.
+#   Beweis: ci/tests/anhang_forward_probe.sh (Faelle A1-A18, Selbstbiss N1-N7);
+#   A15-A18 decken seit 11.08.2026 die zwei E-18-SNAP-Wachen JE MIT GEGENPROBE.
+#   Die EINBUCHUNG des Schnappschusses in das 288-Repo liegt NICHT hier, sondern
+#   in ci/anhang_snapshot_einbuchen.sh -- Beweis dort in
+#   ci/tests/anhang_snapshot_einbuchen_probe.sh (S1-S10, Selbstbiss N1-N3).
 #
 # WO DIE KONKATENATION SEIT DEM 09.08.2026 WOHNT (P4c):
 #   NICHT MEHR HIER. F2/F3/F4 sassen in Zeilen, die WORTGLEICH auch in den beiden
@@ -254,6 +269,12 @@
 #   AF_SNAP_ROOT_STRICT true (Default) | false -- Vertrags-Durchsetzung fuer AF_SNAPSHOT_ROOT.
 #                     false loggt den Verstoss literal und laeuft ohne REMOTE-Wache weiter
 #                     (nur fuer Fixture-/Laborlaeufe; die CI setzt es NIE).
+#   AF_SNAP_REMOTE_STRICT true (Default) | false -- FAIL-CLOSED auch beim ERSTEN Fetch der
+#                     REMOTE-Wache. Der Re-Fetch vor dem Schreiben war das immer; der Erst-Fetch
+#                     lief bis 11.08.2026 mit einer blossen Warnung weiter -- und weil der
+#                     Re-Fetch ohne gesetzten REMOTE-Stand sofort mit rc 0 zurueckkehrt, war
+#                     sein fail-closed-Zweig genau dann unerreichbar, wenn man ihn braucht.
+#                     false = bewusster Rueckfall (Fixture/Labor ohne Remote), literal gemeldet.
 #   AF_SNAP_REMOTE    Remote fuer die REMOTE-Wache der Suffix-/Nachhol-Entscheidung (Default: origin)
 #   AF_SNAP_REMOTE_BRANCH  Branch dort (Default: $AF_PROV_SUPER_REF; "NA"/leer => REMOTE-Wache aus,
 #                     literal gemeldet, Rueckfall auf lokale Pruefung + mkdir-Lock)
@@ -289,14 +310,20 @@ AF_COMPILE_SNAPSHOT="${AF_COMPILE_SNAPSHOT:-true}"
 # (Wer hier je eine *.result.csv ablegt, bricht genau diese Zusage.)
 AF_SNAPSHOT_ROOT="${AF_SNAPSHOT_ROOT:-$AF_WORK_ROOT/$AF_CORPUS_ROOT/thesis_compiles}"
 AF_SNAP_ROOT_STRICT="${AF_SNAP_ROOT_STRICT:-true}"
+# NB2-REST (a): der ERST-Fetch der REMOTE-Wache ist fail-closed wie der Re-Fetch. Default true.
+AF_SNAP_REMOTE_STRICT="${AF_SNAP_REMOTE_STRICT:-true}"
 AF_SNAP_REMOTE="${AF_SNAP_REMOTE:-origin}"
 AF_SNAP_REMOTE_BRANCH="${AF_SNAP_REMOTE_BRANCH:-$AF_PROV_SUPER_REF}"
 AF_RECOVER_MAX="${AF_RECOVER_MAX:-1}"
 AF_RECOVER_TIEFE="${AF_RECOVER_TIEFE:-20}"
 # Beide steuern Schleifen bzw. `git log -n` -- ein nicht-numerischer Wert waere ein spaeterer,
 # schwer lesbarer Fehler mitten im Lauf. Lieber sofort und literal.
-case "$AF_RECOVER_MAX"   in *[!0-9]* | "") echo "FEHLER: AF_RECOVER_MAX='$AF_RECOVER_MAX' ist keine Zahl" >&2; exit 1 ;; esac
-case "$AF_RECOVER_TIEFE" in *[!0-9]* | "") echo "FEHLER: AF_RECOVER_TIEFE='$AF_RECOVER_TIEFE' ist keine Zahl" >&2; exit 1 ;; esac
+case "$AF_RECOVER_MAX" in *[!0-9]* | "")
+  echo "FEHLER: AF_RECOVER_MAX='$AF_RECOVER_MAX' ist keine Zahl" >&2; exit 1 ;;
+esac
+case "$AF_RECOVER_TIEFE" in *[!0-9]* | "")
+  echo "FEHLER: AF_RECOVER_TIEFE='$AF_RECOVER_TIEFE' ist keine Zahl" >&2; exit 1 ;;
+esac
 # Bau-Produkt-Buchfuehrung des PDF-Gates (von run_pdf_gate gesetzt; leer = es wurde NICHT gebaut).
 AF_GATE_MAIN=""
 AF_GATE_TOOL=""
@@ -572,6 +599,12 @@ if [ -z "$SRC_ROOT" ]; then
     # wie vorher -- die Probe prueft sie literal (A1/A3/A6/A8/A9/A10).
     _zaehlweise="Zaehlweise awk NR"
     echo "   [1b] WIDE-Aggregat: $WIDE_ZEILEN Zeilen (header=$_hdr_txt, davon Datenzeilen=$WIDE_DATEN), $_zaehlweise"
+    # P29 (10.08.2026) DER NENNER GEHOERT IN DIE AUSGABE (V-1). Die Zeile oben nennt nur
+    # das ERGEBNIS; ohne die Grundgesamtheit ist "0 Datenzeilen" nicht von "0 Quellen
+    # gelistet" zu unterscheiden. Sie steht ZUSAETZLICH, nicht anstelle: die Probe
+    # (A1/A3/A6/A8/A9/A10) fordert die obere Zeile literal.
+    _nenner="$WIDE_QUELLEN Quelle(n) gelistet -- $WIDE_MIT_DATEN mit Daten,"
+    echo "   [1b] WIDE-Nenner: $_nenner $WIDE_OHNE_DATEN ohne Daten, $WIDE_FEHLEND nicht lesbar"
     if [ "$WIDE_DATEN" -le 0 ]; then
       echo "   [1b] WIDE-Aggregat hat keine Datenzeile -> honest-empty"
     else
@@ -814,7 +847,8 @@ af_snap_remote_pfade_unter() {
 af_snap_remote_init_impl() {
   # Legt NUR das (leere) Wurzelverzeichnis an -- fuer git ist ein leerer Ordner unsichtbar, es
   # entsteht also nichts Commitbares. Es ist der Bezugspunkt fuer rev-parse --show-toplevel.
-  mkdir -p "$AF_SNAPSHOT_ROOT" || { echo "FEHLER: Schnappschuss-Wurzel '$AF_SNAPSHOT_ROOT' nicht anlegbar" >&2; return 1; }
+  mkdir -p "$AF_SNAPSHOT_ROOT" \
+    || { echo "FEHLER: Schnappschuss-Wurzel '$AF_SNAPSHOT_ROOT' nicht anlegbar" >&2; return 1; }
   if ! af_snap_root_vertrag; then
     if [ "$AF_SNAP_ROOT_STRICT" != "false" ]; then
       echo "FEHLER: AF_SNAPSHOT_ROOT-Vertrag VERLETZT (s.o.) -> Abbruch statt gruenem Job ohne Beleg." >&2
@@ -838,11 +872,34 @@ af_snap_remote_init_impl() {
     if [ -z "$AF_SNAP_REMOTE_REF" ]; then
       echo "FEHLER: fetch war gruen, aber FETCH_HEAD nicht aufloesbar -> FAIL-CLOSED" >&2; return 1
     fi
-    echo "   E-18-SNAP-WACHE: REMOTE-Stand geholt ($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH -> $AF_SNAP_REMOTE_REF), Pfad '$AF_SNAP_REL'"
+    echo "   E-18-SNAP-WACHE: REMOTE-Stand geholt" \
+         "($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH -> $AF_SNAP_REMOTE_REF), Pfad '$AF_SNAP_REL'"
     af_snap_remote_liste_bauen || return 1
   else
-    echo "   E-18-SNAP-WACHE: fetch '$AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH' fehlgeschlagen -> REMOTE-Stand"
-    echo "   NICHT geprueft; Rueckfall auf lokale Pruefung + mkdir-Lock (literal, kein stiller Teil-Schutz)"
+    # NB2-REST (a), GEHEILT AM 11.08.2026 -- DIE ASYMMETRIE WAR DAS LOCH:
+    #   af_snap_remote_refresh (der RE-Fetch unmittelbar vor dem Schreiben) ist seit jeher
+    #   FAIL-CLOSED ("lieber kein Beleg als ein Beleg auf einem blind gewaehlten Namen").
+    #   Der ERST-Fetch hier war es NICHT -- er lief mit einer Warnung weiter. Und weil
+    #   af_snap_remote_refresh bei leerem AF_SNAP_REMOTE_REF sofort mit rc 0 zurueckkehrt
+    #   (die Zeile "Remote-Wache war schon aus -> bleibt aus"), war der fail-closed-Zweig
+    #   AUSGERECHNET in dem Fall unerreichbar, fuer den er gebaut wurde: Erst-Fetch kaputt
+    #   => refresh still gruen => Suffix- und Nachhol-Entscheidung fielen blind, ohne dass
+    #   irgendeine Wache das noch sagen konnte. Ein blind gewaehlter Name endet im
+    #   288-Merge als add/add-Konflikt (= verlorener Beleg), eine blinde Nachhol-Frage
+    #   erzeugt einen ZWEITEN Beleg zu einem Stand, der laengst einen hat.
+    # Die Vorgabe ist damit dieselbe wie beim Re-Fetch: ABBRUCH. Wer den Rueckfall
+    # bewusst will (Fixture/Labor ohne Remote), setzt AF_SNAP_REMOTE_STRICT=false --
+    # dann steht der Verstoss literal im Protokoll, statt still zu passieren.
+    if [ "$AF_SNAP_REMOTE_STRICT" != "false" ]; then
+      echo "FEHLER: Erst-Fetch '$AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH' fehlgeschlagen -- der" >&2
+      echo "       REMOTE-Stand ist unbekannt. FAIL-CLOSED, genau wie der Re-Fetch: eine" >&2
+      echo "       Suffix-/Nachhol-Entscheidung auf blinder Grundlage ist kein Schutz." >&2
+      echo "       Bewusster Rueckfall nur mit AF_SNAP_REMOTE_STRICT=false." >&2
+      return 1
+    fi
+    echo "   E-18-SNAP-WACHE: fetch '$AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH' fehlgeschlagen ->"
+    echo "   AF_SNAP_REMOTE_STRICT=false -> REMOTE-Stand NICHT geprueft; Rueckfall auf lokale"
+    echo "   Pruefung + mkdir-Lock (literal, kein stiller Teil-Schutz)"
   fi
   return 0
 }
@@ -954,7 +1011,8 @@ af_beleg_remote_gueltig() {  # $1 = Remote-Pfad der QUELLSTAND.txt, $2 = erwarte
   if ! git -C "$AF_SNAP_GIT_TOP" cat-file -e "$AF_SNAP_REMOTE_REF:$dir/compile-export.txt" 2>/dev/null; then
     echo "      Beleg-Validator(remote): '$dir/compile-export.txt' fehlt im Remote-Stand"; return 1
   fi
-  ist_sha="$(git -C "$AF_SNAP_GIT_TOP" cat-file blob "$AF_SNAP_REMOTE_REF:$dir/$pdf_datei" 2>/dev/null | sha256sum | cut -d' ' -f1)"
+  ist_sha="$(git -C "$AF_SNAP_GIT_TOP" cat-file blob "$AF_SNAP_REMOTE_REF:$dir/$pdf_datei" \
+               2>/dev/null | sha256sum | cut -d' ' -f1)"
   if [ "$ist_sha" != "$pdf_sha" ]; then
     echo "      Beleg-Validator(remote): sha256-Bruch in '$dir' ($ist_sha != $pdf_sha)"; return 1
   fi
@@ -1068,13 +1126,86 @@ af_recover_kandidaten_historie() {
 }
 
 # ---- (3) Idempotenz: Commit NUR bei Byte-Delta ---------------------------------------
+# FUENFTE TRANSPORT-FALLE, GEHEILT AM 10.08.2026 (Posten ##20) -- die letzte still:
+#   (F5) DIE UEBERNAHME WURDE NIE NACHGEZAEHLT. Gestagt wurde das VERZEICHNIS
+#        ('git add -- "anhang/$lang/tabellen" 2>/dev/null || true'); ob die eben
+#        kopierten .tex dabei wirklich in den Index kamen, hat niemand gefragt.
+#        Nahm git sie nicht (.gitignore im Ziel-Repo, index.lock, fehlendes
+#        Schreibrecht), blieb 'changed' auf 0 -- und der Kanal sagte "IDEMPOTENT:
+#        0 Aenderungen", rc=0. DASSELBE WORT fuer "nichts hat sich geaendert" und
+#        "nichts ist angekommen". Am Objekt gemessen (10.08.2026, gewuerfelter
+#        Koeder): Ziel-Repo mit 'anhang/**/tabellen/*.tex' in der .gitignore ->
+#        "kopiert gesamt: 1 .tex" + "gestagte Aenderungen: 0" -> IDEMPOTENT, rc=0,
+#        Commits 1->1, Koeder NICHT im Blob. GEGENPROBE ohne die Ignorier-Regel,
+#        sonst identische Fixture: Commit, Koeder im committeten Blob. Der Messwert
+#        war weg und der Job gruen -- fail-OPEN, die teuerste Richtung.
+#
+# WARUM NICHT EINFACH DAS '|| true' FAELLT (so verlangte es Posten ##20 woertlich:
+#   "`|| true` beim git add faellt") -- am Objekt gemessen und WIDERLEGT: der CI-Job
+#   setzt AF_LANGS="de,en", eine Quelle darf aber legitim nur 'de' tragen. Dann gibt
+#   es 'anhang/en/tabellen' im Ziel gar nicht, 'git add' bricht mit "pathspec
+#   'anhang/en/tabellen' did not match any files" ab und 'set -e' toetet den ganzen
+#   Kanal -- gemessen: rc=128, kein Commit, obwohl die de-Haelfte fertig kopiert
+#   dalag. Das '|| true' war also nicht der Defekt, sondern die Kruecke fuer ein
+#   falsches Pathspec. Geheilt wird das PATHSPEC: gestagt wird genau das, was DIESER
+#   Lauf geschrieben hat -- die Buchfuehrungs-Liste $COPIED_LIST, die es fuer den
+#   Rollback ohnehin schon gibt. Damit kann 'git add' an einer nicht bedienten
+#   Sprache nicht mehr scheitern, und ein Fehlschlag ist wieder ein echter.
+#
+# SELBSTCHECK (##20, 2026-08-10):
+#   ZUGESICHERT: die Null bekommt ihren Nenner. Es wird IMMER gedruckt
+#     'Uebernahme-Nenner: kopiert=N im_index=M nicht_uebernommen=K git_add_fehler=F'.
+#     "0 Aenderungen" heisst ab jetzt belegbar "alle N liegen im Index und sind
+#     byte-gleich zum Bestand" -- und nicht mehr auch "keine ist angekommen".
+#   ZUGESICHERT: K>0 oder F>0 ist fail-loud (exit 1) und nennt die DATEINAMEN.
+#   NICHT zugesichert: der Push-/Merge-Retry-Pfad danach. Er bleibt ungedeckt
+#     (AF_NO_PUSH=true in allen Faellen), s. Testkritik in der Probe.
 echo "-- (3) Idempotenz-Pruefung im Ziel-Repo --"
-for lang in "${AF_LANG_LIST[@]}"; do
-  git -C "$AF_DEST_REPO" add -- "anhang/$lang/tabellen" 2>/dev/null || true
-done
+# SATZFORMAT DER BUCHFUEHRUNGS-LISTE (Merge-Naht 11.08.2026, INHALTLICH aufgeloest):
+#   $COPIED_LIST fuehrt seit dem Vorbestands-Rollback DREI Felder je Zeile --
+#   'zustand|sicherung|rel' (s. anhang_rollback oben). Die ##20-Uebernahmezaehlung
+#   entstand auf einem Stand, an dem die Liste nur den nackten Pfad trug; wer sie
+#   unveraendert uebernimmt, uebergibt 'fremd|1.bin|anhang/de/...' als Pathspec an
+#   'git add' -- gemessen: "fatal: pathspec ... did not match any files", danach
+#   nicht_uebernommen=2 von 2 und fail-loud. Das ist KEIN Textkonflikt gewesen,
+#   sondern ein Formatkonflikt: beide Seiten lasen dieselbe Datei verschieden.
+#   Gelesen wird darum an BEIDEN Stellen mit demselben Feldtrenner wie im Rollback.
+af_add_fehler=0
+while IFS='|' read -r _zustand _sicherung rel; do
+  [ -n "$rel" ] || continue
+  git -C "$AF_DEST_REPO" add -- "$rel" || af_add_fehler=$((af_add_fehler + 1))
+done < "$COPIED_LIST"
+# DAS ORAKEL IST DER INDEX, NICHT DER RUECKGABEWERT: gefragt wird nicht, ob
+# 'git add' zufrieden aussah, sondern ob die Datei danach WIRKLICH drinsteht.
+NICHT_UEBERNOMMEN="$AF_TMP/nicht_uebernommen.txt"; : > "$NICHT_UEBERNOMMEN"
+nicht_uebernommen=0
+while IFS='|' read -r _zustand _sicherung rel; do
+  [ -n "$rel" ] || continue
+  if ! git -C "$AF_DEST_REPO" ls-files --error-unmatch -- "$rel" >/dev/null 2>&1; then
+    nicht_uebernommen=$((nicht_uebernommen + 1))
+    printf '%s\n' "$rel" >> "$NICHT_UEBERNOMMEN"
+  fi
+done < "$COPIED_LIST"
+im_index=$((copied - nicht_uebernommen))
+_uebernahme="kopiert=$copied im_index=$im_index nicht_uebernommen=$nicht_uebernommen"
+echo "   Uebernahme-Nenner: $_uebernahme git_add_fehler=$af_add_fehler"
 changed=$(git -C "$AF_DEST_REPO" diff --cached --name-only | awk 'END{print NR+0}')
 echo "   gestagte Aenderungen: $changed Datei(en)"
 if [ "$changed" -gt 0 ]; then git -C "$AF_DEST_REPO" diff --cached --name-only | sed 's/^/     /'; fi
+# EINE Entscheidung ueber BEIDE Zahlen: sie sind zwei Symptome desselben Sachverhalts
+# -- die kopierte .tex hat den Index nicht erreicht. Zwei getrennte Abbrueche haetten
+# bedeutet, dass der erste den zweiten nie zum Zug kommen laesst; der zweite bliebe
+# dann ungedeckt, und ein Mutant auf ihn bliebe gruen.
+if [ "$nicht_uebernommen" -gt 0 ] || [ "$af_add_fehler" -gt 0 ]; then
+  echo "FEHLER: $nicht_uebernommen von $copied kopierten .tex sind NICHT im Index des" >&2
+  echo "        Ziel-Repos ('git add' meldete $af_add_fehler Fehlschlag/Fehlschlaege)." >&2
+  if [ -s "$NICHT_UEBERNOMMEN" ]; then sed 's/^/          /' "$NICHT_UEBERNOMMEN" >&2; fi
+  echo "        Bekannte Ursachen: .gitignore im Ziel-Repo, index.lock eines" >&2
+  echo "        Parallel-Laufs, fehlendes Schreibrecht auf dem Klon." >&2
+  echo "        Das ist KEIN Idempotenz-Fall: der Messwert waere still verloren und" >&2
+  echo "        der Job trotzdem gruen. Abbruch (fail-loud)." >&2
+  exit 1
+fi
 DEST_HEAD="$(git -C "$AF_DEST_REPO" rev-parse HEAD)"
 AF_DEST_ZURUECK="$(git -C "$AF_DEST_REPO" symbolic-ref -q --short HEAD 2>/dev/null || echo "$DEST_HEAD")"
 AF_BELEG_SHA="$DEST_HEAD"
@@ -1083,6 +1214,10 @@ if git -C "$AF_DEST_REPO" diff --cached --quiet; then
   # starb, verlor seinen Compile-Beleg damit fuer immer (Codex HOCH-1). Die Frage ist NICHT "gibt es
   # ein Delta?", sondern "gibt es fuer den SCHULDIGEN 289-Stand schon einen gueltigen Beleg?".
   echo "   IDEMPOTENT: 0 Byte-Delta im Anhang (289-HEAD=$DEST_HEAD)"
+  # Der ##20-Beleg bleibt WOERTLICH stehen: "0 Aenderungen" ist erst dann eine Aussage,
+  # wenn der Nenner darunter steht. Er gilt hier genauso -- E-18-SNAP haengt nur das
+  # zweite Kriterium (Compile-Beleg) daneben, es ERSETZT das erste nicht.
+  echo "    belegt: alle $copied kopierten .tex liegen im Index und sind byte-gleich."
   if [ "$AF_COMPILE_SNAPSHOT" != "true" ]; then
     echo "=== anhang:forward IDEMPOTENT: 0 Aenderungen, Schnappschuss abgeschaltet -> kein Commit ==="
     exit 0
@@ -1150,7 +1285,8 @@ if git -C "$AF_DEST_REPO" diff --cached --quiet; then
 fi
 if [ "$AF_DRY_RUN" = "true" ]; then
   if [ "$AF_MODE" != "vorwaerts" ]; then
-    echo "=== anhang:forward DRY-RUN: $AF_MODE waere faellig (0 Delta, Beleg fehlt zu $AF_BELEG_SHA), aber KEIN Compile, KEIN Schreiben ==="
+    echo "=== anhang:forward DRY-RUN: $AF_MODE waere faellig (0 Delta, Beleg fehlt zu" \
+         "$AF_BELEG_SHA), aber KEIN Compile, KEIN Schreiben ==="
     if [ "$AF_MODE" = "recovery" ]; then git -C "$AF_DEST_REPO" checkout -q --force "$AF_DEST_ZURUECK" || true; fi
   else
     echo "=== anhang:forward DRY-RUN: $changed Aenderung(en) gestaged, KEIN Commit, KEIN Push ==="
@@ -1282,14 +1418,17 @@ compile_snapshot_einsammeln() {
   # Schnappschuss durch (z.B. Platte voll) und der Kanal meldete trotzdem Erfolg.
   # Die Ernte-Ablage wird VORHER GELEERT: sonst koennte eine Datei aus einem frueheren Bau in den
   # neuen Beleg einwandern (Codex: "Stage nicht geleert").
-  rm -rf -- "$AF_SNAP_STAGE" || { echo "FEHLER: E-18-SNAP: Ernte-Ablage '$AF_SNAP_STAGE' nicht raeumbar" >&2; return 1; }
+  rm -rf -- "$AF_SNAP_STAGE" \
+    || { echo "FEHLER: E-18-SNAP: Ernte-Ablage '$AF_SNAP_STAGE' nicht raeumbar" >&2; return 1; }
   mkdir -p "$AF_SNAP_STAGE" || { echo "FEHLER: E-18-SNAP: Ernte-Ablage '$AF_SNAP_STAGE' nicht anlegbar" >&2; return 1; }
   local pdf_base sha_src sha_dst
   pdf_base="$(basename "$AF_GATE_PDF")"
   cp -- "$AF_GATE_PDF" "$AF_SNAP_STAGE/$pdf_base" \
     || { echo "FEHLER: E-18-SNAP: PDF '$AF_GATE_PDF' liess sich nicht ernten" >&2; return 1; }
-  sha_src="$(af_sha256 "$AF_GATE_PDF")" || { echo "FEHLER: E-18-SNAP: sha256 der Quell-PDF fehlgeschlagen" >&2; return 1; }
-  sha_dst="$(af_sha256 "$AF_SNAP_STAGE/$pdf_base")" || { echo "FEHLER: E-18-SNAP: sha256 der geernteten PDF fehlgeschlagen" >&2; return 1; }
+  sha_src="$(af_sha256 "$AF_GATE_PDF")" \
+    || { echo "FEHLER: E-18-SNAP: sha256 der Quell-PDF fehlgeschlagen" >&2; return 1; }
+  sha_dst="$(af_sha256 "$AF_SNAP_STAGE/$pdf_base")" \
+    || { echo "FEHLER: E-18-SNAP: sha256 der geernteten PDF fehlgeschlagen" >&2; return 1; }
   # af_sha256 kann nicht mehr leer zurueckkommen (fail-loud) -- der frueher moegliche
   # Doppelfehler-Vergleich ""=="" ist damit ausgeschlossen (Codex MITTEL-1).
   if [ -z "$sha_src" ] || [ -z "$sha_dst" ]; then
@@ -1305,7 +1444,8 @@ compile_snapshot_einsammeln() {
   cp -- "$AF_GATE_LOG" "$AF_SNAP_STAGE/compile-export.txt" \
     || { echo "FEHLER: E-18-SNAP: compile-export '$AF_GATE_LOG' liess sich nicht ernten" >&2; return 1; }
   echo "   E-18-SNAP: geerntet $pdf_base ($(wc -c < "$AF_SNAP_STAGE/$pdf_base") Bytes, sha256=$sha_src)"
-  echo "   E-18-SNAP: geerntet compile-export.txt ($(wc -l < "$AF_SNAP_STAGE/compile-export.txt") Zeilen $AF_GATE_TOOL-Ausgabe)"
+  echo "   E-18-SNAP: geerntet compile-export.txt" \
+       "($(wc -l < "$AF_SNAP_STAGE/compile-export.txt") Zeilen $AF_GATE_TOOL-Ausgabe)"
   return 0
 }
 
@@ -1351,7 +1491,8 @@ compile_snapshot_schreiben() {
       k=$((k + 1)); continue
     fi
     if [ -n "$AF_SNAP_REL" ] && af_snapshot_remote_belegt "$rel_cand"; then
-      echo "   E-18-SNAP: '$rel_cand' existiert bereits im REMOTE-Stand ($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH) -> naechstes Suffix"
+      echo "   E-18-SNAP: '$rel_cand' existiert bereits im REMOTE-Stand" \
+           "($AF_SNAP_REMOTE/$AF_SNAP_REMOTE_BRANCH) -> naechstes Suffix"
       k=$((k + 1)); continue
     fi
     # (NB2-5) Gearbeitet wird im VERSTECKTEN .tmp -- der Endname entsteht erst beim atomaren mv.
@@ -1381,10 +1522,12 @@ $tmpdir"
   for f in "$AF_SNAP_STAGE"/*; do
     [ -f "$f" ] || continue
     b="$(basename "$f")"
-    cp -- "$f" "$tmpdir/$b" || { echo "FEHLER: E-18-SNAP: '$b' liess sich nicht nach '$tmpdir' schreiben" >&2; return 1; }
+    cp -- "$f" "$tmpdir/$b" \
+      || { echo "FEHLER: E-18-SNAP: '$b' liess sich nicht nach '$tmpdir' schreiben" >&2; return 1; }
     local sha_a sha_b
     sha_a="$(af_sha256 "$f")"        || { echo "FEHLER: E-18-SNAP: sha256 von '$f' fehlgeschlagen" >&2; return 1; }
-    sha_b="$(af_sha256 "$tmpdir/$b")" || { echo "FEHLER: E-18-SNAP: sha256 von '$tmpdir/$b' fehlgeschlagen" >&2; return 1; }
+    sha_b="$(af_sha256 "$tmpdir/$b")" \
+      || { echo "FEHLER: E-18-SNAP: sha256 von '$tmpdir/$b' fehlgeschlagen" >&2; return 1; }
     if [ -z "$sha_a" ] || [ "$sha_a" != "$sha_b" ]; then
       echo "FEHLER: E-18-SNAP sha256-Mismatch beim Ablegen von '$b' ('$sha_a' != '$sha_b')" >&2; return 1
     fi
@@ -1423,8 +1566,13 @@ $tmpdir"
     echo "recovery_quelle=${AF_RECOVER_QUELLE:-NA}"
     echo "thesis_commit_aus_diesem_lauf=$([ "$AF_MODE" = "vorwaerts" ] && echo ja || echo nein)"
     # AF_NO_PUSH-Faelle duerfen nicht so aussehen, als sei der Stand gelandet (Codex).
-    echo "gepusht=$([ "$AF_MODE" = "vorwaerts" ] && { [ "$AF_NO_PUSH" = "true" ] && echo nein || echo ja; } || echo "nein-nicht-noetig")"
-  } > "$tmpdir/QUELLSTAND.txt" || { echo "FEHLER: E-18-SNAP: QUELLSTAND.txt in '$tmpdir' nicht schreibbar" >&2; return 1; }
+    _gepusht="nein-nicht-noetig"
+    if [ "$AF_MODE" = "vorwaerts" ]; then
+      if [ "$AF_NO_PUSH" = "true" ]; then _gepusht="nein"; else _gepusht="ja"; fi
+    fi
+    echo "gepusht=$_gepusht"
+  } > "$tmpdir/QUELLSTAND.txt" \
+    || { echo "FEHLER: E-18-SNAP: QUELLSTAND.txt in '$tmpdir' nicht schreibbar" >&2; return 1; }
   # VOLLSTAENDIGKEITS-WACHE ueber den GEMEINSAMEN VALIDATOR (Codex NB2-3): dieselbe Funktion, die
   # auch entscheidet, ob ein FREMDER Ordner als Beleg gilt. Ein halb geschriebener Ordner darf NIE
   # als Erfolg durchgehen -- und da hier noch der .tmp-Name steht, entsteht der Endname gar nicht.
@@ -1518,7 +1666,8 @@ if [ "$AF_MODE" = "nachholen" ] || [ "$AF_MODE" = "recovery" ]; then
     echo "    (nichts committet, nichts gepusht -- der 289-Stand $DEST_HEAD bleibt unveraendert)" >&2
     exit 1
   fi
-  echo "=== anhang:forward OK: KEIN Commit (0 Byte-Delta), Compile-Beleg zu $AF_BELEG_SHA nachgeholt (modus=$AF_MODE) ==="
+  echo "=== anhang:forward OK: KEIN Commit (0 Byte-Delta), Compile-Beleg zu" \
+       "$AF_BELEG_SHA nachgeholt (modus=$AF_MODE) ==="
   exit 0
 fi
 
@@ -1649,16 +1798,31 @@ compile_snapshot_refixieren() {
   echo "   E-18-SNAP: re-geerntet aus dem gelandeten Baum $PUSHED_TREE"
   return 0
 }
+# WELCHE RECOVERY-QUELLE HIER WIRKLICH TRAEGT (Restbefund, gemessen am Objekt 11.08.2026):
+#   Der Marker-Weg (i) verlangt, dass die Datei PENDING-<kennung>.txt in den 288-BAUM kommt --
+#   und das tut ausschliesslich der 288-Writeback des Job-Blocks (Stufe 4b, Einbuchung). Ein
+#   'exit 1' HIER toetet mit 'set -euo pipefail' den ganzen Job, BEVOR dieser Writeback laeuft:
+#   der Marker liegt dann nur im Runner-Workspace und stirbt mit ihm. Die frueheren Zeilen an
+#   dieser Stelle sagten trotzdem "der naechste Lauf holt den Beleg darueber nach" -- eine
+#   Zusage auf einen Weg, den genau dieser Ausgang selbst zerstoert. Was hier TRAEGT, ist
+#   Quelle (ii): die Bot-Commits in 289 sind die dauerhafte Spur und ueberleben jeden
+#   Runner-Tod. Der Text nennt darum ab jetzt (ii) zuerst und (i) nur noch mit seiner Bedingung.
+af_recovery_hinweis() {
+  echo "    RECOVERY: dauerhaft traegt hier die BOT-HISTORIE in 289 -- der naechste Lauf findet" >&2
+  echo "    $PUSHED_SHA als juengsten Bot-Commit ohne gueltigen Beleg und holt ihn nach." >&2
+  echo "    Der PENDING-Marker '${AF_SNAP_MARKER:-<keine>}' hilft NUR, wenn ein Lauf den" >&2
+  echo "    288-Writeback noch erreicht; DIESER Ausgang erreicht ihn nicht (Job endet hier)." >&2
+}
 if ! compile_snapshot_refixieren; then
   echo "=== anhang:forward ABGEBROCHEN: 289-Commit IST GEPUSHT ($PUSHED_SHA), aber der Compile-Beleg ===" >&2
   echo "    liess sich nicht wahrheitsgemaess auf diesen Stand fixieren -> KEIN Schnappschuss abgelegt." >&2
-  echo "    (Die Recovery-Identitaet steht in '${AF_SNAP_MARKER:-<keine>}'; der naechste Lauf holt den" >&2
-  echo "     Beleg darueber nach, sobald der Bau wieder gruen ist.)" >&2
+  af_recovery_hinweis
   exit 1
 fi
 if ! compile_snapshot_schreiben "$PUSHED_SHA"; then
   echo "=== anhang:forward ABGEBROCHEN: 289-Commit IST GEPUSHT ($PUSHED_SHA), aber der Compile-Beleg ===" >&2
-  echo "    liess sich nicht ablegen -> KEIN Schnappschuss. Recovery-Identitaet: '${AF_SNAP_MARKER:-<keine>}'." >&2
+  echo "    liess sich nicht ablegen -> KEIN Schnappschuss." >&2
+  af_recovery_hinweis
   exit 1
 fi
 echo "=== anhang:forward OK: gepusht (Versuch $PUSH_ATTEMPT) nach $AF_BRANCH ==="

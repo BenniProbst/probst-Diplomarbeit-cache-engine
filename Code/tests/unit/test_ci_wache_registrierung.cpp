@@ -97,6 +97,37 @@ TEST(CiYmlScanner, BlockEndetAnSpalteNullEinschliesslichKommentaren) {
         << "Der Block hat das allow_failure des NAECHSTEN Jobs eingesammelt.";
 }
 
+TEST(CiYmlScanner, TABULATOR_EINRUECKUNG_BeendetDenBlockNICHT) {
+    // GEFUNDEN VOM MUTATIONS-HARNESS, nicht durch Nachlesen (Lauf 2026-08-10, Mutant
+    // M5-yml-tabulator): faellt die Tabulator-Bedingung aus beginnt_in_spalte_null
+    // heraus, endet ein tabulator-eingerueckter Job-Block an der ERSTEN solchen Zeile.
+    // Alles danach faellt aus der Zaehlung -- ein allow_failure hinter einem Tabulator
+    // waere unsichtbar. Der Mutant UEBERLEBTE die Suite von 332 Tests; die Schwester-
+    // stelle in ist_kommentarzeile war gedeckt (KommentarerkennungAchtetAufEinrueckung),
+    // DIESE nicht. Genau die Klasse K1 keine-negativprobe des Designplans V7.
+    //
+    // ZUR SACHE: YAML verbietet den Tabulator als Einrueckung, aber der Scanner ist ein
+    // Zeilen-Scanner und kein YAML-Parser -- er bekommt zu sehen, was in der Datei
+    // steht, nicht was gueltig waere. Ein Tabulator in einem Job-Block ist ein Defekt
+    // der CI-Datei; er darf die WACHE nicht blind machen.
+    const std::vector<std::string> zeilen = {
+        "job:a:",         "  script:", "\t- echo hinter einem tabulator", "  allow_failure: true",
+        "naechster:job:", "  script:"};
+    const std::optional<JobBlock> block = finde_job_block(zeilen, "job:a:");
+    ASSERT_TRUE(block.has_value());
+    EXPECT_EQ(block->zeilen.size(), 4u) << "Der Tabulator hat den Block vorzeitig beendet.";
+    EXPECT_EQ(zaehle_wirksam(block->zeilen, "allow_failure"), 1u)
+        << "Was hinter dem Tabulator steht, faellt aus der Zaehlung.";
+
+    // GEGENEINGANG (T-4): eine Zeile in Spalte 0 beendet den Block sehr wohl -- sonst
+    // waere die Zusicherung oben auch mit einem Scanner erfuellt, der NIE beendet.
+    const std::optional<JobBlock> kurz = finde_job_block(zeilen, "naechster:job:");
+    ASSERT_TRUE(kurz.has_value());
+    EXPECT_EQ(kurz->zeilen.size(), 2u);
+    EXPECT_EQ(zaehle_wirksam(kurz->zeilen, "allow_failure"), 0u)
+        << "Der zweite Block hat das allow_failure des ERSTEN eingesammelt.";
+}
+
 TEST(CiYmlScanner, AngehaengtesAllowFailureWirdGEFUNDEN) {
     // Die Gegenrichtung derselben Zusicherung: wird allow_failure IN den Block gehaengt,
     // muss der Scanner es sehen. Ohne diesen Fall waere die Zusicherung oben mit einem

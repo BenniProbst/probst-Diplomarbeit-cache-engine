@@ -94,6 +94,13 @@
 #     drankommt. Seine Reihenfolge-Semantik ist hier nicht Gegenstand.
 #   - Der Rollback-Pfad (PDF-Gate rot -> COPIED_LIST zurueckdrehen) haengt am
 #     abgeschalteten Gate und ist damit ebenfalls ungedeckt.
+#   - VON DEN ZWEI URSACHEN DER FUENFTEN FALLE (##20) IST NUR EINE GEFAHREN.
+#     A12 erzeugt eine .gitignore im Ziel-Repo; dort schlaegt 'git add' fehl UND
+#     die Datei fehlt hinterher im Index, beide Zaehler steigen also zugleich.
+#     Der zweite Weg -- 'git add' meldet 0, die Datei ist trotzdem nicht im Index
+#     (index.lock eines Parallel-Laufs, entzogenes Schreibrecht mitten im Lauf) --
+#     laesst sich in einem Fixture nicht ehrlich herstellen und ist ein
+#     DEFENSIVES Netz, keine gefahrene Deckung. Genannt statt verschwiegen.
 #   - Ob der ECHTE appendix-generator aus einer gueltigen WIDE-Matrix richtige
 #     Tabellen macht, ist Gegenstand anderer Wachen. Hier zaehlt der TRANSPORT.
 #   - A8/A9 STELLEN die Reihenfolge her, sie messen sie nicht. Die Faelle legen
@@ -218,6 +225,20 @@ sandbox() {           # $1 = Fallname ; setzt ARBEIT, ZIEL, BASIS_N
     BASIS_N=$(git -C "$ZIEL" rev-list --count HEAD)
 }
 
+# --- Sandbox-Variante fuer die FUENFTE Transportfalle (##20, 2026-08-10) ------
+# Das Ziel-Repo ignoriert genau die Dateien, die der Kanal dort ablegt. Das ist
+# kein erfundener Fall: das Thesis-Repo 289 traegt eine .gitignore, und eine
+# Regel darin ist eine Zeile weit von diesem Zustand entfernt. Am 10.08.2026 lag
+# der Kanal hier still gruen ("IDEMPOTENT: 0 Aenderungen", rc=0, kein Commit) --
+# der Messwert war weg und der Job sah aus wie ein ehrliches "nichts zu tun".
+sandbox_ignoriert() {   # $1 = Fallname ; wie sandbox(), plus .gitignore im Ziel
+    sandbox "$1"
+    printf 'anhang/**/tabellen/*.tex\n' > "$ZIEL/.gitignore"
+    git -C "$ZIEL" add -- .gitignore
+    git -C "$ZIEL" commit --quiet -m "Ziel-Repo ignoriert die Anhang-Tabellen"
+    BASIS_N=$(git -C "$ZIEL" rev-list --count HEAD)
+}
+
 # --- Fixtures im PRODUKTIONS-LAYOUT ------------------------------------------
 # <korpus>/<RUN_TS>/measure_out/<perm>/result.csv  -- so legt der persist-Sammler
 # den Laufordner an, und so schreibt ce die Datei (kResultCsvName).
@@ -258,11 +279,25 @@ kanal() {             # $1 = AF_CORPUS_ROOT (relativ zu ARBEIT)
     AF_WIDE_AGGREGAT="$AGGREGAT" \
     AF_NO_PUSH=true \
     AF_PDF_GATE=off \
+    AF_COMPILE_SNAPSHOT="${AF_PROBE_SNAPSHOT:-false}" \
+    AF_SNAPSHOT_ROOT="${AF_PROBE_SNAP_ROOT:-$ARBEIT/$1/thesis_compiles}" \
+    AF_SNAP_ROOT_STRICT="${AF_PROBE_SNAP_STRICT:-true}" \
+    AF_SNAP_REMOTE_STRICT="${AF_PROBE_SNAP_REMOTE_STRICT:-true}" \
+    AF_SNAP_REMOTE_BRANCH="${AF_PROBE_SNAP_REMOTE_BRANCH:-NA}" \
     AF_TMP="$WERK/tmp_$N_FALL" \
     bash "$KERN" > "$OUT" 2> "$ERR"
     RC=$?
     set -e
 }
+# WARUM AF_COMPILE_SNAPSHOT HIER AUF false STEHT (E-18-SNAP, 2026-08-11):
+#   Die Faelle A1-A14 messen den ANHANG-Pfad; sie fahren alle mit AF_PDF_GATE=off, es
+#   entsteht also gar kein Bau-Produkt und folglich nie ein Compile-Schnappschuss. Bliebe
+#   der Schalter auf seinem Betriebs-Default true, liefe im Idempotenz-Zweig zusaetzlich
+#   die E-18-SNAP-Wache an -- und wuerde in dieser Sandbox voellig zu Recht abbrechen: die
+#   Arbeitswurzel der Probe ist KEIN git-Arbeitsbaum, der Schnappschuss waere dort nie
+#   committierbar. Das ist SOLLVERHALTEN des Prueflings und kein Befund; es gehoert in
+#   einen eigenen Fall (A15/A16 unten) und nicht als Nebenwirkung in vierzehn fremde.
+#   Wer den Schnappschuss-Zweig will, setzt AF_PROBE_SNAPSHOT=true vor dem Aufruf.
 
 protokoll() {
     echo "        ----- literale Ausgabe des Kerns (stdout) -----"
@@ -549,6 +584,177 @@ fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$BAS
 fall_ende
 
 # =============================================================================
+# A12 DIE FUENFTE TRANSPORTFALLE (##20, 2026-08-10): DIE UEBERNAHME INS ZIEL-REPO
+#     WURDE NIE NACHGEZAEHLT. Die Messwerte sind da, das Aggregat stimmt, die
+#     .tex sind geschrieben und kopiert -- und dann nimmt git sie nicht. Bis zu
+#     diesem Paket sagte der Kanal darauf "IDEMPOTENT: 0 Aenderungen" und ging
+#     mit rc=0. Dasselbe Wort fuer "nichts hat sich geaendert" und "nichts ist
+#     angekommen": das ist genau die Ununterscheidbarkeit, gegen die F1-F4
+#     geheilt wurden, eine Station weiter unten.
+#     VORHER-LAUF (10.08.2026, gegen den Stand VOR diesem Paket, gewuerfelter
+#     Koeder): "kopiert gesamt: 1 .tex" / "gestagte Aenderungen: 0" / "IDEMPOTENT"
+#     / rc=0 / Commits 1->1 / Koeder NICHT im committeten Blob.
+#     GEFORDERT jetzt: rc=1, KEIN Commit, der Nenner gedruckt, die Dateinamen
+#     genannt. Fail-loud statt fail-open.
+# =============================================================================
+K12=$(token)
+TS12="20260812-070007-ziel-ignoriert"
+fall "A12 Ziel-Repo ignoriert die .tex -> ROT mit Nenner, nicht 'IDEMPOTENT'"
+sandbox_ignoriert a12
+csv_ohne_newline "$ARBEIT/korpus/$TS12/measure_out/perm0/result.csv" "$K12"
+kanal korpus
+fordere_rc 1
+fordere_literal "$OUT" "kopiert gesamt: 2 .tex"
+fordere_literal "$OUT" "Uebernahme-Nenner: kopiert=2 im_index=0 nicht_uebernommen=2"
+fordere_literal "$ERR" "sind NICHT im Index des"
+fordere_literal "$ERR" "anhang/de/tabellen/A_messwerte.tex"
+fordere_literal "$ERR" "anhang/en/tabellen/A_messwerte.tex"
+fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$BASIS_N"
+fall_ende
+
+# =============================================================================
+# A13 GEGENRICHTUNG ZU A12, PFLICHT (T-4). Byte-gleiche Fixture, EINZIGER
+#     Unterschied ist die fehlende Ignorier-Regel im Ziel-Repo. Ohne diesen Fall
+#     waere A12 von einer Regel "der Kanal ist jetzt immer rot" nicht zu
+#     unterscheiden -- und genau diese Verwechslung ist die Fehlerklasse des
+#     ganzen Pakets, nur mit umgedrehtem Vorzeichen.
+# =============================================================================
+K13=$(token)
+TS13="20260812-070008-ziel-nimmt"
+fall "A13 GEGENPROBE: dieselbe Fixture ohne Ignorier-Regel -> Commit mit Koeder"
+sandbox a13
+csv_ohne_newline "$ARBEIT/korpus/$TS13/measure_out/perm0/result.csv" "$K13"
+kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "Uebernahme-Nenner: kopiert=2 im_index=2 nicht_uebernommen=0"
+fordere_literal "$OUT" "git_add_fehler=0"
+fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fordere_tex de 1 "$K13"
+fordere_tex en 1 "$K13"
+fall_ende
+
+# =============================================================================
+# A14 ECHTE IDEMPOTENZ BLEIBT ECHT (Gegeneingang zu A12, zweite Richtung).
+#     Derselbe Lauf zweimal: der zweite darf KEINEN zweiten Commit erzeugen --
+#     das ist die Loop-/Rausch-Wache, an der der Kanal seit dem ersten Tag haengt
+#     ("bei jedem CI neu setzen" heisst nicht "bei jedem CI ein Commit").
+#     Der Fall belegt zugleich, dass das neue Urteil die richtige Grundlage hat:
+#     'IDEMPOTENT' steht hier MIT dem Beleg 'alle 2 kopierten .tex liegen im
+#     Index', waehrend A12 dieselbe Zahl 0 als Riss ausweist. Zwei Faelle, eine
+#     Zahl, zwei Urteile -- ohne diesen Fall waere die Zahl wieder blind.
+# =============================================================================
+K14=$(token)
+TS14="20260812-070009-zweimal"
+fall "A14 zweiter Lauf auf demselben Stand -> IDEMPOTENT, KEIN zweiter Commit"
+sandbox a14
+csv_ohne_newline "$ARBEIT/korpus/$TS14/measure_out/perm0/result.csv" "$K14"
+kanal korpus
+fordere_rc 0
+fordere_zahl "Commits nach Lauf 1 (Basis war $BASIS_N)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "Uebernahme-Nenner: kopiert=2 im_index=2 nicht_uebernommen=0"
+fordere_literal "$OUT" "IDEMPOTENT: 0 Aenderungen"
+fordere_literal "$OUT" "belegt: alle 2 kopierten .tex liegen im Index"
+fordere_zahl "Commits nach Lauf 2 (unveraendert erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fordere_tex de 1 "$K14"
+fall_ende
+
+# =============================================================================
+# A15-A18 E-18-SNAP: DIE ZWEI WACHEN DES SCHNAPPSCHUSSES, JE MIT GEGENPROBE.
+#     Bis 11.08.2026 hatte der gesamte E-18-SNAP-Zweig in DIESER Probe NULL
+#     Faelle -- am Objekt gemessen: 'grep -cF SNAP ci/tests/anhang_forward_probe.sh'
+#     ergab 0, waehrend der Kern 32 SNAP-Stellen trug. Die Beweise lagen unter
+#     docs/sessions/backups/, wo weder die CI noch die Registrierungs-Wache je
+#     hinsieht. Eine Probe, die den halben Pruefling nicht kennt, ist ein Nenner
+#     ohne Zaehler. Die vier Faelle unten schliessen das fuer die zwei Wachen,
+#     die ueber "Beleg oder kein Beleg" entscheiden.
+#     ZUGANG: beide Wachen liegen im IDEMPOTENZ-Zweig (0 Byte-Delta) -- also
+#     derselbe Zweimal-Lauf wie A14, nur mit AF_PROBE_SNAPSHOT=true.
+# =============================================================================
+K15=$(token)
+TS15="20260812-070010-snap-vertrag"
+fall "A15 Schnappschuss-Wurzel liegt in KEINEM Arbeitsbaum -> Vertrag VERLETZT, rc=1"
+sandbox a15
+csv_ohne_newline "$ARBEIT/korpus/$TS15/measure_out/perm0/result.csv" "$K15"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true kanal korpus
+fordere_rc 1
+fordere_literal "$OUT" "liegt in KEINEM git-Arbeitsbaum"
+fordere_literal "$ERR" "AF_SNAPSHOT_ROOT-Vertrag VERLETZT"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+# GEGENPROBE ZU A15 (PFLICHT): dieselbe Fixture, nur der Schalter umgelegt.
+# Ohne sie waere A15 von "der Schnappschuss-Zweig ist immer rot" nicht zu
+# unterscheiden -- und genau diese Verwechslung ist die Fehlerklasse des Pakets.
+K16=$(token)
+TS16="20260812-070011-snap-labor"
+fall "A16 GEGENPROBE: AF_SNAP_ROOT_STRICT=false -> Verstoss bewusst hingenommen, gruen"
+sandbox a16
+csv_ohne_newline "$ARBEIT/korpus/$TS16/measure_out/perm0/result.csv" "$K16"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true AF_PROBE_SNAP_STRICT=false kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "AF_SNAP_ROOT_STRICT=false -> Verstoss BEWUSST hingenommen"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+# =============================================================================
+# A17/A18 DER ERST-FETCH DER REMOTE-WACHE IST FAIL-CLOSED (NB2-Restbefund (a),
+#     geheilt 11.08.2026). Die Asymmetrie war das Loch: der RE-Fetch vor dem
+#     Schreiben brach seit jeher ab, der ERST-Fetch lief mit einer Warnung
+#     weiter -- und weil der Re-Fetch ohne gesetzten REMOTE-Stand sofort mit
+#     rc 0 zurueckkehrt, war sein fail-closed-Zweig AUSGERECHNET dann
+#     unerreichbar, wenn man ihn braucht. Hier faehrt die Wurzel im
+#     Arbeitsbaum (Vertrag erfuellt), aber der Remote-Branch existiert nicht.
+# =============================================================================
+snap_arbeitsbaum() {   # legt ein 288-artiges Repo an und setzt AF_PROBE_SNAP_ROOT
+    _r="$ARBEIT/super288"
+    mkdir -p "$_r"
+    git init --quiet "$_r"
+    git -C "$_r" config user.name  "probe-bot"
+    git -C "$_r" config user.email "probe-bot@test.local"
+    git -C "$_r" config commit.gpgsign false
+    printf 'Sandkasten-288\n' > "$_r/LIESMICH.txt"
+    git -C "$_r" add -- LIESMICH.txt
+    git -C "$_r" commit --quiet -m "Ausgangs-Commit 288"
+    AF_PROBE_SNAP_ROOT="$_r/measurement/thesis_compiles"
+    mkdir -p "$AF_PROBE_SNAP_ROOT"
+}
+K17=$(token)
+TS17="20260812-070012-snap-fetch"
+fall "A17 Erst-Fetch der REMOTE-Wache scheitert -> FAIL-CLOSED, rc=1 (NB2-Rest (a))"
+sandbox a17
+snap_arbeitsbaum
+csv_ohne_newline "$ARBEIT/korpus/$TS17/measure_out/perm0/result.csv" "$K17"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true AF_PROBE_SNAP_REMOTE_BRANCH="gibt-es-nicht" kanal korpus
+fordere_rc 1
+fordere_literal "$ERR" "Erst-Fetch"
+fordere_literal "$ERR" "FAIL-CLOSED"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+K18=$(token)
+TS18="20260812-070013-snap-fetch-labor"
+fall "A18 GEGENPROBE: AF_SNAP_REMOTE_STRICT=false -> Rueckfall literal, gruen"
+sandbox a18
+snap_arbeitsbaum
+csv_ohne_newline "$ARBEIT/korpus/$TS18/measure_out/perm0/result.csv" "$K18"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true AF_PROBE_SNAP_REMOTE_BRANCH="gibt-es-nicht" \
+  AF_PROBE_SNAP_REMOTE_STRICT=false kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "AF_SNAP_REMOTE_STRICT=false -> REMOTE-Stand NICHT geprueft"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+# =============================================================================
 # A11 KEIN VIERTER ZWILLING (P4c, 2026-08-09).
 #     Die Mutanten N2/N3/N5 decken die beiden measure-Jobs NUR, solange die dort
 #     keine eigene Kopie mehr tragen. Kaeme eine zurueck -- durch ein Zurueck-
@@ -681,6 +887,8 @@ fi
 #       Header wieder "stellen" (Falle 4, der Header-Dieb).
 #   N6  Die Leerheitspruefung laesst alles durch -- der Gegeneingang (A6/A10)
 #       muss das fangen, sonst waere die Heilung ein Scheunentor.
+#   N7  Die Uebernahme ins Ziel-Repo wird gezaehlt, aber nicht beurteilt
+#       (Falle 5). A12 muss daran sterben, A13/A14 duerfen es nicht.
 #
 # JEDER MUTANT FUEHRT SEINE ZAHL MIT: erwartet wird eine exakte Anzahl
 # geaenderter Quellzeilen. Ohne sie bliebe ein Mutant unauffaellig, dessen
@@ -697,7 +905,11 @@ fi
 #   FOLGE, ausdruecklich benannt: die awk-Zaehlung ist an DIESER Stelle heute
 #   REDUNDANTE Deckung, nicht die tragende. Tragend fuer den Ein-Zeilen-Fall ist
 #   das 'awk 1' der Konkatenation. Die awk-Zaehlung bleibt trotzdem: sie ist die
-#   Zusage "wortgleich zu Wache und Sammler", und sie faengt den Fall ab, falls
+#   Zusage "dasselbe Zaehl-WERKZEUG wie Wache und Sammler" -- seit D3-3b
+#   (10.08.2026) ausdruecklich nicht mehr dieselbe Zaehl-REGEL, denn das Aggregat
+#   muss abbilden, was TATSAECHLICH angehaengt wurde (Begruendung in
+#   ci/wide_aggregat.sh, Abschnitt "ABGRENZUNG ZU D3-3b").
+#   Sie faengt den Fall ab, falls
 #   jemand das 'awk 1' spaeter wieder entfernt. Zwei Deckungen desselben Falls
 #   sind kein Fehler -- sie unbenannt zu lassen waere einer.
 # =============================================================================
@@ -820,6 +1032,17 @@ if [ "$MODUS" = --selbstbiss ]; then
     # Heilung, die anschliessend jede Leere durchwinkt, waere keine.
     mutant n6_leerheit_offen "die Leerheitspruefung laesst alles durch (-le 0 -> -lt 0)" \
         's@\[ "$WIDE_DATEN" -le 0 \]@[ "$WIDE_DATEN" -lt 0 ]@' 1
+    # N7 dreht die FUENFTE Heilung zurueck (##20, 10.08.2026): die Uebernahme wird
+    # zwar noch GEZAEHLT, aber nicht mehr BEURTEILT -- die Zahl steht dann als
+    # Verzierung im Log, und der Kanal faellt wieder in den 'IDEMPOTENT'-Zweig.
+    # Genau so sah der Defekt aus: Nenner vorhanden waere nicht genug gewesen, das
+    # URTEIL ist der tragende Teil. A12 muss daran sterben, A13/A14 nicht.
+    # BEIDE Bedingungen stehen bewusst in EINER Zeile (s. Begruendung im Kern):
+    # zwei getrennte Abbrueche haetten den zweiten unerreichbar und damit
+    # ungedeckt gemacht -- ein Mutant auf ihn waere gruen geblieben.
+    _n7='s@\[ "$nicht_uebernommen" -gt 0 \] || \[ "$af_add_fehler" -gt 0 \]@[ 1 -eq 0 ]@'
+    mutant n7_uebernahme_ohne_urteil "Uebernahme wird gezaehlt, aber nicht beurteilt (Falle 5)" \
+        "$_n7" 1
 
     echo "-----------------------------------------------------------------------------"
     echo "SELBSTBISS-NENNER: $N_GEBISSEN von $N_MUT Mutanten haben die Probe rot gemacht."

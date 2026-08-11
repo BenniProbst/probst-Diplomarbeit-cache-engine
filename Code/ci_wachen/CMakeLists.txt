@@ -30,6 +30,10 @@ comdare_da_add_library(comdare_ci_wachen MODULE M10 SOURCES
     src/xml_wellformed.cpp
     src/gitlink_parity.cpp
     src/ci_yml_scanner.cpp
+    src/ci_invarianten.cpp
+    src/wide_aggregat.cpp
+    src/mutations_lauf.cpp
+    src/lizenz_konsistenz.cpp
 )
 target_compile_features(comdare_ci_wachen PUBLIC cxx_std_23)
 target_include_directories(comdare_ci_wachen PUBLIC
@@ -62,7 +66,27 @@ target_compile_features(ci_thesis_gitlink_wache PRIVATE cxx_std_23)
 target_link_libraries(ci_thesis_gitlink_wache PRIVATE comdare::ci_wachen)
 set_target_properties(ci_thesis_gitlink_wache PROPERTIES OUTPUT_NAME "ci-thesis-gitlink-wache")
 
-install(TARGETS ci_xml_wellformed_wache ci_thesis_gitlink_wache
+# P29 (2026-08-10): die WIDE-Konkatenation. Sie ist KEINE Wache (sie urteilt nicht), sie
+# ist der Aggregator der Mess-Kette -- deshalb heisst das Binary nicht *-wache. Der
+# CLI-Vertrag ist byte-vertraeglich zu ci/wide_aggregat.sh; die drei Produktions-
+# Aufrufstellen rufen weiterhin die Shell-Fassung (Schwenk = Stufe 2, Lead-Entscheid).
+add_executable(ci_wide_aggregat tools/wide_aggregat_main.cpp)
+target_compile_features(ci_wide_aggregat PRIVATE cxx_std_23)
+target_link_libraries(ci_wide_aggregat PRIVATE comdare::ci_wachen)
+set_target_properties(ci_wide_aggregat PROPERTIES OUTPUT_NAME "ci-wide-aggregat")
+
+# MUT (2026-08-10): DER MUTATIONS-HARNESS. Er ist KEINE Wache ueber den Bestand, sondern
+# eine Wache ueber die SUITE -- er baut eine benannte Produktions-Mutation ein, faehrt die
+# Tests und nimmt die Mutation zurueck. Begruendung vollstaendig im Kopf von
+# mutations_lauf.hpp; die Abgrenzung zum Koeder-Verfahren (K13) steht dort ebenfalls.
+# BEWUSST NICHT in .gitlab-ci.yml verdrahtet: er schreibt in Produktionsdateien. Ob er in
+# eine Pipeline gehoert, ist ein Owner-/Lead-Entscheid, kein Modul-Entscheid.
+add_executable(ci_mutations_lauf tools/mutations_lauf_main.cpp)
+target_compile_features(ci_mutations_lauf PRIVATE cxx_std_23)
+target_link_libraries(ci_mutations_lauf PRIVATE comdare::ci_wachen)
+set_target_properties(ci_mutations_lauf PROPERTIES OUTPUT_NAME "ci-mutations-lauf")
+
+install(TARGETS ci_xml_wellformed_wache ci_thesis_gitlink_wache ci_wide_aggregat ci_mutations_lauf
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # -- Die Werkbank der Tests -----------------------------------------------------------

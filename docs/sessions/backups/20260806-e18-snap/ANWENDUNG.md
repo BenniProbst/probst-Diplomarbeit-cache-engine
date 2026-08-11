@@ -1,5 +1,22 @@
 # E-18-SNAP -- Compile-Schnappschuss im anhang:forward-Kanal
 
+> ## NACHTRAG 2026-08-11 -- DIESES DOKUMENT BESCHREIBT DEN STAND VOR DER LANDUNG
+>
+> Das Paket wurde im Dual-Review mit **NICHT_LANDEN** blockiert und danach **neu
+> geschnitten**. Was unten steht, ist die Fassung vom 06.08. und bleibt als Historie
+> stehen (Doku wird nie geloescht); **was heute gilt, steht hier**:
+>
+> | Blocker | Befund am Objekt | Auflösung |
+> |---|---|---|
+> | 1 WIRKSAMKEIT NULL | Der Job stagte `measurement/thesis_compiles` **nicht** -- der Schnappschuss starb mit dem Runner. | Einbuchung als eigene, probefähige Datei `ci/anhang_snapshot_einbuchen.sh`, gerufen aus Block (4b) des Jobs. Beweis: `ci/tests/anhang_snapshot_einbuchen_probe.sh` misst den **Commit** (`git show HEAD:<pfad>`), nicht das Protokoll. |
+> | 2 PATCH NICHT ANWENDBAR | `patch --dry-run -p1` gegen den heutigen Stand: **rc=1**, „Hunk #4 FAILED at 1126", 1 von 4. | `gitlab-ci-delta.patch` **neu geschnitten**; Gegenprobe vor der Anwendung `rc=0`, und das Ergebnis ist byte-genau der gelandete Stand (`cmp` rc=0). |
+> | 3 ZWEI PAKETE ZURUECKGEDREHT | Der Ersatztext kannte nur **einen** Gitlink; der heutige Block bumpt **beide** und prüft danach die Parität am Index. | Der neue Schnitt **rührt die Gitlink-Logik nicht an**. Am Ergebnis gemessen: `THESIS_GITLINKS`-Zuweisung 1, Schleife 2x, Paritäts-Wache 1, verbotenes Einzel-Bump-Muster **0**. |
+>
+> **Die Fixtures unter `fixture/` sind Historie.** Der lebende Beweis liegt seit dem
+> 11.08. in `ci/tests/` -- dort, wo die CI ihn fährt und die Registrierungs-Wache ihn
+> sieht: `anhang_forward_probe.sh` (A1-A18, Selbstbiss N1-N7) und
+> `anhang_snapshot_einbuchen_probe.sh` (S1-S10, Selbstbiss N1-N3).
+
 **Branch:** `b-e18-snap` (ab `origin/development`, Basis `eb3d285a`) -- **kein Push**, ein Commit.
 
 ## OWNER-KERN (Ledger frueh-6, VERBATIM)

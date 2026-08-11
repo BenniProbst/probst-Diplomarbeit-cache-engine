@@ -142,6 +142,21 @@ target_compile_definitions(test_ci_wache_gitlink_parity PRIVATE
     "COMDARE_CI_WACHE_PARITY_BINARY=\"$<TARGET_FILE:ci_thesis_gitlink_wache>\"")
 add_dependencies(test_ci_wache_gitlink_parity ci_thesis_gitlink_wache)
 
+# P29 (2026-08-10) -- DIE WIDE-KONKATENATION. Sie prueft ZWEI Gegenstaende in einem Ziel:
+# die C++-Fassung (Stufe 1 des Owner-KERN-Umbaus) UND, ueber die Prozess-Naht, die heute
+# in der CI laufende Produktions-Shell ci/wide_aggregat.sh. Der Pfad kommt als Define,
+# nicht aus dem Arbeitsverzeichnis -- dieselbe Haertung wie bei test_279 und
+# test_ci_wache_registrierung (eine CWD-Annahme ist keine Zusicherung).
+comdare_da_add_test(test_ci_wache_wide_aggregat
+    SOURCES unit/test_ci_wache_wide_aggregat.cpp
+    LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_wide_aggregat PRIVATE
+    "COMDARE_WIDE_AGGREGAT_SH=\"${CMAKE_SOURCE_DIR}/../ci/wide_aggregat.sh\""
+    "COMDARE_REPO_WURZEL_W29=\"${CMAKE_SOURCE_DIR}/..\""
+    "COMDARE_CI_WIDE_AGGREGAT_BINARY=\"$<TARGET_FILE:ci_wide_aggregat>\"")
+add_dependencies(test_ci_wache_wide_aggregat ci_wide_aggregat)
+
 # T-7: die Abnahme der .gitlab-ci.yml. CMAKE_SOURCE_DIR ist Code/ (configure.sh setzt
 # cmake_unterverzeichnis="Code"), die Datei liegt also eine Ebene darueber. Dasselbe
 # Fixture-Muster wie bei test_279_tier_binary_report (Define statt CWD-Annahme).
@@ -152,6 +167,102 @@ comdare_da_add_test(test_ci_wache_registrierung
 target_compile_definitions(test_ci_wache_registrierung PRIVATE
     "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
     "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
+
+# CI-INV (2026-08-10) -- DIE ZWEI ABSCHALT-KLASSEN. Owner 10.08.: "Gebaut wird immer,
+# skip ist VERBOTEN." Ein Job kann aber auch aufhoeren zu existieren, ohne dass jemand
+# ihn abschaltet: ein doppelter Top-Level-Schluessel loescht den ersten wortlos, und ein
+# rules-Gate auf eine nirgends gesetzte Variable ist von einem toten Job nicht zu
+# unterscheiden. Beides ist im Haus belegt (contract:axis-version-lock, drei Wochen in
+# keinem Lauf bei gruener Pipeline) und war bis heute durch nichts gedeckt.
+#
+# Der Pfad kommt als Define, NICHT aus dem Arbeitsverzeichnis -- dieselbe Haertung wie
+# bei test_ci_wache_registrierung (eine CWD-Annahme ist keine Zusicherung).
+comdare_da_add_test(test_ci_wache_invarianten
+    SOURCES unit/test_ci_wache_invarianten.cpp
+    LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_invarianten PRIVATE
+    "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
+    "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
+
+# MUT (2026-08-10) -- DER MUTATIONS-HARNESS UNTER TEST. Begruendung im Kopf von
+# Code/ci_wachen/include/comdare/ci_wachen/mutations_lauf.hpp.
+#
+# WARUM DER TEST DEN ECHTEN BAUM BRAUCHT (COMDARE_REPO_WURZEL_MUT): der Katalog des
+# Harness traegt Quelltext-ANKER aus vier Produktionsdateien. Steht ein Anker dort nicht
+# mehr GENAU so oft, liefe der Mutant ins Leere -- und der Harness meldete "alle Mutanten
+# getoetet", ohne je eine Datei veraendert zu haben. Genau diese stille Null faengt der
+# Fall MutationsKatalog.JederAnkerStehtGENAUSooftInDerECHTENProduktionsdatei ab. Der Pfad
+# kommt als Define, NICHT aus dem Arbeitsverzeichnis (dieselbe Haertung wie test_279).
+#
+# Der Test startet KEIN cmake und KEIN ctest: die Bau-/Suite-/git-Naht wird durch eine
+# Fake-Naht ersetzt (Muster FakeGitQuelle/FakeXmlParser). Der Beleg, dass die ECHTE Naht
+# baut und faehrt, ist der protokollierte Lauf des Binaries ci-mutations-lauf.
+comdare_da_add_test(test_ci_wache_mutations_lauf
+    SOURCES unit/test_ci_wache_mutations_lauf.cpp
+    LIBRARIES comdare::ci_wachen comdare::ci_wachen_werkbank gmock
+    LABELS ci_wachen)
+add_dependencies(test_ci_wache_mutations_lauf ci_mutations_lauf)
+
+# -- DAS ZWEITE ZIEL: die Katalog-Faelle, ABGEWAEHLT vom Mess-Lauf --------------------
+# Sie lesen die Produktionsdateien von der Platte und sind deshalb unter JEDEM Mutanten
+# rot -- unabhaengig davon, ob die Suite den Fehler wirklich faengt. Am Objekt gemessen
+# (erster Harness-Lauf 10.08.): sie toeteten alle fuenf Mutanten, waehrend die
+# vorhergesagten Deckungstests bei M4 und M5 gruen blieben. Die Rate "0 von 5" war eine
+# Konstante des Aufbaus, keine Messung.
+#
+# Das ZUSATZ-LABEL mut_selbstbezug ist der Mechanismus: der Harness faehrt die Suite mit
+# `-LE mut_selbstbezug`. Es steht hier -- die Zeichenkette selbst kommt aus
+# comdare::ci_wachen::SELBSTBEZUG_LABEL, und der Fall
+# MutationsKatalog.DIE_ABWAHL_StehtPOSITIONSGEBUNDENInDerCMakeDatei haelt beide
+# zusammen: er liest DIESE Datei und verlangt das Label GENAU in diesem Ziel-Block.
+comdare_da_add_test(test_ci_wache_mutations_katalog
+    SOURCES unit/test_ci_wache_mutations_katalog.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen mut_selbstbezug)
+target_compile_definitions(test_ci_wache_mutations_katalog PRIVATE
+    "COMDARE_REPO_WURZEL_MUT=\"${CMAKE_SOURCE_DIR}/..\"")
+# Owner-Auftrag 10.08.2026 ("mal schauen, ob nicht dort speicher eingespart sein kann"):
+# das Bau-Parallelitaets-Budget. Dieselben zwei Defines wie oben -- die Wache liest die
+# .gitlab-ci.yml BEIDER Repositories (super direkt, ce ueber die Repo-Wurzel), weil beide
+# Pipelines sich denselben Runner und damit denselben Arbeitsspeicher teilen.
+comdare_da_add_test(test_ci_wache_speicherbudget
+    SOURCES unit/test_ci_wache_speicherbudget.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_speicherbudget PRIVATE
+    "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
+    "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
+
+# P3 (2026-08-10) -- DIE BASIS DER DIFF-HYGIENE-WACHE. Bis heute stand sie als
+# "origin/$CI_DEFAULT_BRANCH" in der .gitlab-ci.yml, also in einer GitLab-Web-Einstellung
+# statt im versionierten Text. Gemessen: mit dem daraus folgenden 'development' war die
+# Wache auf jeder development-Pipeline ein NO-OP (0 Commit(s) im Bereich, 0 Zeilen
+# geprueft, GRUEN); mit origin/main sind es am selben Stand 52 Commit(s) und 7007 Zeilen
+# im Scope. Nur COMDARE_CI_YML_PFAD noetig -- die Wache liest ausschliesslich den super.
+comdare_da_add_test(test_ci_wache_guard_basis
+    SOURCES unit/test_ci_wache_guard_basis.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_guard_basis PRIVATE
+    "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\"")
+
+# P-LIZENZ (2026-08-11) -- SAGEN NOTICE, LICENSE UND DER ARBEITSBAUM DASSELBE?
+# Bis heute gab es an der Wurzel KEINE NOTICE -- in keinem Commit irgendeines
+# Branches (git log --all -- NOTICE leer; Gegenprobe -- LICENSE = 1 Commit).
+# Dabei zieht das Repo 4 Submodul-Einbindungen und 1544 getrackte Dateien
+# vendorten Forschungscode ein, darunter GPL-3.0 und LGPL-2.1-or-later.
+# Die Wache paart .gitmodules gegen NOTICE in BEIDEN Richtungen, misst jeden
+# behaupteten Lizenz-Marker am Text der genannten Lizenzdatei und haelt die
+# SPDX-Koepfe unter Code/ (ohne Code/external/) auf Apache-2.0.
+# COMDARE_REPO_WURZEL_LIZENZ: derselbe Define-statt-CWD-Griff wie bei test_279
+# und test_ci_wache_registrierung -- eine CWD-Annahme ist keine Zusicherung.
+comdare_da_add_test(test_ci_wache_lizenz_konsistenz
+    SOURCES unit/test_ci_wache_lizenz_konsistenz.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_lizenz_konsistenz PRIVATE
+    "COMDARE_REPO_WURZEL_LIZENZ=\"${CMAKE_SOURCE_DIR}/..\"")
 
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
