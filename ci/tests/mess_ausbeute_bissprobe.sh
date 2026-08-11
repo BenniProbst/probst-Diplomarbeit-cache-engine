@@ -369,6 +369,12 @@ fordere_literal "$OUT" "Modus=provision_only"
 fordere_literal "$OUT" "0 Datenzeile(n) insgesamt"
 fordere_literal "$OUT" "WARNUNG: modus=provision_only"
 fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+# D3-7b: die BEGRUENDUNG muss zum Modus passen. Bis D3-7b stand in JEDEM weichen
+# Modus das provision_only-Erfolgsmass -- eine falsche Auskunft mitten in einer
+# gruenen Ausgabe. Ohne diese zwei Zeilen waere ein Vertauschen der Texte nicht
+# zu bemerken (die case-Zweige waeren stille Zweige).
+fordere_literal "$OUT" "eine DLL bereitgestellt' das Erfolgsmass"
+fordere_kein_literal "$OUT" "S3-Konformitaets-Lauf"
 fall_ende
 
 fall "F13 dasselbe Fenster, modus=voll -> rc=1 (die Gegenrichtung)"
@@ -498,6 +504,69 @@ fordere_literal "$OUT" "davon 0 mit Datenzeilen, 1 ohne"
 fordere_literal "$ERR" "der Messlauf hat 0 Datenzeile(n) erzeugt"
 fall_ende
 
+# F23..F25 DER DRITTE MODUS (D3-7b): pruef_only.
+#     Der S3-Konformitaets-Lauf (ce planner/experiment_plan_director.hpp,
+#     COMDARE_PRUEF_ONLY=true; ce profile_run_entry.hpp 'if (a.pruef_only)')
+#     MISST NICHT und BAUT NICHT -- er laedt jede fertige .so und faehrt nur ihr
+#     Gate. 0 Datenzeilen sind sein SOLL, genau wie bei provision_only.
+#     WARUM DAS HIER STEHEN MUSS UND NICHT NUR IM MARKER: die Allowlist dieser
+#     Wache kannte bis D3-7b nur voll|provision_only|prune_only|auto. Ein Marker
+#     mit modus=pruef_only waere in den Zweig "unlesbarer Marker ist keine
+#     Erlaubnis" gefallen -- rc=2, JOB ROT. Der Marker allein haette den Lauf
+#     also nicht gerettet, sondern erst getoetet; die zwei Seiten gehoeren
+#     zusammen. (F19 bleibt daneben stehen und deckt weiterhin den ECHTEN
+#     Tippfehler-Fall: ein Modus, den niemand vergeben hat, ist weiter rc=2.)
+# =============================================================================
+fall "F23 leeres Fenster, modus=pruef_only -> rc=0 MIT sichtbarer WARNUNG"
+D="$WERK/f23"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 pruef_only
+fordere_rc 0
+fordere_literal "$OUT" "Modus=pruef_only"
+fordere_literal "$OUT" "0 Datenzeile(n) insgesamt"
+fordere_literal "$OUT" "WARNUNG: modus=pruef_only"
+fordere_literal "$OUT" "MESS-AUSBEUTE-WACHE: OK"
+# Die Gegenrichtung zu F12: hier MUSS die S3-Begruendung stehen und die
+# provision_only-Begruendung fehlen.
+fordere_literal "$OUT" "der S3-Konformitaets-Lauf MISST"
+fordere_kein_literal "$OUT" "eine DLL bereitgestellt' das Erfolgsmass"
+fall_ende
+
+fall "F23b leeres Fenster, modus=prune_only -> rc=0, WEDER die eine NOCH die andere Begruendung"
+D="$WERK/f23b"; nur_kopf "$D/perm-0001/measurements.csv"
+lauf "$D" 1 prune_only
+fordere_rc 0
+fordere_literal "$OUT" "WARNUNG: modus=prune_only"
+fordere_literal "$OUT" "In diesem Modus ist die Datenzeile ueberhaupt nicht das"
+fordere_kein_literal "$OUT" "eine DLL bereitgestellt' das Erfolgsmass"
+fordere_kein_literal "$OUT" "der S3-Konformitaets-Lauf MISST"
+fall_ende
+
+fall "F24 modus=auto mit pruef_only-Marker -> Modus wird GELESEN, rc=0"
+D="$WERK/f24"; nur_kopf "$D/perm-0001/measurements.csv"
+marker "$D/perm-0001" pruef_only
+lauf "$D" 1 auto
+fordere_rc 0
+fordere_literal "$OUT" "Modus=pruef_only"
+fordere_literal "$OUT" "1 Lauf-Marker, 0 davon modus=voll"
+fall_ende
+
+fall "F25 modus=auto, 1 voll + 1 pruef_only -> schaerfster gewinnt, rc=1"
+D="$WERK/f25"
+nur_kopf "$D/perm-0001/measurements.csv"; marker "$D/perm-0001" pruef_only
+nur_kopf "$D/perm-0002/measurements.csv"; marker "$D/perm-0002" voll
+lauf "$D" 1 auto
+fordere_rc 1
+fordere_literal "$OUT" "Modus=voll"
+fordere_literal "$OUT" "2 Lauf-Marker, 1 davon modus=voll"
+fall_ende
+
+fall "F26 keine CSV, modus=pruef_only -> trotzdem rc=1 (Zweig unveraendert)"
+D="$WERK/f26"; mkdir -p "$D/leerer_lauf"
+lauf "$D" 1 pruef_only
+fordere_rc 1
+fordere_literal "$ERR" "0 CSV-Dateien"
+fall_ende
+
 # =============================================================================
 # F10 ABNAHME D3: das alte Praesenz-Muster ist aus .gitlab-ci.yml verschwunden.
 #     ZUERST der Koeder -- eine Null ohne beissenden Koeder ist keine Aussage,
@@ -580,6 +649,38 @@ fall_ende
 echo "============================================================================="
 echo "NENNER: $N_FALL Faelle gefahren, $N_OK gehalten, $N_ROT gerissen."
 echo "        Pruefling: $WACHE"
+
+# -----------------------------------------------------------------------------
+# EINDEUTIGKEITS-RIEGEL (11.08.2026) -- er faengt die UNION-AUFLOESUNG.
+#
+# ANLASS, am Objekt: beim Landen von D3-7b kollidierten die Fall-Namen F21/F22
+# dieses Zweigs mit den gleichnamigen Faellen, die D3-3b vorher auf development
+# gebracht hatte. Loest man so einen Konflikt als reine UNION auf, stehen beide
+# Bloecke danach im Baum: die Probe laeuft durch, meldet eine hoehere Fallzahl --
+# und NIEMAND sieht, dass ein Name zweimal vergeben ist. Der Verdikt-Zweig unten
+# haengt allein an N_ROT und kann das nicht bemerken.
+#
+# WARUM DIE FALLZAHL ALLEIN NICHT GENUEGT: eine UNION erhoeht Quelltext- UND
+# Laufzeit-Zaehlung gleichermassen; beide blieben stimmig. Was NICHT stimmig
+# bleibt, ist die EINDEUTIGKEIT der Namen -- deshalb prueft der Riegel sie.
+#
+# FREMDER NENNER (T-3): gezaehlt wird im QUELLTEXT dieser Datei, nicht in den
+# Laufzeit-Zaehlern -- zwei Quellen, wie es der Verifikationsvertrag verlangt.
+# -----------------------------------------------------------------------------
+_fall_namen=$(/usr/bin/grep -oE '^fall "F[0-9]+[a-z]?' "$0" | sed 's/^fall "//')
+_fall_gesamt=$(printf '%s\n' "$_fall_namen" | /usr/bin/grep -c .)
+_fall_distinkt=$(printf '%s\n' "$_fall_namen" | sort -u | /usr/bin/grep -c .)
+echo "        Fall-Namen im Quelltext: $_fall_gesamt, davon distinkt: $_fall_distinkt."
+if [ "$_fall_gesamt" -ne "$_fall_distinkt" ]; then
+    echo "============================================================================="
+    echo "BISSPROBE ROT (NAMENS-DUBLETTE): $_fall_gesamt Fall-Namen, nur $_fall_distinkt" >&2
+    echo "        distinkt. Doppelt vergeben:" >&2
+    printf '%s\n' "$_fall_namen" | sort | uniq -d | sed 's/^/          /' >&2
+    echo "        Das ist die Signatur einer UNION-Konfliktaufloesung: zwei Bloecke" >&2
+    echo "        mit demselben Namen stehen nebeneinander im Baum. Loese den" >&2
+    echo "        Konflikt per UMBENENNUNG auf, nicht per UNION." >&2
+    exit 1
+fi
 echo "============================================================================="
 
 if [ "$N_ROT" -ne 0 ]; then

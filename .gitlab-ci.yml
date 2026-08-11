@@ -549,9 +549,18 @@ test:durchstich-bissprobe:
 # deshalb eine Zeile mit dem echten Byte-Trenner und beweist ZUERST mit einem Koeder, dass sie den
 # Unterschied ueberhaupt sehen kann; Mutant M3 setzt den ASCII-Pfeil zurueck und muss daran sterben.
 #
+# DER DRITTE MODUS (D3-7b, 2026-08-10, Faelle L2b/L2c/L2d): der S3-Konformitaets-Lauf
+# (COMDARE_PRUEF_ONLY=true, je Perm aus der emittierten Kampagnen-Pipeline) baut nicht und misst
+# nicht -- er laedt jede fertige .so und faehrt nur ihr Gate. Bis D3-7b trug seine Bilanz-Zeile
+# keinen Zusatz, der Marker schrieb modus=voll, und ci/mess_ausbeute_wache.sh haette den Lauf mit
+# "0 Datenzeilen" rot gefaerbt. Der Zusatz kommt jetzt AUS DEM TREIBER (ce profile_run_entry.hpp),
+# der Marker liest ihn, und die Wache kennt pruef_only in ihrer Allowlist -- alle drei Seiten, weil
+# jede allein wirkungslos oder schaedlich waere.
+#
 # WARUM --selbstbiss IM CI: eine Probe, die nur am gesunden Objekt gruen ist, koennte immer gruen
-# sein. Der Schalter baut vier SEMANTISCHE Wegwerf-Mutanten (pruefen ohne rot / ohne
-# (provision-only)-Erkennung / ASCII-Pfeil / ohne PRUNE-TESTAT-Rueckfall) und FORDERT, dass die
+# sein. Der Schalter baut sechs SEMANTISCHE Wegwerf-Mutanten (pruefen ohne rot / ohne
+# (provision-only)-Erkennung / ASCII-Pfeil / ohne PRUNE-TESTAT-Rueckfall / ohne
+# (pruef-only)-Erkennung / ohne Fail-closed bei beiden Zusaetzen) und FORDERT, dass die
 # Probe an jedem rot wird. Alle Zahlen und Koeder kommen je Lauf aus /dev/urandom (K13).
 # KEIN allow_failure (Owner 06.07.2026: bei einer harten Pipeline gibt es kein allow_failure).
 test:lauf-marker-probe:

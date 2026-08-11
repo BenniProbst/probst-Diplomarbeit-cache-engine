@@ -21,6 +21,18 @@
 #   Marker am richtigen Ort; Mutant M3 nimmt dem Skript diesen Trenner wieder
 #   weg und muss daran sterben.
 #
+# DER DRITTE MODUS (D3-7b, 2026-08-10) -- Faelle L2b/L2c/L2d, Mutanten M5/M6:
+#   Bis heute kannte der Marker aus der RUN_PROFILE-Bilanzzeile nur ZWEI Modi:
+#   voll und provision_only. Der S3-Konformitaets-Lauf (ce
+#   profile_run_entry.hpp "if (a.pruef_only) { ... }"; die emittierte
+#   Kampagnen-Pipeline faehrt ihn je Perm ueber COMDARE_PRUEF_ONLY=true) BAUT
+#   NICHT und MISST NICHT -- er laedt jede fertige .so und faehrt nur ihr Gate.
+#   Er lief damit als modus=voll durch und waere an der Ausbeute-Wache mit
+#   "0 Datenzeilen" gestorben. L2b faehrt den neuen Zusatz mit gewuerfeltem
+#   Koeder, L2c die Gegenrichtung (ohne Zusatz bleibt es voll -- sonst waere
+#   jeder echte Mess-Lauf entwaffnet), L2d den Fail-closed-Zweig fuer beide
+#   Zusaetze in EINER Zeile.
+#
 # ORAKEL (T-5): measured/resumed/provisioned und die Lauf-Kennungen stammen aus
 # /dev/urandom, nicht aus dieser Datei und nicht aus der Doku des Prueflings
 # (K13). Die Probe schreibt die Zahl in das Log und verlangt SIE im Marker
@@ -119,6 +131,13 @@ fordere_rc() { if [ "$RC" -ne "$1" ]; then reiss "rc=$RC, gefordert war rc=$1"; 
 fordere_literal() {   # $1=Datei $2=Text
     if grep -qF -- "$2" "$1"; then :; else reiss "Text fehlt in $(basename "$1"): >>$2<<"; fi
 }
+# Die Gegenrichtung. Ohne sie belegt "modus=X steht drin" nur die Anwesenheit
+# von X, nicht die ABWESENHEIT des falschen Modus -- und genau der waere der
+# stille Schaden: ein pruef_only-Lauf, der als provision_only durchgeht, ist
+# gedeckt; einer, der als voll durchgeht, stirbt an der Ausbeute-Wache.
+fordere_kein_literal() {   # $1=Datei $2=Text
+    if grep -qF -- "$2" "$1"; then reiss "Text steht in $(basename "$1"), durfte NICHT: >>$2<<"; fi
+}
 fordere_datei() { if [ ! -f "$1" ]; then reiss "Datei fehlt: $1"; fi; }
 fordere_keine_datei() { if [ -f "$1" ]; then reiss "Datei existiert, durfte NICHT: $1"; fi; }
 
@@ -181,7 +200,101 @@ fordere_datei "$D/e4_xml/LAUF_MARKER.txt"
 if [ -f "$D/e4_xml/LAUF_MARKER.txt" ]; then
     fordere_literal "$D/e4_xml/LAUF_MARKER.txt" "modus=provision_only"
     fordere_literal "$D/e4_xml/LAUF_MARKER.txt" "provisioned=$P2"
+    fordere_kein_literal "$D/e4_xml/LAUF_MARKER.txt" "modus=pruef_only"
 fi
+fall_ende
+
+# =============================================================================
+# L2b DER DRITTE MODUS (D3-7b). '(pruef-only)' in der Zeile -> modus=pruef_only.
+#     WARUM ER EIGENS GEBRAUCHT WIRD: der S3-Konformitaets-Lauf misst NICHT und
+#     baut NICHT -- er laedt jede fertige .so und faehrt nur ihr Gate (ce
+#     profile_run_entry.hpp: 'if (a.pruef_only) { exit = any_pruef_ok>0 &&
+#     any_pruef_failed==0 }'). Die emittierte Kampagnen-Pipeline faehrt ihn je
+#     Perm (ce planner/experiment_plan_director.hpp: COMDARE_PRUEF_ONLY=true).
+#     Er ist damit in derselben Lage wie provision_only -- 0 Datenzeilen sind
+#     sein SOLL, nicht sein Versagen -- und war bis D3-7b als modus=voll
+#     markiert: die Ausbeute-Wache haette ihn mit "0 Datenzeilen" rot gefaerbt.
+#     ZUERST DER KOEDER: die Probe muss beweisen, dass sie '(pruef-only)' und
+#     '(provision-only)' ueberhaupt auseinanderhalten kann. Sonst waere ein
+#     gruenes 'modus=pruef_only' auch mit einem blinden Werkzeug zu haben.
+# =============================================================================
+P2B=$(wuerfel 1 99)
+K2B=$(wuerfel 1 4)
+fall "L2b '(pruef-only)' in der Bilanz-Zeile -> modus=pruef_only (dritter Modus)"
+D="$WERK/l2b"; mkdir -p "$D/e4_xml"; printf 'kopf\n' > "$D/e4_xml/measurements.csv"
+KOEDER_PO="$WERK/koeder_pruefonly"
+: > "$KOEDER_PO"
+_i=1
+while [ "$_i" -le "$K2B" ]; do
+    zeile_run_profile 0 0 "$P2B" " (pruef-only)" "/x/$(token)/measurements.csv" >> "$KOEDER_PO"
+    _i=$((_i + 1))
+done
+zeile_run_profile 0 0 "$P2B" " (provision-only)" "/x/measurements.csv" >> "$KOEDER_PO"
+K2B_IST=$(grep -cF -- '(pruef-only)' "$KOEDER_PO" || true)
+K2B_PROV=$(grep -cF -- '(pruef-only)' "$WERK/l2/log" || true)
+if [ "$K2B_IST" != "$K2B" ] || [ "$K2B_PROV" != "0" ]; then
+    echo "  [ABBRUCH] Koeder biss nicht: '(pruef-only)' im Koeder=$K2B_IST (soll $K2B)," >&2
+    echo "            im provision-only-Log von L2=$K2B_PROV (soll 0). Ohne beissenden" >&2
+    echo "            Koeder ist die Aussage ueber den dritten Modus wertlos." >&2
+    exit 2
+fi
+echo "        Koeder beisst: $K2B gewuerfelte '(pruef-only)'-Zeilen geschrieben,"
+echo "        $K2B_IST gefunden; im provision-only-Log von L2 $K2B_PROV (soll 0)."
+zeile_run_profile 0 0 "$P2B" " (pruef-only)" "$D/e4_xml/measurements.csv" > "$D/log"
+lauf schreiben "$D/log" "$D"
+fordere_rc 0
+fordere_datei "$D/e4_xml/LAUF_MARKER.txt"
+if [ -f "$D/e4_xml/LAUF_MARKER.txt" ]; then
+    fordere_literal "$D/e4_xml/LAUF_MARKER.txt" "modus=pruef_only"
+    fordere_literal "$D/e4_xml/LAUF_MARKER.txt" "provisioned=$P2B"
+    fordere_kein_literal "$D/e4_xml/LAUF_MARKER.txt" "modus=voll"
+    fordere_kein_literal "$D/e4_xml/LAUF_MARKER.txt" "modus=provision_only"
+fi
+fall_ende
+
+# =============================================================================
+# L2c DIE GEGENRICHTUNG ZU L2b (K13, beide Richtungen): eine Bilanz-Zeile OHNE
+#     jeden Modus-Zusatz muss weiter modus=voll ergeben. Ohne diesen Fall
+#     koennte der neue Zweig den Modus einfach IMMER auf pruef_only stellen und
+#     L2b bliebe gruen -- das Gate waere dann in jedem echten Mess-Lauf
+#     entwaffnet, und zwar geraeuschlos.
+# =============================================================================
+M2C=$(wuerfel 3 300)
+fall "L2c ohne Modus-Zusatz bleibt modus=voll (sonst entwaffnete L2b jeden Mess-Lauf)"
+D="$WERK/l2c"; mkdir -p "$D/e4_xml"; printf 'kopf\n' > "$D/e4_xml/measurements.csv"
+zeile_run_profile "$M2C" 0 0 "" "$D/e4_xml/measurements.csv" > "$D/log"
+lauf schreiben "$D/log" "$D"
+fordere_rc 0
+if [ -f "$D/e4_xml/LAUF_MARKER.txt" ]; then
+    fordere_literal "$D/e4_xml/LAUF_MARKER.txt" "modus=voll"
+    fordere_literal "$D/e4_xml/LAUF_MARKER.txt" "measured=$M2C"
+    fordere_kein_literal "$D/e4_xml/LAUF_MARKER.txt" "modus=pruef_only"
+else
+    reiss "kein Marker geschrieben"
+fi
+fall_ende
+
+# =============================================================================
+# L2d BEIDE Modus-Zusaetze in EINER Zeile -> rc=1, BENANNT, KEIN Marker.
+#     Der Treiber kann das heute nicht schreiben (die zwei Schalter sind
+#     gegenseitig ausschliessend, ce profile_run_entry.hpp: "Gegenseitig
+#     ausschliessend mit provision_only"). Steht es doch da, hat sich das
+#     Zeilenformat bewegt -- und dann ist der Modus NICHT bekannt. Ein Marker,
+#     der sich in dieser Lage fuer einen der beiden entscheidet, waere genau die
+#     stille Behauptung, gegen die dieses Werkzeug gebaut ist. Ohne diesen Fall
+#     waere der neue Zweig ein VERDECKTER exit-Zweig: er faerbt den Job rot, und
+#     kein Test faehrt ihn je an.
+# =============================================================================
+fall "L2d '(provision-only)' UND '(pruef-only)' in EINER Zeile -> rc=1, kein Marker"
+D="$WERK/l2d"; mkdir -p "$D/e4_xml"; printf 'kopf\n' > "$D/e4_xml/measurements.csv"
+zeile_run_profile 0 0 1 " (provision-only) (pruef-only)" "$D/e4_xml/measurements.csv" > "$D/log"
+lauf schreiben "$D/log" "$D"
+fordere_rc 1
+fordere_literal "$OUT" "1 Bilanz-Zeile(n) im Log gefunden."
+fordere_literal "$OUT" "0 Marker platziert, 1 ohne Marker geblieben."
+fordere_literal "$OUT" "beide Modus-Zusaetze in EINER Zeile"
+fordere_literal "$ERR" "blieben ohne Marker"
+fordere_keine_datei "$D/e4_xml/LAUF_MARKER.txt"
 fall_ende
 
 # =============================================================================
@@ -489,6 +602,18 @@ mutant_fahren "M3  ASCII-Pfeil statt U+2192 (die Falle der Bau-Anweisung)" "$MU"
 MU="$WERK/mut_prune.sh"
 sed "s|if grep -qF '\[PRUNE-TESTAT\]' \"\$LOG\"; then|if false; then|" "$MARKER" > "$MU"
 mutant_fahren "M4  ohne PRUNE-TESTAT-Rueckfall (prune_only ohne Marker)" "$MU"
+
+# M5: die (pruef-only)-Erkennung faellt weg -> der S3-Konformitaets-Lauf laeuft
+#     wieder als modus=voll und stirbt an der Ausbeute-Wache (D3-7b).
+MU="$WERK/mut_pruefonly.sh"
+sed 's/if (teile\[i\] == "(pruef-only)")        { pr = 1 }/if (0) { pr = 1 }/' "$MARKER" > "$MU"
+mutant_fahren "M5  ohne '(pruef-only)'-Erkennung (dritter Modus faellt auf voll)" "$MU"
+
+# M6: der Fail-closed-Zweig fuer BEIDE Zusaetze in einer Zeile faellt weg -- der
+#     Marker entschiede sich dann still fuer einen der beiden Modi.
+MU="$WERK/mut_beide.sh"
+sed 's|if \[ "\$PO" = "1" \] \&\& \[ "\$PR" = "1" \]; then|if false; then|' "$MARKER" > "$MU"
+mutant_fahren "M6  ohne Fail-closed bei beiden Zusaetzen (stille Modus-Wahl)" "$MU"
 
 echo ""
 echo "============================================================================="
