@@ -1513,3 +1513,299 @@ Zahlen vorgelegt.**
 **Der kritische Pfad bleibt unverändert der aus §5** — er bekommt durch diese Konsolidierung
 **einen** neuen Vorläufer: die **Bump-Pflicht-Wache** in W0b, weil ohne sie jeder folgende Bau
 (einschließlich `##47` Kalibrierlauf) auf einem blinden Cache fährt.
+
+---
+
+# 14. DIE TRÄGER-BAUKETTE — VOLLAUSBAU IN REIHENFOLGE (Owner-Entscheid 11.08.2026 nachts)
+
+> **Owner verbatim:** *„Grundsätzlich stimme ich deinen Vorschlägen nicht zu, ich möchte **volles
+> Risiko** fahren, die **komplette Träger-Baukette exakt wie beschrieben** umsetzen und **exakt im
+> Plan mit den Wellen** weiter machen. Dazu gehört der **Aufbau MIT ALLEN TEILEN IN REIHENFOLGE**.
+> Bitte gliedere also alles (Richtung **Variante B**) ein, sodass wir **direkt ins Zielbild** fahren
+> und nicht über Umwege."*
+>
+> **Damit sind die Varianten (A), (A+) und (C) aus §13.4c gestrichen.** Sie bleiben dort als
+> Historie lesbar. Es gilt **(B)**: Stempel **und** Selbstkompilation im Fenster, Wellen und
+> Termine unverändert. Dieser Abschnitt ist die **Ausführungsordnung** dazu — er diskutiert nicht,
+> er gliedert.
+
+---
+
+## 14.1 DAS ZIELBILD, GEGEN DAS GEBAUT WIRD
+
+    ORT   (Traeger-Ordnung, Vertragskomplex)
+          PLANER ──▶ CEB ──▶ HYBRID ──▶ TIER
+          MESS       SYSTEM            ORGAN
+          jede Stufe KOMPILIERT die naechste; nichts wird zur Laufzeit umgeschaltet   (D1/D5)
+
+    ZEIT  (Erzeugung)
+          Planer bauen ──▶ CEB je Messsystem GENERIEREN+kompilieren ──▶ Tier bauen
+          ──▶ EINZELMESSUNG ──▶ Hybrid erzeugen ──▶ einschieben ──▶ Hybrid-Messung
+
+    NUTZLAST
+          hinab   serialisierter unterer Teilbaum als RANGES je Achse       (§38)
+          hinauf  sparser Cursor-/Delta-Fortschrittskanal, Mixed-Radix-konform
+
+    IDENTITAET
+          Der Stempel traegt FUENF Rollen: Identitaet · Cache-Schluessel · Lager-Schluessel
+          · Skip-Marke · Einordnung. Ohne ihn geht nichts.                  (KON9-11)
+
+---
+
+## 14.2 DIE VOLLSTÄNDIGE TEILELISTE — nichts darf fehlen
+
+**Owner-Entscheide, blockierend** (kein Bau, aber jeder Bau dahinter wartet):
+
+| ID | Gegenstand | blockiert |
+|---|---|---|
+| **O-1** | **Syntax + Semantik je Achsen-Kategorie** über `c` hinaus — *„Pflicht und Basis für die Abgabe"* | S-2, S-3 |
+| **O-2** | **W-1:** wirkt der Hybrid-Einschub auf **Organ** oder nicht? KON7-03 sagt *„Organ bleibt hybrid-unberührt"*, die Grammatik-Zuordnung setzt *„System/Organ MIT Hybrid"*. **Ohne diesen Entscheid ist die Grammatik-Zahl nicht schneidbar.** | S-2 |
+| **O-3** | **Voraussetzungs-Semantik:** *„fordert das Flag die Voraussetzung, oder impliziert es sie?"* — der Code stellt die Frage selbst (`algo_semver.hpp:1527-1528`) und beantwortet sie nicht | S-3 |
+| **O-4** | **Meta-Meta-Achsen von System und Organ** — vom Owner als *„zu recherchieren"* markiert; am Objekt: Organ-Liste leer, System genau eine Familie (SIMD) | S-3 |
+| **O-5** | **K1** Lager-Identität der Hybrid-`.so` · **K2** Loader-Schichten-Zuordnung · **K5** Snapshot-Aggregations-Semantik | S-10 |
+
+**Bau-Teile, in Abhängigkeitsordnung:**
+
+| ID | Teil | Quelle | Vorbild im Repo |
+|---|---|---|---|
+| **P-0** | **super-Repo reconcilen** — `v32_messreihe_antrieb.hpp` kartieren, wiederverwenden oder deprecaten | BAUPLAN-Kritik §1 | — |
+| **S-1** | **Gemeinsame Stempel-Basisklasse**, je Achsen-Typ geerbt (heute fünf lose Strukturen, vier Namensschemata) | KON7-08 | — |
+| **S-2** | **Drei Grammatiken je Phasigkeit** (zwei-/drei-/vierphasig) + vierte Klammer-Gruppe der Testat-Grammatik | KON9-04 | `algo_semver.hpp` R1–R8 |
+| **S-3** | **Ordnungs-Relation** über Flag-Mengen (`⊆`) als `constexpr` + **Voraussetzungs-Wache** (Andockstelle steht seit 07.08. bei `:73`) | KON9-05 | `bvset_teilmenge.hpp` (187 Z.) |
+| **S-4** | **Filter-Concepts**: Filter A (Hardware, monoton) · Filter B (Mess, zweischneidig) · je Phasigkeit ein Vertrag, `mp11` | KON9-06 | **`ram_probe_chain.hpp:161/:483`** — concept-CoR existiert |
+| **S-5** | **Stempel-Factory** (compile time) je Achsen-Kategorie + **Composite** je Träger (Planer 2 · CEB 3 · Tier 4 · Hybrid 4 + Karte) | KON7/KON8 | — |
+| **S-6** | **Preimage-Ordnung**: #87 Variablen in Stufigkeits-Ordnung · #78 System-vor-Organ · #67 Benennung (4 Familien, 142 Include-Kanten) | KON9-01 | — |
+| **S-7** | **Achsen-Algo-Hardware-Stempel** `X.Y.Z` in voller System-Achsen-Syntax **und Semantik** | KON9-05 | — |
+| **S-8** | **Planer-Kopf**: Interpreter · **ein** Director · `IPlanBuilder` · `CMakeGraphBuilder` · `CiYamlBuilder` · Template-Method · CoR-Einhängung · `IExperimentDock`+Registry · App-Target · `cmake/experiment_plan.cmake` (2-Pass) | BAUPLAN Phase 1 | **`catalog_codegen.cmake:52-60`** |
+| **S-9** | **CEB-Generierung**: `CebSystemAxisDrive` · `acquire_ceb_system_axis_drive` · **harte Kompilation je Messsystem** · `SystemAxis::collect()` als CSV-Quelle · `.so`-ABI-Grenze (4 Symbole, Magic/Major-Gate, Loader, `host_compatible_with`) | BAUPLAN Phase 2, §30.3 | `search_algorithm_dock.hpp:63-86` |
+| **S-10** | **Teilbaum-Serialisierung** hinab (Ranges) + **Cursor-/Delta-Rückkanal** hinauf | §38 | — |
+| **S-11** | **`ceb:build` von Environment-Variable auf harte Kompilation** umstellen — Kernsatz-Verstoß, *„durch KEINEN Deferred-Posten gedeckt"* | Audit 05.08. | — |
+| **S-12** | **CI-Gerüst**: fünf Stufen, **Mini-Pipeline je Träger**, emittiert vom `CiYamlBuilder` | D17 | — |
+| **S-13** | **Buildsystem-Cache scharf**: CI-Cache = nur Planer · prod-MinIO = alle generierten Folge-Stufen + Sidecars | D18/§31-A4 | — |
+| **S-14** | **Bump-Pflicht-Wache** — Änderung ohne `X.Y.Z`-Bump ⇒ kein Neubau ⇒ schneller **und** falsch | KON9-11 | — |
+| **S-15** | **Hybrid**: Genus mit Fläche 2 · drei Anteile · Bereichskarte · Andocken nur an passende Genus-Interfaces | KON9-02/03 | 943 Z. bestehen |
+| **S-16** | **`ci/tests/*.sh` → Google Tests** — heute **14 Dateien / 8.528 Zeilen**, wachsend | KON6-05, #89 | — |
+
+**Sechzehn Bau-Teile, fünf Owner-Entscheide, ein Reconcile.**
+
+---
+
+## 14.3 DIE ZWINGENDE REIHENFOLGE
+
+```
+        O-1 ─┐
+        O-2 ─┼──────────────────────────────► S-2 ──┐
+        O-3 ─┤                                       ├──► S-3 ──┐
+        O-4 ─┘                        S-1 ───────────┘          │
+                                                                 ├──► S-4 ──┐
+                                                                 │          │
+                                      S-5 ◄───── S-1,S-2,S-3 ────┘          │
+                                       │                                     │
+                                       ├──► S-6 ──► S-7 ──► ══ F2 FREEZE ══  │
+                                       │                                     │
+        P-0 ─────────────────────────────────────────────────────► S-8 ◄────┘
+                                                                    │
+                                                       S-9 ◄────────┤
+                                                        │           │
+                                              S-10 ◄────┤    S-11 ◄─┘
+                                                        │
+                                            S-12 ◄──────┴──► S-13 ──► S-14
+                                              │
+                                    ══ BAU-TRIGGER Mi 26.08. 06:00 ══
+                                              │
+                              Tier-Bau ──► EINZELMESSUNG ──► S-15 (Hybrid)
+                                                                │
+                                              O-5 ──────────────┘
+```
+
+**Die vier harten Regeln der Ordnung:**
+
+1. **Kein Grammatik-Bau ohne O-1 und O-2.** Die Zahl der Grammatiken hängt an O-2; die Semantik an O-1.
+2. **Kein Planer-Kopf ohne P-0.** Sonst entsteht die dritte Enumerations-Engine (BAUPLAN-Kritik §1).
+3. **Alles Preimage-Wirksame vor F2.** S-1, S-2, S-5, S-6, S-7 — danach ist die Identität eingefroren.
+4. **Der Hybrid entsteht nach der Einzelmessung** (ZEIT), steht aber in der Kette vor dem Tier (ORT).
+
+---
+
+## 14.4 DIE WELLEN-EINORDNUNG — Termine unverändert
+
+### W0b · Mi 12.08. mittags – Fr 14.08. = **F1** (Nachlauf bis Di 18.08.)
+
+| | Gegenstand |
+|---|---|
+| **sofort** | **Owner-Vorlage O-1…O-5** — eine Datei, alle fünf Entscheide mit Empfehlung. **Frist Do 14.08.**, sonst rutscht S-2 und mit ihm die ganze Kette |
+| **Bau** | **P-0** super-Repo reconcilen · **S-1** Stempel-Basisklasse · **S-14** Bump-Pflicht-Wache |
+| **F1-Pflicht** | `##25` **DURCHSTICH** · D3-4+D3-5 · D3-1-Marker · D3-8 · ##26 · W0a-Rest (D1e/D1f/D1c/D2-G2/##06/##07) |
+| **Betrieb** | #83 `lint:format` · #80 coverage-guard (F1 **vor** F2, bindend) |
+
+### WE Sa 15./So 16.08. — **Reserve gezogen**
+
+**S-2** drei Grammatiken je Phasigkeit (setzt O-1/O-2 voraus).
+
+### W1 · Mo 17.08. – Fr 21.08. = **F2 = IDENTITÄTS-FREEZE**
+
+| | Gegenstand |
+|---|---|
+| **Stempel** | **S-3** Ordnungs-Relation + Voraussetzungs-Wache · **S-5** Stempel-Factory + Composite je Träger · **S-6** Preimage-Ordnung (#87/#78/#67) · **S-7** Achsen-Algo-Hardware-Stempel |
+| **Kette** | **S-4** Filter-Concepts (`mp11`) — Bauform aus `ram_probe_chain.hpp` ziehen |
+| **Plan** | D4a–D4f · D5-2/4/5 · ##10–##19 · **HY-A1…A3** (Hybrid-Struktur, Fläche 2) |
+| **F2** | **Freeze.** Ab hier ändert keine Zeile mehr das Preimage |
+
+**Band B fällt in W1 geschlossen** (62 h, §12.5 sieht das vor) — mit Zahl im Protokoll.
+
+### WE Sa 22./So 23.08. — **Reserve gezogen**
+
+**S-8 Teil 1**: Interpreter + Director + `IPlanBuilder` + `--dump-plan` + Contract-Test.
+
+### W2 · Mo 24.08. – Fr 28.08. = **F3** · Bau-Trigger Mi 26.08. 06:00
+
+| Tag | Gegenstand |
+|---|---|
+| **Mo** | **S-8 Teil 2**: `CMakeGraphBuilder` + `CiYamlBuilder` + `experiment_plan.cmake` · Bump-Bündel ##32/##33/##34 |
+| **Di** | **S-9** CEB-Generierung · **S-10** Teilbaum + Rückkanal · **S-11** `ceb:build` hart · **S-12** CI-Gerüst · **S-13** Cache scharf · ##46 Anker · **##47 Kalibrierlauf — der erste Ernstfall der neuen Kette** · ##48 Platten-Budget |
+| **Mi 06:00** | **BAU-TRIGGER über die neue Kette.** ~41,4 h |
+| **Do** | Bau läuft · ##50 Zweitlauf |
+| **Fr** | ##51 USER-GO-VORLAGE = **F3** |
+
+### W3-MESS · Sa 29.08. – Do 03.09. · Rückschrieb Fr 04.09. = **F4**
+
+Kampagne wie geplant · nach der Einzelmessung: **S-15 Hybrid erzeugen und einschieben** = HY-B.
+
+### W4 · Mo 07.09. – Fr 11.09. = **F5** · W5 · Sa 12. – Di 15.09.
+
+Unverändert: HY-C · Auswertung · Anhang · P-1 · PDF · Abgabe.
+**S-16** (`ci/tests` → Google Tests) läuft als Dauerposten mit, wo Slots frei werden.
+
+---
+
+## 14.5 DIE KIPP-PUNKTE — damit man sie erkennt, wenn sie kommen
+
+Diese Liste ist **kein Einwand**, sondern ein Instrument. Jeder Punkt ist ein Datum mit einer
+Bedingung; wird sie gerissen, ist die Folge bekannt und muss nicht neu erwogen werden.
+
+| # | Datum | Bedingung | Folge, wenn gerissen |
+|---|---|---|---|
+| **K-1** | **Do 14.08.** | O-1 und O-2 sind entschieden | S-2 rutscht ins WE; jeder Tag Verzug schiebt F2 um denselben Tag |
+| **K-2** | **Fr 21.08.** | S-1…S-7 stehen und sind grün | der Freeze hält nicht; jede spätere Stempel-Änderung entwertet den Bau |
+| **K-3** | **Di 25.08. abends** | `##47` Kalibrierlauf läuft **durch die neue Kette** grün | der Bau-Trigger fährt auf ungeprüftem Weg |
+| **K-4** | **Mi 26.08. 06:00** | Bau-Trigger startet | spätester tolerierbarer Start ist **Fr 28.08. 06:00**; danach fällt das W4-Fangnetz ersatzlos |
+| **K-5** | **Do 27.08. abends** | Bau ist durch | ohne Bau keine Kampagne, ohne Kampagne kein F4 und kein Ergebniskapitel |
+
+**Die Rückfallstufe, falls K-3 oder K-4 reißt** — sie wird hier benannt, damit sie im Riss nicht
+erfunden werden muss: **der heutige Bauweg ist bis zum Bau-Trigger nicht zu entfernen.** `S-11`
+stellt `ceb:build` um, aber die Vorgänger-Fassung bleibt bis F3 im Baum. Reißt die neue Kette am
+Kalibrierlauf, fährt der Bau-Trigger über den alten Weg — **das kostet das Zielbild, nicht die
+Abgabe.**
+
+---
+
+## 14.6 WAS DIESE ENTSCHEIDUNG VERDRÄNGT — ausdrücklich, mit Zahl
+
+| Was fällt | Umfang | Wohin |
+|---|---|---|
+| **Band B in W1** | 62 h, 22 Posten | W7, gezählt |
+| **Die 14 W7-Posten aus §13.3** | #29 #30 #32 #34 #42 #44 #48 #50 #63 #64 #69 #71 #72 #26 | W7, gezählt |
+| **Beide Reserve-Wochenenden** | 15./16.08. und 22./23.08. | verbraucht — es gibt danach keinen Puffer mehr |
+| **Der W0b-Nachlauf ##27–##31** | Frist war Di 18.08. | rutscht hinter S-2 |
+| **Die 1 Werktag Rest-Reserve aus §5** | — | verbraucht |
+
+**Nach dieser Gliederung ist die Reserve null.** Das ist die Bedeutung von *„volles Risiko"* — sie
+ist hier als Zahl ausgewiesen, nicht als Warnung.
+
+---
+
+## 14.7 NACHTRAG AUS DEM CI-EXPLORE (11.08. nachts, 36 Agenten, 0 Fehler)
+
+Der CI-Explore kam **nach** der Abfassung von 14.1–14.6 zurück. Er ändert vier Teile — zwei nach
+unten, zwei nach oben. **Die Teileliste in 14.2 gilt weiter; die folgenden Korrekturen treten
+daneben.**
+
+### 🟢 ZWEI TEILE SIND BILLIGER ALS ANGENOMMEN
+
+**S-8 (Planer-Kopf): der `ExperimentPlanDirector` EXISTIERT BEREITS.**
+`ce libs/cache_engine/profile_facade/planner/experiment_plan_director.hpp` — **unangeschlossen** im
+Submodul. Der Director muss also nicht entworfen, sondern **verdrahtet** werden. Das war die
+teuerste Position der ganzen Kette.
+
+**S-14 (Bump-Pflicht-Wache): die Wache EXISTIERT BEREITS.**
+`ce tools/axis_version_lock/axis_version_lock.cpp:172-185` + `axis_version.lock`, verdrahtet in
+`ce/.gitlab-ci.yml:768-786`. **Sie deckt heute 6 von 136 bump-pflichtigen Dateien — 0 davon unter
+`axes/`** (alle Zahlen im Explore selbst nachgemessen). S-14 ist damit ein **Ausroll-Auftrag**, kein
+Neubau: `AXIS_ALGO_VERSION`-Marker in die 130 `axes/`-Header, Lock-Datei füllen — oder die Wache
+generisch über alle `algo_version`-Träger fahren.
+
+### 🔴 ZWEI TEILE SIND HÄRTER ALS ANGENOMMEN
+
+**B-2 — DAS GITLAB-NESTING-BUDGET IST AUSGESCHÖPFT. Das ist ein technischer Blocker für S-12.**
+`super/.gitlab-ci.yml:2686-2688` nennt die Grenze selbst: *„parent→child→grandchild = GitLab-
+Nesting-Tiefe 2"*. **Drei der vier Träger belegen bereits die drei Ebenen** (Haupt/Planer-Delegation
+→ STUFE-1 CEB → STUFE-2 Tier). **Für den Hybrid ist keine vierte Ebene mehr da.**
+
+    Auflösungen, keine davon kostenlos:
+      (i)   den Hybrid auf eine BESTEHENDE Ebene legen (neben Tier, nicht darunter)
+      (ii)  die Emission FLACH ziehen -- eine Ebene weniger, dafuer breitere Job-Matrix
+      (iii) Owner-Entscheid ueber eine andere Verschachtelung
+
+*Die Ausschöpfung ist gemessen; die Folge für den Hybrid ist eine Ableitung des Explores, kein
+Quellensatz.*
+
+**B-4 — DIE WURZEL DES BUILDSYSTEM-CACHES HAT KEIN ZIEL IM CODE.**
+`comdare-buildsystem` = **0 Treffer** in `ce/libs` + `ce/apps` (selbst gemessen). Dazu ein
+ungelöster Widerspruch im Ledger (`:18698-18699`, 07.08.): **MinIO-Bucket gegen NAS-Ordner.** Die
+Env-Variablen aus dem TWO-CACHE-STORAGE-Bauplan (18.07.) wurden **nie angelegt**.
+
+⇒ **Ohne B-4 hat der genus-lose Planer überhaupt kein Ablageziel.** S-13 setzt einen Owner-Entscheid
+voraus, den 14.2 noch nicht kannte.
+
+**B-5 — `LagerBaumWriter` IST GEBAUT UND WIRD NIRGENDS GERUFEN.**
+Vorkommen in `ce/libs` + `ce/apps`: **genau 1 Datei — seine eigene.** `::kaskade(`-Aufrufe von
+außen: **0**. Für den genus-losen Planer fehlt der Spec-Typ (`lager_baum_writer.hpp:320-331`,
+`LagerWurzelPaar() = delete`) — das ist **owner-konform**, kein Defekt, setzt aber B-4 voraus.
+
+⇒ **Neues Teil S-17: den Lager-Baum-Writer verdrahten** (Bau-Orchestrator + Planer-Kopf). Ohne ihn
+hat auch die **Messdaten-Kaskade** keinen Einsortier-Pfad.
+
+### DIE OWNER-VORLAGE WÄCHST AUF ELF PUNKTE
+
+Zu O-1…O-5 treten sechs CI-Fragen, bei denen der Explore ausdrücklich **keine Quelle** fand:
+
+| ID | Frage | blockiert |
+|---|---|---|
+| **O-6** | Ist „Mini-Pipeline" eine **GitLab-Child-Pipeline** oder eine **Job-Gruppe innerhalb einer Stufe**? *„innerhalb der Haupt-Pipeline"* schließt eine eigenständige Downstream-Pipeline eher aus, entscheidet aber nicht zwischen den beiden verbleibenden Bauarten | S-12 |
+| **O-7** | Sollen die vier Mini-Pipelines **statisch eingecheckt** oder **vom Planer emittiert** sein? Die heutige Architektur emittiert | S-12 |
+| **O-8** | **Wo sitzt der Hybrid**, wenn das Nesting-Budget ausgeschöpft ist? (B-2, drei Auflösungen oben) | S-12, S-15 |
+| **O-9** | **NAS-Ordner oder MinIO-Bucket** als Wurzel des Buildsystem-Caches? (B-4, Ledger-Widerspruch seit 07.08.) | S-13, S-17 |
+| **O-10** | Gilt die Mini-Pipeline je Träger-**TYP** (4 Stück) oder je Träger-**INSTANZ** (n Tier-Binaries)? *„je Träger-Stufe"* deutet auf Typ | S-12 |
+| **O-11** | Was heißt **„eigene Bedürfnisse"** konkret — Runner-Tags, Toolchain, Sanitizer-Profil, Test-Suite? | S-12 |
+
+### EIN NICHTFUND, DER FESTGEHALTEN GEHÖRT
+
+Der Owner verwies am 11.08. auf eine **frühere eigene Aussage** zur Mini-Pipeline-Pflicht. Der
+Explore hat sie **nicht gefunden** — Nichtfund **mit Gegenprobe** über 19 `.jsonl`-Dateien, den
+Ledger, `docs/plaene`, `docs/sessions` und das Memory-Verzeichnis. **Die einzige wörtliche Fassung
+ist der Satz vom 11.08. selbst.**
+
+*Das widerlegt das Owner-Gedächtnis nicht — es heißt, dass es keinen zweiten Beleg zum Abgleichen
+gibt.* Der Satz vom 11.08. ist damit die **maßgebliche und einzige** Quelle für S1…S7.
+
+### DAS IST-BILD, DAS S-12 ZU SCHLIESSEN HAT
+
+    super  2768 Zeilen · 45 Jobs · 11 Stufen · 1 statischer Bau-Job (build:clang)
+    ce     1056 Zeilen · 25 Jobs ·  6 Stufen · 2 statische Bau-Jobs
+    Keine Stufe und kein Job heisst  ceb · tier · hybrid · release
+    4 trigger-Kanten in super: 3 an Submodul-Repos, 1 an die Planer-Delegation
+    -> 0 von 4 triggern einen TRAEGER als Bau-Gegenstand
+    Hybrid: 0 Treffer in BEIDEN CI-Dateien und 0 im YAML-erzeugenden C++
+
+**Sieben Owner-Zusagen (S1…S7), 0 von 4 Trägern erfüllt.** Das ist der Umfang von S-12.
+
+---
+
+## 14.8 DIE ERSTE HANDLUNG
+
+**Die Owner-Vorlage O-1…O-5.** Sie ist der einzige Posten, der **heute** fertig werden kann und
+**fünf** Bau-Teile freischaltet. Ohne sie steht die Kette ab S-2 still, und S-2 ist der zweite
+Baustein von sechzehn.
+
+Sie wird als **eine** Datei vorgelegt, je Entscheid: Frage in einem Satz · Recherche-Weg ·
+Empfehlung · was er freischaltet · Frist.
