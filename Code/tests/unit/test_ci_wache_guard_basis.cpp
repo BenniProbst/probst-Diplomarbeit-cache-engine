@@ -77,9 +77,7 @@ constexpr std::string_view kWacheAufruf = "sh scripts/ci_diff_ascii_width_guard.
 std::vector<std::string> yml_zeilen_oder_fail() {
     auto zeilen = lies_zeilen(std::filesystem::path(COMDARE_CI_YML_PFAD));
     EXPECT_TRUE(zeilen.has_value()) << "FAIL-CLOSED: .gitlab-ci.yml nicht lesbar unter " << COMDARE_CI_YML_PFAD;
-    if (!zeilen.has_value()) {
-        return {};
-    }
+    if (!zeilen.has_value()) { return {}; }
     EXPECT_GT(zeilen->size(), 0U) << "FAIL-CLOSED: .gitlab-ci.yml ist leer -- jede Forderung waere trivial erfuellt.";
     return *zeilen;
 }
@@ -87,19 +85,13 @@ std::vector<std::string> yml_zeilen_oder_fail() {
 // Der Wert hinter kSchluessel in einer Zeile, ohne Anfuehrungszeichen und Rand.
 std::string wert_von(const std::string& zeile) {
     const std::size_t pos = zeile.find(kSchluessel);
-    if (pos == std::string::npos) {
-        return {};
-    }
+    if (pos == std::string::npos) { return {}; }
     std::string wert = zeile.substr(pos + kSchluessel.size());
     // Zeilenendkommentar abschneiden -- andere Zeilen dieser Datei tragen welche.
     const std::size_t raute = wert.find('#');
-    if (raute != std::string::npos) {
-        wert = wert.substr(0, raute);
-    }
+    if (raute != std::string::npos) { wert = wert.substr(0, raute); }
     const std::size_t a = wert.find_first_not_of(" \t\"'");
-    if (a == std::string::npos) {
-        return {};
-    }
+    if (a == std::string::npos) { return {}; }
     const std::size_t b = wert.find_last_not_of(" \t\"'\r");
     return wert.substr(a, b - a + 1);
 }
@@ -108,29 +100,23 @@ std::string wert_von(const std::string& zeile) {
 std::vector<std::string> zuweisungen(const std::vector<std::string>& zeilen) {
     std::vector<std::string> gefunden;
     for (const auto& zeile : zeilen) {
-        if (ist_kommentarzeile(zeile)) {
-            continue;
-        }
-        if (zeile.find(kSchluessel) != std::string::npos) {
-            gefunden.push_back(zeile);
-        }
+        if (ist_kommentarzeile(zeile)) { continue; }
+        if (zeile.find(kSchluessel) != std::string::npos) { gefunden.push_back(zeile); }
     }
     return gefunden;
 }
 
 class GuardBasis : public ::testing::Test {
-  protected:
+protected:
     void SetUp() override {
         zeilen_ = yml_zeilen_oder_fail();
-        if (zeilen_.empty()) {
-            return;
-        }
+        if (zeilen_.empty()) { return; }
         block_ = finde_job_block(zeilen_, std::string(kJobName));
         ASSERT_TRUE(block_.has_value()) << "Job-Block '" << kJobName << "' fehlt in .gitlab-ci.yml. "
                                         << "Ohne ihn hat diese Wache keinen Gegenstand -- kein stilles Gruen.";
     }
 
-    std::vector<std::string>              zeilen_;
+    std::vector<std::string>                    zeilen_;
     std::optional<comdare::ci_wachen::JobBlock> block_;
 };
 
@@ -139,8 +125,8 @@ class GuardBasis : public ::testing::Test {
 // -----------------------------------------------------------------------------
 TEST_F(GuardBasis, GenauEineWirksameZuweisungImJobBlock) {
     const auto treffer = zuweisungen(block_->zeilen);
-    EXPECT_EQ(treffer.size(), 1U) << "NENNER: " << treffer.size() << " wirksame Zuweisung(en) von "
-                                  << kSchluessel << " im Block '" << kJobName << "' (gefordert: genau 1). "
+    EXPECT_EQ(treffer.size(), 1U) << "NENNER: " << treffer.size() << " wirksame Zuweisung(en) von " << kSchluessel
+                                  << " im Block '" << kJobName << "' (gefordert: genau 1). "
                                   << "Bei 0 misst die Wache gegen die Kandidaten-Kette statt gegen die "
                                   << "vereinbarte Basis; bei mehr als 1 entscheidet die Reihenfolge.";
 }
@@ -194,29 +180,25 @@ TEST_F(GuardBasis, HoltDenBasisZweigSelbstUndZwarVORDemAufruf) {
     const std::string                 fetch_soll  = std::string(kFetchTeilA) + std::string(kFetchTeilB);
 
     const std::size_t n_fetch = zaehle_wirksam(job, fetch_soll);
-    EXPECT_EQ(n_fetch, 1U) << "NENNER: " << n_fetch << " Fetch-Zeile(n) fuer den Basis-Zweig im Block '"
-                           << kJobName << "' (gefordert: genau 1). Ohne sie kann origin/main im Job-Klon "
+    EXPECT_EQ(n_fetch, 1U) << "NENNER: " << n_fetch << " Fetch-Zeile(n) fuer den Basis-Zweig im Block '" << kJobName
+                           << "' (gefordert: genau 1). Ohne sie kann origin/main im Job-Klon "
                            << "fehlen -- und dann entscheidet nicht mehr der versionierte Text.";
 
     // Reihenfolge: der Fetch MUSS vor dem Aufruf der Wache stehen.
     std::size_t i_fetch = job.size();
     std::size_t i_wache = job.size();
     for (std::size_t i = 0; i < job.size(); ++i) {
-        if (ist_kommentarzeile(job[i])) {
-            continue;
-        }
+        if (ist_kommentarzeile(job[i])) { continue; }
         if (i_fetch == job.size() && job[i].find("refs/remotes/origin/${_sup_zweig}") != std::string::npos) {
             i_fetch = i;
         }
-        if (i_wache == job.size() && job[i].find(kWacheAufruf) != std::string::npos) {
-            i_wache = i;
-        }
+        if (i_wache == job.size() && job[i].find(kWacheAufruf) != std::string::npos) { i_wache = i; }
     }
     ASSERT_LT(i_wache, job.size()) << "Der Aufruf '" << kWacheAufruf << "' steht nicht im Block '" << kJobName
                                    << "'. Ein Job ohne Aufruf ist keine Wache.";
     ASSERT_LT(i_fetch, job.size()) << "Keine Fetch-Zeile gefunden -- s. den Nenner oben.";
-    EXPECT_LT(i_fetch, i_wache) << "Der Fetch steht in Zeile " << i_fetch << " des Blocks, der Aufruf in "
-                                << i_wache << ". Ein Fetch NACH dem Aufruf kommt zu spaet.";
+    EXPECT_LT(i_fetch, i_wache) << "Der Fetch steht in Zeile " << i_fetch << " des Blocks, der Aufruf in " << i_wache
+                                << ". Ein Fetch NACH dem Aufruf kommt zu spaet.";
 }
 
 // -----------------------------------------------------------------------------
@@ -227,8 +209,8 @@ TEST_F(GuardBasis, HoltDenBasisZweigSelbstUndZwarVORDemAufruf) {
 TEST_F(GuardBasis, KeineZweiteZuweisungImGanzenText) {
     const std::size_t wirksam = zaehle_wirksam(zeilen_, kSchluessel);
     const std::size_t roh     = zaehle_roh(zeilen_, kSchluessel);
-    EXPECT_EQ(wirksam, 1U) << "NENNER: " << wirksam << " wirksame und " << roh
-                           << " rohe Vorkommen von " << kSchluessel << " in der ganzen Datei "
+    EXPECT_EQ(wirksam, 1U) << "NENNER: " << wirksam << " wirksame und " << roh << " rohe Vorkommen von " << kSchluessel
+                           << " in der ganzen Datei "
                            << "(gefordert wirksam: genau 1). Eine zweite Zuweisung macht die Basis "
                            << "von der Job-Reihenfolge abhaengig.";
     EXPECT_GE(roh, wirksam) << "roh < wirksam ist unmoeglich -- der Scanner selbst ist defekt.";
