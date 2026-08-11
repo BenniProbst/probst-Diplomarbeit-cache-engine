@@ -176,10 +176,21 @@
 #       Ist er NICHT gesetzt: origin/main, main, origin/development, development
 #       -- der erste, der aufloest.
 #       Ein blanker SHA statt einer Branch-Referenz ist ein FEHLER (Exit 2).
+#   sh scripts/ci_diff_ascii_width_guard.sh --bereich <basis> [<spitze>]
+#       DERSELBE kumulative Modus, aber mit BEIDEN Enden vom Aufrufer benannt
+#       (2026-08-10, Paket r7-wachen-divergenz). Kein Bare-SHA-Verbot -- wer
+#       zwei Enden ausspricht, meint sie; ein SHA-Paar misst sich in einem Jahr
+#       noch gleich. Ein Bereich mit NULL Commits ist hier ABBRUCH, nicht GRUEN.
+#       Der Name kommt aus der ce-Fassung und ist hier gebaut, damit derselbe
+#       Aufruf in beiden Repos dasselbe tut statt in einem abzubrechen.
 #   sh scripts/ci_diff_ascii_width_guard.sh --bestand
 #       Kein Diff: prueft den GESAMTEN versionierten Bestand im Scope.
 #   sh scripts/ci_diff_ascii_width_guard.sh --stdin < fertiger-diff.txt
 #       Liest einen bereits erzeugten Unified-Diff von stdin.
+#
+#   JEDES ANDERE --wort ist ein FEHLER (Exit 2). Das war hier von Anfang an so
+#   und ist der einzige Grund, warum die Optionsnamen der ce-Fassung in DIESER
+#   nie unbemerkt durchfielen -- s. ci/wachen_paritaet.sh.
 #
 # EXIT:  0 = sauber (Zusammenfassung mit Nenner wird IMMER gedruckt)
 #        1 = mindestens ein Verstoss (Nicht-ASCII und/oder >120 Spalten)
@@ -206,11 +217,23 @@ command -v mktemp >/dev/null 2>&1 || ce_abbruch "mktemp ist nicht im PATH."
 command -v git >/dev/null 2>&1 || ce_abbruch "git ist nicht im PATH."
 
 _ce_modus="arbeitsbaum"
+_ce_basis_auto=1
 case "${1:-}" in
     --stdin)      _ce_modus="stdin";      shift ;;
     --seit-basis) _ce_modus="seit-basis"; shift ;;
+    # --bereich IST DERSELBE MODUS mit frei gewaehlten Enden (Paket
+    # r7-wachen-divergenz, 10.08.2026). Der Name kommt aus der ce-Fassung, wo er
+    # der einzige kumulative Modus ist. Bis heute brach er hier ab
+    # ("Unbekannte Option '--bereich'") -- sauber, aber eben ein Abbruch: wer
+    # zwischen den Repos wechselte, scheiterte am WORT, nicht an der Sache.
+    # Der Unterschied zu --seit-basis ist genau einer: --seit-basis bestimmt die
+    # Basis selbst und verbietet einen blanken SHA, --bereich nimmt beide Enden
+    # ausdruecklich entgegen und erlaubt SHAs (ein beidseitig gepinnter Bereich
+    # misst sich in einem Jahr noch gleich).
+    --bereich)    _ce_modus="seit-basis"; _ce_basis_auto=0; shift ;;
     --bestand)    _ce_modus="bestand";    shift ;;
-    --*)          ce_abbruch "Unbekannte Option '$1'. Erlaubt: --seit-basis, --bestand, --stdin." ;;
+    --)           : ;;
+    --*)          ce_abbruch "Unbekannte Option '$1'. Erlaubt: --bereich, --bestand, --seit-basis, --stdin." ;;
 esac
 
 _ce_script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) \
@@ -264,42 +287,68 @@ arbeitsbaum)
     ;;
 
 seit-basis)
-    _ce_basis="${1:-}"
-    if [ -n "$_ce_basis" ]; then
+    _ce_spitze="HEAD"
+    _ce_modus_wort="--seit-basis"
+    if [ "$_ce_basis_auto" -eq 0 ]; then
+        # --bereich: BEIDE Enden kommen vom Aufrufer. Die Basis ist Pflicht, die
+        # Spitze hat HEAD als Vorgabe -- gleiche Form wie in der ce-Fassung,
+        # damit derselbe Aufruf in beiden Repos dasselbe tut.
+        _ce_modus_wort="--bereich"
+        [ "$#" -ge 1 ] || ce_abbruch "--bereich braucht eine BASIS (z.B. 'origin/main'), \
+optional eine SPITZE (Default HEAD). Aufruf: --bereich <basis> [<spitze>]"
+        _ce_basis="$1"
         shift
-    elif [ -n "${COMDARE_GUARD_BASIS_REF:-}" ]; then
-        # EINE GENANNTE BASIS IST EINE ANWEISUNG, KEIN VORSCHLAG (2026-08-10).
-        #
-        # VORHER stand $COMDARE_GUARD_BASIS_REF nur als ERSTER KANDIDAT in der Kette unten.
-        # Loeste er nicht auf, rutschte die Wache STILL auf den naechsten weiter -- in diesem
-        # Repo also auf origin/development -- und meldete GRUEN. Am Objekt gemessen, gleicher
-        # Baum, gleicher Koeder, einziger Unterschied "gibt es refs/remotes/origin/main":
-        #     vorhanden -> Basis origin/main,        2 Commit(s), 1 Nicht-ASCII, rc=1 ROT
-        #     fehlt     -> Basis origin/development, 0 Commit(s), 0 geprueft,    rc=0 GRUEN
-        # Der Verstoss lag in BEIDEN Laeufen im Baum. Genau die Fehlerklasse, gegen die diese
-        # Wache gebaut ist: ein zu eng geschnittener Bereich, der nichts mehr sieht.
-        #
-        # Deshalb hier fail-closed: wer eine Basis NENNT, bekommt sie oder einen Abbruch --
-        # nie eine andere. Die Kandidaten-Kette unten bleibt fuer den Fall, dass NICHTS
-        # genannt wurde (manueller Aufruf); dort ist ein Rueckfall kein Ersatz, sondern die
-        # einzige Auskunft, die es gibt.
-        _ce_basis="$COMDARE_GUARD_BASIS_REF"
-        git -C "$_ce_repo_root" rev-parse --verify --quiet "${_ce_basis}^{commit}" >/dev/null 2>&1 \
-            || ce_abbruch "$(
-                   echo "COMDARE_GUARD_BASIS_REF='${_ce_basis}' ist in diesem Klon NICHT aufloesbar."
-                   echo "Eine GENANNTE Basis wird nicht durch eine andere ersetzt -- das waere eine"
-                   echo "stille Abschwaechung der Wache. Der Aufrufer muss den Zweig selbst holen:"
-                   echo "  git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'"
-                   echo "Bei flachem Klon zusaetzlich GIT_DEPTH: 0 bzw. --unshallow. KEINE stille Null."
-               )"
+        if [ "$#" -ge 1 ]; then
+            _ce_spitze="$1"
+            shift
+        fi
     else
-        for _ce_kand in origin/main main origin/development development; do
-            [ -n "$_ce_kand" ] || continue
-            if git -C "$_ce_repo_root" rev-parse --verify --quiet "${_ce_kand}^{commit}" >/dev/null 2>&1; then
-                _ce_basis="$_ce_kand"
-                break
-            fi
-        done
+        # --seit-basis: die Wache bestimmt die Basis SELBST. Beide Zweige dieses
+        # Merges leben hier NEBENEINANDER, nicht statt einander (Landung R4,
+        # 11.08.2026): der --bereich-Modus oben ist neu, der fail-closed-Riegel
+        # auf $COMDARE_GUARD_BASIS_REF unten ist der Bestand von development.
+        # Waehlte man eine Seite, fiele entweder der zweite Modus oder der
+        # Riegel weg -- beides ist eine stille Abschwaechung.
+        _ce_basis="${1:-}"
+        if [ -n "$_ce_basis" ]; then
+            shift
+        elif [ -n "${COMDARE_GUARD_BASIS_REF:-}" ]; then
+            # EINE GENANNTE BASIS IST EINE ANWEISUNG, KEIN VORSCHLAG (2026-08-10).
+            #
+            # VORHER stand $COMDARE_GUARD_BASIS_REF nur als ERSTER KANDIDAT in der Kette unten.
+            # Loeste er nicht auf, rutschte die Wache STILL auf den naechsten weiter -- in diesem
+            # Repo also auf origin/development -- und meldete GRUEN. Am Objekt gemessen, gleicher
+            # Baum, gleicher Koeder, einziger Unterschied "gibt es refs/remotes/origin/main":
+            #     vorhanden -> Basis origin/main,        2 Commit(s), 1 Nicht-ASCII, rc=1 ROT
+            #     fehlt     -> Basis origin/development, 0 Commit(s), 0 geprueft,    rc=0 GRUEN
+            # Der Verstoss lag in BEIDEN Laeufen im Baum. Genau die Fehlerklasse, gegen die diese
+            # Wache gebaut ist: ein zu eng geschnittener Bereich, der nichts mehr sieht.
+            #
+            # Deshalb hier fail-closed: wer eine Basis NENNT, bekommt sie oder einen Abbruch --
+            # nie eine andere. Die Kandidaten-Kette unten bleibt fuer den Fall, dass NICHTS
+            # genannt wurde (manueller Aufruf); dort ist ein Rueckfall kein Ersatz, sondern die
+            # einzige Auskunft, die es gibt.
+            #
+            # NUR IN DIESEM ZWEIG: bei --bereich hat der Aufrufer beide Enden selbst
+            # ausgesprochen, dort wird $COMDARE_GUARD_BASIS_REF gar nicht erst befragt.
+            _ce_basis="$COMDARE_GUARD_BASIS_REF"
+            git -C "$_ce_repo_root" rev-parse --verify --quiet "${_ce_basis}^{commit}" >/dev/null 2>&1 \
+                || ce_abbruch "$(
+                       echo "COMDARE_GUARD_BASIS_REF='${_ce_basis}' ist in diesem Klon NICHT aufloesbar."
+                       echo "Eine GENANNTE Basis wird nicht durch eine andere ersetzt -- das waere eine"
+                       echo "stille Abschwaechung der Wache. Der Aufrufer muss den Zweig selbst holen:"
+                       echo "  git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'"
+                       echo "Bei flachem Klon zusaetzlich GIT_DEPTH: 0 bzw. --unshallow. KEINE stille Null."
+                   )"
+        else
+            for _ce_kand in origin/main main origin/development development; do
+                [ -n "$_ce_kand" ] || continue
+                if git -C "$_ce_repo_root" rev-parse --verify --quiet "${_ce_kand}^{commit}" >/dev/null 2>&1; then
+                    _ce_basis="$_ce_kand"
+                    break
+                fi
+            done
+        fi
     fi
     [ -n "$_ce_basis" ] || ce_abbruch "$(
         echo "Keine Basis-Referenz aufloesbar. Probiert wurden:"
@@ -312,40 +361,65 @@ seit-basis)
     # BARE-SHA-VERBOT: nur eine echte Referenz wird akzeptiert. Fuer einen
     # blanken SHA liefert --symbolic-full-name eine LEERE Ausgabe (rc=0!),
     # deshalb wird auf refs/ geprueft und nicht auf den Exit-Code.
+    # NUR FUER --seit-basis: dort bestimmt die Wache den Bereich selbst, und ein
+    # untergeschobener Zwischen-SHA waere genau der Fehler, gegen den der Modus
+    # gebaut ist. Bei --bereich hat der Aufrufer BEIDE Enden ausgesprochen; ein
+    # SHA-Paar ist dort der dokumentierte, beidseitig gepinnte Aufrufweg.
     _ce_sym=$(git -C "$_ce_repo_root" rev-parse --symbolic-full-name "$_ce_basis" 2>/dev/null)
-    case "$_ce_sym" in
-        refs/*) : ;;
-        *) ce_abbruch "$(
-               echo "Basis '${_ce_basis}' ist keine Branch-Referenz, sondern ein Zwischen-SHA."
-               echo "Der Bereich MUSS aus git merge-base gegen eine Branch-Referenz kommen:"
-               echo "ein zu eng geschnittener Bereich hat in dieser Session 61 Prozent einer"
-               echo "Aenderung verborgen."
-           )" ;;
-    esac
+    if [ "$_ce_basis_auto" -eq 1 ]; then
+        case "$_ce_sym" in
+            refs/*) : ;;
+            *) ce_abbruch "$(
+                   echo "Basis '${_ce_basis}' ist keine Branch-Referenz, sondern ein Zwischen-SHA."
+                   echo "Der Bereich MUSS aus git merge-base gegen eine Branch-Referenz kommen:"
+                   echo "ein zu eng geschnittener Bereich hat in dieser Session 61 Prozent einer"
+                   echo "Aenderung verborgen. Wer zwei Enden bewusst pinnen will: --bereich."
+               )" ;;
+        esac
+    fi
 
-    _ce_mb=$(git -C "$_ce_repo_root" merge-base "$_ce_basis" HEAD 2>/dev/null)
+    _ce_spitze_sha=$(git -C "$_ce_repo_root" rev-parse --verify --quiet "${_ce_spitze}^{commit}") \
+        || ce_abbruch "SPITZE '${_ce_spitze}' ist in diesem Repo nicht aufloesbar (nicht geholt, \
+flacher Klon oder Tippfehler). Fail-closed: das ist ABBRUCH, keine stille Null."
+
+    _ce_mb=$(git -C "$_ce_repo_root" merge-base "$_ce_basis" "$_ce_spitze_sha" 2>/dev/null)
     _ce_rc=$?
     [ "$_ce_rc" -eq 0 ] && [ -n "$_ce_mb" ] || ce_abbruch "$(
-        echo "git merge-base ${_ce_basis} HEAD fehlgeschlagen (rc=${_ce_rc})."
+        echo "git merge-base ${_ce_basis} ${_ce_spitze} fehlgeschlagen (rc=${_ce_rc})."
         echo "Bei flachem Klon GIT_DEPTH: 0 setzen. KEINE stille Null."
     )"
 
-    _ce_head=$(git -C "$_ce_repo_root" rev-parse HEAD 2>/dev/null) \
-        || ce_abbruch "git rev-parse HEAD fehlgeschlagen."
-    _ce_ncommits=$(git -C "$_ce_repo_root" rev-list --count "${_ce_mb}..HEAD" 2>/dev/null) \
+    _ce_ncommits=$(git -C "$_ce_repo_root" rev-list --count "${_ce_mb}..${_ce_spitze_sha}" 2>/dev/null) \
         || ce_abbruch "git rev-list --count fehlgeschlagen."
 
     echo ""
-    echo "MODUS: --seit-basis (Bereich SELBST bestimmt, nie uebergeben)"
+    if [ "$_ce_basis_auto" -eq 1 ]; then
+        echo "MODUS: --seit-basis (Bereich SELBST bestimmt, nie uebergeben)"
+    else
+        echo "MODUS: --bereich (KUMULATIV -- beide Enden vom Aufrufer benannt)"
+    fi
     echo "  Basis-Referenz : ${_ce_basis}  (${_ce_sym})"
     echo "  merge-base     : ${_ce_mb}"
-    echo "  HEAD           : ${_ce_head}"
-    echo "  BEREICHSBREITE : ${_ce_ncommits} Commit(s) in merge-base..HEAD"
+    echo "  SPITZE         : ${_ce_spitze} = ${_ce_spitze_sha}"
+    echo "  BEREICHSBREITE : ${_ce_ncommits} Commit(s) in merge-base..SPITZE"
     if [ "$_ce_ncommits" -eq 0 ]; then
-        echo "  HINWEIS: HEAD ist Vorfahr der Basis -- kein eigener Beitrag im Bereich."
+        if [ "$_ce_basis_auto" -eq 0 ]; then
+            # NULL COMMITS IST BEI --bereich ABBRUCH, NICHT GRUEN -- gleiche
+            # Asymmetrie wie in der ce-Fassung: hier hat der Aufrufer nach einem
+            # URTEIL ueber einen Stand gefragt, und ueber einen leeren Stand gibt
+            # es keines. Bei --seit-basis bleibt es ein HINWEIS: dieser Modus
+            # laeuft unbedingt in der CI, auch auf der Basis selbst, wo 0 der
+            # regulaere Fall ist.
+            ce_abbruch "0 Commit(s) zwischen Abzweigung und SPITZE -- es wurde NICHTS geprueft, \
+also ist nichts bestanden. Sind BASIS und SPITZE derselbe Stand, gibt es nichts zu uebertragen \
+und dieser Aufruf ist ueberfluessig, nicht gruen."
+        fi
+        echo "  HINWEIS: SPITZE ist Vorfahr der Basis -- kein eigener Beitrag im Bereich."
+        echo "  ACHTUNG: der Nenner unten ist dann 0. Ein GRUEN darauf ist KEIN Urteil"
+        echo "  ueber den Baum, sondern nur ueber einen leeren Bereich."
     fi
 
-    git -C "$_ce_repo_root" diff -U0 --no-color --no-ext-diff "${_ce_mb}" HEAD -- "$@" \
+    git -C "$_ce_repo_root" diff -U0 --no-color --no-ext-diff "${_ce_mb}" "${_ce_spitze_sha}" -- "$@" \
         > "$_ce_diff_datei" 2>"${_ce_diff_datei}.err"
     _ce_rc=$?
     if [ "$_ce_rc" -ne 0 ]; then
@@ -353,7 +427,8 @@ seit-basis)
         ce_abbruch "git diff selbst ist fehlgeschlagen (rc=${_ce_rc}) -- KEINE stille Null."
     fi
 
-    _ce_nfiles=$(git -C "$_ce_repo_root" diff --name-only "${_ce_mb}" HEAD -- "$@" 2>/dev/null | wc -l)
+    _ce_nfiles=$(git -C "$_ce_repo_root" diff --name-only "${_ce_mb}" "${_ce_spitze_sha}" -- "$@" \
+        2>/dev/null | wc -l)
     echo "  BERUEHRTE DAT. : ${_ce_nfiles} Datei(en) im Bereich"
     ;;
 

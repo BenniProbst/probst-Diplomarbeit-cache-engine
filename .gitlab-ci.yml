@@ -128,6 +128,17 @@ variables:
           - "thesis/diplomarbeit"  # thesis-Gitlink (der LEBENDE der beiden)
           - ".gitmodules"
           - ".gitlab-ci.yml"
+          # DIE BEIDEN WACHEN-DATEIEN SIND BAU-CODE, genau nach derselben Ueberlegung wie
+          # configure.sh und Makefile weiter oben: sie entscheiden, WIE STRENG geprueft wird.
+          # Befund, der sie erzwang (Paket r7-wachen-divergenz, 10.08.2026): die Diff-Hygiene-
+          # Wache liegt in zwei Fassungen (hier und im ce) und war unbemerkt auseinandergelaufen.
+          # ci/wachen_paritaet.sh haelt sie zusammen und laeuft in verify:submodules -- also in
+          # einem Job unter DIESEN Regeln. Ohne diese zwei Zeilen waere er ausgerechnet fuer die
+          # Aenderung blind, die er bewacht: wer die super-eigene Fassung anfasst, aendert nichts
+          # unter Code/** und weckte den Job auf einem Feature-Zweig nicht. Der ce-Gitlink ist
+          # ueber "Code/external/*" schon gedeckt; das hier ist die andere Haelfte.
+          - "scripts/ci_diff_ascii_width_guard.sh"
+          - "ci/wachen_paritaet.sh"
     - when: never
 
 # ── #53 ccache-Hygiene: Konsumenten ziehen den ccache nur (policy: pull), EIN Writer (analyse:thesis-data)
@@ -1190,6 +1201,30 @@ verify:submodules:
     # Freifahrtschein -- die Begruendung steht im Kopf von ci/thesis_gitlink_parity.sh.
     - 'test -x ci/thesis_gitlink_parity.sh || { echo "FEHLER: ci/thesis_gitlink_parity.sh fehlt/nicht ausfuehrbar"; exit 1; }'
     - ci/thesis_gitlink_parity.sh --quelle head
+    # WACHEN-PARITAET (Paket r7-wachen-divergenz, 2026-08-10). Die Diff-Hygiene-Wache liegt in
+    # ZWEI Fassungen -- scripts/ci_diff_ascii_width_guard.sh hier und dieselbe Datei im ce. Sie
+    # sind bis heute unbemerkt auseinandergelaufen: gemessen am Stand super 7144f4f6 / ce-Gitlink
+    # e114cabd gaben sie auf DENSELBEN --stdin-Diff bei 3 von 5 gewuerfelten Proben verschiedene
+    # Verdikte, und die ce-Fassung reichte jedes unbekannte --wort ungelesen an `git diff` weiter
+    # (`--name-only` -> Exit 0, "GRUEN", Nenner 0 -- eine Wache, die gruen meldet, ohne
+    # hingesehen zu haben).
+    #
+    # WARUM HIER UND NICHT IN lint:diff-hygiene: dieser Job hat die Submodule in der Hand, jener
+    # faehrt GIT_SUBMODULE_STRATEGY: none -- dort ist Code/external/comdare-cache-engine ein
+    # LEERES Verzeichnis, und eine Paritaets-Wache mit nur einem Gegenstand ist keine. Sie bricht
+    # dort fail-closed ab (Exit 2), statt still gruen zu werden. Und sie steht bewusst NEBEN der
+    # Thesis-Gitlink-Paritaet: es ist dieselbe Frage (zwei Zeiger auf denselben Gegenstand duerfen
+    # nicht divergieren), nur eine Ebene hoeher -- am Werkzeug statt am Gitlink.
+    #
+    # WARUM KEIN EIGENER JOB: er kostete einen Runner-Slot, und der Owner hat am 10.08.2026
+    # ausdruecklich um weniger CI-Last gebeten. Dieser Job laeuft ohnehin und hat alles zur Hand.
+    #
+    # GRENZE, EHRLICH BENANNT: dieser Job haengt an .code-rules. Ein Bump des ce-Gitlinks weckt
+    # ihn ueber "Code/external/*"; eine Aenderung NUR an der super-eigenen Fassung weckt ihn ueber
+    # den Pfad-Eintrag, der dafuer in .code-rules ergaenzt wurde. Beide Wege sind gedeckt; ohne
+    # den zweiten waere die Wache genau fuer die Aenderung blind gewesen, die sie bewacht.
+    - 'test -x ci/wachen_paritaet.sh || { echo "FEHLER: ci/wachen_paritaet.sh fehlt/nicht ausfuehrbar"; exit 1; }'
+    - sh ci/wachen_paritaet.sh
 
 # ── Stage analyse: Auswertungswerkzeuge bauen (KEIN grosses Artefakt) ──
 analyse:thesis-data:
