@@ -195,13 +195,47 @@ grep -cF 'test -n "$(find' <datei>   ->  5   rc=0     [richtig]
 **`ci/plan_zahlen_wache.sh`** leitet die folgenden Anker bei jedem CI-Lauf neu aus dem Code ab und vergleicht sie mit diesem Dokument. SOLL kommt aus dem Plan, IST aus dem Code — **zwei Quellen** (T-3). Weicht eine ab, ist der Lauf rot und nennt beide Zahlen.
 
 ```
-PZW-CE-SHA         = e114cabdcaf09c810c90f571f7cafa9c0115d07c
+PZW-CE-SHA         = 670483c084293c2fa7f6fb7c72dcc3a8192e0b48
 PZW-SCHEMA-STELLEN = 40
 PZW-SCHEMA-DATEIEN = 21
 PZW-SCHEMA-LITERAL = 2
 PZW-CI-AUFRUFE     = 2
 PZW-CI-ALTMUSTER   = 0
 ```
+
+**Nachzug 11.08.2026, nachts — vierter Gitlink-Zug, und KEINE der vier Zahlen bewegt sich.
+Die vorherige Fassung bleibt darunter stehen (Doku wird deprecatet, nicht gelöscht).**
+
+Der Gitlink zog von `e114cabd` auf **`670483c0`** (die R5-Landung, r7-Wachen-Divergenz `#79`).
+**Die Wache hat es gefangen** — super-Pipeline **15706**, Job **374843**, `exit 2`, wörtlich:
+*„der Plan nennt einen ANDEREN ce-Zustand als super HEAD fuehrt."* **Zum vierten Mal hat dieser
+Mechanismus getan, wofür er gebaut ist.**
+
+| Anker | alt (Stand `e114cabd`) | neu (Stand `670483c0`) | Zählweise / Nenner |
+|---|---|---|---|
+| `PZW-CE-SHA` | `e114cabdcaf0…` | **`670483c084293…`** | Gitlink an super HEAD |
+| `PZW-SCHEMA-STELLEN` | 40 | **40** | 497 Test-`.cpp` im Baum, 59 Rohzeilen, Kommentar abgezogen |
+| `PZW-SCHEMA-DATEIEN` | 21 | **21** | 497 Test-`.cpp` im Baum `670483c0` |
+| `PZW-SCHEMA-LITERAL` | 2 | **2** | 497 Test-`.cpp` |
+| `PZW-CI-AUFRUFE` | 2 | **2** | 2768 Zeilen `.gitlab-ci.yml` |
+| `PZW-CI-ALTMUSTER` | 0 | **0** | 2768 Zeilen, gemessen **mit** `-F` |
+
+**Warum sich trotz gewachsenem Nenner (493 → 497 Test-`.cpp`) keine Zahl bewegt:** die vier neuen
+Test-Dateien rufen `lazy_csv_header()` nicht. Dasselbe Muster wie beim Zug vom 09.08. abends — der
+Nenner zählt **Dateien**, die Anker zählen **Stellen**; zwei Einheiten, zwei Zahlen.
+
+**Abnahme, beide Wege (§61-Dual-Weg):** CI-Job 374843 `exit 2` mit dem Wortlaut oben · lokal
+`sh ci/plan_zahlen_wache.sh` nach dem Anker-Nachzug: **„5 von 5 Ankern decken sich mit dem Objekt"**,
+`rc=0` **ohne Pipe gemessen** (K11).
+
+**Eigener Messfehler beim Nachziehen, protokolliert, weil er die Regel belegt:** ich hatte die
+Stellen-Zahl zuerst selbst nachgebaut und **59 statt 40** erhalten — mein `sed` schnitt
+`^[^:]*:[0-9]*:` weg, `git grep -n <SHA>` liefert aber **vier** Felder (`SHA:datei:zeile:inhalt`).
+Die Wache selbst schneidet korrekt `^[^:]*:[^:]*:[0-9]+:`. *Die CI-Formel ist die CI-Formel — nie
+eine eigene Menge bilden.* Aufgefallen ist es nur, weil „59 Rohzeilen = 59 Stellen" bedeutet hätte,
+dass **keine einzige** Kommentarzeile existiert.
+
+---
 
 **Nachzug 10.08.2026, 17:35 UTC — dritter Gitlink-Zug, vier Zahlen gewandert. Die alte Fassung
 bleibt hier stehen (Doku wird deprecatet, nicht gelöscht), die neue steht oben.**
