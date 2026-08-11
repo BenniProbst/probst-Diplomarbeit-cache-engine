@@ -130,3 +130,32 @@ Zwei unabhängige Auswertungen desselben Datensatzes sind damit selbst ein Beleg
 übereinstimmen, ist die Aussage doppelt getragen; wo sie abweichen, liegt der Fund.**
 
 Auswertung: Ledger **KON14**.
+
+---
+
+## NACHTRAG 2 — der abgebrochene Explore-Lauf `wf_eede2f12-7ed`
+
+Nach den vierzehn Owner-Antworten (Ledger **KON16**) wurde ein neun-straengiger Explore gestartet:
+die drei Owner-Explore-Auftraege (Flag-Syntax `c`=CPU · freigebende vs. compile-time-Seite ·
+geplante Export-Ziele), die drei Kontext-Bitten (Typ vs. Instanz · eigene Beduerfnisse ·
+C-4-Wache) und die Objektpruefung der drei neuen Architektur-Aussagen (Stufe/Phase-Umbenennung ·
+kein-YAML/Bau-Modul · drei Flaechen).
+
+**Auf Owner-Anweisung gestoppt**, bevor ein Ergebnis zurueckkam.
+
+| Datei | Inhalt |
+|---|---|
+| `lauf-wf_eede2f12-7ed-ABGEBROCHEN.tar.gz` | 3,2 M — 16 gestartete Agenten, 0 Ergebnisse, vollstaendiges Journal |
+| `wf_owner_antworten.js` | das Skript in der gefahrenen Fassung — der Lauf ist damit reproduzierbar |
+
+```
+gitleaks   8,30 MB gescannt   no leaks found
+Gegenprobe VORHER gefahren:   Koeder 'glpat-' + 20 Zeichen aus /dev/urandom -> leaks found: 1
+```
+
+**Wiederaufnahme:** `Workflow({scriptPath: ".../wf_owner_antworten.js"})`. Ein Resume ueber
+`resumeFromRunId` lohnt nicht — es gab null Ergebnisse zu cachen.
+
+**Warum das Skript gesichert wird, obwohl nichts zurueckkam:** die neun Straenge tragen die
+ausformulierten Owner-Zitate und Suchauftraege. Das ist der eigentliche Wert — nicht die
+Agenten-Ausgabe, die es nie gab.
