@@ -219,6 +219,36 @@ Optionsnamen) · #78 Ebene 2/3 der Stempel-Reihenfolge (ABI-/Fingerprint-Bruch, 
 Reihenfolge = **Mess → System → Organ**, vierfach belegt · `Projekte`-Repo nur GitLab, weil dort der
 Gesamtplan liegt.
 
+> ⚠️ **KORREKTUR-EINSCHUB 11.08.2026 — die Zeile darüber ist in EINEM Punkt falsch. Sie bleibt
+> wörtlich stehen, weil der Bestand an Irrtümern selbst ein Datum ist (Muster D2-G4/D2-G5).**
+>
+> **Was hält:** `-Wall`/`-Werror` als D-3 (aber neu zugeschnitten, s. u.) und `Projekte` nur GitLab.
+>
+> **Was NICHT hält: „Reihenfolge = Mess → System → Organ, vierfach belegt".** Der Owner-Satz vom
+> 10.08. lautet *„system sollte immer vorn stehen und organ hinten"* — er legt **zwei** Positionen
+> fest, nicht drei. Beide Ordnungen erfüllen ihn:
+>
+>     {Format, measurement, system, organ}   ODER   {Format, system, organ, measurement}
+>
+> **Wo MESS steht, ist offen.** Der Zehn-Wochen-Explore fand dazu nichts: Ledger flach
+> (2.734.392 Byte) → `Preimage-Ordnung` = 0 Treffer, `system vor organ` = 0. Die Festlegung ist
+> **neu**, nicht vergessen — und ohne sie ist Ebene 3 des Stempels nicht baubar. Sie liegt seit
+> 11.08. beim Owner.
+>
+> **Die „vierfache Belegung" belegt etwas anderes**, als dieser Satz behauptet: sie stützt die
+> Aufzählung *„Mess/System/Organ"* als Nennung der drei Stufen, nicht als Reihenfolgen-Anweisung
+> für die Preimage-Glieder. Das ist die Verwechslung, aus der die falsche Zeile entstand.
+>
+> **Gefunden hat es nicht mein Nachlesen, sondern ein Explore-Agent**, der diesen Satz gegen das
+> gleichentags geschriebene `20260810-CE-STEMPEL-WARNSTUFE-workflow-ergebnis.md` hielt und den
+> Widerspruch meldete. In der Memory war er da bereits korrigiert; **hier stand er noch** — ein
+> gelandetes Dokument altert nicht mit, wenn man nur das Gedächtnis nachzieht.
+>
+> **Zur Warnstufe im selben Zug:** „`-Wall` einführen" ist **gegenstandslos** — die Option steht in
+> `ce/cmake/compiler_flags.cmake:22`. Globales `-Werror` in einem Schritt darf nicht landen: es
+> macht **12 heute gedeckte Ziele** mit 26 Warnungen sofort rot. Neuer Zuschnitt S0…S3, vollständig
+> in Task #44.
+
 ---
 
 ## 9. WAS SICH AN DER DOKTRIN GEÄNDERT HAT
