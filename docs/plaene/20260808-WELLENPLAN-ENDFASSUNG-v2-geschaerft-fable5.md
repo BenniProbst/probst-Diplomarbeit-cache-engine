@@ -1809,3 +1809,113 @@ Baustein von sechzehn.
 
 Sie wird als **eine** Datei vorgelegt, je Entscheid: Frage in einem Satz · Recherche-Weg ·
 Empfehlung · was er freischaltet · Frist.
+
+---
+
+# 15. KORREKTUREN AN §13 UND §14 (nachgetragen 11.08.2026 spät)
+
+> **Anlass:** ein Konsistenz-Review über alle Festlegungen dieser Nacht (27 Agenten, 0 Fehler,
+> 20 Korrekturvorschläge gegengeprüft — **elf fielen**) plus die Owner-Antworten darauf.
+> **§13 und §14 bleiben unverändert stehen.** Was hier steht, gilt vor.
+> Volltext und Belege: Ledger **KON13**.
+
+## 15.1 O-2 ENTFÄLLT — an sechs Stellen
+
+**W-1 war nie eine offene Owner-Frage**, sondern ein Agenten-Widerspruch gegen einen bereits
+vorliegenden Owner-Satz (KON8-12, 16:12). **Der Hybrid ist Glied der MESS-Kette, nicht der
+BAU-/FREIGABE-Kette — weil er nicht bauen kann, nur messen.**
+
+    MESS   (Planer -> CEB -> [Hybrid ->] Tier)          3 ohne Hybrid, 4 mit
+    SYSTEM (CEB -> Tier  ||  CEB -> Hybrid, PARALLEL)   2 / 2
+    ORGAN  (CEB -> Tier)                                2 / 2
+
+**Betroffene Stellen, an denen O-2 zu streichen ist:** die Blocker-Zeile in §14.2 · die Graph-Kante
+`O-2 → S-2` in §14.3 · Regel 2 („Kein Grammatik-Bau ohne O-1 und O-2") · die W0b-Zeile „O-1…O-5"
+in §14.4 · die WE-Zeile „setzt O-1/O-2 voraus" · **Kipp-Punkt K-1 in §14.5**.
+**S-2 hängt nur noch an O-1.**
+
+## 15.2 ES SIND ZWEI GRAMMATIKEN, NICHT DREI — und eine existiert schon
+
+Owner: *„eine vereinfachte/ausgelegte Grammatik (Design durch Claude vorschlagen) für die
+DREIPHASIGE Mess-Achse und eine zweite Grammatik für die ZWEIPHASIGE System-Achse und Organ-Achse
+(existiert schon als volle System-Achsen-Syntax und Semantik muss nachgeholt werden in Reihenfolge
+der Achsen-Nummerierung)."*
+
+| # | Gegenstand | Zustand | Auftrag |
+|---|---|---|---|
+| **G-1** | Mess-Achse, dreiphasig | fehlt | **vereinfachte** Grammatik, Design vorzulegen |
+| **G-2** | System **und** Organ, zweiphasig | Syntax **existiert** | **Semantik nachholen**, in Reihenfolge der Achsen-Nummerierung |
+
+**Damit fällt der Satz „Ohne diesen Entscheid ist die Grammatik-Zahl nicht schneidbar"** aus §14.2
+und §14.3. Die vierphasige braucht keine eigene Grammatik — ihr Kern ist dreiphasig (15.3).
+
+## 15.3 DIE VIER-PARTEIEN-KETTE HAT EINEN DREIPHASIGEN KERN
+
+Owner: *„Weil Hybrid und Tier unabhängig voneinander sind, sind es **2 parallele DREIPHASIG
+Verträge über die Mess-Achse des Planers** […] **Konzeptionell hat die CEB hier 2 dritte Phasen**,
+die sie als Kopf steuert, **in der Anordnung des Ortes allerdings 4 Phasen**."*
+
+⇒ **S-4 baut nicht einen vierstelligen Vertrag, sondern zweimal einen dreistelligen, parallel** —
+mit der CEB als gemeinsamem Kopf. Die zwei Steuerungswege: Tausch des Hybrid am Prüfdock direkt,
+oder Beauftragung an den Hybrid (andere Tier-Binaries an Hybrid-Prüfdocks, mehr oder weniger
+Prüfdocks mit geänderten Synthese-Funktionen und Tier-Binary-Aktionsbereichen).
+
+## 15.4 S-3 FÄLLT NICHT — es ist transitiv preimage-wirksam
+
+§13.3 stufte die Ordnungs-Relation als `(M)` ein und ließ sie bei Zeitnot zuerst nach W2 fallen.
+**§14.3 zeichnet aber S-5 als abhängig von S-3**, und S-5 ist preimage-kritisch vor F2.
+⇒ **Regel 3 in §14.3 lautet: S-1, S-2, S-3, S-5, S-6, S-7** (deckt sich mit K-2, das ohnehin
+„S-1…S-7" nennt). **Nur #68 fällt.**
+
+## 15.5 P-0 IST BEGLEITEND, NICHT BLOCKIEREND
+
+Der `ExperimentPlanDirector` ist **gebaut, konstruiert und im Produktionspfad benutzt**
+(`profile_run_facade.cpp`, ce `670483c0`) — zweimal unabhängig am Objekt bestätigt (KON12-01).
+§14.3 Regel 2 („Kein Planer-Kopf ohne P-0") und die §14.7-Zeile „unangeschlossen im Submodul" sind
+damit überholt. **P-0 wird zu:** *die super-Seite auf das ce-seitige Skelett ziehen, wenn S-8
+gebaut wird.*
+
+## 15.6 S-17 BEKOMMT EINEN WELLEN-PLATZ
+
+§14.4 ordnet P-0 und **16 von 17** S-Posten einer Welle zu; **S-17** (Lager-Baum-Writer verdrahten)
+kam erst in §14.7 dazu und fehlt in der Zuordnung. **Er gehört nach W2**, zusammen mit S-13 — beide
+hängen an derselben Cache-/Ablage-Klärung (jetzt beantwortet, siehe 15.8).
+
+## 15.7 DIE FRIST IST FREITAG
+
+„Do 14.08." in §14.4 und §14.5 (**Kipp-Punkt K-1**) → **Fr 14.08.** Der 14.08.2026 ist ein Freitag;
+acht weitere Stellen derselben Abschnitte tragen es korrekt. Alle 30+ Wochentag/Datum-Paare in
+§13/§14 wurden nachgerechnet — sonst keine Abweichung.
+
+## 15.8 S-13 PRÄZISIERT: DREI ORTE, ZWEI BACKENDS, EINE XML
+
+Die Cache-Frage (O-9) ist beantwortet. **S-13 ist nicht „einen Cache scharfschalten", sondern drei
+getrennt konfigurierbare Ziele mit je zwei Backends:**
+
+    (1) CCACHE             generische Tools + Compiler, HOT zum Job geladen,
+                           NICHT auf prod1/prod2 behalten
+    (2) BUILDSYSTEM-CACHE  Lager-Items = Projekt-Binaries UND Messungen;
+                           isoliert auf PR4100 NAS (backup1.comdare.de)
+    (3) CACHE-ENGINE-      Cluster_NFS, AUSGABE-Ort: NUR finale Zusammenfassung,
+        EXPERIMENT         LaTeX und PDF + XML-angeforderte Einzelnachweise
+
+**Beide Caches müssen S3 UND Filesystem können. Alle drei sind per XML separat konfigurierbar.**
+Der `buildsystem-cache` im Cluster_NFS ist der **alte** Filesystem-ccache, nicht der neue.
+
+## 15.9 EIN NEUER BAU-POSTEN: S-18, DIE ACHSEN-INTERFACE-TRENNUNG
+
+Die Zahl „7 von 130" aus KON12-02 ist **keine Deckungsquote**: die sechs Träger des Markers
+`AXIS_ALGO_VERSION` liegen sämtlich unter `libs/cache_engine/heuristik/`, die 130 Dateien sind
+`axes/`-Header — **Schnittmenge null**, und keiner der 130 trägt irgendeinen `*_VERSION`-Marker.
+
+Owner: *„C-4 ist eine **üble Bilanz**, weil wir das **trennen und verdrahten** müssen, damit die
+**Achseninterfaces** überhaupt wie geplant laufen."*
+
+⇒ **S-18 — die Achsen-Versionierung trennen und verdrahten.** Umfang und Ort sind Gegenstand eines
+laufenden Explores; der Posten wird nach dessen Rücklauf geschnitten und eingeordnet.
+
+## 15.10 WAS NACH WIE VOR UNGEPRÜFT IST
+
+**14 von 17 Bau-Teilen** sind nie gegen den Code gemessen worden (nur P-0, S-14, S-17). Der
+**Stunden-/Tage-Aufwand** von S-1…S-18 steht an keiner Stelle dieses Plans — *„Termine unverändert"*
+ist aus dem Dokument allein **nicht** entscheidbar. Beides läuft im Explore vom 11.08. nachts.

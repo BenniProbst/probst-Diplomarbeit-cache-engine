@@ -15,6 +15,49 @@
 
 ---
 
+---
+
+## 🔴 STAND NACH DER KONSISTENZ-PRÜFUNG (11.08.2026 spät) — VIER ÄNDERUNGEN
+
+Ein Konsistenz-Review (27 Agenten, 0 Fehler) und die Owner-Antworten darauf haben diese Vorlage an
+vier Stellen verändert. **Die Tabelle unten und die Einzelabschnitte bleiben unverändert stehen;
+was hier steht, gilt vor.**
+
+| | Änderung |
+|---|---|
+| **O-9** | **BEANTWORTET.** Die Cache-Landschaft ist geklärt — siehe Ledger **KON13-04**. Drei Orte: `ccache` (Tools+Compiler, hot geladen) · Buildsystem-Cache (Lager-Items: Projekt-Binaries **und** Messungen, isoliert auf PR4100 NAS) · `cache-engine-experiment` im Cluster_NFS (**nur** finale Zusammenfassung, LaTeX, PDF + XML-angeforderte Einzelnachweise). Beide Caches müssen **S3 UND Filesystem** können, alle drei sind **per XML separat konfigurierbar**. Der `buildsystem-cache` im Cluster_NFS ist der **alte** Filesystem-ccache. **O-9 entfällt als Frage** und wird zum Bauauftrag S-13. |
+| **O-4** | **FALSCH GESTELLT.** Die Teilfrage *„und gibt es sie dort überhaupt?"* ist für Organ bereits entschieden — Owner-E2 (02.08.), verbatim in `organ_meta_meta_axis.hpp`: *„Die Meta-Meta-Achsen … sind wie alle Hauptachsen **PFLICHT** … da eine Meta-Meta-Achse immer zu den Mess-Achsen, System-Achsen oder Organ-Achsen gehört."* **Offen ist nur der INHALT.** *(aus Bericht, vor dem Umformulieren am Objekt zu lesen)* |
+| **O-1** | Zahl korrigiert: **294** `static_assert`, nicht 295. Zwei Zählweisen; KON7-08 führt im selben Ledger bereits 294. |
+| **Frist** | **Fr 14.08.**, nicht „Do" — der 14.08.2026 ist ein Freitag. Betrifft auch Kipp-Punkt K-1 im Wellenplan. |
+
+**Und O-2 war nie eine Owner-Frage.** Der Widerspruch (*wirkt der Hybrid auf Organ?*) ist durch
+Owner-Wort vom selben Abend aufgelöst — der Hybrid ist Glied der **Mess**-Kette, weil er nicht bauen
+kann (KON13-01). Die Grammatik-Zahl war nie in Gefahr: es sind **zwei** Grammatiken, owner-gesetzt
+(KON13-03), und **S-2 ist nicht gesperrt**.
+
+### NEU AUFGENOMMEN, auf Owner-GO zu F-4
+
+**O-12 · Fork E — XML-Kanal-Konvergenz.** Soll der Planer auf **eine** XML-Interpreter-Quelle
+konvergieren (Experiment- gegen Thesis-Profil), oder bleiben beide koexistent?
+*Recherche:* seit dem 19.07. als GO-pflichtiger Fork geführt (`20260719-planer-ceb-tier-topdown-BAUPLAN.md`,
+FORK E); *„der offizielle golden Mess-Pfad läuft über `parse_thesis_profile`/`run_profile_facade`"*,
+während `run_experiment_profile` bereits über `parse_experiment_profile` fährt.
+*Blockiert:* **S-8** (Planer-Kopf). *Empfehlung damals:* Experiment-Kanal als das eine Ziel,
+ThesisProfile als referenzierter Mess-Detail-Träger.
+
+**O-13 · Fork B — der dritte Builder.** Ist `--dump-plan` ein **dritter trivialer**
+`PlanTextBuilder` oder eine Director-Methode? *Empfehlung damals: ja, dritter Builder — sauberer
+für den Contract-Test.* *Blockiert:* S-8, klein.
+
+**O-14 · Fork R1 — Registry-Single-Source.** Code = Wahrheit + Generator-Ausbau, oder Registry =
+Hand-Wahrheit? *Empfehlung damals: Option 1, Hand-Pflege driftet nachweislich.* *Blockiert:* die
+Registry-Arbeit in S-2/S-9.
+
+**Damit sind es zwölf Punkte** (O-1, O-3…O-8, O-10, O-11 unverändert · O-9 beantwortet ·
+O-12…O-14 neu).
+
+---
+
 ## ÜBERSICHT: WAS JEDER ENTSCHEID FREISCHALTET
 
 | ID | Frage in Kurzform | schaltet frei | Dringlichkeit |
