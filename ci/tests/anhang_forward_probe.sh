@@ -94,6 +94,13 @@
 #     drankommt. Seine Reihenfolge-Semantik ist hier nicht Gegenstand.
 #   - Der Rollback-Pfad (PDF-Gate rot -> COPIED_LIST zurueckdrehen) haengt am
 #     abgeschalteten Gate und ist damit ebenfalls ungedeckt.
+#   - VON DEN ZWEI URSACHEN DER FUENFTEN FALLE (##20) IST NUR EINE GEFAHREN.
+#     A12 erzeugt eine .gitignore im Ziel-Repo; dort schlaegt 'git add' fehl UND
+#     die Datei fehlt hinterher im Index, beide Zaehler steigen also zugleich.
+#     Der zweite Weg -- 'git add' meldet 0, die Datei ist trotzdem nicht im Index
+#     (index.lock eines Parallel-Laufs, entzogenes Schreibrecht mitten im Lauf) --
+#     laesst sich in einem Fixture nicht ehrlich herstellen und ist ein
+#     DEFENSIVES Netz, keine gefahrene Deckung. Genannt statt verschwiegen.
 #   - Ob der ECHTE appendix-generator aus einer gueltigen WIDE-Matrix richtige
 #     Tabellen macht, ist Gegenstand anderer Wachen. Hier zaehlt der TRANSPORT.
 #   - A8/A9 STELLEN die Reihenfolge her, sie messen sie nicht. Die Faelle legen
@@ -215,6 +222,20 @@ sandbox() {           # $1 = Fallname ; setzt ARBEIT, ZIEL, BASIS_N
     printf 'Sandbox-Ziel der anhang-forward-Probe\n' > "$ZIEL/LIESMICH.txt"
     git -C "$ZIEL" add -- LIESMICH.txt
     git -C "$ZIEL" commit --quiet -m "Ausgangs-Commit der Sandbox"
+    BASIS_N=$(git -C "$ZIEL" rev-list --count HEAD)
+}
+
+# --- Sandbox-Variante fuer die FUENFTE Transportfalle (##20, 2026-08-10) ------
+# Das Ziel-Repo ignoriert genau die Dateien, die der Kanal dort ablegt. Das ist
+# kein erfundener Fall: das Thesis-Repo 289 traegt eine .gitignore, und eine
+# Regel darin ist eine Zeile weit von diesem Zustand entfernt. Am 10.08.2026 lag
+# der Kanal hier still gruen ("IDEMPOTENT: 0 Aenderungen", rc=0, kein Commit) --
+# der Messwert war weg und der Job sah aus wie ein ehrliches "nichts zu tun".
+sandbox_ignoriert() {   # $1 = Fallname ; wie sandbox(), plus .gitignore im Ziel
+    sandbox "$1"
+    printf 'anhang/**/tabellen/*.tex\n' > "$ZIEL/.gitignore"
+    git -C "$ZIEL" add -- .gitignore
+    git -C "$ZIEL" commit --quiet -m "Ziel-Repo ignoriert die Anhang-Tabellen"
     BASIS_N=$(git -C "$ZIEL" rev-list --count HEAD)
 }
 
@@ -549,6 +570,83 @@ fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$BAS
 fall_ende
 
 # =============================================================================
+# A12 DIE FUENFTE TRANSPORTFALLE (##20, 2026-08-10): DIE UEBERNAHME INS ZIEL-REPO
+#     WURDE NIE NACHGEZAEHLT. Die Messwerte sind da, das Aggregat stimmt, die
+#     .tex sind geschrieben und kopiert -- und dann nimmt git sie nicht. Bis zu
+#     diesem Paket sagte der Kanal darauf "IDEMPOTENT: 0 Aenderungen" und ging
+#     mit rc=0. Dasselbe Wort fuer "nichts hat sich geaendert" und "nichts ist
+#     angekommen": das ist genau die Ununterscheidbarkeit, gegen die F1-F4
+#     geheilt wurden, eine Station weiter unten.
+#     VORHER-LAUF (10.08.2026, gegen den Stand VOR diesem Paket, gewuerfelter
+#     Koeder): "kopiert gesamt: 1 .tex" / "gestagte Aenderungen: 0" / "IDEMPOTENT"
+#     / rc=0 / Commits 1->1 / Koeder NICHT im committeten Blob.
+#     GEFORDERT jetzt: rc=1, KEIN Commit, der Nenner gedruckt, die Dateinamen
+#     genannt. Fail-loud statt fail-open.
+# =============================================================================
+K12=$(token)
+TS12="20260812-070007-ziel-ignoriert"
+fall "A12 Ziel-Repo ignoriert die .tex -> ROT mit Nenner, nicht 'IDEMPOTENT'"
+sandbox_ignoriert a12
+csv_ohne_newline "$ARBEIT/korpus/$TS12/measure_out/perm0/result.csv" "$K12"
+kanal korpus
+fordere_rc 1
+fordere_literal "$OUT" "kopiert gesamt: 2 .tex"
+fordere_literal "$OUT" "Uebernahme-Nenner: kopiert=2 im_index=0 nicht_uebernommen=2"
+fordere_literal "$ERR" "sind NICHT im Index des"
+fordere_literal "$ERR" "anhang/de/tabellen/A_messwerte.tex"
+fordere_literal "$ERR" "anhang/en/tabellen/A_messwerte.tex"
+fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$BASIS_N"
+fall_ende
+
+# =============================================================================
+# A13 GEGENRICHTUNG ZU A12, PFLICHT (T-4). Byte-gleiche Fixture, EINZIGER
+#     Unterschied ist die fehlende Ignorier-Regel im Ziel-Repo. Ohne diesen Fall
+#     waere A12 von einer Regel "der Kanal ist jetzt immer rot" nicht zu
+#     unterscheiden -- und genau diese Verwechslung ist die Fehlerklasse des
+#     ganzen Pakets, nur mit umgedrehtem Vorzeichen.
+# =============================================================================
+K13=$(token)
+TS13="20260812-070008-ziel-nimmt"
+fall "A13 GEGENPROBE: dieselbe Fixture ohne Ignorier-Regel -> Commit mit Koeder"
+sandbox a13
+csv_ohne_newline "$ARBEIT/korpus/$TS13/measure_out/perm0/result.csv" "$K13"
+kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "Uebernahme-Nenner: kopiert=2 im_index=2 nicht_uebernommen=0"
+fordere_literal "$OUT" "git_add_fehler=0"
+fordere_zahl "Commits im Ziel-Repo (Basis war $BASIS_N)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fordere_tex de 1 "$K13"
+fordere_tex en 1 "$K13"
+fall_ende
+
+# =============================================================================
+# A14 ECHTE IDEMPOTENZ BLEIBT ECHT (Gegeneingang zu A12, zweite Richtung).
+#     Derselbe Lauf zweimal: der zweite darf KEINEN zweiten Commit erzeugen --
+#     das ist die Loop-/Rausch-Wache, an der der Kanal seit dem ersten Tag haengt
+#     ("bei jedem CI neu setzen" heisst nicht "bei jedem CI ein Commit").
+#     Der Fall belegt zugleich, dass das neue Urteil die richtige Grundlage hat:
+#     'IDEMPOTENT' steht hier MIT dem Beleg 'alle 2 kopierten .tex liegen im
+#     Index', waehrend A12 dieselbe Zahl 0 als Riss ausweist. Zwei Faelle, eine
+#     Zahl, zwei Urteile -- ohne diesen Fall waere die Zahl wieder blind.
+# =============================================================================
+K14=$(token)
+TS14="20260812-070009-zweimal"
+fall "A14 zweiter Lauf auf demselben Stand -> IDEMPOTENT, KEIN zweiter Commit"
+sandbox a14
+csv_ohne_newline "$ARBEIT/korpus/$TS14/measure_out/perm0/result.csv" "$K14"
+kanal korpus
+fordere_rc 0
+fordere_zahl "Commits nach Lauf 1 (Basis war $BASIS_N)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "Uebernahme-Nenner: kopiert=2 im_index=2 nicht_uebernommen=0"
+fordere_literal "$OUT" "IDEMPOTENT: 0 Aenderungen"
+fordere_literal "$OUT" "belegt: alle 2 kopierten .tex liegen im Index"
+fordere_zahl "Commits nach Lauf 2 (unveraendert erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fordere_tex de 1 "$K14"
+fall_ende
+
+# =============================================================================
 # A11 KEIN VIERTER ZWILLING (P4c, 2026-08-09).
 #     Die Mutanten N2/N3/N5 decken die beiden measure-Jobs NUR, solange die dort
 #     keine eigene Kopie mehr tragen. Kaeme eine zurueck -- durch ein Zurueck-
@@ -681,6 +779,8 @@ fi
 #       Header wieder "stellen" (Falle 4, der Header-Dieb).
 #   N6  Die Leerheitspruefung laesst alles durch -- der Gegeneingang (A6/A10)
 #       muss das fangen, sonst waere die Heilung ein Scheunentor.
+#   N7  Die Uebernahme ins Ziel-Repo wird gezaehlt, aber nicht beurteilt
+#       (Falle 5). A12 muss daran sterben, A13/A14 duerfen es nicht.
 #
 # JEDER MUTANT FUEHRT SEINE ZAHL MIT: erwartet wird eine exakte Anzahl
 # geaenderter Quellzeilen. Ohne sie bliebe ein Mutant unauffaellig, dessen
@@ -824,6 +924,17 @@ if [ "$MODUS" = --selbstbiss ]; then
     # Heilung, die anschliessend jede Leere durchwinkt, waere keine.
     mutant n6_leerheit_offen "die Leerheitspruefung laesst alles durch (-le 0 -> -lt 0)" \
         's@\[ "$WIDE_DATEN" -le 0 \]@[ "$WIDE_DATEN" -lt 0 ]@' 1
+    # N7 dreht die FUENFTE Heilung zurueck (##20, 10.08.2026): die Uebernahme wird
+    # zwar noch GEZAEHLT, aber nicht mehr BEURTEILT -- die Zahl steht dann als
+    # Verzierung im Log, und der Kanal faellt wieder in den 'IDEMPOTENT'-Zweig.
+    # Genau so sah der Defekt aus: Nenner vorhanden waere nicht genug gewesen, das
+    # URTEIL ist der tragende Teil. A12 muss daran sterben, A13/A14 nicht.
+    # BEIDE Bedingungen stehen bewusst in EINER Zeile (s. Begruendung im Kern):
+    # zwei getrennte Abbrueche haetten den zweiten unerreichbar und damit
+    # ungedeckt gemacht -- ein Mutant auf ihn waere gruen geblieben.
+    _n7='s@\[ "$nicht_uebernommen" -gt 0 \] || \[ "$af_add_fehler" -gt 0 \]@[ 1 -eq 0 ]@'
+    mutant n7_uebernahme_ohne_urteil "Uebernahme wird gezaehlt, aber nicht beurteilt (Falle 5)" \
+        "$_n7" 1
 
     echo "-----------------------------------------------------------------------------"
     echo "SELBSTBISS-NENNER: $N_GEBISSEN von $N_MUT Mutanten haben die Probe rot gemacht."

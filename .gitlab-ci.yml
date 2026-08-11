@@ -659,18 +659,22 @@ test:object-stat-wache-bissprobe:
 # mehrtaegigen Messlaufs, mit echten Messdaten, ohne Netz. Genau dieser Fehler ist in diesem
 # Repo schon passiert: eine Wache wurde gebaut und nirgends aufgerufen.
 #
-# WAS DIE PROBE HAELT: 10 Faelle (A1-A10) gegen die VIER stillen Transportfallen, die der Kern
-# am 09.08. geheilt hat -- Selektor traf 'result.csv' nie / 'wc -l' verwarf genau eine Datenzeile
-# / Konkatenation ohne 'awk 1' verklebte zwei Messwerte zu einem / 0-Byte-CSV stahl den Header.
-# Alle vier endeten mit rc=0 und einer Ausgabe, die wie ein ehrliches "nichts zu tun" aussah.
-# Der Beweis wird am ZIEL-REPO gefuehrt (git rev-list --count, git show HEAD:<pfad>), nicht am
-# Log: gefragt wird, ob der gewuerfelte Koeder im COMMITTETEN Blob steht.
+# WAS DIE PROBE HAELT: 13 fachliche Faelle (A1-A6, A8-A10, A12-A14) gegen die FUENF stillen
+# Transportfallen des Kerns -- Selektor traf 'result.csv' nie / 'wc -l' verwarf genau eine
+# Datenzeile / Konkatenation ohne 'awk 1' verklebte zwei Messwerte zu einem / 0-Byte-CSV stahl
+# den Header (alle vier 09.08.) / die Uebernahme ins Ziel-Repo wurde nie nachgezaehlt, sodass
+# "git nimmt die .tex nicht" und "nichts hat sich geaendert" dieselbe Zeile "IDEMPOTENT: 0
+# Aenderungen" bekamen (##20, 10.08.). Alle fuenf endeten mit rc=0 und einer Ausgabe, die wie ein
+# ehrliches "nichts zu tun" aussah. Der Beweis wird am ZIEL-REPO gefuehrt (git rev-list --count,
+# git show HEAD:<pfad>), nicht am Log: gefragt wird, ob der gewuerfelte Koeder im COMMITTETEN
+# Blob steht. Dazu A7 (Registrierung) und A11 (kein vierter Inline-Zwilling) = 15 Faelle gesamt.
 #
 # WARUM --selbstbiss IM CI: eine Probe, die nur am gesunden Objekt gruen ist, belegt nichts. Der
-# Schalter baut SECHS Wegwerf-Mutanten des Kerns (N1-N6: alter Glob / Stand vor P4 / kein awk 1 /
-# Nenner-Zeile weg / -s-Wache weg / Leerheitspruefung offen) und FORDERT, dass jeder die Probe rot
-# macht. Am Objekt gemessen bei der Verdrahtung: 6 von 6 gebissen. Der Nenner faehrt bei jedem
-# Lauf mit, statt hier als Prosa zu verjaehren.
+# Schalter baut SIEBEN Wegwerf-Mutanten (N1-N7: alter Glob / Stand vor P4 / kein awk 1 /
+# Nenner-Zeile weg / -s-Wache weg / Leerheitspruefung offen / Uebernahme gezaehlt aber nicht
+# beurteilt) und FORDERT, dass jeder die Probe rot macht. Am Objekt gemessen bei der Verdrahtung:
+# 6 von 6, nach ##20 (10.08.) 7 von 7 gebissen. Der Nenner faehrt bei jedem Lauf mit, statt hier
+# als Prosa zu verjaehren.
 #
 # WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
 # wie bei den drei Proben darueber). KEIN .code-rules: der Kern kann ueber eine reine Aenderung an
