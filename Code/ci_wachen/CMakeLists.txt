@@ -32,6 +32,7 @@ comdare_da_add_library(comdare_ci_wachen MODULE M10 SOURCES
     src/ci_yml_scanner.cpp
     src/wide_aggregat.cpp
     src/mutations_lauf.cpp
+    src/lizenz_konsistenz.cpp
 )
 target_compile_features(comdare_ci_wachen PUBLIC cxx_std_23)
 target_include_directories(comdare_ci_wachen PUBLIC

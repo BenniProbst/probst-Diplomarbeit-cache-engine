@@ -230,6 +230,23 @@ comdare_da_add_test(test_ci_wache_guard_basis
 target_compile_definitions(test_ci_wache_guard_basis PRIVATE
     "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\"")
 
+# P-LIZENZ (2026-08-11) -- SAGEN NOTICE, LICENSE UND DER ARBEITSBAUM DASSELBE?
+# Bis heute gab es an der Wurzel KEINE NOTICE -- in keinem Commit irgendeines
+# Branches (git log --all -- NOTICE leer; Gegenprobe -- LICENSE = 1 Commit).
+# Dabei zieht das Repo 4 Submodul-Einbindungen und 1544 getrackte Dateien
+# vendorten Forschungscode ein, darunter GPL-3.0 und LGPL-2.1-or-later.
+# Die Wache paart .gitmodules gegen NOTICE in BEIDEN Richtungen, misst jeden
+# behaupteten Lizenz-Marker am Text der genannten Lizenzdatei und haelt die
+# SPDX-Koepfe unter Code/ (ohne Code/external/) auf Apache-2.0.
+# COMDARE_REPO_WURZEL_LIZENZ: derselbe Define-statt-CWD-Griff wie bei test_279
+# und test_ci_wache_registrierung -- eine CWD-Annahme ist keine Zusicherung.
+comdare_da_add_test(test_ci_wache_lizenz_konsistenz
+    SOURCES unit/test_ci_wache_lizenz_konsistenz.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_lizenz_konsistenz PRIVATE
+    "COMDARE_REPO_WURZEL_LIZENZ=\"${CMAKE_SOURCE_DIR}/..\"")
+
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
 if(COMDARE_V32_ENABLE)

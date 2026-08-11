@@ -1,0 +1,144 @@
+super -- TU Dresden Diplomarbeit / BEP Venture UG (Marke Comdare)
+=================================================================
+
+Copyright 2026 BEP Venture UG (Marke Comdare)
+
+Der EIGENCODE dieses Repositoriums steht unter der Apache License,
+Version 2.0; der Volltext liegt in LICENSE. Der Abschnitt
+"GELTUNGSBEREICH DIESER LIZENZ" am Ende von LICENSE grenzt ab, worauf
+sie sich bezieht und worauf ausdruecklich nicht.
+
+Comdare ist eine MARKE der BEP Venture UG, kein Lizenzgeber. Die
+Diplomarbeit selbst ist die Arbeit von Benjamin-Elias Probst als
+natuerlicher Person; das Urheberrecht daran liegt bei ihm.
+
+MASSGEBLICH IST JE KOMPONENTE IHRE EIGENE LIZENZDATEI -- nicht diese
+Datei und nicht das NOTICE eines fremden Repositoriums. Diese Datei
+sagt nur, WO die massgebliche Lizenzdatei liegt und WORAN man sie
+erkennt.
+
+
+-------------------------------------------------------------------
+DIE WACHE: -ZEILEN
+-------------------------------------------------------------------
+
+Jede Zeile, die OHNE EINRUECKUNG mit "WACHE: " beginnt, ist ein
+maschinenlesbarer Eintrag. Der Test test_ci_wache_lizenz_konsistenz
+liest sie bei jedem Testlauf, paart sie gegen .gitmodules und gegen
+den Arbeitsbaum und prueft, ob der genannte Marker WOERTLICH in der
+genannten Lizenzdatei steht.
+
+Spalte 0 bindet: die drei Muster-Zeilen gleich darunter stehen
+EINGERUECKT und sind deshalb Text, kein Eintrag. Genau dadurch kann
+diese Datei ihre eigene Grammatik erklaeren, ohne sich dabei selbst
+mitzuzaehlen. Die Zeilenformen:
+
+  WACHE: SUBMODUL <pfad> LIZENZ "<marker>" DATEI <relpfad>
+  WACHE: SUBMODUL <pfad> KEINE-LIZENZDATEI
+  WACHE: VENDOR <pfad> LIZENZ "<marker>" DATEI <relpfad>
+
+<pfad> ist bei SUBMODUL repo-relativ (wie in .gitmodules), bei VENDOR
+relativ zu Forschungsarbeiten/code. <relpfad> ist IMMER relativ zu
+<pfad>, also zur Wurzel der genannten Komponente.
+
+Wer eine dieser Zeilen aendert, ohne dass der Baum dazu passt, wird
+rot. Wer den Baum aendert, ohne die Zeile nachzuziehen, ebenfalls.
+
+
+-------------------------------------------------------------------
+SUBMODULE
+-------------------------------------------------------------------
+
+Vier Einbindungen in .gitmodules, aber nur DREI Repositorien: die
+Diplomarbeit ist zweimal eingebunden, und zwar mit Absicht. Beide
+Zeiger zeigen auf dasselbe Remote (../20260931-overleaf-diplomarbeit)
+und haben verschiedene Rollen:
+
+  thesis/diplomarbeit
+      DER BAUPFAD. Hier baut die CI das PDF.
+  Code/external/20260931-overleaf-diplomarbeit
+      DER STATISCHE FUNDORT. Zielort der gesyncten LaTeX-Anlage, neben
+      cache engine und prt-art; er traegt auch den netzlosen Fall, in
+      dem der Lauf lokal statt in der CI stattfindet.
+
+Die Begruendung und das Owner-Zitat dazu stehen im Kommentarblock von
+.gitmodules. Beide Zeiger werden von Hand gemeinsam gesetzt.
+
+Das Diplomarbeits-Repositorium fuehrt KEINE eigene Lizenzdatei; das
+Urheberrecht an der Arbeit liegt bei Benjamin-Elias Probst. Beide
+Einbindungen sind hier deshalb als KEINE-LIZENZDATEI gefuehrt.
+
+WACHE: SUBMODUL Code/external/comdare-cache-engine LIZENZ "Comdare Cache Engine -- Dual License" DATEI LICENSE
+WACHE: SUBMODUL Code/external/comdare-prt-art LIZENZ "Apache License" DATEI LICENSE
+WACHE: SUBMODUL thesis/diplomarbeit KEINE-LIZENZDATEI
+WACHE: SUBMODUL Code/external/20260931-overleaf-diplomarbeit KEINE-LIZENZDATEI
+
+Zum cache-engine-Eintrag: er nennt den Stand, den der Gitlink HEUTE
+zeigt. Steht dort spaeter eine andere Lizenz, wird diese Zeile hart
+rot und muss mit dem Gitlink zusammen nachgezogen werden -- genau
+dafuer ist die Wache da.
+
+Nicht ausgecheckte Submodule (ein Klon ohne `git submodule update`)
+werden nur GEPAART, nicht inhaltsgeprueft; die Wache protokolliert den
+Verzicht als SKIP-Zeile.
+
+
+-------------------------------------------------------------------
+VENDORTER FORSCHUNGSCODE UNTER Forschungsarbeiten/code
+-------------------------------------------------------------------
+
+Dieser Baum enthaelt fremden Forschungscode, der bit-identisch und
+unveraendert beiliegt. Er ist INERT: super uebersetzt ihn nicht und
+linkt ihn nicht. Am Bautag nachgemessen -- die Zeichenfolge
+"Forschungsarbeiten" kommt in Code/CMakeLists.txt, Makefile und
+configure.sh je 0 Mal vor (Gegenprobe mit "COMDARE" auf denselben drei
+Dateien: 70, 7 und 16 Treffer, das Werkzeug greift also).
+
+Jedes dieser Projekte behaelt seine ORIGINAL-Lizenz. Darunter sind
+Copyleft-Lizenzen; sie sind hier ausdruecklich benannt und nicht durch
+die Apache-Lizenz des Eigencodes ersetzt:
+
+  P04-CoCo-trie     GPL-3.0
+  P07-Wormhole      GPL-3.0
+  P29-RCU-McKenney  LGPL-2.1-or-later
+  P01-ART, P10-SuRF                 Apache-2.0
+  P02-HOT                           ISC
+  P03-Masstree                      MIT mit Namensnennungs-Zusatz
+  P05-START, P20-BTreesAreBack      MIT
+
+WACHE: VENDOR P01-ART LIZENZ "Apache License" DATEI unodb/LICENSE
+WACHE: VENDOR P02-HOT LIZENZ "ISC License" DATEI hot/LICENSE
+WACHE: VENDOR P03-Masstree LIZENZ "an MIT license, plus a clause" DATEI masstree-beta/LICENSE
+WACHE: VENDOR P04-CoCo-trie LIZENZ "GNU GENERAL PUBLIC LICENSE" DATEI CoCo-trie/LICENSE
+WACHE: VENDOR P05-START LIZENZ "MIT License" DATEI START/LICENSE
+WACHE: VENDOR P07-Wormhole LIZENZ "GNU GENERAL PUBLIC LICENSE" DATEI wormhole/LICENSE
+WACHE: VENDOR P10-SuRF LIZENZ "Apache License" DATEI SuRF/LICENSE
+WACHE: VENDOR P20-BTreesAreBack LIZENZ "MIT License" DATEI leanstore/LICENSE
+WACHE: VENDOR P29-RCU-McKenney LIZENZ "LGPL-2.1-or-later" DATEI userspace-rcu/LICENSE.md
+
+Was der Marker leistet und was nicht: er ist eine Substring-Probe auf
+die genannte Datei, keine juristische Textanalyse. Er faengt einen
+Lizenz-WECHSEL, aber nicht jeden Versions-Wechsel innerhalb derselben
+Familie -- die Boilerplate-Texte von Apache und GPL tragen ihren Titel
+in Zeile 1 und die Versionsnummer erst in Zeile 2. Die Versionsangaben
+in der Liste oben sind daher am Bautag von Hand gelesen und nicht
+maschinell gebunden.
+
+P28-Kuehn-DAMON traegt bewusst KEINE WACHE: -Zeile. Der Quellcode
+dieses Projekts (ein privates TU-Dortmund-Repositorium, Roland Kuehn)
+ist per .gitignore vom Repositorium ausgeschlossen, weil seine Lizenz
+ungeklaert ist; im Baum liegt allein eine STATUS.md, die den Stand
+beschreibt. Es gibt dort keine Lizenzdatei -- die Wache findet das
+Projekt daher nicht und fordert auch keinen Eintrag. Sobald Code
+hinzukaeme, waere ein Eintrag faellig und die Wache wuerde ihn
+erzwingen.
+
+
+-------------------------------------------------------------------
+PRUEFUNGSUNTERLAGEN
+-------------------------------------------------------------------
+
+Die Pruefungsunterlagen (Expose-Dokumente, Betreuer-Gutachten,
+Anmeldeformulare) bleiben Bestandteil dieses Repositoriums und werden
+mit veroeffentlicht. Sie sind Teil der Diplomarbeit von
+Benjamin-Elias Probst und tragen keine gesonderte Lizenz.

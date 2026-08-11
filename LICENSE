@@ -199,3 +199,34 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+-------------------------------------------------------------------------------
+GELTUNGSBEREICH DIESER LIZENZ -- EIGENCODE, SUBMODULE, VENDORED FORSCHUNGSCODE
+-------------------------------------------------------------------------------
+
+Die Apache License 2.0 oben deckt den EIGENCODE dieses Repositoriums, also den
+Code und die Texte, die im Rahmen dieser Diplomarbeit selbst verfasst wurden.
+Sie deckt ausdruecklich NICHT alles, was in diesem Baum liegt.
+
+1. SUBMODULE unter Code/external/ und thesis/ tragen je eigene Lizenzen. Fuer
+   jedes von ihnen ist SEINE EIGENE Lizenzdatei massgeblich, nicht diese hier
+   und nicht das NOTICE eines fremden Repositoriums. Welche das ist und woran
+   man sie erkennt, steht in NOTICE.
+
+2. VENDORTER FORSCHUNGSCODE unter Forschungsarbeiten/code/ behaelt seine
+   ORIGINAL-Lizenzen. Darunter sind Copyleft-Lizenzen, unter anderem GPL-3.0
+   (P04-CoCo-trie, P07-Wormhole) und LGPL-2.1-or-later (P29-RCU-McKenney).
+   Dieser Code liegt bit-identisch und unveraendert bei; er wird von super
+   weder uebersetzt noch gelinkt. Die vollstaendige Liste mit Fundort und
+   Erkennungsmerkmal je Projekt steht in NOTICE.
+
+3. MASSGEBLICH IST JE KOMPONENTE IHRE EIGENE LIZENZDATEI. Bestehen zwischen
+   dieser Datei, NOTICE und der Lizenzdatei einer Komponente Unterschiede, gilt
+   die Lizenzdatei der Komponente.
+
+Die Zuordnung in NOTICE ist maschinell bewacht: der Test
+test_ci_wache_lizenz_konsistenz paart die Eintraege gegen .gitmodules und gegen
+den Arbeitsbaum und prueft, ob der genannte Marker woertlich in der genannten
+Lizenzdatei steht. Wer eine Komponente hinzufuegt, austauscht oder umlizenziert,
+ohne NOTICE nachzuziehen, bekommt einen roten Test.
