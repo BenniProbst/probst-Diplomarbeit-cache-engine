@@ -16,6 +16,496 @@
 > architektur-ziele-offene-punkte-ledger.md`; das Cluster-Ledger ist der 5. Pfad (Infra-Hoheit). Bei Widerspruch
 > gewinnt DIESES Ledger (repo-lokale Ledger = repo-lokale Sicht).
 
+## NACHTRAG 11.08.2026 SPÄTABENDS — DIE STEMPEL-ARCHITEKTUR, VOM OWNER SATZ FÜR SATZ ABGENOMMEN
+
+**Dieser Nachtrag hält eine Architektur fest, die in einem Dialog entstanden ist, in dem der Owner
+sieben Mal korrigiert oder präzisiert hat.** Jeder Abschnitt trägt den Wortlaut, auf dem er beruht.
+Er ist damit **Festlegung**, nicht Vorschlag — die offenen Stellen sind ausdrücklich als solche
+markiert.
+
+### KON7-01 — ZWEI FLÄCHEN AN JEDER BINARY-AUSSENSEITE
+
+**Owner verbatim:** *„das Versionierungsinterface auf jeder binary SEPARAT ABI STABIL vorhanden
+sein muss, also mit dem Genus Interface NICHTS zu tun hat. Beide werden IMMER separat auf die
+Aussenseite der Binary gelegt, sind aber verschiedene System. Das Genus Interface ist eine
+abstract factory und der Stempel eine compile time factory — zwei Verschiedene Design pattern."*
+
+Und die Abgrenzung, was zu welcher Fläche gehört:
+
+> *„Stempel sind immer die separate Fläche 2 und alles andere auch bei Verträgen zwischen binaries
+> und am Planer direkt ohne Vertrag vorne, ist Fläche 1."*
+
+    FLÄCHE 1 = VERTRAG / FUNKTION            FLÄCHE 2 = IDENTITÄT
+      Muster: abstract factory (Laufzeit)      Muster: compile time factory
+      WAS die Binary KANN                      WAS die Binary IST
+      Planer:  direkt vorne, OHNE Vertrag      auf JEDEM Träger, separat, ABI-STABIL
+      CEB:     Vertrag zum Planer
+               (Director → Builder, Commands)
+      Tier:    Genus-Interface (Prüfdock)
+      Hybrid:  Reroute/Adapter zu den Tiers
+               + eigene Genus-Fläche
+
+**Das Genus-Interface ist damit nur die AUSPRÄGUNG von Fläche 1 beim Tier — nicht Fläche 1 selbst.**
+Beim Planer hat sie eine völlig andere Form (XML rein, Commands raus), bei der CEB ist sie
+zweiseitig.
+
+**MEIN FEHLER, den das korrigiert:** ich hatte gesagt *„die Factory ist nicht neu erfunden — das
+Genus hat schon eine abstract factory"* und damit zwei Systeme verschmolzen, weil beide das Wort
+„Factory" tragen. Fehlerklasse: **Namensgleichheit für Sachgleichheit genommen** — derselbe Griff
+wie „Lager-Ordnung = Stufen-Ordnung" am selben Tag.
+
+**IST-STAND, gemessen:** die Identitäts-Fläche ist heute **OPTIONAL**, nicht Pflicht.
+`abi/anatomy_module_abi_v1_decl.hpp:136` nennt vier Pflicht-Symbole, der Versionsstempel ist das
+fünfte (`:304`). Der Loader sagt es wörtlich (`anatomy_module_loader.hpp:133-141`):
+*„Der Loader verlangt weiterhin NUR die VIER Pflicht-Symbole — ein Modul ohne Stempel lädt
+unverändert, es trägt hier eben nullptr."*
+⇒ **SOLL: Pflicht.** Konkreter Bauauftrag, kein Feinschliff.
+
+Nicht verwechseln: `comdare_anatomy_abi_version()` (Pflicht) ist die **ABI-Version des
+Modulvertrags**, `comdare_anatomy_version_lines()` (optional) ist der **Versionsstempel**.
+
+### KON7-02 — VIER TRÄGER-KATEGORIEN, UND NUR VIER
+
+Ein fünfter Binary-Typ existiert nicht; was heute so aussieht (acht CLIs, 60 Shell-Dateien), ist
+Behelfsweg.
+
+**Zwei Dinge tragen eigene Versionen, sind aber KEINE Träger:**
+* **Achsen-Algorithmen** — je Stück ein X.Y.Z; sie *fließen in* die Stempel, tragen selbst keine
+  Fläche 2.
+* **Das Genus-Interface** — die zusammengesetzte CT-Version „für das, was es leistet". Da
+  `GENUS_impl` **1:1** einem Tier-Binary entspricht, sitzt sie auf dessen Fläche 2.
+
+### KON7-03 — DIE STUFIGKEIT BESTIMMT DIE ZEILENZAHL
+
+    MESS    DREIPHASIG   Planer ──RT-Freigabe──▶ CEB ──CT-Einbau──▶ Tier
+    SYSTEM  ZWEIPHASIG             CEB ──RT-Freigabe──▶ Tier ──CT-Einbau
+    ORGAN   ZWEIPHASIG             CEB ──RT-Freigabe──▶ Tier ──CT-Einbau
+
+**Gesetz:** Stufe 1 ist IMMER Runtime-Freigabe, alle folgenden sind Compile-Time-Einbau.
+Der Planer gibt **nur Mess** frei — deshalb ist Mess die einzige dreiphasige Art (Owner 10.08.:
+*„Der Planer, der ja DREIPHASIG nur Messachsen freigibt"*). Durch den Hybrid dehnen sich die
+Ketten auf **4 / 3 / 2**; Organ bleibt hybrid-unberührt.
+
+**DARAUS FOLGT DIE ZEILENZAHL — nicht umgekehrt.** Ein Träger trägt genau die Zeilen der
+Achsen-Arten, die bei ihm bereits **eingebaut** sind:
+
+| Träger | X.Y.Z | Mess | System | Organ | SHA | **Zeilen** |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Planer** | ✅ +ISA/OS | — | — | — | ✅ | **2** |
+| **CEB** | — | ✅ | ✅ | ❌ | ✅ | **3** |
+| **Tier** | — | ✅ | ✅ | ✅ | ✅ | **4** |
+| **Hybrid** | — | ✅ | ✅ | ✅ *Adapter-Gattung* | ✅ | **4 + Durchreichung** |
+
+**Die CEB hat deshalb keine Organ-Zeile, weil Organ bei ihr erst in Stufe 1 steht** — freigegeben,
+nicht eingebaut. Das ist keine Auslassung, sondern die Stufigkeit.
+
+**OFFEN, vom Owner selbst benannt (11.08.):** *„Die Stufen-Ordnung ist DREIPHASIG oder ZWEIPHASIG.
+Da fehlt noch was."* Im Rohtranskript elfmal referenziert, nie vollständig hergeleitet.
+
+### KON7-04 — DIE SIEBEN INTERFACES VON FLÄCHE 2
+
+    (1) version_xyz()        nur Planer
+    (2) mess_zeile()         CEB · Tier · Hybrid
+    (3) system_zeile()       CEB · Tier · Hybrid
+    (4) organ_zeile()        Tier · Hybrid
+    (5) fingerprint_sha()    alle vier
+    (6) gesamt_stempel()     alle vier — Konkatenation der EIGENEN Zeilen, compile-time
+    (7) angeschlossene()     ★ NUR HYBRID — Laufzeit
+
+**(1)–(6) sind `constexpr`-Ausgaben eines feststehenden Strings. (7) braucht einen
+LAUFZEIT-SAMMLER über die Dock-Registrierung.** Zwei verschiedene Mechanismen hinter derselben
+ABI-Fläche — das ist beim Bau zu trennen.
+
+### KON7-05 — DER HYBRID: EINE BEREICHS-KARTE, KEINE KONKATENATION
+
+**Owner verbatim 11.08.:** *„Der Hybrid muss nach den Parameter-Kurven festlegen innerhalb welcher
+Funktion und deren Funktions-Parameter-Bereiche welche Tier-Binary geladen wird, um dies als
+Versionierung an Fläche 2 anzuzeigen und für jeden Bereich gilt dann die Versionierung eines dafür
+eingesetzten Tier-Binaries. (break even ist geplant für Parametrisierung)."*
+
+Und zur Doppelnatur:
+
+> *„dieser [gibt] seine eigenen Eigenschaften compile time wie ein Tier-Binary aus, aber als
+> Laufzeitanfrage die derzeit angeschlossenen und registrierten Tier-Binaries über deren Fläche 2
+> ab[…] und wie geplant konkateniert aus[…]. Also ist Hybrid die einzige Träger-Klasse, die auch
+> auf Fläche 2 alle Signale durchreicht und minimal durch String konkatenation über ALLE
+> angeschlossenen Prüf-Dock Tier-Binaries ausgibt, was dann eine Snap-shot Versionierung der
+> aktuellen Einrichtung ergibt."*
+
+    Funktion f, Parameterbereich [a, b)  →  Tier-Binary X, dessen Fläche-2-Stempel
+    Funktion f, Parameterbereich [b, c)  →  Tier-Binary Y, dessen Fläche-2-Stempel
+                              ↑
+                     die BREAK-EVEN-Punkte sind die Bereichsgrenzen
+
+**Das verbindet zwei Stränge, die bisher getrennt liefen:** Break-Even ist nicht nur
+Auswertungs-Thema (##57, OV-1/OV-6, HY-C), sondern **Strukturgeber der Hybrid-Identität**. Der
+Router liefert die Kurven, aus denen die Bereichsgrenzen entstehen; die Fläche-2-Ausgabe ist deren
+Abbild.
+
+**KONSEQUENZ FÜR DIE TERMINIERUNG:** der Hybrid-Stempel hat einen **frühen** Teil (die eigenen vier
+Zeilen, compile-time, sofort baubar) und einen **späten** (die Bereichs-Karte, erst nach HY-B/HY-C,
+wenn die Kurven existieren). Vorher ist die Karte leer oder einbereichig — das ist kein Mangel,
+sondern ihre Natur.
+
+### KON7-06 — DIE KOMPLEXITÄTS-LEITER IST DREISTUFIG
+
+**Owner verbatim 11.08.:** *„Bei den Organ-Achsen gibt es durchaus die Erweiterungs-Flags und Tags
+für CPU c und GPU g und FPGA f und NPU n und noch viele weitere. […] Aber die Komplexität der
+Systemachsen erreichen die Organ-Achsen Stempel nicht. Die Mess-Achsen Stempel tragen dieselben
+Erweiterungen wie die Organ-Achsen Stempel."*
+
+    SYSTEM   volle komplexe Grammatik, rekursiv, tiefe Verschachtelung
+    ORGAN    Erweiterungs-Flags und Tags (c/g/f/n und weitere) -- NICHT die System-Komplexität
+    MESS     DIESELBEN Erweiterungen wie ORGAN
+
+**MEINE FRÜHERE NOTIZ WAR ZU ENG** (*„Mess: nur X.Y.Z + Hardware-Flags wo anwendbar, kein
+komplexes Tag-System"*) — Mess und Organ liegen auf **derselben** Stufe.
+Die Sonderrolle bleibt: `measurement_tooling_registry` darf als **Haupt-Achse** System-Syntax
+tragen (Owner 10.08.).
+
+**GEMESSENE LÜCKE, die den Explore auslöst:** der Vollausbau in
+`ce measurement/algo_semver.hpp:1181-1187` hat **59 Knoten — alle im `c`-Zweig** (x86-CPU).
+Die Basis-Flags `g` (GPU), `f` (FPGA), `n` (NPU) sind in der Grammatik deklariert (`:14`) und haben
+**null Sub-Token**. Die Grammatik kann sie, der Katalog kennt sie nicht.
+⇒ Zehn-Wochen-Explore läuft (`wf_283f202c-0ba`, vier Korpora), Auftrag: *„Bitte suche das breit im
+Session log."*
+
+### KON7-07 — DIE FRAGEN-REIHENFOLGE IST SELBST EINE FESTLEGUNG
+
+**Owner verbatim:** *„Also wo soll der Stempel platziert werden und was muss daher überhaupt drin
+stehen ist die Frage VOR der Frage, wie die Syntax dort ausgeführt werden muss."*
+
+    1. WO platziert?     COMPOSITE  -- welche Teile darf ein Träger führen
+    2. WAS steht drin?   COMPOSITE  -- die Zulassungsmatrix, inkl. der VERBOTE
+    3. WIE Syntax?       STRATEGY (was in die Klammer) + BUILDER (wie zusammensetzen)
+
+**Ich hatte 3 vor 1 gestellt.** Die Syntax ist die Notation eines Inhalts — wer sie zuerst
+festlegt, notiert etwas, dessen Umfang er noch nicht kennt.
+
+**Und die Verbote sind der eigentliche Gehalt des Composite.** *„CEB trägt keine Organ-Achsen"* ist
+eine Composite-Regel, keine Syntax-Regel — sie sagt, welches **Kind an diesem Knoten unzulässig**
+ist. Eine Syntax-Regel könnte das gar nicht ausdrücken.
+**IST:** die Zulassungsmatrix ist nirgends durchgesetzt; dass die CEB ihren System-Anteil leer
+trägt, ist heute eine **Kommentar-Begründung, kein Riegel** (`ceb_version_stamp.hpp:590-594`).
+
+### KON7-08 — DIE VIER MUSTER UND IHRE ZUSTÄNDIGKEIT
+
+    COMPOSITE            Frage 1+2: welche Stempel-TEILE darf ein Träger führen
+    STRATEGY             Frage 3a: WAS darf je Achsen-Typ in die Klammer
+    BUILDER              Frage 3b: WIE wird je Achse zusammengesetzt
+    COMPILE TIME FACTORY die erzeugende Instanz von Fläche 2 (≠ abstract factory von Fläche 1)
+
+**Owner:** *„Der Schnitt der Stempel Syntax UND Semantik in eine Basisform mit Strategy Builder
+Pattern für jede Achse ist Pflicht."* Und: *„erbt jede Stempel-Klasse für jeden Achsen-Typ von der
+Basis."* Eine Erbin darf **verschärfen, nie aufweichen**.
+
+**Alles compile-time — und das ist bereits Hausform**, am Objekt gemessen:
+`anatomy_fingerprint.hpp` 43 `constexpr` / 19 `consteval` / 35 `static_assert` / **0 `virtual`** ·
+`algo_semver.hpp` 54 / 4 / **294** / 0 · im ce-Baum 126 Dateien mit CRTP, 204 mit Concepts.
+Die GoF-Muster sind im Lehrbuch laufzeit-polymorph formuliert; hier bedeutet das **CRTP statt
+`virtual`**, Template-Parameter statt Objektreferenzen. Wer im Review nach `virtual` sucht, findet
+keine Factory — und hält sie fälschlich für nicht gebaut.
+
+**Die Andockstelle ist vorbereitet:** `algo_semver.hpp:73` **S2-KATALOG-ANDOCKSTELLE**, mit
+ausdrücklicher Trennung *„der PARSER kennt keinen Katalog"* (`:70`), *„Katalog eine über HARDWARE.
+Diese Zeile ist die EINE Naht zwischen beiden"* (`:98`). Der Katalog selbst ist **noch nicht
+recherchiert** (`:369`, Owner F-5/F-6).
+
+### KON7-09 — DIE ASYMMETRIE, DIE DER BAU ZUGLEICH HEILT
+
+Am Objekt gemessen, POD `AnatomyVersionLines`:
+
+    ORGAN    Zeile ✅   strukturierte Einträge ✅   Kompositionsfunktion ✅ compose_organ_stamp_line()
+    SYSTEM   Zeile ✅   strukturierte Einträge ✅   Kompositionsfunktion ❌
+    MESS     Zeile ✅   Einträge ❌                 Kompositionsfunktion ❌
+
+Es gibt bereits eine Komposition — **aber nur für Organ**. Und das POD trägt `organ_entries` +
+`system_entries`, aber **kein `measurement_entries`**: Mess kam später **append-only** als bloße
+Zeile dazu. Die Feldreihenfolge `organ → system → measurement` ist deshalb **gewachsen, nicht
+entworfen** — und läuft der Stufigkeits-Ordnung entgegen. **Thema A und Thema B treffen sich an
+derselben Struktur.**
+
+⇒ Die Vererbungs-Vorgabe ist damit nicht nur Neubau, sondern **Symmetrisierung von etwas halb
+Gebautem**: Organ hat den vollen Aufbau, System zwei Drittel, Mess ein Drittel.
+
+### KON7-10 — WAS OFFEN BLEIBT
+
+1. **Die weiteren Basis-Flags** jenseits `c/g/f/n` — Explore läuft.
+2. **Die genaue Grenze** der Organ-/Mess-Komplexität gegenüber System: ist die Rekursion
+   ausgeschlossen? die Tiefe? bestimmte Token-Klassen? — Teil desselben Explores.
+3. **„Da fehlt noch was"** zur Stufen-Ordnung (Owner 11.08.) — elfmal referenziert, nie hergeleitet.
+4. **Die MESS-Position im Preimage** — der Satz *„system vorn, organ hinten"* ordnet nur zwei von
+   drei. Die Transpositions-Sperre ist davon **unabhängig** und sofort baubar: sie verhindert das
+   Vertauschen typgleicher Parameter, ohne die Reihenfolge festzulegen, und ändert kein Byte.
+## NACHTRAG 11.08.2026 -- DER TAG, AN DEM DER HAUPTSTRANG EINEN NAMEN BEKAM: STEMPEL
+
+**Elf Owner-Festlegungen, vier Landungen, acht neue Posten und eine stehende Regression, die ich
+selbst vergroessert habe.** Jede Zahl unten ist am Objekt gemessen oder traegt ihre Quelle.
+
+### KON6-01 -- WAS GELANDET IST
+
+| Repo | Landung | Pipeline |
+|---|---|---|
+| super | `2388afdc -> e6d90232` P-LIZENZ | **15674 · 33 von 33 gruen** |
+| ce | `31240ac5 -> d79bbcdd` Sammellandung P-WARN + P-D37B | 15675 · 23 von 24, 1 rot: `test:coverage-guard` |
+| super | `e6d90232 -> d359920e` Zwischenstandsdoku | (docs) |
+| super | `d359920e -> 75505b9d` R3-D37B-SUPER (D3-7b super-Haelfte) | offen |
+
+**P-WARN traegt eine NEUE SHA:** `aa65b527` existiert auf development nicht mehr -- der
+Commit-Text wurde per `--amend` korrigiert (die Herleitung der Zahl 226 war falsch). Gelandet ist
+`b2d713d4`, Tree-SHA identisch (`fd529567`). Wer nach der alten Nummer sucht, findet sie nicht.
+
+**Der beste Commit der Runde:** `346b6da9` -- *„die Ausschliessung der zwei Lauf-Modi wird
+DURCHGESETZT statt zugesagt"*. Ein Kommentar behauptete, zwei Schalter seien gegenseitig
+ausschliessend; drei Ebenen zeigten NULL Code-Durchsetzung. Statt den Kommentar zu entschaerfen,
+wurde der Riegel gebaut (`ex::lauf_modus_konflikt`, fail-closed, exit_code 7, T-6-Schwesterstelle
+mitgeheilt).
+
+**Was die Lande-Stufe dreimal in Folge gefangen hat:** `lint:format` war je hart rot --
+bei P-LIZENZ 159 Verstoesse in genau den drei Paketdateien, bei ce 10 in der neuen D3-7b-Testdatei.
+Die Heil-Stufe hatte P-LIZENZ als landefaehig gemeldet; das war falsch. Ohne die zweite Stufe
+waeren beide Pipelines unmittelbar nach dem Push rot geworden.
+
+### KON6-02 -- ELF OWNER-FESTLEGUNGEN DES TAGES, je woertlich
+
+**(1) PARALLEL BAUEN, SEQUENTIELL LANDEN.** *„das sequentielle Landen ist schneller als das
+sequentielle bauen … sequentielles Landen in den workflow als Stufe mit einbauen."*
+Die Serialisierung gehoert an die Landung -- sie ist ohnehin seriell (R4 + Ein-Blech) und kuerzer
+als ein Vollbau. Verankert als **A2.1 in der Arbeitsweise v3.2** (`Projekte c62c888`).
+
+**(2) ES WURDE NOCH NIE EINE FLOTTE GEBAUT.** *„daher kein Blocker vorhanden, aber der Bau ist
+unser Ziel."* Damit ist jede Kostenrechnung der Form „das invalidiert die Flotte"
+**gegenstandslos** -- die Menge ist leer. **Die Dringlichkeit dreht sich um:** Identitaets-Umbauten
+sind HEUTE kostenlos und werden nach dem Bau-Trigger (Mi 26.08. 06:00) teuer.
+⇒ NICHT „erst bauen, dann ordnen", sondern zwingend umgekehrt. Riegel: **F2 = IDENTITAETS-FREEZE**.
+*Mein Fehler dabei: eine Kostenaussage ohne Bestandsmessung. Neue Pruefrage vor jedem
+„das invalidiert X": **wie viele X existieren heute?***
+
+**(3) ZWEI GETRENNTE THEMEN.** *„Die Stempel Mechanik und vertauschte Variablen sind 2 themen,
+die separat betrachtet werden muessen, beide Anforderungen von mir sind korrekt."*
+
+**(4) FUNKTIONS-VARIABLEN IN STUFIGKEITS-ORDNUNG.** *„alle Funktions-Variablen in Reihenfolge der
+Stufigkeit der ZWEIPHASIG/DREIPHASIG … und nur das Lager hat hier eine Ausnahme."*
+
+    MESS   = DREISTUFIG   Planer (RT-Freigabe) -> CEB (CT) -> Tier (CT)
+    SYSTEM = ZWEISTUFIG   gibt frei
+    ORGAN  = ZWEISTUFIG   setzt durch          ⇒ SOLL: MESS, SYSTEM, ORGAN
+
+Die Lager-Ausnahme ist belegt: `lager_baum_writer.hpp` Messdaten `:711/:712/:716`
+(MESS→SYSTEM→ORGAN), Binaries `:744/:748/:756` (SYSTEM→ORGAN→MESS, Posten D-12).
+
+**(5) DIE ALTEN STEMPEL WERDEN NICHT ZURUECKGEHOLT.** *„weil wir neue geplant haben und auch sich
+die Architektur bis hierhin geschaerft hat."* Die alte Implementierung ist Referenz fuer die
+FAEHIGKEIT, nicht Vorlage fuer Code.
+
+**(6) ZEHN-WOCHEN-EXPLORE UEBER ALLE FUENF QUELLEN.** *„Laeuft der Explore ueber die letzten
+10 Wochen an session log/Plaene/Sessions/Ledger/Code? Sonst findet der nichts."* -- berechtigt,
+siehe KON6-05.
+
+**(7) MAXIMALE GRUENDLICHKEIT BEIM STEMPEL, KEINE KOMPROMISSE.** *„Rein planungstechnisch ist das
+Stempel Thema das komplexeste."*
+
+**(8) KONSOLIDIERUNGS-ARCHITEKTUR, GETRENNT FUER CODE UND DOKU**, fuer alle vier Repos; **nichts
+loeschen**; PRT-ART und Thesis werden synchron nachgezogen.
+
+**(9) ERST LAUTE COMPILE-FEHLER, DANN VERSCHIEBEN.** *„jede dieser Abhaengigkeiten jeweils mit
+einer lesbaren und verstaendlichen Compiletime error Nachricht … danach koennen wir die Struktur
+verschieben."* Das ersetzt meinen schwaecheren Vorschlag (die stillen Brueche durch Sorgfalt
+VERMEIDEN) durch den strukturellen: sie **laut machen**.
+
+**(10) COMPOSITE VOR STRATEGY+BUILDER -- und die Fragen-Reihenfolge.** *„welche Stempel je
+Planer/CEB/Hybrid/Tier-Binary ueberhaupt verwendet werden darf, muss … als COMPOSITE PATTERN
+festgelegt werden … Also WO soll der Stempel platziert werden und WAS muss daher ueberhaupt drin
+stehen ist die Frage VOR der Frage, WIE die Syntax dort ausgefuehrt werden muss."*
+Dazu: *„Der Schnitt der Stempel Syntax UND Semantik in eine Basisform mit Strategy Builder
+Pattern fuer jede Achse ist Pflicht."*
+
+    1. WO platziert?     COMPOSITE  -- welche Teile darf ein Traeger fuehren
+    2. WAS steht drin?   COMPOSITE  -- die Zulassungsmatrix, inkl. der VERBOTE
+    3. WIE Syntax?       STRATEGY (was in die Klammer) + BUILDER (wie zusammensetzen)
+
+*Ich hatte 3 vor 1 gestellt. Die Syntax ist die Notation eines Inhalts -- wer sie zuerst festlegt,
+notiert etwas, dessen Umfang er noch nicht kennt.*
+
+**(11) SKRIPTE SIND EINE STEHENDE REGRESSION.** *„Skripte waren doch sowieso verboten und wir
+verwenden nur C++ und cmake? Jedes Skript als google Test? Das ist alles Festgelegt."* -- KON6-05.
+
+### KON6-03 -- DER HAUPTSTRANG: ALLE BLOCKER KLEMMEN AM STEMPEL
+
+Owner: *„Alle Blocker klemmen also an der Reimplementierung der geschaerften Stempel-Mechanik."*
+Der Wellenplan fuehrt denselben Befund unabhaengig (§5, Korrektur-Einschub 10.08.:
+*„Das ist der einzige verbleibende Blocker vor F1."*).
+
+**Am Objekt heute, beide Teile ungeheilt:**
+`ce sota_catalog.hpp:172` und `:248` emittieren `STAMP_M("organ", "system", ...)` -- Organ VORN.
+
+**DIE SYNTAX IST GEFUNDEN UND IMPLEMENTIERT -- die MECHANIK fehlt.**
+`ce measurement/algo_semver.hpp:12-17` traegt die Grammatik als formale Produktion:
+
+    version := UINT '.' UINT '.' UINT [ '.' <flag> ]*
+    flag    := <basis> [ '{' <sub> [ '.' <sub> ]* '}' ] | <companion>
+    basis   := 'c' | 'g' | 'f' | 'n' | 'x128' | 'x256' | 'x512'
+    sub     := <token> [ '{' <sub> ... '}' ]                    -- REKURSIV
+    Beispiel: memory_layout=SoaMemoryLayout@1.0.0.c{p.e}.x512{f.vl.bw.dq}.gfni
+
+**DAS IST DIE „KLAMMERUNG"**: geschweifte Klammern fuer hierarchische Sub-Flags, rekursiv.
+Acht Regeln R1..R8, jede compile-time bewiesen, darunter (R3) *„BASIS DIREKT AN IHRER KLAMMER,
+ohne Punkt: `c{p.e}`, nie `c.{p.e}`"* -- ausdruecklich als **Owner-F-2-Korrektur** markiert.
+Bau-Vorlage: `super docs/plaene/20260807-DESIGN-flag-grammatik-v2-punkt-notation-komposit.md`.
+
+**Die Fassung entstand an EINEM Tag durch dreifache Schaerfung:** 02.08. Q3-Grammatik
+(`v`-Praefix, genau EIN Hardware-Flag) → 07.08. mittags v2 ersetzt sie vollstaendig (`v` faellt,
+Kardinalitaet 1→n) → 07.08. nachmittags Section 8 erklaert `1.0.0.c.p.e` fuer *„bindend"* →
+Stunden spaeter Section 9, F-2: *„Die Schreibweise ist `c{p.e}`, NICHT `c.p.e`. Meine flache
+Lesart war falsch."* **Das Etikett „bindend" hielt keine drei Stunden.**
+
+**WAS FEHLT (IST-Luecken, 10.08. gemessen, heute bestaetigt):**
+* Planer hat KEINEN Fingerprint-SHA (`planner_version.hpp`, 0 Treffer `fingerprint`/`sha`)
+* CEB traegt den System-Anteil LEER (`ceb_version_stamp.hpp:415`) -- und das ist heute eine
+  **Kommentar-Begruendung, kein Riegel**
+* Genus-Versionen HANDGESCHRIEBEN statt zusammengesetzt (`pruef_dock_version.hpp:58-64`, fuenf
+  freie Literale, EIN Aufrufer -- ein Test; produktions-tot)
+* **KEINE Vererbungshierarchie**: fuenf lose Stempel-Strukturen ohne gemeinsame Basis
+  (`StampSegment :205` · `StampLineLiteral :444` in `anatomy_stamp_entries.hpp` ·
+  `CompletedSystemStampLine` `system_cell_values.hpp:364` · `ToolchainStampParts`
+  `toolchain_stamp_glied.hpp:282` · `AnatomyStampEntryV1` `anatomy_module_abi_v1_decl.hpp:178`)
+* Die Andockstelle ist aber **vorbereitet**: `algo_semver.hpp:73` **S2-KATALOG-ANDOCKSTELLE**,
+  mit ausdruecklicher Trennung *„der PARSER kennt keinen Katalog"* (`:70`). Der Katalog selbst
+  ist **noch nicht recherchiert** (`:369`, Owner F-5/F-6).
+
+**DIE FORENSIK (Referenz fuer die Faehigkeit, nicht Vorlage):**
+19.07. `ce b23b7ee2` „feat(W12-A/§43): Versionierungs-Bausteine" -- 7 Dateien, 452 Zeilen, EINE
+Wurzel. 22.07.-04.08. bauten DREI Pakete daneben statt darauf (`g1_binary_version_stamp.hpp`,
+`ceb_version_stamp.hpp`, `pruef_dock_version.hpp`) -- vier Nummernkreise, vier Namensschemata.
+27.07. `ce 813c3232` „V-4 Permutations-Alt-Kanal retired" entfernte 17 Dateien / 2180 Zeilen,
+darunter `tools/permutation_codegen/axes_versions.txt` mit dem **selektiven Rebuild**:
+*„Codegen detektiert Differenz zu perm_<id>.version + triggert MINOR-Bump nur bei BETROFFENEN
+Permutationen."* Heute vergleicht `dll_is_current` (`build_orchestrator.hpp:345-352`) 128 hex auf
+GLEICHHEIT ⇒ die ganze Flotte muesste neu. **Das ist genau die Faehigkeit, die die Owner-Regel
+„Hardware-Erweiterung ist additiv" braucht.**
+**W12-B**, die zweite Haelfte von §43, wartet seit dem 19.07. auf „nach W11".
+
+### KON6-04 -- ACHT NEUE POSTEN
+
+| # | Gegenstand | Klasse |
+|---|---|---|
+| **#82** | UEBERLEBENDER MUTANT in GELANDETEM Code (P-GLIED): `bvset_ist_teilmenge` auf `for(a=1;a<2;++a)` -- page_type und general_hardware VOLLSTAENDIG blind, 21 von 21 Tests bleiben gruen | Defekt |
+| **#83** | `lint:format` ohne auffindbare lokale Deckung: clang-format 22.1.8 liegt unter `~/tools/cf22/`, nicht im PATH. Sofortmassnahme gefahren (Symlink), Repo-Skript fehlt | Werkzeug |
+| **#84** | VORBESTANDS-ROT in ce: `test_warn1_d2_fingerprint_koeder` (clang, beide Stufen, 482/483) · `test_vs_taxonomie_klassen_grep` (gcc, beide Stufen) · `test_d2_abdeckungs_wache_nenner` als FLATTERTEST entlarvt | Defekt |
+| **#85** | Wechselwirkung der Sammellandung -- **ENTLASTET** durch Pipeline 15675: `build:gcc`/`build:clang` gruen. Deckung kam von der CI, nicht von meiner Lande-Kette (Gate-Kette, keine Bau-Kette) | erledigt |
+| **#86** | **THEMA A -- STEMPEL-MECHANIK** (der Hauptstrang, KON6-03) | Bau |
+| **#87** | **THEMA B -- VERTAUSCHTE VARIABLEN** (Stufigkeits-Ordnung, KON6-02/4) | Bau |
+| **#88** | **KONSOLIDIERUNGS-ARCHITEKTUR** Code/Doku getrennt, vier Repos | Design |
+| **#89** | **STEHENDE REGRESSION: 13 Shell-Testproben** (KON6-05) | Regression |
+
+**#80 vollstaendig aufgeklaert** (Pipeline 15669 Job 374052, Trace 4819 Zeilen, `exit status 4`):
+5 Tests Differenz = **4 ISA-gegatete (SOLLVERHALTEN)** + **1 Pruefling-Fixture (echter Befund)**.
+Der Job lief auf **prod1** (`AuthenticAMD`, Ryzen 9 9950X3D), also der Maschine MIT AVX-512 --
+der fremde Baum ist der aermere. Owner 10.08.: *„Wenn prod2 kein AVX512 hat, dann kann sie es auch
+nicht testen und hat compile time weniger tests, was ist daran falsch?"* Nichts. Die Wache kennt
+die Klasse nicht und braucht eine **Host-Klassen-Achse**; das Werkzeug dafuer existiert
+(`scripts/ci_host_klassen_bericht.sh`). Vier Fuenftel des Rots sind Sollverhalten.
+
+### KON6-05 -- DIE STEHENDE REGRESSION, UND ICH HABE SIE HEUTE VERGROESSERT
+
+**Die Festlegung steht seit dem 09.08.**, Owner woertlich: *„Ich sehe einen Haufen shells statt
+vernuenftiger google tests, was soll das? … SKRIPTE SAGEN GAR NICHTS."* Und: *„es war ja auch nur
+C++ und cmake erlaubt, es gibt ja keine skripte."*
+
+**Die Abgrenzung vom 10.08. erlaubt NICHT, was ich getan habe:**
+*„CI Skripte gehoeren formal nicht zum Kernprojekt und sind daher erlaubt, aber .sh und .bat und
+.py wollen wir vermeiden."*
+
+    ci/*.sh         = CI-STEUERUNG   -> formal erlaubt, aber zu vermeiden
+    ci/tests/*.sh   = TESTS          -> muessen Google Tests sein. KEINE Ausnahme.
+
+Eine Bissprobe prueft, ob eine Wache beisst. **Das IST ein Test**, kein CI-Skript.
+
+**IST heute gemessen:** `super ci/tests/*.sh` = **13 Dateien, 7.967 Zeilen**.
+Gegenprobe zur richtigen Form: **ce `tests/unit/*.cpp` = 496 gtest-Dateien**, super `Code/tests` 21.
+⇒ **517 Google Tests gegen 13 Shell-Proben.** Die Shell-Form ist der Ausreisser.
+**Und sie waechst: 09.08. morgens 5 → 09.08. abends 12 → 11.08. 13.**
+
+**MEIN ANTEIL, ausdruecklich:** beim Landen von R3 habe ich einen Eindeutigkeits-Riegel gebaut
+(zaehlt distinkte Fall-Namen gegen die Gesamtzahl, Koeder `e534f270` beidseitig gefahren) -- und
+ihn in `ci/tests/mess_ausbeute_bissprobe.sh` gelegt, also **in die Regression**. Ich habe die
+Schwaeche sogar benannt (*„solange die Wache ein Shell-Skript ist, haelt der Riegel erst beim
+Ausfuehren"*) -- als Randnotiz, nicht als Regelverstoss. **Ein Befund, der als Beobachtung
+durchgeht statt als Auftrag.**
+
+**Warum die Shell-Form messbar versagt** (Beleg 09.08.): ein Selbstbiss-Orakel zaehlte jeden
+Rueckgabewert ausser 0 und 2 als Biss; ein `tr`-Shim mit Exit 127 liess ALLE FUENF Mutanten als
+*„wird gefangen"* durchgehen -- Gesamt `rc=0`, *„SELBSTBISS GRUEN"*. Ein Google Test unterscheidet
+strukturell die drei Zustaende, die eine Shell-Probe nicht trennen kann: Wache greift (mit ihrem
+eigenen Riss-Literal) · Mutant ueberlebt · Werkzeug kaputt.
+
+### KON6-06 -- DER KORPUS-BEFUND, der den Explore erst brauchbar machte
+
+Owner-Nachfrage: *„Laeuft der Explore ueber die letzten 10 Wochen …? Sonst findet der nichts."*
+**Am Objekt geprueft -- mein erster Korpus war zu schmal:**
+
+* Rohtranskripte `.claude/projects/-home-comdare/*.jsonl`: 19 Dateien, 503 MB, aber **erst ab
+  06.08.** -- fuenf Tage, keine zehn Wochen.
+* Am **18.07.** lief eine „Voll-Konsolidierung docs/ (super)" (`36a609af`, `c9536bb0`, `14327206`):
+  **325 authored Docs** aus `backups/` und `docs/sessions` in SECHS Kategorie-Ordner. Deshalb
+  beginnt die Git-Historie von `docs/plaene/` erst am 18.07., obwohl die Dateinamen bis 02.07.
+  zurueckreichen.
+* **`docs/` hat heute NEUNZEHN Unterordner.** Die Dokumente reichen bis **14.05.** zurueck,
+  `docs/termine/` bis **Maerz** -- verteilt ueber `audits/`, `kartierungen/`, `architektur/`,
+  `bausteine/`, `glossar/`, `uml_planning/`, `HANDOVER-ANHANG-MEMORIES-20260705/` u.a.
+* Die **Workflow-Journale** unter `docs/sessions/backups/**/*.jsonl` reichen ab **10.07.** --
+  sie sind die Tiefenquelle fuer die Vor-August-Zeit.
+
+**Die Lehre, und sie zaehlt fuer #88:** die Konsolidierung vom 18.07. ist selbst wieder zerlaufen
+(6 → 19 Ordner). **Ein Zielbild ohne durchsetzende Wache haelt nicht.**
+
+### KON6-07 -- DIE ABHAENGIGKEITSZAHLEN FUER JEDEN KUENFTIGEN UMBAU
+
+| Klasse | ce | super |
+|---|---|---|
+| `#include` | 17.783 | 693 |
+| CMake `add_subdirectory` | 205 | 52 |
+| CMake `include_directories` | 544 | 103 |
+| **CMake `file(GLOB …)`** | **32** | **3** |
+| CI-YAML-Pfade | 44 | 164 |
+| Shell-Skripte mit Pfadaufrufen | 23 | 43 |
+| Fixture-Verzeichnisse | 11 | 42 |
+| Doku-Querverweise | 110 | 93 |
+| **Anker `datei:zeile`** | — | **29** |
+
+**18.900 brechen LAUT** -- Fleissarbeit, kein Risiko. **64 brechen STILL:**
+35× `file(GLOB)` findet nach einem Umzug einfach weniger (kein Fehler, keine Warnung -- die
+Klasse, wegen der T-7 existiert) · 29× Zeilen-Anker zeigen auf einen Nachbargegenstand, werden
+**falsch statt rot** (Praezedenz: der D5-3-Anker war um 239 Zeilen gedriftet, geheilt durch
+Umstellung auf **Symbol-Form**).
+⇒ Nach Owner-Festlegung (9) bekommt **jede** dieser Abhaengigkeiten zuerst eine **lesbare**
+Compile-Time-Meldung, **danach** wird verschoben.
+
+**DREI UNORDNUNGS-BELEGE fuer #88, gemessen:**
+1. Die **Thesis ist ZWEIMAL** als Submodul eingebunden (`thesis/diplomarbeit` und
+   `Code/external/20260931-overleaf-diplomarbeit`), beide auf dasselbe Repo/denselben Branch --
+   genau die Falle aus Arbeitsweise V3 („die CI liest den anderen, die gebaute PDF war die alte").
+2. **Beide Pfade sind LEER** -- das Submodul ist in super gar nicht ausgecheckt. Die
+   `InputIfFileExists` liegen im echten Klon: **13 Treffer**, waehrend der Wellenplan (##58)
+   **28** nennt. Eine der Zahlen ist falsch oder zaehlt anders -- vor dem F5-Anhang-Gate klaeren.
+3. Die Doku-Konsolidierung vom 18.07. ist zerlaufen (KON6-06).
+
+### KON6-08 -- WAS ALS NAECHSTES FAELLT
+
+1. **Stempel-Explore** (`wf_b5f7f3a5-bfd`, 9 Schnitte) zurueck → Stufe 2 (Lead liest jede tragende
+   Referenz selbst nach) → **Designplan**, getrennt nach Thema A und B, als Vorlage an den Owner.
+2. **Restlandung** laeuft: R5 (ce) → R4 (super, Gitlink auf R5s Merge-SHA) → R2 (super).
+   **R1-E18SNAP** wird NEU GESCHNITTEN, nicht gelandet wie vorgelegt -- Wirksamkeit null (der Job
+   staged den Snapshot-Pfad nicht), Patch nicht mehr anwendbar (`git apply --check` rc=1), und er
+   wuerde ZWEI gelandete Pakete zurueckdrehen (er kennt EINEN Gitlink, der Job bumpt beide).
+   Owner-Frist aus Ledger §68c: vor dem Bau-Trigger Mi 26.08. 06:00.
+3. **Konsolidierungs-Explore** (#88) nach den Stempel-Explores.
+4. Nach gruener ce-Pipeline: **Gitlink-Bump** in super, dann **main-FF** beider Repos --
+   vor dem FF die Hygiene-Wache ueber den KUMULATIVEN Bereich (heute gemessen: 77 Commits,
+   10.046 Zeilen, 0 Verstoesse).
+
+**Reiche Zwischenstandsdoku:** `docs/sessions/20260811-ZWISCHENSTAND-der-hauptstrang-heisst-stempel.md`
+(306 Zeilen, gelandet `d359920e`).
 ## NACHTRAG 10.08.2026 SPAETABENDS -- KORREKTUR AN KON4-10: ES GIBT KEINEN STEMPEL-RISS
 
 **Dieser Nachtrag widerruft eine Aussage, die ich WENIGE STUNDEN VORHER selbst in denselben
