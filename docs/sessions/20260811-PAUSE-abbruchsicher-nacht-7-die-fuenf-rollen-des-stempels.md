@@ -60,6 +60,71 @@ BASIS  ~/.claude/projects/-home-comdare/5a19728e-f6e1-4736-a246-e3fda9ac35a1/sub
 
 ---
 
+## 2a. NACHTRAG: DIE EXPLORES SIND GEERNTET UND SAUBER GESTOPPT
+
+**Reihenfolge war: erst ernten, dann stoppen.** Sonst pausiert man Arbeit weg, die fertig ist.
+
+    Stempel-Explore   alle 7 Schnitte FERTIG    · 32 Verify-Läufe · 215 Funde gesamt
+    CI-Explore        2 von 5 Schnitten fertig  ·  2 Verify-Läufe · 26 Funde, davon 10 Blocker
+
+**129 der 215 Funde tragen das Gewicht OWNER-WORT.** Schnitt 7 allein förderte **96 Owner-Sätze**
+aus den beiden Rohtranskripten.
+
+### Durabel gesichert — außerhalb des Job-Verzeichnisses
+
+```
+/home/comdare/ernte-20260811-nacht7/        760 KB
+    ernte-stempel-explore.md          304 KB   39 Agenten-Ergebnisse, aufbereitet
+    ernte-ci-explore.md                40 KB    4 Agenten-Ergebnisse
+    journal-stempel-…jsonl            300 KB   Rohjournal (die Wahrheit)
+    journal-ci-…jsonl                  40 KB   Rohjournal
+    wf_stempel_explore.js / wf_ci_explore.js   die Skripte, wiederverwendbar
+    ernte_journal.py                           das Ernte-Werkzeug
+    owner-antworten-…-{F1-F2,F2b-F6,ABC}.md    die Owner-Worte dieser Nacht
+```
+
+**Credential-Prüfung vor der Sicherung gefahren:** acht Muster (`glpat-`, `ghp_`, `github_pat`,
+`AKIA`, `PRIVATE-TOKEN`, `Bearer`, `password`, `BEGIN…PRIVATE KEY`) → **je 0 Treffer**,
+Gegenprobe „Stempel" 117. Die Nullen tragen. **Kein committetes Backup** — das verlangt den
+kuratierten 233-Regel-Redaktions-Pass, der nicht in eine Pause gehört.
+
+### 🔴 SCHNITT 1 IST DER VOLLTREFFER — der Entwurf hat einen Namen
+
+Das Ergebnis trägt den Kopf *„SCHNITT 1 VOLLSTÄNDIG GEFUNDEN — mehrfach unabhängig belegt, nicht
+nur behauptet."* Die tragenden Fundstellen:
+
+| Quelle | Was dort steht |
+|---|---|
+| **`docs/plaene/20260719-planer-ceb-tier-topdown-BAUPLAN.md`** | **DER EIGENE ENTWURF.** `:48-50` nennt die GoF-Muster: **Interpreter (XML→Plan) + EIN Director + ZWEI ConcreteBuilder** aus demselben Walk — `CMakeGraphBuilder` und `CiYamlBuilder` |
+| `docs/plaene/20260719-FINALES-DESIGN-ABSTRACT-kette-baum-registries.md:24` | Design-Satz D1: 3–4 Binaries, top-down generiert, **„jede Stufe kompiliert die nächste"** |
+| Rohtranskript `46375cdc…jsonl:60943` (19.07.) | Owner korrigiert wörtlich: **der Planer steuert die CEB-Bau-Jobs** |
+| **Ledger `:10617` (§40.b)** | **die gesuchte Mini-Pipeline-Stelle:** zwei gestaffelte **Child-Pipelines**, keine Stufe darf die andere überholen |
+| Ledger `:11529` | Präzisierung: die Kette läuft **nicht über die Shell, sondern CEB-intern**; der Planer instrumentiert die erzeugte CEB per XML-Anweisung |
+| Ledger `:10581` (§38) | was der Planer übergibt: **ein serialisierter Teilbaum des Experiment-B+-Baumes** |
+| Ledger `:3146` (**KON-34**) | die doktrinäre Wurzel der „nur-CMake"-Regel — **bislang unverknüpft** |
+| `ce cmake/catalog_codegen.cmake:52-60` | die **gebaute Blaupause**: `add_custom_command` führt die kompilierte Codegen-Binary aus |
+| `ce apps/experiment_planner/main.cpp:4-6` | Owner-Kern als bindende Bauvorschrift **im Code**; die Planer-Binary **existiert real** |
+
+**Und die Gegenrichtung, wie gefordert:** ein Audit vom 05.08. (Ledger `:12242`) stellt fest, dass
+die reale CEB-Kompilationsstufe die Selbstkompilations-Regel **verletzt**. Dazu die Nenner:
+13 Shell-Dateien / 7.967 Zeilen in der CI-Testschicht gegen 517 echte Google Tests · 60
+Shell-Dateien / 20.030 Zeilen im eigenen Baum · 8 eigenständige Produktions-CLIs.
+
+### 🔴 METHODISCHER BEFUND: das `widerlegt`-Flag war zu grob
+
+Die Bilanz meldet „23 bestätigt, 9 widerlegt" — **das ist falsch gelesen, und der Fehler ist meiner.**
+Alle neun angeblichen Widerlegungen beginnen mit *„Quelle existiert, Zeile stimmt, Zitat wörtlich"*
+und **bestätigen** den Befund; das Flag wurde für **Präzisierungen** gesetzt (*„ZITAT WÖRTLICH?
+Fast."* · *„nur Whitespace-Padding geglättet"*).
+
+> **Ein binäres `widerlegt`-Flag verliert die Unterscheidung zwischen „falsch" und „fast richtig".**
+
+Hätte ich die Zahl übernommen, wären **neun gültige Befunde als gefallen verworfen** worden.
+Konsequenz für das nächste Schema: dritter Zustand `PRAEZISIERT` neben `bestaetigt`/`widerlegt`.
+**Die neun brauchen beim Konsolidieren eine Einzelprüfung** — sie sind Material, kein Ausschuss.
+
+---
+
 ## 3. DIE OWNER-FESTLEGUNGEN DIESER NACHT
 
 Vollständig mit Zitat und Beleg in **KON9** (Ledger-Kopf). Kurzform:
