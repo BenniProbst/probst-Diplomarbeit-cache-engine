@@ -401,6 +401,47 @@ test:xml-wellformed-probe:
   script:
     - sh ci/tests/xml_wellformed_probe.sh --selbstbiss
 
+# -- P3 (2026-08-11): PROBE fuer die BASIS-WAHL DER DIFF-HYGIENE-WACHE --
+# Der Fix "COMDARE_GUARD_BASIS_REF steht literal" hat drei Teile: (a) das Literal in dieser Datei,
+# (b) der fail-closed-Vorspann im Job lint:diff-hygiene, (c) die Wache BRICHT AB, wenn eine
+# GENANNTE Basis nicht aufloest. Fuer (a) und (b) gibt es sechs GoogleTest-Faelle (GuardBasis.*) --
+# die lesen aber nur den YAML-TEXT. Teil (c) ist VERHALTEN eines Shell-Skripts und war ungedeckt:
+# am 10.08. wurde der elif-Zweig der Wache probeweise entfernt und ALLE VIER damals gefahrenen
+# Gates blieben gruen (rc=0). Ein Text-Scanner mehr haette daran nichts geaendert; er sieht kein
+# Verhalten. Diese Probe RUFT die Wache in Wegwerf-git-Repos und misst ihren Exit-Code.
+#
+# DIE VIER ARME (plus die Registrierung dieser Probe selbst, Arm T7):
+#   A  Basis vorhanden, gewuerfelter Nicht-ASCII-Koeder im Bereich   -> rc=1 ROT
+#   B  KERN: genannte Basis unaufloesbar, origin/development auf HEAD -> rc=2 ABBRUCH.
+#      rc=0 waere der stille Kettenrueckfall auf einen 0-Commit-Bereich, also genau das
+#      Dauer-Gruen, gegen das der Fix gebaut ist. Der Arm belegt VORHER am Fixture, dass der
+#      Rueckfall dort wirklich 0 Commits faende -- sonst prueft er nichts.
+#   C  gesunder Baum, Basis vorhanden, kein Koeder                    -> rc=0 GRUEN
+#   D  Variable ungesetzt, Kandidaten-Kette wie dokumentiert          -> rc=0 GRUEN
+# C und D sind GEGENKOEDER gegen ein Dauer-Rot; beide fordern zusaetzlich BEREICHSBREITE >= 1,
+# denn ein Gruen ueber einem leeren Bereich ist die stille Null selbst.
+#
+# --selbstbiss baut zwei Wegwerf-Mutanten der Wache und FORDERT, dass die Probe an ihnen rot wird:
+# M1 ohne den elif-Zweig (exakt die Mutation vom 10.08.), M2 ohne das abschliessende 'exit 1'.
+# Zwei UNABHAENGIGE Richtungen -- sonst belegte der Biss nur die Empfindlichkeit eines Arms.
+#
+# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null (gleiche Begruendung
+# wie bei lint:diff-hygiene). KEIN .code-rules: die Wache und ihre Probe muessen auch in einer
+# docs-only-Welle laufen. KEIN extends: der Job braucht sh, awk, od, sed und git -- kein Compile,
+# kein Submodul.
+test:guard-basis-probe:
+  stage: test
+  tags: [baremetal]
+  needs: []
+  cache:
+    paths: []
+  rules:
+    - when: on_success
+  variables:
+    GIT_SUBMODULE_STRATEGY: none   # super-eigene Wache; die Fixtures sind Wegwerf-Repos
+  script:
+    - sh ci/tests/guard_basis_bissprobe.sh --selbstbiss
+
 # -- D3-5 (2026-08-09): PROBE fuer die THESIS-GITLINK-PARITAETS-WACHE --
 # ci/thesis_gitlink_parity.sh haelt die beiden Einbindungen DESSELBEN Thesis-Repos gleich und wird an
 # ZWEI scharfen Stellen gerufen: in verify:submodules als Praevention (--quelle head) und in
