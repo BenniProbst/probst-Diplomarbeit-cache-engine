@@ -83,8 +83,8 @@ std::optional<std::string> spdx_wert_aus(std::string_view kopf) {
     const std::string marke = std::string(LIZENZ_SPDX_MARKE_A) + std::string(LIZENZ_SPDX_MARKE_B);
     const std::size_t pos   = kopf.find(marke);
     if (pos == std::string_view::npos) { return std::nullopt; }
-    std::string_view rest = kopf.substr(pos + marke.size());
-    const std::size_t nl  = rest.find('\n');
+    std::string_view  rest = kopf.substr(pos + marke.size());
+    const std::size_t nl   = rest.find('\n');
     if (nl != std::string_view::npos) { rest = rest.substr(0, nl); }
     const std::string_view wert = rand_weg(rest);
     return std::string(wert);
@@ -102,8 +102,8 @@ bool verzeichnis_nicht_leer(const std::filesystem::path& p) {
 // hier ein bool -- damit war die DATEI-Bindung nicht formulierbar: "es liegt
 // eine da" sagt nichts darueber, ob es DIE benannte ist.
 std::vector<std::string> lizenzdateien_an_wurzel(const std::filesystem::path& wurzel) {
-    std::vector<std::string> namen;
-    std::error_code          ec;
+    std::vector<std::string>            namen;
+    std::error_code                     ec;
     std::filesystem::directory_iterator it(wurzel, ec);
     if (ec) { return namen; }
     for (const auto& eintrag : it) {
@@ -150,15 +150,14 @@ void pruefe_zeilennorm(std::string_view name, std::string_view text,
     for (const std::string& zeile : in_zeilen(text)) {
         ++nr;
         if (zeile.size() > LIZENZ_ZEILE_MAX_BYTE) {
-            melde(BefundArt::TextZeileZuLang, std::string(name) + "-Zeile ueber " +
-                                                    std::to_string(LIZENZ_ZEILE_MAX_BYTE) + " Byte: Zeile " +
-                                                    std::to_string(nr) + " hat " + std::to_string(zeile.size()) +
-                                                    " Byte.");
+            melde(BefundArt::TextZeileZuLang,
+                  std::string(name) + "-Zeile ueber " + std::to_string(LIZENZ_ZEILE_MAX_BYTE) + " Byte: Zeile " +
+                      std::to_string(nr) + " hat " + std::to_string(zeile.size()) + " Byte.");
         }
         for (std::size_t i = 0; i < zeile.size(); ++i) {
             const unsigned char c = static_cast<unsigned char>(zeile[i]);
             if (ist_ascii_zeichen(c)) { continue; }
-            char hex[3] = {0, 0, 0};
+            char        hex[3]  = {0, 0, 0};
             const char* ziffern = "0123456789ABCDEF";
             hex[0]              = ziffern[(c >> 4) & 0x0f];
             hex[1]              = ziffern[c & 0x0f];
@@ -189,7 +188,7 @@ std::vector<std::string> parse_gitmodules(std::string_view text) {
 }
 
 std::vector<NoticeEintrag> parse_notice(std::string_view text) {
-    std::vector<NoticeEintrag> eintraege;
+    std::vector<NoticeEintrag>     eintraege;
     const std::vector<std::string> zeilen = in_zeilen(text);
     for (std::size_t i = 0; i < zeilen.size(); ++i) {
         // SPALTE 0 BINDET. Nur eine Zeile, die OHNE Einrueckung mit WACHE:
@@ -203,7 +202,7 @@ std::vector<NoticeEintrag> parse_notice(std::string_view text) {
         if (zeile.rfind(kWacheMarke, 0) != 0) { continue; }
 
         NoticeEintrag eintrag;
-        eintrag.zeile = i + 1;
+        eintrag.zeile         = i + 1;
         std::string_view rest = rand_weg(zeile.substr(kWacheMarke.size()));
 
         if (rest.rfind(kFormSubmodul, 0) == 0) {
@@ -238,7 +237,7 @@ std::vector<NoticeEintrag> parse_notice(std::string_view text) {
             eintraege.push_back(eintrag);
             continue;
         }
-        rest                     = rest.substr(kFormLizenz.size());
+        rest                      = rest.substr(kFormLizenz.size());
         const std::size_t schluss = rest.find('"');
         if (schluss == std::string_view::npos || schluss == 0) {
             eintraege.push_back(eintrag); // leerer Marker gilt als UNLESBAR:
@@ -359,8 +358,8 @@ std::string ergebnis_bericht(const LizenzErgebnis& ergebnis) {
     // die am 11.08. als umgebungsabhaengig auffiel, ohne dass die Ausgabe es
     // zeigte; "26 von 187 gescannten" traegt seine Herkunft mit, und die
     // SKIP-Zeilen darunter nennen jedes ausgelassene Verzeichnis beim Namen.
-    aus << "  NENNER SPDX-Dateien          : " << ergebnis.nenner_spdx << " von "
-        << ergebnis.nenner_code_dateien << " gescannten Dateien unter Code/\n";
+    aus << "  NENNER SPDX-Dateien          : " << ergebnis.nenner_spdx << " von " << ergebnis.nenner_code_dateien
+        << " gescannten Dateien unter Code/\n";
     aus << "  NENNER NOTICE SUBMODUL-Zeilen: " << ergebnis.nenner_notice_submodul << "\n";
     aus << "  NENNER NOTICE VENDOR-Zeilen  : " << ergebnis.nenner_notice_vendor << "\n";
     for (const std::string& skip : ergebnis.skips) { aus << "  SKIP    " << skip << "\n"; }
@@ -483,15 +482,14 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
         const auto        treffer       = std::count(gitmodule.begin(), gitmodule.end(), pfad);
         const std::size_t in_gitmodules = static_cast<std::size_t>(treffer);
         if (in_gitmodules > 1) {
-            melde(BefundArt::GitmodulesPfadMehrfach, ".gitmodules nennt denselben Pfad " +
-                                                         std::to_string(in_gitmodules) + " mal: " + pfad);
+            melde(BefundArt::GitmodulesPfadMehrfach,
+                  ".gitmodules nennt denselben Pfad " + std::to_string(in_gitmodules) + " mal: " + pfad);
         }
         const std::size_t in_notice = anzahl_in(notice_submodul_je_pfad, pfad);
         if (in_notice == 0) {
             melde(BefundArt::SubmodulOhneNoticeZeile, "Submodul ohne NOTICE-Zeile: " + pfad);
         } else if (in_notice > 1) {
-            melde(BefundArt::NoticeZeileMehrfach, "NOTICE nennt denselben SUBMODUL-Pfad " +
-                                                      std::to_string(in_notice) +
+            melde(BefundArt::NoticeZeileMehrfach, "NOTICE nennt denselben SUBMODUL-Pfad " + std::to_string(in_notice) +
                                                       " mal, zugesichert ist GENAU EINE: " + pfad);
         }
     }
@@ -516,8 +514,8 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
         if (e.art == NoticeArt::SubmodulOhneLizenzdatei) {
             if (!am_baum->second.lizenzdateien.empty()) {
                 melde(BefundArt::KeineLizenzdateiObwohlVorhanden,
-                      "KEINE-LIZENZDATEI behauptet, aber an der Wurzel von " + e.pfad + " liegt: " +
-                          liste_text(am_baum->second.lizenzdateien));
+                      "KEINE-LIZENZDATEI behauptet, aber an der Wurzel von " + e.pfad +
+                          " liegt: " + liste_text(am_baum->second.lizenzdateien));
             }
             continue;
         }
@@ -606,9 +604,8 @@ LizenzErgebnis pruefe(const LizenzEingang& eingang) {
     // -- SPDX-Uniformitaet unter Code/ -------------------------------------------
     for (const SpdxFund& fund : eingang.spdx_funde) {
         if (fund.wert != LIZENZ_SPDX_SOLL) {
-            melde(BefundArt::SpdxAbweichler,
-                  "SPDX-Abweichler: " + fund.datei + " traegt \"" + fund.wert + "\" statt " +
-                      std::string(LIZENZ_SPDX_SOLL));
+            melde(BefundArt::SpdxAbweichler, "SPDX-Abweichler: " + fund.datei + " traegt \"" + fund.wert + "\" statt " +
+                                                 std::string(LIZENZ_SPDX_SOLL));
         }
     }
 
@@ -636,7 +633,7 @@ LizenzEingang sammle_vom_baum(const std::filesystem::path& wurzel) {
     }
 
     for (const std::string& pfad : parse_gitmodules(eingang.gitmodules_text)) {
-        SubmodulAmBaum zustand;
+        SubmodulAmBaum              zustand;
         const std::filesystem::path dir = wurzel / pfad;
         zustand.ausgecheckt             = verzeichnis_nicht_leer(dir);
         if (zustand.ausgecheckt) { zustand.lizenzdateien = lizenzdateien_an_wurzel(dir); }
@@ -650,7 +647,7 @@ LizenzEingang sammle_vom_baum(const std::filesystem::path& wurzel) {
     std::error_code             ec;
     if (std::filesystem::is_directory(vendor_wurzel, ec) && !ec) {
         std::map<std::string, std::vector<std::string>> je_projekt;
-        std::filesystem::recursive_directory_iterator it(vendor_wurzel, ec);
+        std::filesystem::recursive_directory_iterator   it(vendor_wurzel, ec);
         if (!ec) {
             for (auto lauf = std::filesystem::begin(it); lauf != std::filesystem::end(it); lauf.increment(ec)) {
                 if (ec) { break; }
@@ -699,18 +696,18 @@ LizenzEingang sammle_vom_baum(const std::filesystem::path& wurzel) {
     // .gitignore", waehrend die Datei vier trug -- und die CI baut nach
     // Code/build-test und Code/build-test-debug. Am Objekt stieg der Nenner damit
     // von 26 auf 39, und die Wache las generierte Bauartefakte als Repo-Quelle.
-    const GitignoreMuster muster    = parse_gitignore(eingang.code_gitignore_text);
-    eingang.gitignore_unverstanden  = muster.unverstanden;
+    const GitignoreMuster muster   = parse_gitignore(eingang.code_gitignore_text);
+    eingang.gitignore_unverstanden = muster.unverstanden;
     std::vector<std::string> uebersprungen;
 
     const std::filesystem::path code = wurzel / "Code";
     if (std::filesystem::is_directory(code, ec) && !ec) {
-        std::map<std::string, std::string> sortiert;
+        std::map<std::string, std::string>            sortiert;
         std::filesystem::recursive_directory_iterator it(code, ec);
         if (!ec) {
             for (auto lauf = std::filesystem::begin(it); lauf != std::filesystem::end(it); lauf.increment(ec)) {
                 if (ec) { break; }
-                std::error_code ec2;
+                std::error_code   ec2;
                 const std::string name = lauf->path().filename().string();
                 if (lauf->is_directory(ec2) && !ec2) {
                     if (ist_uebersprungen(name, muster.verzeichnisse) || name.rfind('.', 0) == 0) {

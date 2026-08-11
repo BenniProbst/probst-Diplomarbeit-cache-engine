@@ -208,11 +208,11 @@ enum class NoticeArt {
 };
 
 struct NoticeEintrag {
-    NoticeArt   art  = NoticeArt::Submodul;
+    NoticeArt   art = NoticeArt::Submodul;
     std::string pfad;
     std::string marker;      // leer bei SubmodulOhneLizenzdatei
     std::string lizenzdatei; // relativ zu `pfad`; leer bei SubmodulOhneLizenzdatei
-    std::size_t zeile     = 0;
+    std::size_t zeile       = 0;
     bool        wohlgeformt = false; // false = die Zeile trug WACHE:, war aber unlesbar
 };
 
@@ -317,9 +317,9 @@ struct LizenzErgebnis {
     std::vector<std::string> skips; // protokollierte Verzichte (nicht ausgecheckt)
 
     // DIE NENNER. Sie gehoeren in die AUSGABE, nicht nur in den Kopf des Autors.
-    std::size_t nenner_gitmodules      = 0;
-    std::size_t nenner_vendor          = 0;
-    std::size_t nenner_spdx            = 0;
+    std::size_t nenner_gitmodules = 0;
+    std::size_t nenner_vendor     = 0;
+    std::size_t nenner_spdx       = 0;
     // Die Grundgesamtheit von nenner_spdx: alle vom Scan angefassten Dateien.
     // "26" allein ist eine nackte Zahl; "26 von 187" traegt seine Herkunft mit.
     std::size_t nenner_code_dateien    = 0;

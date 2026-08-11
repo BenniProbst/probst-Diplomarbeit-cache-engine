@@ -119,23 +119,20 @@ LizenzEingang gesunder_satz() {
     e.notice_vorhanden = true;
     // DATEI ist relativ zur genannten Komponente, <pfad> einer VENDOR-Zeile
     // relativ zu Forschungsarbeiten/code (Grammatik-Block im Header).
-    e.notice_text =
-        "Beispiel-NOTICE\n"
-        "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI LICENSE\n"
-        "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-        "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
-    e.gitmodules_text =
-        "[submodule \"ext/alpha\"]\n"
-        "\tpath = ext/alpha\n"
-        "\turl = ../alpha.git\n"
-        "[submodule \"ext/beta\"]\n"
-        "\tpath = ext/beta\n"
-        "\turl = ../beta.git\n";
-    e.license_text =
-        "                                 Apache License\n"
-        "                           Version 2.0, January 2004\n"
-        "\n"
-        "GELTUNGSBEREICH DIESER LIZENZ -- EIGENCODE, SUBMODULE, VENDORED FORSCHUNGSCODE\n";
+    e.notice_text       = "Beispiel-NOTICE\n"
+                          "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI LICENSE\n"
+                          "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
+                          "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+    e.gitmodules_text   = "[submodule \"ext/alpha\"]\n"
+                          "\tpath = ext/alpha\n"
+                          "\turl = ../alpha.git\n"
+                          "[submodule \"ext/beta\"]\n"
+                          "\tpath = ext/beta\n"
+                          "\turl = ../beta.git\n";
+    e.license_text      = "                                 Apache License\n"
+                          "                           Version 2.0, January 2004\n"
+                          "\n"
+                          "GELTUNGSBEREICH DIESER LIZENZ -- EIGENCODE, SUBMODULE, VENDORED FORSCHUNGSCODE\n";
     e.submodule_am_baum = {
         {"ext/alpha", SubmodulAmBaum{true, {"LICENSE"}}},
         {"ext/beta", SubmodulAmBaum{true, {}}},
@@ -179,15 +176,14 @@ TEST(LizenzKern, GesunderSatzLiefertNULLBefundeUndGRUEN) {
 // gemessen wurde.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, FehlendeNoticeIstRotMitLiteralFehltext) {
-    LizenzEingang e   = gesunder_satz();
-    e.notice_vorhanden = false;
-    e.notice_text      = "";
+    LizenzEingang e        = gesunder_satz();
+    e.notice_vorhanden     = false;
+    e.notice_text          = "";
     const LizenzErgebnis r = pruefe(e);
 
     EXPECT_TRUE(hat_befund(r, BefundArt::NoticeFehlt)) << ergebnis_bericht(r);
     EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("NOTICE fehlt an der Wurzel"));
-    EXPECT_EQ(r.status, WacheStatus::Riss) << "Eine fehlende NOTICE ist ein Riss, kein Gruen.\n"
-                                           << ergebnis_bericht(r);
+    EXPECT_EQ(r.status, WacheStatus::Riss) << "Eine fehlende NOTICE ist ein Riss, kein Gruen.\n" << ergebnis_bericht(r);
 }
 
 // -----------------------------------------------------------------------------
@@ -208,11 +204,10 @@ TEST(LizenzKern, ErfundenerSubmodulEintragIstRot) {
 // Richtung derselben Paarung; ohne sie waere die Wache einseitig.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, EchtesSubmodulOhneNoticeZeileIstRot) {
-    LizenzEingang e = gesunder_satz();
-    e.notice_text =
-        "Beispiel-NOTICE\n"
-        "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-        "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+    LizenzEingang e        = gesunder_satz();
+    e.notice_text          = "Beispiel-NOTICE\n"
+                             "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
+                             "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
     const LizenzErgebnis r = pruefe(e);
 
     EXPECT_TRUE(hat_befund(r, BefundArt::SubmodulOhneNoticeZeile)) << ergebnis_bericht(r);
@@ -225,7 +220,7 @@ TEST(LizenzKern, EchtesSubmodulOhneNoticeZeileIstRot) {
 // zwei Dateien, zwei Aussagen.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, FalscherMarkerIstRot) {
-    LizenzEingang e = gesunder_satz();
+    LizenzEingang e                    = gesunder_satz();
     e.dateiinhalt["ext/alpha/LICENSE"] = "Alpha Dual License\nGanz andere Bedingungen.\n";
     const LizenzErgebnis r             = pruefe(e);
 
@@ -238,10 +233,9 @@ TEST(LizenzKern, FalscherMarkerIstRot) {
 // K5 (Koeder d) -- LICENSE OHNE KLAUSEL-MARKER.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, LicenseOhneKlauselMarkerIstRot) {
-    LizenzEingang e = gesunder_satz();
-    e.license_text =
-        "                                 Apache License\n"
-        "                           Version 2.0, January 2004\n";
+    LizenzEingang e        = gesunder_satz();
+    e.license_text         = "                                 Apache License\n"
+                             "                           Version 2.0, January 2004\n";
     const LizenzErgebnis r = pruefe(e);
 
     EXPECT_TRUE(hat_befund(r, BefundArt::WurzelLizenzOhneKlauselMarker)) << ergebnis_bericht(r);
@@ -258,10 +252,9 @@ TEST(LizenzKern, LicenseOhneKlauselMarkerIstRot) {
 // Klausel-Marker, aber die Lizenz selbst ist ausgetauscht.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, LicenseOhneApacheMarkerIstRot) {
-    LizenzEingang e = gesunder_satz();
-    e.license_text =
-        "GNU GENERAL PUBLIC LICENSE\n"
-        "GELTUNGSBEREICH DIESER LIZENZ -- EIGENCODE, SUBMODULE, VENDORED FORSCHUNGSCODE\n";
+    LizenzEingang e        = gesunder_satz();
+    e.license_text         = "GNU GENERAL PUBLIC LICENSE\n"
+                             "GELTUNGSBEREICH DIESER LIZENZ -- EIGENCODE, SUBMODULE, VENDORED FORSCHUNGSCODE\n";
     const LizenzErgebnis r = pruefe(e);
 
     EXPECT_TRUE(hat_befund(r, BefundArt::WurzelLizenzOhneApacheMarker)) << ergebnis_bericht(r);
@@ -303,9 +296,9 @@ TEST(LizenzKern, VendorZeileOhneProjektAmBaumIstRot) {
 // naechsten eingebrachten Fremdprojekt zuschnappt.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, NeuesVendorProjektOhneNoticeZeileIstRot) {
-    LizenzEingang e                        = gesunder_satz();
-    e.vendor_am_baum["P97-Neu"]            = {"LICENSE"};
-    const LizenzErgebnis r                 = pruefe(e);
+    LizenzEingang e             = gesunder_satz();
+    e.vendor_am_baum["P97-Neu"] = {"LICENSE"};
+    const LizenzErgebnis r      = pruefe(e);
 
     EXPECT_TRUE(hat_befund(r, BefundArt::VendorProjektOhneNoticeZeile)) << ergebnis_bericht(r);
     EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("Vendor-Projekt ohne NOTICE-Zeile: P97-Neu"));
@@ -316,9 +309,9 @@ TEST(LizenzKern, NeuesVendorProjektOhneNoticeZeileIstRot) {
 // K10 -- KEINE-LIZENZDATEI BEHAUPTET, OBWOHL EINE DALIEGT.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, KeineLizenzdateiObwohlEineDaliegtIstRot) {
-    LizenzEingang e                                = gesunder_satz();
-    e.submodule_am_baum["ext/beta"].lizenzdateien  = {"COPYING"};
-    const LizenzErgebnis r                         = pruefe(e);
+    LizenzEingang e                               = gesunder_satz();
+    e.submodule_am_baum["ext/beta"].lizenzdateien = {"COPYING"};
+    const LizenzErgebnis r                        = pruefe(e);
 
     EXPECT_TRUE(hat_befund(r, BefundArt::KeineLizenzdateiObwohlVorhanden)) << ergebnis_bericht(r);
     EXPECT_EQ(r.status, WacheStatus::Riss) << ergebnis_bericht(r);
@@ -330,10 +323,10 @@ TEST(LizenzKern, KeineLizenzdateiObwohlEineDaliegtIstRot) {
 // zweite den Unterschied zwischen "bewusster Verzicht" und "verdeckte Null" macht.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, NichtAusgecheckesWirdNurGepaartUndProtokolliert) {
-    LizenzEingang e                        = gesunder_satz();
-    e.submodule_am_baum["ext/alpha"]       = SubmodulAmBaum{false, {}};
+    LizenzEingang e                  = gesunder_satz();
+    e.submodule_am_baum["ext/alpha"] = SubmodulAmBaum{false, {}};
     e.dateiinhalt.erase("ext/alpha/LICENSE"); // am Baum waere die Datei ebenfalls weg
-    const LizenzErgebnis r                 = pruefe(e);
+    const LizenzErgebnis r = pruefe(e);
 
     EXPECT_EQ(r.status, WacheStatus::Gruen) << "Ein nicht ausgechecktes Submodul darf die Wache NICHT rot "
                                             << "machen -- sonst waere sie auf jedem frischen Klon konstant "
@@ -347,11 +340,10 @@ TEST(LizenzKern, NichtAusgecheckesWirdNurGepaartUndProtokolliert) {
     // T-4-GEGENEINGANG: die PAARUNG gilt weiter. Nimmt man die NOTICE-Zeile des
     // nicht ausgecheckten Submoduls heraus, wird es trotzdem rot.
     LizenzEingang ohne_zeile = e;
-    ohne_zeile.notice_text =
-        "Beispiel-NOTICE\n"
-        "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-        "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
-    const LizenzErgebnis r2 = pruefe(ohne_zeile);
+    ohne_zeile.notice_text   = "Beispiel-NOTICE\n"
+                               "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
+                               "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+    const LizenzErgebnis r2  = pruefe(ohne_zeile);
     EXPECT_TRUE(hat_befund(r2, BefundArt::SubmodulOhneNoticeZeile))
         << "Nicht ausgecheckt heisst NUR: keine Inhaltspruefung. Die Paarung bleibt.\n"
         << ergebnis_bericht(r2);
@@ -364,10 +356,10 @@ TEST(LizenzKern, NichtAusgecheckesWirdNurGepaartUndProtokolliert) {
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, NennerNullIstAbbruchNiemalsGruen) {
     {
-        LizenzEingang e     = gesunder_satz();
-        e.gitmodules_text   = "";
-        e.notice_text       = "Beispiel-NOTICE\n"
-                              "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+        LizenzEingang e        = gesunder_satz();
+        e.gitmodules_text      = "";
+        e.notice_text          = "Beispiel-NOTICE\n"
+                                 "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
         const LizenzErgebnis r = pruefe(e);
         EXPECT_EQ(r.nenner_gitmodules, 0U);
         EXPECT_EQ(r.status, WacheStatus::Abbruch) << "0 .gitmodules-Eintraege: die Paarung waere leer.\n"
@@ -377,10 +369,9 @@ TEST(LizenzKern, NennerNullIstAbbruchNiemalsGruen) {
     {
         LizenzEingang e = gesunder_satz();
         e.vendor_am_baum.clear();
-        e.notice_text =
-            "Beispiel-NOTICE\n"
-            "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI LICENSE\n"
-            "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n";
+        e.notice_text          = "Beispiel-NOTICE\n"
+                                 "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI LICENSE\n"
+                                 "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n";
         const LizenzErgebnis r = pruefe(e);
         EXPECT_EQ(r.nenner_vendor, 0U);
         EXPECT_EQ(r.status, WacheStatus::Abbruch) << ergebnis_bericht(r);
@@ -398,8 +389,8 @@ TEST(LizenzKern, NennerNullIstAbbruchNiemalsGruen) {
         // Die GRUNDGESAMTHEIT selbst. Ein Zaehler von 2 ueber 0 angefassten
         // Dateien ist kein Ergebnis, sondern ein Widerspruch -- und am Baum ist
         // 0 angefasste Dateien genau der Zustand "falsche Wurzel".
-        LizenzEingang e   = gesunder_satz();
-        e.spdx_gescannt   = 0;
+        LizenzEingang e        = gesunder_satz();
+        e.spdx_gescannt        = 0;
         const LizenzErgebnis r = pruefe(e);
         EXPECT_EQ(r.nenner_code_dateien, 0U);
         EXPECT_EQ(r.status, WacheStatus::Abbruch) << ergebnis_bericht(r);
@@ -423,7 +414,7 @@ TEST(LizenzKern, UnlesbareUndZuLangeEintragszeilenSindRot) {
             << ergebnis_bericht(r);
     }
     {
-        LizenzEingang e             = gesunder_satz();
+        LizenzEingang     e = gesunder_satz();
         const std::string langer_pfad(90, 'x');
         e.notice_text += "WACHE: VENDOR " + langer_pfad + " LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
         const LizenzErgebnis r = pruefe(e);
@@ -436,14 +427,14 @@ TEST(LizenzKern, UnlesbareUndZuLangeEintragszeilenSindRot) {
 // ein stiller Parse-Fehler wuerde dort als "alles in Ordnung" erscheinen.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, ParseGitmodulesLiestGenauDiePathZeilen) {
-    const std::string text =
-        "[submodule \"a\"]\n"
-        "\tpath = ext/a\n"
-        "\turl = ../a.git\n"
-        "\tpathologisch = nicht/das\n" // Gegeneingang: Praefix-Treffer darf NICHT zaehlen
-        "# path = auskommentiert/zaehlt/trotzdem\n"
-        "[submodule \"b\"]\n"
-        "\tpath = ext/b\n";
+    const std::string              text  = "[submodule \"a\"]\n"
+                                           "\tpath = ext/a\n"
+                                           "\turl = ../a.git\n"
+                                           // Gegeneingang: Praefix-Treffer darf NICHT zaehlen
+                                           "\tpathologisch = nicht/das\n"
+                                           "# path = auskommentiert/zaehlt/trotzdem\n"
+                                           "[submodule \"b\"]\n"
+                                           "\tpath = ext/b\n";
     const std::vector<std::string> pfade = parse_gitmodules(text);
     // Die Raute ist in .gitmodules KEIN Kommentarzeichen fuer diesen Parser: er
     // liest, was git liest -- und dort beginnt ein Kommentar mit ';' oder '#' am
@@ -452,12 +443,11 @@ TEST(LizenzKern, ParseGitmodulesLiestGenauDiePathZeilen) {
 }
 
 TEST(LizenzKern, ParseNoticeUnterscheidetDieDreiZeilenformen) {
-    const std::string text =
-        "Kopf ohne Marke\n"
-        "WACHE: SUBMODUL p/eins LIZENZ \"M1\" DATEI LICENSE\n"
-        "WACHE: SUBMODUL p/zwei KEINE-LIZENZDATEI\n"
-        "WACHE: VENDOR p-drei LIZENZ \"M3\" DATEI klon/LICENSE\n";
-    const auto e = parse_notice(text);
+    const std::string text = "Kopf ohne Marke\n"
+                             "WACHE: SUBMODUL p/eins LIZENZ \"M1\" DATEI LICENSE\n"
+                             "WACHE: SUBMODUL p/zwei KEINE-LIZENZDATEI\n"
+                             "WACHE: VENDOR p-drei LIZENZ \"M3\" DATEI klon/LICENSE\n";
+    const auto        e    = parse_notice(text);
     ASSERT_EQ(e.size(), 3U);
     EXPECT_EQ(e[0].art, NoticeArt::Submodul);
     EXPECT_EQ(e[0].pfad, "p/eins");
@@ -474,12 +464,11 @@ TEST(LizenzKern, ParseNoticeUnterscheidetDieDreiZeilenformen) {
     // kein Eintrag -- sonst koennte die NOTICE ihre eigene Grammatik nicht
     // erklaeren, ohne die Muster-Zeilen mitzuzaehlen. Am Bautag 11.08. genau so
     // passiert: 6 statt 4 SUBMODUL- und 10 statt 9 VENDOR-Eintraege.
-    const auto eingerueckt = parse_notice(
-        "  WACHE: SUBMODUL <pfad> LIZENZ \"<marker>\" DATEI <relpfad>\n"
-        "\tWACHE: VENDOR <pfad> KEINE-LIZENZDATEI\n"
-        "WACHE: VENDOR echt LIZENZ \"M\" DATEI LICENSE\n");
-    ASSERT_EQ(eingerueckt.size(), 1U) << "Eingerueckte WACHE:-Zeilen sind Text. Gezaehlt wurden "
-                                      << eingerueckt.size() << " Eintrag/Eintraege statt 1.";
+    const auto eingerueckt = parse_notice("  WACHE: SUBMODUL <pfad> LIZENZ \"<marker>\" DATEI <relpfad>\n"
+                                          "\tWACHE: VENDOR <pfad> KEINE-LIZENZDATEI\n"
+                                          "WACHE: VENDOR echt LIZENZ \"M\" DATEI LICENSE\n");
+    ASSERT_EQ(eingerueckt.size(), 1U) << "Eingerueckte WACHE:-Zeilen sind Text. Gezaehlt wurden " << eingerueckt.size()
+                                      << " Eintrag/Eintraege statt 1.";
     EXPECT_EQ(eingerueckt[0].pfad, "echt");
 
     // GEGENEINGANG: ein LEERER Marker ist unlesbar, nicht "immer gefunden".
@@ -511,16 +500,15 @@ TEST(LizenzKern, NoticeDarfNurEineWIRKLICHELizenzdateiBenennen) {
     // Vendor-Richtung.
     {
         LizenzEingang e = gesunder_satz();
-        e.notice_text =
-            "Beispiel-NOTICE\n"
-            "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI LICENSE\n"
-            "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-            "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/README.md\n";
+        e.notice_text   = "Beispiel-NOTICE\n"
+                          "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI LICENSE\n"
+                          "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
+                          "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/README.md\n";
         // Die benannte Datei EXISTIERT und traegt den Marker sogar -- sie ist nur
         // keine Lizenzdatei. Ohne die Bindung waere genau das gruen.
         e.dateiinhalt["Forschungsarbeiten/code/P99-Gamma/klon/README.md"] = "Gamma License steht hier im Fliesstext.\n";
         e.dateiinhalt["Forschungsarbeiten/code/P99-Gamma/klon/LICENSE"]   = "Delta License\nGanz andere Lizenz.\n";
-        const LizenzErgebnis r = pruefe(e);
+        const LizenzErgebnis r                                            = pruefe(e);
 
         EXPECT_TRUE(hat_befund(r, BefundArt::NoticeDateiIstKeineLizenzdatei)) << ergebnis_bericht(r);
         EXPECT_THAT(ergebnis_bericht(r), testing::HasSubstr("aber dort liegt als Lizenzdatei: klon/LICENSE"));
@@ -534,12 +522,11 @@ TEST(LizenzKern, NoticeDarfNurEineWIRKLICHELizenzdateiBenennen) {
     // Reviewer genau hier "DATEI NOTICE" fuer die cache-engine durchbekommen --
     // ce/NOTICE behauptet Apache, ce/LICENSE daneben "Dual License".
     {
-        LizenzEingang e = gesunder_satz();
-        e.notice_text =
-            "Beispiel-NOTICE\n"
-            "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI NOTICE\n"
-            "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-            "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+        LizenzEingang e                   = gesunder_satz();
+        e.notice_text                     = "Beispiel-NOTICE\n"
+                                            "WACHE: SUBMODUL ext/alpha LIZENZ \"Alpha Public License\" DATEI NOTICE\n"
+                                            "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
+                                            "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
         e.dateiinhalt["ext/alpha/NOTICE"] = "Alpha Public License, behauptet das NOTICE.\n";
         const LizenzErgebnis r            = pruefe(e);
 
@@ -551,9 +538,9 @@ TEST(LizenzKern, NoticeDarfNurEineWIRKLICHELizenzdateiBenennen) {
     // fragt "ist es EINE davon", nicht "ist es die erste" -- sonst waere die
     // cache-engine (LICENSE + LICENSE_AUDIT_EXT.md) falsch rot.
     {
-        LizenzEingang e                              = gesunder_satz();
+        LizenzEingang e                                = gesunder_satz();
         e.submodule_am_baum["ext/alpha"].lizenzdateien = {"COPYING", "LICENSE"};
-        const LizenzErgebnis r                       = pruefe(e);
+        const LizenzErgebnis r                         = pruefe(e);
         EXPECT_EQ(r.status, WacheStatus::Gruen) << "LICENSE ist eine der beiden Lizenzdateien -- das ist "
                                                 << "keine Abweichung.\n"
                                                 << ergebnis_bericht(r);
@@ -574,12 +561,11 @@ TEST(LizenzKern, NoticeDarfNurEineWIRKLICHELizenzdateiBenennen) {
 TEST(LizenzKern, MarkerOhneAussagekraftIstRot) {
     // (a) Der gewuerfelte Fall: ein Leerzeichen.
     {
-        LizenzEingang e = gesunder_satz();
-        e.notice_text =
-            "Beispiel-NOTICE\n"
-            "WACHE: SUBMODUL ext/alpha LIZENZ \" \" DATEI LICENSE\n"
-            "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-            "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+        LizenzEingang e        = gesunder_satz();
+        e.notice_text          = "Beispiel-NOTICE\n"
+                                 "WACHE: SUBMODUL ext/alpha LIZENZ \" \" DATEI LICENSE\n"
+                                 "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
+                                 "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
         const LizenzErgebnis r = pruefe(e);
         EXPECT_TRUE(hat_befund(r, BefundArt::MarkerOhneAussagekraft)) << ergebnis_bericht(r);
         EXPECT_EQ(r.status, WacheStatus::Riss) << ergebnis_bericht(r);
@@ -590,12 +576,11 @@ TEST(LizenzKern, MarkerOhneAussagekraftIstRot) {
     }
     // (b) Der zweite Fall derselben Klasse: ein ueberall vorkommender Baustein.
     {
-        LizenzEingang e = gesunder_satz();
-        e.notice_text =
-            "Beispiel-NOTICE\n"
-            "WACHE: SUBMODUL ext/alpha LIZENZ \"License\" DATEI LICENSE\n"
-            "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
-            "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
+        LizenzEingang e                    = gesunder_satz();
+        e.notice_text                      = "Beispiel-NOTICE\n"
+                                             "WACHE: SUBMODUL ext/alpha LIZENZ \"License\" DATEI LICENSE\n"
+                                             "WACHE: SUBMODUL ext/beta KEINE-LIZENZDATEI\n"
+                                             "WACHE: VENDOR P99-Gamma LIZENZ \"Gamma License\" DATEI klon/LICENSE\n";
         e.dateiinhalt["ext/alpha/LICENSE"] = "Irgendeine License steht hier.\n";
         const LizenzErgebnis r             = pruefe(e);
         EXPECT_TRUE(hat_befund(r, BefundArt::MarkerOhneAussagekraft)) << ergebnis_bericht(r);
@@ -619,9 +604,9 @@ TEST(LizenzKern, MarkerOhneAussagekraftIstRot) {
     // T-4-GEGENEINGANG: die ELF Marker, die am Objekt wirklich in NOTICE stehen,
     // muessen ALLE durchkommen. Eine Untergrenze, die den Bestand schneidet,
     // waere keine Haertung, sondern ein Dauer-Rotstand.
-    for (const char* echt : {"Comdare Cache Engine -- Dual License", "Apache License", "ISC License",
-                             "an MIT license, plus a clause", "GNU GENERAL PUBLIC LICENSE", "MIT License",
-                             "LGPL-2.1-or-later"}) {
+    for (const char* echt :
+         {"Comdare Cache Engine -- Dual License", "Apache License", "ISC License", "an MIT license, plus a clause",
+          "GNU GENERAL PUBLIC LICENSE", "MIT License", "LGPL-2.1-or-later"}) {
         EXPECT_TRUE(marker_ist_aussagekraeftig(echt)) << "Marker am Objekt in Gebrauch: \"" << echt << "\"";
     }
 }
@@ -693,20 +678,18 @@ TEST(LizenzKern, ZweiteZeileZumSelbenPfadIstRot) {
 // ueber eine Datei, die es im Repo gar nicht gibt.
 // -----------------------------------------------------------------------------
 TEST(LizenzKern, SkipListeKommtAusDerGitignoreUndDecktDieCiBauverzeichnisse) {
-    const GitignoreMuster m = parse_gitignore(
-        "# Build\n"
-        "build/\n"
-        "build-*/\n"
-        "cmake-build-*/\n"
-        "_runs/\n"
-        "\n"
-        "# IDE\n"
-        ".vscode/\n"
-        "*.swp\n"       // Dateimuster: nicht Gegenstand, faellt still heraus
-        "*.user\n"
-        "Thumbs.db\n");
-    EXPECT_THAT(m.verzeichnisse,
-                testing::ElementsAre("build", "build-*", "cmake-build-*", "_runs", ".vscode"));
+    const GitignoreMuster m = parse_gitignore("# Build\n"
+                                              "build/\n"
+                                              "build-*/\n"
+                                              "cmake-build-*/\n"
+                                              "_runs/\n"
+                                              "\n"
+                                              "# IDE\n"
+                                              ".vscode/\n"
+                                              "*.swp\n" // Dateimuster: nicht Gegenstand, faellt still heraus
+                                              "*.user\n"
+                                              "Thumbs.db\n");
+    EXPECT_THAT(m.verzeichnisse, testing::ElementsAre("build", "build-*", "cmake-build-*", "_runs", ".vscode"));
     EXPECT_EQ(m.unverstanden.size(), 0U) << "Diese fuenf Muster sind alle in der unterstuetzten Form.";
 
     // Die CI-Bauverzeichnisse, WOERTLICH aus .gitlab-ci.yml:1037 und :1082.
@@ -899,8 +882,8 @@ TEST_F(LizenzAmObjekt, LeererBaumIstAbbruchUndNichtGruen) {
 // Test laeuft. Er ist damit kein Laborfall, sondern der Normalfall.
 // -----------------------------------------------------------------------------
 TEST_F(LizenzAmObjekt, SpdxNennerNenntSeineGrundgesamtheitUndJedenUebersprungenenPfad) {
-    ASSERT_GT(eingang_->spdx_gescannt, 0U) << "FAIL-CLOSED: der SPDX-Scan hat unter " << wurzel_
-                                           << "/Code keine einzige Datei angefasst.";
+    ASSERT_GT(eingang_->spdx_gescannt, 0U)
+        << "FAIL-CLOSED: der SPDX-Scan hat unter " << wurzel_ << "/Code keine einzige Datei angefasst.";
     EXPECT_LE(eingang_->spdx_funde.size(), eingang_->spdx_gescannt)
         << "NENNER: " << eingang_->spdx_funde.size() << " SPDX-tragende von " << eingang_->spdx_gescannt
         << " gescannten Dateien -- der Zaehler kann seine Grundgesamtheit nicht ueberschreiten.";
