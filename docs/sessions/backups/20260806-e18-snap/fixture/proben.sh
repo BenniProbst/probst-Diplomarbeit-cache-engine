@@ -109,7 +109,8 @@ neue_tabellen "$R/w_retry" "Lauf 1"
 env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development \
     AF_DEST_REPO="$R/d_retry" AF_WORK_ROOT="$R/w_retry" "$H/core_alt.sh" > "$H/h1_alt.log" 2>&1
 pruef "ALT: Beleg nach Retry" "$(find "$R/w_retry/measurement" -name QUELLSTAND.txt | wc -l)" "0"
-grep -q "IDEMPOTENT: 0 Aenderungen -> kein Commit" "$H/h1_alt.log" && ok "ALT bricht vor dem Compile ab (Beleg dauerhaft verloren)"
+grep -q "IDEMPOTENT: 0 Aenderungen -> kein Commit" "$H/h1_alt.log" && ok \
+    "ALT bricht vor dem Compile ab (Beleg dauerhaft verloren)"
 lauf AF_DEST_REPO="$R/d_retry" AF_WORK_ROOT="$R/w_retry" > "$H/h1_neu.log"
 pruef "NEU: Beleg nach Retry nachgeholt" "$(find "$R/w_retry/measurement" -name QUELLSTAND.txt | wc -l)" "1"
 Q=$(find "$R/w_retry/measurement" -name QUELLSTAND.txt | head -1)
@@ -127,7 +128,8 @@ git -C "$R/w_remote" checkout -q "$(git -C "$R/w_remote" rev-parse HEAD~1)"
 neue_tabellen "$R/w_remote" "Lauf 1"
 pruef "REMOTE-Zweig: lokal KEIN Beleg sichtbar" "$(find "$R/w_remote/measurement" -name QUELLSTAND.txt | wc -l)" "0"
 lauf AF_DEST_REPO="$R/d_retry" AF_WORK_ROOT="$R/w_remote" > "$H/h1_remote.log"
-grep -q "Beleg im REMOTE-Stand vorhanden" "$H/h1_remote.log" && ok "Beleg im REMOTE-Stand erkannt -> kein Doppel-Compile"
+grep -q "Beleg im REMOTE-Stand vorhanden" "$H/h1_remote.log" && ok \
+    "Beleg im REMOTE-Stand erkannt -> kein Doppel-Compile"
 
 # ------------------------------------------------------------------ HOCH-2: Kollision
 kopf "HOCH-2  Kollisions-Wahl gegen lokal + REMOTE + mkdir-Lock"
@@ -139,7 +141,8 @@ KENN=r42-j4242
 TS=20260806-130000
 git clone -q -b development "$R/super.git" "$R/w_push"
 mkdir -p "$R/w_push/measurement/thesis_compiles/$TS-$KENN"
-printf 'thesis_commit_sha=cafebabecafebabecafebabecafebabecafebabe\n' > "$R/w_push/measurement/thesis_compiles/$TS-$KENN/QUELLSTAND.txt"
+printf 'thesis_commit_sha=cafebabecafebabecafebabecafebabecafebabe\n' > \
+    "$R/w_push/measurement/thesis_compiles/$TS-$KENN/QUELLSTAND.txt"
 printf 'PDF eines FREMDEN Runners\n' > "$R/w_push/measurement/thesis_compiles/$TS-$KENN/diplomarbeit.pdf"
 # Derselbe Fremd-Beleg zusaetzlich unter dem ALTEN Namensschema (nur Zeitstempel) -- die
 # ALT-Gegenprobe unten waehlt genau diesen Namen und laeuft damit in den add/add-Konflikt.
@@ -152,7 +155,8 @@ git clone -q -b development "$R/super.git" "$R/w_koll"
 git -C "$R/w_koll" checkout -q "$(git -C "$R/w_koll" rev-parse HEAD~1)"   # kennt den fremden Ordner NICHT
 neue_tabellen "$R/w_koll" "Lauf Kollision"
 git clone -q -b development "$R/dest.git" "$R/d_koll"
-E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/d_koll" AF_WORK_ROOT="$R/w_koll" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true > "$H/h2_remote.log"
+E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/d_koll" AF_WORK_ROOT="$R/w_koll" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true > \
+    "$H/h2_remote.log"
 grep -q "existiert bereits im REMOTE-Stand" "$H/h2_remote.log" && ok "REMOTE-Belegung erkannt"
 pruef "Suffix gewachsen" "$([ -d "$R/w_koll/measurement/thesis_compiles/$TS-$KENN-2" ] && echo ja || echo nein)" "ja"
 # Gegenprobe ALT: waehlt den belegten Namen -> add/add-Konflikt beim 288-Merge
@@ -161,14 +165,17 @@ git -C "$R/w_koll_alt" checkout -q "$(git -C "$R/w_koll_alt" rev-parse HEAD~1)"
 neue_tabellen "$R/w_koll_alt" "Lauf Kollision"
 git clone -q -b development "$R/dest.git" "$R/d_koll_alt"
 env E18_FIXED_TS=$TS AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_NO_PUSH=true \
-    AF_PROV_SUPER_REF=development AF_DEST_REPO="$R/d_koll_alt" AF_WORK_ROOT="$R/w_koll_alt" "$H/core_alt.sh" > "$H/h2_alt.log" 2>&1
-pruef "ALT waehlt den belegten Namen" "$([ -d "$R/w_koll_alt/measurement/thesis_compiles/$TS" ] && echo ja || echo nein)" "ja"
+    AF_PROV_SUPER_REF=development AF_DEST_REPO="$R/d_koll_alt" AF_WORK_ROOT="$R/w_koll_alt" "$H/core_alt.sh" > \
+        "$H/h2_alt.log" 2>&1
+pruef "ALT waehlt den belegten Namen" \
+    "$([ -d "$R/w_koll_alt/measurement/thesis_compiles/$TS" ] && echo ja || echo nein)" "ja"
 git -C "$R/w_koll_alt" add -A -- measurement >/dev/null
 git -C "$R/w_koll_alt" -c user.name=f -c user.email=f@l commit -q -m "unser Beleg"
 git -C "$R/w_koll_alt" fetch -q origin development
 git -C "$R/w_koll_alt" -c user.name=f -c user.email=f@l merge --no-edit origin/development > "$H/h2_merge.log" 2>&1
 pruef "ALT: 288-Merge des Writebacks" "$?" "1"
-grep -q "CONFLICT (add/add)" "$H/h2_merge.log" && ok "add/add-Konflikt literal -> der Writeback-Retry haette abgebrochen (Beleg weg)"
+grep -q "CONFLICT (add/add)" "$H/h2_merge.log" && ok \
+    "add/add-Konflikt literal -> der Writeback-Retry haette abgebrochen (Beleg weg)"
 git -C "$R/w_koll_alt" merge --abort 2>/dev/null
 # mkdir-Lock: haengender Symlink auf dem .tmp-Namen -> [ -e ] ist FALSE, mkdir scheitert trotzdem
 # (wie beim verlorenen Rennen). Seit NB2 wird im versteckten ".<name>.tmp" gearbeitet -- der Lock
@@ -178,9 +185,11 @@ git clone -q -b development "$R/super.git" "$R/w_lock"; neue_tabellen "$R/w_lock
 git clone -q -b development "$R/dest.git" "$R/d_lock"
 mkdir -p "$R/w_lock/measurement/thesis_compiles"
 ln -s /nicht/vorhanden "$R/w_lock/measurement/thesis_compiles/.$TS2-$KENN.tmp"
-E18_FIXED_TS=$TS2 lauf AF_DEST_REPO="$R/d_lock" AF_WORK_ROOT="$R/w_lock" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true > "$H/h2_lock.log"
+E18_FIXED_TS=$TS2 lauf AF_DEST_REPO="$R/d_lock" AF_WORK_ROOT="$R/w_lock" AF_SNAP_LAUF_KENNUNG="$KENN" AF_NO_PUSH=true \
+    > "$H/h2_lock.log"
 grep -q "mkdir-Lock verloren" "$H/h2_lock.log" && ok "mkdir-Lock-Zweig genommen"
-pruef "Lock-Fall weicht auf Suffix aus" "$([ -d "$R/w_lock/measurement/thesis_compiles/$TS2-$KENN-2" ] && echo ja || echo nein)" "ja"
+pruef "Lock-Fall weicht auf Suffix aus" \
+    "$([ -d "$R/w_lock/measurement/thesis_compiles/$TS2-$KENN-2" ] && echo ja || echo nein)" "ja"
 # zwei ECHT parallele Laeufe, fixer Zeitstempel, ERZWUNGEN gleiche Kennung, gemeinsame Wurzel:
 # so entscheidet allein der atomare Lock -- genau der Gurt, der auch nach NB2 bestehen bleibt.
 TS3=20260806-150000
@@ -221,7 +230,8 @@ vorher_liste "$R/w_nff_alt/measurement/thesis_compiles" "$H/h3a_vor.txt"
 env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development AF_PUSH_RETRIES=3 \
     AF_DEST_REPO="$R/d_nff_alt" AF_WORK_ROOT="$R/w_nff_alt" "$H/core_alt.sh" > "$H/h3_alt.log" 2>&1
 QA=$(neuer_beleg "$R/w_nff_alt/measurement/thesis_compiles" "$H/h3a_vor.txt")
-if [ "$(grep '^thesis_commit_sha=' "$QA/QUELLSTAND.txt" | cut -d= -f2)" != "$(git -C "$R/dest.git" rev-parse development)" ]; then
+if [ "$(grep '^thesis_commit_sha=' "$QA/QUELLSTAND.txt" | cut -d= -f2)" != \
+    "$(git -C "$R/dest.git" rev-parse development)" ]; then
   ok "ALT dokumentiert einen Commit, der so nie auf dem Branch stand (Divergenz)"
 else nok "ALT haette divergent sein muessen"; fi
 
@@ -241,14 +251,16 @@ env PATH="$H/bin_cpfail:$PATH" AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_
     AF_SNAPSHOT_ROOT="$R/w_err/snap_neu" "$CORE" > "$H/m1_neu.log" 2>&1
 pruef "NEU: RC bei Schreibfehler" "$?" "1"
 pruef "NEU legt NICHTS ab" "$(find "$R/w_err/snap_neu" -type f 2>/dev/null | wc -l)" "0"
-pruef "NEU committet auch nichts" "$(git -C "$R/d_err_neu" rev-parse HEAD)" "$(git -C "$R/dest.git" rev-parse development)"
+pruef "NEU committet auch nichts" "$(git -C "$R/d_err_neu" rev-parse HEAD)" \
+    "$(git -C "$R/dest.git" rev-parse development)"
 
 # ------------------------------------------------------------------ MITTEL-2 + Commit-Text
 kopf "MITTEL-2  AF_SNAPSHOT_ROOT-Override: der Writeback stagt den GEWAEHLTEN Pfad"
 git clone -q -b development "$R/super.git" "$R/w_ovr"; neue_tabellen "$R/w_ovr" "Lauf Override"
 git clone -q -b development "$R/dest.git" "$R/d_ovr"
 export SNAP_DIR="measurement/eigene_beleg_wurzel"
-lauf AF_DEST_REPO="$R/d_ovr" AF_WORK_ROOT="$R/w_ovr" AF_SNAPSHOT_ROOT="$R/w_ovr/$SNAP_DIR" AF_NO_PUSH=true > "$H/m2_kern.log"
+lauf AF_DEST_REPO="$R/d_ovr" AF_WORK_ROOT="$R/w_ovr" AF_SNAPSHOT_ROOT="$R/w_ovr/$SNAP_DIR" AF_NO_PUSH=true > \
+    "$H/m2_kern.log"
 git -C "$R/w_ovr" config user.name f; git -C "$R/w_ovr" config user.email f@l
 export NEW_THESIS_SHA=$(git -C "$R/d_ovr" rev-parse HEAD)
 wb "$H/wb_neu.sh" "$R/w_ovr" > "$H/m2_neu.log"
@@ -261,14 +273,16 @@ git clone -q -b development "$R/dest.git" "$R/d_ovr_alt"
 # Der Klon traegt den bereits gelandeten Beleg des NEU-Laufs -- gefragt ist der Ordner, den DIESER
 # Lauf anlegt. Darum Vorher/Nachher-Differenz statt "irgendein Ordner".
 vorher_liste "$R/w_ovr_alt/$SNAP_DIR" "$H/m2a_vor.txt"
-lauf AF_DEST_REPO="$R/d_ovr_alt" AF_WORK_ROOT="$R/w_ovr_alt" AF_SNAPSHOT_ROOT="$R/w_ovr_alt/$SNAP_DIR" AF_NO_PUSH=true > "$H/m2_kern_alt.log"
+lauf AF_DEST_REPO="$R/d_ovr_alt" AF_WORK_ROOT="$R/w_ovr_alt" AF_SNAPSHOT_ROOT="$R/w_ovr_alt/$SNAP_DIR" AF_NO_PUSH=true \
+    > "$H/m2_kern_alt.log"
 NEUSTER=$(basename "$(neuer_beleg "$R/w_ovr_alt/$SNAP_DIR" "$H/m2a_vor.txt")")
 git -C "$R/w_ovr_alt" config user.name f; git -C "$R/w_ovr_alt" config user.email f@l
 export NEW_THESIS_SHA=$(git -C "$R/d_ovr_alt" rev-parse HEAD)
 wb "$H/wb_alt.sh" "$R/w_ovr_alt" > "$H/m2_alt.log"
 pruef "ALT: derselbe Beleg im Remote" \
   "$(git -C "$R/super.git" ls-tree -r --name-only development | grep -c "$NEUSTER")" "0"
-grep -q '+ Compile-Schnappschuss' "$H/m2_alt.log" && ok "ALT-Commit-Text behauptet einen Schnappschuss, der nicht drin ist"
+grep -q '+ Compile-Schnappschuss' "$H/m2_alt.log" && ok \
+    "ALT-Commit-Text behauptet einen Schnappschuss, der nicht drin ist"
 
 kopf "patch:76  Vollstaendigkeits-Wache im Writeback"
 unset SNAP_DIR
@@ -334,19 +348,23 @@ roll_dest() { git clone -q -b development "$R/dest.git" "$1"
   printf 'FREMD-INHALT-T3 (unversioniert)\n' > "$1/anhang/de/tabellen/T3.tex"
   printf 'nie angefasst\n'                   > "$1/anhang/de/tabellen/FREMD.txt"; }
 roll_dest "$R/d_roll"
-perl -0pi -e 's|\\end\{document\}|\\InputIfFileExists{anhang/de/tabellen/T2.tex}{}{}\n\\end{document}|' "$R/d_roll/diplomarbeit.tex"
+perl -0pi -e 's|\\end\{document\}|\\InputIfFileExists{anhang/de/tabellen/T2.tex}{}{}\n\\end{document}|' \
+    "$R/d_roll/diplomarbeit.tex"
 git -C "$R/d_roll" -c user.name=f -c user.email=f@l commit -q -am "T2 wird eingebunden"
 git -C "$R/d_roll" push -q origin development
 T3VOR=$(sha256sum < "$R/d_roll/anhang/de/tabellen/T3.tex" | cut -d' ' -f1)
 lauf AF_DEST_REPO="$R/d_roll" AF_WORK_ROOT="$R/w_roll" AF_NO_PUSH=true > "$H/m3_neu.log"
 pruef "NEU: RC bei rotem PDF-Gate" "$?" "1"
-pruef "NEU: fremde T3.tex erhalten" "$(sha256sum < "$R/d_roll/anhang/de/tabellen/T3.tex" 2>/dev/null | cut -d' ' -f1)" "$T3VOR"
-pruef "NEU: selbst angelegte T2.tex entfernt" "$([ -e "$R/d_roll/anhang/de/tabellen/T2.tex" ] && echo da || echo weg)" "weg"
+pruef "NEU: fremde T3.tex erhalten" "$(sha256sum < "$R/d_roll/anhang/de/tabellen/T3.tex" 2>/dev/null | cut -d' ' -f1)" \
+    "$T3VOR"
+pruef "NEU: selbst angelegte T2.tex entfernt" "$([ -e "$R/d_roll/anhang/de/tabellen/T2.tex" ] && echo da || echo weg)" \
+    "weg"
 pruef "NEU: unbeteiligte FREMD.txt unangetastet" "$(cat "$R/d_roll/anhang/de/tabellen/FREMD.txt")" "nie angefasst"
 roll_dest "$R/d_roll_alt"
 env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_NO_PUSH=true AF_PROV_SUPER_REF=development \
     AF_DEST_REPO="$R/d_roll_alt" AF_WORK_ROOT="$R/w_roll" "$H/core_alt.sh" > "$H/m3_alt.log" 2>&1
-pruef "ALT: fremde T3.tex" "$([ -e "$R/d_roll_alt/anhang/de/tabellen/T3.tex" ] && echo da || echo GELOESCHT)" "GELOESCHT"
+pruef "ALT: fremde T3.tex" "$([ -e "$R/d_roll_alt/anhang/de/tabellen/T3.tex" ] && echo da || echo GELOESCHT)" \
+    "GELOESCHT"
 
 # ------------------------------------------------------------------ Grenzen unveraendert
 kopf "Grenzen unveraendert (Regression)"
@@ -355,22 +373,29 @@ git clone -q -b development "$R/dest.git" "$R/d_off"
 VOR=$(find "$R/w_off/measurement/thesis_compiles" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
 env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=off AF_NO_PUSH=true AF_PROV_SUPER_REF=development \
     AF_DEST_REPO="$R/d_off" AF_WORK_ROOT="$R/w_off" "$CORE" > "$H/g_off.log" 2>&1
-grep -q "KEIN Schnappschuss -- das PDF-Gate hat nicht gebaut" "$H/g_off.log" && ok "ohne Compile kein Beleg, literal begruendet"
-pruef "Ordnerzahl unveraendert" "$(find "$R/w_off/measurement/thesis_compiles" -mindepth 1 -maxdepth 1 -type d | wc -l)" "$VOR"
+grep -q "KEIN Schnappschuss -- das PDF-Gate hat nicht gebaut" "$H/g_off.log" && ok \
+    "ohne Compile kein Beleg, literal begruendet"
+pruef "Ordnerzahl unveraendert" \
+    "$(find "$R/w_off/measurement/thesis_compiles" -mindepth 1 -maxdepth 1 -type d | wc -l)" "$VOR"
 git clone -q -b development "$R/super.git" "$R/w_leer"; git clone -q -b development "$R/dest.git" "$R/d_leer"
-lauf AF_DEST_REPO="$R/d_leer" AF_WORK_ROOT="$R/w_leer" AF_SNAPSHOT_ROOT=/tmp/e18snap-nie AF_NO_PUSH=true > "$H/g_leer.log"
+lauf AF_DEST_REPO="$R/d_leer" AF_WORK_ROOT="$R/w_leer" AF_SNAPSHOT_ROOT=/tmp/e18snap-nie AF_NO_PUSH=true > \
+    "$H/g_leer.log"
 grep -q "NO-OP: keine Anhang-Quelle" "$H/g_leer.log" && ok "honest-empty unveraendert"
 pruef "honest-empty legt keine Wurzel an" "$([ -e /tmp/e18snap-nie ] && echo ja || echo nein)" "nein"
 git clone -q -b development "$R/super.git" "$R/w_aus"; neue_tabellen "$R/w_aus" "Lauf ausserhalb"
 git clone -q -b development "$R/dest.git" "$R/d_aus"
 rm -rf /tmp/e18snap-ausserhalb
-lauf AF_DEST_REPO="$R/d_aus" AF_WORK_ROOT="$R/w_aus" AF_SNAPSHOT_ROOT=/tmp/e18snap-ausserhalb/beleg AF_NO_PUSH=true > "$H/g_aus.log"
+lauf AF_DEST_REPO="$R/d_aus" AF_WORK_ROOT="$R/w_aus" AF_SNAPSHOT_ROOT=/tmp/e18snap-ausserhalb/beleg AF_NO_PUSH=true > \
+    "$H/g_aus.log"
 # SEIT NB2 ist das kein blosser Hinweis mehr, sondern ein VERTRAGSBRUCH mit lautem Abbruch: eine
 # Wurzel, die der 288-Writeback nie committen kann, darf keinen gruenen Job erzeugen (Codex MITTEL-2).
 pruef "Wurzel ausserhalb eines Arbeitsbaums: RC" "$?" "1"
-grep -q "liegt in KEINEM git-Arbeitsbaum" "$H/g_aus.log" && ok "Wurzel ausserhalb eines Arbeitsbaums: literal gemeldet, kein stiller Teil-Schutz"
-grep -q "AF_SNAPSHOT_ROOT-Vertrag VERLETZT" "$H/g_aus.log" && ok "Vertragsbruch fuehrt zum Abbruch statt zu stillem Gruen"
-pruef "kein Beleg ausserhalb des 288-Baums" "$([ -e /tmp/e18snap-ausserhalb/beleg/QUELLSTAND.txt ] && echo ja || echo nein)" "nein"
+grep -q "liegt in KEINEM git-Arbeitsbaum" "$H/g_aus.log" && ok \
+    "Wurzel ausserhalb eines Arbeitsbaums: literal gemeldet, kein stiller Teil-Schutz"
+grep -q "AF_SNAPSHOT_ROOT-Vertrag VERLETZT" "$H/g_aus.log" && ok \
+    "Vertragsbruch fuehrt zum Abbruch statt zu stillem Gruen"
+pruef "kein Beleg ausserhalb des 288-Baums" \
+    "$([ -e /tmp/e18snap-ausserhalb/beleg/QUELLSTAND.txt ] && echo ja || echo nein)" "nein"
 
 echo
 if [ "$FEHLER" -eq 0 ]; then echo "=== PROBEN GRUEN: alle Pfade belegt (0 Abweichungen) ==="; exit 0; fi

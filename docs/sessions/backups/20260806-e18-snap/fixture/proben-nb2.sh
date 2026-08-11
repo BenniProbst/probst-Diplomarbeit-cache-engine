@@ -49,7 +49,10 @@ cat > "$H/bin_mkdirfail/mkdir" <<'EOF'
 # Faellt NUR fuer den versteckten .tmp-Ordner um -- und legt ihn NICHT an. Genau so sieht
 # EACCES/ENOSPC aus: der Pfad existiert hinterher nicht, es ist KEINE Kollision.
 for a in "$@"; do last="$a"; done
-case "$last" in *.tmp) echo "mkdir: cannot create directory '$last': Permission denied (PROBEN-SHIM)" >&2; exit 1 ;; esac
+case "$last" in *.tmp)
+  echo "mkdir: cannot create directory '$last': Permission denied (PROBEN-SHIM)" >&2
+  exit 1 ;;
+esac
 exec /bin/mkdir "$@"
 EOF
 cat > "$H/bin_cptmpfail/cp" <<'EOF'
@@ -119,8 +122,10 @@ tabellen_wie_branch() { # $1 = work-root, $2 = dest-Klon
     cp "$2/anhang/$l/tabellen/"*.tex "$1/Code/measure_out/appendix/$l/tabellen/" 2>/dev/null || true
   done
 }
-lauf()     { env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development "$@" "$CORE" 2>&1; }
-lauf_alt() { env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development "$@" "$H/core_alt.sh" 2>&1; }
+lauf()     { env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development "$@" \
+    "$CORE" 2>&1; }
+lauf_alt() { env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=on AF_PROV_SUPER_REF=development "$@" \
+    "$H/core_alt.sh" 2>&1; }
 snapdirs() { find "$1" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort; }
 
 bash "$(dirname "${BASH_SOURCE[0]}")/setup.sh" > /dev/null
@@ -149,17 +154,24 @@ git clone -q -b development "$R/dest.git" "$R/n1_dAltA"; git clone -q -b develop
 for w in A B; do
   E18_FIXED_TS=$TS lauf_alt AF_DEST_REPO="$R/n1_dAlt$w" AF_WORK_ROOT="$R/n1_alt$w" AF_NO_PUSH=true > "$H/n1_alt$w.log"
 done
-pruef "ALT: getrennte Runner waehlen denselben Ordnernamen" \
-  "$( { [ -d "$R/n1_altA/measurement/thesis_compiles/$TS" ] && [ -d "$R/n1_altB/measurement/thesis_compiles/$TS" ]; } && echo ja || echo nein)" "ja"
+_n1_beide=nein
+if [ -d "$R/n1_altA/measurement/thesis_compiles/$TS" ] \
+   && [ -d "$R/n1_altB/measurement/thesis_compiles/$TS" ]; then
+  _n1_beide=ja
+fi
+pruef "ALT: getrennte Runner waehlen denselben Ordnernamen" "$_n1_beide" "ja"
 echo "   (genau daraus wurde beim 288-Merge ein add/add-Konflikt = verlorener Beleg -- Codex HOCH-2)"
 
 kopf "NB2-1b  Gurt bleibt: bei ERZWUNGEN gleicher Kennung waechst weiterhin ein Suffix"
 git clone -q -b development "$R/super.git" "$R/n1b_work"; neue_tabellen "$R/n1b_work" "NB2-1b"
 git clone -q -b development "$R/dest.git" "$R/n1b_d1"; git clone -q -b development "$R/dest.git" "$R/n1b_d2"
-E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/n1b_d1" AF_WORK_ROOT="$R/n1b_work" AF_SNAP_LAUF_KENNUNG="r1-j1" AF_NO_PUSH=true > "$H/n1b_1.log"
-E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/n1b_d2" AF_WORK_ROOT="$R/n1b_work" AF_SNAP_LAUF_KENNUNG="r1-j1" AF_NO_PUSH=true > "$H/n1b_2.log"
+E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/n1b_d1" AF_WORK_ROOT="$R/n1b_work" AF_SNAP_LAUF_KENNUNG="r1-j1" AF_NO_PUSH=true \
+    > "$H/n1b_1.log"
+E18_FIXED_TS=$TS lauf AF_DEST_REPO="$R/n1b_d2" AF_WORK_ROOT="$R/n1b_work" AF_SNAP_LAUF_KENNUNG="r1-j1" AF_NO_PUSH=true \
+    > "$H/n1b_2.log"
 pruef "erster Ordner" "$([ -d "$R/n1b_work/measurement/thesis_compiles/$TS-r1-j1" ] && echo ja || echo nein)" "ja"
-pruef "zweiter Ordner mit Suffix -2" "$([ -d "$R/n1b_work/measurement/thesis_compiles/$TS-r1-j1-2" ] && echo ja || echo nein)" "ja"
+pruef "zweiter Ordner mit Suffix -2" \
+    "$([ -d "$R/n1b_work/measurement/thesis_compiles/$TS-r1-j1-2" ] && echo ja || echo nein)" "ja"
 hat "$H/n1b_2.log" "existiert LOKAL -> naechstes Suffix" "Kollisions-Gurt greift literal"
 
 kopf "NB2-1c  mkdir-FEHLERART: echter Dateisystem-Fehler ist FATAL, nicht 99 Kollisions-Retries"
@@ -177,7 +189,10 @@ mkdir -p "$H/bin_mkdirfail_alt"
 cat > "$H/bin_mkdirfail_alt/mkdir" <<'EOF'
 #!/bin/sh
 for a in "$@"; do last="$a"; done
-case "$last" in */thesis_compiles/2*) echo "mkdir: cannot create directory '$last': Permission denied (PROBEN-SHIM)" >&2; exit 1 ;; esac
+case "$last" in */thesis_compiles/2*)
+  echo "mkdir: cannot create directory '$last': Permission denied (PROBEN-SHIM)" >&2
+  exit 1 ;;
+esac
 exec /bin/mkdir "$@"
 EOF
 chmod +x "$H/bin_mkdirfail_alt/mkdir"
@@ -218,11 +233,13 @@ git clone -q -b development "$R/super.git" "$R/n2_wRetry"; neue_tabellen "$R/n2_
 git clone -q -b development "$R/dest.git" "$R/n2_dRetry"
 lauf AF_DEST_REPO="$R/n2_dRetry" AF_WORK_ROOT="$R/n2_wRetry" AF_SNAP_LAUF_KENNUNG="r5-j501" > "$H/n2_retry.log"
 Q="$(find "$R/n2_wRetry/measurement/thesis_compiles" -name QUELLSTAND.txt | head -1)"
-pruef "NEU: genau EIN Beleg nachgeholt" "$(find "$R/n2_wRetry/measurement/thesis_compiles" -name QUELLSTAND.txt | wc -l)" "1"
+pruef "NEU: genau EIN Beleg nachgeholt" \
+    "$(find "$R/n2_wRetry/measurement/thesis_compiles" -name QUELLSTAND.txt | wc -l)" "1"
 pruef "NEU: Beleg zeigt auf SHA_A (Recovery-Identitaet)" "$(sed -n 's/^thesis_commit_sha=//p' "$Q")" "$SHA_A"
 pruef "NEU: Modus ehrlich" "$(sed -n 's/^modus=//p' "$Q")" "recovery"
 hat "$H/n2_retry.log" "RECOVERY-ZIEL: $SHA_A" "Recovery-Ziel literal benannt"
-hat "$H/n2_retry.log" "289-Klon nachweislich zurueck auf $SHA_B" "289-Klon steht wieder auf dem BRANCH-HEAD (Gitlink-Schutz)"
+hat "$H/n2_retry.log" "289-Klon nachweislich zurueck auf $SHA_B" \
+    "289-Klon steht wieder auf dem BRANCH-HEAD (Gitlink-Schutz)"
 pruef "NEU: 289 hat KEINEN neuen Commit bekommen" "$(git -C "$R/dest.git" rev-parse development)" "$SHA_B"
 # GEGENPROBE ALT auf EXAKT demselben Zustand
 git clone -q -b development "$R/super.git" "$R/n2_wAlt"; neue_tabellen "$R/n2_wAlt" "NB2-2a"
@@ -244,7 +261,8 @@ pruef "Wurzel ohne jeden Beleg"  "$(find "$N2B_ROOT" -name QUELLSTAND.txt 2>/dev
 lauf AF_DEST_REPO="$R/n2b_d" AF_WORK_ROOT="$R/n2b_w" AF_SNAPSHOT_ROOT="$N2B_ROOT" \
      AF_SNAP_LAUF_KENNUNG="r5-j502" > "$H/n2b.log"
 QB="$(find "$N2B_ROOT" -name QUELLSTAND.txt | head -1)"
-pruef "NEU: Beleg fuer SHA_A (aus der Bot-Historie, ohne jeden Marker)" "$(sed -n 's/^thesis_commit_sha=//p' "$QB")" "$SHA_A"
+pruef "NEU: Beleg fuer SHA_A (aus der Bot-Historie, ohne jeden Marker)" "$(sed -n 's/^thesis_commit_sha=//p' "$QB")" \
+    "$SHA_A"
 hat "$H/n2b.log" "RECOVERY-ZIEL: $SHA_A" "Bot-Historie liefert dieselbe Identitaet ohne jeden Marker"
 
 kopf "NB2-2c  Marker auf eine NIE gelandete SHA -> literal uebersprungen, kein Luegen-Beleg"
@@ -291,7 +309,8 @@ kopf "NB2-3a  HALBER Ordner gilt NIE als Beleg (fehlender compile-export)"
 val_stand 3a
 halber_beleg "$VROOT/20260807-110000-rX-jX" "$VSHA" ohne-export
 cp -r "$VW" "$R/v_3a_w_alt"
-val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j600" > "$H/n3_neu.log"
+val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j600" > \
+    "$H/n3_neu.log"
 hat "$H/n3_neu.log" "ist aber KEIN gueltiger Beleg" "NEU benennt den Halb-Ordner literal"
 hat "$H/n3_neu.log" "compile-export.txt' fehlt/leer" "NEU nennt das fehlende Pflichtstueck"
 pruef "NEU holt den echten Beleg nach" "$(find "$VROOT" -name QUELLSTAND.txt | wc -l)" "2"
@@ -305,7 +324,8 @@ kopf "NB2-3b  Teiltreffer statt ganzer Zeile: laengere SHA im QUELLSTAND ist KEI
 val_stand 3b
 halber_beleg "$VROOT/20260807-120000-rY-jY" "$VSHA" zu-lange-sha
 cp -r "$VW" "$R/v_3b_w_alt"
-val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j601" > "$H/n3b_neu.log"
+val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j601" > \
+    "$H/n3b_neu.log"
 pruef "NEU laesst sich vom Teiltreffer NICHT taeuschen (Beleg wird gebaut)" \
   "$(find "$VROOT" -name QUELLSTAND.txt | wc -l)" "2"
 git clone -q -b development "$R/dest.git" "$R/v_3b_d_alt"
@@ -335,13 +355,15 @@ git -C "$R/n3d_seed" add -A -- measurement >/dev/null
 git -C "$R/n3d_seed" -c user.name=f -c user.email=f@l commit -q -m "fremde Notiz mit derselben Zeile"
 git -C "$R/n3d_seed" push -q origin development
 cp -r "$VW" "$R/v_3d_w_alt"
-val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j604" > "$H/n3d_neu.log"
+val_lauf AF_DEST_REPO="$VD" AF_WORK_ROOT="$VW" AF_SNAPSHOT_ROOT="$VROOT" AF_SNAP_LAUF_KENNUNG="r6-j604" > \
+    "$H/n3d_neu.log"
 hatnicht "$H/n3d_neu.log" "Beleg im REMOTE-Stand vorhanden" "NEU liest die Fremddatei NICHT als Beleg"
 pruef "NEU holt den echten Beleg nach" "$(find "$VROOT" -name QUELLSTAND.txt | wc -l)" "1"
 git clone -q -b development "$R/dest.git" "$R/v_3d_d_alt"
 lauf_alt AF_DEST_REPO="$R/v_3d_d_alt" AF_WORK_ROOT="$R/v_3d_w_alt" \
          AF_SNAPSHOT_ROOT="$R/v_3d_w_alt/measurement/beleg_wurzel_3d" > "$H/n3d_alt.log"
-hat "$H/n3d_alt.log" "Beleg im REMOTE-Stand vorhanden" "ALT nimmt die Fremddatei als Beleg (git grep ueber ALLE Dateien)"
+hat "$H/n3d_alt.log" "Beleg im REMOTE-Stand vorhanden" \
+    "ALT nimmt die Fremddatei als Beleg (git grep ueber ALLE Dateien)"
 
 # ============================================================ (4) ERZWUNGENE RE-KOMPILATION
 kopf "NB2-4a  Re-Fixierung nach non-FF: Bau ist erzwungen frisch und wird belegt"
@@ -357,8 +379,10 @@ hat "$H/n4_neu.log" "RE-ERNTE" "Divergenz erkannt"
 hat "$H/n4_neu.log" "ERZWUNGENE Re-Kompilation" "Re-Ernte laeuft mit -gg und geloeschten Bau-Produkten"
 hat "$H/n4_neu.log" "Neuheits-Wache" "die neu gebaute PDF ist nachweislich juenger als der Bau-Beginn"
 QN="$(find "$R/n4_w/measurement/thesis_compiles" -name QUELLSTAND.txt | head -1)"
-pruef "Beleg zeigt auf die BRANCH-SPITZE" "$(sed -n 's/^thesis_commit_sha=//p' "$QN")" "$(git -C "$R/dest.git" rev-parse development)"
-pruef "compile-export stammt aus dem GEMERGTEN Baum" "$(grep -c 'FREMDZUSATZ-NB2' "$(dirname "$QN")/compile-export.txt")" "1"
+pruef "Beleg zeigt auf die BRANCH-SPITZE" "$(sed -n 's/^thesis_commit_sha=//p' "$QN")" \
+    "$(git -C "$R/dest.git" rev-parse development)"
+pruef "compile-export stammt aus dem GEMERGTEN Baum" "$(grep -c 'FREMDZUSATZ-NB2' "$(dirname \
+    "$QN")/compile-export.txt")" "1"
 
 kopf "NB2-4b  'Nothing to do' darf NIE eine alte PDF mit neuer SHA beschriften"
 git clone -q -b development "$R/dest.git" "$R/n4b_d"
@@ -497,7 +521,8 @@ env PATH="$H/bin_leerhead:$PATH" E18_LEER_REVPARSE_AB=2 AF_ARTIFACT_ROOTS="Code/
     AF_DEST_REPO="$R/m2_d" AF_WORK_ROOT="$R/m2_w" "$CORE" > "$H/m2_neu.log" 2>&1
 pruef "NEU: RC bei leerem HEAD" "$?" "1"
 hat "$H/m2_neu.log" "nicht aufloesbar" "NEU bricht mit literalem Grund ab"
-pruef "NEU legt keinen Beleg ab" "$(find "$R/m2_w/measurement/thesis_compiles" -name QUELLSTAND.txt 2>/dev/null | wc -l)" "0"
+pruef "NEU legt keinen Beleg ab" \
+    "$(find "$R/m2_w/measurement/thesis_compiles" -name QUELLSTAND.txt 2>/dev/null | wc -l)" "0"
 rm -f "$H/revparse.cnt"
 env PATH="$H/bin_leerhead:$PATH" E18_LEER_REVPARSE_AB=2 AF_ARTIFACT_ROOTS="Code/measure_out/appendix" \
     AF_PDF_GATE=on AF_PROV_SUPER_REF=development AF_NO_PUSH=true \
@@ -556,7 +581,8 @@ env AF_ARTIFACT_ROOTS="Code/measure_out/appendix" AF_PDF_GATE=off AF_NO_PUSH=tru
     AF_PROV_SUPER_REF=development AF_DEST_REPO="$R/g_off_d" AF_WORK_ROOT="$R/g_off" "$CORE" > "$H/g_off.log" 2>&1
 hat "$H/g_off.log" "KEIN Schnappschuss -- das PDF-Gate hat nicht gebaut" "ohne Compile kein Beleg, literal begruendet"
 git clone -q -b development "$R/super.git" "$R/g_leer"; git clone -q -b development "$R/dest.git" "$R/g_leer_d"
-lauf AF_DEST_REPO="$R/g_leer_d" AF_WORK_ROOT="$R/g_leer" AF_SNAPSHOT_ROOT=/tmp/e18snap-nb2-nie AF_NO_PUSH=true > "$H/g_leer.log" 2>&1
+lauf AF_DEST_REPO="$R/g_leer_d" AF_WORK_ROOT="$R/g_leer" AF_SNAPSHOT_ROOT=/tmp/e18snap-nb2-nie AF_NO_PUSH=true > \
+    "$H/g_leer.log" 2>&1
 hat "$H/g_leer.log" "NO-OP: keine Anhang-Quelle" "honest-empty unveraendert"
 pruef "honest-empty legt keine Wurzel an" "$([ -e /tmp/e18snap-nb2-nie ] && echo ja || echo nein)" "nein"
 

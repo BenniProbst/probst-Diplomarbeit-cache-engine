@@ -52,7 +52,8 @@ git -C "$ROOT/work" add -A
 # Gitlink wie im echten super-Repo (Wert zeigt bewusst auf den 289-Ausgangsstand).
 DEST_HEAD="$(git -C "$ROOT/dest" rev-parse HEAD)"
 git -C "$ROOT/work" update-index --add --cacheinfo "160000,$DEST_HEAD,thesis/diplomarbeit"
-git -C "$ROOT/work" -c user.name=fixture -c user.email=fixture@local commit -q -m "Fixture-Ausgangsstand 288-artig (Gitlink + measurement/)"
+git -C "$ROOT/work" -c user.name=fixture -c user.email=fixture@local commit -q -m \
+    "Fixture-Ausgangsstand 288-artig (Gitlink + measurement/)"
 git init -q --bare -b development "$ROOT/super.git"
 git -C "$ROOT/work" remote add origin "$ROOT/super.git"
 git -C "$ROOT/work" push -q -u origin development
