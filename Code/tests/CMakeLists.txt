@@ -217,6 +217,19 @@ target_compile_definitions(test_ci_wache_speicherbudget PRIVATE
     "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\""
     "COMDARE_REPO_WURZEL=\"${CMAKE_SOURCE_DIR}/..\"")
 
+# P3 (2026-08-10) -- DIE BASIS DER DIFF-HYGIENE-WACHE. Bis heute stand sie als
+# "origin/$CI_DEFAULT_BRANCH" in der .gitlab-ci.yml, also in einer GitLab-Web-Einstellung
+# statt im versionierten Text. Gemessen: mit dem daraus folgenden 'development' war die
+# Wache auf jeder development-Pipeline ein NO-OP (0 Commit(s) im Bereich, 0 Zeilen
+# geprueft, GRUEN); mit origin/main sind es am selben Stand 52 Commit(s) und 7007 Zeilen
+# im Scope. Nur COMDARE_CI_YML_PFAD noetig -- die Wache liest ausschliesslich den super.
+comdare_da_add_test(test_ci_wache_guard_basis
+    SOURCES unit/test_ci_wache_guard_basis.cpp
+    LIBRARIES comdare::ci_wachen gmock
+    LABELS ci_wachen)
+target_compile_definitions(test_ci_wache_guard_basis PRIVATE
+    "COMDARE_CI_YML_PFAD=\"${CMAKE_SOURCE_DIR}/../.gitlab-ci.yml\"")
+
 # V32.II.3 (2026-05-21) + V33.C.2 (2026-05-21) - V32Orchestrator Tests
 # V33.C.2: Include-Pfade fuer cache-engine V32 commands + prt-art default_lookup
 if(COMDARE_V32_ENABLE)

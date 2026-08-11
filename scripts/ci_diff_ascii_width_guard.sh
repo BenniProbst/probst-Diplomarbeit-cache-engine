@@ -170,8 +170,11 @@
 #       Arbeitsverzeichnis gegen HEAD (die manuelle Vor-Paketmeldung-Pruefung).
 #   sh scripts/ci_diff_ascii_width_guard.sh --seit-basis [<branch-ref>]
 #       CI-Modus. Bestimmt den Bereich selbst per `git merge-base <ref> HEAD`.
-#       Ohne <branch-ref>: $COMDARE_GUARD_BASIS_REF, sonst origin/main, main,
-#       origin/development, development -- der erste, der aufloest.
+#       Ohne <branch-ref>: ist $COMDARE_GUARD_BASIS_REF GESETZT, gilt genau er --
+#       loest er nicht auf, ist das Exit 2 und KEIN Rueckfall auf einen anderen
+#       Zweig (eine genannte Basis ist eine Anweisung, kein Vorschlag).
+#       Ist er NICHT gesetzt: origin/main, main, origin/development, development
+#       -- der erste, der aufloest.
 #       Ein blanker SHA statt einer Branch-Referenz ist ein FEHLER (Exit 2).
 #   sh scripts/ci_diff_ascii_width_guard.sh --bestand
 #       Kein Diff: prueft den GESAMTEN versionierten Bestand im Scope.
@@ -264,8 +267,33 @@ seit-basis)
     _ce_basis="${1:-}"
     if [ -n "$_ce_basis" ]; then
         shift
+    elif [ -n "${COMDARE_GUARD_BASIS_REF:-}" ]; then
+        # EINE GENANNTE BASIS IST EINE ANWEISUNG, KEIN VORSCHLAG (2026-08-10).
+        #
+        # VORHER stand $COMDARE_GUARD_BASIS_REF nur als ERSTER KANDIDAT in der Kette unten.
+        # Loeste er nicht auf, rutschte die Wache STILL auf den naechsten weiter -- in diesem
+        # Repo also auf origin/development -- und meldete GRUEN. Am Objekt gemessen, gleicher
+        # Baum, gleicher Koeder, einziger Unterschied "gibt es refs/remotes/origin/main":
+        #     vorhanden -> Basis origin/main,        2 Commit(s), 1 Nicht-ASCII, rc=1 ROT
+        #     fehlt     -> Basis origin/development, 0 Commit(s), 0 geprueft,    rc=0 GRUEN
+        # Der Verstoss lag in BEIDEN Laeufen im Baum. Genau die Fehlerklasse, gegen die diese
+        # Wache gebaut ist: ein zu eng geschnittener Bereich, der nichts mehr sieht.
+        #
+        # Deshalb hier fail-closed: wer eine Basis NENNT, bekommt sie oder einen Abbruch --
+        # nie eine andere. Die Kandidaten-Kette unten bleibt fuer den Fall, dass NICHTS
+        # genannt wurde (manueller Aufruf); dort ist ein Rueckfall kein Ersatz, sondern die
+        # einzige Auskunft, die es gibt.
+        _ce_basis="$COMDARE_GUARD_BASIS_REF"
+        git -C "$_ce_repo_root" rev-parse --verify --quiet "${_ce_basis}^{commit}" >/dev/null 2>&1 \
+            || ce_abbruch "$(
+                   echo "COMDARE_GUARD_BASIS_REF='${_ce_basis}' ist in diesem Klon NICHT aufloesbar."
+                   echo "Eine GENANNTE Basis wird nicht durch eine andere ersetzt -- das waere eine"
+                   echo "stille Abschwaechung der Wache. Der Aufrufer muss den Zweig selbst holen:"
+                   echo "  git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'"
+                   echo "Bei flachem Klon zusaetzlich GIT_DEPTH: 0 bzw. --unshallow. KEINE stille Null."
+               )"
     else
-        for _ce_kand in "${COMDARE_GUARD_BASIS_REF:-}" origin/main main origin/development development; do
+        for _ce_kand in origin/main main origin/development development; do
             [ -n "$_ce_kand" ] || continue
             if git -C "$_ce_repo_root" rev-parse --verify --quiet "${_ce_kand}^{commit}" >/dev/null 2>&1; then
                 _ce_basis="$_ce_kand"
@@ -275,7 +303,8 @@ seit-basis)
     fi
     [ -n "$_ce_basis" ] || ce_abbruch "$(
         echo "Keine Basis-Referenz aufloesbar. Probiert wurden:"
-        echo "  \$COMDARE_GUARD_BASIS_REF, origin/main, main, origin/development, development."
+        echo "  origin/main, main, origin/development, development."
+        echo "(\$COMDARE_GUARD_BASIS_REF war nicht gesetzt -- gesetzt bricht er oben eigenstaendig ab.)"
         echo "In der CI ist die haeufigste Ursache ein flacher Klon -- GIT_DEPTH: 0 setzen."
         echo "KEINE stille Null."
     )"

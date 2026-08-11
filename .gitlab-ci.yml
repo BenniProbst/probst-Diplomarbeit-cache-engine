@@ -267,7 +267,8 @@ lint:static:
 # ("N Zeilen geprueft, davon 0 Nicht-ASCII") und benennt die uebersprungenen Dateien.
 #
 # WARUM KEIN allow_failure -- eine advisory Wache ist die naechste stille Null. Der Bereich ist
-# in der Praxis klein (nur noch nicht gelandete Commits gegen origin/$CI_DEFAULT_BRANCH), der
+# in der Praxis klein (nur die noch nicht auf main gelandeten Commits, gemessen 52 an d8f3cd77
+# mit 7007 Zeilen im Scope; die Basis steht literal unten und ist begruendet), der
 # Alt-Bestand wird bewusst NICHT geprueft: `--bestand` meldet heute 845 Nicht-ASCII- und
 # 174 Breiten-Zeilen aus 18714: eine Bestands-Wache waere am Tag ihrer Einfuehrung rot geboren.
 # Diese Wache stoppt NEUE Verstoesse, sie saniert keine alten.
@@ -285,8 +286,53 @@ lint:diff-hygiene:
   variables:
     GIT_SUBMODULE_STRATEGY: none   # super-eigener Diff; das ce lintet in SEINER Pipeline
     GIT_DEPTH: 0                   # merge-base braucht Historie -- flacher Klon => FATAL, nie still gruen
-    COMDARE_GUARD_BASIS_REF: "origin/$CI_DEFAULT_BRANCH"
+    # LITERAL, NICHT "origin/$CI_DEFAULT_BRANCH" (2026-08-10) -- zwei Gruende, beide gemessen:
+    #
+    # (1) $CI_DEFAULT_BRANCH ist eine GITLAB-UI-EINSTELLUNG. Fuer Projekt 288 steht sie heute auf
+    #     'development' (Rohbeleg: docs/sessions/backups/20260802-e23-suchlauf-belege/e23/
+    #     projects_all.ndjson, Zeile mit id=288). Wer sie im Web umstellt, verschiebt die Basis
+    #     dieser Wache -- ohne Commit, ohne Diff, ohne Review. Der versionierte Text muss sagen,
+    #     wogegen gemessen wird.
+    # (2) VIEL WICHTIGER, und erst beim Nachmessen aufgefallen: mit 'development' als Basis war
+    #     diese Wache auf JEDER development-Pipeline ein NO-OP. Gemessen an d8f3cd77 (dem Stand,
+    #     der diesen Text traegt): merge-base(origin/development, HEAD) = HEAD, also
+    #     "BEREICHSBREITE: 0 Commit(s)", "0 Zeilen geprueft", GRUEN. Sie hat dort nie etwas
+    #     angesehen. Mit origin/main sind es an demselben Stand 52 Commit(s), 60 Datei(en),
+    #     7007 Zeilen im Scope -- und 0 Verstoesse, die Umstellung ist also heute gruen
+    #     schaltbar. Waere sie es nicht gewesen, stuende hier eine Staffelung statt der Basis.
+    #
+    # WARUM main UND NICHT development: main ist die Autoritaet (Gitflow-Doktrin), development
+    # laeuft voraus. Der Bereich main..HEAD enthaelt den Bereich development..HEAD -- die
+    # Umstellung nimmt der Wache also nichts weg, sie gibt ihr nur mehr zu sehen.
+    # Auf main selbst ist der Bereich 0 Commit(s); das war mit der alten Basis genauso und
+    # bleibt hier ehrlich benannt statt weggeschwiegen.
+    #
+    # Dasselbe Muster faehrt das ce bereits (dort COMDARE_HYG_FF_BASIS mit Literal-Default
+    # 'main') -- diese Zeile zieht den super nach, sie erfindet nichts Neues.
+    COMDARE_GUARD_BASIS_REF: "origin/main"
   script:
+    # DIE BASIS MUSS IM KLON LIEGEN -- sonst haelt das Literal oben nicht (2026-08-10).
+    # Gemessen am Objekt, gleicher Baum, gleicher Koeder, einziger Unterschied "gibt es
+    # refs/remotes/origin/main": vorhanden -> 2 Commit(s), 1 Nicht-ASCII, rc=1 ROT;
+    # fehlt -> die Wache rutschte auf origin/development, 0 Commit(s), rc=0 GRUEN.
+    # Die Wache bricht seit heute in diesem Fall selbst ab (Exit 2, kein Rueckfall auf einen
+    # anderen Zweig) -- dieser Vorspann sorgt dafuer, dass es gar nicht erst dazu kommt.
+    # Der Zweigname wird aus der Variablen ABGELEITET, damit es nur EINE Quelle gibt.
+    - |
+      set -eu
+      _sup_zweig="${COMDARE_GUARD_BASIS_REF#origin/}"
+      if [ "$_sup_zweig" = "$COMDARE_GUARD_BASIS_REF" ] || [ -z "$_sup_zweig" ]; then
+        echo "COMDARE_GUARD_BASIS_REF='${COMDARE_GUARD_BASIS_REF}' hat nicht die Form" >&2
+        echo "'origin/<zweig>' -- der Vorspann kann den Zweig nicht holen. KEIN stilles Gruen." >&2
+        exit 2
+      fi
+      _sup_gitdir=$(git rev-parse --git-dir)
+      if [ -e "${_sup_gitdir}/shallow" ]; then
+        echo "DIFF-HYGIENE: flacher Klon -- wird entflacht (ohne Historie keine Abzweigung)."
+        git fetch --no-tags --unshallow origin
+      fi
+      echo "DIFF-HYGIENE: hole Basis-Zweig '${_sup_zweig}' (fail-closed: schlaegt der Fetch fehl, ist der Job rot)."
+      git fetch --no-tags origin "+refs/heads/${_sup_zweig}:refs/remotes/origin/${_sup_zweig}"
     - sh scripts/ci_diff_ascii_width_guard.sh --seit-basis
     # ZWEITE, UNABHAENGIGE AUFRUFSTELLE der Registrierungs-Wache (P4c, 2026-08-09).
     # Sie steht bewusst in einem Job einer ANDEREN Familie: ihr eigener Job
