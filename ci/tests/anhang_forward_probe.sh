@@ -279,11 +279,25 @@ kanal() {             # $1 = AF_CORPUS_ROOT (relativ zu ARBEIT)
     AF_WIDE_AGGREGAT="$AGGREGAT" \
     AF_NO_PUSH=true \
     AF_PDF_GATE=off \
+    AF_COMPILE_SNAPSHOT="${AF_PROBE_SNAPSHOT:-false}" \
+    AF_SNAPSHOT_ROOT="${AF_PROBE_SNAP_ROOT:-$ARBEIT/$1/thesis_compiles}" \
+    AF_SNAP_ROOT_STRICT="${AF_PROBE_SNAP_STRICT:-true}" \
+    AF_SNAP_REMOTE_STRICT="${AF_PROBE_SNAP_REMOTE_STRICT:-true}" \
+    AF_SNAP_REMOTE_BRANCH="${AF_PROBE_SNAP_REMOTE_BRANCH:-NA}" \
     AF_TMP="$WERK/tmp_$N_FALL" \
     bash "$KERN" > "$OUT" 2> "$ERR"
     RC=$?
     set -e
 }
+# WARUM AF_COMPILE_SNAPSHOT HIER AUF false STEHT (E-18-SNAP, 2026-08-11):
+#   Die Faelle A1-A14 messen den ANHANG-Pfad; sie fahren alle mit AF_PDF_GATE=off, es
+#   entsteht also gar kein Bau-Produkt und folglich nie ein Compile-Schnappschuss. Bliebe
+#   der Schalter auf seinem Betriebs-Default true, liefe im Idempotenz-Zweig zusaetzlich
+#   die E-18-SNAP-Wache an -- und wuerde in dieser Sandbox voellig zu Recht abbrechen: die
+#   Arbeitswurzel der Probe ist KEIN git-Arbeitsbaum, der Schnappschuss waere dort nie
+#   committierbar. Das ist SOLLVERHALTEN des Prueflings und kein Befund; es gehoert in
+#   einen eigenen Fall (A15/A16 unten) und nicht als Nebenwirkung in vierzehn fremde.
+#   Wer den Schnappschuss-Zweig will, setzt AF_PROBE_SNAPSHOT=true vor dem Aufruf.
 
 protokoll() {
     echo "        ----- literale Ausgabe des Kerns (stdout) -----"
@@ -644,6 +658,100 @@ fordere_literal "$OUT" "IDEMPOTENT: 0 Aenderungen"
 fordere_literal "$OUT" "belegt: alle 2 kopierten .tex liegen im Index"
 fordere_zahl "Commits nach Lauf 2 (unveraendert erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
 fordere_tex de 1 "$K14"
+fall_ende
+
+# =============================================================================
+# A15-A18 E-18-SNAP: DIE ZWEI WACHEN DES SCHNAPPSCHUSSES, JE MIT GEGENPROBE.
+#     Bis 11.08.2026 hatte der gesamte E-18-SNAP-Zweig in DIESER Probe NULL
+#     Faelle -- am Objekt gemessen: 'grep -cF SNAP ci/tests/anhang_forward_probe.sh'
+#     ergab 0, waehrend der Kern 32 SNAP-Stellen trug. Die Beweise lagen unter
+#     docs/sessions/backups/, wo weder die CI noch die Registrierungs-Wache je
+#     hinsieht. Eine Probe, die den halben Pruefling nicht kennt, ist ein Nenner
+#     ohne Zaehler. Die vier Faelle unten schliessen das fuer die zwei Wachen,
+#     die ueber "Beleg oder kein Beleg" entscheiden.
+#     ZUGANG: beide Wachen liegen im IDEMPOTENZ-Zweig (0 Byte-Delta) -- also
+#     derselbe Zweimal-Lauf wie A14, nur mit AF_PROBE_SNAPSHOT=true.
+# =============================================================================
+K15=$(token)
+TS15="20260812-070010-snap-vertrag"
+fall "A15 Schnappschuss-Wurzel liegt in KEINEM Arbeitsbaum -> Vertrag VERLETZT, rc=1"
+sandbox a15
+csv_ohne_newline "$ARBEIT/korpus/$TS15/measure_out/perm0/result.csv" "$K15"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true kanal korpus
+fordere_rc 1
+fordere_literal "$OUT" "liegt in KEINEM git-Arbeitsbaum"
+fordere_literal "$ERR" "AF_SNAPSHOT_ROOT-Vertrag VERLETZT"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+# GEGENPROBE ZU A15 (PFLICHT): dieselbe Fixture, nur der Schalter umgelegt.
+# Ohne sie waere A15 von "der Schnappschuss-Zweig ist immer rot" nicht zu
+# unterscheiden -- und genau diese Verwechslung ist die Fehlerklasse des Pakets.
+K16=$(token)
+TS16="20260812-070011-snap-labor"
+fall "A16 GEGENPROBE: AF_SNAP_ROOT_STRICT=false -> Verstoss bewusst hingenommen, gruen"
+sandbox a16
+csv_ohne_newline "$ARBEIT/korpus/$TS16/measure_out/perm0/result.csv" "$K16"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true AF_PROBE_SNAP_STRICT=false kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "AF_SNAP_ROOT_STRICT=false -> Verstoss BEWUSST hingenommen"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+# =============================================================================
+# A17/A18 DER ERST-FETCH DER REMOTE-WACHE IST FAIL-CLOSED (NB2-Restbefund (a),
+#     geheilt 11.08.2026). Die Asymmetrie war das Loch: der RE-Fetch vor dem
+#     Schreiben brach seit jeher ab, der ERST-Fetch lief mit einer Warnung
+#     weiter -- und weil der Re-Fetch ohne gesetzten REMOTE-Stand sofort mit
+#     rc 0 zurueckkehrt, war sein fail-closed-Zweig AUSGERECHNET dann
+#     unerreichbar, wenn man ihn braucht. Hier faehrt die Wurzel im
+#     Arbeitsbaum (Vertrag erfuellt), aber der Remote-Branch existiert nicht.
+# =============================================================================
+snap_arbeitsbaum() {   # legt ein 288-artiges Repo an und setzt AF_PROBE_SNAP_ROOT
+    _r="$ARBEIT/super288"
+    mkdir -p "$_r"
+    git init --quiet "$_r"
+    git -C "$_r" config user.name  "probe-bot"
+    git -C "$_r" config user.email "probe-bot@test.local"
+    git -C "$_r" config commit.gpgsign false
+    printf 'Sandkasten-288\n' > "$_r/LIESMICH.txt"
+    git -C "$_r" add -- LIESMICH.txt
+    git -C "$_r" commit --quiet -m "Ausgangs-Commit 288"
+    AF_PROBE_SNAP_ROOT="$_r/measurement/thesis_compiles"
+    mkdir -p "$AF_PROBE_SNAP_ROOT"
+}
+K17=$(token)
+TS17="20260812-070012-snap-fetch"
+fall "A17 Erst-Fetch der REMOTE-Wache scheitert -> FAIL-CLOSED, rc=1 (NB2-Rest (a))"
+sandbox a17
+snap_arbeitsbaum
+csv_ohne_newline "$ARBEIT/korpus/$TS17/measure_out/perm0/result.csv" "$K17"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true AF_PROBE_SNAP_REMOTE_BRANCH="gibt-es-nicht" kanal korpus
+fordere_rc 1
+fordere_literal "$ERR" "Erst-Fetch"
+fordere_literal "$ERR" "FAIL-CLOSED"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
+fall_ende
+
+K18=$(token)
+TS18="20260812-070013-snap-fetch-labor"
+fall "A18 GEGENPROBE: AF_SNAP_REMOTE_STRICT=false -> Rueckfall literal, gruen"
+sandbox a18
+snap_arbeitsbaum
+csv_ohne_newline "$ARBEIT/korpus/$TS18/measure_out/perm0/result.csv" "$K18"
+kanal korpus
+fordere_rc 0
+AF_PROBE_SNAPSHOT=true AF_PROBE_SNAP_REMOTE_BRANCH="gibt-es-nicht" \
+  AF_PROBE_SNAP_REMOTE_STRICT=false kanal korpus
+fordere_rc 0
+fordere_literal "$OUT" "AF_SNAP_REMOTE_STRICT=false -> REMOTE-Stand NICHT geprueft"
+fordere_zahl "Commits (kein zweiter erwartet)" "$(z_commitzahl)" "$((BASIS_N + 1))"
 fall_ende
 
 # =============================================================================

@@ -1,0 +1,249 @@
+# =============================================================================
+#  E-18-SNAP -- DELTA AM JOB anhang:forward  (NEU GESCHNITTEN 2026-08-11)
+# =============================================================================
+# STATUS: BEREITS ANGEWANDT. Dieses Delta ist der BELEG der Landung, kein
+# offener Vorschlag mehr -- .gitlab-ci.yml auf development traegt es. Wer es ein
+# zweites Mal anwendet, bekommt zu Recht "Reversed (or previously applied)".
+#
+# WARUM ES NEU GESCHNITTEN WERDEN MUSSTE (beides am Objekt nachgemessen):
+#   BLOCKER 2 -- die Vorfassung war NICHT MEHR ANWENDBAR. Gegen den heutigen
+#     Stand gemessen: "patch --dry-run -p1" rc=1, "Hunk #4 FAILED at 1126",
+#     1 von 4 Hunks. Die drei Kommentar-Hunks passten noch (mit Offsets bis
+#     +1357 Zeilen), der EINE Hunk mit der Sacharbeit nicht.
+#   BLOCKER 3 -- genau dieser Hunk #4 haette ZWEI GELANDETE PAKETE
+#     ZURUECKGEDREHT. Sein Ersatztext kannte nur EINEN Gitlink
+#     (thesis/diplomarbeit); der heutige Block bumpt BEIDE (Paket
+#     b-ci-rueckschrieb-beide-zeiger) und prueft die Paritaet danach am INDEX
+#     (Paket R4-WACHEN-PARITAET). Ein Ersatztext ist eben kein Merge: er nimmt
+#     alles mit, was zwischen Schnitt und Anwendung an dieser Stelle entstand.
+#
+# WAS DER NEUE SCHNITT ANDERS MACHT:
+#   * Er RUEHRT DIE GITLINK-LOGIK NICHT AN. THESIS_GITLINKS, die _need_bump-
+#     Schleife und ci/thesis_gitlink_parity.sh bleiben Zeile fuer Zeile stehen;
+#     die Paritaets-Wache laeuft jetzt sogar im reinen Schnappschuss-Fall mit.
+#   * Die Einbuchung liegt NICHT als YAML-Text im Job, sondern in
+#     ci/anhang_snapshot_einbuchen.sh -- probefaehig, mit eigener Probe
+#     (ci/tests/anhang_snapshot_einbuchen_probe.sh, S1-S10 + 3 Mutanten), die
+#     den COMMIT misst und nicht das Protokoll. Genau daran war die Vorfassung
+#     gescheitert: WIRKSAMKEIT NULL bei gruenem Log.
+#
+# GEGENPROBE, GEFAHREN VOR DER ANWENDUNG (Pflicht):
+#   patch --dry-run -p1 gegen origin/development:.gitlab-ci.yml  ->  rc=0
+#   git apply --check  auf denselben Stand                       ->  rc=0
+# =============================================================================
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 01d87e58..2de16b41 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -862,7 +862,8 @@ test:object-stat-wache-bissprobe:
+ # Aenderungen" bekamen (##20, 10.08.). Alle fuenf endeten mit rc=0 und einer Ausgabe, die wie ein
+ # ehrliches "nichts zu tun" aussah. Der Beweis wird am ZIEL-REPO gefuehrt (git rev-list --count,
+ # git show HEAD:<pfad>), nicht am Log: gefragt wird, ob der gewuerfelte Koeder im COMMITTETEN
+-# Blob steht. Dazu A7 (Registrierung) und A11 (kein vierter Inline-Zwilling) = 15 Faelle gesamt.
++# Blob steht. Dazu A7 (Registrierung), A11 (kein vierter Inline-Zwilling) und seit 11.08.2026
++# A15-A18 (die zwei E-18-SNAP-Wachen, JE MIT GEGENPROBE) = 18 Faelle gesamt.
+ #
+ # WARUM --selbstbiss IM CI: eine Probe, die nur am gesunden Objekt gruen ist, belegt nichts. Der
+ # Schalter baut SIEBEN Wegwerf-Mutanten (N1-N7: alter Glob / Stand vor P4 / kein awk 1 /
+@@ -893,6 +894,46 @@ test:anhang-forward-probe:
+   script:
+     - sh ci/tests/anhang_forward_probe.sh --selbstbiss
+ 
++# ── E-18-SNAP (2026-08-11): PROBE DER EINBUCHUNG -- sie misst den COMMIT, nicht das Protokoll ──
++# DER BEFUND, DER SIE ERZWUNGEN HAT. Das Paket E-18-SNAP legte den Compile-Schnappschuss unter
++# measurement/thesis_compiles/ ab -- und der Job anhang:forward stagte den Pfad NICHT. Der Kern
++# druckte "Schnappschuss abgelegt", der Job wurde gruen, der Ordner starb mit dem Runner.
++# WIRKSAMKEIT NULL bei gruenem Protokoll. Ein Log-Fall haette das nie gefunden: er haette die
++# Zeile gesehen und gruen gemeldet. Diese Probe fragt darum ausschliesslich
++#   git show HEAD:<pfad> | grep koeder_<gewuerfelt>
++# also den BLOB des Commits. Ein Beleg auf Platte zaehlt hier nicht.
++#
++# ZEHN FAELLE, BEIDSEITIG: S1 Positivfall (Koeder IM Commit) / S2 der Blocker selbst reproduziert
++# (alter Weg, nur Gitlink gestagt -> Koeder NICHT im Commit) / S3 V-8 am scharfen Objekt (eine
++# .gitignore-Regel des 288-Repos schluckt den Beleg, 'git add' bleibt still erfolgreich -- NUR das
++# Index-Orakel sieht es) / S4 Gegenprobe zu S3 ohne die Regel / S5+S6 halber Beleg auf ZWEI Achsen
++# (fehlende Datei / QUELLSTAND ohne verankerte 40-hex-SHA) / S7 .tmp-Halbstand entfernt, Nachbar
++# kommt durch / S8 ehrlicher Leerlauf / S9 Additivitaet beim zweiten Lauf / S10 Registrierung.
++#
++# WARUM --selbstbiss IM CI: drei Wegwerf-Mutanten des Prueflings (Vollstaendigkeits-Wache
++# entschaerft / Index-Orakel entfernt / 'git add' faellt weg = der Blocker als Mutation) muessen die
++# Probe ROT machen. Eine Probe ohne Mutationsbeweis ist von einer Probe, die nichts prueft, nicht
++# zu unterscheiden.
++#
++# WARUM KEIN allow_failure: eine advisory Probe ist die naechste stille Null. KEIN .code-rules:
++# S10 prueft .gitlab-ci.yml selbst -- der Aufruf der Einbuchung kann in einer docs-only-Welle
++# verschwinden, und genau dann muss sie rot werden.
++#
++# GIT_SUBMODULE_STRATEGY: none ist geprueft: die Probe legt ihre 288-Sandkaesten per mktemp -d an,
++# setzt die git-Identitaet selbst und braucht weder Submodule noch TeX-Toolchain.
++test:anhang-snapshot-einbuchen-probe:
++  stage: test
++  tags: [baremetal]
++  needs: []
++  cache:
++    paths: []
++  rules:
++    - when: on_success
++  variables:
++    GIT_SUBMODULE_STRATEGY: none   # super-eigene Datei; die Sandkaesten baut die Probe selbst
++  script:
++    - sh ci/tests/anhang_snapshot_einbuchen_probe.sh --selbstbiss
++
+ # ── P4c (2026-08-09): REGISTRIERUNGS-WACHE ueber ci/tests/*.sh -- gegen eine Zirkularitaet ──
+ # DER BEFUND. Jede Probe dieses Repos prueft ihre eigene Registrierung selbst (A7, F11, K9...).
+ # Das faengt "Probe gebaut, Job vergessen". Es faengt NICHT den Fall, gegen den T-7 gerichtet ist:
+@@ -2194,8 +2235,9 @@ measure:golden-320:
+ #    beide Richtungen. persist:measurements holt die Mess-Ergebnisse IN das super-Repo; anhang:forward
+ #    schiebt die daraus regenerierten LaTeX-Anhang-Tabellen VORWAERTS in das Thesis-Submodul (Projekt 289)
+ #    und zieht den super-Gitlink nach. Beide sind unabhaengig inert-schaltbar (COMDARE_PERSIST_MEASUREMENTS
+-#    bzw. COMDARE_ANHANG_FORWARD) und schreiben auf DISJUNKTE Pfade (measurement/ vs. Gitlink) -> die
+-#    beidseitigen MERGE-Retry-Schleifen koennen sich mechanisch nicht in die Quere kommen.
++#    bzw. COMDARE_ANHANG_FORWARD) und schreiben auf DISJUNKTE Pfade (measurement/<RUN_TS>/ hier gegen
++#    Gitlinks + measurement/thesis_compiles/<TS>-<kennung>/ dort) -> die beidseitigen MERGE-Retry-
++#    Schleifen koennen sich mechanisch nicht in die Quere kommen.
+ persist:measurements:
+   stage: persist
+   tags: [baremetal]
+@@ -2341,6 +2383,32 @@ persist:measurements:
+ #    dem Lebend-Check (eine getriggerte Pipeline: 289-Commit sichtbar + 289-Pipeline gruen + Gitlink-Bump
+ #    gelandet + KEINE Echo-Pipeline auf 288).
+ #
++#    E-18-SNAP -- COMPILE-SCHNAPPSCHUSS (OWNER-KERN, Ledger frueh-6, VERBATIM): "in Zukunft soll die
++#    Diplomarbeit einerseits fertig auf den branch gepusht werden, aber andererseits wird sie
++#    zusaetzlich in einen Ordner an der Wurzel der Messwerte kopiert, samt latex compile-export
++#    (Benennung nach Datum und Uhrzeit). so laesst sich ein compile nachvollziehen."
++#    UMSETZUNG OHNE ZWEITEN COMPILE: das PDF-Gate baut die Thesis-PDF ohnehin schon im 289-Klon --
++#    der Kern ERNTET dieses Bau-Produkt nach measurement/thesis_compiles/<JJJJMMTT-HHMMSS>-<kennung>/
++#    mit <haupt>.pdf + compile-export.txt + QUELLSTAND.txt (289-SHA + 288-SHA + Kanal-Lauf-ID).
++#    WER IHN EINBUCHT (und warum das eine eigene Datei ist): ci/anhang_snapshot_einbuchen.sh, gerufen
++#    aus Block (4b) unten. Der erste Entwurf dieses Pakets liess die Einbuchung WEG -- der Ordner
++#    entstand im Runner-Workspace, der Job wurde gruen, und alles war am Pipeline-Ende verloren.
++#    WIRKSAMKEIT NULL bei gruenem Protokoll; genau die Fehlerklasse, gegen die dieses Repo baut.
++#    Die Einbuchung liegt darum NICHT als YAML-Text hier, sondern in einer probefaehigen Datei:
++#    ci/tests/anhang_snapshot_einbuchen_probe.sh misst den COMMIT (git show HEAD:<pfad>) und nicht
++#    das Protokoll, mit gewuerfeltem Koeder in beide Richtungen. Dieselbe Begruendung wie bei
++#    ci/persist_sammler.sh: Logik in einem YAML-Block ist nicht testbar.
++#    GRENZE (bewusst): OHNE Compile KEIN Schnappschuss. Ueberspringt AF_PDF_GATE (auto ohne
++#    TeX-Toolchain) oder ist es off, entsteht kein Bau-Produkt; der Kern sagt das literal, statt
++#    einen leeren Ordner anzulegen. Die AF_PDF_GATE-Semantik ist dadurch UNVERAENDERT.
++#    ADDITIV: der Ordnername traegt die Lauf-Kennung r<RUNNER>-j<JOB>, ist also runneruebergreifend
++#    eindeutig; ein bestehender Ordner wird NIE ueberschrieben und NIE geloescht (Messdaten-Doktrin).
++#    NACHHOLUNG: der Beleg haengt NICHT am Anhang-Byte-Delta. Ein Lauf, der 289 pusht und vor dem
++#    Writeback stirbt, hinterlaesst einen 289-Stand ohne Compile-Beleg; der naechste Lauf erkennt das
++#    und holt NUR den Beleg nach -- ohne 289-Commit, ohne Push. Darum haengt der Frueh-Abbruch in
++#    Block (4) nicht mehr allein am Gitlink, und die Commit-Botschaft wird aus dem GESTAGTEN Ist
++#    gebildet statt pauschal behauptet.
++#
+ #    INFRA-VORAUSSETZUNG (Handout 2026-08-05, E-20-Kanal): EIGENES Write-Token AUF PROJEKT 289
+ #    (COMDARE_THESIS_WRITEBACK_USER / COMDARE_THESIS_WRITEBACK_TOKEN; write_repository-only, Rolle
+ #    Developer, masked+hidden+protected). BEWUSST NICHT das 288-Token (COMDARE_WRITEBACK_USER/TOKEN,
+@@ -2384,6 +2452,10 @@ anhang:forward:
+         echo "FEHLER: 288-Write-Credential fehlt -> der Gitlink-Bump koennte nicht landen"; exit 1
+       fi
+       test -x ci/anhang_forward_core.sh || { echo "FEHLER: ci/anhang_forward_core.sh fehlt/nicht ausfuehrbar"; exit 1; }
++      # E-18-SNAP: die Einbuchung des Compile-Schnappschusses liegt in einer EIGENEN Datei
++      # (probefaehig, s. ci/tests/anhang_snapshot_einbuchen_probe.sh). Fehlt sie, bricht der
++      # Job VOR dem 289-Klon ab -- sonst entstuende ein Schnappschuss, den niemand einbucht.
++      test -x ci/anhang_snapshot_einbuchen.sh || { echo "FEHLER: ci/anhang_snapshot_einbuchen.sh fehlt/nicht ausfuehrbar"; exit 1; }
+       # P4c: der Kern holt sich die WIDE-Konkatenation aus ci/wide_aggregat.sh (dieselbe Datei,
+       # die measure:smoke und measure:golden-320 rufen). Er prueft sie selbst und bricht fail-loud
+       # ab, wenn sie fehlt -- diese Zeile zieht den Abbruch nur VOR den 289-Klon.
+@@ -2406,6 +2478,12 @@ anhang:forward:
+         "$THESIS_CLONE"
+       echo "289-Klon auf development: $(git -C "$THESIS_CLONE" rev-parse --short HEAD)"
+       # -- (3) KERN: Quellen-Kaskade + Whitelist-Kopie + Idempotenz + Commit + Push (ci/anhang_forward_core.sh) --
++      #    EINE QUELLE fuer die Schnappschuss-Wurzel: derselbe Pfad geht als AF_SNAPSHOT_ROOT in
++      #    den Kern und als Argument in die Einbuchung unten. Stuende er zweimal hart da, bekaeme
++      #    jeder, der AF_SNAPSHOT_ROOT umsetzt, den Ordner still nie eingebucht.
++      #    KONTRAKT: repo-relativ unter $CI_PROJECT_DIR, sonst kann git ihn nicht stagen. Der Kern
++      #    setzt denselben Vertrag ueber AF_SNAP_ROOT_STRICT durch und sagt es literal.
++      SNAP_DIR="measurement/thesis_compiles"
+       AF_DEST_REPO="$THESIS_CLONE" \
+       AF_BRANCH="development" \
+       AF_LANGS="de,en" \
+@@ -2418,10 +2496,14 @@ anhang:forward:
+       AF_PROV_PIPELINE_URL="${CI_PIPELINE_URL:-NA}" \
+       AF_PROV_SUPER_SHA="${CI_COMMIT_SHA:-NA}" \
+       AF_PROV_SUPER_REF="${CI_COMMIT_REF_NAME:-NA}" \
++      AF_SNAPSHOT_ROOT="$CI_PROJECT_DIR/$SNAP_DIR" \
++      AF_SNAP_REMOTE_BRANCH="${CI_COMMIT_BRANCH:-${CI_COMMIT_REF_NAME:-NA}}" \
+         ci/anhang_forward_core.sh
+       NEW_THESIS_SHA=$(git -C "$THESIS_CLONE" rev-parse HEAD)
+       echo "289-HEAD nach dem Kanal: $NEW_THESIS_SHA"
+-      # -- (4) Gitlink-Bump auf 288 -- NUR wenn sich 289 wirklich bewegt hat (sonst kein Leer-Commit) --
++      # -- (4) 288-Writeback: Gitlink-Bump + E-18-SNAP-Compile-Schnappschuss (EIN Commit) --
++      # Beides gehoert in DENSELBEN Commit, weil beides denselben Lauf belegt: der Gitlink sagt, WELCHER
++      # 289-Stand gilt; der Schnappschuss belegt, WIE dessen PDF entstanden ist.
+       # BEIDE Thesis-Gitlinks (Paket b-ci-rueckschrieb-beide-zeiger, 2026-08-06): .gitmodules bindet DASSELBE
+       # Repo zweimal ein. Bis zu diesem Paket bumpte der Job nur thesis/diplomarbeit -- die CI ERZEUGTE die
+       # Divergenz damit bei jedem Rueckschrieb selbst und still. Der zweite Bump ist bewusst GENAUSO fehlerhart
+@@ -2436,30 +2518,63 @@ anhang:forward:
+         echo "Gitlink $_p: alt=$_old neu=$NEW_THESIS_SHA"
+         [ "$_old" = "$NEW_THESIS_SHA" ] || _need_bump=1
+       done
+-      if [ "$_need_bump" -eq 0 ]; then
+-        echo "=== anhang:forward OK: BEIDE Thesis-Gitlinks bereits aktuell -> kein Bump-Commit ==="; exit 0
++      # E-18-SNAP: der Frueh-Abbruch darf NICHT mehr allein am Gitlink haengen. Der Kern liefert
++      # einen Compile-Beleg auch OHNE Gitlink-Bewegung (Nachhol-Modus nach abgerissenem Vorlauf);
++      # entschiede hier weiter nur der Gitlink, ginge genau dieser Beleg still verloren -- und der
++      # Owner-KERN lautet "so laesst sich ein compile nachvollziehen".
++      _snap_offen=$(ci/anhang_snapshot_einbuchen.sh ausstehend "$SNAP_DIR")
++      echo "E-18-SNAP: ausstehende Schnappschuss-Pfade: $_snap_offen"
++      if [ "$_need_bump" -eq 0 ] && [ "$_snap_offen" -eq 0 ]; then
++        echo "=== anhang:forward OK: BEIDE Thesis-Gitlinks aktuell + kein neuer Schnappschuss -> kein Commit ==="; exit 0
+       fi
+       git config user.name "measurement-bot"; git config user.email "measurement-bot@ci.local"
+       git remote set-url origin "https://${COMDARE_WRITEBACK_USER}:${COMDARE_WRITEBACK_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+       git fetch origin "$CI_COMMIT_BRANCH"
++      # untracked measurement/ ueberlebt das checkout -B (gleiche Mechanik wie persist:measurements)
+       git checkout -B "$CI_COMMIT_BRANCH" "origin/$CI_COMMIT_BRANCH"
++      # BEIDE Gitlinks werden gemeinsam gesetzt, sobald EINER abweicht -- nie nur einer.
+       for _p in $THESIS_GITLINKS; do
+         git update-index --cacheinfo 160000 "$NEW_THESIS_SHA" "$_p"
+       done
+       # NACHBEDINGUNG am Objekt statt Vertrauen in die Schleife: derselbe Pruefkoerper, den auch
+       # verify:submodules ruft -- hier gegen den INDEX und mit --erwartet. Schlaegt er an, bricht der Job ab,
+       # BEVOR ein halb gebumpter Commit entsteht (fail-closed; ein fehlender Pfad ist dort ebenfalls FEHLER).
++      # Sie laeuft AUCH im reinen Schnappschuss-Fall (_need_bump=0): dann sind beide Gitlinks ohnehin
++      # schon NEW_THESIS_SHA, und die Wache belegt genau das -- ein Schnappschuss-Commit darf den
++      # Zeiger unter keinen Umstaenden rueckwaerts setzen.
+       test -x ci/thesis_gitlink_parity.sh || { echo "FEHLER: ci/thesis_gitlink_parity.sh fehlt/nicht ausfuehrbar"; exit 1; }
+       ci/thesis_gitlink_parity.sh --quelle index --erwartet "$NEW_THESIS_SHA"
+-      if git diff --cached --quiet; then echo "Gitlinks unveraendert (Race) -> kein Commit"; exit 0; fi
+-      git commit -m "thesis(E-18): BEIDE Gitlinks auf ${NEW_THESIS_SHA} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
++      # -- (4b) E-18-SNAP: den Compile-Schnappschuss in DENSELBEN Commit einbuchen --
++      # Der Kern LEGT ihn nur an; hierher gehoert die Uebernahme in das super-Repo. Die Datei
++      # prueft Vollstaendigkeit (kein halber Beleg), raeumt .tmp-Halbstaende und zaehlt nach dem
++      # 'git add' gegen den INDEX nach -- eine .gitignore-Regel wuerde den Beleg sonst still
++      # schlucken und der Job bliebe gruen OHNE Beleg. Sie ist fail-loud; kein '|| true'.
++      ci/anhang_snapshot_einbuchen.sh stagen "$SNAP_DIR"
++      if git diff --cached --quiet; then echo "weder Gitlinks noch Schnappschuss veraendert (Race) -> kein Commit"; exit 0; fi
++      # COMMIT-TEXT NIE LUEGEN: die Botschaft nennt genau das, was GESTAGT ist. Ein pauschales
++      # "Gitlinks + Schnappschuss" waere im Nachhol-Fall (Gitlinks unbewegt) und im reinen
++      # Bump-Fall (kein Beleg) schlicht falsch -- und der Git-Log ist Beweismittel.
++      _snap_staged=$(git diff --cached --name-only -- "$SNAP_DIR" | awk 'END{print NR+0}')
++      _link_staged=$(git diff --cached --name-only -- $THESIS_GITLINKS | awk 'END{print NR+0}')
++      echo "GESTAGT: gitlink_dateien=$_link_staged schnappschuss_dateien=$_snap_staged"
++      if [ "$_link_staged" -gt 0 ] && [ "$_snap_staged" -gt 0 ]; then
++        _msg="thesis(E-18): BEIDE Gitlinks auf ${NEW_THESIS_SHA} + Compile-Schnappschuss (${_snap_staged} Datei(en))"
++      elif [ "$_link_staged" -gt 0 ]; then
++        _msg="thesis(E-18): BEIDE Gitlinks auf ${NEW_THESIS_SHA} (kein neuer Compile-Schnappschuss)"
++      else
++        _msg="thesis(E-18): Compile-Schnappschuss (${_snap_staged} Datei(en)), Gitlinks unveraendert bei ${NEW_THESIS_SHA}"
++      fi
++      git commit -m "${_msg} (Anhang-Vorwaerts-Kanal, Pipeline ${CI_PIPELINE_ID:-NA}) [skip ci]"
+       for attempt in 1 2 3 4 5; do
+         if git push -o ci.skip origin "HEAD:$CI_COMMIT_BRANCH"; then
+-          echo "=== anhang:forward OK: Gitlink gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
++          echo "=== anhang:forward OK: 288-Writeback gepusht (Versuch $attempt) nach $CI_COMMIT_BRANCH ==="; exit 0
+         fi
+         echo "push abgelehnt (non-ff-Race gegen persist:measurements) -> fetch + MERGE (kein rebase) + retry ($attempt)" >&2
+         git fetch origin "$CI_COMMIT_BRANCH"
+-        # Pfade disjunkt (Gitlink vs measurement/) -> Merge mechanisch konfliktfrei; [skip ci] auch im Merge-Commit.
++        # Pfade disjunkt (Gitlinks + measurement/thesis_compiles/<TS>-<kennung>/ hier gegen
++        # measurement/<RUN_TS>/ beim Schwester-Job; die Lauf-Kennung traegt Runner+Job, also kann
++        # auch kein zweiter anhang:forward denselben Ordnernamen waehlen)
++        # -> Merge mechanisch konfliktfrei; [skip ci] auch im Merge-Commit.
+         if ! git merge --no-edit -m "Merge origin/$CI_COMMIT_BRANCH in anhang-forward-gitlink [skip ci]" "origin/$CI_COMMIT_BRANCH"; then
+           git merge --abort || true
+           echo "UNerwarteter Merge-Konflikt (Versuch $attempt) -> echter Bug, Abbruch (kein --force)" >&2; exit 1
